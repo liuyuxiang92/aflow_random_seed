@@ -12,11 +12,19 @@
 //#include "aflow.h"
 using std::ostream;
 
+#define VERBOSE_XOPTION false //DX20200907
+
 namespace aurostd {
   // ***************************************************************************
 
   // constructure
-  xoption::xoption() {
+  xoption::xoption() {free();}  //CO20200624 - moved to free()
+
+  // destructor
+  xoption::~xoption() {free();} //CO20200624 - moved to free()
+
+  // free
+  void xoption::free() {
     keyword=""; //DX20180824 - missing from constructor
     isentry=FALSE; 
     content_string="";
@@ -29,16 +37,6 @@ namespace aurostd {
     vxscheme.clear();
     vxsghost.clear();
     preserved=FALSE;
-    LDEBUG=FALSE;
-  }
-
-  // destructor
-  xoption::~xoption() {
-    free();
-  }
-
-  // free
-  void xoption::free() {
   }
 
   // copy fuction
@@ -55,7 +53,6 @@ namespace aurostd {
     vxscheme.clear();for(uint i=0;i<b.vxscheme.size();i++) vxscheme.push_back(b.vxscheme.at(i));
     vxsghost.clear();for(uint i=0;i<b.vxsghost.size();i++) vxsghost.push_back(b.vxsghost.at(i));
     preserved=b.preserved;
-    LDEBUG=b.LDEBUG;
   }
 
   // copy conctructor
@@ -80,28 +77,30 @@ namespace aurostd {
   }
 
   void xoption::clear() {
-    xoption aflow_option_temp;
-    copy(aflow_option_temp);
+    //[CO20200624 - creating objects is SLOW]xoption aflow_option_temp;
+    //[CO20200624 - creating objects is SLOWcopy(aflow_option_temp);
+    free();
   }
 
   // **************************************************************************
   void xoption::options2entry(string options_FILE,string input_keyword,int _option_DEFAULT,string xscheme_DEFAULT) {
+    bool VERBOSE=(FALSE || VERBOSE_XOPTION); //DX20200907 - LDEBUG to VERBOSE; decouple from XHOST.DEBUG;
+    string soliloquy=XPID+"aurostd::xoption::options2entry():";
     clear();
-    LDEBUG=FALSE;
     bool option_DEFAULT=FALSE; 
     if(_option_DEFAULT==0) option_DEFAULT=FALSE; // it is a int.. it might be -1
     if(_option_DEFAULT==1) option_DEFAULT=TRUE; // it is a int.. it might be -1
     isentry=option_DEFAULT;option=option_DEFAULT;content_string=xscheme_DEFAULT;xscheme=xscheme_DEFAULT;preserved=FALSE;   // DEFAULT
-    if(LDEBUG) cerr << "DEBUG - aurostd::xoption::options2entry: BEGIN " << endl;
-    if(LDEBUG) cerr << "DEBUG - aurostd::xoption::options2entry: input_keyword=\"" << input_keyword << "\"" << endl;
-    if(LDEBUG) cerr << "DEBUG - aurostd::xoption::options2entry: option_DEFAULT=" << (option_DEFAULT?"TRUE":"FALSE") << endl;
-    if(LDEBUG) cerr << "DEBUG - aurostd::xoption::options2entry: xscheme_DEFAULT=\"" << xscheme_DEFAULT << "\"" << endl;
+    if(VERBOSE) cerr << "DEBUG - " << soliloquy << " BEGIN " << endl;
+    if(VERBOSE) cerr << "DEBUG - " << soliloquy << " input_keyword=\"" << input_keyword << "\"" << endl;
+    if(VERBOSE) cerr << "DEBUG - " << soliloquy << " option_DEFAULT=" << (option_DEFAULT?"TRUE":"FALSE") << endl;
+    if(VERBOSE) cerr << "DEBUG - " << soliloquy << " xscheme_DEFAULT=\"" << xscheme_DEFAULT << "\"" << endl;
     // start the scan
     //string keyword; //CO20180404 - now a member of the object
     vector<string> vkeyword;
     // tokenize the option
     aurostd::string2tokens(input_keyword,vkeyword,"|"); 
-    if(LDEBUG) for(uint i=0;i<vkeyword.size();i++) cerr << "\"" << vkeyword.at(i) << "\"" << endl;
+    if(VERBOSE) for(uint i=0;i<vkeyword.size();i++) cerr << "\"" << vkeyword.at(i) << "\"" << endl;
     // loop through the scan
     if(vkeyword.size()>0) {
       // some default
@@ -110,7 +109,7 @@ namespace aurostd {
         if(aurostd::substring2bool(options_FILE,vkeyword.at(i),TRUE))
           keyword=vkeyword.at(i);
       // found one keyword
-      if(LDEBUG) cerr << "DEBUG - aurostd::xoption::options2entry: keyword=\"" << keyword << "\"" << endl;
+      if(VERBOSE) cerr << "DEBUG - " << soliloquy << " keyword=\"" << keyword << "\"" << endl;
       // LOOK FOR EXIST/!EXIST ENTRY
       if(_option_DEFAULT==aurostd_xoptionONOFF) {
         isentry=aurostd::substring2bool(options_FILE,keyword,TRUE);
@@ -119,13 +118,14 @@ namespace aurostd {
       } // aurostd_xoptionONOFF exit/~exit
       // LOOK FOR ON/OFF MODE WITH strings/schemes.
       if(_option_DEFAULT==0 || _option_DEFAULT==1) {
-        if(LDEBUG) cerr << "DEBUG - aurostd::xoption::options2entry: LOOK FOR ON/OFF MODE WITH strings/schemes" << endl;
+        if(VERBOSE) cerr << "DEBUG - " << soliloquy << " LOOK FOR ON/OFF MODE WITH strings/schemes" << endl;
         // start the scan
         isentry=aurostd::substring2bool(options_FILE,keyword,TRUE);
         if(isentry && xscheme_DEFAULT.empty()) {
           content_string=aurostd::RemoveWhiteSpaces(aurostd::substring2string(options_FILE,keyword,FALSE));
+          if(content_string.empty()){content_string=aurostd::RemoveWhiteSpaces(aurostd::substring2string(options_FILE,keyword,TRUE));}  //CO20200731 - "[AFLOW]SYSTEM=" vs. "[AFLOW] SYSTEM = "
           string saus=content_string;content_string="";
-          if(LDEBUG) cerr << "DEBUG - aurostd::xoption::options2entry: found saus=" << saus << endl;
+          if(VERBOSE) cerr << "DEBUG - " << soliloquy << " found saus=" << saus << endl;
           vector<string> tokens;aurostd::string2tokens(saus,tokens,",");
           for(uint i=0;i<tokens.size();i++) { //      c<< tokens.at(i) << endl;
             if(tokens.at(i)=="ON" || tokens.at(i)[0]=='T' || tokens.at(i)[0]=='t' || tokens.at(i)[0]=='1' || tokens.at(i)[0]=='Y' || tokens.at(i)[0]=='y') {
@@ -139,11 +139,12 @@ namespace aurostd {
           }
         }
         // SCHEME MODE
-        if(LDEBUG) cerr << "DEBUG - aurostd::xoption::options2entry: xscheme_DEFAULT=\"" << xscheme_DEFAULT << "\"" << endl;
-        if(LDEBUG) cerr << "DEBUG - aurostd::xoption::options2entry: xscheme_DEFAULT.empty()=" << xscheme_DEFAULT.empty() << endl;
+        if(VERBOSE) cerr << "DEBUG - " << soliloquy << " xscheme_DEFAULT=\"" << xscheme_DEFAULT << "\"" << endl;
+        if(VERBOSE) cerr << "DEBUG - " << soliloquy << " xscheme_DEFAULT.empty()=" << xscheme_DEFAULT.empty() << endl;
         if(isentry && !xscheme_DEFAULT.empty()) {
-          if(LDEBUG) cerr << "DEBUG - aurostd::xoption::options2entry: SCHEME MODE" << endl;
+          if(VERBOSE) cerr << "DEBUG - " << soliloquy << " SCHEME MODE" << endl;
           content_string=aurostd::RemoveWhiteSpaces(aurostd::substring2string(options_FILE,keyword,FALSE));
+          if(content_string.empty()){content_string=aurostd::RemoveWhiteSpaces(aurostd::substring2string(options_FILE,keyword,TRUE));}  //CO20200731 - "[AFLOW]SYSTEM=" vs. "[AFLOW] SYSTEM = "
           //ME20181030 - Special case: if the scheme is a Boolean keyword, unset option
           //ME20190107 - Cannot use N or F because it's ambiguous (nitrogen, fluorine)
           string content = aurostd::toupper(content_string);
@@ -154,8 +155,9 @@ namespace aurostd {
           }
         }
         if(isentry && (xscheme_DEFAULT.empty() && content_string.empty())) {
-          if(LDEBUG) cerr << "DEBUG - aurostd::xoption::options2entry: SCHEME MODE EMPTY DEFAULT STILL EMPTY CONTENT" << endl;
+          if(VERBOSE) cerr << "DEBUG - " << soliloquy << " SCHEME MODE EMPTY DEFAULT STILL EMPTY CONTENT" << endl;
           content_string=aurostd::RemoveWhiteSpaces(aurostd::substring2string(options_FILE,keyword,FALSE));
+          if(content_string.empty()){content_string=aurostd::RemoveWhiteSpaces(aurostd::substring2string(options_FILE,keyword,TRUE));}  //CO20200731 - "[AFLOW]SYSTEM=" vs. "[AFLOW] SYSTEM = "
           option=isentry;
         }
         if(!isentry && option_DEFAULT) {
@@ -174,7 +176,7 @@ namespace aurostd {
             aurostd::StringSubst(strcheck,";",",");
             aurostd::string2tokens(strcheck,vstrcheck,","); 
             for(uint j=0;j<vstrcheck.size();j++) {
-              if(LDEBUG) cerr << "DEBUG - aurostd::xoption::options2entry: BEFORE keyword=" << keyword << "   " << "vstrcheck.at(j)=" << vstrcheck.at(j) << endl;
+              if(VERBOSE) cerr << "DEBUG - " << soliloquy << " BEFORE keyword=" << keyword << "   " << "vstrcheck.at(j)=" << vstrcheck.at(j) << endl;
               if(aurostd::substring2bool(keyword,"KPOINTS")) {
                 if(vstrcheck.at(j)=="A") vstrcheck.at(j)="AUTO";
                 if(vstrcheck.at(j)=="G") vstrcheck.at(j)="GAMMA";
@@ -212,7 +214,7 @@ namespace aurostd {
                 if(vstrcheck.at(j)=="PRES") vstrcheck.at(j)="PRESERVE";
                 if(vstrcheck.at(j)=="PRESERVE") vstrcheck.at(j)="PRESERVE";
               }	
-              if(LDEBUG) cerr << "DEBUG - aurostd::xoption::options2entry: AFTER keyword=" << keyword << "   " << "vstrcheck.at(j)=" << vstrcheck.at(j) << endl;
+              if(VERBOSE) cerr << "DEBUG - " << soliloquy << " AFTER keyword=" << keyword << "   " << "vstrcheck.at(j)=" << vstrcheck.at(j) << endl;
               vcontent.push_back(vstrcheck.at(j));
             }
           }
@@ -228,37 +230,29 @@ namespace aurostd {
     content_uint=aurostd::string2utype<uint>(content_string);
     xscheme=content_string;
     aurostd::string2tokens(xscheme,vxscheme,","); 
-    if(LDEBUG) if(_option_DEFAULT==aurostd_xoptionMULTI) for(uint i=0;i<vxscheme.size();i++) cerr << "DEBUG - aurostd::xoption::options2entry: vxscheme.at(" << i << ")=" << vxscheme.at(i) << endl;
+    if(VERBOSE) if(_option_DEFAULT==aurostd_xoptionMULTI) for(uint i=0;i<vxscheme.size();i++) cerr << "DEBUG - " << soliloquy << " vxscheme.at(" << i << ")=" << vxscheme.at(i) << endl;
 
     preserved=FALSE;
     for(uint i=0;i<vxscheme.size()&&!preserved;i++) preserved=(vxscheme.at(i)=="PRESERVED");
-    if(LDEBUG) cerr << "DEBUG - aurostd::xoption::options2entry: isentry=" << (isentry?"TRUE":"FALSE") << endl;
-    if(LDEBUG) cerr << "DEBUG - aurostd::xoption::options2entry: content_string=\"" << content_string << "\"" << endl;
-    if(LDEBUG) cerr << "DEBUG - aurostd::xoption::options2entry: content_double=\"" << content_double << "\"" << endl;
-    if(LDEBUG) cerr << "DEBUG - aurostd::xoption::options2entry: content_int=\"" << content_int << "\"" << endl;
-    if(LDEBUG) cerr << "DEBUG - aurostd::xoption::options2entry: content_uint=\"" << content_uint << "\"" << endl;
-    if(LDEBUG) cerr << "DEBUG - aurostd::xoption::options2entry: option=" << (option?"TRUE":"FALSE") << endl;
-    if(LDEBUG) cerr << "DEBUG - aurostd::xoption::options2entry: preserved=" << (preserved?"TRUE":"FALSE") << endl;
-    if(LDEBUG) cerr << "DEBUG - aurostd::xoption::options2entry: xscheme=" << xscheme << endl << endl;
+    if(VERBOSE) cerr << "DEBUG - " << soliloquy << " isentry=" << (isentry?"TRUE":"FALSE") << endl;
+    if(VERBOSE) cerr << "DEBUG - " << soliloquy << " content_string=\"" << content_string << "\"" << endl;
+    if(VERBOSE) cerr << "DEBUG - " << soliloquy << " content_double=\"" << content_double << "\"" << endl;
+    if(VERBOSE) cerr << "DEBUG - " << soliloquy << " content_int=\"" << content_int << "\"" << endl;
+    if(VERBOSE) cerr << "DEBUG - " << soliloquy << " content_uint=\"" << content_uint << "\"" << endl;
+    if(VERBOSE) cerr << "DEBUG - " << soliloquy << " option=" << (option?"TRUE":"FALSE") << endl;
+    if(VERBOSE) cerr << "DEBUG - " << soliloquy << " preserved=" << (preserved?"TRUE":"FALSE") << endl;
+    if(VERBOSE) cerr << "DEBUG - " << soliloquy << " xscheme=" << xscheme << endl << endl;
     if(isentry && content_string.empty()) {
-      // check for errors
-      cerr << "ERROR - aurostd::xoption::options2entry: content_string=" <<  content_string << endl;
-      cerr << "ERROR - aurostd::xoption::options2entry: content_double=" <<  content_double << endl;
-      cerr << "ERROR - aurostd::xoption::options2entry: content_int=" <<  content_int << endl;
-      cerr << "ERROR - aurostd::xoption::options2entry: content_uint=" <<  content_uint << endl;
-      cerr << "ERROR - aurostd::xoption::options2entry: keyword=" << keyword  << endl;
-      cerr << "ERROR - aurostd::xoption::options2entry: isentry=" << isentry  << endl;
-      // check for errors
-      cout << "ERROR - aurostd::xoption::options2entry: content_string=" <<  content_string << endl;
-      cout << "ERROR - aurostd::xoption::options2entry: content_double=" <<  content_double << endl;
-      cout << "ERROR - aurostd::xoption::options2entry: content_int=" <<  content_int << endl;
-      cout << "ERROR - aurostd::xoption::options2entry: content_uint=" <<  content_uint << endl;
-      cout << "ERROR - aurostd::xoption::options2entry: keyword=" << keyword  << endl;
-      cout << "ERROR - aurostd::xoption::options2entry: isentry=" << isentry  << endl;
-      exit(0);
+      stringstream message;
+      message << "Content string empty. content_string=" <<  content_string
+              << ", content_double=" <<  content_double
+              << ", content_int=" <<  content_int
+              << ", content_uint=" << content_uint
+              << ", keyword=" << keyword
+              << ", isentry=" << isentry;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _RUNTIME_ERROR_);
     }
-    if(LDEBUG) cerr << "DEBUG - aurostd::xoption::options2entry: END" << endl;
-    //  exit(0);
+    if(VERBOSE) cerr << "DEBUG - " << soliloquy << " END" << endl;
     // return isentry;
   }
 
@@ -335,25 +329,26 @@ namespace aurostd {
   uint xoption::pop(string _xscheme)         { return opscheme(_xscheme,FALSE); }
 
   uint xoption::opscheme(string _xscheme,bool operation) {
+    bool VERBOSE=(FALSE || VERBOSE_XOPTION); //DX20200907 - LDEBUG to VERBOSE; decouple from XHOST.DEBUG;
     if(operation==TRUE) {
-      if(LDEBUG) cerr << "DEBUG - aurostd::xoption::opscheme: ADD=" << aurostd::toupper(_xscheme) << endl;
-      if(LDEBUG) for(uint i=0;i<vxscheme.size();i++) cerr << "DEBUG - aurostd::xoption::opscheme: ADD_BEFORE vxscheme.at(" << i << ")=" << vxscheme.at(i) << endl;
+      if(VERBOSE) cerr << "DEBUG - aurostd::xoption::opscheme: ADD=" << aurostd::toupper(_xscheme) << endl;
+      if(VERBOSE) for(uint i=0;i<vxscheme.size();i++) cerr << "DEBUG - aurostd::xoption::opscheme: ADD_BEFORE vxscheme.at(" << i << ")=" << vxscheme.at(i) << endl;
       //CO20181226 START - check that it doesn't already exist, multiples don't affect isscheme, but affects how we iterate through aplopts
       for(uint i=0;i<vxscheme.size();i++){
         if(aurostd::toupper(vxscheme.at(i))==aurostd::toupper(_xscheme)){opscheme(_xscheme,FALSE);} //recursion is GNU's pleasure
       }
       //CO20181226 STOP
       vxscheme.push_back(aurostd::toupper(_xscheme));
-      if(LDEBUG) for(uint i=0;i<vxscheme.size();i++) cerr << "DEBUG - aurostd::xoption::opscheme: ADD_BEFORE vxscheme.at(" << i << ")=" << vxscheme.at(i) << endl;
+      if(VERBOSE) for(uint i=0;i<vxscheme.size();i++) cerr << "DEBUG - aurostd::xoption::opscheme: ADD_BEFORE vxscheme.at(" << i << ")=" << vxscheme.at(i) << endl;
     } else {
-      if(LDEBUG) cerr << "DEBUG - aurostd::xoption::opscheme: PURGE=" << aurostd::toupper(_xscheme) << endl;
-      if(LDEBUG) for(uint i=0;i<vxscheme.size();i++) cerr << "DEBUG - aurostd::xoption::opscheme: PURGE_BEFORE vxscheme.at(" << i << ")=" << vxscheme.at(i) << endl;
+      if(VERBOSE) cerr << "DEBUG - aurostd::xoption::opscheme: PURGE=" << aurostd::toupper(_xscheme) << endl;
+      if(VERBOSE) for(uint i=0;i<vxscheme.size();i++) cerr << "DEBUG - aurostd::xoption::opscheme: PURGE_BEFORE vxscheme.at(" << i << ")=" << vxscheme.at(i) << endl;
       vector<string> _vxscheme(vxscheme);
       vxscheme.clear();
       for(uint i=0;i<_vxscheme.size();i++) {
         if(aurostd::toupper(_vxscheme.at(i))!=aurostd::toupper(_xscheme)) vxscheme.push_back(_vxscheme.at(i));
       }
-      if(LDEBUG) for(uint i=0;i<vxscheme.size();i++) cerr << "DEBUG - aurostd::xoption::opscheme: PURGE_AFTER vxscheme.at(" << i << ")=" << vxscheme.at(i) << endl;
+      if(VERBOSE) for(uint i=0;i<vxscheme.size();i++) cerr << "DEBUG - aurostd::xoption::opscheme: PURGE_AFTER vxscheme.at(" << i << ")=" << vxscheme.at(i) << endl;
     }
     refresh();
     return vxscheme.size();
@@ -394,23 +389,25 @@ namespace aurostd {
     return FALSE;   //SC20200114
   }   //SC20200114
 
-  string xoption::getattachedscheme(string xscheme) const {
+  string xoption::getattachedscheme(const string& xscheme) const {
+    bool VERBOSE=(FALSE || VERBOSE_XOPTION); //DX20200907 - LDEBUG to VERBOSE; decouple from XHOST.DEBUG;
     if(vxsghost.size()==0) return "";
     for(uint i=0;i<vxsghost.size()-1;i+=2) {
-      if(LDEBUG) cerr << i << " --- [" << aurostd::toupper(xscheme) << "] --- [" << aurostd::toupper(vxsghost.at(i)) << "] --- [" << aurostd::toupper(vxsghost.at(i+1)) << "]" << endl;
+      if(VERBOSE) cerr << i << " --- [" << aurostd::toupper(xscheme) << "] --- [" << aurostd::toupper(vxsghost.at(i)) << "] --- [" << aurostd::toupper(vxsghost.at(i+1)) << "]" << endl;
       if(aurostd::toupper(xscheme)==aurostd::toupper(vxsghost.at(i))) 
         return vxsghost.at(i+1);
     }
     return "";
   }
-  template<class utype> utype xoption::getattachedutype(string xscheme) {
+  template<class utype> utype xoption::getattachedutype(const string& xscheme) const { //CO20200731
     return aurostd::string2utype<utype>(getattachedscheme(xscheme));
   }
 
   uint xoption::opattachedscheme(string _xscheme,string attached,bool operation) {
+    bool VERBOSE=(FALSE || VERBOSE_XOPTION); //DX20200907 - LDEBUG to VERBOSE; decouple from XHOST.DEBUG;
     if(operation==TRUE) {
-      if(LDEBUG) cerr << "DEBUG - aurostd::xoption::opattachedscheme: ADD=" << aurostd::toupper(_xscheme) << endl;
-      if(LDEBUG) cerr << "DEBUG - aurostd::xoption::opattachedscheme: GHOST=" << attached << endl;
+      if(VERBOSE) cerr << "DEBUG - aurostd::xoption::opattachedscheme: ADD=" << aurostd::toupper(_xscheme) << endl;
+      if(VERBOSE) cerr << "DEBUG - aurostd::xoption::opattachedscheme: GHOST=" << attached << endl;
       //CO20181226 START - check that it doesn't already exist, multiples affect getattachedscheme
       for(uint i=0;i<vxsghost.size();i+=2) {
         if(aurostd::toupper(vxsghost.at(i))==aurostd::toupper(_xscheme)) {opattachedscheme(_xscheme,attached,FALSE);} //recursion is GNU's pleasure
@@ -419,7 +416,7 @@ namespace aurostd {
       vxsghost.push_back(aurostd::toupper(_xscheme));
       vxsghost.push_back(attached);
     }  else {
-      if(LDEBUG) cerr << "DEBUG - aurostd::xoption::opattachedscheme: PURGE=" << aurostd::toupper(_xscheme) << endl;
+      if(VERBOSE) cerr << "DEBUG - aurostd::xoption::opattachedscheme: PURGE=" << aurostd::toupper(_xscheme) << endl;
       vector<string> _vxsghost(vxsghost);
       vxsghost.clear();
       for(uint i=0;i<_vxsghost.size();i+=2) {
@@ -427,7 +424,7 @@ namespace aurostd {
           vxsghost.push_back(_vxsghost.at(i));vxsghost.push_back(_vxsghost.at(i+1));
         }
       }
-      if(LDEBUG) for(uint i=0;i<vxsghost.size();i++) cerr << "PURGEATTACHED_AFTER vxsghost.at(" << i << ")=" << vxsghost.at(i) << endl;
+      if(VERBOSE) for(uint i=0;i<vxsghost.size();i++) cerr << "PURGEATTACHED_AFTER vxsghost.at(" << i << ")=" << vxsghost.at(i) << endl;
     } 
     refresh();
     return vxsghost.size();
@@ -456,12 +453,12 @@ namespace aurostd {
   }
 
   bool xoption::args2addattachedscheme(vector<string> &argv,vector<string> &cmds,const string xscheme,const string& _s_search,string string_default) {
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool VERBOSE=(FALSE || VERBOSE_XOPTION); //DX20200907 - LDEBUG to VERBOSE; decouple from XHOST.DEBUG;
     string s_search(_s_search);
     if(aurostd::args2attachedflag(argv,cmds,s_search)) {
       flag(xscheme,TRUE);
       addattachedscheme(xscheme,aurostd::args2attachedstring(argv,s_search,string_default),TRUE);
-      if(LDEBUG) cerr << "DEBUG - aurostd::xoption::args2addscheme: xscheme=" << xscheme << " s_search=" << s_search << " attached=" << aurostd::args2attachedstring(argv,s_search,string_default) << endl;
+      if(VERBOSE) cerr << "DEBUG - aurostd::xoption::args2addscheme: xscheme=" << xscheme << " s_search=" << s_search << " attached=" << aurostd::args2attachedstring(argv,s_search,string_default) << endl;
       return TRUE;
     } 
     aurostd::StringSubst(s_search,"=","");
@@ -469,9 +466,9 @@ namespace aurostd {
       //    cerr << aurostd::args2string(argv,s_search,string_default) << endl;
       flag(xscheme,TRUE);
       // [OBSOLETE]      addattachedscheme(xscheme,string_default,TRUE);
-      // [OBSOLETE] if(LDEBUG) cerr << "DEBUG - aurostd::xoption::args2addscheme: xscheme=" << xscheme << " s_search=" << s_search << " taking=" << string_default << endl;
+      // [OBSOLETE] if(VERBOSE) cerr << "DEBUG - aurostd::xoption::args2addscheme: xscheme=" << xscheme << " s_search=" << s_search << " taking=" << string_default << endl;
       addattachedscheme(xscheme,aurostd::args2string(argv,s_search,string_default),TRUE);
-      if(LDEBUG) cerr << "DEBUG - aurostd::xoption::args2addscheme: xscheme=" << xscheme << " s_search=" << s_search << " taking=" << aurostd::args2string(argv,s_search,string_default) << endl;
+      if(VERBOSE) cerr << "DEBUG - aurostd::xoption::args2addscheme: xscheme=" << xscheme << " s_search=" << s_search << " taking=" << aurostd::args2string(argv,s_search,string_default) << endl;
       return TRUE;
     }
     return FALSE;

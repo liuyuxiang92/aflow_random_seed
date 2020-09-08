@@ -111,9 +111,10 @@ namespace compare {
     // ---------------------------------------------------------------------------
     // FLAG: usage
     if(vpflow.flag("COMPARE_PERMUTATION::USAGE")) {
-      stringstream ss_usage;
-      init::ErrorOption(ss_usage,vpflow.getattachedscheme("COMPARE_PERMUTATION"),"compare::comparePermutations()",aurostd::liststring2string(usage,options));
-      return ss_usage.str();
+      //[CO20200624 - OBSOLETE]stringstream ss_usage;
+      //[CO20200624 - OBSOLETE]init::ErrorOption(ss_usage,vpflow.getattachedscheme("COMPARE_PERMUTATION"),"compare::comparePermutations()",aurostd::liststring2string(usage,options));
+      //[CO20200624 - OBSOLETE]return ss_usage.str();
+      init::ErrorOption(vpflow.getattachedscheme("COMPARE_PERMUTATION"),"compare::comparePermutations()",aurostd::liststring2string(usage,options));
     }
 
     // ---------------------------------------------------------------------------
@@ -219,7 +220,7 @@ namespace compare{
         deque<uint> reduced_stoichiometry_uint; for(uint i=0;i<reduced_stoichiometry.size(); i++){ reduced_stoichiometry_uint.push_back((uint)reduced_stoichiometry[i]); } //DX20191125
         generatePermutationString(reduced_stoichiometry_uint, unique_permutations); //DX20190508
         if(format=="text"){ //DX20190506
-          ss_output << "Unique permutations (" << unique_permutations.size() << "): " << endl; 
+          ss_output << "Unique atom decorations (" << unique_permutations.size() << "): " << endl; 
           ss_output << " " << aurostd::joinWDelimiter(unique_permutations,"\n ") << endl;
         }
         if(format=="json"){ //DX20190506
@@ -237,8 +238,8 @@ namespace compare{
     StructurePrototype structure;
     structure.structure_representative = xstr;
     structure.structure_representative_name = "input geometry";
-    structure.stoichiometry = compare::getStoichiometry(xstr,true);
-    structure.elements = compare::getElements(xstr);
+    structure.stoichiometry = xstr.GetReducedComposition(false);
+    structure.elements = xstr.GetElements(true,true); // true: clean names
     // update xstructure species
     if(structure.structure_representative.species.size()==0){
       deque<string> deque_species; for(uint j=0;j<structure.elements.size();j++){deque_species.push_back(structure.elements[j]);}
@@ -250,13 +251,13 @@ namespace compare{
     structure.structure_representative_relaxation_step = 0; //DX20200429 input is assumed to be unrelaxed
 
     // ---------------------------------------------------------------------------
-    // get the unique permutations for the structure
+    // get the unique atom decorations for the structure
     vector<StructurePrototype> final_permutations = compare::comparePermutations(structure,num_proc,optimize_match,oss,FileMESSAGE); //DX20190319 - added FileMESSAGE
 
     // ---------------------------------------------------------------------------
     // print results
     if(format=="text"){ //DX20190506
-      ss_output << "Unique permutations (" << final_permutations.size() << "): " << endl; 
+      ss_output << "Unique atom decorations (" << final_permutations.size() << "): " << endl; 
 
       for(uint j=0;j<final_permutations.size();j++){
         ss_output << " " << final_permutations[j].structure_representative_name;
@@ -303,7 +304,7 @@ namespace compare{
     }
 
     // ---------------------------------------------------------------------------
-    // store unique permutations in vector
+    // store unique atom decorations in vector
     for(uint j=0;j<final_permutations.size();j++){
       unique_permutations.push_back(final_permutations[j].structure_representative_name);
     }
@@ -338,20 +339,23 @@ namespace compare {
     // ---------------------------------------------------------------------------
     // FLAG: usage
     if(vpflow.flag("COMPARE_STRUCTURE::USAGE")) {
-      stringstream ss_usage;
+      //[CO20200624 - OBSOLETE]stringstream ss_usage;
       // material-type comparisons
       if(vpflow.flag("COMPARE_MATERIAL_DIRECTORY")){
         string usage_material_comparison="aflow --compare_materials -D <dir_path>";
         string options_material_comparison="[--usage] [--np=|--num_proc=<number>] [--optimize_match] [--no_scale_volume] [--ignore_symmetry] [--ignore_Wyckoff]";
-        init::ErrorOption(ss_usage,vpflow.getattachedscheme("COMPARE_STRUCTURE"),"compare::compareMultipleStructures()",aurostd::liststring2string(usage_material_comparison,options_material_comparison));
+        //[CO20200624 - OBSOLETE]init::ErrorOption(ss_usage,vpflow.getattachedscheme("COMPARE_STRUCTURE"),"compare::compareMultipleStructures()",aurostd::liststring2string(usage_material_comparison,options_material_comparison));
+        init::ErrorOption(vpflow.getattachedscheme("COMPARE_STRUCTURE"),"compare::compareMultipleStructures()",aurostd::liststring2string(usage_material_comparison,options_material_comparison));
       }
       // structure-type comparisons
       else if(vpflow.flag("COMPARE_STRUCTURE_DIRECTORY")){
         string usage_structure_comparison="aflow --compare_structures -D <dir_path>";
         string options_structure_comparison="[--usage] [--np=|--num_proc=<number>] [--optimize_match] [--no_scale_volume] [--ignore_symmetry] [--ignore_Wyckoff] [--remove_duplicates|--remove_duplicate_compounds]";
-        init::ErrorOption(ss_usage,vpflow.getattachedscheme("COMPARE_STRUCTURE"),"compare::compareMultipleStructures()",aurostd::liststring2string(usage_structure_comparison,options_structure_comparison));
+        //[CO20200624 - OBSOLETE]init::ErrorOption(ss_usage,vpflow.getattachedscheme("COMPARE_STRUCTURE"),"compare::compareMultipleStructures()",aurostd::liststring2string(usage_structure_comparison,options_structure_comparison));
+        init::ErrorOption(vpflow.getattachedscheme("COMPARE_STRUCTURE"),"compare::compareMultipleStructures()",aurostd::liststring2string(usage_structure_comparison,options_structure_comparison));
       }
-      return ss_usage.str();
+      //[CO20200624 - OBSOLETE]return ss_usage.str();
+      return "";
     }
 
     // ---------------------------------------------------------------------------
@@ -390,7 +394,7 @@ namespace compare {
     else if(structures_source=="directory") {
       directory=vpflow.getattachedscheme("COMPARE_STRUCTURE::DIRECTORY");
       if(!aurostd::FileExist(directory)) {
-        message << "Unable to locate directory: " << directory << ". Exiting." << endl;
+        message << "Unable to locate directory: " << directory << "." << endl;
         pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_ERROR_);
         return oss.str();
       }
@@ -402,7 +406,7 @@ namespace compare {
     else if(structures_source=="file") {
       filename=vpflow.getattachedscheme("COMPARE_STRUCTURE::FILE");
       if(!aurostd::FileExist(filename)) {
-        message << "Unable to locate file: " << filename << ". Exiting." << endl;
+        message << "Unable to locate file: " << filename << "." << endl;
         pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_ERROR_);
         return oss.str();
       }
@@ -410,7 +414,7 @@ namespace compare {
       pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     }
     else {
-      message << "Need to specify location of structures to compare: -D <directory> or -F=<filename>. Exiting." << endl;
+      message << "Need to specify location of structures to compare: -D <directory> or -F=<filename>." << endl;
       pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_ERROR_);
     }
 
@@ -525,10 +529,10 @@ namespace compare {
     }
 
     // ---------------------------------------------------------------------------
-    // FLAG: do not calculate unique permutations 
+    // FLAG: do not calculate unique atom decorations 
     if(vpflow.flag("COMPARE_STRUCTURE::DO_NOT_CALCULATE_UNIQUE_PERMUTATIONS")) {
       comparison_options.flag("COMPARISON_OPTIONS::CALCULATE_UNIQUE_PERMUTATIONS",FALSE);
-      message << "OPTIONS: Do not calculate unique permutations."; 
+      message << "OPTIONS: Do not calculate unique atom decorations."; 
       pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     }
 
@@ -736,12 +740,13 @@ namespace compare {
 
     // ---------------------------------------------------------------------------
     // stoichiometry
-    vector<uint> stoichiometry = compare::getStoichiometry(xstr,true);
+    vector<uint> stoichiometry = xstr.GetReducedComposition(true);
 
     // ---------------------------------------------------------------------------
     // symmetry
     if(xstr.space_group_ITC<1 || xstr.space_group_ITC>230){ // don't recalculate symmetry if already calculated 
-      xstr.SpaceGroup_ITC();
+      double use_tol = SYM::defaultTolerance(xstr); //DX20200821
+      xstr.SpaceGroup_ITC(use_tol, SG_SETTING_ANRL); //DX20200821 - added ANRL setting
     }
     vector<GroupedWyckoffPosition> grouped_Wyckoff_positions;
     compare::groupWyckoffPositions(xstr, grouped_Wyckoff_positions);
@@ -775,7 +780,7 @@ namespace compare {
     vpflow.push_attached("COMPARE2PROTOTYPES::CATALOG",catalog); 
 
     // ---------------------------------------------------------------------------
-    // do not calculate unique permutations
+    // do not calculate unique atom decorations
     vpflow.flag("COMPARE2PROTOTYPES::DO_NOT_CALCULATE_UNIQUE_PERMUTATIONS",TRUE);
 
     // ---------------------------------------------------------------------------
@@ -928,7 +933,7 @@ namespace compare {
       catalog=aurostd::tolower(vpflow.getattachedscheme("COMPARE2PROTOTYPES::CATALOG"));
       if(catalog!="htqc" && catalog!="anrl" && catalog!="all"){
         message << "Catalog/library can only be htqc, anrl, or all.";     
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_INPUT_ILLEGAL_); //DX20191031 - exit to xerror
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_INPUT_ILLEGAL_);
       }
       message << "OPTIONS: Catalog/library (htqc, anrl, or all): " << catalog << endl; 
       pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
@@ -970,10 +975,10 @@ namespace compare {
     }
 
     // ---------------------------------------------------------------------------
-    // FLAG: do not calculate unique permutations 
+    // FLAG: do not calculate unique atom decorations
     if(vpflow.flag("COMPARE2PROTOTYPES::DO_NOT_CALCULATE_UNIQUE_PERMUTATIONS")) {
       comparison_options.flag("COMPARISON_OPTIONS::CALCULATE_UNIQUE_PERMUTATIONS",FALSE);
-      message << "OPTIONS: Do not calculate unique permutations."; 
+      message << "OPTIONS: Do not calculate unique atom decorations."; 
       pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     }
 
@@ -990,9 +995,9 @@ namespace compare {
     StructurePrototype input_structure;
     input_structure.structure_representative = xstr;
     input_structure.structure_representative_name = "input geometry";
-    input_structure.stoichiometry = compare::getStoichiometry(xstr,true); //true preserves the stoich order for the structure
-    input_structure.elements = compare::getElements(xstr);
-    input_structure.structure_representative_compound = compare::getCompoundName(xstr);
+    input_structure.stoichiometry = xstr.GetReducedComposition(); //preserves the stoich order for the structure
+    input_structure.elements = xstr.GetElements(true,true); // true: clean names
+    input_structure.structure_representative_compound = pflow::prettyPrintCompound(input_structure.elements,input_structure.stoichiometry,no_vrt,false,txt_ft);
     input_structure.structure_representative_generated = true;
     stringstream ss_input; ss_input << xstr;
     input_structure.structure_representative_source = ss_input.str();
@@ -1118,9 +1123,9 @@ namespace compare {
     comparison_schemes.clear();
 
     // ---------------------------------------------------------------------------
-    // get unique permutations 
+    // get unique atom decorations
     if(comparison_options.flag("COMPARISON_OPTIONS::CALCULATE_UNIQUE_PERMUTATIONS")){
-      message << "Identifying unique permutations for representative structures ...";
+      message << "Identifying unique atom decorations for representative structures ...";
       pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
 
       for(uint i=0;i<final_prototypes.size();i++){
@@ -1128,11 +1133,11 @@ namespace compare {
         if(!final_prototypes[i].structure_representative_generated){
           if(!compare::generateStructure(final_prototypes[i].structure_representative_name,final_prototypes[i].structure_representative_source,final_prototypes[i].structure_representative_relaxation_step,final_prototypes[i].structure_representative,oss)){ //DX20200429
             message << "Could not generate structure (" << final_prototypes[i].structure_representative_name << ").";
-            throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_RUNTIME_ERROR_); //DX20191031 - exit to xerror
+            throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_RUNTIME_ERROR_);
           }
         }        
         if(LDEBUG){ //DX20190601 - added LDEBUG
-          cerr << "Finding unique permutations for " << final_prototypes[i].structure_representative_name << ".";
+          cerr << "Finding unique atom decorations for " << final_prototypes[i].structure_representative_name << ".";
         }        
         vector<StructurePrototype> final_permutations = compare::comparePermutations(final_prototypes[i],num_proc,comparison_options.flag("COMPARISON_OPTIONS::OPTIMIZE_MATCH"),oss,FileMESSAGE); //DX20200103 - condensed booleans to xoptions
         for(uint j=0;j<final_permutations.size();j++){
@@ -1142,7 +1147,7 @@ namespace compare {
           final_prototypes[i].atom_decorations_equivalent.push_back(tmp_permutations);
         }
       }
-      message << "Unique permutations found.";
+      message << "Unique atom decorations found.";
       pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_COMPLETE_);
     }
 
@@ -1403,7 +1408,7 @@ namespace compare {
     // ---------------------------------------------------------------------------
     // fix species (remove pseudopotentials, etc.) 
     string species_str = aurostd::joinWDelimiter(xstr.species, ""); //DX20200212 
-    vector<string> vspecies = pflow::stringElements2VectorElements(species_str); //DX20200212
+    vector<string> vspecies = aurostd::getElements(species_str); //DX20200212
     xstr.species = aurostd::vector2deque(vspecies); //DX20200212 - needed to perform material comparisons with database entries
     xstr.SetSpecies(xstr.species);
 
@@ -1423,7 +1428,7 @@ namespace compare {
 
     // ---------------------------------------------------------------------------
     // get stoichiometries
-    vector<uint> stoichiometry = compare::getStoichiometry(xstr,same_species);
+    vector<uint> stoichiometry = xstr.GetReducedComposition(!same_species);
     uint stoichiometry_sum = aurostd::sum(stoichiometry);
     vector<double> normalized_stoichiometry;
     for(uint i=0;i<stoichiometry.size();i++){normalized_stoichiometry.push_back((double)stoichiometry[i]/(double)stoichiometry_sum);}
@@ -1589,9 +1594,9 @@ namespace compare {
     input_structure.structure_representative.ReScale(1.0); //DX20191105
     input_structure.structure_representative.BringInCell(); //DX20200707
     input_structure.structure_representative_name = "input geometry";
-    input_structure.stoichiometry = compare::getStoichiometry(xstr,same_species);
-    input_structure.elements = compare::getElements(xstr);
-    input_structure.structure_representative_compound = compare::getCompoundName(xstr);
+    input_structure.stoichiometry = xstr.GetReducedComposition(!same_species);
+    input_structure.elements = xstr.GetElements(true,true); // true: clean names
+    input_structure.structure_representative_compound = pflow::prettyPrintCompound(input_structure.elements,input_structure.stoichiometry,no_vrt,false,txt_ft);
     //DX20191105 [MOVED LATER - SAME AS SYMMETRY] input_structure.LFA_environments= compare::computeLFAEnvironment(input_structure.structure_representative); //DX20190711
     input_structure.structure_representative_generated = true; 
     stringstream ss_input; ss_input << xstr;
@@ -1605,13 +1610,13 @@ namespace compare {
     // load and store entries from the database 
     for(uint i=0; i<auids.size(); i++){
       // first, get stoichiometry from entry
-      //DX20191106 [OBSOLETE - switch to stringElements2VectorElements] vector<string> species; vector<double> natoms;
-      //DX20191106 [OBSOLETE - switch to stringElements2VectorElements] XATOM_SplitAlloySpecies(compounds[i], species, natoms);
+      //DX20191106 [OBSOLETE - switch to getElements] vector<string> species; vector<double> natoms;
+      //DX20191106 [OBSOLETE - switch to getElements] XATOM_SplitAlloySpecies(compounds[i], species, natoms);
       vector<double> vcomposition;
-      vector<string> species = pflow::stringElements2VectorElements(compounds[i], vcomposition);
+      vector<string> species = aurostd::getElements(compounds[i], vcomposition);
       if(LDEBUG){cerr << function_name << " species=" << aurostd::joinWDelimiter(species,",") << endl;}
       vector<uint> tmp_stoich;
-      //DX20191106 [OBSOLETE - switch to stringElements2VectorElements] for(uint j=0;j<natoms.size();j++)
+      //DX20191106 [OBSOLETE - switch to getElements] for(uint j=0;j<natoms.size();j++)
       for(uint j=0;j<vcomposition.size();j++) //DX20191106
       { //CO20200106 - patching for auto-indenting
         if(aurostd::isinteger(vcomposition[j])){
@@ -1619,7 +1624,7 @@ namespace compare {
         }
         else {
           message << "Expected natoms in " << auids[i] << " to be an integer.";     
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_RUNTIME_ERROR_); //DX20191031 - exit to xerror
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_RUNTIME_ERROR_);
         }
       }
 
@@ -1682,9 +1687,9 @@ namespace compare {
           str_proto_tmp.structure_representative_source="aurl";
           str_proto_tmp.structure_representative_relaxation_step=relaxation_step; //DX20200429
           str_proto_tmp.stoichiometry=tmp_reduced_stoich;
-          str_proto_tmp.structure_representative_compound = compare::getCompoundName(entry.vstr[structure_index]); //DX20190430 - added
+          str_proto_tmp.elements=species; //DX20200903 - needs to be before prettyPrintCompound()
+          str_proto_tmp.structure_representative_compound = pflow::prettyPrintCompound(str_proto_tmp.elements,str_proto_tmp.stoichiometry,no_vrt,false,txt_ft);
           //DX20191105 [MOVED LATER - SAME AS SYMMETRY] str_proto_tmp.LFA_environments= compare::computeLFAEnvironment(str_proto_tmp.structure_representative); //DX20190711
-          str_proto_tmp.elements=species;
           str_proto_tmp.natoms = entry.vstr[structure_index].atoms.size(); //DX20191031
           str_proto_tmp.ntypes = entry.vstr[structure_index].num_each_type.size(); //DX20191031
           // store any properties 
@@ -1704,7 +1709,7 @@ namespace compare {
         }
         else {
           message << "More structures loaded than anticipated for auid=" << auids[i] << " (# structures=" << entry.vstr.size() << ").";     
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_RUNTIME_ERROR_); //DX20191031 - exit to xerror
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_RUNTIME_ERROR_);
         }
       }
     }
@@ -1987,8 +1992,8 @@ namespace compare {
       }
       // split by alloy species (no delimiter)
       else{
-        //DX20191106 [OBSOLETE - switch to stringElements2VectorElements] XATOM_SplitAlloySpecies(alloy_string, species);
-        species = pflow::stringElements2VectorElements(alloy_string); //DX20191106
+        //DX20191106 [OBSOLETE - switch to getElements] XATOM_SplitAlloySpecies(alloy_string, species);
+        species = aurostd::getElements(alloy_string); //DX20191106
       }
     }
 
@@ -2050,10 +2055,10 @@ namespace compare {
     if(magnetic_comparison){} //CO20200508 - keep it busy
 
     // ---------------------------------------------------------------------------
-    // FLAG: do not calculate unique permutations 
+    // FLAG: do not calculate unique atom decorations 
     if(vpflow.flag("COMPARE_DATABASE_ENTRIES::DO_NOT_CALCULATE_UNIQUE_PERMUTATIONS")) {
       comparison_options.flag("COMPARISON_OPTIONS::CALCULATE_UNIQUE_PERMUTATIONS",FALSE);
-      message << "OPTIONS: Do not calculate unique permutations."; 
+      message << "OPTIONS: Do not calculate unique atom decorations."; 
       pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     }
 
@@ -2256,12 +2261,12 @@ namespace compare {
     for(uint i=0; i<auids.size(); i++){
       StructurePrototype str_proto_tmp;
       // first, get stoichiometry from entry
-      //DX20191106 [OBSOLETE - switch to stringElements2VectorElements] vector<string> species; vector<double> natoms;
-      //DX20191106 [OBSOLETE - switch to stringElements2VectorElements] XATOM_SplitAlloySpecies(compounds[i], species, natoms);
+      //DX20191106 [OBSOLETE - switch to getElements] vector<string> species; vector<double> natoms;
+      //DX20191106 [OBSOLETE - switch to getElements] XATOM_SplitAlloySpecies(compounds[i], species, natoms);
       vector<double> vcomposition;
-      vector<string> species = pflow::stringElements2VectorElements(compounds[i], vcomposition);
+      vector<string> species = aurostd::getElements(compounds[i], vcomposition);
       vector<uint> tmp_stoich;
-      //DX20191106 [OBSOLETE - switch to stringElements2VectorElements] for(uint j=0;j<natoms.size();j++)
+      //DX20191106 [OBSOLETE - switch to getElements] for(uint j=0;j<natoms.size();j++)
       for(uint j=0;j<vcomposition.size();j++) //DX20191106
       { //CO20200106 - patching for auto-indenting
         if(aurostd::isinteger(vcomposition[j])){
@@ -2269,9 +2274,7 @@ namespace compare {
         }
         else{
           message << "Expected natoms in " << auids[i] << " to be an integer.";     
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_RUNTIME_ERROR_); //DX20191031 - exit to xerror
-          //DX20191031 pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_ERROR_);
-          //DX20191031 exit(1);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_RUNTIME_ERROR_);
         }
       }
 
@@ -2336,7 +2339,7 @@ namespace compare {
       if(all_structures[i].structure_representative_generated){
         deque<string> deque_species; for(uint j=0;j<all_structures[i].elements.size();j++){deque_species.push_back(all_structures[i].elements[j]);}
         all_structures[i].structure_representative.SetSpecies(deque_species);
-        all_structures[i].structure_representative_compound = compare::getCompoundName(all_structures[i].structure_representative);
+        all_structures[i].structure_representative_compound = pflow::prettyPrintCompound(all_structures[i].elements,all_structures[i].stoichiometry,no_vrt,false,txt_ft);
       }
     }
 
@@ -2358,19 +2361,19 @@ namespace compare {
     vector<StructurePrototype> all_structures;
     for(uint i=0; i<auids.size(); i++){
       // first, get stoichiometry from entry
-      //DX20191106 [OBSOLETE - switch to stringElements2VectorElements] vector<string> species; vector<double> natoms;
-      //DX20191106 [OBSOLETE - switch to stringElements2VectorElements] XATOM_SplitAlloySpecies(compounds[i], species, natoms);
+      //DX20191106 [OBSOLETE - switch to getElements] vector<string> species; vector<double> natoms;
+      //DX20191106 [OBSOLETE - switch to getElements] XATOM_SplitAlloySpecies(compounds[i], species, natoms);
       vector<double> vcomposition;
-      vector<string> species = pflow::stringElements2VectorElements(compounds[i], vcomposition);
+      vector<string> species = aurostd::getElements(compounds[i], vcomposition);
       vector<uint> tmp_stoich;
-      //DX20191106 [OBSOLETE - switch to stringElements2VectorElements] for(uint j=0;j<natoms.size();j++){
+      //DX20191106 [OBSOLETE - switch to getElements] for(uint j=0;j<natoms.size();j++){
       for(uint j=0;j<vcomposition.size();j++){ //DX20191106
         if(aurostd::isinteger(vcomposition[j])){
           tmp_stoich.push_back((uint)aurostd::nint(vcomposition[j]));
         }
         else{
           message << "Expected natoms in " << auids[i] << " to be an integer.";     
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_RUNTIME_ERROR_); //DX20191031 - exit to xerror
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_RUNTIME_ERROR_);
         }
       }
 
@@ -2436,7 +2439,7 @@ namespace compare {
         str_proto_tmp.elements=species;
         str_proto_tmp.natoms = entry.vstr[structure_index].atoms.size(); //DX20191031
         str_proto_tmp.ntypes = entry.vstr[structure_index].num_each_type.size(); //DX20191031
-        str_proto_tmp.structure_representative_compound = compare::getCompoundName(entry.vstr[structure_index]);
+        str_proto_tmp.structure_representative_compound = pflow::prettyPrintCompound(str_proto_tmp.elements,str_proto_tmp.stoichiometry,no_vrt,false,txt_ft);
         //DX20191105 [MOVED LATER - SAME AS SYMMETRY] str_proto_tmp.LFA_environments= compare::computeLFAEnvironment(tmp.structure_representative); //DX20190711
         str_proto_tmp.property_names = property_list; //DX20190326
         str_proto_tmp.property_units = property_units; //DX20190326
@@ -2457,7 +2460,7 @@ namespace compare {
       }
       else{
         message << "More structures loaded than anticipated for auid=" << auids[i] << ".";     
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_RUNTIME_ERROR_); //DX20191031 - exit to xerror
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_RUNTIME_ERROR_);
       }
       //}
     }
@@ -2600,7 +2603,8 @@ namespace compare {
     // calculate symmetries of structures
     // if already calculated, do not recalculate
     bool all_symmetries_calculated = true;
-    for(uint i=0;i<all_structures.size();i++){ all_symmetries_calculated*=all_structures[i].isSymmetryCalculated(); }
+    //for(uint i=0;i<all_structures.size();i++){ all_symmetries_calculated*=all_structures[i].isSymmetryCalculated(); } //DX20200810 - gcc-10 warnings
+    for(uint i=0;i<all_structures.size();i++){ all_symmetries_calculated = (all_symmetries_calculated&&all_structures[i].isSymmetryCalculated()); } //DX20200810
 
     if(!comparison_options.flag("COMPARISON_OPTIONS::IGNORE_SYMMETRY") && !all_symmetries_calculated){
       message << "Calculating the symmetry of the structures.";
@@ -2743,11 +2747,11 @@ namespace compare {
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_COMPLETE_);
 
     // ---------------------------------------------------------------------------
-    // get unique permutations of prototype (representative) structures
+    // get unique atom decorations prototype (representative) structures
     if(!same_species && comparison_options.flag("COMPARISON_OPTIONS::CALCULATE_UNIQUE_PERMUTATIONS")){ 
-      message << "Determining the unique permutations for each prototype.";
+      message << "Determining the unique atom decorations for each prototype.";
       pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
-      // find unique permutations of prototype
+      // find unique atom decorations of prototype
       for(uint i=0;i<final_prototypes.size();i++){
         if(arePermutationsComparableViaComposition(final_prototypes[i].stoichiometry) && 
             arePermutationsComparableViaSymmetry(final_prototypes[i].grouped_Wyckoff_positions)){
@@ -2755,7 +2759,7 @@ namespace compare {
           if(!final_prototypes[i].structure_representative_generated){
             if(!compare::generateStructure(final_prototypes[i].structure_representative_name,final_prototypes[i].structure_representative_source,final_prototypes[i].structure_representative_relaxation_step,final_prototypes[i].structure_representative,oss)){ //DX20200429
               message << "Could not generate structure (" << final_prototypes[i].structure_representative_name << ").";
-              throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_RUNTIME_ERROR_); //DX20191031 - exit to xerror
+              throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_RUNTIME_ERROR_);
             }
           }
           vector<StructurePrototype> final_permutations = compare::comparePermutations(final_prototypes[i],num_proc,comparison_options.flag("COMPARISON_OPTIONS::OPTIMIZE_MATCH"),oss,FileMESSAGE); //DX20200103 - condensed booleans to xoptions
@@ -2884,7 +2888,7 @@ namespace compare {
       vpflow_protos.push_attached("COMPARE2PROTOTYPES::NP",aurostd::utype2string<uint>(num_proc)); 
 
       // ---------------------------------------------------------------------------
-      // do not calculate unique permutations since this was already done
+      // do not calculate unique atom decorations since this was already done
       vpflow_protos.flag("COMPARE2PROTOTYPES::DO_NOT_CALCULATE_UNIQUE_PERMUTATIONS",TRUE);
 
       // ---------------------------------------------------------------------------
@@ -3030,6 +3034,7 @@ namespace compare {
 
     // ---------------------------------------------------------------------------
     // determine minimum interatomic distances of structures (resolution of atoms) //DX20200623
+    // //DX20200715 - may need to rescale this if the structures are being scaled later....
     if(xstr_base.dist_nn_min==AUROSTD_NAN){ xstr_base.dist_nn_min=SYM::minimumDistance(xstr_base); }
     if(xstr_test.dist_nn_min==AUROSTD_NAN){ xstr_test.dist_nn_min=SYM::minimumDistance(xstr_test); }
 
@@ -3042,8 +3047,8 @@ namespace compare {
       // if atoms are not labeled in either structure; assign fake names
       if(xstr_base.atoms.at(0).name == "" || xstr_test.atoms.at(0).name == ""){ 
         if(LDEBUG) {cerr << "compare:: " << "Atoms not labeled ... Assigning fake names." << endl;}
-        fakeAtomsName(xstr_base);
-        fakeAtomsName(xstr_test);
+        xstr_base.DecorateWithFakeElements();
+        xstr_test.DecorateWithFakeElements();
       }
     }
     else if(same_species == false){
@@ -3111,8 +3116,8 @@ namespace compare {
       // ---------------------------------------------------------------------------
       // assign fake atom names 
       if(type_match==1){
-        fakeAtomsName(xstr_base);
-        fakeAtomsName(xstr_test);
+        xstr_base.DecorateWithFakeElements();
+        xstr_test.DecorateWithFakeElements();
       }
 
       // OBSOLETE THIS PRINTS OUT XSTRUCTURES WITH ATOM ZERO SHIFTED TO ORIGIN...
@@ -3122,7 +3127,7 @@ namespace compare {
       // OBSOLETE comparison_log << xstr_test << endl;		
 
       // ---------------------------------------------------------------------------
-      // assign fake atom names 
+      // print lattice parameters
       printParameters(xstr_base,comparison_log);
       printParameters(xstr_test,comparison_log);
 

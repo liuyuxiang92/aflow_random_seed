@@ -56,6 +56,7 @@ namespace aurostd {
         void set(const utype&);
         void reset(void);
         void clear(void);
+        void null(void);  //CO20200731 - to create null vector
       private:
         utype *corpus;
         // bool isfloat,iscomplex;
@@ -247,6 +248,7 @@ namespace aurostd {
 // ----------------------------------------------------------- xvector example types
 namespace aurostd {
   //CO20180419
+  template<class utype> xvector<utype> null_xv() __xprototype;  //CO20200731 - friend so it can access refresh()
   template<class utype> xvector<utype> ones_xv(int=3,int=1) __xprototype;
   template<class utype> xvector<utype> box_filter_xv(int window,int lrows=1) __xprototype;
   template<class utype> xvector<utype> gaussian_filter_xv(utype sigma) __xprototype;  //if you need lrows!=1, use shiftlrows()
@@ -497,6 +499,13 @@ namespace aurostd {
 
   template<class utype> xvector<utype> //get centroid of data points //CO20180409
     getCentroid(const vector<xvector<utype> >& points) __xprototype;
+  template<class utype> xvector<utype> //get centroid of data points with weights //DX20200728
+    getCentroid(const vector<xvector<utype> >& points, const vector<utype>& weights) __xprototype;
+
+  template<class utype> xvector<double> //get centroid of data points //CO20180409
+    getCentroidPBC(const vector<xvector<utype> >& points, const xmatrix<utype>& lattice) __xprototype;
+  template<class utype> xvector<double> //get centroid of data points with weights //DX20200728
+    getCentroidPBC(const vector<xvector<utype> >& points, const vector<utype>& weights, const xmatrix<utype>& lattice) __xprototype;
 
   // TRIGONOMETRIC OPERATIONS BETWEEN TWO GENERAL VECTORS //CO20180409
   template<class utype> xvector<double> 

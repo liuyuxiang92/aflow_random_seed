@@ -61,6 +61,9 @@ for more "realistic" volumes when decorating with different atomic species.
 To force the ANRL defined lattice parameter, add the following flag to the 
 command: --use_anrl_lattice_parameter.
 
+By default, AFLOW will check if the input parameters match with any of the predefined aliases/enumerations.
+If there is a match, then the label is appended with the appropriate enumeration suffix and will
+be printed in the aflow.in and/or geometry file title.
 
 A description of each input is described below:
 
