@@ -1456,6 +1456,7 @@ namespace aflowlib {
       aflowlib::LIB2RAW_Loop_QHA(directory_LIB,directory_RAW,vfile,aflowlib_data,soliloquy+" (qha):");
       if(flag_WEB) {
         if(aurostd::FileExist(directory_RAW+"/aflow.qha.out")) aurostd::LinkFile(directory_RAW+"/aflow.qha.out",directory_WEB);
+        if(aurostd::FileExist(directory_RAW+"/aflow.qha.thermo.out")) aurostd::LinkFile(directory_RAW+"/aflow.qha.thermo.out",directory_WEB);
       }
     }
     // END AS20200831
@@ -5375,7 +5376,8 @@ namespace aflowlib {
     aflow_qha_out.clear();
     if(aurostd::FileExist(directory_LIB+"/"+"aflow.qha.out") || aurostd::EFileExist(directory_LIB+"/"+"aflow.qha.out")) {
       aflowlib::LIB2RAW_FileNeeded(directory_LIB,"aflow.qha.out",directory_RAW,"aflow.qha.out",vfile,MESSAGE);
-      // TODO: list other files that are needed
+      aflowlib::LIB2RAW_FileNeeded(directory_LIB,"aflow.qha.thermo.out",directory_RAW,"aflow.qha.thermo.out",vfile,MESSAGE);
+
       if(AFLOWLIB_VERBOSE) cout << MESSAGE << " loading " << string(directory_RAW+"/"+"aflow.qha.out") << endl;
       aurostd::ExtractToStringstreamEXPLICIT(aurostd::efile2string(directory_RAW+"/"+"aflow.qha.out"),aflow_qha_out,"[QHA_RESULTS]START","[QHA_RESULTS]STOP");
       aurostd::stream2vectorstring(aflow_qha_out,vline);
@@ -6886,6 +6888,7 @@ namespace aflowlib {
 
 	for(uint iext=0;iext<XHOST.vext.size();iext++) {
 	  aurostd::RemoveFile(directory_LIB+"/aflow.qha.out"+XHOST.vext.at(iext));
+	  aurostd::RemoveFile(directory_LIB+"/aflow.qha.thermo.out"+XHOST.vext.at(iext));
         }
 
         if(aurostd::FileExist(directory_LIB+"/qha.LOCK")) {

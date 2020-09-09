@@ -704,6 +704,8 @@ namespace apl
           }
         }
       }
+
+      removeDuplicateBlocksInThermoFile(currentDirectory);
     }
     catch(aurostd::xerror &e){
       pflow::logger(e.whereFileName(),e.whereFunction(), e.what(), currentDirectory,
@@ -2507,35 +2509,35 @@ namespace apl
 
     // the name of the output file depends on the EOS fit method
     stringstream file;
-    string filename = directory + '/' + DEFAULT_SCQHA_FILE_PREFIX;
-    string sc = all_iterations_self_consistent ? "sc." : "";
+    string filename = directory+'/'+DEFAULT_QHA_FILE_PREFIX+DEFAULT_QHA_THERMO_FILE;
+    string sc = all_iterations_self_consistent ? "SC_" : "";
+    string blockname = "[SCQHA_" + sc;
     switch(method){
       case(EOS_SJ):
-        filename += sc+EOS_METHOD_FILE_SJ;
+        blockname += "SJ_THERMO]";
         break;
       case(EOS_BIRCH_MURNAGHAN2):
-        filename += sc+EOS_METHOD_FILE_BIRCH_MURNAGHAN2;
+        blockname += "BM2_THERMO]";
         break;
       case(EOS_BIRCH_MURNAGHAN3):
-        filename += sc+EOS_METHOD_FILE_BIRCH_MURNAGHAN3;
+        blockname += "BM3_THERMO]";
         break;
       case(EOS_BIRCH_MURNAGHAN4):
-        filename += sc+EOS_METHOD_FILE_BIRCH_MURNAGHAN4;
+        blockname += "BM4_THERMO]";
         break;
       case(EOS_MURNAGHAN):
-        filename += sc+EOS_METHOD_FILE_MURNAGHAN;
+        blockname += "M_THERMO]";
         break;
       default:
         msg = "Nonexistent EOS method was passed to " + function;
         throw aurostd::xerror(_AFLOW_FILE_NAME_, QHA_ARUN_MODE, msg, _INPUT_UNKNOWN_);
         break;
     }
-    filename += DEFAULT_QHA_THERMO_FILE;
 
     file.precision(10);
 
     file << AFLOWIN_SEPARATION_LINE << std::endl;
-    file << "[SCQHA_THERMAL_PROPERTIES]START" << std::endl;
+    file << blockname + "START" << std::endl;
 
     // print header
     file << setw(5)  << "# T[K]"               << setw(SW) << ' ' <<
@@ -2675,10 +2677,10 @@ namespace apl
         setw(TW) << GP                  << setw(SW) << ' ' <<
         std::endl;
     }
-    file << "[SCQHA_THERMAL_PROPERTIES]STOP" << std::endl;
+    file << blockname + "STOP" << std::endl;
     file << AFLOWIN_SEPARATION_LINE << std::endl;
 
-    if (!aurostd::stringstream2file(file, filename)){
+    if (!aurostd::stringstream2file(file, filename, "APPEND")){
       msg = "Error writing to " + filename + "file.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function,msg,_FILE_ERROR_);
     }
@@ -2702,16 +2704,16 @@ namespace apl
     string msg = "";
 
     // type of qha calculation
-    string filename = directory + '/';
+    string blockname = "[";
     switch(qha_method){
       case (QHANP_CALC):
-        filename += DEFAULT_QHANP_FILE_PREFIX;
+        blockname += "QHANP_";
         break;
       case (QHA3P_CALC):
-        filename += DEFAULT_QHA3P_FILE_PREFIX;
+        blockname += "QHA3P_";
         break;
       case(QHA_CALC):
-        filename += DEFAULT_QHA_FILE_PREFIX;
+        blockname += "QHA_";
         break;
       default:
         msg = "Nonexistent QHA method was passed to " + function;
@@ -2723,27 +2725,27 @@ namespace apl
     // QHA calculation
     switch(eos_method){
       case(EOS_SJ):
-        filename += EOS_METHOD_FILE_SJ;
+        blockname += "SJ_THERMO]";
         break;
       case(EOS_BIRCH_MURNAGHAN2):
-        filename += EOS_METHOD_FILE_BIRCH_MURNAGHAN2;
+        blockname += "BM2_THERMO]";
         break;
       case(EOS_BIRCH_MURNAGHAN3):
-        filename += EOS_METHOD_FILE_BIRCH_MURNAGHAN3;
+        blockname += "BM3_THERMO]";
         break;
       case(EOS_BIRCH_MURNAGHAN4):
-        filename += EOS_METHOD_FILE_BIRCH_MURNAGHAN4;
+        blockname += "BM4_THERMO]";
         break;
       case(EOS_MURNAGHAN):
-        filename += EOS_METHOD_FILE_MURNAGHAN;
+        blockname += "M_THERMO]";
         break;
       default:
         msg = "Nonexistent EOS method was passed to " + function;
         throw aurostd::xerror(_AFLOW_FILE_NAME_, QHA_ARUN_MODE, msg, _INPUT_UNKNOWN_);
         break;
     }
-    filename += DEFAULT_QHA_THERMO_FILE;
 
+    string filename = directory+'/'+DEFAULT_QHA_FILE_PREFIX+DEFAULT_QHA_THERMO_FILE;
     msg = "Writing T-dependent properties to "+filename;
     pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE, *p_oss,
         _LOGGER_MESSAGE_);
@@ -2752,7 +2754,7 @@ namespace apl
     file.precision(10);
 
     file << AFLOWIN_SEPARATION_LINE << std::endl;
-    file << "[QHA_THERMAL_PROPERTIES]START" << std::endl;
+    file << blockname + "START" << std::endl;
     // write header
     file << setw(5)  << "# T[K]"               << setw(SW) << ' ' <<
       setw(TW) << "Veq[ev/atom]"         << setw(SW) << ' ' <<
@@ -2873,10 +2875,10 @@ namespace apl
       file << std::endl;
     }
 
-    file << "[QHA_THERMAL_PROPERTIES]STOP" << std::endl;
+    file << blockname + "STOP" << std::endl;
     file << AFLOWIN_SEPARATION_LINE << std::endl;
 
-    if (!aurostd::stringstream2file(file, filename)){
+    if (!aurostd::stringstream2file(file, filename, "APPEND")){
       msg = "Error writing to " + filename + "file.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function,msg,_FILE_ERROR_);
     }
@@ -3257,7 +3259,60 @@ namespace apl
     aflow_qha_out << " (GPa)" << endl;
     aflow_qha_out << "[QHA_RESULTS]STOP" << endl;
     aflow_qha_out << AFLOWIN_SEPARATION_LINE << endl;
-    aurostd::stringstream2file(aflow_qha_out, directory + "/aflow.qha.out");
+
+    string filename = directory + '/' + DEFAULT_QHA_FILE_PREFIX + "out";
+    if (!aurostd::stringstream2file(aflow_qha_out, filename)){
+      msg = "Error writing to " + filename + "file.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function,msg,_FILE_ERROR_);
+    }
+  }
+
+  /// Removes duplicate blocks from aflow.qha.thermo.out file preserving the latest
+  /// block from a group of same blocks.
+  void QHA::removeDuplicateBlocksInThermoFile(const string &directory)
+  {
+    string msg="", function = XPID + "QHA::removeDuplicateBlocksInThermoFile():";
+    stringstream thermofile, block;
+    string thermofile_orig = "";
+    string filename = directory + '/' + DEFAULT_QHA_FILE_PREFIX+DEFAULT_QHA_THERMO_FILE;
+    aurostd::file2string(filename, thermofile_orig);
+    vector<string> blocks, qha_modes, eos_models;
+
+    qha_modes.push_back("QHA");
+    qha_modes.push_back("QHA3P");
+    qha_modes.push_back("QHANP");
+    qha_modes.push_back("SCQHA");
+    qha_modes.push_back("SCQHA_SC");
+
+    eos_models.push_back("SJ");
+    eos_models.push_back("BM2");
+    eos_models.push_back("BM3");
+    eos_models.push_back("BM4");
+    eos_models.push_back("M");
+
+    // define possible block keywords
+    for (uint i=0; i<qha_modes.size(); i++){
+      for (uint j=0; j<eos_models.size(); j++){
+        blocks.push_back("["+qha_modes[i]+"_"+eos_models[j]+"_THERMO]");
+      }
+    }
+
+    // read the last block for each keyword and save it to the thermofile
+    for (uint i=0; i<blocks.size(); i++){
+      if (aurostd::ExtractLastToStringstreamEXPLICIT(thermofile_orig, block,
+          blocks[i]+"START", blocks[i]+"STOP")){
+        thermofile << AFLOWIN_SEPARATION_LINE << std::endl;
+        thermofile << blocks[i]+"START" << std::endl;
+        thermofile << block.rdbuf();
+        thermofile << blocks[i]+"STOP" << std::endl;
+        thermofile << AFLOWIN_SEPARATION_LINE << std::endl;
+      }
+    }
+
+    if (!aurostd::stringstream2file(thermofile, filename)){
+      msg = "Error writing to " + filename + "file.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function,msg,_FILE_ERROR_);
+    }
   }
 }
 
