@@ -20,6 +20,8 @@ using std::cerr;
 using std::endl;
 
 #define CCE_DEBUG false
+#define EN_ALLEN 1
+#define BADER 2
 
 namespace cce {
 
@@ -360,9 +362,9 @@ namespace cce {
     /********************************************************/
     // determine oxidation numbers automatically from structure and Allen electronegativities if not provided on command line
     if(!cce_flags.flag("OX_NUMS_PROVIDED")) {
-      if(DEFAULT_CCE_OX_METHOD == 1) { // 1 - ELECTRONEGATIVITY_ALLEN, 2 - BADER
+      if(DEFAULT_CCE_OX_METHOD == EN_ALLEN) { // determining oxidation numbers from Allen electronegativities is the default
         cce_vars.oxidation_states=get_oxidation_states_from_electronegativities(structure, cce_flags, cce_vars);
-      } else if(DEFAULT_CCE_OX_METHOD == 2) { // obtaining oxidation states from Bader charges is outdated but the functionality is kept mainly for test purposes
+      } else if(DEFAULT_CCE_OX_METHOD == BADER) { // obtaining oxidation states from Bader charges is outdated but the functionality is kept mainly for test purposes
         cce_vars.oxidation_states=get_oxidation_states_from_Bader(structure, cce_flags, cce_vars, directory_path);
       }
     }
