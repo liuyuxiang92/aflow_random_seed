@@ -2130,6 +2130,63 @@ namespace plotter {
     }
   }
 
+  //AS20200909 BEGIN
+  //PLOT_THERMO_QHA///////////////////////////////////////////////////////////////
+  // Plots QHA thermal properties.
+  void PLOT_THERMO_QHA(xoption& plotoptions,ostream& oss) {ofstream FileMESSAGE; PLOT_THERMO_QHA(plotoptions,FileMESSAGE,oss);}  //CO20200404
+  void PLOT_THERMO_QHA(xoption& plotoptions,ofstream& FileMESSAGE,ostream& oss) {  //CO20200404
+    stringstream out;
+    plotoptions.push_attached("OUTPUT_FORMAT", "GNUPLOT");
+    plotoptions.push_attached("COLOR", "#000000");
+    plotoptions.push_attached("LINETYPES", "-1");
+    PLOT_THERMO_QHA(plotoptions, out,FileMESSAGE,oss); //CO20200404
+  }
+
+  void PLOT_THERMO_QHA(xoption& plotoptions, stringstream& out,ostream& oss) {ofstream FileMESSAGE; PLOT_THERMO_QHA(plotoptions,out,FileMESSAGE,oss);} //CO20200404
+  void PLOT_THERMO_QHA(xoption& plotoptions, stringstream& out,ofstream& FileMESSAGE,ostream& oss) 
+  {
+    // Set labels
+    static const int nprops = 7;
+    string ylabels[nprops] = {"V", "F", "B", "beta", "c_V", "c_P", "gamma"};
+    string extensions[nprops] = {"qha_equilibrium_volume", "qha_free_energy",
+      "qha_bulk_modulus", "qha_thermal_expansion", "qha_cV", "qha_cP",
+      "qha_grueneisen_parameter"};
+    string yunits[nprops] = {"A/atom", "eV/atom", "GPa", "$10^{-6}$/K", "$k_B$/atom",
+      "$k_B$/atom", ""};
+    string ymin[nprops] = {"", "", "", "", "0", "0", ""};
+
+    // Get data
+    string directory = plotoptions.getattachedscheme("DIRECTORY");
+    string thermo_file = directory+"/"+DEFAULT_QHA_FILE_PREFIX+DEFAULT_QHA_THERMO_FILE;
+    //ME20200413 - Since multiple data files are plotted, the user file
+    // name functions as base file name.
+    string user_file_name = plotoptions.getattachedscheme("FILE_NAME_USER");
+    plotoptions.pop_attached("FILE_NAME_USER");
+    if (aurostd::EFileExist(thermo_file)) {
+      string outformat = plotoptions.getattachedscheme("OUTPUT_FORMAT");
+      plotoptions.push_attached("DATA_FILE", thermo_file);
+      plotoptions.push_attached("KEYWORD", "QHA_SJ_THERMO");
+      vector<vector<double> > data = readAflowDataFile(plotoptions);
+      if (!user_file_name.empty()) plotoptions.push_attached("DEFAULT_TITLE", user_file_name);  //ME20200413
+      for (int i = 0; i < nprops; i++) {
+        plotoptions.pop_attached("YMIN");
+        if (!ymin[i].empty()) plotoptions.push_attached("YMIN", ymin[i]);
+        plotoptions.push_attached("EXTENSION", extensions[i]);
+        setPlotLabels(plotoptions, "T", "K", ylabels[i], yunits[i]);
+        plotSingleFromSet(plotoptions, out, data, i + 1,FileMESSAGE,oss);  //CO20200404
+        if (outformat == "GNUPLOT") {
+          savePlotGNUPLOT(plotoptions, out);
+        }
+        out.str("");  //ME20200513 - reset stringstream
+      }
+    } else {
+      string function = "plotter::PLOT_THERMO_QHA():";
+      string message = "Could not find file " + thermo_file + ".";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_NOT_FOUND_);
+    }
+  }
+  //AS20200909 END
+
   //PLOT_TCOND////////////////////////////////////////////////////////////////
   // Plots AAPL thermal conductivity tensors
   void PLOT_TCOND(xoption& plotoptions,ostream& oss) {ofstream FileMESSAGE;return PLOT_TCOND(plotoptions,FileMESSAGE,oss);} //CO20200404

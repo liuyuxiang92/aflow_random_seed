@@ -3816,6 +3816,12 @@ namespace plotter {
   void PLOT_TCOND(aurostd::xoption&, stringstream&,ostream& oss=cout);  //CO20200404
   void PLOT_TCOND(aurostd::xoption&, stringstream&,ofstream& FileMESSAGE,ostream& oss=cout);  //CO20200404
 
+  // QHA properties plotter -------------------------------------------------
+  void PLOT_THERMO_QHA(aurostd::xoption&,ostream& oss=cout);  //AS20200909
+  void PLOT_THERMO_QHA(aurostd::xoption&,ofstream& FileMESSAGE,ostream& oss=cout); //AS20200909
+  void PLOT_THERMO_QHA(aurostd::xoption&, stringstream&,ostream& oss=cout); //AS2020909
+  void PLOT_THERMO_QHA(aurostd::xoption&, stringstream&,ofstream& FileMESSAGE,ostream& oss=cout); //AS20200909
+
   // General plots -----------------------------------------------------------
   void plotSingleFromSet(xoption&, stringstream&, const vector<vector<double> >&, int,ostream& oss=cout); //CO20200404
   void plotSingleFromSet(xoption&, stringstream&, const vector<vector<double> >&, int,ofstream& FileMESSAGE,ostream& oss=cout); //CO20200404
