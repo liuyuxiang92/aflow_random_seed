@@ -3352,4 +3352,26 @@ namespace apl{
 
     return qha_aflowin_is_found;
   }
+
+  /// Links existing APL calculation at the input volume to a corresponding QHA directory
+  /// (ARUN.QHA_PHONONS_1.0000).
+  /// It is assumed that linking should be performed before the first QHA run.
+  void LinkAPLtoQHA()
+  {
+     string qha_directory_default = ARUN_DIRECTORY_PREFIX+QHA_ARUN_MODE+"_PHONON_1.0000";
+     string currentDirectory = aurostd::getPWD();
+     string qha_directory = currentDirectory + '/' + qha_directory_default;
+     if (!aurostd::IsDirectory(qha_directory)) aurostd::DirectoryMake(qha_directory);
+
+     vector<string> vfiles;
+     aurostd::DirectoryLS(currentDirectory, vfiles);
+     string dirname = "";
+     for (uint i=0; i<vfiles.size(); i++){
+       if (aurostd::substring2bool(vfiles[i], ARUN_DIRECTORY_PREFIX+"APL")){
+         dirname = currentDirectory+'/'+vfiles[i];
+         cout << "Linking "+dirname+" to "+qha_directory << endl;
+         aurostd::LinkFile(dirname, qha_directory);
+       }
+     }
+  }
 }

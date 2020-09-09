@@ -1510,6 +1510,9 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   // effective mass
   vpflow.flag("EFFECTIVEMASS",aurostd::args2flag(argv,cmds,"--effective-mass|--em"));// && (argv.size() == 3));
 
+  // QHA
+  vpflow.flag("LINKAPLQHA",aurostd::args2flag(argv,cmds,"--link_apl_qha"));//AS20200908
+
   if(LDEBUG) cout << "PflowARGs: xscheme=" << vpflow.xscheme << endl;
   if(LDEBUG) cout << "PflowARGs: vxscheme.size()=" << vpflow.vxscheme.size() << endl;
   if(LDEBUG) cout << "PflowARGs: argv.size()=" << argv.size() << endl;
@@ -1671,6 +1674,8 @@ namespace pflow {
       // [OBSOLETE] if(vpflow.flag("SG::FINDSYM_PRINT")) {pflow::FINDSYM(vpflow.getattachedscheme("SG::FINDSYM_PRINT"),0,cin); _PROGRAMRUN=true;}
       // [OBSOLETE] if(vpflow.flag("SG::FINDSYM_EXEC")) {pflow::FINDSYM(vpflow.getattachedscheme("SG::FINDSYM_EXEC"),1,cin); _PROGRAMRUN=true;}
       // if(vpflow.flag("PROTO_GUS_CPP")) {pflow::PROTO_GUS_CPP(argv); _PROGRAMRUN=true;}
+      // QHA
+      if(vpflow.flag("LINKAPLQHA")){apl::LinkAPLtoQHA();_PROGRAMRUN=true;}//AS20200908
     }
     // *********************************************************************
     if(argv.size()>=2 && !_PROGRAMRUN) {
