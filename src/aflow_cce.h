@@ -93,7 +93,7 @@ namespace cce {
   void treat_Pb3O4_special_case(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss=std::cout);
   void treat_Ti_O_Magneli_phase_special_case(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss=std::cout);
   void treat_Fe3O4_special_case(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss=std::cout);
-  void treat_Mn3O4_Co3O4_special_case(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, const string& cation_species, ostream& oss=std::cout);
+  void treat_X3O4_special_case(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, const string& cation_species, ostream& oss=std::cout);
   void treat_alkali_sesquioxide_special_case(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss=std::cout);
   // following special cases only needed when determining oxidation states from Bader charges
   void treat_MnMoO4_special_case(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss=std::cout);

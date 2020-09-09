@@ -1230,9 +1230,9 @@ namespace cce {
       // for Fe3O4 in inverse spinel structure, the oxidation states are not identified properly
       treat_Fe3O4_special_case(structure, cce_flags, cce_vars);
       // for Mn3O4 in spinel structure, the oxidation states are not identified properly
-      treat_Mn3O4_Co3O4_special_case(structure, cce_flags, cce_vars, "Mn");
+      treat_X3O4_special_case(structure, cce_flags, cce_vars, "Mn");
       // for Co3O4 in spinel structure, the oxidation states are not identified properly
-      treat_Mn3O4_Co3O4_special_case(structure, cce_flags, cce_vars, "Co");
+      treat_X3O4_special_case(structure, cce_flags, cce_vars, "Co");
       // alkali metal sesquioxides need to be treated specially since oxidation numbers and number of per- and superoxide bonds are not recognized appropriately
       treat_alkali_sesquioxide_special_case(structure, cce_flags, cce_vars);
     }
@@ -1774,15 +1774,15 @@ namespace cce {
     }
   }
 
-  //treat_Mn3O4_Co3O4_special_case////////////////////////////////////////////////////////
+  //treat_X3O4_special_case////////////////////////////////////////////////////////
   // for Co3O4 and Mn3O4 in the normal spinel structure Co2+/Mn2+ occupies only tetrahedral sites 
   // while Co3+/Mn3+ occupies octahedral sites; the correction hence needs to be different than for Fe3O4
   // but at the present stage there are no corrections for Co3+ and Mn3+, see:
   // https://en.wikipedia.org/wiki/Cobalt(II,III)_oxide
   // https://en.wikipedia.org/wiki/Manganese(II,III)_oxide
-  void treat_Mn3O4_Co3O4_special_case(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, const string& cation_species, ostream& oss) {
+  void treat_X3O4_special_case(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, const string& cation_species, ostream& oss) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
-    string soliloquy=XPID+"cce::treat_Mn3O4_Co3O4_special_case():";
+    string soliloquy=XPID+"cce::treat_X3O4_special_case():";
     stringstream message;
     if (! ( structure.species.size() == 2 && ((KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "O" && KBIN::VASP_PseudoPotential_CleanName(structure.species[1]) == cation_species) || (KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == cation_species && KBIN::VASP_PseudoPotential_CleanName(structure.species[1]) == "O")) )) {return;}
     uint num_O_before_cation_species = 0;
@@ -2335,9 +2335,9 @@ namespace cce {
               // for Fe3O4 in inverse spinel structure, the oxidation states are not identified properly via the Bader charges.
               treat_Fe3O4_special_case(structure, cce_flags, cce_vars);
               // for Mn3O4 in spinel structure, the oxidation states are not identified properly
-              treat_Mn3O4_Co3O4_special_case(structure, cce_flags, cce_vars, "Mn");
+              treat_X3O4_special_case(structure, cce_flags, cce_vars, "Mn");
               // for Co3O4 in spinel structure, the oxidation states are not identified properly
-              treat_Mn3O4_Co3O4_special_case(structure, cce_flags, cce_vars, "Co");
+              treat_X3O4_special_case(structure, cce_flags, cce_vars, "Co");
               // MnMoO4 needs to be treated specially since oxidation numbers are not recognized appropriately
               treat_MnMoO4_special_case(structure, cce_flags, cce_vars);
               if (functional == "LDA") {
