@@ -6194,20 +6194,23 @@ namespace compare{
 // Find Matches
 // ***************************************************************************
 namespace compare{
-  bool findMatch(const deque<_atom>& _xstr1_atoms,
-      const deque<_atom>& _PROTO_atoms,
+  bool findMatch(const deque<_atom>& xstr1_atoms,
+      const deque<_atom>& PROTO_atoms,
       const xmatrix<double>& PROTO_lattice,
       double minimum_interatomic_distance, //DX20200622
       vector<uint>& mapping_index_str1,
       vector<uint>& mapping_index_str2,
       vector<double>& min_dists,
-      const int& type_match){
+      const int& type_match,
+      xvector<double>& origin_shift){
 
     // In order to find the best matchings the routine computes 
     // the difference between one atom and all the others, 
     // building a matrix of differences of coordinates.
     // Then, it checks which atoms have the best matching
     // with another atom in the second structure.
+    // The atoms positions may be updated to the optimal origin choice for
+    // PROTO_atoms
 
     // A | 1    A1, A2     I can check which is the best matching
     // B | 2 -> B1, B2  -> for the atom 1 and 2 in the structure
@@ -6218,11 +6221,6 @@ namespace compare{
     bool VERBOSE=false;
 
     string function_name = XPID + "compare::findMatch():";
-   
-    // ---------------------------------------------------------------------------
-    // determine the center of mass (centroid) for the Cartesian coordinates //DX20200715
-    deque<_atom> xstr1_atoms = _xstr1_atoms;
-    deque<_atom> PROTO_atoms = _PROTO_atoms;
 
     // ---------------------------------------------------------------------------
     // Determines cutoff distance in which atoms map onto one another and are
@@ -6268,7 +6266,6 @@ namespace compare{
     //DX20190226 [BETA] xvector<double> best_centroid1 = centroid_with_PBC(xstr1); 
     //DX20190226 [BETA] xvector<double> best_centroid2 = centroid_with_PBC(PROTO); 
 
-
     vector<xvector<double> > l1, l2, l3;
     vector<int> a_index, b_index, c_index;
     //double radius=RadiusSphereLattice(lattice); //DX20190701 - use robust method
@@ -6279,7 +6276,6 @@ namespace compare{
     // declare variables outside of loop (efficiency) //DX20200401
     xvector<double> min_xvec, incell_dist, tmp_xvec, a_component, ab_component;
     xvector<double> min_map_vector_tmp;
-
     for(j=0;j<xstr1_atoms.size();j++){
       //cerr << "xstr1.atoms[j]: " << xstr1.atoms[j] << endl;
       tmp_xvec = xstr1_atoms[j].cpos;
@@ -6450,7 +6446,8 @@ namespace compare{
 
     // ---------------------------------------------------------------------------
     // try to minimize mapping distances
-    vector<xvector<double> > new_mapping_vectors = minimizeMappingDistances(min_map_vectors);
+    xvector<double> origin_shift_test;
+    vector<xvector<double> > new_mapping_vectors = minimizeMappingDistances(min_map_vectors, origin_shift_test);
     vector<double> new_mapping_distances;
     for(uint i=0;i<min_dists.size();i++){ new_mapping_distances.push_back(aurostd::modulus(new_mapping_vectors[i])); }
 
@@ -6467,6 +6464,7 @@ namespace compare{
     if((aurostd::sum(new_mapping_distances)-aurostd::sum(min_dists)) < _ZERO_TOL_){
       min_dists = new_mapping_distances;
       min_map_vectors = new_mapping_vectors;
+      origin_shift = origin_shift_test;
     }
     else{
       if(LDEBUG){
@@ -6485,6 +6483,16 @@ namespace compare {
    vector<xvector<double> > minimizeMappingDistances(
        const vector<xvector<double> >& distance_vectors){
 
+     xvector<double> origin_shift;
+     return minimizeMappingDistances(distance_vectors,origin_shift);
+   }
+}
+
+namespace compare {
+   vector<xvector<double> > minimizeMappingDistances(
+       const vector<xvector<double> >& distance_vectors,
+       xvector<double>& origin_shift){
+
     // after identifying the mapped positions (distance vectors for mapped
     // positions), try to minimize the mapping vectors
     // do this by seeing if there is a drift/residual between the mapping
@@ -6495,19 +6503,16 @@ namespace compare {
 
     // ---------------------------------------------------------------------------
     // calculate the drift/residual of the mapping distances (and normalize)
-    xvector<double> drift;
-    for(uint i=0;i<distance_vectors.size();i++){
-      drift+=distance_vectors[i];
-    }
-    drift/=double(distance_vectors.size()); // need to normalize
+    // via centroid method
+    origin_shift = aurostd::getCentroid(distance_vectors);
 
-    if(LDEBUG){ cerr << function_name << " drift: " << drift << " mod=" << aurostd::modulus(drift) << endl; }
+    if(LDEBUG){ cerr << function_name << " origin_shift " << origin_shift << " mod=" << aurostd::modulus(origin_shift) << endl; }
 
     // ---------------------------------------------------------------------------
     // subtract off the residuals (rigid shift)
     vector<xvector<double> > new_distance_vectors;
     for(uint i=0;i<distance_vectors.size();i++){
-      new_distance_vectors.push_back(distance_vectors[i]-drift);
+      new_distance_vectors.push_back(distance_vectors[i]-origin_shift);
     }
 
     return new_distance_vectors;
@@ -8373,11 +8378,16 @@ namespace compare{
             }
             vector<uint> map_index_str1, map_index_str2;
             vector<double> min_dists;
-            if(findMatch(xstr1_atoms,proto_atoms,proto.lattice,minimum_interatomic_distance,map_index_str1,map_index_str2,min_dists,type_match)){
+            xvector<double> origin_shift; //DX20200910
+            if(findMatch(xstr1_atoms,proto_atoms,proto.lattice,minimum_interatomic_distance,map_index_str1,map_index_str2,min_dists,type_match,origin_shift)){
               if(VERBOSE){
                 for(uint m=0;m<map_index_str1.size();m++){
                   cerr << "compare::structureSearch: " << map_index_str1[m] << " == " << map_index_str2[m] << " : dist=" << min_dists[m] << endl;
                 }
+              }
+              // update atom positions if they shifted //DX20200910
+              if(aurostd::modulus(origin_shift)>_ZERO_TOL_){
+                proto = ShiftPos(proto,origin_shift,false); //false -> cpos shift
               }
               double cd=AUROSTD_NAN, f=AUROSTD_NAN; //DX20200421 - missing initialization
               // Only calculate the NN for the proto if we found suitable matches.  
