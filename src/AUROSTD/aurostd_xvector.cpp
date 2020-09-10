@@ -2069,7 +2069,7 @@ namespace aurostd {
       if(points.size()==0){ xvector<utype> centroid; return centroid; }
       xvector<utype> centroid(points[0].lrows,points[0].urows); //DX+CO20200907 - ensure dimensions are commensurate
       centroid=points[0]*weights[0]; //DX20200728
-      for(uint i=1;i<points.size();i++){centroid+=points[i]*weights[0];} //DX20200728
+      for(uint i=1;i<points.size();i++){centroid+=points[i]*weights[i];} //DX20200728
       centroid/=(aurostd::sum(weights));
       return centroid;
     }
