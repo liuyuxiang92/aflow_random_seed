@@ -55,6 +55,7 @@
         -- Added sorting functionality for Wyckoff positions (DX)
         -- Added ANRL prototype keywords (6) to schema (DX)
         -- Changed LDEBUG in xoptions and argv to VERBOSE (DX)
+        -- Added functionality to minimize mapping distances in XtalFinder (DX)
         -- cleaning up all getElements() variants (CO+DX)
         -- adding aurostd_xparser.cpp .h (CO)
         -- adding enthlapy_formation_cce_300K_cell, enthlapy_formation_cce_300K_atom, enthlapy_formation_cce_0K_cell, and enthlapy_formation_cce_0K_cell to database (CO+RF)
