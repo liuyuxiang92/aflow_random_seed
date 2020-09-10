@@ -6202,7 +6202,7 @@ namespace compare{
       vector<uint>& mapping_index_str2,
       vector<double>& min_dists,
       const int& type_match,
-      xvector<double>& origin_shift){
+      xvector<double>& origin_shift){ //DX20200910 - added origin_shift
 
     // In order to find the best matchings the routine computes 
     // the difference between one atom and all the others, 
@@ -6445,7 +6445,7 @@ namespace compare{
     }
 
     // ---------------------------------------------------------------------------
-    // try to minimize mapping distances
+    // try to minimize mapping distances //DX20200910
     xvector<double> origin_shift_test;
     vector<xvector<double> > new_mapping_vectors = minimizeMappingDistances(min_map_vectors, origin_shift_test);
     vector<double> new_mapping_distances;
@@ -6460,7 +6460,7 @@ namespace compare{
     // ---------------------------------------------------------------------------
     // check if the distances were minimized or stayed the same
     // if they increased, then something went wrong and we default to the original
-    // mapping distances
+    // mapping distances //DX20200910
     if((aurostd::sum(new_mapping_distances)-aurostd::sum(min_dists)) < _ZERO_TOL_){
       min_dists = new_mapping_distances;
       min_map_vectors = new_mapping_vectors;
@@ -6477,7 +6477,7 @@ namespace compare{
 }
 
 // ***************************************************************************
-// mimimizeMatchingDistance()
+// mimimizeMatchingDistance() //DX20200910
 // ***************************************************************************
 namespace compare {
    vector<xvector<double> > minimizeMappingDistances(
