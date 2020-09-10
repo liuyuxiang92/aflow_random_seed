@@ -2537,6 +2537,7 @@ namespace apl
     file.precision(10);
 
     file << AFLOWIN_SEPARATION_LINE << std::endl;
+    file << blockname + "SYSTEM=" << system_title << std::endl;
     file << blockname + "START" << std::endl;
 
     // print header
@@ -2754,6 +2755,7 @@ namespace apl
     file.precision(10);
 
     file << AFLOWIN_SEPARATION_LINE << std::endl;
+    file << blockname + "SYSTEM=" << system_title << std::endl;
     file << blockname + "START" << std::endl;
     // write header
     file << setw(5)  << "# T[K]"               << setw(SW) << ' ' <<
@@ -3302,6 +3304,7 @@ namespace apl
       if (aurostd::ExtractLastToStringstreamEXPLICIT(thermofile_orig, block,
           blocks[i]+"START", blocks[i]+"STOP")){
         thermofile << AFLOWIN_SEPARATION_LINE << std::endl;
+        thermofile << blocks[i] + "SYSTEM=" << system_title << std::endl;
         thermofile << blocks[i]+"START" << std::endl;
         thermofile << block.rdbuf();
         thermofile << blocks[i]+"STOP" << std::endl;

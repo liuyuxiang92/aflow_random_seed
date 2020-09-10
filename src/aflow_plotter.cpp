@@ -2147,12 +2147,12 @@ namespace plotter {
   {
     // Set labels
     static const int nprops = 7;
-    string ylabels[nprops] = {"V", "F", "B", "beta", "c_V", "c_P", "gamma"};
+    string ylabels[nprops] = {"V", "F", "B", "\\beta", "c_V", "c_P", "\\gamma"};
     string extensions[nprops] = {"qha_equilibrium_volume", "qha_free_energy",
       "qha_bulk_modulus", "qha_thermal_expansion", "qha_cV", "qha_cP",
       "qha_grueneisen_parameter"};
-    string yunits[nprops] = {"A/atom", "eV/atom", "GPa", "$10^{-6}$/K", "$k_B$/atom",
-      "$k_B$/atom", ""};
+    string yunits[nprops] = {"\\AA/atom", "eV/atom", "GPa", "$10^{-6}K^{-1}$",
+      "$k_B$/atom", "$k_B$/atom", ""};
     string ymin[nprops] = {"", "", "", "", "0", "0", ""};
 
     // Get data
