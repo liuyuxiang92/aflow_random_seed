@@ -62,6 +62,7 @@ namespace cce {
   void print_oxidation_numbers(aurostd::xoption& flags, std::istream& ist, ostream& oss=std::cout);
   vector<double> calculate_corrections(const string& directory_path);
   vector<double> calculate_corrections(const xstructure& structure, string functional, const string& directory_path=aurostd::getPWD(), ostream& oss=std::cout);
+  vector<double> calculate_corrections(const xstructure& structure, string functional, ofstream& FileMESSAGE, const string& directory_path=aurostd::getPWD(), ostream& oss=std::cout);
   void CCE_core(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, const string& directory_path=aurostd::getPWD());
   // read user input (from command line or directory path)
   xstructure read_structure(const string& structure_file, int=IOAFLOW_AUTO); // set xstructure mode argument only here and it is automoatically recognized in the main CCE cpp file
@@ -76,7 +77,7 @@ namespace cce {
   CCE_Variables init_variables(const xstructure&); //ME20200213
   // structural analysis
   string determine_anion_species(const xstructure& structure, CCE_Variables& cce_vars);
-  vector<uint> check_for_multi_anion_system(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, double tolerance=DEFAULT_CCE_NN_DIST_TOL_MULTI_ANION, ostream& oss=std::cout);
+  vector<uint> check_for_multi_anion_system(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, double tolerance=DEFAULT_CCE_NN_DIST_TOL_MULTI_ANION);
   vector<uint> get_num_neighbors(const xstructure& structure, double tolerance=_CCE_NN_DIST_TOL_);
   vector<uint> get_num_neighbors(const xstructure& structure, const string& anion_species, double tolerance=_CCE_NN_DIST_TOL_);
   vector<uint> get_num_neighbors(const xstructure& structure, const string& anion_species, xoption& cce_flags, CCE_Variables& cce_vars, double tolerance=_CCE_NN_DIST_TOL_, ostream& oss=std::cout);
@@ -119,11 +120,9 @@ namespace cce {
   void apply_pbe_u_icsd_shifts(const xstructure& structure, CCE_Variables& cce_vars, ostream& oss=std::cout);
   // print output and citation
   string print_JSON_cation_coordination_numbers(const xstructure& structure, xoption& cce_flags, const CCE_Variables& cce_vars, vector<vector<uint> >& multi_anion_num_neighbors);
-  void append_coordination_info_JSON(const xstructure& structure, const CCE_Variables& cce_vars, const vector<uint>& num_neighbors, const string& considered_anion_species, stringstream& json);
   string print_JSON_ox_nums(const xstructure& structure, const CCE_Variables& cce_vars);
   string print_JSON_corrections(const xstructure& structure, const CCE_Variables& cce_vars); //ME20200213
   string print_output_cation_coordination_numbers(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, vector<vector<uint> >& multi_anion_num_neighbors);
-  void append_coordination_info_output(const xstructure& structure, const CCE_Variables& cce_vars, double tolerance, const vector<uint>& num_neighbors, const string& considered_anion_species, stringstream& output);
   string print_output_oxidation_numbers(const xstructure& structure, CCE_Variables& cce_vars);
   string print_output_corrections(const xstructure& structure, CCE_Variables& cce_vars, const vector<double>& enthalpy_formation_cell_cce);
   string print_test_output(CCE_Variables& cce_vars, const vector<double>& enthalpy_formation_cell_cce);
