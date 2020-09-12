@@ -15047,16 +15047,17 @@ xmatrix<double> GetDistMatrix(const xstructure& aa){
       distsij(it1+1,it2+1)=distsij(it2+1,it1+1)=AUROSTD_MAX_DOUBLE;
     }
   }
-  uint atom1;
+  uint atom1=0,atom2=0;
+  uint it1=0,it2=0,ia1=0,ia2=0;
   double distij,min_dist;
-  for(uint it1=0;it1<atom_types.size();it1++){      //type 1 (must be in this order)
-    for(uint it2=it1;it2<atom_types.size();it2++){  //type 2 (must be in this order)
+  for(it1=0;it1<atom_types.size();it1++){      //type 1 (must be in this order)
+    for(it2=it1;it2<atom_types.size();it2++){  //type 2 (must be in this order)
       if(LDEBUG) {cerr << "GetDistMatrix: finding min dist between itype=" << it1 << " and itype=" << it2 << endl;}
       min_dist=AUROSTD_MAX_DOUBLE;                                      //reset min_dist
-      for(uint ia1=0;ia1<atom_types[it1].size();ia1++){                 //must go through all atoms of same type
+      for(ia1=0;ia1<atom_types[it1].size();ia1++){                 //must go through all atoms of same type
         atom1=xstr_cluster.grid_atoms_pc2scMap[atom_types[it1][ia1]];   //get respective index in cluster
-        for(uint ia2=0;ia2<atom_types[it2].size();ia2++){               //must go through all atoms of the same type
-          for(uint atom2=0;atom2<(uint)xstr_cluster.grid_atoms_number;atom2++){ //go through all atoms of the cluster
+        for(ia2=0;ia2<atom_types[it2].size();ia2++){               //must go through all atoms of the same type
+          for(atom2=0;atom2<(uint)xstr_cluster.grid_atoms_number;atom2++){ //go through all atoms of the cluster
             if(atom1!=atom2 && a.atoms[atom_types[it2][ia2]].type==xstr_cluster.grid_atoms[atom2].type){  //cannot be same index (dist=0), and must be the types we want
               distij=AtomDist(xstr_cluster.grid_atoms[atom1],xstr_cluster.grid_atoms[atom2]); //distance
               if(0&&LDEBUG){
@@ -15634,20 +15635,78 @@ void xstructure::check_structure(){
 // **************************************************************************
 // Function GetNeighbors
 // **************************************************************************
-// rewrite of GetNeighData()
+// rewrite of GetNeighData() - English spelling is good
 // CO20200912
-void xstructure::GetNeighbors(vector<vector<uint> >& i_neighbors,vector<vector<double> >& distances,double rmin,bool prim){
-  double rmax=RadiusSphereLattice((*this).scale*(*this).lattice);
-  return GetNeighbors(i_neighbors,distances,rmax,rmin,prim);
+void xstructure::GetNeighbors(deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,double rmin,bool prim,bool unique_only){
+  deque<_atom> atoms_cell;
+  return GetNeighbors(atoms_cell,i_neighbors,distances,rmin,prim,unique_only);
 }
-void xstructure::GetNeighbors(vector<vector<uint> >& i_neighbors,vector<vector<double> >& distances,double rmax,double rmin,bool prim){
+void xstructure::GetNeighbors(deque<_atom>& atoms_cell,deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,double rmin,bool prim,bool unique_only){
+  double rmax=RadiusSphereLattice((*this).scale*(*this).lattice);
+  return GetNeighbors(atoms_cell,i_neighbors,distances,rmax,rmin,prim,unique_only);
+}
+void xstructure::GetNeighbors(deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,double rmax,double rmin,bool prim,bool unique_only){
+  deque<_atom> atoms_cell;
+  return GetNeighbors(atoms_cell,i_neighbors,distances,rmax,rmin,prim,unique_only);
+}
+void xstructure::GetNeighbors(deque<_atom>& atoms_cell,deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,double rmax,double rmin,bool prim,bool unique_only){
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   string soliloquy=XPID+"xstructure::GetNeighbors():";
 
-  if(prim){(*this).GetPrimitive();}
+  uint i=0,j=0,k=0;
 
-  (*this).ReScale(1.0);
-  xvector<int> dims=LatticeDimensionSphere((*this).lattice,rmax);
+  if(prim){GetPrimitive();}
+  ReScale(1.0);
+  //get atoms_cell
+  atoms_cell.clear();
+  vector<uint> atomscell2atoms_mapping;
+  if(unique_only){
+    if(iatoms_calculated==false){CalculateSymmetry();}
+    for(i=0;i<iatoms.size();i++){
+      atoms_cell.push_back(atoms[iatoms[i][0]]);
+      atomscell2atoms_mapping.push_back(iatoms[i][0]);
+      i_neighbors.push_back(deque<uint>(0));
+      distances.push_back(deque<double>(0));
+    }
+  }else{
+    for(uint i=0;i<atoms.size();i++){
+      atoms_cell.push_back(atoms[i]);
+      atomscell2atoms_mapping.push_back(i);
+      i_neighbors.push_back(deque<uint>(0));
+      distances.push_back(deque<double>(0));
+    }
+  }
+
+  if(LDEBUG){cerr << soliloquy << " GenerateGridAtoms() starting" << endl;}
+  GenerateGridAtoms(rmax);
+  if(LDEBUG){cerr << soliloquy << " GenerateGridAtoms() done" << endl;}
+  if(LDEBUG){cerr << soliloquy << " grid_atoms_number=" << grid_atoms_number << endl;}
+
+  double dist=0.0;
+  uint atom1=0,atom2=0;
+  for(i=0;i<atoms_cell.size();i++){
+    atom1=grid_atoms_pc2scMap[atomscell2atoms_mapping[i]];
+    for(atom2=0;atom2<(uint)grid_atoms_number;atom2++){
+      if(atom1==atom2){continue;} //skip self
+      dist=AtomDist(grid_atoms[atom1],grid_atoms[atom2]); //distance
+      if(dist>rmin && dist<rmax){
+        i_neighbors[i].push_back(atom2);
+        distances[i].push_back(dist);
+      }
+    }
+  }
+
+  //now sort
+  for(k=0;k<i_neighbors.size();k++){
+    for(i=0;i<i_neighbors[k].size();i++){
+      for(j=i+1;j<i_neighbors[k].size();j++){
+        if(distances[k][j]<distances[k][i]){
+          std::swap(i_neighbors[k][i],i_neighbors[k][j]);
+          std::swap(distances[k][i],distances[k][j]);
+        }
+      }
+    }
+  }
 
 }
 

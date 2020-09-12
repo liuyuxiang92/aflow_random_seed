@@ -1827,9 +1827,11 @@ class xstructure {
     // std::vector<vector<double> > rshell;                       // vector of shells
     // std::vector<vector<int> > nshell;                          // vector of density in shells
     // int nbins;                                                 // number of bins
-    void GetNeighbors(vector<vector<uint> >& i_neighbors,vector<vector<double> >& distances,double rmin=0.0,bool prim=true); //CO20200912
-    void GetNeighbors(vector<vector<uint> >& i_neighbors,vector<vector<double> >& distances,double rmax,double rmin=0.0,bool prim=true); //CO20200912
     void check_structure();                                       //RF20200831; rescale structure to 1 and check whether e.g. species and atoms are present
+    void GetNeighbors(deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,double rmin=0.0,bool prim=true,bool unique_only=true);  //CO20200912
+    void GetNeighbors(deque<_atom>& atoms_cell,deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,double rmin=0.0,bool prim=true,bool unique_only=true);  //CO20200912
+    void GetNeighbors(deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,double rmax,double rmin=0.0,bool prim=true,bool unique_only=true);  //CO20200912
+    void GetNeighbors(deque<_atom>& atoms_cell,deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,double rmax,double rmin=0.0,bool prim=true,bool unique_only=true);  //CO20200912
     // NEIGHBOURS OBEJCTS OLD-ACONVASP BUT WORKS                  // NEIGHBOURS OBEJCTS 
     // GetNeighData collects all the neighbor data between rmin and rmax and stores it for each atom in a vector of atom objects in order of increasing distance.  
     void GetNeighData(const deque<_atom>& in_atom_vec,const double& rmin, const double& rmax,deque<deque<_atom> >& neigh_mat);
