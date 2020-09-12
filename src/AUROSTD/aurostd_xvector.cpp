@@ -2053,12 +2053,66 @@ namespace aurostd {
 
 namespace aurostd {
   template<class utype> xvector<utype> //get centroid of data points //CO20180409
-    getCentroid(const vector<xvector<utype> >& points) {
-      xvector<utype> centroid;
-      if(points.size()==0){return centroid;}
-      centroid=points[0];
-      for(uint i=1;i<points.size();i++){centroid+=points[i];}
-      centroid/=points.size();
+    getCentroid(const vector<xvector<utype> >& points) { //DX20200728 - added weights
+
+      vector<utype> weights;
+      for(uint i=0;i<points.size();i++){
+        weights.push_back((utype)1.0);
+      }
+      return getCentroid(points,weights);
+    }
+}
+
+namespace aurostd {
+  template<class utype> xvector<utype> //get centroid of data points //CO20180409
+    getCentroid(const vector<xvector<utype> >& points, const vector<utype>& weights) { //DX20200728 - added weights
+      if(points.size()==0){ xvector<utype> centroid; return centroid; }
+      xvector<utype> centroid(points[0].lrows,points[0].urows); //DX+CO20200907 - ensure dimensions are commensurate
+      centroid=points[0]*weights[0]; //DX20200728
+      for(uint i=1;i<points.size();i++){centroid+=points[i]*weights[0];} //DX20200728
+      centroid/=(aurostd::sum(weights));
+      return centroid;
+    }
+}
+
+namespace aurostd {
+  template<class utype> xvector<double> //get centroid of data points with PBC //DX20200728
+    getCentroidPBC(const vector<xvector<utype> >& points, const xmatrix<utype>& lattice) {
+
+      vector<utype> weights;
+      for(uint i=0;i<points.size();i++){
+        weights.push_back((utype)1.0);
+      }
+      return getCentroidPBC(points,weights,lattice);
+    }
+}
+
+namespace aurostd {
+  template<class utype> xvector<double> //get centroid of data points with PBC //DX20200728
+    getCentroidPBC(const vector<xvector<utype> >& points, const vector<utype>& weights, const xmatrix<utype>& lattice) {
+
+      // Calculate the centroid in a system with periodic boundary conditions.
+      // This is based on the algorithm proposed in:
+      // https://en.wikipedia.org/wiki/Center_of_mass#Systems_with_periodic_boundary_conditions
+
+      if(points.size()==0){ xvector<double> centroid; return centroid; }
+      xvector<double> centroid(points[0].lrows,points[0].urows); //DX+CO20200907 - ensure dimensions are commensurate
+
+      for(uint i=1;i<4;i++){
+        double zi_avg = 0.0;
+        double zeta_avg = 0.0;
+        for(uint j=0;j<points.size();j++){
+          double theta = points[j][i]*(2.0*pi)/(aurostd::modulus(lattice(i)));
+          double zi = std::cos(theta)*weights[j];
+          double zeta = std::sin(theta)*weights[j];
+          zi_avg += zi;
+          zeta_avg += zeta;
+        }
+        zi_avg/=(aurostd::sum(weights));
+        zeta_avg/=(aurostd::sum(weights));
+        double theta_avg = std::atan2(-zeta_avg,-zi_avg);
+        centroid(i) = theta_avg*(aurostd::modulus(lattice(i))/(2.0*pi));
+      }
       return centroid;
     }
 }

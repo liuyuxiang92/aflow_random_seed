@@ -1854,14 +1854,22 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
       string catalog = "anrl";
       vector<string> existing_prototype_labels = compare::getMatchingPrototypes(xstr_orig,catalog); //DX20190326 - use unpocc'd structure //DX20200226 - update namespace to compare
       if(existing_prototype_labels.size()){
+        vector<string> label_tokens; aurostd::string2tokens(xvasp.AVASP_label,label_tokens,"."); //DX20200710
+        string anrl_base_label = label_tokens[0]; //DX20200710
         //DX20190326 - added if-statement cases - START
         // contains degrees of freedom
         if(aurostd::substring2bool(existing_prototype_labels[0],"-")){ 
           vector<string> tmp_tokens; aurostd::string2tokens(existing_prototype_labels[0],tmp_tokens,"-");
+          if(anrl_base_label!=tmp_tokens[0]){ //DX20200710 - check to make sure the labels are the same and not just isopointal
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"This system is equivalent to an existing ANRL prototype, but the labels are ordered differently: system="+anrl_base_label+" vs ANRL="+tmp_tokens[0],_INPUT_ILLEGAL_);
+          }
           anrl_add_on = "-" + tmp_tokens[1]; // e.g., 001
         }
         // doesn't contain degree of freedom
         else {
+          if(anrl_base_label!=existing_prototype_labels[0]){ //DX20200710 - check to make sure the labels are the same and not just isopointal
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"This system is equivalent to an existing ANRL prototype, but the labels are ordered differently: system="+anrl_base_label+" vs ANRL="+existing_prototype_labels[0],_INPUT_ILLEGAL_);
+          }
           anrl_add_on = "";
         }
         //DX20190326 - added if-statement cases - END

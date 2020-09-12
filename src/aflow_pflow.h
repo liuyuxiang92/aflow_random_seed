@@ -171,8 +171,10 @@ namespace pflow {
   void JOINSTRLIST(vector<string>);
   void MAKESTRLIST(vector<string>);
   xstructure LATTICEREDUCTION(istream& input);
-  string LATTICE_TYPE(istream& input);
-  string LATTICE_LATTICE_TYPE(istream& input);
+  //DX20200820 [OBSOLETE] string LATTICE_TYPE(istream& input);
+  //DX20200820 [OBSOLETE] string LATTICE_LATTICE_TYPE(istream& input);
+  string LATTICE_TYPE(istream& input,aurostd::xoption& vpflow); //DX20200820 - added vpflow
+  string LATTICE_LATTICE_TYPE(istream& input,aurostd::xoption& vpflow); //DX20200820
   string listPrototypeLabels(aurostd::xoption& vpflow); //DX20181004
   //DX20200225 [OBSOLETE - moved to XtalFinder header] string isopointalPrototypes(istream& input, const aurostd::xoption& vpflow); //DX20200131 
   //DX20200225 [OBSOLETE - moved to XtalFinder header] vector<string> getIsopointalPrototypes(xstructure& xstr, string& catalog); //DX20200131 
@@ -293,10 +295,10 @@ namespace pflow {
   vector<vector<string> > elementalCombinations(const vector<string>& velements, uint nary);
   ////////////////////////////////////////////////////////////////////////////////
   //easy way to think about it:  do compounds belong to the hull?
-  bool compoundsBelong(const vector<string>& velements, const string& input, ostream& oss=cout, bool clean=true, bool sort_elements=false, compound_designation c_desig=composition_string, bool shortcut_pp_string_AFLOW_database=false);
-  bool compoundsBelong(const vector<string>& velements, const string& input, vector<string>& input_velements, vector<double>& input_vcomposition, ostream& oss=cout, bool clean=true, bool sort_elements=false, compound_designation c_desig=composition_string, bool shortcut_pp_string_AFLOW_database=false);
-  bool compoundsBelong(const vector<string>& velements, const string& input, ofstream& FileMESSAGE, ostream& oss=cout, bool clean=true, bool sort_elements=false, compound_designation c_desig=composition_string,bool shortcut_pp_string_AFLOW_database=false);
-  bool compoundsBelong(const vector<string>& velements, const string& input, vector<string>& input_velements, vector<double>& input_vcomposition, ofstream& FileMESSAGE, ostream& oss=cout, bool clean=true, bool sort_elements=false, compound_designation c_desig=composition_string,bool shortcut_pp_string_AFLOW_database=false);
+  bool compoundsBelong(const vector<string>& velements, const string& input, ostream& oss=cout, bool clean=true, bool sort_elements=false, elements_string_type e_str_type=composition_string, bool shortcut_pp_string_AFLOW_database=false);
+  bool compoundsBelong(const vector<string>& velements, const string& input, vector<string>& input_velements, vector<double>& input_vcomposition, ostream& oss=cout, bool clean=true, bool sort_elements=false, elements_string_type e_str_type=composition_string, bool shortcut_pp_string_AFLOW_database=false);
+  bool compoundsBelong(const vector<string>& velements, const string& input, ofstream& FileMESSAGE, ostream& oss=cout, bool clean=true, bool sort_elements=false, elements_string_type e_str_type=composition_string,bool shortcut_pp_string_AFLOW_database=false);
+  bool compoundsBelong(const vector<string>& velements, const string& input, vector<string>& input_velements, vector<double>& input_vcomposition, ofstream& FileMESSAGE, ostream& oss=cout, bool clean=true, bool sort_elements=false, elements_string_type e_str_type=composition_string,bool shortcut_pp_string_AFLOW_database=false);
   bool compoundsBelong(const vector<string>& velements, const vector<string>& elements, ostream& oss=cout, bool sort_elements=false);
   bool compoundsBelong(const vector<string>& velements, const vector<string>& elements, ofstream& FileMESSAGE, ostream& oss=cout, bool sort_elements=false);
   ////////////////////////////////////////////////////////////////////////////////
@@ -304,17 +306,6 @@ namespace pflow {
   bool loadXstructures(aflowlib::_aflowlib_entry& entry, ostream& oss=cout, bool relaxed_only=true, string path="", bool is_url_path=false);
   bool loadXstructures(aflowlib::_aflowlib_entry& entry, ofstream& FileMESSAGE, ostream& oss=cout, bool relaxed_only=true, string path="", bool is_url_path=false);
   bool loadXstructures(aflowlib::_aflowlib_entry& entry, vector<string>& structure_files, ofstream& FileMESSAGE, ostream& oss=cout, bool relaxed_only=true, string path="", bool is_url_path=false); //DX20200224
-  ////////////////////////////////////////////////////////////////////////////////
-  vector<string> getElements(const string& _input); //CO20190712
-  void elementsFromCompositionString(const string& input);  //CO20190712
-  void elementsFromCompositionString(const string& input,vector<string>& velements,vector<double>& vcomposition); //CO20190712
-  void elementsFromPPString(const string& input,vector<string>& velements,bool keep_pp=false); //CO20190712
-  ////////////////////////////////////////////////////////////////////////////////
-  // returns UNSORTED vector<string> from string
-  vector<string> stringElements2VectorElements(const string& input, bool clean=true, bool sort_elements=false, compound_designation c_desig=composition_string, bool keep_pp=false, ostream& oss=cout);
-  vector<string> stringElements2VectorElements(const string& input, vector<double>& vcomposition, bool clean=true, bool sort_elements=false, compound_designation c_desig=composition_string, bool keep_pp=false, ostream& oss=cout);  //ME20190628
-  vector<string> stringElements2VectorElements(const string& input, ofstream& FileMESSAGE, bool clean=true, bool sort_elements=false, compound_designation c_desig=composition_string, bool keep_pp=false, ostream& oss=cout);
-  vector<string> stringElements2VectorElements(const string& input, vector<double>& vcomposition, ofstream& FileMESSAGE, bool clean=true, bool sort_elements=false, compound_designation c_desig=composition_string, bool keep_pp=false, ostream& oss=cout);  //ME20190628
   ////////////////////////////////////////////////////////////////////////////////
   //[CO20190712 - OBSOLETE]// functions for making input alphabetic
   //[CO20190712 - OBSOLETE]// PdMn -> MnPd, does it by CAPITAL letters
@@ -922,10 +913,18 @@ namespace pflow {
   const int COEF_PRECISION = 4;
 
   string prettyPrintCompound(const string&, vector_reduction_type vred=gcd_vrt, bool=true, filetype ftype=latex_ft); //char=_latex_  //CO20190629
+  string prettyPrintCompound(const vector<string>&, const vector<uint>&, vector_reduction_type vred=gcd_vrt, bool=true, filetype ftype=latex_ft);  //char=_latex_  //DX20200727 - uint variant
   string prettyPrintCompound(const vector<string>&, const vector<double>&, vector_reduction_type vred=gcd_vrt, bool=true, filetype ftype=latex_ft);  //char=_latex_  //CO20190629
+  string prettyPrintCompound(const vector<string>&, const aurostd::xvector<uint>&, vector_reduction_type vred=gcd_vrt, bool=true, filetype ftype=latex_ft);  //char=_latex_  //CO20200727 - uint variant
   string prettyPrintCompound(const vector<string>&, const aurostd::xvector<double>&, vector_reduction_type vred=gcd_vrt, bool=true, filetype ftype=latex_ft);  //char=_latex_  //CO20190629
 
 }  // namespace pflow
+
+namespace pflow {
+  vector<string> fakeElements(uint nspecies); //DX20200728
+  double getSymmetryTolerance(const xstructure& xstr, const string& tolerance_string);
+  vector<double> getSymmetryToleranceSpectrum(const string& tolerance_range_string);
+}
 
 #endif
 // ***************************************************************************

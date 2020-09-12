@@ -521,7 +521,7 @@ bool StructurePrototype::addStructurePrototypeAsDuplicate(StructurePrototype& b)
   // only add xstructure if it has been generated
   if(b.structure_representative_generated){
     structures_duplicate.push_back(b.structure_representative);
-    structures_duplicate_compounds.push_back(compare::getCompoundName(b.structure_representative)); //DX20190111 - added compound, e.g., Ag1Br2
+    structures_duplicate_compounds.push_back(pflow::prettyPrintCompound(b.elements,b.stoichiometry,no_vrt,false,txt_ft)); //DX20190111 - added compound, e.g., Ag1Br2
   }
   else if(!b.structure_representative_compound.empty()){
     structures_duplicate_compounds.push_back(b.structure_representative_compound); //DX20190111 - added compound, e.g., Ag1Br2
@@ -620,7 +620,7 @@ bool StructurePrototype::putDuplicateAsRepresentative(StructurePrototype& b, uin
   structure_representative_name=b.structures_duplicate_names[index];
   // ntypes=b.structures_duplicate[index].num_each_type.size();
   structure_representative_compound=b.structures_duplicate_compounds[index]; //DX20190111 - added compound, e.g., Ag1Br2
-  elements = pflow::getElements(structure_representative_compound); //DX20191003 - add elements of this compound only!
+  elements = aurostd::getElements(structure_representative_compound); //DX20191003 - add elements of this compound only!
   structure_representative_generated=b.structures_duplicate_generated[index];
   structure_representative_source=b.structures_duplicate_source[index];
   structure_representative_relaxation_step=b.structures_duplicate_relaxation_step[index]; //DX20200429
@@ -1015,11 +1015,11 @@ namespace compare {
         structure_tmp.structure_representative.ReScale(1.0); //DX20190715
         structure_tmp.structure_representative.BringInCell(); //DX20200707
         structure_tmp.structure_representative_name = directory+"/"+vfiles[i];
-        structure_tmp.stoichiometry = compare::getStoichiometry(xstr1,same_species);
-        structure_tmp.elements = compare::getElements(xstr1);
+        structure_tmp.stoichiometry = xstr1.GetReducedComposition(!same_species);
+        structure_tmp.elements = xstr1.GetElements(true,true); // true: clean names
         structure_tmp.natoms = xstr1.atoms.size(); //DX20190425
         structure_tmp.ntypes = xstr1.num_each_type.size(); //DX20190425
-        structure_tmp.structure_representative_compound = compare::getCompoundName(xstr1); //remove ones is true  //DX20190311 //DX20190313 - use xstr1
+        structure_tmp.structure_representative_compound = pflow::prettyPrintCompound(structure_tmp.elements,structure_tmp.stoichiometry,no_vrt,false,txt_ft);//remove ones is true  //DX20190311 //DX20190313 - use xstr1
         // update xstructure species
         if(structure_tmp.structure_representative.species.size()==0){
           deque<string> deque_species; for(uint j=0;j<structure_tmp.elements.size();j++){deque_species.push_back(structure_tmp.elements[j]);}
@@ -1127,11 +1127,11 @@ namespace compare {
         structure_tmp.structure_representative.ReScale(1.0); //DX20190715
         structure_tmp.structure_representative.BringInCell(); //DX20200707
         structure_tmp.structure_representative_name = designation.str();
-        structure_tmp.stoichiometry = compare::getStoichiometry(structure_tmp.structure_representative,same_species);
-        structure_tmp.elements = compare::getElements(structure_tmp.structure_representative);
+        structure_tmp.stoichiometry = structure_tmp.structure_representative.GetReducedComposition(!same_species);
+        structure_tmp.elements = structure_tmp.structure_representative.GetElements(true,true); // true: clean names
         structure_tmp.natoms = structure_tmp.structure_representative.atoms.size(); //DX20190425
         structure_tmp.ntypes = structure_tmp.structure_representative.num_each_type.size(); //DX20190425
-        structure_tmp.structure_representative_compound = compare::getCompoundName(structure_tmp.structure_representative); //remove ones is true  //DX20190311 //DX20190313 - use xstr
+        structure_tmp.structure_representative_compound = pflow::prettyPrintCompound(structure_tmp.elements,structure_tmp.stoichiometry,no_vrt,false,txt_ft); //remove ones is true  //DX20190311 //DX20190313 - use xstr
         // update xstructure species
         if(structure_tmp.structure_representative.species.size()==0){
           deque<string> deque_species; for(uint j=0;j<structure_tmp.elements.size();j++){deque_species.push_back(structure_tmp.elements[j]);}
@@ -1208,11 +1208,11 @@ namespace compare {
       structure_tmp.structure_representative.ReScale(1.0); //DX20190715
       structure_tmp.structure_representative.BringInCell(); //DX20200707
       structure_tmp.structure_representative_name = filenames[i];
-      structure_tmp.stoichiometry = compare::getStoichiometry(xstr,same_species);
-      structure_tmp.elements = compare::getElements(xstr);
+      structure_tmp.stoichiometry = xstr.GetReducedComposition(!same_species);
+      structure_tmp.elements = xstr.GetElements(true,true); // true: clean names and assign fake names
       structure_tmp.natoms = xstr.atoms.size(); //DX20190425
       structure_tmp.ntypes = xstr.num_each_type.size(); //DX20190425
-      structure_tmp.structure_representative_compound = compare::getCompoundName(xstr); //remove ones is true  //DX20190311 //DX20190313 - use xstr
+      structure_tmp.structure_representative_compound = pflow::prettyPrintCompound(structure_tmp.elements,structure_tmp.stoichiometry,no_vrt,false,txt_ft); //remove ones is true  //DX20190311 //DX20190313 - use xstr
       // update xstructure species
       if(structure_tmp.structure_representative.species.size()==0){
         deque<string> deque_species; for(uint j=0;j<structure_tmp.elements.size();j++){deque_species.push_back(structure_tmp.elements[j]);}
@@ -1623,7 +1623,7 @@ namespace compare{
 
     // ---------------------------------------------------------------------------
     // get stoichiometry
-    vector<uint> stoichiometry = compare::getStoichiometry(structure.structure_representative,true);
+    vector<uint> stoichiometry = structure.structure_representative.GetReducedComposition();
 
     // ---------------------------------------------------------------------------
     // calculate symmetry (if not already calculated)
@@ -1763,7 +1763,7 @@ namespace compare{
 
     vector<StructurePrototype> permutation_structures;
 
-    vector<string> names = fakeElements(structure.stoichiometry.size());
+    vector<string> names = pflow::fakeElements(structure.stoichiometry.size()); //DX20200728 - now in pflow
     vector<uint> indices = structure.stoichiometry;
     vector<vector<string> > name_order;  
     uint num_elements = structure.stoichiometry.size();
@@ -1874,10 +1874,10 @@ namespace compare{
       str_proto_tmp.structure_representative_source = ss_str.str(); //DX20190730
       str_proto_tmp.structure_representative_relaxation_step = 0; //DX20200429 - input is assumed to be unrelaxed
       str_proto_tmp.copyPrototypeInformation(structure);
-      str_proto_tmp.stoichiometry = compare::getStoichiometry(str_proto_tmp.structure_representative, true); //DX20190529 - need updated stoich
+      str_proto_tmp.elements = xstr_tmp.GetElements(true,true); //DX20200728 - was missing
+      str_proto_tmp.stoichiometry = str_proto_tmp.structure_representative.GetReducedComposition(); //DX20190529 - need updated stoich
       // compound name is always alphabetic; order swapping is dictated by stoichiometry
-      //tmp.structure_representative_compound = compare::getCompoundName(name_order[0],tmp.stoichiometry,false); //remove ones is true //DX20190529 - need compound name to group later;
-      str_proto_tmp.structure_representative_compound = compare::getCompoundName(str_proto_tmp.structure_representative); //remove ones is true  //DX20190311 //DX20190313 - use xstr1
+      str_proto_tmp.structure_representative_compound = pflow::prettyPrintCompound(str_proto_tmp.elements,str_proto_tmp.stoichiometry,no_vrt,false,txt_ft); //remove ones is true  //DX20190311 //DX20190313 - use xstr1
       str_proto_tmp.environments_LFA=compare::computeLFAEnvironment(str_proto_tmp.structure_representative); //DX20190711
       str_proto_tmp.grouped_Wyckoff_positions = permutation_grouped_Wyckoff_positions[i];
       permutation_structures.push_back(str_proto_tmp);
@@ -1903,7 +1903,7 @@ namespace compare{
 
     vector<StructurePrototype> permutation_structures;
 
-    vector<string> names = fakeElements(stoichiometry.size());
+    vector<string> names = pflow::fakeElements(stoichiometry.size()); //DX20200728 - now in pflow
     vector<uint> indices = stoichiometry;
     vector<vector<string> > name_order;  
     uint num_elements = stoichiometry.size();
@@ -2173,62 +2173,62 @@ namespace compare{
   }
 }
 
-// ***************************************************************************
-//  Get Stoichiometry - Obtain stoichiometries from composition string
-// ***************************************************************************
-namespace compare{
-  vector<uint> getStoichiometry(string& composition, const bool& same_species){
-
-    // Obtains the least common multiple representation of the stoichiometry.
-
-    //cerr << "composition string: " << composition << endl;
-
-    vector<uint> stoich;
-    if(composition.size()==1){
-      stoich.push_back(1);
-    }
-    else {
-      bool is_previous_alpha = false;
-      vector<uint> stoichiometry;
-      stringstream tmp;
-      for(uint i=0;i<composition.size();i++){
-        if(isalpha(composition[i])){
-          if(is_previous_alpha){
-            stoichiometry.push_back(1);
-          }
-          else if(i!=0 && tmp.str().size() == 0){
-            stoichiometry.push_back(aurostd::string2utype<uint>(tmp.str()));
-            tmp.str("");
-          }
-        }
-        else if(isdigit(composition[i])){
-          tmp << composition[i];
-        }    
-        is_previous_alpha = isalpha(composition[i]);
-      }
-      if(is_previous_alpha){
-        stoichiometry.push_back(1);
-      }
-      else if(tmp.str().size() == 0){
-        stoichiometry.push_back(aurostd::string2utype<uint>(tmp.str()));
-        tmp.str("");
-      }
-      //::print(stoichiometry);
-      //DX20191125 [OBSOLETE] stoich=gcdStoich(stoichiometry);
-      stoich = stoichiometry;
-      aurostd::reduceByGCD(stoichiometry, stoich); //DX20191125
-    }
-    // If a structure prototype comparison (not material type), ensure 
-    // stoichiometries are in numerical order for comparison.  Else, 
-    // leave in position indicating atomic species count.
-    if(same_species==false){
-      for(uint i=0; i<stoich.size(); i++){
-        std::sort(stoich.begin(),stoich.end());
-      }
-    }
-    return stoich;
-  }
-}
+//DX20200727 [OBSOLETE] // ***************************************************************************
+//DX20200727 [OBSOLETE] //  Get Stoichiometry - Obtain stoichiometries from composition string
+//DX20200727 [OBSOLETE] // ***************************************************************************
+//DX20200727 [OBSOLETE] namespace compare{
+//DX20200727 [OBSOLETE]   vector<uint> getStoichiometry(string& composition, const bool& same_species){
+//DX20200727 [OBSOLETE] 
+//DX20200727 [OBSOLETE]     // Obtains the least common multiple representation of the stoichiometry.
+//DX20200727 [OBSOLETE] 
+//DX20200727 [OBSOLETE]     //cerr << "composition string: " << composition << endl;
+//DX20200727 [OBSOLETE] 
+//DX20200727 [OBSOLETE]     vector<uint> stoich;
+//DX20200727 [OBSOLETE]     if(composition.size()==1){
+//DX20200727 [OBSOLETE]       stoich.push_back(1);
+//DX20200727 [OBSOLETE]     }
+//DX20200727 [OBSOLETE]     else {
+//DX20200727 [OBSOLETE]       bool is_previous_alpha = false;
+//DX20200727 [OBSOLETE]       vector<uint> stoichiometry;
+//DX20200727 [OBSOLETE]       stringstream tmp;
+//DX20200727 [OBSOLETE]       for(uint i=0;i<composition.size();i++){
+//DX20200727 [OBSOLETE]         if(isalpha(composition[i])){
+//DX20200727 [OBSOLETE]           if(is_previous_alpha){
+//DX20200727 [OBSOLETE]             stoichiometry.push_back(1);
+//DX20200727 [OBSOLETE]           }
+//DX20200727 [OBSOLETE]           else if(i!=0 && tmp.str().size() == 0){
+//DX20200727 [OBSOLETE]             stoichiometry.push_back(aurostd::string2utype<uint>(tmp.str()));
+//DX20200727 [OBSOLETE]             tmp.str("");
+//DX20200727 [OBSOLETE]           }
+//DX20200727 [OBSOLETE]         }
+//DX20200727 [OBSOLETE]         else if(isdigit(composition[i])){
+//DX20200727 [OBSOLETE]           tmp << composition[i];
+//DX20200727 [OBSOLETE]         }    
+//DX20200727 [OBSOLETE]         is_previous_alpha = isalpha(composition[i]);
+//DX20200727 [OBSOLETE]       }
+//DX20200727 [OBSOLETE]       if(is_previous_alpha){
+//DX20200727 [OBSOLETE]         stoichiometry.push_back(1);
+//DX20200727 [OBSOLETE]       }
+//DX20200727 [OBSOLETE]       else if(tmp.str().size() == 0){
+//DX20200727 [OBSOLETE]         stoichiometry.push_back(aurostd::string2utype<uint>(tmp.str()));
+//DX20200727 [OBSOLETE]         tmp.str("");
+//DX20200727 [OBSOLETE]       }
+//DX20200727 [OBSOLETE]       //::print(stoichiometry);
+//DX20200727 [OBSOLETE]       //DX20191125 [OBSOLETE] stoich=gcdStoich(stoichiometry);
+//DX20200727 [OBSOLETE]       stoich = stoichiometry;
+//DX20200727 [OBSOLETE]       aurostd::reduceByGCD(stoichiometry, stoich); //DX20191125
+//DX20200727 [OBSOLETE]     }
+//DX20200727 [OBSOLETE]     // If a structure prototype comparison (not material type), ensure 
+//DX20200727 [OBSOLETE]     // stoichiometries are in numerical order for comparison.  Else, 
+//DX20200727 [OBSOLETE]     // leave in position indicating atomic species count.
+//DX20200727 [OBSOLETE]     if(same_species==false){
+//DX20200727 [OBSOLETE]       for(uint i=0; i<stoich.size(); i++){
+//DX20200727 [OBSOLETE]         std::sort(stoich.begin(),stoich.end());
+//DX20200727 [OBSOLETE]       }
+//DX20200727 [OBSOLETE]     }
+//DX20200727 [OBSOLETE]     return stoich;
+//DX20200727 [OBSOLETE]   }
+//DX20200727 [OBSOLETE] }
 
 // ***************************************************************************
 //  addAFLOWPrototypes2StructurePrototypeVector() 
@@ -2265,8 +2265,8 @@ namespace compare{
           //structure_tmp.space_group = prototype_space_groups[i]; 
           structure_tmp.space_group = all_structures[0].space_group; // same as representative structure (either will be the same, or we are forcing it to be for the ignore_symmetry/ignore_Wyckoff run)
           structure_tmp.grouped_Wyckoff_positions = all_structures[0].grouped_Wyckoff_positions;
-          structure_tmp.elements = compare::fakeElements(all_structures[0].stoichiometry.size());
-          structure_tmp.structure_representative_compound = compare::getCompoundName(structure_tmp.elements,structure_tmp.stoichiometry,true); //remove ones is true 
+          structure_tmp.elements = pflow::fakeElements(all_structures[0].stoichiometry.size()); //DX20200728 - now in pflow
+          structure_tmp.structure_representative_compound = pflow::prettyPrintCompound(structure_tmp.elements,structure_tmp.stoichiometry,no_vrt,true,txt_ft); //remove ones is true
           structure_tmp.structure_representative_generated = false; 
           structure_tmp.structure_representative_source = "aflow_prototypes";
           structure_tmp.structure_representative_relaxation_step = 0; //DX20200429 - prototypes are unrelaxed
@@ -2283,8 +2283,8 @@ namespace compare{
         structure_tmp.space_group = all_structures[0].space_group; // same as representative structure (either will be the same, or we are forcing it to be for the ignore_symmetry/ignore_Wyckoff run)
         structure_tmp.grouped_Wyckoff_positions = all_structures[0].grouped_Wyckoff_positions;
         vector<string> elements;
-        structure_tmp.elements = compare::fakeElements(all_structures[0].stoichiometry.size());
-        structure_tmp.structure_representative_compound = compare::getCompoundName(structure_tmp.elements,structure_tmp.stoichiometry,true); //remove ones is true 
+        structure_tmp.elements = pflow::fakeElements(all_structures[0].stoichiometry.size()); //DX20200728 - now in pflow
+        structure_tmp.structure_representative_compound = pflow::prettyPrintCompound(structure_tmp.elements,structure_tmp.stoichiometry,no_vrt,true,txt_ft); //remove ones is true
         structure_tmp.structure_representative_generated = false; 
         structure_tmp.structure_representative_source = "aflow_prototypes";
         structure_tmp.structure_representative_relaxation_step = 0; //DX20200429 - prototypes are unrelaxed
@@ -2295,108 +2295,108 @@ namespace compare{
   }
 } 
 
-// ***************************************************************************
-//  Get Stoichiometry - Obtain stoichiometries from xstructure
-// ***************************************************************************
-namespace compare{
-  string getCompoundName(xstructure& xstr, bool remove_ones){
-
-    // Obtains compound name from xstructure in the reduced stoichiometric form.
-
-    vector<uint> stoichiometry = compare::getStoichiometry(xstr,true);
-    vector<string> elements = compare::getElements(xstr);
-
-    return getCompoundName(elements,stoichiometry,remove_ones);
-  }
-}
-
-// ***************************************************************************
-//  Get Stoichiometry - Obtain stoichiometries from xstructure
-// ***************************************************************************
-namespace compare{
-  string getCompoundName(vector<string>& elements, vector<uint>& stoichiometry, bool remove_ones){
-
-    // Obtains compound name from the elements and stoichiometry vectors.
-    // Note: Does not guarantee reduced stoichiometric form.
-
-    stringstream compound_name;
-    if(stoichiometry.size() == elements.size()){
-      for(uint i=0;i<stoichiometry.size();i++){
-        if(remove_ones && stoichiometry[i]==1){
-          compound_name << elements[i];
-        }
-        else {
-          compound_name << elements[i] << stoichiometry[i];
-        }
-      }
-    }
-    else {
-      cerr << "compare::getCompoundName():WARNING: Size of elements != stoichiometry. Not returning reduced compound name" << endl;
-      return "";
-    }
-    return compound_name.str();
-  }
-}
-
-// ***************************************************************************
-//  Get Stoichiometry - Obtain stoichiometries from xstructure
-// ***************************************************************************
-namespace compare{
-  vector<uint> getStoichiometry(const xstructure& xstr, const bool& same_species){
-
-    // Obtains the least common multiple representation of the stoichiometry.
-
-    deque<int> stoich;
-    if(xstr.species.size()==1){
-      stoich.push_back(1);
-    }
-    else {
-      //DX20191125 stoich=gcdStoich(xstr.num_each_type);
-      stoich = xstr.num_each_type;
-      aurostd::reduceByGCD(xstr.num_each_type, stoich); //DX20191125
-    }
-    // If a structure prototype comparison (not material type), ensure 
-    // stoichiometries are in numerical order for comparison.  Else, 
-    // leave in position indicating atomic species count.
-    if(same_species==false){
-      //DX20191125 for(uint i=0; i<stoich.size(); i++){
-      std::sort(stoich.begin(),stoich.end());
-      //DX20191125 }
-    }
-
-    // convert to vector<uint>
-    vector<uint> stoich_uint;
-    for(uint i=0;i<stoich.size();i++){ stoich_uint.push_back((uint)stoich[i]); }
-    return stoich_uint;
-  }
-}
-
-// ***************************************************************************
-//  Get Elements 
-// ***************************************************************************
-namespace compare{
-  vector<string> getElements(xstructure& xstr){
-
-    // Obtains the elements in the xstructure.
-
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
-    vector<string> velements;
-    // If atoms in poscar not labeled in either POSCAR; assign fake names
-    if (xstr.atoms[0].name == ""){
-      if(LDEBUG) {cerr << "compare::getElements():" << "WARNING!!!!! Atoms not labeled ... Assigning Fake names" << endl;}
-      fakeAtomsName(xstr);
-    }
-
-    string prev_element="";
-    for(uint i=0; i<xstr.atoms.size(); i++){
-      if(KBIN::VASP_PseudoPotential_CleanName(xstr.atoms[i].name) != prev_element){ //DX20190329 - remove pseudopotential info
-        velements.push_back(KBIN::VASP_PseudoPotential_CleanName(xstr.atoms[i].name)); //DX20190329 - remove pseudopotential info
-        prev_element=KBIN::VASP_PseudoPotential_CleanName(xstr.atoms[i].name); //DX20190329 - remove pseudopotential info
-      }
-    }
-    return velements;
-  }
-}
+//DX20200728 [OBSOLETE] // ***************************************************************************
+//DX20200728 [OBSOLETE] //  Get Stoichiometry - Obtain stoichiometries from xstructure
+//DX20200728 [OBSOLETE] // ***************************************************************************
+//DX20200728 [OBSOLETE] namespace compare{
+//DX20200728 [OBSOLETE]   string getCompoundName(xstructure& xstr, bool remove_ones){
+//DX20200728 [OBSOLETE] 
+//DX20200728 [OBSOLETE]     // Obtains compound name from xstructure in the reduced stoichiometric form.
+//DX20200728 [OBSOLETE] 
+//DX20200728 [OBSOLETE]     vector<uint> stoichiometry = compare::getStoichiometry(xstr,true);
+//DX20200728 [OBSOLETE]     vector<string> elements = compare::getElements(xstr);
+//DX20200728 [OBSOLETE] 
+//DX20200728 [OBSOLETE]     return getCompoundName(elements,stoichiometry,remove_ones);
+//DX20200728 [OBSOLETE]   }
+//DX20200728 [OBSOLETE] }
+//DX20200728 [OBSOLETE] 
+//DX20200728 [OBSOLETE] // ***************************************************************************
+//DX20200728 [OBSOLETE] //  Get Stoichiometry - Obtain stoichiometries from xstructure
+//DX20200728 [OBSOLETE] // ***************************************************************************
+//DX20200728 [OBSOLETE] namespace compare{
+//DX20200728 [OBSOLETE]   string getCompoundName(vector<string>& elements, vector<uint>& stoichiometry, bool remove_ones){
+//DX20200728 [OBSOLETE] 
+//DX20200728 [OBSOLETE]     // Obtains compound name from the elements and stoichiometry vectors.
+//DX20200728 [OBSOLETE]     // Note: Does not guarantee reduced stoichiometric form.
+//DX20200728 [OBSOLETE] 
+//DX20200728 [OBSOLETE]     stringstream compound_name;
+//DX20200728 [OBSOLETE]     if(stoichiometry.size() == elements.size()){
+//DX20200728 [OBSOLETE]       for(uint i=0;i<stoichiometry.size();i++){
+//DX20200728 [OBSOLETE]         if(remove_ones && stoichiometry[i]==1){
+//DX20200728 [OBSOLETE]           compound_name << elements[i];
+//DX20200728 [OBSOLETE]         }
+//DX20200728 [OBSOLETE]         else {
+//DX20200728 [OBSOLETE]           compound_name << elements[i] << stoichiometry[i];
+//DX20200728 [OBSOLETE]         }
+//DX20200728 [OBSOLETE]       }
+//DX20200728 [OBSOLETE]     }
+//DX20200728 [OBSOLETE]     else {
+//DX20200728 [OBSOLETE]       cerr << "compare::getCompoundName():WARNING: Size of elements != stoichiometry. Not returning reduced compound name" << endl;
+//DX20200728 [OBSOLETE]       return "";
+//DX20200728 [OBSOLETE]     }
+//DX20200728 [OBSOLETE]     return compound_name.str();
+//DX20200728 [OBSOLETE]   }
+//DX20200728 [OBSOLETE] }
+//DX20200728 [OBSOLETE] 
+//DX20200728 [OBSOLETE] // ***************************************************************************
+//DX20200728 [OBSOLETE] //  Get Stoichiometry - Obtain stoichiometries from xstructure
+//DX20200728 [OBSOLETE] // ***************************************************************************
+//DX20200728 [OBSOLETE] namespace compare{
+//DX20200728 [OBSOLETE]   vector<uint> getStoichiometry(const xstructure& xstr, const bool& same_species){
+//DX20200728 [OBSOLETE] 
+//DX20200728 [OBSOLETE]     // Obtains the least common multiple representation of the stoichiometry.
+//DX20200728 [OBSOLETE] 
+//DX20200728 [OBSOLETE]     deque<int> stoich;
+//DX20200728 [OBSOLETE]     if(xstr.species.size()==1){
+//DX20200728 [OBSOLETE]       stoich.push_back(1);
+//DX20200728 [OBSOLETE]     }
+//DX20200728 [OBSOLETE]     else {
+//DX20200728 [OBSOLETE]       //DX20191125 stoich=gcdStoich(xstr.num_each_type);
+//DX20200728 [OBSOLETE]       stoich = xstr.num_each_type;
+//DX20200728 [OBSOLETE]       aurostd::reduceByGCD(xstr.num_each_type, stoich); //DX20191125
+//DX20200728 [OBSOLETE]     }
+//DX20200728 [OBSOLETE]     // If a structure prototype comparison (not material type), ensure 
+//DX20200728 [OBSOLETE]     // stoichiometries are in numerical order for comparison.  Else, 
+//DX20200728 [OBSOLETE]     // leave in position indicating atomic species count.
+//DX20200728 [OBSOLETE]     if(same_species==false){
+//DX20200728 [OBSOLETE]       //DX20191125 for(uint i=0; i<stoich.size(); i++){
+//DX20200728 [OBSOLETE]       std::sort(stoich.begin(),stoich.end());
+//DX20200728 [OBSOLETE]       //DX20191125 }
+//DX20200728 [OBSOLETE]     }
+//DX20200728 [OBSOLETE] 
+//DX20200728 [OBSOLETE]     // convert to vector<uint>
+//DX20200728 [OBSOLETE]     vector<uint> stoich_uint;
+//DX20200728 [OBSOLETE]     for(uint i=0;i<stoich.size();i++){ stoich_uint.push_back((uint)stoich[i]); }
+//DX20200728 [OBSOLETE]     return stoich_uint;
+//DX20200728 [OBSOLETE]   }
+//DX20200728 [OBSOLETE] }
+//DX20200728 [OBSOLETE] 
+//DX20200728 [OBSOLETE] // ***************************************************************************
+//DX20200728 [OBSOLETE] //  Get Elements 
+//DX20200728 [OBSOLETE] // ***************************************************************************
+//DX20200728 [OBSOLETE] namespace compare{
+//DX20200728 [OBSOLETE]   vector<string> getElements(xstructure& xstr){
+//DX20200728 [OBSOLETE] 
+//DX20200728 [OBSOLETE]     // Obtains the elements in the xstructure.
+//DX20200728 [OBSOLETE] 
+//DX20200728 [OBSOLETE]     bool LDEBUG=(FALSE || XHOST.DEBUG);
+//DX20200728 [OBSOLETE]     vector<string> velements;
+//DX20200728 [OBSOLETE]     // If atoms in poscar not labeled in either POSCAR; assign fake names
+//DX20200728 [OBSOLETE]     if (xstr.atoms[0].name == ""){
+//DX20200728 [OBSOLETE]       if(LDEBUG) {cerr << "compare::getElements():" << "WARNING!!!!! Atoms not labeled ... Assigning Fake names" << endl;}
+//DX20200728 [OBSOLETE]       fakeAtomsName(xstr);
+//DX20200728 [OBSOLETE]     }
+//DX20200728 [OBSOLETE] 
+//DX20200728 [OBSOLETE]     string prev_element="";
+//DX20200728 [OBSOLETE]     for(uint i=0; i<xstr.atoms.size(); i++){
+//DX20200728 [OBSOLETE]       if(KBIN::VASP_PseudoPotential_CleanName(xstr.atoms[i].name) != prev_element){ //DX20190329 - remove pseudopotential info
+//DX20200728 [OBSOLETE]         velements.push_back(KBIN::VASP_PseudoPotential_CleanName(xstr.atoms[i].name)); //DX20190329 - remove pseudopotential info
+//DX20200728 [OBSOLETE]         prev_element=KBIN::VASP_PseudoPotential_CleanName(xstr.atoms[i].name); //DX20190329 - remove pseudopotential info
+//DX20200728 [OBSOLETE]       }
+//DX20200728 [OBSOLETE]     }
+//DX20200728 [OBSOLETE]     return velements;
+//DX20200728 [OBSOLETE]   }
+//DX20200728 [OBSOLETE] }
 
 //DX20191125 [OBSOLETE - USING AUROSTD VERSION] // ***************************************************************************
 //DX20191125 [OBSOLETE - USING AUROSTD VERSION] // gcdStoich - Euler's Greatest Common Divisor Algorithm
@@ -2990,28 +2990,33 @@ namespace compare{
 // groupWyckoffPositions
 // ***************************************************************************
 namespace compare{
-  bool groupWyckoffPositions(xstructure& xstr, vector<GroupedWyckoffPosition>& grouped_positions){
+  bool groupWyckoffPositions(const xstructure& xstr, vector<GroupedWyckoffPosition>& grouped_positions){
 
     // Groups the Wyckoff positions via species 
     // Obtains information from xstructure
     // Assumes xstr.SpaceGroup_ITC() has been called, otherwise, this will fail
 
+    return groupWyckoffPositions(xstr.wyckoff_sites_ITC, grouped_positions);
+  }
+}
+namespace compare{
+  bool groupWyckoffPositions(const vector<wyckoffsite_ITC>& wyckoff_sites_ITC, vector<GroupedWyckoffPosition>& grouped_positions){
     uint type_count = 0; //DX20190425 - add type indicator
 
-    for(uint i=0;i<xstr.wyckoff_sites_ITC.size();i++){
+    for(uint i=0;i<wyckoff_sites_ITC.size();i++){
       //DX20191030 [OBOSLETE] vector<string> tokens;
-      //DX20191030 [OBOSLETE] aurostd::string2tokens(xstr.wyckoff_sites_ITC[i].wyckoffSymbol,tokens," ");  
+      //DX20191030 [OBOSLETE] aurostd::string2tokens(wyckoff_sites_ITC[i].wyckoffSymbol,tokens," ");
       //DX20191030 [OBOSLETE] uint multiplicity = aurostd::string2utype<uint>(tokens[0]);     
       //DX20191030 [OBOSLETE] string letter = aurostd::string2utype<string>(tokens[1]);     
       //DX20191030 [OBOSLETE] string site_symmetry = aurostd::string2utype<string>(tokens[2]);     
-      uint multiplicity = xstr.wyckoff_sites_ITC[i].multiplicity; //DX20191031 
-      string letter = xstr.wyckoff_sites_ITC[i].letter; //DX20191031
-      string site_symmetry = xstr.wyckoff_sites_ITC[i].site_symmetry; //DX20191031
+      uint multiplicity = wyckoff_sites_ITC[i].multiplicity; //DX20191031
+      string letter = wyckoff_sites_ITC[i].letter; //DX20191031
+      string site_symmetry = wyckoff_sites_ITC[i].site_symmetry; //DX20191031
 
       bool element_found = false;
       uint element_index = 0;
       for(uint j=0;j<grouped_positions.size();j++){
-        if(KBIN::VASP_PseudoPotential_CleanName(xstr.wyckoff_sites_ITC[i].type) == KBIN::VASP_PseudoPotential_CleanName(grouped_positions[j].element)){ //DX20190329 - remove pseudopotential info   
+        if(KBIN::VASP_PseudoPotential_CleanName(wyckoff_sites_ITC[i].type) == KBIN::VASP_PseudoPotential_CleanName(grouped_positions[j].element)){ //DX20190329 - remove pseudopotential info
           element_found = true;
           element_index = j;
           break;
@@ -3019,11 +3024,11 @@ namespace compare{
       }
       if(element_found == false){
         GroupedWyckoffPosition tmp;
-        tmp.type = type_count; //DX20190425 - added type   
-        tmp.element = KBIN::VASP_PseudoPotential_CleanName(xstr.wyckoff_sites_ITC[i].type); //DX20190329 - remove pseudopotential info   
-        tmp.site_symmetries.push_back(site_symmetry);          
-        tmp.multiplicities.push_back(multiplicity);          
-        tmp.letters.push_back(letter); //DX20190208 - add Wyckoff letters      
+        tmp.type = type_count; //DX20190425 - added type
+        tmp.element = KBIN::VASP_PseudoPotential_CleanName(wyckoff_sites_ITC[i].type); //DX20190329 - remove pseudopotential info
+        tmp.site_symmetries.push_back(site_symmetry);
+        tmp.multiplicities.push_back(multiplicity);
+        tmp.letters.push_back(letter); //DX20190208 - add Wyckoff letters
         grouped_positions.push_back(tmp);
         type_count++; //DX20190425
       }
@@ -3034,10 +3039,6 @@ namespace compare{
       }
     }
 
-    //cerr << "xstr: " << xstr << endl;
-    //for(uint j=0;j<grouped_positions.size();j++){
-    //  cerr << "grouped wyckoffs: " << grouped_positions[j] << endl;
-    //}
     return true;
   }
 }
@@ -3046,7 +3047,10 @@ namespace compare{
 // groupWyckoffPositions
 // ***************************************************************************
 namespace compare{
-  bool groupWyckoffPositionsFromGroupedString(uint& space_group_number, uint& setting, vector<vector<string> >& grouped_Wyckoff_string, vector<GroupedWyckoffPosition>& grouped_positions){
+  bool groupWyckoffPositionsFromGroupedString(uint space_group_number,
+      uint setting,
+      vector<vector<string> >& grouped_Wyckoff_string,
+      vector<GroupedWyckoffPosition>& grouped_positions){
 
     // Groups the Wyckoff positions via species 
     // Obtains information from the string of the following form: a,f,g;b,c;a,a
@@ -3062,7 +3066,8 @@ namespace compare{
     string spacegroupstring = ITC_sym_info.gl_sgs[space_group_number - 1]; //DX20190215
     for(uint i=0;i<grouped_Wyckoff_string.size();i++){
       GroupedWyckoffPosition tmp;
-      tmp.element = aurostd::utype2string<uint>(i);   
+      tmp.type = i; //DX20200625
+      tmp.element = aurostd::utype2string<uint>(i); //DX20200625 - this is just a placeholder since atoms were not fed in
       for(uint j=0;j<grouped_Wyckoff_string[i].size();j++){
         string Wyckoff_letter = grouped_Wyckoff_string[i][j];
         uint Wyckoff_multiplicity = 0;
@@ -3569,7 +3574,7 @@ namespace compare{
           str_proto_tmp.structure_representative=vxstrs[i];
           str_proto_tmp.ntypes=vxstrs[i].num_each_type.size();
           str_proto_tmp.natoms=vxstrs[i].atoms.size();
-          str_proto_tmp.structure_representative_compound=getCompoundName(vxstrs[i]); //DX20190111 - added compound, e.g., Ag1Br2
+          str_proto_tmp.structure_representative_compound=pflow::prettyPrintCompound(str_proto_tmp.elements,str_proto_tmp.stoichiometry,no_vrt,false,txt_ft);
         }
         comparison_schemes.push_back(str_proto_tmp);
       }
@@ -3629,7 +3634,7 @@ namespace compare{
                  //cerr << "adding to " << j << " (from): " << comparison_schemes[j].structures_duplicate_source.size() << endl;
                  if(vstructures_generated[i]){
                    comparison_schemes[j].structures_duplicate.push_back(vxstrs[i]);
-                   comparison_schemes[j].structures_duplicate_compounds.push_back(getCompoundName(vxstrs[i])); //DX20190111 - added compound, e.g., Ag1Br2
+                   comparison_schemes[j].structures_duplicate_compounds.push_back(pflow::prettyPrintCompound(comparison_schemes[j].elements,comparison_schemes[j].stoichiometry,no_vrt,false,txt_ft));
                  }
                  structure_misfit temp_misfit_info = compare::initialize_misfit_struct(); //DX20191218
                  comparison_schemes[j].structure_misfits_duplicate.push_back(temp_misfit_info); //DX20191218
@@ -3668,7 +3673,7 @@ namespace compare{
             str_proto_tmp.structure_representative=vxstrs[i];
             str_proto_tmp.ntypes=vxstrs[i].num_each_type.size();
             str_proto_tmp.natoms=vxstrs[i].atoms.size();
-            str_proto_tmp.structure_representative_compound=getCompoundName(vxstrs[i]); //DX20190111 - added compound, e.g., Ag1Br2
+            str_proto_tmp.structure_representative_compound=pflow::prettyPrintCompound(str_proto_tmp.elements,str_proto_tmp.stoichiometry,no_vrt,false,txt_ft);
           }
           comparison_schemes.push_back(str_proto_tmp);
         }
@@ -5522,47 +5527,47 @@ namespace compare{
   }
 }
 
-// ***************************************************************************
-// Fake Atoms Name
-// ***************************************************************************
-namespace compare{
-  vector<string> fakeElements(const uint& number_of_species){
+//DX20200728 [OBSOLETE - moved to pflow] // ***************************************************************************
+//DX20200728 [OBSOLETE - moved to pflow] // Fake Atoms Name
+//DX20200728 [OBSOLETE - moved to pflow] // ***************************************************************************
+//DX20200728 [OBSOLETE - moved to pflow] namespace compare{
+//DX20200728 [OBSOLETE - moved to pflow]   vector<string> fakeElements(const uint& number_of_species){
+//DX20200728 [OBSOLETE - moved to pflow] 
+//DX20200728 [OBSOLETE - moved to pflow]     // Return vector of fake letters
+//DX20200728 [OBSOLETE - moved to pflow] 
+//DX20200728 [OBSOLETE - moved to pflow]     vector<string> elements;
+//DX20200728 [OBSOLETE - moved to pflow] 
+//DX20200728 [OBSOLETE - moved to pflow]     string letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+//DX20200728 [OBSOLETE - moved to pflow]     for(uint i=0;i<number_of_species;i++){
+//DX20200728 [OBSOLETE - moved to pflow]       stringstream ss_letter; ss_letter << letters[i]; // cannot type cast char to string directly
+//DX20200728 [OBSOLETE - moved to pflow]       elements.push_back(ss_letter.str());
+//DX20200728 [OBSOLETE - moved to pflow]     }
+//DX20200728 [OBSOLETE - moved to pflow] 
+//DX20200728 [OBSOLETE - moved to pflow]     return elements;
+//DX20200728 [OBSOLETE - moved to pflow]   }
+//DX20200728 [OBSOLETE - moved to pflow] }
 
-    // Return vector of fake letters
-
-    vector<string> elements;
-
-    string letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    for(uint i=0;i<number_of_species;i++){
-      stringstream ss_letter; ss_letter << letters[i]; // cannot type cast char to string directly
-      elements.push_back(ss_letter.str());
-    }
-
-    return elements;
-  }
-}
-
-// ***************************************************************************
-// Fake Atoms Name
-// ***************************************************************************
-namespace compare{
-  void fakeAtomsName(xstructure& xstr){
-
-    // Assign a fake letter to each atom type. In case of materials with more 
-    // than 26 species it is necessary to add more characters to this string
-
-    string letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    int iat=0;
-
-    for(uint i=0; i<xstr.num_each_type.size(); i++){
-      xstr.species[i]=letters[i];
-      for(int j=0; j<xstr.num_each_type[i]; j++){
-        xstr.atoms[iat].name=letters[i];
-        iat++;
-      }
-    }
-  }
-}
+//DX20200728 [OBSOLETE - moved to xatom] // ***************************************************************************
+//DX20200728 [OBSOLETE - moved to xatom] // Fake Atoms Name
+//DX20200728 [OBSOLETE - moved to xatom] // ***************************************************************************
+//DX20200728 [OBSOLETE - moved to xatom] namespace compare{
+//DX20200728 [OBSOLETE - moved to xatom]   void fakeAtomsName(xstructure& xstr){
+//DX20200728 [OBSOLETE - moved to xatom] 
+//DX20200728 [OBSOLETE - moved to xatom]     // Assign a fake letter to each atom type. In case of materials with more 
+//DX20200728 [OBSOLETE - moved to xatom]     // than 26 species it is necessary to add more characters to this string
+//DX20200728 [OBSOLETE - moved to xatom] 
+//DX20200728 [OBSOLETE - moved to xatom]     string letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+//DX20200728 [OBSOLETE - moved to xatom]     int iat=0;
+//DX20200728 [OBSOLETE - moved to xatom] 
+//DX20200728 [OBSOLETE - moved to xatom]     for(uint i=0; i<xstr.num_each_type.size(); i++){
+//DX20200728 [OBSOLETE - moved to xatom]       xstr.species[i]=letters[i];
+//DX20200728 [OBSOLETE - moved to xatom]       for(int j=0; j<xstr.num_each_type[i]; j++){
+//DX20200728 [OBSOLETE - moved to xatom]         xstr.atoms[iat].name=letters[i];
+//DX20200728 [OBSOLETE - moved to xatom]         iat++;
+//DX20200728 [OBSOLETE - moved to xatom]       }
+//DX20200728 [OBSOLETE - moved to xatom]     }
+//DX20200728 [OBSOLETE - moved to xatom]   }
+//DX20200728 [OBSOLETE - moved to xatom] }
 
 // ***************************************************************************
 // Print Structure Parameters
@@ -6041,86 +6046,163 @@ namespace compare{
 //DX20191122 [MOVED TO XATOM]   }
 //DX20191122 [MOVED TO XATOM] }
 
-// ***************************************************************************
-// Find centroid for system with periodic boundary conditions
-// ***************************************************************************
-namespace compare{
-  xvector<double> centroid_with_PBC(const xstructure& xstr){
 
-    // Calculate the "best" centroid in a system with periodic boundary conditions.
-    // This is based on the algorithm proposed in: 
-    // https://en.wikipedia.org/wiki/Center_of_mass#Systems_with_periodic_boundary_conditions
-    // Used to find the best origin/centroid for a crystal structure.
-    // Use of this for finding the best origin is still in beta testing; 
-    // the method has some issues
-
-    vector<xvector<double> > coordinates;
-    for(uint i=0;i<xstr.atoms.size();i++){
-      coordinates.push_back(xstr.atoms[i].cpos); //or cpos
-    }
-    return centroid_with_PBC(coordinates,xstr.lattice);
-  }
-}
-
-// ***************************************************************************
-// Find centroid for system with periodic boundary conditions
-// ***************************************************************************
-namespace compare{
-  xvector<double> centroid_with_PBC(vector<xvector<double> >& coordinates, const xmatrix<double>& lattice){
-
-    // Calculate the "best" centroid in a system with periodic boundary conditions.
-    // This is based on the algorithm proposed in: 
-    // https://en.wikipedia.org/wiki/Center_of_mass#Systems_with_periodic_boundary_conditions
-    // If there are no weights (geometric center), then the weights are set to 1
-
-    vector<double> weights;
-    for(uint i=0;i<coordinates.size();i++){
-      weights.push_back(1.0);
-    }
-    return centroid_with_PBC(coordinates,weights,lattice);
-  }
-}
-
-// ***************************************************************************
-// Find centroid for system with periodic boundary conditions
-// ***************************************************************************
-namespace compare{
-  xvector<double> centroid_with_PBC(vector<xvector<double> >& coordinates, vector<double>& weights, 
-      const xmatrix<double>& lattice){
-
-    // Calculate the "best" centroid in a system with periodic boundary conditions.
-    // This is based on the algorithm proposed in: 
-    // https://en.wikipedia.org/wiki/Center_of_mass#Systems_with_periodic_boundary_conditions
-
-    xvector<double> centroid;
-    for(uint i=1;i<4;i++){
-      double zi_avg = 0.0;
-      double zeta_avg = 0.0;
-      double theta_avg =0.0;
-      for(uint j=0;j<coordinates.size();j++){
-        double theta = coordinates[j][i]*(2.0*Pi_r)/(aurostd::modulus(lattice(i)));
-        double zi = std::cos(theta)*weights[j];
-        double zeta = std::sin(theta)*weights[j];
-        zi_avg += zi/coordinates.size();
-        zeta_avg += zeta/coordinates.size();
-      }
-      theta_avg = std::atan2(-zeta_avg,-zi_avg);
-      centroid(i) = theta_avg*(aurostd::modulus(lattice(i))/(2.0*Pi_r));
-    }
-    return centroid;
-  } 
-}
-
+//DX20200728 [Moved centroid (NON-PBC and PBC) into XATOM and extended AUROSTD getCentroid()]
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] // ***************************************************************************
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] // Find centroid for system with periodic boundary conditions
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] // ***************************************************************************
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] namespace compare{
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]   xvector<double> centroid_with_PBC(const xstructure& xstr){
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] 
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     // Calculate the "best" centroid in a system with periodic boundary conditions.
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     // This is based on the algorithm proposed in: 
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     // https://en.wikipedia.org/wiki/Center_of_mass#Systems_with_periodic_boundary_conditions
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     // Used to find the best origin/centroid for a crystal structure.
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     // Use of this for finding the best origin is still in beta testing; 
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     // the method has some issues
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] 
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     vector<xvector<double> > coordinates;
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     for(uint i=0;i<xstr.atoms.size();i++){
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]       coordinates.push_back(xstr.atoms[i].cpos); //or cpos
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     }
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] 
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     return centroid_with_PBC(coordinates,xstr.lattice);
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]   }
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] }
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] 
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] // ***************************************************************************
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] // Find centroid for system with periodic boundary conditions
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] // ***************************************************************************
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] namespace compare{
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]   xvector<double> centroid_with_PBC(vector<xvector<double> >& coordinates, const xmatrix<double>& lattice){
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] 
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     // Calculate the "best" centroid in a system with periodic boundary conditions.
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     // This is based on the algorithm proposed in: 
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     // https://en.wikipedia.org/wiki/Center_of_mass#Systems_with_periodic_boundary_conditions
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     // If there are no weights (geometric center), then the weights are set to 1
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] 
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     vector<double> weights;
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     for(uint i=0;i<coordinates.size();i++){
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]       weights.push_back(1.0);
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     }
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     return centroid_with_PBC(coordinates,weights,lattice);
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]   }
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] }
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] 
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] // ***************************************************************************
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] // Find centroid for system with periodic boundary conditions
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] // ***************************************************************************
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] namespace compare{
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]   xvector<double> centroid_with_PBC(vector<xvector<double> >& coordinates, vector<double>& weights, 
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]       const xmatrix<double>& lattice){
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] 
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     // Calculate the "best" centroid in a system with periodic boundary conditions.
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     // This is based on the algorithm proposed in: 
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     // https://en.wikipedia.org/wiki/Center_of_mass#Systems_with_periodic_boundary_conditions
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] 
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     xvector<double> centroid;
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     for(uint i=1;i<4;i++){
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]       double zi_avg = 0.0;
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]       double zeta_avg = 0.0;
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]       double theta_avg =0.0;
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]       for(uint j=0;j<coordinates.size();j++){
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]         double theta = coordinates[j][i]*(2.0*Pi_r)/(aurostd::modulus(lattice(i)));
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]         double zi = std::cos(theta)*weights[j];
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]         double zeta = std::sin(theta)*weights[j];
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]         zi_avg += zi/coordinates.size();
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]         zeta_avg += zeta/coordinates.size();
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]       }
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]       theta_avg = std::atan2(-zeta_avg,-zi_avg);
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]       centroid(i) = theta_avg*(aurostd::modulus(lattice(i))/(2.0*Pi_r));
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     }
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     return centroid;
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]   } 
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] }
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] 
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] // ***************************************************************************
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] // Find centroid for system (NO periodic boundary conditions)
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] // ***************************************************************************
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] namespace compare{
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]   xvector<double> centroid(const xstructure& xstr){
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] 
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     // Calculate the centroid in a non-periodic system.
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     // Takes the cpos coordinates
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] 
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     vector<xvector<double> > coordinates;
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     for(uint i=0;i<xstr.atoms.size();i++){
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]       coordinates.push_back(xstr.atoms[i].cpos); //or cpos
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     }
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] 
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     return centroid(coordinates);
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]   }
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] }
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] 
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] // ***************************************************************************
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] // Find centroid for system (NO periodic boundary conditions)
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] // ***************************************************************************
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] namespace compare{
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]   xvector<double> centroid(const deque<_atom>& atoms){
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] 
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     // Calculate the centroid in a non-periodic system.
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     // Takes the cpos coordinates
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] 
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     vector<xvector<double> > coordinates;
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     for(uint i=0;i<atoms.size();i++){
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]       coordinates.push_back(atoms[i].cpos); //or cpos
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     }
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] 
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     return centroid(coordinates);
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]   }
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] }
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] 
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] // ***************************************************************************
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] // Find centroid for system (NO periodic boundary conditions)
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] // ***************************************************************************
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] namespace compare{
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]   xvector<double> centroid(const vector<xvector<double> >& coordinates){
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] 
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     // Calculate the centroid in a non-periodic system.
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     // Sets weights equal to one in this function.
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] 
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     vector<double> weights;
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     for(uint i=0;i<coordinates.size();i++){
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]       weights.push_back(1.0);
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     }
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     return centroid(coordinates,weights);
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]   }
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] }
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] 
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] // ***************************************************************************
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] // Find centroid for system with periodic boundary conditions
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] // ***************************************************************************
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] namespace compare{
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]   xvector<double> centroid(const vector<xvector<double> >& coordinates, const vector<double>& weights){
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] 
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     // Calculate the centroid in a non-periodic system.
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] 
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     xvector<double> centroid;
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     for(uint i=0;i<coordinates.size();i++){
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]       centroid += coordinates[i]*weights[i];
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     }
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     centroid /= coordinates.size();
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] 
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]     return centroid;
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]   } 
+//DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] }
 
 // ***************************************************************************
 // Find Matches
 // ***************************************************************************
 namespace compare{
-  bool findMatch(const deque<_atom>& xstr1_atoms, const deque<_atom>& PROTO_atoms,
+  bool findMatch(const deque<_atom>& _xstr1_atoms,
+      const deque<_atom>& _PROTO_atoms,
+      const xmatrix<double>& xstr1_lattice,
       const xmatrix<double>& PROTO_lattice,
       double minimum_interatomic_distance, //DX20200622
-      vector<uint>& mapping_index_str1, vector<uint>& mapping_index_str2, vector<double>& min_dists,
-      const int& type_match) {
+      vector<uint>& mapping_index_str1,
+      vector<uint>& mapping_index_str2,
+      vector<double>& min_dists,
+      const int& type_match){
 
     // In order to find the best matchings the routine computes 
     // the difference between one atom and all the others, 
@@ -6135,8 +6217,45 @@ namespace compare{
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     bool VERBOSE=false;
+    bool USE_CENTROID_METHOD=false;
 
     string function_name = XPID + "compare::findMatch():";
+   
+    // ---------------------------------------------------------------------------
+    // determine the center of mass (centroid) for the Cartesian coordinates //DX20200715
+    deque<_atom> xstr1_atoms = _xstr1_atoms;
+    xvector<double> xstr1_centroid,xstr1_centroid_PBC,PROTO_centroid,PROTO_centroid_PBC;
+    if(USE_CENTROID_METHOD){
+      for(uint i=0;i<xstr1_atoms.size();i++){ xstr1_atoms[i].mass = GetAtomMass(xstr1_atoms[i].name)/AMU2KILOGRAM; cerr << xstr1_atoms[i].name << " -> " << xstr1_atoms[i].mass << endl;}
+      xstr1_centroid = getCentroidOfStructure(xstr1_atoms,true,false);
+      xstr1_centroid_PBC = getCentroidOfStructurePBC(xstr1_atoms,xstr1_lattice,false,false); //DX20200904 - use PBC to account for switching sides of cell
+    }
+    deque<_atom> PROTO_atoms = _PROTO_atoms;
+    if(USE_CENTROID_METHOD){
+      for(uint i=0;i<PROTO_atoms.size();i++){ PROTO_atoms[i].mass = GetAtomMass(PROTO_atoms[i].name)/AMU2KILOGRAM;}
+      PROTO_centroid = getCentroidOfStructure(PROTO_atoms,true,false);
+      PROTO_centroid_PBC = getCentroidOfStructurePBC(PROTO_atoms,PROTO_lattice,false,false); //DX20200904 - use PBC to account for switching sides of cell
+    }
+
+    if(USE_CENTROID_METHOD){
+      cerr << function_name << " xstr1_centroid: " << xstr1_centroid << endl;
+      cerr << function_name << " xstr1_centroid_PBC: " << xstr1_centroid_PBC << endl;
+      cerr << function_name << " FRAC:xstr1_centroid: " << aurostd::inverse(trasp(xstr1_lattice))*xstr1_centroid << endl;
+      cerr << function_name << " FRAC:xstr1_centroid_PBC: " << aurostd::inverse(trasp(xstr1_lattice))*xstr1_centroid_PBC << endl;
+      cerr << function_name << " PROTO_centroid: " << PROTO_centroid << endl;
+      cerr << function_name << " PROTO_centroid_PBC: " << PROTO_centroid_PBC << endl;
+      cerr << function_name << " FRAC:PROTO_centroid: " << aurostd::inverse(trasp(PROTO_lattice))*PROTO_centroid << endl;
+      cerr << function_name << " FRAC:PROTO_centroid_PBC: " << aurostd::inverse(trasp(PROTO_lattice))*PROTO_centroid_PBC << endl;
+      xvector<double> xstr1_centroid_PBC_cart = aurostd::trasp(xstr1_lattice)*BringInCell(xstr1_centroid_PBC);
+      xvector<double> PROTO_centroid_PBC_cart = aurostd::trasp(PROTO_lattice)*BringInCell(PROTO_centroid_PBC);
+      cerr << function_name << " CART:xstr1_centroid_PBC: " << xstr1_centroid_PBC_cart << endl; 
+      cerr << function_name << " CART:PROTO_centroid_PBC: " << PROTO_centroid_PBC_cart << endl;
+    }
+
+    if(USE_CENTROID_METHOD){
+      for(uint i=0;i<xstr1_atoms.size();i++){xstr1_atoms[i].cpos = xstr1_atoms[i].cpos-xstr1_centroid_PBC; }
+      for(uint i=0;i<PROTO_atoms.size();i++){PROTO_atoms[i].cpos = PROTO_atoms[i].cpos-PROTO_centroid_PBC; }
+    }
 
     // ---------------------------------------------------------------------------
     // Determines cutoff distance in which atoms map onto one another and are
@@ -6181,6 +6300,7 @@ namespace compare{
 
     //DX20190226 [BETA] xvector<double> best_centroid1 = centroid_with_PBC(xstr1); 
     //DX20190226 [BETA] xvector<double> best_centroid2 = centroid_with_PBC(PROTO); 
+
 
     vector<xvector<double> > l1, l2, l3;
     vector<int> a_index, b_index, c_index;
@@ -7029,6 +7149,9 @@ namespace compare{
     // Compute the coordinates deviation by looking at each pair of atoms from
     // the reference and mapped structure
 
+    string function_name = XPID + "compare::coordinateDeviation():";
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+
     uint j=0;
     double num=0, den=0, nfail=0;
     double dd=0.0, nn1=0.0, nn2=0.0; //dd=delta distance, nn=nearest neighbour
@@ -7040,7 +7163,14 @@ namespace compare{
       nn1 = all_nn1[indexMatch1[j]];
       nn2 = all_nn_proto[indexMatch2[j]];
       dd = min_dists[j];
-
+      
+      if(LDEBUG){
+        cerr << function_name << " indexMatch1[j]: " << indexMatch1[j] << endl;
+        cerr << function_name << " indexMatch2[j]: " << indexMatch2[j] << endl;
+        cerr << function_name << " nn1: " << nn1 << endl;
+        cerr << function_name << " nn2: " << nn2 << endl;
+        cerr << function_name << " dd: " << dd << endl;
+      }
       //DX [OBSOLETE] if(dd<=0.5*nn1) fail1=0;
       //DX [OBSOLETE] if(dd>0.5*nn1) fail1=1;
       //DX [OBSOLETE] if(dd<=0.5*nn2) fail2=0;
@@ -7061,7 +7191,12 @@ namespace compare{
       }   
       if(fail1==1) nfail++;
       if(fail2==1) nfail++;
-    }   
+    }  
+
+    if(LDEBUG){
+      cerr << function_name << " cumulative num: " << num << endl;
+      cerr << function_name << " cumulative den: " << den << endl;
+    }
 
     if(den==0) cd=1;
     else cd=num/den;
@@ -7498,8 +7633,9 @@ namespace compare{
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string function_name = XPID + "compare::latticeAndOriginSearch():";
 
-    bool supercell_method = false; //DX20200330 - original method, but slow
+    bool supercell_method = true; //DX20200330 - original method, but slow //DX20200827 - false method is not robust enough yet
     bool test_one_lfa_only = false; //DX20190318
+    bool test_one_origin_only = false; //DX20200715
     //DX - SPEED UP BUT NOT ROBUST - if(type_match==2){ test_one_lfa_only=true;} //DX20190318
 
     bool magnetic_analysis = (xstr1.atoms[0].spin_is_given || xstr1.atoms[0].noncoll_spin_is_given);
@@ -7554,7 +7690,7 @@ namespace compare{
       // convert to clattice representation
       xstr1_tmp.lattice=GetClat(xstr1_tmp.a,xstr1_tmp.b,xstr1_tmp.c,xstr1_tmp.alpha,xstr1_tmp.beta,xstr1_tmp.gamma);
       for(uint iat=0; iat<xstr1_tmp.atoms.size(); iat++){
-        xstr1_tmp.atoms[iat].cpos=F2C(xstr1_tmp.lattice,xstr1_tmp.atoms[iat].fpos);
+        xstr1_tmp.atoms[iat].cpos=F2C(xstr1_tmp.scale*xstr1_tmp.lattice,xstr1_tmp.atoms[iat].fpos); //DX20200715 - add scale just in case
       }
       vector<double> all_nn1 = computeNearestNeighbors(xstr1_tmp); // nearest neighbor distances (invariant of origin shifts) 
 
@@ -7656,111 +7792,109 @@ namespace compare{
           // ---------------------------------------------------------------------------
           // shift representative structure to LFA
           // NEED TO SHIFT origin of xstr1_tmp to one of the LFA (this was missing before and caused ICSD_102428.BCA, and CBA to not match, but they should
+          // //DX20200715 - now explore all shifts, cannot just test one
           for(uint i=0;i<xstr1_tmp.atoms.size();i++){
             if(xstr1_tmp.atoms[i].name==lfa_str1){
               xstr1_tmp.ShiftOriginToAtom(i);
               xstr1_tmp.BringInCell(1e-10);
-              break;
-            }
-          }
 
-          // ---------------------------------------------------------------------------
-          // create vector of variables for each thread 
-          vector<xstructure> xstr1_for_thread;
-          vector<structure_misfit> possible_min_misfit_info; //DX20191218
-          vector<vector<uint> > possible_matching_indices_1, possible_matching_indices_2;
-          vector<vector<double> > possible_minimum_distances;
-          vector<vector<xstructure> > vvprotos;
-          for(uint n=0; n<num_proc; n++){
-            vector<xstructure> vprotos_tmp;
-            vvprotos.push_back(vprotos_tmp);
-            xstr1_for_thread.push_back(xstr1_tmp);
-            structure_misfit temp_misfit_info = compare::initialize_misfit_struct((magnetic_analysis && _CALCULATE_MAGNETIC_MISFIT_)); //DX20191218
-            possible_min_misfit_info.push_back(temp_misfit_info); //DX20191218
-            vector<uint> tmp_indices;
-            possible_matching_indices_1.push_back(tmp_indices);
-            possible_matching_indices_2.push_back(tmp_indices);
-            vector<double> tmp_distances;
-            possible_minimum_distances.push_back(tmp_distances);
-          }
+              // ---------------------------------------------------------------------------
+              // create vector of variables for each thread 
+              vector<xstructure> xstr1_for_thread;
+              vector<structure_misfit> possible_min_misfit_info; //DX20191218
+              vector<vector<uint> > possible_matching_indices_1, possible_matching_indices_2;
+              vector<vector<double> > possible_minimum_distances;
+              vector<vector<xstructure> > vvprotos;
+              for(uint n=0; n<num_proc; n++){
+                vector<xstructure> vprotos_tmp;
+                vvprotos.push_back(vprotos_tmp);
+                xstr1_for_thread.push_back(xstr1_tmp);
+                structure_misfit temp_misfit_info = compare::initialize_misfit_struct((magnetic_analysis && _CALCULATE_MAGNETIC_MISFIT_)); //DX20191218
+                possible_min_misfit_info.push_back(temp_misfit_info); //DX20191218
+                vector<uint> tmp_indices;
+                possible_matching_indices_1.push_back(tmp_indices);
+                possible_matching_indices_2.push_back(tmp_indices);
+                vector<double> tmp_distances;
+                possible_minimum_distances.push_back(tmp_distances);
+              }
 
 #ifdef AFLOW_COMPARE_MULTITHREADS_ENABLE
-          // ---------------------------------------------------------------------------
-          // threaded (DX20191107 thread pointer) 
-          vector<std::thread*> threads;
-          if(LDEBUG){cerr << function_name << " Searching for possible matching structures [THREADED VERSION]" << endl;}
-          for(uint n=0; n<number_of_threads; n++){
-            threads.push_back(new std::thread(structureSearch,
-                  std::ref(xstr1_for_thread[n]),
-                  std::ref(xstr_supercell),
-                  std::ref(all_nn1),
-                  std::ref(lfa_str2),
-                  type_match,
-                  std::ref(lattices),std::ref(clattices),std::ref(latt_devs),
-                  //DX20191107 [switching to getThreadDistribution] - start_indices[n], end_indices[n],
-                  thread_distribution[n][0], thread_distribution[n][1],
-                  std::ref(possible_min_misfit_info[n]), //DX20191218
-                  std::ref(possible_matching_indices_1[n]),std::ref(possible_matching_indices_2[n]),
-                  std::ref(possible_minimum_distances[n]),std::ref(vvprotos[n]),
-                  optimize_match));
-          }         
-          for(uint t=0;t<threads.size();t++){
-            threads[t]->join();
-            delete threads[t];
-          }
+              // ---------------------------------------------------------------------------
+              // threaded (DX20191107 thread pointer) 
+              vector<std::thread*> threads;
+              if(LDEBUG){cerr << function_name << " Searching for possible matching structures [THREADED VERSION]" << endl;}
+              for(uint n=0; n<number_of_threads; n++){
+                threads.push_back(new std::thread(structureSearch,
+                      std::ref(xstr1_for_thread[n]),
+                      std::ref(xstr_supercell),
+                      std::ref(all_nn1),
+                      std::ref(lfa_str2),
+                      type_match,
+                      std::ref(lattices),std::ref(clattices),std::ref(latt_devs),
+                      //DX20191107 [switching to getThreadDistribution] - start_indices[n], end_indices[n],
+                      thread_distribution[n][0], thread_distribution[n][1],
+                      std::ref(possible_min_misfit_info[n]), //DX20191218
+                      std::ref(possible_matching_indices_1[n]),std::ref(possible_matching_indices_2[n]),
+                      std::ref(possible_minimum_distances[n]),std::ref(vvprotos[n]),
+                      optimize_match));
+              }         
+              for(uint t=0;t<threads.size();t++){
+                threads[t]->join();
+                delete threads[t];
+              }
 #else
-          // ---------------------------------------------------------------------------
-          // non-threaded 
-          uint n=0;
-          uint start_index=0;
-          uint end_index=lattices.size();  //DX20191107 switching end point convention
-          if(LDEBUG){cerr << function_name << " Searching for possible matching structures [NON-THREADED VERSION]" << endl;}
-          //structureSearch(lfa_str2,all_nn1,xstr_supercell,vvprotos[n],xstr1_for_thread[n],type_match,possible_minMis[n],
-          //                lattices,clattices,latt_devs,optimize_match,start_index,end_index);
-          structureSearch(
-              xstr1_for_thread[n],
-              xstr_supercell,
-              all_nn1,
-              lfa_str2,
-              type_match,
-              lattices,clattices,latt_devs,
-              start_index, end_index,
-              possible_min_misfit_info[n], //DX20191218
-              possible_matching_indices_1[n],possible_matching_indices_2[n],
-              possible_minimum_distances[n],vvprotos[n],
-              optimize_match);
+              // ---------------------------------------------------------------------------
+              // non-threaded 
+              uint n=0;
+              uint start_index=0;
+              uint end_index=lattices.size();  //DX20191107 switching end point convention
+              if(LDEBUG){cerr << function_name << " Searching for possible matching structures [NON-THREADED VERSION]" << endl;}
+              //structureSearch(lfa_str2,all_nn1,xstr_supercell,vvprotos[n],xstr1_for_thread[n],type_match,possible_minMis[n],
+              //                lattices,clattices,latt_devs,optimize_match,start_index,end_index);
+              structureSearch(
+                  xstr1_for_thread[n],
+                  xstr_supercell,
+                  all_nn1,
+                  lfa_str2,
+                  type_match,
+                  lattices,clattices,latt_devs,
+                  start_index, end_index,
+                  possible_min_misfit_info[n], //DX20191218
+                  possible_matching_indices_1[n],possible_matching_indices_2[n],
+                  possible_minimum_distances[n],vvprotos[n],
+                  optimize_match);
 #endif
 
-          // ---------------------------------------------------------------------------
-          // collect misfits and matching structure representations
-          for(uint p=0;p<possible_min_misfit_info.size();p++){
-            if(p==0 && y==0 && x==0){ //DX20170208 - need to add x==0 ortherwise matches can be overwritten
-              min_misfit_info=possible_min_misfit_info[p]; //DX20191218
-              matching_indices_1=possible_matching_indices_1[p];
-              matching_indices_2=possible_matching_indices_2[p];
-              minimum_distances=possible_minimum_distances[p];
-              xstr1=xstr1_for_thread[p];
-              vprotos=vvprotos[p];
-            }
-            else {
-              if(possible_min_misfit_info[p].misfit<=min_misfit_info.misfit){
-                min_misfit_info=possible_min_misfit_info[p]; //DX20191218
-                matching_indices_1=possible_matching_indices_1[p];
-                matching_indices_2=possible_matching_indices_2[p];
-                minimum_distances=possible_minimum_distances[p];
-                xstr1=xstr1_for_thread[p];
-                vprotos=vvprotos[p];
+              // ---------------------------------------------------------------------------
+              // collect misfits and matching structure representations
+              for(uint p=0;p<possible_min_misfit_info.size();p++){
+                if(possible_min_misfit_info[p].misfit<=min_misfit_info.misfit){
+                  min_misfit_info=possible_min_misfit_info[p]; //DX20191218
+                  matching_indices_1=possible_matching_indices_1[p];
+                  matching_indices_2=possible_matching_indices_2[p];
+                  minimum_distances=possible_minimum_distances[p];
+                  xstr1=xstr1_for_thread[p];
+                  vprotos=vvprotos[p];
+                }
+              }
+
+              // ---------------------------------------------------------------------------
+              // quick return if found a match
+              if(min_misfit_info.misfit<0.1 && !optimize_match){
+                if(LDEBUG){cerr << function_name << " Found match (misfit = " << min_misfit_info.misfit << ")! Terminating search early." << endl;}
+                printStructureMappingResults(oss,xstr1,vprotos[0],min_misfit_info.misfit,min_misfit_info.lattice_deviation,min_misfit_info.coordinate_displacement,min_misfit_info.failure,min_misfit_info.magnetic_displacement,min_misfit_info.magnetic_failure,
+                    matching_indices_1,matching_indices_2,minimum_distances,magnetic_analysis);
+                return;
+              }
+
+              // ---------------------------------------------------------------------------
+              // quick return if testing only one origin //DX20200715
+              if(!optimize_match && aurostd::isequal(min_misfit_info.misfit,AUROSTD_MAX_DOUBLE)){ test_one_origin_only=true;}
+              if(test_one_origin_only){
+                if(LDEBUG){cerr << function_name << " No mapping found. Searched only one origin. Terminating search early." << endl;}
+                return;
               }
             }
-          }
-
-          // ---------------------------------------------------------------------------
-          // quick return if found a match
-          if(min_misfit_info.misfit<0.1 && !optimize_match){
-            if(LDEBUG){cerr << function_name << " Found match (misfit = " << min_misfit_info.misfit << ")! Terminating search early." << endl;}
-            printStructureMappingResults(oss,xstr1,vprotos[0],min_misfit_info.misfit,min_misfit_info.lattice_deviation,min_misfit_info.coordinate_displacement,min_misfit_info.failure,min_misfit_info.magnetic_displacement,min_misfit_info.magnetic_failure,
-                matching_indices_1,matching_indices_2,minimum_distances,magnetic_analysis);
-            return;
           }
 
           // ---------------------------------------------------------------------------
@@ -8073,7 +8207,7 @@ namespace compare{
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     bool VERBOSE=false;
 
-    bool supercell_method = false; //DX20200330
+    bool supercell_method = true; //DX20200330 //DX20200827 - false method is not robust enough yet
     double mis=AUROSTD_MAX_DOUBLE;
     double mag_dis=AUROSTD_MAX_DOUBLE; double mag_fail=AUROSTD_MAX_DOUBLE;
 
@@ -8084,10 +8218,12 @@ namespace compare{
 
     vector<string> species_str1=sortSpeciesByFrequency(xstr1);
     deque<_atom> xstr1_atoms;
+    vector<double> all_nn1_resorted;
     for(uint i=0;i<species_str1.size();i++){
       for(uint j=0;j<xstr1.atoms.size();j++){
         if(species_str1[i]==xstr1.atoms[j].name){
           xstr1_atoms.push_back(xstr1.atoms[j]);
+          all_nn1_resorted.push_back(all_nn1[j]); //DX20200713    
         }
       }
     }
@@ -8187,6 +8323,7 @@ namespace compare{
       if(sameSpecies(proto,xstr1,false)){
         vector<string> species_str2=sortSpeciesByFrequency(proto);
         vector<double> all_nn_proto;
+        vector<double> all_nn_proto_resorted; //DX20200713
         bool all_nn_calculated = false;
         for(uint iat=0; iat<proto.atoms.size();iat++){
           if(proto.atoms[iat].name==lfa){
@@ -8206,7 +8343,7 @@ namespace compare{
             }
             vector<uint> map_index_str1, map_index_str2;
             vector<double> min_dists;
-            if(findMatch(xstr1_atoms,proto_atoms,proto.lattice,minimum_interatomic_distance,map_index_str1,map_index_str2,min_dists,type_match)){;
+            if(findMatch(xstr1_atoms,proto_atoms,xstr1.lattice,proto.lattice,minimum_interatomic_distance,map_index_str1,map_index_str2,min_dists,type_match)){;
               if(VERBOSE){
                 for(uint m=0;m<map_index_str1.size();m++){
                   cerr << "compare::structureSearch: " << map_index_str1[m] << " == " << map_index_str2[m] << " : dist=" << min_dists[m] << endl;
@@ -8223,9 +8360,17 @@ namespace compare{
                     cerr << "compare::structureSearch: Nearest neighbor distance from " << a << " atom: " << all_nn_proto[a] << endl;
                   }
                 }
+                all_nn_proto_resorted.clear(); //DX20200715
+                for(uint i=0;i<species_str2.size();i++){
+                  for(uint j=0;j<proto.atoms.size();j++){
+                    if(species_str2[i]==proto.atoms[j].name){
+                      all_nn_proto_resorted.push_back(all_nn_proto[j]); //DX20200715
+                    }
+                  }
+                }
                 all_nn_calculated = true;
               }
-              coordinateDeviation(xstr1,proto,all_nn1,all_nn_proto,map_index_str1,map_index_str2,min_dists,cd,f);
+              coordinateDeviation(xstr1,proto,all_nn1_resorted,all_nn_proto_resorted,map_index_str1,map_index_str2,min_dists,cd,f); //DX20200713 - used resorted nn's
               if(_CALCULATE_MAGNETIC_MISFIT_&& 
                   ((xstr1.atoms[0].spin_is_given && proto.atoms[0].spin_is_given) || 
                    (xstr1.atoms[0].noncoll_spin_is_given && proto.atoms[0].noncoll_spin_is_given))){

@@ -229,7 +229,7 @@ namespace SYM {
             for(uint p=0;p<l3.size();p++){
               tmp = ab_component + l3[p];                       //DX : coord1-coord2+a*lattice(1) + (b*lattice(2)) + (c*lattice(3))
               min_dist=aurostd::min(min_dist,aurostd::modulus(tmp));
-              if(LDEBUG) {cerr << function_name << " atoms[" << i << "," << k << "]: a=" << a_index[m] << ",b=" << b_index[n] << ",c=" << c_index[p] << "; min_dist=" << min_dist << endl;}
+              if(LDEBUG) {cerr << function_name << " atoms[" << i << "," << k << "]: a=" << a_index[m] << ",b=" << b_index[n] << ",c=" << c_index[p] << "; min_dist=" << min_dist << "; this_dist=" << aurostd::modulus(tmp) << endl;}
             }
           }
         }
