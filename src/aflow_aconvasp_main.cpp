@@ -2301,7 +2301,7 @@ namespace pflow {
     strstream << tab << x << " --bzplotdata < POSCAR" << endl;
     strstream << tab << x << " --bzplotdatauseKPOINTS=KPOINTS < POSCAR" << endl;
     strstream << tab << x << " --cart [-c] < POSCAR" << endl;
-    strstream << tab << x << " [--cce (prints user instructions and exits)] --cce=POSCAR_FILE_PATH [--oxidation_numbers=ox_num_1,ox_num_2,...] [--dft_formation_enthalpies=form_enthalpy_1,form_enthalpy_2,...] [--functionals=functional_1,functional_2,...]" << endl;
+    strstream << tab << x << " [--cce (prints user instructions and exits)] --cce=POSCAR_FILE_PATH [--oxidation_numbers=ox_num_1,ox_num_2,...] [--enthalpies_formation_dft=form_enthalpy_1,form_enthalpy_2,...] [--functionals=functional_1,functional_2,...]" << endl;
     strstream << tab << x << " [options] --chgcar2jvxl=|--c2j=CHGCAR11[,CHGCAR2,...]::CUTOFF1,CUTOFF2...[::DOWNSAMPLE1,DOWNSAMPLE2,...]|CHGCAR1,CUTOFF1[,DOWNSAMPLE1:CHGCAR2,CUTOFF2[,DOWNSAMPLE2:...]]|CHGCAR,CUTOFF[,DOWNSAMPLE]" << endl;
     strstream << tab << xspaces << " " << "options are:  --usage" << endl;
     strstream << tab << xspaces << " " << "              --output=|--o=OUTPUT_FILE" << endl;

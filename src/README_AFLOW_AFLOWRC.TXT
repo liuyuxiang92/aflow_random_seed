@@ -1002,6 +1002,41 @@ DEFAULT_CCE_OX_METHOD
   choices: 1 (ELECTRONEGATIVITY_ALLEN), 2 (BADER)
   default: 1
 
+DEFAULT_CCE_NN_DIST_TOL_MULTI_ANION
+  description: Tolerance between shortest and longest bonds when testing for multi-anion compound in Ang.
+  type: double
+  default: 0.4
+
+DEFAULT_CCE_OX_TOL
+  description: Tolerance for sum of oxidation numbers to be considered as zero.
+  type: double
+  default: 0.001
+
+DEFAULT_CCE_SELF_DIST_TOL
+  description: Distance tolerance in Ang for neighbor screening to savely exclude the central atom itself.
+  type: double
+  default: 0.001
+
+DEFAULT_CCE_PEROX_CUTOFF
+  description: Upper bound for O-O bond length in peroxides in Ang.
+  type: double
+  default: 1.6
+
+DEFAULT_CCE_SUPEROX_CUTOFF
+  description: Upper bound for O-O bond length in superoxides in Ang.
+  type: double
+  default: 1.4
+
+DEFAULT_CCE_O2_MOLECULE_UPPER_CUTOFF
+  description: Upper bound for O-O bond length for molecular O2 in Ang.
+  type: double
+  default: 1.3
+
+DEFAULT_CCE_O2_MOLECULE_LOWER_CUTOFF
+  description: Lower bound for O-O bond length for molecular O2 in Ang.
+  type: double
+  default: 1.2
+
 ####################################################################################################
 DEFAULTS GFA
 

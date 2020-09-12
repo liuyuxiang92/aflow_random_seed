@@ -733,7 +733,7 @@ LATTICES = (the ones with "")
         options:
             [ --usage ]
             [ --functionals=PBE|LDA|SCAN]
-            [ --dft_formation_enthalpies|enthalpies_formation_dft=form_enthalpy_1,form_enthalpy_2,...]
+            [ --enthalpies_formation_dft|dft_formation_enthalpies=form_enthalpy_1,form_enthalpy_2,...]
             [ --oxidation_numbers=ox_num_1,ox_num_2,...]
             [ --print=json|out] (default is out)
 
@@ -742,7 +742,7 @@ LATTICES = (the ones with "")
         POSCAR is required or, if a VASP4 POSCAR is used, the species must be written on the right side
         next to the coordinates for each atom.
         Precalculated DFT formation enthalpies can be provided as a comma separated list using the option
-        --dft_formation_enthalpies= in eV/cell.
+        --enthalpies_formation_dft= in eV/cell.
         Functionals for which corrections should be returned can be provided as a comma separated list 
         using the option --functionals=. If used together with --dft_formation enthalpies, the functionals
         must be in the same sequence as the DFT formation enthalpies they correspond to. 
@@ -2673,7 +2673,7 @@ LATTICES = (the ones with "")
   aflow --poscar2cce|--get_cce_correction|--get_cce_cor < STRUCT_FILE
         options:
             [ --functionals=PBE|LDA|SCAN]
-            [ --dft_formation_enthalpies|enthalpies_formation_dft=form_enthalpy_1,form_enthalpy_2,...]
+            [ --enthalpies_formation_dft|dft_formation_enthalpies=form_enthalpy_1,form_enthalpy_2,...]
             [ --oxidation_numbers=ox_num_1,ox_num_2,...]
             [ --print=json|out] (default is out)
 
@@ -2682,7 +2682,7 @@ LATTICES = (the ones with "")
         POSCAR is required or, if a VASP4 POSCAR is used, the species must be written on the right side
         next to the coordinates for each atom.
         Precalculated DFT formation enthalpies can be provided as a comma separated list using the option
-        --dft_formation_enthalpies= in eV/cell.
+        --enthalpies_formation_dft= in eV/cell.
         Functionals for which corrections should be returned can be provided as a comma separated list 
         using the option --functionals=. If used together with --dft_formation enthalpies, the functionals
         must be in the same sequence as the DFT formation enthalpies they correspond to. 
