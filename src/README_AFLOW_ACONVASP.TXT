@@ -1052,6 +1052,11 @@ LATTICES = (the ones with "")
               a warning if structure is not a ground state one. It removes the point from the 
               hull, calculates the new hull, and calculates the distance of this point from
               below/above (Hf/Ts) hull.
+        [--n+1_enthalpy_gain=|--n+1_energy_gain=|--n+1enthalpygain=|--n+1energygain=|--n+1egain=|--n1egain=|--n+1_enthalpygain=|--n+1+energygain=|--n+1_egain=aflow:bb0d45ab555bc208,aflow:fb9eaa58604ce774] :
+              Calculates the N+1 enthalpy gain of the ground state structure. Will return
+              a warning if structure is not a ground state one. It removes all points having the 
+              same dimensionality from the hull, calculates the new hull, and calculates the 
+              distance of this point from below/above (Hf/Ts) hull.
         [--hull_formation_enthalpy=|--hull_energy=0.25,0.25] : Returns the value of the convex hull surface at the specified coordinate/concentration.
               For stoichiometric hulls, provide the reduced composition form, i.e., for the compound Mn2PdPt, use
               --hull_formation_enthalpy=0.5,0.25, where the composition of the last component is implicitly 1-sum(0.5+0.25).
@@ -1061,10 +1066,13 @@ LATTICES = (the ones with "")
               equivalent ground state structures is skipped (can be time consuming).
         [--skip_stability_criterion_analysis|--skipstabilitycriterionanalysis|--skipscriterion|--sscriterion] : analysis
               of stability criterion for ground state structures is skipped (can be time consuming).
+        [--skip_n_plus_1_enthalpy_gain_analysis|--skip_n_plus_1_energy_gain_analysis|--skipnplus1enthalpygainanalysis|--skipnplus1energygainanalysis|--skipnplus1|--snp1|--snpo] : analysis
+              of N+1 enthalpy gain for ground state structures is skipped (can be time consuming).
         [--include_skewed_hulls|--include_skewed|--ish] : process hull despite skewed endpoints (abs(ground state endpoint energy) < 15 meV).
         [--include_unreliable_hulls|--include_unreliable|--iuh] : process hull despite poor statistics (binary hull count < 200).
         [--include_outliers|--io] : include any detected outliers (output/warning is still shown).
         [--force] : force output despite warnings.
+        [--force_outliers|--fo] : force output despite outlier warnings.
 
         PDF/LATEX OPTIONS:
         [--image_only|--imageonly|--image] : Latex/PDF output mode only. Similar to --document_only, 
@@ -1990,6 +1998,12 @@ LATTICES = (the ones with "")
         lattice vector magnitudes to the volume of the parallelpiped defined 
         by the lattice vectors. So, for three orthogonal vectors, this ratio 
         would be unity. (R. Taylor).
+
+  aflow --patch_database --patchfiles=file1,file2,...
+        Patches entries of the database file. The patch files have to be in
+        jsonl format. Each json in the jsonl must contain an AUID. If an AUID
+        is not found in the database, it will be skipped. Properties not in
+        the schema will be ignored.
 
   aflow --pdb < POSCAR
         Outputs to standard out a protein database (PDB) format file
@@ -3015,8 +3029,9 @@ LATTICES = (the ones with "")
         each type you can create supercell (see --supercell) to make this
         function usable.
 
-  aflow --rebuild_database
+  aflow --rebuild_database [--patchfiles=file1,file2,...]
         Fetches new entries and rebuilds the AFLOW database file.
+        --patchfiles can be used to patch the AFLOW database using jsonl files (see --patch_database).
 
   aflow --revsg [#] [n] [l] [m]
         Constructs a POSCAR of a specified space group and with specified wyckoff positions
@@ -3389,8 +3404,9 @@ LATTICES = (the ones with "")
   aflow --uffenergy | --ue <  POSCAR
         Output the energy of the structure using the simplified Universal Force Filed (UFF) method [JACS, 114, 10024 (1992)].
 
-  aflow --update_database
+  aflow --update_database [--patchfiles=file1,file2,...]
         Fetches new entries and rebuilds the AFLOW database file if new entries are available.
+        --patchfiles can be used to patch the AFLOW database using jsonl files (see --patch_database).
 
   aflow --vasp                                                                     
         Transforms the GEOMETRICAL (or whicever is the input file format) to a        

@@ -1314,7 +1314,7 @@ DEFAULT_APL_ADISP_NPERIODS
 DEFAULTS QHA
 
 DEFAULT_QHA_MODE
-  descriptions: Defines QHA mode to run (it is possible to run several modes simultaneously).
+  description: Defines QHA mode to run (it is possible to run several modes simultaneously).
   type: string
   choices: "QHA", "QHA3P", "SCHQA" or their comma-separated combination
   default: "QHA"
@@ -1328,6 +1328,12 @@ DEFAULT_QHA_EOS_DISTORTION_RANGE
   description: Sets the range of volumes and the volume increment for the set of EOS calculations.
   type: string
   default: "-12:16:3"
+
+DEFAULT_QHA_EOS_MODEL
+  description: Defines what equation of state model(s) to use for the E(V) relation fitting.
+  type: string
+  choices: "SJ", "BM3", "BM4", "M" or their comma-separated combination
+  default: "SJ,BM4"
 
 DEFAULT_QHA_GP_DISTORTION
   description: Sets the value of volume change (dV) for the calculation of the Grueneisen parameter using the finite difference method.

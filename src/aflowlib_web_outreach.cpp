@@ -540,6 +540,8 @@ bool AlloyAlphabeticLIBRARY(const string& s) {
 // ******************************************************************************************************************************************************
 
 void voutreach_print(uint _mode,ostream& oss,string what2print) {
+  string function = XPID + "voutreach_print()";
+  string message = "";
   aurostd::xoption vflag=XHOST.vflag_outreach;
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   uint mode=_mode;
@@ -562,7 +564,6 @@ void voutreach_print(uint _mode,ostream& oss,string what2print) {
     // if(LDEBUG) cerr << voutreach.at(6);// << endl;
     // if(LDEBUG) cerr << voutreach.at(7);// << endl;
     // if(LDEBUG) cerr << voutreach.at(8);// << endl;
-    //    if(LDEBUG) exit(0); 
 
     vector<_outreach> voutreach_local;
     vector<string> vauthor,vkeyword,valloy;
@@ -606,8 +607,8 @@ void voutreach_print(uint _mode,ostream& oss,string what2print) {
         if(LOCAL_VERBOSE) cerr << "voutreach_print: [" << XHOST.vflag_control.getattachedscheme("CV::AUTHOR") << "]" << endl;
         aurostd::string2tokens(XHOST.vflag_control.getattachedscheme("CV::AUTHOR"),vauthor,",");
         if(vauthor.size()==0) {
-          cerr << "no authors specified" << endl;
-          exit(0);
+          message = "No authors specified.";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message);
         }
       }
     }
@@ -618,14 +619,20 @@ void voutreach_print(uint _mode,ostream& oss,string what2print) {
       if(XHOST.vflag_control.getattachedscheme("PHP::PUBS_ALLOY")!="--print=html") {
         mode=HTRESOURCE_MODE_PHP_ALLOY;
         aurostd::string2tokens(XHOST.vflag_control.getattachedscheme("PHP::PUBS_ALLOY"),valloy,",");
-        if(valloy.size()==0) exit(0);
+        if(valloy.size()==0) {
+          message = "valloy.size() == 0";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message);
+        }
       }
     }
     if(XHOST.vflag_control.flag("PHP::PUBS_KEYWORD") || mode==HTRESOURCE_MODE_PHP_THRUST)  {
       mode=HTRESOURCE_MODE_PHP_THRUST;
       aurostd::string2tokens(XHOST.vflag_control.getattachedscheme("PHP::PUBS_KEYWORD"),vkeyword,",");
-      if(vkeyword.size()==0) exit(0);
-      for(uint i=0;i<vkeyword.size();i++) cerr << "vkeyword.at(" << i << ")=" <<  vkeyword.at(i) << endl;//exit(0);
+      if(vkeyword.size()==0) {
+        message = "No keywords specified.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message);
+      }
+      for(uint i=0;i<vkeyword.size();i++) cerr << "vkeyword.at(" << i << ")=" <<  vkeyword.at(i) << endl;
     }
 
     // cerr << "vauthor.size()=" <<  vauthor.size() << endl;
@@ -1214,7 +1221,6 @@ uint voutreach_load(vector<_outreach>& voutreach,string what2print) {
       }
     }
   }
-  // cerr << "vlabel.size()=" << vlabel.size() << endl; for(uint i=0;i<vlabel.size();i++)   cerr << vlabel.at(i) << endl; exit(0);
 
   for(uint i=0;i<voutreach.size();i++) fixlabel(vlabel,voutreach.at(i).vauthor);
   for(uint i=0;i<voutreach.size();i++) fixlabel(vlabel,voutreach.at(i).vextra_html);
@@ -1242,7 +1248,6 @@ uint voutreach_load(vector<_outreach>& voutreach,string what2print) {
     for(uint i=0;i<voutreach.size();i++)
       voutreach_presentations.push_back(voutreach.at(i));
   }
-  //  exit(0);
   return voutreach.size();
 }
 
@@ -1252,7 +1257,11 @@ void HT_CHECK_GRANTS(ostream& oss) {//,const vector<string>& vitems,string msg1,
   aurostd::xoption vflag=XHOST.vflag_outreach;
   vector<_outreach> voutreach;
   voutreach_load(voutreach,"PUBLICATIONS");
-  if(!vflag.flag("GRANTS")) {cerr << "no grants" << endl;exit(0);}
+  if(!vflag.flag("GRANTS")) {
+    string function = XPID + "HT_CHECK_GRANTS():";
+    string message = "No grants.";
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message);
+   }
   cerr << "LOADED " << voutreach.size() << " " << endl;
   string grant=vflag.getattachedscheme("GRANTS");
   //  if(mode==HTRESOURCE_MODE_NONE) {mode=HTRESOURCE_MODE_PHP_AUTHOR;} // by default
@@ -1281,8 +1290,6 @@ bool ProcessPhpLatexCv(void) {
       !XHOST.vflag_control.flag("PRINT_MODE::LATEX") && 
       !XHOST.vflag_control.flag("PRINT_MODE::TXT")) {
     XHOST.vflag_control.flag("PRINT_MODE::HTML",TRUE);
-    //    cerr << "ERROR ProcessPhpLatexCv: a print mode must be specified: --print=latex|txt|html" << endl;
-    //  exit(0);
   }
   if(XHOST.vflag_control.flag("PRINT_MODE::HTML")) {XHOST.vflag_control.flag("PRINT_MODE::LATEX",FALSE);XHOST.vflag_control.flag("PRINT_MODE::TXT",FALSE);}
   if(XHOST.vflag_control.flag("PRINT_MODE::LATEX")) {XHOST.vflag_control.flag("PRINT_MODE::TXT",FALSE);XHOST.vflag_control.flag("PRINT_MODE::HTML",FALSE);}
@@ -1375,7 +1382,11 @@ bool ProcessPhpLatexCv(void) {
     Arun=TRUE;
   }
 
-  if(Arun) exit(0);
+  if(Arun) {
+    string function = XPID + "ProcessPhpLatexCv():";
+    string message = "Arun == true";
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message);
+  }
   return TRUE;
 }
 

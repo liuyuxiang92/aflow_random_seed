@@ -239,7 +239,7 @@ namespace cce {
     string outcar_file= directory_path + "/" + "OUTCAR.relax1";
     string functional=get_functional_from_aflow_in_outcar(structure, aflowin_file, outcar_file);
     if (functional.empty()) {
-      message << " Functional cannot be determined from aflow.in. Corrections are available for PBE, LDA, SCAN, or PBE+U_ICSD.";
+      message << " Functional cannot be determined from aflow.in. Corrections are available for PBE, LDA, SCAN, or PBE+U:ICSD.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
     }
     return calculate_corrections(structure, functional, directory_path); // directory path must be propagated if ox. states are determined from Bader charges
@@ -543,7 +543,7 @@ namespace cce {
       cerr << soliloquy << "PBE: " << aurostd::WithinList(cce_vars.vfunctionals, "PBE") << endl;
       cerr << soliloquy << "LDA: " << aurostd::WithinList(cce_vars.vfunctionals, "LDA") << endl;
       cerr << soliloquy << "SCAN: " << aurostd::WithinList(cce_vars.vfunctionals, "SCAN") << endl;
-      cerr << soliloquy << "PBE+U_ICSD: " << aurostd::WithinList(cce_vars.vfunctionals, "PBE+U_ICSD") << endl;
+      cerr << soliloquy << "PBE+U:ICSD: " << aurostd::WithinList(cce_vars.vfunctionals, "PBE+U:ICSD") << endl;
       cerr << soliloquy << "exp: " << aurostd::WithinList(cce_vars.vfunctionals, "exp") << endl;
       cerr << endl;
     }
@@ -555,7 +555,7 @@ namespace cce {
     if (functional=="PBE")          {return 0;}
     if (functional=="LDA")          {return 2;}
     if (functional=="SCAN")         {return 4;}
-    if (functional=="PBE+U_ICSD")   {return 6;}
+    if (functional=="PBE+U:ICSD")   {return 6;}
     if (functional=="exp")          {return 8;}
     else {return -1;}
   }
@@ -649,7 +649,7 @@ namespace cce {
     if (vflags.KBIN_VASP_FORCE_OPTION_METAGGA.xscheme == "SCAN"){
       scan = true;
     }
-    // check whether it is a DFT+U calculation with parameters as for the ICSD (PBE+U_ICSD calculation)
+    // check whether it is a DFT+U calculation with parameters as for the ICSD (PBE+U:ICSD calculation)
     // new implementation checking Us explicitly
     if (!vflags.KBIN_VASP_LDAU_PARAMETERS.empty() && vflags.KBIN_VASP_FORCE_OPTION_LDAU2.isentry && !vflags.KBIN_VASP_FORCE_OPTION_LDAU_ADIABATIC.isentry && !vflags.KBIN_VASP_FORCE_OPTION_LDAU_CUTOFF.isentry){
       ldau2=true;
@@ -676,7 +676,7 @@ namespace cce {
         message << " BAD NEWS: The number of species in the DFT+U settings differs from the number of provided U values. Please adapt and rerun.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
       }
-      // get standard Us for PBE+U_ICSD
+      // get standard Us for PBE+U:ICSD
       vector<double> standard_ICSD_Us_vector;
       bool LDAU=true;
       vector<string> vLDAUspecies;
@@ -707,7 +707,7 @@ namespace cce {
       }
       pbe_u_icsd = true;
     }
-    // check whether it is a DFT+U calculation with different parameters than for PBE+U_ICSD
+    // check whether it is a DFT+U calculation with different parameters than for PBE+U:ICSD
     if ((vflags.KBIN_VASP_FORCE_OPTION_LDAU1.isentry || vflags.KBIN_VASP_FORCE_OPTION_LDAU2.isentry) && !pbe_u_icsd){
       message << " BAD NEWS: It seems you are providing an aflow.in for a DFT+U calculation with different parameters than for the AFLOW ICSD database (Dudarev's approach, LDAU2=ON). There are no corrections for this case.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
@@ -715,7 +715,7 @@ namespace cce {
 
     if (pbe){
       if (pbe_u_icsd){
-        functional = "PBE+U_ICSD";
+        functional = "PBE+U:ICSD";
       } else if (scan){ //SCAN calculations are usually done with PBE PPs
         functional = "SCAN";
       } else if (!ldau && !ldau2){
@@ -875,7 +875,8 @@ namespace cce {
     cce_vars.cutoffs=get_dist_cutoffs(structure, tolerance);
     double cutoffs_max=aurostd::max(cce_vars.cutoffs);
     deque<deque<_atom> > neigh_mat;
-    structure.GetStrNeighData(cutoffs_max,neigh_mat);
+    //[CO20200731 - OBSOLETE]structure.GetStrNeighData(cutoffs_max,neigh_mat);
+    pflow::GetStrNeighData(structure,cutoffs_max,neigh_mat); //CO20200731 - const xstructure
     uint z = 0;
     for(uint i=0,isize=neigh_mat.size();i<isize;i++){ //same size as structure.atoms.size(); number of atoms in the structure (not determined by cutoff (or cutoffs_max))
       uint neighbors_count=0;
@@ -999,7 +1000,8 @@ namespace cce {
     double cutoffs_max=aurostd::max(cce_vars.cutoffs);
     vector<uint> num_neighbors(structure.atoms.size());
     deque<deque<_atom> > neigh_mat;
-    structure.GetStrNeighData(cutoffs_max,neigh_mat);
+    //[CO20200731 - OBSOLETE]structure.GetStrNeighData(cutoffs_max,neigh_mat);
+    pflow::GetStrNeighData(structure,cutoffs_max,neigh_mat); //CO20200731 - const xstructure
     for(uint i=0,isize=neigh_mat.size();i<isize;i++){ //same size as structure.atoms.size(); number of atoms in the structure (not determined by cutoff (or cutoffs_max))
       uint neighbors_count=0;
       bool warning = false;
@@ -1089,7 +1091,8 @@ namespace cce {
     cce_vars.cutoffs=get_dist_cutoffs(structure);
     double cutoffs_max=aurostd::max(cce_vars.cutoffs);
     deque<deque<_atom> > neigh_mat;
-    structure.GetStrNeighData(cutoffs_max,neigh_mat);
+    //[CO20200731 - OBSOLETE]structure.GetStrNeighData(cutoffs_max,neigh_mat);
+    pflow::GetStrNeighData(structure,cutoffs_max,neigh_mat); //CO20200731 - const xstructure
     for(uint i=0,isize=neigh_mat.size();i<isize;i++){ //same size as structure.atoms.size(); number of atoms in the structure (not determined by cutoff (or cutoffs_max))
       if (structure.atoms[i].cleanname == "O"){ // identify per- and superoxides by O-O bond length
         for(uint j=0,jsize=neigh_mat[i].size();j<jsize;j++){  //number of nearest neighbors within cutoff of atom i; number of neighbors of each atom i determined by the cutoffs_max
@@ -2306,7 +2309,7 @@ namespace cce {
     if (cce_vars.anion_species == "O") {
       // in this part functional dependent settings will be primarily evaluated with "if, else if" conditions, 
       // since the calculation (for getting the Bader charges) could have only been done with one functional and not more than one
-      // oxidation numbers should not be functional dependent since results are for a specific calculation, i.e. PBE or LDA or SCAN or PBE+U_ICSD and not more than one
+      // oxidation numbers should not be functional dependent since results are for a specific calculation, i.e. PBE or LDA or SCAN or PBE+U:ICSD and not more than one
       // for a given structure there should be only one correct assignment of oxidation numbers
       string system_name = "";
       string functional = "";
@@ -2400,7 +2403,7 @@ namespace cce {
       cerr << soliloquy << "PBE: " << aurostd::WithinList(cce_vars.vfunctionals, "PBE") << endl;
       cerr << soliloquy << "LDA: " << aurostd::WithinList(cce_vars.vfunctionals, "LDA") << endl;
       cerr << soliloquy << "SCAN: " << aurostd::WithinList(cce_vars.vfunctionals, "SCAN") << endl;
-      cerr << soliloquy << "PBE+U_ICSD: " << aurostd::WithinList(cce_vars.vfunctionals, "PBE+U_ICSD") << endl;
+      cerr << soliloquy << "PBE+U:ICSD: " << aurostd::WithinList(cce_vars.vfunctionals, "PBE+U:ICSD") << endl;
       cerr << soliloquy << "exp: " << aurostd::WithinList(cce_vars.vfunctionals, "exp") << endl;
     }
     // if functional determined from aflow.in is different from the ones given by the input options, 
@@ -2506,7 +2509,7 @@ namespace cce {
               if(LDEBUG){
                 cerr << soliloquy << "Bader_deviation: " << Bader_deviation << endl;
               }
-              cce_vars.oxidation_states[i]= aurostd::string2utype<double>(Bader_tokens[1+(CCE_num_functionals_Bader+1)*n]); // (CCE_num_functionals_Bader+1)*n because oxidation numbers in Bader_templ_line are separated by corrections for four different functionals (PBE, LDA, SCAN, and PBE+U_ICSD) and there is 1 formal oxidation number in front of the Bader charges
+              cce_vars.oxidation_states[i]= aurostd::string2utype<double>(Bader_tokens[1+(CCE_num_functionals_Bader+1)*n]); // (CCE_num_functionals_Bader+1)*n because oxidation numbers in Bader_templ_line are separated by corrections for four different functionals (PBE, LDA, SCAN, and PBE+U:ICSD) and there is 1 formal oxidation number in front of the Bader charges
             } else { // only if element is found but no corrections can be assigned because above conditions are not met, update Bader_deviation_min
               if ( std::abs(Bader_template-cce_vars.Bader_charges[i]) < Bader_deviation_min ) {
                 Bader_deviation_min= std::abs(Bader_template-cce_vars.Bader_charges[i]);
@@ -2540,9 +2543,14 @@ namespace cce {
               // list all oxidation states of the element for which corrections are available
               string ox_nums_avail="";
               string separator=", ";
-              vector<string> ox_nums_avail_vec;
+              vector<string> ox_nums_avail_vec; //CO20200826
               for(uint n=0;n<num_ox_states;n++){ 
-                ox_nums_avail_vec.push_back(Bader_tokens[1+(CCE_num_functionals_Bader+1)*n]); // (CCE_num_functionals_Bader+1)*n because oxidation numbers in Bader_templ_line are separated by corrections for four different functionals (PBE, LDA, SCAN, and PBE+U_ICSD) and there is 1 formal oxidation number in front of the Bader charges
+                ox_nums_avail_vec.push_back(Bader_tokens[1+(CCE_num_functionals_Bader+1)*n]); // (CCE_num_functionals_Bader+1)*n because oxidation numbers in Bader_templ_line are separated by corrections for four different functionals (PBE, LDA, SCAN, and PBE+U_ICSD) and there is 1 formal oxidation number in front of the Bader charges  //CO20200826
+                //[CO20200826 - OBSOLETE]if (n<num_ox_states-1){
+                //[CO20200826 - OBSOLETE]  ox_nums_avail+= Bader_tokens[1+(CCE_num_functionals_Bader+1)*n] + separator ; // (CCE_num_functionals_Bader+1)*n because oxidation numbers in Bader_templ_line are separated by corrections for four different functionals (PBE, LDA, SCAN, and PBE+U:ICSD) and there is 1 formal oxidation number in front of the Bader charges
+                //[CO20200826 - OBSOLETE]} else if (n==num_ox_states-1){
+                //[CO20200826 - OBSOLETE]  ox_nums_avail+= Bader_tokens[1+(CCE_num_functionals_Bader+1)*n]; // (CCE_num_functionals_Bader+1)*n because oxidation numbers in Bader_templ_line are separated by corrections for four different functionals (PBE, LDA, SCAN, and PBE+U:ICSD) and there is 1 formal oxidation number in front of the Bader charges
+                //[CO20200826 - OBSOLETE]}
               }
               ox_nums_avail = aurostd::joinWDelimiter(ox_nums_avail_vec, separator);
               oss << "Corrections for " << structure.atoms[i].cleanname << " coordinated by " << cce_vars.anion_species << " are available for oxidation states: " << ox_nums_avail << endl;

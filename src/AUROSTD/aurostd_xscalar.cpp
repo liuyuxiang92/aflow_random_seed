@@ -599,8 +599,9 @@ namespace aurostd {
   // namespace aurostd
   bool factorial(bool x) {
     if(_isfloat(x)) {
-      cerr << _AUROSTD_XLIBS_ERROR_ << " factorial(bool) implemented only for bool !" << endl;
-      exit(0);
+      string function = XPID + "aurostd::factorial():";
+      string message = "factorial(bool) implemented only for bool !";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
     }
     return TRUE;
   }
@@ -690,8 +691,9 @@ namespace aurostd {
   template<class utype>
     bool _isodd(utype x) {
       if(_isfloat(x)) {
-        cerr << _AUROSTD_XLIBS_ERROR_ << " _isodd implemented only for integers !" << endl;
-        exit(0);
+        string function = XPID + "aurostd::factorial():";
+        string message = "_isodd implemented only for integers !";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
       }
       if(!mod(x,(utype) 2)) return FALSE;
       else return TRUE;
@@ -726,8 +728,9 @@ namespace aurostd {
   template<class utype>
     bool _iseven(utype x) {
       if(_isfloat(x)) {
-        cerr << _AUROSTD_XLIBS_ERROR_ << " _iseven implemented only for integers !" << endl;
-        exit(0);
+        string function = XPID + "aurostd::factorial():";
+        string message = "_iseven implemented only for integers !";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
       }
       if(mod(x,(utype) 2)) return FALSE;
       else return TRUE;
@@ -962,15 +965,12 @@ namespace aurostd{
     if (T>_ZERO_TOL_){
       return 1/(1+std::exp((E-mu)/(KBOLTZEV*T)));
     }
-    else
-      // At T=0 FD transforms to Heaviside step function
-      if (E<mu){
-        return 1;
-      }
-      else if (E>mu){
-        return 0;
-      }
-      else return 0.5;
+    //[//CO20200731 - what else is there?]else
+    // At T=0 FD transforms to Heaviside step function
+    if (E<mu) return 1;
+    else if (E>mu) return 0;
+    //CO20200731 - what else is there?else 
+    return 0.5;
   }
 }
 //AS20200513 END

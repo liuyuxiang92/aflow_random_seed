@@ -275,8 +275,7 @@ vector<int> AllCombination42(int num, int total_num, vector<int> & str_in) {
   //}
 
   if(int(str_in.size()) != num) {
-    cerr << "AllCombination42: input str must have a size equal to " << num << "!\n";
-    exit(_EXIT_RANK_NOT_MATCH);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,"AllCombination42():","input str must have a size equal to "+aurostd::utype2string(num),_INPUT_ILLEGAL_); //CO20200624
   }
 
   for(int i=0; i<num; i++) {
@@ -1134,8 +1133,7 @@ int ceallclusters::EquivalentCluster(const vector<_sym_op> pgroup) {
   int ucol;
 
   if(pgroup.size() == 0) {
-    cerr << "No symmetric operator! exit ... \n";
-    exit(_EXIT_NO_SYMMETRIC_OPERATOR);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,"ceallclusters::EquivalentCluster():","no symmetric operator",_RUNTIME_ERROR_); //CO20200624
   }
 
   int lrow = 1;
@@ -1381,8 +1379,7 @@ bool ceallclusters::ReadIn(string & filename) {
   fin.open(filename.c_str());
 
   if(!fin) { // cannot open file
-    cerr << "file " << filename << " cannot be opened\n";
-    exit(_EXIT_NO_INPUTFILE);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,"ceallclusters::ReadIn():","file "+filename+" cannot be opened",_FILE_CORRUPT_); //CO20200624
   }
     
   int rep_cluster_num;
@@ -1900,8 +1897,7 @@ void ceECIcluster::ReadIn(istream & os) {
   os >> ECI_size;
 
   if(str_cluster == 0) {
-    cerr << "ceECIcluster::ReadIn: Clusters must be supplied! Exit! \n";
-    exit(_EXIT_FAIL);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,"ceECIcluster::ReadIn():","clusters must be supplied",_FILE_CORRUPT_); //CO20200624
   }
 
   ECI.clear();
@@ -2846,8 +2842,7 @@ void cesubcluster::SetUp(vector<int> base_cluster, ceallclusters & cluster1) {
 void cesubcluster::SetBaseCluster(int base_cluster_nr) {
     
   if(base_cluster.size() !=0) {
-    cerr << "Already has a base!\n";
-    exit(_EXIT_FAIL);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,"cesubcluster::SetBaseCluster():","already has a base",_INPUT_ILLEGAL_); //CO20200624
   } else {
     base_cluster.push_back(base_cluster_nr);
   }
@@ -2857,8 +2852,7 @@ void cesubcluster::SetBaseCluster(vector<int> base_cluster_nr) {
   //if(str_cluster_calculated) {
   base_cluster = base_cluster_nr;
   //} else {
-  //    cerr << "Must get all clusters of a structure frist! \n";
-  //    exit(_EXIT_FAIL);
+  //    throw aurostd::xerror(_AFLOW_FILE_NAME_,"cesubcluster::SetBaseCluster():","must get all clusters of a structure first",_INPUT_ILLEGAL_); //CO20200624
   //}
 }
 
@@ -3334,8 +3328,7 @@ ceSL::ceSL(string & str_name) : cestructure(str_name, 0.0, 0.0) {
   base_atoms.clear();
 
   if(!(base == "fcc" || base == "bcc" || base =="hcp" )) {
-    cerr << "ceSL:base structure must be one of fcc/bcc/hcp!\n";
-    exit(_EXIT_NOSTRUCTURE);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,"ceSL::ceSL():","structure must be one of fcc/bcc/hcp",_INPUT_ILLEGAL_); //CO20200624
   }
 }
 
@@ -3352,8 +3345,7 @@ ceSL::ceSL(string & str_name, double stoich_b,
   base_atoms.clear();
 
   if(!(base == "fcc" || base == "bcc" || base =="hcp" )) {
-    cerr << "ceSL:base structure must be one of fcc/bcc/hcp!\n";
-    exit(_EXIT_NOSTRUCTURE);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,"ceSL::ceSL():","structure must be one of fcc/bcc/hcp",_INPUT_ILLEGAL_); //CO20200624
   }
 
 }
@@ -3465,10 +3457,7 @@ void ceSL::SetUp(string & SLname) {
     GetStructure(N_mat, cell_nr_in);
     SetConfig(config);
   } else {
-    cerr << "ceSL: cannot find Superlattice with name "
-	 << SLname
-	 << endl;
-    exit(_EXIT_NOSTRUCTURE);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,"ceSL::SetUp():","cannot find superlattice with name "+SLname,_INPUT_MISSING_); //CO20200624
   }
 }
 

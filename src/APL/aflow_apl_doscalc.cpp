@@ -299,7 +299,7 @@ namespace apl {
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
     }
     // Check parameters
-    if (aurostd::isequal(fmax, fmin, _ZERO_TOL_LOOSE_)) {
+    if (aurostd::isequal(fmax, fmin, _FLOAT_TOL_)) {
       message = "Frequency range of phonon DOS is nearly zero.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
     } else if (fmin > fmax) {

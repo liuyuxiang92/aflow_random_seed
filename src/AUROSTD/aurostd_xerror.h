@@ -33,6 +33,7 @@ namespace aurostd {
 #define _RUNTIME_ERROR_       50
 #define _RUNTIME_INIT_        51
 #define _RUNTIME_SQL_         52
+#define _RUNTIME_BUSY_        53
 #define _ALLOC_ERROR_         60
 #define _ALLOC_ALLOCATE_      61
 #define _ALLOC_INSUFFICIENT_  62

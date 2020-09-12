@@ -91,6 +91,11 @@ namespace pocc {
   double getHmix(const xvector<double>& v_dg,const xvector<double>& v_energies);
   double getHmix(const xvector<double>& v_dg,const xvector<double>& v_energies,double& dg_total);
   double getEFA(const xvector<double>& v_dg,const xvector<double>& v_energies);
+
+  void poccOld2New(ostream& oss=cout);
+  void poccOld2New(ofstream& FileMESSAGE,ostream& oss=cout);
+  
+  string addDefaultPOCCTOL2string(const string& input);
 } // namespace pocc
 
 namespace pocc {
@@ -518,8 +523,8 @@ namespace pocc {
       double m_energy_dft_ground;
       uint m_ARUN_directory_ground;
       xDOSCAR m_xdoscar;
-      vector<double> m_Egap;
-      double m_Egap_net;
+      vector<double> m_Egap_DOS,m_Egap;
+      double m_Egap_DOS_net,m_Egap_net;
 
       //initializers
       bool initialize(ostream& oss);
@@ -602,11 +607,13 @@ namespace pocc {
       bool initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags);
 
       //external methods
-      void setPOccFlags(const aurostd::xoption& pocc_flags);  //input flags, e.g., vpflow
-      void loadPOccStructureFromAFlags(const _aflags& aflags);
+      void setPOccFlags(const aurostd::xoption& pocc_flags);                    //input flags, e.g., vpflow
+      void loadFromAFlags();                                                    //grabs from m_aflags
+      void loadFromAFlags(const aurostd::xoption& loader);                      //grabs from m_aflags
       void setPOccStructure(const xstructure& xstr_pocc);
-      void setKFlags(const _kflags& Kflags);                      //standard _kflags
-      void setVFlags(const _vflags& Vflags);                      //standard _vflags
+      void setAFlags(const _aflags& Aflags);                                    //standard _aflags
+      void setKFlags(const _kflags& Kflags);                                    //standard _kflags
+      void setVFlags(const _vflags& Vflags);                                    //standard _vflags
 
       void writePARTCAR() const;
       void generateStructures(const _xvasp& xvasp);
@@ -630,6 +637,8 @@ namespace pocc {
       void resetHNFMatrices();
       void resetSiteConfigurations();
 
+      void CleanPostProcessing();
+      void loadDataIntoCalculator();
       void postProcessing();
       void StructuresAllFile2SupercellSets();
       void StructuresUniqueFile2SupercellSets();
@@ -722,8 +731,10 @@ namespace pocc {
 
       //CT20200323 - POCC+AGL functions
       void calculateDebyeThermalProperties(const vector<double>& v_temperatures);
-      void setAGLOptions(bool& agl_run_postprocess, bool& agl_write_full_results, uint& ntemperature, double& stemperature, uint& npressure, double& spressure);
-      void generateDebyeThermalProperties(uint ntemperature, double stemperature, uint npressure, double spressure, vector<double>& Debye_temperature, vector<double>& Debye_acoustic, vector<double>& Gruneisen, vector<double>& Cv300K, vector<double>& Cp300K, vector<double>& Fvib300K_atom, vector<double>& Fvib300K_cell, vector<double>& Svib300K_atom, vector<double>& Svib300K_cell, vector<double>& kappa300K, vector<vector<double> >& agl_temperatures, vector<vector<double> >& agl_gibbs_energies_atom, vector<vector<double> >& agl_vibrational_energies_atom);
+      // [OBSOLETE] void setAGLOptions(bool& agl_run_postprocess, bool& agl_write_full_results, uint& ntemperature, double& stemperature, uint& npressure, double& spressure);
+      void setAGLOptions(bool& agl_run_postprocess, bool& agl_write_full_results); //CT20200722
+      // [OBSOLETE] void generateDebyeThermalProperties(uint ntemperature, double stemperature, uint npressure, double spressure, vector<double>& Debye_temperature, vector<double>& Debye_acoustic, vector<double>& Gruneisen, vector<double>& Cv300K, vector<double>& Cp300K, vector<double>& Fvib300K_atom, vector<double>& Fvib300K_cell, vector<double>& Svib300K_atom, vector<double>& Svib300K_cell, vector<double>& kappa300K, vector<vector<double> >& agl_temperatures, vector<vector<double> >& agl_gibbs_energies_atom, vector<vector<double> >& agl_vibrational_energies_atom);
+      void generateDebyeThermalProperties(vector<double>& Debye_temperature, vector<double>& Debye_acoustic, vector<double>& Gruneisen, vector<double>& Cv300K, vector<double>& Cp300K, vector<double>& Fvib300K_atom, vector<double>& Fvib300K_cell, vector<double>& Svib300K_atom, vector<double>& Svib300K_cell, vector<double>& kappa300K, vector<vector<double> >& agl_temperatures, vector<vector<double> >& agl_gibbs_energies_atom, vector<vector<double> >& agl_vibrational_energies_atom); //CT20200722
       void getDebyeThermalProperties(vector<double>& Debye_temperature, vector<double>& Debye_acoustic, vector<double>& Gruneisen, vector<double>& Cv300K, vector<double>& Cp300K, vector<double>& Fvib300K_atom, vector<double>& Fvib300K_cell, vector<double>& Svib300K_atom, vector<double>& Svib300K_cell, vector<double>& kappa300K, vector<vector<double> >& agl_temperatures, vector<vector<double> >& agl_gibbs_energies_atom, vector<vector<double> >& agl_vibrational_energies_atom);
       void getAverageDebyeThermalProperties(const vector<double>& v_temperatures, bool agl_write_full_results, vector<double>& Debye_temperature, vector<double>& Debye_acoustic, vector<double>& Gruneisen, vector<double>& Cv300K, vector<double>& Cp300K, vector<double>& Fvib300K_atom, vector<double>& Fvib300K_cell, vector<double>& Svib300K_atom, vector<double>& Svib300K_cell, vector<double>& kappa300K, vector<vector<double> >& agl_temperatures, vector<vector<double> >& agl_gibbs_energies_atom, vector<vector<double> >& agl_vibrational_energies_atom);
   };
