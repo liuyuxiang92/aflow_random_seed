@@ -15635,7 +15635,9 @@ void xstructure::check_structure(){
 // **************************************************************************
 // Function GetNeighbors
 // **************************************************************************
-// rewrite of GetNeighData() - English spelling is good
+// rewrite of GetNeighData()
+// atoms_cell is the atoms for which neighbors are found (could be iatoms), hence it determines the sizes of i_neighbors and distances
+// i_neighbors are indices to gird_atoms
 // CO20200912
 void xstructure::GetNeighbors(deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,double rmin,bool prim,bool unique_only){
   deque<_atom> atoms_cell;
