@@ -2543,14 +2543,14 @@ namespace cce {
               // list all oxidation states of the element for which corrections are available
               string ox_nums_avail="";
               string separator=", ";
-              vector<string> ox_nums_avail_vec; //CO20200826
+              vector<string> ox_nums_avail_vec; //RF20200826
               for(uint n=0;n<num_ox_states;n++){ 
-                ox_nums_avail_vec.push_back(Bader_tokens[1+(CCE_num_functionals_Bader+1)*n]); // (CCE_num_functionals_Bader+1)*n because oxidation numbers in Bader_templ_line are separated by corrections for four different functionals (PBE, LDA, SCAN, and PBE+U_ICSD) and there is 1 formal oxidation number in front of the Bader charges  //CO20200826
-                //[CO20200826 - OBSOLETE]if (n<num_ox_states-1){
-                //[CO20200826 - OBSOLETE]  ox_nums_avail+= Bader_tokens[1+(CCE_num_functionals_Bader+1)*n] + separator ; // (CCE_num_functionals_Bader+1)*n because oxidation numbers in Bader_templ_line are separated by corrections for four different functionals (PBE, LDA, SCAN, and PBE+U:ICSD) and there is 1 formal oxidation number in front of the Bader charges
-                //[CO20200826 - OBSOLETE]} else if (n==num_ox_states-1){
-                //[CO20200826 - OBSOLETE]  ox_nums_avail+= Bader_tokens[1+(CCE_num_functionals_Bader+1)*n]; // (CCE_num_functionals_Bader+1)*n because oxidation numbers in Bader_templ_line are separated by corrections for four different functionals (PBE, LDA, SCAN, and PBE+U:ICSD) and there is 1 formal oxidation number in front of the Bader charges
-                //[CO20200826 - OBSOLETE]}
+                ox_nums_avail_vec.push_back(Bader_tokens[1+(CCE_num_functionals_Bader+1)*n]); // (CCE_num_functionals_Bader+1)*n because oxidation numbers in Bader_templ_line are separated by corrections for four different functionals (PBE, LDA, SCAN, and PBE+U_ICSD) and there is 1 formal oxidation number in front of the Bader charges  //RF20200826
+                //[RF20200826 - OBSOLETE]if (n<num_ox_states-1){
+                //[RF20200826 - OBSOLETE]  ox_nums_avail+= Bader_tokens[1+(CCE_num_functionals_Bader+1)*n] + separator ; // (CCE_num_functionals_Bader+1)*n because oxidation numbers in Bader_templ_line are separated by corrections for four different functionals (PBE, LDA, SCAN, and PBE+U:ICSD) and there is 1 formal oxidation number in front of the Bader charges
+                //[RF20200826 - OBSOLETE]} else if (n==num_ox_states-1){
+                //[RF20200826 - OBSOLETE]  ox_nums_avail+= Bader_tokens[1+(CCE_num_functionals_Bader+1)*n]; // (CCE_num_functionals_Bader+1)*n because oxidation numbers in Bader_templ_line are separated by corrections for four different functionals (PBE, LDA, SCAN, and PBE+U:ICSD) and there is 1 formal oxidation number in front of the Bader charges
+                //[RF20200826 - OBSOLETE]}
               }
               ox_nums_avail = aurostd::joinWDelimiter(ox_nums_avail_vec, separator);
               oss << "Corrections for " << structure.atoms[i].cleanname << " coordinated by " << cce_vars.anion_species << " are available for oxidation states: " << ox_nums_avail << endl;

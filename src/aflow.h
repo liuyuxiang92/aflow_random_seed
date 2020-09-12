@@ -1553,9 +1553,13 @@ class xstructure {
     void CalculateSymmetryPointGroupKCrystal(void);               // Calculate the symmetry  //ME20200114
     void CalculateSymmetryPointGroupKPatterson(bool);             // Calculate the symmetry  //ME20200129
     void CalculateSymmetryPointGroupKPatterson(void);             // Calculate the symmetry  //ME20200129
-    int  GenerateGridAtoms(int,int,int,int,int,int);              // generate grid of atoms
-    int  GenerateGridAtoms(int,int,int);                          // generate grid of atoms
-    int  GenerateGridAtoms(int);                                  // generate grid of atoms
+    int GenerateGridAtoms(double);                                // generate grid of atoms
+    int GenerateGridAtoms(int);                                   // generate grid of atoms
+    int GenerateGridAtoms(int,int,int);                           // generate grid of atoms
+    int GenerateGridAtoms(const xvector<int>& dims);              // generate grid of atoms
+    int GenerateGridAtoms(int,int,int,int,int,int);               // generate grid of atoms
+    int GenerateGridAtoms_20190520(int i1,int i2,int j1,int j2,int k1,int k2); //DX20191218 [ORIG]  //CO20200912
+    int GenerateGridAtoms_20191218(int i1,int i2,int j1,int j2,int k1,int k2); //DX20191218 [NEW] //CO20200912
     int  GenerateLIJK(double);                                    // generate lijk look up table
     // QUANTUM ESPRESSO AND ABINIT AND AIMS                       // --------------------------------------
     void buildGenericTitle(bool vasp_input=false,bool force_fix=false); // build a nice title with atoms
@@ -1823,6 +1827,8 @@ class xstructure {
     // std::vector<vector<double> > rshell;                       // vector of shells
     // std::vector<vector<int> > nshell;                          // vector of density in shells
     // int nbins;                                                 // number of bins
+    void GetNeighbors(vector<vector<uint> >& i_neighbors,vector<vector<double> >& distances,double rmin=0.0,bool prim=true); //CO20200912
+    void GetNeighbors(vector<vector<uint> >& i_neighbors,vector<vector<double> >& distances,double rmax,double rmin=0.0,bool prim=true); //CO20200912
     void check_structure();                                       //RF20200831; rescale structure to 1 and check whether e.g. species and atoms are present
     // NEIGHBOURS OBEJCTS OLD-ACONVASP BUT WORKS                  // NEIGHBOURS OBEJCTS 
     // GetNeighData collects all the neighbor data between rmin and rmax and stores it for each atom in a vector of atom objects in order of increasing distance.  
@@ -2423,14 +2429,12 @@ bool SameAtom(const _atom& atom1,const _atom& atom2);
 bool DifferentAtom(const xstructure& str,const _atom& atom1,const _atom& atom2);
 xmatrix<double> GetDistMatrix(const xstructure& a); //CO20171025
 vector<double> GetNBONDXX(const xstructure& a);
-int GenerateGridAtoms(xstructure& str,int i1,int i2,int j1,int j2,int k1,int k2);
-int GenerateGridAtoms_20190520(xstructure& str,int i1,int i2,int j1,int j2,int k1,int k2); //DX20191218 [ORIG]
-int GenerateGridAtoms_20191218(xstructure& str,int i1,int i2,int j1,int j2,int k1,int k2); //DX20191218 [NEW]
-int GenerateGridAtoms(xstructure& str,int d1,int d2,int d3);
+int GenerateGridAtoms(xstructure& str,int i1,int i2,int j1,int j2,int k1,int k2); //DX20191218 [ORIG]
+int GenerateGridAtoms(xstructure& str,double radius); //CO20200912 - double
 int GenerateGridAtoms(xstructure& str,int d);
+int GenerateGridAtoms(xstructure& str,int d1,int d2,int d3);
 int GenerateGridAtoms(xstructure& str,const xvector<int>& dims);
 int GenerateGridAtoms(xstructure& str);
-int GenerateGridAtoms(xstructure& str,const double& radius);
 
 void l2ijk(const xstructure& str,const int &l,int &i,int &j,int &k);
 void l2ijk(const xstructure& str,const int &l,xvector<int>& ijk);
