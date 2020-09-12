@@ -3109,6 +3109,7 @@ namespace cce {
   //print_output_oxidation_numbers////////////////////////////////////////////////////////
   // print oxidation numbers
   string print_output_oxidation_numbers(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars) {
+    if(cce_flags.flag("KEEPING_BUSY")){}; //CO20200912 - keeping busy for now
     stringstream output;
     // print oxidation numbers
     output << endl;
