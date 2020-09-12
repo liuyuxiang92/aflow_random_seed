@@ -15908,7 +15908,9 @@ void xstructure::GetNeighbors(deque<_atom>& atoms_cell,deque<deque<uint> >& i_ne
   if(prim){GetPrimitive();}
   ReScale(1.0);
   //get atoms_cell
-  atoms_cell.clear();
+  atoms_cell.clear(); //clear
+  for(i=0;i<i_neighbors.size();i++){i_neighbors[i].clear();} i_neighbors.clear(); //clear
+  for(i=0;i<distances.size();i++){distances[i].clear();} distances.clear(); //clear
   vector<uint> atomscell2atoms_mapping;
   if(unique_only){
     if(iatoms_calculated==false){CalculateSymmetry();}
@@ -15968,6 +15970,72 @@ void xstructure::GetNeighbors(deque<_atom>& atoms_cell,deque<deque<uint> >& i_ne
       cerr << soliloquy << " ATOMS_CELL[k=" << k << "]: " << atoms_cell[k].name << endl;
       for(i=0;i<i_neighbors[k].size();i++){
         cerr << "  neighbor[i=" << i << "]: " << grid_atoms[i_neighbors[k][i]].name << " dist=" << distances[k][i] << endl;
+      }
+    }
+  }
+
+}
+
+// **************************************************************************
+// Function GetCoordinations
+// **************************************************************************
+// CO20200912
+void xstructure::GetCoordinations(deque<deque<uint> >& coordinations,double rmin,double tol,bool prim,bool unique_only){
+  deque<deque<uint> > i_neighbors;
+  return GetCoordinations(i_neighbors,coordinations,tol,rmin,prim,unique_only);
+}
+void xstructure::GetCoordinations(deque<_atom>& atoms_cell,deque<deque<uint> >& coordinations,double rmin,double tol,bool prim,bool unique_only){
+  deque<deque<uint> > i_neighbors;
+  return GetCoordinations(atoms_cell,i_neighbors,coordinations,tol,rmin,prim,unique_only);
+}
+void xstructure::GetCoordinations(deque<deque<uint> >& coordinations,double rmax,double rmin,double tol,bool prim,bool unique_only){
+  deque<deque<uint> > i_neighbors;
+  return GetCoordinations(i_neighbors,coordinations,rmax,rmin,tol,prim,unique_only);
+}
+void xstructure::GetCoordinations(deque<_atom>& atoms_cell,deque<deque<uint> >& coordinations,double rmax,double rmin,double tol,bool prim,bool unique_only){
+  deque<deque<uint> > i_neighbors;
+  return GetCoordinations(atoms_cell,i_neighbors,coordinations,rmax,rmin,tol,prim,unique_only);
+}
+void xstructure::GetCoordinations(deque<deque<uint> >& i_neighbors,deque<deque<uint> >& coordinations,double rmin,double tol,bool prim,bool unique_only){
+  deque<_atom> atoms_cell;
+  return GetCoordinations(atoms_cell,i_neighbors,coordinations,tol,rmin,prim,unique_only);
+}
+void xstructure::GetCoordinations(deque<_atom>& atoms_cell,deque<deque<uint> >& i_neighbors,deque<deque<uint> >& coordinations,double rmin,double tol,bool prim,bool unique_only){
+  double rmax=RadiusSphereLattice((*this).scale*(*this).lattice);
+  return GetCoordinations(atoms_cell,i_neighbors,coordinations,rmax,rmin,tol,prim,unique_only);
+}
+void xstructure::GetCoordinations(deque<deque<uint> >& i_neighbors,deque<deque<uint> >& coordinations,double rmax,double rmin,double tol,bool prim,bool unique_only){
+  deque<_atom> atoms_cell;
+  return GetCoordinations(atoms_cell,i_neighbors,coordinations,rmax,rmin,tol,prim,unique_only);
+}
+void xstructure::GetCoordinations(deque<_atom>& atoms_cell,deque<deque<uint> >& i_neighbors,deque<deque<uint> >& coordinations,double rmax,double rmin,double tol,bool prim,bool unique_only){
+  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  string soliloquy=XPID+"xstructure::GetCoordinations():";
+
+  deque<deque<double> > distances;
+  GetNeighbors(atoms_cell,i_neighbors,distances,rmax,rmin,prim,unique_only);
+  
+  uint i=0,j=0,k=0;
+  for(i=0;i<coordinations.size();i++){coordinations[i].clear();} coordinations.clear(); //clear
+
+  for(k=0;k<i_neighbors.size();k++){
+    coordinations.push_back(deque<uint>(0));
+    j=0;  //index to start at
+    coordinations.back().push_back(0);
+    for(i=0;i<i_neighbors[k].size();i++){
+      if(aurostd::isequal(distances[k][j],distances[k][i],tol)){coordinations.back().back()+=1;}
+      else{
+        j=i;
+        coordinations.back().push_back(1);
+      }
+    }
+  }
+  
+  if(LDEBUG){
+    for(k=0;k<i_neighbors.size();k++){
+      cerr << soliloquy << " ATOMS_CELL[k=" << k << "]: " << atoms_cell[k].name << endl;
+      for(i=0;i<coordinations[k].size();i++){
+        cerr << "  coordination[i=" << i << "]: " << coordinations[k][i] << endl;
       }
     }
   }
