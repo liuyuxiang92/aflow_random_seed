@@ -15677,9 +15677,14 @@ void xstructure::GetNeighbors(deque<_atom>& atoms_cell,deque<deque<uint> >& i_ne
     }
   }
 
-  if(LDEBUG){cerr << soliloquy << " GenerateGridAtoms() starting" << endl;}
+  if(LDEBUG){
+    cerr << soliloquy << " atoms_cell.size()=" << atoms_cell.size() << endl;
+    cerr << soliloquy << " atomscell2atoms_mapping=" << aurostd::joinWDelimiter(atomscell2atoms_mapping,",") << endl;
+  }
+
+  if(LDEBUG){cerr << soliloquy << " GenerateGridAtoms(): starting" << endl;}
   GenerateGridAtoms(rmax);
-  if(LDEBUG){cerr << soliloquy << " GenerateGridAtoms() done" << endl;}
+  if(LDEBUG){cerr << soliloquy << " GenerateGridAtoms(): done" << endl;}
   if(LDEBUG){cerr << soliloquy << " grid_atoms_number=" << grid_atoms_number << endl;}
 
   double dist=0.0;
@@ -15704,6 +15709,15 @@ void xstructure::GetNeighbors(deque<_atom>& atoms_cell,deque<deque<uint> >& i_ne
           std::swap(i_neighbors[k][i],i_neighbors[k][j]);
           std::swap(distances[k][i],distances[k][j]);
         }
+      }
+    }
+  }
+
+  if(LDEBUG){
+    for(k=0;k<i_neighbors.size();k++){
+      cerr << soliloquy << " ATOMS_CELL[k=" << k << "]: " << atoms_cell[k].name << endl;
+      for(i=0;i<i_neighbors[k].size();i++){
+        cerr << "  neighbor[i=" << i << "]: " << grid_atoms[i_neighbors[k][i]].name << " dist=" << distances[k][i] << endl;
       }
     }
   }
