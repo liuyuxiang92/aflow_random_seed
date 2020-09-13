@@ -60,10 +60,8 @@ namespace cce {
 
   void print_corrections(xstructure& structure, aurostd::xoption& flags) {
     aurostd::xoption cce_flags = init_flags();
-    if(aurostd::toupper(flags.flag("CCE_CORRECTION::TEST_COMMAND_LINE"))){ // some output should be written in specific way to test command line functionality
-      cce_flags.flag("TEST_COMMAND_LINE",TRUE);
-    } else if (aurostd::toupper(flags.flag("CCE_CORRECTION::TEST"))) {
-      cce_flags.flag("TEST",TRUE);
+    if (aurostd::toupper(flags.flag("CCE_CORRECTION::UNIT_TEST"))) {
+      cce_flags.flag("UNIT_TEST",TRUE);
     }
     CCE_Variables cce_vars = init_variables(structure);
 
@@ -110,7 +108,7 @@ namespace cce {
 
       if (aurostd::toupper(flags.getattachedscheme("CCE_CORRECTION::PRINT")) == "JSON") {
         oss << print_JSON_corrections(structure, cce_vars) << std::endl;
-      } else if (aurostd::toupper(flags.flag("CCE_CORRECTION::TEST"))) {
+      } else if (aurostd::toupper(flags.flag("CCE_CORRECTION::UNIT_TEST"))) {
         oss << print_test_output(cce_vars, cce_vars.enthalpy_formation_cell_cce) << std::endl;
       } else {
         //// print oxidation_numbers
@@ -259,10 +257,10 @@ namespace cce {
   vector<double> calculate_corrections(const xstructure& structure, string functional, ofstream& FileMESSAGE, const string& directory_path, ostream& oss) { // functional needed as input when determining oxidation numbers from electronegativities
     string soliloquy=XPID+"cce::calculate_corrections():";
     stringstream message;
-    // copy structure to structure_to_use since check_structure includes rescaling to 1
+    // copy structure to structure_to_use since checkStructure includes rescaling to 1
     xstructure structure_to_use=structure;
     // check structure
-    structure_to_use.check_structure(); //includes rescaling the structure to 1
+    structure_to_use.checkStructure(); //includes rescaling the structure to 1
     // init variables and flags
     CCE_Variables cce_vars = init_variables(structure_to_use);
     aurostd::xoption cce_flags = init_flags();
@@ -466,7 +464,7 @@ namespace cce {
     stringstream message;
     //string structure_file = aurostd::file2string(structure_file_path); // first argument of read_structure_function does not need to be converted to string since it contains already the file content and not only the file name
     xstructure structure(structure_file, mode);
-    structure.check_structure();
+    structure.checkStructure();
     return structure;
   }
 
@@ -475,7 +473,7 @@ namespace cce {
   xstructure read_structure(std::istream& ist){
     string soliloquy=XPID+"cce::read_structure():";
     xstructure structure(ist);
-    structure.check_structure();
+    structure.checkStructure();
     return structure;
   }
 
@@ -757,8 +755,7 @@ namespace cce {
   // Initializes the CCE flags to their default values.
   aurostd::xoption init_flags() {
     aurostd::xoption flags;
-    flags.flag("TEST_COMMAND_LINE", false);
-    flags.flag("TEST", false);
+    flags.flag("UNIT_TEST", false);
     flags.flag("RUN_FULL_CCE", false);
     flags.flag("CORRECTABLE", true); // first assuming that formation enthalpy of system IS correctable; will be set to not correctable if, for any atom, no correction can be identified
     flags.flag("OX_NUMS_PROVIDED", false);
@@ -1023,10 +1020,7 @@ namespace cce {
         stringstream message;
         message << " Not all nearest neighbors of " << structure.atoms[i].cleanname << " (ATOM[" << i << "]) within the distance tolerance are " << anion_species << "!" << endl;
         message << other_neighbors.str();
-        if(cce_flags.flag("TEST_COMMAND_LINE")){
-          oss << endl;
-          oss << "WARNING:" << message.str();
-        } else if (!cce_flags.flag("TEST")){
+        if (!cce_flags.flag("UNIT_TEST")){
           ostream& oss = cout;
           ofstream FileMESSAGE;
           _aflags aflags;aflags.Directory=aurostd::getPWD();
@@ -1123,10 +1117,7 @@ namespace cce {
       stringstream message;
       message << " This should be a peroxide!" << endl;
       message << "Number of peroxide O-O bonds in cell: " << cce_vars.num_perox_bonds << endl;
-      if(cce_flags.flag("TEST_COMMAND_LINE")){
-        oss << endl;
-        oss << "WARNING:" << message.str();
-      } else if (!cce_flags.flag("TEST")) {
+      if (!cce_flags.flag("UNIT_TEST")) {
         ostream& oss = cout;
         ofstream FileMESSAGE;
         _aflags aflags;aflags.Directory=aurostd::getPWD();
@@ -1136,10 +1127,7 @@ namespace cce {
       stringstream message_so;
       message_so << " This should be a superoxide!" << endl;
       message_so << "Number of superoxide O-O bonds in cell: " << cce_vars.num_superox_bonds << endl;
-      if(cce_flags.flag("TEST_COMMAND_LINE")){
-        oss << endl;
-        oss << "WARNING:" << message_so.str();
-      } else if (!cce_flags.flag("TEST")) {
+      if (!cce_flags.flag("UNIT_TEST")) {
         ostream& oss = cout;
         ofstream FileMESSAGE;
         _aflags aflags;aflags.Directory=aurostd::getPWD();
@@ -1159,7 +1147,7 @@ namespace cce {
   // function overloading for below function to be able to use oxidation number determination independently of CCE
   vector<double> get_oxidation_states_from_electronegativities(xstructure& structure) {
     // check structure
-    structure.check_structure(); //includes rescaling the structure to 1
+    structure.checkStructure(); //includes rescaling the structure to 1
     CCE_Variables cce_vars = init_variables(structure);
     cce_vars.anion_species=determine_anion_species(structure, cce_vars);
     aurostd::xoption cce_flags = init_flags();
@@ -1440,10 +1428,7 @@ namespace cce {
       message << "The oxidation numbers and the number of cation-anion bonds will be set as known for this special case." << endl;
       message << "The individual oxidation numbers might therefore not be assigned to the correct atoms." << endl; //, but at least how often each cation oxidation state occurs should be correct." << endl;
       message << "Sb2O4 with ratio of Sb/O= " << Sb_O_ratio << endl;
-      if(cce_flags.flag("TEST_COMMAND_LINE")){
-        oss << endl;
-        oss << "WARNING:" << message.str();
-      } else if (!cce_flags.flag("TEST")) {
+      if (!cce_flags.flag("UNIT_TEST")) {
         ostream& oss = cout;
         ofstream FileMESSAGE;
         _aflags aflags;aflags.Directory=aurostd::getPWD();
@@ -1528,10 +1513,7 @@ namespace cce {
       message << "The oxidation numbers and the number of cation-anion bonds will be set as known for this special case." << endl;
       message << "The individual oxidation numbers might therefore not be assigned to the correct atoms." << endl; //, but at least how often each cation oxidation state occurs should be correct." << endl;
       message << "Pb3O4 with ratio of Pb/O= " << Pb_O_ratio << endl;
-      if(cce_flags.flag("TEST_COMMAND_LINE")){
-        oss << endl;
-        oss << "WARNING:" << message.str();
-      } else if (!cce_flags.flag("TEST")) {
+      if (!cce_flags.flag("UNIT_TEST")) {
         ostream& oss = cout;
         ofstream FileMESSAGE;
         _aflags aflags;aflags.Directory=aurostd::getPWD();
@@ -1631,10 +1613,7 @@ namespace cce {
         message << "The oxidation numbers and the number of cation-anion bonds will be set as known for this special case." << endl;
         message << "The individual oxidation numbers might therefore not be assigned to the correct atoms." << endl; //, but at least how often each cation oxidation state occurs should be correct." << endl;
         message << "n= " << n << " Magneli composition Ti_nO_(2n-1)" << endl;
-        if(cce_flags.flag("TEST_COMMAND_LINE")){
-          oss << endl;
-          oss << "WARNING:" << message.str();
-        } else if (!cce_flags.flag("TEST")) {
+        if (!cce_flags.flag("UNIT_TEST")) {
           ostream& oss = cout;
           ofstream FileMESSAGE;
           _aflags aflags;aflags.Directory=aurostd::getPWD();
@@ -1722,10 +1701,7 @@ namespace cce {
       message << "The oxidation numbers and the number of cation-anion bonds will be set as known for this special case." << endl;
       message << "The individual oxidation numbers might therefore not be assigned to the correct atoms." << endl; //, but at least how often each cation oxidation state occurs should be correct." << endl;
       message << "Fe3O4 with ratio of Fe/O= " << Fe_O_ratio << endl;
-      if(cce_flags.flag("TEST_COMMAND_LINE")){
-        oss << endl;
-        oss << "WARNING:" << message.str();
-      } else if (!cce_flags.flag("TEST")) {
+      if (!cce_flags.flag("UNIT_TEST")) {
         ostream& oss = cout;
         ofstream FileMESSAGE;
         _aflags aflags;aflags.Directory=aurostd::getPWD();
@@ -1813,10 +1789,7 @@ namespace cce {
       message << "The oxidation numbers and the number of cation-anion bonds will be set as known for this special case." << endl;
       message << "The individual oxidation numbers might therefore not be assigned to the correct atoms." << endl; //, but at least how often each cation oxidation state occurs should be correct." << endl;
       message << cation_species << "3O4 with ratio of " << cation_species << "/O= " << cation_species_O_ratio << endl;
-      if(cce_flags.flag("TEST_COMMAND_LINE")){
-        oss << endl;
-        oss << "WARNING:" << message.str();
-      } else if (!cce_flags.flag("TEST")) {
+      if (!cce_flags.flag("UNIT_TEST")) {
         ostream& oss = cout;
         ofstream FileMESSAGE;
         _aflags aflags;aflags.Directory=aurostd::getPWD();
@@ -1919,10 +1892,7 @@ namespace cce {
       message << "The oxidation numbers and the number of cation-anion bonds will be set as known for this special case." << endl;
       message << "The individual oxidation numbers might therefore not be assigned to the correct atoms." << endl; //, but at least how often each cation oxidation state occurs should be correct." << endl;
       message << alkali_metal << "2O3 with ratio of O/" << alkali_metal << "= " << O_alkali_ratio << endl;
-      if(cce_flags.flag("TEST_COMMAND_LINE")){
-        oss << endl;
-        oss << "WARNING:" << message.str();
-      } else if (!cce_flags.flag("TEST")) {
+      if (!cce_flags.flag("UNIT_TEST")) {
         ostream& oss = cout;
         ofstream FileMESSAGE;
         _aflags aflags;aflags.Directory=aurostd::getPWD();
@@ -2003,10 +1973,7 @@ namespace cce {
       if (aurostd::isequal(amount_Mn/amount_Mo,1.0) && aurostd::isequal(amount_Mn/amount_O,0.25) && aurostd::isequal(amount_Mo/amount_O,0.25)) {
         stringstream message;
         message << " MnMoO4 special treatment since sum over oxidation states is zero but individual oxidation numbers are wrong!!!" << endl;
-        if(cce_flags.flag("TEST_COMMAND_LINE")){
-          oss << endl;
-          oss << "WARNING:" << message.str();
-        } else if (!cce_flags.flag("TEST")) {
+        if (!cce_flags.flag("UNIT_TEST")) {
           ostream& oss = cout;
           ofstream FileMESSAGE;
           _aflags aflags;aflags.Directory=aurostd::getPWD();
@@ -2064,10 +2031,7 @@ namespace cce {
       if (aurostd::isequal(amount_Ca/amount_Fe,1.0) && aurostd::isequal(amount_Ca/amount_O,0.4) && aurostd::isequal(amount_Fe/amount_O,0.4)) {
         stringstream message;
         message << " Ca2Fe2O5 special treatment for LDA since oxidation numbers for Fe, which should be Fe+3, are not correctly determined from Bader charges for all Fe!!!" << endl;
-        if(cce_flags.flag("TEST_COMMAND_LINE")){
-          oss << endl;
-          oss << "WARNING:" << message.str();
-        } else if (!cce_flags.flag("TEST")){
+        if (!cce_flags.flag("UNIT_TEST")){
           ostream& oss = cout;
           ofstream FileMESSAGE;
           _aflags aflags;aflags.Directory=aurostd::getPWD();
@@ -2086,10 +2050,7 @@ namespace cce {
       } else if (amount_Ca/amount_Fe == 0.5 && amount_Ca/amount_O == 0.25 && amount_Fe/amount_O == 0.5) {
         stringstream message;
         message << " CaFe2O4 special treatment for LDA since oxidation numbers for Fe, which should be Fe+3, are not correctly determined from Bader charges for all Fe!!!" << endl;
-        if(cce_flags.flag("TEST_COMMAND_LINE")){
-          oss << endl;
-          oss << "WARNING:" << message.str();
-        } else if (!cce_flags.flag("TEST")){
+        if (!cce_flags.flag("UNIT_TEST")){
           ostream& oss = cout;
           ofstream FileMESSAGE;
           _aflags aflags;aflags.Directory=aurostd::getPWD();
@@ -2142,10 +2103,7 @@ namespace cce {
       if (aurostd::isequal(amount_Fe/amount_Ti,1.0) && aurostd::isequal(amount_Fe/amount_O,1.0/3) && aurostd::isequal(amount_Ti/amount_O,1.0/3)) {
         stringstream message;
         message << " FeTiO3 special treatment for LDA since oxidation numbers for Ti, which should be Ti+4, are not correctly determined from Bader charges and using other fixing would also change Fe oxidation numbers!!!" << endl;
-        if(cce_flags.flag("TEST_COMMAND_LINE")){
-          oss << endl;
-          oss << "WARNING:" << message.str();
-        } else if (!cce_flags.flag("TEST")){
+        if (!cce_flags.flag("UNIT_TEST")){
           ostream& oss = cout;
           ofstream FileMESSAGE;
           _aflags aflags;aflags.Directory=aurostd::getPWD();
@@ -2423,10 +2381,7 @@ namespace cce {
     if(!(cce_vars.vfunctionals.size() == 1 && cce_vars.vfunctionals[0] == functional)){
       stringstream message;
       message << " The oxidation numbers are only determined on the basis of a" << (functional == "LDA"?"n ":" ") << functional << " calculation." << endl;
-      if(cce_flags.flag("TEST_COMMAND_LINE")){
-        oss << endl;
-        oss << "WARNING:" << message.str();
-      } else if (!cce_flags.flag("TEST")) {
+      if (!cce_flags.flag("UNIT_TEST")) {
         ostream& oss = cout;
         ofstream FileMESSAGE;
         _aflags aflags;aflags.Directory=aurostd::getPWD();
@@ -2588,16 +2543,14 @@ namespace cce {
         }
       }
     }
-    if(!cce_flags.flag("TEST_COMMAND_LINE")){ // don't throw following errors when testing CCE command line output; otherwise automated checks break
-      if (error1) { // errors can only be thrown after loop over atoms is complete since the output should indicate all species for which corrections might be missing/cannot be identified
-        message << " VERY BAD NEWS: The formation enthalpy of this system is not correctable since there are no corrections for " << aurostd::joinWDelimiter(species_missing_corrections, ", ") << " coordinated by " << cce_vars.anion_species << "!" << endl;
-        message << " See also the output for details.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
-      } else if (error2) {
-        message << " BAD NEWS: The oxidation numbers (and hence the corrections) of " << aurostd::joinWDelimiter(undetermined_ox_states, ", ") << " cannot be identified from the Bader charges!"  << endl;
-        message << " See the output for details.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
-      }
+    if (error1) { // errors can only be thrown after loop over atoms is complete since the output should indicate all species for which corrections might be missing/cannot be identified
+      message << " VERY BAD NEWS: The formation enthalpy of this system is not correctable since there are no corrections for " << aurostd::joinWDelimiter(species_missing_corrections, ", ") << " coordinated by " << cce_vars.anion_species << "!" << endl;
+      message << " See also the output for details.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
+    } else if (error2) {
+      message << " BAD NEWS: The oxidation numbers (and hence the corrections) of " << aurostd::joinWDelimiter(undetermined_ox_states, ", ") << " cannot be identified from the Bader charges!"  << endl;
+      message << " See the output for details.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
     }
     return cce_vars.oxidation_states;
   }
@@ -2611,10 +2564,7 @@ namespace cce {
     string soliloquy=XPID+"cce::general_attempt_fixing_oxidation_states():";
     stringstream message;
     message << " The sum over all oxidation numbers (as determined from the Bader charges) is NOT zero, trying to repair that based on known problematic cases (Ti, V, Fe). This may or may not work." << endl;
-    if(cce_flags.flag("TEST_COMMAND_LINE")){
-      oss << endl;
-      oss << "WARNING:" << message.str();
-    } else if (!cce_flags.flag("TEST")) {
+    if (!cce_flags.flag("UNIT_TEST")) {
       ostream& oss = cout;
       ofstream FileMESSAGE;
       _aflags aflags;aflags.Directory=aurostd::getPWD();
@@ -2727,7 +2677,7 @@ namespace cce {
         set_anion_corrections(structure, cce_vars, corrections_atom, i);
       }
     }
-    if(error && !cce_flags.flag("TEST_COMMAND_LINE")){ // don't throw following errors when testing CCE command line output; otherwise automated checks break
+    if(error){
       // errors can only be thrown after loop over atoms is complete since the output should indicate all species for which corrections might be missing/cannot be identified
       message << " BAD NEWS: No correction available for " << std::showpos << aurostd::joinWDelimiter(missing_corrections, ", ") << "." << endl;
       message << " See also the output for details.";
@@ -2947,7 +2897,6 @@ namespace cce {
 
     json << "{";
     uint l=0;
-    //json << "\"cation_coordination_numbers\":{";
     for (uint i=0;i<nspecies;i++){
       atoms_neighbors_vector.clear();
       string cation_info="";
@@ -3062,7 +3011,6 @@ namespace cce {
   // print cation coordination numbers, i.e. number of anions coordinating each cation
   string print_output_cation_coordination_numbers(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, vector<vector<uint> >& multi_anion_num_neighbors) {
     stringstream output;
-    //output << endl;
     output << std::setw(4) << std::right << "atom" << std::setw(13) << std::left << "   species" << std::setw(8) << "anion" << std::setw(13) << std::right << "coord. number" << endl;
     for (uint i=0,isize=structure.atoms.size();i<isize;i++){
       if ((structure.atoms[i].cleanname != cce_vars.anion_species) && (cce_vars.multi_anion_atoms[i] != 1)){ // exclude main anion species and multi anion atoms detected previously
@@ -3087,7 +3035,6 @@ namespace cce {
   string print_output_oxidation_numbers(const xstructure& structure, CCE_Variables& cce_vars) {
     stringstream output;
     // print oxidation numbers
-    //output << endl;
     output << std::setw(4) << std::right << "atom" << std::setw(13) << std::left << "   species" << std::setw(15) << std::right << "oxidation state" << endl;
     for (uint k=0,ksize=cce_vars.oxidation_states.size();k<ksize;k++){
       output << std::showpos << std::setw(4) << std::right << k+1 << std::setw(13) << std::left << "   " + structure.atoms[k].cleanname << std::setw(15) << std::right << cce_vars.oxidation_states[k] << endl; // k+1: convert to 1-based counting
@@ -3101,7 +3048,6 @@ namespace cce {
   string print_output_corrections(const xstructure& structure, CCE_Variables& cce_vars, const vector<double>& enthalpy_formation_cell_cce) {
     stringstream output;
     // print out CCE corrections per cell and atom for functionals selected
-    //output << endl;
     if (!(cce_vars.vfunctionals.size() == 1 && cce_vars.vfunctionals[0] == "exp")){ // if only exp is set as functional CCE CORRECTIONS: should not be written
       output << "CCE CORRECTIONS (to be subtracted from precalculated DFT formation enthalpies):" << endl;
       output << std::setw(10) << "functional" << std::setw(14) << "temperature" << std::setw(13) << "correction" << std::setw(13) << "correction" << endl;
@@ -3192,7 +3138,6 @@ namespace cce {
     oss << "When you use results from CCE and/or this implementation, please cite the following article:" << endl;
     oss << "Friedrich et al., npj Comput. Mater. 5, 59 (2019); https://doi.org/10.1038/s41524-019-0192-1" << endl;
     oss << "############################################################################################" << endl;
-    //oss << endl;
     return oss.str();
   }
 

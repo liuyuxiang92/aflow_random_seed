@@ -1837,7 +1837,7 @@ class xstructure {
     // std::vector<vector<double> > rshell;                       // vector of shells
     // std::vector<vector<int> > nshell;                          // vector of density in shells
     // int nbins;                                                 // number of bins
-    void check_structure();                                       //RF20200831; rescale structure to 1 and check whether e.g. species and atoms are present
+    void checkStructure();                                       //RF20200831; rescale structure to 1 and check whether e.g. species and atoms are present
     //
     void GetNeighbors(deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,double rmin=0.0,bool prim=true,bool unique_only=true);  //CO20200912
     void GetNeighbors(deque<_atom>& atoms_cell,deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,double rmin=0.0,bool prim=true,bool unique_only=true);  //CO20200912

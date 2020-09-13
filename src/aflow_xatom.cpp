@@ -15844,14 +15844,14 @@ class compare_GetNeighData {
     }
 };
 
-//RF20200831 - check_structure - START
+//RF20200831 - checkStructure - START
 // **************************************************************************
-// check_structure
+// checkStructure
 // **************************************************************************
 // rescale structure to 1 and check whether e.g. species and atoms are present
-void xstructure::check_structure(){
+void xstructure::checkStructure(){
   bool LDEBUG = (FALSE || XHOST.DEBUG);
-  string soliloquy=XPID+"xstructure::check_structure():";
+  string soliloquy=XPID+"xstructure::checkStructure():";
   stringstream message;
   (*this).ReScale(1.0); // rescales scaling factor in second line of POSCAR to 1, needed for correct distances
   //throw some general information such as input structure
@@ -15877,7 +15877,7 @@ void xstructure::check_structure(){
     }
   }
 }
-//RF20200831 - check_structure - END
+//RF20200831 - checkStructure - END
 
 
 // **************************************************************************

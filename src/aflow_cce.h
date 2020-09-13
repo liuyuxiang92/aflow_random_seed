@@ -73,7 +73,6 @@ namespace cce {
   // read user input (from command line or directory path)
   xstructure read_structure(const string& structure_file, int=IOAFLOW_AUTO); // set xstructure mode argument only here and it is automoatically recognized in the main CCE cpp file
   xstructure read_structure(std::istream& ist);
-  //xstructure check_structure(xstructure& structure);
   void get_dft_form_enthalpies_functionals(const string& enthalpies_dft_input_str, const string& functionals_input_str, CCE_Variables& cce_vars);
   int get_offset(const string& functional);
   vector<double> get_oxidation_states(const string& oxidation_numbers_input_str, const xstructure& structure, CCE_Variables& cce_vars, ostream& oss=std::cout);
