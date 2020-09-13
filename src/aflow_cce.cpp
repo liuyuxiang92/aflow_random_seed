@@ -257,10 +257,10 @@ namespace cce {
   vector<double> calculate_corrections(const xstructure& structure, string functional, ofstream& FileMESSAGE, const string& directory_path, ostream& oss) { // functional needed as input when determining oxidation numbers from electronegativities
     string soliloquy=XPID+"cce::calculate_corrections():";
     stringstream message;
-    // copy structure to structure_to_use since check_structure includes rescaling to 1
+    // copy structure to structure_to_use since checkStructure includes rescaling to 1
     xstructure structure_to_use=structure;
     // check structure
-    structure_to_use.check_structure(); //includes rescaling the structure to 1
+    structure_to_use.checkStructure(); //includes rescaling the structure to 1
     // init variables and flags
     CCE_Variables cce_vars = init_variables(structure_to_use);
     aurostd::xoption cce_flags = init_flags();
@@ -464,7 +464,7 @@ namespace cce {
     stringstream message;
     //string structure_file = aurostd::file2string(structure_file_path); // first argument of read_structure_function does not need to be converted to string since it contains already the file content and not only the file name
     xstructure structure(structure_file, mode);
-    structure.check_structure();
+    structure.checkStructure();
     return structure;
   }
 
@@ -473,7 +473,7 @@ namespace cce {
   xstructure read_structure(std::istream& ist){
     string soliloquy=XPID+"cce::read_structure():";
     xstructure structure(ist);
-    structure.check_structure();
+    structure.checkStructure();
     return structure;
   }
 
@@ -1144,7 +1144,7 @@ namespace cce {
   // function overloading for below function to be able to use oxidation number determination independently of CCE
   vector<double> get_oxidation_states_from_electronegativities(xstructure& structure) {
     // check structure
-    structure.check_structure(); //includes rescaling the structure to 1
+    structure.checkStructure(); //includes rescaling the structure to 1
     CCE_Variables cce_vars = init_variables(structure);
     cce_vars.anion_species=determine_anion_species(structure, cce_vars);
     aurostd::xoption cce_flags = init_flags();

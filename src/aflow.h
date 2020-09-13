@@ -1798,7 +1798,7 @@ class xstructure {
     // std::vector<vector<double> > rshell;                       // vector of shells
     // std::vector<vector<int> > nshell;                          // vector of density in shells
     // int nbins;                                                 // number of bins
-    void check_structure();                                       //RF20200831; rescale structure to 1 and check whether e.g. species and atoms are present
+    void checkStructure();                                       //RF20200831; rescale structure to 1 and check whether e.g. species and atoms are present
     // NEIGHBOURS OBEJCTS OLD-ACONVASP BUT WORKS                  // NEIGHBOURS OBEJCTS 
     // GetNeighData collects all the neighbor data between rmin and rmax and stores it for each atom in a vector of atom objects in order of increasing distance.  
     void GetNeighData(const deque<_atom>& in_atom_vec,const double& rmin, const double& rmax,deque<deque<_atom> >& neigh_mat);
