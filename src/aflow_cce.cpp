@@ -60,8 +60,8 @@ namespace cce {
 
   void print_corrections(xstructure& structure, aurostd::xoption& flags) {
     aurostd::xoption cce_flags = init_flags();
-    if (aurostd::toupper(flags.flag("CCE_CORRECTION::TEST"))) {
-      cce_flags.flag("TEST",TRUE);
+    if (aurostd::toupper(flags.flag("CCE_CORRECTION::UNIT_TEST"))) {
+      cce_flags.flag("UNIT_TEST",TRUE);
     }
     CCE_Variables cce_vars = init_variables(structure);
 
@@ -108,7 +108,7 @@ namespace cce {
 
       if (aurostd::toupper(flags.getattachedscheme("CCE_CORRECTION::PRINT")) == "JSON") {
         oss << print_JSON_corrections(structure, cce_vars) << std::endl;
-      } else if (aurostd::toupper(flags.flag("CCE_CORRECTION::TEST"))) {
+      } else if (aurostd::toupper(flags.flag("CCE_CORRECTION::UNIT_TEST"))) {
         oss << print_test_output(cce_vars, cce_vars.enthalpy_formation_cell_cce) << std::endl;
       } else {
         //// print oxidation_numbers
@@ -755,7 +755,7 @@ namespace cce {
   // Initializes the CCE flags to their default values.
   aurostd::xoption init_flags() {
     aurostd::xoption flags;
-    flags.flag("TEST", false);
+    flags.flag("UNIT_TEST", false);
     flags.flag("RUN_FULL_CCE", false);
     flags.flag("CORRECTABLE", true); // first assuming that formation enthalpy of system IS correctable; will be set to not correctable if, for any atom, no correction can be identified
     flags.flag("OX_NUMS_PROVIDED", false);
@@ -1018,7 +1018,7 @@ namespace cce {
         stringstream message;
         message << " Not all nearest neighbors of " << structure.atoms[i].cleanname << " (ATOM[" << i << "]) within the distance tolerance are " << anion_species << "!" << endl;
         message << other_neighbors.str();
-        if (!cce_flags.flag("TEST")){
+        if (!cce_flags.flag("UNIT_TEST")){
           ostream& oss = cout;
           ofstream FileMESSAGE;
           _aflags aflags;aflags.Directory=aurostd::getPWD();
@@ -1114,7 +1114,7 @@ namespace cce {
       stringstream message;
       message << " This should be a peroxide!" << endl;
       message << "Number of peroxide O-O bonds in cell: " << cce_vars.num_perox_bonds << endl;
-      if (!cce_flags.flag("TEST")) {
+      if (!cce_flags.flag("UNIT_TEST")) {
         ostream& oss = cout;
         ofstream FileMESSAGE;
         _aflags aflags;aflags.Directory=aurostd::getPWD();
@@ -1124,7 +1124,7 @@ namespace cce {
       stringstream message_so;
       message_so << " This should be a superoxide!" << endl;
       message_so << "Number of superoxide O-O bonds in cell: " << cce_vars.num_superox_bonds << endl;
-      if (!cce_flags.flag("TEST")) {
+      if (!cce_flags.flag("UNIT_TEST")) {
         ostream& oss = cout;
         ofstream FileMESSAGE;
         _aflags aflags;aflags.Directory=aurostd::getPWD();
@@ -1425,7 +1425,7 @@ namespace cce {
       message << "The oxidation numbers and the number of cation-anion bonds will be set as known for this special case." << endl;
       message << "The individual oxidation numbers might therefore not be assigned to the correct atoms." << endl; //, but at least how often each cation oxidation state occurs should be correct." << endl;
       message << "Sb2O4 with ratio of Sb/O= " << Sb_O_ratio << endl;
-      if (!cce_flags.flag("TEST")) {
+      if (!cce_flags.flag("UNIT_TEST")) {
         ostream& oss = cout;
         ofstream FileMESSAGE;
         _aflags aflags;aflags.Directory=aurostd::getPWD();
@@ -1510,7 +1510,7 @@ namespace cce {
       message << "The oxidation numbers and the number of cation-anion bonds will be set as known for this special case." << endl;
       message << "The individual oxidation numbers might therefore not be assigned to the correct atoms." << endl; //, but at least how often each cation oxidation state occurs should be correct." << endl;
       message << "Pb3O4 with ratio of Pb/O= " << Pb_O_ratio << endl;
-      if (!cce_flags.flag("TEST")) {
+      if (!cce_flags.flag("UNIT_TEST")) {
         ostream& oss = cout;
         ofstream FileMESSAGE;
         _aflags aflags;aflags.Directory=aurostd::getPWD();
@@ -1610,7 +1610,7 @@ namespace cce {
         message << "The oxidation numbers and the number of cation-anion bonds will be set as known for this special case." << endl;
         message << "The individual oxidation numbers might therefore not be assigned to the correct atoms." << endl; //, but at least how often each cation oxidation state occurs should be correct." << endl;
         message << "n= " << n << " Magneli composition Ti_nO_(2n-1)" << endl;
-        if (!cce_flags.flag("TEST")) {
+        if (!cce_flags.flag("UNIT_TEST")) {
           ostream& oss = cout;
           ofstream FileMESSAGE;
           _aflags aflags;aflags.Directory=aurostd::getPWD();
@@ -1698,7 +1698,7 @@ namespace cce {
       message << "The oxidation numbers and the number of cation-anion bonds will be set as known for this special case." << endl;
       message << "The individual oxidation numbers might therefore not be assigned to the correct atoms." << endl; //, but at least how often each cation oxidation state occurs should be correct." << endl;
       message << "Fe3O4 with ratio of Fe/O= " << Fe_O_ratio << endl;
-      if (!cce_flags.flag("TEST")) {
+      if (!cce_flags.flag("UNIT_TEST")) {
         ostream& oss = cout;
         ofstream FileMESSAGE;
         _aflags aflags;aflags.Directory=aurostd::getPWD();
@@ -1786,7 +1786,7 @@ namespace cce {
       message << "The oxidation numbers and the number of cation-anion bonds will be set as known for this special case." << endl;
       message << "The individual oxidation numbers might therefore not be assigned to the correct atoms." << endl; //, but at least how often each cation oxidation state occurs should be correct." << endl;
       message << cation_species << "3O4 with ratio of " << cation_species << "/O= " << cation_species_O_ratio << endl;
-      if (!cce_flags.flag("TEST")) {
+      if (!cce_flags.flag("UNIT_TEST")) {
         ostream& oss = cout;
         ofstream FileMESSAGE;
         _aflags aflags;aflags.Directory=aurostd::getPWD();
@@ -1889,7 +1889,7 @@ namespace cce {
       message << "The oxidation numbers and the number of cation-anion bonds will be set as known for this special case." << endl;
       message << "The individual oxidation numbers might therefore not be assigned to the correct atoms." << endl; //, but at least how often each cation oxidation state occurs should be correct." << endl;
       message << alkali_metal << "2O3 with ratio of O/" << alkali_metal << "= " << O_alkali_ratio << endl;
-      if (!cce_flags.flag("TEST")) {
+      if (!cce_flags.flag("UNIT_TEST")) {
         ostream& oss = cout;
         ofstream FileMESSAGE;
         _aflags aflags;aflags.Directory=aurostd::getPWD();
@@ -1970,7 +1970,7 @@ namespace cce {
       if (aurostd::isequal(amount_Mn/amount_Mo,1.0) && aurostd::isequal(amount_Mn/amount_O,0.25) && aurostd::isequal(amount_Mo/amount_O,0.25)) {
         stringstream message;
         message << " MnMoO4 special treatment since sum over oxidation states is zero but individual oxidation numbers are wrong!!!" << endl;
-        if (!cce_flags.flag("TEST")) {
+        if (!cce_flags.flag("UNIT_TEST")) {
           ostream& oss = cout;
           ofstream FileMESSAGE;
           _aflags aflags;aflags.Directory=aurostd::getPWD();
@@ -2028,7 +2028,7 @@ namespace cce {
       if (aurostd::isequal(amount_Ca/amount_Fe,1.0) && aurostd::isequal(amount_Ca/amount_O,0.4) && aurostd::isequal(amount_Fe/amount_O,0.4)) {
         stringstream message;
         message << " Ca2Fe2O5 special treatment for LDA since oxidation numbers for Fe, which should be Fe+3, are not correctly determined from Bader charges for all Fe!!!" << endl;
-        if (!cce_flags.flag("TEST")){
+        if (!cce_flags.flag("UNIT_TEST")){
           ostream& oss = cout;
           ofstream FileMESSAGE;
           _aflags aflags;aflags.Directory=aurostd::getPWD();
@@ -2047,7 +2047,7 @@ namespace cce {
       } else if (amount_Ca/amount_Fe == 0.5 && amount_Ca/amount_O == 0.25 && amount_Fe/amount_O == 0.5) {
         stringstream message;
         message << " CaFe2O4 special treatment for LDA since oxidation numbers for Fe, which should be Fe+3, are not correctly determined from Bader charges for all Fe!!!" << endl;
-        if (!cce_flags.flag("TEST")){
+        if (!cce_flags.flag("UNIT_TEST")){
           ostream& oss = cout;
           ofstream FileMESSAGE;
           _aflags aflags;aflags.Directory=aurostd::getPWD();
@@ -2100,7 +2100,7 @@ namespace cce {
       if (aurostd::isequal(amount_Fe/amount_Ti,1.0) && aurostd::isequal(amount_Fe/amount_O,1.0/3) && aurostd::isequal(amount_Ti/amount_O,1.0/3)) {
         stringstream message;
         message << " FeTiO3 special treatment for LDA since oxidation numbers for Ti, which should be Ti+4, are not correctly determined from Bader charges and using other fixing would also change Fe oxidation numbers!!!" << endl;
-        if (!cce_flags.flag("TEST")){
+        if (!cce_flags.flag("UNIT_TEST")){
           ostream& oss = cout;
           ofstream FileMESSAGE;
           _aflags aflags;aflags.Directory=aurostd::getPWD();
@@ -2378,7 +2378,7 @@ namespace cce {
     if(!(cce_vars.vfunctionals.size() == 1 && cce_vars.vfunctionals[0] == functional)){
       stringstream message;
       message << " The oxidation numbers are only determined on the basis of a" << (functional == "LDA"?"n ":" ") << functional << " calculation." << endl;
-      if (!cce_flags.flag("TEST")) {
+      if (!cce_flags.flag("UNIT_TEST")) {
         ostream& oss = cout;
         ofstream FileMESSAGE;
         _aflags aflags;aflags.Directory=aurostd::getPWD();
@@ -2556,7 +2556,7 @@ namespace cce {
     string soliloquy=XPID+"cce::general_attempt_fixing_oxidation_states():";
     stringstream message;
     message << " The sum over all oxidation numbers (as determined from the Bader charges) is NOT zero, trying to repair that based on known problematic cases (Ti, V, Fe). This may or may not work." << endl;
-    if (!cce_flags.flag("TEST")) {
+    if (!cce_flags.flag("UNIT_TEST")) {
       ostream& oss = cout;
       ofstream FileMESSAGE;
       _aflags aflags;aflags.Directory=aurostd::getPWD();
