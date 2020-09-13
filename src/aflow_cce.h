@@ -79,9 +79,9 @@ namespace cce {
   vector<uint> check_for_multi_anion_system(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, double tolerance=DEFAULT_CCE_NN_DIST_TOL_MULTI_ANION);
   vector<uint> get_num_neighbors(const xstructure& structure, double tolerance=_CCE_NN_DIST_TOL_);
   vector<uint> get_num_neighbors(const xstructure& structure, const string& anion_species, double tolerance=_CCE_NN_DIST_TOL_);
-  vector<uint> get_num_neighbors(const xstructure& structure, const string& anion_species, xoption& cce_flags, CCE_Variables& cce_vars, double tolerance=_CCE_NN_DIST_TOL_, ostream& oss=std::cout);
+  vector<uint> get_num_neighbors(const xstructure& structure, const string& anion_species, xoption& cce_flags, CCE_Variables& cce_vars, double tolerance=_CCE_NN_DIST_TOL_);
   vector<double> get_dist_cutoffs(const xstructure& structure, double tolerance=_CCE_NN_DIST_TOL_);
-  void check_per_super_oxides(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss=std::cout);
+  void check_per_super_oxides(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars);
   // determine oxidation numbers from electronegativities
   vector<double> get_oxidation_states_from_electronegativities(xstructure& structure);
   vector<double> get_oxidation_states_from_electronegativities(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss=std::cout);
@@ -105,10 +105,10 @@ namespace cce {
   double get_oxidation_states_sum(CCE_Variables& cce_vars);
   // determine oxidation numbers from Bader charges (outdated)
   vector<double> get_oxidation_states_from_Bader(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, const string& directory_path=aurostd::getPWD(), ostream& oss=std::cout);
-  void get_system_name_functional_from_aflow_in(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, string& system_name, string& functional, const string& directory_path=aurostd::getPWD(), ostream& oss=std::cout);
+  void get_system_name_functional_from_aflow_in(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, string& system_name, string& functional, const string& directory_path=aurostd::getPWD());
   vector<double> get_Bader_charges_from_Bader_file(const xstructure& structure, CCE_Variables& cce_vars, const string& Bader_file);
   vector<double> Bader_charges_to_oxidation_states(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, string& functional, ostream& oss=std::cout);
-  void general_attempt_fixing_oxidation_states(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss=std::cout);
+  void general_attempt_fixing_oxidation_states(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars);
   // assign corrections
   void get_corrections(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, const string& considered_anion_species, const vector<uint>& num_neighbors, vector<vector<double> >& corrections_atom, ostream& oss=std::cout);
   void load_cation_corrections(const xstructure& structure, CCE_Variables& cce_vars, const string& corrections_line, vector<vector<double> >& corrections_atom, uint i);
@@ -118,6 +118,7 @@ namespace cce {
   void check_apply_per_super_ox_corrections(CCE_Variables& cce_vars);
   void apply_pbe_u_icsd_shifts(const xstructure& structure, CCE_Variables& cce_vars, ostream& oss=std::cout);
   // print output and citation
+  string print_output(const xstructure& structure, aurostd::xoption& flags, xoption& cce_flags, CCE_Variables& cce_vars, vector<vector<uint> >& multi_anion_num_neighbors);
   string print_JSON_cation_coordination_numbers(const xstructure& structure, xoption& cce_flags, const CCE_Variables& cce_vars, vector<vector<uint> >& multi_anion_num_neighbors);
   string print_JSON_ox_nums(const xstructure& structure, const CCE_Variables& cce_vars);
   string print_JSON_corrections(const xstructure& structure, const CCE_Variables& cce_vars); //ME20200213

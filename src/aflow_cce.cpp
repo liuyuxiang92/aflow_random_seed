@@ -981,7 +981,7 @@ namespace cce {
 
   //get_num_neighbors////////////////////////////////////////////////////////
   // trying to get the number of neighbors for each atom within respective species selective cutoff
-  vector<uint> get_num_neighbors(const xstructure& structure, const string& anion_species, xoption& cce_flags, CCE_Variables& cce_vars, double tolerance, ostream& oss) { // anion_species here cannot be taken from cce_vars since function is also used to determine multi anion num_neighbors for which anion_species is the respective multi_anion_species
+  vector<uint> get_num_neighbors(const xstructure& structure, const string& anion_species, xoption& cce_flags, CCE_Variables& cce_vars, double tolerance) { // anion_species here cannot be taken from cce_vars since function is also used to determine multi anion num_neighbors for which anion_species is the respective multi_anion_species
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
     string soliloquy=XPID+"cce::get_num_neighbors():";
     if(LDEBUG){
@@ -1062,7 +1062,7 @@ namespace cce {
 
   //check_per_super_oxides////////////////////////////////////////////////////////
   // check whether the system contains per- or superoxide ions based on the O-O bond length and set variables accordingly
-  void check_per_super_oxides(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss) {
+  void check_per_super_oxides(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
     string soliloquy=XPID+"cce::check_per_super_oxides():";
     stringstream message;
@@ -2350,7 +2350,7 @@ namespace cce {
 
   //get_system_name_functional_from_aflow_in////////////////////////////////////////////////////////
   // determine the system name and functional from the aflow_in
-  void get_system_name_functional_from_aflow_in(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, string& system_name, string& functional, const string& directory_path, ostream& oss) {
+  void get_system_name_functional_from_aflow_in(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, string& system_name, string& functional, const string& directory_path) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
     string soliloquy=XPID+"cce::get_system_name_functional_from_aflow_in():";
     stringstream message;
@@ -2551,7 +2551,7 @@ namespace cce {
   // for some ions known to be problematic for the Bader analysis (e.g. V+5, Fe+2, Fe+3, Ti+4) 
   // a brute force ansatz can be implemented to just change their oxidation state and later check 
   // whether it fixes the oxidation number sum rule
-  void general_attempt_fixing_oxidation_states(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss) {
+  void general_attempt_fixing_oxidation_states(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
     string soliloquy=XPID+"cce::general_attempt_fixing_oxidation_states():";
     stringstream message;
@@ -2877,6 +2877,45 @@ namespace cce {
   //                        PRINT OUTPUT AND CITATION                        //
   //                                                                         //
   /////////////////////////////////////////////////////////////////////////////
+
+  //print_output/////////////////////////////////////////////////////////////
+  // Decides which output to print when running corrections
+  string print_output(const xstructure& structure, aurostd::xoption& flags, xoption& cce_flags, CCE_Variables& cce_vars, vector<vector<uint> >& multi_anion_num_neighbors) {
+    stringstream output;
+    if (aurostd::toupper(flags.flag("CCE_CORRECTION::GET_CATION_COORDINATION_NUMBERS"))) {
+      if (aurostd::toupper(flags.getattachedscheme("CCE_CORRECTION::PRINT")) == "JSON") {
+        output << print_JSON_cation_coordination_numbers(structure, cce_flags, cce_vars, multi_anion_num_neighbors) << std::endl;
+      } else {
+        // print cation coordination numbers
+        output << print_output_cation_coordination_numbers(structure, cce_flags, cce_vars, multi_anion_num_neighbors);
+        // print CCE citation
+        output << print_citation();
+      }
+    }
+    if (aurostd::toupper(flags.flag("CCE_CORRECTION::GET_OXIDATION_NUMBERS"))) {
+      if (aurostd::toupper(flags.getattachedscheme("CCE_CORRECTION::PRINT")) == "JSON") {
+        output << print_JSON_ox_nums(structure, cce_vars) << std::endl;
+      } else {
+        // print oxidation numbers
+        output << print_output_oxidation_numbers(structure, cce_vars);
+        // print CCE citation
+        output << print_citation();
+      }
+    }
+    if (aurostd::toupper(flags.flag("CCE_CORRECTION::POSCAR_PATH")) || aurostd::toupper(flags.flag("CCE_CORRECTION::POSCAR2CCE"))) {
+      if (aurostd::toupper(flags.getattachedscheme("CCE_CORRECTION::PRINT")) == "JSON") {
+        output << print_JSON_corrections(structure, cce_vars) << std::endl;
+      } else if (aurostd::toupper(flags.flag("CCE_CORRECTION::UNIT_TEST"))) {
+        output << print_test_output(cce_vars, cce_vars.enthalpy_formation_cell_cce) << std::endl;
+      } else {
+        // print CCE corrections & corrected formation enthalpies per cell and atom
+        output << print_output_corrections(structure, cce_vars, cce_vars.enthalpy_formation_cell_cce);
+        // print CCE citation
+        output << print_citation();
+      }
+    }
+    return output.str();
+  }
 
   //print_JSON_cation_coordination_numbers/////////////////////////////////////////////////////////////
   // Returns cation coordination numbers, i.e. number of anions coordinating each cation in JSON format
