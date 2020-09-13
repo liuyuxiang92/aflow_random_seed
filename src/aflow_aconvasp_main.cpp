@@ -1952,8 +1952,6 @@ namespace pflow {
       if(vpflow.flag("RMCOPIES")) {cout << pflow::RMCOPIES(cin); _PROGRAMRUN=true;}
       if(vpflow.flag("RSM")) {pflow::RSM(argv,cin); _PROGRAMRUN=true;}
       if(vpflow.flag("RASMOL")) {pflow::RASMOL(vpflow.getattachedscheme("RASMOL"),cin); _PROGRAMRUN=true;}
-      if(vpflow.flag("CCE_CORRECTION")) {cce::print_corrections(vpflow); _PROGRAMRUN=true;}
-      if(vpflow.flag("CCE_CORRECTION::POSCAR2CCE")) {cce::print_corrections(vpflow, std::cin); _PROGRAMRUN=true;} //ME20200508
       //ME20191001 START
       //ME20200829 - Added patch functionality
       if (vpflow.flag("REBUILDDB") || vpflow.flag("UPDATEDB") || vpflow.flag("PATCHDB")) {
