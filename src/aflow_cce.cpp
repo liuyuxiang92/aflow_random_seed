@@ -87,7 +87,8 @@ namespace cce {
     /********************************************************/
     // obtain total CCE corrections per cell from CCE core function only based on
     // structure, oxidation numbers and functional information
-    CCE_core(structure, cce_flags, cce_vars);
+    vector<vector<uint> > multi_anion_num_neighbors;
+    CCE_core(structure, cce_flags, cce_vars, multi_anion_num_neighbors);
 
     // CALCULATE CORRECTED FORMATION ENTHALPIES AT 298.15 AND 0K ###################################
     if (cce_flags.flag("CORRECTABLE")){
@@ -105,6 +106,9 @@ namespace cce {
           cce_vars.enthalpy_formation_cell_cce[num_temps*k] = cce_vars.cce_correction[num_temps*k] ;
         }
       }
+
+      //// print output
+      //oss << print_output(structure, flags, cce_flags, cce_vars, multi_anion_num_neighbors);
 
       if (aurostd::toupper(flags.getattachedscheme("CCE_CORRECTION::PRINT")) == "JSON") {
         oss << print_JSON_corrections(structure, cce_vars) << std::endl;
@@ -277,7 +281,8 @@ namespace cce {
     cce_vars.vfunctionals.push_back(functional);
     cce_vars.offset.push_back(get_offset(functional));
     // run main CCE function to determine correction
-    CCE_core(structure_to_use, cce_flags, cce_vars, directory_path);
+    vector<vector<uint> > multi_anion_num_neighbors;
+    CCE_core(structure_to_use, cce_flags, cce_vars, multi_anion_num_neighbors, directory_path);
     // print oxidation_numbers
     message << print_output_oxidation_numbers(structure_to_use, cce_vars);
     _aflags aflags;aflags.Directory=aurostd::getPWD();
@@ -292,7 +297,7 @@ namespace cce {
   // main CCE function core called by all other main CCE functions
   // analyzing structure, determining oxidation numbers, assigning corrections,
   // and calculating total corrections
-  void CCE_core(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, const string& directory_path) {
+  void CCE_core(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, vector<vector<uint> >& multi_anion_num_neighbors, const string& directory_path) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
     string soliloquy=XPID+"cce::CCE_core():";
     stringstream message;
@@ -338,7 +343,8 @@ namespace cce {
     cce_vars.num_neighbors=get_num_neighbors(structure, cce_vars.anion_species, cce_flags, cce_vars);
 
     // determine anion nearest neighbors for cations bound to multi anion atoms if needed
-    vector<vector<uint> > multi_anion_num_neighbors(cce_vars.multi_anion_species.size(), vector<uint>(structure.atoms.size()));
+    //vector<vector<uint> > multi_anion_num_neighbors(cce_vars.multi_anion_species.size(), vector<uint>(structure.atoms.size()));
+    multi_anion_num_neighbors.resize(cce_vars.multi_anion_species.size(), vector<uint>(structure.atoms.size()));
     if (cce_flags.flag("MULTI_ANION_SYSTEM")){
       for(uint k=0,ksize=cce_vars.multi_anion_species.size();k<ksize;k++){ 
         if(LDEBUG){
@@ -2888,8 +2894,6 @@ namespace cce {
       } else {
         // print cation coordination numbers
         output << print_output_cation_coordination_numbers(structure, cce_flags, cce_vars, multi_anion_num_neighbors);
-        // print CCE citation
-        output << print_citation();
       }
     }
     if (aurostd::toupper(flags.flag("CCE_CORRECTION::GET_OXIDATION_NUMBERS"))) {
@@ -2898,11 +2902,9 @@ namespace cce {
       } else {
         // print oxidation numbers
         output << print_output_oxidation_numbers(structure, cce_vars);
-        // print CCE citation
-        output << print_citation();
       }
     }
-    if (aurostd::toupper(flags.flag("CCE_CORRECTION::POSCAR_PATH")) || aurostd::toupper(flags.flag("CCE_CORRECTION::POSCAR2CCE"))) {
+    //if (aurostd::toupper(flags.flag("CCE_CORRECTION::POSCAR_PATH")) || aurostd::toupper(flags.flag("CCE_CORRECTION::POSCAR2CCE"))) {
       if (aurostd::toupper(flags.getattachedscheme("CCE_CORRECTION::PRINT")) == "JSON") {
         output << print_JSON_corrections(structure, cce_vars) << std::endl;
       } else if (aurostd::toupper(flags.flag("CCE_CORRECTION::UNIT_TEST"))) {
@@ -2913,7 +2915,7 @@ namespace cce {
         // print CCE citation
         output << print_citation();
       }
-    }
+    //}
     return output.str();
   }
 

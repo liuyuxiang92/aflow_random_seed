@@ -63,7 +63,8 @@ namespace cce {
   vector<double> calculate_corrections(const string& directory_path);
   vector<double> calculate_corrections(const xstructure& structure, string functional, const string& directory_path=aurostd::getPWD(), ostream& oss=std::cout);
   vector<double> calculate_corrections(const xstructure& structure, string functional, ofstream& FileMESSAGE, const string& directory_path=aurostd::getPWD(), ostream& oss=std::cout);
-  void CCE_core(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, const string& directory_path=aurostd::getPWD());
+  //void CCE_core(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, const string& directory_path=aurostd::getPWD());
+  void CCE_core(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, vector<vector<uint> >& multi_anion_num_neighbors, const string& directory_path=aurostd::getPWD());
   // read user input (from command line or directory path)
   xstructure read_structure(const string& structure_file, int=IOAFLOW_AUTO); // set xstructure mode argument only here and it is automoatically recognized in the main CCE cpp file
   xstructure read_structure(std::istream& ist);
