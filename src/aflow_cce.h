@@ -86,7 +86,7 @@ namespace cce {
   vector<uint> get_num_neighbors(const xstructure& structure, double tolerance=_CCE_NN_DIST_TOL_);
   vector<uint> get_num_neighbors(const xstructure& structure, const string& anion_species, double tolerance=_CCE_NN_DIST_TOL_);
   vector<uint> get_num_neighbors(const xstructure& structure, const string& anion_species, xoption& cce_flags, CCE_Variables& cce_vars, double tolerance=_CCE_NN_DIST_TOL_);
-  vector<double> get_dist_cutoffs(const xstructure& structure, double tolerance=_CCE_NN_DIST_TOL_);
+  vector<double> get_dist_cutoffs(const xstructure& structure);
   void check_per_super_oxides(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars);
   // determine oxidation numbers from electronegativities
   vector<double> get_oxidation_states_from_electronegativities(xstructure& structure);
