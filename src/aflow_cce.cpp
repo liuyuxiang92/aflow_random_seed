@@ -108,22 +108,22 @@ namespace cce {
       }
 
       //// print output
-      //oss << print_output(structure, flags, cce_flags, cce_vars, multi_anion_num_neighbors);
+      oss << print_output(structure, flags, cce_flags, cce_vars, multi_anion_num_neighbors);
 
-      if (aurostd::toupper(flags.getattachedscheme("CCE_CORRECTION::PRINT")) == "JSON") {
-        oss << print_JSON_corrections(structure, cce_vars) << std::endl;
-      } else if (aurostd::toupper(flags.flag("CCE_CORRECTION::UNIT_TEST"))) {
-        oss << print_test_output(cce_vars, cce_vars.enthalpy_formation_cell_cce) << std::endl;
-      } else {
-        //// print oxidation_numbers
-        //oss << endl;
-        //oss << (cce_flags.flag("OX_NUMS_PROVIDED")?"INPUT ":"") << "OXIDATION NUMBERS:" << endl;
-        //oss << print_output_oxidation_numbers(structure, cce_vars);
-        // print CCE corrections & corrected formation enthalpies per cell and atom
-        oss << print_output_corrections(structure, cce_vars, cce_vars.enthalpy_formation_cell_cce);
-        // print CCE citation
-        oss << print_citation();
-      }
+      //if (aurostd::toupper(flags.getattachedscheme("CCE_CORRECTION::PRINT")) == "JSON") {
+      //  oss << print_JSON_corrections(structure, cce_vars) << std::endl;
+      //} else if (aurostd::toupper(flags.flag("CCE_CORRECTION::UNIT_TEST"))) {
+      //  oss << print_test_output(cce_vars, cce_vars.enthalpy_formation_cell_cce) << std::endl;
+      //} else {
+      //  //// print oxidation_numbers
+      //  //oss << endl;
+      //  //oss << (cce_flags.flag("OX_NUMS_PROVIDED")?"INPUT ":"") << "OXIDATION NUMBERS:" << endl;
+      //  //oss << print_output_oxidation_numbers(structure, cce_vars);
+      //  // print CCE corrections & corrected formation enthalpies per cell and atom
+      //  oss << print_output_corrections(structure, cce_vars, cce_vars.enthalpy_formation_cell_cce);
+      //  // print CCE citation
+      //  oss << print_citation();
+      //}
     }
   } // main CCE function for command line use
 
@@ -2893,25 +2893,29 @@ namespace cce {
   // Decides which output to print when running corrections
   string print_output(const xstructure& structure, aurostd::xoption& flags, xoption& cce_flags, CCE_Variables& cce_vars, vector<vector<uint> >& multi_anion_num_neighbors) {
     stringstream output;
-    if (flags.flag("CCE_CORRECTION::GET_CATION_COORDINATION_NUMBERS")) {
+    if (flags.flag("CCE_CORRECTION::POSCAR_PATH") && !flags.flag("CCE_CORRECTION::UNIT_TEST")) {
       if (aurostd::toupper(flags.getattachedscheme("CCE_CORRECTION::PRINT")) == "JSON") {
-        output << print_JSON_cation_coordination_numbers(structure, cce_flags, cce_vars, multi_anion_num_neighbors) << std::endl;
+        output << "{";
+        output << "\"cation_coordination_numbers\":";
+        output << print_JSON_cation_coordination_numbers(structure, cce_flags, cce_vars, multi_anion_num_neighbors);
+        output << ",\"oxidation_states\":";
+        output << print_JSON_ox_nums(structure, cce_vars) << ",";
       } else {
         // print cation coordination numbers
+        output << "CATION COORDINATION NUMBERS:" << std::endl;
         output << print_output_cation_coordination_numbers(structure, cce_flags, cce_vars, multi_anion_num_neighbors);
-      }
-    }
-    if (flags.flag("CCE_CORRECTION::GET_OXIDATION_NUMBERS")) {
-      if (aurostd::toupper(flags.getattachedscheme("CCE_CORRECTION::PRINT")) == "JSON") {
-        output << print_JSON_ox_nums(structure, cce_vars) << std::endl;
-      } else {
         // print oxidation numbers
+        output << "OXIDATION NUMBERS:" << std::endl;
         output << print_output_oxidation_numbers(structure, cce_vars);
       }
     }
     if (aurostd::toupper(flags.getattachedscheme("CCE_CORRECTION::PRINT")) == "JSON") {
-      output << print_JSON_corrections(structure, cce_vars) << std::endl;
-    } else if (aurostd::toupper(flags.flag("CCE_CORRECTION::UNIT_TEST"))) {
+      if (!(flags.flag("CCE_CORRECTION::POSCAR_PATH") && !flags.flag("CCE_CORRECTION::UNIT_TEST"))) {
+        output << "{";
+      }
+      output << print_JSON_corrections(structure, cce_vars);
+      output << "}" << std::endl;
+    } else if (flags.flag("CCE_CORRECTION::UNIT_TEST")) {
       output << print_test_output(cce_vars, cce_vars.enthalpy_formation_cell_cce) << std::endl;
     } else {
       // print CCE corrections & corrected formation enthalpies per cell and atom
@@ -3003,9 +3007,9 @@ namespace cce {
     uint num_temps=cce_vars.vtemperatures.size();
     uint natoms = structure.atoms.size();
 
-    json << "{";
-    json << "\"oxidation_states\":";
-    json << "[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(cce_vars.oxidation_states),",") << "],";
+    //json << "{";
+    //json << "\"oxidation_states\":";
+    //json << "[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(cce_vars.oxidation_states),",") << "],";
     json << "\"CCE\":{";
     for (uint i = 0; i < nfuncs; i++) {
       json << "\"" << cce_vars.vfunctionals[i] << "\":{";
@@ -3039,7 +3043,7 @@ namespace cce {
     json << "\"publication\":";
     json << "\"Friedrich et al., Coordination corrected ab initio formation enthalpies, npj Comput. Mater. 5, 59 (2019). ";
     json << "https://doi.org/10.1038/s41524-019-0192-1\"";
-    json << "}";
+    //json << "}";
     return json.str();
   }
 
