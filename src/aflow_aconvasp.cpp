@@ -788,10 +788,10 @@ namespace pflow {
 // ***************************************************************************
 namespace pflow {
   xstructure SetAllAtomNames(const xstructure& a, const vector<string>& in) {
+    string soliloquy=XPID+"pflow::SetAllAtomNames():";
     xstructure b(a);
     if(in.size()==a.num_each_type.size()) {
-      cerr << "SetAllAtomNames: this routine must be fixed... it does not work here" << endl;
-      exit(0);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"this routine must be fixed, it does not work here",_RUNTIME_ERROR_);
 
       for(uint iat=0;iat<b.num_each_type.size();iat++) {
         b.atoms.at(iat).name=in.at(b.atoms.at(iat).type);       // CONVASP_MODE
@@ -812,10 +812,11 @@ namespace pflow {
       }
       return b;
     }
-    cerr << "Must specity as many names as types/numbers: in.size()=" << (int) in.size()
-      << "   =a.num_each_type.size()=" << (int) a.num_each_type.size()
-      << "   =a.atoms.size()=" << (int) a.atoms.size() << endl;
-    exit(0);
+    stringstream message;
+    message << "Must specify as many names as types/numbers: in.size()=" << (int) in.size();
+    message << "   =a.num_each_type.size()=" << (int) a.num_each_type.size();
+    message << "   =a.atoms.size()=" << (int) a.atoms.size();
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_NUMBER_);
   }
 }
 
@@ -824,10 +825,10 @@ namespace pflow {
 // ***************************************************************************
 namespace pflow {
   xstructure SetNamesWereGiven(const xstructure& a, const vector<int>& in) {
+    string soliloquy=XPID+"pflow::SetNamesWereGiven():";
     xstructure b(a);
     if(in.size()==a.num_each_type.size()) {
-      cerr << "ERROR - SetNamesWereGiven: this routine must be fixed... it does not work here" << endl;
-      exit(0);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"this routine must be fixed... it does not work here",_RUNTIME_ERROR_);
       for(uint iat=0;iat<b.num_each_type.size();iat++)
         b.atoms.at(iat).name_is_given=in.at(b.atoms.at(iat).type);      // CONVASP_MODE
       return b;
@@ -838,10 +839,11 @@ namespace pflow {
       }
       return b;
     }
-    cerr << "Must specity as many names as types/numbers: in.size()=" << (uint) in.size()
-      << "   =a.num_each_type.size()=" << (uint) a.num_each_type.size()
-      << "   =a.atoms.size()=" << (uint) a.atoms.size() << endl;
-    exit(0);
+    stringstream message;
+    message << "Must specify as many names as types/numbers: in.size()=" << (int) in.size();
+    message << "   =a.num_each_type.size()=" << (int) a.num_each_type.size();
+    message << "   =a.atoms.size()=" << (int) a.atoms.size();
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_NUMBER_);
   }
 }
 
@@ -1409,8 +1411,8 @@ namespace pflow {
     }
     h=xa[khi]-xa[klo];
     if(h == 0.0) {
-      cerr << "ERROR - pflow::GetSplineInt Bad xa input to routine splint" << endl;
-      exit(0);
+      string soliloquy=XPID+"pflow::GetSplineInt():";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Bad xa input to routine splint",_INPUT_ERROR_);
     }
     a=(xa[khi]-x)/h;
     b=(x-xa[klo])/h;

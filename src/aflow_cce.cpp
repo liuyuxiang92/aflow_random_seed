@@ -244,7 +244,7 @@ namespace cce {
     string outcar_file= directory_path + "/" + "OUTCAR.relax1";
     string functional=get_functional_from_aflow_in_outcar(structure, aflowin_file, outcar_file);
     if (functional.empty()) {
-      message << " Functional cannot be determined from aflow.in. Corrections are available for PBE, LDA, SCAN, or PBE+U_ICSD.";
+      message << " Functional cannot be determined from aflow.in. Corrections are available for PBE, LDA, SCAN, or PBE+U:ICSD.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
     }
     return calculate_corrections(structure, functional, directory_path); // directory path must be propagated if ox. states are determined from Bader charges
@@ -450,7 +450,7 @@ namespace cce {
       if (cce_vars.num_perox_bonds > 0 || cce_vars.num_superox_bonds > 0){
         check_apply_per_super_ox_corrections(cce_vars);
       }
-      // add ref. enthalpy shifts for PBE+U_ICSD if needed
+      // add ref. enthalpy shifts for PBE+U:ICSD if needed
       apply_pbe_u_icsd_shifts(structure, cce_vars);
     }
   } // main CCE function core
@@ -553,7 +553,7 @@ namespace cce {
       cerr << soliloquy << "PBE: " << aurostd::WithinList(cce_vars.vfunctionals, "PBE") << endl;
       cerr << soliloquy << "LDA: " << aurostd::WithinList(cce_vars.vfunctionals, "LDA") << endl;
       cerr << soliloquy << "SCAN: " << aurostd::WithinList(cce_vars.vfunctionals, "SCAN") << endl;
-      cerr << soliloquy << "PBE+U_ICSD: " << aurostd::WithinList(cce_vars.vfunctionals, "PBE+U_ICSD") << endl;
+      cerr << soliloquy << "PBE+U:ICSD: " << aurostd::WithinList(cce_vars.vfunctionals, "PBE+U:ICSD") << endl;
       cerr << soliloquy << "exp: " << aurostd::WithinList(cce_vars.vfunctionals, "exp") << endl;
       cerr << endl;
     }
@@ -565,7 +565,7 @@ namespace cce {
     if (functional=="PBE")          {return 0;}
     if (functional=="LDA")          {return 2;}
     if (functional=="SCAN")         {return 4;}
-    if (functional=="PBE+U_ICSD")   {return 6;}
+    if (functional=="PBE+U:ICSD")   {return 6;}
     if (functional=="exp")          {return 8;}
     else {return -1;}
   }
@@ -659,7 +659,7 @@ namespace cce {
     if (vflags.KBIN_VASP_FORCE_OPTION_METAGGA.xscheme == "SCAN"){
       scan = true;
     }
-    // check whether it is a DFT+U calculation with parameters as for the ICSD (PBE+U_ICSD calculation)
+    // check whether it is a DFT+U calculation with parameters as for the ICSD (PBE+U:ICSD calculation)
     // new implementation checking Us explicitly
     if (!vflags.KBIN_VASP_LDAU_PARAMETERS.empty() && vflags.KBIN_VASP_FORCE_OPTION_LDAU2.isentry && !vflags.KBIN_VASP_FORCE_OPTION_LDAU_ADIABATIC.isentry && !vflags.KBIN_VASP_FORCE_OPTION_LDAU_CUTOFF.isentry){
       ldau2=true;
@@ -686,7 +686,7 @@ namespace cce {
         message << " BAD NEWS: The number of species in the DFT+U settings differs from the number of provided U values. Please adapt and rerun.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
       }
-      // get standard Us for PBE+U_ICSD
+      // get standard Us for PBE+U:ICSD
       vector<double> standard_ICSD_Us_vector;
       bool LDAU=true;
       vector<string> vLDAUspecies;
@@ -717,7 +717,7 @@ namespace cce {
       }
       pbe_u_icsd = true;
     }
-    // check whether it is a DFT+U calculation with different parameters than for PBE+U_ICSD
+    // check whether it is a DFT+U calculation with different parameters than for PBE+U:ICSD
     if ((vflags.KBIN_VASP_FORCE_OPTION_LDAU1.isentry || vflags.KBIN_VASP_FORCE_OPTION_LDAU2.isentry) && !pbe_u_icsd){
       message << " BAD NEWS: It seems you are providing an aflow.in for a DFT+U calculation with different parameters than for the AFLOW ICSD database (Dudarev's approach, LDAU2=ON). There are no corrections for this case.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
@@ -725,7 +725,7 @@ namespace cce {
 
     if (pbe){
       if (pbe_u_icsd){
-        functional = "PBE+U_ICSD";
+        functional = "PBE+U:ICSD";
       } else if (scan){ //SCAN calculations are usually done with PBE PPs
         functional = "SCAN";
       } else if (!ldau && !ldau2){
@@ -744,7 +744,7 @@ namespace cce {
     }
     // if functional is still empty, i.e. cannot be determined from aflow.in, throw error
     if (functional.empty()) {
-      message << " Functional cannot be determined from aflow.in. Corrections are available for PBE, LDA, SCAN, or PBE+U_ICSD.";
+      message << " Functional cannot be determined from aflow.in. Corrections are available for PBE, LDA, SCAN, or PBE+U:ICSD.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
     }
     return functional;
@@ -2280,7 +2280,7 @@ namespace cce {
     if (cce_vars.anion_species == "O") {
       // in this part functional dependent settings will be primarily evaluated with "if, else if" conditions, 
       // since the calculation (for getting the Bader charges) could have only been done with one functional and not more than one
-      // oxidation numbers should not be functional dependent since results are for a specific calculation, i.e. PBE or LDA or SCAN or PBE+U_ICSD and not more than one
+      // oxidation numbers should not be functional dependent since results are for a specific calculation, i.e. PBE or LDA or SCAN or PBE+U:ICSD and not more than one
       // for a given structure there should be only one correct assignment of oxidation numbers
       string system_name = "";
       string functional = "";
@@ -2364,7 +2364,7 @@ namespace cce {
     string outcar_file= directory_path + "/" + "OUTCAR.relax1";
     functional=get_functional_from_aflow_in_outcar(structure, aflowin_file, outcar_file);
     if (functional.empty()) {
-      message << " Functional cannot be determined from aflow.in. Corrections are available for PBE, LDA, SCAN, or PBE+U_ICSD.";
+      message << " Functional cannot be determined from aflow.in. Corrections are available for PBE, LDA, SCAN, or PBE+U:ICSD.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
     }
     // Bader implementation works currently only with Bader file and aflow.in in directory where AFLOW is run
@@ -2374,7 +2374,7 @@ namespace cce {
       cerr << soliloquy << "PBE: " << aurostd::WithinList(cce_vars.vfunctionals, "PBE") << endl;
       cerr << soliloquy << "LDA: " << aurostd::WithinList(cce_vars.vfunctionals, "LDA") << endl;
       cerr << soliloquy << "SCAN: " << aurostd::WithinList(cce_vars.vfunctionals, "SCAN") << endl;
-      cerr << soliloquy << "PBE+U_ICSD: " << aurostd::WithinList(cce_vars.vfunctionals, "PBE+U_ICSD") << endl;
+      cerr << soliloquy << "PBE+U:ICSD: " << aurostd::WithinList(cce_vars.vfunctionals, "PBE+U:ICSD") << endl;
       cerr << soliloquy << "exp: " << aurostd::WithinList(cce_vars.vfunctionals, "exp") << endl;
     }
     // if functional determined from aflow.in is different from the ones given by the input options, 
@@ -2477,7 +2477,7 @@ namespace cce {
               if(LDEBUG){
                 cerr << soliloquy << "Bader_deviation: " << Bader_deviation << endl;
               }
-              cce_vars.oxidation_states[i]= aurostd::string2utype<double>(Bader_tokens[1+(CCE_num_functionals_Bader+1)*n]); // (CCE_num_functionals_Bader+1)*n because oxidation numbers in Bader_templ_line are separated by corrections for four different functionals (PBE, LDA, SCAN, and PBE+U_ICSD) and there is 1 formal oxidation number in front of the Bader charges
+              cce_vars.oxidation_states[i]= aurostd::string2utype<double>(Bader_tokens[1+(CCE_num_functionals_Bader+1)*n]); // (CCE_num_functionals_Bader+1)*n because oxidation numbers in Bader_templ_line are separated by corrections for four different functionals (PBE, LDA, SCAN, and PBE+U:ICSD) and there is 1 formal oxidation number in front of the Bader charges
             } else { // only if element is found but no corrections can be assigned because above conditions are not met, update Bader_deviation_min
               if ( std::abs(Bader_template-cce_vars.Bader_charges[i]) < Bader_deviation_min ) {
                 Bader_deviation_min= std::abs(Bader_template-cce_vars.Bader_charges[i]);
@@ -2511,9 +2511,14 @@ namespace cce {
               // list all oxidation states of the element for which corrections are available
               string ox_nums_avail="";
               string separator=", ";
-              vector<string> ox_nums_avail_vec;
+              vector<string> ox_nums_avail_vec; //RF20200826
               for(uint n=0;n<num_ox_states;n++){ 
-                ox_nums_avail_vec.push_back(Bader_tokens[1+(CCE_num_functionals_Bader+1)*n]); // (CCE_num_functionals_Bader+1)*n because oxidation numbers in Bader_templ_line are separated by corrections for four different functionals (PBE, LDA, SCAN, and PBE+U_ICSD) and there is 1 formal oxidation number in front of the Bader charges
+                ox_nums_avail_vec.push_back(Bader_tokens[1+(CCE_num_functionals_Bader+1)*n]); // (CCE_num_functionals_Bader+1)*n because oxidation numbers in Bader_templ_line are separated by corrections for four different functionals (PBE, LDA, SCAN, and PBE+U:ICSD) and there is 1 formal oxidation number in front of the Bader charges  //RF20200826
+                //[RF20200826 - OBSOLETE]if (n<num_ox_states-1){
+                //[RF20200826 - OBSOLETE]  ox_nums_avail+= Bader_tokens[1+(CCE_num_functionals_Bader+1)*n] + separator ; // (CCE_num_functionals_Bader+1)*n because oxidation numbers in Bader_templ_line are separated by corrections for four different functionals (PBE, LDA, SCAN, and PBE+U:ICSD) and there is 1 formal oxidation number in front of the Bader charges
+                //[RF20200826 - OBSOLETE]} else if (n==num_ox_states-1){
+                //[RF20200826 - OBSOLETE]  ox_nums_avail+= Bader_tokens[1+(CCE_num_functionals_Bader+1)*n]; // (CCE_num_functionals_Bader+1)*n because oxidation numbers in Bader_templ_line are separated by corrections for four different functionals (PBE, LDA, SCAN, and PBE+U:ICSD) and there is 1 formal oxidation number in front of the Bader charges
+                //[RF20200826 - OBSOLETE]}
               }
               ox_nums_avail = aurostd::joinWDelimiter(ox_nums_avail_vec, separator);
               oss << "Corrections for " << structure.atoms[i].cleanname << " coordinated by " << cce_vars.anion_species << " are available for oxidation states: " << ox_nums_avail << endl;
@@ -2850,7 +2855,7 @@ namespace cce {
   }
 
   //apply_pbe_u_icsd_shifts////////////////////////////////////////////////////////
-  // apply the shifts for the ref. enthalpies for PBE+U_ICSD if needed
+  // apply the shifts for the ref. enthalpies for PBE+U:ICSD if needed
   void apply_pbe_u_icsd_shifts(const xstructure& structure, CCE_Variables& cce_vars, ostream& oss) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
     string soliloquy=XPID+"cce::apply_pbe_u_icsd_shifts():";
@@ -2858,16 +2863,16 @@ namespace cce {
     uint num_funcs=cce_vars.vfunctionals.size();
     uint num_temps=cce_vars.vtemperatures.size();
     for (uint k = 0; k < num_funcs; k++) {
-      if (cce_vars.vfunctionals[k] == "PBE+U_ICSD") { // for PBE+U_ICSD additional ref. enthalpy shifts must be applied since corrections have been fitted to ref. enthalpies calculated with U but internal AFLOW ref. enthalpies are from plain PBE
+      if (cce_vars.vfunctionals[k] == "PBE+U:ICSD") { // for PBE+U:ICSD additional ref. enthalpy shifts must be applied since corrections have been fitted to ref. enthalpies calculated with U but internal AFLOW ref. enthalpies are from plain PBE
         if(LDEBUG){
-          cerr << soliloquy << cce_vars.vfunctionals[k] << " applying ref. enthalpy shifts for PBE+U_ICSD." << endl;
+          cerr << soliloquy << cce_vars.vfunctionals[k] << " applying ref. enthalpy shifts for PBE+U:ICSD." << endl;
         }
         for(uint i=0,isize=structure.atoms.size();i<isize;i++){
           for (uint l = 0; l < num_temps; l++) {
             double ref_enthalpy_shift=get_ref_enthalpy_shift_pbe_u_icsd(structure.atoms[i].cleanname);
             if (ref_enthalpy_shift == AUROSTD_NAN) { // for some species needing shifts, there is no reference (ground state) energy yet
               oss << print_output_oxidation_numbers(structure, cce_vars);
-              message << " No ref. enthalpy shift for " << structure.atoms[i].cleanname << " for PBE+U_ICSD yet.";
+              message << " No ref. enthalpy shift for " << structure.atoms[i].cleanname << " for PBE+U:ICSD yet.";
               throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
             } else if (ref_enthalpy_shift > 0) { // consider only species that need a ref. enthalpy shift, i.e. for which a U is used
               cce_vars.cce_correction[num_temps*k+l] += ref_enthalpy_shift;
@@ -3291,7 +3296,7 @@ namespace cce {
  
   //get_corrections_line////////////////////////////////////////////////////////
   // function to get corrections
-  //CCE corrections per bond for DFT formation enthalpies for polar materials from binary data using AFLOW (PBE, LDA, SCAN, and PBE+U_ICSD) 
+  //CCE corrections per bond for DFT formation enthalpies for polar materials from binary data using AFLOW (PBE, LDA, SCAN, and PBE+U:ICSD) 
   //with PAW data sets for VASP 5.4.4 and measured experimental values according to the CCE paper 
   //Friedrich et al., Coordination corrected ab initio formation enthalpies, npj Comput. Mater. 5, 59 (2019). 
   //The extensions after the binary formula indicate the source from which the experimental value was taken: 
@@ -3487,10 +3492,10 @@ namespace cce {
   }
 
   //get_ref_enthalpy_shift_pbe_u_icsd////////////////////////////////////////////////////////
-  // Since the corrections for the PBE+U_ICSD calculations in the AFLOW ICSD were fit to ref. enthalpies
+  // Since the corrections for the PBE+U:ICSD calculations in the AFLOW ICSD were fit to ref. enthalpies
   // calculated with the same Us as for the species in the compound, a shift needs to be applied to 
   // the PBE ref. enthalpies that are used for formation enthalpy calculations to bring them to the 
-  // PBE+U_ICSD ref. enthalpy values. These shifts will be summed for all atoms in the structure as 
+  // PBE+U:ICSD ref. enthalpy values. These shifts will be summed for all atoms in the structure as 
   // needed and included in the CCE correction
   double get_ref_enthalpy_shift_pbe_u_icsd(const string& element) {
     if (element=="Sc")          {return 1.1610235;} // AUID="4b48722b5ae8f9e9"

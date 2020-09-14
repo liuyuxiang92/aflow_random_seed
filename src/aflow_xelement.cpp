@@ -150,9 +150,10 @@ void free();                                              // free space
 std::vector<xelement::xelement> velement(NUM_ELEMENTS);        // store starting from ONE
 
 namespace pflow {
-  void XelementPrint(string options,ostream& oss) {
+  void XelementPrint(const string& options,ostream& oss) {
     bool LDEBUG=0;//(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << XPID << "pflow::XelementPrint [BEGIN]" << endl;
+    string soliloquy=XPID+"pflow::XelementPrint():";
+    if(LDEBUG) cerr << soliloquy << " [BEGIN]" << endl;
     if(LDEBUG) cerr << "options=" << options << endl;
     if(LDEBUG) cerr << "velement.size()=" << velement.size() << endl;
 
@@ -160,8 +161,7 @@ namespace pflow {
     aurostd::string2tokens(options,tokens,",");
     if(LDEBUG) cerr << "tokens.size()=" << tokens.size() << endl;
     if(tokens.size()==0) {
-      init::ErrorOption(cout,options,"pflow::XelementPrint","aflow --element=Z|name|symbol[,property[,property]....]");
-      exit(0);
+      init::ErrorOption(options,soliloquy,"aflow --element=Z|name|symbol[,property[,property]....]");
     } 
     // move on
     string species=tokens.at(0);
@@ -169,7 +169,7 @@ namespace pflow {
     // try with number
     if(tokens.size()>=1) if(aurostd::string2utype<uint>(species)>0) Z=aurostd::string2utype<uint>(species);
     if(Z>103) {
-      init::ErrorOption(cout,options,"pflow::XelementPrint",aurostd::liststring2string("aflow --element=Z|name|symbol[,property[,property]....]","Z outside [1,103] or name or symbol unrecognized"));
+      init::ErrorOption(options,soliloquy,aurostd::liststring2string("aflow --element=Z|name|symbol[,property[,property]....]","Z outside [1,103] or name or symbol unrecognized"));
     }
     // try with symbol
     if(Z==0) {
@@ -208,10 +208,12 @@ namespace pflow {
           if(c=="ALL" || c==aurostd::toupper("Group")) vs.push_back(aurostd::PaddedPOST("Group="+aurostd::utype2string(xelement::xelement(Z).Group),len));
           if(c=="ALL" || c==aurostd::toupper("Series")) vs.push_back(aurostd::PaddedPOST("Series="+xelement::xelement(Z).Series,len));
           if(c=="ALL" || c==aurostd::toupper("Block")) vs.push_back(aurostd::PaddedPOST("Block="+xelement::xelement(Z).Block,len));
+          //
           if(c=="ALL" || c==aurostd::toupper("mass")) vs.push_back(aurostd::PaddedPOST("mass="+aurostd::utype2string(xelement::xelement(Z).mass,prec),len)+"// (kg)");
           if(c=="ALL" || c==aurostd::toupper("MolarVolume")) vs.push_back(aurostd::PaddedPOST("MolarVolume="+aurostd::utype2string(xelement::xelement(Z).MolarVolume,prec),len)+"// (m^3/mol)");
           if(c=="ALL" || c==aurostd::toupper("volume")) vs.push_back(aurostd::PaddedPOST("volume="+aurostd::utype2string(xelement::xelement(Z).volume,prec),len)+"// A^3");
           if(c=="ALL" || c==aurostd::toupper("Miedema_Vm")) vs.push_back(aurostd::PaddedPOST("Miedema_Vm="+aurostd::utype2string(xelement::xelement(Z).Miedema_Vm,prec),len)+"// (V_m^{2/3} in (cm^2))");
+          //
           if(c=="ALL" || c==aurostd::toupper("valence_std")) vs.push_back(aurostd::PaddedPOST("valence_std="+aurostd::utype2string(xelement::xelement(Z).valence_std),len));
           if(c=="ALL" || c==aurostd::toupper("valence_iupac")) vs.push_back(aurostd::PaddedPOST("valence_iupac="+aurostd::utype2string(xelement::xelement(Z).valence_iupac),len));
           if(c=="ALL" || c==aurostd::toupper("valence_PT")) vs.push_back(aurostd::PaddedPOST("valence_PT="+aurostd::utype2string(xelement::xelement(Z).valence_PT),len));
@@ -220,7 +222,6 @@ namespace pflow {
           if(c=="ALL" || c==aurostd::toupper("CrystalStr_PT")) vs.push_back(aurostd::PaddedPOST("CrystalStr_PT="+xelement::xelement(Z).CrystalStr_PT,len));
           if(c=="ALL" || c==aurostd::toupper("space_group")) vs.push_back(aurostd::PaddedPOST("space_group="+xelement::xelement(Z).space_group,len));
           if(c=="ALL" || c==aurostd::toupper("space_group_number")) vs.push_back(aurostd::PaddedPOST("space_group_number="+aurostd::utype2string(xelement::xelement(Z).space_group_number),len));
-
           if(c=="ALL" || c==aurostd::toupper("Pearson_coefficient")) vs.push_back(aurostd::PaddedPOST("Pearson_coefficient="+aurostd::utype2string(xelement::xelement(Z).Pearson_coefficient,prec),len));
           if(c=="ALL" || c==aurostd::toupper("lattice_constant")) vs.push_back(aurostd::PaddedPOST("lattice_constant="+aurostd::utype2string(xelement::xelement(Z).lattice_constant[1],prec)+","+aurostd::utype2string(xelement::xelement(Z).lattice_constant[2],prec)+","+aurostd::utype2string(xelement::xelement(Z).lattice_constant[3],prec),len)+"// (pm)");
           if(c=="ALL" || c==aurostd::toupper("lattice_angle")) vs.push_back(aurostd::PaddedPOST("lattice_angle="+aurostd::utype2string(xelement::xelement(Z).lattice_angle[1],prec)+","+aurostd::utype2string(xelement::xelement(Z).lattice_angle[2],prec)+","+aurostd::utype2string(xelement::xelement(Z).lattice_angle[3],prec),len)+"// (rad)");
@@ -233,17 +234,22 @@ namespace pflow {
           if(c=="ALL" || c==aurostd::toupper("radii_Ghosh08")) vs.push_back(aurostd::PaddedPOST("radii_Ghosh08="+aurostd::utype2string(xelement::xelement(Z).radii_Ghosh08,prec),len)+"// (Angstrom)");
           if(c=="ALL" || c==aurostd::toupper("radii_Slatter")) vs.push_back(aurostd::PaddedPOST("radii_Slatter="+aurostd::utype2string(xelement::xelement(Z).radii_Slatter,prec),len)+"// (Angstrom)");
           if(c=="ALL" || c==aurostd::toupper("radii_Pyykko")) vs.push_back(aurostd::PaddedPOST("radii_Pyykko="+aurostd::utype2string(xelement::xelement(Z).radii_Pyykko,prec),len)+"// (pm)");
-
+          //
           if(c=="ALL" || c==aurostd::toupper("electrical_conductivity")) vs.push_back(aurostd::PaddedPOST("electrical_conductivity="+aurostd::utype2string(xelement::xelement(Z).electrical_conductivity,prec),len)+"// (S/m)");
           if(c=="ALL" || c==aurostd::toupper("electronegativity_vec")) vs.push_back(aurostd::PaddedPOST("electronegativity_vec="+aurostd::utype2string(xelement::xelement(Z).electronegativity_vec,prec),len));
           if(c=="ALL" || c==aurostd::toupper("hardness_Ghosh")) vs.push_back(aurostd::PaddedPOST("hardness_Ghosh="+aurostd::utype2string(xelement::xelement(Z).hardness_Ghosh,prec),len)+"// (eV)");
-          if(c=="ALL" || c==aurostd::toupper("electronegativity_Pearson")) vs.push_back(aurostd::PaddedPOST("electronegativity_Pearson="+aurostd::utype2string(xelement::xelement(Z).electronegativity_Pearson,prec),len)+"// (eV)");
-          if(c=="ALL" || c==aurostd::toupper("electronegativity_Ghosh")) vs.push_back(aurostd::PaddedPOST("electronegativity_Ghosh="+aurostd::utype2string(xelement::xelement(Z).electronegativity_Ghosh,prec),len)+"// (eV)");
+          if(c=="ALL" || c==aurostd::toupper("electronegativity_Pearson")) vs.push_back(aurostd::PaddedPOST("electronegativity_Pearson="+aurostd::utype2string(xelement::xelement(Z).electronegativity_Pearson,prec),len)); //+"// (eV)
+          if(c=="ALL" || c==aurostd::toupper("electronegativity_Ghosh")) vs.push_back(aurostd::PaddedPOST("electronegativity_Ghosh="+aurostd::utype2string(xelement::xelement(Z).electronegativity_Ghosh,prec),len)); //+"// (eV)
+          if(c=="ALL" || c==aurostd::toupper("electronegativity_Allen")) vs.push_back(aurostd::PaddedPOST("electronegativity_Allen="+aurostd::utype2string(xelement::xelement(Z).electronegativity_Allen,prec),len)); //CO20200731
+          if(c=="ALL" || c==aurostd::toupper("oxidation_states")) vs.push_back(aurostd::PaddedPOST("oxidation_states="+aurostd::joinWDelimiter(aurostd::vecDouble2vecString(xelement::xelement(Z).oxidation_states,prec),","),len)); //CO20200731
+          if(c=="ALL" || c==aurostd::toupper("oxidation_states_preferred")) vs.push_back(aurostd::PaddedPOST("oxidation_states_preferred="+aurostd::joinWDelimiter(aurostd::vecDouble2vecString(xelement::xelement(Z).oxidation_states_preferred,prec),","),len)); //CO20200731
           if(c=="ALL" || c==aurostd::toupper("electron_affinity_PT")) vs.push_back(aurostd::PaddedPOST("electron_affinity_PT="+aurostd::utype2string(xelement::xelement(Z).electron_affinity_PT,prec),len)+"// (kJ/mol)");
           if(c=="ALL" || c==aurostd::toupper("Miedema_phi_star")) vs.push_back(aurostd::PaddedPOST("Miedema_phi_star="+aurostd::utype2string(xelement::xelement(Z).Miedema_phi_star,prec),len)+"// (V) (phi^star)");
           if(c=="ALL" || c==aurostd::toupper("Miedema_nws")) vs.push_back(aurostd::PaddedPOST("Miedema_nws="+aurostd::utype2string(xelement::xelement(Z).Miedema_nws,prec),len)+"// (d.u.)^1/3 n_{ws}^{1/3}");
           if(c=="ALL" || c==aurostd::toupper("Miedema_gamma_s")) vs.push_back(aurostd::PaddedPOST("Miedema_gamma_s="+aurostd::utype2string(xelement::xelement(Z).Miedema_gamma_s,prec),len)+"// (mJ/m^2)");
+          //
           if(c=="ALL" || c==aurostd::toupper("Pettifor_scale")) vs.push_back(aurostd::PaddedPOST("Pettifor_scale="+aurostd::utype2string(xelement::xelement(Z).Pettifor_scale,prec),len)); 
+          //
           if(c=="ALL" || c==aurostd::toupper("boiling_point")) vs.push_back(aurostd::PaddedPOST("boiling_point="+aurostd::utype2string(xelement::xelement(Z).boiling_point,prec),len)+"// (Celsius)");
           if(c=="ALL" || c==aurostd::toupper("melting_point")) vs.push_back(aurostd::PaddedPOST("melting_point="+aurostd::utype2string(xelement::xelement(Z).melting_point,prec),len)+"// (Celsius)");
           if(c=="ALL" || c==aurostd::toupper("vaporization_heat_PT")) vs.push_back(aurostd::PaddedPOST("vaporization_heat_PT="+aurostd::utype2string(xelement::xelement(Z).vaporization_heat_PT,prec),len)+"// (kJ/mol)");
@@ -252,6 +258,7 @@ namespace pflow {
           if(c=="ALL" || c==aurostd::toupper("critical_Temperature_PT")) vs.push_back(aurostd::PaddedPOST("critical_Temperature_PT="+aurostd::utype2string(xelement::xelement(Z).critical_Temperature_PT,prec),len)+"// (K)"); 
           if(c=="ALL" || c==aurostd::toupper("thermal_expansion")) vs.push_back(aurostd::PaddedPOST("thermal_expansion="+aurostd::utype2string(xelement::xelement(Z).thermal_expansion,prec),len)+"// (K^{-1})");
           if(c=="ALL" || c==aurostd::toupper("thermal_conductivity")) vs.push_back(aurostd::PaddedPOST("thermal_conductivity="+aurostd::utype2string(xelement::xelement(Z).thermal_conductivity,prec),len)+"// (W/(mK))");
+          //
           if(c=="ALL" || c==aurostd::toupper("Brinelll_hardness")) vs.push_back(aurostd::PaddedPOST("Brinelll_hardness="+aurostd::utype2string(xelement::xelement(Z).Brinelll_hardness,prec),len)+"// (MPa)");
           if(c=="ALL" || c==aurostd::toupper("Mohs_hardness")) vs.push_back(aurostd::PaddedPOST("Mohs_hardness="+aurostd::utype2string(xelement::xelement(Z).Mohs_hardness,prec),len));
           if(c=="ALL" || c==aurostd::toupper("Vickers_hardness")) vs.push_back(aurostd::PaddedPOST("Vickers_hardness="+aurostd::utype2string(xelement::xelement(Z).Vickers_hardness,prec),len)+"// (MPa)");
@@ -263,15 +270,16 @@ namespace pflow {
           if(c=="ALL" || c==aurostd::toupper("bulk_modulus")) vs.push_back(aurostd::PaddedPOST("bulk_modulus="+aurostd::utype2string(xelement::xelement(Z).bulk_modulus,prec),len)+"// (GPa)");
           if(c=="ALL" || c==aurostd::toupper("Poisson_ratio_PT")) vs.push_back(aurostd::PaddedPOST("Poisson_ratio_PT="+aurostd::utype2string(xelement::xelement(Z).Poisson_ratio_PT,prec),len));
           if(c=="ALL" || c==aurostd::toupper("Miedema_BVm")) vs.push_back(aurostd::PaddedPOST("Miedema_BVm="+aurostd::utype2string(xelement::xelement(Z).Miedema_BVm,prec),len)+"// (kJ/mole)");
-
+          //
           if(c=="ALL" || c==aurostd::toupper("Magnetic_Type_PT")) vs.push_back(aurostd::PaddedPOST("Magnetic_Type_PT="+xelement::xelement(Z).Magnetic_Type_PT,len));
           if(c=="ALL" || c==aurostd::toupper("Mass_Magnetic_Susceptibility")) vs.push_back(aurostd::PaddedPOST("Mass_Magnetic_Susceptibility="+aurostd::utype2string(xelement::xelement(Z).Mass_Magnetic_Susceptibility,prec),len)+"// (m^3/K)");
           if(c=="ALL" || c==aurostd::toupper("Volume_Magnetic_Susceptibility")) vs.push_back(aurostd::PaddedPOST("Volume_Magnetic_Susceptibility="+aurostd::utype2string(xelement::xelement(Z).Volume_Magnetic_Susceptibility,prec),len));
           if(c=="ALL" || c==aurostd::toupper("Molar_Magnetic_Susceptibility")) vs.push_back(aurostd::PaddedPOST("Molar_Magnetic_Susceptibility="+aurostd::utype2string(xelement::xelement(Z).Molar_Magnetic_Susceptibility,prec),len)+"// (m^3/mol)");
           if(c=="ALL" || c==aurostd::toupper("Curie_point")) vs.push_back(aurostd::PaddedPOST("Curie_point="+aurostd::utype2string(xelement::xelement(Z).Curie_point,prec),len)+"// (K)");
-
+          //
           if(c=="ALL" || c==aurostd::toupper("refractive_index")) vs.push_back(aurostd::PaddedPOST("refractive_index="+aurostd::utype2string(xelement::xelement(Z).refractive_index,prec),len));
           if(c=="ALL" || c==aurostd::toupper("color_PT")) vs.push_back(aurostd::PaddedPOST("color_PT="+xelement::xelement(Z).color_PT,len));
+          //
           if(c=="ALL" || c==aurostd::toupper("HHIP")) vs.push_back(aurostd::PaddedPOST("HHIP="+aurostd::utype2string(xelement::xelement(Z).HHIP,prec),len));
           if(c=="ALL" || c==aurostd::toupper("HHIR")) vs.push_back(aurostd::PaddedPOST("HHIR="+aurostd::utype2string(xelement::xelement(Z).HHIR,prec),len));
           if(c=="ALL" || c==aurostd::toupper("xray_scatt")) vs.push_back(aurostd::PaddedPOST("xray_scatt="+aurostd::utype2string(xelement::xelement(Z).xray_scatt,prec),len)+"// shift+1");
@@ -283,7 +291,7 @@ namespace pflow {
       }
     }
 
-    if(LDEBUG) cerr << XPID << "pflow::XelementPrint [END]" << endl;
+    if(LDEBUG) cerr << soliloquy << " [END]" << endl;
   }
 }
 
@@ -464,11 +472,9 @@ namespace xelement {
     hardness_Ghosh=b.hardness_Ghosh;            
     electronegativity_Pearson=b.electronegativity_Pearson;           
     electronegativity_Ghosh=b.electronegativity_Ghosh;             
-
     electronegativity_Allen=b.electronegativity_Allen;  //RF+SK20200410
     oxidation_states=b.oxidation_states;  //RF+SK20200410
     oxidation_states_preferred=b.oxidation_states_preferred;  //RF+SK20200410
-
     electron_affinity_PT=b.electron_affinity_PT;      
     Miedema_phi_star=b.Miedema_phi_star;         
     Miedema_nws=b.Miedema_nws;              

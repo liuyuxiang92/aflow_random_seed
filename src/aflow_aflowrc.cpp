@@ -310,6 +310,8 @@
 #define         DEFAULT_AFLOW_LIBRARY_DIRECTORIES             XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_LIBRARY_DIRECTORIES")
 #define AFLOWRC_DEFAULT_AFLOW_PROJECTS_DIRECTORIES            string("/common/AUID,/common/ICSD,/common/LIB0,/common/LIB1,/common/LIB2,/common/LIB3,/common/LIB4,/common/LIB5,/common/LIB6,/common/LIB7,/common/LIB8,/common/LIB9")  // first is default, tokenized with ","
 #define         DEFAULT_AFLOW_PROJECTS_DIRECTORIES            XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_PROJECTS_DIRECTORIES")
+#define AFLOWRC_DEFAULT_AFLOWDATA_WEB_DIRECTORY               string("/www/AFLOWDATA")  //CO+ME20200731
+#define         DEFAULT_AFLOWDATA_WEB_DIRECTORY               XHOST.adefault.getattachedscheme("DEFAULT_AFLOWDATA_WEB_DIRECTORY") //CO+ME20200731
 
 // PLATON/FINDSYM // DONE
 #define AFLOWRC_DEFAULT_PLATON_P_EQUAL                        FALSE
@@ -578,6 +580,10 @@
 #define         DEFAULT_QHA_EOS                               XHOST.adefault.getattachedutype<bool>("DEFAULT_QHA_EOS")
 #define AFLOWRC_DEFAULT_QHA_EOS_DISTORTION_RANGE              string("-12:16:3")
 #define         DEFAULT_QHA_EOS_DISTORTION_RANGE              XHOST.adefault.getattachedscheme("DEFAULT_QHA_EOS_DISTORTION_RANGE")
+//AS20200818 BEGIN
+#define AFLOWRC_DEFAULT_QHA_EOS_MODEL                         string("SJ,BM4")
+#define         DEFAULT_QHA_EOS_MODEL                         XHOST.adefault.getattachedscheme("DEFAULT_QHA_EOS_MODEL")
+//AS20200818 END
 #define AFLOWRC_DEFAULT_QHA_GP_DISTORTION                     1.0
 #define         DEFAULT_QHA_GP_DISTORTION                     XHOST.adefault.getattachedutype<double>("DEFAULT_QHA_GP_DISTORTION")
 //AS20200602 BEGIN
@@ -802,6 +808,12 @@
 #define AFLOWRC_DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING    4.0 // factor that divides minimum interatomic distance
 #define         DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING    XHOST.adefault.getattachedutype<double>("DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING")
 //DX20200709 - END
+
+//DX20200720 - START
+// DEFAULT ANRL
+#define AFLOWRC_DEFAULT_ANRL_WYCKOFF_FRACTIONAL_TOL           1e-6 // tolerance for equivalent Wyckoff coordinates
+#define         DEFAULT_ANRL_WYCKOFF_FRACTIONAL_TOL           XHOST.adefault.getattachedutype<double>("DEFAULT_ANRL_WYCKOFF_FRACTIONAL_TOL")
+//DX20200720 - END
 
 // CORES // DONE
 #define AFLOWRC_AFLOW_CORE_TEMPERATURE_BEEP                   56.0    // Celsius
@@ -1248,6 +1260,7 @@ namespace aflowrc {
     // AFLOW_LIBRARY AFLOW_PROJECT
     aflowrc::load_default("DEFAULT_AFLOW_LIBRARY_DIRECTORIES",AFLOWRC_DEFAULT_AFLOW_LIBRARY_DIRECTORIES);
     aflowrc::load_default("DEFAULT_AFLOW_PROJECTS_DIRECTORIES",AFLOWRC_DEFAULT_AFLOW_PROJECTS_DIRECTORIES);
+    aflowrc::load_default("DEFAULT_AFLOWDATA_WEB_DIRECTORY",AFLOWRC_DEFAULT_AFLOWDATA_WEB_DIRECTORY); //CO+ME20200731
 
     // DEFAULT PLATON/FINDSYM
     aflowrc::load_default("DEFAULT_PLATON_P_EQUAL",AFLOWRC_DEFAULT_PLATON_P_EQUAL);
@@ -1394,6 +1407,7 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_QHA_MODE", AFLOWRC_DEFAULT_QHA_MODE);
     aflowrc::load_default("DEFAULT_QHA_EOS", AFLOWRC_DEFAULT_QHA_EOS);
     aflowrc::load_default("DEFAULT_QHA_EOS_DISTORTION_RANGE", AFLOWRC_DEFAULT_QHA_EOS_DISTORTION_RANGE);
+    aflowrc::load_default("DEFAULT_QHA_EOS_MODEL", AFLOWRC_DEFAULT_QHA_EOS_MODEL);//AS20200818
     aflowrc::load_default("DEFAULT_QHA_GP_DISTORTION", AFLOWRC_DEFAULT_QHA_GP_DISTORTION);
     aflowrc::load_default("DEFAULT_QHA_TAYLOR_EXPANSION_ORDER", AFLOWRC_DEFAULT_QHA_TAYLOR_EXPANSION_ORDER);//AS20200602
     aflowrc::load_default("DEFAULT_QHA_INCLUDE_ELEC_CONTRIB", AFLOWRC_DEFAULT_QHA_INCLUDE_ELEC_CONTRIB);
@@ -1520,6 +1534,11 @@ namespace aflowrc {
     // DEFAULT XTALFINDER
     aflowrc::load_default("DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING",AFLOWRC_DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING);
     //DX20200709 - END
+
+    //DX20200720 - START
+    // DEFAULT ANRL
+    aflowrc::load_default("DEFAULT_ANRL_WYCKOFF_FRACTIONAL_TOL",AFLOWRC_DEFAULT_ANRL_WYCKOFF_FRACTIONAL_TOL);
+    //DX20200720 - END
 
     // DEFAULT CORE
     aflowrc::load_default("AFLOW_CORE_TEMPERATURE_BEEP",AFLOWRC_AFLOW_CORE_TEMPERATURE_BEEP);
@@ -1812,6 +1831,7 @@ namespace aflowrc {
     aflowrc << "// AFLOW_LIBRARY AFLOW_PROJECT" << endl;
     aflowrc << "DEFAULT_AFLOW_LIBRARY_DIRECTORIES=\"" << AFLOWRC_DEFAULT_AFLOW_LIBRARY_DIRECTORIES << "\"" << endl;
     aflowrc << "DEFAULT_AFLOW_PROJECTS_DIRECTORIES=\"" << AFLOWRC_DEFAULT_AFLOW_PROJECTS_DIRECTORIES << "\"" << endl;
+    aflowrc << "DEFAULT_AFLOWDATA_WEB_DIRECTORY=\"" << AFLOWRC_DEFAULT_AFLOWDATA_WEB_DIRECTORY << "\"" << endl; //CO+ME20200731
 
     aflowrc << " " << endl;
     aflowrc << "// DEFAULT PLATON/FINDSYM" << endl;
@@ -1960,6 +1980,7 @@ namespace aflowrc {
     aflowrc << "DEFAULT_QHA_MODE=\"" << AFLOWRC_DEFAULT_QHA_MODE << "\"" << endl;
     aflowrc << "DEFAULT_QHA_EOS=" << AFLOWRC_DEFAULT_QHA_EOS  << endl;
     aflowrc << "DEFAULT_QHA_EOS_DISTORTION_RANGE=\"" << AFLOWRC_DEFAULT_QHA_EOS_DISTORTION_RANGE << "\"" << endl;
+    aflowrc << "DEFAULT_QHA_EOS_MODEL=\"" << AFLOWRC_DEFAULT_QHA_EOS_MODEL << "\"" << endl;//AS20200818
     aflowrc << "DEFAULT_QHA_GP_DISTORTION=" << AFLOWRC_DEFAULT_QHA_GP_DISTORTION  << endl;
     aflowrc << "DEFAULT_QHA_TAYLOR_EXPANSION_ORDER=" << AFLOWRC_DEFAULT_QHA_TAYLOR_EXPANSION_ORDER  << endl;//AS20200602
     aflowrc << "DEFAULT_QHA_INCLUDE_ELEC_CONTRIB=" << AFLOWRC_DEFAULT_QHA_INCLUDE_ELEC_CONTRIB  << endl;
@@ -2079,6 +2100,12 @@ namespace aflowrc {
     aflowrc << "DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING=" << AFLOWRC_DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING << " // factor that divides minimum interatomic distance" << endl;
     //DX20200708 - END
 
+    //DX20200720 - START
+    aflowrc << " " << endl;
+    aflowrc << "// DEFAULTS ANRL" << endl;
+    aflowrc << "DEFAULT_ANRL_WYCKOFF_FRACTIONAL_TOL=" << AFLOWRC_DEFAULT_ANRL_WYCKOFF_FRACTIONAL_TOL << " // tolerance for equivalent Wyckoff coordinates" << endl;
+    //DX20200720 - END
+
     aflowrc << " " << endl;
     aflowrc << "// DEFAULTS CORE" << endl;
     aflowrc << "AFLOW_CORE_TEMPERATURE_BEEP=" << AFLOWRC_AFLOW_CORE_TEMPERATURE_BEEP << " // Celsius" << endl;
@@ -2181,7 +2208,6 @@ namespace aflowrc {
       }
     }
     if(LDEBUG) oss << soliloquy << " END" << endl;
-    //    exit(0);
     return TRUE;
   }
 } // namespace aflowrc
@@ -2353,6 +2379,7 @@ namespace aflowrc {
     if(LDEBUG) oss << "// AFLOW_LIBRARY AFLOW_PROJECT" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AFLOW_LIBRARY_DIRECTORIES\")=\"" << DEFAULT_AFLOW_LIBRARY_DIRECTORIES << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AFLOW_PROJECTS_DIRECTORIES\")=\"" << DEFAULT_AFLOW_PROJECTS_DIRECTORIES << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AFLOWDATA_WEB_DIRECTORY\")=\"" << DEFAULT_AFLOWDATA_WEB_DIRECTORY << "\"" << endl;  //CO+ME20200731
 
     if(LDEBUG) oss << "// DEFAULT PLATON/FINDSYM" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<bool>(\"DEFAULT_PLATON_P_EQUAL\")=" << DEFAULT_PLATON_P_EQUAL << endl;
@@ -2493,6 +2520,7 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_MODE\")=\"" << DEFAULT_QHA_MODE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_EOS\")=" << DEFAULT_QHA_EOS << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_EOS_DISTORTION_RANGE\")=\"" << DEFAULT_QHA_EOS_DISTORTION_RANGE << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_EOS_MODEL\")=\"" << DEFAULT_QHA_EOS_MODEL << "\"" << endl;//AS20200818
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_GP_DISTORTION\")=" << DEFAULT_QHA_GP_DISTORTION << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_TAYLOR_EXPANSION_ORDER\")=" << DEFAULT_QHA_TAYLOR_EXPANSION_ORDER << endl;//AS20200602
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_INCLUDE_ELEC_CONTRIB\")=" << DEFAULT_QHA_INCLUDE_ELEC_CONTRIB << endl;
@@ -2603,7 +2631,12 @@ namespace aflowrc {
 
     //DX20200708 - START
     if(LDEBUG) oss << "// DEFAULTS XTALFINDER" << endl;
-    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING\")=\"" << DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING\")=" << DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING << endl;
+    //DX20200708 - END
+
+    //DX20200720 - START
+    if(LDEBUG) oss << "// DEFAULTS ANRL" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_ANRL_WYCKOFF_FRACTIONAL_TOL\")=" << DEFAULT_ANRL_WYCKOFF_FRACTIONAL_TOL << endl;
     //DX20200708 - END
 
     if(LDEBUG) oss << "// DEFAULT CORE" << endl;
@@ -2699,7 +2732,6 @@ namespace aflowrc {
     if(LDEBUG) oss << "aflowrc::print_aflowrc: END" << endl;
 
     oss.flush();
-    //    exit(0);
     return FALSE;
   }
 } // namespace aflowrc

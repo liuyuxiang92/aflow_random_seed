@@ -112,6 +112,8 @@ namespace apennsy_std {
       const char* _superlatt,
       const char* _proto,
       bool VERB) {
+    string soliloquy=XPID+"apennsy_std::read_VASPIN():";
+    stringstream message;
     ifstream File,FileResult;
     ofstream FileOut;
     ostringstream aus0,aus1;
@@ -137,8 +139,7 @@ namespace apennsy_std {
       if(VERB) cerr << "FILE=[" << FileName << "]" << "  ";
       File.open(FileName.c_str(),std::ios::in);
       if(!File.good()) {
-        cerr << "File not found" << FileName << endl;
-        exit(0);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"file not found: "+FileName,_FILE_CORRUPT_); //CO20200624
       }
     }
     { // GET AA and BB NUMBERS
@@ -163,16 +164,16 @@ namespace apennsy_std {
       if(VERB) cerr << "volume=" << volume << "\t";
     }
     if(AA>APENNSY_AAmax) {
-      cerr << "apennsy_std:: read_VASPIN Error: AA>Amax: " << AA << ">" << APENNSY_AAmax << endl;
-      exit(0);
+      message << "AA>Amax: " << AA << ">" << APENNSY_AAmax;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_); //CO20200624
     }
     if(BB>APENNSY_BBmax) {
-      cerr << "apennsy_std:: read_VASPIN Error: BB>Bmax: " << BB << ">" << APENNSY_BBmax << endl;
-      exit(0);
+      message << "BB>Bmax: " << BB << ">" << APENNSY_BBmax;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_); //CO20200624
     }
     if(BB>0 && BB<AA) {
-      cerr << "apennsy_std:: read_VASPIN Error: BB<AA" << endl;
-      exit(0);
+      message << "BB<AA";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_); //CO20200624
     }
     Cb=(double) BB/(AA+BB);
     { // FORMULA
@@ -1324,7 +1325,6 @@ namespace apennsy_std {
     cerr << " *********************************************************************** END " << endl;
     LatexSideMarginThesisOFF();
     //cout << "\\end{document}" << endl;  
-    exit(0);
   }
 }
 

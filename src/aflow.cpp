@@ -26,6 +26,7 @@
 
 #include "aflow.h"
 #include "aflow_pflow.h"
+#include "aflow_pocc.h"  //CO20200624
 
 //#define  __XOPTIMIZE
 //#include "aflow_array.h"
@@ -55,6 +56,59 @@
 //[OBSOLETE]//CO20180419 - global exception handling - STOP
 
 
+bool CeramGenTest(ostream& oss){ofstream FileMESSAGE;return CeramGenTest(FileMESSAGE,oss);}  //CO20190520
+bool CeramGenTest(ofstream& FileMESSAGE,ostream& oss){  //CO20190520
+  string soliloquy="CeramGenTest():";
+  //bool LDEBUG=TRUE; // TRUE;
+  stringstream message;
+  _aflags aflags;aflags.Directory=".";
+
+  message << "Performing ceramics generation test";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+
+  //./aflow --generate_ceramics --nm=N,C --m=Co,Mo,Fe,Ru,Ni,Rh,Pt,Cu,Cr,V --N=5
+  vector<string> vnonmetals,vmetals;
+  aurostd::string2tokens("N,C",vnonmetals,",");aurostd::string2tokens("Co,Mo,Fe,Ru,Ni,Rh,Pt,Cu,Cr,V",vmetals,",");
+
+  vector<string> commands=pflow::GENERATE_CERAMICS(vnonmetals,vmetals,5);
+  if(commands.size()!=6){
+    message << "commands.size()!=6";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
+    return false;
+  }
+  //C:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:N
+  //C:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:N:Ni,Pt,Rh,Ru,V
+  //C:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:N:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V
+  //C:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:N:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V
+  //C:Co,Cr,Cu,Fe,Mo:N:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V
+  //C:N:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V
+  
+  if(!aurostd::WithinList(commands,"C:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:N")){
+    message << "C:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:N not found";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
+    return false;
+  }
+  if(!aurostd::WithinList(commands,"C:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:N:Ni,Pt,Rh,Ru,V")){
+    message << "C:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:N:Ni,Pt,Rh,Ru,V not found";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
+    return false;
+  }
+  if(!aurostd::WithinList(commands,"C:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:N:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V")){
+    message << "C:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:N:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V not found";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
+    return false;
+  }
+  if(!aurostd::WithinList(commands,"C:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:N:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V")){
+    message << "C:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:N:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V not found";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
+    return false;
+  }
+  if(!aurostd::WithinList(commands,"C:Co,Cr,Cu,Fe,Mo:N:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V")){
+    message << "C:Co,Cr,Cu,Fe,Mo:N:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V not found";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
+    return false;
+  }
+  if(!aurostd::WithinList(commands,"C:N:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V")){
+    message << "C:N:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V not found";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
+    return false;
+  }
+  
+  message << "Ceramics generation test successful";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_COMPLETE_);
+  return true;
+}
 bool EgapTest(ostream& oss){ofstream FileMESSAGE;return EgapTest(FileMESSAGE,oss);}  //CO20190520
 bool EgapTest(ofstream& FileMESSAGE,ostream& oss){  //CO20190520
   string soliloquy="EgapTest():";
@@ -299,22 +353,74 @@ bool smithTest(ofstream& FileMESSAGE,ostream& oss){  //CO20190520
   return TRUE; //CO20180419
 }
 
+bool coordinationTest(ostream& oss){ofstream FileMESSAGE;return coordinationTest(FileMESSAGE,oss);}  //CO20190520
+bool coordinationTest(ofstream& FileMESSAGE,ostream& oss){  //CO20190520
+  string soliloquy=XPID+"coordinationTest():";
+  bool LDEBUG=TRUE; // TRUE;
+  stringstream message;
+  _aflags aflags;aflags.Directory=".";
+
+  xstructure str("aflowlib.duke.edu:AFLOWDATA/ICSD_WEB/FCC/Cl1Na1_ICSD_240599","CONTCAR.relax.vasp",IOAFLOW_AUTO);
+  deque<deque<uint> > coordinations;
+  str.GetCoordinations(coordinations);
+  if(coordinations.size()<2){
+    if(LDEBUG){cerr << soliloquy << " coordinations not found" << endl;}
+    return FALSE;
+  }
+  if(coordinations[0].size()<2){
+    if(LDEBUG){cerr << soliloquy << " coordinations[0] not found" << endl;}
+    return FALSE;
+  }
+  if(coordinations[1].size()<2){
+    if(LDEBUG){cerr << soliloquy << " coordinations[1] not found" << endl;}
+    return FALSE;
+  }
+  //first iatom
+  //first shell
+  if(coordinations[0][0]!=6){
+    if(LDEBUG){cerr << soliloquy << " coordinations[0][0]!=6 (==" << coordinations[0][0] << ")" << endl;}
+    return FALSE;
+  }
+  //second shell
+  if(coordinations[0][1]!=12){
+    if(LDEBUG){cerr << soliloquy << " coordinations[0][1]!=12 (==" << coordinations[0][1] << ")" << endl;}
+    return FALSE;
+  }
+  //second iatom
+  //first shell
+  if(coordinations[1][0]!=6){
+    if(LDEBUG){cerr << soliloquy << " coordinations[1][0]!=6 (==" << coordinations[1][0] << ")" << endl;}
+    return FALSE;
+  }
+  //second shell
+  if(coordinations[1][1]!=12){
+    if(LDEBUG){cerr << soliloquy << " coordinations[1][1]!=12 (==" << coordinations[1][1] << ")" << endl;}
+    return FALSE;
+  }
+
+  message << "coordination test successful";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_COMPLETE_);
+  return TRUE; //CO20180419
+}
+
 int main(int _argc,char **_argv) {
   string soliloquy = XPID + "main():"; //CO20180419
   ostream& oss=cout;  //CO20180419
   try{
     bool LDEBUG=FALSE; // TRUE;
+    int return_code = 0;  //ME20200901
     if(LDEBUG) cerr << "AFLOW-MAIN [1]" << endl;
     std::vector<string> argv(aurostd::get_arguments_from_input(_argc,_argv));
     if(LDEBUG) cerr << "AFLOW-MAIN [2]" << endl;
     std::vector<string> cmds;
 
     // MACHINE
-    init::InitMachine(FALSE,argv,cmds,cerr);    
+    //ME20200724
+    int code = init::InitMachine(FALSE,argv,cmds,cerr);
+    if (code >= 0) return code;
     if(LDEBUG || XHOST.DEBUG) cerr << "AFLOW-MAIN [3]" << endl;
 
     // aurostd::TmpDirectoryCreate("test");
-    // cerr << args2flag(argv,"--aaa|--bbb |--ccc") << endl; exit(0);
+    // cerr << args2flag(argv,"--aaa|--bbb |--ccc") << endl;
     // CHECK USERS MACHINES - DEBUG
 
     // initialize_templates_never_call_this_procedure(1);
@@ -329,6 +435,7 @@ int main(int _argc,char **_argv) {
     AFLOW_PTHREADS::FLAG=AFLOW_PTHREADS::Check_Threads(argv,!XHOST.QUIET);
 
     bool Arun=FALSE;
+    if(!Arun && aurostd::args2flag(argv,cmds,"--pocc_old2new|--pocc_o2n"))  {Arun=TRUE;pocc::poccOld2New();} //CO20200624
     if(!Arun && aurostd::args2flag(argv,cmds,"--prx|--prx="))  {Arun=TRUE;PERFORM_PRX(cout);}
     if(!Arun && aurostd::args2flag(argv,cmds,"--generate_makefile|--makefile"))  {Arun=TRUE;makefile::createMakefileAFLOW(".");}  //CO20200508 - if calling from command-line, you should be sitting inside aflow directory (will write out Makefile.aflow)
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_getpp")) {
@@ -357,7 +464,7 @@ int main(int _argc,char **_argv) {
       oss = &std::cerr;
       _oss << "assigned CERR" << endl;
       _oss.flush();
-      exit(0);
+      return 1; //CO20200624 - debug mode
     }
     if(0) { // https://stdcxx.apache.org/doc/stdlibug/34-2.html
       std::ofstream oss;
@@ -398,7 +505,7 @@ int main(int _argc,char **_argv) {
       }
       oss << "FRISCOSITY_POST" << std::endl;
 
-      exit(0);
+      return 1; //CO20200624 - debug mode
     }
 
 
@@ -463,15 +570,16 @@ int main(int _argc,char **_argv) {
         m--;
         if(m==0) {y--;m+=12;} 
       }
-      //exit(0);
       return 0; //CO20180419
     }
+    if(!Arun && aurostd::args2flag(argv,cmds,"--test_CeramGen|--CeramGen_test")) {return (CeramGenTest()?0:1);}  //CO20190601
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_Egap|--Egap_test")) {return (EgapTest()?0:1);}  //CO20190601
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_gcd|--gcd_test")) {return (gcdTest()?0:1);}  //CO20190601
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_smith|--smith_test")) {return (smithTest()?0:1);}  //CO20190601
+    if(!Arun && aurostd::args2flag(argv,cmds,"--test_coordination|--coordination_test")) {return (coordinationTest()?0:1);}  //CO20190601
     if(!Arun && aurostd::args2flag(argv,cmds,"--test")) {
 
-      if(XHOST.vext.size()!=XHOST.vcat.size()) { cerr << "ERROR - aflow.cpp:main: XHOST.vext.size()!=XHOST.vcat.size(), aborting." << endl;exit(0);}
+      if(XHOST.vext.size()!=XHOST.vcat.size()) {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"XHOST.vext.size()!=XHOST.vcat.size(), aborting.",_RUNTIME_ERROR_);}
 
       for(uint iext=0;iext<XHOST.vext.size();iext++) { 
         cout << "\"" << XHOST.vext.at(iext) << "\"" << " " << "\"" << XHOST.vcat.at(iext) << "\"" << endl;
@@ -500,7 +608,6 @@ int main(int _argc,char **_argv) {
       for(uint i=0;i<_tokens.size();i++){
         cerr << _tokens[i] << endl;
       }
-      //exit(0);
       return 0; //CO20180419
       //CO START 20170614 - some SQLITE tests
       //http://zetcode.com/db/sqlitec/ - more tests here
@@ -572,7 +679,6 @@ int main(int _argc,char **_argv) {
       stringstream aus;
       aus << "************************   00000  MESSAGE KPOINTS KSHIFT=[" << 1 << " " << 2 << " " << 3 << "]" << " ************************ " << endl;
       cout << aus.str() << endl;
-      //exit(0);
       return 0; //CO20180419
     }
 
@@ -580,25 +686,25 @@ int main(int _argc,char **_argv) {
       string b64String;
       aurostd::bin2base64(aurostd::args2attachedstring(argv,"--bin2base64=",""),b64String);
       cout << b64String << endl;
-      exit(0);
+      return 0; //CO20180419
     }
 
     if(!Arun && aurostd::args2flag(argv,cmds,"--test=POTCAR|--test=POTCAR.relax1"+DEFAULT_KZIP_EXT+"|--test=POTCAR.relax2"+DEFAULT_KZIP_EXT+"|--test=POTCAR.static"+DEFAULT_KZIP_EXT+"|--test=POTCAR.bands"+DEFAULT_KZIP_EXT+"")) {
-      XHOST.DEBUG=TRUE;xPOTCAR(aurostd::args2attachedstring(argv,"--test=",""));/*exit(0)*/return 0;} //CO20180419
+      XHOST.DEBUG=TRUE;xPOTCAR(aurostd::args2attachedstring(argv,"--test=",""));return 0;} //CO20180419
     if(!Arun && aurostd::args2flag(argv,cmds,"--test=DOSCAR|--test=DOSCAR.relax1"+DEFAULT_KZIP_EXT+"|--test=DOSCAR.relax2"+DEFAULT_KZIP_EXT+"|--test=DOSCAR.static"+DEFAULT_KZIP_EXT+"|--test=DOSCAR.bands"+DEFAULT_KZIP_EXT+"")) {
-      XHOST.DEBUG=TRUE;xDOSCAR(aurostd::args2attachedstring(argv,"--test=",""));/*exit(0)*/return 0;} //CO20180419
+      XHOST.DEBUG=TRUE;xDOSCAR(aurostd::args2attachedstring(argv,"--test=",""));return 0;} //CO20180419
     if(!Arun && aurostd::args2flag(argv,cmds,"--test=EIGENVAL|--test=EIGENVAL.relax1"+DEFAULT_KZIP_EXT+"|--test=EIGENVAL.relax2"+DEFAULT_KZIP_EXT+"|--test=EIGENVAL.static"+DEFAULT_KZIP_EXT+"|--test=EIGENVAL.bands"+DEFAULT_KZIP_EXT+"")) {
-      XHOST.DEBUG=TRUE;xEIGENVAL(aurostd::args2attachedstring(argv,"--test=",""));/*exit(0)*/return 0;} //CO20180419
+      XHOST.DEBUG=TRUE;xEIGENVAL(aurostd::args2attachedstring(argv,"--test=",""));return 0;} //CO20180419
     if(!Arun && aurostd::args2flag(argv,cmds,"--test=OUTCAR|--test=OUTCAR.relax1"+DEFAULT_KZIP_EXT+"|--test=OUTCAR.relax2"+DEFAULT_KZIP_EXT+"|--test=OUTCAR.static"+DEFAULT_KZIP_EXT+"|--test=OUTCAR.bands"+DEFAULT_KZIP_EXT+"")) {
-      XHOST.DEBUG=TRUE;xOUTCAR(aurostd::args2attachedstring(argv,"--test=",""));/*exit(0)*/return 0;} //CO20180419
+      XHOST.DEBUG=TRUE;xOUTCAR(aurostd::args2attachedstring(argv,"--test=",""));return 0;} //CO20180419
     if(!Arun && aurostd::args2flag(argv,cmds,"--test=KPOINTS|--test=KPOINTS.relax1"+DEFAULT_KZIP_EXT+"|--test=KPOINTS.relax2"+DEFAULT_KZIP_EXT+"|--test=KPOINTS.static"+DEFAULT_KZIP_EXT+"|--test=KPOINTS.bands"+DEFAULT_KZIP_EXT+"")) {
-      XHOST.DEBUG=TRUE;xKPOINTS(aurostd::args2attachedstring(argv,"--test=",""));/*exit(0)*/return 0;}  //CO20180419
+      XHOST.DEBUG=TRUE;xKPOINTS(aurostd::args2attachedstring(argv,"--test=",""));return 0;}  //CO20180419
     if(!Arun && aurostd::args2flag(argv,cmds,"--test=vasprun|--test=vasprun.xml.relax1"+DEFAULT_KZIP_EXT+"|--test=vasprun.xml.relax2"+DEFAULT_KZIP_EXT+"|--test=vasprun.xml.static"+DEFAULT_KZIP_EXT+"|--test=vasprun.xml.bands"+DEFAULT_KZIP_EXT+"")) {
-      XHOST.DEBUG=TRUE;xVASPRUNXML(aurostd::args2attachedstring(argv,"--test=",""));/*exit(0)*/return 0;} //CO20180419
+      XHOST.DEBUG=TRUE;xVASPRUNXML(aurostd::args2attachedstring(argv,"--test=",""));return 0;} //CO20180419
     if(!Arun && aurostd::args2flag(argv,cmds,"--test=IBZKPT|--test=IBZKPT.relax1"+DEFAULT_KZIP_EXT+"|--test=IBZKPT.relax2"+DEFAULT_KZIP_EXT+"|--test=IBZKPT.static"+DEFAULT_KZIP_EXT+"|--test=IBZKPT.bands"+DEFAULT_KZIP_EXT+"")) {
-      XHOST.DEBUG=TRUE;xIBZKPT(aurostd::args2attachedstring(argv,"--test=",""));/*exit(0)*/return 0;} //CO20180419
+      XHOST.DEBUG=TRUE;xIBZKPT(aurostd::args2attachedstring(argv,"--test=",""));return 0;} //CO20180419
     if(!Arun && aurostd::args2flag(argv,cmds,"--test=CHGCAR|--test=CHGCAR.relax1"+DEFAULT_KZIP_EXT+"|--test=CHGCAR.relax2"+DEFAULT_KZIP_EXT+"|--test=CHGCAR.static"+DEFAULT_KZIP_EXT+"|--test=CHGCAR.bands"+DEFAULT_KZIP_EXT+"")) {
-      XHOST.DEBUG=TRUE;xCHGCAR(aurostd::args2attachedstring(argv,"--test=",""));/*exit(0)*/return 0;} //CO20180419
+      XHOST.DEBUG=TRUE;xCHGCAR(aurostd::args2attachedstring(argv,"--test=",""));return 0;} //CO20180419
 
     // SCRUB things
     if(!Arun && aurostd::args2flag(argv,cmds,"--scrub=POTCAR")) { 
@@ -609,7 +715,7 @@ int main(int _argc,char **_argv) {
         cerr << "PROCESSING = " << vfile.at(ifile) << endl;
         xPOTCAR xPOT(vfile.at(ifile));
       }
-      exit(0);
+      return 0; //CO20180419
     }
     if(!Arun && aurostd::args2flag(argv,cmds,"--scrub=OUTCAR")) { 
       XHOST.DEBUG=FALSE;
@@ -620,28 +726,28 @@ int main(int _argc,char **_argv) {
         xOUTCAR xOUT(vfile.at(ifile));
         // cout << xOUT << endl;
       }
-      exit(0);
+      return 0; //CO20180419
     }
 
     if(!Arun && (aurostd::args2flag(argv,cmds,"--scrub") || aurostd::args2attachedflag(argv,"--scrub="))) {
       //  XHOST.DEBUG=TRUE;
       aflowlib::LIB2SCRUB(aurostd::args2attachedstring(argv,"--scrub=","ALL"),TRUE);
-      exit(0);
+      return 0; //CO20180419
     }
     if(!Arun && (aurostd::args2attachedflag(argv,"--lib2auid="))) {
       //  XHOST.DEBUG=TRUE;
       aflowlib::LIB2AUID(aurostd::args2attachedstring(argv,"--lib2auid=","ALL"),FALSE,TRUE); // no test, act
-      exit(0);
+      return 0; //CO20180419
     }
     if(!Arun && (aurostd::args2flag(argv,cmds,"--mosfet") || aurostd::args2attachedflag(argv,"--mosfet="))) {
       //  XHOST.DEBUG=TRUE;
       aflowlib::MOSFET(aurostd::args2attachedutype<int>(argv,"--mosfet=",0),TRUE);
-      exit(0);
+      return 0; //CO20180419
     }
     if(!Arun && (aurostd::args2flag(argv,cmds,"--mail2scan") || aurostd::args2attachedflag(argv,"--mail2scan="))) {
       //  XHOST.DEBUG=TRUE;
       aflowlib::MAIL2SCAN(aurostd::args2attachedstring(argv,"--mail2scan=","/var/mail/auro"),TRUE);
-      exit(0);
+      return 0; //CO20180419
     }
 
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_proto1")) {
@@ -677,7 +783,6 @@ int main(int _argc,char **_argv) {
           }
         }
       }
-      //exit(0);
       return 0; //CO20180419
     }
 
@@ -685,7 +790,11 @@ int main(int _argc,char **_argv) {
     // [OBSOLETE] if(!Arun && aurostd::args2flag(argv,cmds,"--test1")) {Arun=TRUE;PERFORM_TEST1(cout);}
     if(!Arun && aurostd::args2flag(argv,cmds,"--test3")) {Arun=TRUE;PERFORM_TEST3(cout);}
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_slab|--slab_test")) {return (slab::slabTest()?0:1);}  //CO20190601  //CO20190629 if TRUE(==1), return 0 (normal)
-    if(!Arun && XHOST.vflag_control.flag("MACHINE"))  {Arun=TRUE;init::InitMachine(TRUE,argv,cmds,cout);}
+    if(!Arun && XHOST.vflag_control.flag("MACHINE")) {
+      //ME20200724
+      int code = init::InitMachine(FALSE,argv,cmds,cerr);
+      if (code >= 0) return code;
+    }
 
     // **************************************************************
     // INTERCEPT AFLOW
@@ -713,24 +822,24 @@ int main(int _argc,char **_argv) {
 
     // **************************************************************
     // intercept commands
-    if(!Arun && XHOST.vflag_control.flag("MULTI=SH")) {Arun=TRUE;AFLOW_PTHREADS::MULTI_sh(argv);/*exit(0)*/return 0;}  //CO20180419
-    if(!Arun && XHOST.vflag_control.flag("MULTI=BZIP2")) {Arun=TRUE;AFLOW_PTHREADS::MULTI_compress("bzip2",argv);/*exit(0)*/return 0;}  //CO20180419
-    if(!Arun && XHOST.vflag_control.flag("MULTI=BUNZIP2")) {Arun=TRUE;AFLOW_PTHREADS::MULTI_compress("bunzip2",argv);/*exit(0)*/return 0;}  //CO20180419
-    if(!Arun && XHOST.vflag_control.flag("MULTI=GZIP")) {Arun=TRUE;AFLOW_PTHREADS::MULTI_compress("gzip",argv);/*exit(0)*/return 0;}  //CO20180419
-    if(!Arun && XHOST.vflag_control.flag("MULTI=GUNZIP")) {Arun=TRUE;AFLOW_PTHREADS::MULTI_compress("gunzip",argv);/*exit(0)*/return 0;}  //CO20180419
-    if(!Arun && XHOST.vflag_control.flag("MULTI=XZIP")) {Arun=TRUE;AFLOW_PTHREADS::MULTI_compress("xz",argv);/*exit(0)*/return 0;}  //CO20180419
-    if(!Arun && XHOST.vflag_control.flag("MULTI=XUNZIP")) {Arun=TRUE;AFLOW_PTHREADS::MULTI_compress("xunzip",argv);/*exit(0)*/return 0;}  //CO20180419
-    if(!Arun && XHOST.vflag_control.flag("MULTI=BZ2XZ")) {Arun=TRUE;AFLOW_PTHREADS::MULTI_bz2xz(argv);/*exit(0)*/return 0;}  //CO20180419
-    if(!Arun && XHOST.vflag_control.flag("MULTI=GZ2XZ")) {Arun=TRUE;AFLOW_PTHREADS::MULTI_gz2xz(argv);/*exit(0)*/return 0;}  //CO20180419
-    if(!Arun && XHOST.vflag_control.flag("MULTI=ZIP")) {Arun=TRUE;AFLOW_PTHREADS::MULTI_zip(argv);/*exit(0)*/return 0;}  //CO20180419
-    if(!Arun && XHOST.vflag_control.flag("MONITOR")) {Arun=TRUE;AFLOW_monitor(argv);/*exit(0)*/return 0;} //CO20180419
-    if(!Arun && XHOST.vflag_control.flag("GETTEMP")) {Arun=TRUE;AFLOW_getTEMP(argv);/*exit(0)*/return 0;} //CO20180419
+    if(!Arun && XHOST.vflag_control.flag("MULTI=SH")) {Arun=TRUE;AFLOW_PTHREADS::MULTI_sh(argv);return 0;}  //CO20180419
+    if(!Arun && XHOST.vflag_control.flag("MULTI=BZIP2")) {Arun=TRUE;AFLOW_PTHREADS::MULTI_compress("bzip2",argv);return 0;}  //CO20180419
+    if(!Arun && XHOST.vflag_control.flag("MULTI=BUNZIP2")) {Arun=TRUE;AFLOW_PTHREADS::MULTI_compress("bunzip2",argv);return 0;}  //CO20180419
+    if(!Arun && XHOST.vflag_control.flag("MULTI=GZIP")) {Arun=TRUE;AFLOW_PTHREADS::MULTI_compress("gzip",argv);return 0;}  //CO20180419
+    if(!Arun && XHOST.vflag_control.flag("MULTI=GUNZIP")) {Arun=TRUE;AFLOW_PTHREADS::MULTI_compress("gunzip",argv);return 0;}  //CO20180419
+    if(!Arun && XHOST.vflag_control.flag("MULTI=XZIP")) {Arun=TRUE;AFLOW_PTHREADS::MULTI_compress("xz",argv);return 0;}  //CO20180419
+    if(!Arun && XHOST.vflag_control.flag("MULTI=XUNZIP")) {Arun=TRUE;AFLOW_PTHREADS::MULTI_compress("xunzip",argv);return 0;}  //CO20180419
+    if(!Arun && XHOST.vflag_control.flag("MULTI=BZ2XZ")) {Arun=TRUE;AFLOW_PTHREADS::MULTI_bz2xz(argv);return 0;}  //CO20180419
+    if(!Arun && XHOST.vflag_control.flag("MULTI=GZ2XZ")) {Arun=TRUE;AFLOW_PTHREADS::MULTI_gz2xz(argv);return 0;}  //CO20180419
+    if(!Arun && XHOST.vflag_control.flag("MULTI=ZIP")) {Arun=TRUE;AFLOW_PTHREADS::MULTI_zip(argv);return 0;}  //CO20180419
+    if(!Arun && XHOST.vflag_control.flag("MONITOR")) {Arun=TRUE;AFLOW_monitor(argv);return 0;} //CO20180419
+    if(!Arun && XHOST.vflag_control.flag("GETTEMP")) {Arun=TRUE;AFLOW_getTEMP(argv);return 0;} //CO20180419
 
     // **************************************************************
     // INTERCEPT HELP
     if(XHOST.vflag_control.flag("AFLOW_HELP")) {
       cout << aflow::Banner("BANNER_BIG") << endl << aflow::Intro_HELP("aflow") << aflow::Banner("BANNER_BIG") << endl;
-      /*exit(1)*/return 0;} // << endl; //CO20180419
+      return 0;} // << endl; //CO20180419
     if(XHOST.vflag_control.flag("AFLOW_EXCEPTIONS")) {
       cout << aflow::Banner("BANNER_BIG") << endl << aflow::Banner("EXCEPTIONS") << endl;
       return 0;
@@ -741,70 +850,70 @@ int main(int _argc,char **_argv) {
       cout << init::InitGlobalObject("README_AFLOW_LICENSE_GPL3_TXT") << endl;
       cout << " " << endl;
       cout << "*************************************************************************** " << endl;
-      /*exit(1)*/return 0;} // << endl; //CO20180419
+      return 0;} // << endl; //CO20180419
     if(XHOST.vflag_control.flag("README_AFLOW"))  {
       cout << init::InitGlobalObject("README_AFLOW_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; //CO20180419
+      return 0;} // << endl; //CO20180419
     if(XHOST.vflag_control.flag("README_AFLOW_VERSIONS_HISTORY"))  {
       cout << init::InitGlobalObject("README_AFLOW_VERSIONS_HISTORY_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; //CO20180419
+      return 0;} // << endl; //CO20180419
     if(XHOST.vflag_control.flag("README_AFLOW_PFLOW"))  {
       cout << init::InitGlobalObject("README_AFLOW_PFLOW_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; //CO20180419
+      return 0;} // << endl; //CO20180419
     if(XHOST.vflag_control.flag("README_FROZSL"))  {
       cout << init::InitGlobalObject("README_AFLOW_FROZSL_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; //CO20180419
+      return 0;} // << endl; //CO20180419
     if(XHOST.vflag_control.flag("README_APL"))  {
       cout << init::InitGlobalObject("README_AFLOW_APL_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; //CO20180419
+      return 0;} // << endl; //CO20180419
     if(XHOST.vflag_control.flag("README_QHA"))  {
       cout << init::InitGlobalObject("README_AFLOW_QHA_SCQHA_QHA3P_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; //CO20180419
+      return 0;} // << endl; //CO20180419
     if(XHOST.vflag_control.flag("README_AAPL"))  {
       cout << init::InitGlobalObject("README_AFLOW_APL_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; //CO20180419
+      return 0;} // << endl; //CO20180419
     if(XHOST.vflag_control.flag("README_AGL"))  {
       cout << init::InitGlobalObject("README_AFLOW_AGL_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; //CO20180419
+      return 0;} // << endl; //CO20180419
     if(XHOST.vflag_control.flag("README_AEL"))  {
       cout << init::InitGlobalObject("README_AFLOW_AEL_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; //CO20180419
+      return 0;} // << endl; //CO20180419
     if(XHOST.vflag_control.flag("README_ANRL"))  {
       cout << init::InitGlobalObject("README_AFLOW_ANRL_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; //CO20180419
+      return 0;} // << endl; //CO20180419
     if(XHOST.vflag_control.flag("README_COMPARE"))  { //CO20190401
       cout << init::InitGlobalObject("README_AFLOW_COMPARE_TXT") << endl; //CO20190401
-      /*exit(1)*/return 0;} // << endl; //CO20190401
+      return 0;} // << endl; //CO20190401
     if(XHOST.vflag_control.flag("README_GFA"))  {
       cout << init::InitGlobalObject("README_AFLOW_GFA_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; //CO20180419
+      return 0;} // << endl; //CO20180419
     if(XHOST.vflag_control.flag("README_SYMMETRY"))  {
       cout << init::InitGlobalObject("README_AFLOW_SYM_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; //CO20180419
+      return 0;} // << endl; //CO20180419
     if(XHOST.vflag_control.flag("README_CCE"))  {
       cout << init::InitGlobalObject("README_AFLOW_CCE_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; //CO20180419
+      return 0;} // << endl; //CO20180419
     if(XHOST.vflag_control.flag("README_CHULL"))  {
       cout << init::InitGlobalObject("README_AFLOW_CHULL_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; //CO20180419
+      return 0;} // << endl; //CO20180419
     if(XHOST.vflag_control.flag("README_PARTIAL_OCCUPATION")) {
       cout << init::InitGlobalObject("README_AFLOW_POCC_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; //CO20180419
+      return 0;} // << endl; //CO20180419
     if(XHOST.vflag_control.flag("README_APENNSY"))  {
       cout << init::InitGlobalObject("README_AFLOW_APENNSY_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; //CO20180419
+      return 0;} // << endl; //CO20180419
     if(XHOST.vflag_control.flag("README_SCRIPTING"))  {
       cout << init::InitGlobalObject("README_AFLOW_SCRIPTING_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; //CO20180419
+      return 0;} // << endl; //CO20180419
     if(XHOST.vflag_control.flag("README_EXCEPTIONS"))  {
       cout << init::InitGlobalObject("README_AFLOW_EXCEPTIONS_TXT") << endl;
       return 0;}  //ME20180531
     if(XHOST.vflag_control.flag("README_XAFLOW"))  {
       cout << init::InitGlobalObject("README_AFLOW_XAFLOW_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; //CO20180419
+      return 0;} // << endl; //CO20180419
     if(XHOST.vflag_control.flag("README_AFLOWRC"))  {
       cout << init::InitGlobalObject("README_AFLOW_AFLOWRC_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; //CO20180419
+      return 0;} // << endl; //CO20180419
 
     // **************************************************************
     // PHP-WEB AND CURRICULUM AND HIGH-THROUGHPUT STUFF
@@ -813,8 +922,8 @@ int main(int _argc,char **_argv) {
 
     // **************************************************************
     bool VVERSION=aurostd::args2flag(argv,cmds,"-v|--version");
-    if(!Arun && VVERSION)  {Arun=TRUE;cout << aflow::Banner("AFLOW_VERSION");/*exit(0)*/return 0;} // look for version IMMEDIATELY //CO20180419
-    if(!Arun && XHOST.TEST) { Arun=TRUE;cerr << "test" << endl;/*exit(0)*/return 0;} //CO20180419
+    if(!Arun && VVERSION)  {Arun=TRUE;cout << aflow::Banner("AFLOW_VERSION");return 0;} // look for version IMMEDIATELY //CO20180419
+    if(!Arun && XHOST.TEST) { Arun=TRUE;cerr << "test" << endl;return 0;} //CO20180419
 
     // [OBSOLETE]  if(!Arun && (aurostd::substring2bool(XHOST.progname,"aflow1") || aurostd::substring2bool(XHOST.progname,"aflowd1"))) {
     // [OBSOLETE]  Arun=TRUE;AFLOW_main1(argv,cmds);}
@@ -836,11 +945,12 @@ int main(int _argc,char **_argv) {
     // **************************************************************
     // LAST RESOURCE PFLOW
     if(!Arun) { 
-      Arun=TRUE;pflow::main(argv,cmds);
+      Arun=TRUE;
+      return_code = pflow::main(argv,cmds);   //ME20200901 - use pflow::main return code database handling
     }
     // **************************************************************
     // END
-    return (Arun?0:1); //Arun==TRUE is 1, so flip because return 0 is normal  //CO20190629 - more explicit return 0
+    return (Arun?return_code:1); //Arun==TRUE is 1, so flip because return 0 is normal  //CO20190629 - more explicit return 0//ME20200901 - use return_code
   }
   //CO20180729 - OBSOLETE - use xerror
   //[OBSOLETE]catch(AFLOWRuntimeError& re){
@@ -1204,6 +1314,8 @@ namespace aflow {
       oss << "       43                              mismatch                           _INDEX_MISMATCH_          " << endl;
       oss << "       50       Runtime Error          generic                            _RUNTIME_ERROR_           " << endl;
       oss << "       51                              not initialized                    _RUNTIME_INIT_            " << endl;
+      oss << "       52                              SQL error                          _RUNTIME_SQL_             " << endl;
+      oss << "       53                              busy                               _RUNTIME_BUSY_            " << endl;
       oss << "       60       Allocation Error       generic                            _ALLOC_ERROR_             " << endl;
       oss << "       61                              could not allocate memory          _ALLOC_ALLOCATE_          " << endl;
       oss << "       62                              insufficient memory                _ALLOC_INSUFFICIENT_      " << endl;
@@ -1212,7 +1324,6 @@ namespace aflow {
     }
     cerr << XPID << "aflow::Banner type=" << type << " not found..." << endl;
     oss << "aflow::Banner type=" << type << " not found..." << endl;
-    //exit(0);
     return 0; //CO20180419
     return oss.str();
   }

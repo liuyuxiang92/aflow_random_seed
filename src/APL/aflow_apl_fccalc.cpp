@@ -1643,7 +1643,7 @@ namespace apl {
     for (uint k = 0; k < allDistortionsOfAtom.size(); k++) {
       testDistortion = testDistortion - aurostd::getVectorProjection(testDistortion, allDistortionsOfAtom[k]);
     }
-    if (aurostd::modulus(testDistortion) > _ZERO_TOL_LOOSE_) {
+    if (aurostd::modulus(testDistortion) > _FLOAT_TOL_) {
       // Normalize vector
       testDistortion = testDistortion / aurostd::modulus(testDistortion);
       // Store this vector (in Cartesian form!)
@@ -1661,7 +1661,7 @@ namespace apl {
         for (uint k = 0; k < allDistortionsOfAtom.size(); k++) {
           testDistortion = testDistortion - aurostd::getVectorProjection(testDistortion, allDistortionsOfAtom[k]);
         }
-        if (aurostd::modulus(testDistortion) > _ZERO_TOL_LOOSE_) {
+        if (aurostd::modulus(testDistortion) > _FLOAT_TOL_) {
           testDistortion = testDistortion / aurostd::modulus(testDistortion);
           allDistortionsOfAtom.push_back(testDistortion);
           //cout << "new symmetry generated distortion vector: " << testDistortion << std::endl;
@@ -1685,7 +1685,7 @@ namespace apl {
     for (uint i = 0; i < agroup.size(); i++) {
       rotated_distortion = agroup[i].Uc * _uniqueDistortions[atom_index][distortion_index];
       //cerr << "rdistortion : " << rotated_distortion << std::endl;
-      if (identical(_uniqueDistortions[atom_index][distortion_index], -rotated_distortion, _ZERO_TOL_LOOSE_)) {  //just mimicking Jahnatek tolerance here
+      if (identical(_uniqueDistortions[atom_index][distortion_index], -rotated_distortion, _FLOAT_TOL_)) {  //just mimicking Jahnatek tolerance here
         return FALSE;
         //need_minus = false;
         //break;
@@ -1868,7 +1868,7 @@ namespace apl {
             }
 
             // If the remaining vector is non-zero length, it is new independent direction, hence store it...
-            if (aurostd::modulus(testVec) > _ZERO_TOL_LOOSE_) {
+            if (aurostd::modulus(testVec) > _FLOAT_TOL_) {
               // Normalize to unit length
               double testVectorLength = aurostd::modulus(testVec);
               for (uint l = 0; l < _supercell->getNumberOfAtoms(); l++) {
@@ -2223,9 +2223,9 @@ namespace apl {
   // [OBSOLETE]       for (int k = 0; k < _supercell->getNumberOfAtoms(); k++) {
   // [OBSOLETE]         int l = 0;
   // [OBSOLETE]         for (; l < _supercell->getNumberOfAtoms(); l++)
-  // [OBSOLETE]           if ((aurostd::abs(ix.atoms[k].cpos(1) - _supercell->getSupercellStructure().atoms[l].cpos(1)) < _ZERO_TOL_LOOSE_) &&
-  // [OBSOLETE]               (aurostd::abs(ix.atoms[k].cpos(2) - _supercell->getSupercellStructure().atoms[l].cpos(2)) < _ZERO_TOL_LOOSE_) &&
-  // [OBSOLETE]               (aurostd::abs(ix.atoms[k].cpos(3) - _supercell->getSupercellStructure().atoms[l].cpos(3)) < _ZERO_TOL_LOOSE_))
+  // [OBSOLETE]           if ((aurostd::abs(ix.atoms[k].cpos(1) - _supercell->getSupercellStructure().atoms[l].cpos(1)) < _FLOAT_TOL_) &&
+  // [OBSOLETE]               (aurostd::abs(ix.atoms[k].cpos(2) - _supercell->getSupercellStructure().atoms[l].cpos(2)) < _FLOAT_TOL_) &&
+  // [OBSOLETE]               (aurostd::abs(ix.atoms[k].cpos(3) - _supercell->getSupercellStructure().atoms[l].cpos(3)) < _FLOAT_TOL_))
   // [OBSOLETE]             break;
   // [OBSOLETE]         //CO, not really mapping error, just mismatch between structure read in (ix) and current supercell structure (should be exact)
   // [OBSOLETE]         if (l == _supercell->getNumberOfAtoms()) {
