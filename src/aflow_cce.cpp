@@ -2888,7 +2888,7 @@ namespace cce {
   // Decides which output to print when running corrections
   string print_output(const xstructure& structure, aurostd::xoption& flags, xoption& cce_flags, CCE_Variables& cce_vars, vector<vector<uint> >& multi_anion_num_neighbors) {
     stringstream output;
-    if (aurostd::toupper(flags.flag("CCE_CORRECTION::GET_CATION_COORDINATION_NUMBERS"))) {
+    if (flags.flag("CCE_CORRECTION::GET_CATION_COORDINATION_NUMBERS")) {
       if (aurostd::toupper(flags.getattachedscheme("CCE_CORRECTION::PRINT")) == "JSON") {
         output << print_JSON_cation_coordination_numbers(structure, cce_flags, cce_vars, multi_anion_num_neighbors) << std::endl;
       } else {
@@ -2896,7 +2896,7 @@ namespace cce {
         output << print_output_cation_coordination_numbers(structure, cce_flags, cce_vars, multi_anion_num_neighbors);
       }
     }
-    if (aurostd::toupper(flags.flag("CCE_CORRECTION::GET_OXIDATION_NUMBERS"))) {
+    if (flags.flag("CCE_CORRECTION::GET_OXIDATION_NUMBERS")) {
       if (aurostd::toupper(flags.getattachedscheme("CCE_CORRECTION::PRINT")) == "JSON") {
         output << print_JSON_ox_nums(structure, cce_vars) << std::endl;
       } else {
@@ -2904,18 +2904,16 @@ namespace cce {
         output << print_output_oxidation_numbers(structure, cce_vars);
       }
     }
-    //if (aurostd::toupper(flags.flag("CCE_CORRECTION::POSCAR_PATH")) || aurostd::toupper(flags.flag("CCE_CORRECTION::POSCAR2CCE"))) {
-      if (aurostd::toupper(flags.getattachedscheme("CCE_CORRECTION::PRINT")) == "JSON") {
-        output << print_JSON_corrections(structure, cce_vars) << std::endl;
-      } else if (aurostd::toupper(flags.flag("CCE_CORRECTION::UNIT_TEST"))) {
-        output << print_test_output(cce_vars, cce_vars.enthalpy_formation_cell_cce) << std::endl;
-      } else {
-        // print CCE corrections & corrected formation enthalpies per cell and atom
-        output << print_output_corrections(structure, cce_vars, cce_vars.enthalpy_formation_cell_cce);
-        // print CCE citation
-        output << print_citation();
-      }
-    //}
+    if (aurostd::toupper(flags.getattachedscheme("CCE_CORRECTION::PRINT")) == "JSON") {
+      output << print_JSON_corrections(structure, cce_vars) << std::endl;
+    } else if (aurostd::toupper(flags.flag("CCE_CORRECTION::UNIT_TEST"))) {
+      output << print_test_output(cce_vars, cce_vars.enthalpy_formation_cell_cce) << std::endl;
+    } else {
+      // print CCE corrections & corrected formation enthalpies per cell and atom
+      output << print_output_corrections(structure, cce_vars, cce_vars.enthalpy_formation_cell_cce);
+      // print CCE citation
+      output << print_citation();
+    }
     return output.str();
   }
 
