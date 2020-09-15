@@ -218,12 +218,12 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
 
   vpflow.flag("CCE_CORRECTION::USAGE",aurostd::args2flag(argv,cmds,"--cce_correction|--cce"));
   vpflow.args2addattachedscheme(argv,cmds,"CCE_CORRECTION::POSCAR_PATH","--cce_correction=|--cce=","");
+  vpflow.flag("CCE_CORRECTION::POSCAR2CCE", aurostd::args2flag(argv,cmds,"--poscar2cce|--get_cce_correction|--get_cce_cor|--get_cce_corrections|--get_cce_cors")); //ME
   vpflow.flag("CCE_CORRECTION",vpflow.flag("CCE_CORRECTION::USAGE") || !vpflow.getattachedscheme("CCE_CORRECTION::POSCAR_PATH").empty());
   if(vpflow.flag("CCE_CORRECTION") && aurostd::args2flag(argv,cmds,"--usage")){vpflow.flag("CCE_CORRECTION::USAGE",TRUE);}
   vpflow.args2addattachedscheme(argv,cmds,"CCE_CORRECTION::ENTHALPIES_FORMATION_DFT","--enthalpies_formation_dft=|--enthalpy_formation_dft=|--dft_formation_enthalpies=|--dft_formation_energies=|--dft_formation_enthalpy=|--dft_formation_energy=|--dftes=|--dfte=","");
   vpflow.args2addattachedscheme(argv,cmds,"CCE_CORRECTION::FUNCTIONALS","--functional=|--func=|--functionals=|--funcs=","");
   vpflow.args2addattachedscheme(argv,cmds,"CCE_CORRECTION::OXIDATION_NUMBERS","--oxidation_numbers=|--ox_nums=|--oxidation_number=|--ox_num=","");
-  vpflow.flag("CCE_CORRECTION::POSCAR2CCE", aurostd::args2flag(argv,cmds,"--poscar2cce|--get_cce_correction|--get_cce_cor|--get_cce_corrections|--get_cce_cors")); //ME
   vpflow.args2addattachedscheme(argv,cmds,"CCE_CORRECTION::PRINT","--print=","OUT"); //ME
   vpflow.flag("CCE_CORRECTION::UNIT_TEST",aurostd::args2flag(argv,cmds,"--cce_test")); //RF20200409
   vpflow.flag("CCE_CORRECTION::GET_OXIDATION_NUMBERS", aurostd::args2flag(argv,cmds,"--get_oxidation_numbers|--get_ox_nums|--get_oxidation_number|--get_ox_num|--poscar2ox_nums|--poscar2ox_num")); //RF20200725
