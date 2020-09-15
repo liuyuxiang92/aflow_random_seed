@@ -876,32 +876,35 @@ namespace cce {
       cce_vars.multi_anion_atoms[i] = 0; 
     }
     if(LDEBUG){cerr << soliloquy << " structure=" << endl;cerr << structure << endl;}
-    if(cce_vars.cutoffs.empty()){cce_vars.cutoffs=get_dist_cutoffs(structure);}  //CO20200914
-    vector<double> cutoffs; //CO20200914
-    for(uint i=0;i<cce_vars.cutoffs.size();i++){cutoffs.push_back(cce_vars.cutoffs[i]+tolerance);}  //CO20200914
-    if(LDEBUG){
-      cerr << soliloquy << " cutoff=" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(cutoffs,5),",") << endl;
+
+    //CO20200914 - START
+    if(cce_vars.xstr_neighbors.atoms.size()==0 || cce_vars.i_neighbors.size()!=structure.atoms.size() || cce_vars.i_neighbors.size()!=cce_vars.distances.size()){
+      if(LDEBUG){cerr << soliloquy << " NEIGHBORS ANALYSIS START" << endl;}
+      cce_vars.xstr_neighbors=structure;
+      cce_vars.xstr_neighbors.GetNeighbors(cce_vars.i_neighbors,cce_vars.distances,0.0,false,false);
+      if(LDEBUG){cerr << soliloquy << " NEIGHBORS ANALYSIS STOP" << endl;}
     }
-    double cutoffs_max=aurostd::max(cutoffs);
-    deque<deque<_atom> > neigh_mat;
-    structure.GetStrNeighData(cutoffs_max,neigh_mat);
-    uint z = 0;
-    for(uint i=0,isize=neigh_mat.size();i<isize;i++){ //same size as structure.atoms.size(); number of atoms in the structure (not determined by cutoff (or cutoffs_max))
-      uint neighbors_count=0;
-      uint multi_anion_count=0;
-      for(uint j=0,jsize=neigh_mat[i].size();j<jsize;j++){  //number of nearest neighbors within cutoff of atom i; number of neighbors of each atom i determined by cutoffs_max
-        const _atom& atom=neigh_mat[i][j]; // the atom object stands for the neighbors of each atom of the structure
-        if ((DEFAULT_CCE_SELF_DIST_TOL < AtomDist(structure.atoms[i],atom)) && (AtomDist(structure.atoms[i],atom) <= cutoffs[structure.atoms[i].type]) ){ // distance must be larger than DEFAULT_CCE_SELF_DIST_TOL since GetStrNeighData includes also structure.atoms[i] itself as neighbor having distance zero to itself
+    //CO20200914 - END
+
+    uint i=0,isize=0,j=0,jsize=0,neighbors_count=0,multi_anion_count=0;
+    double cutoff=0.0,electronegativity_atom=0.0,electronegativity_neighbor=0.0;
+    xelement::xelement atom_element,neigh_element;
+    for(i=0,isize=cce_vars.i_neighbors.size();i<isize;i++){ //same size as structure.atoms.size(); number of atoms in the structure (not determined by cutoff (or cutoffs_max))
+      neighbors_count=0;
+      multi_anion_count=0;
+      cutoff=cce_vars.distances[i][0]+tolerance;  //add tolerance
+      for(j=0,jsize=cce_vars.i_neighbors[i].size();j<jsize;j++){  //number of nearest neighbors within cutoff of atom i; number of neighbors of each atom i determined by cutoffs_max
+        if(cce_vars.distances[i][j]>cutoff){break;}  //we only need first nearest neighbors
+        const _atom& atom=cce_vars.xstr_neighbors.grid_atoms[cce_vars.i_neighbors[i][j]];
+        if (cce_vars.distances[i][j] <= cutoff) { // distance must be larger than DEFAULT_CCE_SELF_DIST_TOL since GetStrNeighData includes also structure.atoms[i] itself as neighbor having distance zero to itself
           if (atom.cleanname == cce_vars.anion_species){
             neighbors_count+=1;
           } else if ((atom.cleanname != cce_vars.anion_species) && (structure.atoms[i].cleanname != cce_vars.anion_species)){ // second condition set since the anion_species cannot be set as a multi-anion species again
             neighbors_count+=1;
-            z = GetAtomNumber(structure.atoms[i].cleanname);
-            xelement::xelement atom_element(z);
-            z = GetAtomNumber(atom.cleanname);
-            xelement::xelement neigh_element(z);
-            double electronegativity_atom = atom_element.electronegativity_Allen;
-            double electronegativity_neighbor = neigh_element.electronegativity_Allen;
+            atom_element.populate(structure.atoms[i].cleanname);
+            neigh_element.populate(atom.cleanname);
+            electronegativity_atom = atom_element.electronegativity_Allen;
+            electronegativity_neighbor = neigh_element.electronegativity_Allen;
             if(LDEBUG){
               cerr << soliloquy << " electronegativity of atom " << i << ": " << electronegativity_atom << endl;
               cerr << soliloquy << " electronegativity of neighbor " << j << ": " << electronegativity_neighbor << endl;
@@ -945,9 +948,7 @@ namespace cce {
           }
         }
         // set multi anion oxidation numbers and check whether it is negative
-        _atom atom;
-        z = GetAtomNumber(structure.atoms[i].cleanname);
-        xelement::xelement atom_element(z);
+        atom_element.populate(structure.atoms[i].cleanname);
         cce_vars.oxidation_states[i] = atom_element.oxidation_states[atom_element.oxidation_states.size()-1];
         if(LDEBUG){
           cerr << soliloquy << " Oxidation state for atom " << i << " (" << structure.atoms[i].cleanname << ") has been set to: " << cce_vars.oxidation_states[i] << endl;
@@ -994,23 +995,31 @@ namespace cce {
       cerr << soliloquy << " STRUCTURAL ANALYSIS:" << endl;
     }
     if(LDEBUG){cerr << soliloquy << " structure=" << endl;cerr << structure << endl;}
-    if(cce_vars.cutoffs.empty()){cce_vars.cutoffs=get_dist_cutoffs(structure);}  //CO20200914
-    vector<double> cutoffs; //CO20200914
-    for(uint i=0;i<cce_vars.cutoffs.size();i++){cutoffs.push_back(cce_vars.cutoffs[i]+tolerance);}  //CO20200914
-    if(LDEBUG){
-      cerr << soliloquy << " cce_vars.cutoff=" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(cutoffs,5),",") << endl;
-    }
-    double cutoffs_max=aurostd::max(cutoffs);
+    
     vector<uint> num_neighbors(structure.atoms.size());
-    deque<deque<_atom> > neigh_mat;
-    structure.GetStrNeighData(cutoffs_max,neigh_mat);
-    for(uint i=0,isize=neigh_mat.size();i<isize;i++){ //same size as structure.atoms.size(); number of atoms in the structure (not determined by cutoff (or cutoffs_max))
-      uint neighbors_count=0;
-      bool warning = false;
-      stringstream other_neighbors;
-      for(uint j=0,jsize=neigh_mat[i].size();j<jsize;j++){  //number of nearest neighbors within cutoff of atom i; number of neighbors of each atom i determined by cutoffs_max
-        const _atom& atom=neigh_mat[i][j];
-        if ((DEFAULT_CCE_SELF_DIST_TOL < AtomDist(structure.atoms[i],atom)) && (AtomDist(structure.atoms[i],atom) <= cutoffs[structure.atoms[i].type]) ){ // distance must be larger than DEFAULT_CCE_SELF_DIST_TOL since GetStrNeighData includes also structure.atoms[i] itself as neighbor having distance zero to itself
+    
+    //CO20200914 - START
+    if(cce_vars.xstr_neighbors.atoms.size()==0 || cce_vars.i_neighbors.size()!=structure.atoms.size() || cce_vars.i_neighbors.size()!=cce_vars.distances.size()){
+      if(LDEBUG){cerr << soliloquy << " NEIGHBORS ANALYSIS START" << endl;}
+      cce_vars.xstr_neighbors=structure;
+      cce_vars.xstr_neighbors.GetNeighbors(cce_vars.i_neighbors,cce_vars.distances,0.0,false,false);
+      if(LDEBUG){cerr << soliloquy << " NEIGHBORS ANALYSIS STOP" << endl;}
+    }
+    //CO20200914 - END
+
+    uint i=0,isize=0,j=0,jsize=0,neighbors_count=0;
+    bool warning=false;
+    stringstream message,other_neighbors;
+    double cutoff=0.0;
+    for(i=0,isize=cce_vars.i_neighbors.size();i<isize;i++){ //same size as structure.atoms.size(); number of atoms in the structure (not determined by cutoff (or cutoffs_max))
+      neighbors_count=0;
+      warning = false;
+      aurostd::StringstreamClean(other_neighbors);
+      cutoff=cce_vars.distances[i][0]+tolerance;  //add tolerance
+      for(j=0,jsize=cce_vars.i_neighbors[i].size();j<jsize;j++){  //number of nearest neighbors within cutoff of atom i; number of neighbors of each atom i determined by cutoffs_max
+        if(cce_vars.distances[i][j]>cutoff){break;}  //we only need first nearest neighbors
+        const _atom& atom=cce_vars.xstr_neighbors.grid_atoms[cce_vars.i_neighbors[i][j]];
+        if (cce_vars.distances[i][j] <= cutoff) { // distance must be larger than DEFAULT_CCE_SELF_DIST_TOL since GetStrNeighData includes also structure.atoms[i] itself as neighbor having distance zero to itself
           if (!anion_species.empty()){ // variable called anion type since function was developed for CCE for polar materials but it can be used to check for any atom type and only include those as neighbors
             // implement check whether each nearest neighbor is of the anion_species, otherwise throw warning; 
             if (atom.cleanname == anion_species){
@@ -1027,7 +1036,6 @@ namespace cce {
         }
       }
       if (!cce_flags.flag("MULTI_ANION_SYSTEM") && warning){
-        stringstream message;
         message << " Not all nearest neighbors of " << structure.atoms[i].cleanname << " (ATOM[" << i << "]) within the distance tolerance are " << anion_species << "!" << endl;
         message << other_neighbors.str();
         if (!cce_flags.flag("UNIT_TEST")){
@@ -1086,30 +1094,38 @@ namespace cce {
       cce_vars.perox_indices[i] = 0; 
       cce_vars.superox_indices[i] = 0; 
     }
-    if(cce_vars.cutoffs.empty()){cce_vars.cutoffs=get_dist_cutoffs(structure);}  //CO20200914
-    double cutoffs_max=aurostd::max(cce_vars.cutoffs);
-    deque<deque<_atom> > neigh_mat;
-    structure.GetStrNeighData(cutoffs_max,neigh_mat);
-    for(uint i=0,isize=neigh_mat.size();i<isize;i++){ //same size as structure.atoms.size(); number of atoms in the structure (not determined by cutoff (or cutoffs_max))
+
+    //CO20200914 - START
+    if(cce_vars.xstr_neighbors.atoms.size()==0 || cce_vars.i_neighbors.size()!=structure.atoms.size() || cce_vars.i_neighbors.size()!=cce_vars.distances.size()){
+      if(LDEBUG){cerr << soliloquy << " NEIGHBORS ANALYSIS START" << endl;}
+      cce_vars.xstr_neighbors=structure;
+      cce_vars.xstr_neighbors.GetNeighbors(cce_vars.i_neighbors,cce_vars.distances,0.0,false,false);
+      if(LDEBUG){cerr << soliloquy << " NEIGHBORS ANALYSIS STOP" << endl;}
+    }
+    //CO20200914 - END
+
+    uint i=0,isize=0,j=0,jsize=0;
+    for(i=0,isize=cce_vars.i_neighbors.size();i<isize;i++){ //same size as structure.atoms.size(); number of atoms in the structure (not determined by cutoff (or cutoffs_max))
       if (structure.atoms[i].cleanname == "O"){ // identify per- and superoxides by O-O bond length
-        for(uint j=0,jsize=neigh_mat[i].size();j<jsize;j++){  //number of nearest neighbors within cutoff of atom i; number of neighbors of each atom i determined by the cutoffs_max
-          const _atom& atom=neigh_mat[i][j];
+        for(j=0,jsize=cce_vars.i_neighbors[i].size();j<jsize;j++){  //number of nearest neighbors within cutoff of atom i; number of neighbors of each atom i determined by the cutoffs_max
+          if(cce_vars.distances[i][j]>cce_vars.distances[i][0]){break;}  //we only need first nearest neighbors
+          const _atom& atom=cce_vars.xstr_neighbors.grid_atoms[cce_vars.i_neighbors[i][j]];
           if (atom.cleanname == "O"){
-            if ((DEFAULT_CCE_SELF_DIST_TOL < AtomDist(structure.atoms[i],atom)) && (AtomDist(structure.atoms[i],atom) <= DEFAULT_CCE_O2_MOLECULE_LOWER_CUTOFF) ){ // distance must be larger than DEFAULT_CCE_SELF_DIST_TOL to savely exclude the anion itself having distance zero to itself; if O-O bond is shorter than in O2 molecule (approx. 1.21 Ang) the result of the structural relaxation is most likely wrong
-              message << " THE DETERMINED OXYGEN-OXYGEN BOND LENGTH IS SHORTER THAN IN THE O2 MOLECULE; CHECK YOUR STRUCTURE! THE O-O BOND LENGTH IS: " << AtomDist(structure.atoms[i],atom) << " Ang.";
+            if (cce_vars.distances[i][j] <= DEFAULT_CCE_O2_MOLECULE_LOWER_CUTOFF) { // distance must be larger than DEFAULT_CCE_SELF_DIST_TOL to savely exclude the anion itself having distance zero to itself; if O-O bond is shorter than in O2 molecule (approx. 1.21 Ang) the result of the structural relaxation is most likely wrong
+              message << " THE DETERMINED OXYGEN-OXYGEN BOND LENGTH IS SHORTER THAN IN THE O2 MOLECULE; CHECK YOUR STRUCTURE! THE O-O BOND LENGTH IS: " << cce_vars.distances[i][j] << " Ang.";
               throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
-            } else if ((DEFAULT_CCE_O2_MOLECULE_LOWER_CUTOFF < AtomDist(structure.atoms[i],atom)) && (AtomDist(structure.atoms[i],atom) < DEFAULT_CCE_O2_MOLECULE_UPPER_CUTOFF) ){
-              message << " THE DETERMINED OXYGEN-OXYGEN BOND LENGTH IS ABOUT THE SAME AS IN THE O2 MOLECULE, I.E. THE STRUCTURE SEEMS TO INCLUDE MOLECULAR OXYGEN FOR WHICH NO CCE CORRECTION IS AVAILABLE! THE O-O BOND LENGTH IS: " << AtomDist(structure.atoms[i],atom) << " Ang.";
+            } else if ((DEFAULT_CCE_O2_MOLECULE_LOWER_CUTOFF < cce_vars.distances[i][j]) && (cce_vars.distances[i][j] < DEFAULT_CCE_O2_MOLECULE_UPPER_CUTOFF) ){
+              message << " THE DETERMINED OXYGEN-OXYGEN BOND LENGTH IS ABOUT THE SAME AS IN THE O2 MOLECULE, I.E. THE STRUCTURE SEEMS TO INCLUDE MOLECULAR OXYGEN FOR WHICH NO CCE CORRECTION IS AVAILABLE! THE O-O BOND LENGTH IS: " << cce_vars.distances[i][j] << " Ang.";
               throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
-            } else if ((DEFAULT_CCE_O2_MOLECULE_UPPER_CUTOFF <= AtomDist(structure.atoms[i],atom)) && (AtomDist(structure.atoms[i],atom) <= DEFAULT_CCE_SUPEROX_CUTOFF) ){
+            } else if ((DEFAULT_CCE_O2_MOLECULE_UPPER_CUTOFF <= cce_vars.distances[i][j]) && (cce_vars.distances[i][j] <= DEFAULT_CCE_SUPEROX_CUTOFF) ){
               if(LDEBUG){
-                cerr << soliloquy << " WARNING: This should be a superoxide; the O-O bond length is: " << AtomDist(structure.atoms[i],atom) << " Ang." << endl;
+                cerr << soliloquy << " WARNING: This should be a superoxide; the O-O bond length is: " << cce_vars.distances[i][j] << " Ang." << endl;
               }
               superox_count+=1;
               cce_vars.superox_indices[i]=1;
-            } else if ((DEFAULT_CCE_SUPEROX_CUTOFF < AtomDist(structure.atoms[i],atom)) && (AtomDist(structure.atoms[i],atom) <= DEFAULT_CCE_PEROX_CUTOFF) ){
+            } else if ((DEFAULT_CCE_SUPEROX_CUTOFF < cce_vars.distances[i][j]) && (cce_vars.distances[i][j] <= DEFAULT_CCE_PEROX_CUTOFF) ){
               if(LDEBUG){
-                cerr << soliloquy << " WARNING: This should be a peroxide; the O-O bond length is: " << AtomDist(structure.atoms[i],atom) << " Ang." << endl;
+                cerr << soliloquy << " WARNING: This should be a peroxide; the O-O bond length is: " << cce_vars.distances[i][j] << " Ang." << endl;
               }
               perox_count+=1;
               cce_vars.perox_indices[i]=1;

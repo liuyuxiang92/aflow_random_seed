@@ -34,6 +34,9 @@ namespace cce {
     vector<double> oxidation_states;
     string anion_species;
     vector<double> cutoffs;
+    xstructure xstr_neighbors;
+    deque<deque<uint> > i_neighbors;  //CO20200914
+    deque<deque<double> > distances;  //CO20200914
     vector<string> multi_anion_species; // vector storing all the multi anion species
     uint num_perox_bonds;
     uint num_superox_bonds;

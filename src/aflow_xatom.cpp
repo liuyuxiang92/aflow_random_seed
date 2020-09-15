@@ -15903,7 +15903,7 @@ void xstructure::GetNeighbors(deque<_atom>& atoms_cell,deque<deque<uint> >& i_ne
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   string soliloquy=XPID+"xstructure::GetNeighbors():";
 
-  uint i=0,j=0,k=0;
+  uint i=0,k=0;
 
   if(prim){GetPrimitive();}
   ReScale(1.0);
@@ -15939,31 +15939,84 @@ void xstructure::GetNeighbors(deque<_atom>& atoms_cell,deque<deque<uint> >& i_ne
   if(LDEBUG){cerr << soliloquy << " GenerateGridAtoms(): done" << endl;}
   if(LDEBUG){cerr << soliloquy << " grid_atoms_number=" << grid_atoms_number << endl;}
 
+  if(LDEBUG){cerr << soliloquy << " generating neighbors" << endl;}
+  //[STILL SLOWER THAN AUROSTD::SORT()]//[SHAVES 1 SECOND]vector<double> v_mindist;
   double dist=0.0;
   uint atom1=0,atom2=0;
   for(i=0;i<atoms_cell.size();i++){
+    //[STILL SLOWER THAN AUROSTD::SORT()]//[SHAVES 1 SECOND]v_mindist.push_back(AUROSTD_MAX_DOUBLE);
     atom1=grid_atoms_pc2scMap[atomscell2atoms_mapping[i]];
     for(atom2=0;atom2<(uint)grid_atoms_number;atom2++){
       if(atom1==atom2){continue;} //skip self
       dist=AtomDist(grid_atoms[atom1],grid_atoms[atom2]); //distance
-      if(dist>rmin && dist<rmax){
+      if(dist>rmin && dist<=rmax){
         i_neighbors[i].push_back(atom2);
         distances[i].push_back(dist);
+        //[STILL SLOWER THAN AUROSTD::SORT()]//[SHAVES 1 SECOND]if(dist<v_mindist.back()){v_mindist.back()=dist;}
       }
+    }
+  }
+  
+  if(0){
+    //an attempt to shave off more runtime: only shaves off a second AT BEST for "make check_cce"
+    //the slowest part of the algorithm WAS sorting (using insertion sort), so reducing vector size would help
+    //now using quicksort, reducing the vector size does not help much (very efficient)
+    //to fully realize the 1 second shave off, replace min(distances[k]) with v_mindist (see above)
+    vector<uint> i2remove;
+    double cutoff=0.0;
+    for(k=0;k<distances.size();k++){
+      if(LDEBUG){cerr << soliloquy << " START distances[k=" << k << "].size()=" << distances[k].size() << endl;}
+      i2remove.clear();
+      cutoff=1.25*min(distances[k]); //v_mindist[k];  //focus on first shell: does not require an input tol
+      for(i=0;i<distances[k].size();i++){
+        if(distances[k][i]>cutoff){i2remove.push_back(i);}
+      }
+      for(i=i2remove.size()-1;i<i2remove.size();i--){
+        i_neighbors[k].erase(i_neighbors[k].begin()+i2remove[i]);
+        distances[k].erase(distances[k].begin()+i2remove[i]);
+      }
+      if(LDEBUG){cerr << soliloquy << " STOP  distances[k=" << k << "].size()=" << distances[k].size() << endl;}
     }
   }
 
   //now sort
-  for(k=0;k<i_neighbors.size();k++){
-    for(i=0;i<i_neighbors[k].size();i++){
-      for(j=i+1;j<i_neighbors[k].size();j++){
-        if(distances[k][j]<distances[k][i]){
-          std::swap(i_neighbors[k][i],i_neighbors[k][j]);
-          std::swap(distances[k][i],distances[k][j]);
-        }
-      }
-    }
-  }
+  if(LDEBUG){cerr << soliloquy << " sorting" << endl;}
+  //[TOO SLOW FOR LARGE VECTORS]uint uint_tmp=0;
+  //[TOO SLOW FOR LARGE VECTORS]double double_tmp=0;
+  //[TOO SLOW FOR LARGE VECTORS]for(k=0;k<i_neighbors.size();k++){
+  //[TOO SLOW FOR LARGE VECTORS]  for(i=0;i<i_neighbors[k].size();i++){
+  //[TOO SLOW FOR LARGE VECTORS]    for(j=i+1;j<i_neighbors[k].size();j++){
+  //[TOO SLOW FOR LARGE VECTORS]      if(distances[k][j]<distances[k][i]){
+  //[TOO SLOW FOR LARGE VECTORS]        //std::swap(i_neighbors[k][i],i_neighbors[k][j]);
+  //[TOO SLOW FOR LARGE VECTORS]        uint_tmp=i_neighbors[k][i];
+  //[TOO SLOW FOR LARGE VECTORS]        i_neighbors[k][i]=i_neighbors[k][j];
+  //[TOO SLOW FOR LARGE VECTORS]        i_neighbors[k][j]=uint_tmp;
+  //[TOO SLOW FOR LARGE VECTORS]        //std::swap(distances[k][i],distances[k][j]);
+  //[TOO SLOW FOR LARGE VECTORS]        double_tmp=distances[k][i];
+  //[TOO SLOW FOR LARGE VECTORS]        distances[k][i]=distances[k][j];
+  //[TOO SLOW FOR LARGE VECTORS]        distances[k][j]=double_tmp;
+  //[TOO SLOW FOR LARGE VECTORS]      }
+  //[TOO SLOW FOR LARGE VECTORS]    }
+  //[TOO SLOW FOR LARGE VECTORS]  }
+  //[TOO SLOW FOR LARGE VECTORS]}
+  //[STILL SLOWER THAN AUROSTD::SORT()]vector<uint> i_sorting;
+  //[STILL SLOWER THAN AUROSTD::SORT()]deque<uint> i_neighborsk; //copy
+  //[STILL SLOWER THAN AUROSTD::SORT()]deque<double> distancesk; //copy
+  //[STILL SLOWER THAN AUROSTD::SORT()]for(k=0;k<i_neighbors.size();k++){
+  //[STILL SLOWER THAN AUROSTD::SORT()]  i_neighborsk=i_neighbors[k];  //copy
+  //[STILL SLOWER THAN AUROSTD::SORT()]  distancesk=distances[k];  //copy
+  //[STILL SLOWER THAN AUROSTD::SORT()]  i_sorting.clear();for(i=0;i<i_neighbors[k].size();i++){i_sorting.push_back(i);}
+  //[STILL SLOWER THAN AUROSTD::SORT()]  std::sort(i_sorting.begin(),i_sorting.end(),[&](uint a, uint b) {return distances[k][a]<distances[k][b];});
+  //[STILL SLOWER THAN AUROSTD::SORT()]  //reorder
+  //[STILL SLOWER THAN AUROSTD::SORT()]  //https://stackoverflow.com/questions/838384/reorder-vector-using-a-vector-of-indices
+  //[STILL SLOWER THAN AUROSTD::SORT()]  //do NOT use a reordering algorithm, it takes a LONG time
+  //[STILL SLOWER THAN AUROSTD::SORT()]  //instead make a copy, memory is not a problem here, as the order of the memory used does not change (2N vs. 4N)
+  //[STILL SLOWER THAN AUROSTD::SORT()]  for(i=0;i<i_sorting.size();i++){
+  //[STILL SLOWER THAN AUROSTD::SORT()]    i_neighbors[k][i]=i_neighborsk[i_sorting[i]];
+  //[STILL SLOWER THAN AUROSTD::SORT()]    distances[k][i]=distancesk[i_sorting[i]];
+  //[STILL SLOWER THAN AUROSTD::SORT()]  }
+  //[STILL SLOWER THAN AUROSTD::SORT()]}
+  for(k=0;k<i_neighbors.size();k++){aurostd::sort(distances[k],i_neighbors[k]);}
 
   if(LDEBUG){
     for(k=0;k<i_neighbors.size();k++){
@@ -15976,43 +16029,65 @@ void xstructure::GetNeighbors(deque<_atom>& atoms_cell,deque<deque<uint> >& i_ne
 
 }
 
+
+void GetNeighbors(const xstructure& xstr_in,deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,double rmin,bool prim,bool unique_only){
+  xstructure xstr(xstr_in);
+  return xstr.GetNeighbors(i_neighbors,distances,rmin,prim,unique_only);
+}
+void GetNeighbors(const xstructure& xstr_in,deque<_atom>& atoms_cell,deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,double rmin,bool prim,bool unique_only){
+  xstructure xstr(xstr_in);
+  return xstr.GetNeighbors(atoms_cell,i_neighbors,distances,rmin,prim,unique_only);
+}
+void GetNeighbors(const xstructure& xstr_in,deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,double rmax,double rmin,bool prim,bool unique_only){
+  xstructure xstr(xstr_in);
+  return xstr.GetNeighbors(i_neighbors,distances,rmax,rmin,prim,unique_only);
+}
+void GetNeighbors(const xstructure& xstr_in,deque<_atom>& atoms_cell,deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,double rmax,double rmin,bool prim,bool unique_only){
+  xstructure xstr(xstr_in);
+  return xstr.GetNeighbors(atoms_cell,i_neighbors,distances,rmax,rmin,prim,unique_only);
+}
+
+
 // **************************************************************************
 // Function GetCoordinations
 // **************************************************************************
 // CO20200912
 void xstructure::GetCoordinations(deque<deque<uint> >& coordinations,double rmin,double tol,bool prim,bool unique_only){
   deque<deque<uint> > i_neighbors;
-  return GetCoordinations(i_neighbors,coordinations,tol,rmin,prim,unique_only);
+  deque<deque<double> > distances;
+  return GetCoordinations(i_neighbors,distances,coordinations,tol,rmin,prim,unique_only);
 }
 void xstructure::GetCoordinations(deque<_atom>& atoms_cell,deque<deque<uint> >& coordinations,double rmin,double tol,bool prim,bool unique_only){
   deque<deque<uint> > i_neighbors;
-  return GetCoordinations(atoms_cell,i_neighbors,coordinations,tol,rmin,prim,unique_only);
+  deque<deque<double> > distances;
+  return GetCoordinations(atoms_cell,i_neighbors,distances,coordinations,tol,rmin,prim,unique_only);
 }
 void xstructure::GetCoordinations(deque<deque<uint> >& coordinations,double rmax,double rmin,double tol,bool prim,bool unique_only){
   deque<deque<uint> > i_neighbors;
-  return GetCoordinations(i_neighbors,coordinations,rmax,rmin,tol,prim,unique_only);
+  deque<deque<double> > distances;
+  return GetCoordinations(i_neighbors,distances,coordinations,rmax,rmin,tol,prim,unique_only);
 }
 void xstructure::GetCoordinations(deque<_atom>& atoms_cell,deque<deque<uint> >& coordinations,double rmax,double rmin,double tol,bool prim,bool unique_only){
   deque<deque<uint> > i_neighbors;
-  return GetCoordinations(atoms_cell,i_neighbors,coordinations,rmax,rmin,tol,prim,unique_only);
+  deque<deque<double> > distances;
+  return GetCoordinations(atoms_cell,i_neighbors,distances,coordinations,rmax,rmin,tol,prim,unique_only);
 }
-void xstructure::GetCoordinations(deque<deque<uint> >& i_neighbors,deque<deque<uint> >& coordinations,double rmin,double tol,bool prim,bool unique_only){
+void xstructure::GetCoordinations(deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,deque<deque<uint> >& coordinations,double rmin,double tol,bool prim,bool unique_only){
   deque<_atom> atoms_cell;
-  return GetCoordinations(atoms_cell,i_neighbors,coordinations,tol,rmin,prim,unique_only);
+  return GetCoordinations(atoms_cell,i_neighbors,distances,coordinations,tol,rmin,prim,unique_only);
 }
-void xstructure::GetCoordinations(deque<_atom>& atoms_cell,deque<deque<uint> >& i_neighbors,deque<deque<uint> >& coordinations,double rmin,double tol,bool prim,bool unique_only){
+void xstructure::GetCoordinations(deque<_atom>& atoms_cell,deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,deque<deque<uint> >& coordinations,double rmin,double tol,bool prim,bool unique_only){
   double rmax=RadiusSphereLattice((*this).scale*(*this).lattice);
-  return GetCoordinations(atoms_cell,i_neighbors,coordinations,rmax,rmin,tol,prim,unique_only);
+  return GetCoordinations(atoms_cell,i_neighbors,distances,coordinations,rmax,rmin,tol,prim,unique_only);
 }
-void xstructure::GetCoordinations(deque<deque<uint> >& i_neighbors,deque<deque<uint> >& coordinations,double rmax,double rmin,double tol,bool prim,bool unique_only){
+void xstructure::GetCoordinations(deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,deque<deque<uint> >& coordinations,double rmax,double rmin,double tol,bool prim,bool unique_only){
   deque<_atom> atoms_cell;
-  return GetCoordinations(atoms_cell,i_neighbors,coordinations,rmax,rmin,tol,prim,unique_only);
+  return GetCoordinations(atoms_cell,i_neighbors,distances,coordinations,rmax,rmin,tol,prim,unique_only);
 }
-void xstructure::GetCoordinations(deque<_atom>& atoms_cell,deque<deque<uint> >& i_neighbors,deque<deque<uint> >& coordinations,double rmax,double rmin,double tol,bool prim,bool unique_only){
+void xstructure::GetCoordinations(deque<_atom>& atoms_cell,deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,deque<deque<uint> >& coordinations,double rmax,double rmin,double tol,bool prim,bool unique_only){
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   string soliloquy=XPID+"xstructure::GetCoordinations():";
 
-  deque<deque<double> > distances;
   GetNeighbors(atoms_cell,i_neighbors,distances,rmax,rmin,prim,unique_only);
   
   uint i=0,j=0,k=0;
@@ -16040,6 +16115,39 @@ void xstructure::GetCoordinations(deque<_atom>& atoms_cell,deque<deque<uint> >& 
     }
   }
 
+}
+
+void GetCoordinations(const xstructure& xstr_in,deque<deque<uint> >& coordinations,double rmin,double tol,bool prim,bool unique_only){
+  xstructure xstr(xstr_in);
+  return xstr.GetCoordinations(coordinations,tol,rmin,prim,unique_only);
+}
+void GetCoordinations(const xstructure& xstr_in,deque<_atom>& atoms_cell,deque<deque<uint> >& coordinations,double rmin,double tol,bool prim,bool unique_only){
+  xstructure xstr(xstr_in);
+  return xstr.GetCoordinations(atoms_cell,coordinations,tol,rmin,prim,unique_only);
+}
+void GetCoordinations(const xstructure& xstr_in,deque<deque<uint> >& coordinations,double rmax,double rmin,double tol,bool prim,bool unique_only){
+  xstructure xstr(xstr_in);
+  return xstr.GetCoordinations(coordinations,rmax,rmin,tol,prim,unique_only);
+}
+void GetCoordinations(const xstructure& xstr_in,deque<_atom>& atoms_cell,deque<deque<uint> >& coordinations,double rmax,double rmin,double tol,bool prim,bool unique_only){
+  xstructure xstr(xstr_in);
+  return xstr.GetCoordinations(atoms_cell,coordinations,rmax,rmin,tol,prim,unique_only);
+}
+void GetCoordinations(const xstructure& xstr_in,deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,deque<deque<uint> >& coordinations,double rmin,double tol,bool prim,bool unique_only){
+  xstructure xstr(xstr_in);
+  return xstr.GetCoordinations(i_neighbors,distances,coordinations,tol,rmin,prim,unique_only);
+}
+void GetCoordinations(const xstructure& xstr_in,deque<_atom>& atoms_cell,deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,deque<deque<uint> >& coordinations,double rmin,double tol,bool prim,bool unique_only){
+  xstructure xstr(xstr_in);
+  return xstr.GetCoordinations(atoms_cell,i_neighbors,distances,coordinations,rmin,tol,prim,unique_only);
+}
+void GetCoordinations(const xstructure& xstr_in,deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,deque<deque<uint> >& coordinations,double rmax,double rmin,double tol,bool prim,bool unique_only){
+  xstructure xstr(xstr_in);
+  return xstr.GetCoordinations(i_neighbors,distances,coordinations,rmax,rmin,tol,prim,unique_only);
+}
+void GetCoordinations(const xstructure& xstr_in,deque<_atom>& atoms_cell,deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,deque<deque<uint> >& coordinations,double rmax,double rmin,double tol,bool prim,bool unique_only){
+  xstructure xstr(xstr_in);
+  return xstr.GetCoordinations(atoms_cell,i_neighbors,distances,coordinations,rmax,rmin,tol,prim,unique_only);
 }
 
 // **************************************************************************
