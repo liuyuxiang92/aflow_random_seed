@@ -1108,11 +1108,13 @@ namespace apl
           pflow::logger(QHA_ARUN_MODE, function, e.error_message, currentDirectory,
               *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
           msg = "Reading data from the hibernation file failed.";
-          msg += " Force constants and the relevant data will be recalculated.";
           pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
-              *p_oss, _LOGGER_WARNING_);
+              *p_oss, _LOGGER_ERROR_);
           return false;
         }
+        msg = "Hibernation file was read successfully.";
+        pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
+              *p_oss, _LOGGER_MESSAGE_);
       }
 
       // calculate all phonon-related data: DOS, frequencies along the q-mesh and
