@@ -34,6 +34,9 @@ namespace cce {
     vector<double> oxidation_states;
     string anion_species;
     vector<double> cutoffs;
+    xstructure xstr_neighbors;
+    deque<deque<uint> > i_neighbors;  //CO20200914
+    deque<deque<double> > distances;  //CO20200914
     vector<string> multi_anion_species; // vector storing all the multi anion species
     uint num_perox_bonds;
     uint num_superox_bonds;
@@ -87,7 +90,7 @@ namespace cce {
   vector<uint> get_num_neighbors(const xstructure& structure, double tolerance=_CCE_NN_DIST_TOL_);
   vector<uint> get_num_neighbors(const xstructure& structure, const string& anion_species, double tolerance=_CCE_NN_DIST_TOL_);
   vector<uint> get_num_neighbors(const xstructure& structure, const string& anion_species, xoption& cce_flags, CCE_Variables& cce_vars, double tolerance=_CCE_NN_DIST_TOL_);
-  vector<double> get_dist_cutoffs(const xstructure& structure, double tolerance=_CCE_NN_DIST_TOL_);
+  vector<double> get_dist_cutoffs(const xstructure& structure);
   void check_per_super_oxides(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars);
   // determine oxidation numbers from electronegativities
   vector<double> get_oxidation_states_from_electronegativities(xstructure& structure);

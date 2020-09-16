@@ -1849,10 +1849,10 @@ class xstructure {
     void GetCoordinations(deque<deque<uint> >& coordinations,double rmax,double rmin=0.0,double tol=0.5,bool prim=true,bool unique_only=true);  //CO20200912
     void GetCoordinations(deque<_atom>& atoms_cell,deque<deque<uint> >& coordinations,double rmax,double rmin=0.0,double tol=0.5,bool prim=true,bool unique_only=true);  //CO20200912
     //
-    void GetCoordinations(deque<deque<uint> >& i_neighbors,deque<deque<uint> >& coordinations,double rmin=0.0,double tol=0.5,bool prim=true,bool unique_only=true);  //CO20200912
-    void GetCoordinations(deque<_atom>& atoms_cell,deque<deque<uint> >& i_neighbors,deque<deque<uint> >& coordinations,double rmin=0.0,double tol=0.5,bool prim=true,bool unique_only=true);  //CO20200912
-    void GetCoordinations(deque<deque<uint> >& i_neighbors,deque<deque<uint> >& coordinations,double rmax,double rmin=0.0,double tol=0.5,bool prim=true,bool unique_only=true);  //CO20200912
-    void GetCoordinations(deque<_atom>& atoms_cell,deque<deque<uint> >& i_neighbors,deque<deque<uint> >& coordinations,double rmax,double rmin=0.0,double tol=0.5,bool prim=true,bool unique_only=true);  //CO20200912
+    void GetCoordinations(deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,deque<deque<uint> >& coordinations,double rmin=0.0,double tol=0.5,bool prim=true,bool unique_only=true);  //CO20200912
+    void GetCoordinations(deque<_atom>& atoms_cell,deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,deque<deque<uint> >& coordinations,double rmin=0.0,double tol=0.5,bool prim=true,bool unique_only=true);  //CO20200912
+    void GetCoordinations(deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,deque<deque<uint> >& coordinations,double rmax,double rmin=0.0,double tol=0.5,bool prim=true,bool unique_only=true);  //CO20200912
+    void GetCoordinations(deque<_atom>& atoms_cell,deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,deque<deque<uint> >& coordinations,double rmax,double rmin=0.0,double tol=0.5,bool prim=true,bool unique_only=true);  //CO20200912
     //
     // NEIGHBOURS OBEJCTS OLD-ACONVASP BUT WORKS                  // NEIGHBOURS OBEJCTS 
     // GetNeighData collects all the neighbor data between rmin and rmax and stores it for each atom in a vector of atom objects in order of increasing distance.  
@@ -1875,6 +1875,20 @@ class xstructure {
     void free();                                                  // to free everything
     void copy(const xstructure& b);                               // the flag is necessary because sometimes you need to allocate the space.
 };
+
+void GetNeighbors(const xstructure& xstr_in,deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,double rmin,bool prim,bool unique_only);
+void GetNeighbors(const xstructure& xstr_in,deque<_atom>& atoms_cell,deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,double rmin,bool prim,bool unique_only);
+void GetNeighbors(const xstructure& xstr_in,deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,double rmax,double rmin,bool prim,bool unique_only);
+void GetNeighbors(const xstructure& xstr,deque<_atom>& atoms_cell,deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,double rmax,double rmin,bool prim,bool unique_only);
+//
+void GetCoordinations(const xstructure& xstr_in,deque<deque<uint> >& coordinations,double rmin,double tol,bool prim,bool unique_only);  //CO2020914
+void GetCoordinations(const xstructure& xstr_in,deque<_atom>& atoms_cell,deque<deque<uint> >& coordinations,double rmin,double tol,bool prim,bool unique_only); //CO2020914
+void GetCoordinations(const xstructure& xstr_in,deque<deque<uint> >& coordinations,double rmax,double rmin,double tol,bool prim,bool unique_only);  //CO2020914
+void GetCoordinations(const xstructure& xstr_in,deque<_atom>& atoms_cell,deque<deque<uint> >& coordinations,double rmax,double rmin,double tol,bool prim,bool unique_only); //CO2020914
+void GetCoordinations(const xstructure& xstr_in,deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,deque<deque<uint> >& coordinations,double rmin,double tol,bool prim,bool unique_only);  //CO2020914
+void GetCoordinations(const xstructure& xstr_in,deque<_atom>& atoms_cell,deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,deque<deque<uint> >& coordinations,double rmin,double tol,bool prim,bool unique_only); //CO2020914
+void GetCoordinations(const xstructure& xstr_in,deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,deque<deque<uint> >& coordinations,double rmax,double rmin,double tol,bool prim,bool unique_only);  //CO2020914
+void GetCoordinations(const xstructure& xstr_in,deque<_atom>& atoms_cell,deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,deque<deque<uint> >& coordinations,double rmax,double rmin,double tol,bool prim,bool unique_only); //CO2020914
 
 void LightCopy(const xstructure&, xstructure&);  //ME20200220
 
