@@ -218,7 +218,8 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
 
   vpflow.flag("CCE_CORRECTION::USAGE",aurostd::args2flag(argv,cmds,"--cce_correction|--cce"));
   vpflow.args2addattachedscheme(argv,cmds,"CCE_CORRECTION::POSCAR_PATH","--cce_correction=|--cce=","");
-  vpflow.flag("CCE_CORRECTION::POSCAR2CCE", aurostd::args2flag(argv,cmds,"--poscar2cce|--get_cce_correction|--get_cce_cor|--get_cce_corrections|--get_cce_cors")); //ME
+  vpflow.flag("CCE_CORRECTION::POSCAR2CCE", aurostd::args2flag(argv,cmds,"--poscar2cce")); //ME
+  vpflow.flag("CCE_CORRECTION::GET_CCE_CORRECTION", aurostd::args2flag(argv,cmds,"--get_cce_correction|--get_cce_cor|--get_cce_corrections|--get_cce_cors"));
   vpflow.flag("CCE_CORRECTION",vpflow.flag("CCE_CORRECTION::USAGE") || !vpflow.getattachedscheme("CCE_CORRECTION::POSCAR_PATH").empty());
   if(vpflow.flag("CCE_CORRECTION") && aurostd::args2flag(argv,cmds,"--usage")){vpflow.flag("CCE_CORRECTION::USAGE",TRUE);}
   vpflow.args2addattachedscheme(argv,cmds,"CCE_CORRECTION::ENTHALPIES_FORMATION_DFT","--enthalpies_formation_dft=|--enthalpy_formation_dft=|--dft_formation_enthalpies=|--dft_formation_energies=|--dft_formation_enthalpy=|--dft_formation_energy=|--dftes=|--dfte=","");
@@ -1726,6 +1727,7 @@ namespace pflow {
       if(vpflow.flag("CART")) {cout << pflow::CART(cin); _PROGRAMRUN=true;}
       if(vpflow.flag("CCE_CORRECTION")) {cce::print_corrections(vpflow); _PROGRAMRUN=true;}
       if(vpflow.flag("CCE_CORRECTION::POSCAR2CCE")) {cce::print_corrections(vpflow, std::cin); _PROGRAMRUN=true;} //ME20200508
+      if(vpflow.flag("CCE_CORRECTION::GET_CCE_CORRECTION")) {cce::print_corrections(vpflow, std::cin); _PROGRAMRUN=true;} //RF20200916
       if(vpflow.flag("CCE_CORRECTION::GET_OXIDATION_NUMBERS")) {cce::print_oxidation_numbers(vpflow, std::cin); _PROGRAMRUN=true;} //RF20200725
       if(vpflow.flag("CCE_CORRECTION::GET_CATION_COORDINATION_NUMBERS")) {cce::print_cation_coordination_numbers(vpflow, std::cin); _PROGRAMRUN=true;} //RF20200814
       if(vpflow.flag("CHECKINTEGRITIY")) {pflow::CheckIntegritiy(); _PROGRAMRUN=true;}

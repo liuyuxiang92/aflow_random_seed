@@ -2893,7 +2893,7 @@ namespace cce {
   // Decides which output to print when running corrections
   string print_output(const xstructure& structure, aurostd::xoption& flags, xoption& cce_flags, CCE_Variables& cce_vars, vector<vector<uint> >& multi_anion_num_neighbors) {
     stringstream output;
-    if (flags.flag("CCE_CORRECTION::POSCAR_PATH") && !flags.flag("CCE_CORRECTION::UNIT_TEST")) {
+    if ((flags.flag("CCE_CORRECTION::POSCAR_PATH") || flags.flag("CCE_CORRECTION::POSCAR2CCE")) && !flags.flag("CCE_CORRECTION::UNIT_TEST")) {
       if (aurostd::toupper(flags.getattachedscheme("CCE_CORRECTION::PRINT")) == "JSON") {
         output << "{";
         output << "\"cation_coordination_numbers\":";
@@ -2910,7 +2910,7 @@ namespace cce {
       }
     }
     if (aurostd::toupper(flags.getattachedscheme("CCE_CORRECTION::PRINT")) == "JSON") {
-      if (!(flags.flag("CCE_CORRECTION::POSCAR_PATH") && !flags.flag("CCE_CORRECTION::UNIT_TEST"))) {
+      if (!((flags.flag("CCE_CORRECTION::POSCAR_PATH") || flags.flag("CCE_CORRECTION::POSCAR2CCE")) && !flags.flag("CCE_CORRECTION::UNIT_TEST"))) {
         output << "{";
       }
       output << print_JSON_corrections(structure, cce_vars);
