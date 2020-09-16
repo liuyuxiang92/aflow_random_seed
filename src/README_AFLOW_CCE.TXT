@@ -19,40 +19,73 @@ https://doi.org/10.1038/s41524-019-0192-1
 Please cite this article when using this method and/or this implementation.
 The corrections depend on the number of cation-anion bonds and on the cation oxidation state.
 The current implementation requires a structure file as input and will return the CCE corrections for
-the DFT formation energies for PBE, LDA and SCAN if the oxidation numbers can be determined.
+the DFT formation enthalpies for PBE, LDA and SCAN if the oxidation numbers can be determined.
 The oxidation numbers can be provided by the user or can be automatically determined from the
 structure using Allen electronegativities.
-In addition, the user can provide precalculated DFT formation energies for PBE, LDA and SCAN and the 
+In addition, the user can provide precalculated DFT formation enthalpies for PBE, LDA and SCAN and the
 implementation will directly calculate and return the CCE formation enthalpies at both 298.15 and 0 K.
-If DFT formation energies are provided as additional input, the functionals corresponding to those 
-energies are required. They need to be given in the same sequence as the precalculated DFT formation 
-energies they correspond to.
-However, when you specify only one formation energy, no functional is required as it is assumed to 
+If DFT formation enthalpies are provided as additional input, the functionals corresponding to those
+enthalpies are required. They need to be given in the same sequence as the precalculated DFT formation
+enthalpies they correspond to.
+However, when you specify only one formation enthalpy, no functional is required as it is assumed to
 be PBE (default).
 Details for the options available are explained in the following.
 
 (ii) AVAILABLE OPTIONS:
---cce                         Prints user instructions.
---cce=STRUCTURE_FILE_PATH     Provide the path to the structure file. It can be in any structure 
-                              format that AFLOW supports, e.g. VASP POSCAR, QE, aims, ... 
-                              For VASP, a VASP5 POSCAR is required.
---dft_formation_energies=     Provide a comma separated list of precalculated DFT formation energies, 
-                              they are assumed to be: (i) negative for compounds lower in energy 
-                              than the elements, (ii) in eV/cell. Currently, corrections are available 
-                              for PBE, LDA and SCAN.
---functionals=                Provide a comma separated list of functionals for which corrections 
-                              should be returned. If used together with --dft_formation energies, 
-                              the functionals must be in the same sequence as the DFT formation 
-                              energies they correspond to. Available functionals are:
-                              (i) PBE, (ii) LDA or (iii) SCAN. Default: PBE (if only one DFT formation 
-                              energy is provided).
---oxidation_numbers=          Provide as a comma separated list the oxidation numbers. It is 
-                              assumed that: (i) one is provided for each atom of the structure and 
-                              (ii) they are in the same sequence as the corresponding atoms in the 
-                              provided structure file.
---poscar2cce < STRUCT_FILE    Determines the CCE corrections for the structure in file STRUCT_FILE. 
-                              It can be in any structure format that AFLOW supports, e.g. VASP POSCAR,
-                              QE, aims, ... For VASP, a VASP5 POSCAR is required.
+--cce                            Prints user instructions.
+
+--cce=STRUCTURE_FILE_PATH        Provide the path to the structure file. It can be in any structure
+                                 format that AFLOW supports, e.g. VASP POSCAR, QE, AIMS, ABINIT, ELK, and CIF.
+                                 For VASP, a VASP5 POSCAR is required or if a VASP4 POSCAR is used, the species
+                                 must be written on the right side next to the coordinates for each atom
+                                 just as for the EXAMPLE INPUT STRUCTURE FOR ROCKSALT MgO below.
+
+--enthalpies_formation_dft=|--dfte=
+                                 Provide a comma separated list of precalculated DFT formation enthalpies,
+                                 they are assumed to be: (i) negative for compounds lower in enthalpy
+                                 than the elements, (ii) in eV/cell. Currently, corrections are available
+                                 for PBE, LDA and SCAN.
+
+--functionals=|--func=|--functional=
+                                 Provide a comma separated list of functionals for which corrections
+                                 should be returned. If used together with --enthalpies_formation_dft,
+                                 the functionals must be in the same sequence as the DFT formation
+                                 enthalpies they correspond to. Available functionals are:
+                                 (i) PBE, (ii) LDA or (iii) SCAN. Default: PBE (if only one DFT formation
+                                 enthalpy is provided).
+
+--oxidation_numbers=|--ox_nums=|--oxidation_number=
+                                 Provide as a comma separated list the oxidation numbers. It is
+                                 assumed that: (i) one is provided for each atom of the structure and
+                                 (ii) they are in the same sequence as the corresponding atoms in the
+                                 provided structure file.
+
+--get_cce_correction|--get_cce_cor|--poscar2cce < STRUCTURE_FILE_PATH
+                                 Determines the CCE corrections for the structure in STRUCTURE_FILE_PATH.
+                                 It can be in any structure format that AFLOW supports, e.g. VASP POSCAR,
+                                 QE, AIMS, ABINIT, ELK, and CIF. For VASP, a VASP5 POSCAR is required or if a
+                                 VASP4 POSCAR is used, the species must be written on the right side next to
+                                 the coordinates for each atom just as for the EXAMPLE INPUT STRUCTURE FOR
+                                 ROCKSALT MgO below.
+
+--get_oxidation_numbers|--get_ox_nums|--poscar2ox_nums < STRUCTURE_FILE_PATH
+                                 Determines the oxidation numbers for the structure in STRUCTURE_FILE_PATH.
+                                 It can be in any structure format that AFLOW supports, e.g. VASP POSCAR,
+                                 QE, AIMS, ABINIT, ELK, and CIF. For VASP, a VASP5 POSCAR is required or if a
+                                 VASP4 POSCAR is used, the species must be written on the right side next to
+                                 the coordinates for each atom just as for the EXAMPLE INPUT STRUCTURE FOR
+                                 ROCKSALT MgO below.
+
+--get_cation_coordination_numbers|--get_cation_coord_nums|--poscar2cation_coord_nums < STRUCTURE_FILE_PATH
+                                 Determines the number of anion neighbors for each cation for the structure
+                                 in STRUCTURE_FILE_PATH. It can be in any structure format that AFLOW
+                                 supports, e.g. VASP POSCAR, QE, AIMS, ABINIT, ELK, and CIF. For VASP, a
+                                 VASP5 POSCAR is required or if a VASP4 POSCAR is used, the species must
+                                 be written on the right side next to the coordinates for each atom just
+                                 as for the EXAMPLE INPUT STRUCTURE FOR ROCKSALT MgO below.
+
+--print=                         Obtain output in standard format (--print=out) or as json (--print=json).
+                                 Default: out.
 
 (iii) EXAMPLE INPUT STRUCTURE FOR ROCKSALT MgO:
 Mg1O1   [FCC,FCC,cF8] (STD_PRIM doi:10.1  [FCC,FCC,cF8] (STD_PRIM doi:10.1016/j.commatsci.2010.05.010)
@@ -70,13 +103,13 @@ Direct(2) [A1B1]
 Assuming that AFLOW is in your PATH and you saved the above example structure file for MgO 
 in the current directory as POSCAR, the following commands can be executed:
 
-aflow --cce=POSCAR --dft_formation_energies=-5.434,-6.220,-6.249 --functionals=PBE,LDA,SCAN
+aflow --cce=POSCAR --enthalpies_formation_dft=-5.434,-6.220,-6.249 --functionals=PBE,LDA,SCAN
 This will give you the CCE corrections and CCE formation enthalpies for PBE, LDA, and SCAN for MgO.
 
-aflow --cce=POSCAR --dft_formation_energies=-6.220 --functionals=LDA
+aflow --cce=POSCAR --enthalpies_formation_dft=-6.220 --functionals=LDA
 This gives you only the CCE corrections and CCE formation enthalpies for LDA.
 
-aflow --cce=POSCAR --dft_formation_energies=-5.434
+aflow --cce=POSCAR --enthalpies_formation_dft=-5.434
 This gives you the CCE corrections and CCE formation enthalpies for PBE with a warning that 
 PBE is assumed as functional.
 

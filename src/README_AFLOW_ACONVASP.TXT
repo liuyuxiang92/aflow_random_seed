@@ -730,21 +730,23 @@ LATTICES = (the ones with "")
 
   aflow --cce[=STRUCT_FILE --usage]
         Prints user instructions for CCE.
-  aflow --cce=STRUCT_FILE
+  aflow --cce|--cce_correction=STRUCT_FILE
         options:
             [ --usage ]
             [ --functionals=PBE|LDA|SCAN]
-            [ --dft_formation_energies=form_energy_1,form_energy_2,...]
+            [ --enthalpies_formation_dft|dft_formation_enthalpies=form_enthalpy_1,form_enthalpy_2,...]
             [ --oxidation_numbers=ox_num_1,ox_num_2,...]
             [ --print=json|out] (default is out)
 
-        Determines the CCE corrections for the structure in file STRUCT_FILE. It can be in any structure 
-        format that AFLOW supports, e.g. VASP POSCAR, QE, aims, ... For VASP, a VASP5 POSCAR is required.
-        Precalculated DFT formation energies can be provided as a comma separated list using the option
-        --dft_formation_energies= in eV/cell.
+        Determines the CCE corrections for the structure in file STRUCT_FILE. It can be in any structure
+        format that AFLOW supports, e.g. VASP POSCAR, QE, AIMS, ABINIT, ELK, and CIF. For VASP, a VASP5
+        POSCAR is required or, if a VASP4 POSCAR is used, the species must be written on the right side
+        next to the coordinates for each atom.
+        Precalculated DFT formation enthalpies can be provided as a comma separated list using the option
+        --enthalpies_formation_dft= in eV/cell.
         Functionals for which corrections should be returned can be provided as a comma separated list 
-        using the option --functionals=. If used together with --dft_formation energies, the functionals
-        must be in the same sequence as the DFT formation energies they correspond to. 
+        using the option --functionals=. If used together with --dft_formation enthalpies, the functionals
+        must be in the same sequence as the DFT formation enthalpies they correspond to. 
         Oxidation numbers can be provided as a comma separated list using the option --oxidation_numbers=
         It is assumed that: (i) one is provided for each atom of the structure and (ii) they are in the 
         same sequence as the corresponding atoms in the provided structure file.
@@ -1370,6 +1372,18 @@ LATTICES = (the ones with "")
   aflow --frac [-f,-d,--fract,--fractional,--direct] < POSCAR
         Outputs to standard out a new POSCAR file with
         atom positions in direct (fractional) coordinates.
+
+  aflow --get_cation_coordination_numbers|--get_cation_coord_nums|--poscar2cation_coord_nums < STRUC_FILE
+        Determines the number of anion neighbors for each cation for the structure in file STRUC_FILE.
+        It can be in any structure format that AFLOW supports, e.g. VASP POSCAR, QE, AIMS, ABINIT, ELK, and CIF.
+        For VASP, a VASP5 POSCAR is required or, if a VASP4 POSCAR is used, the species must be written
+        on the right side next to the coordinates for each atom. (RF20200820)
+
+  aflow --get_oxidation_numbers|--get_ox_nums|--poscar2ox_nums < STRUC_FILE
+        Determines the oxidation numbers for the structure in file STRUC_FILE. It can be in any structure
+        format that AFLOW supports, e.g. VASP POSCAR, QE, AIMS, ABINIT, ELK, and CIF. For VASP, a VASP5 POSCAR
+        is required or, if a VASP4 POSCAR is used, the species must be written on the right side next to
+        the coordinates for each atom.
 
   aflow --getTEMP[s] [--runstat | --runbar | --refresh=X | --warning_beep=T | --warning_halt=T ]
         If available, the command outputs the hostname and temperatures of the machine. Useful to find hardware issues:
@@ -2671,20 +2685,22 @@ LATTICES = (the ones with "")
         Makes an "almost standard" aflow.in starting from the poscar.
         Useful for scripting (SC100630).
 
-  aflow --poscar2cce < STRUCT_FILE
+  aflow --poscar2cce|--get_cce_correction|--get_cce_cor < STRUCT_FILE
         options:
             [ --functionals=PBE|LDA|SCAN]
-            [ --dft_formation_energies=form_energy_1,form_energy_2,...]
+            [ --enthalpies_formation_dft|dft_formation_enthalpies=form_enthalpy_1,form_enthalpy_2,...]
             [ --oxidation_numbers=ox_num_1,ox_num_2,...]
             [ --print=json|out] (default is out)
 
-        Determines the CCE corrections for the structure in file STRUCT_FILE. It can be in any structure 
-        format that AFLOW supports, e.g. VASP POSCAR, QE, aims, ... For VASP, a VASP5 POSCAR is required.
-        Precalculated DFT formation energies can be provided as a comma separated list using the option
-        --dft_formation_energies= in eV/cell.
+        Determines the CCE corrections for the structure in file STRUCT_FILE. It can be in any structure
+        format that AFLOW supports, e.g. VASP POSCAR, QE, AIMS, ABINIT, ELK, and CIF. For VASP, a VASP5
+        POSCAR is required or, if a VASP4 POSCAR is used, the species must be written on the right side
+        next to the coordinates for each atom.
+        Precalculated DFT formation enthalpies can be provided as a comma separated list using the option
+        --enthalpies_formation_dft= in eV/cell.
         Functionals for which corrections should be returned can be provided as a comma separated list 
-        using the option --functionals=. If used together with --dft_formation energies, the functionals
-        must be in the same sequence as the DFT formation energies they correspond to. 
+        using the option --functionals=. If used together with --dft_formation enthalpies, the functionals
+        must be in the same sequence as the DFT formation enthalpies they correspond to. 
         Oxidation numbers can be provided as a comma separated list using the option --oxidation_numbers=
         It is assumed that: (i) one is provided for each atom of the structure and (ii) they are in the 
         same sequence as the corresponding atoms in the provided structure file.

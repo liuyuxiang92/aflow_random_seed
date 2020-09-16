@@ -353,6 +353,55 @@ bool smithTest(ofstream& FileMESSAGE,ostream& oss){  //CO20190520
   return TRUE; //CO20180419
 }
 
+bool coordinationTest(ostream& oss){ofstream FileMESSAGE;return coordinationTest(FileMESSAGE,oss);}  //CO20190520
+bool coordinationTest(ofstream& FileMESSAGE,ostream& oss){  //CO20190520
+  string soliloquy=XPID+"coordinationTest():";
+  bool LDEBUG=TRUE; // TRUE;
+  stringstream message;
+  _aflags aflags;aflags.Directory=".";
+
+  xstructure str("aflowlib.duke.edu:AFLOWDATA/ICSD_WEB/FCC/Cl1Na1_ICSD_240599","CONTCAR.relax.vasp",IOAFLOW_AUTO);
+  deque<deque<uint> > coordinations;
+  str.GetCoordinations(coordinations);
+  if(coordinations.size()<2){
+    if(LDEBUG){cerr << soliloquy << " coordinations not found" << endl;}
+    return FALSE;
+  }
+  if(coordinations[0].size()<2){
+    if(LDEBUG){cerr << soliloquy << " coordinations[0] not found" << endl;}
+    return FALSE;
+  }
+  if(coordinations[1].size()<2){
+    if(LDEBUG){cerr << soliloquy << " coordinations[1] not found" << endl;}
+    return FALSE;
+  }
+  //first iatom
+  //first shell
+  if(coordinations[0][0]!=6){
+    if(LDEBUG){cerr << soliloquy << " coordinations[0][0]!=6 (==" << coordinations[0][0] << ")" << endl;}
+    return FALSE;
+  }
+  //second shell
+  if(coordinations[0][1]!=12){
+    if(LDEBUG){cerr << soliloquy << " coordinations[0][1]!=12 (==" << coordinations[0][1] << ")" << endl;}
+    return FALSE;
+  }
+  //second iatom
+  //first shell
+  if(coordinations[1][0]!=6){
+    if(LDEBUG){cerr << soliloquy << " coordinations[1][0]!=6 (==" << coordinations[1][0] << ")" << endl;}
+    return FALSE;
+  }
+  //second shell
+  if(coordinations[1][1]!=12){
+    if(LDEBUG){cerr << soliloquy << " coordinations[1][1]!=12 (==" << coordinations[1][1] << ")" << endl;}
+    return FALSE;
+  }
+
+  message << "coordination test successful";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_COMPLETE_);
+  return TRUE; //CO20180419
+}
+
 int main(int _argc,char **_argv) {
   string soliloquy = XPID + "main():"; //CO20180419
   ostream& oss=cout;  //CO20180419
@@ -527,6 +576,7 @@ int main(int _argc,char **_argv) {
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_Egap|--Egap_test")) {return (EgapTest()?0:1);}  //CO20190601
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_gcd|--gcd_test")) {return (gcdTest()?0:1);}  //CO20190601
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_smith|--smith_test")) {return (smithTest()?0:1);}  //CO20190601
+    if(!Arun && aurostd::args2flag(argv,cmds,"--test_coordination|--coordination_test")) {return (coordinationTest()?0:1);}  //CO20190601
     if(!Arun && aurostd::args2flag(argv,cmds,"--test")) {
 
       if(XHOST.vext.size()!=XHOST.vcat.size()) {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"XHOST.vext.size()!=XHOST.vcat.size(), aborting.",_RUNTIME_ERROR_);}

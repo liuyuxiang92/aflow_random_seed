@@ -15325,16 +15325,17 @@ xmatrix<double> GetDistMatrix(const xstructure& aa){
       distsij(it1+1,it2+1)=distsij(it2+1,it1+1)=AUROSTD_MAX_DOUBLE;
     }
   }
-  uint atom1;
+  uint atom1=0,atom2=0;
+  uint it1=0,it2=0,ia1=0,ia2=0;
   double distij,min_dist;
-  for(uint it1=0;it1<atom_types.size();it1++){      //type 1 (must be in this order)
-    for(uint it2=it1;it2<atom_types.size();it2++){  //type 2 (must be in this order)
+  for(it1=0;it1<atom_types.size();it1++){      //type 1 (must be in this order)
+    for(it2=it1;it2<atom_types.size();it2++){  //type 2 (must be in this order)
       if(LDEBUG) {cerr << "GetDistMatrix: finding min dist between itype=" << it1 << " and itype=" << it2 << endl;}
       min_dist=AUROSTD_MAX_DOUBLE;                                      //reset min_dist
-      for(uint ia1=0;ia1<atom_types[it1].size();ia1++){                 //must go through all atoms of same type
+      for(ia1=0;ia1<atom_types[it1].size();ia1++){                 //must go through all atoms of same type
         atom1=xstr_cluster.grid_atoms_pc2scMap[atom_types[it1][ia1]];   //get respective index in cluster
-        for(uint ia2=0;ia2<atom_types[it2].size();ia2++){               //must go through all atoms of the same type
-          for(uint atom2=0;atom2<(uint)xstr_cluster.grid_atoms_number;atom2++){ //go through all atoms of the cluster
+        for(ia2=0;ia2<atom_types[it2].size();ia2++){               //must go through all atoms of the same type
+          for(atom2=0;atom2<(uint)xstr_cluster.grid_atoms_number;atom2++){ //go through all atoms of the cluster
             if(atom1!=atom2 && a.atoms[atom_types[it2][ia2]].type==xstr_cluster.grid_atoms[atom2].type){  //cannot be same index (dist=0), and must be the types we want
               distij=AtomDist(xstr_cluster.grid_atoms[atom1],xstr_cluster.grid_atoms[atom2]); //distance
               if(0&&LDEBUG){
@@ -15381,68 +15382,54 @@ vector<double> GetNBONDXX(const xstructure& a){
 // GenerateGridAtoms
 // **************************************************************************
 // make grid of atoms !
-int xstructure::GenerateGridAtoms(int i1,int i2,int j1,int j2,int k1,int k2) {
-  int GenerateGridAtoms(xstructure& str,int i1,int i2,int j1,int j2,int k1,int k2);
-  return GenerateGridAtoms(*this,i1,i2,j1,j2,k1,k2);
-}
-
-int xstructure::GenerateGridAtoms(int d1,int d2,int d3) {
-  int GenerateGridAtoms(xstructure& str,int i1,int i2,int j1,int j2,int k1,int k2);
-  return GenerateGridAtoms(*this,-d1,d1,-d2,d2,-d3,d3);
-}
-
-int xstructure::GenerateGridAtoms(int d) {
-  int GenerateGridAtoms(xstructure& str,int i1,int i2,int j1,int j2,int k1,int k2);
-  return GenerateGridAtoms(*this,-d,d,-d,d,-d,d);
-}
-
-int GenerateGridAtoms(xstructure& str,int i1,int i2,int j1,int j2,int k1,int k2) { //DX20191218
-  return GenerateGridAtoms_20191218(str,i1,i2,j1,j2,k1,k2);
-}
-
-int GenerateGridAtoms_20190520(xstructure& str,int i1,int i2,int j1,int j2,int k1,int k2) { //DX20191218 - added date [ORIG]
+int xstructure::GenerateGridAtoms(double radius) {return GenerateGridAtoms(LatticeDimensionSphere((*this),radius));} // radius is not normalized over the scale
+int xstructure::GenerateGridAtoms(int d) {return GenerateGridAtoms(-d,d,-d,d,-d,d);}
+int xstructure::GenerateGridAtoms(int d1,int d2,int d3) {return GenerateGridAtoms(-d1,d1,-d2,d2,-d3,d3);}
+int xstructure::GenerateGridAtoms(const xvector<int>& dims) {return GenerateGridAtoms(-dims(1),dims(1),-dims(2),dims(2),-dims(3),dims(3));} //CO20200912
+int xstructure::GenerateGridAtoms(int i1,int i2,int j1,int j2,int k1,int k2) {return GenerateGridAtoms_20191218(i1,i2,j1,j2,k1,k2);}
+int xstructure::GenerateGridAtoms_20190520(int i1,int i2,int j1,int j2,int k1,int k2) { //DX20191218 - added date [ORIG]
   bool LDEBUG=(FALSE || XHOST.DEBUG); //CO20190520
   string soliloquy = XPID + "GenerateGridAtoms():"; //CO20190520
   if(LDEBUG) { //CO20190520
-    cerr << soliloquy << " str=" << endl;cerr << str << endl; //CO20190520
+    cerr << soliloquy << " str=" << endl;cerr << (*this) << endl; //CO20190520
     cerr << soliloquy << " i=" << i1 << ":" << i2 << endl; //CO20190520
     cerr << soliloquy << " j=" << j1 << ":" << j2 << endl; //CO20190520
     cerr << soliloquy << " k=" << k1 << ":" << k2 << endl; //CO20190520
   } //CO20190520
   // same scale as before
-  str.grid_atoms.clear();
-  str.grid_atoms_sc2pcMap.clear(); str.grid_atoms_pc2scMap.clear();
+  grid_atoms.clear();
+  grid_atoms_sc2pcMap.clear(); grid_atoms_pc2scMap.clear();
   _atom atom;
-  str.BringInCell();  // are INCELL.
+  BringInCell();  // are INCELL.
   //xvector<double> a1(3),a2(3),a3(3);                     // a1,a2,a3 are the rows of the lattice matrix
-  //a1=str.lattice(1);a2=str.lattice(2);a3=str.lattice(3); // a1,a2,a3 are the rows of the lattice matrix
-  const xvector<double>& a1=str.lattice(1);  //CO20190520 - no need to make copies
-  const xvector<double>& a2=str.lattice(2);  //CO20190520 - no need to make copies
-  const xvector<double>& a3=str.lattice(3);  //CO20190520 - no need to make copies
+  //a1=lattice(1);a2=lattice(2);a3=lattice(3); // a1,a2,a3 are the rows of the lattice matrix
+  const xvector<double>& a1=lattice(1);  //CO20190520 - no need to make copies
+  const xvector<double>& a2=lattice(2);  //CO20190520 - no need to make copies
+  const xvector<double>& a3=lattice(3);  //CO20190520 - no need to make copies
 
-  for(uint iat=0;iat<str.atoms.size();iat++){
-    str.grid_atoms.push_back(str.atoms[iat]);  // put first the unit cell ! //DX20190709 - at to [] = speed increase
-    str.grid_atoms_pc2scMap.push_back(str.grid_atoms.size()-1); //CO20171025 
-    str.grid_atoms_sc2pcMap.push_back(iat); //CO20171025
+  for(uint iat=0;iat<atoms.size();iat++){
+    grid_atoms.push_back(atoms[iat]);  // put first the unit cell ! //DX20190709 - at to [] = speed increase
+    grid_atoms_pc2scMap.push_back(grid_atoms.size()-1); //CO20171025 
+    grid_atoms_sc2pcMap.push_back(iat); //CO20171025
   }
   for(int i=i1;i<=i2;i++) {
     for(int j=j1;j<=j2;j++) {
       for(int k=k1;k<=k2;k++) {
         if(i!=0 || j!=0 || k!=0) {
-          for(uint iat=0;iat<str.atoms.size();iat++) {
-            atom=str.atoms[iat]; //DX20190709 - at to [] = speed increase
+          for(uint iat=0;iat<atoms.size();iat++) {
+            atom=atoms[iat]; //DX20190709 - at to [] = speed increase
             atom.isincell=FALSE; // these are OUT OF CELL
-            atom.cpos=((double)i)*a1+((double)j)*a2+((double)k)*a3+str.atoms[iat].cpos; //DX20190709 - at to [] = speed increase
-            atom.fpos[1]=i+str.atoms[iat].fpos[1]; //DX20190709 - at to [] = speed increase
-            atom.fpos[2]=j+str.atoms[iat].fpos[2]; //DX20190709 - at to [] = speed increase
-            atom.fpos[3]=k+str.atoms[iat].fpos[3]; //DX20190709 - at to [] = speed increase
-            str.grid_atoms.push_back(atom);
-            str.grid_atoms_sc2pcMap.push_back(iat); //CO20171025
+            atom.cpos=((double)i)*a1+((double)j)*a2+((double)k)*a3+atoms[iat].cpos; //DX20190709 - at to [] = speed increase
+            atom.fpos[1]=i+atoms[iat].fpos[1]; //DX20190709 - at to [] = speed increase
+            atom.fpos[2]=j+atoms[iat].fpos[2]; //DX20190709 - at to [] = speed increase
+            atom.fpos[3]=k+atoms[iat].fpos[3]; //DX20190709 - at to [] = speed increase
+            grid_atoms.push_back(atom);
+            grid_atoms_sc2pcMap.push_back(iat); //CO20171025
             if(LDEBUG) { //CO20190520
-              cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].cpos=" << str.grid_atoms.back().cpos << endl; //CO20190520
-              cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].fpos=" << str.grid_atoms.back().fpos << endl; //CO20190520
-              cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "]=" << str.grid_atoms.back() << endl; //DX20191218
-              cerr << soliloquy << " grid_atoms_sc2pcMap[" << str.grid_atoms.size()-1 << "]=" << str.grid_atoms_sc2pcMap.back() << endl; //DX20191218
+              cerr << soliloquy << " grid_atoms[" << grid_atoms.size()-1 << "].cpos=" << grid_atoms.back().cpos << endl; //CO20190520
+              cerr << soliloquy << " grid_atoms[" << grid_atoms.size()-1 << "].fpos=" << grid_atoms.back().fpos << endl; //CO20190520
+              cerr << soliloquy << " grid_atoms[" << grid_atoms.size()-1 << "]=" << grid_atoms.back() << endl; //DX20191218
+              cerr << soliloquy << " grid_atoms_sc2pcMap[" << grid_atoms.size()-1 << "]=" << grid_atoms_sc2pcMap.back() << endl; //DX20191218
             } //CO20190520
           }
         }
@@ -15451,45 +15438,45 @@ int GenerateGridAtoms_20190520(xstructure& str,int i1,int i2,int j1,int j2,int k
   }
   if(0){  //CO20190808 - quick check of mindist
     double min_dist_local=AUROSTD_MAX_DOUBLE,min_dist=AUROSTD_MAX_DOUBLE;
-    for(uint i=0;i<str.grid_atoms.size()-1;i++){
-      for(uint j=i+1;j<str.grid_atoms.size();j++){
-        min_dist_local=aurostd::modulus(str.grid_atoms[i].cpos-str.grid_atoms[j].cpos);
+    for(uint i=0;i<grid_atoms.size()-1;i++){
+      for(uint j=i+1;j<grid_atoms.size();j++){
+        min_dist_local=aurostd::modulus(grid_atoms[i].cpos-grid_atoms[j].cpos);
         if(min_dist_local<min_dist){
           min_dist=min_dist_local;
         }
       }
     }
-    if(!aurostd::isequal(min_dist,SYM::minimumDistance(str),0.1)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Minimum distance changed, check that atoms are not rotated",_RUNTIME_ERROR_);}
+    if(!aurostd::isequal(min_dist,SYM::minimumDistance((*this)),0.1)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Minimum distance changed, check that atoms are not rotated",_RUNTIME_ERROR_);}
   }
-  str.grid_atoms_calculated=TRUE;
-  str.grid_atoms_dimsL[1]=i1;str.grid_atoms_dimsL[2]=j1;str.grid_atoms_dimsL[3]=k1;
-  str.grid_atoms_dimsH[1]=i2;str.grid_atoms_dimsH[2]=j2;str.grid_atoms_dimsH[3]=k2;
-  str.grid_atoms_number=str.grid_atoms.size();
-  //  for(uint i=0;i<str.grid_atoms.size();i++)
-  //   cerr << str.grid_atoms.at(i).cpos << endl;
-  // cerr << str.grid_atoms.size() << endl;
-  return str.grid_atoms.size();
+  grid_atoms_calculated=TRUE;
+  grid_atoms_dimsL[1]=i1;grid_atoms_dimsL[2]=j1;grid_atoms_dimsL[3]=k1;
+  grid_atoms_dimsH[1]=i2;grid_atoms_dimsH[2]=j2;grid_atoms_dimsH[3]=k2;
+  grid_atoms_number=grid_atoms.size();
+  //  for(uint i=0;i<grid_atoms.size();i++)
+  //   cerr << grid_atoms.at(i).cpos << endl;
+  // cerr << grid_atoms.size() << endl;
+  return grid_atoms.size();
 }
 
-int GenerateGridAtoms_20191218(xstructure& str,int i1,int i2,int j1,int j2,int k1,int k2) { //DX20191218 - [NEW]
+int xstructure::GenerateGridAtoms_20191218(int i1,int i2,int j1,int j2,int k1,int k2) { //DX20191218 - [NEW]
   bool LDEBUG=(FALSE || XHOST.DEBUG); //CO20190520
   string soliloquy = XPID + "GenerateGridAtoms():"; //CO20190520
   if(LDEBUG) { //CO20190520
-    cerr << soliloquy << " str=" << endl;cerr << str << endl; //CO20190520
+    cerr << soliloquy << " str=" << endl;cerr << (*this) << endl; //CO20190520
     cerr << soliloquy << " i=" << i1 << ":" << i2 << endl; //CO20190520
     cerr << soliloquy << " j=" << j1 << ":" << j2 << endl; //CO20190520
     cerr << soliloquy << " k=" << k1 << ":" << k2 << endl; //CO20190520
   } //CO20190520
   // same scale as before
-  str.grid_atoms.clear();
-  str.grid_atoms_sc2pcMap.clear(); str.grid_atoms_pc2scMap.clear();
+  grid_atoms.clear();
+  grid_atoms_sc2pcMap.clear(); grid_atoms_pc2scMap.clear();
   _atom atom;
-  str.BringInCell();  // are INCELL.
+  BringInCell();  // are INCELL.
   //xvector<double> a1(3),a2(3),a3(3);                     // a1,a2,a3 are the rows of the lattice matrix
-  //a1=str.lattice(1);a2=str.lattice(2);a3=str.lattice(3); // a1,a2,a3 are the rows of the lattice matrix
-  const xvector<double>& a1=str.lattice(1);  //CO20190520 - no need to make copies
-  const xvector<double>& a2=str.lattice(2);  //CO20190520 - no need to make copies
-  const xvector<double>& a3=str.lattice(3);  //CO20190520 - no need to make copies
+  //a1=lattice(1);a2=lattice(2);a3=lattice(3); // a1,a2,a3 are the rows of the lattice matrix
+  const xvector<double>& a1=lattice(1);  //CO20190520 - no need to make copies
+  const xvector<double>& a2=lattice(2);  //CO20190520 - no need to make copies
+  const xvector<double>& a3=lattice(3);  //CO20190520 - no need to make copies
   //DX20190709 - calculate and store once = speed - START
   vector<xvector<double> > l1, l2, l3;
   vector<int> a_index, b_index, c_index;
@@ -15499,38 +15486,38 @@ int GenerateGridAtoms_20191218(xstructure& str,int i1,int i2,int j1,int j2,int k
   //DX20191218 - calculate and store once = speed - END
 
   // resize vectors - DX20191122
-  uint num_grid_atoms = str.atoms.size()*l1.size()*l2.size()*l3.size();
-  str.grid_atoms.resize(num_grid_atoms);
-  str.grid_atoms_pc2scMap.resize(str.atoms.size()); //DX20191218 - should be the size of the the primitive cell, not grid
-  str.grid_atoms_sc2pcMap.resize(num_grid_atoms);
+  uint num_grid_atoms = atoms.size()*l1.size()*l2.size()*l3.size();
+  grid_atoms.resize(num_grid_atoms);
+  grid_atoms_pc2scMap.resize(atoms.size()); //DX20191218 - should be the size of the the primitive cell, not grid
+  grid_atoms_sc2pcMap.resize(num_grid_atoms);
 
   uint grid_atom_count = 0; // keep track of index - DX20191122
 
-  for(uint iat=0;iat<str.atoms.size();iat++){
-    //str.grid_atoms.push_back(str.atoms[iat]);  // put first the unit cell ! //DX20190709 - at to [] = speed increase
-    //str.grid_atoms_pc2scMap.push_back(str.grid_atoms.size()-1); //CO20171025 
-    //str.grid_atoms_sc2pcMap.push_back(iat); //CO20171025
-    str.grid_atoms[grid_atom_count] = str.atoms[iat];  // put first the unit cell ! //DX20190709 - at to [] = speed increase
-    str.grid_atoms_pc2scMap[grid_atom_count] = iat; //DX20191218 - use the index of the primitive cell not the running count of grid_atoms since it was resized
-    str.grid_atoms_sc2pcMap[grid_atom_count] = iat; //CO20171025
+  for(uint iat=0;iat<atoms.size();iat++){
+    //grid_atoms.push_back(atoms[iat]);  // put first the unit cell ! //DX20190709 - at to [] = speed increase
+    //grid_atoms_pc2scMap.push_back(grid_atoms.size()-1); //CO20171025 
+    //grid_atoms_sc2pcMap.push_back(iat); //CO20171025
+    grid_atoms[grid_atom_count] = atoms[iat];  // put first the unit cell ! //DX20190709 - at to [] = speed increase
+    grid_atoms_pc2scMap[grid_atom_count] = iat; //DX20191218 - use the index of the primitive cell not the running count of grid_atoms since it was resized
+    grid_atoms_sc2pcMap[grid_atom_count] = iat; //CO20171025
     grid_atom_count++; //DX20191122
   }
   //for(int i=i1;i<=i2;i++) {
   //for(int j=j1;j<=j2;j++) {
   //for(int k=k1;k<=k2;k++) {
   //if(i!=0 || j!=0 || k!=0) {
-  //for(uint iat=0;iat<str.atoms.size();iat++) {
-  //atom=str.atoms[iat]; //DX20190709 - at to [] = speed increase
+  //for(uint iat=0;iat<atoms.size();iat++) {
+  //atom=atoms[iat]; //DX20190709 - at to [] = speed increase
   //atom.isincell=FALSE; // these are OUT OF CELL
-  //atom.cpos=((double)i)*a1+((double)j)*a2+((double)k)*a3+str.atoms[iat].cpos; //DX20190709 - at to [] = speed increase
-  //atom.fpos[1]=i+str.atoms[iat].fpos[1]; //DX20190709 - at to [] = speed increase
-  //atom.fpos[2]=j+str.atoms[iat].fpos[2]; //DX20190709 - at to [] = speed increase
-  //atom.fpos[3]=k+str.atoms[iat].fpos[3]; //DX20190709 - at to [] = speed increase
-  //str.grid_atoms.push_back(atom);
-  //str.grid_atoms_sc2pcMap.push_back(iat); //CO20171025
+  //atom.cpos=((double)i)*a1+((double)j)*a2+((double)k)*a3+atoms[iat].cpos; //DX20190709 - at to [] = speed increase
+  //atom.fpos[1]=i+atoms[iat].fpos[1]; //DX20190709 - at to [] = speed increase
+  //atom.fpos[2]=j+atoms[iat].fpos[2]; //DX20190709 - at to [] = speed increase
+  //atom.fpos[3]=k+atoms[iat].fpos[3]; //DX20190709 - at to [] = speed increase
+  //grid_atoms.push_back(atom);
+  //grid_atoms_sc2pcMap.push_back(iat); //CO20171025
   //if(LDEBUG) { //CO20190520
-  //cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].cpos=" << str.grid_atoms.back().cpos << endl; //CO20190520
-  //cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].fpos=" << str.grid_atoms.back().fpos << endl; //CO20190520
+  //cerr << soliloquy << " grid_atoms[" << grid_atoms.size()-1 << "].cpos=" << grid_atoms.back().cpos << endl; //CO20190520
+  //cerr << soliloquy << " grid_atoms[" << grid_atoms.size()-1 << "].fpos=" << grid_atoms.back().fpos << endl; //CO20190520
   //} //CO20190520
   //}
   //}
@@ -15538,7 +15525,7 @@ int GenerateGridAtoms_20191218(xstructure& str,int i1,int i2,int j1,int j2,int k
   //}
   //}
   xvector<double> a_component(3), ab_component(3), abc_component(3); //DX+ME20191107 - define outside loop (speed increase)
-  uint natoms = str.atoms.size(); //DX20191107 - initialize natoms outside loop (speed increase)
+  uint natoms = atoms.size(); //DX20191107 - initialize natoms outside loop (speed increase)
   for(uint i=0;i<l1.size();i++) {
     a_component = l1[i];                           //DX : i*lattice(1)
     for(uint j=0;j<l2.size();j++) {
@@ -15548,28 +15535,28 @@ int GenerateGridAtoms_20191218(xstructure& str,int i1,int i2,int j1,int j2,int k
         if(a_index[i]!=0 || b_index[j]!=0 || c_index[k]!=0) //DX20191218
         { //CO20200106 - patching for auto-indenting
           abc_component = ab_component + l3[k];    //DX : i*lattice(1) + j*lattice(2) + k*lattice(3)
-          for(uint iat=0;iat<natoms;iat++) {       //DX20191107 - replace str.atoms.size() with natoms
-            atom=str.atoms[iat];                   //DX20190709 - at to [] = speed increase
+          for(uint iat=0;iat<natoms;iat++) {       //DX20191107 - replace atoms.size() with natoms
+            atom=atoms[iat];                   //DX20190709 - at to [] = speed increase
             atom.isincell=FALSE;                   // these are OUT OF CELL
-            //DX20191127 [OBOSLETE] atom.cpos=abc_component+str.atoms[iat].cpos; //DX20190709 - at to [] = speed increase
+            //DX20191127 [OBOSLETE] atom.cpos=abc_component+atoms[iat].cpos; //DX20190709 - at to [] = speed increase
             atom.cpos+=abc_component;              //DX20190709 - at to [] = speed increase //CO20191127 
-            //DX20191127 [OBOSLETE] atom.fpos[1]=a_index[i]+str.atoms[iat].fpos[1]; //DX20190709 - at to [] = speed increase
-            //DX20191127 [OBOSLETE] atom.fpos[2]=b_index[j]+str.atoms[iat].fpos[2]; //DX20190709 - at to [] = speed increase
-            //DX20191127 [OBOSLETE] atom.fpos[3]=c_index[k]+str.atoms[iat].fpos[3]; //DX20190709 - at to [] = speed increase
+            //DX20191127 [OBOSLETE] atom.fpos[1]=a_index[i]+atoms[iat].fpos[1]; //DX20190709 - at to [] = speed increase
+            //DX20191127 [OBOSLETE] atom.fpos[2]=b_index[j]+atoms[iat].fpos[2]; //DX20190709 - at to [] = speed increase
+            //DX20191127 [OBOSLETE] atom.fpos[3]=c_index[k]+atoms[iat].fpos[3]; //DX20190709 - at to [] = speed increase
             atom.fpos[1]+=a_index[i];              //DX20190709 - at to [] = speed increase //CO20191127
             atom.fpos[2]+=b_index[j];              //DX20190709 - at to [] = speed increase //CO20191127
             atom.fpos[3]+=c_index[k];              //DX20190709 - at to [] = speed increase //CO20191127
-            //DX20191122 [OBSOLETE-PUSH_BACK] str.grid_atoms.push_back(atom);
-            //DX20191122 [OBSOLETE-PUSH_BACK] str.grid_atoms_sc2pcMap.push_back(iat); //CO20171025
-            str.grid_atoms[grid_atom_count] = atom;
-            str.grid_atoms_sc2pcMap[grid_atom_count] = iat; //CO20171025
+            //DX20191122 [OBSOLETE-PUSH_BACK] grid_atoms.push_back(atom);
+            //DX20191122 [OBSOLETE-PUSH_BACK] grid_atoms_sc2pcMap.push_back(iat); //CO20171025
+            grid_atoms[grid_atom_count] = atom;
+            grid_atoms_sc2pcMap[grid_atom_count] = iat; //CO20171025
             //DX20200320 [OBSOLETE-moved outside of loop for speed] if(LDEBUG) { //CO20190520
-            //DX20200320 [OBSOLETE-moved outside of loop for speed]   //DX20191122 [OBSOLETE-PUSH_BACK] cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].cpos=" << str.grid_atoms.back().cpos << endl; //CO20190520
-            //DX20200320 [OBSOLETE-moved outside of loop for speed]   //DX20191122 [OBSOLETE-PUSH_BACK] cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].fpos=" << str.grid_atoms.back().fpos << endl; //CO20190520
-            //DX20200320 [OBSOLETE-moved outside of loop for speed]   cerr << soliloquy << " grid_atoms[" << grid_atom_count << "].cpos=" << str.grid_atoms[grid_atom_count].cpos << endl; //CO20190520
-            //DX20200320 [OBSOLETE-moved outside of loop for speed]   cerr << soliloquy << " grid_atoms[" << grid_atom_count << "].fpos=" << str.grid_atoms[grid_atom_count].fpos << endl; //CO20190520
-            //DX20200320 [OBSOLETE-moved outside of loop for speed]   cerr << soliloquy << " grid_atoms[" << grid_atom_count << "]=" << str.grid_atoms[grid_atom_count] << endl; //DX20191218
-            //DX20200320 [OBSOLETE-moved outside of loop for speed]   cerr << soliloquy << " grid_atoms_sc2pcMap[" << grid_atom_count << "]=" << str.grid_atoms_sc2pcMap[grid_atom_count] << endl; //DX20191218
+            //DX20200320 [OBSOLETE-moved outside of loop for speed]   //DX20191122 [OBSOLETE-PUSH_BACK] cerr << soliloquy << " grid_atoms[" << grid_atoms.size()-1 << "].cpos=" << grid_atoms.back().cpos << endl; //CO20190520
+            //DX20200320 [OBSOLETE-moved outside of loop for speed]   //DX20191122 [OBSOLETE-PUSH_BACK] cerr << soliloquy << " grid_atoms[" << grid_atoms.size()-1 << "].fpos=" << grid_atoms.back().fpos << endl; //CO20190520
+            //DX20200320 [OBSOLETE-moved outside of loop for speed]   cerr << soliloquy << " grid_atoms[" << grid_atom_count << "].cpos=" << grid_atoms[grid_atom_count].cpos << endl; //CO20190520
+            //DX20200320 [OBSOLETE-moved outside of loop for speed]   cerr << soliloquy << " grid_atoms[" << grid_atom_count << "].fpos=" << grid_atoms[grid_atom_count].fpos << endl; //CO20190520
+            //DX20200320 [OBSOLETE-moved outside of loop for speed]   cerr << soliloquy << " grid_atoms[" << grid_atom_count << "]=" << grid_atoms[grid_atom_count] << endl; //DX20191218
+            //DX20200320 [OBSOLETE-moved outside of loop for speed]   cerr << soliloquy << " grid_atoms_sc2pcMap[" << grid_atom_count << "]=" << grid_atoms_sc2pcMap[grid_atom_count] << endl; //DX20191218
             //DX20200320 [OBSOLETE-moved outside of loop for speed] } //CO20190520
             grid_atom_count++; //DX20191122
           }
@@ -15579,59 +15566,43 @@ int GenerateGridAtoms_20191218(xstructure& str,int i1,int i2,int j1,int j2,int k
   }
   //DX20200320 - moved outside of loop so that LDEBUG boolean is not checked every time (speed increase when grid atoms is large)
   if(LDEBUG) { //CO20190520
-    for(uint i=0;i<str.grid_atoms.size();i++){
-      //DX20191122 [OBSOLETE-PUSH_BACK] cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].cpos=" << str.grid_atoms.back().cpos << endl; //CO20190520
-      //DX20191122 [OBSOLETE-PUSH_BACK] cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].fpos=" << str.grid_atoms.back().fpos << endl; //CO20190520
-      cerr << soliloquy << " grid_atoms[" << i << "].cpos=" << str.grid_atoms[i].cpos << endl; //CO20190520
-      cerr << soliloquy << " grid_atoms[" << i << "].fpos=" << str.grid_atoms[i].fpos << endl; //CO20190520
-      cerr << soliloquy << " grid_atoms[" << i << "]=" << str.grid_atoms[i] << endl; //DX20191218
-      cerr << soliloquy << " grid_atoms_sc2pcMap[" << i << "]=" << str.grid_atoms_sc2pcMap[i] << endl; //DX20191218
+    for(uint i=0;i<grid_atoms.size();i++){
+      //DX20191122 [OBSOLETE-PUSH_BACK] cerr << soliloquy << " grid_atoms[" << grid_atoms.size()-1 << "].cpos=" << grid_atoms.back().cpos << endl; //CO20190520
+      //DX20191122 [OBSOLETE-PUSH_BACK] cerr << soliloquy << " grid_atoms[" << grid_atoms.size()-1 << "].fpos=" << grid_atoms.back().fpos << endl; //CO20190520
+      cerr << soliloquy << " grid_atoms[" << i << "].cpos=" << grid_atoms[i].cpos << endl; //CO20190520
+      cerr << soliloquy << " grid_atoms[" << i << "].fpos=" << grid_atoms[i].fpos << endl; //CO20190520
+      cerr << soliloquy << " grid_atoms[" << i << "]=" << grid_atoms[i] << endl; //DX20191218
+      cerr << soliloquy << " grid_atoms_sc2pcMap[" << i << "]=" << grid_atoms_sc2pcMap[i] << endl; //DX20191218
     } //CO20190520
   }
   if(0){  //CO20190808 - quick check of mindist
     double min_dist_local=AUROSTD_MAX_DOUBLE,min_dist=AUROSTD_MAX_DOUBLE;
-    for(uint i=0;i<str.grid_atoms.size()-1;i++){
-      for(uint j=i+1;j<str.grid_atoms.size();j++){
-        min_dist_local=aurostd::modulus(str.grid_atoms[i].cpos-str.grid_atoms[j].cpos);
+    for(uint i=0;i<grid_atoms.size()-1;i++){
+      for(uint j=i+1;j<grid_atoms.size();j++){
+        min_dist_local=aurostd::modulus(grid_atoms[i].cpos-grid_atoms[j].cpos);
         if(min_dist_local<min_dist){
           min_dist=min_dist_local;
         }
       }
     }
-    if(!aurostd::isequal(min_dist,SYM::minimumDistance(str),0.1)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Minimum distance changed, check that atoms are not rotated",_RUNTIME_ERROR_);}
+    if(!aurostd::isequal(min_dist,SYM::minimumDistance((*this)),0.1)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Minimum distance changed, check that atoms are not rotated",_RUNTIME_ERROR_);}
   }
-  str.grid_atoms_calculated=TRUE;
-  str.grid_atoms_dimsL[1]=i1;str.grid_atoms_dimsL[2]=j1;str.grid_atoms_dimsL[3]=k1;
-  str.grid_atoms_dimsH[1]=i2;str.grid_atoms_dimsH[2]=j2;str.grid_atoms_dimsH[3]=k2;
-  str.grid_atoms_number=str.grid_atoms.size();
-  //  for(uint i=0;i<str.grid_atoms.size();i++)
-  //   cerr << str.grid_atoms.at(i).cpos << endl;
-  // cerr << str.grid_atoms.size() << endl;
-  return str.grid_atoms.size();
+  grid_atoms_calculated=TRUE;
+  grid_atoms_dimsL[1]=i1;grid_atoms_dimsL[2]=j1;grid_atoms_dimsL[3]=k1;
+  grid_atoms_dimsH[1]=i2;grid_atoms_dimsH[2]=j2;grid_atoms_dimsH[3]=k2;
+  grid_atoms_number=grid_atoms.size();
+  //  for(uint i=0;i<grid_atoms.size();i++)
+  //   cerr << grid_atoms.at(i).cpos << endl;
+  // cerr << grid_atoms.size() << endl;
+  return grid_atoms.size();
 }
 
-int GenerateGridAtoms(xstructure& str,const double& radius) {
-  xvector<int> dims(3);
-  dims=LatticeDimensionSphere(str,radius);  // radius is not normalized over the scale
-  return GenerateGridAtoms(str,-dims(1),dims(1),-dims(2),dims(2),-dims(3),dims(3));
-}
-
-int GenerateGridAtoms(xstructure& str,int d1,int d2,int d3) {
-  return GenerateGridAtoms_20191218(str,-d1,d1,-d2,d2,-d3,d3);
-}
-
-int GenerateGridAtoms(xstructure& str,int d) {
-  return GenerateGridAtoms(str,-d,d,-d,d,-d,d);
-}
-
-int GenerateGridAtoms(xstructure& str,const xvector<int>& dims) {
-  return GenerateGridAtoms(str,-dims(1),dims(1),-dims(2),dims(2),-dims(3),dims(3));
-}
-
-int GenerateGridAtoms(xstructure& str) {
-  return GenerateGridAtoms(str,-1,1,-1,1,-1,1);
-}
-
+int GenerateGridAtoms(xstructure& str) {return str.GenerateGridAtoms(-1,1,-1,1,-1,1);}
+int GenerateGridAtoms(xstructure& str,double radius) {return str.GenerateGridAtoms(radius);}  //CO20200912 - double
+int GenerateGridAtoms(xstructure& str,int d) {return str.GenerateGridAtoms(d);}
+int GenerateGridAtoms(xstructure& str,int d1,int d2,int d3) {return str.GenerateGridAtoms(d1,d2,d3);}
+int GenerateGridAtoms(xstructure& str,int i1,int i2,int j1,int j2,int k1,int k2) {return str.GenerateGridAtoms(i1,i2,j1,j2,k1,k2);} //DX20191218
+int GenerateGridAtoms(xstructure& str,const xvector<int>& dims) {return str.GenerateGridAtoms(dims);} //CO20200912
 
 // **************************************************************************
 // GenerateLIJK table stuff
@@ -15903,6 +15874,312 @@ class compare_GetNeighData {
     }
 };
 
+//RF20200831 - checkStructure - START
+// **************************************************************************
+// checkStructure
+// **************************************************************************
+// rescale structure to 1 and check whether e.g. species and atoms are present
+void xstructure::checkStructure(){
+  bool LDEBUG = (FALSE || XHOST.DEBUG);
+  string soliloquy=XPID+"xstructure::checkStructure():";
+  stringstream message;
+  (*this).ReScale(1.0); // rescales scaling factor in second line of POSCAR to 1, needed for correct distances
+  //throw some general information such as input structure
+  if(LDEBUG){
+    cerr << soliloquy << endl << "INPUT STRUCTURE:" << endl;
+    cerr << soliloquy << (*this) << endl;
+  }
+  // check whether the species vector is populated, otherwise throw error
+  if ((*this).species.size() == 0){
+    message << " BAD NEWS: It seems there are no species in the structure. Please adjust the structure and rerun.";
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
+  }
+  // check whether there are any atoms in the structure
+  if ((*this).atoms.size() == 0){
+    message << " BAD NEWS: It seems there are no atoms in the structure. Please adjust the structure and rerun.";
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
+  }
+  // if species of atoms are not known like in VASP4 format, throw error
+  for(uint k=0,ksize=(*this).atoms.size();k<ksize;k++){
+    if ((*this).atoms[k].cleanname == ""){
+      message << " BAD NEWS: It seems you are providing a structure without complete species information as input. This implementation requires a structure with the species information included. For a VASP4 POSCAR, the species must be written on the right side next to the coordinates for each atom. Please adjust the structure and rerun.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
+    }
+  }
+}
+//RF20200831 - checkStructure - END
+
+
+// **************************************************************************
+// Function GetNeighbors
+// **************************************************************************
+// rewrite of GetNeighData()
+// atoms_cell is the atoms for which neighbors are found (could be iatoms), hence it determines the sizes of i_neighbors and distances
+// i_neighbors are indices to gird_atoms
+// CO20200912
+void xstructure::GetNeighbors(deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,double rmin,bool prim,bool unique_only){
+  deque<_atom> atoms_cell;
+  return GetNeighbors(atoms_cell,i_neighbors,distances,rmin,prim,unique_only);
+}
+void xstructure::GetNeighbors(deque<_atom>& atoms_cell,deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,double rmin,bool prim,bool unique_only){
+  double rmax=RadiusSphereLattice((*this).scale*(*this).lattice);
+  return GetNeighbors(atoms_cell,i_neighbors,distances,rmax,rmin,prim,unique_only);
+}
+void xstructure::GetNeighbors(deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,double rmax,double rmin,bool prim,bool unique_only){
+  deque<_atom> atoms_cell;
+  return GetNeighbors(atoms_cell,i_neighbors,distances,rmax,rmin,prim,unique_only);
+}
+void xstructure::GetNeighbors(deque<_atom>& atoms_cell,deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,double rmax,double rmin,bool prim,bool unique_only){
+  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  string soliloquy=XPID+"xstructure::GetNeighbors():";
+
+  uint i=0,k=0;
+
+  if(prim){GetPrimitive();}
+  ReScale(1.0);
+  //get atoms_cell
+  atoms_cell.clear(); //clear
+  for(i=0;i<i_neighbors.size();i++){i_neighbors[i].clear();} i_neighbors.clear(); //clear
+  for(i=0;i<distances.size();i++){distances[i].clear();} distances.clear(); //clear
+  vector<uint> atomscell2atoms_mapping;
+  if(unique_only){
+    if(iatoms_calculated==false){CalculateSymmetry();}
+    for(i=0;i<iatoms.size();i++){
+      atoms_cell.push_back(atoms[iatoms[i][0]]);
+      atomscell2atoms_mapping.push_back(iatoms[i][0]);
+      i_neighbors.push_back(deque<uint>(0));
+      distances.push_back(deque<double>(0));
+    }
+  }else{
+    for(uint i=0;i<atoms.size();i++){
+      atoms_cell.push_back(atoms[i]);
+      atomscell2atoms_mapping.push_back(i);
+      i_neighbors.push_back(deque<uint>(0));
+      distances.push_back(deque<double>(0));
+    }
+  }
+
+  if(LDEBUG){
+    cerr << soliloquy << " atoms_cell.size()=" << atoms_cell.size() << endl;
+    cerr << soliloquy << " atomscell2atoms_mapping=" << aurostd::joinWDelimiter(atomscell2atoms_mapping,",") << endl;
+  }
+
+  if(LDEBUG){cerr << soliloquy << " GenerateGridAtoms(): starting" << endl;}
+  GenerateGridAtoms(rmax);
+  if(LDEBUG){cerr << soliloquy << " GenerateGridAtoms(): done" << endl;}
+  if(LDEBUG){cerr << soliloquy << " grid_atoms_number=" << grid_atoms_number << endl;}
+
+  if(LDEBUG){cerr << soliloquy << " generating neighbors" << endl;}
+  //[STILL SLOWER THAN AUROSTD::SORT()]//[SHAVES 1 SECOND]vector<double> v_mindist;
+  double dist=0.0;
+  uint atom1=0,atom2=0;
+  for(i=0;i<atoms_cell.size();i++){
+    //[STILL SLOWER THAN AUROSTD::SORT()]//[SHAVES 1 SECOND]v_mindist.push_back(AUROSTD_MAX_DOUBLE);
+    atom1=grid_atoms_pc2scMap[atomscell2atoms_mapping[i]];
+    for(atom2=0;atom2<(uint)grid_atoms_number;atom2++){
+      if(atom1==atom2){continue;} //skip self
+      dist=AtomDist(grid_atoms[atom1],grid_atoms[atom2]); //distance
+      if(dist>rmin && dist<=rmax){
+        i_neighbors[i].push_back(atom2);
+        distances[i].push_back(dist);
+        //[STILL SLOWER THAN AUROSTD::SORT()]//[SHAVES 1 SECOND]if(dist<v_mindist.back()){v_mindist.back()=dist;}
+      }
+    }
+  }
+  
+  if(0){
+    //an attempt to shave off more runtime: only shaves off a second AT BEST for "make check_cce"
+    //the slowest part of the algorithm WAS sorting (using insertion sort), so reducing vector size would help
+    //now using quicksort, reducing the vector size does not help much (very efficient)
+    //to fully realize the 1 second shave off, replace min(distances[k]) with v_mindist (see above)
+    vector<uint> i2remove;
+    double cutoff=0.0;
+    for(k=0;k<distances.size();k++){
+      if(LDEBUG){cerr << soliloquy << " START distances[k=" << k << "].size()=" << distances[k].size() << endl;}
+      i2remove.clear();
+      cutoff=1.25*min(distances[k]); //v_mindist[k];  //focus on first shell: does not require an input tol
+      for(i=0;i<distances[k].size();i++){
+        if(distances[k][i]>cutoff){i2remove.push_back(i);}
+      }
+      for(i=i2remove.size()-1;i<i2remove.size();i--){
+        i_neighbors[k].erase(i_neighbors[k].begin()+i2remove[i]);
+        distances[k].erase(distances[k].begin()+i2remove[i]);
+      }
+      if(LDEBUG){cerr << soliloquy << " STOP  distances[k=" << k << "].size()=" << distances[k].size() << endl;}
+    }
+  }
+
+  //now sort
+  if(LDEBUG){cerr << soliloquy << " sorting" << endl;}
+  //[TOO SLOW FOR LARGE VECTORS]uint uint_tmp=0;
+  //[TOO SLOW FOR LARGE VECTORS]double double_tmp=0;
+  //[TOO SLOW FOR LARGE VECTORS]for(k=0;k<i_neighbors.size();k++){
+  //[TOO SLOW FOR LARGE VECTORS]  for(i=0;i<i_neighbors[k].size();i++){
+  //[TOO SLOW FOR LARGE VECTORS]    for(j=i+1;j<i_neighbors[k].size();j++){
+  //[TOO SLOW FOR LARGE VECTORS]      if(distances[k][j]<distances[k][i]){
+  //[TOO SLOW FOR LARGE VECTORS]        //std::swap(i_neighbors[k][i],i_neighbors[k][j]);
+  //[TOO SLOW FOR LARGE VECTORS]        uint_tmp=i_neighbors[k][i];
+  //[TOO SLOW FOR LARGE VECTORS]        i_neighbors[k][i]=i_neighbors[k][j];
+  //[TOO SLOW FOR LARGE VECTORS]        i_neighbors[k][j]=uint_tmp;
+  //[TOO SLOW FOR LARGE VECTORS]        //std::swap(distances[k][i],distances[k][j]);
+  //[TOO SLOW FOR LARGE VECTORS]        double_tmp=distances[k][i];
+  //[TOO SLOW FOR LARGE VECTORS]        distances[k][i]=distances[k][j];
+  //[TOO SLOW FOR LARGE VECTORS]        distances[k][j]=double_tmp;
+  //[TOO SLOW FOR LARGE VECTORS]      }
+  //[TOO SLOW FOR LARGE VECTORS]    }
+  //[TOO SLOW FOR LARGE VECTORS]  }
+  //[TOO SLOW FOR LARGE VECTORS]}
+  //[STILL SLOWER THAN AUROSTD::SORT()]vector<uint> i_sorting;
+  //[STILL SLOWER THAN AUROSTD::SORT()]deque<uint> i_neighborsk; //copy
+  //[STILL SLOWER THAN AUROSTD::SORT()]deque<double> distancesk; //copy
+  //[STILL SLOWER THAN AUROSTD::SORT()]for(k=0;k<i_neighbors.size();k++){
+  //[STILL SLOWER THAN AUROSTD::SORT()]  i_neighborsk=i_neighbors[k];  //copy
+  //[STILL SLOWER THAN AUROSTD::SORT()]  distancesk=distances[k];  //copy
+  //[STILL SLOWER THAN AUROSTD::SORT()]  i_sorting.clear();for(i=0;i<i_neighbors[k].size();i++){i_sorting.push_back(i);}
+  //[STILL SLOWER THAN AUROSTD::SORT()]  std::sort(i_sorting.begin(),i_sorting.end(),[&](uint a, uint b) {return distances[k][a]<distances[k][b];});
+  //[STILL SLOWER THAN AUROSTD::SORT()]  //reorder
+  //[STILL SLOWER THAN AUROSTD::SORT()]  //https://stackoverflow.com/questions/838384/reorder-vector-using-a-vector-of-indices
+  //[STILL SLOWER THAN AUROSTD::SORT()]  //do NOT use a reordering algorithm, it takes a LONG time
+  //[STILL SLOWER THAN AUROSTD::SORT()]  //instead make a copy, memory is not a problem here, as the order of the memory used does not change (2N vs. 4N)
+  //[STILL SLOWER THAN AUROSTD::SORT()]  for(i=0;i<i_sorting.size();i++){
+  //[STILL SLOWER THAN AUROSTD::SORT()]    i_neighbors[k][i]=i_neighborsk[i_sorting[i]];
+  //[STILL SLOWER THAN AUROSTD::SORT()]    distances[k][i]=distancesk[i_sorting[i]];
+  //[STILL SLOWER THAN AUROSTD::SORT()]  }
+  //[STILL SLOWER THAN AUROSTD::SORT()]}
+  for(k=0;k<i_neighbors.size();k++){aurostd::sort(distances[k],i_neighbors[k]);}
+
+  if(LDEBUG){
+    for(k=0;k<i_neighbors.size();k++){
+      cerr << soliloquy << " ATOMS_CELL[k=" << k << "]: " << atoms_cell[k].name << endl;
+      for(i=0;i<i_neighbors[k].size();i++){
+        cerr << "  neighbor[i=" << i << "]: " << grid_atoms[i_neighbors[k][i]].name << " dist=" << distances[k][i] << endl;
+      }
+    }
+  }
+
+}
+
+
+void GetNeighbors(const xstructure& xstr_in,deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,double rmin,bool prim,bool unique_only){
+  xstructure xstr(xstr_in);
+  return xstr.GetNeighbors(i_neighbors,distances,rmin,prim,unique_only);
+}
+void GetNeighbors(const xstructure& xstr_in,deque<_atom>& atoms_cell,deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,double rmin,bool prim,bool unique_only){
+  xstructure xstr(xstr_in);
+  return xstr.GetNeighbors(atoms_cell,i_neighbors,distances,rmin,prim,unique_only);
+}
+void GetNeighbors(const xstructure& xstr_in,deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,double rmax,double rmin,bool prim,bool unique_only){
+  xstructure xstr(xstr_in);
+  return xstr.GetNeighbors(i_neighbors,distances,rmax,rmin,prim,unique_only);
+}
+void GetNeighbors(const xstructure& xstr_in,deque<_atom>& atoms_cell,deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,double rmax,double rmin,bool prim,bool unique_only){
+  xstructure xstr(xstr_in);
+  return xstr.GetNeighbors(atoms_cell,i_neighbors,distances,rmax,rmin,prim,unique_only);
+}
+
+
+// **************************************************************************
+// Function GetCoordinations
+// **************************************************************************
+// CO20200912
+void xstructure::GetCoordinations(deque<deque<uint> >& coordinations,double rmin,double tol,bool prim,bool unique_only){
+  deque<deque<uint> > i_neighbors;
+  deque<deque<double> > distances;
+  return GetCoordinations(i_neighbors,distances,coordinations,tol,rmin,prim,unique_only);
+}
+void xstructure::GetCoordinations(deque<_atom>& atoms_cell,deque<deque<uint> >& coordinations,double rmin,double tol,bool prim,bool unique_only){
+  deque<deque<uint> > i_neighbors;
+  deque<deque<double> > distances;
+  return GetCoordinations(atoms_cell,i_neighbors,distances,coordinations,tol,rmin,prim,unique_only);
+}
+void xstructure::GetCoordinations(deque<deque<uint> >& coordinations,double rmax,double rmin,double tol,bool prim,bool unique_only){
+  deque<deque<uint> > i_neighbors;
+  deque<deque<double> > distances;
+  return GetCoordinations(i_neighbors,distances,coordinations,rmax,rmin,tol,prim,unique_only);
+}
+void xstructure::GetCoordinations(deque<_atom>& atoms_cell,deque<deque<uint> >& coordinations,double rmax,double rmin,double tol,bool prim,bool unique_only){
+  deque<deque<uint> > i_neighbors;
+  deque<deque<double> > distances;
+  return GetCoordinations(atoms_cell,i_neighbors,distances,coordinations,rmax,rmin,tol,prim,unique_only);
+}
+void xstructure::GetCoordinations(deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,deque<deque<uint> >& coordinations,double rmin,double tol,bool prim,bool unique_only){
+  deque<_atom> atoms_cell;
+  return GetCoordinations(atoms_cell,i_neighbors,distances,coordinations,tol,rmin,prim,unique_only);
+}
+void xstructure::GetCoordinations(deque<_atom>& atoms_cell,deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,deque<deque<uint> >& coordinations,double rmin,double tol,bool prim,bool unique_only){
+  double rmax=RadiusSphereLattice((*this).scale*(*this).lattice);
+  return GetCoordinations(atoms_cell,i_neighbors,distances,coordinations,rmax,rmin,tol,prim,unique_only);
+}
+void xstructure::GetCoordinations(deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,deque<deque<uint> >& coordinations,double rmax,double rmin,double tol,bool prim,bool unique_only){
+  deque<_atom> atoms_cell;
+  return GetCoordinations(atoms_cell,i_neighbors,distances,coordinations,rmax,rmin,tol,prim,unique_only);
+}
+void xstructure::GetCoordinations(deque<_atom>& atoms_cell,deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,deque<deque<uint> >& coordinations,double rmax,double rmin,double tol,bool prim,bool unique_only){
+  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  string soliloquy=XPID+"xstructure::GetCoordinations():";
+
+  GetNeighbors(atoms_cell,i_neighbors,distances,rmax,rmin,prim,unique_only);
+  
+  uint i=0,j=0,k=0;
+  for(i=0;i<coordinations.size();i++){coordinations[i].clear();} coordinations.clear(); //clear
+
+  for(k=0;k<i_neighbors.size();k++){
+    coordinations.push_back(deque<uint>(0));
+    j=0;  //index to start at
+    coordinations.back().push_back(0);
+    for(i=0;i<i_neighbors[k].size();i++){
+      if(aurostd::isequal(distances[k][j],distances[k][i],tol)){coordinations.back().back()+=1;}
+      else{
+        j=i;
+        coordinations.back().push_back(1);
+      }
+    }
+  }
+  
+  if(LDEBUG){
+    for(k=0;k<i_neighbors.size();k++){
+      cerr << soliloquy << " ATOMS_CELL[k=" << k << "]: " << atoms_cell[k].name << endl;
+      for(i=0;i<coordinations[k].size();i++){
+        cerr << "  coordination[i=" << i << "]: " << coordinations[k][i] << endl;
+      }
+    }
+  }
+
+}
+
+void GetCoordinations(const xstructure& xstr_in,deque<deque<uint> >& coordinations,double rmin,double tol,bool prim,bool unique_only){
+  xstructure xstr(xstr_in);
+  return xstr.GetCoordinations(coordinations,tol,rmin,prim,unique_only);
+}
+void GetCoordinations(const xstructure& xstr_in,deque<_atom>& atoms_cell,deque<deque<uint> >& coordinations,double rmin,double tol,bool prim,bool unique_only){
+  xstructure xstr(xstr_in);
+  return xstr.GetCoordinations(atoms_cell,coordinations,tol,rmin,prim,unique_only);
+}
+void GetCoordinations(const xstructure& xstr_in,deque<deque<uint> >& coordinations,double rmax,double rmin,double tol,bool prim,bool unique_only){
+  xstructure xstr(xstr_in);
+  return xstr.GetCoordinations(coordinations,rmax,rmin,tol,prim,unique_only);
+}
+void GetCoordinations(const xstructure& xstr_in,deque<_atom>& atoms_cell,deque<deque<uint> >& coordinations,double rmax,double rmin,double tol,bool prim,bool unique_only){
+  xstructure xstr(xstr_in);
+  return xstr.GetCoordinations(atoms_cell,coordinations,rmax,rmin,tol,prim,unique_only);
+}
+void GetCoordinations(const xstructure& xstr_in,deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,deque<deque<uint> >& coordinations,double rmin,double tol,bool prim,bool unique_only){
+  xstructure xstr(xstr_in);
+  return xstr.GetCoordinations(i_neighbors,distances,coordinations,tol,rmin,prim,unique_only);
+}
+void GetCoordinations(const xstructure& xstr_in,deque<_atom>& atoms_cell,deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,deque<deque<uint> >& coordinations,double rmin,double tol,bool prim,bool unique_only){
+  xstructure xstr(xstr_in);
+  return xstr.GetCoordinations(atoms_cell,i_neighbors,distances,coordinations,rmin,tol,prim,unique_only);
+}
+void GetCoordinations(const xstructure& xstr_in,deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,deque<deque<uint> >& coordinations,double rmax,double rmin,double tol,bool prim,bool unique_only){
+  xstructure xstr(xstr_in);
+  return xstr.GetCoordinations(i_neighbors,distances,coordinations,rmax,rmin,tol,prim,unique_only);
+}
+void GetCoordinations(const xstructure& xstr_in,deque<_atom>& atoms_cell,deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,deque<deque<uint> >& coordinations,double rmax,double rmin,double tol,bool prim,bool unique_only){
+  xstructure xstr(xstr_in);
+  return xstr.GetCoordinations(atoms_cell,i_neighbors,distances,coordinations,rmax,rmin,tol,prim,unique_only);
+}
+
 // **************************************************************************
 // Function GetNeighData
 // **************************************************************************
@@ -16041,7 +16318,7 @@ void xstructure::GetNeighData(const deque<_atom>& in_atom_vec,
 // **************************************************************************
 // This function collects all the neighbor data out to some
 // cutoff and stores it for each atom in the structure.
-void xstructure::GetStrNeighData(const double cutoff,deque<deque<_atom> >& neigh_mat) {
+void xstructure::GetStrNeighData(const double cutoff,deque<deque<_atom> >& neigh_mat) const { //RF+CO20200513
   deque<_atom> atom_vec;
   neigh_mat.clear();
   // Get data from str.

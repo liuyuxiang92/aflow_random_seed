@@ -2,6 +2,12 @@
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.5.tar.xz
         -- patched convert issue: security policy 'PDF' blocking conversion (SC)
         -- adding decompositionAuids for webapp (SK)
+        -- Implemented option (--get_num_anion_neighbors) for printing number of anion neighbors for each cation for given POSCAR (RF)
+        -- Implemented option (--get_oxidation_numbers) for printing oxidation numbers for given POSCAR (RF)
+        -- Separated CCE corrections listing into different anion types (RF)
+        -- Moved CCE corrections and Bader charges to main CCE file (RF)
+        -- fixed output printing of CCE (RF)
+        -- fixed CCE for ICSD (RF)
         -- adding --lib2lib patches for AEL/AGL (CT)
         -- Added 49 new ANRL prototype files for the nitrides and oxides (DX+RF)
         -- Added 14 new parameter enumerations to existing ANRL labels for nitrides and oxides (DX+RF)
@@ -122,6 +128,9 @@
         -- adjusting aflow_max_argv for xplug (CO)
         -- adding --np functionality to --multi=zip (CO)
         -- added aurostd::meanWeighted() (CO)
+        -- cleaned up GenerateGridAtoms() (CO)
+        -- rewrote GetNeighbors() and GetCoordinations() function (CO)
+        -- sped up CCE with new GetNeighbors() and GetCoordinations() functions and restructuring structural analysis (CO)
 3.2.4 - 2020/06/25
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.4.tar.xz
         -- Added latex->dvips->ps2pdf compilation route for pre-2010 texlive versions. (ME)
