@@ -1855,16 +1855,16 @@ namespace aurostd {
   //***************************************************************************//
   // aurostd::IsCompressed
   //***************************************************************************//
-  bool IsCompressed(string FileNameIN,string& FileNameOUT) {
+  bool IsCompressed(const string& FileNameIN,string& FileNameOUT) {
     //Corey Oses
     //Given a File, it will return name of decompressed variant
     //NB: Does not actually decompress
     //FileNameOUT="";
-    if(FileNameIN.find(".xz")!=string::npos) {FileNameOUT=StringSubst(FileNameIN,".xz","");return TRUE;}
-    if(FileNameIN.find(".bz2")!=string::npos) {FileNameOUT=StringSubst(FileNameIN,".bz2","");return TRUE;}
-    if(FileNameIN.find(".tar.gz")!=string::npos) {FileNameOUT=StringSubst(FileNameIN,".tar.gz","");return TRUE;}
-    if(FileNameIN.find(".gz")!=string::npos) {FileNameOUT=StringSubst(FileNameIN,".gz","");return TRUE;}
-    if(FileNameIN.find(".zip")!=string::npos) {FileNameOUT=StringSubst(FileNameIN,".zip","");return TRUE;}
+    if(FileNameIN.find(".xz")!=string::npos) {FileNameOUT=FileNameIN;StringSubst(FileNameOUT,".xz","");return TRUE;}
+    if(FileNameIN.find(".bz2")!=string::npos) {FileNameOUT=FileNameIN;StringSubst(FileNameOUT,".bz2","");return TRUE;}
+    if(FileNameIN.find(".tar.gz")!=string::npos) {FileNameOUT=FileNameIN;StringSubst(FileNameOUT,".tar.gz","");return TRUE;}
+    if(FileNameIN.find(".gz")!=string::npos) {FileNameOUT=FileNameIN;StringSubst(FileNameOUT,".gz","");return TRUE;}
+    if(FileNameIN.find(".zip")!=string::npos) {FileNameOUT=FileNameIN;StringSubst(FileNameOUT,".zip","");return TRUE;}
     // FileNameOUT=FileNameIN; // dont touch it if not found
     return FALSE;
   }
@@ -1872,7 +1872,7 @@ namespace aurostd {
   //***************************************************************************//
   // aurostd::IsCompressed
   //***************************************************************************//
-  bool IsCompressed(string FileNameIN) {
+  bool IsCompressed(const string& FileNameIN) {
     string FileNameOUT;
     return IsCompressed(FileNameIN,FileNameOUT);
   }

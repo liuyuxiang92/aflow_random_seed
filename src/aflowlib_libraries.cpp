@@ -5355,12 +5355,13 @@ namespace aflowlib {
     stringstream aflow_pocc_out,aflow_pocc_agl_out;
     uint i=0,j=0;
     vector<double> v_dgs,v_energies;
+    vector<string> vfiles;
 
     if(aurostd::EFileExist(directory_LIB+"/"+POCC_FILE_PREFIX+POCC_OUT_FILE)) {
+      aflowlib::LIB2RAW_FileNeeded(directory_LIB,"aflow.in",directory_RAW,"aflow.in",vfile,MESSAGE);  // aflow.in, needed for ExtractSystemName() in plotter
       aflowlib::LIB2RAW_FileNeeded(directory_LIB,POCC_FILE_PREFIX+POCC_OUT_FILE,directory_RAW,POCC_FILE_PREFIX+POCC_OUT_FILE,vfile,MESSAGE);  // aflow.pocc.out
       aflowlib::LIB2RAW_FileNeeded(directory_LIB,POCC_FILE_PREFIX+POCC_UNIQUE_SUPERCELLS_FILE,directory_RAW,POCC_FILE_PREFIX+POCC_UNIQUE_SUPERCELLS_FILE,vfile,MESSAGE);  // aflow.pocc.structures_unique.out
       //get DOSCAR.pocc + png's
-      vector<string> vfiles;
       aurostd::DirectoryLS(directory_LIB,vfiles);
       for(i=0;i<vfiles.size();i++){
         if(vfiles[i].find(POCC_DOSCAR_FILE)!=string::npos){
@@ -5514,11 +5515,22 @@ namespace aflowlib {
     _aflags aflags;aflags.Directory=directory_LIB;
     pocc::POccCalculator pcalc(aflags);
     pcalc.loadDataIntoCalculator();
+    pcalc.setTemperatureStringParameters(); //needed for DOSCAR plots
     if(pcalc.m_ARUN_directories.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No ARUN.POCC_* runs found",_FILE_CORRUPT_);}
     if(pcalc.m_ARUN_directories.size()!=v_dgs.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"pcalc.m_ARUN_directories.size()!=v_dgs.size()",_FILE_CORRUPT_);}
     if(pcalc.m_ARUN_directories.size()!=v_energies.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"pcalc.m_ARUN_directories.size()!=v_energies.size()",_FILE_CORRUPT_);}
     xvector<double> xv_dgs=aurostd::vector2xvector(v_dgs);  //for aurostd::meanWeighted()
     
+    //do DOSCAR plots
+    vfiles.clear();
+    aurostd::DirectoryLS(directory_RAW,vfiles);
+    for(i=0;i<vfiles.size();i++){
+      if(vfiles[i].find(POCC_DOSCAR_FILE)!=string::npos){
+        if(AFLOWLIB_VERBOSE) cout << MESSAGE << " plotting " << vfiles[i] << endl;
+        pcalc.plotAvgDOSCAR(directory_RAW+"/"+vfiles[i],directory_RAW);
+      }
+    }
+
     //xOUTCAR
     string filename="";
     if(!aurostd::EFileExist(directory_LIB+"/"+pcalc.m_ARUN_directories[0]+"/OUTCAR.relax2",filename)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"xOUTCAR cannot be extracted",_FILE_CORRUPT_);}

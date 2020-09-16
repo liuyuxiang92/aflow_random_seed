@@ -96,6 +96,7 @@ namespace pocc {
   void poccOld2New(ofstream& FileMESSAGE,ostream& oss=cout);
   
   string addDefaultPOCCTOL2string(const string& input);
+  string getTemperatureString(double temperature,int precision=2,bool temperatures_int=true,int zero_padding_temperature=3);
 } // namespace pocc
 
 namespace pocc {
@@ -639,6 +640,8 @@ namespace pocc {
 
       void CleanPostProcessing();
       void loadDataIntoCalculator();
+      void setTemperatureStringParameters();
+      void setTemperatureStringParameters(vector<double>& v_temperatures);
       void postProcessing();
       void StructuresAllFile2SupercellSets();
       void StructuresUniqueFile2SupercellSets();
@@ -649,7 +652,9 @@ namespace pocc {
       void setPOccStructureProbabilities(double temperature=300); //room temperature
       string getTemperatureString(double temperature) const;
       void setAvgDOSCAR(double temperature=300);  //depends on probabilities
-      void plotAvgDOSCAR(double temperature=300);
+      void plotAvgDOSCAR(double temperature=300) const;
+      void plotAvgDOSCAR(const string& doscar_path,const string& directory=".") const;
+      void plotAvgDOSCAR(const xDOSCAR& xdos,double temperature,const string& directory=".") const;
       void writeResults() const;
       void writeResults(double temperature) const;
 

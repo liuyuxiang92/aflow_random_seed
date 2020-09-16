@@ -69,7 +69,7 @@ namespace pocc {
 namespace pocc {
   void poccOld2New(ostream& oss){ofstream FileMESSAGE;return poccOld2New(FileMESSAGE,oss);}
   void poccOld2New(ofstream& FileMESSAGE,ostream& oss){
-    bool LDEBUG=(TRUE || _DEBUG_POCC_ || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     string soliloquy=XPID+"pocc::poccOld2New():";
     stringstream message;
 
@@ -905,19 +905,22 @@ namespace pocc {
   }
 
   string POccCalculator::getTemperatureString(double temperature) const {
+    return pocc::getTemperatureString(temperature,TEMPERATURE_PRECISION,m_temperatures_int,m_zero_padding_temperature);
+  }
+  string getTemperatureString(double temperature,int precision,bool temperatures_int,int zero_padding_temperature) {
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     string soliloquy=XPID+"POccCalculator::getTemperatureString():";
 
     stringstream t_ss;
-    if(m_temperatures_int==false){t_ss.setf(std::ios::fixed,std::ios::floatfield);t_ss.precision(TEMPERATURE_PRECISION);}
-    t_ss.width(m_zero_padding_temperature);t_ss.fill('0');
+    if(temperatures_int==false){t_ss.setf(std::ios::fixed,std::ios::floatfield);t_ss.precision(precision);}
+    t_ss.width(zero_padding_temperature);t_ss.fill('0');
     t_ss << temperature;
 
     if(LDEBUG){
       cerr << soliloquy << " temperature=" << temperature << endl;
-      cerr << soliloquy << " temperatures_int=" << m_temperatures_int << endl;
-      cerr << soliloquy << " zero_padding=" << m_zero_padding_temperature << endl;
-      cerr << soliloquy << " temperature_precision=" << TEMPERATURE_PRECISION << endl;
+      cerr << soliloquy << " temperatures_int=" << temperatures_int << endl;
+      cerr << soliloquy << " zero_padding=" << zero_padding_temperature << endl;
+      cerr << soliloquy << " temperature_precision=" << precision << endl;
       cerr << soliloquy << " temperature_string=" << t_ss.str() << endl;
     }
 
@@ -1080,7 +1083,7 @@ namespace pocc {
 
     //XDOSCAR.OUT
     //string xdoscar_filename=POCC_DOSCAR_FILE+"_T"+aurostd::utype2string(temperature,TEMPERATURE_PRECISION)+"K";
-    string xdoscar_filename=POCC_DOSCAR_FILE+"_T"+getTemperatureString(temperature)+"K";
+    string xdoscar_filename=POCC_DOSCAR_FILE+"_T"+(*this).getTemperatureString(temperature)+"K";
     message << "Writing out " << xdoscar_filename;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
     stringstream pocc_xdoscar_ss;
     pocc_xdoscar_ss << m_xdoscar;
@@ -1106,36 +1109,63 @@ namespace pocc {
     if(!found_all_OUTCARs){return;}
 
     setAvgDOSCAR(temperature);
-    plotAvgDOSCAR(temperature);
+    if(0){plotAvgDOSCAR(temperature);}  //do not plot as part of LIB2LIB, leave for LIB2RAW
   }
 
-  void POccCalculator::plotAvgDOSCAR(double temperature){
+  void POccCalculator::plotAvgDOSCAR(double temperature) const {return plotAvgDOSCAR(m_xdoscar,temperature,m_aflags.Directory);}
+  void POccCalculator::plotAvgDOSCAR(const string& doscar_path,const string& directory) const {
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
+    string soliloquy=XPID+"POccCalculator::plotAvgDOSCAR():";
+    
+    xDOSCAR xdos(doscar_path,*p_FileMESSAGE,true,*p_oss);
+    //get temperature from title
+    //DOSCAR.pocc_T0000K
+    if(doscar_path.find("DOSCAR.pocc_T")==string::npos){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"odd DOSCAR filename, format should be DOSCAR.pocc_T0000K",_FILE_CORRUPT_);}
+    vector<string> vtokens;
+    aurostd::string2tokens(doscar_path,vtokens,"/");
+    string temperature_str="";
+    uint i=0,j=0;
+    for(i=0;i<vtokens.size();i++){
+      if(vtokens[i].find("pocc_T")!=string::npos && vtokens[i].find("K")!=string::npos){
+        temperature_str=vtokens[i];
+        aurostd::StringSubst(temperature_str,"DOSCAR.pocc_T","");
+        aurostd::StringSubst(temperature_str,"K","");
+        for(j=0;j<XHOST.vext.size();j++){aurostd::StringSubst(temperature_str,XHOST.vext[j],"");} //remove compression extension
+        if(LDEBUG){cerr << soliloquy << " temperature_str=" << temperature_str << endl;}
+        if(aurostd::isfloat(temperature_str)){break;}
+      }
+    }
+    if(doscar_path.find("DOSCAR.pocc_T")==string::npos){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"cannot get temperature_str",_FILE_CORRUPT_);}
+    double temperature=aurostd::string2utype<double>(temperature_str);
+    return plotAvgDOSCAR(xdos,temperature,directory);
+  }
+  void POccCalculator::plotAvgDOSCAR(const xDOSCAR& xdos,double temperature,const string& directory) const {
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     string soliloquy=XPID+"POccCalculator::plotAvgDOSCAR():";
 
     if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
-
-    if(m_ARUN_directories.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_ARUN_directories.size()==0",_RUNTIME_ERROR_);}
+    
+    if(m_ARUN_directories.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,"POccCalculator::plotAvgDOSCAR():","m_ARUN_directories.size()==0",_RUNTIME_ERROR_);}
 
     aurostd::xoption cmdline_opts, plot_opts;
-    cmdline_opts.push_attached("PLOT_DOS", m_aflags.Directory);
+    cmdline_opts.push_attached("PLOT_DOS", directory);
     cmdline_opts.push_attached("PLOTTER::PRINT", "png");
     plot_opts = plotter::getPlotOptionsEStructure(cmdline_opts, "PLOT_DOS");
-    plot_opts.push_attached("DIRECTORY",m_aflags.Directory);
+    plot_opts.push_attached("DIRECTORY",directory);
     if(1){  //turn off for ME - POCC+APL
       plot_opts.push_attached("PROJECTION","ORBITALS");
       //plot_opts.push_attached("EXTENSION","dos_orbitals_T"+aurostd::utype2string(temperature,TEMPERATURE_PRECISION)+"K");
-      plot_opts.push_attached("EXTENSION","dos_orbitals_T"+getTemperatureString(temperature)+"K");
-      plotter::PLOT_DOS(plot_opts,m_xdoscar);
+      plot_opts.push_attached("EXTENSION","dos_orbitals_T"+(*this).getTemperatureString(temperature)+"K");
+      plotter::PLOT_DOS(plot_opts,xdos,*p_FileMESSAGE,*p_oss);
 
       plot_opts.push_attached("ARUN_DIRECTORY",m_ARUN_directories[0]);
       plot_opts.pop_attached("PROJECTION");
       plot_opts.push_attached("PROJECTION","SPECIES");
       //plot_opts.push_attached("EXTENSION","dos_species_T"+aurostd::utype2string(temperature,TEMPERATURE_PRECISION)+"K");
-      plot_opts.push_attached("EXTENSION","dos_species_T"+getTemperatureString(temperature)+"K");
-      plotter::PLOT_DOS(plot_opts,m_xdoscar);
+      plot_opts.push_attached("EXTENSION","dos_species_T"+(*this).getTemperatureString(temperature)+"K");
+      plotter::PLOT_DOS(plot_opts,xdos,*p_FileMESSAGE,*p_oss);
 
-      if(0){  //turn on for shachar - plot orbitals for each species near fermi energy (dos_species_T0K_Cs_1)
+      if(0){  //turn on for SG - plot orbitals for each species near fermi energy (dos_species_T0K_Cs_1)
         plot_opts.pop_attached("PROJECTION");
         plot_opts.push_attached("PROJECTION","ORBITALS");
         plot_opts.push_attached("DATATYPE","SPECIES");
@@ -1144,17 +1174,17 @@ namespace pocc {
         for(uint ispecies=0;ispecies<xstr_pocc.species.size();ispecies++){
           plot_opts.pop_attached("DATASET"); plot_opts.push_attached("DATASET",aurostd::utype2string(ispecies+1));
           plot_opts.pop_attached("DATALABEL"); plot_opts.push_attached("DATALABEL",KBIN::VASP_PseudoPotential_CleanName(xstr_pocc.species[0]));
-          plotter::PLOT_PDOS(plot_opts,m_xdoscar);
+          plotter::PLOT_PDOS(plot_opts,xdos,*p_FileMESSAGE,*p_oss);
         }
       }
     }else{  //ME!
       plot_opts.push_attached("ARUN_DIRECTORY",m_ARUN_directories[0]);
       plot_opts.push_attached("PROJECTION","ATOMS");
       //plot_opts.push_attached("EXTENSION","dos_atoms_T"+aurostd::utype2string(temperature,TEMPERATURE_PRECISION)+"K");
-      plot_opts.push_attached("EXTENSION","dos_atoms_T"+getTemperatureString(temperature)+"K");
+      plot_opts.push_attached("EXTENSION","dos_atoms_T"+(*this).getTemperatureString(temperature)+"K");
       plot_opts.pop_attached("XMIN");plot_opts.pop_attached("XMAX");
       plot_opts.push_attached("XMIN","0");plot_opts.push_attached("XMAX","0.05");
-      plotter::PLOT_DOS(plot_opts,m_xdoscar);
+      plotter::PLOT_DOS(plot_opts,xdos,*p_FileMESSAGE,*p_oss);
     }
 
     if(LDEBUG){cerr << soliloquy << " END" << endl;}
@@ -1223,7 +1253,7 @@ namespace pocc {
     message << "Writing out " << POCC_FILE_PREFIX+POCC_OUT_FILE << " (T=" << temperature << "K properties)";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_); //CO20200502 - no getTemperatureString(T) needed here
     stringstream pocc_out_ss;
     pocc_out_ss << AFLOWIN_SEPARATION_LINE << endl;
-    pocc_out_ss << POCC_AFLOWIN_tag << "START_TEMPERATURE=" << getTemperatureString(temperature) << "_K" << endl;  //"  (K)"
+    pocc_out_ss << POCC_AFLOWIN_tag << "START_TEMPERATURE=" << (*this).getTemperatureString(temperature) << "_K" << endl;  //"  (K)"
     //[CO20200502 - removed unnecessary separation line]pocc_out_ss << AFLOWIN_SEPARATION_LINE << endl;
 
     //supercell probabilities
@@ -1252,7 +1282,7 @@ namespace pocc {
     }
     if(Egap_net!=AUROSTD_MAX_DOUBLE) pocc_out_ss << "Egap_net=" << aurostd::utype2string(Egap_net,pocc_precision,true,pocc_roundoff_tol,SCIENTIFIC_STREAM) << "  (eV)" << endl;
     //[CO20200502 - removed unnecessary separation line]pocc_out_ss << AFLOWIN_SEPARATION_LINE << endl;
-    pocc_out_ss << POCC_AFLOWIN_tag << "STOP_TEMPERATURE=" << getTemperatureString(temperature) << "_K" << endl;  //"  (K)"
+    pocc_out_ss << POCC_AFLOWIN_tag << "STOP_TEMPERATURE=" << (*this).getTemperatureString(temperature) << "_K" << endl;  //"  (K)"
     pocc_out_ss << AFLOWIN_SEPARATION_LINE << endl;
 
     aurostd::stringstream2file(pocc_out_ss,m_aflags.Directory+"/"+POCC_FILE_PREFIX+POCC_OUT_FILE,"APPEND");
@@ -1413,23 +1443,18 @@ namespace pocc {
   }
 
   //CT20200319 - added AEL/AGL option
-  void POccCalculator::postProcessing(){
+  void POccCalculator::setTemperatureStringParameters(){vector<double> v_temperatures;return setTemperatureStringParameters(v_temperatures);}
+  void POccCalculator::setTemperatureStringParameters(vector<double>& v_temperatures){
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
-    string soliloquy=XPID+"POccCalculator::postProcessing():";
-    stringstream message;
-
+    string soliloquy=XPID+"POccCalculator::setTemperatureStringParameters():";
+    
     if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"POccCalculator failed to initialized");}
-
     if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
-
-    loadDataIntoCalculator();
-    if(!QMVASPsFound()){return;}
-    setDFTEnergies();
-    setEFA();
-
+    
     //START: TEMPERATURE DEPENDENT PROPERTIES
+    v_temperatures.clear();
     //v_temperatures.push_back(300);  //1000
-    vector<double> v_temperatures=getVTemperatures(m_kflags.KBIN_POCC_TEMPERATURE_STRING);
+    v_temperatures=getVTemperatures(m_kflags.KBIN_POCC_TEMPERATURE_STRING);
     if(XHOST.vflag_control.flag("CALCULATION_TEMPERATURE")){v_temperatures.clear();v_temperatures=getVTemperatures(XHOST.vflag_control.getattachedscheme("CALCULATION_TEMPERATURE"));}  //command line input
     if(v_temperatures.empty()){v_temperatures.clear();v_temperatures=getVTemperatures(DEFAULT_POCC_TEMPERATURE_STRING);}  //user aflow.rc
     if(v_temperatures.empty()){v_temperatures.clear();v_temperatures=getVTemperatures(AFLOWRC_DEFAULT_POCC_TEMPERATURE_STRING);}  //internal aflow.rc, will always work
@@ -1439,6 +1464,23 @@ namespace pocc {
     m_temperatures_int=true;
     for(uint itemp=0;itemp<v_temperatures.size();itemp++){if(!aurostd::isinteger(v_temperatures[itemp])){m_temperatures_int=false;break;}}  //found a non-int temperature
     m_zero_padding_temperature=aurostd::getZeroPadding(max(v_temperatures))+(m_temperatures_int ? 0 : TEMPERATURE_PRECISION+1); //+1 for decimal place
+  }
+
+  void POccCalculator::postProcessing(){
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
+    string soliloquy=XPID+"POccCalculator::postProcessing():";
+    stringstream message;
+
+    if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"POccCalculator failed to initialized");}
+    if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
+
+    loadDataIntoCalculator();
+    if(!QMVASPsFound()){return;}
+    setDFTEnergies();
+    setEFA();
+
+    vector<double> v_temperatures;
+    setTemperatureStringParameters(v_temperatures);
 
     message << "Performing POCC post-processing for these temperatures: " << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(v_temperatures,5),",");pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
 
