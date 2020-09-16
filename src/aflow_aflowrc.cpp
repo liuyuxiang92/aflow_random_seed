@@ -581,14 +581,14 @@
 #define AFLOWRC_DEFAULT_QHA_EOS_DISTORTION_RANGE              string("-12:16:3")
 #define         DEFAULT_QHA_EOS_DISTORTION_RANGE              XHOST.adefault.getattachedscheme("DEFAULT_QHA_EOS_DISTORTION_RANGE")
 //AS20200818 BEGIN
-#define AFLOWRC_DEFAULT_QHA_EOS_MODEL                         string("SJ,BM4")
+#define AFLOWRC_DEFAULT_QHA_EOS_MODEL                         string("SJ")
 #define         DEFAULT_QHA_EOS_MODEL                         XHOST.adefault.getattachedscheme("DEFAULT_QHA_EOS_MODEL")
 //AS20200818 END
 #define AFLOWRC_DEFAULT_QHA_GP_DISTORTION                     1.0
 #define         DEFAULT_QHA_GP_DISTORTION                     XHOST.adefault.getattachedutype<double>("DEFAULT_QHA_GP_DISTORTION")
 //AS20200602 BEGIN
-#define AFLOWRC_DEFAULT_QHA_TAYLOR_EXPANSION_ORDER             2
-#define         DEFAULT_QHA_TAYLOR_EXPANSION_ORDER             XHOST.adefault.getattachedutype<double>("DEFAULT_QHA_TAYLOR_EXPANSION_ORDER")
+#define AFLOWRC_DEFAULT_QHA_TAYLOR_EXPANSION_ORDER            2
+#define         DEFAULT_QHA_TAYLOR_EXPANSION_ORDER            XHOST.adefault.getattachedutype<double>("DEFAULT_QHA_TAYLOR_EXPANSION_ORDER")
 //AS20200602 END
 #define AFLOWRC_DEFAULT_QHA_INCLUDE_ELEC_CONTRIB              FALSE
 #define         DEFAULT_QHA_INCLUDE_ELEC_CONTRIB              XHOST.adefault.getattachedutype<bool>("DEFAULT_QHA_INCLUDE_ELEC_CONTRIB")
@@ -596,7 +596,7 @@
 #define AFLOWRC_DEFAULT_QHA_SOMMERFELD_EXPANSION              FALSE
 #define         DEFAULT_QHA_SOMMERFELD_EXPANSION              XHOST.adefault.getattachedutype<bool>("DEFAULT_QHA_SOMMERFELD_EXPANSION")
 //AS20200528 END
-#define AFLOWRC_DEFAULT_QHA_PDIS_T                            string("50,100,600")
+#define AFLOWRC_DEFAULT_QHA_PDIS_T                            string("300")
 #define         DEFAULT_QHA_PDIS_T                            XHOST.adefault.getattachedscheme("DEFAULT_QHA_PDIS_T")
 //AS20200508 BEGIN
 #define AFLOWRC_DEFAULT_QHA_GP_FINITE_DIFF                    FALSE
