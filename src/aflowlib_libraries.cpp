@@ -5400,10 +5400,10 @@ namespace aflowlib {
         aurostd::StringSubst(vline.at(i),"="," ");
         aurostd::string2tokens(vline.at(i),tokens," ");
         if(tokens.size()>=2) {
-          if(tokens[0]=="grueneisen_qha") data.grueneisen_qha=aurostd::string2utype<double>(tokens[1]);
-          if(tokens[0]=="grueneisen_300K_qha") data.grueneisen_300K_qha=aurostd::string2utype<double>(tokens[1]);
+          if(tokens[0]=="gruneisen_qha") data.gruneisen_qha=aurostd::string2utype<double>(tokens[1]);
+          if(tokens[0]=="gruneisen_300K_qha") data.gruneisen_300K_qha=aurostd::string2utype<double>(tokens[1]);
           if(tokens[0]=="thermal_expansion_300K_qha") data.thermal_expansion_300K_qha=aurostd::string2utype<double>(tokens[1]);
-          if(tokens[0]=="modulus_bulk_static_300K_qha") data.modulus_bulk_static_300K_qha=aurostd::string2utype<double>(tokens[1]);
+          if(tokens[0]=="modulus_bulk_300K_qha") data.modulus_bulk_300K_qha=aurostd::string2utype<double>(tokens[1]);
         }
       }
 

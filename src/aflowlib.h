@@ -231,10 +231,10 @@ namespace aflowlib {
       xmatrix<double> ael_stiffness_tensor;  //ME20191105
       xmatrix<double> ael_compliance_tensor;  //ME20191105
       // QHA  //AS20200831
-      double grueneisen_qha; //AS20200831
-      double grueneisen_300K_qha; //AS20200903
+      double gruneisen_qha; //AS20200831
+      double gruneisen_300K_qha; //AS20200903
       double thermal_expansion_300K_qha; //AS20200831
-      double modulus_bulk_static_300K_qha; //AS20200831
+      double modulus_bulk_300K_qha; //AS20200831
       // BADER
       string bader_net_charges;vector<double> vbader_net_charges;//electrons
       string bader_atomic_volumes;vector<double> vbader_atomic_volumes;//Angst^3

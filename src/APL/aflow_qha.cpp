@@ -3218,7 +3218,9 @@ namespace apl
           // not supported, this case is handled in an earlier switch statement
           break;
       }
-      filename += aurostd::PaddedNumString(T, ndigits)+'.'+DEFAULT_APL_PDIS_FILE;
+      filename += DEFAULT_APL_PDIS_FILE.substr(0,DEFAULT_APL_PDIS_FILE.size()-4);//"phonon_dispersion"
+      filename += ".T"+aurostd::PaddedNumString(T, ndigits)+"K";
+      filename += DEFAULT_APL_PDIS_FILE.substr(DEFAULT_APL_PDIS_FILE.size()-4,4);//".out"
       aurostd::stringstream2file(eig_stream, filename);
       if (!aurostd::FileExist(filename)){
         msg = "Cannot open "+filename+" file.";
@@ -3255,11 +3257,11 @@ namespace apl
     stringstream aflow_qha_out;
     aflow_qha_out << AFLOWIN_SEPARATION_LINE << endl;
     aflow_qha_out << "[QHA_RESULTS]START" << endl;
-    aflow_qha_out << "grueneisen_qha = " << grueneisen << endl;
-    aflow_qha_out << "grueneisen_300K_qha = " << grueneisen_300K << endl;
+    aflow_qha_out << "gruneisen_qha = " << grueneisen << endl;
+    aflow_qha_out << "gruneisen_300K_qha = " << grueneisen_300K << endl;
     aflow_qha_out << "thermal_expansion_300K_qha = " << thermal_expansion * 1e5;
     aflow_qha_out << " (10^-5/K)" << endl;
-    aflow_qha_out << "modulus_bulk_static_300K_qha = " << bulk_modulus;
+    aflow_qha_out << "modulus_bulk_300K_qha = " << bulk_modulus;
     aflow_qha_out << " (GPa)" << endl;
     aflow_qha_out << "[QHA_RESULTS]STOP" << endl;
     aflow_qha_out << AFLOWIN_SEPARATION_LINE << endl;
