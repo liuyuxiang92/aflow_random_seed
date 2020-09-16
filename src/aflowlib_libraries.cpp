@@ -1457,6 +1457,16 @@ namespace aflowlib {
       if(flag_WEB) {
         if(aurostd::FileExist(directory_RAW+"/aflow.qha.out")) aurostd::LinkFile(directory_RAW+"/aflow.qha.out",directory_WEB);
         if(aurostd::FileExist(directory_RAW+"/aflow.qha.thermo.out")) aurostd::LinkFile(directory_RAW+"/aflow.qha.thermo.out",directory_WEB);
+        if(aurostd::FileExist(directory_RAW+"/aflow.qha.FVT.out")) aurostd::LinkFile(directory_RAW+"/aflow.qha.thermo.out",directory_WEB);
+        // link all QHA plots
+        vector<string> files;
+        aurostd::DirectoryLS(directory_LIB, files);
+        for (uint i=0; i<files.size(); i++){
+          if (aurostd::substring2bool(files[i],"qha") &&
+              aurostd::substring2bool(files[i],".png")){
+            aurostd::LinkFile(directory_RAW+"/"+files[i],directory_WEB);
+           }
+        }
       }
     }
     // END AS20200831
@@ -1991,7 +2001,7 @@ namespace aflowlib {
 }
 
 // ***************************************************************************
-// aflowlib::LIB2RAW_Loop_Bands
+// aflowlib::LIB2RAW_Loop_Static
 // ***************************************************************************
 namespace aflowlib {
   bool LIB2RAW_Loop_Static(const string& directory_LIB,const string& directory_RAW,vector<string> &vfile,aflowlib::_aflowlib_entry& data,const string& MESSAGE) { //CO20200731
@@ -5377,7 +5387,12 @@ namespace aflowlib {
     if(aurostd::FileExist(directory_LIB+"/"+"aflow.qha.out") || aurostd::EFileExist(directory_LIB+"/"+"aflow.qha.out")) {
       aflowlib::LIB2RAW_FileNeeded(directory_LIB,"aflow.qha.out",directory_RAW,"aflow.qha.out",vfile,MESSAGE);
       aflowlib::LIB2RAW_FileNeeded(directory_LIB,"aflow.qha.thermo.out",directory_RAW,"aflow.qha.thermo.out",vfile,MESSAGE);
+      aflowlib::LIB2RAW_FileNeeded(directory_LIB,"aflow.qha.FVT.out",directory_RAW,"aflow.qha.FVT.out",vfile,MESSAGE);
+ //     aflowlib::LIB2RAW_FileNeeded(directory_LIB,"aflow.qha.phonon_dispersion_T300K.out",directory_RAW,
+//          "aflow.qha.phonon_dispersion_T300K.out",vfile,MESSAGE);
 
+
+      // read QHA data from the aflow.qha.out file
       if(AFLOWLIB_VERBOSE) cout << MESSAGE << " loading " << string(directory_RAW+"/"+"aflow.qha.out") << endl;
       aurostd::ExtractToStringstreamEXPLICIT(aurostd::efile2string(directory_RAW+"/"+"aflow.qha.out"),aflow_qha_out,"[QHA_RESULTS]START","[QHA_RESULTS]STOP");
       aurostd::stream2vectorstring(aflow_qha_out,vline);
@@ -5389,6 +5404,28 @@ namespace aflowlib {
           if(tokens[0]=="grueneisen_300K_qha") data.grueneisen_300K_qha=aurostd::string2utype<double>(tokens[1]);
           if(tokens[0]=="thermal_expansion_300K_qha") data.thermal_expansion_300K_qha=aurostd::string2utype<double>(tokens[1]);
           if(tokens[0]=="modulus_bulk_static_300K_qha") data.modulus_bulk_static_300K_qha=aurostd::string2utype<double>(tokens[1]);
+        }
+      }
+
+      // plot thermodynamic
+      if (aurostd::EFileExist(directory_LIB+"/"+"aflow.qha.thermo.out")){
+        if (AFLOWLIB_VERBOSE) cout << MESSAGE << " plotting QHA thermodynamic data " << endl;
+        aurostd::xoption opt;
+        opt.flag("PLOT_THERMO_QHA", true);
+        opt.addattachedscheme("PLOT_THERMO_QHA", directory_LIB, true);
+        opt.push_attached("PLOTTER::PRINT", "png");
+        aurostd::xoption plotopts=plotter::getPlotOptions(opt,"PLOT_THERMO_QHA");
+        plotter::PLOT_THERMO_QHA(plotopts);
+
+        // set to copy all QHA graphs
+        vector<string> files;
+        aurostd::DirectoryLS(directory_LIB, files);
+        for (uint i=0; i<files.size(); i++){
+          if (aurostd::substring2bool(files[i],"qha") &&
+              aurostd::substring2bool(files[i],".png")){
+             aflowlib::LIB2RAW_FileNeeded(directory_LIB,files[i],directory_RAW,
+                 files[i],vfile,MESSAGE);
+           }
         }
       }
     } else {
@@ -6810,6 +6847,8 @@ namespace aflowlib {
         else if(aurostd::FileExist(directory_LIB+"/"+_AFLOWLOCK_+".OLD")){aurostd::file2file(directory_LIB+"/"+_AFLOWLOCK_+".OLD",directory_LIB+"/"+_AFLOWLOCK_+".pocc.preprocessing");}
         else if(aurostd::FileExist(directory_LIB+"/"+_AFLOWLOCK_)){aurostd::file2file(directory_LIB+"/"+_AFLOWLOCK_,directory_LIB+"/"+_AFLOWLOCK_+".pocc.preprocessing");}
       }
+      vAflowInName.push_back(AflowInName); //AS20200915
+      vFileLockName.push_back(FileLockName); //AS20200915
     } else {
       // [OBSOLETE] else if(aurostd::FileExist(directory_LIB+"/agl_aflow.in"))
       AGL_functions::AGL_Get_AflowInName(AflowInName, directory_LIB, agl_aflowin_found); //CT20200713 Call function to find correct aflow.in file name
@@ -6886,13 +6925,12 @@ namespace aflowlib {
       if (qha_aflowin_found){
         run_directory = true;
 
-	for(uint iext=0;iext<XHOST.vext.size();iext++) {
-	  aurostd::RemoveFile(directory_LIB+"/aflow.qha.out"+XHOST.vext.at(iext));
-	  aurostd::RemoveFile(directory_LIB+"/aflow.qha.thermo.out"+XHOST.vext.at(iext));
-        }
+        // clean QHA output files
+        aurostd::RemoveFile(directory_LIB+"/aflow.*qha*");
+        aurostd::RemoveFile(directory_LIB+"/*qha*png*");
 
-        if(aurostd::FileExist(directory_LIB+"/qha.LOCK")) {
-          FileLockName = "qha.LOCK";
+        if(aurostd::FileExist(directory_LIB+"/LOCK.qha")) {
+          FileLockName = "LOCK.qha";
         }
 
         // AS20200904

@@ -2478,6 +2478,20 @@ namespace init {
     nschema++;
     //CO20200829 END
 
+    //AS20200915
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:GRUNEISEN_QHA","gruneisen_qha");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:GRUNEISEN_QHA","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:GRUNEISEN_QHA","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:GRUNEISEN_300K_QHA","gruneisen_qha");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:GRUNEISEN_300K_QHA","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:GRUNEISEN_300K_QHA","number");
+    nschema++;
+    //AS20200915 END
+
     // schema is CAPITAL, content is not necessarily
     XHOST.vschema.push_attached("SCHEMA::NAME:KPOINTS","kpoints");
     XHOST.vschema.push_attached("SCHEMA::UNIT:KPOINTS","");
@@ -2567,6 +2581,13 @@ namespace init {
     XHOST.vschema.push_attached("SCHEMA::UNIT:LOOP","");
     XHOST.vschema.push_attached("SCHEMA::TYPE:LOOP","strings");
     nschema++;
+
+    //AS20200915 BEGIN
+    XHOST.vschema.push_attached("SCHEMA::NAME:MODULUS_BULK_300K_QHA","modulus_bulk_300K_qha");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:MODULUS_BULK_300K_QHA","GPa");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:MODULUS_BULK_300K_QHA","number");
+    nschema++;
+    //AS20200915 END
 
     // schema is CAPITAL, content is not necessarily
     XHOST.vschema.push_attached("SCHEMA::NAME:NATOMS","natoms");
@@ -2905,6 +2926,14 @@ namespace init {
     XHOST.vschema.push_attached("SCHEMA::UNIT:STRESS_TENSOR","kbar");
     XHOST.vschema.push_attached("SCHEMA::TYPE:STRESS_TENSOR","numbers");
     nschema++;
+
+    //AS20200915 BEGIN
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:THERMAL_EXPANSION_300K_QHA","thermal_expansion_300K_qha");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:THERMAL_EXPANSION_300K_QHA","K^-1");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:THERMAL_EXPANSION_300K_QHA","number");
+    nschema++;
+    //AS20200915 END
 
     // schema is CAPITAL, content is not necessarily
     // OBSOLETE ME20200829
