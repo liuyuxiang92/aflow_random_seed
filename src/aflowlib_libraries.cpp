@@ -1458,6 +1458,8 @@ namespace aflowlib {
         if(aurostd::FileExist(directory_RAW+"/aflow.qha.out")) aurostd::LinkFile(directory_RAW+"/aflow.qha.out",directory_WEB);
         if(aurostd::FileExist(directory_RAW+"/aflow.qha.thermo.out")) aurostd::LinkFile(directory_RAW+"/aflow.qha.thermo.out",directory_WEB);
         if(aurostd::FileExist(directory_RAW+"/aflow.qha.FVT.out")) aurostd::LinkFile(directory_RAW+"/aflow.qha.thermo.out",directory_WEB);
+        if(aurostd::FileExist(directory_RAW+"/aflow.qha.phonon_dispersion.T300K.out")) aurostd::LinkFile(directory_RAW+"/aflow.qha.phonon_dispersion.T300K.out",directory_WEB);
+
         // link all QHA plots
         vector<string> files;
         aurostd::DirectoryLS(directory_LIB, files);
@@ -5388,8 +5390,8 @@ namespace aflowlib {
       aflowlib::LIB2RAW_FileNeeded(directory_LIB,"aflow.qha.out",directory_RAW,"aflow.qha.out",vfile,MESSAGE);
       aflowlib::LIB2RAW_FileNeeded(directory_LIB,"aflow.qha.thermo.out",directory_RAW,"aflow.qha.thermo.out",vfile,MESSAGE);
       aflowlib::LIB2RAW_FileNeeded(directory_LIB,"aflow.qha.FVT.out",directory_RAW,"aflow.qha.FVT.out",vfile,MESSAGE);
- //     aflowlib::LIB2RAW_FileNeeded(directory_LIB,"aflow.qha.phonon_dispersion_T300K.out",directory_RAW,
-//          "aflow.qha.phonon_dispersion_T300K.out",vfile,MESSAGE);
+      aflowlib::LIB2RAW_FileNeeded(directory_LIB,"aflow.qha.phonon_dispersion.T300K.out",directory_RAW,
+          "aflow.qha.phonon_dispersion.T300K.out",vfile,MESSAGE);
 
 
       // read QHA data from the aflow.qha.out file
