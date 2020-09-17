@@ -32,7 +32,6 @@ const string POSCAR_POCC_series_START_tag=POSCAR_series_START_tag+"POCC_";
 const string POSCAR_POCC_series_STOP_tag=POSCAR_series_STOP_tag+"POCC_";
 
 const string POCC_AFLOWIN_tag="[AFLOW_POCC]";
-const int TEMPERATURE_PRECISION=2;  //not really going to explore more than 2000-3000K, looks weird if decimal is larger than non-decimal part of number //4;  //this is std::fixed
 
 //make defaults in AFLOW_RC
 const double ENERGY_RADIUS = 10; //angstroms  //keep, so we can still compare with KY

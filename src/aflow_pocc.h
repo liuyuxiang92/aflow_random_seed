@@ -38,6 +38,8 @@ const string STD_ELEMENTS_LIST="Sc Ti V Cr Mn Fe Co Ni Cu Zn "
 "Y Zr Nb Mo Tc Ru Rh Pd Ag Cd "
 "La Hf Ta W Re Os Ir Pt Au Hg ";
 
+const int TEMPERATURE_PRECISION=2;  //not really going to explore more than 2000-3000K, looks weird if decimal is larger than non-decimal part of number //4;  //this is std::fixed
+
 namespace pocc {
   class POccCalculator; //forward declaration
   struct POccSuperCellSet; //forward declaration
@@ -96,7 +98,7 @@ namespace pocc {
   void poccOld2New(ofstream& FileMESSAGE,ostream& oss=cout);
   
   string addDefaultPOCCTOL2string(const string& input);
-  string getTemperatureString(double temperature,int precision=2,bool temperatures_int=true,int zero_padding_temperature=3);
+  string getTemperatureString(double temperature,int precision=TEMPERATURE_PRECISION,bool temperatures_int=true,int zero_padding_temperature=TEMPERATURE_PRECISION+1);
 } // namespace pocc
 
 namespace pocc {
