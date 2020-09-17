@@ -3245,7 +3245,7 @@ namespace aflowlib {
 
       //////////////////////////////////////////////////////////////////////////
       if(gruneisen_300K_qha!=AUROSTD_NAN) {
-        sscontent_json << "\"gruneisen_300K_qha\":" << gruneisen_qha;
+        sscontent_json << "\"gruneisen_300K_qha\":" << gruneisen_300K_qha;
       } else {
         if(PRINT_NULL) sscontent_json << "\"gruneisen_300K_qha\":null";
       }
