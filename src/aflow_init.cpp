@@ -2486,7 +2486,7 @@ namespace init {
     nschema++;
 
     // schema is CAPITAL, content is not necessarily
-    XHOST.vschema.push_attached("SCHEMA::NAME:GRUNEISEN_300K_QHA","gruneisen_qha");
+    XHOST.vschema.push_attached("SCHEMA::NAME:GRUNEISEN_300K_QHA","gruneisen_300K_qha");
     XHOST.vschema.push_attached("SCHEMA::UNIT:GRUNEISEN_300K_QHA","");
     XHOST.vschema.push_attached("SCHEMA::TYPE:GRUNEISEN_300K_QHA","number");
     nschema++;

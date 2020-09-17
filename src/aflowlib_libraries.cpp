@@ -5434,7 +5434,12 @@ namespace aflowlib {
       return FALSE;
     }
 
-//    if(AFLOWLIB_VERBOSE) cout << MESSAGE << " agl_vibrational_entropy_300K_cell (meV/cell*K) = " << ((data.agl_vibrational_entropy_300K_cell!=AUROSTD_NAN)?aurostd::utype2string(data.agl_vibrational_entropy_300K_cell,10):"unavailable") << endl; //CT20181212
+    if(AFLOWLIB_VERBOSE){
+      cout << MESSAGE << " gruneisen_qha = " << ((data.gruneisen_qha!=AUROSTD_NAN)?aurostd::utype2string(data.gruneisen_qha,10):"unavailable") << endl;
+      cout << MESSAGE << " gruneisen_300K_qha = " << ((data.gruneisen_qha!=AUROSTD_NAN)?aurostd::utype2string(data.gruneisen_300K_qha,10):"unavailable") << endl;
+      cout << MESSAGE << " thermal_expansion_300K_qha (10^-5/K) = " << ((data.thermal_expansion_300K_qha!=AUROSTD_NAN)?aurostd::utype2string(data.thermal_expansion_300K_qha,10):"unavailable") << endl;
+      cout << MESSAGE << " modulus_bulk_300K_qha (GPa) = " << ((data.modulus_bulk_300K_qha!=AUROSTD_NAN)?aurostd::utype2string(data.modulus_bulk_300K_qha,10):"unavailable") << endl;
+    }
     // done
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " aflowlib::LIB2RAW_Loop_QHA - end " << directory_LIB << endl;
     return TRUE;
