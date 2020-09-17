@@ -11,6 +11,8 @@
         -- adding --lib2lib patches for AEL/AGL (CT)
         -- Added calculation of electronic contributions to the free energy. (AS)
         -- Added calculation of temperature-dependent phonon dispersions. (AS)
+        -- Added plotting functionality to plot thermodynamic properties calculated by QHA with SJ EOS model. (AS)
+        -- Added processing of QHA data to LIB2LIB and LIB2RAW. (AS)
         -- Implemented QHANP method (frequency-volume dependency is extrapolated by N-order Taylor expansion). (AS)
         -- Removed old QHA code, related infrastructure and dependencies. (AS)
         -- Fixed web output for README files and AFLOW banners. (ME)
