@@ -109,21 +109,6 @@ namespace cce {
 
       //// print output
       oss << print_output(structure, flags, cce_flags, cce_vars, multi_anion_num_neighbors);
-
-      //if (aurostd::toupper(flags.getattachedscheme("CCE_CORRECTION::PRINT")) == "JSON") {
-      //  oss << print_JSON_corrections(structure, cce_vars) << std::endl;
-      //} else if (aurostd::toupper(flags.flag("CCE_CORRECTION::UNIT_TEST"))) {
-      //  oss << print_test_output(cce_vars, cce_vars.enthalpy_formation_cell_cce) << std::endl;
-      //} else {
-      //  //// print oxidation_numbers
-      //  //oss << endl;
-      //  //oss << (cce_flags.flag("OX_NUMS_PROVIDED")?"INPUT ":"") << "OXIDATION NUMBERS:" << endl;
-      //  //oss << print_output_oxidation_numbers(structure, cce_vars);
-      //  // print CCE corrections & corrected formation enthalpies per cell and atom
-      //  oss << print_output_corrections(structure, cce_vars, cce_vars.enthalpy_formation_cell_cce);
-      //  // print CCE citation
-      //  oss << print_citation();
-      //}
     }
   } // main CCE function for command line use
 
