@@ -869,6 +869,7 @@ namespace aurostd {
   template<class utype1> void sort(vector<utype1>& arr);
   template<class utype1> void sort_remove_duplicates(vector<utype1>& arr);
   template<class utype1,class utype2> void sort(vector<utype1>& arr, vector<utype2>& brr);
+  template<class utype1,class utype2> void sort(deque<utype1>& arr, deque<utype2>& brr);  //CO20200915
   template<class utype1,class utype2,class utype3> void sort(vector<utype1>& arr, vector<utype2>& brr, vector<utype3>& crr);
   template<class utype1,class utype2,class utype3,class utype4> void sort(vector<utype1>& arr, vector<utype2>& brr, vector<utype3>& crr, vector<utype4>& drr);
 }

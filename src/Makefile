@@ -1137,6 +1137,7 @@ check_full:
 	$(MAKE) check_aflow_exits
 	$(MAKE) check_gcd
 	$(MAKE) check_smith
+	$(MAKE) check_coordination
 	$(MAKE) check_proto
 	$(MAKE) check_slab
 	#[TO BE ADDED BACK WITH THE NEXT VERSION]$(MAKE) check_chull
@@ -1177,6 +1178,10 @@ check_gcd:
 check_smith:
 	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
 	./aflow --smith_test
+.PHONY: check_coordination
+check_coordination:
+	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
+	./aflow --coordination_test
 .PHONY: check_slab
 check_slab:
 	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
