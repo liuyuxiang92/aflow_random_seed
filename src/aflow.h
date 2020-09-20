@@ -1563,9 +1563,13 @@ class xstructure {
     void CalculateSymmetryPointGroupKCrystal(void);               // Calculate the symmetry  //ME20200114
     void CalculateSymmetryPointGroupKPatterson(bool);             // Calculate the symmetry  //ME20200129
     void CalculateSymmetryPointGroupKPatterson(void);             // Calculate the symmetry  //ME20200129
-    int  GenerateGridAtoms(int,int,int,int,int,int);              // generate grid of atoms
-    int  GenerateGridAtoms(int,int,int);                          // generate grid of atoms
-    int  GenerateGridAtoms(int);                                  // generate grid of atoms
+    int GenerateGridAtoms(double);                                // generate grid of atoms
+    int GenerateGridAtoms(int);                                   // generate grid of atoms
+    int GenerateGridAtoms(int,int,int);                           // generate grid of atoms
+    int GenerateGridAtoms(const xvector<int>& dims);              // generate grid of atoms
+    int GenerateGridAtoms(int,int,int,int,int,int);               // generate grid of atoms
+    int GenerateGridAtoms_20190520(int i1,int i2,int j1,int j2,int k1,int k2); //DX20191218 [ORIG]  //CO20200912
+    int GenerateGridAtoms_20191218(int i1,int i2,int j1,int j2,int k1,int k2); //DX20191218 [NEW] //CO20200912
     int  GenerateLIJK(double);                                    // generate lijk look up table
     // QUANTUM ESPRESSO AND ABINIT AND AIMS                       // --------------------------------------
     void buildGenericTitle(bool vasp_input=false,bool force_fix=false); // build a nice title with atoms
@@ -1833,11 +1837,28 @@ class xstructure {
     // std::vector<vector<double> > rshell;                       // vector of shells
     // std::vector<vector<int> > nshell;                          // vector of density in shells
     // int nbins;                                                 // number of bins
+    void checkStructure();                                       //RF20200831; rescale structure to 1 and check whether e.g. species and atoms are present
+    //
+    void GetNeighbors(deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,double rmin=0.0,bool prim=true,bool unique_only=true);  //CO20200912
+    void GetNeighbors(deque<_atom>& atoms_cell,deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,double rmin=0.0,bool prim=true,bool unique_only=true);  //CO20200912
+    void GetNeighbors(deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,double rmax,double rmin=0.0,bool prim=true,bool unique_only=true);  //CO20200912
+    void GetNeighbors(deque<_atom>& atoms_cell,deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,double rmax,double rmin=0.0,bool prim=true,bool unique_only=true);  //CO20200912
+    //
+    void GetCoordinations(deque<deque<uint> >& coordinations,double rmin=0.0,double tol=0.5,bool prim=true,bool unique_only=true);  //CO20200912
+    void GetCoordinations(deque<_atom>& atoms_cell,deque<deque<uint> >& coordinations,double rmin=0.0,double tol=0.5,bool prim=true,bool unique_only=true);  //CO20200912
+    void GetCoordinations(deque<deque<uint> >& coordinations,double rmax,double rmin=0.0,double tol=0.5,bool prim=true,bool unique_only=true);  //CO20200912
+    void GetCoordinations(deque<_atom>& atoms_cell,deque<deque<uint> >& coordinations,double rmax,double rmin=0.0,double tol=0.5,bool prim=true,bool unique_only=true);  //CO20200912
+    //
+    void GetCoordinations(deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,deque<deque<uint> >& coordinations,double rmin=0.0,double tol=0.5,bool prim=true,bool unique_only=true);  //CO20200912
+    void GetCoordinations(deque<_atom>& atoms_cell,deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,deque<deque<uint> >& coordinations,double rmin=0.0,double tol=0.5,bool prim=true,bool unique_only=true);  //CO20200912
+    void GetCoordinations(deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,deque<deque<uint> >& coordinations,double rmax,double rmin=0.0,double tol=0.5,bool prim=true,bool unique_only=true);  //CO20200912
+    void GetCoordinations(deque<_atom>& atoms_cell,deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,deque<deque<uint> >& coordinations,double rmax,double rmin=0.0,double tol=0.5,bool prim=true,bool unique_only=true);  //CO20200912
+    //
     // NEIGHBOURS OBEJCTS OLD-ACONVASP BUT WORKS                  // NEIGHBOURS OBEJCTS 
     // GetNeighData collects all the neighbor data between rmin and rmax and stores it for each atom in a vector of atom objects in order of increasing distance.  
     void GetNeighData(const deque<_atom>& in_atom_vec,const double& rmin, const double& rmax,deque<deque<_atom> >& neigh_mat);
     // GetStrNeighData collects all the neighbor data out to some cutoff and stores it for each atom in the structure.
-    void GetStrNeighData(const double cutoff,deque<deque<_atom> >& neigh_mat);
+    void GetStrNeighData(const double cutoff,deque<deque<_atom> >& neigh_mat) const; //RF+CO20200513
     // ----------------------------------------------------------------------------------------
     // OUTPUT/ERROR FLAGS                                         // --------------------------------------
     bool Niggli_has_failed;                                       // Niggli has failed ?
@@ -1854,6 +1875,20 @@ class xstructure {
     void free();                                                  // to free everything
     void copy(const xstructure& b);                               // the flag is necessary because sometimes you need to allocate the space.
 };
+
+void GetNeighbors(const xstructure& xstr_in,deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,double rmin,bool prim,bool unique_only);
+void GetNeighbors(const xstructure& xstr_in,deque<_atom>& atoms_cell,deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,double rmin,bool prim,bool unique_only);
+void GetNeighbors(const xstructure& xstr_in,deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,double rmax,double rmin,bool prim,bool unique_only);
+void GetNeighbors(const xstructure& xstr,deque<_atom>& atoms_cell,deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,double rmax,double rmin,bool prim,bool unique_only);
+//
+void GetCoordinations(const xstructure& xstr_in,deque<deque<uint> >& coordinations,double rmin,double tol,bool prim,bool unique_only);  //CO2020914
+void GetCoordinations(const xstructure& xstr_in,deque<_atom>& atoms_cell,deque<deque<uint> >& coordinations,double rmin,double tol,bool prim,bool unique_only); //CO2020914
+void GetCoordinations(const xstructure& xstr_in,deque<deque<uint> >& coordinations,double rmax,double rmin,double tol,bool prim,bool unique_only);  //CO2020914
+void GetCoordinations(const xstructure& xstr_in,deque<_atom>& atoms_cell,deque<deque<uint> >& coordinations,double rmax,double rmin,double tol,bool prim,bool unique_only); //CO2020914
+void GetCoordinations(const xstructure& xstr_in,deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,deque<deque<uint> >& coordinations,double rmin,double tol,bool prim,bool unique_only);  //CO2020914
+void GetCoordinations(const xstructure& xstr_in,deque<_atom>& atoms_cell,deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,deque<deque<uint> >& coordinations,double rmin,double tol,bool prim,bool unique_only); //CO2020914
+void GetCoordinations(const xstructure& xstr_in,deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,deque<deque<uint> >& coordinations,double rmax,double rmin,double tol,bool prim,bool unique_only);  //CO2020914
+void GetCoordinations(const xstructure& xstr_in,deque<_atom>& atoms_cell,deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,deque<deque<uint> >& coordinations,double rmax,double rmin,double tol,bool prim,bool unique_only); //CO2020914
 
 void LightCopy(const xstructure&, xstructure&);  //ME20200220
 
@@ -2432,14 +2467,12 @@ bool SameAtom(const _atom& atom1,const _atom& atom2);
 bool DifferentAtom(const xstructure& str,const _atom& atom1,const _atom& atom2);
 xmatrix<double> GetDistMatrix(const xstructure& a); //CO20171025
 vector<double> GetNBONDXX(const xstructure& a);
-int GenerateGridAtoms(xstructure& str,int i1,int i2,int j1,int j2,int k1,int k2);
-int GenerateGridAtoms_20190520(xstructure& str,int i1,int i2,int j1,int j2,int k1,int k2); //DX20191218 [ORIG]
-int GenerateGridAtoms_20191218(xstructure& str,int i1,int i2,int j1,int j2,int k1,int k2); //DX20191218 [NEW]
-int GenerateGridAtoms(xstructure& str,int d1,int d2,int d3);
+int GenerateGridAtoms(xstructure& str,int i1,int i2,int j1,int j2,int k1,int k2); //DX20191218 [ORIG]
+int GenerateGridAtoms(xstructure& str,double radius); //CO20200912 - double
 int GenerateGridAtoms(xstructure& str,int d);
+int GenerateGridAtoms(xstructure& str,int d1,int d2,int d3);
 int GenerateGridAtoms(xstructure& str,const xvector<int>& dims);
 int GenerateGridAtoms(xstructure& str);
-int GenerateGridAtoms(xstructure& str,const double& radius);
 
 void l2ijk(const xstructure& str,const int &l,int &i,int &j,int &k);
 void l2ijk(const xstructure& str,const int &l,xvector<int>& ijk);
@@ -2491,6 +2524,8 @@ bool gcdTest(ostream& oss=cout);
 bool gcdTest(ofstream& FileMESSAGE,ostream& oss=cout);
 bool smithTest(ostream& oss=cout);
 bool smithTest(ofstream& FileMESSAGE,ostream& oss=cout);
+bool coordinationTest(ostream& oss=cout);
+bool coordinationTest(ofstream& FileMESSAGE,ostream& oss=cout);
 
 // ----------------------------------------------------------------------------
 // Structure Prototypes
