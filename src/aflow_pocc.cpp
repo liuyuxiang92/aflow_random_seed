@@ -1125,19 +1125,28 @@ namespace pocc {
     if(doscar_path.find("DOSCAR.pocc_T")==string::npos){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"odd DOSCAR filename, format should be DOSCAR.pocc_T0000K",_FILE_CORRUPT_);}
     vector<string> vtokens;
     aurostd::string2tokens(doscar_path,vtokens,"/");
-    string temperature_str="";
-    uint i=0,j=0;
-    for(i=0;i<vtokens.size();i++){
-      if(vtokens[i].find("pocc_T")!=string::npos && vtokens[i].find("K")!=string::npos){
-        temperature_str=vtokens[i];
-        aurostd::StringSubst(temperature_str,"DOSCAR.pocc_T","");
-        aurostd::StringSubst(temperature_str,"K","");
-        for(j=0;j<XHOST.vext.size();j++){aurostd::StringSubst(temperature_str,XHOST.vext[j],"");} //remove compression extension
-        if(LDEBUG){cerr << soliloquy << " temperature_str=" << temperature_str << endl;}
-        if(aurostd::isfloat(temperature_str)){break;}
-      }
+    string pocc_doscar_start="DOSCAR.pocc_T";
+    string pocc_doscar_end="K";
+    string::size_type loc_start=vtokens.back().find(pocc_doscar_start);
+    string::size_type loc_end=vtokens.back().find(pocc_doscar_end);
+    if(loc_start==string::npos||loc_end==string::npos){
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"cannot get temperature_str",_FILE_CORRUPT_);
     }
-    if(doscar_path.find("DOSCAR.pocc_T")==string::npos){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"cannot get temperature_str",_FILE_CORRUPT_);}
+    string temperature_str=vtokens.back().substr(loc_start+(pocc_doscar_start.size()),loc_end-(loc_start+(pocc_doscar_start.size())));
+    if(LDEBUG){cerr << soliloquy << " temperature_str=" << temperature_str << endl;}
+    if(!aurostd::isfloat(temperature_str)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"temperature_str is not a float",_FILE_CORRUPT_);}
+    //[CO+ME20200921 - just look at vtokens.back()]uint i=0,j=0;
+    //[CO+ME20200921 - just look at vtokens.back()]for(i=0;i<vtokens.size();i++){
+    //[CO+ME20200921 - just look at vtokens.back()]  if(vtokens[i].find("pocc_T")!=string::npos && vtokens[i].find("K")!=string::npos){
+    //[CO+ME20200921 - just look at vtokens.back()]    temperature_str=vtokens[i];
+    //[CO+ME20200921 - just look at vtokens.back()]    aurostd::StringSubst(temperature_str,"DOSCAR.pocc_T","");
+    //[CO+ME20200921 - just look at vtokens.back()]    aurostd::StringSubst(temperature_str,"K","");
+    //[CO+ME20200921 - just look at vtokens.back()]    for(j=0;j<XHOST.vext.size();j++){aurostd::StringSubst(temperature_str,XHOST.vext[j],"");} //remove compression extension
+    //[CO+ME20200921 - just look at vtokens.back()]    if(LDEBUG){cerr << soliloquy << " temperature_str=" << temperature_str << endl;}
+    //[CO+ME20200921 - just look at vtokens.back()]    if(aurostd::isfloat(temperature_str)){break;}
+    //[CO+ME20200921 - just look at vtokens.back()]  }
+    //[CO+ME20200921 - just look at vtokens.back()]}
+    //[CO+ME20200921 - just look at vtokens.back()]if(doscar_path.find("DOSCAR.pocc_T")==string::npos){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"cannot get temperature_str",_FILE_CORRUPT_);}
     double temperature=aurostd::string2utype<double>(temperature_str);
     return plotAvgDOSCAR(xdos,temperature,directory);
   }

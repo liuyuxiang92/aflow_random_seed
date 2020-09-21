@@ -5524,6 +5524,7 @@ namespace aflowlib {
     //do DOSCAR plots
     vfiles.clear();
     aurostd::DirectoryLS(directory_RAW,vfiles);
+    std::sort(vfiles.begin(),vfiles.end()); //get in order
     for(i=0;i<vfiles.size();i++){
       if(vfiles[i].find(POCC_DOSCAR_FILE)!=string::npos){
         if(AFLOWLIB_VERBOSE) cout << MESSAGE << " plotting " << vfiles[i] << endl;
