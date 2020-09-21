@@ -5221,7 +5221,7 @@ namespace aurostd {
 
 namespace aurostd {
 
-  // http://www.w3schools.com/html/ref_entities.asp
+  // http://www.w3schools.com/html/html_entities.asp
   // http://en.wikibooks.org/wiki/LaTeX/Accents
 
   //ME20200921 - Replaces HTML special characters with the correct entity name
