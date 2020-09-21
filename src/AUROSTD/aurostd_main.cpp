@@ -5221,8 +5221,20 @@ namespace aurostd {
 
 namespace aurostd {
 
-  // http://www.w3schools.com/tags/ref_entities.asp
+  // http://www.w3schools.com/html/ref_entities.asp
   // http://en.wikibooks.org/wiki/LaTeX/Accents
+
+  //ME20200921 - Replaces HTML special characters with the correct entity name
+  string text2html(const string& str) {
+    string out = str;
+    // Ampersand must come first since it is in the entity name!
+    aurostd::StringSubst(out, "&", "&amp;");
+    aurostd::StringSubst(out, "<", "&lt;");
+    aurostd::StringSubst(out, ">", "&gt;");
+    aurostd::StringSubst(out, "\"", "&quot;");
+    aurostd::StringSubst(out, "'", "&apos;");
+    return out;
+  }
 
   string html2latex(const string& str) {
     string out=str;
