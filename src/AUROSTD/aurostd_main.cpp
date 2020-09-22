@@ -1742,7 +1742,8 @@ namespace aurostd {
     string fileOUT=fileIN;
     if(LDEBUG) cerr << "aurostd::CleanFileName: " << fileOUT << endl;
     // [OBSOLETE] interferes with ~/.aflow.rc   if(aurostd::substring2bool(fileOUT,"~/")) aurostd::StringSubst(fileOUT,"~/","/home/"+XHOST.user+"/");
-    aurostd::StringSubst(fileOUT,"//","/");
+    //ME20200922 - Cleaning // must be in a while loop or it won't clean e.g. ///
+    while (fileOUT.find("//") != string::npos) aurostd::StringSubst(fileOUT,"//","/");
     aurostd::StringSubst(fileOUT,"/./","/");
     aurostd::StringSubst(fileOUT,"*","\"*\"");
     aurostd::StringSubst(fileOUT,"?","\"?\"");
@@ -3902,9 +3903,10 @@ namespace aurostd {
     if(!FileExist(FileNameIN,FileNameOUT) && !EFileExist(FileNameIN,FileNameOUT)) {
       cerr << "ERROR - aurostd::efile2stringstream: file=" << FileNameIN << " not present !" << endl;
       return FALSE;}   
-    if(aurostd::substring2bool(FileNameOUT,".bz2") ) return aurostd::bz2file2stringstream(FileNameOUT,StringstreamIN);
-    if(aurostd::substring2bool(FileNameOUT,".gz"))  return aurostd::gzfile2stringstream(FileNameOUT,StringstreamIN);
-    if(aurostd::substring2bool(FileNameOUT,".xz"))  return aurostd::xzfile2stringstream(FileNameOUT,StringstreamIN);
+    //ME20200922 - Do not use substring2bool - it may delete paths if not properly cleaned (e.g. if they contain //)
+    if(FileNameOUT.find(".bz2") != string::npos) return aurostd::bz2file2stringstream(FileNameOUT,StringstreamIN);
+    if(FileNameOUT.find(".gz") != string::npos)  return aurostd::gzfile2stringstream(FileNameOUT,StringstreamIN);
+    if(FileNameOUT.find(".xz") != string::npos)  return aurostd::xzfile2stringstream(FileNameOUT,StringstreamIN);
     return aurostd::file2stringstream(FileNameOUT,StringstreamIN);
   }
 

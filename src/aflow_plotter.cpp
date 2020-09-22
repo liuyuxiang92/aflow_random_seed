@@ -899,6 +899,7 @@ namespace plotter {
     string soliloquy=XPID+"plotter::patchDefaultTitleAFLOWIN():"; //CO20200404
 
     const string& directory = plotoptions.getattachedscheme("DIRECTORY");
+    if (!aurostd::FileExist(directory + "/" + _AFLOWIN_)) return;  //ME20200922
     if(LDEBUG) { cerr << soliloquy << " directory=" << directory << endl;}
     string SYSTEM=KBIN::ExtractSystemNameFromAFLOWIN(directory); //CO20200731
     if(!SYSTEM.empty()){
