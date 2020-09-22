@@ -455,7 +455,7 @@ namespace compare{
       const xmatrix<double>& PROTO_lattice,
       double minimum_interatomic_distance, //DX20200622
       vector<uint>& mapping_index_str1, vector<uint>& mapping_index_str2, vector<double>& min_dists,
-      const int& type_match,
+      int type_match,
       xvector<double>& origin_shift); //DX20190716
   vector<xvector<double> > minimizeMappingDistances(const vector<xvector<double> >& distance_vectors); //DX20200909
   vector<xvector<double> > minimizeMappingDistances(const vector<xvector<double> >& distance_vectors, xvector<double>& origin_shift); //DX20200909
