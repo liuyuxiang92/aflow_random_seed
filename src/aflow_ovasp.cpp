@@ -4874,7 +4874,7 @@ ostream& operator<<(ostream& oss, const xDOSCAR& xdos) {
   oss << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
   oss << std::setprecision(7) << std::scientific;
   oss << std::setw(15) << xdos.Vol;
-  for (int i = 1; i < 4; i++) oss << std::setw(15) << xdos.lattice[i];
+  for (int i = 1; i <= 3; i++) oss << std::setw(15) << xdos.lattice[i];
   oss << std::setw(15) << xdos.POTIM << std::endl;
   oss << "  " << std::setprecision(15) << xdos.temperature << std::endl;
   oss << "  " << xdos.carstring << std::endl;

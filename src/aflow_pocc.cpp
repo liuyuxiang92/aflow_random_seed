@@ -1083,6 +1083,13 @@ namespace pocc {
     }
     message << "Egap_DOS_net=" << m_Egap_DOS_net;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
 
+    //remaining properties
+    //should really print RELAXED values, but these are still being worked out for pocc
+    //default to initial values
+    m_xdoscar.Vol=xstr_pocc.GetVolume();
+    m_xdoscar.lattice=Getabc_angles(xstr_pocc.scale*xstr_pocc.lattice,DEGREES); //will be size 6, but only the first 3 are printed/read
+    for(int i=1;i<=3;i++){m_xdoscar.lattice[i]*=1e-10;}  //convert Angstroms to meters
+
     //XDOSCAR.OUT
     //string xdoscar_filename=POCC_DOSCAR_FILE+"_T"+aurostd::utype2string(temperature,TEMPERATURE_PRECISION)+"K";
     string xdoscar_filename=POCC_DOSCAR_FILE+"_T"+(*this).getTemperatureString(temperature)+"K";
