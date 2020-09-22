@@ -6201,7 +6201,7 @@ namespace compare{
       vector<uint>& mapping_index_str1,
       vector<uint>& mapping_index_str2,
       vector<double>& min_dists,
-      const int& type_match,
+      int type_match,
       xvector<double>& origin_shift){ //DX20200910 - added origin_shift
 
     // In order to find the best matchings the routine computes 
