@@ -4223,11 +4223,15 @@ bool xDOSCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   //ME20190614 START
   uint norbitals = 0;
   int d = 0, e = 0;
-  double dos;
+  double dos = 0.0;
   if (partial) {
     aurostd::string2tokens(vcontent.at(number_energies + 7), tokens, " ");
     int ncols = (int) tokens.size() - 1;  // Don't count the energy column
-    if (carstring == "CAR") {  // VASP DOSCAR
+    if (carstring == "PHON") {  // APL DOSCAR
+      norbitals = ncols;
+      isLSCOUPLING = false;
+      lmResolved = true;
+    } else {  // No special case, so VASP DOSCAR
       // Determine whether the DOSCAR is lm-resolved and/or has spin-orbit coupling (SOC)
       if (ncols == 16) {
         // If the DOSCAR has 16 columns, the variables cannot be properly resolved.
@@ -4302,10 +4306,6 @@ bool xDOSCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
       // Since VASP always prints s, p, and d orbitals, lm-resolved
       // DOSCARS contain at least 9 oribtals
       lmResolved = (norbitals > 8);
-    } else if (carstring == "PHON") {  // APL DOSCAR
-      norbitals = ncols;
-      isLSCOUPLING = false;
-      lmResolved = true;
     }
   }
   if (isLSCOUPLING) {  //ME20190620 - LSCOUPLING has four spin channels
