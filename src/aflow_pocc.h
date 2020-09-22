@@ -654,7 +654,7 @@ namespace pocc {
       void setPOccStructureProbabilities(double temperature=300); //room temperature
       string getTemperatureString(double temperature) const;
       void setAvgDOSCAR(double temperature=300);  //depends on probabilities
-      void plotAvgDOSCAR(double temperature=300) const;
+      void plotAvgDOSCAR(double temperature) const; //no default temperature, needs to be set inside setAvgDOSCAR()
       void plotAvgDOSCAR(const string& doscar_path,const string& directory=".") const;
       void plotAvgDOSCAR(const xDOSCAR& xdos,double temperature,const string& directory=".") const;
       void writeResults() const;
