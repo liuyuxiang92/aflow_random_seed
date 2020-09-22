@@ -6454,7 +6454,7 @@ namespace compare{
     for(uint i=0;i<num_distances;i++){ new_mapping_distances[i] = aurostd::modulus(new_mapping_vectors[i]); } //DX20200922 - assign with [i], no longer dynamic
 
     if(LDEBUG){
-      for(uint i=0;i<min_dists.size();i++){
+      for(uint i=0;i<num_distances;i++){ //DX20200922 - use uint instead of vector.size(); efficiency
         cerr << function_name << " minimum distance: " << min_dists[i] << " (before) --> " << new_mapping_distances[i] << " (after)" << endl;
       }
     }
@@ -6514,7 +6514,7 @@ namespace compare {
     // subtract off the residuals (rigid shift)
     uint num_distances = distance_vectors.size(); //DX20200922
     vector<xvector<double> > new_distance_vectors(num_distances); //DX20200922 - set size; fixed
-    for(uint i=0;i<num_distances;i++){
+    for(uint i=0;i<num_distances;i++){ //DX20200922 - use uint instead of vector.size(); efficiency
       new_distance_vectors[i] = distance_vectors[i]-origin_shift; //DX20200922 - assign with [i], no longer dynamic
     }
 
