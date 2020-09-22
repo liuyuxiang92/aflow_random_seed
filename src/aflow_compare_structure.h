@@ -443,13 +443,13 @@ namespace compare{
   //DX20191122 [MOVED TO XATOM] void minimumCoordinationShell(const xstructure& xstr, uint center_index, 
   //DX20191122 [MOVED TO XATOM]     double& min_dist, uint& frequency, vector<xvector<double> >& coordinates, const string& type); //DX20191105
   //DX20191122 [MOVED TO XATOM] xvector<double> centroid_with_PBC(const xstructure& xstr);
-  //DX20191122 [MOVED TO AUROSTD] xvector<double> centroid_with_PBC(vector<xvector<double> >& coordinates, const xmatrix<double>& lattice);
-  //DX20191122 [MOVED TO AUROSTD] xvector<double> centroid_with_PBC(vector<xvector<double> >& coordinates, vector<double>& weights,
-  //DX20191122 [MOVED TO AUROSTD]    const xmatrix<double>& lattice);
+  //DX20191122 [COMBINED WITH AUROSTD FUNCTION] xvector<double> centroid_with_PBC(vector<xvector<double> >& coordinates, const xmatrix<double>& lattice);
+  //DX20191122 [COMBINED WITH AUROSTD FUNCTION] xvector<double> centroid_with_PBC(vector<xvector<double> >& coordinates, vector<double>& weights,
+  //DX20191122 [COMBINED WITH AUROSTD FUNCTION]    const xmatrix<double>& lattice);
   //DX20191122 [MOVED TO XATOM] xvector<double> centroid(const xstructure& xstr); //DX20200715
-  //DX20191122 [MOVED TO AUROSTD] xvector<double> centroid(const deque<_atom>& atoms); //DX20200715
-  //DX20191122 [MOVED TO AUROSTD] xvector<double> centroid(const vector<xvector<double> >& coordinates); //DX20200715
-  //DX20191122 [MOVED TO AUROSTD] xvector<double> centroid(const vector<xvector<double> >& coordinates, const vector<double>& weights); //DX20200715
+  //DX20191122 [COMBINED WITH AUROSTD FUNCTION] xvector<double> centroid(const deque<_atom>& atoms); //DX20200715
+  //DX20191122 [COMBINED WITH AUROSTD FUNCTION] xvector<double> centroid(const vector<xvector<double> >& coordinates); //DX20200715
+  //DX20191122 [COMBINED WITH AUROSTD FUNCTION] xvector<double> centroid(const vector<xvector<double> >& coordinates, const vector<double>& weights); //DX20200715
   //bool findMatch(const xstructure& xstr1, const xstructure& PROTO,vector<uint>& im1, vector<uint>& im2, vector<double>& min_dists, const int& type_match);
   bool findMatch(const deque<_atom>& xstr1_atoms, const deque<_atom>& PROTO_atoms,
       const xmatrix<double>& PROTO_lattice,
