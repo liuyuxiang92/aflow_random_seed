@@ -6449,7 +6449,7 @@ namespace compare{
     xvector<double> origin_shift_test;
     vector<xvector<double> > new_mapping_vectors = minimizeMappingDistances(min_map_vectors, origin_shift_test);
     vector<double> new_mapping_distances;
-    new_mapping_distances.resize(min_map_vectors.size()); //DX20200922 - set size; fixed
+    new_mapping_distances.resize(new_mapping_vectors.size()); //DX20200922 - set size; fixed
     for(uint i=0;i<min_dists.size();i++){ new_mapping_distances[i] = aurostd::modulus(new_mapping_vectors[i]); } //DX20200922 - assign with [i], no longer dynamic
 
     if(LDEBUG){
