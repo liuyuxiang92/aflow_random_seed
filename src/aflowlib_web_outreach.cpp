@@ -1382,12 +1382,7 @@ bool ProcessPhpLatexCv(void) {
     Arun=TRUE;
   }
 
-  if(Arun) {
-    string function = XPID + "ProcessPhpLatexCv():";
-    string message = "Arun == true";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message);
-  }
-  return TRUE;
+  return Arun;
 }
 
 

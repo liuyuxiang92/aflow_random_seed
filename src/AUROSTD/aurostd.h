@@ -848,6 +848,7 @@ namespace aurostd { // aurostd_crc64.cpp
 // ***************************************************************************
 
 namespace aurostd {
+  string text2html(const string& str) __xprototype;  //ME20200921
   string html2latex(const string& str) __xprototype;
   string html2txt(const string& str) __xprototype;
   string string2latex(const string& str) __xprototype;
