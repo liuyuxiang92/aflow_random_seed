@@ -1488,7 +1488,7 @@ namespace pocc {
     string soliloquy=XPID+"POccCalculator::postProcessing():";
     stringstream message;
 
-    if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"POccCalculator failed to initialized");}
+    if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"POccCalculator failed to initialize");}
     if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
 
     loadDataIntoCalculator();
