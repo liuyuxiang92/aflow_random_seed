@@ -6449,7 +6449,8 @@ namespace compare{
     xvector<double> origin_shift_test;
     vector<xvector<double> > new_mapping_vectors = minimizeMappingDistances(min_map_vectors, origin_shift_test);
     vector<double> new_mapping_distances;
-    for(uint i=0;i<min_dists.size();i++){ new_mapping_distances.push_back(aurostd::modulus(new_mapping_vectors[i])); }
+    new_mapping_distances.resize(min_map_vectors.size()); //DX20200922 - set size; fixed
+    for(uint i=0;i<min_dists.size();i++){ new_mapping_distances[i] = aurostd::modulus(new_mapping_vectors[i]); } //DX20200922 - assign with [i], no longer dynamic
 
     if(LDEBUG){
       for(uint i=0;i<min_dists.size();i++){
@@ -6511,8 +6512,9 @@ namespace compare {
     // ---------------------------------------------------------------------------
     // subtract off the residuals (rigid shift)
     vector<xvector<double> > new_distance_vectors;
+    new_distance_vectors.resize(distance_vectors.size()); //DX20200922 - set size; fixed
     for(uint i=0;i<distance_vectors.size();i++){
-      new_distance_vectors.push_back(distance_vectors[i]-origin_shift);
+      new_distance_vectors[i] = distance_vectors[i]-origin_shift; //DX20200922 - assign with [i], no longer dynamic
     }
 
     return new_distance_vectors;
