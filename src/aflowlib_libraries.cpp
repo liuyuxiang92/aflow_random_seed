@@ -3726,18 +3726,24 @@ namespace aflowlib {
       }
     }
 
+ 
     // ONLY TO GET REFERENCE ENERGIES AND INTERCEPT PROTOTYPES
     if(1) { // ONLY TO GENERATE AUIDS - SC ONLY DONT TOUCH
       if(data.nspecies==1) {
         string s=str_relax.species.at(0);
         string TXT1,TXT2;
-        TXT1= "XXX if(AUID==\""+data.vspecies_pp_AUID.at(0);
+	TXT1= "XXX if(AUID==\""+data.vspecies_pp_AUID.at(0);
         if(!aurostd::substring2bool(str_relax.species_pp_version.at(0),"SCAN")) { TXT1+="\" && nKIN) {found=TRUE;groundstate_structure=\""; } else { TXT1+="\" && SCAN) {found=TRUE;groundstate_structure=\""; }
         TXT2="\";groundstate_energy="+aurostd::utype2string<double>(data.enthalpy_atom,7)+";volume_atom="+aurostd::utype2string<double>(data.volume_atom,7);
         if(aurostd::abs(data.spin_atom)<0.1) { TXT2+=";spin_atom=0.0;} // "; } else { TXT2+=";spin_atom="+aurostd::utype2string<double>(data.spin_atom,7)+";} // ";}
         TXT2+=str_relax.species_pp_version.at(0);
-        cout << data.anrl_label_orig << endl;
-        // A1
+        if(data.anrl_label_orig!="") cout << data.anrl_label_orig << endl;
+
+	// cerr << data.nspecies << endl; 
+	// cerr << "\"" << data.anrl_label_orig << "\"" << endl; 
+	// cerr << str_relax.species.at(0) << endl;
+
+	// A1
         if(data.anrl_label_orig=="A_cF4_225_a" && (s=="Ac" || s=="Ag" || s=="Al" || s=="Au" || s=="Ca" || s=="Cu" || s=="Ir" || s=="La" || s=="Ni" || s=="Pb" || s=="Pd" || s=="Pt" || s=="Rh" || s=="Sr" || s=="Yb" || s=="Ar" || s=="Ne" || s=="Xe" || s=="Kr")) { // A1
           cout << TXT1 << "A1" << TXT2 << endl;}
         // A2
@@ -3786,6 +3792,9 @@ namespace aflowlib {
           cout << TXT1 << "ICSD_56992" << TXT2 << endl;}
         if(data.anrl_label_orig=="A_hR3_166_ac" && (s=="Sm")) { // C19
           cout << TXT1 << "C19" << TXT2 << endl;}
+	if(data.anrl_label_orig=="" && (s=="Xe")) { // ISOLATED
+          cout << TXT1 << "isolated" << TXT2 << endl;}
+       
       }
     }
 

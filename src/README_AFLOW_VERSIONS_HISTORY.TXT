@@ -1,3 +1,6 @@
+3.2.4b - 2020/07/19
+        Location: http://materials.duke.edu/AFLOW/aflow.3.2.4b.tar.xz
+        -- Fixed xprototype class for David ANRL symbolic (SC)
 3.2.4 - 2020/06/25
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.4.tar.xz
         -- Added latex->dvips->ps2pdf compilation route for pre-2010 texlive versions. (ME)
