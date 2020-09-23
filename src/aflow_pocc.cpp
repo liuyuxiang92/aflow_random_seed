@@ -1092,7 +1092,7 @@ namespace pocc {
 
     //XDOSCAR.OUT
     //string xdoscar_filename=POCC_DOSCAR_FILE+"_T"+aurostd::utype2string(temperature,TEMPERATURE_PRECISION)+"K";
-    string xdoscar_filename=POCC_DOSCAR_FILE+"_T"+(*this).getTemperatureString(temperature)+"K";
+    string xdoscar_filename=POCC_DOSCAR_FILE+"_T"+getTemperatureString(temperature)+"K";
     message << "Writing out " << xdoscar_filename;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
     stringstream pocc_xdoscar_ss;
     pocc_xdoscar_ss << m_xdoscar;
@@ -1172,14 +1172,14 @@ namespace pocc {
     if(1){  //turn off for ME - POCC+APL
       plot_opts.push_attached("PROJECTION","ORBITALS");
       //plot_opts.push_attached("EXTENSION","dos_orbitals_T"+aurostd::utype2string(temperature,TEMPERATURE_PRECISION)+"K");
-      plot_opts.push_attached("EXTENSION","dos_orbitals_T"+(*this).getTemperatureString(temperature)+"K");
+      plot_opts.push_attached("EXTENSION","dos_orbitals_T"+getTemperatureString(temperature)+"K");
       plotter::PLOT_DOS(plot_opts,xdos,*p_FileMESSAGE,*p_oss);
 
       plot_opts.push_attached("ARUN_DIRECTORY",m_ARUN_directories[0]);
       plot_opts.pop_attached("PROJECTION");
       plot_opts.push_attached("PROJECTION","SPECIES");
       //plot_opts.push_attached("EXTENSION","dos_species_T"+aurostd::utype2string(temperature,TEMPERATURE_PRECISION)+"K");
-      plot_opts.push_attached("EXTENSION","dos_species_T"+(*this).getTemperatureString(temperature)+"K");
+      plot_opts.push_attached("EXTENSION","dos_species_T"+getTemperatureString(temperature)+"K");
       plotter::PLOT_DOS(plot_opts,xdos,*p_FileMESSAGE,*p_oss);
 
       if(0){  //turn on for SG - plot orbitals for each species near fermi energy (dos_species_T0K_Cs_1)
@@ -1198,7 +1198,7 @@ namespace pocc {
       plot_opts.push_attached("ARUN_DIRECTORY",m_ARUN_directories[0]);
       plot_opts.push_attached("PROJECTION","ATOMS");
       //plot_opts.push_attached("EXTENSION","dos_atoms_T"+aurostd::utype2string(temperature,TEMPERATURE_PRECISION)+"K");
-      plot_opts.push_attached("EXTENSION","dos_atoms_T"+(*this).getTemperatureString(temperature)+"K");
+      plot_opts.push_attached("EXTENSION","dos_atoms_T"+getTemperatureString(temperature)+"K");
       plot_opts.pop_attached("XMIN");plot_opts.pop_attached("XMAX");
       plot_opts.push_attached("XMIN","0");plot_opts.push_attached("XMAX","0.05");
       plotter::PLOT_DOS(plot_opts,xdos,*p_FileMESSAGE,*p_oss);
@@ -1270,7 +1270,7 @@ namespace pocc {
     message << "Writing out " << POCC_FILE_PREFIX+POCC_OUT_FILE << " (T=" << temperature << "K properties)";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_); //CO20200502 - no getTemperatureString(T) needed here
     stringstream pocc_out_ss;
     pocc_out_ss << AFLOWIN_SEPARATION_LINE << endl;
-    pocc_out_ss << POCC_AFLOWIN_tag << "START_TEMPERATURE=" << (*this).getTemperatureString(temperature) << "_K" << endl;  //"  (K)"
+    pocc_out_ss << POCC_AFLOWIN_tag << "START_TEMPERATURE=" << getTemperatureString(temperature) << "_K" << endl;  //"  (K)"
     //[CO20200502 - removed unnecessary separation line]pocc_out_ss << AFLOWIN_SEPARATION_LINE << endl;
 
     //supercell probabilities
@@ -1299,7 +1299,7 @@ namespace pocc {
     }
     if(Egap_net!=AUROSTD_MAX_DOUBLE) pocc_out_ss << "Egap_net=" << aurostd::utype2string(Egap_net,pocc_precision,true,pocc_roundoff_tol,SCIENTIFIC_STREAM) << "  (eV)" << endl;
     //[CO20200502 - removed unnecessary separation line]pocc_out_ss << AFLOWIN_SEPARATION_LINE << endl;
-    pocc_out_ss << POCC_AFLOWIN_tag << "STOP_TEMPERATURE=" << (*this).getTemperatureString(temperature) << "_K" << endl;  //"  (K)"
+    pocc_out_ss << POCC_AFLOWIN_tag << "STOP_TEMPERATURE=" << getTemperatureString(temperature) << "_K" << endl;  //"  (K)"
     pocc_out_ss << AFLOWIN_SEPARATION_LINE << endl;
 
     aurostd::stringstream2file(pocc_out_ss,m_aflags.Directory+"/"+POCC_FILE_PREFIX+POCC_OUT_FILE,"APPEND");
