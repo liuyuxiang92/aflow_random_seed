@@ -621,7 +621,7 @@ namespace chull {
       ////////////////////////////////////////////////////////////////////////////
       // END Stability criterion calculation
       ////////////////////////////////////////////////////////////////////////////
-      
+
       ////////////////////////////////////////////////////////////////////////////
       // START N+1 enthalpy gain calculation
       ////////////////////////////////////////////////////////////////////////////
@@ -4125,10 +4125,10 @@ namespace chull {
         }
         if(remove_submodular){
           if(entry.aurl.find("ARUN.AEL_")!=string::npos ||
-             entry.aurl.find("ARUN.AGL_")!=string::npos ||
-             entry.aurl.find("ARUN.APL_")!=string::npos ||
-             entry.aurl.find("ARUN.QHA_")!=string::npos ||
-             FALSE){
+              entry.aurl.find("ARUN.AGL_")!=string::npos ||
+              entry.aurl.find("ARUN.APL_")!=string::npos ||
+              entry.aurl.find("ARUN.QHA_")!=string::npos ||
+              FALSE){
             silent=true;  //no need to see
             message << "Neglecting [auid=" << entry.auid << ",aurl=" << entry.aurl << "]: sub-module load";
             pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, LOGGER_TYPE, silent);
@@ -6525,10 +6525,10 @@ namespace chull {
         for(uint i=0,fl_size_i=vcpoints.size();i<fl_size_i;i++){cerr << vcpoints[i] << " ";} 
         cerr << endl;
       }
-      
+
       getFakeHull(vcpoints,elements_present_hull,elements_present_points,fake_hull);
     }
-    
+
     //since j_nary and j_alloy don't change, the getDistanceToHull function should work fine (getRelevantFacets())
     //xvector<int> elements_present=m_naries[j_nary].m_alloys[j_alloy].m_elements_present;
     //if(LDEBUG) {cerr << soliloquy << " elements_present=" << elements_present << endl;}
@@ -6631,7 +6631,7 @@ namespace chull {
     string soliloquy=XPID+"ConvexHull::setNPlus1EnthalpyGain():";
     if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Hull not initialized");}
     stringstream message;
-    
+
     if(i_point>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
     if(!m_points[i_point].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
     //[CO20200404 - not useful, we still want values for binaries, this would skip over value assignment]if(test_binary_np1==false&&m_points[i_point].m_i_nary<2){continue;} //unaries would be trivial, and binaries is simply H_f
@@ -6740,7 +6740,7 @@ namespace chull {
       if(!m_points[i_point].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
       //[CO20200404 - not useful, we still want values for binaries, this would skip over value assignment]if(test_binary_np1==false&&m_points[i_point].m_i_nary<2){continue;} //unaries would be trivial, and binaries is simply H_f
       if(LDEBUG) {cerr << soliloquy << " looking at point[i_point=" << i_point << "].m_coords=" << m_points[i_point].m_coords << ", compound=" << m_points[i_point].m_entry.compound << endl;}
-      
+
       found=false;
       for(j=0,fl_size_j=v_elements_present.size();j<fl_size_j&&found==false;j++){
         if(m_points[i_point].m_elements_present==v_elements_present[j]){

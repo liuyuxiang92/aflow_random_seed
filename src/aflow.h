@@ -4791,50 +4791,50 @@ extern std::vector<xelement::xelement> velement;        // store starting from O
 
 namespace xprototype {
   class xprototype {  // stuff in aflow_xprototype.cpp
-  public:
-    // constructor destructor                          // constructor/destructor
-    xprototype();                                      // default, just allocate
-    xprototype(const string&);                         // look at it by symbol or name IN ANRL database
-    ~xprototype();                                     // kill everything
-    const xprototype& operator=(const xprototype &b);  // copy
-    void clear(); 
-    void populate(const string& prototype);  
-    //    void populate(uint ZZ);
-    // content                                         // content
-    bool verbose;
-    // label/params info
-    string catalog;                                    // prototype catalog 'anrl' or 'htqc'
-    uint volume;                                       // volume/part of Encyclopedia
-    string label;                                      // label (e.g., 201 or AB_cF8_225_a_b)
-    vector<string> parameter_list;                     // list of degrees of freedom (a,b/a,c/a,alpha,beta,gamma,x1,y1,z1,x2,...)
-    vector<double> parameter_values;                   // values for degrees of freedom
-    string parameter_set_id;                           // parameter set enumeration (e.g., 001, 002, 003, etc.)
-    string weblink;                                    // link to the corresponding CrystalDatabase web page
-    vector<uint> stoichiometry;                        // reduced stoichiometry for prototype (e.g., equicompositional ternary=1:1:1)
-    // symmetry
-    string Pearson_symbol;                             // Pearson symbol
-    uint space_group_number;                           // space group number
-    string space_group_symbol_H_M;                     // space group symbol Hermann-Mauguin (optional or use AFLOW lookup table)
-    string space_group_symbol_Hall;                    // space group symbol Hall (optional or use AFLOW lookup table)
-    string space_group_symbol_Schoenflies;             // space group symbol Schoenflies (optional or use AFLOW lookup table)
-    vector<vector<string> > Wyckoff_letters;           // list of Wyckoff letters grouped by species ([[a,b],[c,d,e],[f,g,h,i],...])
-    vector<vector<string> > Wyckoff_site_symmetries;   // list of Wyckoff site symmetries grouped by species ([mmm],[2mm,m2m],[mm2],...]) (optional, I can grab from look-up table)
-    vector<vector<uint> > Wyckoff_multiplicities;      // list of Wyckoff multiplicities grouped by species ([48],[24,24],[12,12,12][4,4,4,4],...]) (optional, I can grab from look-up table)
-    // designations
-    string prototype_material;                         // common prototype material, e.g., NaCl
-    string common_name;                                // common prototype name, e.g., half-Heusler
-    string mineral_name;                               // mineral name, e.g., corundum
-    string phase;                                      // compound phase designation (alpha, beta, gamma, delta, etc.) (if applicable)
-    string strukturbericht;                            // Strukturbericht designation (if applicable)
-    vector<string> similar_materials;                  // list of similar compounds (if in same order as stoichiometry we can easily decorate prototypes)
-    vector<string> comments;                           // noteworthy comments (included in ANRL document and webpage)
-    string title;                                      // title (for ANRL document/webpage)
-    // operators/functions                                    // operator/functions
-    friend ostream& operator<<(ostream &,const xprototype&);    // print
-    xprototype Iinitialize(uint Z);                    // function to clean up the name
-  private:                                             //
-    void free();                                       // free space
-    void copy(const xprototype& b);                    // copy space
+    public:
+      // constructor destructor                          // constructor/destructor
+      xprototype();                                      // default, just allocate
+      xprototype(const string&);                         // look at it by symbol or name IN ANRL database
+      ~xprototype();                                     // kill everything
+      const xprototype& operator=(const xprototype &b);  // copy
+      void clear(); 
+      void populate(const string& prototype);  
+      //    void populate(uint ZZ);
+      // content                                         // content
+      bool verbose;
+      // label/params info
+      string catalog;                                    // prototype catalog 'anrl' or 'htqc'
+      uint volume;                                       // volume/part of Encyclopedia
+      string label;                                      // label (e.g., 201 or AB_cF8_225_a_b)
+      vector<string> parameter_list;                     // list of degrees of freedom (a,b/a,c/a,alpha,beta,gamma,x1,y1,z1,x2,...)
+      vector<double> parameter_values;                   // values for degrees of freedom
+      string parameter_set_id;                           // parameter set enumeration (e.g., 001, 002, 003, etc.)
+      string weblink;                                    // link to the corresponding CrystalDatabase web page
+      vector<uint> stoichiometry;                        // reduced stoichiometry for prototype (e.g., equicompositional ternary=1:1:1)
+      // symmetry
+      string Pearson_symbol;                             // Pearson symbol
+      uint space_group_number;                           // space group number
+      string space_group_symbol_H_M;                     // space group symbol Hermann-Mauguin (optional or use AFLOW lookup table)
+      string space_group_symbol_Hall;                    // space group symbol Hall (optional or use AFLOW lookup table)
+      string space_group_symbol_Schoenflies;             // space group symbol Schoenflies (optional or use AFLOW lookup table)
+      vector<vector<string> > Wyckoff_letters;           // list of Wyckoff letters grouped by species ([[a,b],[c,d,e],[f,g,h,i],...])
+      vector<vector<string> > Wyckoff_site_symmetries;   // list of Wyckoff site symmetries grouped by species ([mmm],[2mm,m2m],[mm2],...]) (optional, I can grab from look-up table)
+      vector<vector<uint> > Wyckoff_multiplicities;      // list of Wyckoff multiplicities grouped by species ([48],[24,24],[12,12,12][4,4,4,4],...]) (optional, I can grab from look-up table)
+      // designations
+      string prototype_material;                         // common prototype material, e.g., NaCl
+      string common_name;                                // common prototype name, e.g., half-Heusler
+      string mineral_name;                               // mineral name, e.g., corundum
+      string phase;                                      // compound phase designation (alpha, beta, gamma, delta, etc.) (if applicable)
+      string strukturbericht;                            // Strukturbericht designation (if applicable)
+      vector<string> similar_materials;                  // list of similar compounds (if in same order as stoichiometry we can easily decorate prototypes)
+      vector<string> comments;                           // noteworthy comments (included in ANRL document and webpage)
+      string title;                                      // title (for ANRL document/webpage)
+      // operators/functions                                    // operator/functions
+      friend ostream& operator<<(ostream &,const xprototype&);    // print
+      xprototype Iinitialize(uint Z);                    // function to clean up the name
+    private:                                             //
+      void free();                                       // free space
+      void copy(const xprototype& b);                    // copy space
   };
 }
 

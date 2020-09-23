@@ -236,7 +236,7 @@ namespace SYM {
     if(sg_number >= 3 && sg_number <= 15){
       // simple monoclinic
       if(sg_number == 3 || sg_number == 4 || sg_number == 6 || sg_number == 7 ||
-         sg_number == 10 || sg_number == 11 || sg_number == 13 || sg_number == 14){
+          sg_number == 10 || sg_number == 11 || sg_number == 13 || sg_number == 14){
         return "mP";
       }
       // base-centered monoclinic
@@ -271,14 +271,14 @@ namespace SYM {
     if(sg_number >= 75 && sg_number <= 142){
       // simple tetragonal
       if((sg_number >= 75 && sg_number <= 78) || (sg_number == 81) || (sg_number >= 83 && sg_number <= 86) ||
-         (sg_number >= 89 && sg_number <= 96) || (sg_number >= 99 && sg_number <= 106) || (sg_number >= 111 && sg_number <= 118) ||
-         (sg_number >= 123 && sg_number <= 138)){
+          (sg_number >= 89 && sg_number <= 96) || (sg_number >= 99 && sg_number <= 106) || (sg_number >= 111 && sg_number <= 118) ||
+          (sg_number >= 123 && sg_number <= 138)){
         return "tP";
       }
       // body-centered tetragonal
       else if((sg_number >= 79 && sg_number <= 80) || (sg_number == 82) || (sg_number >= 87 && sg_number <= 88) ||
-              (sg_number >= 97 && sg_number <= 98) || (sg_number >= 107 && sg_number <= 110) || (sg_number >= 119 && sg_number <= 122) ||
-              (sg_number >= 139 && sg_number <= 142)){
+          (sg_number >= 97 && sg_number <= 98) || (sg_number >= 107 && sg_number <= 110) || (sg_number >= 119 && sg_number <= 122) ||
+          (sg_number >= 139 && sg_number <= 142)){
         return "tI";
       }
     }
@@ -288,12 +288,12 @@ namespace SYM {
     if(sg_number >= 143 && sg_number <= 167){
       // trigonal
       if((sg_number >= 143 && sg_number <= 145) || (sg_number == 147) || (sg_number >= 149 && sg_number <= 154) ||
-         (sg_number >= 156 && sg_number <= 159) || (sg_number >= 162 && sg_number <= 165)){
+          (sg_number >= 156 && sg_number <= 159) || (sg_number >= 162 && sg_number <= 165)){
         return "hP";
       }
       // rhombohedral
       else if((sg_number == 146) || (sg_number == 148) || (sg_number == 155) ||
-              (sg_number >= 160 && sg_number <= 161) || (sg_number >= 166 && sg_number <= 167)){
+          (sg_number >= 160 && sg_number <= 161) || (sg_number >= 166 && sg_number <= 167)){
         return "hR";
       }
     }
@@ -309,18 +309,18 @@ namespace SYM {
     if(sg_number >= 195 && sg_number <= 230){
       // simple cubic
       if(sg_number == 195 || sg_number == 198 || sg_number == 200 || sg_number == 201 || sg_number == 205 || sg_number == 207 ||
-         sg_number == 208 || sg_number == 212 || sg_number == 213 || sg_number == 215 || sg_number == 218 || sg_number == 221 ||
-         sg_number == 222 || sg_number == 223 || sg_number == 224){
+          sg_number == 208 || sg_number == 212 || sg_number == 213 || sg_number == 215 || sg_number == 218 || sg_number == 221 ||
+          sg_number == 222 || sg_number == 223 || sg_number == 224){
         return "cP";
       }
       // face-centered cubic
       else if(sg_number == 196 || sg_number == 202 || sg_number == 203 || sg_number == 209 || sg_number == 210 || sg_number == 216 ||
-              sg_number == 219 || sg_number == 225 || sg_number == 226 || sg_number == 227 || sg_number == 228){
+          sg_number == 219 || sg_number == 225 || sg_number == 226 || sg_number == 227 || sg_number == 228){
         return "cF";
       }
       // body-centered cubic
       else if(sg_number == 197 || sg_number == 199 || sg_number == 204 || sg_number == 206 || sg_number == 211 || sg_number == 214 ||
-              sg_number == 217 || sg_number == 220 || sg_number == 229 || sg_number == 230){
+          sg_number == 217 || sg_number == 220 || sg_number == 229 || sg_number == 230){
         return "cI";
       }
     }
@@ -2829,7 +2829,7 @@ void wyckoffsite_ITC::getWyckoffFromLetter(const string& space_group_string, con
       letter = Wyckoff_tokens[1];
       if(letter == Wyckoff_letter){
         //if(isdigit(Wyckoff_tokens[0])){
-          multiplicity = aurostd::string2utype<uint>(Wyckoff_tokens[0]);
+        multiplicity = aurostd::string2utype<uint>(Wyckoff_tokens[0]);
         //}
         //else{
         //  message << "The first position of the Wyckoff string is not a number (multiplicity): " << all_Wyckoff_strings[i];

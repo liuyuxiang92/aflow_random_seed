@@ -402,7 +402,7 @@ namespace makefile {
     if(vcpp_aurostd.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"vcpp_aurostd.size()==0",_RUNTIME_ERROR_);}
     if(vcpp_aurostd[0]!=file){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,file+" not set to first entry of vcpp_aurostd",_RUNTIME_ERROR_);}
     if(LDEBUG){cerr << soliloquy << " vcpp_aurostd=" << aurostd::joinWDelimiter(vcpp_aurostd,",") << endl;}
-   
+
     //DX20200801 - SYMBOLIC MATH - START
 #if COMPILE_SYMBOLIC
     //do SYMBOLICCPLUSPLUS second - it gets compiled separately
@@ -429,7 +429,7 @@ namespace makefile {
     if(vcpp_symbolic[0]!=file){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,file+" not set to first entry of vcpp_symbolic",_RUNTIME_ERROR_);}
     if(LDEBUG){cerr << soliloquy << " vcpp_symbolic=" << aurostd::joinWDelimiter(vcpp_symbolic,",") << endl;}
 #endif
-      //DX20200801 - SYMBOLIC MATH - END
+    //DX20200801 - SYMBOLIC MATH - END
 
     //ANRL
     vector<string> vcpp_anrl;

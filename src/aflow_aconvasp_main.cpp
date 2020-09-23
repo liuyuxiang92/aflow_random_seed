@@ -1968,7 +1968,7 @@ namespace pflow {
           return_code = db.patchDatabase(patchfiles, false);
         }
         if ((return_code < 100) || (return_code >= 200)) {
-            db.analyzeDatabase(DEFAULT_AFLOW_DB_STATS_FILE);
+          db.analyzeDatabase(DEFAULT_AFLOW_DB_STATS_FILE);
         }
         _PROGRAMRUN = true;
         return return_code;
@@ -6533,7 +6533,7 @@ namespace pflow {
 
     // get tolerance
     double tolerance = pflow::getSymmetryTolerance(a,vpflow.getattachedscheme("FULLSYMMETRY::TOLERANCE")); //DX20200820 - consolidated setting tolerance into a function
-    
+
     //DX20170803 - Add format flag - START
     string format = "txt";
     if(XHOST.vflag_control.flag("PRINT_MODE::TXT")){
@@ -10254,7 +10254,7 @@ namespace pflow {
       tag_code="00000";
       tag_message="NOTICE";
     }
-      
+
     ostringstream stream;
     if(type == _LOGGER_RAW_) {
       for(uint i=0;i<message_parts.size();i++){stream << message_parts[i] << endl;} //CO20181226 //message;
@@ -12793,7 +12793,7 @@ namespace pflow {
     //get vmix
     vector<string> vmix=vnonmetals;vmix.insert(vmix.end(),vmetals.begin(),vmetals.end());
     std::sort(vmix.begin(),vmix.end());
-    
+
     //get vind_nm
     vector<uint> vind_nm;
     if(LDEBUG){cerr << soliloquy << " vmix=" << aurostd::joinWDelimiter(vmix,",") << endl;}
@@ -12827,13 +12827,13 @@ namespace pflow {
 
     //get vNinbetween_std
     vector<uint> vNinbetween_std;vNinbetween_std.assign(vNinbetween.size(),0);vNinbetween_std.back()=metal_arity;
-    
+
     uint k=0; //index of nonmetals
     vector<string> vcommands,vtmp;
     string command="",tmp;
     while(vcommands.size()<1e4){  //not simple as number of combinations since we could have 2 or more nonmetals
       command="";
-      
+
       for(i=0,k=0;i<vNinbetween.size();i++){
         tmp=aurostd::joinWDelimiter(vvinbetween[i],",");
         vtmp.clear();
@@ -12847,7 +12847,7 @@ namespace pflow {
           command+=vnonmetals[k++];
         }
       }
-      
+
       if(LDEBUG){cerr << soliloquy << " command=" << command << endl;}
       vcommands.push_back(command);
       if(vNinbetween==vNinbetween_std){break;}
@@ -12860,7 +12860,7 @@ namespace pflow {
       }
       if(LDEBUG){cerr << soliloquy << " vNinbetween=" << aurostd::joinWDelimiter(vNinbetween,",") << endl;}
     }
-    
+
     return vcommands;
   }
   vector<string> GENERATE_CERAMICS(const aurostd::xoption& vpflow){ //CO20200731
@@ -13604,7 +13604,7 @@ namespace pflow {
 
       // get tolerance
       double tolerance = pflow::getSymmetryTolerance(a,vpflow.getattachedscheme("SG::TOLERANCE")); //DX20200820 - consolidated setting tolerance into a function
-      
+
       bool tolerance_spectrum_analysis = false;
       vector<double> tolerance_spectrum;
       //DX20200817 - SPACEGROUP SPECTRUM - START
@@ -13842,7 +13842,7 @@ namespace pflow {
 
     // get tolerance
     double tolerance = pflow::getSymmetryTolerance(a,vpflow.getattachedscheme("SGDATA::TOLERANCE")); //DX20200820 - consolidated setting tolerance into a function
-    
+
     //DX20180806 - added setting - START
     int setting = 0;
     if(vpflow.flag("SGDATA::SETTING")){

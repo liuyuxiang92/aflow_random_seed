@@ -969,7 +969,7 @@ namespace aurostd {
         ){RemoveCharacterInPlace(s,s[i]);}
     }
   }
-  
+
   // ***************************************************************************
   // Function RemoveTrailingCharacter
   // ***************************************************************************
@@ -2465,7 +2465,7 @@ namespace aurostd {
     //[CO20200624 - OBSOLETE]FileMESSAGE << stream.str().c_str(); FileMESSAGE.flush();
     //[CO20200624 - OBSOLETE]if(osswrite) {if(!quiet) {oss << stream.str().c_str();oss.flush();}}
     //[CO20200624 - OBSOLETE]// cerr << stream.str().c_str(); cerr.flush();
-    
+
     //CO20181226 - split by newlines and print separately
     vector<string> message_parts,_message_parts;
     aurostd::string2vectorstring(stream.str(),_message_parts);
@@ -2562,7 +2562,7 @@ namespace aurostd {
     //[CO20200624 - OBSOLETE]FileMESSAGE << ErrorBarString << endl << stream.str().c_str() << ErrorBarString << endl; FileMESSAGE.flush();
     //[CO20200624 - OBSOLETE]oss << ErrorBarString << endl << stream.str().c_str() << ErrorBarString << endl;cout.flush();
     //[CO20200624 - OBSOLETE]// cerr << stream.str().c_str(); cerr.flush();
-    
+
     //CO20181226 - split by newlines and print separately
     vector<string> message_parts,_message_parts;
     aurostd::string2vectorstring(stream.str(),_message_parts);
@@ -2636,7 +2636,7 @@ namespace aurostd {
     //[CO20200624 - OBSOLETE]FileMESSAGE << stream.str().c_str(); FileMESSAGE.flush();
     //[CO20200624 - OBSOLETE]if(osswrite) {oss << stream.str().c_str();oss.flush();}
     //[CO20200624 - OBSOLETE]// cerr << stream.str().c_str(); cerr.flush();
-    
+
     //CO20181226 - split by newlines and print separately
     vector<string> message_parts,_message_parts;
     aurostd::string2vectorstring(stream.str(),_message_parts);
