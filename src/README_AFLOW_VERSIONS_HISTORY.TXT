@@ -18,6 +18,7 @@
         -- Added calculation of temperature-dependent phonon dispersions. (AS)
         -- Implemented QHANP method (frequency-volume dependency is extrapolated by N-order Taylor expansion). (AS)
         -- Removed old QHA code, related infrastructure and dependencies. (AS)
+        -- Fixed web output for README files and AFLOW banners. (ME)
         -- Added patch functionality to the AflowDB database. (ME)
         -- Added xStream to AflowDB. (ME)
         -- Improved database analysis speed. (ME)

@@ -837,92 +837,81 @@ int main(int _argc,char **_argv) {
 
     // **************************************************************
     // INTERCEPT HELP
+    // ME20200921 - Restructured to make web processing easier
+    stringstream banner_message;
     if(XHOST.vflag_control.flag("AFLOW_HELP")) {
-      cout << aflow::Banner("BANNER_BIG") << endl << aflow::Intro_HELP("aflow") << aflow::Banner("BANNER_BIG") << endl;
-      return 0;} // << endl; //CO20180419
-    if(XHOST.vflag_control.flag("AFLOW_EXCEPTIONS")) {
-      cout << aflow::Banner("BANNER_BIG") << endl << aflow::Banner("EXCEPTIONS") << endl;
+      banner_message << aflow::Banner("BANNER_BIG") << endl << aflow::Intro_HELP("aflow") << aflow::Banner("BANNER_BIG") << endl;
+    } else if(XHOST.vflag_control.flag("AFLOW_EXCEPTIONS")) {
+      banner_message << aflow::Banner("BANNER_BIG") << endl << aflow::Banner("EXCEPTIONS") << endl;
+    } else if(XHOST.vflag_control.flag("README_AFLOW_LICENSE_GPL3")) {
+      banner_message << aflow::License_Preamble_aflow() << endl;
+      banner_message << " " << endl;
+      banner_message << init::InitGlobalObject("README_AFLOW_LICENSE_GPL3_TXT") << endl;
+      banner_message << " " << endl;
+      banner_message << "*************************************************************************** " << endl;
+    } else if(XHOST.vflag_control.flag("README_AFLOW"))  {
+      banner_message << init::InitGlobalObject("README_AFLOW_TXT") << endl;
+    } else if(XHOST.vflag_control.flag("README_AFLOW_VERSIONS_HISTORY"))  {
+      banner_message << init::InitGlobalObject("README_AFLOW_VERSIONS_HISTORY_TXT") << endl;
+    } else if(XHOST.vflag_control.flag("README_AFLOW_PFLOW"))  {
+      banner_message << init::InitGlobalObject("README_AFLOW_PFLOW_TXT") << endl;
+    } else if(XHOST.vflag_control.flag("README_FROZSL"))  {
+      banner_message << init::InitGlobalObject("README_AFLOW_FROZSL_TXT") << endl;
+    } else if(XHOST.vflag_control.flag("README_APL"))  {
+      banner_message << init::InitGlobalObject("README_AFLOW_APL_TXT") << endl;
+    } else if(XHOST.vflag_control.flag("README_QHA"))  {
+      banner_message << init::InitGlobalObject("README_AFLOW_QHA_SCQHA_QHA3P_TXT") << endl;
+    } else if(XHOST.vflag_control.flag("README_AAPL"))  {
+      banner_message << init::InitGlobalObject("README_AFLOW_APL_TXT") << endl;
+    } else if(XHOST.vflag_control.flag("README_AGL"))  {
+      banner_message << init::InitGlobalObject("README_AFLOW_AGL_TXT") << endl;
+    } else if(XHOST.vflag_control.flag("README_AEL"))  {
+      banner_message << init::InitGlobalObject("README_AFLOW_AEL_TXT") << endl;
+    } else if(XHOST.vflag_control.flag("README_ANRL"))  {
+      banner_message << init::InitGlobalObject("README_AFLOW_ANRL_TXT") << endl;
+    } else if(XHOST.vflag_control.flag("README_COMPARE"))  { //CO20190401
+      banner_message << init::InitGlobalObject("README_AFLOW_COMPARE_TXT") << endl; //CO20190401
+    } else if(XHOST.vflag_control.flag("README_GFA"))  {
+      banner_message << init::InitGlobalObject("README_AFLOW_GFA_TXT") << endl;
+    } else if(XHOST.vflag_control.flag("README_SYMMETRY"))  {
+      banner_message << init::InitGlobalObject("README_AFLOW_SYM_TXT") << endl;
+    } else if(XHOST.vflag_control.flag("README_CCE"))  {
+      banner_message << init::InitGlobalObject("README_AFLOW_CCE_TXT") << endl;
+    } else if(XHOST.vflag_control.flag("README_CHULL"))  {
+      banner_message << init::InitGlobalObject("README_AFLOW_CHULL_TXT") << endl;
+    } else if(XHOST.vflag_control.flag("README_PARTIAL_OCCUPATION")) {
+      banner_message << init::InitGlobalObject("README_AFLOW_POCC_TXT") << endl;
+    } else if(XHOST.vflag_control.flag("README_APENNSY"))  {
+      banner_message << init::InitGlobalObject("README_AFLOW_APENNSY_TXT") << endl;
+    } else if(XHOST.vflag_control.flag("README_SCRIPTING"))  {
+      banner_message << init::InitGlobalObject("README_AFLOW_SCRIPTING_TXT") << endl;
+    } else if(XHOST.vflag_control.flag("README_EXCEPTIONS"))  {
+      banner_message << init::InitGlobalObject("README_AFLOW_EXCEPTIONS_TXT") << endl;
+    } else if(XHOST.vflag_control.flag("README_XAFLOW"))  {
+      banner_message << init::InitGlobalObject("README_AFLOW_XAFLOW_TXT") << endl;
+    } else if(XHOST.vflag_control.flag("README_AFLOWRC"))  {
+      banner_message << init::InitGlobalObject("README_AFLOW_AFLOWRC_TXT") << endl;
+    }
+
+    if (!banner_message.str().empty()) {
+      std::cout << (XHOST.vflag_control.flag("WWW")?aurostd::text2html(banner_message.str()):banner_message.str()) << std::endl;
       return 0;
-    }  //ME20180531
-    if(XHOST.vflag_control.flag("README_AFLOW_LICENSE_GPL3"))  {
-      cout << aflow::License_Preamble_aflow() << endl;
-      cout << " " << endl;
-      cout << init::InitGlobalObject("README_AFLOW_LICENSE_GPL3_TXT") << endl;
-      cout << " " << endl;
-      cout << "*************************************************************************** " << endl;
-      return 0;} // << endl; //CO20180419
-    if(XHOST.vflag_control.flag("README_AFLOW"))  {
-      cout << init::InitGlobalObject("README_AFLOW_TXT") << endl;
-      return 0;} // << endl; //CO20180419
-    if(XHOST.vflag_control.flag("README_AFLOW_VERSIONS_HISTORY"))  {
-      cout << init::InitGlobalObject("README_AFLOW_VERSIONS_HISTORY_TXT") << endl;
-      return 0;} // << endl; //CO20180419
-    if(XHOST.vflag_control.flag("README_AFLOW_PFLOW"))  {
-      cout << init::InitGlobalObject("README_AFLOW_PFLOW_TXT") << endl;
-      return 0;} // << endl; //CO20180419
-    if(XHOST.vflag_control.flag("README_FROZSL"))  {
-      cout << init::InitGlobalObject("README_AFLOW_FROZSL_TXT") << endl;
-      return 0;} // << endl; //CO20180419
-    if(XHOST.vflag_control.flag("README_APL"))  {
-      cout << init::InitGlobalObject("README_AFLOW_APL_TXT") << endl;
-      return 0;} // << endl; //CO20180419
-    if(XHOST.vflag_control.flag("README_QHA"))  {
-      cout << init::InitGlobalObject("README_AFLOW_QHA_SCQHA_QHA3P_TXT") << endl;
-      return 0;} // << endl; //CO20180419
-    if(XHOST.vflag_control.flag("README_AAPL"))  {
-      cout << init::InitGlobalObject("README_AFLOW_APL_TXT") << endl;
-      return 0;} // << endl; //CO20180419
-    if(XHOST.vflag_control.flag("README_AGL"))  {
-      cout << init::InitGlobalObject("README_AFLOW_AGL_TXT") << endl;
-      return 0;} // << endl; //CO20180419
-    if(XHOST.vflag_control.flag("README_AEL"))  {
-      cout << init::InitGlobalObject("README_AFLOW_AEL_TXT") << endl;
-      return 0;} // << endl; //CO20180419
-    if(XHOST.vflag_control.flag("README_ANRL"))  {
-      cout << init::InitGlobalObject("README_AFLOW_ANRL_TXT") << endl;
-      return 0;} // << endl; //CO20180419
-    if(XHOST.vflag_control.flag("README_COMPARE"))  { //CO20190401
-      cout << init::InitGlobalObject("README_AFLOW_COMPARE_TXT") << endl; //CO20190401
-      return 0;} // << endl; //CO20190401
-    if(XHOST.vflag_control.flag("README_GFA"))  {
-      cout << init::InitGlobalObject("README_AFLOW_GFA_TXT") << endl;
-      return 0;} // << endl; //CO20180419
-    if(XHOST.vflag_control.flag("README_SYMMETRY"))  {
-      cout << init::InitGlobalObject("README_AFLOW_SYM_TXT") << endl;
-      return 0;} // << endl; //CO20180419
-    if(XHOST.vflag_control.flag("README_CCE"))  {
-      cout << init::InitGlobalObject("README_AFLOW_CCE_TXT") << endl;
-      return 0;} // << endl; //CO20180419
-    if(XHOST.vflag_control.flag("README_CHULL"))  {
-      cout << init::InitGlobalObject("README_AFLOW_CHULL_TXT") << endl;
-      return 0;} // << endl; //CO20180419
-    if(XHOST.vflag_control.flag("README_PARTIAL_OCCUPATION")) {
-      cout << init::InitGlobalObject("README_AFLOW_POCC_TXT") << endl;
-      return 0;} // << endl; //CO20180419
-    if(XHOST.vflag_control.flag("README_APENNSY"))  {
-      cout << init::InitGlobalObject("README_AFLOW_APENNSY_TXT") << endl;
-      return 0;} // << endl; //CO20180419
-    if(XHOST.vflag_control.flag("README_SCRIPTING"))  {
-      cout << init::InitGlobalObject("README_AFLOW_SCRIPTING_TXT") << endl;
-      return 0;} // << endl; //CO20180419
-    if(XHOST.vflag_control.flag("README_EXCEPTIONS"))  {
-      cout << init::InitGlobalObject("README_AFLOW_EXCEPTIONS_TXT") << endl;
-      return 0;}  //ME20180531
-    if(XHOST.vflag_control.flag("README_XAFLOW"))  {
-      cout << init::InitGlobalObject("README_AFLOW_XAFLOW_TXT") << endl;
-      return 0;} // << endl; //CO20180419
-    if(XHOST.vflag_control.flag("README_AFLOWRC"))  {
-      cout << init::InitGlobalObject("README_AFLOW_AFLOWRC_TXT") << endl;
-      return 0;} // << endl; //CO20180419
+    }
 
     // **************************************************************
     // PHP-WEB AND CURRICULUM AND HIGH-THROUGHPUT STUFF
-    ProcessPhpLatexCv();
+    if (ProcessPhpLatexCv()) return 0;
     //  ProcessSecurityOptions(argv,cmds); OLD STUFF AFLOW SECURITY
 
     // **************************************************************
     bool VVERSION=aurostd::args2flag(argv,cmds,"-v|--version");
-    if(!Arun && VVERSION)  {Arun=TRUE;cout << aflow::Banner("AFLOW_VERSION");return 0;} // look for version IMMEDIATELY //CO20180419
+    //ME20200921 - Added web mode
+    if(!Arun && VVERSION)  {
+      // look for version IMMEDIATELY //CO20180419
+      Arun=TRUE;
+      cout << (XHOST.vflag_control.flag("WWW")?aurostd::text2html(aflow::Banner("AFLOW_VERSION")):aflow::Banner("AFLOW_VERSION"));
+      return 0;
+    }
     if(!Arun && XHOST.TEST) { Arun=TRUE;cerr << "test" << endl;return 0;} //CO20180419
 
     // [OBSOLETE]  if(!Arun && (aurostd::substring2bool(XHOST.progname,"aflow1") || aurostd::substring2bool(XHOST.progname,"aflowd1"))) {
@@ -946,7 +935,7 @@ int main(int _argc,char **_argv) {
     // LAST RESOURCE PFLOW
     if(!Arun) { 
       Arun=TRUE;
-      return_code = pflow::main(argv,cmds);   //ME20200901 - use pflow::main return code database handling
+      return_code = pflow::main(argv,cmds);   //ME20200901 - use pflow::main return code for database handling
     }
     // **************************************************************
     // END
