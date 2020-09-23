@@ -442,21 +442,23 @@ namespace compare{
   //DX20191122 [MOVED TO XATOM]     double& min_dist, uint& frequency, vector<xvector<double> >& coordinates); //DX20191105
   //DX20191122 [MOVED TO XATOM] void minimumCoordinationShell(const xstructure& xstr, uint center_index, 
   //DX20191122 [MOVED TO XATOM]     double& min_dist, uint& frequency, vector<xvector<double> >& coordinates, const string& type); //DX20191105
-  xvector<double> centroid_with_PBC(const xstructure& xstr);
-  xvector<double> centroid_with_PBC(vector<xvector<double> >& coordinates, const xmatrix<double>& lattice);
-  xvector<double> centroid_with_PBC(vector<xvector<double> >& coordinates, vector<double>& weights,
-      const xmatrix<double>& lattice);
-  xvector<double> centroid(const xstructure& xstr); //DX20200715
-  xvector<double> centroid(const deque<_atom>& atoms); //DX20200715
-  xvector<double> centroid(const vector<xvector<double> >& coordinates); //DX20200715
-  xvector<double> centroid(const vector<xvector<double> >& coordinates, const vector<double>& weights); //DX20200715
+  //DX20191122 [MOVED TO XATOM] xvector<double> centroid_with_PBC(const xstructure& xstr);
+  //DX20191122 [COMBINED WITH AUROSTD FUNCTION] xvector<double> centroid_with_PBC(vector<xvector<double> >& coordinates, const xmatrix<double>& lattice);
+  //DX20191122 [COMBINED WITH AUROSTD FUNCTION] xvector<double> centroid_with_PBC(vector<xvector<double> >& coordinates, vector<double>& weights,
+  //DX20191122 [COMBINED WITH AUROSTD FUNCTION]    const xmatrix<double>& lattice);
+  //DX20191122 [MOVED TO XATOM] xvector<double> centroid(const xstructure& xstr); //DX20200715
+  //DX20191122 [COMBINED WITH AUROSTD FUNCTION] xvector<double> centroid(const deque<_atom>& atoms); //DX20200715
+  //DX20191122 [COMBINED WITH AUROSTD FUNCTION] xvector<double> centroid(const vector<xvector<double> >& coordinates); //DX20200715
+  //DX20191122 [COMBINED WITH AUROSTD FUNCTION] xvector<double> centroid(const vector<xvector<double> >& coordinates, const vector<double>& weights); //DX20200715
   //bool findMatch(const xstructure& xstr1, const xstructure& PROTO,vector<uint>& im1, vector<uint>& im2, vector<double>& min_dists, const int& type_match);
   bool findMatch(const deque<_atom>& xstr1_atoms, const deque<_atom>& PROTO_atoms,
-      const xmatrix<double>& xstr1_lattice,
       const xmatrix<double>& PROTO_lattice,
       double minimum_interatomic_distance, //DX20200622
       vector<uint>& mapping_index_str1, vector<uint>& mapping_index_str2, vector<double>& min_dists,
-      const int& type_match); //DX20190716
+      int type_match,
+      xvector<double>& origin_shift); //DX20190716
+  vector<xvector<double> > minimizeMappingDistances(const vector<xvector<double> >& distance_vectors); //DX20200909
+  vector<xvector<double> > minimizeMappingDistances(const vector<xvector<double> >& distance_vectors, xvector<double>& origin_shift); //DX20200909
   void clusterize(const xstructure& xstr1, const vector<uint>& im1, vector<string>& TYPE1,
       vector<uint>& QTA1, vector<vector<uint> >& I1);
   bool sameAtomType(const xstructure& xstr1, const xstructure& xstr2, const vector<uint>& im1,

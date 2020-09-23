@@ -6574,7 +6574,7 @@ xstructure GetStructure(const int& iomode,const string& Directory) {
 // xstructure::SetCoordinates
 // **************************************************************************
 // change coordinates type
-void xstructure::SetCoordinates(const int& mode)  {
+void xstructure::SetCoordinates(int mode)  {
   string function_name = XPID + "xstructure::SetCoordinates():";
   switch(mode) {
     case _UPDATE_LATTICE_VECTORS_TO_ABCANGLES_ : {
@@ -9574,7 +9574,7 @@ double GetVol(const xvector<double>& v1,const xvector<double>& v2,const xvector<
 //#define _Getabc_angles Getabc_angles
 //#define _Getabc_angles __NO_USE_Sortabc_angles
 
-xvector<double> Getabc_angles(const xmatrix<double>& lat,const int& mode) {  // AFLOW_FUNCTION_IMPLEMENTATION
+xvector<double> Getabc_angles(const xmatrix<double>& lat,int mode) {  // AFLOW_FUNCTION_IMPLEMENTATION
   xvector<double> data(6);
   data(1)=aurostd::modulus(lat(1));
   data(2)=aurostd::modulus(lat(2));
@@ -9590,7 +9590,7 @@ xvector<double> Getabc_angles(const xmatrix<double>& lat,const int& mode) {  // 
   return data;
 }
 
-xvector<double> Getabc_angles(const xmatrix<double>& lat,const xvector<int>& permut,const int& mode) {        // AFLOW_FUNCTION_IMPLEMENTATION
+xvector<double> Getabc_angles(const xmatrix<double>& lat,const xvector<int>& permut,int mode) {        // AFLOW_FUNCTION_IMPLEMENTATION
   xvector<double> data(6);
   data(1)=aurostd::modulus(lat(1));
   data(2)=aurostd::modulus(lat(2));
@@ -9623,7 +9623,7 @@ xvector<double> Getabc_angles(const xmatrix<double>& lat,const xvector<int>& per
 xvector<double> Getabc_angles(const xvector<double>& r1,      // AFLOW_FUNCTION_IMPLEMENTATION
     const xvector<double>& r2,      // AFLOW_FUNCTION_IMPLEMENTATION
     const xvector<double>& r3,      // AFLOW_FUNCTION_IMPLEMENTATION
-    const int& mode) {              // AFLOW_FUNCTION_IMPLEMENTATION
+    int mode) {              // AFLOW_FUNCTION_IMPLEMENTATION
   xmatrix<double> lat(3,3);
   lat(1,1)=r1(1);lat(1,2)=r1(2);lat(1,3)=r1(3);
   lat(2,1)=r2(1);lat(2,2)=r2(2);lat(2,3)=r2(3);
@@ -9635,7 +9635,7 @@ xvector<double> Getabc_angles(const xvector<double>& r1,      // AFLOW_FUNCTION_
     const xvector<double>& r2,      // AFLOW_FUNCTION_IMPLEMENTATION
     const xvector<double>& r3,      // AFLOW_FUNCTION_IMPLEMENTATION
     const xvector<int>& permut,     // AFLOW_FUNCTION_IMPLEMENTATION
-    const int& mode) {              // AFLOW_FUNCTION_IMPLEMENTATION
+    int mode) {              // AFLOW_FUNCTION_IMPLEMENTATION
   xmatrix<double> lat(3,3);
   lat(1,1)=r1(1);lat(1,2)=r1(2);lat(1,3)=r1(3);
   lat(2,1)=r2(1);lat(2,2)=r2(2);lat(2,3)=r2(3);
@@ -9643,7 +9643,7 @@ xvector<double> Getabc_angles(const xvector<double>& r1,      // AFLOW_FUNCTION_
   return Getabc_angles(lat,permut,mode);
 }
 
-xvector<double> Sortabc_angles(const xmatrix<double>& lat,const int& mode) {        // AFLOW_FUNCTION_IMPLEMENTATION
+xvector<double> Sortabc_angles(const xmatrix<double>& lat,int mode) {        // AFLOW_FUNCTION_IMPLEMENTATION
   // with permutation - from AVDV
   int i,imin,imax,imid;
   double dmin,dmax;
@@ -14663,6 +14663,36 @@ void CalculateSymmetryPointGroupKPatterson(xstructure& str) {
   _aflags aflags;
   aflags.Directory="./";aflags.QUIET=TRUE;
   CalculateSymmetryPointGroupKPatterson(str,FALSE,cout,FALSE);
+}
+
+// ***************************************************************************
+// Function fixEmptyAtomNames()
+// ***************************************************************************
+void xstructure::fixEmptyAtomNames(bool force_fix){
+ bool LDEBUG=(FALSE || XHOST.DEBUG);
+ string soliloquy=XPID+"xstructure::fixEmptyAtomNames():";
+ if(species.size()==species_pp.size()) { //CO20190218
+   for(uint itype=0;itype<species.size();itype++) {
+     if((force_fix || species.at(itype)=="") && species_pp.at(itype)!=""){
+       if(LDEBUG) {cerr << soliloquy << " species_pp.at(" << itype << ")=" << species_pp.at(itype) << endl;}
+       species.at(itype)=species_pp.at(itype); //KBIN::VASP_PseudoPotential_CleanName(species_pp.at(itype));  //CO20181226 KEEP PP INFO if available (auto aflow.in)
+     }
+   }
+ }  // cormac I`ll write a short pflow for this stuff
+ if(species.size()==num_each_type.size()){
+   int iatom=0;
+   for(uint itype=0;itype<num_each_type.size();itype++) {
+     string s=string(species.at(itype));
+     species.at(itype)=s;
+     for(int j=0;j<num_each_type.at(itype);j++) {
+       atoms.at(iatom).name=s;    // CONVASP_MODE
+       atoms.at(iatom).CleanName();
+       atoms.at(iatom).CleanSpin();
+       atoms.at(iatom).name_is_given=TRUE;
+       iatom++;
+     }
+   }
+ }
 }
 
 // ***************************************************************************

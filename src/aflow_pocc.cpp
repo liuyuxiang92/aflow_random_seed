@@ -32,7 +32,6 @@ const string POSCAR_POCC_series_START_tag=POSCAR_series_START_tag+"POCC_";
 const string POSCAR_POCC_series_STOP_tag=POSCAR_series_STOP_tag+"POCC_";
 
 const string POCC_AFLOWIN_tag="[AFLOW_POCC]";
-const int TEMPERATURE_PRECISION=2;  //not really going to explore more than 2000-3000K, looks weird if decimal is larger than non-decimal part of number //4;  //this is std::fixed
 
 //make defaults in AFLOW_RC
 const double ENERGY_RADIUS = 10; //angstroms  //keep, so we can still compare with KY
@@ -69,7 +68,7 @@ namespace pocc {
 namespace pocc {
   void poccOld2New(ostream& oss){ofstream FileMESSAGE;return poccOld2New(FileMESSAGE,oss);}
   void poccOld2New(ofstream& FileMESSAGE,ostream& oss){
-    bool LDEBUG=(TRUE || _DEBUG_POCC_ || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     string soliloquy=XPID+"pocc::poccOld2New():";
     stringstream message;
 
@@ -225,16 +224,16 @@ namespace pocc {
       if(aurostd::IsDirectory(ls_contents[i]) && aurostd::substring2bool(ls_contents[i],"ARUN.POCC")){
         if(!(aurostd::EFileExist(ls_contents[i]+"/"+DEFAULT_AFLOW_QMVASP_OUT))){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,ls_contents[i]+" does not contain "+DEFAULT_AFLOW_QMVASP_OUT,_FILE_NOT_FOUND_);}
         v_qmvasp.push_back(xQMVASP(ls_contents[i]+"/"+DEFAULT_AFLOW_QMVASP_OUT));
-        if(v_qmvasp.back().H_atom_static==AUROSTD_NAN){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,ls_contents[i]+"/"+DEFAULT_AFLOW_QMVASP_OUT+" does not show a static run",_FILE_ERROR_);}
+        if(v_qmvasp.back().H_atom_relax==AUROSTD_NAN){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,ls_contents[i]+"/"+DEFAULT_AFLOW_QMVASP_OUT+" does not show a relaxation run",_FILE_ERROR_);}
       }
     }
     uint v_qmvasp_size=v_qmvasp.size(); //NO MORE PUSH_BACK BELOW! Will save time for AAPL calculations
     if(v_qmvasp_size<1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No ARUN.POCC found in Directory="+directory,_FILE_NOT_FOUND_);}
-    //sort by H_atom_static
+    //sort by H_atom_relax
     xQMVASP qmvasp_tmp;
     for(uint i=0;i<v_qmvasp_size-1;i++){
       for(uint j=i;j<v_qmvasp_size;j++){
-        if(v_qmvasp[i].H_atom_static>v_qmvasp[j].H_atom_static){
+        if(v_qmvasp[i].H_atom_relax>v_qmvasp[j].H_atom_relax){
           qmvasp_tmp=v_qmvasp[i];
           v_qmvasp[i]=v_qmvasp[j];
           v_qmvasp[j]=qmvasp_tmp;
@@ -246,7 +245,7 @@ namespace pocc {
       for(uint i=0;i<v_qmvasp_size-1;i++){
         qmvasp_filename=v_qmvasp[i].filename;
         aurostd::StringSubst(qmvasp_filename,"/"+DEFAULT_AFLOW_QMVASP_OUT,"");
-        cerr << soliloquy << " H_atom_static(" << qmvasp_filename << ")=" << v_qmvasp[i].H_atom_static << endl;
+        cerr << soliloquy << " H_atom_relax(" << qmvasp_filename << ")=" << v_qmvasp[i].H_atom_relax << endl;
       }
     }
     qmvasp_filename=v_qmvasp[0].filename;
@@ -641,23 +640,15 @@ namespace pocc {
 } // namespace pocc
 
 namespace pocc {
-  double getHmix(const xvector<double>& v_dg,const xvector<double>& v_energies){double dg_total;return getHmix(v_dg,v_energies,dg_total);}
-  double getHmix(const xvector<double>& v_dg,const xvector<double>& v_energies,double& dg_total){
-    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
-    string soliloquy=XPID+"pocc::getHmix():";
-    dg_total=aurostd::sum(v_dg);
-    if(LDEBUG){cerr << soliloquy << " dg_total=" << dg_total << endl;}
-    double Hmix=aurostd::scalar_product(v_dg,v_energies)/dg_total;
-    if(LDEBUG){cerr << soliloquy << " Hmix=" << Hmix << endl;}
-    return Hmix;
-  }
-  double getEFA(const xvector<double>& v_dg,const xvector<double>& v_energies){
+  double getHmix(const xvector<double>& xv_energies,const xvector<double>& xv_dgs){double dg_total;return getHmix(xv_energies,xv_dgs,dg_total);}
+  double getHmix(const xvector<double>& xv_energies,const xvector<double>& xv_dgs,double& dg_total){return aurostd::meanWeighted(xv_energies,xv_dgs,dg_total);}
+  double getEFA(const xvector<double>& xv_energies,const xvector<double>& xv_dgs){
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     string soliloquy="pocc::getEFA():";
     double dg_total=0.0;
-    double Hmix=getHmix(v_dg,v_energies,dg_total);
+    double Hmix=getHmix(xv_energies,xv_dgs,dg_total);
     double sigma=0.0;
-    for(int i=v_dg.lrows;i<=v_dg.urows;i++){sigma+=v_dg[i]*pow(v_energies[i]-Hmix,2.0);}
+    for(int i=xv_dgs.lrows;i<=xv_dgs.urows;i++){sigma+=xv_dgs[i]*pow(xv_energies[i]-Hmix,2.0);}
     sigma/=(dg_total-1);
     sigma=sqrt(sigma);
     if(LDEBUG){cerr << soliloquy << " sigma=" << sigma << endl;}
@@ -844,7 +835,14 @@ namespace pocc {
       qmvasp_filename=pocc_directory_abs+"/"+DEFAULT_AFLOW_QMVASP_OUT;
       if(!aurostd::EFileExist(qmvasp_filename,qmvasp_filename)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No qmvasp file found [dir="+pocc_directory_abs+"]",_FILE_NOT_FOUND_);}
       qmvasp.GetPropertiesFile(qmvasp_filename);
-      (*it).m_energy_dft=qmvasp.H_atom_static;
+      if(LDEBUG){
+        cerr << soliloquy << " qmvasp.H_atom_relax=" << qmvasp.H_atom_relax << endl;
+        cerr << soliloquy << " qmvasp.H_atom_static=" << qmvasp.H_atom_static << endl;
+      }
+      //CO20200921 - we pulled H_atom_static previously, but this does not match what is being done in aflowlib_libraries
+      //we pull relax and not static because relaxation runs come with stresses, pressures, etc. from which we can derive PV (for enthalpies)
+      //use H_atom_relax instead
+      (*it).m_energy_dft=qmvasp.H_atom_relax; //this will be the LAST relax, relax matches with aflowlib_libraries (NOT static)
       if((*it).m_energy_dft==AUROSTD_NAN){(*it).m_energy_dft=qmvasp.H_atom_relax;}
       if((*it).m_energy_dft==AUROSTD_NAN){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No H_atom found in qmvasp [dir="+pocc_directory_abs+"]",_FILE_CORRUPT_);}
       //energy_dft_ground
@@ -894,38 +892,41 @@ namespace pocc {
 
   void POccCalculator::setEFA(){
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
-    string soliloquy=XPID+"POccCalculator::getEFA():";
+    string soliloquy=XPID+"POccCalculator::setEFA():";
 
     if(l_supercell_sets.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"l_supercell_sets.size()==0",_RUNTIME_ERROR_);}
-    xvector<double> v_dg(l_supercell_sets.size()),v_energies(l_supercell_sets.size());
+    xvector<double> xv_dgs(l_supercell_sets.size()),xv_energies(l_supercell_sets.size());
     unsigned long long int isupercell=0;
     for(std::list<POccSuperCellSet>::iterator it=l_supercell_sets.begin();it!=l_supercell_sets.end();++it){
       isupercell=std::distance(l_supercell_sets.begin(),it);
-      v_dg[isupercell+v_dg.lrows]=(*it).getDegeneracy();
-      v_energies[isupercell+v_energies.lrows]=(*it).m_energy_dft;
+      xv_dgs[isupercell+xv_dgs.lrows]=(*it).getDegeneracy();
+      xv_energies[isupercell+xv_energies.lrows]=(*it).m_energy_dft;
       if(LDEBUG){
-        cerr << soliloquy << " v_dg[i=" << isupercell+v_dg.lrows << "]=" << v_dg[isupercell+v_dg.lrows];
-        cerr << " v_energies[" << isupercell+v_energies.lrows << "]=" << v_energies[isupercell+v_energies.lrows] << endl;
+        cerr << soliloquy << " xv_dgs[i=" << isupercell+xv_dgs.lrows << "]=" << xv_dgs[isupercell+xv_dgs.lrows];
+        cerr << " xv_energies[" << isupercell+xv_energies.lrows << "]=" << xv_energies[isupercell+xv_energies.lrows] << endl;
       }
     }
-    m_Hmix=pocc::getHmix(v_dg,v_energies);
-    m_efa=pocc::getEFA(v_dg,v_energies);
+    m_Hmix=pocc::getHmix(xv_energies,xv_dgs);
+    m_efa=pocc::getEFA(xv_energies,xv_dgs);
   }
 
   string POccCalculator::getTemperatureString(double temperature) const {
+    return pocc::getTemperatureString(temperature,TEMPERATURE_PRECISION,m_temperatures_int,m_zero_padding_temperature);
+  }
+  string getTemperatureString(double temperature,int precision,bool temperatures_int,int zero_padding_temperature) {
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     string soliloquy=XPID+"POccCalculator::getTemperatureString():";
 
     stringstream t_ss;
-    if(m_temperatures_int==false){t_ss.setf(std::ios::fixed,std::ios::floatfield);t_ss.precision(TEMPERATURE_PRECISION);}
-    t_ss.width(m_zero_padding_temperature);t_ss.fill('0');
+    if(temperatures_int==false){t_ss.setf(std::ios::fixed,std::ios::floatfield);t_ss.precision(precision);}
+    t_ss.width(zero_padding_temperature);t_ss.fill('0');
     t_ss << temperature;
 
     if(LDEBUG){
       cerr << soliloquy << " temperature=" << temperature << endl;
-      cerr << soliloquy << " temperatures_int=" << m_temperatures_int << endl;
-      cerr << soliloquy << " zero_padding=" << m_zero_padding_temperature << endl;
-      cerr << soliloquy << " temperature_precision=" << TEMPERATURE_PRECISION << endl;
+      cerr << soliloquy << " temperatures_int=" << temperatures_int << endl;
+      cerr << soliloquy << " zero_padding=" << zero_padding_temperature << endl;
+      cerr << soliloquy << " temperature_precision=" << precision << endl;
       cerr << soliloquy << " temperature_string=" << t_ss.str() << endl;
     }
 
@@ -1086,6 +1087,13 @@ namespace pocc {
     }
     message << "Egap_DOS_net=" << m_Egap_DOS_net;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
 
+    //remaining properties
+    //should really print RELAXED values, but these are still being worked out for pocc
+    //default to initial values
+    m_xdoscar.Vol=xstr_pocc.GetVolume();
+    m_xdoscar.lattice=Getabc_angles(xstr_pocc.scale*xstr_pocc.lattice,DEGREES); //will be size 6, but only the first 3 are printed/read
+    for(int i=1;i<=3;i++){m_xdoscar.lattice[i]*=1e-10;}  //convert Angstroms to meters
+
     //XDOSCAR.OUT
     //string xdoscar_filename=POCC_DOSCAR_FILE+"_T"+aurostd::utype2string(temperature,TEMPERATURE_PRECISION)+"K";
     string xdoscar_filename=POCC_DOSCAR_FILE+"_T"+getTemperatureString(temperature)+"K";
@@ -1114,36 +1122,71 @@ namespace pocc {
     if(!found_all_OUTCARs){return;}
 
     setAvgDOSCAR(temperature);
-    plotAvgDOSCAR(temperature);
+    if(0){plotAvgDOSCAR(temperature);}  //do not plot as part of LIB2LIB, leave for LIB2RAW
   }
 
-  void POccCalculator::plotAvgDOSCAR(double temperature){
+  void POccCalculator::plotAvgDOSCAR(double temperature) const {return plotAvgDOSCAR(m_xdoscar,temperature,m_aflags.Directory);}
+  void POccCalculator::plotAvgDOSCAR(const string& doscar_path,const string& directory) const {
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
+    string soliloquy=XPID+"POccCalculator::plotAvgDOSCAR():";
+    
+    xDOSCAR xdos(doscar_path,*p_FileMESSAGE,true,*p_oss);
+    //get temperature from title
+    //DOSCAR.pocc_T0000K
+    if(doscar_path.find("DOSCAR.pocc_T")==string::npos){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"odd DOSCAR filename, format should be DOSCAR.pocc_T0000K",_FILE_CORRUPT_);}
+    vector<string> vtokens;
+    aurostd::string2tokens(doscar_path,vtokens,"/");
+    string pocc_doscar_start="DOSCAR.pocc_T";
+    string pocc_doscar_end="K";
+    string::size_type loc_start=vtokens.back().find(pocc_doscar_start);
+    string::size_type loc_end=vtokens.back().find(pocc_doscar_end);
+    if(loc_start==string::npos||loc_end==string::npos){
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"cannot get temperature_str",_FILE_CORRUPT_);
+    }
+    string temperature_str=vtokens.back().substr(loc_start+(pocc_doscar_start.size()),loc_end-(loc_start+(pocc_doscar_start.size())));
+    if(LDEBUG){cerr << soliloquy << " temperature_str=" << temperature_str << endl;}
+    if(!aurostd::isfloat(temperature_str)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"temperature_str is not a float",_FILE_CORRUPT_);}
+    //[CO+ME20200921 - just look at vtokens.back()]uint i=0,j=0;
+    //[CO+ME20200921 - just look at vtokens.back()]for(i=0;i<vtokens.size();i++){
+    //[CO+ME20200921 - just look at vtokens.back()]  if(vtokens[i].find("pocc_T")!=string::npos && vtokens[i].find("K")!=string::npos){
+    //[CO+ME20200921 - just look at vtokens.back()]    temperature_str=vtokens[i];
+    //[CO+ME20200921 - just look at vtokens.back()]    aurostd::StringSubst(temperature_str,"DOSCAR.pocc_T","");
+    //[CO+ME20200921 - just look at vtokens.back()]    aurostd::StringSubst(temperature_str,"K","");
+    //[CO+ME20200921 - just look at vtokens.back()]    for(j=0;j<XHOST.vext.size();j++){aurostd::StringSubst(temperature_str,XHOST.vext[j],"");} //remove compression extension
+    //[CO+ME20200921 - just look at vtokens.back()]    if(LDEBUG){cerr << soliloquy << " temperature_str=" << temperature_str << endl;}
+    //[CO+ME20200921 - just look at vtokens.back()]    if(aurostd::isfloat(temperature_str)){break;}
+    //[CO+ME20200921 - just look at vtokens.back()]  }
+    //[CO+ME20200921 - just look at vtokens.back()]}
+    //[CO+ME20200921 - just look at vtokens.back()]if(doscar_path.find("DOSCAR.pocc_T")==string::npos){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"cannot get temperature_str",_FILE_CORRUPT_);}
+    double temperature=aurostd::string2utype<double>(temperature_str);
+    return plotAvgDOSCAR(xdos,temperature,directory);
+  }
+  void POccCalculator::plotAvgDOSCAR(const xDOSCAR& xdos,double temperature,const string& directory) const {
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     string soliloquy=XPID+"POccCalculator::plotAvgDOSCAR():";
 
     if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
-
-    if(m_ARUN_directories.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_ARUN_directories.size()==0",_RUNTIME_ERROR_);}
+    if(m_ARUN_directories.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,"POccCalculator::plotAvgDOSCAR():","m_ARUN_directories.size()==0",_RUNTIME_ERROR_);}
 
     aurostd::xoption cmdline_opts, plot_opts;
-    cmdline_opts.push_attached("PLOT_DOS", m_aflags.Directory);
+    cmdline_opts.push_attached("PLOT_DOS", directory);
     cmdline_opts.push_attached("PLOTTER::PRINT", "png");
     plot_opts = plotter::getPlotOptionsEStructure(cmdline_opts, "PLOT_DOS");
-    plot_opts.push_attached("DIRECTORY",m_aflags.Directory);
+    plot_opts.push_attached("DIRECTORY",directory);
     if(1){  //turn off for ME - POCC+APL
       plot_opts.push_attached("PROJECTION","ORBITALS");
       //plot_opts.push_attached("EXTENSION","dos_orbitals_T"+aurostd::utype2string(temperature,TEMPERATURE_PRECISION)+"K");
       plot_opts.push_attached("EXTENSION","dos_orbitals_T"+getTemperatureString(temperature)+"K");
-      plotter::PLOT_DOS(plot_opts,m_xdoscar);
+      plotter::PLOT_DOS(plot_opts,xdos,*p_FileMESSAGE,*p_oss);
 
       plot_opts.push_attached("ARUN_DIRECTORY",m_ARUN_directories[0]);
       plot_opts.pop_attached("PROJECTION");
       plot_opts.push_attached("PROJECTION","SPECIES");
       //plot_opts.push_attached("EXTENSION","dos_species_T"+aurostd::utype2string(temperature,TEMPERATURE_PRECISION)+"K");
       plot_opts.push_attached("EXTENSION","dos_species_T"+getTemperatureString(temperature)+"K");
-      plotter::PLOT_DOS(plot_opts,m_xdoscar);
+      plotter::PLOT_DOS(plot_opts,xdos,*p_FileMESSAGE,*p_oss);
 
-      if(0){  //turn on for shachar - plot orbitals for each species near fermi energy (dos_species_T0K_Cs_1)
+      if(0){  //turn on for SG - plot orbitals for each species near fermi energy (dos_species_T0K_Cs_1)
         plot_opts.pop_attached("PROJECTION");
         plot_opts.push_attached("PROJECTION","ORBITALS");
         plot_opts.push_attached("DATATYPE","SPECIES");
@@ -1152,7 +1195,7 @@ namespace pocc {
         for(uint ispecies=0;ispecies<xstr_pocc.species.size();ispecies++){
           plot_opts.pop_attached("DATASET"); plot_opts.push_attached("DATASET",aurostd::utype2string(ispecies+1));
           plot_opts.pop_attached("DATALABEL"); plot_opts.push_attached("DATALABEL",KBIN::VASP_PseudoPotential_CleanName(xstr_pocc.species[0]));
-          plotter::PLOT_PDOS(plot_opts,m_xdoscar);
+          plotter::PLOT_PDOS(plot_opts,xdos,*p_FileMESSAGE,*p_oss);
         }
       }
     }else{  //ME!
@@ -1162,7 +1205,7 @@ namespace pocc {
       plot_opts.push_attached("EXTENSION","dos_atoms_T"+getTemperatureString(temperature)+"K");
       plot_opts.pop_attached("XMIN");plot_opts.pop_attached("XMAX");
       plot_opts.push_attached("XMIN","0");plot_opts.push_attached("XMAX","0.05");
-      plotter::PLOT_DOS(plot_opts,m_xdoscar);
+      plotter::PLOT_DOS(plot_opts,xdos,*p_FileMESSAGE,*p_oss);
     }
 
     if(LDEBUG){cerr << soliloquy << " END" << endl;}
@@ -1421,23 +1464,18 @@ namespace pocc {
   }
 
   //CT20200319 - added AEL/AGL option
-  void POccCalculator::postProcessing(){
+  void POccCalculator::setTemperatureStringParameters(){vector<double> v_temperatures;return setTemperatureStringParameters(v_temperatures);}
+  void POccCalculator::setTemperatureStringParameters(vector<double>& v_temperatures){
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
-    string soliloquy=XPID+"POccCalculator::postProcessing():";
-    stringstream message;
-
+    string soliloquy=XPID+"POccCalculator::setTemperatureStringParameters():";
+    
     if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"POccCalculator failed to initialized");}
-
     if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
-
-    loadDataIntoCalculator();
-    if(!QMVASPsFound()){return;}
-    setDFTEnergies();
-    setEFA();
-
+    
     //START: TEMPERATURE DEPENDENT PROPERTIES
+    v_temperatures.clear();
     //v_temperatures.push_back(300);  //1000
-    vector<double> v_temperatures=getVTemperatures(m_kflags.KBIN_POCC_TEMPERATURE_STRING);
+    v_temperatures=getVTemperatures(m_kflags.KBIN_POCC_TEMPERATURE_STRING);
     if(XHOST.vflag_control.flag("CALCULATION_TEMPERATURE")){v_temperatures.clear();v_temperatures=getVTemperatures(XHOST.vflag_control.getattachedscheme("CALCULATION_TEMPERATURE"));}  //command line input
     if(v_temperatures.empty()){v_temperatures.clear();v_temperatures=getVTemperatures(DEFAULT_POCC_TEMPERATURE_STRING);}  //user aflow.rc
     if(v_temperatures.empty()){v_temperatures.clear();v_temperatures=getVTemperatures(AFLOWRC_DEFAULT_POCC_TEMPERATURE_STRING);}  //internal aflow.rc, will always work
@@ -1447,6 +1485,23 @@ namespace pocc {
     m_temperatures_int=true;
     for(uint itemp=0;itemp<v_temperatures.size();itemp++){if(!aurostd::isinteger(v_temperatures[itemp])){m_temperatures_int=false;break;}}  //found a non-int temperature
     m_zero_padding_temperature=aurostd::getZeroPadding(max(v_temperatures))+(m_temperatures_int ? 0 : TEMPERATURE_PRECISION+1); //+1 for decimal place
+  }
+
+  void POccCalculator::postProcessing(){
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
+    string soliloquy=XPID+"POccCalculator::postProcessing():";
+    stringstream message;
+
+    if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"POccCalculator failed to initialize");}
+    if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
+
+    loadDataIntoCalculator();
+    if(!QMVASPsFound()){return;}
+    setDFTEnergies();
+    setEFA();
+
+    vector<double> v_temperatures;
+    setTemperatureStringParameters(v_temperatures);
 
     message << "Performing POCC post-processing for these temperatures: " << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(v_temperatures,5),",");pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
 
@@ -2471,13 +2526,36 @@ namespace pocc {
     return loadFromAFlags(loader);
   }
   void POccCalculator::loadFromAFlags(const aurostd::xoption& loader) { //grabs from m_aflags
-    bool LDEBUG=(FALSE || ENUMERATE_ALL_HNF || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy=XPID+"POccCalculator::loadFromAFlags():";
     string AflowIn_file="",AflowIn="";
     KBIN::getAflowInFromAFlags(m_aflags,AflowIn_file,AflowIn,*p_FileMESSAGE,*p_oss);
     if(LDEBUG){cerr << soliloquy << " loaded aflow.in" << endl;}
     if(loader.flag("LOAD::KFLAGS")){
       m_kflags=KBIN::VASP_Get_Kflags_from_AflowIN(AflowIn,*p_FileMESSAGE,m_aflags,*p_oss);  //set them here if we can, they will get overwritten with input kflags
+      if(LDEBUG){
+        cerr << soliloquy << " m_kflags.KBIN_SYMMETRY_PGROUP_WRITE(pre)=" << m_kflags.KBIN_SYMMETRY_PGROUP_WRITE << endl;
+        cerr << soliloquy << " m_kflags.KBIN_SYMMETRY_PGROUPK_WRITE(pre)=" << m_kflags.KBIN_SYMMETRY_PGROUPK_WRITE << endl;
+        cerr << soliloquy << " m_kflags.KBIN_SYMMETRY_FGROUP_WRITE(pre)=" << m_kflags.KBIN_SYMMETRY_FGROUP_WRITE << endl;
+        cerr << soliloquy << " m_kflags.KBIN_SYMMETRY_PGROUP_XTAL_WRITE(pre)=" << m_kflags.KBIN_SYMMETRY_PGROUP_XTAL_WRITE << endl;
+        cerr << soliloquy << " m_kflags.KBIN_SYMMETRY_PGROUPK_XTAL_WRITE(pre)=" << m_kflags.KBIN_SYMMETRY_PGROUPK_XTAL_WRITE << endl;
+        cerr << soliloquy << " m_kflags.KBIN_SYMMETRY_PGROUPK_PATTERSON_WRITE(pre)=" << m_kflags.KBIN_SYMMETRY_PGROUPK_PATTERSON_WRITE << endl;
+        cerr << soliloquy << " m_kflags.KBIN_SYMMETRY_IATOMS_WRITE(pre)=" << m_kflags.KBIN_SYMMETRY_IATOMS_WRITE << endl;
+        cerr << soliloquy << " m_kflags.KBIN_SYMMETRY_AGROUP_WRITE(pre)=" << m_kflags.KBIN_SYMMETRY_AGROUP_WRITE << endl;
+        cerr << soliloquy << " m_kflags.KBIN_SYMMETRY_SGROUP_WRITE(pre)=" << m_kflags.KBIN_SYMMETRY_SGROUP_WRITE << endl;
+      }
+      pflow::defaultKFlags4SymWrite(m_kflags,false);  //if loading from aflags, we don't want to write new files in that directory
+      if(LDEBUG){
+        cerr << soliloquy << " m_kflags.KBIN_SYMMETRY_PGROUP_WRITE(post)=" << m_kflags.KBIN_SYMMETRY_PGROUP_WRITE << endl;
+        cerr << soliloquy << " m_kflags.KBIN_SYMMETRY_PGROUPK_WRITE(post)=" << m_kflags.KBIN_SYMMETRY_PGROUPK_WRITE << endl;
+        cerr << soliloquy << " m_kflags.KBIN_SYMMETRY_FGROUP_WRITE(post)=" << m_kflags.KBIN_SYMMETRY_FGROUP_WRITE << endl;
+        cerr << soliloquy << " m_kflags.KBIN_SYMMETRY_PGROUP_XTAL_WRITE(post)=" << m_kflags.KBIN_SYMMETRY_PGROUP_XTAL_WRITE << endl;
+        cerr << soliloquy << " m_kflags.KBIN_SYMMETRY_PGROUPK_XTAL_WRITE(post)=" << m_kflags.KBIN_SYMMETRY_PGROUPK_XTAL_WRITE << endl;
+        cerr << soliloquy << " m_kflags.KBIN_SYMMETRY_PGROUPK_PATTERSON_WRITE(post)=" << m_kflags.KBIN_SYMMETRY_PGROUPK_PATTERSON_WRITE << endl;
+        cerr << soliloquy << " m_kflags.KBIN_SYMMETRY_IATOMS_WRITE(post)=" << m_kflags.KBIN_SYMMETRY_IATOMS_WRITE << endl;
+        cerr << soliloquy << " m_kflags.KBIN_SYMMETRY_AGROUP_WRITE(post)=" << m_kflags.KBIN_SYMMETRY_AGROUP_WRITE << endl;
+        cerr << soliloquy << " m_kflags.KBIN_SYMMETRY_SGROUP_WRITE(post)=" << m_kflags.KBIN_SYMMETRY_SGROUP_WRITE << endl;
+      }
       if(LDEBUG){cerr << soliloquy << " loaded kflags" << endl;}
     }
     if(loader.flag("LOAD::VFLAGS")){
@@ -5774,8 +5852,9 @@ namespace pocc {
     //CO - default should always be to turn everything on, modify input
     //get ROBUST symmetry determination
     xstr_sym=xstr_nopocc; //make copy to avoid carrying extra sym_ops (heavy) if not needed
-    pflow::defaultKFlags4SymCalc(m_kflags,true);
-    pflow::defaultKFlags4SymWrite(m_kflags,true);
+    _kflags kflags_sym=m_kflags;  //make a copy so as to not overwrite m_kflags
+    pflow::defaultKFlags4SymCalc(kflags_sym,true);
+    //[this needs to be specified by m_kflags (do NOT override), otherwise LIB2RAW writes in LIB]pflow::defaultKFlags4SymWrite(kflags_sym,true);
 
     //streams
     ostream* p_oss_sym=p_oss;
@@ -5786,13 +5865,13 @@ namespace pocc {
     //verbose=true;
     bool osswrite=verbose;
     if(!verbose){
-      pflow::defaultKFlags4SymWrite(m_kflags,false);
+      pflow::defaultKFlags4SymWrite(kflags_sym,false);  //setting to false is always ok
       if(!badbit_set){(*p_oss_sym).setstate(std::ios_base::badbit);}  //like NULL
       p_FileMESSAGE_sym=&devNull;
     }
     message << "Calculating symmetry of parent structure" << endl;
     pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE_sym,*p_oss_sym,_LOGGER_MESSAGE_);
-    bool sym_calculated=pflow::PerformFullSymmetry(xstr_sym,*p_FileMESSAGE_sym,m_aflags,m_kflags,osswrite,*p_oss_sym);
+    bool sym_calculated=pflow::PerformFullSymmetry(xstr_sym,*p_FileMESSAGE_sym,m_aflags,kflags_sym,osswrite,*p_oss_sym);
     if(!badbit_set){(*p_oss_sym).clear();}  //clear NULL
     if(sym_calculated==false){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"AFLOW-SYM failed to calculate the symmetry of the clean (non-pocc'd) structure");}
 

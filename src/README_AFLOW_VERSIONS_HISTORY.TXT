@@ -1,4 +1,4 @@
-3.2.5 - 2020/XX/XX
+3.2.5 - 2020/09/25
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.5.tar.xz
         -- patched convert issue: security policy 'PDF' blocking conversion (SC)
         -- adding decompositionAuids for webapp (SK)
@@ -62,6 +62,7 @@
         -- Added sorting functionality for Wyckoff positions (DX)
         -- Added ANRL prototype keywords (6) to schema (DX)
         -- Changed LDEBUG in xoptions and argv to VERBOSE (DX)
+        -- Added functionality to minimize mapping distances in XtalFinder (DX)
         -- cleaning up all getElements() variants (CO+DX)
         -- adding aurostd_xparser.cpp .h (CO)
         -- adding enthlapy_formation_cce_300K_cell, enthlapy_formation_cce_300K_atom, enthlapy_formation_cce_0K_cell, and enthlapy_formation_cce_0K_cell to database (CO+RF)
@@ -127,6 +128,7 @@
         -- added enthalpy_formation to POCC structures (CO)
         -- adjusting aflow_max_argv for xplug (CO)
         -- adding --np functionality to --multi=zip (CO)
+        -- added aurostd::meanWeighted() (CO)
         -- cleaned up GenerateGridAtoms() (CO)
         -- rewrote GetNeighbors() and GetCoordinations() function (CO)
         -- sped up CCE with new GetNeighbors() and GetCoordinations() functions and restructuring structural analysis (CO)

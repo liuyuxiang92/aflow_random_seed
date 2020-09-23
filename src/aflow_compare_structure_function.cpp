@@ -6194,21 +6194,23 @@ namespace compare{
 // Find Matches
 // ***************************************************************************
 namespace compare{
-  bool findMatch(const deque<_atom>& _xstr1_atoms,
-      const deque<_atom>& _PROTO_atoms,
-      const xmatrix<double>& xstr1_lattice,
+  bool findMatch(const deque<_atom>& xstr1_atoms,
+      const deque<_atom>& PROTO_atoms,
       const xmatrix<double>& PROTO_lattice,
       double minimum_interatomic_distance, //DX20200622
       vector<uint>& mapping_index_str1,
       vector<uint>& mapping_index_str2,
       vector<double>& min_dists,
-      const int& type_match){
+      int type_match,
+      xvector<double>& origin_shift){ //DX20200910 - added origin_shift
 
     // In order to find the best matchings the routine computes 
     // the difference between one atom and all the others, 
     // building a matrix of differences of coordinates.
     // Then, it checks which atoms have the best matching
     // with another atom in the second structure.
+    // The atoms positions may be updated to the optimal origin choice for
+    // PROTO_atoms
 
     // A | 1    A1, A2     I can check which is the best matching
     // B | 2 -> B1, B2  -> for the atom 1 and 2 in the structure
@@ -6217,45 +6219,8 @@ namespace compare{
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     bool VERBOSE=false;
-    bool USE_CENTROID_METHOD=false;
 
     string function_name = XPID + "compare::findMatch():";
-   
-    // ---------------------------------------------------------------------------
-    // determine the center of mass (centroid) for the Cartesian coordinates //DX20200715
-    deque<_atom> xstr1_atoms = _xstr1_atoms;
-    xvector<double> xstr1_centroid,xstr1_centroid_PBC,PROTO_centroid,PROTO_centroid_PBC;
-    if(USE_CENTROID_METHOD){
-      for(uint i=0;i<xstr1_atoms.size();i++){ xstr1_atoms[i].mass = GetAtomMass(xstr1_atoms[i].name)/AMU2KILOGRAM; cerr << xstr1_atoms[i].name << " -> " << xstr1_atoms[i].mass << endl;}
-      xstr1_centroid = getCentroidOfStructure(xstr1_atoms,true,false);
-      xstr1_centroid_PBC = getCentroidOfStructurePBC(xstr1_atoms,xstr1_lattice,false,false); //DX20200904 - use PBC to account for switching sides of cell
-    }
-    deque<_atom> PROTO_atoms = _PROTO_atoms;
-    if(USE_CENTROID_METHOD){
-      for(uint i=0;i<PROTO_atoms.size();i++){ PROTO_atoms[i].mass = GetAtomMass(PROTO_atoms[i].name)/AMU2KILOGRAM;}
-      PROTO_centroid = getCentroidOfStructure(PROTO_atoms,true,false);
-      PROTO_centroid_PBC = getCentroidOfStructurePBC(PROTO_atoms,PROTO_lattice,false,false); //DX20200904 - use PBC to account for switching sides of cell
-    }
-
-    if(USE_CENTROID_METHOD){
-      cerr << function_name << " xstr1_centroid: " << xstr1_centroid << endl;
-      cerr << function_name << " xstr1_centroid_PBC: " << xstr1_centroid_PBC << endl;
-      cerr << function_name << " FRAC:xstr1_centroid: " << aurostd::inverse(trasp(xstr1_lattice))*xstr1_centroid << endl;
-      cerr << function_name << " FRAC:xstr1_centroid_PBC: " << aurostd::inverse(trasp(xstr1_lattice))*xstr1_centroid_PBC << endl;
-      cerr << function_name << " PROTO_centroid: " << PROTO_centroid << endl;
-      cerr << function_name << " PROTO_centroid_PBC: " << PROTO_centroid_PBC << endl;
-      cerr << function_name << " FRAC:PROTO_centroid: " << aurostd::inverse(trasp(PROTO_lattice))*PROTO_centroid << endl;
-      cerr << function_name << " FRAC:PROTO_centroid_PBC: " << aurostd::inverse(trasp(PROTO_lattice))*PROTO_centroid_PBC << endl;
-      xvector<double> xstr1_centroid_PBC_cart = aurostd::trasp(xstr1_lattice)*BringInCell(xstr1_centroid_PBC);
-      xvector<double> PROTO_centroid_PBC_cart = aurostd::trasp(PROTO_lattice)*BringInCell(PROTO_centroid_PBC);
-      cerr << function_name << " CART:xstr1_centroid_PBC: " << xstr1_centroid_PBC_cart << endl; 
-      cerr << function_name << " CART:PROTO_centroid_PBC: " << PROTO_centroid_PBC_cart << endl;
-    }
-
-    if(USE_CENTROID_METHOD){
-      for(uint i=0;i<xstr1_atoms.size();i++){xstr1_atoms[i].cpos = xstr1_atoms[i].cpos-xstr1_centroid_PBC; }
-      for(uint i=0;i<PROTO_atoms.size();i++){PROTO_atoms[i].cpos = PROTO_atoms[i].cpos-PROTO_centroid_PBC; }
-    }
 
     // ---------------------------------------------------------------------------
     // Determines cutoff distance in which atoms map onto one another and are
@@ -6272,7 +6237,7 @@ namespace compare{
     int basis_index1=0,basis_index2=0;              // basis of atoms (index before sorting)
 
     vector<double> vdiffs;                      //Difference btwn atoms coords
-    vector<std::pair<xvector<double>,xvector<double> > > min_positions;                      //Store sets of Cartesian coords which minimize distance
+    vector<xvector<double> > min_map_vectors;   //Store sets of Cartesian coords which minimize distance
     vector<vector<double> > all_vdiffs;         //For all the atoms
 
     bool is_non_collinear = xstr1_atoms[0].noncoll_spin_is_given; //DX20191213
@@ -6301,7 +6266,6 @@ namespace compare{
     //DX20190226 [BETA] xvector<double> best_centroid1 = centroid_with_PBC(xstr1); 
     //DX20190226 [BETA] xvector<double> best_centroid2 = centroid_with_PBC(PROTO); 
 
-
     vector<xvector<double> > l1, l2, l3;
     vector<int> a_index, b_index, c_index;
     //double radius=RadiusSphereLattice(lattice); //DX20190701 - use robust method
@@ -6311,12 +6275,11 @@ namespace compare{
     // ---------------------------------------------------------------------------
     // declare variables outside of loop (efficiency) //DX20200401
     xvector<double> min_xvec, incell_dist, tmp_xvec, a_component, ab_component;
-    std::pair<xvector<double>,xvector<double> > tmp_pair;
-
+    xvector<double> min_map_vector_tmp;
     for(j=0;j<xstr1_atoms.size();j++){
       //cerr << "xstr1.atoms[j]: " << xstr1.atoms[j] << endl;
       tmp_xvec = xstr1_atoms[j].cpos;
-      tmp_pair.first = tmp_xvec;
+      min_map_vector_tmp = tmp_xvec;
       vdiffs.clear();
       double match_dist=1e9;
       double prev_match_dist=0; //to avoid recalculating dims if nothing has changed
@@ -6385,7 +6348,7 @@ namespace compare{
           i2_name = PROTO_atoms[i2_min].name;
           basis_index1_min = basis_index1; //DX20200521 - use basis not index (protects against resorting)
           basis_index2_min = basis_index2; //DX20200521 - use basis not index (protects against resorting)
-          tmp_pair.second = min_xvec;
+          min_map_vector_tmp = min_xvec;
         }
         vdiffs.push_back(dist);
         //DX20190701 - speed increase, not possible to match to anything else if less than quarter of an Angstrom
@@ -6478,9 +6441,84 @@ namespace compare{
       mapping_index_str2.push_back(basis_index2_min); //DX20200521
       min_dists.push_back(match_dist);
       all_vdiffs.push_back(vdiffs);
-      min_positions.push_back(tmp_pair);
+      min_map_vectors.push_back(min_map_vector_tmp);
     }
+
+    // ---------------------------------------------------------------------------
+    // try to minimize mapping distances //DX20200910
+    xvector<double> origin_shift_test;
+    vector<xvector<double> > new_mapping_vectors = minimizeMappingDistances(min_map_vectors, origin_shift_test);
+
+    uint num_distances = new_mapping_vectors.size(); //DX20200922
+    vector<double> new_mapping_distances(num_distances); //DX20200922 - set size; fixed
+    for(uint i=0;i<num_distances;i++){ new_mapping_distances[i] = aurostd::modulus(new_mapping_vectors[i]); } //DX20200922 - assign with [i], no longer dynamic
+
+    if(LDEBUG){
+      for(uint i=0;i<num_distances;i++){ //DX20200922 - use uint instead of vector.size(); efficiency
+        cerr << function_name << " minimum distance: " << min_dists[i] << " (before) --> " << new_mapping_distances[i] << " (after)" << endl;
+      }
+    }
+
+    // ---------------------------------------------------------------------------
+    // check if the distances were minimized or stayed the same
+    // if they increased, then something went wrong and we default to the original
+    // mapping distances //DX20200910
+    if((aurostd::sum(new_mapping_distances)-aurostd::sum(min_dists)) < _ZERO_TOL_){
+      min_dists = new_mapping_distances;
+      min_map_vectors = new_mapping_vectors;
+      origin_shift = origin_shift_test;
+    }
+    else{
+      if(LDEBUG){
+        cerr << function_name << " the minimization method did not reduce the mapping distances; use the original mapping distances." << endl;
+      }
+    }
+
     return true;
+  }
+}
+
+// ***************************************************************************
+// mimimizeMatchingDistance() //DX20200910
+// ***************************************************************************
+namespace compare {
+   vector<xvector<double> > minimizeMappingDistances(
+       const vector<xvector<double> >& distance_vectors){
+
+     xvector<double> origin_shift;
+     return minimizeMappingDistances(distance_vectors,origin_shift);
+   }
+}
+
+namespace compare {
+   vector<xvector<double> > minimizeMappingDistances(
+       const vector<xvector<double> >& distance_vectors,
+       xvector<double>& origin_shift){
+
+    // after identifying the mapped positions (distance vectors for mapped
+    // positions), try to minimize the mapping vectors
+    // do this by seeing if there is a drift/residual between the mapping
+    // vectors and subtract the drift (rigid shift) from all positions
+
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string function_name = XPID + "compare::minimizeMatchingDistances():";
+
+    // ---------------------------------------------------------------------------
+    // calculate the drift/residual of the mapping distances (and normalize)
+    // via centroid method
+    origin_shift = aurostd::getCentroid(distance_vectors);
+
+    if(LDEBUG){ cerr << function_name << " origin_shift " << origin_shift << " mod=" << aurostd::modulus(origin_shift) << endl; }
+
+    // ---------------------------------------------------------------------------
+    // subtract off the residuals (rigid shift)
+    uint num_distances = distance_vectors.size(); //DX20200922
+    vector<xvector<double> > new_distance_vectors(num_distances); //DX20200922 - set size; fixed
+    for(uint i=0;i<num_distances;i++){ //DX20200922 - use uint instead of vector.size(); efficiency
+      new_distance_vectors[i] = distance_vectors[i]-origin_shift; //DX20200922 - assign with [i], no longer dynamic
+    }
+
+    return new_distance_vectors;
   }
 }
 
@@ -8343,11 +8381,16 @@ namespace compare{
             }
             vector<uint> map_index_str1, map_index_str2;
             vector<double> min_dists;
-            if(findMatch(xstr1_atoms,proto_atoms,xstr1.lattice,proto.lattice,minimum_interatomic_distance,map_index_str1,map_index_str2,min_dists,type_match)){;
+            xvector<double> origin_shift; //DX20200910
+            if(findMatch(xstr1_atoms,proto_atoms,proto.lattice,minimum_interatomic_distance,map_index_str1,map_index_str2,min_dists,type_match,origin_shift)){
               if(VERBOSE){
                 for(uint m=0;m<map_index_str1.size();m++){
                   cerr << "compare::structureSearch: " << map_index_str1[m] << " == " << map_index_str2[m] << " : dist=" << min_dists[m] << endl;
                 }
+              }
+              // update atom positions if they shifted //DX20200910
+              if(aurostd::modulus(origin_shift)>_ZERO_TOL_){
+                proto = ShiftPos(proto,origin_shift,false); //false -> cpos shift
               }
               double cd=AUROSTD_NAN, f=AUROSTD_NAN; //DX20200421 - missing initialization
               // Only calculate the NN for the proto if we found suitable matches.  

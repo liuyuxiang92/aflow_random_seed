@@ -251,6 +251,9 @@ SymbolicProxy &Symbolic::operator=(const CloningSymbolicInterface &s)
 SymbolicProxy &Symbolic::operator=(const SymbolicProxy &s)
 { return SymbolicProxy::operator=(s); }
 
+SymbolicProxy &Symbolic::operator=(const Symbolic &s) //DX20200908 - missing this assignment operator in main SYMBOLICC++ source
+{ return SymbolicProxy::operator=(s); } //DX20200908 - missing this assignment operator in main SYMBOLICC++ source
+
 SymbolicProxy &Symbolic::operator=(const int &i)
 { return *this = Number<int>(i); }
 

@@ -147,6 +147,7 @@ class Symbolic: public SymbolicProxy
 
          SymbolicProxy &operator=(const CloningSymbolicInterface&);
          SymbolicProxy &operator=(const SymbolicProxy&);
+         SymbolicProxy &operator=(const Symbolic&); //DX20200908 - missing this assignment operator in main SYMBOLICC++ source
          SymbolicProxy &operator=(const int&);
          SymbolicProxy &operator=(const double&);
          SymbolicProxy &operator=(const string&);

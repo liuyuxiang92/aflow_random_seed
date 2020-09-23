@@ -38,6 +38,8 @@ const string STD_ELEMENTS_LIST="Sc Ti V Cr Mn Fe Co Ni Cu Zn "
 "Y Zr Nb Mo Tc Ru Rh Pd Ag Cd "
 "La Hf Ta W Re Os Ir Pt Au Hg ";
 
+const int TEMPERATURE_PRECISION=2;  //not really going to explore more than 2000-3000K, looks weird if decimal is larger than non-decimal part of number //4;  //this is std::fixed
+
 namespace pocc {
   class POccCalculator; //forward declaration
   struct POccSuperCellSet; //forward declaration
@@ -88,14 +90,15 @@ namespace pocc {
   string getARUNString(const std::list<POccSuperCellSet>& l_supercell_sets,unsigned long long int i);
   string getARUNString(unsigned long long int index_structure_group,unsigned long long int vstructure_groups_size,unsigned long long int index_structure,unsigned long long int vstructures_size,unsigned long long int index_hnf,unsigned long long int index_site_config,bool include_strgrp=false);
 
-  double getHmix(const xvector<double>& v_dg,const xvector<double>& v_energies);
-  double getHmix(const xvector<double>& v_dg,const xvector<double>& v_energies,double& dg_total);
-  double getEFA(const xvector<double>& v_dg,const xvector<double>& v_energies);
+  double getHmix(const xvector<double>& xv_energies,const xvector<double>& xv_dgs);
+  double getHmix(const xvector<double>& xv_energies,const xvector<double>& xv_dgs,double& dg_total);
+  double getEFA(const xvector<double>& xv_energies,const xvector<double>& xv_dgs);
 
   void poccOld2New(ostream& oss=cout);
   void poccOld2New(ofstream& FileMESSAGE,ostream& oss=cout);
   
   string addDefaultPOCCTOL2string(const string& input);
+  string getTemperatureString(double temperature,int precision=TEMPERATURE_PRECISION,bool temperatures_int=true,int zero_padding_temperature=TEMPERATURE_PRECISION+1);
 } // namespace pocc
 
 namespace pocc {
@@ -639,6 +642,8 @@ namespace pocc {
 
       void CleanPostProcessing();
       void loadDataIntoCalculator();
+      void setTemperatureStringParameters();
+      void setTemperatureStringParameters(vector<double>& v_temperatures);
       void postProcessing();
       void StructuresAllFile2SupercellSets();
       void StructuresUniqueFile2SupercellSets();
@@ -649,7 +654,9 @@ namespace pocc {
       void setPOccStructureProbabilities(double temperature=300); //room temperature
       string getTemperatureString(double temperature) const;
       void setAvgDOSCAR(double temperature=300);  //depends on probabilities
-      void plotAvgDOSCAR(double temperature=300);
+      void plotAvgDOSCAR(double temperature) const; //no default temperature, needs to be set inside setAvgDOSCAR()
+      void plotAvgDOSCAR(const string& doscar_path,const string& directory=".") const;
+      void plotAvgDOSCAR(const xDOSCAR& xdos,double temperature,const string& directory=".") const;
       void writeResults() const;
       void writeResults(double temperature) const;
 

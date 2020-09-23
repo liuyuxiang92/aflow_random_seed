@@ -1475,7 +1475,7 @@ class xstructure {
     bool GetStoich(void);                                         // get stoich_each_type - CO20170724
     bool sortAtomsEquivalent(void);                               // sort by equivalent atoms - CO20190116
     bool FixLattices(void);                                       // Reciprocal/f2c/c2f
-    void SetCoordinates(const int& mode);                         // change coordinates
+    void SetCoordinates(int mode);                                // change coordinates
     void MakeBasis(void);                                         // make basis for atoms (basis and number)
     void MakeTypes(void);                                         // refresh types based on num_each_type  //CO20180420
     void AddAtom(const _atom& atom);                              // adding an atom
@@ -1572,6 +1572,7 @@ class xstructure {
     int GenerateGridAtoms_20191218(int i1,int i2,int j1,int j2,int k1,int k2); //DX20191218 [NEW] //CO20200912
     int  GenerateLIJK(double);                                    // generate lijk look up table
     // QUANTUM ESPRESSO AND ABINIT AND AIMS                       // --------------------------------------
+    void fixEmptyAtomNames(bool force_fix=false);                 //CO20200829
     void buildGenericTitle(bool vasp_input=false,bool force_fix=false); // build a nice title with atoms
     void xstructure2qe(void);                                     // some wrap up IOs to convert format to QE
     void xstructure2vasp(void);                                   // some wrap up IOs to convert format to VASP
@@ -2219,7 +2220,7 @@ class _xinput {
 //const xstructure& xstructure::operator=(const xstructure& b);
 xstructure GetStructure(const int& iomode,ifstream& input);     // plug from cin
 xstructure GetStructure(const int& iomode,const string& Directory); // plug from a directory
-//void xstructure::SetCoordinates(const int& mode);
+//void xstructure::SetCoordinates(int mode);
 xstructure SetSDNumbers(const xstructure& a,const vector<string>& in_sd);
 xstructure SetSDTypes(const xstructure& a,const vector<string>& in_sd);
 vector<int> GetTypes(const xstructure& a);
@@ -2262,14 +2263,14 @@ double det(const xvector<double>& v1,const xvector<double>& v2,const xvector<dou
 double GetVol(const xvector<double>& v1,const xvector<double>& v2,const xvector<double>& v3);
 double det(const double&,const double&,const double&,const double&,const double&,const double&,const double&,const double&,const double&);
 //double getcos(const xvector<double>& a,const xvector<double>& b);  // removed and put in aurostd_xvector.h as cos(xvector,xvector) and sin(xvector,xvector)
-xvector<double> Getabc_angles(const xmatrix<double>& lat,const int& mode);
-xvector<long double> Getabc_angles(const xmatrix<long double>& lat,const int& mode);
-xvector<double> Getabc_angles(const xmatrix<double>& lat,const xvector<int>& permut,const int& mode);
-xvector<double> Getabc_angles(const xvector<double>& r1,const xvector<double>& r2,const xvector<double>& r3,const int& mode);
-xvector<double> Getabc_angles(const xvector<double>& r1,const xvector<double>& r2,const xvector<double>& r3,const xvector<int>& permut,const int& mode);
+xvector<double> Getabc_angles(const xmatrix<double>& lat,int mode);
+xvector<long double> Getabc_angles(const xmatrix<long double>& lat,int mode);
+xvector<double> Getabc_angles(const xmatrix<double>& lat,const xvector<int>& permut,int mode);
+xvector<double> Getabc_angles(const xvector<double>& r1,const xvector<double>& r2,const xvector<double>& r3,int mode);
+xvector<double> Getabc_angles(const xvector<double>& r1,const xvector<double>& r2,const xvector<double>& r3,const xvector<int>& permut,int mode);
 #define _Getabc_angles Getabc_angles
 //#define _Getabc_angles __NO_USE_Sortabc_angles
-xvector<double> Sortabc_angles(const xmatrix<double>& lat,const int& mode);
+xvector<double> Sortabc_angles(const xmatrix<double>& lat,int mode);
 xmatrix<double> GetClat(const xvector<double>& abc_angles);
 xmatrix<double> GetClat(const double &a,const double &b,const double &c,const double &alpha,const double &beta,const double &gamma);
 xstructure GetIntpolStr(xstructure strA,xstructure strB,const double& f,const string& path_flag);
@@ -3269,7 +3270,7 @@ class xDOSCAR : public xStream { //CO20200404 - xStream integration for logging
     string title;
     uint spin;
     double Vol,POTIM;
-    xvector<double> lattice;
+    xvector<double> lattice;    //CO20200922 - an xvector in the style of Getabc_angles(), only the abc are printed/read, must be in meters: https://www.vasp.at/wiki/index.php/DOSCAR
     double temperature;
     bool RWIGS;
     double Efermi;
@@ -4245,7 +4246,7 @@ namespace LATTICE {
   string SpaceGroup2LatticeVariation(uint sg,const xstructure& str);
   string ConventionalLattice_SpaceGroup(uint sg,double a,double b,double c);
   string ConventionalLattice_SpaceGroup(uint sg,const xstructure& str);
-  xvector<double> Getabc_angles_Conventional(const xmatrix<double>& rlattice, string lattice,const int& mode);
+  xvector<double> Getabc_angles_Conventional(const xmatrix<double>& rlattice, string lattice,int mode);
   bool fix_sts_sp(xstructure& str_sp,xmatrix<double> &rlattice,xmatrix<double> &plattice);
   bool Standard_Lattice_Structure(const xstructure& str_in,xstructure& str_sp,xstructure& str_sc,bool full_sym=true);
   bool Standard_Lattice_StructureDefault(const xstructure& str_in,xstructure& str_sp,xstructure& str_sc,bool full_sym=true);
