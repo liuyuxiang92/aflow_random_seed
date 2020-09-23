@@ -570,7 +570,7 @@ namespace LATTICE {
 
 // ***************************************************************************
 namespace LATTICE {
-  xvector<double> Getabc_angles_Conventional(const xmatrix<double>& rlattice, string lattice,const int& mode) {
+  xvector<double> Getabc_angles_Conventional(const xmatrix<double>& rlattice, string lattice,int mode) {
     xmatrix<double> clattice(3,3);
     clattice=rlattice;
     // lattices

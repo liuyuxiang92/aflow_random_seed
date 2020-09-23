@@ -2069,7 +2069,7 @@ namespace aurostd {
       if(points.size()==0){ xvector<utype> centroid; return centroid; }
       xvector<utype> centroid(points[0].lrows,points[0].urows); //DX+CO20200907 - ensure dimensions are commensurate
       centroid=points[0]*weights[0]; //DX20200728
-      for(uint i=1;i<points.size();i++){centroid+=points[i]*weights[0];} //DX20200728
+      for(uint i=1;i<points.size();i++){centroid+=points[i]*weights[i];} //DX20200728
       centroid/=(aurostd::sum(weights));
       return centroid;
     }
@@ -2786,6 +2786,16 @@ namespace aurostd {  // namespace aurostd
 
 namespace aurostd {
   template<class utype> utype mean(const xvector<utype>& a){return sum(a)/a.rows;} //CO20190520
+  template<class utype> utype meanWeighted(const xvector<utype>& a,const xvector<utype>& weights){utype sum_weights;return meanWeighted(a,weights,sum_weights);} //CO20190520
+  template<class utype> utype meanWeighted(const xvector<utype>& a,const xvector<utype>& weights,utype& sum_weights){ //CO20190520
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy=XPID+"aurostd::meanWeighted():";
+    sum_weights=aurostd::sum(weights);
+    if(LDEBUG){cerr << soliloquy << " sum_weights=" << sum_weights << endl;}
+    double avg=aurostd::scalar_product(a,weights)/sum_weights;
+    if(LDEBUG){cerr << soliloquy << " avg=" << avg << endl;}
+    return avg;
+  }
   template<class utype> utype stddev(const xvector<utype>& a){ //CO20190520
     utype avg=mean(a);
     utype sd=(utype)0,diff=(utype)0;

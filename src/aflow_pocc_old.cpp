@@ -120,9 +120,7 @@ bool POCC_GENERATE_INPUT(ofstream &FileMESSAGE,_aflags &aflags) {
         ssxstr_sorted << AFLOWIN_SEPARATION_LINE<< endl;
       }
     } else {  //START CO
-      aurostd::xoption pflags;
-      _kflags kflags;
-      pocc::POccCalculator pcalc(xstr_pocc,aflags,kflags,FileMESSAGE,cout);
+      pocc::POccCalculator pcalc(xstr_pocc,aflags,FileMESSAGE,cout);
       if(!pcalc.m_initialized){
         throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"POCC algorithm failed to initialize",_RUNTIME_ERROR_); //CO20200624
       }

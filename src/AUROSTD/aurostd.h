@@ -437,8 +437,8 @@ namespace aurostd {
   bool MatchCompressed(const string& CompressedFileName,const string& FileNameOUT);
   // [OBSOLETE]  bool DecompressFile(const string& CompressedFileName);
   bool efile2tempfile(string _FileNameIN, string& FileNameOUT); //CO20180220
-  bool IsCompressed(string FileNameIn,string& FileNameOut);
-  bool IsCompressed(string FileNameIn);
+  bool IsCompressed(const string& FileNameIn,string& FileNameOut);
+  bool IsCompressed(const string& FileNameIn);
   string GetCompressionExtension(const string& CompressedFileName);
   //CO END
   bool UncompressFile(const string& FileName,const string& command);  bool UncompressFile(const string& FileName); // with guess  

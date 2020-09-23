@@ -1314,6 +1314,7 @@ namespace KBIN {
   bool CompressDirectory(const _aflags& aflags,const _kflags& kflags) {        // AFLOW_FUNCTION_IMPLEMENTATION
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy = XPID + "KBIN::CompressDirectory():";
+    if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
     //DX+CO START
     // [OBSOLETE] aus << "cd " << aflags.Directory << " && ";
     // [OBSOLETE]  aus << "ls | grep -v .EXT | ";                                //CO, skip anything with bzip extension
@@ -1321,9 +1322,11 @@ namespace KBIN {
     // [OBSOLETE] aus << "grep -v SKIP | ";
     // [OBSOLETE] aus << "grep -v " << KBIN_SUBDIRECTORIES << " | ";
     // [OBSOLETE]  aus << "grep -v aflow.in | grep -v " << _AFLOWIN_ << " ";;    //CO, never zip aflow.in or _aflow.in (agl_aflow.in) or newly defined aflow.in
+    if(LDEBUG){cerr << soliloquy << " directory=" << aflags.Directory << endl;}
     vector<string> _vfiles,vfiles;
     string compressed_variant;
     aurostd::DirectoryLS(aflags.Directory,_vfiles);
+    if(LDEBUG){cerr << soliloquy << "_vfiles=" << aurostd::joinWDelimiter(_vfiles,",") << endl;}
     string file_path;
     for(uint i=0;i<_vfiles.size();i++){
       if(aurostd::IsCompressed(_vfiles[i])){continue;}  //doesn't need full path, just substring2bool for zip variants, e.g., .EXT
@@ -1347,6 +1350,8 @@ namespace KBIN {
       // [OBSOLETE] }
       vfiles.push_back(_vfiles[i]);
     }
+    std::sort(vfiles.begin(),vfiles.end()); //sort in order
+    if(LDEBUG){cerr << soliloquy << " vfiles=" << aurostd::joinWDelimiter(vfiles,",") << endl;}
     // [OBSOLETE] aurostd::string2vectorstring(aurostd::execute2string(aus),vfiles);
     // [OBSOLETE] cerr << vfiles.size() << endl;
     // [OBSOLETE] aurostd::StringstreamClean(aus);
@@ -1358,6 +1363,7 @@ namespace KBIN {
       for(uint i=0;i<vfiles.size();i++){ //better than doing it all in one shot
         aus << kflags.KZIP_BIN << " -9f " << vfiles[i] << "; " << endl;  // semi-colon is important, keeps going if it stalls on one
       }
+      if(LDEBUG){cerr << soliloquy << " command=\"" << aus.str() << "\"" << endl;}
       // aus << kflags.KZIP_BIN << " " << aurostd::joinWDelimiter(vfiles," ") << endl; //AVOID, because if one fails, the whole command stops
       aurostd::execute(aus);
       // cerr << aus.str() << endl;

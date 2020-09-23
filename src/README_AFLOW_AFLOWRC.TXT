@@ -1054,7 +1054,7 @@ ARUN_DIRECTORY_PREFIX
 ####################################################################################################
 DEFAULTS POCC
 
-POCC_FILE_PREFIX
+DEFAULT_POCC_TEMPERATURE_STRING
   description: Temperature range over which POCC will perform post-processing. Scan 0 to 1200 (K) in 300 (K) increments. 0 is converted to _ZERO_TOL_ since T=0 exactly is undefined for the Boltzmann distribution.
   type: string
   default: "0:1200:300"

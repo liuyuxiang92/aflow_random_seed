@@ -883,8 +883,8 @@ namespace init {
 
     // USEFUL shortcuts //SC20200319
     if(!aurostd::args2attachedflag(argv,"--np=")) {
-      deque<string> vshort; //  aurostd::string2tokens("1,2,4,5,6,7,8,9,10,12,14,16,20,24,28,30,32,40,44,48,50,52,56,60,64",vshort,",");
-      for(uint ishort=0;ishort<=64;ishort++)
+      deque<string> vshort; 
+      for(uint ishort=0;ishort<=128;ishort++)
         vshort.push_back(aurostd::utype2string(ishort));
       for(uint ishort=0;ishort<vshort.size();ishort++) {
         if(aurostd::args2flag(argv,cmds,"--multi="+vshort.at(ishort))) {  //SC20200319
@@ -1684,19 +1684,19 @@ string aflow_get_time_string(void) {
   //Www Mmm dd hh:mm:ss yyyy
   //Where Www is the weekday, Mmm the month (in letters), dd the day of the month, hh:mm:ss the time, and yyyy the year.
   //The string is followed by a new-line character ('\n') and terminated with a null-character.
-//[CO20200624 - OBSOLETE]#ifdef ALPHA
-//[CO20200624 - OBSOLETE]  ostringstream aus;
-//[CO20200624 - OBSOLETE]  string OUT;
-//[CO20200624 - OBSOLETE]  aus<<"date | sed \"s/ /_/g\" > "+XHOST.tmpfs+"/date."<< XHOST.ostrPID.str() << "." << XHOST.ostrTID.str() << " " <<endl;  //CO20200502 - threadID
-//[CO20200624 - OBSOLETE]  system(aus.str().c_str());
-//[CO20200624 - OBSOLETE]  ifstream FileAUS;
-//[CO20200624 - OBSOLETE]  string FileNameAUS=XHOST.tmpfs+"/date."+XHOST.ostrPID.str()+"."+XHOST.ostrTID.str();  //CO20200502 - threadID
-//[CO20200624 - OBSOLETE]  FileAUS.open(FileNameAUS.c_str(),std::ios::in);
-//[CO20200624 - OBSOLETE]  FileAUS >> OUT;
-//[CO20200624 - OBSOLETE]  FileAUS.clear();FileAUS.close();
-//[CO20200624 - OBSOLETE]  // return (char*) OUT.c_str();
-//[CO20200624 - OBSOLETE]  return string("NotAvailable \n");
-//[CO20200624 - OBSOLETE]#else
+  //[CO20200624 - OBSOLETE]#ifdef ALPHA
+  //[CO20200624 - OBSOLETE]  ostringstream aus;
+  //[CO20200624 - OBSOLETE]  string OUT;
+  //[CO20200624 - OBSOLETE]  aus<<"date | sed \"s/ /_/g\" > "+XHOST.tmpfs+"/date."<< XHOST.ostrPID.str() << "." << XHOST.ostrTID.str() << " " <<endl;  //CO20200502 - threadID
+  //[CO20200624 - OBSOLETE]  system(aus.str().c_str());
+  //[CO20200624 - OBSOLETE]  ifstream FileAUS;
+  //[CO20200624 - OBSOLETE]  string FileNameAUS=XHOST.tmpfs+"/date."+XHOST.ostrPID.str()+"."+XHOST.ostrTID.str();  //CO20200502 - threadID
+  //[CO20200624 - OBSOLETE]  FileAUS.open(FileNameAUS.c_str(),std::ios::in);
+  //[CO20200624 - OBSOLETE]  FileAUS >> OUT;
+  //[CO20200624 - OBSOLETE]  FileAUS.clear();FileAUS.close();
+  //[CO20200624 - OBSOLETE]  // return (char*) OUT.c_str();
+  //[CO20200624 - OBSOLETE]  return string("NotAvailable \n");
+  //[CO20200624 - OBSOLETE]#else
   long ltime=time(NULL);
 
   string date=string(ctime(&ltime));
@@ -1704,7 +1704,7 @@ string aflow_get_time_string(void) {
     if(date.at(date.length()-1)=='\n')
       date.erase(date.length()-1);
   return date;
-//[CO20200624 - OBSOLETE]#endif
+  //[CO20200624 - OBSOLETE]#endif
 }
 string aflow_convert_time_ctime2aurostd(const string& time_LOCK){ //CO20200624
   //refer to aflow_get_time_string()
@@ -1713,11 +1713,11 @@ string aflow_convert_time_ctime2aurostd(const string& time_LOCK){ //CO20200624
   bool LDEBUG=(FALSE || XHOST.DEBUG);
 
   if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
-  
+
   vector<string> tokens;
   aurostd::string2tokens(time_LOCK,tokens);
   if(tokens.size()!=5){return "";}
-  
+
   //https://en.cppreference.com/w/c/chrono/strftime
   //'Www Mmm dd hh:mm:ss yyyy' === '%a %b %d %H:%M:%S %Y'
   //https://stackoverflow.com/questions/19524720/using-strptime-converting-string-to-time-but-getting-garbage
@@ -1725,7 +1725,7 @@ string aflow_convert_time_ctime2aurostd(const string& time_LOCK){ //CO20200624
   if(!strptime(time_LOCK.c_str(),"%a %b %d %H:%M:%S %Y",&tstruct)){return "";}
 
   if(LDEBUG){cerr << soliloquy << " END" << endl;}
-  
+
   return aurostd::get_datetime(&tstruct);
 }
 
@@ -1884,7 +1884,7 @@ namespace init {
     message << "Routine " << routine << ": Wrong number/type of input parameters (" << tokens_options.size();pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,_LOGGER_ERROR_);
     //[CO20200624 - OBSOLETE]oss << "ERROR: " << routine << ":" << endl;
     //[CO20200624 - OBSOLETE]oss << "       Wrong number/type of input parameters! (" << tokens_options.size() << ")" << endl;
-    
+
     //DX20200724 [OBSOLETE] return MessageOption(options,routine,vusage);
     MessageOption(options,routine,vusage); //DX20200724
     throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Incorrect usage.",_RUNTIME_ERROR_); //DX20200724
@@ -2237,7 +2237,7 @@ namespace init {
     XHOST.vschema.push_attached("SCHEMA::TYPE:COEFFICIENT_ENTROPY_STABILIZATION","number");
     nschema++;
     //CO20200829 END
-    
+
     // schema is CAPITAL, content is not necessarily
     XHOST.vschema.push_attached("SCHEMA::NAME:CODE","code");
     XHOST.vschema.push_attached("SCHEMA::UNIT:CODE","");
@@ -2335,7 +2335,7 @@ namespace init {
     XHOST.vschema.push_attached("SCHEMA::TYPE:DISTANCE_HULL","number");
     nschema++;
     //CO20200829 END
-    
+
     // schema is CAPITAL, content is not necessarily
     XHOST.vschema.push_attached("SCHEMA::NAME:EENTROPY_ATOM","eentropy_atom");
     XHOST.vschema.push_attached("SCHEMA::UNIT:EENTROPY_ATOM","eV/atom");
