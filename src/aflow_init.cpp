@@ -883,8 +883,8 @@ namespace init {
 
     // USEFUL shortcuts //SC20200319
     if(!aurostd::args2attachedflag(argv,"--np=")) {
-      deque<string> vshort; //  aurostd::string2tokens("1,2,4,5,6,7,8,9,10,12,14,16,20,24,28,30,32,40,44,48,50,52,56,60,64",vshort,",");
-      for(uint ishort=0;ishort<=64;ishort++)
+      deque<string> vshort; 
+      for(uint ishort=0;ishort<=128;ishort++)
         vshort.push_back(aurostd::utype2string(ishort));
       for(uint ishort=0;ishort<vshort.size();ishort++) {
         if(aurostd::args2flag(argv,cmds,"--multi="+vshort.at(ishort))) {  //SC20200319

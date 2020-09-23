@@ -169,7 +169,7 @@ static_no_pdf: aflow aflow_data
 #	[CO20200513 - KEEP rm command in case we do 'make -j' first]
 	rm -rf $(SQLITE_OBJ) aflow aflow_data
 	$(MAKE) LIBS_AFLOW="$(LIBS_AFLOW_STATIC)" FLAGS_STATIC_POST="$(FLAGS_STATIC)"
-#	$(CC) -DSQLITE_ENABLE_JSON1 -c $(SQLITE_C) $(LIBS) $(FLAGS_STATIC)	#CO190401 - $(LIBS) -lpthreads not needed, issues with clang++ (mac)
+#	$(CC) -DSQLITE_ENABLE_JSON1 -c $(SQLITE_C) $(LIBS) $(FLAGS_STATIC)	#CO20190401 - $(LIBS) -lpthreads not needed, issues with clang++ (mac)
 #	$(MAKE) $(SQLITE_OBJ) FLAGS_STATIC_POST="$(FLAGS_STATIC)"
 #	rm -f aflow
 #	$(MAKE) aflow LIBS_AFLOW="$(LIBS_AFLOW_STATIC)"
@@ -197,7 +197,7 @@ $(SQLITE_OBJ): $(SQLITE_C) Makefile
 	$(CC) $(SQLITE_OPTS) -c $< -o $@ $(FLAGS_STATIC_POST)
 #	$(CC) -DSQLITE_ENABLE_JSON1 -DSQLITE_OMIT_LOAD_EXTENSION -o $@ -c $< $(LIBS)	#-DSQLITE_OMIT_LOAD_EXTENSION doesn't really work amalgamation
 #	$(CC) -DSQLITE_ENABLE_JSON1 -o $@ -c $< $(LIBS)
-#	$(CC) -DSQLITE_ENABLE_JSON1 -c $< $(LIBS)	#CO190401 - $(LIBS) -lpthreads not needed, issues with clang++ (mac)
+#	$(CC) -DSQLITE_ENABLE_JSON1 -c $< $(LIBS)	#CO20190401 - $(LIBS) -lpthreads not needed, issues with clang++ (mac)
 #	$(CC) $(SQLITE_OPTS) -c $<
 #	cp sqlite3.o ./SQLITE/
 #CO20200508 - catch all rule
@@ -1081,7 +1081,7 @@ vasp:	all
 
 ###################################################################################################
 #EMAIL VERSION UPDATES
-#CO190131 - START
+#CO20190131 - START
 .PHONY: send_version_updates_email
 send_version_updates_email:
 	rm -f version_updates_email.txt
@@ -1089,8 +1089,8 @@ send_version_updates_email:
 	[ -s version_updates_email.txt ]
 	cat version_updates_email.txt | mail -r aflow@materials.duke.edu -s "AFLOW Code Update: v$(VERSNUMBER)" aflow+int+737+2740356048620877160@groups.io
 	rm -f version_updates_email.txt
-#CO190131 - STOP
-#CO190218 - START
+#CO20190131 - STOP
+#CO20190218 - START
 version_updates_email.txt: README_AFLOW_VERSIONS_HISTORY.TXT Makefile
 	rm -f $(@:.txt=_tmp.txt)
 	@file_content=""; \
@@ -1122,7 +1122,7 @@ version_updates_email.txt: README_AFLOW_VERSIONS_HISTORY.TXT Makefile
 	echo "" >> $@
 	echo "Thanks," >> $@
 	echo "AFLOW Dev" >> $@
-#CO190218 - STOP
+#CO20190218 - STOP
 ###################################################################################################
 
 ###################################################################################################

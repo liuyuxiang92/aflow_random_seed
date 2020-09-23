@@ -19,7 +19,7 @@
 #define AUTHOR_RECENT_ARTICLES  200
 #define AUTHOR_RECENT_YEARS     30
 
-#define MAX_YEAR_PRESENTATIONS  2019
+#define MAX_YEAR_PRESENTATIONS  2020
 
 // ******************************************************************************************************************************************************
 // _OUTREACH CLASS
