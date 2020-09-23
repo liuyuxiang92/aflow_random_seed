@@ -835,6 +835,10 @@ namespace pocc {
       qmvasp_filename=pocc_directory_abs+"/"+DEFAULT_AFLOW_QMVASP_OUT;
       if(!aurostd::EFileExist(qmvasp_filename,qmvasp_filename)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No qmvasp file found [dir="+pocc_directory_abs+"]",_FILE_NOT_FOUND_);}
       qmvasp.GetPropertiesFile(qmvasp_filename);
+      if(LDEBUG){
+        cerr << soliloquy << " qmvasp.H_atom_relax=" << qmvasp.H_atom_relax << endl;
+        cerr << soliloquy << " qmvasp.H_atom_static=" << qmvasp.H_atom_static << endl;
+      }
       //CO20200921 - we pulled H_atom_static previously, but this does not match what is being done in aflowlib_libraries
       //we pull relax and not static because relaxation runs come with stresses, pressures, etc. from which we can derive PV (for enthalpies)
       //use H_atom_relax instead
@@ -2522,13 +2526,36 @@ namespace pocc {
     return loadFromAFlags(loader);
   }
   void POccCalculator::loadFromAFlags(const aurostd::xoption& loader) { //grabs from m_aflags
-    bool LDEBUG=(FALSE || ENUMERATE_ALL_HNF || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy=XPID+"POccCalculator::loadFromAFlags():";
     string AflowIn_file="",AflowIn="";
     KBIN::getAflowInFromAFlags(m_aflags,AflowIn_file,AflowIn,*p_FileMESSAGE,*p_oss);
     if(LDEBUG){cerr << soliloquy << " loaded aflow.in" << endl;}
     if(loader.flag("LOAD::KFLAGS")){
       m_kflags=KBIN::VASP_Get_Kflags_from_AflowIN(AflowIn,*p_FileMESSAGE,m_aflags,*p_oss);  //set them here if we can, they will get overwritten with input kflags
+      if(LDEBUG){
+        cerr << soliloquy << " m_kflags.KBIN_SYMMETRY_PGROUP_WRITE(pre)=" << m_kflags.KBIN_SYMMETRY_PGROUP_WRITE << endl;
+        cerr << soliloquy << " m_kflags.KBIN_SYMMETRY_PGROUPK_WRITE(pre)=" << m_kflags.KBIN_SYMMETRY_PGROUPK_WRITE << endl;
+        cerr << soliloquy << " m_kflags.KBIN_SYMMETRY_FGROUP_WRITE(pre)=" << m_kflags.KBIN_SYMMETRY_FGROUP_WRITE << endl;
+        cerr << soliloquy << " m_kflags.KBIN_SYMMETRY_PGROUP_XTAL_WRITE(pre)=" << m_kflags.KBIN_SYMMETRY_PGROUP_XTAL_WRITE << endl;
+        cerr << soliloquy << " m_kflags.KBIN_SYMMETRY_PGROUPK_XTAL_WRITE(pre)=" << m_kflags.KBIN_SYMMETRY_PGROUPK_XTAL_WRITE << endl;
+        cerr << soliloquy << " m_kflags.KBIN_SYMMETRY_PGROUPK_PATTERSON_WRITE(pre)=" << m_kflags.KBIN_SYMMETRY_PGROUPK_PATTERSON_WRITE << endl;
+        cerr << soliloquy << " m_kflags.KBIN_SYMMETRY_IATOMS_WRITE(pre)=" << m_kflags.KBIN_SYMMETRY_IATOMS_WRITE << endl;
+        cerr << soliloquy << " m_kflags.KBIN_SYMMETRY_AGROUP_WRITE(pre)=" << m_kflags.KBIN_SYMMETRY_AGROUP_WRITE << endl;
+        cerr << soliloquy << " m_kflags.KBIN_SYMMETRY_SGROUP_WRITE(pre)=" << m_kflags.KBIN_SYMMETRY_SGROUP_WRITE << endl;
+      }
+      pflow::defaultKFlags4SymWrite(m_kflags,false);  //if loading from aflags, we don't want to write new files in that directory
+      if(LDEBUG){
+        cerr << soliloquy << " m_kflags.KBIN_SYMMETRY_PGROUP_WRITE(post)=" << m_kflags.KBIN_SYMMETRY_PGROUP_WRITE << endl;
+        cerr << soliloquy << " m_kflags.KBIN_SYMMETRY_PGROUPK_WRITE(post)=" << m_kflags.KBIN_SYMMETRY_PGROUPK_WRITE << endl;
+        cerr << soliloquy << " m_kflags.KBIN_SYMMETRY_FGROUP_WRITE(post)=" << m_kflags.KBIN_SYMMETRY_FGROUP_WRITE << endl;
+        cerr << soliloquy << " m_kflags.KBIN_SYMMETRY_PGROUP_XTAL_WRITE(post)=" << m_kflags.KBIN_SYMMETRY_PGROUP_XTAL_WRITE << endl;
+        cerr << soliloquy << " m_kflags.KBIN_SYMMETRY_PGROUPK_XTAL_WRITE(post)=" << m_kflags.KBIN_SYMMETRY_PGROUPK_XTAL_WRITE << endl;
+        cerr << soliloquy << " m_kflags.KBIN_SYMMETRY_PGROUPK_PATTERSON_WRITE(post)=" << m_kflags.KBIN_SYMMETRY_PGROUPK_PATTERSON_WRITE << endl;
+        cerr << soliloquy << " m_kflags.KBIN_SYMMETRY_IATOMS_WRITE(post)=" << m_kflags.KBIN_SYMMETRY_IATOMS_WRITE << endl;
+        cerr << soliloquy << " m_kflags.KBIN_SYMMETRY_AGROUP_WRITE(post)=" << m_kflags.KBIN_SYMMETRY_AGROUP_WRITE << endl;
+        cerr << soliloquy << " m_kflags.KBIN_SYMMETRY_SGROUP_WRITE(post)=" << m_kflags.KBIN_SYMMETRY_SGROUP_WRITE << endl;
+      }
       if(LDEBUG){cerr << soliloquy << " loaded kflags" << endl;}
     }
     if(loader.flag("LOAD::VFLAGS")){
@@ -5825,8 +5852,9 @@ namespace pocc {
     //CO - default should always be to turn everything on, modify input
     //get ROBUST symmetry determination
     xstr_sym=xstr_nopocc; //make copy to avoid carrying extra sym_ops (heavy) if not needed
-    pflow::defaultKFlags4SymCalc(m_kflags,true);
-    pflow::defaultKFlags4SymWrite(m_kflags,true);
+    _kflags kflags_sym=m_kflags;  //make a copy so as to not overwrite m_kflags
+    pflow::defaultKFlags4SymCalc(kflags_sym,true);
+    //[this needs to be specified by m_kflags (do NOT override), otherwise LIB2RAW writes in LIB]pflow::defaultKFlags4SymWrite(kflags_sym,true);
 
     //streams
     ostream* p_oss_sym=p_oss;
@@ -5837,13 +5865,13 @@ namespace pocc {
     //verbose=true;
     bool osswrite=verbose;
     if(!verbose){
-      pflow::defaultKFlags4SymWrite(m_kflags,false);
+      pflow::defaultKFlags4SymWrite(kflags_sym,false);  //setting to false is always ok
       if(!badbit_set){(*p_oss_sym).setstate(std::ios_base::badbit);}  //like NULL
       p_FileMESSAGE_sym=&devNull;
     }
     message << "Calculating symmetry of parent structure" << endl;
     pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE_sym,*p_oss_sym,_LOGGER_MESSAGE_);
-    bool sym_calculated=pflow::PerformFullSymmetry(xstr_sym,*p_FileMESSAGE_sym,m_aflags,m_kflags,osswrite,*p_oss_sym);
+    bool sym_calculated=pflow::PerformFullSymmetry(xstr_sym,*p_FileMESSAGE_sym,m_aflags,kflags_sym,osswrite,*p_oss_sym);
     if(!badbit_set){(*p_oss_sym).clear();}  //clear NULL
     if(sym_calculated==false){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"AFLOW-SYM failed to calculate the symmetry of the clean (non-pocc'd) structure");}
 
