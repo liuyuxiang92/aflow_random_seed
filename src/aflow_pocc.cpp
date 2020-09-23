@@ -1348,28 +1348,31 @@ namespace pocc {
     }
 
     vector<string> tokens;
-    if(aurostd::substring2bool(temp_string,":")){aurostd::string2tokens(temp_string,tokens,":");}
-    else if(aurostd::substring2bool(temp_string,"-")){aurostd::string2tokens(temp_string,tokens,"-");}
+    if(temp_string.find(":")!=string::npos){aurostd::string2tokens(temp_string,tokens,":");}
+    else if(temp_string.find("-")!=string::npos){aurostd::string2tokens(temp_string,tokens,"-");}
+    else if(temp_string.find(",")!=string::npos){aurostd::string2tokens(temp_string,tokens,",");}
     else{tokens.push_back(temp_string);}
 
-    if(tokens.size()<1 || tokens.size()>3){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown temp_string format",_INPUT_ILLEGAL_);}
-
+    if(tokens.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown temp_string format",_INPUT_ILLEGAL_);}
+   
+    //check that they are all doubles
     vector<double> dtokens;
     for(uint i=0;i<tokens.size();i++){
       if(!aurostd::isfloat(tokens[i])){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"temp_string token[i="+tokens[i]+"] is not a float",_INPUT_ILLEGAL_);} //check that all doubles
       dtokens.push_back(aurostd::string2utype<double>(tokens[i]));
+      if(std::signbit(dtokens.back())){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Negative temperature found in temp_string: "+tokens[i],_INPUT_ILLEGAL_);}
     }
 
-    vector<double> vtemperatures;
-    if(dtokens.size()==1){vtemperatures.push_back(dtokens.front());return vtemperatures;}
+    //simple comma-separated list
+    if(dtokens.size()==1 || temp_string.find(",")!=string::npos){return dtokens;}
+    
+    //treat ':' and '-' as delimiter for ranges
+    if(tokens.size()<1 || tokens.size()>3){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown temp_string format",_INPUT_ILLEGAL_);}
 
     double interval=100.0;
     if(dtokens.size()==3){interval=dtokens.back();}
-    for(double temp=dtokens[0];temp<=dtokens[1];temp+=interval){
-      if(std::signbit(temp)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Negative temperature found in temp_string",_INPUT_ILLEGAL_);}
-      vtemperatures.push_back(temp);
-    }
-
+    vector<double> vtemperatures;
+    for(double temp=dtokens[0];temp<=dtokens[1];temp+=interval){vtemperatures.push_back(temp);}
     if(vtemperatures.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No temperatures extracted from temp_string",_INPUT_ILLEGAL_);}
 
     if(LDEBUG){
