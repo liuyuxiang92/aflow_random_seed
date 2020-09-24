@@ -245,11 +245,11 @@ namespace aurostd {
     if(isentry && content_string.empty()) {
       stringstream message;
       message << "Content string empty. content_string=" <<  content_string
-              << ", content_double=" <<  content_double
-              << ", content_int=" <<  content_int
-              << ", content_uint=" << content_uint
-              << ", keyword=" << keyword
-              << ", isentry=" << isentry;
+        << ", content_double=" <<  content_double
+        << ", content_int=" <<  content_int
+        << ", content_uint=" << content_uint
+        << ", keyword=" << keyword
+        << ", isentry=" << isentry;
       throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _RUNTIME_ERROR_);
     }
     if(VERBOSE) cerr << "DEBUG - " << soliloquy << " END" << endl;

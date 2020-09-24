@@ -34,7 +34,7 @@ namespace anrl{
   xmatrix<double> getHexagonalLattice(const string& lattice_and_centering, const vector<double>& lattice_parameter_values, uint mode=0);
   xmatrix<double> getCubicLattice(const string& lattice_and_centering, const vector<double>& lattice_parameter_values, uint mode=0);
   xstructure rhl2hex(const xstructure& str, double& a, double& c); 
-  
+
   // ---------------------------------------------------------------------------
   // functions to determine atomic positions from Wyckoff and parameters
   deque<_atom> getAtomsFromWyckoff(const vector<wyckoffsite_ITC>& Wyckoff_positions, const xmatrix<double>& lattice_conventional);
@@ -42,7 +42,7 @@ namespace anrl{
   void applyWyckoffValues(const vector<double>& Wyckoff_parameter_values,vector<wyckoffsite_ITC>& Wyckoff_positions); //perhaps add this as a method to wyckoffsite_ITC?
   bool containsDuplicateWyckoffCoordinate(const vector<wyckoffsite_ITC>& wyckoff_sites_ITC, bool already_ordered=false);
   vector<wyckoffsite_ITC> getWyckoffSitesFromANRL(const vector<string>& Wyckoff_tokens, const vector<string>& species, uint space_group_number, int setting=SG_SETTING_ANRL); 
-  
+
   // ---------------------------------------------------------------------------
   // checking functions
   bool structureAndLabelConsistent(const xstructure& _xstr, const string& label_input, string& label_and_params_calculated);

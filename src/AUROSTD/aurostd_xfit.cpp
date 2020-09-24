@@ -26,7 +26,7 @@ namespace aurostd{
     for (int i=p.urows-1; i>=p.lrows; i--) res = res*x + p[i];
     return res;
   }
-  
+
   /// Evaluates the value and the derivatives of the polynomial with coefficients p at
   /// the value x and outputs the derivatives in the dp array.
   ///
@@ -40,14 +40,14 @@ namespace aurostd{
       for (int j=dp.urows; j>=dp.lrows+1; j--) dp[j] = dp[j]*x + dp[j-1];
       dp[dp.lrows] = dp[dp.lrows]*x + p[i];
     }
-  
+
     int factor = 1;
     for (int i=dp.lrows+1; i<dp.urows; i++){
       factor *= i;
       dp[i+1] *= factor;
     }
   }
-  
+
   /// Evaluates the value and the derivatives of the polynomial with coefficients p at
   /// the value x and returns the result as an array (dp).
   ///
@@ -60,7 +60,7 @@ namespace aurostd{
     evalPolynomialDeriv(x, p, dp);
     return dp;
   }
-  
+
   /// Constructs the Vandermonde matrix with columns up to a given order n.
   /// Vandermonde matrix:
   /// 1 x1^2 x1^3 .. x1^n
@@ -71,15 +71,15 @@ namespace aurostd{
   xmatrix<double> Vandermonde_matrix(const xvector<double> &x, int n)
   {
     xmatrix<double> VM(x.rows, n);
-  
+
     for (int i=1; i<=x.rows; i++){
       VM[i][1] = 1.0;
       for (int j=2; j<=n; j++) VM[i][j] = std::pow(x[i], j-1);
     }
-  
+
     return VM;
   }
-  
+
   /// Calculates the extremum of the polynomial bounded by the region [xmin,xmax] by searching
   /// for the value x where the derviative of polynomial equals to zero using the
   /// bisection method.
@@ -105,10 +105,10 @@ namespace aurostd{
     bool LDEBUG = (FALSE || DEBUG_XFIT || XHOST.DEBUG);
     string function = XPID + "polynomialFindExtremum(): ";
     if (LDEBUG) cerr << function << "begin" << std::endl;
-  
+
     double left_end = xmin; double right_end = xmax;
     double middle = 0.5*(left_end + right_end);
-  
+
     xvector<double> dp(2); // index 1 - value, index 2 - first derivative
     evalPolynomialDeriv(left_end, p, dp);
     double f_at_left_end  = dp[2];
@@ -116,10 +116,10 @@ namespace aurostd{
     double f_at_right_end = dp[2];
     evalPolynomialDeriv(middle, p, dp);
     double f_at_middle    = dp[2];
-  
+
     // no root within a given interval
     if (sign(f_at_left_end) == sign(f_at_right_end)) return -1;
-  
+
     if (LDEBUG){
       cerr << function << "left_end= "  << left_end  << "middle= ";
       cerr << middle  << "right_end= "  << right_end  << std::endl;
@@ -127,7 +127,7 @@ namespace aurostd{
       cerr << "f_middle= " << f_at_middle << "f_right= ";
       cerr << f_at_right_end << std::endl;
     }
-  
+
     // Iterate until the convergence criterion is reached:
     // f(middle) is sufficiently close to zero.
     // Meanwhile, do a sanity check that the function has opposite signs at the interval ends.
@@ -136,16 +136,16 @@ namespace aurostd{
         std::swap(left_end, middle);
         std::swap(f_at_left_end, f_at_middle);
       }
-  
+
       if (sign(f_at_right_end) == sign(f_at_middle)){
         std::swap(right_end, middle);
         std::swap(f_at_right_end, f_at_middle);
       }
-  
+
       middle = 0.5*(left_end + right_end);
       evalPolynomialDeriv(middle, p, dp);
       f_at_middle = dp[2];
-  
+
       if (LDEBUG){
         cerr << function << "left_end= "  << left_end  << "middle= ";
         cerr << middle  << "right_end= "  << right_end  << std::endl;
@@ -154,10 +154,10 @@ namespace aurostd{
         cerr << f_at_right_end << std::endl;
       }
     }
-  
+
     // double-check that the convergence criterion was reached
     if (std::abs(f_at_middle) > tol) return -1;
-  
+
     if (LDEBUG) cerr << function << "end" << std::endl;
     return middle;
   }

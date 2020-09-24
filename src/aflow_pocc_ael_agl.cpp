@@ -129,7 +129,7 @@ namespace pocc {
       // [OBSOLETE] }
       aelerror = AEL_functions::AEL_Get_AflowInName(AflowInName, pocc_directory_abs, ael_aflowin_found);
       if (aelerror != 0) {
-	throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Problem finding AEL aflow.in filename [dir="+pocc_directory_abs+"]",_FILE_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Problem finding AEL aflow.in filename [dir="+pocc_directory_abs+"]",_FILE_ERROR_);
       }
       if (ael_aflowin_found) {
         if(aurostd::FileExist(pocc_directory_abs+"/ael.LOCK")) {
@@ -226,7 +226,7 @@ namespace pocc {
         compliance_tensor.clear();
       } else {
         // [OBSOLETE] cerr << soliloquy << pocc_directory_abs << "/aflow.ael.out: File not found" << endl;
-	throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Problem with AEL calculation: [dir="+pocc_directory_abs+"]",_FILE_NOT_FOUND_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Problem with AEL calculation: [dir="+pocc_directory_abs+"]",_FILE_NOT_FOUND_);
       }
     }
   }
@@ -886,7 +886,7 @@ namespace pocc {
       //CT20200722 Run AGL postprocessing through KBIN
       aglerror = AGL_functions::AGL_Get_AflowInName(AflowInName, pocc_directory_abs, agl_aflowin_found);
       if (aglerror != 0) {
-	throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Problem finding AGL aflow.in filename [dir="+pocc_directory_abs+"]",_FILE_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Problem finding AGL aflow.in filename [dir="+pocc_directory_abs+"]",_FILE_ERROR_);
       }
       if (agl_aflowin_found) {
         if(aurostd::FileExist(pocc_directory_abs+"/agl.LOCK")) {
@@ -970,7 +970,7 @@ namespace pocc {
         agl_vibrational_energies_atom.push_back(agl_vibrational_energy_atom);
       } else {
         // [OBSOLETE] cerr << soliloquy << pocc_directory_abs << "/aflow.agl.out: File not found" << endl;
-	throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Problem with AGL calculation: [dir="+pocc_directory_abs+"]",_FILE_NOT_FOUND_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Problem with AGL calculation: [dir="+pocc_directory_abs+"]",_FILE_NOT_FOUND_);
       }
     }
   }

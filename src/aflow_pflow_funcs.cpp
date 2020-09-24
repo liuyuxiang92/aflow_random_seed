@@ -45,7 +45,7 @@ string getGenericTitleXStructure(const xstructure& xstr,bool latex){ //CO2019052
   uint iat=0;
   int comp_prec=(int)ceil(log10(1.0/xstr.partial_occupation_stoich_tol));  //ceil ensures we round up above 1 //CO20181226
   bool atom_names=true;
-  
+
   for(uint i=0;i<xstr.atoms.size()&&atom_names;i++){if(xstr.atoms[i].cleanname.empty()){atom_names=false;}}
   for(uint itype=0;itype<xstr.num_each_type.size();itype++){
     for(uint j=0;j<(uint)xstr.num_each_type[itype];j++) {

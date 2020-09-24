@@ -382,7 +382,7 @@ namespace apl
     message << (ignore_imaginary ? "" : "NOT ") << "be ignored.";
 
     pflow::logger(QHA_ARUN_MODE, function, message, currentDirectory, *p_FileMESSAGE,
-            *p_oss, _LOGGER_MESSAGE_);
+        *p_oss, _LOGGER_MESSAGE_);
 
     // determine the names for the directories for the calculation of the Grueneisen parameter
     // (calculated using finite differences method)
@@ -539,7 +539,7 @@ namespace apl
       if ((runQHA && isEOS) || runQHA3P || runSCQHA || runQHANP){
         msg = "Checking if all required files from static DFT calculations exist.";
         pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
-          *p_oss, _LOGGER_MESSAGE_);
+            *p_oss, _LOGGER_MESSAGE_);
         vector<vector<bool> > file_is_present(subdirectories_static.size(),
             vector<bool>(4));
 
@@ -733,7 +733,7 @@ namespace apl
 
       msg = "Generate aflow.in file in " + subdirectories_static[i] + " directory.";
       pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
-        *p_oss, _LOGGER_MESSAGE_);
+          *p_oss, _LOGGER_MESSAGE_);
 
       xinput.xvasp.str = origStructure;
       xinput.xvasp.str.InflateVolume(coefEOSVolumes[i]);
@@ -812,7 +812,7 @@ namespace apl
 
   /// Prints what data output files from static DFT calculations are missing.
   void QHA::printMissingStaticFiles(const vector<vector<bool> > & list, 
-    const vector<string> &subdirectories)
+      const vector<string> &subdirectories)
   {
     string function = XPID + "QHA::printMissingStaticFiles():";
     string msg = "", missing_files = "";
@@ -850,7 +850,7 @@ namespace apl
     // parameters does not depend on any data from any static DFT calculation.
     if (!msg.empty()){
       pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
-              *p_oss, _LOGGER_ERROR_);
+          *p_oss, _LOGGER_ERROR_);
     }
   }
 
@@ -888,7 +888,7 @@ namespace apl
 
       msg = "Generating aflow.in file in " + subdirectories[i] + " directory.";
       pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
-        *p_oss, _LOGGER_MESSAGE_);
+          *p_oss, _LOGGER_MESSAGE_);
 
       xinput.xvasp.str = origStructure;
       xinput.xvasp.str.InflateVolume(coefVolumes[i]);
@@ -996,7 +996,7 @@ namespace apl
     // parameters does not depend on any data from any static DFT calculation.
     if (!msg.empty()){
       pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
-              *p_oss, _LOGGER_ERROR_);
+          *p_oss, _LOGGER_ERROR_);
     }
   }
 
@@ -1023,10 +1023,10 @@ namespace apl
     }
     msg+=" APL calculations exist.";
     pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
-      *p_oss, _LOGGER_MESSAGE_);
+        *p_oss, _LOGGER_MESSAGE_);
 
     vector<string> &subdirectories = (QHA_FD==qhatype) ? subdirectories_apl_gp :
-        (QHA_EOS==qhatype) ? subdirectories_apl_eos : subdirectories_apl_qhanp;
+      (QHA_EOS==qhatype) ? subdirectories_apl_eos : subdirectories_apl_qhanp;
 
     vector<vector<bool> > file_is_present(subdirectories.size(),vector<bool>(2));
 
@@ -1082,7 +1082,7 @@ namespace apl
       if (aurostd::EFileExist(hibernation_file)){
         msg = "Reading hibernation file...";
         pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
-              *p_oss, _LOGGER_MESSAGE_);
+            *p_oss, _LOGGER_MESSAGE_);
         try{
           phcalc.awake();
         } catch (aurostd::xerror& e){
@@ -1116,13 +1116,13 @@ namespace apl
           dummy_dos_projections);
       dosc.calc(aurostd::string2utype<double>(apl_options.getattachedscheme("DOSPOINTS")),
           aurostd::string2utype<double>(apl_options.getattachedscheme("DOSSMEAR")));
-// AS20200824 we do not want to overwrite the PHDOSCAR created by the independent APL
-// calculation.
-// A.S. was not sure if it is necessary to write the file at QHA level at all (maybe for
-// debug purposes).
-// In the case if it would be necessary to output the file, for convenience the
-// following line is left commented instead of being deleted.
-//      dosc.writePHDOSCAR(subdirectories[i]);//AS20200824
+      // AS20200824 we do not want to overwrite the PHDOSCAR created by the independent APL
+      // calculation.
+      // A.S. was not sure if it is necessary to write the file at QHA level at all (maybe for
+      // debug purposes).
+      // In the case if it would be necessary to output the file, for convenience the
+      // following line is left commented instead of being deleted.
+      //      dosc.writePHDOSCAR(subdirectories[i]);//AS20200824
 
       if (dosc.hasNegativeFrequencies()){
         stringstream msg;
@@ -1172,13 +1172,13 @@ namespace apl
       apl::PhononDispersionCalculator pdisc(phcalc);
       pdisc.initPathLattice(USER_DC_INITLATTICE, USER_DC_NPOINTS);
       pdisc.calc(apl::THZ | apl::ALLOW_NEGATIVE);
-// AS20200824 we do not want to overwrite the PHEIGENVAL created by the independent APL
-// calculation.
-// A.S. was not sure if it is necessary to write the file at QHA level at all (maybe for
-// debug purposes).
-// In the case if it would be necessary to output the file, for convenience the
-// following line is left commented instead of being deleted.
-//      pdisc.writePHEIGENVAL(subdirectories[i]);//AS20200824
+      // AS20200824 we do not want to overwrite the PHEIGENVAL created by the independent APL
+      // calculation.
+      // A.S. was not sure if it is necessary to write the file at QHA level at all (maybe for
+      // debug purposes).
+      // In the case if it would be necessary to output the file, for convenience the
+      // following line is left commented instead of being deleted.
+      //      pdisc.writePHEIGENVAL(subdirectories[i]);//AS20200824
 
       // save all the data that is necessary for QHA calculations
       if (i==0){// qmesh data is the same for all volumes: need to store only once
@@ -1288,7 +1288,7 @@ namespace apl
       if (!outcar.GetPropertiesFile(outcarfile)){
         msg = "Could not read the " + outcarfile + " file";
         pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE, 
-          *p_oss, _LOGGER_ERROR_);
+            *p_oss, _LOGGER_ERROR_);
         data_read_success = false;
       }
 
@@ -1303,7 +1303,7 @@ namespace apl
       if (!static_eigvals.back().m_initialized){
         msg = "Could not read the " + subdirectories_static[i]+"/EIGENVAL.static file.";
         pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
-          *p_oss, _LOGGER_ERROR_);
+            *p_oss, _LOGGER_ERROR_);
         data_read_success = false;
       }
     }
@@ -1581,7 +1581,7 @@ namespace apl
         break;
       case(EOS_MURNAGHAN):
         Veq = parameters[2]; // parameters = {E, V, B, Bp}
-        break;
+    break;
     }
     return Veq;
   }
@@ -2065,13 +2065,13 @@ namespace apl
       cerr << f_at_right_end << std::endl;
     }
 
-  // Iterate until the convergence criterion is reached:
-  // f(middle) is sufficiently close to zero or the bracketing interval is sufficiently
-  // small. The latter is used to avoid an infinite loop.
-  // For T->0 it is likely that the IDOS is not smooth but step-like due to numerical
-  // discretization.
-  // Meanwhile, do a sanity check that the function has opposite signs at the interval 
-  // ends.
+    // Iterate until the convergence criterion is reached:
+    // f(middle) is sufficiently close to zero or the bracketing interval is sufficiently
+    // small. The latter is used to avoid an infinite loop.
+    // For T->0 it is likely that the IDOS is not smooth but step-like due to numerical
+    // discretization.
+    // Meanwhile, do a sanity check that the function has opposite signs at the interval 
+    // ends.
     while ((sign(f_at_left_end) != sign(f_at_right_end)) && 
         (std::abs(f_at_middle)>_ZERO_TOL_) && (std::abs(left_end-right_end) > _ZERO_TOL_)){
       if (sign(f_at_left_end) == sign(f_at_middle)){
@@ -2086,7 +2086,7 @@ namespace apl
 
       middle = 0.5*(left_end + right_end);
       f_at_middle = IDOS(middle, T, static_eigvals[Vid]) - Nelectrons;
-  
+
       if (LDEBUG){
         cerr << function << "left_end= "  << left_end  << "middle= ";
         cerr << middle  << "right_end= "  << right_end  << std::endl;
@@ -2112,30 +2112,30 @@ namespace apl
   /// spin down while the calculation was correct for spin up.
   double QHA::electronicFreeEnergy(double T, int Vid)
   {
-     static const double Tmin = 0.1;
-     if (T < Tmin) return 0.0;
-     double U = 0.0, S = 0.0;
-     xEIGENVAL eig = static_eigvals[Vid];
-     double mu  = ChemicalPotential(T, Vid);
-     double mu0 = ChemicalPotential(Tmin, Vid);
-     double E = 0.0;
-     double f = 0.0, f0 = 0.0;
-     double weight = 0.0;
-     for (uint k=0; k<eig.number_kpoints; k++){
-       weight = (2-eig.spin)*eig.vweight[k];// factor 2 if non-magnetic and 1 otherwise
-       for (uint s=0; s<=eig.spin; s++){
-         for (uint b=0; b<eig.number_bands; b++){
-           E = eig.venergy[k][b][0];
-           f = aurostd::FermiDirac(E, mu, T); f0 = aurostd::FermiDirac(E, mu0, Tmin);
-           U += E * weight*(f - f0);
+    static const double Tmin = 0.1;
+    if (T < Tmin) return 0.0;
+    double U = 0.0, S = 0.0;
+    xEIGENVAL eig = static_eigvals[Vid];
+    double mu  = ChemicalPotential(T, Vid);
+    double mu0 = ChemicalPotential(Tmin, Vid);
+    double E = 0.0;
+    double f = 0.0, f0 = 0.0;
+    double weight = 0.0;
+    for (uint k=0; k<eig.number_kpoints; k++){
+      weight = (2-eig.spin)*eig.vweight[k];// factor 2 if non-magnetic and 1 otherwise
+      for (uint s=0; s<=eig.spin; s++){
+        for (uint b=0; b<eig.number_bands; b++){
+          E = eig.venergy[k][b][0];
+          f = aurostd::FermiDirac(E, mu, T); f0 = aurostd::FermiDirac(E, mu0, Tmin);
+          U += E * weight*(f - f0);
 
-           if (f>0 && f<1) S -= (f*log(f) + (1-f)*log(1-f)) * weight;
-         }
-       }
-     }
-     S *= KBOLTZEV;
+          if (f>0 && f<1) S -= (f*log(f) + (1-f)*log(1-f)) * weight;
+        }
+      }
+    }
+    S *= KBOLTZEV;
 
-     return U - T*S;
+    return U - T*S;
   }
 
   /// Calculates the electronic free energy using the Sommerfeld expansion.
@@ -2205,7 +2205,7 @@ namespace apl
         msg = "QHA::extrapolateFrequency() function is designed to be used only with QHA3P, QHANP or SCQHA method.";
         msg += " However, QHA method was requested.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, QHA_ARUN_MODE, msg,
-              _INPUT_ILLEGAL_);
+            _INPUT_ILLEGAL_);
         break;
     }
     return result;
@@ -2259,12 +2259,12 @@ namespace apl
             gamma *= -V/w;
           }
           break;
-      default:
-        string message = "QHA::extrapolateGrueneisen() function is designed to be used only with QHA3P, QHANP or SCQHA method.";
-        message += " However, QHA method was requested.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, QHA_ARUN_MODE, message,
+        default:
+          string message = "QHA::extrapolateGrueneisen() function is designed to be used only with QHA3P, QHANP or SCQHA method.";
+          message += " However, QHA method was requested.";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, QHA_ARUN_MODE, message,
               _INPUT_ILLEGAL_);
-           break;
+          break;
       }
     }
 
@@ -3093,7 +3093,7 @@ namespace apl
         case(QHA_CALC):
           eig = eos_ph_dispersions.front();
           break;
-        // here QHA3P and SCQHA share the same code
+          // here QHA3P and SCQHA share the same code
         case(QHA3P_CALC):
         case(SCQHA_CALC):
           eig = gp_ph_dispersions.front();
@@ -3125,7 +3125,7 @@ namespace apl
               }
               eig.venergy[q][branch][0] = calcFrequencyFit(V, xomega);
               break;
-            // here QHA3P and SCQHA share the same code
+              // here QHA3P and SCQHA share the same code
             case (QHA3P_CALC):
             case (SCQHA_CALC):
               for (int Vid=0; Vid<N_GPvolumes; Vid++){
@@ -3155,7 +3155,7 @@ namespace apl
           filename = DEFAULT_SCQHA_FILE_PREFIX;
           break;
         case (QHANP_CALC):
-           // not supported, this case is handled in an earlier switch statement
+          // not supported, this case is handled in an earlier switch statement
           break;
       }
       filename += aurostd::PaddedNumString(T, ndigits)+'.'+DEFAULT_APL_PDIS_FILE;

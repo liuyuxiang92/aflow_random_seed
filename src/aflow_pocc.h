@@ -96,7 +96,7 @@ namespace pocc {
 
   void poccOld2New(ostream& oss=cout);
   void poccOld2New(ofstream& FileMESSAGE,ostream& oss=cout);
-  
+
   string addDefaultPOCCTOL2string(const string& input);
   string getTemperatureString(double temperature,int precision=TEMPERATURE_PRECISION,bool temperatures_int=true,int zero_padding_temperature=TEMPERATURE_PRECISION+1);
 } // namespace pocc

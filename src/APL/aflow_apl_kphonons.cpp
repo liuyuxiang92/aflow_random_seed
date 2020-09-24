@@ -781,7 +781,7 @@ namespace KBIN {
     for (uint i = 0; i < kflags.KBIN_MODULE_OPTIONS.qhaflags.size(); i++) {
       const string& key = kflags.KBIN_MODULE_OPTIONS.qhaflags[i].keyword;
       message << (kflags.KBIN_MODULE_OPTIONS.qhaflags[i].isentry? "Setting" : "DEFAULT")
-      << " " << _ASTROPT_ << key << "=" << kflags.KBIN_MODULE_OPTIONS.qhaflags[i].xscheme;
+        << " " << _ASTROPT_ << key << "=" << kflags.KBIN_MODULE_OPTIONS.qhaflags[i].xscheme;
       pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, FileMESSAGE, oss);
       qhaopts.flag(key, kflags.KBIN_MODULE_OPTIONS.qhaflags[i].option);
       qhaopts.push_attached(key, kflags.KBIN_MODULE_OPTIONS.qhaflags[i].xscheme);
@@ -960,8 +960,8 @@ namespace KBIN {
         pdisc.initPathLattice("", aurostd::string2utype<int>(aplopts.getattachedscheme("DCPOINTS")));
       } else {
         pdisc.initPathCoords(aplopts.getattachedscheme("DCINITCOORDS"),
-          aplopts.getattachedscheme("DCINITCOORDSLABELS"),
-          aurostd::string2utype<int>(aplopts.getattachedscheme("DCPOINTS")), aplopts.flag("DCCORDS_CART"));
+            aplopts.getattachedscheme("DCINITCOORDSLABELS"),
+            aurostd::string2utype<int>(aplopts.getattachedscheme("DCPOINTS")), aplopts.flag("DCCORDS_CART"));
       }
       //ME20190501 Allow user to override path
       string USER_DC_USERPATH = aplopts.getattachedscheme("DCUSERPATH");
@@ -1404,7 +1404,7 @@ namespace apl {
     string option = "";
 
     pflow::logger(_AFLOW_FILE_NAME_, function, "Validating QHA paramters.", aflags,
-          FileMESSAGE, oss, _LOGGER_MESSAGE_);
+        FileMESSAGE, oss, _LOGGER_MESSAGE_);
 
     // EOS_DISTORTION_RANGE
     option = "EOS_DISTORTION_RANGE";

@@ -487,14 +487,14 @@ namespace KBIN {
     uint aglerror = AGL_functions::AGL_xvasp_flags_populate(xvasp, AflowIn, AflowInName, FileLockName, directory_LIB, aflags, kflags, vflags, FileMESSAGE);
     if (aglerror != 0) { //CT20200624: Check for error, aglerror=2 implies not an AGL main directory
       if (aglerror == 2) {
-	cerr << _AGLSTR_MESSAGE_ << "Not AGL main directory" << endl;
-	cerr << _AGLSTR_MESSAGE_ << AflowInName << endl;
-	return;
+        cerr << _AGLSTR_MESSAGE_ << "Not AGL main directory" << endl;
+        cerr << _AGLSTR_MESSAGE_ << AflowInName << endl;
+        return;
       } else {
-	aurostd::StringstreamClean(aus);
-	aus << _AGLSTR_ERROR_ + "AGL set xvasp flags failed" << endl;  
-	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-	return;
+        aurostd::StringstreamClean(aus);
+        aus << _AGLSTR_ERROR_ + "AGL set xvasp flags failed" << endl;  
+        aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+        return;
       }
     }
 
@@ -560,7 +560,7 @@ namespace AGL_functions {
     } else {
       AflowInName = _AFLOWIN_;
     }
-    
+
     // Call AGL_xvasp_flags_populate to populate xvasp, aflags, kflags and vflags classes
     uint aglerror = AGL_functions::AGL_xvasp_flags_populate(xvasp, AflowIn, AflowInName, FileLockName, directory, aflags, kflags, vflags, FileMESSAGE);
 
