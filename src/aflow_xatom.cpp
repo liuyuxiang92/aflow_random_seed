@@ -14669,30 +14669,30 @@ void CalculateSymmetryPointGroupKPatterson(xstructure& str) {
 // Function fixEmptyAtomNames()
 // ***************************************************************************
 void xstructure::fixEmptyAtomNames(bool force_fix){
- bool LDEBUG=(FALSE || XHOST.DEBUG);
- string soliloquy=XPID+"xstructure::fixEmptyAtomNames():";
- if(species.size()==species_pp.size()) { //CO20190218
-   for(uint itype=0;itype<species.size();itype++) {
-     if((force_fix || species.at(itype)=="") && species_pp.at(itype)!=""){
-       if(LDEBUG) {cerr << soliloquy << " species_pp.at(" << itype << ")=" << species_pp.at(itype) << endl;}
-       species.at(itype)=species_pp.at(itype); //KBIN::VASP_PseudoPotential_CleanName(species_pp.at(itype));  //CO20181226 KEEP PP INFO if available (auto aflow.in)
-     }
-   }
- }  // cormac I`ll write a short pflow for this stuff
- if(species.size()==num_each_type.size()){
-   int iatom=0;
-   for(uint itype=0;itype<num_each_type.size();itype++) {
-     string s=string(species.at(itype));
-     species.at(itype)=s;
-     for(int j=0;j<num_each_type.at(itype);j++) {
-       atoms.at(iatom).name=s;    // CONVASP_MODE
-       atoms.at(iatom).CleanName();
-       atoms.at(iatom).CleanSpin();
-       atoms.at(iatom).name_is_given=TRUE;
-       iatom++;
-     }
-   }
- }
+  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  string soliloquy=XPID+"xstructure::fixEmptyAtomNames():";
+  if(species.size()==species_pp.size()) { //CO20190218
+    for(uint itype=0;itype<species.size();itype++) {
+      if((force_fix || species.at(itype)=="") && species_pp.at(itype)!=""){
+        if(LDEBUG) {cerr << soliloquy << " species_pp.at(" << itype << ")=" << species_pp.at(itype) << endl;}
+        species.at(itype)=species_pp.at(itype); //KBIN::VASP_PseudoPotential_CleanName(species_pp.at(itype));  //CO20181226 KEEP PP INFO if available (auto aflow.in)
+      }
+    }
+  }  // cormac I`ll write a short pflow for this stuff
+  if(species.size()==num_each_type.size()){
+    int iatom=0;
+    for(uint itype=0;itype<num_each_type.size();itype++) {
+      string s=string(species.at(itype));
+      species.at(itype)=s;
+      for(int j=0;j<num_each_type.at(itype);j++) {
+        atoms.at(iatom).name=s;    // CONVASP_MODE
+        atoms.at(iatom).CleanName();
+        atoms.at(iatom).CleanSpin();
+        atoms.at(iatom).name_is_given=TRUE;
+        iatom++;
+      }
+    }
+  }
 }
 
 // ***************************************************************************
@@ -14900,17 +14900,17 @@ string xstructure::platon2print(bool P_EQUAL,bool P_EXACT,double P_ang,double P_
 // Function DecorateWithElements()
 // ***************************************************************************
 void xstructure::DecorateWithElements(void) {
-  
+
   // Apply an element to each atom type.
   // Elements are first alphabetized to follow the AFLOW convention
-  
+
   string function_name = XPID + "xstructure::DecorateWithElements():";
-  
+
   // elements need to be alphabetic for AFLOW
   deque<string> elements;
   for(uint i=0;i<velement.size();i++){ elements.push_back(velement[i].symbol); } // from xelement
   std::stable_sort(elements.begin(), elements.end());
- 
+
   // update species and atom names;
   SetSpecies(elements);
 
@@ -15986,7 +15986,7 @@ void xstructure::GetNeighbors(deque<_atom>& atoms_cell,deque<deque<uint> >& i_ne
       }
     }
   }
-  
+
   if(0){
     //an attempt to shave off more runtime: only shaves off a second AT BEST for "make check_cce"
     //the slowest part of the algorithm WAS sorting (using insertion sort), so reducing vector size would help
@@ -16119,7 +16119,7 @@ void xstructure::GetCoordinations(deque<_atom>& atoms_cell,deque<deque<uint> >& 
   string soliloquy=XPID+"xstructure::GetCoordinations():";
 
   GetNeighbors(atoms_cell,i_neighbors,distances,rmax,rmin,prim,unique_only);
-  
+
   uint i=0,j=0,k=0;
   for(i=0;i<coordinations.size();i++){coordinations[i].clear();} coordinations.clear(); //clear
 
@@ -16135,7 +16135,7 @@ void xstructure::GetCoordinations(deque<_atom>& atoms_cell,deque<deque<uint> >& 
       }
     }
   }
-  
+
   if(LDEBUG){
     for(k=0;k<i_neighbors.size();k++){
       cerr << soliloquy << " ATOMS_CELL[k=" << k << "]: " << atoms_cell[k].name << endl;

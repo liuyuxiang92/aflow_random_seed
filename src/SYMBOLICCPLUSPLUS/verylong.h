@@ -1,22 +1,20 @@
-/*
-    SymbolicC++ : An object oriented computer algebra system written in C++
-
-    Copyright (C) 2008 Yorick Hardy and Willi-Hans Steeb
-
-    This library is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This library is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+//   SymbolicC++ : An object oriented computer algebra system written in C++
+//
+//   Copyright (C) 2008 Yorick Hardy and Willi-Hans Steeb
+//
+//   This library is free software; you can redistribute it and/or modify
+//   it under the terms of the GNU General Public License as published by
+//   the Free Software Foundation; either version 2 of the License, or
+//   (at your option) any later version.
+//
+//   This library is distributed in the hope that it will be useful,
+//   but WITHOUT ANY WARRANTY; without even the implied warranty of
+//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//   GNU General Public License for more details.
+//
+//   You should have received a copy of the GNU General Public License along
+//   with this program; if not, write to the Free Software Foundation, Inc.,
+//   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 
 // verylong.h
@@ -37,9 +35,9 @@
 //using namespace std; //DX20200625 - do not import entire namespace, now calling std functions when necessary (pair, bad_cast, list, ios, type_info, numeric_limits, and complex)
 
 namespace symbolic{ //DX20200625
-class Verylong
-{
-   private:
+  class Verylong
+  {
+    private:
       // Data Fields
       string vlstr;     // The string is stored in reverse order.
       int    vlsign;    // Sign of Verylong: +=>0; -=>1
@@ -48,7 +46,7 @@ class Verylong
       Verylong multdigit(int) const;
       Verylong mult10(int) const;
 
-   public:
+    public:
       // Constructors and destructor
       Verylong(const string& = "0");
       Verylong(int);
@@ -101,14 +99,14 @@ class Verylong
       // I/O stream functions
       friend ostream & operator << (ostream&,const Verylong&);
       friend istream & operator >> (istream&,Verylong&);
-};
+  };
 } //namespace symbolic //DX20200625
 
 //DX20200825 - moved function definitions to verylong.cpp
 
 namespace symbolic{ //DX20200625
-template <> Verylong zero(Verylong);
-template <> Verylong one(Verylong);
+  template <> Verylong zero(Verylong);
+  template <> Verylong one(Verylong);
 } //namespace symbolic //DX20200625
 
 #endif

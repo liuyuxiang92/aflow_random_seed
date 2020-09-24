@@ -353,7 +353,7 @@ namespace anrl {
 // *************************************************************************** 
 namespace anrl {
   uint getANRLSettingChoice(int spacegroup){ //DX20191031 - remove reference
-    
+
     // ANRL setting choice
     // rhl: rhombohedral setting: setting=1
     // monoclinic: unique axis-b: setting=1
@@ -378,7 +378,7 @@ namespace anrl {
 // *************************************************************************** 
 namespace anrl {
   string structure2anrl(istream& input, aurostd::xoption& vpflow) { 
-    
+
     // determine anrl label, parameters, and parameter values of the input structure
 
     string function_name = XPID + "anrl::structure2anrl():";
@@ -1216,7 +1216,7 @@ namespace anrl {
     // variables 
     deque<_atom> atoms_conventional_cell;
     _atom atom_tmp;
-    
+
     // ---------------------------------------------------------------------------
     // create f2c once (efficiency)
     xmatrix<double> f2c = trasp(lattice_conventional);
@@ -1414,8 +1414,8 @@ namespace anrl {
 // *************************************************************************** 
 namespace anrl {
   bool containsDuplicateWyckoffCoordinate(const vector<wyckoffsite_ITC>& wyckoff_sites_ITC, bool already_ordered){
-   
-		// Checks if Wyckoff positions occur in the structure multiple times
+
+    // Checks if Wyckoff positions occur in the structure multiple times
     // Two cases:
     //   1) multiple instances of a fixed Wyckoff position (i.e., no variables) 
     //   2) multiple instances of a variable Wyckoff position with the same 
@@ -2979,7 +2979,7 @@ namespace anrl { // put them in order
   // ternaries
   uint PrototypeANRL_ABC_oP12_62_c_c_c(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Friedrich-nitride-2
   uint PrototypeANRL_A2B2C_tI10_139_e_e_a(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Friedrich-nitride-3
-  
+
 }
 
 // *************************************************************************** 
@@ -4981,7 +4981,7 @@ namespace anrl {
     }
     // ---------------------------------------------------------------------------
     //DX IN PART 1 SECTION // 77 // ./aflow --proto=A2B_oP12_62_2c_c --params=3.875,1.64232258065,1.89496774194,0.004,0.758,0.24,0.07,0.24,0.39
-    //DX IN PART 1 SECTION if(vlabel.at(ifound)=="A2B_oP12_62_2c_c") {
+    //DX IN PART 1 SECTION if(vlabel.at(ifound)=="A2B_oP12_62_2c_c")
     //DX IN PART 1 SECTION  PrototypeANRL_A2B_oP12_62_2c_c(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
     // ---------------------------------------------------------------------------
     // 78 // ./aflow --proto=A3B_oP16_62_cd_c --params=6.5982,1.11416750023,0.727789397108,0.011,0.415,0.369,0.555,0.174,0.053,0.856
@@ -5005,7 +5005,7 @@ namespace anrl {
     }
     // ---------------------------------------------------------------------------
     //DX IN PART 1 SECTION // 82 // ./aflow --proto=AB_oP8_62_c_c --params=5.454,0.609644297763,1.10542720939,0.2005,0.5741,0.0058,0.1993
-    //DX IN PART 1 SECTION if(vlabel.at(ifound)=="AB_oP8_62_c_c") {
+    //DX IN PART 1 SECTION if(vlabel.at(ifound)=="AB_oP8_62_c_c")
     //DX IN PART 1 SECTION  PrototypeANRL_AB_oP8_62_c_c(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
     // ---------------------------------------------------------------------------
     // 83 // ./aflow --proto=A2BC3_oC24_63_e_c_cg --params=9.049,1.21770361366,0.600176815118,0.6699,0.1191,0.8502,0.2174,0.3859
@@ -5513,7 +5513,7 @@ namespace anrl {
     }
     // ---------------------------------------------------------------------------
     //DX IN PART 1 // 184 // ./aflow --proto=A2B_tI12_141_e_a --params=4.126,3.47697527872,0.2915
-    //DX IN PART 1 if(vlabel.at(ifound)=="A2B_tI12_141_e_a") {
+    //DX IN PART 1 if(vlabel.at(ifound)=="A2B_tI12_141_e_a")
     //DX IN PART 1  PrototypeANRL_A2B_tI12_141_e_a(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
     // ---------------------------------------------------------------------------
     // 185 // ./aflow --proto=A_tI16_142_f --params=8.5939,0.420984651904,0.1405

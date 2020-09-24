@@ -91,9 +91,9 @@ void substituteVariableWithParameterDesignation(vector<SymbolicWyckoffSite>& Wyc
 
 // SymbolicWyckoffSite
 void substituteVariableWithParameterDesignation(SymbolicWyckoffSite& Wyckoff_symbolic){
-    
+
   // convert a generic variable to the parameter designation, e.g., x -> x2
-  
+
   for(uint i=0;i<Wyckoff_symbolic.equations.size();i++){
     Wyckoff_symbolic.equations[i]=Wyckoff_symbolic.equations[i].subst("x","x"+aurostd::utype2string<uint>(Wyckoff_symbolic.parameter_index));
     Wyckoff_symbolic.equations[i]=Wyckoff_symbolic.equations[i].subst("y","y"+aurostd::utype2string<uint>(Wyckoff_symbolic.parameter_index));
@@ -106,7 +106,7 @@ void substituteVariableWithParameterDesignation(SymbolicWyckoffSite& Wyckoff_sym
 // *************************************************************************** 
 namespace symbolic {
   Symbolic string2symbolic(const string& str){
-    
+
     // Convert a string into symbolic math notation
     // The SYMBOLICC++ library cannot convert a string into a symbol so
     // we must do it ourselves
@@ -121,7 +121,7 @@ namespace symbolic {
     // ---------------------------------------------------------------------------
     // break up string into doubles and characters
     vector<SYM::sdouble> sdouble_temp = SYM::simplify(str);
-    
+
     // ---------------------------------------------------------------------------
     // loop over characters and build symbolic expression 
     Symbolic out;
@@ -153,7 +153,7 @@ namespace symbolic {
 // *************************************************************************** 
 namespace symbolic {
   bool isEqual(const Symbolic& a, const Symbolic& b){
-    
+
     // relies on SymbolicC++'s implementation of "=="
     // this is sufficient for now, e.g., (1e-9)*x+(1e-6)*y+0 = 0
 
@@ -175,9 +175,9 @@ namespace symbolic {
 // *************************************************************************** 
 namespace symbolic {
   bool isEqualVector(const Symbolic& a_vec, const Symbolic& b_vec){
-    
+
     // check if Symbolic vector inputs are equal
-    
+
     // ---------------------------------------------------------------------------
     // check that the inputs' types are SymbolicMatrix (vector)
     const char* a_vec_info = get_type(a_vec); //DX20200901
@@ -234,7 +234,7 @@ namespace symbolic {
       vector<string> row;
       for(uint j=0;j<3;j++){
         stringstream ss_component; ss_component << lattice.row(i)(j);
-				row.push_back(ss_component.str());
+        row.push_back(ss_component.str());
       }
       vvstring.push_back(row);
     }
@@ -248,7 +248,7 @@ namespace symbolic {
 // *************************************************************************** 
 namespace symbolic {
   Symbolic BringInCell(const Symbolic& vec_in, double tolerance, double upper_bound, double lower_bound){
-    
+
     // bring symbolic math inside the cell
     // it is impossible to know what the variable (x, y, or z) will be 
     // to truly bring the coordinate in the cell, but this function brings 
@@ -262,7 +262,7 @@ namespace symbolic {
     // NOTE: preference to lower bound (e.g., 0) vs upper bound (e.g., 1)
 
     Symbolic vec_out = vec_in;
-    
+
     // ---------------------------------------------------------------------------
     // define a constant so we can determine the "coefficients of the constant"
     Symbolic constant = Symbolic(1); // 1 is a great constant
@@ -286,7 +286,7 @@ namespace symbolic {
 // *************************************************************************** 
 namespace anrl {
   symbolic::Symbolic SymbolicANRLPrimitiveLattices(const string& lattice_and_centering, const char& space_group_letter){
-    
+
     // Grab symbolic representation of primitive lattice in the ANRL convention.
 
     bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_SYMBOLIC_);
@@ -313,123 +313,123 @@ namespace anrl {
     // ---------------------------------------------------------------------------
     // triclinic (aP)
     if(lattice_and_centering == "aP"){
-	    lattice = ((a, _SYMBOLIC_ZERO_, _SYMBOLIC_ZERO_),
-	              (b*cos(gamma), b*sin(gamma), _SYMBOLIC_ZERO_),
-	              (cx, cy, cz));
+      lattice = ((a, _SYMBOLIC_ZERO_, _SYMBOLIC_ZERO_),
+          (b*cos(gamma), b*sin(gamma), _SYMBOLIC_ZERO_),
+          (cx, cy, cz));
     }
 
     // ---------------------------------------------------------------------------
     // simple monoclinic (mP)
     if(lattice_and_centering == "mP"){
       lattice = ((a, _SYMBOLIC_ZERO_, _SYMBOLIC_ZERO_),
-                 (_SYMBOLIC_ZERO_, b, _SYMBOLIC_ZERO_),
-                 (c*cos(beta), _SYMBOLIC_ZERO_, c*sin(beta)));
+          (_SYMBOLIC_ZERO_, b, _SYMBOLIC_ZERO_),
+          (c*cos(beta), _SYMBOLIC_ZERO_, c*sin(beta)));
     }
 
     // ---------------------------------------------------------------------------
     // base-centered monoclinic (mC)
     if(lattice_and_centering == "mC"){
       lattice = ((1/2*a, -(1.0/2.0)*b, _SYMBOLIC_ZERO_),
-	               (1.0/2.0*a, (1.0/2.0)*b, _SYMBOLIC_ZERO_),
-	               (c*cos(beta), _SYMBOLIC_ZERO_ , c*sin(beta)));
+          (1.0/2.0*a, (1.0/2.0)*b, _SYMBOLIC_ZERO_),
+          (c*cos(beta), _SYMBOLIC_ZERO_ , c*sin(beta)));
     }
 
     // ---------------------------------------------------------------------------
     // simple orthorhombic (oP)
     if(lattice_and_centering == "oP"){
-	    lattice = ((a, _SYMBOLIC_ZERO_, _SYMBOLIC_ZERO_),
-	               (_SYMBOLIC_ZERO_, b, _SYMBOLIC_ZERO_),
-                 (_SYMBOLIC_ZERO_, _SYMBOLIC_ZERO_, c));
+      lattice = ((a, _SYMBOLIC_ZERO_, _SYMBOLIC_ZERO_),
+          (_SYMBOLIC_ZERO_, b, _SYMBOLIC_ZERO_),
+          (_SYMBOLIC_ZERO_, _SYMBOLIC_ZERO_, c));
     }
 
     // ---------------------------------------------------------------------------
     // base-centered orthorhombic (oC)
     if(lattice_and_centering == "oC"){
-	    if(space_group_letter == 'A'){
-	      lattice = ((a, _SYMBOLIC_ZERO_, _SYMBOLIC_ZERO_),
-	                 (_SYMBOLIC_ZERO_, (1.0/2.0)*b, -(1.0/2.0)*c),
-	                 (_SYMBOLIC_ZERO_, (1.0/2.0)*b, (1.0/2.0)*c));
+      if(space_group_letter == 'A'){
+        lattice = ((a, _SYMBOLIC_ZERO_, _SYMBOLIC_ZERO_),
+            (_SYMBOLIC_ZERO_, (1.0/2.0)*b, -(1.0/2.0)*c),
+            (_SYMBOLIC_ZERO_, (1.0/2.0)*b, (1.0/2.0)*c));
       }
-	    if(space_group_letter == 'C'){
-	      lattice = (((1.0/2.0)*a, -(1.0/2.0)*b, _SYMBOLIC_ZERO_),
-	                 ((1.0/2.0)*a, (1.0/2.0)*b, _SYMBOLIC_ZERO_),
-	                 (_SYMBOLIC_ZERO_, _SYMBOLIC_ZERO_, c));
+      if(space_group_letter == 'C'){
+        lattice = (((1.0/2.0)*a, -(1.0/2.0)*b, _SYMBOLIC_ZERO_),
+            ((1.0/2.0)*a, (1.0/2.0)*b, _SYMBOLIC_ZERO_),
+            (_SYMBOLIC_ZERO_, _SYMBOLIC_ZERO_, c));
       }
     }
 
     // ---------------------------------------------------------------------------
     // body-centered orthorhombic (oI)
     if(lattice_and_centering == "oI"){
-	    lattice = ((-(1.0/2.0)*a, (1.0/2.0)*b, (1.0/2.0)*c),
-	               ((1.0/2.0)*a, -(1.0/2.0)*b, (1.0/2.0)*c),
-	               ((1.0/2.0)*a, (1.0/2.0)*b, -(1.0/2.0)*c));
+      lattice = ((-(1.0/2.0)*a, (1.0/2.0)*b, (1.0/2.0)*c),
+          ((1.0/2.0)*a, -(1.0/2.0)*b, (1.0/2.0)*c),
+          ((1.0/2.0)*a, (1.0/2.0)*b, -(1.0/2.0)*c));
     }
 
     // ---------------------------------------------------------------------------
     // face-centered orthorhombic (oF)
     if(lattice_and_centering == "oF"){
-	    lattice = ((_SYMBOLIC_ZERO_, (1.0/2.0)*b, (1.0/2.0)*c),
-	               ((1.0/2.0)*a, _SYMBOLIC_ZERO_, (1.0/2.0)*c),
-	               ((1.0/2.0)*a, (1.0/2.0)*b, _SYMBOLIC_ZERO_));
+      lattice = ((_SYMBOLIC_ZERO_, (1.0/2.0)*b, (1.0/2.0)*c),
+          ((1.0/2.0)*a, _SYMBOLIC_ZERO_, (1.0/2.0)*c),
+          ((1.0/2.0)*a, (1.0/2.0)*b, _SYMBOLIC_ZERO_));
     }
 
     // ---------------------------------------------------------------------------
     // simple tetragonal (tP)
     if(lattice_and_centering == "tP"){
-	    lattice = ((a, _SYMBOLIC_ZERO_, _SYMBOLIC_ZERO_),
-	               (_SYMBOLIC_ZERO_, a, _SYMBOLIC_ZERO_),
-	               (_SYMBOLIC_ZERO_, _SYMBOLIC_ZERO_, c));
+      lattice = ((a, _SYMBOLIC_ZERO_, _SYMBOLIC_ZERO_),
+          (_SYMBOLIC_ZERO_, a, _SYMBOLIC_ZERO_),
+          (_SYMBOLIC_ZERO_, _SYMBOLIC_ZERO_, c));
     }
 
     // ---------------------------------------------------------------------------
     // body-centered tetragonal (tI)
     if(lattice_and_centering == "tI"){
-	    lattice = ((-(1.0/2.0)*a, (1.0/2.0)*a, (1.0/2.0)*c),
-	               ((1.0/2.0)*a, -(1.0/2.0)*a, (1.0/2.0)*c),
-	               ((1.0/2.0)*a, (1.0/2.0)*a, -(1.0/2.0)*c));
+      lattice = ((-(1.0/2.0)*a, (1.0/2.0)*a, (1.0/2.0)*c),
+          ((1.0/2.0)*a, -(1.0/2.0)*a, (1.0/2.0)*c),
+          ((1.0/2.0)*a, (1.0/2.0)*a, -(1.0/2.0)*c));
     }
 
     // ---------------------------------------------------------------------------
     // hexagonal/trigonal (hP)
     if(lattice_and_centering == "hP"){
-	    lattice = (((1.0/2.0)*a, -(sqrt(3.0)/2.0)*a, _SYMBOLIC_ZERO_),
-	               ((1.0/2.0)*a, (sqrt(3.0)/2.0)*a, _SYMBOLIC_ZERO_),
-	               (_SYMBOLIC_ZERO_, _SYMBOLIC_ZERO_, c));
+      lattice = (((1.0/2.0)*a, -(sqrt(3.0)/2.0)*a, _SYMBOLIC_ZERO_),
+          ((1.0/2.0)*a, (sqrt(3.0)/2.0)*a, _SYMBOLIC_ZERO_),
+          (_SYMBOLIC_ZERO_, _SYMBOLIC_ZERO_, c));
     }
 
     // ---------------------------------------------------------------------------
     // rhombohedral (hR)
     if(lattice_and_centering == "hR"){
-	    lattice = (((1.0/2.0)*a, -(1.0/(2.0*sqrt(3.0)))*a, (1.0/3.0)*c),
-	               (_SYMBOLIC_ZERO_, (1.0/sqrt(3.0))*a, (1.0/3.0)*c),
-	               (-(1.0/2.0)*a, -(1.0/(2.0*sqrt(3.0)))*a, (1.0/3.0)*c));
+      lattice = (((1.0/2.0)*a, -(1.0/(2.0*sqrt(3.0)))*a, (1.0/3.0)*c),
+          (_SYMBOLIC_ZERO_, (1.0/sqrt(3.0))*a, (1.0/3.0)*c),
+          (-(1.0/2.0)*a, -(1.0/(2.0*sqrt(3.0)))*a, (1.0/3.0)*c));
     }
 
     // ---------------------------------------------------------------------------
     // simple cubic (cP)
     if(lattice_and_centering == "cP"){
-	    lattice = ((a, _SYMBOLIC_ZERO_, _SYMBOLIC_ZERO_),
-	               (_SYMBOLIC_ZERO_, a, _SYMBOLIC_ZERO_),
-	               (_SYMBOLIC_ZERO_, _SYMBOLIC_ZERO_, a));
+      lattice = ((a, _SYMBOLIC_ZERO_, _SYMBOLIC_ZERO_),
+          (_SYMBOLIC_ZERO_, a, _SYMBOLIC_ZERO_),
+          (_SYMBOLIC_ZERO_, _SYMBOLIC_ZERO_, a));
     }
 
     // ---------------------------------------------------------------------------
     // body-centered cubic (cI)
     if(lattice_and_centering == "cI"){
-	    lattice = ((-(1.0/2.0)*a, (1.0/2.0)*a, (1.0/2.0)*a),
-	               ((1.0/2.0)*a, -(1.0/2.0)*a, (1.0/2.0)*a),
-	               ((1.0/2.0)*a, (1.0/2.0)*a, -(1.0/2.0)*a));
+      lattice = ((-(1.0/2.0)*a, (1.0/2.0)*a, (1.0/2.0)*a),
+          ((1.0/2.0)*a, -(1.0/2.0)*a, (1.0/2.0)*a),
+          ((1.0/2.0)*a, (1.0/2.0)*a, -(1.0/2.0)*a));
     }
-    
+
     // ---------------------------------------------------------------------------
     // face-centered cubic (cF)
     if(lattice_and_centering == "cF"){
-	    lattice = ((_SYMBOLIC_ZERO_, (1.0/2.0)*a, (1.0/2.0)*a),
-	               ((1.0/2.0)*a, _SYMBOLIC_ZERO_, (1.0/2.0)*a),
-	               ((1.0/2.0)*a, (1.0/2.0)*a, _SYMBOLIC_ZERO_));
+      lattice = ((_SYMBOLIC_ZERO_, (1.0/2.0)*a, (1.0/2.0)*a),
+          ((1.0/2.0)*a, _SYMBOLIC_ZERO_, (1.0/2.0)*a),
+          ((1.0/2.0)*a, (1.0/2.0)*a, _SYMBOLIC_ZERO_));
     }
-		
-		if(LDEBUG){
+
+    if(LDEBUG){
       cerr << function_name << " lattice: " << lattice << endl;
     }
 
@@ -442,7 +442,7 @@ namespace anrl {
 // *************************************************************************** 
 namespace anrl {
   vector<symbolic::Symbolic> equations2SymbolicEquations(const vector<vector<string> >& equations){
-    
+
     // Convert equations (vector<vector<string> >) to symbolic notation.
 
     bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_SYMBOLIC_);
@@ -471,7 +471,7 @@ namespace anrl {
     if(LDEBUG){
       for(uint i=0;i<symbolic_equations.size();i++){
         cerr << function_name << " equations (string): " << aurostd::joinWDelimiter(equations[i],",") << " --> equations (Symbolic): " << symbolic_equations[i] << endl;
-			}
+      }
     }
 
     return symbolic_equations;
@@ -483,7 +483,7 @@ namespace anrl {
 // *************************************************************************** 
 namespace anrl {
   symbolic::Symbolic cartesian2lattice(const symbolic::Symbolic& lattice, const symbolic::Symbolic& cartesian_coordinate){
- 
+
     // converts Cartesian coordinates to lattice coordinates
     // this is the symbolic math equivalent to C2F()
 
@@ -502,21 +502,21 @@ namespace anrl {
     symbolic::Symbolic b1 = (lattice.row(1)%(lattice.row(2)))/volume;
     symbolic::Symbolic b2 = (lattice.row(2)%(lattice.row(0)))/volume;
     symbolic::Symbolic b3 = (lattice.row(0)%(lattice.row(1)))/volume;
-    
-		if(LDEBUG){
+
+    if(LDEBUG){
       cerr << function_name << " transformation vectors b1=" << b1 << endl;
       cerr << function_name << " transformation vectors b2=" << b2 << endl;
       cerr << function_name << " transformation vectors b3=" << b3 << endl;
     }
-    
+
     // ---------------------------------------------------------------------------
     // convert to lattice coordinate 
     symbolic::Symbolic lattice_coordinate("latt_coord",3);
     lattice_coordinate(0)=(cartesian_coordinate|b1).simplify();
     lattice_coordinate(1)=(cartesian_coordinate|b2).simplify();
     lattice_coordinate(2)=(cartesian_coordinate|b3).simplify();
-    
-		if(LDEBUG){
+
+    if(LDEBUG){
       cerr << function_name << " cartesian coord=" << cartesian_coordinate << " --> " << lattice_coordinate << endl;
     }
 
@@ -529,12 +529,12 @@ namespace anrl {
 // *************************************************************************** 
 namespace anrl{
   symbolic::Symbolic getXYZ2LatticeTransformation(const string& lattice_and_centering){
-    
+
     // gets transformation matrix from XYZ coordinates (ITC equations) to 
     // the Cartesian coordinates with respect to the lattice vectors.
-   
+
     symbolic::Symbolic xyz2lattice("xyz2lattice",3,3);
-    
+
     // ---------------------------------------------------------------------------
     // create symbolic list of characters
     symbolic::Symbolic a("a");
@@ -548,36 +548,36 @@ namespace anrl{
 
     // ---------------------------------------------------------------------------
     if(lattice_and_centering == "aP"){
-	    xyz2lattice = ((a, b*cos(gamma), cx),
-                     (_SYMBOLIC_ZERO_, b*sin(gamma), cy),
-                     (_SYMBOLIC_ZERO_, _SYMBOLIC_ZERO_, cz));
-	  } 
-	                   
+      xyz2lattice = ((a, b*cos(gamma), cx),
+          (_SYMBOLIC_ZERO_, b*sin(gamma), cy),
+          (_SYMBOLIC_ZERO_, _SYMBOLIC_ZERO_, cz));
+    } 
+
     else if(lattice_and_centering == "mP" || lattice_and_centering == "mC"){
-	    xyz2lattice = ((a, _SYMBOLIC_ZERO_, c*cos(beta)),
-                     (_SYMBOLIC_ZERO_, b, _SYMBOLIC_ZERO_),
-                     (_SYMBOLIC_ZERO_, _SYMBOLIC_ZERO_, c*sin(beta)));
+      xyz2lattice = ((a, _SYMBOLIC_ZERO_, c*cos(beta)),
+          (_SYMBOLIC_ZERO_, b, _SYMBOLIC_ZERO_),
+          (_SYMBOLIC_ZERO_, _SYMBOLIC_ZERO_, c*sin(beta)));
     }
     else if(lattice_and_centering == "oP" || lattice_and_centering == "oC" || 
         lattice_and_centering == "oI" || lattice_and_centering == "oF"){
-	    xyz2lattice = ((a, _SYMBOLIC_ZERO_, _SYMBOLIC_ZERO_),
-                     (_SYMBOLIC_ZERO_, b, _SYMBOLIC_ZERO_),
-                     (_SYMBOLIC_ZERO_, _SYMBOLIC_ZERO_, c));
+      xyz2lattice = ((a, _SYMBOLIC_ZERO_, _SYMBOLIC_ZERO_),
+          (_SYMBOLIC_ZERO_, b, _SYMBOLIC_ZERO_),
+          (_SYMBOLIC_ZERO_, _SYMBOLIC_ZERO_, c));
     }
     else if(lattice_and_centering == "tP" || lattice_and_centering == "tI"){
-	    xyz2lattice = ((a, _SYMBOLIC_ZERO_, _SYMBOLIC_ZERO_),
-                     (_SYMBOLIC_ZERO_, a, _SYMBOLIC_ZERO_),
-                     (_SYMBOLIC_ZERO_, _SYMBOLIC_ZERO_, c));
+      xyz2lattice = ((a, _SYMBOLIC_ZERO_, _SYMBOLIC_ZERO_),
+          (_SYMBOLIC_ZERO_, a, _SYMBOLIC_ZERO_),
+          (_SYMBOLIC_ZERO_, _SYMBOLIC_ZERO_, c));
     }
     else if(lattice_and_centering == "hP" || lattice_and_centering == "hR"){
-	    xyz2lattice = ((a, _SYMBOLIC_ZERO_, _SYMBOLIC_ZERO_),
-                     (_SYMBOLIC_ZERO_, a, _SYMBOLIC_ZERO_),
-                     (_SYMBOLIC_ZERO_, _SYMBOLIC_ZERO_, c));
+      xyz2lattice = ((a, _SYMBOLIC_ZERO_, _SYMBOLIC_ZERO_),
+          (_SYMBOLIC_ZERO_, a, _SYMBOLIC_ZERO_),
+          (_SYMBOLIC_ZERO_, _SYMBOLIC_ZERO_, c));
     }
     else if(lattice_and_centering == "cP" || lattice_and_centering == "cF" || lattice_and_centering == "cI"){
-	    xyz2lattice = ((a, _SYMBOLIC_ZERO_, _SYMBOLIC_ZERO_),
-                     (_SYMBOLIC_ZERO_, a, _SYMBOLIC_ZERO_),
-                     (_SYMBOLIC_ZERO_, _SYMBOLIC_ZERO_, a));
+      xyz2lattice = ((a, _SYMBOLIC_ZERO_, _SYMBOLIC_ZERO_),
+          (_SYMBOLIC_ZERO_, a, _SYMBOLIC_ZERO_),
+          (_SYMBOLIC_ZERO_, _SYMBOLIC_ZERO_, a));
     }
 
     return xyz2lattice;
@@ -591,7 +591,7 @@ namespace anrl {
   vector<symbolic::Symbolic> getEquationsForCenteredLattices(const string& lattice_and_centering,
       const symbolic::Symbolic& lattice,
       const vector<symbolic::Symbolic>& conventional_equations){
-    
+
     // convert equations to lattice equations for centered lattice (C, I, F).
 
     bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_SYMBOLIC_);
@@ -599,8 +599,8 @@ namespace anrl {
     stringstream message;
 
     vector<symbolic::Symbolic> lattice_equations;
-    
-		// ---------------------------------------------------------------------------
+
+    // ---------------------------------------------------------------------------
     // get symbolic transformation matrix for a particular lattice 
     symbolic::Symbolic xyz2lattice = getXYZ2LatticeTransformation(lattice_and_centering);
     if(LDEBUG){ cerr << function_name << " symbolic transformation from xyz to lattice: " << xyz2lattice << endl; }
@@ -614,27 +614,27 @@ namespace anrl {
 
     // ---------------------------------------------------------------------------
     // [LDEBUG] print conventional vs centered lattice equations
-		if(LDEBUG){
-    	for(uint i=0;i<conventional_equations.size();i++){
+    if(LDEBUG){
+      for(uint i=0;i<conventional_equations.size();i++){
         cerr << "conventional: " << conventional_equations[i] << " to centered lattice: " << lattice_equations[i] << endl;
       }
     }
-   
+
     // ---------------------------------------------------------------------------
     // bring lattice equations in cell after transformation 
     for(uint i=0;i<lattice_equations.size();i++){
       lattice_equations[i] = symbolic::BringInCell(lattice_equations[i]);
     }
-    
-		// ---------------------------------------------------------------------------
+
+    // ---------------------------------------------------------------------------
     // [LDEBUG] print conventional vs centered lattice equations AFTER bring in cell
-		if(LDEBUG){
-    	for(uint i=0;i<conventional_equations.size();i++){
+    if(LDEBUG){
+      for(uint i=0;i<conventional_equations.size();i++){
         cerr << "conventional: " << conventional_equations[i] << " to centered lattice: " << lattice_equations[i] << endl;
       }
     }
 
-		// ---------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------
     // remove duplicates after bring in cell
     vector<symbolic::Symbolic> primitive_lattice_equations;
     for(uint i=0;i<lattice_equations.size();i++){
@@ -647,8 +647,8 @@ namespace anrl {
       }
       if(is_unique_equation){ primitive_lattice_equations.push_back(lattice_equations[i]); }
     }
-		
-		if(LDEBUG){
+
+    if(LDEBUG){
       cerr << "# equations before: " << lattice_equations.size() << " vs # equations after: " << primitive_lattice_equations.size() << endl;
     }
 
@@ -671,8 +671,8 @@ namespace anrl {
     // ---------------------------------------------------------------------------
     // if C-, I-, F-centered, then the equations from ITC are xyz coordinates
     if(lattice_and_centering == "mC" || lattice_and_centering == "oC" || lattice_and_centering == "oI" ||
-       lattice_and_centering == "oF" || lattice_and_centering == "tI" || lattice_and_centering == "cI" ||
-       lattice_and_centering == "cF"){
+        lattice_and_centering == "oF" || lattice_and_centering == "tI" || lattice_and_centering == "cI" ||
+        lattice_and_centering == "cF"){
       transformed_equations = getEquationsForCenteredLattices(lattice_and_centering, lattice, conventional_equations);  
     }
 
@@ -696,7 +696,7 @@ namespace anrl {
 // *************************************************************************** 
 namespace anrl {
   void addSymbolicEquation2Atoms(const vector<symbolic::Symbolic>& equations, deque<_atom>& atoms, bool isfpos){
-   
+
     // add symbolic equations to atom.fpos_equation or atom.cpos_equation
     // converts from variables from Symbolic to string
     // DEFAULT: update atom.fpos_equation
@@ -707,38 +707,38 @@ namespace anrl {
 
     // ---------------------------------------------------------------------------
     // ensure sizes of atoms and symbolic equations match 
-		if(equations.size() != atoms.size()){
-			message << "The number of equations and atoms do not match. Check tolerances. #equations=" << equations.size() << ", #atoms=" << atoms.size();
-			throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
-		}
+    if(equations.size() != atoms.size()){
+      message << "The number of equations and atoms do not match. Check tolerances. #equations=" << equations.size() << ", #atoms=" << atoms.size();
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
+    }
 
     // ---------------------------------------------------------------------------
     // ensure sizes of atoms and symbolic equations match 
-		for(uint i=0;i<atoms.size();i++){
+    for(uint i=0;i<atoms.size();i++){
       vector<string> coordinate;
-			for(uint j=0;j<3;j++){
-				stringstream ss_pos; ss_pos << equations[i].row(j);
-				coordinate.push_back(ss_pos.str());
+      for(uint j=0;j<3;j++){
+        stringstream ss_pos; ss_pos << equations[i].row(j);
+        coordinate.push_back(ss_pos.str());
       }
       if(isfpos){ atoms[i].fpos_equation = coordinate; }
       else{ atoms[i].cpos_equation = coordinate; }
-		}
+    }
 
     // ---------------------------------------------------------------------------
     // [LDEBUG] print string (fpos/cpos) version of symbolic equation
-		if(LDEBUG){
-			if(isfpos){
-			  for(uint i=0;i<atoms.size();i++){
+    if(LDEBUG){
+      if(isfpos){
+        for(uint i=0;i<atoms.size();i++){
           cerr << function_name << " fpos_equation=" << aurostd::joinWDelimiter(atoms[i].fpos_equation,",") << endl;
         } 
       }
-			else{
-			  for(uint i=0;i<atoms.size();i++){
+      else{
+        for(uint i=0;i<atoms.size();i++){
           cerr << function_name << " cpos_equation=" << aurostd::joinWDelimiter(atoms[i].cpos_equation,",") << endl;
         } 
       }
     }
-	}
+  }
 }
 #endif // USE_SYMBOLIC_SOURCE
 

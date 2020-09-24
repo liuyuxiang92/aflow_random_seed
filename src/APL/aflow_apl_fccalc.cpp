@@ -928,7 +928,7 @@ namespace apl {
       message = "Could not save state into file " + filename + ".";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
-    
+
   }
 
   // ME20200501
@@ -2127,56 +2127,56 @@ namespace apl {
 
 namespace apl {
 
-   // Writes the forces into a VASP DYNMAT format
-   void ForceConstantCalculator::writeDYNMAT(const string& filename) {
-     string message = "Writing forces into file " + filename + ".";
-     pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
+  // Writes the forces into a VASP DYNMAT format
+  void ForceConstantCalculator::writeDYNMAT(const string& filename) {
+    string message = "Writing forces into file " + filename + ".";
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
 
-     stringstream outfile;
+    stringstream outfile;
 
-     // 1st line
-     outfile << _supercell->getNumberOfUniqueAtoms() << " ";
-     outfile << _supercell->getNumberOfAtoms() << " ";
-     int dof = 0;
-     for (uint i = 0; i < _uniqueDistortions.size(); i++)
-       dof += _uniqueDistortions[i].size();
-     outfile << dof << std::endl;
+    // 1st line
+    outfile << _supercell->getNumberOfUniqueAtoms() << " ";
+    outfile << _supercell->getNumberOfAtoms() << " ";
+    int dof = 0;
+    for (uint i = 0; i < _uniqueDistortions.size(); i++)
+      dof += _uniqueDistortions[i].size();
+    outfile << dof << std::endl;
 
-     // 2nd line
-     outfile << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
-     outfile << setprecision(3);
-     for (uint i = 0; i < _supercell->getNumberOfUniqueAtoms(); i++) {
-       if (i != 0) outfile << " ";
-       outfile << _supercell->getUniqueAtomMass(i);
-     }
-     outfile << std::endl;
+    // 2nd line
+    outfile << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
+    outfile << setprecision(3);
+    for (uint i = 0; i < _supercell->getNumberOfUniqueAtoms(); i++) {
+      if (i != 0) outfile << " ";
+      outfile << _supercell->getUniqueAtomMass(i);
+    }
+    outfile << std::endl;
 
-     // forces + 1 line info about distortion
-     for (uint i = 0; i < _supercell->getNumberOfUniqueAtoms(); i++) {
-       for (uint j = 0; j < _uniqueDistortions[i].size(); j++) {
-         // line info
-         outfile << (_supercell->getUniqueAtomID(i) + 1) << " ";
-         outfile << (j + 1) << " ";
-         xvector<double> shift(3);
-         shift = DISTORTION_MAGNITUDE * _uniqueDistortions[i][j];
-         outfile << setprecision(3);
-         outfile << shift(1) << " " << shift(2) << " " << shift(3) << std::endl;
-         // forces
-         outfile << setprecision(6);
-         for (uint k = 0; k < _supercell->getNumberOfAtoms(); k++)
-           outfile << setw(15) << _uniqueForces[i][j][k](1)
-             << setw(15) << _uniqueForces[i][j][k](2)
-             << setw(15) << _uniqueForces[i][j][k](3) << std::endl;
-       }
-     }
+    // forces + 1 line info about distortion
+    for (uint i = 0; i < _supercell->getNumberOfUniqueAtoms(); i++) {
+      for (uint j = 0; j < _uniqueDistortions[i].size(); j++) {
+        // line info
+        outfile << (_supercell->getUniqueAtomID(i) + 1) << " ";
+        outfile << (j + 1) << " ";
+        xvector<double> shift(3);
+        shift = DISTORTION_MAGNITUDE * _uniqueDistortions[i][j];
+        outfile << setprecision(3);
+        outfile << shift(1) << " " << shift(2) << " " << shift(3) << std::endl;
+        // forces
+        outfile << setprecision(6);
+        for (uint k = 0; k < _supercell->getNumberOfAtoms(); k++)
+          outfile << setw(15) << _uniqueForces[i][j][k](1)
+            << setw(15) << _uniqueForces[i][j][k](2)
+            << setw(15) << _uniqueForces[i][j][k](3) << std::endl;
+      }
+    }
 
-     aurostd::stringstream2file(outfile, filename);
-     if (!aurostd::FileExist(filename)) {
-       string function = "ForceConstantCalculator::writeDYNMAT()";
-       message = "Cannot open output file " + filename + ".";
-       throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
-     }
-   }
+    aurostd::stringstream2file(outfile, filename);
+    if (!aurostd::FileExist(filename)) {
+      string function = "ForceConstantCalculator::writeDYNMAT()";
+      message = "Cannot open output file " + filename + ".";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
+    }
+  }
 
   // [OBSOLETE]  //////////////////////////////////////////////////////////////////////////////
 

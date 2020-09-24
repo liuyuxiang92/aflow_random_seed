@@ -1,22 +1,20 @@
-/*
-    SymbolicC++ : An object oriented computer algebra system written in C++
-
-    Copyright (C) 2008 Yorick Hardy and Willi-Hans Steeb
-
-    This library is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This library is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+//   SymbolicC++ : An object oriented computer algebra system written in C++
+//
+//   Copyright (C) 2008 Yorick Hardy and Willi-Hans Steeb
+//
+//   This library is free software; you can redistribute it and/or modify
+//   it under the terms of the GNU General Public License as published by
+//   the Free Software Foundation; either version 2 of the License, or
+//   (at your option) any later version.
+//
+//   This library is distributed in the hope that it will be useful,
+//   but WITHOUT ANY WARRANTY; without even the implied warranty of
+//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//   GNU General Public License for more details.
+//
+//   You should have received a copy of the GNU General Public License along
+//   with this program; if not, write to the Free Software Foundation, Inc.,
+//   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 
 // equation.h
@@ -32,7 +30,7 @@
 //DX20200831 [OBSOLETE] #define SYMBOLIC_CPLUSPLUS_EQUATION_FORWARD
 
 namespace symbolic{ //DX20200625
-class Equation;
+  class Equation;
 } //namespace symbolic //DX20200625
 
 //DX20200831 [OBSOLETE] #endif
@@ -43,34 +41,34 @@ class Equation;
 #define SYMBOLIC_CPLUSPLUS_EQUATION_DECLARE
 
 namespace symbolic{ //DX20200625
-class Equation: public CloningSymbolicInterface
-{
- public: Symbolic lhs, rhs;
-	 std::list<Symbolic> free;
-         Equation(const Equation&);
-         Equation(const Equation&, const Symbolic &);
-         Equation(const Symbolic&,const Symbolic&);
-         ~Equation();
+  class Equation: public CloningSymbolicInterface
+  {
+    public: Symbolic lhs, rhs;
+            std::list<Symbolic> free;
+            Equation(const Equation&);
+            Equation(const Equation&, const Symbolic &);
+            Equation(const Symbolic&,const Symbolic&);
+            ~Equation();
 
-         void print(ostream&) const;
-         Symbolic subst(const Symbolic&,const Symbolic&,int &n) const;
-         Simplified simplify() const;
-         int compare(const Symbolic&) const;
-         Symbolic df(const Symbolic&) const;
-         Symbolic integrate(const Symbolic&) const;
-         Symbolic coeff(const Symbolic&) const;
-         Expanded expand() const;
-         int commute(const Symbolic&) const;
-         PatternMatches match(const Symbolic&, const std::list<Symbolic>&) const;
-         PatternMatches match_parts(const Symbolic&,
-                                    const std::list<Symbolic>&) const;
+            void print(ostream&) const;
+            Symbolic subst(const Symbolic&,const Symbolic&,int &n) const;
+            Simplified simplify() const;
+            int compare(const Symbolic&) const;
+            Symbolic df(const Symbolic&) const;
+            Symbolic integrate(const Symbolic&) const;
+            Symbolic coeff(const Symbolic&) const;
+            Expanded expand() const;
+            int commute(const Symbolic&) const;
+            PatternMatches match(const Symbolic&, const std::list<Symbolic>&) const;
+            PatternMatches match_parts(const Symbolic&,
+                const std::list<Symbolic>&) const;
 
-         operator bool() const;
-         operator int() const;
+            operator bool() const;
+            operator int() const;
 
-         //DX20200825 Cloning *clone() const { return Cloning::clone(*this); }
-         Cloning *clone() const; //DX20200825 - moved definition to cpp file
-};
+            //DX20200825 Cloning *clone() const { return Cloning::clone(*this); }
+            Cloning *clone() const; //DX20200825 - moved definition to cpp file
+  };
 } //namespace symbolic //DX20200625
 
 #endif

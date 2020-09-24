@@ -6482,18 +6482,18 @@ namespace compare{
 // mimimizeMatchingDistance() //DX20200910
 // ***************************************************************************
 namespace compare {
-   vector<xvector<double> > minimizeMappingDistances(
-       const vector<xvector<double> >& distance_vectors){
+  vector<xvector<double> > minimizeMappingDistances(
+      const vector<xvector<double> >& distance_vectors){
 
-     xvector<double> origin_shift;
-     return minimizeMappingDistances(distance_vectors,origin_shift);
-   }
+    xvector<double> origin_shift;
+    return minimizeMappingDistances(distance_vectors,origin_shift);
+  }
 }
 
 namespace compare {
-   vector<xvector<double> > minimizeMappingDistances(
-       const vector<xvector<double> >& distance_vectors,
-       xvector<double>& origin_shift){
+  vector<xvector<double> > minimizeMappingDistances(
+      const vector<xvector<double> >& distance_vectors,
+      xvector<double>& origin_shift){
 
     // after identifying the mapped positions (distance vectors for mapped
     // positions), try to minimize the mapping vectors
@@ -7201,7 +7201,7 @@ namespace compare{
       nn1 = all_nn1[indexMatch1[j]];
       nn2 = all_nn_proto[indexMatch2[j]];
       dd = min_dists[j];
-      
+
       if(LDEBUG){
         cerr << function_name << " indexMatch1[j]: " << indexMatch1[j] << endl;
         cerr << function_name << " indexMatch2[j]: " << indexMatch2[j] << endl;

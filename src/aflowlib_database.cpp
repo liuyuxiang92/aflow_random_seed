@@ -608,28 +608,28 @@ namespace aflowlib {
 
     // Check files that need to be patched
     for (uint i = 0; i < npatch_input; i++) {
-        string filename = patch_files_input[i];
-        if (!aurostd::EFileExist(filename)) {
-          // Check if the file is in the data path
-          if (aurostd::EFileExist(data_path + "/" + filename)) {
-            filename = aurostd::CleanFileName(data_path + "/" + filename);
-          } else {
-            message << "File " << filename << " not found. Skipping.";
-            pflow::logger(_AFLOW_FILE_NAME_, function, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
-
-            // If a file is missing, then the patch is incomplete
-            patch_code = _AFLOW_DB_PATCH_INCOMPLETE_;
-            continue;
-          }
-        }
-
-        if (!check_timestamps || (aurostd::FileModificationTime(filename) > tm_db)) {
-          patch_files.push_back(filename);
-          message << "Adding file " << filename << " to patch list.";
+      string filename = patch_files_input[i];
+      if (!aurostd::EFileExist(filename)) {
+        // Check if the file is in the data path
+        if (aurostd::EFileExist(data_path + "/" + filename)) {
+          filename = aurostd::CleanFileName(data_path + "/" + filename);
         } else {
-          message << "Skipping file " << filename << ". File is older than the database.";
+          message << "File " << filename << " not found. Skipping.";
+          pflow::logger(_AFLOW_FILE_NAME_, function, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+
+          // If a file is missing, then the patch is incomplete
+          patch_code = _AFLOW_DB_PATCH_INCOMPLETE_;
+          continue;
         }
-        pflow::logger(_AFLOW_FILE_NAME_, function, message, *p_FileMESSAGE, *p_oss);
+      }
+
+      if (!check_timestamps || (aurostd::FileModificationTime(filename) > tm_db)) {
+        patch_files.push_back(filename);
+        message << "Adding file " << filename << " to patch list.";
+      } else {
+        message << "Skipping file " << filename << ". File is older than the database.";
+      }
+      pflow::logger(_AFLOW_FILE_NAME_, function, message, *p_FileMESSAGE, *p_oss);
     }
 
     uint npatch = patch_files.size();

@@ -1211,12 +1211,12 @@ namespace apl {
   // Writes the group velocities into a file. Each row belongs to a q-point,
   // and each column triplet belongs to a phonon branch.
   void PhononCalculator::writeGroupVelocitiesToFile(const string& filename,
-    const vector<vector<xvector<double> > >& gvel) {
+      const vector<vector<xvector<double> > >& gvel) {
     vector<vector<double> > freqs;
     writeGroupVelocitiesToFile(filename, gvel, freqs);
   }
   void PhononCalculator::writeGroupVelocitiesToFile(const string& filename,
-    const vector<vector<xvector<double> > >& gvel, const vector<vector<double> >& freqs, const string& unit) {
+      const vector<vector<xvector<double> > >& gvel, const vector<vector<double> >& freqs, const string& unit) {
     if (gvel.size() == 0) return;  // Nothing to write
     string function = "apl::PhononCalculator::writeGroupVelocitiesToFile():";
     string message = "";

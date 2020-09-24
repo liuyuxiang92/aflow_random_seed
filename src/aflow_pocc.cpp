@@ -136,7 +136,7 @@ namespace pocc {
     message << "Rewriting " << AflowIn_file;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_COMPLETE_);
     stringstream aflowin_ss;for(uint i=0;i<vlines.size();i++){aflowin_ss << vlines[i] << endl;}
     aurostd::stringstream2file(aflowin_ss,AflowIn_file);
-    
+
     if(LDEBUG){cerr << soliloquy << " END" << endl;}
 
     return;
@@ -168,7 +168,7 @@ namespace KBIN {
     _xvasp xvasp;
     string AflowIn_file="",AflowIn="";
     _aflags aflags;aflags.Directory=directory;
-    
+
     //get AflowIn
     try{KBIN::getAflowInFromAFlags(aflags,AflowIn_file,AflowIn,FileMESSAGE,oss);}
     catch(aurostd::xerror& err){
@@ -176,7 +176,7 @@ namespace KBIN {
       FileMESSAGE.close();
       return;
     }
-    
+
     _kflags kflags=KBIN::VASP_Get_Kflags_from_AflowIN(AflowIn,aflags);
     _vflags vflags=KBIN::VASP_Get_Vflags_from_AflowIN(AflowIn,aflags,kflags);
 
@@ -1129,7 +1129,7 @@ namespace pocc {
   void POccCalculator::plotAvgDOSCAR(const string& doscar_path,const string& directory) const {
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     string soliloquy=XPID+"POccCalculator::plotAvgDOSCAR():";
-    
+
     xDOSCAR xdos(doscar_path,*p_FileMESSAGE,true,*p_oss);
     //get temperature from title
     //DOSCAR.pocc_T0000K
@@ -1232,7 +1232,7 @@ namespace pocc {
     pocc_out_ss << AFLOWIN_SEPARATION_LINE << endl;
     pocc_out_ss << POCC_AFLOWIN_tag << "START_TEMPERATURE=ALL" << endl;  //"  (K)"
     //[CO20200502 - removed unnecessary separation line]pocc_out_ss << AFLOWIN_SEPARATION_LINE << endl;
-    
+
     //supercell degeneracy
     isupercell=0;
     for(std::list<POccSuperCellSet>::const_iterator it=l_supercell_sets.begin();it!=l_supercell_sets.end();++it){
@@ -1250,7 +1250,7 @@ namespace pocc {
     //if(m_energy_dft_ground!=AUROSTD_MAX_DOUBLE) pocc_out_ss << enthalpy_tag << "_atom_ground=" << aurostd::utype2string(m_energy_dft_ground,pocc_precision,true,pocc_roundoff_tol,SCIENTIFIC_STREAM) << "  (eV/at)  " << "[" << m_ARUN_directories[m_ARUN_directory_ground] << "]" << endl;
     if(m_Hmix!=AUROSTD_MAX_DOUBLE) pocc_out_ss << enthalpy_tag << "_mix_atom=" << aurostd::utype2string(m_Hmix,pocc_precision,true,pocc_roundoff_tol,SCIENTIFIC_STREAM) << "  (eV/at)" << endl;
     if(m_efa!=AUROSTD_MAX_DOUBLE) pocc_out_ss << "entropy_forming_ability=" << aurostd::utype2string(m_efa,pocc_precision,true,pocc_roundoff_tol,SCIENTIFIC_STREAM) << "  (eV/at)^{-1}" << endl;
-    
+
     //[CO20200502 - removed unnecessary separation line]pocc_out_ss << AFLOWIN_SEPARATION_LINE << endl;
     pocc_out_ss << POCC_AFLOWIN_tag << "STOP_TEMPERATURE=ALL" << endl;  //"  (K)"
     pocc_out_ss << AFLOWIN_SEPARATION_LINE << endl;
@@ -1407,7 +1407,7 @@ namespace pocc {
   void POccCalculator::loadDataIntoCalculator(){
     string soliloquy=XPID+"POccCalculator::loadDataIntoCalculator():";
     if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"POccCalculator failed to initialized");}
-    
+
     POccStructuresFile psf;
     psf.initialize(POCC_FILE_PREFIX+POCC_UNIQUE_SUPERCELLS_FILE,m_aflags,*p_FileMESSAGE,*p_oss);
     if(!psf.loadDataIntoCalculator((*this),false)){  //do not try DirectoryLS() yet
@@ -1471,10 +1471,10 @@ namespace pocc {
   void POccCalculator::setTemperatureStringParameters(vector<double>& v_temperatures){
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     string soliloquy=XPID+"POccCalculator::setTemperatureStringParameters():";
-    
+
     if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"POccCalculator failed to initialized");}
     if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
-    
+
     //START: TEMPERATURE DEPENDENT PROPERTIES
     v_temperatures.clear();
     //v_temperatures.push_back(300);  //1000

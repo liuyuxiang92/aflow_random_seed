@@ -294,7 +294,7 @@ namespace aflowlib {
     //[CO20200829 - OBSOLETE]  vserverdir.at(i).clear();
     //[CO20200829 - OBSOLETE]vserverdir.clear();  // clear all vectors
     //[CO20200829 - OBSOLETE]vstoich.clear(); // clear all vectors
-    
+
     entry.clear();ventry.clear();
     auid.clear();
     vauid.clear();vauid.clear();
@@ -2012,7 +2012,7 @@ namespace aflowlib {
       }
       vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
-      
+
       //////////////////////////////////////////////////////////////////////////
       if(enthalpy_formation_cce_300K_cell!=AUROSTD_NAN) {  //CO20200624
         sscontent_json << "\"enthalpy_formation_cce_300K_cell\":" << enthalpy_formation_cce_300K_cell;
@@ -2021,7 +2021,7 @@ namespace aflowlib {
       }
       vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
-      
+
       //////////////////////////////////////////////////////////////////////////
       if(enthalpy_formation_cce_0K_cell!=AUROSTD_NAN) {  //CO20200624
         sscontent_json << "\"enthalpy_formation_cce_0K_cell\":" << enthalpy_formation_cce_0K_cell;
@@ -2039,7 +2039,7 @@ namespace aflowlib {
       }
       vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
-      
+
       //////////////////////////////////////////////////////////////////////////
       if(enthalpy_formation_cce_300K_atom!=AUROSTD_NAN) {  //CO20200624
         sscontent_json << "\"enthalpy_formation_cce_300K_atom\":" << enthalpy_formation_cce_300K_atom;
@@ -2048,7 +2048,7 @@ namespace aflowlib {
       }
       vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
-      
+
       //////////////////////////////////////////////////////////////////////////
       if(enthalpy_formation_cce_0K_atom!=AUROSTD_NAN) {  //CO20200624
         sscontent_json << "\"enthalpy_formation_cce_0K_atom\":" << enthalpy_formation_cce_0K_atom;
@@ -2066,7 +2066,7 @@ namespace aflowlib {
       }
       vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
-      
+
       //////////////////////////////////////////////////////////////////////////
       if(entropic_temperature!=AUROSTD_NAN) {
         sscontent_json << "\"entropic_temperature\":" << entropic_temperature;
@@ -2891,7 +2891,7 @@ namespace aflowlib {
       vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
       //DX20190208 - added anrl info - END
- 
+
       //CO20200731
       //////////////////////////////////////////////////////////////////////////
       if(pocc_parameters.size()){
@@ -3277,7 +3277,7 @@ namespace aflowlib {
       }
       vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
-      
+
       //////////////////////////////////////////////////////////////////////////
       if(catalog.size()) {
         sscontent_json << "\"catalog\":\"" << catalog << "\"";
@@ -3740,7 +3740,7 @@ namespace aflowlib {
     bool LDEBUG=(TRUE || XHOST.DEBUG);
     string soliloquy=XPID+"_aflowlib_entry::POCCdirectory2MetadataAUIDjsonfile():";
     stringstream message;
-    
+
     if(aurl.empty()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"AURL has not been calculated",_INPUT_MISSING_);}
 
     string system_name=KBIN::ExtractSystemName(directory);
@@ -3768,13 +3768,13 @@ namespace aflowlib {
     stringstream sscontent_json;
     string eendl="";
     vector<string> vcontent_json;
-    
+
     sscontent_json << "\"salt\":" << aurostd::utype2string(salt);vcontent_json.push_back(sscontent_json.str());aurostd::StringstreamClean(sscontent_json);
     sscontent_json << "\"aflow_type\":" << "\"aggregate\"";vcontent_json.push_back(sscontent_json.str());aurostd::StringstreamClean(sscontent_json);
     sscontent_json << "\"method\":" << "\"aflow_pocc\"";vcontent_json.push_back(sscontent_json.str());aurostd::StringstreamClean(sscontent_json);
     sscontent_json << "\"aggregate_parameters\":" << "\"" << system_name << "\"";vcontent_json.push_back(sscontent_json.str());aurostd::StringstreamClean(sscontent_json);
     sscontent_json << "\"aggregate_content\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(vauid_aruns,"\""),",") << "]";vcontent_json.push_back(sscontent_json.str());aurostd::StringstreamClean(sscontent_json);
-    
+
     string metadata_auid_json="";
     uint64_t crc=0;
 
@@ -4614,7 +4614,13 @@ namespace aflowlib {
           vflags.flag("FLAG::ICSD",TRUE);
           vflags.flag("FLAG::FOUND",TRUE);
           catalog=entry_tmp.catalog;
-          label=directory;
+          //ME20200923 - Use the last subdirectory or XHOST.label will be inconsistent.
+          //For example, using --aflowlib=7bed936e9d5a44ca results in XHOST.label = Ni1Sn1Ti1_ICSD_174568
+          //whereas using --aflowlib=174568 results in XHOST.label=FCC.Ni1Sn1Ti1_ICSD_174568
+          //[OBSOLETE] label=directory;
+          vector<string> tokens;
+          aurostd::string2tokens(directory, tokens, "/");
+          label = tokens.back();
           //	  cerr << directory_ICSD2LINK+"/RAW/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT << endl;
         }
         //ME20200707 - Restore
