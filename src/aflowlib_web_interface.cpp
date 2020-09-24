@@ -4617,7 +4617,7 @@ namespace aflowlib {
           //ME20200923 - Use the last subdirectory or XHOST.label will be inconsistent.
           //For example, using --aflowlib=7bed936e9d5a44ca results in XHOST.label = Ni1Sn1Ti1_ICSD_174568
           //whereas using --aflowlib=174568 results in XHOST.label=FCC.Ni1Sn1Ti1_ICSD_174568
-          //[OBSOLETE] label=director;
+          //[OBSOLETE] label=directory;
           vector<string> tokens;
           aurostd::string2tokens(directory, tokens, "/");
           label = tokens.back();
