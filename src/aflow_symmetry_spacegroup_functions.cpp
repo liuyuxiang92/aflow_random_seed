@@ -3760,11 +3760,23 @@ namespace SYM {
       //if(str[i+1]=='-' || str[i+1]=='+' || str[i+1]=='\0' || str[i+1]==' ')
       if(!blank(oss.str()))
       { //CO20200106 - patching for auto-indenting
-        if(str[i + 1] == '\0' || str[i + 1] == ' ' || str[i + 1] == '+' || str[i + 1] == '-') {
+        //DX20200924 [OBSOLETE] if(str[i + 1] == '\0' || str[i + 1] == ' ' || str[i + 1] == '+' || str[i + 1] == '-') {
+        //DX20200924 - START
+        // distinguish between empty lines and spaces
+        if(str[i + 1] == '\0' || str[i + 1] == ' '){
           temp.push_back(oss.str());
-          //cerr << oss.str();// << endl;
           oss.str("");
         }
+        // check for + or -
+        else if(str[i + 1] == '+' || str[i + 1] == '-') {
+          // ensure their isn't a multiplication/division prior to the + or -
+          // (otherwise this indicates the sign of the value)
+          if(str[i] != '*' && str[i] != '/'){
+            temp.push_back(oss.str());
+            oss.str("");
+          }
+        }
+        //DX20200924 - END
       }
     }
 
