@@ -5536,6 +5536,8 @@ namespace aflowlib {
     std::sort(vfiles.begin(),vfiles.end()); //get in order
     for(i=0;i<vfiles.size();i++){
       if(vfiles[i].find(POCC_DOSCAR_FILE)!=string::npos){
+        //need to grab POSCAR from ARUN.POCC_01
+        //inside plotter we change '/RAW/' to '/LIB/', everything in RAW must be self-contained
         if(AFLOWLIB_VERBOSE) cout << MESSAGE << " plotting " << vfiles[i] << endl;
         pcalc.plotAvgDOSCAR(directory_RAW+"/"+vfiles[i],directory_RAW);
       }
