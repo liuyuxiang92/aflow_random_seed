@@ -34,7 +34,7 @@ namespace aurostd {
     {"file not found", "wrong format", "file corrupt", "", "", "", "", "", ""},
     {"illegal value", "out of range", "", "", "", "", "", "", ""},
     {"illegal value", "out of bounds", "mismatch", "", "", "", "", "", ""},
-    {"not initialized", "SQL error", "", "", "", "", "", "", ""},
+    {"not initialized", "SQL error", "busy", "", "", "", "", "", ""},
     {"could not allocate", "insufficient memory", "", "", "", "", "", "", ""}};
 
   //Constructors////////////////////////////////////////////////////////////////
@@ -97,6 +97,9 @@ namespace aurostd {
       msgstr << "Supplied error message: ";
     }
     msgstr << what();  // detailed error message
+    if(XHOST.vflag_control.flag("DIRECTORY_CLEAN")){  //CO20200624
+      msgstr << " [dir=" << XHOST.vflag_control.getattachedscheme("DIRECTORY_CLEAN") << "]";
+    }
     return msgstr.str();
   }
 

@@ -1,7 +1,8 @@
-// [OBSOLETE] #include <iostream>
-// [OBSOLETE] #include <sstream>
-// [OBSOLETE] #include <string>
-// [OBSOLETE] #include <limits>
+// ***************************************************************************
+// *                                                                         *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *                                                                         *
+// ***************************************************************************
 
 #include "aflow_apl.h"
 
@@ -17,9 +18,7 @@
 #endif
 //CO END
 
-#define MIN_FREQ_TRESHOLD -0.1
-
-using namespace std;
+static const double MIN_FREQ_THRESHOLD = -0.1;
 
 namespace apl {
 
@@ -36,19 +35,18 @@ namespace apl {
   }
 
   DOSCalculator::DOSCalculator(const DOSCalculator& that) {
-    free();
+    if (this != &that) free();
     copy(that);
   }
 
   DOSCalculator& DOSCalculator::operator=(const DOSCalculator& that) {
-    if (this != &that) {
-      free();
-      copy(that);
-    }
+    if (this != &that) free();
+    copy(that);
     return *this;
   }
 
   void DOSCalculator::copy(const DOSCalculator& that) {
+    if (this == &that) return;
     _pc = that._pc;
     _pc_set = that._pc_set;
     _bzmethod = that._bzmethod;
@@ -110,7 +108,7 @@ namespace apl {
     }
     _bzmethod = method;
     _projections = projections;
-    _system = _pc->getSystemName();
+    _system = _pc->_system;
 
     if (!_pc->getSupercell().isConstructed()) {
       message = "The supercell structure has not been initialized yet.";
@@ -203,10 +201,10 @@ namespace apl {
 #endif
     //CO END
 
-    //if freq > MIN_FREQ_TRESHOLD considerd as +ve freq [PN]
+    //if freq > MIN_FREQ_THRESHOLD considerd as +ve freq [PN]
     for (uint i = 0; i < _freqs.size(); i++) {
       for (int j = _freqs[i].lrows; j <= _freqs[i].urows; j++) {
-        if ((_freqs[i][j] < 0.00) && (_freqs[i][j] > MIN_FREQ_TRESHOLD)) _freqs[i][j] = 0.00;
+        if ((_freqs[i][j] < 0.00) && (_freqs[i][j] > MIN_FREQ_THRESHOLD)) _freqs[i][j] = 0.00;
       }
     }
     //PN END
@@ -221,7 +219,7 @@ namespace apl {
       }
     }
     _maxFreq += 1.0;
-    if (_minFreq < MIN_FREQ_TRESHOLD) _minFreq -= 1.0;
+    if (_minFreq < MIN_FREQ_THRESHOLD) _minFreq -= 1.0;
     else _minFreq = 0.0;
   }
 
@@ -301,7 +299,7 @@ namespace apl {
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
     }
     // Check parameters
-    if (aurostd::isequal(fmax, fmin, _AFLOW_APL_EPS_)) {
+    if (aurostd::isequal(fmax, fmin, _FLOAT_TOL_)) {
       message = "Frequency range of phonon DOS is nearly zero.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
     } else if (fmin > fmax) {
@@ -683,7 +681,7 @@ namespace apl {
   }
 
   bool DOSCalculator::hasNegativeFrequencies() const {
-    return (_minFreq < MIN_FREQ_TRESHOLD ? true : false);
+    return (_minFreq < MIN_FREQ_THRESHOLD ? true : false);
   }
 
   // ///////////////////////////////////////////////////////////////////////////
@@ -732,3 +730,9 @@ namespace apl {
   // ///////////////////////////////////////////////////////////////////////////
 
 }  // namespace apl
+
+// ***************************************************************************
+// *                                                                         *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *                                                                         *
+// ***************************************************************************

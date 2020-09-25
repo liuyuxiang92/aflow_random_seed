@@ -129,7 +129,7 @@ int cecluster::GetNNNum(vector<double> NN_distance) {
   vector< vector<int> > str;
   const int atom_num = 2;
   double dist, dist_max = -1.0;
-    
+
   if(structure.atoms.size() == 1) return 1; // only one atom in the cluster
 
 
@@ -143,7 +143,7 @@ int cecluster::GetNNNum(vector<double> NN_distance) {
       atom_config = AllCombination42(atom_num, total_num, atom_config);
     }
     dist = modulus(structure.atoms.at(atom_config.at(0)).cpos
-		   - structure.atoms.at(atom_config.at(1)).cpos);
+        - structure.atoms.at(atom_config.at(1)).cpos);
     dist_max = max(dist, dist_max); // get the largest distance in the cluster
   }
 
@@ -159,7 +159,7 @@ int cecluster::GetNNNum(vector<double> NN_distance) {
 
 double cecluster::ClusterDistance() {
   // get the total distance between any two atoms in a cluster
-    
+
   double dist;
   vector< vector<int> > str; // all possible combinations of two atoms
   int total_num, num;
@@ -172,18 +172,18 @@ double cecluster::ClusterDistance() {
   if(total_num == 1) {
     dist = modulus(structure.atoms.at(0).cpos);
   } else {
-        
+
     int str_size = CombinationNr(num, total_num);
     dist = 0;
     vector<int> atom_config;
     for(int i=0; i<str_size; i++) {
       if(i==0) {
-	atom_config = AllCombination41(num, total_num, i+1);
+        atom_config = AllCombination41(num, total_num, i+1);
       } else {
-	atom_config = AllCombination42(num, total_num, atom_config);
+        atom_config = AllCombination42(num, total_num, atom_config);
       }
       dist = dist + modulus(structure.atoms.at(atom_config.at(0)).cpos
-			    - structure.atoms.at(atom_config.at(1)).cpos);
+          - structure.atoms.at(atom_config.at(1)).cpos);
     }
 
 
@@ -211,7 +211,7 @@ vector<int> AllCombination41(int num, int total_num, int index) {
   int j;
 
 
- R2:
+R2:
   ++count;
   if(count == index) {
     str.clear();
@@ -240,7 +240,7 @@ vector<int> AllCombination41(int num, int total_num, int index) {
     }
   }
 
- R4:
+R4:
   if(c[j-1] >= j) {
     c[j-1] = c[j-2];
     c[j-2] = j-2;
@@ -249,7 +249,7 @@ vector<int> AllCombination41(int num, int total_num, int index) {
     ++j;
   }
 
- R5:
+R5:
   if(c[j-1] + 1 < c[j]) {
     c[j-2] = c[j-1];
     ++c[j-1];
@@ -275,8 +275,7 @@ vector<int> AllCombination42(int num, int total_num, vector<int> & str_in) {
   //}
 
   if(int(str_in.size()) != num) {
-    cerr << "AllCombination42: input str must have a size equal to " << num << "!\n";
-    exit(_EXIT_RANK_NOT_MATCH);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,"AllCombination42():","input str must have a size equal to "+aurostd::utype2string(num),_INPUT_ILLEGAL_); //CO20200624
   }
 
   for(int i=0; i<num; i++) {
@@ -291,7 +290,7 @@ vector<int> AllCombination42(int num, int total_num, vector<int> & str_in) {
   int next = 2; // only find the next combination
 
 
- R2:
+R2:
   ++count;
   if(count == next) {
     str.clear();
@@ -320,7 +319,7 @@ vector<int> AllCombination42(int num, int total_num, vector<int> & str_in) {
     }
   }
 
- R4:
+R4:
   if(c[j-1] >= j) {
     c[j-1] = c[j-2];
     c[j-2] = j-2;
@@ -329,7 +328,7 @@ vector<int> AllCombination42(int num, int total_num, vector<int> & str_in) {
     ++j;
   }
 
- R5:
+R5:
   if(c[j-1] + 1 < c[j]) {
     c[j-2] = c[j-1];
     ++c[j-1];
@@ -525,13 +524,13 @@ bool comparison_cluster(const cecluster& cluster1, const cecluster& cluster2) {
       _atom atom1, atom2;
 
       for(int i=0; i<size1; i++) {
-	atom1 = cluster1.structure.atoms.at(i);
-	atom2 = cluster2.structure.atoms.at(i);
+        atom1 = cluster1.structure.atoms.at(i);
+        atom2 = cluster2.structure.atoms.at(i);
 
-	dist1 += modulus(atom1.cpos);
-	dist2 += modulus(atom2.cpos);
-	shell1 = max(shell1, atom1.shell);
-	shell2 = max(shell2, atom2.shell);
+        dist1 += modulus(atom1.cpos);
+        dist2 += modulus(atom2.cpos);
+        shell1 = max(shell1, atom1.shell);
+        shell2 = max(shell2, atom2.shell);
       }
 
       return (shell1 < shell2) && (dist1 < dist2);
@@ -573,7 +572,7 @@ bool is_equal(const cecluster & cluster1, const cecluster & cluster2) {
 }
 
 bool is_equal_crystal(const cecluster & cluster1,
-		      const cecluster & cluster2) {
+    const cecluster & cluster2) {
   // two clusters are equivalent if they are related by a translational operator
   _atom atom_tmp, atom_ref;
   cecluster cluster_tmp;
@@ -739,19 +738,19 @@ ostream & operator<<(ostream & os, const ceallclusters & cestr) {
     //cerr.setf(ios_base::fixed);
     //cerr.precision(4);
     os << setw(6)
-       << i
-       << setw(16)
-       << cestr.NN_distance.at(i)
-       << setw(10)
-       << cestr.NN_shell_num.at(i)
-       << endl;
+      << i
+      << setw(16)
+      << cestr.NN_distance.at(i)
+      << setw(10)
+      << cestr.NN_shell_num.at(i)
+      << endl;
   }
 
   return os;
 }
 
 int ceallclusters::SetCluster( const int& SiteNum_low, const int& SiteNum_up,
-			       const int& NNNum_low, const int& NNNum_up) {
+    const int& NNNum_low, const int& NNNum_up) {
 
   clock_t start, end;
   double diff;
@@ -878,12 +877,12 @@ int ceallclusters::GetNearestNeighbour(int NNNum) {
     NN_shell_num.push_back(0);
     for(uint j = 0; j< structure.grid_atoms.size(); j++) {
       if(is_equal(modulus(structure.grid_atoms.at(j).cpos-atom_orig.cpos),
-		    NN_distance.at(i))) {
-	atom_tmp = structure.grid_atoms.at(j);
-	atom_tmp.shell = i;
-	atom_list.push_back(atom_tmp);
-	NN_shell_num.at(i)++;
-	continue;
+            NN_distance.at(i))) {
+        atom_tmp = structure.grid_atoms.at(j);
+        atom_tmp.shell = i;
+        atom_list.push_back(atom_tmp);
+        NN_shell_num.at(i)++;
+        continue;
       }
     }
   }
@@ -892,7 +891,7 @@ int ceallclusters::GetNearestNeighbour(int NNNum) {
 }
 
 int ceallclusters::GenerateAllCluster(int SiteNum_low, int SiteNum_up,
-				      int NNNum_low, int NNNum_up) {
+    int NNNum_low, int NNNum_up) {
   // generate all cluster in a structure
 
   int site_index, NN_index;
@@ -922,12 +921,12 @@ int ceallclusters::GenerateAllCluster(int SiteNum_low, int SiteNum_up,
       cluster_tmp.site_num = site_index;
 
       if(site_index == 1) {
-	// one atom has no nearest neighbour
-	cluster_tmp.pair_name = "1 0";
-	cluster_tmp.structure.atoms.push_back(atom_list.at(0));
-	cluster_tmp.structure.indices.push_back(0);
-	rep_cluster.push_back(cluster_tmp);
-	continue;
+        // one atom has no nearest neighbour
+        cluster_tmp.pair_name = "1 0";
+        cluster_tmp.structure.atoms.push_back(atom_list.at(0));
+        cluster_tmp.structure.indices.push_back(0);
+        rep_cluster.push_back(cluster_tmp);
+        continue;
       }
 
       cluster_tmp.pair_name.append(aurostd::utype2string(site_index));
@@ -945,39 +944,39 @@ int ceallclusters::GenerateAllCluster(int SiteNum_low, int SiteNum_up,
 
       vector<int> atom_config;
       for(int i=0; i< str_size; i++) {
-	if(i==0) {
-	  atom_config=AllCombination41(num_config, total_num, i+1);
-	} else {
-	  atom_config=AllCombination42(num_config, total_num, atom_config);
-	}
+        if(i==0) {
+          atom_config=AllCombination41(num_config, total_num, i+1);
+        } else {
+          atom_config=AllCombination42(num_config, total_num, atom_config);
+        }
 
-	cluster_tmp.structure.atoms.clear();
-	cluster_tmp.structure.indices.clear();
-	for(uint j=0; j<atom_config.size(); j++) {
-	  //cout << atom_config.at(j) << " ";
+        cluster_tmp.structure.atoms.clear();
+        cluster_tmp.structure.indices.clear();
+        for(uint j=0; j<atom_config.size(); j++) {
+          //cout << atom_config.at(j) << " ";
 
-	  cluster_tmp.structure.atoms.push_back(atom_list.at(atom_config.at(j)+1));
-	  cluster_tmp.structure.indices.push_back(atom_config.at(j)+1);
-	}
-
-
-	cluster_tmp.structure.atoms.push_back(atom_list.at(0)); // include the atom at origin
-	cluster_tmp.structure.indices.push_back(0);
-	cluster_tmp.NNNum = cluster_tmp.GetNNNum(NN_distance);
+          cluster_tmp.structure.atoms.push_back(atom_list.at(atom_config.at(j)+1));
+          cluster_tmp.structure.indices.push_back(atom_config.at(j)+1);
+        }
 
 
-	for(NN_index = NNNum_low; NN_index < NN_up + 1; NN_index++) {
-	  if(cluster_tmp.NNNum == NN_index) {
+        cluster_tmp.structure.atoms.push_back(atom_list.at(0)); // include the atom at origin
+        cluster_tmp.structure.indices.push_back(0);
+        cluster_tmp.NNNum = cluster_tmp.GetNNNum(NN_distance);
 
-	    cluster_tmp.pair_name.append(aurostd::utype2string(cluster_tmp.NNNum)); // neareset neighbour shell index
 
-	    rep_cluster.push_back(cluster_tmp);
+        for(NN_index = NNNum_low; NN_index < NN_up + 1; NN_index++) {
+          if(cluster_tmp.NNNum == NN_index) {
 
-	    // erase the old NNN_num in pair_name to store the new one in next step
-	    cluster_tmp.pair_name.erase(cluster_tmp.pair_name.size()-1, cluster_tmp.pair_name.size()-1);
-	    //break;
-	  }
-	}
+            cluster_tmp.pair_name.append(aurostd::utype2string(cluster_tmp.NNNum)); // neareset neighbour shell index
+
+            rep_cluster.push_back(cluster_tmp);
+
+            // erase the old NNN_num in pair_name to store the new one in next step
+            cluster_tmp.pair_name.erase(cluster_tmp.pair_name.size()-1, cluster_tmp.pair_name.size()-1);
+            //break;
+          }
+        }
       }
     }
 
@@ -1001,7 +1000,7 @@ int ceallclusters::GetRepresentCluster() {
   // keep only one of those symmetric atoms
   // divide clusters into equivlant symmetry groups
 
-        
+
   vector<cecluster> rep_cluster_tmp;
   _atom atom_tmp, atom_cmp;
   vector< vector<cecluster> > all_cluster_tmp;
@@ -1054,23 +1053,23 @@ void ceallclusters::PrintRepCluster() const
     cerr << "Cluster Name (" << rep_cluster.at(i).pair_name << ")\n";
     cerr << "Equivalent clusters " << rep_cluster.at(i).equivalent_num << "\n";
     cerr << "Site_num " << rep_cluster.at(i).site_num
-	 << " " << "NNNnum " << rep_cluster.at(i).NNNum
-	 << " " << "dist " << rep_cluster.at(i).dist
-	 << " " << "index " << rep_cluster.at(i).index << endl;
+      << " " << "NNNnum " << rep_cluster.at(i).NNNum
+      << " " << "dist " << rep_cluster.at(i).dist
+      << " " << "index " << rep_cluster.at(i).index << endl;
     for(uint j = 0; j < rep_cluster.at(i).structure.atoms.size();j++) {
       cerr << setw(6)
-	   << rep_cluster.at(i).structure.atoms.at(j).cpos(1) << " "
-	   << setw(6)
-	   << rep_cluster.at(i).structure.atoms.at(j).cpos(2) << " "
-	   << setw(6)
-	   << rep_cluster.at(i).structure.atoms.at(j).cpos(3) << "\n";
+        << rep_cluster.at(i).structure.atoms.at(j).cpos(1) << " "
+        << setw(6)
+        << rep_cluster.at(i).structure.atoms.at(j).cpos(2) << " "
+        << setw(6)
+        << rep_cluster.at(i).structure.atoms.at(j).cpos(3) << "\n";
     }
-        
+
     // output the indices of atom in atom_list
     cerr << "Indices of these atoms in atom_lists are: \n";
     for(uint j = 0; j < rep_cluster.at(i).structure.indices.size();j++) {
       cerr << setw(6)
-	   << rep_cluster.at(i).structure.indices.at(j) ;
+        << rep_cluster.at(i).structure.indices.at(j) ;
     }
     cerr << "\n";
   }
@@ -1090,23 +1089,23 @@ void ceallclusters::PrintAllCluster() const
       cerr << "Cluster Name (" << all_cluster.at(k).at(i).pair_name << ")\n";
       cerr << "Equivalent clusters " << all_cluster.at(k).at(i).equivalent_num << "\n";
       cerr << "Site_num " << all_cluster.at(k).at(i).site_num
-	   << " " << "NNNnum " << all_cluster.at(k).at(i).NNNum
-	   << " " << "dist " << all_cluster.at(k).at(i).dist
-	   << " " << "index " << all_cluster.at(k).at(i).index << endl;
+        << " " << "NNNnum " << all_cluster.at(k).at(i).NNNum
+        << " " << "dist " << all_cluster.at(k).at(i).dist
+        << " " << "index " << all_cluster.at(k).at(i).index << endl;
       for(uint j = 0; j < all_cluster.at(k).at(i).structure.atoms.size();j++) {
-	cerr << setw(6)
-	     << all_cluster.at(k).at(i).structure.atoms.at(j).cpos(1) << " "
-	     << setw(6)
-	     << all_cluster.at(k).at(i).structure.atoms.at(j).cpos(2) << " "
-	     << setw(6)
-	     << all_cluster.at(k).at(i).structure.atoms.at(j).cpos(3) << "\n";
+        cerr << setw(6)
+          << all_cluster.at(k).at(i).structure.atoms.at(j).cpos(1) << " "
+          << setw(6)
+          << all_cluster.at(k).at(i).structure.atoms.at(j).cpos(2) << " "
+          << setw(6)
+          << all_cluster.at(k).at(i).structure.atoms.at(j).cpos(3) << "\n";
       }
 
       // output the indices of atom in atom_list
       cerr << "Indices of these atoms in atom_lists are: \n";
       for(uint j = 0; j < all_cluster.at(k).at(i).structure.indices.size();j++) {
-	cerr << setw(6)
-	     << all_cluster.at(k).at(i).structure.indices.at(j);
+        cerr << setw(6)
+          << all_cluster.at(k).at(i).structure.indices.at(j);
       }
       cerr << "\n";
 
@@ -1134,8 +1133,7 @@ int ceallclusters::EquivalentCluster(const vector<_sym_op> pgroup) {
   int ucol;
 
   if(pgroup.size() == 0) {
-    cerr << "No symmetric operator! exit ... \n";
-    exit(_EXIT_NO_SYMMETRIC_OPERATOR);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,"ceallclusters::EquivalentCluster():","no symmetric operator",_RUNTIME_ERROR_); //CO20200624
   }
 
   int lrow = 1;
@@ -1154,7 +1152,7 @@ int ceallclusters::EquivalentCluster(const vector<_sym_op> pgroup) {
     for(uint i=0; i<cluster1.structure.atoms.size(); i++) {
       atom_tmp = cluster1.structure.atoms.at(i);
       for(uint j=1; j<_DIM+1; j++) {
-	coord_atoms[j][i+1] = atom_tmp.cpos[j];
+        coord_atoms[j][i+1] = atom_tmp.cpos[j];
       }
     }
 
@@ -1183,37 +1181,37 @@ int ceallclusters::EquivalentCluster(const vector<_sym_op> pgroup) {
 
       // store the trasferred atoms in a temporary cluster object
       for(uint j=0; j<cluster1.structure.atoms.size(); j++) {
-	for(uint k=0; k<3; k++) {
-	  atom_tmp.cpos[k+1] = coord_sym[k+1][j+1];
-	}
-	cluster_tmp.structure.atoms.push_back(atom_tmp);
+        for(uint k=0; k<3; k++) {
+          atom_tmp.cpos[k+1] = coord_sym[k+1][j+1];
+        }
+        cluster_tmp.structure.atoms.push_back(atom_tmp);
       }
 
       for(uint j=1; j<rep_cluster.size(); j++) {
-	flag_eq = false;
-	cluster2 = rep_cluster.at(j);
+        flag_eq = false;
+        cluster2 = rep_cluster.at(j);
 
-	if(cluster1.structure.atoms.size()
-	     < cluster2.structure.atoms.size()
-	     || (cluster1.pair_name != cluster2.pair_name)) {
-	  if(j== 1) {
-	    flag = true;
-	  }
-	  break;
-	}
+        if(cluster1.structure.atoms.size()
+            < cluster2.structure.atoms.size()
+            || (cluster1.pair_name != cluster2.pair_name)) {
+          if(j== 1) {
+            flag = true;
+          }
+          break;
+        }
 
-	if(cluster1.structure.atoms.size()
-	     == cluster2.structure.atoms.size()) {
-	  flag_eq = flag_eq || is_equal_crystal(cluster2, cluster_tmp);
-	} else {
-	  flag_eq = false;
-	}
+        if(cluster1.structure.atoms.size()
+            == cluster2.structure.atoms.size()) {
+          flag_eq = flag_eq || is_equal_crystal(cluster2, cluster_tmp);
+        } else {
+          flag_eq = false;
+        }
 
-	//if(flag_eq) return j; //return true
-	if(flag_eq) {
-	  cluster_eq_list_tmp.push_back(cluster2); // equivalent clusters
-	  index_list.push_back(j);
-	}
+        //if(flag_eq) return j; //return true
+        if(flag_eq) {
+          cluster_eq_list_tmp.push_back(cluster2); // equivalent clusters
+          index_list.push_back(j);
+        }
 
       }
 
@@ -1222,11 +1220,11 @@ int ceallclusters::EquivalentCluster(const vector<_sym_op> pgroup) {
 
       // delete found cluster from rep_cluster
       for(int j=index_list.size()-1; j>=0; j--) {
-	rep_cluster.erase(rep_cluster.begin()+index_list.at(j));
+        rep_cluster.erase(rep_cluster.begin()+index_list.at(j));
       }
 
       if(flag) {
-	break;
+        break;
       }
 
     }
@@ -1274,7 +1272,7 @@ void ceallclusters::GetClusterDistance() {
       dist = rep_cluster.at(i).ClusterDistance();
       flag = false;
       for(uint k=0; k<distance.size(); k++) {
-	flag = flag || is_equal(dist, distance.at(k));
+        flag = flag || is_equal(dist, distance.at(k));
       }
       if(!flag) distance.push_back(dist);
 
@@ -1283,15 +1281,15 @@ void ceallclusters::GetClusterDistance() {
 
       if(i == rep_cluster.size() -1)counter_same_old_label++;
       for(int j = pos; j < pos + counter_same_old_label; j++) {
-	dist = rep_cluster.at(j).ClusterDistance();
-	for(uint k = 0; k < distance.size(); k++) {
-	  if(is_equal(dist, distance.at(k))) {
-	    rep_cluster.at(j).pair_name.push_back(' ');
-	    rep_cluster.at(j).pair_name.append(aurostd::utype2string(k+1));
-	    rep_cluster.at(j).dist = k+1;
-	    break;
-	  }
-	}
+        dist = rep_cluster.at(j).ClusterDistance();
+        for(uint k = 0; k < distance.size(); k++) {
+          if(is_equal(dist, distance.at(k))) {
+            rep_cluster.at(j).pair_name.push_back(' ');
+            rep_cluster.at(j).pair_name.append(aurostd::utype2string(k+1));
+            rep_cluster.at(j).dist = k+1;
+            break;
+          }
+        }
       }
 
 
@@ -1325,15 +1323,15 @@ string ceallclusters::GetNamebyCluster(cecluster & cluster_in) const
     for(uint j=0; j<all_cluster.at(i).size(); j++) {
       cluster_cmp = all_cluster.at(i).at(j);
       if(cluster_cmp.structure.atoms.size()
-	   != cluster_in.structure.atoms.size()) {
-	flag = false;
-	break;
+          != cluster_in.structure.atoms.size()) {
+        flag = false;
+        break;
       } else {
-	if(is_equal_crystal(cluster_in, cluster_cmp)) {
-	  name = cluster_cmp.pair_name;
-	  flag = true;
-	  break;
-	}
+        if(is_equal_crystal(cluster_in, cluster_cmp)) {
+          name = cluster_cmp.pair_name;
+          flag = true;
+          break;
+        }
       }
     }
     if(flag) break;
@@ -1356,15 +1354,15 @@ int ceallclusters::GetIndexbyCluster(cecluster & cluster_in) const
     for(uint j=0; j<all_cluster.at(i).size(); j++) {
       cluster_cmp = all_cluster.at(i).at(j);
       if(cluster_cmp.structure.atoms.size()
-	   != cluster_in.structure.atoms.size()) {
-	flag = false;
-	break;
+          != cluster_in.structure.atoms.size()) {
+        flag = false;
+        break;
       } else {
-	if(is_equal_crystal(cluster_in, cluster_cmp)) {
-	  index = cluster_cmp.index;
-	  flag = true;
-	  break;
-	}
+        if(is_equal_crystal(cluster_in, cluster_cmp)) {
+          index = cluster_cmp.index;
+          flag = true;
+          break;
+        }
       }
     }
     if(flag) break;
@@ -1381,10 +1379,9 @@ bool ceallclusters::ReadIn(string & filename) {
   fin.open(filename.c_str());
 
   if(!fin) { // cannot open file
-    cerr << "file " << filename << " cannot be opened\n";
-    exit(_EXIT_NO_INPUTFILE);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,"ceallclusters::ReadIn():","file "+filename+" cannot be opened",_FILE_CORRUPT_); //CO20200624
   }
-    
+
   int rep_cluster_num;
   fin >> rep_cluster_num;
 
@@ -1395,21 +1392,21 @@ bool ceallclusters::ReadIn(string & filename) {
 
     fin.ignore(1,'\n');
     getline(fin, cluster1.pair_name, '\n');
-        
+
     fin >> cluster1.equivalent_num;
     fin >> cluster1.site_num
-	>> cluster1.NNNum
-	>> cluster1.dist
-	>> cluster1.index;
+      >> cluster1.NNNum
+      >> cluster1.dist
+      >> cluster1.index;
 
     _atom atom1;
     int atom_index;
 
     for(int i1=0; i1<cluster1.site_num; i1++) {
       fin >> atom1.cpos(1)
-	  >> atom1.cpos(2)
-	  >> atom1.cpos(3)
-	  >> atom_index;
+        >> atom1.cpos(2)
+        >> atom1.cpos(3)
+        >> atom_index;
       cluster1.structure.atoms.push_back(atom1);
       cluster1.structure.indices.push_back(atom_index);
     }
@@ -1431,23 +1428,23 @@ bool ceallclusters::ReadIn(string & filename) {
       getline(fin, cluster1.pair_name);
       fin >> cluster1.equivalent_num;
       fin >> cluster1.site_num
-	  >> cluster1.NNNum
-	  >> cluster1.dist
-	  >> cluster1.index;
+        >> cluster1.NNNum
+        >> cluster1.dist
+        >> cluster1.index;
 
       cluster1.structure.atoms.clear();
       cluster1.structure.indices.clear();
       for(int i1=0; i1<cluster1.site_num; i1++) {
-	fin >> atom1.cpos(1)
-	    >> atom1.cpos(2)
-	    >> atom1.cpos(3)
-	    >> atom_index;
-	cluster1.structure.atoms.push_back(atom1);
-	cluster1.structure.indices.push_back(atom_index);
+        fin >> atom1.cpos(1)
+          >> atom1.cpos(2)
+          >> atom1.cpos(3)
+          >> atom_index;
+        cluster1.structure.atoms.push_back(atom1);
+        cluster1.structure.indices.push_back(atom_index);
       }
 
       if(cluster1.dist <= _DIST_LIST[cluster1.site_num-1]) {
-	cluster_list.push_back(cluster1);
+        cluster_list.push_back(cluster1);
       }
     }
 
@@ -1456,7 +1453,7 @@ bool ceallclusters::ReadIn(string & filename) {
     }
 
   }
-    
+
   // read NN_distance, NN_shell_num, and atom_list
 
   int NN_distance_num;
@@ -1478,8 +1475,8 @@ bool ceallclusters::ReadIn(string & filename) {
   for(int i=0; i<atom_list_num; i++) {
     _atom atom1;
     fin >> atom1.cpos[1]
-	>> atom1.cpos[2]
-	>> atom1.cpos[3];
+      >> atom1.cpos[2]
+      >> atom1.cpos[3];
     atom_list.push_back(atom1);
   }
 
@@ -1504,7 +1501,7 @@ bool ceallclusters::ReadIn(string & filename) {
       all_cluster.at(i).at(j).index = i+1;
     }
 
-        
+
   }
 
 
@@ -1531,24 +1528,24 @@ bool ceallclusters::WriteFile(string & filename, string & stat) {
     fout << rep_cluster.at(i).pair_name << endl;
     fout << rep_cluster.at(i).equivalent_num << endl;
     fout << setw(8)
-	 << rep_cluster.at(i).site_num
-	 << setw(8)
-	 << rep_cluster.at(i).NNNum
-	 << setw(8)
-	 << rep_cluster.at(i).dist
-	 << setw(8)
-	 << rep_cluster.at(i).index
-	 << endl;
+      << rep_cluster.at(i).site_num
+      << setw(8)
+      << rep_cluster.at(i).NNNum
+      << setw(8)
+      << rep_cluster.at(i).dist
+      << setw(8)
+      << rep_cluster.at(i).index
+      << endl;
     for(int i1=0; i1<rep_cluster.at(i).site_num; i1++) {
       fout << setw(16)
-	   << rep_cluster.at(i).structure.atoms.at(i1).cpos[1]
-	   << setw(16)
-	   << rep_cluster.at(i).structure.atoms.at(i1).cpos[2]
-	   << setw(16)
-	   << rep_cluster.at(i).structure.atoms.at(i1).cpos[3]
-	   << setw(16)
-	   << rep_cluster.at(i).structure.indices.at(i1)
-	   << endl;
+        << rep_cluster.at(i).structure.atoms.at(i1).cpos[1]
+        << setw(16)
+        << rep_cluster.at(i).structure.atoms.at(i1).cpos[2]
+        << setw(16)
+        << rep_cluster.at(i).structure.atoms.at(i1).cpos[3]
+        << setw(16)
+        << rep_cluster.at(i).structure.indices.at(i1)
+        << endl;
     }
 
     for(int j=0; j<rep_cluster.at(i).equivalent_num; j++) {
@@ -1556,24 +1553,24 @@ bool ceallclusters::WriteFile(string & filename, string & stat) {
       fout << all_cluster.at(i).at(j).pair_name << endl;
       fout << all_cluster.at(i).at(j).equivalent_num << endl;
       fout << setw(8)
-	   << all_cluster.at(i).at(j).site_num
-	   << setw(8)
-	   << all_cluster.at(i).at(j).NNNum
-	   << setw(8)
-	   << all_cluster.at(i).at(j).dist
-	   << setw(8)
-	   << all_cluster.at(i).at(j).index
-	   << endl;
+        << all_cluster.at(i).at(j).site_num
+        << setw(8)
+        << all_cluster.at(i).at(j).NNNum
+        << setw(8)
+        << all_cluster.at(i).at(j).dist
+        << setw(8)
+        << all_cluster.at(i).at(j).index
+        << endl;
       for(int i1=0; i1<all_cluster.at(i).at(j).site_num; i1++) {
-	fout << setw(16)
-	     << all_cluster.at(i).at(j).structure.atoms.at(i1).cpos(1)
-	     << setw(16)
-	     << all_cluster.at(i).at(j).structure.atoms.at(i1).cpos(2)
-	     << setw(16)
-	     << all_cluster.at(i).at(j).structure.atoms.at(i1).cpos(3)
-	     << setw(16)
-	     << all_cluster.at(i).at(j).structure.indices.at(i1)
-	     << endl;
+        fout << setw(16)
+          << all_cluster.at(i).at(j).structure.atoms.at(i1).cpos(1)
+          << setw(16)
+          << all_cluster.at(i).at(j).structure.atoms.at(i1).cpos(2)
+          << setw(16)
+          << all_cluster.at(i).at(j).structure.atoms.at(i1).cpos(3)
+          << setw(16)
+          << all_cluster.at(i).at(j).structure.indices.at(i1)
+          << endl;
       }
     }
 
@@ -1585,21 +1582,21 @@ bool ceallclusters::WriteFile(string & filename, string & stat) {
   fout << NN_distance.size() << endl;
   for(uint i=0; i<NN_distance.size(); i++) {
     fout << setw(8)
-	 << NN_distance.at(i)
-	 << setw(8)
-	 << NN_shell_num.at(i)
-	 << endl;
+      << NN_distance.at(i)
+      << setw(8)
+      << NN_shell_num.at(i)
+      << endl;
   }
 
   fout << atom_list.size() << endl;
   for(uint i=0; i<atom_list.size(); i++) {
     fout << setw(16)
-	 << atom_list.at(i).cpos(1)
-	 << setw(16)
-	 << atom_list.at(i).cpos(2)
-	 << setw(16)
-	 << atom_list.at(i).cpos(3)
-	 << endl;
+      << atom_list.at(i).cpos(1)
+      << setw(16)
+      << atom_list.at(i).cpos(2)
+      << setw(16)
+      << atom_list.at(i).cpos(3)
+      << endl;
   }
 
   fout.close();
@@ -1611,7 +1608,7 @@ bool ceallclusters::WriteFile(string & filename, string & stat) {
 }
 
 bool comparison_cluster_list(const vector<cecluster> & cluster_list_1,
-			     const vector<cecluster> & cluster_list_2) {
+    const vector<cecluster> & cluster_list_2) {
   // comparison of two clusters lists grouped by the same pair_name
   // "smaller" cluster list has "small" pair_name
   // sorted by descending order
@@ -1692,7 +1689,7 @@ void ceECIcluster::SetUp(ceallclusters & cluster1) {
 }
 
 void ceECIcluster::SetStrCluster(const ceallclusters & ceallcluster_in) {
-    
+
   if(!str_cluster_calculated) {
     str_cluster = &ceallcluster_in;
     str_cluster_calculated = true;
@@ -1754,11 +1751,11 @@ void ceECIcluster::GetECICluster() {
     index = ECI_cluster.at(i);
 
     cerr << "i " << i
-	 << " | "
-	 << " index "
-	 << index
-	 << " | "
-	 << " " << str_cluster->rep_cluster.at(index).pair_name << endl;
+      << " | "
+      << " index "
+      << index
+      << " | "
+      << " " << str_cluster->rep_cluster.at(index).pair_name << endl;
   }
 
   allECI_cluster = ECI_cluster;
@@ -1814,11 +1811,11 @@ void ceECIcluster::PrintOutECICluster() {
     index = ECI_cluster.at(i);
 
     cerr << "i " << i
-	 << " | "
-	 << " index "
-	 << index
-	 << " | "
-	 << " " << str_cluster->rep_cluster.at(index).pair_name << endl;
+      << " | "
+      << " index "
+      << index
+      << " | "
+      << " " << str_cluster->rep_cluster.at(index).pair_name << endl;
   }
 
 
@@ -1837,17 +1834,17 @@ void ceECIcluster::PrintECI(ostream & os) {
   os << "ECIs " << ECI_cluster.size() << endl;
 
   os << setw(12)
-     << "0 0 0 0"
-     << setw(12)
-     << ECIValue().at(0)
-     << endl;
+    << "0 0 0 0"
+    << setw(12)
+    << ECIValue().at(0)
+    << endl;
   for(uint i=0; i<ECI_cluster.size(); i++) {
     int index = ECI_cluster.at(i);
     os << setw(12)
-       << str_cluster->rep_cluster.at(index).pair_name
-       << setw(12)
-       << ECI.at(i+1)
-       << endl;
+      << str_cluster->rep_cluster.at(index).pair_name
+      << setw(12)
+      << ECI.at(i+1)
+      << endl;
   }
 
   os.setf(old_stat, ios_base::floatfield);
@@ -1866,8 +1863,8 @@ void ceECIcluster::WriteFile(ostream & os) {
   // ECI values
   for(uint i=0; i<ECI.size(); i++) {
     os << setw(width)
-       << ECI.at(i)
-       << endl;
+      << ECI.at(i)
+      << endl;
   }
 
   // ECI clusters
@@ -1881,12 +1878,12 @@ void ceECIcluster::WriteFile(ostream & os) {
 
     for(int i1=0; i1 < atom_num; i1++) {
       os << setw(width)
-	 << str_cluster->rep_cluster.at(index).structure.atoms.at(i1).cpos[1]
-	 << setw(width)
-	 << str_cluster->rep_cluster.at(index).structure.atoms.at(i1).cpos[2]
-	 << setw(width)
-	 << str_cluster->rep_cluster.at(index).structure.atoms.at(i1).cpos[3]
-	 << endl;
+        << str_cluster->rep_cluster.at(index).structure.atoms.at(i1).cpos[1]
+        << setw(width)
+        << str_cluster->rep_cluster.at(index).structure.atoms.at(i1).cpos[2]
+        << setw(width)
+        << str_cluster->rep_cluster.at(index).structure.atoms.at(i1).cpos[3]
+        << endl;
     }
   }
 
@@ -1900,8 +1897,7 @@ void ceECIcluster::ReadIn(istream & os) {
   os >> ECI_size;
 
   if(str_cluster == 0) {
-    cerr << "ceECIcluster::ReadIn: Clusters must be supplied! Exit! \n";
-    exit(_EXIT_FAIL);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,"ceECIcluster::ReadIn():","clusters must be supplied",_FILE_CORRUPT_); //CO20200624
   }
 
   ECI.clear();
@@ -1913,7 +1909,7 @@ void ceECIcluster::ReadIn(istream & os) {
 
   int ECI_cluster_num;
   os >> ECI_cluster_num;
-    
+
   int  atom_num;
   ECI_cluster.clear();
   for(int i=0; i<ECI_cluster_num; i++) {
@@ -1923,8 +1919,8 @@ void ceECIcluster::ReadIn(istream & os) {
     _atom atom_tmp;
     for(int i1=0; i1<atom_num; i1++) {
       os >> atom_tmp.cpos[1]
-	 >> atom_tmp.cpos[2]
-	 >> atom_tmp.cpos[3];
+        >> atom_tmp.cpos[2]
+        >> atom_tmp.cpos[3];
       cluster_tmp.structure.atoms.push_back(atom_tmp);
     }
 
@@ -1932,8 +1928,8 @@ void ceECIcluster::ReadIn(istream & os) {
 
     for(uint j1=0; j1<str_cluster->rep_cluster.size(); j1++) {
       if(is_equal(cluster_tmp, str_cluster->rep_cluster.at(j1))) {
-	index = j1;
-	break;
+        index = j1;
+        break;
       }
     }
 
@@ -1992,7 +1988,7 @@ cestructure::cestructure() : structure() {
 }
 
 cestructure::cestructure(string & str_name, double stoich_b_in,
-			 double fit_quantity) : structure() {
+    double fit_quantity) : structure() {
   name = str_name;
   stoich_b = stoich_b_in;
   energy_in = fit_quantity;
@@ -2051,12 +2047,12 @@ ostream & operator<<(ostream & os, const cestructure & cestr) {
   os.precision(8);
 
   os << setw(6)
-     << cestr.name
-     << setw(12)
-     << cestr.stoich_b
-     << setw(12)
-     << cestr.energy_in;
-    
+    << cestr.name
+    << setw(12)
+    << cestr.stoich_b
+    << setw(12)
+    << cestr.energy_in;
+
   return os;
 }
 
@@ -2069,7 +2065,7 @@ void cestructure::SetUp(const ceallclusters & cluster1, ceECIcluster & cluster2)
 }
 
 void cestructure::SetUp(const ceallclusters & cluster1, ceECIcluster & cluster2,
-			istream & corfilein) {
+    istream & corfilein) {
   // set up everthing
   SetStrCluster(cluster1);
   SetAllECICluster(cluster2);
@@ -2078,7 +2074,7 @@ void cestructure::SetUp(const ceallclusters & cluster1, ceECIcluster & cluster2,
 }
 
 void cestructure::SetStrCluster(const ceallclusters & ceallcluster_in) {
-    
+
   //if(!str_cluster_calculated) {
   str_cluster = &ceallcluster_in;
   str_cluster_calculated = true;
@@ -2138,8 +2134,8 @@ vector<double> cestructure::GetCorrelation(vector<int> & index_list) {
   for(uint i1=0; i1<structure.atoms.size(); i1++) {
     for(uint l1=1; l1<4; l1++) {
       if(str_tmp.atoms.at(i1).fpos[l1] < 0) {
-	str_tmp.atoms.at(i1).fpos[l1] +=
-	  abs(int(str_tmp.atoms.at(i1).fpos[l1])) + 1.0;
+        str_tmp.atoms.at(i1).fpos[l1] +=
+          abs(int(str_tmp.atoms.at(i1).fpos[l1])) + 1.0;
       }
     }
 
@@ -2164,22 +2160,22 @@ vector<double> cestructure::GetCorrelation(vector<int> & index_list) {
       atom_tmp.cpos = atom_list.at(i1).cpos -str_tmp.atoms.at(l2).cpos;
 
       g11 = abs(str_tmp.klattice[1][1]*atom_tmp.cpos[1]
-		+str_tmp.klattice[1][2]*atom_tmp.cpos[2]
-		+str_tmp.klattice[1][3]*atom_tmp.cpos[3])/(2.0*_pi)+_EQUAL_DOUBLE*0.1;
+          +str_tmp.klattice[1][2]*atom_tmp.cpos[2]
+          +str_tmp.klattice[1][3]*atom_tmp.cpos[3])/(2.0*_pi)+_EQUAL_DOUBLE*0.1;
       g12 = abs(str_tmp.klattice[2][1]*atom_tmp.cpos[1]
-		+str_tmp.klattice[2][2]*atom_tmp.cpos[2]
-		+str_tmp.klattice[2][3]*atom_tmp.cpos[3])/(2.0*_pi)+_EQUAL_DOUBLE*0.1;
+          +str_tmp.klattice[2][2]*atom_tmp.cpos[2]
+          +str_tmp.klattice[2][3]*atom_tmp.cpos[3])/(2.0*_pi)+_EQUAL_DOUBLE*0.1;
       g13 = abs(str_tmp.klattice[3][1]*atom_tmp.cpos[1]
-		+str_tmp.klattice[3][2]*atom_tmp.cpos[2]
-		+str_tmp.klattice[3][3]*atom_tmp.cpos[3])/(2.0*_pi)+_EQUAL_DOUBLE*0.1;
+          +str_tmp.klattice[3][2]*atom_tmp.cpos[2]
+          +str_tmp.klattice[3][3]*atom_tmp.cpos[3])/(2.0*_pi)+_EQUAL_DOUBLE*0.1;
 
 
       if(( abs(g11 - int(g11)) < _EQUAL_DOUBLE )
-	   &&(abs(g12 - int(g12)) < _EQUAL_DOUBLE )
-	   &&(abs(g13 - int(g13)) < _EQUAL_DOUBLE )
-	  ) {
-	equiv_atoms.at(l2).push_back(i1);
-	break;
+          &&(abs(g12 - int(g12)) < _EQUAL_DOUBLE )
+          &&(abs(g13 - int(g13)) < _EQUAL_DOUBLE )
+        ) {
+        equiv_atoms.at(l2).push_back(i1);
+        break;
       }
     }
 
@@ -2203,8 +2199,8 @@ vector<double> cestructure::GetCorrelation(vector<int> & index_list) {
     atoms_tmp = atoms_org;
     for(uint i1=0; i1<structure.atoms.size(); i1++) {
       for(uint l1=1; l1<4; l1++) {
-	str_tmp.atoms.at(i1).cpos[l1] = structure.atoms.at(i1).cpos[l1]
-	  - structure.atoms.at(i).cpos[l1];
+        str_tmp.atoms.at(i1).cpos[l1] = structure.atoms.at(i1).cpos[l1]
+          - structure.atoms.at(i).cpos[l1];
       }
 
       str_tmp.atoms.at(i1).fpos = C2F(str_tmp.lattice, str_tmp.atoms.at(i1).cpos);
@@ -2216,13 +2212,13 @@ vector<double> cestructure::GetCorrelation(vector<int> & index_list) {
     // shift the atoms back to the primitive unit cell
     for(uint i1=0; i1<structure.atoms.size(); i1++) {
       for(uint l1=1; l1<4; l1++) {
-	// fpos of atom in the primitive unit cell
-	// is always positive
-	// only shift those atom with negative fpos elements
-	if(str_tmp.atoms.at(i1).fpos[l1] < -1.0*_EQUAL_DOUBLE) {
-	  str_tmp.atoms.at(i1).fpos[l1] +=
-	    abs(int(str_tmp.atoms.at(i1).fpos[l1])) + 1.0;
-	}
+        // fpos of atom in the primitive unit cell
+        // is always positive
+        // only shift those atom with negative fpos elements
+        if(str_tmp.atoms.at(i1).fpos[l1] < -1.0*_EQUAL_DOUBLE) {
+          str_tmp.atoms.at(i1).fpos[l1] +=
+            abs(int(str_tmp.atoms.at(i1).fpos[l1])) + 1.0;
+        }
       }
 
       str_tmp.atoms.at(i1).cpos = F2C(str_tmp.lattice, str_tmp.atoms.at(i1).fpos);
@@ -2233,10 +2229,10 @@ vector<double> cestructure::GetCorrelation(vector<int> & index_list) {
     // restore the order of atoms in unit cell with new configuration
     for(uint i1=0; i1 < atoms_tmp.size(); i1++) {
       for(uint i2=0; i2 < str_tmp.atoms.size(); i2++) {
-	if(is_equal(atoms_tmp.at(i1), str_tmp.atoms.at(i2))) {
-	  atoms_tmp.at(i1).name = str_tmp.atoms.at(i2).name;
-	  break;
-	}
+        if(is_equal(atoms_tmp.at(i1), str_tmp.atoms.at(i2))) {
+          atoms_tmp.at(i1).name = str_tmp.atoms.at(i2).name;
+          break;
+        }
       }
     }
 
@@ -2249,7 +2245,7 @@ vector<double> cestructure::GetCorrelation(vector<int> & index_list) {
 
     for(uint i1=0; i1 < equiv_atoms.size(); i1++) {
       for(uint i2=0; i2 < equiv_atoms.at(i1).size(); i2++) {
-	atom_list.at(equiv_atoms.at(i1).at(i2)).name = str_tmp.atoms.at(i1).name;
+        atom_list.at(equiv_atoms.at(i1).at(i2)).name = str_tmp.atoms.at(i1).name;
       }
     }
 
@@ -2264,14 +2260,14 @@ vector<double> cestructure::GetCorrelation(vector<int> & index_list) {
     for(uint i1=0; i1<atom_list.size(); i1++) {
       char ch = atom_list.at(i1).name.at(0);
       switch(ch) {
-      case 'A':
-      case 'a':
-	configuration.push_back(_A_ATOM);
-	break;
-      case 'B':
-      case 'b':
-	configuration.push_back(_B_ATOM);
-	break;
+        case 'A':
+        case 'a':
+          configuration.push_back(_A_ATOM);
+          break;
+        case 'B':
+        case 'b':
+          configuration.push_back(_B_ATOM);
+          break;
       }
     }
 
@@ -2294,13 +2290,13 @@ vector<double> cestructure::GetCorrelation(vector<int> & index_list) {
 
       for(uint j1=0; j1<str_cluster->all_cluster.at(j).size(); j1++) {
 
-	cecluster cluster1 = str_cluster->all_cluster.at(j).at(j1);
-	int cor_tmp = 1;
-	for(uint j2=0; j2<cluster1.structure.indices.size(); j2++) {
-	  int ind = cluster1.structure.indices.at(j2);
-	  cor_tmp *= configuration.at(ind);
-	}
-	cors[j] += double(cor_tmp);
+        cecluster cluster1 = str_cluster->all_cluster.at(j).at(j1);
+        int cor_tmp = 1;
+        for(uint j2=0; j2<cluster1.structure.indices.size(); j2++) {
+          int ind = cluster1.structure.indices.at(j2);
+          cor_tmp *= configuration.at(ind);
+        }
+        cors[j] += double(cor_tmp);
 
       }
 
@@ -2359,14 +2355,14 @@ void cestructure::GetECICorrelation() {
     for(uint j=0; j<allECI_cluster.size(); j++) {
       if(ECI_cluster.at(i) == allECI_cluster.at(j)) {
 
-	// ******************************************************
-	// first item in ECI_corrleation is the correlation of "0 0 0 0"
-	// this structure is not stored in EC_cluster and ECI_cluster!
-	// that's why j+1 is used here
-	// ******************************************************
+        // ******************************************************
+        // first item in ECI_corrleation is the correlation of "0 0 0 0"
+        // this structure is not stored in EC_cluster and ECI_cluster!
+        // that's why j+1 is used here
+        // ******************************************************
 
-	ECI_correlation.push_back(allECI_correlation.at(j+1));
-	break;
+        ECI_correlation.push_back(allECI_correlation.at(j+1));
+        break;
       }
     }
   }
@@ -2436,22 +2432,22 @@ void cestructure::PrintOutCorrelation() {
   for(uint i=0; i<ECI_correlation.size(); i++) {
     if(i==0) {
       cerr << setw(12)
-	   <<"0 0 0 0";
+        <<"0 0 0 0";
     } else {
       int index = ECI_cluster.at(i-1);
       cerr << setw(12)
-	   << str_cluster->rep_cluster.at(index).pair_name;
+        << str_cluster->rep_cluster.at(index).pair_name;
     }
     cerr.setf(ios_base::fixed, ios_base::floatfield);
     cerr.precision(6);
     cerr << setw(12)
-	 << "eq cluster "
-	 << setw(4)
-	 << ECI_equivalent_num.at(i)
-	 << setw(6)
-	 <<" cor "
-	 << setw(10)
-	 << ECI_correlation.at(i) << endl;
+      << "eq cluster "
+      << setw(4)
+      << ECI_equivalent_num.at(i)
+      << setw(6)
+      <<" cor "
+      << setw(10)
+      << ECI_correlation.at(i) << endl;
   }
 
 
@@ -2462,26 +2458,26 @@ void cestructure::PrintOutCorrelation() {
 void cestructure::WriteFile(ostream & os) {
 
   os << setw(10)
-     << name
-     << setw(10)
+    << name
+    << setw(10)
     //<< ECI_correlation.size()
-     << ECI_correlation.size()
-     << endl;
+    << ECI_correlation.size()
+    << endl;
 
 
   for(uint i=0; i<ECI_correlation.size(); i++) {
     if(i==0) {
       os << setw(12)
-	 <<"0 0 0 0" ;
+        <<"0 0 0 0" ;
     } else {
       int index = ECI_cluster.at(i-1);
       os << setw(12)
-	 << str_cluster->rep_cluster.at(index).pair_name ;
+        << str_cluster->rep_cluster.at(index).pair_name ;
     }
     os.setf(ios_base::fixed, ios_base::floatfield);
     os.precision(8);
     os << setw(12)
-       << ECI_correlation.at(i) << endl;
+      << ECI_correlation.at(i) << endl;
   }
 
   os.precision(6);
@@ -2507,15 +2503,15 @@ bool cestructure::ReadIn(istream & fin) {
       flag = false;
       for(int i = 0; i< cor_num; i++) {
 
-	string pair_name;
-	int site_num, NNNum, dist, index;
-	double cor;
+        string pair_name;
+        int site_num, NNNum, dist, index;
+        double cor;
 
-	fin >> site_num
-	    >> NNNum
-	    >> dist
-	    >> index
-	    >> cor;
+        fin >> site_num
+          >> NNNum
+          >> dist
+          >> index
+          >> cor;
 
       }
       continue;
@@ -2532,10 +2528,10 @@ bool cestructure::ReadIn(istream & fin) {
       double cor;
 
       fin >> site_num
-	  >> NNNum
-	  >> dist
-	  >> index
-	  >> cor;
+        >> NNNum
+        >> dist
+        >> index
+        >> cor;
 
       allECI_correlation.at(index) = cor;
     }
@@ -2574,7 +2570,7 @@ int cestructure::ReadIn(istream & fin, int pos) {
       getline(fin, str_name);
       for(int i = 0; i< cor_num; i++) {
 
-	getline(fin, str_name);
+        getline(fin, str_name);
       }
       continue;
     }
@@ -2591,10 +2587,10 @@ int cestructure::ReadIn(istream & fin, int pos) {
       double cor;
 
       fin >> site_num
-	  >> NNNum
-	  >> dist
-	  >> index
-	  >> cor;
+        >> NNNum
+        >> dist
+        >> index
+        >> cor;
 
       allECI_correlation.at(index) = cor;
     }
@@ -2617,7 +2613,7 @@ int cestructure::NameToValue(string name) {
 }
 
 void cestructure::GetEnergy() {
-    
+
   energy = 0.0;
 
   //cerr << "ECI correlation size " << ECI_correlation.size() << endl;
@@ -2649,16 +2645,16 @@ void cestructure::PrintOutComparison(ostream & os) {
 
 
   os << setw(6)
-     << name
-     << setw(12)
-     << stoich_b
-     << setw(12)
-     << energy
-     << setw(12)
-     << energy_in
-     << setw(12)
-     << de
-     << endl;
+    << name
+    << setw(12)
+    << stoich_b
+    << setw(12)
+    << energy
+    << setw(12)
+    << energy_in
+    << setw(12)
+    << de
+    << endl;
 
   // restore to the old setting
   os.setf(stat_old, ios_base::floatfield);
@@ -2693,8 +2689,7 @@ ceralloy::ceralloy() : cestructure() {
 //ceralloy::ceralloy(string & str_name, double stoich_b,
 //        double temperature) : cestructure(str_name, stoich_b,
 //            0.0, 0.0, 0.0, 0.0, 1.0, temperature)
-ceralloy::ceralloy(string & str_name, double stoich_b) :
-  cestructure(str_name, stoich_b, 0.0) {
+ceralloy::ceralloy(string & str_name, double stoich_b) : cestructure(str_name, stoich_b, 0.0) {
 }
 
 ceralloy::ceralloy(xstructure & xstr) : cestructure(xstr) {
@@ -2712,13 +2707,13 @@ ostream & operator<<(ostream & os, const ceralloy & cestr) {
   os.precision(8);
 
   os << setw(6)
-     << cestr.name
-     << setw(12)
-     << cestr.stoich_b
-     << setw(12)
-     << cestr.energy_in
-     << setw(12)
-     << cestr.energy;
+    << cestr.name
+    << setw(12)
+    << cestr.stoich_b
+    << setw(12)
+    << cestr.energy_in
+    << setw(12)
+    << cestr.energy;
 
   return os;
 }
@@ -2761,14 +2756,14 @@ void ceralloy::GetAllECICorrelation() {
     for(uint j=0; j<allECI_cluster.size(); j++) {
       if(ECI_cluster.at(i) == allECI_cluster.at(j)) {
 
-	// ******************************************************
-	// first item in ECI_corrleation is the correlation of "0 0 0 0"
-	// this structure is not stored in EC_cluster and CVM_cluster!
-	// that's why j+1 is used here
-	// ******************************************************
+        // ******************************************************
+        // first item in ECI_corrleation is the correlation of "0 0 0 0"
+        // this structure is not stored in EC_cluster and CVM_cluster!
+        // that's why j+1 is used here
+        // ******************************************************
 
-	ECI_correlation.push_back(allECI_correlation.at(j+1));
-	break;
+        ECI_correlation.push_back(allECI_correlation.at(j+1));
+        break;
       }
     }
   }
@@ -2816,7 +2811,7 @@ cesubcluster::~cesubcluster() {
 }
 
 void cesubcluster::SetStrCluster(const ceallclusters & ceallcluster_in) {
-    
+
   if(!str_cluster_calculated) {
     str_cluster = &ceallcluster_in;
     str_cluster_calculated = true;
@@ -2824,7 +2819,7 @@ void cesubcluster::SetStrCluster(const ceallclusters & ceallcluster_in) {
 }
 
 void cesubcluster::SetStrCluster(const ceallclusters * ceallcluster_in) {
-    
+
   if(!str_cluster_calculated) {
     str_cluster = ceallcluster_in;
     str_cluster_calculated = true;
@@ -2844,10 +2839,9 @@ void cesubcluster::SetUp(vector<int> base_cluster, ceallclusters & cluster1) {
 }
 
 void cesubcluster::SetBaseCluster(int base_cluster_nr) {
-    
+
   if(base_cluster.size() !=0) {
-    cerr << "Already has a base!\n";
-    exit(_EXIT_FAIL);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,"cesubcluster::SetBaseCluster():","already has a base",_INPUT_ILLEGAL_); //CO20200624
   } else {
     base_cluster.push_back(base_cluster_nr);
   }
@@ -2857,23 +2851,22 @@ void cesubcluster::SetBaseCluster(vector<int> base_cluster_nr) {
   //if(str_cluster_calculated) {
   base_cluster = base_cluster_nr;
   //} else {
-  //    cerr << "Must get all clusters of a structure frist! \n";
-  //    exit(_EXIT_FAIL);
+  //    throw aurostd::xerror(_AFLOW_FILE_NAME_,"cesubcluster::SetBaseCluster():","must get all clusters of a structure first",_INPUT_ILLEGAL_); //CO20200624
   //}
 }
 
 void cesubcluster::AddBaseCluster(int base_cluster_nr) {
-    
+
   base_cluster.push_back(base_cluster_nr);
 }
 
 void cesubcluster::AddBaseCluster(vector<int> base_cluster_nr) {
-    
+
   for(uint i=0; i<base_cluster_nr.size(); i++) {
     AddBaseCluster(base_cluster_nr.at(i));
   }
 }
-            
+
 vector<Baker_str> cesubcluster::GetSubCluster(int base_cluster) {
   // get all subclusters of a base cluster
 
@@ -2915,9 +2908,9 @@ vector<Baker_str> cesubcluster::GetSubCluster(int base_cluster) {
     for(int j=0; j<str_size; j++) {
 
       if(j==0) {
-	atom_config = AllCombination41(i+1, total_atom_num, j+1);
+        atom_config = AllCombination41(i+1, total_atom_num, j+1);
       } else {
-	atom_config = AllCombination42(i+1, total_atom_num, atom_config);
+        atom_config = AllCombination42(i+1, total_atom_num, atom_config);
       }
 
       atom_num = atom_config.size();
@@ -2925,81 +2918,81 @@ vector<Baker_str> cesubcluster::GetSubCluster(int base_cluster) {
 
 
       for(int k=0; k<atom_num; k++) {
-	atom_index = atom_config.at(k);
-	atom_tmp = cluster1.structure.atoms.at(atom_index);
-	if(k == 0) {
-	  atom_ref = atom_tmp;
-	}
-	for(int k1=1; k1<=3; k1++) {
-	  // move the cluster with one atom at origin due to the structure of clusters stored in str_cluster.rep_cluster and str_cluster.all_cluster
-	  atom_tmp.cpos[k1] -= atom_ref.cpos[k1];
-	}
-	cluster2.structure.atoms.push_back(atom_tmp);
+        atom_index = atom_config.at(k);
+        atom_tmp = cluster1.structure.atoms.at(atom_index);
+        if(k == 0) {
+          atom_ref = atom_tmp;
+        }
+        for(int k1=1; k1<=3; k1++) {
+          // move the cluster with one atom at origin due to the structure of clusters stored in str_cluster.rep_cluster and str_cluster.all_cluster
+          atom_tmp.cpos[k1] -= atom_ref.cpos[k1];
+        }
+        cluster2.structure.atoms.push_back(atom_tmp);
       }
 
       flag_found = false;
       bool flag_1, flag_2;
       for(uint k=0; k<str_cluster->all_cluster.size(); k++) {
 
-	for(uint k1=0; k1<str_cluster->all_cluster.at(k).size(); k1++) {
+        for(uint k1=0; k1<str_cluster->all_cluster.at(k).size(); k1++) {
 
-	  // [OBSOLETE] set but not used 	  int index_tmp;
-	  site_num = str_cluster->all_cluster.at(k).at(k1).site_num;
-	  NNNum = str_cluster->all_cluster.at(k).at(k1).NNNum;
-	  dist_tmp = str_cluster->all_cluster.at(k).at(k1).dist;
-	  index_tmp = str_cluster->all_cluster.at(k).at(k1).index;
+          // [OBSOLETE] set but not used 	  int index_tmp;
+          site_num = str_cluster->all_cluster.at(k).at(k1).site_num;
+          NNNum = str_cluster->all_cluster.at(k).at(k1).NNNum;
+          dist_tmp = str_cluster->all_cluster.at(k).at(k1).dist;
+          index_tmp = str_cluster->all_cluster.at(k).at(k1).index;
 
-	  // clusters with same atom number keep only those smaller ones, i.e. short distance
-	  // cluster with smaller atom number keep all
+          // clusters with same atom number keep only those smaller ones, i.e. short distance
+          // cluster with smaller atom number keep all
 
-	  flag_1 = (str_cluster->all_cluster.at(k).at(k1).site_num == total_atom_num)
-	    &&(str_cluster->all_cluster.at(k).at(k1).NNNum == cluster1.NNNum)
-	    && (dist_tmp == dist);
-	  flag_2 = str_cluster->all_cluster.at(k).at(k1).site_num < total_atom_num;
+          flag_1 = (str_cluster->all_cluster.at(k).at(k1).site_num == total_atom_num)
+            &&(str_cluster->all_cluster.at(k).at(k1).NNNum == cluster1.NNNum)
+            && (dist_tmp == dist);
+          flag_2 = str_cluster->all_cluster.at(k).at(k1).site_num < total_atom_num;
 
 
-	  if(flag_1 || flag_2) {
+          if(flag_1 || flag_2) {
 
-	    cluster_name = str_cluster->all_cluster.at(k).at(k1).pair_name;
+            cluster_name = str_cluster->all_cluster.at(k).at(k1).pair_name;
 
-	    // check if the representive cluster is stored or not
-	    flag = false;
+            // check if the representive cluster is stored or not
+            flag = false;
 
-	    for(uint k2=0; k2<sub_cluster.size(); k2++) {
-	      if(str_cluster->rep_cluster.at(sub_cluster.at(k2).index-1).pair_name
-		   == cluster_name) {
-		// if found add the number by 1
-		if(is_equal(str_cluster->all_cluster.at(k).at(k1), cluster2)) {
-		  sub_cluster.at(k2).n_num++;
-		}
-		flag = true;
-		break; //stop k2 loop
-	      }
-	    } // k2
+            for(uint k2=0; k2<sub_cluster.size(); k2++) {
+              if(str_cluster->rep_cluster.at(sub_cluster.at(k2).index-1).pair_name
+                  == cluster_name) {
+                // if found add the number by 1
+                if(is_equal(str_cluster->all_cluster.at(k).at(k1), cluster2)) {
+                  sub_cluster.at(k2).n_num++;
+                }
+                flag = true;
+                break; //stop k2 loop
+              }
+            } // k2
 
-	    if(flag == false) {
-	      // if not found add the subcluster
+            if(flag == false) {
+              // if not found add the subcluster
 
-	      int n_num;
-                            
-	      if(is_equal (str_cluster->all_cluster.at(k).at(k1), cluster2)) {
-		n_num= 1;
-	      } else {
-		n_num = 0;
-	      }
+              int n_num;
 
-	      int m_tmp = str_cluster->rep_cluster.at(k).equivalent_num
-		/str_cluster->rep_cluster.at(k).structure.atoms.size();
+              if(is_equal (str_cluster->all_cluster.at(k).at(k1), cluster2)) {
+                n_num= 1;
+              } else {
+                n_num = 0;
+              }
 
-	      subcluster_tmp.index = k+1;
-	      subcluster_tmp.m_num = m_tmp;
-	      subcluster_tmp.n_num = n_num;
-	      sub_cluster.push_back(subcluster_tmp);
+              int m_tmp = str_cluster->rep_cluster.at(k).equivalent_num
+                /str_cluster->rep_cluster.at(k).structure.atoms.size();
 
-	    }
+              subcluster_tmp.index = k+1;
+              subcluster_tmp.m_num = m_tmp;
+              subcluster_tmp.n_num = n_num;
+              sub_cluster.push_back(subcluster_tmp);
 
-	  } // k1
-	}
+            }
+
+          } // k1
+        }
 
       } //k
 
@@ -3015,14 +3008,14 @@ vector<Baker_str> cesubcluster::GetSubCluster(int base_cluster) {
   cerr << "sub_cluster size " << sub_cluster.size() << endl;
   for(uint i=0; i<sub_cluster.size(); i++) {
     cerr << sub_cluster.at(i).index
-	 << " "
+      << " "
       //<< str_cluster->rep_cluster.at(sub_cluster.at(i)).pair_name
       //<< " "
-	 << sub_cluster.at(i).m_num
-	 << " "
-	 << sub_cluster.at(i).n_num
-	 << " "
-	 << endl;
+      << sub_cluster.at(i).m_num
+      << " "
+      << sub_cluster.at(i).n_num
+      << " "
+      << endl;
   }
 
   return sub_cluster;
@@ -3044,7 +3037,7 @@ vector<Baker_str> cesubcluster::GetOverlapCluster(int index_in) {
   deque<_atom> atom_list, atom_list_old;
   cecluster cluster1, cluster2, cluster_overlap;
   string subcluster_name;
-    
+
   vector<Baker_str> subcluster_list_out; // overlapped subclusters
 
   string pair_name;
@@ -3068,11 +3061,11 @@ vector<Baker_str> cesubcluster::GetOverlapCluster(int index_in) {
     for(uint j=0; j<cluster1.structure.atoms.size(); j++) {
       atom1 = cluster1.structure.atoms.at(j);
       for(uint k=0; k<cluster2.structure.atoms.size(); k++) {
-	atom2 = cluster2.structure.atoms.at(k);
-	if(is_equal(atom1, atom2)) {
-	  atom_list.push_back(atom1);
-	  break;
-	}
+        atom2 = cluster2.structure.atoms.at(k);
+        if(is_equal(atom1, atom2)) {
+          atom_list.push_back(atom1);
+          break;
+        }
       }
     }
 
@@ -3083,17 +3076,17 @@ vector<Baker_str> cesubcluster::GetOverlapCluster(int index_in) {
     bool flag=false;
     for(uint j=0; j<subcluster_list_out.size(); j++) {
       if(index_tmp == subcluster_list_out.at(j).index) {
-	// already stored
-	flag = true;
-	break;
+        // already stored
+        flag = true;
+        break;
       }
     }
     if(!flag) { // not stored
       for(uint j=0; j<sub_cluster.at(index_in-1).size(); j++) {
-	if(index_tmp == sub_cluster.at(index_in-1).at(j).index) {
-	  subcluster_list_out.push_back(sub_cluster.at(index_in-1).at(j));
-	  break;
-	}
+        if(index_tmp == sub_cluster.at(index_in-1).at(j).index) {
+          subcluster_list_out.push_back(sub_cluster.at(index_in-1).at(j));
+          break;
+        }
       }
     }
   }
@@ -3105,11 +3098,11 @@ vector<Baker_str> cesubcluster::GetOverlapCluster(int index_in) {
   cerr << "overlap_cluster size " << subcluster_list_out.size() << endl;
   for(uint i=0; i<subcluster_list_out.size(); i++) {
     cerr << subcluster_list_out.at(i).index
-	 << " "
-	 << subcluster_list_out.at(i).m_num
-	 << " "
-	 << subcluster_list_out.at(i).n_num
-	 << endl;
+      << " "
+      << subcluster_list_out.at(i).m_num
+      << " "
+      << subcluster_list_out.at(i).n_num
+      << endl;
   }
 
 
@@ -3120,8 +3113,8 @@ vector<Baker_str> cesubcluster::GetOverlapCluster(int index_in) {
 
 
 vector<Baker_str> cesubcluster::GetOverlapCluster(
-						  const vector<Baker_str> & subcluster_list1,
-						  const vector<Baker_str> & subcluster_list2) {
+    const vector<Baker_str> & subcluster_list1,
+    const vector<Baker_str> & subcluster_list2) {
   // get the overlap clusters of two base clusters
   // only those clusters contribute the to configurational entropy
 
@@ -3148,9 +3141,9 @@ vector<Baker_str> cesubcluster::GetOverlapCluster(
     for(uint j=0; j<subcluster_list_new1.size(); j++) {
       subcluster1 = subcluster_list_new1.at(j);
       if((subcluster2.n_num != 0)&&
-	   (subcluster1.index == subcluster2.index)) {
-	subcluster_list_new2.push_back(subcluster2);
-	break;
+          (subcluster1.index == subcluster2.index)) {
+        subcluster_list_new2.push_back(subcluster2);
+        break;
       }
     }
   }
@@ -3178,7 +3171,7 @@ vector<Baker_str> cesubcluster::GetOverlapCluster(
   if(!flag) {
     subcluster_list_new2.push_back(subcluster_list2.at(size2-1));
   }
-    
+
   sort(subcluster_list_new2.begin(), subcluster_list_new2.end(), &comparison_subcluster);
 
   //cerr << "Overlap\n";
@@ -3230,7 +3223,7 @@ void cesubcluster::GetOverlapCluster() {
     }
 
     overlap_list = GetOverlapCluster( sub_cluster.at(config.at(0)),
-				      sub_cluster.at(config.at(1)) );
+        sub_cluster.at(config.at(1)) );
     overlap_list_out = MergeTwoSubCluster(overlap_list, overlap_list_out);
   }
 
@@ -3251,8 +3244,8 @@ void cesubcluster::GetOverlapCluster() {
 }
 
 vector<Baker_str> cesubcluster::MergeTwoSubCluster(
-						   const vector<Baker_str> & subcluster_list1,
-						   const vector<Baker_str> & subcluster_list2) {
+    const vector<Baker_str> & subcluster_list1,
+    const vector<Baker_str> & subcluster_list2) {
   // Merge subcluster lists of two basic clusters
 
   vector<Baker_str> subcluster_list_new;
@@ -3265,8 +3258,8 @@ vector<Baker_str> cesubcluster::MergeTwoSubCluster(
     flag = false;
     for(uint j=0; j<subcluster_list_new.size(); j++) {
       if(is_equal(subcluster_tmp, subcluster_list_new.at(j))) {
-	flag = true;
-	break;
+        flag = true;
+        break;
       }
     }
     if(!flag) {
@@ -3293,7 +3286,7 @@ vector<Baker_str> cesubcluster::MergeTwoSubCluster(
 
 
 bool comparison_subcluster(const Baker_str& subcluster1,
-			   const Baker_str& subcluster2) {
+    const Baker_str& subcluster2) {
   // comparison of two clusters
   // "smaller" cluster has "small" pair_name
   // sorted by descending order
@@ -3334,15 +3327,13 @@ ceSL::ceSL(string & str_name) : cestructure(str_name, 0.0, 0.0) {
   base_atoms.clear();
 
   if(!(base == "fcc" || base == "bcc" || base =="hcp" )) {
-    cerr << "ceSL:base structure must be one of fcc/bcc/hcp!\n";
-    exit(_EXIT_NOSTRUCTURE);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,"ceSL::ceSL():","structure must be one of fcc/bcc/hcp",_INPUT_ILLEGAL_); //CO20200624
   }
 }
 
-ceSL::ceSL(string & str_name, double stoich_b,
-	   double fit_quantity)
-  : cestructure( str_name, stoich_b,
-		 fit_quantity) {
+ceSL::ceSL(string & str_name, double stoich_b, 
+    double fit_quantity) : cestructure( str_name, stoich_b, fit_quantity) 
+{
   for(uint i=0; i<name.size(); i++) {
     base.push_back(tolower(name.at(i)));
   }
@@ -3352,8 +3343,7 @@ ceSL::ceSL(string & str_name, double stoich_b,
   base_atoms.clear();
 
   if(!(base == "fcc" || base == "bcc" || base =="hcp" )) {
-    cerr << "ceSL:base structure must be one of fcc/bcc/hcp!\n";
-    exit(_EXIT_NOSTRUCTURE);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,"ceSL::ceSL():","structure must be one of fcc/bcc/hcp",_INPUT_ILLEGAL_); //CO20200624
   }
 
 }
@@ -3395,7 +3385,7 @@ ceSL::ceSL(string & str_name, xstructure & xstr) : cestructure(xstr) {
   vector<int> atom_config;
   _atom atom1, atom2;
   bool flag = true;
-    
+
   for(uint i=0; i<structure.atoms.size(); i++) {
     atom1 = structure.atoms.at(i);
     flag = true;
@@ -3403,15 +3393,15 @@ ceSL::ceSL(string & str_name, xstructure & xstr) : cestructure(xstr) {
     for(uint j=0; j<xstr.fgroup.size() && flag; j++) {
       atom2.fpos = xstr.fgroup.at(j).Uf*atom1.fpos + xstr.fgroup.at(j).ftau;
       for(uint k=0; k<xstr.atoms.size() && flag; k++) {
-	if(is_equal_fpos(atom2, xstr.atoms.at(k))) {
-	  if(xstr.atoms.at(k).name == xstr.species.at(0)) {
-	    structure.atoms.at(i).name = "A";
-	  } else if(xstr.atoms.at(k).name == xstr.species.at(1)) {
-	    structure.atoms.at(i).name = "B";
-	    atom_config.push_back(i);
-	  }
-	  flag = false;
-	}
+        if(is_equal_fpos(atom2, xstr.atoms.at(k))) {
+          if(xstr.atoms.at(k).name == xstr.species.at(0)) {
+            structure.atoms.at(i).name = "A";
+          } else if(xstr.atoms.at(k).name == xstr.species.at(1)) {
+            structure.atoms.at(i).name = "B";
+            atom_config.push_back(i);
+          }
+          flag = false;
+        }
       }
     }
 
@@ -3435,11 +3425,11 @@ ostream & operator<<(ostream & os, const ceSL & cestr) {
   os.precision(8);
 
   os << setw(18)
-     << cestr.name
-     << setw(12)
-     << cestr.stoich_b
-     << setw(12)
-     << cestr.energy;
+    << cestr.name
+    << setw(12)
+    << cestr.stoich_b
+    << setw(12)
+    << cestr.energy;
 
   // restore to the old setting
   os.setf(stat_old, ios_base::floatfield);
@@ -3458,17 +3448,14 @@ void ceSL::SetUp(string & SLname) {
     xmatrix<int> N_mat(1, 1, 3, 3);
     for(uint i=0; i<N.size(); i++) {
       for(uint j=0; j<N.size(); j++) {
-	N_mat[i+1][j+1] = N.at(i).at(j);
+        N_mat[i+1][j+1] = N.at(i).at(j);
       }
     }
     int cell_nr_in = cell_nr;
     GetStructure(N_mat, cell_nr_in);
     SetConfig(config);
   } else {
-    cerr << "ceSL: cannot find Superlattice with name "
-	 << SLname
-	 << endl;
-    exit(_EXIT_NOSTRUCTURE);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,"ceSL::SetUp():","cannot find superlattice with name "+SLname,_INPUT_MISSING_); //CO20200624
   }
 }
 
@@ -3516,7 +3503,7 @@ void ceSL::GetStructure(xmatrix<int> Nmat_in, int cell_nr_in) {
   //cerr << endl;
   //cerr << inverse(xdouble(Nmat_in)) << endl;
   //cerr << endl;
-    
+
   xmatrix<double> Ninv(1, 1, 3, 3);
   Ninv = inverse(xdouble(Nmat_in));
 
@@ -3537,75 +3524,75 @@ void ceSL::GetStructure(xmatrix<int> Nmat_in, int cell_nr_in) {
   for(int i1=-Nmax; i1 < Nmax + 1; i1++) {
     for(int i2=-Nmax; i2 < Nmax + 1; i2++) {
       for(int i3=-Nmax; i3 < Nmax + 1; i3++) {
-	bool flag = true;
+        bool flag = true;
 
-	// in fractional coordinates
-	xmatrix<double> x(1, 1, 3, 3);
-	for(int l1=1; l1 < 4; l1++) {
-	  x[1][l1] = double(i1)*Ninv[1][l1];
-	  x[2][l1] = double(i2)*Ninv[2][l1];
-	  x[3][l1] = double(i3)*Ninv[3][l1];
-	}
+        // in fractional coordinates
+        xmatrix<double> x(1, 1, 3, 3);
+        for(int l1=1; l1 < 4; l1++) {
+          x[1][l1] = double(i1)*Ninv[1][l1];
+          x[2][l1] = double(i2)*Ninv[2][l1];
+          x[3][l1] = double(i3)*Ninv[3][l1];
+        }
 
-	double x1=0.0, x2=0.0, x3=0.0;
-	for(int l1=1; l1 < 4; l1++) {
-	  x1 += x[l1][1];
-	  x2 += x[l1][2];
-	  x3 += x[l1][3];
-	}
+        double x1=0.0, x2=0.0, x3=0.0;
+        for(int l1=1; l1 < 4; l1++) {
+          x1 += x[l1][1];
+          x2 += x[l1][2];
+          x3 += x[l1][3];
+        }
 
 
-	flag = flag && (1.0 - abs(x1) > _EQUAL_DOUBLE)
-	  && (1.0 - abs(x2) > _EQUAL_DOUBLE)
-	  && (1.0 - abs(x3) > _EQUAL_DOUBLE) ;
+        flag = flag && (1.0 - abs(x1) > _EQUAL_DOUBLE)
+          && (1.0 - abs(x2) > _EQUAL_DOUBLE)
+          && (1.0 - abs(x3) > _EQUAL_DOUBLE) ;
 
-	if(flag) {
+        if(flag) {
 
-	  for(uint k=0; k<str_base.atoms.size(); k++) {
-	    for(int l1=1; l1 < 4; l1++) {
-	      atom_tmp.cpos[l1] = x1*str_SL.lattice[1][l1]
-		+ x2*str_SL.lattice[2][l1]
-		+ x3*str_SL.lattice[3][l1];
-	      atom_tmp.name = "A";
-	    }
+          for(uint k=0; k<str_base.atoms.size(); k++) {
+            for(int l1=1; l1 < 4; l1++) {
+              atom_tmp.cpos[l1] = x1*str_SL.lattice[1][l1]
+                + x2*str_SL.lattice[2][l1]
+                + x3*str_SL.lattice[3][l1];
+              atom_tmp.name = "A";
+            }
 
-	    atom_tmp.fpos = C2F(str_SL.lattice, atom_tmp.cpos);
+            atom_tmp.fpos = C2F(str_SL.lattice, atom_tmp.cpos);
 
-	    for(uint l1=1; l1<4; l1++) {
-	      if(atom_tmp.fpos[l1] < 0) {
-		atom_tmp.fpos[l1] +=
-		  abs(int(atom_tmp.fpos[l1])) + 1.0;
-	      }
-	    }
+            for(uint l1=1; l1<4; l1++) {
+              if(atom_tmp.fpos[l1] < 0) {
+                atom_tmp.fpos[l1] +=
+                  abs(int(atom_tmp.fpos[l1])) + 1.0;
+              }
+            }
 
-	    atom_tmp.cpos = F2C(str_SL.lattice, atom_tmp.fpos);
+            atom_tmp.cpos = F2C(str_SL.lattice, atom_tmp.fpos);
 
-	    bool flag_nodup = true;
-	    for(uint l1=0; l1<str_SL.atoms.size(); l1++) {
-	      // no duplicated atoms in base atoms
+            bool flag_nodup = true;
+            for(uint l1=0; l1<str_SL.atoms.size(); l1++) {
+              // no duplicated atoms in base atoms
 
-	      if(is_equal(atom_tmp, str_SL.atoms.at(l1))) {
-		flag_nodup = false;
-		break;
-	      }
-	    }
+              if(is_equal(atom_tmp, str_SL.atoms.at(l1))) {
+                flag_nodup = false;
+                break;
+              }
+            }
 
-	    if(flag_nodup) {
-	      str_SL.atoms.push_back(atom_tmp);
-	      ++atom_count;
-	    }
-	  }
+            if(flag_nodup) {
+              str_SL.atoms.push_back(atom_tmp);
+              ++atom_count;
+            }
+          }
 
-	  if(atom_count == atom_nr) {
-	    goto out_of_loop;
-	  }
+          if(atom_count == atom_nr) {
+            goto out_of_loop;
+          }
 
-	  //cerr << "atom " << atom_tmp << endl;
-	  //cerr << "cpos " << atom_tmp.cpos[1];
-	  //cerr << " " << atom_tmp.cpos[2];
-	  //cerr << " " << atom_tmp.cpos[3] << endl;
+          //cerr << "atom " << atom_tmp << endl;
+          //cerr << "cpos " << atom_tmp.cpos[1];
+          //cerr << " " << atom_tmp.cpos[2];
+          //cerr << " " << atom_tmp.cpos[3] << endl;
 
-	}
+        }
 
       }
     }
@@ -3613,9 +3600,9 @@ void ceSL::GetStructure(xmatrix<int> Nmat_in, int cell_nr_in) {
 
   //cerr << "atom count " << atom_count << endl;
 
- out_of_loop: ;
+out_of_loop: ;
 
-  structure.SetStructure(str_SL);
+             structure.SetStructure(str_SL);
 }
 
 void ceSL::SetConfig(vector<int> & atom_config) {
@@ -3626,9 +3613,9 @@ void ceSL::SetConfig(vector<int> & atom_config) {
 
   // reset all atom to type A
   for(uint k=0; k<structure.atoms.size(); k++)
-    {
-      structure.atoms.at(k).name = "A";
-    }
+  {
+    structure.atoms.at(k).name = "A";
+  }
 
   for(uint k=0; k<atom_config.size(); k++) {
     structure.atoms.at(atom_config.at(k)).name = "B";
@@ -3683,15 +3670,15 @@ bool ceSL::NameToStructure(string & SLname) {
   size_t SL_pos;
   SL_pos = SLname.find("SL");
   if(( uint(SL_pos) > name_size )
-       && (SLname.find("0x") > name_size )
-       && (SLname.find("_") > name_size )
-      ) {
+      && (SLname.find("0x") > name_size )
+      && (SLname.find("_") > name_size )
+    ) {
     flag_fmt = false;
   }
 
   if(!flag_fmt) {
     cerr << "ceSL::NameToStructure: Superlattice name must have the format "
-	 << "xSL(n11)_(n12)_(n13)_(n21)_(n22)_(n23)_(n32)_(n32)_(n33)_(cell_num)_0x(xxxx) \n";
+      << "xSL(n11)_(n12)_(n13)_(n21)_(n22)_(n23)_(n32)_(n32)_(n33)_(cell_num)_0x(xxxx) \n";
     return false;
   }
 
@@ -3708,12 +3695,12 @@ bool ceSL::NameToStructure(string & SLname) {
 
       num.clear();
       for(uint i=0; i< name_tmp.size(); i++) {
-	if(name_tmp.at(i) != '_') {
-	  num.push_back(name_tmp.at(i));
-	} else {
-	  name_tmp.erase(0, i+1);
-	  break;
-	}
+        if(name_tmp.at(i) != '_') {
+          num.push_back(name_tmp.at(i));
+        } else {
+          name_tmp.erase(0, i+1);
+          break;
+        }
       }
 
       Ns.push_back(aurostd::string2utype<int>(num));
@@ -3745,32 +3732,32 @@ bool ceSL::NameToStructure(string & SLname) {
     num.clear();
     num.push_back(ch);
     switch (ch) {
-    case 'A' :
-    case 'a' :
-      n = 10;
-      break;
-    case 'B':
-    case 'b':
-      n = 11;
-      break;
-    case 'C':
-    case 'c':
-      n = 12;
-      break;
-    case 'D':
-    case 'd':
-      n = 13;
-      break;
-    case 'E':
-    case 'e':
-      n = 14;
-      break;
-    case 'F':
-    case 'f':
-      n = 15;
-      break;
-    default:
-      n = aurostd::string2utype<int>(num);
+      case 'A' :
+      case 'a' :
+        n = 10;
+        break;
+      case 'B':
+      case 'b':
+        n = 11;
+        break;
+      case 'C':
+      case 'c':
+        n = 12;
+        break;
+      case 'D':
+      case 'd':
+        n = 13;
+        break;
+      case 'E':
+      case 'e':
+        n = 14;
+        break;
+      case 'F':
+      case 'f':
+        n = 15;
+        break;
+      default:
+        n = aurostd::string2utype<int>(num);
     }
 
     for(int j=0; j<4; j++) { // which position has value 1
@@ -3778,7 +3765,7 @@ bool ceSL::NameToStructure(string & SLname) {
       ++pos;
 
       if(val == 1) {
-	config.push_back(pos);
+        config.push_back(pos);
       }
 
       n = n/2;
@@ -3824,7 +3811,7 @@ void ceSL::PrintStructure(ostream & os) {
   for(uint i1=0; i1<N.size(); i1++) {
     for(uint i2=0; i2<N.at(0).size(); i2++) {
       os << setw(4)
-	 << N.at(i1).at(i2);
+        << N.at(i1).at(i2);
     }
     os << " | ";
   }
@@ -3846,10 +3833,10 @@ void ceSL::PrintStructure(ostream & os) {
       << endl;
   }
   os << setw(4)
-     << structure.num_each_type.at(0)
-     << setw(4)
-     << structure.num_each_type.at(1)
-     << endl;
+    << structure.num_each_type.at(0)
+    << setw(4)
+    << structure.num_each_type.at(1)
+    << endl;
   //os << "Catesian(" << structure.atoms.size() <<")" << endl;
   //for(uint i=0; i<structure.atoms.size(); i++) {
   //    os << setw(19)
@@ -3867,14 +3854,14 @@ void ceSL::PrintStructure(ostream & os) {
   os << "Direct(" << structure.atoms.size() <<")" << endl;
   for(uint i=0; i<structure.atoms.size(); i++) {
     os << setw(19)
-       << structure.atoms.at(i).fpos[1]
-       << setw(19)
-       << structure.atoms.at(i).fpos[2]
-       << setw(19)
-       << structure.atoms.at(i).fpos[3]
-       << setw(4)
-       << structure.atoms.at(i).name
-       << endl;
+      << structure.atoms.at(i).fpos[1]
+      << setw(19)
+      << structure.atoms.at(i).fpos[2]
+      << setw(19)
+      << structure.atoms.at(i).fpos[3]
+      << setw(4)
+      << structure.atoms.at(i).name
+      << endl;
   }
   os.precision(_DEFAULT_PRECISION);
   os.setf(old_stat, ios_base::floatfield);
@@ -3910,10 +3897,10 @@ void ceSL::PrintStructure(ostream & os, vector<_ceatom> atom_species) {
       << endl;
   }
   os << setw(4)
-     << structure.num_each_type.at(0)
-     << setw(4)
-     << structure.num_each_type.at(1)
-     << endl;
+    << structure.num_each_type.at(0)
+    << setw(4)
+    << structure.num_each_type.at(1)
+    << endl;
   //os << "Catesian(" << structure.atoms.size() <<")" << endl;
   //for(uint i=0; i<structure.atoms.size(); i++) {
   //    os << setw(19)
@@ -3938,14 +3925,14 @@ void ceSL::PrintStructure(ostream & os, vector<_ceatom> atom_species) {
       name = atom_species.at(1).name;
     }
     os << setw(19)
-       << structure.atoms.at(i).fpos[1]
-       << setw(19)
-       << structure.atoms.at(i).fpos[2]
-       << setw(19)
-       << structure.atoms.at(i).fpos[3]
-       << setw(4)
-       << name
-       << endl;
+      << structure.atoms.at(i).fpos[1]
+      << setw(19)
+      << structure.atoms.at(i).fpos[2]
+      << setw(19)
+      << structure.atoms.at(i).fpos[3]
+      << setw(4)
+      << name
+      << endl;
   }
   os.precision(_DEFAULT_PRECISION);
   os.setf(old_stat, ios_base::floatfield);
@@ -3971,21 +3958,21 @@ double ceSL::IsSQS(int site_num, int NNNum) {
   // The clusters are those with number of site no larger than "site_num"
   // and the largest NNNum equal or smaller than "NNNum"
   // (0 0 0 0) is excluded
-    
+
   cecluster cluster_iter;
 
   for(uint i=0; i< str_cluster->rep_cluster.size(); i++) {
     cluster_iter = str_cluster->rep_cluster.at(i);
     if(cluster_iter.site_num <= site_num &&
-	 cluster_iter.site_num > 1) {
+        cluster_iter.site_num > 1) {
       // exclude cluster (0 0 0 0) and (1 0 1 1)
       // as their correlations are always the same in both
       // SQS and random structure
       if(cluster_iter.NNNum <= NNNum) {
-	cmp_cluster.pair_name = cluster_iter.pair_name;
-	cmp_cluster.index = cluster_iter.index;
-	cmp_cluster.site_num = cluster_iter.site_num;
-	SQScompare_cluster_list.push_back(cmp_cluster);
+        cmp_cluster.pair_name = cluster_iter.pair_name;
+        cmp_cluster.index = cluster_iter.index;
+        cmp_cluster.site_num = cluster_iter.site_num;
+        SQScompare_cluster_list.push_back(cmp_cluster);
       }
     }
   }
@@ -4003,10 +3990,10 @@ double ceSL::IsSQS(int site_num, int NNNum) {
       // correlation has already been calculated
       int pos = iter - allECI_cluster.begin();
       if(pos < int(allECI_correlation.size())) {
-	SQScompare_cluster_list.at(i).correlation = allECI_correlation.at(pos);
+        SQScompare_cluster_list.at(i).correlation = allECI_correlation.at(pos);
       } else {
-	cal_cor_list.push_back(i);
-	index_list.push_back(index);
+        cal_cor_list.push_back(i);
+        index_list.push_back(index);
       }
     } else {
       // not be calculated
@@ -4036,12 +4023,12 @@ double ceSL::IsSQS(int site_num, int NNNum) {
     for(uint i=0; i<cal_cor_list.size(); i++) {
       int cluster_index = cal_cor_list.at(i);
       SQScompare_cluster_list.at(cluster_index).correlation =
-	cor_list.at(i);
+        cor_list.at(i);
     }
   }
 
   // get the figure of merit
-    
+
   for(uint i=0; i<SQScompare_cluster_list.size();i++) {
     double cor = SQScompare_cluster_list.at(i).correlation;
     double cor_random = SQScompare_cluster_list.at(i).correlation_random_structure;
@@ -4058,40 +4045,40 @@ double ceSL::IsSQS(int site_num, int NNNum) {
 void ceSL::OutputSQS(ostream & oss) {
 
   oss << setw(20)
-      <<"Strucutre "
-      << setw(12)
-      << name
-      << endl;
+    <<"Strucutre "
+    << setw(12)
+    << name
+    << endl;
   oss << setw(20)
-      << "concentration"
-      << setw(20)
-      << stoich_b << endl;
+    << "concentration"
+    << setw(20)
+    << stoich_b << endl;
   oss << setw(20)
-      << "atom number"
-      << setw(20)
-      << cell_nr << endl;
+    << "atom number"
+    << setw(20)
+    << cell_nr << endl;
   oss << "-------------------------------------------------------------\n";
   oss << setw(10)
-      << "cluster"
-      << setw(30)
-      << "          correlation"
-      << endl;
+    << "cluster"
+    << setw(30)
+    << "          correlation"
+    << endl;
 
   oss << "         "
-      << setw(20)
-      << "CE::SQS"
-      << setw(20)
-      << "random"
-      << endl;
+    << setw(20)
+    << "CE::SQS"
+    << setw(20)
+    << "random"
+    << endl;
   oss << "-------------------------------------------------------------\n";
   for(uint i=0; i<SQScompare_cluster_list.size(); i++) {
     oss << setw(10)
-	<< SQScompare_cluster_list.at(i).pair_name
-	<< setw(20)
-	<< SQScompare_cluster_list.at(i).correlation
-	<< setw(20)
-	<< SQScompare_cluster_list.at(i).correlation_random_structure
-	<< endl;
+      << SQScompare_cluster_list.at(i).pair_name
+      << setw(20)
+      << SQScompare_cluster_list.at(i).correlation
+      << setw(20)
+      << SQScompare_cluster_list.at(i).correlation_random_structure
+      << endl;
   }
 
 }
@@ -4151,7 +4138,7 @@ bool ceSL::IsPrimitiveCell() {
 
 
       for(int l1=1; l1<4; l1++) {
-	atom4.fpos[l1] = atom4.fpos[l1] - int(atom4.fpos[l1]+_EQUAL_DOUBLE*0.1);
+        atom4.fpos[l1] = atom4.fpos[l1] - int(atom4.fpos[l1]+_EQUAL_DOUBLE*0.1);
       }
 
       //cerr << atom4.fpos[1]
@@ -4162,9 +4149,9 @@ bool ceSL::IsPrimitiveCell() {
       //    << endl;
 
       for(uint l1=1; l1<4; l1++) {
-	if(atom4.fpos[l1] < 0) {
-	  atom4.fpos[l1] += abs(int(atom4.fpos[l1])) + 1.0;
-	}
+        if(atom4.fpos[l1] < 0) {
+          atom4.fpos[l1] += abs(int(atom4.fpos[l1])) + 1.0;
+        }
       }
 
       //cerr << atom4.fpos[1]
@@ -4177,11 +4164,11 @@ bool ceSL::IsPrimitiveCell() {
       // get the new atom's type
 
       for(uint l1=0; l1<structure.atoms.size();l1++) {
-	atom3 = structure.atoms.at(l1);
-	if(( modulus(atom4.fpos - atom3.fpos)) < _EQUAL_DOUBLE) {
-	  atom4.name = atom3.name;
-	  break;
-	}
+        atom3 = structure.atoms.at(l1);
+        if(( modulus(atom4.fpos - atom3.fpos)) < _EQUAL_DOUBLE) {
+          atom4.name = atom3.name;
+          break;
+        }
       }
 
       // cerr << "atom4 " << atom4.name << "  atom2 " << atom2.name << endl;

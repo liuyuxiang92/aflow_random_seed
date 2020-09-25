@@ -22,7 +22,7 @@ using std::string;
 #define CHMODWEB FALSE
 #define INF 1E9
 #define ENERGY_ATOM_ERROR_meV 50
-#define PRESSURE_ZERO_ENTHALPY_ENERGY 1e-6
+#define PRESSURE_ZERO_ENTHALPY_ENERGY _FLOAT_TOL_ //1e-6
 
 extern vector<string> vLibrary_LIB2;   // need to remove somwhoe
 extern vector<string> vLibrary_LIB3;
@@ -51,12 +51,13 @@ namespace aflowlib {
       string auid;                                              // AFLOW UNIQUE IDENTIFIER
       deque<string> vauid;                                      // AFLOW UNIQUE IDENTIFIER SPLIT
       string aurl;deque<string> vaurl;                          // AFLOW RESEARCH LOCATOR and TOKENS
-      string title;                                             //ME20190125 - title of the calculation
+      string system_name;                                       //ME20190125 - system_name of the calculation
       string keywords;deque<string> vkeywords;                  // keywords inside
-      string aflowlib_date,aflowlib_version;                    // version/creation
+      string aflowlib_date;vector<string> vaflowlib_date;       // CONTAINS 2 DATES: [0]=lock_date, [1]=lib2raw_date
+      string aflowlib_version;                                  // version
       string aflowlib_entries;vector<string> vaflowlib_entries; // this contains the subdirectories that can be associated
       int aflowlib_entries_number;                              // their number
-      string aflow_version;                                     // version/creation
+      string aflow_version;                                     // version
       string catalog;                                           // ICSD,LIB2, etc.
       string data_api,data_source,data_language;                // version/source/language
       string error_status;                                            // ERROR ??
@@ -90,6 +91,9 @@ namespace aflowlib {
       double kpoints_bands_path_grid;
       double enthalpy_cell,enthalpy_atom;
       double enthalpy_formation_cell,enthalpy_formation_atom;
+      double enthalpy_formation_cce_300K_cell,enthalpy_formation_cce_300K_atom; //CO20200624
+      double enthalpy_formation_cce_0K_cell,enthalpy_formation_cce_0K_atom; //CO20200624
+      double entropy_forming_ability; //CO20200624
       double entropic_temperature;
       string files;vector<string> vfiles;
       string files_LIB;vector<string> vfiles_LIB;
@@ -192,6 +196,7 @@ namespace aflowlib {
       string anrl_parameter_list_relax;
       string anrl_parameter_values_relax;
       //DX20190208 - added anrl info - END
+      string pocc_parameters; //CO20200731
       // AGL/AEL
       double agl_thermal_conductivity_300K;//  (W/m*K)
       double agl_debye;//  (K)
@@ -254,7 +259,10 @@ namespace aflowlib {
       uint url2aflowlib(const string& url,ostream& oss,bool=TRUE); // load from the web (VERBOSE)
       string aflowlib2string(string="out");                      //
       string aflowlib2file(string file,string="out");            //
-      bool directory2auid(string directory);                                                // from directory and AURL gives AUID and VAUID
+      string POCCdirectory2MetadataAUIDjsonfile(const string& directory,uint salt=0);           //CO20200624 - get contents of auid_metadata.json 
+      bool directory2auid(const string& directory);                                         // from directory and AURL gives AUID and VAUID
+      double enthalpyFormationCell(int T=300) const;                                        //CO20200624 - CCE correction added
+      double enthalpyFormationAtom(int T=300) const;                                        //CO20200624 - CCE correction added
       void correctBadDatabase(bool verbose=true,ostream& oss=cout);                         //CO20171202 - apennsy fixes
       void correctBadDatabase(ofstream& FileMESSAGE,bool verbose=true,ostream& oss=cout);   //CO20171202 - apennsy fixes
       bool ignoreBadDatabase() const;                                                       //CO20171202 - apennsy fixes
@@ -268,6 +276,7 @@ namespace aflowlib {
 }
 
 namespace aflowlib {
+  string VASPdirectory2auid(const string& directory,const string& aurl);   //CO20200624 - moving from inside _aflowlib_entry
   uint auid2vauid(const string auid, deque<string>& vauid);                // splits the auid into vauid
   string auid2directory(const string auid);                                // gives AUID directory from existence of vauid
 }
@@ -364,30 +373,34 @@ namespace aflowlib {
 // ***************************************************************************
 // LIBS to RAWS of each entry
 namespace aflowlib {
-  uint GetSpeciesDirectory(string directory,vector<string>& vspecies);
+  uint GetSpeciesDirectory(const string& directory,vector<string>& vspecies);
 }
 namespace aflowlib {
   void XFIX_LIBRARY_ALL(string LIBRARY_IN,vector<string>);
   // void LIB2RAW_LIBRARY_ALL(string LIBRARY_IN);
-  string LIB2RAW_CheckProjectFromDirectory(string directory);
+  string LIB2RAW_CheckProjectFromDirectory(const string& directory);
   bool LIB2RAW_ALL(string options,bool overwrite);
-  bool LIB2RAW_FileNeeded(string directory_LIB,string fileLIB,string directory_RAW,string fileRAW,vector<string> &vfiles,string MESSAGE);
+  bool LIB2RAW_FileNeeded(string directory_LIB,string fileLIB,string directory_RAW,string fileRAW,vector<string> &vfiles,const string& MESSAGE);
   // [OBSOLETE] bool LIB2RAW(vector<string> argv,bool overwrite);
-  bool LIB2RAW(string options,bool overwrite,bool LOCAL=false);
+  void CleanDirectoryLIB(string& directory);  //CO20200624
+  bool LIB2RAW(const string& options,bool overwrite,bool LOCAL=false);
   bool XPLUG_CHECK_ONLY(const vector<string>& argv); //CO20200501
   bool XPLUG_CHECK_ONLY(const vector<string>& argv,deque<string>& vdirsOUT,deque<string>& vzips,deque<string>& vcleans); //CO20200501
   bool XPLUG(const vector<string>& argv);  //CO20200501
   bool AddFileNameBeforeExtension(string _file,string addendum,string& out_file); //CO20171025
-  bool LIB2RAW_Loop_Thermodynamics(string& directory_LIB,string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry&,string MESSAGE,bool LOCAL=false);
-  // [OBSOLETE]  bool LIB2RAW_Loop_DATA(string& directory_LIB,string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry& data,string MESSAGE);
-  bool LIB2RAW_Loop_Bands(string& directory_LIB,string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry&,string MESSAGE);
-  bool LIB2RAW_Loop_Magnetic(string& directory_LIB,string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry&,string MESSAGE);
-  bool LIB2RAW_Loop_Bader(string& directory_LIB,string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry&,string MESSAGE);
-  bool LIB2RAW_Loop_AGL(string& directory_LIB,string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry&,string MESSAGE);
-  bool LIB2RAW_Loop_AEL(string& directory_LIB,string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry&,string MESSAGE);
-  bool LIB2RAW_Loop_LOCK(string& directory_LIB,string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry& data,string MESSAGE);
-  bool LIB2RAW_Loop_PATCH(string& directory_LIB,string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry& data,string MESSAGE);
-  bool LIB2LIB(string options,bool overwrite,bool LOCAL=false); //CT20181212
+  bool LIB2RAW_Calculate_FormationEnthalpy(aflowlib::_aflowlib_entry& data,const xstructure& xstr,const string& MESSAGE); //CO20200731
+  bool LIB2RAW_Loop_Thermodynamics(const string& directory_LIB,const string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry&,const string& MESSAGE,bool LOCAL=false);
+  // [OBSOLETE]  bool LIB2RAW_Loop_DATA(const string& directory_LIB,const string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry& data,const string& MESSAGE);
+  bool LIB2RAW_Loop_Static(const string& directory_LIB,const string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry&,const string& MESSAGE);  //CO20200731
+  bool LIB2RAW_Loop_Bands(const string& directory_LIB,const string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry&,const string& MESSAGE);
+  bool LIB2RAW_Loop_Magnetic(const string& directory_LIB,const string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry&,const string& MESSAGE);
+  bool LIB2RAW_Loop_Bader(const string& directory_LIB,const string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry&,const string& MESSAGE);
+  bool LIB2RAW_Loop_AGL(const string& directory_LIB,const string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry&,const string& MESSAGE);
+  bool LIB2RAW_Loop_AEL(const string& directory_LIB,const string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry&,const string& MESSAGE);
+  bool LIB2RAW_Loop_LOCK(const string& directory_LIB,const string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry& data,const string& MESSAGE);
+  bool LIB2RAW_Loop_POCC(const string& directory_LIB,const string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry& data,const string& MESSAGE);  //CO20200624
+  bool LIB2RAW_Loop_PATCH(const string& directory_LIB,const string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry& data,const string& MESSAGE);
+  bool LIB2LIB(const string& options,bool overwrite,bool LOCAL=false); //CT20181212
 }
 
 namespace aflowlib {
@@ -503,7 +516,7 @@ namespace aflowlib {
 
   struct DBStats {
     vector<string> columns;
-    vector<int> count;
+    vector<vector<int> > count;  // 2D to accommodate bool
     vector<std::pair<string, int> > loop_counts;
     vector<string> max;
     vector<string> min;
@@ -511,13 +524,14 @@ namespace aflowlib {
     int nsystems;
     vector<vector<string> > set;
     vector<string> species;
+    vector<string> types;
     string catalog;
   };
 
-  class AflowDB {
+  class AflowDB : public xStream {
     public:
-      AflowDB(const string&);
-      AflowDB(const string&, const string&, const string&);
+      AflowDB(const string&, ostream& oss=std::cout);
+      AflowDB(const string&, const string&, const string&, ostream& oss=std::cout);
       AflowDB(const AflowDB&);
       AflowDB& operator=(const AflowDB&);
       ~AflowDB();
@@ -529,27 +543,31 @@ namespace aflowlib {
 
       bool isTMP();
 
-      bool rebuildDatabase(bool=false);
+      int rebuildDatabase(bool force_rebuild=false);
+      int rebuildDatabase(const string&, bool force_rebuild=false);
+      int rebuildDatabase(const vector<string>&, bool force_rebuild=false);
+      int patchDatabase(const string&, bool check_timestamps=false);
+      int patchDatabase(const vector<string>&, bool check_timestamps=false);
       void analyzeDatabase(const string&);
 
-      vector<string> getTables(string="");
-      vector<string> getTables(sqlite3*, string="");
+      vector<string> getTables(const string& where="");
+      vector<string> getTables(sqlite3*, const string& where="");
 
       vector<string> getColumnNames(const string&);
       vector<string> getColumnNames(sqlite3*, const string&);
       vector<string> getColumnTypes(const string&);
       vector<string> getColumnTypes(sqlite3*, const string&);
 
-      string getValue(const string&, const string&, string="");
-      string getValue(sqlite3*, const string&, const string&, string="");
-      string getProperty(const string&, const string&, const string&, string="");
-      string getProperty(sqlite3*, const string&, const string&, const string&, string="");
-      vector<string> getPropertyMultiTables(const string&, const vector<string>&, const string&, string="");
-      vector<string> getPropertyMultiTables(sqlite3*, const string&, const vector<string>&, const string&, string="");
-      vector<string> getSet(const string&, const string&, bool=false, string="", int=0, string="");
-      vector<string> getSet(sqlite3*, const string&, const string&, bool=false, string="", int=0, string="");
-      vector<string> getSetMultiTables(const vector<string>&, const string&, bool=false, string="", int=0);
-      vector<string> getSetMultiTables(sqlite3*, const vector<string>&, const string&, bool=false, string="", int=0);
+      string getValue(const string&, const string&, const string& where="");
+      string getValue(sqlite3*, const string&, const string&, const string& where="");
+      string getProperty(const string&, const string&, const string&, const string& where="");
+      string getProperty(sqlite3*, const string&, const string&, const string&, const string& where="");
+      vector<string> getPropertyMultiTables(const string&, const vector<string>&, const string&, const string& where="");
+      vector<string> getPropertyMultiTables(sqlite3*, const string&, const vector<string>&, const string&, const string& where="");
+      vector<string> getSet(const string&, const string&, bool distinct=false, const string& where="", int limit=0, const string& order_by="");
+      vector<string> getSet(sqlite3*, const string&, const string&, bool distinct=false, const string& where="", int limit=0, const string& order_by="");
+      vector<string> getSetMultiTables(const vector<string>&, const string&, bool distinct=false, const string& where="", int limit=0);
+      vector<string> getSetMultiTables(sqlite3*, const vector<string>&, const string&, bool distinct=false, const string& where="", int limit=0);
 
       void transaction(bool);
 
@@ -562,21 +580,27 @@ namespace aflowlib {
       sqlite3* db;
       bool is_tmp;
 
-      void openTmpFile(int = SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_FULLMUTEX);
-      bool closeTmpFile(bool=false, bool=false);
+      void openTmpFile(int open_flags=SQLITE_OPEN_READWRITE|SQLITE_OPEN_CREATE|SQLITE_OPEN_FULLMUTEX, bool copy_original=false);
+      bool closeTmpFile(bool force_copy=false, bool keep=false, bool nocopy=false);
 
       void rebuildDB();
       void buildTables(int, int, const vector<string>&, const vector<string>&);
       void populateTable(const string&, const vector<string>&, const vector<vector<string> >&);
 
+      uint applyPatchFromJsonl(const vector<string>&);
+      bool auidInDatabase(const string&);
+      void updateEntry(const string&, const vector<string>&, const vector<string>&);
+
       vector<string> getSchemaKeys();
       vector<string> getDataTypes(const vector<string>&, bool);
       vector<string> getDataValues(const string&, const vector<string>&, const vector<string>&);
+      vector<string> extractJsonKeysAflow(const string&);
       string extractJsonValueAflow(const string&, string);
 
+      DBStats initDBStats(const string&, const vector<string>&, const vector<string>&);
       DBStats getCatalogStats(const string&, const vector<string>&, const vector<string>&, const vector<string>&);
       void getColStats(int, int, const string&, const vector<string>&, const vector<string>&,
-          const vector<string>&, vector<vector<int> >&, vector<vector<int> >&,
+          const vector<string>&, const vector<string>&, vector<vector<vector<int> > >&, vector<vector<int> >&,
           vector<vector<vector<string> > >&, vector<vector<vector<string> > >&);
       vector<string> getUniqueFromJsonArrays(const vector<string>&);
       void writeStatsToJson(std::stringstream&, const DBStats&);
@@ -588,8 +612,9 @@ namespace aflowlib {
       void createTable(const string&, const vector<string>&, const vector<string>&);
       void insertValues(const string&, const vector<string>&);
       void insertValues(const string&, const vector<string>&, const vector<string>&);
-      string prepareSELECT(const string&, const string&, const string&, string="", int=0, string="");
-      string prepareSELECT(const string&, const string&, const vector<string>&, string="", int=0, string="");
+      void updateRow(const string&, const vector<string>&, const vector<string>&, const string&);
+      string prepareSELECT(const string&, const string&, const string&, const string& where="", int limit=0, const string& order_by="");
+      string prepareSELECT(const string&, const string&, const vector<string>&, const string& where="", int limit=0, const string& order_by="");
   };
 }  // namespace aflowlib
 

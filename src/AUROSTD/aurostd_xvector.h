@@ -56,6 +56,7 @@ namespace aurostd {
         void set(const utype&);
         void reset(void);
         void clear(void);
+        void null(void);  //CO20200731 - to create null vector
       private:
         utype *corpus;
         // bool isfloat,iscomplex;
@@ -247,6 +248,7 @@ namespace aurostd {
 // ----------------------------------------------------------- xvector example types
 namespace aurostd {
   //CO20180419
+  template<class utype> xvector<utype> null_xv() __xprototype;  //CO20200731 - friend so it can access refresh()
   template<class utype> xvector<utype> ones_xv(int=3,int=1) __xprototype;
   template<class utype> xvector<utype> box_filter_xv(int window,int lrows=1) __xprototype;
   template<class utype> xvector<utype> gaussian_filter_xv(utype sigma) __xprototype;  //if you need lrows!=1, use shiftlrows()
@@ -497,6 +499,13 @@ namespace aurostd {
 
   template<class utype> xvector<utype> //get centroid of data points //CO20180409
     getCentroid(const vector<xvector<utype> >& points) __xprototype;
+  template<class utype> xvector<utype> //get centroid of data points with weights //DX20200728
+    getCentroid(const vector<xvector<utype> >& points, const vector<utype>& weights) __xprototype;
+
+  template<class utype> xvector<double> //get centroid of data points //CO20180409
+    getCentroidPBC(const vector<xvector<utype> >& points, const xmatrix<utype>& lattice) __xprototype;
+  template<class utype> xvector<double> //get centroid of data points with weights //DX20200728
+    getCentroidPBC(const vector<xvector<utype> >& points, const vector<utype>& weights, const xmatrix<utype>& lattice) __xprototype;
 
   // TRIGONOMETRIC OPERATIONS BETWEEN TWO GENERAL VECTORS //CO20180409
   template<class utype> xvector<double> 
@@ -513,6 +522,9 @@ namespace aurostd {
 
   template<class utype> bool
     linePlaneIntersect(const xvector<utype>& p0,const xvector<utype>& n,const xvector<utype>& l0, const xvector<utype>& l,double& d,xvector<utype>& intersection); //CO20180520
+
+  template<class utype> xvector<utype> getVectorProjection(const xvector<utype>& b, const xvector<utype>& a);  //ME20200511
+  template<class utype> xvector<utype> getModeratedVectorProjection(const xvector<utype> c, const xvector<utype>& b, const xvector<utype>& a);  //ME20200511
 
   // SIMPLE SORT ROUTINES
   template<class utype> xvector<utype>  // WRAP TO SHELL SHORT
@@ -582,6 +594,8 @@ namespace aurostd { //CO20190419
 namespace aurostd { //CO20190419
   //SOME STATS STUFF
   template<class utype> utype mean(const xvector<utype>& a); //CO20190520
+  template<class utype> utype meanWeighted(const xvector<utype>& a,const xvector<utype>& weights); //CO20190520
+  template<class utype> utype meanWeighted(const xvector<utype>& a,const xvector<utype>& weights,utype& sum_weights); //CO20190520
   template<class utype> utype stddev(const xvector<utype>& a); //CO20190520
   template<class utype> void getQuartiles(const xvector<utype>& _a,utype& q1,utype& q2,utype& q3);  //CO20171202
   template<class utype> utype getMAD(const xvector<utype>& _a,utype median=(utype)AUROSTD_NAN);   //CO20171202, absolute deviation around the median (MAD)

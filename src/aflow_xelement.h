@@ -72,7 +72,6 @@ namespace xelement {
       double hardness_Ghosh;                   // (eV) Int. J. Quantum Chem 110, 1206-1213 (2010) Table III       //DU20190517
       double electronegativity_Pearson;                  // (eV) Inorg. Chem., 27(4), 734–740 (1988)      //DU20190517
       double electronegativity_Ghosh;                    // (eV) Journal of Theoretical and Computational Chemistry, 4, 21-33 (2005)      //DU20190517
-
       //RF+SK20200410 START
       // Allen electronegativities were chosen for CCE since the IUPAC definition of oxidation states seems to use Allen electronegativities and since they also gave the best results
       // https://en.wikipedia.org/wiki/Oxidation_state#Determination
@@ -84,11 +83,11 @@ namespace xelement {
       vector<double> oxidation_states_preferred;
       vector<double> oxidation_states;
       //RF+SK20200410 END
-
       double electron_affinity_PT;             // (kJ/mol)  http://periodictable.com       //DU20190517
       double Miedema_phi_star;                // (V)        (phi^\star   Miedema Rule Table 1a Physica 100B 1-28 (1980)
       double Miedema_nws;                     // (d.u.)^1/3 n_{ws}^{1/3} Miedema Rule Table 1a Physica 100B 1-28 (1980)
       double Miedema_gamma_s;                 // (mJ/m^2)   \gamma_s^0   Miedema Rule Table 1a Physica 100B 1-28 (1980)
+      //
       double Pettifor_scale;                  // Chemical Scale Pettifor Solid State Communications 51 31-34 (1984)
       //                                          
       double boiling_point;                   // (Celsius), http://periodictable.com C:diamond, P:"YELLOW" Phosphorus, As:sublimates at this T.      //DU20190517

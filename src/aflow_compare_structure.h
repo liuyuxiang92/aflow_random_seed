@@ -4,7 +4,7 @@
 // *           Aflow DAVID HICKS - Duke University 2014-2020                 *
 // *                                                                         *
 // ***************************************************************************
-// AFLOW-XtalMatch (compare crystal structures) - Functions
+// AFLOW-XtalFinder (compare crystal structures) - Functions
 // Written by David Hicks (david.hicks@duke.edu) 
 // Contributors: Carlo De Santo
 
@@ -229,12 +229,12 @@ namespace compare{
   void generateStructures(vector<StructurePrototype>& structures, ostream& oss=cout, uint start_index=0, uint end_index=AUROSTD_MAX_UINT); //DX20191122
   bool generateStructure(string& structure_name, string& structure_source, uint relaxation_step, xstructure& structure, ostream& oss); //DX20200429 - added relaxation_step
   void removeNonGeneratedStructures(vector<StructurePrototype>& structures); //DX20191105
-  vector<uint> getStoichiometry(string& compositions, const bool& same_species);
+  //DX20200727 [OBSOLETE] vector<uint> getStoichiometry(string& compositions, const bool& same_species);
   bool addAFLOWPrototypes2StructurePrototypeVector(vector<StructurePrototype>& all_structures, vector<string>& vlabel);
-  string getCompoundName(xstructure& xstr, bool remove_ones=false);
-  string getCompoundName(vector<string>& elements, vector<uint>& stoichiometry, bool remove_ones=false);
-  vector<uint> getStoichiometry(const xstructure& xstr, const bool& same_species);
-  vector<string> getElements(xstructure& xstr);
+  //DX20200727 [OBSOLETE - USE PFLOW] string getCompoundName(xstructure& xstr, bool remove_ones=false);
+  //DX20200727 [OBSOLETE - USE PFLOW] string getCompoundName(vector<string>& elements, vector<uint>& stoichiometry, bool remove_ones=false);
+  //DX20200727 [OBSOLETE - USE PFLOW] vector<uint> getStoichiometry(const xstructure& xstr, const bool& same_species);
+  //DX20200727 [OBSOLETE - USE PFLOW] vector<string> getElements(xstructure& xstr);
   //DX20191125 [OBSOLETE - USING AUROSTD VERSION] vector<uint> gcdStoich(const vector<uint>& numbers); //DX20181009
   //DX20191125 [OBSOLETE - USING AUROSTD VERSION] vector<uint> gcdStoich(const deque<int>& numbers);
   //DX20191108 [OBSOLETE - switching to getThreadDistribution] bool prepareSymmetryThreads(vector<xstructure>& vxstrs, uint& num_proc,
@@ -250,8 +250,9 @@ namespace compare{
   void calculateSymmetries(vector<StructurePrototype>& structures, uint& num_proc);  //DX20190118
   void calculateSymmetry(xstructure& xstr, vector<string>& vpearsons, vector<uint>& vsgroups,
       vector<vector<GroupedWyckoffPosition> >& vgrouped_Wyckoff_positions);
-  bool groupWyckoffPositions(xstructure& xstr, vector<GroupedWyckoffPosition>& grouped_positions);
-  bool groupWyckoffPositionsFromGroupedString(uint& space_group_number, uint& setting, vector<vector<string> >& grouped_Wyckoff_string, vector<GroupedWyckoffPosition>& grouped_positions);
+  bool groupWyckoffPositions(const xstructure& xstr, vector<GroupedWyckoffPosition>& grouped_positions);
+  bool groupWyckoffPositions(const vector<wyckoffsite_ITC>& wyckoff_sites_ITC, vector<GroupedWyckoffPosition>& grouped_positions); //DX20200512
+  bool groupWyckoffPositionsFromGroupedString(uint space_group_number, uint setting, vector<vector<string> >& grouped_Wyckoff_string, vector<GroupedWyckoffPosition>& grouped_positions); //DX20200622 - removed pointer to uints
   string printWyckoffString(const vector<GroupedWyckoffPosition>& grouped_positions, bool alphabetize=false);
   vector<GroupedWyckoffPosition> sortSiteSymmetryOfGroupedWyckoffPositions(const vector<GroupedWyckoffPosition>& grouped_Wyckoffs); //DX20190219
   bool matchableWyckoffPositions(const vector<GroupedWyckoffPosition>& temp_grouped_Wyckoffs,
@@ -415,7 +416,7 @@ namespace compare{
   void rescaleStructure(xstructure& x1, xstructure& x2);
   void atomicNumberDensity(xstructure& xstr1, xstructure& xstr2);
   vector<string> fakeElements(const uint& number_of_species);
-  void fakeAtomsName(xstructure& x1);
+  //DX20200728 [OBSOLETE-MOVED TO XATOM] void fakeAtomsName(xstructure& x1);
   void printParameters(xstructure& xstr, ostream& oss);
   string leastFrequentAtom(const xstructure& xstr);
   vector<string> getLeastFrequentAtomSpecies(const xstructure& xstr);
@@ -441,15 +442,23 @@ namespace compare{
   //DX20191122 [MOVED TO XATOM]     double& min_dist, uint& frequency, vector<xvector<double> >& coordinates); //DX20191105
   //DX20191122 [MOVED TO XATOM] void minimumCoordinationShell(const xstructure& xstr, uint center_index, 
   //DX20191122 [MOVED TO XATOM]     double& min_dist, uint& frequency, vector<xvector<double> >& coordinates, const string& type); //DX20191105
-  xvector<double> centroid_with_PBC(const xstructure& xstr);
-  xvector<double> centroid_with_PBC(vector<xvector<double> >& coordinates, const xmatrix<double>& lattice);
-  xvector<double> centroid_with_PBC(vector<xvector<double> >& coordinates, vector<double>& weights,
-      const xmatrix<double>& lattice);
+  //DX20191122 [MOVED TO XATOM] xvector<double> centroid_with_PBC(const xstructure& xstr);
+  //DX20191122 [COMBINED WITH AUROSTD FUNCTION] xvector<double> centroid_with_PBC(vector<xvector<double> >& coordinates, const xmatrix<double>& lattice);
+  //DX20191122 [COMBINED WITH AUROSTD FUNCTION] xvector<double> centroid_with_PBC(vector<xvector<double> >& coordinates, vector<double>& weights,
+  //DX20191122 [COMBINED WITH AUROSTD FUNCTION]    const xmatrix<double>& lattice);
+  //DX20191122 [MOVED TO XATOM] xvector<double> centroid(const xstructure& xstr); //DX20200715
+  //DX20191122 [COMBINED WITH AUROSTD FUNCTION] xvector<double> centroid(const deque<_atom>& atoms); //DX20200715
+  //DX20191122 [COMBINED WITH AUROSTD FUNCTION] xvector<double> centroid(const vector<xvector<double> >& coordinates); //DX20200715
+  //DX20191122 [COMBINED WITH AUROSTD FUNCTION] xvector<double> centroid(const vector<xvector<double> >& coordinates, const vector<double>& weights); //DX20200715
   //bool findMatch(const xstructure& xstr1, const xstructure& PROTO,vector<uint>& im1, vector<uint>& im2, vector<double>& min_dists, const int& type_match);
   bool findMatch(const deque<_atom>& xstr1_atoms, const deque<_atom>& PROTO_atoms,
       const xmatrix<double>& PROTO_lattice,
+      double minimum_interatomic_distance, //DX20200622
       vector<uint>& mapping_index_str1, vector<uint>& mapping_index_str2, vector<double>& min_dists,
-      const int& type_match); //DX20190716
+      int type_match,
+      xvector<double>& origin_shift); //DX20190716
+  vector<xvector<double> > minimizeMappingDistances(const vector<xvector<double> >& distance_vectors); //DX20200909
+  vector<xvector<double> > minimizeMappingDistances(const vector<xvector<double> >& distance_vectors, xvector<double>& origin_shift); //DX20200909
   void clusterize(const xstructure& xstr1, const vector<uint>& im1, vector<string>& TYPE1,
       vector<uint>& QTA1, vector<vector<uint> >& I1);
   bool sameAtomType(const xstructure& xstr1, const xstructure& xstr2, const vector<uint>& im1,

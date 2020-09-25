@@ -129,6 +129,7 @@ Code     Error Type          Error                     Name of Constant
   50     Runtime Error       generic                   _RUNTIME_ERROR_
   51                         not initialized           _RUNTIME_INIT_
   52                         SQL error                 _RUNTIME_SQL_
+  53                         busy                      _RUNTIME_BUSY_
   60     Allocation Error    generic                   _ALLOC_ERROR_
   61                         could not allocate        _ALLOC_ALLOCATE_
   62                         insufficient memory       _ALLOC_INSUFFICIENT_
@@ -200,6 +201,9 @@ Code     Error Type          Error                     Name of Constant
                        may throw such an error.
 
   52. SQL Error: Used when SQLite returns an error.
+
+  53. Busy: Used when a required process is busy or when a file is already accessed by another
+            process. Can also be used to prevent concurrent execution of a function or process.
 
 [61 - 69] Allocation Error: Errors associated with memory allocation.
 

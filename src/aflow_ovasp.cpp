@@ -47,6 +47,7 @@ void xOUTCAR::free() {
   NIONS=0;                      // for aflowlib_libraries.cpp
   Efermi=0.0;                   // for aflowlib_libraries.cpp
   isLSCOUPLING=FALSE;           // for aflowlib_libraries.cpp
+  nelectrons = 0;               // AS20200528
   natoms=0.0;                   // for aflowlib_libraries.cpp
   energy_cell=0.0;              // for aflowlib_libraries.cpp
   energy_atom=0.0;              // for aflowlib_libraries.cpp
@@ -217,6 +218,7 @@ void xOUTCAR::copy(const xOUTCAR& b) { // copy PRIVATE
   NIONS=b.NIONS;
   Efermi=b.Efermi;
   isLSCOUPLING=b.isLSCOUPLING;
+  nelectrons=b.nelectrons; //AS20200528
   natoms=b.natoms;                              // for aflowlib_libraries.cpp
   energy_cell=b.energy_cell;                    // for aflowlib_libraries.cpp
   energy_atom=b.energy_atom;                    // for aflowlib_libraries.cpp
@@ -356,6 +358,7 @@ ostream& operator<<(ostream& oss, const xOUTCAR& xOUT) {  //SC20200330
   oss << " NIONS=" << xOUT.NIONS << endl;
   oss << " Efermi=" << xOUT.Efermi << endl;
   oss << " isLSCOUPLING=" << xOUT.isLSCOUPLING << endl;
+  oss << " nelectrons=" << xOUT.nelectrons << endl; //AS20200528
   oss << " natoms=" << xOUT.natoms << endl;
   oss << " energy_cell=" << xOUT.energy_cell << endl;
   oss << " energy_atom=" << xOUT.energy_atom << endl;
@@ -499,7 +502,6 @@ bool xOUTCAR::GetPropertiesFile(const string& fileIN,uint natoms_check,bool QUIE
   bool flag=GetPropertiesFile(fileIN,QUIET);
   if(aurostd::abs(natoms_check-(double) natoms)>0.1) { 
     //[CO20200404 - OBSOLETE]cerr << "ERROR xOUTCAR::GetPropertiesFile: natoms_check(" << natoms_check << ")!= (int) natoms(" << natoms << ") ..." << endl;
-    //[CO20200404 - OBSOLETE]exit(0);
     string soliloquy="xOUTCAR::GetPropertiesFile():";
     stringstream message;
     message << "natoms_check(" << natoms_check << ")!= (int) natoms(" << natoms << ")";
@@ -616,7 +618,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   bool LDEBUG=(FALSE || XHOST.DEBUG || !QUIET);
   string soliloquy=XPID+"xOUTCAR::GetProperties():";
   stringstream message;
-  bool force_exit=!XHOST.GENERATE_AFLOWIN_ONLY; //SC wants to exit here so we can fix the problem  // ME20200604 - do not exit with generate_aflowin_only
+  bool force_exit=XHOST.POSTPROCESS; //SC wants to exit here so we can fix the problem  // ME20200604 - do not exit with generate_aflowin_only
 
   bool ERROR_flag=FALSE;
   clear(); // so it does not mess up vector/deque
@@ -688,9 +690,9 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
       Efermi=aurostd::string2utype<double>(tokens.at(2));
     }
   }
-  if(LDEBUG) cerr << soliloquy << " NIONS=" << NIONS << endl; //exit(0);
-  if(LDEBUG) cerr << soliloquy << " isLSCOUPLING=" << isLSCOUPLING << endl; //exit(0);
-  if(LDEBUG) cerr << soliloquy << " Efermi=" << Efermi << endl; //exit(0);
+  if(LDEBUG) cerr << soliloquy << " NIONS=" << NIONS << endl;
+  if(LDEBUG) cerr << soliloquy << " isLSCOUPLING=" << isLSCOUPLING << endl;
+  if(LDEBUG) cerr << soliloquy << " Efermi=" << Efermi << endl;
   // return TRUE;
   // ----------------------------------------------------------------------
   // DO SC STUFF
@@ -714,11 +716,11 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     message << "Wrong number of entries (entropy) in OUTCAR; line=[ " << line << "]" << "   filename=[" << filename << "]";
     pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
     ERROR_flag=TRUE;
-  }//exit(0); //CO20200106 - patching for auto-indenting
+  }
   eentropy_cell=0;
   if(tokens.size()>1) eentropy_cell=aurostd::string2utype<double>(tokens.at(1));
   eentropy_atom=eentropy_cell/natoms;
-  if(LDEBUG) cerr << soliloquy << " eentropy_cell=" << eentropy_cell << endl; //exit(0);
+  if(LDEBUG) cerr << soliloquy << " eentropy_cell=" << eentropy_cell << endl;
   // LOAD ENERGY DATA  // without energy of electrons
   if(LDEBUG) cerr << soliloquy << " LOAD ENERGY DATA" << endl;
   line="";
@@ -736,7 +738,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     message << "Wrong number of entries (energy_1) in OUTCAR; line=[ " << line << "]" << "   filename=[" << filename << "]";
     pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
     ERROR_flag=TRUE;
-  }//exit(0); //CO20200106 - patching for auto-indenting
+  }
   if(tokens.size()>1) line=tokens.at(1);
   aurostd::string2tokens(line,tokens,"e");
   if(tokens.size()==0) {
@@ -744,7 +746,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     message << "Wrong number of entries (energy_2) in OUTCAR; line=[ " << line << "]" << "   filename=[" << filename << "]";
     pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
     ERROR_flag=TRUE;
-  }//exit(0); //CO20200106 - patching for auto-indenting
+  }
   if(tokens.size()>0) energy_cell=aurostd::string2utype<double>(tokens.at(0));
   energy_atom=energy_cell/natoms;
   if(LDEBUG) cerr << soliloquy << " energy_cell=" << energy_cell << " energy_atom=" << energy_atom << endl; 
@@ -773,7 +775,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
       message << "Wrong number of entries (PV) in OUTCAR; line=[ " << line << "]" << "   filename=[" << filename << "]";
       pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
       ERROR_flag=TRUE;
-    }//exit(0); //CO20200106 - patching for auto-indenting
+    }
     if(tokens.size()>2) PV_cell=aurostd::string2utype<double>(tokens.at(2));
     PV_atom=PV_cell/natoms;
     if(LDEBUG) cerr << soliloquy << " PV_cell=" << PV_cell << " PV_atom=" << PV_atom << endl; 
@@ -796,7 +798,6 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
         } 
     if(LDEBUG) cerr << soliloquy << " line=" << line << endl;
     aurostd::string2tokens(line,tokens," ");
-    //    if(tokens.size()==0) {if(!QUIET) cerr << "WARNING - "<< soliloquy << " wrong number of entries (enthalpy_1) in OUTCAR; line=[ " << line << "]" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;}//exit(0); //CO20200106 - patching for auto-indenting 
 
     if(tokens.size()!=0) {
       for(int i=tokens.size()-2;i>=0;i--)
@@ -887,7 +888,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     message << "Wrong number of entries (Pulay stress) in OUTCAR; line=[ " << line << "]" << "   filename=[" << filename << "]";
     pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
     ERROR_flag=TRUE;
-  }//exit(0); //CO20200106 - patching for auto-indenting
+  }
 
   pressure_residual=0;
   Pulay_stress=0;
@@ -1035,7 +1036,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
           message << "Wrong number of force/positions entries in OUTCAR; line=[ " << vcontent.at(iline+iat+2) << "]" << "   filename=[" << filename << "]";
           pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
           ERROR_flag=TRUE;
-        }//exit(0); //CO20200106 - patching for auto-indenting
+        }
         vpositions_cartesian.at(iat)[1]=aurostd::string2utype<double>(tokens.at(0));
         vpositions_cartesian.at(iat)[2]=aurostd::string2utype<double>(tokens.at(1));
         vpositions_cartesian.at(iat)[3]=aurostd::string2utype<double>(tokens.at(2));
@@ -1088,7 +1089,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     message << "Wrong number of \"Ionic relaxation\" in OUTCAR" << "   filename=[" << filename << "]";
     pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
     ERROR_flag=TRUE;
-  }//exit(0);  //CO20200106 - patching for auto-indenting
+  }
   for(uint j=0;j<vline.size();j++) {   // to the back
     //   if(LDEBUG) cerr << soliloquy << " vline.at(" << j << ")=" << vline.at(j) << endl;
     aurostd::StringSubst(vline.at(j),"="," ");
@@ -1179,6 +1180,8 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     if(aurostd::substring2bool(vcontentRED.at(iline),"EAUG")) vline.push_back(vcontentRED.at(iline));
     if(aurostd::substring2bool(vcontentRED.at(iline),"RAUG") && aurostd::substring2bool(vcontentRED.at(iline),"sphere")) vline.push_back(vcontentRED.at(iline));
     if(aurostd::substring2bool(vcontentRED.at(iline),"RMAX") && aurostd::substring2bool(vcontentRED.at(iline),"radius")) vline.push_back(vcontentRED.at(iline));
+    //AS20200528
+    if(aurostd::substring2bool(vcontentRED.at(iline),"NELECT") && aurostd::substring2bool(vcontentRED.at(iline),"total number of electrons")) vline.push_back(vcontentRED.at(iline));
   }
   if(LDEBUG) cerr << soliloquy << " vline.size()=" << vline.size() << " (" << time_delay(seconds) << ")" << endl;
   if(vline.size()==0) {
@@ -1186,7 +1189,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     message << "Wrong number of \"ENMAX ENMIN POMASS ZVAL EATOM RCORE RWIGS EAUG RAUG RMAX\" in OUTCAR" << "   filename=[" << filename << "]";
     pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
     ERROR_flag=TRUE;
-  }//exit(0);  //CO20200106 - patching for auto-indenting
+  }
   for(uint j=0;j<vline.size();j++) {
     // if(LDEBUG) cerr << soliloquy << " vline.at(" << j << ")=" << vline.at(j) << endl;
     aurostd::StringSubst(vline.at(j),"="," ");
@@ -1204,6 +1207,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
       if(tokens.at(k)=="EAUG" && k+1<tokens.size()) vEAUG.push_back(aurostd::string2utype<double>(tokens.at(k+1)));
       if(tokens.at(k)=="RAUG" && k+1<tokens.size()) vRAUG.push_back(aurostd::string2utype<double>(tokens.at(k+1)));
       if(tokens.at(k)=="RMAX" && k+1<tokens.size()) vRMAX.push_back(aurostd::string2utype<double>(tokens.at(k+1)));
+      if(tokens.at(k)=="NELECT" && k+1<tokens.size()) nelectrons=aurostd::string2utype<int>(tokens.at(k+1));//AS20200528
     }
   }
 
@@ -1307,48 +1311,41 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     message << "Wrong number of pseudopotentials (TITEL) in OUTCAR" << "   filename=[" << filename << "]";
     pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
     ERROR_flag=TRUE;  
-    //[CO20200404 - OBSOLETE]exit(0);
   } //CO20200106 - patching for auto-indenting
   if(vLEXCH.size()==0) {
     //[CO20200404 - OBSOLETE]if(!QUIET) cerr << "WARNING - "<< soliloquy << " wrong number of pseudopotentials (LEXCH) in OUTCAR" << "   filename=[" << filename << "]" << endl;
     message << "Wrong number of pseudopotentials (LEXCH) in OUTCAR" << "   filename=[" << filename << "]";
     pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
     ERROR_flag=TRUE;  
-    //[CO20200404 - OBSOLETE]exit(0);
   } //CO20200106 - patching for auto-indenting
   if(vEATOM.size()==0) {
     message << "Wrong number of pseudopotentials (EATOM) in OUTCAR" << "   filename=[" << filename << "]";
     pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
     ERROR_flag=TRUE;
-    //[CO20200404 - OBSOLETE]exit(0);
   } //CO20200106 - patching for auto-indenting
   if(vRMAX.size()==0) {
     //[CO20200404 - OBSOLETE]if(!QUIET) cerr << "WARNING - "<< soliloquy << " wrong number of pseudopotentials (RMAX) in OUTCAR" << "   filename=[" << filename << "]" << endl;
     message << "Wrong number of pseudopotentials (RMAX) in OUTCAR" << "   filename=[" << filename << "]";
     pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
     ERROR_flag=TRUE;
-    //[CO20200404 - OBSOLETE]exit(0);
   }   //CO20200106 - patching for auto-indenting
   if(vTITEL.size()!=vLEXCH.size()) {
     //[CO20200404 - OBSOLETE]if(!QUIET) cerr << "WARNING - "<< soliloquy << " wrong number of pseudopotentials (TITEL/LEXCH) in OUTCAR" << "   filename=[" << filename << "]" << endl;
     message << "Wrong number of pseudopotentials (TITEL/LEXCH) in OUTCAR" << "   filename=[" << filename << "]";
     pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
     ERROR_flag=TRUE;
-    //[CO20200404 - OBSOLETE]exit(0);
   } //CO20200106 - patching for auto-indenting
   if(vLEXCH.size()!=vEATOM.size()) {
     //[CO20200404 - OBSOLETE]if(!QUIET) cerr << "WARNING - "<< soliloquy << " wrong number of pseudopotentials (LEXCH/EATOM) in OUTCAR" << "   filename=[" << filename << "]" << endl;
     message << "Wrong number of pseudopotentials (LEXCH/EATOM) in OUTCAR" << "   filename=[" << filename << "]";
     pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
     ERROR_flag=TRUE;
-    //[CO20200404 - OBSOLETE]exit(0);
   } //CO20200106 - patching for auto-indenting
   if(vEATOM.size()!=vRMAX.size()) {
     //[CO20200404 - OBSOLETE]if(!QUIET) cerr << "WARNING - "<< soliloquy << " wrong number of pseudopotentials (EATOM/RMAX) in OUTCAR" << "   filename=[" << filename << "]" << endl;
     message << "Wrong number of pseudopotentials (EATOM/RMAX) in OUTCAR" << "   filename=[" << filename << "]";
     pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
     ERROR_flag=TRUE;
-    //[CO20200404 - OBSOLETE]exit(0);
   }   //CO20200106 - patching for auto-indenting
 
   for(uint j=0;j<vTITEL.size();j++) {
@@ -1449,27 +1446,23 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
       message << "species_pp_vLDAU.size()[" << species_pp_vLDAU.size() << "] != species.size()[" << species.size() << "]" << "   filename=[" << filename << "]";
       pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
       ERROR_flag=TRUE;
-      //exit(0);
     }
     if(species_pp_vLDAU.size()!=vLDAUL.size()) {
       //[CO20200404 - OBSOLETE]if(!QUIET) cerr << soliloquy << " ERROR - species_pp_vLDAU.size()[" << species_pp_vLDAU.size() << "] != vLDAUL.size()[" << vLDAUL.size() << "]" << "   filename=[" << filename << "]" << endl;
       message << "species_pp_vLDAU.size()[" << species_pp_vLDAU.size() << "] != vLDAUL.size()[" << vLDAUL.size() << "]" << "   filename=[" << filename << "]";
       pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
       ERROR_flag=TRUE;
-      //exit(0);
     }
     if(species_pp_vLDAU.size()!=vLDAUU.size()) {
       //[CO20200404 - OBSOLETE]if(!QUIET) cerr << soliloquy << " ERROR - species_pp_vLDAU.size()[" << species_pp_vLDAU.size() << "] != vLDAUU.size()[" << vLDAUU.size() << "]" << "   filename=[" << filename << "]" << endl;
       message << "species_pp_vLDAU.size()[" << species_pp_vLDAU.size() << "] != vLDAUU.size()[" << vLDAUU.size() << "]" << "   filename=[" << filename << "]";
       ERROR_flag=TRUE;
-      //exit(0);
     }
     if(species_pp_vLDAU.size()!=vLDAUJ.size()) {
       //[CO20200404 - OBSOLETE]if(!QUIET) cerr << soliloquy << " ERROR - species_pp_vLDAU.size()[" << species_pp_vLDAU.size() << "] != vLDAUJ.size()[" << vLDAUJ.size() << "]" << "   filename=[" << filename << "]" << endl;
       message << "species_pp_vLDAU.size()[" << species_pp_vLDAU.size() << "] != vLDAUJ.size()[" << vLDAUJ.size() << "]" << "   filename=[" << filename << "]";
       pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
       ERROR_flag=TRUE;
-      //exit(0);
     }
     for(uint j=0;j<species.size();j++) {
       species_pp_vLDAU.at(j).push_back(LDAUT);
@@ -1528,7 +1521,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     message << "Wrong number of \"DOS related values\" in OUTCAR" << "   filename=[" << filename << "]";
     pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
     ERROR_flag=TRUE;
-  }//exit(0);  //CO20200106 - patching for auto-indenting
+  }
   for(uint j=0;j<vline.size();j++) {
     //   if(LDEBUG) cerr << soliloquy << " vline.at(" << j << ")=" << vline.at(j) << endl;
     aurostd::StringSubst(vline.at(j),"="," ");
@@ -1573,7 +1566,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     message << "Wrong number of \"Electronic relaxation\" in OUTCAR" << "   filename=[" << filename << "]";
     pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
     ERROR_flag=TRUE;
-  }//exit(0); //CO20200106 - patching for auto-indenting
+  }
   for(uint j=0;j<vline.size();j++) {
     //  if(LDEBUG) cerr << soliloquy << " vline.at(" << j << ")=" << vline.at(j) << endl;
     aurostd::StringSubst(vline.at(j),"="," ");
@@ -1626,7 +1619,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     message << "Wrong number of \"Intra band minimization\" in OUTCAR" << "   filename=[" << filename << "]";
     pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
     ERROR_flag=TRUE;
-  }//exit(0); //CO20200106 - patching for auto-indenting
+  }
   for(uint j=0;j<vline.size();j++) {
     //  if(LDEBUG) cerr << soliloquy << " vline.at(" << j << ")=" << vline.at(j) << endl;
     aurostd::StringSubst(vline.at(j),"="," ");
@@ -1668,7 +1661,6 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   //[CO20200404 - breaks for all OUTCAR.bands]  message << "Wrong number of \" LOAD NWEIGHTS VKPOINT\" in OUTCAR" << "   filename=[" << filename << "]";
   //[CO20200404 - breaks for all OUTCAR.bands]  pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
   //[CO20200404 - breaks for all OUTCAR.bands]  ERROR_flag=TRUE;
-  //[CO20200404 - breaks for all OUTCAR.bands]}//exit(0);  //CO20200106 - patching for auto-indenting
   for(uint j=0;j<vline.size();j++) {
     if(LDEBUG) cerr << soliloquy << " vline.at(" << j << ")=" << vline.at(j) << endl;
     aurostd::StringSubst(vline.at(j),"="," ");
@@ -1696,7 +1688,6 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
         nweights+=aurostd::string2utype<uint>(tokens.at(3));
       } else {
         //	if(!QUIET) cerr << soliloquy << " error in NWEIGHTS/VKPOINT calculation tokens.size()=" << tokens.size() << endl;
-        //	ERROR_flag=TRUE;//exit(0);
       }
     }
     nkpoints_line+=3;
@@ -1711,7 +1702,6 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
         vkpoint_cartesian.push_back(kpoint); // cerr.precision(20);
       } else {
         //	if(!QUIET) cerr << soliloquy << " error in NWEIGHTS/VKPOINT calculation tokens.size()=" << tokens.size() << endl;
-        //	ERROR_flag=TRUE;//exit(0);
       }
     }
   }
@@ -1753,7 +1743,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     message << "In OUTCAR (no calculation_time)" << "   filename=[" << filename << "]";
     pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
     ERROR_flag=TRUE;
-  } // exit(0);  //CO20200106 - patching for auto-indenting
+  }
   aurostd::string2tokens(line,tokens);
   if(tokens.size()>1) calculation_time=aurostd::string2utype<double>(tokens.at(tokens.size()-1));
   if(LDEBUG) cout << soliloquy << " calculation_time=" << calculation_time << endl;
@@ -1770,7 +1760,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     message << "In OUTCAR (no calculation_memory)" << "   filename=[" << filename << "]";
     pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
     ERROR_flag=TRUE;
-  } // exit(0);  //CO20200106 - patching for auto-indenting
+  }
   aurostd::string2tokens(line,tokens); //   cerr << tokens.at(3) << endl;
   if(tokens.size()>3) calculation_memory=aurostd::string2utype<double>(tokens.at(3));
   if(LDEBUG) cout << soliloquy << " calculation_memory=" << calculation_memory << endl;
@@ -2513,7 +2503,7 @@ bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   string soliloquy=XPID+"xOUTCAR::GetBandGap():";
   stringstream message;
-  bool force_exit=!XHOST.GENERATE_AFLOWIN_ONLY; //SC wants to exit here so we can fix the problem  // ME20200604 - do not exit with generate_aflowin_only
+  bool force_exit=XHOST.POSTPROCESS; //SC wants to exit here so we can fix the problem  // ME20200604 - do not exit with generate_aflowin_only
 
   if((content == "") || (vcontent.size() == 0)) {
     //[CO20200404 - OBSOLETE]ERROR = soliloquy + " xOUTCAR needs to be loaded before. \n"
@@ -4171,7 +4161,7 @@ bool xDOSCAR::GetPropertiesUrlFile(const string& url,const string& file,bool VER
 bool xDOSCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   bool LDEBUG=(FALSE || XHOST.DEBUG || !QUIET);
   string soliloquy="xDOSCAR::GetProperties():";
-  bool force_exit=!XHOST.GENERATE_AFLOWIN_ONLY; //SC wants to exit here so we can fix the problem  // ME20200604 - do not exit with generate_aflowin_only
+  bool force_exit=XHOST.POSTPROCESS; //SC wants to exit here so we can fix the problem  // ME20200604 - do not exit with generate_aflowin_only
   stringstream message;
 
   bool ERROR_flag=FALSE;
@@ -4233,11 +4223,15 @@ bool xDOSCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   //ME20190614 START
   uint norbitals = 0;
   int d = 0, e = 0;
-  double dos;
+  double dos = 0.0;
   if (partial) {
     aurostd::string2tokens(vcontent.at(number_energies + 7), tokens, " ");
     int ncols = (int) tokens.size() - 1;  // Don't count the energy column
-    if (carstring == "CAR") {  // VASP DOSCAR
+    if (carstring == "PHON") {  // APL DOSCAR
+      norbitals = ncols;
+      isLSCOUPLING = false;
+      lmResolved = true;
+    } else {  // No special case, so VASP DOSCAR
       // Determine whether the DOSCAR is lm-resolved and/or has spin-orbit coupling (SOC)
       if (ncols == 16) {
         // If the DOSCAR has 16 columns, the variables cannot be properly resolved.
@@ -4312,10 +4306,6 @@ bool xDOSCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
       // Since VASP always prints s, p, and d orbitals, lm-resolved
       // DOSCARS contain at least 9 oribtals
       lmResolved = (norbitals > 8);
-    } else if (carstring == "PHON") {  // APL DOSCAR
-      norbitals = ncols;
-      isLSCOUPLING = false;
-      lmResolved = true;
     }
   }
   if (isLSCOUPLING) {  //ME20190620 - LSCOUPLING has four spin channels
@@ -4579,7 +4569,7 @@ bool xDOSCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   string soliloquy="xDOSCAR::GetBandGap():";
   stringstream message;
-  bool force_exit=!XHOST.GENERATE_AFLOWIN_ONLY; //SC wants to exit here so we can fix the problem  // ME20200604 - do not exit with generate_aflowin_only
+  bool force_exit=XHOST.POSTPROCESS; //SC wants to exit here so we can fix the problem  // ME20200604 - do not exit with generate_aflowin_only
 
   if((content == "") || (vcontent.size() == 0)) {
     //[CO20200404 - OBSOLETE]ERROR = soliloquy + " xDOSCAR needs to be loaded before. \n"
@@ -4884,7 +4874,7 @@ ostream& operator<<(ostream& oss, const xDOSCAR& xdos) {
   oss << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
   oss << std::setprecision(7) << std::scientific;
   oss << std::setw(15) << xdos.Vol;
-  for (int i = 1; i < 4; i++) oss << std::setw(15) << xdos.lattice[i];
+  for (int i = 1; i <= 3; i++) oss << std::setw(15) << xdos.lattice[i];
   oss << std::setw(15) << xdos.POTIM << std::endl;
   oss << "  " << std::setprecision(15) << xdos.temperature << std::endl;
   oss << "  " << xdos.carstring << std::endl;
@@ -5060,7 +5050,7 @@ bool xEIGENVAL::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   bool LDEBUG=(FALSE || XHOST.DEBUG || !QUIET);
   string soliloquy=XPID+"xEIGENVAL::GetProperties():";
   stringstream message;
-  bool force_exit=!XHOST.GENERATE_AFLOWIN_ONLY; //SC wants to exit here so we can fix the problem  // ME20200604 - do not exit with generate_aflowin_only
+  bool force_exit=XHOST.POSTPROCESS; //SC wants to exit here so we can fix the problem  // ME20200604 - do not exit with generate_aflowin_only
 
   bool ERROR_flag=FALSE;
   long double seconds=aurostd::get_seconds();
@@ -7040,7 +7030,10 @@ bool IBZextrema(xEIGENVAL& xeigenval,
               for(uint itr3=0; itr3<curvature.size(); itr3++) all_curves.push_back(curvature.at(itr3)) ;
               curvature.clear() ; posvec.clear() ;
             }
-            exit(0) ;
+            //ME20200724 - there used to be an exit here without comment or explanation
+            string function = "IBZextrema()";
+            string message = "branches.at(itr0).at(itr1)[1] > branches.at(itr0).at(itr1)[2])";
+            throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message);
           } else if(branches.at(itr0).at(itr1)[1] < branches.at(itr0).at(itr1)[2]) {
             for(int itr2=branches.at(itr0).at(itr1)[1]+2; itr2<=branches.at(itr0).at(itr1)[2]-2; itr2++) {
               ndxvec[1] = itr2-2 ;
@@ -7598,7 +7591,7 @@ bool xPOTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   bool LDEBUG=(FALSE || XHOST.DEBUG || !QUIET);
   string soliloquy="xPOTCAR::GetProperties():";
   stringstream message;
-  bool force_exit=!XHOST.GENERATE_AFLOWIN_ONLY; //SC wants to exit here so we can fix the problem  // ME20200604 - do not exit with generate_aflowin_only
+  bool force_exit=XHOST.POSTPROCESS; //SC wants to exit here so we can fix the problem  // ME20200604 - do not exit with generate_aflowin_only
 
   bool ERROR_flag=FALSE;
   // XHOST.PSEUDOPOTENTIAL_GENERATOR=TRUE;
@@ -7650,7 +7643,7 @@ bool xPOTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     message << "Wrong number of \"EATOM RCORE RWIGS EAUG RAUG ENMAX ENMIN POMASS ZVAL RMAX\" in POTCAR" << "   filename=[" << filename << "]" << endl;
     pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
     ERROR_flag=TRUE;
-  }//exit(0);  
+  }
   for(uint j=0;j<vline.size();j++) {
     aurostd::StringSubst(vline.at(j),"="," ");
     aurostd::StringSubst(vline.at(j),";"," ");
@@ -7737,49 +7730,42 @@ bool xPOTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   //ME20200604 - Only exit if force_exit is true
   if(vTITEL.size()==0) {
     //[CO20200404 - OBSOLETE]if(!QUIET) cerr << "WARNING - " << soliloquy << " wrong number of pseudopotentials (TITEL) in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;
-    //[CO20200604 - OBSOLETE]if(force_exit)exit(0);
     message << "Wrong number of pseudopotentials (TITEL) in POTCAR" << "   filename=[" << filename << "]" << endl;
     pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
     ERROR_flag=TRUE;
   } //CO20200106 - patching for auto-indenting
   if(vLEXCH.size()==0) {
     //[CO20200604 - OBSOLETE]if(!QUIET) cerr << "WARNING - " << soliloquy << " wrong number of pseudopotentials (LEXCH) in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;
-    //[CO20200604 - OBSOLETE]if(force_exit)exit(0);
     message << "Wrong number of pseudopotentials (LEXCH) in POTCAR" << "   filename=[" << filename << "]" << endl;
     pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
     ERROR_flag=TRUE;
   } //CO20200106 - patching for auto-indenting
   if(vEATOM.size()==0) {
     //[CO20200604 - OBSOLETE]if(!QUIET) cerr << "WARNING - " << soliloquy << " wrong number of pseudopotentials (EATOM) in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;
-    //[CO20200604 - OBSOLETE]if(force_exit)exit(0);
     message << "Wrong number of pseudopotentials (EATOM) in POTCAR" << "   filename=[" << filename << "]" << endl;
     pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
     ERROR_flag=TRUE;
   } //CO20200106 - patching for auto-indenting
   if(vRMAX.size()==0) {
     //[CO20200604 - OBSOLETE]if(!QUIET) cerr << "WARNING - " << soliloquy << " wrong number of pseudopotentials (RMAX) in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;
-    //[CO20200604 - OBSOLETE]if(force_exit)exit(0);
     message << "Wrong number of pseudopotentials (RMAX) in POTCAR" << "   filename=[" << filename << "]" << endl;
     pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
     ERROR_flag=TRUE;
   }   //CO20200106 - patching for auto-indenting
   if(vTITEL.size()!=vLEXCH.size()) {
     //[CO20200604 - OBSOLETE]if(!QUIET) cerr << "WARNING - " << soliloquy << " wrong number of pseudopotentials (TITEL/LEXCH) in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;
-    //[CO20200604 - OBSOLETE]if(force_exit)exit(0);
     message << "Wrong number of pseudopotentials (TITEL/LEXCH) in POTCAR" << "   filename=[" << filename << "]" << endl;
     pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
     ERROR_flag=TRUE;
   } //CO20200106 - patching for auto-indenting
   if(vLEXCH.size()!=vEATOM.size()) {
     //[CO20200604 - OBSOLETE]if(!QUIET) cerr << "WARNING - " << soliloquy << " wrong number of pseudopotentials (LEXCH/EATOM) in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;
-    //[CO20200604 - OBSOLETE]if(force_exit)exit(0);
     message << "Wrong number of pseudopotentials (LEXCH/EATOM) in POTCAR" << "   filename=[" << filename << "]" << endl;
     pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
     ERROR_flag=TRUE;
   } //CO20200106 - patching for auto-indenting
   if(vEATOM.size()!=vRMAX.size()) {
     //[CO20200604 - OBSOLETE]if(!QUIET) cerr << "WARNING - " << soliloquy << " wrong number of pseudopotentials (EATOM/RMAX) in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;
-    //[CO20200604 - OBSOLETE]if(force_exit)exit(0);
     message << "Wrong number of pseudopotentials (EATOM/RMAX) in POTCAR" << "   filename=[" << filename << "]" << endl;
     pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
     ERROR_flag=TRUE;
@@ -7999,7 +7985,7 @@ bool xVASPRUNXML::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   bool LDEBUG=(FALSE || XHOST.DEBUG || !QUIET);
   string soliloquy=XPID+"xVASPRUNXML::GetProperties():";
   stringstream message;
-  bool force_exit=!XHOST.GENERATE_AFLOWIN_ONLY; //SC wants to exit here so we can fix the problem  // ME20200604 - do not exit with generate_aflowin_only
+  bool force_exit=XHOST.POSTPROCESS; //SC wants to exit here so we can fix the problem  // ME20200604 - do not exit with generate_aflowin_only
   bool ERROR_flag=FALSE;
   long double seconds=aurostd::get_seconds();
   if(LDEBUG) cout << soliloquy << " BEGIN (" << time_delay(seconds) << ")" << endl;
@@ -8059,7 +8045,7 @@ bool xVASPRUNXML::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
           //[CO20200604 - OBSOLETE]if(!QUIET) cerr << soliloquy << " error in QM FORCES calculation" << endl;
           message << "Error in QM FORCES calculation" << endl;
           pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
-          ERROR_flag=TRUE;//exit(0);
+          ERROR_flag=TRUE;
         }
       }
       iline=-1;
@@ -8093,7 +8079,7 @@ bool xVASPRUNXML::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
             //[CO20200604 - OBSOLETE]if(!QUIET) cerr << soliloquy << " error in QM KPOINTLIST calculation" << endl;
             message << "Error in QM KPOINTLIST calculation" << endl;
             pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
-            ERROR_flag=TRUE;//exit(0);
+            ERROR_flag=TRUE;
           }
         }
       }
@@ -8123,7 +8109,7 @@ bool xVASPRUNXML::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
             //[CO20200604 - OBSOLETE]if(!QUIET) cerr << soliloquy << " error in QM WEIGHTS calculation" << endl;
             message << "Error in QM WEIGHTS calculation" << endl;
             pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
-            ERROR_flag=TRUE;//exit(0);
+            ERROR_flag=TRUE;
           }
         }
       }
@@ -8150,7 +8136,7 @@ bool xVASPRUNXML::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
           //[CO20200604 - OBSOLETE]if(!QUIET) cerr << soliloquy << " error in QM STRESS calculation" << endl;
           message << "Error in QM STRESS calculation" << endl;
           pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
-          ERROR_flag=TRUE;//exit(0);
+          ERROR_flag=TRUE;
         }
       }
       iline=-1;
@@ -8195,7 +8181,7 @@ bool xVASPRUNXML::GetForces(stringstream& stringstreamIN, bool QUIET) {
   bool LDEBUG=(FALSE || XHOST.DEBUG || !QUIET);
   string soliloquy="xVASPRUNXML::GetForces():";
   stringstream message;
-  bool force_exit=!XHOST.GENERATE_AFLOWIN_ONLY; //SC wants to exit here so we can fix the problem  // ME20200604 - do not exit with generate_aflowin_only
+  bool force_exit=XHOST.POSTPROCESS; //SC wants to exit here so we can fix the problem  // ME20200604 - do not exit with generate_aflowin_only
   bool ERROR_flag=FALSE;
 
   if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
@@ -8329,7 +8315,7 @@ bool xIBZKPT::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   bool LDEBUG=(FALSE || XHOST.DEBUG || !QUIET);
   string soliloquy=XPID+"xIBZKPT::GetProperties():";
   stringstream message;
-  bool force_exit=!XHOST.GENERATE_AFLOWIN_ONLY; //SC wants to exit here so we can fix the problem  // ME20200604 - do not exit with generate_aflowin_only
+  bool force_exit=XHOST.POSTPROCESS; //SC wants to exit here so we can fix the problem  // ME20200604 - do not exit with generate_aflowin_only
   bool ERROR_flag=FALSE;
 
   long double seconds=aurostd::get_seconds();
@@ -8376,7 +8362,7 @@ bool xIBZKPT::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
           //[CO20200604 - OBSOLETE]if(!QUIET) cerr << soliloquy << " error in QM NWEIGHTS/VKPOINT calculation" << endl;
           message << "Error in QM NWEIGHTS/VKPOINT calculation" << endl;
           pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
-          ERROR_flag=TRUE;//exit(0);
+          ERROR_flag=TRUE;
         }
       }
     }
@@ -8401,7 +8387,6 @@ bool xIBZKPT::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
       if(LDEBUG) cerr << soliloquy << " ntetrahedra=" << ntetrahedra << endl;
       if(LDEBUG) cerr << soliloquy << " wtetrahedra=" << wtetrahedra << endl;
       iline+=1; // skip text
-      //     cerr << soliloquy << " vcontent.at(iline)=" << vcontent.at(iline) << endl; ERROR_flag=TRUE;//exit(0);
       for(uint iat=0;iat<ntetrahedra;iat++) {
         // 	cerr << soliloquy << " vcontent.at(iline+iat)=" << vcontent.at(iline+iat) << endl;
         aurostd::string2tokens(vcontent.at(iline+iat),tokens," ");
@@ -8416,7 +8401,7 @@ bool xIBZKPT::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
           //	  if(LDEBUG) cerr << soliloquy << " tetrahedra=" << tetrahedra << " " << endl;
         } else {
           if(!QUIET) cerr << soliloquy << " error in QM NTETRAHEDRA/WTETRAHEDRA/TETRAHEDRA calculation" << endl;
-          ERROR_flag=TRUE;//exit(0);
+          ERROR_flag=TRUE;
         }
       }
     }
@@ -8541,7 +8526,7 @@ bool xKPOINTS::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   bool LDEBUG=(FALSE || XHOST.DEBUG || !QUIET);
   string soliloquy=XPID+"xKPOINTS::GetProperties():";
   stringstream message;
-  bool force_exit=!XHOST.GENERATE_AFLOWIN_ONLY; //SC wants to exit here so we can fix the problem  // ME20200604 - do not exit with generate_aflowin_only
+  bool force_exit=XHOST.POSTPROCESS; //SC wants to exit here so we can fix the problem  // ME20200604 - do not exit with generate_aflowin_only
 
   bool ERROR_flag=FALSE;
   clear(); // so it does not mess up vector/deque
@@ -8854,7 +8839,7 @@ bool xCHGCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   bool LDEBUG=(FALSE || XHOST.DEBUG || !QUIET);
   string soliloquy=XPID+"xCHGCAR::GetProperties():";
   stringstream message;
-  bool force_exit=!XHOST.GENERATE_AFLOWIN_ONLY; //SC wants to exit here so we can fix the problem  // ME20200604 - do not exit with generate_aflowin_only
+  bool force_exit=XHOST.POSTPROCESS; //SC wants to exit here so we can fix the problem  // ME20200604 - do not exit with generate_aflowin_only
 
   bool ERROR_flag=FALSE;
   long double seconds=aurostd::get_seconds();
@@ -9039,7 +9024,7 @@ bool xQMVASP::GetProperties(const stringstream& stringstreamIN,bool QUIET) { //C
   bool LDBEUG=(FALSE || XHOST.DEBUG || !QUIET);
   string soliloquy=XPID+"xQMVASP::GetProperties():";
   stringstream message;
-  bool force_exit=!XHOST.GENERATE_AFLOWIN_ONLY; //SC wants to exit here so we can fix the problem  // ME20200604 - do not exit with generate_aflowin_only
+  bool force_exit=XHOST.POSTPROCESS; //SC wants to exit here so we can fix the problem  // ME20200604 - do not exit with generate_aflowin_only
 
   bool ERROR_flag=FALSE;
   long double seconds=aurostd::get_seconds();
@@ -9052,7 +9037,7 @@ bool xQMVASP::GetProperties(const stringstream& stringstreamIN,bool QUIET) { //C
   if(filename=="") filename="stringstream";
 
   // crunching to eat the info
-  H_atom_relax=AUROSTD_NAN;
+  H_atom_relax=AUROSTD_NAN; //this will be the LAST relax
   H_atom_static=AUROSTD_NAN;
   bool inside_relax=false,inside_static=false;
   // ----------------------------------------------------------------------

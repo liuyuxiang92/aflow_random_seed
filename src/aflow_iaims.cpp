@@ -18,7 +18,7 @@
 // INPUT
 namespace KBIN {
   bool AIMS_Produce_INPUT(_xaims& xaims,string AflowIn,ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags,_aimsflags &aimsflags) {
-    if(AflowIn.length()==0) {cerr << "EEEEE  ERROR: KBIN::AIMS_Produce_INPUT  empty AflowIn" << endl;exit(0);}
+    if(AflowIn.length()==0) {throw aurostd::xerror(_AFLOW_FILE_NAME_,"KBIN::AIMS_Produce_INPUT():","empty AflowIn",_FILE_CORRUPT_);} //CO20200624
     bool Krun=TRUE;
     if(Krun) Krun=(Krun && KBIN::AIMS_Produce_GEOM(xaims,AflowIn,FileMESSAGE,aflags,kflags,aimsflags));     // produce GEOM before KPOINTS
     if(Krun) Krun=(Krun && KBIN::AIMS_Produce_CONTROL(xaims,AflowIn,FileMESSAGE,aflags,kflags,aimsflags));
@@ -103,7 +103,7 @@ namespace KBIN {
 // CONTROL
 namespace KBIN {
   bool AIMS_Produce_CONTROL(_xaims& xaims,string AflowIn,ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags,_aimsflags &aimsflags) { // AFLOW_FUNCTION_IMPLEMENTATION
-    if(AflowIn.length()==0) {cerr << "EEEEE  ERROR: KBIN::AIMS_Produce_CONTROL  empty AflowIn" << endl;exit(0);}
+    if(AflowIn.length()==0) {throw aurostd::xerror(_AFLOW_FILE_NAME_,"KBIN::AIMS_Produce_CONTROL():","empty AflowIn",_FILE_CORRUPT_);} //CO20200624
     if(!kflags.AFLOW_MODE_AIMS) {cerr << XPID << "KBIN::AIMS_Produce_CONTROL: should kflags.AFLOW_MODE_AIMS be set ??" << endl;}
     ostringstream aus;
     bool Krun=TRUE;
@@ -327,7 +327,7 @@ namespace KBIN {
 namespace KBIN {
   bool AIMS_Produce_GEOM(_xaims& xaims,string AflowIn,ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags,_aimsflags &aimsflags) {        // AFLOW_FUNCTION_IMPLEMENTATION
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(AflowIn.length()==0) {cerr << "EEEEE  ERROR: KBIN::AIMS_Produce_GEOM  empty AflowIn" << endl;exit(0);}
+    if(AflowIn.length()==0) {throw aurostd::xerror(_AFLOW_FILE_NAME_,"KBIN::AIMS_Produce_GEOM():","empty AflowIn",_FILE_CORRUPT_);} //CO20200624
     if(!kflags.AFLOW_MODE_AIMS) {cerr << XPID << "KBIN::AIMS_Produce_GEOM: should kflags.AFLOW_MODE_AIMS be set ??" << endl;}
     ostringstream aus;
     bool Krun=TRUE;
@@ -859,7 +859,7 @@ namespace KBIN {
     if(Krun && aimsflags.KBIN_AIMS_GEOM_MODE.flag("IMPLICIT") && aimsflags.KBIN_AIMS_GEOM_FILE_VOLUME.flag("MULTIPLY_EQUAL")) {  // [AIMS_GEOM_FILE]VOLUME*=             /*************** GEOM **************/
       double factor=aurostd::substring2utype<double>(AflowIn,"[AIMS_GEOM_FILE]VOLUME*=",FALSE);
       //     double factor=aurostd::string2utype<double>(aimsflags.KBIN_AIMS_GEOM_FILE_VOLUME.getattachedscheme("MULTIPLY_EQUAL"));
-      //      cerr << "CORMAC MULTIPLY_EQUAL=" << factor << endl; exit(0);
+      //      cerr << "CORMAC MULTIPLY_EQUAL=" << factor << endl;
       aus << "00000  MESSAGE GEOM  IMPLICIT Volume *= " << factor << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       if(factor<=0.0) {
@@ -1023,9 +1023,7 @@ namespace KBIN {
     cerr << XPID << "KBIN::XAIMS_CONTROL_PREPARE_GENERIC: dvalue=" << dvalue << endl;
     cerr << XPID << "KBIN::XAIMS_CONTROL_PREPARE_GENERIC: OPTION=" << OPTION << endl;
 
-    exit(0);
-
-    return TRUE;
+    return FALSE; //previously an exit
   }
 } 
 

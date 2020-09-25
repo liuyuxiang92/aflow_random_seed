@@ -6,6 +6,16 @@
 
 #include "aflow_apl.h"
 
+// Some parts are written within the C++0x support in GCC, especially the std::thread,
+// which is implemented in gcc 4.4 and higher.... For multithreads with std::thread see:
+// http://www.justsoftwaresolutions.co.uk/threading/multithreading-in-c++0x-part-1-starting-threads.html
+#if GCC_VERSION >= 40400  // added two zeros
+#define AFLOW_APL_MULTITHREADS_ENABLE 1
+#include <thread>
+#else
+#warning "The multithread parts of APL will not be included, since they need gcc 4.4 and higher (C++0x support)."
+#endif
+
 #define _DEBUG_APL_PHONCALC_ false  //CO20190116
 
 using std::string;
@@ -38,22 +48,20 @@ namespace apl {
     _ncpus = 1;
   }
 
-
   PhononCalculator::PhononCalculator(const PhononCalculator& that) : xStream(*that.getOFStream(),*that.getOSS()) {
-    free();
+    if (this != &that) free();
     copy(that);
   }
 
   // Copy constructors
   PhononCalculator& PhononCalculator::operator=(const PhononCalculator& that) {
-    if (this != &that) {
-      free();
-      copy(that);
-    }
+    if (this != &that) free();
+    copy(that);
     return *this;
   }
 
   void PhononCalculator::copy(const PhononCalculator& that) {
+    if (this == &that) return;
     xStream::copy(that);
     _bornEffectiveChargeTensor = that._bornEffectiveChargeTensor;
     _dielectricTensor = that._dielectricTensor;
@@ -126,10 +134,6 @@ namespace apl {
   }
 
   //ME20190614
-  string PhononCalculator::getSystemName() const {
-    return _system;
-  }
-
   string PhononCalculator::getDirectory() const {
     return _directory;
   }
@@ -161,14 +165,10 @@ namespace apl {
 
 namespace apl {
 
-  void PhononCalculator::setSystem(const string& sys) {
-    _system = sys;
-  }
-
   void PhononCalculator::setDirectory(const string& dir) {
     _directory = dir;
-    _qm.setDirectory(dir);
-    _supercell.setDirectory(dir);
+    _qm._directory = dir;
+    _supercell._directory = dir;
   }
 
   void PhononCalculator::setNCPUs(const _kflags& kfl) {
@@ -197,7 +197,7 @@ namespace apl {
     _supercell.initialize(xstr);
   }
   void PhononCalculator::initialize_supercell(const string& filename) {
-    _supercell.readFromStateFile(filename);
+    _supercell.initialize(filename);
   }
 }
 
@@ -297,7 +297,7 @@ namespace apl {
       for (int k = 1; k <= 3; k++) {
         line = vlines[line_count++];  //CO
         int t = line.find_first_of(">") + 1;
-        tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
+        aurostd::string2tokens(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
         m(k, 1) = aurostd::string2utype<double>(tokens.at(0));
         m(k, 2) = aurostd::string2utype<double>(tokens.at(1));
         m(k, 3) = aurostd::string2utype<double>(tokens.at(2));
@@ -358,7 +358,7 @@ namespace apl {
       for (int k = 1; k <= 3; k++) {
         line = vlines[line_count++];  //CO
         int t = line.find_first_of(">") + 1;
-        tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
+        aurostd::string2tokens(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
         m(k, 1) = aurostd::string2utype<double>(tokens.at(0));
         m(k, 2) = aurostd::string2utype<double>(tokens.at(1));
         m(k, 3) = aurostd::string2utype<double>(tokens.at(2));
@@ -382,7 +382,7 @@ namespace apl {
     for (int k = 1; k <= 3; k++) {
       line = vlines[line_count++];  //CO
       int t = line.find_first_of(">") + 1;
-      tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
+      aurostd::string2tokens(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
       _dielectricTensor(k, 1) = aurostd::string2utype<double>(tokens.at(0));
       _dielectricTensor(k, 2) = aurostd::string2utype<double>(tokens.at(1));
       _dielectricTensor(k, 3) = aurostd::string2utype<double>(tokens.at(2));
@@ -537,27 +537,28 @@ namespace apl {
 
   xvector<double> PhononCalculator::getFrequency(const xvector<double>& kpoint, const xvector<double>& kpoint_nac,
       const IPCFreqFlags& flags, xmatrix<xcomplex<double> >& eigenvectors) {
-    vector<xmatrix<xcomplex<double> > > placeholder_mat;
-    return getFrequency(kpoint, kpoint_nac, flags, eigenvectors, placeholder_mat, false);
+    vector<xvector<double> > placeholder_gvel;
+    return getFrequency(kpoint, kpoint_nac, flags, eigenvectors, placeholder_gvel, false);
   }
 
   xvector<double> PhononCalculator::getFrequency(const xvector<double>& kpoint,
       const IPCFreqFlags& flags, xmatrix<xcomplex<double> >& eigenvectors,
-      vector<xmatrix<xcomplex<double> > >& dDynMat, bool calc_derivative) {
-    return getFrequency(kpoint, kpoint, flags, eigenvectors, dDynMat, calc_derivative);
+      vector<xvector<double> >& gvel, bool calc_derivative) {
+    return getFrequency(kpoint, kpoint, flags, eigenvectors, gvel, calc_derivative);
   }
 
   xvector<double> PhononCalculator::getFrequency(const xvector<double>& kpoint, const xvector<double>& kpoint_nac,
       const IPCFreqFlags& flags, xmatrix<xcomplex<double> >& eigenvectors,
-      vector<xmatrix<xcomplex<double> > >& dDynMat, bool calc_derivative) {
+      vector<xvector<double> >& gvel, bool calc_gvel) {
     // Compute frequency(omega) from eigenvalues [in eV/A/A/atomic_mass_unit]
-    xvector<double> omega = getEigenvalues(kpoint, kpoint_nac, eigenvectors, dDynMat, calc_derivative);
+    vector<xmatrix<xcomplex<double> > > dDynMat;
+    xvector<double> omega = getEigenvalues(kpoint, kpoint_nac, eigenvectors, dDynMat, calc_gvel);
 
     // Get value of conversion factor
     double conversionFactor = getFrequencyConversionFactor(apl::RAW | apl::OMEGA, flags);
 
     // Transform values to desired format
-    for (_AFLOW_APL_REGISTER_ int i = omega.lrows; i <= omega.urows; i++) {
+    for (int i = omega.lrows; i <= omega.urows; i++) {
       if (omega(i) < 0) {
         if (flags & ALLOW_NEGATIVE)
           omega(i) = -sqrt(-omega(i));
@@ -569,6 +570,25 @@ namespace apl {
 
       // Convert to desired units
       omega(i) *= conversionFactor;
+    }
+
+    if (calc_gvel) {
+      double conversionFactorGvel = getFrequencyConversionFactor(flags, apl::THZ | apl::OMEGA);
+      uint nbranches = getNumberOfBranches();
+      gvel.clear();
+      gvel.resize(nbranches, xvector<double>(3));
+      xvector<xcomplex<double> > eigenvec(3), eigenvec_conj(3);
+      xcomplex<double> prod;
+      for (uint br = 0; br < nbranches; br++) {
+        if (omega[br + 1] > _FLOAT_TOL_) {
+          eigenvec = eigenvectors.getcol(br + 1);
+          eigenvec_conj = conj(eigenvec);
+          for (uint i = 1; i < 4; i++) {
+            prod = eigenvec_conj * (dDynMat[i - 1] * eigenvec);
+            gvel[br][i] = au2nmTHz * prod.re/(2.0 * omega[br + 1] * conversionFactorGvel);
+          }
+        }
+      }
     }
 
     // Return
@@ -711,19 +731,23 @@ namespace apl {
         uint ipc2 = _supercell.sc2pcMap(isc2);
         int neq = 0;  // Important for NAC derivative
         if (_supercell.calcShellPhaseFactor(isc2, isc1, kpoint, phase, neq, derivative, calc_derivative)) {  //ME20180827
-          for (_AFLOW_APL_REGISTER_ int ix = 1; ix <= 3; ix++) {
-            for (_AFLOW_APL_REGISTER_ int iy = 1; iy <= 3; iy++) {
+          for (int ix = 1; ix <= 3; ix++) {
+            for (int iy = 1; iy <= 3; iy++) {
               value = 0.5 * (_forceConstantMatrices[isc1][isc2](ix, iy) + _forceConstantMatrices[isc2][isc1](iy, ix));
-              dynamicalMatrix(3 * ipc1 + ix, 3 * ipc2 + iy) += value * phase;
-              if (_isPolarMaterial)
+              if (!aurostd::iszero(value)) {
+                dynamicalMatrix(3 * ipc1 + ix, 3 * ipc2 + iy) += value * phase;
+                dynamicalMatrix0(3 * ipc1 + ix, 3 * ipc2 + iy) += value;
+                if (calc_derivative) {
+                  for (int d = 0; d < 3; d++) {
+                    dDynMat[d](3 * ipc1 + ix, 3 * ipc2 + iy) += value * derivative[d+1];
+                  }
+                }
+              }
+              if (_isPolarMaterial) {
                 dynamicalMatrix(3 * ipc1 + ix, 3 * ipc2 + iy) += dynamicalMatrixNA(3 * ipc1 + ix, 3 * ipc2 + iy) * phase;
-              dynamicalMatrix0(3 * ipc1 + ix, 3 * ipc2 + iy) += value;
-              if (_isPolarMaterial)
                 dynamicalMatrix0(3 * ipc1 + ix, 3 * ipc2 + iy) += dynamicalMatrixNA(3 * ipc1 + ix, 3 * ipc2 + iy);
-              if (calc_derivative) {
-                for (int d = 0; d < 3; d++) {
-                  dDynMat[d](3 * ipc1 + ix, 3 * ipc2 + iy) += value * derivative[d+1];
-                  if (_isPolarMaterial && (aurostd::modulus(kpoint) > _AFLOW_APL_EPS_)) {
+                if (calc_derivative && !aurostd::iszero(kpoint)) {
+                  for (int d = 0; d < 3; d++) {
                     nac = ((double) neq) * phase * dDynMat_NAC[d](3 * ipc1 + ix, 3 * ipc2 + iy);
                     dDynMat[d](3 * ipc1 + ix, 3 * ipc2 + iy) += nac;
                   }
@@ -739,8 +763,8 @@ namespace apl {
     // Subtract the sum of all "forces" from the central atom, this is like an automatic sum rule...
     for (uint i = 0; i < pcAtomsSize; i++) {
       for (uint j = 0; j < pcAtomsSize; j++) {
-        for (_AFLOW_APL_REGISTER_ int ix = 1; ix <= 3; ix++) {
-          for (_AFLOW_APL_REGISTER_ int iy = 1; iy <= 3; iy++) {
+        for (int ix = 1; ix <= 3; ix++) {
+          for (int iy = 1; iy <= 3; iy++) {
             dynamicalMatrix(3 * i + ix, 3 * i + iy) = dynamicalMatrix(3 * i + ix, 3 * i + iy) - dynamicalMatrix0(3 * i + ix, 3 * j + iy);
           }
         }
@@ -754,8 +778,8 @@ namespace apl {
     // Make it hermitian
     for (uint i = 0; i <= pcAtomsSize - 1; i++) {
       for (uint j = 0; j <= i; j++) {
-        for (_AFLOW_APL_REGISTER_ int ix = 1; ix <= 3; ix++) {
-          for (_AFLOW_APL_REGISTER_ int iy = 1; iy <= 3; iy++) {
+        for (int ix = 1; ix <= 3; ix++) {
+          for (int iy = 1; iy <= 3; iy++) {
             dynamicalMatrix(3 * i + ix, 3 * j + iy) += conj(dynamicalMatrix(3 * j + iy, 3 * i + ix));
             dynamicalMatrix(3 * i + ix, 3 * j + iy) *= 0.5;
             dynamicalMatrix(3 * j + iy, 3 * i + ix) = conj(dynamicalMatrix(3 * i + ix, 3 * j + iy));
@@ -776,8 +800,8 @@ namespace apl {
       double mass_i = _supercell.getAtomMass(_supercell.pc2scMap(i));
       for (uint j = 0; j < pcAtomsSize; j++) {
         double mass_j = _supercell.getAtomMass(_supercell.pc2scMap(j));
-        for (_AFLOW_APL_REGISTER_ int ix = 1; ix <= 3; ix++) {
-          for (_AFLOW_APL_REGISTER_ int iy = 1; iy <= 3; iy++) {
+        for (int ix = 1; ix <= 3; ix++) {
+          for (int iy = 1; iy <= 3; iy++) {
             dynamicalMatrix(3 * i + ix, 3 * j + iy) *= 1.0 / sqrt(mass_i * mass_j);
             if (calc_derivative) {
               for (int d = 0; d < 3; d++) {
@@ -813,8 +837,8 @@ namespace apl {
 
     // to correct the q=\Gamma as a limit
     xvector<double> q(_q);
-    if (aurostd::modulus(q) < _AFLOW_APL_EPS_) {
-      q(1) = _AFLOW_APL_EPS_ * 1.001;
+    if (aurostd::modulus(q) < _FLOAT_TOL_) {
+      q(1) = _FLOAT_TOL_ * 1.001;
     }
 
     uint pcAtomsSize = pc.atoms.size();
@@ -823,7 +847,7 @@ namespace apl {
     uint _nBranches = getNumberOfBranches();
     xmatrix<xcomplex<double> > dynamicalMatrix(_nBranches, _nBranches);
 
-    if (aurostd::modulus(q) > _AFLOW_APL_EPS_) {
+    if (aurostd::modulus(q) > _FLOAT_TOL_) {
       if (calc_derivative) {  // reset derivative
         derivative.clear();
         xmatrix<xcomplex<double> > mat(_nBranches, _nBranches, 1, 1);
@@ -846,8 +870,8 @@ namespace apl {
         int iat1 = pc.atoms[ipc1].index_iatoms;
         for (uint ipc2 = 0; ipc2 < pcAtomsSize; ipc2++) {
           int iat2 = pc.atoms[ipc2].index_iatoms;
-          for (_AFLOW_APL_REGISTER_ int ix = 1; ix <= 3; ix++) {
-            for (_AFLOW_APL_REGISTER_ int iy = 1; iy <= 3; iy++) {
+          for (int ix = 1; ix <= 3; ix++) {
+            for (int iy = 1; iy <= 3; iy++) {
               //int typei = pc.atoms[ipc1].type;
               //int typej = pc.atoms[ipc2].type;
               //double borni = (q * _bornEffectiveChargeTensor[typei])(ix);
@@ -872,7 +896,6 @@ namespace apl {
       }
     }
 
-    //
     return dynamicalMatrix;
   }
 
@@ -893,8 +916,8 @@ namespace apl {
       for (uint ipc1 = 0; ipc1 < pcAtomsSize; ipc1++) {
         xmatrix<xcomplex<double> > sum(3, 3);
         for (uint ipc2 = 0; ipc2 < pcAtomsSize; ipc2++) {
-          for (_AFLOW_APL_REGISTER_ int ix = 1; ix <= 3; ix++)
-            for (_AFLOW_APL_REGISTER_ int iy = 1; iy <= 3; iy++)
+          for (int ix = 1; ix <= 3; ix++)
+            for (int iy = 1; iy <= 3; iy++)
               sum(ix, iy) += dynamicalMatrix0(3 * ipc1 + ix, 3 * ipc2 + iy);
         }
         _gammaEwaldCorr.push_back(sum);
@@ -907,8 +930,8 @@ namespace apl {
     xmatrix<xcomplex<double> > dynamicalMatrix(getEwaldSumDipoleDipoleContribution(kpoint));
 
     for (uint ipc1 = 0; ipc1 < pcAtomsSize; ipc1++) {
-      for (_AFLOW_APL_REGISTER_ int ix = 1; ix <= 3; ix++)
-        for (_AFLOW_APL_REGISTER_ int iy = 1; iy <= 3; iy++)
+      for (int ix = 1; ix <= 3; ix++)
+        for (int iy = 1; iy <= 3; iy++)
           dynamicalMatrix(3 * ipc1 + ix, 3 * ipc1 + iy) -= _gammaEwaldCorr[ipc1](ix, iy);
     }
 
@@ -955,14 +978,14 @@ namespace apl {
     // Term 1 - Reciprocal space sum
 
     if (includeTerm1) {
-      for (_AFLOW_APL_REGISTER_ int m1 = -n1; m1 <= n1; m1++) {
-        for (_AFLOW_APL_REGISTER_ int m2 = -n2; m2 <= n2; m2++) {
-          for (_AFLOW_APL_REGISTER_ int m3 = -n3; m3 <= n3; m3++) {
+      for (int m1 = -n1; m1 <= n1; m1++) {
+        for (int m2 = -n2; m2 <= n2; m2++) {
+          for (int m3 = -n3; m3 <= n3; m3++) {
             xvector<double> g = m1 * klattice(1) + m2 * klattice(2) + m3 * klattice(3) + qpoint;
 
             geg = scalar_product(g, _dielectricTensor * g);
 
-            if (aurostd::abs(geg) > _AFLOW_APL_EPS_ && geg / lambda2 / 4.0 < gmax) {
+            if (aurostd::abs(geg) > _FLOAT_TOL_ && geg / lambda2 / 4.0 < gmax) {
               double fac2 = fac * exp(-geg / lambda2 / 4.0) / geg;
 
               for (uint ipc1 = 0; ipc1 < pcAtomsSize; ipc1++) {
@@ -980,8 +1003,8 @@ namespace apl {
                   //xcomplex<double> facg = fac2 * e;
                   xcomplex<double> facg = fac2 * exp(iONE * scalar_product(g, sc.atoms[ipc2].cpos - sc.atoms[ipc1].cpos));
 
-                  for (_AFLOW_APL_REGISTER_ int ix = 1; ix <= 3; ix++) {
-                    for (_AFLOW_APL_REGISTER_ int iy = 1; iy <= 3; iy++) {
+                  for (int ix = 1; ix <= 3; ix++) {
+                    for (int iy = 1; iy <= 3; iy++) {
                       dynamicalMatrix(3 * ipc1 + ix, 3 * ipc2 + iy) += fac0 * facg * zag(ix) * zbg(iy);
                     }
                   }
@@ -994,9 +1017,9 @@ namespace apl {
     }
 
     // Term 2 - Real space sum
-    //for(_AFLOW_APL_REGISTER_ int m1 = -n1; m1 <= n1; m1++)
-    //  for(_AFLOW_APL_REGISTER_ int m2 = -n2; m2 <= n2; m2++)
-    //    for(_AFLOW_APL_REGISTER_ int m3 = -n2; m3 <= n3; m3++) {
+    //for(int m1 = -n1; m1 <= n1; m1++)
+    //  for(int m2 = -n2; m2 <= n2; m2++)
+    //    for(int m3 = -n2; m3 <= n3; m3++) {
     //      xvector<double> rc = m1 * pc.lattice(1) + m2 * pc.lattice(2)
     //        + m3 * pc.lattice(3);
 
@@ -1004,7 +1027,7 @@ namespace apl {
     //      //xvector<double> rf = _supercell.getFPositionItsNearestImage(rc,zero,pc.lattice);
     //      //rc = F2C(pc.lattice,rf);
 
-    //      if( aurostd::modulus(rc) < _AFLOW_APL_EPS_ ) continue;
+    //      if( aurostd::modulus(rc) < _FLOAT_TOL_ ) continue;
 
     //      //
     //      xvector<double> delta = _inverseDielectricTensor * rc;
@@ -1020,8 +1043,8 @@ namespace apl {
     //      double erfcdy = erfc(y) / y;
     //      double c1 = ym2 * ( 3.0 * erfcdy * ym2 + ( emy2dpi * ( 3.0 * ym2 + 2.0 ) ) );
     //      double c2 = ym2 * ( erfcdy + emy2dpi );
-    //      for(_AFLOW_APL_REGISTER_ int a = 1; a <= 3; a++)
-    //        for(_AFLOW_APL_REGISTER_ int b = 1; b <= 3; b++) {
+    //      for(int a = 1; a <= 3; a++)
+    //        for(int b = 1; b <= 3; b++) {
     //          H(a,b) = x(a) * x(b) * c1 - _inverseDielectricTensor(a,b) * c2;
     //        }
 
@@ -1036,8 +1059,8 @@ namespace apl {
     //        for(uint ipc2 = 0; ipc2 < pcAtomsSize; ipc2++) {
     //          xmatrix<double> zhz = zh * _bornEffectiveChargeTensor[pc.atoms[ipc2].type];
 
-    //          for(_AFLOW_APL_REGISTER_ int ix = 1; ix <= 3; ix++)
-    //            for(_AFLOW_APL_REGISTER_ int iy = 1; iy <= 3; iy++)
+    //          for(int ix = 1; ix <= 3; ix++)
+    //            for(int iy = 1; iy <= 3; iy++)
     //              dynamicalMatrix(3*ipc1+ix,3*ipc2+iy) -= fac * zhz(ix,iy);
     //        }
     //      }
@@ -1051,10 +1074,10 @@ namespace apl {
       for (uint isc2 = 0; isc2 < scAtomsSize; isc2++) {
         uint ipc2 = _supercell.sc2pcMap(isc2);
 
-        xvector<double> rf = _supercell.getFPositionItsNearestImage(isc2, isc1);
-        xvector<double> rc = F2C(sc.lattice, rf);
+        xvector<double> rc = SYM::minimizeDistanceCartesianMethod(sc.atoms[isc2].cpos, sc.atoms[isc1].cpos, sc.lattice);
+        xvector<double> rf = F2C(sc.lattice, rc);
 
-        if (aurostd::modulus(rc) < _AFLOW_APL_EPS_) continue;
+        if (aurostd::modulus(rc) < _FLOAT_TOL_) continue;
 
         //
         xvector<double> delta = _inverseDielectricTensor * rc;
@@ -1070,8 +1093,8 @@ namespace apl {
         double erfcdy = erfc(y) / y;
         double c1 = ym2 * (3.0 * erfcdy * ym2 + (emy2dpi * (3.0 * ym2 + 2.0)));
         double c2 = ym2 * (erfcdy + emy2dpi);
-        for (_AFLOW_APL_REGISTER_ int a = 1; a <= 3; a++) {
-          for (_AFLOW_APL_REGISTER_ int b = 1; b <= 3; b++) {
+        for (int a = 1; a <= 3; a++) {
+          for (int b = 1; b <= 3; b++) {
             H(a, b) = x(a) * x(b) * c1 - _inverseDielectricTensor(a, b) * c2;
           }
         }
@@ -1090,8 +1113,8 @@ namespace apl {
 
         //
         xcomplex<double> fac = fac0 * lambda3 * _recsqrtDielectricTensorDeterminant * e;
-        for (_AFLOW_APL_REGISTER_ int ix = 1; ix <= 3; ix++)
-          for (_AFLOW_APL_REGISTER_ int iy = 1; iy <= 3; iy++)
+        for (int ix = 1; ix <= 3; ix++)
+          for (int iy = 1; iy <= 3; iy++)
             dynamicalMatrix(3 * ipc1 + ix, 3 * ipc2 + iy) -= fac * zhz(ix, iy);
       }
     }
@@ -1105,13 +1128,203 @@ namespace apl {
       xmatrix<double> z = _bornEffectiveChargeTensor[iat1];
       xmatrix<double> zez = z * _inverseDielectricTensor * z;
 
-      for (_AFLOW_APL_REGISTER_ int ix = 1; ix <= 3; ix++)
-        for (_AFLOW_APL_REGISTER_ int iy = 1; iy <= 3; iy++)
+      for (int ix = 1; ix <= 3; ix++)
+        for (int iy = 1; iy <= 3; iy++)
           dynamicalMatrix(3 * ipc1 + ix, 3 * ipc1 + iy) -= facterm3 * zez(ix, iy);
     }
 
     //
     return dynamicalMatrix;
+  }
+
+}  // namespace apl
+
+//////////////////////////////////////////////////////////////////////////////
+//                                                                          //
+//                           GROUP VELOCITIES                               //
+//                                                                          //
+//////////////////////////////////////////////////////////////////////////////
+
+namespace apl {
+
+  // Calculate the group velocities on a q-point mesh using the Hellmann-Feynman
+  // theorem. Group velocities will be in km/s (nm THz).
+  vector<vector<xvector<double> > > PhononCalculator::calculateGroupVelocitiesOnMesh() {
+    vector<vector<double> > freqs_placeholder;
+    vector<xmatrix<xcomplex<double> > > eigenvectors_placeholder;
+    return calculateGroupVelocitiesOnMesh(freqs_placeholder, eigenvectors_placeholder);
+  }
+
+  vector<vector<xvector<double> > > PhononCalculator::calculateGroupVelocitiesOnMesh(vector<vector<double> >& freqs) {
+    vector<xmatrix<xcomplex<double> > > eigenvectors_placeholder;
+    return calculateGroupVelocitiesOnMesh(freqs, eigenvectors_placeholder);
+  }
+
+  vector<vector<xvector<double> > > PhononCalculator::calculateGroupVelocitiesOnMesh(vector<vector<double> >& freqs, vector<xmatrix<xcomplex<double> > >& eigenvectors) {
+    string function = "apl::PhononCalculator::calculateGroupVelocitiesOnMesh():";
+    string message = "";
+    if (!_supercell.isConstructed()) {
+      message = "Supercell not constructed yet.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
+    }
+    uint nQPs = _qm.getnQPs();
+    if (nQPs == 0) {
+      message = "Mesh has no q-points.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
+    }
+
+    freqs.clear();
+    eigenvectors.clear();
+
+    uint nbranches = getNumberOfBranches();
+    freqs.resize(nQPs);
+    eigenvectors.resize(nQPs, xmatrix<xcomplex<double> >(nbranches, nbranches));
+    vector<vector<xvector<double> > > gvel(nQPs);
+#ifdef AFLOW_APL_MULTITHREADS_ENABLE
+    vector<vector<int> > thread_dist = getThreadDistribution(nQPs, _ncpus);
+    vector<std::thread*> threads;
+    threads.clear();
+    for (int icpu = 0; icpu < _ncpus; icpu++) {
+      threads.push_back(new std::thread(&PhononCalculator::calculateGroupVelocitiesThread, this,
+            thread_dist[icpu][0], thread_dist[icpu][1], std::ref(freqs), std::ref(eigenvectors), std::ref(gvel)));
+    }
+    for (uint t = 0; t < threads.size(); t++) {
+      threads[t]->join();
+      delete threads[t];
+    }
+#else
+    calculateGroupVelocitiesThread(0, nQPs, freqs, eigenvectors, gvel);
+#endif
+    return gvel;
+  }
+
+  void PhononCalculator::calculateGroupVelocitiesThread(int startIndex, int endIndex,
+      vector<vector<double> >& freqs, vector<xmatrix<xcomplex<double> > >& eigenvectors, vector<vector<xvector<double> > >& gvel) {
+    xvector<double> f;
+    for (int q = startIndex; q < endIndex; q++) {
+      f = getFrequency(_qm.getQPoint(q).cpos, apl::THZ | apl::OMEGA, eigenvectors[q], gvel[q]);
+      freqs[q] = aurostd::xvector2vector(f);
+    }
+  }
+
+  //writeGroupVelocitiesToFile////////////////////////////////////////////////
+  // Writes the group velocities into a file. Each row belongs to a q-point,
+  // and each column triplet belongs to a phonon branch.
+  void PhononCalculator::writeGroupVelocitiesToFile(const string& filename,
+      const vector<vector<xvector<double> > >& gvel) {
+    vector<vector<double> > freqs;
+    writeGroupVelocitiesToFile(filename, gvel, freqs);
+  }
+  void PhononCalculator::writeGroupVelocitiesToFile(const string& filename,
+      const vector<vector<xvector<double> > >& gvel, const vector<vector<double> >& freqs, const string& unit) {
+    if (gvel.size() == 0) return;  // Nothing to write
+    string function = "apl::PhononCalculator::writeGroupVelocitiesToFile():";
+    string message = "";
+    stringstream output;
+
+    uint nBranches = getNumberOfBranches();
+    uint nQPs = _qm.getnQPs();
+
+    // Consistency check
+    if (gvel.size() != nQPs) {
+      message = "Number of group velocities is not equal to the number of q-points.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
+    }
+    for (uint q = 0; q < nQPs; q++) {
+      if (gvel[q].size() != nBranches) {
+        message = "Number of group velocities for q-point " + aurostd::utype2string<uint>(q) + " is not equal to the number branches.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
+      }
+    }
+
+    if (freqs.size() > 0) {
+      if (freqs.size() != nQPs) {
+        message = "Number of frequencies is not equal to the number of q-points.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
+      }
+      for (uint q = 0; q < nQPs; q++) {
+        if (freqs[q].size() != nBranches) {
+          message = "Number of frequencies for q-point " + aurostd::utype2string<uint>(q) + " is not equal to the number branches.";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
+        }
+      }
+    }
+
+    // Header
+    output << AFLOWIN_SEPARATION_LINE << std::endl;
+    if (!_system.empty()) {
+      output << "[APL_GROUP_VELOCITY]SYSTEM=" << _system << std::endl;
+      output << AFLOWIN_SEPARATION_LINE << std::endl;
+    }
+
+    output << "[APL_GROUP_VELOCITY]START" << std::endl;
+    output << std::setiosflags(std::ios::fixed | std::ios::right);
+    output << std::setw(10) << "# Q-point";
+    output << std::setw(20) << " ";
+    output << "Group Velocity (km/s)" << std::endl;
+
+    // Body
+    for (uint q = 0; q < nQPs; q++) {
+      output << std::setiosflags(std::ios::fixed | std::ios::right);
+      output << std::setw(10) << q;
+      for (uint br = 0; br < nBranches; br++) {
+        for (uint i = 1; i < 4; i++) {
+          output << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
+          output << std::setw(20) << std::setprecision(10) << std::scientific << gvel[q][br][i];
+        }
+        output << std::setw(5) << " ";
+      }
+      output << std::endl;
+    }
+
+    output << "[APL_GROUP_VELOCITY]STOP" << std::endl;
+    output << AFLOWIN_SEPARATION_LINE << std::endl;
+
+    // Write frequencies if provided
+    if (freqs.size() > 0) {
+      output << "[APL_FREQUENCY]STOP" << std::endl;
+      output << std::setiosflags(std::ios::fixed | std::ios::right);
+      output << std::setw(10) << "# Q-point"
+        << std::setw(20) << " "
+        << "Frequency " << (unit.empty()?"":("(" + unit + ")")) << std::endl;
+      for (uint q = 0; q < nQPs; q++) {
+        output << std::setiosflags(std::ios::fixed | std::ios::right);
+        output << std::setw(10) << q;
+        for (uint br = 0; br < nBranches; br++) {
+          output << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
+          output << std::setw(20) << std::setprecision(10) << std::scientific << freqs[q][br];
+        }
+        output << std::endl;
+      }
+      output << "[APL_FREQUENCY]STOP" << std::endl;
+      output << AFLOWIN_SEPARATION_LINE << std::endl;
+    }
+
+    // Write q-points
+    output << "[APL_QPOINTS]START" << std::endl;
+    output << std::setiosflags(std::ios::fixed | std::ios::right);
+    output << std::setw(10) << "# Index";
+    output << std::setw(20) << " ";
+    output << "Q-points (fractional)" << std::endl;
+    // Body
+    for (uint q = 0; q < nQPs; q++) {
+      output << std::setiosflags(std::ios::fixed | std::ios::right);
+      output << std::setw(10) << q;
+      for (uint i = 1; i < 4; i++) {
+        output << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
+        output << std::setw(20) << std::setprecision(10) << std::scientific << _qm.getQPoint(q).fpos[i];
+      }
+      output << std::endl;
+    }
+    output << "[APL_QPOINTS]STOP" << std::endl;
+    output << AFLOWIN_SEPARATION_LINE << std::endl;
+
+    // Write to file
+    aurostd::stringstream2file(output, filename);
+    if (!aurostd::FileExist(filename)) {
+      message = "Could not write group velocities to file.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
+    }
   }
 
 }  // namespace apl

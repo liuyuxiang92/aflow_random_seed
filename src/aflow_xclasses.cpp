@@ -34,7 +34,9 @@ _XHOST::_XHOST() {  // constructor PUBLIC
   DEBUG=FALSE;
   MPI=FALSE;
   GENERATE_AFLOWIN_ONLY=FALSE;  //CT20180719
-  POSTPROCESS=FALSE;  //CT20181212
+  POSTPROCESS=FALSE;  //CO20200624
+  ARUN_POSTPROCESS=FALSE;  //CT20181212
+  AVOID_RUNNING_VASP=FALSE;  //CO20200624
   PSEUDOPOTENTIAL_GENERATOR=FALSE; //SC20200327
   hostname="";
   machine_type="";
@@ -145,7 +147,9 @@ void _XHOST::copy(const _XHOST& b) { // copy PRIVATE
   DEBUG=b.DEBUG;
   MPI=b.MPI;
   GENERATE_AFLOWIN_ONLY=b.GENERATE_AFLOWIN_ONLY;  //CT20180719
-  POSTPROCESS=b.POSTPROCESS;  //CT20181212
+  POSTPROCESS=b.POSTPROCESS;  //CO20200624
+  ARUN_POSTPROCESS=b.ARUN_POSTPROCESS;  //CT20181212
+  AVOID_RUNNING_VASP=b.AVOID_RUNNING_VASP;  //CO20200624
   PSEUDOPOTENTIAL_GENERATOR=b.PSEUDOPOTENTIAL_GENERATOR; //SC20200327
   hostname=b.hostname;
   machine_type=b.machine_type;
@@ -314,7 +318,6 @@ std::string _XHOST::command(const string& command) {
     }
   }
   //CO20180705 STOP
-  //[CO20190629 - kills is_command(), use xerror (avoids exit)]cerr << "ERROR XHOST.command: command=" << command << " not found ... exiting" << endl; exit(0); // not found
   throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"command="+command+" not found",_INPUT_MISSING_);
   return string();
 }
@@ -543,6 +546,7 @@ _kflags::_kflags() {
   KBIN_POCC                                        = FALSE;
   KBIN_POCC_CALCULATION                            = FALSE;
   KBIN_POCC_TEMPERATURE_STRING                     = "";  //CO20191110
+  KBIN_POCC_ARUNS2SKIP_STRING                      = "";  //CO20200624
   KBIN_FROZSL                                      = FALSE;
   KBIN_FROZSL_DOWNLOAD                             = FALSE;
   KBIN_FROZSL_FILE                                 = FALSE;
@@ -563,21 +567,6 @@ _kflags::_kflags() {
   KBIN_PHONONS_CALCULATION_APL                     = FALSE;
   KBIN_PHONONS_CALCULATION_QHA                     = FALSE; //CO20170601
   KBIN_PHONONS_CALCULATION_AAPL                    = FALSE; //CO20170601
-  //ME20190208 START
-  // Flags must be initialized to false, or they may be initialized
-  // to random numbers
-  KBIN_PHONONS_CALCULATION_QHA_A                   = FALSE;
-  KBIN_PHONONS_CALCULATION_QHA_B                   = FALSE;
-  KBIN_PHONONS_CALCULATION_QHA_C                   = FALSE;
-  KBIN_PHONONS_CALCULATION_SCQHA                   = FALSE;
-  KBIN_PHONONS_CALCULATION_SCQHA_A                 = FALSE;
-  KBIN_PHONONS_CALCULATION_SCQHA_B                 = FALSE;
-  KBIN_PHONONS_CALCULATION_SCQHA_C                 = FALSE;
-  KBIN_PHONONS_CALCULATION_QHA3P                   = FALSE;
-  KBIN_PHONONS_CALCULATION_QHA3P_A                 = FALSE;
-  KBIN_PHONONS_CALCULATION_QHA3P_B                 = FALSE;
-  KBIN_PHONONS_CALCULATION_QHA3P_C                 = FALSE;
-  //ME20190208 END
   KBIN_PHONONS_CALCULATION_AGL                     = FALSE;
   KBIN_PHONONS_CALCULATION_AEL                     = FALSE;
   KBIN_PHONONS_CALCULATION_FROZSL                  = FALSE;
@@ -667,6 +656,7 @@ void _kflags::copy(const _kflags& b) {
   KBIN_POCC                                        = b.KBIN_POCC;
   KBIN_POCC_CALCULATION                            = b.KBIN_POCC_CALCULATION; //CO20191110
   KBIN_POCC_TEMPERATURE_STRING                     = b.KBIN_POCC_TEMPERATURE_STRING; //CO20191110
+  KBIN_POCC_ARUNS2SKIP_STRING                      = b.KBIN_POCC_ARUNS2SKIP_STRING; //CO20200627
   KBIN_FROZSL                                      = b.KBIN_FROZSL;
   KBIN_FROZSL_DOWNLOAD                             = b.KBIN_FROZSL_DOWNLOAD;
   KBIN_FROZSL_FILE                                 = b.KBIN_FROZSL_FILE;
@@ -688,19 +678,6 @@ void _kflags::copy(const _kflags& b) {
   KBIN_PHONONS_CALCULATION_AAPL                    = b.KBIN_PHONONS_CALCULATION_AAPL; //CO20170601
   KBIN_PHONONS_CALCULATION_AGL                     = b.KBIN_PHONONS_CALCULATION_AGL;
   KBIN_PHONONS_CALCULATION_AEL                     = b.KBIN_PHONONS_CALCULATION_AEL;
-  //ME20190208 START
-  KBIN_PHONONS_CALCULATION_QHA_A                   = b.KBIN_PHONONS_CALCULATION_QHA_A;
-  KBIN_PHONONS_CALCULATION_QHA_B                   = b.KBIN_PHONONS_CALCULATION_QHA_B;
-  KBIN_PHONONS_CALCULATION_QHA_C                   = b.KBIN_PHONONS_CALCULATION_QHA_C;
-  KBIN_PHONONS_CALCULATION_SCQHA                   = b.KBIN_PHONONS_CALCULATION_SCQHA;
-  KBIN_PHONONS_CALCULATION_SCQHA_A                 = b.KBIN_PHONONS_CALCULATION_SCQHA_A;
-  KBIN_PHONONS_CALCULATION_SCQHA_B                 = b.KBIN_PHONONS_CALCULATION_SCQHA_B;
-  KBIN_PHONONS_CALCULATION_SCQHA_C                 = b.KBIN_PHONONS_CALCULATION_SCQHA_C;
-  KBIN_PHONONS_CALCULATION_QHA3P                   = b.KBIN_PHONONS_CALCULATION_QHA3P;
-  KBIN_PHONONS_CALCULATION_QHA3P_A                 = b.KBIN_PHONONS_CALCULATION_QHA3P_A;
-  KBIN_PHONONS_CALCULATION_QHA3P_B                 = b.KBIN_PHONONS_CALCULATION_QHA3P_B;
-  KBIN_PHONONS_CALCULATION_QHA3P_C                 = b.KBIN_PHONONS_CALCULATION_QHA3P_C;
-  //ME20190208 END
   KBIN_PHONONS_CALCULATION_FROZSL                  = b.KBIN_PHONONS_CALCULATION_FROZSL;
   KBIN_PHONONS_CALCULATION_FROZSL_output           = b.KBIN_PHONONS_CALCULATION_FROZSL_output;
   KBIN_PHONONS_CALCULATION_FROZSL_poscars          = b.KBIN_PHONONS_CALCULATION_FROZSL_poscars;
@@ -1922,8 +1899,7 @@ void _xinput::setXALIEN(_xalien& in_xalien) {
 
 xstructure& _xinput::getXStr() {
   if(!(AFLOW_MODE_VASP || AFLOW_MODE_AIMS)) {
-    cerr << "_xinput::getXStr: no xstructure available!" << endl;
-    exit(1);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"_xinput::getXStr():","No structure available.",_INPUT_MISSING_);
   }
   if(AFLOW_MODE_VASP) {return xvasp.str;}
   if(AFLOW_MODE_AIMS) {return xaims.str;}
@@ -1932,8 +1908,7 @@ xstructure& _xinput::getXStr() {
 
 string& _xinput::getDirectory() {
   if(!(AFLOW_MODE_VASP || AFLOW_MODE_AIMS || AFLOW_MODE_ALIEN)) {
-    cerr << "_xinput::getDirectory: no Directory available!" << endl;
-    exit(1);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"_xinput::getDirectory():","No directory available.",_INPUT_MISSING_);
   }
   if(AFLOW_MODE_VASP) {return xvasp.Directory;}
   if(AFLOW_MODE_AIMS) {return xaims.Directory;}
@@ -1943,8 +1918,7 @@ string& _xinput::getDirectory() {
 
 void _xinput::setXStr(const xstructure& str,bool set_all) {
   if(!(AFLOW_MODE_VASP || AFLOW_MODE_AIMS)) {
-    cerr << "_xinput::setStr: no xstructure available!" << endl;
-    exit(1);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"_xinput::setXStr():","No structure available.",_INPUT_MISSING_);
   }
   if(AFLOW_MODE_VASP || set_all) {xvasp.str=str;}
   if(AFLOW_MODE_AIMS || set_all) {xaims.str=str;}
@@ -1952,8 +1926,7 @@ void _xinput::setXStr(const xstructure& str,bool set_all) {
 
 void _xinput::setDirectory(string Directory,bool set_all) {
   if(!(AFLOW_MODE_VASP || AFLOW_MODE_AIMS || AFLOW_MODE_ALIEN)) {
-    cerr << "_xinput::setDirectory: no Directory available!" << endl;
-    exit(1);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"_xinput::setDirectory():","No directory available.",_INPUT_MISSING_);
   }
   if(AFLOW_MODE_VASP  || set_all) {xvasp.Directory=  Directory;}
   if(AFLOW_MODE_AIMS  || set_all) {xaims.Directory=  Directory;}

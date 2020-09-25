@@ -168,8 +168,10 @@ using std::vector;
 #include "aurostd_xrandom.h"
 #include "aurostd_xoption.h"
 #include "aurostd_argv.h"
+#include "aurostd_xparser.h" //CO20200624
 #include "aurostd_xcombos.h"
 #include "aurostd_xerror.h" //ME20180627
+#include "aurostd_xfit.h" //AS20200824
 
 using aurostd::min;
 using aurostd::max;
@@ -232,6 +234,42 @@ typedef unsigned uint;
 #include "../aflow.h"     //needed for XHOST
 //#include "../SQLITE/sqlite3.h"  // OBSOLETE ME20191228 - not used
 
+//CO20200624 START - adding from Jahnatek
+//http://ascii-table.com/ansi-escape-sequences.php
+//http://ascii-table.com/ansi-escape-sequences-vt-100.php
+#define cursor_moveyx(y, x) printf("\033[%d;%dH", y, x) //Move cursor to position y,x (rows, columns) with (1,1) as origin    
+#define cursor_moveup(y) printf("\033[%dA", y)          //Move cursor up y    
+#define cursor_movedown(y) printf("\033[%dB", y)        //Move cursor down y    
+#define cursor_moveright(x) printf("\033[%dC", x)       //Move cursor right x    
+#define cursor_moveleft(x) printf("\033[%dD", x)        //Move cursor left x    
+#define cursor_store() printf("\033[s")                 //Store current cursor position and color    
+#define cursor_restore() printf("\033[u")               //Restore cursor position and color from cursor_store()    
+#define cursor_clear() printf("\033[2J")                //Clear screen and leave cursor where is    
+#define cursor_clearline() printf("\033[K")             //Clear to end of line and leave cursor where is    
+#define cursor_fore_black() printf("\033[30m")          //Change foreground color to black    
+#define cursor_fore_red() printf("\033[31m")            //Change foreground color to red    
+#define cursor_fore_green() printf("\033[32m")          //Change foreground color to green    
+#define cursor_fore_orange() printf("\033[33m")         //Change foreground color to orange    
+#define cursor_fore_blue() printf("\033[34m")           //Change foreground color to blue    
+#define cursor_fore_magenta() printf("\033[35m")        //Change foreground color to magenta    
+#define cursor_fore_cyan() printf("\033[36m")           //Change foreground color to cyan    
+#define cursor_fore_yellow() printf("\033[33m\033[1m")  //Change foreground color to yellow (add bold to help visibility) 
+#define cursor_fore_white() printf("\033[37m")          //Change foreground color to white    
+#define cursor_back_black() printf("\033[40m")          //Change background color to black    
+#define cursor_back_red() printf("\033[41m")            //Change background color to red    
+#define cursor_back_green() printf("\033[42m")          //Change background color to green    
+#define cursor_back_orange() printf("\033[43m")         //Change background color to orange    
+#define cursor_back_blue() printf("\033[44m")           //Change background color to blue    
+#define cursor_back_magenta() printf("\033[45m")        //Change background color to magenta    
+#define cursor_back_cyan() printf("\033[46m")           //Change background color to cyan    
+#define cursor_back_white() printf("\033[47m")          //Change background color to white    
+#define cursor_attr_none() printf("\033[0m")            //Turn off all cursor attributes    
+#define cursor_attr_bold() printf("\033[1m")            //Make test bold    
+#define cursor_attr_underline() printf("\033[4m")       //Underline text    
+#define cursor_attr_blink() printf("\033[5m")           //Supposed to make text blink, usually bolds it instead    
+#define cursor_attr_reverse() printf("\033[7m")         //Swap background and foreground colors
+//CO20200624 END - adding from Jahnatek
+
 template<class utype> std::ostream& operator<<(std::ostream&,const std::vector<utype>&);// __xprototype;
 template<class utype> std::ostream& operator<<(std::ostream&,const std::deque<utype>&);// __xprototype;
 
@@ -239,12 +277,19 @@ template<class utype> std::ostream& operator<<(std::ostream&,const std::deque<ut
 // TIME stuff
 namespace aurostd {
   int get_day(void);
+  int get_day(tm* tstruct); //CO20200624
   int get_month(void);
+  int get_month(tm* tsruct);  //CO20200624
   int get_year(void);
+  int get_year(tm* tstruct);  //CO20200624
   long int get_date(void);
+  long int get_date(tm* tstruct);  //CO20200624
   int get_hour(void);
+  int get_hour(tm* tstruct);  //CO20200624
   int get_min(void);
+  int get_min(tm* tstruct); //CO20200624
   int get_sec(void);
+  int get_sec(tm* tstruct); //CO20200624
   long double get_seconds(void);
   long double get_seconds(long double reference_seconds);
   long double get_delta_seconds(long double& seconds_begin);
@@ -255,8 +300,11 @@ namespace aurostd {
   long double get_useconds(long double reference_useconds);
   long double get_delta_useconds(long double& useconds_begin);
   string get_time(void);
+  string get_time(tm* tstruct); //CO20200624
   string get_datetime(void);
+  string get_datetime(tm* tstruct); //CO20200624
   string get_datetime_formatted(const string& date_delim="/",bool include_time=true,const string& date_time_sep=" ",const string& time_delim=":");  //CO20171215
+  string get_datetime_formatted(tm* tstruct,const string& date_delim="/",bool include_time=true,const string& date_time_sep=" ",const string& time_delim=":");  //CO20171215  //CO20200624
   bool beep(uint=2000,uint=100); // standard values
 }
 // ----------------------------------------------------------------------------
@@ -334,6 +382,8 @@ namespace aurostd {
   string CleanStringASCII_20190712(const string& s) __xprototype; //CO20190712
   string CleanStringASCII_20190101(const string& s) __xprototype; //CO20190712
   void CleanStringASCII_InPlace(string& s) __xprototype;  //CO20190712
+  string RemoveTrailingCharacter(const string& s,char c); //CO+ME20200825
+  void RemoveTrailingCharacter_InPlace(string& s,char c); //CO+ME20200825
   string CGI_StringClean(const string& stringIN) __xprototype;
   string RemoveWhiteSpaces(const string& s) __xprototype;
   string RemoveWhiteSpaces(const string& s, const char toogle) __xprototype;
@@ -368,8 +418,9 @@ namespace aurostd {
   bool DirectoryMake(string Directory);
   bool SSH_DirectoryMake(string user, string machine,string Directory);
   bool DirectoryChmod(string chmod_string,string Directory);
-  bool DirectoryLS(string Directory,vector<string> &vfiles);
-  bool DirectoryLS(string Directory,deque<string> &vfiles);
+  bool SubDirectoryLS(const string& _Directory,vector<string>& vsubd);  //CO20200731
+  bool DirectoryLS(const string& Directory,vector<string> &vfiles);
+  bool DirectoryLS(const string& Directory,deque<string> &vfiles);
   bool DirectoryLocked(string directory,string="LOCK");
   bool DirectorySkipped(string directory);
   bool DirectoryWritable(string directory);
@@ -386,8 +437,8 @@ namespace aurostd {
   bool MatchCompressed(const string& CompressedFileName,const string& FileNameOUT);
   // [OBSOLETE]  bool DecompressFile(const string& CompressedFileName);
   bool efile2tempfile(string _FileNameIN, string& FileNameOUT); //CO20180220
-  bool IsCompressed(string FileNameIn,string& FileNameOut);
-  bool IsCompressed(string FileNameIn);
+  bool IsCompressed(const string& FileNameIn,string& FileNameOut);
+  bool IsCompressed(const string& FileNameIn);
   string GetCompressionExtension(const string& CompressedFileName);
   //CO END
   bool UncompressFile(const string& FileName,const string& command);  bool UncompressFile(const string& FileName); // with guess  
@@ -410,7 +461,7 @@ namespace aurostd {
   unsigned int getFileCheckSum(const string&, const string&);  //ME20190219
   unsigned int getFletcher32(unsigned short*, size_t);  //ME20190219
   string FileToString(const string& FileName);
-  void InFileExistCheck(const string& routine,const string& filename,ifstream& file_to_check,std::ostream& outf);
+  void InFileExistCheck(const string& routine,const string& filename,ifstream& file_to_check);
   bool IsCommandAvailable(const string& command);
   bool IsCommandAvailable(const string& command, string& position);
   bool IsCommandAvailableModify(string& command);
@@ -427,31 +478,44 @@ namespace aurostd {
   // remove comments
 
   // about printing
-  void PrintMessageStream(ofstream& FileERROR,ostringstream& stream,const bool& quiet);
-  void PrintMessageStream(std::ostream& FileERROR,ostringstream& stream,const bool& quiet);
-  void PrintMessageStream(ofstream& FileERROR,ostringstream& stream,const bool& quiet,const bool& osswrite,std::ostream& oss);
-  void PrintMessageStream(ostringstream& stream,const bool& quiet);
-  void PrintErrorStream(ofstream& FileERROR,ostringstream& stream,const bool& quiet);
-  void PrintErrorStream(std::ostream& FileERROR,ostringstream& stream,const bool& quiet);
-  void PrintErrorStream(ofstream& FileERROR,ostringstream& stream,const bool& quiet,const bool& osswrite,std::ostream& oss);
-  void PrintErrorStream(ostringstream& stream,const bool& quiet);
-  void PrintWarningStream(ofstream& FileERROR,ostringstream& stream,const bool& quiet);
-  void PrintWarningStream(std::ostream& FileERROR,ostringstream& stream,const bool& quiet);
-  void PrintWarningStream(ofstream& FileERROR,ostringstream& stream,const bool& quiet,const bool& osswrite,std::ostream& oss);
-  void PrintWarningStream(ostringstream& stream,const bool& quiet);
+  //[CO20200624 - OBSOLETE]void PrintMessageStream(ofstream& FileERROR,ostringstream& stream,bool quiet);
+  //[CO20200624 - OBSOLETE]void PrintMessageStream(std::ostream& FileERROR,ostringstream& stream,bool quiet);
+  void PrintANSIEscapeSequence(const aurostd::xoption& color);
+  void PrintMessageStream(ostringstream& stream,bool quiet,std::ostream& oss=cout); //CO20200624
+  void PrintMessageStream(ofstream& FileMESSAGE,ostringstream& stream,bool quiet,std::ostream& oss=cout); //CO20200624
+  void PrintMessageStream(ofstream& FileMESSAGE,ostringstream& stream,bool quiet,bool osswrite,std::ostream& oss=cout);
+  //[CO20200624 - OBSOLETE]void PrintMessageStream(ostringstream& stream,bool quiet);
+  //[CO20200624 - OBSOLETE]void PrintErrorStream(ofstream& FileERROR,ostringstream& stream,bool quiet);
+  //[CO20200624 - OBSOLETE]void PrintErrorStream(std::ostream& FileERROR,ostringstream& stream,bool quiet);
+  void PrintErrorStream(ostringstream& stream,bool quiet); //CO20200624
+  void PrintErrorStream(ofstream& FileERROR,ostringstream& stream,bool quiet); //CO20200624
+  void PrintErrorStream(ofstream& FileERROR,ostringstream& stream,bool quiet,bool osswrite);
+  //[CO20200624 - OBSOLETE]void PrintErrorStream(ostringstream& stream,bool quiet);
+  //[CO20200624 - OBSOLETE]void PrintWarningStream(ofstream& FileERROR,ostringstream& stream,bool quiet);
+  //[CO20200624 - OBSOLETE]void PrintWarningStream(std::ostream& FileERROR,ostringstream& stream,bool quiet);
+  void PrintWarningStream(ostringstream& stream,bool quiet); //CO20200624
+  void PrintWarningStream(ofstream& FileWARNING,ostringstream& stream,bool quiet); //CO20200624
+  void PrintWarningStream(ofstream& FileWARNING,ostringstream& stream,bool quiet,bool osswrite);
+  //[CO20200624 - OBSOLETE]void PrintWarningStream(ostringstream& stream,bool quiet);
 
-  void PrintMessageStream(ofstream& FileERROR,stringstream& stream,const bool& quiet);
-  void PrintMessageStream(std::ostream& FileERROR,stringstream& stream,const bool& quiet);
-  void PrintMessageStream(ofstream& FileERROR,stringstream& stream,const bool& quiet,const bool& osswrite,std::ostream& oss);
-  void PrintMessageStream(stringstream& stream,const bool& quiet);
-  void PrintErrorStream(ofstream& FileERROR,stringstream& stream,const bool& quiet);
-  void PrintErrorStream(std::ostream& FileERROR,stringstream& stream,const bool& quiet);
-  void PrintErrorStream(ofstream& FileERROR,stringstream& stream,const bool& quiet,const bool& osswrite,std::ostream& oss);
-  void PrintErrorStream(stringstream& stream,const bool& quiet);
-  void PrintWarningStream(ofstream& FileERROR,stringstream& stream,const bool& quiet);
-  void PrintWarningStream(std::ostream& FileERROR,stringstream& stream,const bool& quiet);
-  void PrintWarningStream(ofstream& FileERROR,stringstream& stream,const bool& quiet,const bool& osswrite,std::ostream& oss);
-  void PrintWarningStream(stringstream& stream,const bool& quiet);
+  //[CO20200624 - OBSOLETE]void PrintMessageStream(ofstream& FileERROR,stringstream& stream,bool quiet);
+  //[CO20200624 - OBSOLETE]void PrintMessageStream(std::ostream& FileERROR,stringstream& stream,bool quiet);
+  void PrintMessageStream(stringstream& stream,bool quiet,std::ostream& oss=cout);  //CO20200624
+  void PrintMessageStream(ofstream& FileMESSAGE,stringstream& stream,bool quiet,std::ostream& oss=cout);  //CO20200624
+  void PrintMessageStream(ofstream& FileMESSAGE,stringstream& stream,bool quiet,bool osswrite,std::ostream& oss=cout);
+  //[CO20200624 - OBSOLETE]void PrintMessageStream(stringstream& stream,bool quiet);
+  //[CO20200624 - OBSOLETE]void PrintErrorStream(ofstream& FileERROR,stringstream& stream,bool quiet);
+  //[CO20200624 - OBSOLETE]void PrintErrorStream(std::ostream& FileERROR,stringstream& stream,bool quiet);
+  void PrintErrorStream(stringstream& stream,bool quiet);  //CO20200624
+  void PrintErrorStream(ofstream& FileERROR,stringstream& stream,bool quiet);  //CO20200624
+  void PrintErrorStream(ofstream& FileERROR,stringstream& stream,bool quiet,bool osswrite);
+  //[CO20200624 - OBSOLETE]void PrintErrorStream(stringstream& stream,bool quiet);
+  //[CO20200624 - OBSOLETE]void PrintWarningStream(ofstream& FileERROR,stringstream& stream,bool quiet);
+  //[CO20200624 - OBSOLETE]void PrintWarningStream(std::ostream& FileERROR,stringstream& stream,bool quiet);
+  void PrintWarningStream(stringstream& stream,bool quiet);  //CO20200624
+  void PrintWarningStream(ofstream& FileWARNING,stringstream& stream,bool quiet);  //CO20200624
+  void PrintWarningStream(ofstream& FileWARNING,stringstream& stream,bool quiet,bool osswrite);
+  //[CO20200624 - OBSOLETE]void PrintWarningStream(stringstream& stream,bool quiet);
 
   // about executing
   bool execute(ostringstream& command);
@@ -616,8 +680,8 @@ namespace aurostd {
   bool file2file(const string& _file,const string& destination); //CO20171025
   string file2md5sum(const string& _file); //SC20200326
   string file2auid(const string& _file); //SC20200326  
-  bool IsDirectory(string path);
-  bool IsFile(string path);
+  bool IsDirectory(const string& path);
+  bool IsFile(const string& path);
   //CO END
   bool RemoveFile(string FileNameOUTPUT);
   bool RemoveFile(const vector<string>& files); //CO
@@ -671,6 +735,7 @@ namespace aurostd {
   string utype2string(double from,bool roff,double tol);
   string utype2string(double from,int precision,bool roff,double tol);
   string utype2string(double from,bool roff,char FORMAT);
+  string utype2string(double from,int precision,char FORMAT,bool roff=false); //CO20200624
   string utype2string(double from,int precision,bool roff,char FORMAT);
   string utype2string(double from,bool roff,double tol,char FORMAT);
   string utype2string(double from,int precision,bool roff,double tol,char FORMAT);
@@ -783,6 +848,7 @@ namespace aurostd { // aurostd_crc64.cpp
 // ***************************************************************************
 
 namespace aurostd {
+  string text2html(const string& str) __xprototype;  //ME20200921
   string html2latex(const string& str) __xprototype;
   string html2txt(const string& str) __xprototype;
   string string2latex(const string& str) __xprototype;
@@ -804,6 +870,7 @@ namespace aurostd {
   template<class utype1> void sort(vector<utype1>& arr);
   template<class utype1> void sort_remove_duplicates(vector<utype1>& arr);
   template<class utype1,class utype2> void sort(vector<utype1>& arr, vector<utype2>& brr);
+  template<class utype1,class utype2> void sort(deque<utype1>& arr, deque<utype2>& brr);  //CO20200915
   template<class utype1,class utype2,class utype3> void sort(vector<utype1>& arr, vector<utype2>& brr, vector<utype3>& crr);
   template<class utype1,class utype2,class utype3,class utype4> void sort(vector<utype1>& arr, vector<utype2>& brr, vector<utype3>& crr, vector<utype4>& drr);
 }
