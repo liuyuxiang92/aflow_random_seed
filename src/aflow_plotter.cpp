@@ -709,6 +709,10 @@ namespace plotter {
         vector<string> vstr;
         string directory = plotoptions.getattachedscheme("DIRECTORY");
         string extension = plotoptions.getattachedscheme("EXTENSION");
+        if(LDEBUG){
+          cerr << soliloquy << " directory=" << directory << endl;
+          cerr << soliloquy << " extension=" << extension << endl;
+        }
         if (aurostd::substring2bool(extension, "phdisp") || (extension == "phdos")) {
           aurostd::efile2vectorstring("PHPOSCAR", vstr);
         } else {
@@ -1158,9 +1162,10 @@ namespace plotter {
   // Extracts the structure from VASP input files, including species names.
   xstructure getStructureWithNames(const xoption& plotoptions,const string& carstring,ostream& oss) {ofstream FileMESSAGE;return getStructureWithNames(plotoptions,FileMESSAGE,carstring,oss);} //CO20200404
   xstructure getStructureWithNames(const xoption& plotoptions,ofstream& FileMESSAGE,const string& carstring,ostream& oss) { //CO20200404
-    bool LDEBUG=(FALSE || _DEBUG_PLOTTER_ || XHOST.DEBUG); 
+    bool LDEBUG=(FALSE || _DEBUG_PLOTTER_ || XHOST.DEBUG);
     string soliloquy="plotter::getStructureWithNames():";
     string directory = plotoptions.getattachedscheme("DIRECTORY");
+    if(LDEBUG){cerr << soliloquy << " directory(input)=" << directory << endl;}
     string poscar_file = "POSCAR"; //CO20200404
     std::stringstream poscar;
     //if (plotoptions.getattachedscheme("EXTENSION") == "phdos")
@@ -1175,7 +1180,9 @@ namespace plotter {
         arun = plotoptions.getattachedscheme("ARUN_DIRECTORY");  //relative path
         if(LDEBUG){cerr << soliloquy << " grabbing POSCAR from " << arun << endl;}
         directory+="/"+arun;
+        aurostd::StringSubst(directory,"/RAW/","/LIB/");  //read POSCAR from LIB, not RAW (may not have been processed yet)
       }
+      if(LDEBUG){cerr << soliloquy << " directory(POSCAR)=" << directory << endl;}
       aflowlib::vaspfile2stringstream(directory + "", poscar_file, poscar);  //CO20200404
     }
 
