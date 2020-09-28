@@ -2760,22 +2760,26 @@ namespace apl
     file << blockname + "SYSTEM=" << system_title << std::endl;
     file << blockname + "START" << std::endl;
     // write header
-    file << setw(5)  << "# T[K]"               << setw(SW) << ' ' <<
-      setw(TW) << "Veq[ev/atom]"         << setw(SW) << ' ' <<
-      setw(TW) << "F(V0)[eV/atom]"       << setw(SW) << ' ' <<
+    file << setw(5)  << "#T[K]"          << setw(SW) << ' ' <<
+      setw(TW) << "V[A^3]"               << setw(SW) << ' ' <<
+      setw(TW) << "F(V)[eV/atom]"        << setw(SW) << ' ' <<
       setw(TW) << "B[GPa]"               << setw(SW) << ' ' <<
       setw(TW) << "beta[10^-6/K]"        << setw(SW) << ' ' <<
-      setw(TW) << "Cv[kB/atom]"         << setw(SW) << ' ' <<
-      setw(TW) << "Cp[kB/atom]"         << setw(SW) << ' ' <<
-      setw(TW) << "gamma(beta,B,Cv)"     << setw(SW) << ' ' <<
+      setw(TW) << "Cv(V)[kB/atom]"       << setw(SW) << ' ' <<
+      setw(TW) << "Cp(V)[kB/atom]"       << setw(SW) << ' ' <<
+      setw(TW) << "gamma(beta,B,Cv(V))"  << setw(SW) << ' ' <<
       setw(TW) << "Bprime";
     // the following properties are calculated only with a regular QHA calculation
     if (qha_method==QHA_CALC){
       file  << setw(SW) << ' ' <<
-        setw(TW) << "beta_mesh[10^-6/K]"   << setw(SW) << ' ' <<
-        setw(TW) << "Cv_mesh[kB/atom]"    << setw(SW) << ' ' <<
-        setw(TW) << "Cp_mesh[kB/atom]"    << setw(SW) << ' ' <<
-        setw(TW) << "gamma_mesh";
+        setw(TW) << "gamma(V,mesh)"                          << setw(SW) << ' ' <<
+        setw(TW) << "beta(gamma(V,mesh),B,Cv(V))[10^-6/K]"   << setw(SW) << ' ' <<
+        setw(TW) << "Cv(V,mesh)[kB/atom]"                    << setw(SW) << ' ' <<
+        setw(TW) << "Cp(V,mesh)[kB/atom]"                    << setw(SW) << ' ' <<
+        setw(TW) << "gamma(V0,mesh)"                         << setw(SW) << ' ' <<
+        setw(TW) << "beta(gamma(V0,mesh),B,Cv(V0))[10^-6/K]" << setw(SW) << ' ' <<
+        setw(TW) << "Cv(V0,mesh)[kB/atom]"                   << setw(SW) << ' ' <<
+        setw(TW) << "Cp(V0,mesh)[kB/atom]";
     }
     file << std::endl;
 
@@ -2802,8 +2806,10 @@ namespace apl
     double V0K = EOS_volume_at_equilibrium; // equilibrium volume at 0K
 
     double T = 0.0, Veq = 0.0, Feq = 0.0, B = 0.0, Bp = 0.0, beta = 0.0, CV = 0.0, CP = 0.0, GP = 0.0;
-    double CV_mesh = 0.0, GP_mesh = 0.0, CP_mesh = 0.0, beta_mesh = 0.0; // these properties are calculated 
-    // by weighted sum over q-points mesh
+    // the following properties are calculated by weighted sum over q-points mesh
+    double CV_mesh_V0 = 0.0, GP_mesh_V0 = 0.0, CP_mesh_V0 = 0.0, beta_mesh_V0 = 0.0;
+    double CV_mesh_V  = 0.0, GP_mesh_V  = 0.0, CP_mesh_V  = 0.0, beta_mesh_V  = 0.0;
+
     for (int Tid=0; Tid<Ntemperatures; Tid++){
       T = Temperatures[Tid];
 
@@ -2847,15 +2853,19 @@ namespace apl
       B   = EOS_bulk_modulus_at_equilibrium;  // [GPa]
       Bp  = EOS_Bprime_at_equilibrium;
       beta = ThermalExpansion(T, eos_method, qha_method); // [K^-1]
-      CV   = IsochoricSpecificHeat(T, V0K, eos_method, qha_method)/KBOLTZEV; // [kB/atom]
+      CV   = IsochoricSpecificHeat(T, Veq, eos_method, qha_method)/KBOLTZEV; // [kB/atom]
       CP   = CV + Veq*T*B*pow(beta,2)/eV2GPa/KBOLTZEV; // [kB/atom]
       GP   = (beta/CV)*B*Veq/eV2GPa/KBOLTZEV;
 
       // the following properties are calculated only with a regular QHA calculation
       if (qha_method==QHA_CALC){
-        calcCVandGPfit(T, Veq, CV_mesh, GP_mesh);
-        beta_mesh = KBOLTZEV*CV_mesh*GP_mesh/Veq/(B/eV2GPa); // [K^-1]
-        CP_mesh   = CV_mesh + Veq*T*B*pow(beta_mesh,2)/eV2GPa/KBOLTZEV; // [kB/atom]
+        calcCVandGPfit(T, V0K, CV_mesh_V0, GP_mesh_V0);
+        beta_mesh_V0 = KBOLTZEV*CV_mesh_V0*GP_mesh_V0/V0K/(B/eV2GPa); // [K^-1]
+        CP_mesh_V0 = CV_mesh_V0 + V0K*T*B*pow(beta_mesh_V0,2)/eV2GPa/KBOLTZEV;//[kB/atom]
+
+        calcCVandGPfit(T, Veq, CV_mesh_V,  GP_mesh_V);
+        beta_mesh_V = KBOLTZEV*CV_mesh_V*GP_mesh_V/Veq/(B/eV2GPa); // [K^-1]
+        CP_mesh_V   = CV_mesh_V + Veq*T*B*pow(beta_mesh_V,2)/eV2GPa/KBOLTZEV; //[kB/atom]
       }
 
       // write values to file
@@ -2871,10 +2881,14 @@ namespace apl
       // the following properties are calculated only with a regular QHA calculation
       if (qha_method==QHA_CALC){
         file << setw(SW) << ' ' <<
-          setw(TW) << beta_mesh * 1e6     << setw(SW) << ' ' << //[10^-6/K]
-          setw(TW) << CV_mesh             << setw(SW) << ' ' <<
-          setw(TW) << CP_mesh             << setw(SW) << ' ' <<
-          setw(TW) << GP_mesh             << setw(SW);
+          setw(TW) << GP_mesh_V              << setw(SW) << ' ' <<
+          setw(TW) << beta_mesh_V * 1e6      << setw(SW) << ' ' << //[10^-6/K]
+          setw(TW) << CV_mesh_V              << setw(SW) << ' ' <<
+          setw(TW) << CP_mesh_V              << setw(SW) << ' ' <<
+          setw(TW) << GP_mesh_V0             << setw(SW) << ' ' <<
+          setw(TW) << beta_mesh_V0 * 1e6     << setw(SW) << ' ' << //[10^-6/K]
+          setw(TW) << CV_mesh_V0             << setw(SW) << ' ' <<
+          setw(TW) << CP_mesh_V0             << setw(SW);
       }
       file << std::endl;
     }
