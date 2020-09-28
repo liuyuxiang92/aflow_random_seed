@@ -846,7 +846,7 @@ namespace sflow {
     }
 
     if(LDEBUG) cerr << function_name << " END" << endl;
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Throw for debugging purposes.",_GENERIC_ERROR_);
+    //throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Throw for debugging purposes.",_GENERIC_ERROR_);
   }  
 } // namespace sflow
 
