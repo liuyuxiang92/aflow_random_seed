@@ -766,6 +766,12 @@ namespace apl
       }
       if (!xinput.xvasp.AVASP_value_BANDS_GRID)
         xinput.xvasp.AVASP_value_BANDS_GRID=DEFAULT_BANDS_GRID;
+
+      // set CONVERT_UNIT_CELL to PRES
+      xinput.xvasp.aopts.flag("AFLOWIN_FLAG::CONVERT_UNIT_CELL",true);
+      xinput.xvasp.aopts.pop_attached("AFLOWIN_FLAG::CONVERT_UNIT_CELL");
+      xinput.xvasp.aopts.push_attached("AFLOWIN_FLAG::CONVERT_UNIT_CELL", "PRES");
+
       AVASP_MakeSingleAFLOWIN(xinput.xvasp, aflow, true);
 
       xinput.xvasp.AVASP_INCAR_EXPLICIT_START_STOP.str(std::string());
@@ -923,6 +929,12 @@ namespace apl
       }
       if (!xinput.xvasp.AVASP_value_BANDS_GRID)
         xinput.xvasp.AVASP_value_BANDS_GRID=DEFAULT_BANDS_GRID;
+
+      // set CONVERT_UNIT_CELL to PRES
+      xinput.xvasp.aopts.flag("AFLOWIN_FLAG::CONVERT_UNIT_CELL",true);
+      xinput.xvasp.aopts.pop_attached("AFLOWIN_FLAG::CONVERT_UNIT_CELL");
+      xinput.xvasp.aopts.push_attached("AFLOWIN_FLAG::CONVERT_UNIT_CELL", "PRES");
+
       AVASP_MakeSingleAFLOWIN(xinput.xvasp, aflow, true);
 
       xinput.xvasp.AVASP_INCAR_EXPLICIT_START_STOP.str(std::string());
