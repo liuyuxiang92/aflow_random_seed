@@ -122,6 +122,7 @@ namespace aflowlib {
         bool ICSD2LINK=TRUE;//TRUE;
         bool ZIPNOMIX=TRUE;
         bool BROKEN=FALSE;//TRUE; // VERY VERY SLOW
+	bool TOUCH=FALSE;
 
         deque<string> vext; aurostd::string2tokens(".xz",vext,",");
         deque<string> vcmd; aurostd::string2tokens("xzcat",vcmd,",");
@@ -357,7 +358,8 @@ namespace aflowlib {
           }
 
           // RETOUCHING DATE OF AFLOW.IN TO REPRESENT AFLOW.END.OUT
-          if(FileExist_directory_LIB_AFLOW_IN && aurostd::FileExist(directory_LIB+"/aflow.end.out")) {
+          if(TOUCH) { // TOO MANY
+	  if(FileExist_directory_LIB_AFLOW_IN && aurostd::FileExist(directory_LIB+"/aflow.end.out")) {
             struct stat fileInfo_IN,fileInfo_OUT;
             stat(string(directory_LIB+"/"+_AFLOWIN_).c_str(), &fileInfo_IN);
             stat(string(directory_LIB+"/aflow.end.out").c_str(), &fileInfo_OUT);
@@ -375,6 +377,7 @@ namespace aflowlib {
               //  acout << "FIXED " << directory_LIB << endl;
             }
           }
+	  }
 
           // some step debug
           aurostd::ProgressBar(acerr,"aflowlib::LIB2SCRUB ",j,list2found.size(),1,1,1);
