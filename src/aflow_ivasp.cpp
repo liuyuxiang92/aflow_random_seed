@@ -5751,7 +5751,7 @@ namespace KBIN {
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
     }
     aurostd::StringSubst(system_name,":.","."); //CO20200731 - patching bug in system name generation
-    aurostd::StringSubst(system_name,"@",".");  //CO20200731 - patching for AEL/AGL ARUNs
+    aurostd::StringSubst(system_name,"@ARUN.A",":ARUN.A");  //CO20200731 - patching for AEL/AGL ARUNs - @ in filenames are NOT good
     return system_name;
   }
 

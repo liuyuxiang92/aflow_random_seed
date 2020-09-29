@@ -574,8 +574,9 @@ namespace plotter {
     string proto="";
     vector<string> velements;
     string pocc_params="";
-    string arun="";
-    string::size_type c;
+    string arun_pocc="";
+    string arun_module="";
+    string::size_type c=0,m=0;
     xstructure xstr;
     while(t!=string::npos && (t+1)<elements_prototype_str.length()){
       pps=elements_prototype_str.substr(0,t);
@@ -592,11 +593,19 @@ namespace plotter {
       c=pocc_params_arun_str.find(POCC_ARUN_TITLE_TAG);
       if(c!=string::npos && (c+1)<pocc_params_arun_str.length()){
         pocc_params=pocc_params_arun_str.substr(0,c);
-        arun=pocc_params_arun_str.substr(c+1,string::npos);
+        arun_pocc=pocc_params_arun_str.substr(c+1,string::npos);
+        if(LDEBUG){cerr << soliloquy << " arun_pocc(with-module)=" << arun_pocc << endl;}
+        m=arun_pocc.find(":");
+        if(m!=string::npos && (m+1)<arun_pocc.length()){
+          string arun_pocc_new=arun_pocc.substr(0,m);
+          arun_module=arun_pocc.substr(m+1,string::npos);
+          arun_pocc=arun_pocc_new;
+        }
       }
       if(LDEBUG){
         cerr << soliloquy << " pocc_params=" << pocc_params << endl;
-        cerr << soliloquy << " arun=" << arun << endl;
+        cerr << soliloquy << " arun_pocc=" << arun_pocc << endl;
+        cerr << soliloquy << " arun_module=" << arun_module << endl;
       }
 
       aurostd::xoption proto_flags;
@@ -641,12 +650,24 @@ namespace plotter {
     }
     new_title+=" ("+aurostd::fixStringLatex(proto,false,false);
 
-    if(!arun.empty()){
-      vector<string> tokens;
-      aurostd::string2tokens(arun,tokens,"_");
+    vector<string> tokens;
+    //ARUN.POCC_49
+    if(!arun_pocc.empty()){
+      aurostd::string2tokens(arun_pocc,tokens,"_");
       string pocc_hash="";
       if(tokens.size()>1){pocc_hash=tokens.back();}
       if(!pocc_hash.empty()){new_title+=":"+aurostd::fixStringLatex(pocc_hash,false,false);}
+    }
+    //arun_module=ARUN.AGL_6_SF_0.92
+    if(!arun_module.empty()){
+      aurostd::string2tokens(arun_module,tokens,"_");
+      string module_hash="";
+      if(tokens.size()>1){
+        vector<string> new_tokens;
+        for(uint i=2;i<tokens.size();i++){new_tokens.push_back(tokens[i]);}
+        module_hash=aurostd::joinWDelimiter(new_tokens,"_");
+      }
+      if(!module_hash.empty()){new_title+=":"+aurostd::fixStringLatex(module_hash,false,false);}
     }
 
     new_title+=")";
@@ -905,7 +926,7 @@ namespace plotter {
     const string& directory = plotoptions.getattachedscheme("DIRECTORY");
     if (!aurostd::FileExist(directory + "/" + _AFLOWIN_)) return;  //ME20200922
     if(LDEBUG) { cerr << soliloquy << " directory=" << directory << endl;}
-    string SYSTEM=KBIN::ExtractSystemNameFromAFLOWIN(directory); //CO20200731
+    string SYSTEM=KBIN::ExtractSystemName(directory); //CO20200731
     if(!SYSTEM.empty()){
       if(LDEBUG) { cerr << soliloquy << " DEFAULT_TITLE(OLD)=" << plotoptions.getattachedscheme("DEFAULT_TITLE") << endl;}
       plotoptions.pop_attached("DEFAULT_TITLE");
