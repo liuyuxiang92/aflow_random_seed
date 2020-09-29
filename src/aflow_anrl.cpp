@@ -1759,6 +1759,13 @@ namespace anrl {
     string label_permutations=""; deque<uint> vpermutation;
 
     // ---------------------------------------------------------------------------
+    // handle corner cases //DX20200929
+    if(label.find("sigma_tP30_136_bf2ij") != std::string::npos){
+      aurostd::StringSubst(label,"sigma_tP30_136_bf2ij","A_tP30_136_bf2ij"); // label
+      aurostd::StringSubst(label,".sigma",".A"); // permutation
+    }
+
+    // ---------------------------------------------------------------------------
     // search for label_permutations
     aurostd::string2tokens(label,tokens,".");
     if(LDEBUG) { cerr << function_name << ": tokens.size()=" << tokens.size() << endl;}

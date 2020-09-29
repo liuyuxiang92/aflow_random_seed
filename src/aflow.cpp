@@ -402,6 +402,54 @@ bool coordinationTest(ofstream& FileMESSAGE,ostream& oss){  //CO20190520
   return TRUE; //CO20180419
 }
 
+bool PrototypeGeneratorTest(ostream& oss){ofstream FileMESSAGE;return PrototypeGeneratorTest(FileMESSAGE,oss);} //DX20200925
+bool PrototypeGeneratorTest(ofstream& FileMESSAGE,ostream& oss){  //DX20200925
+  string function_name="PrototypeGeneratorTest():";
+  bool LDEBUG=FALSE; // TRUE;
+  stringstream message;
+  _aflags aflags;aflags.Directory=aurostd::getPWD();
+
+  message << "Testing generation of all AFLOW prototypes";
+  pflow::logger(_AFLOW_FILE_NAME_,function_name,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+
+  vector<string> prototype_labels, compositions;
+  vector<uint> space_group_numbers;
+  vector<vector<vector<string> > > grouped_Wyckoff_letters;
+  string library = "anrl";
+
+  uint num_protos = aflowlib::GetAllPrototypeLabels(prototype_labels,
+      compositions,
+      space_group_numbers,
+      grouped_Wyckoff_letters,
+      library);
+
+  message << "Number of prototype labels = " << num_protos << " (each may have multiple parameter sets)";
+  pflow::logger(_AFLOW_FILE_NAME_,function_name,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+
+  for(uint i=0;i<num_protos;i++){
+    // get parameters
+    vector<string> parameter_sets = anrl::getANRLParameters(prototype_labels[i],"all");
+
+    if(LDEBUG){ cerr << "Number of parameters for label=" << prototype_labels[i] << ": " << parameter_sets.size() << endl; }
+
+    for(uint j=0;j<parameter_sets.size();j++){
+      try{
+        xstructure xstr = aflowlib::PrototypeLibraries(oss,prototype_labels[i],parameter_sets[j],1);
+      }
+      catch(aurostd::xerror& excpt){
+        message << "Could not generate prototype=" << prototype_labels[i] << ", check inputs or the symbolic generator.";
+        pflow::logger(_AFLOW_FILE_NAME_,function_name,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+        return false;
+      }
+    }
+  }
+  message << "Successfully generated all prototypes!";
+  pflow::logger(_AFLOW_FILE_NAME_,function_name,message,aflags,FileMESSAGE,oss,_LOGGER_COMPLETE_);
+
+  return true;
+}
+
+
 int main(int _argc,char **_argv) {
   string soliloquy = XPID + "main():"; //CO20180419
   ostream& oss=cout;  //CO20180419
@@ -577,6 +625,7 @@ int main(int _argc,char **_argv) {
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_gcd|--gcd_test")) {return (gcdTest()?0:1);}  //CO20190601
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_smith|--smith_test")) {return (smithTest()?0:1);}  //CO20190601
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_coordination|--coordination_test")) {return (coordinationTest()?0:1);}  //CO20190601
+    if(!Arun && aurostd::args2flag(argv,cmds,"--test_PrototypeGenerator|--PrototypeGenerator_test")) {return (PrototypeGeneratorTest()?0:1);}  //DX20200928
     if(!Arun && aurostd::args2flag(argv,cmds,"--test")) {
 
       if(XHOST.vext.size()!=XHOST.vcat.size()) {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"XHOST.vext.size()!=XHOST.vcat.size(), aborting.",_RUNTIME_ERROR_);}
