@@ -1,3 +1,7 @@
+3.2.6 - 2020/09/25
+        Location: http://materials.duke.edu/AFLOW/aflow.3.2.5.tar.xz
+        -- added check_prototype_generator (and --PrototypeGenerator_test) to the Makefile to ensure all AFLOW prototypes can be generated (DX)
+        -- updated README_AFLOW_ANRL.TXT (DX)
 3.2.5 - 2020/09/25
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.5.tar.xz
         -- patched convert issue: security policy 'PDF' blocking conversion (SC)
