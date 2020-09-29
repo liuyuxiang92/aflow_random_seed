@@ -310,6 +310,8 @@ namespace aflowlib {
   string AFLUXCall(vector<string>& matchbook); //DX20190206 - add AFLUX functionality
   string AFLUXCall(string& summons); //DX20190206 - add AFLUX functionality 
   vector<vector<std::pair<string,string> > > getPropertiesFromAFLUXResponse(string& response); //DX20190206 - get properties from AFLUX response
+  string getSpaceGroupAFLUXSummons(vector<uint>& space_groups, uint relaxation_step); //DX20200929
+  string getSpaceGroupAFLUXSummons(uint space_group_number, uint relaxation_step, bool only_one_sg=true); //DX20200929
   // [OBSOLETE] uint WEB_Aflowlib_Entry_PHP(string options,ostream& oss); //SC20200327
   uint WEB_Aflowlib_Entry(string options,ostream& oss); 
   // [OBSOLETE] uint WEB_Aflowlib_Entry_PHP3(string options,ostream& oss);  //SC20190813

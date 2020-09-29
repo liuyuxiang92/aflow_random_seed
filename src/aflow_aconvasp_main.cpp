@@ -409,7 +409,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     vpflow.args2addattachedscheme(argv,cmds,"COMPARE_DATABASE_ENTRIES::RELAXATION_STEP","--relaxation_step=|--relaxation=","");
     vpflow.args2addattachedscheme(argv,cmds,"COMPARE_DATABASE_ENTRIES::CATALOG","--catalog=|--library=","");
     vpflow.args2addattachedscheme(argv,cmds,"COMPARE_DATABASE_ENTRIES::STOICHIOMETRY","--stoichiometry=","");
-    vpflow.args2addattachedscheme(argv,cmds,"COMPARE_DATABASE_ENTRIES::SPACE_GROUP","--space_group=","");
+    vpflow.args2addattachedscheme(argv,cmds,"COMPARE_DATABASE_ENTRIES::SPACE_GROUP","--space_group=|--spacegroup=|--sg=","");
     vpflow.args2addattachedscheme(argv,cmds,"COMPARE_DATABASE_ENTRIES::WYCKOFF","--Wyckoff=|--wyckoff=","");
     vpflow.flag("COMPARE_DATABASE_ENTRIES::STRUCTURE",aurostd::args2flag(argv,cmds,"--structure|--structure_comparison|--ignore_species"));
     vpflow.flag("COMPARE_DATABASE_ENTRIES::KEEP_UNMATCHED",aurostd::args2flag(argv,cmds,"--keep_unmatched")); //DX20190424

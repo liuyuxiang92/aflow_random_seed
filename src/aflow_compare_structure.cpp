@@ -1436,35 +1436,7 @@ namespace compare {
     // ---------------------------------------------------------------------------
     // AFLUX matchbook preparations: get entries with compatible space groups, i.e., same or enantiomorph
     if(!comparison_options.flag("COMPARISON_OPTIONS::IGNORE_SYMMETRY")){
-      string space_group_summons = "";
-      // check if enantiomorphic space group
-      int enantiomorph_space_group_number = SYM::getEnantiomorphSpaceGroupNumber(space_group_number);
-      if(space_group_number == enantiomorph_space_group_number){
-        // relaxed: need to match last in string, i.e., "*,<sg_symbol> <sg_number>" (comma necessary or we may grab the orig symmetry)
-        if(relaxation_step==_COMPARE_DATABASE_GEOMETRY_ORIGINAL_){
-          space_group_summons = "sg2(%27" + GetSpaceGroupName(space_group_number) + "%20%23" + aurostd::utype2string<int>(space_group_number) + ",%27*)";
-        }
-        else if(relaxation_step==_COMPARE_DATABASE_GEOMETRY_RELAX1_){
-          space_group_summons = "sg2(*%27," + GetSpaceGroupName(space_group_number) + "%20%23" + aurostd::utype2string<int>(space_group_number) + ",%27*)";
-        }
-        else if(relaxation_step==_COMPARE_DATABASE_GEOMETRY_MOST_RELAXED_){
-          space_group_summons = "sg2(*%27," + GetSpaceGroupName(space_group_number) + "%20%23" + aurostd::utype2string<int>(space_group_number) + "%27)";
-        }
-      }
-      else { // need to get enantiomorph too
-        if(relaxation_step==_COMPARE_DATABASE_GEOMETRY_ORIGINAL_){
-          space_group_summons = "sg2(%27" + GetSpaceGroupName(space_group_number) + "%20%23" + aurostd::utype2string<int>(space_group_number) + ",%27*";
-          space_group_summons += ":%27" + GetSpaceGroupName(enantiomorph_space_group_number) + "%20%23" + aurostd::utype2string<int>(enantiomorph_space_group_number) + ",%27*)";
-        }
-        else if(relaxation_step==_COMPARE_DATABASE_GEOMETRY_RELAX1_){
-          space_group_summons = "sg2(*%27," + GetSpaceGroupName(space_group_number) + "%20%23" + aurostd::utype2string<int>(space_group_number) + ",%27*";
-          space_group_summons += ":*%27," + GetSpaceGroupName(enantiomorph_space_group_number) + "%20%23" + aurostd::utype2string<int>(enantiomorph_space_group_number) + ",%27*)";
-        }
-        else if(relaxation_step==_COMPARE_DATABASE_GEOMETRY_MOST_RELAXED_){
-          space_group_summons = "sg2(*%27," + GetSpaceGroupName(space_group_number) + "%20%23" + aurostd::utype2string<int>(space_group_number) + "%27";
-          space_group_summons += ":*%27," + GetSpaceGroupName(enantiomorph_space_group_number) + "%20%23" + aurostd::utype2string<int>(enantiomorph_space_group_number) + "%27)";
-        }
-      }
+      string space_group_summons = aflowlib::getSpaceGroupAFLUXSummons(space_group_number,relaxation_step); //DX20200929 - consolidated formatting to a function
       matchbook.push_back(space_group_summons);
     }
     vector<GroupedWyckoffPosition> grouped_Wyckoff_positions;
@@ -1997,6 +1969,28 @@ namespace compare {
       }
     }
 
+    // ---------------------------------------------------------------------------
+    // FLAG: specify space group
+    vector<uint> space_groups;
+    if(vpflow.flag("COMPARE_DATABASE_ENTRIES::SPACE_GROUP")){
+      string space_group_input = vpflow.getattachedscheme("COMPARE_DATABASE_ENTRIES::SPACE_GROUP");
+      vector<string> space_group_strings;
+      aurostd::string2tokens(space_group_input,space_group_strings,",");
+
+      uint sg_tmp = 0;
+      for(uint i=0;i<space_group_strings.size();i++){
+        sg_tmp = aurostd::string2utype<uint>(space_group_strings[i]);
+        if(sg_tmp<1 || sg_tmp>230){
+          message << "Invalid space group requested: " << space_group_strings[i] << ". Please check input.";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_INPUT_ERROR_);
+        }
+        space_groups.push_back(sg_tmp);
+      }
+      message << "OPTIONS: Requesting the following space groups: " << space_group_input;
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+
+    }
+
     //TODO
     // ===== FLAG: STOICHIOMETRY ===== //
     //string alloy_string = vpflow.getattachedscheme("COMPARE_ALLOY::ALLOY");
@@ -2141,8 +2135,17 @@ namespace compare {
       nspecies_summons = "nspecies(" + aurostd::utype2string<uint>(arity) + ")";
     }
 
+    // ---------------------------------------------------------------------------
+    // AFLUX matchbook preparations: get space group(s) //DX20200929
+    string sg_summons = "";
+    if(space_groups.size()!=0){
+      sg_summons = aflowlib::getSpaceGroupAFLUXSummons(space_groups, relaxation_step);
+      if(LDEBUG){ cerr << "Space group summons: " << sg_summons << endl; }
+    }
+
     matchbook.push_back(species_summons);
     matchbook.push_back(nspecies_summons);
+    matchbook.push_back(sg_summons);
 
     // ---------------------------------------------------------------------------
     // AFLUX matchbook preparations: format AFLUX output 

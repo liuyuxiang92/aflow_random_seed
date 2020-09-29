@@ -12,6 +12,7 @@
 #define _AFLOWLIB_WEB_INTERFACE_CPP_
 #include "aflow.h"
 #include "aflow_pocc.h" //CO20200624
+#include "aflow_symmetry_spacegroup.h" //DX20200929
 #include "aflowlib_webapp_entry.cpp"  //CO20170622 - BH JMOL stuff
 #include "aflowlib_webapp_bands.cpp"  //CO20180305 - GG bands stuff
 
@@ -4387,6 +4388,68 @@ namespace aflowlib {
 }
 
 //DX+FR20190206 - AFLUX functionality via command line - END
+
+//DX20200929 - START
+namespace aflowlib {
+  string getSpaceGroupAFLUXSummons(vector<uint>& space_groups, uint relaxation_step){
+
+    vector<string> vsummons(space_groups.size());
+
+    for(uint i=0;i<space_groups.size();i++){
+      vsummons[i] = getSpaceGroupAFLUXSummons(space_groups[i], relaxation_step, false); //false - signals more than one space group
+    }
+    return "sg2(" + aurostd::joinWDelimiter(vsummons,":") + ")";
+  }
+}
+
+namespace aflowlib {
+  string getSpaceGroupAFLUXSummons(uint space_group_number, uint relaxation_step, bool only_one_sg){
+
+    // Formats the space group summons for an AFLUX matchbook
+    // This also grabs the relative enantiomorphs, since they
+    // are simply mirror images of one another (structurally the same)
+    // The summons are formatted differently depending on the relaxation type
+    // (i.e. placement of comma(s) or lack thereof)
+
+    string space_group_summons = "";
+    // check if enantiomorphic space group
+    uint enantiomorph_space_group_number = SYM::getEnantiomorphSpaceGroupNumber(space_group_number);
+    if(space_group_number == enantiomorph_space_group_number){
+      // relaxed: need to match last in string, i.e., "*,<sg_symbol> <sg_number>" (comma necessary or we may grab the orig symmetry)
+      if(relaxation_step==_COMPARE_DATABASE_GEOMETRY_ORIGINAL_){
+        space_group_summons = "%27" + GetSpaceGroupName(space_group_number) + "%20%23" + aurostd::utype2string<int>(space_group_number) + ",%27*";
+      }
+      else if(relaxation_step==_COMPARE_DATABASE_GEOMETRY_RELAX1_){
+        space_group_summons = "*%27," + GetSpaceGroupName(space_group_number) + "%20%23" + aurostd::utype2string<int>(space_group_number) + ",%27*";
+      }
+      else if(relaxation_step==_COMPARE_DATABASE_GEOMETRY_MOST_RELAXED_){
+        space_group_summons = "*%27," + GetSpaceGroupName(space_group_number) + "%20%23" + aurostd::utype2string<int>(space_group_number) + "%27";
+      }
+    }
+    else { // need to get enantiomorph too
+      if(relaxation_step==_COMPARE_DATABASE_GEOMETRY_ORIGINAL_){
+        space_group_summons = "%27" + GetSpaceGroupName(space_group_number) + "%20%23" + aurostd::utype2string<int>(space_group_number) + ",%27*";
+        space_group_summons += ":%27" + GetSpaceGroupName(enantiomorph_space_group_number) + "%20%23" + aurostd::utype2string<int>(enantiomorph_space_group_number) + ",%27*";
+      }
+      else if(relaxation_step==_COMPARE_DATABASE_GEOMETRY_RELAX1_){
+        space_group_summons = "*%27," + GetSpaceGroupName(space_group_number) + "%20%23" + aurostd::utype2string<int>(space_group_number) + ",%27*";
+        space_group_summons += ":*%27," + GetSpaceGroupName(enantiomorph_space_group_number) + "%20%23" + aurostd::utype2string<int>(enantiomorph_space_group_number) + ",%27*";
+      }
+      else if(relaxation_step==_COMPARE_DATABASE_GEOMETRY_MOST_RELAXED_){
+        space_group_summons = "*%27," + GetSpaceGroupName(space_group_number) + "%20%23" + aurostd::utype2string<int>(space_group_number) + "%27";
+        space_group_summons += ":*%27," + GetSpaceGroupName(enantiomorph_space_group_number) + "%20%23" + aurostd::utype2string<int>(enantiomorph_space_group_number) + "%27";
+      }
+    }
+
+    // ---------------------------------------------------------------------------
+    // if there is only one space group in the query, put summons in sg2();
+    // otherwise this is down outside this function
+    if(only_one_sg) { space_group_summons = "sg2(" + space_group_summons + ")"; }
+
+    return space_group_summons;
+  }
+}
+//DX20200929 - END
 
 namespace aflowlib {
   uint WEB_Aflowlib_Entry(string options,ostream& oss) {
