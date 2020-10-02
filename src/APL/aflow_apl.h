@@ -1191,10 +1191,10 @@ namespace apl
     public:
       QHA(ostream& oss=std::cout);
       QHA(const QHA& qha);
-      QHA(_xinput &xinput, xoption &qhaopts, xoption &aplopts, ofstream &FileMESSAGE,
-          ostream &oss=std::cout);
-      void initialize(_xinput &xinput, xoption &qhaopts, xoption &aplopts,
-          ofstream &FileMESSAGE, ostream &oss);
+      QHA(const xstructure &struc, _xinput &xinput, xoption &qhaopts, xoption &aplopts,
+          ofstream &FileMESSAGE, ostream &oss=std::cout);
+      void initialize(const xstructure &struc, _xinput &xinput, xoption &qhaopts,
+          xoption &aplopts, ofstream &FileMESSAGE, ostream &oss);
       ~QHA();
       const QHA& operator=(const QHA &qha);
       void run(_xflags &xflags, _aflags &aflags, _kflags &kflags);

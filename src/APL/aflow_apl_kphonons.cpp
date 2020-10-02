@@ -792,7 +792,8 @@ namespace KBIN {
 
     //AS20200513 BEGIN
     if (kflags.KBIN_PHONONS_CALCULATION_QHA){
-      apl::QHA qha(xinput, qhaopts, aplopts, FileMESSAGE, oss);
+      apl::QHA qha(supercell.getInputStructureLight(), xinput,
+          qhaopts, aplopts, FileMESSAGE, oss);
 
       qha.system_title = phcalc._system;
       qha.run(xflags, aflags, kflags);

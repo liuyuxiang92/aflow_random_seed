@@ -298,16 +298,16 @@ namespace apl
 
   ///////////////////////////////////////////////////////////////////////////////
 
-  QHA::QHA(_xinput &xinput, xoption &qha_options, xoption &apl_options,
-      ofstream &FileMESSAGE, ostream &oss)
+  QHA::QHA(const xstructure &in_structure, _xinput &xinput, xoption &qha_options,
+      xoption &apl_options, ofstream &FileMESSAGE, ostream &oss)
   {
-    initialize(xinput, qha_options, apl_options, FileMESSAGE, oss);
+    initialize(in_structure, xinput, qha_options, apl_options, FileMESSAGE, oss);
   }
 
   /// Initializes the QHA class with all the necessary data.
   ///
-  void QHA::initialize(_xinput &xinput, xoption &qha_options, xoption &apl_options,
-      ofstream &FileMESSAGE, ostream &oss)
+  void QHA::initialize(const xstructure &in_structure, _xinput &xinput,
+      xoption &qha_options, xoption &apl_options, ofstream &FileMESSAGE, ostream &oss)
   {
     static const int REQUIRED_MIN_NUM_OF_DATA_POINTS_FOR_EOS_FIT = 5;
     static const int precision_format = 4;
@@ -330,7 +330,7 @@ namespace apl
     currentDirectory = xinput.xvasp.Directory; // remember the current directory
 
     // initialization of the data that is derived from the structure
-    origStructure = xinput.xvasp.str;
+    origStructure = in_structure;
     origStructure.ReScale(1.0);
     NatomsOrigCell = origStructure.atoms.size();
     Nbranches = NatomsOrigCell * 3;
