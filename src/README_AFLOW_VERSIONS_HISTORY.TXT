@@ -5,6 +5,7 @@
         -- added --space_group=|--sg= flag to compare database entries; can handle multiple space group inputs (DX)
         -- fixed bug in GFA calculator: bug in macros (KbT and TEMPERATURE)(DX)
         -- added more debugging to GFA code (DX)
+        -- added defaults/options for machine003 to run AFLOW+DFT (DX)
 3.2.5 - 2020/09/25
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.5.tar.xz
         -- patched convert issue: security policy 'PDF' blocking conversion (SC)
