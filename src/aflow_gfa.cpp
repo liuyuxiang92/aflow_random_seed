@@ -17,6 +17,8 @@
 #include "aflow_chull.h"
 #include "aflow_compare_structure.h"
 
+#define _DEBUG_GFA_ false //DX20201005
+
 /********DEFINITIONS**********/
 
 //atomic environments
@@ -28,8 +30,8 @@
 //gfa
 // [OBSOLETE] #define _ZTOL_ 0.05 //Tolerance for positive formation enthalpies - was originally 0.05
 //[CO20190628]#define KbT 0.025 // setting for room temperature - 0.025, could also be human body temperature - 0.0267
-#define TEMPERATURE 300 //Kelvin //CO20190628
-#define KbT KBOLTZEV*TEMPERATURE // setting for room temperature - 0.025, could also be human body temperature - 0.0267 //CO20190628
+#define TEMPERATURE 300.0 //Kelvin //CO20190628 //DX20201005 - needs to be a float/double (not integer)
+#define KbT (KBOLTZEV*TEMPERATURE) // setting for room temperature - 0.025, could also be human body temperature - 0.0267 //CO20190628 //DX20201006 - need parentheses around macro multiplication
 
 /********DEFINITIONS**********/
 
@@ -716,7 +718,7 @@ namespace pflow {
       vector<uint> distinctAE_size, vector<chull::ChullPoint> vcpt, vector<vector<double> > VStoichE,
       vector<string> species){
 
-    bool LDEBUG=(FALSE || XHOST.DEBUG); //CO20190424
+    bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_GFA_); //CO20190424
     string soliloquy = XPID + "pflow::ComputeGFA():";  //CO20190424
     if(LDEBUG) { //CO20190424
       for(uint i=0;i<Egs.size();i++){cerr << soliloquy << " Egs[i=" << i << "]=" << Egs[i] << endl;} //CO20190424
@@ -933,7 +935,11 @@ namespace pflow {
                   El_ref=El_ref+VStoichE.at(indices[l][i]).back()*psc_temp[indices[l][i]+1];
                 }
               }
+
+              if(LDEBUG){ cerr << soliloquy << " exp(-abs(El_ref-Egs[X])/KbT)*weight*(1.0-dotProduct): " << exp(-abs(El_ref-Egs[X])/KbT)*weight*(1.0-dotProduct) << endl; }
+
               gfa[X]=gfa[X]+exp(-abs(El_ref-Egs[X])/KbT)*weight*(1.0-dotProduct);
+              if(LDEBUG){ cerr << soliloquy << " gfa[X]: " << gfa[X] << endl; }
               sampling[X]=sampling[X]+weight;
 
               weight_avgDP.push_back(weight);
@@ -1040,7 +1046,7 @@ namespace pflow {
   //************** Function for computing GFA (end)
 
   void CalculateGFA(aurostd::xoption& vpflow, const string& alloy, const string& AE_file_read, double fe_cut){
-    bool LDEBUG=(FALSE || XHOST.DEBUG); //CO20190424
+    bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_GFA_); //CO20190424
     string soliloquy = XPID + "pflow::CalculateGFA():";  //CO20190424
 
     uint entries_size=0;
