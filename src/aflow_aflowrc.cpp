@@ -889,6 +889,15 @@
 #define         MPI_BINARY_DIR_MACHINE002                    XHOST.adefault.getattachedscheme("MPI_BINARY_DIR_MACHINE002")
 //DX20190509 - MACHINE002 - END
 
+//DX20201005 - MACHINE003 - START
+#define AFLOWRC_MPI_OPTIONS_MACHINE003                       string("") // MACHINE003
+#define         MPI_OPTIONS_MACHINE003                       XHOST.adefault.getattachedscheme("MPI_OPTIONS_MACHINE003")
+#define AFLOWRC_MPI_COMMAND_MACHINE003                       string("/p/app/intel/parallel_studio_xe_2018_update1/impi/2018.1.163/intel64/bin/mpirun -np") // MACHINE003
+#define         MPI_COMMAND_MACHINE003                       XHOST.adefault.getattachedscheme("MPI_COMMAND_MACHINE003")
+#define AFLOWRC_MPI_BINARY_DIR_MACHINE003                    string("~/bin/") // MACHINE003
+#define         MPI_BINARY_DIR_MACHINE003                    XHOST.adefault.getattachedscheme("MPI_BINARY_DIR_MACHINE003")
+//DX20201005 - MACHINE003 - END
+
 #define AFLOWRC_MPI_OPTIONS_MPCDF_EOS                         string("ulimit -s unlimited ") // MPCDF_EOS_MPICH
 #define         MPI_OPTIONS_MPCDF_EOS                         XHOST.adefault.getattachedscheme("MPI_OPTIONS_MPCDF_EOS")
 #define AFLOWRC_MPI_COMMAND_MPCDF_EOS                         string("/usr/bin/srun -n") // MPCDF_EOS_MPICH
@@ -1583,6 +1592,12 @@ namespace aflowrc {
     aflowrc::load_default("MPI_BINARY_DIR_MACHINE002",AFLOWRC_MPI_BINARY_DIR_MACHINE002);
     //DX20190509 - MACHINE002 - END
 
+    //DX20201005 - MACHINE003 - START
+    aflowrc::load_default("MPI_OPTIONS_MACHINE003",AFLOWRC_MPI_OPTIONS_MACHINE003);
+    aflowrc::load_default("MPI_COMMAND_MACHINE003",AFLOWRC_MPI_COMMAND_MACHINE003);
+    aflowrc::load_default("MPI_BINARY_DIR_MACHINE003",AFLOWRC_MPI_BINARY_DIR_MACHINE003);
+    //DX20201005 - MACHINE003 - END
+
     //DX20190107 - CMU EULER - START
     aflowrc::load_default("MPI_OPTIONS_CMU_EULER",AFLOWRC_MPI_OPTIONS_CMU_EULER); 
     aflowrc::load_default("MPI_COMMAND_CMU_EULER",AFLOWRC_MPI_COMMAND_CMU_EULER); 
@@ -2150,6 +2165,12 @@ namespace aflowrc {
     aflowrc << "MPI_BINARY_DIR_MACHINE002=\"" << AFLOWRC_MPI_BINARY_DIR_MACHINE002 << "\"" << "// MACHINE002" << endl;
     //DX20190509 - MACHINE002 - START
 
+    //DX20201005 - MACHINE003 - START
+    aflowrc << "MPI_OPTIONS_MACHINE003=\"" << AFLOWRC_MPI_OPTIONS_MACHINE003 << "\"" << "// MACHINE003" << endl;
+    aflowrc << "MPI_COMMAND_MACHINE003=\"" << AFLOWRC_MPI_COMMAND_MACHINE003 << "\"" << "// MACHINE003" << endl;
+    aflowrc << "MPI_BINARY_DIR_MACHINE003=\"" << AFLOWRC_MPI_BINARY_DIR_MACHINE003 << "\"" << "// MACHINE003" << endl;
+    //DX20201005 - MACHINE003 - START
+
     //DX20190107 - CMU EULER - START
     aflowrc << "MPI_OPTIONS_CMU_EULER=\"" << AFLOWRC_MPI_OPTIONS_CMU_EULER << "\"" << "// CMU_EULER" << endl;
     aflowrc << "MPI_COMMAND_CMU_EULER=\"" << AFLOWRC_MPI_COMMAND_CMU_EULER << "\"" << "// CMU_EULER" << endl;
@@ -2679,6 +2700,12 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_COMMAND_MACHINE002\")=\"" << MPI_COMMAND_MACHINE002 << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_BINARY_DIR_MACHINE002\")=\"" << MPI_BINARY_DIR_MACHINE002 << "\"" << endl;
     //DX20190509 - MACHINE002 - END
+
+    //DX20201005 - MACHINE003 - START
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_OPTIONS_MACHINE003\")=\"" << MPI_OPTIONS_MACHINE003 << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_COMMAND_MACHINE003\")=\"" << MPI_COMMAND_MACHINE003 << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_BINARY_DIR_MACHINE003\")=\"" << MPI_BINARY_DIR_MACHINE003 << "\"" << endl;
+    //DX20201005 - MACHINE003 - END
 
     //DX20190107 - CMU EULER - START
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_OPTIONS_CMU_EULER\")=\"" << MPI_OPTIONS_CMU_EULER << "\"" << endl;

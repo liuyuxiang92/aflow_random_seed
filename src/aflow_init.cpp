@@ -460,6 +460,11 @@ namespace init {
       oss << "MPI_COMMAND_MACHINE002=" << MPI_COMMAND_MACHINE002 << "\"" << endl;
       oss << "MPI_BINARY_DIR_MACHINE002=" << MPI_BINARY_DIR_MACHINE002 << "\"" << endl;
       //DX20190509 - MACHINE002 - END
+      //DX20201005 - MACHINE003 - START
+      oss << "MPI_OPTIONS_MACHINE003=" << MPI_OPTIONS_MACHINE003 << "\"" << endl;
+      oss << "MPI_COMMAND_MACHINE003=" << MPI_COMMAND_MACHINE003 << "\"" << endl;
+      oss << "MPI_BINARY_DIR_MACHINE003=" << MPI_BINARY_DIR_MACHINE003 << "\"" << endl;
+      //DX20201005 - MACHINE003 - END
       //DX20190107 - CMU EULER - START
       oss << "MPI_OPTIONS_CMU_EULER=" << MPI_OPTIONS_CMU_EULER << "\"" << endl;
       oss << "MPI_COMMAND_CMU_EULER=" << MPI_COMMAND_CMU_EULER << "\"" << endl;
