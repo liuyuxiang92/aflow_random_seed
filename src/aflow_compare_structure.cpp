@@ -536,6 +536,30 @@ namespace compare {
       pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     }
 
+    // ---------------------------------------------------------------------------
+    // FLAG: primitivize structures //DX20201005
+    if(vpflow.flag("COMPARE_STRUCTURE::PRIMITIVIZE")) {
+      comparison_options.flag("COMPARISON_OPTIONS::PRIMITIVIZE",TRUE);
+      message << "OPTIONS: Converting all structures to a primitive representation.";
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+    }
+
+    // ---------------------------------------------------------------------------
+    // FLAG: Minkowski reduction //DX20201005
+    if(vpflow.flag("COMPARE_STRUCTURE::MINKOWSKI")) {
+      comparison_options.flag("COMPARISON_OPTIONS::MINKOWSKI",TRUE);
+      message << "OPTIONS: Performing Minkowski lattice reduction on all structures.";
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+    }
+
+    // ---------------------------------------------------------------------------
+    // FLAG: Niggli reduction //DX20201005
+    if(vpflow.flag("COMPARE_STRUCTURE::NIGGLI")) {
+      comparison_options.flag("COMPARISON_OPTIONS::NIGGLI",TRUE);
+      message << "OPTIONS: Performing Niggli lattice reduction on all structures.";
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+    }
+
     //DX20190425 - added print and screen only flag - START
     // ---------------------------------------------------------------------------
     // FLAG: print format
@@ -1318,6 +1342,30 @@ namespace compare {
     }
 
     // ---------------------------------------------------------------------------
+    // FLAG: primitivize structures //DX20201005
+    if(vpflow.flag("COMPARE2DATABASE::PRIMITIVIZE")) {
+      comparison_options.flag("COMPARISON_OPTIONS::PRIMITIVIZE",TRUE);
+      message << "OPTIONS: Converting all structures to a primitive representation.";
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+    }
+
+    // ---------------------------------------------------------------------------
+    // FLAG: Minkowski reduction //DX20201005
+    if(vpflow.flag("COMPARE2DATABASE::MINKOWSKI")) {
+      comparison_options.flag("COMPARISON_OPTIONS::MINKOWSKI",TRUE);
+      message << "OPTIONS: Performing Minkowski lattice reduction on all structures.";
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+    }
+
+    // ---------------------------------------------------------------------------
+    // FLAG: Niggli reduction //DX20201005
+    if(vpflow.flag("COMPARE2DATABASE::NIGGLI")) {
+      comparison_options.flag("COMPARISON_OPTIONS::NIGGLI",TRUE);
+      message << "OPTIONS: Performing Niggli lattice reduction on all structures.";
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+    }
+
+    // ---------------------------------------------------------------------------
     // FLAG: type of comparison (material-type or structure-type)
     bool structure_comparison=false;
     if(vpflow.flag("COMPARE2DATABASE::STRUCTURE")) {
@@ -1939,6 +1987,30 @@ namespace compare {
     if(vpflow.flag("COMPARE_DATABASE_ENTRIES::IGNORE_ENVIRONMENT_ANALYSIS")) {
       comparison_options.flag("COMPARISON_OPTIONS::IGNORE_ENVIRONMENT_ANALYSIS",TRUE);
       message << "OPTIONS: Ignoring LFA environment analysis when grouping comparisons."; 
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+    }
+
+    // ---------------------------------------------------------------------------
+    // FLAG: primitivize structures //DX20201005
+    if(vpflow.flag("COMPARE_DATABASE_ENTRIES::PRIMITIVIZE")) {
+      comparison_options.flag("COMPARISON_OPTIONS::PRIMITIVIZE",TRUE);
+      message << "OPTIONS: Converting all structures to a primitive representation.";
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+    }
+
+    // ---------------------------------------------------------------------------
+    // FLAG: Minkowski reduction //DX20201005
+    if(vpflow.flag("COMPARE_DATABASE_ENTRIES::MINKOWSKI")) {
+      comparison_options.flag("COMPARISON_OPTIONS::MINKOWSKI",TRUE);
+      message << "OPTIONS: Performing Minkowski lattice reduction on all structures.";
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+    }
+
+    // ---------------------------------------------------------------------------
+    // FLAG: Niggli reduction //DX20201005
+    if(vpflow.flag("COMPARE_DATABASE_ENTRIES::NIGGLI")) {
+      comparison_options.flag("COMPARISON_OPTIONS::NIGGLI",TRUE);
+      message << "OPTIONS: Performing Niggli lattice reduction on all structures.";
       pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     }
 
@@ -2601,6 +2673,19 @@ namespace compare {
 
     message << "Total number of structures to compare: " << all_structures.size();
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+
+    // ---------------------------------------------------------------------------
+    // convert to structures to certain representations //DX20201006
+    // conversion type(s) is indicated in the comparison_options flag
+    if(comparison_options.flag("COMPARISON_OPTIONS::PRIMITIVIZE") ||
+        comparison_options.flag("COMPARISON_OPTIONS::MINKOWSKI") ||
+        comparison_options.flag("COMPARISON_OPTIONS::NIGGLI")){
+      message << "Converting structures standard representation (primitive, Minkowski, and/or Niggli).";
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+      compare::convertStructures(all_structures,comparison_options,num_proc);
+      message << "All structures converted.";
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_COMPLETE_);
+    }
 
     // ---------------------------------------------------------------------------
     // calculate symmetries of structures

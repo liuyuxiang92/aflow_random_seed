@@ -933,6 +933,9 @@ namespace compare {
       comparison_options.flag("COMPARISON_OPTIONS::SINGLE_COMPARISON_ROUND",FALSE); // compare all permutations until matched or exhausted all comparisons
       comparison_options.flag("COMPARISON_OPTIONS::ICSD_COMPARISON",FALSE);
       comparison_options.flag("COMPARISON_OPTIONS::CALCULATE_UNIQUE_PERMUTATIONS",FALSE);
+      comparison_options.flag("COMPARISON_OPTIONS::PRIMITIVIZE",FALSE); //DX20201006
+      comparison_options.flag("COMPARISON_OPTIONS::MINKOWSKI",FALSE); //DX20201006
+      comparison_options.flag("COMPARISON_OPTIONS::NIGGLI",FALSE); //DX20201006
     }
     else{
       comparison_options.flag("COMPARISON_OPTIONS::SCALE_VOLUME",TRUE);
@@ -950,6 +953,9 @@ namespace compare {
       comparison_options.flag("COMPARISON_OPTIONS::SINGLE_COMPARISON_ROUND",FALSE);
       comparison_options.flag("COMPARISON_OPTIONS::ICSD_COMPARISON",FALSE);
       comparison_options.flag("COMPARISON_OPTIONS::CALCULATE_UNIQUE_PERMUTATIONS",TRUE);
+      comparison_options.flag("COMPARISON_OPTIONS::PRIMITIVIZE",FALSE); //DX20201006
+      comparison_options.flag("COMPARISON_OPTIONS::MINKOWSKI",FALSE); //DX20201006
+      comparison_options.flag("COMPARISON_OPTIONS::NIGGLI",FALSE); //DX20201006
     }
 
     return comparison_options;
@@ -2688,6 +2694,153 @@ namespace compare{
       }
     }
     return true;
+  }
+}
+
+// ***************************************************************************
+// convertStructures()
+// ***************************************************************************
+namespace compare{
+  void convertStructures(vector<StructurePrototype>& structures,
+      const aurostd::xoption& comparison_options,
+      uint num_proc){
+
+    // Converts all structures to certain unit cell representations
+    // generally offering a speed increase for comparisons
+
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string function_name = XPID + "compare::convertStructures():";
+    if(LDEBUG) {cerr << function_name << " Number of threads=" << num_proc << endl;}
+
+    uint number_of_structures = structures.size();
+
+#ifdef AFLOW_COMPARE_MULTITHREADS_ENABLE
+    // THREADED VERSION - START
+
+    // Distribute threads via indices
+    vector<vector<int> > thread_distribution = getThreadDistribution(number_of_structures, num_proc);
+
+    // ---------------------------------------------------------------------------
+    // primitivize (do this first)
+    bool all_structures_primitivized = true;
+    for(uint i=0;i<structures.size();i++){ all_structures_primitivized = (all_structures_primitivized&&structures[i].structure_representative.primitive_calculated); }
+    if(comparison_options.flag("COMPARISON_OPTIONS::PRIMITIVIZE") && !all_structures_primitivized){
+      // Run threads
+      vector<std::thread*> threads;
+      for(uint n=0; n<num_proc; n++){
+        threads.push_back(new std::thread(&compare::GetPrimitiveStructures,std::ref(structures),thread_distribution[n][0],thread_distribution[n][1]));
+      }
+      // Join threads
+      for(uint t=0;t<num_proc;t++){
+        threads[t]->join();
+        delete threads[t];
+      }
+    }
+
+    // ---------------------------------------------------------------------------
+    // Minkowski (second)
+    bool all_structures_Minkowski_reduced = true;
+    for(uint i=0;i<structures.size();i++){ all_structures_Minkowski_reduced = (all_structures_Minkowski_reduced&&structures[i].structure_representative.Minkowski_calculated); }
+    if(comparison_options.flag("COMPARISON_OPTIONS::MINKOWSKI") && !all_structures_Minkowski_reduced){
+      // Run threads
+      vector<std::thread*> threads;
+      for(uint n=0; n<num_proc; n++){
+        threads.push_back(new std::thread(&compare::GetMinkowskiStructures,std::ref(structures),thread_distribution[n][0],thread_distribution[n][1]));
+      }
+      // Join threads
+      for(uint t=0;t<num_proc;t++){
+        threads[t]->join();
+        delete threads[t];
+      }
+    }
+
+    // ---------------------------------------------------------------------------
+    // Niggli (last)
+    bool all_structures_Niggli_reduced = true;
+    for(uint i=0;i<structures.size();i++){ all_structures_Niggli_reduced = (all_structures_Niggli_reduced&&structures[i].structure_representative.Niggli_calculated); }
+    if(comparison_options.flag("COMPARISON_OPTIONS::NIGGLI") && !all_structures_Niggli_reduced){
+      // Run threads
+      vector<std::thread*> threads;
+      for(uint n=0; n<num_proc; n++){
+        threads.push_back(new std::thread(&compare::GetNiggliStructures,std::ref(structures),thread_distribution[n][0],thread_distribution[n][1]));
+      }
+      // Join threads
+      for(uint t=0;t<num_proc;t++){
+        threads[t]->join();
+        delete threads[t];
+      }
+    }
+
+    // THREADED VERSION - END
+
+#else
+    // NONTHREADS - START
+
+    // ---------------------------------------------------------------------------
+    // primitivize (do this first)
+    for(uint i=0; i<number_of_structures; i++){
+      structures[i].structure_representative.GetPrimitive();
+    }
+
+    // ---------------------------------------------------------------------------
+    // Minkowski (second)
+    for(uint i=0; i<number_of_structures; i++){
+      structures[i].structure_representative.MinkowskiBasisReduction();
+    }
+
+    // ---------------------------------------------------------------------------
+    // Niggli (last)
+    for(uint i=0; i<number_of_structures; i++){
+      structures[i].structure_representative.NiggliUnitCellForm();
+    }
+    // NONTHREADS - END
+
+#endif
+  }
+}
+
+// ***************************************************************************
+// GetPrimitiveStructures() //DX20201006
+// ***************************************************************************
+namespace compare {
+  void GetPrimitiveStructures(vector<StructurePrototype>& structures, uint start_index, uint end_index){
+
+    // if end index is default (i.e., AUROSTD_MAX_UINT), then compute Niggli cell for all structures
+    if(end_index == AUROSTD_MAX_UINT){ end_index=structures.size(); }
+
+    for(uint i=start_index;i<end_index;i++){
+      structures[i].structure_representative.GetPrimitive();
+    }
+  }
+}
+
+// ***************************************************************************
+// GetMinkowskiStructures() //DX20201006
+// ***************************************************************************
+namespace compare {
+  void GetMinkowskiStructures(vector<StructurePrototype>& structures, uint start_index, uint end_index){
+
+    // if end index is default (i.e., AUROSTD_MAX_UINT), then compute Minkowski cell for all structures
+    if(end_index == AUROSTD_MAX_UINT){ end_index=structures.size(); }
+
+    for(uint i=start_index;i<end_index;i++){
+      structures[i].structure_representative.MinkowskiBasisReduction();
+    }
+  }
+}
+
+// ***************************************************************************
+// GetNiggliStructures() //DX20201006
+// ***************************************************************************
+namespace compare {
+  void GetNiggliStructures(vector<StructurePrototype>& structures, uint start_index, uint end_index){
+
+    // if end index is default (i.e., AUROSTD_MAX_UINT), then compute Niggli cell for all structures
+    if(end_index == AUROSTD_MAX_UINT){ end_index=structures.size(); }
+
+    for(uint i=start_index;i<end_index;i++){
+      structures[i].structure_representative.NiggliUnitCellForm();
+    }
   }
 }
 

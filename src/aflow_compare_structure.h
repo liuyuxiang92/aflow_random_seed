@@ -341,6 +341,12 @@ namespace compare{
   bool splitComparisonIntoThreads(vector<StructurePrototype>& comparison_schemes, uint& num_proc,
       vector<std::pair<uint,uint> >& start_indices,
       vector<std::pair<uint,uint> >& end_indices);
+  void convertStructures(vector<StructurePrototype>& structures,
+      const aurostd::xoption& comparison_options,
+      uint num_proc); //DX20201005
+  void GetPrimitiveStructures(vector<StructurePrototype>& structures, uint start_index, uint end_index); //DX20201005
+  void GetMinkowskiStructures(vector<StructurePrototype>& structures, uint start_index, uint end_index); //DX20201005
+  void GetNiggliStructures(vector<StructurePrototype>& structures, uint start_index, uint end_index); //DX20201005
   void runComparisonThreads(vector<StructurePrototype>& comparison_schemes, 
       std::pair<uint,uint>& start_indices,
       std::pair<uint,uint>& end_indices,

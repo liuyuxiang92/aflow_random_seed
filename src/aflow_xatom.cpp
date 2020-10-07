@@ -2255,6 +2255,7 @@ void xstructure::free() { //DX20191220 - moved all initializations from constuct
   // ATOMS -----------------------------
   atoms.clear();
   // FLAGS -----------------------------
+  primitive_calculated=FALSE; //DX20201005
   Niggli_calculated=FALSE;
   Niggli_avoid=FALSE;
   Minkowski_calculated=FALSE;
@@ -2546,6 +2547,7 @@ void xstructure::copy(const xstructure& bstr) {
   is_vasp4_poscar_format=bstr.is_vasp4_poscar_format;
   is_vasp5_poscar_format=bstr.is_vasp5_poscar_format;
   // FLAGS -----------------------------
+  primitive_calculated=bstr.primitive_calculated; //DX20201007
   Niggli_calculated=bstr.Niggli_calculated;
   Niggli_avoid=bstr.Niggli_avoid;
   Minkowski_calculated=bstr.Minkowski_calculated;
@@ -11207,6 +11209,19 @@ xmatrix<double> NiggliUnitCellForm(const xmatrix<double>& lattice) {
   return GetNiggliStr(lattice);
 }
 
+// ***************************************************************************
+// Function GetNiggliStructures() //DX20201006
+// ***************************************************************************
+void GetNiggliStructures(vector<xstructure>& structures, uint start_index, uint end_index){
+
+  // if end index is default (i.e., AUROSTD_MAX_UINT), then compute Niggli cell for all structures
+  if(end_index == AUROSTD_MAX_UINT){ end_index=structures.size(); }
+
+  for(uint i=start_index;i<end_index;i++){
+    structures[i].NiggliUnitCellForm();
+  }
+}
+
 // **************************************************************************
 // Function MinkowskiBasisReduction
 // **************************************************************************
@@ -11257,6 +11272,19 @@ xmatrix<double> MinkowskiBasisReduction(const xmatrix<double>& lattice) {
   basis=aurostd::reduce_to_shortest_basis(basis);
   basis=trasp(basis);
   return basis;
+}
+
+// ***************************************************************************
+// Function GetMinkowskiStructures() //DX20201006
+// ***************************************************************************
+void GetMinkowskiStructures(vector<xstructure>& structures, uint start_index, uint end_index){
+
+  // if end index is default (i.e., AUROSTD_MAX_UINT), then compute Minkowski cell for all structures
+  if(end_index == AUROSTD_MAX_UINT){ end_index=structures.size(); }
+
+  for(uint i=start_index;i<end_index;i++){
+    structures[i].MinkowskiBasisReduction();
+  }
 }
 
 // ***************************************************************************
@@ -12507,6 +12535,7 @@ xstructure GetPrimitiveMULTITHREAD(const xstructure& _a,double tolerance) {  // 
   // everything ok
   if(LDEBUG) cerr << soliloquy << " END [ok]=" << fraction_atoms << endl;  //CO20200201
   b.ClearSymmetry();  //CO20181226 - new structure, symmetry not calculated
+  b.primitive_calculated = TRUE; //DX20201007
   return b;
 
 }
@@ -12621,6 +12650,7 @@ xstructure GetPrimitiveSINGLE(const xstructure& _a,double tolerance) {  // APRIL
   }
   // everything ok
   b.ClearSymmetry();  //CO20181226 - new structure, symmetry not calculated
+  b.primitive_calculated = TRUE; //DX20201007
   return b;
 }
 
@@ -12764,6 +12794,7 @@ xstructure GetPrimitive1(const xstructure& a) {  // MARCH 2009
     throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
   }
   // everything ok
+  b.primitive_calculated = TRUE; //DX20201007
   return b;
 }
 
@@ -12945,6 +12976,7 @@ xstructure GetPrimitive2(const xstructure& a) {
   // Put everything in new primitive cell.
   b=BringInCell(b);
   // everything ok
+  b.primitive_calculated = TRUE; //DX20201007
   return b;
 }
 
@@ -13093,6 +13125,7 @@ xstructure GetPrimitive3(const xstructure& a) {
     throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
   }
   // everything ok
+  b.primitive_calculated = TRUE; //DX20201007
   return b;
 }
 
@@ -13125,6 +13158,19 @@ void xstructure::GetPrimitive3(void) {
   extern xstructure GetPrimitive3(const xstructure& a); // so it does not recurse
   xstructure a(*this);
   *this=GetPrimitive3(a);
+}
+
+// ***************************************************************************
+// Function GetPrimitiveStructures() //DX20201006
+// ***************************************************************************
+void GetPrimitiveStructures(vector<xstructure>& structures, uint start_index, uint end_index){
+
+  // if end index is default (i.e., AUROSTD_MAX_UINT), then compute primitive cell for all structures
+  if(end_index == AUROSTD_MAX_UINT){ end_index=structures.size(); }
+
+  for(uint i=start_index;i<end_index;i++){
+    structures[i].GetPrimitive();
+  }
 }
 
 // ***************************************************************************

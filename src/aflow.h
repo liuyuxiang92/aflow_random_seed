@@ -1506,7 +1506,13 @@ class xstructure {
     void Standard_Conventional_UnitCellForm(void);                // Reduce the Unit Cell to Standard Conventional Form
     void GetStandardConventional(void);                           // stub for void Standard_Conventional_UnitCellForm(void);
     void NiggliUnitCellForm(void);                                // Reduce the Unit Cell to Niggli Form
+    void GetNiggliStructures(vector<xstructure>& structures,
+        uint start_index=0,
+        uint end_index=AUROSTD_MAX_UINT); //DX20201006
     void MinkowskiBasisReduction(void);                           // Reduce the Basis to the max orthogonality (Minkowski)
+    void GetMinkowskiStructures(vector<xstructure>& structures,
+        uint start_index=0,
+        uint end_index=AUROSTD_MAX_UINT); //DX20201006
     void LatticeReduction(void);                                  // Lattice Reduction to Max Orthogonality (MINK) and then Niggly Form
     //DX20190905 [OBSOLETE] void BringInCell(void);                                       // Bring all the atoms in the origin
     //DX20190905 [OBSOLETE] void BringInCell(double);                                     // Bring all the atoms in the origin
@@ -1518,6 +1524,9 @@ class xstructure {
     void GetPrimitive1(void);                                     // Make it primitive, if possible
     void GetPrimitive2(void);                                     // Make it primitive, if possible
     void GetPrimitive3(void);                                     // Make it primitive, if possible
+    void GetPrimitiveStructures(vector<xstructure>& structures,
+        uint start_index=0,
+        uint end_index=AUROSTD_MAX_UINT); //DX20201006
     uint GetPrimitiveCell(void);                                  // Make it primitive, if possible. Returns 1 if routine fails (RHT)   //RHT
     double MinDist(void);                                         // get minimum interatomic distance -- CO20171024
     void ReScale(const double &in_scale);                         // Change scale but keep volume fixed
@@ -1631,6 +1640,7 @@ class xstructure {
     //  ----------------------------------------------------------------------------------------
     bool is_vasp4_poscar_format;                                  // flags for VASP4*
     bool is_vasp5_poscar_format;                                  // flags for VASP5*
+    bool primitive_calculated;                                    // flags for calculation //DX20201007
     bool Niggli_calculated;                                       // flags for calculation
     bool Niggli_avoid;                                            // flags for avoiding the calculation
     bool Minkowski_calculated;                                    // flags for calculation
