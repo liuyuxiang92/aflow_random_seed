@@ -2384,6 +2384,13 @@ namespace init {
     XHOST.vschema.push_attached("SCHEMA::TYPE:ENERGY_CUTOFF","number");
     nschema++;
 
+    //AS20201008 BEGIN
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:ENERGY_FREE_ATOM_300K_QHA","energy_free_atom_300K_qha");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:ENERGY_FREE_ATOM_300K_QHA","eV/atom");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:ENERGY_FREE_ATOM_300K_QHA","number");
+    //AS20201008 END
+
     // schema is CAPITAL, content is not necessarily
     XHOST.vschema.push_attached("SCHEMA::NAME:ENTHALPY_ATOM","enthalpy_atom");
     XHOST.vschema.push_attached("SCHEMA::UNIT:ENTHALPY_ATOM","eV/atom");
@@ -2492,6 +2499,18 @@ namespace init {
     nschema++;
     //AS20200915 END
 
+    //AS20201008 BEGIN
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:HEAT_CAPACITY_CP_ATOM_300K_QHA","heat_capacity_Cv_atom_300K_qha");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:HEAT_CAPACITY_CP_ATOM_300K_QHA","kB/atom");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:HEAT_CAPACITY_CP_ATOM_300K_QHA","number");
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:HEAT_CAPACITY_CV_ATOM_300K_QHA","heat_capacity_Cp_atom_300K_qha");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:HEAT_CAPACITY_CV_ATOM_300K_QHA","kB/atom");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:HEAT_CAPACITY_CV_ATOM_300K_QHA","number");
+    //AS20201008 END
+
     // schema is CAPITAL, content is not necessarily
     XHOST.vschema.push_attached("SCHEMA::NAME:KPOINTS","kpoints");
     XHOST.vschema.push_attached("SCHEMA::UNIT:KPOINTS","");
@@ -2588,6 +2607,14 @@ namespace init {
     XHOST.vschema.push_attached("SCHEMA::TYPE:MODULUS_BULK_300K_QHA","number");
     nschema++;
     //AS20200915 END
+    
+    //AS20201008 BEGIN
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:MODULUS_BULK_PRESSURE_DERIVATIVE_300K_QHA","modulus_bulk_pressure_derivative_300K_qha");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:MODULUS_BULK_PRESSURE_DERIVATIVE_300K_QHA","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:MODULUS_BULK_PRESSURE_DERIVATIVE_300K_QHA","number");
+    nschema++;
+    //AS20201008 END
 
     // schema is CAPITAL, content is not necessarily
     XHOST.vschema.push_attached("SCHEMA::NAME:NATOMS","natoms");
@@ -2959,6 +2986,13 @@ namespace init {
     XHOST.vschema.push_attached("SCHEMA::UNIT:VOLUME_ATOM","A^3/atom");
     XHOST.vschema.push_attached("SCHEMA::TYPE:VOLUME_ATOM","number");
     nschema++;
+
+    //AS20201008 BEGIN
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:VOLUME_ATOM_300K_QHA","volume_atom_300K_qha");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:VOLUME_ATOM_300K_QHA","A^3/atom");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:VOLUME_ATOM_300K_QHA","number");
+    //AS20201008 END
 
     // schema is CAPITAL, content is not necessarily
     XHOST.vschema.push_attached("SCHEMA::NAME:VOLUME_CELL","volume_cell");

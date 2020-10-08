@@ -3273,12 +3273,18 @@ namespace apl
     for (int Vid=0; Vid<N_EOSvolumes; Vid++) F[Vid+1] = FreeEnergy(T, Vid);
     fitToEOSmodel(F, EOS_SJ);
 
+    double volume = EOS_volume_at_equilibrium;
+    double free_energy = EOS_energy_at_equilibrium;
     double bulk_modulus = EOS_bulk_modulus_at_equilibrium;
+    double bprime = EOS_Bprime_at_equilibrium;
     double thermal_expansion = ThermalExpansion(T, EOS_SJ, QHA_CALC);
 
     double CV = 0.0, grueneisen_300K = 0.0;
     calcCVandGPfit(T, V0K, CV, grueneisen_300K);
     double grueneisen = calcGPinfFit(V0K);
+
+    CV = IsochoricSpecificHeat(T, volume, EOS_SJ, QHA_CALC)/KBOLTZEV; // [kB/atom]
+    double CP = CV + volume*T*bulk_modulus*pow(thermal_expansion,2)/eV2GPa/KBOLTZEV; // [kB/atom]
 
     stringstream aflow_qha_out;
     aflow_qha_out << AFLOWIN_SEPARATION_LINE << endl;
@@ -3289,6 +3295,15 @@ namespace apl
     aflow_qha_out << " (10^-5/K)" << endl;
     aflow_qha_out << "modulus_bulk_300K_qha = " << bulk_modulus;
     aflow_qha_out << " (GPa)" << endl;
+    aflow_qha_out << "modulus_bulk_pressure_derivative_300K_qha = " << bprime << endl;
+    aflow_qha_out << "heat_capacity_Cv_atom_300K_qha = " << CV;
+    aflow_qha_out << " (kB/atom)" << endl;
+    aflow_qha_out << "heat_capacity_Cp_atom_300K_qha = " << CP;
+    aflow_qha_out << " (kB/atom)" << endl;
+    aflow_qha_out << "volume_atom_300K_qha = " << volume;
+    aflow_qha_out << " (A^3/atom)" << endl;
+    aflow_qha_out << "energy_free_atom_300K_qha = " << free_energy;
+    aflow_qha_out << " (eV/atom)" << endl;
     aflow_qha_out << "[QHA_RESULTS]STOP" << endl;
     aflow_qha_out << AFLOWIN_SEPARATION_LINE << endl;
 

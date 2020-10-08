@@ -5404,8 +5404,20 @@ namespace aflowlib {
         if(tokens.size()>=2) {
           if(tokens[0]=="gruneisen_qha") data.gruneisen_qha=aurostd::string2utype<double>(tokens[1]);
           if(tokens[0]=="gruneisen_300K_qha") data.gruneisen_300K_qha=aurostd::string2utype<double>(tokens[1]);
-          if(tokens[0]=="thermal_expansion_300K_qha") data.thermal_expansion_300K_qha=aurostd::string2utype<double>(tokens[1]);
-          if(tokens[0]=="modulus_bulk_300K_qha") data.modulus_bulk_300K_qha=aurostd::string2utype<double>(tokens[1]);
+          if(tokens[0]=="thermal_expansion_300K_qha") 
+            data.thermal_expansion_300K_qha=aurostd::string2utype<double>(tokens[1]);
+          if(tokens[0]=="modulus_bulk_300K_qha")
+            data.modulus_bulk_300K_qha=aurostd::string2utype<double>(tokens[1]);
+          if(tokens[0]=="modulus_bulk_pressure_derivative_300K_qha")
+            data.modulus_bulk_pressure_derivative_300K_qha=aurostd::string2utype<double>(tokens[1]);
+          if(tokens[0]=="heat_capacity_Cv_atom_300K_qha")
+            data.heat_capacity_Cv_atom_300K_qha=aurostd::string2utype<double>(tokens[1]);
+          if(tokens[0]=="heat_capacity_Cp_atom_300K_qha")
+            data.heat_capacity_Cp_atom_300K_qha=aurostd::string2utype<double>(tokens[1]);
+          if(tokens[0]=="volume_atom_300K_qha")
+            data.volume_atom_300K_qha=aurostd::string2utype<double>(tokens[1]);
+          if(tokens[0]=="energy_free_atom_300K_qha")
+            data.energy_free_atom_300K_qha=aurostd::string2utype<double>(tokens[1]);
         }
       }
 
@@ -5439,6 +5451,11 @@ namespace aflowlib {
       cout << MESSAGE << " gruneisen_300K_qha = " << ((data.gruneisen_300K_qha!=AUROSTD_NAN)?aurostd::utype2string(data.gruneisen_300K_qha,10):"unavailable") << endl;
       cout << MESSAGE << " thermal_expansion_300K_qha (10^-5/K) = " << ((data.thermal_expansion_300K_qha!=AUROSTD_NAN)?aurostd::utype2string(data.thermal_expansion_300K_qha,10):"unavailable") << endl;
       cout << MESSAGE << " modulus_bulk_300K_qha (GPa) = " << ((data.modulus_bulk_300K_qha!=AUROSTD_NAN)?aurostd::utype2string(data.modulus_bulk_300K_qha,10):"unavailable") << endl;
+      cout << MESSAGE << " modulus_bulk_pressure_derivative_300K_qha = " << ((data.modulus_bulk_pressure_derivative_300K_qha!=AUROSTD_NAN)?aurostd::utype2string(data.modulus_bulk_pressure_derivative_300K_qha,10):"unavailable") << endl;
+      cout << MESSAGE << " heat_capacity_Cv_atom_300K_qha = " << ((data.heat_capacity_Cv_atom_300K_qha!=AUROSTD_NAN)?aurostd::utype2string(data.heat_capacity_Cv_atom_300K_qha,10):"unavailable") << endl;
+      cout << MESSAGE << " heat_capacity_Cp_atom_300K_qha = " << ((data.heat_capacity_Cp_atom_300K_qha!=AUROSTD_NAN)?aurostd::utype2string(data.heat_capacity_Cp_atom_300K_qha,10):"unavailable") << endl;
+      cout << MESSAGE << " volume_atom_300K_qha = " << ((data.volume_atom_300K_qha!=AUROSTD_NAN)?aurostd::utype2string(data.volume_atom_300K_qha,10):"unavailable") << endl;
+      cout << MESSAGE << " energy_free_atom_300K_qha = " << ((data.energy_free_atom_300K_qha!=AUROSTD_NAN)?aurostd::utype2string(data.energy_free_atom_300K_qha,10):"unavailable") << endl;
     }
     // done
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " aflowlib::LIB2RAW_Loop_QHA - end " << directory_LIB << endl;
