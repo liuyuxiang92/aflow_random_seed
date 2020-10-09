@@ -752,6 +752,7 @@ namespace apl
 
       xinput.xvasp.str = origStructure;
       xinput.xvasp.str.InflateVolume(coefEOSVolumes[i]);
+      xinput.xvasp.str.is_vasp5_poscar_format = true;
 
       xinput.setDirectory(currentDirectory);
       xinput.xvasp.AVASP_arun_mode = QHA_ARUN_MODE;
@@ -915,6 +916,7 @@ namespace apl
 
       xinput.xvasp.str = origStructure;
       xinput.xvasp.str.InflateVolume(coefVolumes[i]);
+      xinput.xvasp.str.is_vasp5_poscar_format = true;
 
       xinput.setDirectory(currentDirectory);
       xinput.xvasp.AVASP_arun_mode = QHA_ARUN_MODE;
