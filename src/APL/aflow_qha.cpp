@@ -2910,9 +2910,17 @@ namespace apl
     file << blockname + "STOP" << std::endl;
     file << AFLOWIN_SEPARATION_LINE << std::endl;
 
-    if (!aurostd::stringstream2file(file, filename, "APPEND")){
-      msg = "Error writing to " + filename + "file.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function,msg,_FILE_ERROR_);
+    if (aurostd::FileExist(filename)){
+      if (!aurostd::stringstream2file(file, filename, "APPEND")){
+        msg = "Error writing to " + filename + "file.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function,msg,_FILE_ERROR_);
+      }
+    }
+    else{
+      if (!aurostd::stringstream2file(file, filename)){
+        msg = "Error writing to " + filename + "file.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function,msg,_FILE_ERROR_);
+      }
     }
   }
 
