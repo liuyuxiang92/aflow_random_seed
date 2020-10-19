@@ -3064,7 +3064,7 @@ namespace compare {
     // ---------------------------------------------------------------------------
     // prepare structures (swap structure order if necessary, fix lattices, rescale, etc.)
     xstructure xstr_base, xstr_test;
-    int mode = 1; // 0: expand structure with more atoms (robust using 3x3x3 method); 1: make xstr1 structure with smaller lattice point radius (faster using dims)
+    /*int mode = 1; // 0: expand structure with more atoms (robust using 3x3x3 method); 1: make xstr1 structure with smaller lattice point radius (faster using dims)
     // expand larger system to ensure we find a commensurate unit cell between each structure
     if(mode==0){
       if(xstr1.atoms.size()>xstr2.atoms.size()){
@@ -3091,6 +3091,8 @@ namespace compare {
       else { xstr_base = xstr1; xstr_test = xstr2; }
     }
     else { xstr_base = xstr1; xstr_test = xstr2; }
+*/
+    xstr_base = xstr1; xstr_test = xstr2;
 
     xstr_base.FixLattices();
     xstr_test.FixLattices();
@@ -3098,6 +3100,35 @@ namespace compare {
     xstr_test.ReScale(1.0);
     xstr_base.BringInCell(); //DX20190329 - need to ensure incell; otherwise supercell expansion breaks
     xstr_test.BringInCell(); //DX20190329 - need to ensure incell; otherwise supercell expansion breaks
+
+    /*
+    xmatrix<double> rotation1 = aurostd::inverse(xstr_test.lattice)*xstr_base.lattice;
+    cerr << "xstr base: " << xstr_base << endl;
+    cerr << "xstr test: " << xstr_test << endl;
+    xmatrix<double> base_metric_tensor = MetricTensor(xstr_base.lattice);
+    xmatrix<double> test_metric_tensor = MetricTensor(xstr_test.lattice);
+    cerr << "base metric tensor: " << base_metric_tensor << endl; 
+    cerr << "test metric tensor: " << test_metric_tensor << endl; 
+    cerr << "rotation1: " << rotation1 << endl;
+    cerr << "identity?: " << trasp(rotation1)*rotation1 << endl;
+    cerr << "xstr test new_lattice: " << xstr_test.lattice*rotation1 << endl;
+   
+    cerr << "---------------------------------------------------" << endl;
+    xmatrix<double> rotation2 = aurostd::inverse(xstr_base.lattice)*xstr_test.lattice;
+    cerr << "xstr base: " << xstr_base << endl;
+    cerr << "xstr test: " << xstr_test << endl;
+    cerr << "rotation2: " << rotation2 << endl;
+    cerr << "identity?: " << trasp(rotation2)*rotation2 << endl;
+    cerr << "xstr base new_lattice: " << xstr_base.lattice*rotation2 << endl;
+    
+    cerr << "---------------------------------------------------" << endl;
+    xmatrix<double> rotation3 = trasp(xstr_base.lattice) * aurostd::inverse(xstr_test.lattice);
+    cerr << "rotation3: " << rotation3 << endl;
+    
+    cerr << "identity?: " << trasp(rotation3)*rotation3 << endl;
+    cerr << "xstr base new_lattice: " << xstr_base.lattice*rotation3 << endl;
+    cerr << "OR xstr base new_lattice: " << rotation3*xstr_base.lattice << endl;
+*/
 
     // ---------------------------------------------------------------------------
     // clean atom names (remove pseudopotential information)

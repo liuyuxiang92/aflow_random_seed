@@ -61,7 +61,7 @@ namespace anrl {
     vproto.push_back("A_mC4_12_i;1;2;12;3;6;mC4;a,b/a,c/a,beta,x1,z1;-;O2;alphaO2");
     vproto.push_back("ABC4_mP12_13_e_a_2g;3;12;13;5;11;mP12;a,b/a,c/a,beta,y2,x3,y3,z3,x4,y4,z4;E1_b;AgAuTe4;Sylvanite");
     vproto.push_back("A_mP84_13_21g;1;84;13;3;67;mP84;a,b/a,c/a,beta,x1,y1,z1,x2,y2,z2,x3,y3,z3,x4,y4,z4,x5,y5,z5,x6,y6,z6,x7,y7,z7,x8,y8,z8,x9,y9,z9,x10,y10,z10,x11,y11,z11,x12,y12,z12,x13,y13,z13,x14,y14,z14,x15,y15,z15,x16,y16,z16,x17,y17,z17,x18,y18,z18,x19,y19,z19,x20,y20,z20,x21,y21,z21;-;P;Monoclinic Phosphorus");
-    vproto.push_back("A2B_mP12_14_2e_e;2;12;14;4;13;mP12;a,b/a,c/a,beta,x1,y1,z1,x2,y2,z2,x3,y3,z3;C43/-;ZrO2/O2W;Baddeleyite/O2W (ICSD #8217)"); //DX20200703 - added R. Friedrich binary oxide
+    vproto.push_back("A2B_mP12_14_2e_e;2;12;14;4;13;mP12;a,b/a,c/a,beta,x1,y1,z1,x2,y2,z2,x3,y3,z3;C43/-/-;ZrO2/O2W/N2Os1;Baddeleyite/O2W (ICSD #8217)/N2Os1 (ICSD #240759)"); //DX20200703 - added R. Friedrich binary oxide //DX20201019 - added metal nitride
     vproto.push_back("A_mP32_14_8e;1;32;14;3;28;mP32;a,b/a,c/a,beta,x1,y1,z1,x2,y2,z2,x3,y3,z3,x4,y4,z4,x5,y5,z5,x6,y6,z6,x7,y7,z7,x8,y8,z8;A_l;Se;betaSe");
     vproto.push_back("A_mP64_14_16e;1;64;14;3;52;mP64;a,b/a,c/a,beta,x1,y1,z1,x2,y2,z2,x3,y3,z3,x4,y4,z4,x5,y5,z5,x6,y6,z6,x7,y7,z7,x8,y8,z8,x9,y9,z9,x10,y10,z10,x11,y11,z11,x12,y12,z12,x13,y13,z13,x14,y14,z14,x15,y15,z15,x16,y16,z16;A_k;Se;Se");
     vproto.push_back("A2B5_mC28_15_f_e2f;2;14;15;4;14;mC28;a,b/a,c/a,beta,y1,x2,y2,z2,x3,y3,z3,x4,y4,z4;-/-;B2Pd5/Sb2O5;B2Pd5/Sb2O5 (ICSD #1422)"); //DX20200703 - added R. Friedrich binary oxide
@@ -89,7 +89,7 @@ namespace anrl {
     vproto.push_back("A3B2_oP20_56_ce_e;2;20;56;4;10;oP20;a,b/a,c/a,z1,x2,y2,z2,x3,y3,z3;D5_11;Sb2O3;Sb2O3");
     vproto.push_back("ABCD_oP16_57_d_c_d_d;4;16;57;6;10;oP16;a,b/a,c/a,x1,x2,y2,x3,y3,x4,y4;F5_9;KCNS;KCNS");
     vproto.push_back("AB_oP8_57_d_d;2;8;57;4;7;oP8;a,b/a,c/a,x1,y1,x2,y2;-;TlF;TlF-II, 57");
-    vproto.push_back("AB2_oP6_58_a_g;2;6;58;4;5;oP6;a,b/a,c/a,x2,y2;C35/-/C18;CaCl2/etaFe2C/FeS2;Hydrophilite/eta-Fe2C/Marcasite");
+    vproto.push_back("AB2_oP6_58_a_g;2;6;58;4;5;oP6;a,b/a,c/a,x2,y2;C35/-/C18/-/-;CaCl2/etaFe2C/FeS2/Ir1N2/Au1N2;Hydrophilite/eta-Fe2C/Marcasite/Ir1N2 (ICSD #160620)/Au1N2 (ICSD #166465)"); //DX20201019 - added two metal nitrides
     vproto.push_back("AB_oP4_59_a_b;2;4;59;4;5;oP4;a,b/a,c/a,z1,z2;-;CuTe;Vulcanite");
     vproto.push_back("ABC_oP6_59_a_a_a;3;6;59;5;6;oP6;a,b/a,c/a,z1,z2,z3;-;CNCl;CNCl");
     vproto.push_back("A3B_oP8_59_bf_a;2;8;59;4;7;oP8;a,b/a,c/a,z1,z2,x3,z3;D0_a;TiCu3;betaTiCu3");
@@ -99,14 +99,14 @@ namespace anrl {
     vproto.push_back("AB3C_oP20_62_c_cd_a;3;20;62;5;10;oP20;a,b/a,c/a,x2,z2,x3,z3,x4,y4,z4;-/-;CaTiO3/CaO3Zr;CaTiO3 Pnma Perovskite/CaO3Zr (ICSD #97463)"); //DX20200703 - added R. Friedrich ternary oxide
     vproto.push_back("A4B_oP20_62_2cd_c;2;20;62;4;12;oP20;a,b/a,c/a,x1,z1,x2,z2,x3,z3,x4,y4,z4;-;MgB4;MgB4");
     vproto.push_back("AB2C_oP16_62_c_2c_c;3;16;62;5;11;oP16;a,b/a,c/a,x1,z1,x2,z2,x3,z3,x4,z4;F5_6;CuSbS2;Chalcostibite");
-    vproto.push_back("A2B_oP12_62_2c_c;2;12;62;4;9;oP12;a,b/a,c/a,x1,z1,x2,z2,x3,z3;C37/C25/C23/C29;Co2Si/HgCl2/PbCl2/SrH2;Co2Si/HgCl2/Cotunnite/SrH2"); //added info from part 2 A2B_oP12_62_2c_c;2;12;62;4;9;oP12;a,b/a,c/a,x1,z1,x2,z2,x3,z3;C29;SrH2;SrH2
+    vproto.push_back("A2B_oP12_62_2c_c;2;12;62;4;9;oP12;a,b/a,c/a,x1,z1,x2,z2,x3,z3;C37/C25/C23/C29/-;Co2Si/HgCl2/PbCl2/SrH2/N2Re1;Co2Si/HgCl2/Cotunnite/SrH2/N2Re1 (ICSD #187446)"); //added info from part 2 A2B_oP12_62_2c_c;2;12;62;4;9;oP12;a,b/a,c/a,x1,z1,x2,z2,x3,z3;C29;SrH2;SrH2 //DX20201019 - added metal-nitride
     vproto.push_back("AB_oP8_62_c_c;2;8;62;4;7;oP8;a,b/a,c/a,x1,z1,x2,z2;B16/B31/B27/B29/B14;GeS/MnP/FeB/SnS/FeAs;GeS/MnP/FeB/SnS/Westerveldite"); //added info from part 2 AB_oP8_62_c_c;2;8;62;4;7;oP8;a,b/a,c/a,x1,z1,x2,z2;B14;FeAs;Westerveldite
-    vproto.push_back("AB3_oP16_62_c_cd;2;16;62;4;10;oP16;a,b/a,c/a,x1,z1,x2,z2,x3,y3,z3;D0_11;Fe3C;Cementite");
+    vproto.push_back("AB3_oP16_62_c_cd;2;16;62;4;10;oP16;a,b/a,c/a,x1,z1,x2,z2,x3,y3,z3;D0_11/-;Fe3C/N1Na3;Cementite/N1Na3 (ICSD #165990)"); //DX20201019 - added metal-nitride
     vproto.push_back("A3B7_oP40_62_cd_3c2d;2;40;62;4;20;oP40;a,b/a,c/a,x1,z1,x2,z2,x3,z3,x4,z4,x5,y5,z5,x6,y6,z6,x7,y7,z7;D10_1;C3Cr7;C3Cr7");
     vproto.push_back("A_oP8_62_2c;1;8;62;3;7;oP8;a,b/a,c/a,x1,z1,x2,z2;A_c;alphaNp;alphaNp");
-    vproto.push_back("AB2C_oC16_63_c_2c_c;3;8;63;5;7;oC16;a,b/a,c/a,y1,y2,y3,y4;-;SrCuO2;SrCuO2");
+    vproto.push_back("AB2C_oC16_63_c_2c_c;3;8;63;5;7;oC16;a,b/a,c/a,y1,y2,y3,y4;-/-;SrCuO2/Au1Ca2N1;SrCuO2/Au1Ca2N1 (ICSD #85528)"); //DX20201016 - added metal-nitride
     vproto.push_back("A2B_oC12_63_2c_c;2;6;63;4;6;oC12;a,b/a,c/a,y1,y2,y3;C49;ZrSi2;ZrSi2");
-    vproto.push_back("AB_oC8_63_c_c;2;4;63;4;5;oC8;a,b/a,c/a,y1,y2;B33/-;CrB/-;CrB/-");
+    vproto.push_back("AB_oC8_63_c_c;2;4;63;4;5;oC8;a,b/a,c/a,y1,y2;B33/-/-;CrB/-/Al1N1;CrB/-/Al1N1 (ICSD #163951)"); //DX20201019 - added metal-nitride
     vproto.push_back("A_oC4_63_c;1;2;63;3;4;oC4;a,b/a,c/a,y1;A20;alpha-U;alpha-Uranium");
     vproto.push_back("A_oC8_64_f;1;4;64;3;5;oC8;a,b/a,c/a,y1,z1;A11/A17/A14;alphaGa/P/I2;alphaGallium/Black Phosphorus/Molecular Iodine");
     vproto.push_back("A2B2C_oC80_64_efg_efg_df;3;40;64;5;18;oC80;a,b/a,c/a,x1,y2,y3,y4,z4,y5,z5,y6,z6,x7,y7,z7,x8,y8,z8;-;MgB2C2;MgB2C2");
@@ -193,7 +193,7 @@ namespace anrl {
     vproto.push_back("ABC3_hR10_161_a_a_b;3;10;161;5;7;hR10;a,c/a,x1,x2,x3,y3,z3;-;LiNbO3;Ferroelectric LiNbO3");
     vproto.push_back("AB2_hP9_162_ad_k;2;9;162;4;4;hP9;a,c/a,x3,z3;-;NV2;betaV2N");
     vproto.push_back("AB2CD2_hP36_163_h_i_bf_i;4;36;163;6;10;hP36;a,c/a,z2,x3,x4,y4,z4,x5,y5,z5;F5_10;KAg(CN)2;KAg2");
-    vproto.push_back("A3B2_hP5_164_ad_d;2;5;164;4;4;hP5;a,c/a,z2,z3;D5_13;Al3Ni2;Al3Ni2");
+    vproto.push_back("A3B2_hP5_164_ad_d;2;5;164;4;4;hP5;a,c/a,z2,z3;D5_13/-/-/-;Al3Ni2/Ca3N2/Ca3N2/Ca3N2;Al3Ni2/Ca3N2 (ICSD #162795)/Ca3N2 (ICSD #162796)/Ca3N2 (ICSD #169727)"); //DX20201019 - added three metal-nitrides
     vproto.push_back("AB2_hP3_164_a_d;2;3;164;4;3;hP3;a,c/a,z2;C6;CdI2;omega Phase");
     vproto.push_back("A3B_hP24_165_adg_f;2;24;165;4;7;hP24;a,c/a,z2,x3,x4,y4,z4;-;H3Ho;H3Ho");
     vproto.push_back("AB_hR2_166_a_b;2;2;166;4;2;hR2;a,c/a;L1_1;CuPt;CuPt");
@@ -215,10 +215,10 @@ namespace anrl {
     vproto.push_back("AB3_hP8_182_c_g;2;8;182;4;3;hP8;a,c/a,x2;-;Fe3C;Bainite");
     vproto.push_back("A_hP4_186_ab;1;4;186;3;4;hP4;a,c/a,z1,z2;-;C;Buckled Graphite");
     vproto.push_back("AB_hP8_186_ab_ab;2;8;186;4;6;hP8;a,c/a,z1,z2,z3,z4;B5;SiC;Moissanite-4H SiC");
-    vproto.push_back("AB_hP4_186_b_b;2;4;186;4;4;hP4;a,c/a,z1,z2;B4;ZnS;Wurtzite");
+    vproto.push_back("AB_hP4_186_b_b;2;4;186;4;4;hP4;a,c/a,z1,z2;B4/-/-/-;ZnS/Ga1N1/La1N1/Mo1N1;Wurtzite/Ga1N1 (ICSD #153888)/La1N1 (ICSD #162195)/Mo1N1 (ICSD #168369)"); //DX20201019 - added three metal-nitride
     vproto.push_back("AB_hP12_186_a2b_a2b;2;12;186;4;8;hP12;a,c/a,z1,z2,z3,z4,z5,z6;B6;SiC;Moissanite-6H SiC");
     vproto.push_back("A5B3C_hP18_186_2a3b_2ab_b;3;18;186;5;11;hP18;a,c/a,z1,z2,z3,z4,z5,z6,z7,z8,z9;E9_4;Al5C3N;Al5C3N");
-    vproto.push_back("AB_hP4_186_b_a;2;4;186;4;4;hP4;a,c/a,z1,z2;B12;BN;Original BN");
+    vproto.push_back("AB_hP4_186_b_a;2;4;186;4;4;hP4;a,c/a,z1,z2;B12/-;BN/Ga1N1;Original BN/Ga1N1 (ICSD #159250)"); //DX20201019 - added metal-nitride
     vproto.push_back("ABC_hP3_187_a_d_f;3;3;187;5;2;hP3;a,c/a;-;BaPtSb;BaPtSb");
     vproto.push_back("AB_hP2_187_d_a;2;2;187;4;2;hP2;a,c/a;B_h;WC;Tungsten Carbide");
     vproto.push_back("A2B_hP9_189_fg_bc;2;9;189;4;4;hP9;a,c/a,x3,x4;C22;Fe2P;Revised Fe2P");
@@ -228,14 +228,14 @@ namespace anrl {
     vproto.push_back("A3B_hP4_191_bc_a;2;4;191;4;2;hP4;a,c/a;-;Li3N;Li3 Ni");
     vproto.push_back("AB2_hP3_191_a_d;2;3;191;4;2;hP3;a,c/a;C32;AlB2;Hexagonal omega");
     vproto.push_back("A2B_hP6_191_h_e;2;6;191;4;4;hP6;a,c/a,z1,z2;C_h;Cu2Te;Cu2Te");
-    vproto.push_back("AB_hP6_191_f_ad;2;6;191;4;2;hP6;a,c/a;B35;CoSn;CoSn");
+    vproto.push_back("AB_hP6_191_f_ad;2;6;191;4;2;hP6;a,c/a;B35/-;CoSn/N1Ta1;CoSn/N1Ta1 (ICSD #25659)"); //DX20201019 - added metal-nitride
     vproto.push_back("AB_hP8_194_ad_f;2;8;194;4;3;hP8;a,c/a,z3;B_i;AsTi;AsTi");
     vproto.push_back("A_hP6_194_h;1;6;194;3;3;hP6;a,c/a,x1;-;C;Hypothetical Tetrahedrally Bonded Carbon with 3-Member Rings");
     vproto.push_back("AB_hP12_194_af_bf;2;12;194;4;4;hP12;a,c/a,z3,z4;-;CMo;CMo structure");
     vproto.push_back("A_hP4_194_ac;1;4;194;3;2;hP4;a,c/a;A3\';La;alphaLa");
     vproto.push_back("AB3_hP8_194_c_bf;2;8;194;4;3;hP8;a,c/a,z3;D0_18;Na3As;Na3As");
     vproto.push_back("AB2_hP6_194_b_f;2;6;194;4;3;hP6;a,c/a,z2;-;CaIn2;CaIn2");
-    vproto.push_back("AB_hP4_194_c_d;2;4;194;4;2;hP4;a,c/a;B_k;BN;BN");
+    vproto.push_back("AB_hP4_194_c_d;2;4;194;4;2;hP4;a,c/a;B_k/-;BN/Al1N1;BN/Al1N1 (ICSD #163950)"); //DX20201019 - added metal-nitride
     vproto.push_back("ABC2_hP8_194_d_a_f;3;8;194;5;3;hP8;a,c/a,z3;-;AlCCr2;AlCCr2");
     vproto.push_back("A3B_hP8_194_h_c;2;8;194;4;3;hP8;a,c/a,x2;D0_19;Ni3Sn;Ni3Sn");
     vproto.push_back("A_hP4_194_bc;1;4;194;3;2;hP4;a,c/a;A9;C;Hexagonal Graphite structure");
@@ -387,7 +387,7 @@ namespace anrl {
     vproto.push_back("A2B_oP24_55_2g2h_gh;2;24;55;4;15;oP24;a,b/a,c/a,x1,y1,x2,y2,x3,y3,x4,y4,x5,y5,x6,y6;-;GeAs2;GeAs2");
     vproto.push_back("A3B5_oP16_55_ch_agh;2;16;55;4;9;oP16;a,b/a,c/a,x3,y3,x4,y4,x5,y5;-;Rh5Ge3;Rh5Ge3");
     vproto.push_back("A_oP16_55_2g2h;1;16;55;3;11;oP16;a,b/a,c/a,x1,y1,x2,y2,x3,y3,x4,y4;-;C;R-carbon");
-    vproto.push_back("A2B_oP6_58_g_a;2;6;58;4;5;oP6;a,b/a,c/a,x2,y2;C50;alpha-PdCl2;alpha-PdCl2");
+    vproto.push_back("A2B_oP6_58_g_a;2;6;58;4;5;oP6;a,b/a,c/a,x2,y2;C50/-/-;alpha-PdCl2/N2Os1/N2Pt1;alpha-PdCl2/N2Os1 (ICSD #157283)/N2Pt1 (ICSD #166463)"); //DX20201019 - added two metal nitrides
     vproto.push_back("ABC_oP6_59_a_b_a;3;6;59;5;6;oP6;a,b/a,c/a,z1,z2,z3;E0_{5};FeOCl;FeOCl"); //DX 20180925 - added Strukturbericht
     vproto.push_back("A2B3_oP20_60_d_cd;2;20;60;4;10;oP20;a,b/a,c/a,y1,x2,y2,z2,x3,y3,z3;-;Rh2S3;Rh2S3");
     vproto.push_back("A3B_oP32_60_3d_d;2;32;60;4;15;oP32;a,b/a,c/a,x1,y1,z1,x2,y2,z2,x3,y3,z3,x4,y4,z4;-;WO3;WO3");
@@ -640,7 +640,7 @@ namespace anrl {
     // -------------------------------------------------------------------------
     // misc prototypes (from Y. Lederer) //DX 20200203
     // -------------------------------------------------------------------------
-    vproto.push_back("AB3_mC8_12_a_di;2;4;12;4;6;mC8;a,b/a,c/a,beta,x3,z3;-;-;-");
+    vproto.push_back("AB3_mC8_12_a_di;2;4;12;4;6;mC8;a,b/a,c/a,beta,x3,z3;-/-/-;-/Li1N3/Li1N3;-/Li1N3 (ICSD #34675)/Li1N3 (ICSD #181559)"); //DX20201019 - added two metal nitrides
     vproto.push_back("AB_mC8_12_i_i;2;4;12;4;8;mC8;a,b/a,c/a,beta,x1,z1,x2,z2;-;-;-");
     vproto.push_back("AB3C4_mC16_12_a_di_2i;3;8;12;5;10;mC16;a,b/a,c/a,beta,x3,z3,x4,z4,x5,z5;-;-;-");
     vproto.push_back("ABC2_mC16_12_i_i_adi;3;8;12;5;10;mC16;a,b/a,c/a,beta,x3,z3,x4,z4,x5,z5;-;-;-");
@@ -691,7 +691,7 @@ namespace anrl {
     vproto.push_back("A2B_hP3_164_d_a;2;3;164;4;3;hP3;a,c/a,z2;-;-;-");
     vproto.push_back("A2BC3_hP6_164_d_a_bd;3;6;164;5;4;hP6;a,c/a,z3,z4;-;-;-");
     vproto.push_back("A2BC3_hP6_164_d_b_ad;3;6;164;5;4;hP6;a,c/a,z3,z4;-;-;-");
-    vproto.push_back("A3B_hR4_166_bc_a;2;4;166;4;3;hR4;a,c/a,x3;-;-;-");
+    vproto.push_back("A3B_hR4_166_bc_a;2;4;166;4;3;hR4;a,c/a,x3;-/-;-/N3Na1;-/N3Na1 (ICSD #1144)"); //DX20201019 - added metal-nitride
     vproto.push_back("AB3_hR4_166_a_bc;2;4;166;4;3;hR4;a,c/a,x3;-;-;-");
     vproto.push_back("AB_hR4_166_c_c;2;4;166;4;4;hR4;a,c/a,x1,x2;-;-;-");
     vproto.push_back("A3BC4_hR8_166_bc_a_2c;3;8;166;5;5;hR8;a,c/a,x3,x4,x5;-;-;-");
@@ -716,7 +716,7 @@ namespace anrl {
     vproto.push_back("AB_oC16_64_e_f;2;8;64;4;6;oC16;a,b/a,c/a,y1,y2,z2;-;KO;KO (ICSD #180559)");
     vproto.push_back("A4B3_tP28_135_gh_dh;2;28;135;4;7;tP28;a,c/a,x2,x3,y3,x4,y4;-;O4Pb3;O4Pb3:vs (ICSD #29094)");
     vproto.push_back("A2B3_hP15_144_2a_3a;2;15;144;4;17;hP15;a,c/a,x1,y1,z1,x2,y2,z2,x3,y3,z3,x4,y4,z4,x5,y5,z5;-;B2O3;B2O3 (ICSD #24649)");
-    vproto.push_back("A2B_hR3_166_c_a;2;3;166;4;3;hR3;a,c/a,x2;-;Cs2O;Cs2O (ICSD #27919)");
+    vproto.push_back("A2B_hR3_166_c_a;2;3;166;4;3;hR3;a,c/a,x2;-/-/-;Cs2O/Ca2N1/Ba2N1;Cs2O (ICSD #27919)/Ca2N1 (ICSD #22231)/Ba2N1 (ICSD #409851)"); //DX20201019 - added two metal-nitrides
     vproto.push_back("AB2_hR6_166_c_2c;2;6;166;4;5;hR6;a,c/a,x1,x2,x3;-;OTl2;OTl2 (ICSD #16220)");
     vproto.push_back("AB_hP12_189_fg_eh;2;12;189;4;6;hP12;a,c/a,z1,x2,x3,z4;-;NaO;NaO (ICSD #25526)");
     vproto.push_back("AB_hP8_194_ac_f;2;8;194;4;3;hP8;a,c/a,z3;-;LiO;LiO (ICSD #152183)");
@@ -755,9 +755,117 @@ namespace anrl {
     // binaries
     vproto.push_back("A2B3_cI80_206_ad_e;2;40;206;4;5;cI80;a,x2,x3,y3,z3;-;N2Zn3;N2Zn3 (ICSD #84918)");
     // ternaries
-    vproto.push_back("ABC_oP12_62_c_c_c;3;12;62;5;9;oP12;a,b/a,c/a,x1,z1,x2,z2,x3,z3;-;CaLiN;CaLiN (ICSD #107304)");
-    vproto.push_back("A2B2C_tI10_139_e_e_a;3;5;139;5;4;tI10;a,c/a,z2,z3;-;Ca2N2Zn;Ca2N2Zn (ICSD #69049)");
+    vproto.push_back("ABC_oP12_62_c_c_c;3;12;62;5;9;oP12;a,b/a,c/a,x1,z1,x2,z2,x3,z3;-/-;CaLiN/Li1Mg1N1;CaLiN (ICSD #107304)/Li1Mg1N1 (ICSD #93259)"); //DX20201016 - added another metal-nitride system
+    vproto.push_back("A2B2C_tI10_139_e_e_a;3;5;139;5;4;tI10;a,c/a,z2,z3;-/-/-;Ca2N2Zn/N2Sr2Zn1/Ba2N2Zn1;Ca2N2Zn (ICSD #69049)/N2Sr2Zn1 (ICSD #80376)/Ba2N2Zn1 (ICSD #80377)"); //DX20201016 - added two metal-nitride prototypes
     vproto.push_back("A3BC2_hP6_191_f_a_d;3;6;191;5;2;hP6;a,c/a;-;Na3TaTi2;Na3TaTi2 (ICSD #186418)");
+    // -------------------------------------------------------------------------
+    // metal-nitride prototypes (from DX) //DX2021016
+    // -------------------------------------------------------------------------
+    // binaries
+    vproto.push_back("A2B_mP6_6_3ab_ab;2;6;6;4;16;mP6;a,b/a,c/a,beta,x1,z1,x2,z2,x3,z3,x4,z4,x5,z5,x6,z6;-;N2Re1;N2Re1 (ICSD #187448)");
+    vproto.push_back("A2B_mC12_8_4a_2a;2;6;8;4;16;mC12;a,b/a,c/a,beta,x1,z1,x2,z2,x3,z3,x4,z4,x5,z5,x6,z6;-;N2Re1;N2Re1 (ICSD #187447)");
+    vproto.push_back("A3B_mC16_8_6a_b;2;8;8;4;19;mC16;a,b/a,c/a,beta,x1,z1,x2,z2,x3,z3,x4,z4,x5,z5,x6,z6,x7,y7,z7;-;N3Rb1;N3Rb1 (ICSD #155169)");
+    vproto.push_back("A2B_mP6_11_2e_e;2;6;11;4;10;mP6;a,b/a,c/a,beta,x1,z1,x2,z2,x3,z3;-;N2Re1;N2Re1 (ICSD #187444)");
+    vproto.push_back("AB6_mP14_11_e_6e;2;14;11;4;18;mP14;a,b/a,c/a,beta,x1,z1,x2,z2,x3,z3,x4,z4,x5,z5,x6,z6,x7,z7;-;Ba1N6;Ba1N6 (ICSD #14244)");
+    vproto.push_back("A3B_mC8_12_di_a;2;4;12;4;6;mC8;a,b/a,c/a,beta,x3,z3;-/-;N3Na1/N3Na1;N3Na1 (ICSD #29370)/N3Na1 (ICSD #29376)");
+    vproto.push_back("A2B_mC12_12_2i_i;2;6;12;4;10;mC12;a,b/a,c/a,beta,x1,z1,x2,z2,x3,z3;-;N2Re1;N2Re1 (ICSD #187441)");
+    vproto.push_back("AB_mC16_12_2i_2i;2;8;12;4;12;mC16;a,b/a,c/a,beta,x1,z1,x2,z2,x3,z3,x4,z4;-;N1Sr1;N1Sr1 (ICSD #411555)");
+    vproto.push_back("A3B2_mC30_12_a4i_3i;2;15;12;4;18;mC30;a,b/a,c/a,beta,x2,z2,x3,z3,x4,z4,x5,z5,x6,z6,x7,z7,x8,z8;-/-;Ca3N2/Ca3N2;Ca3N2 (ICSD #162794)/Ca3N2 (ICSD #169726)");
+    vproto.push_back("A2B_mP6_13_g_e;2;6;13;4;8;mP6;a,b/a,c/a,beta,y1,x2,y2,z2;-;N2Re1;N2Re1 (ICSD #187451)");
+    vproto.push_back("AB2_mP12_14_e_2e;2;12;14;4;13;mP12;a,b/a,c/a,beta,x1,y1,z1,x2,y2,z2,x3,y3,z3;-;Ir1N2;Ir1N2 (ICSD #160623)");
+    vproto.push_back("AB3_mP16_14_e_3e;2;16;14;4;16;mP16;a,b/a,c/a,beta,x1,y1,z1,x2,y2,z2,x3,y3,z3,x4,y4,z4;-;Hg2N6;Hg2N6 (ICSD #98661)");
+    vproto.push_back("AB2_mC12_15_e_f;2;6;15;4;8;mC12;a,b/a,c/a,beta,y1,x2,y2,z2;-;Ba1N2;Ba1N2 (ICSD #280681)");
+    vproto.push_back("AB_oC16_36_2a_2a;2;8;36;4;11;oC16;a,b/a,c/a,y1,z1,y2,z2,y3,z3,y4,z4;-;N1Os1;N1Os1 (ICSD #167514)");
+    vproto.push_back("AB_oP8_53_h_h;2;8;53;4;7;oP8;a,b/a,c/a,y1,z1,y2,z2;-;N1Os1;N1Os1 (ICSD #167513)");
+    vproto.push_back("A2B_oP12_57_e_c;2;12;57;4;7;oP12;a,b/a,c/a,x1,x2,y2,z2;-;N2Re1;N2Re1 (ICSD #187450)");
+    vproto.push_back("A5B3_oC32_63_c2f_cf;2;16;63;4;11;oC32;a,b/a,c/a,y1,y2,y3,z3,y4,z4,y5,z5;-/-;N5Ta3/N5Ta3;N5Ta3 (ICSD #16253)/N5Ta3 (ICSD #66533)");
+    vproto.push_back("A2B_oC12_65_gj_e;2;6;65;4;5;oC12;a,b/a,c/a,x2,y3;-;N2Re1;N2Re1 (ICSD #187452)");
+    vproto.push_back("AB_oI4_71_b_c;2;4;71;4;3;oI4;a,b/a,c/a;-;Cr1N1;Cr1N1 (ICSD #53146)");
+    vproto.push_back("A2B_oI12_71_2e_f;2;6;71;4;6;oI12;a,b/a,c/a,x1,x2,x3;-;N2Re1;N2Re1 (ICSD #187449)");
+    vproto.push_back("AB_oI16_71_abe_n;2;8;71;4;6;oI16;a,b/a,c/a,x3,x4,y4;-;Li2N2;Li2N2 (ICSD #423831)");
+    vproto.push_back("AB3_oI16_72_b_cj;2;8;72;4;5;oI16;a,b/a,c/a,x3,y3;-;Ag1N3;Ag1N3 (ICSD #27135)");
+    vproto.push_back("A5B4_tI18_87_ah_h;2;9;87;4;6;tI18;a,c/a,x2,y2,x3,y3;-;N5Nb4;N5Nb4 (ICSD #26251)");
+    vproto.push_back("AB3_tI32_88_d_cf;2;16;88;4;5;tI32;a,c/a,x3,y3,z3;-;Cu1N3;Cu1N3 (ICSD #30633)");
+    vproto.push_back("AB_tP2_123_d_a;2;2;123;4;2;tP2;a,c/a;-;N1Pr1;N1Pr1 (ICSD #168645)");
+    vproto.push_back("A3B_tP4_123_ag_d;2;4;123;4;3;tP4;a,c/a,z3;-;N3Rb1;N3Rb1 (ICSD #16963)");
+    vproto.push_back("A3B_tP8_123_egh_ab;2;8;123;4;4;tP8;a,c/a,z4,z5;-;Cu3N1;Cu3N1 (ICSD #180237)");
+    vproto.push_back("A2B_tP6_127_g_b;2;6;127;4;3;tP6;a,c/a,x2;-;N2Re1;N2Re1 (ICSD #187442)");
+    vproto.push_back("AB_tP4_131_e_c;2;4;131;4;2;tP4;a,c/a;-;N1Tc1;N1Tc1 (ICSD #187709)");
+    vproto.push_back("AB_tI4_139_a_b;2;2;139;4;2;tI4;a,c/a;-;Mn1N1;Mn1N1 (ICSD #106932)");
+    vproto.push_back("A3B2_tI10_139_ae_e;2;5;139;4;4;tI10;a,c/a,z2,z3;-/-;Mn3N2/Mn3N2;Mn3N2 (ICSD #71638)/Mn3N2 (ICSD #84202)");
+    vproto.push_back("A3B4_tI14_139_ad_ce;2;7;139;4;3;tI14;a,c/a,z4;-;N3Nb4;N3Nb4 (ICSD #76389)");
+    vproto.push_back("A8B_tI18_139_deh_a;2;9;139;4;4;tI18;a,c/a,z3,x4;-;Fe16N2;Fe16N2 (ICSD #41953)");
+    vproto.push_back("AB3_tI16_140_a_dh;2;8;140;4;3;tI16;a,c/a,x3;-/-/-;K1N3/Cs1N3/Ag1N3;K1N3 (ICSD #24007)/Cs1N3 (ICSD #25008)/Ag1N3 (ICSD #183201)");
+    vproto.push_back("AB3_tI16_140_a_ch;2;8;140;4;3;tI16;a,c/a,x3;-;Cu1N3;Cu1N3 (ICSD #187018)");
+    vproto.push_back("AB3_tI16_140_c_ah;2;8;140;4;3;tI16;a,c/a,x3;-;K1N3;K1N3 (ICSD #1145)");
+    vproto.push_back("AB2_tI12_141_a_e;2;6;141;4;3;tI12;a,c/a,z2;-;N1Ti2;N1Ti2 (ICSD #23403)");
+    vproto.push_back("A3B_hR4_160_3a_a;2;4;160;4;6;hR4;a,c/a,x1,x2,x3,x4;-;N3Na1;N3Na1 (ICSD #644523)");
+    vproto.push_back("A3B2_hR5_160_3a_2a;2;5;160;4;7;hR5;a,c/a,x1,x2,x3,x4,x5;-;Be3N2;Be3N2 (ICSD #185490)");
+    vproto.push_back("AB_hP16_162_ek_ci;2;16;162;4;6;hP16;a,c/a,z2,x3,x4,z4;-;Mo1N1;Mo1N1 (ICSD #43559)");
+    vproto.push_back("A3B2_hP5_164_ac_d;2;5;164;4;4;hP5;a,c/a,z2,z3;-;N3V2;N3V2 (ICSD #182700)");
+    vproto.push_back("AB_hP16_164_ci_di;2;16;164;4;8;hP16;a,c/a,z1,z2,x3,z3,x4,z4;-;Mo1N1;Mo1N1 (ICSD #60168)");
+    vproto.push_back("AB_hP16_186_ac_bc;2;16;186;4;8;hP16;a,c/a,z1,z2,x3,z3,x4,z4;-;Mo1N1;Mo1N1 (ICSD #76280)");
+    vproto.push_back("AB2_hP3_187_a_h;2;3;187;4;3;hP3;a,c/a,z2;-;Hf1N2;Hf1N2 (ICSD #290427)");
+    vproto.push_back("A2B_hP3_191_e_a;2;3;191;4;3;hP3;a,c/a,z2;-;N2Os1;N2Os1 (ICSD #260545)");
+    vproto.push_back("A2B_hP6_191_af_d;2;6;191;4;2;hP6;a,c/a;-;N4Ta2;N4Ta2 (ICSD #182351)");
+    vproto.push_back("AB_hP6_191_ad_f;2;6;191;4;2;hP6;a,c/a;-;N1Ta1;N1Ta1 (ICSD #76457)");
+    vproto.push_back("AB_hP6_191_bc_ad;2;6;191;4;2;hP6;a,c/a;-;N1Y1;N1Y1 (ICSD #161079)");
+    vproto.push_back("A3B_hP8_193_g_b;2;8;193;4;3;hP8;a,c/a,x2;-;Ba3N1;Ba3N1 (ICSD #77730)");
+    vproto.push_back("AB_hP4_194_a_c;2;4;194;4;2;hP4;a,c/a;-;Ir1N1;Ir1N1 (ICSD #183157)");
+    vproto.push_back("AB2_hP6_194_c_e;2;6;194;4;3;hP6;a,c/a,z2;-;Hf1N2;Hf1N2 (ICSD #290428)");
+    vproto.push_back("A3B2_hP10_194_bf_ac;2;10;194;4;3;hP10;a,c/a,z4;-/-;Be3N2/Ca3N2;Be3N2 (ICSD #25656)/Ca3N2 (ICSD #162797)");
+    vproto.push_back("A3B2_hP10_194_cf_f;2;10;194;4;4;hP10;a,c/a,z2,z3;-;N3W2;N3W2 (ICSD #186207)");
+    vproto.push_back("AB_hP16_194_bh_ag;2;16;194;4;3;hP16;a,c/a,x4;-;Mo1N1;Mo1N1 (ICSD #106926)");
+    vproto.push_back("AB3_cI32_204_c_g;2;16;204;4;3;cI32;a,y2,z2;-/-;Co1N3/Co1N3;Co1N3 (ICSD #162105)/Co1N3 (ICSD #162106)");
+    vproto.push_back("AB4_cP5_221_a_bc;2;5;221;4;1;cP5;a;-;N1Ni4;N1Ni4 (ICSD #76403)");
+
+    // -------------------------------------------------------------------------
+    // ternaries
+    vproto.push_back("AB2C5_aP8_1_a_2a_5a;3;8;1;5;30;aP8;a,b/a,c/a,alpha,beta,gamma,x1,y1,z1,x2,y2,z2,x3,y3,z3,x4,y4,z4,x5,y5,z5,x6,y6,z6,x7,y7,z7,x8,y8,z8;-;Li1N2Na5;Li1N2Na5 (ICSD #92316)");
+    vproto.push_back("AB2C5_mC16_5_a_c_a2bc;3;8;5;5;14;mC16;a,b/a,c/a,beta,y1,y2,y3,y4,x5,y5,z5,x6,y6,z6;-;Li1N2Na5;Li1N2Na5 (ICSD #92315)");
+    vproto.push_back("A3B2C3_mP8_6_2ab_ab_a2b;3;8;6;5;20;mP8;a,b/a,c/a,beta,x1,z1,x2,z2,x3,z3,x4,z4,x5,z5,x6,z6,x7,z7,x8,z8;-;Li3N2Na3;Li3N2Na3 (ICSD #92312)");
+    vproto.push_back("A5B2C_mP8_6_3a2b_ab_b;3;8;6;5;20;mP8;a,b/a,c/a,beta,x1,z1,x2,z2,x3,z3,x4,z4,x5,z5,x6,z6,x7,z7,x8,z8;-;Li5N2Na1;Li5N2Na1 (ICSD #92314)");
+    vproto.push_back("A2BC2_mC20_12_2i_i_2i;3;10;12;5;14;mC20;a,b/a,c/a,beta,x1,z1,x2,z2,x3,z3,x4,z4,x5,z5;-;Ca2Fe1N2;Ca2Fe1N2 (ICSD #72389)");
+    vproto.push_back("AB2C12_mC30_12_a_i_6i;3;15;12;5;18;mC30;a,b/a,c/a,beta,x2,z2,x3,z3,x4,z4,x5,z5,x6,z6,x7,z7,x8,z8;-/-;Cd1K2N12/Cd1K2N12;Cd1K2N12 (ICSD #31297)/Cd1K2N12 (ICSD #659621)");
+    vproto.push_back("ABC_mP12_14_e_e_e;3;12;14;5;13;mP12;a,b/a,c/a,beta,x1,y1,z1,x2,y2,z2,x3,y3,z3;-;Be1Li1N1;Be1Li1N1 (ICSD #402341)");
+    vproto.push_back("A2BC_oC16_63_2c_c_c;3;8;63;5;7;oC16;a,b/a,c/a,y1,y2,y3,y4;-;Ca2In1N1;Ca2In1N1 (ICSD #96228)");
+    vproto.push_back("ABC3_oC20_63_c_a_cf;3;10;63;5;7;oC20;a,b/a,c/a,y2,y3,y4,z4;-;Al1N1Zr3;Al1N1Zr3 (ICSD #29521)");
+    vproto.push_back("A3BC3_oC28_63_cg_c_cg;3;14;63;5;10;oC28;a,b/a,c/a,y1,y2,y3,x4,y4,x5,y5;-;Ca3Cr1N3;Ca3Cr1N3 (ICSD #40205)");
+    vproto.push_back("A2BC_oC8_65_i_c_b;3;4;65;5;4;oC8;a,b/a,c/a,y3;-;Li4N2Na2;Li4N2Na2 (ICSD #92307)");
+    vproto.push_back("A7B2C3_oC24_65_a2ij_i_cj;3;12;65;5;8;oC24;a,b/a,c/a,y3,y4,y5,y6,y7;-;Ca7N2Tl3;Ca7N2Tl3 (ICSD #98178)");
+    vproto.push_back("A2BC3_oI12_71_e_a_de;3;6;71;5;5;oI12;a,b/a,c/a,x3,x4;-;Ce2Mn1N3;Ce2Mn1N3 (ICSD #50579)");
+    vproto.push_back("ABC_tP6_99_ab_ab_ab;3;6;99;5;8;tP6;a,c/a,z1,z2,z3,z4,z5,z6;-;Cr1N1Nb1;Cr1N1Nb1 (ICSD #23779)");
+    vproto.push_back("A3B2C3_tP8_115_abc_g_de;3;8;115;5;4;tP8;a,c/a,z5,z6;-;Li3N2Na3;Li3N2Na3 (ICSD #92311)");
+    vproto.push_back("ABC_tP3_123_c_a_b;3;3;123;5;2;tP3;a,c/a;-;Fe1N1Ni1;Fe1N1Ni1 (ICSD #53505)");
+    vproto.push_back("A5B2C_tP8_123_ai_bc_d;3;8;123;5;3;tP8;a,c/a,z5;-;Li5N2Na1;Li5N2Na1 (ICSD #92313)");
+    vproto.push_back("ABC_tP6_129_c_c_c;3;6;129;5;5;tP6;a,c/a,z1,z2,z3;-/-;Ca1Ga1N1/Mo1N1Ta1;Ca1Ga1N1 (ICSD #2027)/Mo1N1Ta1 (ICSD #100437)");
+    vproto.push_back("ABC2_tP8_129_c_c_bc;3;8;129;5;5;tP8;a,c/a,z2,z3,z4;-;Ba1Hf1N2;Ba1Hf1N2 (ICSD #50994)");
+    vproto.push_back("ABC2_tP8_129_a_c_bc;3;8;129;5;4;tP8;a,c/a,z3,z4;-;Li2N2Na4;Li2N2Na4 (ICSD #92309)");
+    vproto.push_back("ABC_tP6_131_e_c_b;3;6;131;5;2;tP6;a,c/a;-;Ca1N1Ni1;Ca1N1Ni1 (ICSD #69044)");
+    vproto.push_back("ABC_tP6_131_b_c_e;3;6;131;5;2;tP6;a,c/a;-;Li1N1Sr1;Li1N1Sr1 (ICSD #87414)");
+    vproto.push_back("A2BC_tI8_139_d_b_a;3;4;139;5;2;tI8;a,c/a;-;Li4N2Na2;Li4N2Na2 (ICSD #92305)");
+    vproto.push_back("A3B6C2_tI22_139_ae_eg_e;3;11;139;5;6;tI22;a,c/a,z2,z3,z4,z5;-/-;La3N6V2/La3N6Nb2;La3N6V2 (ICSD #98477)/La3N6Nb2 (ICSD #411473)");
+    vproto.push_back("A2B2C_tI20_140_h_h_a;3;10;140;5;4;tI20;a,c/a,x2,x3;-;Be4N4Sr2;Be4N4Sr2 (ICSD #413356)");
+    vproto.push_back("A2BC2_tI20_140_h_a_h;3;10;140;5;4;tI20;a,c/a,x2,x3;-;Be4Ca2N4;Be4Ca2N4 (ICSD #413357)");
+    vproto.push_back("AB2C2_tI20_140_a_h_h;3;10;140;5;4;tI20;a,c/a,x2,x3;-;Ba1Be2N2;Ba1Be2N2 (ICSD #415304)");
+    vproto.push_back("AB2C_hR4_160_a_2a_a;3;4;160;5;6;hR4;a,c/a,x1,x2,x3,x4;-;Cr1N2W1;Cr1N2W1 (ICSD #84639)");
+    vproto.push_back("A2B2C_hP5_164_d_d_a;3;5;164;5;4;hP5;a,c/a,z2,z3;-/-;Li2N2Zr1/Mg2N2Sr1;Li2N2Zr1 (ICSD #16231)/Mg2N2Sr1 (ICSD #410826)");
+    vproto.push_back("AB2C2_hP5_164_a_d_d;3;5;164;5;4;hP5;a,c/a,z2,z3;-;Ce1Li2N2;Ce1Li2N2 (ICSD #34003)");
+    vproto.push_back("AB2C_hR4_166_a_c_b;3;4;166;5;3;hR4;a,c/a,x3;-;Cu1N2Ta1;Cu1N2Ta1 (ICSD #71136)");
+    vproto.push_back("A3BC3_hP14_176_h_c_h;3;14;176;5;6;hP14;a,c/a,x2,y2,x3,y3;-;Ba3Fe1N3;Ba3Fe1N3 (ICSD #36502)");
+    vproto.push_back("ABC_hP6_186_b_b_a;3;6;186;5;5;hP6;a,c/a,z1,z2,z3;-;N1Na1Sn1;N1Na1Sn1 (ICSD #172471)");
+    vproto.push_back("AB2C_hP8_186_a_ab_b;3;8;186;5;6;hP8;a,c/a,z1,z2,z3,z4;-;Mn1N2W1;Mn1N2W1 (ICSD #80029)");
+    vproto.push_back("ABC_hP3_187_a_c_d;3;3;187;5;2;hP3;a,c/a;-;Li1N1Ni1;Li1N1Ni1 (ICSD #247028)");
+    vproto.push_back("A5B3C3_hP11_189_dg_g_f;3;11;189;5;5;hP11;a,c/a,x2,x3,x4;-;Li5N3Ni3;Li5N3Ni3 (ICSD #411152)");
+    vproto.push_back("A2BC_hP4_191_c_a_b;3;4;191;5;2;hP4;a,c/a;-;Li2N1Na1;Li2N1Na1 (ICSD #92308)");
+    vproto.push_back("ABC2_hP4_191_b_a_c;3;4;191;5;2;hP4;a,c/a;-;Li1N1Na2;Li1N1Na2 (ICSD #92310)");
+    vproto.push_back("ABC2_hP8_194_c_a_f;3;8;194;5;3;hP8;a,c/a,z3;-;Ba1Ce1N2;Ba1Ce1N2 (ICSD #74791)");
+    vproto.push_back("AB2C_hP8_194_a_f_b;3;8;194;5;3;hP8;a,c/a,z3;-;Fe1N2W1;Fe1N2W1 (ICSD #75971)");
+    vproto.push_back("ABC2_hP8_194_a_c_f;3;8;194;5;3;hP8;a,c/a,z3;-;Mg1Mo1N2;Mg1Mo1N2 (ICSD #185913)");
+    vproto.push_back("A3BC_hP10_194_h_a_c;3;10;194;5;3;hP10;a,c/a,x3;-;Ba3N1Na1;Ba3N1Na1 (ICSD #67497)");
+    vproto.push_back("A3BC_hP10_194_h_c_a;3;10;194;5;3;hP10;a,c/a,x3;-;Ba3Bi1N1;Ba3Bi1N1 (ICSD #152055)");
+    vproto.push_back("AB3C4_hP16_194_c_ae_2f;3;16;194;5;5;hP16;a,c/a,z3,z4,z5;-;Al1N3V4;Al1N3V4 (ICSD #181351)");
+    vproto.push_back("AB2C_cF32_227_b_c_a;3;8;227;5;1;cF32;a;-;Cs1N2Nb1;Cs1N2Nb1 (ICSD #72546)");
     // done now produce
 
     // FROM PROTO LIST
@@ -906,6 +1014,7 @@ namespace anrl {
         vparameters.push_back("5.1505,1.01186292593,1.03238520532,99.23,0.07,0.3317,0.3447,0.4496,0.7569,0.4792,0.2754,0.0395,0.2083");
         vparameters.push_back("5.4972,0.880103,1,120.47,0.8881,0.2186,0.7666,0.61,0.7024,0.7014,0.7722,0.9898,0.9889"); // Friedrich-binary-oxide (ICSD #8217) 
         vparameters.push_back("5.7038,0.78679126,0.93574459,122.6,0.106,0.212,0.209,0.401,0.703,0.299,0.239,0.979,0.026"); // Friedrich-binary-oxide (ICSD #647610) 
+        vparameters.push_back("5.4128,0.90027343,0.90766332,123.7682,0.192,0.404,0.885,0.321,0.594,0.145,0.235,0,0.01");  // 004, binary metal-nitride prototype (ICSD #240759)
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="A_mP32_14_8e"){
@@ -1021,6 +1130,8 @@ namespace anrl {
         vparameters.push_back("6.24,1.03044871795,0.673076923077,0.275,0.325");
         vparameters.push_back("4.704,0.917942176871,0.601615646259,0.66667,0.25");
         vparameters.push_back("4.4446,1.22049228277,0.761913333033,0.2004,0.3787");
+        vparameters.push_back("4.025,1.1965466,0.67115528,0.8682,0.5945");  // 004, binary metal-nitride prototype (ICSD #160620)
+        vparameters.push_back("5.013,1.2288051,0.58567724,0.414,0.068");  // 005, binary metal-nitride prototype (ICSD #166465)
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="AB_oP4_59_a_b"){
@@ -1064,6 +1175,8 @@ namespace anrl {
         vparameters.push_back("4.918,0.7600650671,1.44550630338,0.038,0.282,0.674,0.562,0.202,0.611");
         vparameters.push_back("12.735,0.468237141735,0.339615233608,0.733,0.125,0.508,0.722,0.874,0.447");
         vparameters.push_back("7.6204,0.595008136056,1.1869718125,0.125,0.4217,0.0202,0.837,0.2377,0.0959");
+        vparameters.push_back("3.875,1.64232258065,1.89496774194,0.004,0.758,0.24,0.07,0.24,0.39"); //DX20201019 - moved from Part 2 to here
+        vparameters.push_back("9.579,0.29710826,0.43334377,0.174,0.545,0.094,0.259,0.891,0.1");  // 005, binary metal-nitride prototype (ICSD #187446)
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="AB_oP8_62_c_c"){
@@ -1075,6 +1188,7 @@ namespace anrl {
       // ---------------------------------------------------------------------------
       if(anrl_label=="AB3_oP16_62_c_cd"){
         vparameters.push_back("5.09,1.3257367387,0.888605108055,0.39,0.05,0.036,0.852,0.186,0.063,0.328");
+        vparameters.push_back("7.09,1.0603667,0.67616361,0.376,0.943,0.026,0.085,0.838,0.928,0.384");  // 002, binary metal-nitride prototype (ICSD #165990)
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="A3B7_oP40_62_cd_3c2d"){
@@ -1087,6 +1201,7 @@ namespace anrl {
       // ---------------------------------------------------------------------------
       if(anrl_label=="AB2C_oC16_63_c_2c_c"){
         vparameters.push_back("3.577,4.56863293263,1.09538719597,0.06109,-0.0558,0.1792,0.33096");
+        vparameters.push_back("3.5814,5.0438934,1.3735132,0.95974,0.60233,0.78501,0.19337");  // 002, ternary metal-nitride prototype (ICSD #85528)
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="A2B_oC12_63_2c_c"){
@@ -1096,6 +1211,7 @@ namespace anrl {
       if(anrl_label=="AB_oC8_63_c_c"){
         vparameters.push_back("2.9782,2.64253575985,0.985360284736,0.436,0.14525");
         vparameters.push_back("1.0.0185797325,1.41421356236,0.707106781182,0.625,0.125"); // Lederer-13
+        vparameters.push_back("3.31,1.4441088,1.1389728,0.3174,0.6888");  // 003, binary metal-nitride prototype (ICSD #163951)
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="A_oC4_63_c"){
@@ -1453,6 +1569,9 @@ namespace anrl {
       // ---------------------------------------------------------------------------
       if(anrl_label=="A3B2_hP5_164_ad_d"){
         vparameters.push_back("4.0282,1.21409066084,0.648,0.149");
+        vparameters.push_back("4.1971,1.2861976,0.31689,0.76948");  // 002, binary metal-nitride prototype (ICSD #162795)
+        vparameters.push_back("3.8572,1.7764181,0.33541,0.76913");  // 003, binary metal-nitride prototype (ICSD #162796)
+        vparameters.push_back("3.938,1.2496191,0.606,0.231");  // 004, binary metal-nitride prototype (ICSD #169727)
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="AB2_hP3_164_a_d"){
@@ -1549,6 +1668,9 @@ namespace anrl {
       // ---------------------------------------------------------------------------
       if(anrl_label=="AB_hP4_186_b_b"){
         vparameters.push_back("3.8227,1.63776911607,0.3748,0.0");
+        vparameters.push_back("3.143,1.823099,0,0.375");  // 002, binary metal-nitride prototype (ICSD #153888)
+        vparameters.push_back("4.084,1.4299706,0.5,0.91");  // 003, binary metal-nitride prototype (ICSD #162195)
+        vparameters.push_back("2.965,2.0856661,0,0.3748");  // 004, binary metal-nitride prototype (ICSD #168369)
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="AB_hP12_186_a2b_a2b"){
@@ -1561,6 +1683,7 @@ namespace anrl {
       // ---------------------------------------------------------------------------
       if(anrl_label=="AB_hP4_186_b_a"){
         vparameters.push_back("2.51,2.66932270916,0.0,0.05");
+        vparameters.push_back("3.172,1.6314628,0,0.38");  // 002, binary metal-nitride prototype (ICSD #159250)
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="ABC_hP3_187_a_d_f"){
@@ -1601,6 +1724,7 @@ namespace anrl {
       // ---------------------------------------------------------------------------
       if(anrl_label=="AB_hP6_191_f_ad"){
         vparameters.push_back("5.279,0.806914188293");
+        vparameters.push_back("5.1912,0.56069888");  // 002, binary metal-nitride prototype (ICSD #25659)
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="AB_hP8_194_ad_f"){
@@ -1629,6 +1753,7 @@ namespace anrl {
       // ---------------------------------------------------------------------------
       if(anrl_label=="AB_hP4_194_c_d"){
         vparameters.push_back("2.50399,2.66023426611");
+        vparameters.push_back("3.03,1.2508251");  // 002, binary metal-nitride prototype (ICSD #163950)
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="ABC2_hP8_194_d_a_f"){
@@ -2229,6 +2354,8 @@ namespace anrl {
       // ---------------------------------------------------------------------------
       if(anrl_label=="A2B_oP6_58_g_a"){
         vparameters.push_back("3.7572,2.89952624295,0.89063664431,0.3326,0.63309");
+        vparameters.push_back("2.7,1.8259259,1.5296296,0.87249,0.40386");  // 002, binary metal-nitride prototype (ICSD #157283)
+        vparameters.push_back("3.778,1.2916887,0.84912652,0.852,0.584");  // 003, binary metal-nitride prototype (ICSD #166463)
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="ABC_oP6_59_a_b_a"){
@@ -2260,9 +2387,9 @@ namespace anrl {
         vparameters.push_back("9.3538,0.698497,0.550536,0.134,0.4967,0.1506,0.0677,0.3502,0.7211,0.3161,0.0161,0.6155,0.5647,0.8583"); // Friedrich-ternary-oxide (ICSD #16298)
       }
       // ---------------------------------------------------------------------------
-      if(anrl_label=="A2B_oP12_62_2c_c"){
-        vparameters.push_back("3.875,1.64232258065,1.89496774194,0.004,0.758,0.24,0.07,0.24,0.39");
-      }
+      //DX20201019 [OBSOLETE - moved up ] if(anrl_label=="A2B_oP12_62_2c_c"){
+      //DX20201019 [OBSOLETE - moved up ]   vparameters.push_back("3.875,1.64232258065,1.89496774194,0.004,0.758,0.24,0.07,0.24,0.39");
+      //DX20201019 [OBSOLETE - moved up ] }
       // ---------------------------------------------------------------------------
       if(anrl_label=="A3B_oP16_62_cd_c"){
         vparameters.push_back("6.5982,1.11416750023,0.727789397108,0.011,0.415,0.369,0.555,0.174,0.053,0.856");
@@ -3204,6 +3331,8 @@ namespace anrl {
       // ---------------------------------------------------------------------------
       if(anrl_label=="AB3_mC8_12_a_di"){
         vparameters.push_back("1.0,0.301511344577,0.522232967868,100.024987862,0.75,0.25");
+        vparameters.push_back("5.627,0.58983473,0.88484095,72.6,0.6048,0.2603");  // 002, binary metal-nitride prototype (ICSD #34675)
+        vparameters.push_back("5.328,0.60041291,0.8871997,77.38,0.3756,0.7456");  // 003, binary metal-nitride prototype (ICSD #181559)
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="AB_mC8_12_i_i"){
@@ -3405,6 +3534,7 @@ namespace anrl {
       // ---------------------------------------------------------------------------
       if(anrl_label=="A3B_hR4_166_bc_a"){
         vparameters.push_back("1.0,4.89897948557,0.25");
+        vparameters.push_back("3.6459845,4.1752552,0.42402");  // 002, binary metal-nitride prototype (ICSD #1144)
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="AB3_hR4_166_a_bc"){
@@ -3500,6 +3630,8 @@ namespace anrl {
       // ---------------------------------------------------------------------------
       if(anrl_label=="A2B_hR3_166_c_a"){
         vparameters.push_back("5.73015,4.46193,0.744");
+        vparameters.push_back("3.6378513,5.1624334,0.268");  // 002, binary metal-nitride prototype (ICSD #22231)
+        vparameters.push_back("4.0290164,5.5658926,0.26647");  // 003, binary metal-nitride prototype (ICSD #409851)
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="AB2_hR6_166_c_2c"){
@@ -3648,14 +3780,441 @@ namespace anrl {
       // ---------------------------------------------------------------------------
       if(anrl_label=="ABC_oP12_62_c_c_c"){
         vparameters.push_back("9.95851159,0.433951127369,0.653641836852,0.15617,0.97349,0.04761,0.42551,0.40749,0.75982");
+        vparameters.push_back("7.1586,0.48988629,0.70044422,0.0948,0.4719,0.1442,0.9797,0.3792,0.731");  // 002, ternary metal-nitride prototype (ICSD #93259)
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="A2B2C_tI10_139_e_e_a"){
         vparameters.push_back("4.0191421247,3.53238454024,0.664,0.8545");
+        vparameters.push_back("3.8568,3.3538166,0.1449,0.3409");  // 002, ternary metal-nitride prototype (ICSD #80376)
+        vparameters.push_back("4.152,3.1442678,0.6557,0.8589");  // 003, ternary metal-nitride prototype (ICSD #80377)
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="A3BC2_hP6_191_f_a_d"){
         vparameters.push_back("5.3369,0.57059342");
+      }
+
+      // -------------------------------------------------------------------------
+      // metal-nitride prototypes (from DX)
+      // ---------------------------------------------------------------------------
+      // binaries 
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A2B_mP6_6_3ab_ab"){
+        vparameters.push_back("4.86,0.58148148,0.84053498,99.49,0.192,0.064,0.825,0.654,0.62,0.359,0.201,0.425,0.353,0.805,0.778,0.028");  // 001, binary metal-nitride prototype (ICSD #187448)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A2B_mC12_8_4a_2a"){
+        vparameters.push_back("4.964,0.57836422,1.9284851,107.49,0.252,0.798,0.162,0.643,0.008,0.376,0.407,0.065,0.999,0.936,0.749,0.505");  // 001, binary metal-nitride prototype (ICSD #187447)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3B_mC16_8_6a_b"){
+        vparameters.push_back("9.0123,0.83308367,0.70781044,134.9427,0.86936937,0.5,0.12962963,0.5,0.63036963,0.76073926,0.36862937,0.23926074,0,0.4995005,0.5004995,0.5004995,0.5,0.75,0");  // 001, binary metal-nitride prototype (ICSD #155169)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A2B_mP6_11_2e_e"){
+        vparameters.push_back("5.1164,0.56651161,0.82880541,113.029,0.29511678,0.65490933,0.17069835,0.88921147,0.71680688,0.70665402");  // 001, binary metal-nitride prototype (ICSD #187444)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB6_mP14_11_e_6e"){
+        vparameters.push_back("9.63,0.45794393,0.56386293,99.34,0.7819,0.8285,0.093,0.86,0.108,0.646,0.112,0.437,0.416,0.221,0.54,0.25,0.667,0.298");  // 001, binary metal-nitride prototype (ICSD #14244)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3B_mC8_12_di_a"){
+        vparameters.push_back("6.2233,0.58666624,0.85740684,71.556,0.0939,0.2687");  // 001, binary metal-nitride prototype (ICSD #29370)
+        vparameters.push_back("6.3105,0.57963711,0.86886934,68.788,0.0836,0.2705");  // 002, binary metal-nitride prototype (ICSD #29376)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A2B_mC12_12_2i_i"){
+        vparameters.push_back("6.817,0.41587208,0.84264339,83.9924,0.373,0.864,0.902,0.47,0.675,0.769");  // 001, binary metal-nitride prototype (ICSD #187441)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB_mC16_12_2i_2i"){
+        vparameters.push_back("13.46,0.2830312,0.49946508,85.287,0.7559,0.7486,0.9779,0.0833,0.846,0.3926,0.6441,0.092");  // 001, binary metal-nitride prototype (ICSD #411555)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3B2_mC30_12_a4i_3i"){
+        vparameters.push_back("15.0498,0.25136547,0.62120427,79.46,0.62567,0.72225,0.328,0.96482,0.28973,0.62051,0.96826,0.66055,0.14105,0.51172,0.18256,0.86977,0.46936,0.81225");  // 001, binary metal-nitride prototype (ICSD #162794)
+        vparameters.push_back("14.095,0.25902802,0.63213906,81.748,0.328,0.965,0.299,0.629,0.631,0.715,0.974,0.658,0.141,0.508,0.18,0.868,0.465,0.807");  // 002, binary metal-nitride prototype (ICSD #169726)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A2B_mP6_13_g_e"){
+        vparameters.push_back("5.053,0.58321789,0.98495943,129.9799,0.809,0.679,0.698,0.37");  // 001, binary metal-nitride prototype (ICSD #187451)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB2_mP12_14_e_2e"){
+        vparameters.push_back("5.6053,0.86029294,0.85947229,126.0785,0.2336,0,0.0131,0.1841,0.4,0.8837,0.3261,0.5888,0.169");  // 001, binary metal-nitride prototype (ICSD #160623)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB3_mP16_14_e_3e"){
+        vparameters.push_back("5.9607,2.1122855,0.60051672,103.253,0.2956,0.03505,0.3855,0.949,0.0987,0.19,0.914,0.1852,0.297,0.865,0.2681,0.362");  // 001, binary metal-nitride prototype (ICSD #98661)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB2_mC12_15_e_f"){
+        vparameters.push_back("7.1712,0.61281236,1.2249554,127.232,0.5516,0.491,0.607,0.032");  // 001, binary metal-nitride prototype (ICSD #280681)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB_oC16_36_2a_2a"){
+        vparameters.push_back("2.59,4.6100386,1.7722008,0.86,0,0.77,0.82,0.47,0.82,0.15,0.93");  // 001, binary metal-nitride prototype (ICSD #167514)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB_oP8_53_h_h"){
+        vparameters.push_back("2.79,1.344086,1.5197133,0.35,0.7,0.86,0.89");  // 001, binary metal-nitride prototype (ICSD #167513)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A2B_oP12_57_e_c"){
+        vparameters.push_back("2.901,1.7087211,2.7083764,0.297,0.792,0.08,0.838");  // 001, binary metal-nitride prototype (ICSD #187450)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A5B3_oC32_63_c2f_cf"){
+        vparameters.push_back("3.893,2.6365271,2.6365271,0.2373,0.70243,0.047,0.8812,0.3097,0.9268,0.13429,0.4399");  // 001, binary metal-nitride prototype (ICSD #16253)
+        vparameters.push_back("3.8862,2.6277083,2.6407287,0.23678,0.8029,0.04701,0.88051,0.30862,0.92622,0.13455,0.44094");  // 002, binary metal-nitride prototype (ICSD #66533)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A2B_oC12_65_gj_e"){
+        vparameters.push_back("5.701,1.3513419,0.49587792,0.117,0.31");  // 001, binary metal-nitride prototype (ICSD #187452)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB_oI4_71_b_c"){
+        vparameters.push_back("2.8796,1.479268,1.0460133");  // 001, binary metal-nitride prototype (ICSD #53146)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A2B_oI12_71_2e_f"){
+        vparameters.push_back("13.0613,0.28741396,0.215415,0.45057355,0.20799023,0.84176015");  // 001, binary metal-nitride prototype (ICSD #187449)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB_oI16_71_abe_n"){
+        vparameters.push_back("10.7912,0.41118689,0.2889484,0.751,0.12321,0.6466");  // 001, binary metal-nitride prototype (ICSD #423831)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB3_oI16_72_b_cj"){
+        vparameters.push_back("5.94,0.94107744,1.0185185,0.855,0.145");  // 001, binary metal-nitride prototype (ICSD #27135)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A5B4_tI18_87_ah_h"){
+        vparameters.push_back("6.873,0.62534556,0.6,0.2,0.9,0.3");  // 001, binary metal-nitride prototype (ICSD #26251)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB3_tI32_88_d_cf"){
+        vparameters.push_back("8.653,0.64648099,0.173,0.827,0.625");  // 001, binary metal-nitride prototype (ICSD #30633)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB_tP2_123_d_a"){
+        vparameters.push_back("4.129,0.7808186");  // 001, binary metal-nitride prototype (ICSD #168645)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3B_tP4_123_ag_d"){
+        vparameters.push_back("4.497,0.82432733,0.304");  // 001, binary metal-nitride prototype (ICSD #16963)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3B_tP8_123_egh_ab"){
+        vparameters.push_back("3.745,2,0.25,0.25");  // 001, binary metal-nitride prototype (ICSD #180237)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A2B_tP6_127_g_b"){
+        vparameters.push_back("4.408,0.60528584,0.61441863");  // 001, binary metal-nitride prototype (ICSD #187442)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB_tP4_131_e_c"){
+        vparameters.push_back("2.704,2.2525888");  // 001, binary metal-nitride prototype (ICSD #187709)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB_tI4_139_a_b"){
+        vparameters.push_back("3.009,1.3921569");  // 001, binary metal-nitride prototype (ICSD #106932)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3B2_tI10_139_ae_e"){
+        vparameters.push_back("4.2,2.8878571,0.667,0.8412");  // 001, binary metal-nitride prototype (ICSD #71638)
+        vparameters.push_back("2.974,4.0773369,0.33341,0.1593");  // 002, binary metal-nitride prototype (ICSD #84202)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3B4_tI14_139_ad_ce"){
+        vparameters.push_back("4.382,1.9698768,0.2521");  // 001, binary metal-nitride prototype (ICSD #76389)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A8B_tI18_139_deh_a"){
+        vparameters.push_back("5.72,1.0996503,0.293,0.757");  // 001, binary metal-nitride prototype (ICSD #41953)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB3_tI16_140_a_dh"){
+        vparameters.push_back("6.106,1.1578775,0.635");  // 001, binary metal-nitride prototype (ICSD #24007)
+        vparameters.push_back("6.5412,1.2368984,0.374");  // 002, binary metal-nitride prototype (ICSD #25008)
+        vparameters.push_back("5.52,1.009058,0.84");  // 003, binary metal-nitride prototype (ICSD #183201)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB3_tI16_140_a_ch"){
+        vparameters.push_back("6.1624,1.0959853,0.4359");  // 001, binary metal-nitride prototype (ICSD #187018)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB3_tI16_140_c_ah"){
+        vparameters.push_back("6.1188,1.1606034,0.36406");  // 001, binary metal-nitride prototype (ICSD #1145)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB2_tI12_141_a_e"){
+        vparameters.push_back("4.14,2.1268116,0.64");  // 001, binary metal-nitride prototype (ICSD #23403)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3B_hR4_160_3a_a"){
+        vparameters.push_back("3.6458651,4.1802255,0.428,0.5,0.583,0");  // 001, binary metal-nitride prototype (ICSD #644523)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3B2_hR5_160_3a_2a"){
+        vparameters.push_back("2.8499718,5.1435171,0.14085,0.68246,0.91112,0.79584,0.29163");  // 001, binary metal-nitride prototype (ICSD #185490)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB_hP16_162_ek_ci"){
+        vparameters.push_back("5.665,0.97440424,0.25,0.83333,0.494,0.75");  // 001, binary metal-nitride prototype (ICSD #43559)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3B2_hP5_164_ac_d"){
+        vparameters.push_back("2.82,2.2163121,0.393,0.802");  // 001, binary metal-nitride prototype (ICSD #182700)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB_hP16_164_ci_di"){
+        vparameters.push_back("5.72,0.97902098,0.25,0,0.511,0.25,0.83333,0");  // 001, binary metal-nitride prototype (ICSD #60168)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB_hP16_186_ac_bc"){
+        vparameters.push_back("5.745,0.97859008,0.25,0,0.51,0.25,0.833,0");  // 001, binary metal-nitride prototype (ICSD #76280)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB2_hP3_187_a_h"){
+        vparameters.push_back("3.2689,1.1635107,0.687679");  // 001, binary metal-nitride prototype (ICSD #290427)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A2B_hP3_191_e_a"){
+        vparameters.push_back("2.829,1.7575115,0.384");  // 001, binary metal-nitride prototype (ICSD #260545)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A2B_hP6_191_af_d"){
+        vparameters.push_back("5.263,0.5166255");  // 001, binary metal-nitride prototype (ICSD #182351)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB_hP6_191_ad_f"){
+        vparameters.push_back("5.186,0.56170459");  // 001, binary metal-nitride prototype (ICSD #76457)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB_hP6_191_bc_ad"){
+        vparameters.push_back("3.98,1.2084925");  // 001, binary metal-nitride prototype (ICSD #161079)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3B_hP8_193_g_b"){
+        vparameters.push_back("7.6418,0.9225706,0.2721");  // 001, binary metal-nitride prototype (ICSD #77730)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB_hP4_194_a_c"){
+        vparameters.push_back("2.46,1.5859756");  // 001, binary metal-nitride prototype (ICSD #183157)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB2_hP6_194_c_e"){
+        vparameters.push_back("3.2647,2.3412565,0.5930479");  // 001, binary metal-nitride prototype (ICSD #290428)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3B2_hP10_194_bf_ac"){
+        vparameters.push_back("2.8413,3.4114666,0.075");  // 001, binary metal-nitride prototype (ICSD #25656)
+        vparameters.push_back("3.8911,3.3888361,0.5862");  // 002, binary metal-nitride prototype (ICSD #162797)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3B2_hP10_194_cf_f"){
+        vparameters.push_back("2.89,5.2892734,0.07,0.84");  // 001, binary metal-nitride prototype (ICSD #186207)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB_hP16_194_bh_ag"){
+        vparameters.push_back("5.72,0.96153846,0.52");  // 001, binary metal-nitride prototype (ICSD #106926)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB3_cI32_204_c_g"){
+        vparameters.push_back("6.592,0.6933,0.0944");  // 001, binary metal-nitride prototype (ICSD #162105)
+        vparameters.push_back("6.289,0.8855,0.3784");  // 002, binary metal-nitride prototype (ICSD #162106)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB4_cP5_221_a_bc"){
+        vparameters.push_back("3.74");  // binary metal-nitride prototype (ICSD #76403)
+      }
+      // -------------------------------------------------------------------------
+      // ternaries
+      // ---------------------------------------------------------------------------
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB2C5_aP8_1_a_2a_5a"){
+        vparameters.push_back("6.57,0.6173516,0.56754947,90.52,90.53,91.16,0.788,0,0.759,0.791,0.497,0.745,0.291,0.505,0.238,0.958,0.555,0.254,0.124,0.447,0.732,0.285,0.998,0.127,0.621,0.465,0.246,0.459,0.536,0.74");  // 001, ternary metal-nitride prototype (ICSD #92316)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB2C5_mC16_5_a_c_a2bc"){
+        vparameters.push_back("6.731,0.88307829,0.94829892,88.82,0.093,0.631,0.084,0.617,0.73,0.85,0.763,0.715,0.848,0.232");  // 001, ternary metal-nitride prototype (ICSD #92315)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3B2C3_mP8_6_2ab_ab_a2b"){
+        vparameters.push_back("6.32,0.58164557,0.60981013,90.31,0.972,0.462,0.283,0,0.297,0.5,0.638,0.566,0.819,0,0.814,0.502,0.473,0.395,0.143,0.617");  // 001, ternary metal-nitride prototype (ICSD #92312)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A5B2C_mP8_6_3a2b_ab_b"){
+        vparameters.push_back("6.6606,0.57952737,0.64258475,91.4279,0.363,0.521,0.67,0.005,0.026,0.447,0.688,0.505,0.221,0,0.535,0.61,0.207,0.498,0.872,0.659");  // 001, ternary metal-nitride prototype (ICSD #92314)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A2BC2_mC20_12_2i_i_2i"){
+        vparameters.push_back("10.93,0.45379689,0.86336688,141.6047,0.726,0.7657,0.0848,0.4066,0.5029,0.8751,0.7185,0.1958,0.4256,0.613");  // 001, ternary metal-nitride prototype (ICSD #72389)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB2C12_mC30_12_a_i_6i"){
+        vparameters.push_back("14.272,0.26534473,0.62268778,87.17,0.347,0.6745,0.3979,0.0033,0.3277,0.0835,0.2593,0.1569,0,0.7378,0.068,0.6555,0.133,0.5702");  // 001, ternary metal-nitride prototype (ICSD #31297)
+        vparameters.push_back("14.254,0.2655395,0.62319349,87.1,0.847,0.674,0.398,0.003,0.328,0.084,0.259,0.157,0,0.738,0.068,0.656,0.133,0.57");  // 002, ternary metal-nitride prototype (ICSD #659621)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC_mP12_14_e_e_e"){
+        vparameters.push_back("4.54,1.0484581,1.2790749,124.9,0.91998,0.39152,0.608,0.67587,0.54156,0.91072,0.84932,0.19521,0.8007");  // 001, ternary metal-nitride prototype (ICSD #402341)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A2BC_oC16_63_2c_c_c"){
+        vparameters.push_back("3.532,5.7202718,1.4068516,0.78124,0.62006,0.96137,0.19906");  // 001, ternary metal-nitride prototype (ICSD #96228)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC3_oC20_63_c_a_cf"){
+        vparameters.push_back("3.369,3.4128822,2.6662214,0.2526,0.9554,0.3719,0.958");  // 001, ternary metal-nitride prototype (ICSD #29521)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3BC3_oC28_63_cg_c_cg"){
+        vparameters.push_back("8.503,1.2094555,0.59179113,0.8921,0.3055,0.1243,0.2843,0.1174,0.6918,0.8714");  // 001, ternary metal-nitride prototype (ICSD #40205)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A2BC_oC8_65_i_c_b"){
+        vparameters.push_back("3.698,1.7212006,1.2439156,0.166");  // 001, ternary metal-nitride prototype (ICSD #92307)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A7B2C3_oC24_65_a2ij_i_cj"){
+        vparameters.push_back("4.9,5.0531224,0.99591837,0.1982,0.40004,0.1027,0.0998,0.29317");  // 001, ternary metal-nitride prototype (ICSD #98178)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A2BC3_oI12_71_e_a_de"){
+        vparameters.push_back("12.4601,0.30095264,0.2764424,0.35332,0.1638");  // 001, ternary metal-nitride prototype (ICSD #50579)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC_tP6_99_ab_ab_ab"){
+        vparameters.push_back("3.0285,2.430246,0.76,0.05,0.35,0.58,0.3,0");  // 001, ternary metal-nitride prototype (ICSD #23779)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3B2C3_tP8_115_abc_g_de"){
+        vparameters.push_back("3.8929,2.021886,0.23552817,0.098179023");  // 001, ternary metal-nitride prototype (ICSD #92311)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC_tP3_123_c_a_b"){
+        vparameters.push_back("2.83,1.3120141");  // 001, ternary metal-nitride prototype (ICSD #53505)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A5B2C_tP8_123_ai_bc_d"){
+        vparameters.push_back("3.965,1.3881463,0.75");  // 001, ternary metal-nitride prototype (ICSD #92313)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC_tP6_129_c_c_c"){
+        vparameters.push_back("3.5701,2.1170836,0.65036,0.08393,0.3303");  // 001, ternary metal-nitride prototype (ICSD #2027)
+        vparameters.push_back("3.081,2.5316456,0.9,0.617,0.335");  // 002, ternary metal-nitride prototype (ICSD #100437)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC2_tP8_129_c_c_bc"){
+        vparameters.push_back("4.1279,2.0304755,0.8479,0.4142,0.168");  // 001, ternary metal-nitride prototype (ICSD #50994)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC2_tP8_129_a_c_bc"){
+        vparameters.push_back("3.895,1.5697047,0.221,0.789");  // 001, ternary metal-nitride prototype (ICSD #92309)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC_tP6_131_e_c_b"){
+        vparameters.push_back("3.5809,1.9574967");  // 001, ternary metal-nitride prototype (ICSD #69044)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC_tP6_131_b_c_e"){
+        vparameters.push_back("3.924,1.8055556");  // 001, ternary metal-nitride prototype (ICSD #87414)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A2BC_tI8_139_d_b_a"){
+        vparameters.push_back("3.653,1.460991");  // 001, ternary metal-nitride prototype (ICSD #92305)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3B6C2_tI22_139_ae_eg_e"){
+        vparameters.push_back("3.905,5.1766965,0.1805,0.6949,0.6023,0.5871");  // 001, ternary metal-nitride prototype (ICSD #98477)
+        vparameters.push_back("4.0698,4.9520861,0.82019,0.3019,0.39895,0.9153");  // 002, ternary metal-nitride prototype (ICSD #411473)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A2B2C_tI20_140_h_h_a"){
+        vparameters.push_back("5.6213,1.3433192,0.872,0.333");  // 001, ternary metal-nitride prototype (ICSD #413356)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A2BC2_tI20_140_h_a_h"){
+        vparameters.push_back("5.5615,1.2370224,0.3794,0.8312");  // 001, ternary metal-nitride prototype (ICSD #413357)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB2C2_tI20_140_a_h_h"){
+        vparameters.push_back("5.6646,1.4818699,0.372,0.836");  // 001, ternary metal-nitride prototype (ICSD #415304)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB2C_hR4_160_a_2a_a"){
+        vparameters.push_back("2.8560976,5.4641029,0.8251,0.2629,0.4068,0");  // 001, ternary metal-nitride prototype (ICSD #84639)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A2B2C_hP5_164_d_d_a"){
+        vparameters.push_back("3.282,1.6636197,0.39,0.77");  // 001, ternary metal-nitride prototype (ICSD #16231)
+        vparameters.push_back("3.622,1.7556599,0.6314,0.2797");  // 002, ternary metal-nitride prototype (ICSD #410826)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB2C2_hP5_164_a_d_d"){
+        vparameters.push_back("3.557,1.5451223,0.65,0.27");  // 001, ternary metal-nitride prototype (ICSD #34003)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB2C_hR4_166_a_c_b"){
+        vparameters.push_back("3.1359829,5.5605955,0.881");  // 001, ternary metal-nitride prototype (ICSD #71136)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3BC3_hP14_176_h_c_h"){
+        vparameters.push_back("8.0141,0.69977914,0.35834333,0.086966667,0.12945233,0.68896467");  // 001, ternary metal-nitride prototype (ICSD #36502)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC_hP6_186_b_b_a"){
+        vparameters.push_back("3.3306,3.2702516,0,0.598,0.2466");  // 001, ternary metal-nitride prototype (ICSD #172471)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB2C_hP8_186_a_ab_b"){
+        vparameters.push_back("2.9213,3.7507274,0,0.2,0.4,0.8");  // 001, ternary metal-nitride prototype (ICSD #80029)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC_hP3_187_a_c_d"){
+        vparameters.push_back("3.64,0.93956044");  // 001, ternary metal-nitride prototype (ICSD #247028)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A5B3C3_hP11_189_dg_g_f"){
+        vparameters.push_back("6.475,0.54903475,0.3557,0.7281,0.3537");  // 001, ternary metal-nitride prototype (ICSD #411152)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A2BC_hP4_191_c_a_b"){
+        vparameters.push_back("3.65,1.260274");  // 001, ternary metal-nitride prototype (ICSD #92308)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC2_hP4_191_b_a_c"){
+        vparameters.push_back("4,1.05");  // 001, ternary metal-nitride prototype (ICSD #92310)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC2_hP8_194_c_a_f"){
+        vparameters.push_back("3.6506,3.4680053,0.595");  // 001, ternary metal-nitride prototype (ICSD #74791)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB2C_hP8_194_a_f_b"){
+        vparameters.push_back("2.8724,3.8201504,0.128");  // 001, ternary metal-nitride prototype (ICSD #75971)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC2_hP8_194_a_c_f"){
+        vparameters.push_back("2.9108,3.6245362,0.6384");  // 001, ternary metal-nitride prototype (ICSD #185913)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3BC_hP10_194_h_a_c"){
+        vparameters.push_back("8.4414,0.82707845,0.8561");  // 001, ternary metal-nitride prototype (ICSD #67497)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3BC_hP10_194_h_c_a"){
+        vparameters.push_back("7.6111,0.87756041,0.83953333");  // 001, ternary metal-nitride prototype (ICSD #152055)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB3C4_hP16_194_c_ae_2f"){
+        vparameters.push_back("2.795,8.5144902,0.6078,0.0543,0.6591");  // 001, ternary metal-nitride prototype (ICSD #181351)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB2C_cF32_227_b_c_a"){
+        vparameters.push_back("8.74");  // ternary metal-nitride prototype (ICSD #72546)
       }
 
     }

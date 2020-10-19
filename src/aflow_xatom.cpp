@@ -5869,6 +5869,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     //DX20191010 - moved loop that used to be here after re-alphabetizing
     a.SpeciesPutAlphabetic(); //DX20190508 - put alphabetic, needed for many AFLOW functions to work properly
     std::stable_sort(a.atoms.begin(),a.atoms.end(),sortAtomsNames); //DX20200312
+    std::sort(a.wyckoff_sites_ITC.begin(), a.wyckoff_sites_ITC.end(), sortWyckoffByType); //DX20201014 - sort the Wyckoff positions too
     a.MakeBasis(); //DX20200803 - must be after alphabetic sort
     a.MakeTypes(); //DX20190508 - otherwise types are not created //DX20200803 - must be after alphabetic sort
     //DX20191010 - moved this loop - START
@@ -16387,6 +16388,56 @@ void xstructure::GetStrNeighData(const double cutoff,deque<deque<_atom> >& neigh
   double rmin=1e-6;
   // [OBSOLETE] GetNeighData(atom_vec,sstr,rmin,cutoff,neigh_mat);
   sstr.GetNeighData(atom_vec,rmin,cutoff,neigh_mat);
+}
+
+// **************************************************************************
+// Function GetBasisTransformation //DX20201015
+// **************************************************************************
+xmatrix<double> GetBasisTransformation(const xmatrix<double>& lattice_original, const xmatrix<double>& lattice_new) {
+  return lattice_new*inverse(lattice_original);
+}
+
+// **************************************************************************
+// Function GetRotation //DX20201015
+// **************************************************************************
+xmatrix<double> GetRotation(const xmatrix<double>& lattice_original, const xmatrix<double>& lattice_new) {
+  return aurostd::inverse(lattice_original)*lattice_new; 
+}
+
+// **************************************************************************
+// Function ChangeBasis //DX20201015
+// **************************************************************************
+xstructure ChangeBasis(const xstructure& xstr, const xmatrix<double>& transformation_matrix) {
+  
+  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  string function_name = XPID + "ChangeBasis():";
+
+  xstructure xstr_transformed = xstr;
+ 
+  if(LDEBUG){
+    cerr << function_name << " structure BEFORE basis transformation:" << endl;
+    cerr << xstr << endl;
+  }
+
+  // ---------------------------------------------------------------------------
+  // transform the lattice 
+  xstr_transformed.lattice = transformation_matrix*xstr_transformed.lattice;
+
+  // ---------------------------------------------------------------------------
+  // transform the atom positions
+  for(uint i=0;i<xstr_transformed.atoms.size();i++){
+    xstr_transformed.atoms[i].fpos=inverse(trasp(transformation_matrix))*xstr_transformed.atoms[i].fpos; // Q*pos , but need to transpose Q for AFLOW xmatrix convention
+    xstr_transformed.atoms[i].fpos=BringInCell(xstr_transformed.atoms[i].fpos);
+    xstr_transformed.atoms[i].cpos=trasp(xstr_transformed.lattice)*xstr_transformed.atoms[i].fpos;
+  }
+  
+  if(LDEBUG){
+    cerr << function_name << " structure AFTER basis transformation:" << endl;
+    cerr << xstr_transformed << endl;
+  }
+
+  return xstr_transformed;
+
 }
 
 // **************************************************************************

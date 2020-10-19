@@ -8397,7 +8397,41 @@ namespace pflow {
           setting,
           library);
     }
-    return aurostd::joinWDelimiter(prototype_labels,",");
+
+    //------------------------------------------------- 
+    // need to add enumeration suffixes to ANRL prototypes  //DX20201013
+    vector<string> all_prototype_designations;
+  
+    for(uint i=0;i<prototype_labels.size();i++){
+      // check for ANRL
+      vector<string> tokens;
+      if(aurostd::string2tokens(prototype_labels[i],tokens,"_")>=4) {
+        // get parameters
+        vector<string> parameter_sets = anrl::getANRLParameters(prototype_labels[i],"all");
+        // if only one parameter set
+        if(parameter_sets.size()==1){
+          vector<string> sub_tokens;
+          if(aurostd::string2tokens(parameter_sets[0],sub_tokens,",")==1){
+            all_prototype_designations.push_back(prototype_labels[i]);
+          }
+          else{
+            all_prototype_designations.push_back(prototype_labels[i]+"-001");
+          }
+        }
+        // loop through all parameter sets and enumerate
+        else{
+          for(uint j=0;j<parameter_sets.size();j++){
+            stringstream suffix; suffix << "-" << std::setw(3) << std::setfill('0') << j+1;
+            all_prototype_designations.push_back(prototype_labels[i]+suffix.str());
+          }
+        }
+      }
+      // not an ANRL prototype, no suffix needed
+      else{
+        all_prototype_designations.push_back(prototype_labels[i]);
+      }
+    }
+    return aurostd::joinWDelimiter(all_prototype_designations,",");
   }
 }
 //DX20190109 - list prototype labels - END

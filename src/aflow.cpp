@@ -437,7 +437,7 @@ bool PrototypeGeneratorTest(ofstream& FileMESSAGE,ostream& oss){  //DX20200925
         xstructure xstr = aflowlib::PrototypeLibraries(oss,prototype_labels[i],parameter_sets[j],1);
       }
       catch(aurostd::xerror& excpt){
-        message << "Could not generate prototype=" << prototype_labels[i] << ", check inputs or the symbolic generator.";
+        message << "Could not generate prototype=" << prototype_labels[i] << " given parameters: " << parameter_sets[j] << "; check inputs or the symbolic generator.";
         pflow::logger(_AFLOW_FILE_NAME_,function_name,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
         return false;
       }

@@ -521,7 +521,8 @@ bool StructurePrototype::addStructurePrototypeAsDuplicate(StructurePrototype& b)
   // only add xstructure if it has been generated
   if(b.structure_representative_generated){
     structures_duplicate.push_back(b.structure_representative);
-    structures_duplicate_compounds.push_back(pflow::prettyPrintCompound(b.elements,b.stoichiometry,no_vrt,false,txt_ft)); //DX20190111 - added compound, e.g., Ag1Br2
+    //DX20201009 - uses ALL accumulated elements - structures_duplicate_compounds.push_back(pflow::prettyPrintCompound(b.elements,b.stoichiometry,no_vrt,false,txt_ft)); //DX20190111 - added compound, e.g., Ag1Br2
+    structures_duplicate_compounds.push_back(b.structure_representative_compound); //DX20190111 - added compound, e.g., Ag1Br2
   }
   else if(!b.structure_representative_compound.empty()){
     structures_duplicate_compounds.push_back(b.structure_representative_compound); //DX20190111 - added compound, e.g., Ag1Br2
@@ -7880,9 +7881,38 @@ namespace compare{
       cellDiagonal(xstr1_tmp,D1,F1,1); // cell diagonals
       // convert to clattice representation
       xstr1_tmp.lattice=GetClat(xstr1_tmp.a,xstr1_tmp.b,xstr1_tmp.c,xstr1_tmp.alpha,xstr1_tmp.beta,xstr1_tmp.gamma);
+    
+      // get transformation
+//      xmatrix<double> orig_metric_tensor_xstr1 = MetricTensor(xstr1.lattice);
+//      xmatrix<double> clattice_metric_tensor_xstr1 = MetricTensor(xstr1_tmp.lattice);
+//      xmatrix<double> rotation_xstr1;
+      //cerr << "orig_metric_tensor: " << orig_metric_tensor_xstr1 << endl;
+      //cerr << "clattice_metric_tensor: " << clattice_metric_tensor_xstr1 << endl;
+      //if(!aurostd::identical(orig_metric_tensor_xstr1,clattice_metric_tensor_xstr1)){
+      //  throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, "Change of basis not a simple rotation (i.e. metric tensor changed).", _RUNTIME_ERROR_);
+      //}
+      //else{
+      //  rotation_xstr1 = aurostd::inverse(xstr1.lattice)*xstr1_tmp.lattice;
+      //}
+      //cerr << "ROTATION FOR XSTR1 TO CLATTICE: " << rotation_xstr1 << endl;
+      //xmatrix<double> Uf; string _string; bool _inversion; double _angle;
+      //xvector<double> _axis;
+      //xmatrix<double> _generator; 
+      //xvector<double> _generator_coefficients;
+      //xmatrix<xcomplex<double> > _SU2_matrix;
+      //xvector<xcomplex<double> > _su2_coefficients; //DX20180117 - added SU(2) and su(2) coefficients
+//
+ //     Uf = trasp(xstr1.lattice)*rotation_xstr1*inverse(trasp(xstr1.lattice));
+ //     SYM::TypePointGroupOperation(rotation_xstr1, Uf, _string, _inversion, _angle, _axis, _generator, _generator_coefficients, 
+ //         _SU2_matrix, _su2_coefficients, 1e-3); //DX20180117 - added SU(2) and su(2) coefficients
+ //     
+ //     cerr << "axis: " << _axis << endl;
+ //     cerr << "angle: " << _angle << endl;
+//
       for(uint iat=0; iat<xstr1_tmp.atoms.size(); iat++){
         xstr1_tmp.atoms[iat].cpos=F2C(xstr1_tmp.scale*xstr1_tmp.lattice,xstr1_tmp.atoms[iat].fpos); //DX20200715 - add scale just in case
       }
+ //     cerr << "xstr1_tmp: " << xstr1_tmp << endl;
       vector<double> all_nn1 = computeNearestNeighbors(xstr1_tmp); // nearest neighbor distances (invariant of origin shifts) 
 
       // ---------------------------------------------------------------------------
@@ -7914,45 +7944,203 @@ namespace compare{
       vector<vector<int> > thread_distribution = getThreadDistribution(number_of_lattices, number_of_threads); //DX20191107 
 #endif
 
+      bool find_transformation = false;
+      if(find_transformation){
+      // ---------------------------------------------------------------------------
+      // identify rotation between original and new structure
+      vector<xmatrix<double> > basis_transformations;
+      vector<xmatrix<double> > rotations;
+      getLatticeTransformations(xstr2.lattice,xstr1.lattice,lattices,basis_transformations,rotations);
+/*
+      xmatrix<double> xstr2_metric_tensor = MetricTensor(xstr2.lattice);
+      for(uint p=0;p<lattices.size();p++){
+        xmatrix<double> lattice_metric_tensor = MetricTensor(lattices[p]);
+        if(!aurostd::identical(xstr2_metric_tensor,lattice_metric_tensor)){
+          xmatrix<double> basis_transformation = lattices[p]*aurostd::inverse(xstr2.lattice);
+          basis_transformations.push_back(basis_transformation);
+
+          xmatrix<double> lattice_tmp = basis_transformation*xstr2.lattice;
+          //rotations.push_back(aurostd::inverse(lattice_tmp)*xstr1_tmp.lattice);
+          rotations.push_back(aurostd::inverse(lattice_tmp)*xstr1.lattice);
+        }
+        else{
+          rotations.push_back(aurostd::inverse(xstr2.lattice)*lattices[p]); 
+          // should it be this?: rotations.push_back(aurostd::inverse(xstr2.lattice)*xstr1.lattice); 
+          basis_transformations.push_back(aurostd::eye<double>());
+        }
+      }
+  */    
+      for(uint p=0;p<lattices.size();p++){
+        cerr << "p: " << p << endl;
+        cerr << "basis transformations: " << basis_transformations[p] << endl;
+        cerr << "rotations: " << rotations[p] << endl;
+        xmatrix<double> Uf; string _string; bool _inversion; double _angle;
+        xvector<double> _axis;
+        xmatrix<double> _generator; 
+        xvector<double> _generator_coefficients;
+        xmatrix<xcomplex<double> > _SU2_matrix;
+        xvector<xcomplex<double> > _su2_coefficients; //DX20180117 - added SU(2) and su(2) coefficients
+          
+        xmatrix<double> lattice_tmp = basis_transformations[p]*xstr2.lattice;
+          Uf = trasp(lattice_tmp)*rotations[p]*inverse(trasp(lattice_tmp));
+        SYM::TypePointGroupOperation(rotations[p], Uf, _string, _inversion, _angle, _axis, _generator, _generator_coefficients, 
+          _SU2_matrix, _su2_coefficients, 1e-3); //DX20180117 - added SU(2) and su(2) coefficients
+      
+        cerr << "axis: " << _axis << endl;
+        cerr << "angle: " << _angle << endl;
+
+        xstructure test = ChangeBasis(xstr2, basis_transformations[p]);
+        /*
+
+        cerr << " apply basis transformation..." << endl;
+          xstructure test = xstr2;
+          test.lattice = basis_transformations[p]*test.lattice;
+          for(uint i=0;i<test.atoms.size();i++){
+            //test.atoms[i].cpos=basis_transformations[p]*test.atoms[i].cpos;
+            //test.atoms[i].fpos=inverse(trasp(test.lattice))*test.atoms[i].cpos;
+            ////test.atoms[i].fpos=inverse(basis_transformations[p])*test.atoms[i].fpos;
+            //test.atoms[i].fpos=BringInCell(test.atoms[i].fpos);
+            //test.atoms[i].cpos=trasp(test.lattice)*test.atoms[i].fpos;
+            
+            //test.atoms[i].fpos=basis_transformations[p]*inverse(basis_transformations[p])*test.atoms[i].fpos;
+            test.atoms[i].fpos=inverse(trasp(basis_transformations[p]))*test.atoms[i].fpos; // Q*pos , but need to transpose Q for AFLOW xmatrix convention
+            test.atoms[i].fpos=BringInCell(test.atoms[i].fpos);
+            test.atoms[i].cpos=trasp(test.lattice)*test.atoms[i].fpos;
+
+          }
+          //test.ShiftOriginToAtom(5);
+          //test = BringInCell(test);
+          */
+
+          test = Rotate(test, trasp(rotations[p]));
+          /*
+          cerr << "TRANSFORMED test: " << test << endl;
+          cerr << "now rotate lattice... " << endl;
+          test.lattice = test.lattice*rotations[p];
+          test.f2c = trasp(test.lattice);
+          test.c2f = inverse(trasp(test.lattice));
+          test.UpdateCartesianCoordinates();
+          */
+          cerr << "ROTATED test: " << test << endl;
+        
+
+        cerr << "--------------------------------" << endl;
+
+      }
+      }
+/*
       // ---------------------------------------------------------------------------
       // identify rotation between original and new structure
       // [ODD BEHAVIOR - REVISIT]
-      //DX [REVISIT] for(uint p=0;p<lattices.size();p++){
-      //DX [REVISIT]   cerr << "lattice:" << lattices[p] << endl;
-      //DX [REVISIT]   cerr << "clattice:" << clattices[p] << endl;
-      //DX [REVISIT]   xmatrix<double> lattice_metric_tensor = MetricTensor(lattices[p]);
-      //DX [REVISIT]   xmatrix<double> clattice_metric_tensor = MetricTensor(clattices[p]);
-      //DX [REVISIT]   cerr << "lattice metric tensor: " << lattice_metric_tensor << endl;
-      //DX [REVISIT]   cerr << "clattice metric tensor: " << clattice_metric_tensor << endl;
-      //DX [REVISIT]   //xmatrix<double> rotation = lattices[p]*aurostd::inverse(clattices[p]);
-      //DX [REVISIT]   xmatrix<double> rotation1 = aurostd::inverse(lattices[p])*clattices[p];
-      //DX [REVISIT]   cerr << "rotation1: " << rotation1 << endl; 
-      //DX [REVISIT]   xstructure xstr_rot1 = xstr2;
-      //DX [REVISIT]   xstr_rot1 = Rotate(xstr2,trasp(rotation1));
-      //DX [REVISIT]   xmatrix<double> rotation2 = trasp(clattices[p])*trasp(aurostd::inverse(lattices[p]));
-      //DX [REVISIT]   cerr << "rotation2: " << rotation2 << endl; 
-      //DX [REVISIT]   xstructure xstr_rot2 = xstr2;
-      //DX [REVISIT]   xstr_rot2 = Rotate(xstr2,rotation2);
-      //DX [REVISIT]   xmatrix<double> rotation3 = trasp(clattices[p])*trasp(aurostd::inverse(lattices[p]));
-      //DX [REVISIT]   cerr << "rotation3: " << rotation3 << endl; 
-      //DX [REVISIT]   xstructure xstr_rot3 = xstr2;
-      //DX [REVISIT]   xstr_rot3 = GetLTCell(rotation3,xstr2);
-      //DX [REVISIT]   xmatrix<double> rotation4 = trasp(rotation1); 
-      //DX [REVISIT]   cerr << "rotation4: " << rotation4 << endl; 
-      //DX [REVISIT]   xstructure xstr_rot4 = xstr2;
-      //DX [REVISIT]   xstr_rot4 = Rotate(xstr2,rotation4);
+          cerr << "xstr2: " << xstr2 << endl;
+      for(uint p=0;p<lattices.size();p++){
+        cerr << "xstr2.lattice:" << xstr2.lattice << endl;
+        cerr << "lattice:" << lattices[p] << endl;
+        cerr << "clattice:" << clattices[p] << endl;
+        xmatrix<double> orig_metric_tensor = MetricTensor(xstr2.lattice);
+        xmatrix<double> lattice_metric_tensor = MetricTensor(lattices[p]);
+        cerr << "original metric tensor: " << orig_metric_tensor << endl;
+        cerr << "lattice metric tensor: " << lattice_metric_tensor << endl;
+    
+        xmatrix<double> transform_coords;
+        xmatrix<double> rotate;
+        if(!aurostd::identical(orig_metric_tensor,lattice_metric_tensor)){
+          cerr << "orig vs lattice - metric tensor (diff)"<< endl;
+          transform_coords=lattices[p]*aurostd::inverse(xstr2.lattice);
+          cerr << "lattice?1: " << transform_coords*xstr2.lattice << endl;
+          xstructure test = xstr2;
+          test.lattice = transform_coords*test.lattice;
+          for(uint i=0;i<test.atoms.size();i++){
+            test.atoms[i].cpos=transform_coords*test.atoms[i].cpos;
+            test.atoms[i].fpos=inverse(trasp(test.lattice))*test.atoms[i].cpos;
+            test.atoms[i].fpos=BringInCell(test.atoms[i].fpos);
+          }
+          cerr << "TRANSFORMED test: " << test << endl;
+          xvector<double> abc_angles_test=Getabc_angles(test.lattice,DEGREES);
+          cerr << "angles: " << abc_angles_test << endl;
+        
+          xmatrix<double> test_metric_tensor = MetricTensor(test.lattice);
+          cerr << "test_metric_tensor: " << test_metric_tensor << endl;
+        xmatrix<double> rotation_from_xstr2_2_xstr1;
+        // MAY NOT BE EXACTLY SAME if(!aurostd::identical(orig_metric_tensor_xstr1,test_metric_tensor)){
+        //  cerr << "metric tensor between the original and new lattice are not the same" << endl;
+       // }
+       // else{
+          cerr << "metric tensor between the original and new lattice ARE THE SAME" << endl;
+          rotation_from_xstr2_2_xstr1 = aurostd::inverse(test.lattice)*xstr1_tmp.lattice;
+        cerr << "rotated test lattice: " << test.lattice*rotation_from_xstr2_2_xstr1 << endl;
+        xmatrix<double> final_lattice = test.lattice*rotation_from_xstr2_2_xstr1;
+        //}
+        cerr << "rotation_from_xstr2_2_xstr1: " << rotation_from_xstr2_2_xstr1 << endl;
+      xmatrix<double> Uf; string _string; bool _inversion; double _angle;
+      xvector<double> _axis;
+      xmatrix<double> _generator; 
+      xvector<double> _generator_coefficients;
+      xmatrix<xcomplex<double> > _SU2_matrix;
+      xvector<xcomplex<double> > _su2_coefficients; //DX20180117 - added SU(2) and su(2) coefficients
 
-      //DX [REVISIT]   cerr << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << endl;
-      //DX [REVISIT]   cerr << "orig xstr2: " << xstr2 << endl;
-      //DX [REVISIT]   cerr << "-----------------------------------------------------------------" << endl;
-      //DX [REVISIT]   cerr << "rotated xstr2 - 1: " << xstr_rot1 << endl;
-      //DX [REVISIT]   cerr << "-----------------------------------------------------------------" << endl;
-      //DX [REVISIT]   cerr << "rotated xstr2 - 2: " << xstr_rot2 << endl;
-      //DX [REVISIT]   cerr << "-----------------------------------------------------------------" << endl;
-      //DX [REVISIT]   cerr << "rotated xstr2 - 3: " << xstr_rot3 << endl;
-      //DX [REVISIT]   cerr << "-----------------------------------------------------------------" << endl;
-      //DX [REVISIT]   cerr << "rotated xstr2 - 4: " << xstr_rot4 << endl;
-      //DX [REVISIT] }
+      Uf = trasp(final_lattice)*rotation_from_xstr2_2_xstr1*inverse(final_lattice);
+      SYM::TypePointGroupOperation(rotation_from_xstr2_2_xstr1, Uf, _string, _inversion, _angle, _axis, _generator, _generator_coefficients, 
+          _SU2_matrix, _su2_coefficients, 1e-3); //DX20180117 - added SU(2) and su(2) coefficients
+      
+      cerr << "axis: " << _axis << endl;
+      cerr << "angle: " << _angle << endl;
+
+          // DOESN'T WORK cerr << "lattice?2: " << xstr2.lattice*aurostd::inverse(trasp(transform_coords)) << endl;
+        }
+        else {
+          cerr << "orig vs lattice - metric tensor (same)"<< endl;
+          rotate=aurostd::inverse(xstr2.lattice)*lattices[p]; 
+          cerr << "lattice?: " << xstr2.lattice*rotate << endl;
+        }
+        
+
+        cerr << "transform_coords: " << transform_coords << endl;
+        cerr << "inverse(transform_coords): " << aurostd::inverse(transform_coords) << endl;
+        cerr << "rotate: " << rotate << endl;
+        xmatrix<double> clattice_metric_tensor = MetricTensor(clattices[p]);
+        cerr << "clattice metric tensor: " << clattice_metric_tensor << endl;
+        //xmatrix<double> rotation = lattices[p]*aurostd::inverse(clattices[p]);
+        xmatrix<double> rotation1 = aurostd::inverse(lattices[p])*clattices[p];
+        cerr << "rotation1: " << rotation1 << endl;
+        cerr << "transformed (lattice*rot==clattice?): " << (lattices[p]*rotation1) << endl; 
+        xstructure xstr_rot1 = xstr2;
+        xstr_rot1 = Rotate(xstr2,trasp(rotation1));
+        xmatrix<double> rotation2 = trasp(clattices[p])*trasp(aurostd::inverse(lattices[p]));
+        cerr << "rotation2: " << rotation2 << endl; 
+        xstructure xstr_rot2 = xstr2;
+        xstr_rot2 = Rotate(xstr2,rotation2);
+        xmatrix<double> rotation3 = trasp(clattices[p])*trasp(aurostd::inverse(lattices[p]));
+        cerr << "rotation3: " << rotation3 << endl; 
+        xstructure xstr_rot3 = xstr2;
+        xstr_rot3 = GetLTCell(rotation3,xstr2);
+        xmatrix<double> rotation4 = trasp(rotation1); 
+        cerr << "rotation4: " << rotation4 << endl; 
+        xstructure xstr_rot4 = xstr2;
+        xstr_rot4 = Rotate(xstr2,rotation4);
+        
+        xstructure xstr_rot5 = xstr2;
+        xstr_rot5.lattice = lattices[p]*rotation1;
+        for(uint a=0;a<xstr_rot5.atoms.size();a++){
+          xstr_rot5.atoms[a].cpos = xstr_rot5.atoms[a].cpos*rotation1;
+          xstr_rot5.atoms[a].fpos = aurostd::inverse(trasp(xstr_rot5.lattice))*xstr_rot5.atoms[a].cpos;
+        }
+        cerr << "xstr_rot5:" << xstr_rot5 << endl;
+
+        cerr << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << endl;
+        cerr << "orig xstr2: " << xstr2 << endl;
+        cerr << "-----------------------------------------------------------------" << endl;
+        cerr << "rotated xstr2 - 1: " << xstr_rot1 << endl;
+        cerr << "-----------------------------------------------------------------" << endl;
+        cerr << "rotated xstr2 - 2: " << xstr_rot2 << endl;
+        cerr << "-----------------------------------------------------------------" << endl;
+        cerr << "rotated xstr2 - 3: " << xstr_rot3 << endl;
+        cerr << "-----------------------------------------------------------------" << endl;
+        cerr << "rotated xstr2 - 4: " << xstr_rot4 << endl;
+  
+        }
+*/
+
 
       // ---------------------------------------------------------------------------
       // test origin shifts 
@@ -8425,6 +8613,8 @@ namespace compare{
         cerr << "lattice=" << lattices[p] << endl;
       }
 
+        //cerr << "p: " << p << endl;
+        /*
       // ---------------------------------------------------------------------------
       // lattice rotation (beta) 
       xmatrix<double> lattice_rotation = aurostd::inverse(lattices[p])*clattices[p];
@@ -8434,7 +8624,41 @@ namespace compare{
         cerr << "is " << lattice_rotation << endl;
         cerr << "validate (lattice * rotation =? clattice) : " << lattices[p]*lattice_rotation << endl;
       }
+        cerr << "p: " << p << endl;
+        cerr << "rotation between lattice " << lattices[p] << endl;
+        cerr << "and clattice: " << clattices[p] << endl;
+        cerr << "is " << lattice_rotation << endl;
+        cerr << "identity: " << trasp(lattice_rotation)*lattice_rotation << endl;
+        cerr << "det: " << aurostd::det(lattice_rotation) << endl;
+        cerr << "validate (lattice * rotation =? clattice) : " << lattices[p]*lattice_rotation << endl;
+      
+      // get transformation
+      xmatrix<double> orig_metric_tensor = MetricTensor(lattices[p]);
+      xmatrix<double> clattice_metric_tensor = MetricTensor(clattices[p]);
+      xmatrix<double> rotation_xstr2;
+      cerr << "orig_metric_tensor: " << orig_metric_tensor << endl;
+      cerr << "clattice_metric_tensor: " << clattice_metric_tensor << endl;
+      if(!aurostd::identical(orig_metric_tensor,clattice_metric_tensor)){
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, "compare::structureSearch()", "Change of basis not a simple rotation (i.e. metric tensor changed).", _RUNTIME_ERROR_);
+      }
+      else{
+        rotation_xstr2 = aurostd::inverse(lattices[p])*clattices[p];
+      }
+      cerr << "ROTATION FOR XSTR2 TO CLATTICE: " << rotation_xstr2 << endl;
+      xmatrix<double> Uf; string _string; bool _inversion; double _angle;
+      xvector<double> _axis;
+      xmatrix<double> _generator; 
+      xvector<double> _generator_coefficients;
+      xmatrix<xcomplex<double> > _SU2_matrix;
+      xvector<xcomplex<double> > _su2_coefficients; //DX20180117 - added SU(2) and su(2) coefficients
 
+      Uf = trasp(lattices[p])*rotation_xstr2*inverse(trasp(lattices[p]));
+      SYM::TypePointGroupOperation(rotation_xstr2, Uf, _string, _inversion, _angle, _axis, _generator, _generator_coefficients, 
+          _SU2_matrix, _su2_coefficients, 1e-3); //DX20180117 - added SU(2) and su(2) coefficients
+      
+      cerr << "axis: " << _axis << endl;
+      cerr << "angle: " << _angle << endl;
+*/
       // ---------------------------------------------------------------------------
       // make smaller lattice the new lattice in the supercell structure 
       // note: lattices[p] are oriented wrt to supercell (it has to be), otherwise could break periodicity
@@ -8470,7 +8694,6 @@ namespace compare{
           new_basis_2.push_back(proto.atoms[iat]);
         }
       }
-
       xstructure proto_new;
       proto_new.title=proto.title;
       proto_new.lattice=clattices[p];
@@ -8919,6 +9142,54 @@ namespace compare{
     }
 
     return true;
+  }
+}
+
+// ***************************************************************************
+// getLatticeTransformations()
+// ***************************************************************************
+namespace compare{
+  void getLatticeTransformations(const xmatrix<double>& lattice_original, 
+      const xmatrix<double>& lattice_ideal,
+      const vector<xmatrix<double> >& candidate_lattices,
+      vector<xmatrix<double> >& basis_transformations,
+      vector<xmatrix<double> >& rotations){
+     
+    // ---------------------------------------------------------------------------
+    // calculate the metric tensor of the original lattice
+    xmatrix<double> metric_tensor_original = MetricTensor(lattice_original);
+    
+    // ---------------------------------------------------------------------------
+    // cycle through candidate lattices and determine transformations 
+    for(uint i=0;i<candidate_lattices.size();i++){
+
+      // ---------------------------------------------------------------------------
+      // if the metric tensors ARE NOT equal: change of basis between lattices
+      xmatrix<double> metric_tensor_candidate = MetricTensor(candidate_lattices[i]);
+      if(!aurostd::identical(metric_tensor_original,metric_tensor_candidate)){
+        xmatrix<double> basis_transformation = GetBasisTransformation(lattice_original,candidate_lattices[i]);
+        //xmatrix<double> basis_transformation = candidate_lattices[i]*aurostd::inverse(lattice_original);
+        basis_transformations.push_back(basis_transformation);
+
+        xmatrix<double> lattice_new = basis_transformation*lattice_original;
+        xmatrix<double> metric_tensor_new = MetricTensor(lattice_new);
+        xmatrix<double> metric_tensor_ideal = MetricTensor(lattice_ideal);
+        cerr << "metric_tensor_new: " << metric_tensor_new << endl;
+        cerr << "metric_tensor_ideal: " << metric_tensor_ideal << endl;
+        // ---------------------------------------------------------------------------
+        // then rotate to the ideal lattice 
+        rotations.push_back(GetRotation(lattice_new,lattice_ideal));
+        //rotations.push_back(aurostd::inverse(lattice_new)*lattice_ideal);
+      }
+      // ---------------------------------------------------------------------------
+      // if the metric tensors ARE equal: simple rotation between lattices
+      else{
+        rotations.push_back(GetRotation(lattice_original,candidate_lattices[i]));
+        //rotations.push_back(aurostd::inverse(lattice_original)*candidate_lattices[i]); 
+        // should it be this?: rotations.push_back(aurostd::inverse(xstr2.lattice)*xstr1.lattice); 
+        basis_transformations.push_back(aurostd::eye<double>());
+      }
+    }
   }
 }
 

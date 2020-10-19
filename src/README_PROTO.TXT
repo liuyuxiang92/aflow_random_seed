@@ -1589,6 +1589,157 @@ ABC_oP12_62_c_c_c-001.{ABC}                      oP12      Pnma                -
 A2B2C_tI10_139_e_e_a-001.{ABC}                   tI10      I4/mmm              -         Ca2N2Zn             #139      Ca2N2Zn, ICSD #69049
 A3BC2_hP6_191_f_a_d-001.{ABC}                    hP6       P6/mmm              -         Na3TaTi2            #191      Na3TaTi2, ICSD #186418
 
+*****************************************************************************************************************************************************
+ANRL - metal nitrides - BINARIES
+
+ANRL Label                                       Pearson   SG symbol           Struk     Prototype           SG #      notes
+----------------------------------------------------------------------------------------------------------------------------------------------------
+A2B_mP6_6_3ab_ab-001.{AB}                        mP6       Pm                  -         N2Re1               #6        binary metal-nitride prototype; N2Re1, ICSD #187448
+A2B_mC12_8_4a_2a-001.{AB}                        mC12      Cm                  -         N2Re1               #8        binary metal-nitride prototype; N2Re1, ICSD #187447
+A3B_mC16_8_6a_b-001.{AB}                         mC16      Cm                  -         N3Rb1               #8        binary metal-nitride prototype; N3Rb1, ICSD #155169
+A2B_mP6_11_2e_e-001.{AB}                         mP6       P2_{1}/m            -         N2Re1               #11       binary metal-nitride prototype; N2Re1, ICSD #187444
+AB6_mP14_11_e_6e-001.{AB}                        mP14      P2_{1}/m            -         Ba1N6               #11       binary metal-nitride prototype; Ba1N6, ICSD #14244
+A3B_mC8_12_di_a-001.{AB}                         mC8       C2/m                -         N3Na1               #12       binary metal-nitride prototype; N3Na1, ICSD #29370
+A3B_mC8_12_di_a-002.{AB}                         mC8       C2/m                -         N3Na1               #12       binary metal-nitride prototype; N3Na1, ICSD #29376
+AB3_mC8_12_a_di-002.{AB}                         mC8       C2/m                -         Li1N3               #12       binary metal-nitride prototype; Li1N3, ICSD #34675
+AB3_mC8_12_a_di-003.{AB}                         mC8       C2/m                -         Li1N3               #12       binary metal-nitride prototype; Li1N3, ICSD #181559
+A2B_mC12_12_2i_i-001.{AB}                        mC12      C2/m                -         N2Re1               #12       binary metal-nitride prototype; N2Re1, ICSD #187441
+AB_mC16_12_2i_2i-001.{AB}                        mC16      C2/m                -         N1Sr1               #12       binary metal-nitride prototype; N1Sr1, ICSD #411555
+A3B2_mC30_12_a4i_3i-001.{AB}                     mC30      C2/m                -         Ca3N2               #12       binary metal-nitride prototype; Ca3N2, ICSD #162794
+A3B2_mC30_12_a4i_3i-002.{AB}                     mC30      C2/m                -         Ca3N2               #12       binary metal-nitride prototype; Ca3N2, ICSD #169726
+A2B_mP6_13_g_e-001.{AB}                          mP6       P2/c                -         N2Re1               #13       binary metal-nitride prototype; N2Re1, ICSD #187451
+AB2_mP12_14_e_2e-001.{AB}                        mP12      P2_{1}/c            -         Ir1N2               #14       binary metal-nitride prototype; Ir1N2, ICSD #160623
+A2B_mP12_14_2e_e-004.{AB}                        mP12      P2_{1}/c            -         N2Os1               #14       binary metal-nitride prototype; N2Os1, ICSD #240759
+AB3_mP16_14_e_3e-001.{AB}                        mP16      P2_{1}/c            -         Hg2N6               #14       binary metal-nitride prototype; Hg2N6, ICSD #98661
+AB2_mC12_15_e_f-001.{AB}                         mC12      C2/c                -         Ba1N2               #15       binary metal-nitride prototype; Ba1N2, ICSD #280681
+AB_oC16_36_2a_2a-001.{AB}                        oC16      Cmc2_{1}            -         N1Os1               #36       binary metal-nitride prototype; N1Os1, ICSD #167514
+AB_oP8_53_h_h-001.{AB}                           oP8       Pmna                -         N1Os1               #53       binary metal-nitride prototype; N1Os1, ICSD #167513
+A2B_oP12_57_e_c-001.{AB}                         oP12      Pbcm                -         N2Re1               #57       binary metal-nitride prototype; N2Re1, ICSD #187450
+A2B_oP6_58_g_a-002.{AB}                          oP6       Pnnm                -         N2Os1               #58       binary metal-nitride prototype; N2Os1, ICSD #157283
+A2B_oP6_58_g_a-003.{AB}                          oP6       Pnnm                -         N2Pt1               #58       binary metal-nitride prototype; N2Pt1, ICSD #166463
+AB2_oP6_58_a_g-004.{AB}                          oP6       Pnnm                -         Ir1N2               #58       binary metal-nitride prototype; Ir1N2, ICSD #160620
+AB2_oP6_58_a_g-005.{AB}                          oP6       Pnnm                -         Au1N2               #58       binary metal-nitride prototype; Au1N2, ICSD #166465
+A2B_oP12_62_2c_c-005.{AB}                        oP12      Pnma                -         N2Re1               #62       binary metal-nitride prototype; N2Re1, ICSD #187446
+AB3_oP16_62_c_cd-002.{AB}                        oP16      Pnma                -         N1Na3               #62       binary metal-nitride prototype; N1Na3, ICSD #165990
+AB_oC8_63_c_c-003.AB                             oC8       Cmcm                -         Al1N1               #63       binary metal-nitride prototype; Al1N1, ICSD #163951
+A5B3_oC32_63_c2f_cf-001.{AB}                     oC32      Cmcm                -         N5Ta3               #63       binary metal-nitride prototype; N5Ta3, ICSD #16253
+A5B3_oC32_63_c2f_cf-002.{AB}                     oC32      Cmcm                -         N5Ta3               #63       binary metal-nitride prototype; N5Ta3, ICSD #66533
+A2B_oC12_65_gj_e-001.{AB}                        oC12      Cmmm                -         N2Re1               #65       binary metal-nitride prototype; N2Re1, ICSD #187452
+AB_oI4_71_b_c-001.AB                             oI4       Immm                -         Cr1N1               #71       binary metal-nitride prototype; Cr1N1, ICSD #53146
+A2B_oI12_71_2e_f-001.{AB}                        oI12      Immm                -         N2Re1               #71       binary metal-nitride prototype; N2Re1, ICSD #187449
+AB_oI16_71_abe_n-001.{AB}                        oI16      Immm                -         Li2N2               #71       binary metal-nitride prototype; Li2N2, ICSD #423831
+AB3_oI16_72_b_cj-001.{AB}                        oI16      Ibam                -         Ag1N3               #72       binary metal-nitride prototype; Ag1N3, ICSD #27135
+A5B4_tI18_87_ah_h-001.{AB}                       tI18      I4/m                -         N5Nb4               #87       binary metal-nitride prototype; N5Nb4, ICSD #26251
+AB3_tI32_88_d_cf-001.{AB}                        tI32      I4_{1}/a            -         Cu1N3               #88       binary metal-nitride prototype; Cu1N3, ICSD #30633
+AB_tP2_123_d_a-001.AB                            tP2       P4/mmm              -         N1Pr1               #123      binary metal-nitride prototype; N1Pr1, ICSD #168645
+A3B_tP4_123_ag_d-001.{AB}                        tP4       P4/mmm              -         N3Rb1               #123      binary metal-nitride prototype; N3Rb1, ICSD #16963
+A3B_tP8_123_egh_ab-001.{AB}                      tP8       P4/mmm              -         Cu3N1               #123      binary metal-nitride prototype; Cu3N1, ICSD #180237
+A2B_tP6_127_g_b-001.{AB}                         tP6       P4/mbm              -         N2Re1               #127      binary metal-nitride prototype; N2Re1, ICSD #187442
+AB_tP4_131_e_c-001.{AB}                          tP4       P4_{2}/mmc          -         N1Tc1               #131      binary metal-nitride prototype; N1Tc1, ICSD #187709
+AB_tI4_139_a_b-001.AB                            tI4       I4/mmm              -         Mn1N1               #139      binary metal-nitride prototype; Mn1N1, ICSD #106932
+A3B2_tI10_139_ae_e-001.{AB}                      tI10      I4/mmm              -         Mn3N2               #139      binary metal-nitride prototype; Mn3N2, ICSD #71638
+A3B2_tI10_139_ae_e-002.{AB}                      tI10      I4/mmm              -         Mn3N2               #139      binary metal-nitride prototype; Mn3N2, ICSD #84202
+A3B4_tI14_139_ad_ce-001.{AB}                     tI14      I4/mmm              -         N3Nb4               #139      binary metal-nitride prototype; N3Nb4, ICSD #76389
+A8B_tI18_139_deh_a-001.{AB}                      tI18      I4/mmm              -         Fe16N2              #139      binary metal-nitride prototype; Fe16N2, ICSD #41953
+AB3_tI16_140_a_dh-001.{AB}                       tI16      I4/mcm              -         K1N3                #140      binary metal-nitride prototype; K1N3, ICSD #24007
+AB3_tI16_140_a_dh-002.{AB}                       tI16      I4/mcm              -         Cs1N3               #140      binary metal-nitride prototype; Cs1N3, ICSD #25008
+AB3_tI16_140_a_dh-003.{AB}                       tI16      I4/mcm              -         Ag1N3               #140      binary metal-nitride prototype; Ag1N3, ICSD #183201
+AB3_tI16_140_a_ch-001.{AB}                       tI16      I4/mcm              -         Cu1N3               #140      binary metal-nitride prototype; Cu1N3, ICSD #187018
+AB3_tI16_140_c_ah-001.{AB}                       tI16      I4/mcm              -         K1N3                #140      binary metal-nitride prototype; K1N3, ICSD #1145
+AB2_tI12_141_a_e-001.{AB}                        tI12      I4_{1}/amd          -         N1Ti2               #141      binary metal-nitride prototype; N1Ti2, ICSD #23403
+A3B_hR4_160_3a_a-001.{AB}                        hR4       R3m                 -         N3Na1               #160      binary metal-nitride prototype; N3Na1, ICSD #644523
+A3B2_hR5_160_3a_2a-001.{AB}                      hR5       R3m                 -         Be3N2               #160      binary metal-nitride prototype; Be3N2, ICSD #185490
+AB_hP16_162_ek_ci-001.{AB}                       hP16      P-31m               -         Mo1N1               #162      binary metal-nitride prototype; Mo1N1, ICSD #43559
+A3B2_hP5_164_ad_d-002.{AB}                       hP5       P-3m1               -         Ca3N2               #164      binary metal-nitride prototype; Ca3N2, ICSD #162795
+A3B2_hP5_164_ad_d-003.{AB}                       hP5       P-3m1               -         Ca3N2               #164      binary metal-nitride prototype; Ca3N2, ICSD #162796
+A3B2_hP5_164_ad_d-004.{AB}                       hP5       P-3m1               -         Ca3N2               #164      binary metal-nitride prototype; Ca3N2, ICSD #169727
+A3B2_hP5_164_ac_d-001.{AB}                       hP5       P-3m1               -         N3V2                #164      binary metal-nitride prototype; N3V2, ICSD #182700
+AB_hP16_164_ci_di-001.{AB}                       hP16      P-3m1               -         Mo1N1               #164      binary metal-nitride prototype; Mo1N1, ICSD #60168
+A2B_hR3_166_c_a-002.{AB}                         hR3       R-3m                -         Ca2N1               #166      binary metal-nitride prototype; Ca2N1, ICSD #22231
+A2B_hR3_166_c_a-003.{AB}                         hR3       R-3m                -         Ba2N1               #166      binary metal-nitride prototype; Ba2N1, ICSD #409851
+A3B_hR4_166_bc_a-002.{AB}                        hR4       R-3m                -         N3Na1               #166      binary metal-nitride prototype; N3Na1, ICSD #1144
+AB_hP4_186_b_b-002.AB                            hP4       P6_{3}mc            -         Ga1N1               #186      binary metal-nitride prototype; Ga1N1, ICSD #153888
+AB_hP4_186_b_b-003.AB                            hP4       P6_{3}mc            -         La1N1               #186      binary metal-nitride prototype; La1N1, ICSD #162195
+AB_hP4_186_b_b-004.AB                            hP4       P6_{3}mc            -         Mo1N1               #186      binary metal-nitride prototype; Mo1N1, ICSD #168369
+AB_hP4_186_b_a-002.{AB}                          hP4       P6_{3}mc            -         Ga1N1               #186      binary metal-nitride prototype; Ga1N1, ICSD #159250
+AB_hP16_186_ac_bc-001.{AB}                       hP16      P6_{3}mc            -         Mo1N1               #186      binary metal-nitride prototype; Mo1N1, ICSD #76280
+AB2_hP3_187_a_h-001.{AB}                         hP3       P-6m2               -         Hf1N2               #187      binary metal-nitride prototype; Hf1N2, ICSD #290427
+A2B_hP3_191_e_a-001.{AB}                         hP3       P6/mmm              -         N2Os1               #191      binary metal-nitride prototype; N2Os1, ICSD #260545
+AB_hP6_191_f_ad-002.{AB}                         hP6       P6/mmm              -         N1Ta1               #191      binary metal-nitride prototype; N1Ta1, ICSD #25659
+A2B_hP6_191_af_d-001.{AB}                        hP6       P6/mmm              -         N4Ta2               #191      binary metal-nitride prototype; N4Ta2, ICSD #182351
+AB_hP6_191_ad_f-001.{AB}                         hP6       P6/mmm              -         N1Ta1               #191      binary metal-nitride prototype; N1Ta1, ICSD #76457
+AB_hP6_191_bc_ad-001.AB                          hP6       P6/mmm              -         N1Y1                #191      binary metal-nitride prototype; N1Y1, ICSD #161079
+A3B_hP8_193_g_b-001.{AB}                         hP8       P6_{3}/mcm          -         Ba3N1               #193      binary metal-nitride prototype; Ba3N1, ICSD #77730
+AB_hP4_194_c_d-002.AB                            hP4       P6_{3}/mmc          -         Al1N1               #194      binary metal-nitride prototype; Al1N1, ICSD #163950
+AB_hP4_194_a_c-001.{AB}                          hP4       P6_{3}/mmc          -         Ir1N1               #194      binary metal-nitride prototype; Ir1N1, ICSD #183157
+AB2_hP6_194_c_e-001.{AB}                         hP6       P6_{3}/mmc          -         Hf1N2               #194      binary metal-nitride prototype; Hf1N2, ICSD #290428
+A3B2_hP10_194_bf_ac-001.{AB}                     hP10      P6_{3}/mmc          -         Be3N2               #194      binary metal-nitride prototype; Be3N2, ICSD #25656
+A3B2_hP10_194_cf_f-001.{AB}                      hP10      P6_{3}/mmc          -         N3W2                #194      binary metal-nitride prototype; N3W2, ICSD #186207
+A3B2_hP10_194_bf_ac-002.{AB}                     hP10      P6_{3}/mmc          -         Ca3N2               #194      binary metal-nitride prototype; Ca3N2, ICSD #162797
+AB_hP16_194_bh_ag-001.{AB}                       hP16      P6_{3}/mmc          -         Mo1N1               #194      binary metal-nitride prototype; Mo1N1, ICSD #106926
+AB3_cI32_204_c_g-001.{AB}                        cI32      Im-3                -         Co1N3               #204      binary metal-nitride prototype; Co1N3, ICSD #162105
+AB3_cI32_204_c_g-002.{AB}                        cI32      Im-3                -         Co1N3               #204      binary metal-nitride prototype; Co1N3, ICSD #162106
+AB4_cP5_221_a_bc.{AB}                            cP5       Pm-3m               -         N1Ni4               #221      binary metal-nitride prototype; N1Ni4, ICSD #76403
+
+*****************************************************************************************************************************************************
+ANRL - metal nitrides - TERNARIES
+
+ANRL Label                                       Pearson   SG symbol           Struk     Prototype           SG #      notes
+----------------------------------------------------------------------------------------------------------------------------------------------------
+AB2C5_aP8_1_a_2a_5a-001.{ABC}                    aP8       P1                  -         Li1N2Na5            #1        ternary metal-nitride prototype; Li1N2Na5, ICSD #92316
+AB2C5_mC16_5_a_c_a2bc-001.{ABC}                  mC16      C2                  -         Li1N2Na5            #5        ternary metal-nitride prototype; Li1N2Na5, ICSD #92315
+A3B2C3_mP8_6_2ab_ab_a2b-001.{ABC}                mP8       Pm                  -         Li3N2Na3            #6        ternary metal-nitride prototype; Li3N2Na3, ICSD #92312
+A5B2C_mP8_6_3a2b_ab_b-001.{ABC}                  mP8       Pm                  -         Li5N2Na1            #6        ternary metal-nitride prototype; Li5N2Na1, ICSD #92314
+A2BC2_mC20_12_2i_i_2i-001.{ABC}                  mC20      C2/m                -         Ca2Fe1N2            #12       ternary metal-nitride prototype; Ca2Fe1N2, ICSD #72389
+AB2C12_mC30_12_a_i_6i-001.{ABC}                  mC30      C2/m                -         Cd1K2N12            #12       ternary metal-nitride prototype; Cd1K2N12, ICSD #31297
+AB2C12_mC30_12_a_i_6i-002.{ABC}                  mC30      C2/m                -         Cd1K2N12            #12       ternary metal-nitride prototype; Cd1K2N12, ICSD #659621
+ABC_mP12_14_e_e_e-001.{ABC}                      mP12      P2_{1}/c            -         Be1Li1N1            #14       ternary metal-nitride prototype; Be1Li1N1, ICSD #402341
+ABC_oP12_62_c_c_c-002.{ABC}                      oP12      Pnma                -         Li1Mg1N1            #62       ternary metal-nitride prototype; Li1Mg1N1, ICSD #93259
+AB2C_oC16_63_c_2c_c-002.{ABC}                    oC16      Cmcm                -         Au1Ca2N1            #63       ternary metal-nitride prototype; Au1Ca2N1, ICSD #85528
+A2BC_oC16_63_2c_c_c-001.{ABC}                    oC16      Cmcm                -         Ca2In1N1            #63       ternary metal-nitride prototype; Ca2In1N1, ICSD #96228
+ABC3_oC20_63_c_a_cf-001.{ABC}                    oC20      Cmcm                -         Al1N1Zr3            #63       ternary metal-nitride prototype; Al1N1Zr3, ICSD #29521
+A3BC3_oC28_63_cg_c_cg-001.{ABC}                  oC28      Cmcm                -         Ca3Cr1N3            #63       ternary metal-nitride prototype; Ca3Cr1N3, ICSD #40205
+A2BC_oC8_65_i_c_b-001.{ABC}                      oC8       Cmmm                -         Li4N2Na2            #65       ternary metal-nitride prototype; Li4N2Na2, ICSD #92307
+A7B2C3_oC24_65_a2ij_i_cj-001.{ABC}               oC24      Cmmm                -         Ca7N2Tl3            #65       ternary metal-nitride prototype; Ca7N2Tl3, ICSD #98178
+A2BC3_oI12_71_e_a_de-001.{ABC}                   oI12      Immm                -         Ce2Mn1N3            #71       ternary metal-nitride prototype; Ce2Mn1N3, ICSD #50579
+ABC_tP6_99_ab_ab_ab-001.{ABC}                    tP6       P4mm                -         Cr1N1Nb1            #99       ternary metal-nitride prototype; Cr1N1Nb1, ICSD #23779
+A3B2C3_tP8_115_abc_g_de-001.{ABC}                tP8       P-4m2               -         Li3N2Na3            #115      ternary metal-nitride prototype; Li3N2Na3, ICSD #92311
+ABC_tP3_123_c_a_b-001.{ABC}                      tP3       P4/mmm              -         Fe1N1Ni1            #123      ternary metal-nitride prototype; Fe1N1Ni1, ICSD #53505
+A5B2C_tP8_123_ai_bc_d-001.{ABC}                  tP8       P4/mmm              -         Li5N2Na1            #123      ternary metal-nitride prototype; Li5N2Na1, ICSD #92313
+ABC_tP6_129_c_c_c-001.{ABC}                      tP6       P4/nmm              -         Ca1Ga1N1            #129      ternary metal-nitride prototype; Ca1Ga1N1, ICSD #2027
+ABC_tP6_129_c_c_c-002.{ABC}                      tP6       P4/nmm              -         Mo1N1Ta1            #129      ternary metal-nitride prototype; Mo1N1Ta1, ICSD #100437
+ABC2_tP8_129_c_c_bc-001.{ABC}                    tP8       P4/nmm              -         Ba1Hf1N2            #129      ternary metal-nitride prototype; Ba1Hf1N2, ICSD #50994
+ABC2_tP8_129_a_c_bc-001.{ABC}                    tP8       P4/nmm              -         Li2N2Na4            #129      ternary metal-nitride prototype; Li2N2Na4, ICSD #92309
+ABC_tP6_131_e_c_b-001.{ABC}                      tP6       P4_{2}/mmc          -         Ca1N1Ni1            #131      ternary metal-nitride prototype; Ca1N1Ni1, ICSD #69044
+ABC_tP6_131_b_c_e-001.{ABC}                      tP6       P4_{2}/mmc          -         Li1N1Sr1            #131      ternary metal-nitride prototype; Li1N1Sr1, ICSD #87414
+A2BC_tI8_139_d_b_a-001.ABC/BCA/CAB               tI8       I4/mmm              -         Li4N2Na2            #139      ternary metal-nitride prototype; Li4N2Na2, ICSD #92305
+A2B2C_tI10_139_e_e_a-002.{ABC}                   tI10      I4/mmm              -         N2Sr2Zn1            #139      ternary metal-nitride prototype; N2Sr2Zn1, ICSD #80376
+A2B2C_tI10_139_e_e_a-003.{ABC}                   tI10      I4/mmm              -         Ba2N2Zn1            #139      ternary metal-nitride prototype; Ba2N2Zn1, ICSD #80377
+A3B6C2_tI22_139_ae_eg_e-001.{ABC}                tI22      I4/mmm              -         La3N6V2             #139      ternary metal-nitride prototype; La3N6V2, ICSD #98477
+A3B6C2_tI22_139_ae_eg_e-002.{ABC}                tI22      I4/mmm              -         La3N6Nb2            #139      ternary metal-nitride prototype; La3N6Nb2, ICSD #411473
+A2B2C_tI20_140_h_h_a-001.{ABC}                   tI20      I4/mcm              -         Be4N4Sr2            #140      ternary metal-nitride prototype; Be4N4Sr2, ICSD #413356
+A2BC2_tI20_140_h_a_h-001.{ABC}                   tI20      I4/mcm              -         Be4Ca2N4            #140      ternary metal-nitride prototype; Be4Ca2N4, ICSD #413357
+AB2C2_tI20_140_a_h_h-001.{ABC}                   tI20      I4/mcm              -         Ba1Be2N2            #140      ternary metal-nitride prototype; Ba1Be2N2, ICSD #415304
+AB2C_hR4_160_a_2a_a-001.{ABC}                    hR4       R3m                 -         Cr1N2W1             #160      ternary metal-nitride prototype; Cr1N2W1, ICSD #84639
+A2B2C_hP5_164_d_d_a-001.{ABC}                    hP5       P-3m1               -         Li2N2Zr1            #164      ternary metal-nitride prototype; Li2N2Zr1, ICSD #16231
+A2B2C_hP5_164_d_d_a-002.{ABC}                    hP5       P-3m1               -         Mg2N2Sr1            #164      ternary metal-nitride prototype; Mg2N2Sr1, ICSD #410826
+AB2C2_hP5_164_a_d_d-001.{ABC}                    hP5       P-3m1               -         Ce1Li2N2            #164      ternary metal-nitride prototype; Ce1Li2N2, ICSD #34003
+AB2C_hR4_166_a_c_b-001.{ABC}                     hR4       R-3m                -         Cu1N2Ta1            #166      ternary metal-nitride prototype; Cu1N2Ta1, ICSD #71136
+A3BC3_hP14_176_h_c_h-001.{ABC}                   hP14      P6_{3}/m            -         Ba3Fe1N3            #176      ternary metal-nitride prototype; Ba3Fe1N3, ICSD #36502
+ABC_hP6_186_b_b_a-001.{ABC}                      hP6       P6_{3}mc            -         N1Na1Sn1            #186      ternary metal-nitride prototype; N1Na1Sn1, ICSD #172471
+AB2C_hP8_186_a_ab_b-001.{ABC}                    hP8       P6_{3}mc            -         Mn1N2W1             #186      ternary metal-nitride prototype; Mn1N2W1, ICSD #80029
+ABC_hP3_187_a_c_d-001.{ABC}                      hP3       P-6m2               -         Li1N1Ni1            #187      ternary metal-nitride prototype; Li1N1Ni1, ICSD #247028
+A5B3C3_hP11_189_dg_g_f-001.{ABC}                 hP11      P-62m               -         Li5N3Ni3            #189      ternary metal-nitride prototype; Li5N3Ni3, ICSD #411152
+A2BC_hP4_191_c_a_b-001.{ABC}                     hP4       P6/mmm              -         Li2N1Na1            #191      ternary metal-nitride prototype; Li2N1Na1, ICSD #92308
+ABC2_hP4_191_b_a_c-001.{ABC}                     hP4       P6/mmm              -         Li1N1Na2            #191      ternary metal-nitride prototype; Li1N1Na2, ICSD #92310
+ABC2_hP8_194_c_a_f-001.{ABC}                     hP8       P6_{3}/mmc          -         Ba1Ce1N2            #194      ternary metal-nitride prototype; Ba1Ce1N2, ICSD #74791
+AB2C_hP8_194_a_f_b-001.{ABC}                     hP8       P6_{3}/mmc          -         Fe1N2W1             #194      ternary metal-nitride prototype; Fe1N2W1, ICSD #75971
+ABC2_hP8_194_a_c_f-001.{ABC}                     hP8       P6_{3}/mmc          -         Mg1Mo1N2            #194      ternary metal-nitride prototype; Mg1Mo1N2, ICSD #185913
+A3BC_hP10_194_h_a_c-001.{ABC}                    hP10      P6_{3}/mmc          -         Ba3N1Na1            #194      ternary metal-nitride prototype; Ba3N1Na1, ICSD #67497
+A3BC_hP10_194_h_c_a-001.{ABC}                    hP10      P6_{3}/mmc          -         Ba3Bi1N1            #194      ternary metal-nitride prototype; Ba3Bi1N1, ICSD #152055
+AB3C4_hP16_194_c_ae_2f-001.{ABC}                 hP16      P6_{3}/mmc          -         Al1N3V4             #194      ternary metal-nitride prototype; Al1N3V4, ICSD #181351
+AB2C_cF32_227_b_c_a.{ABC}                        cF32      Fd-3m               -         Cs1N2Nb1            #227      ternary metal-nitride prototype; Cs1N2Nb1, ICSD #72546
+
 ****************************************************************************************************
 ****************************************************************************************************
 ****************************************************************************************************

@@ -1238,8 +1238,8 @@ namespace chull {
   //bool lessEqualZero(double val,bool soft_cutoff){return ( soft_cutoff? val<=-ZERO_TOL : val<=0.0 );}
   bool greaterEqualZero(double val){return (val>=0.0);}
   bool lessEqualZero(double val){return (val<=0.0);}
-  bool notPositive(double val,bool soft_cutoff,double tol){return (soft_cutoff? val<=tol : lessEqualZero(val));}
-  bool notNegative(double val,bool soft_cutoff,double tol){return (soft_cutoff? val>=-tol : greaterEqualZero(val));}
+  bool notPositive(double val,bool soft_cutoff,double tol){return (soft_cutoff? val<=-tol : lessEqualZero(val));} //DX20201008 - this breaks for GFA: AlCuMo: val=-2.122E-314, perhaps flip to val<=-tol
+  bool notNegative(double val,bool soft_cutoff,double tol){return (soft_cutoff? val>=tol : greaterEqualZero(val));} //DX20201008 - if changing above, perhaps change to val>=tol
   bool zeroWithinTol(double val,double tol){return notPositive(abs(val),true,tol);}
   bool nonZeroWithinTol(double val,double tol){return !zeroWithinTol(val,tol);}
 

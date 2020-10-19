@@ -540,6 +540,11 @@ namespace compare{
   //                        vector<double>& latt_devs,
   //			                  const bool& optimize_match,
   //                        const uint& start_index, const uint& end_index); //DX20190530 - new 
+  void getLatticeTransformations(const xmatrix<double>& lattice_original, 
+      const xmatrix<double>& lattice_ideal,
+      const vector<xmatrix<double> >& candidate_lattices,
+      vector<xmatrix<double> >& basis_transformations,
+      vector<xmatrix<double> >& rotations); //DX20201015
   bool structureSearch(
       const xstructure& xstr1, 
       const xstructure& xstr_supercell, //DX20190530 - added "_supercell"; more descriptive 

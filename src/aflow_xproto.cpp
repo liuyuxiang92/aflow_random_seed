@@ -324,6 +324,11 @@ namespace aflowlib {
     vector<string> prototype_labels, filtered_prototype_labels, tokens;
     uint number_of_prototypes = GetAllPrototypeLabels(prototype_labels, compositions, all_space_group_numbers, all_grouped_Wyckoff_letters, library);
     for(uint i=0;i<number_of_prototypes;i++){
+      // ---------------------------------------------------------------------------
+      // handle corner cases //DX20200929
+      if(compositions[i].find("sigma") != std::string::npos){
+        aurostd::StringSubst(compositions[i],"sigma","A");
+      }
       uint prototype_number_of_species = aurostd::RemoveNumbers(compositions[i]).size();
       if(prototype_number_of_species == number_of_species || number_of_species==0){ //DX20191107 - add number_of_species==0 if stoich is not specified
 

@@ -2061,6 +2061,13 @@ namespace anrl {
     // ---------------------------------------------------------------------------
     // generate atoms based Wyckoff equations and Wyckoff parameter values
     deque<_atom> atoms_conventional_cell = getAtomsFromWyckoff(ordered_Wyckoff_sites_ITC,lattice_conventional);
+    
+    // ---------------------------------------------------------------------------
+    // get interatomic distance to find a good "fold-in" tolerance //DX20201021
+    xstructure str_conv;
+    str_conv.lattice = lattice_conventional;
+    str_conv.atoms = atoms_conventional_cell;
+    str_conv.sym_eps = SYM::defaultTolerance(str_conv);
 
     deque<_atom> atoms_primitive_cell;
     // special case: if using the rhombohedral setting, then the Wyckoff positions 
@@ -2074,7 +2081,7 @@ namespace anrl {
           lattice_conventional,
           lattice_primitive,
           false,
-          1e-6,
+          str_conv.sym_eps, //DX20201019 - use sym_eps instead of 1e-6
           false);
     }
 
