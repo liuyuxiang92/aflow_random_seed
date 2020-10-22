@@ -232,14 +232,14 @@ namespace aflowlib {
       xmatrix<double> ael_compliance_tensor;  //ME20191105
       // QHA  //AS20200831
       double gruneisen_qha; //AS20200831
-      double gruneisen_300K_qha; //AS20200903
-      double thermal_expansion_300K_qha; //AS20200831
-      double modulus_bulk_300K_qha; //AS20200831
-      double modulus_bulk_pressure_derivative_300K_qha; //AS20201008
-      double heat_capacity_Cv_atom_300K_qha; //AS20201008
-      double heat_capacity_Cp_atom_300K_qha; //AS20201008
-      double volume_atom_300K_qha; //AS20201008
-      double energy_free_atom_300K_qha; //AS20201008
+      double gruneisen_qha_300K; //AS20200903
+      double thermal_expansion_qha_300K; //AS20200831
+      double modulus_bulk_qha_300K; //AS20200831
+      double modulus_bulk_derivative_pressure_qha_300K; //AS20201008
+      double heat_capacity_Cv_atom_qha_300K; //AS20201008
+      double heat_capacity_Cp_atom_qha_300K; //AS20201008
+      double volume_atom_qha_300K; //AS20201008
+      double energy_free_atom_qha_300K; //AS20201008
       // BADER
       string bader_net_charges;vector<double> vbader_net_charges;//electrons
       string bader_atomic_volumes;vector<double> vbader_atomic_volumes;//Angst^3
