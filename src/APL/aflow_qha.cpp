@@ -3254,9 +3254,8 @@ namespace apl
           // not supported, this case is handled in an earlier switch statement
           break;
       }
-      filename += DEFAULT_APL_PDIS_FILE.substr(0,DEFAULT_APL_PDIS_FILE.size()-4);//"phonon_dispersion"
-      filename += ".T"+aurostd::PaddedNumString(T, ndigits)+"K";
-      filename += DEFAULT_APL_PDIS_FILE.substr(DEFAULT_APL_PDIS_FILE.size()-4,4);//".out"
+      filename += DEFAULT_QHA_PDIS_FILE;
+      filename += ".T"+aurostd::PaddedNumString(T, ndigits)+"K.out";
       aurostd::stringstream2file(eig_stream, filename);
       if (!aurostd::FileExist(filename)){
         msg = "Cannot open "+filename+" file.";
