@@ -1458,7 +1458,7 @@ namespace aflowlib {
         if(aurostd::FileExist(directory_RAW+"/aflow.qha.out")) aurostd::LinkFile(directory_RAW+"/aflow.qha.out",directory_WEB);
         if(aurostd::FileExist(directory_RAW+"/aflow.qha.thermo.out")) aurostd::LinkFile(directory_RAW+"/aflow.qha.thermo.out",directory_WEB);
         if(aurostd::FileExist(directory_RAW+"/aflow.qha.FVT.out")) aurostd::LinkFile(directory_RAW+"/aflow.qha.thermo.out",directory_WEB);
-        if(aurostd::FileExist(directory_RAW+"/aflow.qha.phonon_dispersion.T300K.out")) aurostd::LinkFile(directory_RAW+"/aflow.qha.phonon_dispersion.T300K.out",directory_WEB);
+        if(aurostd::FileExist(directory_RAW+"/aflow.qha.dispersion_phonon.T300K.out")) aurostd::LinkFile(directory_RAW+"/aflow.qha.dispersion_phonon.T300K.out",directory_WEB);
 
         // link all QHA plots
         vector<string> files;
