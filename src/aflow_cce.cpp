@@ -2380,7 +2380,7 @@ namespace cce {
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
     }
     // Bader implementation works currently only with Bader file and aflow.in in directory where AFLOW is run
-    system_name=KBIN::ExtractSystemNameFromAFLOWIN(directory_path);
+    system_name=KBIN::ExtractSystemName(directory_path);  //CO20200928
     if(LDEBUG){
       cerr << soliloquy << " functional determined from aflow.in: " << functional << endl;
       cerr << soliloquy << " PBE: " << aurostd::WithinList(cce_vars.vfunctionals, "PBE") << endl;

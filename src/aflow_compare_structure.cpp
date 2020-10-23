@@ -2626,7 +2626,8 @@ namespace compare {
     // calculate LFA environments of  database entries 
     // if already calculated, do not recalculate
     bool all_environments_calculated = true;
-    for(uint i=0;i<all_structures.size();i++){ all_environments_calculated*=all_structures[i].isLFAEnvironmentCalculated(); }
+    //for(uint i=0;i<all_structures.size();i++){ all_environments_calculated*=all_structures[i].isLFAEnvironmentCalculated(); } //DX20200925 - gcc-10 warnings
+    for(uint i=0;i<all_structures.size();i++){ all_environments_calculated = (all_environments_calculated&&all_structures[i].isLFAEnvironmentCalculated()); } //DX20200925 - gcc-10 warnings
     if(!comparison_options.flag("COMPARISON_OPTIONS::IGNORE_ENVIRONMENT_ANALYSIS") && !all_environments_calculated){
       message << "Calculating the environments of the structures.";
       pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);

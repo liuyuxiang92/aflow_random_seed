@@ -2563,9 +2563,14 @@ namespace aflowlib {
         if(aurostd::WithinList(data.vspecies,"O")) found_correctable=true;
         if(aurostd::WithinList(data.vspecies,"N")) found_correctable=true;
         if(found_correctable){
-          data.enthalpy_formation_cce_300K_cell=data.enthalpy_formation_cce_0K_cell=data.enthalpy_formation_cell;
-          vector<double> enthalpy_formation_cell_corrections_cce=cce::calculate_corrections(xstr,functional);
-          if(enthalpy_formation_cell_corrections_cce.size()==2){  //the first is at 300K, the second at 0K
+          vector<double> enthalpy_formation_cell_corrections_cce;
+          try{enthalpy_formation_cell_corrections_cce=cce::calculate_corrections(xstr,functional);}
+          catch (aurostd::xerror& excpt) {
+            pflow::logger(excpt.whereFileName(), excpt.whereFunction(), excpt.error_message, cout, _LOGGER_ERROR_);
+            found_correctable=false;
+          }
+          if(found_correctable && enthalpy_formation_cell_corrections_cce.size()==2){  //the first is at 300K, the second at 0K
+            data.enthalpy_formation_cce_300K_cell=data.enthalpy_formation_cce_0K_cell=data.enthalpy_formation_cell;
             data.enthalpy_formation_cce_300K_cell-=enthalpy_formation_cell_corrections_cce[0];
             data.enthalpy_formation_cce_0K_cell-=enthalpy_formation_cell_corrections_cce[1];
             data.enthalpy_formation_cce_300K_atom=data.enthalpy_formation_cce_300K_cell/data_natoms;
@@ -5536,6 +5541,8 @@ namespace aflowlib {
     std::sort(vfiles.begin(),vfiles.end()); //get in order
     for(i=0;i<vfiles.size();i++){
       if(vfiles[i].find(POCC_DOSCAR_FILE)!=string::npos){
+        //need to grab POSCAR from ARUN.POCC_01
+        //inside plotter we change '/RAW/' to '/LIB/', everything in RAW must be self-contained
         if(AFLOWLIB_VERBOSE) cout << MESSAGE << " plotting " << vfiles[i] << endl;
         pcalc.plotAvgDOSCAR(directory_RAW+"/"+vfiles[i],directory_RAW);
       }
