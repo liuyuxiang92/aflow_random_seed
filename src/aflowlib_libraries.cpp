@@ -5390,8 +5390,8 @@ namespace aflowlib {
       aflowlib::LIB2RAW_FileNeeded(directory_LIB,"aflow.qha.out",directory_RAW,"aflow.qha.out",vfile,MESSAGE);
       aflowlib::LIB2RAW_FileNeeded(directory_LIB,"aflow.qha.thermo.out",directory_RAW,"aflow.qha.thermo.out",vfile,MESSAGE);
       aflowlib::LIB2RAW_FileNeeded(directory_LIB,"aflow.qha.FVT.out",directory_RAW,"aflow.qha.FVT.out",vfile,MESSAGE);
-      aflowlib::LIB2RAW_FileNeeded(directory_LIB,"aflow.qha.phonon_dispersion.T300K.out",directory_RAW,
-          "aflow.qha.phonon_dispersion.T300K.out",vfile,MESSAGE);
+      aflowlib::LIB2RAW_FileNeeded(directory_LIB,"aflow.qha.dispersion_phonon.T300K.out",directory_RAW,
+          "aflow.qha.dispersion_phonon.T300K.out",vfile,MESSAGE);
 
 
       // read QHA data from the aflow.qha.out file
