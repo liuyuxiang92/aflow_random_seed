@@ -4,8 +4,8 @@
 // *                                                                         *
 // ***************************************************************************
 // Written by Stefano Curtarolo - 2007-2019
-#ifndef _AFLOW_XELEMENT_H
-#define _AFLOW_XELEMENT_H
+#ifndef _AFLOW_XELEMENT_H_
+#define _AFLOW_XELEMENT_H_
 //#include "aflow.h"
 
 // ---------------------------------------------------------------------------

@@ -4,8 +4,8 @@
 // *                                                                         *
 // ***************************************************************************
 // Written by Stefano Curtarolo - 2007-2019
-#ifndef _AFLOW_XELEMENT_CPP
-#define _AFLOW_XELEMENT_CPP
+#ifndef _AFLOW_XELEMENT_CPP_
+#define _AFLOW_XELEMENT_CPP_
 #include "aflow.h"
 
 // ---------------------------------------------------------------------------
@@ -5122,7 +5122,7 @@ namespace xelement {
       symbol="La";
       name="Lanthanium";
       Period=6;
-      Group=NNN;
+      Group=3;  //[CO20200930]NNN
       Series="Lanthanide";
       Block="f";
       mass=AMU2KILOGRAM*138.9055;
