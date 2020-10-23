@@ -5432,6 +5432,9 @@ namespace compare{
   void printStructureMappingResults(ostream& oss, 
       const xstructure& xstr_reference,
       const xstructure& xstr_transformed,
+      const xmatrix<double>& basis_transformation, //DX20201023
+      const xmatrix<double>& rotation, //DX20201023
+      const xvector<double>& origin_shift, //DX20201023
       const double misfit,
       const double lattice_deviation,
       const double coordinate_displacement,
@@ -5463,6 +5466,14 @@ namespace compare{
         oss << "Figure of Magnetic Displacement:	" << magnetic_displacement << endl;
         oss << "Figure of Magnetic Failure:	" << magnetic_failure << endl;
       }
+      oss <<"----------------------------------------------------"<<endl;
+      oss <<"STRUCTURE TRANSFORMATION (test structure -> reference structure)" << endl;
+      oss <<"Basis Transformation" << endl;
+      oss << basis_transformation << endl;
+      oss <<"Rotation" << endl;
+      oss << rotation << endl;
+      //DX20201023 [ NOT YET ] oss <<"Origin Shift" << endl;
+      //DX20201023 [ NOT YET ] oss << origin_shift << endl;
       oss <<"----------------------------------------------------"<<endl;
       printMatch(matching_indices_1,matching_indices_2,minimum_distances,xstr_transformed,xstr_reference,oss);
       oss <<"----------------------------------------------------"<<endl;
@@ -7835,6 +7846,11 @@ namespace compare{
     vector<uint> matching_indices_1, matching_indices_2;
     vector<double> minimum_distances;
 
+    uint matched_lattice_index = 0; //DX20201023
+    xvector<double> matched_origin_shift; //DX20201023 - shift structure 2 to structure 1
+    xmatrix<double> matched_basis_transformation; //DX20201023 
+    xmatrix<double> matched_rotation; //DX20201023 
+
     // ---------------------------------------------------------------------------
     // determine least-frequently occuring atom type (LFA) for each structure
     // (there may be more than one)
@@ -7874,6 +7890,7 @@ namespace compare{
 
     if(lattices.size()>0){
 
+      cerr << "XSTR1: " << xstr1 << endl;
       xstructure xstr1_tmp = xstr1;
       // ---------------------------------------------------------------------------
       // calculate attributes of structure 1 (volume, lattice parameters, nearest neighbor distances, etc.)
@@ -7944,8 +7961,8 @@ namespace compare{
       vector<vector<int> > thread_distribution = getThreadDistribution(number_of_lattices, number_of_threads); //DX20191107 
 #endif
 
-      bool find_transformation = false;
-      if(find_transformation){
+      bool find_transformation = true;
+//      if(find_transformation){
       // ---------------------------------------------------------------------------
       // identify rotation between original and new structure
       vector<xmatrix<double> > basis_transformations;
@@ -7972,24 +7989,52 @@ namespace compare{
   */    
       for(uint p=0;p<lattices.size();p++){
         cerr << "p: " << p << endl;
+        cerr << "lattice: " << lattices[p] << endl;
+        cerr << "xstr2.lattice: " << xstr2.lattice << endl;
+        cerr << "basis transformations: " << basis_transformations[p] << endl;
+        xmatrix<double> basis_rotation = extractRotationFromBasisChange(basis_transformations[p]); 
         cerr << "basis transformations: " << basis_transformations[p] << endl;
         cerr << "rotations: " << rotations[p] << endl;
+        //xmatrix<double> complete_rotation = trasp(basis_rotation)*trasp(rotations[p]);
+        //xmatrix<double> complete_rotation = trasp(rotations[p])*trasp(basis_rotation);
+        cerr << "basis rotation: " << basis_rotation << endl;
+        xmatrix<double> complete_rotation = basis_rotation*rotations[p];
+        //xmatrix<double> complete_rotation = basis_rotation;
+        cerr << "basis rotation * rotations: " << complete_rotation << endl;
+        cerr << "subtract: " << basis_rotation-rotations[p] << endl;
         xmatrix<double> Uf; string _string; bool _inversion; double _angle;
         xvector<double> _axis;
         xmatrix<double> _generator; 
         xvector<double> _generator_coefficients;
         xmatrix<xcomplex<double> > _SU2_matrix;
         xvector<xcomplex<double> > _su2_coefficients; //DX20180117 - added SU(2) and su(2) coefficients
-          
+        
         xmatrix<double> lattice_tmp = basis_transformations[p]*xstr2.lattice;
-          Uf = trasp(lattice_tmp)*rotations[p]*inverse(trasp(lattice_tmp));
+       
+        Uf = trasp(lattice_tmp)*basis_rotation*inverse(trasp(lattice_tmp));
+        SYM::TypePointGroupOperation(basis_rotation, Uf, _string, _inversion, _angle, _axis, _generator, _generator_coefficients, 
+          _SU2_matrix, _su2_coefficients, 1e-3); //DX20180117 - added SU(2) and su(2) coefficients
+        cerr << "det basis transformation rot: " << aurostd::det(basis_rotation) << endl;
+        cerr << "BASIS TRANSFORMATION ROT axis: " << _axis << endl;
+        cerr << "BASIS TRANSFORAMTION ROT angle: " << _angle << endl;
+          
+        Uf = trasp(lattice_tmp)*rotations[p]*inverse(trasp(lattice_tmp));
         SYM::TypePointGroupOperation(rotations[p], Uf, _string, _inversion, _angle, _axis, _generator, _generator_coefficients, 
           _SU2_matrix, _su2_coefficients, 1e-3); //DX20180117 - added SU(2) and su(2) coefficients
+        cerr << "det rotation: " << aurostd::det(rotations[p]) << endl;
+        cerr << "ROTATION axis: " << _axis << endl;
+        cerr << "ROTATION angle: " << _angle << endl;
+        
+        Uf = trasp(lattice_tmp)*complete_rotation*inverse(trasp(lattice_tmp));
+        SYM::TypePointGroupOperation(complete_rotation, Uf, _string, _inversion, _angle, _axis, _generator, _generator_coefficients, 
+          _SU2_matrix, _su2_coefficients, 1e-3); //DX20180117 - added SU(2) and su(2) coefficients
       
-        cerr << "axis: " << _axis << endl;
-        cerr << "angle: " << _angle << endl;
+        cerr << "det complete rotation: " << aurostd::det(complete_rotation) << endl;
+        cerr << "COMPLETE ROTATION: axis: " << _axis << endl;
+        cerr << "COMPLETE ROTATION: angle: " << _angle << endl;
 
         xstructure test = ChangeBasis(xstr2, basis_transformations[p]);
+        cerr << "CHANGE BASIS test: " << test << endl;
         /*
 
         cerr << " apply basis transformation..." << endl;
@@ -8022,12 +8067,17 @@ namespace compare{
           test.UpdateCartesianCoordinates();
           */
           cerr << "ROTATED test: " << test << endl;
+          
+          xstructure test2 = xstr2;
+          test2 = Rotate(test2, trasp(complete_rotation));
+          cerr << "ROTATED test2: " << test2 << endl;
+          
         
 
         cerr << "--------------------------------" << endl;
 
       }
-      }
+  //    }
 /*
       // ---------------------------------------------------------------------------
       // identify rotation between original and new structure
@@ -8184,6 +8234,8 @@ namespace compare{
               vector<vector<uint> > possible_matching_indices_1, possible_matching_indices_2;
               vector<vector<double> > possible_minimum_distances;
               vector<vector<xstructure> > vvprotos;
+              vector<uint> vmatching_lattice_indices; //DX20201023
+              vector<xvector<double> > vorigin_shifts; //DX20201023
               for(uint n=0; n<num_proc; n++){
                 vector<xstructure> vprotos_tmp;
                 vvprotos.push_back(vprotos_tmp);
@@ -8195,6 +8247,9 @@ namespace compare{
                 possible_matching_indices_2.push_back(tmp_indices);
                 vector<double> tmp_distances;
                 possible_minimum_distances.push_back(tmp_distances);
+                vmatching_lattice_indices.push_back(0); //DX20201023
+                xvector<double> tmp_origin_shifts; //DX20201023
+                vorigin_shifts.push_back(tmp_origin_shifts); //DX20201023
               }
 
 #ifdef AFLOW_COMPARE_MULTITHREADS_ENABLE
@@ -8215,6 +8270,7 @@ namespace compare{
                       std::ref(possible_min_misfit_info[n]), //DX20191218
                       std::ref(possible_matching_indices_1[n]),std::ref(possible_matching_indices_2[n]),
                       std::ref(possible_minimum_distances[n]),std::ref(vvprotos[n]),
+                      std::ref(vmatching_lattice_indices[n]),std::ref(vorigin_shifts[n]),
                       optimize_match));
               }         
               for(uint t=0;t<threads.size();t++){
@@ -8241,6 +8297,7 @@ namespace compare{
                   possible_min_misfit_info[n], //DX20191218
                   possible_matching_indices_1[n],possible_matching_indices_2[n],
                   possible_minimum_distances[n],vvprotos[n],
+                  vmatching_lattice_indices[n],vorigin_shifts[n],
                   optimize_match);
 #endif
 
@@ -8254,14 +8311,23 @@ namespace compare{
                   minimum_distances=possible_minimum_distances[p];
                   xstr1=xstr1_for_thread[p];
                   vprotos=vvprotos[p];
+                  matched_lattice_index = vmatching_lattice_indices[p];
+                  matched_origin_shift = vorigin_shifts[p];
                 }
               }
+
+              //find transformation info
+              xmatrix<double> matched_basis_transformation = basis_transformations[matched_lattice_index]; //DX20201023 
+              xmatrix<double> matched_rotation = rotations[matched_lattice_index]; //DX20201023 
+
+              cerr << "basis transformation: " << matched_basis_transformation << endl;
+              cerr << "matched_rotation: " << matched_rotation << endl;
 
               // ---------------------------------------------------------------------------
               // quick return if found a match
               if(min_misfit_info.misfit<0.1 && !optimize_match){
                 if(LDEBUG){cerr << function_name << " Found match (misfit = " << min_misfit_info.misfit << ")! Terminating search early." << endl;}
-                printStructureMappingResults(oss,xstr1,vprotos[0],min_misfit_info.misfit,min_misfit_info.lattice_deviation,min_misfit_info.coordinate_displacement,min_misfit_info.failure,min_misfit_info.magnetic_displacement,min_misfit_info.magnetic_failure,
+                printStructureMappingResults(oss,xstr1,vprotos[0],matched_basis_transformation,matched_rotation,matched_origin_shift,min_misfit_info.misfit,min_misfit_info.lattice_deviation,min_misfit_info.coordinate_displacement,min_misfit_info.failure,min_misfit_info.magnetic_displacement,min_misfit_info.magnetic_failure,
                     matching_indices_1,matching_indices_2,minimum_distances,magnetic_analysis);
                 return;
               }
@@ -8288,7 +8354,7 @@ namespace compare{
       } 
     }  
     if(aurostd::isdifferent(min_misfit_info.misfit,AUROSTD_MAX_DOUBLE) && vprotos.size()>0){
-      printStructureMappingResults(oss,xstr1,vprotos[0],min_misfit_info.misfit,min_misfit_info.lattice_deviation,min_misfit_info.coordinate_displacement,min_misfit_info.failure,min_misfit_info.magnetic_displacement,min_misfit_info.magnetic_failure,
+      printStructureMappingResults(oss,xstr1,vprotos[0],matched_basis_transformation,matched_rotation,matched_origin_shift,min_misfit_info.misfit,min_misfit_info.lattice_deviation,min_misfit_info.coordinate_displacement,min_misfit_info.failure,min_misfit_info.magnetic_displacement,min_misfit_info.magnetic_failure,
           matching_indices_1,matching_indices_2,minimum_distances,magnetic_analysis);
     }
   }
@@ -8581,6 +8647,8 @@ namespace compare{
       vector<uint>& index_match_1, vector<uint>& index_match_2,
       vector<double>& min_distances,
       vector<xstructure>& vprotos,
+      uint& matching_lattice_index, //DX20201023
+      xvector<double>& matching_origin_shift, //DX20201023
       bool optimize_match){ 
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
@@ -8613,6 +8681,7 @@ namespace compare{
         cerr << "lattice=" << lattices[p] << endl;
       }
 
+        cerr << "p: " << p << endl;
         //cerr << "p: " << p << endl;
         /*
       // ---------------------------------------------------------------------------
@@ -8742,6 +8811,7 @@ namespace compare{
         for(uint iat=0; iat<proto.atoms.size();iat++){
           if(proto.atoms[iat].name==lfa){
             proto.ShiftOriginToAtom(iat);
+            // need to get shift from here
             proto.BringInCell(1e-10);
             if(VERBOSE){
               cerr << "compare::structureSearch: orig structure " << xstr1 << endl;
@@ -8811,6 +8881,8 @@ namespace compare{
                 //cerr << "storing: " << proto << endl;
                 vprotos.clear();
                 vprotos.push_back(proto);
+                matching_lattice_index = p; //DX20201023
+                matching_origin_shift = origin_shift; //DX20201023
                 min_misfit_info.misfit=mis;
                 min_misfit_info.lattice_deviation=latt_devs[p];
                 min_misfit_info.coordinate_displacement=cd;
@@ -9171,19 +9243,33 @@ namespace compare{
         //xmatrix<double> basis_transformation = candidate_lattices[i]*aurostd::inverse(lattice_original);
         basis_transformations.push_back(basis_transformation);
 
+        //BETA xmatrix<double> basis_rotation = extractRotationFromBasisChange(basis_transformation);
+        //BETA cerr << "basis_rotation: " << basis_rotation << endl;
+        //BETA xmatrix<double> undo_basis_rotation = aurostd::inverse(basis_rotation);
+        //BETA cerr << "undo_basis_rotation: " << undo_basis_rotation << endl;
+
         xmatrix<double> lattice_new = basis_transformation*lattice_original;
+        
+        //BETA xmatrix<double> tmp_lattice = lattice_new*undo_basis_rotation;
+        //BETA cerr << "tmp_lattice: " << tmp_lattice << endl;
+       
+        cerr << "lattice new: " << lattice_new << endl;
+        cerr << "lattice ideal: " << lattice_ideal << endl;
         xmatrix<double> metric_tensor_new = MetricTensor(lattice_new);
+        //BETA xmatrix<double> metric_tensor_new = MetricTensor(tmp_lattice);
         xmatrix<double> metric_tensor_ideal = MetricTensor(lattice_ideal);
         cerr << "metric_tensor_new: " << metric_tensor_new << endl;
         cerr << "metric_tensor_ideal: " << metric_tensor_ideal << endl;
         // ---------------------------------------------------------------------------
         // then rotate to the ideal lattice 
         rotations.push_back(GetRotation(lattice_new,lattice_ideal));
+        //BETA rotations.push_back(GetRotation(tmp_lattice,lattice_ideal));
         //rotations.push_back(aurostd::inverse(lattice_new)*lattice_ideal);
       }
       // ---------------------------------------------------------------------------
       // if the metric tensors ARE equal: simple rotation between lattices
       else{
+        cerr << "simple rotations only!!!!" << endl;
         rotations.push_back(GetRotation(lattice_original,candidate_lattices[i]));
         //rotations.push_back(aurostd::inverse(lattice_original)*candidate_lattices[i]); 
         // should it be this?: rotations.push_back(aurostd::inverse(xstr2.lattice)*xstr1.lattice); 

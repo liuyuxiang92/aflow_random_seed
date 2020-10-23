@@ -1909,6 +1909,7 @@ xmatrix<double> GetBasisTransformation(const xmatrix<double>& lattice_original, 
 xmatrix<double> GetRotation(const xmatrix<double>& lattice_original, const xmatrix<double>& lattice_new); //DX20201015
 xstructure ChangeBasis(const xstructure& xstr, const xmatrix<double>& transformation_matrix); //DX20201015
 
+xmatrix<double> extractRotationFromBasisChange(const xmatrix<double>& transformation_matrix); //DX20201021
 
 //CO20180420
 //for stream management with objects

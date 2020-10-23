@@ -16440,6 +16440,101 @@ xstructure ChangeBasis(const xstructure& xstr, const xmatrix<double>& transforma
 
 }
 
+xmatrix<double> extractRotationFromBasisChange(const xmatrix<double>& transformation_matrix) {
+  
+  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  string function_name = XPID + "extractRotationFromBasisChange():";
+
+  //square the matrix
+  xmatrix<double> tmp = trasp(transformation_matrix)*transformation_matrix;
+  //cerr << "tmp: " << tmp << endl;
+
+  xvector<double> d;
+  xmatrix<double> v;
+  jacobi(tmp, d, v);
+  //cerr << "d: " << d << endl;
+  //cerr << "v: " << v << endl;
+
+  xmatrix<double> D_sqr = aurostd::eye<double>();
+  D_sqr[1][1] = aurostd::sqrt(d(1));
+  D_sqr[2][2] = aurostd::sqrt(d(2));
+  D_sqr[3][3] = aurostd::sqrt(d(3));
+
+  //cerr << "D_sqrt: " << D_sqr << endl;
+  xmatrix<double> tmp_half = v*D_sqr*aurostd::inverse(v);
+  //attempt2 - xmatrix<double> tmp_half = aurostd::inverse(v)*D_sqr*v;
+
+  //cerr << "tmp_half: " << tmp_half << endl;
+
+  xmatrix<double> tmp_rotation = transformation_matrix*aurostd::inverse(tmp_half);
+  // attempt2 - xmatrix<double> tmp_rotation = aurostd::inverse(tmp_half)*transformation_matrix;
+  //cerr << "tmp_rotation: " << tmp_rotation << endl;
+
+
+  //cerr << "trasp: " << aurostd::trasp(tmp_rotation) << endl;
+  //cerr << "inv: " << aurostd::inverse(tmp_rotation) << endl;
+  //cerr << "orthogonal: " << tmp_rotation*trasp(tmp_rotation) << endl;
+
+
+  //cerr << "Recover tmp?: " << tmp_rotation*tmp_half << endl;
+  return tmp_rotation;
+  //xvector<double> wr;  
+  //xvector<double> wi;  
+  //eigen(tmp,wr,wi);
+  //cerr << "wr: " << wr << endl;
+  //cerr << "wi: " << wi << endl;
+
+  xvector<double> row1, row2, row3;
+
+  if(LDEBUG){
+    cerr << function_name << " transformation matrix:" << endl;
+    cerr << transformation_matrix << endl;
+  }
+
+  row1 = transformation_matrix(1); 
+  row2 = transformation_matrix(2); 
+  row3 = transformation_matrix(3);
+
+  cerr << "row1: " << row1 << endl;
+  cerr << "row2: " << row2 << endl;
+  cerr << "row3: " << row3 << endl;
+
+  xvector<double> scale; 
+  scale(1) = aurostd::modulus(row1);
+  scale(2) = aurostd::modulus(row2);
+  scale(3) = aurostd::modulus(row3);
+
+  cerr << "scale: " << scale << endl;
+  cerr << "scale1: " << scale(1) << endl;
+  cerr << "scale2: " << scale(2) << endl;
+  cerr << "scale3: " << scale(3) << endl;
+
+  xmatrix<double> rotation = transformation_matrix;
+
+  cerr << "norm 1: " << transformation_matrix(1)/scale(1) << endl;
+  cerr << "norm 2: " << transformation_matrix(2)/scale(2) << endl;
+  cerr << "norm 3: " << transformation_matrix(3)/scale(3) << endl;
+
+ 
+  rotation[1][1] /= scale(1);
+  rotation[1][2] /= scale(1);
+  rotation[1][3] /= scale(1);
+  rotation[2][1] /= scale(2);
+  rotation[2][2] /= scale(2);
+  rotation[2][3] /= scale(2);
+  rotation[3][1] /= scale(3);
+  rotation[3][2] /= scale(3);
+  rotation[3][3] /= scale(3);
+
+  cerr << "rotation: " << rotation << endl;
+  
+  cerr << "rotation1: " << rotation(1) << endl;
+  cerr << "rotation2: " << rotation(2) << endl;
+  cerr << "rotation3: " << rotation(3) << endl;
+
+  return rotation;
+}
+
 // **************************************************************************
 // GenerateXXXXXXXXXXx
 // **************************************************************************

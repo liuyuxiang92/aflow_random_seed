@@ -3064,6 +3064,7 @@ namespace compare {
     // ---------------------------------------------------------------------------
     // prepare structures (swap structure order if necessary, fix lattices, rescale, etc.)
     xstructure xstr_base, xstr_test;
+    /*
     int mode = 1; // 0: expand structure with more atoms (robust using 3x3x3 method); 1: make xstr1 structure with smaller lattice point radius (faster using dims)
     // expand larger system to ensure we find a commensurate unit cell between each structure
     if(mode==0){
@@ -3091,6 +3092,8 @@ namespace compare {
       else { xstr_base = xstr1; xstr_test = xstr2; }
     }
     else { xstr_base = xstr1; xstr_test = xstr2; }
+    */
+    xstr_base = xstr1; xstr_test = xstr2; //DX20201020
 
     xstr_base.FixLattices();
     xstr_test.FixLattices();

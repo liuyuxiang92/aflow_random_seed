@@ -385,6 +385,9 @@ namespace compare{
   void printStructureMappingResults(ostream& oss, 
       const xstructure& xstr_reference,
       const xstructure& xstr_transformed,
+      const xmatrix<double>& basis_transformation, //DX20201023
+      const xmatrix<double>& rotation, //DX20201023
+      const xvector<double>& origin_shift, //DX20201023
       const double misfit,
       const double lattice_deviation,
       const double coordinate_displacement,
@@ -562,6 +565,8 @@ namespace compare{
       vector<uint>& index_match_1, vector<uint>& index_match_2,
       vector<double>& min_distances,
       vector<xstructure>& vprotos,
+      uint& matching_lattice_index, //DX20201023
+      xvector<double>& matching_origin_shift, //DX20201023
       bool optimize_match);  //DX20190802 - new input format
   // [OBSOLETE - DX20190717]bool structureSearch(const string& lfa,
   // [OBSOLETE - DX20190717]                      const vector<double>& all_nn1,
