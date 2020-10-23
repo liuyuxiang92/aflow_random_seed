@@ -5426,21 +5426,10 @@ namespace aflowlib {
         if (AFLOWLIB_VERBOSE) cout << MESSAGE << " plotting QHA thermodynamic data " << endl;
         aurostd::xoption opt;
         opt.flag("PLOT_THERMO_QHA", true);
-        opt.addattachedscheme("PLOT_THERMO_QHA", directory_LIB, true);
+        opt.addattachedscheme("PLOT_THERMO_QHA", directory_RAW, true);
         opt.push_attached("PLOTTER::PRINT", "png");
         aurostd::xoption plotopts=plotter::getPlotOptions(opt,"PLOT_THERMO_QHA");
         plotter::PLOT_THERMO_QHA(plotopts);
-
-        // set to copy all QHA graphs
-        vector<string> files;
-        aurostd::DirectoryLS(directory_LIB, files);
-        for (uint i=0; i<files.size(); i++){
-          if (aurostd::substring2bool(files[i],"qha") &&
-              aurostd::substring2bool(files[i],".png")){
-             aflowlib::LIB2RAW_FileNeeded(directory_LIB,files[i],directory_RAW,
-                 files[i],vfile,MESSAGE);
-           }
-        }
       }
     } else {
       return FALSE;

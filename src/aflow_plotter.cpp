@@ -2150,7 +2150,7 @@ namespace plotter {
     string ylabels[nprops] = {"V", "F", "B", "\\beta", "c_V", "c_P", "\\gamma"};
     string extensions[nprops] = {"volume_equilibrium_qha", "energy_free_qha",
       "modulus_bulk_qha", "thermal_expansion_qha", "cV_qha", "cP_qha",
-      "grueneisen_parameter_qha"};
+      "gruneisen_parameter_qha"};
     string yunits[nprops] = {"\\AA/atom", "eV/atom", "GPa", "$10^{-6}K^{-1}$",
       "$k_B$/atom", "$k_B$/atom", ""};
     string ymin[nprops] = {"", "", "", "", "0", "0", ""};
