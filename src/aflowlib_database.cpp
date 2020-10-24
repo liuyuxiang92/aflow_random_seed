@@ -256,6 +256,7 @@ namespace aflowlib {
         aurostd::RemoveFile(tmp_file);
         aurostd::RemoveFile(tmp_file + "-journal");
       } else {
+        aurostd::RemoveFile(lock_link);
         message << "Could not create temporary database file. File already exists and rebuild process is active.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_BUSY_);
       }
@@ -275,6 +276,7 @@ namespace aflowlib {
       if (copied) {
         aurostd::ChmodFile("664", tmp_file);
       } else {
+        aurostd::RemoveFile(lock_link);
         message << "Unable to copy original database file.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
       }
@@ -573,7 +575,7 @@ namespace aflowlib {
       // Do not check timestamps after a rebuild because patches must be applied
       int patch_code = patchDatabase(patch_files_input, !rebuild_db);
       if (rebuild_db) {
-        if (patch_code == _AFLOW_DB_NOT_PATCHED_) return _AFLOW_DB_NOT_PATCHED_; // Database was rebuilt but not patched
+        if (patch_code == _AFLOW_DB_NOT_PATCHED_) return _AFLOW_DB_PATCH_SKIPPED_; // Database was rebuilt but not patched
         else return patch_code;
       } else if (patch_code == _AFLOW_DB_NOT_PATCHED_) {
         return _AFLOW_DB_NOT_UPDATED_;  // Database not rebuilt and not patched
