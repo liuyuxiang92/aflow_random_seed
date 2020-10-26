@@ -133,7 +133,7 @@ namespace KBIN {
 namespace FROZSL {
   string Generate_Input_file(ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags) {
     ostringstream aus;
-    aus << XPID << "00000  MESSAGE FROZSL running GENERATE INPUT files " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << "00000  MESSAGE FROZSL running GENERATE INPUT files " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 
     // Writing original input data into a file
@@ -194,7 +194,7 @@ namespace FROZSL {
 namespace FROZSL {
   bool WGET_INPUT(ofstream &FileMESSAGE,string AflowIn,_aflags &aflags,_kflags &kflags) {
     ostringstream aus;
-    aus << XPID << "00000  MESSAGE FROZSL " << _AFLOWIN_ << " self-modification for input files " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << "00000  MESSAGE FROZSL " << _AFLOWIN_ << " self-modification for input files " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 
     // [OBSOLETE] string aflowin=aflags.Directory+"/"+_AFLOWIN_;
@@ -213,10 +213,10 @@ namespace FROZSL {
 
       // MAKE FROZSL INPUT
       string FROZSL_INPUT= FROZSL::Generate_Input_file(FileMESSAGE,aflags,kflags);   
-      aus << XPID << "00000  MESSAGE FROZSL loading data_XXXX.txt" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+      aus << "00000  MESSAGE FROZSL loading data_XXXX.txt" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       FROZSL::Write("data_space.txt;data_wyckoff.txt;data_images.txt;data_irreps.txt;data_little.txt;data_isotropy.txt;symmetry2.dat;const.dat",aflags.Directory);
 
-      aus << XPID << "00000  MESSAGE FROZSL running frozsl_init" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+      aus << "00000  MESSAGE FROZSL running frozsl_init" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       kflags.KBIN_PHONONS_CALCULATION_FROZSL_output=aurostd::execute2string("cat "+FROZSL_INPUT+" | "+XHOST.command("frozsl_init"));
       aurostd::string2file("[AFLOW_FROZSL]CALC.START\n",aflags.Directory+"/"+_AFLOWIN_,"POST");
       aurostd::string2file(kflags.KBIN_PHONONS_CALCULATION_FROZSL_output+"\n",aflags.Directory+"/"+_AFLOWIN_,"POST");
@@ -247,13 +247,13 @@ namespace FROZSL {
       aurostd::RemoveFile(file_frozsl_input);
       aurostd::RemoveFile(file_frozsl_perl);
 
-      aus << XPID << "00000  MESSAGE FROZSL Clean up \" aflow --clean -D ./\" " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-      aus << XPID << "00000  MESSAGE FROZSL Restart. " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+      aus << "00000  MESSAGE FROZSL Clean up \" aflow --clean -D ./\" " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+      aus << "00000  MESSAGE FROZSL Restart. " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 
       return TRUE;
     } else {
-      aus << XPID << "00000  MESSAGE FROZSL input file already created " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+      aus << "00000  MESSAGE FROZSL input file already created " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       return FALSE;
     }
@@ -270,7 +270,7 @@ namespace FROZSL {
     string function = XPID + "FROZSL::WGET_OUTPUT():";
     string message = "";
     ostringstream aus;
-    aus << XPID << "00000  MESSAGE FROZSL running WGET OUTPUT files " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << "00000  MESSAGE FROZSL running WGET OUTPUT files " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 
     string aflowin=aflags.Directory+"/"+_AFLOWIN_;
@@ -309,7 +309,7 @@ namespace FROZSL {
       }
       for(uint i=0;i<vfiles.size();i++) {
         if(aurostd::FileExist(vfiles.at(i))) {
-          aus << XPID << "00000  MESSAGE FROZSL file OK: " << vfiles.at(i) << "" << endl;
+          aus << "00000  MESSAGE FROZSL file OK: " << vfiles.at(i) << "" << endl;
           aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
         } else {
           message = "file not found " + vfiles[i];
@@ -317,7 +317,7 @@ namespace FROZSL {
         }
       }
       // ENERGIES
-      aus << XPID << "00000  MESSAGE FROZSL Frozen phonons energies: " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+      aus << "00000  MESSAGE FROZSL Frozen phonons energies: " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       stringstream aflow_frozsl_out_stringstream;
       aflow_frozsl_out_stringstream.str(std::string());
@@ -326,7 +326,7 @@ namespace FROZSL {
       aus << aflow_frozsl_out_stringstream.str();
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       // RELATIVE ENERGIES
-      aus << XPID << "00000  MESSAGE FROZSL Frozen phonons relative energies: " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+      aus << "00000  MESSAGE FROZSL Frozen phonons relative energies: " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       stringstream aflow_frozsl_modes_stringstream;
       aflow_frozsl_modes_stringstream.str(std::string());
@@ -334,7 +334,7 @@ namespace FROZSL {
       aus << aflow_frozsl_modes_stringstream.str();
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       // EIGENVALUES
-      aus << XPID << "00000  MESSAGE FROZSL Frozen phonons eigenvalues: " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+      aus << "00000  MESSAGE FROZSL Frozen phonons eigenvalues: " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 
       //**************************************************New Code by K.S.Y****************************************************
@@ -369,10 +369,10 @@ namespace FROZSL {
       //**************************************************New Code by K.S.Y****************************************************
 
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-      aus << XPID << "00000  MESSAGE FROZSL calculation finished " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+      aus << "00000  MESSAGE FROZSL calculation finished " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     } else {
-      aus << XPID << "00000  MESSAGE FROZSL you have to generate the input and run it " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+      aus << "00000  MESSAGE FROZSL you have to generate the input and run it " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     }
     return FALSE;
@@ -434,7 +434,7 @@ namespace FROZSL {
     bool Krun=TRUE;
 
     input_file.clear();input_file.str(std::string());
-    // aus << XPID << "00000  MESSAGE FROZSL from [AFLOW_FROZSL]CALC " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    // aus << "00000  MESSAGE FROZSL from [AFLOW_FROZSL]CALC " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     // aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 
     // CHECK FOR INSIDE STUFF
@@ -478,15 +478,15 @@ namespace FROZSL {
     kflags.KBIN_FROZSL_DIELECTRIC_ZEFF=FALSE;
 
     // SOME VERBOSE
-    aus << XPID << "00000  MESSAGE FROZSL from [AFLOW_FROZSL]CALC " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << "00000  MESSAGE FROZSL from [AFLOW_FROZSL]CALC " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     // GET STRUCTURE
     kflags.KBIN_FROZSL_STRUCTURE_MODE_FILE             =
       aurostd::substring2bool(AflowIn,"[FROZSL_STRUCTURE_FILE]");
     if(kflags.KBIN_FROZSL_STRUCTURE_MODE_FILE) {
-      aus << XPID << "00000  MESSAGE FROZSL found FROZSL_STRUCTURE_MODE_FILE " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+      aus << "00000  MESSAGE FROZSL found FROZSL_STRUCTURE_MODE_FILE " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-      aus << XPID << "00000  MESSAGE FROZSL_STRUCTURE generation EXPLICIT file from " << _AFLOWIN_ << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+      aus << "00000  MESSAGE FROZSL_STRUCTURE generation EXPLICIT file from " << _AFLOWIN_ << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       aurostd::ExtractToStringstreamEXPLICIT(AflowIn,ssfrozslSTRUCTURE,"[FROZSL_STRUCTURE_FILE]");
       kflags.KBIN_FROZSL_STRUCTURE_STRING=ssfrozslSTRUCTURE.str();
@@ -497,9 +497,9 @@ namespace FROZSL {
       aurostd::substring2bool(AflowIn,"[FROZSL_MODE_EXPLICIT]START.FROZSL_STRUCTURE") &&
       aurostd::substring2bool(AflowIn,"[FROZSL_MODE_EXPLICIT]STOP.FROZSL_STRUCTURE");
     if(kflags.KBIN_FROZSL_STRUCTURE_MODE_EXPLICIT_START_STOP) {
-      aus << XPID << "00000  MESSAGE FROZSL found FROZSL_STRUCTURE_MODE_EXPLICIT_START_STOP " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+      aus << "00000  MESSAGE FROZSL found FROZSL_STRUCTURE_MODE_EXPLICIT_START_STOP " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-      aus << XPID << "00000  MESSAGE FROZSL_STRUCTURE generation EXPLICIT file from " << _AFLOWIN_ << " with START/STOP  " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+      aus << "00000  MESSAGE FROZSL_STRUCTURE generation EXPLICIT file from " << _AFLOWIN_ << " with START/STOP  " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       aurostd::ExtractToStringstreamEXPLICIT(AflowIn,ssfrozslSTRUCTURE,"[FROZSL_MODE_EXPLICIT]START.FROZSL_STRUCTURE","[FROZSL_MODE_EXPLICIT]STOP.FROZSL_STRUCTURE");
       kflags.KBIN_FROZSL_STRUCTURE_STRING=ssfrozslSTRUCTURE.str();
@@ -559,9 +559,9 @@ namespace FROZSL {
     kflags.KBIN_FROZSL_DIELECTRIC_MODE_FILE             =
       aurostd::substring2bool(AflowIn,"[FROZSL_DIELECTRIC_FILE]");
     if(kflags.KBIN_FROZSL_DIELECTRIC_MODE_FILE) {
-      aus << XPID << "00000  MESSAGE FROZSL found FROZSL_DIELECTRIC_MODE_FILE " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+      aus << "00000  MESSAGE FROZSL found FROZSL_DIELECTRIC_MODE_FILE " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-      aus << XPID << "00000  MESSAGE FROZSL_DIELECTRIC generation EXPLICIT file from " << _AFLOWIN_ << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+      aus << "00000  MESSAGE FROZSL_DIELECTRIC generation EXPLICIT file from " << _AFLOWIN_ << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       aurostd::ExtractToStringstreamEXPLICIT(AflowIn,ssfrozslDIELECTRIC,"[FROZSL_DIELECTRIC_FILE]");
       kflags.KBIN_FROZSL_DIELECTRIC_STRING=ssfrozslDIELECTRIC.str();
@@ -573,9 +573,9 @@ namespace FROZSL {
       aurostd::substring2bool(AflowIn,"[FROZSL_MODE_EXPLICIT]START.FROZSL_DIELECTRIC") &&
       aurostd::substring2bool(AflowIn,"[FROZSL_MODE_EXPLICIT]STOP.FROZSL_DIELECTRIC");
     if(kflags.KBIN_FROZSL_DIELECTRIC_MODE_EXPLICIT_START_STOP) {
-      aus << XPID << "00000  MESSAGE FROZSL found FROZSL_DIELECTRIC_MODE_EXPLICIT_START_STOP " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+      aus << "00000  MESSAGE FROZSL found FROZSL_DIELECTRIC_MODE_EXPLICIT_START_STOP " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-      aus << XPID << "00000  MESSAGE FROZSL_DIELECTRIC generation EXPLICIT file from " << _AFLOWIN_ << " with START/STOP " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+      aus << "00000  MESSAGE FROZSL_DIELECTRIC generation EXPLICIT file from " << _AFLOWIN_ << " with START/STOP " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       aurostd::ExtractToStringstreamEXPLICIT(AflowIn,ssfrozslDIELECTRIC,"[FROZSL_MODE_EXPLICIT]START.FROZSL_DIELECTRIC","[FROZSL_MODE_EXPLICIT]STOP.FROZSL_DIELECTRIC");
       kflags.KBIN_FROZSL_DIELECTRIC_STRING=ssfrozslDIELECTRIC.str();
@@ -585,7 +585,7 @@ namespace FROZSL {
     }
     // NO DIELECTRIC
     if(kflags.KBIN_FROZSL_DIELECTRIC_MODE_FILE==FALSE && kflags.KBIN_FROZSL_DIELECTRIC_MODE_EXPLICIT_START_STOP==FALSE) {
-      aus << XPID << "00000  MESSAGE FROZSL No DIELECTRIC found " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+      aus << "00000  MESSAGE FROZSL No DIELECTRIC found " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       kflags.KBIN_FROZSL_DIELECTRIC_ZEFF=FALSE;
     }
@@ -613,7 +613,7 @@ namespace FROZSL {
     } else {
       kflags.KBIN_FROZSL_FILE_NAME=DEFAULT_AFLOW_FROZSL_INPUT_OUT;
     }
-    aus << XPID << "00000  MESSAGE FROZSL_FILE_NAME= " << kflags.KBIN_FROZSL_FILE_NAME << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << "00000  MESSAGE FROZSL_FILE_NAME= " << kflags.KBIN_FROZSL_FILE_NAME << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 
     Krun=Krun && aurostd::FileExist(string(aflags.Directory+"/"+kflags.KBIN_FROZSL_FILE_NAME));

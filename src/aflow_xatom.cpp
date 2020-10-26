@@ -9181,14 +9181,14 @@ string KPPRA(int& k1,int& k2,int& k3,const xmatrix<double>& rlattice,const int& 
       kk++;
       if(dk<=1e-5) {
         k1=1;k2=1;k3=1;
-        aus << XPID << "00000  MESSAGE KPOINTS KPPRA minimun not found k=[" << k1 << "," << k2 << "," << k3 << "]=" << k1*k2*k3 << endl;
+        aus << "00000  MESSAGE KPOINTS KPPRA minimun not found k=[" << k1 << "," << k2 << "," << k3 << "]=" << k1*k2*k3 << endl;
       }
       kk1=(int) floor((double) nb1/dk);db1=b1/((double) kk1);
       kk2=(int) floor((double) nb2/dk);db2=b2/((double) kk2);
       kk3=(int) floor((double) nb3/dk);db3=b3/((double) kk3);
       if(kk1+kk2+kk3>iverbose) {
         //  if(!mod(kk,50) || kk1*kk2*kk3>=NK)
-        aus << XPID << "00000  MESSAGE KPOINTS KPPRA minimizing k=[" << kk1 << "," << kk2 << "," << kk3 << "]=" << kk1*kk2*kk3 << " =[" << aurostd::modulus(db1) << "," << aurostd::modulus(db2) << "," << aurostd::modulus(db3) << "]   dk=" << dk << endl;
+        aus << "00000  MESSAGE KPOINTS KPPRA minimizing k=[" << kk1 << "," << kk2 << "," << kk3 << "]=" << kk1*kk2*kk3 << " =[" << aurostd::modulus(db1) << "," << aurostd::modulus(db2) << "," << aurostd::modulus(db3) << "]   dk=" << dk << endl;
         iverbose=kk1+kk2+kk3;
       }
       if(kk1*kk2*kk3>=NK) {
@@ -9201,7 +9201,7 @@ string KPPRA(int& k1,int& k2,int& k3,const xmatrix<double>& rlattice,const int& 
     k1=1;k2=1;k3=1;
   }
   db1=b1/((double) k1); db2=b2/((double) k2); db3=b3/((double) k3);
-  aus << XPID << "00000  MESSAGE KPOINTS KPPRA routine [" << k1 << "," << k2 << "," << k3 << "]=" << k1*k2*k3 << "=[" << aurostd::modulus(db1) << "," << aurostd::modulus(db2) << "," << aurostd::modulus(db3) << "]   "  << endl;
+  aus << "00000  MESSAGE KPOINTS KPPRA routine [" << k1 << "," << k2 << "," << k3 << "]=" << k1*k2*k3 << "=[" << aurostd::modulus(db1) << "," << aurostd::modulus(db2) << "," << aurostd::modulus(db3) << "]   "  << endl;
   return aus.str();
 }
 
@@ -9236,7 +9236,7 @@ string KPPRA_LAT(int& k1,int& k2,int& k3,const xmatrix<double>& rlattice,const i
       kk++;
       if(dk<=1e-5) {
         k1=1;k2=1;k3=1;
-        aus << XPID << "00000  MESSAGE KPOINTS KPPRA minimun not found k=[" << k1 << "," << k2 << "," << k3 << "]=" << k1*k2*k3 << endl;
+        aus << "00000  MESSAGE KPOINTS KPPRA minimun not found k=[" << k1 << "," << k2 << "," << k3 << "]=" << k1*k2*k3 << endl;
       }
       kk1=(int) floor((double) nb1/dk);db1=b1/((double) kk1);
       kk2=(int) floor((double) nb2/dk);db2=b2/((double) kk2);
@@ -9245,7 +9245,7 @@ string KPPRA_LAT(int& k1,int& k2,int& k3,const xmatrix<double>& rlattice,const i
 
       if(kk1+kk2+kk3>iverbose) {
         //  if(!mod(kk,50) || kk1*kk2*kk3>=NK)
-        aus << XPID << "00000  MESSAGE KPOINTS KPPRA minimizing k=[" << kk1 << "," << kk2 << "," << kk3 << "," << GetLatticeType(kdatagrid) << "]=" << kk1*kk2*kk3 << " = [" << aurostd::modulus(db1) << "," << aurostd::modulus(db2) << "," << aurostd::modulus(db3) << "]   dk=" << dk << " " << endl;
+        aus << "00000  MESSAGE KPOINTS KPPRA minimizing k=[" << kk1 << "," << kk2 << "," << kk3 << "," << GetLatticeType(kdatagrid) << "]=" << kk1*kk2*kk3 << " = [" << aurostd::modulus(db1) << "," << aurostd::modulus(db2) << "," << aurostd::modulus(db3) << "]   dk=" << dk << " " << endl;
         iverbose=kk1+kk2+kk3;
       }
       if(kk1*kk2*kk3>=NK) {
@@ -9258,7 +9258,7 @@ string KPPRA_LAT(int& k1,int& k2,int& k3,const xmatrix<double>& rlattice,const i
     k1=1;k2=1;k3=1;
   }
   db1=b1/((double) k1); db2=b2/((double) k2); db3=b3/((double) k3);
-  aus << XPID << "00000  MESSAGE KPOINTS KPPRA routine [" << k1 << "," << k2 << "," << k3 << "]=" << k1*k2*k3 << "=[" << aurostd::modulus(db1) << "," << aurostd::modulus(db2) << "," << aurostd::modulus(db3) << "]   "  << endl;
+  aus << "00000  MESSAGE KPOINTS KPPRA routine [" << k1 << "," << k2 << "," << k3 << "]=" << k1*k2*k3 << "=[" << aurostd::modulus(db1) << "," << aurostd::modulus(db2) << "," << aurostd::modulus(db3) << "]   "  << endl;
   return aus.str();
 }
 
@@ -9312,7 +9312,7 @@ string KPPRA_DELTA(int& k1,int& k2,int& k3,const xmatrix<double>& rlattice,const
       kk3=(int) floor((double) nb3/dk);db3=b3/((double) kk3);
       if(kk1+kk2+kk3>iverbose) {
         //  if(!mod(kk,50) || kk1*kk2*kk3>=DK)
-        aus << XPID << "00000  MESSAGE KPOINTS KPPRA minimizing k=[" << kk1 << "," << kk2 << "," << kk3 << "]=" << kk1*kk2*kk3 << " =[" << aurostd::modulus(db1) << "," << aurostd::modulus(db2) << "," << aurostd::modulus(db3) << "]   dk=" << dk << endl;
+        aus << "00000  MESSAGE KPOINTS KPPRA minimizing k=[" << kk1 << "," << kk2 << "," << kk3 << "]=" << kk1*kk2*kk3 << " =[" << aurostd::modulus(db1) << "," << aurostd::modulus(db2) << "," << aurostd::modulus(db3) << "]   dk=" << dk << endl;
         iverbose=kk1+kk2+kk3;
       }
       if((aurostd::modulus(db1)<DK) && (aurostd::modulus(db2)<DK) && (aurostd::modulus(db3)<DK)) {
@@ -9323,7 +9323,7 @@ string KPPRA_DELTA(int& k1,int& k2,int& k3,const xmatrix<double>& rlattice,const
     k1=1;k2=1;k3=1;
   }
   db1=b1/((double) k1); db2=b2/((double) k2); db3=b3/((double) k3);
-  aus << XPID << "00000  MESSAGE KPOINTS KPPRA routine [" << k1 << "," << k2 << "," << k3 << "]=" << k1*k2*k3 << "=[" << aurostd::modulus(db1) << "," << aurostd::modulus(db2) << "," << aurostd::modulus(db3) << "]   "  << endl;
+  aus << "00000  MESSAGE KPOINTS KPPRA routine [" << k1 << "," << k2 << "," << k3 << "]=" << k1*k2*k3 << "=[" << aurostd::modulus(db1) << "," << aurostd::modulus(db2) << "," << aurostd::modulus(db3) << "]   "  << endl;
   return aus.str();
 }
 

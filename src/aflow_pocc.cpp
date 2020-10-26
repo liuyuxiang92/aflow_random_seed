@@ -1658,7 +1658,7 @@ namespace pocc {
   }
   const POccSuperCell& POccSuperCellSet::getSuperCell() const {
     if(m_psc_set.size()==0){
-      string soliloquy=XPID+" POccSuperCellSet::getSuperCell():";
+      string soliloquy=XPID+"POccSuperCellSet::getSuperCell():";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_psc_set.size()==0",_INDEX_ERROR_);
     }
     return m_psc_set[0];
