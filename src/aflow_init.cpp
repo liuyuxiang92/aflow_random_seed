@@ -1082,7 +1082,6 @@ namespace init {
 	// 	}
 	// 	//       if(LDEBUG) cerr << soliloquy << " out=" << out << endl; 
 	// if(LDEBUG) cerr << soliloquy << " str2load=" << str2load << endl;
-	// exit(0);
       } else {
 	//	cerr <<  soliloquy << " [2] " << endl;
 	if(LDEBUG) {cerr << soliloquy << " issuing command: " << XHOST.command("aflow_data") << " " << str2load << endl;}
