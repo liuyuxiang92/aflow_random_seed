@@ -80,13 +80,13 @@ namespace ALIEN {
     // EXPLICIT **************************************************
     if(Krun && alienflags.KBIN_ALIEN_INPUT_MODE_EXPLICIT) {  // [ALIEN_INPUT_MODE_EXPLICIT] construction
       if(alienflags.KBIN_ALIEN_INPUT_FILE && !alienflags.KBIN_ALIEN_INPUT_MODE_EXPLICIT_START_STOP) {
-        aus << XPID << "00000  MESSAGE INPUT  generation EXPLICIT file from " << _AFLOWIN_ << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+        aus << "00000  MESSAGE INPUT  generation EXPLICIT file from " << _AFLOWIN_ << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
         aurostd::ExtractToStringstreamEXPLICIT(FileAFLOWIN,xalien.INPUT,"[ALIEN_INPUT_FILE]");
         // DO SOME LOADING
         // DEBUG xalien.str=xstructure(xalien.INPUT,IOALIEN);  // load structure
       } else if(!alienflags.KBIN_ALIEN_INPUT_FILE && alienflags.KBIN_ALIEN_INPUT_MODE_EXPLICIT_START_STOP) {
-        aus << XPID << "00000  MESSAGE INPUT  generation EXPLICIT file from " << _AFLOWIN_ << " with START/STOP  " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+        aus << "00000  MESSAGE INPUT  generation EXPLICIT file from " << _AFLOWIN_ << " with START/STOP  " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
         if(aurostd::substring2bool(AflowIn,"[ALIEN_INPUT_FILE_EXPLICIT]START") && aurostd::substring2bool(AflowIn,"[ALIEN_INPUT_FILE_EXPLICIT]STOP"))
           aurostd::ExtractToStringstreamEXPLICIT(FileAFLOWIN,xalien.INPUT,"[ALIEN_INPUT_FILE_EXPLICIT]START","[ALIEN_INPUT_FILE_EXPLICIT]STOP");
@@ -153,7 +153,7 @@ namespace ALIEN {
     // EXTERNAL **************************************************
     if(Krun && alienflags.KBIN_ALIEN_INPUT_MODE_EXTERNAL) {  // [ALIEN_INPUT_MODE_EXTERNAL] construction
       string file;
-      aus << XPID << "00000  MESSAGE INPUT  generation EXTERNAL file from " << _AFLOWIN_ << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+      aus << "00000  MESSAGE INPUT  generation EXTERNAL file from " << _AFLOWIN_ << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);  
       if(alienflags.KBIN_ALIEN_INPUT_FILE_COMMAND_FLAG && alienflags.KBIN_ALIEN_INPUT_FILE_FILE_FLAG) {
         aus << "EEEEE   [ALIEN_INPUT_MODE]FILE=  and  [ALIEN_INPUT_MODE]COMMAND=  can not be used together "  << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
@@ -164,11 +164,11 @@ namespace ALIEN {
       if(!alienflags.KBIN_ALIEN_INPUT_FILE_COMMAND_FLAG && (alienflags.KBIN_ALIEN_INPUT_FILE_FILE_FLAG || !alienflags.KBIN_ALIEN_INPUT_FILE_FILE_FLAG)) {
         if(alienflags.KBIN_ALIEN_INPUT_FILE_FILE_FLAG) {
           file=alienflags.KBIN_ALIEN_INPUT_FILE_FILE_VALUE;
-          aus << XPID << "00000  MESSAGE INPUT  generation EXTERNAL from file=" << file << endl;
+          aus << "00000  MESSAGE INPUT  generation EXTERNAL from file=" << file << endl;
           aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);  
         } else {
           file=ALIEN_EXTERNAL_INPUT_DEFAULT;
-          aus << XPID << "00000  MESSAGE INPUT  generation EXTERNAL from DEFAULT file=" << ALIEN_EXTERNAL_INPUT_DEFAULT << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+          aus << "00000  MESSAGE INPUT  generation EXTERNAL from DEFAULT file=" << ALIEN_EXTERNAL_INPUT_DEFAULT << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
           aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);  
         }
         if(!aurostd::FileExist(file)) {
@@ -189,7 +189,7 @@ namespace ALIEN {
       }
       if(alienflags.KBIN_ALIEN_INPUT_FILE_COMMAND_FLAG && !alienflags.KBIN_ALIEN_INPUT_FILE_FILE_FLAG) {
         file=alienflags.KBIN_ALIEN_INPUT_FILE_COMMAND_VALUE;
-        aus << XPID << "00000  MESSAGE INPUT  generation EXTERNAL from command= '" << file << "' " << endl;
+        aus << "00000  MESSAGE INPUT  generation EXTERNAL from command= '" << file << "' " << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);  
         file=file+" > ./_aflow_INPUT."+XHOST.ostrPID.str()+"."+XHOST.ostrTID.str()+".tmp";    // create temp  //CO20200502 - threadID
         aurostd::execute(file);                           // create temp
@@ -220,20 +220,20 @@ namespace ALIEN {
 
     if(!alienflags.KBIN_ALIEN_INPUT_MODE_INPUT_FLAG) {
       xalien.INPUT_FILE_NAME=alienflags.KBIN_ALIEN_INPUT_MODE_INPUT_VALUE;
-      aus << XPID << "00000  MESSAGE INPUT  generation to default filename " << xalien.INPUT_FILE_NAME << "   " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+      aus << "00000  MESSAGE INPUT  generation to default filename " << xalien.INPUT_FILE_NAME << "   " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
     } else {
       xalien.INPUT_FILE_NAME=alienflags.KBIN_ALIEN_INPUT_MODE_INPUT_VALUE;
-      aus << XPID << "00000  MESSAGE INPUT  generation to filename " << xalien.INPUT_FILE_NAME << "   " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+      aus << "00000  MESSAGE INPUT  generation to filename " << xalien.INPUT_FILE_NAME << "   " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
     }
     if(!alienflags.KBIN_ALIEN_OUTPUT_MODE_OUTPUT_FLAG) {
       xalien.OUTPUT_FILE_NAME=alienflags.KBIN_ALIEN_OUTPUT_MODE_OUTPUT_VALUE;
-      aus << XPID << "00000  MESSAGE OUTPUT  generation to default filename " << xalien.OUTPUT_FILE_NAME << "   " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+      aus << "00000  MESSAGE OUTPUT  generation to default filename " << xalien.OUTPUT_FILE_NAME << "   " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
     } else {
       xalien.OUTPUT_FILE_NAME=alienflags.KBIN_ALIEN_OUTPUT_MODE_OUTPUT_VALUE;
-      aus << XPID << "00000  MESSAGE OUTPUT  generation to filename " << xalien.OUTPUT_FILE_NAME << "   " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+      aus << "00000  MESSAGE OUTPUT  generation to filename " << xalien.OUTPUT_FILE_NAME << "   " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
     }
     // done produced and modified
@@ -263,7 +263,7 @@ namespace ALIEN {
     xalien.INPUT_orig << xalien.INPUT.str();
 
     if(Krun && alienflags.KBIN_ALIEN_FORCE_OPTION_SOMETHING) {  // [ALIEN_FORCE_OPTION]FORCE_OPTION_SOMETHING construction
-      aus << XPID << "00000  MESSAGE INPUT   FORCE_OPTION_SOMETHING " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+      aus << "00000  MESSAGE INPUT   FORCE_OPTION_SOMETHING " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);  
       xalien.INPUT.str(std::string());xalien.INPUT.clear();
       // some modification
@@ -279,7 +279,7 @@ namespace ALIEN {
     // INPUT done
     if(Krun && alienflags.KBIN_ALIEN_FORCE_OPTION_NOTUNE==FALSE) {
       if(0) {
-        aus << XPID << "00000  MESSAGE Option XXXXX"  << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+        aus << "00000  MESSAGE Option XXXXX"  << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
         aurostd::PrintErrorStream(FileMESSAGE,aus,XHOST.QUIET);    
       }
     }
