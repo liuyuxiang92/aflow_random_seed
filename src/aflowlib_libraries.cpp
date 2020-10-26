@@ -1013,6 +1013,14 @@ namespace aflowlib {
     //[CO+ME20200825 OBSOLETE]while(directory.size()>0 && directory.at(directory.size()-1)=='/'){directory=directory.substr(0,directory.size()-1);} //CO20200624 - MOVED FROM BELOW
     aurostd::RemoveTrailingCharacter_InPlace(directory,'/');
     if(directory=="." || directory.empty()) {directory=aurostd::getPWD();} //[CO20191112 - OBSOLETE]aurostd::execute2string("pwd")
+    //CO202010213 START - patching so --lib2raw can run from anywhere
+    directory=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(directory);
+    if(directory.empty()){return;}
+    if(directory[0]!='/'){
+      directory=aurostd::getPWD()+"/"+directory;
+      aurostd::StringSubst(directory,"//","/");
+    }
+    //CO202010213 START - patching so --lib2raw can run from anywhere
   }
 }
 
@@ -1309,8 +1317,14 @@ namespace aflowlib {
       aflowlib_data.aurl="aflowlib.duke.edu:"+directory_LIB;
 
       if(true){
-        aurostd::StringSubst(aflowlib_data.aurl,"/mnt/MAIN/STAGING/qrats_finished_runs/LIB6/carbide","common"); //CO20200731 DEBUGGING ONLY
-        aurostd::StringSubst(aflowlib_data.aurl,"/home/corey/common","common"); //CO20200731 DEBUGGING ONLY
+        //aurostd::StringSubst(aflowlib_data.aurl,"/mnt/MAIN/STAGING/qrats_finished_runs/LIB6/carbide","common"); //CO20200731 DEBUGGING ONLY
+        aurostd::StringSubst(aflowlib_data.aurl,XHOST.home+"/common","common"); //CO20200731 DEBUGGING ONLY
+        aurostd::StringSubst(aflowlib_data.aurl,XHOST.home+"/scratch/common","common"); //CO20200731 DEBUGGING ONLY
+        aurostd::StringSubst(aflowlib_data.aurl,XHOST.home+"/SCRATCH/common","common"); //CO20200731 DEBUGGING ONLY
+        aurostd::StringSubst(aflowlib_data.aurl,XHOST.home+"/work/common","common"); //CO20200731 DEBUGGING ONLY
+        aurostd::StringSubst(aflowlib_data.aurl,XHOST.home+"/WORK/common","common"); //CO20200731 DEBUGGING ONLY
+        aurostd::StringSubst(aflowlib_data.aurl,XHOST.home+"/archive/common","common"); //CO20200731 DEBUGGING ONLY
+        aurostd::StringSubst(aflowlib_data.aurl,XHOST.home+"/ARCHIVE/common","common"); //CO20200731 DEBUGGING ONLY
       }
 
       if(LDEBUG){cerr << soliloquy << " aurl(PRE )=" << aflowlib_data.aurl << endl;}

@@ -968,6 +968,12 @@ realclean: clean
 .PHONY: dataclean
 dataclean:
 	rm -f aflow_data aflow_data_*
+datainstall:
+	rm -f aflow_data aflow_data_*
+	make data
+	cp -f aflow_data $(BIN)/
+	ls -las $(BIN)/aflow_data*
+redata: datainstall
 .PHONY: clean_autogen
 clean_autogen:
 	rm -rf aflowlib_webapp_entry.cpp aflowlib_webapp_bands.cpp aflow_chull_jupyter.cpp aflow_chull_jupyter_plotter.cpp aflow_chull_python.cpp aflow_chull_jupyter_requirements.cpp aflow_data_readme.cpp aflow_readme_aflow.cpp aflow_readme_aconvasp.cpp aflow_readme_apennsy.cpp aflow_readme_proto.cpp aflow_xproto_icsd_lib.cpp aflow_matlab_funcs.cpp aflow_gnuplot_funcs.cpp aflow_data_*cpp *.dat

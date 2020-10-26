@@ -57,21 +57,21 @@ namespace KBIN {
       // get (string) kflags.KBIN_QSUB_COMMAND
       if(!aurostd::substring2bool(AflowIn,"[AFLOW_QSUB_MODE]COMMAND=",TRUE)) {
         kflags.KBIN_QSUB_COMMAND=QSUB_COMMAND_DEFAULT;
-        aus << "00000  MESSAGE QSUB: COMMAND string is missing, taking COMMAND=\"" << kflags.KBIN_QSUB_COMMAND << "\"  " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+        aus << XPID << "00000  MESSAGE QSUB: COMMAND string is missing, taking COMMAND=\"" << kflags.KBIN_QSUB_COMMAND << "\"  " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
       } else {
         kflags.KBIN_QSUB_COMMAND=aurostd::RemoveCharacter(aurostd::substring2string(AflowIn,"[AFLOW_QSUB_MODE]COMMAND=",TRUE),'"');
-        aus << "00000  MESSAGE QSUB: found COMMAND=\"" << kflags.KBIN_QSUB_COMMAND << "\"  " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+        aus << XPID << "00000  MESSAGE QSUB: found COMMAND=\"" << kflags.KBIN_QSUB_COMMAND << "\"  " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
       }
       // get (string) kflags.KBIN_QSUB_PARAMS
       if(!aurostd::substring2bool(AflowIn,"[AFLOW_QSUB_MODE]PARAMS=",TRUE)) {
         kflags.KBIN_QSUB_PARAMS=QSUB_PARAMS_DEFAULT;
-        aus << "00000  MESSAGE QSUB: PARAMS string is missing, taking PARAMS=\"" << kflags.KBIN_QSUB_PARAMS << "\"  " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+        aus << XPID << "00000  MESSAGE QSUB: PARAMS string is missing, taking PARAMS=\"" << kflags.KBIN_QSUB_PARAMS << "\"  " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
       } else {
         kflags.KBIN_QSUB_PARAMS=aurostd::RemoveCharacter(aurostd::substring2string(AflowIn,"[AFLOW_QSUB_MODE]PARAMS=",TRUE),'"');
-        aus << "00000  MESSAGE QSUB: found PARAMS=\"" << kflags.KBIN_QSUB_PARAMS << "\"  " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+        aus << XPID << "00000  MESSAGE QSUB: found PARAMS=\"" << kflags.KBIN_QSUB_PARAMS << "\"  " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
       }
 
@@ -84,11 +84,11 @@ namespace KBIN {
       }
       if(Krun && kflags.KBIN_QSUB_MODE_EXPLICIT) {  // [AFLOW_QSUB_MODE_EXPLICIT] construction
         if(kflags.KBIN_QSUB_FILE && !kflags.KBIN_QSUB_MODE_EXPLICIT_START_STOP) {
-          aus << "00000  MESSAGE QSUB   generation EXPLICIT file from " << _AFLOWIN_ << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+          aus << XPID << "00000  MESSAGE QSUB   generation EXPLICIT file from " << _AFLOWIN_ << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
           aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
           aurostd::ExtractToStringstreamEXPLICIT(FileAFLOWIN,xqsub.QSUB,"[AFLOW_QSUB_FILE]");
         } else if(!kflags.KBIN_QSUB_FILE && kflags.KBIN_QSUB_MODE_EXPLICIT_START_STOP) {
-          aus << "00000  MESSAGE QSUB   generation EXPLICIT file from " << _AFLOWIN_ << " with START/STOP  " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+          aus << XPID << "00000  MESSAGE QSUB   generation EXPLICIT file from " << _AFLOWIN_ << " with START/STOP  " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
           aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
           if(aurostd::substring2bool(AflowIn,"[AFLOW_QSUB_MODE_EXPLICIT]START") && aurostd::substring2bool(AflowIn,"[AFLOW_QSUB_MODE_EXPLICIT]STOP"))
             aurostd::ExtractToStringstreamEXPLICIT(FileAFLOWIN,xqsub.QSUB,"[AFLOW_QSUB_MODE_EXPLICIT]START","[AFLOW_QSUB_MODE_EXPLICIT]STOP");
@@ -200,30 +200,30 @@ namespace KBIN {
     ostringstream aus_exec,aus;
     aurostd::StringstreamClean(aus_exec);
     aurostd::StringstreamClean(aus);
-    // if(verbose) aus << "00000  MESSAGE RUN CHECK FINISHED : " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    // if(verbose) aus << XPID << "00000  MESSAGE RUN CHECK FINISHED : " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     // if(verbose) aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     // aflow.qsub.done DOES NOT EXIST
     if(!aurostd::FileExist(aflags.Directory+"/aflow.qsub.done")) {
-      if(verbose) aus << "00000  MESSAGE RUN NOT FINISHED (aflow.qsub.done does not exist) : " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+      if(verbose) aus << XPID << "00000  MESSAGE RUN NOT FINISHED (aflow.qsub.done does not exist) : " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       if(verbose) aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       return FALSE;
     }
     // OTUCAR ESISTS BUT EMPTY
     if(aurostd::FileEmpty(aflags.Directory+"/aflow.qsub.done")) {
-      if(verbose) aus << "00000  MESSAGE RUN NOT FINISHED (aflow.qsub.done is empty) : " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+      if(verbose) aus << XPID << "00000  MESSAGE RUN NOT FINISHED (aflow.qsub.done is empty) : " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       if(verbose) aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       return FALSE;
     }
     // aflow.qsub.done EXISTS
     if(aurostd::substring_present_file(aflags.Directory+"/aflow.qsub.done","DONE",TRUE) ||
         aurostd::substring_present_file(aflags.Directory+"/aflow.qsub.done","done",TRUE)) {
-      if(verbose) aus << "00000  MESSAGE RUN FINISHED (aflow.qsub.done is complete) : " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+      if(verbose) aus << XPID << "00000  MESSAGE RUN FINISHED (aflow.qsub.done is complete) : " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       if(verbose) aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       aurostd::execute(aus_exec);    
       return TRUE;
     }
     aurostd::execute(aus_exec);
-    if(verbose) aus << "00000  MESSAGE RUN NOT FINISHED (aflow.qsub.done is incomplete) : " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    if(verbose) aus << XPID << "00000  MESSAGE RUN NOT FINISHED (aflow.qsub.done is incomplete) : " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     if(verbose) aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 
     return FALSE;
