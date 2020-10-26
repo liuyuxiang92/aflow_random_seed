@@ -1061,28 +1061,43 @@ namespace init {
     if(LDEBUG) cerr << "00000  MESSAGE AFLOW INIT Loading data = [" << str2load << "]";
     if(LDEBUG) cerr.flush();
 
-
     string out;
     string aflow_data_path=aurostd::args2attachedstring(XHOST.argv,"--aflow_data_path=",(string) "");
     if(aflow_data_path=="") {
+      if(LDEBUG) cerr << endl;
+      if(LDEBUG) cerr << soliloquy << " XHOST.hostname=" << XHOST.hostname << endl;
+      if(LDEBUG) cerr << soliloquy << " XHOST.user=" << XHOST.user << endl;
+      if(LDEBUG) cerr << soliloquy << " XHOST.home=" << XHOST.home << endl;
+ 
       if(XHOST.hostname=="nietzsche.mems.duke.edu"&&XHOST.user=="auro"&&aurostd::FileExist(XHOST.home+"/work/AFLOW3/aflow_data")) {  //CO, special SC
-        out=aurostd::execute2string(string(XHOST.home+"/work/AFLOW3/aflow_data")+string(" ")+str2load);
-        if(LDEBUG) cerr << soliloquy << " FOUND " << XHOST.home << "/work/AFLOW3/aflow_data" << endl;
-        //       if(LDEBUG) cerr << soliloquy << " out=" << out << endl; 
-        if(LDEBUG) cerr << soliloquy << " str2load=" << str2load << endl; 
+	if(LDEBUG) cerr << soliloquy << " FOUND " << XHOST.home << "/work/AFLOW3/aflow_data" << endl;
+	//	if(LDEBUG) cerr << soliloquy << " out.length()=" << out.length() << endl;
+ 	out=aurostd::execute2string(XHOST.home+"/work/AFLOW3/aflow_data"+" "+str2load);
+	if(LDEBUG) cerr << soliloquy << " out.length()=" << out.length() << endl;
+	// 	vector<string> vout;aurostd::string2vectorstring(out,vout);
+	// 	if(LDEBUG) cerr << soliloquy << " vout.size()=" << vout.size() << endl;
+	// 	for(uint i=0;i<vout.size();i+=3) {
+	// 	  if(aurostd::substring2bool(vout.at(i),"LIB6") || aurostd::substring2bool(vout.at(i+1),"LIB6") || aurostd::substring2bool(vout.at(i+2),"LIB6")) 
+	// 	    cout << vout.at(i) << "    " << vout.at(i+1) << "    " << vout.at(i+2) << endl;
+	// 	}
+	// 	//       if(LDEBUG) cerr << soliloquy << " out=" << out << endl; 
+	// if(LDEBUG) cerr << soliloquy << " str2load=" << str2load << endl;
+	// exit(0);
       } else {
-        if(LDEBUG) {cerr << soliloquy << " issuing command: " << XHOST.command("aflow_data") << " " << str2load << endl;}
+	//	cerr <<  soliloquy << " [2] " << endl;
+	if(LDEBUG) {cerr << soliloquy << " issuing command: " << XHOST.command("aflow_data") << " " << str2load << endl;}
         out=aurostd::execute2string(XHOST.command("aflow_data")+" "+str2load);
       }
     } else { // cerr << string(aflow_data_path+"/"+XHOST.command("aflow_data")) << endl;
+      //      cerr <<  soliloquy << " [3] " << endl;
       out=aurostd::execute2string(aflow_data_path+"/"+XHOST.command("aflow_data")+" "+str2load);
     }
     if(LDEBUG) cerr << soliloquy << " out.length()=" << out.length() << endl;
     if(LDEBUG) cerr.flush();
     if(LDEBUG) cerr << soliloquy << " XHOST_vLIBS.size()=" << XHOST_vLIBS.size() << endl;
 
-    if((str2load=="vLIBS" || str2load=="XHOST_vLIBS") && XHOST_vLIBS.size()!=3) {
-      for(uint i=0;i<XHOST_vLIBS.size();i++) XHOST_vLIBS.at(i).clear();
+    if((str2load=="vLIBS" || str2load=="XHOST_vLIBS")) { // && XHOST_vLIBS.size()!=3) {
+      if(XHOST_vLIBS.size()) for(uint i=0;i<XHOST_vLIBS.size();i++) XHOST_vLIBS.at(i).clear();
       XHOST_vLIBS.clear();
       XHOST_vLIBS.push_back(vector<string>()); // AURL
       XHOST_vLIBS.push_back(vector<string>()); // AUID
@@ -1092,6 +1107,9 @@ namespace init {
       string aurl,auid,loop;
       bool found=FALSE;
       aurostd::string2vectorstring(out,vout);
+      if(LDEBUG) cerr << soliloquy << " vout.size()=" << vout.size() << endl;
+      // make some checks if it  is divisible by three
+      
       for(uint i=0;i<vout.size();) {
         aurl=vout.at(i++);XHOST_vLIBS.at(0).push_back(aurl); // AURL
         auid=vout.at(i++);XHOST_vLIBS.at(1).push_back(auid); // AUID

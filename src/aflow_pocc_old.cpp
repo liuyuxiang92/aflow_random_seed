@@ -61,7 +61,7 @@ namespace pflow {
 bool POCC_GENERATE_INPUT(ofstream &FileMESSAGE,_aflags &aflags) {
   string soliloquy=XPID+"POCC_GENERATE_INPUT():";
   ostringstream aus;
-  aus << "00000  MESSAGE running POCC_GENERATE_INPUT files " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+  aus << XPID << "00000  MESSAGE running POCC_GENERATE_INPUT files " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
   aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 
   string aflowin=aflags.Directory+"/"+_AFLOWIN_;
@@ -160,7 +160,7 @@ bool POCC_GENERATE_INPUT(ofstream &FileMESSAGE,_aflags &aflags) {
     file_aflowin.close();
   } 
   else {
-    aus << "00000  MESSAGE POCC input file already created " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << XPID << "00000  MESSAGE POCC input file already created " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     return FALSE;
   }
@@ -3485,7 +3485,7 @@ namespace pocc {
           outcar_file = aurostd::CleanFileName(directory + "/ARUN."+vrun.at(i)+"/OUTCAR.static"+XHOST.vext.at(iext));
           if(aurostd::FileExist(outcar_file)) {
             if(LDEBUG) {
-              aus << "00000  MESSAGE POCC OUTCAR file OK: " << outcar_file << " " << endl;
+              aus << XPID << "00000  MESSAGE POCC OUTCAR file OK: " << outcar_file << " " << endl;
             }
             if(LDEBUG) {
               aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -3507,7 +3507,7 @@ namespace pocc {
           doscar_file = aurostd::CleanFileName(directory + "/ARUN."+vrun.at(i)+"/DOSCAR.static"+XHOST.vext.at(iext));
           if(aurostd::FileExist(doscar_file)) {
             if(LDEBUG) {
-              aus << "00000  MESSAGE POCC DOSCAR file OK: " << doscar_file << " " << endl;
+              aus << XPID << "00000  MESSAGE POCC DOSCAR file OK: " << doscar_file << " " << endl;
             }
             if(LDEBUG) {
               aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
