@@ -7940,27 +7940,27 @@ namespace compare{
       vector<xmatrix<double> > rotations;
       getLatticeTransformations(xstr2.lattice,xstr1.lattice,lattices,basis_transformations,rotations);
       
-      if(LDEBUG){
-        for(uint p=0;p<lattices.size();p++){
-          cerr << function_name << " lattice index: " << p << endl;
-          cerr << function_name << " lattice: " << lattices[p] << endl;
-          cerr << function_name << " basis transformation: " << basis_transformations[p] << endl;
-          cerr << function_name << " rotation: " << rotations[p] << endl;
-          cerr << function_name << " determinant: " << aurostd::det(rotations[p]) << endl;
-          cerr << function_name << " identity: " << trasp(rotations[p])*rotations[p] << endl;
-          
-          cerr << function_name << " Apply transformations:" << endl;
-          xstructure test = ChangeBasis(xstr2, basis_transformations[p]);
-          cerr << Getabc_angles(test.lattice,DEGREES) << endl;
-          cerr << function_name << " after CHANGING BASIS: " << test << endl;
-          test = Rotate(test, rotations[p]);
-          cerr << Getabc_angles(test.lattice,DEGREES) << endl;
-          cerr << function_name << " after ROTATING: " << test << endl;
-          test = Rotate(xstr2, rotations[p]);
-          cerr << Getabc_angles(test.lattice,DEGREES) << endl;
-          cerr << "just rotating: " << test << endl; 
-        }
-      }
+      //DX20201026 [OBSOLETE]if(LDEBUG){
+       //DX20201026 [OBSOLETE]for(uint p=0;p<lattices.size();p++){
+       //DX20201026 [OBSOLETE]  cerr << function_name << " lattice index: " << p << endl;
+       //DX20201026 [OBSOLETE]  cerr << function_name << " lattice: " << lattices[p] << endl;
+       //DX20201026 [OBSOLETE]  cerr << function_name << " basis transformation: " << basis_transformations[p] << endl;
+       //DX20201026 [OBSOLETE]  cerr << function_name << " rotation: " << rotations[p] << endl;
+       //DX20201026 [OBSOLETE]  cerr << function_name << " determinant: " << aurostd::det(rotations[p]) << endl;
+       //DX20201026 [OBSOLETE]  cerr << function_name << " identity: " << trasp(rotations[p])*rotations[p] << endl;
+       //DX20201026 [OBSOLETE]  
+       //DX20201026 [OBSOLETE]  cerr << function_name << " Apply transformations:" << endl;
+       //DX20201026 [OBSOLETE]  xstructure test = ChangeBasis(xstr2, basis_transformations[p]);
+       //DX20201026 [OBSOLETE]  cerr << Getabc_angles(test.lattice,DEGREES) << endl;
+       //DX20201026 [OBSOLETE]  cerr << function_name << " after CHANGING BASIS: " << test << endl;
+       //DX20201026 [OBSOLETE]  test = Rotate(test, rotations[p]);
+       //DX20201026 [OBSOLETE]  cerr << Getabc_angles(test.lattice,DEGREES) << endl;
+       //DX20201026 [OBSOLETE]  cerr << function_name << " after ROTATING: " << test << endl;
+       //DX20201026 [OBSOLETE]  test = Rotate(xstr2, rotations[p]);
+       //DX20201026 [OBSOLETE]  cerr << Getabc_angles(test.lattice,DEGREES) << endl;
+       //DX20201026 [OBSOLETE]  cerr << "just rotating: " << test << endl; 
+       //DX20201026 [OBSOLETE]}
+      //DX20201026 [OBSOLETE]}
 
 
       // ---------------------------------------------------------------------------
@@ -8091,8 +8091,26 @@ namespace compare{
               xmatrix<double> matched_basis_transformation = basis_transformations[matched_lattice_index]; //DX20201023 
               xmatrix<double> matched_rotation = rotations[matched_lattice_index]; //DX20201023 
 
-              cerr << "basis transformation: " << matched_basis_transformation << endl;
-              cerr << "matched_rotation: " << matched_rotation << endl;
+              if(LDEBUG){
+                cerr << function_name << " matched basis transformation: " << matched_basis_transformation << endl;
+                cerr << function_name << " matched rotation (R): " << matched_rotation << endl;
+          
+                cerr << function_name << " determinant(R): " << aurostd::det(matched_rotation) << endl;
+                cerr << function_name << " R*R^T==I: " << matched_rotation*trasp(matched_rotation) << endl;
+          
+                cerr << function_name << " Apply transformations:" << endl;
+                xstructure test = ChangeBasis(xstr2, matched_basis_transformation);
+                cerr << function_name << " after CHANGING BASIS: structure: " << test << endl;
+                cerr << function_name << " angles: " << Getabc_angles(test.lattice,DEGREES) << endl;
+                cerr << "-----------------------------------------------------------------" << endl;
+                test = Rotate(test, matched_rotation);
+                cerr << function_name << " after ROTATING: " << test << endl;
+                cerr << function_name << " angles: " << Getabc_angles(test.lattice,DEGREES) << endl;
+                cerr << "-----------------------------------------------------------------" << endl;
+                xstructure rotate_only = Rotate(xstr2, matched_rotation);
+                cerr << function_name << " rotated only (no basis transformation): " << rotate_only << endl;
+                cerr << function_name << " angles: " << Getabc_angles(rotate_only.lattice,DEGREES) << endl;
+              }
 
               // ---------------------------------------------------------------------------
               // quick return if found a match
