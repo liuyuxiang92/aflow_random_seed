@@ -7949,11 +7949,6 @@ namespace compare{
           cerr << function_name << " determinant: " << aurostd::det(rotations[p]) << endl;
           cerr << function_name << " identity: " << trasp(rotations[p])*rotations[p] << endl;
           
-          //xmatrix<double> rotation_only = extractRotationFromBasisChange(rotations[p]);
-          //cerr << function_name << " rotation ONLY: " << rotation_only << endl;
-          //cerr << function_name << " determinant: " << aurostd::det(rotation_only) << endl;
-          //cerr << function_name << " identity: " << trasp(rotation_only)*rotation_only << endl;
-
           cerr << function_name << " Apply transformations:" << endl;
           xstructure test = ChangeBasis(xstr2, basis_transformations[p]);
           cerr << Getabc_angles(test.lattice,DEGREES) << endl;
@@ -8958,6 +8953,8 @@ namespace compare{
      
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string function_name = XPID + "compare::getLatticeTransformations():";
+        
+    xmatrix<double> rotation, deformation;
     
     // ---------------------------------------------------------------------------
     // calculate the metric tensor of the original lattice
@@ -8979,11 +8976,8 @@ namespace compare{
         // convert to new lattice 
         xmatrix<double> lattice_new = basis_transformation*lattice_original;
         
-        //BETA xmatrix<double> tmp_lattice = lattice_new*undo_basis_rotation;
-        //BETA cerr << "tmp_lattice: " << tmp_lattice << endl;
-      
         if(LDEBUG){
-          cerr << "i: " << i << endl; 
+          cerr << function_name << " i: " << i << endl; 
           cerr << function_name << " lattice new: " << lattice_new << endl;
           cerr << function_name << " lattice ideal: " << lattice_ideal << endl;
         
@@ -9008,35 +9002,38 @@ namespace compare{
         //  lattice_new = basis_transformation*lattice_original;
         //}
         basis_transformations.push_back(basis_transformation);
+        
         // ---------------------------------------------------------------------------
         // then rotate to the ideal lattice 
-        //DX20201023 - rotations.push_back(GetRotation(lattice_new,lattice_ideal));
-        xmatrix<double> rotation = trasp(GetRotation(lattice_new,lattice_ideal)); // use trasp for AFLOW convention
+        xmatrix<double> rotation_tmp = trasp(GetRotation(lattice_new,lattice_ideal)); // use trasp for AFLOW convention
 
         // ---------------------------------------------------------------------------
         // since we are rotating to the ideal lattice, the GetRotation() function
         // may incorporated a "deformation" component in the matrix
         // we can differentiate this with a polar decomposition T=R*U
         // T: original matrix, R: pure rotation, U: deformation matrix
-        rotation = extractRotationFromBasisChange(rotation);
+        PolarDecomposition(rotation_tmp, rotation, deformation);
 
         rotations.push_back(rotation);
-        //cerr << "TRANSFORMATION BTWN NEW LATT AND IDEAL: " << GetBasisTransformation(lattice_new,lattice_ideal) << endl;
-        //xmatrix<double> basis_transformation2ideal = GetBasisTransformation(lattice_new,lattice_ideal);
-        //cerr << "ROTATION NEW: " << extractRotationFromBasisChange(basis_transformation2ideal) << endl;
-        //rotations.push_back(aurostd::inverse(lattice_new)*lattice_ideal);
       }
       // ---------------------------------------------------------------------------
       // if the metric tensors ARE equal: simple rotation between lattices
       else{
+        
         if(LDEBUG){
-          cerr << function_name << " Simple rotation only!!!!" << endl;
+          cerr << function_name << " rotation only (no basis transformation)!" << endl;
         }
-        //rotations.push_back(GetRotation(lattice_original,candidate_lattices[i]));
-        rotations.push_back(GetRotation(lattice_original,lattice_ideal));
-        //rotations.push_back(aurostd::inverse(lattice_original)*candidate_lattices[i]); 
-        // should it be this?: rotations.push_back(aurostd::inverse(xstr2.lattice)*xstr1.lattice); 
         basis_transformations.push_back(aurostd::eye<double>());
+        
+        // ---------------------------------------------------------------------------
+        // since we are rotating to the ideal lattice, the GetRotation() function
+        // may incorporated a "deformation" component in the matrix
+        // we can differentiate this with a polar decomposition T=R*U
+        // T: original matrix, R: pure rotation, U: deformation matrix
+        xmatrix<double> rotation_tmp = trasp(GetRotation(lattice_original,lattice_ideal)); // use trasp for AFLOW convention
+        PolarDecomposition(rotation_tmp, rotation, deformation);
+
+        rotations.push_back(rotation);
       }
     }
   }

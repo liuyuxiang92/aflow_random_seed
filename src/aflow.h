@@ -1908,8 +1908,9 @@ void LightCopy(const xstructure&, xstructure&);  //ME20200220
 xmatrix<double> GetBasisTransformation(const xmatrix<double>& lattice_original, const xmatrix<double>& lattice_new); //DX20201015
 xmatrix<double> GetRotation(const xmatrix<double>& lattice_original, const xmatrix<double>& lattice_new); //DX20201015
 xstructure ChangeBasis(const xstructure& xstr, const xmatrix<double>& transformation_matrix); //DX20201015
-
-xmatrix<double> extractRotationFromBasisChange(const xmatrix<double>& transformation_matrix); //DX20201021
+void PolarDecomposition(const xmatrix<double>& transformation_matrix,
+    xmatrix<double>& rotation,
+    xmatrix<double>& deformation); //DX20201026
 
 //CO20180420
 //for stream management with objects

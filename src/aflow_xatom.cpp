@@ -16440,99 +16440,78 @@ xstructure ChangeBasis(const xstructure& xstr, const xmatrix<double>& transforma
 
 }
 
-xmatrix<double> extractRotationFromBasisChange(const xmatrix<double>& transformation_matrix) {
+// **************************************************************************
+// Polar Decomposition //DX20201026 
+// **************************************************************************
+void PolarDecomposition(const xmatrix<double>& transformation_matrix,
+    xmatrix<double>& rotation,
+    xmatrix<double>& deformation) {
   
+  // Decompose a lattice transformation into its rotation and deformation
+  // matrices: T=R*U, 
+  // where T=original matrix, R=rotation, U=deformation.
+  // Procedure:
+  // 1) T^2=trasp(T)*T = trasp(R*U)*(R*U) = trasp(U)*trasp(R)*R*U = trasp(U)*U 
+  //    (since trasp(R)*R=I, i.e. orthogonal matrix)
+  // 2) U = sqrt(trap(U)*U), using diagonalization technique: 
+  //    http://en.wikipedia.org/wiki/Square_root_of_a_matrix#By_diagonalization
+  // 3) R = T*inverse(U)
+  // Following ref: http://www.continuummechanics.org/polardecomposition.html
+
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string function_name = XPID + "extractRotationFromBasisChange():";
+  string function_name = XPID + "PolarDecomposition():";
 
-  //square the matrix
-  xmatrix<double> tmp = trasp(transformation_matrix)*transformation_matrix;
-  //cerr << "tmp: " << tmp << endl;
+  // ---------------------------------------------------------------------------
+  // square the matrix
+  xmatrix<double> T_squared = trasp(transformation_matrix)*transformation_matrix;
+  
+  if(LDEBUG){ cerr << function_name << " T^2: " << T_squared << endl; }
 
-  xvector<double> d;
-  xmatrix<double> v;
-  jacobi(tmp, d, v);
-  //cerr << "d: " << d << endl;
-  //cerr << "v: " << v << endl;
-
-  xmatrix<double> D_sqr = aurostd::eye<double>();
-  D_sqr[1][1] = aurostd::sqrt(d(1));
-  D_sqr[2][2] = aurostd::sqrt(d(2));
-  D_sqr[3][3] = aurostd::sqrt(d(3));
-
-  //cerr << "D_sqrt: " << D_sqr << endl;
-  xmatrix<double> tmp_half = v*D_sqr*aurostd::inverse(v);
-  //attempt2 - xmatrix<double> tmp_half = aurostd::inverse(v)*D_sqr*v;
-
-  //cerr << "tmp_half: " << tmp_half << endl;
-
-  xmatrix<double> tmp_rotation = transformation_matrix*aurostd::inverse(tmp_half);
-  // attempt2 - xmatrix<double> tmp_rotation = aurostd::inverse(tmp_half)*transformation_matrix;
-  //cerr << "tmp_rotation: " << tmp_rotation << endl;
-
-
-  //cerr << "trasp: " << aurostd::trasp(tmp_rotation) << endl;
-  //cerr << "inv: " << aurostd::inverse(tmp_rotation) << endl;
-  //cerr << "orthogonal: " << tmp_rotation*trasp(tmp_rotation) << endl;
-
-
-  //cerr << "Recover tmp?: " << tmp_rotation*tmp_half << endl;
-  return tmp_rotation;
-  //xvector<double> wr;  
-  //xvector<double> wi;  
-  //eigen(tmp,wr,wi);
-  //cerr << "wr: " << wr << endl;
-  //cerr << "wi: " << wi << endl;
-
-  xvector<double> row1, row2, row3;
+  // ---------------------------------------------------------------------------
+  // find square root of matrix via diagonalization method (move to AUROSTD) 
+  xvector<double> diag; //diag: vector of diagonal components
+  xmatrix<double> eigen_vec; //eigen_vec: matrix with eigen vectors as columns
+  
+  // ---------------------------------------------------------------------------
+  // Jacobi
+  jacobi(T_squared, diag, eigen_vec);
 
   if(LDEBUG){
-    cerr << function_name << " transformation matrix:" << endl;
-    cerr << transformation_matrix << endl;
+    cerr << function_name << " diag: " << diag << endl;
+    cerr << function_name << " eigen_vec: " << eigen_vec << endl;
   }
 
-  row1 = transformation_matrix(1); 
-  row2 = transformation_matrix(2); 
-  row3 = transformation_matrix(3);
+  // ---------------------------------------------------------------------------
+  // build diagonal matrix 
+  xmatrix<double> Diag_matrix = aurostd::eye<double>();
+  Diag_matrix[1][1] = aurostd::sqrt(diag(1));
+  Diag_matrix[2][2] = aurostd::sqrt(diag(2));
+  Diag_matrix[3][3] = aurostd::sqrt(diag(3));
 
-  cerr << "row1: " << row1 << endl;
-  cerr << "row2: " << row2 << endl;
-  cerr << "row3: " << row3 << endl;
+  if(LDEBUG){ cerr << function_name << " Diag_matrix: " << Diag_matrix << endl; }
 
-  xvector<double> scale; 
-  scale(1) = aurostd::modulus(row1);
-  scale(2) = aurostd::modulus(row2);
-  scale(3) = aurostd::modulus(row3);
-
-  cerr << "scale: " << scale << endl;
-  cerr << "scale1: " << scale(1) << endl;
-  cerr << "scale2: " << scale(2) << endl;
-  cerr << "scale3: " << scale(3) << endl;
-
-  xmatrix<double> rotation = transformation_matrix;
-
-  cerr << "norm 1: " << transformation_matrix(1)/scale(1) << endl;
-  cerr << "norm 2: " << transformation_matrix(2)/scale(2) << endl;
-  cerr << "norm 3: " << transformation_matrix(3)/scale(3) << endl;
-
- 
-  rotation[1][1] /= scale(1);
-  rotation[1][2] /= scale(1);
-  rotation[1][3] /= scale(1);
-  rotation[2][1] /= scale(2);
-  rotation[2][2] /= scale(2);
-  rotation[2][3] /= scale(2);
-  rotation[3][1] /= scale(3);
-  rotation[3][2] /= scale(3);
-  rotation[3][3] /= scale(3);
-
-  cerr << "rotation: " << rotation << endl;
+  // ---------------------------------------------------------------------------
+  // find deformation (U) via U=v*D*inverse(v); 
+  deformation = eigen_vec*Diag_matrix*aurostd::inverse(eigen_vec);
   
-  cerr << "rotation1: " << rotation(1) << endl;
-  cerr << "rotation2: " << rotation(2) << endl;
-  cerr << "rotation3: " << rotation(3) << endl;
+  if(LDEBUG){ cerr << function_name << " deformation matrix (U): " << deformation << endl; }
 
-  return rotation;
+  // ---------------------------------------------------------------------------
+  // find rotation (R) via R=T*inverse(U) 
+  rotation = transformation_matrix*aurostd::inverse(deformation);
+
+  if(LDEBUG){ cerr << function_name << " rotation matrix (R): " << rotation << endl; }
+  
+  // ---------------------------------------------------------------------------
+  // verify conditions of an orthogonal matrix 
+  if(LDEBUG){
+    // R^T==R^-1
+    cerr << function_name << " transpose(R): " << aurostd::trasp(rotation) << endl;
+    cerr << function_name << " inverse(R): " << aurostd::inverse(rotation) << endl;
+    // R*R^T=I
+    cerr << function_name << " identity (R*R^T=I): " << rotation*trasp(rotation) << endl;
+  }
+
 }
 
 // **************************************************************************
