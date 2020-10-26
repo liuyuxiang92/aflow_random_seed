@@ -3095,6 +3095,39 @@ namespace compare {
     */
     xstr_base = xstr1; xstr_test = xstr2; //DX20201020
 
+    
+
+    /*
+    cerr << xstr_base << endl;
+    xmatrix<double> y_axis_45 = aurostd::eye<double>();
+    y_axis_45[1][1] = 0.707; y_axis_45[1][2] = 0.0; y_axis_45[1][3] = 0.707;
+    y_axis_45[2][1] = 0.0; y_axis_45[2][2] = 1.0; y_axis_45[2][3] = 0.0;
+    y_axis_45[3][1] = -0.707; y_axis_45[3][2] = 0.0; y_axis_45[3][3] = 0.707;
+    xstr_base = Rotate(xstr_base, trasp(y_axis_45));
+    cerr << "ROTATED Y-AXIS 45" << endl;
+    cerr << xstr_base << endl;
+    */
+    /*
+    cerr << xstr_test << endl;
+    xmatrix<double> z_axis_45 = aurostd::eye<double>();
+    z_axis_45[1][1] = 0.707; z_axis_45[1][2] = -0.707; z_axis_45[1][3] = 0.0;
+    z_axis_45[2][1] = 0.707; z_axis_45[2][2] = 0.707; z_axis_45[2][3] = 0.0;
+    z_axis_45[3][1] = 0.0; z_axis_45[3][2] = 0.0; z_axis_45[3][3] = 1.0;
+    xstr_test = Rotate(xstr_test, trasp(z_axis_45));
+    cerr << "ROTATED Z-AXIS 45" << endl;
+    cerr << xstr_test << endl;
+    */
+    /*
+    cerr << xstr_test << endl;
+    xmatrix<double> orient = aurostd::eye<double>();
+    orient[1][1] = 0.99751222; orient[1][2] = 0.0; orient[1][3] = 0.0704938;
+    orient[2][1] = 0.0; orient[2][2] = 1.0; orient[2][3] = 0;
+    orient[3][1] = -0.00704938; orient[3][2] = 0.0; orient[3][3] = 0.9975122;
+    xstr_test = Rotate(xstr_test, trasp(orient));
+    cerr << "ROTATED 4.04" << endl;
+    cerr << xstr_test << endl;
+*/
+
     xstr_base.FixLattices();
     xstr_test.FixLattices();
     xstr_base.ReScale(1.0);
