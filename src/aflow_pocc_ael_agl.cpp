@@ -808,8 +808,6 @@ namespace pocc {
     //run postprocessing
     agl_run_postprocess=( agl_run_postprocess || XHOST.vflag_control.flag("AGL_RUN_POSTPROCESSING") );  //CO20201026
     agl_run_postprocess=( agl_run_postprocess || XHOST.POSTPROCESS );  //CO20201026
-    cerr << agl_run_postprocess << endl;
-    exit(0);
 
     //write extra output (debugging mostly)
     agl_write_full_results=( agl_write_full_results || XHOST.vflag_control.flag("AGL_WRITE_FULL_RESULTS") );
