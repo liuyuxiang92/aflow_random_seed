@@ -2068,39 +2068,39 @@ namespace init {
     nschema++;
 
     // schema is CAPITAL, content is not necessarily //DX20200902
-    XHOST.vschema.push_attached("SCHEMA::NAME:ANRL_LABEL_ORIG","anrl_label_orig");
-    XHOST.vschema.push_attached("SCHEMA::UNIT:ANRL_LABEL_ORIG","");
-    XHOST.vschema.push_attached("SCHEMA::TYPE:ANRL_LABEL_ORIG","string");
+    XHOST.vschema.push_attached("SCHEMA::NAME:AFLOW_PROTOTYPE_LABEL_ORIG","aflow_prototype_label_orig");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AFLOW_PROTOTYPE_LABEL_ORIG","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AFLOW_PROTOTYPE_LABEL_ORIG","string");
     nschema++;
 
     // schema is CAPITAL, content is not necessarily //DX20200902
-    XHOST.vschema.push_attached("SCHEMA::NAME:ANRL_PARAMETER_LIST_ORIG","anrl_parameter_list_orig");
-    XHOST.vschema.push_attached("SCHEMA::UNIT:ANRL_PARAMETER_LIST_ORIG","");
-    XHOST.vschema.push_attached("SCHEMA::TYPE:ANRL_PARAMETER_LIST_ORIG","strings");
+    XHOST.vschema.push_attached("SCHEMA::NAME:AFLOW_PROTOTYPE_PARAMETER_LIST_ORIG","aflow_prototype_parameter_list_orig");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AFLOW_PROTOTYPE_PARAMETER_LIST_ORIG","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AFLOW_PROTOTYPE_PARAMETER_LIST_ORIG","strings");
     nschema++;
 
     // schema is CAPITAL, content is not necessarily //DX20200902
-    XHOST.vschema.push_attached("SCHEMA::NAME:ANRL_PARAMETER_VALUES_ORIG","anrl_parameter_values_orig");
-    XHOST.vschema.push_attached("SCHEMA::UNIT:ANRL_PARAMETER_VALUES_ORIG","");
-    XHOST.vschema.push_attached("SCHEMA::TYPE:ANRL_PARAMETER_VALUES_ORIG","numbers");
+    XHOST.vschema.push_attached("SCHEMA::NAME:AFLOW_PROTOTYPE_PARAMETER_VALUES_ORIG","aflow_prototype_parameter_values_orig");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AFLOW_PROTOTYPE_PARAMETER_VALUES_ORIG","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AFLOW_PROTOTYPE_PARAMETER_VALUES_ORIG","numbers");
     nschema++;
 
     // schema is CAPITAL, content is not necessarily //DX20200902
-    XHOST.vschema.push_attached("SCHEMA::NAME:ANRL_LABEL_RELAX","anrl_label_relax");
-    XHOST.vschema.push_attached("SCHEMA::UNIT:ANRL_LABEL_RELAX","");
-    XHOST.vschema.push_attached("SCHEMA::TYPE:ANRL_LABEL_RELAX","string");
+    XHOST.vschema.push_attached("SCHEMA::NAME:AFLOW_PROTOTYPE_LABEL_RELAX","aflow_prototype_label_relax");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AFLOW_PROTOTYPE_LABEL_RELAX","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AFLOW_PROTOTYPE_LABEL_RELAX","string");
     nschema++;
 
     // schema is CAPITAL, content is not necessarily //DX20200902
-    XHOST.vschema.push_attached("SCHEMA::NAME:ANRL_PARAMETER_LIST_RELAX","anrl_parameter_list_relax");
-    XHOST.vschema.push_attached("SCHEMA::UNIT:ANRL_PARAMETER_LIST_RELAX","");
-    XHOST.vschema.push_attached("SCHEMA::TYPE:ANRL_PARAMETER_LIST_RELAX","strings");
+    XHOST.vschema.push_attached("SCHEMA::NAME:AFLOW_PROTOTYPE_PARAMETER_LIST_RELAX","aflow_prototype_parameter_list_relax");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AFLOW_PROTOTYPE_PARAMETER_LIST_RELAX","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AFLOW_PROTOTYPE_PARAMETER_LIST_RELAX","strings");
     nschema++;
 
     // schema is CAPITAL, content is not necessarily //DX20200902
-    XHOST.vschema.push_attached("SCHEMA::NAME:ANRL_PARAMETER_VALUES_RELAX","anrl_parameter_values_relax");
-    XHOST.vschema.push_attached("SCHEMA::UNIT:ANRL_PARAMETER_VALUES_RELAX","");
-    XHOST.vschema.push_attached("SCHEMA::TYPE:ANRL_PARAMETER_VALUES_RELAX","numbers");
+    XHOST.vschema.push_attached("SCHEMA::NAME:AFLOW_PROTOTYPE_PARAMETER_VALUES_RELAX","aflow_prototype_parameter_values_relax");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AFLOW_PROTOTYPE_PARAMETER_VALUES_RELAX","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AFLOW_PROTOTYPE_PARAMETER_VALUES_RELAX","numbers");
     nschema++;
 
     // schema is CAPITAL, content is not necessarily
