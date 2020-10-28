@@ -189,12 +189,12 @@ namespace aflowlib {
       string Wyckoff_site_symmetries;
       //DX20180823 - added more symmetry info - END
       //DX20190208 - added anrl info - START
-      string anrl_label_orig;
-      string anrl_parameter_list_orig;
-      string anrl_parameter_values_orig;
-      string anrl_label_relax;
-      string anrl_parameter_list_relax;
-      string anrl_parameter_values_relax;
+      string aflow_prototype_label_orig;
+      string aflow_prototype_parameter_list_orig;
+      string aflow_prototype_parameter_values_orig;
+      string aflow_prototype_label_relax;
+      string aflow_prototype_parameter_list_relax;
+      string aflow_prototype_parameter_values_relax;
       //DX20190208 - added anrl info - END
       string pocc_parameters; //CO20200731
       // AGL/AEL

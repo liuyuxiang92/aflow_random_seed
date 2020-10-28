@@ -179,12 +179,12 @@ namespace aflowlib {
     Wyckoff_site_symmetries=b.Wyckoff_site_symmetries;
     //DX20180823 - added more symmetry info - END
     //DX20190209 - added anrl info - START
-    anrl_label_orig=b.anrl_label_orig;
-    anrl_parameter_list_orig=b.anrl_parameter_list_orig;
-    anrl_parameter_values_orig=b.anrl_parameter_values_orig;
-    anrl_label_relax=b.anrl_label_relax;
-    anrl_parameter_list_relax=b.anrl_parameter_list_relax;
-    anrl_parameter_values_relax=b.anrl_parameter_values_relax;
+    aflow_prototype_label_orig=b.aflow_prototype_label_orig;
+    aflow_prototype_parameter_list_orig=b.aflow_prototype_parameter_list_orig;
+    aflow_prototype_parameter_values_orig=b.aflow_prototype_parameter_values_orig;
+    aflow_prototype_label_relax=b.aflow_prototype_label_relax;
+    aflow_prototype_parameter_list_relax=b.aflow_prototype_parameter_list_relax;
+    aflow_prototype_parameter_values_relax=b.aflow_prototype_parameter_values_relax;
     //DX20190209 - added anrl info - END
     pocc_parameters=b.pocc_parameters;  //CO20200731
     // AGL/AEL
@@ -441,12 +441,12 @@ namespace aflowlib {
     Wyckoff_site_symmetries="";
     //DX20180823 - added more symmetry info - END
     //DX20190209 - added anrl info - START
-    anrl_label_orig="";
-    anrl_parameter_list_orig="";
-    anrl_parameter_values_orig="";
-    anrl_label_relax="";
-    anrl_parameter_list_relax="";
-    anrl_parameter_values_relax="";
+    aflow_prototype_label_orig="";
+    aflow_prototype_parameter_list_orig="";
+    aflow_prototype_parameter_values_orig="";
+    aflow_prototype_label_relax="";
+    aflow_prototype_parameter_list_relax="";
+    aflow_prototype_parameter_values_relax="";
     //DX20190209 - added anrl info - END
     pocc_parameters=""; //CO20200731
     // AGL/AEL
@@ -773,12 +773,12 @@ namespace aflowlib {
         else if(keyword=="Wyckoff_site_symmetries") {Wyckoff_site_symmetries=content;}
         //DX20180823 - added more symmetry info - END
         //DX20190209 - added anrl info - START
-        else if(keyword=="anrl_label_orig") {anrl_label_orig=content;}
-        else if(keyword=="anrl_parameter_list_orig") {anrl_parameter_list_orig=content;}
-        else if(keyword=="anrl_parameter_values_orig") {anrl_parameter_values_orig=content;}
-        else if(keyword=="anrl_label_relax") {anrl_label_relax=content;}
-        else if(keyword=="anrl_parameter_list_relax") {anrl_parameter_list_relax=content;}
-        else if(keyword=="anrl_parameter_values_relax") {anrl_parameter_values_relax=content;}
+        else if(keyword=="aflow_prototype_label_orig") {aflow_prototype_label_orig=content;}
+        else if(keyword=="aflow_prototype_parameter_list_orig") {aflow_prototype_parameter_list_orig=content;}
+        else if(keyword=="aflow_prototype_parameter_values_orig") {aflow_prototype_parameter_values_orig=content;}
+        else if(keyword=="aflow_prototype_label_relax") {aflow_prototype_label_relax=content;}
+        else if(keyword=="aflow_prototype_parameter_list_relax") {aflow_prototype_parameter_list_relax=content;}
+        else if(keyword=="aflow_prototype_parameter_values_relax") {aflow_prototype_parameter_values_relax=content;}
         //DX20190209 - added anrl info - END
         else if(keyword=="pocc_parameters") {pocc_parameters=content;}  //CO20200731
         // AGL/AEL
@@ -1076,12 +1076,12 @@ namespace aflowlib {
       oss << "Wyckoff_site_symmetries" << Wyckoff_site_symmetries << (html?"<br>":"") << endl;
       //DX20180823 - added more symmetry info - END
       //DX20190208 - added anrl info - START
-      oss << "anrl_label_orig" << anrl_label_orig << (html?"<br>":"") << endl;
-      oss << "anrl_parameter_list_orig" << anrl_parameter_list_orig << (html?"<br>":"") << endl;
-      oss << "anrl_parameter_values_orig" << anrl_parameter_values_orig << (html?"<br>":"") << endl;
-      oss << "anrl_label_relax" << anrl_label_relax << (html?"<br>":"") << endl;
-      oss << "anrl_parameter_list_relax" << anrl_parameter_list_relax << (html?"<br>":"") << endl;
-      oss << "anrl_parameter_values_relax" << anrl_parameter_values_relax << (html?"<br>":"") << endl;
+      oss << "aflow_prototype_label_orig" << aflow_prototype_label_orig << (html?"<br>":"") << endl;
+      oss << "aflow_prototype_parameter_list_orig" << aflow_prototype_parameter_list_orig << (html?"<br>":"") << endl;
+      oss << "aflow_prototype_parameter_values_orig" << aflow_prototype_parameter_values_orig << (html?"<br>":"") << endl;
+      oss << "aflow_prototype_label_relax" << aflow_prototype_label_relax << (html?"<br>":"") << endl;
+      oss << "aflow_prototype_parameter_list_relax" << aflow_prototype_parameter_list_relax << (html?"<br>":"") << endl;
+      oss << "aflow_prototype_parameter_values_relax" << aflow_prototype_parameter_values_relax << (html?"<br>":"") << endl;
       //DX20190208 - added anrl info - END
       oss << "pocc_parameters" << pocc_parameters << (html?"<br>":"") << endl;  //CO20200731
       // AGL/AEL
@@ -1306,12 +1306,12 @@ namespace aflowlib {
       if(Wyckoff_site_symmetries.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "Wyckoff_site_symmetries=" << Wyckoff_site_symmetries << eendl;
       //DX20180823 - added more symmetry info - END
       //DX20190208 - added anrl info - START
-      if(anrl_label_orig.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "anrl_label_orig=" << anrl_label_orig << eendl;
-      if(anrl_parameter_list_orig.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "anrl_parameter_list_orig=" << anrl_parameter_list_orig << eendl;
-      if(anrl_parameter_values_orig.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "anrl_parameter_values_orig=" << anrl_parameter_values_orig << eendl;
-      if(anrl_label_relax.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "anrl_label_relax=" << anrl_label_relax << eendl;
-      if(anrl_parameter_list_relax.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "anrl_parameter_list_relax=" << anrl_parameter_list_relax << eendl;
-      if(anrl_parameter_values_relax.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "anrl_parameter_values_relax=" << anrl_parameter_values_relax << eendl;
+      if(aflow_prototype_label_orig.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "aflow_prototype_label_orig=" << aflow_prototype_label_orig << eendl;
+      if(aflow_prototype_parameter_list_orig.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "aflow_prototype_parameter_list_orig=" << aflow_prototype_parameter_list_orig << eendl;
+      if(aflow_prototype_parameter_values_orig.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "aflow_prototype_parameter_values_orig=" << aflow_prototype_parameter_values_orig << eendl;
+      if(aflow_prototype_label_relax.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "aflow_prototype_label_relax=" << aflow_prototype_label_relax << eendl;
+      if(aflow_prototype_parameter_list_relax.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "aflow_prototype_parameter_list_relax=" << aflow_prototype_parameter_list_relax << eendl;
+      if(aflow_prototype_parameter_values_relax.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "aflow_prototype_parameter_values_relax=" << aflow_prototype_parameter_values_relax << eendl;
       //DX20190208 - added anrl info - END
       if(pocc_parameters.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "pocc_parameters=" << pocc_parameters << eendl; //CO20200731
       // AGL/AEL
@@ -2840,54 +2840,54 @@ namespace aflowlib {
       //DX20190208 - added anrl info - START
       // ANRL
       //////////////////////////////////////////////////////////////////////////
-      if(anrl_label_orig.size()){
-        sscontent_json << "\"anrl_label_orig\":\"" << anrl_label_orig << "\"";
+      if(aflow_prototype_label_orig.size()){
+        sscontent_json << "\"aflow_prototype_label_orig\":\"" << aflow_prototype_label_orig << "\"";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"anrl_label_orig\":null";
+        if(PRINT_NULL) sscontent_json << "\"aflow_prototype_label_orig\":null";
       }
       vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
       //////////////////////////////////////////////////////////////////////////
-      if(anrl_parameter_list_orig.size()){
-        vector<string> anrl_parameters_vector_orig; aurostd::string2tokens(anrl_parameter_list_orig,anrl_parameters_vector_orig,",");
-        sscontent_json << "\"anrl_parameter_list_orig\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(anrl_parameters_vector_orig,"\""),",") << "]";
+      if(aflow_prototype_parameter_list_orig.size()){
+        vector<string> aflow_prototype_parameters_vector_orig; aurostd::string2tokens(aflow_prototype_parameter_list_orig,aflow_prototype_parameters_vector_orig,",");
+        sscontent_json << "\"aflow_prototype_parameter_list_orig\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(aflow_prototype_parameters_vector_orig,"\""),",") << "]";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"anrl_parameter_list_orig\":null";
+        if(PRINT_NULL) sscontent_json << "\"aflow_prototype_parameter_list_orig\":null";
       }
       vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
       //////////////////////////////////////////////////////////////////////////
-      if(anrl_parameter_values_orig.size()){
-        vector<string> anrl_values_vector_orig; aurostd::string2tokens(anrl_parameter_values_orig,anrl_values_vector_orig,",");
-        sscontent_json << "\"anrl_parameter_values_orig\":[" << aurostd::joinWDelimiter(anrl_values_vector_orig,",") << "]";
+      if(aflow_prototype_parameter_values_orig.size()){
+        vector<string> aflow_prototype_values_vector_orig; aurostd::string2tokens(aflow_prototype_parameter_values_orig,aflow_prototype_values_vector_orig,",");
+        sscontent_json << "\"aflow_prototype_parameter_values_orig\":[" << aurostd::joinWDelimiter(aflow_prototype_values_vector_orig,",") << "]";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"anrl_parameter_values_orig\":null";
+        if(PRINT_NULL) sscontent_json << "\"aflow_prototype_parameter_values_orig\":null";
       }
       vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
       //////////////////////////////////////////////////////////////////////////
-      if(anrl_label_relax.size()){
-        sscontent_json << "\"anrl_label_relax\":\"" << anrl_label_relax << "\"";
+      if(aflow_prototype_label_relax.size()){
+        sscontent_json << "\"aflow_prototype_label_relax\":\"" << aflow_prototype_label_relax << "\"";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"anrl_label_relax\":null";
+        if(PRINT_NULL) sscontent_json << "\"aflow_prototype_label_relax\":null";
       }
       vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
       //////////////////////////////////////////////////////////////////////////
-      if(anrl_parameter_list_relax.size()){
-        vector<string> anrl_parameters_vector_relax; aurostd::string2tokens(anrl_parameter_list_relax,anrl_parameters_vector_relax,",");
-        sscontent_json << "\"anrl_parameter_list_relax\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(anrl_parameters_vector_relax,"\""),",") << "]";
+      if(aflow_prototype_parameter_list_relax.size()){
+        vector<string> aflow_prototype_parameters_vector_relax; aurostd::string2tokens(aflow_prototype_parameter_list_relax,aflow_prototype_parameters_vector_relax,",");
+        sscontent_json << "\"aflow_prototype_parameter_list_relax\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(aflow_prototype_parameters_vector_relax,"\""),",") << "]";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"anrl_parameter_list_relax\":null";
+        if(PRINT_NULL) sscontent_json << "\"aflow_prototype_parameter_list_relax\":null";
       }
       vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
       //////////////////////////////////////////////////////////////////////////
-      if(anrl_parameter_values_relax.size()){
-        vector<string> anrl_values_vector_relax; aurostd::string2tokens(anrl_parameter_values_relax,anrl_values_vector_relax,",");
-        sscontent_json << "\"anrl_parameter_values_relax\":[" << aurostd::joinWDelimiter(anrl_values_vector_relax,",") << "]";
+      if(aflow_prototype_parameter_values_relax.size()){
+        vector<string> aflow_prototype_values_vector_relax; aurostd::string2tokens(aflow_prototype_parameter_values_relax,aflow_prototype_values_vector_relax,",");
+        sscontent_json << "\"aflow_prototype_parameter_values_relax\":[" << aurostd::joinWDelimiter(aflow_prototype_values_vector_relax,",") << "]";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"anrl_parameter_values_relax\":null";
+        if(PRINT_NULL) sscontent_json << "\"aflow_prototype_parameter_values_relax\":null";
       }
       vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
