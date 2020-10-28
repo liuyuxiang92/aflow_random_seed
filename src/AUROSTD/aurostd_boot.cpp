@@ -91,7 +91,7 @@ using aurostd::getElements; //CO20200624
 template<class utype> bool initialize_scalar(utype d) {
   string s="";
   utype u=0;
-  u+=aurostd::string2utype<utype>(aurostd::utype2string<utype>(utype())+aurostd::utype2string<utype>(utype(),int()));
+  u+=aurostd::string2utype<utype>(aurostd::utype2string<utype>(utype())+aurostd::utype2string<utype>(utype(),int())+aurostd::utype2string<utype>(utype(),int(),DEFAULT_STREAM)); //DX20201028 - added third variant containing format
   u+=aurostd::substring2utype<utype>(s,s,1)+aurostd::substring2utype<utype>(s,s,s,1);
   u+=aurostd::substring2utype<utype>(s,s)+aurostd::substring2utype<utype>(s,s,s);
   double o=0;

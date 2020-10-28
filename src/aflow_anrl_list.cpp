@@ -104,7 +104,7 @@ namespace anrl {
     vproto.push_back("AB3_oP16_62_c_cd;2;16;62;4;10;oP16;a,b/a,c/a,x1,z1,x2,z2,x3,y3,z3;D0_11/-;Fe3C/N1Na3;Cementite/N1Na3 (ICSD #165990)"); //DX20201019 - added metal-nitride
     vproto.push_back("A3B7_oP40_62_cd_3c2d;2;40;62;4;20;oP40;a,b/a,c/a,x1,z1,x2,z2,x3,z3,x4,z4,x5,y5,z5,x6,y6,z6,x7,y7,z7;D10_1;C3Cr7;C3Cr7");
     vproto.push_back("A_oP8_62_2c;1;8;62;3;7;oP8;a,b/a,c/a,x1,z1,x2,z2;A_c;alphaNp;alphaNp");
-    vproto.push_back("AB2C_oC16_63_c_2c_c;3;8;63;5;7;oC16;a,b/a,c/a,y1,y2,y3,y4;-/-;SrCuO2/Au1Ca2N1;SrCuO2/Au1Ca2N1 (ICSD #85528)"); //DX20201016 - added metal-nitride
+    vproto.push_back("AB2C_oC16_63_c_2c_c;3;8;63;5;7;oC16;a,b/a,c/a,y1,y2,y3,y4;-/-/-/-;SrCuO2/Au1Ca2N1/Cu1Sn2Sr1/Co1Sn2Tb1;SrCuO2/Au1Ca2N1 (ICSD #85528)/Cu1Sn2Sr1 (ICSD #103110)/Co1Sn2Tb1 (ICSD #240096)"); //DX20201016 - added metal-nitride //DX20201028 - added two metals
     vproto.push_back("A2B_oC12_63_2c_c;2;6;63;4;6;oC12;a,b/a,c/a,y1,y2,y3;C49;ZrSi2;ZrSi2");
     vproto.push_back("AB_oC8_63_c_c;2;4;63;4;5;oC8;a,b/a,c/a,y1,y2;B33/-/-;CrB/-/Al1N1;CrB/-/Al1N1 (ICSD #163951)"); //DX20201019 - added metal-nitride
     vproto.push_back("A_oC4_63_c;1;2;63;3;4;oC4;a,b/a,c/a,y1;A20;alpha-U;alpha-Uranium");
@@ -242,7 +242,7 @@ namespace anrl {
     vproto.push_back("AB2_hP6_194_c_f;2;6;194;4;3;hP6;a,c/a,z2;C7;MoS2;Molybdenite");
     vproto.push_back("A5B2_hP14_194_abdf_f;2;14;194;4;4;hP14;a,c/a,z4,z5;D8_h;W2B5;W2B5");
     vproto.push_back("AB2_hP12_194_f_ah;2;12;194;4;4;hP12;a,c/a,z2,x3;C14;MgZn2;MgZn2 Hexagonal Laves");
-    vproto.push_back("ABC_hP6_194_c_d_a;3;6;194;5;2;hP6;a,c/a;-;LiBC;LiBC");
+    vproto.push_back("ABC_hP6_194_c_d_a;3;6;194;5;2;hP6;a,c/a;-/-;LiBC/Hg1Pb1Yb1;LiBC/Hg1Pb1Yb1 (ICSD #108545)"); //DX20201028 - added metal ternary
     vproto.push_back("A_hP4_194_f;1;4;194;3;3;hP4;a,c/a,z1;-;C;Lonsdaleite");
     vproto.push_back("AB2_hP6_194_c_ad;2;6;194;4;2;hP6;a,c/a;B8_2;Ni2In;Ni2In");
     vproto.push_back("AB3C4_hP16_194_c_af_ef;3;16;194;5;5;hP16;a,c/a,z3,z4,z5;-;AlN3Ti4;AlN3Ti4");
@@ -689,7 +689,7 @@ namespace anrl {
     vproto.push_back("ABC2_tI16_139_e_e_cd;3;8;139;5;4;tI16;a,c/a,z3,z4;-;-;-");
     vproto.push_back("ABC2_tI16_141_a_b_e;3;8;141;5;3;tI16;a,c/a,z3;-;-;-");
     vproto.push_back("A2B_hP3_164_d_a;2;3;164;4;3;hP3;a,c/a,z2;-;-;-");
-    vproto.push_back("A2BC3_hP6_164_d_a_bd;3;6;164;5;4;hP6;a,c/a,z3,z4;-;-;-");
+    vproto.push_back("A2BC3_hP6_164_d_a_bd;3;6;164;5;4;hP6;a,c/a,z3,z4;-/-;-/Bi2La1Li3;-/Bi2La1Li3 (ICSD #616769)"); //DX20201028 - added metal prototype
     vproto.push_back("A2BC3_hP6_164_d_b_ad;3;6;164;5;4;hP6;a,c/a,z3,z4;-;-;-");
     vproto.push_back("A3B_hR4_166_bc_a;2;4;166;4;3;hR4;a,c/a,x3;-/-;-/N3Na1;-/N3Na1 (ICSD #1144)"); //DX20201019 - added metal-nitride
     vproto.push_back("AB3_hR4_166_a_bc;2;4;166;4;3;hR4;a,c/a,x3;-;-;-");
@@ -755,7 +755,7 @@ namespace anrl {
     // binaries
     vproto.push_back("A2B3_cI80_206_ad_e;2;40;206;4;5;cI80;a,x2,x3,y3,z3;-;N2Zn3;N2Zn3 (ICSD #84918)");
     // ternaries
-    vproto.push_back("ABC_oP12_62_c_c_c;3;12;62;5;9;oP12;a,b/a,c/a,x1,z1,x2,z2,x3,z3;-/-;CaLiN/Li1Mg1N1;CaLiN (ICSD #107304)/Li1Mg1N1 (ICSD #93259)"); //DX20201016 - added another metal-nitride system
+    vproto.push_back("ABC_oP12_62_c_c_c;3;12;62;5;9;oP12;a,b/a,c/a,x1,z1,x2,z2,x3,z3;-/-/-/-/-/-/-/-/-/-/-/-/-/-;CaLiN/Li1Mg1N1/Ca1Mg1Sn1/Ni1Sn1Tb1/Co1Dy1Sn1/Nd1Pd1Sn1/Al1Pd1Tb1/Bi1Ca1Li1/Ni1Sc1Sn1/Co1Dy1Sn1/La1Ni1Sn1/La1Ni1Sn1/Ni1Pr1Sn1/Er1Ga1Rh1;CaLiN (ICSD #107304)/Li1Mg1N1 (ICSD #93259)/Ca1Mg1Sn1 (ICSD #42757)/Ni1Sn1Tb1 (ICSD #54301)/Co1Dy1Sn1 (ICSD #54415)/Nd1Pd1Sn1 (ICSD #54460)/Al1Pd1Tb1 (ICSD #54938)/Bi1Ca1Li1 (ICSD #58762)/Ni1Sc1Sn1 (ICSD #105338)/Co1Dy1Sn1 (ICSD #106459)/La1Ni1Sn1 (ICSD #108571)/La1Ni1Sn1 (ICSD #157921)/Ni1Pr1Sn1 (ICSD #157923)/Er1Ga1Rh1 (ICSD #630573)"); //DX20201016 - added another metal-nitride system //DX20201028 - added 12 metal systems
     vproto.push_back("A2B2C_tI10_139_e_e_a;3;5;139;5;4;tI10;a,c/a,z2,z3;-/-/-;Ca2N2Zn/N2Sr2Zn1/Ba2N2Zn1;Ca2N2Zn (ICSD #69049)/N2Sr2Zn1 (ICSD #80376)/Ba2N2Zn1 (ICSD #80377)"); //DX20201016 - added two metal-nitride prototypes
     vproto.push_back("A3BC2_hP6_191_f_a_d;3;6;191;5;2;hP6;a,c/a;-;Na3TaTi2;Na3TaTi2 (ICSD #186418)");
     // -------------------------------------------------------------------------
@@ -851,9 +851,9 @@ namespace anrl {
     vproto.push_back("AB2C_hR4_160_a_2a_a;3;4;160;5;6;hR4;a,c/a,x1,x2,x3,x4;-;Cr1N2W1;Cr1N2W1 (ICSD #84639)");
     vproto.push_back("A2B2C_hP5_164_d_d_a;3;5;164;5;4;hP5;a,c/a,z2,z3;-/-;Li2N2Zr1/Mg2N2Sr1;Li2N2Zr1 (ICSD #16231)/Mg2N2Sr1 (ICSD #410826)");
     vproto.push_back("AB2C2_hP5_164_a_d_d;3;5;164;5;4;hP5;a,c/a,z2,z3;-;Ce1Li2N2;Ce1Li2N2 (ICSD #34003)");
-    vproto.push_back("AB2C_hR4_166_a_c_b;3;4;166;5;3;hR4;a,c/a,x3;-;Cu1N2Ta1;Cu1N2Ta1 (ICSD #71136)");
+    vproto.push_back("AB2C_hR4_166_a_c_b;3;4;166;5;3;hR4;a,c/a,x3;-/-;Cu1N2Ta1/Ba1Cu2Ga1;Cu1N2Ta1 (ICSD #71136)/Ba1Cu2Ga1 (ICSD #615828)"); //DX20201028 - added metal prototype
     vproto.push_back("A3BC3_hP14_176_h_c_h;3;14;176;5;6;hP14;a,c/a,x2,y2,x3,y3;-;Ba3Fe1N3;Ba3Fe1N3 (ICSD #36502)");
-    vproto.push_back("ABC_hP6_186_b_b_a;3;6;186;5;5;hP6;a,c/a,z1,z2,z3;-;N1Na1Sn1;N1Na1Sn1 (ICSD #172471)");
+    vproto.push_back("ABC_hP6_186_b_b_a;3;6;186;5;5;hP6;a,c/a,z1,z2,z3;-/-/-;N1Na1Sn1/Cu1Sn1Ti1/Bi1Cu1Yb1;N1Na1Sn1 (ICSD #172471)/Cu1Sn1Ti1 (ICSD #54657)/Bi1Cu1Yb1 (ICSD #416143)"); //DX20201028 - added two metal prototypes
     vproto.push_back("AB2C_hP8_186_a_ab_b;3;8;186;5;6;hP8;a,c/a,z1,z2,z3,z4;-;Mn1N2W1;Mn1N2W1 (ICSD #80029)");
     vproto.push_back("ABC_hP3_187_a_c_d;3;3;187;5;2;hP3;a,c/a;-;Li1N1Ni1;Li1N1Ni1 (ICSD #247028)");
     vproto.push_back("A5B3C3_hP11_189_dg_g_f;3;11;189;5;5;hP11;a,c/a,x2,x3,x4;-;Li5N3Ni3;Li5N3Ni3 (ICSD #411152)");
@@ -866,6 +866,182 @@ namespace anrl {
     vproto.push_back("A3BC_hP10_194_h_c_a;3;10;194;5;3;hP10;a,c/a,x3;-;Ba3Bi1N1;Ba3Bi1N1 (ICSD #152055)");
     vproto.push_back("AB3C4_hP16_194_c_ae_2f;3;16;194;5;5;hP16;a,c/a,z3,z4,z5;-;Al1N3V4;Al1N3V4 (ICSD #181351)");
     vproto.push_back("AB2C_cF32_227_b_c_a;3;8;227;5;1;cF32;a;-;Cs1N2Nb1;Cs1N2Nb1 (ICSD #72546)");
+
+    // -------------------------------------------------------------------------
+    // metal prototypes (from DX) //DX2021028
+    // -------------------------------------------------------------------------
+    // ternaries
+    vproto.push_back("ABC2_mC16_8_b_2a_2ab;3;8;8;5;18;mC16;a,b/a,c/a,beta,x1,z1,x2,z2,x3,z3,x4,z4,x5,y5,z5,x6,y6,z6;-;Bi1Pb1Pd2;Bi1Pb1Pd2 (ICSD #58830)");
+    vproto.push_back("A2B4C3_mP9_10_m_2n_am;3;9;10;5;12;mP9;a,b/a,c/a,beta,x2,z2,x3,z3,x4,z4,x5,z5;-;Co2Gd4Mg3;Co2Gd4Mg3 (ICSD #417035)");
+    vproto.push_back("A2B5C4_mP11_10_m_a2m_2n;3;11;10;5;14;mP11;a,b/a,c/a,beta,x2,z2,x3,z3,x4,z4,x5,z5,x6,z6;-;Co2In5Zr4;Co2In5Zr4 (ICSD #55578)");
+    vproto.push_back("AB2C2_mP10_11_e_2e_2e;3;10;11;5;14;mP10;a,b/a,c/a,beta,x1,z1,x2,z2,x3,z3,x4,z4,x5,z5;-;Ba1Bi2Pd2;Ba1Bi2Pd2 (ICSD #416299)");
+    vproto.push_back("A2BC2_mP10_11_2e_e_2e;3;10;11;5;14;mP10;a,b/a,c/a,beta,x1,z1,x2,z2,x3,z3,x4,z4,x5,z5;-;Sn2Sr1Zn2;Sn2Sr1Zn2 (ICSD #424108)");
+    vproto.push_back("A2B4C_mP14_11_2e_4e_e;3;14;11;5;18;mP14;a,b/a,c/a,beta,x1,z1,x2,z2,x3,z3,x4,z4,x5,z5,x6,z6,x7,z7;-;Au2In4Yb1;Au2In4Yb1 (ICSD #261042)");
+    vproto.push_back("A2BC2_mC10_12_i_a_i;3;5;12;5;8;mC10;a,b/a,c/a,beta,x2,z2,x3,z3;-;Cu2Eu1Sn2;Cu2Eu1Sn2 (ICSD #182050)");
+    vproto.push_back("ABC_mC12_12_i_i_i;3;6;12;5;10;mC12;a,b/a,c/a,beta,x1,z1,x2,z2,x3,z3;-;Al1Ce1Co1;Al1Ce1Co1 (ICSD #20632)");
+    vproto.push_back("A3B2C2_mC14_12_ai_i_i;3;7;12;5;10;mC14;a,b/a,c/a,beta,x2,z2,x3,z3,x4,z4;-;In3Rh2Sr2;In3Rh2Sr2 (ICSD #410985)");
+    vproto.push_back("A6B2C_mC18_12_3i_i_a;3;9;12;5;12;mC18;a,b/a,c/a,beta,x2,z2,x3,z3,x4,z4,x5,z5;-;Na6Sn2Zn1;Na6Sn2Zn1 (ICSD #260159)");
+    vproto.push_back("A2B5C4_mC22_12_i_a2i_2i;3;11;12;5;14;mC22;a,b/a,c/a,beta,x2,z2,x3,z3,x4,z4,x5,z5,x6,z6;-;Mn2Sn5Yb4;Mn2Sn5Yb4 (ICSD #419134)");
+    vproto.push_back("A3B4C8_mC30_12_ai_hi_2ij;3;15;12;5;16;mC30;a,b/a,c/a,beta,y2,x3,z3,x4,z4,x5,z5,x6,z6,x7,y7,z7;-;Ba3Li4Sn8;Ba3Li4Sn8 (ICSD #240016)");
+    vproto.push_back("A6B2C7_mC30_12_3i_i_a3i;3;15;12;5;18;mC30;a,b/a,c/a,beta,x2,z2,x3,z3,x4,z4,x5,z5,x6,z6,x7,z7,x8,z8;-;Ca6Cu2Sn7;Ca6Cu2Sn7 (ICSD #171243)");
+    vproto.push_back("AB2C2_mC20_15_e_f_f;3;10;15;5;11;mC20;a,b/a,c/a,beta,y1,x2,y2,z2,x3,y3,z3;-;In1Pd2Sr2;In1Pd2Sr2 (ICSD #391432)");
+    vproto.push_back("A2B4C_mC28_15_f_2f_e;3;14;15;5;14;mC28;a,b/a,c/a,beta,y1,x2,y2,z2,x3,y3,z3,x4,y4,z4;-;Na2Sn4Sr1;Na2Sn4Sr1 (ICSD #261117)");
+    vproto.push_back("ABC2_oC16_20_b_a_c;3;8;20;5;8;oC16;a,b/a,c/a,x1,y2,x3,y3,z3;-;Ag1Bi1K2;Ag1Bi1K2 (ICSD #1156)");
+    vproto.push_back("ABC_oP12_33_a_a_a;3;12;33;5;12;oP12;a,b/a,c/a,x1,y1,z1,x2,y2,z2,x3,y3,z3;-;Ce1Pd1Sn1;Ce1Pd1Sn1 (ICSD #106418)");
+    vproto.push_back("ABC_oC12_36_a_a_a;3;6;36;5;9;oC12;a,b/a,c/a,y1,z1,y2,z2,y3,z3;-;Ag1Ce1Sn1;Ag1Ce1Sn1 (ICSD #55819)");
+    vproto.push_back("ABC2_oC32_36_b_2a_2ab;3;16;36;5;17;oC32;a,b/a,c/a,y1,z1,y2,z2,y3,z3,y4,z4,x5,y5,z5,x6,y6,z6;-;Bi1Pb1Pd2;Bi1Pb1Pd2 (ICSD #56278)");
+    vproto.push_back("ABC_oC18_38_ad_be_bd;3;9;38;5;12;oC18;a,b/a,c/a,z1,z2,z3,y4,z4,y5,z5,y6,z6;-;In1Nd1Rh1;In1Nd1Rh1 (ICSD #59430)");
+    vproto.push_back("ABC_oC18_38_bd_be_ad;3;9;38;5;12;oC18;a,b/a,c/a,z1,z2,z3,y4,z4,y5,z5,y6,z6;-;Cu1Dy1In1;Cu1Dy1In1 (ICSD #260992)");
+    vproto.push_back("ABC_oC18_38_be_ad_bd;3;9;38;5;12;oC18;a,b/a,c/a,z1,z2,z3,y4,z4,y5,z5,y6,z6;-;Gd1In1Pd1;Gd1In1Pd1 (ICSD #415506)");
+    vproto.push_back("A10BC3_oP14_47_2q2rs_h_bt;3;14;47;5;9;oP14;a,b/a,c/a,z3,z4,z5,z6,z7,z8;-;Ga10Ni1Pr3;Ga10Ni1Pr3 (ICSD #20663)");
+    vproto.push_back("ABC2_oP8_51_f_e_be;3;8;51;5;6;oP8;a,b/a,c/a,z2,z3,z4;-;In1La1Ni2;In1La1Ni2 (ICSD #106800)");
+    vproto.push_back("A2BC_oP8_51_ae_f_f;3;8;51;5;6;oP8;a,b/a,c/a,z2,z3,z4;-;Co2Ga1La1;Co2Ga1La1 (ICSD #623100)");
+    vproto.push_back("A2BC_oP8_51_af_f_e;3;8;51;5;6;oP8;a,b/a,c/a,z2,z3,z4;-;Co2Dy1In1;Co2Dy1In1 (ICSD #658675)");
+    vproto.push_back("A4BC_oP12_51_afj_e_e;3;12;51;5;8;oP12;a,b/a,c/a,z2,z3,z4,x5,z5;-/-/-;Al4Co1La1/Al4Ce1Co1/In4Rh1Yb1;Al4Co1La1 (ICSD #9986)/Al4Ce1Co1 (ICSD #55598)/In4Rh1Yb1 (ICSD #411393)");
+    vproto.push_back("A3B2C_oP12_51_ak_ef_f;3;12;51;5;8;oP12;a,b/a,c/a,z2,z3,z4,y5,z5;-;Au3Rb2Tl1;Au3Rb2Tl1 (ICSD #249924)");
+    vproto.push_back("AB4C_oP12_51_e_afj_e;3;12;51;5;8;oP12;a,b/a,c/a,z2,z3,z4,x5,z5;-;Ca1In4Rh1;Ca1In4Rh1 (ICSD #410891)");
+    vproto.push_back("ABC_oP12_57_c_d_d;3;12;57;5;8;oP12;a,b/a,c/a,x1,x2,y2,x3,y3;-;Al1Ca1Pd1;Al1Ca1Pd1 (ICSD #370036)");
+    vproto.push_back("AB2C_oP16_57_d_2d_c;3;16;57;5;10;oP16;a,b/a,c/a,x1,x2,y2,x3,y3,x4,y4;-;Bi1K2Sn1;Bi1K2Sn1 (ICSD #107616)");
+    vproto.push_back("AB2C_oP8_59_a_e_b;3;8;59;5;7;oP8;a,b/a,c/a,z1,z2,y3,z3;-;Cu1Ni2Ti1;Cu1Ni2Ti1 (ICSD #628580)");
+    vproto.push_back("A3B3C_oP14_59_ae_ae_b;3;14;59;5;10;oP14;a,b/a,c/a,z1,z2,z3,y4,z4,y5,z5;-;Au3In3Sr1;Au3In3Sr1 (ICSD #245679)");
+    vproto.push_back("AB3C4_oP16_59_b_ae_ef;3;16;59;5;11;oP16;a,b/a,c/a,z1,z2,y3,z3,y4,z4,x5,z5;-/-;Au1K3Sn4/Au1Cs3Pb4;Au1K3Sn4 (ICSD #107444)/Au1Cs3Pb4 (ICSD #107448)");
+    vproto.push_back("AB2C_oP16_62_c_d_c;3;16;62;5;10;oP16;a,b/a,c/a,x1,z1,x2,z2,x3,y3,z3;-/-;Ca1Cd2Pd1/Ga1Pd2Y1;Ca1Cd2Pd1 (ICSD #425509)/Ga1Pd2Y1 (ICSD #602790)");
+    vproto.push_back("ABC2_oP16_62_c_c_d;3;16;62;5;10;oP16;a,b/a,c/a,x1,z1,x2,z2,x3,y3,z3;-;Dy1Ga1Pd2;Dy1Ga1Pd2 (ICSD #656966)");
+    vproto.push_back("ABC_oC12_63_c_c_c;3;6;63;5;6;oC12;a,b/a,c/a,y1,y2,y3;-;Mg1Ni1Tb1;Mg1Ni1Tb1 (ICSD #166874)");
+    vproto.push_back("ABC_oC12_63_c_c_a;3;6;63;5;5;oC12;a,b/a,c/a,y2,y3;-;Pt1Sc1Zn1;Pt1Sc1Zn1 (ICSD #424600)");
+    vproto.push_back("A2BC_oC16_63_f_c_c;3;8;63;5;7;oC16;a,b/a,c/a,y1,y2,y3,z3;-/-/-/-/-/-/-;Al2Co1Y1/Al2Cu1Mg1/Al2Dy1Ni1/Ga2Ni1Sc1/In2Rh1Yb1/Mg2Pd1Sr1/Al2Ce1Pt1;Al2Co1Y1 (ICSD #57645)/Al2Cu1Mg1 (ICSD #57693)/Al2Dy1Ni1 (ICSD #57759)/Ga2Ni1Sc1 (ICSD #103875)/In2Rh1Yb1 (ICSD #152048)/Mg2Pd1Sr1 (ICSD #425493)/Al2Ce1Pt1 (ICSD #658140)");
+    vproto.push_back("ABC2_oC16_63_a_c_g;3;8;63;5;6;oC16;a,b/a,c/a,y2,x3,y3;-/-/-/-;Au1Bi1Li2/Au1Bi1Li2/Au1Bi1Na2/Au1Bi1K2;Au1Bi1Li2 (ICSD #261785)/Au1Bi1Li2 (ICSD #261786)/Au1Bi1Na2 (ICSD #261788)/Au1Bi1K2 (ICSD #380341)");
+    vproto.push_back("ABC2_oC16_63_c_c_2c;3;8;63;5;7;oC16;a,b/a,c/a,y1,y2,y3,y4;-/-/-/-/-;Ba1Cu1Sn2/Co1Ho1Sn2/Ce1Ni1Sn2/Cu1Pr1Sn2/La1Rh1Sn2;Ba1Cu1Sn2 (ICSD #58647)/Co1Ho1Sn2 (ICSD #240098)/Ce1Ni1Sn2 (ICSD #621687)/Cu1Pr1Sn2 (ICSD #628742)/La1Rh1Sn2 (ICSD #641754)");
+    vproto.push_back("AB2C_oC16_63_c_f_c;3;8;63;5;7;oC16;a,b/a,c/a,y1,y2,y3,z3;-/-/-/-;La1Mg2Ni1/Ce1In2Pd1/Ba1In2Ir1/Dy1Ga2Pd1;La1Mg2Ni1 (ICSD #96152)/Ce1In2Pd1 (ICSD #150132)/Ba1In2Ir1 (ICSD #414434)/Dy1Ga2Pd1 (ICSD #600150)");
+    vproto.push_back("A2BC_oC16_63_g_c_c;3;8;63;5;7;oC16;a,b/a,c/a,y1,y2,x3,y3;-;Cd2Cu1Er1;Cd2Cu1Er1 (ICSD #99139)");
+    vproto.push_back("ABC2_oC16_63_c_c_f;3;8;63;5;7;oC16;a,b/a,c/a,y1,y2,y3,z3;-;Eu1Pd1Tl2;Eu1Pd1Tl2 (ICSD #172230)");
+    vproto.push_back("A2B2C_oC20_63_g_2c_a;3;10;63;5;7;oC20;a,b/a,c/a,y2,y3,x4,y4;-;Bi2Cs2Pt1;Bi2Cs2Pt1 (ICSD #658701)");
+    vproto.push_back("A4BC_oC24_63_acf_c_c;3;12;63;5;8;oC24;a,b/a,c/a,y2,y3,y4,y5,z5;-/-;Al4Dy1Ni1/Al4Ni1Tb1;Al4Dy1Ni1 (ICSD #57760)/Al4Ni1Tb1 (ICSD #58060)");
+    vproto.push_back("AB3C2_oC24_63_c_cg_e;3;12;63;5;8;oC24;a,b/a,c/a,y1,y2,x3,x4,y4;-;Ca1Ga3Ni2;Ca1Ga3Ni2 (ICSD #58898)");
+    vproto.push_back("A3BC3_oC28_63_cf_a_cf;3;14;63;5;9;oC28;a,b/a,c/a,y2,y3,y4,z4,y5,z5;-;Co3Ga1Y3;Co3Ga1Y3 (ICSD #10044)");
+    vproto.push_back("ABC2_oC32_63_ac_f_2cf;3;16;63;5;10;oC32;a,b/a,c/a,y2,y3,y4,y5,z5,y6,z6;-;La1Rh1Sn2;La1Rh1Sn2 (ICSD #410732)");
+    vproto.push_back("A2B2C_oC10_65_j_i_a;3;5;65;5;5;oC10;a,b/a,c/a,y2,y3;-;Ho2Ni2Pb1;Ho2Ni2Pb1 (ICSD #54612)");
+    vproto.push_back("A2B3C_oC12_65_i_cf_a;3;6;65;5;4;oC12;a,b/a,c/a,y4;-;Al2Ni3Pr1;Al2Ni3Pr1 (ICSD #107864)");
+    vproto.push_back("A3B2C2_oC14_65_aj_j_i;3;7;65;5;6;oC14;a,b/a,c/a,y2,y3,y4;-;Mg3Ni2Tb2;Mg3Ni2Tb2 (ICSD #240761)");
+    vproto.push_back("A2BC_oC16_65_aci_j_i;3;8;65;5;6;oC16;a,b/a,c/a,y3,y4,y5;-;Ga2Nd1Ni1;Ga2Nd1Ni1 (ICSD #103850)");
+    vproto.push_back("A2BC6_oC18_65_j_a_2ij;3;9;65;5;7;oC18;a,b/a,c/a,y2,y3,y4,y5;-;Dy2Ni1Sn6;Dy2Ni1Sn6 (ICSD #165783)");
+    vproto.push_back("A3B2C7_oC24_65_aj_i_c2ij;3;12;65;5;8;oC24;a,b/a,c/a,y3,y4,y5,y6,y7;-/-;Ce3Ni2Sn7La3Ni2Sn7;Ce3Ni2Sn7 (ICSD #102239)/La3Ni2Sn7 (ICSD #160913)");
+    vproto.push_back("A2B2C_oI10_71_f_h_a;3;5;71;5;5;oI10;a,b/a,c/a,x2,y3;-/-;Ce2Ni2Sn1/Ca2Cu2Ga1;Ce2Ni2Sn1 (ICSD #55495)/Ca2Cu2Ga1 (ICSD #58885)");
+    vproto.push_back("A2B2C3_oI14_71_e_f_af;3;7;71;5;6;oI14;a,b/a,c/a,x2,x3,x4;-;Al2Sn2Sr3;Al2Sn2Sr3 (ICSD #9564)");
+    vproto.push_back("A5B2C_oI16_71_an_e_d;3;8;71;5;6;oI16;a,b/a,c/a,x3,x4,y4;-;Al5Ni2Pr1;Al5Ni2Pr1 (ICSD #58046)");
+    vproto.push_back("A4B3C4_oI22_71_n_af_eg;3;11;71;5;8;oI22;a,b/a,c/a,x2,x3,y4,x5,y5;-/-;Ag8Ce6Sn8/Ag8Pr6Sn8;Ag8Ce6Sn8 (ICSD #55826)/Ag8Pr6Sn8 (ICSD #55827)");
+    vproto.push_back("A4B3C4_oI22_71_n_af_eh;3;11;71;5;8;oI22;a,b/a,c/a,x2,x3,y4,x5,y5;-;Ag4Dy3Sn4;Ag4Dy3Sn4 (ICSD #156968)");
+    vproto.push_back("A3B4C4_oI22_71_af_eh_n;3;11;71;5;8;oI22;a,b/a,c/a,x2,x3,y4,x5,y5;-;La3Pd4Zn4;La3Pd4Zn4 (ICSD #182774)");
+    vproto.push_back("A6B6C_oI26_71_hk_efg_a;3;13;71;5;7;oI26;a,b/a,c/a,x2,x3,y4,y5;-;Fe6Ga6Sc1;Fe6Ga6Sc1 (ICSD #103465)");
+    vproto.push_back("A3B3C8_oI28_71_cg_be_2n;3;14;71;5;9;oI28;a,b/a,c/a,x3,y4,x5,y5,x6,y6;-/-;Ag3Er3Ga8/Au3Er3Ga8;Ag3Er3Ga8 (ICSD #605107)/Au3Er3Ga8 (ICSD #611824)");
+    vproto.push_back("A3B10C_oI28_71_be_g2n_c;3;14;71;5;9;oI28;a,b/a,c/a,x3,y4,x5,y5,x6,y6;-;Ba3Hg10In1;Ba3Hg10In1 (ICSD #290305)");
+    vproto.push_back("A6B5C3_oI28_71_gn_cn_be;3;14;71;5;9;oI28;a,b/a,c/a,x3,y4,x5,y5,x6,y6;-;Cu6Sn5Yb3;Cu6Sn5Yb3 (ICSD #413485)");
+    vproto.push_back("A9B3C2_oI28_71_c2n_be_g;3;14;71;5;9;oI28;a,b/a,c/a,x3,y4,x5,y5,x6,y6;-;Ga9Ho3Pd2;Ga9Ho3Pd2 (ICSD #634397)");
+    vproto.push_back("A8B3C3_oI28_71_2n_be_cg;3;14;71;5;9;oI28;a,b/a,c/a,x3,y4,x5,y5,x6,y6;-;Ga8Ho3Ir3;Ga8Ho3Ir3 (ICSD #634379)");
+    vproto.push_back("A2B2C_oI20_72_j_j_a;3;10;72;5;7;oI20;a,b/a,c/a,x2,y2,x3,y3;-;Ba2Bi2Zn1;Ba2Bi2Zn1 (ICSD #421424)");
+    vproto.push_back("ABC3_tI10_107_a_a_ab;3;5;107;5;6;tI10;a,c/a,z1,z2,z3,z4;-;Ba1Ni1Sn3;Ba1Ni1Sn3 (ICSD #58662)");
+    vproto.push_back("A3BC_tI10_107_ab_a_a;3;5;107;5;6;tI10;a,c/a,z1,z2,z3,z4;-;Al3Cu1Pr1;Al3Cu1Pr1 (ICSD #290390)");
+    vproto.push_back("A3BC_tI10_119_bf_a_c;3;5;119;5;3;tI10;a,c/a,z4;-;In3Mg1Sr1;In3Mg1Sr1 (ICSD #249592)");
+    vproto.push_back("AB4C2_tI28_120_d_i_e;3;14;120;5;6;tI28;a,c/a,x2,x3,y3,z3;-;Ce1Ni4Sn2;Ce1Ni4Sn2 (ICSD #102238)");
+    vproto.push_back("A4B6C_tI22_121_i_ci_a;3;11;121;5;6;tI22;a,c/a,x3,z3,x4,z4;-;Ru4Sn6Y1;Ru4Sn6Y1 (ICSD #54354)");
+    vproto.push_back("AB2C_tP4_123_b_h_a;3;4;123;5;3;tP4;a,c/a,z3;-;Cd1Pt2Zn1;Cd1Pt2Zn1 (ICSD #102057)");
+    vproto.push_back("AB4C_tP6_123_b_i_a;3;6;123;5;3;tP6;a,c/a,z3;-;Co1Ga4Hf1;Co1Ga4Hf1 (ICSD #623081)");
+    vproto.push_back("ABC5_tP7_123_a_b_ci;3;7;123;5;3;tP7;a,c/a,z4;-;Ce1Co1In5;Ce1Co1In5 (ICSD #102108)");
+    vproto.push_back("AB5C_tP7_123_a_ci_b;3;7;123;5;3;tP7;a,c/a,z4;-;Co1In5Tb1;Co1In5Tb1 (ICSD #623944)");
+    vproto.push_back("AB6C_tP8_123_a_hi_b;3;8;123;5;4;tP8;a,c/a,z3,z4;-;Ce1Ga6Pd1;Ce1Ga6Pd1 (ICSD #240161)");
+    vproto.push_back("AB8C2_tP11_123_a_ehi_g;3;11;123;5;5;tP11;a,c/a,z3,z4,z5;-/-;Co1Ga8Ho2/Fe1Ga8Ho2;Co1Ga8Ho2 (ICSD #42426)/Fe1Ga8Ho2 (ICSD #180132)");
+    vproto.push_back("A2BC2_tP10_127_g_a_h;3;10;127;5;4;tP10;a,c/a,x2,x3;-;Ni2Sn1Zr2;Ni2Sn1Zr2 (ICSD #54303)");
+    vproto.push_back("AB2C2_tP10_127_a_g_h;3;10;127;5;4;tP10;a,c/a,x2,x3;-;Al1Cu2Re2;Al1Cu2Re2 (ICSD #57706)");
+    vproto.push_back("ABC_tP6_129_b_c_c;3;6;129;5;4;tP6;a,c/a,z2,z3;-;Mn1Sn1Sr1;Mn1Sn1Sr1 (ICSD #66951)");
+    vproto.push_back("ABC_tP6_129_c_c_a;3;6;129;5;4;tP6;a,c/a,z2,z3;-;Bi1K1Mn1;Bi1K1Mn1 (ICSD #601586)");
+    vproto.push_back("ABC_tP6_129_a_c_c;3;6;129;5;4;tP6;a,c/a,z2,z3;-;Ba1Mg1Pb1;Ba1Mg1Pb1 (ICSD #615958)");
+    vproto.push_back("A2BC_tP8_129_bc_c_a;3;8;129;5;4;tP8;a,c/a,z3,z4;-/-;Sn2Tb1Zn1/Bi2La1Li1;Sn2Tb1Zn1 (ICSD #163425)/Bi2La1Li1 (ICSD #415728)");
+    vproto.push_back("AB2C2_tP10_129_c_ac_bc;3;10;129;5;5;tP10;a,c/a,z3,z4,z5;-;Nd1Ni2Sn2;Nd1Ni2Sn2 (ICSD #160053)");
+    vproto.push_back("AB2C2_tP10_129_c_bc_ac;3;10;129;5;5;tP10;a,c/a,z3,z4,z5;-;Eu1Sn2Zn2;Eu1Sn2Zn2 (ICSD #162267)");
+    vproto.push_back("A2BC2_tP10_129_bc_c_ac;3;10;129;5;5;tP10;a,c/a,z3,z4,z5;-;Bi2Ce1Ni2;Bi2Ce1Ni2 (ICSD #616562)");
+    vproto.push_back("A2BC4_tP14_129_ac_b_j;3;14;129;5;5;tP14;a,c/a,z3,x4,z4;-;Ce2Ru1Zn4;Ce2Ru1Zn4 (ICSD #418547)");
+    vproto.push_back("AB2C_tI8_139_b_d_a;3;4;139;5;2;tI8;a,c/a;-;Li1Pd2Tl1;Li1Pd2Tl1 (ICSD #54365)");
+    vproto.push_back("A2BC2_tI10_139_d_a_e;3;5;139;5;3;tI10;a,c/a,z3;-/-;Al2Ce1Ga2/Al2Ca1Zn2;Al2Ce1Ga2 (ICSD #55789)/Al2Ca1Zn2 (ICSD #57550)");
+    vproto.push_back("ABC_tI12_139_c_e_e;3;6;139;5;4;tI12;a,c/a,z2,z3;-;Mg1Pr1Sn1;Mg1Pr1Sn1 (ICSD #182479)");
+    vproto.push_back("ABC_tI12_139_e_c_e;3;6;139;5;4;tI12;a,c/a,z2,z3;-/-;Dy1Mg1Sn1/Au1Cu1Sn1;Dy1Mg1Sn1 (ICSD #183524)/Au1Cu1Sn1 (ICSD #611768)");
+    vproto.push_back("A4B2C_tI14_139_h_d_a;3;7;139;5;3;tI14;a,c/a,x3;-;Al4Mo2Yb1;Al4Mo2Yb1 (ICSD #456)");
+    vproto.push_back("AB4C2_tI14_139_a_h_d;3;7;139;5;3;tI14;a,c/a,x3;-;Er1Ga4Ti2;Er1Ga4Ti2 (ICSD #630579)");
+    vproto.push_back("A5B2C_tI16_139_bg_e_a;3;8;139;5;4;tI16;a,c/a,z3,z4;-;Al5Ni2Zr1;Al5Ni2Zr1 (ICSD #58084)");
+    vproto.push_back("A2BC_tI16_139_ce_e_d;3;8;139;5;4;tI16;a,c/a,z3,z4;-;Bi2Sr1Zn1;Bi2Sr1Zn1 (ICSD #41924)");
+    vproto.push_back("AB2C_tI16_139_e_ce_d;3;8;139;5;4;tI16;a,c/a,z3,z4;-/-;Ba1Bi2Cd1/Ba1Bi2Zn1;Ba1Bi2Cd1 (ICSD #58635)/Ba1Bi2Zn1 (ICSD #58638)");
+    vproto.push_back("A2BC_tI16_139_ce_d_e;3;8;139;5;4;tI16;a,c/a,z3,z4;-;Bi2Cd1Sr1;Bi2Cd1Sr1 (ICSD #58764)");
+    vproto.push_back("A2B5C3_tI20_139_e_bg_ae;3;10;139;5;5;tI20;a,c/a,z3,z4,z5;-;K2Mg5Sn3;K2Mg5Sn3 (ICSD #421342)");
+    vproto.push_back("A8BC4_tI26_139_ij_a_f;3;13;139;5;4;tI26;a,c/a,x3,x4;-;Al8Ca1Cu4;Al8Ca1Cu4 (ICSD #57539)");
+    vproto.push_back("A4B8C_tI26_139_i_fj_a;3;13;139;5;4;tI26;a,c/a,x3,x4;-;Cr4Fe8Y1;Cr4Fe8Y1 (ICSD #168240)");
+    vproto.push_back("A8B4C_tI26_139_ij_f_a;3;13;139;5;4;tI26;a,c/a,x3,x4;-;Al8Mn4Y1;Al8Mn4Y1 (ICSD #57997)");
+    vproto.push_back("ABC4_tI24_140_a_c_l;3;12;140;5;4;tI24;a,c/a,x3,z3;-;Ir1Li1Sn4;Ir1Li1Sn4 (ICSD #172149)");
+    vproto.push_back("A2BC4_tI28_140_h_a_k;3;14;140;5;5;tI28;a,c/a,x2,x3,y3;-;Bi2Mn1Ti4;Bi2Mn1Ti4 (ICSD #150145)");
+    vproto.push_back("A4B2C_tI28_140_l_h_a;3;14;140;5;5;tI28;a,c/a,x2,x3,z3;-;Cu4Sn2Sr1;Cu4Sn2Sr1 (ICSD #182104)");
+    vproto.push_back("AB5C2_tI32_140_a_cl_h;3;16;140;5;5;tI32;a,c/a,x3,x4,z4;-;Bi1Er5Pt2;Bi1Er5Pt2 (ICSD #107217)");
+    vproto.push_back("A3B4C_tI32_140_ah_l_c;3;16;140;5;5;tI32;a,c/a,x3,x4,z4;-;Bi3In4Pb1;Bi3In4Pb1 (ICSD #616725)");
+    vproto.push_back("AB5C2_tI32_140_a_bk_h;3;16;140;5;5;tI32;a,c/a,x3,x4,y4;-;Ga1Nb5Sn2;Ga1Nb5Sn2 (ICSD #103842)");
+    vproto.push_back("A2BC5_tI32_140_h_a_cl;3;16;140;5;5;tI32;a,c/a,x3,x4,z4;-;Au2Bi1Tb5;Au2Bi1Tb5 (ICSD #156956)");
+    vproto.push_back("AB2C5_tI32_140_a_h_cl;3;16;140;5;5;tI32;a,c/a,x3,x4,z4;-;Bi1Co2Ho5;Bi1Co2Ho5 (ICSD #161658)");
+    vproto.push_back("A4B7C3_hR14_146_ab_a2b_b;3;14;146;5;16;hR14;a,c/a,x1,x2,x3,y3,z3,x4,y4,z4,x5,y5,z5,x6,y6,z6;-;Ga4Pd7Zn3;Ga4Pd7Zn3 (ICSD #103911)");
+    vproto.push_back("ABC_hP9_156_3a_b2c_2bc;3;9;156;5;11;hP9;a,c/a,z1,z2,z3,z4,z5,z6,z7,z8,z9;-;Ca1Li1Sn1;Ca1Li1Sn1 (ICSD #58911)");
+    vproto.push_back("A5BC4_hR10_160_5a_a_4a;3;10;160;5;12;hR10;a,c/a,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10;-;Li5Na1Sn4;Li5Na1Sn4 (ICSD #12142)");
+    vproto.push_back("A2BC_hR4_166_c_b_a;3;4;166;5;3;hR4;a,c/a,x3;-;Cu2Ga1Sr1;Cu2Ga1Sr1 (ICSD #102938)");
+    vproto.push_back("AB2C4_hR7_166_a_c_2c;3;7;166;5;5;hR7;a,c/a,x2,x3,x4;-;Au1Ni2Sn4;Au1Ni2Sn4 (ICSD #150127)");
+    vproto.push_back("AB4C6_hR11_166_a_2c_h;3;11;166;5;6;hR11;a,c/a,x2,x3,x4,z4;-;Gd1Sn4Ti6;Gd1Sn4Ti6 (ICSD #166193)");
+    vproto.push_back("A2BC_hR12_166_h_bc_ac;3;12;166;5;6;hR12;a,c/a,x3,x4,x5,z5;-;Al2Cu1Yb1;Al2Cu1Yb1 (ICSD #604213)");
+    vproto.push_back("A7B3C2_hR12_166_bh_ac_c;3;12;166;5;6;hR12;a,c/a,x3,x4,x5,z5;-;Al7Ca3Cu2;Al7Ca3Cu2 (ICSD #57538)");
+    vproto.push_back("AB2C9_hR12_166_a_c_bch;3;12;166;5;6;hR12;a,c/a,x3,x4,x5,z5;-;La1Mg2Ni9;La1Mg2Ni9 (ICSD #55614)");
+    vproto.push_back("A9B2C_hR12_166_eh_c_a;3;12;166;5;5;hR12;a,c/a,x2,x4,z4;-;Ni3Ti0.67Zr0.33;Ni3Ti0.67Zr0.33 (ICSD #646978)");
+    vproto.push_back("AB2C_hR12_166_bc_h_ac;3;12;166;5;6;hR12;a,c/a,x3,x4,x5,z5;-;Ag1Al2Pr1;Ag1Al2Pr1 (ICSD #604688)");
+    vproto.push_back("A2B7C3_hR12_166_c_bh_ac;3;12;166;5;6;hR12;a,c/a,x3,x4,x5,z5;-;Ag2Al7Ca3;Ag2Al7Ca3 (ICSD #104173)");
+    vproto.push_back("A7B4C2_hR13_166_ah_2c_c;3;13;166;5;7;hR13;a,c/a,x2,x3,x4,x5,z5;-;Au7Rb4Sn2;Au7Rb4Sn2 (ICSD #58581)");
+    vproto.push_back("A3B2C2_hR14_166_3c_2c_abc;3;14;166;5;8;hR14;a,c/a,x3,x4,x5,x6,x7,x8;-;Au3Sn2Yb2;Au3Sn2Yb2 (ICSD #710044)");
+    vproto.push_back("ABC_hP6_186_b_a_b;3;6;186;5;5;hP6;a,c/a,z1,z2,z3;-/-;Au1Pr1Sn1/Bi1Li1Zn1;Au1Pr1Sn1 (ICSD #54997)/Bi1Li1Zn1 (ICSD #100115)");
+    vproto.push_back("ABC_hP6_186_a_b_b;3;6;186;5;5;hP6;a,c/a,z1,z2,z3;-;Ca1Sn1Zn1;Ca1Sn1Zn1 (ICSD #106358)");
+    vproto.push_back("A4BC_hP12_186_ac_b_b;3;12;186;5;7;hP12;a,c/a,z1,z2,z3,x4,z4;-;Cu4In1Mn1;Cu4In1Mn1 (ICSD #424277)");
+    vproto.push_back("A3BC4_hP16_186_a2b_b_2a2b;3;16;186;5;10;hP16;a,c/a,z1,z2,z3,z4,z5,z6,z7,z8;-;Au3Li1Sn4;Au3Li1Sn4 (ICSD #412207)");
+    vproto.push_back("ABC_hP6_187_i_h_ab;3;6;187;5;4;hP6;a,c/a,z3,z4;-;Au1Ga1Zr1;Au1Ga1Zr1 (ICSD #156264)");
+    vproto.push_back("A4BC_hP6_187_hi_b_a;3;6;187;5;4;hP6;a,c/a,z3,z4;-;Ga4Li1Y1;Ga4Li1Y1 (ICSD #98666)");
+    vproto.push_back("ABC_hP9_187_dh_ai_eg;3;9;187;5;5;hP9;a,c/a,z4,z5,z6;-;Ca1Li1Pb1;Ca1Li1Pb1 (ICSD #409533)");
+    vproto.push_back("ABC_hP9_187_eh_ci_bg;3;9;187;5;5;hP9;a,c/a,z4,z5,z6;-;Li1Pb1Yb1;Li1Pb1Yb1 (ICSD #409534)");
+    vproto.push_back("A5B5C_hP11_187_hk_cgi_a;3;11;187;5;6;hP11;a,c/a,z3,z4,z5,x6;-;Al5Ba5Pb1;Al5Ba5Pb1 (ICSD #416337)");
+    vproto.push_back("A4B6C_hP11_187_ck_jk_a;3;11;187;5;5;hP11;a,c/a,x3,x4,x5;-;Au4In6K1;Au4In6K1 (ICSD #249520)");
+    vproto.push_back("A3B2C3_hP8_189_f_c_g;3;8;189;5;4;hP8;a,c/a,x2,x3;-;In3Rh2Ti3;In3Rh2Ti3 (ICSD #410967)");
+    vproto.push_back("ABC_hP9_189_g_f_ad;3;9;189;5;4;hP9;a,c/a,x3,x4;-;Bi1Dy1Rh1;Bi1Dy1Rh1 (ICSD #51845)");
+    vproto.push_back("AB2C6_hP9_189_b_c_fg;3;9;189;5;4;hP9;a,c/a,x3,x4;-;Co1Ga2Zr6;Co1Ga2Zr6 (ICSD #20876)");
+    vproto.push_back("A5B3C_hP9_189_cf_g_b;3;9;189;5;4;hP9;a,c/a,x3,x4;-;Ga5Lu3Ni1;Ga5Lu3Ni1 (ICSD #634575)");
+    vproto.push_back("ABC_hP9_189_bc_g_f;3;9;189;5;4;hP9;a,c/a,x3,x4;-/-;Ni1Pr1Zn1/Pd1Tb1Tl1;Ni1Pr1Zn1 (ICSD #54295)/Pd1Tb1Tl1 (ICSD #105713)");
+    vproto.push_back("A2BC6_hP9_189_c_b_fg;3;9;189;5;4;hP9;a,c/a,x3,x4;-;Bi2Fe1Ho6;Bi2Fe1Ho6 (ICSD #96253)");
+    vproto.push_back("ABC_hP9_189_g_bc_f;3;9;189;5;4;hP9;a,c/a,x3,x4;-/-;Pb1Pd1Y1/Hf1Ir1Sn1;Pb1Pd1Y1 (ICSD #54315)/Hf1Ir1Sn1 (ICSD #638586)");
+    vproto.push_back("ABC_hP9_189_f_bc_g;3;9;189;5;4;hP9;a,c/a,x3,x4;-/-;Mg1Sn1Yb1/Ga1Ni1Ti1;Mg1Sn1Yb1 (ICSD #54344)/Ga1Ni1Ti1 (ICSD #103885)");
+    vproto.push_back("ABC_hP9_189_f_ad_g;3;9;189;5;4;hP9;a,c/a,x3,x4;-;Dy1In1Mg1;Dy1In1Mg1 (ICSD #55102)");
+    vproto.push_back("ABC_hP9_189_g_f_bc;3;9;189;5;4;hP9;a,c/a,x3,x4;-;Dy1In1Ni1;Dy1In1Ni1 (ICSD #55846)");
+    vproto.push_back("ABC_hP9_189_f_g_bc;3;9;189;5;4;hP9;a,c/a,x3,x4;-/-/-;Al1Dy1Ni1/Al1Hf1Pt1/Al1Nd1Ni1;Al1Dy1Ni1 (ICSD #107416)/Al1Hf1Pt1 (ICSD #608141)/Al1Nd1Ni1 (ICSD #608770)");
+    vproto.push_back("ABC_hP9_189_ad_g_f;3;9;189;5;4;hP9;a,c/a,x3,x4;-;Al1Mg1Y1;Al1Mg1Y1 (ICSD #160908)");
+    vproto.push_back("ABC_hP9_189_bc_f_g;3;9;189;5;4;hP9;a,c/a,x3,x4;-;Cu1In1Tb1;Cu1In1Tb1 (ICSD #628137)");
+    vproto.push_back("A3B2C_hP6_191_g_c_a;3;6;191;5;2;hP6;a,c/a;-/-;Ag3Al2La1/Co3Ga2Tb1;Ag3Al2La1 (ICSD #57329)/Co3Ga2Tb1 (ICSD #102452)");
+    vproto.push_back("A2BC3_hP6_191_c_a_g;3;6;191;5;2;hP6;a,c/a;-/-;Cu2Dy1In3/Al2Ce1Pt3;Cu2Dy1In3 (ICSD #108369)/Al2Ce1Pt3 (ICSD #658142)");
+    vproto.push_back("A9BC2_hP12_191_fm_a_c;3;12;191;5;3;hP12;a,c/a,x4;-;Al9Ba1Fe2;Al9Ba1Fe2 (ICSD #57518)");
+    vproto.push_back("A6BC6_hP13_191_i_a_cde;3;13;191;5;4;hP13;a,c/a,z4,z5;-;Mn6Sc1Sn6;Mn6Sc1Sn6 (ICSD #54273)");
+    vproto.push_back("A6B6C_hP13_191_i_cde_a;3;13;191;5;4;hP13;a,c/a,z4,z5;-;Mn6Sn6Tb1;Mn6Sn6Tb1 (ICSD #54277)");
+    vproto.push_back("A3B3C2_hP16_193_g_g_d;3;16;193;5;4;hP16;a,c/a,x2,x3;-;Ga3Hf3Nb2;Ga3Hf3Nb2 (ICSD #103733)");
+    vproto.push_back("ABC_hP6_194_d_a_c;3;6;194;5;2;hP6;a,c/a;-;Pb1Sr1Zn1;Pb1Sr1Zn1 (ICSD #54319)");
+    vproto.push_back("ABC_hP6_194_a_c_d;3;6;194;5;2;hP6;a,c/a;-/-/-;Ag1Ba1Bi1/Ce1Cu1Sn1/Ce1Tl1Zn1;Ag1Ba1Bi1 (ICSD #56978)/Ce1Cu1Sn1 (ICSD #106384)/Ce1Tl1Zn1 (ICSD #622301)");
+    vproto.push_back("ABC_hP6_194_c_a_d;3;6;194;5;2;hP6;a,c/a;-/-;Bi1Ca1Cu1/Cu1Gd1Sn1;Bi1Ca1Cu1 (ICSD #57018)/Cu1Gd1Sn1 (ICSD #600994)");
+    vproto.push_back("ABC_hP6_194_a_d_c;3;6;194;5;2;hP6;a,c/a;-/-;Ba1Bi1Cu1/Ca1Hg1Pb1;Ba1Bi1Cu1 (ICSD #106303)/Ca1Hg1Pb1 (ICSD #106345)");
+    vproto.push_back("AB2C_hP8_194_b_f_c;3;8;194;5;3;hP8;a,c/a,z3;-;Al1Pt2Zr1;Al1Pt2Zr1 (ICSD #58139)");
+    vproto.push_back("AB2C_hP8_194_a_f_c;3;8;194;5;3;hP8;a,c/a,z3;-;In1Pt2Y1;In1Pt2Y1 (ICSD #59505)");
+    vproto.push_back("AB2C_hP8_194_c_f_a;3;8;194;5;3;hP8;a,c/a,z3;-/-;Er1Pt2Sn1/Ce1Cu2Mg1;Er1Pt2Sn1 (ICSD #103292)/Ce1Cu2Mg1 (ICSD #157110)");
+    vproto.push_back("A2BC_hP8_194_f_a_c;3;8;194;5;3;hP8;a,c/a,z3;-;Cu2Li1Sn1;Cu2Li1Sn1 (ICSD #150602)");
+    vproto.push_back("A3BC2_hP12_194_h_a_f;3;12;194;5;4;hP12;a,c/a,z2,x3;-;Al3Ru1Sc2;Al3Ru1Sc2 (ICSD #58159)");
+    vproto.push_back("ABC_hP12_194_f_f_ab;3;12;194;5;4;hP12;a,c/a,z3,z4;-;Ga1Sn1Sr1;Ga1Sn1Sr1 (ICSD #66003)");
+    vproto.push_back("ABC_hP12_194_ab_f_f;3;12;194;5;4;hP12;a,c/a,z3,z4;-/-;Gd1Sn1Zn1/La1Sn1Zn1;Gd1Sn1Zn1 (ICSD #152621)/La1Sn1Zn1 (ICSD #152623)");
+    vproto.push_back("ABC_hP12_194_f_ab_f;3;12;194;5;4;hP12;a,c/a,z3,z4;-;Sn1Y1Zn1;Sn1Y1Zn1 (ICSD #152622)");
+    vproto.push_back("A3B3C2_hP16_194_h_af_f;3;16;194;5;5;hP16;a,c/a,z2,z3,x4;-;Al2Ba2Ga1.33;Al2Ba2Ga1.33 (ICSD #415931)");
+    vproto.push_back("AB2C_cP16_215_e_bce_ad;3;16;215;5;3;cP16;a,x5,x6;-;Ir1Li2Mg1;Ir1Li2Mg1 (ICSD #180119)");
+    vproto.push_back("A3B4C4_cI22_217_b_c_c;3;11;217;5;3;cI22;a,x2,x3;-;Ca3Ga4Ni4;Ca3Ga4Ni4 (ICSD #58899)");
+    vproto.push_back("A3BC_cP15_221_ag_c_d;3;15;221;5;2;cP15;a,x4;-;Ga3Os1Tb1;Ga3Os1Tb1 (ICSD #412144)");
+    vproto.push_back("AB3C_cP15_221_d_ag_c;3;15;221;5;2;cP15;a,x4;-;Dy1Ga3Ru1;Dy1Ga3Ru1 (ICSD #629734)");
     // done now produce
 
     // FROM PROTO LIST
@@ -1202,6 +1378,8 @@ namespace anrl {
       if(anrl_label=="AB2C_oC16_63_c_2c_c"){
         vparameters.push_back("3.577,4.56863293263,1.09538719597,0.06109,-0.0558,0.1792,0.33096");
         vparameters.push_back("3.5814,5.0438934,1.3735132,0.95974,0.60233,0.78501,0.19337");  // 002, ternary metal-nitride prototype (ICSD #85528)
+        vparameters.push_back("4.57,4.2778993,0.98905908,0.826,0.249,0.958,0.609");  // 003, metallic ternary prototype (ICSD #103110)
+        vparameters.push_back("4.4247,3.7013583,0.98573915,0.697,0.5638,0.2498,0.9044");  // 004, metallic ternary prototype (ICSD #240096)
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="A2B_oC12_63_2c_c"){
@@ -3526,6 +3704,7 @@ namespace anrl {
       // ---------------------------------------------------------------------------
       if(anrl_label=="A2BC3_hP6_164_d_a_bd"){
         vparameters.push_back("1.0,2.44948974278,0.3333333333,0.8333333333");
+        vparameters.push_back("4.704,1.6001276,0.742,0.342");  // 002, metallic ternary prototype (ICSD #616769)
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="A2BC3_hP6_164_d_b_ad"){
@@ -3781,6 +3960,18 @@ namespace anrl {
       if(anrl_label=="ABC_oP12_62_c_c_c"){
         vparameters.push_back("9.95851159,0.433951127369,0.653641836852,0.15617,0.97349,0.04761,0.42551,0.40749,0.75982");
         vparameters.push_back("7.1586,0.48988629,0.70044422,0.0948,0.4719,0.1442,0.9797,0.3792,0.731");  // 002, ternary metal-nitride prototype (ICSD #93259)
+        vparameters.push_back("7.86,0.59287532,1.1119593,0.482,0.317,0.352,0.939,0.732,0.886");  // 003, metallic ternary prototype (ICSD #42757)
+        vparameters.push_back("7.146,0.62244612,1.0720683,0.8048,0.9093,0.6959,0.589,0.012,0.2975");  // 004, metallic ternary prototype (ICSD #54301)
+        vparameters.push_back("7.199,0.62911515,1.0247257,0.859,0.435,0.017,0.7973,0.204,0.371");  // 005, metallic ternary prototype (ICSD #54415)
+        vparameters.push_back("7.3628,0.62931222,1.0731651,0.0105,0.7963,0.7969,0.4187,0.1866,0.4123");  // 006, metallic ternary prototype (ICSD #54460)
+        vparameters.push_back("6.897,0.6415833,1.1204872,0.8555,0.0637,0.7261,0.3829,0.9679,0.6799");  // 007, metallic ternary prototype (ICSD #54938)
+        vparameters.push_back("7.77,0.61132561,1.0862291,0.731,0.901,0.494,0.296,0.387,0.917");  // 008, metallic ternary prototype (ICSD #58762)
+        vparameters.push_back("6.625,0.65403774,1.1375094,0.198,0.431,0.462,0.715,0.7839,0.408");  // 009, metallic ternary prototype (ICSD #105338)
+        vparameters.push_back("7.156,0.6352711,1.0444382,0.839,0.439,0.974,0.794,0.17,0.426");  // 010, metallic ternary prototype (ICSD #106459)
+        vparameters.push_back("7.671,0.60643984,0.98970147,0.478,0.809,0.688,0.452,0.815,0.07");  // 011, metallic ternary prototype (ICSD #108571)
+        vparameters.push_back("7.7672,0.61037439,0.94261767,0.9694,0.3161,0.176,0.9257,0.3232,0.6007");  // 012, metallic ternary prototype (ICSD #157921)
+        vparameters.push_back("7.6,0.61628947,0.97888158,0.1794,0.924,0.9737,0.3099,0.3181,0.5972");  // 013, metallic ternary prototype (ICSD #157923)
+        vparameters.push_back("6.723,0.62977837,1.1518667,0.012,0.304,0.677,0.551,0.794,0.903");  // 014, metallic ternary prototype (ICSD #630573)
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="A2B2C_tI10_139_e_e_a"){
@@ -4159,6 +4350,7 @@ namespace anrl {
       // ---------------------------------------------------------------------------
       if(anrl_label=="AB2C_hR4_166_a_c_b"){
         vparameters.push_back("3.1359829,5.5605955,0.881");  // 001, ternary metal-nitride prototype (ICSD #71136)
+        vparameters.push_back("4.3180071,3.9173242,0.189");  // 002, metallic ternary prototype (ICSD #615828)
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="A3BC3_hP14_176_h_c_h"){
@@ -4167,6 +4359,8 @@ namespace anrl {
       // ---------------------------------------------------------------------------
       if(anrl_label=="ABC_hP6_186_b_b_a"){
         vparameters.push_back("3.3306,3.2702516,0,0.598,0.2466");  // 001, ternary metal-nitride prototype (ICSD #172471)
+        vparameters.push_back("4.3972,1.3683253,0,0.777,0.245");  // 002, metallic ternary prototype (ICSD #54657)
+        vparameters.push_back("4.5825,1.7151555,0,0.2398,0.7854");  // 003, metallic ternary prototype (ICSD #416143)
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="AB2C_hP8_186_a_ab_b"){
@@ -4215,6 +4409,785 @@ namespace anrl {
       // ---------------------------------------------------------------------------
       if(anrl_label=="AB2C_cF32_227_b_c_a"){
         vparameters.push_back("8.74");  // ternary metal-nitride prototype (ICSD #72546)
+      }
+      
+      // -------------------------------------------------------------------------
+      // metal prototypes (from DX) //DX20201028
+      // ---------------------------------------------------------------------------
+      // ternaries
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC2_mC16_8_b_2a_2ab"){
+        vparameters.push_back("7.171,1.2100126,0.7774369,71.74,0.12,0,0.641,0.978,0.961,0.538,0.551,0.528,0.281,0.224,0.42,0.417,0.756,0.876");  // 001, metallic ternary prototype (ICSD #58830)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A2B4C3_mP9_10_m_2n_am"){
+        vparameters.push_back("8.225,0.45483283,0.91671733,109.65,0.89515,0.35185,0.4983,0.7077,0.1823,0.39514,0.2748,0.90637");  // 001, metallic ternary prototype (ICSD #417035)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A2B5C4_mP11_10_m_a2m_2n"){
+        vparameters.push_back("9.046,0.36325448,0.82367897,94.53,0.6346,0.5766,0.8578,0.343,0.6676,0.9576,0.1541,0.3154,0.5619,0.295");  // 001, metallic ternary prototype (ICSD #55578)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB2C2_mP10_11_e_2e_2e"){
+        vparameters.push_back("10.783,0.45015302,0.45618103,91.3,0.7587,0.2575,0.4999,0.7506,0.1184,0.2145,0,0.6962,0.3728,0.2462");  // 001, metallic ternary prototype (ICSD #416299)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A2BC2_mP10_11_2e_e_2e"){
+        vparameters.push_back("11.3765,0.40427196,0.40718147,90.542,0.13236,0.2261,0.49959,0.7565,0.75464,0.2577,0.3606,0.2566,0.001,0.7307");  // 001, metallic ternary prototype (ICSD #424108)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A2B4C_mP14_11_2e_4e_e"){
+        vparameters.push_back("9.591,0.47361068,0.79799812,107.838,0.05956,0.27432,0.57956,0.27679,0.8773,0.90331,0.57123,0.89518,0.36827,0.46211,0.87129,0.49589,0.21178,0.8337");  // 001, metallic ternary prototype (ICSD #261042)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A2BC2_mC10_12_i_a_i"){
+        vparameters.push_back("11.1,0.38801802,0.95268468,154.4287,0.5942,0.8555,0.9238,0.5702");  // 001, metallic ternary prototype (ICSD #182050)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC_mC12_12_i_i_i"){
+        vparameters.push_back("11.098,0.3973689,0.98442963,154.8009,0.2238,0.8102,0.8046,0.675,0.3393,0.1465");  // 001, metallic ternary prototype (ICSD #20632)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3B2C2_mC14_12_ai_i_i"){
+        vparameters.push_back("11.019,0.38767583,0.94896089,136.7589,0.30129,0.44343,0.42164,0.79411,0.8673,0.22347");  // 001, metallic ternary prototype (ICSD #410985)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A6B2C_mC18_12_3i_i_a"){
+        vparameters.push_back("10.077,0.54314776,0.92448149,81.93,0.5297,0.2753,0.7074,0.9295,0.8264,0.5908,0.85526,0.24903");  // 001, metallic ternary prototype (ICSD #260159)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A2B5C4_mC22_12_i_a2i_2i"){
+        vparameters.push_back("16.9369,0.27129522,0.97586926,153.6114,0.38824,0.6115,0.04121,0.23355,0.40758,0.34101,0.71885,0.06875,0.2201,0.643");  // 001, metallic ternary prototype (ICSD #419134)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3B4C8_mC30_12_ai_hi_2ij"){
+        vparameters.push_back("18.549,0.36039679,0.36616529,81.66,0.213,0.67755,0.6913,0.791,0.13,0.8708,0.4541,0.51517,0.202,0.14945,0.26752,0.19789");  // 001, metallic ternary prototype (ICSD #240016)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A6B2C7_mC30_12_3i_i_a3i"){
+        vparameters.push_back("14.257,0.32012345,0.86806481,86.021,0.63732,0.49687,0.46213,0.20062,0.19481,0.20687,0.83052,0.11118,0.81799,0.32444,0.01039,0.38194,0.65953,0.01844");  // 001, metallic ternary prototype (ICSD #171243)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB2C2_mC20_15_e_f_f"){
+        vparameters.push_back("10.487,0.5754744,0.79202823,76.32,0.1345,0.63313,0.36433,0.99699,0.85144,0.3604,0.64786");  // 001, metallic ternary prototype (ICSD #391432)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A2B4C_mC28_15_f_2f_e"){
+        vparameters.push_back("19.0003,0.35246812,0.35005237,86.065,0.7786,0.2981,0.0987,0.1999,0.42255,0.20721,0.77201,0.34791,0.51916,0.01422");  // 001, metallic ternary prototype (ICSD #261117)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC2_oC16_20_b_a_c"){
+        vparameters.push_back("8.38,1.2601432,0.75536993,0.7698,0.504,0.351,0.673,0.513");  // 001, metallic ternary prototype (ICSD #1156)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC_oP12_33_a_a_a"){
+        vparameters.push_back("7.5356,1.0569563,0.62430331,0.51211,0.79877,0.75,0.29931,0.41498,0.7559,0.18658,0.0868,0.7533");  // 001, metallic ternary prototype (ICSD #106418)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC_oC12_36_a_a_a"){
+        vparameters.push_back("4.8891,1.720603,1.6021354,0.66671918,0.026102028,0.99999382,0.23452562,0.66654623,0.45737235");  // 001, metallic ternary prototype (ICSD #55819)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC2_oC32_36_b_2a_2ab"){
+        vparameters.push_back("8.681,0.82363783,1.2135699,0.638,0.011,0.12,0,0.082,0.731,0.673,0.736,0.7763,0.622,0.29,0.756,0.619,0.563");  // 001, metallic ternary prototype (ICSD #56278)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC_oC18_38_ad_be_bd"){
+        vparameters.push_back("4.0307,3.2806709,1.8867442,0.74976771,0.40946388,0.0012150248,0.8747892,0.1251434,0.66729312,0.00026107832,0.70531985,0.29437221");  // 001, metallic ternary prototype (ICSD #59430)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC_oC18_38_bd_be_ad"){
+        vparameters.push_back("4.1297,3.1724823,1.8520958,0.2464,0,0.5914,0.83335,0.50005,0.3768,0.3768,0.2043,0.2043");  // 001, metallic ternary prototype (ICSD #260992)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC_oC18_38_be_ad_bd"){
+        vparameters.push_back("3.9497,3.3839026,1.9576677,0.25494797,0.59120572,1.0483556e-05,0.12745096,0.87256621,0.33335379,2.1695924e-05,0.79560917,0.20433001");  // 001, metallic ternary prototype (ICSD #415506)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A10BC3_oP14_47_2q2rs_h_bt"){
+        vparameters.push_back("4.261,1.0073926,3.6026754,0.3187,0.1603,0.0819,0.4156,0.4159,0.255");  // 001, metallic ternary prototype (ICSD #20663)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC2_oP8_51_f_e_be"){
+        vparameters.push_back("5.254,0.78625809,1.3644842,0.2824,0.8886,0.656");  // 001, metallic ternary prototype (ICSD #106800)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A2BC_oP8_51_ae_f_f"){
+        vparameters.push_back("5.09,0.79980354,1.3709234,0.315,0.118,0.683");  // 001, metallic ternary prototype (ICSD #623100)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A2BC_oP8_51_af_f_e"){
+        vparameters.push_back("4.998,0.80712285,1.412565,0.346,0.103,0.715");  // 001, metallic ternary prototype (ICSD #658675)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A4BC_oP12_51_afj_e_e"){
+        vparameters.push_back("7.7097,0.52203069,0.91056721,0.17610349,0.61101001,0.95660968,0.92790085,0.71070497");  // 001, metallic ternary prototype (ICSD #9986)
+        vparameters.push_back("7.6602,0.5295162,0.90252213,0.61759,0.18412,0.95685,0.93045,0.70183");  // 002, metallic ternary prototype (ICSD #55598)
+        vparameters.push_back("8.637,0.48917448,0.86036818,0.19372,0.60198,0.93439,0.93656,0.68597");  // 003, metallic ternary prototype (ICSD #411393)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3B2C_oP12_51_ak_ef_f"){
+        vparameters.push_back("5.66,1.1909894,1.5980565,0.3741,0.1328,0.57444,0.20949,0.78478");  // 001, metallic ternary prototype (ICSD #249924)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB4C_oP12_51_e_afj_e"){
+        vparameters.push_back("8.676,0.48744813,0.85892116,0.5998,0.19219,0.93475,0.93556,0.68673");  // 001, metallic ternary prototype (ICSD #410891)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC_oP12_57_c_d_d"){
+        vparameters.push_back("5.75,1.3547826,0.9773913,0.104,0.6363,0.3994,0.8726,0.0244");  // 001, metallic ternary prototype (ICSD #370036)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB2C_oP16_57_d_2d_c"){
+        vparameters.push_back("6.804,1.96796,0.95517343,0.093,0.6601,0.8945,0.841,0.4885,0.611,0.1664");  // 001, metallic ternary prototype (ICSD #107616)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB2C_oP8_59_a_e_b"){
+        vparameters.push_back("4.216,1.2018501,1.0661765,0.333,0.333,0.5,0.833");  // 001, metallic ternary prototype (ICSD #628580)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3B3C_oP14_59_ae_ae_b"){
+        vparameters.push_back("4.5526,1.7043008,1.9876554,0.04449,0.36673,0.2694,0.52383,0.58763,0.55436,0.88559");  // 001, metallic ternary prototype (ICSD #245679)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB3C4_oP16_59_b_ae_ef"){
+        vparameters.push_back("6.938,1.8080138,0.94018449,0.4367,0.68751,0.9941,0.1706,0.62693,0.33466,0.52489,0.95941");  // 001, metallic ternary prototype (ICSD #107444)
+        vparameters.push_back("7.333,1.8847675,0.93113323,0.4473,0.6873,0.99594,0.1735,0.63365,0.33473,0.52812,0.962");  // 002, metallic ternary prototype (ICSD #107448)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB2C_oP16_62_c_d_c"){
+        vparameters.push_back("7.946,1.0187516,0.69808709,0.0332,0.89792,0.37781,0.11849,0.82793,0.9443,0.59466");  // 001, metallic ternary prototype (ICSD #425509)
+        vparameters.push_back("7.38,0.95799458,0.75880759,0.379,0.652,0.033,0.35,0.823,0.947,0.088");  // 002, metallic ternary prototype (ICSD #602790)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC2_oP16_62_c_c_d"){
+        vparameters.push_back("7.292,0.96941854,0.76851344,0.033,0.35,0.379,0.652,0.823,0.947,0.088");  // 001, metallic ternary prototype (ICSD #656966)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC_oC12_63_c_c_c"){
+        vparameters.push_back("3.6684,4.8307164,1.086441,0.7978,0.95664,0.58754");  // 001, metallic ternary prototype (ICSD #166874)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC_oC12_63_c_c_a"){
+        vparameters.push_back("4.2145,2.2335271,1.2607189,0.5972146,0.29158002");  // 001, metallic ternary prototype (ICSD #424600)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A2BC_oC16_63_f_c_c"){
+        vparameters.push_back("4.08,2.4877451,1.7303922,0.213,0.939,0.348,0.956");  // 001, metallic ternary prototype (ICSD #57645)
+        vparameters.push_back("4,2.3075,1.785,0.222,0.928,0.356,0.944");  // 002, metallic ternary prototype (ICSD #57693)
+        vparameters.push_back("4.077,2.4724062,1.6997792,0.061,0.787,0.348,0.044");  // 003, metallic ternary prototype (ICSD #57759)
+        vparameters.push_back("4.037,2.3661135,1.6019321,0.796,0.085,0.364,0.05");  // 004, metallic ternary prototype (ICSD #103875)
+        vparameters.push_back("4.1824,2.448355,1.9307096,0.21983,0.93483,0.35459,0.9494");  // 005, metallic ternary prototype (ICSD #152048)
+        vparameters.push_back("4.3642,2.589478,1.8801613,0.77214,0.05365,0.66459,0.94045");  // 006, metallic ternary prototype (ICSD #425493)
+        vparameters.push_back("4.223,2.6381719,1.6663509,0.561,0.287,0.152,0.956");  // 007, metallic ternary prototype (ICSD #658140)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC2_oC16_63_a_c_g"){
+        vparameters.push_back("7.7183,0.90569167,0.70617882,0.6485,0.819,0.3032");  // 001, metallic ternary prototype (ICSD #261785)
+        vparameters.push_back("9.1362,0.8928548,0.62475646,0.3044,0.8289,0.7637");  // 002, metallic ternary prototype (ICSD #261786)
+        vparameters.push_back("9.2835,0.8182582,0.63188453,0.3153,0.8185,0.6763");  // 003, metallic ternary prototype (ICSD #261788)
+        vparameters.push_back("10.632,0.74473288,0.62046652,0.72594,0.8269,0.328");  // 004, metallic ternary prototype (ICSD #380341)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC2_oC16_63_c_c_2c"){
+        vparameters.push_back("4.75,4.1263158,0.97894737,0.609,0.824,0.25,0.957");  // 001, metallic ternary prototype (ICSD #58647)
+        vparameters.push_back("4.3923,3.6935091,0.98661294,0.6994,0.038,0.5648,0.2504");  // 002, metallic ternary prototype (ICSD #240098)
+        vparameters.push_back("4.499,3.9319849,1,0.894,0.685,0.55,0.25");  // 003, metallic ternary prototype (ICSD #621687)
+        vparameters.push_back("4.46,3.9506726,0.99080717,0.327,0.109,0.448,0.749");  // 004, metallic ternary prototype (ICSD #628742)
+        vparameters.push_back("4.675,3.7411765,0.98524064,0.107,0.315,0.452,0.749");  // 005, metallic ternary prototype (ICSD #641754)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB2C_oC16_63_c_f_c"){
+        vparameters.push_back("4.2266,2.4376567,1.9779492,0.55971,0.27339,0.1543,0.9448");  // 001, metallic ternary prototype (ICSD #96152)
+        vparameters.push_back("4.621,2.3142177,1.6132872,0.9244,0.2069,0.6388,0.0506");  // 002, metallic ternary prototype (ICSD #150132)
+        vparameters.push_back("4.433,2.5971126,1.8181818,0.94579,0.21864,0.66381,0.05497");  // 003, metallic ternary prototype (ICSD #414434)
+        vparameters.push_back("4.397,2.2967933,1.5010234,0.589,0.3,0.13,0.94");  // 004, metallic ternary prototype (ICSD #600150)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A2BC_oC16_63_g_c_c"){
+        vparameters.push_back("7.097,1.5019022,0.6299845,0.6747,0.13117,0.7127,0.90293");  // 001, metallic ternary prototype (ICSD #99139)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC2_oC16_63_c_c_f"){
+        vparameters.push_back("4.4744,2.4125693,1.8175174,0.43302,0.71694,0.14403,0.44878");  // 001, metallic ternary prototype (ICSD #172230)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A2B2C_oC20_63_g_2c_a"){
+        vparameters.push_back("7.0102,2.1704231,0.98316738,0.584,0.205,0.816,0.888");  // 001, metallic ternary prototype (ICSD #658701)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A4BC_oC24_63_acf_c_c"){
+        vparameters.push_back("4.056,3.7302761,1.6346154,0.557,0.379,0.729,0.814,0.946");  // 001, metallic ternary prototype (ICSD #57760)
+        vparameters.push_back("4.075,3.7398773,1.6220859,0.557,0.729,0.379,0.814,0.946");  // 002, metallic ternary prototype (ICSD #58060)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB3C2_oC24_63_c_cg_e"){
+        vparameters.push_back("9.765,0.80747568,0.52892985,0.329,0.948,0.202,0.194,0.708");  // 001, metallic ternary prototype (ICSD #58898)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3BC3_oC28_63_cf_a_cf"){
+        vparameters.push_back("4.098,2.4670571,3.1747194,0.3088,0.9983,0.5714,0.9114,0.289,0.8959");  // 001, metallic ternary prototype (ICSD #10044)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC2_oC32_63_ac_f_2cf"){
+        vparameters.push_back("4.639,3.6861393,2.0773874,0.7976,0.5921,0.4277,0.3515,0.4931,0.1961,0.4111");  // 001, metallic ternary prototype (ICSD #410732)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A2B2C_oC10_65_j_i_a"){
+        vparameters.push_back("4.0172,3.4774221,0.9045106,0.1986,0.3599");  // 001, metallic ternary prototype (ICSD #54612)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A2B3C_oC12_65_i_cf_a"){
+        vparameters.push_back("5.3308,1.7232498,0.69906956,0.66645548");  // 001, metallic ternary prototype (ICSD #107864)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3B2C2_oC14_65_aj_j_i"){
+        vparameters.push_back("3.9788,5.3289937,0.91944807,0.17641,0.4198,0.28698");  // 001, metallic ternary prototype (ICSD #240761)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A2BC_oC16_65_aci_j_i"){
+        vparameters.push_back("4.192,4.1898855,0.98592557,0.288,0.416,0.136");  // 001, metallic ternary prototype (ICSD #103850)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A2BC6_oC18_65_j_a_2ij"){
+        vparameters.push_back("4.313,5.2124275,1.0159286,0.2046,0.4311,0.3222,0.0697");  // 001, metallic ternary prototype (ICSD #165783)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3B2C7_oC24_65_aj_i_c2ij"){
+        vparameters.push_back("4.565,5.9824754,1,0.875,0.593,0.7813,0.6847,0.9107");  // 001, metallic ternary prototype (ICSD #102239)
+        vparameters.push_back("4.579,5.7896921,1,0.8718,0.592,0.7812,0.6845,0.9087");  // 002, metallic ternary prototype (ICSD #160913)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A2B2C_oI10_71_f_h_a"){
+        vparameters.push_back("8.5967,0.66765154,0.51107983,0.7969,0.2835");  // 001, metallic ternary prototype (ICSD #55495)
+        vparameters.push_back("8.994,0.60973983,0.47520569,0.1961,0.2537");  // 002, metallic ternary prototype (ICSD #58885)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A2B2C3_oI14_71_e_f_af"){
+        vparameters.push_back("19.795,0.24976004,0.22556201,0.4351,0.8584,0.6832");  // 001, metallic ternary prototype (ICSD #9564)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A5B2C_oI16_71_an_e_d"){
+        vparameters.push_back("9.562,0.73457436,0.41612633,0.758,0.354,0.31");  // 001, metallic ternary prototype (ICSD #58046)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A4B3C4_oI22_71_n_af_eg"){
+        vparameters.push_back("16.5484,0.51916802,0.27410505,0.80940162,0.81788308,0.65938423,0.61795128,0.69904145");  // 001, metallic ternary prototype (ICSD #55826)
+        vparameters.push_back("15.489,0.47588611,0.30221447,0.204,0.152,0.31,0.337,0.322");  // 002, metallic ternary prototype (ICSD #55827)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A4B3C4_oI22_71_n_af_eh"){
+        vparameters.push_back("15.1225,0.48197719,0.29965945,0.2162,0.8716,0.3059,0.3285,0.6944");  // 001, metallic ternary prototype (ICSD #156968)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3B4C4_oI22_71_af_eh_n"){
+        vparameters.push_back("14.407,0.51613799,0.2911779,0.78461,0.87104,0.6954,0.67309,0.6906");  // 001, metallic ternary prototype (ICSD #182774)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A6B6C_oI26_71_hk_efg_a"){
+        vparameters.push_back("8.613,0.97886915,0.58156275,0.655,0.665,0.336,0.757");  // 001, metallic ternary prototype (ICSD #103465)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3B3C8_oI28_71_cg_be_2n"){
+        vparameters.push_back("12.707,0.7480916,0.33721571,0.201,0.181,0.369,0.282,0.153,0.367");  // 001, metallic ternary prototype (ICSD #605107)
+        vparameters.push_back("12.373,0.80029096,0.34009537,0.799,0.181,0.631,0.282,0.847,0.367");  // 002, metallic ternary prototype (ICSD #611824)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3B10C_oI28_71_be_g2n_c"){
+        vparameters.push_back("15.007,0.6622243,0.34248018,0.20187,0.8153,0.35777,0.71484,0.15945,0.64223");  // 001, metallic ternary prototype (ICSD #290305)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A6B5C3_oI28_71_gn_cn_be"){
+        vparameters.push_back("12.827,0.76666407,0.34029781,0.19179,0.19303,0.3783,0.28322,0.16931,0.34743");  // 001, metallic ternary prototype (ICSD #413485)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A9B3C2_oI28_71_c2n_be_g"){
+        vparameters.push_back("12.442,0.75952419,0.34078122,0.799,0.819,0.631,0.718,0.847,0.633");  // 001, metallic ternary prototype (ICSD #634397)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A8B3C3_oI28_71_2n_be_cg"){
+        vparameters.push_back("12.1749,0.81103746,0.34336216,0.82977124,0.78536152,0.62439285,0.71382786,0.83444541,0.62824919");  // 001, metallic ternary prototype (ICSD #634379)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A2B2C_oI20_72_j_j_a"){
+        vparameters.push_back("14.325,0.50820244,0.49486911,0.86413,0.70673,0.61373,0.71129");  // 001, metallic ternary prototype (ICSD #421424)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC3_tI10_107_a_a_ab"){
+        vparameters.push_back("4.82,2.2676349,0,0.6654,0.4241,0.7494");  // 001, metallic ternary prototype (ICSD #58662)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3BC_tI10_107_ab_a_a"){
+        vparameters.push_back("4.2357,2.5098095,0.405,0.635,0,0.748");  // 001, metallic ternary prototype (ICSD #290390)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3BC_tI10_119_bf_a_c"){
+        vparameters.push_back("4.6895,2.6930376,0.8608");  // 001, metallic ternary prototype (ICSD #249592)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB4C2_tI28_120_d_i_e"){
+        vparameters.push_back("7.753,1.014962,0.856,0.648,0.625,0.417");  // 001, metallic ternary prototype (ICSD #102238)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A4B6C_tI22_121_i_ci_a"){
+        vparameters.push_back("6.84,1.4307018,0.3274,0.9228,0.3237,0.2067");  // 001, metallic ternary prototype (ICSD #54354)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB2C_tP4_123_b_h_a"){
+        vparameters.push_back("2.9,2.4965517,0.23");  // 001, metallic ternary prototype (ICSD #102057)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB4C_tP6_123_b_i_a"){
+        vparameters.push_back("4.103,1.5781136,0.3");  // 001, metallic ternary prototype (ICSD #623081)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC5_tP7_123_a_b_ci"){
+        vparameters.push_back("4.601,1.6387742,0.3103");  // 001, metallic ternary prototype (ICSD #102108)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB5C_tP7_123_a_ci_b"){
+        vparameters.push_back("4.549,1.6322269,0.805");  // 001, metallic ternary prototype (ICSD #623944)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB6C_tP8_123_a_hi_b"){
+        vparameters.push_back("4.35,1.8211494,0.15149,0.32935");  // 001, metallic ternary prototype (ICSD #240161)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB8C2_tP11_123_a_ehi_g"){
+        vparameters.push_back("4.217,2.6013754,0.3093,0.2933,0.1189");  // 001, metallic ternary prototype (ICSD #42426)
+        vparameters.push_back("4.23,2.3841608,0.3104,0.2925,0.1138");  // 002, metallic ternary prototype (ICSD #180132)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A2BC2_tP10_127_g_a_h"){
+        vparameters.push_back("7.0659,0.48323639,0.374,0.169");  // 001, metallic ternary prototype (ICSD #54303)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB2C2_tP10_127_a_g_h"){
+        vparameters.push_back("5.716,0.55563331,0.389,0.181");  // 001, metallic ternary prototype (ICSD #57706)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC_tP6_129_b_c_c"){
+        vparameters.push_back("4.7819,1.6426943,0.72227037,0.16905509");  // 001, metallic ternary prototype (ICSD #66951)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC_tP6_129_c_c_a"){
+        vparameters.push_back("4.741,1.7527948,0.201,0.65");  // 001, metallic ternary prototype (ICSD #601586)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC_tP6_129_a_c_c"){
+        vparameters.push_back("4.9,1.6857143,0.273,0.72");  // 001, metallic ternary prototype (ICSD #615958)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A2BC_tP8_129_bc_c_a"){
+        vparameters.push_back("4.3365,2.2772743,0.1843,0.7494");  // 001, metallic ternary prototype (ICSD #163425)
+        vparameters.push_back("4.5206,2.4320223,0.16198,0.73829");  // 002, metallic ternary prototype (ICSD #415728)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB2C2_tP10_129_c_ac_bc"){
+        vparameters.push_back("4.401,2.2842536,0.2446,0.6257,0.8776");  // 001, metallic ternary prototype (ICSD #160053)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB2C2_tP10_129_c_bc_ac"){
+        vparameters.push_back("4.528,2.5110424,0.75271,0.13526,0.3628");  // 001, metallic ternary prototype (ICSD #162267)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A2BC2_tP10_129_bc_c_ac"){
+        vparameters.push_back("4.546,2.1240651,0.135,0.76,0.38");  // 001, metallic ternary prototype (ICSD #616562)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A2BC4_tP14_129_ac_b_j"){
+        vparameters.push_back("7.196,0.72290161,0.7755,0.43525,0.29");  // 001, metallic ternary prototype (ICSD #418547)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB2C_tI8_139_b_d_a"){
+        vparameters.push_back("4.137,1.7689147");  // 001, metallic ternary prototype (ICSD #54365)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A2BC2_tI10_139_d_a_e"){
+        vparameters.push_back("4.242,2.6692834,0.38820402");  // 001, metallic ternary prototype (ICSD #55789)
+        vparameters.push_back("4.127,2.8279622,0.6073");  // 002, metallic ternary prototype (ICSD #57550)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC_tI12_139_c_e_e"){
+        vparameters.push_back("4.4914,3.6117024,0.66644,0.8675");  // 001, metallic ternary prototype (ICSD #182479)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC_tI12_139_e_c_e"){
+        vparameters.push_back("4.359,3.6237669,0.333,0.135");  // 001, metallic ternary prototype (ICSD #183524)
+        vparameters.push_back("4.073,3.1723545,0.131,0.341");  // 002, metallic ternary prototype (ICSD #611768)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A4B2C_tI14_139_h_d_a"){
+        vparameters.push_back("6.717,0.79082924,0.303");  // 001, metallic ternary prototype (ICSD #456)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB4C2_tI14_139_a_h_d"){
+        vparameters.push_back("7.606,0.71916908,0.3");  // 001, metallic ternary prototype (ICSD #630579)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A5B2C_tI16_139_bg_e_a"){
+        vparameters.push_back("4.023,3.5893612,0.762,0.851");  // 001, metallic ternary prototype (ICSD #58084)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A2BC_tI16_139_ce_e_d"){
+        vparameters.push_back("4.64,4.7327586,0.3248,0.1233");  // 001, metallic ternary prototype (ICSD #41924)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB2C_tI16_139_e_ce_d"){
+        vparameters.push_back("4.768,4.9496644,0.1158,0.3296");  // 001, metallic ternary prototype (ICSD #58635)
+        vparameters.push_back("4.846,4.5356995,0.8717,0.6859");  // 002, metallic ternary prototype (ICSD #58638)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A2BC_tI16_139_ce_d_e"){
+        vparameters.push_back("4.635,4.9363538,0.6636,0.8862");  // 001, metallic ternary prototype (ICSD #58764)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A2B5C3_tI20_139_e_bg_ae"){
+        vparameters.push_back("4.9461,4.7316067,0.19934,0.64091,0.57874");  // 001, metallic ternary prototype (ICSD #421342)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A8BC4_tI26_139_ij_a_f"){
+        vparameters.push_back("8.823,0.58381503,0.6526,0.7244");  // 001, metallic ternary prototype (ICSD #57539)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A4B8C_tI26_139_i_fj_a"){
+        vparameters.push_back("8.301,0.56161908,0.3594,0.7234");  // 001, metallic ternary prototype (ICSD #168240)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A8B4C_tI26_139_ij_f_a"){
+        vparameters.push_back("8.86,0.5744921,0.365,0.175");  // 001, metallic ternary prototype (ICSD #57997)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC4_tI24_140_a_c_l"){
+        vparameters.push_back("6.5562,1.721424,0.1575,0.867");  // 001, metallic ternary prototype (ICSD #172149)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A2BC4_tI28_140_h_a_k"){
+        vparameters.push_back("10.491,0.47450195,0.861,0.8027,0.0827");  // 001, metallic ternary prototype (ICSD #150145)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A4B2C_tI28_140_l_h_a"){
+        vparameters.push_back("8.175,0.95425076,0.33913,0.36404,0.66158");  // 001, metallic ternary prototype (ICSD #182104)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB5C2_tI32_140_a_cl_h"){
+        vparameters.push_back("7.7012,1.7607516,0.36124,0.65581,0.63793");  // 001, metallic ternary prototype (ICSD #107217)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3B4C_tI32_140_ah_l_c"){
+        vparameters.push_back("8.565,1.4824285,0.85,0.15,0.34");  // 001, metallic ternary prototype (ICSD #616725)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB5C2_tI32_140_a_bk_h"){
+        vparameters.push_back("10.586,0.48904213,0.832,0.7796,0.0724");  // 001, metallic ternary prototype (ICSD #103842)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A2BC5_tI32_140_h_a_cl"){
+        vparameters.push_back("7.9856,1.6805249,0.1336,0.6569,0.8577");  // 001, metallic ternary prototype (ICSD #156956)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB2C5_tI32_140_a_h_cl"){
+        vparameters.push_back("7.4816,1.855726,0.8881,0.6658,0.8611");  // 001, metallic ternary prototype (ICSD #161658)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A4B7C3_hR14_146_ab_a2b_b"){
+        vparameters.push_back("11.53099,0.4552076,0.944,0.46,0.352,0.533,0.121,0.408,0.149,0.972,0.617,0.864,0.026,0.629,0.461,0.903");  // 001, metallic ternary prototype (ICSD #103911)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC_hP9_156_3a_b2c_2bc"){
+        vparameters.push_back("4.94,2.2064777,0.334,0.668,0,0.454,0.146,0.853,0.214,0.788,0.5");  // 001, metallic ternary prototype (ICSD #58911)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A5BC4_hR10_160_5a_a_4a"){
+        vparameters.push_back("4.7099904,6.7346082,0.94,0.862,0.409,0.061,0.145,0.501,0.7787,0.6863,0.2327,0.3215");  // 001, metallic ternary prototype (ICSD #12142)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A2BC_hR4_166_c_b_a"){
+        vparameters.push_back("4.2709972,3.7286311,0.1888");  // 001, metallic ternary prototype (ICSD #102938)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB2C4_hR7_166_a_c_2c"){
+        vparameters.push_back("4.2259957,6.2863209,0.90091,0.79965,0.61204");  // 001, metallic ternary prototype (ICSD #150127)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB4C6_hR11_166_a_2c_h"){
+        vparameters.push_back("5.9937387,3.892206,0.66786054,0.87208523,0.39951361,0.88682193");  // 001, metallic ternary prototype (ICSD #166193)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A2BC_hR12_166_h_bc_ac"){
+        vparameters.push_back("5.4710243,4.6349773,0.335,0.142,0.593,0.054");  // 001, metallic ternary prototype (ICSD #604213)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A7B3C2_hR12_166_bh_ac_c"){
+        vparameters.push_back("5.6140311,4.6050915,0.1426,0.335,0.5787,0.0745");  // 001, metallic ternary prototype (ICSD #57538)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB2C9_hR12_166_a_c_bch"){
+        vparameters.push_back("4.9234811,4.8473628,0.146,0.334,0.5872,0.0827");  // 001, metallic ternary prototype (ICSD #55614)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A9B2C_hR12_166_eh_c_a"){
+        vparameters.push_back("5.1579625,3.6593664,0.222,0.278,0.777");  // 001, metallic ternary prototype (ICSD #646978)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB2C_hR12_166_bc_h_ac"){
+        vparameters.push_back("5.6320019,4.8020254,0.333,0.14,0.586,0.074");  // 001, metallic ternary prototype (ICSD #604688)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A2B7C3_hR12_166_c_bh_ac"){
+        vparameters.push_back("5.6139959,4.7716445,0.6644,0.8571,0.419,0.908");  // 001, metallic ternary prototype (ICSD #104173)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A7B4C2_hR13_166_ah_2c_c"){
+        vparameters.push_back("6.8009851,4.2773178,0.3152,0.1878,0.5493,0.2133,0.8046");  // 001, metallic ternary prototype (ICSD #58581)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3B2C2_hR14_166_3c_2c_abc"){
+        vparameters.push_back("4.7683821,9.8351827,0.93576,0.79728,0.64381,0.87437,0.70884,0.57697");  // 001, metallic ternary prototype (ICSD #710044)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC_hP6_186_b_a_b"){
+        vparameters.push_back("4.7199,1.6142715,0.75,0.0593,0.473");  // 001, metallic ternary prototype (ICSD #54997)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC_hP6_186_b_a_b"){
+        vparameters.push_back("4.576,1.6121066,0,0.382,0");  // 002, metallic ternary prototype (ICSD #100115)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC_hP6_186_a_b_b"){
+        vparameters.push_back("4.655,1.6386681,0.247,0.467,0.0518");  // 001, metallic ternary prototype (ICSD #106358)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A4BC_hP12_186_ac_b_b"){
+        vparameters.push_back("4.9708,1.5973284,0,0.9386,0.5644,0.83026667,0.7503");  // 001, metallic ternary prototype (ICSD #424277)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3BC4_hP16_186_a2b_b_2a2b"){
+        vparameters.push_back("4.4831,4.5854431,0.16473,0.02937,0.29581,0.98426,0.84576,0.711,0.12513,0.40817");  // 001, metallic ternary prototype (ICSD #412207)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC_hP6_187_i_h_ab"){
+        vparameters.push_back("4.3442,1.5409512,0.7853,0.7161");  // 001, metallic ternary prototype (ICSD #156264)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A4BC_hP6_187_hi_b_a"){
+        vparameters.push_back("4.3168,1.5918273,0.30839,0.22249");  // 001, metallic ternary prototype (ICSD #98666)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC_hP9_187_dh_ai_eg"){
+        vparameters.push_back("4.933,2.2278532,0.6533,0.8342,0.708");  // 001, metallic ternary prototype (ICSD #409533)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC_hP9_187_eh_ci_bg"){
+        vparameters.push_back("4.918,2.2206181,0.8334,0.696,0.6544");  // 001, metallic ternary prototype (ICSD #409534)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A5B5C_hP11_187_hk_cgi_a"){
+        vparameters.push_back("6.0692,1.8322019,0.32828,0.322,0.2,0.5122");  // 001, metallic ternary prototype (ICSD #416337)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A4B6C_hP11_187_ck_jk_a"){
+        vparameters.push_back("8.0581,0.55113488,0.53424,0.79441,0.19539");  // 001, metallic ternary prototype (ICSD #249520)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3B2C3_hP8_189_f_c_g"){
+        vparameters.push_back("7.2873,0.42088291,0.76243633,0.41574233");  // 001, metallic ternary prototype (ICSD #410967)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC_hP9_189_g_f_ad"){
+        vparameters.push_back("7.579,0.51801029,0.60163,0.26746");  // 001, metallic ternary prototype (ICSD #51845)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB2C6_hP9_189_b_c_fg"){
+        vparameters.push_back("7.801,0.43276503,0.249,0.592");  // 001, metallic ternary prototype (ICSD #20876)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A5B3C_hP9_189_cf_g_b"){
+        vparameters.push_back("6.759,0.61236869,0.24,0.578");  // 001, metallic ternary prototype (ICSD #634575)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC_hP9_189_bc_g_f"){
+        vparameters.push_back("7.1941,0.54156879,0.755,0.415");  // 001, metallic ternary prototype (ICSD #54295)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A2BC6_hP9_189_c_b_fg"){
+        vparameters.push_back("8.213,0.50651406,0.235,0.601");  // 001, metallic ternary prototype (ICSD #96253)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC_hP9_189_g_bc_f"){
+        vparameters.push_back("7.717,0.49941687,0.597,0.26");  // 001, metallic ternary prototype (ICSD #54315)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC_hP9_189_f_bc_g"){
+        vparameters.push_back("7.637,0.61332984,0.75,0.4277");  // 001, metallic ternary prototype (ICSD #54344)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC_hP9_189_f_ad_g"){
+        vparameters.push_back("7.4992,0.62021282,0.5659,0.243");  // 001, metallic ternary prototype (ICSD #55102)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC_hP9_189_g_f_bc"){
+        vparameters.push_back("7.4174,0.50893844,0.2522,0.5889");  // 001, metallic ternary prototype (ICSD #55846)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC_hP9_189_f_bc_g"){
+        vparameters.push_back("6.798,0.46587232,0.273,0.615");  // 002, metallic ternary prototype (ICSD #103885)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC_hP9_189_bc_g_f"){
+        vparameters.push_back("7.751,0.48651787,0.245,0.585");  // 002, metallic ternary prototype (ICSD #105713)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC_hP9_189_f_g_bc"){
+        vparameters.push_back("7.0015,0.54982504,0.793,0.446");  // 001, metallic ternary prototype (ICSD #107416)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC_hP9_189_ad_g_f"){
+        vparameters.push_back("7.345,0.6250919,0.56643333,0.24173333");  // 001, metallic ternary prototype (ICSD #160908)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC_hP9_189_f_g_bc"){
+        vparameters.push_back("7.0941,0.50138848,0.76,0.6667");  // 002, metallic ternary prototype (ICSD #608141)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC_hP9_189_f_g_bc"){
+        vparameters.push_back("7.016,0.5791049,0.24,0.3333");  // 003, metallic ternary prototype (ICSD #608770)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC_hP9_189_bc_f_g"){
+        vparameters.push_back("7.45,0.53288591,0.75506667,0.51506667");  // 001, metallic ternary prototype (ICSD #628137)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC_hP9_189_g_bc_f"){
+        vparameters.push_back("7.286,0.49725501,0.25,0.3333");  // 002, metallic ternary prototype (ICSD #638586)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3B2C_hP6_191_g_c_a"){
+        vparameters.push_back("5.565,0.81239892");  // 001, metallic ternary prototype (ICSD #57329)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3B2C_hP6_191_g_c_a"){
+        vparameters.push_back("8.813,0.46102349");  // 002, metallic ternary prototype (ICSD #102452)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A2BC3_hP6_191_c_a_g"){
+        vparameters.push_back("7.44,0.52956989");  // 001, metallic ternary prototype (ICSD #108369)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A2BC3_hP6_191_c_a_g"){
+        vparameters.push_back("5.581,0.70757929");  // 002, metallic ternary prototype (ICSD #658142)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A9BC2_hP12_191_fm_a_c"){
+        vparameters.push_back("8.04,0.48383085,0.212");  // 001, metallic ternary prototype (ICSD #57518)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A6BC6_hP13_191_i_a_cde"){
+        vparameters.push_back("5.48,1.6394161,0.6683,0.7529");  // 001, metallic ternary prototype (ICSD #54273)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A6B6C_hP13_191_i_cde_a"){
+        vparameters.push_back("5.5301,1.6316522,0.168,0.746");  // 001, metallic ternary prototype (ICSD #54277)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3B3C2_hP16_193_g_g_d"){
+        vparameters.push_back("7.9396,0.68974508,0.60359025,0.24573816");  // 001, metallic ternary prototype (ICSD #103733)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC_hP6_194_d_a_c"){
+        vparameters.push_back("4.713,1.8949714");  // 001, metallic ternary prototype (ICSD #54319)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC_hP6_194_a_c_d"){
+        vparameters.push_back("4.953,1.8465576");  // 001, metallic ternary prototype (ICSD #56978)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC_hP6_194_c_a_d"){
+        vparameters.push_back("4.553,1.7665276");  // 001, metallic ternary prototype (ICSD #57018)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC_hP6_194_a_d_c"){
+        vparameters.push_back("4.726,1.9970377");  // 001, metallic ternary prototype (ICSD #106303)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC_hP6_194_a_d_c"){
+        vparameters.push_back("4.909,1.500713");  // 002, metallic ternary prototype (ICSD #106345)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC_hP6_194_a_c_d"){
+        vparameters.push_back("4.583,1.7161248");  // 002, metallic ternary prototype (ICSD #106384)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC_hP6_194_c_d_a"){
+        vparameters.push_back("4.922,1.4691182");  // 002, metallic ternary prototype (ICSD #108545)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC_hP6_194_c_a_d"){
+        vparameters.push_back("4.5813,1.6472617");  // 002, metallic ternary prototype (ICSD #600994)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC_hP6_194_a_c_d"){
+        vparameters.push_back("4.783,1.6048505");  // 003, metallic ternary prototype (ICSD #622301)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB2C_hP8_194_b_f_c"){
+        vparameters.push_back("4.267,2.0180455,0.58");  // 001, metallic ternary prototype (ICSD #58139)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB2C_hP8_194_a_f_c"){
+        vparameters.push_back("4.539,1.9649703,0.592");  // 001, metallic ternary prototype (ICSD #59505)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB2C_hP8_194_c_f_a"){
+        vparameters.push_back("4.498,1.9873277,0.59");  // 001, metallic ternary prototype (ICSD #103292)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A2BC_hP8_194_f_a_c"){
+        vparameters.push_back("4.303,1.7748083,0.583");  // 001, metallic ternary prototype (ICSD #150602)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB2C_hP8_194_c_f_a"){
+        vparameters.push_back("4.6571,1.8583024,0.5887");  // 002, metallic ternary prototype (ICSD #157110)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3BC2_hP12_194_h_a_f"){
+        vparameters.push_back("5.27,1.626186,0.063,0.833");  // 001, metallic ternary prototype (ICSD #58159)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC_hP12_194_f_f_ab"){
+        vparameters.push_back("4.552,4.1001757,0.1617,0.6162");  // 001, metallic ternary prototype (ICSD #66003)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC_hP12_194_ab_f_f"){
+        vparameters.push_back("4.4951,3.5496874,0.11481,0.65681");  // 001, metallic ternary prototype (ICSD #152621)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC_hP12_194_f_ab_f"){
+        vparameters.push_back("4.468,3.5505819,0.61414,0.15824");  // 001, metallic ternary prototype (ICSD #152622)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC_hP12_194_ab_f_f"){
+        vparameters.push_back("4.588,3.7149085,0.6154,0.1507");  // 002, metallic ternary prototype (ICSD #152623)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3B3C2_hP16_194_h_af_f"){
+        vparameters.push_back("5.9892,2.4310425,0.12318,0.612,0.84546667");  // 001, metallic ternary prototype (ICSD #415931)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB2C_cP16_215_e_bce_ad"){
+        vparameters.push_back("6.315,0.7511,0.2331");  // 001, metallic ternary prototype (ICSD #180119)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3B4C4_cI22_217_b_c_c"){
+        vparameters.push_back("7.41,0.2031,0.366");  // 001, metallic ternary prototype (ICSD #58899)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3BC_cP15_221_ag_c_d"){
+        vparameters.push_back("6.408,0.29015");  // 001, metallic ternary prototype (ICSD #412144)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB3C_cP15_221_d_ag_c"){
+        vparameters.push_back("6.384,0.711");  // 001, metallic ternary prototype (ICSD #629734)
       }
 
     }

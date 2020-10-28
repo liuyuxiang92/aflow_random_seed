@@ -631,11 +631,11 @@ namespace anrl {
       stringstream sscontent_json;
       vector<string> vcontent_json;
 
-      sscontent_json << "\"aflow_label\":\"" << aflow_label << "\"" << eendl;
+      sscontent_json << "\"aflow_prototype_label\":\"" << aflow_label << "\"" << eendl;
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-      sscontent_json << "\"aflow_parameter_list\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(parameter_list,"\""),",") << "]" << eendl;
+      sscontent_json << "\"aflow_prototype_parameter_list\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(parameter_list,"\""),",") << "]" << eendl;
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-      sscontent_json << "\"aflow_parameter_values\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(parameter_values,8,roff),",") << "]" << eendl;
+      sscontent_json << "\"aflow_prototype_parameter_values\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(parameter_values,8,roff),",") << "]" << eendl;
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
       oss << "{" << aurostd::joinWDelimiter(vcontent_json,",")  << "}";
@@ -1225,9 +1225,10 @@ namespace anrl {
     // create an _atom for each Wyckoff position by plugging in the relevant parameters  
     for(uint i=0;i<Wyckoff_positions.size();i++){
       // get x, y, and z coordinates from the Wyckoff object
-      string x_value_string = aurostd::utype2string<double>(Wyckoff_positions[i].coord(1));
-      string y_value_string = aurostd::utype2string<double>(Wyckoff_positions[i].coord(2));
-      string z_value_string = aurostd::utype2string<double>(Wyckoff_positions[i].coord(3));
+      // added format=FIXED_STREAM since SYM::simplify has trouble with scientific notation
+      string x_value_string = aurostd::utype2string<double>(Wyckoff_positions[i].coord(1),AUROSTD_DEFAULT_PRECISION,FIXED_STREAM); //DX20201028 - added precision and format
+      string y_value_string = aurostd::utype2string<double>(Wyckoff_positions[i].coord(2),AUROSTD_DEFAULT_PRECISION,FIXED_STREAM); //DX20201028 - added precision and format
+      string z_value_string = aurostd::utype2string<double>(Wyckoff_positions[i].coord(3),AUROSTD_DEFAULT_PRECISION,FIXED_STREAM); //DX20201028 - added precision and format
       for(uint j=0;j<Wyckoff_positions[i].equations.size();j++){
         vector<string> coordinate_vstring = Wyckoff_positions[i].equations[j];
         xvector<double> coordinate(3);
@@ -2011,6 +2012,7 @@ namespace anrl {
     vector<string> vparameters_temp;
     aurostd::string2tokens(parameters,vparameters_temp,",");
     vector<double> vparameters = aurostd::vectorstring2vectordouble(vparameters_temp);
+    if(LDEBUG){ cerr << function_name << " parameter_values=" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vparameters,AUROSTD_DEFAULT_PRECISION,FIXED_STREAM),",") << endl; }
 
     // ---------------------------------------------------------------------------
     // check for automatic volume scaling (i.e., first parameter is negative)
