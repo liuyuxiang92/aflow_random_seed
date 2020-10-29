@@ -140,6 +140,8 @@ class StructurePrototype{
     vector<vector<string> > properties_structures_family; //DX20190506                      // vector of property values for the family structures (if using AFLUX) //DX20190425
     // functions
     uint numberOfDuplicates() const; //DX20190506                                           // return the number of duplicate structures for this prototype (i.e., checks misfit value)
+    string printRepresentativeStructure() const; //DX20201028                               // return the representative structure in a JSON format
+    string printMatchedStructures(const string& mode) const; //DX20201028                   // return the matched structures in a JSON format
     uint numberOfComparisons(); //DX20181221                                                // return the number of comparisons for this prototype
     bool isSymmetryCalculated(); //DX20190228
     bool isLFAEnvironmentCalculated(); //DX20191105

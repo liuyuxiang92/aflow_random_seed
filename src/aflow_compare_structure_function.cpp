@@ -179,12 +179,14 @@ ostream& operator<<(ostream& oss, const StructurePrototype& StructurePrototype){
     vector<string> vcontent_json, tmp_vstring;
 
     // structure_representative 
-    sscontent_json << "\"structure_representative\":\"" << StructurePrototype.structure_representative_name << "\"" << eendl;
+    sscontent_json << "\"structure_representative\":" << StructurePrototype.printRepresentativeStructure() << eendl;
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+    //DX20201028 [OBSOLETE] sscontent_json << "\"structure_representative\":\"" << StructurePrototype.structure_representative_name << "\"" << eendl;
+    //DX20201028 [OBSOLETE] vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
     // number_compounds_matching_representative 
-    sscontent_json << "\"number_compounds_matching_representative\":" << StructurePrototype.number_compounds_matching_representative << eendl;
-    vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+    //DX20201028 [OBSOLETE] sscontent_json << "\"number_compounds_matching_representative\":" << StructurePrototype.number_compounds_matching_representative << eendl;
+    //DX20201028 [OBSOLETE] vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
     // ntypes
     sscontent_json << "\"ntypes\":" << StructurePrototype.ntypes << eendl;
@@ -247,15 +249,15 @@ ostream& operator<<(ostream& oss, const StructurePrototype& StructurePrototype){
 
     if(StructurePrototype.aflow_label.size()!=0){
       // aflow_label 
-      sscontent_json << "\"aflow_label\":\"" << StructurePrototype.aflow_label << "\"" << eendl;
+      sscontent_json << "\"aflow_prototype_label\":\"" << StructurePrototype.aflow_label << "\"" << eendl;
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
       // aflow_parameter_list
-      sscontent_json << "\"aflow_parameter_list\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(StructurePrototype.aflow_parameter_list,"\""),",") << "]" << eendl;
+      sscontent_json << "\"aflow_prototype_parameter_list\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(StructurePrototype.aflow_parameter_list,"\""),",") << "]" << eendl;
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
       // aflow_parameter_values
-      sscontent_json << "\"aflow_parameter_values\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(StructurePrototype.aflow_parameter_values,8,roff),",") << "]" << eendl;
+      sscontent_json << "\"aflow_prototype_parameter_values\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(StructurePrototype.aflow_parameter_values,8,roff),",") << "]" << eendl;
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
     }
 
@@ -276,120 +278,130 @@ ostream& operator<<(ostream& oss, const StructurePrototype& StructurePrototype){
     sscontent_json << aurostd::joinWDelimiter(tmp_vstring,",") << "]" << eendl;
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
-    // split duplicate info
-    vector<double> misfits_duplicate, lattice_deviations_duplicate, coordinate_displacements_duplicate, failures_duplicate, magnetic_displacements_duplicate, magnetic_failures_duplicate;
-    stringstream ss_tmp;
-    bool magnetic_misfit_duplicate = false;
-    for(uint j=0;j<StructurePrototype.structures_duplicate_names.size();j++){
-      ss_tmp << StructurePrototype.structure_misfits_duplicate[j].misfit;
-      misfits_duplicate.push_back(aurostd::string2utype<double>(ss_tmp.str())); ss_tmp.str("");
-      ss_tmp << StructurePrototype.structure_misfits_duplicate[j].lattice_deviation;
-      lattice_deviations_duplicate.push_back(aurostd::string2utype<double>(ss_tmp.str())); ss_tmp.str("");
-      ss_tmp << StructurePrototype.structure_misfits_duplicate[j].coordinate_displacement;
-      coordinate_displacements_duplicate.push_back(aurostd::string2utype<double>(ss_tmp.str())); ss_tmp.str("");
-      ss_tmp << StructurePrototype.structure_misfits_duplicate[j].failure;
-      failures_duplicate.push_back(aurostd::string2utype<double>(ss_tmp.str())); ss_tmp.str("");
-      ss_tmp << StructurePrototype.structure_misfits_duplicate[j].magnetic_displacement;
-      magnetic_displacements_duplicate.push_back(aurostd::string2utype<double>(ss_tmp.str())); ss_tmp.str("");
-      ss_tmp << StructurePrototype.structure_misfits_duplicate[j].magnetic_failure;
-      magnetic_failures_duplicate.push_back(aurostd::string2utype<double>(ss_tmp.str())); ss_tmp.str("");
-      magnetic_misfit_duplicate=StructurePrototype.structure_misfits_duplicate[j].is_magnetic_misfit;
-    }
-
-    // structures_duplicate
-    sscontent_json << "\"structures_duplicate\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(StructurePrototype.structures_duplicate_names,"\""),",") << "]" << eendl;
+    // duplicate info
+    string mode = "duplicate";
+    sscontent_json << "\"stuctures_duplicate\":[" << StructurePrototype.printMatchedStructures(mode) << "]";
+    vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+    
+    // family info
+    mode = "family";
+    sscontent_json << "\"stuctures_family\":[" << StructurePrototype.printMatchedStructures(mode) << "]";
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
-    // misfits_duplicate
-    sscontent_json << "\"misfits_duplicate\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(misfits_duplicate,8,roff),",") << "]" << eendl;
-    vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+    //DX20201028 [OBSOLETE] // split duplicate info
+    //DX20201028 [OBSOLETE] vector<double> misfits_duplicate, lattice_deviations_duplicate, coordinate_displacements_duplicate, failures_duplicate, magnetic_displacements_duplicate, magnetic_failures_duplicate;
+    //DX20201028 [OBSOLETE] stringstream ss_tmp;
+    //DX20201028 [OBSOLETE] bool magnetic_misfit_duplicate = false;
+    //DX20201028 [OBSOLETE] for(uint j=0;j<StructurePrototype.structures_duplicate_names.size();j++){
+    //DX20201028 [OBSOLETE]   ss_tmp << StructurePrototype.structure_misfits_duplicate[j].misfit;
+    //DX20201028 [OBSOLETE]   misfits_duplicate.push_back(aurostd::string2utype<double>(ss_tmp.str())); ss_tmp.str("");
+    //DX20201028 [OBSOLETE]   ss_tmp << StructurePrototype.structure_misfits_duplicate[j].lattice_deviation;
+    //DX20201028 [OBSOLETE]   lattice_deviations_duplicate.push_back(aurostd::string2utype<double>(ss_tmp.str())); ss_tmp.str("");
+    //DX20201028 [OBSOLETE]   ss_tmp << StructurePrototype.structure_misfits_duplicate[j].coordinate_displacement;
+    //DX20201028 [OBSOLETE]   coordinate_displacements_duplicate.push_back(aurostd::string2utype<double>(ss_tmp.str())); ss_tmp.str("");
+    //DX20201028 [OBSOLETE]   ss_tmp << StructurePrototype.structure_misfits_duplicate[j].failure;
+    //DX20201028 [OBSOLETE]   failures_duplicate.push_back(aurostd::string2utype<double>(ss_tmp.str())); ss_tmp.str("");
+    //DX20201028 [OBSOLETE]   ss_tmp << StructurePrototype.structure_misfits_duplicate[j].magnetic_displacement;
+    //DX20201028 [OBSOLETE]   magnetic_displacements_duplicate.push_back(aurostd::string2utype<double>(ss_tmp.str())); ss_tmp.str("");
+    //DX20201028 [OBSOLETE]   ss_tmp << StructurePrototype.structure_misfits_duplicate[j].magnetic_failure;
+    //DX20201028 [OBSOLETE]   magnetic_failures_duplicate.push_back(aurostd::string2utype<double>(ss_tmp.str())); ss_tmp.str("");
+    //DX20201028 [OBSOLETE]   magnetic_misfit_duplicate=StructurePrototype.structure_misfits_duplicate[j].is_magnetic_misfit;
+    //DX20201028 [OBSOLETE] }
 
-    // lattice_deviations_duplicate
-    sscontent_json << "\"lattice_deviations_duplicate\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(lattice_deviations_duplicate,8,roff),",") << "]" << eendl;
-    vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+    //DX20201028 [OBSOLETE] // structures_duplicate
+    //DX20201028 [OBSOLETE] sscontent_json << "\"structures_duplicate\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(StructurePrototype.structures_duplicate_names,"\""),",") << "]" << eendl;
+    //DX20201028 [OBSOLETE] vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
-    // coordinate_displacements_duplicate
-    sscontent_json << "\"coordinate_displacements_duplicate\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(coordinate_displacements_duplicate,8,roff),",") << "]" << eendl;
-    vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+    //DX20201028 [OBSOLETE] // misfits_duplicate
+    //DX20201028 [OBSOLETE] sscontent_json << "\"misfits_duplicate\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(misfits_duplicate,8,roff),",") << "]" << eendl;
+    //DX20201028 [OBSOLETE] vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
-    // failures_duplicate
-    sscontent_json << "\"failures_duplicate\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(failures_duplicate,8,roff),",") << "]" << eendl;
-    vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+    //DX20201028 [OBSOLETE] // lattice_deviations_duplicate
+    //DX20201028 [OBSOLETE] sscontent_json << "\"lattice_deviations_duplicate\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(lattice_deviations_duplicate,8,roff),",") << "]" << eendl;
+    //DX20201028 [OBSOLETE] vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
-    if(magnetic_misfit_duplicate){
-      //// magnetic_misfits_duplicate
-      //sscontent_json << "\"magnetic_misfits_duplicate\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(magnetic_misfits_duplicate,8,roff),",") << "]" << eendl;
-      //vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+    //DX20201028 [OBSOLETE] // coordinate_displacements_duplicate
+    //DX20201028 [OBSOLETE] sscontent_json << "\"coordinate_displacements_duplicate\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(coordinate_displacements_duplicate,8,roff),",") << "]" << eendl;
+    //DX20201028 [OBSOLETE] vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
-      // magnetic_displacements_duplicate
-      sscontent_json << "\"magnetic_displacements_duplicate\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(magnetic_displacements_duplicate,8,roff),",") << "]" << eendl;
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+    //DX20201028 [OBSOLETE] // failures_duplicate
+    //DX20201028 [OBSOLETE] sscontent_json << "\"failures_duplicate\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(failures_duplicate,8,roff),",") << "]" << eendl;
+    //DX20201028 [OBSOLETE] vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
-      // magnetic_failures_duplicate
-      sscontent_json << "\"magnetic_failures_duplicate\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(magnetic_failures_duplicate,8,roff),",") << "]" << eendl;
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-    }
+    //DX20201028 [OBSOLETE] if(magnetic_misfit_duplicate){
+    //DX20201028 [OBSOLETE]   //// magnetic_misfits_duplicate
+    //DX20201028 [OBSOLETE]   //sscontent_json << "\"magnetic_misfits_duplicate\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(magnetic_misfits_duplicate,8,roff),",") << "]" << eendl;
+    //DX20201028 [OBSOLETE]   //vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
-    // number_compounds_matching_duplicate
-    sscontent_json << "\"number_compounds_matching_duplicate\":[" << aurostd::joinWDelimiter(StructurePrototype.number_compounds_matching_duplicate,",") << "]" << eendl;
-    vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+    //DX20201028 [OBSOLETE]   // magnetic_displacements_duplicate
+    //DX20201028 [OBSOLETE]   sscontent_json << "\"magnetic_displacements_duplicate\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(magnetic_displacements_duplicate,8,roff),",") << "]" << eendl;
+    //DX20201028 [OBSOLETE]   vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
-    // split family info
-    vector<double> misfits_family, lattice_deviations_family, coordinate_displacements_family, failures_family, magnetic_displacements_family, magnetic_failures_family;
-    bool magnetic_misfit_family=false;
-    for(uint j=0;j<StructurePrototype.structures_family_names.size();j++){
-      ss_tmp << StructurePrototype.structure_misfits_family[j].misfit;
-      misfits_family.push_back(aurostd::string2utype<double>(ss_tmp.str())); ss_tmp.str("");
-      ss_tmp << StructurePrototype.structure_misfits_family[j].lattice_deviation;
-      lattice_deviations_family.push_back(aurostd::string2utype<double>(ss_tmp.str())); ss_tmp.str("");
-      ss_tmp << StructurePrototype.structure_misfits_family[j].coordinate_displacement;
-      coordinate_displacements_family.push_back(aurostd::string2utype<double>(ss_tmp.str())); ss_tmp.str("");
-      ss_tmp << StructurePrototype.structure_misfits_family[j].failure;
-      failures_family.push_back(aurostd::string2utype<double>(ss_tmp.str())); ss_tmp.clear();
-      ss_tmp << StructurePrototype.structure_misfits_family[j].magnetic_displacement;
-      magnetic_displacements_family.push_back(aurostd::string2utype<double>(ss_tmp.str())); ss_tmp.str("");
-      ss_tmp << StructurePrototype.structure_misfits_family[j].magnetic_failure;
-      magnetic_failures_family.push_back(aurostd::string2utype<double>(ss_tmp.str())); ss_tmp.str("");
-      magnetic_misfit_family=StructurePrototype.structure_misfits_family[j].is_magnetic_misfit;
-    }
+    //DX20201028 [OBSOLETE]   // magnetic_failures_duplicate
+    //DX20201028 [OBSOLETE]   sscontent_json << "\"magnetic_failures_duplicate\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(magnetic_failures_duplicate,8,roff),",") << "]" << eendl;
+    //DX20201028 [OBSOLETE]   vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+    //DX20201028 [OBSOLETE] }
 
-    // structures_family
-    sscontent_json << "\"structures_family\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(StructurePrototype.structures_family_names,"\""),",") << "]" << eendl;
-    vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+    //DX20201028 [OBSOLETE] // number_compounds_matching_duplicate
+    //DX20201028 [OBSOLETE] sscontent_json << "\"number_compounds_matching_duplicate\":[" << aurostd::joinWDelimiter(StructurePrototype.number_compounds_matching_duplicate,",") << "]" << eendl;
+    //DX20201028 [OBSOLETE] vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
-    // misfits_family
-    sscontent_json << "\"misfits_family\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(misfits_family,8,roff),",") << "]" << eendl;
-    vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+    //DX20201028 [OBSOLETE] // split family info
+    //DX20201028 [OBSOLETE] vector<double> misfits_family, lattice_deviations_family, coordinate_displacements_family, failures_family, magnetic_displacements_family, magnetic_failures_family;
+    //DX20201028 [OBSOLETE] bool magnetic_misfit_family=false;
+    //DX20201028 [OBSOLETE] for(uint j=0;j<StructurePrototype.structures_family_names.size();j++){
+    //DX20201028 [OBSOLETE]   ss_tmp << StructurePrototype.structure_misfits_family[j].misfit;
+    //DX20201028 [OBSOLETE]   misfits_family.push_back(aurostd::string2utype<double>(ss_tmp.str())); ss_tmp.str("");
+    //DX20201028 [OBSOLETE]   ss_tmp << StructurePrototype.structure_misfits_family[j].lattice_deviation;
+    //DX20201028 [OBSOLETE]   lattice_deviations_family.push_back(aurostd::string2utype<double>(ss_tmp.str())); ss_tmp.str("");
+    //DX20201028 [OBSOLETE]   ss_tmp << StructurePrototype.structure_misfits_family[j].coordinate_displacement;
+    //DX20201028 [OBSOLETE]   coordinate_displacements_family.push_back(aurostd::string2utype<double>(ss_tmp.str())); ss_tmp.str("");
+    //DX20201028 [OBSOLETE]   ss_tmp << StructurePrototype.structure_misfits_family[j].failure;
+    //DX20201028 [OBSOLETE]   failures_family.push_back(aurostd::string2utype<double>(ss_tmp.str())); ss_tmp.clear();
+    //DX20201028 [OBSOLETE]   ss_tmp << StructurePrototype.structure_misfits_family[j].magnetic_displacement;
+    //DX20201028 [OBSOLETE]   magnetic_displacements_family.push_back(aurostd::string2utype<double>(ss_tmp.str())); ss_tmp.str("");
+    //DX20201028 [OBSOLETE]   ss_tmp << StructurePrototype.structure_misfits_family[j].magnetic_failure;
+    //DX20201028 [OBSOLETE]   magnetic_failures_family.push_back(aurostd::string2utype<double>(ss_tmp.str())); ss_tmp.str("");
+    //DX20201028 [OBSOLETE]   magnetic_misfit_family=StructurePrototype.structure_misfits_family[j].is_magnetic_misfit;
+    //DX20201028 [OBSOLETE] }
 
-    // lattice_deviations_family
-    sscontent_json << "\"lattice_deviations_family\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(lattice_deviations_family,8,roff),",") << "]" << eendl;
-    vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+    //DX20201028 [OBSOLETE] // structures_family
+    //DX20201028 [OBSOLETE] sscontent_json << "\"structures_family\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(StructurePrototype.structures_family_names,"\""),",") << "]" << eendl;
+    //DX20201028 [OBSOLETE] vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
-    // coordinate_displacements_family
-    sscontent_json << "\"coordinate_displacements_family\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(coordinate_displacements_family,8,roff),",") << "]" << eendl;
-    vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+    //DX20201028 [OBSOLETE] // misfits_family
+    //DX20201028 [OBSOLETE] sscontent_json << "\"misfits_family\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(misfits_family,8,roff),",") << "]" << eendl;
+    //DX20201028 [OBSOLETE] vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
-    // failures_family
-    sscontent_json << "\"failures_family\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(failures_family,8,roff),",") << "]" << eendl;
-    vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+    //DX20201028 [OBSOLETE] // lattice_deviations_family
+    //DX20201028 [OBSOLETE] sscontent_json << "\"lattice_deviations_family\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(lattice_deviations_family,8,roff),",") << "]" << eendl;
+    //DX20201028 [OBSOLETE] vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
-    if(magnetic_misfit_family){
-      //// magnetic_misfits_family
-      //sscontent_json << "\"magnetic_misfits_family\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(magnetic_misfits_family,8,roff),",") << "]" << eendl;
-      //vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+    //DX20201028 [OBSOLETE] // coordinate_displacements_family
+    //DX20201028 [OBSOLETE] sscontent_json << "\"coordinate_displacements_family\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(coordinate_displacements_family,8,roff),",") << "]" << eendl;
+    //DX20201028 [OBSOLETE] vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
-      // magnetic_displacements_family
-      sscontent_json << "\"magnetic_displacements_family\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(magnetic_displacements_family,8,roff),",") << "]" << eendl;
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+    //DX20201028 [OBSOLETE] // failures_family
+    //DX20201028 [OBSOLETE] sscontent_json << "\"failures_family\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(failures_family,8,roff),",") << "]" << eendl;
+    //DX20201028 [OBSOLETE] vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
-      // magnetic_failures_family
-      sscontent_json << "\"magnetic_failures_family\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(magnetic_failures_family,8,roff),",") << "]" << eendl;
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-    }
+    //DX20201028 [OBSOLETE] if(magnetic_misfit_family){
+    //DX20201028 [OBSOLETE]   //// magnetic_misfits_family
+    //DX20201028 [OBSOLETE]   //sscontent_json << "\"magnetic_misfits_family\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(magnetic_misfits_family,8,roff),",") << "]" << eendl;
+    //DX20201028 [OBSOLETE]   //vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
-    // number_compounds_matching_family
-    sscontent_json << "\"number_compounds_matching_family\":[" << aurostd::joinWDelimiter(StructurePrototype.number_compounds_matching_family,",") << "]" << eendl;
-    vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+    //DX20201028 [OBSOLETE]   // magnetic_displacements_family
+    //DX20201028 [OBSOLETE]   sscontent_json << "\"magnetic_displacements_family\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(magnetic_displacements_family,8,roff),",") << "]" << eendl;
+    //DX20201028 [OBSOLETE]   vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+
+    //DX20201028 [OBSOLETE]   // magnetic_failures_family
+    //DX20201028 [OBSOLETE]   sscontent_json << "\"magnetic_failures_family\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(magnetic_failures_family,8,roff),",") << "]" << eendl;
+    //DX20201028 [OBSOLETE]   vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+    //DX20201028 [OBSOLETE] }
+
+    //DX20201028 [OBSOLETE] // number_compounds_matching_family
+    //DX20201028 [OBSOLETE] sscontent_json << "\"number_compounds_matching_family\":[" << aurostd::joinWDelimiter(StructurePrototype.number_compounds_matching_family,",") << "]" << eendl;
+    //DX20201028 [OBSOLETE] vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
     if(StructurePrototype.property_names.size()!=0){ //DX20190425 - only print if requested
       // property_names
@@ -400,33 +412,33 @@ ostream& operator<<(ostream& oss, const StructurePrototype& StructurePrototype){
       sscontent_json << "\"property_units\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(StructurePrototype.property_units,"\""),",") << "]" << eendl;
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
-      // properties_structure_representative
-      sscontent_json << "\"properties_structure_representative\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(StructurePrototype.properties_structure_representative,"\""),",") << "]" << eendl;
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      //DX20201028 [OBSOLETE] // properties_structure_representative
+      //DX20201028 [OBSOLETE] sscontent_json << "\"properties_structure_representative\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(StructurePrototype.properties_structure_representative,"\""),",") << "]" << eendl;
+      //DX20201028 [OBSOLETE] vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
-      // duplicate_structure_properties
-      sscontent_json << "\"properties_structures_duplicate\":[";
-      tmp_vstring.clear();
-      //DX20190326 - should be duplicate for(uint i=0;i<StructurePrototype.properties_structure_representative.size();i++)
-      for(uint i=0;i<StructurePrototype.properties_structures_duplicate.size();i++) //DX20190326 - correctly changed to duplicate_sturctures_properties
-      { //CO20200106 - patching for auto-indenting
-        tmp_vstring.push_back(aurostd::joinWDelimiter(aurostd::wrapVecEntries(StructurePrototype.properties_structures_duplicate[i],"\""),","));
-      }
-      sscontent_json << aurostd::joinWDelimiter(aurostd::wrapVecEntries(tmp_vstring,"[","]"),",");
-      sscontent_json << "]" << eendl;
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      //DX20201028 [OBSOLETE] // duplicate_structure_properties
+      //DX20201028 [OBSOLETE] sscontent_json << "\"properties_structures_duplicate\":[";
+      //DX20201028 [OBSOLETE] tmp_vstring.clear();
+      //DX20201028 [OBSOLETE] //DX20190326 - should be duplicate for(uint i=0;i<StructurePrototype.properties_structure_representative.size();i++)
+      //DX20201028 [OBSOLETE] for(uint i=0;i<StructurePrototype.properties_structures_duplicate.size();i++) //DX20190326 - correctly changed to duplicate_sturctures_properties
+      //DX20201028 [OBSOLETE] { //CO20200106 - patching for auto-indenting
+      //DX20201028 [OBSOLETE]   tmp_vstring.push_back(aurostd::joinWDelimiter(aurostd::wrapVecEntries(StructurePrototype.properties_structures_duplicate[i],"\""),","));
+      //DX20201028 [OBSOLETE] }
+      //DX20201028 [OBSOLETE] sscontent_json << aurostd::joinWDelimiter(aurostd::wrapVecEntries(tmp_vstring,"[","]"),",");
+      //DX20201028 [OBSOLETE] sscontent_json << "]" << eendl;
+      //DX20201028 [OBSOLETE] vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
-      //DX20190425 START
-      // family_structure_properties
-      sscontent_json << "\"properties_structures_family\":[";
-      tmp_vstring.clear();
-      for(uint i=0;i<StructurePrototype.properties_structures_family.size();i++){
-        tmp_vstring.push_back(aurostd::joinWDelimiter(aurostd::wrapVecEntries(StructurePrototype.properties_structures_family[i],"\""),","));
-      }
-      sscontent_json << aurostd::joinWDelimiter(aurostd::wrapVecEntries(tmp_vstring,"[","]"),",");
-      sscontent_json << "]" << eendl;
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-      //DX20190425 END
+      //DX20201028 [OBSOLETE] //DX20190425 START
+      //DX20201028 [OBSOLETE] // family_structure_properties
+      //DX20201028 [OBSOLETE] sscontent_json << "\"properties_structures_family\":[";
+      //DX20201028 [OBSOLETE] tmp_vstring.clear();
+      //DX20201028 [OBSOLETE] for(uint i=0;i<StructurePrototype.properties_structures_family.size();i++){
+      //DX20201028 [OBSOLETE]   tmp_vstring.push_back(aurostd::joinWDelimiter(aurostd::wrapVecEntries(StructurePrototype.properties_structures_family[i],"\""),","));
+      //DX20201028 [OBSOLETE] }
+      //DX20201028 [OBSOLETE] sscontent_json << aurostd::joinWDelimiter(aurostd::wrapVecEntries(tmp_vstring,"[","]"),",");
+      //DX20201028 [OBSOLETE] sscontent_json << "]" << eendl;
+      //DX20201028 [OBSOLETE] vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      //DX20201028 [OBSOLETE] //DX20190425 END
     } //DX20190425
 
     // Put into json StructurePrototype object
@@ -451,6 +463,109 @@ uint StructurePrototype::numberOfDuplicates() const {
   }
 
   return number_of_duplicates;
+}
+
+// ***************************************************************************
+// StructurePrototype::printRepresentativeStructureStructure() 
+// ***************************************************************************
+string StructurePrototype::printRepresentativeStructure() const {
+  
+  string eendl="";
+  stringstream sscontent_json;
+  vector<string> vcontent_json;
+
+  sscontent_json << "\"name\":" << "\"" << structure_representative_name << "\"" << eendl;
+  vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      
+  sscontent_json << "\"number_compounds_matching_entry\":" << number_compounds_matching_representative << eendl;
+  vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+
+  // representative structure may not have properties
+  if(properties_structure_representative.size()){
+    for(uint i=0;i<property_names.size();i++){
+      sscontent_json << "\"" << property_names[i] << "\":\"" << properties_structure_representative[i] << "\"" << eendl;
+      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+    }
+  }
+
+  return "{" + aurostd::joinWDelimiter(vcontent_json,",") + "}";
+
+}
+
+// ***************************************************************************
+// StructurePrototype::printMatchedStructure() 
+// ***************************************************************************
+string StructurePrototype::printMatchedStructures(const string& mode) const {
+
+  bool roff=true;
+  string eendl="";
+  stringstream sscontent_json;
+  vector<string> vcontent_json, vstructures;
+
+  // print duplicate structure information
+  if(mode == "duplicate"){
+    for(uint j=0;j<structures_duplicate_names.size();j++){
+      sscontent_json << "\"name\":" << "\"" << structures_duplicate_names[j] << "\"" << eendl;
+      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      sscontent_json << "\"misfit\":" << aurostd::utype2string<double>(structure_misfits_duplicate[j].misfit,AUROSTD_ROUNDOFF_TOL,roff) << eendl;
+      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      sscontent_json << "\"lattice_deviation\":" << aurostd::utype2string<double>(structure_misfits_duplicate[j].lattice_deviation,AUROSTD_ROUNDOFF_TOL,roff) << eendl;
+      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      sscontent_json << "\"coordinate_displacement\":" << aurostd::utype2string<double>(structure_misfits_duplicate[j].coordinate_displacement,AUROSTD_ROUNDOFF_TOL,roff) << eendl;
+      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      sscontent_json << "\"failure\":" << aurostd::utype2string<double>(structure_misfits_duplicate[j].failure,AUROSTD_ROUNDOFF_TOL,roff) << eendl;
+      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      if(structure_misfits_duplicate[j].is_magnetic_misfit){
+        //BETA sscontent_json << "\"misfit_magnetic\":" << structure_misfits_duplicate[j].magnetic_misfit << eendl;
+        //BETSvcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+        sscontent_json << "\"displacement_magnetic\":" << aurostd::utype2string<double>(structure_misfits_duplicate[j].magnetic_displacement,AUROSTD_ROUNDOFF_TOL,roff) << eendl;
+        vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+        sscontent_json << "\"failure_magnetic\":" << aurostd::utype2string<double>(structure_misfits_duplicate[j].magnetic_failure,AUROSTD_ROUNDOFF_TOL,roff) << eendl;
+        vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      }
+      sscontent_json << "\"number_compounds_matching_entry\":" << number_compounds_matching_duplicate[j] << eendl;
+      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      for(uint i=0;i<property_names.size();i++){
+        sscontent_json << "\"" << property_names[i] << "\":\"" << properties_structures_duplicate[j][i] << "\"" << eendl;
+        vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      }
+      vstructures.push_back("{" + aurostd::joinWDelimiter(vcontent_json,",") + "}");
+      vcontent_json.clear();
+    }
+  }
+  // print same family structure information
+  else if(mode == "family"){
+    for(uint j=0;j<structures_family_names.size();j++){
+      sscontent_json << "\"name\":" << "\"" << structures_family_names[j] << "\"" << eendl;
+      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      sscontent_json << "\"misfit\":" << aurostd::utype2string<double>(structure_misfits_family[j].misfit,AUROSTD_ROUNDOFF_TOL,roff) << eendl;
+      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      sscontent_json << "\"lattice_deviation\":" << aurostd::utype2string<double>(structure_misfits_family[j].lattice_deviation,AUROSTD_ROUNDOFF_TOL,roff) << eendl;
+      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      sscontent_json << "\"coordinate_displacement\":" << aurostd::utype2string<double>(structure_misfits_family[j].coordinate_displacement,AUROSTD_ROUNDOFF_TOL,roff) << eendl;
+      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      sscontent_json << "\"failure\":" << aurostd::utype2string<double>(structure_misfits_family[j].failure,AUROSTD_ROUNDOFF_TOL,roff) << eendl;
+      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      if(structure_misfits_family[j].is_magnetic_misfit){
+        //BETA sscontent_json << "\"misfit_magnetic\":" << structure_misfits_family[j].magnetic_misfit << eendl;
+        //BETSvcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+        sscontent_json << "\"displacement_magnetic\":" << aurostd::utype2string<double>(structure_misfits_family[j].magnetic_displacement,AUROSTD_ROUNDOFF_TOL,roff) << eendl;
+        vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+        sscontent_json << "\"failure_magnetic\":" << aurostd::utype2string<double>(structure_misfits_family[j].magnetic_failure,AUROSTD_ROUNDOFF_TOL,roff) << eendl;
+        vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      }
+      sscontent_json << "\"number_compounds_matching_entry\":" << number_compounds_matching_family[j] << eendl;
+      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      for(uint i=0;i<property_names.size();i++){
+        sscontent_json << "\"" << property_names[i] << "\":\"" << properties_structures_family[j][i] << "\"" << eendl;
+        vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      }
+      vstructures.push_back("{" + aurostd::joinWDelimiter(vcontent_json,",") + "}");
+      vcontent_json.clear();
+    }
+  }
+
+  return aurostd::joinWDelimiter(vstructures,",");
 }
 
 // ***************************************************************************
