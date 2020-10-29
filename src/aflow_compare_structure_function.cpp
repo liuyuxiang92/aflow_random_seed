@@ -692,6 +692,9 @@ void StructurePrototype::putDuplicateAsFamily(uint index, bool keep_generated){
   else{ //default
     structures_family_generated.push_back(false);
   }
+  
+  // add matched compounds 
+  number_compounds_matching_family.push_back(number_compounds_matching_duplicate[index]); //DX20201028
 
   // store properties of family structures
   if(property_names.size()!=0){
