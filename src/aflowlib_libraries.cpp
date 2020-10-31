@@ -6228,6 +6228,7 @@ namespace aflowlib {
     if(ok) { obb << ".";if(!aurostd::FileExist(dir+"/"+_AFLOWLOCK_)) { ok=FALSE;obb << " no=LOCK"; }}
     if(ok) { obb << ".";if(aurostd::FileExist(dir+"/EIGENVAL")) { ok=FALSE;obb << " yes=EIGENVAL"; }}
     if(ok) { obb << ".";if(aurostd::FileExist(dir+"/vasp.out")) { ok=FALSE;obb << " yes=vasp.out"; }}
+    if(ok) { obb << ".";if(aurostd::FileExist(dir+"/aflow.qmvasp.out")) { ok=FALSE;obb << " yes=aflow.qmvasp.out"; }}
     if(ok) { obb << ".";if(aurostd::FileExist(dir+"/AECCAR0")) { ok=FALSE;obb << " yes=AECCAR0"; }}
     if(ok) { obb << ".";if(aurostd::FileExist(dir+"/AECCAR1")) { ok=FALSE;obb << " yes=AECCAR1"; }}
     if(ok) { obb << ".";if(aurostd::FileExist(dir+"/AECCAR2")) { ok=FALSE;obb << " yes=AECCAR2"; }}
@@ -6240,6 +6241,18 @@ namespace aflowlib {
       if(ok) { obb << ".";if(aurostd::FileExist(dir+"/OUTCAR"+vrelax.at(irelax))) { ok=FALSE;obb << " yes=OUTCAR"+vrelax.at(irelax); }}
       if(ok) { obb << ".";if(aurostd::FileExist(dir+"/OSZICAR"+vrelax.at(irelax))) { ok=FALSE;obb << " yes=OSZICAR"+vrelax.at(irelax); }}
       if(ok) { obb << ".";if(aurostd::FileExist(dir+"/POTCAR"+vrelax.at(irelax))) { ok=FALSE;obb << " yes=POTCAR"+vrelax.at(irelax); }}
+    }
+    // TEST COMPRESS
+    if(ok) { obb << "z";  // check all the outputs
+      if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/aflow.agroup.out")) { ok=FALSE;obb << " no=aflow.agroup.out" << ".EXT"; }}
+      if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/aflow.fgroup.out")) { ok=FALSE;obb << " no=aflow.fgroup.out" << ".EXT"; }}
+      if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/aflow.iatoms.out")) { ok=FALSE;obb << " no=aflow.iatoms.out" << ".EXT"; }}
+      if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/aflow.pgroup.out")) { ok=FALSE;obb << " no=aflow.pgroup.out" << ".EXT"; }}
+      if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/aflow.pgroup_xtal.out")) { ok=FALSE;obb << " no=aflow.pgroup_xtal.out" << ".EXT"; }}
+      if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/aflow.pseudopotential_auid.out")) { ok=FALSE;obb << " no=aflow.pseudopotential_auid.out" << ".EXT"; }}
+      if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/aflow.qmvasp.out")) { ok=FALSE;obb << " no=aflow.qmvasp.out" << ".EXT"; }}
+      if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/INCAR.orig")) { ok=FALSE;obb << " no=INCAR.orig" << ".EXT"; }}
+      if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/POSCAR.orig")) { ok=FALSE;obb << " no=POSCAR.orig" << ".EXT"; }}
     }
     // TEST RELAX1 RELAX2 RELAX3
     for(uint irelax=0;irelax<vrelax.size();irelax++) {
