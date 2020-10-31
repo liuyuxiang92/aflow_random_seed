@@ -85,7 +85,7 @@ namespace init {
     XHOST.home=aurostd::execute2string("cd && pwd");  //AS SOON AS POSSIBLE
     if(XHOST.home.empty()){XHOST.home=getenv("HOME");}  //CO20200624 - attempt 2
     XHOST.GENERATE_AFLOWIN_ONLY=aurostd::args2flag(argv,cmds,"--generate_aflowin_only");  //CT20180719
-    XHOST.POSTPROCESS=aurostd::args2flag(argv,cmds,"--lib2raw|--lib2lib");  //CO20200624
+    XHOST.POSTPROCESS=aurostd::args2attachedflag(argv,cmds,"--lib2raw=|--lib2lib=");  //CO20200624
     XHOST.ARUN_POSTPROCESS=aurostd::args2flag(argv,cmds,"--postprocess");  //CT20181212
 
     // AFLOWRC LOAD DEFAULTS FROM AFLOWRC.
@@ -1082,7 +1082,6 @@ namespace init {
 	// 	}
 	// 	//       if(LDEBUG) cerr << soliloquy << " out=" << out << endl; 
 	// if(LDEBUG) cerr << soliloquy << " str2load=" << str2load << endl;
-	// exit(0);
       } else {
 	//	cerr <<  soliloquy << " [2] " << endl;
 	if(LDEBUG) {cerr << soliloquy << " issuing command: " << XHOST.command("aflow_data") << " " << str2load << endl;}
