@@ -280,12 +280,12 @@ ostream& operator<<(ostream& oss, const StructurePrototype& StructurePrototype){
 
     // duplicate info
     string mode = "duplicate";
-    sscontent_json << "\"stuctures_duplicate\":[" << StructurePrototype.printMatchedStructures(mode) << "]";
+    sscontent_json << "\"structures_duplicate\":[" << StructurePrototype.printMatchedStructures(mode) << "]";
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
     
     // family info
     mode = "family";
-    sscontent_json << "\"stuctures_family\":[" << StructurePrototype.printMatchedStructures(mode) << "]";
+    sscontent_json << "\"structures_family\":[" << StructurePrototype.printMatchedStructures(mode) << "]";
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
     //DX20201028 [OBSOLETE] // split duplicate info
