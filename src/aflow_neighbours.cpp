@@ -139,7 +139,7 @@ bool StepNeighboursPerform(xstructure& a,string AflowIn,ofstream &FileMESSAGE,_a
   //  //  --------------------------- create unique list
   //  if(LVERBOSE) aus << "00000  MESSAGE NEIGHBOURS create unique list of atoms " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
   //  if(LVERBOSE) aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-  //  if(LVERBOSE) cout << "00000  MESSAGE NEIGHBOURS working size(before)=";
+  //  if(LVERBOSE) cout << XPID << "00000  MESSAGE NEIGHBOURS working size(before)=";
   //
   //  for(iat1=0;iat1<numatoms;iat1++)                                                      // create unique list
   //    for(iat2=0;iat2<str.natoms.at(iat1).size();iat2++)                                  // create unique list
@@ -180,7 +180,7 @@ bool StepNeighboursPerform(xstructure& a,string AflowIn,ofstream &FileMESSAGE,_a
   //  if(LVERBOSE) aus << "00000  MESSAGE NEIGHBOURS working size(after)=";
   //  if(LVERBOSE) aus << str.ashell.size() << endl;
   //  if(LVERBOSE) aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-  //  if(LVERBOSE) cout << "00000  MESSAGE NEIGHBOURS working size(double checking)";
+  //  if(LVERBOSE) cout << XPID << "00000  MESSAGE NEIGHBOURS working size(double checking)";
   //
   //  for(iat1=0;iat1<str.ashell.size();iat1++) {                                          // be double sure
   //    if(!mod((int)iat1,(int)str.ashell.size()/25)) if(LVERBOSE) {cout<<".";cout.flush();}// be double sure

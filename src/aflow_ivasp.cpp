@@ -3629,13 +3629,13 @@ namespace KBIN {
   int XVASP_INCAR_GetNBANDS(_xvasp& xvasp,bool ispin) {
     vector<double> vZVAL;
     double ZVAL=GetZVAL(xvasp.POTCAR,vZVAL);
-    // // cout << "00000  MESSAGE POTCAR ZVAL max   = " << ZVAL << endl;
+    // // cout << XPID << "00000  MESSAGE POTCAR ZVAL max   = " << ZVAL << endl;
     int nbands;
     nbands=GetNBANDS((int) ZVAL,(int) xvasp.str.atoms.size(),5,ispin);
     nbands=GetNBANDS((int) ZVAL,(int) xvasp.str.atoms.size(),5,TRUE);  // SAFETY
     // nbands=nbands+20+nbands/5; // MORE SAFETY
-    // cout << "00000  MESSAGE POTCAR NBANDS = " << nbands << endl;
-    if(!XHOST.QUIET) cout << "00000  MESSAGE-OPTION  [VASP_FORCE_OPTION]NBANDS  = " << nbands << endl;
+    // cout << XPID << "00000  MESSAGE POTCAR NBANDS = " << nbands << endl;
+    if(!XHOST.QUIET) cout << XPID << "00000  MESSAGE-OPTION  [VASP_FORCE_OPTION]NBANDS  = " << nbands << endl;
     return nbands;
   }
 }
