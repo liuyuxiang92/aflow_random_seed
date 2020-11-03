@@ -1736,7 +1736,6 @@ ABC2_hP8_194_c_a_f-001.{ABC}                     hP8       P6_{3}/mmc          -
 AB2C_hP8_194_a_f_b-001.{ABC}                     hP8       P6_{3}/mmc          -         Fe1N2W1             #194      ternary metal-nitride prototype; Fe1N2W1, ICSD #75971
 ABC2_hP8_194_a_c_f-001.{ABC}                     hP8       P6_{3}/mmc          -         Mg1Mo1N2            #194      ternary metal-nitride prototype; Mg1Mo1N2, ICSD #185913
 A3BC_hP10_194_h_a_c-001.{ABC}                    hP10      P6_{3}/mmc          -         Ba3N1Na1            #194      ternary metal-nitride prototype; Ba3N1Na1, ICSD #67497
-A3BC_hP10_194_h_c_a-001.{ABC}                    hP10      P6_{3}/mmc          -         Ba3Bi1N1            #194      ternary metal-nitride prototype; Ba3Bi1N1, ICSD #152055
 AB3C4_hP16_194_c_ae_2f-001.{ABC}                 hP16      P6_{3}/mmc          -         Al1N3V4             #194      ternary metal-nitride prototype; Al1N3V4, ICSD #181351
 AB2C_cF32_227_b_c_a.{ABC}                        cF32      Fd-3m               -         Cs1N2Nb1            #227      ternary metal-nitride prototype; Cs1N2Nb1, ICSD #72546
 

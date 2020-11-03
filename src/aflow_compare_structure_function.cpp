@@ -477,7 +477,7 @@ string StructurePrototype::printRepresentativeStructure() const {
   sscontent_json << "\"name\":" << "\"" << structure_representative_name << "\"" << eendl;
   vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
       
-  sscontent_json << "\"number_compounds_matching_entry\":" << number_compounds_matching_representative << eendl;
+  sscontent_json << "\"number_compounds_matching_structure\":" << number_compounds_matching_representative << eendl;
   vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
   // representative structure may not have properties
@@ -523,7 +523,7 @@ string StructurePrototype::printMatchedStructures(const string& mode) const {
         sscontent_json << "\"failure_magnetic\":" << aurostd::utype2string<double>(structure_misfits_duplicate[j].magnetic_failure,AUROSTD_ROUNDOFF_TOL,roff) << eendl;
         vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
       }
-      sscontent_json << "\"number_compounds_matching_entry\":" << number_compounds_matching_duplicate[j] << eendl;
+      sscontent_json << "\"number_compounds_matching_structure\":" << number_compounds_matching_duplicate[j] << eendl;
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
       for(uint i=0;i<property_names.size();i++){
         sscontent_json << "\"" << property_names[i] << "\":\"" << properties_structures_duplicate[j][i] << "\"" << eendl;
@@ -8241,7 +8241,7 @@ namespace compare{
 
               // ---------------------------------------------------------------------------
               // quick return if testing only one origin //DX20200715
-              if(!optimize_match && aurostd::isequal(min_misfit_info.misfit,AUROSTD_MAX_DOUBLE)){ test_one_origin_only=true;}
+              if(!optimize_match && aurostd::isequal(min_misfit_info.misfit,AUROSTD_MAX_DOUBLE) && type_match==2){ test_one_origin_only=true;} //DX20201102 - need type_match==2 (otherwise we don't check different types)
               if(test_one_origin_only){
                 if(LDEBUG){cerr << function_name << " No mapping found. Searched only one origin. Terminating search early." << endl;}
                 return;
