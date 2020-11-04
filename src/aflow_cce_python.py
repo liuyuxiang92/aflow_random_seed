@@ -81,9 +81,16 @@ class CCE:
             # convert to list
             functionals = functionals.replace(' ', '')
             functionals = functionals.split(',')
+        if type(functionals) == tuple and len(functionals) > 0:
+            # convert to list
+            functionals = list(functionals)
         if type(functionals) == list and len(functionals) > 0:
             self.validate_functionals(functionals)
             command = self.add_functionals(functionals, command)
+        else:
+            raise TypeError('The functionals argument must be either a list, '
+                            'or a tuple, or a string with functionals '
+                            'separated by commas.')
 
         # handling enthalpies_formation_dft
         if type(enthalpies_formation_dft) == str and enthalpies_formation_dft:
