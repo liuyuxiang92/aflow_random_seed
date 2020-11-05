@@ -7,8 +7,27 @@ VERBOSE = False
 
 class CCE:
     def __init__(self, aflow_executable='aflow'):
-        '''checks whether aflow executable exists'''
+        '''Class implementing CCE python functionality
+
+        Methods:
+        get_corrections -- get CCE corrections
+        Arguments:
+        struct_file_path -- path to the structure file
+        functionals -- functionals to get corrections for (optional)
+        enthalpies_formation_dft -- input DFT formation enthalpies (optional)
+        oxidation_numbers -- input oxidation numbers for each atom (optional)
+
+        get_oxidation_numbers -- get CCE oxidation numbers
+        Arguments:
+        struct_file_path -- path to the structure file
+
+        get_cation_coordination_numbers -- get CCE cation coordination numbers
+        Arguments:
+        struct_file_path -- path to the structure file
+        '''
+
         self.aflow_executable = aflow_executable
+        # checks whether aflow executable exists
         try:
             subprocess.check_output(self.aflow_executable, shell=True)
         except subprocess.CalledProcessError:
@@ -85,9 +104,11 @@ class CCE:
             # convert to list
             functionals = list(functionals)
         if type(functionals) == list and len(functionals) > 0:
+            functionals = [x.upper() for x in functionals]
             self.validate_functionals(functionals)
             command = self.add_functionals(functionals, command)
-        else:
+        elif type(functionals) != list and type(functionals) != str and type(
+             functionals) != tuple:
             raise TypeError('The functionals argument must be either a list, '
                             'or a tuple, or a string with functionals '
                             'separated by commas.')
