@@ -61,7 +61,7 @@ namespace anrl {
     vproto.push_back("A_mC4_12_i;1;2;12;3;6;mC4;a,b/a,c/a,beta,x1,z1;-;O2;alphaO2");
     vproto.push_back("ABC4_mP12_13_e_a_2g;3;12;13;5;11;mP12;a,b/a,c/a,beta,y2,x3,y3,z3,x4,y4,z4;E1_b;AgAuTe4;Sylvanite");
     vproto.push_back("A_mP84_13_21g;1;84;13;3;67;mP84;a,b/a,c/a,beta,x1,y1,z1,x2,y2,z2,x3,y3,z3,x4,y4,z4,x5,y5,z5,x6,y6,z6,x7,y7,z7,x8,y8,z8,x9,y9,z9,x10,y10,z10,x11,y11,z11,x12,y12,z12,x13,y13,z13,x14,y14,z14,x15,y15,z15,x16,y16,z16,x17,y17,z17,x18,y18,z18,x19,y19,z19,x20,y20,z20,x21,y21,z21;-;P;Monoclinic Phosphorus");
-    vproto.push_back("A2B_mP12_14_2e_e;2;12;14;4;13;mP12;a,b/a,c/a,beta,x1,y1,z1,x2,y2,z2,x3,y3,z3;C43/-/-;ZrO2/O2W/N2Os1;Baddeleyite/O2W (ICSD #8217)/N2Os1 (ICSD #240759)"); //DX20200703 - added R. Friedrich binary oxide //DX20201019 - added metal nitride
+    vproto.push_back("A2B_mP12_14_2e_e;2;12;14;4;13;mP12;a,b/a,c/a,beta,x1,y1,z1,x2,y2,z2,x3,y3,z3;C43/-/-/-;ZrO2/O2W/O2V/N2Os1;Baddeleyite/O2W (ICSD #8217)/O2V (ICSD #647610)/N2Os1 (ICSD #240759)"); //DX20200703 - added R. Friedrich binary oxide //DX20201019 - added metal nitride
     vproto.push_back("A_mP32_14_8e;1;32;14;3;28;mP32;a,b/a,c/a,beta,x1,y1,z1,x2,y2,z2,x3,y3,z3,x4,y4,z4,x5,y5,z5,x6,y6,z6,x7,y7,z7,x8,y8,z8;A_l;Se;betaSe");
     vproto.push_back("A_mP64_14_16e;1;64;14;3;52;mP64;a,b/a,c/a,beta,x1,y1,z1,x2,y2,z2,x3,y3,z3,x4,y4,z4,x5,y5,z5,x6,y6,z6,x7,y7,z7,x8,y8,z8,x9,y9,z9,x10,y10,z10,x11,y11,z11,x12,y12,z12,x13,y13,z13,x14,y14,z14,x15,y15,z15,x16,y16,z16;A_k;Se;Se");
     vproto.push_back("A2B5_mC28_15_f_e2f;2;14;15;4;14;mC28;a,b/a,c/a,beta,y1,x2,y2,z2,x3,y3,z3,x4,y4,z4;-/-;B2Pd5/Sb2O5;B2Pd5/Sb2O5 (ICSD #1422)"); //DX20200703 - added R. Friedrich binary oxide
@@ -104,7 +104,7 @@ namespace anrl {
     vproto.push_back("AB3_oP16_62_c_cd;2;16;62;4;10;oP16;a,b/a,c/a,x1,z1,x2,z2,x3,y3,z3;D0_11/-;Fe3C/N1Na3;Cementite/N1Na3 (ICSD #165990)"); //DX20201019 - added metal-nitride
     vproto.push_back("A3B7_oP40_62_cd_3c2d;2;40;62;4;20;oP40;a,b/a,c/a,x1,z1,x2,z2,x3,z3,x4,z4,x5,y5,z5,x6,y6,z6,x7,y7,z7;D10_1;C3Cr7;C3Cr7");
     vproto.push_back("A_oP8_62_2c;1;8;62;3;7;oP8;a,b/a,c/a,x1,z1,x2,z2;A_c;alphaNp;alphaNp");
-    vproto.push_back("AB2C_oC16_63_c_2c_c;3;8;63;5;7;oC16;a,b/a,c/a,y1,y2,y3,y4;-/-/-/-;SrCuO2/Au1Ca2N1/Cu1Sn2Sr1/Co1Sn2Tb1;SrCuO2/Au1Ca2N1 (ICSD #85528)/Cu1Sn2Sr1 (ICSD #103110)/Co1Sn2Tb1 (ICSD #240096)"); //DX20201016 - added metal-nitride //DX20201028 - added two metals
+    vproto.push_back("AB2C_oC16_63_c_2c_c;3;8;63;5;7;oC16;a,b/a,c/a,y1,y2,y3,y4;-/-/-;SrCuO2/Au1Ca2N1/Co1Sn2Tb1;SrCuO2/Au1Ca2N1 (ICSD #85528)/Co1Sn2Tb1 (ICSD #240096)"); //DX20201016 - added metal-nitride //DX20201028 - added one metal
     vproto.push_back("A2B_oC12_63_2c_c;2;6;63;4;6;oC12;a,b/a,c/a,y1,y2,y3;C49;ZrSi2;ZrSi2");
     vproto.push_back("AB_oC8_63_c_c;2;4;63;4;5;oC8;a,b/a,c/a,y1,y2;B33/-/-;CrB/-/Al1N1;CrB/-/Al1N1 (ICSD #163951)"); //DX20201019 - added metal-nitride
     vproto.push_back("A_oC4_63_c;1;2;63;3;4;oC4;a,b/a,c/a,y1;A20;alpha-U;alpha-Uranium");
@@ -170,7 +170,7 @@ namespace anrl {
     vproto.push_back("A4BC_tI24_141_h_b_a;3;12;141;5;4;tI24;a,c/a,y3,z3;-;ZrSiO4;Zircon");
     vproto.push_back("A_tI4_141_a;1;2;141;3;2;tI4;a,c/a;A5;Sn;betaSn");
     vproto.push_back("A3B4_tI28_141_ad_h;2;14;141;4;4;tI28;a,c/a,y3,z3;-;Mn3O4;Hausmannite");
-    vproto.push_back("A2B_tI12_141_e_a;2;6;141;4;3;tI12;a,c/a,z2;C5/C_{c};TiO2/alpha-ThSi2;Anatase/alpha-ThSi2"); // added info from part 2 - A2B_tI12_141_e_a;2;6;141;4;3;tI12;a,c/a,z2;C_{c};alpha-ThSi2;alpha-ThSi2
+    vproto.push_back("A2B_tI12_141_e_a;2;6;141;4;3;tI12;a,c/a,z2;C5/C_{c}/-;TiO2/alpha-ThSi2/Mo2N1;Anatase/alpha-ThSi2/Mo2N1 (ICSD #30593)"); // added info from part 2 - A2B_tI12_141_e_a;2;6;141;4;3;tI12;a,c/a,z2;C_{c};alpha-ThSi2;alpha-ThSi2 //DX20201103 - added metal-nitride
     vproto.push_back("AB_tI16_141_e_e;2;8;141;4;4;tI16;a,c/a,z1,z2;B_g;MoB;MoB");
     vproto.push_back("A2B_tI24_141_2e_e;2;12;141;4;5;tI28;a,c/a,z1,z2,z3;-;Ga2Hf;Ga2Hf");
     vproto.push_back("AB_tI8_141_a_b;2;4;141;4;2;tI8;a,c/a;\"40\"/-;NbP/-;NbP/-");
@@ -220,7 +220,7 @@ namespace anrl {
     vproto.push_back("A5B3C_hP18_186_2a3b_2ab_b;3;18;186;5;11;hP18;a,c/a,z1,z2,z3,z4,z5,z6,z7,z8,z9;E9_4;Al5C3N;Al5C3N");
     vproto.push_back("AB_hP4_186_b_a;2;4;186;4;4;hP4;a,c/a,z1,z2;B12/-;BN/Ga1N1;Original BN/Ga1N1 (ICSD #159250)"); //DX20201019 - added metal-nitride
     vproto.push_back("ABC_hP3_187_a_d_f;3;3;187;5;2;hP3;a,c/a;-;BaPtSb;BaPtSb");
-    vproto.push_back("AB_hP2_187_d_a;2;2;187;4;2;hP2;a,c/a;B_h;WC;Tungsten Carbide");
+    vproto.push_back("AB_hP2_187_d_a;2;2;187;4;2;hP2;a,c/a;B_h/-;WC/Ir1N1;Tungsten Carbide/Ir1N1 (ICSD #186245)"); //DX20201103 - added metal-nitride
     vproto.push_back("A2B_hP9_189_fg_bc;2;9;189;4;4;hP9;a,c/a,x3,x4;C22;Fe2P;Revised Fe2P");
     vproto.push_back("AB4C_hP6_191_a_h_b;3;6;191;5;3;hP6;a,c/a,z3;-;AlB4Mg;AlB4Mg");
     vproto.push_back("AB5_hP6_191_a_cg;2;6;191;4;2;hP6;a,c/a;D2_d;CaCu5;CaCu5");
@@ -239,17 +239,17 @@ namespace anrl {
     vproto.push_back("ABC2_hP8_194_d_a_f;3;8;194;5;3;hP8;a,c/a,z3;-;AlCCr2;AlCCr2");
     vproto.push_back("A3B_hP8_194_h_c;2;8;194;4;3;hP8;a,c/a,x2;D0_19;Ni3Sn;Ni3Sn");
     vproto.push_back("A_hP4_194_bc;1;4;194;3;2;hP4;a,c/a;A9;C;Hexagonal Graphite structure");
-    vproto.push_back("AB2_hP6_194_c_f;2;6;194;4;3;hP6;a,c/a,z2;C7;MoS2;Molybdenite");
+    vproto.push_back("AB2_hP6_194_c_f;2;6;194;4;3;hP6;a,c/a,z2;C7/-;MoS2/N1Re2;Molybdenite/N1Re2 (ICSD #169882)"); //DX20201103 - added metal-nitride
     vproto.push_back("A5B2_hP14_194_abdf_f;2;14;194;4;4;hP14;a,c/a,z4,z5;D8_h;W2B5;W2B5");
     vproto.push_back("AB2_hP12_194_f_ah;2;12;194;4;4;hP12;a,c/a,z2,x3;C14;MgZn2;MgZn2 Hexagonal Laves");
-    vproto.push_back("ABC_hP6_194_c_d_a;3;6;194;5;2;hP6;a,c/a;-/-;LiBC/Hg1Pb1Yb1;LiBC/Hg1Pb1Yb1 (ICSD #108545)"); //DX20201028 - added metal ternary
+    vproto.push_back("ABC_hP6_194_c_d_a;3;6;194;5;2;hP6;a,c/a;-/-;LiBC/Al1Au1Ti1;LiBC/Al1Au1Ti1 (ICSD #57506)"); //DX20201028 - added metal ternary
     vproto.push_back("A_hP4_194_f;1;4;194;3;3;hP4;a,c/a,z1;-;C;Lonsdaleite");
     vproto.push_back("AB2_hP6_194_c_ad;2;6;194;4;2;hP6;a,c/a;B8_2;Ni2In;Ni2In");
     vproto.push_back("AB3C4_hP16_194_c_af_ef;3;16;194;5;5;hP16;a,c/a,z3,z4,z5;-;AlN3Ti4;AlN3Ti4");
     vproto.push_back("A_hP2_194_c;1;2;194;3;2;hP2;a,c/a;A3;Mg;Hexagonal Close Packed");
     vproto.push_back("AB2_hP24_194_ef_fgh;2;24;194;4;6;hP24;a,c/a,z1,z2,z3,x5;C36;MgNi2;MgNi2 Hexagonal Laves");
     vproto.push_back("AB_hP12_194_df_ce;2;12;194;4;4;hP12;a,c/a,z3,z4;B18;CuS;Covellite");
-    vproto.push_back("AB_hP4_194_c_a;2;4;194;4;2;hP4;a,c/a;B8_1;NiAs;NiAs");
+    vproto.push_back("AB_hP4_194_c_a;2;4;194;4;2;hP4;a,c/a;B8_1/-/-/-/-;NiAs/N1Nb1/N1Ta1/N1Re1/N1Nb1;NiAs/N1Nb1 (ICSD #76384)/N1Ta1 (ICSD #105123)/N1Re1 (ICSD #181300)/N1Nb1 (ICSD #185559)"); //DX20201103 - added 4 metal-nitrides
     vproto.push_back("A2B_hP12_194_cg_f;2;12;194;4;3;hP12;a,c/a,z2;C10;SiO2;beta-Tridymite");
     vproto.push_back("A4B_cI40_197_cde_c;2;20;197;4;5;cI40;a,x1,x2,x3,x4;-;Ga4Ni;Ga4Ni3");
     vproto.push_back("ABC_cP12_198_a_a_a;3;12;198;5;4;cP12;a,x1,x2,x3;F0_1;NiSSb;Ullmanite");
@@ -387,7 +387,7 @@ namespace anrl {
     vproto.push_back("A2B_oP24_55_2g2h_gh;2;24;55;4;15;oP24;a,b/a,c/a,x1,y1,x2,y2,x3,y3,x4,y4,x5,y5,x6,y6;-;GeAs2;GeAs2");
     vproto.push_back("A3B5_oP16_55_ch_agh;2;16;55;4;9;oP16;a,b/a,c/a,x3,y3,x4,y4,x5,y5;-;Rh5Ge3;Rh5Ge3");
     vproto.push_back("A_oP16_55_2g2h;1;16;55;3;11;oP16;a,b/a,c/a,x1,y1,x2,y2,x3,y3,x4,y4;-;C;R-carbon");
-    vproto.push_back("A2B_oP6_58_g_a;2;6;58;4;5;oP6;a,b/a,c/a,x2,y2;C50/-/-;alpha-PdCl2/N2Os1/N2Pt1;alpha-PdCl2/N2Os1 (ICSD #157283)/N2Pt1 (ICSD #166463)"); //DX20201019 - added two metal nitrides
+    vproto.push_back("A2B_oP6_58_g_a;2;6;58;4;5;oP6;a,b/a,c/a,x2,y2;C50/-/-/-/-;alpha-PdCl2/N2Os1/N2Pt1/Ir1N2/Au1N2;alpha-PdCl2/N2Os1 (ICSD #157283)/N2Pt1 (ICSD #166463)/Ir1N2 (ICSD #160620)/Au1N2 (ICSD #166465)"); //DX20201019 - added four metal nitrides
     vproto.push_back("ABC_oP6_59_a_b_a;3;6;59;5;6;oP6;a,b/a,c/a,z1,z2,z3;E0_{5};FeOCl;FeOCl"); //DX 20180925 - added Strukturbericht
     vproto.push_back("A2B3_oP20_60_d_cd;2;20;60;4;10;oP20;a,b/a,c/a,y1,x2,y2,z2,x3,y3,z3;-;Rh2S3;Rh2S3");
     vproto.push_back("A3B_oP32_60_3d_d;2;32;60;4;15;oP32;a,b/a,c/a,x1,y1,z1,x2,y2,z2,x3,y3,z3,x4,y4,z4;-;WO3;WO3");
@@ -396,7 +396,7 @@ namespace anrl {
     vproto.push_back("A2B3_oP20_62_2c_3c;2;20;62;4;13;oP20;a,b/a,c/a,x1,z1,x2,z2,x3,z3,x4,z4,x5,z5;D5_{10};Cr3C2;Tongbaite");
     vproto.push_back("A2B4C_oP28_62_ac_2cd_c;3;28;62;5;14;oP28;a,b/a,c/a,x2,z2,x3,z3,x4,z4,x5,z5,x6,y6,z6;S1_{2}/-;Mg2SiO4/Ag2CrO4;Forsterite/Ag2CrO4 (ICSD #16298)"); //DX20200703 - added R. Friedrich ternary oxide
     //DX 20180619 - added info to label in part 1 vproto.push_back("A2B_oP12_62_2c_c;2;12;62;4;9;oP12;a,b/a,c/a,x1,z1,x2,z2,x3,z3;C29;SrH2;SrH2");
-    vproto.push_back("A3B_oP16_62_cd_c;2;16;62;4;10;oP16;a,b/a,c/a,x1,z1,x2,z2,x3,y3,z3;D0_{20};epsilon-NiAl3;epsilon-NiAl3");
+    vproto.push_back("A3B_oP16_62_cd_c;2;16;62;4;10;oP16;a,b/a,c/a,x1,z1,x2,z2,x3,y3,z3;D0_{20}/-;epsilon-NiAl3/Fe3N1;epsilon-NiAl3/Fe3N1 (ICSD #260758)"); //DX20201103 - added metal-nitride
     vproto.push_back("AB2C3_oP24_62_c_d_cd;3;24;62;5;13;oP24;a,b/a,c/a,x1,z1,x2,z2,x3,y3,z3,x4,y4,z4;E9_{e};CuFe2S3;Cubanite");
     vproto.push_back("AB3_oP16_62_c_3c;2;16;62;4;11;oP16;a,b/a,c/a,x1,z1,x2,z2,x3,z3,x4,z4;D0_{8};MoO3;Molybdite");
     vproto.push_back("AB4C_oP24_62_c_2cd_c;3;24;62;5;14;oP24;a,b/a,c/a,x1,z1,x2,z2,x3,z3,x4,z4,x5,y5,z5;H0_{2};BaSO4;Barite");
@@ -671,7 +671,7 @@ namespace anrl {
     vproto.push_back("A3B_tP4_123_cf_a;2;4;123;4;2;tP4;a,c/a;-;-;-");
     vproto.push_back("AB3_tP4_123_a_bh;2;4;123;4;3;tP4;a,c/a,z3;-;-;-");
     vproto.push_back("ABC2_tP4_123_a_b_h;3;4;123;5;3;tP4;a,c/a,z3;-;-;-");
-    vproto.push_back("ABC2_tP4_123_a_c_e;3;4;123;5;2;tP4;a,c/a;-;-;-");
+    vproto.push_back("ABC2_tP4_123_a_c_e;3;4;123;5;2;tP4;a,c/a;-/-;-/Fe1Ni1Pt2;-/Fe1Ni1Pt2 (ICSD #42564)"); //DX20201103 - added metal
     vproto.push_back("ABC2_tP4_123_a_d_bc;3;4;123;5;2;tP4;a,c/a;-;-;-");
     vproto.push_back("AB_tP4_123_g_g;2;4;123;4;4;tP4;a,c/a,z1,z2;-;-;-");
     vproto.push_back("A2BC3_tP6_123_g_b_ch;3;6;123;5;4;tP6;a,c/a,z3,z4;-;-;-");
@@ -688,7 +688,7 @@ namespace anrl {
     vproto.push_back("AB3C4_tI16_139_a_bd_ce;3;8;139;5;3;tI16;a,c/a,z5;-;-;-");
     vproto.push_back("ABC2_tI16_139_e_e_cd;3;8;139;5;4;tI16;a,c/a,z3,z4;-;-;-");
     vproto.push_back("ABC2_tI16_141_a_b_e;3;8;141;5;3;tI16;a,c/a,z3;-;-;-");
-    vproto.push_back("A2B_hP3_164_d_a;2;3;164;4;3;hP3;a,c/a,z2;-;-;-");
+    vproto.push_back("A2B_hP3_164_d_a;2;3;164;4;3;hP3;a,c/a,z2;-/-/-;-/-/N2Zr1;-/-/N2Zr1 (ICSD #262746)"); //DX20201103 -- added metal-nitride
     vproto.push_back("A2BC3_hP6_164_d_a_bd;3;6;164;5;4;hP6;a,c/a,z3,z4;-/-;-/Bi2La1Li3;-/Bi2La1Li3 (ICSD #616769)"); //DX20201028 - added metal prototype
     vproto.push_back("A2BC3_hP6_164_d_b_ad;3;6;164;5;4;hP6;a,c/a,z3,z4;-;-;-");
     vproto.push_back("A3B_hR4_166_bc_a;2;4;166;4;3;hR4;a,c/a,x3;-/-;-/N3Na1;-/N3Na1 (ICSD #1144)"); //DX20201019 - added metal-nitride
@@ -719,7 +719,7 @@ namespace anrl {
     vproto.push_back("A2B_hR3_166_c_a;2;3;166;4;3;hR3;a,c/a,x2;-/-/-;Cs2O/Ca2N1/Ba2N1;Cs2O (ICSD #27919)/Ca2N1 (ICSD #22231)/Ba2N1 (ICSD #409851)"); //DX20201019 - added two metal-nitrides
     vproto.push_back("AB2_hR6_166_c_2c;2;6;166;4;5;hR6;a,c/a,x1,x2,x3;-;OTl2;OTl2 (ICSD #16220)");
     vproto.push_back("AB_hP12_189_fg_eh;2;12;189;4;6;hP12;a,c/a,z1,x2,x3,z4;-;NaO;NaO (ICSD #25526)");
-    vproto.push_back("AB_hP8_194_ac_f;2;8;194;4;3;hP8;a,c/a,z3;-;LiO;LiO (ICSD #152183)");
+    vproto.push_back("AB_hP8_194_ac_f;2;8;194;4;3;hP8;a,c/a,z3;-/-;LiO/N1Nb1;LiO (ICSD #152183)/N1Nb1 (ICSD #76008)"); //DX20201103 - added metal-nitride
     vproto.push_back("A2B3_cI80_199_a2b_2c;2;40;199;4;10;cI80;a,x1,x2,x3,x4,y4,z4,x5,y5,z5;-;In2O3;In2O3 (ICSD #33649)");
     vproto.push_back("A3B2_cF80_227_f_e;2;20;227;4;3;cF80;a,x1,x2;-;O3Sb2;O3Sb2 (ICSD #31102)");
     // ternaries
@@ -755,9 +755,10 @@ namespace anrl {
     // binaries
     vproto.push_back("A2B3_cI80_206_ad_e;2;40;206;4;5;cI80;a,x2,x3,y3,z3;-;N2Zn3;N2Zn3 (ICSD #84918)");
     // ternaries
-    vproto.push_back("ABC_oP12_62_c_c_c;3;12;62;5;9;oP12;a,b/a,c/a,x1,z1,x2,z2,x3,z3;-/-/-/-/-/-/-/-/-/-/-/-/-/-;CaLiN/Li1Mg1N1/Ca1Mg1Sn1/Ni1Sn1Tb1/Co1Dy1Sn1/Nd1Pd1Sn1/Al1Pd1Tb1/Bi1Ca1Li1/Ni1Sc1Sn1/Co1Dy1Sn1/La1Ni1Sn1/La1Ni1Sn1/Ni1Pr1Sn1/Er1Ga1Rh1;CaLiN (ICSD #107304)/Li1Mg1N1 (ICSD #93259)/Ca1Mg1Sn1 (ICSD #42757)/Ni1Sn1Tb1 (ICSD #54301)/Co1Dy1Sn1 (ICSD #54415)/Nd1Pd1Sn1 (ICSD #54460)/Al1Pd1Tb1 (ICSD #54938)/Bi1Ca1Li1 (ICSD #58762)/Ni1Sc1Sn1 (ICSD #105338)/Co1Dy1Sn1 (ICSD #106459)/La1Ni1Sn1 (ICSD #108571)/La1Ni1Sn1 (ICSD #157921)/Ni1Pr1Sn1 (ICSD #157923)/Er1Ga1Rh1 (ICSD #630573)"); //DX20201016 - added another metal-nitride system //DX20201028 - added 12 metal systems
+    vproto.push_back("ABC_oP12_62_c_c_c;3;12;62;5;9;oP12;a,b/a,c/a,x1,z1,x2,z2,x3,z3;-/-/-/-/-/-/-/-/-/-/-/-/-/-;CaLiN/Li1Mg1N1/Ca1Mg1Sn1/Ni1Sn1Tb1/Co1Dy1Sn1/Bi1Ca1Li1/Ni1Sc1Sn1/Co1Dy1Sn1/La1Ni1Sn1/Al1Ce1Pt1/La1Ni1Sn1/Pt1Yb1Zn1/Er1Ga1Rh1/Ga1Pd1Sc1;CaLiN (ICSD #107304)/Li1Mg1N1 (ICSD #93259)/Ca1Mg1Sn1 (ICSD #42757)/Ni1Sn1Tb1 (ICSD #54301)/Co1Dy1Sn1 (ICSD #54415)/Bi1Ca1Li1 (ICSD #58762)/Ni1Sc1Sn1 (ICSD #105338)/Co1Dy1Sn1 (ICSD #106459)/La1Ni1Sn1 (ICSD #108571)/Al1Ce1Pt1 (ICSD #150172)/La1Ni1Sn1 (ICSD #157921)/Pt1Yb1Zn1 (ICSD #159305)/Er1Ga1Rh1 (ICSD #630573)/Ga1Pd1Sc1 (ICSD #635080)"); //DX20201016 - added another metal-nitride system //DX20201028 - added 12 metal systems
     vproto.push_back("A2B2C_tI10_139_e_e_a;3;5;139;5;4;tI10;a,c/a,z2,z3;-/-/-;Ca2N2Zn/N2Sr2Zn1/Ba2N2Zn1;Ca2N2Zn (ICSD #69049)/N2Sr2Zn1 (ICSD #80376)/Ba2N2Zn1 (ICSD #80377)"); //DX20201016 - added two metal-nitride prototypes
     vproto.push_back("A3BC2_hP6_191_f_a_d;3;6;191;5;2;hP6;a,c/a;-;Na3TaTi2;Na3TaTi2 (ICSD #186418)");
+
     // -------------------------------------------------------------------------
     // metal-nitride prototypes (from DX) //DX2021016
     // -------------------------------------------------------------------------
@@ -778,6 +779,7 @@ namespace anrl {
     vproto.push_back("AB_oC16_36_2a_2a;2;8;36;4;11;oC16;a,b/a,c/a,y1,z1,y2,z2,y3,z3,y4,z4;-;N1Os1;N1Os1 (ICSD #167514)");
     vproto.push_back("AB_oP8_53_h_h;2;8;53;4;7;oP8;a,b/a,c/a,y1,z1,y2,z2;-;N1Os1;N1Os1 (ICSD #167513)");
     vproto.push_back("A2B_oP12_57_e_c;2;12;57;4;7;oP12;a,b/a,c/a,x1,x2,y2,z2;-;N2Re1;N2Re1 (ICSD #187450)");
+    vproto.push_back("A2B_oP12_60_d_c;2;12;60;4;7;oP12;a,b/a,c/a,y1,x2,y2,z2;-;Fe2N1;Fe2N1 (ICSD #150889)");
     vproto.push_back("A5B3_oC32_63_c2f_cf;2;16;63;4;11;oC32;a,b/a,c/a,y1,y2,y3,z3,y4,z4,y5,z5;-/-;N5Ta3/N5Ta3;N5Ta3 (ICSD #16253)/N5Ta3 (ICSD #66533)");
     vproto.push_back("A2B_oC12_65_gj_e;2;6;65;4;5;oC12;a,b/a,c/a,x2,y3;-;N2Re1;N2Re1 (ICSD #187452)");
     vproto.push_back("AB_oI4_71_b_c;2;4;71;4;3;oI4;a,b/a,c/a;-;Cr1N1;Cr1N1 (ICSD #53146)");
@@ -804,20 +806,25 @@ namespace anrl {
     vproto.push_back("AB_hP16_162_ek_ci;2;16;162;4;6;hP16;a,c/a,z2,x3,x4,z4;-;Mo1N1;Mo1N1 (ICSD #43559)");
     vproto.push_back("A3B2_hP5_164_ac_d;2;5;164;4;4;hP5;a,c/a,z2,z3;-;N3V2;N3V2 (ICSD #182700)");
     vproto.push_back("AB_hP16_164_ci_di;2;16;164;4;8;hP16;a,c/a,z1,z2,x3,z3,x4,z4;-;Mo1N1;Mo1N1 (ICSD #60168)");
+    vproto.push_back("AB2_hR3_166_a_c;2;3;166;4;3;hR3;a,c/a,x2;-;N1Sr2;N1Sr2 (ICSD #23530)");
     vproto.push_back("AB_hP16_186_ac_bc;2;16;186;4;8;hP16;a,c/a,z1,z2,x3,z3,x4,z4;-;Mo1N1;Mo1N1 (ICSD #76280)");
     vproto.push_back("AB2_hP3_187_a_h;2;3;187;4;3;hP3;a,c/a,z2;-;Hf1N2;Hf1N2 (ICSD #290427)");
+    vproto.push_back("A2B_hP3_187_h_a;2;3;187;4;3;hP3;a,c/a,z2;-;N2W1;N2W1 (ICSD #290433)");
+    vproto.push_back("AB_hP6_189_f_ad;2;6;189;4;3;hP6;a,c/a,x3;-;N1Ta1;N1Ta1 (ICSD #1396)");
     vproto.push_back("A2B_hP3_191_e_a;2;3;191;4;3;hP3;a,c/a,z2;-;N2Os1;N2Os1 (ICSD #260545)");
     vproto.push_back("A2B_hP6_191_af_d;2;6;191;4;2;hP6;a,c/a;-;N4Ta2;N4Ta2 (ICSD #182351)");
-    vproto.push_back("AB_hP6_191_ad_f;2;6;191;4;2;hP6;a,c/a;-;N1Ta1;N1Ta1 (ICSD #76457)");
     vproto.push_back("AB_hP6_191_bc_ad;2;6;191;4;2;hP6;a,c/a;-;N1Y1;N1Y1 (ICSD #161079)");
     vproto.push_back("A3B_hP8_193_g_b;2;8;193;4;3;hP8;a,c/a,x2;-;Ba3N1;Ba3N1 (ICSD #77730)");
-    vproto.push_back("AB_hP4_194_a_c;2;4;194;4;2;hP4;a,c/a;-;Ir1N1;Ir1N1 (ICSD #183157)");
+    vproto.push_back("AB_hP4_194_a_c;2;4;194;4;2;hP4;a,c/a;-;Cd1N1;Cd1N1 (ICSD #185566)");
     vproto.push_back("AB2_hP6_194_c_e;2;6;194;4;3;hP6;a,c/a,z2;-;Hf1N2;Hf1N2 (ICSD #290428)");
+    vproto.push_back("A2B_hP6_194_e_c;2;6;194;4;3;hP6;a,c/a,z2;-;N2Ta1;N2Ta1 (ICSD #290431)");
     vproto.push_back("A3B2_hP10_194_bf_ac;2;10;194;4;3;hP10;a,c/a,z4;-/-;Be3N2/Ca3N2;Be3N2 (ICSD #25656)/Ca3N2 (ICSD #162797)");
     vproto.push_back("A3B2_hP10_194_cf_f;2;10;194;4;4;hP10;a,c/a,z2,z3;-;N3W2;N3W2 (ICSD #186207)");
     vproto.push_back("AB_hP16_194_bh_ag;2;16;194;4;3;hP16;a,c/a,x4;-;Mo1N1;Mo1N1 (ICSD #106926)");
-    vproto.push_back("AB3_cI32_204_c_g;2;16;204;4;3;cI32;a,y2,z2;-/-;Co1N3/Co1N3;Co1N3 (ICSD #162105)/Co1N3 (ICSD #162106)");
+    vproto.push_back("AB3_cI32_204_c_g;2;16;204;4;3;cI32;a,y2,z2;-;Co1N3/Co1N3;Co1N3 (ICSD #162105)/Co1N3 (ICSD #162106)");
+    vproto.push_back("A4B_cP5_221_ac_b;2;5;221;4;1;cP5;a;-;Mn4N1;Mn4N1 (ICSD #44369)");
     vproto.push_back("AB4_cP5_221_a_bc;2;5;221;4;1;cP5;a;-;N1Ni4;N1Ni4 (ICSD #76403)");
+    vproto.push_back("A4B3_cP7_221_ac_d;2;7;221;4;1;cP7;a;-;N4W3;N4W3 (ICSD #30370)");
 
     // -------------------------------------------------------------------------
     // ternaries
@@ -853,7 +860,7 @@ namespace anrl {
     vproto.push_back("AB2C2_hP5_164_a_d_d;3;5;164;5;4;hP5;a,c/a,z2,z3;-;Ce1Li2N2;Ce1Li2N2 (ICSD #34003)");
     vproto.push_back("AB2C_hR4_166_a_c_b;3;4;166;5;3;hR4;a,c/a,x3;-/-;Cu1N2Ta1/Ba1Cu2Ga1;Cu1N2Ta1 (ICSD #71136)/Ba1Cu2Ga1 (ICSD #615828)"); //DX20201028 - added metal prototype
     vproto.push_back("A3BC3_hP14_176_h_c_h;3;14;176;5;6;hP14;a,c/a,x2,y2,x3,y3;-;Ba3Fe1N3;Ba3Fe1N3 (ICSD #36502)");
-    vproto.push_back("ABC_hP6_186_b_b_a;3;6;186;5;5;hP6;a,c/a,z1,z2,z3;-/-/-;N1Na1Sn1/Cu1Sn1Ti1/Bi1Cu1Yb1;N1Na1Sn1 (ICSD #172471)/Cu1Sn1Ti1 (ICSD #54657)/Bi1Cu1Yb1 (ICSD #416143)"); //DX20201028 - added two metal prototypes
+    vproto.push_back("ABC_hP6_186_b_b_a;3;6;186;5;5;hP6;a,c/a,z1,z2,z3;-/-;N1Na1Sn1/Cu1Sn1Ti1;N1Na1Sn1 (ICSD #172471)/Cu1Sn1Ti1 (ICSD #54657)"); //DX20201028 - added two metal prototypes
     vproto.push_back("AB2C_hP8_186_a_ab_b;3;8;186;5;6;hP8;a,c/a,z1,z2,z3,z4;-;Mn1N2W1;Mn1N2W1 (ICSD #80029)");
     vproto.push_back("ABC_hP3_187_a_c_d;3;3;187;5;2;hP3;a,c/a;-;Li1N1Ni1;Li1N1Ni1 (ICSD #247028)");
     vproto.push_back("A5B3C3_hP11_189_dg_g_f;3;11;189;5;5;hP11;a,c/a,x2,x3,x4;-;Li5N3Ni3;Li5N3Ni3 (ICSD #411152)");
@@ -890,13 +897,10 @@ namespace anrl {
     vproto.push_back("ABC_oC12_36_a_a_a;3;6;36;5;9;oC12;a,b/a,c/a,y1,z1,y2,z2,y3,z3;-;Ag1Ce1Sn1;Ag1Ce1Sn1 (ICSD #55819)");
     vproto.push_back("ABC2_oC32_36_b_2a_2ab;3;16;36;5;17;oC32;a,b/a,c/a,y1,z1,y2,z2,y3,z3,y4,z4,x5,y5,z5,x6,y6,z6;-;Bi1Pb1Pd2;Bi1Pb1Pd2 (ICSD #56278)");
     vproto.push_back("ABC_oC18_38_ad_be_bd;3;9;38;5;12;oC18;a,b/a,c/a,z1,z2,z3,y4,z4,y5,z5,y6,z6;-;In1Nd1Rh1;In1Nd1Rh1 (ICSD #59430)");
-    vproto.push_back("ABC_oC18_38_bd_be_ad;3;9;38;5;12;oC18;a,b/a,c/a,z1,z2,z3,y4,z4,y5,z5,y6,z6;-;Cu1Dy1In1;Cu1Dy1In1 (ICSD #260992)");
-    vproto.push_back("ABC_oC18_38_be_ad_bd;3;9;38;5;12;oC18;a,b/a,c/a,z1,z2,z3,y4,z4,y5,z5,y6,z6;-;Gd1In1Pd1;Gd1In1Pd1 (ICSD #415506)");
     vproto.push_back("A10BC3_oP14_47_2q2rs_h_bt;3;14;47;5;9;oP14;a,b/a,c/a,z3,z4,z5,z6,z7,z8;-;Ga10Ni1Pr3;Ga10Ni1Pr3 (ICSD #20663)");
     vproto.push_back("ABC2_oP8_51_f_e_be;3;8;51;5;6;oP8;a,b/a,c/a,z2,z3,z4;-;In1La1Ni2;In1La1Ni2 (ICSD #106800)");
     vproto.push_back("A2BC_oP8_51_ae_f_f;3;8;51;5;6;oP8;a,b/a,c/a,z2,z3,z4;-;Co2Ga1La1;Co2Ga1La1 (ICSD #623100)");
-    vproto.push_back("A2BC_oP8_51_af_f_e;3;8;51;5;6;oP8;a,b/a,c/a,z2,z3,z4;-;Co2Dy1In1;Co2Dy1In1 (ICSD #658675)");
-    vproto.push_back("A4BC_oP12_51_afj_e_e;3;12;51;5;8;oP12;a,b/a,c/a,z2,z3,z4,x5,z5;-/-/-;Al4Co1La1/Al4Ce1Co1/In4Rh1Yb1;Al4Co1La1 (ICSD #9986)/Al4Ce1Co1 (ICSD #55598)/In4Rh1Yb1 (ICSD #411393)");
+    vproto.push_back("A4BC_oP12_51_afj_e_e;3;12;51;5;8;oP12;a,b/a,c/a,z2,z3,z4,x5,z5;-;Al4Co1La1;Al4Co1La1 (ICSD #9986)");
     vproto.push_back("A3B2C_oP12_51_ak_ef_f;3;12;51;5;8;oP12;a,b/a,c/a,z2,z3,z4,y5,z5;-;Au3Rb2Tl1;Au3Rb2Tl1 (ICSD #249924)");
     vproto.push_back("AB4C_oP12_51_e_afj_e;3;12;51;5;8;oP12;a,b/a,c/a,z2,z3,z4,x5,z5;-;Ca1In4Rh1;Ca1In4Rh1 (ICSD #410891)");
     vproto.push_back("ABC_oP12_57_c_d_d;3;12;57;5;8;oP12;a,b/a,c/a,x1,x2,y2,x3,y3;-;Al1Ca1Pd1;Al1Ca1Pd1 (ICSD #370036)");
@@ -905,17 +909,15 @@ namespace anrl {
     vproto.push_back("A3B3C_oP14_59_ae_ae_b;3;14;59;5;10;oP14;a,b/a,c/a,z1,z2,z3,y4,z4,y5,z5;-;Au3In3Sr1;Au3In3Sr1 (ICSD #245679)");
     vproto.push_back("AB3C4_oP16_59_b_ae_ef;3;16;59;5;11;oP16;a,b/a,c/a,z1,z2,y3,z3,y4,z4,x5,z5;-/-;Au1K3Sn4/Au1Cs3Pb4;Au1K3Sn4 (ICSD #107444)/Au1Cs3Pb4 (ICSD #107448)");
     vproto.push_back("AB2C_oP16_62_c_d_c;3;16;62;5;10;oP16;a,b/a,c/a,x1,z1,x2,z2,x3,y3,z3;-/-;Ca1Cd2Pd1/Ga1Pd2Y1;Ca1Cd2Pd1 (ICSD #425509)/Ga1Pd2Y1 (ICSD #602790)");
-    vproto.push_back("ABC2_oP16_62_c_c_d;3;16;62;5;10;oP16;a,b/a,c/a,x1,z1,x2,z2,x3,y3,z3;-;Dy1Ga1Pd2;Dy1Ga1Pd2 (ICSD #656966)");
     vproto.push_back("ABC_oC12_63_c_c_c;3;6;63;5;6;oC12;a,b/a,c/a,y1,y2,y3;-;Mg1Ni1Tb1;Mg1Ni1Tb1 (ICSD #166874)");
     vproto.push_back("ABC_oC12_63_c_c_a;3;6;63;5;5;oC12;a,b/a,c/a,y2,y3;-;Pt1Sc1Zn1;Pt1Sc1Zn1 (ICSD #424600)");
-    vproto.push_back("A2BC_oC16_63_f_c_c;3;8;63;5;7;oC16;a,b/a,c/a,y1,y2,y3,z3;-/-/-/-/-/-/-;Al2Co1Y1/Al2Cu1Mg1/Al2Dy1Ni1/Ga2Ni1Sc1/In2Rh1Yb1/Mg2Pd1Sr1/Al2Ce1Pt1;Al2Co1Y1 (ICSD #57645)/Al2Cu1Mg1 (ICSD #57693)/Al2Dy1Ni1 (ICSD #57759)/Ga2Ni1Sc1 (ICSD #103875)/In2Rh1Yb1 (ICSD #152048)/Mg2Pd1Sr1 (ICSD #425493)/Al2Ce1Pt1 (ICSD #658140)");
+    vproto.push_back("A2BC_oC16_63_f_c_c;3;8;63;5;7;oC16;a,b/a,c/a,y1,y2,y3,z3;-/-/-/-/-;Al2Co1Y1/Al2Cu1Mg1/Ga2Ni1Sc1/Mg2Pd1Sr1/Al2Ce1Pt1;Al2Co1Y1 (ICSD #57645)/Al2Cu1Mg1 (ICSD #57693)/Ga2Ni1Sc1 (ICSD #103875)/Mg2Pd1Sr1 (ICSD #425493)/Al2Ce1Pt1 (ICSD #658140)");
     vproto.push_back("ABC2_oC16_63_a_c_g;3;8;63;5;6;oC16;a,b/a,c/a,y2,x3,y3;-/-/-/-;Au1Bi1Li2/Au1Bi1Li2/Au1Bi1Na2/Au1Bi1K2;Au1Bi1Li2 (ICSD #261785)/Au1Bi1Li2 (ICSD #261786)/Au1Bi1Na2 (ICSD #261788)/Au1Bi1K2 (ICSD #380341)");
-    vproto.push_back("ABC2_oC16_63_c_c_2c;3;8;63;5;7;oC16;a,b/a,c/a,y1,y2,y3,y4;-/-/-/-/-;Ba1Cu1Sn2/Co1Ho1Sn2/Ce1Ni1Sn2/Cu1Pr1Sn2/La1Rh1Sn2;Ba1Cu1Sn2 (ICSD #58647)/Co1Ho1Sn2 (ICSD #240098)/Ce1Ni1Sn2 (ICSD #621687)/Cu1Pr1Sn2 (ICSD #628742)/La1Rh1Sn2 (ICSD #641754)");
-    vproto.push_back("AB2C_oC16_63_c_f_c;3;8;63;5;7;oC16;a,b/a,c/a,y1,y2,y3,z3;-/-/-/-;La1Mg2Ni1/Ce1In2Pd1/Ba1In2Ir1/Dy1Ga2Pd1;La1Mg2Ni1 (ICSD #96152)/Ce1In2Pd1 (ICSD #150132)/Ba1In2Ir1 (ICSD #414434)/Dy1Ga2Pd1 (ICSD #600150)");
+    vproto.push_back("ABC2_oC16_63_c_c_2c;3;8;63;5;7;oC16;a,b/a,c/a,y1,y2,y3,y4;-/-/-;Ba1Cu1Sn2/Co1Ho1Sn2/Ce1Ni1Sn2;Ba1Cu1Sn2 (ICSD #58647)/Co1Ho1Sn2 (ICSD #240098)/Ce1Ni1Sn2 (ICSD #621687)");
+    vproto.push_back("AB2C_oC16_63_c_f_c;3;8;63;5;7;oC16;a,b/a,c/a,y1,y2,y3,z3;-;La1Mg2Ni1;La1Mg2Ni1 (ICSD #96152)");
     vproto.push_back("A2BC_oC16_63_g_c_c;3;8;63;5;7;oC16;a,b/a,c/a,y1,y2,x3,y3;-;Cd2Cu1Er1;Cd2Cu1Er1 (ICSD #99139)");
-    vproto.push_back("ABC2_oC16_63_c_c_f;3;8;63;5;7;oC16;a,b/a,c/a,y1,y2,y3,z3;-;Eu1Pd1Tl2;Eu1Pd1Tl2 (ICSD #172230)");
     vproto.push_back("A2B2C_oC20_63_g_2c_a;3;10;63;5;7;oC20;a,b/a,c/a,y2,y3,x4,y4;-;Bi2Cs2Pt1;Bi2Cs2Pt1 (ICSD #658701)");
-    vproto.push_back("A4BC_oC24_63_acf_c_c;3;12;63;5;8;oC24;a,b/a,c/a,y2,y3,y4,y5,z5;-/-;Al4Dy1Ni1/Al4Ni1Tb1;Al4Dy1Ni1 (ICSD #57760)/Al4Ni1Tb1 (ICSD #58060)");
+    vproto.push_back("A4BC_oC24_63_acf_c_c;3;12;63;5;8;oC24;a,b/a,c/a,y2,y3,y4,y5,z5;-;Al4Dy1Ni1;Al4Dy1Ni1 (ICSD #57760)");
     vproto.push_back("AB3C2_oC24_63_c_cg_e;3;12;63;5;8;oC24;a,b/a,c/a,y1,y2,x3,x4,y4;-;Ca1Ga3Ni2;Ca1Ga3Ni2 (ICSD #58898)");
     vproto.push_back("A3BC3_oC28_63_cf_a_cf;3;14;63;5;9;oC28;a,b/a,c/a,y2,y3,y4,z4,y5,z5;-;Co3Ga1Y3;Co3Ga1Y3 (ICSD #10044)");
     vproto.push_back("ABC2_oC32_63_ac_f_2cf;3;16;63;5;10;oC32;a,b/a,c/a,y2,y3,y4,y5,z5,y6,z6;-;La1Rh1Sn2;La1Rh1Sn2 (ICSD #410732)");
@@ -924,7 +926,7 @@ namespace anrl {
     vproto.push_back("A3B2C2_oC14_65_aj_j_i;3;7;65;5;6;oC14;a,b/a,c/a,y2,y3,y4;-;Mg3Ni2Tb2;Mg3Ni2Tb2 (ICSD #240761)");
     vproto.push_back("A2BC_oC16_65_aci_j_i;3;8;65;5;6;oC16;a,b/a,c/a,y3,y4,y5;-;Ga2Nd1Ni1;Ga2Nd1Ni1 (ICSD #103850)");
     vproto.push_back("A2BC6_oC18_65_j_a_2ij;3;9;65;5;7;oC18;a,b/a,c/a,y2,y3,y4,y5;-;Dy2Ni1Sn6;Dy2Ni1Sn6 (ICSD #165783)");
-    vproto.push_back("A3B2C7_oC24_65_aj_i_c2ij;3;12;65;5;8;oC24;a,b/a,c/a,y3,y4,y5,y6,y7;-/-;Ce3Ni2Sn7La3Ni2Sn7;Ce3Ni2Sn7 (ICSD #102239)/La3Ni2Sn7 (ICSD #160913)");
+    vproto.push_back("A3B2C7_oC24_65_aj_i_c2ij;3;12;65;5;8;oC24;a,b/a,c/a,y3,y4,y5,y6,y7;-/-;Ce3Ni2Sn7/La3Ni2Sn7;Ce3Ni2Sn7 (ICSD #102239)/La3Ni2Sn7 (ICSD #160913)");
     vproto.push_back("A2B2C_oI10_71_f_h_a;3;5;71;5;5;oI10;a,b/a,c/a,x2,y3;-/-;Ce2Ni2Sn1/Ca2Cu2Ga1;Ce2Ni2Sn1 (ICSD #55495)/Ca2Cu2Ga1 (ICSD #58885)");
     vproto.push_back("A2B2C3_oI14_71_e_f_af;3;7;71;5;6;oI14;a,b/a,c/a,x2,x3,x4;-;Al2Sn2Sr3;Al2Sn2Sr3 (ICSD #9564)");
     vproto.push_back("A5B2C_oI16_71_an_e_d;3;8;71;5;6;oI16;a,b/a,c/a,x3,x4,y4;-;Al5Ni2Pr1;Al5Ni2Pr1 (ICSD #58046)");
@@ -936,7 +938,6 @@ namespace anrl {
     vproto.push_back("A3B10C_oI28_71_be_g2n_c;3;14;71;5;9;oI28;a,b/a,c/a,x3,y4,x5,y5,x6,y6;-;Ba3Hg10In1;Ba3Hg10In1 (ICSD #290305)");
     vproto.push_back("A6B5C3_oI28_71_gn_cn_be;3;14;71;5;9;oI28;a,b/a,c/a,x3,y4,x5,y5,x6,y6;-;Cu6Sn5Yb3;Cu6Sn5Yb3 (ICSD #413485)");
     vproto.push_back("A9B3C2_oI28_71_c2n_be_g;3;14;71;5;9;oI28;a,b/a,c/a,x3,y4,x5,y5,x6,y6;-;Ga9Ho3Pd2;Ga9Ho3Pd2 (ICSD #634397)");
-    vproto.push_back("A8B3C3_oI28_71_2n_be_cg;3;14;71;5;9;oI28;a,b/a,c/a,x3,y4,x5,y5,x6,y6;-;Ga8Ho3Ir3;Ga8Ho3Ir3 (ICSD #634379)");
     vproto.push_back("A2B2C_oI20_72_j_j_a;3;10;72;5;7;oI20;a,b/a,c/a,x2,y2,x3,y3;-;Ba2Bi2Zn1;Ba2Bi2Zn1 (ICSD #421424)");
     vproto.push_back("ABC3_tI10_107_a_a_ab;3;5;107;5;6;tI10;a,c/a,z1,z2,z3,z4;-;Ba1Ni1Sn3;Ba1Ni1Sn3 (ICSD #58662)");
     vproto.push_back("A3BC_tI10_107_ab_a_a;3;5;107;5;6;tI10;a,c/a,z1,z2,z3,z4;-;Al3Cu1Pr1;Al3Cu1Pr1 (ICSD #290390)");
@@ -945,30 +946,27 @@ namespace anrl {
     vproto.push_back("A4B6C_tI22_121_i_ci_a;3;11;121;5;6;tI22;a,c/a,x3,z3,x4,z4;-;Ru4Sn6Y1;Ru4Sn6Y1 (ICSD #54354)");
     vproto.push_back("AB2C_tP4_123_b_h_a;3;4;123;5;3;tP4;a,c/a,z3;-;Cd1Pt2Zn1;Cd1Pt2Zn1 (ICSD #102057)");
     vproto.push_back("AB4C_tP6_123_b_i_a;3;6;123;5;3;tP6;a,c/a,z3;-;Co1Ga4Hf1;Co1Ga4Hf1 (ICSD #623081)");
-    vproto.push_back("ABC5_tP7_123_a_b_ci;3;7;123;5;3;tP7;a,c/a,z4;-;Ce1Co1In5;Ce1Co1In5 (ICSD #102108)");
     vproto.push_back("AB5C_tP7_123_a_ci_b;3;7;123;5;3;tP7;a,c/a,z4;-;Co1In5Tb1;Co1In5Tb1 (ICSD #623944)");
     vproto.push_back("AB6C_tP8_123_a_hi_b;3;8;123;5;4;tP8;a,c/a,z3,z4;-;Ce1Ga6Pd1;Ce1Ga6Pd1 (ICSD #240161)");
     vproto.push_back("AB8C2_tP11_123_a_ehi_g;3;11;123;5;5;tP11;a,c/a,z3,z4,z5;-/-;Co1Ga8Ho2/Fe1Ga8Ho2;Co1Ga8Ho2 (ICSD #42426)/Fe1Ga8Ho2 (ICSD #180132)");
     vproto.push_back("A2BC2_tP10_127_g_a_h;3;10;127;5;4;tP10;a,c/a,x2,x3;-;Ni2Sn1Zr2;Ni2Sn1Zr2 (ICSD #54303)");
     vproto.push_back("AB2C2_tP10_127_a_g_h;3;10;127;5;4;tP10;a,c/a,x2,x3;-;Al1Cu2Re2;Al1Cu2Re2 (ICSD #57706)");
-    vproto.push_back("ABC_tP6_129_b_c_c;3;6;129;5;4;tP6;a,c/a,z2,z3;-;Mn1Sn1Sr1;Mn1Sn1Sr1 (ICSD #66951)");
-    vproto.push_back("ABC_tP6_129_c_c_a;3;6;129;5;4;tP6;a,c/a,z2,z3;-;Bi1K1Mn1;Bi1K1Mn1 (ICSD #601586)");
-    vproto.push_back("ABC_tP6_129_a_c_c;3;6;129;5;4;tP6;a,c/a,z2,z3;-;Ba1Mg1Pb1;Ba1Mg1Pb1 (ICSD #615958)");
     vproto.push_back("A2BC_tP8_129_bc_c_a;3;8;129;5;4;tP8;a,c/a,z3,z4;-/-;Sn2Tb1Zn1/Bi2La1Li1;Sn2Tb1Zn1 (ICSD #163425)/Bi2La1Li1 (ICSD #415728)");
     vproto.push_back("AB2C2_tP10_129_c_ac_bc;3;10;129;5;5;tP10;a,c/a,z3,z4,z5;-;Nd1Ni2Sn2;Nd1Ni2Sn2 (ICSD #160053)");
     vproto.push_back("AB2C2_tP10_129_c_bc_ac;3;10;129;5;5;tP10;a,c/a,z3,z4,z5;-;Eu1Sn2Zn2;Eu1Sn2Zn2 (ICSD #162267)");
     vproto.push_back("A2BC2_tP10_129_bc_c_ac;3;10;129;5;5;tP10;a,c/a,z3,z4,z5;-;Bi2Ce1Ni2;Bi2Ce1Ni2 (ICSD #616562)");
     vproto.push_back("A2BC4_tP14_129_ac_b_j;3;14;129;5;5;tP14;a,c/a,z3,x4,z4;-;Ce2Ru1Zn4;Ce2Ru1Zn4 (ICSD #418547)");
     vproto.push_back("AB2C_tI8_139_b_d_a;3;4;139;5;2;tI8;a,c/a;-;Li1Pd2Tl1;Li1Pd2Tl1 (ICSD #54365)");
-    vproto.push_back("A2BC2_tI10_139_d_a_e;3;5;139;5;3;tI10;a,c/a,z3;-/-;Al2Ce1Ga2/Al2Ca1Zn2;Al2Ce1Ga2 (ICSD #55789)/Al2Ca1Zn2 (ICSD #57550)");
+    vproto.push_back("A2BC_tI8_139_d_a_b;3;4;139;5;2;tI8;a,c/a;-;Co2Ga1Ni1;Co2Ga1Ni1 (ICSD #169733)");
+    vproto.push_back("AB2C2_tI10_139_a_d_e;3;5;139;5;3;tI10;a,c/a,z3;-;Ba1Mn2Sn2;Ba1Mn2Sn2 (ICSD #405)");
+    vproto.push_back("A2BC2_tI10_139_d_a_e;3;5;139;5;3;tI10;a,c/a,z3;-/-/-;Ag2Ba1Sn2/Al2Ce1Ga2/Al2Ca1Zn2;Ag2Ba1Sn2 (ICSD #25332)/Al2Ce1Ga2 (ICSD #55789)/Al2Ca1Zn2 (ICSD #57550)");
     vproto.push_back("ABC_tI12_139_c_e_e;3;6;139;5;4;tI12;a,c/a,z2,z3;-;Mg1Pr1Sn1;Mg1Pr1Sn1 (ICSD #182479)");
-    vproto.push_back("ABC_tI12_139_e_c_e;3;6;139;5;4;tI12;a,c/a,z2,z3;-/-;Dy1Mg1Sn1/Au1Cu1Sn1;Dy1Mg1Sn1 (ICSD #183524)/Au1Cu1Sn1 (ICSD #611768)");
+    vproto.push_back("ABC_tI12_139_e_c_e;3;6;139;5;4;tI12;a,c/a,z2,z3;-;Au1Cu1Sn1;Au1Cu1Sn1 (ICSD #611768)");
     vproto.push_back("A4B2C_tI14_139_h_d_a;3;7;139;5;3;tI14;a,c/a,x3;-;Al4Mo2Yb1;Al4Mo2Yb1 (ICSD #456)");
     vproto.push_back("AB4C2_tI14_139_a_h_d;3;7;139;5;3;tI14;a,c/a,x3;-;Er1Ga4Ti2;Er1Ga4Ti2 (ICSD #630579)");
     vproto.push_back("A5B2C_tI16_139_bg_e_a;3;8;139;5;4;tI16;a,c/a,z3,z4;-;Al5Ni2Zr1;Al5Ni2Zr1 (ICSD #58084)");
     vproto.push_back("A2BC_tI16_139_ce_e_d;3;8;139;5;4;tI16;a,c/a,z3,z4;-;Bi2Sr1Zn1;Bi2Sr1Zn1 (ICSD #41924)");
     vproto.push_back("AB2C_tI16_139_e_ce_d;3;8;139;5;4;tI16;a,c/a,z3,z4;-/-;Ba1Bi2Cd1/Ba1Bi2Zn1;Ba1Bi2Cd1 (ICSD #58635)/Ba1Bi2Zn1 (ICSD #58638)");
-    vproto.push_back("A2BC_tI16_139_ce_d_e;3;8;139;5;4;tI16;a,c/a,z3,z4;-;Bi2Cd1Sr1;Bi2Cd1Sr1 (ICSD #58764)");
     vproto.push_back("A2B5C3_tI20_139_e_bg_ae;3;10;139;5;5;tI20;a,c/a,z3,z4,z5;-;K2Mg5Sn3;K2Mg5Sn3 (ICSD #421342)");
     vproto.push_back("A8BC4_tI26_139_ij_a_f;3;13;139;5;4;tI26;a,c/a,x3,x4;-;Al8Ca1Cu4;Al8Ca1Cu4 (ICSD #57539)");
     vproto.push_back("A4B8C_tI26_139_i_fj_a;3;13;139;5;4;tI26;a,c/a,x3,x4;-;Cr4Fe8Y1;Cr4Fe8Y1 (ICSD #168240)");
@@ -996,27 +994,22 @@ namespace anrl {
     vproto.push_back("A7B4C2_hR13_166_ah_2c_c;3;13;166;5;7;hR13;a,c/a,x2,x3,x4,x5,z5;-;Au7Rb4Sn2;Au7Rb4Sn2 (ICSD #58581)");
     vproto.push_back("A3B2C2_hR14_166_3c_2c_abc;3;14;166;5;8;hR14;a,c/a,x3,x4,x5,x6,x7,x8;-;Au3Sn2Yb2;Au3Sn2Yb2 (ICSD #710044)");
     vproto.push_back("ABC_hP6_186_b_a_b;3;6;186;5;5;hP6;a,c/a,z1,z2,z3;-/-;Au1Pr1Sn1/Bi1Li1Zn1;Au1Pr1Sn1 (ICSD #54997)/Bi1Li1Zn1 (ICSD #100115)");
-    vproto.push_back("ABC_hP6_186_a_b_b;3;6;186;5;5;hP6;a,c/a,z1,z2,z3;-;Ca1Sn1Zn1;Ca1Sn1Zn1 (ICSD #106358)");
+    vproto.push_back("ABC_hP6_186_a_b_b;3;6;186;5;5;hP6;a,c/a,z1,z2,z3;-;Ce1Cu1Sn1;Ce1Cu1Sn1 (ICSD #156394)");
     vproto.push_back("A4BC_hP12_186_ac_b_b;3;12;186;5;7;hP12;a,c/a,z1,z2,z3,x4,z4;-;Cu4In1Mn1;Cu4In1Mn1 (ICSD #424277)");
     vproto.push_back("A3BC4_hP16_186_a2b_b_2a2b;3;16;186;5;10;hP16;a,c/a,z1,z2,z3,z4,z5,z6,z7,z8;-;Au3Li1Sn4;Au3Li1Sn4 (ICSD #412207)");
     vproto.push_back("ABC_hP6_187_i_h_ab;3;6;187;5;4;hP6;a,c/a,z3,z4;-;Au1Ga1Zr1;Au1Ga1Zr1 (ICSD #156264)");
     vproto.push_back("A4BC_hP6_187_hi_b_a;3;6;187;5;4;hP6;a,c/a,z3,z4;-;Ga4Li1Y1;Ga4Li1Y1 (ICSD #98666)");
     vproto.push_back("ABC_hP9_187_dh_ai_eg;3;9;187;5;5;hP9;a,c/a,z4,z5,z6;-;Ca1Li1Pb1;Ca1Li1Pb1 (ICSD #409533)");
-    vproto.push_back("ABC_hP9_187_eh_ci_bg;3;9;187;5;5;hP9;a,c/a,z4,z5,z6;-;Li1Pb1Yb1;Li1Pb1Yb1 (ICSD #409534)");
     vproto.push_back("A5B5C_hP11_187_hk_cgi_a;3;11;187;5;6;hP11;a,c/a,z3,z4,z5,x6;-;Al5Ba5Pb1;Al5Ba5Pb1 (ICSD #416337)");
     vproto.push_back("A4B6C_hP11_187_ck_jk_a;3;11;187;5;5;hP11;a,c/a,x3,x4,x5;-;Au4In6K1;Au4In6K1 (ICSD #249520)");
     vproto.push_back("A3B2C3_hP8_189_f_c_g;3;8;189;5;4;hP8;a,c/a,x2,x3;-;In3Rh2Ti3;In3Rh2Ti3 (ICSD #410967)");
     vproto.push_back("ABC_hP9_189_g_f_ad;3;9;189;5;4;hP9;a,c/a,x3,x4;-;Bi1Dy1Rh1;Bi1Dy1Rh1 (ICSD #51845)");
     vproto.push_back("AB2C6_hP9_189_b_c_fg;3;9;189;5;4;hP9;a,c/a,x3,x4;-;Co1Ga2Zr6;Co1Ga2Zr6 (ICSD #20876)");
     vproto.push_back("A5B3C_hP9_189_cf_g_b;3;9;189;5;4;hP9;a,c/a,x3,x4;-;Ga5Lu3Ni1;Ga5Lu3Ni1 (ICSD #634575)");
-    vproto.push_back("ABC_hP9_189_bc_g_f;3;9;189;5;4;hP9;a,c/a,x3,x4;-/-;Ni1Pr1Zn1/Pd1Tb1Tl1;Ni1Pr1Zn1 (ICSD #54295)/Pd1Tb1Tl1 (ICSD #105713)");
+    vproto.push_back("ABC_hP9_189_g_bc_f;3;9;189;5;4;hP9;a,c/a,x3,x4;-;Pb1Pd1Y1;Pb1Pd1Y1 (ICSD #54315)");
     vproto.push_back("A2BC6_hP9_189_c_b_fg;3;9;189;5;4;hP9;a,c/a,x3,x4;-;Bi2Fe1Ho6;Bi2Fe1Ho6 (ICSD #96253)");
-    vproto.push_back("ABC_hP9_189_g_bc_f;3;9;189;5;4;hP9;a,c/a,x3,x4;-/-;Pb1Pd1Y1/Hf1Ir1Sn1;Pb1Pd1Y1 (ICSD #54315)/Hf1Ir1Sn1 (ICSD #638586)");
     vproto.push_back("ABC_hP9_189_f_bc_g;3;9;189;5;4;hP9;a,c/a,x3,x4;-/-;Mg1Sn1Yb1/Ga1Ni1Ti1;Mg1Sn1Yb1 (ICSD #54344)/Ga1Ni1Ti1 (ICSD #103885)");
-    vproto.push_back("ABC_hP9_189_f_ad_g;3;9;189;5;4;hP9;a,c/a,x3,x4;-;Dy1In1Mg1;Dy1In1Mg1 (ICSD #55102)");
-    vproto.push_back("ABC_hP9_189_g_f_bc;3;9;189;5;4;hP9;a,c/a,x3,x4;-;Dy1In1Ni1;Dy1In1Ni1 (ICSD #55846)");
     vproto.push_back("ABC_hP9_189_f_g_bc;3;9;189;5;4;hP9;a,c/a,x3,x4;-/-/-;Al1Dy1Ni1/Al1Hf1Pt1/Al1Nd1Ni1;Al1Dy1Ni1 (ICSD #107416)/Al1Hf1Pt1 (ICSD #608141)/Al1Nd1Ni1 (ICSD #608770)");
-    vproto.push_back("ABC_hP9_189_ad_g_f;3;9;189;5;4;hP9;a,c/a,x3,x4;-;Al1Mg1Y1;Al1Mg1Y1 (ICSD #160908)");
     vproto.push_back("ABC_hP9_189_bc_f_g;3;9;189;5;4;hP9;a,c/a,x3,x4;-;Cu1In1Tb1;Cu1In1Tb1 (ICSD #628137)");
     vproto.push_back("A3B2C_hP6_191_g_c_a;3;6;191;5;2;hP6;a,c/a;-/-;Ag3Al2La1/Co3Ga2Tb1;Ag3Al2La1 (ICSD #57329)/Co3Ga2Tb1 (ICSD #102452)");
     vproto.push_back("A2BC3_hP6_191_c_a_g;3;6;191;5;2;hP6;a,c/a;-/-;Cu2Dy1In3/Al2Ce1Pt3;Cu2Dy1In3 (ICSD #108369)/Al2Ce1Pt3 (ICSD #658142)");
@@ -1025,22 +1018,21 @@ namespace anrl {
     vproto.push_back("A6B6C_hP13_191_i_cde_a;3;13;191;5;4;hP13;a,c/a,z4,z5;-;Mn6Sn6Tb1;Mn6Sn6Tb1 (ICSD #54277)");
     vproto.push_back("A3B3C2_hP16_193_g_g_d;3;16;193;5;4;hP16;a,c/a,x2,x3;-;Ga3Hf3Nb2;Ga3Hf3Nb2 (ICSD #103733)");
     vproto.push_back("ABC_hP6_194_d_a_c;3;6;194;5;2;hP6;a,c/a;-;Pb1Sr1Zn1;Pb1Sr1Zn1 (ICSD #54319)");
-    vproto.push_back("ABC_hP6_194_a_c_d;3;6;194;5;2;hP6;a,c/a;-/-/-;Ag1Ba1Bi1/Ce1Cu1Sn1/Ce1Tl1Zn1;Ag1Ba1Bi1 (ICSD #56978)/Ce1Cu1Sn1 (ICSD #106384)/Ce1Tl1Zn1 (ICSD #622301)");
     vproto.push_back("ABC_hP6_194_c_a_d;3;6;194;5;2;hP6;a,c/a;-/-;Bi1Ca1Cu1/Cu1Gd1Sn1;Bi1Ca1Cu1 (ICSD #57018)/Cu1Gd1Sn1 (ICSD #600994)");
-    vproto.push_back("ABC_hP6_194_a_d_c;3;6;194;5;2;hP6;a,c/a;-/-;Ba1Bi1Cu1/Ca1Hg1Pb1;Ba1Bi1Cu1 (ICSD #106303)/Ca1Hg1Pb1 (ICSD #106345)");
+    vproto.push_back("ABC_hP6_194_a_c_d;3;6;194;5;2;hP6;a,c/a;-;Ba1Pb1Zn1;Ba1Pb1Zn1 (ICSD #106315)");
+    vproto.push_back("ABC_hP6_194_a_d_c;3;6;194;5;2;hP6;a,c/a;-;Ca1Hg1Pb1;Ca1Hg1Pb1 (ICSD #106345)");
     vproto.push_back("AB2C_hP8_194_b_f_c;3;8;194;5;3;hP8;a,c/a,z3;-;Al1Pt2Zr1;Al1Pt2Zr1 (ICSD #58139)");
     vproto.push_back("AB2C_hP8_194_a_f_c;3;8;194;5;3;hP8;a,c/a,z3;-;In1Pt2Y1;In1Pt2Y1 (ICSD #59505)");
-    vproto.push_back("AB2C_hP8_194_c_f_a;3;8;194;5;3;hP8;a,c/a,z3;-/-;Er1Pt2Sn1/Ce1Cu2Mg1;Er1Pt2Sn1 (ICSD #103292)/Ce1Cu2Mg1 (ICSD #157110)");
     vproto.push_back("A2BC_hP8_194_f_a_c;3;8;194;5;3;hP8;a,c/a,z3;-;Cu2Li1Sn1;Cu2Li1Sn1 (ICSD #150602)");
     vproto.push_back("A3BC2_hP12_194_h_a_f;3;12;194;5;4;hP12;a,c/a,z2,x3;-;Al3Ru1Sc2;Al3Ru1Sc2 (ICSD #58159)");
     vproto.push_back("ABC_hP12_194_f_f_ab;3;12;194;5;4;hP12;a,c/a,z3,z4;-;Ga1Sn1Sr1;Ga1Sn1Sr1 (ICSD #66003)");
     vproto.push_back("ABC_hP12_194_ab_f_f;3;12;194;5;4;hP12;a,c/a,z3,z4;-/-;Gd1Sn1Zn1/La1Sn1Zn1;Gd1Sn1Zn1 (ICSD #152621)/La1Sn1Zn1 (ICSD #152623)");
-    vproto.push_back("ABC_hP12_194_f_ab_f;3;12;194;5;4;hP12;a,c/a,z3,z4;-;Sn1Y1Zn1;Sn1Y1Zn1 (ICSD #152622)");
     vproto.push_back("A3B3C2_hP16_194_h_af_f;3;16;194;5;5;hP16;a,c/a,z2,z3,x4;-;Al2Ba2Ga1.33;Al2Ba2Ga1.33 (ICSD #415931)");
     vproto.push_back("AB2C_cP16_215_e_bce_ad;3;16;215;5;3;cP16;a,x5,x6;-;Ir1Li2Mg1;Ir1Li2Mg1 (ICSD #180119)");
+    vproto.push_back("ABC2_cF16_216_a_d_bc;3;4;216;5;1;cF16;a;-;Ag1Al1Li2;Ag1Al1Li2 (ICSD #57330)");
+    vproto.push_back("AB4C_cF24_216_a_e_c;3;6;216;5;2;cF24;a,x3;-;In1Ni4Zr1;In1Ni4Zr1 (ICSD #59462)");
     vproto.push_back("A3B4C4_cI22_217_b_c_c;3;11;217;5;3;cI22;a,x2,x3;-;Ca3Ga4Ni4;Ca3Ga4Ni4 (ICSD #58899)");
     vproto.push_back("A3BC_cP15_221_ag_c_d;3;15;221;5;2;cP15;a,x4;-;Ga3Os1Tb1;Ga3Os1Tb1 (ICSD #412144)");
-    vproto.push_back("AB3C_cP15_221_d_ag_c;3;15;221;5;2;cP15;a,x4;-;Dy1Ga3Ru1;Dy1Ga3Ru1 (ICSD #629734)");
     // done now produce
 
     // FROM PROTO LIST
@@ -1262,7 +1254,8 @@ namespace anrl {
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="A2B_oC12_38_de_ab"){
-        vparameters.push_back("4.684,1.81084543126,1.0269000854,0.06,0.5,0.17,0.56,0.17,0.0");
+        //DX20201105 - changed y4 to keep in SG#38 (see comments in part 1) vparameters.push_back("4.684,1.81084543126,1.0269000854,0.06,0.5,0.17,0.56,0.17,0.0");
+        vparameters.push_back("4.684,1.81084543126,1.0269000854,0.06,0.5,0.17,0.56,0.1701,0.0");
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="AB4_oC20_41_a_2b"){
@@ -1377,8 +1370,7 @@ namespace anrl {
       if(anrl_label=="AB2C_oC16_63_c_2c_c"){
         vparameters.push_back("3.577,4.56863293263,1.09538719597,0.06109,-0.0558,0.1792,0.33096");
         vparameters.push_back("3.5814,5.0438934,1.3735132,0.95974,0.60233,0.78501,0.19337");  // 002, ternary metal-nitride prototype (ICSD #85528)
-        vparameters.push_back("4.57,4.2778993,0.98905908,0.826,0.249,0.958,0.609");  // 003, metallic ternary prototype (ICSD #103110)
-        vparameters.push_back("4.4247,3.7013583,0.98573915,0.697,0.5638,0.2498,0.9044");  // 004, metallic ternary prototype (ICSD #240096)
+        vparameters.push_back("4.4247,3.7013583,0.98573915,0.697,0.5638,0.2498,0.9044");  // 003, metallic ternary prototype (ICSD #240096)
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="A2B_oC12_63_2c_c"){
@@ -1653,6 +1645,8 @@ namespace anrl {
       // ---------------------------------------------------------------------------
       if(anrl_label=="A2B_tI12_141_e_a"){
         vparameters.push_back("3.785,2.51360634082,0.08306");
+        vparameters.push_back("4.126,3.47697527872,0.2915"); //DX20201103 - moved from part 2
+        vparameters.push_back("4.2,1.9047619,0.617");  // 003, binary metal-nitride prototype (ICSD #30593)
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="AB_tI16_141_e_e"){
@@ -1869,6 +1863,7 @@ namespace anrl {
       // ---------------------------------------------------------------------------
       if(anrl_label=="AB_hP2_187_d_a"){
         vparameters.push_back("2.9065,0.975950455875");
+        vparameters.push_back("2.864,1.1075419");  // 002, binary metal-nitride prototype (ICSD #186245)
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="A2B_hP9_189_fg_bc"){
@@ -1947,6 +1942,7 @@ namespace anrl {
       // ---------------------------------------------------------------------------
       if(anrl_label=="AB2_hP6_194_c_f"){
         vparameters.push_back("3.161,3.8895919013,0.6275");
+        vparameters.push_back("2.7767,3.5081212,0.606");  // 002, binary metal-nitride prototype (ICSD #169882)
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="A5B2_hP14_194_abdf_f"){
@@ -1959,6 +1955,7 @@ namespace anrl {
       // ---------------------------------------------------------------------------
       if(anrl_label=="ABC_hP6_194_c_d_a"){
         vparameters.push_back("2.752,2.56468023256");
+        vparameters.push_back("4.4075,1.3225184");  // 002, metallic ternary prototype (ICSD #57506)
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="A_hP4_194_f"){
@@ -1987,6 +1984,10 @@ namespace anrl {
       // ---------------------------------------------------------------------------
       if(anrl_label=="AB_hP4_194_c_a"){
         vparameters.push_back("3.619,1.39375518099");
+        vparameters.push_back("2.968,1.8696092");  // 002, binary metal-nitride prototype (ICSD #76384)
+        vparameters.push_back("3.048,1.6135171");  // 003, binary metal-nitride prototype (ICSD #105123)
+        vparameters.push_back("2.7472,2.1177927");  // 004, binary metal-nitride prototype (ICSD #181300)
+        vparameters.push_back("2.93,1.9931741");  // 005, binary metal-nitride prototype (ICSD #185559)
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="A2B_hP12_194_cg_f"){
@@ -2570,6 +2571,7 @@ namespace anrl {
       // ---------------------------------------------------------------------------
       if(anrl_label=="A3B_oP16_62_cd_c"){
         vparameters.push_back("6.5982,1.11416750023,0.727789397108,0.011,0.415,0.369,0.555,0.174,0.053,0.856");
+        vparameters.push_back("4.955,1.4377397,0.90938446,0.05881,0.18533,0.38201,0.93464,0.82626,0.57653,0.31483");  // 002, binary metal-nitride prototype (ICSD #260758)
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="AB2C3_oP24_62_c_d_cd"){
@@ -2988,10 +2990,6 @@ namespace anrl {
       // ---------------------------------------------------------------------------
       if(anrl_label=="A3B5_tI32_140_ah_cl"){
         vparameters.push_back("5.46,1.91575091575,0.625,0.166,0.15");
-      }
-      // ---------------------------------------------------------------------------
-      if(anrl_label=="A2B_tI12_141_e_a"){
-        vparameters.push_back("4.126,3.47697527872,0.2915");
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="A_tI16_142_f"){
@@ -3634,6 +3632,7 @@ namespace anrl {
       // ---------------------------------------------------------------------------
       if(anrl_label=="ABC2_tP4_123_a_c_e"){
         vparameters.push_back("1.0,0.707106781182");
+        vparameters.push_back("3.837,0.95282773");  // 002, metallic ternary prototype (ICSD #42564)
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="ABC2_tP4_123_a_d_bc"){
@@ -3699,6 +3698,7 @@ namespace anrl {
       if(anrl_label=="A2B_hP3_164_d_a"){
         vparameters.push_back("1.0,2.44948974278,0.3333333333");
         vparameters.push_back("1.0,1.22474487139,0.3333333333");
+        vparameters.push_back("3.38,1.2810651,0.23");  // 003, binary metal-nitride prototype (ICSD #262746)
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="A2BC3_hP6_164_d_a_bd"){
@@ -3822,6 +3822,7 @@ namespace anrl {
       // ---------------------------------------------------------------------------
       if(anrl_label=="AB_hP8_194_ac_f"){
         vparameters.push_back("3.7639841644,2.4272070374,0.6497");
+        vparameters.push_back("2.952,3.8109756,0.625");  // 002, binary metal-nitride prototype (ICSD #76008)
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="A2B3_cI80_199_a2b_2c"){
@@ -3962,15 +3963,15 @@ namespace anrl {
         vparameters.push_back("7.86,0.59287532,1.1119593,0.482,0.317,0.352,0.939,0.732,0.886");  // 003, metallic ternary prototype (ICSD #42757)
         vparameters.push_back("7.146,0.62244612,1.0720683,0.8048,0.9093,0.6959,0.589,0.012,0.2975");  // 004, metallic ternary prototype (ICSD #54301)
         vparameters.push_back("7.199,0.62911515,1.0247257,0.859,0.435,0.017,0.7973,0.204,0.371");  // 005, metallic ternary prototype (ICSD #54415)
-        vparameters.push_back("7.3628,0.62931222,1.0731651,0.0105,0.7963,0.7969,0.4187,0.1866,0.4123");  // 006, metallic ternary prototype (ICSD #54460)
-        vparameters.push_back("6.897,0.6415833,1.1204872,0.8555,0.0637,0.7261,0.3829,0.9679,0.6799");  // 007, metallic ternary prototype (ICSD #54938)
-        vparameters.push_back("7.77,0.61132561,1.0862291,0.731,0.901,0.494,0.296,0.387,0.917");  // 008, metallic ternary prototype (ICSD #58762)
-        vparameters.push_back("6.625,0.65403774,1.1375094,0.198,0.431,0.462,0.715,0.7839,0.408");  // 009, metallic ternary prototype (ICSD #105338)
-        vparameters.push_back("7.156,0.6352711,1.0444382,0.839,0.439,0.974,0.794,0.17,0.426");  // 010, metallic ternary prototype (ICSD #106459)
-        vparameters.push_back("7.671,0.60643984,0.98970147,0.478,0.809,0.688,0.452,0.815,0.07");  // 011, metallic ternary prototype (ICSD #108571)
-        vparameters.push_back("7.7672,0.61037439,0.94261767,0.9694,0.3161,0.176,0.9257,0.3232,0.6007");  // 012, metallic ternary prototype (ICSD #157921)
-        vparameters.push_back("7.6,0.61628947,0.97888158,0.1794,0.924,0.9737,0.3099,0.3181,0.5972");  // 013, metallic ternary prototype (ICSD #157923)
-        vparameters.push_back("6.723,0.62977837,1.1518667,0.012,0.304,0.677,0.551,0.794,0.903");  // 014, metallic ternary prototype (ICSD #630573)
+        vparameters.push_back("7.77,0.61132561,1.0862291,0.731,0.901,0.494,0.296,0.387,0.917");  // 006, metallic ternary prototype (ICSD #58762)
+        vparameters.push_back("6.625,0.65403774,1.1375094,0.198,0.431,0.462,0.715,0.7839,0.408");  // 007, metallic ternary prototype (ICSD #105338)
+        vparameters.push_back("7.156,0.6352711,1.0444382,0.839,0.439,0.974,0.794,0.17,0.426");  // 008, metallic ternary prototype (ICSD #106459)
+        vparameters.push_back("7.671,0.60643984,0.98970147,0.478,0.809,0.688,0.452,0.815,0.07");  // 009, metallic ternary prototype (ICSD #108571)
+        vparameters.push_back("7.2813,0.62620686,1.0674605,0.8549771,0.067753334,0.96462031,0.67830856,0.70964818,0.38654465");  // 010, metallic ternary prototype (ICSD #150172)
+        vparameters.push_back("7.7672,0.61037439,0.94261767,0.9694,0.3161,0.176,0.9257,0.3232,0.6007");  // 011, metallic ternary prototype (ICSD #157921)
+        vparameters.push_back("6.842,0.59295528,1.1843028,0.7486,0.6244,0.9579,0.3169,0.8643,0.938");  // 012, metallic ternary prototype (ICSD #159305)
+        vparameters.push_back("6.723,0.62977837,1.1518667,0.012,0.304,0.677,0.551,0.794,0.903");  // 013, metallic ternary prototype (ICSD #630573)
+        vparameters.push_back("6.281,0.6938704,1.2023563,0.735,0.619,0.858,0.938,0.978,0.315");  // 014, metallic ternary prototype (ICSD #635080)
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="A2B2C_tI10_139_e_e_a"){
@@ -3987,6 +3988,7 @@ namespace anrl {
       // metal-nitride prototypes (from DX)
       // ---------------------------------------------------------------------------
       // binaries 
+      // ---------------------------------------------------------------------------
       // ---------------------------------------------------------------------------
       if(anrl_label=="A2B_mP6_6_3ab_ab"){
         vparameters.push_back("4.86,0.58148148,0.84053498,99.49,0.192,0.064,0.825,0.654,0.62,0.359,0.201,0.425,0.353,0.805,0.778,0.028");  // 001, binary metal-nitride prototype (ICSD #187448)
@@ -4052,6 +4054,10 @@ namespace anrl {
       // ---------------------------------------------------------------------------
       if(anrl_label=="A2B_oP12_57_e_c"){
         vparameters.push_back("2.901,1.7087211,2.7083764,0.297,0.792,0.08,0.838");  // 001, binary metal-nitride prototype (ICSD #187450)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A2B_oP12_60_d_c"){
+        vparameters.push_back("4.425,1.2481356,1.0915254,0.875,0.25,0.125,0.0833");  // 001, binary metal-nitride prototype (ICSD #150889)
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="A5B3_oC32_63_c2f_cf"){
@@ -4162,6 +4168,10 @@ namespace anrl {
         vparameters.push_back("5.72,0.97902098,0.25,0,0.511,0.25,0.83333,0");  // 001, binary metal-nitride prototype (ICSD #60168)
       }
       // ---------------------------------------------------------------------------
+      if(anrl_label=="AB2_hR3_166_a_c"){
+        vparameters.push_back("3.8520969,5.3707781,0.2678");  // 001, binary metal-nitride prototype (ICSD #23530)
+      }
+      // ---------------------------------------------------------------------------
       if(anrl_label=="AB_hP16_186_ac_bc"){
         vparameters.push_back("5.745,0.97859008,0.25,0,0.51,0.25,0.833,0");  // 001, binary metal-nitride prototype (ICSD #76280)
       }
@@ -4170,16 +4180,20 @@ namespace anrl {
         vparameters.push_back("3.2689,1.1635107,0.687679");  // 001, binary metal-nitride prototype (ICSD #290427)
       }
       // ---------------------------------------------------------------------------
+      if(anrl_label=="A2B_hP3_187_h_a"){
+        vparameters.push_back("2.923,1.3373247,0.68184");  // 001, binary metal-nitride prototype (ICSD #290433)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB_hP6_189_f_ad"){
+        vparameters.push_back("5.196,0.56023865,0.3928");  // 001, binary metal-nitride prototype (ICSD #1396)
+      }
+      // ---------------------------------------------------------------------------
       if(anrl_label=="A2B_hP3_191_e_a"){
         vparameters.push_back("2.829,1.7575115,0.384");  // 001, binary metal-nitride prototype (ICSD #260545)
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="A2B_hP6_191_af_d"){
         vparameters.push_back("5.263,0.5166255");  // 001, binary metal-nitride prototype (ICSD #182351)
-      }
-      // ---------------------------------------------------------------------------
-      if(anrl_label=="AB_hP6_191_ad_f"){
-        vparameters.push_back("5.186,0.56170459");  // 001, binary metal-nitride prototype (ICSD #76457)
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="AB_hP6_191_bc_ad"){
@@ -4191,11 +4205,15 @@ namespace anrl {
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="AB_hP4_194_a_c"){
-        vparameters.push_back("2.46,1.5859756");  // 001, binary metal-nitride prototype (ICSD #183157)
+        vparameters.push_back("3.31,1.7492447");  // 001, binary metal-nitride prototype (ICSD #185566)
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="AB2_hP6_194_c_e"){
         vparameters.push_back("3.2647,2.3412565,0.5930479");  // 001, binary metal-nitride prototype (ICSD #290428)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A2B_hP6_194_e_c"){
+        vparameters.push_back("3.0543,2.549946,0.0905853");  // 001, binary metal-nitride prototype (ICSD #290431)
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="A3B2_hP10_194_bf_ac"){
@@ -4216,9 +4234,18 @@ namespace anrl {
         vparameters.push_back("6.289,0.8855,0.3784");  // 002, binary metal-nitride prototype (ICSD #162106)
       }
       // ---------------------------------------------------------------------------
+      if(anrl_label=="A4B_cP5_221_ac_b"){
+        vparameters.push_back("3.868");  // binary metal-nitride prototype (ICSD #44369)
+      }
+      // ---------------------------------------------------------------------------
       if(anrl_label=="AB4_cP5_221_a_bc"){
         vparameters.push_back("3.74");  // binary metal-nitride prototype (ICSD #76403)
       }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A4B3_cP7_221_ac_d"){
+        vparameters.push_back("4.122");  // binary metal-nitride prototype (ICSD #30370)
+      }
+
       // -------------------------------------------------------------------------
       // ternaries
       // ---------------------------------------------------------------------------
@@ -4359,7 +4386,6 @@ namespace anrl {
       if(anrl_label=="ABC_hP6_186_b_b_a"){
         vparameters.push_back("3.3306,3.2702516,0,0.598,0.2466");  // 001, ternary metal-nitride prototype (ICSD #172471)
         vparameters.push_back("4.3972,1.3683253,0,0.777,0.245");  // 002, metallic ternary prototype (ICSD #54657)
-        vparameters.push_back("4.5825,1.7151555,0,0.2398,0.7854");  // 003, metallic ternary prototype (ICSD #416143)
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="AB2C_hP8_186_a_ab_b"){
@@ -4405,7 +4431,7 @@ namespace anrl {
       if(anrl_label=="AB2C_cF32_227_b_c_a"){
         vparameters.push_back("8.74");  // ternary metal-nitride prototype (ICSD #72546)
       }
-      
+
       // -------------------------------------------------------------------------
       // metal prototypes (from DX) //DX20201028
       // ---------------------------------------------------------------------------
@@ -4491,14 +4517,6 @@ namespace anrl {
         vparameters.push_back("4.0307,3.2806709,1.8867442,0.74976771,0.40946388,0.0012150248,0.8747892,0.1251434,0.66729312,0.00026107832,0.70531985,0.29437221");  // 001, metallic ternary prototype (ICSD #59430)
       }
       // ---------------------------------------------------------------------------
-      if(anrl_label=="ABC_oC18_38_bd_be_ad"){
-        vparameters.push_back("4.1297,3.1724823,1.8520958,0.2464,0,0.5914,0.83335,0.50005,0.3768,0.3768,0.2043,0.2043");  // 001, metallic ternary prototype (ICSD #260992)
-      }
-      // ---------------------------------------------------------------------------
-      if(anrl_label=="ABC_oC18_38_be_ad_bd"){
-        vparameters.push_back("3.9497,3.3839026,1.9576677,0.25494797,0.59120572,1.0483556e-05,0.12745096,0.87256621,0.33335379,2.1695924e-05,0.79560917,0.20433001");  // 001, metallic ternary prototype (ICSD #415506)
-      }
-      // ---------------------------------------------------------------------------
       if(anrl_label=="A10BC3_oP14_47_2q2rs_h_bt"){
         vparameters.push_back("4.261,1.0073926,3.6026754,0.3187,0.1603,0.0819,0.4156,0.4159,0.255");  // 001, metallic ternary prototype (ICSD #20663)
       }
@@ -4511,14 +4529,8 @@ namespace anrl {
         vparameters.push_back("5.09,0.79980354,1.3709234,0.315,0.118,0.683");  // 001, metallic ternary prototype (ICSD #623100)
       }
       // ---------------------------------------------------------------------------
-      if(anrl_label=="A2BC_oP8_51_af_f_e"){
-        vparameters.push_back("4.998,0.80712285,1.412565,0.346,0.103,0.715");  // 001, metallic ternary prototype (ICSD #658675)
-      }
-      // ---------------------------------------------------------------------------
       if(anrl_label=="A4BC_oP12_51_afj_e_e"){
         vparameters.push_back("7.7097,0.52203069,0.91056721,0.17610349,0.61101001,0.95660968,0.92790085,0.71070497");  // 001, metallic ternary prototype (ICSD #9986)
-        vparameters.push_back("7.6602,0.5295162,0.90252213,0.61759,0.18412,0.95685,0.93045,0.70183");  // 002, metallic ternary prototype (ICSD #55598)
-        vparameters.push_back("8.637,0.48917448,0.86036818,0.19372,0.60198,0.93439,0.93656,0.68597");  // 003, metallic ternary prototype (ICSD #411393)
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="A3B2C_oP12_51_ak_ef_f"){
@@ -4555,10 +4567,6 @@ namespace anrl {
         vparameters.push_back("7.38,0.95799458,0.75880759,0.379,0.652,0.033,0.35,0.823,0.947,0.088");  // 002, metallic ternary prototype (ICSD #602790)
       }
       // ---------------------------------------------------------------------------
-      if(anrl_label=="ABC2_oP16_62_c_c_d"){
-        vparameters.push_back("7.292,0.96941854,0.76851344,0.033,0.35,0.379,0.652,0.823,0.947,0.088");  // 001, metallic ternary prototype (ICSD #656966)
-      }
-      // ---------------------------------------------------------------------------
       if(anrl_label=="ABC_oC12_63_c_c_c"){
         vparameters.push_back("3.6684,4.8307164,1.086441,0.7978,0.95664,0.58754");  // 001, metallic ternary prototype (ICSD #166874)
       }
@@ -4570,11 +4578,9 @@ namespace anrl {
       if(anrl_label=="A2BC_oC16_63_f_c_c"){
         vparameters.push_back("4.08,2.4877451,1.7303922,0.213,0.939,0.348,0.956");  // 001, metallic ternary prototype (ICSD #57645)
         vparameters.push_back("4,2.3075,1.785,0.222,0.928,0.356,0.944");  // 002, metallic ternary prototype (ICSD #57693)
-        vparameters.push_back("4.077,2.4724062,1.6997792,0.061,0.787,0.348,0.044");  // 003, metallic ternary prototype (ICSD #57759)
-        vparameters.push_back("4.037,2.3661135,1.6019321,0.796,0.085,0.364,0.05");  // 004, metallic ternary prototype (ICSD #103875)
-        vparameters.push_back("4.1824,2.448355,1.9307096,0.21983,0.93483,0.35459,0.9494");  // 005, metallic ternary prototype (ICSD #152048)
-        vparameters.push_back("4.3642,2.589478,1.8801613,0.77214,0.05365,0.66459,0.94045");  // 006, metallic ternary prototype (ICSD #425493)
-        vparameters.push_back("4.223,2.6381719,1.6663509,0.561,0.287,0.152,0.956");  // 007, metallic ternary prototype (ICSD #658140)
+        vparameters.push_back("4.037,2.3661135,1.6019321,0.796,0.085,0.364,0.05");  // 003, metallic ternary prototype (ICSD #103875)
+        vparameters.push_back("4.3642,2.589478,1.8801613,0.77214,0.05365,0.66459,0.94045");  // 004, metallic ternary prototype (ICSD #425493)
+        vparameters.push_back("4.223,2.6381719,1.6663509,0.561,0.287,0.152,0.956");  // 005, metallic ternary prototype (ICSD #658140)
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="ABC2_oC16_63_a_c_g"){
@@ -4588,23 +4594,14 @@ namespace anrl {
         vparameters.push_back("4.75,4.1263158,0.97894737,0.609,0.824,0.25,0.957");  // 001, metallic ternary prototype (ICSD #58647)
         vparameters.push_back("4.3923,3.6935091,0.98661294,0.6994,0.038,0.5648,0.2504");  // 002, metallic ternary prototype (ICSD #240098)
         vparameters.push_back("4.499,3.9319849,1,0.894,0.685,0.55,0.25");  // 003, metallic ternary prototype (ICSD #621687)
-        vparameters.push_back("4.46,3.9506726,0.99080717,0.327,0.109,0.448,0.749");  // 004, metallic ternary prototype (ICSD #628742)
-        vparameters.push_back("4.675,3.7411765,0.98524064,0.107,0.315,0.452,0.749");  // 005, metallic ternary prototype (ICSD #641754)
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="AB2C_oC16_63_c_f_c"){
         vparameters.push_back("4.2266,2.4376567,1.9779492,0.55971,0.27339,0.1543,0.9448");  // 001, metallic ternary prototype (ICSD #96152)
-        vparameters.push_back("4.621,2.3142177,1.6132872,0.9244,0.2069,0.6388,0.0506");  // 002, metallic ternary prototype (ICSD #150132)
-        vparameters.push_back("4.433,2.5971126,1.8181818,0.94579,0.21864,0.66381,0.05497");  // 003, metallic ternary prototype (ICSD #414434)
-        vparameters.push_back("4.397,2.2967933,1.5010234,0.589,0.3,0.13,0.94");  // 004, metallic ternary prototype (ICSD #600150)
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="A2BC_oC16_63_g_c_c"){
         vparameters.push_back("7.097,1.5019022,0.6299845,0.6747,0.13117,0.7127,0.90293");  // 001, metallic ternary prototype (ICSD #99139)
-      }
-      // ---------------------------------------------------------------------------
-      if(anrl_label=="ABC2_oC16_63_c_c_f"){
-        vparameters.push_back("4.4744,2.4125693,1.8175174,0.43302,0.71694,0.14403,0.44878");  // 001, metallic ternary prototype (ICSD #172230)
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="A2B2C_oC20_63_g_2c_a"){
@@ -4613,7 +4610,6 @@ namespace anrl {
       // ---------------------------------------------------------------------------
       if(anrl_label=="A4BC_oC24_63_acf_c_c"){
         vparameters.push_back("4.056,3.7302761,1.6346154,0.557,0.379,0.729,0.814,0.946");  // 001, metallic ternary prototype (ICSD #57760)
-        vparameters.push_back("4.075,3.7398773,1.6220859,0.557,0.729,0.379,0.814,0.946");  // 002, metallic ternary prototype (ICSD #58060)
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="AB3C2_oC24_63_c_cg_e"){
@@ -4700,10 +4696,6 @@ namespace anrl {
         vparameters.push_back("12.442,0.75952419,0.34078122,0.799,0.819,0.631,0.718,0.847,0.633");  // 001, metallic ternary prototype (ICSD #634397)
       }
       // ---------------------------------------------------------------------------
-      if(anrl_label=="A8B3C3_oI28_71_2n_be_cg"){
-        vparameters.push_back("12.1749,0.81103746,0.34336216,0.82977124,0.78536152,0.62439285,0.71382786,0.83444541,0.62824919");  // 001, metallic ternary prototype (ICSD #634379)
-      }
-      // ---------------------------------------------------------------------------
       if(anrl_label=="A2B2C_oI20_72_j_j_a"){
         vparameters.push_back("14.325,0.50820244,0.49486911,0.86413,0.70673,0.61373,0.71129");  // 001, metallic ternary prototype (ICSD #421424)
       }
@@ -4736,10 +4728,6 @@ namespace anrl {
         vparameters.push_back("4.103,1.5781136,0.3");  // 001, metallic ternary prototype (ICSD #623081)
       }
       // ---------------------------------------------------------------------------
-      if(anrl_label=="ABC5_tP7_123_a_b_ci"){
-        vparameters.push_back("4.601,1.6387742,0.3103");  // 001, metallic ternary prototype (ICSD #102108)
-      }
-      // ---------------------------------------------------------------------------
       if(anrl_label=="AB5C_tP7_123_a_ci_b"){
         vparameters.push_back("4.549,1.6322269,0.805");  // 001, metallic ternary prototype (ICSD #623944)
       }
@@ -4759,18 +4747,6 @@ namespace anrl {
       // ---------------------------------------------------------------------------
       if(anrl_label=="AB2C2_tP10_127_a_g_h"){
         vparameters.push_back("5.716,0.55563331,0.389,0.181");  // 001, metallic ternary prototype (ICSD #57706)
-      }
-      // ---------------------------------------------------------------------------
-      if(anrl_label=="ABC_tP6_129_b_c_c"){
-        vparameters.push_back("4.7819,1.6426943,0.72227037,0.16905509");  // 001, metallic ternary prototype (ICSD #66951)
-      }
-      // ---------------------------------------------------------------------------
-      if(anrl_label=="ABC_tP6_129_c_c_a"){
-        vparameters.push_back("4.741,1.7527948,0.201,0.65");  // 001, metallic ternary prototype (ICSD #601586)
-      }
-      // ---------------------------------------------------------------------------
-      if(anrl_label=="ABC_tP6_129_a_c_c"){
-        vparameters.push_back("4.9,1.6857143,0.273,0.72");  // 001, metallic ternary prototype (ICSD #615958)
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="A2BC_tP8_129_bc_c_a"){
@@ -4798,9 +4774,18 @@ namespace anrl {
         vparameters.push_back("4.137,1.7689147");  // 001, metallic ternary prototype (ICSD #54365)
       }
       // ---------------------------------------------------------------------------
+      if(anrl_label=="A2BC_tI8_139_d_a_b"){
+        vparameters.push_back("3.59,1.9749304");  // 001, metallic ternary prototype (ICSD #169733)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB2C2_tI10_139_a_d_e"){
+        vparameters.push_back("4.74,2.4978903,0.624");  // 001, metallic ternary prototype (ICSD #405)
+      }
+      // ---------------------------------------------------------------------------
       if(anrl_label=="A2BC2_tI10_139_d_a_e"){
-        vparameters.push_back("4.242,2.6692834,0.38820402");  // 001, metallic ternary prototype (ICSD #55789)
-        vparameters.push_back("4.127,2.8279622,0.6073");  // 002, metallic ternary prototype (ICSD #57550)
+        vparameters.push_back("4.81,2.3596674,0.376");  // 001, metallic ternary prototype (ICSD #25332)
+        vparameters.push_back("4.242,2.6692834,0.38820402");  // 002, metallic ternary prototype (ICSD #55789)
+        vparameters.push_back("4.127,2.8279622,0.6073");  // 003, metallic ternary prototype (ICSD #57550)
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="ABC_tI12_139_c_e_e"){
@@ -4808,8 +4793,7 @@ namespace anrl {
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="ABC_tI12_139_e_c_e"){
-        vparameters.push_back("4.359,3.6237669,0.333,0.135");  // 001, metallic ternary prototype (ICSD #183524)
-        vparameters.push_back("4.073,3.1723545,0.131,0.341");  // 002, metallic ternary prototype (ICSD #611768)
+        vparameters.push_back("4.073,3.1723545,0.131,0.341");  // 001, metallic ternary prototype (ICSD #611768)
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="A4B2C_tI14_139_h_d_a"){
@@ -4831,10 +4815,6 @@ namespace anrl {
       if(anrl_label=="AB2C_tI16_139_e_ce_d"){
         vparameters.push_back("4.768,4.9496644,0.1158,0.3296");  // 001, metallic ternary prototype (ICSD #58635)
         vparameters.push_back("4.846,4.5356995,0.8717,0.6859");  // 002, metallic ternary prototype (ICSD #58638)
-      }
-      // ---------------------------------------------------------------------------
-      if(anrl_label=="A2BC_tI16_139_ce_d_e"){
-        vparameters.push_back("4.635,4.9363538,0.6636,0.8862");  // 001, metallic ternary prototype (ICSD #58764)
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="A2B5C3_tI20_139_e_bg_ae"){
@@ -4943,14 +4923,11 @@ namespace anrl {
       // ---------------------------------------------------------------------------
       if(anrl_label=="ABC_hP6_186_b_a_b"){
         vparameters.push_back("4.7199,1.6142715,0.75,0.0593,0.473");  // 001, metallic ternary prototype (ICSD #54997)
-      }
-      // ---------------------------------------------------------------------------
-      if(anrl_label=="ABC_hP6_186_b_a_b"){
         vparameters.push_back("4.576,1.6121066,0,0.382,0");  // 002, metallic ternary prototype (ICSD #100115)
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="ABC_hP6_186_a_b_b"){
-        vparameters.push_back("4.655,1.6386681,0.247,0.467,0.0518");  // 001, metallic ternary prototype (ICSD #106358)
+        vparameters.push_back("4.5858,1.7114789,0.25,0.523,0.978");  // 001, metallic ternary prototype (ICSD #156394)
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="A4BC_hP12_186_ac_b_b"){
@@ -4971,10 +4948,6 @@ namespace anrl {
       // ---------------------------------------------------------------------------
       if(anrl_label=="ABC_hP9_187_dh_ai_eg"){
         vparameters.push_back("4.933,2.2278532,0.6533,0.8342,0.708");  // 001, metallic ternary prototype (ICSD #409533)
-      }
-      // ---------------------------------------------------------------------------
-      if(anrl_label=="ABC_hP9_187_eh_ci_bg"){
-        vparameters.push_back("4.918,2.2206181,0.8334,0.696,0.6544");  // 001, metallic ternary prototype (ICSD #409534)
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="A5B5C_hP11_187_hk_cgi_a"){
@@ -5001,51 +4974,22 @@ namespace anrl {
         vparameters.push_back("6.759,0.61236869,0.24,0.578");  // 001, metallic ternary prototype (ICSD #634575)
       }
       // ---------------------------------------------------------------------------
-      if(anrl_label=="ABC_hP9_189_bc_g_f"){
-        vparameters.push_back("7.1941,0.54156879,0.755,0.415");  // 001, metallic ternary prototype (ICSD #54295)
+      if(anrl_label=="ABC_hP9_189_g_bc_f"){
+        vparameters.push_back("7.717,0.49941687,0.597,0.26");  // 001, metallic ternary prototype (ICSD #54315)
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="A2BC6_hP9_189_c_b_fg"){
         vparameters.push_back("8.213,0.50651406,0.235,0.601");  // 001, metallic ternary prototype (ICSD #96253)
       }
       // ---------------------------------------------------------------------------
-      if(anrl_label=="ABC_hP9_189_g_bc_f"){
-        vparameters.push_back("7.717,0.49941687,0.597,0.26");  // 001, metallic ternary prototype (ICSD #54315)
-      }
-      // ---------------------------------------------------------------------------
       if(anrl_label=="ABC_hP9_189_f_bc_g"){
         vparameters.push_back("7.637,0.61332984,0.75,0.4277");  // 001, metallic ternary prototype (ICSD #54344)
-      }
-      // ---------------------------------------------------------------------------
-      if(anrl_label=="ABC_hP9_189_f_ad_g"){
-        vparameters.push_back("7.4992,0.62021282,0.5659,0.243");  // 001, metallic ternary prototype (ICSD #55102)
-      }
-      // ---------------------------------------------------------------------------
-      if(anrl_label=="ABC_hP9_189_g_f_bc"){
-        vparameters.push_back("7.4174,0.50893844,0.2522,0.5889");  // 001, metallic ternary prototype (ICSD #55846)
-      }
-      // ---------------------------------------------------------------------------
-      if(anrl_label=="ABC_hP9_189_f_bc_g"){
         vparameters.push_back("6.798,0.46587232,0.273,0.615");  // 002, metallic ternary prototype (ICSD #103885)
-      }
-      // ---------------------------------------------------------------------------
-      if(anrl_label=="ABC_hP9_189_bc_g_f"){
-        vparameters.push_back("7.751,0.48651787,0.245,0.585");  // 002, metallic ternary prototype (ICSD #105713)
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="ABC_hP9_189_f_g_bc"){
         vparameters.push_back("7.0015,0.54982504,0.793,0.446");  // 001, metallic ternary prototype (ICSD #107416)
-      }
-      // ---------------------------------------------------------------------------
-      if(anrl_label=="ABC_hP9_189_ad_g_f"){
-        vparameters.push_back("7.345,0.6250919,0.56643333,0.24173333");  // 001, metallic ternary prototype (ICSD #160908)
-      }
-      // ---------------------------------------------------------------------------
-      if(anrl_label=="ABC_hP9_189_f_g_bc"){
         vparameters.push_back("7.0941,0.50138848,0.76,0.6667");  // 002, metallic ternary prototype (ICSD #608141)
-      }
-      // ---------------------------------------------------------------------------
-      if(anrl_label=="ABC_hP9_189_f_g_bc"){
         vparameters.push_back("7.016,0.5791049,0.24,0.3333");  // 003, metallic ternary prototype (ICSD #608770)
       }
       // ---------------------------------------------------------------------------
@@ -5053,23 +4997,13 @@ namespace anrl {
         vparameters.push_back("7.45,0.53288591,0.75506667,0.51506667");  // 001, metallic ternary prototype (ICSD #628137)
       }
       // ---------------------------------------------------------------------------
-      if(anrl_label=="ABC_hP9_189_g_bc_f"){
-        vparameters.push_back("7.286,0.49725501,0.25,0.3333");  // 002, metallic ternary prototype (ICSD #638586)
-      }
-      // ---------------------------------------------------------------------------
       if(anrl_label=="A3B2C_hP6_191_g_c_a"){
         vparameters.push_back("5.565,0.81239892");  // 001, metallic ternary prototype (ICSD #57329)
-      }
-      // ---------------------------------------------------------------------------
-      if(anrl_label=="A3B2C_hP6_191_g_c_a"){
         vparameters.push_back("8.813,0.46102349");  // 002, metallic ternary prototype (ICSD #102452)
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="A2BC3_hP6_191_c_a_g"){
         vparameters.push_back("7.44,0.52956989");  // 001, metallic ternary prototype (ICSD #108369)
-      }
-      // ---------------------------------------------------------------------------
-      if(anrl_label=="A2BC3_hP6_191_c_a_g"){
         vparameters.push_back("5.581,0.70757929");  // 002, metallic ternary prototype (ICSD #658142)
       }
       // ---------------------------------------------------------------------------
@@ -5093,36 +5027,17 @@ namespace anrl {
         vparameters.push_back("4.713,1.8949714");  // 001, metallic ternary prototype (ICSD #54319)
       }
       // ---------------------------------------------------------------------------
-      if(anrl_label=="ABC_hP6_194_a_c_d"){
-        vparameters.push_back("4.953,1.8465576");  // 001, metallic ternary prototype (ICSD #56978)
-      }
-      // ---------------------------------------------------------------------------
       if(anrl_label=="ABC_hP6_194_c_a_d"){
         vparameters.push_back("4.553,1.7665276");  // 001, metallic ternary prototype (ICSD #57018)
-      }
-      // ---------------------------------------------------------------------------
-      if(anrl_label=="ABC_hP6_194_a_d_c"){
-        vparameters.push_back("4.726,1.9970377");  // 001, metallic ternary prototype (ICSD #106303)
-      }
-      // ---------------------------------------------------------------------------
-      if(anrl_label=="ABC_hP6_194_a_d_c"){
-        vparameters.push_back("4.909,1.500713");  // 002, metallic ternary prototype (ICSD #106345)
-      }
-      // ---------------------------------------------------------------------------
-      if(anrl_label=="ABC_hP6_194_a_c_d"){
-        vparameters.push_back("4.583,1.7161248");  // 002, metallic ternary prototype (ICSD #106384)
-      }
-      // ---------------------------------------------------------------------------
-      if(anrl_label=="ABC_hP6_194_c_d_a"){
-        vparameters.push_back("4.922,1.4691182");  // 002, metallic ternary prototype (ICSD #108545)
-      }
-      // ---------------------------------------------------------------------------
-      if(anrl_label=="ABC_hP6_194_c_a_d"){
         vparameters.push_back("4.5813,1.6472617");  // 002, metallic ternary prototype (ICSD #600994)
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="ABC_hP6_194_a_c_d"){
-        vparameters.push_back("4.783,1.6048505");  // 003, metallic ternary prototype (ICSD #622301)
+        vparameters.push_back("4.801,2.0249948");  // 001, metallic ternary prototype (ICSD #106315)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC_hP6_194_a_d_c"){
+        vparameters.push_back("4.909,1.500713");  // 001, metallic ternary prototype (ICSD #106345)
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="AB2C_hP8_194_b_f_c"){
@@ -5133,16 +5048,8 @@ namespace anrl {
         vparameters.push_back("4.539,1.9649703,0.592");  // 001, metallic ternary prototype (ICSD #59505)
       }
       // ---------------------------------------------------------------------------
-      if(anrl_label=="AB2C_hP8_194_c_f_a"){
-        vparameters.push_back("4.498,1.9873277,0.59");  // 001, metallic ternary prototype (ICSD #103292)
-      }
-      // ---------------------------------------------------------------------------
       if(anrl_label=="A2BC_hP8_194_f_a_c"){
         vparameters.push_back("4.303,1.7748083,0.583");  // 001, metallic ternary prototype (ICSD #150602)
-      }
-      // ---------------------------------------------------------------------------
-      if(anrl_label=="AB2C_hP8_194_c_f_a"){
-        vparameters.push_back("4.6571,1.8583024,0.5887");  // 002, metallic ternary prototype (ICSD #157110)
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="A3BC2_hP12_194_h_a_f"){
@@ -5155,13 +5062,6 @@ namespace anrl {
       // ---------------------------------------------------------------------------
       if(anrl_label=="ABC_hP12_194_ab_f_f"){
         vparameters.push_back("4.4951,3.5496874,0.11481,0.65681");  // 001, metallic ternary prototype (ICSD #152621)
-      }
-      // ---------------------------------------------------------------------------
-      if(anrl_label=="ABC_hP12_194_f_ab_f"){
-        vparameters.push_back("4.468,3.5505819,0.61414,0.15824");  // 001, metallic ternary prototype (ICSD #152622)
-      }
-      // ---------------------------------------------------------------------------
-      if(anrl_label=="ABC_hP12_194_ab_f_f"){
         vparameters.push_back("4.588,3.7149085,0.6154,0.1507");  // 002, metallic ternary prototype (ICSD #152623)
       }
       // ---------------------------------------------------------------------------
@@ -5173,6 +5073,14 @@ namespace anrl {
         vparameters.push_back("6.315,0.7511,0.2331");  // 001, metallic ternary prototype (ICSD #180119)
       }
       // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC2_cF16_216_a_d_bc"){
+        vparameters.push_back("6.35");  // metallic ternary prototype (ICSD #57330)
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB4C_cF24_216_a_e_c"){
+        vparameters.push_back("6.86,0.625");  // 001, metallic ternary prototype (ICSD #59462)
+      }
+      // ---------------------------------------------------------------------------
       if(anrl_label=="A3B4C4_cI22_217_b_c_c"){
         vparameters.push_back("7.41,0.2031,0.366");  // 001, metallic ternary prototype (ICSD #58899)
       }
@@ -5180,11 +5088,6 @@ namespace anrl {
       if(anrl_label=="A3BC_cP15_221_ag_c_d"){
         vparameters.push_back("6.408,0.29015");  // 001, metallic ternary prototype (ICSD #412144)
       }
-      // ---------------------------------------------------------------------------
-      if(anrl_label=="AB3C_cP15_221_d_ag_c"){
-        vparameters.push_back("6.384,0.711");  // 001, metallic ternary prototype (ICSD #629734)
-      }
-
     }
     if(library=="" && !keep_original_lattice_parameter){
       //DX 20190314 - loop over parameters - START

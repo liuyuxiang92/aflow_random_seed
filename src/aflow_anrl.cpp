@@ -450,7 +450,7 @@ namespace anrl {
 namespace anrl {
   string structure2anrl(xstructure& xstr, bool recalculate_symmetry){ //DX20190829 - added recalculate_symmetry
     // determine anrl label, parameters, and parameter values of the input structure
-    double default_tolerance=SYM::defaultTolerance(xstr); 
+    double default_tolerance=SYM::defaultTolerance(xstr);
     uint setting=SG_SETTING_ANRL; //anrl setting choice is default
     return structure2anrl(xstr,default_tolerance,setting, recalculate_symmetry); //DX20190829 - added recalculate_symmetry
   }
@@ -1593,12 +1593,85 @@ namespace anrl {
 }
 
 // *************************************************************************** 
+// anrl::specialCaseSymmetryTolerances
+// *************************************************************************** 
+namespace anrl {
+  double specialCaseSymmetryTolerances(const string& label_input){
+    
+    // symmetry tolerances for specific prototypes
+    // some parameter values can be "close" to higher symmetry points,
+    // causing strucures to fall into higher symmetries when analyzed with
+    // certain tolerance; occurs for certain AFLOW Prototype Encyclopedia
+    // structures 
+
+    // ---------------------------------------------------------------------------
+    // AB_oP8_33_a_ai-001 (Modderite)
+    // see comments in http://aflow.org/prototype-encyclopedia/AB_oP8_33_a_a.html
+    if(label_input == "AB_oP8_33_a_a-001"){
+      return 0.001; // symmetry tolerance
+    }
+    // ---------------------------------------------------------------------------
+    // A2B_oC12_38_de_ab-001 (Au2V)
+    // see comments in http://aflow.org/prototype-encyclopedia/A2B_oC12_38_de_ab.html
+    else if(label_input == "A2B_oC12_38_de_ab-001"){
+      return 0.0001; // symmetry tolerance
+    }
+    // ---------------------------------------------------------------------------
+    // AB4_oC20_41_a_2b-001 (PtSn4, Struk: D1_{c})
+    // see comments in http://aflow.org/prototype-encyclopedia/AB4_oC20_41_a_2b.html
+    else if(label_input == "AB4_oC20_41_a_2b-001"){
+      return 0.001; // symmetry tolerance
+    }
+    // ---------------------------------------------------------------------------
+    // AB2_oC24_41_2a_2b-001 (PdSn2, Struk: C_{e})
+    else if(label_input == "AB2_oC24_41_2a_2b-001"){
+      return 0.001; // symmetry tolerance
+    }
+    // ---------------------------------------------------------------------------
+    // A5B2_oP14_49_dehq_ab-001 (beta-Ta2O5)
+    else if(label_input == "A5B2_oP14_49_dehq_ab-001"){
+      return 0.001; // symmetry tolerance
+    }
+    // ---------------------------------------------------------------------------
+    // AB_oC8_67_a_g-001 (alpha-FeSe)
+    else if(label_input == "AB_oC8_67_a_g-001"){
+      return 0.001; // symmetry tolerance
+    }
+    // ---------------------------------------------------------------------------
+    // AB_oC8_67_a_g-002 (alpha-PbO)
+    else if(label_input == "AB_oC8_67_a_g-002"){
+      return 0.001; // symmetry tolerance
+    }
+    // ---------------------------------------------------------------------------
+    // AB_tP8_111_n_n-001 (VN, low-temperature)
+    // see comments in http://aflow.org/prototype-encyclopedia/AB_tP8_111_n_n.html
+    else if(label_input == "AB_tP8_111_n_n-001"){
+      return 0.001; // symmetry tolerance
+    }
+    // ---------------------------------------------------------------------------
+    // A4B6C_hP11_143_bd_2d_a-001 (ScRh6P4)
+    // see comments in http://aflow.org/prototype-encyclopedia/A4B6C_hP11_143_bd_2d_a.html
+    else if(label_input == "A4B6C_hP11_143_bd_2d_a-001"){
+      return 0.001; // symmetry tolerance
+    }
+    // ---------------------------------------------------------------------------
+    // A12BC4_cP34_195_2j_ab_2e-001 (PrRu4P12)
+    // see comments in http://aflow.org/prototype-encyclopedia/A12BC4_cP34_195_2j_ab_2e.html
+    else if(label_input == "A12BC4_cP34_195_2j_ab_2e-001"){
+      return 0.001; // symmetry tolerance
+    }
+    return AUROSTD_MAX_DOUBLE;
+  }
+}
+
+// *************************************************************************** 
 // anrl::structureAndLabelConsistent()
 // *************************************************************************** 
 namespace anrl {
   bool structureAndLabelConsistent(const xstructure& _xstr,
       const string& label_input,
-      string& label_and_params_calculated){
+      string& label_and_params_calculated,
+      const double& tolerance_sym_input){ //DX20201105
 
     // Checks if the created structure is consistent with the label;
     // it is possible that the provided parameters elevate the structure
@@ -1610,8 +1683,13 @@ namespace anrl {
     xstructure xstr = _xstr; // copy
 
     // ---------------------------------------------------------------------------
+    // set symmetry tolerance
+    double tolerance_sym = tolerance_sym_input;
+    if(tolerance_sym == AUROSTD_MAX_DOUBLE){ tolerance_sym = SYM::defaultTolerance(xstr); }
+
+    // ---------------------------------------------------------------------------
     // determine label from structure (reverse process)
-    label_and_params_calculated = structure2anrl(xstr, true); // true=calculate sym
+    label_and_params_calculated = structure2anrl(xstr, tolerance_sym); //DX20201105 - pass in symmetry tolerance
 
     // cannot do a strict string comparison of labels, symmetry analysis may
     // change origin (i.e., Wyckoff letters); need to check if labels are
@@ -1819,7 +1897,7 @@ namespace anrl {
     // check if using original anrl lattice parameter value when using the 
     // preset parameter functionality
     bool keep_anrl_lattice_parameter = false;
-    bool scale_volume_by_species = true;
+    bool scale_volume_by_species = false; //DX20201104 - default should be false
     if(parameters=="use_anrl_lattice_param"){
       keep_anrl_lattice_parameter=true;
       scale_volume_by_species = false;
@@ -2011,6 +2089,11 @@ namespace anrl {
     // partition in parameter values
     vector<string> vparameters_temp;
     aurostd::string2tokens(parameters,vparameters_temp,",");
+    if(aurostd::string2utype<double>(vparameters_temp[0])<=0.0){ //DX20201104 - was missing
+      scale_volume_by_species=true;
+      vparameters_temp[0]="1.0"; //fix
+      parameters=aurostd::joinWDelimiter(vparameters_temp,",");
+    }
     vector<double> vparameters = aurostd::vectorstring2vectordouble(vparameters_temp);
     if(LDEBUG){ cerr << function_name << " parameter_values=" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vparameters,AUROSTD_DEFAULT_PRECISION,FIXED_STREAM),",") << endl; }
 
@@ -3385,8 +3468,9 @@ namespace anrl {
       PrototypeANRL_A2BC_oC8_38_e_a_b(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
     }
     // ---------------------------------------------------------------------------
-    // 38 // ./aflow --proto=A2B_oC12_38_de_ab --params=4.684,1.81084543126,1.0269000854,0.06,0.5,0.17,0.56,0.17,0.0
-    // Change z3 from z4 to get SG #38 (discussed in paper)
+    // 38 // ./aflow --proto=A2B_oC12_38_de_ab --params=4.684,1.81084543126,1.0269000854,0.06,0.5,0.17,0.56,0.1701,0.0
+    // //DX20201105 - changing y3 and y4 to get SG #38 - 38 // ./aflow --proto=A2B_oC12_38_de_ab --params=4.684,1.81084543126,1.0269000854,0.06,0.5,0.17,0.56,0.17,0.0
+    // Change y3 from y4 to get SG #38 (discussed in paper)
     if(vlabel.at(ifound)=="A2B_oC12_38_de_ab") {
       PrototypeANRL_A2B_oC12_38_de_ab(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
     }
