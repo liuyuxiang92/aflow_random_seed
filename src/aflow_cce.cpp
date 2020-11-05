@@ -14,7 +14,7 @@
 #include "aflowlib.h"
 #include "aflow_pflow.h"
 #include "aflow_cce.h"
-//#include "aflow_cce_python.cpp"  //CO20201105
+#include "aflow_cce_python.cpp"  //CO20201105
 
 using std::cout;
 using std::cerr;
@@ -37,13 +37,43 @@ namespace cce {
 
   //CO20201105 START
   void run(aurostd::xoption& flags, ostream& oss) { //CO20201105
-    if(flags.flag("CCE_CORRECTION")){cce::print_corrections(flags,oss);}
+    string soliloquy=XPID+"cce::run()";
+    if (aurostd::toupper(flags.getattachedscheme("CCE_CORRECTION::PRINT")) == "PYTHON") {
+      string directory="."; //can change later with a flag input
+      string aflow_cce_python_subdir = "AFLOW_CCE_PYTHON";
+      string python_directory=directory + '/' + aflow_cce_python_subdir;
+      aurostd::DirectoryMake(python_directory);
+      string aflow_cce_python=AFLOW_CCE_PYTHON_PY;
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "Writing out python script to: "+python_directory, oss, _LOGGER_NOTICE_);
+      stringstream output;
+      output << aflow_cce_python;
+      aurostd::stringstream2file(output,python_directory+'/'+"aflow_cce_python.py");
+      // print CCE citation
+      oss << print_citation();
+    } else {
+      if(flags.flag("CCE_CORRECTION")){cce::print_corrections(flags,oss);}
+    }
   }
   void run(aurostd::xoption& flags, std::istream& ist, ostream& oss) {  //CO20201105
-    if(flags.flag("CCE_CORRECTION::POSCAR2CCE")) {cce::print_corrections(flags, ist, oss);}
-    if(flags.flag("CCE_CORRECTION::GET_CCE_CORRECTION")) {cce::print_corrections(flags, ist, oss);}
-    if(flags.flag("CCE_CORRECTION::GET_OXIDATION_NUMBERS")) {cce::print_oxidation_numbers(flags, ist, oss);}
-    if(flags.flag("CCE_CORRECTION::GET_CATION_COORDINATION_NUMBERS")) {cce::print_cation_coordination_numbers(flags, ist, oss);}
+    string soliloquy=XPID+"cce::run()";
+    if (aurostd::toupper(flags.getattachedscheme("CCE_CORRECTION::PRINT")) == "PYTHON") {
+      string directory="."; //can change later with a flag input
+      string aflow_cce_python_subdir = "AFLOW_CCE_PYTHON";
+      string python_directory=directory + '/' + aflow_cce_python_subdir;
+      aurostd::DirectoryMake(python_directory);
+      string aflow_cce_python=AFLOW_CCE_PYTHON_PY;
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "Writing out python script to: "+python_directory, oss, _LOGGER_NOTICE_);
+      stringstream output;
+      output << aflow_cce_python;
+      aurostd::stringstream2file(output,python_directory+'/'+"aflow_cce_python.py");
+      // print CCE citation
+      oss << print_citation();
+    } else {
+      if(flags.flag("CCE_CORRECTION::POSCAR2CCE")) {cce::print_corrections(flags, ist, oss);}
+      if(flags.flag("CCE_CORRECTION::GET_CCE_CORRECTION")) {cce::print_corrections(flags, ist, oss);}
+      if(flags.flag("CCE_CORRECTION::GET_OXIDATION_NUMBERS")) {cce::print_oxidation_numbers(flags, ist, oss);}
+      if(flags.flag("CCE_CORRECTION::GET_CATION_COORDINATION_NUMBERS")) {cce::print_cation_coordination_numbers(flags, ist, oss);}
+    }
   }
   //CO20201105 END
 
