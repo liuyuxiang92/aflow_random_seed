@@ -104,22 +104,25 @@ class CCE:
         command = self.add_structure_file_path(command, struct_file)
 
         # handling functionals
-        if type(functionals) == str and functionals:
-            # convert to list
-            functionals = functionals.replace(' ', '')
-            functionals = functionals.split(',')
-        if type(functionals) == tuple and len(functionals) > 0:
-            # convert to list
-            functionals = list(functionals)
-        if type(functionals) == list and len(functionals) > 0:
-            functionals = [x.upper() for x in functionals]
-            valid_functionals = self.validate_functionals(functionals)
-            command = self.add_functionals(valid_functionals, command)
-        elif type(functionals) != list and type(functionals) != str and type(
-             functionals) != tuple:
+        if type(functionals) == str:
+            if functionals:
+                # convert to list
+                functionals = functionals.replace(' ', '')
+                functionals = functionals.split(',')
+        elif type(functionals) == tuple:
+            if len(functionals) > 0:
+                # convert to list
+                functionals = list(functionals)
+        elif type(functionals) == list:
+            pass
+        else:
             raise TypeError('The functionals argument must be either a list, '
                             'or a tuple, or a string with functionals '
                             'separated by commas.')
+        if len(functionals) > 0:
+            functionals = [x.upper() for x in functionals]
+            valid_functionals = self.validate_functionals(functionals)
+            command = self.add_functionals(valid_functionals, command)
 
         # handling enthalpies_formation_dft
         if type(enthalpies_formation_dft) == str and enthalpies_formation_dft:
