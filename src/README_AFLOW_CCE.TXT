@@ -84,7 +84,7 @@ Details for the options available are explained in the following.
                                  be written on the right side next to the coordinates for each atom just
                                  as for the EXAMPLE INPUT STRUCTURE FOR ROCKSALT MgO below.
 
---print=                         Obtain output in standard format (--print=out) or as json (--print=json).
+--print=                         Obtain output in standard format (--print=out), json (--print=json), or as a python script (--print=python).
                                  Default: out.
 
 (iii) EXAMPLE INPUT STRUCTURE FOR ROCKSALT MgO:
