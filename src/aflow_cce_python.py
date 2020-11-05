@@ -1,6 +1,7 @@
 import json
 import os
 import subprocess
+import warnings
 
 VERBOSE = False
 
@@ -75,9 +76,16 @@ class CCE:
         available_functionals = ['PBE', 'LDA', 'SCAN']
         invalid_functionals = [n for n in input_functionals if n not in
                                available_functionals]
+        valid_functionals = [n for n in input_functionals if n in
+                             available_functionals]
         if invalid_functionals:
-            raise ValueError('No corrections available for: ' +
-                             ','.join(invalid_functionals))
+            warnings.warn('No corrections available for: ' +
+                          ','.join(invalid_functionals))
+        if not valid_functionals:
+            raise ValueError('No valid functionals provided. '
+                             'Please choose from: ' +
+                             ','.join(available_functionals))
+        return valid_functionals
 
     def add_functionals(self, functionals, cmd):
         '''adds functionals to command'''
@@ -105,8 +113,8 @@ class CCE:
             functionals = list(functionals)
         if type(functionals) == list and len(functionals) > 0:
             functionals = [x.upper() for x in functionals]
-            self.validate_functionals(functionals)
-            command = self.add_functionals(functionals, command)
+            valid_functionals = self.validate_functionals(functionals)
+            command = self.add_functionals(valid_functionals, command)
         elif type(functionals) != list and type(functionals) != str and type(
              functionals) != tuple:
             raise TypeError('The functionals argument must be either a list, '
@@ -124,6 +132,14 @@ class CCE:
             if len(enthalpies_formation_dft) != len(functionals):
                 raise ValueError('number of input formation enthalpies '
                                  'does not equal number of functionals')
+            # consider only enthalpies corresponding to valid functionals
+            if len(enthalpies_formation_dft) != len(valid_functionals):
+                enthalpies_new = []
+                for i in range(len(functionals)):
+                    for j in range(len(valid_functionals)):
+                        if functionals[i] == valid_functionals[j]:
+                            enthalpies_new.append(enthalpies_formation_dft[i])
+                enthalpies_formation_dft = enthalpies_new
             enthalpies_formation = ','.join([str(n) for n in
                                             enthalpies_formation_dft])
             command += ' --enthalpies_formation_dft=' + enthalpies_formation
