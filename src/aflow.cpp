@@ -403,8 +403,8 @@ bool coordinationTest(ofstream& FileMESSAGE,ostream& oss){  //CO20190520
   return TRUE; //CO20180419
 }
 
-bool PrototypeGeneratorTest(ostream& oss){ofstream FileMESSAGE;return PrototypeGeneratorTest(FileMESSAGE,oss);} //DX20200925
-bool PrototypeGeneratorTest(ofstream& FileMESSAGE,ostream& oss){  //DX20200925
+bool PrototypeGeneratorTest(ostream& oss, bool check_symmetry){ofstream FileMESSAGE;return PrototypeGeneratorTest(FileMESSAGE,oss,check_symmetry);} //DX20200925
+bool PrototypeGeneratorTest(ofstream& FileMESSAGE,ostream& oss,bool check_symmetry){  //DX20200925
   string function_name="PrototypeGeneratorTest():";
   bool LDEBUG=FALSE; // TRUE;
   stringstream message;
@@ -412,6 +412,11 @@ bool PrototypeGeneratorTest(ofstream& FileMESSAGE,ostream& oss){  //DX20200925
 
   message << "Testing generation of all AFLOW prototypes";
   pflow::logger(_AFLOW_FILE_NAME_,function_name,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+
+  if(check_symmetry){
+    message << "AND checking symmetry all generated AFLOW prototypes";
+    pflow::logger(_AFLOW_FILE_NAME_,function_name,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+  }
 
   vector<string> prototype_labels, compositions;
   vector<uint> space_group_numbers;
@@ -436,22 +441,25 @@ bool PrototypeGeneratorTest(ofstream& FileMESSAGE,ostream& oss){  //DX20200925
       try{
         xstructure xstr = aflowlib::PrototypeLibraries(oss,prototype_labels[i],parameter_sets[j],1);
 
-        if(LDEBUG){ cerr << "Check that the generated structure is consistent with the label=" << prototype_labels[i] << ": " << parameter_sets.size() << endl; }
+        // check symmetry
+        if(check_symmetry){
+          if(LDEBUG){ cerr << "Check that the generated structure is consistent with the label=" << prototype_labels[i] << ": " << parameter_sets.size() << endl; }
 
-        // symmetry tolerances
-        // some prototype require special tolerance values
-        stringstream label_input_ss; label_input_ss << prototype_labels[i] << "-" << std::setw(3) << std::setfill('0') << j+1;
-        string label_input = label_input_ss.str();
-        double tolerance_sym = anrl::specialCaseSymmetryTolerances(label_input);
+          // symmetry tolerances
+          // some prototype require special tolerance values
+          stringstream label_input_ss; label_input_ss << prototype_labels[i] << "-" << std::setw(3) << std::setfill('0') << j+1;
+          string label_input = label_input_ss.str();
+          double tolerance_sym = anrl::specialCaseSymmetryTolerances(label_input);
 
-        string updated_label_and_params = "";
-        if(!anrl::structureAndLabelConsistent(xstr, prototype_labels[i], updated_label_and_params, tolerance_sym)){ //DX20201105 - added symmetry tolerance
-          // if changes symmetry, give the appropriate label
-          message << "The structure has a higher symmetry than indicated by the label. ";
-          message << "The correct label and parameters for this structure are:" << endl;
-          message << updated_label_and_params << endl;
-          message << "Please feed this label and set of parameters into the prototype generator.";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
+          string updated_label_and_params = "";
+          if(!anrl::structureAndLabelConsistent(xstr, prototype_labels[i], updated_label_and_params, tolerance_sym)){ //DX20201105 - added symmetry tolerance
+            // if changes symmetry, give the appropriate label
+            message << "The structure has a higher symmetry than indicated by the label. ";
+            message << "The correct label and parameters for this structure are:" << endl;
+            message << updated_label_and_params << endl;
+            message << "Please feed this label and set of parameters into the prototype generator.";
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
+          }
         }
       }
       catch(aurostd::xerror& excpt){
@@ -644,6 +652,7 @@ int main(int _argc,char **_argv) {
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_smith|--smith_test")) {return (smithTest()?0:1);}  //CO20190601
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_coordination|--coordination_test")) {return (coordinationTest()?0:1);}  //CO20190601
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_PrototypeGenerator|--PrototypeGenerator_test")) {return (PrototypeGeneratorTest()?0:1);}  //DX20200928
+    if(!Arun && aurostd::args2flag(argv,cmds,"--test_PrototypeSymmetry|--PrototypeSymmetry_test")) {return (PrototypeGeneratorTest(cout,true)?0:1);}  //DX20201105
     if(!Arun && aurostd::args2flag(argv,cmds,"--test")) {
 
       if(XHOST.vext.size()!=XHOST.vcat.size()) {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"XHOST.vext.size()!=XHOST.vcat.size(), aborting.",_RUNTIME_ERROR_);}

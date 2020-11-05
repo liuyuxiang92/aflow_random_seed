@@ -2546,8 +2546,8 @@ bool smithTest(ostream& oss=cout);
 bool smithTest(ofstream& FileMESSAGE,ostream& oss=cout);
 bool coordinationTest(ostream& oss=cout);
 bool coordinationTest(ofstream& FileMESSAGE,ostream& oss=cout);
-bool PrototypeGeneratorTest(ostream& oss=cout); //DX20200928
-bool PrototypeGeneratorTest(ofstream& FileMESSAGE,ostream& oss=cout); //DX20200928
+bool PrototypeGeneratorTest(ostream& oss=cout, bool check_symmetry=false); //DX20200928
+bool PrototypeGeneratorTest(ofstream& FileMESSAGE,ostream& oss=cout, bool check_symmetry=false); //DX20200928
 
 // ----------------------------------------------------------------------------
 // Structure Prototypes
