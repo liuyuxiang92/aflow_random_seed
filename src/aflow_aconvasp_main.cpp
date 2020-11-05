@@ -1725,11 +1725,11 @@ namespace pflow {
       if(vpflow.flag("CAGES") && !AFLOW_PTHREADS::FLAG) {pflow::CAGES(aflags,vpflow.getattachedscheme("CAGES"),cin); _PROGRAMRUN=true;}
       if(vpflow.flag("CAGES") &&  AFLOW_PTHREADS::FLAG) {pflow::CAGES(aflags,vpflow.getattachedscheme("CAGES"),cin); _PROGRAMRUN=true;}
       if(vpflow.flag("CART")) {cout << pflow::CART(cin); _PROGRAMRUN=true;}
-      if(vpflow.flag("CCE_CORRECTION")) {cce::print_corrections(vpflow); _PROGRAMRUN=true;}
-      if(vpflow.flag("CCE_CORRECTION::POSCAR2CCE")) {cce::print_corrections(vpflow, std::cin); _PROGRAMRUN=true;} //ME20200508
-      if(vpflow.flag("CCE_CORRECTION::GET_CCE_CORRECTION")) {cce::print_corrections(vpflow, std::cin); _PROGRAMRUN=true;} //RF20200916
-      if(vpflow.flag("CCE_CORRECTION::GET_OXIDATION_NUMBERS")) {cce::print_oxidation_numbers(vpflow, std::cin); _PROGRAMRUN=true;} //RF20200725
-      if(vpflow.flag("CCE_CORRECTION::GET_CATION_COORDINATION_NUMBERS")) {cce::print_cation_coordination_numbers(vpflow, std::cin); _PROGRAMRUN=true;} //RF20200814
+      if(vpflow.flag("CCE_CORRECTION")) {cce::run(vpflow); _PROGRAMRUN=true;}
+      if(vpflow.flag("CCE_CORRECTION::POSCAR2CCE")) {cce::run(vpflow, std::cin); _PROGRAMRUN=true;} //ME20200508  //CO20201105
+      if(vpflow.flag("CCE_CORRECTION::GET_CCE_CORRECTION")) {cce::run(vpflow, std::cin); _PROGRAMRUN=true;} //RF20200916  //CO20201105
+      if(vpflow.flag("CCE_CORRECTION::GET_OXIDATION_NUMBERS")) {cce::run(vpflow, std::cin); _PROGRAMRUN=true;} //RF20200725 //CO20201105
+      if(vpflow.flag("CCE_CORRECTION::GET_CATION_COORDINATION_NUMBERS")) {cce::run(vpflow, std::cin); _PROGRAMRUN=true;} //RF20200814 //CO20201105
       if(vpflow.flag("CHECKINTEGRITIY")) {pflow::CheckIntegritiy(); _PROGRAMRUN=true;}
       if(vpflow.flag("CHANGESUFFIX")) {pflow::ChangeSuffix(vpflow.getattachedscheme("CHANGESUFFIX")); _PROGRAMRUN=true;} //KY20131222
       if(vpflow.flag("CIF") && !vpflow.flag("PROTO_AFLOW") && !vpflow.flag("PROTO")) {pflow::CIF(cin,vpflow); _PROGRAMRUN=true;} //DX20180806 - added vpflow

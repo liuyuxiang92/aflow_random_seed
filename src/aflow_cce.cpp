@@ -14,6 +14,7 @@
 #include "aflowlib.h"
 #include "aflow_pflow.h"
 #include "aflow_cce.h"
+//#include "aflow_cce_python.cpp"  //CO20201105
 
 using std::cout;
 using std::cerr;
@@ -33,6 +34,18 @@ namespace cce {
   // for command line use, 
   // use inside AFLOW providing directory path or xstructure & functional string or flags and istream for web tool, 
   // and CCE core function called by all other main CCE functions
+
+  //CO20201105 START
+  void run(aurostd::xoption& flags, ostream& oss) { //CO20201105
+    if(flags.flag("CCE_CORRECTION")){cce::print_corrections(flags,oss);}
+  }
+  void run(aurostd::xoption& flags, std::istream& ist, ostream& oss) {  //CO20201105
+    if(flags.flag("CCE_CORRECTION::POSCAR2CCE")) {cce::print_corrections(flags, ist, oss);}
+    if(flags.flag("CCE_CORRECTION::GET_CCE_CORRECTION")) {cce::print_corrections(flags, ist, oss);}
+    if(flags.flag("CCE_CORRECTION::GET_OXIDATION_NUMBERS")) {cce::print_oxidation_numbers(flags, ist, oss);}
+    if(flags.flag("CCE_CORRECTION::GET_CATION_COORDINATION_NUMBERS")) {cce::print_cation_coordination_numbers(flags, ist, oss);}
+  }
+  //CO20201105 END
 
   //print_corrections////////////////////////////////////////////////////////
   // main CCE function for command line use 
@@ -58,7 +71,7 @@ namespace cce {
     print_corrections(structure, flags);
   }
 
-  void print_corrections(xstructure& structure, aurostd::xoption& flags) {
+  void print_corrections(xstructure& structure, aurostd::xoption& flags, ostream& oss) {  //CO20201105
     aurostd::xoption cce_flags = init_flags();
     if (aurostd::toupper(flags.flag("CCE_CORRECTION::UNIT_TEST"))) {
       cce_flags.flag("UNIT_TEST",TRUE);
@@ -78,7 +91,7 @@ namespace cce {
       cce_vars.oxidation_states = get_oxidation_states(flags.getattachedscheme("CCE_CORRECTION::OXIDATION_NUMBERS"), structure, cce_vars);
     }
 
-    print_corrections(structure, flags, cce_flags, cce_vars);
+    print_corrections(structure, flags, cce_flags, cce_vars, oss);  //CO20201105
   }
 
   void print_corrections(xstructure& structure, aurostd::xoption& flags, aurostd::xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss) {
@@ -117,11 +130,11 @@ namespace cce {
   //print_corrections///////////////////////////////////////////////////////////////////////
   //ME20200213
   // For poscar2cce
-  void print_corrections(aurostd::xoption& flags, std::istream& ist) {
+  void print_corrections(aurostd::xoption& flags, std::istream& ist, ostream& oss) {  //CO20201105
     // read structure
     xstructure structure=read_structure(ist);
 
-    print_corrections(structure, flags);
+    print_corrections(structure, flags, oss);
   }
 
 

@@ -754,7 +754,7 @@ aflowlib_webapp_bands.cpp: aflowlib_webapp_bands.js Makefile
 	echo "\";" >> $@
 	echo "#endif // _AFLOWLIB_WEBAPP_BANDS_CPP_" >> $@
 #CO20180305 - END
-#MB 190301 - START
+#MB20190301 - START
 aflow_chull_jupyter.cpp: aflow_chull_jupyter.json Makefile
 	rm -rf $@
 	echo "#ifndef _AFLOW_CHULL_JUPYTER_CPP_" >> $@
@@ -764,8 +764,8 @@ aflow_chull_jupyter.cpp: aflow_chull_jupyter.json Makefile
 	cat $< | perl -p -e 's/\r//g' | perl -p -e 's/\\n/\\\\n/g' | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\"/\\"/g' >> $@	
 	echo "\";" >> $@
 	echo "#endif // _AFLOW_CHULL_JUPYTER_CPP_" >> $@
-#MB 190301 - END
-#MB 190301 - START
+#MB20190301 - END
+#MB20190301 - START
 aflow_chull_jupyter_plotter.cpp: aflow_chull_jupyter_plotter.py Makefile
 	rm -rf $@
 	echo "#ifndef _AFLOW_CHULL_JUPYTER_PLOTTER_CPP_" >> $@
@@ -775,8 +775,8 @@ aflow_chull_jupyter_plotter.cpp: aflow_chull_jupyter_plotter.py Makefile
 	cat $< | perl -p -e 's/\r//g' | perl -p -e 's/\\d/\\\\d/g' | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\"/\\"/g' >> $@
 	echo "\";" >> $@
 	echo "#endif // _AFLOW_CHULL_JUPYTER_PLOTTER_CPP_" >> $@
-#MB 190301 - END
-#MB 190301 - START
+#MB20190301 - END
+#MB20190301 - START
 aflow_chull_jupyter_requirements.cpp: aflow_chull_jupyter_requirements.txt Makefile
 	rm -rf $@
 	echo "#ifndef _AFLOW_CHULL_JUPYTER_REQUIREMENTS_CPP_" >> $@
@@ -786,8 +786,8 @@ aflow_chull_jupyter_requirements.cpp: aflow_chull_jupyter_requirements.txt Makef
 	cat $< | perl -p -e 's/\r//g' | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\"/\\"/g' >> $@
 	echo "\";" >> $@
 	echo "#endif // _AFLOW_CHULL_JUPYTER_REQUIREMENTS_CPP_" >> $@
-#MB 190301 - END
-#MB 190301 - START
+#MB20190301 - END
+#MB20190301 - START
 aflow_chull_python.cpp: aflow_chull_python.py Makefile
 	rm -rf $@
 	echo "#ifndef _AFLOW_CHULL_PYTHON_CPP_" >> $@
@@ -797,7 +797,18 @@ aflow_chull_python.cpp: aflow_chull_python.py Makefile
 	cat $< | perl -p -e 's/\r//g' | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\"/\\"/g' >> $@
 	echo "\";" >> $@
 	echo "#endif // _AFLOW_CHULL_PYTHON_CPP_" >> $@
-#MB 190301 - END
+#MB20190301 - END
+#CO20201105 - START
+aflow_cce_python.cpp: aflow_cce_python.py Makefile
+	rm -rf $@
+	echo "#ifndef _AFLOW_CCE_PYTHON_CPP_" >> $@
+	echo "#define _AFLOW_CCE_PYTHON_CPP_" >> $@
+	echo "// $@ automatic generated" >> $@
+	echo "std::string AFLOW_CCE_PYTHON_PY=\"\\" >> $@
+	cat $< | perl -p -e 's/\r//g' | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\"/\\"/g' >> $@
+	echo "\";" >> $@
+	echo "#endif // _AFLOW_CCE_PYTHON_CPP_" >> $@
+#CO20201105 - END
 aflow_mix_nomix_table.cpp: Makefile $(AFLOW_HPPS) $(AUROSTD_HPPS)
 	rm -rf nomix.tmp
 	find $(PROJECT_DIRECTORY_GNDSTATE)/NOMIX/ -name aflow.in | sed "s/\/common\/$(PROJECT_DIRECTORY_GNDSTATE)\/NOMIX\/LIB2\/LIB\///g" | sed "s/aflow.in//g" >> nomix.tmp
