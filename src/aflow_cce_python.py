@@ -44,7 +44,7 @@ class CCE:
                                              shell=True)
             return output
         except subprocess.CalledProcessError:
-            raise OSError('An error occured while executing: ' +
+            raise OSError('An error occurred while executing: ' +
                           self.aflow_executable + cmd)
 
     def add_structure_file_path(self, cmd, struct_file):
@@ -117,7 +117,7 @@ class CCE:
             pass
         else:
             raise TypeError('The functionals argument must be either a list, '
-                            'or a tuple, or a string with functionals '
+                            'a tuple, or a string with functionals '
                             'separated by commas.')
         if len(functionals) > 0:
             functionals = [x.upper() for x in functionals]
@@ -139,7 +139,7 @@ class CCE:
             pass
         else:
             raise TypeError('The enthalpies argument must be either a list, '
-                            'or a tuple, or a string with enthalpies '
+                            'a tuple, or a string with enthalpies '
                             'separated by commas.')
         if len(enthalpies_formation_dft) > 0:
             if len(enthalpies_formation_dft) != len(functionals):
@@ -171,7 +171,7 @@ class CCE:
             pass
         else:
             raise TypeError('The oxidation numbers must be either a list, '
-                            'or a tuple, or a string with numbers '
+                            'a tuple, or a string with numbers '
                             'separated by commas.')
         if len(oxidation_numbers) > 0:
             input_oxidation_numbers = ','.join([str(n) for n in
