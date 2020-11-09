@@ -125,13 +125,23 @@ class CCE:
             command = self.add_functionals(valid_functionals, command)
 
         # handling enthalpies_formation_dft
-        if type(enthalpies_formation_dft) == str and enthalpies_formation_dft:
-            # convert to list
-            enthalpies_formation_dft = enthalpies_formation_dft.replace(' ',
-                                                                        '')
-            enthalpies_formation_dft = enthalpies_formation_dft.split(',')
-        if type(enthalpies_formation_dft) == list and len(
-           enthalpies_formation_dft) > 0:
+        if type(enthalpies_formation_dft) == str:
+            if enthalpies_formation_dft:
+                # convert to list
+                enthalpies_formation_dft = enthalpies_formation_dft.replace(
+                                           ' ', '')
+                enthalpies_formation_dft = enthalpies_formation_dft.split(',')
+        elif type(enthalpies_formation_dft) == tuple:
+            if len(enthalpies_formation_dft) > 0:
+                # convert to list
+                enthalpies_formation_dft = list(enthalpies_formation_dft)
+        elif type(enthalpies_formation_dft) == list:
+            pass
+        else:
+            raise TypeError('The enthalpies argument must be either a list, '
+                            'or a tuple, or a string with enthalpies '
+                            'separated by commas.')
+        if len(enthalpies_formation_dft) > 0:
             if len(enthalpies_formation_dft) != len(functionals):
                 raise ValueError('number of input formation enthalpies '
                                  'does not equal number of functionals')
@@ -148,11 +158,22 @@ class CCE:
             command += ' --enthalpies_formation_dft=' + enthalpies_formation
 
         # handling oxidation_numbers
-        if type(oxidation_numbers) == str and oxidation_numbers:
-            # convert to list
-            oxidation_numbers = oxidation_numbers.replace(' ', '')
-            oxidation_numbers = oxidation_numbers.split(',')
-        if type(oxidation_numbers) == list and len(oxidation_numbers) > 0:
+        if type(oxidation_numbers) == str:
+            if oxidation_numbers:
+                # convert to list
+                oxidation_numbers = oxidation_numbers.replace(' ', '')
+                oxidation_numbers = oxidation_numbers.split(',')
+        elif type(oxidation_numbers) == tuple:
+            if len(oxidation_numbers) > 0:
+                # convert to list
+                oxidation_numbers = list(oxidation_numbers)
+        elif type(oxidation_numbers) == list:
+            pass
+        else:
+            raise TypeError('The oxidation numbers must be either a list, '
+                            'or a tuple, or a string with numbers '
+                            'separated by commas.')
+        if len(oxidation_numbers) > 0:
             input_oxidation_numbers = ','.join([str(n) for n in
                                                oxidation_numbers])
             command += ' --oxidation_numbers=' + input_oxidation_numbers
