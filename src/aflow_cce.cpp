@@ -3082,13 +3082,8 @@ namespace cce {
         }
       } else {
         json << "\"298.15K\":{";
-        json << "\"cce_correction_cell\":" << cce_vars.cce_correction[num_temps*i] << ",";
-        json << "\"cce_correction_atom\":" << (cce_vars.cce_correction[num_temps*i]/natoms);
-        if (print_Hf) {
-          json << ",";
-          json << "\"formation_enthalpy_cell\":" << cce_vars.enthalpy_formation_cell_cce[num_temps*i] << ",";
-          json << "\"formation_enthalpy_atom\":" << (cce_vars.enthalpy_formation_cell_cce[num_temps*i]/natoms);
-        }
+        json << "\"formation_enthalpy_cell\":" << cce_vars.enthalpy_formation_cell_cce[num_temps*i] << ",";
+        json << "\"formation_enthalpy_atom\":" << (cce_vars.enthalpy_formation_cell_cce[num_temps*i]/natoms);
         json << "}";
       }
       json << "}";
@@ -3258,7 +3253,9 @@ namespace cce {
     oss << "(ii) AVAILABLE OPTIONS:" << endl;
     oss << "--cce                            Prints these user instructions." << endl;
     oss << endl;
-    oss << "--cce=STRUCTURE_FILE_PATH        Provide the path to the structure file. It can be in any structure" << endl;
+    oss << "--cce=STRUCTURE_FILE_PATH        Prints the results of the full CCE anaysis, i.e. cation coordination" << endl;
+    oss << "                                 numbers, oxidation numbers, and CCE corrections and formation enthalpies," << endl
+    oss << "                                 for the given structure file. It can be in any structure" << endl;
     oss << "                                 format that AFLOW supports, e.g. VASP POSCAR, QE, AIMS, ABINIT, ELK, and CIF." << endl;
     oss << "                                 For VASP, a VASP5 POSCAR is required or, if a VASP4 POSCAR is used, the species" << endl;
     oss << "                                 must be written on the right side next to the coordinates for each atom" << endl;
