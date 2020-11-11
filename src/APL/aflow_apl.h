@@ -522,7 +522,7 @@ namespace apl {
       void initialize_qmesh(const vector<int>&, bool=true, bool=true);
       void initialize_qmesh(const xvector<int>&, bool=true, bool=true);
       void initialize_supercell(const xstructure&, bool verbose=true);//AS20200908
-      void initialize_supercell(const string&, bool verbose=true);//AS20200908
+      void initialize_supercell(const string&);
 
       // IFCs
       void setHarmonicForceConstants(const ForceConstantCalculator&);

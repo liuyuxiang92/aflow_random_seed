@@ -196,8 +196,8 @@ namespace apl {
   void PhononCalculator::initialize_supercell(const xstructure& xstr, bool verbose) {
     _supercell.initialize(xstr, verbose);//AS20200908
   }
-  void PhononCalculator::initialize_supercell(const string& filename, bool verbose) {
-    _supercell.initialize(filename, verbose);//AS20200908
+  void PhononCalculator::initialize_supercell(const string& filename) {
+    _supercell.initialize(filename);
   }
 }
 
