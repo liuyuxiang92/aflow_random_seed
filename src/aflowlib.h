@@ -255,7 +255,7 @@ namespace aflowlib {
       void clear();                                              // free space
       uint Load(const stringstream& stream,ostream& oss);        // load from stringstream it std is cout
       uint Load(const string& entry,ostream& oss);               // load from string it std is cout
-      uint file2aflowlib(const string& file,ostream& oss);       // load from file
+      uint file2aflowlib(const string& file,ostream& oss=std::cout);       // load from file
       uint url2aflowlib(const string& url,ostream& oss,bool=TRUE); // load from the web (VERBOSE)
       string aflowlib2string(string="out");                      //
       string aflowlib2file(string file,string="out");            //

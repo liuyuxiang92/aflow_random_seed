@@ -4656,33 +4656,34 @@ namespace xelement {
       void clear();
       void populate(const string& element); //CO20200520
       void populate(uint ZZ); //CO20200520
+      string getProperty(const string& property) const; //CO20201111
       // content                                             // content
       bool verbose;
       // [AFLOW]START=DECLARATION
       int Z;                                  // Z
       string symbol;                          // http://periodictable.com      //DU20190517   // DONE SC20190524
       string name;                            // http://periodictable.com      //DU20190517   // DONE SC20190524
-      double Period;                          // http://periodictable.com      //DU20190517
-      double Group;                           // http://periodictable.com      //DU20190517
+      double period;                          // http://periodictable.com      //DU20190517
+      double group;                           // http://periodictable.com      //DU20190517
       string Series;                          // http://periodictable.com For Nh,Fl,Mc,Lv,Ts Value is a guess based on periodic table trend.      //DU20190517 
       string Block;                           // http://periodictable.com      //DU20190517
       //                                          
       double mass;                            // (kg)     // DONE SC20190524
-      double MolarVolume;                     // (m^3/mol) http://periodictable.com      //DU20190517
+      double molar_volume;                     // (m^3/mol) http://periodictable.com      //DU20190517
       double volume;                          // atomic volume in A^3 from the FCC vasp table and/or successive calculations // DONE SC20190524
-      double Miedema_Vm;                      // (V_m^{2/3} in (cm^2)) Miedema Rule Table 1a Physica 100B (1980) 1-28
+      double Vm_Miedema;                      // (V_m^{2/3} in (cm^2)) Miedema Rule Table 1a Physica 100B (1980) 1-28
       // for lanthines from J.A. Alonso and N.H. March. Electrons in Metals and Alloys, Academic Press, London (1989) (except La)
       double valence_std;                     // http://en.wikipedia.org/wiki/Valence_(chemistry) standard: number electrons minus closed shell at leff (noble gas)
       double valence_iupac;                   // http://en.wikipedia.org/wiki/Valence_(chemistry) IUPAC Maximum number of univalent atoms that may combine with an atom of the element under consideration, or with a fragment, or for which an atom of this element can be substituted.
       double valence_PT;                      //           http://periodictable.com      //DU20190517
-      double Density_PT;                      // (g/cm^3)  http://periodictable.com      //DU20190517
+      double density_PT;                      // (g/cm^3)  http://periodictable.com      //DU20190517
       string crystal;                         // Ashcroft-Mermin                                                                                                                   
-      string CrystalStr_PT;                   // http://periodictable.com      //DU20190517
+      string crystal_structure_PT;                   // http://periodictable.com      //DU20190517
       string space_group;                     // http://periodictable.com      //DU20190517
       uint space_group_number;                // http://periodictable.com      //DU20190517
-      double Pearson_coefficient;             // Pearson mass deviation coefficient //ME20181020
-      xvector<double> lattice_constant;       // (pm) http://periodictable.com      //DU20190517
-      xvector<double> lattice_angle;          // (rad) http://periodictable.com      //DU20190517
+      double variance_parameter_mass;             // Pearson mass deviation coefficient: the square deviation of the isotope masses (weighted by occurrence): 10.1103/PhysRevB.27.858 (isotope corrections), 10.1351/PAC-REP-10-06-02 (isotope distributions) //ME20181020
+      xvector<double> lattice_constants;       // (pm) http://periodictable.com      //DU20190517
+      xvector<double> lattice_angles;          // (rad) http://periodictable.com      //DU20190517
       string phase;                           //      http://periodictable.com      //DU20190517
       double radius;                          // Saxena (nm)
       double radius_PT;                       // (pm)       http://periodictable.com      //DU20190517
@@ -4693,7 +4694,7 @@ namespace xelement {
       double radii_Slatter;                    // (Angstrom) J. of Chem. Phys. 41, 3199 (1964)      //DU20190517
       double radii_Pyykko;                     // (pm) single bond covalent radii  Chem. Eur. J. 15, 186-197 (2009)      //DU20190517
       //                                          
-      double electrical_conductivity;          // (S/m)  http://periodictable.com  Value given for graphite. Diamond electrical conductivity is approximately 0.001.      //DU20190517
+      double conductivity_electrical;          // (S/m)  http://periodictable.com  Value given for graphite. Diamond electrical conductivity is approximately 0.001.      //DU20190517
       double electronegativity_vec;           // Saxena
       double hardness_Ghosh;                   // (eV) Int. J. Quantum Chem 110, 1206-1213 (2010) Table III       //DU20190517
       double electronegativity_Pearson;                  // (eV) Inorg. Chem., 27(4), 734–740 (1988)      //DU20190517
@@ -4712,37 +4713,37 @@ namespace xelement {
       //RF+SK20200410 END
 
       double electron_affinity_PT;             // (kJ/mol)  http://periodictable.com       //DU20190517
-      double Miedema_phi_star;                // (V)        (phi^\star   Miedema Rule Table 1a Physica 100B 1-28 (1980)
-      double Miedema_nws;                     // (d.u.)^1/3 n_{ws}^{1/3} Miedema Rule Table 1a Physica 100B 1-28 (1980)
-      double Miedema_gamma_s;                 // (mJ/m^2)   \gamma_s^0   Miedema Rule Table 1a Physica 100B 1-28 (1980)
-      double Pettifor_scale;                  // Chemical Scale Pettifor Solid State Communications 51 31-34 (1984)
+      double phi_star_Miedema;                // (V)        (phi^\star   Miedema Rule Table 1a Physica 100B 1-28 (1980)
+      double nws_Miedema;                     // (d.u.)^1/3 n_{ws}^{1/3} Miedema Rule Table 1a Physica 100B 1-28 (1980)
+      double gamma_s_Miedema;                 // (mJ/m^2)   \gamma_s^0   Miedema Rule Table 1a Physica 100B 1-28 (1980)
+      double scale_Pettifor;                  // Chemical Scale Pettifor Solid State Communications 51 31-34 (1984)
       //                                          
-      double boiling_point;                   // (Celsius), http://periodictable.com C:diamond, P:"YELLOW" Phosphorus, As:sublimates at this T.      //DU20190517
-      double melting_point;                   // (Celsius), http://periodictable.com He does not solidify at standard pressure,C: Value given for diamond form, P : Value given for "YELLOW" phosphorus form, S : Value given for monoclinic, beta form, Se: Value given for hexagonal, gray form, Bk: Value given for alpha form.           //DU20190517
+      double temperature_boiling;                   // (Celsius), http://periodictable.com C:diamond, P:"YELLOW" Phosphorus, As:sublimates at this T.      //DU20190517
+      double temperature_melting;                   // (Celsius), http://periodictable.com He does not solidify at standard pressure,C: Value given for diamond form, P : Value given for "YELLOW" phosphorus form, S : Value given for monoclinic, beta form, Se: Value given for hexagonal, gray form, Bk: Value given for alpha form.           //DU20190517
       double vaporization_heat_PT;             // (kJ/mol)   http://periodictable.com      //DU20190517
       double specific_heat_PT;                 // (J/(kg.K)) http://periodictable.com Gas_Phase:H(H2),He,N(N2),O(O2),F(F2),Ne,Cl(Cl2),Ar,Kr,Tc,Xe,Rn,Ra,Pa -- Liquid_Phase:Br,Hg -- Solid Phase: B(rhombic),C(graphite),S(rhombic),P(phase of P.4),As(alpha),Se(hexagonal),Cd(gamma),Sn(gray),Li,In,Be,Na,Mg,Al,Si,K,Ca,Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Ga,Ge,Rb,Sr,Y,Zr,Nb,Mo,Ru,Rh,Pd,Ag,Sb,Te,I,Cs,Ba,La,Ce,Pr,Nd,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Hf,Ta,W,Re,Os,Ir,Pt,Au,Tl,Pb,Bi,Ac,Th,U.      //DU20190517 
       double critical_Pressure;                // (Atm)      http://periodictable.com Li,Na,K,Rb: Value estimated based on extrapolation.      //DU20190517
       double critical_Temperature_PT;          // (K)        http://periodictable.com Li,Na,K,Rb: Value estimated based on extrapolation.      //DU20190517
       double thermal_expansion;               // (K^{-1})   http://periodictable.com C:graphite      //DU20190517
-      double thermal_conductivity;            // (W/(mK))   http://periodictable.com      //DU20190517
+      double conductivity_thermal;            // (W/(mK))   http://periodictable.com      //DU20190517
       //                                         
-      double Brinelll_hardness;               // (MPa)  http://periodictable.com For Ge value is converted from Mohs scale      //DU20190517
-      double Mohs_hardness;                   //        http://periodictable.com For C, value given for graphite. Diamond value is 10.0; For Pr, Nd, Sm, Eu, Gd, Tb, Dy, Ho, Er, Tm, Lu converted from Vickers scale.      //DU20190517
-      double Vickers_hardness;                // (MPa)  http://periodictable.com For Si,Ge,As,Ru,Os converted from Brinell scale.      //DU20190517
-      double Hardness_Pearson;                // (eV)   Inorg. Chem. 27(4) 734-740 (1988).      //DU20190517
-      double Hardness_Putz;                   // (eV/atom) International Journal of Quantum Chemistry, Vol 106, 361–389 (2006), TABLE-V.      //DU20190517
-      double Hardness_RB;                     // (eV)   Robles and Bartolotti, J. Am. Chem. Soc. 106, 3723-3727 (1984).      //DU20190517
-      double shear_modulus;                    // (GPa)  http://periodictable.com      //DU20190517
-      double Young_modulus;                    // (GPa)  http://periodictable.com      //DU20190517
-      double bulk_modulus;                     // (GPa)  http://periodictable.com      //DU20190517
+      double hardness_Brinell;               // (MPa)  http://periodictable.com For Ge value is converted from Mohs scale      //DU20190517
+      double hardness_Mohs;                   //        http://periodictable.com For C, value given for graphite. Diamond value is 10.0; For Pr, Nd, Sm, Eu, Gd, Tb, Dy, Ho, Er, Tm, Lu converted from Vickers scale.      //DU20190517
+      double hardness_Vickers;                // (MPa)  http://periodictable.com For Si,Ge,As,Ru,Os converted from Brinell scale.      //DU20190517
+      double hardness_Pearson;                // (eV)   Inorg. Chem. 27(4) 734-740 (1988).      //DU20190517
+      double hardness_Putz;                   // (eV/atom) International Journal of Quantum Chemistry, Vol 106, 361–389 (2006), TABLE-V.      //DU20190517
+      double hardness_RB;                     // (eV)   Robles and Bartolotti, J. Am. Chem. Soc. 106, 3723-3727 (1984).      //DU20190517
+      double modulus_shear;                    // (GPa)  http://periodictable.com      //DU20190517
+      double modulus_Young;                    // (GPa)  http://periodictable.com      //DU20190517
+      double modulus_bulk;                     // (GPa)  http://periodictable.com      //DU20190517
       double Poisson_ratio_PT;                 // (--)   http://periodictable.com      //DU20190517
-      double Miedema_BVm;                     // (kJ/mole) BV_m Miedema Rule Table 1a Physica 100B 1-28 (1980) 
+      double BVm_Miedema;                     // (kJ/mole) BV_m Miedema Rule Table 1a Physica 100B 1-28 (1980) 
       //
-      string Magnetic_Type_PT;                 //           http://periodictable.com  //DU20190517
-      double Mass_Magnetic_Susceptibility;      // (m^3/K)   http://periodictable.com //DU20190517
-      double Volume_Magnetic_Susceptibility;    //           http://periodictable.com //DU20190517
-      double Molar_Magnetic_Susceptibility;     // (m^3/mol) http://periodictable.com //DU20190517
-      double Curie_point;                     // (K)       http://periodictable.com   //DU20190517
+      string magnetic_type_PT;                 //           http://periodictable.com  //DU20190517
+      double susceptibility_magnetic_mass;      // (m^3/K)   http://periodictable.com //DU20190517
+      double susceptibility_magnetic_volume;    //           http://periodictable.com //DU20190517
+      double susceptibility_magnetic_molar;     // (m^3/mol) http://periodictable.com //DU20190517
+      double temperature_Curie;                     // (K)       http://periodictable.com   //DU20190517
       //
       double refractive_index;                 // http://periodictable.com C:diamond      //DU20190517
       string color_PT;                        // http://periodictable.com      //DU20190517
