@@ -876,12 +876,14 @@ static const string ESTRUCTURE_COLORS[ESTRUCTURE_NCOLORS] = {
 };
 static const string ISPIN_COLORS[2] = {"#000000", "#C44E52"};
 static const string ORBITALS[4] = {"s", "p", "d", "f"};
-static const string LM_ORBITALS[16] = {"s", "py", "pz", "px",
+static const string LM_ORBITALS[16] = {"s", "p_y", "p_z", "p_x",
+  "d_{xy}", "d_{yz}", "d_{z^2}", "d_{xz}", "d_{x^2-y^2}",
+  "f_{y(3x^2-y^2)}", "f_{xyz}", "f_{yz^2}", "f_{z^3}",
+  "f_{xz^2}", "f_{z(x^2-y^2)}", "f_{x(x^2-3y^2)}"};
+//AS20201110 as used by E.G. in BANDSDATA_JSON procedure:
+static const string LM_ORBITALS_EG[16] = {"s", "py", "pz", "px",
   "dxy", "dyz", "dz2", "dxz", "dx2-y2",
-  "f1", "f2", "f3", "f4", "f5", "f6", "f7"};// as used by E.G.
-// to use Cartesian labeling replace by the following:
-//  "f_{y(3x^2-y^2)}", "f_{xyz}", "f_{yz^2}", "f_{z^3}",
-//  "f_{xz^2}", "f_{z(x^2-y^2)}", "f_{x(x^2-3y^2)}"};
+  "f1", "f2", "f3", "f4", "f5", "f6", "f7"};
 static const string SPIN_LABEL[2] = {"majority", "minority"};//AS20201102
 static const string LS_ORBITALS[16] = {"s_total", "sx", "sy", "sz",
   "p_total", "px", "py", "pz", "d_total", "dx", "dy", "dz",
@@ -1519,7 +1521,7 @@ namespace plotter {
         for (uint i=0; i<16; i++) orb_labels[i] = LS_ORBITALS[i];
       }
       else if (xdos.lmResolved){
-        for (uint i=0; i<16; i++) orb_labels[i] = LM_ORBITALS[i];
+        for (uint i=0; i<16; i++) orb_labels[i] = LM_ORBITALS_EG[i];
       }
       else{
         for (uint i=0; i<4; i++) orb_labels[i] = ORBITALS[i];
