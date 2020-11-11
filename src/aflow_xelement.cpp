@@ -18,7 +18,7 @@
 // XELEMENT
 // look into aflow.h for the definitions
 
-#define _UTYPE2STRING_PREC_ 10
+#define _UTYPE2STRING_PREC_ 12
 
 std::vector<xelement::xelement> velement(NUM_ELEMENTS);        // store starting from ONE
 
@@ -80,8 +80,8 @@ namespace pflow {
           if(c=="ALL" || c==aurostd::toupper("Z")) vs.push_back(aurostd::PaddedPOST("Z="+aurostd::utype2string(xelement::xelement(Z).Z),len));
           if(c=="ALL" || c==aurostd::toupper("period")) vs.push_back(aurostd::PaddedPOST("period="+aurostd::utype2string(xelement::xelement(Z).period),len));
           if(c=="ALL" || c==aurostd::toupper("group")) vs.push_back(aurostd::PaddedPOST("group="+aurostd::utype2string(xelement::xelement(Z).group),len));
-          if(c=="ALL" || c==aurostd::toupper("Series")) vs.push_back(aurostd::PaddedPOST("Series="+xelement::xelement(Z).Series,len));
-          if(c=="ALL" || c==aurostd::toupper("Block")) vs.push_back(aurostd::PaddedPOST("Block="+xelement::xelement(Z).Block,len));
+          if(c=="ALL" || c==aurostd::toupper("series")) vs.push_back(aurostd::PaddedPOST("series="+xelement::xelement(Z).series,len));
+          if(c=="ALL" || c==aurostd::toupper("block")) vs.push_back(aurostd::PaddedPOST("block="+xelement::xelement(Z).block,len));
           //
           if(c=="ALL" || c==aurostd::toupper("mass")) vs.push_back(aurostd::PaddedPOST("mass="+aurostd::utype2string(xelement::xelement(Z).mass,_UTYPE2STRING_PREC_),len)+"// (kg)");
           if(c=="ALL" || c==aurostd::toupper("molar_volume")) vs.push_back(aurostd::PaddedPOST("molar_volume="+aurostd::utype2string(xelement::xelement(Z).molar_volume,_UTYPE2STRING_PREC_),len)+"// (m^3/mol)");
@@ -218,8 +218,8 @@ namespace xelement {
     name="UNDEFINED";
     period=NNN;
     group=NNN; 
-    Series="UNDEFINED";
-    Block="nnn";      
+    series="UNDEFINED";
+    block="nnn";      
     //                                          
     mass=NNN;//  AMU2KILOGRAM goes inside.
     molar_volume=NNN;  
@@ -312,8 +312,8 @@ namespace xelement {
     name=b.name;
     period=b.period;
     group=b.group; 
-    Series=b.Series;
-    Block=b.Block;      
+    series=b.series;
+    block=b.block;      
     //                                          
     mass=b.mass;
     molar_volume=b.molar_volume;  
@@ -410,14 +410,14 @@ namespace xelement {
   xelement::xelement(const string& element) {free();populate(element);}  //CO20200520
   xelement::xelement(uint ZZ) {free();populate(ZZ);} //CO20200520
 
-  string xelement::getProperty(const string& property) const { //CO20201111
+  string xelement::getProperty(const string& property,const string& delim) const { //CO20201111
     if(property==aurostd::toupper("name")) return name;
     if(property==aurostd::toupper("symbol")) return symbol;
     if(property==aurostd::toupper("Z")) return aurostd::utype2string(Z);
     if(property==aurostd::toupper("period")) return aurostd::utype2string(period);
     if(property==aurostd::toupper("group")) return aurostd::utype2string(group);
-    if(property==aurostd::toupper("Series")) return Series;
-    if(property==aurostd::toupper("Block")) return Block;
+    if(property==aurostd::toupper("series")) return series;
+    if(property==aurostd::toupper("block")) return block;
     //
     if(property==aurostd::toupper("mass")) return aurostd::utype2string(mass,_UTYPE2STRING_PREC_);
     if(property==aurostd::toupper("molar_volume")) return aurostd::utype2string(molar_volume,_UTYPE2STRING_PREC_);
@@ -433,8 +433,8 @@ namespace xelement {
     if(property==aurostd::toupper("space_group")) return space_group;
     if(property==aurostd::toupper("space_group_number")) return aurostd::utype2string(space_group_number);
     if(property==aurostd::toupper("variance_parameter_mass")) return aurostd::utype2string(variance_parameter_mass,_UTYPE2STRING_PREC_);
-    if(property==aurostd::toupper("lattice_constants")) return aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(lattice_constants,_UTYPE2STRING_PREC_),",");
-    if(property==aurostd::toupper("lattice_angles")) return aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(lattice_angles,_UTYPE2STRING_PREC_),",");
+    if(property==aurostd::toupper("lattice_constants")) return aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(lattice_constants,_UTYPE2STRING_PREC_),delim);
+    if(property==aurostd::toupper("lattice_angles")) return aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(lattice_angles,_UTYPE2STRING_PREC_),delim);
     if(property==aurostd::toupper("phase")) return phase;
     if(property==aurostd::toupper("radius")) return aurostd::utype2string(radius,_UTYPE2STRING_PREC_);
     if(property==aurostd::toupper("radius_PT")) return aurostd::utype2string(radius_PT,_UTYPE2STRING_PREC_);
@@ -451,8 +451,8 @@ namespace xelement {
     if(property==aurostd::toupper("electronegativity_Pearson")) return aurostd::utype2string(electronegativity_Pearson,_UTYPE2STRING_PREC_); //+"// (eV)
     if(property==aurostd::toupper("electronegativity_Ghosh")) return aurostd::utype2string(electronegativity_Ghosh,_UTYPE2STRING_PREC_); //+"// (eV)
     if(property==aurostd::toupper("electronegativity_Allen")) return aurostd::utype2string(electronegativity_Allen,_UTYPE2STRING_PREC_); //CO20200731
-    if(property==aurostd::toupper("oxidation_states")) return aurostd::joinWDelimiter(aurostd::vecDouble2vecString(oxidation_states,_UTYPE2STRING_PREC_),","); //CO20200731
-    if(property==aurostd::toupper("oxidation_states_preferred")) return aurostd::joinWDelimiter(aurostd::vecDouble2vecString(oxidation_states_preferred,_UTYPE2STRING_PREC_),","); //CO20200731
+    if(property==aurostd::toupper("oxidation_states")) return aurostd::joinWDelimiter(aurostd::vecDouble2vecString(oxidation_states,_UTYPE2STRING_PREC_),delim); //CO20200731
+    if(property==aurostd::toupper("oxidation_states_preferred")) return aurostd::joinWDelimiter(aurostd::vecDouble2vecString(oxidation_states_preferred,_UTYPE2STRING_PREC_),delim); //CO20200731
     if(property==aurostd::toupper("electron_affinity_PT")) return aurostd::utype2string(electron_affinity_PT,_UTYPE2STRING_PREC_);
     if(property==aurostd::toupper("phi_star_Miedema")) return aurostd::utype2string(phi_star_Miedema,_UTYPE2STRING_PREC_);
     if(property==aurostd::toupper("nws_Miedema")) return aurostd::utype2string(nws_Miedema,_UTYPE2STRING_PREC_);
@@ -547,8 +547,8 @@ namespace xelement {
       name="Hydrogen";
       period=1;
       group=1;
-      Series="Nonmetal";
-      Block="s";
+      series="Nonmetal";
+      block="s";
       mass=AMU2KILOGRAM*1.0079;
       molar_volume=0.01121;
       volume=0.75110;
@@ -630,8 +630,8 @@ namespace xelement {
       name="Helium";
       period=1;
       group=18;
-      Series="NobleGas";
-      Block="s";
+      series="NobleGas";
+      block="s";
       mass=AMU2KILOGRAM*4.0026;
       molar_volume=0.022424;
       volume=-1.000;
@@ -715,8 +715,8 @@ namespace xelement {
       name="Lithium";
       period=2;
       group=1;
-      Series="AlkaliMetal";
-      Block="s";
+      series="AlkaliMetal";
+      block="s";
       mass=AMU2KILOGRAM*6.941;
       molar_volume=0.00001297;
       volume=20.24110;
@@ -798,8 +798,8 @@ namespace xelement {
       name="Beryllium";
       period=2;
       group=2;
-      Series="AlkalineEarthMetal";
-      Block="s";
+      series="AlkalineEarthMetal";
+      block="s";
       mass=AMU2KILOGRAM*9.0122;
       molar_volume=4.8767E-6;
       volume=7.83290;
@@ -882,8 +882,8 @@ namespace xelement {
       name="Boron";
       period=2;
       group=13;
-      Series="Metalloid";
-      Block="p";
+      series="Metalloid";
+      block="p";
       mass=AMU2KILOGRAM*10.81;
       molar_volume=4.3943E-6;
       volume=5.88420;
@@ -965,8 +965,8 @@ namespace xelement {
       name="Carbon";
       period=2;
       group=14;
-      Series="Nonmetal";
-      Block="p";
+      series="Nonmetal";
+      block="p";
       mass=AMU2KILOGRAM*12.011;
       molar_volume=5.3146E-6;
       volume=5.59490;
@@ -1048,8 +1048,8 @@ namespace xelement {
       name="Nitrogen";
       period=2;
       group=15;
-      Series="Nonmetal";
-      Block="p";
+      series="Nonmetal";
+      block="p";
       mass=AMU2KILOGRAM*14.0067;
       molar_volume=0.011197;
       volume=7.59940;
@@ -1131,8 +1131,8 @@ namespace xelement {
       name="Oxygen";
       period=2;
       group=16;
-      Series="Chalcogen";
-      Block="p";
+      series="Chalcogen";
+      block="p";
       mass=AMU2KILOGRAM*15.9994;
       molar_volume=0.011196;
       volume=7.78230;
@@ -1214,8 +1214,8 @@ namespace xelement {
       name="Fluorine";
       period=2;
       group=17;
-      Series="Halogen";
-      Block="p";
+      series="Halogen";
+      block="p";
       mass=AMU2KILOGRAM*18.9984;
       molar_volume=0.011202;
       volume=9.99090;
@@ -1297,8 +1297,8 @@ namespace xelement {
       name="Neon";
       period=2;
       group=18;
-      Series="NobleGas";
-      Block="p";
+      series="NobleGas";
+      block="p";
       mass=AMU2KILOGRAM*20.179;
       molar_volume=0.02242;
       volume=19.9052;
@@ -1382,8 +1382,8 @@ namespace xelement {
       name="Sodium";
       period=3;
       group=1;
-      Series="AlkaliMetal";
-      Block="s";
+      series="AlkaliMetal";
+      block="s";
       mass=AMU2KILOGRAM*22.9898;
       molar_volume=0.00002375;
       volume=36.9135;
@@ -1465,8 +1465,8 @@ namespace xelement {
       name="Magnesium";
       period=3;
       group=2;
-      Series="AlkalineEarthMetal";
-      Block="s";
+      series="AlkalineEarthMetal";
+      block="s";
       mass=AMU2KILOGRAM*24.305;
       molar_volume=0.000013984;
       volume=22.8178;
@@ -1549,8 +1549,8 @@ namespace xelement {
       name="Aluminium";
       period=3;
       group=13;
-      Series="PoorMetal";
-      Block="p";
+      series="PoorMetal";
+      block="p";
       mass=AMU2KILOGRAM*26.9815;
       molar_volume=9.99E-6;
       volume=16.4000;
@@ -1632,8 +1632,8 @@ namespace xelement {
       name="Silicon";
       period=3;
       group=14;
-      Series="Metalloid";
-      Block="p";
+      series="Metalloid";
+      block="p";
       mass=AMU2KILOGRAM*28.0855;
       molar_volume=0.000012054;
       volume=14.3536;
@@ -1715,8 +1715,8 @@ namespace xelement {
       name="Phosphorus";
       period=3;
       group=15;
-      Series="Nonmetal";
-      Block="p";
+      series="Nonmetal";
+      block="p";
       mass=AMU2KILOGRAM*30.9738;
       molar_volume=0.000016991;
       volume=14.1995;
@@ -1798,8 +1798,8 @@ namespace xelement {
       name="Sulphur";
       period=3;
       group=16;
-      Series="Chalcogen";
-      Block="p";
+      series="Chalcogen";
+      block="p";
       mass=AMU2KILOGRAM*32.06;
       molar_volume=0.000016357;
       volume=15.7301;
@@ -1881,8 +1881,8 @@ namespace xelement {
       name="Chlorine";
       period=3;
       group=17;
-      Series="Halogen";
-      Block="p";
+      series="Halogen";
+      block="p";
       mass=AMU2KILOGRAM*35.453;
       molar_volume=0.01103;
       volume=21.2947;
@@ -1964,8 +1964,8 @@ namespace xelement {
       name="Argon";
       period=3;
       group=18;
-      Series="NobleGas";
-      Block="p";
+      series="NobleGas";
+      block="p";
       mass=AMU2KILOGRAM*39.948;
       molar_volume=0.022392;
       volume=22.000;
@@ -2049,8 +2049,8 @@ namespace xelement {
       name="Potassium";
       period=4;
       group=1;
-      Series="AlkaliMetal";
-      Block="s";
+      series="AlkaliMetal";
+      block="s";
       mass=AMU2KILOGRAM*39.0983;
       molar_volume=0.00004568;
       volume=73.9091;
@@ -2132,8 +2132,8 @@ namespace xelement {
       name="Calcium";
       period=4;
       group=2;
-      Series="AlkalineEarthMetal";
-      Block="s";
+      series="AlkalineEarthMetal";
+      block="s";
       mass=AMU2KILOGRAM*40.08;
       molar_volume=0.000025857;
       volume=42.1927;
@@ -2216,8 +2216,8 @@ namespace xelement {
       name="Scandium";
       period=4;
       group=3;
-      Series="TransitionMetal";
-      Block="d";
+      series="TransitionMetal";
+      block="d";
       mass=AMU2KILOGRAM*44.9559;
       molar_volume=0.000015061;
       volume=24.6739;
@@ -2299,8 +2299,8 @@ namespace xelement {
       name="Titanium";
       period=4;
       group=4;
-      Series="TransitionMetal";
-      Block="d";
+      series="TransitionMetal";
+      block="d";
       mass=AMU2KILOGRAM*47.9;
       molar_volume=0.000010621;
       volume=17.1035;
@@ -2382,8 +2382,8 @@ namespace xelement {
       name="Vanadium";
       period=4;
       group=5;
-      Series="TransitionMetal";
-      Block="d";
+      series="TransitionMetal";
+      block="d";
       mass=AMU2KILOGRAM*50.9415;
       molar_volume=8.3374E-6;
       volume=13.2086;
@@ -2465,8 +2465,8 @@ namespace xelement {
       name="Chromium";
       period=4;
       group=6;
-      Series="TransitionMetal";
-      Block="d";
+      series="TransitionMetal";
+      block="d";
       mass=AMU2KILOGRAM*51.996;
       molar_volume=7.2317E-6;
       volume=11.4136;
@@ -2548,8 +2548,8 @@ namespace xelement {
       name="Manganese";
       period=4;
       group=7;
-      Series="TransitionMetal";
-      Block="d";
+      series="TransitionMetal";
+      block="d";
       mass=AMU2KILOGRAM*54.93805;
       molar_volume=7.3545E-6;
       volume=10.6487;
@@ -2631,8 +2631,8 @@ namespace xelement {
       name="Iron";
       period=4;
       group=8;
-      Series="TransitionMetal";
-      Block="d";
+      series="TransitionMetal";
+      block="d";
       mass=AMU2KILOGRAM*55.847;
       molar_volume=7.0923E-6;
       volume=10.2315;
@@ -2714,8 +2714,8 @@ namespace xelement {
       name="Cobalt";
       period=4;
       group=9;
-      Series="TransitionMetal";
-      Block="d";
+      series="TransitionMetal";
+      block="d";
       mass=AMU2KILOGRAM*58.9332;
       molar_volume=6.62E-6;
       volume=10.3205;
@@ -2797,8 +2797,8 @@ namespace xelement {
       name="Nickel";
       period=4;
       group=10;
-      Series="TransitionMetal";
-      Block="d";
+      series="TransitionMetal";
+      block="d";
       mass=AMU2KILOGRAM*58.69;
       molar_volume=6.5888E-6;
       volume=10.8664;
@@ -2880,8 +2880,8 @@ namespace xelement {
       name="Copper";
       period=4;
       group=11;
-      Series="TransitionMetal";
-      Block="d";
+      series="TransitionMetal";
+      block="d";
       mass=AMU2KILOGRAM*63.546;
       molar_volume=7.0922E-6;
       volume=12.0159;
@@ -2963,8 +2963,8 @@ namespace xelement {
       name="Zinc";
       period=4;
       group=12;
-      Series="TransitionMetal";
-      Block="d";
+      series="TransitionMetal";
+      block="d";
       mass=AMU2KILOGRAM*65.38;
       molar_volume=9.157E-6;
       volume=15.0827;
@@ -3047,8 +3047,8 @@ namespace xelement {
       name="Gallium";
       period=4;
       group=13;
-      Series="PoorMetal";
-      Block="p";
+      series="PoorMetal";
+      block="p";
       mass=AMU2KILOGRAM*69.737;
       molar_volume=0.000011809;
       volume=18.9039;
@@ -3130,8 +3130,8 @@ namespace xelement {
       name="Germanium";
       period=4;
       group=14;
-      Series="Metalloid";
-      Block="p";
+      series="Metalloid";
+      block="p";
       mass=AMU2KILOGRAM*72.59;
       molar_volume=0.000013645;
       volume=19.2948;
@@ -3213,8 +3213,8 @@ namespace xelement {
       name="Arsenic";
       period=4;
       group=15;
-      Series="Metalloid";
-      Block="p";
+      series="Metalloid";
+      block="p";
       mass=AMU2KILOGRAM*74.9216;
       molar_volume=0.000013082;
       volume=19.0677;
@@ -3296,8 +3296,8 @@ namespace xelement {
       name="Selenium";
       period=4;
       group=16;
-      Series="Chalcogen";
-      Block="p";
+      series="Chalcogen";
+      block="p";
       mass=AMU2KILOGRAM*78.96;
       molar_volume=0.000016387;
       volume=20.3733;
@@ -3379,8 +3379,8 @@ namespace xelement {
       name="Bromine";
       period=4;
       group=17;
-      Series="Halogen";
-      Block="p";
+      series="Halogen";
+      block="p";
       mass=AMU2KILOGRAM*79.904;
       molar_volume=0.00002561;
       volume=26.3292;
@@ -3462,8 +3462,8 @@ namespace xelement {
       name="Krypton";
       period=4;
       group=18;
-      Series="NobleGas";
-      Block="p";
+      series="NobleGas";
+      block="p";
       mass=AMU2KILOGRAM*83.8;
       molar_volume=0.02235;
       volume=-1.0000;
@@ -3547,8 +3547,8 @@ namespace xelement {
       name="Rubidium";
       period=5;
       group=1;
-      Series="AlkaliMetal";
-      Block="s";
+      series="AlkaliMetal";
+      block="s";
       mass=AMU2KILOGRAM*85.4678;
       molar_volume=0.000055788;
       volume=91.2738;
@@ -3630,8 +3630,8 @@ namespace xelement {
       name="Strontium";
       period=5;
       group=2;
-      Series="AlkalineEarthMetal";
-      Block="s";
+      series="AlkalineEarthMetal";
+      block="s";
       mass=AMU2KILOGRAM*87.62;
       molar_volume=0.000033316;
       volume=55.4105;
@@ -3714,8 +3714,8 @@ namespace xelement {
       name="Yttrium";
       period=5;
       group=3;
-      Series="TransitionMetal";
-      Block="d";
+      series="TransitionMetal";
+      block="d";
       mass=AMU2KILOGRAM*88.9059;
       molar_volume=0.000019881;
       volume=32.4546;
@@ -3797,8 +3797,8 @@ namespace xelement {
       name="Zirconium";
       period=5;
       group=4;
-      Series="TransitionMetal";
-      Block="d";
+      series="TransitionMetal";
+      block="d";
       mass=AMU2KILOGRAM*91.22;
       molar_volume=0.000014011;
       volume=23.2561;
@@ -3880,8 +3880,8 @@ namespace xelement {
       name="Niobium";
       period=5;
       group=5;
-      Series="TransitionMetal";
-      Block="d";
+      series="TransitionMetal";
+      block="d";
       mass=AMU2KILOGRAM*92.9064;
       molar_volume=0.000010841;
       volume=18.3132;
@@ -3963,8 +3963,8 @@ namespace xelement {
       name="Molybdenum";
       period=5;
       group=6;
-      Series="TransitionMetal";
-      Block="d";
+      series="TransitionMetal";
+      block="d";
       mass=AMU2KILOGRAM*95.94;
       molar_volume=9.334E-6;
       volume=15.6175;
@@ -4046,8 +4046,8 @@ namespace xelement {
       name="Technetium";
       period=5;
       group=7;
-      Series="TransitionMetal";
-      Block="d";
+      series="TransitionMetal";
+      block="d";
       mass=AMU2KILOGRAM*98.9062;
       molar_volume=8.434782608696E-6;
       volume=14.4670;
@@ -4129,8 +4129,8 @@ namespace xelement {
       name="Ruthenium";
       period=5;
       group=8;
-      Series="TransitionMetal";
-      Block="d";
+      series="TransitionMetal";
+      block="d";
       mass=AMU2KILOGRAM*101.07;
       molar_volume=8.1706E-6;
       volume=13.8390;
@@ -4212,8 +4212,8 @@ namespace xelement {
       name="Rhodium";
       period=5;
       group=9;
-      Series="TransitionMetal";
-      Block="d";
+      series="TransitionMetal";
+      block="d";
       mass=AMU2KILOGRAM*102.9055;
       molar_volume=8.2655E-6;
       volume=14.1731;
@@ -4295,8 +4295,8 @@ namespace xelement {
       name="Palladium";
       period=5;
       group=10;
-      Series="TransitionMetal";
-      Block="d";
+      series="TransitionMetal";
+      block="d";
       mass=AMU2KILOGRAM*106.4;
       molar_volume=8.8514E-6;
       volume=15.4596;
@@ -4378,8 +4378,8 @@ namespace xelement {
       name="Silver";
       period=5;
       group=11;
-      Series="TransitionMetal";
-      Block="d";
+      series="TransitionMetal";
+      block="d";
       mass=AMU2KILOGRAM*107.8682;
       molar_volume=0.000010283;
       volume=18.0678;
@@ -4461,8 +4461,8 @@ namespace xelement {
       name="Cadmium";
       period=5;
       group=12;
-      Series="TransitionMetal";
-      Block="d";
+      series="TransitionMetal";
+      block="d";
       mass=AMU2KILOGRAM*112.41;
       molar_volume=0.000012996;
       volume=22.0408;
@@ -4545,8 +4545,8 @@ namespace xelement {
       name="Indium";
       period=5;
       group=13;
-      Series="PoorMetal";
-      Block="p";
+      series="PoorMetal";
+      block="p";
       mass=AMU2KILOGRAM*114.82;
       molar_volume=0.000015707;
       volume=27.5233;
@@ -4628,8 +4628,8 @@ namespace xelement {
       name="Tin";
       period=5;
       group=14;
-      Series="PoorMetal";
-      Block="p";
+      series="PoorMetal";
+      block="p";
       mass=AMU2KILOGRAM*118.69;
       molar_volume=0.000016239;
       volume=27.5555;
@@ -4711,8 +4711,8 @@ namespace xelement {
       name="Antimony";
       period=5;
       group=15;
-      Series="Metalloid";
-      Block="p";
+      series="Metalloid";
+      block="p";
       mass=AMU2KILOGRAM*121.75;
       molar_volume=0.000018181;
       volume=27.1823;
@@ -4794,8 +4794,8 @@ namespace xelement {
       name="Tellurium";
       period=5;
       group=16;
-      Series="Chalcogen";
-      Block="p";
+      series="Chalcogen";
+      block="p";
       mass=AMU2KILOGRAM*127.6;
       molar_volume=0.000020449;
       volume=28.1993;
@@ -4877,8 +4877,8 @@ namespace xelement {
       name="Iodine";
       period=5;
       group=17;
-      Series="Halogen";
-      Block="p";
+      series="Halogen";
+      block="p";
       mass=AMU2KILOGRAM*126.9045;
       molar_volume=0.000025689;
       volume=34.9784;
@@ -4960,8 +4960,8 @@ namespace xelement {
       name="Xenon";
       period=5;
       group=18;
-      Series="NobleGas";
-      Block="p";
+      series="NobleGas";
+      block="p";
       mass=AMU2KILOGRAM*131.3;
       molar_volume=0.0223;
       volume=-1.0000;
@@ -5045,8 +5045,8 @@ namespace xelement {
       name="Cesium";
       period=6;
       group=1;
-      Series="AlkaliMetal";
-      Block="s";
+      series="AlkaliMetal";
+      block="s";
       mass=AMU2KILOGRAM*132.9054;
       molar_volume=0.000070732;
       volume=117.281;
@@ -5128,8 +5128,8 @@ namespace xelement {
       name="Barium";
       period=6;
       group=2;
-      Series="AlkalineEarthMetal";
-      Block="s";
+      series="AlkalineEarthMetal";
+      block="s";
       mass=AMU2KILOGRAM*137.33;
       molar_volume=0.000039125;
       volume=62.6649;
@@ -5212,8 +5212,8 @@ namespace xelement {
       name="Lanthanium";
       period=6;
       group=3;  //[CO20200930]NNN
-      Series="Lanthanide";
-      Block="f";
+      series="Lanthanide";
+      block="f";
       mass=AMU2KILOGRAM*138.9055;
       molar_volume=0.000022601;
       volume=36.8495;
@@ -5296,8 +5296,8 @@ namespace xelement {
       name="Cerium";
       period=6;
       group=NNN;
-      Series="Lanthanide";
-      Block="f";
+      series="Lanthanide";
+      block="f";
       mass=AMU2KILOGRAM*140.12;
       molar_volume=0.000020947;
       volume=26.4729;
@@ -5379,8 +5379,8 @@ namespace xelement {
       name="Praseodymium";
       period=6;
       group=NNN;
-      Series="Lanthanide";
-      Block="f";
+      series="Lanthanide";
+      block="f";
       mass=AMU2KILOGRAM*140.9077;
       molar_volume=0.000021221;
       volume=36.4987;
@@ -5462,8 +5462,8 @@ namespace xelement {
       name="Neodymium";
       period=6;
       group=NNN;
-      Series="Lanthanide";
-      Block="f";
+      series="Lanthanide";
+      block="f";
       mass=AMU2KILOGRAM*144.24;
       molar_volume=0.000020577;
       volume=29.6719;
@@ -5545,8 +5545,8 @@ namespace xelement {
       name="Promethium";
       period=6;
       group=NNN;
-      Series="Lanthanide";
-      Block="f";
+      series="Lanthanide";
+      block="f";
       mass=AMU2KILOGRAM*146.92;
       molar_volume=0.00001996145374449;
       volume=34.6133;
@@ -5628,8 +5628,8 @@ namespace xelement {
       name="Samarium";
       period=6;
       group=NNN;
-      Series="Lanthanide";
-      Block="f";
+      series="Lanthanide";
+      block="f";
       mass=AMU2KILOGRAM*150.4;
       molar_volume=0.000020449;
       volume=33.9484;
@@ -5711,8 +5711,8 @@ namespace xelement {
       name="Europium";
       period=6;
       group=NNN;
-      Series="Lanthanide";
-      Block="f";
+      series="Lanthanide";
+      block="f";
       mass=AMU2KILOGRAM*151.96;
       molar_volume=0.000028979;
       volume=43.1719;
@@ -5794,8 +5794,8 @@ namespace xelement {
       name="Gadolinium";
       period=6;
       group=NNN;
-      Series="Lanthanide";
-      Block="f";
+      series="Lanthanide";
+      block="f";
       mass=AMU2KILOGRAM*157.25;
       molar_volume=0.000019903;
       volume=32.5777;
@@ -5877,8 +5877,8 @@ namespace xelement {
       name="Terbium";
       period=6;
       group=NNN;
-      Series="Lanthanide";
-      Block="f";
+      series="Lanthanide";
+      block="f";
       mass=AMU2KILOGRAM*158.9254;
       molar_volume=0.000019336;
       volume=32.0200;
@@ -5960,8 +5960,8 @@ namespace xelement {
       name="Dysprosium";
       period=6;
       group=NNN;
-      Series="Lanthanide";
-      Block="f";
+      series="Lanthanide";
+      block="f";
       mass=AMU2KILOGRAM*162.5;
       molar_volume=0.000019004;
       volume=31.5096;
@@ -6043,8 +6043,8 @@ namespace xelement {
       name="Holmium";
       period=6;
       group=NNN;
-      Series="Lanthanide";
-      Block="f";
+      series="Lanthanide";
+      block="f";
       mass=AMU2KILOGRAM*164.9304;
       molar_volume=0.000018753;
       volume=31.0155;
@@ -6126,8 +6126,8 @@ namespace xelement {
       name="Erbium";
       period=6;
       group=NNN;
-      Series="Lanthanide";
-      Block="f";
+      series="Lanthanide";
+      block="f";
       mass=AMU2KILOGRAM*167.26;
       molar_volume=0.000018449;
       volume=30.5431;
@@ -6209,8 +6209,8 @@ namespace xelement {
       name="Thulium";
       period=6;
       group=NNN;
-      Series="Lanthanide";
-      Block="f";
+      series="Lanthanide";
+      block="f";
       mass=AMU2KILOGRAM*168.9342;
       molar_volume=0.000018126;
       volume=30.0016;
@@ -6292,8 +6292,8 @@ namespace xelement {
       name="Ytterbium";
       period=6;
       group=NNN;
-      Series="Lanthanide";
-      Block="f";
+      series="Lanthanide";
+      block="f";
       mass=AMU2KILOGRAM*173.04;
       molar_volume=0.000026339;
       volume=39.4395;
@@ -6375,8 +6375,8 @@ namespace xelement {
       name="Lutetium";
       period=6;
       group=3;
-      Series="TransitionMetal";
-      Block="d";
+      series="TransitionMetal";
+      block="d";
       mass=AMU2KILOGRAM*174.967;
       molar_volume=0.000017779;
       volume=29.3515;
@@ -6459,8 +6459,8 @@ namespace xelement {
       name="Hafnium";
       period=6;
       group=4;
-      Series="TransitionMetal";
-      Block="d";
+      series="TransitionMetal";
+      block="d";
       mass=AMU2KILOGRAM*178.49;
       molar_volume=0.0000134102;
       volume=22.0408;
@@ -6542,8 +6542,8 @@ namespace xelement {
       name="Tantalum";
       period=6;
       group=5;
-      Series="TransitionMetal";
-      Block="d";
+      series="TransitionMetal";
+      block="d";
       mass=AMU2KILOGRAM*180.9479;
       molar_volume=0.0000108677;
       volume=18.1100;
@@ -6625,8 +6625,8 @@ namespace xelement {
       name="Tungsten";
       period=6;
       group=6;
-      Series="TransitionMetal";
-      Block="d";
+      series="TransitionMetal";
+      block="d";
       mass=AMU2KILOGRAM*183.85;
       molar_volume=9.5501E-6;
       volume=15.9387;
@@ -6708,8 +6708,8 @@ namespace xelement {
       name="Rhenium";
       period=6;
       group=7;
-      Series="TransitionMetal";
-      Block="d";
+      series="TransitionMetal";
+      block="d";
       mass=AMU2KILOGRAM*186.2;
       molar_volume=8.85856E-6;
       volume=14.8941;
@@ -6791,8 +6791,8 @@ namespace xelement {
       name="Osmium";
       period=6;
       group=8;
-      Series="TransitionMetal";
-      Block="d";
+      series="TransitionMetal";
+      block="d";
       mass=AMU2KILOGRAM*190.2;
       molar_volume=8.421E-6;
       volume=14.2403;
@@ -6874,8 +6874,8 @@ namespace xelement {
       name="Iridium";
       period=6;
       group=9;
-      Series="TransitionMetal";
-      Block="d";
+      series="TransitionMetal";
+      block="d";
       mass=AMU2KILOGRAM*192.22;
       molar_volume=8.5203E-6;
       volume=14.5561;
@@ -6957,8 +6957,8 @@ namespace xelement {
       name="Platinum";
       period=6;
       group=10;
-      Series="TransitionMetal";
-      Block="d";
+      series="TransitionMetal";
+      block="d";
       mass=AMU2KILOGRAM*195.09;
       molar_volume=9.0948E-6;
       volume=15.7298;
@@ -7040,8 +7040,8 @@ namespace xelement {
       name="Gold";
       period=6;
       group=11;
-      Series="TransitionMetal";
-      Block="d";
+      series="TransitionMetal";
+      block="d";
       mass=AMU2KILOGRAM*196.9665;
       molar_volume=0.00001021;
       volume=18.1904;
@@ -7123,8 +7123,8 @@ namespace xelement {
       name="Mercury";
       period=6;
       group=12;
-      Series="TransitionMetal";
-      Block="d";
+      series="TransitionMetal";
+      block="d";
       mass=AMU2KILOGRAM*200.59;
       molar_volume=0.0000148213;
       volume=29.7156;
@@ -7207,8 +7207,8 @@ namespace xelement {
       name="Thallium";
       period=6;
       group=13;
-      Series="PoorMetal";
-      Block="p";
+      series="PoorMetal";
+      block="p";
       mass=AMU2KILOGRAM*204.37;
       molar_volume=0.0000172473;
       volume=31.0721;
@@ -7290,8 +7290,8 @@ namespace xelement {
       name="Lead";
       period=6;
       group=14;
-      Series="PoorMetal";
-      Block="p";
+      series="PoorMetal";
+      block="p";
       mass=AMU2KILOGRAM*207.2;
       molar_volume=0.000018272;
       volume=31.6649;
@@ -7373,8 +7373,8 @@ namespace xelement {
       name="Bismuth";
       period=6;
       group=15;
-      Series="PoorMetal";
-      Block="p";
+      series="PoorMetal";
+      block="p";
       mass=AMU2KILOGRAM*208.9804;
       molar_volume=0.000021368;
       volume=31.5691;
@@ -7456,8 +7456,8 @@ namespace xelement {
       name="Polonium";
       period=6;
       group=16;
-      Series="Chalcogen";
-      Block="p";
+      series="Chalcogen";
+      block="p";
       mass=AMU2KILOGRAM*209.98;
       molar_volume=0.00002272727272727;
       volume=NNN;
@@ -7539,8 +7539,8 @@ namespace xelement {
       name="Astatine";
       period=6;
       group=17;
-      Series="Halogen";
-      Block="p";
+      series="Halogen";
+      block="p";
       mass=AMU2KILOGRAM*210;
       molar_volume=NNN;
       volume=NNN;
@@ -7622,8 +7622,8 @@ namespace xelement {
       name="Radon";
       period=6;
       group=18;
-      Series="NobleGas";
-      Block="p";
+      series="NobleGas";
+      block="p";
       mass=AMU2KILOGRAM*222;
       molar_volume=0.02281603288798;
       volume=NNN;
@@ -7707,8 +7707,8 @@ namespace xelement {
       name="Francium";
       period=7;
       group=1;
-      Series="AlkaliMetal";
-      Block="s";
+      series="AlkaliMetal";
+      block="s";
       mass=AMU2KILOGRAM*223.02;
       molar_volume=NNN;
       volume=NNN;
@@ -7790,8 +7790,8 @@ namespace xelement {
       name="Radium";
       period=7;
       group=2;
-      Series="AlkalineEarthMetal";
-      Block="s";
+      series="AlkalineEarthMetal";
+      block="s";
       mass=AMU2KILOGRAM*226.0254;
       molar_volume=0.0000452;
       volume=-1.0000;
@@ -7874,8 +7874,8 @@ namespace xelement {
       name="Actinium";
       period=7;
       group=NNN;
-      Series="Actinide";
-      Block="f";
+      series="Actinide";
+      block="f";
       mass=AMU2KILOGRAM*227.03;
       molar_volume=0.00002254220456802;
       volume=45.2437;
@@ -7958,8 +7958,8 @@ namespace xelement {
       name="Thorium";
       period=7;
       group=NNN;
-      Series="Actinide";
-      Block="f";
+      series="Actinide";
+      block="f";
       mass=AMU2KILOGRAM*232.0381;
       molar_volume=0.0000197917;
       volume=31.9586;
@@ -8041,8 +8041,8 @@ namespace xelement {
       name="Protoactinium";
       period=7;
       group=NNN;
-      Series="Actinide";
-      Block="f";
+      series="Actinide";
+      block="f";
       mass=AMU2KILOGRAM*231.04;
       molar_volume=0.0000150316;
       volume=NNN;
@@ -8124,8 +8124,8 @@ namespace xelement {
       name="Uranium";
       period=7;
       group=NNN;
-      Series="Actinide";
-      Block="f";
+      series="Actinide";
+      block="f";
       mass=AMU2KILOGRAM*238.03;
       molar_volume=0.000012495;
       volume=NNN;
@@ -8207,8 +8207,8 @@ namespace xelement {
       name="Neptunium";
       period=7;
       group=NNN;
-      Series="Actinide";
-      Block="f";
+      series="Actinide";
+      block="f";
       mass=AMU2KILOGRAM*237.05;
       molar_volume=0.00001158924205379;
       volume=NNN;
@@ -8290,8 +8290,8 @@ namespace xelement {
       name="Plutonium";
       period=7;
       group=NNN;
-      Series="Actinide";
-      Block="f";
+      series="Actinide";
+      block="f";
       mass=AMU2KILOGRAM*244.06;
       molar_volume=0.00001231328219621;
       volume=NNN;
@@ -8373,8 +8373,8 @@ namespace xelement {
       name="Americium";
       period=7;
       group=NNN;
-      Series="Actinide";
-      Block="f";
+      series="Actinide";
+      block="f";
       mass=AMU2KILOGRAM*243.06;
       molar_volume=0.00001777615215801;
       volume=NNN;
@@ -8456,8 +8456,8 @@ namespace xelement {
       name="Curium";
       period=7;
       group=NNN;
-      Series="Actinide";
-      Block="f";
+      series="Actinide";
+      block="f";
       mass=AMU2KILOGRAM*247.07;
       molar_volume=0.00001828275351591;
       volume=NNN;
@@ -8539,8 +8539,8 @@ namespace xelement {
       name="Berkelium";
       period=7;
       group=NNN;
-      Series="Actinide";
-      Block="f";
+      series="Actinide";
+      block="f";
       mass=AMU2KILOGRAM*247.07;
       molar_volume=0.00001671177266576;
       volume=NNN;
@@ -8622,8 +8622,8 @@ namespace xelement {
       name="Californium";
       period=7;
       group=NNN;
-      Series="Actinide";
-      Block="f";
+      series="Actinide";
+      block="f";
       mass=AMU2KILOGRAM*251.08;
       molar_volume=0.00001662251655629;
       volume=NNN;
@@ -8705,8 +8705,8 @@ namespace xelement {
       name="Einsteinium";
       period=7;
       group=NNN;
-      Series="Actinide";
-      Block="f";
+      series="Actinide";
+      block="f";
       mass=AMU2KILOGRAM*252.08;
       molar_volume=NNN;
       volume=NNN;
@@ -8788,8 +8788,8 @@ namespace xelement {
       name="Fermium";
       period=7;
       group=NNN;
-      Series="Actinide";
-      Block="f";
+      series="Actinide";
+      block="f";
       mass=AMU2KILOGRAM*257.1;
       molar_volume=NNN;
       volume=NNN;
@@ -8871,8 +8871,8 @@ namespace xelement {
       name="Mendelevium";
       period=7;
       group=NNN;
-      Series="Actinide";
-      Block="f";
+      series="Actinide";
+      block="f";
       mass=AMU2KILOGRAM*258.1;
       molar_volume=NNN;
       volume=NNN;
@@ -8954,8 +8954,8 @@ namespace xelement {
       name="Nobelium";
       period=7;
       group=NNN;
-      Series="Actinide";
-      Block="f";
+      series="Actinide";
+      block="f";
       mass=AMU2KILOGRAM*259.1;
       molar_volume=NNN;
       volume=NNN;
@@ -9037,8 +9037,8 @@ namespace xelement {
       name="Lawrencium";
       period=7;
       group=3;
-      Series="TransitionMetal";
-      Block="d";
+      series="TransitionMetal";
+      block="d";
       mass=AMU2KILOGRAM*262.11;
       molar_volume=NNN;
       volume=NNN;

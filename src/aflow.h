@@ -4656,7 +4656,7 @@ namespace xelement {
       void clear();
       void populate(const string& element); //CO20200520
       void populate(uint ZZ); //CO20200520
-      string getProperty(const string& property) const; //CO20201111
+      string getProperty(const string& property,const string& delim=",") const; //CO20201111
       // content                                             // content
       bool verbose;
       // [AFLOW]START=DECLARATION
@@ -4665,8 +4665,8 @@ namespace xelement {
       string name;                            // http://periodictable.com      //DU20190517   // DONE SC20190524
       double period;                          // http://periodictable.com      //DU20190517
       double group;                           // http://periodictable.com      //DU20190517
-      string Series;                          // http://periodictable.com For Nh,Fl,Mc,Lv,Ts Value is a guess based on periodic table trend.      //DU20190517 
-      string Block;                           // http://periodictable.com      //DU20190517
+      string series;                          // http://periodictable.com For Nh,Fl,Mc,Lv,Ts Value is a guess based on periodic table trend.      //DU20190517 
+      string block;                           // http://periodictable.com      //DU20190517
       //                                          
       double mass;                            // (kg)     // DONE SC20190524
       double molar_volume;                     // (m^3/mol) http://periodictable.com      //DU20190517
