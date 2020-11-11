@@ -876,10 +876,16 @@ static const string ESTRUCTURE_COLORS[ESTRUCTURE_NCOLORS] = {
 };
 static const string ISPIN_COLORS[2] = {"#000000", "#C44E52"};
 static const string ORBITALS[4] = {"s", "p", "d", "f"};
-static const string LM_ORBITALS[16] = {"s", "p_y", "p_z", "p_x",
-  "d_{xy}", "d_{yz}", "d_{z^2}", "d_{xz}", "d_{x^2-y^2}",
-  "f_{y(3x^2-y^2)}", "f_{xyz}", "f_{yz^2}", "f_{z^3}",
-  "f_{xz^2}", "f_{z(x^2-y^2)}", "f_{x(x^2-3y^2)}"};
+static const string LM_ORBITALS[16] = {"s", "py", "pz", "px",
+  "dxy", "dyz", "dz2", "dxz", "dx2-y2",
+  "f1", "f2", "f3", "f4", "f5", "f6", "f7"};// as used by E.G.
+// to use Cartesian labeling replace by the following:
+//  "f_{y(3x^2-y^2)}", "f_{xyz}", "f_{yz^2}", "f_{z^3}",
+//  "f_{xz^2}", "f_{z(x^2-y^2)}", "f_{x(x^2-3y^2)}"};
+static const string SPIN_LABEL[2] = {"majority", "minority"};//AS20201102
+static const string LS_ORBITALS[16] = {"s_total", "sx", "sy", "sz",
+  "p_total", "px", "py", "pz", "d_total", "dx", "dy", "dz",
+  "f_total", "fx", "fy", "fz"};//AS20201105
 
 namespace plotter {
 
@@ -1311,6 +1317,443 @@ namespace plotter {
     }
   }
 
+  //AS20201030 BEGIN
+  ///////////////////////////////////////////////////////////////////////////
+  //            Auxiliary functions to work with JSON object
+  ///////////////////////////////////////////////////////////////////////////
+  // An example how to create a nested JSON object:
+  //   JSONbegin(json, "first-level");
+  //   JSONbegin(json, "second-level1");
+  //   JSONstring(json, "test_string", "foobar");
+  //   JSONend(json);
+  //   JSONbegin(json, "second-level2");
+  //   JSONnumber(json, "test_number", 42);
+  //   JSONend(json); JSONfinish(json);
+  //   JSONend(json); JSONfinish(json);
+  //
+  // will produce:
+  // "first-level": {
+  // "second-level1": {
+  // "test_string": "foobar"
+  // },
+  // "second-level2": {
+  // "test_number": 42
+  // }
+  // }  
+
+  /// Creates JSON object by typing it's key name and the opening bracket.
+  void JSONbegin(stringstream &json, string name)
+  {
+    if (name.empty()){
+      json << "{" << endl;
+    }
+    else{
+      json << "\"" << name << "\": {" << endl;
+    }
+  }
+
+  /// Closes JSON object by typing the closing bracket and removing previous
+  /// coma and line break characters.
+  /// Note that trailing coma is also added after the closing bracket:
+  /// use JSONfinish to remove it.
+  void JSONend(stringstream &json)
+  {
+    json.seekp(-2, json.cur);
+    json << endl << "}," << endl;
+  }
+
+  /// Terminates the JSON object by removing the trailing coma and the line
+  /// break character.
+  void JSONfinish(stringstream &json){
+    json.seekp(-2, json.cur);
+    json << " " << endl;
+  }
+
+  /// Saves key-value pair with string value to the JSON object.
+  void JSONstring(stringstream &json, string name, string value)
+  {
+    json << "\"" << name << "\": " << "\"" << value << "\"," << endl;
+  }
+
+  /// Saves key-value pair with boolean value to the JSON object.
+  void JSONbool(stringstream &json, string name, bool value)
+  {
+    json << "\"" << name << "\": " << (value ? "true," : "false,") << endl;
+  }
+
+  /// Saves key-value pair with number value to the JSON object.
+  template<typename utype> void JSONnumber(stringstream &json, string name,
+      utype value)
+  {
+    json << "\"" << name << "\": " << value << "," << endl;
+  }
+
+  template void JSONnumber(stringstream&, string, float);
+  template void JSONnumber(stringstream&, string, double);
+  template void JSONnumber(stringstream&, string, int);
+  template void JSONnumber(stringstream&, string, uint);
+
+  /// Saves key-value pair with an value as std::vector array to the JSON object.
+  template<typename utype> void JSONvector(stringstream &json, string name,
+      const vector<utype> &value)
+  {
+    json << "\"" << name << "\": [";
+    for (uint i=0; i<value.size(); i++) json << value[i] << ",";
+    if (value.size()>0) json.seekp(-1,json.cur);
+    json << "]," << endl;
+  }
+  template void JSONvector(stringstream &, string, const vector<float> &);
+  template void JSONvector(stringstream &, string, const vector<double> &);
+  template void JSONvector(stringstream &, string, const vector<int> &);
+  template void JSONvector(stringstream &, string, const vector<uint> &);
+
+  template<typename utype> void JSONvector(stringstream &json, string name,
+     const vector<vector<utype> > &value)
+  {
+    json << "\"" << name << "\": [";
+    for (uint i=0; i<value.size(); i++){
+      json << "[";
+      for (uint j=0; j<value[i].size(); j++){
+        json << value[i][j] << ",";
+      }
+      if (value[i].size()>0) json.seekp(-1,json.cur);
+      json << "]," << endl;
+    }
+    if (value.size()>0) json.seekp(-1,json.cur);
+    json << "]," << endl;
+  }
+  template void JSONvector(stringstream &, string, const vector<vector<float> >&);
+  template void JSONvector(stringstream &, string, const vector<vector<double> >&);
+  template void JSONvector(stringstream &, string, const vector<vector<int> >&);
+  template void JSONvector(stringstream &, string, const vector<vector<uint> >&);
+
+  void JSONvector(stringstream &json, string name, vector<string> &value)
+  {
+    json << "\"" << name << "\": [";
+    for (uint i=0; i<value.size(); i++) json << "\"" << value[i] << "\",";
+    if (value.size()>0) json.seekp(-1,json.cur);
+    json << "]," << endl;
+  }
+
+  /// Saves key-value pair with an value as std::deque array to the JSON object.
+  /// @param negate allows to invert numerical values by multiplying them with -1.
+  template<typename utype>
+  void JSONdeque(stringstream &json, string name, const deque<utype> &value,
+     bool negate=false)
+  {
+    utype factor = negate ? -1 : 1;
+
+    json << "\"" << name << "\": [";
+    for (uint i=0; i<value.size(); i++) json <<  factor*value[i] << ",";
+    if (value.size()>0) json.seekp(-1,json.cur);
+    json << "]," << endl;
+  }
+  template void JSONdeque(stringstream &, string, const deque<float>&, bool);
+  template void JSONdeque(stringstream &, string, const deque<double>&, bool);
+  template void JSONdeque(stringstream &, string, const deque<int>&, bool);
+  // not possible to realize using uint
+
+  void JSONdeque(stringstream &json, string name, deque<string> &value)
+  {
+    json << "\"" << name << "\": [";
+    for (uint i=0; i<value.size(); i++) json << "\"" << value[i] << "\",";
+    if (value.size()>0) json.seekp(-1,json.cur);
+    json << "]," << endl;
+  }
+  //AS20201030 END
+
+#define BANDS_DOS_JSON_VERSION 1.0
+
+  /// Converts DOS data from xDOSCAR to the file in json format.
+  ///
+  /// @param xopts controls the following input options:
+  /// "DIRECTORY" -- the directory name
+  /// "NOSHIFT" -- if true energy is NOT shifted w.r.t Fermi energy
+  ///
+  /// @param standalone_json_object controls if the output json file is
+  /// a standalone object or a part of another json object (i.e. if opening
+  /// and closing curly brackets are present or not)
+  void DosToJSON(stringstream &json, xoption &xopt, xDOSCAR &xdos,
+      ofstream& FileMESSAGE, ostream &oss, bool standalone_json_object)
+  {
+    string directory = ".";
+    xopt.push_attached("DIRECTORY", directory);
+    if (directory.empty()) directory = ".";
+
+    xstructure xstr = getStructureWithNames(xopt,FileMESSAGE,xdos.carstring,oss);
+
+    string name = KBIN::ExtractSystemName(directory);
+    if (standalone_json_object) JSONbegin(json, "");
+    // TDOS header begin
+    JSONnumber(json, "version", BANDS_DOS_JSON_VERSION);
+    JSONstring(json, "name", name);
+    JSONdeque(json,  "species", xstr.species);
+    JSONdeque(json,  "composition", xstr.num_each_type);
+    JSONnumber(json, "Emin", xdos.energy_min);
+    JSONnumber(json, "Emax", xdos.energy_max);
+    JSONnumber(json, "Efermi", xdos.Efermi);
+    JSONnumber(json, "DOS_grid", xdos.number_energies);
+    // TDOS header end
+
+    JSONbegin(json, "tDOS_data");
+    JSONbool(json,  "energies_shifted", !xopt.flag("NOSHIFT"));
+    JSONdeque(json, "energy",xopt.flag("NOSHIFT") ? xdos.venergy : xdos.venergyEf);
+
+    if (xdos.spin){
+      JSONdeque(json, "spin_majority", xdos.vDOS[0][0][0]);
+      JSONdeque(json, "spin_minority", xdos.vDOS[0][0][1],true);
+      JSONdeque(json, "sum_spin_majority", xdos.viDOS[0]);
+      JSONdeque(json, "sum_spin_minority", xdos.viDOS[1],true);
+    }
+    else{
+      JSONdeque(json, "tDOS", xdos.vDOS[0][0][0]);
+      JSONdeque(json, "sum", xdos.viDOS[0]);
+    }
+    JSONend(json);
+
+    if (xdos.partial){
+      // determine what orbital labels are used depending on the type of data
+      // present in DOSCAR
+      vector<string> orb_labels(xdos.isLSCOUPLING ? 16 : (xdos.lmResolved ? 16 : 4));
+      if (xdos.isLSCOUPLING){
+        for (uint i=0; i<16; i++) orb_labels[i] = LS_ORBITALS[i];
+      }
+      else if (xdos.lmResolved){
+        for (uint i=0; i<16; i++) orb_labels[i] = LM_ORBITALS[i];
+      }
+      else{
+        for (uint i=0; i<4; i++) orb_labels[i] = ORBITALS[i];
+      }
+
+      // for "orbitals" key we want to print a list of orbitals up to the
+      // highest present in any atom, not the entire list of known/possible orbitals
+      int highest_orbital = 0;
+      for (uint i=0; i<xdos.vDOS.size(); i++){
+        if (xdos.lmResolved){ // there are 1 s, 3 p, 5 d and so on orbitals
+          int orbs_total_num = 1, l = 0;
+          while (((int)xdos.vDOS[i].size()-1) - orbs_total_num){// 0's index of vDOS stands for total: it should not be counted
+            l++;
+            orbs_total_num += 2*l+1;
+          }
+          highest_orbital = std::max(highest_orbital, l+1);
+        }
+        else{
+          highest_orbital = std::max(highest_orbital, (int)xdos.vDOS[i].size()-1);
+        }
+      }
+
+      // make an array of orbitals labels from s to whichever is highest
+      vector<string> orb_labels_out(highest_orbital);
+      for (uint i=0; i<orb_labels_out.size(); i++){
+        orb_labels_out[i] = ORBITALS[i];
+      }
+
+      // header of partial DOS
+      JSONbegin(json,  "pDOS_data");
+      JSONvector(json, "orbitals", orb_labels_out);
+      JSONbool(json,   "spin_polarized", xdos.spin);
+      JSONbool(json,   "energies_shifted", !xopt.flag("NOSHIFT"));
+      JSONdeque(json,  "energy", xopt.flag("NOSHIFT") ? xdos.venergy : xdos.venergyEf);
+
+      // create a mapping of species to the id of the first representative of
+      // each group of the symmetry equivalent atoms, i.e. for SG #12 BaBiO3
+      // with Ba : {{0,1}}, Bi: {{2},{3}}, O: {{4,5,6,7}, {8,9}} make the
+      // following mapping: Ba -> {0}, Bi -> {2,3}, O -> {4,8}
+      pflow::PerformFullSymmetry(xstr);
+      vector<vector<int> > map_species_to_iatoms(xstr.species.size());
+      for (uint species_id=0; species_id<xstr.species.size(); species_id++){
+        for (uint iatom=0; iatom<xstr.iatoms.size(); iatom++){
+          if (xstr.atoms[xstr.iatoms[iatom][0]].type == (int)species_id)
+            map_species_to_iatoms[species_id].push_back(xstr.iatoms[iatom][0]);
+        }
+      }
+
+      // write atom-projected DOS for each unique atom
+      string label = "";
+      for (uint species_id=0; species_id<xstr.species.size(); species_id++){
+        JSONbegin(json, xstr.species[species_id]);
+        for (uint iatom=0; iatom<map_species_to_iatoms[species_id].size(); iatom++){
+          int atom_id = map_species_to_iatoms[species_id][iatom];
+          JSONbegin(json, aurostd::utype2string<int>(atom_id));
+          atom_id++; // in vDOS atoms are indexed starting from 1
+
+          if (xdos.isLSCOUPLING){
+            for (uint orb=1; orb<xdos.vDOS[atom_id].size(); orb++){
+              // there are 4 spin channels
+              for (uint spin=0; spin<xdos.vDOS[atom_id][orb].size(); spin++){
+                label = orb_labels[4*(orb-1) + spin];
+                JSONdeque(json, label, xdos.vDOS[atom_id][orb][spin]);
+              }
+            }
+
+            JSONdeque(json, "total", xdos.vDOS[atom_id][0][0]);
+          }
+          else{
+            for (uint spin=0; spin<=xdos.spin; spin++){
+              if (xdos.vDOS[atom_id].size()){
+                label = "total" + (xdos.spin ? "_"+SPIN_LABEL[spin] : "");
+                JSONdeque(json, label, xdos.vDOS[atom_id][0][spin], spin);
+              }
+
+              for (uint orb=1; orb<xdos.vDOS[atom_id].size(); orb++){
+                label = orb_labels[orb-1] + (xdos.spin ? "_"+SPIN_LABEL[spin] : "");
+                JSONdeque(json, label, xdos.vDOS[atom_id][orb][spin], spin);
+              }
+            }
+          }
+          JSONend(json);
+        }
+        JSONend(json);
+      }
+
+      // write the sum of DOS contributions for each orbital (s, p, d and f)
+      // for all atoms
+      if (xdos.lmResolved){
+        deque<deque<double> > orb_dos(xdos.spin+1, deque<double> (xdos.number_energies));
+        for (int l=0, norb=1; norb<=(int)xdos.vDOS[0].size()-1; l++, norb += (2*l+1)){
+          for (uint spin=0; spin<=xdos.spin; spin++){
+            for (uint en=0; en<orb_dos[spin].size(); en++) orb_dos[spin][en] = 0.0;
+          }
+
+          for (uint spin=0; spin<=xdos.spin; spin++){
+            // orbitals are grouped by 2*l+1 manifolds: loop to sum each group
+            for (int i=0; i<2*l+1; i++){
+              for (uint en=0; en<orb_dos[spin].size(); en++){
+                orb_dos[spin][en] += xdos.vDOS[0][norb-i][spin][en];
+              }
+            }
+            label = "sum_" + ORBITALS[l];
+            label += xdos.spin ? "_"+SPIN_LABEL[spin] : "";
+            JSONdeque(json, label, orb_dos[spin], spin);
+          }
+        }
+      }
+      else{
+        for (uint orb=1; orb<xdos.vDOS[0].size(); orb++){
+          for (uint spin=0; spin<=xdos.spin; spin++){
+            if (xdos.isLSCOUPLING){
+              label = "sum_"+ORBITALS[orb-1];
+            }
+            else{
+              label = "sum_"+orb_labels[orb-1];
+              label += xdos.spin ? "_"+SPIN_LABEL[spin] : "";
+            }
+            JSONdeque(json, label, xdos.vDOS[0][orb][spin], spin);
+          }
+        }
+      }
+      JSONend(json);
+    }
+
+    if (standalone_json_object){
+      JSONend(json);
+      JSONfinish(json);
+    }
+  }
+
+  /// Converts band structure data from xEIGENVAL and xKPOINTS to the file in
+  /// json format.
+  ///
+  /// @plotoptions specifies the following options:
+  /// "DIRECTORY" -- the directory name
+  /// "NOSHIFT" -- if true energy is NOT shifted w.r.t Fermi energy
+  /// "EFERMI" -- the value of Fermi energy
+  void BandsToJSON(stringstream &out, const xEIGENVAL &xeigen, const xKPOINTS &xkpts,
+      const vector<double> &distances, const vector<double> &segment_points,
+      const xoption& plotoptions)
+  {
+    string directory = plotoptions.getattachedscheme("DIRECTORY");
+    if (directory.empty()) directory = ".";
+    string name = KBIN::ExtractSystemName(directory);
+
+    // get lattice type as written in KPOINTS.bands file
+    vector<string> tokens;
+    aurostd::string2tokens(xkpts.title, tokens, " ");
+    string LattName = tokens[0];
+
+    // write header
+    JSONstring(out, "title", name+" ("+LattName+")");
+    JSONnumber(out, "n_kpoints", xeigen.number_kpoints);
+    JSONnumber(out, "n_bands", xeigen.number_bands);
+
+    static const int num = 4;
+    string tags[num] = {"kpoint_labels", "kpoint_labels_latex", "kpoint_labels_gnuplot", "kpoint_labels_html"};
+    string formats[num] = { "", "LATEX", "GNUPLOT", "HTML"};
+
+    // we need clean labels: to be consistent with E.G. format of JSON file
+    // they will be formatted into all possible formats
+    uint nsegments = xkpts.vpath.size()/2;
+    vector<string> labels_formated(nsegments+1);
+    for (uint f=0; f<num; f++){
+      labels_formated[0] = convertKPointLabel(xkpts.vpath[0], formats[f]);
+      for (uint i = 2; i < 2 * nsegments; i += 2) {
+        labels_formated[i/2] = convertKPointLabel(xkpts.vpath[i - 1], formats[f]);
+        if (xkpts.vpath[i-1] != xkpts.vpath[i]) {
+          labels_formated[i/2] += ("GNUPLOT" == formats[f] ? " |" : "|");
+          labels_formated[i/2] += convertKPointLabel(xkpts.vpath[i], formats[f]);
+        }
+      }
+      labels_formated.back() = convertKPointLabel(xkpts.vpath.back(), formats[f]);
+
+      // escape backslash symbols in all labels
+      for (uint j=0; j<labels_formated.size();j++){
+        labels_formated[j] = aurostd::StringSubst(labels_formated[j], "\\", "\\\\");
+      }
+
+      JSONvector(out, tags[f], labels_formated);
+    }
+
+    JSONvector(out, "kpoint_positions", segment_points);
+    JSONbool(out,  "energies_shifted", !plotoptions.flag("NOSHIFT"));
+
+    // write bands data
+    string bandslabel = "";
+    double Efermi = aurostd::string2utype<double>(plotoptions.getattachedscheme("EFERMI"));
+    for (uint s=0; s<=xeigen.spin; s++){
+      bandslabel = "bands_data";
+      bandslabel += xeigen.spin ? (s ? "_minority" : "_majority") : "";
+
+      out << "     \"" + bandslabel + "\": [";
+      for (uint i=0; i<distances.size(); i++){
+        out << endl << "          [";
+        out << distances[i] << ",";
+        for (uint band=0; band<xeigen.number_bands; band++){
+          out << (plotoptions.flag("NOSHIFT") ? xeigen.venergy[i][band][s] :
+                 xeigen.venergy[i][band][s] - Efermi);
+          out << ",";
+        }
+        out.seekp(-1,out.cur);
+        out << "],";
+      }
+      out.seekp(-1,out.cur);
+      out << endl;
+      out << "     ],";
+    }
+    out << endl;
+  }
+
+  /// Converts DOS and BANDS data from xDOSCAR, xEIGENVAL and xKPOINTS files
+  /// to JSON object
+  void BandsDosToJSON(stringstream &json, xDOSCAR &xdos, xEIGENVAL &xeigen,
+      xKPOINTS &xkpts, xoption &xopt, ofstream &FileMESSAGE, ostream &oss)
+  {
+    JSONbegin(json, "");
+
+    // get DOS part of JSON
+    DosToJSON(json, xopt, xdos, FileMESSAGE, oss, false);
+
+    // get BANDS part of JSON
+    xstructure xstr = getStructureWithNames(xopt,FileMESSAGE,xdos.carstring,oss);
+    xopt.pop_attached("OUTPUT_FORMAT");
+    xopt.push_attached("OUTPUT_FORMAT","JSON");
+    xopt.pop_attached("EFERMI");
+    xopt.push_attached("EFERMI", aurostd::utype2string<double>(xdos.Efermi));
+    generateBandPlot(json, xeigen, xkpts, xstr, xopt);
+
+    JSONend(json);
+    JSONfinish(json);
+  }
+
   // DOS ---------------------------------------------------------------------
 
   //generateDosPlot///////////////////////////////////////////////////////////
@@ -1420,8 +1863,10 @@ namespace plotter {
           }
         }
       } else { // In case someone uses pdos option and projection=atoms
-        labels.push_back(xstr.species[pdos-1]);
-        dos.push_back(vDOS_species[pdos][0]);
+        //labels.push_back(xstr.species[pdos-1]);
+        //dos.push_back(vDOS_species[pdos][0]);
+        labels.push_back(xstr.atoms[pdos-1].name);//AS20201028
+        dos.push_back(vDOS_species[xstr.atoms[pdos-1].type+1][0]);//AS20201028
       }
     } else if (projection == "NONE") {  // Total DOS only without projections
       dos.push_back(xdos.vDOS[0][0]);
@@ -1496,6 +1941,9 @@ namespace plotter {
     if (outformat == "GNUPLOT") {
       generateBandPlotGNUPLOT(out, xeigen, distances, segment_points, labels, plotoptions);
     }
+    else if (outformat == "JSON"){
+      BandsToJSON(out, xeigen, xkpts, distances, segment_points, plotoptions);
+    }
   }
 
   //convertKPointLabel////////////////////////////////////////////////////////
@@ -1513,6 +1961,14 @@ namespace plotter {
       } else if (format == "HTML") {
         formatted_label += "<sub>" + parts[1] + "</sub>";
       }
+      //AS20201103 BEGIN
+      else if (format == "GNUPLOT"){
+        formatted_label += "_{/"+DEFAULT_GNUPLOT_EPS_FONT+" "+parts[1]+"}";
+      }
+      else{// return the second part even if no format is specified
+        formatted_label += "_" + parts[1];
+      }
+      //AS20201103 END
     }
     return formatted_label;
   }
@@ -1532,6 +1988,19 @@ namespace plotter {
         letter += ";";
       }
     }
+    //AS20201103 BEGIN
+    else if (format == "GNUPLOT"){
+      if (aurostd::substring2bool(letter, "Gamma")){
+        letter = "{/Symbol G}";
+      }
+      else if (aurostd::substring2bool(letter, "Sigma")){
+        letter = "{/Symbol S}";
+      }
+      else{
+        letter = "{/"+DEFAULT_GNUPLOT_EPS_FONT_ITALICS+" "+letter+"}";
+      }
+    }
+    //AS20201103 END
     return letter;
   }
 

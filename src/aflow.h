@@ -3770,6 +3770,12 @@ namespace plotter {
   string getLatticeFromKpointsTitle(const string&);
   void shiftEfermiToZero(xEIGENVAL&, double);
   void setEMinMax(aurostd::xoption&, double, double);
+  void DosToJSON(stringstream &json, xoption &xopt, xDOSCAR &xdos,
+      ofstream& FileMESSAGE, ostream &oss, bool standalone_json_object);//AS20201102
+  void BandsToJSON(stringstream &out, const xEIGENVAL &xeigen, const xKPOINTS &xkpts,
+      const vector<double> &distances, const vector<double> &segment_points,
+      const xoption& plotoptions);//AS2021102
+  void BandsDosToJSON(stringstream &json, xDOSCAR &xdos, xEIGENVAL &xeigen, xKPOINTS &xkpts, xoption &xopt, ofstream &FileMESSAGE, ostream &oss);//AS20201102
 
   // DOS
   void generateDosPlot(stringstream&, const xDOSCAR&, const aurostd::xoption&,ostream& oss=cout);  //CO20200404
