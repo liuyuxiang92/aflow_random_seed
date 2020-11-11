@@ -67,13 +67,12 @@ namespace pocc {
     ael_run_postprocess = false;
     ael_write_full_results = false;
 
-    if(XHOST.vflag_control.flag("AEL_RUN_POSTPROCESSING")){
-      ael_run_postprocess=true; //[CO20200502 - speed]XHOST.vflag_control.flag("AEL_RUN_POSTPROCESSING");
-    }  //command line input
-
-    if(XHOST.vflag_control.flag("AEL_WRITE_FULL_RESULTS")){
-      ael_write_full_results=true;  //[CO20200502 - speed]XHOST.vflag_control.flag("AEL_WRITE_FULL_RESULTS");
-    }  //command line input
+    //run postprocessing
+    ael_run_postprocess=(ael_run_postprocess || XHOST.vflag_control.flag("AEL_RUN_POSTPROCESSING") ); //CO20201026
+    ael_run_postprocess=(ael_run_postprocess || XHOST.POSTPROCESS ); //CO20201026
+    
+    //write extra output (debugging mostly)
+    ael_write_full_results=(ael_write_full_results || XHOST.vflag_control.flag("AEL_WRITE_FULL_RESULTS") ); //CO20201026
   }
 } // namespace pocc
 
@@ -806,13 +805,12 @@ namespace pocc {
     // [OBSOLETE] npressure = 0;
     // [OBSOLETE] spressure = 0.0;
 
-    if(XHOST.vflag_control.flag("AGL_RUN_POSTPROCESSING")){
-      agl_run_postprocess=XHOST.vflag_control.flag("AGL_RUN_POSTPROCESSING");
-    }  //command line input
+    //run postprocessing
+    agl_run_postprocess=( agl_run_postprocess || XHOST.vflag_control.flag("AGL_RUN_POSTPROCESSING") );  //CO20201026
+    agl_run_postprocess=( agl_run_postprocess || XHOST.POSTPROCESS );  //CO20201026
 
-    if(XHOST.vflag_control.flag("AGL_WRITE_FULL_RESULTS")){
-      agl_write_full_results=XHOST.vflag_control.flag("AGL_WRITE_FULL_RESULTS");
-    }  //command line input
+    //write extra output (debugging mostly)
+    agl_write_full_results=( agl_write_full_results || XHOST.vflag_control.flag("AGL_WRITE_FULL_RESULTS") );
 
     // [OBSOLETE] if(XHOST.vflag_control.flag("AGL_NTEMPERATURE")){
     // [OBSOLETE]   ntemperature=aurostd::string2utype<uint>(XHOST.vflag_control.getattachedscheme("AGL_NTEMPERATURE"));
