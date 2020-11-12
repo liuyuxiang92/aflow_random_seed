@@ -11,6 +11,7 @@
 #define _AFLOW_ML_H_
 
 namespace aflowML {
+  void insertCrystalPropertiesCCE(const string& structure_path,const string& anion,vector<string>& vitems);
   void writeCCECSV();
 }
 
