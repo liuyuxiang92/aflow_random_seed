@@ -4015,8 +4015,8 @@ namespace aflowlib {
             data.reciprocal_lattice_variation_type_orig=vpflow_edata_orig.getattachedscheme("EDATA::RECIPROCAL_LATTICE_VARIATION_TYPE"); 
           }
           //DX20190131 - use self-consistent space group orig - START
-          if(data.spacegroup_orig.empty()) {
-            data.spacegroup_orig=vpflow_edata_orig.getattachedscheme("SGDATA::SPACE_GROUP_NUMBER");
+          if(data.spacegroup_orig==AUROSTD_NAN) { //CO20201111
+            data.spacegroup_orig=vpflow_edata_orig.getattachedutype<uint>("SGDATA::SPACE_GROUP_NUMBER");  //CO20201111
             if(AFLOWLIB_VERBOSE) cout << MESSAGE << " SPACEGROUP_ORIG = " << data.spacegroup_orig << endl;
           } 
           //DX20190131 - use self-consistent space group orig - END
@@ -4331,8 +4331,8 @@ namespace aflowlib {
             data.reciprocal_lattice_variation_type=vpflow_edata_relax.getattachedscheme("EDATA::RECIPROCAL_LATTICE_VARIATION_TYPE"); 
           }
           //DX20190131 - use self-consistent space group relax - START
-          if(data.spacegroup_relax.empty()) {
-            data.spacegroup_relax=vpflow_edata_relax.getattachedscheme("SGDATA::SPACE_GROUP_NUMBER");
+          if(data.spacegroup_relax==AUROSTD_NAN) {  //CO20201111
+            data.spacegroup_relax=vpflow_edata_relax.getattachedutype<uint>("SGDATA::SPACE_GROUP_NUMBER");  //CO20201111
             if(AFLOWLIB_VERBOSE) cout << MESSAGE << " SPACEGROUP_RELAX = " << data.spacegroup_relax << endl;
           } 
           //DX20190131 - use self-consistent space group orig - END
@@ -4574,8 +4574,8 @@ namespace aflowlib {
             data.reciprocal_lattice_variation_type=vpflow_edata_bands.getattachedscheme("EDATA::RECIPROCAL_LATTICE_VARIATION_TYPE"); 
           }
           //DX20190131 - use self-consistent space group relax - START
-          if(data.spacegroup_relax.empty()) {
-            data.spacegroup_relax=vpflow_edata_bands.getattachedscheme("SGDATA::SPACE_GROUP_NUMBER");
+          if(data.spacegroup_relax==AUROSTD_NAN) {  //CO20201111
+            data.spacegroup_relax=vpflow_edata_bands.getattachedutype<uint>("SGDATA::SPACE_GROUP_NUMBER");  //CO20201111
             if(AFLOWLIB_VERBOSE) cout << MESSAGE << " SPACEGROUP_RELAX = " << data.spacegroup_relax << endl;
           } 
           //DX20190131 - use self-consistent space group orig - END

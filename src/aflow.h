@@ -4676,6 +4676,10 @@ namespace xelement {
       double valence_std;                     // http://en.wikipedia.org/wiki/Valence_(chemistry) standard: number electrons minus closed shell at leff (noble gas)
       double valence_iupac;                   // http://en.wikipedia.org/wiki/Valence_(chemistry) IUPAC Maximum number of univalent atoms that may combine with an atom of the element under consideration, or with a fragment, or for which an atom of this element can be substituted.
       double valence_PT;                      //           http://periodictable.com      //DU20190517
+      double valence_s;                       // number of valence s electrons (http://periodictable.com) //CO20201111
+      double valence_p;                       // number of valence p electrons (http://periodictable.com) //CO20201111
+      double valence_d;                       // number of valence f electrons (http://periodictable.com) //CO20201111
+      double valence_f;                       // number of valence f electrons (http://periodictable.com) //CO20201111
       double density_PT;                      // (g/cm^3)  http://periodictable.com      //DU20190517
       string crystal;                         // Ashcroft-Mermin                                                                                                                   
       string crystal_structure_PT;                   // http://periodictable.com      //DU20190517
@@ -4685,7 +4689,7 @@ namespace xelement {
       xvector<double> lattice_constants;       // (pm) http://periodictable.com      //DU20190517
       xvector<double> lattice_angles;          // (rad) http://periodictable.com      //DU20190517
       string phase;                           //      http://periodictable.com      //DU20190517
-      double radius;                          // Saxena (nm)
+      double radius_Saxena;                          // Saxena (nm)
       double radius_PT;                       // (pm)       http://periodictable.com      //DU20190517
       double radius_covalent_PT;              // (pm)       http://periodictable.com      //DU20190517
       double radius_covalent;                 // (Angstrom) Dalton Trans. 2836, 2832-2838 (2008) //DX+CO20170904
@@ -4713,6 +4717,7 @@ namespace xelement {
       //RF+SK20200410 END
 
       double electron_affinity_PT;             // (kJ/mol)  http://periodictable.com       //DU20190517
+      vector<double> energies_ionization;     // (kJ/mol) http://periodictable.com //CO20201111
       double phi_star_Miedema;                // (V)        (phi^\star   Miedema Rule Table 1a Physica 100B 1-28 (1980)
       double nws_Miedema;                     // (d.u.)^1/3 n_{ws}^{1/3} Miedema Rule Table 1a Physica 100B 1-28 (1980)
       double gamma_s_Miedema;                 // (mJ/m^2)   \gamma_s^0   Miedema Rule Table 1a Physica 100B 1-28 (1980)
@@ -4720,10 +4725,11 @@ namespace xelement {
       //                                          
       double temperature_boiling;                   // (Celsius), http://periodictable.com C:diamond, P:"YELLOW" Phosphorus, As:sublimates at this T.      //DU20190517
       double temperature_melting;                   // (Celsius), http://periodictable.com He does not solidify at standard pressure,C: Value given for diamond form, P : Value given for "YELLOW" phosphorus form, S : Value given for monoclinic, beta form, Se: Value given for hexagonal, gray form, Bk: Value given for alpha form.           //DU20190517
+      double fusion_heat_PT;                  // (kJ/mol)   http://periodictable.com      //CO20201111
       double vaporization_heat_PT;             // (kJ/mol)   http://periodictable.com      //DU20190517
       double specific_heat_PT;                 // (J/(kg.K)) http://periodictable.com Gas_Phase:H(H2),He,N(N2),O(O2),F(F2),Ne,Cl(Cl2),Ar,Kr,Tc,Xe,Rn,Ra,Pa -- Liquid_Phase:Br,Hg -- Solid Phase: B(rhombic),C(graphite),S(rhombic),P(phase of P.4),As(alpha),Se(hexagonal),Cd(gamma),Sn(gray),Li,In,Be,Na,Mg,Al,Si,K,Ca,Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Ga,Ge,Rb,Sr,Y,Zr,Nb,Mo,Ru,Rh,Pd,Ag,Sb,Te,I,Cs,Ba,La,Ce,Pr,Nd,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Hf,Ta,W,Re,Os,Ir,Pt,Au,Tl,Pb,Bi,Ac,Th,U.      //DU20190517 
-      double critical_Pressure;                // (Atm)      http://periodictable.com Li,Na,K,Rb: Value estimated based on extrapolation.      //DU20190517
-      double critical_Temperature_PT;          // (K)        http://periodictable.com Li,Na,K,Rb: Value estimated based on extrapolation.      //DU20190517
+      double critical_pressure;                // (Atm)      http://periodictable.com Li,Na,K,Rb: Value estimated based on extrapolation.      //DU20190517
+      double critical_temperature_PT;          // (K)        http://periodictable.com Li,Na,K,Rb: Value estimated based on extrapolation.      //DU20190517
       double thermal_expansion;               // (K^{-1})   http://periodictable.com C:graphite      //DU20190517
       double conductivity_thermal;            // (W/(mK))   http://periodictable.com      //DU20190517
       //                                         

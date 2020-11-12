@@ -120,7 +120,7 @@ namespace aflowlib {
       double PV_cell,PV_atom;
       double scintillation_attenuation_length;
       string sg,sg2;vector<string> vsg,vsg2; //CO20180101
-      string spacegroup_orig,spacegroup_relax;
+      uint spacegroup_orig,spacegroup_relax;
       string species;vector<string> vspecies;
       string species_pp;vector<string> vspecies_pp;
       string species_pp_version;vector<string> vspecies_pp_version;

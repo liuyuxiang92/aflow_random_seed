@@ -18,8 +18,6 @@
 // XELEMENT
 // look into aflow.h for the definitions
 
-#define _UTYPE2STRING_PREC_ 12
-
 std::vector<xelement::xelement> velement(NUM_ELEMENTS);        // store starting from ONE
 
 namespace pflow {
@@ -83,80 +81,86 @@ namespace pflow {
           if(c=="ALL" || c==aurostd::toupper("series")) vs.push_back(aurostd::PaddedPOST("series="+xelement::xelement(Z).series,len));
           if(c=="ALL" || c==aurostd::toupper("block")) vs.push_back(aurostd::PaddedPOST("block="+xelement::xelement(Z).block,len));
           //
-          if(c=="ALL" || c==aurostd::toupper("mass")) vs.push_back(aurostd::PaddedPOST("mass="+aurostd::utype2string(xelement::xelement(Z).mass,_UTYPE2STRING_PREC_),len)+"// (kg)");
-          if(c=="ALL" || c==aurostd::toupper("molar_volume")) vs.push_back(aurostd::PaddedPOST("molar_volume="+aurostd::utype2string(xelement::xelement(Z).molar_volume,_UTYPE2STRING_PREC_),len)+"// (m^3/mol)");
-          if(c=="ALL" || c==aurostd::toupper("volume")) vs.push_back(aurostd::PaddedPOST("volume="+aurostd::utype2string(xelement::xelement(Z).volume,_UTYPE2STRING_PREC_),len)+"// A^3");
-          if(c=="ALL" || c==aurostd::toupper("Vm_Miedema")) vs.push_back(aurostd::PaddedPOST("Vm_Miedema="+aurostd::utype2string(xelement::xelement(Z).Vm_Miedema,_UTYPE2STRING_PREC_),len)+"// (V_m^{2/3} in (cm^2))");
+          if(c=="ALL" || c==aurostd::toupper("mass")) vs.push_back(aurostd::PaddedPOST("mass="+aurostd::utype2string(xelement::xelement(Z).mass,_DOUBLE_WRITE_PRECISION_),len)+"// (kg)");
+          if(c=="ALL" || c==aurostd::toupper("molar_volume")) vs.push_back(aurostd::PaddedPOST("molar_volume="+aurostd::utype2string(xelement::xelement(Z).molar_volume,_DOUBLE_WRITE_PRECISION_),len)+"// (m^3/mol)");
+          if(c=="ALL" || c==aurostd::toupper("volume")) vs.push_back(aurostd::PaddedPOST("volume="+aurostd::utype2string(xelement::xelement(Z).volume,_DOUBLE_WRITE_PRECISION_),len)+"// A^3");
+          if(c=="ALL" || c==aurostd::toupper("Vm_Miedema")) vs.push_back(aurostd::PaddedPOST("Vm_Miedema="+aurostd::utype2string(xelement::xelement(Z).Vm_Miedema,_DOUBLE_WRITE_PRECISION_),len)+"// (V_m^{2/3} in (cm^2))");
           //
           if(c=="ALL" || c==aurostd::toupper("valence_std")) vs.push_back(aurostd::PaddedPOST("valence_std="+aurostd::utype2string(xelement::xelement(Z).valence_std),len));
           if(c=="ALL" || c==aurostd::toupper("valence_iupac")) vs.push_back(aurostd::PaddedPOST("valence_iupac="+aurostd::utype2string(xelement::xelement(Z).valence_iupac),len));
           if(c=="ALL" || c==aurostd::toupper("valence_PT")) vs.push_back(aurostd::PaddedPOST("valence_PT="+aurostd::utype2string(xelement::xelement(Z).valence_PT),len));
-          if(c=="ALL" || c==aurostd::toupper("density_PT")) vs.push_back(aurostd::PaddedPOST("density_PT="+aurostd::utype2string(xelement::xelement(Z).density_PT,_UTYPE2STRING_PREC_),len)+"// (g/cm^3)");
+          if(c=="ALL" || c==aurostd::toupper("valence_s")) vs.push_back(aurostd::PaddedPOST("valence_s="+aurostd::utype2string(xelement::xelement(Z).valence_s),len));  //CO20201111
+          if(c=="ALL" || c==aurostd::toupper("valence_p")) vs.push_back(aurostd::PaddedPOST("valence_p="+aurostd::utype2string(xelement::xelement(Z).valence_p),len));  //CO20201111
+          if(c=="ALL" || c==aurostd::toupper("valence_d")) vs.push_back(aurostd::PaddedPOST("valence_d="+aurostd::utype2string(xelement::xelement(Z).valence_d),len));  //CO20201111  
+          if(c=="ALL" || c==aurostd::toupper("valence_f")) vs.push_back(aurostd::PaddedPOST("valence_f="+aurostd::utype2string(xelement::xelement(Z).valence_f),len));  //CO20201111
+          if(c=="ALL" || c==aurostd::toupper("density_PT")) vs.push_back(aurostd::PaddedPOST("density_PT="+aurostd::utype2string(xelement::xelement(Z).density_PT,_DOUBLE_WRITE_PRECISION_),len)+"// (g/cm^3)");
           if(c=="ALL" || c==aurostd::toupper("crystal")) vs.push_back(aurostd::PaddedPOST("crystal="+xelement::xelement(Z).crystal,len));
           if(c=="ALL" || c==aurostd::toupper("crystal_structure_PT")) vs.push_back(aurostd::PaddedPOST("crystal_structure_PT="+xelement::xelement(Z).crystal_structure_PT,len));
           if(c=="ALL" || c==aurostd::toupper("space_group")) vs.push_back(aurostd::PaddedPOST("space_group="+xelement::xelement(Z).space_group,len));
           if(c=="ALL" || c==aurostd::toupper("space_group_number")) vs.push_back(aurostd::PaddedPOST("space_group_number="+aurostd::utype2string(xelement::xelement(Z).space_group_number),len));
-          if(c=="ALL" || c==aurostd::toupper("variance_parameter_mass")) vs.push_back(aurostd::PaddedPOST("variance_parameter_mass="+aurostd::utype2string(xelement::xelement(Z).variance_parameter_mass,_UTYPE2STRING_PREC_),len));
-          if(c=="ALL" || c==aurostd::toupper("lattice_constants")) vs.push_back(aurostd::PaddedPOST("lattice_constants="+aurostd::utype2string(xelement::xelement(Z).lattice_constants[1],_UTYPE2STRING_PREC_)+","+aurostd::utype2string(xelement::xelement(Z).lattice_constants[2],_UTYPE2STRING_PREC_)+","+aurostd::utype2string(xelement::xelement(Z).lattice_constants[3],_UTYPE2STRING_PREC_),len)+"// (pm)");
-          if(c=="ALL" || c==aurostd::toupper("lattice_angles")) vs.push_back(aurostd::PaddedPOST("lattice_angles="+aurostd::utype2string(xelement::xelement(Z).lattice_angles[1],_UTYPE2STRING_PREC_)+","+aurostd::utype2string(xelement::xelement(Z).lattice_angles[2],_UTYPE2STRING_PREC_)+","+aurostd::utype2string(xelement::xelement(Z).lattice_angles[3],_UTYPE2STRING_PREC_),len)+"// (rad)");
+          if(c=="ALL" || c==aurostd::toupper("variance_parameter_mass")) vs.push_back(aurostd::PaddedPOST("variance_parameter_mass="+aurostd::utype2string(xelement::xelement(Z).variance_parameter_mass,_DOUBLE_WRITE_PRECISION_),len));
+          if(c=="ALL" || c==aurostd::toupper("lattice_constants")) vs.push_back(aurostd::PaddedPOST("lattice_constants="+aurostd::utype2string(xelement::xelement(Z).lattice_constants[1],_DOUBLE_WRITE_PRECISION_)+","+aurostd::utype2string(xelement::xelement(Z).lattice_constants[2],_DOUBLE_WRITE_PRECISION_)+","+aurostd::utype2string(xelement::xelement(Z).lattice_constants[3],_DOUBLE_WRITE_PRECISION_),len)+"// (pm)");
+          if(c=="ALL" || c==aurostd::toupper("lattice_angles")) vs.push_back(aurostd::PaddedPOST("lattice_angles="+aurostd::utype2string(xelement::xelement(Z).lattice_angles[1],_DOUBLE_WRITE_PRECISION_)+","+aurostd::utype2string(xelement::xelement(Z).lattice_angles[2],_DOUBLE_WRITE_PRECISION_)+","+aurostd::utype2string(xelement::xelement(Z).lattice_angles[3],_DOUBLE_WRITE_PRECISION_),len)+"// (rad)");
           if(c=="ALL" || c==aurostd::toupper("phase")) vs.push_back(aurostd::PaddedPOST("phase="+xelement::xelement(Z).phase,len));
-          if(c=="ALL" || c==aurostd::toupper("radius")) vs.push_back(aurostd::PaddedPOST("radius="+aurostd::utype2string(xelement::xelement(Z).radius,_UTYPE2STRING_PREC_),len)+"// (nm)");
-          if(c=="ALL" || c==aurostd::toupper("radius_PT")) vs.push_back(aurostd::PaddedPOST("radius_PT="+aurostd::utype2string(xelement::xelement(Z).radius_PT,_UTYPE2STRING_PREC_),len)+"// (pm)");
-          if(c=="ALL" || c==aurostd::toupper("radius_covalent_PT")) vs.push_back(aurostd::PaddedPOST("radius_covalent_PT="+aurostd::utype2string(xelement::xelement(Z).radius_covalent_PT,_UTYPE2STRING_PREC_),len)+"// (pm)");
-          if(c=="ALL" || c==aurostd::toupper("radius_covalent")) vs.push_back(aurostd::PaddedPOST("radius_covalent="+aurostd::utype2string(xelement::xelement(Z).radius_covalent,_UTYPE2STRING_PREC_),len)+"// (Angstrom)");
-          if(c=="ALL" || c==aurostd::toupper("radius_VanDerWaals_PT")) vs.push_back(aurostd::PaddedPOST("radius_VanDerWaals_PT="+aurostd::utype2string(xelement::xelement(Z).radius_VanDerWaals_PT,_UTYPE2STRING_PREC_),len)+"// (pm)");
-          if(c=="ALL" || c==aurostd::toupper("radii_Ghosh08")) vs.push_back(aurostd::PaddedPOST("radii_Ghosh08="+aurostd::utype2string(xelement::xelement(Z).radii_Ghosh08,_UTYPE2STRING_PREC_),len)+"// (Angstrom)");
-          if(c=="ALL" || c==aurostd::toupper("radii_Slatter")) vs.push_back(aurostd::PaddedPOST("radii_Slatter="+aurostd::utype2string(xelement::xelement(Z).radii_Slatter,_UTYPE2STRING_PREC_),len)+"// (Angstrom)");
-          if(c=="ALL" || c==aurostd::toupper("radii_Pyykko")) vs.push_back(aurostd::PaddedPOST("radii_Pyykko="+aurostd::utype2string(xelement::xelement(Z).radii_Pyykko,_UTYPE2STRING_PREC_),len)+"// (pm)");
+          if(c=="ALL" || c==aurostd::toupper("radius_Saxena")) vs.push_back(aurostd::PaddedPOST("radius_Saxena="+aurostd::utype2string(xelement::xelement(Z).radius_Saxena,_DOUBLE_WRITE_PRECISION_),len)+"// (nm)");
+          if(c=="ALL" || c==aurostd::toupper("radius_PT")) vs.push_back(aurostd::PaddedPOST("radius_PT="+aurostd::utype2string(xelement::xelement(Z).radius_PT,_DOUBLE_WRITE_PRECISION_),len)+"// (pm)");
+          if(c=="ALL" || c==aurostd::toupper("radius_covalent_PT")) vs.push_back(aurostd::PaddedPOST("radius_covalent_PT="+aurostd::utype2string(xelement::xelement(Z).radius_covalent_PT,_DOUBLE_WRITE_PRECISION_),len)+"// (pm)");
+          if(c=="ALL" || c==aurostd::toupper("radius_covalent")) vs.push_back(aurostd::PaddedPOST("radius_covalent="+aurostd::utype2string(xelement::xelement(Z).radius_covalent,_DOUBLE_WRITE_PRECISION_),len)+"// (Angstrom)");
+          if(c=="ALL" || c==aurostd::toupper("radius_VanDerWaals_PT")) vs.push_back(aurostd::PaddedPOST("radius_VanDerWaals_PT="+aurostd::utype2string(xelement::xelement(Z).radius_VanDerWaals_PT,_DOUBLE_WRITE_PRECISION_),len)+"// (pm)");
+          if(c=="ALL" || c==aurostd::toupper("radii_Ghosh08")) vs.push_back(aurostd::PaddedPOST("radii_Ghosh08="+aurostd::utype2string(xelement::xelement(Z).radii_Ghosh08,_DOUBLE_WRITE_PRECISION_),len)+"// (Angstrom)");
+          if(c=="ALL" || c==aurostd::toupper("radii_Slatter")) vs.push_back(aurostd::PaddedPOST("radii_Slatter="+aurostd::utype2string(xelement::xelement(Z).radii_Slatter,_DOUBLE_WRITE_PRECISION_),len)+"// (Angstrom)");
+          if(c=="ALL" || c==aurostd::toupper("radii_Pyykko")) vs.push_back(aurostd::PaddedPOST("radii_Pyykko="+aurostd::utype2string(xelement::xelement(Z).radii_Pyykko,_DOUBLE_WRITE_PRECISION_),len)+"// (pm)");
           //
-          if(c=="ALL" || c==aurostd::toupper("conductivity_electrical")) vs.push_back(aurostd::PaddedPOST("conductivity_electrical="+aurostd::utype2string(xelement::xelement(Z).conductivity_electrical,_UTYPE2STRING_PREC_),len)+"// (S/m)");
-          if(c=="ALL" || c==aurostd::toupper("electronegativity_vec")) vs.push_back(aurostd::PaddedPOST("electronegativity_vec="+aurostd::utype2string(xelement::xelement(Z).electronegativity_vec,_UTYPE2STRING_PREC_),len));
-          if(c=="ALL" || c==aurostd::toupper("hardness_Ghosh")) vs.push_back(aurostd::PaddedPOST("hardness_Ghosh="+aurostd::utype2string(xelement::xelement(Z).hardness_Ghosh,_UTYPE2STRING_PREC_),len)+"// (eV)");
-          if(c=="ALL" || c==aurostd::toupper("electronegativity_Pearson")) vs.push_back(aurostd::PaddedPOST("electronegativity_Pearson="+aurostd::utype2string(xelement::xelement(Z).electronegativity_Pearson,_UTYPE2STRING_PREC_),len)); //+"// (eV)
-          if(c=="ALL" || c==aurostd::toupper("electronegativity_Ghosh")) vs.push_back(aurostd::PaddedPOST("electronegativity_Ghosh="+aurostd::utype2string(xelement::xelement(Z).electronegativity_Ghosh,_UTYPE2STRING_PREC_),len)); //+"// (eV)
-          if(c=="ALL" || c==aurostd::toupper("electronegativity_Allen")) vs.push_back(aurostd::PaddedPOST("electronegativity_Allen="+aurostd::utype2string(xelement::xelement(Z).electronegativity_Allen,_UTYPE2STRING_PREC_),len)); //CO20200731
-          if(c=="ALL" || c==aurostd::toupper("oxidation_states")) vs.push_back(aurostd::PaddedPOST("oxidation_states="+aurostd::joinWDelimiter(aurostd::vecDouble2vecString(xelement::xelement(Z).oxidation_states,_UTYPE2STRING_PREC_),","),len)); //CO20200731
-          if(c=="ALL" || c==aurostd::toupper("oxidation_states_preferred")) vs.push_back(aurostd::PaddedPOST("oxidation_states_preferred="+aurostd::joinWDelimiter(aurostd::vecDouble2vecString(xelement::xelement(Z).oxidation_states_preferred,_UTYPE2STRING_PREC_),","),len)); //CO20200731
-          if(c=="ALL" || c==aurostd::toupper("electron_affinity_PT")) vs.push_back(aurostd::PaddedPOST("electron_affinity_PT="+aurostd::utype2string(xelement::xelement(Z).electron_affinity_PT,_UTYPE2STRING_PREC_),len)+"// (kJ/mol)");
-          if(c=="ALL" || c==aurostd::toupper("phi_star_Miedema")) vs.push_back(aurostd::PaddedPOST("phi_star_Miedema="+aurostd::utype2string(xelement::xelement(Z).phi_star_Miedema,_UTYPE2STRING_PREC_),len)+"// (V) (phi^star)");
-          if(c=="ALL" || c==aurostd::toupper("nws_Miedema")) vs.push_back(aurostd::PaddedPOST("nws_Miedema="+aurostd::utype2string(xelement::xelement(Z).nws_Miedema,_UTYPE2STRING_PREC_),len)+"// (d.u.)^1/3 n_{ws}^{1/3}");
-          if(c=="ALL" || c==aurostd::toupper("gamma_s_Miedema")) vs.push_back(aurostd::PaddedPOST("gamma_s_Miedema="+aurostd::utype2string(xelement::xelement(Z).gamma_s_Miedema,_UTYPE2STRING_PREC_),len)+"// (mJ/m^2)");
+          if(c=="ALL" || c==aurostd::toupper("conductivity_electrical")) vs.push_back(aurostd::PaddedPOST("conductivity_electrical="+aurostd::utype2string(xelement::xelement(Z).conductivity_electrical,_DOUBLE_WRITE_PRECISION_),len)+"// (S/m)");
+          if(c=="ALL" || c==aurostd::toupper("electronegativity_vec")) vs.push_back(aurostd::PaddedPOST("electronegativity_vec="+aurostd::utype2string(xelement::xelement(Z).electronegativity_vec,_DOUBLE_WRITE_PRECISION_),len));
+          if(c=="ALL" || c==aurostd::toupper("hardness_Ghosh")) vs.push_back(aurostd::PaddedPOST("hardness_Ghosh="+aurostd::utype2string(xelement::xelement(Z).hardness_Ghosh,_DOUBLE_WRITE_PRECISION_),len)+"// (eV)");
+          if(c=="ALL" || c==aurostd::toupper("electronegativity_Pearson")) vs.push_back(aurostd::PaddedPOST("electronegativity_Pearson="+aurostd::utype2string(xelement::xelement(Z).electronegativity_Pearson,_DOUBLE_WRITE_PRECISION_),len)); //+"// (eV)
+          if(c=="ALL" || c==aurostd::toupper("electronegativity_Ghosh")) vs.push_back(aurostd::PaddedPOST("electronegativity_Ghosh="+aurostd::utype2string(xelement::xelement(Z).electronegativity_Ghosh,_DOUBLE_WRITE_PRECISION_),len)); //+"// (eV)
+          if(c=="ALL" || c==aurostd::toupper("electronegativity_Allen")) vs.push_back(aurostd::PaddedPOST("electronegativity_Allen="+aurostd::utype2string(xelement::xelement(Z).electronegativity_Allen,_DOUBLE_WRITE_PRECISION_),len)); //CO20200731
+          if(c=="ALL" || c==aurostd::toupper("oxidation_states")) vs.push_back(aurostd::PaddedPOST("oxidation_states="+aurostd::joinWDelimiter(aurostd::vecDouble2vecString(xelement::xelement(Z).oxidation_states,_DOUBLE_WRITE_PRECISION_),","),len)); //CO20200731
+          if(c=="ALL" || c==aurostd::toupper("oxidation_states_preferred")) vs.push_back(aurostd::PaddedPOST("oxidation_states_preferred="+aurostd::joinWDelimiter(aurostd::vecDouble2vecString(xelement::xelement(Z).oxidation_states_preferred,_DOUBLE_WRITE_PRECISION_),","),len)); //CO20200731
+          if(c=="ALL" || c==aurostd::toupper("electron_affinity_PT")) vs.push_back(aurostd::PaddedPOST("electron_affinity_PT="+aurostd::utype2string(xelement::xelement(Z).electron_affinity_PT,_DOUBLE_WRITE_PRECISION_),len)+"// (kJ/mol)");
+          if(c=="ALL" || c==aurostd::toupper("energies_ionization")) vs.push_back(aurostd::PaddedPOST("energies_ionization="+aurostd::joinWDelimiter(aurostd::vecDouble2vecString(xelement::xelement(Z).energies_ionization,_DOUBLE_WRITE_PRECISION_),","),len)+"// (kJ/mol)"); //CO20201111
+          if(c=="ALL" || c==aurostd::toupper("phi_star_Miedema")) vs.push_back(aurostd::PaddedPOST("phi_star_Miedema="+aurostd::utype2string(xelement::xelement(Z).phi_star_Miedema,_DOUBLE_WRITE_PRECISION_),len)+"// (V) (phi^star)");
+          if(c=="ALL" || c==aurostd::toupper("nws_Miedema")) vs.push_back(aurostd::PaddedPOST("nws_Miedema="+aurostd::utype2string(xelement::xelement(Z).nws_Miedema,_DOUBLE_WRITE_PRECISION_),len)+"// (d.u.)^1/3 n_{ws}^{1/3}");
+          if(c=="ALL" || c==aurostd::toupper("gamma_s_Miedema")) vs.push_back(aurostd::PaddedPOST("gamma_s_Miedema="+aurostd::utype2string(xelement::xelement(Z).gamma_s_Miedema,_DOUBLE_WRITE_PRECISION_),len)+"// (mJ/m^2)");
           //
-          if(c=="ALL" || c==aurostd::toupper("scale_Pettifor")) vs.push_back(aurostd::PaddedPOST("scale_Pettifor="+aurostd::utype2string(xelement::xelement(Z).scale_Pettifor,_UTYPE2STRING_PREC_),len)); 
+          if(c=="ALL" || c==aurostd::toupper("scale_Pettifor")) vs.push_back(aurostd::PaddedPOST("scale_Pettifor="+aurostd::utype2string(xelement::xelement(Z).scale_Pettifor,_DOUBLE_WRITE_PRECISION_),len)); 
           //
-          if(c=="ALL" || c==aurostd::toupper("temperature_boiling")) vs.push_back(aurostd::PaddedPOST("temperature_boiling="+aurostd::utype2string(xelement::xelement(Z).temperature_boiling,_UTYPE2STRING_PREC_),len)+"// (Celsius)");
-          if(c=="ALL" || c==aurostd::toupper("temperature_melting")) vs.push_back(aurostd::PaddedPOST("temperature_melting="+aurostd::utype2string(xelement::xelement(Z).temperature_melting,_UTYPE2STRING_PREC_),len)+"// (Celsius)");
-          if(c=="ALL" || c==aurostd::toupper("vaporization_heat_PT")) vs.push_back(aurostd::PaddedPOST("vaporization_heat_PT="+aurostd::utype2string(xelement::xelement(Z).vaporization_heat_PT,_UTYPE2STRING_PREC_),len)+"// (kJ/mol)");
-          if(c=="ALL" || c==aurostd::toupper("specific_heat_PT")) vs.push_back(aurostd::PaddedPOST("specific_heat_PT="+aurostd::utype2string(xelement::xelement(Z).specific_heat_PT,_UTYPE2STRING_PREC_),len)+"// (J/(kg.K))");
-          if(c=="ALL" || c==aurostd::toupper("critical_Pressure")) vs.push_back(aurostd::PaddedPOST("critical_Pressure="+aurostd::utype2string(xelement::xelement(Z).critical_Pressure,_UTYPE2STRING_PREC_),len)+"// (Atm) "); 
-          if(c=="ALL" || c==aurostd::toupper("critical_Temperature_PT")) vs.push_back(aurostd::PaddedPOST("critical_Temperature_PT="+aurostd::utype2string(xelement::xelement(Z).critical_Temperature_PT,_UTYPE2STRING_PREC_),len)+"// (K)"); 
-          if(c=="ALL" || c==aurostd::toupper("thermal_expansion")) vs.push_back(aurostd::PaddedPOST("thermal_expansion="+aurostd::utype2string(xelement::xelement(Z).thermal_expansion,_UTYPE2STRING_PREC_),len)+"// (K^{-1})");
-          if(c=="ALL" || c==aurostd::toupper("conductivity_thermal")) vs.push_back(aurostd::PaddedPOST("conductivity_thermal="+aurostd::utype2string(xelement::xelement(Z).conductivity_thermal,_UTYPE2STRING_PREC_),len)+"// (W/(mK))");
+          if(c=="ALL" || c==aurostd::toupper("temperature_boiling")) vs.push_back(aurostd::PaddedPOST("temperature_boiling="+aurostd::utype2string(xelement::xelement(Z).temperature_boiling,_DOUBLE_WRITE_PRECISION_),len)+"// (Celsius)");
+          if(c=="ALL" || c==aurostd::toupper("temperature_melting")) vs.push_back(aurostd::PaddedPOST("temperature_melting="+aurostd::utype2string(xelement::xelement(Z).temperature_melting,_DOUBLE_WRITE_PRECISION_),len)+"// (Celsius)");
+          if(c=="ALL" || c==aurostd::toupper("fusion_heat_PT")) vs.push_back(aurostd::PaddedPOST("fusion_heat_PT="+aurostd::utype2string(xelement::xelement(Z).fusion_heat_PT,_DOUBLE_WRITE_PRECISION_),len)+"// (kJ/mol)");  //CO20201111
+          if(c=="ALL" || c==aurostd::toupper("vaporization_heat_PT")) vs.push_back(aurostd::PaddedPOST("vaporization_heat_PT="+aurostd::utype2string(xelement::xelement(Z).vaporization_heat_PT,_DOUBLE_WRITE_PRECISION_),len)+"// (kJ/mol)");
+          if(c=="ALL" || c==aurostd::toupper("specific_heat_PT")) vs.push_back(aurostd::PaddedPOST("specific_heat_PT="+aurostd::utype2string(xelement::xelement(Z).specific_heat_PT,_DOUBLE_WRITE_PRECISION_),len)+"// (J/(kg.K))");
+          if(c=="ALL" || c==aurostd::toupper("critical_pressure")) vs.push_back(aurostd::PaddedPOST("critical_pressure="+aurostd::utype2string(xelement::xelement(Z).critical_pressure,_DOUBLE_WRITE_PRECISION_),len)+"// (Atm) "); 
+          if(c=="ALL" || c==aurostd::toupper("critical_temperature_PT")) vs.push_back(aurostd::PaddedPOST("critical_temperature_PT="+aurostd::utype2string(xelement::xelement(Z).critical_temperature_PT,_DOUBLE_WRITE_PRECISION_),len)+"// (K)"); 
+          if(c=="ALL" || c==aurostd::toupper("thermal_expansion")) vs.push_back(aurostd::PaddedPOST("thermal_expansion="+aurostd::utype2string(xelement::xelement(Z).thermal_expansion,_DOUBLE_WRITE_PRECISION_),len)+"// (K^{-1})");
+          if(c=="ALL" || c==aurostd::toupper("conductivity_thermal")) vs.push_back(aurostd::PaddedPOST("conductivity_thermal="+aurostd::utype2string(xelement::xelement(Z).conductivity_thermal,_DOUBLE_WRITE_PRECISION_),len)+"// (W/(mK))");
           //
-          if(c=="ALL" || c==aurostd::toupper("hardness_Brinell")) vs.push_back(aurostd::PaddedPOST("hardness_Brinell="+aurostd::utype2string(xelement::xelement(Z).hardness_Brinell,_UTYPE2STRING_PREC_),len)+"// (MPa)");
-          if(c=="ALL" || c==aurostd::toupper("hardness_Mohs")) vs.push_back(aurostd::PaddedPOST("hardness_Mohs="+aurostd::utype2string(xelement::xelement(Z).hardness_Mohs,_UTYPE2STRING_PREC_),len));
-          if(c=="ALL" || c==aurostd::toupper("hardness_Vickers")) vs.push_back(aurostd::PaddedPOST("hardness_Vickers="+aurostd::utype2string(xelement::xelement(Z).hardness_Vickers,_UTYPE2STRING_PREC_),len)+"// (MPa)");
-          if(c=="ALL" || c==aurostd::toupper("hardness_Pearson")) vs.push_back(aurostd::PaddedPOST("hardness_Pearson="+aurostd::utype2string(xelement::xelement(Z).hardness_Pearson,_UTYPE2STRING_PREC_),len)+"// (eV)");
-          if(c=="ALL" || c==aurostd::toupper("hardness_Putz")) vs.push_back(aurostd::PaddedPOST("hardness_Putz="+aurostd::utype2string(xelement::xelement(Z).hardness_Putz,_UTYPE2STRING_PREC_),len)+"// (eV/atom)");
-          if(c=="ALL" || c==aurostd::toupper("hardness_RB")) vs.push_back(aurostd::PaddedPOST("hardness_RB="+aurostd::utype2string(xelement::xelement(Z).hardness_RB,_UTYPE2STRING_PREC_),len)+"// (eV)");
-          if(c=="ALL" || c==aurostd::toupper("modulus_shear")) vs.push_back(aurostd::PaddedPOST("modulus_shear="+aurostd::utype2string(xelement::xelement(Z).modulus_shear,_UTYPE2STRING_PREC_),len)+"// (GPa)");
-          if(c=="ALL" || c==aurostd::toupper("modulus_Young")) vs.push_back(aurostd::PaddedPOST("modulus_Young="+aurostd::utype2string(xelement::xelement(Z).modulus_Young,_UTYPE2STRING_PREC_),len)+"// (GPa)");
-          if(c=="ALL" || c==aurostd::toupper("modulus_bulk")) vs.push_back(aurostd::PaddedPOST("modulus_bulk="+aurostd::utype2string(xelement::xelement(Z).modulus_bulk,_UTYPE2STRING_PREC_),len)+"// (GPa)");
-          if(c=="ALL" || c==aurostd::toupper("Poisson_ratio_PT")) vs.push_back(aurostd::PaddedPOST("Poisson_ratio_PT="+aurostd::utype2string(xelement::xelement(Z).Poisson_ratio_PT,_UTYPE2STRING_PREC_),len));
-          if(c=="ALL" || c==aurostd::toupper("BVm_Miedema")) vs.push_back(aurostd::PaddedPOST("BVm_Miedema="+aurostd::utype2string(xelement::xelement(Z).BVm_Miedema,_UTYPE2STRING_PREC_),len)+"// (kJ/mole)");
+          if(c=="ALL" || c==aurostd::toupper("hardness_Brinell")) vs.push_back(aurostd::PaddedPOST("hardness_Brinell="+aurostd::utype2string(xelement::xelement(Z).hardness_Brinell,_DOUBLE_WRITE_PRECISION_),len)+"// (MPa)");
+          if(c=="ALL" || c==aurostd::toupper("hardness_Mohs")) vs.push_back(aurostd::PaddedPOST("hardness_Mohs="+aurostd::utype2string(xelement::xelement(Z).hardness_Mohs,_DOUBLE_WRITE_PRECISION_),len));
+          if(c=="ALL" || c==aurostd::toupper("hardness_Vickers")) vs.push_back(aurostd::PaddedPOST("hardness_Vickers="+aurostd::utype2string(xelement::xelement(Z).hardness_Vickers,_DOUBLE_WRITE_PRECISION_),len)+"// (MPa)");
+          if(c=="ALL" || c==aurostd::toupper("hardness_Pearson")) vs.push_back(aurostd::PaddedPOST("hardness_Pearson="+aurostd::utype2string(xelement::xelement(Z).hardness_Pearson,_DOUBLE_WRITE_PRECISION_),len)+"// (eV)");
+          if(c=="ALL" || c==aurostd::toupper("hardness_Putz")) vs.push_back(aurostd::PaddedPOST("hardness_Putz="+aurostd::utype2string(xelement::xelement(Z).hardness_Putz,_DOUBLE_WRITE_PRECISION_),len)+"// (eV/atom)");
+          if(c=="ALL" || c==aurostd::toupper("hardness_RB")) vs.push_back(aurostd::PaddedPOST("hardness_RB="+aurostd::utype2string(xelement::xelement(Z).hardness_RB,_DOUBLE_WRITE_PRECISION_),len)+"// (eV)");
+          if(c=="ALL" || c==aurostd::toupper("modulus_shear")) vs.push_back(aurostd::PaddedPOST("modulus_shear="+aurostd::utype2string(xelement::xelement(Z).modulus_shear,_DOUBLE_WRITE_PRECISION_),len)+"// (GPa)");
+          if(c=="ALL" || c==aurostd::toupper("modulus_Young")) vs.push_back(aurostd::PaddedPOST("modulus_Young="+aurostd::utype2string(xelement::xelement(Z).modulus_Young,_DOUBLE_WRITE_PRECISION_),len)+"// (GPa)");
+          if(c=="ALL" || c==aurostd::toupper("modulus_bulk")) vs.push_back(aurostd::PaddedPOST("modulus_bulk="+aurostd::utype2string(xelement::xelement(Z).modulus_bulk,_DOUBLE_WRITE_PRECISION_),len)+"// (GPa)");
+          if(c=="ALL" || c==aurostd::toupper("Poisson_ratio_PT")) vs.push_back(aurostd::PaddedPOST("Poisson_ratio_PT="+aurostd::utype2string(xelement::xelement(Z).Poisson_ratio_PT,_DOUBLE_WRITE_PRECISION_),len));
+          if(c=="ALL" || c==aurostd::toupper("BVm_Miedema")) vs.push_back(aurostd::PaddedPOST("BVm_Miedema="+aurostd::utype2string(xelement::xelement(Z).BVm_Miedema,_DOUBLE_WRITE_PRECISION_),len)+"// (kJ/mole)");
           //
           if(c=="ALL" || c==aurostd::toupper("magnetic_type_PT")) vs.push_back(aurostd::PaddedPOST("magnetic_type_PT="+xelement::xelement(Z).magnetic_type_PT,len));
-          if(c=="ALL" || c==aurostd::toupper("susceptibility_magnetic_mass")) vs.push_back(aurostd::PaddedPOST("susceptibility_magnetic_mass="+aurostd::utype2string(xelement::xelement(Z).susceptibility_magnetic_mass,_UTYPE2STRING_PREC_),len)+"// (m^3/K)");
-          if(c=="ALL" || c==aurostd::toupper("susceptibility_magnetic_volume")) vs.push_back(aurostd::PaddedPOST("susceptibility_magnetic_volume="+aurostd::utype2string(xelement::xelement(Z).susceptibility_magnetic_volume,_UTYPE2STRING_PREC_),len));
-          if(c=="ALL" || c==aurostd::toupper("susceptibility_magnetic_molar")) vs.push_back(aurostd::PaddedPOST("susceptibility_magnetic_molar="+aurostd::utype2string(xelement::xelement(Z).susceptibility_magnetic_molar,_UTYPE2STRING_PREC_),len)+"// (m^3/mol)");
-          if(c=="ALL" || c==aurostd::toupper("temperature_Curie")) vs.push_back(aurostd::PaddedPOST("temperature_Curie="+aurostd::utype2string(xelement::xelement(Z).temperature_Curie,_UTYPE2STRING_PREC_),len)+"// (K)");
+          if(c=="ALL" || c==aurostd::toupper("susceptibility_magnetic_mass")) vs.push_back(aurostd::PaddedPOST("susceptibility_magnetic_mass="+aurostd::utype2string(xelement::xelement(Z).susceptibility_magnetic_mass,_DOUBLE_WRITE_PRECISION_),len)+"// (m^3/K)");
+          if(c=="ALL" || c==aurostd::toupper("susceptibility_magnetic_volume")) vs.push_back(aurostd::PaddedPOST("susceptibility_magnetic_volume="+aurostd::utype2string(xelement::xelement(Z).susceptibility_magnetic_volume,_DOUBLE_WRITE_PRECISION_),len));
+          if(c=="ALL" || c==aurostd::toupper("susceptibility_magnetic_molar")) vs.push_back(aurostd::PaddedPOST("susceptibility_magnetic_molar="+aurostd::utype2string(xelement::xelement(Z).susceptibility_magnetic_molar,_DOUBLE_WRITE_PRECISION_),len)+"// (m^3/mol)");
+          if(c=="ALL" || c==aurostd::toupper("temperature_Curie")) vs.push_back(aurostd::PaddedPOST("temperature_Curie="+aurostd::utype2string(xelement::xelement(Z).temperature_Curie,_DOUBLE_WRITE_PRECISION_),len)+"// (K)");
           //
-          if(c=="ALL" || c==aurostd::toupper("refractive_index")) vs.push_back(aurostd::PaddedPOST("refractive_index="+aurostd::utype2string(xelement::xelement(Z).refractive_index,_UTYPE2STRING_PREC_),len));
+          if(c=="ALL" || c==aurostd::toupper("refractive_index")) vs.push_back(aurostd::PaddedPOST("refractive_index="+aurostd::utype2string(xelement::xelement(Z).refractive_index,_DOUBLE_WRITE_PRECISION_),len));
           if(c=="ALL" || c==aurostd::toupper("color_PT")) vs.push_back(aurostd::PaddedPOST("color_PT="+xelement::xelement(Z).color_PT,len));
           //
-          if(c=="ALL" || c==aurostd::toupper("HHIP")) vs.push_back(aurostd::PaddedPOST("HHIP="+aurostd::utype2string(xelement::xelement(Z).HHIP,_UTYPE2STRING_PREC_),len));
-          if(c=="ALL" || c==aurostd::toupper("HHIR")) vs.push_back(aurostd::PaddedPOST("HHIR="+aurostd::utype2string(xelement::xelement(Z).HHIR,_UTYPE2STRING_PREC_),len));
-          if(c=="ALL" || c==aurostd::toupper("xray_scatt")) vs.push_back(aurostd::PaddedPOST("xray_scatt="+aurostd::utype2string(xelement::xelement(Z).xray_scatt,_UTYPE2STRING_PREC_),len)+"// shift+1");
+          if(c=="ALL" || c==aurostd::toupper("HHIP")) vs.push_back(aurostd::PaddedPOST("HHIP="+aurostd::utype2string(xelement::xelement(Z).HHIP,_DOUBLE_WRITE_PRECISION_),len));
+          if(c=="ALL" || c==aurostd::toupper("HHIR")) vs.push_back(aurostd::PaddedPOST("HHIR="+aurostd::utype2string(xelement::xelement(Z).HHIR,_DOUBLE_WRITE_PRECISION_),len));
+          if(c=="ALL" || c==aurostd::toupper("xray_scatt")) vs.push_back(aurostd::PaddedPOST("xray_scatt="+aurostd::utype2string(xelement::xelement(Z).xray_scatt,_DOUBLE_WRITE_PRECISION_),len)+"// shift+1");
 
           if(vs.size())
             for(uint j=0;j<vs.size();j++)
@@ -229,6 +233,10 @@ namespace xelement {
     valence_std=NNN;  
     valence_iupac=NNN;
     valence_PT=NNN;       
+    valence_s=0;       //CO20201111
+    valence_p=0;       //CO20201111
+    valence_d=0;       //CO20201111
+    valence_f=0;       //CO20201111
     density_PT=NNN;       
     crystal="nnn";    
     crystal_structure_PT="UNDEFINED";
@@ -238,7 +246,7 @@ namespace xelement {
     lattice_constants[1]=NNN;lattice_constants[2]=NNN;lattice_constants[3]=NNN;
     lattice_angles[1]=NNN;lattice_angles[2]=NNN;lattice_angles[3]=NNN; 
     phase="nnn";         
-    radius=NNN;         
+    radius_Saxena=NNN;         
     radius_PT=NNN;          
     radius_covalent_PT=NNN;   
     radius_covalent=NNN;  
@@ -256,6 +264,7 @@ namespace xelement {
     oxidation_states.clear();oxidation_states.push_back(NNN);  //RF+SK20200410
     oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
     electron_affinity_PT=NNN;      
+    energies_ionization.clear();energies_ionization.push_back(NNN);  //CO20201111
     phi_star_Miedema=NNN;         
     nws_Miedema=NNN;              
     gamma_s_Miedema=NNN;          
@@ -264,10 +273,11 @@ namespace xelement {
     //
     temperature_boiling=NNN;         
     temperature_melting=NNN;         
+    fusion_heat_PT=NNN;     //CO20201111
     vaporization_heat_PT=NNN;     
     specific_heat_PT=NNN;         
-    critical_Pressure=NNN;     
-    critical_Temperature_PT=NNN;  
+    critical_pressure=NNN;     
+    critical_temperature_PT=NNN;  
     thermal_expansion=NNN;     
     conductivity_thermal=NNN;  
     //                                         
@@ -323,6 +333,10 @@ namespace xelement {
     valence_std=b.valence_std;  
     valence_iupac=b.valence_iupac;
     valence_PT=b.valence_PT;       
+    valence_s=b.valence_s;       //CO20201111
+    valence_p=b.valence_p;       //CO20201111
+    valence_d=b.valence_d;       //CO20201111
+    valence_f=b.valence_f;       //CO20201111
     density_PT=b.density_PT;       
     crystal=b.crystal;    
     crystal_structure_PT=b.crystal_structure_PT;
@@ -332,7 +346,7 @@ namespace xelement {
     lattice_constants=b.lattice_constants; 
     lattice_angles=b.lattice_angles;   
     phase=b.phase;
-    radius=b.radius;         
+    radius_Saxena=b.radius_Saxena;         
     radius_PT=b.radius_PT;          
     radius_covalent_PT=b.radius_covalent_PT;   
     radius_covalent=b.radius_covalent;  
@@ -347,9 +361,10 @@ namespace xelement {
     electronegativity_Pearson=b.electronegativity_Pearson;           
     electronegativity_Ghosh=b.electronegativity_Ghosh;             
     electronegativity_Allen=b.electronegativity_Allen;  //RF+SK20200410
-    oxidation_states=b.oxidation_states;  //RF+SK20200410
-    oxidation_states_preferred=b.oxidation_states_preferred;  //RF+SK20200410
+    oxidation_states.clear();for(uint i=0;i<b.oxidation_states.size();i++){oxidation_states.push_back(b.oxidation_states[i]);} //RF+SK20200410  //CO20201111
+    oxidation_states_preferred.clear();for(uint i=0;i<b.oxidation_states_preferred.size();i++){oxidation_states_preferred.push_back(b.oxidation_states_preferred[i]);} //RF+SK20200410  //CO20201111
     electron_affinity_PT=b.electron_affinity_PT;      
+    energies_ionization.clear();for(uint i=0;i<b.energies_ionization.size();i++){energies_ionization.push_back(b.energies_ionization[i]);} //CO20201111
     phi_star_Miedema=b.phi_star_Miedema;         
     nws_Miedema=b.nws_Miedema;              
     gamma_s_Miedema=b.gamma_s_Miedema;          
@@ -358,10 +373,11 @@ namespace xelement {
     //
     temperature_boiling=b.temperature_boiling;         
     temperature_melting=b.temperature_melting;         
+    fusion_heat_PT=b.fusion_heat_PT;     //CO20201111
     vaporization_heat_PT=b.vaporization_heat_PT;     
     specific_heat_PT=b.specific_heat_PT;         
-    critical_Pressure=b.critical_Pressure;     
-    critical_Temperature_PT=b.critical_Temperature_PT;  
+    critical_pressure=b.critical_pressure;     
+    critical_temperature_PT=b.critical_temperature_PT;  
     thermal_expansion=b.thermal_expansion;     
     conductivity_thermal=b.conductivity_thermal;  
     //                                         
@@ -411,88 +427,95 @@ namespace xelement {
   xelement::xelement(uint ZZ) {free();populate(ZZ);} //CO20200520
 
   string xelement::getProperty(const string& property,const string& delim) const { //CO20201111
-    if(property==aurostd::toupper("name")) return name;
-    if(property==aurostd::toupper("symbol")) return symbol;
-    if(property==aurostd::toupper("Z")) return aurostd::utype2string(Z);
-    if(property==aurostd::toupper("period")) return aurostd::utype2string(period);
-    if(property==aurostd::toupper("group")) return aurostd::utype2string(group);
-    if(property==aurostd::toupper("series")) return series;
-    if(property==aurostd::toupper("block")) return block;
+    string c=aurostd::toupper(property);
+    if(c==aurostd::toupper("name")) return name;
+    if(c==aurostd::toupper("symbol")) return symbol;
+    if(c==aurostd::toupper("Z")) return aurostd::utype2string(Z);
+    if(c==aurostd::toupper("period")) return aurostd::utype2string(period);
+    if(c==aurostd::toupper("group")) return aurostd::utype2string(group);
+    if(c==aurostd::toupper("series")) return series;
+    if(c==aurostd::toupper("block")) return block;
     //
-    if(property==aurostd::toupper("mass")) return aurostd::utype2string(mass,_UTYPE2STRING_PREC_);
-    if(property==aurostd::toupper("molar_volume")) return aurostd::utype2string(molar_volume,_UTYPE2STRING_PREC_);
-    if(property==aurostd::toupper("volume")) return aurostd::utype2string(volume,_UTYPE2STRING_PREC_);
-    if(property==aurostd::toupper("Vm_Miedema")) return aurostd::utype2string(Vm_Miedema,_UTYPE2STRING_PREC_);
+    if(c==aurostd::toupper("mass")) return aurostd::utype2string(mass,_DOUBLE_WRITE_PRECISION_);
+    if(c==aurostd::toupper("molar_volume")) return aurostd::utype2string(molar_volume,_DOUBLE_WRITE_PRECISION_);
+    if(c==aurostd::toupper("volume")) return aurostd::utype2string(volume,_DOUBLE_WRITE_PRECISION_);
+    if(c==aurostd::toupper("Vm_Miedema")) return aurostd::utype2string(Vm_Miedema,_DOUBLE_WRITE_PRECISION_);
     //
-    if(property==aurostd::toupper("valence_std")) return aurostd::utype2string(valence_std);
-    if(property==aurostd::toupper("valence_iupac")) return aurostd::utype2string(valence_iupac);
-    if(property==aurostd::toupper("valence_PT")) return aurostd::utype2string(valence_PT);
-    if(property==aurostd::toupper("density_PT")) return aurostd::utype2string(density_PT,_UTYPE2STRING_PREC_);
-    if(property==aurostd::toupper("crystal")) return crystal;
-    if(property==aurostd::toupper("crystal_structure_PT")) return crystal_structure_PT;
-    if(property==aurostd::toupper("space_group")) return space_group;
-    if(property==aurostd::toupper("space_group_number")) return aurostd::utype2string(space_group_number);
-    if(property==aurostd::toupper("variance_parameter_mass")) return aurostd::utype2string(variance_parameter_mass,_UTYPE2STRING_PREC_);
-    if(property==aurostd::toupper("lattice_constants")) return aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(lattice_constants,_UTYPE2STRING_PREC_),delim);
-    if(property==aurostd::toupper("lattice_angles")) return aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(lattice_angles,_UTYPE2STRING_PREC_),delim);
-    if(property==aurostd::toupper("phase")) return phase;
-    if(property==aurostd::toupper("radius")) return aurostd::utype2string(radius,_UTYPE2STRING_PREC_);
-    if(property==aurostd::toupper("radius_PT")) return aurostd::utype2string(radius_PT,_UTYPE2STRING_PREC_);
-    if(property==aurostd::toupper("radius_covalent_PT")) return aurostd::utype2string(radius_covalent_PT,_UTYPE2STRING_PREC_);
-    if(property==aurostd::toupper("radius_covalent")) return aurostd::utype2string(radius_covalent,_UTYPE2STRING_PREC_);
-    if(property==aurostd::toupper("radius_VanDerWaals_PT")) return aurostd::utype2string(radius_VanDerWaals_PT,_UTYPE2STRING_PREC_);
-    if(property==aurostd::toupper("radii_Ghosh08")) return aurostd::utype2string(radii_Ghosh08,_UTYPE2STRING_PREC_);
-    if(property==aurostd::toupper("radii_Slatter")) return aurostd::utype2string(radii_Slatter,_UTYPE2STRING_PREC_);
-    if(property==aurostd::toupper("radii_Pyykko")) return aurostd::utype2string(radii_Pyykko,_UTYPE2STRING_PREC_);
+    if(c==aurostd::toupper("valence_std")) return aurostd::utype2string(valence_std);
+    if(c==aurostd::toupper("valence_iupac")) return aurostd::utype2string(valence_iupac);
+    if(c==aurostd::toupper("valence_PT")) return aurostd::utype2string(valence_PT);
+    if(c==aurostd::toupper("valence_s")) return aurostd::utype2string(valence_s); //CO20201111
+    if(c==aurostd::toupper("valence_p")) return aurostd::utype2string(valence_p); //CO20201111
+    if(c==aurostd::toupper("valence_d")) return aurostd::utype2string(valence_d); //CO20201111
+    if(c==aurostd::toupper("valence_f")) return aurostd::utype2string(valence_f); //CO20201111
+    if(c==aurostd::toupper("density_PT")) return aurostd::utype2string(density_PT,_DOUBLE_WRITE_PRECISION_);
+    if(c==aurostd::toupper("crystal")) return crystal;
+    if(c==aurostd::toupper("crystal_structure_PT")) return crystal_structure_PT;
+    if(c==aurostd::toupper("space_group")) return space_group;
+    if(c==aurostd::toupper("space_group_number")) return aurostd::utype2string(space_group_number);
+    if(c==aurostd::toupper("variance_parameter_mass")) return aurostd::utype2string(variance_parameter_mass,_DOUBLE_WRITE_PRECISION_);
+    if(c==aurostd::toupper("lattice_constants")) return aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(lattice_constants,_DOUBLE_WRITE_PRECISION_),delim);
+    if(c==aurostd::toupper("lattice_angles")) return aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(lattice_angles,_DOUBLE_WRITE_PRECISION_),delim);
+    if(c==aurostd::toupper("phase")) return phase;
+    if(c==aurostd::toupper("radius_Saxena")) return aurostd::utype2string(radius_Saxena,_DOUBLE_WRITE_PRECISION_);
+    if(c==aurostd::toupper("radius_PT")) return aurostd::utype2string(radius_PT,_DOUBLE_WRITE_PRECISION_);
+    if(c==aurostd::toupper("radius_covalent_PT")) return aurostd::utype2string(radius_covalent_PT,_DOUBLE_WRITE_PRECISION_);
+    if(c==aurostd::toupper("radius_covalent")) return aurostd::utype2string(radius_covalent,_DOUBLE_WRITE_PRECISION_);
+    if(c==aurostd::toupper("radius_VanDerWaals_PT")) return aurostd::utype2string(radius_VanDerWaals_PT,_DOUBLE_WRITE_PRECISION_);
+    if(c==aurostd::toupper("radii_Ghosh08")) return aurostd::utype2string(radii_Ghosh08,_DOUBLE_WRITE_PRECISION_);
+    if(c==aurostd::toupper("radii_Slatter")) return aurostd::utype2string(radii_Slatter,_DOUBLE_WRITE_PRECISION_);
+    if(c==aurostd::toupper("radii_Pyykko")) return aurostd::utype2string(radii_Pyykko,_DOUBLE_WRITE_PRECISION_);
     //
-    if(property==aurostd::toupper("conductivity_electrical")) return aurostd::utype2string(conductivity_electrical,_UTYPE2STRING_PREC_);
-    if(property==aurostd::toupper("electronegativity_vec")) return aurostd::utype2string(electronegativity_vec,_UTYPE2STRING_PREC_);
-    if(property==aurostd::toupper("hardness_Ghosh")) return aurostd::utype2string(hardness_Ghosh,_UTYPE2STRING_PREC_);
-    if(property==aurostd::toupper("electronegativity_Pearson")) return aurostd::utype2string(electronegativity_Pearson,_UTYPE2STRING_PREC_); //+"// (eV)
-    if(property==aurostd::toupper("electronegativity_Ghosh")) return aurostd::utype2string(electronegativity_Ghosh,_UTYPE2STRING_PREC_); //+"// (eV)
-    if(property==aurostd::toupper("electronegativity_Allen")) return aurostd::utype2string(electronegativity_Allen,_UTYPE2STRING_PREC_); //CO20200731
-    if(property==aurostd::toupper("oxidation_states")) return aurostd::joinWDelimiter(aurostd::vecDouble2vecString(oxidation_states,_UTYPE2STRING_PREC_),delim); //CO20200731
-    if(property==aurostd::toupper("oxidation_states_preferred")) return aurostd::joinWDelimiter(aurostd::vecDouble2vecString(oxidation_states_preferred,_UTYPE2STRING_PREC_),delim); //CO20200731
-    if(property==aurostd::toupper("electron_affinity_PT")) return aurostd::utype2string(electron_affinity_PT,_UTYPE2STRING_PREC_);
-    if(property==aurostd::toupper("phi_star_Miedema")) return aurostd::utype2string(phi_star_Miedema,_UTYPE2STRING_PREC_);
-    if(property==aurostd::toupper("nws_Miedema")) return aurostd::utype2string(nws_Miedema,_UTYPE2STRING_PREC_);
-    if(property==aurostd::toupper("gamma_s_Miedema")) return aurostd::utype2string(gamma_s_Miedema,_UTYPE2STRING_PREC_);
+    if(c==aurostd::toupper("conductivity_electrical")) return aurostd::utype2string(conductivity_electrical,_DOUBLE_WRITE_PRECISION_);
+    if(c==aurostd::toupper("electronegativity_vec")) return aurostd::utype2string(electronegativity_vec,_DOUBLE_WRITE_PRECISION_);
+    if(c==aurostd::toupper("hardness_Ghosh")) return aurostd::utype2string(hardness_Ghosh,_DOUBLE_WRITE_PRECISION_);
+    if(c==aurostd::toupper("electronegativity_Pearson")) return aurostd::utype2string(electronegativity_Pearson,_DOUBLE_WRITE_PRECISION_); //+"// (eV)
+    if(c==aurostd::toupper("electronegativity_Ghosh")) return aurostd::utype2string(electronegativity_Ghosh,_DOUBLE_WRITE_PRECISION_); //+"// (eV)
+    if(c==aurostd::toupper("electronegativity_Allen")) return aurostd::utype2string(electronegativity_Allen,_DOUBLE_WRITE_PRECISION_); //CO20200731
+    if(c==aurostd::toupper("oxidation_states")) return aurostd::joinWDelimiter(aurostd::vecDouble2vecString(oxidation_states,_DOUBLE_WRITE_PRECISION_),delim); //CO20201111
+    if(c==aurostd::toupper("oxidation_states_preferred")) return aurostd::joinWDelimiter(aurostd::vecDouble2vecString(oxidation_states_preferred,_DOUBLE_WRITE_PRECISION_),delim); //CO20200731
+    if(c==aurostd::toupper("electron_affinity_PT")) return aurostd::utype2string(electron_affinity_PT,_DOUBLE_WRITE_PRECISION_);
+    if(c==aurostd::toupper("energies_ionization")) return aurostd::joinWDelimiter(aurostd::vecDouble2vecString(energies_ionization,_DOUBLE_WRITE_PRECISION_),delim); //CO20201111
+    if(c==aurostd::toupper("phi_star_Miedema")) return aurostd::utype2string(phi_star_Miedema,_DOUBLE_WRITE_PRECISION_);
+    if(c==aurostd::toupper("nws_Miedema")) return aurostd::utype2string(nws_Miedema,_DOUBLE_WRITE_PRECISION_);
+    if(c==aurostd::toupper("gamma_s_Miedema")) return aurostd::utype2string(gamma_s_Miedema,_DOUBLE_WRITE_PRECISION_);
     //
-    if(property==aurostd::toupper("scale_Pettifor")) return aurostd::utype2string(scale_Pettifor,_UTYPE2STRING_PREC_); 
+    if(c==aurostd::toupper("scale_Pettifor")) return aurostd::utype2string(scale_Pettifor,_DOUBLE_WRITE_PRECISION_); 
     //
-    if(property==aurostd::toupper("temperature_boiling")) return aurostd::utype2string(temperature_boiling,_UTYPE2STRING_PREC_);
-    if(property==aurostd::toupper("temperature_melting")) return aurostd::utype2string(temperature_melting,_UTYPE2STRING_PREC_);
-    if(property==aurostd::toupper("vaporization_heat_PT")) return aurostd::utype2string(vaporization_heat_PT,_UTYPE2STRING_PREC_);
-    if(property==aurostd::toupper("specific_heat_PT")) return aurostd::utype2string(specific_heat_PT,_UTYPE2STRING_PREC_);
-    if(property==aurostd::toupper("critical_Pressure")) return aurostd::utype2string(critical_Pressure,_UTYPE2STRING_PREC_); 
-    if(property==aurostd::toupper("critical_Temperature_PT")) return aurostd::utype2string(critical_Temperature_PT,_UTYPE2STRING_PREC_); 
-    if(property==aurostd::toupper("thermal_expansion")) return aurostd::utype2string(thermal_expansion,_UTYPE2STRING_PREC_);
-    if(property==aurostd::toupper("conductivity_thermal")) return aurostd::utype2string(conductivity_thermal,_UTYPE2STRING_PREC_);
+    if(c==aurostd::toupper("temperature_boiling")) return aurostd::utype2string(temperature_boiling,_DOUBLE_WRITE_PRECISION_);
+    if(c==aurostd::toupper("temperature_melting")) return aurostd::utype2string(temperature_melting,_DOUBLE_WRITE_PRECISION_);
+    if(c==aurostd::toupper("fusion_heat_PT")) return aurostd::utype2string(fusion_heat_PT,_DOUBLE_WRITE_PRECISION_);  //CO20201111
+    if(c==aurostd::toupper("vaporization_heat_PT")) return aurostd::utype2string(vaporization_heat_PT,_DOUBLE_WRITE_PRECISION_);
+    if(c==aurostd::toupper("specific_heat_PT")) return aurostd::utype2string(specific_heat_PT,_DOUBLE_WRITE_PRECISION_);
+    if(c==aurostd::toupper("critical_pressure")) return aurostd::utype2string(critical_pressure,_DOUBLE_WRITE_PRECISION_); 
+    if(c==aurostd::toupper("critical_temperature_PT")) return aurostd::utype2string(critical_temperature_PT,_DOUBLE_WRITE_PRECISION_); 
+    if(c==aurostd::toupper("thermal_expansion")) return aurostd::utype2string(thermal_expansion,_DOUBLE_WRITE_PRECISION_);
+    if(c==aurostd::toupper("conductivity_thermal")) return aurostd::utype2string(conductivity_thermal,_DOUBLE_WRITE_PRECISION_);
     //
-    if(property==aurostd::toupper("hardness_Brinell")) return aurostd::utype2string(hardness_Brinell,_UTYPE2STRING_PREC_);
-    if(property==aurostd::toupper("hardness_Mohs")) return aurostd::utype2string(hardness_Mohs,_UTYPE2STRING_PREC_);
-    if(property==aurostd::toupper("hardness_Vickers")) return aurostd::utype2string(hardness_Vickers,_UTYPE2STRING_PREC_);
-    if(property==aurostd::toupper("hardness_Pearson")) return aurostd::utype2string(hardness_Pearson,_UTYPE2STRING_PREC_);
-    if(property==aurostd::toupper("hardness_Putz")) return aurostd::utype2string(hardness_Putz,_UTYPE2STRING_PREC_);
-    if(property==aurostd::toupper("hardness_RB")) return aurostd::utype2string(hardness_RB,_UTYPE2STRING_PREC_);
-    if(property==aurostd::toupper("modulus_shear")) return aurostd::utype2string(modulus_shear,_UTYPE2STRING_PREC_);
-    if(property==aurostd::toupper("modulus_Young")) return aurostd::utype2string(modulus_Young,_UTYPE2STRING_PREC_);
-    if(property==aurostd::toupper("modulus_bulk")) return aurostd::utype2string(modulus_bulk,_UTYPE2STRING_PREC_);
-    if(property==aurostd::toupper("Poisson_ratio_PT")) return aurostd::utype2string(Poisson_ratio_PT,_UTYPE2STRING_PREC_);
-    if(property==aurostd::toupper("BVm_Miedema")) return aurostd::utype2string(BVm_Miedema,_UTYPE2STRING_PREC_);
+    if(c==aurostd::toupper("hardness_Brinell")) return aurostd::utype2string(hardness_Brinell,_DOUBLE_WRITE_PRECISION_);
+    if(c==aurostd::toupper("hardness_Mohs")) return aurostd::utype2string(hardness_Mohs,_DOUBLE_WRITE_PRECISION_);
+    if(c==aurostd::toupper("hardness_Vickers")) return aurostd::utype2string(hardness_Vickers,_DOUBLE_WRITE_PRECISION_);
+    if(c==aurostd::toupper("hardness_Pearson")) return aurostd::utype2string(hardness_Pearson,_DOUBLE_WRITE_PRECISION_);
+    if(c==aurostd::toupper("hardness_Putz")) return aurostd::utype2string(hardness_Putz,_DOUBLE_WRITE_PRECISION_);
+    if(c==aurostd::toupper("hardness_RB")) return aurostd::utype2string(hardness_RB,_DOUBLE_WRITE_PRECISION_);
+    if(c==aurostd::toupper("modulus_shear")) return aurostd::utype2string(modulus_shear,_DOUBLE_WRITE_PRECISION_);
+    if(c==aurostd::toupper("modulus_Young")) return aurostd::utype2string(modulus_Young,_DOUBLE_WRITE_PRECISION_);
+    if(c==aurostd::toupper("modulus_bulk")) return aurostd::utype2string(modulus_bulk,_DOUBLE_WRITE_PRECISION_);
+    if(c==aurostd::toupper("Poisson_ratio_PT")) return aurostd::utype2string(Poisson_ratio_PT,_DOUBLE_WRITE_PRECISION_);
+    if(c==aurostd::toupper("BVm_Miedema")) return aurostd::utype2string(BVm_Miedema,_DOUBLE_WRITE_PRECISION_);
     //
-    if(property==aurostd::toupper("magnetic_type_PT")) return magnetic_type_PT;
-    if(property==aurostd::toupper("susceptibility_magnetic_mass")) return aurostd::utype2string(susceptibility_magnetic_mass,_UTYPE2STRING_PREC_);
-    if(property==aurostd::toupper("susceptibility_magnetic_volume")) return aurostd::utype2string(susceptibility_magnetic_volume,_UTYPE2STRING_PREC_);
-    if(property==aurostd::toupper("susceptibility_magnetic_molar")) return aurostd::utype2string(susceptibility_magnetic_molar,_UTYPE2STRING_PREC_);
-    if(property==aurostd::toupper("temperature_Curie")) return aurostd::utype2string(temperature_Curie,_UTYPE2STRING_PREC_);
+    if(c==aurostd::toupper("magnetic_type_PT")) return magnetic_type_PT;
+    if(c==aurostd::toupper("susceptibility_magnetic_mass")) return aurostd::utype2string(susceptibility_magnetic_mass,_DOUBLE_WRITE_PRECISION_);
+    if(c==aurostd::toupper("susceptibility_magnetic_volume")) return aurostd::utype2string(susceptibility_magnetic_volume,_DOUBLE_WRITE_PRECISION_);
+    if(c==aurostd::toupper("susceptibility_magnetic_molar")) return aurostd::utype2string(susceptibility_magnetic_molar,_DOUBLE_WRITE_PRECISION_);
+    if(c==aurostd::toupper("temperature_Curie")) return aurostd::utype2string(temperature_Curie,_DOUBLE_WRITE_PRECISION_);
     //
-    if(property==aurostd::toupper("refractive_index")) return aurostd::utype2string(refractive_index,_UTYPE2STRING_PREC_);
-    if(property==aurostd::toupper("color_PT")) return color_PT;
+    if(c==aurostd::toupper("refractive_index")) return aurostd::utype2string(refractive_index,_DOUBLE_WRITE_PRECISION_);
+    if(c==aurostd::toupper("color_PT")) return color_PT;
     //
-    if(property==aurostd::toupper("HHIP")) return aurostd::utype2string(HHIP,_UTYPE2STRING_PREC_);
-    if(property==aurostd::toupper("HHIR")) return aurostd::utype2string(HHIR,_UTYPE2STRING_PREC_);
-    if(property==aurostd::toupper("xray_scatt")) return aurostd::utype2string(xray_scatt,_UTYPE2STRING_PREC_);
+    if(c==aurostd::toupper("HHIP")) return aurostd::utype2string(HHIP,_DOUBLE_WRITE_PRECISION_);
+    if(c==aurostd::toupper("HHIR")) return aurostd::utype2string(HHIR,_DOUBLE_WRITE_PRECISION_);
+    if(c==aurostd::toupper("xray_scatt")) return aurostd::utype2string(xray_scatt,_DOUBLE_WRITE_PRECISION_);
     return "";
   }
 
@@ -556,6 +579,10 @@ namespace xelement {
       valence_std=1;
       valence_iupac=1;
       valence_PT=1;
+      valence_s=1;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=0.899E-4;
       crystal="hex";
       crystal_structure_PT="Simple_Hexagonal";
@@ -565,7 +592,7 @@ namespace xelement {
       lattice_constants[1]=470;lattice_constants[2]=470;lattice_constants[3]=340;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=2*PI/3;
       phase="Gas";
-      radius=0.046;
+      radius_Saxena=0.046;
       radius_PT=53;
       radius_covalent=0.31;
       radius_covalent_PT=31;
@@ -579,19 +606,21 @@ namespace xelement {
       electronegativity_Pearson=7.18;
       electronegativity_Ghosh=7.178;
       electronegativity_Allen=2.300;  //RF+SK20200410
-      oxidation_states.clear();oxidation_states.push_back(1); oxidation_states.push_back(-1);  //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(1);oxidation_states.push_back(-1);  //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(1);  //RF+SK20200410
       electron_affinity_PT=72.8;
+      energies_ionization.clear();energies_ionization.push_back(1312);  //CO20201111
       phi_star_Miedema=5.2;
       nws_Miedema=1.5;
       gamma_s_Miedema=NNN;
       scale_Pettifor=0;
       temperature_boiling=-252.87;
       temperature_melting=-259.14;
+      fusion_heat_PT=0.558;  //CO20201111
       vaporization_heat_PT=0.452;
       specific_heat_PT=14300;
-      critical_Pressure=12.76;
-      critical_Temperature_PT=32.97;
+      critical_pressure=12.76;
+      critical_temperature_PT=32.97;
       thermal_expansion=NNN;
       conductivity_thermal=0.1805;
       hardness_Brinell=NNN;
@@ -639,6 +668,10 @@ namespace xelement {
       valence_std=0;
       valence_iupac=0;
       valence_PT=0;
+      valence_s=2;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=1.785E-4;
       crystal="hcp";
       crystal_structure_PT="Face-centered_Cubic";
@@ -648,7 +681,7 @@ namespace xelement {
       lattice_constants[1]=424.2;lattice_constants[2]=424.2;lattice_constants[3]=424.2;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=PI/2;
       phase="Gas";
-      radius=NNN;
+      radius_Saxena=NNN;
       radius_PT=31;
       radius_covalent=0.28;
       radius_covalent_PT=28;
@@ -665,16 +698,18 @@ namespace xelement {
       oxidation_states.clear();oxidation_states.push_back(NNN);  //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
       electron_affinity_PT=0;
+      energies_ionization.clear();energies_ionization.push_back(2372.3);energies_ionization.push_back(5250.5);  //CO20201111
       phi_star_Miedema=NNN;
       nws_Miedema=NNN;
       gamma_s_Miedema=NNN;
       scale_Pettifor=0;
       temperature_boiling=-268.93;
       temperature_melting=NNN;
+      fusion_heat_PT=0.02;  //CO20201111
       vaporization_heat_PT=0.083;
       specific_heat_PT=5193.1;
-      critical_Pressure=2.24;
-      critical_Temperature_PT=5.19;
+      critical_pressure=2.24;
+      critical_temperature_PT=5.19;
       thermal_expansion=NNN;
       conductivity_thermal=0.1513;
       hardness_Brinell=NNN;
@@ -724,6 +759,10 @@ namespace xelement {
       valence_std=1;
       valence_iupac=1;
       valence_PT=1;
+      valence_s=1;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=0.535;
       crystal="bcc";
       crystal_structure_PT="Body-centered_Cubic";
@@ -733,7 +772,7 @@ namespace xelement {
       lattice_constants[1]=351;lattice_constants[2]=351;lattice_constants[3]=351;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=PI/2;
       phase="Solid";
-      radius=0.152;
+      radius_Saxena=0.152;
       radius_PT=167;
       radius_covalent=1.28;
       radius_covalent_PT=128;
@@ -750,16 +789,18 @@ namespace xelement {
       oxidation_states.clear();oxidation_states.push_back(1);  //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(1);  //RF+SK20200410
       electron_affinity_PT=59.6;
+      energies_ionization.clear();energies_ionization.push_back(520.2);energies_ionization.push_back(7298.1);energies_ionization.push_back(11815);  //CO20201111
       phi_star_Miedema=2.85;
       nws_Miedema=0.98;
       gamma_s_Miedema=530;
       scale_Pettifor=0.45;
       temperature_boiling=1342;
       temperature_melting=180.54;
+      fusion_heat_PT=3;  //CO20201111
       vaporization_heat_PT=147;
       specific_heat_PT=3570;
-      critical_Pressure=661.2;
-      critical_Temperature_PT=3223;
+      critical_pressure=661.2;
+      critical_temperature_PT=3223;
       thermal_expansion=0.000046;
       conductivity_thermal=85;
       hardness_Brinell=NNN;
@@ -807,6 +848,10 @@ namespace xelement {
       valence_std=2;
       valence_iupac=2;
       valence_PT=2;
+      valence_s=2;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=1.848;
       crystal="hcp";
       crystal_structure_PT="Simple_Hexagonal";
@@ -816,7 +861,7 @@ namespace xelement {
       lattice_constants[1]=228.58;lattice_constants[2]=228.58;lattice_constants[3]=358.43;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=2*PI/3;
       phase="Solid";
-      radius=0.114;
+      radius_Saxena=0.114;
       radius_PT=112;
       radius_covalent=0.96;
       radius_covalent_PT=96;
@@ -833,16 +878,18 @@ namespace xelement {
       oxidation_states.clear();oxidation_states.push_back(2);  //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(2);  //RF+SK20200410
       electron_affinity_PT=0;
+      energies_ionization.clear();energies_ionization.push_back(899.5);energies_ionization.push_back(1757.1);energies_ionization.push_back(14848.7);energies_ionization.push_back(21006.6);  //CO20201111
       phi_star_Miedema=4.20;
       nws_Miedema=1.60;
       gamma_s_Miedema=1900;
       scale_Pettifor=1.50;
       temperature_boiling=2470;
       temperature_melting=1287;
+      fusion_heat_PT=7.95;  //CO20201111
       vaporization_heat_PT=297;
       specific_heat_PT=1820;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=0.0000113;
       conductivity_thermal=190;
       hardness_Brinell=600;
@@ -891,6 +938,10 @@ namespace xelement {
       valence_std=3;
       valence_iupac=3;
       valence_PT=3;
+      valence_s=2;  //CO20201111
+      valence_p=1;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=2.46;
       crystal="tet";
       crystal_structure_PT="Simple_Trigonal";
@@ -900,7 +951,7 @@ namespace xelement {
       lattice_constants[1]=506;lattice_constants[2]=506;lattice_constants[3]=506;
       lattice_angles[1]=1.01334;lattice_angles[2]=1.01334;lattice_angles[3]=1.01334;
       phase="Solid";
-      radius=0.097;
+      radius_Saxena=0.097;
       radius_PT=87;
       radius_covalent=0.84;
       radius_covalent_PT=85;
@@ -917,16 +968,18 @@ namespace xelement {
       oxidation_states.clear();oxidation_states.push_back(3);  //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);  //RF+SK20200410
       electron_affinity_PT=26.7;
+      energies_ionization.clear();energies_ionization.push_back(800.6);energies_ionization.push_back(2427.1);energies_ionization.push_back(3659.7);energies_ionization.push_back(25025.8);energies_ionization.push_back(32826.7);  //CO20201111
       phi_star_Miedema=4.75;
       nws_Miedema=1.55;
       gamma_s_Miedema=NNN;
       scale_Pettifor=2.00;
       temperature_boiling=4000;
       temperature_melting=2075;
+      fusion_heat_PT=50;  //CO20201111
       vaporization_heat_PT=507;
       specific_heat_PT=1030;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=6E-6;
       conductivity_thermal=27;
       hardness_Brinell=NNN;
@@ -974,6 +1027,10 @@ namespace xelement {
       valence_std=4;
       valence_iupac=4;
       valence_PT=4;
+      valence_s=2;  //CO20201111
+      valence_p=2;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=2.26;
       crystal="dia";
       crystal_structure_PT="Simple_Hexagonal";
@@ -983,7 +1040,7 @@ namespace xelement {
       lattice_constants[1]=246.4;lattice_constants[2]=246.4;lattice_constants[3]=671.1;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=2*PI/3;
       phase="Solid";
-      radius=0.077;
+      radius_Saxena=0.077;
       radius_PT=67;
       radius_covalent=0.76;
       radius_covalent_PT=76;
@@ -997,19 +1054,21 @@ namespace xelement {
       electronegativity_Pearson=6.27;
       electronegativity_Ghosh=6.116;
       electronegativity_Allen=2.544;  //RF+SK20200410
-      oxidation_states.clear();oxidation_states.push_back(4); oxidation_states.push_back(2); oxidation_states.push_back(-4); //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(4);oxidation_states.push_back(2);oxidation_states.push_back(-4); //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(4); oxidation_states_preferred.push_back(-4);  //RF+SK20200410
       electron_affinity_PT=153.9;
+      energies_ionization.clear();energies_ionization.push_back(1086.5);energies_ionization.push_back(2352.6);energies_ionization.push_back(4620.5);energies_ionization.push_back(6222.7);energies_ionization.push_back(37831);energies_ionization.push_back(47277);  //CO20201111
       phi_star_Miedema=6.20;
       nws_Miedema=1.90;
       gamma_s_Miedema=NNN;
       scale_Pettifor=2.50;
       temperature_boiling=4027;
       temperature_melting=3550;
+      fusion_heat_PT=105;  //CO20201111
       vaporization_heat_PT=715;
       specific_heat_PT=710;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=7.1E-6;
       conductivity_thermal=140;
       hardness_Brinell=NNN;
@@ -1057,6 +1116,10 @@ namespace xelement {
       valence_std=5;
       valence_iupac=5;
       valence_PT=3;
+      valence_s=2;  //CO20201111
+      valence_p=3;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=12.51E-4;
       crystal="hex";
       crystal_structure_PT="Simple_Hexagonal";
@@ -1066,7 +1129,7 @@ namespace xelement {
       lattice_constants[1]=386.1;lattice_constants[2]=386.1;lattice_constants[3]=626.5;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=2*PI/3;
       phase="Gas";
-      radius=0.071;
+      radius_Saxena=0.071;
       radius_PT=56;
       radius_covalent=0.71;
       radius_covalent_PT=71;
@@ -1080,19 +1143,21 @@ namespace xelement {
       electronegativity_Pearson=7.30;
       electronegativity_Ghosh=7.209;
       electronegativity_Allen=3.066;  //RF+SK20200410
-      oxidation_states.clear();oxidation_states.push_back(5); oxidation_states.push_back(4); oxidation_states.push_back(3); oxidation_states.push_back(2); oxidation_states.push_back(-3); //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(5);oxidation_states.push_back(4);oxidation_states.push_back(3);oxidation_states.push_back(2);oxidation_states.push_back(-3); //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(-3); //RF+SK20200410
       electron_affinity_PT=7;
+      energies_ionization.clear();energies_ionization.push_back(1402.3);energies_ionization.push_back(2856);energies_ionization.push_back(4578.1);energies_ionization.push_back(7475);energies_ionization.push_back(9444.9);energies_ionization.push_back(53266.6);energies_ionization.push_back(64360);  //CO20201111
       phi_star_Miedema=7.00;
       nws_Miedema=1.60;
       gamma_s_Miedema=NNN;
       scale_Pettifor=3.00;
       temperature_boiling=-195.79;
       temperature_melting=-210.1;
+      fusion_heat_PT=0.36;  //CO20201111
       vaporization_heat_PT=2.79;
       specific_heat_PT=1040;
-      critical_Pressure=33.46;
-      critical_Temperature_PT=126.21;
+      critical_pressure=33.46;
+      critical_temperature_PT=126.21;
       thermal_expansion=NNN;
       conductivity_thermal=0.02583;
       hardness_Brinell=NNN;
@@ -1140,6 +1205,10 @@ namespace xelement {
       valence_std=6;
       valence_iupac=2;
       valence_PT=2;
+      valence_s=2;  //CO20201111
+      valence_p=4;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=14.29E-4;
       crystal="cub";
       crystal_structure_PT="Base-centered_Monoclinic";
@@ -1149,7 +1218,7 @@ namespace xelement {
       lattice_constants[1]=540.3;lattice_constants[2]=342.9;lattice_constants[3]=508.6;
       lattice_angles[1]=PI/2;lattice_angles[2]=2.313085;lattice_angles[3]=PI/2;
       phase="Gas";
-      radius=0.060;
+      radius_Saxena=0.060;
       radius_PT=48;
       radius_covalent=0.66;
       radius_covalent_PT=66;
@@ -1163,19 +1232,21 @@ namespace xelement {
       electronegativity_Pearson=7.54;
       electronegativity_Ghosh=8.287;
       electronegativity_Allen=3.610;  //RF+SK20200410
-      oxidation_states.clear();oxidation_states.push_back(-0.5); oxidation_states.push_back(-1); oxidation_states.push_back(-2); //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(-0.5);oxidation_states.push_back(-1);oxidation_states.push_back(-2); //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(-2); //RF+SK20200410
       electron_affinity_PT=141;
+      energies_ionization.clear();energies_ionization.push_back(1313.9);energies_ionization.push_back(3388.3);energies_ionization.push_back(5300.5);energies_ionization.push_back(7469.2);energies_ionization.push_back(10989.5);energies_ionization.push_back(13326.5);energies_ionization.push_back(71330);energies_ionization.push_back(84078);  //CO20201111
       phi_star_Miedema=6.97;
       nws_Miedema=1.70;
       gamma_s_Miedema=NNN;
       scale_Pettifor=3.50;
       temperature_boiling=-182.9;
       temperature_melting=-218.3;
+      fusion_heat_PT=0.222;  //CO20201111
       vaporization_heat_PT=3.41;
       specific_heat_PT=919;
-      critical_Pressure=49.77;
-      critical_Temperature_PT=154.59;
+      critical_pressure=49.77;
+      critical_temperature_PT=154.59;
       thermal_expansion=NNN;
       conductivity_thermal=0.02658;
       hardness_Brinell=NNN;
@@ -1223,6 +1294,10 @@ namespace xelement {
       valence_std=7;
       valence_iupac=1;
       valence_PT=1;
+      valence_s=2;  //CO20201111
+      valence_p=5;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=16.96E-4;
       crystal="mcl";
       crystal_structure_PT="Base-centered_Monoclinic";
@@ -1232,7 +1307,7 @@ namespace xelement {
       lattice_constants[1]=550;lattice_constants[2]=328;lattice_constants[3]=728;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=PI/2;
       phase="Gas";
-      radius=NNN;
+      radius_Saxena=NNN;
       radius_PT=42;
       radius_covalent=0.57;
       radius_covalent_PT=57;
@@ -1249,16 +1324,18 @@ namespace xelement {
       oxidation_states.clear();oxidation_states.push_back(-1); //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(-1); //RF+SK20200410
       electron_affinity_PT=328;
+      energies_ionization.clear();energies_ionization.push_back(1681);energies_ionization.push_back(3374.2);energies_ionization.push_back(6050.4);energies_ionization.push_back(8407.7);energies_ionization.push_back(11022.7);energies_ionization.push_back(15164.1);energies_ionization.push_back(17868);energies_ionization.push_back(92038.1);energies_ionization.push_back(106434.3);  //CO20201111
       phi_star_Miedema=NNN;
       nws_Miedema=NNN;
       gamma_s_Miedema=NNN;
       scale_Pettifor=4.00;
       temperature_boiling=-188.12;
       temperature_melting=-219.6;
+      fusion_heat_PT=0.26;  //CO20201111
       vaporization_heat_PT=3.27;
       specific_heat_PT=824;
-      critical_Pressure=51.04;
-      critical_Temperature_PT=144.13;
+      critical_pressure=51.04;
+      critical_temperature_PT=144.13;
       thermal_expansion=NNN;
       conductivity_thermal=0.0277;
       hardness_Brinell=NNN;
@@ -1306,6 +1383,10 @@ namespace xelement {
       valence_std=0;
       valence_iupac=0;
       valence_PT=0;
+      valence_s=2;  //CO20201111
+      valence_p=6;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=9E-4;
       crystal="fcc";
       crystal_structure_PT="Face-centered_Cubic";
@@ -1315,7 +1396,7 @@ namespace xelement {
       lattice_constants[1]=442.9;lattice_constants[2]=442.9;lattice_constants[3]=442.9;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=PI/2;
       phase="Gas";
-      radius=0.160;
+      radius_Saxena=0.160;
       radius_PT=38;
       radius_covalent=0.58;
       radius_covalent_PT=58;
@@ -1332,16 +1413,18 @@ namespace xelement {
       oxidation_states.clear();oxidation_states.push_back(NNN);  //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
       electron_affinity_PT=0;
+      energies_ionization.clear();energies_ionization.push_back(2080.7);energies_ionization.push_back(3952.3);energies_ionization.push_back(6122);energies_ionization.push_back(9371);energies_ionization.push_back(12177);energies_ionization.push_back(15238);energies_ionization.push_back(19999);energies_ionization.push_back(23069.5);energies_ionization.push_back(115379.5);energies_ionization.push_back(131432);  //CO20201111
       phi_star_Miedema=NNN;
       nws_Miedema=NNN;
       gamma_s_Miedema=NNN;
       scale_Pettifor=0;
       temperature_boiling=-246.08;
       temperature_melting=-248.59;
+      fusion_heat_PT=0.34;  //CO20201111
       vaporization_heat_PT=1.75;
       specific_heat_PT=1030;
-      critical_Pressure=27.24;
-      critical_Temperature_PT=44.4;
+      critical_pressure=27.24;
+      critical_temperature_PT=44.4;
       thermal_expansion=NNN;
       conductivity_thermal=0.0491;
       hardness_Brinell=NNN;
@@ -1391,6 +1474,10 @@ namespace xelement {
       valence_std=1;
       valence_iupac=1;
       valence_PT=1;
+      valence_s=1;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=0.968;
       crystal="bcc";
       crystal_structure_PT="Body-centered_Cubic";
@@ -1400,7 +1487,7 @@ namespace xelement {
       lattice_constants[1]=429.06;lattice_constants[2]=429.06;lattice_constants[3]=429.06;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=PI/2;
       phase="Solid";
-      radius=0.186;
+      radius_Saxena=0.186;
       radius_PT=190;
       radius_covalent=1.66;
       radius_covalent_PT=166;
@@ -1417,16 +1504,18 @@ namespace xelement {
       oxidation_states.clear();oxidation_states.push_back(1);  //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(1);  //RF+SK20200410
       electron_affinity_PT=52.8;
+      energies_ionization.clear();energies_ionization.push_back(495.8);energies_ionization.push_back(4562);energies_ionization.push_back(6910.3);energies_ionization.push_back(9543);energies_ionization.push_back(13354);energies_ionization.push_back(16613);energies_ionization.push_back(20117);energies_ionization.push_back(25496);energies_ionization.push_back(28932);energies_ionization.push_back(141362);  //CO20201111
       phi_star_Miedema=2.70;
       nws_Miedema=0.82;
       gamma_s_Miedema=260;
       scale_Pettifor=0.40;
       temperature_boiling=883;
       temperature_melting=97.72;
+      fusion_heat_PT=2.6;  //CO20201111
       vaporization_heat_PT=97.7;
       specific_heat_PT=1230;
-      critical_Pressure=345.4;
-      critical_Temperature_PT=2573;
+      critical_pressure=345.4;
+      critical_temperature_PT=2573;
       thermal_expansion=0.00007;
       conductivity_thermal=140;
       hardness_Brinell=0.69;
@@ -1474,6 +1563,10 @@ namespace xelement {
       valence_std=2;
       valence_iupac=2;
       valence_PT=2;
+      valence_s=2;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=1.738;
       crystal="hcp";
       crystal_structure_PT="Simple_Hexagonal";
@@ -1483,7 +1576,7 @@ namespace xelement {
       lattice_constants[1]=320.94;lattice_constants[2]=320.94;lattice_constants[3]=521.08;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=2*PI/3;
       phase="Solid";
-      radius=0.160;
+      radius_Saxena=0.160;
       radius_PT=145;
       radius_covalent=1.41;
       radius_covalent_PT=141;
@@ -1500,16 +1593,18 @@ namespace xelement {
       oxidation_states.clear();oxidation_states.push_back(2);  //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(2);  //RF+SK20200410
       electron_affinity_PT=0;
+      energies_ionization.clear();energies_ionization.push_back(737.7);energies_ionization.push_back(1450.7);energies_ionization.push_back(7732.7);energies_ionization.push_back(10542.5);energies_ionization.push_back(13630);energies_ionization.push_back(18020);energies_ionization.push_back(21711);energies_ionization.push_back(25661);energies_ionization.push_back(31653);energies_ionization.push_back(35458);  //CO20201111
       phi_star_Miedema=3.45;
       nws_Miedema=1.17;
       gamma_s_Miedema=790;
       scale_Pettifor=1.28;
       temperature_boiling=1090;
       temperature_melting=650;
+      fusion_heat_PT=8.7;  //CO20201111
       vaporization_heat_PT=128;
       specific_heat_PT=1020;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=0.0000248;
       conductivity_thermal=160;
       hardness_Brinell=260;
@@ -1558,6 +1653,10 @@ namespace xelement {
       valence_std=3;
       valence_iupac=3;
       valence_PT=3;
+      valence_s=2;  //CO20201111
+      valence_p=1;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=2.7;
       crystal="fcc";
       crystal_structure_PT="Face-centered_Cubic";
@@ -1567,7 +1666,7 @@ namespace xelement {
       lattice_constants[1]=404.95;lattice_constants[2]=404.95;lattice_constants[3]=404.95;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=PI/2;
       phase="Solid";
-      radius=0.143;
+      radius_Saxena=0.143;
       radius_PT=118;
       radius_covalent=1.21;
       radius_covalent_PT=121;
@@ -1584,16 +1683,18 @@ namespace xelement {
       oxidation_states.clear();oxidation_states.push_back(3);  //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);  //RF+SK20200410
       electron_affinity_PT=42.5;
+      energies_ionization.clear();energies_ionization.push_back(577.5);energies_ionization.push_back(1816.7);energies_ionization.push_back(2744.8);energies_ionization.push_back(11577);energies_ionization.push_back(14842);energies_ionization.push_back(18379);energies_ionization.push_back(23326);energies_ionization.push_back(27465);energies_ionization.push_back(31853);energies_ionization.push_back(38473);  //CO20201111
       phi_star_Miedema=4.20;
       nws_Miedema=1.39;
       gamma_s_Miedema=1200;
       scale_Pettifor=1.66;
       temperature_boiling=2519;
       temperature_melting=660.32;
+      fusion_heat_PT=10.7;  //CO20201111
       vaporization_heat_PT=293;
       specific_heat_PT=904;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=0.0000231;
       conductivity_thermal=235;
       hardness_Brinell=245;
@@ -1641,6 +1742,10 @@ namespace xelement {
       valence_std=4;
       valence_iupac=4;
       valence_PT=4;
+      valence_s=2;  //CO20201111
+      valence_p=2;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=2.33;
       crystal="dia";
       crystal_structure_PT="Tetrahedral_Packing";
@@ -1650,7 +1755,7 @@ namespace xelement {
       lattice_constants[1]=543.09;lattice_constants[2]=543.09;lattice_constants[3]=543.09;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=PI/2;
       phase="Solid";
-      radius=0.117;
+      radius_Saxena=0.117;
       radius_PT=111;
       radius_covalent=1.11;
       radius_covalent_PT=111;
@@ -1664,19 +1769,21 @@ namespace xelement {
       electronegativity_Pearson=4.77;
       electronegativity_Ghosh=4.857;
       electronegativity_Allen=1.916;  //RF+SK20200410
-      oxidation_states.clear();oxidation_states.push_back(4); oxidation_states.push_back(-4);  //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(4);oxidation_states.push_back(-4);  //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(4);  //RF+SK20200410
       electron_affinity_PT=133.6;
+      energies_ionization.clear();energies_ionization.push_back(786.5);energies_ionization.push_back(1577.1);energies_ionization.push_back(3231.6);energies_ionization.push_back(4355.5);energies_ionization.push_back(16091);energies_ionization.push_back(19805);energies_ionization.push_back(23780);energies_ionization.push_back(29287);energies_ionization.push_back(33878);energies_ionization.push_back(38726);  //CO20201111
       phi_star_Miedema=4.70;
       nws_Miedema=1.50;
       gamma_s_Miedema=1290;
       scale_Pettifor=1.92;
       temperature_boiling=2900;
       temperature_melting=1414;
+      fusion_heat_PT=50.2;  //CO20201111
       vaporization_heat_PT=359;
       specific_heat_PT=710;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=2.6E-6;
       conductivity_thermal=150;
       hardness_Brinell=NNN;
@@ -1724,6 +1831,10 @@ namespace xelement {
       valence_std=5;
       valence_iupac=5;
       valence_PT=5;
+      valence_s=2;  //CO20201111
+      valence_p=3;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=1.823;
       crystal="cub";
       crystal_structure_PT="Simple_Triclinic";
@@ -1733,7 +1844,7 @@ namespace xelement {
       lattice_constants[1]=1145;lattice_constants[2]=550.3;lattice_constants[3]=1126.1;
       lattice_angles[1]=1.25384;lattice_angles[2]=1.57725;lattice_angles[3]=1.24896;
       phase="Solid";
-      radius=0.109;
+      radius_Saxena=0.109;
       radius_PT=98;
       radius_covalent=1.07;
       radius_covalent_PT=107;
@@ -1747,19 +1858,21 @@ namespace xelement {
       electronegativity_Pearson=5.62;
       electronegativity_Ghosh=5.631;
       electronegativity_Allen=2.253;  //RF+SK20200410
-      oxidation_states.clear();oxidation_states.push_back(5); oxidation_states.push_back(3); oxidation_states.push_back(-3); //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(5);oxidation_states.push_back(3);oxidation_states.push_back(-3); //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(5);  //RF+SK20200410
       electron_affinity_PT=71;
+      energies_ionization.clear();energies_ionization.push_back(1011.8);energies_ionization.push_back(1907);energies_ionization.push_back(2914.1);energies_ionization.push_back(4963.6);energies_ionization.push_back(6273.9);energies_ionization.push_back(21267);energies_ionization.push_back(25431);energies_ionization.push_back(29872);energies_ionization.push_back(35905);energies_ionization.push_back(40950);  //CO20201111
       phi_star_Miedema=5.5;
       nws_Miedema=1.65;
       gamma_s_Miedema=NNN;
       scale_Pettifor=2.18;
       temperature_boiling=280.5;
       temperature_melting=44.2;
+      fusion_heat_PT=0.64;  //CO20201111
       vaporization_heat_PT=12.4;
       specific_heat_PT=769.7;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=NNN;
       conductivity_thermal=0.236;
       hardness_Brinell=NNN;
@@ -1807,6 +1920,10 @@ namespace xelement {
       valence_std=6;
       valence_iupac=6;
       valence_PT=6;
+      valence_s=2;  //CO20201111
+      valence_p=4;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=1.96;
       crystal="orc";
       crystal_structure_PT="Face-centered_Orthorhombic";
@@ -1816,7 +1933,7 @@ namespace xelement {
       lattice_constants[1]=1043.7;lattice_constants[2]=1284.5;lattice_constants[3]=2436.9;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=PI/2;
       phase="Solid";
-      radius=0.106;
+      radius_Saxena=0.106;
       radius_PT=87;
       radius_covalent=1.05;
       radius_covalent_PT=105;
@@ -1830,19 +1947,21 @@ namespace xelement {
       electronegativity_Pearson=6.22;
       electronegativity_Ghosh=6.420;
       electronegativity_Allen=2.589;  //RF+SK20200410
-      oxidation_states.clear();oxidation_states.push_back(6); oxidation_states.push_back(4); oxidation_states.push_back(2); oxidation_states.push_back(-2);  //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(6);oxidation_states.push_back(4);oxidation_states.push_back(2);oxidation_states.push_back(-2);  //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(6);  //RF+SK20200410
       electron_affinity_PT=200;
+      energies_ionization.clear();energies_ionization.push_back(999.6);energies_ionization.push_back(2252);energies_ionization.push_back(3357);energies_ionization.push_back(4556);energies_ionization.push_back(7004.3);energies_ionization.push_back(8495.8);energies_ionization.push_back(27107);energies_ionization.push_back(31719);energies_ionization.push_back(36621);energies_ionization.push_back(43177);  //CO20201111
       phi_star_Miedema=5.6;
       nws_Miedema=1.46;
       gamma_s_Miedema=NNN;
       scale_Pettifor=2.44;
       temperature_boiling=444.72;
       temperature_melting=115.21;
+      fusion_heat_PT=1.73;  //CO20201111
       vaporization_heat_PT=9.8;
       specific_heat_PT=705;
-      critical_Pressure=204.3;
-      critical_Temperature_PT=1314;
+      critical_pressure=204.3;
+      critical_temperature_PT=1314;
       thermal_expansion=NNN;
       conductivity_thermal=0.205;
       hardness_Brinell=NNN;
@@ -1890,6 +2009,10 @@ namespace xelement {
       valence_std=7;
       valence_iupac=7;
       valence_PT=5;
+      valence_s=2;  //CO20201111
+      valence_p=5;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=32.14E-4;
       crystal="orc";
       crystal_structure_PT="Base_Orthorhombic";
@@ -1899,7 +2022,7 @@ namespace xelement {
       lattice_constants[1]=622.35;lattice_constants[2]=445.61;lattice_constants[3]=817.85;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=PI/2;
       phase="Gas";
-      radius=0.107;
+      radius_Saxena=0.107;
       radius_PT=79;
       radius_covalent=1.02;
       radius_covalent_PT=102;
@@ -1913,19 +2036,21 @@ namespace xelement {
       electronegativity_Pearson=8.30;
       electronegativity_Ghosh=7.178;
       electronegativity_Allen=2.869;  //RF+SK20200410
-      oxidation_states.clear();oxidation_states.push_back(7); oxidation_states.push_back(5); oxidation_states.push_back(3); oxidation_states.push_back(1); oxidation_states.push_back(-1); //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(7);oxidation_states.push_back(5);oxidation_states.push_back(3);oxidation_states.push_back(1);oxidation_states.push_back(-1); //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(-1); //RF+SK20200410
       electron_affinity_PT=349;
+      energies_ionization.clear();energies_ionization.push_back(1251.2);energies_ionization.push_back(2298);energies_ionization.push_back(3822);energies_ionization.push_back(5158.6);energies_ionization.push_back(6542);energies_ionization.push_back(9362);energies_ionization.push_back(11018);energies_ionization.push_back(33604);energies_ionization.push_back(38600);energies_ionization.push_back(43961);  //CO20201111
       phi_star_Miedema=5.32;
       nws_Miedema=0.34;
       gamma_s_Miedema=1013;
       scale_Pettifor=2.70;
       temperature_boiling=-34.04;
       temperature_melting=-101.5;
+      fusion_heat_PT=3.2;  //CO20201111
       vaporization_heat_PT=10.2;
       specific_heat_PT=478.2;
-      critical_Pressure=78.87;
-      critical_Temperature_PT=416.9;
+      critical_pressure=78.87;
+      critical_temperature_PT=416.9;
       thermal_expansion=NNN;
       conductivity_thermal=0.0089;
       hardness_Brinell=NNN;
@@ -1973,6 +2098,10 @@ namespace xelement {
       valence_std=0;
       valence_iupac=2;
       valence_PT=0;
+      valence_s=2;  //CO20201111
+      valence_p=6;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=17.84E-4;
       crystal="fcc";
       crystal_structure_PT="Face-centered_Cubic";
@@ -1982,7 +2111,7 @@ namespace xelement {
       lattice_constants[1]=525.6;lattice_constants[2]=525.6;lattice_constants[3]=525.6;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=PI/2;
       phase="Gas";
-      radius=0.192;
+      radius_Saxena=0.192;
       radius_PT=71;
       radius_covalent=1.06;
       radius_covalent_PT=106;
@@ -1999,16 +2128,18 @@ namespace xelement {
       oxidation_states.clear();oxidation_states.push_back(NNN);  //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
       electron_affinity_PT=0;
+      energies_ionization.clear();energies_ionization.push_back(1520.6);energies_ionization.push_back(2665.8);energies_ionization.push_back(3931);energies_ionization.push_back(5771);energies_ionization.push_back(7238);energies_ionization.push_back(8781);energies_ionization.push_back(11995);energies_ionization.push_back(13842);energies_ionization.push_back(40760);energies_ionization.push_back(46186);  //CO20201111
       phi_star_Miedema=NNN;
       nws_Miedema=NNN;
       gamma_s_Miedema=NNN;
       scale_Pettifor=0;
       temperature_boiling=-185.8;
       temperature_melting=-189.3;
+      fusion_heat_PT=1.18;  //CO20201111
       vaporization_heat_PT=6.5;
       specific_heat_PT=520.33;
-      critical_Pressure=48.34;
-      critical_Temperature_PT=150.87;
+      critical_pressure=48.34;
+      critical_temperature_PT=150.87;
       thermal_expansion=NNN;
       conductivity_thermal=0.01772;
       hardness_Brinell=NNN;
@@ -2058,6 +2189,10 @@ namespace xelement {
       valence_std=1;
       valence_iupac=1;
       valence_PT=1;
+      valence_s=1;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=0.856;
       crystal="fcc";
       crystal_structure_PT="Body-centered_Cubic";
@@ -2067,7 +2202,7 @@ namespace xelement {
       lattice_constants[1]=532.8;lattice_constants[2]=532.8;lattice_constants[3]=532.8;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=PI/2;
       phase="Solid";
-      radius=0.231;
+      radius_Saxena=0.231;
       radius_PT=243;
       radius_covalent=2.03;
       radius_covalent_PT=203;
@@ -2084,16 +2219,18 @@ namespace xelement {
       oxidation_states.clear();oxidation_states.push_back(1);  //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(1);  //RF+SK20200410
       electron_affinity_PT=48.4;
+      energies_ionization.clear();energies_ionization.push_back(418.8);energies_ionization.push_back(3052);energies_ionization.push_back(4420);energies_ionization.push_back(5877);energies_ionization.push_back(7975);energies_ionization.push_back(9590);energies_ionization.push_back(11343);energies_ionization.push_back(14944);energies_ionization.push_back(16963.7);energies_ionization.push_back(48610);  //CO20201111
       phi_star_Miedema=2.25;
       nws_Miedema=0.65;
       gamma_s_Miedema=150;
       scale_Pettifor=0.35;
       temperature_boiling=759;
       temperature_melting=63.38;
+      fusion_heat_PT=2.33;  //CO20201111
       vaporization_heat_PT=76.9;
       specific_heat_PT=757;
-      critical_Pressure=157.9;
-      critical_Temperature_PT=2223;
+      critical_pressure=157.9;
+      critical_temperature_PT=2223;
       thermal_expansion=NNN;
       conductivity_thermal=100;
       hardness_Brinell=0.363;
@@ -2141,6 +2278,10 @@ namespace xelement {
       valence_std=2;
       valence_iupac=2;
       valence_PT=2;
+      valence_s=2;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=1.55;
       crystal="bcc";
       crystal_structure_PT="Face-centered_Cubic";
@@ -2150,7 +2291,7 @@ namespace xelement {
       lattice_constants[1]=558.84;lattice_constants[2]=558.84;lattice_constants[3]=558.84;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=PI/2;
       phase="Solid";
-      radius=0.197;
+      radius_Saxena=0.197;
       radius_PT=194;
       radius_covalent=1.76;
       radius_covalent_PT=176;
@@ -2167,16 +2308,18 @@ namespace xelement {
       oxidation_states.clear();oxidation_states.push_back(2);  //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(2);  //RF+SK20200410
       electron_affinity_PT=2.37;
+      energies_ionization.clear();energies_ionization.push_back(589.8);energies_ionization.push_back(1145.4);energies_ionization.push_back(4912.4);energies_ionization.push_back(6491);energies_ionization.push_back(8153);energies_ionization.push_back(10496);energies_ionization.push_back(12270);energies_ionization.push_back(14206);energies_ionization.push_back(18191);energies_ionization.push_back(20385);energies_ionization.push_back(57110);  //CO20201111
       phi_star_Miedema=2.55;
       nws_Miedema=0.91;
       gamma_s_Miedema=490;
       scale_Pettifor=0.60;
       temperature_boiling=1484;
       temperature_melting=842;
+      fusion_heat_PT=8.54;  //CO20201111
       vaporization_heat_PT=155;
       specific_heat_PT=631;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=0.0000223;
       conductivity_thermal=200;
       hardness_Brinell=167;
@@ -2225,6 +2368,10 @@ namespace xelement {
       valence_std=3;
       valence_iupac=3;
       valence_PT=3;
+      valence_s=2;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=1;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=2.985;
       crystal="hcp";
       crystal_structure_PT="Simple_Hexagonal";
@@ -2234,7 +2381,7 @@ namespace xelement {
       lattice_constants[1]=330.9;lattice_constants[2]=330.9;lattice_constants[3]=527.33;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=2*PI/3;
       phase="Solid";
-      radius=0.160;
+      radius_Saxena=0.160;
       radius_PT=184;
       radius_covalent=1.70;
       radius_covalent_PT=170;
@@ -2251,16 +2398,18 @@ namespace xelement {
       oxidation_states.clear();oxidation_states.push_back(3);  //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);  //RF+SK20200410
       electron_affinity_PT=18.1;
+      energies_ionization.clear();energies_ionization.push_back(633.1);energies_ionization.push_back(1235);energies_ionization.push_back(2388.6);energies_ionization.push_back(7090.6);energies_ionization.push_back(8843);energies_ionization.push_back(10679);energies_ionization.push_back(13310);energies_ionization.push_back(15250);energies_ionization.push_back(17370);energies_ionization.push_back(21726);energies_ionization.push_back(24102);energies_ionization.push_back(66320);energies_ionization.push_back(73010);energies_ionization.push_back(80160);energies_ionization.push_back(89490);energies_ionization.push_back(97400);energies_ionization.push_back(105600);energies_ionization.push_back(117000);energies_ionization.push_back(124270);energies_ionization.push_back(547530);energies_ionization.push_back(582163);  //CO20201111
       phi_star_Miedema=3.25;
       nws_Miedema=1.27;
       gamma_s_Miedema=1200;
       scale_Pettifor=0.74;
       temperature_boiling=2830;
       temperature_melting=1541;
+      fusion_heat_PT=16;  //CO20201111
       vaporization_heat_PT=318;
       specific_heat_PT=567;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=0.0000102;
       conductivity_thermal=16;
       hardness_Brinell=750;
@@ -2308,6 +2457,10 @@ namespace xelement {
       valence_std=4;
       valence_iupac=4;
       valence_PT=4;
+      valence_s=2;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=2;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=4.507;
       crystal="hcp";
       crystal_structure_PT="Simple_Hexagonal";
@@ -2317,7 +2470,7 @@ namespace xelement {
       lattice_constants[1]=295.08;lattice_constants[2]=295.08;lattice_constants[3]=468.55;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=2*PI/3;
       phase="Solid";
-      radius=0.147;
+      radius_Saxena=0.147;
       radius_PT=176;
       radius_covalent=1.60;
       radius_covalent_PT=160;
@@ -2331,19 +2484,21 @@ namespace xelement {
       electronegativity_Pearson=3.45;
       electronegativity_Ghosh=3.357;
       electronegativity_Allen=1.38; //RF+SK20200410
-      oxidation_states.clear();oxidation_states.push_back(4); oxidation_states.push_back(3); oxidation_states.push_back(2);  //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(4);oxidation_states.push_back(3);oxidation_states.push_back(2);  //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(4);  //RF+SK20200410
       electron_affinity_PT=7.6;
+      energies_ionization.clear();energies_ionization.push_back(658.8);energies_ionization.push_back(1309.8);energies_ionization.push_back(2652.5);energies_ionization.push_back(4174.6);energies_ionization.push_back(9581);energies_ionization.push_back(11533);energies_ionization.push_back(13590);energies_ionization.push_back(16440);energies_ionization.push_back(18530);energies_ionization.push_back(20833);energies_ionization.push_back(25575);energies_ionization.push_back(28125);energies_ionization.push_back(76015);energies_ionization.push_back(83280);energies_ionization.push_back(90880);energies_ionization.push_back(100700);energies_ionization.push_back(109100);energies_ionization.push_back(117800);energies_ionization.push_back(129900);energies_ionization.push_back(137530);energies_ionization.push_back(602930);  //CO20201111
       phi_star_Miedema=3.65;
       nws_Miedema=1.47;
       gamma_s_Miedema=2050;
       scale_Pettifor=0.79;
       temperature_boiling=3287;
       temperature_melting=1668;
+      fusion_heat_PT=18.7;  //CO20201111
       vaporization_heat_PT=425;
       specific_heat_PT=520;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=8.6E-6;
       conductivity_thermal=22;
       hardness_Brinell=715;
@@ -2391,6 +2546,10 @@ namespace xelement {
       valence_std=5;
       valence_iupac=5;
       valence_PT=5;
+      valence_s=2;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=3;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=6.11;
       crystal="bcc";
       crystal_structure_PT="Body-centered_Cubic";
@@ -2400,7 +2559,7 @@ namespace xelement {
       lattice_constants[1]=303;lattice_constants[2]=303;lattice_constants[3]=303;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=PI/2;
       phase="Solid";
-      radius=0.132;
+      radius_Saxena=0.132;
       radius_PT=171;
       radius_covalent=1.53;
       radius_covalent_PT=153;
@@ -2414,19 +2573,21 @@ namespace xelement {
       electronegativity_Pearson=3.6;
       electronegativity_Ghosh=3.465;
       electronegativity_Allen=1.53; //RF+SK20200410
-      oxidation_states.clear();oxidation_states.push_back(5); oxidation_states.push_back(4); oxidation_states.push_back(3); oxidation_states.push_back(2); oxidation_states.push_back(0);  //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(5);oxidation_states.push_back(4);oxidation_states.push_back(3);oxidation_states.push_back(2);oxidation_states.push_back(0);  //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(5);  //RF+SK20200410
       electron_affinity_PT=50.6;
+      energies_ionization.clear();energies_ionization.push_back(650.9);energies_ionization.push_back(1414);energies_ionization.push_back(2830);energies_ionization.push_back(4507);energies_ionization.push_back(6298.7);energies_ionization.push_back(12363);energies_ionization.push_back(14530);energies_ionization.push_back(16730);energies_ionization.push_back(19860);energies_ionization.push_back(22240);energies_ionization.push_back(24670);energies_ionization.push_back(29730);energies_ionization.push_back(32446);energies_ionization.push_back(86450);energies_ionization.push_back(94170);energies_ionization.push_back(102300);energies_ionization.push_back(112700);energies_ionization.push_back(121600);energies_ionization.push_back(130700);energies_ionization.push_back(143400);energies_ionization.push_back(151440);  //CO20201111
       phi_star_Miedema=4.25;
       nws_Miedema=1.64;
       gamma_s_Miedema=2600;
       scale_Pettifor=0.84;
       temperature_boiling=3407;
       temperature_melting=1910;
+      fusion_heat_PT=22.8;  //CO20201111
       vaporization_heat_PT=453;
       specific_heat_PT=489;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=8.4E-6;
       conductivity_thermal=31;
       hardness_Brinell=628;
@@ -2474,6 +2635,10 @@ namespace xelement {
       valence_std=6;
       valence_iupac=6;
       valence_PT=6;
+      valence_s=1;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=5;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=7.19;
       crystal="bcc";
       crystal_structure_PT="Body-centered_Cubic";
@@ -2483,7 +2648,7 @@ namespace xelement {
       lattice_constants[1]=291;lattice_constants[2]=291;lattice_constants[3]=291;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=PI/2;
       phase="Solid";
-      radius=0.125;
+      radius_Saxena=0.125;
       radius_PT=166;
       radius_covalent=1.39;
       radius_covalent_PT=139;
@@ -2497,19 +2662,21 @@ namespace xelement {
       electronegativity_Pearson=3.72;
       electronegativity_Ghosh=3.573;
       electronegativity_Allen=1.650;  //RF+SK20200410
-      oxidation_states.clear();oxidation_states.push_back(6); oxidation_states.push_back(3); oxidation_states.push_back(2); oxidation_states.push_back(0); //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(6);oxidation_states.push_back(3);oxidation_states.push_back(2);oxidation_states.push_back(0); //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3); oxidation_states_preferred.push_back(6); //RF+SK20200410 //Cr+3 most preferred oxidation number
       electron_affinity_PT=64.3;
+      energies_ionization.clear();energies_ionization.push_back(652.9);energies_ionization.push_back(1590.6);energies_ionization.push_back(2987);energies_ionization.push_back(4743);energies_ionization.push_back(6702);energies_ionization.push_back(8744.9);energies_ionization.push_back(15455);energies_ionization.push_back(17820);energies_ionization.push_back(20190);energies_ionization.push_back(23580);energies_ionization.push_back(26130);energies_ionization.push_back(28750);energies_ionization.push_back(34230);energies_ionization.push_back(37066);energies_ionization.push_back(97510);energies_ionization.push_back(105800);energies_ionization.push_back(114300);energies_ionization.push_back(125300);energies_ionization.push_back(134700);energies_ionization.push_back(144300);energies_ionization.push_back(157700);  //CO20201111
       phi_star_Miedema=4.65;
       nws_Miedema=1.74;
       gamma_s_Miedema=2400;
       scale_Pettifor=0.89;
       temperature_boiling=2671;
       temperature_melting=1907;
+      fusion_heat_PT=20.5;  //CO20201111
       vaporization_heat_PT=339;
       specific_heat_PT=448;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=4.9E-6;
       conductivity_thermal=94;
       hardness_Brinell=1120;
@@ -2557,6 +2724,10 @@ namespace xelement {
       valence_std=7;
       valence_iupac=7;
       valence_PT=4;
+      valence_s=2;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=5;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=7.47;
       crystal="cub";
       crystal_structure_PT="Body-centered_Cubic";
@@ -2566,7 +2737,7 @@ namespace xelement {
       lattice_constants[1]=891.25;lattice_constants[2]=891.25;lattice_constants[3]=891.25;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=PI/2;
       phase="Solid";
-      radius=0.112;
+      radius_Saxena=0.112;
       radius_PT=161;
       radius_covalent=1.61;
       radius_covalent_PT=139;
@@ -2580,19 +2751,21 @@ namespace xelement {
       electronegativity_Pearson=3.72;
       electronegativity_Ghosh=3.681;
       electronegativity_Allen=1.75; //RF+SK20200410
-      oxidation_states.clear();oxidation_states.push_back(7); oxidation_states.push_back(6); oxidation_states.push_back(4); oxidation_states.push_back(3); oxidation_states.push_back(2); oxidation_states.push_back(0); oxidation_states.push_back(-1); //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(7);oxidation_states.push_back(6);oxidation_states.push_back(4);oxidation_states.push_back(3);oxidation_states.push_back(2);oxidation_states.push_back(0);oxidation_states.push_back(-1); //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(2);  //RF+SK20200410
       electron_affinity_PT=0;
+      energies_ionization.clear();energies_ionization.push_back(717.3);energies_ionization.push_back(1509);energies_ionization.push_back(3248);energies_ionization.push_back(4940);energies_ionization.push_back(6990);energies_ionization.push_back(9220);energies_ionization.push_back(11500);energies_ionization.push_back(18770);energies_ionization.push_back(21400);energies_ionization.push_back(23960);energies_ionization.push_back(27590);energies_ionization.push_back(30330);energies_ionization.push_back(33150);energies_ionization.push_back(38880);energies_ionization.push_back(41987);energies_ionization.push_back(109480);energies_ionization.push_back(118100);energies_ionization.push_back(127100);energies_ionization.push_back(138600);energies_ionization.push_back(148500);energies_ionization.push_back(158600);  //CO20201111
       phi_star_Miedema=4.45;
       nws_Miedema=1.61;
       gamma_s_Miedema=1600;
       scale_Pettifor=0.94;
       temperature_boiling=2061;
       temperature_melting=1246;
+      fusion_heat_PT=13.2;  //CO20201111
       vaporization_heat_PT=220;
       specific_heat_PT=479;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=0.0000217;
       conductivity_thermal=7.7;
       hardness_Brinell=196;
@@ -2640,6 +2813,10 @@ namespace xelement {
       valence_std=8;
       valence_iupac=6;
       valence_PT=3;
+      valence_s=2;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=6;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=7.874;
       crystal="bcc";
       crystal_structure_PT="Body-centered_Cubic";
@@ -2649,7 +2826,7 @@ namespace xelement {
       lattice_constants[1]=286.65;lattice_constants[2]=286.65;lattice_constants[3]=286.65;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=PI/2;
       phase="Solid";
-      radius=0.124;
+      radius_Saxena=0.124;
       radius_PT=156;
       radius_covalent=1.52;
       radius_covalent_PT=132;
@@ -2663,19 +2840,21 @@ namespace xelement {
       electronegativity_Pearson=4.06;
       electronegativity_Ghosh=3.789;
       electronegativity_Allen=1.80; //RF+SK20200410
-      oxidation_states.clear();oxidation_states.push_back(6); oxidation_states.push_back(3); oxidation_states.push_back(2); oxidation_states.push_back(0); oxidation_states.push_back(-2); //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(6);oxidation_states.push_back(3);oxidation_states.push_back(2);oxidation_states.push_back(0);oxidation_states.push_back(-2); //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3); oxidation_states_preferred.push_back(2); //RF+SK20200410 //Fe+3 most preferred oxidation number
       electron_affinity_PT=15.7;
+      energies_ionization.clear();energies_ionization.push_back(762.5);energies_ionization.push_back(1561.9);energies_ionization.push_back(2957);energies_ionization.push_back(5290);energies_ionization.push_back(7240);energies_ionization.push_back(9560);energies_ionization.push_back(12060);energies_ionization.push_back(14580);energies_ionization.push_back(22540);energies_ionization.push_back(25290);energies_ionization.push_back(28000);energies_ionization.push_back(31920);energies_ionization.push_back(34830);energies_ionization.push_back(37840);energies_ionization.push_back(44100);energies_ionization.push_back(47206);energies_ionization.push_back(122200);energies_ionization.push_back(131000);energies_ionization.push_back(140500);energies_ionization.push_back(152600);energies_ionization.push_back(163000);  //CO20201111
       phi_star_Miedema=4.93;
       nws_Miedema=1.77;
       gamma_s_Miedema=2550;
       scale_Pettifor=0.99;
       temperature_boiling=2861;
       temperature_melting=1538;
+      fusion_heat_PT=13.8;  //CO20201111
       vaporization_heat_PT=347;
       specific_heat_PT=449;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=0.0000118;
       conductivity_thermal=79;
       hardness_Brinell=490;
@@ -2723,6 +2902,10 @@ namespace xelement {
       valence_std=9;
       valence_iupac=5;
       valence_PT=4;
+      valence_s=2;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=7;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=8.9;
       crystal="hcp";
       crystal_structure_PT="Simple_Hexagonal";
@@ -2732,7 +2915,7 @@ namespace xelement {
       lattice_constants[1]=250.71;lattice_constants[2]=250.71;lattice_constants[3]=406.95;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=2*PI/3;
       phase="Solid";
-      radius=0.125;
+      radius_Saxena=0.125;
       radius_PT=152;
       radius_covalent=1.26;
       radius_covalent_PT=126;
@@ -2746,19 +2929,21 @@ namespace xelement {
       electronegativity_Pearson=4.3;
       electronegativity_Ghosh=3.897;
       electronegativity_Allen=1.84; //RF+SK20200410
-      oxidation_states.clear();oxidation_states.push_back(3); oxidation_states.push_back(2); oxidation_states.push_back(0); oxidation_states.push_back(-1);  //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(3);oxidation_states.push_back(2);oxidation_states.push_back(0);oxidation_states.push_back(-1);  //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(2);  //RF+SK20200410
       electron_affinity_PT=63.7;
+      energies_ionization.clear();energies_ionization.push_back(760.4);energies_ionization.push_back(1648);energies_ionization.push_back(3232);energies_ionization.push_back(4950);energies_ionization.push_back(7670);energies_ionization.push_back(9840);energies_ionization.push_back(12440);energies_ionization.push_back(15230);energies_ionization.push_back(17959);energies_ionization.push_back(26570);energies_ionization.push_back(29400);energies_ionization.push_back(32400);energies_ionization.push_back(36600);energies_ionization.push_back(39700);energies_ionization.push_back(42800);energies_ionization.push_back(49396);energies_ionization.push_back(52737);energies_ionization.push_back(134810);energies_ionization.push_back(145170);energies_ionization.push_back(154700);energies_ionization.push_back(167400);  //CO20201111
       phi_star_Miedema=5.10;
       nws_Miedema=1.75;
       gamma_s_Miedema=2550;
       scale_Pettifor=1.04;
       temperature_boiling=2927;
       temperature_melting=1495;
+      fusion_heat_PT=16.2;  //CO20201111
       vaporization_heat_PT=375;
       specific_heat_PT=421;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=0.000013;
       conductivity_thermal=100;
       hardness_Brinell=700;
@@ -2806,6 +2991,10 @@ namespace xelement {
       valence_std=10;
       valence_iupac=4;
       valence_PT=2;
+      valence_s=2;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=8;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=8.908;
       crystal="fcc";
       crystal_structure_PT="Face-centered_Cubic";
@@ -2815,7 +3004,7 @@ namespace xelement {
       lattice_constants[1]=352.4;lattice_constants[2]=352.4;lattice_constants[3]=352.4;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=PI/2;
       phase="Solid";
-      radius=0.125;
+      radius_Saxena=0.125;
       radius_PT=149;
       radius_covalent=1.24;
       radius_covalent_PT=124;
@@ -2829,19 +3018,21 @@ namespace xelement {
       electronegativity_Pearson=4.40;
       electronegativity_Ghosh=4.005;
       electronegativity_Allen=1.88; //RF+SK20200410
-      oxidation_states.clear();oxidation_states.push_back(3); oxidation_states.push_back(2); oxidation_states.push_back(0);  //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(3);oxidation_states.push_back(2);oxidation_states.push_back(0);  //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(2);  //RF+SK20200410
       electron_affinity_PT=112;
+      energies_ionization.clear();energies_ionization.push_back(737.1);energies_ionization.push_back(1753);energies_ionization.push_back(3395);energies_ionization.push_back(5300);energies_ionization.push_back(7339);energies_ionization.push_back(10400);energies_ionization.push_back(12800);energies_ionization.push_back(15600);energies_ionization.push_back(18600);energies_ionization.push_back(21670);energies_ionization.push_back(30970);energies_ionization.push_back(34000);energies_ionization.push_back(37100);energies_ionization.push_back(41500);energies_ionization.push_back(44800);energies_ionization.push_back(48100);energies_ionization.push_back(55101);energies_ionization.push_back(58570);energies_ionization.push_back(148700);energies_ionization.push_back(159000);energies_ionization.push_back(169400);  //CO20201111
       phi_star_Miedema=5.20;
       nws_Miedema=1.75;
       gamma_s_Miedema=2450;
       scale_Pettifor=1.09;
       temperature_boiling=2913;
       temperature_melting=1455;
+      fusion_heat_PT=17.2;  //CO20201111
       vaporization_heat_PT=378;
       specific_heat_PT=445;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=0.0000134;
       conductivity_thermal=91;
       hardness_Brinell=700;
@@ -2889,6 +3080,10 @@ namespace xelement {
       valence_std=11;
       valence_iupac=4;
       valence_PT=2;
+      valence_s=1;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=10;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=8.96;
       crystal="fcc";
       crystal_structure_PT="Face-centered_Cubic";
@@ -2898,7 +3093,7 @@ namespace xelement {
       lattice_constants[1]=361.49;lattice_constants[2]=361.49;lattice_constants[3]=361.49;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=PI/2;
       phase="Solid";
-      radius=0.128;
+      radius_Saxena=0.128;
       radius_PT=145;
       radius_covalent=1.32;
       radius_covalent_PT=132;
@@ -2912,19 +3107,21 @@ namespace xelement {
       electronegativity_Pearson=4.48;
       electronegativity_Ghosh=4.113;
       electronegativity_Allen=1.85; //RF+SK20200410
-      oxidation_states.clear();oxidation_states.push_back(2); oxidation_states.push_back(1); //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(2);oxidation_states.push_back(1); //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(2); oxidation_states_preferred.push_back(1); //RF+SK20200410 //Cu+2 most preferred oxidation number
       electron_affinity_PT=118.4;
+      energies_ionization.clear();energies_ionization.push_back(745.5);energies_ionization.push_back(1957.9);energies_ionization.push_back(3555);energies_ionization.push_back(5536);energies_ionization.push_back(7700);energies_ionization.push_back(9900);energies_ionization.push_back(13400);energies_ionization.push_back(16000);energies_ionization.push_back(19200);energies_ionization.push_back(22400);energies_ionization.push_back(25600);energies_ionization.push_back(35600);energies_ionization.push_back(38700);energies_ionization.push_back(42000);energies_ionization.push_back(46700);energies_ionization.push_back(50200);energies_ionization.push_back(53700);energies_ionization.push_back(61100);energies_ionization.push_back(64702);energies_ionization.push_back(163700);energies_ionization.push_back(174100);  //CO20201111
       phi_star_Miedema=4.55;
       nws_Miedema=1.47;
       gamma_s_Miedema=1850;
       scale_Pettifor=1.20;
       temperature_boiling=2562;
       temperature_melting=1084.62;
+      fusion_heat_PT=13.1;  //CO20201111
       vaporization_heat_PT=300;
       specific_heat_PT=384.4;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=0.0000165;
       conductivity_thermal=400;
       hardness_Brinell=874;
@@ -2972,6 +3169,10 @@ namespace xelement {
       valence_std=12;
       valence_iupac=2;
       valence_PT=2;
+      valence_s=2;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=10;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=7.14;
       crystal="hcp";
       crystal_structure_PT="Simple_Hexagonal";
@@ -2981,7 +3182,7 @@ namespace xelement {
       lattice_constants[1]=266.49;lattice_constants[2]=266.49;lattice_constants[3]=494.68;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=2*PI/3;
       phase="Solid";
-      radius=0.133;
+      radius_Saxena=0.133;
       radius_PT=142;
       radius_covalent=1.22;
       radius_covalent_PT=122;
@@ -2998,16 +3199,18 @@ namespace xelement {
       oxidation_states.clear();oxidation_states.push_back(2);  //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(2);  //RF+SK20200410
       electron_affinity_PT=0;
+      energies_ionization.clear();energies_ionization.push_back(906.4);energies_ionization.push_back(1733.3);energies_ionization.push_back(3833);energies_ionization.push_back(5731);energies_ionization.push_back(7970);energies_ionization.push_back(10400);energies_ionization.push_back(12900);energies_ionization.push_back(16800);energies_ionization.push_back(19600);energies_ionization.push_back(23000);energies_ionization.push_back(26400);energies_ionization.push_back(29990);energies_ionization.push_back(40490);energies_ionization.push_back(43800);energies_ionization.push_back(47300);energies_ionization.push_back(52300);energies_ionization.push_back(55900);energies_ionization.push_back(59700);energies_ionization.push_back(67300);energies_ionization.push_back(71200);energies_ionization.push_back(179100);  //CO20201111
       phi_star_Miedema=4.10;
       nws_Miedema=1.32;
       gamma_s_Miedema=1020;
       scale_Pettifor=1.44;
       temperature_boiling=907;
       temperature_melting=419.53;
+      fusion_heat_PT=7.35;  //CO20201111
       vaporization_heat_PT=119;
       specific_heat_PT=388;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=0.0000302;
       conductivity_thermal=120;
       hardness_Brinell=412;
@@ -3056,6 +3259,10 @@ namespace xelement {
       valence_std=3;
       valence_iupac=3;
       valence_PT=3;
+      valence_s=2;  //CO20201111
+      valence_p=1;  //CO20201111
+      valence_d=10;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=5.904;
       crystal="orc";
       crystal_structure_PT="Base_Orthorhombic";
@@ -3065,7 +3272,7 @@ namespace xelement {
       lattice_constants[1]=451.97;lattice_constants[2]=766.33;lattice_constants[3]=452.6;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=PI/2;
       phase="Solid";
-      radius=0.135;
+      radius_Saxena=0.135;
       radius_PT=136;
       radius_covalent=1.22;
       radius_covalent_PT=122;
@@ -3082,16 +3289,18 @@ namespace xelement {
       oxidation_states.clear();oxidation_states.push_back(3);  //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);  //RF+SK20200410
       electron_affinity_PT=28.9;
+      energies_ionization.clear();energies_ionization.push_back(578.8);energies_ionization.push_back(1979.3);energies_ionization.push_back(2963);energies_ionization.push_back(6180);  //CO20201111
       phi_star_Miedema=4.10;
       nws_Miedema=1.31;
       gamma_s_Miedema=830;
       scale_Pettifor=1.68;
       temperature_boiling=2204;
       temperature_melting=29.76;
+      fusion_heat_PT=5.59;  //CO20201111
       vaporization_heat_PT=256;
       specific_heat_PT=371;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=0.00012;
       conductivity_thermal=29;
       hardness_Brinell=60;
@@ -3139,6 +3348,10 @@ namespace xelement {
       valence_std=4;
       valence_iupac=4;
       valence_PT=4;
+      valence_s=2;  //CO20201111
+      valence_p=2;  //CO20201111
+      valence_d=10;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=5.323;
       crystal="dia";
       crystal_structure_PT="Face-centered_Cubic";
@@ -3148,7 +3361,7 @@ namespace xelement {
       lattice_constants[1]=565.75;lattice_constants[2]=565.75;lattice_constants[3]=565.75;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=PI/2;
       phase="Solid";
-      radius=0.122;
+      radius_Saxena=0.122;
       radius_PT=125;
       radius_covalent=1.20;
       radius_covalent_PT=120;
@@ -3165,16 +3378,18 @@ namespace xelement {
       oxidation_states.clear();oxidation_states.push_back(4);  //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(4);  //RF+SK20200410
       electron_affinity_PT=119;
+      energies_ionization.clear();energies_ionization.push_back(762);energies_ionization.push_back(1537.5);energies_ionization.push_back(3302.1);energies_ionization.push_back(4411);energies_ionization.push_back(9020);  //CO20201111
       phi_star_Miedema=4.55;
       nws_Miedema=1.37;
       gamma_s_Miedema=1030;
       scale_Pettifor=1.92;
       temperature_boiling=2820;
       temperature_melting=938.3;
+      fusion_heat_PT=31.8;  //CO20201111
       vaporization_heat_PT=334;
       specific_heat_PT=321.4;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=6E-6;
       conductivity_thermal=60;
       hardness_Brinell=7273.402498871;
@@ -3222,6 +3437,10 @@ namespace xelement {
       valence_std=5;
       valence_iupac=5;
       valence_PT=5;
+      valence_s=2;  //CO20201111
+      valence_p=3;  //CO20201111
+      valence_d=10;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=5.727;
       crystal="rhl";
       crystal_structure_PT="Simple_Trigonal";
@@ -3231,7 +3450,7 @@ namespace xelement {
       lattice_constants[1]=375.98;lattice_constants[2]=375.98;lattice_constants[3]=1054.75;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=2*PI/3;
       phase="Solid";
-      radius=0.125;
+      radius_Saxena=0.125;
       radius_PT=114;
       radius_covalent=1.19;
       radius_covalent_PT=119;
@@ -3245,19 +3464,21 @@ namespace xelement {
       electronegativity_Pearson=5.3;
       electronegativity_Ghosh=5.628;
       electronegativity_Allen=2.211;  //RF+SK20200410
-      oxidation_states.clear();oxidation_states.push_back(5); oxidation_states.push_back(3); oxidation_states.push_back(-3); //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(5);oxidation_states.push_back(3);oxidation_states.push_back(-3); //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);  //RF+SK20200410
       electron_affinity_PT=78;
+      energies_ionization.clear();energies_ionization.push_back(947);energies_ionization.push_back(1798);energies_ionization.push_back(2735);energies_ionization.push_back(4837);energies_ionization.push_back(6043);energies_ionization.push_back(12310);  //CO20201111
       phi_star_Miedema=4.80;
       nws_Miedema=1.44;
       gamma_s_Miedema=1000;
       scale_Pettifor=2.16;
       temperature_boiling=614;
       temperature_melting=817;
+      fusion_heat_PT=27.7;  //CO20201111
       vaporization_heat_PT=32.4;
       specific_heat_PT=328;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=NNN;
       conductivity_thermal=50;
       hardness_Brinell=1440;
@@ -3305,6 +3526,10 @@ namespace xelement {
       valence_std=6;
       valence_iupac=6;
       valence_PT=6;
+      valence_s=2;  //CO20201111
+      valence_p=4;  //CO20201111
+      valence_d=10;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=4.819;
       crystal="hex";
       crystal_structure_PT="Simple_Monoclinic";
@@ -3314,7 +3539,7 @@ namespace xelement {
       lattice_constants[1]=905.4;lattice_constants[2]=908.3;lattice_constants[3]=1160.1;
       lattice_angles[1]=PI/2;lattice_angles[2]=1.58493;lattice_angles[3]=PI/2;
       phase="Solid";
-      radius=0.116;
+      radius_Saxena=0.116;
       radius_PT=103;
       radius_covalent=1.20;
       radius_covalent_PT=120;
@@ -3328,19 +3553,21 @@ namespace xelement {
       electronegativity_Pearson=5.89;
       electronegativity_Ghosh=6.096;
       electronegativity_Allen=2.424;  //RF+SK20200410
-      oxidation_states.clear();oxidation_states.push_back(6); oxidation_states.push_back(4); oxidation_states.push_back(-2); //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(6);oxidation_states.push_back(4);oxidation_states.push_back(-2); //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(4);  //RF+SK20200410
       electron_affinity_PT=195;
+      energies_ionization.clear();energies_ionization.push_back(941);energies_ionization.push_back(2045);energies_ionization.push_back(2973.7);energies_ionization.push_back(4144);energies_ionization.push_back(6590);energies_ionization.push_back(7880);energies_ionization.push_back(14990);  //CO20201111
       phi_star_Miedema=5.17;
       nws_Miedema=1.40;
       gamma_s_Miedema=NNN;
       scale_Pettifor=2.40;
       temperature_boiling=685;
       temperature_melting=221;
+      fusion_heat_PT=5.4;  //CO20201111
       vaporization_heat_PT=26;
       specific_heat_PT=321.2;
-      critical_Pressure=268.4;
-      critical_Temperature_PT=1766;
+      critical_pressure=268.4;
+      critical_temperature_PT=1766;
       thermal_expansion=NNN;
       conductivity_thermal=0.52;
       hardness_Brinell=736;
@@ -3388,6 +3615,10 @@ namespace xelement {
       valence_std=7;
       valence_iupac=7;
       valence_PT=5;
+      valence_s=2;  //CO20201111
+      valence_p=5;  //CO20201111
+      valence_d=10;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=3.12;
       crystal="orc";
       crystal_structure_PT="Base_Orthorhombic";
@@ -3397,7 +3628,7 @@ namespace xelement {
       lattice_constants[1]=672.65;lattice_constants[2]=464.51;lattice_constants[3]=870.23;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=PI/2;
       phase="Liquid";
-      radius=0.119;
+      radius_Saxena=0.119;
       radius_PT=94;
       radius_covalent=1.20;
       radius_covalent_PT=120;
@@ -3411,19 +3642,21 @@ namespace xelement {
       electronegativity_Pearson=7.59;
       electronegativity_Ghosh=6.565;
       electronegativity_Allen=2.685;  //RF+SK20200410
-      oxidation_states.clear();oxidation_states.push_back(7); oxidation_states.push_back(5); oxidation_states.push_back(3); oxidation_states.push_back(1); oxidation_states.push_back(-1); //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(7);oxidation_states.push_back(5);oxidation_states.push_back(3);oxidation_states.push_back(1);oxidation_states.push_back(-1); //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(-1); //RF+SK20200410
       electron_affinity_PT=324.6;
+      energies_ionization.clear();energies_ionization.push_back(1139.9);energies_ionization.push_back(2103);energies_ionization.push_back(3470);energies_ionization.push_back(4560);energies_ionization.push_back(5760);energies_ionization.push_back(8550);energies_ionization.push_back(9940);energies_ionization.push_back(18600);  //CO20201111
       phi_star_Miedema=5.20;
       nws_Miedema=1.35;
       gamma_s_Miedema=943;
       scale_Pettifor=2.64;
       temperature_boiling=59;
       temperature_melting=-7.3;
+      fusion_heat_PT=5.8;  //CO20201111
       vaporization_heat_PT=14.8;
       specific_heat_PT=947.3;
-      critical_Pressure=102;
-      critical_Temperature_PT=588;
+      critical_pressure=102;
+      critical_temperature_PT=588;
       thermal_expansion=NNN;
       conductivity_thermal=0.12;
       hardness_Brinell=NNN;
@@ -3471,6 +3704,10 @@ namespace xelement {
       valence_std=0;
       valence_iupac=2;
       valence_PT=2;
+      valence_s=2;  //CO20201111
+      valence_p=6;  //CO20201111
+      valence_d=10;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=37.5E-4;
       crystal="fcc";
       crystal_structure_PT="Face-centered_Cubic";
@@ -3480,7 +3717,7 @@ namespace xelement {
       lattice_constants[1]=570.6;lattice_constants[2]=570.6;lattice_constants[3]=570.6;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=PI/2;
       phase="Gas";
-      radius=0.197;
+      radius_Saxena=0.197;
       radius_PT=87;
       radius_covalent=1.16;
       radius_covalent_PT=116;
@@ -3497,16 +3734,18 @@ namespace xelement {
       oxidation_states.clear();oxidation_states.push_back(2);  //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(2);  //RF+SK20200410
       electron_affinity_PT=0;
+      energies_ionization.clear();energies_ionization.push_back(1350.8);energies_ionization.push_back(2350.4);energies_ionization.push_back(3565);energies_ionization.push_back(5070);energies_ionization.push_back(6240);energies_ionization.push_back(7570);energies_ionization.push_back(10710);energies_ionization.push_back(12138);energies_ionization.push_back(22274);energies_ionization.push_back(25880);energies_ionization.push_back(29700);energies_ionization.push_back(33800);energies_ionization.push_back(37700);energies_ionization.push_back(43100);energies_ionization.push_back(47500);energies_ionization.push_back(52200);energies_ionization.push_back(57100);energies_ionization.push_back(61800);energies_ionization.push_back(75800);energies_ionization.push_back(80400);energies_ionization.push_back(85300);  //CO20201111
       phi_star_Miedema=NNN;
       nws_Miedema=NNN;
       gamma_s_Miedema=NNN;
       scale_Pettifor=0;
       temperature_boiling=-153.22;
       temperature_melting=-157.36;
+      fusion_heat_PT=1.64;  //CO20201111
       vaporization_heat_PT=9.02;
       specific_heat_PT=248.05;
-      critical_Pressure=54.28;
-      critical_Temperature_PT=209.41;
+      critical_pressure=54.28;
+      critical_temperature_PT=209.41;
       thermal_expansion=NNN;
       conductivity_thermal=0.00943;
       hardness_Brinell=NNN;
@@ -3556,6 +3795,10 @@ namespace xelement {
       valence_std=1;
       valence_iupac=1;
       valence_PT=1;
+      valence_s=1;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=1.532;
       crystal="bcc";
       crystal_structure_PT="Body-centered_Cubic";
@@ -3565,7 +3808,7 @@ namespace xelement {
       lattice_constants[1]=558.5;lattice_constants[2]=558.5;lattice_constants[3]=558.5;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=PI/2;
       phase="Solid";
-      radius=0.251;
+      radius_Saxena=0.251;
       radius_PT=265;
       radius_covalent=2.20;
       radius_covalent_PT=220;
@@ -3582,16 +3825,18 @@ namespace xelement {
       oxidation_states.clear();oxidation_states.push_back(1);  //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(1);  //RF+SK20200410
       electron_affinity_PT=46.9;
+      energies_ionization.clear();energies_ionization.push_back(403);energies_ionization.push_back(2633);energies_ionization.push_back(3860);energies_ionization.push_back(5080);energies_ionization.push_back(6850);energies_ionization.push_back(8140);energies_ionization.push_back(9570);energies_ionization.push_back(13120);energies_ionization.push_back(14500);energies_ionization.push_back(26740);  //CO20201111
       phi_star_Miedema=2.10;
       nws_Miedema=0.60;
       gamma_s_Miedema=120;
       scale_Pettifor=0.30;
       temperature_boiling=688;
       temperature_melting=39.31;
+      fusion_heat_PT=2.19;  //CO20201111
       vaporization_heat_PT=71;
       specific_heat_PT=364;
-      critical_Pressure=157.9;
-      critical_Temperature_PT=2093;
+      critical_pressure=157.9;
+      critical_temperature_PT=2093;
       thermal_expansion=NNN;
       conductivity_thermal=58;
       hardness_Brinell=0.216;
@@ -3639,6 +3884,10 @@ namespace xelement {
       valence_std=2;
       valence_iupac=2;
       valence_PT=2;
+      valence_s=2;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=2.63;
       crystal="fcc";
       crystal_structure_PT="Face-centered_Cubic";
@@ -3648,7 +3897,7 @@ namespace xelement {
       lattice_constants[1]=608.49;lattice_constants[2]=608.49;lattice_constants[3]=608.49;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=PI/2;
       phase="Solid";
-      radius=0.215;
+      radius_Saxena=0.215;
       radius_PT=219;
       radius_covalent=1.95;
       radius_covalent_PT=195;
@@ -3665,16 +3914,18 @@ namespace xelement {
       oxidation_states.clear();oxidation_states.push_back(2);  //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(2);  //RF+SK20200410
       electron_affinity_PT=5.03;
+      energies_ionization.clear();energies_ionization.push_back(549.5);energies_ionization.push_back(1064.2);energies_ionization.push_back(4138);energies_ionization.push_back(5500);energies_ionization.push_back(6910);energies_ionization.push_back(8760);energies_ionization.push_back(10230);energies_ionization.push_back(11800);energies_ionization.push_back(15600);energies_ionization.push_back(17100);  //CO20201111
       phi_star_Miedema=2.40;
       nws_Miedema=0.84;
       gamma_s_Miedema=430;
       scale_Pettifor=0.55;
       temperature_boiling=1382;
       temperature_melting=777;
+      fusion_heat_PT=8;  //CO20201111
       vaporization_heat_PT=137;
       specific_heat_PT=300;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=0.0000225;
       conductivity_thermal=35;
       hardness_Brinell=NNN;
@@ -3723,6 +3974,10 @@ namespace xelement {
       valence_std=3;
       valence_iupac=3;
       valence_PT=3;
+      valence_s=2;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=1;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=4.472;
       crystal="hcp";
       crystal_structure_PT="Simple_Hexagonal";
@@ -3732,7 +3987,7 @@ namespace xelement {
       lattice_constants[1]=364.74;lattice_constants[2]=364.74;lattice_constants[3]=573.06;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=2*PI/3;
       phase="Solid";
-      radius=0.181;
+      radius_Saxena=0.181;
       radius_PT=212;
       radius_covalent=1.90;
       radius_covalent_PT=190;
@@ -3749,16 +4004,18 @@ namespace xelement {
       oxidation_states.clear();oxidation_states.push_back(3);  //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);  //RF+SK20200410
       electron_affinity_PT=29.6;
+      energies_ionization.clear();energies_ionization.push_back(600);energies_ionization.push_back(1180);energies_ionization.push_back(1980);energies_ionization.push_back(5847);energies_ionization.push_back(7430);energies_ionization.push_back(8970);energies_ionization.push_back(11190);energies_ionization.push_back(12450);energies_ionization.push_back(14110);energies_ionization.push_back(18400);  //CO20201111
       phi_star_Miedema=3.20;
       nws_Miedema=1.21;
       gamma_s_Miedema=1100;
       scale_Pettifor=0.70;
       temperature_boiling=3345;
       temperature_melting=1526;
+      fusion_heat_PT=11.4;  //CO20201111
       vaporization_heat_PT=380;
       specific_heat_PT=298;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=0.0000106;
       conductivity_thermal=17;
       hardness_Brinell=588;
@@ -3806,6 +4063,10 @@ namespace xelement {
       valence_std=4;
       valence_iupac=4;
       valence_PT=4;
+      valence_s=2;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=2;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=6.511;
       crystal="hcp";
       crystal_structure_PT="Simple_Hexagonal";
@@ -3815,7 +4076,7 @@ namespace xelement {
       lattice_constants[1]=323.2;lattice_constants[2]=323.2;lattice_constants[3]=514.7;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=2*PI/3;
       phase="Solid";
-      radius=0.158;
+      radius_Saxena=0.158;
       radius_PT=206;
       radius_covalent=1.75;
       radius_covalent_PT=175;
@@ -3829,19 +4090,21 @@ namespace xelement {
       electronegativity_Pearson=3.64;
       electronegativity_Ghosh=3.398;
       electronegativity_Allen=1.32; //RF+SK20200410
-      oxidation_states.clear();oxidation_states.push_back(4); oxidation_states.push_back(3); //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(4);oxidation_states.push_back(3); //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(4);  //RF+SK20200410
       electron_affinity_PT=41.1;
+      energies_ionization.clear();energies_ionization.push_back(640.1);energies_ionization.push_back(1270);energies_ionization.push_back(2218);energies_ionization.push_back(3313);energies_ionization.push_back(7752);energies_ionization.push_back(9500);  //CO20201111
       phi_star_Miedema=3.40;
       nws_Miedema=1.39;
       gamma_s_Miedema=1950;
       scale_Pettifor=0.76;
       temperature_boiling=4409;
       temperature_melting=1855;
+      fusion_heat_PT=21;  //CO20201111
       vaporization_heat_PT=580;
       specific_heat_PT=278;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=5.7E-6;
       conductivity_thermal=23;
       hardness_Brinell=650;
@@ -3889,6 +4152,10 @@ namespace xelement {
       valence_std=5;
       valence_iupac=5;
       valence_PT=5;
+      valence_s=1;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=4;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=8.57;
       crystal="bcc";
       crystal_structure_PT="Body-centered_Cubic";
@@ -3898,7 +4165,7 @@ namespace xelement {
       lattice_constants[1]=330.04;lattice_constants[2]=330.04;lattice_constants[3]=330.04;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=PI/2;
       phase="Solid";
-      radius=0.143;
+      radius_Saxena=0.143;
       radius_PT=198;
       radius_covalent=1.64;
       radius_covalent_PT=164;
@@ -3912,19 +4179,21 @@ namespace xelement {
       electronegativity_Pearson=4.0;
       electronegativity_Ghosh=3.485;
       electronegativity_Allen=1.41; //RF+SK20200410
-      oxidation_states.clear();oxidation_states.push_back(5); oxidation_states.push_back(3); oxidation_states.push_back(2);  //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(5);oxidation_states.push_back(3);oxidation_states.push_back(2);  //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(5);  //RF+SK20200410
       electron_affinity_PT=86.1;
+      energies_ionization.clear();energies_ionization.push_back(652.1);energies_ionization.push_back(1380);energies_ionization.push_back(2416);energies_ionization.push_back(3700);energies_ionization.push_back(4877);energies_ionization.push_back(9847);energies_ionization.push_back(12100);  //CO20201111
       phi_star_Miedema=4.00;
       nws_Miedema=1.62;
       gamma_s_Miedema=2700;
       scale_Pettifor=0.82;
       temperature_boiling=4744;
       temperature_melting=2477;
+      fusion_heat_PT=26.8;  //CO20201111
       vaporization_heat_PT=690;
       specific_heat_PT=265;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=7.3E-6;
       conductivity_thermal=54;
       hardness_Brinell=736;
@@ -3972,6 +4241,10 @@ namespace xelement {
       valence_std=6;
       valence_iupac=6;
       valence_PT=6;
+      valence_s=1;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=5;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=10.28;
       crystal="bcc";
       crystal_structure_PT="Body-centered_Cubic";
@@ -3981,7 +4254,7 @@ namespace xelement {
       lattice_constants[1]=314.7;lattice_constants[2]=314.7;lattice_constants[3]=314.7;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=PI/2;
       phase="Solid";
-      radius=0.136;
+      radius_Saxena=0.136;
       radius_PT=190;
       radius_covalent=1.54;
       radius_covalent_PT=154;
@@ -3995,19 +4268,21 @@ namespace xelement {
       electronegativity_Pearson=3.9;
       electronegativity_Ghosh=3.572;
       electronegativity_Allen=1.47; //RF+SK20200410
-      oxidation_states.clear();oxidation_states.push_back(6); oxidation_states.push_back(5); oxidation_states.push_back(4); oxidation_states.push_back(3); oxidation_states.push_back(2); oxidation_states.push_back(0); //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(6);oxidation_states.push_back(5);oxidation_states.push_back(4);oxidation_states.push_back(3);oxidation_states.push_back(2);oxidation_states.push_back(0); //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(6);  //RF+SK20200410
       electron_affinity_PT=71.9;
+      energies_ionization.clear();energies_ionization.push_back(684.3);energies_ionization.push_back(1560);energies_ionization.push_back(2618);energies_ionization.push_back(4480);energies_ionization.push_back(5257);energies_ionization.push_back(6640.8);energies_ionization.push_back(12125);energies_ionization.push_back(13860);energies_ionization.push_back(15835);energies_ionization.push_back(17980);energies_ionization.push_back(20190);energies_ionization.push_back(22219);energies_ionization.push_back(26930);energies_ionization.push_back(29196);energies_ionization.push_back(52490);energies_ionization.push_back(55000);energies_ionization.push_back(61400);energies_ionization.push_back(67700);energies_ionization.push_back(74000);energies_ionization.push_back(80400);energies_ionization.push_back(87000);  //CO20201111
       phi_star_Miedema=4.65;
       nws_Miedema=1.77;
       gamma_s_Miedema=2950;
       scale_Pettifor=0.88;
       temperature_boiling=4639;
       temperature_melting=2623;
+      fusion_heat_PT=36;  //CO20201111
       vaporization_heat_PT=600;
       specific_heat_PT=251;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=4.8E-6;
       conductivity_thermal=139;
       hardness_Brinell=1500;
@@ -4055,6 +4330,10 @@ namespace xelement {
       valence_std=7;
       valence_iupac=7;
       valence_PT=6;
+      valence_s=2;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=5;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=11.5;
       crystal="hcp";
       crystal_structure_PT="Simple_Hexagonal";
@@ -4064,7 +4343,7 @@ namespace xelement {
       lattice_constants[1]=273.5;lattice_constants[2]=273.5;lattice_constants[3]=438.8;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=2*PI/3;
       phase="Solid";
-      radius=NNN;
+      radius_Saxena=NNN;
       radius_PT=183;
       radius_covalent=1.47;
       radius_covalent_PT=147;
@@ -4081,16 +4360,18 @@ namespace xelement {
       oxidation_states.clear();oxidation_states.push_back(7);  //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(7);  //RF+SK20200410
       electron_affinity_PT=53;
+      energies_ionization.clear();energies_ionization.push_back(702);energies_ionization.push_back(1470);energies_ionization.push_back(2850);  //CO20201111
       phi_star_Miedema=5.30;
       nws_Miedema=1.81;
       gamma_s_Miedema=3050;
       scale_Pettifor=0.94;
       temperature_boiling=4265;
       temperature_melting=2157;
+      fusion_heat_PT=23;  //CO20201111
       vaporization_heat_PT=550;
       specific_heat_PT=63;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=NNN;
       conductivity_thermal=51;
       hardness_Brinell=NNN;
@@ -4138,6 +4419,10 @@ namespace xelement {
       valence_std=8;
       valence_iupac=8;
       valence_PT=6;
+      valence_s=1;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=7;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=12.37;
       crystal="hcp";
       crystal_structure_PT="Simple_Hexagonal";
@@ -4147,7 +4432,7 @@ namespace xelement {
       lattice_constants[1]=270.59;lattice_constants[2]=270.59;lattice_constants[3]=428.15;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=2*PI/3;
       phase="Solid";
-      radius=0.134;
+      radius_Saxena=0.134;
       radius_PT=178;
       radius_covalent=1.46;
       radius_covalent_PT=146;
@@ -4161,19 +4446,21 @@ namespace xelement {
       electronegativity_Pearson=4.5;
       electronegativity_Ghosh=3.745;
       electronegativity_Allen=1.54; //RF+SK20200410
-      oxidation_states.clear();oxidation_states.push_back(8); oxidation_states.push_back(6); oxidation_states.push_back(4); oxidation_states.push_back(3); oxidation_states.push_back(2); oxidation_states.push_back(0); oxidation_states.push_back(-2); //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(8);oxidation_states.push_back(6);oxidation_states.push_back(4);oxidation_states.push_back(3);oxidation_states.push_back(2);oxidation_states.push_back(0);oxidation_states.push_back(-2); //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(4); oxidation_states_preferred.push_back(3); //RF+SK20200410
       electron_affinity_PT=101.3;
+      energies_ionization.clear();energies_ionization.push_back(710.2);energies_ionization.push_back(1620);energies_ionization.push_back(2747);  //CO20201111
       phi_star_Miedema=5.40;
       nws_Miedema=1.83;
       gamma_s_Miedema=3050;
       scale_Pettifor=1.00;
       temperature_boiling=4150;
       temperature_melting=2334;
+      fusion_heat_PT=25.7;  //CO20201111
       vaporization_heat_PT=580;
       specific_heat_PT=238;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=6.4E-6;
       conductivity_thermal=120;
       hardness_Brinell=2160;
@@ -4221,6 +4508,10 @@ namespace xelement {
       valence_std=9;
       valence_iupac=6;
       valence_PT=6;
+      valence_s=1;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=8;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=12.45;
       crystal="fcc";
       crystal_structure_PT="Face-centered_Cubic";
@@ -4230,7 +4521,7 @@ namespace xelement {
       lattice_constants[1]=380.34;lattice_constants[2]=380.34;lattice_constants[3]=380.34;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=PI/2;
       phase="Solid";
-      radius=0.134;
+      radius_Saxena=0.134;
       radius_PT=173;
       radius_covalent=1.42;
       radius_covalent_PT=142;
@@ -4244,19 +4535,21 @@ namespace xelement {
       electronegativity_Pearson=4.3;
       electronegativity_Ghosh=3.832;
       electronegativity_Allen=1.56; //RF+SK20200410
-      oxidation_states.clear();oxidation_states.push_back(5); oxidation_states.push_back(4); oxidation_states.push_back(3); oxidation_states.push_back(2); oxidation_states.push_back(1); oxidation_states.push_back(0); //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(5);oxidation_states.push_back(4);oxidation_states.push_back(3);oxidation_states.push_back(2);oxidation_states.push_back(1);oxidation_states.push_back(0); //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3); oxidation_states_preferred.push_back(1); //RF+SK20200410
       electron_affinity_PT=109.7;
+      energies_ionization.clear();energies_ionization.push_back(719.7);energies_ionization.push_back(1740);energies_ionization.push_back(2997);  //CO20201111
       phi_star_Miedema=5.40;
       nws_Miedema=1.76;
       gamma_s_Miedema=2750;
       scale_Pettifor=1.06;
       temperature_boiling=3695;
       temperature_melting=1964;
+      fusion_heat_PT=21.7;  //CO20201111
       vaporization_heat_PT=495;
       specific_heat_PT=240;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=8E-6;
       conductivity_thermal=150;
       hardness_Brinell=1100;
@@ -4304,6 +4597,10 @@ namespace xelement {
       valence_std=10;
       valence_iupac=4;
       valence_PT=4;
+      valence_s=0;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=10;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=12.023;
       crystal="fcc";
       crystal_structure_PT="Face-centered_Cubic";
@@ -4313,7 +4610,7 @@ namespace xelement {
       lattice_constants[1]=389.07;lattice_constants[2]=389.07;lattice_constants[3]=389.07;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=PI/2;
       phase="Solid";
-      radius=0.137;
+      radius_Saxena=0.137;
       radius_PT=169;
       radius_covalent=1.39;
       radius_covalent_PT=139;
@@ -4327,19 +4624,21 @@ namespace xelement {
       electronegativity_Pearson=4.45;
       electronegativity_Ghosh=3.919;
       electronegativity_Allen=1.58; //RF+SK20200410
-      oxidation_states.clear();oxidation_states.push_back(4); oxidation_states.push_back(2); oxidation_states.push_back(0);  //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(4);oxidation_states.push_back(2);oxidation_states.push_back(0);  //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(2);  //RF+SK20200410
       electron_affinity_PT=53.7;
+      energies_ionization.clear();energies_ionization.push_back(804.4);energies_ionization.push_back(1870);energies_ionization.push_back(3177);  //CO20201111
       phi_star_Miedema=5.45;
       nws_Miedema=1.67;
       gamma_s_Miedema=2100;
       scale_Pettifor=1.12;
       temperature_boiling=2963;
       temperature_melting=1554.9;
+      fusion_heat_PT=16.7;  //CO20201111
       vaporization_heat_PT=380;
       specific_heat_PT=240;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=0.0000118;
       conductivity_thermal=71;
       hardness_Brinell=37.2;
@@ -4387,6 +4686,10 @@ namespace xelement {
       valence_std=11;
       valence_iupac=4;
       valence_PT=1;
+      valence_s=1;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=10;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=10.49;
       crystal="fcc";
       crystal_structure_PT="Face-centered_Cubic";
@@ -4396,7 +4699,7 @@ namespace xelement {
       lattice_constants[1]=408.53;lattice_constants[2]=408.53;lattice_constants[3]=408.53;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=PI/2;
       phase="Solid";
-      radius=0.144;
+      radius_Saxena=0.144;
       radius_PT=165;
       radius_covalent=1.45;
       radius_covalent_PT=145;
@@ -4410,19 +4713,21 @@ namespace xelement {
       electronegativity_Pearson=4.44;
       electronegativity_Ghosh=4.006;
       electronegativity_Allen=1.87; //RF+SK20200410
-      oxidation_states.clear();oxidation_states.push_back(2); oxidation_states.push_back(1); //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(2);oxidation_states.push_back(1); //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(1);  //RF+SK20200410
       electron_affinity_PT=125.6;
+      energies_ionization.clear();energies_ionization.push_back(731);energies_ionization.push_back(2070);energies_ionization.push_back(3361);  //CO20201111
       phi_star_Miedema=4.45;
       nws_Miedema=1.39;
       gamma_s_Miedema=1250;
       scale_Pettifor=1.18;
       temperature_boiling=2162;
       temperature_melting=961.78;
+      fusion_heat_PT=11.3;  //CO20201111
       vaporization_heat_PT=255;
       specific_heat_PT=235;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=0.0000189;
       conductivity_thermal=430;
       hardness_Brinell=24.5;
@@ -4470,6 +4775,10 @@ namespace xelement {
       valence_std=12;
       valence_iupac=2;
       valence_PT=2;
+      valence_s=2;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=10;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=8.65;
       crystal="hcp";
       crystal_structure_PT="Simple_Hexagonal";
@@ -4479,7 +4788,7 @@ namespace xelement {
       lattice_constants[1]=297.94;lattice_constants[2]=297.94;lattice_constants[3]=561.86;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=2*PI/3;
       phase="Solid";
-      radius=0.150;
+      radius_Saxena=0.150;
       radius_PT=161;
       radius_covalent=1.44;
       radius_covalent_PT=144;
@@ -4496,16 +4805,18 @@ namespace xelement {
       oxidation_states.clear();oxidation_states.push_back(2);  //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(2);  //RF+SK20200410
       electron_affinity_PT=0;
+      energies_ionization.clear();energies_ionization.push_back(867.8);energies_ionization.push_back(1631.4);energies_ionization.push_back(3616);  //CO20201111
       phi_star_Miedema=4.05;
       nws_Miedema=1.24;
       gamma_s_Miedema=780;
       scale_Pettifor=1.36;
       temperature_boiling=767;
       temperature_melting=321.07;
+      fusion_heat_PT=6.3;  //CO20201111
       vaporization_heat_PT=100;
       specific_heat_PT=230;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=0.0000308;
       conductivity_thermal=96;
       hardness_Brinell=203;
@@ -4554,6 +4865,10 @@ namespace xelement {
       valence_std=3;
       valence_iupac=3;
       valence_PT=3;
+      valence_s=2;  //CO20201111
+      valence_p=1;  //CO20201111
+      valence_d=10;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=7.31;
       crystal="fct";
       crystal_structure_PT="Centered_Tetragonal";
@@ -4563,7 +4878,7 @@ namespace xelement {
       lattice_constants[1]=325.23;lattice_constants[2]=325.23;lattice_constants[3]=494.61;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=PI/2;
       phase="Solid";
-      radius=0.157;
+      radius_Saxena=0.157;
       radius_PT=156;
       radius_covalent=1.42;
       radius_covalent_PT=142;
@@ -4580,16 +4895,18 @@ namespace xelement {
       oxidation_states.clear();oxidation_states.push_back(3);  //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);  //RF+SK20200410
       electron_affinity_PT=28.9;
+      energies_ionization.clear();energies_ionization.push_back(558.3);energies_ionization.push_back(1820.7);energies_ionization.push_back(2704);energies_ionization.push_back(5210);  //CO20201111
       phi_star_Miedema=3.90;
       nws_Miedema=1.17;
       gamma_s_Miedema=690;
       scale_Pettifor=1.60;
       temperature_boiling=2072;
       temperature_melting=156.6;
+      fusion_heat_PT=3.26;  //CO20201111
       vaporization_heat_PT=230;
       specific_heat_PT=233;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=0.0000321;
       conductivity_thermal=82;
       hardness_Brinell=8.83;
@@ -4637,6 +4954,10 @@ namespace xelement {
       valence_std=4;
       valence_iupac=4;
       valence_PT=4;
+      valence_s=2;  //CO20201111
+      valence_p=2;  //CO20201111
+      valence_d=10;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=7.31;
       crystal="bct";
       crystal_structure_PT="Centered_Tetragonal";
@@ -4646,7 +4967,7 @@ namespace xelement {
       lattice_constants[1]=583.18;lattice_constants[2]=583.18;lattice_constants[3]=318.19;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=PI/2;
       phase="Solid";
-      radius=0.158;
+      radius_Saxena=0.158;
       radius_PT=145;
       radius_covalent=1.39;
       radius_covalent_PT=139;
@@ -4660,19 +4981,21 @@ namespace xelement {
       electronegativity_Pearson=4.3;
       electronegativity_Ghosh=4.845;
       electronegativity_Allen=1.824;  //RF+SK20200410
-      oxidation_states.clear();oxidation_states.push_back(4); oxidation_states.push_back(2); //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(4);oxidation_states.push_back(2); //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(4); oxidation_states_preferred.push_back(2); //RF+SK20200410
       electron_affinity_PT=107.3;
+      energies_ionization.clear();energies_ionization.push_back(708.6);energies_ionization.push_back(1411.8);energies_ionization.push_back(2943);energies_ionization.push_back(3930.3);energies_ionization.push_back(7456);  //CO20201111
       phi_star_Miedema=4.15;
       nws_Miedema=1.24;
       gamma_s_Miedema=710;
       scale_Pettifor=1.84;
       temperature_boiling=2602;
       temperature_melting=231.93;
+      fusion_heat_PT=7;  //CO20201111
       vaporization_heat_PT=290;
       specific_heat_PT=217;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=0.000022;
       conductivity_thermal=67;
       hardness_Brinell=51;
@@ -4720,6 +5043,10 @@ namespace xelement {
       valence_std=5;
       valence_iupac=5;
       valence_PT=5;
+      valence_s=2;  //CO20201111
+      valence_p=3;  //CO20201111
+      valence_d=10;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=6.697;
       crystal="rhl";
       crystal_structure_PT="Simple_Trigonal";
@@ -4729,7 +5056,7 @@ namespace xelement {
       lattice_constants[1]=430.7;lattice_constants[2]=430.7;lattice_constants[3]=1127.3;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=2*PI/3;
       phase="Solid";
-      radius=0.161;
+      radius_Saxena=0.161;
       radius_PT=133;
       radius_covalent=1.39;
       radius_covalent_PT=139;
@@ -4743,19 +5070,21 @@ namespace xelement {
       electronegativity_Pearson=4.85;
       electronegativity_Ghosh=5.221;
       electronegativity_Allen=1.984;  //RF+SK20200410
-      oxidation_states.clear();oxidation_states.push_back(5); oxidation_states.push_back(3); oxidation_states.push_back(-3); //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(5);oxidation_states.push_back(3);oxidation_states.push_back(-3); //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);  //RF+SK20200410
       electron_affinity_PT=103.2;
+      energies_ionization.clear();energies_ionization.push_back(834);energies_ionization.push_back(1594.9);energies_ionization.push_back(2440);energies_ionization.push_back(4260);energies_ionization.push_back(5400);energies_ionization.push_back(10400);  //CO20201111
       phi_star_Miedema=4.40;
       nws_Miedema=1.26;
       gamma_s_Miedema=680;
       scale_Pettifor=2.08;
       temperature_boiling=1587;
       temperature_melting=630.63;
+      fusion_heat_PT=19.7;  //CO20201111
       vaporization_heat_PT=67;
       specific_heat_PT=207;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=0.000011;
       conductivity_thermal=24;
       hardness_Brinell=294;
@@ -4803,6 +5132,10 @@ namespace xelement {
       valence_std=6;
       valence_iupac=6;
       valence_PT=6;
+      valence_s=2;  //CO20201111
+      valence_p=4;  //CO20201111
+      valence_d=10;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=6.24;
       crystal="hex";
       crystal_structure_PT="Simple_Trigonal";
@@ -4812,7 +5145,7 @@ namespace xelement {
       lattice_constants[1]=445.72;lattice_constants[2]=445.72;lattice_constants[3]=592.9;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=2*PI/3;
       phase="Solid";
-      radius=0.143;
+      radius_Saxena=0.143;
       radius_PT=123;
       radius_covalent=1.38;
       radius_covalent_PT=138;
@@ -4826,19 +5159,21 @@ namespace xelement {
       electronegativity_Pearson=5.49;
       electronegativity_Ghosh=5.597;
       electronegativity_Allen=2.158;  //RF+SK20200410
-      oxidation_states.clear();oxidation_states.push_back(6); oxidation_states.push_back(4); oxidation_states.push_back(-2); //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(6);oxidation_states.push_back(4);oxidation_states.push_back(-2); //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(4);  //RF+SK20200410
       electron_affinity_PT=190.2;
+      energies_ionization.clear();energies_ionization.push_back(869.3);energies_ionization.push_back(1790);energies_ionization.push_back(2698);energies_ionization.push_back(3610);energies_ionization.push_back(5668);energies_ionization.push_back(6820);energies_ionization.push_back(13200);  //CO20201111
       phi_star_Miedema=4.72;
       nws_Miedema=1.31;
       gamma_s_Miedema=NNN;
       scale_Pettifor=2.32;
       temperature_boiling=988;
       temperature_melting=449.51;
+      fusion_heat_PT=17.5;  //CO20201111
       vaporization_heat_PT=48;
       specific_heat_PT=201;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=NNN;
       conductivity_thermal=3;
       hardness_Brinell=180;
@@ -4886,6 +5221,10 @@ namespace xelement {
       valence_std=7;
       valence_iupac=7;
       valence_PT=7;
+      valence_s=2;  //CO20201111
+      valence_p=5;  //CO20201111
+      valence_d=10;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=4.94;
       crystal="orc";
       crystal_structure_PT="Base_Orthorhombic";
@@ -4895,7 +5234,7 @@ namespace xelement {
       lattice_constants[1]=718.02;lattice_constants[2]=471.02;lattice_constants[3]=981.03;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=PI/2;
       phase="Solid";
-      radius=0.136;
+      radius_Saxena=0.136;
       radius_PT=115;
       radius_covalent=1.39;
       radius_covalent_PT=139;
@@ -4909,19 +5248,21 @@ namespace xelement {
       electronegativity_Pearson=6.76;
       electronegativity_Ghosh=5.973;
       electronegativity_Allen=2.359;  //RF+SK20200410
-      oxidation_states.clear();oxidation_states.push_back(7); oxidation_states.push_back(5); oxidation_states.push_back(1); oxidation_states.push_back(-1);  //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(7);oxidation_states.push_back(5);oxidation_states.push_back(1);oxidation_states.push_back(-1);  //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(-1); //RF+SK20200410
       electron_affinity_PT=295.2;
+      energies_ionization.clear();energies_ionization.push_back(1008.4);energies_ionization.push_back(1845.9);energies_ionization.push_back(3180);  //CO20201111
       phi_star_Miedema=5.33;
       nws_Miedema=0.17;
       gamma_s_Miedema=NNN;
       scale_Pettifor=2.56;
       temperature_boiling=184.3;
       temperature_melting=113.7;
+      fusion_heat_PT=7.76;  //CO20201111
       vaporization_heat_PT=20.9;
       specific_heat_PT=429;
-      critical_Pressure=115.5;
-      critical_Temperature_PT=819;
+      critical_pressure=115.5;
+      critical_temperature_PT=819;
       thermal_expansion=NNN;
       conductivity_thermal=0.449;
       hardness_Brinell=NNN;
@@ -4969,6 +5310,10 @@ namespace xelement {
       valence_std=0;
       valence_iupac=8;
       valence_PT=6;
+      valence_s=2;  //CO20201111
+      valence_p=6;  //CO20201111
+      valence_d=10;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=59E-4;
       crystal="fcc";
       crystal_structure_PT="Face-centered_Cubic";
@@ -4978,7 +5323,7 @@ namespace xelement {
       lattice_constants[1]=620.23;lattice_constants[2]=620.23;lattice_constants[3]=620.23;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=PI/2;
       phase="Gas";
-      radius=0.218;
+      radius_Saxena=0.218;
       radius_PT=108;
       radius_covalent=1.40;
       radius_covalent_PT=140;
@@ -4992,19 +5337,21 @@ namespace xelement {
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=6.349;
       electronegativity_Allen=2.582;  //RF+SK20200410
-      oxidation_states.clear();oxidation_states.push_back(8); oxidation_states.push_back(6); oxidation_states.push_back(4); oxidation_states.push_back(2); //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(8);oxidation_states.push_back(6);oxidation_states.push_back(4);oxidation_states.push_back(2); //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
       electron_affinity_PT=0;
+      energies_ionization.clear();energies_ionization.push_back(1170.4);energies_ionization.push_back(2046.4);energies_ionization.push_back(3099.4);  //CO20201111
       phi_star_Miedema=NNN;
       nws_Miedema=NNN;
       gamma_s_Miedema=NNN;
       scale_Pettifor=0;
       temperature_boiling=-108;
       temperature_melting=-111.8;
+      fusion_heat_PT=2.3;  //CO20201111
       vaporization_heat_PT=12.64;
       specific_heat_PT=158.32;
-      critical_Pressure=57.65;
-      critical_Temperature_PT=289.77;
+      critical_pressure=57.65;
+      critical_temperature_PT=289.77;
       thermal_expansion=NNN;
       conductivity_thermal=0.00565;
       hardness_Brinell=NNN;
@@ -5054,6 +5401,10 @@ namespace xelement {
       valence_std=1;
       valence_iupac=1;
       valence_PT=1;
+      valence_s=0;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=1.879;
       crystal="bcc";
       crystal_structure_PT="Body-centered_Cubic";
@@ -5063,7 +5414,7 @@ namespace xelement {
       lattice_constants[1]=614.1;lattice_constants[2]=614.1;lattice_constants[3]=614.1;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=PI/2;
       phase="Solid";
-      radius=0.265;
+      radius_Saxena=0.265;
       radius_PT=298;
       radius_covalent=2.44;
       radius_covalent_PT=244;
@@ -5080,16 +5431,18 @@ namespace xelement {
       oxidation_states.clear();oxidation_states.push_back(1);  //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(1);  //RF+SK20200410
       electron_affinity_PT=45.5;
+      energies_ionization.clear();energies_ionization.push_back(375.7);energies_ionization.push_back(2234.3);energies_ionization.push_back(3400);  //CO20201111
       phi_star_Miedema=1.95;
       nws_Miedema=0.55;
       gamma_s_Miedema=95;
       scale_Pettifor=0.25;
       temperature_boiling=671;
       temperature_melting=28.44;
+      fusion_heat_PT=NNN;  //CO20201111
       vaporization_heat_PT=64;
       specific_heat_PT=242;
-      critical_Pressure=92.77;
-      critical_Temperature_PT=1938;
+      critical_pressure=92.77;
+      critical_temperature_PT=1938;
       thermal_expansion=NNN;
       conductivity_thermal=36;
       hardness_Brinell=0.14;
@@ -5137,6 +5490,10 @@ namespace xelement {
       valence_std=2;
       valence_iupac=2;
       valence_PT=2;
+      valence_s=0;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=3.51;
       crystal="bcc";
       crystal_structure_PT="Body-centered_Cubic";
@@ -5146,7 +5503,7 @@ namespace xelement {
       lattice_constants[1]=502.8;lattice_constants[2]=502.8;lattice_constants[3]=502.8;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=PI/2;
       phase="Solid";
-      radius=0.217;
+      radius_Saxena=0.217;
       radius_PT=253;
       radius_covalent=2.15;
       radius_covalent_PT=215;
@@ -5163,16 +5520,18 @@ namespace xelement {
       oxidation_states.clear();oxidation_states.push_back(2);  //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(2);  //RF+SK20200410
       electron_affinity_PT=13.95;
+      energies_ionization.clear();energies_ionization.push_back(502.9);energies_ionization.push_back(965.2);energies_ionization.push_back(3600);  //CO20201111
       phi_star_Miedema=2.32;
       nws_Miedema=0.81;
       gamma_s_Miedema=370;
       scale_Pettifor=0.50;
       temperature_boiling=1870;
       temperature_melting=727;
+      fusion_heat_PT=NNN;  //CO20201111
       vaporization_heat_PT=140;
       specific_heat_PT=205;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=0.0000206;
       conductivity_thermal=18;
       hardness_Brinell=NNN;
@@ -5221,6 +5580,10 @@ namespace xelement {
       valence_std=3;
       valence_iupac=3;
       valence_PT=3;
+      valence_s=0;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=6.146;
       crystal="hex";
       crystal_structure_PT="Simple_Hexagonal";
@@ -5230,7 +5593,7 @@ namespace xelement {
       lattice_constants[1]=377.2;lattice_constants[2]=377.2;lattice_constants[3]=1214.4;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=2*PI/3;
       phase="Solid";
-      radius=0.187;
+      radius_Saxena=0.187;
       radius_PT=NNN;
       radius_covalent=2.07;
       radius_covalent_PT=207;
@@ -5247,16 +5610,18 @@ namespace xelement {
       oxidation_states.clear();oxidation_states.push_back(3);
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);
       electron_affinity_PT=48;
+      energies_ionization.clear();energies_ionization.push_back(538.1);energies_ionization.push_back(1067);energies_ionization.push_back(1850.3);energies_ionization.push_back(4819);energies_ionization.push_back(5940);  //CO20201111
       phi_star_Miedema=3.05;
       nws_Miedema=1.09;
       gamma_s_Miedema=900;
       scale_Pettifor=0.7480;
       temperature_boiling=3464;
       temperature_melting=919;
+      fusion_heat_PT=NNN;  //CO20201111
       vaporization_heat_PT=400;
       specific_heat_PT=195;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=0.0000121;
       conductivity_thermal=13;
       hardness_Brinell=363;
@@ -5305,6 +5670,10 @@ namespace xelement {
       valence_std=4;
       valence_iupac=4;
       valence_PT=4;
+      valence_s=0;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=6.689;
       crystal="fcc";
       crystal_structure_PT="Simple_Hexagonal";
@@ -5314,7 +5683,7 @@ namespace xelement {
       lattice_constants[1]=362;lattice_constants[2]=362;lattice_constants[3]=599;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=2*PI/3;
       phase="Solid";
-      radius=0.182;
+      radius_Saxena=0.182;
       radius_PT=NNN;
       radius_covalent=2.04;
       radius_covalent_PT=204;
@@ -5328,19 +5697,21 @@ namespace xelement {
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=4.561;
       electronegativity_Allen=1.09; // RF+SK20200410; use value for Lu since no values are available for other lanthanides and they are all usually very similar chemically
-      oxidation_states.clear();oxidation_states.push_back(4); oxidation_states.push_back(3);
+      oxidation_states.clear();oxidation_states.push_back(4);oxidation_states.push_back(3);
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);
       electron_affinity_PT=50;
+      energies_ionization.clear();energies_ionization.push_back(534.4);energies_ionization.push_back(1050);energies_ionization.push_back(1949);energies_ionization.push_back(3547);energies_ionization.push_back(6325);energies_ionization.push_back(7490);  //CO20201111
       phi_star_Miedema=3.18;
       nws_Miedema=1.19;
       gamma_s_Miedema=NNN;
       scale_Pettifor=0.7460;
       temperature_boiling=3360;
       temperature_melting=798;
+      fusion_heat_PT=NNN;  //CO20201111
       vaporization_heat_PT=350;
       specific_heat_PT=192;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=6.3E-6;
       conductivity_thermal=11;
       hardness_Brinell=412;
@@ -5388,6 +5759,10 @@ namespace xelement {
       valence_std=5;
       valence_iupac=4;
       valence_PT=4;
+      valence_s=0;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=6.64;
       crystal="hex";
       crystal_structure_PT="Simple_Hexagonal";
@@ -5397,7 +5772,7 @@ namespace xelement {
       lattice_constants[1]=367.25;lattice_constants[2]=367.25;lattice_constants[3]=1183.54;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=2*PI/3;
       phase="Solid";
-      radius=0.183;
+      radius_Saxena=0.183;
       radius_PT=247;
       radius_covalent=2.03;
       radius_covalent_PT=203;
@@ -5411,19 +5786,21 @@ namespace xelement {
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=4.682;
       electronegativity_Allen=1.09; // RF+SK20200410; use value for Lu since no values are available for other lanthanides and they are all usually very similar chemically
-      oxidation_states.clear();oxidation_states.push_back(4); oxidation_states.push_back(3);
+      oxidation_states.clear();oxidation_states.push_back(4);oxidation_states.push_back(3);
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);
       electron_affinity_PT=50;
+      energies_ionization.clear();energies_ionization.push_back(527);energies_ionization.push_back(1020);energies_ionization.push_back(2086);energies_ionization.push_back(3761);energies_ionization.push_back(5551);  //CO20201111
       phi_star_Miedema=3.19;
       nws_Miedema=1.20;
       gamma_s_Miedema=NNN;
       scale_Pettifor=0.7440;
       temperature_boiling=3290;
       temperature_melting=931;
+      fusion_heat_PT=NNN;  //CO20201111
       vaporization_heat_PT=330;
       specific_heat_PT=193;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=6.7E-6;
       conductivity_thermal=13;
       hardness_Brinell=481;
@@ -5471,6 +5848,10 @@ namespace xelement {
       valence_std=6;
       valence_iupac=4;
       valence_PT=3;
+      valence_s=0;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=7.01;
       crystal="hex";
       crystal_structure_PT="Simple_Hexagonal";
@@ -5480,7 +5861,7 @@ namespace xelement {
       lattice_constants[1]=365.8;lattice_constants[2]=365.8;lattice_constants[3]=1179.9;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=2*PI/3;
       phase="Solid";
-      radius=0.182;
+      radius_Saxena=0.182;
       radius_PT=206;
       radius_covalent=2.01;
       radius_covalent_PT=201;
@@ -5497,16 +5878,18 @@ namespace xelement {
       oxidation_states.clear();oxidation_states.push_back(3);
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);
       electron_affinity_PT=50;
+      energies_ionization.clear();energies_ionization.push_back(533.1);energies_ionization.push_back(1040);energies_ionization.push_back(2130);energies_ionization.push_back(3900);  //CO20201111
       phi_star_Miedema=3.19;
       nws_Miedema=1.20;
       gamma_s_Miedema=NNN;
       scale_Pettifor=0.7420;
       temperature_boiling=3100;
       temperature_melting=1021;
+      fusion_heat_PT=NNN;  //CO20201111
       vaporization_heat_PT=285;
       specific_heat_PT=190;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=9.6E-6;
       conductivity_thermal=17;
       hardness_Brinell=265;
@@ -5554,6 +5937,10 @@ namespace xelement {
       valence_std=7;
       valence_iupac=3;
       valence_PT=3;
+      valence_s=0;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=7.264;
       crystal="hex";
       crystal_structure_PT="NNN";
@@ -5563,7 +5950,7 @@ namespace xelement {
       lattice_constants[1]=NNN;lattice_constants[2]=NNN;lattice_constants[3]=NNN;
       lattice_angles[1]=NNN;lattice_angles[2]=NNN;lattice_angles[3]=NNN;
       phase="Solid";
-      radius=NNN;
+      radius_Saxena=NNN;
       radius_PT=205;
       radius_covalent=1.99;
       radius_covalent_PT=199;
@@ -5580,16 +5967,18 @@ namespace xelement {
       oxidation_states.clear();oxidation_states.push_back(3);
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);
       electron_affinity_PT=50;
+      energies_ionization.clear();energies_ionization.push_back(540);energies_ionization.push_back(1050);energies_ionization.push_back(2150);energies_ionization.push_back(3970);  //CO20201111
       phi_star_Miedema=3.19;
       nws_Miedema=1.21;
       gamma_s_Miedema=NNN;
       scale_Pettifor=0.7400;
       temperature_boiling=3000;
       temperature_melting=1100;
+      fusion_heat_PT=NNN;  //CO20201111
       vaporization_heat_PT=290;
       specific_heat_PT=NNN;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=0.000011;
       conductivity_thermal=15;
       hardness_Brinell=NNN;
@@ -5637,6 +6026,10 @@ namespace xelement {
       valence_std=8;
       valence_iupac=3;
       valence_PT=3;
+      valence_s=0;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=7.353;
       crystal="rhl";
       crystal_structure_PT="Simple_Trigonal";
@@ -5646,7 +6039,7 @@ namespace xelement {
       lattice_constants[1]=362.1;lattice_constants[2]=362.1;lattice_constants[3]=2625;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=2*PI/3;
       phase="Solid";
-      radius=0.181;
+      radius_Saxena=0.181;
       radius_PT=238;
       radius_covalent=1.98;
       radius_covalent_PT=198;
@@ -5660,19 +6053,21 @@ namespace xelement {
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=5.047;
       electronegativity_Allen=1.09; // RF+SK20200410; use value for Lu since no values are available for other lanthanides and they are all usually very similar chemically
-      oxidation_states.clear();oxidation_states.push_back(3); oxidation_states.push_back(2);
+      oxidation_states.clear();oxidation_states.push_back(3);oxidation_states.push_back(2);
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);
       electron_affinity_PT=50;
+      energies_ionization.clear();energies_ionization.push_back(544.5);energies_ionization.push_back(1070);energies_ionization.push_back(2260);energies_ionization.push_back(3990);  //CO20201111
       phi_star_Miedema=3.20;
       nws_Miedema=1.21;
       gamma_s_Miedema=NNN;
       scale_Pettifor=0.7380;
       temperature_boiling=1803;
       temperature_melting=1072;
+      fusion_heat_PT=NNN;  //CO20201111
       vaporization_heat_PT=175;
       specific_heat_PT=196;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=0.0000127;
       conductivity_thermal=13;
       hardness_Brinell=441;
@@ -5720,6 +6115,10 @@ namespace xelement {
       valence_std=9;
       valence_iupac=3;
       valence_PT=3;
+      valence_s=0;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=5.244;
       crystal="bcc";
       crystal_structure_PT="Body-centered_Cubic";
@@ -5729,7 +6128,7 @@ namespace xelement {
       lattice_constants[1]=458.1;lattice_constants[2]=458.1;lattice_constants[3]=458.1;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=PI/2;
       phase="Solid";
-      radius=0.204;
+      radius_Saxena=0.204;
       radius_PT=231;
       radius_covalent=1.98;
       radius_covalent_PT=198;
@@ -5743,19 +6142,21 @@ namespace xelement {
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=5.168;
       electronegativity_Allen=1.09; // RF+SK20200410; use value for Lu since no values are available for other lanthanides and they are all usually very similar chemically
-      oxidation_states.clear();oxidation_states.push_back(3); oxidation_states.push_back(2);
+      oxidation_states.clear();oxidation_states.push_back(3);oxidation_states.push_back(2);
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);
       electron_affinity_PT=50;
+      energies_ionization.clear();energies_ionization.push_back(547.1);energies_ionization.push_back(1085);energies_ionization.push_back(2404);energies_ionization.push_back(4120);  //CO20201111
       phi_star_Miedema=3.20;
       nws_Miedema=1.21;
       gamma_s_Miedema=NNN;
       scale_Pettifor=0.7360;
       temperature_boiling=1527;
       temperature_melting=822;
+      fusion_heat_PT=NNN;  //CO20201111
       vaporization_heat_PT=175;
       specific_heat_PT=182;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=0.000035;
       conductivity_thermal=14;
       hardness_Brinell=NNN;
@@ -5803,6 +6204,10 @@ namespace xelement {
       valence_std=10;
       valence_iupac=3;
       valence_PT=3;
+      valence_s=0;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=7.901;
       crystal="hcp";
       crystal_structure_PT="Simple_Hexagonal";
@@ -5812,7 +6217,7 @@ namespace xelement {
       lattice_constants[1]=363.6;lattice_constants[2]=363.6;lattice_constants[3]=578.26;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=2*PI/3;
       phase="Solid";
-      radius=0.180;
+      radius_Saxena=0.180;
       radius_PT=233;
       radius_covalent=1.96;
       radius_covalent_PT=196;
@@ -5829,16 +6234,18 @@ namespace xelement {
       oxidation_states.clear();oxidation_states.push_back(3);
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);
       electron_affinity_PT=50;
+      energies_ionization.clear();energies_ionization.push_back(593.4);energies_ionization.push_back(1170);energies_ionization.push_back(1990);energies_ionization.push_back(4250);  //CO20201111
       phi_star_Miedema=3.20;
       nws_Miedema=1.21;
       gamma_s_Miedema=NNN;
       scale_Pettifor=0.7340;
       temperature_boiling=3250;
       temperature_melting=1313;
+      fusion_heat_PT=NNN;  //CO20201111
       vaporization_heat_PT=305;
       specific_heat_PT=240;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=9.4E-6;
       conductivity_thermal=11;
       hardness_Brinell=NNN;
@@ -5886,6 +6293,10 @@ namespace xelement {
       valence_std=11;
       valence_iupac=4;
       valence_PT=3;
+      valence_s=0;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=8.219;
       crystal="hcp";
       crystal_structure_PT="Simple_Hexagonal";
@@ -5895,7 +6306,7 @@ namespace xelement {
       lattice_constants[1]=360.1;lattice_constants[2]=360.1;lattice_constants[3]=569.36;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=2*PI/3;
       phase="Solid";
-      radius=0.177;
+      radius_Saxena=0.177;
       radius_PT=225;
       radius_covalent=1.94;
       radius_covalent_PT=194;
@@ -5909,19 +6320,21 @@ namespace xelement {
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=5.411;
       electronegativity_Allen=1.09; // RF+SK20200410; use value for Lu since no values are available for other lanthanides and they are all usually very similar chemically
-      oxidation_states.clear();oxidation_states.push_back(4); oxidation_states.push_back(3);
+      oxidation_states.clear();oxidation_states.push_back(4);oxidation_states.push_back(3);
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);
       electron_affinity_PT=50;
+      energies_ionization.clear();energies_ionization.push_back(565.8);energies_ionization.push_back(1110);energies_ionization.push_back(2114);energies_ionization.push_back(3839);  //CO20201111
       phi_star_Miedema=3.21;
       nws_Miedema=1.22;
       gamma_s_Miedema=NNN;
       scale_Pettifor=0.7320;
       temperature_boiling=3230;
       temperature_melting=1356;
+      fusion_heat_PT=NNN;  //CO20201111
       vaporization_heat_PT=295;
       specific_heat_PT=182;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=0.0000103;
       conductivity_thermal=11;
       hardness_Brinell=677;
@@ -5969,6 +6382,10 @@ namespace xelement {
       valence_std=12;
       valence_iupac=4;
       valence_PT=3;
+      valence_s=0;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=8.551;
       crystal="hcp";
       crystal_structure_PT="Simple_Hexagonal";
@@ -5978,7 +6395,7 @@ namespace xelement {
       lattice_constants[1]=359.3;lattice_constants[2]=359.3;lattice_constants[3]=565.37;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=2*PI/3;
       phase="Solid";
-      radius=0.177;
+      radius_Saxena=0.177;
       radius_PT=228;
       radius_covalent=1.92;
       radius_covalent_PT=192;
@@ -5995,16 +6412,18 @@ namespace xelement {
       oxidation_states.clear();oxidation_states.push_back(3);
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);
       electron_affinity_PT=50;
+      energies_ionization.clear();energies_ionization.push_back(573);energies_ionization.push_back(1130);energies_ionization.push_back(2200);energies_ionization.push_back(3990);  //CO20201111
       phi_star_Miedema=3.21;
       nws_Miedema=1.22;
       gamma_s_Miedema=NNN;
       scale_Pettifor=0.7300;
       temperature_boiling=2567;
       temperature_melting=1412;
+      fusion_heat_PT=NNN;  //CO20201111
       vaporization_heat_PT=280;
       specific_heat_PT=167;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=0.00001;
       conductivity_thermal=11;
       hardness_Brinell=500;
@@ -6052,6 +6471,10 @@ namespace xelement {
       valence_std=13;
       valence_iupac=3;
       valence_PT=3;
+      valence_s=0;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=8.795;
       crystal="hcp";
       crystal_structure_PT="Simple_Hexagonal";
@@ -6061,7 +6484,7 @@ namespace xelement {
       lattice_constants[1]=357.73;lattice_constants[2]=357.73;lattice_constants[3]=561.58;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=2*PI/3;
       phase="Solid";
-      radius=0.176;
+      radius_Saxena=0.176;
       radius_PT=226;
       radius_covalent=1.92;
       radius_covalent_PT=192;
@@ -6078,16 +6501,18 @@ namespace xelement {
       oxidation_states.clear();oxidation_states.push_back(3);
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);
       electron_affinity_PT=50;
+      energies_ionization.clear();energies_ionization.push_back(581);energies_ionization.push_back(1140);energies_ionization.push_back(2204);energies_ionization.push_back(4100);  //CO20201111
       phi_star_Miedema=3.22;
       nws_Miedema=1.22;
       gamma_s_Miedema=NNN;
       scale_Pettifor=0.7280;
       temperature_boiling=2700;
       temperature_melting=1474;
+      fusion_heat_PT=NNN;  //CO20201111
       vaporization_heat_PT=265;
       specific_heat_PT=165;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=0.0000112;
       conductivity_thermal=16;
       hardness_Brinell=746;
@@ -6135,6 +6560,10 @@ namespace xelement {
       valence_std=14;
       valence_iupac=3;
       valence_PT=3;
+      valence_s=0;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=9.066;
       crystal="hcp";
       crystal_structure_PT="Simple_Hexagonal";
@@ -6144,7 +6573,7 @@ namespace xelement {
       lattice_constants[1]=355.88;lattice_constants[2]=355.88;lattice_constants[3]=558.74;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=2*PI/3;
       phase="Solid";
-      radius=0.175;
+      radius_Saxena=0.175;
       radius_PT=226;
       radius_covalent=1.89;
       radius_covalent_PT=189;
@@ -6161,16 +6590,18 @@ namespace xelement {
       oxidation_states.clear();oxidation_states.push_back(3);
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);
       electron_affinity_PT=50;
+      energies_ionization.clear();energies_ionization.push_back(589.3);energies_ionization.push_back(1150);energies_ionization.push_back(2194);energies_ionization.push_back(4120);  //CO20201111
       phi_star_Miedema=3.22;
       nws_Miedema=1.23;
       gamma_s_Miedema=NNN;
       scale_Pettifor=0.7260;
       temperature_boiling=2868;
       temperature_melting=1497;
+      fusion_heat_PT=NNN;  //CO20201111
       vaporization_heat_PT=285;
       specific_heat_PT=168;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=0.0000122;
       conductivity_thermal=15;
       hardness_Brinell=814;
@@ -6218,6 +6649,10 @@ namespace xelement {
       valence_std=15;
       valence_iupac=4;
       valence_PT=3;
+      valence_s=0;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=9.32;
       crystal="hcp";
       crystal_structure_PT="Simple_Hexagonal";
@@ -6227,7 +6662,7 @@ namespace xelement {
       lattice_constants[1]=353.75;lattice_constants[2]=353.75;lattice_constants[3]=555.46;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=2*PI/3;
       phase="Solid";
-      radius=0.174;
+      radius_Saxena=0.174;
       radius_PT=222;
       radius_covalent=1.90;
       radius_covalent_PT=190;
@@ -6241,19 +6676,21 @@ namespace xelement {
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=5.897;
       electronegativity_Allen=1.09; // RF+SK20200410; use value for Lu since no values are available for other lanthanides and they are all usually very similar chemically
-      oxidation_states.clear();oxidation_states.push_back(3); oxidation_states.push_back(2);
+      oxidation_states.clear();oxidation_states.push_back(3);oxidation_states.push_back(2);
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);
       electron_affinity_PT=50;
+      energies_ionization.clear();energies_ionization.push_back(596.7);energies_ionization.push_back(1160);energies_ionization.push_back(2285);energies_ionization.push_back(4120);  //CO20201111
       phi_star_Miedema=3.22;
       nws_Miedema=1.23;
       gamma_s_Miedema=NNN;
       scale_Pettifor=0.7240;
       temperature_boiling=1950;
       temperature_melting=1545;
+      fusion_heat_PT=NNN;  //CO20201111
       vaporization_heat_PT=250;
       specific_heat_PT=160;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=0.0000133;
       conductivity_thermal=17;
       hardness_Brinell=471;
@@ -6301,6 +6738,10 @@ namespace xelement {
       valence_std=16;
       valence_iupac=3;
       valence_PT=3;
+      valence_s=0;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=6.57;
       crystal="fcc";
       crystal_structure_PT="Face-centered_Cubic";
@@ -6310,7 +6751,7 @@ namespace xelement {
       lattice_constants[1]=548.47;lattice_constants[2]=548.47;lattice_constants[3]=548.47;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=PI/2;
       phase="Solid";
-      radius=0.193;
+      radius_Saxena=0.193;
       radius_PT=222;
       radius_covalent=1.87;
       radius_covalent_PT=187;
@@ -6324,19 +6765,21 @@ namespace xelement {
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=6.019;
       electronegativity_Allen=1.09; // RF+SK20200410; use value for Lu since no values are available for other lanthanides and they are all usually very similar chemically
-      oxidation_states.clear();oxidation_states.push_back(3); oxidation_states.push_back(2);
+      oxidation_states.clear();oxidation_states.push_back(3);oxidation_states.push_back(2);
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);
       electron_affinity_PT=50;
+      energies_ionization.clear();energies_ionization.push_back(603.4);energies_ionization.push_back(1174.8);energies_ionization.push_back(2417);energies_ionization.push_back(4203);  //CO20201111
       phi_star_Miedema=3.22;
       nws_Miedema=1.23;
       gamma_s_Miedema=NNN;
       scale_Pettifor=0.7220;
       temperature_boiling=1196;
       temperature_melting=819;
+      fusion_heat_PT=NNN;  //CO20201111
       vaporization_heat_PT=160;
       specific_heat_PT=154;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=0.0000263;
       conductivity_thermal=39;
       hardness_Brinell=343;
@@ -6384,6 +6827,10 @@ namespace xelement {
       valence_std=17;
       valence_iupac=3;
       valence_PT=3;
+      valence_s=0;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=9.841;
       crystal="hcp";
       crystal_structure_PT="Simple_Hexagonal";
@@ -6393,7 +6840,7 @@ namespace xelement {
       lattice_constants[1]=350.31;lattice_constants[2]=350.31;lattice_constants[3]=555.09;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=2*PI/3;
       phase="Solid";
-      radius=0.173;
+      radius_Saxena=0.173;
       radius_PT=217;
       radius_covalent=1.87;
       radius_covalent_PT=187;
@@ -6410,16 +6857,18 @@ namespace xelement {
       oxidation_states.clear();oxidation_states.push_back(3);  //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);  //RF+SK20200410
       electron_affinity_PT=50;
+      energies_ionization.clear();energies_ionization.push_back(523.5);energies_ionization.push_back(1340);energies_ionization.push_back(2022.3);energies_ionization.push_back(4370);energies_ionization.push_back(6445);  //CO20201111
       phi_star_Miedema=3.22;
       nws_Miedema=1.24;
       gamma_s_Miedema=NNN;
       scale_Pettifor=0.7200;
       temperature_boiling=3402;
       temperature_melting=1663;
+      fusion_heat_PT=NNN;  //CO20201111
       vaporization_heat_PT=415;
       specific_heat_PT=154;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=0.00001;
       conductivity_thermal=16;
       hardness_Brinell=893;
@@ -6468,6 +6917,10 @@ namespace xelement {
       valence_std=4;
       valence_iupac=4;
       valence_PT=4;
+      valence_s=0;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=13.31;
       crystal="hcp";
       crystal_structure_PT="Simple_Hexagonal";
@@ -6477,7 +6930,7 @@ namespace xelement {
       lattice_constants[1]=319.64;lattice_constants[2]=319.64;lattice_constants[3]=505.11;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=2*PI/3;
       phase="Solid";
-      radius=0.159;
+      radius_Saxena=0.159;
       radius_PT=208;
       radius_covalent=1.75;
       radius_covalent_PT=175;
@@ -6491,19 +6944,21 @@ namespace xelement {
       electronegativity_Pearson=3.8;
       electronegativity_Ghosh=6.258;
       electronegativity_Allen=1.16; //RF+SK20200410
-      oxidation_states.clear();oxidation_states.push_back(4); oxidation_states.push_back(3); //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(4);oxidation_states.push_back(3); //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(4);  //RF+SK20200410
       electron_affinity_PT=0;
+      energies_ionization.clear();energies_ionization.push_back(658.5);energies_ionization.push_back(1440);energies_ionization.push_back(2250);energies_ionization.push_back(3216);  //CO20201111
       phi_star_Miedema=3.55;
       nws_Miedema=1.43;
       gamma_s_Miedema=2200;
       scale_Pettifor=0.775;
       temperature_boiling=4603;
       temperature_melting=2233;
+      fusion_heat_PT=NNN;  //CO20201111
       vaporization_heat_PT=630;
       specific_heat_PT=144;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=5.9E-6;
       conductivity_thermal=23;
       hardness_Brinell=1700;
@@ -6551,6 +7006,10 @@ namespace xelement {
       valence_std=5;
       valence_iupac=5;
       valence_PT=5;
+      valence_s=0;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=16.65;
       crystal="bcc";
       crystal_structure_PT="Body-centered_Cubic";
@@ -6560,7 +7019,7 @@ namespace xelement {
       lattice_constants[1]=330.13;lattice_constants[2]=330.13;lattice_constants[3]=330.13;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=PI/2;
       phase="Solid";
-      radius=0.147;
+      radius_Saxena=0.147;
       radius_PT=200;
       radius_covalent=1.70;
       radius_covalent_PT=170;
@@ -6574,19 +7033,21 @@ namespace xelement {
       electronegativity_Pearson=4.11;
       electronegativity_Ghosh=6.383;
       electronegativity_Allen=1.34; //RF+SK20200410
-      oxidation_states.clear();oxidation_states.push_back(5); oxidation_states.push_back(3); //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(5);oxidation_states.push_back(3); //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(5);  //RF+SK20200410
       electron_affinity_PT=31;
+      energies_ionization.clear();energies_ionization.push_back(761);energies_ionization.push_back(1500);  //CO20201111
       phi_star_Miedema=4.05;
       nws_Miedema=1.63;
       gamma_s_Miedema=3050;
       scale_Pettifor=0.83;
       temperature_boiling=5458;
       temperature_melting=3017;
+      fusion_heat_PT=NNN;  //CO20201111
       vaporization_heat_PT=736;
       specific_heat_PT=140;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=6.3E-6;
       conductivity_thermal=57;
       hardness_Brinell=800;
@@ -6634,6 +7095,10 @@ namespace xelement {
       valence_std=6;
       valence_iupac=6;
       valence_PT=6;
+      valence_s=0;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=19.25;
       crystal="bcc";
       crystal_structure_PT="Body-centered_Cubic";
@@ -6643,7 +7108,7 @@ namespace xelement {
       lattice_constants[1]=316.52;lattice_constants[2]=316.52;lattice_constants[3]=316.52;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=PI/2;
       phase="Solid";
-      radius=0.137;
+      radius_Saxena=0.137;
       radius_PT=193;
       radius_covalent=1.62;
       radius_covalent_PT=162;
@@ -6657,19 +7122,21 @@ namespace xelement {
       electronegativity_Pearson=4.40;
       electronegativity_Ghosh=6.505;
       electronegativity_Allen=1.47; //RF+SK20200410
-      oxidation_states.clear();oxidation_states.push_back(6); oxidation_states.push_back(5); oxidation_states.push_back(4); oxidation_states.push_back(3); oxidation_states.push_back(2); oxidation_states.push_back(0); //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(6);oxidation_states.push_back(5);oxidation_states.push_back(4);oxidation_states.push_back(3);oxidation_states.push_back(2);oxidation_states.push_back(0); //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(6);  //RF+SK20200410
       electron_affinity_PT=78.6;
+      energies_ionization.clear();energies_ionization.push_back(770);energies_ionization.push_back(1700);  //CO20201111
       phi_star_Miedema=4.80;
       nws_Miedema=1.81;
       gamma_s_Miedema=3300;
       scale_Pettifor=0.885;
       temperature_boiling=5555;
       temperature_melting=3422;
+      fusion_heat_PT=NNN;  //CO20201111
       vaporization_heat_PT=800;
       specific_heat_PT=132;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=4.5E-6;
       conductivity_thermal=170;
       hardness_Brinell=2570;
@@ -6717,6 +7184,10 @@ namespace xelement {
       valence_std=7;
       valence_iupac=7;
       valence_PT=7;
+      valence_s=0;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=21.02;
       crystal="hcp";
       crystal_structure_PT="Simple_Hexagonal";
@@ -6726,7 +7197,7 @@ namespace xelement {
       lattice_constants[1]=276.1;lattice_constants[2]=276.1;lattice_constants[3]=445.6;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=2*PI/3;
       phase="Solid";
-      radius=0.138;
+      radius_Saxena=0.138;
       radius_PT=188;
       radius_covalent=1.51;
       radius_covalent_PT=151;
@@ -6740,19 +7211,21 @@ namespace xelement {
       electronegativity_Pearson=4.02;
       electronegativity_Ghosh=6.626;
       electronegativity_Allen=1.60; //RF+SK20200410
-      oxidation_states.clear();oxidation_states.push_back(7); oxidation_states.push_back(6); oxidation_states.push_back(4); oxidation_states.push_back(2); oxidation_states.push_back(-1); //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(7);oxidation_states.push_back(6);oxidation_states.push_back(4);oxidation_states.push_back(2);oxidation_states.push_back(-1); //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(7);  //RF+SK20200410
       electron_affinity_PT=14.5;
+      energies_ionization.clear();energies_ionization.push_back(760);energies_ionization.push_back(1260);energies_ionization.push_back(2510);energies_ionization.push_back(3640);  //CO20201111
       phi_star_Miedema=5.40;
       nws_Miedema=1.86;
       gamma_s_Miedema=3650;
       scale_Pettifor=0.94;
       temperature_boiling=5596;
       temperature_melting=3186;
+      fusion_heat_PT=NNN;  //CO20201111
       vaporization_heat_PT=705;
       specific_heat_PT=137;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=6.2E-6;
       conductivity_thermal=48;
       hardness_Brinell=1320;
@@ -6800,6 +7273,10 @@ namespace xelement {
       valence_std=8;
       valence_iupac=8;
       valence_PT=6;
+      valence_s=0;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=22.59;
       crystal="hcp";
       crystal_structure_PT="Simple_Hexagonal";
@@ -6809,7 +7286,7 @@ namespace xelement {
       lattice_constants[1]=273.44;lattice_constants[2]=273.44;lattice_constants[3]=431.73;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=2*PI/3;
       phase="Solid";
-      radius=0.135;
+      radius_Saxena=0.135;
       radius_PT=185;
       radius_covalent=1.44;
       radius_covalent_PT=144;
@@ -6823,19 +7300,21 @@ namespace xelement {
       electronegativity_Pearson=4.9;
       electronegativity_Ghosh=6.748;
       electronegativity_Allen=1.65; //RF+SK20200410
-      oxidation_states.clear();oxidation_states.push_back(8); oxidation_states.push_back(6); oxidation_states.push_back(4); oxidation_states.push_back(3); oxidation_states.push_back(2); oxidation_states.push_back(0); oxidation_states.push_back(-2); //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(8);oxidation_states.push_back(6);oxidation_states.push_back(4);oxidation_states.push_back(3);oxidation_states.push_back(2);oxidation_states.push_back(0);oxidation_states.push_back(-2); //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(4);  //RF+SK20200410
       electron_affinity_PT=106.1;
+      energies_ionization.clear();energies_ionization.push_back(840);energies_ionization.push_back(1600);  //CO20201111
       phi_star_Miedema=5.40;
       nws_Miedema=1.85;
       gamma_s_Miedema=3500;
       scale_Pettifor=0.995;
       temperature_boiling=5012;
       temperature_melting=3033;
+      fusion_heat_PT=NNN;  //CO20201111
       vaporization_heat_PT=630;
       specific_heat_PT=130;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=5.1E-6;
       conductivity_thermal=87;
       hardness_Brinell=3920;
@@ -6883,6 +7362,10 @@ namespace xelement {
       valence_std=9;
       valence_iupac=8;
       valence_PT=6;
+      valence_s=0;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=22.56;
       crystal="fcc";
       crystal_structure_PT="Face-centered_Cubic";
@@ -6892,7 +7375,7 @@ namespace xelement {
       lattice_constants[1]=383.9;lattice_constants[2]=383.9;lattice_constants[3]=383.9;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=PI/2;
       phase="Solid";
-      radius=0.135;
+      radius_Saxena=0.135;
       radius_PT=180;
       radius_covalent=1.41;
       radius_covalent_PT=141;
@@ -6906,19 +7389,21 @@ namespace xelement {
       electronegativity_Pearson=5.4;
       electronegativity_Ghosh=6.831;
       electronegativity_Allen=1.68; //RF+SK20200410
-      oxidation_states.clear();oxidation_states.push_back(6); oxidation_states.push_back(4); oxidation_states.push_back(3); oxidation_states.push_back(2); oxidation_states.push_back(1); oxidation_states.push_back(0); oxidation_states.push_back(-1); //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(6);oxidation_states.push_back(4);oxidation_states.push_back(3);oxidation_states.push_back(2);oxidation_states.push_back(1);oxidation_states.push_back(0);oxidation_states.push_back(-1); //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(4); oxidation_states_preferred.push_back(1); //RF+SK20200410
       electron_affinity_PT=151;
+      energies_ionization.clear();energies_ionization.push_back(880);energies_ionization.push_back(1600);  //CO20201111
       phi_star_Miedema=5.55;
       nws_Miedema=1.83;
       gamma_s_Miedema=3100;
       scale_Pettifor=1.05;
       temperature_boiling=4428;
       temperature_melting=2466;
+      fusion_heat_PT=NNN;  //CO20201111
       vaporization_heat_PT=560;
       specific_heat_PT=131;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=6.4E-6;
       conductivity_thermal=150;
       hardness_Brinell=1670;
@@ -6966,6 +7451,10 @@ namespace xelement {
       valence_std=10;
       valence_iupac=6;
       valence_PT=6;
+      valence_s=0;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=21.45;
       crystal="fcc";
       crystal_structure_PT="Face-centered_Cubic";
@@ -6975,7 +7464,7 @@ namespace xelement {
       lattice_constants[1]=392.42;lattice_constants[2]=392.42;lattice_constants[3]=392.42;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=PI/2;
       phase="Solid";
-      radius=0.138;
+      radius_Saxena=0.138;
       radius_PT=177;
       radius_covalent=1.36;
       radius_covalent_PT=136;
@@ -6989,19 +7478,21 @@ namespace xelement {
       electronegativity_Pearson=5.6;
       electronegativity_Ghosh=6.991;
       electronegativity_Allen=1.72; //RF+SK20200410
-      oxidation_states.clear();oxidation_states.push_back(4); oxidation_states.push_back(2); oxidation_states.push_back(0);  //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(4);oxidation_states.push_back(2);oxidation_states.push_back(0);  //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(4); oxidation_states_preferred.push_back(2); //RF+SK20200410
       electron_affinity_PT=205.3;
+      energies_ionization.clear();energies_ionization.push_back(870);energies_ionization.push_back(1791);  //CO20201111
       phi_star_Miedema=5.65;
       nws_Miedema=1.78;
       gamma_s_Miedema=2550;
       scale_Pettifor=1.105;
       temperature_boiling=3825;
       temperature_melting=1768.3;
+      fusion_heat_PT=NNN;  //CO20201111
       vaporization_heat_PT=490;
       specific_heat_PT=133;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=8.9E-6;
       conductivity_thermal=71;
       hardness_Brinell=392;
@@ -7049,6 +7540,10 @@ namespace xelement {
       valence_std=11;
       valence_iupac=5;
       valence_PT=5;
+      valence_s=0;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=19.3;
       crystal="fcc";
       crystal_structure_PT="Face-centered_Cubic";
@@ -7058,7 +7553,7 @@ namespace xelement {
       lattice_constants[1]=407.82;lattice_constants[2]=407.82;lattice_constants[3]=407.82;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=PI/2;
       phase="Solid";
-      radius=0.144;
+      radius_Saxena=0.144;
       radius_PT=174;
       radius_covalent=1.36;
       radius_covalent_PT=136;
@@ -7072,19 +7567,21 @@ namespace xelement {
       electronegativity_Pearson=5.77;
       electronegativity_Ghosh=7.112;
       electronegativity_Allen=1.92; //RF+SK20200410
-      oxidation_states.clear();oxidation_states.push_back(3); oxidation_states.push_back(1); //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(3);oxidation_states.push_back(1); //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);  //RF+SK20200410
       electron_affinity_PT=222.8;
+      energies_ionization.clear();energies_ionization.push_back(890.1);energies_ionization.push_back(1980);  //CO20201111
       phi_star_Miedema=5.15;
       nws_Miedema=1.57;
       gamma_s_Miedema=1550;
       scale_Pettifor=1.16;
       temperature_boiling=2856;
       temperature_melting=1064.18;
+      fusion_heat_PT=NNN;  //CO20201111
       vaporization_heat_PT=330;
       specific_heat_PT=129.1;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=0.0000142;
       conductivity_thermal=320;
       hardness_Brinell=2450;
@@ -7132,6 +7629,10 @@ namespace xelement {
       valence_std=12;
       valence_iupac=4;
       valence_PT=2;
+      valence_s=0;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=13.534;
       crystal="rhl";
       crystal_structure_PT="Simple_Trigonal";
@@ -7141,7 +7642,7 @@ namespace xelement {
       lattice_constants[1]=300.5;lattice_constants[2]=300.5;lattice_constants[3]=300.5;
       lattice_angles[1]=1.23081;lattice_angles[2]=1.23081;lattice_angles[3]=1.23081;
       phase="Liquid";
-      radius=0.150;
+      radius_Saxena=0.150;
       radius_PT=171;
       radius_covalent=1.32;
       radius_covalent_PT=132;
@@ -7155,19 +7656,21 @@ namespace xelement {
       electronegativity_Pearson=4.91;
       electronegativity_Ghosh=7.233;
       electronegativity_Allen=1.76; //RF+SK20200410
-      oxidation_states.clear();oxidation_states.push_back(2); oxidation_states.push_back(1); //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(2);oxidation_states.push_back(1); //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(2);  //RF+SK20200410
       electron_affinity_PT=0;
+      energies_ionization.clear();energies_ionization.push_back(1007.1);energies_ionization.push_back(1810);energies_ionization.push_back(3300);  //CO20201111
       phi_star_Miedema=4.20;
       nws_Miedema=1.24;
       gamma_s_Miedema=610;
       scale_Pettifor=1.32;
       temperature_boiling=356.73;
       temperature_melting=-38.83;
+      fusion_heat_PT=NNN;  //CO20201111
       vaporization_heat_PT=59.2;
       specific_heat_PT=139.5;
-      critical_Pressure=1698;
-      critical_Temperature_PT=1750;
+      critical_pressure=1698;
+      critical_temperature_PT=1750;
       thermal_expansion=0.000181;
       conductivity_thermal=8.3;
       hardness_Brinell=NNN;
@@ -7216,6 +7719,10 @@ namespace xelement {
       valence_std=3;
       valence_iupac=3;
       valence_PT=3;
+      valence_s=0;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=11.85;
       crystal="hcp";
       crystal_structure_PT="Simple_Hexagonal";
@@ -7225,7 +7732,7 @@ namespace xelement {
       lattice_constants[1]=345.66;lattice_constants[2]=345.66;lattice_constants[3]=552.48;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=2*PI/3;
       phase="Solid";
-      radius=0.171;
+      radius_Saxena=0.171;
       radius_PT=156;
       radius_covalent=1.45;
       radius_covalent_PT=145;
@@ -7239,19 +7746,21 @@ namespace xelement {
       electronegativity_Pearson=3.2;
       electronegativity_Ghosh=4.719;
       electronegativity_Allen=1.789;  //RF+SK20200410
-      oxidation_states.clear();oxidation_states.push_back(3); oxidation_states.push_back(1); //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(3);oxidation_states.push_back(1); //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(1);  //RF+SK20200410
       electron_affinity_PT=19.2;
+      energies_ionization.clear();energies_ionization.push_back(589.4);energies_ionization.push_back(1971);energies_ionization.push_back(2878);  //CO20201111
       phi_star_Miedema=3.90;
       nws_Miedema=1.12;
       gamma_s_Miedema=610;
       scale_Pettifor=1.56;
       temperature_boiling=1473;
       temperature_melting=304;
+      fusion_heat_PT=NNN;  //CO20201111
       vaporization_heat_PT=165;
       specific_heat_PT=129;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=0.0000299;
       conductivity_thermal=46;
       hardness_Brinell=26.4;
@@ -7299,6 +7808,10 @@ namespace xelement {
       valence_std=4;
       valence_iupac=4;
       valence_PT=4;
+      valence_s=0;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=11.34;
       crystal="fcc";
       crystal_structure_PT="Face-centered_Cubic";
@@ -7308,7 +7821,7 @@ namespace xelement {
       lattice_constants[1]=495.08;lattice_constants[2]=495.08;lattice_constants[3]=495.08;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=PI/2;
       phase="Solid";
-      radius=0.175;
+      radius_Saxena=0.175;
       radius_PT=154;
       radius_covalent=1.46;
       radius_covalent_PT=146;
@@ -7322,19 +7835,21 @@ namespace xelement {
       electronegativity_Pearson=3.90;
       electronegativity_Ghosh=4.841;
       electronegativity_Allen=1.854;  //RF+SK20200410
-      oxidation_states.clear();oxidation_states.push_back(4); oxidation_states.push_back(2); //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(4);oxidation_states.push_back(2); //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(2);  //RF+SK20200410
       electron_affinity_PT=35.1;
+      energies_ionization.clear();energies_ionization.push_back(715.6);energies_ionization.push_back(1450.5);energies_ionization.push_back(3081.5);energies_ionization.push_back(4083);energies_ionization.push_back(6640);  //CO20201111
       phi_star_Miedema=4.10;
       nws_Miedema=1.15;
       gamma_s_Miedema=610;
       scale_Pettifor=1.80;
       temperature_boiling=1749;
       temperature_melting=327.46;
+      fusion_heat_PT=NNN;  //CO20201111
       vaporization_heat_PT=178;
       specific_heat_PT=127;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=0.0000289;
       conductivity_thermal=35;
       hardness_Brinell=38.3;
@@ -7382,6 +7897,10 @@ namespace xelement {
       valence_std=5;
       valence_iupac=5;
       valence_PT=5;
+      valence_s=0;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=9.78;
       crystal="rhl";
       crystal_structure_PT="Base-centered_Monoclinic";
@@ -7391,7 +7910,7 @@ namespace xelement {
       lattice_constants[1]=667.4;lattice_constants[2]=611.7;lattice_constants[3]=330.4;
       lattice_angles[1]=PI/2;lattice_angles[2]=1.925622;lattice_angles[3]=PI/2;
       phase="Solid";
-      radius=0.182;
+      radius_Saxena=0.182;
       radius_PT=143;
       radius_covalent=1.48;
       radius_covalent_PT=148;
@@ -7405,19 +7924,21 @@ namespace xelement {
       electronegativity_Pearson=4.69;
       electronegativity_Ghosh=4.962;
       electronegativity_Allen=2.01; //RF+SK20200410
-      oxidation_states.clear();oxidation_states.push_back(5); oxidation_states.push_back(3); //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(5);oxidation_states.push_back(3); //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);  //RF+SK20200410
       electron_affinity_PT=91.2;
+      energies_ionization.clear();energies_ionization.push_back(703);energies_ionization.push_back(1610);energies_ionization.push_back(2466);energies_ionization.push_back(4370);energies_ionization.push_back(5400);energies_ionization.push_back(8520);  //CO20201111
       phi_star_Miedema=4.15;
       nws_Miedema=1.16;
       gamma_s_Miedema=550;
       scale_Pettifor=2.04;
       temperature_boiling=1564;
       temperature_melting=271.3;
+      fusion_heat_PT=NNN;  //CO20201111
       vaporization_heat_PT=160;
       specific_heat_PT=122;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=0.0000134;
       conductivity_thermal=8;
       hardness_Brinell=94.2;
@@ -7465,6 +7986,10 @@ namespace xelement {
       valence_std=6;
       valence_iupac=6;
       valence_PT=6;
+      valence_s=0;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=9.196;
       crystal="sc";
       crystal_structure_PT="Simple_Cubic";
@@ -7474,7 +7999,7 @@ namespace xelement {
       lattice_constants[1]=335.9;lattice_constants[2]=335.9;lattice_constants[3]=335.9;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=PI/2;
       phase="Solid";
-      radius=0.140;
+      radius_Saxena=0.140;
       radius_PT=135;
       radius_covalent=1.40;
       radius_covalent_PT=140;
@@ -7488,19 +8013,21 @@ namespace xelement {
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=5.084;
       electronegativity_Allen=2.19; //RF+SK20200410
-      oxidation_states.clear();oxidation_states.push_back(6); oxidation_states.push_back(4); oxidation_states.push_back(2);  //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(6);oxidation_states.push_back(4);oxidation_states.push_back(2);  //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(4);  //RF+SK20200410
       electron_affinity_PT=183.3;
+      energies_ionization.clear();energies_ionization.push_back(812.1);  //CO20201111
       phi_star_Miedema=NNN;
       nws_Miedema=NNN;
       gamma_s_Miedema=NNN;
       scale_Pettifor=2.28;
       temperature_boiling=962;
       temperature_melting=254;
+      fusion_heat_PT=NNN;  //CO20201111
       vaporization_heat_PT=100;
       specific_heat_PT=NNN;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=NNN;
       conductivity_thermal=NNN;
       hardness_Brinell=NNN;
@@ -7548,6 +8075,10 @@ namespace xelement {
       valence_std=7;
       valence_iupac=7;
       valence_PT=7;
+      valence_s=0;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=NNN;
       crystal="nnn";
       crystal_structure_PT="NNN";
@@ -7557,7 +8088,7 @@ namespace xelement {
       lattice_constants[1]=NNN;lattice_constants[2]=NNN;lattice_constants[3]=NNN;
       lattice_angles[1]=NNN;lattice_angles[2]=NNN;lattice_angles[3]=NNN;
       phase="Solid";
-      radius=NNN;
+      radius_Saxena=NNN;
       radius_PT=127;
       radius_covalent=1.50;
       radius_covalent_PT=150;
@@ -7571,19 +8102,21 @@ namespace xelement {
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=5.206;
       electronegativity_Allen=2.39; //RF+SK20200410
-      oxidation_states.clear();oxidation_states.push_back(7); oxidation_states.push_back(5); oxidation_states.push_back(3); oxidation_states.push_back(1); oxidation_states.push_back(-1); //RF+SK20200410
+      oxidation_states.clear();oxidation_states.push_back(7);oxidation_states.push_back(5);oxidation_states.push_back(3);oxidation_states.push_back(1);oxidation_states.push_back(-1); //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(-1); //RF+SK20200410
       electron_affinity_PT=270.1;
+      energies_ionization.clear();energies_ionization.push_back(920);  //CO20201111
       phi_star_Miedema=NNN;
       nws_Miedema=NNN;
       gamma_s_Miedema=NNN;
       scale_Pettifor=2.52;
       temperature_boiling=NNN;
       temperature_melting=302;
+      fusion_heat_PT=NNN;  //CO20201111
       vaporization_heat_PT=40;
       specific_heat_PT=NNN;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=NNN;
       conductivity_thermal=2;
       hardness_Brinell=NNN;
@@ -7631,6 +8164,10 @@ namespace xelement {
       valence_std=0;
       valence_iupac=6;
       valence_PT=6;
+      valence_s=0;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=97.3E-4;
       crystal="fcc";
       crystal_structure_PT="NNN";
@@ -7640,7 +8177,7 @@ namespace xelement {
       lattice_constants[1]=NNN;lattice_constants[2]=NNN;lattice_constants[3]=NNN;
       lattice_angles[1]=NNN;lattice_angles[2]=NNN;lattice_angles[3]=NNN;
       phase="Gas";
-      radius=NNN;
+      radius_Saxena=NNN;
       radius_PT=120;
       radius_covalent=1.50;
       radius_covalent_PT=150;
@@ -7657,16 +8194,18 @@ namespace xelement {
       oxidation_states.clear();oxidation_states.push_back(2);  //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(2);  //RF+SK20200410
       electron_affinity_PT=0;
+      energies_ionization.clear();energies_ionization.push_back(1037);  //CO20201111
       phi_star_Miedema=NNN;
       nws_Miedema=NNN;
       gamma_s_Miedema=NNN;
       scale_Pettifor=0;
       temperature_boiling=-61.7;
       temperature_melting=-71;
+      fusion_heat_PT=NNN;  //CO20201111
       vaporization_heat_PT=17;
       specific_heat_PT=93.65;
-      critical_Pressure=61.98;
-      critical_Temperature_PT=377;
+      critical_pressure=61.98;
+      critical_temperature_PT=377;
       thermal_expansion=NNN;
       conductivity_thermal=0.00361;
       hardness_Brinell=NNN;
@@ -7716,6 +8255,10 @@ namespace xelement {
       valence_std=1;
       valence_iupac=1;
       valence_PT=1;
+      valence_s=0;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=NNN;
       crystal="bcc";
       crystal_structure_PT="NNN";
@@ -7725,7 +8268,7 @@ namespace xelement {
       lattice_constants[1]=NNN;lattice_constants[2]=NNN;lattice_constants[3]=NNN;
       lattice_angles[1]=NNN;lattice_angles[2]=NNN;lattice_angles[3]=NNN;
       phase="Solid";
-      radius=NNN;
+      radius_Saxena=NNN;
       radius_PT=NNN;
       radius_covalent=2.60;
       radius_covalent_PT=260;
@@ -7742,16 +8285,18 @@ namespace xelement {
       oxidation_states.clear();oxidation_states.push_back(1);  //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(1);  //RF+SK20200410
       electron_affinity_PT=NNN;
+      energies_ionization.clear();energies_ionization.push_back(380);  //CO20201111
       phi_star_Miedema=NNN;
       nws_Miedema=NNN;
       gamma_s_Miedema=NNN;
       scale_Pettifor=0;
       temperature_boiling=NNN;
       temperature_melting=NNN;
+      fusion_heat_PT=NNN;  //CO20201111
       vaporization_heat_PT=64;
       specific_heat_PT=NNN;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=NNN;
       conductivity_thermal=NNN;
       hardness_Brinell=NNN;
@@ -7799,6 +8344,10 @@ namespace xelement {
       valence_std=2;
       valence_iupac=2;
       valence_PT=2;
+      valence_s=0;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=5;
       crystal="bct";
       crystal_structure_PT="Body-centered_Cubic";
@@ -7808,7 +8357,7 @@ namespace xelement {
       lattice_constants[1]=514.8;lattice_constants[2]=514.8;lattice_constants[3]=514.8;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=PI/2;
       phase="Solid";
-      radius=NNN;
+      radius_Saxena=NNN;
       radius_PT=NNN;
       radius_covalent=2.21;
       radius_covalent_PT=221;
@@ -7825,16 +8374,18 @@ namespace xelement {
       oxidation_states.clear();oxidation_states.push_back(2);  //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(2);  //RF+SK20200410
       electron_affinity_PT=NNN;
+      energies_ionization.clear();energies_ionization.push_back(509.3);energies_ionization.push_back(979);  //CO20201111
       phi_star_Miedema=NNN;
       nws_Miedema=NNN;
       gamma_s_Miedema=NNN;
       scale_Pettifor=0;
       temperature_boiling=1737;
       temperature_melting=700;
+      fusion_heat_PT=NNN;  //CO20201111
       vaporization_heat_PT=125;
       specific_heat_PT=92;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=NNN;
       conductivity_thermal=19;
       hardness_Brinell=NNN;
@@ -7883,6 +8434,10 @@ namespace xelement {
       valence_std=3;
       valence_iupac=3;
       valence_PT=3;
+      valence_s=0;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=10.07;
       crystal="fcc";
       crystal_structure_PT="Face-centered_Cubic";
@@ -7892,7 +8447,7 @@ namespace xelement {
       lattice_constants[1]=567;lattice_constants[2]=567;lattice_constants[3]=567;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=PI/2;
       phase="Solid";
-      radius=NNN;
+      radius_Saxena=NNN;
       radius_PT=NNN;
       radius_covalent=2.15;
       radius_covalent_PT=215;
@@ -7909,16 +8464,18 @@ namespace xelement {
       oxidation_states.clear();oxidation_states.push_back(NNN);  //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
       electron_affinity_PT=NNN;
+      energies_ionization.clear();energies_ionization.push_back(499);energies_ionization.push_back(1170);  //CO20201111
       phi_star_Miedema=NNN;
       nws_Miedema=NNN;
       gamma_s_Miedema=NNN;
       scale_Pettifor=0;
       temperature_boiling=3200;
       temperature_melting=1050;
+      fusion_heat_PT=NNN;  //CO20201111
       vaporization_heat_PT=400;
       specific_heat_PT=120;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=NNN;
       conductivity_thermal=12;
       hardness_Brinell=NNN;
@@ -7967,6 +8524,10 @@ namespace xelement {
       valence_std=4;
       valence_iupac=4;
       valence_PT=4;
+      valence_s=0;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=11.724;
       crystal="fcc";
       crystal_structure_PT="Face-centered_Cubic";
@@ -7976,7 +8537,7 @@ namespace xelement {
       lattice_constants[1]=508.42;lattice_constants[2]=508.42;lattice_constants[3]=508.42;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=PI/2;
       phase="Solid";
-      radius=0.180;
+      radius_Saxena=0.180;
       radius_PT=NNN;
       radius_covalent=2.06;
       radius_covalent_PT=206;
@@ -7993,16 +8554,18 @@ namespace xelement {
       oxidation_states.clear();oxidation_states.push_back(NNN);  //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
       electron_affinity_PT=NNN;
+      energies_ionization.clear();energies_ionization.push_back(587);energies_ionization.push_back(1110);energies_ionization.push_back(1930);energies_ionization.push_back(2780);  //CO20201111
       phi_star_Miedema=3.30;
       nws_Miedema=1.28;
       gamma_s_Miedema=NNN;
       scale_Pettifor=0;
       temperature_boiling=4820;
       temperature_melting=1750;
+      fusion_heat_PT=NNN;  //CO20201111
       vaporization_heat_PT=530;
       specific_heat_PT=118;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=0.000011;
       conductivity_thermal=54;
       hardness_Brinell=400;
@@ -8050,6 +8613,10 @@ namespace xelement {
       valence_std=5;
       valence_iupac=5;
       valence_PT=5;
+      valence_s=0;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=15.37;
       crystal="bct";
       crystal_structure_PT="Centered_Tetragonal";
@@ -8059,7 +8626,7 @@ namespace xelement {
       lattice_constants[1]=392.5;lattice_constants[2]=392.5;lattice_constants[3]=323.8;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=PI/2;
       phase="Solid";
-      radius=NNN;
+      radius_Saxena=NNN;
       radius_PT=NNN;
       radius_covalent=2.00;
       radius_covalent_PT=200;
@@ -8076,16 +8643,18 @@ namespace xelement {
       oxidation_states.clear();oxidation_states.push_back(NNN);  //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
       electron_affinity_PT=NNN;
+      energies_ionization.clear();energies_ionization.push_back(568);  //CO20201111
       phi_star_Miedema=NNN;
       nws_Miedema=NNN;
       gamma_s_Miedema=NNN;
       scale_Pettifor=0;
       temperature_boiling=4000;
       temperature_melting=1572;
+      fusion_heat_PT=NNN;  //CO20201111
       vaporization_heat_PT=470;
       specific_heat_PT=99.1;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=NNN;
       conductivity_thermal=47;
       hardness_Brinell=NNN;
@@ -8133,6 +8702,10 @@ namespace xelement {
       valence_std=6;
       valence_iupac=6;
       valence_PT=6;
+      valence_s=0;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=19.05;
       crystal="orc";
       crystal_structure_PT="Base_Orthorhombic";
@@ -8142,7 +8715,7 @@ namespace xelement {
       lattice_constants[1]=285.37;lattice_constants[2]=586.95;lattice_constants[3]=495.48;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=PI/2;
       phase="Solid";
-      radius=0.138;
+      radius_Saxena=0.138;
       radius_PT=NNN;
       radius_covalent=1.96;
       radius_covalent_PT=196;
@@ -8159,16 +8732,18 @@ namespace xelement {
       oxidation_states.clear();oxidation_states.push_back(NNN);  //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
       electron_affinity_PT=NNN;
+      energies_ionization.clear();energies_ionization.push_back(597.6);energies_ionization.push_back(1420);  //CO20201111
       phi_star_Miedema=NNN;
       nws_Miedema=NNN;
       gamma_s_Miedema=NNN;
       scale_Pettifor=0;
       temperature_boiling=3927;
       temperature_melting=1135;
+      fusion_heat_PT=NNN;  //CO20201111
       vaporization_heat_PT=420;
       specific_heat_PT=116;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=0.0000139;
       conductivity_thermal=27;
       hardness_Brinell=2400;
@@ -8216,6 +8791,10 @@ namespace xelement {
       valence_std=7;
       valence_iupac=7;
       valence_PT=6;
+      valence_s=0;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=20.45;
       crystal="nnn";
       crystal_structure_PT="Simple_Orthorhombic";
@@ -8225,7 +8804,7 @@ namespace xelement {
       lattice_constants[1]=666.3;lattice_constants[2]=472.3;lattice_constants[3]=488.7;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=PI/2;
       phase="Solid";
-      radius=NNN;
+      radius_Saxena=NNN;
       radius_PT=NNN;
       radius_covalent=1.90;
       radius_covalent_PT=190;
@@ -8242,16 +8821,18 @@ namespace xelement {
       oxidation_states.clear();oxidation_states.push_back(NNN);  //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
       electron_affinity_PT=NNN;
+      energies_ionization.clear();energies_ionization.push_back(604.5);  //CO20201111
       phi_star_Miedema=NNN;
       nws_Miedema=NNN;
       gamma_s_Miedema=NNN;
       scale_Pettifor=0;
       temperature_boiling=4000;
       temperature_melting=644;
+      fusion_heat_PT=NNN;  //CO20201111
       vaporization_heat_PT=335;
       specific_heat_PT=NNN;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=NNN;
       conductivity_thermal=6;
       hardness_Brinell=NNN;
@@ -8299,6 +8880,10 @@ namespace xelement {
       valence_std=8;
       valence_iupac=7;
       valence_PT=6;
+      valence_s=0;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=19.816;
       crystal="nnn";
       crystal_structure_PT="Simple_Monoclinic";
@@ -8308,7 +8893,7 @@ namespace xelement {
       lattice_constants[1]=618.3;lattice_constants[2]=482.2;lattice_constants[3]=1096.3;
       lattice_angles[1]=PI/2;lattice_angles[2]=1.776571;lattice_angles[3]=PI/2;
       phase="Solid";
-      radius=NNN;
+      radius_Saxena=NNN;
       radius_PT=NNN;
       radius_covalent=1.87;
       radius_covalent_PT=187;
@@ -8325,16 +8910,18 @@ namespace xelement {
       oxidation_states.clear();oxidation_states.push_back(NNN);  //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
       electron_affinity_PT=NNN;
+      energies_ionization.clear();energies_ionization.push_back(584.7);  //CO20201111
       phi_star_Miedema=NNN;
       nws_Miedema=NNN;
       gamma_s_Miedema=NNN;
       scale_Pettifor=0;
       temperature_boiling=3230;
       temperature_melting=640;
+      fusion_heat_PT=NNN;  //CO20201111
       vaporization_heat_PT=325;
       specific_heat_PT=NNN;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=NNN;
       conductivity_thermal=6;
       hardness_Brinell=NNN;
@@ -8382,6 +8969,10 @@ namespace xelement {
       valence_std=9;
       valence_iupac=7;
       valence_PT=4;
+      valence_s=0;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=13.67;
       crystal="nnn";
       crystal_structure_PT="Simple_Hexagonal";
@@ -8391,7 +8982,7 @@ namespace xelement {
       lattice_constants[1]=346.81;lattice_constants[2]=346.81;lattice_constants[3]=1124.1;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=2*PI/3;
       phase="Solid";
-      radius=NNN;
+      radius_Saxena=NNN;
       radius_PT=NNN;
       radius_covalent=1.80;
       radius_covalent_PT=180;
@@ -8408,16 +8999,18 @@ namespace xelement {
       oxidation_states.clear();oxidation_states.push_back(NNN);  //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
       electron_affinity_PT=NNN;
+      energies_ionization.clear();energies_ionization.push_back(578);  //CO20201111
       phi_star_Miedema=NNN;
       nws_Miedema=NNN;
       gamma_s_Miedema=NNN;
       scale_Pettifor=0;
       temperature_boiling=2011;
       temperature_melting=1176;
+      fusion_heat_PT=NNN;  //CO20201111
       vaporization_heat_PT=NNN;
       specific_heat_PT=NNN;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=NNN;
       conductivity_thermal=10;
       hardness_Brinell=NNN;
@@ -8465,6 +9058,10 @@ namespace xelement {
       valence_std=10;
       valence_iupac=8;
       valence_PT=4;
+      valence_s=0;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=13.51;
       crystal="nnn";
       crystal_structure_PT="Simple_Hexagonal";
@@ -8474,7 +9071,7 @@ namespace xelement {
       lattice_constants[1]=349.6;lattice_constants[2]=349.6;lattice_constants[3]=1133.1;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=2*PI/3;
       phase="Solid";
-      radius=NNN;
+      radius_Saxena=NNN;
       radius_PT=NNN;
       radius_covalent=1.69;
       radius_covalent_PT=169;
@@ -8491,16 +9088,18 @@ namespace xelement {
       oxidation_states.clear();oxidation_states.push_back(NNN);  //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
       electron_affinity_PT=NNN;
+      energies_ionization.clear();energies_ionization.push_back(581);  //CO20201111
       phi_star_Miedema=NNN;
       nws_Miedema=NNN;
       gamma_s_Miedema=NNN;
       scale_Pettifor=0;
       temperature_boiling=3110;
       temperature_melting=1345;
+      fusion_heat_PT=NNN;  //CO20201111
       vaporization_heat_PT=NNN;
       specific_heat_PT=NNN;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=NNN;
       conductivity_thermal=NNN;
       hardness_Brinell=NNN;
@@ -8548,6 +9147,10 @@ namespace xelement {
       valence_std=11;
       valence_iupac=4;
       valence_PT=4;
+      valence_s=0;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=14.78;
       crystal="nnn";
       crystal_structure_PT="Simple_Hexagonal";
@@ -8557,7 +9160,7 @@ namespace xelement {
       lattice_constants[1]=341.6;lattice_constants[2]=341.6;lattice_constants[3]=1106.9;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=2*PI/3;
       phase="Solid";
-      radius=NNN;
+      radius_Saxena=NNN;
       radius_PT=NNN;
       radius_covalent=NNN;
       radius_covalent_PT=NNN;
@@ -8574,16 +9177,18 @@ namespace xelement {
       oxidation_states.clear();oxidation_states.push_back(NNN);  //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
       electron_affinity_PT=NNN;
+      energies_ionization.clear();energies_ionization.push_back(601);  //CO20201111
       phi_star_Miedema=NNN;
       nws_Miedema=NNN;
       gamma_s_Miedema=NNN;
       scale_Pettifor=0;
       temperature_boiling=NNN;
       temperature_melting=1050;
+      fusion_heat_PT=NNN;  //CO20201111
       vaporization_heat_PT=NNN;
       specific_heat_PT=NNN;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=NNN;
       conductivity_thermal=10;
       hardness_Brinell=NNN;
@@ -8631,6 +9236,10 @@ namespace xelement {
       valence_std=12;
       valence_iupac=4;
       valence_PT=4;
+      valence_s=0;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=15.1;
       crystal="nnn";
       crystal_structure_PT="Simple_Hexagonal";
@@ -8640,7 +9249,7 @@ namespace xelement {
       lattice_constants[1]=338;lattice_constants[2]=338;lattice_constants[3]=1102.5;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=2*PI/3;
       phase="Solid";
-      radius=NNN;
+      radius_Saxena=NNN;
       radius_PT=NNN;
       radius_covalent=NNN;
       radius_covalent_PT=NNN;
@@ -8657,16 +9266,18 @@ namespace xelement {
       oxidation_states.clear();oxidation_states.push_back(NNN);  //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
       electron_affinity_PT=NNN;
+      energies_ionization.clear();energies_ionization.push_back(608);  //CO20201111
       phi_star_Miedema=NNN;
       nws_Miedema=NNN;
       gamma_s_Miedema=NNN;
       scale_Pettifor=0;
       temperature_boiling=NNN;
       temperature_melting=900;
+      fusion_heat_PT=NNN;  //CO20201111
       vaporization_heat_PT=NNN;
       specific_heat_PT=NNN;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=NNN;
       conductivity_thermal=NNN;
       hardness_Brinell=NNN;
@@ -8714,6 +9325,10 @@ namespace xelement {
       valence_std=13;
       valence_iupac=4;
       valence_PT=4;
+      valence_s=0;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=NNN;
       crystal="nnn";
       crystal_structure_PT="NNN";
@@ -8723,7 +9338,7 @@ namespace xelement {
       lattice_constants[1]=NNN;lattice_constants[2]=NNN;lattice_constants[3]=NNN;
       lattice_angles[1]=NNN;lattice_angles[2]=NNN;lattice_angles[3]=NNN;
       phase="Solid";
-      radius=NNN;
+      radius_Saxena=NNN;
       radius_PT=NNN;
       radius_covalent=NNN;
       radius_covalent_PT=NNN;
@@ -8740,16 +9355,18 @@ namespace xelement {
       oxidation_states.clear();oxidation_states.push_back(NNN);  //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
       electron_affinity_PT=NNN;
+      energies_ionization.clear();energies_ionization.push_back(619);  //CO20201111
       phi_star_Miedema=NNN;
       nws_Miedema=NNN;
       gamma_s_Miedema=NNN;
       scale_Pettifor=0;
       temperature_boiling=NNN;
       temperature_melting=860;
+      fusion_heat_PT=NNN;  //CO20201111
       vaporization_heat_PT=NNN;
       specific_heat_PT=NNN;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=NNN;
       conductivity_thermal=NNN;
       hardness_Brinell=NNN;
@@ -8797,6 +9414,10 @@ namespace xelement {
       valence_std=14;
       valence_iupac=3;
       valence_PT=3;
+      valence_s=0;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=NNN;
       crystal="nnn";
       crystal_structure_PT="NNN";
@@ -8806,7 +9427,7 @@ namespace xelement {
       lattice_constants[1]=NNN;lattice_constants[2]=NNN;lattice_constants[3]=NNN;
       lattice_angles[1]=NNN;lattice_angles[2]=NNN;lattice_angles[3]=NNN;
       phase="nnn";
-      radius=NNN;
+      radius_Saxena=NNN;
       radius_PT=NNN;
       radius_covalent=NNN;
       radius_covalent_PT=NNN;
@@ -8823,16 +9444,18 @@ namespace xelement {
       oxidation_states.clear();oxidation_states.push_back(NNN);  //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
       electron_affinity_PT=NNN;
+      energies_ionization.clear();energies_ionization.push_back(627);  //CO20201111
       phi_star_Miedema=NNN;
       nws_Miedema=NNN;
       gamma_s_Miedema=NNN;
       scale_Pettifor=0;
       temperature_boiling=NNN;
       temperature_melting=1527;
+      fusion_heat_PT=NNN;  //CO20201111
       vaporization_heat_PT=NNN;
       specific_heat_PT=NNN;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=NNN;
       conductivity_thermal=NNN;
       hardness_Brinell=NNN;
@@ -8880,6 +9503,10 @@ namespace xelement {
       valence_std=15;
       valence_iupac=3;
       valence_PT=3;
+      valence_s=0;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=NNN;
       crystal="nnn";
       crystal_structure_PT="NNN";
@@ -8889,7 +9516,7 @@ namespace xelement {
       lattice_constants[1]=NNN;lattice_constants[2]=NNN;lattice_constants[3]=NNN;
       lattice_angles[1]=NNN;lattice_angles[2]=NNN;lattice_angles[3]=NNN;
       phase="nnn";
-      radius=NNN;
+      radius_Saxena=NNN;
       radius_PT=NNN;
       radius_covalent=NNN;
       radius_covalent_PT=NNN;
@@ -8906,16 +9533,18 @@ namespace xelement {
       oxidation_states.clear();oxidation_states.push_back(NNN);  //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
       electron_affinity_PT=NNN;
+      energies_ionization.clear();energies_ionization.push_back(635);  //CO20201111
       phi_star_Miedema=NNN;
       nws_Miedema=NNN;
       gamma_s_Miedema=NNN;
       scale_Pettifor=0;
       temperature_boiling=NNN;
       temperature_melting=828;
+      fusion_heat_PT=NNN;  //CO20201111
       vaporization_heat_PT=NNN;
       specific_heat_PT=NNN;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=NNN;
       conductivity_thermal=NNN;
       hardness_Brinell=NNN;
@@ -8963,6 +9592,10 @@ namespace xelement {
       valence_std=16;
       valence_iupac=3;
       valence_PT=3;
+      valence_s=0;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=NNN;
       crystal="nnn";
       crystal_structure_PT="NNN";
@@ -8972,7 +9605,7 @@ namespace xelement {
       lattice_constants[1]=NNN;lattice_constants[2]=NNN;lattice_constants[3]=NNN;
       lattice_angles[1]=NNN;lattice_angles[2]=NNN;lattice_angles[3]=NNN;
       phase="nnn";
-      radius=NNN;
+      radius_Saxena=NNN;
       radius_PT=NNN;
       radius_covalent=NNN;
       radius_covalent_PT=NNN;
@@ -8989,16 +9622,18 @@ namespace xelement {
       oxidation_states.clear();oxidation_states.push_back(NNN);  //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
       electron_affinity_PT=NNN;
+      energies_ionization.clear();energies_ionization.push_back(642);  //CO20201111
       phi_star_Miedema=NNN;
       nws_Miedema=NNN;
       gamma_s_Miedema=NNN;
       scale_Pettifor=0;
       temperature_boiling=NNN;
       temperature_melting=828;
+      fusion_heat_PT=NNN;  //CO20201111
       vaporization_heat_PT=NNN;
       specific_heat_PT=NNN;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=NNN;
       conductivity_thermal=NNN;
       hardness_Brinell=NNN;
@@ -9046,6 +9681,10 @@ namespace xelement {
       valence_std=17;
       valence_iupac=3;
       valence_PT=3;
+      valence_s=0;  //CO20201111
+      valence_p=0;  //CO20201111
+      valence_d=0;  //CO20201111
+      valence_f=0;  //CO20201111
       density_PT=NNN;
       crystal="nnn";
       crystal_structure_PT="NNN";
@@ -9055,7 +9694,7 @@ namespace xelement {
       lattice_constants[1]=NNN;lattice_constants[2]=NNN;lattice_constants[3]=NNN;
       lattice_angles[1]=NNN;lattice_angles[2]=NNN;lattice_angles[3]=NNN;
       phase="nnn";
-      radius=NNN;
+      radius_Saxena=NNN;
       radius_PT=NNN;
       radius_covalent=NNN;
       radius_covalent_PT=NNN;
@@ -9072,16 +9711,18 @@ namespace xelement {
       oxidation_states.clear();oxidation_states.push_back(NNN);  //RF+SK20200410
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
       electron_affinity_PT=NNN;
+      energies_ionization.clear();energies_ionization.push_back(NNN);  //CO20201111
       phi_star_Miedema=NNN;
       nws_Miedema=NNN;
       gamma_s_Miedema=NNN;
       scale_Pettifor=0;
       temperature_boiling=NNN;
       temperature_melting=1627;
+      fusion_heat_PT=NNN;  //CO20201111
       vaporization_heat_PT=NNN;
       specific_heat_PT=NNN;
-      critical_Pressure=NNN;
-      critical_Temperature_PT=NNN;
+      critical_pressure=NNN;
+      critical_temperature_PT=NNN;
       thermal_expansion=NNN;
       conductivity_thermal=NNN;
       hardness_Brinell=NNN;
