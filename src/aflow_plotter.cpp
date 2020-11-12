@@ -1441,7 +1441,7 @@ namespace plotter {
   /// @param negate allows to invert numerical values by multiplying them with -1.
   template<typename utype>
   void JSONdeque(stringstream &json, string name, const deque<utype> &value,
-     bool negate=false)
+     bool negate)
   {
     utype factor = negate ? -1 : 1;
 
