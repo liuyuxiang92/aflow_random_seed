@@ -1220,7 +1220,14 @@ namespace apl
         qpWeights = phcalc.getQMesh().getWeights();
         qPoints   = phcalc.getQMesh().getIrredQPointsFPOS();
         Nqpoints  = qPoints.size();
-        qpath = pdisc.getPHKPOINTS();
+        stringstream qpath_stream;
+        qpath_stream <<  pdisc.getPHKPOINTS();
+        string filename = currentDirectory+"/";
+        filename += DEFAULT_QHA_FILE_PREFIX + DEFAULT_QHA_KPOINTS_FILE;
+        if (!aurostd::stringstream2file(qpath_stream, filename)){
+          msg = "Error writing to " + filename + "file.";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,function,msg,_FILE_ERROR_);
+        }
       }
       else{
         if (qpWeights.size() != phcalc.getQMesh().getWeights().size()){
@@ -3256,24 +3263,9 @@ namespace apl
           break;
       }
       filename += DEFAULT_QHA_PDIS_FILE;
-      filename += ".T"+aurostd::PaddedNumString(T, ndigits)+"K";
-      if (!aurostd::stringstream2file(eig_stream, filename + ".out")){
-        msg = "An error occured when attempted to write "+filename+".out file.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,function,msg,_FILE_ERROR_);
-      }
-
-      // Save phonon dispersion relations into JSON file
-      stringstream json;
-      xoption xopt;
-      xopt.push_attached("EFERMI","0.0");
-      xopt.push_attached("OUTPUT_FORMAT","JSON");
-      xopt.flag("NOSHIFT", true);
-      plotter::JSONbegin(json, "");
-      plotter::generateBandPlot(json, eig, qpath, origStructure, xopt);
-      plotter::JSONend(json);
-      plotter::JSONfinish(json);
-      if (!aurostd::stringstream2file(json, filename + ".json")){
-        msg = "An error occured when attempted to write "+filename+".json file.";
+      filename += ".T"+aurostd::PaddedNumString(T, ndigits)+"K.out";
+      if (!aurostd::stringstream2file(eig_stream, filename)){
+        msg = "An error occured when attempted to write "+filename+" file.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_,function,msg,_FILE_ERROR_);
       }
     }

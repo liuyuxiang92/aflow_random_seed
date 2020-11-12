@@ -1459,6 +1459,7 @@ namespace aflowlib {
         if(aurostd::FileExist(directory_RAW+"/aflow.qha.thermo.out")) aurostd::LinkFile(directory_RAW+"/aflow.qha.thermo.out",directory_WEB);
         if(aurostd::FileExist(directory_RAW+"/aflow.qha.FVT.out")) aurostd::LinkFile(directory_RAW+"/aflow.qha.thermo.out",directory_WEB);
         if(aurostd::FileExist(directory_RAW+"/aflow.qha.dispersion_phonon.T300K.out")) aurostd::LinkFile(directory_RAW+"/aflow.qha.dispersion_phonon.T300K.out",directory_WEB);
+        if(aurostd::FileExist(directory_RAW+"/aflow.qha.dispersion_phonon.T300K.json")) aurostd::LinkFile(directory_RAW+"/aflow.qha.dispersion_phonon.T300K.json",directory_WEB);
 
         // link all QHA plots
         vector<string> files;
@@ -5387,11 +5388,15 @@ namespace aflowlib {
 
     aflow_qha_out.clear();
     if(aurostd::FileExist(directory_LIB+"/"+"aflow.qha.out") || aurostd::EFileExist(directory_LIB+"/"+"aflow.qha.out")) {
+      aflowlib::LIB2RAW_FileNeeded(directory_LIB,"aflow_qha.in",directory_RAW,"aflow_qha.in",vfile,MESSAGE);
       aflowlib::LIB2RAW_FileNeeded(directory_LIB,"aflow.qha.out",directory_RAW,"aflow.qha.out",vfile,MESSAGE);
       aflowlib::LIB2RAW_FileNeeded(directory_LIB,"aflow.qha.thermo.out",directory_RAW,"aflow.qha.thermo.out",vfile,MESSAGE);
       aflowlib::LIB2RAW_FileNeeded(directory_LIB,"aflow.qha.FVT.out",directory_RAW,"aflow.qha.FVT.out",vfile,MESSAGE);
       aflowlib::LIB2RAW_FileNeeded(directory_LIB,"aflow.qha.dispersion_phonon.T300K.out",directory_RAW,
           "aflow.qha.dispersion_phonon.T300K.out",vfile,MESSAGE);
+      aflowlib::LIB2RAW_FileNeeded(directory_LIB,"PHPOSCAR",directory_RAW,"PHPOSCAR",vfile,MESSAGE);
+      aflowlib::LIB2RAW_FileNeeded(directory_LIB,DEFAULT_QHA_FILE_PREFIX+DEFAULT_QHA_KPOINTS_FILE,
+          directory_RAW,DEFAULT_QHA_FILE_PREFIX+DEFAULT_QHA_KPOINTS_FILE,vfile,MESSAGE);
 
 
       // read QHA data from the aflow.qha.out file
@@ -5430,6 +5435,29 @@ namespace aflowlib {
         opt.push_attached("PLOTTER::PRINT", "png");
         aurostd::xoption plotopts=plotter::getPlotOptions(opt,"PLOT_THERMO_QHA");
         plotter::PLOT_THERMO_QHA(plotopts);
+      }
+
+      // convert T-dependent phonon dispersions to JSON file
+      if (aurostd::EFileExist(directory_RAW+"/aflow.qha.dispersion_phonon.T300K.out")
+          && aurostd::EFileExist(directory_RAW+"/PHPOSCAR") 
+          && aurostd::EFileExist(directory_RAW+"/"+DEFAULT_QHA_FILE_PREFIX+
+            DEFAULT_QHA_KPOINTS_FILE)){
+        if (AFLOWLIB_VERBOSE) cout << MESSAGE << " converting T-dependent phonon dispersions to JSON format " << endl;
+        stringstream json;
+        xoption xopt;
+        xstructure xstr(directory_RAW+"/PHPOSCAR");
+        xKPOINTS   xkpts(directory_RAW+"/"+DEFAULT_QHA_FILE_PREFIX+DEFAULT_QHA_KPOINTS_FILE);
+        xEIGENVAL xeig(directory_RAW+"/aflow.qha.dispersion_phonon.T300K.out");
+        xopt.push_attached("EFERMI","0.0");
+        xopt.push_attached("OUTPUT_FORMAT","JSON");
+        xopt.push_attached("DIRECTORY",directory_RAW);
+        xopt.flag("NOSHIFT", true);
+        plotter::JSONbegin(json, "");
+        plotter::generateBandPlot(json, xeig, xkpts, xstr, xopt);
+        plotter::JSONend(json);
+        plotter::JSONfinish(json);
+
+        aurostd::stringstream2file(json, directory_RAW + "/aflow.qha.dispersion_phonon.T300K.json");
       }
     } else {
       return FALSE;

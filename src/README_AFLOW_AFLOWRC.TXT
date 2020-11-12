@@ -1452,8 +1452,18 @@ DEFAULT_QHA_FREQS_FILE
 
 DEFAULT_QHA_FVT_FILE
   description: Output file for temperature- and volume-dependent free energy.
-  type:
+  type: string
   default: "FVT.out"
+
+DEFAULT_QHA_PDIS_FILE
+  description: Output file for temperature-dependent phonon dispersion relations.
+  type: string
+  default: "dispersion_phonon"
+
+DEFAULT_QHA_KPOINTS_FILE
+  description: Output file for path in the BZ used to calculated temperature-dependent phonon dispersion relations.
+  type: string
+  default: "kpoints.out"
 
 ####################################################################################################
 DEFAULTS AAPL

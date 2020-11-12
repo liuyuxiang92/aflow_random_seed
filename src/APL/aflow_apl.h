@@ -1302,7 +1302,6 @@ namespace apl
       vector<xEIGENVAL> gp_ph_dispersions;
       vector<xEIGENVAL> eos_ph_dispersions;
       vector<ThermalPropertiesCalculator> eos_vib_thermal_properties;
-      xKPOINTS qpath;
       //
       vector<string> subdirectories_apl_eos;
       vector<string> subdirectories_apl_gp;
