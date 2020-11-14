@@ -426,7 +426,38 @@ namespace xelement {
   xelement::xelement(const string& element) {free();populate(element);}  //CO20200520
   xelement::xelement(uint ZZ) {free();populate(ZZ);} //CO20200520
 
-  string xelement::getProperty(const string& property,const string& delim) const { //CO20201111
+  string xelement::getPropertyVector(const string& property,const string& delim,uint ncols) const { //CO20201111
+    string c=aurostd::toupper(property);
+    if(ncols==AUROSTD_MAX_UINT){
+      if(c==aurostd::toupper("lattice_constants")) return aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(lattice_constants,_DOUBLE_WRITE_PRECISION_),delim);
+      if(c==aurostd::toupper("lattice_angles")) return aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(lattice_angles,_DOUBLE_WRITE_PRECISION_),delim);
+      if(c==aurostd::toupper("oxidation_states")) return aurostd::joinWDelimiter(aurostd::vecDouble2vecString(oxidation_states,_DOUBLE_WRITE_PRECISION_),delim); //CO20201111
+      if(c==aurostd::toupper("oxidation_states_preferred")) return aurostd::joinWDelimiter(aurostd::vecDouble2vecString(oxidation_states_preferred,_DOUBLE_WRITE_PRECISION_),delim); //CO20200731
+      if(c==aurostd::toupper("energies_ionization")) return aurostd::joinWDelimiter(aurostd::vecDouble2vecString(energies_ionization,_DOUBLE_WRITE_PRECISION_),delim); //CO20201111
+    }else{
+      //so far, vectors are all double
+      //modify as needed later
+      vector<double> vitems;
+      if(c==aurostd::toupper("lattice_constants")) {
+        for(int i=lattice_constants.lrows;i<=(lattice_constants.lrows+(int)ncols)&&i<=lattice_constants.urows;i++){vitems.push_back(lattice_constants[i]);}
+      }
+      else if(c==aurostd::toupper("lattice_angles")) {
+        for(int i=lattice_angles.lrows;i<=(lattice_angles.lrows+(int)ncols)&&i<=lattice_angles.urows;i++){vitems.push_back(lattice_angles[i]);}
+      }
+      else if(c==aurostd::toupper("oxidation_states")) {
+        for(uint i=0;i<(ncols)&&i<oxidation_states.size();i++){vitems.push_back(oxidation_states[i]);}
+      }
+      else if(c==aurostd::toupper("oxidation_states_preferred")) {
+        for(uint i=0;i<(ncols)&&i<oxidation_states_preferred.size();i++){vitems.push_back(oxidation_states_preferred[i]);}
+      }
+      else if(c==aurostd::toupper("energies_ionization")) {
+        for(uint i=0;i<(ncols)&&i<energies_ionization.size();i++){vitems.push_back(energies_ionization[i]);}
+      }
+      return aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vitems,_DOUBLE_WRITE_PRECISION_),delim); //CO20201111
+    }
+    return "";
+  }
+  string xelement::getProperty(const string& property,const string& delim,uint ncols) const { //CO20201111
     string c=aurostd::toupper(property);
     if(c==aurostd::toupper("name")) return name;
     if(c==aurostd::toupper("symbol")) return symbol;
@@ -454,8 +485,8 @@ namespace xelement {
     if(c==aurostd::toupper("space_group")) return space_group;
     if(c==aurostd::toupper("space_group_number")) return aurostd::utype2string(space_group_number);
     if(c==aurostd::toupper("variance_parameter_mass")) return aurostd::utype2string(variance_parameter_mass,_DOUBLE_WRITE_PRECISION_);
-    if(c==aurostd::toupper("lattice_constants")) return aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(lattice_constants,_DOUBLE_WRITE_PRECISION_),delim);
-    if(c==aurostd::toupper("lattice_angles")) return aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(lattice_angles,_DOUBLE_WRITE_PRECISION_),delim);
+    if(c==aurostd::toupper("lattice_constants")) return getPropertyVector(property,delim,ncols);
+    if(c==aurostd::toupper("lattice_angles")) return getPropertyVector(property,delim,ncols);
     if(c==aurostd::toupper("phase")) return phase;
     if(c==aurostd::toupper("radius_Saxena")) return aurostd::utype2string(radius_Saxena,_DOUBLE_WRITE_PRECISION_);
     if(c==aurostd::toupper("radius_PT")) return aurostd::utype2string(radius_PT,_DOUBLE_WRITE_PRECISION_);
@@ -472,10 +503,10 @@ namespace xelement {
     if(c==aurostd::toupper("electronegativity_Pearson")) return aurostd::utype2string(electronegativity_Pearson,_DOUBLE_WRITE_PRECISION_); //+"// (eV)
     if(c==aurostd::toupper("electronegativity_Ghosh")) return aurostd::utype2string(electronegativity_Ghosh,_DOUBLE_WRITE_PRECISION_); //+"// (eV)
     if(c==aurostd::toupper("electronegativity_Allen")) return aurostd::utype2string(electronegativity_Allen,_DOUBLE_WRITE_PRECISION_); //CO20200731
-    if(c==aurostd::toupper("oxidation_states")) return aurostd::joinWDelimiter(aurostd::vecDouble2vecString(oxidation_states,_DOUBLE_WRITE_PRECISION_),delim); //CO20201111
-    if(c==aurostd::toupper("oxidation_states_preferred")) return aurostd::joinWDelimiter(aurostd::vecDouble2vecString(oxidation_states_preferred,_DOUBLE_WRITE_PRECISION_),delim); //CO20200731
+    if(c==aurostd::toupper("oxidation_states")) return getPropertyVector(property,delim,ncols);
+    if(c==aurostd::toupper("oxidation_states_preferred")) return getPropertyVector(property,delim,ncols);
     if(c==aurostd::toupper("electron_affinity_PT")) return aurostd::utype2string(electron_affinity_PT,_DOUBLE_WRITE_PRECISION_);
-    if(c==aurostd::toupper("energies_ionization")) return aurostd::joinWDelimiter(aurostd::vecDouble2vecString(energies_ionization,_DOUBLE_WRITE_PRECISION_),delim); //CO20201111
+    if(c==aurostd::toupper("energies_ionization")) return getPropertyVector(property,delim,ncols);
     if(c==aurostd::toupper("phi_star_Miedema")) return aurostd::utype2string(phi_star_Miedema,_DOUBLE_WRITE_PRECISION_);
     if(c==aurostd::toupper("nws_Miedema")) return aurostd::utype2string(nws_Miedema,_DOUBLE_WRITE_PRECISION_);
     if(c==aurostd::toupper("gamma_s_Miedema")) return aurostd::utype2string(gamma_s_Miedema,_DOUBLE_WRITE_PRECISION_);

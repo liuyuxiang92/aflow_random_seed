@@ -4656,7 +4656,8 @@ namespace xelement {
       void clear();
       void populate(const string& element); //CO20200520
       void populate(uint ZZ); //CO20200520
-      string getProperty(const string& property,const string& delim=",") const; //CO20201111
+      string getPropertyVector(const string& property,const string& delim=",",uint ncols=AUROSTD_MAX_UINT) const; //CO20201111
+      string getProperty(const string& property,const string& delim=",",uint ncols=AUROSTD_MAX_UINT) const; //CO20201111
       // content                                             // content
       bool verbose;
       // [AFLOW]START=DECLARATION
