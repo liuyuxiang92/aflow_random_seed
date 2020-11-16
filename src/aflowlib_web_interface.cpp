@@ -3872,7 +3872,9 @@ namespace aflowlib {
 
     return TRUE;
   }
+}
 
+namespace aflowlib {
   bool json2aflowlib(const string& json,string key,string& value) { //SC20200415
     // return TRUE if something has been found
     value="";

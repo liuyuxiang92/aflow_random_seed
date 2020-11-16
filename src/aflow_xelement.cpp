@@ -109,13 +109,13 @@ namespace pflow {
           if(c=="ALL" || c==aurostd::toupper("radius_VanDerWaals_PT")) vs.push_back(aurostd::PaddedPOST("radius_VanDerWaals_PT="+aurostd::utype2string(xelement::xelement(Z).radius_VanDerWaals_PT,_DOUBLE_WRITE_PRECISION_),len)+"// (pm)");
           if(c=="ALL" || c==aurostd::toupper("radii_Ghosh08")) vs.push_back(aurostd::PaddedPOST("radii_Ghosh08="+aurostd::utype2string(xelement::xelement(Z).radii_Ghosh08,_DOUBLE_WRITE_PRECISION_),len)+"// (Angstrom)");
           if(c=="ALL" || c==aurostd::toupper("radii_Slatter")) vs.push_back(aurostd::PaddedPOST("radii_Slatter="+aurostd::utype2string(xelement::xelement(Z).radii_Slatter,_DOUBLE_WRITE_PRECISION_),len)+"// (Angstrom)");
-          if(c=="ALL" || c==aurostd::toupper("radii_Pyykko")) vs.push_back(aurostd::PaddedPOST("radii_Pyykko="+aurostd::utype2string(xelement::xelement(Z).radii_Pyykko,_DOUBLE_WRITE_PRECISION_),len)+"// (pm)");
+          if(c=="ALL" || c==aurostd::toupper("radii_Pyykko")) vs.push_back(aurostd::PaddedPOST("radii_Pyykko="+aurostd::utype2string(xelement::xelement(Z).radii_Pyykko,_DOUBLE_WRITE_PRECISION_),len)+"// (Angstrom)");
           //
           if(c=="ALL" || c==aurostd::toupper("conductivity_electrical")) vs.push_back(aurostd::PaddedPOST("conductivity_electrical="+aurostd::utype2string(xelement::xelement(Z).conductivity_electrical,_DOUBLE_WRITE_PRECISION_),len)+"// (S/m)");
-          if(c=="ALL" || c==aurostd::toupper("electronegativity_vec")) vs.push_back(aurostd::PaddedPOST("electronegativity_vec="+aurostd::utype2string(xelement::xelement(Z).electronegativity_vec,_DOUBLE_WRITE_PRECISION_),len));
+          if(c=="ALL" || c==aurostd::toupper("electronegativity_Pauling")) vs.push_back(aurostd::PaddedPOST("electronegativity_Pauling="+aurostd::utype2string(xelement::xelement(Z).electronegativity_Pauling,_DOUBLE_WRITE_PRECISION_),len));
           if(c=="ALL" || c==aurostd::toupper("hardness_Ghosh")) vs.push_back(aurostd::PaddedPOST("hardness_Ghosh="+aurostd::utype2string(xelement::xelement(Z).hardness_Ghosh,_DOUBLE_WRITE_PRECISION_),len)+"// (eV)");
-          if(c=="ALL" || c==aurostd::toupper("electronegativity_Pearson")) vs.push_back(aurostd::PaddedPOST("electronegativity_Pearson="+aurostd::utype2string(xelement::xelement(Z).electronegativity_Pearson,_DOUBLE_WRITE_PRECISION_),len)); //+"// (eV)
-          if(c=="ALL" || c==aurostd::toupper("electronegativity_Ghosh")) vs.push_back(aurostd::PaddedPOST("electronegativity_Ghosh="+aurostd::utype2string(xelement::xelement(Z).electronegativity_Ghosh,_DOUBLE_WRITE_PRECISION_),len)); //+"// (eV)
+          if(c=="ALL" || c==aurostd::toupper("electronegativity_Pearson")) vs.push_back(aurostd::PaddedPOST("electronegativity_Pearson="+aurostd::utype2string(xelement::xelement(Z).electronegativity_Pearson,_DOUBLE_WRITE_PRECISION_),len)+"// (eV)");
+          if(c=="ALL" || c==aurostd::toupper("electronegativity_Ghosh")) vs.push_back(aurostd::PaddedPOST("electronegativity_Ghosh="+aurostd::utype2string(xelement::xelement(Z).electronegativity_Ghosh,_DOUBLE_WRITE_PRECISION_),len)+"// (eV)");
           if(c=="ALL" || c==aurostd::toupper("electronegativity_Allen")) vs.push_back(aurostd::PaddedPOST("electronegativity_Allen="+aurostd::utype2string(xelement::xelement(Z).electronegativity_Allen,_DOUBLE_WRITE_PRECISION_),len)); //CO20200731
           if(c=="ALL" || c==aurostd::toupper("oxidation_states")) vs.push_back(aurostd::PaddedPOST("oxidation_states="+aurostd::joinWDelimiter(aurostd::vecDouble2vecString(xelement::xelement(Z).oxidation_states,_DOUBLE_WRITE_PRECISION_),","),len)); //CO20200731
           if(c=="ALL" || c==aurostd::toupper("oxidation_states_preferred")) vs.push_back(aurostd::PaddedPOST("oxidation_states_preferred="+aurostd::joinWDelimiter(aurostd::vecDouble2vecString(xelement::xelement(Z).oxidation_states_preferred,_DOUBLE_WRITE_PRECISION_),","),len)); //CO20200731
@@ -131,11 +131,11 @@ namespace pflow {
           if(c=="ALL" || c==aurostd::toupper("temperature_melting")) vs.push_back(aurostd::PaddedPOST("temperature_melting="+aurostd::utype2string(xelement::xelement(Z).temperature_melting,_DOUBLE_WRITE_PRECISION_),len)+"// (Celsius)");
           if(c=="ALL" || c==aurostd::toupper("fusion_heat_PT")) vs.push_back(aurostd::PaddedPOST("fusion_heat_PT="+aurostd::utype2string(xelement::xelement(Z).fusion_heat_PT,_DOUBLE_WRITE_PRECISION_),len)+"// (kJ/mol)");  //CO20201111
           if(c=="ALL" || c==aurostd::toupper("vaporization_heat_PT")) vs.push_back(aurostd::PaddedPOST("vaporization_heat_PT="+aurostd::utype2string(xelement::xelement(Z).vaporization_heat_PT,_DOUBLE_WRITE_PRECISION_),len)+"// (kJ/mol)");
-          if(c=="ALL" || c==aurostd::toupper("specific_heat_PT")) vs.push_back(aurostd::PaddedPOST("specific_heat_PT="+aurostd::utype2string(xelement::xelement(Z).specific_heat_PT,_DOUBLE_WRITE_PRECISION_),len)+"// (J/(kg.K))");
+          if(c=="ALL" || c==aurostd::toupper("specific_heat_PT")) vs.push_back(aurostd::PaddedPOST("specific_heat_PT="+aurostd::utype2string(xelement::xelement(Z).specific_heat_PT,_DOUBLE_WRITE_PRECISION_),len)+"// (J/(kg K))");
           if(c=="ALL" || c==aurostd::toupper("critical_pressure")) vs.push_back(aurostd::PaddedPOST("critical_pressure="+aurostd::utype2string(xelement::xelement(Z).critical_pressure,_DOUBLE_WRITE_PRECISION_),len)+"// (Atm) "); 
           if(c=="ALL" || c==aurostd::toupper("critical_temperature_PT")) vs.push_back(aurostd::PaddedPOST("critical_temperature_PT="+aurostd::utype2string(xelement::xelement(Z).critical_temperature_PT,_DOUBLE_WRITE_PRECISION_),len)+"// (K)"); 
           if(c=="ALL" || c==aurostd::toupper("thermal_expansion")) vs.push_back(aurostd::PaddedPOST("thermal_expansion="+aurostd::utype2string(xelement::xelement(Z).thermal_expansion,_DOUBLE_WRITE_PRECISION_),len)+"// (K^{-1})");
-          if(c=="ALL" || c==aurostd::toupper("conductivity_thermal")) vs.push_back(aurostd::PaddedPOST("conductivity_thermal="+aurostd::utype2string(xelement::xelement(Z).conductivity_thermal,_DOUBLE_WRITE_PRECISION_),len)+"// (W/(mK))");
+          if(c=="ALL" || c==aurostd::toupper("conductivity_thermal")) vs.push_back(aurostd::PaddedPOST("conductivity_thermal="+aurostd::utype2string(xelement::xelement(Z).conductivity_thermal,_DOUBLE_WRITE_PRECISION_),len)+"// (W/(m K))");
           //
           if(c=="ALL" || c==aurostd::toupper("hardness_Brinell")) vs.push_back(aurostd::PaddedPOST("hardness_Brinell="+aurostd::utype2string(xelement::xelement(Z).hardness_Brinell,_DOUBLE_WRITE_PRECISION_),len)+"// (MPa)");
           if(c=="ALL" || c==aurostd::toupper("hardness_Mohs")) vs.push_back(aurostd::PaddedPOST("hardness_Mohs="+aurostd::utype2string(xelement::xelement(Z).hardness_Mohs,_DOUBLE_WRITE_PRECISION_),len));
@@ -147,7 +147,7 @@ namespace pflow {
           if(c=="ALL" || c==aurostd::toupper("modulus_Young")) vs.push_back(aurostd::PaddedPOST("modulus_Young="+aurostd::utype2string(xelement::xelement(Z).modulus_Young,_DOUBLE_WRITE_PRECISION_),len)+"// (GPa)");
           if(c=="ALL" || c==aurostd::toupper("modulus_bulk")) vs.push_back(aurostd::PaddedPOST("modulus_bulk="+aurostd::utype2string(xelement::xelement(Z).modulus_bulk,_DOUBLE_WRITE_PRECISION_),len)+"// (GPa)");
           if(c=="ALL" || c==aurostd::toupper("Poisson_ratio_PT")) vs.push_back(aurostd::PaddedPOST("Poisson_ratio_PT="+aurostd::utype2string(xelement::xelement(Z).Poisson_ratio_PT,_DOUBLE_WRITE_PRECISION_),len));
-          if(c=="ALL" || c==aurostd::toupper("BVm_Miedema")) vs.push_back(aurostd::PaddedPOST("BVm_Miedema="+aurostd::utype2string(xelement::xelement(Z).BVm_Miedema,_DOUBLE_WRITE_PRECISION_),len)+"// (kJ/mole)");
+          if(c=="ALL" || c==aurostd::toupper("BVm_Miedema")) vs.push_back(aurostd::PaddedPOST("BVm_Miedema="+aurostd::utype2string(xelement::xelement(Z).BVm_Miedema,_DOUBLE_WRITE_PRECISION_),len)+"// (kJ/mol)");
           //
           if(c=="ALL" || c==aurostd::toupper("magnetic_type_PT")) vs.push_back(aurostd::PaddedPOST("magnetic_type_PT="+xelement::xelement(Z).magnetic_type_PT,len));
           if(c=="ALL" || c==aurostd::toupper("susceptibility_magnetic_mass")) vs.push_back(aurostd::PaddedPOST("susceptibility_magnetic_mass="+aurostd::utype2string(xelement::xelement(Z).susceptibility_magnetic_mass,_DOUBLE_WRITE_PRECISION_),len)+"// (m^3/K)");
@@ -256,7 +256,7 @@ namespace xelement {
     radii_Pyykko=NNN;          
     //                                          
     conductivity_electrical=NNN;
-    electronegativity_vec=NNN;    
+    electronegativity_Pauling=NNN;    
     hardness_Ghosh=NNN;            
     electronegativity_Pearson=NNN;           
     electronegativity_Ghosh=NNN;             
@@ -356,7 +356,7 @@ namespace xelement {
     radii_Pyykko=b.radii_Pyykko;          
     //                                          
     conductivity_electrical=b.conductivity_electrical;
-    electronegativity_vec=b.electronegativity_vec;    
+    electronegativity_Pauling=b.electronegativity_Pauling;    
     hardness_Ghosh=b.hardness_Ghosh;            
     electronegativity_Pearson=b.electronegativity_Pearson;           
     electronegativity_Ghosh=b.electronegativity_Ghosh;             
@@ -498,7 +498,7 @@ namespace xelement {
     if(c==aurostd::toupper("radii_Pyykko")) return aurostd::utype2string(radii_Pyykko,_DOUBLE_WRITE_PRECISION_);
     //
     if(c==aurostd::toupper("conductivity_electrical")) return aurostd::utype2string(conductivity_electrical,_DOUBLE_WRITE_PRECISION_);
-    if(c==aurostd::toupper("electronegativity_vec")) return aurostd::utype2string(electronegativity_vec,_DOUBLE_WRITE_PRECISION_);
+    if(c==aurostd::toupper("electronegativity_Pauling")) return aurostd::utype2string(electronegativity_Pauling,_DOUBLE_WRITE_PRECISION_);
     if(c==aurostd::toupper("hardness_Ghosh")) return aurostd::utype2string(hardness_Ghosh,_DOUBLE_WRITE_PRECISION_);
     if(c==aurostd::toupper("electronegativity_Pearson")) return aurostd::utype2string(electronegativity_Pearson,_DOUBLE_WRITE_PRECISION_); //+"// (eV)
     if(c==aurostd::toupper("electronegativity_Ghosh")) return aurostd::utype2string(electronegativity_Ghosh,_DOUBLE_WRITE_PRECISION_); //+"// (eV)
@@ -632,7 +632,7 @@ namespace xelement {
       radii_Slatter=0.25;
       radii_Pyykko=0.32;
       conductivity_electrical=NNN;
-      electronegativity_vec=2.10;
+      electronegativity_Pauling=2.10;
       hardness_Ghosh=6.4299;
       electronegativity_Pearson=7.18;
       electronegativity_Ghosh=7.178;
@@ -721,7 +721,7 @@ namespace xelement {
       radii_Slatter=NNN;
       radii_Pyykko=0.46;
       conductivity_electrical=NNN;
-      electronegativity_vec=NNN;
+      electronegativity_Pauling=NNN;
       hardness_Ghosh=12.5449;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=12.046;
@@ -812,7 +812,7 @@ namespace xelement {
       radii_Slatter=1.45;
       radii_Pyykko=1.33;
       conductivity_electrical=1.1E7;
-      electronegativity_vec=0.98;
+      electronegativity_Pauling=0.98;
       hardness_Ghosh=2.3746;
       electronegativity_Pearson=3.01;
       electronegativity_Ghosh=2.860;
@@ -901,7 +901,7 @@ namespace xelement {
       radii_Slatter=1.05;
       radii_Pyykko=1.02;
       conductivity_electrical=2.5E7;
-      electronegativity_vec=1.57;
+      electronegativity_Pauling=1.57;
       hardness_Ghosh=3.4968;
       electronegativity_Pearson=4.90;
       electronegativity_Ghosh=3.945;
@@ -991,7 +991,7 @@ namespace xelement {
       radii_Slatter=0.85;
       radii_Pyykko=0.85;
       conductivity_electrical=0.0001;
-      electronegativity_vec=2.04;
+      electronegativity_Pauling=2.04;
       hardness_Ghosh=4.6190;
       electronegativity_Pearson=4.29;
       electronegativity_Ghosh=5.031;
@@ -1080,7 +1080,7 @@ namespace xelement {
       radii_Slatter=0.70;
       radii_Pyykko=0.75;
       conductivity_electrical=100000;
-      electronegativity_vec=2.55;
+      electronegativity_Pauling=2.55;
       hardness_Ghosh=5.7410;
       electronegativity_Pearson=6.27;
       electronegativity_Ghosh=6.116;
@@ -1169,7 +1169,7 @@ namespace xelement {
       radii_Slatter=0.65;
       radii_Pyykko=0.71;
       conductivity_electrical=NNN;
-      electronegativity_vec=3.04;
+      electronegativity_Pauling=3.04;
       hardness_Ghosh=6.8625;
       electronegativity_Pearson=7.30;
       electronegativity_Ghosh=7.209;
@@ -1258,7 +1258,7 @@ namespace xelement {
       radii_Slatter=0.60;
       radii_Pyykko=0.63;
       conductivity_electrical=NNN;
-      electronegativity_vec=3.44;
+      electronegativity_Pauling=3.44;
       hardness_Ghosh=7.9854;
       electronegativity_Pearson=7.54;
       electronegativity_Ghosh=8.287;
@@ -1347,7 +1347,7 @@ namespace xelement {
       radii_Slatter=0.50;
       radii_Pyykko=0.64;
       conductivity_electrical=NNN;
-      electronegativity_vec=3.98;
+      electronegativity_Pauling=3.98;
       hardness_Ghosh=9.1065;
       electronegativity_Pearson=10.41;
       electronegativity_Ghosh=9.372;
@@ -1436,7 +1436,7 @@ namespace xelement {
       radii_Slatter=NNN;
       radii_Pyykko=0.67;
       conductivity_electrical=NNN;
-      electronegativity_vec=NNN;
+      electronegativity_Pauling=NNN;
       hardness_Ghosh=10.2303;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=10.459;
@@ -1527,7 +1527,7 @@ namespace xelement {
       radii_Slatter=1.80;
       radii_Pyykko=1.55;
       conductivity_electrical=2.1E7;
-      electronegativity_vec=0.93;
+      electronegativity_Pauling=0.93;
       hardness_Ghosh=2.4441;
       electronegativity_Pearson=2.85;
       electronegativity_Ghosh=2.536;
@@ -1616,7 +1616,7 @@ namespace xelement {
       radii_Slatter=1.50;
       radii_Pyykko=1.39;
       conductivity_electrical=2.3E7;
-      electronegativity_vec=1.31;
+      electronegativity_Pauling=1.31;
       hardness_Ghosh=3.0146;
       electronegativity_Pearson=3.75;
       electronegativity_Ghosh=3.310;
@@ -1706,7 +1706,7 @@ namespace xelement {
       radii_Slatter=1.25;
       radii_Pyykko=1.26;
       conductivity_electrical=3.8E7;
-      electronegativity_vec=1.61;
+      electronegativity_Pauling=1.61;
       hardness_Ghosh=3.5849;
       electronegativity_Pearson=3.23;
       electronegativity_Ghosh=4.084;
@@ -1795,7 +1795,7 @@ namespace xelement {
       radii_Slatter=1.10;
       radii_Pyykko=1.16;
       conductivity_electrical=1000;
-      electronegativity_vec=1.90;
+      electronegativity_Pauling=1.90;
       hardness_Ghosh=4.1551;
       electronegativity_Pearson=4.77;
       electronegativity_Ghosh=4.857;
@@ -1884,7 +1884,7 @@ namespace xelement {
       radii_Slatter=1.00;
       radii_Pyykko=1.11;
       conductivity_electrical=1E7;
-      electronegativity_vec=2.19;
+      electronegativity_Pauling=2.19;
       hardness_Ghosh=4.7258;
       electronegativity_Pearson=5.62;
       electronegativity_Ghosh=5.631;
@@ -1973,7 +1973,7 @@ namespace xelement {
       radii_Slatter=1.00;
       radii_Pyykko=1.03;
       conductivity_electrical=1E-15;
-      electronegativity_vec=2.58;
+      electronegativity_Pauling=2.58;
       hardness_Ghosh=5.2960;
       electronegativity_Pearson=6.22;
       electronegativity_Ghosh=6.420;
@@ -2062,7 +2062,7 @@ namespace xelement {
       radii_Slatter=1.00;
       radii_Pyykko=0.99;
       conductivity_electrical=0.01;
-      electronegativity_vec=3.16;
+      electronegativity_Pauling=3.16;
       hardness_Ghosh=5.8662;
       electronegativity_Pearson=8.30;
       electronegativity_Ghosh=7.178;
@@ -2151,7 +2151,7 @@ namespace xelement {
       radii_Slatter=NNN;
       radii_Pyykko=0.96;
       conductivity_electrical=NNN;
-      electronegativity_vec=NNN;
+      electronegativity_Pauling=NNN;
       hardness_Ghosh=6.4366;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=7.951;
@@ -2242,7 +2242,7 @@ namespace xelement {
       radii_Slatter=2.20;
       radii_Pyykko=1.96;
       conductivity_electrical=1.4E7;
-      electronegativity_vec=0.82;
+      electronegativity_Pauling=0.82;
       hardness_Ghosh=2.3273;
       electronegativity_Pearson=2.42;
       electronegativity_Ghosh=2.672;
@@ -2331,7 +2331,7 @@ namespace xelement {
       radii_Slatter=1.80;
       radii_Pyykko=1.71;
       conductivity_electrical=2.9E7;
-      electronegativity_vec=1.00;
+      electronegativity_Pauling=1.00;
       hardness_Ghosh=2.7587;
       electronegativity_Pearson=2.2;
       electronegativity_Ghosh=3.140;
@@ -2421,7 +2421,7 @@ namespace xelement {
       radii_Slatter=1.60;
       radii_Pyykko=1.48;
       conductivity_electrical=1.8E6;
-      electronegativity_vec=1.36;
+      electronegativity_Pauling=1.36;
       hardness_Ghosh=2.8582;
       electronegativity_Pearson=3.34;
       electronegativity_Ghosh=3.248;
@@ -2510,7 +2510,7 @@ namespace xelement {
       radii_Slatter=1.40;
       radii_Pyykko=1.36;
       conductivity_electrical=2.5E6;
-      electronegativity_vec=1.54;
+      electronegativity_Pauling=1.54;
       hardness_Ghosh=2.9578;
       electronegativity_Pearson=3.45;
       electronegativity_Ghosh=3.357;
@@ -2599,7 +2599,7 @@ namespace xelement {
       radii_Slatter=1.35;
       radii_Pyykko=1.34;
       conductivity_electrical=5E6;
-      electronegativity_vec=1.63;
+      electronegativity_Pauling=1.63;
       hardness_Ghosh=3.0573;
       electronegativity_Pearson=3.6;
       electronegativity_Ghosh=3.465;
@@ -2688,7 +2688,7 @@ namespace xelement {
       radii_Slatter=1.40;
       radii_Pyykko=1.22;
       conductivity_electrical=7.9E6;
-      electronegativity_vec=1.66;
+      electronegativity_Pauling=1.66;
       hardness_Ghosh=3.1567;
       electronegativity_Pearson=3.72;
       electronegativity_Ghosh=3.573;
@@ -2764,7 +2764,7 @@ namespace xelement {
       crystal_structure_PT="Body-centered_Cubic";
       space_group="I_43m";
       space_group_number=217;
-      variance_parameter_mass=1.67276E-32;
+      variance_parameter_mass=0.0;  //[CO+ME20201116]1.67276E-32;
       lattice_constants[1]=891.25;lattice_constants[2]=891.25;lattice_constants[3]=891.25;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=PI/2;
       phase="Solid";
@@ -2777,7 +2777,7 @@ namespace xelement {
       radii_Slatter=1.40;
       radii_Pyykko=1.19;
       conductivity_electrical=620000;
-      electronegativity_vec=1.55;
+      electronegativity_Pauling=1.55;
       hardness_Ghosh=3.2564;
       electronegativity_Pearson=3.72;
       electronegativity_Ghosh=3.681;
@@ -2866,7 +2866,7 @@ namespace xelement {
       radii_Slatter=1.40;
       radii_Pyykko=1.16;
       conductivity_electrical=1E7;
-      electronegativity_vec=1.83;
+      electronegativity_Pauling=1.83;
       hardness_Ghosh=3.3559;
       electronegativity_Pearson=4.06;
       electronegativity_Ghosh=3.789;
@@ -2955,7 +2955,7 @@ namespace xelement {
       radii_Slatter=1.35;
       radii_Pyykko=1.11;
       conductivity_electrical=1.7E7;
-      electronegativity_vec=1.88;
+      electronegativity_Pauling=1.88;
       hardness_Ghosh=3.4556;
       electronegativity_Pearson=4.3;
       electronegativity_Ghosh=3.897;
@@ -3044,7 +3044,7 @@ namespace xelement {
       radii_Slatter=1.35;
       radii_Pyykko=1.10;
       conductivity_electrical=1.4E7;
-      electronegativity_vec=1.91;
+      electronegativity_Pauling=1.91;
       hardness_Ghosh=3.5550;
       electronegativity_Pearson=4.40;
       electronegativity_Ghosh=4.005;
@@ -3133,7 +3133,7 @@ namespace xelement {
       radii_Slatter=1.35;
       radii_Pyykko=1.12;
       conductivity_electrical=5.9E7;
-      electronegativity_vec=1.90;
+      electronegativity_Pauling=1.90;
       hardness_Ghosh=3.6544;
       electronegativity_Pearson=4.48;
       electronegativity_Ghosh=4.113;
@@ -3222,7 +3222,7 @@ namespace xelement {
       radii_Slatter=1.35;
       radii_Pyykko=1.18;
       conductivity_electrical=1.7E7;
-      electronegativity_vec=1.65;
+      electronegativity_Pauling=1.65;
       hardness_Ghosh=3.7542;
       electronegativity_Pearson=4.45;
       electronegativity_Ghosh=4.222;
@@ -3312,7 +3312,7 @@ namespace xelement {
       radii_Slatter=1.30;
       radii_Pyykko=1.24;
       conductivity_electrical=7.1E6;
-      electronegativity_vec=1.81;
+      electronegativity_Pauling=1.81;
       hardness_Ghosh=4.1855;
       electronegativity_Pearson=3.2;
       electronegativity_Ghosh=4.690;
@@ -3401,7 +3401,7 @@ namespace xelement {
       radii_Slatter=1.25;
       radii_Pyykko=1.21;
       conductivity_electrical=2000;
-      electronegativity_vec=2.01;
+      electronegativity_Pauling=2.01;
       hardness_Ghosh=4.6166;
       electronegativity_Pearson=4.6;
       electronegativity_Ghosh=5.159;
@@ -3490,7 +3490,7 @@ namespace xelement {
       radii_Slatter=1.15;
       radii_Pyykko=1.21;
       conductivity_electrical=3.3E6;
-      electronegativity_vec=2.18;
+      electronegativity_Pauling=2.18;
       hardness_Ghosh=5.0662;
       electronegativity_Pearson=5.3;
       electronegativity_Ghosh=5.628;
@@ -3579,7 +3579,7 @@ namespace xelement {
       radii_Slatter=1.15;
       radii_Pyykko=1.16;
       conductivity_electrical=NNN;
-      electronegativity_vec=2.55;
+      electronegativity_Pauling=2.55;
       hardness_Ghosh=5.4795;
       electronegativity_Pearson=5.89;
       electronegativity_Ghosh=6.096;
@@ -3668,7 +3668,7 @@ namespace xelement {
       radii_Slatter=1.15;
       radii_Pyykko=1.14;
       conductivity_electrical=1E-10;
-      electronegativity_vec=2.96;
+      electronegativity_Pauling=2.96;
       hardness_Ghosh=5.9111;
       electronegativity_Pearson=7.59;
       electronegativity_Ghosh=6.565;
@@ -3757,7 +3757,7 @@ namespace xelement {
       radii_Slatter=NNN;
       radii_Pyykko=1.17;
       conductivity_electrical=NNN;
-      electronegativity_vec=3;
+      electronegativity_Pauling=3;
       hardness_Ghosh=6.3418;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=7.033;
@@ -3848,7 +3848,7 @@ namespace xelement {
       radii_Slatter=2.35;
       radii_Pyykko=2.10;
       conductivity_electrical=8.3E6;
-      electronegativity_vec=0.82;
+      electronegativity_Pauling=0.82;
       hardness_Ghosh=2.1204;
       electronegativity_Pearson=2.34;
       electronegativity_Ghosh=2.849;
@@ -3937,7 +3937,7 @@ namespace xelement {
       radii_Slatter=2.00;
       radii_Pyykko=1.85;
       conductivity_electrical=7.7E6;
-      electronegativity_vec=0.95;
+      electronegativity_Pauling=0.95;
       hardness_Ghosh=2.5374;
       electronegativity_Pearson=2.0;
       electronegativity_Ghosh=3.225;
@@ -4027,7 +4027,7 @@ namespace xelement {
       radii_Slatter=1.80;
       radii_Pyykko=1.63;
       conductivity_electrical=1.8E6;
-      electronegativity_vec=1.22;
+      electronegativity_Pauling=1.22;
       hardness_Ghosh=2.6335;
       electronegativity_Pearson=3.19;
       electronegativity_Ghosh=3.311;
@@ -4116,7 +4116,7 @@ namespace xelement {
       radii_Slatter=1.55;
       radii_Pyykko=1.54;
       conductivity_electrical=2.4E6;
-      electronegativity_vec=1.33;
+      electronegativity_Pauling=1.33;
       hardness_Ghosh=2.7298;
       electronegativity_Pearson=3.64;
       electronegativity_Ghosh=3.398;
@@ -4205,7 +4205,7 @@ namespace xelement {
       radii_Slatter=1.45;
       radii_Pyykko=1.47;
       conductivity_electrical=6.7E6;
-      electronegativity_vec=1.60;
+      electronegativity_Pauling=1.60;
       hardness_Ghosh=2.8260;
       electronegativity_Pearson=4.0;
       electronegativity_Ghosh=3.485;
@@ -4294,7 +4294,7 @@ namespace xelement {
       radii_Slatter=1.45;
       radii_Pyykko=1.38;
       conductivity_electrical=2E7;
-      electronegativity_vec=2.16;
+      electronegativity_Pauling=2.16;
       hardness_Ghosh=2.9221;
       electronegativity_Pearson=3.9;
       electronegativity_Ghosh=3.572;
@@ -4383,7 +4383,7 @@ namespace xelement {
       radii_Slatter=1.35;
       radii_Pyykko=1.28;
       conductivity_electrical=5E6;
-      electronegativity_vec=1.90;
+      electronegativity_Pauling=1.90;
       hardness_Ghosh=3.0184;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=3.659;
@@ -4472,7 +4472,7 @@ namespace xelement {
       radii_Slatter=1.30;
       radii_Pyykko=1.25;
       conductivity_electrical=1.4E7;
-      electronegativity_vec=2.20;
+      electronegativity_Pauling=2.20;
       hardness_Ghosh=3.1146;
       electronegativity_Pearson=4.5;
       electronegativity_Ghosh=3.745;
@@ -4548,7 +4548,7 @@ namespace xelement {
       crystal_structure_PT="Face-centered_Cubic";
       space_group="Fm_3m";
       space_group_number=225;
-      variance_parameter_mass=1.90706E-32;
+      variance_parameter_mass=0.0;  //[CO+ME20201116]1.90706E-32;
       lattice_constants[1]=380.34;lattice_constants[2]=380.34;lattice_constants[3]=380.34;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=PI/2;
       phase="Solid";
@@ -4561,7 +4561,7 @@ namespace xelement {
       radii_Slatter=1.35;
       radii_Pyykko=1.25;
       conductivity_electrical=2.3E7;
-      electronegativity_vec=2.28;
+      electronegativity_Pauling=2.28;
       hardness_Ghosh=3.2108;
       electronegativity_Pearson=4.3;
       electronegativity_Ghosh=3.832;
@@ -4650,7 +4650,7 @@ namespace xelement {
       radii_Slatter=1.40;
       radii_Pyykko=1.20;
       conductivity_electrical=1E7;
-      electronegativity_vec=2.20;
+      electronegativity_Pauling=2.20;
       hardness_Ghosh=3.3069;
       electronegativity_Pearson=4.45;
       electronegativity_Ghosh=3.919;
@@ -4739,7 +4739,7 @@ namespace xelement {
       radii_Slatter=1.60;
       radii_Pyykko=1.28;
       conductivity_electrical=6.2E7;
-      electronegativity_vec=1.93;
+      electronegativity_Pauling=1.93;
       hardness_Ghosh=3.4032;
       electronegativity_Pearson=4.44;
       electronegativity_Ghosh=4.006;
@@ -4828,7 +4828,7 @@ namespace xelement {
       radii_Slatter=1.55;
       radii_Pyykko=1.36;
       conductivity_electrical=1.4E7;
-      electronegativity_vec=1.69;
+      electronegativity_Pauling=1.69;
       hardness_Ghosh=3.4994;
       electronegativity_Pearson=4.33;
       electronegativity_Ghosh=4.093;
@@ -4918,7 +4918,7 @@ namespace xelement {
       radii_Slatter=1.55;
       radii_Pyykko=1.42;
       conductivity_electrical=1.2E7;
-      electronegativity_vec=1.78;
+      electronegativity_Pauling=1.78;
       hardness_Ghosh=3.9164;
       electronegativity_Pearson=3.1;
       electronegativity_Ghosh=4.469;
@@ -5007,7 +5007,7 @@ namespace xelement {
       radii_Slatter=1.45;
       radii_Pyykko=1.40;
       conductivity_electrical=9.1E6;
-      electronegativity_vec=1.96;
+      electronegativity_Pauling=1.96;
       hardness_Ghosh=4.3332;
       electronegativity_Pearson=4.3;
       electronegativity_Ghosh=4.845;
@@ -5096,7 +5096,7 @@ namespace xelement {
       radii_Slatter=1.45;
       radii_Pyykko=1.40;
       conductivity_electrical=2.5E6;
-      electronegativity_vec=2.05;
+      electronegativity_Pauling=2.05;
       hardness_Ghosh=4.7501;
       electronegativity_Pearson=4.85;
       electronegativity_Ghosh=5.221;
@@ -5185,7 +5185,7 @@ namespace xelement {
       radii_Slatter=1.40;
       radii_Pyykko=1.36;
       conductivity_electrical=10000;
-      electronegativity_vec=2.10;
+      electronegativity_Pauling=2.10;
       hardness_Ghosh=5.1670;
       electronegativity_Pearson=5.49;
       electronegativity_Ghosh=5.597;
@@ -5274,7 +5274,7 @@ namespace xelement {
       radii_Slatter=1.40;
       radii_Pyykko=1.33;
       conductivity_electrical=1E-7;
-      electronegativity_vec=2.66;
+      electronegativity_Pauling=2.66;
       hardness_Ghosh=5.5839;
       electronegativity_Pearson=6.76;
       electronegativity_Ghosh=5.973;
@@ -5363,7 +5363,7 @@ namespace xelement {
       radii_Slatter=NNN;
       radii_Pyykko=1.31;
       conductivity_electrical=NNN;
-      electronegativity_vec=2.60;
+      electronegativity_Pauling=2.60;
       hardness_Ghosh=6.0009;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=6.349;
@@ -5454,7 +5454,7 @@ namespace xelement {
       radii_Slatter=2.60;
       radii_Pyykko=2.32;
       conductivity_electrical=5E6;
-      electronegativity_vec=0.79;
+      electronegativity_Pauling=0.79;
       hardness_Ghosh=0.6829;
       electronegativity_Pearson=2.18;
       electronegativity_Ghosh=4.196;
@@ -5543,7 +5543,7 @@ namespace xelement {
       radii_Slatter=2.15;
       radii_Pyykko=1.96;
       conductivity_electrical=2.9E6;
-      electronegativity_vec=0.89;
+      electronegativity_Pauling=0.89;
       hardness_Ghosh=0.9201;
       electronegativity_Pearson=2.4;
       electronegativity_Ghosh=4.318;
@@ -5633,7 +5633,7 @@ namespace xelement {
       radii_Slatter=1.95;
       radii_Pyykko=1.80;
       conductivity_electrical=1.6E6;
-      electronegativity_vec=1.10;
+      electronegativity_Pauling=1.10;
       hardness_Ghosh=1.1571;
       electronegativity_Pearson=3.1;
       electronegativity_Ghosh=4.439;
@@ -5723,7 +5723,7 @@ namespace xelement {
       radii_Slatter=1.85;
       radii_Pyykko=1.63;
       conductivity_electrical=1.4E6;
-      electronegativity_vec=1.12;
+      electronegativity_Pauling=1.12;
       hardness_Ghosh=1.3943;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=4.561;
@@ -5812,7 +5812,7 @@ namespace xelement {
       radii_Slatter=1.85;
       radii_Pyykko=1.76;
       conductivity_electrical=1.4E6;
-      electronegativity_vec=1.13;
+      electronegativity_Pauling=1.13;
       hardness_Ghosh=1.6315;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=4.682;
@@ -5901,7 +5901,7 @@ namespace xelement {
       radii_Slatter=1.85;
       radii_Pyykko=1.74;
       conductivity_electrical=1.6E6;
-      electronegativity_vec=1.14;
+      electronegativity_Pauling=1.14;
       hardness_Ghosh=1.8684;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=4.804;
@@ -5990,7 +5990,7 @@ namespace xelement {
       radii_Slatter=1.85;
       radii_Pyykko=1.73;
       conductivity_electrical=1.3E6;
-      electronegativity_vec=1.13;
+      electronegativity_Pauling=1.13;
       hardness_Ghosh=2.1056;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=4.925;
@@ -6079,7 +6079,7 @@ namespace xelement {
       radii_Slatter=1.85;
       radii_Pyykko=1.72;
       conductivity_electrical=1.1E6;
-      electronegativity_vec=1.17;
+      electronegativity_Pauling=1.17;
       hardness_Ghosh=2.3427;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=5.047;
@@ -6168,7 +6168,7 @@ namespace xelement {
       radii_Slatter=1.85;
       radii_Pyykko=1.68;
       conductivity_electrical=1.1E6;
-      electronegativity_vec=1.20;
+      electronegativity_Pauling=1.20;
       hardness_Ghosh=2.5798;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=5.168;
@@ -6257,7 +6257,7 @@ namespace xelement {
       radii_Slatter=1.80;
       radii_Pyykko=1.69;
       conductivity_electrical=770000;
-      electronegativity_vec=1.20;
+      electronegativity_Pauling=1.20;
       hardness_Ghosh=2.8170;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=5.290;
@@ -6346,7 +6346,7 @@ namespace xelement {
       radii_Slatter=1.75;
       radii_Pyykko=1.68;
       conductivity_electrical=830000;
-      electronegativity_vec=1.10;
+      electronegativity_Pauling=1.10;
       hardness_Ghosh=3.0540;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=5.411;
@@ -6435,7 +6435,7 @@ namespace xelement {
       radii_Slatter=1.75;
       radii_Pyykko=1.67;
       conductivity_electrical=1.1E6;
-      electronegativity_vec=1.22;
+      electronegativity_Pauling=1.22;
       hardness_Ghosh=3.2912;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=5.533;
@@ -6511,7 +6511,7 @@ namespace xelement {
       crystal_structure_PT="Simple_Hexagonal";
       space_group="P6_3/mmc";
       space_group_number=194;
-      variance_parameter_mass=2.96961E-32;
+      variance_parameter_mass=0.0;  //[CO+ME20201116]2.96961E-32;
       lattice_constants[1]=357.73;lattice_constants[2]=357.73;lattice_constants[3]=561.58;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=2*PI/3;
       phase="Solid";
@@ -6524,7 +6524,7 @@ namespace xelement {
       radii_Slatter=1.75;
       radii_Pyykko=1.66;
       conductivity_electrical=1.1E6;
-      electronegativity_vec=1.23;
+      electronegativity_Pauling=1.23;
       hardness_Ghosh=3.5283;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=5.654;
@@ -6613,7 +6613,7 @@ namespace xelement {
       radii_Slatter=1.75;
       radii_Pyykko=1.65;
       conductivity_electrical=1.2E6;
-      electronegativity_vec=1.24;
+      electronegativity_Pauling=1.24;
       hardness_Ghosh=3.7655;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=5.776;
@@ -6702,7 +6702,7 @@ namespace xelement {
       radii_Slatter=1.75;
       radii_Pyykko=1.64;
       conductivity_electrical=1.4E6;
-      electronegativity_vec=1.25;
+      electronegativity_Pauling=1.25;
       hardness_Ghosh=4.0026;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=5.897;
@@ -6791,7 +6791,7 @@ namespace xelement {
       radii_Slatter=1.75;
       radii_Pyykko=1.70;
       conductivity_electrical=3.6E6;
-      electronegativity_vec=1.10;
+      electronegativity_Pauling=1.10;
       hardness_Ghosh=4.2395;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=6.019;
@@ -6880,7 +6880,7 @@ namespace xelement {
       radii_Slatter=1.75;
       radii_Pyykko=1.62;
       conductivity_electrical=1.8E6;
-      electronegativity_vec=1.27;
+      electronegativity_Pauling=1.27;
       hardness_Ghosh=4.4766;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=6.140;
@@ -6970,7 +6970,7 @@ namespace xelement {
       radii_Slatter=1.55;
       radii_Pyykko=1.52;
       conductivity_electrical=3.3E6;
-      electronegativity_vec=1.30;
+      electronegativity_Pauling=1.30;
       hardness_Ghosh=4.7065;
       electronegativity_Pearson=3.8;
       electronegativity_Ghosh=6.258;
@@ -7059,7 +7059,7 @@ namespace xelement {
       radii_Slatter=1.45;
       radii_Pyykko=1.46;
       conductivity_electrical=7.7E6;
-      electronegativity_vec=1.50;
+      electronegativity_Pauling=1.50;
       hardness_Ghosh=4.9508;
       electronegativity_Pearson=4.11;
       electronegativity_Ghosh=6.383;
@@ -7148,7 +7148,7 @@ namespace xelement {
       radii_Slatter=1.35;
       radii_Pyykko=1.37;
       conductivity_electrical=2E7;
-      electronegativity_vec=2.36;
+      electronegativity_Pauling=2.36;
       hardness_Ghosh=5.1879;
       electronegativity_Pearson=4.40;
       electronegativity_Ghosh=6.505;
@@ -7237,7 +7237,7 @@ namespace xelement {
       radii_Slatter=1.35;
       radii_Pyykko=1.31;
       conductivity_electrical=5.6E6;
-      electronegativity_vec=1.90;
+      electronegativity_Pauling=1.90;
       hardness_Ghosh=5.4256;
       electronegativity_Pearson=4.02;
       electronegativity_Ghosh=6.626;
@@ -7326,7 +7326,7 @@ namespace xelement {
       radii_Slatter=1.30;
       radii_Pyykko=1.29;
       conductivity_electrical=1.2E7;
-      electronegativity_vec=2.20;
+      electronegativity_Pauling=2.20;
       hardness_Ghosh=5.6619;
       electronegativity_Pearson=4.9;
       electronegativity_Ghosh=6.748;
@@ -7415,7 +7415,7 @@ namespace xelement {
       radii_Slatter=1.35;
       radii_Pyykko=1.22;
       conductivity_electrical=2.1E7;
-      electronegativity_vec=2.20;
+      electronegativity_Pauling=2.20;
       hardness_Ghosh=5.9000;
       electronegativity_Pearson=5.4;
       electronegativity_Ghosh=6.831;
@@ -7504,7 +7504,7 @@ namespace xelement {
       radii_Slatter=1.35;
       radii_Pyykko=1.23;
       conductivity_electrical=9.4E6;
-      electronegativity_vec=2.28;
+      electronegativity_Pauling=2.28;
       hardness_Ghosh=6.1367;
       electronegativity_Pearson=5.6;
       electronegativity_Ghosh=6.991;
@@ -7580,7 +7580,7 @@ namespace xelement {
       crystal_structure_PT="Face-centered_Cubic";
       space_group="Fm_3m";
       space_group_number=225;
-      variance_parameter_mass=2.08217E-32;
+      variance_parameter_mass=0.0;  //[CO+ME20201116]2.08217E-32;
       lattice_constants[1]=407.82;lattice_constants[2]=407.82;lattice_constants[3]=407.82;
       lattice_angles[1]=PI/2;lattice_angles[2]=PI/2;lattice_angles[3]=PI/2;
       phase="Solid";
@@ -7593,7 +7593,7 @@ namespace xelement {
       radii_Slatter=1.35;
       radii_Pyykko=1.24;
       conductivity_electrical=4.5E7;
-      electronegativity_vec=2.54;
+      electronegativity_Pauling=2.54;
       hardness_Ghosh=6.3741;
       electronegativity_Pearson=5.77;
       electronegativity_Ghosh=7.112;
@@ -7682,7 +7682,7 @@ namespace xelement {
       radii_Slatter=1.50;
       radii_Pyykko=1.33;
       conductivity_electrical=1E6;
-      electronegativity_vec=2.00;
+      electronegativity_Pauling=2.00;
       hardness_Ghosh=6.6103;
       electronegativity_Pearson=4.91;
       electronegativity_Ghosh=7.233;
@@ -7772,7 +7772,7 @@ namespace xelement {
       radii_Slatter=1.90;
       radii_Pyykko=1.44;
       conductivity_electrical=6.7E6;
-      electronegativity_vec=1.62;
+      electronegativity_Pauling=1.62;
       hardness_Ghosh=1.7043;
       electronegativity_Pearson=3.2;
       electronegativity_Ghosh=4.719;
@@ -7861,7 +7861,7 @@ namespace xelement {
       radii_Slatter=NNN;
       radii_Pyykko=1.44;
       conductivity_electrical=4.8E6;
-      electronegativity_vec=2.33;
+      electronegativity_Pauling=2.33;
       hardness_Ghosh=1.9414;
       electronegativity_Pearson=3.90;
       electronegativity_Ghosh=4.841;
@@ -7950,7 +7950,7 @@ namespace xelement {
       radii_Slatter=1.60;
       radii_Pyykko=1.51;
       conductivity_electrical=770000;
-      electronegativity_vec=2.02;
+      electronegativity_Pauling=2.02;
       hardness_Ghosh=2.1785;
       electronegativity_Pearson=4.69;
       electronegativity_Ghosh=4.962;
@@ -8039,7 +8039,7 @@ namespace xelement {
       radii_Slatter=1.90;
       radii_Pyykko=1.45;
       conductivity_electrical=2.3E6;
-      electronegativity_vec=2.00;
+      electronegativity_Pauling=2.00;
       hardness_Ghosh=2.4158;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=5.084;
@@ -8128,7 +8128,7 @@ namespace xelement {
       radii_Slatter=NNN;
       radii_Pyykko=1.47;
       conductivity_electrical=NNN;
-      electronegativity_vec=2.20;
+      electronegativity_Pauling=2.20;
       hardness_Ghosh=2.6528;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=5.206;
@@ -8217,7 +8217,7 @@ namespace xelement {
       radii_Slatter=NNN;
       radii_Pyykko=1.42;
       conductivity_electrical=NNN;
-      electronegativity_vec=2.2;
+      electronegativity_Pauling=2.2;
       hardness_Ghosh=2.8900;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=5.327;
@@ -8308,7 +8308,7 @@ namespace xelement {
       radii_Slatter=NNN;
       radii_Pyykko=2.23;
       conductivity_electrical=NNN;
-      electronegativity_vec=0.70;
+      electronegativity_Pauling=0.70;
       hardness_Ghosh=0.9882;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=2.376;
@@ -8397,7 +8397,7 @@ namespace xelement {
       radii_Slatter=2.15;
       radii_Pyykko=2.01;
       conductivity_electrical=1E6;
-      electronegativity_vec=0.89;
+      electronegativity_Pauling=0.89;
       hardness_Ghosh=1.2819;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=2.664;
@@ -8487,7 +8487,7 @@ namespace xelement {
       radii_Slatter=1.95;
       radii_Pyykko=1.86;
       conductivity_electrical=NNN;
-      electronegativity_vec=1.10;
+      electronegativity_Pauling=1.10;
       hardness_Ghosh=1.3497;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=2.730;
@@ -8577,7 +8577,7 @@ namespace xelement {
       radii_Slatter=1.80;
       radii_Pyykko=1.75;
       conductivity_electrical=6.7E6;
-      electronegativity_vec=1.30;
+      electronegativity_Pauling=1.30;
       hardness_Ghosh=1.4175;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=2.796;
@@ -8666,7 +8666,7 @@ namespace xelement {
       radii_Slatter=1.80;
       radii_Pyykko=1.69;
       conductivity_electrical=5.6E6;
-      electronegativity_vec=1.50;
+      electronegativity_Pauling=1.50;
       hardness_Ghosh=1.9369;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=3.306;
@@ -8755,7 +8755,7 @@ namespace xelement {
       radii_Slatter=1.75;
       radii_Pyykko=1.70;
       conductivity_electrical=3.6E6;
-      electronegativity_vec=1.38;
+      electronegativity_Pauling=1.38;
       hardness_Ghosh=2.2306;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=3.594;
@@ -8844,7 +8844,7 @@ namespace xelement {
       radii_Slatter=1.75;
       radii_Pyykko=1.71;
       conductivity_electrical=830000;
-      electronegativity_vec=NNN;
+      electronegativity_Pauling=NNN;
       hardness_Ghosh=2.5241;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=3.882;
@@ -8933,7 +8933,7 @@ namespace xelement {
       radii_Slatter=1.75;
       radii_Pyykko=1.72;
       conductivity_electrical=670000;
-      electronegativity_vec=NNN;
+      electronegativity_Pauling=NNN;
       hardness_Ghosh=3.0436;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=4.391;
@@ -9022,7 +9022,7 @@ namespace xelement {
       radii_Slatter=1.75;
       radii_Pyykko=1.66;
       conductivity_electrical=NNN;
-      electronegativity_vec=NNN;
+      electronegativity_Pauling=NNN;
       hardness_Ghosh=3.4169;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=4.678;
@@ -9111,7 +9111,7 @@ namespace xelement {
       radii_Slatter=NNN;
       radii_Pyykko=1.66;
       conductivity_electrical=NNN;
-      electronegativity_vec=NNN;
+      electronegativity_Pauling=NNN;
       hardness_Ghosh=3.4050;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=4.745;
@@ -9200,7 +9200,7 @@ namespace xelement {
       radii_Slatter=NNN;
       radii_Pyykko=1.68;
       conductivity_electrical=NNN;
-      electronegativity_vec=NNN;
+      electronegativity_Pauling=NNN;
       hardness_Ghosh=3.9244;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=5.256;
@@ -9289,7 +9289,7 @@ namespace xelement {
       radii_Slatter=NNN;
       radii_Pyykko=1.68;
       conductivity_electrical=NNN;
-      electronegativity_vec=NNN;
+      electronegativity_Pauling=NNN;
       hardness_Ghosh=4.2181;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=5.542;
@@ -9378,7 +9378,7 @@ namespace xelement {
       radii_Slatter=NNN;
       radii_Pyykko=1.65;
       conductivity_electrical=NNN;
-      electronegativity_vec=NNN;
+      electronegativity_Pauling=NNN;
       hardness_Ghosh=4.5116;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=5.830;
@@ -9467,7 +9467,7 @@ namespace xelement {
       radii_Slatter=NNN;
       radii_Pyykko=1.67;
       conductivity_electrical=NNN;
-      electronegativity_vec=NNN;
+      electronegativity_Pauling=NNN;
       hardness_Ghosh=4.8051;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=6.118;
@@ -9556,7 +9556,7 @@ namespace xelement {
       radii_Slatter=NNN;
       radii_Pyykko=1.73;
       conductivity_electrical=NNN;
-      electronegativity_vec=NNN;
+      electronegativity_Pauling=NNN;
       hardness_Ghosh=5.0990;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=6.406;
@@ -9645,7 +9645,7 @@ namespace xelement {
       radii_Slatter=NNN;
       radii_Pyykko=1.76;
       conductivity_electrical=NNN;
-      electronegativity_vec=NNN;
+      electronegativity_Pauling=NNN;
       hardness_Ghosh=5.3926;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=6.694;
@@ -9734,7 +9734,7 @@ namespace xelement {
       radii_Slatter=NNN;
       radii_Pyykko=1.61;
       conductivity_electrical=NNN;
-      electronegativity_vec=NNN;
+      electronegativity_Pauling=NNN;
       hardness_Ghosh=5.4607;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=6.760;

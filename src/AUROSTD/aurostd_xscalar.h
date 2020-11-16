@@ -61,9 +61,10 @@
 #define KBOLTZEV                (KBOLTZ/E_ELECTRON)             // eV/K //8.617343E-5
 #define eV2K                    (11604.505)                     // 1eV=11604.505 K
 #define meV2K                   (11.604505)                     // 1meV=11.604505 K
-#define atom2mol                6.0221408E23                    //CO20180329
-#define meVatom2kJmol           (E_ELECTRON*atom2mol/1.0e6)     //CO20180329
-#define hartree2eV              27.2113862459                   //ME20200206
+#define mol2atom                6.0221408E23                    // 1mol=6.022e23 atoms    //CO20180329
+#define eVatom2kJmol            (E_ELECTRON*mol2atom/1.0e3)     // 1eV/atom=96.5kJ/mol    //CO20180329
+#define meVatom2kJmol           (eVatom2kJmol/1.0e3)            // 1meV/atom=0.0965kJ/mol //CO20180329
+#define hartree2eV              27.2113862459                   // 1hartree=27.211eV      //ME20200206
 
 //ME20200107 - (A)APL conversion factors
 #define THz2Hz                        1E12

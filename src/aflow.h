@@ -4697,10 +4697,10 @@ namespace xelement {
       double radius_VanDerWaals_PT;           // (pm)       http://periodictable.com      //DU20190517
       double radii_Ghosh08;                    // (Angstrom) Journal of Molecular Structure: THEOCHEM 865, 60–67 (2008)      //DU20190517
       double radii_Slatter;                    // (Angstrom) J. of Chem. Phys. 41, 3199 (1964)      //DU20190517
-      double radii_Pyykko;                     // (pm) single bond covalent radii  Chem. Eur. J. 15, 186-197 (2009)      //DU20190517
+      double radii_Pyykko;                     // (Angstrom) single bond covalent radii  Chem. Eur. J. 15, 186-197 (2009)      //DU20190517
       //                                          
       double conductivity_electrical;          // (S/m)  http://periodictable.com  Value given for graphite. Diamond electrical conductivity is approximately 0.001.      //DU20190517
-      double electronegativity_vec;           // Saxena
+      double electronegativity_Pauling;           // Saxena
       double hardness_Ghosh;                   // (eV) Int. J. Quantum Chem 110, 1206-1213 (2010) Table III       //DU20190517
       double electronegativity_Pearson;                  // (eV) Inorg. Chem., 27(4), 734–740 (1988)      //DU20190517
       double electronegativity_Ghosh;                    // (eV) Journal of Theoretical and Computational Chemistry, 4, 21-33 (2005)      //DU20190517
@@ -4728,11 +4728,11 @@ namespace xelement {
       double temperature_melting;                   // (Celsius), http://periodictable.com He does not solidify at standard pressure,C: Value given for diamond form, P : Value given for "YELLOW" phosphorus form, S : Value given for monoclinic, beta form, Se: Value given for hexagonal, gray form, Bk: Value given for alpha form.           //DU20190517
       double fusion_heat_PT;                  // (kJ/mol)   http://periodictable.com      //CO20201111
       double vaporization_heat_PT;             // (kJ/mol)   http://periodictable.com      //DU20190517
-      double specific_heat_PT;                 // (J/(kg.K)) http://periodictable.com Gas_Phase:H(H2),He,N(N2),O(O2),F(F2),Ne,Cl(Cl2),Ar,Kr,Tc,Xe,Rn,Ra,Pa -- Liquid_Phase:Br,Hg -- Solid Phase: B(rhombic),C(graphite),S(rhombic),P(phase of P.4),As(alpha),Se(hexagonal),Cd(gamma),Sn(gray),Li,In,Be,Na,Mg,Al,Si,K,Ca,Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Ga,Ge,Rb,Sr,Y,Zr,Nb,Mo,Ru,Rh,Pd,Ag,Sb,Te,I,Cs,Ba,La,Ce,Pr,Nd,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Hf,Ta,W,Re,Os,Ir,Pt,Au,Tl,Pb,Bi,Ac,Th,U.      //DU20190517 
+      double specific_heat_PT;                 // (J/(kg K)) http://periodictable.com Gas_Phase:H(H2),He,N(N2),O(O2),F(F2),Ne,Cl(Cl2),Ar,Kr,Tc,Xe,Rn,Ra,Pa -- Liquid_Phase:Br,Hg -- Solid Phase: B(rhombic),C(graphite),S(rhombic),P(phase of P.4),As(alpha),Se(hexagonal),Cd(gamma),Sn(gray),Li,In,Be,Na,Mg,Al,Si,K,Ca,Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Ga,Ge,Rb,Sr,Y,Zr,Nb,Mo,Ru,Rh,Pd,Ag,Sb,Te,I,Cs,Ba,La,Ce,Pr,Nd,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Hf,Ta,W,Re,Os,Ir,Pt,Au,Tl,Pb,Bi,Ac,Th,U.      //DU20190517 
       double critical_pressure;                // (Atm)      http://periodictable.com Li,Na,K,Rb: Value estimated based on extrapolation.      //DU20190517
       double critical_temperature_PT;          // (K)        http://periodictable.com Li,Na,K,Rb: Value estimated based on extrapolation.      //DU20190517
       double thermal_expansion;               // (K^{-1})   http://periodictable.com C:graphite      //DU20190517
-      double conductivity_thermal;            // (W/(mK))   http://periodictable.com      //DU20190517
+      double conductivity_thermal;            // (W/(m K))   http://periodictable.com      //DU20190517
       //                                         
       double hardness_Brinell;               // (MPa)  http://periodictable.com For Ge value is converted from Mohs scale      //DU20190517
       double hardness_Mohs;                   //        http://periodictable.com For C, value given for graphite. Diamond value is 10.0; For Pr, Nd, Sm, Eu, Gd, Tb, Dy, Ho, Er, Tm, Lu converted from Vickers scale.      //DU20190517
