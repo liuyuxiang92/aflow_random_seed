@@ -393,8 +393,16 @@ namespace apl
     for (int j=0; j<N_GPvolumes; j++){
       arun_runnames_apl_gp.push_back("PHONON_"
           + aurostd::utype2string(gprange[j],precision_format,false,FIXED_STREAM));
-      subdirectories_apl_gp.push_back(ARUN_DIRECTORY_PREFIX + QHA_ARUN_MODE + '_' +
+
+      // if harmonic IFC file for V=1.0 exists, reuse it and do not create PHONON_1.000 directory
+      if (aurostd::isequal(gprange[j], 1.0) &&
+          aurostd::EFileExist(DEFAULT_APL_FILE_PREFIX+DEFAULT_APL_HARMIFC_FILE)){
+        subdirectories_apl_gp.push_back(".");
+      }
+      else{
+        subdirectories_apl_gp.push_back(ARUN_DIRECTORY_PREFIX + QHA_ARUN_MODE + '_' +
           arun_runnames_apl_gp.back());
+      }
 
       coefGPVolumes.push_back(gprange[j]);
       GPvolumes.push_back(gprange[j]*Volume/NatomsOrigCell);
@@ -427,8 +435,16 @@ namespace apl
       for (double i=eosrange[0]; i<=eosrange[1]; i+=eosrange[2]){
         arun_runnames_apl_eos.push_back( "PHONON_" +
             aurostd::utype2string(i,precision_format,false,FIXED_STREAM));
-        subdirectories_apl_eos.push_back(ARUN_DIRECTORY_PREFIX + QHA_ARUN_MODE + '_' +
-            arun_runnames_apl_eos.back());
+
+        // if harmonic IFC file for V=1.0 exists, reuse it and do not create PHONON_1.000 directory
+        if (aurostd::isequal(i, 1.0) &&
+            aurostd::EFileExist(DEFAULT_APL_FILE_PREFIX+DEFAULT_APL_HARMIFC_FILE)){
+          subdirectories_apl_eos.push_back(".");
+        }
+        else{
+          subdirectories_apl_eos.push_back(ARUN_DIRECTORY_PREFIX + QHA_ARUN_MODE + '_' +
+              arun_runnames_apl_eos.back());
+        }
 
         arun_runnames_static.push_back("STATIC_" + 
             aurostd::utype2string(i, precision_format, false, FIXED_STREAM));
@@ -452,8 +468,16 @@ namespace apl
         coef = 1.0 + (-TaylorExpansionOrder + i)*gp_distortion; //dV = 2*gp_distortion
         arun_runnames_apl_qhanp.push_back("PHONON_"+
             aurostd::utype2string(coef,precision_format,false,FIXED_STREAM));
-        subdirectories_apl_qhanp.push_back(ARUN_DIRECTORY_PREFIX + QHA_ARUN_MODE + '_' +
-            arun_runnames_apl_qhanp.back());
+
+        // if harmonic IFC file for V=1.0 exists, reuse it and do not create PHONON_1.000 directory
+        if (aurostd::isequal(coef, 1.0) &&
+            aurostd::EFileExist(DEFAULT_APL_FILE_PREFIX+DEFAULT_APL_HARMIFC_FILE)){
+          subdirectories_apl_qhanp.push_back(".");
+        }
+        else{
+          subdirectories_apl_qhanp.push_back(ARUN_DIRECTORY_PREFIX + QHA_ARUN_MODE + '_' +
+              arun_runnames_apl_qhanp.back());
+        }
 
         coefQHANPVolumes.push_back(coef);
         QHANPvolumes.push_back(coef*Volume/NatomsOrigCell);
