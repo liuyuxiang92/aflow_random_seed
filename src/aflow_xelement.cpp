@@ -90,7 +90,7 @@ namespace pflow {
           if(c=="ALL" || c==aurostd::toupper("mass")) {units=xel.getUnits(c);vs.push_back(aurostd::PaddedPOST("mass="+aurostd::utype2string(xel.mass,_DOUBLE_WRITE_PRECISION_),len)+(units.empty()?"":" // ("+units+")"));}
           if(c=="ALL" || c==aurostd::toupper("volume_molar")) {units=xel.getUnits(c);vs.push_back(aurostd::PaddedPOST("volume_molar="+aurostd::utype2string(xel.volume_molar,_DOUBLE_WRITE_PRECISION_),len)+(units.empty()?"":" // ("+units+")"));}
           if(c=="ALL" || c==aurostd::toupper("volume")) {units=xel.getUnits(c);vs.push_back(aurostd::PaddedPOST("volume="+aurostd::utype2string(xel.volume,_DOUBLE_WRITE_PRECISION_),len)+(units.empty()?"":" // ("+units+")"));}
-          if(c=="ALL" || c==aurostd::toupper("Vm_Miedema")) {units=xel.getUnits(c);vs.push_back(aurostd::PaddedPOST("Vm_Miedema="+aurostd::utype2string(xel.Vm_Miedema,_DOUBLE_WRITE_PRECISION_),len)+" // ("+units+") (V_m^{2/3})");}
+          if(c=="ALL" || c==aurostd::toupper("area_molar_Miedema")) {units=xel.getUnits(c);vs.push_back(aurostd::PaddedPOST("area_molar_Miedema="+aurostd::utype2string(xel.area_molar_Miedema,_DOUBLE_WRITE_PRECISION_),len)+" // ("+units+") (V_m^{2/3})");}
           //
           if(c=="ALL" || c==aurostd::toupper("valence_std")) {units=xel.getUnits(c);vs.push_back(aurostd::PaddedPOST("valence_std="+aurostd::utype2string(xel.valence_std),len)+(units.empty()?"":" // ("+units+")"));}
           if(c=="ALL" || c==aurostd::toupper("valence_iupac")) {units=xel.getUnits(c);vs.push_back(aurostd::PaddedPOST("valence_iupac="+aurostd::utype2string(xel.valence_iupac),len)+(units.empty()?"":" // ("+units+")"));}
@@ -127,16 +127,18 @@ namespace pflow {
           if(c=="ALL" || c==aurostd::toupper("oxidation_states_preferred")) {units=xel.getUnits(c);vs.push_back(aurostd::PaddedPOST("oxidation_states_preferred="+aurostd::joinWDelimiter(aurostd::vecDouble2vecString(xel.oxidation_states_preferred,_DOUBLE_WRITE_PRECISION_),","),len)+(units.empty()?"":" // ("+units+")"));} //CO20200731
           if(c=="ALL" || c==aurostd::toupper("electron_affinity_PT")) {units=xel.getUnits(c);vs.push_back(aurostd::PaddedPOST("electron_affinity_PT="+aurostd::utype2string(xel.electron_affinity_PT,_DOUBLE_WRITE_PRECISION_),len)+(units.empty()?"":" // ("+units+")"));}
           if(c=="ALL" || c==aurostd::toupper("energies_ionization")) {units=xel.getUnits(c);vs.push_back(aurostd::PaddedPOST("energies_ionization="+aurostd::joinWDelimiter(aurostd::vecDouble2vecString(xel.energies_ionization,_DOUBLE_WRITE_PRECISION_),","),len)+(units.empty()?"":" // ("+units+")"));} //CO20201111
-          if(c=="ALL" || c==aurostd::toupper("phi_star_Miedema")) {units=xel.getUnits(c);vs.push_back(aurostd::PaddedPOST("phi_star_Miedema="+aurostd::utype2string(xel.phi_star_Miedema,_DOUBLE_WRITE_PRECISION_),len)+" // ("+units+") (phi^{star})");}
-          if(c=="ALL" || c==aurostd::toupper("nws_Miedema")) {units=xel.getUnits(c);vs.push_back(aurostd::PaddedPOST("nws_Miedema="+aurostd::utype2string(xel.nws_Miedema,_DOUBLE_WRITE_PRECISION_),len)+" // ("+units+") (n_{ws}^{1/3})");}
-          if(c=="ALL" || c==aurostd::toupper("gamma_s_Miedema")) {units=xel.getUnits(c);vs.push_back(aurostd::PaddedPOST("gamma_s_Miedema="+aurostd::utype2string(xel.gamma_s_Miedema,_DOUBLE_WRITE_PRECISION_),len)+(units.empty()?"":" // ("+units+")"));}
+          if(c=="ALL" || c==aurostd::toupper("work_function_Miedema")) {units=xel.getUnits(c);vs.push_back(aurostd::PaddedPOST("work_function_Miedema="+aurostd::utype2string(xel.work_function_Miedema,_DOUBLE_WRITE_PRECISION_),len)+" // ("+units+") (phi^{star})");}
+          if(c=="ALL" || c==aurostd::toupper("density_line_electron_WS_Miedema")) {units=xel.getUnits(c);vs.push_back(aurostd::PaddedPOST("density_line_electron_WS_Miedema="+aurostd::utype2string(xel.density_line_electron_WS_Miedema,_DOUBLE_WRITE_PRECISION_),len)+" // ("+units+") (n_{ws}^{1/3})");}
+          if(c=="ALL" || c==aurostd::toupper("energy_surface_0K_Miedema")) {units=xel.getUnits(c);vs.push_back(aurostd::PaddedPOST("energy_surface_0K_Miedema="+aurostd::utype2string(xel.energy_surface_0K_Miedema,_DOUBLE_WRITE_PRECISION_),len)+(units.empty()?"":" // ("+units+")"));}
           //
           if(c=="ALL" || c==aurostd::toupper("scale_Pettifor")) {units=xel.getUnits(c);vs.push_back(aurostd::PaddedPOST("scale_Pettifor="+aurostd::utype2string(xel.scale_Pettifor,_DOUBLE_WRITE_PRECISION_),len)+(units.empty()?"":" // ("+units+")"));} 
           //
           if(c=="ALL" || c==aurostd::toupper("temperature_boiling")) {units=xel.getUnits(c);vs.push_back(aurostd::PaddedPOST("temperature_boiling="+aurostd::utype2string(xel.temperature_boiling,_DOUBLE_WRITE_PRECISION_),len)+(units.empty()?"":" // ("+units+")"));}
           if(c=="ALL" || c==aurostd::toupper("temperature_melting")) {units=xel.getUnits(c);vs.push_back(aurostd::PaddedPOST("temperature_melting="+aurostd::utype2string(xel.temperature_melting,_DOUBLE_WRITE_PRECISION_),len)+(units.empty()?"":" // ("+units+")"));}
-          if(c=="ALL" || c==aurostd::toupper("fusion_heat_PT")) {units=xel.getUnits(c);vs.push_back(aurostd::PaddedPOST("fusion_heat_PT="+aurostd::utype2string(xel.fusion_heat_PT,_DOUBLE_WRITE_PRECISION_),len)+(units.empty()?"":" // ("+units+")"));}  //CO20201111
-          if(c=="ALL" || c==aurostd::toupper("vaporization_heat_PT")) {units=xel.getUnits(c);vs.push_back(aurostd::PaddedPOST("vaporization_heat_PT="+aurostd::utype2string(xel.vaporization_heat_PT,_DOUBLE_WRITE_PRECISION_),len)+(units.empty()?"":" // ("+units+")"));}
+          if(c=="ALL" || c==aurostd::toupper("enthalpy_fusion")) {units=xel.getUnits(c);vs.push_back(aurostd::PaddedPOST("enthalpy_fusion="+aurostd::utype2string(xel.enthalpy_fusion,_DOUBLE_WRITE_PRECISION_),len)+(units.empty()?"":" // ("+units+")"));}  //CO20201111
+          if(c=="ALL" || c==aurostd::toupper("enthalpy_vaporization")) {units=xel.getUnits(c);vs.push_back(aurostd::PaddedPOST("enthalpy_vaporization="+aurostd::utype2string(xel.enthalpy_vaporization,_DOUBLE_WRITE_PRECISION_),len)+(units.empty()?"":" // ("+units+")"));}
+          if(c=="ALL" || c==aurostd::toupper("enthalpy_atomization_WE")) {units=xel.getUnits(c);vs.push_back(aurostd::PaddedPOST("enthalpy_atomization_WE="+aurostd::utype2string(xel.enthalpy_atomization_WE,_DOUBLE_WRITE_PRECISION_),len)+(units.empty()?"":" // ("+units+")"));}  //CO20201111
+          if(c=="ALL" || c==aurostd::toupper("energy_cohesive")) {units=xel.getUnits(c);vs.push_back(aurostd::PaddedPOST("energy_cohesive="+aurostd::utype2string(xel.energy_cohesive,_DOUBLE_WRITE_PRECISION_),len)+(units.empty()?"":" // ("+units+")"));}  //CO20201111
           if(c=="ALL" || c==aurostd::toupper("specific_heat_PT")) {units=xel.getUnits(c);vs.push_back(aurostd::PaddedPOST("specific_heat_PT="+aurostd::utype2string(xel.specific_heat_PT,_DOUBLE_WRITE_PRECISION_),len)+" // ("+units+"))");}
           if(c=="ALL" || c==aurostd::toupper("critical_pressure")) {units=xel.getUnits(c);vs.push_back(aurostd::PaddedPOST("critical_pressure="+aurostd::utype2string(xel.critical_pressure,_DOUBLE_WRITE_PRECISION_),len)+" // ("+units+") ");} 
           if(c=="ALL" || c==aurostd::toupper("critical_temperature_PT")) {units=xel.getUnits(c);vs.push_back(aurostd::PaddedPOST("critical_temperature_PT="+aurostd::utype2string(xel.critical_temperature_PT,_DOUBLE_WRITE_PRECISION_),len)+(units.empty()?"":" // ("+units+")"));} 
@@ -153,7 +155,7 @@ namespace pflow {
           if(c=="ALL" || c==aurostd::toupper("modulus_Young")) {units=xel.getUnits(c);vs.push_back(aurostd::PaddedPOST("modulus_Young="+aurostd::utype2string(xel.modulus_Young,_DOUBLE_WRITE_PRECISION_),len)+(units.empty()?"":" // ("+units+")"));}
           if(c=="ALL" || c==aurostd::toupper("modulus_bulk")) {units=xel.getUnits(c);vs.push_back(aurostd::PaddedPOST("modulus_bulk="+aurostd::utype2string(xel.modulus_bulk,_DOUBLE_WRITE_PRECISION_),len)+(units.empty()?"":" // ("+units+")"));}
           if(c=="ALL" || c==aurostd::toupper("Poisson_ratio_PT")) {units=xel.getUnits(c);vs.push_back(aurostd::PaddedPOST("Poisson_ratio_PT="+aurostd::utype2string(xel.Poisson_ratio_PT,_DOUBLE_WRITE_PRECISION_),len)+(units.empty()?"":" // ("+units+")"));}
-          if(c=="ALL" || c==aurostd::toupper("BVm_Miedema")) {units=xel.getUnits(c);vs.push_back(aurostd::PaddedPOST("BVm_Miedema="+aurostd::utype2string(xel.BVm_Miedema,_DOUBLE_WRITE_PRECISION_),len)+(units.empty()?"":" // ("+units+")"));}
+          if(c=="ALL" || c==aurostd::toupper("modulus_bulk_x_volume_molar_Miedema")) {units=xel.getUnits(c);vs.push_back(aurostd::PaddedPOST("modulus_bulk_x_volume_molar_Miedema="+aurostd::utype2string(xel.modulus_bulk_x_volume_molar_Miedema,_DOUBLE_WRITE_PRECISION_),len)+(units.empty()?"":" // ("+units+")"));}
           //
           if(c=="ALL" || c==aurostd::toupper("magnetic_type_PT")) {units=xel.getUnits(c);vs.push_back(aurostd::PaddedPOST("magnetic_type_PT="+xel.magnetic_type_PT,len)+(units.empty()?"":" // ("+units+")"));}
           if(c=="ALL" || c==aurostd::toupper("susceptibility_magnetic_mass")) {units=xel.getUnits(c);vs.push_back(aurostd::PaddedPOST("susceptibility_magnetic_mass="+aurostd::utype2string(xel.susceptibility_magnetic_mass,_DOUBLE_WRITE_PRECISION_),len)+(units.empty()?"":" // ("+units+")"));}
@@ -234,7 +236,7 @@ namespace xelement {
     mass=NNN;//  AMU2KILOGRAM goes inside.
     volume_molar=NNN;  
     volume=NNN;      
-    Vm_Miedema=NNN;      
+    area_molar_Miedema=NNN;      
     //
     valence_std=NNN;  
     valence_iupac=NNN;
@@ -271,16 +273,18 @@ namespace xelement {
     oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
     electron_affinity_PT=NNN;      
     energies_ionization.clear();energies_ionization.push_back(NNN);  //CO20201111
-    phi_star_Miedema=NNN;         
-    nws_Miedema=NNN;              
-    gamma_s_Miedema=NNN;          
+    work_function_Miedema=NNN;         
+    density_line_electron_WS_Miedema=NNN;              
+    energy_surface_0K_Miedema=NNN;          
     //
     scale_Pettifor=NNN;          
     //
     temperature_boiling=NNN;         
     temperature_melting=NNN;         
-    fusion_heat_PT=NNN;     //CO20201111
-    vaporization_heat_PT=NNN;     
+    enthalpy_fusion=NNN; //CO20201111
+    enthalpy_vaporization=NNN;     
+    enthalpy_atomization_WE=NNN;  //CO20201111
+    energy_cohesive=NNN;  //CO20201111
     specific_heat_PT=NNN;         
     critical_pressure=NNN;     
     critical_temperature_PT=NNN;  
@@ -297,7 +301,7 @@ namespace xelement {
     modulus_Young=NNN;    
     modulus_bulk=NNN;     
     Poisson_ratio_PT=NNN;    
-    BVm_Miedema=NNN;        
+    modulus_bulk_x_volume_molar_Miedema=NNN;        
     //
     magnetic_type_PT="UNDEFINED";     
     susceptibility_magnetic_mass=NNN;
@@ -325,7 +329,7 @@ namespace xelement {
     units_mass="";
     units_volume_molar="";  
     units_volume="";      
-    units_Vm_Miedema="";      
+    units_area_molar_Miedema="";      
     //
     units_valence_std="";  
     units_valence_iupac="";
@@ -362,16 +366,18 @@ namespace xelement {
     units_oxidation_states_preferred="";
     units_electron_affinity_PT="";      
     units_energies_ionization="";
-    units_phi_star_Miedema="";         
-    units_nws_Miedema="";              
-    units_gamma_s_Miedema="";          
+    units_work_function_Miedema="";         
+    units_density_line_electron_WS_Miedema="";              
+    units_energy_surface_0K_Miedema="";          
     //
     units_scale_Pettifor="";          
     //
     units_temperature_boiling="";         
     units_temperature_melting="";         
-    units_fusion_heat_PT="";     //CO20201111
-    units_vaporization_heat_PT="";     
+    units_enthalpy_fusion="";  //CO20201111
+    units_enthalpy_vaporization="";     
+    units_enthalpy_atomization_WE=""; //CO20201111
+    units_energy_cohesive=""; //CO20201111
     units_specific_heat_PT="";         
     units_critical_pressure="";     
     units_critical_temperature_PT="";  
@@ -388,7 +394,7 @@ namespace xelement {
     units_modulus_Young="";    
     units_modulus_bulk="";     
     units_Poisson_ratio_PT="";    
-    units_BVm_Miedema="";        
+    units_modulus_bulk_x_volume_molar_Miedema="";        
     //
     units_magnetic_type_PT="";
     units_susceptibility_magnetic_mass="";
@@ -424,7 +430,7 @@ namespace xelement {
     mass=b.mass;
     volume_molar=b.volume_molar;  
     volume=b.volume;      
-    Vm_Miedema=b.Vm_Miedema;      
+    area_molar_Miedema=b.area_molar_Miedema;      
     //
     valence_std=b.valence_std;  
     valence_iupac=b.valence_iupac;
@@ -461,16 +467,18 @@ namespace xelement {
     oxidation_states_preferred.clear();for(uint i=0;i<b.oxidation_states_preferred.size();i++){oxidation_states_preferred.push_back(b.oxidation_states_preferred[i]);} //RF+SK20200410  //CO20201111
     electron_affinity_PT=b.electron_affinity_PT;      
     energies_ionization.clear();for(uint i=0;i<b.energies_ionization.size();i++){energies_ionization.push_back(b.energies_ionization[i]);} //CO20201111
-    phi_star_Miedema=b.phi_star_Miedema;         
-    nws_Miedema=b.nws_Miedema;              
-    gamma_s_Miedema=b.gamma_s_Miedema;          
+    work_function_Miedema=b.work_function_Miedema;         
+    density_line_electron_WS_Miedema=b.density_line_electron_WS_Miedema;              
+    energy_surface_0K_Miedema=b.energy_surface_0K_Miedema;          
     //
     scale_Pettifor=b.scale_Pettifor;          
     //
     temperature_boiling=b.temperature_boiling;         
     temperature_melting=b.temperature_melting;         
-    fusion_heat_PT=b.fusion_heat_PT;     //CO20201111
-    vaporization_heat_PT=b.vaporization_heat_PT;     
+    enthalpy_fusion=b.enthalpy_fusion;  //CO20201111
+    enthalpy_vaporization=b.enthalpy_vaporization;     
+    enthalpy_atomization_WE=b.enthalpy_atomization_WE;  //CO20201111
+    energy_cohesive=b.energy_cohesive;  //CO20201111
     specific_heat_PT=b.specific_heat_PT;         
     critical_pressure=b.critical_pressure;     
     critical_temperature_PT=b.critical_temperature_PT;  
@@ -487,7 +495,7 @@ namespace xelement {
     modulus_Young=b.modulus_Young;    
     modulus_bulk=b.modulus_bulk;     
     Poisson_ratio_PT=b.Poisson_ratio_PT;    
-    BVm_Miedema=b.BVm_Miedema;        
+    modulus_bulk_x_volume_molar_Miedema=b.modulus_bulk_x_volume_molar_Miedema;        
     //
     magnetic_type_PT=b.magnetic_type_PT;
     susceptibility_magnetic_mass=b.susceptibility_magnetic_mass;
@@ -515,7 +523,7 @@ namespace xelement {
     units_mass=b.units_mass;
     units_volume_molar=b.units_volume_molar;  
     units_volume=b.units_volume;      
-    units_Vm_Miedema=b.units_Vm_Miedema;      
+    units_area_molar_Miedema=b.units_area_molar_Miedema;      
     //
     units_valence_std=b.units_valence_std;  
     units_valence_iupac=b.units_valence_iupac;
@@ -552,16 +560,18 @@ namespace xelement {
     units_oxidation_states_preferred=b.units_oxidation_states_preferred;
     units_electron_affinity_PT=b.units_electron_affinity_PT;      
     units_energies_ionization=b.units_energies_ionization;
-    units_phi_star_Miedema=b.units_phi_star_Miedema;         
-    units_nws_Miedema=b.units_nws_Miedema;              
-    units_gamma_s_Miedema=b.units_gamma_s_Miedema;          
+    units_work_function_Miedema=b.units_work_function_Miedema;         
+    units_density_line_electron_WS_Miedema=b.units_density_line_electron_WS_Miedema;              
+    units_energy_surface_0K_Miedema=b.units_energy_surface_0K_Miedema;          
     //
     units_scale_Pettifor=b.units_scale_Pettifor;          
     //
     units_temperature_boiling=b.units_temperature_boiling;         
     units_temperature_melting=b.units_temperature_melting;         
-    units_fusion_heat_PT=b.units_fusion_heat_PT;     //CO20201111
-    units_vaporization_heat_PT=b.units_vaporization_heat_PT;     
+    units_enthalpy_fusion=b.units_enthalpy_fusion;  //CO20201111
+    units_enthalpy_vaporization=b.units_enthalpy_vaporization;     
+    units_enthalpy_atomization_WE=b.units_enthalpy_atomization_WE;  //CO20201111
+    units_energy_cohesive=b.units_energy_cohesive;  //CO20201111
     units_specific_heat_PT=b.units_specific_heat_PT;         
     units_critical_pressure=b.units_critical_pressure;     
     units_critical_temperature_PT=b.units_critical_temperature_PT;  
@@ -578,7 +588,7 @@ namespace xelement {
     units_modulus_Young=b.units_modulus_Young;    
     units_modulus_bulk=b.units_modulus_bulk;     
     units_Poisson_ratio_PT=b.units_Poisson_ratio_PT;    
-    units_BVm_Miedema=b.units_BVm_Miedema;        
+    units_modulus_bulk_x_volume_molar_Miedema=b.units_modulus_bulk_x_volume_molar_Miedema;        
     //
     units_magnetic_type_PT=b.units_magnetic_type_PT;
     units_susceptibility_magnetic_mass=b.units_susceptibility_magnetic_mass;
@@ -610,7 +620,7 @@ namespace xelement {
     units_mass="kg";
     units_volume_molar="m^3/mol";  
     units_volume="A^3";      
-    units_Vm_Miedema="cm^2";      
+    units_area_molar_Miedema="cm^2";      
     //
     units_valence_std="e-";  //electrons
     units_valence_iupac="e-";
@@ -647,16 +657,18 @@ namespace xelement {
     units_oxidation_states_preferred="";
     units_electron_affinity_PT="kJ/mol";      
     units_energies_ionization="kJ/mol";
-    units_phi_star_Miedema="V";         
-    units_nws_Miedema="d.u.^{1/3}"; //1 d.u. (density unit) = 10^-2 electrons/a.u.^3 = 6.748*10^22 electrons/cm^3; 1 a.u = 52.918 pm (first Bohr radius): https://cdsweb.cern.ch/record/747057/files/34081384.pdf
-    units_gamma_s_Miedema="mJ/m^2";          
+    units_work_function_Miedema="V";         
+    units_density_line_electron_WS_Miedema="d.u.^{1/3}"; //1 d.u. (density unit) = 10^-2 electrons/a.u.^3 = 6.748*10^22 electrons/cm^3; 1 a.u = 52.918 pm (first Bohr radius): https://cdsweb.cern.ch/record/747057/files/34081384.pdf
+    units_energy_surface_0K_Miedema="mJ/m^2";          
     //
     units_scale_Pettifor="";          
     //
     units_temperature_boiling="degC";  //Celsius        
     units_temperature_melting="degC";         
-    units_fusion_heat_PT="kJ/mol";     //CO20201111
-    units_vaporization_heat_PT="kJ/mol";     
+    units_enthalpy_fusion="kJ/mol";  //CO20201111
+    units_enthalpy_vaporization="kJ/mol";     
+    units_enthalpy_atomization_WE="kJ/mol"; //CO20201111
+    units_energy_cohesive="kJ/mol"; //CO20201111
     units_specific_heat_PT="J/(kg K)";         
     units_critical_pressure="atm";     
     units_critical_temperature_PT="K";  
@@ -673,7 +685,7 @@ namespace xelement {
     units_modulus_Young="GPa";    
     units_modulus_bulk="GPa";     
     units_Poisson_ratio_PT="";    
-    units_BVm_Miedema="kJ/mol";        
+    units_modulus_bulk_x_volume_molar_Miedema="kJ/mol";        
     //
     units_magnetic_type_PT="";
     units_susceptibility_magnetic_mass="m^3/K";
@@ -748,7 +760,7 @@ namespace xelement {
     if(c==aurostd::toupper("mass")) return aurostd::utype2string(mass,_DOUBLE_WRITE_PRECISION_);
     if(c==aurostd::toupper("volume_molar")) return aurostd::utype2string(volume_molar,_DOUBLE_WRITE_PRECISION_);
     if(c==aurostd::toupper("volume")) return aurostd::utype2string(volume,_DOUBLE_WRITE_PRECISION_);
-    if(c==aurostd::toupper("Vm_Miedema")) return aurostd::utype2string(Vm_Miedema,_DOUBLE_WRITE_PRECISION_);
+    if(c==aurostd::toupper("area_molar_Miedema")) return aurostd::utype2string(area_molar_Miedema,_DOUBLE_WRITE_PRECISION_);
     //
     if(c==aurostd::toupper("valence_std")) return aurostd::utype2string(valence_std);
     if(c==aurostd::toupper("valence_iupac")) return aurostd::utype2string(valence_iupac);
@@ -785,16 +797,18 @@ namespace xelement {
     if(c==aurostd::toupper("oxidation_states_preferred")) return getPropertyVector(property,delim,ncols);
     if(c==aurostd::toupper("electron_affinity_PT")) return aurostd::utype2string(electron_affinity_PT,_DOUBLE_WRITE_PRECISION_);
     if(c==aurostd::toupper("energies_ionization")) return getPropertyVector(property,delim,ncols);
-    if(c==aurostd::toupper("phi_star_Miedema")) return aurostd::utype2string(phi_star_Miedema,_DOUBLE_WRITE_PRECISION_);
-    if(c==aurostd::toupper("nws_Miedema")) return aurostd::utype2string(nws_Miedema,_DOUBLE_WRITE_PRECISION_);
-    if(c==aurostd::toupper("gamma_s_Miedema")) return aurostd::utype2string(gamma_s_Miedema,_DOUBLE_WRITE_PRECISION_);
+    if(c==aurostd::toupper("work_function_Miedema")) return aurostd::utype2string(work_function_Miedema,_DOUBLE_WRITE_PRECISION_);
+    if(c==aurostd::toupper("density_line_electron_WS_Miedema")) return aurostd::utype2string(density_line_electron_WS_Miedema,_DOUBLE_WRITE_PRECISION_);
+    if(c==aurostd::toupper("energy_surface_0K_Miedema")) return aurostd::utype2string(energy_surface_0K_Miedema,_DOUBLE_WRITE_PRECISION_);
     //
     if(c==aurostd::toupper("scale_Pettifor")) return aurostd::utype2string(scale_Pettifor,_DOUBLE_WRITE_PRECISION_); 
     //
     if(c==aurostd::toupper("temperature_boiling")) return aurostd::utype2string(temperature_boiling,_DOUBLE_WRITE_PRECISION_);
     if(c==aurostd::toupper("temperature_melting")) return aurostd::utype2string(temperature_melting,_DOUBLE_WRITE_PRECISION_);
-    if(c==aurostd::toupper("fusion_heat_PT")) return aurostd::utype2string(fusion_heat_PT,_DOUBLE_WRITE_PRECISION_);  //CO20201111
-    if(c==aurostd::toupper("vaporization_heat_PT")) return aurostd::utype2string(vaporization_heat_PT,_DOUBLE_WRITE_PRECISION_);
+    if(c==aurostd::toupper("enthalpy_fusion")) return aurostd::utype2string(enthalpy_fusion,_DOUBLE_WRITE_PRECISION_);  //CO20201111
+    if(c==aurostd::toupper("enthalpy_vaporization")) return aurostd::utype2string(enthalpy_vaporization,_DOUBLE_WRITE_PRECISION_);
+    if(c==aurostd::toupper("enthalpy_atomization_WE")) return aurostd::utype2string(enthalpy_atomization_WE,_DOUBLE_WRITE_PRECISION_);  //CO20201111
+    if(c==aurostd::toupper("energy_cohesive")) return aurostd::utype2string(energy_cohesive,_DOUBLE_WRITE_PRECISION_);  //CO20201111
     if(c==aurostd::toupper("specific_heat_PT")) return aurostd::utype2string(specific_heat_PT,_DOUBLE_WRITE_PRECISION_);
     if(c==aurostd::toupper("critical_pressure")) return aurostd::utype2string(critical_pressure,_DOUBLE_WRITE_PRECISION_); 
     if(c==aurostd::toupper("critical_temperature_PT")) return aurostd::utype2string(critical_temperature_PT,_DOUBLE_WRITE_PRECISION_); 
@@ -811,7 +825,7 @@ namespace xelement {
     if(c==aurostd::toupper("modulus_Young")) return aurostd::utype2string(modulus_Young,_DOUBLE_WRITE_PRECISION_);
     if(c==aurostd::toupper("modulus_bulk")) return aurostd::utype2string(modulus_bulk,_DOUBLE_WRITE_PRECISION_);
     if(c==aurostd::toupper("Poisson_ratio_PT")) return aurostd::utype2string(Poisson_ratio_PT,_DOUBLE_WRITE_PRECISION_);
-    if(c==aurostd::toupper("BVm_Miedema")) return aurostd::utype2string(BVm_Miedema,_DOUBLE_WRITE_PRECISION_);
+    if(c==aurostd::toupper("modulus_bulk_x_volume_molar_Miedema")) return aurostd::utype2string(modulus_bulk_x_volume_molar_Miedema,_DOUBLE_WRITE_PRECISION_);
     //
     if(c==aurostd::toupper("magnetic_type_PT")) return magnetic_type_PT;
     if(c==aurostd::toupper("susceptibility_magnetic_mass")) return aurostd::utype2string(susceptibility_magnetic_mass,_DOUBLE_WRITE_PRECISION_);
@@ -843,7 +857,7 @@ namespace xelement {
     if(c==aurostd::toupper("mass")) return "number";
     if(c==aurostd::toupper("volume_molar")) return "number";
     if(c==aurostd::toupper("volume")) return "number";
-    if(c==aurostd::toupper("Vm_Miedema")) return "number";
+    if(c==aurostd::toupper("area_molar_Miedema")) return "number";
     //
     if(c==aurostd::toupper("valence_std")) return "number";
     if(c==aurostd::toupper("valence_iupac")) return "number";
@@ -880,16 +894,18 @@ namespace xelement {
     if(c==aurostd::toupper("oxidation_states_preferred")) return "numbers";
     if(c==aurostd::toupper("electron_affinity_PT")) return "number";
     if(c==aurostd::toupper("energies_ionization")) return "numbers";
-    if(c==aurostd::toupper("phi_star_Miedema")) return "number";
-    if(c==aurostd::toupper("nws_Miedema")) return "number";
-    if(c==aurostd::toupper("gamma_s_Miedema")) return "number";
+    if(c==aurostd::toupper("work_function_Miedema")) return "number";
+    if(c==aurostd::toupper("density_line_electron_WS_Miedema")) return "number";
+    if(c==aurostd::toupper("energy_surface_0K_Miedema")) return "number";
     //
     if(c==aurostd::toupper("scale_Pettifor")) return "number"; 
     //
     if(c==aurostd::toupper("temperature_boiling")) return "number";
     if(c==aurostd::toupper("temperature_melting")) return "number";
-    if(c==aurostd::toupper("fusion_heat_PT")) return "number";  //CO20201111
-    if(c==aurostd::toupper("vaporization_heat_PT")) return "number";
+    if(c==aurostd::toupper("enthalpy_fusion")) return "number";  //CO20201111
+    if(c==aurostd::toupper("enthalpy_vaporization")) return "number";
+    if(c==aurostd::toupper("enthalpy_atomization_WE")) return "number"; //CO20201111
+    if(c==aurostd::toupper("energy_cohesive")) return "number"; //CO20201111
     if(c==aurostd::toupper("specific_heat_PT")) return "number";
     if(c==aurostd::toupper("critical_pressure")) return "number"; 
     if(c==aurostd::toupper("critical_temperature_PT")) return "number"; 
@@ -906,7 +922,7 @@ namespace xelement {
     if(c==aurostd::toupper("modulus_Young")) return "number";
     if(c==aurostd::toupper("modulus_bulk")) return "number";
     if(c==aurostd::toupper("Poisson_ratio_PT")) return "number";
-    if(c==aurostd::toupper("BVm_Miedema")) return "number";
+    if(c==aurostd::toupper("modulus_bulk_x_volume_molar_Miedema")) return "number";
     //
     if(c==aurostd::toupper("magnetic_type_PT")) return "number";
     if(c==aurostd::toupper("susceptibility_magnetic_mass")) return "number";
@@ -937,7 +953,7 @@ namespace xelement {
     if(c==aurostd::toupper("mass")) return units_mass;
     if(c==aurostd::toupper("volume_molar")) return units_volume_molar;
     if(c==aurostd::toupper("volume")) return units_volume;
-    if(c==aurostd::toupper("Vm_Miedema")) return units_Vm_Miedema;
+    if(c==aurostd::toupper("area_molar_Miedema")) return units_area_molar_Miedema;
     //
     if(c==aurostd::toupper("valence_std")) return units_valence_std;
     if(c==aurostd::toupper("valence_iupac")) return units_valence_iupac;
@@ -974,16 +990,18 @@ namespace xelement {
     if(c==aurostd::toupper("oxidation_states_preferred")) return units_oxidation_states_preferred;
     if(c==aurostd::toupper("electron_affinity_PT")) return units_electron_affinity_PT;
     if(c==aurostd::toupper("energies_ionization")) return units_energies_ionization;
-    if(c==aurostd::toupper("phi_star_Miedema")) return units_phi_star_Miedema;
-    if(c==aurostd::toupper("nws_Miedema")) return units_nws_Miedema;
-    if(c==aurostd::toupper("gamma_s_Miedema")) return units_gamma_s_Miedema;
+    if(c==aurostd::toupper("work_function_Miedema")) return units_work_function_Miedema;
+    if(c==aurostd::toupper("density_line_electron_WS_Miedema")) return units_density_line_electron_WS_Miedema;
+    if(c==aurostd::toupper("energy_surface_0K_Miedema")) return units_energy_surface_0K_Miedema;
     //
     if(c==aurostd::toupper("scale_Pettifor")) return units_scale_Pettifor; 
     //
     if(c==aurostd::toupper("temperature_boiling")) return units_temperature_boiling;
     if(c==aurostd::toupper("temperature_melting")) return units_temperature_melting;
-    if(c==aurostd::toupper("fusion_heat_PT")) return units_fusion_heat_PT;  //CO20201111
-    if(c==aurostd::toupper("vaporization_heat_PT")) return units_vaporization_heat_PT;
+    if(c==aurostd::toupper("enthalpy_fusion")) return units_enthalpy_fusion;  //CO20201111
+    if(c==aurostd::toupper("enthalpy_vaporization")) return units_enthalpy_vaporization;
+    if(c==aurostd::toupper("enthalpy_atomization_WE")) return units_enthalpy_atomization_WE;  //CO20201111
+    if(c==aurostd::toupper("energy_cohesive")) return units_energy_cohesive;  //CO20201111
     if(c==aurostd::toupper("specific_heat_PT")) return units_specific_heat_PT;
     if(c==aurostd::toupper("critical_pressure")) return units_critical_pressure; 
     if(c==aurostd::toupper("critical_temperature_PT")) return units_critical_temperature_PT; 
@@ -1000,7 +1018,7 @@ namespace xelement {
     if(c==aurostd::toupper("modulus_Young")) return units_modulus_Young;
     if(c==aurostd::toupper("modulus_bulk")) return units_modulus_bulk;
     if(c==aurostd::toupper("Poisson_ratio_PT")) return units_Poisson_ratio_PT;
-    if(c==aurostd::toupper("BVm_Miedema")) return units_BVm_Miedema;
+    if(c==aurostd::toupper("modulus_bulk_x_volume_molar_Miedema")) return units_modulus_bulk_x_volume_molar_Miedema;
     //
     if(c==aurostd::toupper("magnetic_type_PT")) return units_magnetic_type_PT;
     if(c==aurostd::toupper("susceptibility_magnetic_mass")) return units_susceptibility_magnetic_mass;
@@ -1059,7 +1077,7 @@ namespace xelement {
       if(vproperties[i]==aurostd::toupper("mass")) {dptr=&mass;sptr=&units_mass;}
       if(vproperties[i]==aurostd::toupper("volume_molar")) {dptr=&volume_molar;sptr=&units_volume_molar;}
       if(vproperties[i]==aurostd::toupper("volume")) {dptr=&volume;sptr=&units_volume;}
-      if(vproperties[i]==aurostd::toupper("Vm_Miedema")) {dptr=&Vm_Miedema;sptr=&units_Vm_Miedema;}
+      if(vproperties[i]==aurostd::toupper("area_molar_Miedema")) {dptr=&area_molar_Miedema;sptr=&units_area_molar_Miedema;}
       //
       if(vproperties[i]==aurostd::toupper("valence_std")) continue;
       if(vproperties[i]==aurostd::toupper("valence_iupac")) continue;
@@ -1096,16 +1114,18 @@ namespace xelement {
       if(vproperties[i]==aurostd::toupper("oxidation_states_preferred")) {dvptr=&oxidation_states_preferred;sptr=&units_oxidation_states_preferred;}
       if(vproperties[i]==aurostd::toupper("electron_affinity_PT")) {dptr=&electron_affinity_PT;sptr=&units_electron_affinity_PT;}
       if(vproperties[i]==aurostd::toupper("energies_ionization")) {dvptr=&energies_ionization;sptr=&units_energies_ionization;}
-      if(vproperties[i]==aurostd::toupper("phi_star_Miedema")) {dptr=&phi_star_Miedema;sptr=&units_phi_star_Miedema;}
-      if(vproperties[i]==aurostd::toupper("nws_Miedema")) {dptr=&nws_Miedema;sptr=&units_nws_Miedema;}
-      if(vproperties[i]==aurostd::toupper("gamma_s_Miedema")) {dptr=&gamma_s_Miedema;sptr=&units_gamma_s_Miedema;}
+      if(vproperties[i]==aurostd::toupper("work_function_Miedema")) {dptr=&work_function_Miedema;sptr=&units_work_function_Miedema;}
+      if(vproperties[i]==aurostd::toupper("density_line_electron_WS_Miedema")) {dptr=&density_line_electron_WS_Miedema;sptr=&units_density_line_electron_WS_Miedema;}
+      if(vproperties[i]==aurostd::toupper("energy_surface_0K_Miedema")) {dptr=&energy_surface_0K_Miedema;sptr=&units_energy_surface_0K_Miedema;}
       //
       if(vproperties[i]==aurostd::toupper("scale_Pettifor")) {dptr=&scale_Pettifor;sptr=&units_scale_Pettifor;}
       //
       if(vproperties[i]==aurostd::toupper("temperature_boiling")) {dptr=&temperature_boiling;sptr=&units_temperature_boiling;}
       if(vproperties[i]==aurostd::toupper("temperature_melting")) {dptr=&temperature_melting;sptr=&units_temperature_melting;}
-      if(vproperties[i]==aurostd::toupper("fusion_heat_PT")) {dptr=&fusion_heat_PT;sptr=&units_fusion_heat_PT;}
-      if(vproperties[i]==aurostd::toupper("vaporization_heat_PT")) {dptr=&vaporization_heat_PT;sptr=&units_vaporization_heat_PT;}
+      if(vproperties[i]==aurostd::toupper("enthalpy_fusion")) {dptr=&enthalpy_fusion;sptr=&units_enthalpy_fusion;} //CO20201111
+      if(vproperties[i]==aurostd::toupper("enthalpy_vaporization")) {dptr=&enthalpy_vaporization;sptr=&units_enthalpy_vaporization;}
+      if(vproperties[i]==aurostd::toupper("enthalpy_atomization_WE")) {dptr=&enthalpy_atomization_WE;sptr=&units_enthalpy_atomization_WE;}  //CO20201111
+      if(vproperties[i]==aurostd::toupper("energy_cohesive")) {dptr=&energy_cohesive;sptr=&units_energy_cohesive;}  //CO20201111
       if(vproperties[i]==aurostd::toupper("specific_heat_PT")) {dptr=&specific_heat_PT;sptr=&units_specific_heat_PT;}
       if(vproperties[i]==aurostd::toupper("critical_pressure")) {dptr=&critical_pressure;sptr=&units_critical_pressure;}
       if(vproperties[i]==aurostd::toupper("critical_temperature_PT")) {dptr=&critical_temperature_PT;sptr=&units_critical_temperature_PT;}
@@ -1122,7 +1142,7 @@ namespace xelement {
       if(vproperties[i]==aurostd::toupper("modulus_Young")) {dptr=&modulus_Young;sptr=&units_modulus_Young;}
       if(vproperties[i]==aurostd::toupper("modulus_bulk")) {dptr=&modulus_bulk;sptr=&units_modulus_bulk;}
       if(vproperties[i]==aurostd::toupper("Poisson_ratio_PT")) continue;
-      if(vproperties[i]==aurostd::toupper("BVm_Miedema")) {dptr=&BVm_Miedema;sptr=&units_BVm_Miedema;}
+      if(vproperties[i]==aurostd::toupper("modulus_bulk_x_volume_molar_Miedema")) {dptr=&modulus_bulk_x_volume_molar_Miedema;sptr=&units_modulus_bulk_x_volume_molar_Miedema;}
       //
       if(vproperties[i]==aurostd::toupper("magnetic_type_PT")) continue;
       if(vproperties[i]==aurostd::toupper("susceptibility_magnetic_mass")) {dptr=&susceptibility_magnetic_mass;sptr=&units_susceptibility_magnetic_mass;}
@@ -1359,7 +1379,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*1.0079;
       volume_molar=0.01121;
       volume=0.75110;
-      Vm_Miedema=NNN;
+      area_molar_Miedema=NNN;
       valence_std=1;
       valence_iupac=1;
       valence_PT=1;
@@ -1394,14 +1414,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(1);  //RF+SK20200410
       electron_affinity_PT=72.8;
       energies_ionization.clear();energies_ionization.push_back(1312);  //CO20201111
-      phi_star_Miedema=5.2;
-      nws_Miedema=1.5;
-      gamma_s_Miedema=NNN;
+      work_function_Miedema=5.2;
+      density_line_electron_WS_Miedema=1.5;
+      energy_surface_0K_Miedema=NNN;
       scale_Pettifor=0;
       temperature_boiling=-252.87;
       temperature_melting=-259.14;
-      fusion_heat_PT=0.558;  //CO20201111
-      vaporization_heat_PT=0.452;
+      enthalpy_fusion=0.558;  //CO20201111
+      enthalpy_vaporization=0.452;
+      enthalpy_atomization_WE=218;  //CO20201111
+      energy_cohesive=NNN;  //CO20201111
       specific_heat_PT=14300;
       critical_pressure=12.76;
       critical_temperature_PT=32.97;
@@ -1417,7 +1439,7 @@ namespace xelement {
       modulus_Young=NNN;
       modulus_bulk=NNN;
       Poisson_ratio_PT=NNN;
-      BVm_Miedema=NNN;
+      modulus_bulk_x_volume_molar_Miedema=NNN;
       magnetic_type_PT="Diamagnetic";
       susceptibility_magnetic_mass=-2.48E-8;
       susceptibility_magnetic_volume=-2.23E-9;
@@ -1449,7 +1471,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*4.0026;
       volume_molar=0.022424;
       volume=-1.000;
-      Vm_Miedema=NNN;
+      area_molar_Miedema=NNN;
       valence_std=0;
       valence_iupac=0;
       valence_PT=0;
@@ -1484,14 +1506,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
       electron_affinity_PT=0;
       energies_ionization.clear();energies_ionization.push_back(2372.3);energies_ionization.push_back(5250.5);  //CO20201111
-      phi_star_Miedema=NNN;
-      nws_Miedema=NNN;
-      gamma_s_Miedema=NNN;
+      work_function_Miedema=NNN;
+      density_line_electron_WS_Miedema=NNN;
+      energy_surface_0K_Miedema=NNN;
       scale_Pettifor=0;
       temperature_boiling=-268.93;
       temperature_melting=NNN;
-      fusion_heat_PT=0.02;  //CO20201111
-      vaporization_heat_PT=0.083;
+      enthalpy_fusion=0.02;  //CO20201111
+      enthalpy_vaporization=0.083;
+      enthalpy_atomization_WE=0;  //CO20201111
+      energy_cohesive=NNN;  //CO20201111
       specific_heat_PT=5193.1;
       critical_pressure=2.24;
       critical_temperature_PT=5.19;
@@ -1507,7 +1531,7 @@ namespace xelement {
       modulus_Young=NNN;
       modulus_bulk=NNN;
       Poisson_ratio_PT=NNN;
-      BVm_Miedema=NNN;
+      modulus_bulk_x_volume_molar_Miedema=NNN;
       magnetic_type_PT="Diamagnetic";
       susceptibility_magnetic_mass=-5.9E-9;
       susceptibility_magnetic_volume=-1.05E-9;
@@ -1541,7 +1565,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*6.941;
       volume_molar=0.00001297;
       volume=20.24110;
-      Vm_Miedema=5.5;
+      area_molar_Miedema=5.5;
       valence_std=1;
       valence_iupac=1;
       valence_PT=1;
@@ -1576,14 +1600,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(1);  //RF+SK20200410
       electron_affinity_PT=59.6;
       energies_ionization.clear();energies_ionization.push_back(520.2);energies_ionization.push_back(7298.1);energies_ionization.push_back(11815);  //CO20201111
-      phi_star_Miedema=2.85;
-      nws_Miedema=0.98;
-      gamma_s_Miedema=530;
+      work_function_Miedema=2.85;
+      density_line_electron_WS_Miedema=0.98;
+      energy_surface_0K_Miedema=530;
       scale_Pettifor=0.45;
       temperature_boiling=1342;
       temperature_melting=180.54;
-      fusion_heat_PT=3;  //CO20201111
-      vaporization_heat_PT=147;
+      enthalpy_fusion=3;  //CO20201111
+      enthalpy_vaporization=147;
+      enthalpy_atomization_WE=159;  //CO20201111
+      energy_cohesive=158;  //CO20201111
       specific_heat_PT=3570;
       critical_pressure=661.2;
       critical_temperature_PT=3223;
@@ -1599,7 +1625,7 @@ namespace xelement {
       modulus_Young=4.9;
       modulus_bulk=11;
       Poisson_ratio_PT=NNN;
-      BVm_Miedema=1.5;
+      modulus_bulk_x_volume_molar_Miedema=1.5;
       magnetic_type_PT="Paramagnetic";
       susceptibility_magnetic_mass=2.56E-8;
       susceptibility_magnetic_volume=0.0000137;
@@ -1631,7 +1657,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*9.0122;
       volume_molar=4.8767E-6;
       volume=7.83290;
-      Vm_Miedema=2.9;
+      area_molar_Miedema=2.9;
       valence_std=2;
       valence_iupac=2;
       valence_PT=2;
@@ -1666,14 +1692,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(2);  //RF+SK20200410
       electron_affinity_PT=0;
       energies_ionization.clear();energies_ionization.push_back(899.5);energies_ionization.push_back(1757.1);energies_ionization.push_back(14848.7);energies_ionization.push_back(21006.6);  //CO20201111
-      phi_star_Miedema=4.20;
-      nws_Miedema=1.60;
-      gamma_s_Miedema=1900;
+      work_function_Miedema=4.20;
+      density_line_electron_WS_Miedema=1.60;
+      energy_surface_0K_Miedema=1900;
       scale_Pettifor=1.50;
       temperature_boiling=2470;
       temperature_melting=1287;
-      fusion_heat_PT=7.95;  //CO20201111
-      vaporization_heat_PT=297;
+      enthalpy_fusion=7.95;  //CO20201111
+      enthalpy_vaporization=297;
+      enthalpy_atomization_WE=324;  //CO20201111
+      energy_cohesive=320;  //CO20201111
       specific_heat_PT=1820;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -1689,7 +1717,7 @@ namespace xelement {
       modulus_Young=287;
       modulus_bulk=130;
       Poisson_ratio_PT=0.032;
-      BVm_Miedema=4.9;
+      modulus_bulk_x_volume_molar_Miedema=4.9;
       magnetic_type_PT="Diamagnetic";
       susceptibility_magnetic_mass=-1.26E-8;
       susceptibility_magnetic_volume=-0.00002328;
@@ -1722,7 +1750,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*10.81;
       volume_molar=4.3943E-6;
       volume=5.88420;
-      Vm_Miedema=2.8;
+      area_molar_Miedema=2.8;
       valence_std=3;
       valence_iupac=3;
       valence_PT=3;
@@ -1757,14 +1785,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);  //RF+SK20200410
       electron_affinity_PT=26.7;
       energies_ionization.clear();energies_ionization.push_back(800.6);energies_ionization.push_back(2427.1);energies_ionization.push_back(3659.7);energies_ionization.push_back(25025.8);energies_ionization.push_back(32826.7);  //CO20201111
-      phi_star_Miedema=4.75;
-      nws_Miedema=1.55;
-      gamma_s_Miedema=NNN;
+      work_function_Miedema=4.75;
+      density_line_electron_WS_Miedema=1.55;
+      energy_surface_0K_Miedema=NNN;
       scale_Pettifor=2.00;
       temperature_boiling=4000;
       temperature_melting=2075;
-      fusion_heat_PT=50;  //CO20201111
-      vaporization_heat_PT=507;
+      enthalpy_fusion=50;  //CO20201111
+      enthalpy_vaporization=507;
+      enthalpy_atomization_WE=563;  //CO20201111
+      energy_cohesive=561;  //CO20201111
       specific_heat_PT=1030;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -1780,7 +1810,7 @@ namespace xelement {
       modulus_Young=NNN;
       modulus_bulk=320;
       Poisson_ratio_PT=NNN;
-      BVm_Miedema=NNN;
+      modulus_bulk_x_volume_molar_Miedema=NNN;
       magnetic_type_PT="Diamagnetic";
       susceptibility_magnetic_mass=-8.7E-9;
       susceptibility_magnetic_volume=-0.0000214;
@@ -1812,7 +1842,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*12.011;
       volume_molar=5.3146E-6;
       volume=5.59490;
-      Vm_Miedema=1.8;
+      area_molar_Miedema=1.8;
       valence_std=4;
       valence_iupac=4;
       valence_PT=4;
@@ -1847,14 +1877,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(4); oxidation_states_preferred.push_back(-4);  //RF+SK20200410
       electron_affinity_PT=153.9;
       energies_ionization.clear();energies_ionization.push_back(1086.5);energies_ionization.push_back(2352.6);energies_ionization.push_back(4620.5);energies_ionization.push_back(6222.7);energies_ionization.push_back(37831);energies_ionization.push_back(47277);  //CO20201111
-      phi_star_Miedema=6.20;
-      nws_Miedema=1.90;
-      gamma_s_Miedema=NNN;
+      work_function_Miedema=6.20;
+      density_line_electron_WS_Miedema=1.90;
+      energy_surface_0K_Miedema=NNN;
       scale_Pettifor=2.50;
       temperature_boiling=4027;
       temperature_melting=3550;
-      fusion_heat_PT=105;  //CO20201111
-      vaporization_heat_PT=715;
+      enthalpy_fusion=105;  //CO20201111 - SMALL DISCREPANCY PERIODICTABLE VS WEBELEMENTS: 117 kJ/mol
+      enthalpy_vaporization=715;
+      enthalpy_atomization_WE=717;  //CO20201111
+      energy_cohesive=711;  //CO20201111
       specific_heat_PT=710;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -1870,7 +1902,7 @@ namespace xelement {
       modulus_Young=NNN;
       modulus_bulk=33;
       Poisson_ratio_PT=NNN;
-      BVm_Miedema=NNN;
+      modulus_bulk_x_volume_molar_Miedema=NNN;
       magnetic_type_PT="Diamagnetic";
       susceptibility_magnetic_mass=-6.2E-9;
       susceptibility_magnetic_volume=-0.000014;
@@ -1902,7 +1934,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*14.0067;
       volume_molar=0.011197;
       volume=7.59940;
-      Vm_Miedema=2.2;
+      area_molar_Miedema=2.2;
       valence_std=5;
       valence_iupac=5;
       valence_PT=3;
@@ -1937,14 +1969,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(-3); //RF+SK20200410
       electron_affinity_PT=7;
       energies_ionization.clear();energies_ionization.push_back(1402.3);energies_ionization.push_back(2856);energies_ionization.push_back(4578.1);energies_ionization.push_back(7475);energies_ionization.push_back(9444.9);energies_ionization.push_back(53266.6);energies_ionization.push_back(64360);  //CO20201111
-      phi_star_Miedema=7.00;
-      nws_Miedema=1.60;
-      gamma_s_Miedema=NNN;
+      work_function_Miedema=7.00;
+      density_line_electron_WS_Miedema=1.60;
+      energy_surface_0K_Miedema=NNN;
       scale_Pettifor=3.00;
       temperature_boiling=-195.79;
       temperature_melting=-210.1;
-      fusion_heat_PT=0.36;  //CO20201111
-      vaporization_heat_PT=2.79;
+      enthalpy_fusion=0.36;  //CO20201111
+      enthalpy_vaporization=2.79;
+      enthalpy_atomization_WE=473;  //CO20201111
+      energy_cohesive=474;  //CO20201111
       specific_heat_PT=1040;
       critical_pressure=33.46;
       critical_temperature_PT=126.21;
@@ -1960,7 +1994,7 @@ namespace xelement {
       modulus_Young=NNN;
       modulus_bulk=NNN;
       Poisson_ratio_PT=NNN;
-      BVm_Miedema=NNN;
+      modulus_bulk_x_volume_molar_Miedema=NNN;
       magnetic_type_PT="Diamagnetic";
       susceptibility_magnetic_mass=-5.4E-9;
       susceptibility_magnetic_volume=-6.8E-9;
@@ -1992,7 +2026,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*15.9994;
       volume_molar=0.011196;
       volume=7.78230;
-      Vm_Miedema=2.656;
+      area_molar_Miedema=2.656;
       valence_std=6;
       valence_iupac=2;
       valence_PT=2;
@@ -2027,14 +2061,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(-2); //RF+SK20200410
       electron_affinity_PT=141;
       energies_ionization.clear();energies_ionization.push_back(1313.9);energies_ionization.push_back(3388.3);energies_ionization.push_back(5300.5);energies_ionization.push_back(7469.2);energies_ionization.push_back(10989.5);energies_ionization.push_back(13326.5);energies_ionization.push_back(71330);energies_ionization.push_back(84078);  //CO20201111
-      phi_star_Miedema=6.97;
-      nws_Miedema=1.70;
-      gamma_s_Miedema=NNN;
+      work_function_Miedema=6.97;
+      density_line_electron_WS_Miedema=1.70;
+      energy_surface_0K_Miedema=NNN;
       scale_Pettifor=3.50;
       temperature_boiling=-182.9;
       temperature_melting=-218.3;
-      fusion_heat_PT=0.222;  //CO20201111
-      vaporization_heat_PT=3.41;
+      enthalpy_fusion=0.222;  //CO20201111
+      enthalpy_vaporization=3.41;
+      enthalpy_atomization_WE=249;  //CO20201111
+      energy_cohesive=251;  //CO20201111
       specific_heat_PT=919;
       critical_pressure=49.77;
       critical_temperature_PT=154.59;
@@ -2050,7 +2086,7 @@ namespace xelement {
       modulus_Young=NNN;
       modulus_bulk=NNN;
       Poisson_ratio_PT=NNN;
-      BVm_Miedema=NNN;
+      modulus_bulk_x_volume_molar_Miedema=NNN;
       magnetic_type_PT="Paramagnetic";
       susceptibility_magnetic_mass=1.335E-6;
       susceptibility_magnetic_volume=1.90772E-6;
@@ -2082,7 +2118,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*18.9984;
       volume_molar=0.011202;
       volume=9.99090;
-      Vm_Miedema=NNN;
+      area_molar_Miedema=NNN;
       valence_std=7;
       valence_iupac=1;
       valence_PT=1;
@@ -2117,14 +2153,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(-1); //RF+SK20200410
       electron_affinity_PT=328;
       energies_ionization.clear();energies_ionization.push_back(1681);energies_ionization.push_back(3374.2);energies_ionization.push_back(6050.4);energies_ionization.push_back(8407.7);energies_ionization.push_back(11022.7);energies_ionization.push_back(15164.1);energies_ionization.push_back(17868);energies_ionization.push_back(92038.1);energies_ionization.push_back(106434.3);  //CO20201111
-      phi_star_Miedema=NNN;
-      nws_Miedema=NNN;
-      gamma_s_Miedema=NNN;
+      work_function_Miedema=NNN;
+      density_line_electron_WS_Miedema=NNN;
+      energy_surface_0K_Miedema=NNN;
       scale_Pettifor=4.00;
       temperature_boiling=-188.12;
       temperature_melting=-219.6;
-      fusion_heat_PT=0.26;  //CO20201111
-      vaporization_heat_PT=3.27;
+      enthalpy_fusion=0.26;  //CO20201111
+      enthalpy_vaporization=3.27;
+      enthalpy_atomization_WE=79;  //CO20201111
+      energy_cohesive=81;  //CO20201111
       specific_heat_PT=824;
       critical_pressure=51.04;
       critical_temperature_PT=144.13;
@@ -2140,7 +2178,7 @@ namespace xelement {
       modulus_Young=NNN;
       modulus_bulk=NNN;
       Poisson_ratio_PT=NNN;
-      BVm_Miedema=NNN;
+      modulus_bulk_x_volume_molar_Miedema=NNN;
       magnetic_type_PT="NNN";
       susceptibility_magnetic_mass=NNN;
       susceptibility_magnetic_volume=NNN;
@@ -2172,7 +2210,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*20.179;
       volume_molar=0.02242;
       volume=19.9052;
-      Vm_Miedema=NNN;
+      area_molar_Miedema=NNN;
       valence_std=0;
       valence_iupac=0;
       valence_PT=0;
@@ -2207,14 +2245,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
       electron_affinity_PT=0;
       energies_ionization.clear();energies_ionization.push_back(2080.7);energies_ionization.push_back(3952.3);energies_ionization.push_back(6122);energies_ionization.push_back(9371);energies_ionization.push_back(12177);energies_ionization.push_back(15238);energies_ionization.push_back(19999);energies_ionization.push_back(23069.5);energies_ionization.push_back(115379.5);energies_ionization.push_back(131432);  //CO20201111
-      phi_star_Miedema=NNN;
-      nws_Miedema=NNN;
-      gamma_s_Miedema=NNN;
+      work_function_Miedema=NNN;
+      density_line_electron_WS_Miedema=NNN;
+      energy_surface_0K_Miedema=NNN;
       scale_Pettifor=0;
       temperature_boiling=-246.08;
       temperature_melting=-248.59;
-      fusion_heat_PT=0.34;  //CO20201111
-      vaporization_heat_PT=1.75;
+      enthalpy_fusion=0.34;  //CO20201111
+      enthalpy_vaporization=1.75;
+      enthalpy_atomization_WE=0;  //CO20201111
+      energy_cohesive=1.92;  //CO20201111
       specific_heat_PT=1030;
       critical_pressure=27.24;
       critical_temperature_PT=44.4;
@@ -2230,7 +2270,7 @@ namespace xelement {
       modulus_Young=NNN;
       modulus_bulk=NNN;
       Poisson_ratio_PT=NNN;
-      BVm_Miedema=NNN;
+      modulus_bulk_x_volume_molar_Miedema=NNN;
       magnetic_type_PT="Diamagnetic";
       susceptibility_magnetic_mass=-4.1E-9;
       susceptibility_magnetic_volume=-3.69E-9;
@@ -2264,7 +2304,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*22.9898;
       volume_molar=0.00002375;
       volume=36.9135;
-      Vm_Miedema=8.3;
+      area_molar_Miedema=8.3;
       valence_std=1;
       valence_iupac=1;
       valence_PT=1;
@@ -2299,14 +2339,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(1);  //RF+SK20200410
       electron_affinity_PT=52.8;
       energies_ionization.clear();energies_ionization.push_back(495.8);energies_ionization.push_back(4562);energies_ionization.push_back(6910.3);energies_ionization.push_back(9543);energies_ionization.push_back(13354);energies_ionization.push_back(16613);energies_ionization.push_back(20117);energies_ionization.push_back(25496);energies_ionization.push_back(28932);energies_ionization.push_back(141362);  //CO20201111
-      phi_star_Miedema=2.70;
-      nws_Miedema=0.82;
-      gamma_s_Miedema=260;
+      work_function_Miedema=2.70;
+      density_line_electron_WS_Miedema=0.82;
+      energy_surface_0K_Miedema=260;
       scale_Pettifor=0.40;
       temperature_boiling=883;
       temperature_melting=97.72;
-      fusion_heat_PT=2.6;  //CO20201111
-      vaporization_heat_PT=97.7;
+      enthalpy_fusion=2.6;  //CO20201111
+      enthalpy_vaporization=97.7;
+      enthalpy_atomization_WE=107;  //CO20201111
+      energy_cohesive=107;  //CO20201111
       specific_heat_PT=1230;
       critical_pressure=345.4;
       critical_temperature_PT=2573;
@@ -2322,7 +2364,7 @@ namespace xelement {
       modulus_Young=10;
       modulus_bulk=6.3;
       Poisson_ratio_PT=NNN;
-      BVm_Miedema=1.6;
+      modulus_bulk_x_volume_molar_Miedema=1.6;
       magnetic_type_PT="Paramagnetic";
       susceptibility_magnetic_mass=8.8E-9;
       susceptibility_magnetic_volume=8.6E-6;
@@ -2354,7 +2396,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*24.305;
       volume_molar=0.000013984;
       volume=22.8178;
-      Vm_Miedema=5.8;
+      area_molar_Miedema=5.8;
       valence_std=2;
       valence_iupac=2;
       valence_PT=2;
@@ -2389,14 +2431,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(2);  //RF+SK20200410
       electron_affinity_PT=0;
       energies_ionization.clear();energies_ionization.push_back(737.7);energies_ionization.push_back(1450.7);energies_ionization.push_back(7732.7);energies_ionization.push_back(10542.5);energies_ionization.push_back(13630);energies_ionization.push_back(18020);energies_ionization.push_back(21711);energies_ionization.push_back(25661);energies_ionization.push_back(31653);energies_ionization.push_back(35458);  //CO20201111
-      phi_star_Miedema=3.45;
-      nws_Miedema=1.17;
-      gamma_s_Miedema=790;
+      work_function_Miedema=3.45;
+      density_line_electron_WS_Miedema=1.17;
+      energy_surface_0K_Miedema=790;
       scale_Pettifor=1.28;
       temperature_boiling=1090;
       temperature_melting=650;
-      fusion_heat_PT=8.7;  //CO20201111
-      vaporization_heat_PT=128;
+      enthalpy_fusion=8.7;  //CO20201111
+      enthalpy_vaporization=128;
+      enthalpy_atomization_WE=146;  //CO20201111
+      energy_cohesive=145;  //CO20201111
       specific_heat_PT=1020;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -2412,7 +2456,7 @@ namespace xelement {
       modulus_Young=45;
       modulus_bulk=45;
       Poisson_ratio_PT=0.29;
-      BVm_Miedema=5.0;
+      modulus_bulk_x_volume_molar_Miedema=5.0;
       magnetic_type_PT="Paramagnetic";
       susceptibility_magnetic_mass=6.9E-9;
       susceptibility_magnetic_volume=0.000012;
@@ -2445,7 +2489,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*26.9815;
       volume_molar=9.99E-6;
       volume=16.4000;
-      Vm_Miedema=4.6;
+      area_molar_Miedema=4.6;
       valence_std=3;
       valence_iupac=3;
       valence_PT=3;
@@ -2480,14 +2524,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);  //RF+SK20200410
       electron_affinity_PT=42.5;
       energies_ionization.clear();energies_ionization.push_back(577.5);energies_ionization.push_back(1816.7);energies_ionization.push_back(2744.8);energies_ionization.push_back(11577);energies_ionization.push_back(14842);energies_ionization.push_back(18379);energies_ionization.push_back(23326);energies_ionization.push_back(27465);energies_ionization.push_back(31853);energies_ionization.push_back(38473);  //CO20201111
-      phi_star_Miedema=4.20;
-      nws_Miedema=1.39;
-      gamma_s_Miedema=1200;
+      work_function_Miedema=4.20;
+      density_line_electron_WS_Miedema=1.39;
+      energy_surface_0K_Miedema=1200;
       scale_Pettifor=1.66;
       temperature_boiling=2519;
       temperature_melting=660.32;
-      fusion_heat_PT=10.7;  //CO20201111
-      vaporization_heat_PT=293;
+      enthalpy_fusion=10.7;  //CO20201111
+      enthalpy_vaporization=293;
+      enthalpy_atomization_WE=326;  //CO20201111
+      energy_cohesive=327;  //CO20201111
       specific_heat_PT=904;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -2503,7 +2549,7 @@ namespace xelement {
       modulus_Young=70;
       modulus_bulk=76;
       Poisson_ratio_PT=0.35;
-      BVm_Miedema=7.2;
+      modulus_bulk_x_volume_molar_Miedema=7.2;
       magnetic_type_PT="Paramagnetic";
       susceptibility_magnetic_mass=7.8E-9;
       susceptibility_magnetic_volume=0.0000211;
@@ -2535,7 +2581,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*28.0855;
       volume_molar=0.000012054;
       volume=14.3536;
-      Vm_Miedema=4.2;
+      area_molar_Miedema=4.2;
       valence_std=4;
       valence_iupac=4;
       valence_PT=4;
@@ -2570,14 +2616,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(4);  //RF+SK20200410
       electron_affinity_PT=133.6;
       energies_ionization.clear();energies_ionization.push_back(786.5);energies_ionization.push_back(1577.1);energies_ionization.push_back(3231.6);energies_ionization.push_back(4355.5);energies_ionization.push_back(16091);energies_ionization.push_back(19805);energies_ionization.push_back(23780);energies_ionization.push_back(29287);energies_ionization.push_back(33878);energies_ionization.push_back(38726);  //CO20201111
-      phi_star_Miedema=4.70;
-      nws_Miedema=1.50;
-      gamma_s_Miedema=1290;
+      work_function_Miedema=4.70;
+      density_line_electron_WS_Miedema=1.50;
+      energy_surface_0K_Miedema=1290;
       scale_Pettifor=1.92;
       temperature_boiling=2900;
       temperature_melting=1414;
-      fusion_heat_PT=50.2;  //CO20201111
-      vaporization_heat_PT=359;
+      enthalpy_fusion=50.2;  //CO20201111
+      enthalpy_vaporization=359;
+      enthalpy_atomization_WE=456;  //CO20201111
+      energy_cohesive=446;  //CO20201111
       specific_heat_PT=710;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -2593,7 +2641,7 @@ namespace xelement {
       modulus_Young=47;
       modulus_bulk=100;
       Poisson_ratio_PT=NNN;
-      BVm_Miedema=11.9;
+      modulus_bulk_x_volume_molar_Miedema=11.9;
       magnetic_type_PT="Diamagnetic";
       susceptibility_magnetic_mass=-1.6E-9;
       susceptibility_magnetic_volume=-3.73E-6;
@@ -2625,7 +2673,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*30.9738;
       volume_molar=0.000016991;
       volume=14.1995;
-      Vm_Miedema=NNN;
+      area_molar_Miedema=NNN;
       valence_std=5;
       valence_iupac=5;
       valence_PT=5;
@@ -2660,14 +2708,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(5);  //RF+SK20200410
       electron_affinity_PT=71;
       energies_ionization.clear();energies_ionization.push_back(1011.8);energies_ionization.push_back(1907);energies_ionization.push_back(2914.1);energies_ionization.push_back(4963.6);energies_ionization.push_back(6273.9);energies_ionization.push_back(21267);energies_ionization.push_back(25431);energies_ionization.push_back(29872);energies_ionization.push_back(35905);energies_ionization.push_back(40950);  //CO20201111
-      phi_star_Miedema=5.5;
-      nws_Miedema=1.65;
-      gamma_s_Miedema=NNN;
+      work_function_Miedema=5.5;
+      density_line_electron_WS_Miedema=1.65;
+      energy_surface_0K_Miedema=NNN;
       scale_Pettifor=2.18;
       temperature_boiling=280.5;
       temperature_melting=44.2;
-      fusion_heat_PT=0.64;  //CO20201111
-      vaporization_heat_PT=12.4;
+      enthalpy_fusion=0.64;  //CO20201111
+      enthalpy_vaporization=12.4;
+      enthalpy_atomization_WE=315;  //CO20201111
+      energy_cohesive=331;  //CO20201111
       specific_heat_PT=769.7;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -2683,7 +2733,7 @@ namespace xelement {
       modulus_Young=NNN;
       modulus_bulk=11;
       Poisson_ratio_PT=NNN;
-      BVm_Miedema=NNN;
+      modulus_bulk_x_volume_molar_Miedema=NNN;
       magnetic_type_PT="Diamagnetic";
       susceptibility_magnetic_mass=-1.13E-8;
       susceptibility_magnetic_volume=-0.0000206;
@@ -2702,12 +2752,12 @@ namespace xelement {
     // ********************************************************************************************************************************************************
 
     // ********************************************************************************************************************************************************
-    // [AFLOW]START=Sulphur
-    // Sulphur Sulphur Sulphur Sulphur Sulphur Sulphur Sulphur Sulphur Sulphur Sulphur Sulphur Sulphur Sulphur Sulphur Sulphur Sulphur Sulphur
-    else if(ZZ==16) { // Sulphur
+    // [AFLOW]START=Sulfur
+    // Sulfur Sulfur Sulfur Sulfur Sulfur Sulfur Sulfur Sulfur Sulfur Sulfur Sulfur Sulfur Sulfur Sulfur Sulfur Sulfur Sulfur
+    else if(ZZ==16) { // Sulfur
       Z=ZZ;
       symbol="S";
-      name="Sulphur";
+      name="Sulfur";
       period=3;
       group=16;
       series="Chalcogen";
@@ -2715,7 +2765,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*32.06;
       volume_molar=0.000016357;
       volume=15.7301;
-      Vm_Miedema=4.376;
+      area_molar_Miedema=4.376;
       valence_std=6;
       valence_iupac=6;
       valence_PT=6;
@@ -2750,14 +2800,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(6);  //RF+SK20200410
       electron_affinity_PT=200;
       energies_ionization.clear();energies_ionization.push_back(999.6);energies_ionization.push_back(2252);energies_ionization.push_back(3357);energies_ionization.push_back(4556);energies_ionization.push_back(7004.3);energies_ionization.push_back(8495.8);energies_ionization.push_back(27107);energies_ionization.push_back(31719);energies_ionization.push_back(36621);energies_ionization.push_back(43177);  //CO20201111
-      phi_star_Miedema=5.6;
-      nws_Miedema=1.46;
-      gamma_s_Miedema=NNN;
+      work_function_Miedema=5.6;
+      density_line_electron_WS_Miedema=1.46;
+      energy_surface_0K_Miedema=NNN;
       scale_Pettifor=2.44;
       temperature_boiling=444.72;
       temperature_melting=115.21;
-      fusion_heat_PT=1.73;  //CO20201111
-      vaporization_heat_PT=9.8;
+      enthalpy_fusion=1.73;  //CO20201111
+      enthalpy_vaporization=9.8;
+      enthalpy_atomization_WE=279;  //CO20201111
+      energy_cohesive=275;  //CO20201111
       specific_heat_PT=705;
       critical_pressure=204.3;
       critical_temperature_PT=1314;
@@ -2773,7 +2825,7 @@ namespace xelement {
       modulus_Young=NNN;
       modulus_bulk=7.7;
       Poisson_ratio_PT=NNN;
-      BVm_Miedema=NNN;
+      modulus_bulk_x_volume_molar_Miedema=NNN;
       magnetic_type_PT="Diamagnetic";
       susceptibility_magnetic_mass=-6.2E-9;
       susceptibility_magnetic_volume=-0.0000122;
@@ -2788,7 +2840,7 @@ namespace xelement {
       loadDefaultUnits();  //CO20201111
       return; //CO20200520
     }
-    // [AFLOW]STOP=Sulphur
+    // [AFLOW]STOP=Sulfur
     // ********************************************************************************************************************************************************
 
     // ********************************************************************************************************************************************************
@@ -2805,7 +2857,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*35.453;
       volume_molar=0.01103;
       volume=21.2947;
-      Vm_Miedema=6.71;
+      area_molar_Miedema=6.71;
       valence_std=7;
       valence_iupac=7;
       valence_PT=5;
@@ -2840,14 +2892,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(-1); //RF+SK20200410
       electron_affinity_PT=349;
       energies_ionization.clear();energies_ionization.push_back(1251.2);energies_ionization.push_back(2298);energies_ionization.push_back(3822);energies_ionization.push_back(5158.6);energies_ionization.push_back(6542);energies_ionization.push_back(9362);energies_ionization.push_back(11018);energies_ionization.push_back(33604);energies_ionization.push_back(38600);energies_ionization.push_back(43961);  //CO20201111
-      phi_star_Miedema=5.32;
-      nws_Miedema=0.34;
-      gamma_s_Miedema=1013;
+      work_function_Miedema=5.32;
+      density_line_electron_WS_Miedema=0.34;
+      energy_surface_0K_Miedema=1013;
       scale_Pettifor=2.70;
       temperature_boiling=-34.04;
       temperature_melting=-101.5;
-      fusion_heat_PT=3.2;  //CO20201111
-      vaporization_heat_PT=10.2;
+      enthalpy_fusion=3.2;  //CO20201111
+      enthalpy_vaporization=10.2;
+      enthalpy_atomization_WE=122;  //CO20201111
+      energy_cohesive=135;  //CO20201111
       specific_heat_PT=478.2;
       critical_pressure=78.87;
       critical_temperature_PT=416.9;
@@ -2863,7 +2917,7 @@ namespace xelement {
       modulus_Young=NNN;
       modulus_bulk=1.1;
       Poisson_ratio_PT=NNN;
-      BVm_Miedema=NNN;
+      modulus_bulk_x_volume_molar_Miedema=NNN;
       magnetic_type_PT="Diamagnetic";
       susceptibility_magnetic_mass=-7.2E-9;
       susceptibility_magnetic_volume=-2.31E-8;
@@ -2895,7 +2949,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*39.948;
       volume_molar=0.022392;
       volume=22.000;
-      Vm_Miedema=NNN;
+      area_molar_Miedema=NNN;
       valence_std=0;
       valence_iupac=2;
       valence_PT=0;
@@ -2930,14 +2984,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
       electron_affinity_PT=0;
       energies_ionization.clear();energies_ionization.push_back(1520.6);energies_ionization.push_back(2665.8);energies_ionization.push_back(3931);energies_ionization.push_back(5771);energies_ionization.push_back(7238);energies_ionization.push_back(8781);energies_ionization.push_back(11995);energies_ionization.push_back(13842);energies_ionization.push_back(40760);energies_ionization.push_back(46186);  //CO20201111
-      phi_star_Miedema=NNN;
-      nws_Miedema=NNN;
-      gamma_s_Miedema=NNN;
+      work_function_Miedema=NNN;
+      density_line_electron_WS_Miedema=NNN;
+      energy_surface_0K_Miedema=NNN;
       scale_Pettifor=0;
       temperature_boiling=-185.8;
       temperature_melting=-189.3;
-      fusion_heat_PT=1.18;  //CO20201111
-      vaporization_heat_PT=6.5;
+      enthalpy_fusion=1.18;  //CO20201111
+      enthalpy_vaporization=6.5;
+      enthalpy_atomization_WE=0;  //CO20201111
+      energy_cohesive=7.74;  //CO20201111
       specific_heat_PT=520.33;
       critical_pressure=48.34;
       critical_temperature_PT=150.87;
@@ -2953,7 +3009,7 @@ namespace xelement {
       modulus_Young=NNN;
       modulus_bulk=NNN;
       Poisson_ratio_PT=NNN;
-      BVm_Miedema=NNN;
+      modulus_bulk_x_volume_molar_Miedema=NNN;
       magnetic_type_PT="Diamagnetic";
       susceptibility_magnetic_mass=-6E-9;
       susceptibility_magnetic_volume=-1.07E-8;
@@ -2987,7 +3043,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*39.0983;
       volume_molar=0.00004568;
       volume=73.9091;
-      Vm_Miedema=12.8;
+      area_molar_Miedema=12.8;
       valence_std=1;
       valence_iupac=1;
       valence_PT=1;
@@ -3022,14 +3078,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(1);  //RF+SK20200410
       electron_affinity_PT=48.4;
       energies_ionization.clear();energies_ionization.push_back(418.8);energies_ionization.push_back(3052);energies_ionization.push_back(4420);energies_ionization.push_back(5877);energies_ionization.push_back(7975);energies_ionization.push_back(9590);energies_ionization.push_back(11343);energies_ionization.push_back(14944);energies_ionization.push_back(16963.7);energies_ionization.push_back(48610);  //CO20201111
-      phi_star_Miedema=2.25;
-      nws_Miedema=0.65;
-      gamma_s_Miedema=150;
+      work_function_Miedema=2.25;
+      density_line_electron_WS_Miedema=0.65;
+      energy_surface_0K_Miedema=150;
       scale_Pettifor=0.35;
       temperature_boiling=759;
       temperature_melting=63.38;
-      fusion_heat_PT=2.33;  //CO20201111
-      vaporization_heat_PT=76.9;
+      enthalpy_fusion=2.33;  //CO20201111
+      enthalpy_vaporization=76.9;
+      enthalpy_atomization_WE=89;  //CO20201111
+      energy_cohesive=90.1;  //CO20201111
       specific_heat_PT=757;
       critical_pressure=157.9;
       critical_temperature_PT=2223;
@@ -3045,7 +3103,7 @@ namespace xelement {
       modulus_Young=NNN;
       modulus_bulk=3.1;
       Poisson_ratio_PT=NNN;
-      BVm_Miedema=1.5;
+      modulus_bulk_x_volume_molar_Miedema=1.5;
       magnetic_type_PT="Paramagnetic";
       susceptibility_magnetic_mass=6.7E-9;
       susceptibility_magnetic_volume=5.74E-6;
@@ -3077,7 +3135,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*40.08;
       volume_molar=0.000025857;
       volume=42.1927;
-      Vm_Miedema=8.8;
+      area_molar_Miedema=8.8;
       valence_std=2;
       valence_iupac=2;
       valence_PT=2;
@@ -3112,14 +3170,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(2);  //RF+SK20200410
       electron_affinity_PT=2.37;
       energies_ionization.clear();energies_ionization.push_back(589.8);energies_ionization.push_back(1145.4);energies_ionization.push_back(4912.4);energies_ionization.push_back(6491);energies_ionization.push_back(8153);energies_ionization.push_back(10496);energies_ionization.push_back(12270);energies_ionization.push_back(14206);energies_ionization.push_back(18191);energies_ionization.push_back(20385);energies_ionization.push_back(57110);  //CO20201111
-      phi_star_Miedema=2.55;
-      nws_Miedema=0.91;
-      gamma_s_Miedema=490;
+      work_function_Miedema=2.55;
+      density_line_electron_WS_Miedema=0.91;
+      energy_surface_0K_Miedema=490;
       scale_Pettifor=0.60;
       temperature_boiling=1484;
       temperature_melting=842;
-      fusion_heat_PT=8.54;  //CO20201111
-      vaporization_heat_PT=155;
+      enthalpy_fusion=8.54;  //CO20201111
+      enthalpy_vaporization=155;
+      enthalpy_atomization_WE=178;  //CO20201111
+      energy_cohesive=178;  //CO20201111
       specific_heat_PT=631;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -3135,7 +3195,7 @@ namespace xelement {
       modulus_Young=20;
       modulus_bulk=17;
       Poisson_ratio_PT=0.31;
-      BVm_Miedema=4.0;
+      modulus_bulk_x_volume_molar_Miedema=4.0;
       magnetic_type_PT="Paramagnetic";
       susceptibility_magnetic_mass=1.38E-8;
       susceptibility_magnetic_volume=0.00002139;
@@ -3168,7 +3228,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*44.9559;
       volume_molar=0.000015061;
       volume=24.6739;
-      Vm_Miedema=6.1;
+      area_molar_Miedema=6.1;
       valence_std=3;
       valence_iupac=3;
       valence_PT=3;
@@ -3203,14 +3263,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);  //RF+SK20200410
       electron_affinity_PT=18.1;
       energies_ionization.clear();energies_ionization.push_back(633.1);energies_ionization.push_back(1235);energies_ionization.push_back(2388.6);energies_ionization.push_back(7090.6);energies_ionization.push_back(8843);energies_ionization.push_back(10679);energies_ionization.push_back(13310);energies_ionization.push_back(15250);energies_ionization.push_back(17370);energies_ionization.push_back(21726);energies_ionization.push_back(24102);energies_ionization.push_back(66320);energies_ionization.push_back(73010);energies_ionization.push_back(80160);energies_ionization.push_back(89490);energies_ionization.push_back(97400);energies_ionization.push_back(105600);energies_ionization.push_back(117000);energies_ionization.push_back(124270);energies_ionization.push_back(547530);energies_ionization.push_back(582163);  //CO20201111
-      phi_star_Miedema=3.25;
-      nws_Miedema=1.27;
-      gamma_s_Miedema=1200;
+      work_function_Miedema=3.25;
+      density_line_electron_WS_Miedema=1.27;
+      energy_surface_0K_Miedema=1200;
       scale_Pettifor=0.74;
       temperature_boiling=2830;
       temperature_melting=1541;
-      fusion_heat_PT=16;  //CO20201111
-      vaporization_heat_PT=318;
+      enthalpy_fusion=16;  //CO20201111
+      enthalpy_vaporization=318;
+      enthalpy_atomization_WE=378;  //CO20201111
+      energy_cohesive=376;  //CO20201111
       specific_heat_PT=567;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -3226,7 +3288,7 @@ namespace xelement {
       modulus_Young=74;
       modulus_bulk=57;
       Poisson_ratio_PT=0.28;
-      BVm_Miedema=6.6;
+      modulus_bulk_x_volume_molar_Miedema=6.6;
       magnetic_type_PT="Paramagnetic";
       susceptibility_magnetic_mass=8.8E-8;
       susceptibility_magnetic_volume=0.0002627;
@@ -3258,7 +3320,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*47.9;
       volume_molar=0.000010621;
       volume=17.1035;
-      Vm_Miedema=4.8;
+      area_molar_Miedema=4.8;
       valence_std=4;
       valence_iupac=4;
       valence_PT=4;
@@ -3293,14 +3355,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(4);  //RF+SK20200410
       electron_affinity_PT=7.6;
       energies_ionization.clear();energies_ionization.push_back(658.8);energies_ionization.push_back(1309.8);energies_ionization.push_back(2652.5);energies_ionization.push_back(4174.6);energies_ionization.push_back(9581);energies_ionization.push_back(11533);energies_ionization.push_back(13590);energies_ionization.push_back(16440);energies_ionization.push_back(18530);energies_ionization.push_back(20833);energies_ionization.push_back(25575);energies_ionization.push_back(28125);energies_ionization.push_back(76015);energies_ionization.push_back(83280);energies_ionization.push_back(90880);energies_ionization.push_back(100700);energies_ionization.push_back(109100);energies_ionization.push_back(117800);energies_ionization.push_back(129900);energies_ionization.push_back(137530);energies_ionization.push_back(602930);  //CO20201111
-      phi_star_Miedema=3.65;
-      nws_Miedema=1.47;
-      gamma_s_Miedema=2050;
+      work_function_Miedema=3.65;
+      density_line_electron_WS_Miedema=1.47;
+      energy_surface_0K_Miedema=2050;
       scale_Pettifor=0.79;
       temperature_boiling=3287;
       temperature_melting=1668;
-      fusion_heat_PT=18.7;  //CO20201111
-      vaporization_heat_PT=425;
+      enthalpy_fusion=18.7;  //CO20201111
+      enthalpy_vaporization=425;
+      enthalpy_atomization_WE=471;  //CO20201111
+      energy_cohesive=468;  //CO20201111
       specific_heat_PT=520;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -3316,7 +3380,7 @@ namespace xelement {
       modulus_Young=116;
       modulus_bulk=110;
       Poisson_ratio_PT=0.32;
-      BVm_Miedema=11.0;
+      modulus_bulk_x_volume_molar_Miedema=11.0;
       magnetic_type_PT="Paramagnetic";
       susceptibility_magnetic_mass=4.01E-8;
       susceptibility_magnetic_volume=0.0001807;
@@ -3348,7 +3412,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*50.9415;
       volume_molar=8.3374E-6;
       volume=13.2086;
-      Vm_Miedema=4.1;
+      area_molar_Miedema=4.1;
       valence_std=5;
       valence_iupac=5;
       valence_PT=5;
@@ -3383,14 +3447,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(5);  //RF+SK20200410
       electron_affinity_PT=50.6;
       energies_ionization.clear();energies_ionization.push_back(650.9);energies_ionization.push_back(1414);energies_ionization.push_back(2830);energies_ionization.push_back(4507);energies_ionization.push_back(6298.7);energies_ionization.push_back(12363);energies_ionization.push_back(14530);energies_ionization.push_back(16730);energies_ionization.push_back(19860);energies_ionization.push_back(22240);energies_ionization.push_back(24670);energies_ionization.push_back(29730);energies_ionization.push_back(32446);energies_ionization.push_back(86450);energies_ionization.push_back(94170);energies_ionization.push_back(102300);energies_ionization.push_back(112700);energies_ionization.push_back(121600);energies_ionization.push_back(130700);energies_ionization.push_back(143400);energies_ionization.push_back(151440);  //CO20201111
-      phi_star_Miedema=4.25;
-      nws_Miedema=1.64;
-      gamma_s_Miedema=2600;
+      work_function_Miedema=4.25;
+      density_line_electron_WS_Miedema=1.64;
+      energy_surface_0K_Miedema=2600;
       scale_Pettifor=0.84;
       temperature_boiling=3407;
       temperature_melting=1910;
-      fusion_heat_PT=22.8;  //CO20201111
-      vaporization_heat_PT=453;
+      enthalpy_fusion=22.8;  //CO20201111
+      enthalpy_vaporization=453;
+      enthalpy_atomization_WE=515;  //CO20201111
+      energy_cohesive=512;  //CO20201111
       specific_heat_PT=489;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -3406,7 +3472,7 @@ namespace xelement {
       modulus_Young=128;
       modulus_bulk=160;
       Poisson_ratio_PT=0.37;
-      BVm_Miedema=14.0;
+      modulus_bulk_x_volume_molar_Miedema=14.0;
       magnetic_type_PT="Paramagnetic";
       susceptibility_magnetic_mass=6.28E-8;
       susceptibility_magnetic_volume=0.0003837;
@@ -3438,7 +3504,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*51.996;
       volume_molar=7.2317E-6;
       volume=11.4136;
-      Vm_Miedema=3.7;
+      area_molar_Miedema=3.7;
       valence_std=6;
       valence_iupac=6;
       valence_PT=6;
@@ -3473,14 +3539,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3); oxidation_states_preferred.push_back(6); //RF+SK20200410 //Cr+3 most preferred oxidation number
       electron_affinity_PT=64.3;
       energies_ionization.clear();energies_ionization.push_back(652.9);energies_ionization.push_back(1590.6);energies_ionization.push_back(2987);energies_ionization.push_back(4743);energies_ionization.push_back(6702);energies_ionization.push_back(8744.9);energies_ionization.push_back(15455);energies_ionization.push_back(17820);energies_ionization.push_back(20190);energies_ionization.push_back(23580);energies_ionization.push_back(26130);energies_ionization.push_back(28750);energies_ionization.push_back(34230);energies_ionization.push_back(37066);energies_ionization.push_back(97510);energies_ionization.push_back(105800);energies_ionization.push_back(114300);energies_ionization.push_back(125300);energies_ionization.push_back(134700);energies_ionization.push_back(144300);energies_ionization.push_back(157700);  //CO20201111
-      phi_star_Miedema=4.65;
-      nws_Miedema=1.74;
-      gamma_s_Miedema=2400;
+      work_function_Miedema=4.65;
+      density_line_electron_WS_Miedema=1.74;
+      energy_surface_0K_Miedema=2400;
       scale_Pettifor=0.89;
       temperature_boiling=2671;
       temperature_melting=1907;
-      fusion_heat_PT=20.5;  //CO20201111
-      vaporization_heat_PT=339;
+      enthalpy_fusion=20.5;  //CO20201111
+      enthalpy_vaporization=339;
+      enthalpy_atomization_WE=397;  //CO20201111
+      energy_cohesive=395;  //CO20201111
       specific_heat_PT=448;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -3496,7 +3564,7 @@ namespace xelement {
       modulus_Young=279;
       modulus_bulk=160;
       Poisson_ratio_PT=0.21;
-      BVm_Miedema=14.0;
+      modulus_bulk_x_volume_molar_Miedema=14.0;
       magnetic_type_PT="Antiferromagnetic";
       susceptibility_magnetic_mass=4.45E-8;
       susceptibility_magnetic_volume=0.0003177;
@@ -3528,7 +3596,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*54.93805;
       volume_molar=7.3545E-6;
       volume=10.6487;
-      Vm_Miedema=3.8;
+      area_molar_Miedema=3.8;
       valence_std=7;
       valence_iupac=7;
       valence_PT=4;
@@ -3563,14 +3631,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(2);  //RF+SK20200410
       electron_affinity_PT=0;
       energies_ionization.clear();energies_ionization.push_back(717.3);energies_ionization.push_back(1509);energies_ionization.push_back(3248);energies_ionization.push_back(4940);energies_ionization.push_back(6990);energies_ionization.push_back(9220);energies_ionization.push_back(11500);energies_ionization.push_back(18770);energies_ionization.push_back(21400);energies_ionization.push_back(23960);energies_ionization.push_back(27590);energies_ionization.push_back(30330);energies_ionization.push_back(33150);energies_ionization.push_back(38880);energies_ionization.push_back(41987);energies_ionization.push_back(109480);energies_ionization.push_back(118100);energies_ionization.push_back(127100);energies_ionization.push_back(138600);energies_ionization.push_back(148500);energies_ionization.push_back(158600);  //CO20201111
-      phi_star_Miedema=4.45;
-      nws_Miedema=1.61;
-      gamma_s_Miedema=1600;
+      work_function_Miedema=4.45;
+      density_line_electron_WS_Miedema=1.61;
+      energy_surface_0K_Miedema=1600;
       scale_Pettifor=0.94;
       temperature_boiling=2061;
       temperature_melting=1246;
-      fusion_heat_PT=13.2;  //CO20201111
-      vaporization_heat_PT=220;
+      enthalpy_fusion=13.2;  //CO20201111
+      enthalpy_vaporization=220;
+      enthalpy_atomization_WE=281;  //CO20201111
+      energy_cohesive=282;  //CO20201111
       specific_heat_PT=479;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -3586,7 +3656,7 @@ namespace xelement {
       modulus_Young=198;
       modulus_bulk=120;
       Poisson_ratio_PT=NNN;
-      BVm_Miedema=4.4;
+      modulus_bulk_x_volume_molar_Miedema=4.4;
       magnetic_type_PT="Paramagnetic";
       susceptibility_magnetic_mass=1.21E-7;
       susceptibility_magnetic_volume=0.00090387;
@@ -3618,7 +3688,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*55.847;
       volume_molar=7.0923E-6;
       volume=10.2315;
-      Vm_Miedema=3.7;
+      area_molar_Miedema=3.7;
       valence_std=8;
       valence_iupac=6;
       valence_PT=3;
@@ -3653,14 +3723,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3); oxidation_states_preferred.push_back(2); //RF+SK20200410 //Fe+3 most preferred oxidation number
       electron_affinity_PT=15.7;
       energies_ionization.clear();energies_ionization.push_back(762.5);energies_ionization.push_back(1561.9);energies_ionization.push_back(2957);energies_ionization.push_back(5290);energies_ionization.push_back(7240);energies_ionization.push_back(9560);energies_ionization.push_back(12060);energies_ionization.push_back(14580);energies_ionization.push_back(22540);energies_ionization.push_back(25290);energies_ionization.push_back(28000);energies_ionization.push_back(31920);energies_ionization.push_back(34830);energies_ionization.push_back(37840);energies_ionization.push_back(44100);energies_ionization.push_back(47206);energies_ionization.push_back(122200);energies_ionization.push_back(131000);energies_ionization.push_back(140500);energies_ionization.push_back(152600);energies_ionization.push_back(163000);  //CO20201111
-      phi_star_Miedema=4.93;
-      nws_Miedema=1.77;
-      gamma_s_Miedema=2550;
+      work_function_Miedema=4.93;
+      density_line_electron_WS_Miedema=1.77;
+      energy_surface_0K_Miedema=2550;
       scale_Pettifor=0.99;
       temperature_boiling=2861;
       temperature_melting=1538;
-      fusion_heat_PT=13.8;  //CO20201111
-      vaporization_heat_PT=347;
+      enthalpy_fusion=13.8;  //CO20201111
+      enthalpy_vaporization=347;
+      enthalpy_atomization_WE=415;  //CO20201111
+      energy_cohesive=413;  //CO20201111
       specific_heat_PT=449;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -3676,7 +3748,7 @@ namespace xelement {
       modulus_Young=211;
       modulus_bulk=170;
       Poisson_ratio_PT=0.29;
-      BVm_Miedema=12.0;
+      modulus_bulk_x_volume_molar_Miedema=12.0;
       magnetic_type_PT="Ferromagnetic";
       susceptibility_magnetic_mass=NNN;
       susceptibility_magnetic_volume=NNN;
@@ -3708,7 +3780,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*58.9332;
       volume_molar=6.62E-6;
       volume=10.3205;
-      Vm_Miedema=3.5;
+      area_molar_Miedema=3.5;
       valence_std=9;
       valence_iupac=5;
       valence_PT=4;
@@ -3743,14 +3815,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(2);  //RF+SK20200410
       electron_affinity_PT=63.7;
       energies_ionization.clear();energies_ionization.push_back(760.4);energies_ionization.push_back(1648);energies_ionization.push_back(3232);energies_ionization.push_back(4950);energies_ionization.push_back(7670);energies_ionization.push_back(9840);energies_ionization.push_back(12440);energies_ionization.push_back(15230);energies_ionization.push_back(17959);energies_ionization.push_back(26570);energies_ionization.push_back(29400);energies_ionization.push_back(32400);energies_ionization.push_back(36600);energies_ionization.push_back(39700);energies_ionization.push_back(42800);energies_ionization.push_back(49396);energies_ionization.push_back(52737);energies_ionization.push_back(134810);energies_ionization.push_back(145170);energies_ionization.push_back(154700);energies_ionization.push_back(167400);  //CO20201111
-      phi_star_Miedema=5.10;
-      nws_Miedema=1.75;
-      gamma_s_Miedema=2550;
+      work_function_Miedema=5.10;
+      density_line_electron_WS_Miedema=1.75;
+      energy_surface_0K_Miedema=2550;
       scale_Pettifor=1.04;
       temperature_boiling=2927;
       temperature_melting=1495;
-      fusion_heat_PT=16.2;  //CO20201111
-      vaporization_heat_PT=375;
+      enthalpy_fusion=16.2;  //CO20201111
+      enthalpy_vaporization=375;
+      enthalpy_atomization_WE=426;  //CO20201111
+      energy_cohesive=424;  //CO20201111
       specific_heat_PT=421;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -3766,7 +3840,7 @@ namespace xelement {
       modulus_Young=209;
       modulus_bulk=180;
       Poisson_ratio_PT=0.31;
-      BVm_Miedema=13.0;
+      modulus_bulk_x_volume_molar_Miedema=13.0;
       magnetic_type_PT="Ferromagnetic";
       susceptibility_magnetic_mass=NNN;
       susceptibility_magnetic_volume=NNN;
@@ -3798,7 +3872,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*58.69;
       volume_molar=6.5888E-6;
       volume=10.8664;
-      Vm_Miedema=3.5;
+      area_molar_Miedema=3.5;
       valence_std=10;
       valence_iupac=4;
       valence_PT=2;
@@ -3833,14 +3907,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(2);  //RF+SK20200410
       electron_affinity_PT=112;
       energies_ionization.clear();energies_ionization.push_back(737.1);energies_ionization.push_back(1753);energies_ionization.push_back(3395);energies_ionization.push_back(5300);energies_ionization.push_back(7339);energies_ionization.push_back(10400);energies_ionization.push_back(12800);energies_ionization.push_back(15600);energies_ionization.push_back(18600);energies_ionization.push_back(21670);energies_ionization.push_back(30970);energies_ionization.push_back(34000);energies_ionization.push_back(37100);energies_ionization.push_back(41500);energies_ionization.push_back(44800);energies_ionization.push_back(48100);energies_ionization.push_back(55101);energies_ionization.push_back(58570);energies_ionization.push_back(148700);energies_ionization.push_back(159000);energies_ionization.push_back(169400);  //CO20201111
-      phi_star_Miedema=5.20;
-      nws_Miedema=1.75;
-      gamma_s_Miedema=2450;
+      work_function_Miedema=5.20;
+      density_line_electron_WS_Miedema=1.75;
+      energy_surface_0K_Miedema=2450;
       scale_Pettifor=1.09;
       temperature_boiling=2913;
       temperature_melting=1455;
-      fusion_heat_PT=17.2;  //CO20201111
-      vaporization_heat_PT=378;
+      enthalpy_fusion=17.2;  //CO20201111
+      enthalpy_vaporization=378;
+      enthalpy_atomization_WE=431;  //CO20201111
+      energy_cohesive=428;  //CO20201111
       specific_heat_PT=445;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -3856,7 +3932,7 @@ namespace xelement {
       modulus_Young=200;
       modulus_bulk=180;
       Poisson_ratio_PT=0.31;
-      BVm_Miedema=12.0;
+      modulus_bulk_x_volume_molar_Miedema=12.0;
       magnetic_type_PT="Ferromagnetic";
       susceptibility_magnetic_mass=NNN;
       susceptibility_magnetic_volume=NNN;
@@ -3888,7 +3964,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*63.546;
       volume_molar=7.0922E-6;
       volume=12.0159;
-      Vm_Miedema=3.7;
+      area_molar_Miedema=3.7;
       valence_std=11;
       valence_iupac=4;
       valence_PT=2;
@@ -3923,14 +3999,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(2); oxidation_states_preferred.push_back(1); //RF+SK20200410 //Cu+2 most preferred oxidation number
       electron_affinity_PT=118.4;
       energies_ionization.clear();energies_ionization.push_back(745.5);energies_ionization.push_back(1957.9);energies_ionization.push_back(3555);energies_ionization.push_back(5536);energies_ionization.push_back(7700);energies_ionization.push_back(9900);energies_ionization.push_back(13400);energies_ionization.push_back(16000);energies_ionization.push_back(19200);energies_ionization.push_back(22400);energies_ionization.push_back(25600);energies_ionization.push_back(35600);energies_ionization.push_back(38700);energies_ionization.push_back(42000);energies_ionization.push_back(46700);energies_ionization.push_back(50200);energies_ionization.push_back(53700);energies_ionization.push_back(61100);energies_ionization.push_back(64702);energies_ionization.push_back(163700);energies_ionization.push_back(174100);  //CO20201111
-      phi_star_Miedema=4.55;
-      nws_Miedema=1.47;
-      gamma_s_Miedema=1850;
+      work_function_Miedema=4.55;
+      density_line_electron_WS_Miedema=1.47;
+      energy_surface_0K_Miedema=1850;
       scale_Pettifor=1.20;
       temperature_boiling=2562;
       temperature_melting=1084.62;
-      fusion_heat_PT=13.1;  //CO20201111
-      vaporization_heat_PT=300;
+      enthalpy_fusion=13.1;  //CO20201111
+      enthalpy_vaporization=300;
+      enthalpy_atomization_WE=338;  //CO20201111
+      energy_cohesive=336;  //CO20201111
       specific_heat_PT=384.4;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -3946,7 +4024,7 @@ namespace xelement {
       modulus_Young=130;
       modulus_bulk=140;
       Poisson_ratio_PT=0.34;
-      BVm_Miedema=9.3;
+      modulus_bulk_x_volume_molar_Miedema=9.3;
       magnetic_type_PT="Diamagnetic";
       susceptibility_magnetic_mass=-1.08E-9;
       susceptibility_magnetic_volume=-9.63E-6;
@@ -3978,7 +4056,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*65.38;
       volume_molar=9.157E-6;
       volume=15.0827;
-      Vm_Miedema=4.4;
+      area_molar_Miedema=4.4;
       valence_std=12;
       valence_iupac=2;
       valence_PT=2;
@@ -4013,14 +4091,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(2);  //RF+SK20200410
       electron_affinity_PT=0;
       energies_ionization.clear();energies_ionization.push_back(906.4);energies_ionization.push_back(1733.3);energies_ionization.push_back(3833);energies_ionization.push_back(5731);energies_ionization.push_back(7970);energies_ionization.push_back(10400);energies_ionization.push_back(12900);energies_ionization.push_back(16800);energies_ionization.push_back(19600);energies_ionization.push_back(23000);energies_ionization.push_back(26400);energies_ionization.push_back(29990);energies_ionization.push_back(40490);energies_ionization.push_back(43800);energies_ionization.push_back(47300);energies_ionization.push_back(52300);energies_ionization.push_back(55900);energies_ionization.push_back(59700);energies_ionization.push_back(67300);energies_ionization.push_back(71200);energies_ionization.push_back(179100);  //CO20201111
-      phi_star_Miedema=4.10;
-      nws_Miedema=1.32;
-      gamma_s_Miedema=1020;
+      work_function_Miedema=4.10;
+      density_line_electron_WS_Miedema=1.32;
+      energy_surface_0K_Miedema=1020;
       scale_Pettifor=1.44;
       temperature_boiling=907;
       temperature_melting=419.53;
-      fusion_heat_PT=7.35;  //CO20201111
-      vaporization_heat_PT=119;
+      enthalpy_fusion=7.35;  //CO20201111
+      enthalpy_vaporization=119;
+      enthalpy_atomization_WE=131;  //CO20201111
+      energy_cohesive=130;  //CO20201111
       specific_heat_PT=388;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -4036,7 +4116,7 @@ namespace xelement {
       modulus_Young=108;
       modulus_bulk=70;
       Poisson_ratio_PT=0.25;
-      BVm_Miedema=5.5;
+      modulus_bulk_x_volume_molar_Miedema=5.5;
       magnetic_type_PT="Diamagnetic";
       susceptibility_magnetic_mass=-2.21E-9;
       susceptibility_magnetic_volume=-0.0000158;
@@ -4069,7 +4149,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*69.737;
       volume_molar=0.000011809;
       volume=18.9039;
-      Vm_Miedema=5.2;
+      area_molar_Miedema=5.2;
       valence_std=3;
       valence_iupac=3;
       valence_PT=3;
@@ -4104,14 +4184,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);  //RF+SK20200410
       electron_affinity_PT=28.9;
       energies_ionization.clear();energies_ionization.push_back(578.8);energies_ionization.push_back(1979.3);energies_ionization.push_back(2963);energies_ionization.push_back(6180);  //CO20201111
-      phi_star_Miedema=4.10;
-      nws_Miedema=1.31;
-      gamma_s_Miedema=830;
+      work_function_Miedema=4.10;
+      density_line_electron_WS_Miedema=1.31;
+      energy_surface_0K_Miedema=830;
       scale_Pettifor=1.68;
       temperature_boiling=2204;
       temperature_melting=29.76;
-      fusion_heat_PT=5.59;  //CO20201111
-      vaporization_heat_PT=256;
+      enthalpy_fusion=5.59;  //CO20201111
+      enthalpy_vaporization=256;
+      enthalpy_atomization_WE=277;  //CO20201111
+      energy_cohesive=271;  //CO20201111
       specific_heat_PT=371;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -4127,7 +4209,7 @@ namespace xelement {
       modulus_Young=NNN;
       modulus_bulk=NNN;
       Poisson_ratio_PT=NNN;
-      BVm_Miedema=6.7;
+      modulus_bulk_x_volume_molar_Miedema=6.7;
       magnetic_type_PT="Diamagnetic";
       susceptibility_magnetic_mass=-3E-9;
       susceptibility_magnetic_volume=-0.0000177;
@@ -4159,7 +4241,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*72.59;
       volume_molar=0.000013645;
       volume=19.2948;
-      Vm_Miedema=4.6;
+      area_molar_Miedema=4.6;
       valence_std=4;
       valence_iupac=4;
       valence_PT=4;
@@ -4194,14 +4276,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(4);  //RF+SK20200410
       electron_affinity_PT=119;
       energies_ionization.clear();energies_ionization.push_back(762);energies_ionization.push_back(1537.5);energies_ionization.push_back(3302.1);energies_ionization.push_back(4411);energies_ionization.push_back(9020);  //CO20201111
-      phi_star_Miedema=4.55;
-      nws_Miedema=1.37;
-      gamma_s_Miedema=1030;
+      work_function_Miedema=4.55;
+      density_line_electron_WS_Miedema=1.37;
+      energy_surface_0K_Miedema=1030;
       scale_Pettifor=1.92;
       temperature_boiling=2820;
       temperature_melting=938.3;
-      fusion_heat_PT=31.8;  //CO20201111
-      vaporization_heat_PT=334;
+      enthalpy_fusion=31.8;  //CO20201111
+      enthalpy_vaporization=334;
+      enthalpy_atomization_WE=377;  //CO20201111
+      energy_cohesive=372;  //CO20201111
       specific_heat_PT=321.4;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -4217,7 +4301,7 @@ namespace xelement {
       modulus_Young=NNN;
       modulus_bulk=NNN;
       Poisson_ratio_PT=NNN;
-      BVm_Miedema=10.5;
+      modulus_bulk_x_volume_molar_Miedema=10.5;
       magnetic_type_PT="Diamagnetic";
       susceptibility_magnetic_mass=-1.5E-9;
       susceptibility_magnetic_volume=-7.98E-6;
@@ -4249,7 +4333,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*74.9216;
       volume_molar=0.000013082;
       volume=19.0677;
-      Vm_Miedema=5.2;
+      area_molar_Miedema=5.2;
       valence_std=5;
       valence_iupac=5;
       valence_PT=5;
@@ -4284,14 +4368,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);  //RF+SK20200410
       electron_affinity_PT=78;
       energies_ionization.clear();energies_ionization.push_back(947);energies_ionization.push_back(1798);energies_ionization.push_back(2735);energies_ionization.push_back(4837);energies_ionization.push_back(6043);energies_ionization.push_back(12310);  //CO20201111
-      phi_star_Miedema=4.80;
-      nws_Miedema=1.44;
-      gamma_s_Miedema=1000;
+      work_function_Miedema=4.80;
+      density_line_electron_WS_Miedema=1.44;
+      energy_surface_0K_Miedema=1000;
       scale_Pettifor=2.16;
       temperature_boiling=614;
       temperature_melting=817;
-      fusion_heat_PT=27.7;  //CO20201111
-      vaporization_heat_PT=32.4;
+      enthalpy_fusion=27.7;  //CO20201111
+      enthalpy_vaporization=32.4;
+      enthalpy_atomization_WE=302;  //CO20201111
+      energy_cohesive=285.3;  //CO20201111
       specific_heat_PT=328;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -4307,7 +4393,7 @@ namespace xelement {
       modulus_Young=8;
       modulus_bulk=22;
       Poisson_ratio_PT=NNN;
-      BVm_Miedema=5.1;
+      modulus_bulk_x_volume_molar_Miedema=5.1;
       magnetic_type_PT="Diamagnetic";
       susceptibility_magnetic_mass=-3.9E-9;
       susceptibility_magnetic_volume=-0.0000223;
@@ -4339,7 +4425,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*78.96;
       volume_molar=0.000016387;
       volume=20.3733;
-      Vm_Miedema=5.172;
+      area_molar_Miedema=5.172;
       valence_std=6;
       valence_iupac=6;
       valence_PT=6;
@@ -4374,14 +4460,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(4);  //RF+SK20200410
       electron_affinity_PT=195;
       energies_ionization.clear();energies_ionization.push_back(941);energies_ionization.push_back(2045);energies_ionization.push_back(2973.7);energies_ionization.push_back(4144);energies_ionization.push_back(6590);energies_ionization.push_back(7880);energies_ionization.push_back(14990);  //CO20201111
-      phi_star_Miedema=5.17;
-      nws_Miedema=1.40;
-      gamma_s_Miedema=NNN;
+      work_function_Miedema=5.17;
+      density_line_electron_WS_Miedema=1.40;
+      energy_surface_0K_Miedema=NNN;
       scale_Pettifor=2.40;
       temperature_boiling=685;
       temperature_melting=221;
-      fusion_heat_PT=5.4;  //CO20201111
-      vaporization_heat_PT=26;
+      enthalpy_fusion=5.4;  //CO20201111
+      enthalpy_vaporization=26;
+      enthalpy_atomization_WE=227;  //CO20201111
+      energy_cohesive=237;  //CO20201111
       specific_heat_PT=321.2;
       critical_pressure=268.4;
       critical_temperature_PT=1766;
@@ -4397,7 +4485,7 @@ namespace xelement {
       modulus_Young=10;
       modulus_bulk=8.3;
       Poisson_ratio_PT=0.33;
-      BVm_Miedema=NNN;
+      modulus_bulk_x_volume_molar_Miedema=NNN;
       magnetic_type_PT="Diamagnetic";
       susceptibility_magnetic_mass=-4E-9;
       susceptibility_magnetic_volume=-0.0000193;
@@ -4429,7 +4517,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*79.904;
       volume_molar=0.00002561;
       volume=26.3292;
-      Vm_Miedema=7.31;
+      area_molar_Miedema=7.31;
       valence_std=7;
       valence_iupac=7;
       valence_PT=5;
@@ -4464,14 +4552,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(-1); //RF+SK20200410
       electron_affinity_PT=324.6;
       energies_ionization.clear();energies_ionization.push_back(1139.9);energies_ionization.push_back(2103);energies_ionization.push_back(3470);energies_ionization.push_back(4560);energies_ionization.push_back(5760);energies_ionization.push_back(8550);energies_ionization.push_back(9940);energies_ionization.push_back(18600);  //CO20201111
-      phi_star_Miedema=5.20;
-      nws_Miedema=1.35;
-      gamma_s_Miedema=943;
+      work_function_Miedema=5.20;
+      density_line_electron_WS_Miedema=1.35;
+      energy_surface_0K_Miedema=943;
       scale_Pettifor=2.64;
       temperature_boiling=59;
       temperature_melting=-7.3;
-      fusion_heat_PT=5.8;  //CO20201111
-      vaporization_heat_PT=14.8;
+      enthalpy_fusion=5.8;  //CO20201111
+      enthalpy_vaporization=14.8;
+      enthalpy_atomization_WE=112;  //CO20201111
+      energy_cohesive=118;  //CO20201111
       specific_heat_PT=947.3;
       critical_pressure=102;
       critical_temperature_PT=588;
@@ -4487,7 +4577,7 @@ namespace xelement {
       modulus_Young=NNN;
       modulus_bulk=1.9;
       Poisson_ratio_PT=NNN;
-      BVm_Miedema=3.4;
+      modulus_bulk_x_volume_molar_Miedema=3.4;
       magnetic_type_PT="Diamagnetic";
       susceptibility_magnetic_mass=-4.9E-9;
       susceptibility_magnetic_volume=-0.0000153;
@@ -4519,7 +4609,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*83.8;
       volume_molar=0.02235;
       volume=-1.0000;
-      Vm_Miedema=NNN;
+      area_molar_Miedema=NNN;
       valence_std=0;
       valence_iupac=2;
       valence_PT=2;
@@ -4554,14 +4644,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(2);  //RF+SK20200410
       electron_affinity_PT=0;
       energies_ionization.clear();energies_ionization.push_back(1350.8);energies_ionization.push_back(2350.4);energies_ionization.push_back(3565);energies_ionization.push_back(5070);energies_ionization.push_back(6240);energies_ionization.push_back(7570);energies_ionization.push_back(10710);energies_ionization.push_back(12138);energies_ionization.push_back(22274);energies_ionization.push_back(25880);energies_ionization.push_back(29700);energies_ionization.push_back(33800);energies_ionization.push_back(37700);energies_ionization.push_back(43100);energies_ionization.push_back(47500);energies_ionization.push_back(52200);energies_ionization.push_back(57100);energies_ionization.push_back(61800);energies_ionization.push_back(75800);energies_ionization.push_back(80400);energies_ionization.push_back(85300);  //CO20201111
-      phi_star_Miedema=NNN;
-      nws_Miedema=NNN;
-      gamma_s_Miedema=NNN;
+      work_function_Miedema=NNN;
+      density_line_electron_WS_Miedema=NNN;
+      energy_surface_0K_Miedema=NNN;
       scale_Pettifor=0;
       temperature_boiling=-153.22;
       temperature_melting=-157.36;
-      fusion_heat_PT=1.64;  //CO20201111
-      vaporization_heat_PT=9.02;
+      enthalpy_fusion=1.64;  //CO20201111
+      enthalpy_vaporization=9.02;
+      enthalpy_atomization_WE=0;  //CO20201111
+      energy_cohesive=11.2;  //CO20201111
       specific_heat_PT=248.05;
       critical_pressure=54.28;
       critical_temperature_PT=209.41;
@@ -4577,7 +4669,7 @@ namespace xelement {
       modulus_Young=NNN;
       modulus_bulk=NNN;
       Poisson_ratio_PT=NNN;
-      BVm_Miedema=NNN;
+      modulus_bulk_x_volume_molar_Miedema=NNN;
       magnetic_type_PT="Diamagnetic";
       susceptibility_magnetic_mass=-4.4E-9;
       susceptibility_magnetic_volume=-1.65E-8;
@@ -4611,7 +4703,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*85.4678;
       volume_molar=0.000055788;
       volume=91.2738;
-      Vm_Miedema=14.6;
+      area_molar_Miedema=14.6;
       valence_std=1;
       valence_iupac=1;
       valence_PT=1;
@@ -4646,14 +4738,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(1);  //RF+SK20200410
       electron_affinity_PT=46.9;
       energies_ionization.clear();energies_ionization.push_back(403);energies_ionization.push_back(2633);energies_ionization.push_back(3860);energies_ionization.push_back(5080);energies_ionization.push_back(6850);energies_ionization.push_back(8140);energies_ionization.push_back(9570);energies_ionization.push_back(13120);energies_ionization.push_back(14500);energies_ionization.push_back(26740);  //CO20201111
-      phi_star_Miedema=2.10;
-      nws_Miedema=0.60;
-      gamma_s_Miedema=120;
+      work_function_Miedema=2.10;
+      density_line_electron_WS_Miedema=0.60;
+      energy_surface_0K_Miedema=120;
       scale_Pettifor=0.30;
       temperature_boiling=688;
       temperature_melting=39.31;
-      fusion_heat_PT=2.19;  //CO20201111
-      vaporization_heat_PT=71;
+      enthalpy_fusion=2.19;  //CO20201111
+      enthalpy_vaporization=71;
+      enthalpy_atomization_WE=81;  //CO20201111
+      energy_cohesive=82.2;  //CO20201111
       specific_heat_PT=364;
       critical_pressure=157.9;
       critical_temperature_PT=2093;
@@ -4669,7 +4763,7 @@ namespace xelement {
       modulus_Young=2.4;
       modulus_bulk=2.5;
       Poisson_ratio_PT=NNN;
-      BVm_Miedema=1.8;
+      modulus_bulk_x_volume_molar_Miedema=1.8;
       magnetic_type_PT="Paramagnetic";
       susceptibility_magnetic_mass=2.6E-9;
       susceptibility_magnetic_volume=3.98E-6;
@@ -4701,7 +4795,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*87.62;
       volume_molar=0.000033316;
       volume=55.4105;
-      Vm_Miedema=10.2;
+      area_molar_Miedema=10.2;
       valence_std=2;
       valence_iupac=2;
       valence_PT=2;
@@ -4736,14 +4830,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(2);  //RF+SK20200410
       electron_affinity_PT=5.03;
       energies_ionization.clear();energies_ionization.push_back(549.5);energies_ionization.push_back(1064.2);energies_ionization.push_back(4138);energies_ionization.push_back(5500);energies_ionization.push_back(6910);energies_ionization.push_back(8760);energies_ionization.push_back(10230);energies_ionization.push_back(11800);energies_ionization.push_back(15600);energies_ionization.push_back(17100);  //CO20201111
-      phi_star_Miedema=2.40;
-      nws_Miedema=0.84;
-      gamma_s_Miedema=430;
+      work_function_Miedema=2.40;
+      density_line_electron_WS_Miedema=0.84;
+      energy_surface_0K_Miedema=430;
       scale_Pettifor=0.55;
       temperature_boiling=1382;
       temperature_melting=777;
-      fusion_heat_PT=8;  //CO20201111
-      vaporization_heat_PT=137;
+      enthalpy_fusion=8;  //CO20201111
+      enthalpy_vaporization=137;
+      enthalpy_atomization_WE=164;  //CO20201111
+      energy_cohesive=166;  //CO20201111
       specific_heat_PT=300;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -4759,7 +4855,7 @@ namespace xelement {
       modulus_Young=NNN;
       modulus_bulk=NNN;
       Poisson_ratio_PT=0.28;
-      BVm_Miedema=3.9;
+      modulus_bulk_x_volume_molar_Miedema=3.9;
       magnetic_type_PT="Paramagnetic";
       susceptibility_magnetic_mass=1.32E-9;
       susceptibility_magnetic_volume=3.47E-6;
@@ -4792,7 +4888,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*88.9059;
       volume_molar=0.000019881;
       volume=32.4546;
-      Vm_Miedema=7.3;
+      area_molar_Miedema=7.3;
       valence_std=3;
       valence_iupac=3;
       valence_PT=3;
@@ -4827,14 +4923,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);  //RF+SK20200410
       electron_affinity_PT=29.6;
       energies_ionization.clear();energies_ionization.push_back(600);energies_ionization.push_back(1180);energies_ionization.push_back(1980);energies_ionization.push_back(5847);energies_ionization.push_back(7430);energies_ionization.push_back(8970);energies_ionization.push_back(11190);energies_ionization.push_back(12450);energies_ionization.push_back(14110);energies_ionization.push_back(18400);  //CO20201111
-      phi_star_Miedema=3.20;
-      nws_Miedema=1.21;
-      gamma_s_Miedema=1100;
+      work_function_Miedema=3.20;
+      density_line_electron_WS_Miedema=1.21;
+      energy_surface_0K_Miedema=1100;
       scale_Pettifor=0.70;
       temperature_boiling=3345;
       temperature_melting=1526;
-      fusion_heat_PT=11.4;  //CO20201111
-      vaporization_heat_PT=380;
+      enthalpy_fusion=11.4;  //CO20201111
+      enthalpy_vaporization=380;
+      enthalpy_atomization_WE=425;  //CO20201111
+      energy_cohesive=422;  //CO20201111
       specific_heat_PT=298;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -4850,7 +4948,7 @@ namespace xelement {
       modulus_Young=64;
       modulus_bulk=41;
       Poisson_ratio_PT=0.24;
-      BVm_Miedema=7.2;
+      modulus_bulk_x_volume_molar_Miedema=7.2;
       magnetic_type_PT="Paramagnetic";
       susceptibility_magnetic_mass=6.66E-8;
       susceptibility_magnetic_volume=0.0002978;
@@ -4882,7 +4980,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*91.22;
       volume_molar=0.000014011;
       volume=23.2561;
-      Vm_Miedema=5.8;
+      area_molar_Miedema=5.8;
       valence_std=4;
       valence_iupac=4;
       valence_PT=4;
@@ -4917,14 +5015,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(4);  //RF+SK20200410
       electron_affinity_PT=41.1;
       energies_ionization.clear();energies_ionization.push_back(640.1);energies_ionization.push_back(1270);energies_ionization.push_back(2218);energies_ionization.push_back(3313);energies_ionization.push_back(7752);energies_ionization.push_back(9500);  //CO20201111
-      phi_star_Miedema=3.40;
-      nws_Miedema=1.39;
-      gamma_s_Miedema=1950;
+      work_function_Miedema=3.40;
+      density_line_electron_WS_Miedema=1.39;
+      energy_surface_0K_Miedema=1950;
       scale_Pettifor=0.76;
       temperature_boiling=4409;
       temperature_melting=1855;
-      fusion_heat_PT=21;  //CO20201111
-      vaporization_heat_PT=580;
+      enthalpy_fusion=21;  //CO20201111
+      enthalpy_vaporization=580;
+      enthalpy_atomization_WE=605;  //CO20201111
+      energy_cohesive=603;  //CO20201111
       specific_heat_PT=278;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -4940,7 +5040,7 @@ namespace xelement {
       modulus_Young=67;
       modulus_bulk=NNN;
       Poisson_ratio_PT=0.34;
-      BVm_Miedema=12.0;
+      modulus_bulk_x_volume_molar_Miedema=12.0;
       magnetic_type_PT="Paramagnetic";
       susceptibility_magnetic_mass=1.68E-8;
       susceptibility_magnetic_volume=0.000109;
@@ -4972,7 +5072,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*92.9064;
       volume_molar=0.000010841;
       volume=18.3132;
-      Vm_Miedema=4.9;
+      area_molar_Miedema=4.9;
       valence_std=5;
       valence_iupac=5;
       valence_PT=5;
@@ -5007,14 +5107,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(5);  //RF+SK20200410
       electron_affinity_PT=86.1;
       energies_ionization.clear();energies_ionization.push_back(652.1);energies_ionization.push_back(1380);energies_ionization.push_back(2416);energies_ionization.push_back(3700);energies_ionization.push_back(4877);energies_ionization.push_back(9847);energies_ionization.push_back(12100);  //CO20201111
-      phi_star_Miedema=4.00;
-      nws_Miedema=1.62;
-      gamma_s_Miedema=2700;
+      work_function_Miedema=4.00;
+      density_line_electron_WS_Miedema=1.62;
+      energy_surface_0K_Miedema=2700;
       scale_Pettifor=0.82;
       temperature_boiling=4744;
       temperature_melting=2477;
-      fusion_heat_PT=26.8;  //CO20201111
-      vaporization_heat_PT=690;
+      enthalpy_fusion=26.8;  //CO20201111
+      enthalpy_vaporization=690;
+      enthalpy_atomization_WE=733;  //CO20201111
+      energy_cohesive=730;  //CO20201111
       specific_heat_PT=265;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -5030,7 +5132,7 @@ namespace xelement {
       modulus_Young=105;
       modulus_bulk=170;
       Poisson_ratio_PT=0.4;
-      BVm_Miedema=18.0;
+      modulus_bulk_x_volume_molar_Miedema=18.0;
       magnetic_type_PT="Paramagnetic";
       susceptibility_magnetic_mass=2.76E-8;
       susceptibility_magnetic_volume=0.000237;
@@ -5062,7 +5164,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*95.94;
       volume_molar=9.334E-6;
       volume=15.6175;
-      Vm_Miedema=4.4;
+      area_molar_Miedema=4.4;
       valence_std=6;
       valence_iupac=6;
       valence_PT=6;
@@ -5097,14 +5199,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(6);  //RF+SK20200410
       electron_affinity_PT=71.9;
       energies_ionization.clear();energies_ionization.push_back(684.3);energies_ionization.push_back(1560);energies_ionization.push_back(2618);energies_ionization.push_back(4480);energies_ionization.push_back(5257);energies_ionization.push_back(6640.8);energies_ionization.push_back(12125);energies_ionization.push_back(13860);energies_ionization.push_back(15835);energies_ionization.push_back(17980);energies_ionization.push_back(20190);energies_ionization.push_back(22219);energies_ionization.push_back(26930);energies_ionization.push_back(29196);energies_ionization.push_back(52490);energies_ionization.push_back(55000);energies_ionization.push_back(61400);energies_ionization.push_back(67700);energies_ionization.push_back(74000);energies_ionization.push_back(80400);energies_ionization.push_back(87000);  //CO20201111
-      phi_star_Miedema=4.65;
-      nws_Miedema=1.77;
-      gamma_s_Miedema=2950;
+      work_function_Miedema=4.65;
+      density_line_electron_WS_Miedema=1.77;
+      energy_surface_0K_Miedema=2950;
       scale_Pettifor=0.88;
       temperature_boiling=4639;
       temperature_melting=2623;
-      fusion_heat_PT=36;  //CO20201111
-      vaporization_heat_PT=600;
+      enthalpy_fusion=36;  //CO20201111
+      enthalpy_vaporization=600;
+      enthalpy_atomization_WE=659;  //CO20201111
+      energy_cohesive=658;  //CO20201111
       specific_heat_PT=251;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -5120,7 +5224,7 @@ namespace xelement {
       modulus_Young=329;
       modulus_bulk=230;
       Poisson_ratio_PT=0.31;
-      BVm_Miedema=26.0;
+      modulus_bulk_x_volume_molar_Miedema=26.0;
       magnetic_type_PT="Paramagnetic";
       susceptibility_magnetic_mass=1.17E-8;
       susceptibility_magnetic_volume=0.0001203;
@@ -5152,7 +5256,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*98.9062;
       volume_molar=8.434782608696E-6;
       volume=14.4670;
-      Vm_Miedema=4.2;
+      area_molar_Miedema=4.2;
       valence_std=7;
       valence_iupac=7;
       valence_PT=6;
@@ -5187,14 +5291,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(7);  //RF+SK20200410
       electron_affinity_PT=53;
       energies_ionization.clear();energies_ionization.push_back(702);energies_ionization.push_back(1470);energies_ionization.push_back(2850);  //CO20201111
-      phi_star_Miedema=5.30;
-      nws_Miedema=1.81;
-      gamma_s_Miedema=3050;
+      work_function_Miedema=5.30;
+      density_line_electron_WS_Miedema=1.81;
+      energy_surface_0K_Miedema=3050;
       scale_Pettifor=0.94;
       temperature_boiling=4265;
       temperature_melting=2157;
-      fusion_heat_PT=23;  //CO20201111
-      vaporization_heat_PT=550;
+      enthalpy_fusion=23;  //CO20201111
+      enthalpy_vaporization=550;
+      enthalpy_atomization_WE=661;  //CO20201111
+      energy_cohesive=661;  //CO20201111
       specific_heat_PT=63;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -5210,7 +5316,7 @@ namespace xelement {
       modulus_Young=NNN;
       modulus_bulk=NNN;
       Poisson_ratio_PT=NNN;
-      BVm_Miedema=26.0;
+      modulus_bulk_x_volume_molar_Miedema=26.0;
       magnetic_type_PT="Paramagnetic";
       susceptibility_magnetic_mass=3.42E-8;
       susceptibility_magnetic_volume=0.0003933;
@@ -5242,7 +5348,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*101.07;
       volume_molar=8.1706E-6;
       volume=13.8390;
-      Vm_Miedema=4.1;
+      area_molar_Miedema=4.1;
       valence_std=8;
       valence_iupac=8;
       valence_PT=6;
@@ -5277,14 +5383,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(4); oxidation_states_preferred.push_back(3); //RF+SK20200410
       electron_affinity_PT=101.3;
       energies_ionization.clear();energies_ionization.push_back(710.2);energies_ionization.push_back(1620);energies_ionization.push_back(2747);  //CO20201111
-      phi_star_Miedema=5.40;
-      nws_Miedema=1.83;
-      gamma_s_Miedema=3050;
+      work_function_Miedema=5.40;
+      density_line_electron_WS_Miedema=1.83;
+      energy_surface_0K_Miedema=3050;
       scale_Pettifor=1.00;
       temperature_boiling=4150;
       temperature_melting=2334;
-      fusion_heat_PT=25.7;  //CO20201111
-      vaporization_heat_PT=580;
+      enthalpy_fusion=25.7;  //CO20201111
+      enthalpy_vaporization=580;
+      enthalpy_atomization_WE=652;  //CO20201111
+      energy_cohesive=650;  //CO20201111
       specific_heat_PT=238;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -5300,7 +5408,7 @@ namespace xelement {
       modulus_Young=447;
       modulus_bulk=220;
       Poisson_ratio_PT=0.3;
-      BVm_Miedema=26.0;
+      modulus_bulk_x_volume_molar_Miedema=26.0;
       magnetic_type_PT="Paramagnetic";
       susceptibility_magnetic_mass=5.42E-9;
       susceptibility_magnetic_volume=0.000067;
@@ -5332,7 +5440,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*102.9055;
       volume_molar=8.2655E-6;
       volume=14.1731;
-      Vm_Miedema=4.1;
+      area_molar_Miedema=4.1;
       valence_std=9;
       valence_iupac=6;
       valence_PT=6;
@@ -5367,14 +5475,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3); oxidation_states_preferred.push_back(1); //RF+SK20200410
       electron_affinity_PT=109.7;
       energies_ionization.clear();energies_ionization.push_back(719.7);energies_ionization.push_back(1740);energies_ionization.push_back(2997);  //CO20201111
-      phi_star_Miedema=5.40;
-      nws_Miedema=1.76;
-      gamma_s_Miedema=2750;
+      work_function_Miedema=5.40;
+      density_line_electron_WS_Miedema=1.76;
+      energy_surface_0K_Miedema=2750;
       scale_Pettifor=1.06;
       temperature_boiling=3695;
       temperature_melting=1964;
-      fusion_heat_PT=21.7;  //CO20201111
-      vaporization_heat_PT=495;
+      enthalpy_fusion=21.7;  //CO20201111
+      enthalpy_vaporization=495;
+      enthalpy_atomization_WE=556;  //CO20201111
+      energy_cohesive=554;  //CO20201111
       specific_heat_PT=240;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -5390,7 +5500,7 @@ namespace xelement {
       modulus_Young=275;
       modulus_bulk=380;
       Poisson_ratio_PT=0.26;
-      BVm_Miedema=23.0;
+      modulus_bulk_x_volume_molar_Miedema=23.0;
       magnetic_type_PT="Paramagnetic";
       susceptibility_magnetic_mass=1.36E-8;
       susceptibility_magnetic_volume=0.0001693;
@@ -5422,7 +5532,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*106.4;
       volume_molar=8.8514E-6;
       volume=15.4596;
-      Vm_Miedema=4.3;
+      area_molar_Miedema=4.3;
       valence_std=10;
       valence_iupac=4;
       valence_PT=4;
@@ -5457,14 +5567,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(2);  //RF+SK20200410
       electron_affinity_PT=53.7;
       energies_ionization.clear();energies_ionization.push_back(804.4);energies_ionization.push_back(1870);energies_ionization.push_back(3177);  //CO20201111
-      phi_star_Miedema=5.45;
-      nws_Miedema=1.67;
-      gamma_s_Miedema=2100;
+      work_function_Miedema=5.45;
+      density_line_electron_WS_Miedema=1.67;
+      energy_surface_0K_Miedema=2100;
       scale_Pettifor=1.12;
       temperature_boiling=2963;
       temperature_melting=1554.9;
-      fusion_heat_PT=16.7;  //CO20201111
-      vaporization_heat_PT=380;
+      enthalpy_fusion=16.7;  //CO20201111
+      enthalpy_vaporization=380;
+      enthalpy_atomization_WE=377;  //CO20201111
+      energy_cohesive=376;  //CO20201111
       specific_heat_PT=240;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -5480,7 +5592,7 @@ namespace xelement {
       modulus_Young=121;
       modulus_bulk=180;
       Poisson_ratio_PT=0.39;
-      BVm_Miedema=16.0;
+      modulus_bulk_x_volume_molar_Miedema=16.0;
       magnetic_type_PT="Paramagnetic";
       susceptibility_magnetic_mass=6.57E-8;
       susceptibility_magnetic_volume=0.0007899;
@@ -5512,7 +5624,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*107.8682;
       volume_molar=0.000010283;
       volume=18.0678;
-      Vm_Miedema=4.7;
+      area_molar_Miedema=4.7;
       valence_std=11;
       valence_iupac=4;
       valence_PT=1;
@@ -5547,14 +5659,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(1);  //RF+SK20200410
       electron_affinity_PT=125.6;
       energies_ionization.clear();energies_ionization.push_back(731);energies_ionization.push_back(2070);energies_ionization.push_back(3361);  //CO20201111
-      phi_star_Miedema=4.45;
-      nws_Miedema=1.39;
-      gamma_s_Miedema=1250;
+      work_function_Miedema=4.45;
+      density_line_electron_WS_Miedema=1.39;
+      energy_surface_0K_Miedema=1250;
       scale_Pettifor=1.18;
       temperature_boiling=2162;
       temperature_melting=961.78;
-      fusion_heat_PT=11.3;  //CO20201111
-      vaporization_heat_PT=255;
+      enthalpy_fusion=11.3;  //CO20201111
+      enthalpy_vaporization=255;
+      enthalpy_atomization_WE=285;  //CO20201111
+      energy_cohesive=284;  //CO20201111
       specific_heat_PT=235;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -5570,7 +5684,7 @@ namespace xelement {
       modulus_Young=85;
       modulus_bulk=100;
       Poisson_ratio_PT=0.37;
-      BVm_Miedema=10.0;
+      modulus_bulk_x_volume_molar_Miedema=10.0;
       magnetic_type_PT="Diamagnetic";
       susceptibility_magnetic_mass=-2.27E-9;
       susceptibility_magnetic_volume=-0.0000238;
@@ -5602,7 +5716,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*112.41;
       volume_molar=0.000012996;
       volume=22.0408;
-      Vm_Miedema=5.5;
+      area_molar_Miedema=5.5;
       valence_std=12;
       valence_iupac=2;
       valence_PT=2;
@@ -5637,14 +5751,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(2);  //RF+SK20200410
       electron_affinity_PT=0;
       energies_ionization.clear();energies_ionization.push_back(867.8);energies_ionization.push_back(1631.4);energies_ionization.push_back(3616);  //CO20201111
-      phi_star_Miedema=4.05;
-      nws_Miedema=1.24;
-      gamma_s_Miedema=780;
+      work_function_Miedema=4.05;
+      density_line_electron_WS_Miedema=1.24;
+      energy_surface_0K_Miedema=780;
       scale_Pettifor=1.36;
       temperature_boiling=767;
       temperature_melting=321.07;
-      fusion_heat_PT=6.3;  //CO20201111
-      vaporization_heat_PT=100;
+      enthalpy_fusion=6.3;  //CO20201111
+      enthalpy_vaporization=100;
+      enthalpy_atomization_WE=112;  //CO20201111
+      energy_cohesive=112;  //CO20201111
       specific_heat_PT=230;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -5660,7 +5776,7 @@ namespace xelement {
       modulus_Young=50;
       modulus_bulk=42;
       Poisson_ratio_PT=0.3;
-      BVm_Miedema=6.10;
+      modulus_bulk_x_volume_molar_Miedema=6.10;
       magnetic_type_PT="Diamagnetic";
       susceptibility_magnetic_mass=-2.3E-9;
       susceptibility_magnetic_volume=-0.0000199;
@@ -5693,7 +5809,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*114.82;
       volume_molar=0.000015707;
       volume=27.5233;
-      Vm_Miedema=6.3;
+      area_molar_Miedema=6.3;
       valence_std=3;
       valence_iupac=3;
       valence_PT=3;
@@ -5728,14 +5844,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);  //RF+SK20200410
       electron_affinity_PT=28.9;
       energies_ionization.clear();energies_ionization.push_back(558.3);energies_ionization.push_back(1820.7);energies_ionization.push_back(2704);energies_ionization.push_back(5210);  //CO20201111
-      phi_star_Miedema=3.90;
-      nws_Miedema=1.17;
-      gamma_s_Miedema=690;
+      work_function_Miedema=3.90;
+      density_line_electron_WS_Miedema=1.17;
+      energy_surface_0K_Miedema=690;
       scale_Pettifor=1.60;
       temperature_boiling=2072;
       temperature_melting=156.6;
-      fusion_heat_PT=3.26;  //CO20201111
-      vaporization_heat_PT=230;
+      enthalpy_fusion=3.26;  //CO20201111
+      enthalpy_vaporization=230;
+      enthalpy_atomization_WE=243;  //CO20201111
+      energy_cohesive=243;  //CO20201111
       specific_heat_PT=233;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -5751,7 +5869,7 @@ namespace xelement {
       modulus_Young=11;
       modulus_bulk=NNN;
       Poisson_ratio_PT=NNN;
-      BVm_Miedema=6.4;
+      modulus_bulk_x_volume_molar_Miedema=6.4;
       magnetic_type_PT="Diamagnetic";
       susceptibility_magnetic_mass=-1.4E-9;
       susceptibility_magnetic_volume=-0.0000102;
@@ -5783,7 +5901,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*118.69;
       volume_molar=0.000016239;
       volume=27.5555;
-      Vm_Miedema=6.4;
+      area_molar_Miedema=6.4;
       valence_std=4;
       valence_iupac=4;
       valence_PT=4;
@@ -5818,14 +5936,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(4); oxidation_states_preferred.push_back(2); //RF+SK20200410
       electron_affinity_PT=107.3;
       energies_ionization.clear();energies_ionization.push_back(708.6);energies_ionization.push_back(1411.8);energies_ionization.push_back(2943);energies_ionization.push_back(3930.3);energies_ionization.push_back(7456);  //CO20201111
-      phi_star_Miedema=4.15;
-      nws_Miedema=1.24;
-      gamma_s_Miedema=710;
+      work_function_Miedema=4.15;
+      density_line_electron_WS_Miedema=1.24;
+      energy_surface_0K_Miedema=710;
       scale_Pettifor=1.84;
       temperature_boiling=2602;
       temperature_melting=231.93;
-      fusion_heat_PT=7;  //CO20201111
-      vaporization_heat_PT=290;
+      enthalpy_fusion=7;  //CO20201111
+      enthalpy_vaporization=290;
+      enthalpy_atomization_WE=302;  //CO20201111
+      energy_cohesive=303;  //CO20201111
       specific_heat_PT=217;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -5841,7 +5961,7 @@ namespace xelement {
       modulus_Young=50;
       modulus_bulk=58;
       Poisson_ratio_PT=0.36;
-      BVm_Miedema=8.8;
+      modulus_bulk_x_volume_molar_Miedema=8.8;
       magnetic_type_PT="Diamagnetic";
       susceptibility_magnetic_mass=-3.1E-9;
       susceptibility_magnetic_volume=-0.0000227;
@@ -5873,7 +5993,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*121.75;
       volume_molar=0.000018181;
       volume=27.1823;
-      Vm_Miedema=6.6;
+      area_molar_Miedema=6.6;
       valence_std=5;
       valence_iupac=5;
       valence_PT=5;
@@ -5908,14 +6028,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);  //RF+SK20200410
       electron_affinity_PT=103.2;
       energies_ionization.clear();energies_ionization.push_back(834);energies_ionization.push_back(1594.9);energies_ionization.push_back(2440);energies_ionization.push_back(4260);energies_ionization.push_back(5400);energies_ionization.push_back(10400);  //CO20201111
-      phi_star_Miedema=4.40;
-      nws_Miedema=1.26;
-      gamma_s_Miedema=680;
+      work_function_Miedema=4.40;
+      density_line_electron_WS_Miedema=1.26;
+      energy_surface_0K_Miedema=680;
       scale_Pettifor=2.08;
       temperature_boiling=1587;
       temperature_melting=630.63;
-      fusion_heat_PT=19.7;  //CO20201111
-      vaporization_heat_PT=67;
+      enthalpy_fusion=19.7;  //CO20201111
+      enthalpy_vaporization=67;    //CO20201111 - SMALL DISCREPANCY PERIODICTABLE VS WEBELEMENTS: 68 kJ/mol
+      enthalpy_atomization_WE=262;  //CO20201111
+      energy_cohesive=265;  //CO20201111
       specific_heat_PT=207;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -5931,7 +6053,7 @@ namespace xelement {
       modulus_Young=55;
       modulus_bulk=42;
       Poisson_ratio_PT=NNN;
-      BVm_Miedema=7.0;
+      modulus_bulk_x_volume_molar_Miedema=7.0;
       magnetic_type_PT="Diamagnetic";
       susceptibility_magnetic_mass=-1.09E-8;
       susceptibility_magnetic_volume=-0.000073;
@@ -5963,7 +6085,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*127.6;
       volume_molar=0.000020449;
       volume=28.1993;
-      Vm_Miedema=6.439;
+      area_molar_Miedema=6.439;
       valence_std=6;
       valence_iupac=6;
       valence_PT=6;
@@ -5998,14 +6120,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(4);  //RF+SK20200410
       electron_affinity_PT=190.2;
       energies_ionization.clear();energies_ionization.push_back(869.3);energies_ionization.push_back(1790);energies_ionization.push_back(2698);energies_ionization.push_back(3610);energies_ionization.push_back(5668);energies_ionization.push_back(6820);energies_ionization.push_back(13200);  //CO20201111
-      phi_star_Miedema=4.72;
-      nws_Miedema=1.31;
-      gamma_s_Miedema=NNN;
+      work_function_Miedema=4.72;
+      density_line_electron_WS_Miedema=1.31;
+      energy_surface_0K_Miedema=NNN;
       scale_Pettifor=2.32;
       temperature_boiling=988;
       temperature_melting=449.51;
-      fusion_heat_PT=17.5;  //CO20201111
-      vaporization_heat_PT=48;
+      enthalpy_fusion=17.5;  //CO20201111
+      enthalpy_vaporization=48;
+      enthalpy_atomization_WE=197;  //CO20201111
+      energy_cohesive=211;  //CO20201111
       specific_heat_PT=201;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -6021,7 +6145,7 @@ namespace xelement {
       modulus_Young=43;
       modulus_bulk=64;
       Poisson_ratio_PT=NNN;
-      BVm_Miedema=NNN;
+      modulus_bulk_x_volume_molar_Miedema=NNN;
       magnetic_type_PT="Diamagnetic";
       susceptibility_magnetic_mass=-3.9E-9;
       susceptibility_magnetic_volume=-0.0000243;
@@ -6053,7 +6177,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*126.9045;
       volume_molar=0.000025689;
       volume=34.9784;
-      Vm_Miedema=8.72;
+      area_molar_Miedema=8.72;
       valence_std=7;
       valence_iupac=7;
       valence_PT=7;
@@ -6088,14 +6212,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(-1); //RF+SK20200410
       electron_affinity_PT=295.2;
       energies_ionization.clear();energies_ionization.push_back(1008.4);energies_ionization.push_back(1845.9);energies_ionization.push_back(3180);  //CO20201111
-      phi_star_Miedema=5.33;
-      nws_Miedema=0.17;
-      gamma_s_Miedema=NNN;
+      work_function_Miedema=5.33;
+      density_line_electron_WS_Miedema=0.17;
+      energy_surface_0K_Miedema=NNN;
       scale_Pettifor=2.56;
       temperature_boiling=184.3;
       temperature_melting=113.7;
-      fusion_heat_PT=7.76;  //CO20201111
-      vaporization_heat_PT=20.9;
+      enthalpy_fusion=7.76;  //CO20201111
+      enthalpy_vaporization=20.9;
+      enthalpy_atomization_WE=107;  //CO20201111
+      energy_cohesive=107;  //CO20201111
       specific_heat_PT=429;
       critical_pressure=115.5;
       critical_temperature_PT=819;
@@ -6111,7 +6237,7 @@ namespace xelement {
       modulus_Young=NNN;
       modulus_bulk=7.7;
       Poisson_ratio_PT=NNN;
-      BVm_Miedema=NNN;
+      modulus_bulk_x_volume_molar_Miedema=NNN;
       magnetic_type_PT="Diamagnetic";
       susceptibility_magnetic_mass=-4.5E-9;
       susceptibility_magnetic_volume=-0.0000222;
@@ -6143,7 +6269,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*131.3;
       volume_molar=0.0223;
       volume=-1.0000;
-      Vm_Miedema=NNN;
+      area_molar_Miedema=NNN;
       valence_std=0;
       valence_iupac=8;
       valence_PT=6;
@@ -6178,14 +6304,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
       electron_affinity_PT=0;
       energies_ionization.clear();energies_ionization.push_back(1170.4);energies_ionization.push_back(2046.4);energies_ionization.push_back(3099.4);  //CO20201111
-      phi_star_Miedema=NNN;
-      nws_Miedema=NNN;
-      gamma_s_Miedema=NNN;
+      work_function_Miedema=NNN;
+      density_line_electron_WS_Miedema=NNN;
+      energy_surface_0K_Miedema=NNN;
       scale_Pettifor=0;
       temperature_boiling=-108;
       temperature_melting=-111.8;
-      fusion_heat_PT=2.3;  //CO20201111
-      vaporization_heat_PT=12.64;
+      enthalpy_fusion=2.3;  //CO20201111
+      enthalpy_vaporization=12.64;
+      enthalpy_atomization_WE=0;  //CO20201111
+      energy_cohesive=15.9;  //CO20201111
       specific_heat_PT=158.32;
       critical_pressure=57.65;
       critical_temperature_PT=289.77;
@@ -6201,7 +6329,7 @@ namespace xelement {
       modulus_Young=NNN;
       modulus_bulk=NNN;
       Poisson_ratio_PT=NNN;
-      BVm_Miedema=NNN;
+      modulus_bulk_x_volume_molar_Miedema=NNN;
       magnetic_type_PT="Diamagnetic";
       susceptibility_magnetic_mass=-4.3E-9;
       susceptibility_magnetic_volume=-2.54E-8;
@@ -6235,7 +6363,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*132.9054;
       volume_molar=0.000070732;
       volume=117.281;
-      Vm_Miedema=16.8;
+      area_molar_Miedema=16.8;
       valence_std=1;
       valence_iupac=1;
       valence_PT=1;
@@ -6270,14 +6398,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(1);  //RF+SK20200410
       electron_affinity_PT=45.5;
       energies_ionization.clear();energies_ionization.push_back(375.7);energies_ionization.push_back(2234.3);energies_ionization.push_back(3400);  //CO20201111
-      phi_star_Miedema=1.95;
-      nws_Miedema=0.55;
-      gamma_s_Miedema=95;
+      work_function_Miedema=1.95;
+      density_line_electron_WS_Miedema=0.55;
+      energy_surface_0K_Miedema=95;
       scale_Pettifor=0.25;
       temperature_boiling=671;
       temperature_melting=28.44;
-      fusion_heat_PT=2.09;  //CO20201111
-      vaporization_heat_PT=64;
+      enthalpy_fusion=2.09;  //CO20201111
+      enthalpy_vaporization=64;  //CO20201111 - SMALL DISCREPANCY PERIODICTABLE VS WEBELEMENTS: 65 kJ/mol
+      enthalpy_atomization_WE=76;  //CO20201111
+      energy_cohesive=77.6;  //CO20201111
       specific_heat_PT=242;
       critical_pressure=92.77;
       critical_temperature_PT=1938;
@@ -6293,7 +6423,7 @@ namespace xelement {
       modulus_Young=1.7;
       modulus_bulk=1.6;
       Poisson_ratio_PT=NNN;
-      BVm_Miedema=1.4;
+      modulus_bulk_x_volume_molar_Miedema=1.4;
       magnetic_type_PT="Paramagnetic";
       susceptibility_magnetic_mass=2.8E-9;
       susceptibility_magnetic_volume=5.26E-6;
@@ -6325,7 +6455,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*137.33;
       volume_molar=0.000039125;
       volume=62.6649;
-      Vm_Miedema=11.3;
+      area_molar_Miedema=11.3;
       valence_std=2;
       valence_iupac=2;
       valence_PT=2;
@@ -6360,14 +6490,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(2);  //RF+SK20200410
       electron_affinity_PT=13.95;
       energies_ionization.clear();energies_ionization.push_back(502.9);energies_ionization.push_back(965.2);energies_ionization.push_back(3600);  //CO20201111
-      phi_star_Miedema=2.32;
-      nws_Miedema=0.81;
-      gamma_s_Miedema=370;
+      work_function_Miedema=2.32;
+      density_line_electron_WS_Miedema=0.81;
+      energy_surface_0K_Miedema=370;
       scale_Pettifor=0.50;
       temperature_boiling=1870;
       temperature_melting=727;
-      fusion_heat_PT=8;  //CO20201111
-      vaporization_heat_PT=140;
+      enthalpy_fusion=8;  //CO20201111
+      enthalpy_vaporization=140;
+      enthalpy_atomization_WE=182;  //CO20201111
+      energy_cohesive=183;  //CO20201111
       specific_heat_PT=205;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -6383,7 +6515,7 @@ namespace xelement {
       modulus_Young=13;
       modulus_bulk=9.4;
       Poisson_ratio_PT=NNN;
-      BVm_Miedema=3.9;
+      modulus_bulk_x_volume_molar_Miedema=3.9;
       magnetic_type_PT="Paramagnetic";
       susceptibility_magnetic_mass=1.13E-8;
       susceptibility_magnetic_volume=0.00003966;
@@ -6416,7 +6548,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*138.9055;
       volume_molar=0.000022601;
       volume=36.8495;
-      Vm_Miedema=8.0;
+      area_molar_Miedema=8.0;
       valence_std=3;
       valence_iupac=3;
       valence_PT=3;
@@ -6451,14 +6583,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);
       electron_affinity_PT=48;
       energies_ionization.clear();energies_ionization.push_back(538.1);energies_ionization.push_back(1067);energies_ionization.push_back(1850.3);energies_ionization.push_back(4819);energies_ionization.push_back(5940);  //CO20201111
-      phi_star_Miedema=3.05;
-      nws_Miedema=1.09;
-      gamma_s_Miedema=900;
+      work_function_Miedema=3.05;
+      density_line_electron_WS_Miedema=1.09;
+      energy_surface_0K_Miedema=900;
       scale_Pettifor=0.7480;
       temperature_boiling=3464;
       temperature_melting=919;
-      fusion_heat_PT=6.3;  //CO20201111
-      vaporization_heat_PT=400;
+      enthalpy_fusion=6.3;  //CO20201111 - SMALL DISCREPANCY PERIODICTABLE VS WEBELEMENTS: 6.2 kJ/mol
+      enthalpy_vaporization=400;
+      enthalpy_atomization_WE=431;  //CO20201111
+      energy_cohesive=431;  //CO20201111
       specific_heat_PT=195;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -6474,7 +6608,7 @@ namespace xelement {
       modulus_Young=37;
       modulus_bulk=28;
       Poisson_ratio_PT=0.28;
-      BVm_Miedema=5.5;
+      modulus_bulk_x_volume_molar_Miedema=5.5;
       magnetic_type_PT="Paramagnetic";
       susceptibility_magnetic_mass=1.1E-8;
       susceptibility_magnetic_volume=0.00006761;
@@ -6507,7 +6641,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*140.12;
       volume_molar=0.000020947;
       volume=26.4729;
-      Vm_Miedema=7.76;
+      area_molar_Miedema=7.76;
       valence_std=4;
       valence_iupac=4;
       valence_PT=4;
@@ -6542,14 +6676,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);
       electron_affinity_PT=50;
       energies_ionization.clear();energies_ionization.push_back(534.4);energies_ionization.push_back(1050);energies_ionization.push_back(1949);energies_ionization.push_back(3547);energies_ionization.push_back(6325);energies_ionization.push_back(7490);  //CO20201111
-      phi_star_Miedema=3.18;
-      nws_Miedema=1.19;
-      gamma_s_Miedema=NNN;
+      work_function_Miedema=3.18;
+      density_line_electron_WS_Miedema=1.19;
+      energy_surface_0K_Miedema=NNN;
       scale_Pettifor=0.7460;
       temperature_boiling=3360;
       temperature_melting=798;
-      fusion_heat_PT=5.5;  //CO20201111
-      vaporization_heat_PT=350;
+      enthalpy_fusion=5.5;  //CO20201111
+      enthalpy_vaporization=350;
+      enthalpy_atomization_WE=423;  //CO20201111
+      energy_cohesive=417;  //CO20201111
       specific_heat_PT=192;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -6565,7 +6701,7 @@ namespace xelement {
       modulus_Young=34;
       modulus_bulk=22;
       Poisson_ratio_PT=0.24;
-      BVm_Miedema=NNN;
+      modulus_bulk_x_volume_molar_Miedema=NNN;
       magnetic_type_PT="Paramagnetic";
       susceptibility_magnetic_mass=2.2E-7;
       susceptibility_magnetic_volume=0.0014716;
@@ -6597,7 +6733,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*140.9077;
       volume_molar=0.000021221;
       volume=36.4987;
-      Vm_Miedema=7.56;
+      area_molar_Miedema=7.56;
       valence_std=5;
       valence_iupac=4;
       valence_PT=4;
@@ -6632,14 +6768,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);
       electron_affinity_PT=50;
       energies_ionization.clear();energies_ionization.push_back(527);energies_ionization.push_back(1020);energies_ionization.push_back(2086);energies_ionization.push_back(3761);energies_ionization.push_back(5551);  //CO20201111
-      phi_star_Miedema=3.19;
-      nws_Miedema=1.20;
-      gamma_s_Miedema=NNN;
+      work_function_Miedema=3.19;
+      density_line_electron_WS_Miedema=1.20;
+      energy_surface_0K_Miedema=NNN;
       scale_Pettifor=0.7440;
       temperature_boiling=3290;
       temperature_melting=931;
-      fusion_heat_PT=6.9;  //CO20201111
-      vaporization_heat_PT=330;
+      enthalpy_fusion=6.9;  //CO20201111
+      enthalpy_vaporization=330;
+      enthalpy_atomization_WE=356;  //CO20201111
+      energy_cohesive=357;  //CO20201111
       specific_heat_PT=193;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -6655,7 +6793,7 @@ namespace xelement {
       modulus_Young=37;
       modulus_bulk=29;
       Poisson_ratio_PT=0.28;
-      BVm_Miedema=NNN;
+      modulus_bulk_x_volume_molar_Miedema=NNN;
       magnetic_type_PT="Paramagnetic";
       susceptibility_magnetic_mass=4.23E-7;
       susceptibility_magnetic_volume=0.0028087;
@@ -6687,7 +6825,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*144.24;
       volume_molar=0.000020577;
       volume=29.6719;
-      Vm_Miedema=7.51;
+      area_molar_Miedema=7.51;
       valence_std=6;
       valence_iupac=4;
       valence_PT=3;
@@ -6722,14 +6860,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);
       electron_affinity_PT=50;
       energies_ionization.clear();energies_ionization.push_back(533.1);energies_ionization.push_back(1040);energies_ionization.push_back(2130);energies_ionization.push_back(3900);  //CO20201111
-      phi_star_Miedema=3.19;
-      nws_Miedema=1.20;
-      gamma_s_Miedema=NNN;
+      work_function_Miedema=3.19;
+      density_line_electron_WS_Miedema=1.20;
+      energy_surface_0K_Miedema=NNN;
       scale_Pettifor=0.7420;
       temperature_boiling=3100;
       temperature_melting=1021;
-      fusion_heat_PT=7.1;  //CO20201111
-      vaporization_heat_PT=285;
+      enthalpy_fusion=7.1;  //CO20201111
+      enthalpy_vaporization=285;
+      enthalpy_atomization_WE=328;  //CO20201111
+      energy_cohesive=328;  //CO20201111
       specific_heat_PT=190;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -6745,7 +6885,7 @@ namespace xelement {
       modulus_Young=41;
       modulus_bulk=32;
       Poisson_ratio_PT=0.28;
-      BVm_Miedema=NNN;
+      modulus_bulk_x_volume_molar_Miedema=NNN;
       magnetic_type_PT="Paramagnetic";
       susceptibility_magnetic_mass=4.8E-7;
       susceptibility_magnetic_volume=0.0033648;
@@ -6777,7 +6917,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*146.92;
       volume_molar=0.00001996145374449;
       volume=34.6133;
-      Vm_Miedema=7.43;
+      area_molar_Miedema=7.43;
       valence_std=7;
       valence_iupac=3;
       valence_PT=3;
@@ -6812,14 +6952,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);
       electron_affinity_PT=50;
       energies_ionization.clear();energies_ionization.push_back(540);energies_ionization.push_back(1050);energies_ionization.push_back(2150);energies_ionization.push_back(3970);  //CO20201111
-      phi_star_Miedema=3.19;
-      nws_Miedema=1.21;
-      gamma_s_Miedema=NNN;
+      work_function_Miedema=3.19;
+      density_line_electron_WS_Miedema=1.21;
+      energy_surface_0K_Miedema=NNN;
       scale_Pettifor=0.7400;
       temperature_boiling=3000;
       temperature_melting=1100;
-      fusion_heat_PT=7.7;  //CO20201111
-      vaporization_heat_PT=290;
+      enthalpy_fusion=7.7;  //CO20201111
+      enthalpy_vaporization=290;
+      enthalpy_atomization_WE=350;  //CO20201111
+      energy_cohesive=NNN;  //CO20201111
       specific_heat_PT=NNN;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -6835,7 +6977,7 @@ namespace xelement {
       modulus_Young=46;
       modulus_bulk=33;
       Poisson_ratio_PT=0.28;
-      BVm_Miedema=NNN;
+      modulus_bulk_x_volume_molar_Miedema=NNN;
       magnetic_type_PT="NNN";
       susceptibility_magnetic_mass=NNN;
       susceptibility_magnetic_volume=NNN;
@@ -6867,7 +7009,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*150.4;
       volume_molar=0.000020449;
       volume=33.9484;
-      Vm_Miedema=7.37;
+      area_molar_Miedema=7.37;
       valence_std=8;
       valence_iupac=3;
       valence_PT=3;
@@ -6902,14 +7044,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);
       electron_affinity_PT=50;
       energies_ionization.clear();energies_ionization.push_back(544.5);energies_ionization.push_back(1070);energies_ionization.push_back(2260);energies_ionization.push_back(3990);  //CO20201111
-      phi_star_Miedema=3.20;
-      nws_Miedema=1.21;
-      gamma_s_Miedema=NNN;
+      work_function_Miedema=3.20;
+      density_line_electron_WS_Miedema=1.21;
+      energy_surface_0K_Miedema=NNN;
       scale_Pettifor=0.7380;
       temperature_boiling=1803;
       temperature_melting=1072;
-      fusion_heat_PT=8.5;  //CO20201111
-      vaporization_heat_PT=175;
+      enthalpy_fusion=8.5;  //CO20201111 - SMALL DISCREPANCY PERIODICTABLE VS WEBELEMENTS: 8.6 kJ/mol
+      enthalpy_vaporization=175;
+      enthalpy_atomization_WE=207;  //CO20201111
+      energy_cohesive=206;  //CO20201111
       specific_heat_PT=196;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -6925,7 +7069,7 @@ namespace xelement {
       modulus_Young=50;
       modulus_bulk=38;
       Poisson_ratio_PT=0.27;
-      BVm_Miedema=NNN;
+      modulus_bulk_x_volume_molar_Miedema=NNN;
       magnetic_type_PT="Paramagnetic";
       susceptibility_magnetic_mass=1.11E-7;
       susceptibility_magnetic_volume=0.00081618;
@@ -6957,7 +7101,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*151.96;
       volume_molar=0.000028979;
       volume=43.1719;
-      Vm_Miedema=7.36;
+      area_molar_Miedema=7.36;
       valence_std=9;
       valence_iupac=3;
       valence_PT=3;
@@ -6992,14 +7136,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);
       electron_affinity_PT=50;
       energies_ionization.clear();energies_ionization.push_back(547.1);energies_ionization.push_back(1085);energies_ionization.push_back(2404);energies_ionization.push_back(4120);  //CO20201111
-      phi_star_Miedema=3.20;
-      nws_Miedema=1.21;
-      gamma_s_Miedema=NNN;
+      work_function_Miedema=3.20;
+      density_line_electron_WS_Miedema=1.21;
+      energy_surface_0K_Miedema=NNN;
       scale_Pettifor=0.7360;
       temperature_boiling=1527;
       temperature_melting=822;
-      fusion_heat_PT=9.3;  //CO20201111
-      vaporization_heat_PT=175;
+      enthalpy_fusion=9.3;  //CO20201111 - SMALL DISCREPANCY PERIODICTABLE VS WEBELEMENTS: 9.2 kJ/mol
+      enthalpy_vaporization=175;
+      enthalpy_atomization_WE=175;  //CO20201111
+      energy_cohesive=179;  //CO20201111
       specific_heat_PT=182;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -7015,7 +7161,7 @@ namespace xelement {
       modulus_Young=18;
       modulus_bulk=8.3;
       Poisson_ratio_PT=0.15;
-      BVm_Miedema=NNN;
+      modulus_bulk_x_volume_molar_Miedema=NNN;
       magnetic_type_PT="Paramagnetic";
       susceptibility_magnetic_mass=2.76E-7;
       susceptibility_magnetic_volume=0.0014473;
@@ -7047,7 +7193,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*157.25;
       volume_molar=0.000019903;
       volume=32.5777;
-      Vm_Miedema=7.34;
+      area_molar_Miedema=7.34;
       valence_std=10;
       valence_iupac=3;
       valence_PT=3;
@@ -7082,14 +7228,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);
       electron_affinity_PT=50;
       energies_ionization.clear();energies_ionization.push_back(593.4);energies_ionization.push_back(1170);energies_ionization.push_back(1990);energies_ionization.push_back(4250);  //CO20201111
-      phi_star_Miedema=3.20;
-      nws_Miedema=1.21;
-      gamma_s_Miedema=NNN;
+      work_function_Miedema=3.20;
+      density_line_electron_WS_Miedema=1.21;
+      energy_surface_0K_Miedema=NNN;
       scale_Pettifor=0.7340;
       temperature_boiling=3250;
       temperature_melting=1313;
-      fusion_heat_PT=10;  //CO20201111
-      vaporization_heat_PT=305;
+      enthalpy_fusion=10;  //CO20201111
+      enthalpy_vaporization=305;
+      enthalpy_atomization_WE=398;  //CO20201111
+      energy_cohesive=400;  //CO20201111
       specific_heat_PT=240;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -7105,7 +7253,7 @@ namespace xelement {
       modulus_Young=55;
       modulus_bulk=38;
       Poisson_ratio_PT=0.26;
-      BVm_Miedema=NNN;
+      modulus_bulk_x_volume_molar_Miedema=NNN;
       magnetic_type_PT="Ferromagnetic";
       susceptibility_magnetic_mass=NNN;
       susceptibility_magnetic_volume=NNN;
@@ -7137,7 +7285,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*158.9254;
       volume_molar=0.000019336;
       volume=32.0200;
-      Vm_Miedema=7.20;
+      area_molar_Miedema=7.20;
       valence_std=11;
       valence_iupac=4;
       valence_PT=3;
@@ -7172,14 +7320,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);
       electron_affinity_PT=50;
       energies_ionization.clear();energies_ionization.push_back(565.8);energies_ionization.push_back(1110);energies_ionization.push_back(2114);energies_ionization.push_back(3839);  //CO20201111
-      phi_star_Miedema=3.21;
-      nws_Miedema=1.22;
-      gamma_s_Miedema=NNN;
+      work_function_Miedema=3.21;
+      density_line_electron_WS_Miedema=1.22;
+      energy_surface_0K_Miedema=NNN;
       scale_Pettifor=0.7320;
       temperature_boiling=3230;
       temperature_melting=1356;
-      fusion_heat_PT=10.8;  //CO20201111
-      vaporization_heat_PT=295;
+      enthalpy_fusion=10.8;  //CO20201111
+      enthalpy_vaporization=295;
+      enthalpy_atomization_WE=389;  //CO20201111
+      energy_cohesive=391;  //CO20201111
       specific_heat_PT=182;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -7195,7 +7345,7 @@ namespace xelement {
       modulus_Young=56;
       modulus_bulk=38.7;
       Poisson_ratio_PT=0.26;
-      BVm_Miedema=NNN;
+      modulus_bulk_x_volume_molar_Miedema=NNN;
       magnetic_type_PT="Paramagnetic";
       susceptibility_magnetic_mass=0.0000136;
       susceptibility_magnetic_volume=0.1117784;
@@ -7227,7 +7377,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*162.5;
       volume_molar=0.000019004;
       volume=31.5096;
-      Vm_Miedema=7.12;
+      area_molar_Miedema=7.12;
       valence_std=12;
       valence_iupac=4;
       valence_PT=3;
@@ -7262,14 +7412,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);
       electron_affinity_PT=50;
       energies_ionization.clear();energies_ionization.push_back(573);energies_ionization.push_back(1130);energies_ionization.push_back(2200);energies_ionization.push_back(3990);  //CO20201111
-      phi_star_Miedema=3.21;
-      nws_Miedema=1.22;
-      gamma_s_Miedema=NNN;
+      work_function_Miedema=3.21;
+      density_line_electron_WS_Miedema=1.22;
+      energy_surface_0K_Miedema=NNN;
       scale_Pettifor=0.7300;
       temperature_boiling=2567;
       temperature_melting=1412;
-      fusion_heat_PT=11.1;  //CO20201111
-      vaporization_heat_PT=280;
+      enthalpy_fusion=11.1;  //CO20201111
+      enthalpy_vaporization=280;
+      enthalpy_atomization_WE=290;  //CO20201111
+      energy_cohesive=294;  //CO20201111
       specific_heat_PT=167;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -7285,7 +7437,7 @@ namespace xelement {
       modulus_Young=61;
       modulus_bulk=41;
       Poisson_ratio_PT=0.25;
-      BVm_Miedema=NNN;
+      modulus_bulk_x_volume_molar_Miedema=NNN;
       magnetic_type_PT="Paramagnetic";
       susceptibility_magnetic_mass=5.45E-6;
       susceptibility_magnetic_volume=0.046603;
@@ -7317,7 +7469,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*164.9304;
       volume_molar=0.000018753;
       volume=31.0155;
-      Vm_Miedema=7.06;
+      area_molar_Miedema=7.06;
       valence_std=13;
       valence_iupac=3;
       valence_PT=3;
@@ -7352,14 +7504,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);
       electron_affinity_PT=50;
       energies_ionization.clear();energies_ionization.push_back(581);energies_ionization.push_back(1140);energies_ionization.push_back(2204);energies_ionization.push_back(4100);  //CO20201111
-      phi_star_Miedema=3.22;
-      nws_Miedema=1.22;
-      gamma_s_Miedema=NNN;
+      work_function_Miedema=3.22;
+      density_line_electron_WS_Miedema=1.22;
+      energy_surface_0K_Miedema=NNN;
       scale_Pettifor=0.7280;
       temperature_boiling=2700;
       temperature_melting=1474;
-      fusion_heat_PT=17;  //CO20201111
-      vaporization_heat_PT=265;
+      enthalpy_fusion=17;  //CO20201111
+      enthalpy_vaporization=265;
+      enthalpy_atomization_WE=301;  //CO20201111
+      energy_cohesive=302;  //CO20201111
       specific_heat_PT=165;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -7375,7 +7529,7 @@ namespace xelement {
       modulus_Young=64;
       modulus_bulk=40;
       Poisson_ratio_PT=0.23;
-      BVm_Miedema=NNN;
+      modulus_bulk_x_volume_molar_Miedema=NNN;
       magnetic_type_PT="Paramagnetic";
       susceptibility_magnetic_mass=5.49E-6;
       susceptibility_magnetic_volume=0.0482845;
@@ -7407,7 +7561,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*167.26;
       volume_molar=0.000018449;
       volume=30.5431;
-      Vm_Miedema=6.98;
+      area_molar_Miedema=6.98;
       valence_std=14;
       valence_iupac=3;
       valence_PT=3;
@@ -7442,14 +7596,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);
       electron_affinity_PT=50;
       energies_ionization.clear();energies_ionization.push_back(589.3);energies_ionization.push_back(1150);energies_ionization.push_back(2194);energies_ionization.push_back(4120);  //CO20201111
-      phi_star_Miedema=3.22;
-      nws_Miedema=1.23;
-      gamma_s_Miedema=NNN;
+      work_function_Miedema=3.22;
+      density_line_electron_WS_Miedema=1.23;
+      energy_surface_0K_Miedema=NNN;
       scale_Pettifor=0.7260;
       temperature_boiling=2868;
       temperature_melting=1497;
-      fusion_heat_PT=19.9;  //CO20201111
-      vaporization_heat_PT=285;
+      enthalpy_fusion=19.9;  //CO20201111
+      enthalpy_vaporization=285;
+      enthalpy_atomization_WE=317;  //CO20201111
+      energy_cohesive=317;  //CO20201111
       specific_heat_PT=168;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -7465,7 +7621,7 @@ namespace xelement {
       modulus_Young=70;
       modulus_bulk=44;
       Poisson_ratio_PT=0.24;
-      BVm_Miedema=NNN;
+      modulus_bulk_x_volume_molar_Miedema=NNN;
       magnetic_type_PT="Paramagnetic";
       susceptibility_magnetic_mass=3.77E-6;
       susceptibility_magnetic_volume=0.0341788;
@@ -7497,7 +7653,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*168.9342;
       volume_molar=0.000018126;
       volume=30.0016;
-      Vm_Miedema=6.90;
+      area_molar_Miedema=6.90;
       valence_std=15;
       valence_iupac=4;
       valence_PT=3;
@@ -7532,14 +7688,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);
       electron_affinity_PT=50;
       energies_ionization.clear();energies_ionization.push_back(596.7);energies_ionization.push_back(1160);energies_ionization.push_back(2285);energies_ionization.push_back(4120);  //CO20201111
-      phi_star_Miedema=3.22;
-      nws_Miedema=1.23;
-      gamma_s_Miedema=NNN;
+      work_function_Miedema=3.22;
+      density_line_electron_WS_Miedema=1.23;
+      energy_surface_0K_Miedema=NNN;
       scale_Pettifor=0.7240;
       temperature_boiling=1950;
       temperature_melting=1545;
-      fusion_heat_PT=16.8;  //CO20201111
-      vaporization_heat_PT=250;
+      enthalpy_fusion=16.8;  //CO20201111
+      enthalpy_vaporization=250;
+      enthalpy_atomization_WE=232;  //CO20201111
+      energy_cohesive=233;  //CO20201111
       specific_heat_PT=160;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -7555,7 +7713,7 @@ namespace xelement {
       modulus_Young=74;
       modulus_bulk=45;
       Poisson_ratio_PT=0.21;
-      BVm_Miedema=NNN;
+      modulus_bulk_x_volume_molar_Miedema=NNN;
       magnetic_type_PT="Paramagnetic";
       susceptibility_magnetic_mass=1.99E-6;
       susceptibility_magnetic_volume=0.0185488;
@@ -7587,7 +7745,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*173.04;
       volume_molar=0.000026339;
       volume=39.4395;
-      Vm_Miedema=6.86;
+      area_molar_Miedema=6.86;
       valence_std=16;
       valence_iupac=3;
       valence_PT=3;
@@ -7622,14 +7780,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);
       electron_affinity_PT=50;
       energies_ionization.clear();energies_ionization.push_back(603.4);energies_ionization.push_back(1174.8);energies_ionization.push_back(2417);energies_ionization.push_back(4203);  //CO20201111
-      phi_star_Miedema=3.22;
-      nws_Miedema=1.23;
-      gamma_s_Miedema=NNN;
+      work_function_Miedema=3.22;
+      density_line_electron_WS_Miedema=1.23;
+      energy_surface_0K_Miedema=NNN;
       scale_Pettifor=0.7220;
       temperature_boiling=1196;
       temperature_melting=819;
-      fusion_heat_PT=7.7;  //CO20201111
-      vaporization_heat_PT=160;
+      enthalpy_fusion=7.7;  //CO20201111
+      enthalpy_vaporization=160;
+      enthalpy_atomization_WE=152;  //CO20201111
+      energy_cohesive=154;  //CO20201111
       specific_heat_PT=154;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -7645,7 +7805,7 @@ namespace xelement {
       modulus_Young=24;
       modulus_bulk=31;
       Poisson_ratio_PT=0.21;
-      BVm_Miedema=NNN;
+      modulus_bulk_x_volume_molar_Miedema=NNN;
       magnetic_type_PT="Paramagnetic";
       susceptibility_magnetic_mass=5.9E-9;
       susceptibility_magnetic_volume=0.0000388;
@@ -7677,7 +7837,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*174.967;
       volume_molar=0.000017779;
       volume=29.3515;
-      Vm_Miedema=6.81;
+      area_molar_Miedema=6.81;
       valence_std=17;
       valence_iupac=3;
       valence_PT=3;
@@ -7712,14 +7872,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);  //RF+SK20200410
       electron_affinity_PT=50;
       energies_ionization.clear();energies_ionization.push_back(523.5);energies_ionization.push_back(1340);energies_ionization.push_back(2022.3);energies_ionization.push_back(4370);energies_ionization.push_back(6445);  //CO20201111
-      phi_star_Miedema=3.22;
-      nws_Miedema=1.24;
-      gamma_s_Miedema=NNN;
+      work_function_Miedema=3.22;
+      density_line_electron_WS_Miedema=1.24;
+      energy_surface_0K_Miedema=NNN;
       scale_Pettifor=0.7200;
       temperature_boiling=3402;
       temperature_melting=1663;
-      fusion_heat_PT=22;  //CO20201111
-      vaporization_heat_PT=415;
+      enthalpy_fusion=22;  //CO20201111
+      enthalpy_vaporization=415;
+      enthalpy_atomization_WE=428;  //CO20201111
+      energy_cohesive=428;  //CO20201111
       specific_heat_PT=154;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -7735,7 +7897,7 @@ namespace xelement {
       modulus_Young=67;
       modulus_bulk=48;
       Poisson_ratio_PT=0.26;
-      BVm_Miedema=NNN;
+      modulus_bulk_x_volume_molar_Miedema=NNN;
       magnetic_type_PT="Paramagnetic";
       susceptibility_magnetic_mass=1.2E-9;
       susceptibility_magnetic_volume=0.0000118;
@@ -7768,7 +7930,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*178.49;
       volume_molar=0.0000134102;
       volume=22.0408;
-      Vm_Miedema=5.6;
+      area_molar_Miedema=5.6;
       valence_std=4;
       valence_iupac=4;
       valence_PT=4;
@@ -7803,14 +7965,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(4);  //RF+SK20200410
       electron_affinity_PT=0;
       energies_ionization.clear();energies_ionization.push_back(658.5);energies_ionization.push_back(1440);energies_ionization.push_back(2250);energies_ionization.push_back(3216);  //CO20201111
-      phi_star_Miedema=3.55;
-      nws_Miedema=1.43;
-      gamma_s_Miedema=2200;
+      work_function_Miedema=3.55;
+      density_line_electron_WS_Miedema=1.43;
+      energy_surface_0K_Miedema=2200;
       scale_Pettifor=0.775;
       temperature_boiling=4603;
       temperature_melting=2233;
-      fusion_heat_PT=25.5;  //CO20201111
-      vaporization_heat_PT=630;
+      enthalpy_fusion=25.5;  //CO20201111
+      enthalpy_vaporization=630;
+      enthalpy_atomization_WE=621;  //CO20201111
+      energy_cohesive=621;  //CO20201111
       specific_heat_PT=144;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -7826,7 +7990,7 @@ namespace xelement {
       modulus_Young=78;
       modulus_bulk=110;
       Poisson_ratio_PT=0.37;
-      BVm_Miedema=15.0;
+      modulus_bulk_x_volume_molar_Miedema=15.0;
       magnetic_type_PT="Paramagnetic";
       susceptibility_magnetic_mass=5.3E-9;
       susceptibility_magnetic_volume=0.0000705;
@@ -7858,7 +8022,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*180.9479;
       volume_molar=0.0000108677;
       volume=18.1100;
-      Vm_Miedema=4.9;
+      area_molar_Miedema=4.9;
       valence_std=5;
       valence_iupac=5;
       valence_PT=5;
@@ -7893,14 +8057,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(5);  //RF+SK20200410
       electron_affinity_PT=31;
       energies_ionization.clear();energies_ionization.push_back(761);energies_ionization.push_back(1500);  //CO20201111
-      phi_star_Miedema=4.05;
-      nws_Miedema=1.63;
-      gamma_s_Miedema=3050;
+      work_function_Miedema=4.05;
+      density_line_electron_WS_Miedema=1.63;
+      energy_surface_0K_Miedema=3050;
       scale_Pettifor=0.83;
       temperature_boiling=5458;
       temperature_melting=3017;
-      fusion_heat_PT=36;  //CO20201111
-      vaporization_heat_PT=736;
+      enthalpy_fusion=36;  //CO20201111
+      enthalpy_vaporization=736; //CO20201111 - SMALL DISCREPANCY PERIODICTABLE VS WEBELEMENTS: 735 kJ/mol
+      enthalpy_atomization_WE=782;  //CO20201111
+      energy_cohesive=782;  //CO20201111
       specific_heat_PT=140;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -7916,7 +8082,7 @@ namespace xelement {
       modulus_Young=186;
       modulus_bulk=200;
       Poisson_ratio_PT=0.34;
-      BVm_Miedema=22.0;
+      modulus_bulk_x_volume_molar_Miedema=22.0;
       magnetic_type_PT="Paramagnetic";
       susceptibility_magnetic_mass=1.07E-8;
       susceptibility_magnetic_volume=0.0001782;
@@ -7948,7 +8114,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*183.85;
       volume_molar=9.5501E-6;
       volume=15.9387;
-      Vm_Miedema=4.5;
+      area_molar_Miedema=4.5;
       valence_std=6;
       valence_iupac=6;
       valence_PT=6;
@@ -7983,14 +8149,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(6);  //RF+SK20200410
       electron_affinity_PT=78.6;
       energies_ionization.clear();energies_ionization.push_back(770);energies_ionization.push_back(1700);  //CO20201111
-      phi_star_Miedema=4.80;
-      nws_Miedema=1.81;
-      gamma_s_Miedema=3300;
+      work_function_Miedema=4.80;
+      density_line_electron_WS_Miedema=1.81;
+      energy_surface_0K_Miedema=3300;
       scale_Pettifor=0.885;
       temperature_boiling=5555;
       temperature_melting=3422;
-      fusion_heat_PT=35;  //CO20201111
-      vaporization_heat_PT=800;
+      enthalpy_fusion=35;  //CO20201111
+      enthalpy_vaporization=800;
+      enthalpy_atomization_WE=860;  //CO20201111
+      energy_cohesive=859;  //CO20201111
       specific_heat_PT=132;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -8006,7 +8174,7 @@ namespace xelement {
       modulus_Young=411;
       modulus_bulk=310;
       Poisson_ratio_PT=0.28;
-      BVm_Miedema=31.0;
+      modulus_bulk_x_volume_molar_Miedema=31.0;
       magnetic_type_PT="Paramagnetic";
       susceptibility_magnetic_mass=4.59E-9;
       susceptibility_magnetic_volume=0.0000884;
@@ -8038,7 +8206,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*186.2;
       volume_molar=8.85856E-6;
       volume=14.8941;
-      Vm_Miedema=4.3;
+      area_molar_Miedema=4.3;
       valence_std=7;
       valence_iupac=7;
       valence_PT=7;
@@ -8073,14 +8241,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(7);  //RF+SK20200410
       electron_affinity_PT=14.5;
       energies_ionization.clear();energies_ionization.push_back(760);energies_ionization.push_back(1260);energies_ionization.push_back(2510);energies_ionization.push_back(3640);  //CO20201111
-      phi_star_Miedema=5.40;
-      nws_Miedema=1.86;
-      gamma_s_Miedema=3650;
+      work_function_Miedema=5.40;
+      density_line_electron_WS_Miedema=1.86;
+      energy_surface_0K_Miedema=3650;
       scale_Pettifor=0.94;
       temperature_boiling=5596;
       temperature_melting=3186;
-      fusion_heat_PT=33;  //CO20201111
-      vaporization_heat_PT=705;
+      enthalpy_fusion=33;  //CO20201111
+      enthalpy_vaporization=705;
+      enthalpy_atomization_WE=776;  //CO20201111
+      energy_cohesive=775;  //CO20201111
       specific_heat_PT=137;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -8096,7 +8266,7 @@ namespace xelement {
       modulus_Young=463;
       modulus_bulk=370;
       Poisson_ratio_PT=0.3;
-      BVm_Miedema=33.0;
+      modulus_bulk_x_volume_molar_Miedema=33.0;
       magnetic_type_PT="Paramagnetic";
       susceptibility_magnetic_mass=4.56E-9;
       susceptibility_magnetic_volume=0.0000959;
@@ -8128,7 +8298,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*190.2;
       volume_molar=8.421E-6;
       volume=14.2403;
-      Vm_Miedema=4.2;
+      area_molar_Miedema=4.2;
       valence_std=8;
       valence_iupac=8;
       valence_PT=6;
@@ -8163,14 +8333,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(4);  //RF+SK20200410
       electron_affinity_PT=106.1;
       energies_ionization.clear();energies_ionization.push_back(840);energies_ionization.push_back(1600);  //CO20201111
-      phi_star_Miedema=5.40;
-      nws_Miedema=1.85;
-      gamma_s_Miedema=3500;
+      work_function_Miedema=5.40;
+      density_line_electron_WS_Miedema=1.85;
+      energy_surface_0K_Miedema=3500;
       scale_Pettifor=0.995;
       temperature_boiling=5012;
       temperature_melting=3033;
-      fusion_heat_PT=31;  //CO20201111
-      vaporization_heat_PT=630;
+      enthalpy_fusion=31;  //CO20201111
+      enthalpy_vaporization=630;
+      enthalpy_atomization_WE=789;  //CO20201111
+      energy_cohesive=788;  //CO20201111
       specific_heat_PT=130;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -8186,7 +8358,7 @@ namespace xelement {
       modulus_Young=NNN;
       modulus_bulk=NNN;
       Poisson_ratio_PT=0.25;
-      BVm_Miedema=35.0;
+      modulus_bulk_x_volume_molar_Miedema=35.0;
       magnetic_type_PT="Paramagnetic";
       susceptibility_magnetic_mass=6E-10;
       susceptibility_magnetic_volume=0.000014;
@@ -8218,7 +8390,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*192.22;
       volume_molar=8.5203E-6;
       volume=14.5561;
-      Vm_Miedema=4.2;
+      area_molar_Miedema=4.2;
       valence_std=9;
       valence_iupac=8;
       valence_PT=6;
@@ -8253,14 +8425,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(4); oxidation_states_preferred.push_back(1); //RF+SK20200410
       electron_affinity_PT=151;
       energies_ionization.clear();energies_ionization.push_back(880);energies_ionization.push_back(1600);  //CO20201111
-      phi_star_Miedema=5.55;
-      nws_Miedema=1.83;
-      gamma_s_Miedema=3100;
+      work_function_Miedema=5.55;
+      density_line_electron_WS_Miedema=1.83;
+      energy_surface_0K_Miedema=3100;
       scale_Pettifor=1.05;
       temperature_boiling=4428;
       temperature_melting=2466;
-      fusion_heat_PT=26;  //CO20201111
-      vaporization_heat_PT=560;
+      enthalpy_fusion=26;  //CO20201111
+      enthalpy_vaporization=560;
+      enthalpy_atomization_WE=671;  //CO20201111
+      energy_cohesive=670;  //CO20201111
       specific_heat_PT=131;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -8276,7 +8450,7 @@ namespace xelement {
       modulus_Young=528;
       modulus_bulk=320;
       Poisson_ratio_PT=0.26;
-      BVm_Miedema=25.0;
+      modulus_bulk_x_volume_molar_Miedema=25.0;
       magnetic_type_PT="Paramagnetic";
       susceptibility_magnetic_mass=1.67E-9;
       susceptibility_magnetic_volume=0.0000377;
@@ -8308,7 +8482,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*195.09;
       volume_molar=9.0948E-6;
       volume=15.7298;
-      Vm_Miedema=4.4;
+      area_molar_Miedema=4.4;
       valence_std=10;
       valence_iupac=6;
       valence_PT=6;
@@ -8343,14 +8517,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(4); oxidation_states_preferred.push_back(2); //RF+SK20200410
       electron_affinity_PT=205.3;
       energies_ionization.clear();energies_ionization.push_back(870);energies_ionization.push_back(1791);  //CO20201111
-      phi_star_Miedema=5.65;
-      nws_Miedema=1.78;
-      gamma_s_Miedema=2550;
+      work_function_Miedema=5.65;
+      density_line_electron_WS_Miedema=1.78;
+      energy_surface_0K_Miedema=2550;
       scale_Pettifor=1.105;
       temperature_boiling=3825;
       temperature_melting=1768.3;
-      fusion_heat_PT=20;  //CO20201111
-      vaporization_heat_PT=490;
+      enthalpy_fusion=20;  //CO20201111
+      enthalpy_vaporization=490;
+      enthalpy_atomization_WE=565;  //CO20201111
+      energy_cohesive=564;  //CO20201111
       specific_heat_PT=133;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -8366,7 +8542,7 @@ namespace xelement {
       modulus_Young=168;
       modulus_bulk=230;
       Poisson_ratio_PT=0.38;
-      BVm_Miedema=18.0;
+      modulus_bulk_x_volume_molar_Miedema=18.0;
       magnetic_type_PT="Paramagnetic";
       susceptibility_magnetic_mass=1.22E-8;
       susceptibility_magnetic_volume=0.0002573;
@@ -8398,7 +8574,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*196.9665;
       volume_molar=0.00001021;
       volume=18.1904;
-      Vm_Miedema=4.7;
+      area_molar_Miedema=4.7;
       valence_std=11;
       valence_iupac=5;
       valence_PT=5;
@@ -8433,14 +8609,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);  //RF+SK20200410
       electron_affinity_PT=222.8;
       energies_ionization.clear();energies_ionization.push_back(890.1);energies_ionization.push_back(1980);  //CO20201111
-      phi_star_Miedema=5.15;
-      nws_Miedema=1.57;
-      gamma_s_Miedema=1550;
+      work_function_Miedema=5.15;
+      density_line_electron_WS_Miedema=1.57;
+      energy_surface_0K_Miedema=1550;
       scale_Pettifor=1.16;
       temperature_boiling=2856;
       temperature_melting=1064.18;
-      fusion_heat_PT=12.5;  //CO20201111
-      vaporization_heat_PT=330;
+      enthalpy_fusion=12.5;  //CO20201111
+      enthalpy_vaporization=330;
+      enthalpy_atomization_WE=368;  //CO20201111
+      energy_cohesive=368;  //CO20201111
       specific_heat_PT=129.1;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -8456,7 +8634,7 @@ namespace xelement {
       modulus_Young=78;
       modulus_bulk=220;
       Poisson_ratio_PT=0.44;
-      BVm_Miedema=18.0;
+      modulus_bulk_x_volume_molar_Miedema=18.0;
       magnetic_type_PT="Diamagnetic";
       susceptibility_magnetic_mass=-1.78E-9;
       susceptibility_magnetic_volume=-0.0000344;
@@ -8488,7 +8666,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*200.59;
       volume_molar=0.0000148213;
       volume=29.7156;
-      Vm_Miedema=5.8;
+      area_molar_Miedema=5.8;
       valence_std=12;
       valence_iupac=4;
       valence_PT=2;
@@ -8523,14 +8701,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(2);  //RF+SK20200410
       electron_affinity_PT=0;
       energies_ionization.clear();energies_ionization.push_back(1007.1);energies_ionization.push_back(1810);energies_ionization.push_back(3300);  //CO20201111
-      phi_star_Miedema=4.20;
-      nws_Miedema=1.24;
-      gamma_s_Miedema=610;
+      work_function_Miedema=4.20;
+      density_line_electron_WS_Miedema=1.24;
+      energy_surface_0K_Miedema=610;
       scale_Pettifor=1.32;
       temperature_boiling=356.73;
       temperature_melting=-38.83;
-      fusion_heat_PT=2.29;  //CO20201111
-      vaporization_heat_PT=59.2;
+      enthalpy_fusion=2.29;  //CO20201111
+      enthalpy_vaporization=59.2;
+      enthalpy_atomization_WE=64;  //CO20201111
+      energy_cohesive=65;  //CO20201111
       specific_heat_PT=139.5;
       critical_pressure=1698;
       critical_temperature_PT=1750;
@@ -8546,7 +8726,7 @@ namespace xelement {
       modulus_Young=NNN;
       modulus_bulk=25;
       Poisson_ratio_PT=NNN;
-      BVm_Miedema=4.0;
+      modulus_bulk_x_volume_molar_Miedema=4.0;
       magnetic_type_PT="Diamagnetic";
       susceptibility_magnetic_mass=-2.1E-9;
       susceptibility_magnetic_volume=-0.0000284;
@@ -8579,7 +8759,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*204.37;
       volume_molar=0.0000172473;
       volume=31.0721;
-      Vm_Miedema=6.6;
+      area_molar_Miedema=6.6;
       valence_std=3;
       valence_iupac=3;
       valence_PT=3;
@@ -8614,14 +8794,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(1);  //RF+SK20200410
       electron_affinity_PT=19.2;
       energies_ionization.clear();energies_ionization.push_back(589.4);energies_ionization.push_back(1971);energies_ionization.push_back(2878);  //CO20201111
-      phi_star_Miedema=3.90;
-      nws_Miedema=1.12;
-      gamma_s_Miedema=610;
+      work_function_Miedema=3.90;
+      density_line_electron_WS_Miedema=1.12;
+      energy_surface_0K_Miedema=610;
       scale_Pettifor=1.56;
       temperature_boiling=1473;
       temperature_melting=304;
-      fusion_heat_PT=4.2;  //CO20201111
-      vaporization_heat_PT=165;
+      enthalpy_fusion=4.2;  //CO20201111
+      enthalpy_vaporization=165;
+      enthalpy_atomization_WE=182;  //CO20201111
+      energy_cohesive=182;  //CO20201111
       specific_heat_PT=129;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -8637,7 +8819,7 @@ namespace xelement {
       modulus_Young=8;
       modulus_bulk=43;
       Poisson_ratio_PT=0.45;
-      BVm_Miedema=6.2;
+      modulus_bulk_x_volume_molar_Miedema=6.2;
       magnetic_type_PT="Diamagnetic";
       susceptibility_magnetic_mass=-3E-9;
       susceptibility_magnetic_volume=-0.0000356;
@@ -8669,7 +8851,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*207.2;
       volume_molar=0.000018272;
       volume=31.6649;
-      Vm_Miedema=6.9;
+      area_molar_Miedema=6.9;
       valence_std=4;
       valence_iupac=4;
       valence_PT=4;
@@ -8704,14 +8886,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(2);  //RF+SK20200410
       electron_affinity_PT=35.1;
       energies_ionization.clear();energies_ionization.push_back(715.6);energies_ionization.push_back(1450.5);energies_ionization.push_back(3081.5);energies_ionization.push_back(4083);energies_ionization.push_back(6640);  //CO20201111
-      phi_star_Miedema=4.10;
-      nws_Miedema=1.15;
-      gamma_s_Miedema=610;
+      work_function_Miedema=4.10;
+      density_line_electron_WS_Miedema=1.15;
+      energy_surface_0K_Miedema=610;
       scale_Pettifor=1.80;
       temperature_boiling=1749;
       temperature_melting=327.46;
-      fusion_heat_PT=4.77;  //CO20201111
-      vaporization_heat_PT=178;
+      enthalpy_fusion=4.77;  //CO20201111
+      enthalpy_vaporization=178;
+      enthalpy_atomization_WE=195;  //CO20201111
+      energy_cohesive=196;  //CO20201111
       specific_heat_PT=127;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -8727,7 +8911,7 @@ namespace xelement {
       modulus_Young=16;
       modulus_bulk=46;
       Poisson_ratio_PT=0.44;
-      BVm_Miedema=7.9;
+      modulus_bulk_x_volume_molar_Miedema=7.9;
       magnetic_type_PT="Diamagnetic";
       susceptibility_magnetic_mass=-1.5E-9;
       susceptibility_magnetic_volume=-0.000017;
@@ -8759,7 +8943,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*208.9804;
       volume_molar=0.000021368;
       volume=31.5691;
-      Vm_Miedema=7.2;
+      area_molar_Miedema=7.2;
       valence_std=5;
       valence_iupac=5;
       valence_PT=5;
@@ -8794,14 +8978,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);  //RF+SK20200410
       electron_affinity_PT=91.2;
       energies_ionization.clear();energies_ionization.push_back(703);energies_ionization.push_back(1610);energies_ionization.push_back(2466);energies_ionization.push_back(4370);energies_ionization.push_back(5400);energies_ionization.push_back(8520);  //CO20201111
-      phi_star_Miedema=4.15;
-      nws_Miedema=1.16;
-      gamma_s_Miedema=550;
+      work_function_Miedema=4.15;
+      density_line_electron_WS_Miedema=1.16;
+      energy_surface_0K_Miedema=550;
       scale_Pettifor=2.04;
       temperature_boiling=1564;
       temperature_melting=271.3;
-      fusion_heat_PT=10.9;  //CO20201111
-      vaporization_heat_PT=160;
+      enthalpy_fusion=10.9;  //CO20201111
+      enthalpy_vaporization=160;
+      enthalpy_atomization_WE=207;  //CO20201111
+      energy_cohesive=210;  //CO20201111
       specific_heat_PT=122;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -8817,7 +9003,7 @@ namespace xelement {
       modulus_Young=32;
       modulus_bulk=31;
       Poisson_ratio_PT=0.33;
-      BVm_Miedema=6.7;
+      modulus_bulk_x_volume_molar_Miedema=6.7;
       magnetic_type_PT="Diamagnetic";
       susceptibility_magnetic_mass=-1.7E-8;
       susceptibility_magnetic_volume=-0.00017;
@@ -8849,7 +9035,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*209.98;
       volume_molar=0.00002272727272727;
       volume=NNN;
-      Vm_Miedema=NNN;
+      area_molar_Miedema=NNN;
       valence_std=6;
       valence_iupac=6;
       valence_PT=6;
@@ -8884,14 +9070,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(4);  //RF+SK20200410
       electron_affinity_PT=183.3;
       energies_ionization.clear();energies_ionization.push_back(812.1);  //CO20201111
-      phi_star_Miedema=NNN;
-      nws_Miedema=NNN;
-      gamma_s_Miedema=NNN;
+      work_function_Miedema=NNN;
+      density_line_electron_WS_Miedema=NNN;
+      energy_surface_0K_Miedema=NNN;
       scale_Pettifor=2.28;
       temperature_boiling=962;
       temperature_melting=254;
-      fusion_heat_PT=13;  //CO20201111
-      vaporization_heat_PT=100;
+      enthalpy_fusion=13;  //CO20201111
+      enthalpy_vaporization=100;
+      enthalpy_atomization_WE=142;  //CO20201111
+      energy_cohesive=144;  //CO20201111
       specific_heat_PT=NNN;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -8907,7 +9095,7 @@ namespace xelement {
       modulus_Young=NNN;
       modulus_bulk=NNN;
       Poisson_ratio_PT=NNN;
-      BVm_Miedema=NNN;
+      modulus_bulk_x_volume_molar_Miedema=NNN;
       magnetic_type_PT="NNN";
       susceptibility_magnetic_mass=NNN;
       susceptibility_magnetic_volume=NNN;
@@ -8939,7 +9127,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*210;
       volume_molar=NNN;
       volume=NNN;
-      Vm_Miedema=NNN;
+      area_molar_Miedema=NNN;
       valence_std=7;
       valence_iupac=7;
       valence_PT=7;
@@ -8974,14 +9162,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(-1); //RF+SK20200410
       electron_affinity_PT=270.1;
       energies_ionization.clear();energies_ionization.push_back(920);  //CO20201111
-      phi_star_Miedema=NNN;
-      nws_Miedema=NNN;
-      gamma_s_Miedema=NNN;
+      work_function_Miedema=NNN;
+      density_line_electron_WS_Miedema=NNN;
+      energy_surface_0K_Miedema=NNN;
       scale_Pettifor=2.52;
       temperature_boiling=NNN;
       temperature_melting=302;
-      fusion_heat_PT=6;  //CO20201111
-      vaporization_heat_PT=40;
+      enthalpy_fusion=6;  //CO20201111
+      enthalpy_vaporization=40;
+      enthalpy_atomization_WE=NNN;  //CO20201111
+      energy_cohesive=NNN;  //CO20201111
       specific_heat_PT=NNN;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -8997,7 +9187,7 @@ namespace xelement {
       modulus_Young=NNN;
       modulus_bulk=NNN;
       Poisson_ratio_PT=NNN;
-      BVm_Miedema=NNN;
+      modulus_bulk_x_volume_molar_Miedema=NNN;
       magnetic_type_PT="NNN";
       susceptibility_magnetic_mass=NNN;
       susceptibility_magnetic_volume=NNN;
@@ -9029,7 +9219,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*222;
       volume_molar=0.02281603288798;
       volume=NNN;
-      Vm_Miedema=NNN;
+      area_molar_Miedema=NNN;
       valence_std=0;
       valence_iupac=6;
       valence_PT=6;
@@ -9064,14 +9254,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(2);  //RF+SK20200410
       electron_affinity_PT=0;
       energies_ionization.clear();energies_ionization.push_back(1037);  //CO20201111
-      phi_star_Miedema=NNN;
-      nws_Miedema=NNN;
-      gamma_s_Miedema=NNN;
+      work_function_Miedema=NNN;
+      density_line_electron_WS_Miedema=NNN;
+      energy_surface_0K_Miedema=NNN;
       scale_Pettifor=0;
       temperature_boiling=-61.7;
       temperature_melting=-71;
-      fusion_heat_PT=3;  //CO20201111
-      vaporization_heat_PT=17;
+      enthalpy_fusion=3;  //CO20201111
+      enthalpy_vaporization=17;
+      enthalpy_atomization_WE=0;  //CO20201111
+      energy_cohesive=19.5;  //CO20201111
       specific_heat_PT=93.65;
       critical_pressure=61.98;
       critical_temperature_PT=377;
@@ -9087,7 +9279,7 @@ namespace xelement {
       modulus_Young=NNN;
       modulus_bulk=NNN;
       Poisson_ratio_PT=NNN;
-      BVm_Miedema=NNN;
+      modulus_bulk_x_volume_molar_Miedema=NNN;
       magnetic_type_PT="NNN";
       susceptibility_magnetic_mass=NNN;
       susceptibility_magnetic_volume=NNN;
@@ -9121,7 +9313,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*223.02;
       volume_molar=NNN;
       volume=NNN;
-      Vm_Miedema=NNN;
+      area_molar_Miedema=NNN;
       valence_std=1;
       valence_iupac=1;
       valence_PT=1;
@@ -9156,14 +9348,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(1);  //RF+SK20200410
       electron_affinity_PT=NNN;
       energies_ionization.clear();energies_ionization.push_back(380);  //CO20201111
-      phi_star_Miedema=NNN;
-      nws_Miedema=NNN;
-      gamma_s_Miedema=NNN;
+      work_function_Miedema=NNN;
+      density_line_electron_WS_Miedema=NNN;
+      energy_surface_0K_Miedema=NNN;
       scale_Pettifor=0;
       temperature_boiling=NNN;
       temperature_melting=NNN;
-      fusion_heat_PT=2;  //CO20201111
-      vaporization_heat_PT=64;
+      enthalpy_fusion=2;  //CO20201111
+      enthalpy_vaporization=64;  //CO20201111 - SMALL DISCREPANCY PERIODICTABLE VS WEBELEMENTS: 65 kJ/mol
+      enthalpy_atomization_WE=64;  //CO20201111
+      energy_cohesive=NNN;  //CO20201111
       specific_heat_PT=NNN;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -9179,7 +9373,7 @@ namespace xelement {
       modulus_Young=NNN;
       modulus_bulk=NNN;
       Poisson_ratio_PT=NNN;
-      BVm_Miedema=NNN;
+      modulus_bulk_x_volume_molar_Miedema=NNN;
       magnetic_type_PT="NNN";
       susceptibility_magnetic_mass=NNN;
       susceptibility_magnetic_volume=NNN;
@@ -9211,7 +9405,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*226.0254;
       volume_molar=0.0000452;
       volume=-1.0000;
-      Vm_Miedema=NNN;
+      area_molar_Miedema=NNN;
       valence_std=2;
       valence_iupac=2;
       valence_PT=2;
@@ -9246,14 +9440,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(2);  //RF+SK20200410
       electron_affinity_PT=NNN;
       energies_ionization.clear();energies_ionization.push_back(509.3);energies_ionization.push_back(979);  //CO20201111
-      phi_star_Miedema=NNN;
-      nws_Miedema=NNN;
-      gamma_s_Miedema=NNN;
+      work_function_Miedema=NNN;
+      density_line_electron_WS_Miedema=NNN;
+      energy_surface_0K_Miedema=NNN;
       scale_Pettifor=0;
       temperature_boiling=1737;
       temperature_melting=700;
-      fusion_heat_PT=8;  //CO20201111
-      vaporization_heat_PT=125;
+      enthalpy_fusion=8;  //CO20201111
+      enthalpy_vaporization=125;
+      enthalpy_atomization_WE=159;  //CO20201111
+      energy_cohesive=160;  //CO20201111
       specific_heat_PT=92;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -9269,7 +9465,7 @@ namespace xelement {
       modulus_Young=NNN;
       modulus_bulk=NNN;
       Poisson_ratio_PT=NNN;
-      BVm_Miedema=NNN;
+      modulus_bulk_x_volume_molar_Miedema=NNN;
       magnetic_type_PT="NNN";
       susceptibility_magnetic_mass=NNN;
       susceptibility_magnetic_volume=NNN;
@@ -9302,7 +9498,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*227.03;
       volume_molar=0.00002254220456802;
       volume=45.2437;
-      Vm_Miedema=NNN;
+      area_molar_Miedema=NNN;
       valence_std=3;
       valence_iupac=3;
       valence_PT=3;
@@ -9337,14 +9533,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
       electron_affinity_PT=NNN;
       energies_ionization.clear();energies_ionization.push_back(499);energies_ionization.push_back(1170);  //CO20201111
-      phi_star_Miedema=NNN;
-      nws_Miedema=NNN;
-      gamma_s_Miedema=NNN;
+      work_function_Miedema=NNN;
+      density_line_electron_WS_Miedema=NNN;
+      energy_surface_0K_Miedema=NNN;
       scale_Pettifor=0;
       temperature_boiling=3200;
       temperature_melting=1050;
-      fusion_heat_PT=14;  //CO20201111
-      vaporization_heat_PT=400;
+      enthalpy_fusion=14;  //CO20201111
+      enthalpy_vaporization=400;
+      enthalpy_atomization_WE=406;  //CO20201111
+      energy_cohesive=410;  //CO20201111
       specific_heat_PT=120;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -9360,7 +9558,7 @@ namespace xelement {
       modulus_Young=NNN;
       modulus_bulk=NNN;
       Poisson_ratio_PT=NNN;
-      BVm_Miedema=NNN;
+      modulus_bulk_x_volume_molar_Miedema=NNN;
       magnetic_type_PT="NNN";
       susceptibility_magnetic_mass=NNN;
       susceptibility_magnetic_volume=NNN;
@@ -9393,7 +9591,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*232.0381;
       volume_molar=0.0000197917;
       volume=31.9586;
-      Vm_Miedema=7.3;
+      area_molar_Miedema=7.3;
       valence_std=4;
       valence_iupac=4;
       valence_PT=4;
@@ -9428,14 +9626,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
       electron_affinity_PT=NNN;
       energies_ionization.clear();energies_ionization.push_back(587);energies_ionization.push_back(1110);energies_ionization.push_back(1930);energies_ionization.push_back(2780);  //CO20201111
-      phi_star_Miedema=3.30;
-      nws_Miedema=1.28;
-      gamma_s_Miedema=NNN;
+      work_function_Miedema=3.30;
+      density_line_electron_WS_Miedema=1.28;
+      energy_surface_0K_Miedema=NNN;
       scale_Pettifor=0;
       temperature_boiling=4820;
       temperature_melting=1750;
-      fusion_heat_PT=16;  //CO20201111
-      vaporization_heat_PT=530;
+      enthalpy_fusion=16;  //CO20201111
+      enthalpy_vaporization=530;
+      enthalpy_atomization_WE=598;  //CO20201111
+      energy_cohesive=598;  //CO20201111
       specific_heat_PT=118;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -9451,7 +9651,7 @@ namespace xelement {
       modulus_Young=79;
       modulus_bulk=54;
       Poisson_ratio_PT=0.27;
-      BVm_Miedema=NNN;
+      modulus_bulk_x_volume_molar_Miedema=NNN;
       magnetic_type_PT="Paramagnetic";
       susceptibility_magnetic_mass=7.2E-9;
       susceptibility_magnetic_volume=0.000084;
@@ -9483,7 +9683,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*231.04;
       volume_molar=0.0000150316;
       volume=NNN;
-      Vm_Miedema=NNN;
+      area_molar_Miedema=NNN;
       valence_std=5;
       valence_iupac=5;
       valence_PT=5;
@@ -9518,14 +9718,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
       electron_affinity_PT=NNN;
       energies_ionization.clear();energies_ionization.push_back(568);  //CO20201111
-      phi_star_Miedema=NNN;
-      nws_Miedema=NNN;
-      gamma_s_Miedema=NNN;
+      work_function_Miedema=NNN;
+      density_line_electron_WS_Miedema=NNN;
+      energy_surface_0K_Miedema=NNN;
       scale_Pettifor=0;
       temperature_boiling=4000;
       temperature_melting=1572;
-      fusion_heat_PT=15;  //CO20201111
-      vaporization_heat_PT=470;
+      enthalpy_fusion=15;  //CO20201111
+      enthalpy_vaporization=470;
+      enthalpy_atomization_WE=607;  //CO20201111
+      energy_cohesive=NNN;  //CO20201111
       specific_heat_PT=99.1;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -9541,7 +9743,7 @@ namespace xelement {
       modulus_Young=NNN;
       modulus_bulk=NNN;
       Poisson_ratio_PT=NNN;
-      BVm_Miedema=NNN;
+      modulus_bulk_x_volume_molar_Miedema=NNN;
       magnetic_type_PT="Paramagnetic";
       susceptibility_magnetic_mass=3.25E-8;
       susceptibility_magnetic_volume=0.0004995;
@@ -9573,7 +9775,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*238.03;
       volume_molar=0.000012495;
       volume=NNN;
-      Vm_Miedema=NNN;
+      area_molar_Miedema=NNN;
       valence_std=6;
       valence_iupac=6;
       valence_PT=6;
@@ -9608,14 +9810,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
       electron_affinity_PT=NNN;
       energies_ionization.clear();energies_ionization.push_back(597.6);energies_ionization.push_back(1420);  //CO20201111
-      phi_star_Miedema=NNN;
-      nws_Miedema=NNN;
-      gamma_s_Miedema=NNN;
+      work_function_Miedema=NNN;
+      density_line_electron_WS_Miedema=NNN;
+      energy_surface_0K_Miedema=NNN;
       scale_Pettifor=0;
       temperature_boiling=3927;
       temperature_melting=1135;
-      fusion_heat_PT=14;  //CO20201111
-      vaporization_heat_PT=420;
+      enthalpy_fusion=14;  //CO20201111
+      enthalpy_vaporization=420;
+      enthalpy_atomization_WE=536;  //CO20201111
+      energy_cohesive=536;  //CO20201111
       specific_heat_PT=116;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -9631,7 +9835,7 @@ namespace xelement {
       modulus_Young=208;
       modulus_bulk=100;
       Poisson_ratio_PT=0.23;
-      BVm_Miedema=NNN;
+      modulus_bulk_x_volume_molar_Miedema=NNN;
       magnetic_type_PT="Paramagnetic";
       susceptibility_magnetic_mass=2.16E-8;
       susceptibility_magnetic_volume=0.000411;
@@ -9663,7 +9867,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*237.05;
       volume_molar=0.00001158924205379;
       volume=NNN;
-      Vm_Miedema=NNN;
+      area_molar_Miedema=NNN;
       valence_std=7;
       valence_iupac=7;
       valence_PT=6;
@@ -9698,14 +9902,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
       electron_affinity_PT=NNN;
       energies_ionization.clear();energies_ionization.push_back(604.5);  //CO20201111
-      phi_star_Miedema=NNN;
-      nws_Miedema=NNN;
-      gamma_s_Miedema=NNN;
+      work_function_Miedema=NNN;
+      density_line_electron_WS_Miedema=NNN;
+      energy_surface_0K_Miedema=NNN;
       scale_Pettifor=0;
       temperature_boiling=4000;
       temperature_melting=644;
-      fusion_heat_PT=10;  //CO20201111
-      vaporization_heat_PT=335;
+      enthalpy_fusion=10;  //CO20201111
+      enthalpy_vaporization=335;
+      enthalpy_atomization_WE=NNN;  //CO20201111
+      energy_cohesive=456;  //CO20201111
       specific_heat_PT=NNN;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -9721,7 +9927,7 @@ namespace xelement {
       modulus_Young=NNN;
       modulus_bulk=NNN;
       Poisson_ratio_PT=NNN;
-      BVm_Miedema=NNN;
+      modulus_bulk_x_volume_molar_Miedema=NNN;
       magnetic_type_PT="NNN";
       susceptibility_magnetic_mass=NNN;
       susceptibility_magnetic_volume=NNN;
@@ -9753,7 +9959,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*244.06;
       volume_molar=0.00001231328219621;
       volume=NNN;
-      Vm_Miedema=NNN;
+      area_molar_Miedema=NNN;
       valence_std=8;
       valence_iupac=7;
       valence_PT=6;
@@ -9788,14 +9994,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
       electron_affinity_PT=NNN;
       energies_ionization.clear();energies_ionization.push_back(584.7);  //CO20201111
-      phi_star_Miedema=NNN;
-      nws_Miedema=NNN;
-      gamma_s_Miedema=NNN;
+      work_function_Miedema=NNN;
+      density_line_electron_WS_Miedema=NNN;
+      energy_surface_0K_Miedema=NNN;
       scale_Pettifor=0;
       temperature_boiling=3230;
       temperature_melting=640;
-      fusion_heat_PT=NNN;  //CO20201111
-      vaporization_heat_PT=325;
+      enthalpy_fusion=2.8;  //CO20201111 - taken from webelements (NNN from periodictable)
+      enthalpy_vaporization=325;
+      enthalpy_atomization_WE=NNN;  //CO20201111
+      energy_cohesive=347;  //CO20201111
       specific_heat_PT=NNN;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -9811,7 +10019,7 @@ namespace xelement {
       modulus_Young=96;
       modulus_bulk=NNN;
       Poisson_ratio_PT=0.21;
-      BVm_Miedema=NNN;
+      modulus_bulk_x_volume_molar_Miedema=NNN;
       magnetic_type_PT="Paramagnetic";
       susceptibility_magnetic_mass=3.17E-8;
       susceptibility_magnetic_volume=0.0006282;
@@ -9843,7 +10051,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*243.06;
       volume_molar=0.00001777615215801;
       volume=NNN;
-      Vm_Miedema=NNN;
+      area_molar_Miedema=NNN;
       valence_std=9;
       valence_iupac=7;
       valence_PT=4;
@@ -9878,14 +10086,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
       electron_affinity_PT=NNN;
       energies_ionization.clear();energies_ionization.push_back(578);  //CO20201111
-      phi_star_Miedema=NNN;
-      nws_Miedema=NNN;
-      gamma_s_Miedema=NNN;
+      work_function_Miedema=NNN;
+      density_line_electron_WS_Miedema=NNN;
+      energy_surface_0K_Miedema=NNN;
       scale_Pettifor=0;
       temperature_boiling=2011;
       temperature_melting=1176;
-      fusion_heat_PT=NNN;  //CO20201111
-      vaporization_heat_PT=NNN;
+      enthalpy_fusion=NNN;  //CO20201111
+      enthalpy_vaporization=NNN;
+      enthalpy_atomization_WE=NNN;  //CO20201111
+      energy_cohesive=264;  //CO20201111
       specific_heat_PT=NNN;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -9901,7 +10111,7 @@ namespace xelement {
       modulus_Young=NNN;
       modulus_bulk=NNN;
       Poisson_ratio_PT=NNN;
-      BVm_Miedema=NNN;
+      modulus_bulk_x_volume_molar_Miedema=NNN;
       magnetic_type_PT="Paramagnetic";
       susceptibility_magnetic_mass=5.15E-8;
       susceptibility_magnetic_volume=0.000704;
@@ -9933,7 +10143,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*247.07;
       volume_molar=0.00001828275351591;
       volume=NNN;
-      Vm_Miedema=NNN;
+      area_molar_Miedema=NNN;
       valence_std=10;
       valence_iupac=8;
       valence_PT=4;
@@ -9968,14 +10178,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
       electron_affinity_PT=NNN;
       energies_ionization.clear();energies_ionization.push_back(581);  //CO20201111
-      phi_star_Miedema=NNN;
-      nws_Miedema=NNN;
-      gamma_s_Miedema=NNN;
+      work_function_Miedema=NNN;
+      density_line_electron_WS_Miedema=NNN;
+      energy_surface_0K_Miedema=NNN;
       scale_Pettifor=0;
       temperature_boiling=3110;
       temperature_melting=1345;
-      fusion_heat_PT=NNN;  //CO20201111
-      vaporization_heat_PT=NNN;
+      enthalpy_fusion=NNN;  //CO20201111
+      enthalpy_vaporization=320;  //CO20201111 - taken from webelements (NNN from periodictable)
+      enthalpy_atomization_WE=NNN;  //CO20201111
+      energy_cohesive=385;  //CO20201111
       specific_heat_PT=NNN;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -9991,7 +10203,7 @@ namespace xelement {
       modulus_Young=NNN;
       modulus_bulk=NNN;
       Poisson_ratio_PT=NNN;
-      BVm_Miedema=NNN;
+      modulus_bulk_x_volume_molar_Miedema=NNN;
       magnetic_type_PT="NNN";
       susceptibility_magnetic_mass=NNN;
       susceptibility_magnetic_volume=NNN;
@@ -10023,7 +10235,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*247.07;
       volume_molar=0.00001671177266576;
       volume=NNN;
-      Vm_Miedema=NNN;
+      area_molar_Miedema=NNN;
       valence_std=11;
       valence_iupac=4;
       valence_PT=4;
@@ -10058,14 +10270,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
       electron_affinity_PT=NNN;
       energies_ionization.clear();energies_ionization.push_back(601);  //CO20201111
-      phi_star_Miedema=NNN;
-      nws_Miedema=NNN;
-      gamma_s_Miedema=NNN;
+      work_function_Miedema=NNN;
+      density_line_electron_WS_Miedema=NNN;
+      energy_surface_0K_Miedema=NNN;
       scale_Pettifor=0;
       temperature_boiling=NNN;
       temperature_melting=1050;
-      fusion_heat_PT=NNN;  //CO20201111
-      vaporization_heat_PT=NNN;
+      enthalpy_fusion=NNN;  //CO20201111
+      enthalpy_vaporization=NNN;
+      enthalpy_atomization_WE=NNN;  //CO20201111
+      energy_cohesive=320;  //CO20201111
       specific_heat_PT=NNN;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -10081,7 +10295,7 @@ namespace xelement {
       modulus_Young=NNN;
       modulus_bulk=NNN;
       Poisson_ratio_PT=NNN;
-      BVm_Miedema=NNN;
+      modulus_bulk_x_volume_molar_Miedema=NNN;
       magnetic_type_PT="NNN";
       susceptibility_magnetic_mass=NNN;
       susceptibility_magnetic_volume=NNN;
@@ -10113,7 +10327,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*251.08;
       volume_molar=0.00001662251655629;
       volume=NNN;
-      Vm_Miedema=NNN;
+      area_molar_Miedema=NNN;
       valence_std=12;
       valence_iupac=4;
       valence_PT=4;
@@ -10148,14 +10362,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
       electron_affinity_PT=NNN;
       energies_ionization.clear();energies_ionization.push_back(608);  //CO20201111
-      phi_star_Miedema=NNN;
-      nws_Miedema=NNN;
-      gamma_s_Miedema=NNN;
+      work_function_Miedema=NNN;
+      density_line_electron_WS_Miedema=NNN;
+      energy_surface_0K_Miedema=NNN;
       scale_Pettifor=0;
       temperature_boiling=NNN;
       temperature_melting=900;
-      fusion_heat_PT=NNN;  //CO20201111
-      vaporization_heat_PT=NNN;
+      enthalpy_fusion=NNN;  //CO20201111
+      enthalpy_vaporization=NNN;
+      enthalpy_atomization_WE=NNN;  //CO20201111
+      energy_cohesive=NNN;  //CO20201111
       specific_heat_PT=NNN;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -10171,7 +10387,7 @@ namespace xelement {
       modulus_Young=NNN;
       modulus_bulk=NNN;
       Poisson_ratio_PT=NNN;
-      BVm_Miedema=NNN;
+      modulus_bulk_x_volume_molar_Miedema=NNN;
       magnetic_type_PT="NNN";
       susceptibility_magnetic_mass=NNN;
       susceptibility_magnetic_volume=NNN;
@@ -10203,7 +10419,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*252.08;
       volume_molar=NNN;
       volume=NNN;
-      Vm_Miedema=NNN;
+      area_molar_Miedema=NNN;
       valence_std=13;
       valence_iupac=4;
       valence_PT=4;
@@ -10238,14 +10454,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
       electron_affinity_PT=NNN;
       energies_ionization.clear();energies_ionization.push_back(619);  //CO20201111
-      phi_star_Miedema=NNN;
-      nws_Miedema=NNN;
-      gamma_s_Miedema=NNN;
+      work_function_Miedema=NNN;
+      density_line_electron_WS_Miedema=NNN;
+      energy_surface_0K_Miedema=NNN;
       scale_Pettifor=0;
       temperature_boiling=NNN;
       temperature_melting=860;
-      fusion_heat_PT=NNN;  //CO20201111
-      vaporization_heat_PT=NNN;
+      enthalpy_fusion=NNN;  //CO20201111
+      enthalpy_vaporization=NNN;
+      enthalpy_atomization_WE=NNN;  //CO20201111
+      energy_cohesive=NNN;  //CO20201111
       specific_heat_PT=NNN;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -10261,7 +10479,7 @@ namespace xelement {
       modulus_Young=NNN;
       modulus_bulk=NNN;
       Poisson_ratio_PT=NNN;
-      BVm_Miedema=NNN;
+      modulus_bulk_x_volume_molar_Miedema=NNN;
       magnetic_type_PT="NNN";
       susceptibility_magnetic_mass=NNN;
       susceptibility_magnetic_volume=NNN;
@@ -10293,7 +10511,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*257.1;
       volume_molar=NNN;
       volume=NNN;
-      Vm_Miedema=NNN;
+      area_molar_Miedema=NNN;
       valence_std=14;
       valence_iupac=3;
       valence_PT=3;
@@ -10328,14 +10546,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
       electron_affinity_PT=NNN;
       energies_ionization.clear();energies_ionization.push_back(627);  //CO20201111
-      phi_star_Miedema=NNN;
-      nws_Miedema=NNN;
-      gamma_s_Miedema=NNN;
+      work_function_Miedema=NNN;
+      density_line_electron_WS_Miedema=NNN;
+      energy_surface_0K_Miedema=NNN;
       scale_Pettifor=0;
       temperature_boiling=NNN;
       temperature_melting=1527;
-      fusion_heat_PT=NNN;  //CO20201111
-      vaporization_heat_PT=NNN;
+      enthalpy_fusion=NNN;  //CO20201111
+      enthalpy_vaporization=NNN;
+      enthalpy_atomization_WE=NNN;  //CO20201111
+      energy_cohesive=NNN;  //CO20201111
       specific_heat_PT=NNN;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -10351,7 +10571,7 @@ namespace xelement {
       modulus_Young=NNN;
       modulus_bulk=NNN;
       Poisson_ratio_PT=NNN;
-      BVm_Miedema=NNN;
+      modulus_bulk_x_volume_molar_Miedema=NNN;
       magnetic_type_PT="NNN";
       susceptibility_magnetic_mass=NNN;
       susceptibility_magnetic_volume=NNN;
@@ -10383,7 +10603,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*258.1;
       volume_molar=NNN;
       volume=NNN;
-      Vm_Miedema=NNN;
+      area_molar_Miedema=NNN;
       valence_std=15;
       valence_iupac=3;
       valence_PT=3;
@@ -10418,14 +10638,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
       electron_affinity_PT=NNN;
       energies_ionization.clear();energies_ionization.push_back(635);  //CO20201111
-      phi_star_Miedema=NNN;
-      nws_Miedema=NNN;
-      gamma_s_Miedema=NNN;
+      work_function_Miedema=NNN;
+      density_line_electron_WS_Miedema=NNN;
+      energy_surface_0K_Miedema=NNN;
       scale_Pettifor=0;
       temperature_boiling=NNN;
       temperature_melting=828;
-      fusion_heat_PT=NNN;  //CO20201111
-      vaporization_heat_PT=NNN;
+      enthalpy_fusion=NNN;  //CO20201111
+      enthalpy_vaporization=NNN;
+      enthalpy_atomization_WE=NNN;  //CO20201111
+      energy_cohesive=NNN;  //CO20201111
       specific_heat_PT=NNN;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -10441,7 +10663,7 @@ namespace xelement {
       modulus_Young=NNN;
       modulus_bulk=NNN;
       Poisson_ratio_PT=NNN;
-      BVm_Miedema=NNN;
+      modulus_bulk_x_volume_molar_Miedema=NNN;
       magnetic_type_PT="NNN";
       susceptibility_magnetic_mass=NNN;
       susceptibility_magnetic_volume=NNN;
@@ -10473,7 +10695,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*259.1;
       volume_molar=NNN;
       volume=NNN;
-      Vm_Miedema=NNN;
+      area_molar_Miedema=NNN;
       valence_std=16;
       valence_iupac=3;
       valence_PT=3;
@@ -10508,14 +10730,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
       electron_affinity_PT=NNN;
       energies_ionization.clear();energies_ionization.push_back(642);  //CO20201111
-      phi_star_Miedema=NNN;
-      nws_Miedema=NNN;
-      gamma_s_Miedema=NNN;
+      work_function_Miedema=NNN;
+      density_line_electron_WS_Miedema=NNN;
+      energy_surface_0K_Miedema=NNN;
       scale_Pettifor=0;
       temperature_boiling=NNN;
       temperature_melting=828;
-      fusion_heat_PT=NNN;  //CO20201111
-      vaporization_heat_PT=NNN;
+      enthalpy_fusion=NNN;  //CO20201111
+      enthalpy_vaporization=NNN;
+      enthalpy_atomization_WE=NNN;  //CO20201111
+      energy_cohesive=NNN;  //CO20201111
       specific_heat_PT=NNN;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -10531,7 +10755,7 @@ namespace xelement {
       modulus_Young=NNN;
       modulus_bulk=NNN;
       Poisson_ratio_PT=NNN;
-      BVm_Miedema=NNN;
+      modulus_bulk_x_volume_molar_Miedema=NNN;
       magnetic_type_PT="NNN";
       susceptibility_magnetic_mass=NNN;
       susceptibility_magnetic_volume=NNN;
@@ -10563,7 +10787,7 @@ namespace xelement {
       mass=AMU2KILOGRAM*262.11;
       volume_molar=NNN;
       volume=NNN;
-      Vm_Miedema=NNN;
+      area_molar_Miedema=NNN;
       valence_std=17;
       valence_iupac=3;
       valence_PT=3;
@@ -10598,14 +10822,16 @@ namespace xelement {
       oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
       electron_affinity_PT=NNN;
       energies_ionization.clear();energies_ionization.push_back(NNN);  //CO20201111
-      phi_star_Miedema=NNN;
-      nws_Miedema=NNN;
-      gamma_s_Miedema=NNN;
+      work_function_Miedema=NNN;
+      density_line_electron_WS_Miedema=NNN;
+      energy_surface_0K_Miedema=NNN;
       scale_Pettifor=0;
       temperature_boiling=NNN;
       temperature_melting=1627;
-      fusion_heat_PT=NNN;  //CO20201111
-      vaporization_heat_PT=NNN;
+      enthalpy_fusion=NNN;  //CO20201111
+      enthalpy_vaporization=NNN;
+      enthalpy_atomization_WE=NNN;  //CO20201111
+      energy_cohesive=NNN;  //CO20201111
       specific_heat_PT=NNN;
       critical_pressure=NNN;
       critical_temperature_PT=NNN;
@@ -10621,7 +10847,7 @@ namespace xelement {
       modulus_Young=NNN;
       modulus_bulk=NNN;
       Poisson_ratio_PT=NNN;
-      BVm_Miedema=NNN;
+      modulus_bulk_x_volume_molar_Miedema=NNN;
       magnetic_type_PT="NNN";
       susceptibility_magnetic_mass=NNN;
       susceptibility_magnetic_volume=NNN;
