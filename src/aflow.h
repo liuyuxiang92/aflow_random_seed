@@ -1185,11 +1185,11 @@ extern std::vector<double> vatom_mass;               // store starting from ONE
 extern std::vector<double> vatom_volume;             // store starting from ONE
 extern std::vector<int> vatom_valence_iupac;         // store starting from ONE http://en.wikipedia.org/wiki/Valence_(chemistry)
 extern std::vector<int> vatom_valence_std;           // store starting from ONE http://en.wikipedia.org/wiki/Valence_(chemistry)
-extern std::vector<double> vatom_miedema_phi_star;       // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
-extern std::vector<double> vatom_miedema_nws;            // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
-extern std::vector<double> vatom_miedema_Vm;             // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
-extern std::vector<double> vatom_miedema_gamma_s;        // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
-extern std::vector<double> vatom_miedema_BVm;            // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
+extern std::vector<double> vatom_miedema_phi_star;       // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28 10.1016/0378-4363(80)90054-6
+extern std::vector<double> vatom_miedema_nws;            // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28 10.1016/0378-4363(80)90054-6
+extern std::vector<double> vatom_miedema_Vm;             // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28 10.1016/0378-4363(80)90054-6
+extern std::vector<double> vatom_miedema_gamma_s;        // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28 10.1016/0378-4363(80)90054-6
+extern std::vector<double> vatom_miedema_BVm;            // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28 10.1016/0378-4363(80)90054-6
 extern std::vector<double> vatom_radius;             // store starting from ONE - Saxena
 extern std::vector<double> vatom_radius_covalent;    // store starting from ONE - Codero, Covalent radii revisited, DOI: 10.1039/b801115j //DX+CO20170904
 extern std::vector<double> vatom_electronegativity;  // store starting from ONE - Saxena
@@ -4644,6 +4644,7 @@ namespace makefile {
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
 // aflow_xelement.h stuff
+#define _AFLOW_XELEMENT_PROPERTIES_ALL_ "name,symbol,Z,period,group,series,block,mass,volume_molar,volume,Vm_Miedema,valence_std,valence_iupac,valence_PT,valence_s,valence_p,valence_d,valence_f,density_PT,crystal,crystal_structure_PT,spacegroup,spacegroup_number,variance_parameter_mass,lattice_constants,lattice_angles,phase,radius_Saxena,radius_PT,radius_covalent_PT,radius_covalent,radius_VanDerWaals_PT,radii_Ghosh08,radii_Slatter,radii_Pyykko,conductivity_electrical,electronegativity_Pauling,hardness_chemical_Ghosh,electronegativity_Pearson,electronegativity_Ghosh,electronegativity_Allen,oxidation_states,oxidation_states_preferred,electron_affinity_PT,energies_ionization,phi_star_Miedema,nws_Miedema,gamma_s_Miedema,scale_Pettifor,temperature_boiling,temperature_melting,fusion_heat_PT,vaporization_heat_PT,specific_heat_PT,critical_pressure,critical_temperature_PT,thermal_expansion,conductivity_thermal,hardness_mechanical_Brinell,hardness_mechanical_Mohs,hardness_mechanical_Vickers,hardness_chemical_Pearson,hardness_chemical_Putz,hardness_chemical_RB,modulus_shear,modulus_Young,modulus_bulk,Poisson_ratio_PT,BVm_Miedema,magnetic_type_PT,susceptibility_magnetic_mass,susceptibility_magnetic_volume,susceptibility_magnetic_molar,temperature_Curie,refractive_index,color_PT,HHIP,HHIR,xray_scatt" //CO20201111
 namespace xelement {
   class xelement { // simple class.. nothing fancy
     public:
@@ -4654,12 +4655,18 @@ namespace xelement {
       ~xelement();                                           // kill everything
       const xelement& operator=(const xelement &b);          // copy
       void clear();
+      void loadDefaultUnits();  //CO20201111
       void populate(const string& element); //CO20200520
       void populate(uint ZZ); //CO20200520
       string getPropertyVector(const string& property,const string& delim=",",uint ncols=AUROSTD_MAX_UINT) const; //CO20201111
       string getProperty(const string& property,const string& delim=",",uint ncols=AUROSTD_MAX_UINT) const; //CO20201111
+      string getType(const string& property) const; //CO20201111
+      string getUnits(const string& property) const; //CO20201111
+      void convertUnits(const string& property="ALL",const string& units_new="SI");  //CO20201111
+      
       // content                                             // content
       bool verbose;
+      
       // [AFLOW]START=DECLARATION
       int Z;                                  // Z
       string symbol;                          // http://periodictable.com      //DU20190517   // DONE SC20190524
@@ -4670,9 +4677,9 @@ namespace xelement {
       string block;                           // http://periodictable.com      //DU20190517
       //                                          
       double mass;                            // (kg)     // DONE SC20190524
-      double molar_volume;                     // (m^3/mol) http://periodictable.com      //DU20190517
+      double volume_molar;                     // (m^3/mol) http://periodictable.com      //DU20190517
       double volume;                          // atomic volume in A^3 from the FCC vasp table and/or successive calculations // DONE SC20190524
-      double Vm_Miedema;                      // (V_m^{2/3} in (cm^2)) Miedema Rule Table 1a Physica 100B (1980) 1-28
+      double Vm_Miedema;                      // (V_m^{2/3} in (cm^2)) Miedema Rule Table 1a Physica 100B (1980) 1-28 10.1016/0378-4363(80)90054-6
       // for lanthines from J.A. Alonso and N.H. March. Electrons in Metals and Alloys, Academic Press, London (1989) (except La)
       double valence_std;                     // http://en.wikipedia.org/wiki/Valence_(chemistry) standard: number electrons minus closed shell at leff (noble gas)
       double valence_iupac;                   // http://en.wikipedia.org/wiki/Valence_(chemistry) IUPAC Maximum number of univalent atoms that may combine with an atom of the element under consideration, or with a fragment, or for which an atom of this element can be substituted.
@@ -4684,8 +4691,8 @@ namespace xelement {
       double density_PT;                      // (g/cm^3)  http://periodictable.com      //DU20190517
       string crystal;                         // Ashcroft-Mermin                                                                                                                   
       string crystal_structure_PT;                   // http://periodictable.com      //DU20190517
-      string space_group;                     // http://periodictable.com      //DU20190517
-      uint space_group_number;                // http://periodictable.com      //DU20190517
+      string spacegroup;                     // http://periodictable.com      //DU20190517
+      uint spacegroup_number;                // http://periodictable.com      //DU20190517
       double variance_parameter_mass;             // Pearson mass deviation coefficient: the square deviation of the isotope masses (weighted by occurrence): 10.1103/PhysRevB.27.858 (isotope corrections), 10.1351/PAC-REP-10-06-02 (isotope distributions) //ME20181020
       xvector<double> lattice_constants;       // (pm) http://periodictable.com      //DU20190517
       xvector<double> lattice_angles;          // (rad) http://periodictable.com      //DU20190517
@@ -4701,7 +4708,7 @@ namespace xelement {
       //                                          
       double conductivity_electrical;          // (S/m)  http://periodictable.com  Value given for graphite. Diamond electrical conductivity is approximately 0.001.      //DU20190517
       double electronegativity_Pauling;           // Saxena
-      double hardness_Ghosh;                   // (eV) Int. J. Quantum Chem 110, 1206-1213 (2010) Table III       //DU20190517
+      double hardness_chemical_Ghosh;                   // (eV) Int. J. Quantum Chem 110, 1206-1213 (2010) Table III       //DU20190517
       double electronegativity_Pearson;                  // (eV) Inorg. Chem., 27(4), 734–740 (1988)      //DU20190517
       double electronegativity_Ghosh;                    // (eV) Journal of Theoretical and Computational Chemistry, 4, 21-33 (2005)      //DU20190517
 
@@ -4719,9 +4726,9 @@ namespace xelement {
 
       double electron_affinity_PT;             // (kJ/mol)  http://periodictable.com       //DU20190517
       vector<double> energies_ionization;     // (kJ/mol) http://periodictable.com //CO20201111
-      double phi_star_Miedema;                // (V)        (phi^\star   Miedema Rule Table 1a Physica 100B 1-28 (1980)
-      double nws_Miedema;                     // (d.u.)^1/3 n_{ws}^{1/3} Miedema Rule Table 1a Physica 100B 1-28 (1980)
-      double gamma_s_Miedema;                 // (mJ/m^2)   \gamma_s^0   Miedema Rule Table 1a Physica 100B 1-28 (1980)
+      double phi_star_Miedema;                // (V)        (phi^\star   Miedema Rule Table 1a Physica 100B 1-28 (1980) 10.1016/0378-4363(80)90054-6
+      double nws_Miedema;                     // (d.u.)^1/3 n_{ws}^{1/3} Miedema Rule Table 1a Physica 100B 1-28 (1980) 10.1016/0378-4363(80)90054-6
+      double gamma_s_Miedema;                 // (mJ/m^2)   \gamma_s^0   Miedema Rule Table 1a Physica 100B 1-28 (1980) 10.1016/0378-4363(80)90054-6
       double scale_Pettifor;                  // Chemical Scale Pettifor Solid State Communications 51 31-34 (1984)
       //                                          
       double temperature_boiling;                   // (Celsius), http://periodictable.com C:diamond, P:"YELLOW" Phosphorus, As:sublimates at this T.      //DU20190517
@@ -4734,17 +4741,17 @@ namespace xelement {
       double thermal_expansion;               // (K^{-1})   http://periodictable.com C:graphite      //DU20190517
       double conductivity_thermal;            // (W/(m K))   http://periodictable.com      //DU20190517
       //                                         
-      double hardness_Brinell;               // (MPa)  http://periodictable.com For Ge value is converted from Mohs scale      //DU20190517
-      double hardness_Mohs;                   //        http://periodictable.com For C, value given for graphite. Diamond value is 10.0; For Pr, Nd, Sm, Eu, Gd, Tb, Dy, Ho, Er, Tm, Lu converted from Vickers scale.      //DU20190517
-      double hardness_Vickers;                // (MPa)  http://periodictable.com For Si,Ge,As,Ru,Os converted from Brinell scale.      //DU20190517
-      double hardness_Pearson;                // (eV)   Inorg. Chem. 27(4) 734-740 (1988).      //DU20190517
-      double hardness_Putz;                   // (eV/atom) International Journal of Quantum Chemistry, Vol 106, 361–389 (2006), TABLE-V.      //DU20190517
-      double hardness_RB;                     // (eV)   Robles and Bartolotti, J. Am. Chem. Soc. 106, 3723-3727 (1984).      //DU20190517
+      double hardness_mechanical_Brinell;               // (MPa)  http://periodictable.com For Ge value is converted from Mohs scale      //DU20190517
+      double hardness_mechanical_Mohs;                   //        http://periodictable.com For C, value given for graphite. Diamond value is 10.0; For Pr, Nd, Sm, Eu, Gd, Tb, Dy, Ho, Er, Tm, Lu converted from Vickers scale.      //DU20190517
+      double hardness_mechanical_Vickers;                // (MPa)  http://periodictable.com For Si,Ge,As,Ru,Os converted from Brinell scale.      //DU20190517
+      double hardness_chemical_Pearson;                // (eV)   Inorg. Chem. 27(4) 734-740 (1988).      //DU20190517
+      double hardness_chemical_Putz;                   // (eV/atom) International Journal of Quantum Chemistry, Vol 106, 361–389 (2006), TABLE-V. 10.1002/qua.20787      //DU20190517
+      double hardness_chemical_RB;                     // (eV)   Robles and Bartolotti, J. Am. Chem. Soc. 106, 3723-3727 (1984).  10.1021/ja00325a003 using Gunnarsson-Lundqvist (GL) for XC functional    //DU20190517
       double modulus_shear;                    // (GPa)  http://periodictable.com      //DU20190517
       double modulus_Young;                    // (GPa)  http://periodictable.com      //DU20190517
       double modulus_bulk;                     // (GPa)  http://periodictable.com      //DU20190517
       double Poisson_ratio_PT;                 // (--)   http://periodictable.com      //DU20190517
-      double BVm_Miedema;                     // (kJ/mole) BV_m Miedema Rule Table 1a Physica 100B 1-28 (1980) 
+      double BVm_Miedema;                     // (kJ/mol) BV_m Miedema Rule Table 1a Physica 100B 1-28 (1980) 
       //
       string magnetic_type_PT;                 //           http://periodictable.com  //DU20190517
       double susceptibility_magnetic_mass;      // (m^3/K)   http://periodictable.com //DU20190517
@@ -4757,7 +4764,7 @@ namespace xelement {
       //
       double HHIP;                            // Chem. Mater. 25(15), 2911–2920 (2013) Herfindahl–Hirschman Index (HHI), HHIP: for elemental production, Uncertinities in HHI_P: C,O,F,Cl,Sc,Ga,Rb,Ru,Rh,Cs,Hf,Os,Ir,Tl.      //DU20190517
       double HHIR;                            // Chem. Mater. 25(15), 2911–2920 (2013) Herfindahl–Hirschman Index (HHI), HHIR: for elemental reserves,   Uncertinities in HHI_R: Be,C,N,O,F,Na,Mg,Al,Si,S,Cl,Ca,Sc,Ga,Ge,As,Rb,Sr,Ru,Rh,Pd,In,Cs,Hf,Os,Ir,Pt,Tl.      //DU20190517
-      double xray_scatt;                      // shift+1 // All data collected from the NIST online tables: http://physics.nist.gov/PhysRefData/FFast/html/form.html//
+      double xray_scatt;                      // e-/atom //shift+1 // All data collected from the NIST online tables: http://physics.nist.gov/PhysRefData/FFast/html/form.html  //CO20201111 - another good source: https://henke.lbl.gov/optical_constants/asf.html
 
       // Xray_scatt_vector All data collected from the NIST online tables
       // http://physics.nist.gov/PhysRefData/FFast/html/form.html
@@ -4769,6 +4776,97 @@ namespace xelement {
       // All data are f1 values for Cu-alpha (wavelength=1.5418A, E=8.0416keV].
 
       // [AFLOW]STOP=DECLARATION
+      
+      //UNITS
+      string units_Z;
+      string units_symbol;
+      string units_name;
+      string units_period;
+      string units_group; 
+      string units_series;
+      string units_block;      
+      //                                          
+      string units_mass;
+      string units_volume_molar;  
+      string units_volume;      
+      string units_Vm_Miedema;      
+      //
+      string units_valence_std;  
+      string units_valence_iupac;
+      string units_valence_PT;       
+      string units_valence_s;       //CO20201111
+      string units_valence_p;       //CO20201111
+      string units_valence_d;       //CO20201111
+      string units_valence_f;       //CO20201111
+      string units_density_PT;       
+      string units_crystal;    
+      string units_crystal_structure_PT;
+      string units_spacegroup;
+      string units_spacegroup_number;    
+      string units_variance_parameter_mass;
+      string units_lattice_constants; 
+      string units_lattice_angles;   
+      string units_phase;
+      string units_radius_Saxena;         
+      string units_radius_PT;          
+      string units_radius_covalent_PT;   
+      string units_radius_covalent;  
+      string units_radius_VanDerWaals_PT;
+      string units_radii_Ghosh08;         
+      string units_radii_Slatter;         
+      string units_radii_Pyykko;          
+      //                                          
+      string units_conductivity_electrical;
+      string units_electronegativity_Pauling;    
+      string units_hardness_chemical_Ghosh;            
+      string units_electronegativity_Pearson;           
+      string units_electronegativity_Ghosh;             
+      string units_electronegativity_Allen;
+      string units_oxidation_states;
+      string units_oxidation_states_preferred;
+      string units_electron_affinity_PT;      
+      string units_energies_ionization;
+      string units_phi_star_Miedema;         
+      string units_nws_Miedema;              
+      string units_gamma_s_Miedema;          
+      //
+      string units_scale_Pettifor;          
+      //
+      string units_temperature_boiling;         
+      string units_temperature_melting;         
+      string units_fusion_heat_PT;     //CO20201111
+      string units_vaporization_heat_PT;     
+      string units_specific_heat_PT;         
+      string units_critical_pressure;     
+      string units_critical_temperature_PT;  
+      string units_thermal_expansion;     
+      string units_conductivity_thermal;  
+      //                                         
+      string units_hardness_mechanical_Brinell;
+      string units_hardness_mechanical_Mohs;    
+      string units_hardness_mechanical_Vickers; 
+      string units_hardness_chemical_Pearson;   
+      string units_hardness_chemical_Putz;      
+      string units_hardness_chemical_RB;        
+      string units_modulus_shear;    
+      string units_modulus_Young;    
+      string units_modulus_bulk;     
+      string units_Poisson_ratio_PT;    
+      string units_BVm_Miedema;        
+      //
+      string units_magnetic_type_PT;
+      string units_susceptibility_magnetic_mass;
+      string units_susceptibility_magnetic_volume;
+      string units_susceptibility_magnetic_molar; 
+      string units_temperature_Curie;                  
+      //
+      string units_refractive_index;             
+      string units_color_PT;         
+      //
+      string units_HHIP;                           
+      string units_HHIR;                           
+      string units_xray_scatt;
+
       // operators/functions                                    // operator/functions
       friend ostream& operator<<(ostream &,const xelement&);    // print
       xelement Initialize(uint Z);                              // function to clean up the name

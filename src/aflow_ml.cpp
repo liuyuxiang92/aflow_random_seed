@@ -61,7 +61,7 @@ namespace aflowML {
 
     if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
 
-    uint ielement=0,ioxidation=0,i=0,j=0,ipp=0;
+    uint ielement=0,ioxidation=0,i=0,j=0,k=0,ipp=0;
     string correction_line="",bader_line="",input_pre="",input="";
     xelement::xelement xel_cation,xel_N,xel_O;xel_N.populate("N");xel_O.populate("O");
     //cce::get_corrections_line_O("Al_+3_N");
@@ -72,7 +72,8 @@ namespace aflowML {
     vector<string> vheaders;
     vector<string> vions;aurostd::string2tokens("cation,anion",vions,",");
     vector<string> vproperties_elements;
-    aurostd::string2tokens("symbol,Z,period,group,mass,molar_volume,volume,valence_std,valence_iupac,valence_PT,valence_s,valence_p,valence_d,valence_f,density_PT,space_group_number,variance_parameter_mass,lattice_constants,lattice_angles,radius_Saxena,radius_PT,radius_covalent_PT,radius_covalent,radius_VanDerWaals_PT,radii_Ghosh08,radii_Slatter,radii_Pyykko,conductivity_electrical,electronegativity_Pauling,hardness_Ghosh,electronegativity_Pearson,electronegativity_Ghosh,electronegativity_Allen,electron_affinity_PT,energies_ionization,,scale_Pettifor,temperature_boiling,temperature_melting,fusion_heat_PT,vaporization_heat_PT,specific_heat_PT,critical_pressure,critical_temperature_PT,thermal_expansion,conductivity_thermal,hardness_Brinell,hardness_Mohs,hardness_Vickers,hardness_Pearson,hardness_Putz,hardness_RB,modulus_shear,modulus_Young,modulus_bulk,Poisson_ratio_PT,refractive_index",vproperties_elements,",");
+    aurostd::string2tokens("symbol,Z,period,group,mass,volume_molar,volume,valence_std,valence_iupac,valence_PT,valence_s,valence_p,valence_d,valence_f,density_PT,spacegroup_number,variance_parameter_mass,lattice_constants,lattice_angles,radius_Saxena,radius_PT,radius_covalent_PT,radius_covalent,radius_VanDerWaals_PT,radii_Ghosh08,radii_Slatter,radii_Pyykko,conductivity_electrical,electronegativity_Pauling,hardness_chemical_Ghosh,electronegativity_Pearson,electronegativity_Ghosh,electronegativity_Allen,electron_affinity_PT,energies_ionization,scale_Pettifor,temperature_boiling,temperature_melting,fusion_heat_PT,vaporization_heat_PT,specific_heat_PT,critical_pressure,critical_temperature_PT,thermal_expansion,conductivity_thermal,hardness_mechanical_Brinell,hardness_mechanical_Mohs,hardness_mechanical_Vickers,hardness_chemical_Pearson,hardness_chemical_Putz,hardness_chemical_RB,modulus_shear,modulus_Young,modulus_bulk,Poisson_ratio_PT,refractive_index",vproperties_elements,",");
+    uint energy_ionization_max=5;
     for(i=0;i<vions.size();i++){
       for(j=0;j<vproperties_elements.size();j++){
         if(vproperties_elements[j]=="lattice_constants"){
@@ -86,8 +87,7 @@ namespace aflowML {
           vheaders.push_back(vproperties_elements[j]+"_gamma_"+vions[i]);
         }
         else if(vproperties_elements[j]=="energies_ionization"){
-          vheaders.push_back(vproperties_elements[j]+"_1_"+vions[i]);
-          vheaders.push_back(vproperties_elements[j]+"_2_"+vions[i]);
+          for(k=0;k<energy_ionization_max;k++){vheaders.push_back(vproperties_elements[j]+"_"+aurostd::utype2string(k+1)+"_"+vions[i]);}
         }
         else{
           vheaders.push_back(vproperties_elements[j]+"_"+vions[i]);
@@ -111,6 +111,7 @@ namespace aflowML {
     vheaders.push_back("exp_298.15K");
     vheaders.push_back("M-X_bonds");
     vheaders.push_back("natoms_per_f.u._cation");
+    vheaders.push_back("natoms_per_f.u._anion");
     vheaders.push_back("enthalpy_formation_atom_exp");
     //
     vheaders.push_back("geometry_a_crystal");
@@ -160,7 +161,13 @@ namespace aflowML {
         vitems_pre.clear();
         //cation
         for(i=0;i<vproperties_elements.size();i++){
-          if(vproperties_elements[i]=="energies_ionization"){vitems_pre.push_back(xel_cation.getProperty(vproperties_elements[i],",",2));} //only go to second ionization
+          if(vproperties_elements[i]=="energies_ionization"){
+            //vitems_pre.push_back(xel_cation.getProperty(vproperties_elements[i],",",2)); //only go to second ionization
+            for(j=0;j<energy_ionization_max;j++){
+              if(j>xel_cation.energies_ionization.size()-1){vitems_pre.push_back(aurostd::utype2string(NNN,_DOUBLE_WRITE_PRECISION_));continue;}
+              vitems_pre.push_back(aurostd::utype2string(xel_cation.energies_ionization[j],_DOUBLE_WRITE_PRECISION_));
+            }
+          }
           else{vitems_pre.push_back(xel_cation.getProperty(vproperties_elements[i],","));}
         }
         //
@@ -184,7 +191,13 @@ namespace aflowML {
           vitems.clear();for(i=0;i<vitems_pre.size();i++){vitems.push_back(vitems_pre[i]);}
           //anion
           for(i=0;i<vproperties_elements.size();i++){
-            if(vproperties_elements[i]=="energies_ionization"){vitems.push_back(xel_N.getProperty(vproperties_elements[i],",",2));} //only go to second ionization
+            if(vproperties_elements[i]=="energies_ionization"){
+              //vitems.push_back(xel_N.getProperty(vproperties_elements[i],",",2)); //only go to second ionization
+              for(j=0;j<energy_ionization_max;j++){
+                if(j>xel_N.energies_ionization.size()-1){vitems.push_back(aurostd::utype2string(NNN,_DOUBLE_WRITE_PRECISION_));continue;}
+                vitems.push_back(aurostd::utype2string(xel_N.energies_ionization[j],_DOUBLE_WRITE_PRECISION_));
+              }
+            }
             else{vitems.push_back(xel_N.getProperty(vproperties_elements[i],","));}
           }
           //
@@ -207,14 +220,15 @@ namespace aflowML {
           //
           if(LDEBUG){cerr << soliloquy << " correction_line=\"" << correction_line << "\"" << endl;}
           aurostd::string2tokens(correction_line,vtokens," ");
-          if(vtokens.size()<15){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"vtokens.size()<13",_FILE_CORRUPT_);}
+          if(vtokens.size()<16){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"vtokens.size()<16",_FILE_CORRUPT_);}
           for(i=2;i<=11;i++){vitems.push_back(vtokens[i]);}
           //
           structure_path=vtokens[12];
           if(LDEBUG){cerr << soliloquy << " structure_path=" << structure_path << endl;}
           //
           vitems.push_back(vtokens[13]);  //ncations_per_f.u.
-          vitems.push_back(vtokens[14]);  //H_f^exp_298.15K
+          vitems.push_back(vtokens[14]);  //nanions_per_f.u.
+          vitems.push_back(vtokens[15]);  //H_f^exp_298.15K
           //
           insertCrystalPropertiesCCE(structure_path,"N",vitems);
           //
@@ -228,7 +242,13 @@ namespace aflowML {
           vitems.clear();for(i=0;i<vitems_pre.size();i++){vitems.push_back(vitems_pre[i]);}
           //anion
           for(i=0;i<vproperties_elements.size();i++){
-            if(vproperties_elements[i]=="energies_ionization"){vitems.push_back(xel_O.getProperty(vproperties_elements[i],",",2));} //only go to second ionization
+            if(vproperties_elements[i]=="energies_ionization"){
+              //vitems.push_back(xel_O.getProperty(vproperties_elements[i],",",2)); //only go to second ionization
+              for(j=0;j<energy_ionization_max;j++){
+                if(j>xel_O.energies_ionization.size()-1){vitems.push_back(aurostd::utype2string(NNN,_DOUBLE_WRITE_PRECISION_));continue;}
+                vitems.push_back(aurostd::utype2string(xel_O.energies_ionization[j],_DOUBLE_WRITE_PRECISION_));
+              }
+            }
             else{vitems.push_back(xel_O.getProperty(vproperties_elements[i],","));}
           }
           //
@@ -257,14 +277,15 @@ namespace aflowML {
           //
           if(LDEBUG){cerr << soliloquy << " correction_line=\"" << correction_line << "\"" << endl;}
           aurostd::string2tokens(correction_line,vtokens," ");
-          if(vtokens.size()<12){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"vtokens.size()<11",_FILE_CORRUPT_);}
+          if(vtokens.size()<16){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"vtokens.size()<16",_FILE_CORRUPT_);}
           for(i=2;i<=11;i++){vitems.push_back(vtokens[i]);}
           //
           structure_path=vtokens[12];
           if(LDEBUG){cerr << soliloquy << " structure_path=" << structure_path << endl;}
           //
           vitems.push_back(vtokens[13]);  //ncations_per_f.u.
-          vitems.push_back(vtokens[14]);  //H_f^exp_298.15K
+          vitems.push_back(vtokens[14]);  //nanions_per_f.u.
+          vitems.push_back(vtokens[15]);  //H_f^exp_298.15K
           //
           insertCrystalPropertiesCCE(structure_path,"O",vitems);
           //

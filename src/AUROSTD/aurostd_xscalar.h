@@ -53,6 +53,8 @@
 #define AMU2KILOGRAM            1.66054E-27
 #define KILOGRAM2AMU            6.022137E+26
 #define E_ELECTRON              1.60217662E-19                  // C
+#define eV2J                    E_ELECTRON                      // 1eV=E_ELECTRON J //CO20201111
+#define J2eV                    (1.0/E_ELECTRON)                //CO20201111
 #define PLANCKSCONSTANT_h       6.62607E-34                     // J*s
 #define PLANCKSCONSTANT_hbar    1.0545718E-34                   // J*s
 #define PLANCKSCONSTANTEV_h     (PLANCKSCONSTANT_h/E_ELECTRON)  // eV*s
@@ -62,6 +64,7 @@
 #define eV2K                    (11604.505)                     // 1eV=11604.505 K
 #define meV2K                   (11.604505)                     // 1meV=11.604505 K
 #define mol2atom                6.0221408E23                    // 1mol=6.022e23 atoms    //CO20180329
+#define atom2mol                (1.0/6.0221408E23)              //CO20201111
 #define eVatom2kJmol            (E_ELECTRON*mol2atom/1.0e3)     // 1eV/atom=96.5kJ/mol    //CO20180329
 #define meVatom2kJmol           (eVatom2kJmol/1.0e3)            // 1meV/atom=0.0965kJ/mol //CO20180329
 #define hartree2eV              27.2113862459                   // 1hartree=27.211eV      //ME20200206
@@ -83,6 +86,7 @@
 
 //AS20200427 - QHA-related conversion factors
 #define eV2GPa (E_ELECTRON*1e21)    // [eV/A^3] --> [GPa]
+#define atm2Pa 101325
 
 // ----------------------------------------------------------------------------
 // ------------------------------------------------------------------ constants
