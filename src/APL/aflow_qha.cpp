@@ -394,9 +394,9 @@ namespace apl
       arun_runnames_apl_gp.push_back("PHONON_"
           + aurostd::utype2string(gprange[j],precision_format,false,FIXED_STREAM));
 
-      // if harmonic IFC file for V=1.0 exists, reuse it and do not create PHONON_1.000 directory
+      // if APL state file for V=1.0 exists, reuse it and do not create PHONON_1.000 directory
       if (aurostd::isequal(gprange[j], 1.0) &&
-          aurostd::EFileExist(DEFAULT_APL_FILE_PREFIX+DEFAULT_APL_HARMIFC_FILE)){
+          aurostd::EFileExist(DEFAULT_APL_FILE_PREFIX+DEFAULT_APL_STATE_FILE)){
         subdirectories_apl_gp.push_back(".");
       }
       else{
@@ -436,9 +436,9 @@ namespace apl
         arun_runnames_apl_eos.push_back( "PHONON_" +
             aurostd::utype2string(i,precision_format,false,FIXED_STREAM));
 
-        // if harmonic IFC file for V=1.0 exists, reuse it and do not create PHONON_1.000 directory
+        // if APL state file for V=1.0 exists, reuse it and do not create PHONON_1.000 directory
         if (aurostd::isequal(i, 1.0) &&
-            aurostd::EFileExist(DEFAULT_APL_FILE_PREFIX+DEFAULT_APL_HARMIFC_FILE)){
+            aurostd::EFileExist(DEFAULT_APL_FILE_PREFIX+DEFAULT_APL_STATE_FILE)){
           subdirectories_apl_eos.push_back(".");
         }
         else{
@@ -469,9 +469,9 @@ namespace apl
         arun_runnames_apl_qhanp.push_back("PHONON_"+
             aurostd::utype2string(coef,precision_format,false,FIXED_STREAM));
 
-        // if harmonic IFC file for V=1.0 exists, reuse it and do not create PHONON_1.000 directory
+        // if APL state file for V=1.0 exists, reuse it and do not create PHONON_1.000 directory
         if (aurostd::isequal(coef, 1.0) &&
-            aurostd::EFileExist(DEFAULT_APL_FILE_PREFIX+DEFAULT_APL_HARMIFC_FILE)){
+            aurostd::EFileExist(DEFAULT_APL_FILE_PREFIX+DEFAULT_APL_STATE_FILE)){
           subdirectories_apl_qhanp.push_back(".");
         }
         else{
