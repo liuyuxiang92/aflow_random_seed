@@ -273,6 +273,28 @@ namespace aflowML {
     return NNN;
   }
 
+  void insertElementalPropertiesCCE(const vector<string>& vproperties,const xelement::xelement& xel,vector<string>& vitems) {
+    uint i=0,j=0;
+    int index=0;
+    for(i=0;i<vproperties.size();i++){
+      if(vproperties[i]=="lattice_constants"||vproperties[i]=="lattice_angles"){
+        const xvector<double>& xvec=xel.getPropertyXVectorDouble(vproperties[i]);
+        for(index=xvec.lrows;index<=xvec.urows;index++){
+          vitems.push_back(aurostd::utype2string(xvec[index],_DOUBLE_WRITE_PRECISION_));
+        }
+      }
+      else if(vproperties[i]=="energies_ionization"){
+        //vitems.push_back(xel.getPropertyString(vproperties[i],",",2)); //only go to second ionization
+        const vector<double> vec=xel.energies_ionization;
+        for(j=0;j<_ENERGIES_IONIZATION_MAX_;j++){
+          if(j>vec.size()-1){vitems.push_back(aurostd::utype2string(NNN,_DOUBLE_WRITE_PRECISION_));continue;}
+          vitems.push_back(aurostd::utype2string(vec[j],_DOUBLE_WRITE_PRECISION_));
+        }
+      }
+      else{vitems.push_back(xel.getPropertyString(vproperties[i],","));}
+    }
+  }
+
   void insertCrystalPropertiesCCE(const string& structure_path,const string& anion,const vector<string>& vheaders,vector<string>& vitems) {
     string soliloquy=XPID+"aflowML::insertCrystalPropertiesCCE():";
     uint i=0,index_cation=0,index_anion=0;
@@ -329,7 +351,6 @@ namespace aflowML {
     if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
 
     uint ielement=0,ioxidation=0,i=0,j=0,k=0,ipp=0;
-    int index=0;
     string correction_line="",bader_line="",input_pre="",input="";
     xelement::xelement xel_cation,xel_N,xel_O;xel_N.populate("N");xel_O.populate("O");
     //cce::get_corrections_line_O("Al_+3_N");
@@ -442,23 +463,7 @@ namespace aflowML {
         if(LDEBUG){cerr << soliloquy << " input=" << input_pre << endl;}
         vitems_pre.clear();
         //cation
-        for(i=0;i<vproperties_elements.size();i++){
-          if(vproperties_elements[i]=="lattice_constants"||vproperties_elements[i]=="lattice_angles"){
-            const xvector<double>& xvec=xel_cation.getPropertyXVectorDouble(vproperties_elements[i]);
-            for(index=xvec.lrows;index<=xvec.urows;index++){
-              vitems_pre.push_back(aurostd::utype2string(xvec[index],_DOUBLE_WRITE_PRECISION_));
-            }
-          }
-          else if(vproperties_elements[i]=="energies_ionization"){
-            //vitems_pre.push_back(xel_cation.getPropertyString(vproperties_elements[i],",",2)); //only go to second ionization
-            const vector<double> vec=xel_cation.energies_ionization;
-            for(j=0;j<_ENERGIES_IONIZATION_MAX_;j++){
-              if(j>vec.size()-1){vitems_pre.push_back(aurostd::utype2string(NNN,_DOUBLE_WRITE_PRECISION_));continue;}
-              vitems_pre.push_back(aurostd::utype2string(vec[j],_DOUBLE_WRITE_PRECISION_));
-            }
-          }
-          else{vitems_pre.push_back(xel_cation.getPropertyString(vproperties_elements[i],","));}
-        }
+        insertElementalPropertiesCCE(vproperties_elements,xel_cation,vitems_pre);
         //
         vitems_pre.push_back(aurostd::utype2string(ioxidation,_DOUBLE_WRITE_PRECISION_)); //ioxidation
         try{species_pp=AVASP_Get_PseudoPotential_PAW_PBE(xel_cation.symbol);}
@@ -479,23 +484,7 @@ namespace aflowML {
         if(!correction_line.empty()){
           vitems.clear();for(i=0;i<vitems_pre.size();i++){vitems.push_back(vitems_pre[i]);}
           //anion
-          for(i=0;i<vproperties_elements.size();i++){
-            if(vproperties_elements[i]=="lattice_constants"||vproperties_elements[i]=="lattice_angles"){
-              const xvector<double>& xvec=xel_N.getPropertyXVectorDouble(vproperties_elements[i]);
-              for(index=xvec.lrows;index<=xvec.urows;index++){
-                vitems.push_back(aurostd::utype2string(xvec[index],_DOUBLE_WRITE_PRECISION_));
-              }
-            }
-            else if(vproperties_elements[i]=="energies_ionization"){
-              //vitems.push_back(xel_N.getPropertyString(vproperties_elements[i],",",2)); //only go to second ionization
-              const vector<double> vec=xel_N.energies_ionization;
-              for(j=0;j<_ENERGIES_IONIZATION_MAX_;j++){
-                if(j>vec.size()-1){vitems.push_back(aurostd::utype2string(NNN,_DOUBLE_WRITE_PRECISION_));continue;}
-                vitems.push_back(aurostd::utype2string(vec[j],_DOUBLE_WRITE_PRECISION_));
-              }
-            }
-            else{vitems.push_back(xel_N.getPropertyString(vproperties_elements[i],","));}
-          }
+          insertElementalPropertiesCCE(vproperties_elements,xel_N,vitems);
           //
           vitems.push_back(aurostd::utype2string(-3,_DOUBLE_WRITE_PRECISION_)); //ioxidation
           try{species_pp=AVASP_Get_PseudoPotential_PAW_PBE(xel_N.symbol);}
@@ -543,23 +532,7 @@ namespace aflowML {
         if(!correction_line.empty()){
           vitems.clear();for(i=0;i<vitems_pre.size();i++){vitems.push_back(vitems_pre[i]);}
           //anion
-          for(i=0;i<vproperties_elements.size();i++){
-            if(vproperties_elements[i]=="lattice_constants"||vproperties_elements[i]=="lattice_angles"){
-              const xvector<double>& xvec=xel_O.getPropertyXVectorDouble(vproperties_elements[i]);
-              for(index=xvec.lrows;index<=xvec.urows;index++){
-                vitems.push_back(aurostd::utype2string(xvec[index],_DOUBLE_WRITE_PRECISION_));
-              }
-            }
-            else if(vproperties_elements[i]=="energies_ionization"){
-              //vitems.push_back(xel_O.getPropertyString(vproperties_elements[i],",",2)); //only go to second ionization
-              const vector<double> vec=xel_O.energies_ionization;
-              for(j=0;j<_ENERGIES_IONIZATION_MAX_;j++){
-                if(j>vec.size()-1){vitems.push_back(aurostd::utype2string(NNN,_DOUBLE_WRITE_PRECISION_));continue;}
-                vitems.push_back(aurostd::utype2string(vec[j],_DOUBLE_WRITE_PRECISION_));
-              }
-            }
-            else{vitems.push_back(xel_O.getPropertyString(vproperties_elements[i],","));}
-          }
+          insertElementalPropertiesCCE(vproperties_elements,xel_O,vitems);
           //
           vitems.push_back(aurostd::utype2string(-2,_DOUBLE_WRITE_PRECISION_)); //ioxidation
           try{species_pp=AVASP_Get_PseudoPotential_PAW_PBE(xel_O.symbol);}

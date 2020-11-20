@@ -11,6 +11,7 @@
 #define _AFLOW_ML_H_
 
 namespace aflowML {
+  void insertElementalPropertiesCCE(const vector<string>& vproperties,const xelement::xelement& xel,vector<string>& vitems);
   void insertCrystalPropertiesCCE(const string& structure_path,const string& anion,const vector<string>& vheaders,vector<string>& vitems);
   void writeCCECSV();
 } // namespace aflowML
