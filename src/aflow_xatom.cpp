@@ -16408,12 +16408,13 @@ xmatrix<double> GetRotation(const xmatrix<double>& lattice_original, const xmatr
 // Function ChangeBasis //DX20201015
 // **************************************************************************
 xstructure ChangeBasis(const xstructure& xstr, const xmatrix<double>& transformation_matrix) {
-  
+
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   string function_name = XPID + "ChangeBasis():";
+  stringstream message;
 
   xstructure xstr_transformed = xstr;
- 
+
   if(LDEBUG){
     cerr << function_name << " structure BEFORE basis transformation:" << endl;
     cerr << xstr << endl;
@@ -16422,6 +16423,7 @@ xstructure ChangeBasis(const xstructure& xstr, const xmatrix<double>& transforma
   // ---------------------------------------------------------------------------
   // transform the lattice 
   xstr_transformed.lattice = transformation_matrix*xstr_transformed.lattice;
+  xstr_transformed.FixLattices();
 
   // ---------------------------------------------------------------------------
   // transform the atom positions
@@ -16430,7 +16432,57 @@ xstructure ChangeBasis(const xstructure& xstr, const xmatrix<double>& transforma
     xstr_transformed.atoms[i].fpos=BringInCell(xstr_transformed.atoms[i].fpos);
     xstr_transformed.atoms[i].cpos=trasp(xstr_transformed.lattice)*xstr_transformed.atoms[i].fpos;
   }
-  
+
+  // ---------------------------------------------------------------------------
+  // remove any duplicate atoms (we may reduce the cell)
+  deque<_atom> new_basis;
+  xvector<double> tmp;
+  bool skew = false;
+  double tol=0.01;
+  for(uint j=0;j<xstr_transformed.atoms.size();j++){
+    bool duplicate_lattice_point=false;
+    for(uint a=0; a<new_basis.size(); a++){
+      tmp = BringInCell(xstr_transformed.atoms[j].fpos,1e-10);
+      if(SYM::MapAtom(new_basis[a].fpos,tmp,xstr_transformed.lattice,xstr_transformed.f2c,skew,tol)){
+        duplicate_lattice_point=true;
+        break;
+      }
+    }
+    if(duplicate_lattice_point==false){
+      xstr_transformed.atoms[j].fpos = BringInCell(xstr_transformed.atoms[j].fpos,1e-10);
+      xstr_transformed.atoms[j].cpos = xstr_transformed.f2c*xstr_transformed.atoms[j].fpos;
+      new_basis.push_back(xstr_transformed.atoms[j]);
+    }
+  }
+  // update atom counts/order/types/etc.
+  std::stable_sort(new_basis.begin(),new_basis.end(),sortAtomsNames);
+  xstr_transformed.atoms = new_basis;
+  xstr_transformed.SpeciesPutAlphabetic();
+  deque<int> sizes = SYM::arrange_atoms(new_basis);
+  xstr_transformed = pflow::SetNumEachType(xstr_transformed, sizes);
+  xstr_transformed.species = xstr.species;
+  xstr_transformed.MakeBasis();
+
+  // check atom count
+  if(xstr.atoms.size()>xstr_transformed.atoms.size()){
+    if(xstr.atoms.size()%xstr_transformed.atoms.size()!=0){
+      message << "Number of atoms is no longer an integer multiple with respect to the input structure"
+        << " original: " << xstr.atoms.size()
+        << " transformed: " << xstr_transformed.atoms.size()
+        << "; check the transformation matrix or same-atom tolerance.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
+    }
+  }
+  else{
+    if(xstr_transformed.atoms.size()%xstr.atoms.size()!=0){
+      message << "Number of atoms is no longer an integer multiple with respect to the input structure"
+        << " original: " << xstr.atoms.size()
+        << " transformed: " << xstr_transformed.atoms.size()
+        << "; check the transformation matrix or same-atom tolerance.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
+    }
+  }
+
   if(LDEBUG){
     cerr << function_name << " structure AFTER basis transformation:" << endl;
     cerr << xstr_transformed << endl;

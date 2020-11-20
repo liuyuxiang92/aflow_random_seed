@@ -60,6 +60,7 @@
 // ===== AtomEnvironment Class ===== //
 //DX20191120 [MOVED TO aflow.h]
 
+
 //DX20191212 - added 
 struct structure_misfit {
   bool is_magnetic_misfit;              // boolean indicating if a magnetic system and using magnetic as misfit
@@ -80,6 +81,53 @@ struct matching_structure {
   string name;
   double misfit;
 };
+
+/*
+// ===== matched_structure struct ===== // DX20201119
+struct matched_structure {
+  string name;
+  string compound;
+  bool generated;
+  string from;
+  xstructure structure;
+  vector<GroupedWyckoffPosition> grouped_Wyckoff_positions;
+  bool is_representative;
+  structure_misfit misfit_info;
+  xmatrix<double> rotation;
+  xmatrix<double> basis_transformation;
+  xvector<double> origin_shift;
+  string comparison_log;
+  uint number_compounds_matching_structure;
+  vector<string> properties_names;
+  vector<string> properties_units;
+  vector<string> properties_types;
+  vector<string> properties; //needs to be static variable type in AFLOW, not required for JSON
+};
+namespace compare{
+  matched_structure initialize_matched_structure_struct();
+}
+
+//DX 20201119
+// ===== CompapareMatchedStructures Class ===== //
+// This class is necessary to pass an argument to the sorting function;
+// the other solution is to use std::bind, but this is not available for early G++ versions
+// see https://stackoverflow.com/questions/26444216/is-it-possible-to-use-stdsort-with-a-sort-function-that-takes-extra-arguments
+class CompareMatchedStructures{
+  public:
+    CompareMatchedStructures(const vector<string>& sorting_attributes) : sorting_attributes(sorting_attributes){}
+    bool operator()(const matched_structure *a, const matched_structure *b);
+  private:
+    vector<string> sorting_attributes;
+};
+
+
+class XtalFinderCalculator{
+  // attributes
+  vector<matched_structure*> structure_containers;  // stores structures in a container (pointer for easy manipulation and mobility)
+  vector<StructurePrototypes> structure_prototypes; // stores the equivalent structure information
+
+}
+*/
 
 // ===== StructurePrototype Class ===== //
 class StructurePrototype{
@@ -167,6 +215,8 @@ namespace compare{
   vector<StructurePrototype> compareStructuresFromStructureList(vector<string>& filenames, vector<string>& magmoms_for_systems, ostream& oss, ofstream& FileMESSAGE, uint& num_proc, bool same_species, const aurostd::xoption& comparison_options); //DX20200103 - condensed bools to xoptions
   vector<StructurePrototype> compareStructuresFromDirectory(string& directory, vector<string>& magmoms_for_systems, ostream& oss, ofstream& FileMESSAGE, uint& num_proc, bool same_species, const aurostd::xoption& comparison_options); //DX20200103 - condensed bools to xoptions
   vector<StructurePrototype> compareStructuresFromFile(string& filename, vector<string>& magmoms_for_systems, ostream& oss, ofstream& FileMESSAGE, uint& num_proc, bool same_species, const aurostd::xoption& comparison_options); //DX20200103 - condensed bools to xoptions
+  vector<aflowlib::_aflowlib_entry> getUniqueEntries(vector<aflowlib::_aflowlib_entry>& entries, uint num_proc, bool same_species, bool scale_volume, bool optimize_match); //DX20201111
+  vector<aflowlib::_aflowlib_entry> getUniqueEntries(vector<aflowlib::_aflowlib_entry>& entries, ostream& oss, ofstream& FileMESSAGE, uint num_proc, bool same_species, bool scale_volume, bool optimize_match); //DX20201111
   vector<StructurePrototype> compareMultipleStructures(vector<StructurePrototype>& all_structures, ostream& oss, ofstream& FileMESSAGE, uint& num_proc, bool same_species, string& directory, ostream& logstream=cout); //DX20190319 - added FileMESSAGE
   vector<StructurePrototype> compareMultipleStructures(vector<StructurePrototype>& all_structures, ostream& oss, ofstream& FileMESSAGE, uint& num_proc, bool same_species, string& directory, const aurostd::xoption& comparison_options, ostream& logstream=cout); //DX20200103 - condensed bools to xoptions 
   bool aflowCompareStructure(const uint& num_proc, const xstructure& xstr1, const xstructure& xstr2, 
@@ -226,6 +276,8 @@ namespace compare{
   vector<StructurePrototype> loadStructuresFromStructureList(const vector<string>& filenames, const vector<string>& magmoms_for_systems, bool same_species, ofstream& FileMESSAGE, ostream& logstream=cout); //DX20190424 //DX20190801 - added vector<string>& magmoms_for_systems //DX20191122 - added ostream and consts
   vector<StructurePrototype> loadStructuresFromDirectory(const string& directory, const vector<string>& magmoms_for_systems, bool same_species, ostream& logstream=cout); //DX20191122 
   vector<StructurePrototype> loadStructuresFromDirectory(const string& directory, const vector<string>& magmoms_for_systems, bool same_species, ofstream& FileMESSAGE, ostream& logstream=cout); //DX20190319 - added FileMESSAGE //DX20190801 - added vector<string>& magmoms_for_systems //DX20191122 - added ostream and consts
+  vector<StructurePrototype> loadStructuresFromAflowlibEntries(const vector<aflowlib::_aflowlib_entry>& entries, const vector<string>& magmoms_for_systems, bool same_species, ostream& logstream=cout);
+  vector<StructurePrototype> loadStructuresFromAflowlibEntries(const vector<aflowlib::_aflowlib_entry>& entries, const vector<string>& magmoms_for_systems, bool same_species, ofstream& FileMESSAGE, ostream& logstream=cout);
   vector<StructurePrototype> loadStructuresFromFile(const string& directory, const vector<string>& magmoms_for_systems, bool same_species, ostream& logstream=cout); //DX20191122
   vector<StructurePrototype> loadStructuresFromFile(const string& directory, const vector<string>& magmoms_for_systems, bool same_species, ofstream& FileMESSAGE, ostream& logstream=cout); //DX20190319 - added FileMESSAGE //DX20190801 - added vector<string>& magmoms_for_systems, //DX20191122 - added ostream and consts
   void generateStructures(vector<StructurePrototype>& structures, ostream& oss=cout, uint start_index=0, uint end_index=AUROSTD_MAX_UINT); //DX20191122
@@ -550,6 +602,10 @@ namespace compare{
       const vector<xmatrix<double> >& candidate_lattices,
       vector<xmatrix<double> >& basis_transformations,
       vector<xmatrix<double> >& rotations); //DX20201015
+  vector<xstructure> getTransformedStructures(
+		const xstructure& xstr,
+		const vector<xmatrix<double> >& basis_transformations,
+		const vector<xmatrix<double> >& rotations); //DX20201119
   bool structureSearch(
       const xstructure& xstr1, 
       const xstructure& xstr_supercell, //DX20190530 - added "_supercell"; more descriptive 
@@ -570,6 +626,21 @@ namespace compare{
       uint& matching_lattice_index, //DX20201023
       xvector<double>& matching_origin_shift, //DX20201023
       bool optimize_match);  //DX20190802 - new input format
+  bool commonOriginSearch(
+      const xstructure& xstr1,
+      const vector<double>& all_nn1,
+      const string& lfa,
+      const int type_match,
+      const vector<xstructure>& vxstr2_transformed,
+      const vector<double>& latt_devs,
+      const uint start_index, const uint end_index,
+      structure_misfit& min_misfit_info,
+      vector<uint>& index_match_1, vector<uint>& index_match_2,
+      vector<double>& min_distances,
+      vector<xstructure>& vprotos,
+      uint& matching_lattice_index, //DX20201023
+      xvector<double>& matching_origin_shift, //DX20201023
+      bool optimize_match); //DX20201120
   // [OBSOLETE - DX20190717]bool structureSearch(const string& lfa,
   // [OBSOLETE - DX20190717]                      const vector<double>& all_nn1,
   // [OBSOLETE - DX20190717]                      const xstructure& xstr,

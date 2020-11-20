@@ -400,6 +400,8 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   if(vpflow.flag("COMPARE_DATABASE_ENTRIES")) {
     vpflow.flag("COMPARE_DATABASE_ENTRIES::OPTIMIZE_MATCH",aurostd::args2flag(argv,cmds,"--optimize|--optimize_match")); //DX20190201 - changed from fast_match to optimize_match
     vpflow.flag("COMPARE_DATABASE_ENTRIES::NO_SCALE_VOLUME",aurostd::args2flag(argv,cmds,"--no_scale_volume"));
+    vpflow.args2addattachedscheme(argv,cmds,"COMPARE_DATABASE_ENTRIES::MISFIT_MATCH","--misfit_match=",""); //DX20201118
+    vpflow.args2addattachedscheme(argv,cmds,"COMPARE_DATABASE_ENTRIES::MISFIT_FAMILY","--misfit_family=",""); //DX20201118
     vpflow.args2addattachedscheme(argv,cmds,"COMPARE_DATABASE_ENTRIES::ALLOY","--compare_alloy=|--alloy=","");
     vpflow.args2addattachedscheme(argv,cmds,"COMPARE_DATABASE_ENTRIES::NP","--np=|--num_proc=","");
     vpflow.args2addattachedscheme(argv,cmds,"COMPARE_DATABASE_ENTRIES::ARITY","--arity=|--nspecies=","");
@@ -468,6 +470,8 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     //DX20190424 [OBSOLETE]   vpflow.push_attached(scheme_name,vinput[i]);
     //DX20190424 [OBSOLETE]   vpflow.flag(scheme_name,TRUE);
     //DX20190424 [OBSOLETE] }
+    vpflow.args2addattachedscheme(argv,cmds,"COMPARE_STRUCTURE::MISFIT_MATCH","--misfit_match=",""); //DX20201118
+    vpflow.args2addattachedscheme(argv,cmds,"COMPARE_STRUCTURE::MISFIT_FAMILY","--misfit_family=",""); //DX20201118
     vpflow.args2addattachedscheme(argv,cmds,"COMPARE_STRUCTURE::NP","--np=|--num_proc=","");
     vpflow.args2addattachedscheme(argv,cmds,"COMPARE_STRUCTURE::MAGNETIC","--mag=|--magnetic=|--magmom=",""); //DX20170803
     vpflow.flag("COMPARE_STRUCTURE::PRINT",aurostd::args2flag(argv,cmds,"--print"));
@@ -522,6 +526,8 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.flag("COMPARE_PERMUTATION",aurostd::args2attachedflag(argv,cmds,"--compare_atom_decoration|--compare_atom_decorations|--unique_atom_decoration|--unique_atom_decorations|--compare_permutation|--compare_permutations|--unique_permutation|--unique_permutations"));
   if(vpflow.flag("COMPARE_PERMUTATION")) {
     vector<string> vinput;
+    vpflow.args2addattachedscheme(argv,cmds,"COMPARE_PERMUTATION::MISFIT_MATCH","--misfit_match=",""); //DX20201118
+    vpflow.args2addattachedscheme(argv,cmds,"COMPARE_PERMUTATION::MISFIT_FAMILY","--misfit_family=",""); //DX20201118
     vpflow.args2addattachedscheme(argv,cmds,"COMPARE_PERMUTATION::NP","--np=|--num_proc=","");
     vpflow.flag("COMPARE_PERMUTATION::PRINT",aurostd::args2flag(argv,cmds,"--print|--misfit|--print_misfit"));
     vpflow.flag("COMPARE_PERMUTATION::USAGE",aurostd::args2flag(argv,cmds,"--usage"));
@@ -531,6 +537,8 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   //DX20181004 - add compare2database - START
   vpflow.flag("COMPARE2DATABASE",aurostd::args2attachedflag(argv,cmds,"--compare2database"));
   if(vpflow.flag("COMPARE2DATABASE")) {
+    vpflow.args2addattachedscheme(argv,cmds,"COMPARE2DATABASE::MISFIT_MATCH","--misfit_match=",""); //DX20201118
+    vpflow.args2addattachedscheme(argv,cmds,"COMPARE2DATABASE::MISFIT_FAMILY","--misfit_family=",""); //DX20201118
     vpflow.args2addattachedscheme(argv,cmds,"COMPARE2DATABASE::NP","--np=|--num_proc=","");
     vpflow.args2addattachedscheme(argv,cmds,"COMPARE2DATABASE::PROPERTY_LIST","--properties=|--property_list=|--property=","");
     vpflow.args2addattachedscheme(argv,cmds,"COMPARE2DATABASE::GEOMETRY_FILE","--geometry_file=|--file=","");
@@ -1370,6 +1378,8 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   //DX20181004 - add structure2proto - START
   vpflow.flag("COMPARE2PROTOTYPES",aurostd::args2attachedflag(argv,cmds,"--compare2protos|--compare2prototypes"));
   if(vpflow.flag("COMPARE2PROTOTYPES")) {
+    vpflow.args2addattachedscheme(argv,cmds,"COMPARE2PROTOTYPES::MISFIT_MATCH","--misfit_match=",""); //DX20201118
+    vpflow.args2addattachedscheme(argv,cmds,"COMPARE2PROTOTYPES::MISFIT_FAMILY","--misfit_family=",""); //DX20201118
     vpflow.args2addattachedscheme(argv,cmds,"COMPARE2PROTOTYPES::NP","--np=|--num_proc=","");
     vpflow.args2addattachedscheme(argv,cmds,"COMPARE2PROTOTYPES::CATALOG","--catalog=|--library=","");
     vpflow.flag("COMPARE2PROTOTYPES::IGNORE_SYMMETRY",aurostd::args2flag(argv,cmds,"--ignore_symmetry"));

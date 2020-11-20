@@ -117,6 +117,32 @@ namespace compare {
       init::ErrorOption(vpflow.getattachedscheme("COMPARE_PERMUTATION"),"compare::comparePermutations()",aurostd::liststring2string(usage,options));
     }
 
+    /*
+    // ---------------------------------------------------------------------------
+    // FLAG: misfit threshold //DX20201119
+    double misfit_match_threshold = DEFAULT_XTALFINDER_MISFIT_MATCH;
+    double misfit_family_threshold = DEFAULT_XTALFINDER_MISFIT_FAMILY;
+    if(vpflow.flag("COMPARE_PERMUTATION::MISFIT_MATCH")) {
+      misfit_match_threshold = aurostd::string2utype<double>(vpflow.getattachedscheme("COMPARE_PERMUTATION::MISFIT_MATCH"));
+      comparison_options.push_attached("COMPARISON_OPTIONS::MISFIT_MATCH",vpflow.getattachedscheme("COMPARE_PERMUTATION::MISFIT_MATCH"));
+    }
+    if(vpflow.flag("COMPARE_PERMUTATION::MISFIT_FAMILY")) {
+      misfit_family_threshold = aurostd::string2utype<double>(vpflow.getattachedscheme("COMPARE_PERMUTATION::MISFIT_FAMILY"));
+      comparison_options.push_attached("COMPARISON_OPTIONS::MISFIT_FAMILY",vpflow.getattachedscheme("COMPARE_PERMUTATION::MISFIT_FAMILY"));
+    }
+    // match threshold must be less than family threshold
+    if(misfit_match_threshold>misfit_family_threshold){
+      message << "Matching misfit threshold must be less than the same family threshold:"
+        << " misfit_match_threshold: " << misfit_match_threshold
+        << " misfit_family_threshold: " << misfit_family_threshold;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_INPUT_ILLEGAL_);
+    }
+    message << "Misfit theshold for matched structures: " << misfit_match_threshold << " (default: " << DEFAULT_XTALFINDER_MISFIT_MATCH << ")"; 
+    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+    message << "Misfit theshold for structures in the same family: " << misfit_family_threshold << " (default: " << DEFAULT_XTALFINDER_MISFIT_FAMILY << ")";
+    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+    */
+
     // ---------------------------------------------------------------------------
     // FLAG: number of processors (multithreading) 
     uint num_proc=1; //defalut=1
@@ -440,6 +466,30 @@ namespace compare {
       message << "OPTIONS: Performing structure type comparisons (any atomic species).";
       pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     }
+
+    // ---------------------------------------------------------------------------
+    // FLAG: misfit threshold //DX20201119
+    double misfit_match_threshold = DEFAULT_XTALFINDER_MISFIT_MATCH;
+    double misfit_family_threshold = DEFAULT_XTALFINDER_MISFIT_FAMILY;
+    if(vpflow.flag("COMPARE_STRUCTURE::MISFIT_MATCH")) {
+      misfit_match_threshold = aurostd::string2utype<double>(vpflow.getattachedscheme("COMPARE_STRUCTURE::MISFIT_MATCH"));
+      comparison_options.push_attached("COMPARISON_OPTIONS::MISFIT_MATCH",vpflow.getattachedscheme("COMPARE_STRUCTURE::MISFIT_MATCH"));
+    }
+    if(vpflow.flag("COMPARE_STRUCTURE::MISFIT_FAMILY")) {
+      misfit_family_threshold = aurostd::string2utype<double>(vpflow.getattachedscheme("COMPARE_STRUCTURE::MISFIT_FAMILY"));
+      comparison_options.push_attached("COMPARISON_OPTIONS::MISFIT_FAMILY",vpflow.getattachedscheme("COMPARE_STRUCTURE::MISFIT_FAMILY"));
+    }
+    // match threshold must be less than family threshold
+    if(misfit_match_threshold>misfit_family_threshold){
+      message << "Matching misfit threshold must be less than the same family threshold:"
+        << " misfit_match_threshold: " << misfit_match_threshold
+        << " misfit_family_threshold: " << misfit_family_threshold;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_INPUT_ILLEGAL_);
+    }
+    message << "Misfit theshold for matched structures: " << misfit_match_threshold << " (default: " << DEFAULT_XTALFINDER_MISFIT_MATCH << ")"; 
+    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+    message << "Misfit theshold for structures in the same family: " << misfit_family_threshold << " (default: " << DEFAULT_XTALFINDER_MISFIT_FAMILY << ")";
+    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
 
     // ---------------------------------------------------------------------------
     // FLAG: consider magnetic structure in comparison 
@@ -944,6 +994,30 @@ namespace compare {
     aurostd::xoption comparison_options = compare::loadDefaultComparisonOptions(); //DX20200103
 
     // ---------------------------------------------------------------------------
+    // FLAG: misfit threshold //DX20201119
+    double misfit_match_threshold = DEFAULT_XTALFINDER_MISFIT_MATCH;
+    double misfit_family_threshold = DEFAULT_XTALFINDER_MISFIT_FAMILY;
+    if(vpflow.flag("COMPARE2PROTOTYPES::MISFIT_MATCH")) {
+      misfit_match_threshold = aurostd::string2utype<double>(vpflow.getattachedscheme("COMPARE2PROTOTYPES::MISFIT_MATCH"));
+      comparison_options.push_attached("COMPARISON_OPTIONS::MISFIT_MATCH",vpflow.getattachedscheme("COMPARE2PROTOTYPES::MISFIT_MATCH"));
+    }
+    if(vpflow.flag("COMPARE2PROTOTYPES::MISFIT_FAMILY")) {
+      misfit_family_threshold = aurostd::string2utype<double>(vpflow.getattachedscheme("COMPARE2PROTOTYPES::MISFIT_FAMILY"));
+      comparison_options.push_attached("COMPARISON_OPTIONS::MISFIT_FAMILY",vpflow.getattachedscheme("COMPARE2PROTOTYPES::MISFIT_FAMILY"));
+    }
+    // match threshold must be less than family threshold
+    if(misfit_match_threshold>misfit_family_threshold){
+      message << "Matching misfit threshold must be less than the same family threshold:"
+        << " misfit_match_threshold: " << misfit_match_threshold
+        << " misfit_family_threshold: " << misfit_family_threshold;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_INPUT_ILLEGAL_);
+    }
+    message << "Misfit theshold for matched structures: " << misfit_match_threshold << " (default: " << DEFAULT_XTALFINDER_MISFIT_MATCH << ")"; 
+    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+    message << "Misfit theshold for structures in the same family: " << misfit_family_threshold << " (default: " << DEFAULT_XTALFINDER_MISFIT_FAMILY << ")";
+    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+
+    // ---------------------------------------------------------------------------
     // FLAG: number of processors (multithreading) 
     uint num_proc=1; //defalut=1
     if(vpflow.flag("COMPARE2PROTOTYPES::NP")) {
@@ -1288,6 +1362,30 @@ namespace compare {
     // ---------------------------------------------------------------------------
     // create xoptions to contain all comparison options
     aurostd::xoption comparison_options = compare::loadDefaultComparisonOptions(); //DX20200103
+
+    // ---------------------------------------------------------------------------
+    // FLAG: misfit threshold //DX20201119
+    double misfit_match_threshold = DEFAULT_XTALFINDER_MISFIT_MATCH;
+    double misfit_family_threshold = DEFAULT_XTALFINDER_MISFIT_FAMILY;
+    if(vpflow.flag("COMPARE2DATABASE::MISFIT_MATCH")) {
+      misfit_match_threshold = aurostd::string2utype<double>(vpflow.getattachedscheme("COMPARE2DATABASE::MISFIT_MATCH"));
+      comparison_options.push_attached("COMPARISON_OPTIONS::MISFIT_MATCH",vpflow.getattachedscheme("COMPARE2DATABASE::MISFIT_MATCH"));
+    }
+    if(vpflow.flag("COMPARE2DATABASE::MISFIT_FAMILY")) {
+      misfit_family_threshold = aurostd::string2utype<double>(vpflow.getattachedscheme("COMPARE2DATABASE::MISFIT_FAMILY"));
+      comparison_options.push_attached("COMPARISON_OPTIONS::MISFIT_FAMILY",vpflow.getattachedscheme("COMPARE2DATABASE::MISFIT_FAMILY"));
+    }
+    // match threshold must be less than family threshold
+    if(misfit_match_threshold>misfit_family_threshold){
+      message << "Matching misfit threshold must be less than the same family threshold:"
+        << " misfit_match_threshold: " << misfit_match_threshold
+        << " misfit_family_threshold: " << misfit_family_threshold;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_INPUT_ILLEGAL_);
+    }
+    message << "Misfit theshold for matched structures: " << misfit_match_threshold << " (default: " << DEFAULT_XTALFINDER_MISFIT_MATCH << ")"; 
+    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+    message << "Misfit theshold for structures in the same family: " << misfit_family_threshold << " (default: " << DEFAULT_XTALFINDER_MISFIT_FAMILY << ")";
+    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
 
     // ---------------------------------------------------------------------------
     // single round of comparisons 
@@ -1941,6 +2039,30 @@ namespace compare {
     // ---------------------------------------------------------------------------
     // create xoptions to contain all comparison options
     aurostd::xoption comparison_options = compare::loadDefaultComparisonOptions(); //DX20200103
+
+    // ---------------------------------------------------------------------------
+    // FLAG: misfit threshold //DX20201119
+    double misfit_match_threshold = DEFAULT_XTALFINDER_MISFIT_MATCH;
+    double misfit_family_threshold = DEFAULT_XTALFINDER_MISFIT_FAMILY;
+    if(vpflow.flag("COMPARE_DATABASE_ENTRIES::MISFIT_MATCH")) {
+      misfit_match_threshold = aurostd::string2utype<double>(vpflow.getattachedscheme("COMPARE_DATABASE_ENTRIES::MISFIT_MATCH"));
+      comparison_options.push_attached("COMPARISON_OPTIONS::MISFIT_MATCH",vpflow.getattachedscheme("COMPARE_DATABASE_ENTRIES::MISFIT_MATCH"));
+    }
+    if(vpflow.flag("COMPARE_DATABASE_ENTRIES::MISFIT_FAMILY")) {
+      misfit_family_threshold = aurostd::string2utype<double>(vpflow.getattachedscheme("COMPARE_DATABASE_ENTRIES::MISFIT_FAMILY"));
+      comparison_options.push_attached("COMPARISON_OPTIONS::MISFIT_FAMILY",vpflow.getattachedscheme("COMPARE_DATABASE_ENTRIES::MISFIT_FAMILY"));
+    }
+    // match threshold must be less than family threshold
+    if(misfit_match_threshold>misfit_family_threshold){
+      message << "Matching misfit threshold must be less than the same family threshold:"
+        << " misfit_match_threshold: " << misfit_match_threshold
+        << " misfit_family_threshold: " << misfit_family_threshold;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_INPUT_ILLEGAL_);
+    }
+    message << "Misfit theshold for matched structures: " << misfit_match_threshold << " (default: " << DEFAULT_XTALFINDER_MISFIT_MATCH << ")"; 
+    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+    message << "Misfit theshold for structures in the same family: " << misfit_family_threshold << " (default: " << DEFAULT_XTALFINDER_MISFIT_FAMILY << ")";
+    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
 
     // ---------------------------------------------------------------------------
     // FLAG: number of processors (multithreading) 
@@ -2603,6 +2725,7 @@ namespace compare {
 }
 //DX20190424 END
 
+
 // ***************************************************************************
 // compare::compareStructuresFromDirectory()
 // ***************************************************************************
@@ -2637,6 +2760,56 @@ namespace compare {
     // ---------------------------------------------------------------------------
     // compare structures returns vector<StructureProtoype> of unique/duplicate info
     return compare::compareMultipleStructures(all_structures, oss, FileMESSAGE, num_proc, same_species, directory, comparison_options); //DX20200103 - condensed booleans to xoptions
+
+  }
+}
+
+// ***************************************************************************
+// compare::getUniqueEntries() //DX20201111
+// ***************************************************************************
+namespace compare {
+  vector<aflowlib::_aflowlib_entry> getUniqueEntries(vector<aflowlib::_aflowlib_entry>& entries, uint num_proc, bool same_species, bool scale_volume, bool optimize_match){
+    ostringstream oss;
+    ofstream FileMESSAGE;
+    return getUniqueEntries(entries, oss, FileMESSAGE, num_proc, same_species, scale_volume, optimize_match);
+  }
+}
+
+namespace compare {
+  vector<aflowlib::_aflowlib_entry> getUniqueEntries(vector<aflowlib::_aflowlib_entry>& entries, ostream& oss, ofstream& FileMESSAGE, uint num_proc, bool same_species, bool scale_volume, bool optimize_match){
+
+    // ---------------------------------------------------------------------------
+    // load structures from aflowlib entries
+    vector<string> magmoms_for_systems; //DX20201111 - not included for now
+    vector<StructurePrototype> all_structures = compare::loadStructuresFromAflowlibEntries(entries, magmoms_for_systems, same_species, FileMESSAGE); //DX20190319 - added FileMESSAGE
+
+    // ---------------------------------------------------------------------------
+    // directory to write results
+    string directory = "."; // for now this is fixed
+
+    // ---------------------------------------------------------------------------
+    // default comparison options
+    aurostd::xoption comparison_options = compare::loadDefaultComparisonOptions();
+    comparison_options.flag("COMPARISON_OPTIONS::SCALE_VOLUME",scale_volume);
+    comparison_options.flag("COMPARISON_OPTIONS::OPTIMIZE_MATCH",optimize_match);
+
+    // ---------------------------------------------------------------------------
+    // compare structures returns vector<StructureProtoype> of unique/duplicate info
+    vector<StructurePrototype> grouped_structures = compare::compareMultipleStructures(all_structures, oss, FileMESSAGE, num_proc, same_species, directory, comparison_options); //DX20200103 - condensed booleans to xoptions
+
+    // ---------------------------------------------------------------------------
+    // filter out duplicate aflowlib entries
+    vector<aflowlib::_aflowlib_entry> entries_unique;
+    for(uint i=0;i<grouped_structures.size();i++){
+      for(uint j=0;j<entries.size();j++){
+        if(grouped_structures[i].structure_representative_name==entries[j].auid){
+          entries_unique.push_back(entries[j]);
+          break;
+        }
+      }
+    }
+
+    return entries_unique;
 
   }
 }
