@@ -4658,8 +4658,11 @@ namespace xelement {
       void loadDefaultUnits();  //CO20201111
       void populate(const string& element); //CO20200520
       void populate(uint ZZ); //CO20200520
-      string getPropertyVector(const string& property,const string& delim=",",uint ncols=AUROSTD_MAX_UINT) const; //CO20201111
-      string getProperty(const string& property,const string& delim=",",uint ncols=AUROSTD_MAX_UINT) const; //CO20201111
+      string getPropertyStringVector(const string& property,const string& delim=",",uint ncols=AUROSTD_MAX_UINT) const; //CO20201111
+      string getPropertyString(const string& property,const string& delim=",",uint ncols=AUROSTD_MAX_UINT) const; //CO20201111
+      double getPropertyDouble(const string& property) const;
+      const xvector<double>& getPropertyXVectorDouble(const string& property) const;
+      const vector<double>& getPropertyVectorDouble(const string& property) const;
       string getType(const string& property) const; //CO20201111
       string getUnits(const string& property) const; //CO20201111
       void convertUnits(const string& property="ALL",const string& units_new="SI");  //CO20201111
@@ -4668,11 +4671,11 @@ namespace xelement {
       bool verbose;
       
       // [AFLOW]START=DECLARATION
-      int Z;                                  // Z
+      uint Z;                                 // Z
       string symbol;                          // http://periodictable.com      //DU20190517   // DONE SC20190524
       string name;                            // http://periodictable.com      //DU20190517   // DONE SC20190524
-      double period;                          // http://periodictable.com      //DU20190517
-      double group;                           // http://periodictable.com      //DU20190517
+      uint period;                            // http://periodictable.com      //DU20190517
+      uint group;                             // http://periodictable.com      //DU20190517
       string series;                          // http://periodictable.com For Nh,Fl,Mc,Lv,Ts Value is a guess based on periodic table trend.      //DU20190517 
       string block;                           // http://periodictable.com      //DU20190517
       //                                          

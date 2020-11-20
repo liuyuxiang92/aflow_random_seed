@@ -975,6 +975,14 @@ namespace aurostd{
 }
 //AS20200513 END
 
+//CO20201111 - binomial coefficient
+namespace aurostd {
+  template<class utype>
+    utype nCk(utype n,utype k) {
+      return factorial(n)/( factorial(k)*factorial(n-k) );
+    }
+}
+
 #endif // _AUROSTD_XSCALAR_CPP_
 
 

@@ -92,13 +92,13 @@ namespace pflow {
           if(c=="ALL" || c==aurostd::toupper("volume")) {units=xel.getUnits(c);vs.push_back(aurostd::PaddedPOST("volume="+aurostd::utype2string(xel.volume,_DOUBLE_WRITE_PRECISION_),len)+(units.empty()?"":" // ("+units+")"));}
           if(c=="ALL" || c==aurostd::toupper("area_molar_Miedema")) {units=xel.getUnits(c);vs.push_back(aurostd::PaddedPOST("area_molar_Miedema="+aurostd::utype2string(xel.area_molar_Miedema,_DOUBLE_WRITE_PRECISION_),len)+" // ("+units+") (V_m^{2/3})");}
           //
-          if(c=="ALL" || c==aurostd::toupper("valence_std")) {units=xel.getUnits(c);vs.push_back(aurostd::PaddedPOST("valence_std="+aurostd::utype2string(xel.valence_std),len)+(units.empty()?"":" // ("+units+")"));}
-          if(c=="ALL" || c==aurostd::toupper("valence_iupac")) {units=xel.getUnits(c);vs.push_back(aurostd::PaddedPOST("valence_iupac="+aurostd::utype2string(xel.valence_iupac),len)+(units.empty()?"":" // ("+units+")"));}
-          if(c=="ALL" || c==aurostd::toupper("valence_PT")) {units=xel.getUnits(c);vs.push_back(aurostd::PaddedPOST("valence_PT="+aurostd::utype2string(xel.valence_PT),len)+(units.empty()?"":" // ("+units+")"));}
-          if(c=="ALL" || c==aurostd::toupper("valence_s")) {units=xel.getUnits(c);vs.push_back(aurostd::PaddedPOST("valence_s="+aurostd::utype2string(xel.valence_s),len)+(units.empty()?"":" // ("+units+")"));}  //CO20201111
-          if(c=="ALL" || c==aurostd::toupper("valence_p")) {units=xel.getUnits(c);vs.push_back(aurostd::PaddedPOST("valence_p="+aurostd::utype2string(xel.valence_p),len)+(units.empty()?"":" // ("+units+")"));}  //CO20201111
-          if(c=="ALL" || c==aurostd::toupper("valence_d")) {units=xel.getUnits(c);vs.push_back(aurostd::PaddedPOST("valence_d="+aurostd::utype2string(xel.valence_d),len)+(units.empty()?"":" // ("+units+")"));}  //CO20201111  
-          if(c=="ALL" || c==aurostd::toupper("valence_f")) {units=xel.getUnits(c);vs.push_back(aurostd::PaddedPOST("valence_f="+aurostd::utype2string(xel.valence_f),len)+(units.empty()?"":" // ("+units+")"));}  //CO20201111
+          if(c=="ALL" || c==aurostd::toupper("valence_std")) {units=xel.getUnits(c);vs.push_back(aurostd::PaddedPOST("valence_std="+aurostd::utype2string(xel.valence_std,_DOUBLE_WRITE_PRECISION_),len)+(units.empty()?"":" // ("+units+")"));}
+          if(c=="ALL" || c==aurostd::toupper("valence_iupac")) {units=xel.getUnits(c);vs.push_back(aurostd::PaddedPOST("valence_iupac="+aurostd::utype2string(xel.valence_iupac,_DOUBLE_WRITE_PRECISION_),len)+(units.empty()?"":" // ("+units+")"));}
+          if(c=="ALL" || c==aurostd::toupper("valence_PT")) {units=xel.getUnits(c);vs.push_back(aurostd::PaddedPOST("valence_PT="+aurostd::utype2string(xel.valence_PT,_DOUBLE_WRITE_PRECISION_),len)+(units.empty()?"":" // ("+units+")"));}
+          if(c=="ALL" || c==aurostd::toupper("valence_s")) {units=xel.getUnits(c);vs.push_back(aurostd::PaddedPOST("valence_s="+aurostd::utype2string(xel.valence_s,_DOUBLE_WRITE_PRECISION_),len)+(units.empty()?"":" // ("+units+")"));}  //CO20201111
+          if(c=="ALL" || c==aurostd::toupper("valence_p")) {units=xel.getUnits(c);vs.push_back(aurostd::PaddedPOST("valence_p="+aurostd::utype2string(xel.valence_p,_DOUBLE_WRITE_PRECISION_),len)+(units.empty()?"":" // ("+units+")"));}  //CO20201111
+          if(c=="ALL" || c==aurostd::toupper("valence_d")) {units=xel.getUnits(c);vs.push_back(aurostd::PaddedPOST("valence_d="+aurostd::utype2string(xel.valence_d,_DOUBLE_WRITE_PRECISION_),len)+(units.empty()?"":" // ("+units+")"));}  //CO20201111  
+          if(c=="ALL" || c==aurostd::toupper("valence_f")) {units=xel.getUnits(c);vs.push_back(aurostd::PaddedPOST("valence_f="+aurostd::utype2string(xel.valence_f,_DOUBLE_WRITE_PRECISION_),len)+(units.empty()?"":" // ("+units+")"));}  //CO20201111
           if(c=="ALL" || c==aurostd::toupper("density_PT")) {units=xel.getUnits(c);vs.push_back(aurostd::PaddedPOST("density_PT="+aurostd::utype2string(xel.density_PT,_DOUBLE_WRITE_PRECISION_),len)+(units.empty()?"":" // ("+units+")"));}
           if(c=="ALL" || c==aurostd::toupper("crystal")) {units=xel.getUnits(c);vs.push_back(aurostd::PaddedPOST("crystal="+xel.crystal,len)+(units.empty()?"":" // ("+units+")"));}
           if(c=="ALL" || c==aurostd::toupper("crystal_structure_PT")) {units=xel.getUnits(c);vs.push_back(aurostd::PaddedPOST("crystal_structure_PT="+xel.crystal_structure_PT,len)+(units.empty()?"":" // ("+units+")"));}
@@ -228,8 +228,8 @@ namespace xelement {
     Z=0;
     symbol="XX";//"UNDEFINED";
     name="UNDEFINED";
-    period=NNN;
-    group=NNN; 
+    period=0;
+    group=0; 
     series="UNDEFINED";
     block="nnn";      
     //                                          
@@ -241,15 +241,15 @@ namespace xelement {
     valence_std=NNN;  
     valence_iupac=NNN;
     valence_PT=NNN;       
-    valence_s=0;       //CO20201111
-    valence_p=0;       //CO20201111
-    valence_d=0;       //CO20201111
-    valence_f=0;       //CO20201111
+    valence_s=NNN;       //CO20201111
+    valence_p=NNN;       //CO20201111
+    valence_d=NNN;       //CO20201111
+    valence_f=NNN;       //CO20201111
     density_PT=NNN;       
     crystal="nnn";    
     crystal_structure_PT="UNDEFINED";
     spacegroup="nnn";     
-    spacegroup_number=NNN;
+    spacegroup_number=0;
     variance_parameter_mass=NNN;
     lattice_constants[1]=NNN;lattice_constants[2]=NNN;lattice_constants[3]=NNN;
     lattice_angles[1]=NNN;lattice_angles[2]=NNN;lattice_angles[3]=NNN; 
@@ -715,7 +715,7 @@ namespace xelement {
   xelement::xelement(const string& element) {free();populate(element);}  //CO20200520
   xelement::xelement(uint ZZ) {free();populate(ZZ);} //CO20200520
 
-  string xelement::getPropertyVector(const string& property,const string& delim,uint ncols) const { //CO20201111
+  string xelement::getPropertyStringVector(const string& property,const string& delim,uint ncols) const { //CO20201111
     string c=aurostd::toupper(property);
     if(ncols==AUROSTD_MAX_UINT){
       if(c==aurostd::toupper("lattice_constants")) return aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(lattice_constants,_DOUBLE_WRITE_PRECISION_),delim);
@@ -744,10 +744,10 @@ namespace xelement {
       }
       return aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vitems,_DOUBLE_WRITE_PRECISION_),delim); //CO20201111
     }
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,"xelement::getPropertyVector():","Property not found: "+property,_INPUT_ILLEGAL_);  //CO20200520
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,"xelement::getPropertyStringVector():","Property not found: "+property,_INPUT_ILLEGAL_);  //CO20200520
     return "";
   }
-  string xelement::getProperty(const string& property,const string& delim,uint ncols) const { //CO20201111
+  string xelement::getPropertyString(const string& property,const string& delim,uint ncols) const { //CO20201111
     string c=aurostd::toupper(property);
     if(c==aurostd::toupper("name")) return name;
     if(c==aurostd::toupper("symbol")) return symbol;
@@ -762,21 +762,21 @@ namespace xelement {
     if(c==aurostd::toupper("volume")) return aurostd::utype2string(volume,_DOUBLE_WRITE_PRECISION_);
     if(c==aurostd::toupper("area_molar_Miedema")) return aurostd::utype2string(area_molar_Miedema,_DOUBLE_WRITE_PRECISION_);
     //
-    if(c==aurostd::toupper("valence_std")) return aurostd::utype2string(valence_std);
-    if(c==aurostd::toupper("valence_iupac")) return aurostd::utype2string(valence_iupac);
-    if(c==aurostd::toupper("valence_PT")) return aurostd::utype2string(valence_PT);
-    if(c==aurostd::toupper("valence_s")) return aurostd::utype2string(valence_s); //CO20201111
-    if(c==aurostd::toupper("valence_p")) return aurostd::utype2string(valence_p); //CO20201111
-    if(c==aurostd::toupper("valence_d")) return aurostd::utype2string(valence_d); //CO20201111
-    if(c==aurostd::toupper("valence_f")) return aurostd::utype2string(valence_f); //CO20201111
+    if(c==aurostd::toupper("valence_std")) return aurostd::utype2string(valence_std,_DOUBLE_WRITE_PRECISION_);
+    if(c==aurostd::toupper("valence_iupac")) return aurostd::utype2string(valence_iupac,_DOUBLE_WRITE_PRECISION_);
+    if(c==aurostd::toupper("valence_PT")) return aurostd::utype2string(valence_PT,_DOUBLE_WRITE_PRECISION_);
+    if(c==aurostd::toupper("valence_s")) return aurostd::utype2string(valence_s,_DOUBLE_WRITE_PRECISION_); //CO20201111
+    if(c==aurostd::toupper("valence_p")) return aurostd::utype2string(valence_p,_DOUBLE_WRITE_PRECISION_); //CO20201111
+    if(c==aurostd::toupper("valence_d")) return aurostd::utype2string(valence_d,_DOUBLE_WRITE_PRECISION_); //CO20201111
+    if(c==aurostd::toupper("valence_f")) return aurostd::utype2string(valence_f,_DOUBLE_WRITE_PRECISION_); //CO20201111
     if(c==aurostd::toupper("density_PT")) return aurostd::utype2string(density_PT,_DOUBLE_WRITE_PRECISION_);
     if(c==aurostd::toupper("crystal")) return crystal;
     if(c==aurostd::toupper("crystal_structure_PT")) return crystal_structure_PT;
     if(c==aurostd::toupper("spacegroup")) return spacegroup;
     if(c==aurostd::toupper("spacegroup_number")) return aurostd::utype2string(spacegroup_number);
     if(c==aurostd::toupper("variance_parameter_mass")) return aurostd::utype2string(variance_parameter_mass,_DOUBLE_WRITE_PRECISION_);
-    if(c==aurostd::toupper("lattice_constants")) return getPropertyVector(property,delim,ncols);
-    if(c==aurostd::toupper("lattice_angles")) return getPropertyVector(property,delim,ncols);
+    if(c==aurostd::toupper("lattice_constants")) return getPropertyStringVector(property,delim,ncols);
+    if(c==aurostd::toupper("lattice_angles")) return getPropertyStringVector(property,delim,ncols);
     if(c==aurostd::toupper("phase")) return phase;
     if(c==aurostd::toupper("radius_Saxena")) return aurostd::utype2string(radius_Saxena,_DOUBLE_WRITE_PRECISION_);
     if(c==aurostd::toupper("radius_PT")) return aurostd::utype2string(radius_PT,_DOUBLE_WRITE_PRECISION_);
@@ -793,10 +793,10 @@ namespace xelement {
     if(c==aurostd::toupper("electronegativity_Pearson")) return aurostd::utype2string(electronegativity_Pearson,_DOUBLE_WRITE_PRECISION_);
     if(c==aurostd::toupper("electronegativity_Ghosh")) return aurostd::utype2string(electronegativity_Ghosh,_DOUBLE_WRITE_PRECISION_);
     if(c==aurostd::toupper("electronegativity_Allen")) return aurostd::utype2string(electronegativity_Allen,_DOUBLE_WRITE_PRECISION_); //CO20200731
-    if(c==aurostd::toupper("oxidation_states")) return getPropertyVector(property,delim,ncols);
-    if(c==aurostd::toupper("oxidation_states_preferred")) return getPropertyVector(property,delim,ncols);
+    if(c==aurostd::toupper("oxidation_states")) return getPropertyStringVector(property,delim,ncols);
+    if(c==aurostd::toupper("oxidation_states_preferred")) return getPropertyStringVector(property,delim,ncols);
     if(c==aurostd::toupper("electron_affinity_PT")) return aurostd::utype2string(electron_affinity_PT,_DOUBLE_WRITE_PRECISION_);
-    if(c==aurostd::toupper("energies_ionization")) return getPropertyVector(property,delim,ncols);
+    if(c==aurostd::toupper("energies_ionization")) return getPropertyStringVector(property,delim,ncols);
     if(c==aurostd::toupper("work_function_Miedema")) return aurostd::utype2string(work_function_Miedema,_DOUBLE_WRITE_PRECISION_);
     if(c==aurostd::toupper("density_line_electron_WS_Miedema")) return aurostd::utype2string(density_line_electron_WS_Miedema,_DOUBLE_WRITE_PRECISION_);
     if(c==aurostd::toupper("energy_surface_0K_Miedema")) return aurostd::utype2string(energy_surface_0K_Miedema,_DOUBLE_WRITE_PRECISION_);
@@ -839,8 +839,293 @@ namespace xelement {
     if(c==aurostd::toupper("HHIP")) return aurostd::utype2string(HHIP,_DOUBLE_WRITE_PRECISION_);
     if(c==aurostd::toupper("HHIR")) return aurostd::utype2string(HHIR,_DOUBLE_WRITE_PRECISION_);
     if(c==aurostd::toupper("xray_scatt")) return aurostd::utype2string(xray_scatt,_DOUBLE_WRITE_PRECISION_);
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,"xelement::getProperty():","Property not found: "+property,_INPUT_ILLEGAL_);  //CO20200520
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,"xelement::getPropertyString():","Property not found: "+property,_INPUT_ILLEGAL_);  //CO20200520
     return "";
+  }
+  double xelement::getPropertyDouble(const string& property) const {
+    string c=aurostd::toupper(property);
+    //if(c==aurostd::toupper("name")) return name;
+    //if(c==aurostd::toupper("symbol")) return symbol;
+    if(c==aurostd::toupper("Z")) return Z; //UINT
+    if(c==aurostd::toupper("period")) return period; //UINT
+    if(c==aurostd::toupper("group")) return group; //UINT
+    //if(c==aurostd::toupper("series")) return series;
+    //if(c==aurostd::toupper("block")) return block;
+    //
+    if(c==aurostd::toupper("mass")) return mass;
+    if(c==aurostd::toupper("volume_molar")) return volume_molar;
+    if(c==aurostd::toupper("volume")) return volume;
+    if(c==aurostd::toupper("area_molar_Miedema")) return area_molar_Miedema;
+    //
+    if(c==aurostd::toupper("valence_std")) return valence_std;
+    if(c==aurostd::toupper("valence_iupac")) return valence_iupac;
+    if(c==aurostd::toupper("valence_PT")) return valence_PT;
+    if(c==aurostd::toupper("valence_s")) return valence_s; //CO20201111
+    if(c==aurostd::toupper("valence_p")) return valence_p; //CO20201111
+    if(c==aurostd::toupper("valence_d")) return valence_d; //CO20201111
+    if(c==aurostd::toupper("valence_f")) return valence_f; //CO20201111
+    if(c==aurostd::toupper("density_PT")) return density_PT;
+    //if(c==aurostd::toupper("crystal")) return crystal;
+    //if(c==aurostd::toupper("crystal_structure_PT")) return crystal_structure_PT;
+    //if(c==aurostd::toupper("spacegroup")) return spacegroup;
+    if(c==aurostd::toupper("spacegroup_number")) return spacegroup_number;  //UINT
+    if(c==aurostd::toupper("variance_parameter_mass")) return variance_parameter_mass;
+    //if(c==aurostd::toupper("lattice_constants")) return lattice_constants;
+    //if(c==aurostd::toupper("lattice_angles")) return lattice_angles;
+    //if(c==aurostd::toupper("phase")) return phase;
+    if(c==aurostd::toupper("radius_Saxena")) return radius_Saxena;
+    if(c==aurostd::toupper("radius_PT")) return radius_PT;
+    if(c==aurostd::toupper("radius_covalent_PT")) return radius_covalent_PT;
+    if(c==aurostd::toupper("radius_covalent")) return radius_covalent;
+    if(c==aurostd::toupper("radius_VanDerWaals_PT")) return radius_VanDerWaals_PT;
+    if(c==aurostd::toupper("radii_Ghosh08")) return radii_Ghosh08;
+    if(c==aurostd::toupper("radii_Slatter")) return radii_Slatter;
+    if(c==aurostd::toupper("radii_Pyykko")) return radii_Pyykko;
+    //
+    if(c==aurostd::toupper("conductivity_electrical")) return conductivity_electrical;
+    if(c==aurostd::toupper("electronegativity_Pauling")) return electronegativity_Pauling;
+    if(c==aurostd::toupper("hardness_chemical_Ghosh")) return hardness_chemical_Ghosh;
+    if(c==aurostd::toupper("electronegativity_Pearson")) return electronegativity_Pearson;
+    if(c==aurostd::toupper("electronegativity_Ghosh")) return electronegativity_Ghosh;
+    if(c==aurostd::toupper("electronegativity_Allen")) return electronegativity_Allen; //CO20200731
+    //if(c==aurostd::toupper("oxidation_states")) return oxidation_states;
+    //if(c==aurostd::toupper("oxidation_states_preferred")) return oxidation_states_preferred;
+    if(c==aurostd::toupper("electron_affinity_PT")) return electron_affinity_PT;
+    //if(c==aurostd::toupper("energies_ionization")) return energies_ionization;
+    if(c==aurostd::toupper("work_function_Miedema")) return work_function_Miedema;
+    if(c==aurostd::toupper("density_line_electron_WS_Miedema")) return density_line_electron_WS_Miedema;
+    if(c==aurostd::toupper("energy_surface_0K_Miedema")) return energy_surface_0K_Miedema;
+    //
+    if(c==aurostd::toupper("scale_Pettifor")) return scale_Pettifor; 
+    //
+    if(c==aurostd::toupper("temperature_boiling")) return temperature_boiling;
+    if(c==aurostd::toupper("temperature_melting")) return temperature_melting;
+    if(c==aurostd::toupper("enthalpy_fusion")) return enthalpy_fusion;  //CO20201111
+    if(c==aurostd::toupper("enthalpy_vaporization")) return enthalpy_vaporization;
+    if(c==aurostd::toupper("enthalpy_atomization_WE")) return enthalpy_atomization_WE;  //CO20201111
+    if(c==aurostd::toupper("energy_cohesive")) return energy_cohesive;  //CO20201111
+    if(c==aurostd::toupper("specific_heat_PT")) return specific_heat_PT;
+    if(c==aurostd::toupper("critical_pressure")) return critical_pressure; 
+    if(c==aurostd::toupper("critical_temperature_PT")) return critical_temperature_PT; 
+    if(c==aurostd::toupper("thermal_expansion")) return thermal_expansion;
+    if(c==aurostd::toupper("conductivity_thermal")) return conductivity_thermal;
+    //
+    if(c==aurostd::toupper("hardness_mechanical_Brinell")) return hardness_mechanical_Brinell;
+    if(c==aurostd::toupper("hardness_mechanical_Mohs")) return hardness_mechanical_Mohs;
+    if(c==aurostd::toupper("hardness_mechanical_Vickers")) return hardness_mechanical_Vickers;
+    if(c==aurostd::toupper("hardness_chemical_Pearson")) return hardness_chemical_Pearson;
+    if(c==aurostd::toupper("hardness_chemical_Putz")) return hardness_chemical_Putz;
+    if(c==aurostd::toupper("hardness_chemical_RB")) return hardness_chemical_RB;
+    if(c==aurostd::toupper("modulus_shear")) return modulus_shear;
+    if(c==aurostd::toupper("modulus_Young")) return modulus_Young;
+    if(c==aurostd::toupper("modulus_bulk")) return modulus_bulk;
+    if(c==aurostd::toupper("Poisson_ratio_PT")) return Poisson_ratio_PT;
+    if(c==aurostd::toupper("modulus_bulk_x_volume_molar_Miedema")) return modulus_bulk_x_volume_molar_Miedema;
+    //
+    //if(c==aurostd::toupper("magnetic_type_PT")) return magnetic_type_PT;
+    if(c==aurostd::toupper("susceptibility_magnetic_mass")) return susceptibility_magnetic_mass;
+    if(c==aurostd::toupper("susceptibility_magnetic_volume")) return susceptibility_magnetic_volume;
+    if(c==aurostd::toupper("susceptibility_magnetic_molar")) return susceptibility_magnetic_molar;
+    if(c==aurostd::toupper("temperature_Curie")) return temperature_Curie;
+    //
+    if(c==aurostd::toupper("refractive_index")) return refractive_index;
+    //if(c==aurostd::toupper("color_PT")) return color_PT;
+    //
+    if(c==aurostd::toupper("HHIP")) return HHIP;
+    if(c==aurostd::toupper("HHIR")) return HHIR;
+    if(c==aurostd::toupper("xray_scatt")) return xray_scatt;
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,"xelement::getPropertyDouble():","Property not found: "+property,_INPUT_ILLEGAL_);  //CO20200520
+    return NNN;
+  }
+  const xvector<double>& xelement::getPropertyXVectorDouble(const string& property) const {
+    string c=aurostd::toupper(property);
+    //if(c==aurostd::toupper("name")) return name;
+    //if(c==aurostd::toupper("symbol")) return symbol;
+    //if(c==aurostd::toupper("Z")) return Z;
+    //if(c==aurostd::toupper("period")) return period;
+    //if(c==aurostd::toupper("group")) return group;
+    //if(c==aurostd::toupper("series")) return series;
+    //if(c==aurostd::toupper("block")) return block;
+    //
+    //if(c==aurostd::toupper("mass")) return mass;
+    //if(c==aurostd::toupper("volume_molar")) return volume_molar;
+    //if(c==aurostd::toupper("volume")) return volume;
+    //if(c==aurostd::toupper("area_molar_Miedema")) return area_molar_Miedema;
+    //
+    //if(c==aurostd::toupper("valence_std")) return valence_std;
+    //if(c==aurostd::toupper("valence_iupac")) return valence_iupac;
+    //if(c==aurostd::toupper("valence_PT")) return valence_PT;
+    //if(c==aurostd::toupper("valence_s")) return valence_s; //CO20201111
+    //if(c==aurostd::toupper("valence_p")) return valence_p; //CO20201111
+    //if(c==aurostd::toupper("valence_d")) return valence_d; //CO20201111
+    //if(c==aurostd::toupper("valence_f")) return valence_f; //CO20201111
+    //if(c==aurostd::toupper("density_PT")) return density_PT;
+    //if(c==aurostd::toupper("crystal")) return crystal;
+    //if(c==aurostd::toupper("crystal_structure_PT")) return crystal_structure_PT;
+    //if(c==aurostd::toupper("spacegroup")) return spacegroup;
+    //if(c==aurostd::toupper("spacegroup_number")) return spacegroup_number;
+    //if(c==aurostd::toupper("variance_parameter_mass")) return variance_parameter_mass;
+    if(c==aurostd::toupper("lattice_constants")) return lattice_constants;
+    if(c==aurostd::toupper("lattice_angles")) return lattice_angles;
+    //if(c==aurostd::toupper("phase")) return phase;
+    //if(c==aurostd::toupper("radius_Saxena")) return radius_Saxena;
+    //if(c==aurostd::toupper("radius_PT")) return radius_PT;
+    //if(c==aurostd::toupper("radius_covalent_PT")) return radius_covalent_PT;
+    //if(c==aurostd::toupper("radius_covalent")) return radius_covalent;
+    //if(c==aurostd::toupper("radius_VanDerWaals_PT")) return radius_VanDerWaals_PT;
+    //if(c==aurostd::toupper("radii_Ghosh08")) return radii_Ghosh08;
+    //if(c==aurostd::toupper("radii_Slatter")) return radii_Slatter;
+    //if(c==aurostd::toupper("radii_Pyykko")) return radii_Pyykko;
+    //
+    //if(c==aurostd::toupper("conductivity_electrical")) return conductivity_electrical;
+    //if(c==aurostd::toupper("electronegativity_Pauling")) return electronegativity_Pauling;
+    //if(c==aurostd::toupper("hardness_chemical_Ghosh")) return hardness_chemical_Ghosh;
+    //if(c==aurostd::toupper("electronegativity_Pearson")) return electronegativity_Pearson;
+    //if(c==aurostd::toupper("electronegativity_Ghosh")) return electronegativity_Ghosh;
+    //if(c==aurostd::toupper("electronegativity_Allen")) return electronegativity_Allen; //CO20200731
+    //if(c==aurostd::toupper("oxidation_states")) return oxidation_states;
+    //if(c==aurostd::toupper("oxidation_states_preferred")) return oxidation_states_preferred;
+    //if(c==aurostd::toupper("electron_affinity_PT")) return electron_affinity_PT;
+    //if(c==aurostd::toupper("energies_ionization")) return energies_ionization;
+    //if(c==aurostd::toupper("work_function_Miedema")) return work_function_Miedema;
+    //if(c==aurostd::toupper("density_line_electron_WS_Miedema")) return density_line_electron_WS_Miedema;
+    //if(c==aurostd::toupper("energy_surface_0K_Miedema")) return energy_surface_0K_Miedema;
+    //
+    //if(c==aurostd::toupper("scale_Pettifor")) return scale_Pettifor; 
+    //
+    //if(c==aurostd::toupper("temperature_boiling")) return temperature_boiling;
+    //if(c==aurostd::toupper("temperature_melting")) return temperature_melting;
+    //if(c==aurostd::toupper("enthalpy_fusion")) return enthalpy_fusion;  //CO20201111
+    //if(c==aurostd::toupper("enthalpy_vaporization")) return enthalpy_vaporization;
+    //if(c==aurostd::toupper("enthalpy_atomization_WE")) return enthalpy_atomization_WE;  //CO20201111
+    //if(c==aurostd::toupper("energy_cohesive")) return energy_cohesive;  //CO20201111
+    //if(c==aurostd::toupper("specific_heat_PT")) return specific_heat_PT;
+    //if(c==aurostd::toupper("critical_pressure")) return critical_pressure; 
+    //if(c==aurostd::toupper("critical_temperature_PT")) return critical_temperature_PT; 
+    //if(c==aurostd::toupper("thermal_expansion")) return thermal_expansion;
+    //if(c==aurostd::toupper("conductivity_thermal")) return conductivity_thermal;
+    //
+    //if(c==aurostd::toupper("hardness_mechanical_Brinell")) return hardness_mechanical_Brinell;
+    //if(c==aurostd::toupper("hardness_mechanical_Mohs")) return hardness_mechanical_Mohs;
+    //if(c==aurostd::toupper("hardness_mechanical_Vickers")) return hardness_mechanical_Vickers;
+    //if(c==aurostd::toupper("hardness_chemical_Pearson")) return hardness_chemical_Pearson;
+    //if(c==aurostd::toupper("hardness_chemical_Putz")) return hardness_chemical_Putz;
+    //if(c==aurostd::toupper("hardness_chemical_RB")) return hardness_chemical_RB;
+    //if(c==aurostd::toupper("modulus_shear")) return modulus_shear;
+    //if(c==aurostd::toupper("modulus_Young")) return modulus_Young;
+    //if(c==aurostd::toupper("modulus_bulk")) return modulus_bulk;
+    //if(c==aurostd::toupper("Poisson_ratio_PT")) return Poisson_ratio_PT;
+    //if(c==aurostd::toupper("modulus_bulk_x_volume_molar_Miedema")) return modulus_bulk_x_volume_molar_Miedema;
+    //
+    //if(c==aurostd::toupper("magnetic_type_PT")) return magnetic_type_PT;
+    //if(c==aurostd::toupper("susceptibility_magnetic_mass")) return susceptibility_magnetic_mass;
+    //if(c==aurostd::toupper("susceptibility_magnetic_volume")) return susceptibility_magnetic_volume;
+    //if(c==aurostd::toupper("susceptibility_magnetic_molar")) return susceptibility_magnetic_molar;
+    //if(c==aurostd::toupper("temperature_Curie")) return temperature_Curie;
+    //
+    //if(c==aurostd::toupper("refractive_index")) return refractive_index;
+    //if(c==aurostd::toupper("color_PT")) return color_PT;
+    //
+    //if(c==aurostd::toupper("HHIP")) return HHIP;
+    //if(c==aurostd::toupper("HHIR")) return HHIR;
+    //if(c==aurostd::toupper("xray_scatt")) return xray_scatt;
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,"xelement::getPropertyXVectorDouble():","Property not found: "+property,_INPUT_ILLEGAL_);  //CO20200520
+    return lattice_constants; //return dummy
+  }
+  const vector<double>& xelement::getPropertyVectorDouble(const string& property) const {
+    string c=aurostd::toupper(property);
+    //if(c==aurostd::toupper("name")) return name;
+    //if(c==aurostd::toupper("symbol")) return symbol;
+    //if(c==aurostd::toupper("Z")) return Z;
+    //if(c==aurostd::toupper("period")) return period;
+    //if(c==aurostd::toupper("group")) return group;
+    //if(c==aurostd::toupper("series")) return series;
+    //if(c==aurostd::toupper("block")) return block;
+    //
+    //if(c==aurostd::toupper("mass")) return mass;
+    //if(c==aurostd::toupper("volume_molar")) return volume_molar;
+    //if(c==aurostd::toupper("volume")) return volume;
+    //if(c==aurostd::toupper("area_molar_Miedema")) return area_molar_Miedema;
+    //
+    //if(c==aurostd::toupper("valence_std")) return valence_std;
+    //if(c==aurostd::toupper("valence_iupac")) return valence_iupac;
+    //if(c==aurostd::toupper("valence_PT")) return valence_PT;
+    //if(c==aurostd::toupper("valence_s")) return valence_s; //CO20201111
+    //if(c==aurostd::toupper("valence_p")) return valence_p; //CO20201111
+    //if(c==aurostd::toupper("valence_d")) return valence_d; //CO20201111
+    //if(c==aurostd::toupper("valence_f")) return valence_f; //CO20201111
+    //if(c==aurostd::toupper("density_PT")) return density_PT;
+    //if(c==aurostd::toupper("crystal")) return crystal;
+    //if(c==aurostd::toupper("crystal_structure_PT")) return crystal_structure_PT;
+    //if(c==aurostd::toupper("spacegroup")) return spacegroup;
+    //if(c==aurostd::toupper("spacegroup_number")) return spacegroup_number;
+    //if(c==aurostd::toupper("variance_parameter_mass")) return variance_parameter_mass;
+    //if(c==aurostd::toupper("lattice_constants")) return lattice_constants;
+    //if(c==aurostd::toupper("lattice_angles")) return lattice_angles;
+    //if(c==aurostd::toupper("phase")) return phase;
+    //if(c==aurostd::toupper("radius_Saxena")) return radius_Saxena;
+    //if(c==aurostd::toupper("radius_PT")) return radius_PT;
+    //if(c==aurostd::toupper("radius_covalent_PT")) return radius_covalent_PT;
+    //if(c==aurostd::toupper("radius_covalent")) return radius_covalent;
+    //if(c==aurostd::toupper("radius_VanDerWaals_PT")) return radius_VanDerWaals_PT;
+    //if(c==aurostd::toupper("radii_Ghosh08")) return radii_Ghosh08;
+    //if(c==aurostd::toupper("radii_Slatter")) return radii_Slatter;
+    //if(c==aurostd::toupper("radii_Pyykko")) return radii_Pyykko;
+    //
+    //if(c==aurostd::toupper("conductivity_electrical")) return conductivity_electrical;
+    //if(c==aurostd::toupper("electronegativity_Pauling")) return electronegativity_Pauling;
+    //if(c==aurostd::toupper("hardness_chemical_Ghosh")) return hardness_chemical_Ghosh;
+    //if(c==aurostd::toupper("electronegativity_Pearson")) return electronegativity_Pearson;
+    //if(c==aurostd::toupper("electronegativity_Ghosh")) return electronegativity_Ghosh;
+    //if(c==aurostd::toupper("electronegativity_Allen")) return electronegativity_Allen; //CO20200731
+    if(c==aurostd::toupper("oxidation_states")) return oxidation_states;
+    if(c==aurostd::toupper("oxidation_states_preferred")) return oxidation_states_preferred;
+    //if(c==aurostd::toupper("electron_affinity_PT")) return electron_affinity_PT;
+    if(c==aurostd::toupper("energies_ionization")) return energies_ionization;
+    //if(c==aurostd::toupper("work_function_Miedema")) return work_function_Miedema;
+    //if(c==aurostd::toupper("density_line_electron_WS_Miedema")) return density_line_electron_WS_Miedema;
+    //if(c==aurostd::toupper("energy_surface_0K_Miedema")) return energy_surface_0K_Miedema;
+    //
+    //if(c==aurostd::toupper("scale_Pettifor")) return scale_Pettifor; 
+    //
+    //if(c==aurostd::toupper("temperature_boiling")) return temperature_boiling;
+    //if(c==aurostd::toupper("temperature_melting")) return temperature_melting;
+    //if(c==aurostd::toupper("enthalpy_fusion")) return enthalpy_fusion;  //CO20201111
+    //if(c==aurostd::toupper("enthalpy_vaporization")) return enthalpy_vaporization;
+    //if(c==aurostd::toupper("enthalpy_atomization_WE")) return enthalpy_atomization_WE;  //CO20201111
+    //if(c==aurostd::toupper("energy_cohesive")) return energy_cohesive;  //CO20201111
+    //if(c==aurostd::toupper("specific_heat_PT")) return specific_heat_PT;
+    //if(c==aurostd::toupper("critical_pressure")) return critical_pressure; 
+    //if(c==aurostd::toupper("critical_temperature_PT")) return critical_temperature_PT; 
+    //if(c==aurostd::toupper("thermal_expansion")) return thermal_expansion;
+    //if(c==aurostd::toupper("conductivity_thermal")) return conductivity_thermal;
+    //
+    //if(c==aurostd::toupper("hardness_mechanical_Brinell")) return hardness_mechanical_Brinell;
+    //if(c==aurostd::toupper("hardness_mechanical_Mohs")) return hardness_mechanical_Mohs;
+    //if(c==aurostd::toupper("hardness_mechanical_Vickers")) return hardness_mechanical_Vickers;
+    //if(c==aurostd::toupper("hardness_chemical_Pearson")) return hardness_chemical_Pearson;
+    //if(c==aurostd::toupper("hardness_chemical_Putz")) return hardness_chemical_Putz;
+    //if(c==aurostd::toupper("hardness_chemical_RB")) return hardness_chemical_RB;
+    //if(c==aurostd::toupper("modulus_shear")) return modulus_shear;
+    //if(c==aurostd::toupper("modulus_Young")) return modulus_Young;
+    //if(c==aurostd::toupper("modulus_bulk")) return modulus_bulk;
+    //if(c==aurostd::toupper("Poisson_ratio_PT")) return Poisson_ratio_PT;
+    //if(c==aurostd::toupper("modulus_bulk_x_volume_molar_Miedema")) return modulus_bulk_x_volume_molar_Miedema;
+    //
+    //if(c==aurostd::toupper("magnetic_type_PT")) return magnetic_type_PT;
+    //if(c==aurostd::toupper("susceptibility_magnetic_mass")) return susceptibility_magnetic_mass;
+    //if(c==aurostd::toupper("susceptibility_magnetic_volume")) return susceptibility_magnetic_volume;
+    //if(c==aurostd::toupper("susceptibility_magnetic_molar")) return susceptibility_magnetic_molar;
+    //if(c==aurostd::toupper("temperature_Curie")) return temperature_Curie;
+    //
+    //if(c==aurostd::toupper("refractive_index")) return refractive_index;
+    //if(c==aurostd::toupper("color_PT")) return color_PT;
+    //
+    //if(c==aurostd::toupper("HHIP")) return HHIP;
+    //if(c==aurostd::toupper("HHIR")) return HHIR;
+    //if(c==aurostd::toupper("xray_scatt")) return xray_scatt;
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,"xelement::getPropertyVectorDouble():","Property not found: "+property,_INPUT_ILLEGAL_);  //CO20200520
+    return energies_ionization; //return dummy
   }
   string xelement::getType(const string& property) const{ //CO20201111
     //keep SIMPLE: number/numbers vs. string/strings
@@ -924,7 +1209,7 @@ namespace xelement {
     if(c==aurostd::toupper("Poisson_ratio_PT")) return "number";
     if(c==aurostd::toupper("modulus_bulk_x_volume_molar_Miedema")) return "number";
     //
-    if(c==aurostd::toupper("magnetic_type_PT")) return "number";
+    if(c==aurostd::toupper("magnetic_type_PT")) return "string";
     if(c==aurostd::toupper("susceptibility_magnetic_mass")) return "number";
     if(c==aurostd::toupper("susceptibility_magnetic_volume")) return "number";
     if(c==aurostd::toupper("susceptibility_magnetic_molar")) return "number";
@@ -1032,7 +1317,7 @@ namespace xelement {
     if(c==aurostd::toupper("HHIP")) return units_HHIP;
     if(c==aurostd::toupper("HHIR")) return units_HHIR;
     if(c==aurostd::toupper("xray_scatt")) return units_xray_scatt;
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,"xelement::getProperty():","Property not found: "+property,_INPUT_ILLEGAL_);  //CO20200520
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,"xelement::getPropertyString():","Property not found: "+property,_INPUT_ILLEGAL_);  //CO20200520
     return "";
   }
   void xelement::convertUnits(const string& property,const string& units_new){
