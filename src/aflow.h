@@ -14,7 +14,7 @@
 
 // #define  _AFLOW_TEMP_PRESERVE_  // to preseve /tmp files for debug
 
-#define NNN   -123456
+//[CO20200502 - moved to aurostd.h]#define NNN   -123456
 //[CO20200502 - moved to aurostd.h]#define GCC_VERSION (__GNUC__ * 10000  + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
 #define _ANRL_NOWEB_ //DX
 // hard-coded prototype generator (ANRL/ subdirectory required) //DX20200623

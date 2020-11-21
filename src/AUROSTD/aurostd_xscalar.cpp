@@ -983,6 +983,12 @@ namespace aurostd {
     }
 }
 
+//CO20201111 - BEGIN
+namespace aurostd {
+  bool isNaN(double d){return d==NNN||d==AUROSTD_NAN||d==AUROSTD_MAX_DOUBLE;}
+}
+//CO20201111 - END
+
 #endif // _AUROSTD_XSCALAR_CPP_
 
 

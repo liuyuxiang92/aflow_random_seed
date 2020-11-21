@@ -57,6 +57,7 @@ namespace aurostd {
         void reset(void);
         void clear(void);
         void null(void);  //CO20200731 - to create null vector
+        void resize(int=3,int nl=1); //CO20201111
       private:
         utype *corpus;
         // bool isfloat,iscomplex;
@@ -597,6 +598,7 @@ namespace aurostd { //CO20190419
   template<class utype> utype meanWeighted(const xvector<utype>& a,const xvector<utype>& weights); //CO20190520
   template<class utype> utype meanWeighted(const xvector<utype>& a,const xvector<utype>& weights,utype& sum_weights); //CO20190520
   template<class utype> utype stddev(const xvector<utype>& a); //CO20190520
+  template<class utype> utype mode(const xvector<utype>& a); //CO20190520
   template<class utype> void getQuartiles(const xvector<utype>& _a,utype& q1,utype& q2,utype& q3);  //CO20171202
   template<class utype> utype getMAD(const xvector<utype>& _a,utype median=(utype)AUROSTD_NAN);   //CO20171202, absolute deviation around the median (MAD)
   template<class utype> xvector<utype> convolution(const xvector<utype>& signal_input,const xvector<utype>& response_input,int SHAPE=CONV_SHAPE_FULL); //CO20190419

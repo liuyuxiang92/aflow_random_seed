@@ -95,6 +95,10 @@ using std::vector;
 #define SWAP(a,b) {temp=(a);(a)=(b);(b)=temp;}
 #endif
 
+#ifndef NNN
+#define NNN -123456
+#endif
+
 #ifndef AUROSTD_NAN
 #define AUROSTD_NAN 1E9
 #endif
