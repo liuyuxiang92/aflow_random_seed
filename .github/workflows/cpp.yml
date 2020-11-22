@@ -15,5 +15,5 @@ jobs:
     - uses: actions/checkout@v2
     - name: make
       run: make -C src
-    - name: make check
-      run: make -C src check
+    - name: make check_full
+      run: make -C src check_full
