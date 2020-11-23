@@ -28,6 +28,72 @@
 #endif
 
 // ***************************************************************************
+// initializeStructureRepresentative() 
+// ***************************************************************************
+namespace compare {
+  structure_representative initializeStructureRepresentativeStruct(
+      xstructure& structure){
+
+    structure_representative str_rep;
+    str_rep.structure = structure;
+    return str_rep;
+  }
+}
+
+// ***************************************************************************
+// initializeStructureMatched() 
+// ***************************************************************************
+namespace compare {
+  structure_matched initializeStructureMatched(
+      xstructure& structure){
+
+    structure_matched str_match;
+    str_match.structure = structure;
+    str_match.misfit_info = compare::initialize_misfit_struct();
+    str_match.rotation = aurostd::eye<double>();
+    str_match.basis_transformation = aurostd::eye<double>();
+    xvector<double> null_double;
+    str_match.origin_shift = null_double;
+    vector<uint> null_uint;
+    str_match.atom_map = null_uint;
+    str_match.basis_map = null_uint;
+    return str_match;
+  }
+}
+
+/*
+// ***************************************************************************
+// initializeStructureRepresentative() 
+// ***************************************************************************
+namespace compare {
+structure_representative initializeStructureRepresentativeStruct(
+    const string& structure_name, 
+    const string& structure_source,
+    uint relaxation_step,
+    xstructure& structure, 
+    ostream& oss){ //DX20200429 - added relaxation_step
+    
+    structure_representative str_rep;
+    // { .attribute=<>, .attribute=<>, ...} doesn't work for old GCC versions
+    str_rep.name=structure_name;
+    str_rep.from=structure_source;
+    str_rep.generated=true; // since xstr is passed in
+        
+    str_rep.structure = xstr1;
+    str_rep.structure.ReScale(1.0); //DX20190715
+    str_rep.structure.BringInCell(); //DX20200707
+    str_rep.name = structure_name;
+    str_rep.stoichiometry = xstr1.GetReducedComposition(!same_species);
+    str_rep.elements = xstr1.GetElements(true,true); // true: clean names
+    str_rep.ntypes = xstr1.num_each_type.size(); //DX20190425
+    str_rep.structure_representative_compound = pflow::prettyPrintCompound(structure_tmp.elements,structure_tmp.stoichiometry,no_vrt,false,txt_ft);//remove ones is true  //DX20190311 //DX20190313 - use xstr1
+    
+    return misfit_info;
+}
+}
+*/
+
+// ***************************************************************************
 // Prototype Class 
 // ***************************************************************************
 // ===== Constructor ===== //
@@ -8341,12 +8407,12 @@ namespace compare{
   }
 }
 
-/*
+
 // ***************************************************************************
 // latticeAndOriginSearch [NEW WITH BASIS TRANSFORMATIONS]
 // ***************************************************************************
 namespace compare{
-  void latticeAndOriginSearch(xstructure& xstr1,
+  void latticeSearch(xstructure& xstr1,
       xstructure& xstr2,
       const uint& num_proc,
       xmatrix<double>& q1,
@@ -8360,7 +8426,7 @@ namespace compare{
     // Performs lattice and origin search
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string function_name = XPID + "compare::latticeAndOriginSearch():";
+    string function_name = XPID + "compare::latticeSearch():";
 
     bool supercell_method = true; //DX20200330 - original method, but slow //DX20200827 - false method is not robust enough yet
     bool test_one_lfa_only = false; //DX20190318
@@ -8506,10 +8572,10 @@ namespace compare{
           // shift representative structure to LFA
           // NEED TO SHIFT origin of xstr1_tmp to one of the LFA (this was missing before and caused ICSD_102428.BCA, and CBA to not match, but they should
           // //DX20200715 - now explore all shifts, cannot just test one
-          for(uint i=0;i<xstr1_tmp.atoms.size();i++){
-            if(xstr1_tmp.atoms[i].name==lfa_str1){
-              xstr1_tmp.ShiftOriginToAtom(i);
-              xstr1_tmp.BringInCell(1e-10);
+          for(uint i=0;i<xstr1.atoms.size();i++){
+            if(xstr1.atoms[i].name==lfa_str1){
+              xstr1.ShiftOriginToAtom(i);
+              xstr1.BringInCell(1e-10);
 
               // ---------------------------------------------------------------------------
               // create vector of variables for each thread 
@@ -8523,7 +8589,7 @@ namespace compare{
               for(uint n=0; n<num_proc; n++){
                 vector<xstructure> vprotos_tmp;
                 vvprotos.push_back(vprotos_tmp);
-                xstr1_for_thread.push_back(xstr1_tmp);
+                xstr1_for_thread.push_back(xstr1);
                 structure_misfit temp_misfit_info = compare::initialize_misfit_struct((magnetic_analysis && _CALCULATE_MAGNETIC_MISFIT_)); //DX20191218
                 possible_min_misfit_info.push_back(temp_misfit_info); //DX20191218
                 vector<uint> tmp_indices;
@@ -8542,14 +8608,12 @@ namespace compare{
               vector<std::thread*> threads;
               if(LDEBUG){cerr << function_name << " Searching for possible matching structures [THREADED VERSION]" << endl;}
               for(uint n=0; n<number_of_threads; n++){
-                threads.push_back(new std::thread(structureSearch,
+                threads.push_back(new std::thread(commonOriginSearch,
                       std::ref(xstr1_for_thread[n]),
-                      std::ref(xstr_supercell),
                       std::ref(all_nn1),
                       std::ref(lfa_str2),
                       type_match,
-                      std::ref(lattices),std::ref(clattices),std::ref(latt_devs),
-                      //DX20191107 [switching to getThreadDistribution] - start_indices[n], end_indices[n],
+                      std::ref(vxstr2_transformed),std::ref(latt_devs),
                       thread_distribution[n][0], thread_distribution[n][1],
                       std::ref(possible_min_misfit_info[n]), //DX20191218
                       std::ref(possible_matching_indices_1[n]),std::ref(possible_matching_indices_2[n]),
@@ -8570,13 +8634,12 @@ namespace compare{
               if(LDEBUG){cerr << function_name << " Searching for possible matching structures [NON-THREADED VERSION]" << endl;}
               //structureSearch(lfa_str2,all_nn1,xstr_supercell,vvprotos[n],xstr1_for_thread[n],type_match,possible_minMis[n],
               //                lattices,clattices,latt_devs,optimize_match,start_index,end_index);
-              structureSearch(
+              commonOriginSearch(
                   xstr1_for_thread[n],
-                  xstr_supercell,
                   all_nn1,
                   lfa_str2,
                   type_match,
-                  lattices,clattices,latt_devs,
+                  vxstr2_transformed,latt_devs,
                   start_index, end_index,
                   possible_min_misfit_info[n], //DX20191218
                   possible_matching_indices_1[n],possible_matching_indices_2[n],
@@ -8661,7 +8724,331 @@ namespace compare{
     }
   }
 }
-*/
+
+// ***************************************************************************
+// latticeAndOriginSearch [NEW WITH BASIS TRANSFORMATIONS]
+// ***************************************************************************
+namespace compare{
+  void latticeSearch(
+      structure_representative& xstr_rep,
+      structure_matched& xstr_match,
+      int type_match,
+      bool optimize_match,
+      bool scale_volume, //DX20200422
+      uint num_proc,
+      ostream& oss){ //DX20201123
+
+    // Performs lattice and origin search
+
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string function_name = XPID + "compare::latticeSearch():";
+
+    bool supercell_method = true; //DX20200330 - original method, but slow //DX20200827 - false method is not robust enough yet
+    bool test_one_lfa_only = false; //DX20190318
+    bool test_one_origin_only = false; //DX20200715
+    //DX - SPEED UP BUT NOT ROBUST - if(type_match==2){ test_one_lfa_only=true;} //DX20190318
+
+    xstructure xstr1 = xstr_rep.structure;
+    vector<xstructure> vprotos; //tmp - will get rid of
+      
+    structure_misfit min_misfit_info = compare::initialize_misfit_struct();
+    bool magnetic_analysis = (xstr1.atoms[0].spin_is_given || xstr1.atoms[0].noncoll_spin_is_given);
+    min_misfit_info.is_magnetic_misfit=(magnetic_analysis && _CALCULATE_MAGNETIC_MISFIT_); //DX20191218
+    vector<uint> matching_indices_1, matching_indices_2;
+    vector<double> minimum_distances;
+
+    uint matched_lattice_index = 0; //DX20201023
+    xvector<double> matched_origin_shift; //DX20201023 - shift structure 2 to structure 1
+    xmatrix<double> matched_basis_transformation; //DX20201023 
+    xmatrix<double> matched_rotation; //DX20201023 
+
+    // ---------------------------------------------------------------------------
+    // determine least-frequently occuring atom type (LFA) for each structure
+    // (there may be more than one)
+    vector<string> LFA_str1=getLeastFrequentAtomSpecies(xstr_rep.structure);
+    vector<string> LFA_str2=getLeastFrequentAtomSpecies(xstr_match.structure);
+    string lfa_str1=LFA_str1[0]; //initialize
+    string lfa_str2=LFA_str2[0]; //initialize
+
+    double abs_det_q1=abs(det(xstr_rep.structure.lattice)); // volume
+    xvector<double> abc_angles_q1=Getabc_angles(xstr_rep.structure.lattice,DEGREES); // lattice parameters
+
+    // ---------------------------------------------------------------------------
+    // determine supercell size via search radius/dims
+    double search_radius = aurostd::max(abc_angles_q1(1),abc_angles_q1(2),abc_angles_q1(3));
+    xvector<int> dims = LatticeDimensionSphere(xstr_match.structure.lattice,search_radius);
+
+    if(LDEBUG){cerr << function_name << " lattice search radius: " << search_radius << endl;}
+    if(LDEBUG){cerr << function_name << " lattice dims : " << dims << endl;}
+
+    // ---------------------------------------------------------------------------
+    // peform supercell expansion on LFA atoms in structure2 
+    xstructure xstr_LFA_supercell = compare::GetLFASupercell(xstr_match.structure, dims, lfa_str2);
+
+    // ---------------------------------------------------------------------------
+    // find possible translation vectors 
+    vector<xvector<double> > translation_vectors;
+    vector<vector<uint> > ij_index;
+    quadrupletSearch(xstr_rep.structure.lattice,xstr_LFA_supercell,xstr_match.structure,translation_vectors,ij_index); //DX20190701 - added xstr2
+
+    // ---------------------------------------------------------------------------
+    // build possible lattices
+    vector<xmatrix<double> > lattices;
+    vector<xmatrix<double> > clattices;
+    vector<double> latt_devs;
+    buildSimilarLattices(translation_vectors, xstr_rep.structure.lattice, abs_det_q1, abs_det_q1, abc_angles_q1, lattices, clattices, latt_devs, optimize_match, scale_volume); //DX20200422
+    if(LDEBUG){cerr << function_name << " Number of lattices to compare: " << lattices.size() << endl;}
+
+    if(lattices.size()>0){
+      
+			// ---------------------------------------------------------------------------
+      // calculate attributes of structure 1 (volume, lattice parameters, nearest neighbor distances, etc.)
+      vector<double> all_nn1 = computeNearestNeighbors(xstr_rep.structure); // nearest neighbor distances (invariant of origin shifts) 
+      
+			// ---------------------------------------------------------------------------
+      // identify basis transformation from xstr2 to its new lattice
+      // then determine the rotation between xstr2's new lattice and xstr1
+      vector<xmatrix<double> > basis_transformations;
+      vector<xmatrix<double> > rotations;
+      getLatticeTransformations(xstr_match.structure.lattice,xstr_rep.structure.lattice,lattices,basis_transformations,rotations);
+
+			vector<xstructure> vxstr2_transformed = getTransformedStructures(xstr_match.structure,basis_transformations,rotations);
+
+      // ---------------------------------------------------------------------------
+      // calculate attributes of structure 1 (volume, lattice parameters, nearest neighbor distances, etc.)
+      //vector<double> D1,F1;
+      //cellDiagonal(xstr1_tmp,D1,F1,1); // cell diagonals
+      //// convert to clattice representation
+      //xstr1_tmp.lattice=GetClat(xstr1_tmp.a,xstr1_tmp.b,xstr1_tmp.c,xstr1_tmp.alpha,xstr1_tmp.beta,xstr1_tmp.gamma);
+    
+      //for(uint iat=0; iat<xstr1_tmp.atoms.size(); iat++){
+      //  xstr1_tmp.atoms[iat].cpos=F2C(xstr1_tmp.scale*xstr1_tmp.lattice,xstr1_tmp.atoms[iat].fpos); //DX20200715 - add scale just in case
+      //}
+      //vector<double> all_nn1 = computeNearestNeighbors(xstr1_tmp); // nearest neighbor distances (invariant of origin shifts) 
+
+      // ---------------------------------------------------------------------------
+      // peform expansion on structure2
+      // wait until we confirm they are similar lattices, otherwise we build it
+      // for nothing (i.e. unnecessary cost)
+      //DX20200330: no need to do supercell expansion anymore; once we have found
+      // the possible lattices, we only need to perform c2f between the orig and new
+      // lattice, then bring in cell. We have guaranteed that the new lattice will
+      // be of the same size or smaller (since xstr2 is choosen as the larger of the
+      // two input structures to compare)
+      //xstructure xstr_supercell=xstr2;
+      //if(supercell_method){ //DX20200330
+      //  GenerateGridAtoms(xstr_supercell,dims(1),dims(2),dims(3));
+      //
+      //  // ---------------------------------------------------------------------------
+      //  // update atoms
+      //  xstr_supercell.atoms = xstr_supercell.grid_atoms;
+      //  xstr_supercell.grid_atoms.clear();
+      //}
+
+#ifdef AFLOW_COMPARE_MULTITHREADS_ENABLE
+      // ---------------------------------------------------------------------------
+      // split task into threads 
+      uint number_of_structures = vxstr2_transformed.size();
+      uint number_of_threads = aurostd::min(num_proc,number_of_structures); // cannot have more threads than lattices
+      vector<vector<int> > thread_distribution = getThreadDistribution(number_of_structures, number_of_threads); //DX20191107 
+#endif
+
+      //// ---------------------------------------------------------------------------
+      //// identify basis transformation from xstr2 to its new lattice
+      //// then determine the rotation between xstr2's new lattice and xstr1
+      //vector<xmatrix<double> > basis_transformations;
+      //vector<xmatrix<double> > rotations;
+      //getLatticeTransformations(xstr2.lattice,xstr1.lattice,lattices,basis_transformations,rotations);
+      
+
+      // ---------------------------------------------------------------------------
+      // test origin shifts 
+      for(uint y=0;y<LFA_str2.size();y++){
+        for(uint x=0;x<LFA_str1.size();x++){
+          lfa_str1=LFA_str1[x];
+          lfa_str2=LFA_str2[y];
+          if(type_match == 2 && lfa_str1 != lfa_str2){ continue;}
+
+          oss << "===> LFA (structure 1): " << lfa_str1 << endl;
+          oss << "===> LFA (structure 2): " << lfa_str2 << endl;
+
+          if(LDEBUG){
+            cerr << function_name << " LFA (structure 1): " << lfa_str1 << endl;
+            cerr << function_name << " LFA (structure 2): " << lfa_str2 << endl;
+          }
+
+          // ---------------------------------------------------------------------------
+          // shift supercell to LFA
+          // cerr << "xstr_supercell.atoms.size(): " << xstr_supercell.atoms.size() << endl;
+          // for(uint a=0;a<xstr_supercell.atoms.size();a++){
+          //   if(xstr_supercell.atoms[a].name == lfa_str2){
+          //     xstr_supercell.ShiftOriginToAtom(a);
+          //     break;
+          //   }
+          // }
+
+          // ---------------------------------------------------------------------------
+          // shift representative structure to LFA
+          // NEED TO SHIFT origin of xstr1_tmp to one of the LFA (this was missing before and caused ICSD_102428.BCA, and CBA to not match, but they should
+          // //DX20200715 - now explore all shifts, cannot just test one
+          for(uint i=0;i<xstr1.atoms.size();i++){
+            if(xstr1.atoms[i].name==lfa_str1){
+              xstr1.ShiftOriginToAtom(i);
+              xstr1.BringInCell(1e-10);
+
+              // ---------------------------------------------------------------------------
+              // create vector of variables for each thread 
+              vector<xstructure> xstr1_for_thread;
+              vector<structure_misfit> possible_min_misfit_info; //DX20191218
+              vector<vector<uint> > possible_matching_indices_1, possible_matching_indices_2;
+              vector<vector<double> > possible_minimum_distances;
+              vector<vector<xstructure> > vvprotos;
+              vector<uint> vmatching_lattice_indices; //DX20201023
+              vector<xvector<double> > vorigin_shifts; //DX20201023
+              for(uint n=0; n<num_proc; n++){
+                vector<xstructure> vprotos_tmp;
+                vvprotos.push_back(vprotos_tmp);
+                xstr1_for_thread.push_back(xstr1);
+                structure_misfit temp_misfit_info = compare::initialize_misfit_struct((magnetic_analysis && _CALCULATE_MAGNETIC_MISFIT_)); //DX20191218
+                possible_min_misfit_info.push_back(temp_misfit_info); //DX20191218
+                vector<uint> tmp_indices;
+                possible_matching_indices_1.push_back(tmp_indices);
+                possible_matching_indices_2.push_back(tmp_indices);
+                vector<double> tmp_distances;
+                possible_minimum_distances.push_back(tmp_distances);
+                vmatching_lattice_indices.push_back(0); //DX20201023
+                xvector<double> tmp_origin_shifts; //DX20201023
+                vorigin_shifts.push_back(tmp_origin_shifts); //DX20201023
+              }
+
+#ifdef AFLOW_COMPARE_MULTITHREADS_ENABLE
+              // ---------------------------------------------------------------------------
+              // threaded (DX20191107 thread pointer) 
+              vector<std::thread*> threads;
+              if(LDEBUG){cerr << function_name << " Searching for possible matching structures [THREADED VERSION]" << endl;}
+              for(uint n=0; n<number_of_threads; n++){
+                threads.push_back(new std::thread(commonOriginSearch,
+                      std::ref(xstr1_for_thread[n]),
+                      std::ref(all_nn1),
+                      std::ref(lfa_str2),
+                      type_match,
+                      std::ref(vxstr2_transformed),std::ref(latt_devs),
+                      thread_distribution[n][0], thread_distribution[n][1],
+                      std::ref(possible_min_misfit_info[n]), //DX20191218
+                      std::ref(possible_matching_indices_1[n]),std::ref(possible_matching_indices_2[n]),
+                      std::ref(possible_minimum_distances[n]),std::ref(vvprotos[n]),
+                      std::ref(vmatching_lattice_indices[n]),std::ref(vorigin_shifts[n]),
+                      optimize_match));
+              }         
+              for(uint t=0;t<threads.size();t++){
+                threads[t]->join();
+                delete threads[t];
+              }
+#else
+              // ---------------------------------------------------------------------------
+              // non-threaded 
+              uint n=0;
+              uint start_index=0;
+              uint end_index=lattices.size();  //DX20191107 switching end point convention
+              if(LDEBUG){cerr << function_name << " Searching for possible matching structures [NON-THREADED VERSION]" << endl;}
+              //structureSearch(lfa_str2,all_nn1,xstr_supercell,vvprotos[n],xstr1_for_thread[n],type_match,possible_minMis[n],
+              //                lattices,clattices,latt_devs,optimize_match,start_index,end_index);
+              commonOriginSearch(
+                  xstr1_for_thread[n],
+                  all_nn1,
+                  lfa_str2,
+                  type_match,
+                  vxstr2_transformed,latt_devs,
+                  start_index, end_index,
+                  possible_min_misfit_info[n], //DX20191218
+                  possible_matching_indices_1[n],possible_matching_indices_2[n],
+                  possible_minimum_distances[n],vvprotos[n],
+                  vmatching_lattice_indices[n],vorigin_shifts[n],
+                  optimize_match);
+#endif
+
+              // ---------------------------------------------------------------------------
+              // collect misfits and matching structure representations
+              for(uint p=0;p<possible_min_misfit_info.size();p++){
+                if(possible_min_misfit_info[p].misfit<=min_misfit_info.misfit){
+                  min_misfit_info=possible_min_misfit_info[p]; //DX20191218
+                  matching_indices_1=possible_matching_indices_1[p];
+                  matching_indices_2=possible_matching_indices_2[p];
+                  minimum_distances=possible_minimum_distances[p];
+                  xstr1=xstr1_for_thread[p];
+                  vprotos=vvprotos[p];
+                  matched_lattice_index = vmatching_lattice_indices[p];
+                  matched_origin_shift = vorigin_shifts[p];
+  
+                  xstr_match.basis_transformation=basis_transformations[matched_lattice_index];
+                  xstr_match.rotation=rotations[matched_lattice_index];
+                  xstr_match.origin_shift = vorigin_shifts[p];
+                  xstr_match.misfit_info = min_misfit_info;
+                  
+                }
+              }
+
+              //find transformation info
+              xmatrix<double> matched_basis_transformation = basis_transformations[matched_lattice_index]; //DX20201023 
+              xmatrix<double> matched_rotation = rotations[matched_lattice_index]; //DX20201023 
+
+              if(LDEBUG){
+                cerr << function_name << " matched basis transformation: " << matched_basis_transformation << endl;
+                cerr << function_name << " matched rotation (R): " << matched_rotation << endl;
+          
+                cerr << function_name << " determinant(R): " << aurostd::det(matched_rotation) << endl;
+                cerr << function_name << " R*R^T==I: " << matched_rotation*trasp(matched_rotation) << endl;
+          
+                cerr << function_name << " Apply transformations:" << endl;
+                xstructure test = ChangeBasis(xstr_match.structure, matched_basis_transformation);
+                cerr << function_name << " after CHANGING BASIS: structure: " << test << endl;
+                cerr << function_name << " angles: " << Getabc_angles(test.lattice,DEGREES) << endl;
+                cerr << "-----------------------------------------------------------------" << endl;
+                test = Rotate(test, matched_rotation);
+                cerr << function_name << " after ROTATING: " << test << endl;
+                cerr << function_name << " angles: " << Getabc_angles(test.lattice,DEGREES) << endl;
+                cerr << "-----------------------------------------------------------------" << endl;
+                xstructure rotate_only = Rotate(xstr_match.structure, matched_rotation);
+                cerr << function_name << " rotated only (no basis transformation): " << rotate_only << endl;
+                cerr << function_name << " angles: " << Getabc_angles(rotate_only.lattice,DEGREES) << endl;
+              }
+
+              // ---------------------------------------------------------------------------
+              // quick return if found a match
+              if(min_misfit_info.misfit<0.1 && !optimize_match){
+                if(LDEBUG){cerr << function_name << " Found match (misfit = " << min_misfit_info.misfit << ")! Terminating search early." << endl;}
+                printStructureMappingResults(oss,xstr1,vprotos[0],matched_basis_transformation,matched_rotation,matched_origin_shift,min_misfit_info.misfit,min_misfit_info.lattice_deviation,min_misfit_info.coordinate_displacement,min_misfit_info.failure,min_misfit_info.magnetic_displacement,min_misfit_info.magnetic_failure,
+                    matching_indices_1,matching_indices_2,minimum_distances,magnetic_analysis);
+                return;
+              }
+
+              // ---------------------------------------------------------------------------
+              // quick return if testing only one origin //DX20200715
+              if(!optimize_match && aurostd::isequal(min_misfit_info.misfit,AUROSTD_MAX_DOUBLE) && type_match==2){ test_one_origin_only=true;} //DX20201102 - need type_match==2 (otherwise we don't check different types)
+              if(test_one_origin_only){
+                if(LDEBUG){cerr << function_name << " No mapping found. Searched only one origin. Terminating search early." << endl;}
+                return;
+              }
+            }
+          }
+
+          // ---------------------------------------------------------------------------
+          // quick return if testing only one LFA set
+          //DX20190702 - can i do this: if(!optimize_match && minMis==1){ test_one_lfa_only=true;}
+          if(!optimize_match && aurostd::isequal(min_misfit_info.misfit,AUROSTD_MAX_DOUBLE) && type_match==2){ test_one_lfa_only=true;} //DX20190809 - need type match here; otherwise we may miss structure-type matches
+          if(test_one_lfa_only){
+            if(LDEBUG){cerr << function_name << " No match found. Searched only one LFA set. Terminating search early." << endl;}
+            return;
+          }
+        } 
+      } 
+    }  
+    if(aurostd::isdifferent(min_misfit_info.misfit,AUROSTD_MAX_DOUBLE) && vprotos.size()>0){
+      printStructureMappingResults(oss,xstr1,vprotos[0],matched_basis_transformation,matched_rotation,matched_origin_shift,min_misfit_info.misfit,min_misfit_info.lattice_deviation,min_misfit_info.coordinate_displacement,min_misfit_info.failure,min_misfit_info.magnetic_displacement,min_misfit_info.magnetic_failure,
+          matching_indices_1,matching_indices_2,minimum_distances,magnetic_analysis);
+    }
+  }
+}
 
 // [OBSOLETE - DX20190717] // ***************************************************************************
 // [OBSOLETE - DX20190717] // Thread Generation (For parallel processing of quadruplets)

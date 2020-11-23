@@ -3427,6 +3427,8 @@ namespace compare {
       vector<uint> im1, im2;
       vector<string> PAIR1, PAIR2;
       structure_misfit min_misfit_info = compare::initialize_misfit_struct();
+      bool magnetic_analysis = (xstr_base.atoms[0].spin_is_given || xstr_base.atoms[0].noncoll_spin_is_given);
+      min_misfit_info.is_magnetic_misfit=(magnetic_analysis && _CALCULATE_MAGNETIC_MISFIT_); //DX20191218
 
       comparison_log<<"-------------------------------------------------------"<<endl;
 
@@ -3468,11 +3470,20 @@ namespace compare {
       if(LDEBUG) {cerr << "compare:: " << "WAIT... Computing quadruplets..."<<endl;} 
       // creates the threads for checking quadruplets (lattices)
       //DX20190530 - OLD threadGeneration(num_proc,q_base,xstr_test,vprotos,xstr_base,type_match,optimize_match,minMis,comparison_log);
-      latticeAndOriginSearch(xstr_base,xstr_test,num_proc,q_base,vprotos,min_misfit_info,type_match,optimize_match,scale_volume,comparison_log); //DX20190530 //DX20200422 - scale_volume added
+      //latticeAndOriginSearch(xstr_base,xstr_test,num_proc,q_base,vprotos,min_misfit_info,type_match,optimize_match,scale_volume,comparison_log); //DX20190530 //DX20200422 - scale_volume added
+      //latticeSearch(xstr_base,xstr_test,num_proc,q_base,vprotos,min_misfit_info,type_match,optimize_match,scale_volume,comparison_log); //DX20190530 //DX20200422 - scale_volume added
+
+      structure_representative str_representative = compare::initializeStructureRepresentativeStruct(xstr_base); 
+      structure_matched str_matched = compare::initializeStructureMatched(xstr_test); 
+
+      latticeSearch(str_representative,str_matched,type_match,optimize_match,scale_volume,num_proc,comparison_log); //DX20190530 //DX20200422 - scale_volume added
+
 
       if(LDEBUG) {cerr << "compare:: " << "Total # of possible matching representations: " << vprotos.size() << endl;}	
-      final_misfit=min_misfit_info.misfit;
-      final_misfit_info=min_misfit_info; //DX20191218
+      //ORIG final_misfit=min_misfit_info.misfit;
+      //ORIG final_misfit_info=min_misfit_info; //DX20191218
+      final_misfit=str_matched.misfit_info.misfit;
+      final_misfit_info=str_matched.misfit_info; //DX20191218
 
       // ---------------------------------------------------------------------------
       // find matches

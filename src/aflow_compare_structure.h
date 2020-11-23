@@ -82,13 +82,28 @@ struct matching_structure {
   double misfit;
 };
 
-/*
-// ===== matched_structure struct ===== // DX20201119
-struct matched_structure {
+
+// ===== structure_matched struct ===== // DX20201119
+struct structure_representative {
   string name;
   string compound;
-  bool generated;
   string from;
+  bool generated;
+  xstructure structure;
+  vector<GroupedWyckoffPosition> grouped_Wyckoff_positions;
+  uint number_compounds_matching_structure;
+  vector<string> properties_names;
+  vector<string> properties_units;
+  vector<string> properties_types;
+  vector<string> properties; //needs to be static variable type in AFLOW, not required for JSON
+};
+
+// ===== structure_matched struct ===== // DX20201119
+struct structure_matched {
+  string name;
+  string compound;
+  string from;
+  bool generated;
   xstructure structure;
   vector<GroupedWyckoffPosition> grouped_Wyckoff_positions;
   bool is_representative;
@@ -96,7 +111,9 @@ struct matched_structure {
   xmatrix<double> rotation;
   xmatrix<double> basis_transformation;
   xvector<double> origin_shift;
-  string comparison_log;
+  vector<uint> atom_map;
+  vector<uint> basis_map;
+  string comparison_log; // perhaps can print this on-the-fly instead of storing
   uint number_compounds_matching_structure;
   vector<string> properties_names;
   vector<string> properties_units;
@@ -104,7 +121,9 @@ struct matched_structure {
   vector<string> properties; //needs to be static variable type in AFLOW, not required for JSON
 };
 namespace compare{
-  matched_structure initialize_matched_structure_struct();
+  structure_representative initializeStructureRepresentativeStruct(xstructure& structure);
+  structure_matched initialize_structure_matched_struct();
+  structure_matched initializeStructureMatched(xstructure& structure);
 }
 
 //DX 20201119
@@ -115,19 +134,12 @@ namespace compare{
 class CompareMatchedStructures{
   public:
     CompareMatchedStructures(const vector<string>& sorting_attributes) : sorting_attributes(sorting_attributes){}
-    bool operator()(const matched_structure *a, const matched_structure *b);
+    bool operator()(const structure_matched *a, const structure_matched *b);
   private:
     vector<string> sorting_attributes;
 };
 
 
-class XtalFinderCalculator{
-  // attributes
-  vector<matched_structure*> structure_containers;  // stores structures in a container (pointer for easy manipulation and mobility)
-  vector<StructurePrototypes> structure_prototypes; // stores the equivalent structure information
-
-}
-*/
 
 // ===== StructurePrototype Class ===== //
 class StructurePrototype{
@@ -138,6 +150,7 @@ class StructurePrototype{
     const StructurePrototype& operator=(const StructurePrototype& b);                       // assignment operator
     StructurePrototype(const StructurePrototype& b);                                        // copy constructor
     int iomode;                                                                             // mode for printing
+    //structure_representative* structure_representative_struct;      
     string structure_representative_name;                                                   // name of representative structure
     string structure_representative_compound;                                               // compound name of representative structure (w/reduced stoichometry), e.g., Ag1Br2
     xstructure structure_representative;                                                    // xstructure of representative structure
@@ -205,6 +218,15 @@ class StructurePrototype{
   private:
     void free();                                                                            // free operator
     void copy(const StructurePrototype& b);                                                 // copy constructor
+};
+
+class XtalFinderCalculator{
+  public:
+  // attributes
+  double misfit_match;
+  double misfit_family;
+  vector<structure_matched*> structure_containers;  // stores structures in a container (pointer for easy manipulation and mobility)
+  vector<StructurePrototype> structure_prototypes; // stores the equivalent structure information
 };
 
 
@@ -576,6 +598,24 @@ namespace compare{
   //    double& minMis, int type_match, bool optimize_match, ostream& oss); //DX20190530
   void latticeAndOriginSearch(xstructure& xstr1, xstructure& xstr2, const uint& num_proc,xmatrix<double>& q1, vector<xstructure> &vprotos, 
       structure_misfit& min_misfit_info, int type_match, bool optimize_match, bool scale_volume, ostream& oss); //DX20190530 //DX20191210 - added lattice_dev, coordinate_dis, and failure //DX20200422 - added scale volume
+  void latticeSearch(xstructure& xstr1,
+      xstructure& xstr2,
+      const uint& num_proc,
+      xmatrix<double>& q1,
+      vector<xstructure> &vprotos,
+      structure_misfit& min_misfit_info,
+      int type_match,
+      bool optimize_match,
+      bool scale_volume, //DX20200422
+      ostream& oss);
+  void latticeSearch(
+      structure_representative& xstr_rep,
+      structure_matched& xstr_match,
+      int type_match,
+      bool optimize_match,
+      bool scale_volume, //DX20200422
+      uint num_proc=1,
+      ostream& oss=cout); //DX20201123
   void quadrupletSearch(const xmatrix<double>& q1, const xstructure& xstr_LFA_supercell,
       const xstructure& xstr2,
       vector<xvector<double> >& lattice_vecs, vector<vector<uint> >& ij_index);
