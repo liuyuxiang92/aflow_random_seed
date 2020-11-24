@@ -745,9 +745,15 @@ namespace apl
   {
     string function = XPID + "QHA:createSubdirectoriesStaticRun():", msg = "";
     // use static_bands calculations to get a reasonable electronic DOS
-    xinput.xvasp.AVASP_flag_RUN_STATIC_BANDS       = true;
+    if (qha_options.flag("RELAX_IONS_CELL")){ 
+      xinput.xvasp.AVASP_flag_RUN_STATIC_BANDS       = false;
+      xinput.xvasp.AVASP_flag_RUN_RELAX_STATIC_BANDS = true;
+    }
+    else {
+      xinput.xvasp.AVASP_flag_RUN_STATIC_BANDS       = true;
+      xinput.xvasp.AVASP_flag_RUN_RELAX_STATIC_BANDS = false;
+    }
     xinput.xvasp.AVASP_flag_RUN_STATIC             = false;
-    xinput.xvasp.AVASP_flag_RUN_RELAX_STATIC_BANDS = false;
     xinput.xvasp.AVASP_flag_RUN_RELAX_STATIC       = false;
     xinput.xvasp.AVASP_flag_RUN_RELAX              = false;
     xinput.xvasp.AVASP_flag_GENERATE               = false;
@@ -796,6 +802,10 @@ namespace apl
       xinput.xvasp.aopts.flag("AFLOWIN_FLAG::CONVERT_UNIT_CELL",true);
       xinput.xvasp.aopts.pop_attached("AFLOWIN_FLAG::CONVERT_UNIT_CELL");
       xinput.xvasp.aopts.push_attached("AFLOWIN_FLAG::CONVERT_UNIT_CELL", "PRES");
+      if (qha_options.flag("RELAX_IONS_CELL")){
+        xinput.xvasp.aopts.pop_attached("AFLOWIN_FLAG::RELAX_TYPE");
+        xinput.xvasp.aopts.push_attached("AFLOWIN_FLAG::RELAX_TYPE","IONS_CELL_SHAPE");
+      }
 
       AVASP_MakeSingleAFLOWIN(xinput.xvasp, aflow, true);
 
@@ -913,7 +923,12 @@ namespace apl
 
     xinput.xvasp.aopts.opattachedscheme("AFLOWIN_FLAG::MODULE","APL",true);
     xinput.xvasp.aopts.flag("FLAG::VOLUME_PRESERVED",true);
-    xinput.xvasp.aplopts.opattachedscheme("AFLOWIN_FLAG::APL_RELAX","OFF",true);
+    if (qha_options.flag("RELAX_IONS_CELL")){
+      xinput.xvasp.aplopts.opattachedscheme("AFLOWIN_FLAG::APL_RELAX","ON",true);
+    }
+    else{
+      xinput.xvasp.aplopts.opattachedscheme("AFLOWIN_FLAG::APL_RELAX","OFF",true);
+    }
     xinput.xvasp.aplopts.opattachedscheme("AFLOWIN_FLAG::APL_HIBERNATE","ON",true);
 
     stringstream aflow;
@@ -960,6 +975,10 @@ namespace apl
       xinput.xvasp.aopts.flag("AFLOWIN_FLAG::CONVERT_UNIT_CELL",true);
       xinput.xvasp.aopts.pop_attached("AFLOWIN_FLAG::CONVERT_UNIT_CELL");
       xinput.xvasp.aopts.push_attached("AFLOWIN_FLAG::CONVERT_UNIT_CELL", "PRES");
+      if (qha_options.flag("RELAX_IONS_CELL")){
+        xinput.xvasp.aopts.pop_attached("AFLOWIN_FLAG::RELAX_TYPE");
+        xinput.xvasp.aopts.push_attached("AFLOWIN_FLAG::RELAX_TYPE","IONS_CELL_SHAPE");
+      }
 
       AVASP_MakeSingleAFLOWIN(xinput.xvasp, aflow, true);
 

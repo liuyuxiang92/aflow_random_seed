@@ -603,6 +603,10 @@
 #define         DEFAULT_QHA_GP_FINITE_DIFF                    XHOST.adefault.getattachedutype<bool>("DEFAULT_QHA_GP_FINITE_DIFF")
 #define AFLOWRC_DEFAULT_QHA_IGNORE_IMAGINARY                  FALSE
 #define         DEFAULT_QHA_IGNORE_IMAGINARY                  XHOST.adefault.getattachedutype<bool>("DEFAULT_QHA_IGNORE_IMAGINARY")
+//AS20201123 BEGIN
+#define AFLOWRC_DEFAULT_QHA_RELAX_IONS_CELL                   FALSE
+#define         DEFAULT_QHA_RELAX_IONS_CELL                   XHOST.adefault.getattachedutype<bool>("DEFAULT_QHA_RELAX_IONS_CELL")
+//AS20201123 END
 
 //// DEFAULT QHA FILES
 #define AFLOWRC_DEFAULT_QHA_FILE_PREFIX                       string("aflow.qha.")
@@ -1422,6 +1426,7 @@ namespace aflowrc {
     //AS20200508 BEGIN
     aflowrc::load_default("DEFAULT_QHA_GP_FINITE_DIFF", AFLOWRC_DEFAULT_QHA_GP_FINITE_DIFF);
     aflowrc::load_default("DEFAULT_QHA_IGNORE_IMAGINARY", AFLOWRC_DEFAULT_QHA_IGNORE_IMAGINARY);
+    aflowrc::load_default("DEFAULT_QHA_RELAX_IONS_CELL", AFLOWRC_DEFAULT_QHA_RELAX_IONS_CELL);//AS20201123
     //// DEFAULT QHA FILES
     aflowrc::load_default("DEFAULT_QHA_FILE_PREFIX", AFLOWRC_DEFAULT_QHA_FILE_PREFIX);
     //AS20200709 BEGIN
@@ -1996,6 +2001,7 @@ namespace aflowrc {
     //AS20200508 BEGIN
     aflowrc << "DEFAULT_QHA_GP_FINITE_DIFF=" << AFLOWRC_DEFAULT_QHA_GP_FINITE_DIFF  << endl;
     aflowrc << "DEFAULT_QHA_IGNORE_IMAGINARY=" << AFLOWRC_DEFAULT_QHA_IGNORE_IMAGINARY  << endl;
+    aflowrc << "DEFAULT_QHA_RELAX_IONS_CELL=" << AFLOWRC_DEFAULT_QHA_RELAX_IONS_CELL  << endl;//AS20201123
     aflowrc << "DEFAULT_QHA_FILE_PREFIX=\"" << AFLOWRC_DEFAULT_QHA_FILE_PREFIX << "\"" << endl;
     //AS20200709 BEGIN
     aflowrc << "DEFAULT_QHA3P_FILE_PREFIX=\"" << AFLOWRC_DEFAULT_QHA3P_FILE_PREFIX << "\"" << endl;
@@ -2537,6 +2543,7 @@ namespace aflowrc {
     //AS20200508 BEGIN
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_GP_FINITE_DIFF\")=" << DEFAULT_QHA_GP_FINITE_DIFF << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_IGNORE_IMAGINARY\")=" << DEFAULT_QHA_IGNORE_IMAGINARY << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_RELAX_IONS_CELL\")=" << DEFAULT_QHA_IGNORE_IMAGINARY << endl;//AS20201123
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_FILE_PREFIX\")=\"" << DEFAULT_QHA_FILE_PREFIX << "\"" << endl;
     //AS20200709 BEGIN
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA3P_FILE_PREFIX\")=\"" << DEFAULT_QHA3P_FILE_PREFIX << "\"" << endl;
