@@ -47,7 +47,7 @@ enum PH_DATA_FILE {PH_DF_DIRECTORY, PH_DF_HARMIFC, PH_DF_PHPOSCAR};
 #define EOS_METHOD_FILE_BIRCH_MURNAGHAN4 "birch-murnaghan4."
 #define EOS_METHOD_FILE_MURNAGHAN "murnaghan."
 
-#define QHA_AFLOWIN_DEFAULT string("qha_aflow.in")
+#define QHA_AFLOWIN_DEFAULT string("aflow_qha.in")
 
 //================================================================================
 //                    EOS related
