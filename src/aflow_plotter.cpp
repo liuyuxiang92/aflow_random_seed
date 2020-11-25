@@ -409,7 +409,7 @@ namespace plotter {
     string default_title = plotoptions.getattachedscheme("DEFAULT_TITLE");
     if(LDEBUG) { cerr << soliloquy << " default_title=" << default_title << endl;}
     if (default_title.empty()) return default_title;
-    string title;
+    string title="";
     if (aurostd::substring2bool(default_title, "_ICSD_")) {  // Check if AFLOW ICSD format
       vector<string> tokens;
       aurostd::string2tokens(default_title, tokens, "_");
