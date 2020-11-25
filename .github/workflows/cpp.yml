@@ -1,0 +1,19 @@
+name: AFLOW-src C++ build
+
+on:
+  push:
+    branches: [ staging ]
+  pull_request:
+    branches: [ staging ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: make
+      run: make -C src
+    - name: make check_full
+      run: make -C src check_full
