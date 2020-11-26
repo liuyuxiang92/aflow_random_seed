@@ -7,7 +7,7 @@ on:
     branches: [ master, staging ]
 
 jobs:
-  build_ubuntu-18.04:
+  build_ubuntu_1804:
     runs-on: [ ubuntu-18.04 ]
     steps:
     - uses: actions/checkout@v2
@@ -15,7 +15,7 @@ jobs:
       run: make -C src
     - name: make check_full
       run: make -C src check_full
-  build_ubuntu-16.04:
+  build_ubuntu_1604:
     runs-on: [ ubuntu-16.04 ]
     steps:
     - uses: actions/checkout@v2
