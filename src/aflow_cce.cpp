@@ -39,7 +39,7 @@ namespace cce {
   void run(aurostd::xoption& flags, ostream& oss) { //CO20201105
     string soliloquy=XPID+"cce::run()";
     if (aurostd::toupper(flags.getattachedscheme("CCE_CORRECTION::PRINT")) == "PYTHON") {
-      string directory="."; //can change later with a flag input
+      string directory=aurostd::getPWD(); //CO20201126 //"."; //can change later with a flag input
       string aflow_cce_python_subdir = "AFLOW_CCE_PYTHON";
       string python_directory=directory + '/' + aflow_cce_python_subdir;
       aurostd::DirectoryMake(python_directory);
@@ -57,7 +57,7 @@ namespace cce {
   void run(aurostd::xoption& flags, std::istream& ist, ostream& oss) {  //CO20201105
     string soliloquy=XPID+"cce::run()";
     if (aurostd::toupper(flags.getattachedscheme("CCE_CORRECTION::PRINT")) == "PYTHON") {
-      string directory="."; //can change later with a flag input
+      string directory=aurostd::getPWD(); //CO20201126 //"."; //can change later with a flag input
       string aflow_cce_python_subdir = "AFLOW_CCE_PYTHON";
       string python_directory=directory + '/' + aflow_cce_python_subdir;
       aurostd::DirectoryMake(python_directory);
