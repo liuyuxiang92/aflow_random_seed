@@ -1405,6 +1405,11 @@ DEFAULT_QHA_IGNORE_IMAGINARY
   type: bool
   default: 0
 
+DEFAULT_QHA_RELAX_IONS_CELL
+  description: Defines if ions and cell shape will be relaxed in QHA-related subcalculations.
+  type: bool
+  default: 0
+
 DEFAULT_QHA_FILE_PREFIX
   description: QHA file prefix. All QHA output files start with this prefix.
   type: string
