@@ -1500,6 +1500,14 @@ namespace plotter {
     JSONbegin(json, "tDOS_data");
     JSONbool(json,  "energies_shifted", !xopt.flag("NOSHIFT"));
     JSONdeque(json, "energy",xopt.flag("NOSHIFT") ? xdos.venergy : xdos.venergyEf);
+    if (aurostd::substring2bool(xdos.carstring, "CAR")){
+      JSONstring(json, "x_unit", "EV");
+      JSONstring(json, "y_unit", "");
+    }
+    else if (aurostd::substring2bool(xdos.carstring, "PHON")){
+      JSONstring(json, "x_unit", "MEV");
+      JSONstring(json, "y_unit", "");
+    }
 
     if (xdos.spin){
       JSONdeque(json, "spin_majority", xdos.vDOS[0][0][0]);
@@ -1513,7 +1521,8 @@ namespace plotter {
     }
     JSONend(json);
 
-    if (xdos.partial){
+    // projected electronic DOS
+    if (xdos.partial && aurostd::substring2bool(xdos.carstring, "CAR")){
       // determine what orbital labels are used depending on the type of data
       // present in DOSCAR
       vector<string> orb_labels(xdos.isLSCOUPLING ? 16 : (xdos.lmResolved ? 16 : 4));
@@ -1556,6 +1565,8 @@ namespace plotter {
       JSONbool(json,   "spin_polarized", xdos.spin);
       JSONbool(json,   "energies_shifted", !xopt.flag("NOSHIFT"));
       JSONdeque(json,  "energy", xopt.flag("NOSHIFT") ? xdos.venergy : xdos.venergyEf);
+      JSONstring(json, "x_unit", "EV");
+      JSONstring(json, "y_unit", "");
 
       // create a mapping of species to the id of the first representative of
       // each group of the symmetry equivalent atoms, i.e. for SG #12 BaBiO3
@@ -1647,6 +1658,56 @@ namespace plotter {
       JSONend(json);
     }
 
+    // projected phonon DOS
+    if (xdos.partial && aurostd::substring2bool(xdos.carstring, "PHON")){
+      // header of partial DOS
+      JSONbegin(json,  "pDOS_data");
+      deque<string> projections;
+      if (xdos.vDOS.size()>=2){
+        for (uint j=1; j<xdos.vDOS[1].size(); j++){
+          projections.push_back("projection_" + aurostd::utype2string(j));
+        }
+      }
+      JSONdeque(json,  "orbitals", projections);
+      JSONbool(json,   "spin_polarized", xdos.spin);
+      JSONbool(json,   "energies_shifted", !xopt.flag("NOSHIFT"));
+      JSONdeque(json,  "energy", xopt.flag("NOSHIFT") ? xdos.venergy : xdos.venergyEf);
+      JSONstring(json, "x_unit", "MEV");
+      JSONstring(json, "y_unit", "");
+
+      // create a mapping of species to the id of the first representative of
+      // each group of the symmetry equivalent atoms, i.e. for SG #12 BaBiO3
+      // with Ba : {{0,1}}, Bi: {{2},{3}}, O: {{4,5,6,7}, {8,9}} make the
+      // following mapping: Ba -> {0}, Bi -> {2,3}, O -> {4,8}
+      pflow::PerformFullSymmetry(xstr);
+      vector<vector<int> > map_species_to_iatoms(xstr.species.size());
+      for (uint species_id=0; species_id<xstr.species.size(); species_id++){
+        for (uint iatom=0; iatom<xstr.iatoms.size(); iatom++){
+          if (xstr.atoms[xstr.iatoms[iatom][0]].type == (int)species_id)
+            map_species_to_iatoms[species_id].push_back(xstr.iatoms[iatom][0]);
+        }
+      }
+
+      // write atom-projected DOS for each unique atom
+      string label = "";
+      for (uint species_id=0; species_id<xstr.species.size(); species_id++){
+        JSONbegin(json, xstr.species[species_id]);
+        for (uint iatom=0; iatom<map_species_to_iatoms[species_id].size(); iatom++){
+          int atom_id = map_species_to_iatoms[species_id][iatom];
+          JSONbegin(json, aurostd::utype2string<int>(atom_id));
+          atom_id++; // in vDOS atoms are indexed starting from 1
+
+          for (uint p=1; p<xdos.vDOS[atom_id].size(); p++){
+            JSONdeque(json, projections[p-1], xdos.vDOS[atom_id][p][0]);
+          }
+          JSONend(json);
+        }
+        JSONend(json);
+      }
+
+      JSONend(json);
+    }
+
     if (standalone_json_object){
       JSONend(json);
       JSONfinish(json);
@@ -1677,6 +1738,14 @@ namespace plotter {
     JSONstring(out, "title", name+" ("+LattName+")");
     JSONnumber(out, "n_kpoints", xeigen.number_kpoints);
     JSONnumber(out, "n_bands", xeigen.number_bands);
+    if(aurostd::substring2bool(xeigen.carstring, "CAR")){
+      JSONstring(out, "x_unit", "");
+      JSONstring(out, "y_unit", "EV");
+    }
+    else if(aurostd::substring2bool(xeigen.carstring, "PHON")){
+      JSONstring(out, "x_unit", "");
+      JSONstring(out, "y_unit", "MEV");
+    }
 
     static const int num = 4;
     string tags[num] = {"kpoint_labels", "kpoint_labels_latex", "kpoint_labels_gnuplot", "kpoint_labels_html"};
