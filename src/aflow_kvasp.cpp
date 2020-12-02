@@ -849,7 +849,7 @@ namespace KBIN {
     if(aurostd::substring2bool(AflowIn,_STROPT_+"RELAX_IONS_CELL_VOLUME",TRUE) || aurostd::substring2bool(AflowIn,_STROPT_+"RELAX_IONS_VOLUME",TRUE)) vflags.KBIN_VASP_FORCE_OPTION_RELAX_TYPE.push("IONS_CELL_VOLUME");
     //AS20201123 BEGIN
     // in KBIN::XVASP_INCAR_Relax_ON ISIF=4 is activated when both RELAX_IONS and RELAX_SHAPE are true.
-    // However, it is not possible to setup ISIF=4 calculation if afow.in is created by
+    // However, it is not possible to set up ISIF=4 calculation if afow.in is created by
     // AVASP_MakeSingleAFLOWIN since it would require xoption with multiple values for the same key.
     // RELAX_IONS_CELL_SHAPE keyword is introduced to solve this issue.
     if(aurostd::substring2bool(AflowIn,_STROPT_+"RELAX_IONS_CELL_SHAPE",TRUE)){

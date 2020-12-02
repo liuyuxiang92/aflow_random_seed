@@ -2966,13 +2966,13 @@ namespace apl
 
     if (aurostd::FileExist(filename)){
       if (!aurostd::stringstream2file(file, filename, "APPEND")){
-        msg = "Error writing to " + filename + "file.";
+        msg = "Error writing to " + filename + " file.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_,function,msg,_FILE_ERROR_);
       }
     }
     else{
       if (!aurostd::stringstream2file(file, filename)){
-        msg = "Error writing to " + filename + "file.";
+        msg = "Error writing to " + filename + " file.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_,function,msg,_FILE_ERROR_);
       }
     }
@@ -3318,7 +3318,7 @@ namespace apl
   }
 
   /// Calculates and writes to a file T-dependent phonon DOS and dispersion
-  /// aprroximating force constants elements with third order polynomial in volume.
+  /// approximating force constants elements with third order polynomial in volume.
   void QHA::writeQHAdosAndBands(EOSmethod eos_method, const string &directory)
   {
     string function = XPID + "QHA::writeQHAdosAndBands():", msg = "";
@@ -3525,7 +3525,7 @@ namespace apl
 
     string filename = directory + '/' + DEFAULT_QHA_FILE_PREFIX + "out";
     if (!aurostd::stringstream2file(aflow_qha_out, filename)){
-      msg = "Error writing to " + filename + "file.";
+      msg = "Error writing to " + filename + " file.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function,msg,_FILE_ERROR_);
     }
   }
@@ -3574,7 +3574,7 @@ namespace apl
     }
 
     if (!aurostd::stringstream2file(thermofile, filename)){
-      msg = "Error writing to " + filename + "file.";
+      msg = "Error writing to " + filename + " file.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function,msg,_FILE_ERROR_);
     }
   }

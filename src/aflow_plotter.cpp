@@ -1355,8 +1355,8 @@ namespace plotter {
   }
 
   /// Closes JSON object by typing the closing bracket and removing previous
-  /// coma and line break characters.
-  /// Note that trailing coma is also added after the closing bracket:
+  /// comma and line break characters.
+  /// Note that trailing comma is also added after the closing bracket:
   /// use JSONfinish to remove it.
   void JSONend(stringstream &json)
   {
@@ -1364,7 +1364,7 @@ namespace plotter {
     json << endl << "}," << endl;
   }
 
-  /// Terminates the JSON object by removing the trailing coma and the line
+  /// Terminates the JSON object by removing the trailing comma and the line
   /// break character.
   void JSONfinish(stringstream &json){
     json.seekp(-2, json.cur);
@@ -1395,7 +1395,7 @@ namespace plotter {
   template void JSONnumber(stringstream&, string, int);
   template void JSONnumber(stringstream&, string, uint);
 
-  /// Saves key-value pair with an value as std::vector array to the JSON object.
+  /// Saves key-value pair with a value as std::vector array to the JSON object.
   template<typename utype> void JSONvector(stringstream &json, string name,
       const vector<utype> &value)
   {
@@ -1437,7 +1437,7 @@ namespace plotter {
     json << "]," << endl;
   }
 
-  /// Saves key-value pair with an value as std::deque array to the JSON object.
+  /// Writes key-value pair where the value is a std::deque to the JSON object.
   /// @param negate allows to invert numerical values by multiplying them with -1.
   template<typename utype>
   void JSONdeque(stringstream &json, string name, const deque<utype> &value,
@@ -1536,7 +1536,7 @@ namespace plotter {
         for (uint i=0; i<4; i++) orb_labels[i] = ORBITALS[i];
       }
 
-      // for "orbitals" key we want to print a list of orbitals up to the
+      // for the "orbitals" key, we want to print a list of orbitals up to the
       // highest present in any atom, not the entire list of known/possible orbitals
       int highest_orbital = 0;
       for (uint i=0; i<xdos.vDOS.size(); i++){
@@ -1568,7 +1568,7 @@ namespace plotter {
       JSONstring(json, "x_unit", "EV");
       JSONstring(json, "y_unit", "");
 
-      // create a mapping of species to the id of the first representative of
+      // create a mapping of species to the ID of the first representative of
       // each group of the symmetry equivalent atoms, i.e. for SG #12 BaBiO3
       // with Ba : {{0,1}}, Bi: {{2},{3}}, O: {{4,5,6,7}, {8,9}} make the
       // following mapping: Ba -> {0}, Bi -> {2,3}, O -> {4,8}
@@ -1751,8 +1751,8 @@ namespace plotter {
     string tags[num] = {"kpoint_labels", "kpoint_labels_latex", "kpoint_labels_gnuplot", "kpoint_labels_html"};
     string formats[num] = { "", "LATEX", "GNUPLOT", "HTML"};
 
-    // we need clean labels: to be consistent with E.G. format of JSON file
-    // they will be formatted into all possible formats
+    // we need clean labels: to be consistent with E.G. format of the JSON file
+    // they will be converted into all possible formats
     uint nsegments = xkpts.vpath.size()/2;
     vector<string> labels_formated(nsegments+1);
     for (uint f=0; f<num; f++){
