@@ -636,6 +636,10 @@
 #define AFLOWRC_DEFAULT_QHA_PDIS_FILE                         string("dispersion_phonon")
 #define         DEFAULT_QHA_PDIS_FILE                         XHOST.adefault.getattachedscheme("DEFAULT_QHA_PDIS_FILE")
 //AS20201022 END
+//AS20201201 BEGIN
+#define AFLOWRC_DEFAULT_QHA_PDOS_FILE                         string("dos_phonon")
+#define         DEFAULT_QHA_PDOS_FILE                         XHOST.adefault.getattachedscheme("DEFAULT_QHA_PDOS_FILE")
+//AS20201201 END
 //AS20201112 BEGIN
 #define AFLOWRC_DEFAULT_QHA_KPOINTS_FILE                      string("kpoints.out")
 #define         DEFAULT_QHA_KPOINTS_FILE                      XHOST.adefault.getattachedscheme("DEFAULT_QHA_KPOINTS_FILE")
@@ -1442,6 +1446,7 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_QHA_FVT_FILE", AFLOWRC_DEFAULT_QHA_FVT_FILE);
     //AS20200508 END
     aflowrc::load_default("DEFAULT_QHA_PDIS_FILE", AFLOWRC_DEFAULT_QHA_PDIS_FILE);//AS20201022
+    aflowrc::load_default("DEFAULT_QHA_PDOS_FILE", AFLOWRC_DEFAULT_QHA_PDOS_FILE);//AS20201201
     aflowrc::load_default("DEFAULT_QHA_KPOINTS_FILE", AFLOWRC_DEFAULT_QHA_KPOINTS_FILE);//AS20201112
 
     // DEFAULT AAPL
@@ -2016,6 +2021,7 @@ namespace aflowrc {
     aflowrc << "DEFAULT_QHA_FVT_FILE=\"" << AFLOWRC_DEFAULT_QHA_FVT_FILE << "\"" << endl;
     //AS20200508 END
     aflowrc << "DEFAULT_QHA_PDIS_FILE=\"" << AFLOWRC_DEFAULT_QHA_PDIS_FILE << "\"" << endl;//AS20201022
+    aflowrc << "DEFAULT_QHA_PDOS_FILE=\"" << AFLOWRC_DEFAULT_QHA_PDOS_FILE << "\"" << endl;//AS20201201
     aflowrc << "DEFAULT_QHA_KPOINTS_FILE=\"" << AFLOWRC_DEFAULT_QHA_KPOINTS_FILE << "\"" << endl;//AS20201112
 
     aflowrc << " " << endl;
@@ -2558,6 +2564,7 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_FVT_FILE\")=\"" << DEFAULT_QHA_FVT_FILE << "\"" << endl;
     //AS20200508 END
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_PDIS_FILE\")=\"" << DEFAULT_QHA_PDIS_FILE << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_PDOS_FILE\")=\"" << DEFAULT_QHA_PDOS_FILE << "\"" << endl;//AS20201201
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_KPOINTS_FILE\")=\"" << DEFAULT_QHA_KPOINTS_FILE << "\"" << endl;//AS20201112
     if(LDEBUG) oss << "// DEFAULTS AAPL" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AAPL_BTE\")=\"" << DEFAULT_AAPL_BTE << "\"" << endl;

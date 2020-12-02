@@ -602,27 +602,27 @@ namespace apl
           if (qha_options.flag("EOS_MODEL:SJ")){
             writeQHAresults(currentDirectory);
             writeThermalProperties(EOS_SJ, QHA_CALC, currentDirectory);
-            writeTphononDispersions(EOS_SJ, QHA_CALC, currentDirectory);
+            writeQHAdosAndBands(EOS_SJ, currentDirectory);
           }
 
           if (qha_options.flag("EOS_MODEL:BM2")){
             writeThermalProperties(EOS_BIRCH_MURNAGHAN2, QHA_CALC, currentDirectory);
-            writeTphononDispersions(EOS_BIRCH_MURNAGHAN2, QHA_CALC, currentDirectory);
+            writeQHAdosAndBands(EOS_BIRCH_MURNAGHAN2, currentDirectory);
           }
 
           if (qha_options.flag("EOS_MODEL:BM3")){
             writeThermalProperties(EOS_BIRCH_MURNAGHAN3, QHA_CALC, currentDirectory);
-            writeTphononDispersions(EOS_BIRCH_MURNAGHAN3, QHA_CALC, currentDirectory);
+            writeQHAdosAndBands(EOS_BIRCH_MURNAGHAN3, currentDirectory);
           }
 
           if (qha_options.flag("EOS_MODEL:BM4")){
             writeThermalProperties(EOS_BIRCH_MURNAGHAN4, QHA_CALC, currentDirectory);
-            writeTphononDispersions(EOS_BIRCH_MURNAGHAN4, QHA_CALC, currentDirectory);
+            writeQHAdosAndBands(EOS_BIRCH_MURNAGHAN4, currentDirectory);
           }
 
           if (qha_options.flag("EOS_MODEL:M")){
             writeThermalProperties(EOS_MURNAGHAN, QHA_CALC, currentDirectory);
-            writeTphononDispersions(EOS_MURNAGHAN, QHA_CALC, currentDirectory);
+            writeQHAdosAndBands(EOS_MURNAGHAN, currentDirectory);
           }
         }
       }
@@ -1173,6 +1173,9 @@ namespace apl
         pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
               *p_oss, _LOGGER_MESSAGE_);
       }
+
+      // save harmonic force constants to interpolate later
+      harmonicFC.push_back(phcalc.getHarmonicForceConstants());
 
       // calculate all phonon-related data: DOS, frequencies along the q-mesh and
       // phonon dispersions
@@ -3308,6 +3311,132 @@ namespace apl
       filename += DEFAULT_QHA_PDIS_FILE;
       filename += ".T"+aurostd::PaddedNumString(T, ndigits)+"K.out";
       if (!aurostd::stringstream2file(eig_stream, filename)){
+        msg = "An error occured when attempted to write "+filename+" file.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function,msg,_FILE_ERROR_);
+      }
+    }
+  }
+
+  /// Calculates and writes to a file T-dependent phonon DOS and dispersion
+  /// aprroximating force constants elements with third order polynomial in volume.
+  void QHA::writeQHAdosAndBands(EOSmethod eos_method, const string &directory)
+  {
+    string function = XPID + "QHA::writeQHAdosAndBands():", msg = "";
+    double V = 0.0; int T = 0;
+
+    int ndigits = aurostd::getZeroPadding(max(ph_disp_temperatures));
+
+    xvector<double> xvols = aurostd::vector2xvector(EOSvolumes);
+    aurostd::cematrix M(aurostd::Vandermonde_matrix(xvols, 4));
+    vector< vector< vector< vector< xvector<double> > > > > 
+      interpolatedFC_coeffs(harmonicFC[0].size(),
+         vector< vector< vector< xvector<double> > > > (harmonicFC[0][0].size(),
+         vector< vector< xvector<double> > > (harmonicFC[0][0][0].rows, 
+         vector< xvector<double> > (harmonicFC[0][0][0].cols, 
+         xvector<double>(4)))));
+
+    // here we are approximating each element of harmonic force constants matrices
+    // as a third order polynomial in volume.
+    // Coefficients are stored in interpolatedFC_coeffs
+    xvector<double> FC(N_EOSvolumes);
+    for (uint i=0; i<harmonicFC[0].size(); i++){
+      for (uint j=0; j<harmonicFC[0][0].size(); j++){
+        for (int a=harmonicFC[0][0][0].lrows; a<=harmonicFC[0][0][0].urows; a++){
+          for (int b=harmonicFC[0][0][0].lcols; b<=harmonicFC[0][0][0].ucols; b++){
+            for (int Vid=1; Vid<=N_EOSvolumes; Vid++){
+              FC[Vid] = harmonicFC[Vid-1][i][j][a][b];
+            }
+            M.LeastSquare(FC);
+            interpolatedFC_coeffs[i][j][a-harmonicFC[0][0][0].lrows][b-harmonicFC[0][0][0].lcols] = M.GetFitVector();
+          }
+        }
+      }
+    }
+
+    vector<vector<xmatrix<double> > > interpolatedFC;
+    interpolatedFC = harmonicFC.back();
+
+    // do calculations for a given list of temperatures
+    for (uint i=0; i<ph_disp_temperatures.size(); i++){
+      T = ph_disp_temperatures[i];
+      V = getEqVolumeT(T, eos_method, QHA_CALC);
+
+      msg = "Writing phonon dispersions corresponding to a ";
+      msg += "temperature of " + aurostd::utype2string<double>(T) + " K.";
+      pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE, *p_oss,
+          _LOGGER_MESSAGE_);
+
+      for (uint i=0; i<interpolatedFC.size(); i++){
+        for (uint j=0; j<interpolatedFC[i].size(); j++){
+          for (int a=interpolatedFC[i][j].lrows; a<=interpolatedFC[i][j].urows; a++){
+            for (int b=interpolatedFC[i][j].lcols; b<=interpolatedFC[i][j].ucols; b++){
+              interpolatedFC[i][j][a][b] = evalPolynomial(V,
+                interpolatedFC_coeffs[i][j][a-harmonicFC[0][0][0].lrows][b-harmonicFC[0][0][0].lcols]);
+            }
+          }
+        }
+      }
+
+      // initialize ForceConstantCalculator and PhononCalculator
+      xstructure struc = origStructure;
+      struc.InflateVolume(V/struc.GetVolume());
+
+      apl::PhononCalculator phcalc(*p_FileMESSAGE, *p_oss);
+      phcalc.initialize_supercell(struc, false);// verbose=false: do not write files related to symmetry-analysis
+      phcalc.getSupercell().build(apl_options);
+      phcalc._system = system_title;
+
+      apl::ForceConstantCalculator fccalc(phcalc.getSupercell(), apl_options, *p_FileMESSAGE, *p_oss);
+      fccalc.setForceConstants(interpolatedFC);
+      phcalc.setHarmonicForceConstants(fccalc);
+
+      // T-dependent phonon dispersion
+      apl::PhononDispersionCalculator pdisc(phcalc);
+      string USER_DC_INITLATTICE="";
+      int USER_DC_NPOINTS = aurostd::string2utype<int>(
+          apl_options.getattachedscheme("DCPOINTS"));
+      pdisc.initPathLattice(USER_DC_INITLATTICE, USER_DC_NPOINTS);
+      pdisc.calc(apl::THZ | apl::ALLOW_NEGATIVE);
+
+      stringstream eig_stream;
+      xEIGENVAL eig = pdisc.createEIGENVAL();
+      eig.temperature = T;
+      eig_stream << eig;
+
+      string filename = directory + '/';
+      filename += DEFAULT_QHA_FILE_PREFIX + DEFAULT_QHA_PDIS_FILE;
+      filename += ".new.T"+aurostd::PaddedNumString(T, ndigits)+"K.out";
+      if (!aurostd::stringstream2file(eig_stream, filename)){
+        msg = "An error occured when attempted to write "+filename+" file.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function,msg,_FILE_ERROR_);
+      }
+
+      // T-dependent DOS
+      vector<xvector<double> > dummy_dos_projections; // do not need for QHA
+      vector<int> dos_mesh(3);
+
+      vector<string> tokens;
+      aurostd::string2tokens(apl_options.getattachedscheme("DOSMESH"), tokens,
+          string(" xX"));
+      for (uint j=0; j<tokens.size(); j++){
+        dos_mesh[j] = aurostd::string2utype<int>(tokens[j]);
+      }
+
+      phcalc.initialize_qmesh(dos_mesh);
+
+      apl::DOSCalculator dosc(phcalc, apl_options.getattachedscheme("DOSMETHOD"),
+          dummy_dos_projections);
+      dosc.calc(aurostd::string2utype<double>(apl_options.getattachedscheme("DOSPOINTS")),
+          aurostd::string2utype<double>(apl_options.getattachedscheme("DOSSMEAR")));
+      xDOSCAR dos = dosc.createDOSCAR();
+      dos.temperature = T;
+      stringstream dos_stream;
+      dos_stream << dos;
+
+      filename = directory + '/';
+      filename += DEFAULT_QHA_FILE_PREFIX + DEFAULT_QHA_PDOS_FILE;
+      filename += ".new.T"+aurostd::PaddedNumString(T, ndigits)+"K.out";
+      if (!aurostd::stringstream2file(dos_stream, filename)){
         msg = "An error occured when attempted to write "+filename+" file.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_,function,msg,_FILE_ERROR_);
       }

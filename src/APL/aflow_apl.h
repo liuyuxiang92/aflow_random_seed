@@ -402,6 +402,7 @@ namespace apl {
       void hibernate();
 
       const vector<vector<xmatrix<double> > >& getForceConstants() const;
+      void setForceConstants(const vector<vector<xmatrix<double> > > &FC);//AS20201201
       const vector<xmatrix<double> >& getBornEffectiveChargeTensor() const;
       const xmatrix<double>& getDielectricTensor() const;
       bool isPolarMaterial() const;
@@ -1248,6 +1249,7 @@ namespace apl
       void   writeFrequencies(const string &directory=".");
       void   writeTphononDispersions(EOSmethod eos_method, QHAmethod qha_method,
           const string &directory=".");
+      void   writeQHAdosAndBands(EOSmethod eos_method, const string &directory=".");
       void   writeQHAresults(const string &directory=".");
       void   removeDuplicateBlocksInThermoFile(const string &directory=".");
       // members
@@ -1302,6 +1304,7 @@ namespace apl
       vector<xEIGENVAL> gp_ph_dispersions;
       vector<xEIGENVAL> eos_ph_dispersions;
       vector<ThermalPropertiesCalculator> eos_vib_thermal_properties;
+      vector<vector<vector<xmatrix< double > > > > harmonicFC;
       //
       vector<string> subdirectories_apl_eos;
       vector<string> subdirectories_apl_gp;

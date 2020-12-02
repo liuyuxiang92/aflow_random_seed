@@ -1465,6 +1465,11 @@ DEFAULT_QHA_PDIS_FILE
   type: string
   default: "dispersion_phonon"
 
+DEFAULT_QHA_PDOS_FILE
+  description: Output file for temperature-dependent phonon DOS.
+  type: string
+  default: "dos_phonon"
+
 DEFAULT_QHA_KPOINTS_FILE
   description: Output file for path in the BZ used to calculated temperature-dependent phonon dispersion relations.
   type: string
