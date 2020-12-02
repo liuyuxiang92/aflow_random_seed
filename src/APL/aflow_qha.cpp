@@ -3405,14 +3405,14 @@ namespace apl
 
       string filename = directory + '/';
       filename += DEFAULT_QHA_FILE_PREFIX + DEFAULT_QHA_PDIS_FILE;
-      filename += ".new.T"+aurostd::PaddedNumString(T, ndigits)+"K.out";
+      filename += ".T"+aurostd::PaddedNumString(T, ndigits)+"K.out";
       if (!aurostd::stringstream2file(eig_stream, filename)){
         msg = "An error occured when attempted to write "+filename+" file.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_,function,msg,_FILE_ERROR_);
       }
 
       // T-dependent DOS
-      vector<xvector<double> > dummy_dos_projections; // do not need for QHA
+      // mesh
       vector<int> dos_mesh(3);
 
       vector<string> tokens;
@@ -3424,8 +3424,36 @@ namespace apl
 
       phcalc.initialize_qmesh(dos_mesh);
 
+      // projections
+      vector<xvector<double> > dos_projections;
+      if (apl_options.flag("DOS_PROJECT")) {
+        if (apl_options.flag("DOS_CART") || apl_options.flag("DOS_FRAC")) {
+          string projscheme = "";
+          if (apl_options.flag("DOS_CART"))
+            projscheme = apl_options.getattachedscheme("DOSPROJECTIONS_CART");
+          else 
+            projscheme = apl_options.getattachedscheme("DOSPROJECTIONS_FRAC");
+          aurostd::string2tokens(projscheme, tokens, "; ");
+          vector<double> proj;
+          for (uint i = 0; i < tokens.size(); i++) {
+            aurostd::string2tokens(tokens[i], proj, ", ");
+            dos_projections.push_back(aurostd::vector2xvector<double>(proj));
+          }
+        } else {
+          xvector<double> proj(3);
+          dos_projections.push_back(proj);
+        }
+      }
+
+      if ((dos_projections.size() > 0) && apl_options.flag("DOS_FRAC")) {
+        for (uint p = 0; p < dos_projections.size(); p++) {
+          dos_projections[p] = struc.f2c * dos_projections[p];
+        }
+      }
+
+      // initialize and calculate
       apl::DOSCalculator dosc(phcalc, apl_options.getattachedscheme("DOSMETHOD"),
-          dummy_dos_projections);
+          dos_projections);
       dosc.calc(aurostd::string2utype<double>(apl_options.getattachedscheme("DOSPOINTS")),
           aurostd::string2utype<double>(apl_options.getattachedscheme("DOSSMEAR")));
       xDOSCAR dos = dosc.createDOSCAR();
@@ -3435,7 +3463,7 @@ namespace apl
 
       filename = directory + '/';
       filename += DEFAULT_QHA_FILE_PREFIX + DEFAULT_QHA_PDOS_FILE;
-      filename += ".new.T"+aurostd::PaddedNumString(T, ndigits)+"K.out";
+      filename += ".T"+aurostd::PaddedNumString(T, ndigits)+"K.out";
       if (!aurostd::stringstream2file(dos_stream, filename)){
         msg = "An error occured when attempted to write "+filename+" file.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_,function,msg,_FILE_ERROR_);
