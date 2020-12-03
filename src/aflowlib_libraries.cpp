@@ -5400,7 +5400,6 @@ namespace aflowlib {
     vector<string> vline,tokens;
     stringstream aflow_qha_out;
 
-    aflow_qha_out.clear();
     if(aurostd::FileExist(directory_LIB+"/"+"aflow.qha.out") || aurostd::EFileExist(directory_LIB+"/"+"aflow.qha.out")) {
       aflowlib::LIB2RAW_FileNeeded(directory_LIB,"aflow_qha.in",directory_RAW,"aflow_qha.in",vfile,MESSAGE);
       aflowlib::LIB2RAW_FileNeeded(directory_LIB,"aflow.qha.out",directory_RAW,"aflow.qha.out",vfile,MESSAGE);
