@@ -3779,19 +3779,19 @@ namespace plotter {
 
   //AS20201111 BEGIN
   //JSON
-  void JSONbegin(stringstream &json, string name);
+  void JSONbegin(stringstream &json, const string &name);
   void JSONend(stringstream &json);
   void JSONfinish(stringstream &json);
-  void JSONstring(stringstream &json, string name, string value);
-  void JSONbool(stringstream &json, string name, bool value);
-  template<typename utype> void JSONnumber(stringstream &json, string name, utype value);
-  template<typename utype> void JSONvector(stringstream &json, string name, const vector<utype> &value);
-  template<typename utype> void JSONvector(stringstream &json, string name,
+  void JSONstring(stringstream &json, const string &name, const string &value);
+  void JSONbool(stringstream &json, const string &name, bool value);
+  template<typename utype> void JSONnumber(stringstream &json, const string &name, utype value);
+  template<typename utype> void JSONvector(stringstream &json, const string &name, const vector<utype> &value);
+  template<typename utype> void JSONvector(stringstream &json, const string &name,
      const vector<vector<utype> > &value);
-  void JSONvector(stringstream &json, string name, vector<string> &value);
-  template<typename utype> void JSONdeque(stringstream &json, string name,
+  void JSONvector(stringstream &json, const string &name, vector<string> &value);
+  template<typename utype> void JSONdeque(stringstream &json, const string &name,
       const deque<utype> &value, bool negate=false);
-  void JSONdeque(stringstream &json, string name, deque<string> &value);
+  void JSONdeque(stringstream &json, const string &name, deque<string> &value);
   //AS20201111 END
 
   // DOS

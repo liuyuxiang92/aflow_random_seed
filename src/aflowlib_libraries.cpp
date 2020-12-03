@@ -1479,8 +1479,8 @@ namespace aflowlib {
         vector<string> files;
         aurostd::DirectoryLS(directory_LIB, files);
         for (uint i=0; i<files.size(); i++){
-          if (aurostd::substring2bool(files[i],"qha") &&
-              aurostd::substring2bool(files[i],".png")){
+          if (files[i].find("qha")!=string::npos &&
+              files[i].find(".png")!=string::npos){
             aurostd::LinkFile(directory_RAW+"/"+files[i],directory_WEB);
            }
         }

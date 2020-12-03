@@ -402,7 +402,6 @@ namespace apl {
       void hibernate();
 
       const vector<vector<xmatrix<double> > >& getForceConstants() const;
-      void setForceConstants(const vector<vector<xmatrix<double> > > &FC);//AS20201201
       const vector<xmatrix<double> >& getBornEffectiveChargeTensor() const;
       const xmatrix<double>& getDielectricTensor() const;
       bool isPolarMaterial() const;
@@ -1182,7 +1181,7 @@ namespace apl
   enum QHAtype   {QHA_FD, QHA_EOS, QHA_TE};
 
   bool QHA_Get_AflowInName(string &AflowInName, const string &directory_LIB);
-  void LinkAPLtoQHA();
+  void linkAPLtoQHA();
 
   /// Calculates QHA-related properties
   ///
@@ -1249,7 +1248,6 @@ namespace apl
       void   writeFrequencies(const string &directory=".");
       void   writeTphononDispersions(EOSmethod eos_method, QHAmethod qha_method,
           const string &directory=".");
-      void   writeQHAdosAndBands(EOSmethod eos_method, const string &directory=".");
       void   writeQHAresults(const string &directory=".");
       void   removeDuplicateBlocksInThermoFile(const string &directory=".");
       // members

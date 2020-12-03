@@ -1344,7 +1344,7 @@ namespace plotter {
   // }  
 
   /// Creates JSON object by typing it's key name and the opening bracket.
-  void JSONbegin(stringstream &json, string name)
+  void JSONbegin(stringstream &json, const string &name)
   {
     if (name.empty()){
       json << "{" << endl;
@@ -1372,31 +1372,31 @@ namespace plotter {
   }
 
   /// Saves key-value pair with string value to the JSON object.
-  void JSONstring(stringstream &json, string name, string value)
+  void JSONstring(stringstream &json, const string &name, const string &value)
   {
     json << "\"" << name << "\": " << "\"" << value << "\"," << endl;
   }
 
   /// Saves key-value pair with boolean value to the JSON object.
-  void JSONbool(stringstream &json, string name, bool value)
+  void JSONbool(stringstream &json, const string &name, bool value)
   {
     json << "\"" << name << "\": " << (value ? "true," : "false,") << endl;
   }
 
   /// Saves key-value pair with number value to the JSON object.
-  template<typename utype> void JSONnumber(stringstream &json, string name,
+  template<typename utype> void JSONnumber(stringstream &json, const string &name,
       utype value)
   {
     json << "\"" << name << "\": " << value << "," << endl;
   }
 
-  template void JSONnumber(stringstream&, string, float);
-  template void JSONnumber(stringstream&, string, double);
-  template void JSONnumber(stringstream&, string, int);
-  template void JSONnumber(stringstream&, string, uint);
+  template void JSONnumber(stringstream&, const string&, float);
+  template void JSONnumber(stringstream&, const string&, double);
+  template void JSONnumber(stringstream&, const string&, int);
+  template void JSONnumber(stringstream&, const string&, uint);
 
   /// Saves key-value pair with a value as std::vector array to the JSON object.
-  template<typename utype> void JSONvector(stringstream &json, string name,
+  template<typename utype> void JSONvector(stringstream &json, const string &name,
       const vector<utype> &value)
   {
     json << "\"" << name << "\": [";
@@ -1404,12 +1404,12 @@ namespace plotter {
     if (value.size()>0) json.seekp(-1,json.cur);
     json << "]," << endl;
   }
-  template void JSONvector(stringstream &, string, const vector<float> &);
-  template void JSONvector(stringstream &, string, const vector<double> &);
-  template void JSONvector(stringstream &, string, const vector<int> &);
-  template void JSONvector(stringstream &, string, const vector<uint> &);
+  template void JSONvector(stringstream &, const string&, const vector<float> &);
+  template void JSONvector(stringstream &, const string&, const vector<double> &);
+  template void JSONvector(stringstream &, const string&, const vector<int> &);
+  template void JSONvector(stringstream &, const string&, const vector<uint> &);
 
-  template<typename utype> void JSONvector(stringstream &json, string name,
+  template<typename utype> void JSONvector(stringstream &json, const string &name,
      const vector<vector<utype> > &value)
   {
     json << "\"" << name << "\": [";
@@ -1424,12 +1424,12 @@ namespace plotter {
     if (value.size()>0) json.seekp(-1,json.cur);
     json << "]," << endl;
   }
-  template void JSONvector(stringstream &, string, const vector<vector<float> >&);
-  template void JSONvector(stringstream &, string, const vector<vector<double> >&);
-  template void JSONvector(stringstream &, string, const vector<vector<int> >&);
-  template void JSONvector(stringstream &, string, const vector<vector<uint> >&);
+  template void JSONvector(stringstream &, const string&, const vector<vector<float> >&);
+  template void JSONvector(stringstream &, const string&, const vector<vector<double> >&);
+  template void JSONvector(stringstream &, const string&, const vector<vector<int> >&);
+  template void JSONvector(stringstream &, const string&, const vector<vector<uint> >&);
 
-  void JSONvector(stringstream &json, string name, vector<string> &value)
+  void JSONvector(stringstream &json, const string &name, vector<string> &value)
   {
     json << "\"" << name << "\": [";
     for (uint i=0; i<value.size(); i++) json << "\"" << value[i] << "\",";
@@ -1440,7 +1440,7 @@ namespace plotter {
   /// Writes key-value pair where the value is a std::deque to the JSON object.
   /// @param negate allows to invert numerical values by multiplying them with -1.
   template<typename utype>
-  void JSONdeque(stringstream &json, string name, const deque<utype> &value,
+  void JSONdeque(stringstream &json, const string &name, const deque<utype> &value,
      bool negate)
   {
     utype factor = negate ? -1 : 1;
@@ -1450,12 +1450,12 @@ namespace plotter {
     if (value.size()>0) json.seekp(-1,json.cur);
     json << "]," << endl;
   }
-  template void JSONdeque(stringstream &, string, const deque<float>&, bool);
-  template void JSONdeque(stringstream &, string, const deque<double>&, bool);
-  template void JSONdeque(stringstream &, string, const deque<int>&, bool);
+  template void JSONdeque(stringstream &, const string&, const deque<float>&, bool);
+  template void JSONdeque(stringstream &, const string&, const deque<double>&, bool);
+  template void JSONdeque(stringstream &, const string&, const deque<int>&, bool);
   // not possible to realize using uint
 
-  void JSONdeque(stringstream &json, string name, deque<string> &value)
+  void JSONdeque(stringstream &json, const string &name, deque<string> &value)
   {
     json << "\"" << name << "\": [";
     for (uint i=0; i<value.size(); i++) json << "\"" << value[i] << "\",";
@@ -1475,12 +1475,12 @@ namespace plotter {
   /// @param standalone_json_object controls if the output json file is
   /// a standalone object or a part of another json object (i.e. if opening
   /// and closing curly brackets are present or not)
-  void Dos2JSON(stringstream &json, xoption &xopt, xDOSCAR &xdos,
+  void Dos2JSON(stringstream &json, xoption &xopt, const xDOSCAR &xdos,
       ofstream& FileMESSAGE, ostream &oss, bool standalone_json_object)
   {
     string directory = ".";
     xopt.push_attached("DIRECTORY", directory);
-    if (directory.empty()) directory = ".";
+    if (directory.empty()) directory = aurostd::getPWD();
 
     xstructure xstr = getStructureWithNames(xopt,FileMESSAGE,xdos.carstring,oss);
 
@@ -1523,8 +1523,14 @@ namespace plotter {
 
     // projected electronic DOS
     if (xdos.partial && aurostd::substring2bool(xdos.carstring, "CAR")){
-      // determine what orbital labels are used depending on the type of data
-      // present in DOSCAR
+      // Here we determine what orbital labels are used depending on the type of data
+      // present in DOSCAR.
+      // For the systems with LS coupling VASP will print at most 16 orbitals:
+      // i_total, i_x, i_y, i_z for i in {s,p,d,f}
+      // When there is no LS coupling, there are two possibilities:
+      // orbitals are classified by their l,m character and, since VASP prints up to
+      // f orbital, there would be 16 orbitals at most.
+      // Or orbitals are classified only by l character, giving at most 4 orbitals.
       vector<string> orb_labels(xdos.isLSCOUPLING ? 16 : (xdos.lmResolved ? 16 : 4));
       if (xdos.isLSCOUPLING){
         for (uint i=0; i<16; i++) orb_labels[i] = LS_ORBITALS[i];
@@ -1726,7 +1732,7 @@ namespace plotter {
       const xoption& plotoptions)
   {
     string directory = plotoptions.getattachedscheme("DIRECTORY");
-    if (directory.empty()) directory = ".";
+    if (directory.empty()) directory = aurostd::getPWD();
     string name = KBIN::ExtractSystemName(directory);
 
     // get lattice type as written in KPOINTS.bands file
@@ -1805,8 +1811,8 @@ namespace plotter {
 
   /// Converts DOS and BANDS data from xDOSCAR, xEIGENVAL and xKPOINTS files
   /// to JSON object
-  void BandsDos2JSON(stringstream &json, xDOSCAR &xdos, xEIGENVAL &xeigen,
-      xKPOINTS &xkpts, xoption &xopt, ofstream &FileMESSAGE, ostream &oss)
+  void BandsDos2JSON(stringstream &json, const xDOSCAR &xdos, const xEIGENVAL &xeigen,
+      const xKPOINTS &xkpts, xoption &xopt, ofstream &FileMESSAGE, ostream &oss)
   {
     JSONbegin(json, "");
 
@@ -2691,7 +2697,7 @@ namespace plotter {
     string extensions[nprops] = {"volume_equilibrium_qha", "energy_free_qha",
       "modulus_bulk_qha", "thermal_expansion_qha", "cV_qha", "cP_qha",
       "gruneisen_parameter_qha"};
-    string yunits[nprops] = {"\\AA/atom", "eV/atom", "GPa", "$10^{-6}K^{-1}$",
+    string yunits[nprops] = {"\\AA^{3}/atom", "eV/atom", "GPa", "$10^{-5}K^{-1}$",
       "$k_B$/atom", "$k_B$/atom", ""};
     string ymin[nprops] = {"", "", "", "", "0", "0", ""};
 

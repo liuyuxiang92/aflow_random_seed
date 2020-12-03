@@ -980,7 +980,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     vpflow.flag("PLOT_THERMO_QHA", true);
     vpflow.addattachedscheme("PLOT_THERMO_QHA", "./", true);
   } else {
-    vpflow.args2addattachedscheme(argv,cmds,"PLOT_THERMO_QHA","--plotthermo=","./");
+    vpflow.args2addattachedscheme(argv,cmds,"PLOT_THERMO_QHA","--plotthermoqha=","./");
   }
   //AS20200909 END
 
@@ -1683,7 +1683,7 @@ namespace pflow {
       // [OBSOLETE] if(vpflow.flag("SG::FINDSYM_EXEC")) {pflow::FINDSYM(vpflow.getattachedscheme("SG::FINDSYM_EXEC"),1,cin); _PROGRAMRUN=true;}
       // if(vpflow.flag("PROTO_GUS_CPP")) {pflow::PROTO_GUS_CPP(argv); _PROGRAMRUN=true;}
       // QHA
-      if(vpflow.flag("LINKAPLQHA")){apl::LinkAPLtoQHA();_PROGRAMRUN=true;}//AS20200908
+      if(vpflow.flag("LINKAPLQHA")){apl::linkAPLtoQHA();_PROGRAMRUN=true;}//AS20200908
     }
     // *********************************************************************
     if(argv.size()>=2 && !_PROGRAMRUN) {

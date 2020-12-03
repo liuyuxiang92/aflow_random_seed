@@ -147,13 +147,6 @@ namespace apl {
     return _forceConstantMatrices;
   }
 
-  //AS20201201 Begin
-  void ForceConstantCalculator::setForceConstants(const vector<vector<xmatrix<double> > > &FC)
-  {
-    _forceConstantMatrices = FC;
-  }
-  //AS20201201 End
-
   const vector<xmatrix<double> >& ForceConstantCalculator::getBornEffectiveChargeTensor() const {
     return _bornEffectiveChargeTensor;
   }
