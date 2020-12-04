@@ -68,6 +68,8 @@ namespace SYM {
     return dist_min;
   }
   double minimumDistance(const deque<_atom>& atoms,const xmatrix<double>& lattice,double scale){
+
+    //DX20201130 - commented nested LDEBUG if-statements, notable speed increase (a few seconds for systems with >50 atoms)
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string function_name = XPID + "SYM::minimumDistance()";
     double min_dist=AUROSTD_MAX_DOUBLE;
@@ -110,7 +112,7 @@ namespace SYM {
           for(uint b=0;b<lattice_lengths[j].size();b++){
             min_dist = aurostd::min(min_dist,aurostd::modulus(lattice_lengths[i][a]+lattice_lengths[j][b]));
             min_dist = aurostd::min(min_dist,aurostd::modulus(lattice_lengths[i][a]-lattice_lengths[j][b]));
-            if(LDEBUG) {cerr << function_name << " lattice_vectors: a=" << lattice_indices[i][a] << ",b=" << lattice_indices[j][b] << "; min_dist=" << min_dist << endl;}
+            //DX20201130 [DEBUG - expensive if-statement] if(LDEBUG) {cerr << function_name << " lattice_vectors: a=" << lattice_indices[i][a] << ",b=" << lattice_indices[j][b] << "; min_dist=" << min_dist << endl;}
           }
         }
       }
@@ -159,7 +161,7 @@ namespace SYM {
                 min_dist = aurostd::min(min_dist,aurostd::modulus(subtracted-lattice_lengths[k][c]));
                 min_dist = aurostd::min(min_dist,aurostd::modulus(added-lattice_lengths[k][c]));
                 min_dist = aurostd::min(min_dist,aurostd::modulus(subtracted+lattice_lengths[k][c]));
-                if(LDEBUG) {cerr << function_name << " lattice_vectors: a=" << lattice_indices[i][a] << ",b=" << lattice_indices[j][b] << ",c=" << lattice_indices[k][c] << "; min_dist=" << min_dist << endl;}
+                //DX20201130 [DEBUG - expensive if-statement] if(LDEBUG) {cerr << function_name << " lattice_vectors: a=" << lattice_indices[i][a] << ",b=" << lattice_indices[j][b] << ",c=" << lattice_indices[k][c] << "; min_dist=" << min_dist << endl;}
               }
             }
           }  
@@ -229,7 +231,7 @@ namespace SYM {
             for(uint p=0;p<l3.size();p++){
               tmp = ab_component + l3[p];                       //DX : coord1-coord2+a*lattice(1) + (b*lattice(2)) + (c*lattice(3))
               min_dist=aurostd::min(min_dist,aurostd::modulus(tmp));
-              if(LDEBUG) {cerr << function_name << " atoms[" << i << "," << k << "]: a=" << a_index[m] << ",b=" << b_index[n] << ",c=" << c_index[p] << "; min_dist=" << min_dist << "; this_dist=" << aurostd::modulus(tmp) << endl;}
+              //DX20201130 [DEBUG - expensive if-statement] if(LDEBUG) {cerr << function_name << " atoms[" << i << "," << k << "]: a=" << a_index[m] << ",b=" << b_index[n] << ",c=" << c_index[p] << "; min_dist=" << min_dist << "; this_dist=" << aurostd::modulus(tmp) << endl;}
             }
           }
         }

@@ -16398,6 +16398,131 @@ xmatrix<double> GetBasisTransformation(const xmatrix<double>& lattice_original, 
 }
 
 // **************************************************************************
+// Function GetBasisTransformation //DX20201124
+// **************************************************************************
+vector<xvector<double> > GetBasisTransformationInternalTranslations(const xmatrix<double>& basis_transformation) {
+
+  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  string function_name = XPID + "GetBasisTransformationInternalTranslations():";
+  stringstream message;
+
+  vector<xvector<double> > translations;
+  
+  double cell_volume_change = aurostd::abs(aurostd::det(basis_transformation));
+  
+  if(LDEBUG){ cerr << function_name << " changed in cell volume from basis transformation: " << cell_volume_change << endl; }
+
+  // ---------------------------------------------------------------------------
+  // check if the basis transformation makes the cell larger and find
+  // corresponding internal translations
+  if(cell_volume_change-1.0>_ZERO_TOL_){
+
+    // ---------------------------------------------------------------------------
+    // get inverse matrix (Q)
+    xmatrix<double> inverse_transform = aurostd::inverse(basis_transformation);
+
+    // ---------------------------------------------------------------------------
+    // to get translations take the "larger cell" in fractional coordinates
+    // and perform the inverse operation (Q) to see how small it gets,
+    // then these are the internal translations
+    xmatrix<double> lattice_frac = aurostd::eye<double>();
+    xmatrix<double> lattice_shrink = inverse_transform*lattice_frac;
+   
+    if(LDEBUG){ cerr << function_name << " shrunken lattice: " << lattice_shrink << endl; }
+
+    // ---------------------------------------------------------------------------
+    // determine number of times the internal translation needs to be applied to
+    // get to the boundary of the new cell;
+    // we need to check each vector and component (since the transformation
+    // may not be unitary)
+    xvector<uint> dims; 
+    for(int i=1;i<=lattice_shrink.ucols;i++){
+      bool all_components=false, x_component=false, y_component=false, z_component=false;
+      xvector<double> tmp_orig = lattice_shrink.getcol(i);
+      xvector<double> tmp = tmp_orig;
+      uint count_limit = 100;
+      uint count = 0;
+      while(!all_components){
+        count++;
+        if(aurostd::isinteger(tmp[1])){
+          x_component = true;
+        }
+        if(aurostd::isinteger(tmp[2])){
+          y_component = true;
+        }
+        if(aurostd::isinteger(tmp[3])){
+          z_component = true;
+        }
+        if(x_component && y_component && z_component){
+          all_components = true;
+        }
+        tmp+=tmp_orig;
+        //safety
+        if(count>count_limit){
+          message << "Could not identify number of times to bring internal translation to unit cell boundary:" << tmp;
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
+        }
+      }
+      dims[i]=count;
+    }
+    
+    if(LDEBUG){ cerr << function_name << " number of times to apply each internal translation: " << dims[1] << "," << dims[2] << "," << dims[3] << endl; }
+
+    for(uint a=0;a<dims[1];a++){
+      translations.push_back((double)a*lattice_shrink.getcol(1));
+      for(uint b=0;b<dims[2];b++){
+        translations.push_back((double)b*lattice_shrink.getcol(2));
+        translations.push_back((double)a*lattice_shrink.getcol(1)+(double)b*lattice_shrink.getcol(2));
+        for(uint c=0;c<dims[3];c++){
+          translations.push_back((double)c*lattice_shrink.getcol(3));
+          translations.push_back((double)a*lattice_shrink.getcol(1)+(double)c*lattice_shrink.getcol(3));
+          translations.push_back((double)b*lattice_shrink.getcol(2)+(double)c*lattice_shrink.getcol(3));
+          translations.push_back((double)a*lattice_shrink.getcol(1)+(double)b*lattice_shrink.getcol(2)+(double)c*lattice_shrink.getcol(3));
+        }
+      }
+    }
+    
+    if(LDEBUG){
+      cerr << function_name << " # translations:" << translations.size() << endl;
+      for(uint t=0;t<translations.size();t++){
+        cerr << function_name << " translations:" << translations[t] << endl;
+      }
+    }
+    
+    // ---------------------------------------------------------------------------
+    // filter out unique translations 
+    vector<xvector<double> > unique_translations;
+    bool unique = true;
+    for(uint t=0;t<translations.size();t++){
+      unique = true;
+      for(uint u=0;u<unique_translations.size();u++){
+        if(aurostd::isequal(translations[t],unique_translations[u])){
+          unique = false;
+          break;
+        }
+      }
+      if(unique){ unique_translations.push_back(translations[t]); }
+    }
+    
+    if(LDEBUG){
+      cerr << function_name << " # unique_translations:" << unique_translations.size() << endl;
+      for(uint t=0;t<unique_translations.size();t++){
+        cerr << function_name << " unique_translations:" << unique_translations[t] << endl;
+      }
+    }
+    translations = unique_translations;
+  }
+  // ---------------------------------------------------------------------------
+  // if the cell size remains the same or shrinks, no internal translations
+  else{
+    // use null vector
+    xvector<double> null;
+    translations.push_back(null);
+  }
+  return translations;
+}
+
+// **************************************************************************
 // Function GetRotation //DX20201015
 // **************************************************************************
 xmatrix<double> GetRotation(const xmatrix<double>& lattice_original, const xmatrix<double>& lattice_new) {
@@ -16424,13 +16549,24 @@ xstructure ChangeBasis(const xstructure& xstr, const xmatrix<double>& transforma
   // transform the lattice 
   xstr_transformed.lattice = transformation_matrix*xstr_transformed.lattice;
   xstr_transformed.FixLattices();
-
+ 
+  // ---------------------------------------------------------------------------
+  // get internal translations from basis transformation (i.e. transforming
+  // to larger cells)
+  vector<xvector<double> > translations = GetBasisTransformationInternalTranslations(transformation_matrix);
+  
   // ---------------------------------------------------------------------------
   // transform the atom positions
+  deque<_atom> atom_basis;
+  _atom atom_tmp;
   for(uint i=0;i<xstr_transformed.atoms.size();i++){
-    xstr_transformed.atoms[i].fpos=inverse(trasp(transformation_matrix))*xstr_transformed.atoms[i].fpos; // Q*pos , but need to transpose Q for AFLOW xmatrix convention
-    xstr_transformed.atoms[i].fpos=BringInCell(xstr_transformed.atoms[i].fpos);
-    xstr_transformed.atoms[i].cpos=trasp(xstr_transformed.lattice)*xstr_transformed.atoms[i].fpos;
+    for(uint t=0;t<translations.size();t++){
+    atom_tmp = xstr_transformed.atoms[i];
+    atom_tmp.fpos=inverse(trasp(transformation_matrix))*xstr_transformed.atoms[i].fpos; // Q*pos , but need to transpose Q for AFLOW xmatrix convention
+    atom_tmp.fpos=BringInCell(atom_tmp.fpos+translations[t]);
+    atom_tmp.cpos=trasp(xstr_transformed.lattice)*atom_tmp.fpos;
+    atom_basis.push_back(atom_tmp);
+    }
   }
 
   // ---------------------------------------------------------------------------
@@ -16439,19 +16575,19 @@ xstructure ChangeBasis(const xstructure& xstr, const xmatrix<double>& transforma
   xvector<double> tmp;
   bool skew = false;
   double tol=0.01;
-  for(uint j=0;j<xstr_transformed.atoms.size();j++){
+  for(uint j=0;j<atom_basis.size();j++){
     bool duplicate_lattice_point=false;
     for(uint a=0; a<new_basis.size(); a++){
-      tmp = BringInCell(xstr_transformed.atoms[j].fpos,1e-10);
+      tmp = BringInCell(atom_basis[j].fpos,1e-10);
       if(SYM::MapAtom(new_basis[a].fpos,tmp,xstr_transformed.lattice,xstr_transformed.f2c,skew,tol)){
         duplicate_lattice_point=true;
         break;
       }
     }
     if(duplicate_lattice_point==false){
-      xstr_transformed.atoms[j].fpos = BringInCell(xstr_transformed.atoms[j].fpos,1e-10);
-      xstr_transformed.atoms[j].cpos = xstr_transformed.f2c*xstr_transformed.atoms[j].fpos;
-      new_basis.push_back(xstr_transformed.atoms[j]);
+      atom_basis[j].fpos = BringInCell(atom_basis[j].fpos,1e-10);
+      atom_basis[j].cpos = xstr_transformed.f2c*atom_basis[j].fpos;
+      new_basis.push_back(atom_basis[j]);
     }
   }
   // update atom counts/order/types/etc.
@@ -16564,6 +16700,34 @@ void PolarDecomposition(const xmatrix<double>& transformation_matrix,
     cerr << function_name << " identity (R*R^T=I): " << rotation*trasp(rotation) << endl;
   }
 
+}
+
+// **************************************************************************
+// Function TransformStructure() //DX20201125
+// **************************************************************************
+xstructure TransformStructure(const xstructure& xstr,
+    const xmatrix<double>& transformation_matrix,
+    const xmatrix<double>& rotation) {
+
+  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  string function_name = XPID + "compare::getTransformedStructures():";
+
+  xstructure xstr_transformed;
+
+  if(LDEBUG){
+    cerr << function_name << " basis transformation: " << transformation_matrix << endl;
+    cerr << function_name << " rotation (R): " << rotation << endl;
+  }
+
+  // changed basis
+  xstr_transformed = ChangeBasis(xstr, transformation_matrix);
+  if(LDEBUG){ cerr << function_name << " structure after CHANGING BASIS: " << xstr_transformed << endl; }
+
+  // now rotate
+  xstr_transformed = Rotate(xstr_transformed, rotation);
+  if(LDEBUG){ cerr << function_name << " structure after ROTATING: " << xstr_transformed << endl; }
+
+  return xstr_transformed;
 }
 
 // **************************************************************************

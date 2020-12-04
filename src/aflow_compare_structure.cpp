@@ -659,11 +659,13 @@ namespace compare {
     //BETA   pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     //BETA }
 
+    //XtalFinderCalculator xtal_finder;
     // ---------------------------------------------------------------------------
     // load structures 
     vector<StructurePrototype> final_prototypes;
     if(structures_source=="structure_list") {
       final_prototypes = compare::compareStructuresFromStructureList(file_list, magmoms_for_systems, oss, FileMESSAGE, num_proc, same_species, comparison_options); //DX20200103 - condensed booleans to xoptions
+      //xtal_finder::compareStructuresFromStructureList(file_list, magmoms_for_systems, oss, FileMESSAGE, num_proc, same_species, comparison_options); //DX20200103 - condensed booleans to xoptions
     }
     else if(structures_source=="directory") {
       final_prototypes = compare::compareStructuresFromDirectory(directory, magmoms_for_systems, oss, FileMESSAGE, num_proc, same_species, comparison_options); //DX20200103 - condensed booleans to xoptions
@@ -2725,6 +2727,28 @@ namespace compare {
 }
 //DX20190424 END
 
+/*
+//DX20190424 START
+// ***************************************************************************
+// compare::compareStructuresFromStructureList()
+// ***************************************************************************
+void XtalFinderCalculator::compareStructuresFromStructureList(vector<string>& filenames, vector<string>& magmoms_for_systems, ostream& oss, ofstream& FileMESSAGE, uint& num_proc, bool same_species, const aurostd::xoption& comparison_options){ //DX20200103 - condensed booleans to xoptions
+
+    // ---------------------------------------------------------------------------
+    // directory to write results
+    string directory = "."; // for now this is fixed
+
+    // ---------------------------------------------------------------------------
+    // load structures appended to command
+    vector<StructurePrototype> all_structures = compare::loadStructuresFromStructureList(filenames, magmoms_for_systems, same_species, FileMESSAGE); //DX20190319 - added FileMESSAGE 
+
+    // ---------------------------------------------------------------------------
+    // compare structures returns vector<StructureProtoype> of unique/duplicate info
+    compare::compareMultipleStructures(all_structures, oss, FileMESSAGE, num_proc, same_species, directory, comparison_options); //DX20200103 - condensed booleans to xoptions 
+
+}
+//DX20190424 END
+*/
 
 // ***************************************************************************
 // compare::compareStructuresFromDirectory()
@@ -3226,182 +3250,114 @@ namespace compare {
       bool same_species, bool scale_volume, bool optimize_match, 
       double& final_misfit, structure_misfit& final_misfit_info, ostream& comparison_log) { //DX20191108 - remove const & from bools //DX20191122 - move ostream to end and add default
 
+    structure_representative str_representative = compare::initializeStructureRepresentativeStruct(xstr1); 
+    structure_matched str_matched = compare::initializeStructureMatched(xstr2);
+
+    XtalFinderCalculator xtal_finder;
+    xtal_finder.compareStructures(str_representative,str_matched,same_species,scale_volume,optimize_match);
+
+    final_misfit = str_matched.misfit_info.misfit;
+    final_misfit_info = str_matched.misfit_info;
+    
+    cerr << "str_matched.name: " << str_matched.structure << endl;;
+    cerr << "basis transformation: " << str_matched.basis_transformation << endl;;
+    cerr << "rotation: " << str_matched.rotation << endl;;
+
+    print(str_matched.atom_map);
+    print(str_matched.basis_map);
+    print(str_matched.distances_mapped);
+    
+    return(final_misfit<=xtal_finder.misfit_match);
+
+  }
+}
+
+// ***************************************************************************
+// compare::aflowCompareStructure - MAIN FUNCTION
+// ***************************************************************************
+void XtalFinderCalculator::compareStructures(structure_representative& str_rep,
+    structure_matched& str_matched,
+    bool same_species,
+    bool scale_volume,
+    bool optimize_match) {
+
     // This is the main comparison function, which  compares two crystal structures
     // and determines their level of similarity based on the idea discussed 
     // in H. Burzlaff's paper (Acta Cryst., A53, 217-224 (1997)).
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
 
-    comparison_log << "==================================================================================" << endl;
+    //DX20201130 [COMPARISON LOG] comparison_log << "==================================================================================" << endl;
 
     // ---------------------------------------------------------------------------
     // prepare structures (swap structure order if necessary, fix lattices, rescale, etc.)
-    xstructure xstr_base, xstr_test;
-    /*
-    int mode = 1; // 0: expand structure with more atoms (robust using 3x3x3 method); 1: make xstr1 structure with smaller lattice point radius (faster using dims)
-    // expand larger system to ensure we find a commensurate unit cell between each structure
-    if(mode==0){
-      if(xstr1.atoms.size()>xstr2.atoms.size()){
-        xstr_base = xstr2;
-        xstr_test = xstr1;
-        if(LDEBUG) {
-          cerr << "compare::aflowCompareStructure: WARNING: Swapping order of xstructure 1 and 2 since 1 is larger than the other." << endl;
-        }
-      }
-      else { xstr_base = xstr1; xstr_test = xstr2; }
-    }
-    else if(mode==1){
-      xvector<double> abc_angles_q1=Getabc_angles(xstr1.lattice,DEGREES);
-      double radius_xstr1 = aurostd::max(abc_angles_q1(1),abc_angles_q1(2),abc_angles_q1(3)); 
-      xvector<double> abc_angles_q2=Getabc_angles(xstr2.lattice,DEGREES);
-      double radius_xstr2 = aurostd::max(abc_angles_q2(1),abc_angles_q2(2),abc_angles_q2(3)); 
-      if(radius_xstr2<radius_xstr1){ 
-        xstr_base = xstr2; 
-        xstr_test = xstr1;
-        if(LDEBUG) {
-          cerr << "compare::aflowCompareStructure: WARNING: Swapping order of xstructure 1 and 2 since 2 has smaller lattice search radius than the other." << endl;
-        }
-      }
-      else { xstr_base = xstr1; xstr_test = xstr2; }
-    }
-    else { xstr_base = xstr1; xstr_test = xstr2; }
-    */
-    xstr_base = xstr1; xstr_test = xstr2; //DX20201020
+    //xstructure xstr_base, xstr_test;
+    //xstr_base = xstr1; xstr_test = xstr2; //DX20201020
 
-    
-
-    /*
-    cerr << xstr_base << endl;
-    xmatrix<double> y_axis_45 = aurostd::eye<double>();
-    y_axis_45[1][1] = 0.707; y_axis_45[1][2] = 0.0; y_axis_45[1][3] = 0.707;
-    y_axis_45[2][1] = 0.0; y_axis_45[2][2] = 1.0; y_axis_45[2][3] = 0.0;
-    y_axis_45[3][1] = -0.707; y_axis_45[3][2] = 0.0; y_axis_45[3][3] = 0.707;
-    xstr_base = Rotate(xstr_base, trasp(y_axis_45));
-    cerr << "ROTATED Y-AXIS 45" << endl;
-    cerr << xstr_base << endl;
-    */
-    /*
-    cerr << xstr_test << endl;
-    xmatrix<double> z_axis_45 = aurostd::eye<double>();
-    z_axis_45[1][1] = 0.707; z_axis_45[1][2] = -0.707; z_axis_45[1][3] = 0.0;
-    z_axis_45[2][1] = 0.707; z_axis_45[2][2] = 0.707; z_axis_45[2][3] = 0.0;
-    z_axis_45[3][1] = 0.0; z_axis_45[3][2] = 0.0; z_axis_45[3][3] = 1.0;
-    xstr_test = Rotate(xstr_test, trasp(z_axis_45));
-    cerr << "ROTATED Z-AXIS 45" << endl;
-    cerr << xstr_test << endl;
-    */
-    /*
-    cerr << xstr_test << endl;
-    xmatrix<double> orient = aurostd::eye<double>();
-    orient[1][1] = 0.99751222; orient[1][2] = 0.0; orient[1][3] = 0.0704938;
-    orient[2][1] = 0.0; orient[2][2] = 1.0; orient[2][3] = 0;
-    orient[3][1] = -0.00704938; orient[3][2] = 0.0; orient[3][3] = 0.9975122;
-    xstr_test = Rotate(xstr_test, trasp(orient));
-    cerr << "ROTATED 4.04" << endl;
-    cerr << xstr_test << endl;
-*/
-
-    xstr_base.FixLattices();
-    xstr_test.FixLattices();
-    xstr_base.ReScale(1.0);
-    xstr_test.ReScale(1.0);
-    xstr_base.BringInCell(); //DX20190329 - need to ensure incell; otherwise supercell expansion breaks
-    xstr_test.BringInCell(); //DX20190329 - need to ensure incell; otherwise supercell expansion breaks
-
-    /*
-    xmatrix<double> rotation1 = aurostd::inverse(xstr_test.lattice)*xstr_base.lattice;
-    cerr << "xstr base: " << xstr_base << endl;
-    cerr << "xstr test: " << xstr_test << endl;
-    xmatrix<double> base_metric_tensor = MetricTensor(xstr_base.lattice);
-    xmatrix<double> test_metric_tensor = MetricTensor(xstr_test.lattice);
-    cerr << "base metric tensor: " << base_metric_tensor << endl; 
-    cerr << "test metric tensor: " << test_metric_tensor << endl; 
-    cerr << "rotation1: " << rotation1 << endl;
-    cerr << "identity?: " << trasp(rotation1)*rotation1 << endl;
-    cerr << "xstr test new_lattice: " << xstr_test.lattice*rotation1 << endl;
-   
-    cerr << "---------------------------------------------------" << endl;
-    xmatrix<double> rotation2 = aurostd::inverse(xstr_base.lattice)*xstr_test.lattice;
-    cerr << "xstr base: " << xstr_base << endl;
-    cerr << "xstr test: " << xstr_test << endl;
-    cerr << "rotation2: " << rotation2 << endl;
-    cerr << "identity?: " << trasp(rotation2)*rotation2 << endl;
-    cerr << "xstr base new_lattice: " << xstr_base.lattice*rotation2 << endl;
-    
-    cerr << "---------------------------------------------------" << endl;
-    xmatrix<double> rotation3 = trasp(xstr_base.lattice) * aurostd::inverse(xstr_test.lattice);
-    cerr << "rotation3: " << rotation3 << endl;
-    
-    cerr << "identity?: " << trasp(rotation3)*rotation3 << endl;
-    cerr << "xstr base new_lattice: " << xstr_base.lattice*rotation3 << endl;
-    cerr << "OR xstr base new_lattice: " << rotation3*xstr_base.lattice << endl;
-*/
+    str_rep.structure.FixLattices();
+    str_matched.structure.FixLattices();
+    str_rep.structure.ReScale(1.0);
+    str_matched.structure.ReScale(1.0);
+    str_rep.structure.BringInCell(); //DX20190329 - need to ensure incell; otherwise supercell expansion breaks
+    str_matched.structure.BringInCell(); //DX20190329 - need to ensure incell; otherwise supercell expansion breaks
 
     // ---------------------------------------------------------------------------
     // clean atom names (remove pseudopotential information)
-    for(uint i=0;i<xstr_base.species.size();i++){ xstr_base.species[i]=KBIN::VASP_PseudoPotential_CleanName(xstr_base.species[i]); }
-    for(uint i=0;i<xstr_test.species.size();i++){ xstr_test.species[i]=KBIN::VASP_PseudoPotential_CleanName(xstr_test.species[i]); }
+    for(uint i=0;i<str_rep.structure.species.size();i++){ str_rep.structure.species[i]=KBIN::VASP_PseudoPotential_CleanName(str_rep.structure.species[i]); }
+    for(uint i=0;i<str_matched.structure.species.size();i++){ str_matched.structure.species[i]=KBIN::VASP_PseudoPotential_CleanName(str_matched.structure.species[i]); }
 
-    for(uint i=0;i<xstr_base.atoms.size();i++){ xstr_base.atoms[i].name=KBIN::VASP_PseudoPotential_CleanName(xstr_base.atoms[i].name); }
-    for(uint i=0;i<xstr_test.atoms.size();i++){ xstr_test.atoms[i].name=KBIN::VASP_PseudoPotential_CleanName(xstr_test.atoms[i].name); }
+    for(uint i=0;i<str_rep.structure.atoms.size();i++){ str_rep.structure.atoms[i].name=KBIN::VASP_PseudoPotential_CleanName(str_rep.structure.atoms[i].name); }
+    for(uint i=0;i<str_matched.structure.atoms.size();i++){ str_matched.structure.atoms[i].name=KBIN::VASP_PseudoPotential_CleanName(str_matched.structure.atoms[i].name); }
 
     // ---------------------------------------------------------------------------
-    // standardize structure (not default) 
+    // NOW DONE BEFOREHAND standardize structure (not default) 
     // below is no longer necessary, algorithm handles supercells/conventional/prim
-    bool primitivize=false;
-    bool niggli=false;
-    if(primitivize){
-      xstr_base=GetStandardPrimitive(xstr_base);
-      xstr_test=GetStandardPrimitive(xstr_test);
-    }
-    if(niggli){
-      xstr_base.NiggliUnitCellForm();
-      xstr_test.NiggliUnitCellForm();
-    }
+    //bool primitivize=false;
+    //bool niggli=false;
+    //if(primitivize){
+    //  str_rep.structure=GetStandardPrimitive(str_rep.structure);
+    //  str_matched.structure=GetStandardPrimitive(str_matched.structure);
+    //}
+    //if(niggli){
+    //  str_rep.structure.NiggliUnitCellForm();
+    //  str_matched.structure.NiggliUnitCellForm();
+    //}
 
     // ---------------------------------------------------------------------------
     // determine minimum interatomic distances of structures (resolution of atoms) //DX20200623
     // //DX20200715 - may need to rescale this if the structures are being scaled later....
-    if(xstr_base.dist_nn_min==AUROSTD_NAN){ xstr_base.dist_nn_min=SYM::minimumDistance(xstr_base); }
-    if(xstr_test.dist_nn_min==AUROSTD_NAN){ xstr_test.dist_nn_min=SYM::minimumDistance(xstr_test); }
+    if(str_rep.structure.dist_nn_min==AUROSTD_NAN){ str_rep.structure.dist_nn_min=SYM::minimumDistance(str_rep.structure); }
+    if(str_matched.structure.dist_nn_min==AUROSTD_NAN){ str_matched.structure.dist_nn_min=SYM::minimumDistance(str_matched.structure); }
 
     // ---------------------------------------------------------------------------
     // determine if structures are matchable (same species and/or same stoichiometry)
     int type_match=0;
-    bool criteria_met = false;
     if(same_species == true){
       type_match=2;
       // if atoms are not labeled in either structure; assign fake names
-      if(xstr_base.atoms.at(0).name == "" || xstr_test.atoms.at(0).name == ""){ 
+      if(str_rep.structure.atoms.at(0).name == "" || str_matched.structure.atoms.at(0).name == ""){ 
         if(LDEBUG) {cerr << "compare:: " << "Atoms not labeled ... Assigning fake names." << endl;}
-        xstr_base.DecorateWithFakeElements();
-        xstr_test.DecorateWithFakeElements();
+        str_rep.structure.DecorateWithFakeElements();
+        str_matched.structure.DecorateWithFakeElements();
       }
     }
     else if(same_species == false){
       type_match=1;
     }
-    if(matchableSpecies(xstr_base,xstr_test,same_species)==true){
-      criteria_met = true;
-    }
-    //cerr << "type_match: " << type_match << endl; 
+    if(compare::matchableSpecies(str_rep.structure,str_matched.structure,same_species)==true){
+      //DX20201130 [COMPARISON LOG] comparison_log << "=========================================================" << endl; 
 
-    // ---------------------------------------------------------------------------
-    // standardize structure (not used) 
-    if(criteria_met == true){
-      comparison_log << "=========================================================" << endl; 
+      //DX20201130 [COMPARISON LOG] comparison_log << "STRUCTURE 1: " << endl;  
+      //DX20201130 [COMPARISON LOG] comparison_log << str_rep.structure << endl;
+      //cerr << str_rep.structure << endl;
 
-      comparison_log << "STRUCTURE 1: " << endl;  
-      comparison_log << xstr_base << endl;
-      //cerr << xstr_base << endl;
+      //DX20201130 [COMPARISON LOG] comparison_log << "=========================================================" << endl;
 
-      comparison_log << "=========================================================" << endl;
+      //DX20201130 [COMPARISON LOG] comparison_log << "STRUCTURE 2: " << endl;
+      //DX20201130 [COMPARISON LOG] comparison_log << str_matched.structure << endl;	
+      //cerr << str_matched.structure << endl;
 
-      comparison_log << "STRUCTURE 2: " << endl;
-      comparison_log << xstr_test << endl;	
-      //cerr << xstr_test << endl;
-
-      comparison_log << "=========================================================" << endl;
+      //DX20201130 [COMPARISON LOG] comparison_log << "=========================================================" << endl;
 
       // ---------------------------------------------------------------------------
       // comparison types
@@ -3409,351 +3365,82 @@ namespace compare {
       //  1: assigns fake names to atoms (allows for structural comparison regardless of type of atom)
       //  2: uses the names given in POSCAR (allows for structural comparison of material; type of atom necessary)
 
-      if(same_species==true){
-        type_match=2;
-      }
-      if(same_species==false){
-        type_match=1;
-      }	
+      if(same_species==true){ type_match=2; }
+      if(same_species==false){ type_match=1; }	
 
       // ---------------------------------------------------------------------------
       // variables
       //[CO20200508 - OBSOLETE]uint i=0;
-      xvector<double> origin;
-      xstructure proto;           
-      vector<xstructure> vprotos,vprotos_tmp;
-      vector<vector<uint> > IM1, IM2;
-      vector<vector<double> > vmin_dists;
-      vector<uint> im1, im2;
-      vector<string> PAIR1, PAIR2;
-      structure_misfit min_misfit_info = compare::initialize_misfit_struct();
-      bool magnetic_analysis = (xstr_base.atoms[0].spin_is_given || xstr_base.atoms[0].noncoll_spin_is_given);
-      min_misfit_info.is_magnetic_misfit=(magnetic_analysis && _CALCULATE_MAGNETIC_MISFIT_); //DX20191218
+      //xvector<double> origin;
+      //xstructure proto;           
+      //vector<xstructure> vprotos,vprotos_tmp;
+      //vector<vector<uint> > IM1, IM2;
+      //vector<vector<double> > vmin_dists;
+      //vector<uint> im1, im2;
+      //vector<string> PAIR1, PAIR2;
+      //structure_misfit min_misfit_info = compare::initialize_misfit_struct();
+      //bool magnetic_analysis = (str_rep.structure.atoms[0].spin_is_given || str_rep.structure.atoms[0].noncoll_spin_is_given);
+      //min_misfit_info.is_magnetic_misfit=(magnetic_analysis && _CALCULATE_MAGNETIC_MISFIT_); //DX20191218
 
-      comparison_log<<"-------------------------------------------------------"<<endl;
+      //DX20201130 [COMPARISON LOG] comparison_log<<"-------------------------------------------------------"<<endl;
 
       // ---------------------------------------------------------------------------
       // normalize scaling factors 
       if(LDEBUG) {cerr << "compare:: " << "Scale structures."<<endl;} 
       // structures should already be scaled to the same scaling factor, below may be redundant
-      rescaleStructure(xstr_base,xstr_test);
+      compare::rescaleStructure(str_rep.structure,str_matched.structure);
 
       // ---------------------------------------------------------------------------
       // scale volumes of structures
-      if(scale_volume==true){atomicNumberDensity(xstr_base, xstr_test);}
+      if(scale_volume==true){compare::atomicNumberDensity(str_rep.structure, str_matched.structure);}
 
       // ---------------------------------------------------------------------------
       // assign fake atom names 
       if(type_match==1){
-        xstr_base.DecorateWithFakeElements();
-        xstr_test.DecorateWithFakeElements();
+        str_rep.structure.DecorateWithFakeElements();
+        str_matched.structure.DecorateWithFakeElements();
       }
 
       // OBSOLETE THIS PRINTS OUT XSTRUCTURES WITH ATOM ZERO SHIFTED TO ORIGIN...
       // OBSOLETE comparison_log<<"========================================================="<<endl;
-      // OBSOLETE comparison_log << xstr_base << endl;
+      // OBSOLETE comparison_log << str_rep.structure << endl;
       // OBSOLETE comparison_log<<"========================================================="<<endl;
-      // OBSOLETE comparison_log << xstr_test << endl;		
+      // OBSOLETE comparison_log << str_matched.structure << endl;		
 
       // ---------------------------------------------------------------------------
       // print lattice parameters
-      printParameters(xstr_base,comparison_log);
-      printParameters(xstr_test,comparison_log);
+      //DX20201130 [COMPARISON LOG] printParameters(str_rep.structure,comparison_log);
+      //DX20201130 [COMPARISON LOG] printParameters(str_matched.structure,comparison_log);
 
-      comparison_log << "========================================================="<<endl;    
-      comparison_log << "QUADRUPLETS METHOD" << endl;
+      //DX20201130 [COMPARISON LOG] comparison_log << "========================================================="<<endl;    
+      //DX20201130 [COMPARISON LOG] comparison_log << "QUADRUPLETS METHOD" << endl;
 
-      xmatrix<double> q_base=xstr_base.lattice;; 
+      xmatrix<double> q_base=str_rep.structure.lattice;; 
 
       // ---------------------------------------------------------------------------
       // compare structures
       if(LDEBUG) {cerr << "compare:: " << "WAIT... Computing quadruplets..."<<endl;} 
       // creates the threads for checking quadruplets (lattices)
-      //DX20190530 - OLD threadGeneration(num_proc,q_base,xstr_test,vprotos,xstr_base,type_match,optimize_match,minMis,comparison_log);
-      //latticeAndOriginSearch(xstr_base,xstr_test,num_proc,q_base,vprotos,min_misfit_info,type_match,optimize_match,scale_volume,comparison_log); //DX20190530 //DX20200422 - scale_volume added
-      //latticeSearch(xstr_base,xstr_test,num_proc,q_base,vprotos,min_misfit_info,type_match,optimize_match,scale_volume,comparison_log); //DX20190530 //DX20200422 - scale_volume added
+      //DX20190530 - OLD threadGeneration(num_proc,q_base,str_matched.structure,vprotos,str_rep.structure,type_match,optimize_match,minMis,comparison_log);
+      //latticeAndOriginSearch(str_rep.structure,str_matched.structure,num_proc,q_base,vprotos,min_misfit_info,type_match,optimize_match,scale_volume,comparison_log); //DX20190530 //DX20200422 - scale_volume added
+      //latticeSearch(str_rep.structure,str_matched.structure,num_proc,q_base,vprotos,min_misfit_info,type_match,optimize_match,scale_volume,comparison_log); //DX20190530 //DX20200422 - scale_volume added
 
-      structure_representative str_representative = compare::initializeStructureRepresentativeStruct(xstr_base); 
-      structure_matched str_matched = compare::initializeStructureMatched(xstr_test); 
+      //structure_representative str_representative = compare::initializeStructureRepresentativeStruct(str_rep.structure); 
+      //structure_matched str_matched = compare::initializeStructureMatched(str_matched.structure); 
 
-      latticeSearch(str_representative,str_matched,type_match,optimize_match,scale_volume,num_proc,comparison_log); //DX20190530 //DX20200422 - scale_volume added
+      stringstream comparison_log; ////DX20201130 [COMPARISON LOG]
+      compare::latticeSearch(str_rep,str_matched,type_match,optimize_match,scale_volume,num_proc,comparison_log); //DX20190530 //DX20200422 - scale_volume added
 
 
-      if(LDEBUG) {cerr << "compare:: " << "Total # of possible matching representations: " << vprotos.size() << endl;}	
+      //if(LDEBUG) {cerr << "compare:: " << "Total # of possible matching representations: " << vprotos.size() << endl;}	
       //ORIG final_misfit=min_misfit_info.misfit;
       //ORIG final_misfit_info=min_misfit_info; //DX20191218
-      final_misfit=str_matched.misfit_info.misfit;
-      final_misfit_info=str_matched.misfit_info; //DX20191218
+      //DXOBS final_misfit=str_matched.misfit_info.misfit;
+      //DXOBSfinal_misfit_info=str_matched.misfit_info; //DX20191218
 
-      // ---------------------------------------------------------------------------
-      // find matches
-      // note, this is done in threadGeneration(), so it is redundant, we can save time  
-
-      // This first match finder is based on the best fitting between each atoms. This means that 
-      // the routine looks for the closest atoms in order to find the match.
-      // Can happen that one atom is the best matching for more than one atom in the second structure;
-      // in this case the match is cancelled (cleanMatch)
-
-      //DX [OBSOLETE - best-match shift is expensive]      for(i=0; i<vprotos.size(); i++){
-      //DX [OBSOLETE - best-match shift is expensive]        //cerr << "xstr_base " << xstr_base << endl;
-      //DX [OBSOLETE - best-match shift is expensive]        //cerr << "vprotos[i] " << vprotos[i] << endl;
-      //DX [OBSOLETE - best-match shift is expensive]        //cerr << "orig: " << endl;
-      //DX [OBSOLETE - best-match shift is expensive]        //for(uint j=0;j<im1.size();j++){
-      //DX [OBSOLETE - best-match shift is expensive]        //  cerr << im1[j] << " == " << im2[j] << endl; 
-      //DX [OBSOLETE - best-match shift is expensive]        //}
-      //DX [OBSOLETE - best-match shift is expensive]        im1.clear(); im2.clear();
-      //DX [OBSOLETE - best-match shift is expensive]        //cerr << "after: " << endl;
-      //DX [OBSOLETE - best-match shift is expensive]        vector<double> min_dists;
-      //DX [OBSOLETE - best-match shift is expensive]        //findMatch(xstr_base,vprotos.at(i),im1,im2);
-      //DX [OBSOLETE - best-match shift is expensive]        //cerr << "find new match" << endl;
-      //DX [OBSOLETE - best-match shift is expensive]        findMatch(xstr_base,vprotos.at(i),im1,im2,min_dists,type_match);
-      //DX [OBSOLETE - best-match shift is expensive]        //cerr << "im1.size(): " << im1.size() << endl;
-      //DX [OBSOLETE - best-match shift is expensive]        //for(uint j=0;j<im1.size();j++){
-      //DX [OBSOLETE - best-match shift is expensive]        //  cerr << im1[j] << " == " << im2[j] << " (" << min_dists[j] << ")" << endl; 
-      //DX [OBSOLETE - best-match shift is expensive]        //}
-      //DX [OBSOLETE - best-match shift is expensive]        if(cleanMatch(im2)==false && cleanMatch(im1)==false){
-      //DX [OBSOLETE - best-match shift is expensive]          //cerr << "cleanMatch" << endl;
-      //DX [OBSOLETE - best-match shift is expensive]          vprotos_tmp.push_back(vprotos.at(i));
-      //DX [OBSOLETE - best-match shift is expensive]          IM1.push_back(im1);
-      //DX [OBSOLETE - best-match shift is expensive]          IM2.push_back(im2);
-      //DX [OBSOLETE - best-match shift is expensive]          vmin_dists.push_back(min_dists);
-      //DX [OBSOLETE - best-match shift is expensive]        }
-      //DX [OBSOLETE - best-match shift is expensive]      }
-      //DX [OBSOLETE - best-match shift is expensive]      if(LDEBUG) {cerr << "compare:: " << "Number of matching representations: "<< vprotos_tmp.size() << endl;}
-      //DX [OBSOLETE - best-match shift is expensive]
-      //DX [OBSOLETE - best-match shift is expensive]      vprotos.clear();
-      //DX [OBSOLETE - best-match shift is expensive]      vprotos=vprotos_tmp;
-      //DX [OBSOLETE - best-match shift is expensive]      vprotos_tmp.clear();
-      //DX [OBSOLETE - best-match shift is expensive]
-      //DX [OBSOLETE - best-match shift is expensive]      if(vprotos.size()!=0){
-      //DX [OBSOLETE - best-match shift is expensive]
-      //DX [OBSOLETE - best-match shift is expensive]        vector<vector<uint> > auxstr_base,auxstr_test;
-      //DX [OBSOLETE - best-match shift is expensive]
-      //DX [OBSOLETE - best-match shift is expensive]        auxstr_base=IM1;
-      //DX [OBSOLETE - best-match shift is expensive]        auxstr_test=IM2;	
-      //DX [OBSOLETE - best-match shift is expensive]        IM1.clear();
-      //DX [OBSOLETE - best-match shift is expensive]        IM2.clear();
-      //DX [OBSOLETE - best-match shift is expensive]
-      //DX [OBSOLETE - best-match shift is expensive]        // sameAtomType allow to check that the atoms matched are of the same type.
-      //DX [OBSOLETE - best-match shift is expensive]        // (can happen that certain transformation find matches between atoms of different type)
-      //DX [OBSOLETE - best-match shift is expensive]
-      //DX [OBSOLETE - best-match shift is expensive]        for(i=0; i<vprotos.size(); i++){
-      //DX [OBSOLETE - best-match shift is expensive]          //cerr << "Same atom" << endl;
-      //DX [OBSOLETE - best-match shift is expensive]          //if(sameAtomType(xstr_base,vprotos.at(i),auxstr_base.at(i),auxstr_test.at(i),type_match)==true){
-      //DX [OBSOLETE - best-match shift is expensive]          //  cerr << "IN Same atom" << endl;
-      //DX [OBSOLETE - best-match shift is expensive]            vprotos_tmp.push_back(vprotos.at(i));
-      //DX [OBSOLETE - best-match shift is expensive]            IM1.push_back(auxstr_base.at(i));
-      //DX [OBSOLETE - best-match shift is expensive]            IM2.push_back(auxstr_test.at(i));
-      //DX [OBSOLETE - best-match shift is expensive]          //}
-      //DX [OBSOLETE - best-match shift is expensive]        }
-      //DX [OBSOLETE - best-match shift is expensive]        if(LDEBUG) {cerr << "compare:: " << "Number of valid matches with the same type: " << vprotos_tmp.size() << endl;}
-      //DX [OBSOLETE - best-match shift is expensive]
-      //DX [OBSOLETE - best-match shift is expensive]        vprotos.clear();
-      //DX [OBSOLETE - best-match shift is expensive]        vprotos=vprotos_tmp;
-      //DX [OBSOLETE - best-match shift is expensive]        vprotos_tmp.clear();
-      //DX [OBSOLETE - best-match shift is expensive]
-      //DX [OBSOLETE - best-match shift is expensive]      }
-      //DX [OBSOLETE - best-match shift is expensive]
-      //DX [OBSOLETE - best-match shift is expensive]      // ---------------------------------------------------------------------------
-      //DX [OBSOLETE - best-match shift is expensive]      // calculate misfit values for all matching structures 
-      //DX [OBSOLETE - best-match shift is expensive]      if(vprotos.size()!=0){
-      //DX [OBSOLETE - best-match shift is expensive]        //  follows the computation of the figure of misfit described by Burzlaff: 
-      //DX [OBSOLETE - best-match shift is expensive]        //  Burzlaff H., Malinovsky Y. (1996), "A Procedure for the Classification of Non-Organic Crystal structures."
-      //DX [OBSOLETE - best-match shift is expensive]
-      //DX [OBSOLETE - best-match shift is expensive]        xstructure xstr_base_tmp = xstr_base;
-      //DX [OBSOLETE - best-match shift is expensive]        vector<double> diag_sum1,diag_sum2,diag_diff1,diag_diff2;
-      //DX [OBSOLETE - best-match shift is expensive]        double scale, lattdev;
-      //DX [OBSOLETE - best-match shift is expensive]        vector<double> vLattDevs;
-      //DX [OBSOLETE - best-match shift is expensive]        vector<double> vCoordDevs, vfails;
-      //DX [OBSOLETE - best-match shift is expensive]        double coorddev=1e9, fail_figure=1e9;
-      //DX [OBSOLETE - best-match shift is expensive]        double mis=1e9;
-      //DX [OBSOLETE - best-match shift is expensive]        vector<double> misfits;
-      //DX [OBSOLETE - best-match shift is expensive]        double min=1e9;
-      //DX [OBSOLETE - best-match shift is expensive]        xstructure better;
-      //DX [OBSOLETE - best-match shift is expensive]
-      //DX [OBSOLETE - best-match shift is expensive]        for(i=0; i<vprotos.size(); i++){
-      //DX [OBSOLETE - best-match shift is expensive]          xstructure proto = vprotos[i];
-      //DX [OBSOLETE - best-match shift is expensive]          diag_sum1.clear();	diag_sum2.clear();
-      //DX [OBSOLETE - best-match shift is expensive]          diag_diff1.clear();	diag_diff2.clear();
-      //DX [OBSOLETE - best-match shift is expensive]
-      //DX [OBSOLETE - best-match shift is expensive]          scale=xstr_base.Volume()/vprotos.at(i).Volume();
-      //DX [OBSOLETE - best-match shift is expensive]          scale=pow(scale,0.3333);
-      //DX [OBSOLETE - best-match shift is expensive]
-      //DX [OBSOLETE - best-match shift is expensive]          cellDiagonal(xstr_base,diag_sum1,diag_diff1,1);
-      //DX [OBSOLETE - best-match shift is expensive]          cellDiagonal(vprotos.at(i),diag_sum2,diag_diff2,scale);
-      //DX [OBSOLETE - best-match shift is expensive]
-      //DX [OBSOLETE - best-match shift is expensive]          lattdev=latticeDeviation(diag_sum1,diag_sum2,diag_diff1,diag_diff2);
-      //DX [OBSOLETE - best-match shift is expensive]          //cerr << "lattdev: " << lattdev << endl;
-      //DX [OBSOLETE - best-match shift is expensive]          vLattDevs.push_back(lattdev);
-      //DX [OBSOLETE - best-match shift is expensive]
-      //DX [OBSOLETE - best-match shift is expensive]          vector<double> all_nn1 = computeNearestNeighbors(xstr_base); 
-      //DX [OBSOLETE - best-match shift is expensive]          vector<double> all_nn_proto = computeNearestNeighbors(proto);
-      //DX [OBSOLETE - best-match shift is expensive]          coordinateDeviation(xstr_base_tmp,proto,all_nn1,all_nn_proto,IM1.at(i),IM2.at(i),vmin_dists[i],coorddev,fail_figure);
-      //DX [OBSOLETE - best-match shift is expensive]          //cerr << "coorddev: " << coorddev << endl;
-      //DX [OBSOLETE - best-match shift is expensive]          //cerr << "fail_figure: " << fail_figure << endl;
-      //DX [OBSOLETE - best-match shift is expensive]
-      //DX [OBSOLETE - best-match shift is expensive]          vCoordDevs.push_back(coorddev);
-      //DX [OBSOLETE - best-match shift is expensive]          vfails.push_back(fail_figure);
-      //DX [OBSOLETE - best-match shift is expensive]
-      //DX [OBSOLETE - best-match shift is expensive]          mis=computeMisfit(lattdev,coorddev,fail_figure);
-      //DX [OBSOLETE - best-match shift is expensive]          min=mis;
-      //DX [OBSOLETE - best-match shift is expensive]	        if(LDEBUG) {cerr << "compare:: " << "misfit: " << mis << "   (lattice deviation: " << lattdev << "  coordinate displacement: " 
-      //DX [OBSOLETE - best-match shift is expensive]                          << coorddev << "  figure of fail: " << fail_figure << ")" << endl;}
-      //DX [OBSOLETE - best-match shift is expensive]          misfits.push_back(mis);
-      //DX [OBSOLETE - best-match shift is expensive]          vprotos_tmp.push_back(vprotos.at(i));
-      //DX [OBSOLETE - best-match shift is expensive]
-      //DX [OBSOLETE - best-match shift is expensive]          /*
-      //DX [OBSOLETE - best-match shift is expensive]          //If between 0.1 and 0.2 will try shifting method to see if we can obtain a figure of misfit under 0.1
-      //DX [OBSOLETE - best-match shift is expensive]          if(minMis <= 0.2 && minMis > 0.1){	
-      //DX [OBSOLETE - best-match shift is expensive]            if(fail_figure!=0 && std::isnan(misfits.at(i))==false){
-      //DX [OBSOLETE - best-match shift is expensive]              // This part is fundamental because it allows us to correct 
-      //DX [OBSOLETE - best-match shift is expensive]              // a trivial simplification done during the transformation: 
-      //DX [OBSOLETE - best-match shift is expensive]              // When the structure has been rotated, then it is shifted 
-      //DX [OBSOLETE - best-match shift is expensive]              // to each atom and brought in the cell to look for matchings. 
-      //DX [OBSOLETE - best-match shift is expensive]              // The atom shifted to the origin will coincide perfectly with 
-      //DX [OBSOLETE - best-match shift is expensive]              // the atom in the origin for the reference structure. 
-      //DX [OBSOLETE - best-match shift is expensive]              // However, this can lead to a matching failure between other 
-      //DX [OBSOLETE - best-match shift is expensive]              // pairs of atoms in a position different from the origin 
-      //DX [OBSOLETE - best-match shift is expensive]              // (see definition of failure on the paper). This routine 
-      //DX [OBSOLETE - best-match shift is expensive]              // aims to take the structure from the atom in the origin and 
-      //DX [OBSOLETE - best-match shift is expensive]              // move the entire structures little by little around this 
-      //DX [OBSOLETE - best-match shift is expensive]              // position. The rigid translation of all the atoms allow us 
-      //DX [OBSOLETE - best-match shift is expensive]              // to compute many different figures of misfit with the 
-      //DX [OBSOLETE - best-match shift is expensive]              // possibility that some failures disapper returning in the 
-      //DX [OBSOLETE - best-match shift is expensive]              // allowed tolerances.	
-      //DX [OBSOLETE - best-match shift is expensive]              if(LDEBUG) {cerr << "compare:: " << "Attempting shift of structure since the minimum misfit is just above the similarity threshold..." << endl;}
-      //DX [OBSOLETE - best-match shift is expensive]              proto=vprotos.at(i);	
-      //DX [OBSOLETE - best-match shift is expensive]              for(j=0; j<proto.atoms.size(); j++){
-      //DX [OBSOLETE - best-match shift is expensive]                if(proto.atoms.at(j).cpos==origin){
-      //DX [OBSOLETE - best-match shift is expensive]                  delta=0.01*shortestDistance(proto,j);		
-      //DX [OBSOLETE - best-match shift is expensive]                  inc=0.2*delta;
-      //DX [OBSOLETE - best-match shift is expensive]                }
-      //DX [OBSOLETE - best-match shift is expensive]              }
-      //DX [OBSOLETE - best-match shift is expensive]              //cerr << "delta: " << delta << endl;
-      //DX [OBSOLETE - best-match shift is expensive]              for(double j=-delta; j<=delta; j=j+inc){
-      //DX [OBSOLETE - best-match shift is expensive]                //cerr << "j: " << j << endl;
-      //DX [OBSOLETE - best-match shift is expensive]                for(double k=-delta; k<=delta; k=k+inc){
-      //DX [OBSOLETE - best-match shift is expensive]                  for(double w=-delta; w<=delta; w=w+inc){
-      //DX [OBSOLETE - best-match shift is expensive]                    proto=vprotos.at(i);
-      //DX [OBSOLETE - best-match shift is expensive]                    for(uint iat=0; iat<proto.atoms.size(); iat++){
-      //DX [OBSOLETE - best-match shift is expensive]                      proto.atoms.at(iat).cpos(1)+=j;
-      //DX [OBSOLETE - best-match shift is expensive]                      proto.atoms.at(iat).cpos(2)+=k;
-      //DX [OBSOLETE - best-match shift is expensive]                      proto.atoms.at(iat).cpos(3)+=w;
-      //DX [OBSOLETE - best-match shift is expensive]                    }	
-      //DX [OBSOLETE - best-match shift is expensive]                    	
-      //DX [OBSOLETE - best-match shift is expensive]                    vector<double> min_dists; 
-      //DX [OBSOLETE - best-match shift is expensive]                    findMatch(xstr_base,proto,im1,im2,min_dists,type_match);
-      //DX [OBSOLETE - best-match shift is expensive]                    //coordinateDeviation(xstr_base,proto,IM1.at(i),IM2.at(i),coorddev,fail_figure);
-      //DX [OBSOLETE - best-match shift is expensive]                    coordinateDeviation(xstr_base,proto,im1,im2,coorddev,fail_figure);
-      //DX [OBSOLETE - best-match shift is expensive]                    //cerr << "lattdev: " << lattdev << endl;
-      //DX [OBSOLETE - best-match shift is expensive]                    //cerr << "coorddev: " << coorddev << endl;
-      //DX [OBSOLETE - best-match shift is expensive]                    mis_tmp=computeMisfit(lattdev,coorddev,fail_figure);
-      //DX [OBSOLETE - best-match shift is expensive]                    //cerr << "mis_tmp: " << mis_tmp << endl;
-      //DX [OBSOLETE - best-match shift is expensive]		                if(mis_tmp<min){
-      //DX [OBSOLETE - best-match shift is expensive]                      min=mis_tmp;
-      //DX [OBSOLETE - best-match shift is expensive]                      coorddev_tmp=coorddev;
-      //DX [OBSOLETE - best-match shift is expensive]                      fail_figure_tmp=fail_figure;
-      //DX [OBSOLETE - best-match shift is expensive]                      better=proto;
-      //DX [OBSOLETE - best-match shift is expensive]                    }
-      //DX [OBSOLETE - best-match shift is expensive]                  }
-      //DX [OBSOLETE - best-match shift is expensive]                }
-      //DX [OBSOLETE - best-match shift is expensive]              }		
-      //DX [OBSOLETE - best-match shift is expensive]              if(min<mis){
-      //DX [OBSOLETE - best-match shift is expensive]                vprotos_tmp.at(i)=better;
-      //DX [OBSOLETE - best-match shift is expensive]                vCoordDevs.at(i)=coorddev_tmp;
-      //DX [OBSOLETE - best-match shift is expensive]                vfails.at(i)=fail_figure_tmp;
-      //DX [OBSOLETE - best-match shift is expensive]                misfits.at(i)=min;
-      //DX [OBSOLETE - best-match shift is expensive]              }
-      //DX [OBSOLETE - best-match shift is expensive]            }
-      //DX [OBSOLETE - best-match shift is expensive]          }
-      //DX [OBSOLETE - best-match shift is expensive]          */
-      //DX [OBSOLETE - best-match shift is expensive]        }
-      //DX [OBSOLETE - best-match shift is expensive]
-      //DX [OBSOLETE - best-match shift is expensive]        vprotos.clear();
-      //DX [OBSOLETE - best-match shift is expensive]        vprotos=vprotos_tmp;
-      //DX [OBSOLETE - best-match shift is expensive]        vprotos_tmp.clear();
-      //DX [OBSOLETE - best-match shift is expensive]
-      //DX [OBSOLETE - best-match shift is expensive]        if(LDEBUG) {cerr << "compare:: " << "Number of Misfits Computed:	"<<vprotos.size()<<endl;}
-      //DX [OBSOLETE - best-match shift is expensive]
-      //DX [OBSOLETE - best-match shift is expensive]        // ---------------------------------------------------------------------------
-      //DX [OBSOLETE - best-match shift is expensive]        // print results 
-      //DX [OBSOLETE - best-match shift is expensive]        if(vprotos.size()!=0){
-      //DX [OBSOLETE - best-match shift is expensive]
-      //DX [OBSOLETE - best-match shift is expensive]          uint min_index = 0; //DX20180514 - added initialization
-      //DX [OBSOLETE - best-match shift is expensive]          int flag=0;
-      //DX [OBSOLETE - best-match shift is expensive]
-      //DX [OBSOLETE - best-match shift is expensive]          for(i=0; i<misfits.size(); i++){
-      //DX [OBSOLETE - best-match shift is expensive]            if(flag==0){
-      //DX [OBSOLETE - best-match shift is expensive]              min=misfits.at(i);
-      //DX [OBSOLETE - best-match shift is expensive]              min_index=i;
-      //DX [OBSOLETE - best-match shift is expensive]              flag=1;
-      //DX [OBSOLETE - best-match shift is expensive]            }
-      //DX [OBSOLETE - best-match shift is expensive]            else {
-      //DX [OBSOLETE - best-match shift is expensive]              if(misfits.at(i)<min){
-      //DX [OBSOLETE - best-match shift is expensive]                min=misfits.at(i);
-      //DX [OBSOLETE - best-match shift is expensive]                min_index=i;
-      //DX [OBSOLETE - best-match shift is expensive]              }   
-      //DX [OBSOLETE - best-match shift is expensive]            }   
-      //DX [OBSOLETE - best-match shift is expensive]          }	   
-      //DX [OBSOLETE - best-match shift is expensive]
-      //DX [OBSOLETE - best-match shift is expensive]          oss << endl <<"**************************** RESULTS ****************************"<<endl;
-      //DX [OBSOLETE - best-match shift is expensive]          final_misfit=misfits.at(min_index);
-      //DX [OBSOLETE - best-match shift is expensive]          if(misfits.at(min_index)<0.1){
-      //DX [OBSOLETE - best-match shift is expensive]            oss << endl <<"MISFIT" <<":			" << misfits.at(min_index)<<"  STRUCTURES ARE COMPATIBLE" << endl;
-      //DX [OBSOLETE - best-match shift is expensive]            oss <<"----------------------------------------------------"<<endl;
-      //DX [OBSOLETE - best-match shift is expensive]            oss << "Figure of Deviation:	"<< vLattDevs.at(min_index) << endl;
-      //DX [OBSOLETE - best-match shift is expensive]            oss << "Figure of Displacement:	"<<vCoordDevs.at(min_index) << endl;
-      //DX [OBSOLETE - best-match shift is expensive]            oss << "Figure of Failure:	"<<vfails.at(min_index) << endl;
-      //DX [OBSOLETE - best-match shift is expensive]            oss <<"----------------------------------------------------"<<endl;
-      //DX [OBSOLETE - best-match shift is expensive]            printMatch(IM1.at(min_index),IM2.at(min_index),vprotos.at(min_index),xstr_base,oss);
-      //DX [OBSOLETE - best-match shift is expensive]            oss <<"----------------------------------------------------"<<endl;
-      //DX [OBSOLETE - best-match shift is expensive]            oss << "FINAL - REFERENCE STRUCTURE: " << endl;	
-      //DX [OBSOLETE - best-match shift is expensive]            oss << xstr_base << endl;
-      //DX [OBSOLETE - best-match shift is expensive]            oss <<"----------------------------------------------------"<<endl;
-      //DX [OBSOLETE - best-match shift is expensive]            oss << "FINAL - MAPPED STRUCTURE: " << endl;
-      //DX [OBSOLETE - best-match shift is expensive]            oss << vprotos.at(min_index);
-      //DX [OBSOLETE - best-match shift is expensive]          }
-      //DX [OBSOLETE - best-match shift is expensive]          else {
-      //DX [OBSOLETE - best-match shift is expensive]            if(misfits.at(min_index)<0.2){
-      //DX [OBSOLETE - best-match shift is expensive]              oss << endl <<"MISFIT" <<":                    " << misfits.at(min_index)<<"  STRUCTURES ARE IN THE SAME FAMILY" << endl;
-      //DX [OBSOLETE - best-match shift is expensive]            }
-      //DX [OBSOLETE - best-match shift is expensive]            else {
-      //DX [OBSOLETE - best-match shift is expensive]              oss << endl <<"MISFIT" <<":			" << misfits.at(min_index)<<"  STRUCTURES ARE INCOMPATIBLE (No match found)" << endl;
-      //DX [OBSOLETE - best-match shift is expensive]            }
-      //DX [OBSOLETE - best-match shift is expensive]            oss <<"----------------------------------------------------"<<endl;
-      //DX [OBSOLETE - best-match shift is expensive]            oss << "Figure of Deviation:	"<< vLattDevs.at(min_index) << endl;
-      //DX [OBSOLETE - best-match shift is expensive]            oss << "Figure of Displacement:	"<<vCoordDevs.at(min_index) << endl;
-      //DX [OBSOLETE - best-match shift is expensive]            oss << "Figure of Failure:	"<<vfails.at(min_index) << endl;
-      //DX [OBSOLETE - best-match shift is expensive]            oss <<"----------------------------------------------------"<<endl;
-      //DX [OBSOLETE - best-match shift is expensive]            printMatch(IM1.at(min_index),IM2.at(min_index),vprotos.at(min_index),xstr_base,oss);
-      //DX [OBSOLETE - best-match shift is expensive]            oss <<"----------------------------------------------------"<<endl;
-      //DX [OBSOLETE - best-match shift is expensive]            oss << "FINAL - REFERENCE STRUCTURE: " << endl;
-      //DX [OBSOLETE - best-match shift is expensive]            oss << xstr_base << endl;
-      //DX [OBSOLETE - best-match shift is expensive]            oss <<"----------------------------------------------------"<<endl;
-      //DX [OBSOLETE - best-match shift is expensive]            oss << "FINAL - MAPPED STRUCTURE: " << endl;
-      //DX [OBSOLETE - best-match shift is expensive]            oss << vprotos.at(min_index) << endl;
-      //DX [OBSOLETE - best-match shift is expensive]          } 
-      //DX [OBSOLETE - best-match shift is expensive]
-      //DX [OBSOLETE - best-match shift is expensive]          //---------------------------------------------------------------------------//
-      //DX [OBSOLETE - best-match shift is expensive]        }
-      //DX [OBSOLETE - best-match shift is expensive]        else {
-      //DX [OBSOLETE - best-match shift is expensive]          oss << "[ERROR]: No match found!" << endl;
-      //DX [OBSOLETE - best-match shift is expensive]        }
-      //DX [OBSOLETE - best-match shift is expensive]      }
-      //DX [OBSOLETE - best-match shift is expensive]      else { 
-      //DX [OBSOLETE - best-match shift is expensive]        oss << "[ERROR]: No match found!" << endl;
-      //DX [OBSOLETE - best-match shift is expensive]      }
-      //DX [OBSOLETE - best-match shift is expensive]      oss << endl << "*********************  THE END - FINE  **********************" << endl << endl;
-      if(final_misfit<0.1 && !((final_misfit+1.0)<1e-3)){
-        return true;
-      }
-      else {
-        return false;
-      }
-    } //end of criteria_met
-    return false;
+    }
   }
-} //end of compare namespace
+//} //end of compare namespace
 
 // AFLOW-XtalMatch (compare crystal structures)
 // Written by David Hicks (david.hicks@duke.edu) 

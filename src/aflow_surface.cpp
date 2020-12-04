@@ -3704,6 +3704,7 @@ namespace slab {
     if(LDEBUG) {cerr << soliloquy << " starting" << endl;}
 
     int xy_dims=1;          //dimensions of supercell in x-y dimensions
+    xvector<double> null;   //null xvector //DX20201124
 
     xstructure xstr_bulk(xstr_in);xstr_bulk.ReScale(1.0); //do NOT modify further
     double min_dist=xstr_bulk.dist_nn_min;
@@ -3841,7 +3842,8 @@ namespace slab {
 
     //clean up structure
     xstr_slab_origbasis.ReScale(1.0);
-    xstr_slab_origbasis.ShiftOriginToAtom(0);xstr_slab_origbasis.origin=0.0; //reset origin
+    //DX20201124 [OBSOLETE - origin is a xvector not double] xstr_slab_origbasis.ShiftOriginToAtom(0);xstr_slab_origbasis.origin=0.0; //reset origin
+    xstr_slab_origbasis.ShiftOriginToAtom(0); xstr_slab_origbasis.origin=null; //reset origin //DX20201124
     xstr_slab_origbasis.BringInCell();
     xstr_slab_origbasis.clean(); //DX20191220 - uppercase to lowercase clean
 
@@ -3861,7 +3863,8 @@ namespace slab {
 
     //clean up structure
     xstr_slab_newbasis.ReScale(1.0);
-    xstr_slab_newbasis.ShiftOriginToAtom(0);xstr_slab_newbasis.origin=0.0; //reset origin
+    //DX20201124 [OBSOLETE - origin is a xvector not double] xstr_slab_newbasis.ShiftOriginToAtom(0);xstr_slab_newbasis.origin=0.0; //reset origin
+    xstr_slab_newbasis.ShiftOriginToAtom(0); xstr_slab_newbasis.origin=null; //reset origin
     xstr_slab_newbasis.BringInCell();
     xstr_slab_newbasis.clean(); //DX20191220 - uppercase to lowercase clean
 
@@ -3928,7 +3931,8 @@ namespace slab {
 
     //clean up structure
     xstr_slab.ReScale(1.0);
-    xstr_slab.ShiftOriginToAtom(0);xstr_slab.origin=0.0; //reset origin
+    //DX20201124 [OBSOLETE - origin is a xvector not double] xstr_slab.ShiftOriginToAtom(0);xstr_slab.origin=0.0; //reset origin
+    xstr_slab.ShiftOriginToAtom(0); xstr_slab.origin=null; //reset origin //DX20201124
     xstr_slab.BringInCell();
     //xstr_slab.clean();  //clear origin! //do not clear ijk! origin is okay here, only a problem for Rotate() //DX20191220 - uppercase to lowercase clean
 

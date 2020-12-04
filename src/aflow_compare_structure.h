@@ -90,6 +90,7 @@ struct structure_representative {
   string from;
   bool generated;
   xstructure structure;
+  vector<double> nearest_neighbor_distances;
   vector<GroupedWyckoffPosition> grouped_Wyckoff_positions;
   uint number_compounds_matching_structure;
   vector<string> properties_names;
@@ -99,12 +100,25 @@ struct structure_representative {
 };
 
 // ===== structure_matched struct ===== // DX20201119
+// a friend of the structure_representative struct 
+struct structure_matched : structure_representative { // friend
+  structure_misfit misfit_info;
+  xmatrix<double> rotation;
+  xmatrix<double> basis_transformation;
+  xvector<double> origin_shift;
+  vector<uint> atom_map;
+  vector<uint> basis_map;
+  vector<double> distances_mapped;
+};
+/*
+// ===== structure_matched struct ===== // DX20201119
 struct structure_matched {
   string name;
   string compound;
   string from;
   bool generated;
   xstructure structure;
+  vector<double> nearest_neighbor_distances;
   vector<GroupedWyckoffPosition> grouped_Wyckoff_positions;
   bool is_representative;
   structure_misfit misfit_info;
@@ -113,6 +127,7 @@ struct structure_matched {
   xvector<double> origin_shift;
   vector<uint> atom_map;
   vector<uint> basis_map;
+  vector<double> distances_mapped;
   string comparison_log; // perhaps can print this on-the-fly instead of storing
   uint number_compounds_matching_structure;
   vector<string> properties_names;
@@ -120,10 +135,12 @@ struct structure_matched {
   vector<string> properties_types;
   vector<string> properties; //needs to be static variable type in AFLOW, not required for JSON
 };
+*/
 namespace compare{
-  structure_representative initializeStructureRepresentativeStruct(xstructure& structure);
+  structure_representative initializeStructureRepresentativeStruct();
+  structure_representative initializeStructureRepresentativeStruct(const xstructure& structure);
   structure_matched initialize_structure_matched_struct();
-  structure_matched initializeStructureMatched(xstructure& structure);
+  structure_matched initializeStructureMatched(const xstructure& structure);
 }
 
 //DX 20201119
@@ -222,11 +239,34 @@ class StructurePrototype{
 
 class XtalFinderCalculator{
   public:
-  // attributes
-  double misfit_match;
-  double misfit_family;
-  vector<structure_matched*> structure_containers;  // stores structures in a container (pointer for easy manipulation and mobility)
-  vector<StructurePrototype> structure_prototypes; // stores the equivalent structure information
+    XtalFinderCalculator(uint num_proc_input=1);
+    XtalFinderCalculator(
+        const double& misfit_match_input,
+        const double& misfit_family_input,
+        uint num_proc_input=1);
+    ~XtalFinderCalculator();                                                                  // destructor operator
+    friend ostream& operator<<(ostream& oss, const XtalFinderCalculator& XtalFinderCalculator); // stringstream operator (printing)
+    const XtalFinderCalculator& operator=(const XtalFinderCalculator& b);                       // assignment operator
+    XtalFinderCalculator(const XtalFinderCalculator& b);                                        // copy constructor
+    // attributes
+    double misfit_match;
+    double misfit_family;
+    uint num_proc;
+    vector<structure_representative> structure_containers;  // stores structures in a container (pointer for easy manipulation and mobility)
+    vector<structure_matched> structure_matched_containers;  // stores structures in a container (will make StructurePrototype a pointer to this)
+    //DX20201130  - should we have this? vector<StructurePrototype> structure_prototypes; // stores the equivalent structure information
+
+
+    //methods
+    void compareStructures(structure_representative& str_rep,
+        structure_matched& str_matched, 
+        bool same_species,
+        bool scale_volume,
+        bool optimize_match);
+    void compareStructuresFromStructureList(vector<string>& filenames, vector<string>& magmoms_for_systems, ostream& oss, ofstream& FileMESSAGE, uint& num_proc, bool same_species, const aurostd::xoption& comparison_options); //DX20200103 - condensed bools to xoptions
+  private:
+    void free();                                                                            // free operator
+    void copy(const XtalFinderCalculator& b);                                                 // copy constructor
 };
 
 
@@ -627,6 +667,7 @@ namespace compare{
   //                        vector<xvector<double> >& lattice_vecs,
   //                        vector<vector<uint> >& ij_index); // 1 bracket
   bool buildSimilarLattices(vector<xvector<double> >& translation_vectors, xmatrix<double>& q1, double& xstr1_vol, double& abs_det_q1, xvector<double>& abc_angles_q1, vector<xmatrix<double> >& lattices, vector<xmatrix<double> >& clattices, vector<double>& latt_devs, bool optimize_match, bool scale_volume); //DX20200422 - scale volume
+  bool buildSimilarLattices(vector<xvector<double> >& translation_vectors, xmatrix<double>& q1, vector<xmatrix<double> >& lattices, vector<double>& latt_devs, bool optimize_match, bool scale_volume); //DX20200422 - scale volume //DX20201130 - NEW
   //  bool structureSearch(const string& lfa,
   //                        const vector<double>& all_nn1,
   //			                  const xstructure& xstr_supercell, //DX20190530 - added "_supercell"; more descriptive 
@@ -681,6 +722,14 @@ namespace compare{
       uint& matching_lattice_index, //DX20201023
       xvector<double>& matching_origin_shift, //DX20201023
       bool optimize_match); //DX20201120
+  bool commonOriginSearch2(
+      const xstructure& xstr1,
+      const vector<double>& all_nn1,
+      const string& lfa,
+      const int type_match,
+      vector<structure_matched>& vstrs_matched_transformed,
+      const uint start_index, const uint end_index,
+      bool optimize_match); //DX20201123
   // [OBSOLETE - DX20190717]bool structureSearch(const string& lfa,
   // [OBSOLETE - DX20190717]                      const vector<double>& all_nn1,
   // [OBSOLETE - DX20190717]                      const xstructure& xstr,
