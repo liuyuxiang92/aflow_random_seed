@@ -220,6 +220,89 @@ namespace apl {
     }
   }
 
+  // AS20201204 BEGIN
+  void PhononCalculator::setHarmonicForceConstants(
+      const vector<vector<xmatrix<double> > > &IFC,
+      const vector<xmatrix<double> > &bornEffectiveChargeTensor,
+      const xmatrix<double> &dielectricTensor,
+      bool isPolar)
+  {
+    string function="PhononCalculator::setHarmonicForceConstants():";
+    string message="";
+    // check if the input IFCs have correct size
+    uint natoms = _supercell.getInputStructure().atoms.size();
+    if (IFC.size() != natoms){
+      message = "The supplied IFC has wrong size: ";
+      message += aurostd::utype2string(IFC.size()) + " instead of ";
+      message += aurostd::utype2string(natoms);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _INDEX_MISMATCH_);
+      for (uint i=0; i<natoms; i++){
+        if (IFC[i].size() != natoms){
+          message = "The supplied IFC["+aurostd::utype2string(i);
+          message += "] has wrong size: ";
+          message += aurostd::utype2string(IFC.size()) + " instead of ";
+          message += aurostd::utype2string(natoms);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _INDEX_MISMATCH_);
+        }
+
+        for (uint j=0; j<natoms; j++){
+          if ((IFC[i][j].rows != 3) && (IFC[i][j].cols != 3)){
+            message = "The supplied IFC["+aurostd::utype2string(i)+"][";
+            message += aurostd::utype2string(j)+"] has wrong size: ";
+            message += aurostd::utype2string(IFC[i][j].rows)+"x"+aurostd::utype2string(IFC[i][j].cols);
+            message += " instead of 3x3";
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _INDEX_MISMATCH_);
+          }
+        }
+      }
+    }
+
+    _forceConstantMatrices = IFC;
+    _isPolarMaterial = isPolar;
+    if (isPolar){
+      if (bornEffectiveChargeTensor.size() != natoms){
+        message = "The supplied bornEffectiveChargeTensor has wrong size: ";
+        message += aurostd::utype2string(bornEffectiveChargeTensor.size()) + " instead of ";
+        message += aurostd::utype2string(natoms);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _INDEX_MISMATCH_);
+
+        for (uint i=0; i<bornEffectiveChargeTensor.size(); i++){
+          if ((bornEffectiveChargeTensor[i].rows != 3) &&
+              (bornEffectiveChargeTensor[i].cols != 3)){
+            message = "The supplied bornEffectiveChargeTensor["+aurostd::utype2string(i);
+            message += "] has wrong size: ";
+            message += aurostd::utype2string(bornEffectiveChargeTensor[i].rows);
+            message += "x"+aurostd::utype2string(bornEffectiveChargeTensor[i].cols);
+            message += " instead of 3x3";
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _INDEX_MISMATCH_);
+          }
+        }
+      }
+
+      if ((dielectricTensor.rows != 3) && (dielectricTensor.cols != 3)){
+            message = "The supplied dielectricTensor has wrong size: ";
+            message += aurostd::utype2string(dielectricTensor.rows)+"x"+aurostd::utype2string(dielectricTensor.cols);
+            message += " instead of 3x3";
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _INDEX_MISMATCH_);
+      }
+
+      _bornEffectiveChargeTensor = bornEffectiveChargeTensor;
+      _dielectricTensor = dielectricTensor;
+      _inverseDielectricTensor = inverse(dielectricTensor);
+      _recsqrtDielectricTensorDeterminant = 1.0/sqrt(determinant(_dielectricTensor));
+    }
+  }
+
+  void PhononCalculator::setHarmonicForceConstants(const vector<vector<xmatrix<double> > > &IFC)
+  {
+      vector<xmatrix<double> > bornEffectiveChargeTensor;//dummy object, material is not polar
+      xmatrix<double> dielectricTensor;//dummy object, material is not polar
+
+      // set only IFC, material is not polar
+      setHarmonicForceConstants(IFC, bornEffectiveChargeTensor, dielectricTensor, false);
+  }
+  // AS20201204 END
+
   void PhononCalculator::awake() {
     string base = _directory + "/" + DEFAULT_APL_FILE_PREFIX;
     readHarmonicIFCs(aurostd::CleanFileName(base + DEFAULT_APL_HARMIFC_FILE));

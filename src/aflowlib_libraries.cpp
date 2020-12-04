@@ -1209,7 +1209,7 @@ namespace aflowlib {
       if(aurostd::FileExist(directory_LIB+"/AECCAR0.static"+XHOST.vext.at(iext)) && aurostd::FileExist(directory_LIB+"/AECCAR2.static"+XHOST.vext.at(iext))) perform_BADER=TRUE;
       if(aurostd::FileExist(directory_LIB+"/aflow.agl.out"+XHOST.vext.at(iext))) perform_AGL=TRUE;
       if(aurostd::FileExist(directory_LIB+"/aflow.ael.out"+XHOST.vext.at(iext))) perform_AEL=TRUE;
-      if(aurostd::FileExist(directory_LIB+"/aflow.qha.out"+XHOST.vext.at(iext))) perform_QHA=TRUE;//AS20200831
+      if(aurostd::FileExist(directory_LIB+"/"+DEFAULT_QHA_FILE_PREFIX+"out"+XHOST.vext.at(iext))) perform_QHA=TRUE;//AS20200831
       if(aurostd::FileExist(directory_LIB+"/"+POCC_FILE_PREFIX+POCC_UNIQUE_SUPERCELLS_FILE+XHOST.vext.at(iext))) perform_POCC=TRUE; //CO20200624
     }
     if((perform_THERMODYNAMICS || perform_BANDS || perform_STATIC)){perform_PATCH=true;} //CO20200624
@@ -1469,11 +1469,21 @@ namespace aflowlib {
       cout << soliloquy << " QHA LOOP ---------------------------------------------------------------------------------" << endl;
       aflowlib::LIB2RAW_Loop_QHA(directory_LIB,directory_RAW,vfile,aflowlib_data,soliloquy+" (qha):");
       if(flag_WEB) {
-        if(aurostd::FileExist(directory_RAW+"/aflow.qha.out")) aurostd::LinkFile(directory_RAW+"/aflow.qha.out",directory_WEB);
-        if(aurostd::FileExist(directory_RAW+"/aflow.qha.thermo.out")) aurostd::LinkFile(directory_RAW+"/aflow.qha.thermo.out",directory_WEB);
-        if(aurostd::FileExist(directory_RAW+"/aflow.qha.FVT.out")) aurostd::LinkFile(directory_RAW+"/aflow.qha.thermo.out",directory_WEB);
-        if(aurostd::FileExist(directory_RAW+"/aflow.qha.dispersion_phonon.T300K.out")) aurostd::LinkFile(directory_RAW+"/aflow.qha.dispersion_phonon.T300K.out",directory_WEB);
-        if(aurostd::FileExist(directory_RAW+"/aflow.qha.dispersion_phonon.T300K.json")) aurostd::LinkFile(directory_RAW+"/aflow.qha.dispersion_phonon.T300K.json",directory_WEB);
+        if(aurostd::FileExist(directory_RAW+"/"+DEFAULT_QHA_FILE_PREFIX+"out")){
+          aurostd::LinkFile(directory_RAW+"/"+DEFAULT_QHA_FILE_PREFIX+"out",directory_WEB);
+        }
+        if(aurostd::FileExist(directory_RAW+"/"+DEFAULT_QHA_FILE_PREFIX+DEFAULT_QHA_THERMO_FILE)){
+          aurostd::LinkFile(directory_RAW+"/"+DEFAULT_QHA_FILE_PREFIX+DEFAULT_QHA_THERMO_FILE,directory_WEB);
+        }
+        if(aurostd::FileExist(directory_RAW+"/"+DEFAULT_QHA_FILE_PREFIX+DEFAULT_QHA_FVT_FILE)){
+          aurostd::LinkFile(directory_RAW+"/"+DEFAULT_QHA_FILE_PREFIX+DEFAULT_QHA_FVT_FILE,directory_WEB);
+        }
+        if(aurostd::FileExist(directory_RAW+"/"+DEFAULT_QHA_FILE_PREFIX+DEFAULT_QHA_PDIS_FILE+".T300K.out")){
+          aurostd::LinkFile(directory_RAW+"/"+DEFAULT_QHA_FILE_PREFIX+DEFAULT_QHA_PDIS_FILE+".T300K.out",directory_WEB);
+        }
+        if(aurostd::FileExist(directory_RAW+"/"+DEFAULT_QHA_FILE_PREFIX+DEFAULT_QHA_PDIS_FILE+".T300K.json")){
+          aurostd::LinkFile(directory_RAW+"/"+DEFAULT_QHA_FILE_PREFIX+DEFAULT_QHA_PDIS_FILE+".T300K.json",directory_WEB);
+        }
 
         // link all QHA plots
         vector<string> files;
@@ -5400,21 +5410,24 @@ namespace aflowlib {
     vector<string> vline,tokens;
     stringstream aflow_qha_out;
 
-    if(aurostd::FileExist(directory_LIB+"/"+"aflow.qha.out") || aurostd::EFileExist(directory_LIB+"/"+"aflow.qha.out")) {
+    if(aurostd::EFileExist(directory_LIB+"/"+DEFAULT_QHA_FILE_PREFIX+"out")){//"aflow.qha.out"
       aflowlib::LIB2RAW_FileNeeded(directory_LIB,"aflow_qha.in",directory_RAW,"aflow_qha.in",vfile,MESSAGE);
-      aflowlib::LIB2RAW_FileNeeded(directory_LIB,"aflow.qha.out",directory_RAW,"aflow.qha.out",vfile,MESSAGE);
-      aflowlib::LIB2RAW_FileNeeded(directory_LIB,"aflow.qha.thermo.out",directory_RAW,"aflow.qha.thermo.out",vfile,MESSAGE);
-      aflowlib::LIB2RAW_FileNeeded(directory_LIB,"aflow.qha.FVT.out",directory_RAW,"aflow.qha.FVT.out",vfile,MESSAGE);
-      aflowlib::LIB2RAW_FileNeeded(directory_LIB,"aflow.qha.dispersion_phonon.T300K.out",directory_RAW,
-          "aflow.qha.dispersion_phonon.T300K.out",vfile,MESSAGE);
-      aflowlib::LIB2RAW_FileNeeded(directory_LIB,"PHPOSCAR",directory_RAW,"PHPOSCAR",vfile,MESSAGE);
+      aflowlib::LIB2RAW_FileNeeded(directory_LIB,DEFAULT_QHA_FILE_PREFIX+"out",directory_RAW,DEFAULT_QHA_FILE_PREFIX+"out",vfile,MESSAGE);//"aflow.qha.out"
+      aflowlib::LIB2RAW_FileNeeded(directory_LIB,DEFAULT_QHA_FILE_PREFIX+DEFAULT_QHA_THERMO_FILE,
+          directory_RAW,DEFAULT_QHA_FILE_PREFIX+DEFAULT_QHA_THERMO_FILE ,vfile,MESSAGE);
+      aflowlib::LIB2RAW_FileNeeded(directory_LIB,DEFAULT_QHA_FILE_PREFIX+DEFAULT_QHA_FVT_FILE,
+          directory_RAW,DEFAULT_QHA_FILE_PREFIX+DEFAULT_QHA_FVT_FILE,vfile,MESSAGE);
+      aflowlib::LIB2RAW_FileNeeded(directory_LIB,DEFAULT_QHA_FILE_PREFIX+DEFAULT_QHA_PDIS_FILE+".T300K.out",
+          directory_RAW,DEFAULT_QHA_FILE_PREFIX+DEFAULT_QHA_PDIS_FILE+".T300K.out",vfile,MESSAGE);
+      aflowlib::LIB2RAW_FileNeeded(directory_LIB,DEFAULT_APL_PHPOSCAR_FILE,
+          directory_RAW, DEFAULT_APL_PHPOSCAR_FILE, vfile,MESSAGE);
       aflowlib::LIB2RAW_FileNeeded(directory_LIB,DEFAULT_QHA_FILE_PREFIX+DEFAULT_QHA_KPOINTS_FILE,
           directory_RAW,DEFAULT_QHA_FILE_PREFIX+DEFAULT_QHA_KPOINTS_FILE,vfile,MESSAGE);
 
 
       // read QHA data from the aflow.qha.out file
-      if(AFLOWLIB_VERBOSE) cout << MESSAGE << " loading " << string(directory_RAW+"/"+"aflow.qha.out") << endl;
-      aurostd::ExtractToStringstreamEXPLICIT(aurostd::efile2string(directory_RAW+"/"+"aflow.qha.out"),aflow_qha_out,"[QHA_RESULTS]START","[QHA_RESULTS]STOP");
+      if(AFLOWLIB_VERBOSE) cout << MESSAGE << " loading " << string(directory_RAW+"/"+DEFAULT_QHA_FILE_PREFIX+"out") << endl;
+      aurostd::ExtractToStringstreamEXPLICIT(aurostd::efile2string(directory_RAW+"/"+DEFAULT_QHA_FILE_PREFIX+"out"),aflow_qha_out,"[QHA_RESULTS]START","[QHA_RESULTS]STOP");
       aurostd::stream2vectorstring(aflow_qha_out,vline);
       for (uint i=0;i<vline.size();i++) {
         aurostd::StringSubst(vline.at(i),"="," ");
@@ -5440,7 +5453,7 @@ namespace aflowlib {
       }
 
       // plot thermodynamic
-      if (aurostd::EFileExist(directory_LIB+"/"+"aflow.qha.thermo.out")){
+      if (aurostd::EFileExist(directory_LIB+"/"+DEFAULT_QHA_FILE_PREFIX+DEFAULT_QHA_THERMO_FILE)){
         if (AFLOWLIB_VERBOSE) cout << MESSAGE << " plotting QHA thermodynamic data " << endl;
         aurostd::xoption opt;
         opt.flag("PLOT_THERMO_QHA", true);
@@ -5451,16 +5464,15 @@ namespace aflowlib {
       }
 
       // convert T-dependent phonon dispersions to JSON file
-      if (aurostd::EFileExist(directory_RAW+"/aflow.qha.dispersion_phonon.T300K.out")
-          && aurostd::EFileExist(directory_RAW+"/PHPOSCAR") 
-          && aurostd::EFileExist(directory_RAW+"/"+DEFAULT_QHA_FILE_PREFIX+
-            DEFAULT_QHA_KPOINTS_FILE)){
+      if (aurostd::EFileExist(directory_RAW+"/"+DEFAULT_QHA_FILE_PREFIX+DEFAULT_QHA_PDIS_FILE+".T300K.out")
+          && aurostd::EFileExist(directory_RAW+"/"+DEFAULT_APL_PHPOSCAR_FILE) 
+          && aurostd::EFileExist(directory_RAW+"/"+DEFAULT_QHA_FILE_PREFIX+DEFAULT_QHA_KPOINTS_FILE)){
         if (AFLOWLIB_VERBOSE) cout << MESSAGE << " converting T-dependent phonon dispersions to JSON format " << endl;
         stringstream json;
         xoption xopt;
-        xstructure xstr(directory_RAW+"/PHPOSCAR");
+        xstructure xstr(directory_RAW+"/"+DEFAULT_APL_PHPOSCAR_FILE);
         xKPOINTS   xkpts(directory_RAW+"/"+DEFAULT_QHA_FILE_PREFIX+DEFAULT_QHA_KPOINTS_FILE);
-        xEIGENVAL xeig(directory_RAW+"/aflow.qha.dispersion_phonon.T300K.out");
+        xEIGENVAL xeig(directory_RAW+"/"+DEFAULT_QHA_FILE_PREFIX+DEFAULT_QHA_PDIS_FILE+".T300K.out");
         xopt.push_attached("EFERMI","0.0");
         xopt.push_attached("OUTPUT_FORMAT","JSON");
         xopt.push_attached("DIRECTORY",directory_RAW);
@@ -5470,7 +5482,7 @@ namespace aflowlib {
         plotter::JSONend(json);
         plotter::JSONfinish(json);
 
-        aurostd::stringstream2file(json, directory_RAW + "/aflow.qha.dispersion_phonon.T300K.json");
+        aurostd::stringstream2file(json, directory_RAW + "/"+DEFAULT_QHA_FILE_PREFIX+DEFAULT_QHA_PDIS_FILE+".T300K.json");
       }
     } else {
       return FALSE;
@@ -6993,7 +7005,10 @@ namespace aflowlib {
         run_directory = true;
 
         // clean QHA output files
-        aurostd::RemoveFile(directory_LIB+"/aflow.*qha*");
+        aurostd::RemoveFile(directory_LIB+"/"+DEFAULT_QHA_FILE_PREFIX+"*");
+        aurostd::RemoveFile(directory_LIB+"/"+DEFAULT_QHA3P_FILE_PREFIX+"*");
+        aurostd::RemoveFile(directory_LIB+"/"+DEFAULT_QHANP_FILE_PREFIX+"*");
+        aurostd::RemoveFile(directory_LIB+"/"+DEFAULT_SCQHA_FILE_PREFIX+"*");
         aurostd::RemoveFile(directory_LIB+"/*qha*png*");
 
         if(aurostd::FileExist(directory_LIB+"/LOCK.qha")) {

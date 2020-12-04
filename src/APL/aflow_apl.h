@@ -526,6 +526,9 @@ namespace apl {
 
       // IFCs
       void setHarmonicForceConstants(const ForceConstantCalculator&);
+      void setHarmonicForceConstants(const vector<vector<xmatrix<double> > > &);//AS20201204
+      void setHarmonicForceConstants(const vector<vector<xmatrix<double> > > &,
+            const vector<xmatrix<double> >&, const xmatrix<double> &, bool isPolar=true);//AS20201204
       void awake();
       void setAnharmonicForceConstants(const AnharmonicIFCs&);
       void readAnharmonicIFCs(string);
@@ -698,12 +701,12 @@ namespace apl {
 
     public:
       DOSCalculator();
-      DOSCalculator(PhononCalculator&, const string&, const vector<xvector<double> >&);
+      DOSCalculator(PhononCalculator&, const xoption&);//AS20201203 input parameters are passed via xoption
       DOSCalculator(const DOSCalculator&);
       DOSCalculator& operator=(const DOSCalculator&);
       ~DOSCalculator();
       void clear(PhononCalculator&);
-      void initialize(const vector<xvector<double> >&, const string&);
+      void initialize(const xoption&);//AS20201203 input parameters are passed via xoption
       void calc(int);
       void calc(int, double);
       void calc(int, double, double, double);  //ME20200203
@@ -1207,36 +1210,36 @@ namespace apl
       void   calcCVandGP(double T, double &CV, double &GP);
       void   calcCVandGPfit(double T, double V, double &CV, double &GP);
       double calcGPinfFit(double V);
-      double FreeEnergy(double T, int id);
-      double FreeEnergyFit(double T, double V, EOSmethod eos_method, QHAmethod method);
-      double electronicFreeEnergy(double T, int id);
-      double ChemicalPotential(double T, int Vid);
-      double IDOS(double e, double T, xEIGENVAL &eig);
-      xvector<double> electronicFreeEnergySommerfeld(double T);
-      xvector<double> DOSatEf();
-      double InternalEnergyFit(double T, double V, EOSmethod method);
+      double calcFreeEnergy(double T, int id);
+      double calcFreeEnergyFit(double T, double V, EOSmethod eos_method, QHAmethod method);
+      double calcElectronicFreeEnergy(double T, int id);
+      double calcChemicalPotential(double T, int Vid);
+      double calcIDOS(double e, double T, xEIGENVAL &eig);
+      xvector<double> calcElectronicFreeEnergySommerfeld(double T);
+      xvector<double> calcDOSatEf();
+      double calcInternalEnergyFit(double T, double V, EOSmethod method);
       xvector<double> fitToEOSmodel(xvector<double> &E, EOSmethod method);
       double evalEOSmodel(double V, const xvector<double> &p, EOSmethod eos_method);
-      double BulkModulus(double V, const xvector<double> &parameters, EOSmethod method);
-      double Bprime(double V, const xvector<double> &parameters, EOSmethod method);
-      double EOS2Pressure(double V, const xvector<double> &parameters, EOSmethod method);
-      double EquilibriumVolume(const xvector<double> &parameters, EOSmethod method);
-      double Entropy(double T, double V, EOSmethod eos_method, QHAmethod method);
+      double calcBulkModulus(double V, const xvector<double> &parameters, EOSmethod method);
+      double calcBprime(double V, const xvector<double> &parameters, EOSmethod method);
+      double calcEOS2Pressure(double V, const xvector<double> &parameters, EOSmethod method);
+      double calcEquilibriumVolume(const xvector<double> &parameters, EOSmethod method);
+      double calcEntropy(double T, double V, EOSmethod eos_method, QHAmethod method);
       double getEqVolumeT(double T, EOSmethod eos_method, QHAmethod method);
-      double ThermalExpansion(double T, EOSmethod eos_method, QHAmethod method);
-      double IsochoricSpecificHeat(double T, double V, EOSmethod eos_method, 
+      double calcThermalExpansion(double T, EOSmethod eos_method, QHAmethod method);
+      double calcIsochoricSpecificHeat(double T, double V, EOSmethod eos_method, 
           QHAmethod qha_method);
       // QHA3P and SCQHA and QHANP
       double extrapolateFrequency(double V, const xvector<double> &xomega, QHAmethod qha_method);
       double extrapolateGrueneisen(double V, const xvector<double> &xomega, QHAmethod qha_method);
       // QHA3P
-      double FreeEnergyTaylorExpansion(double T, int Vid, QHAmethod qha_method);
-      double InternalEnergyTaylorExpansion(double T, double V, QHAmethod qha_method);
+      double calcFreeEnergyTaylorExpansion(double T, int Vid, QHAmethod qha_method);
+      double calcInternalEnergyTaylorExpansion(double T, double V, QHAmethod qha_method);
       // SCQHA
-      double VPgamma(double T, double V);
-      double SCQHAgetEquilibriumVolume(double T, EOSmethod method);
-      double SCQHAgetEquilibriumVolume(double T, double Vguess, xvector<double> &fit_params, EOSmethod method);
-      void   RunSCQHA(EOSmethod method, bool all_iterations_self_consistent=true,
+      double calcVPgamma(double T, double V);
+      double calcSCQHAequilibriumVolume(double T, EOSmethod method);
+      double calcSCQHAequilibriumVolume(double T, double Vguess, xvector<double> &fit_params, EOSmethod method);
+      void   runSCQHA(EOSmethod method, bool all_iterations_self_consistent=true,
           const string &directory=".");
       // output
       void   writeThermalProperties(EOSmethod eos_method, QHAmethod qha_method, 
@@ -1262,7 +1265,7 @@ namespace apl
       bool isEOS;
       bool isGP_FD;
       bool ignore_imaginary;
-      bool runQHA, runQHA3P, runSCQHA, runQHANP;
+      bool isQHA, isQHA3P, isSCQHA, isQHANP;
       bool isInitialized;
       bool includeElectronicContribution;
       bool doSommerfeldExpansion;
@@ -1302,7 +1305,6 @@ namespace apl
       vector<xEIGENVAL> gp_ph_dispersions;
       vector<xEIGENVAL> eos_ph_dispersions;
       vector<ThermalPropertiesCalculator> eos_vib_thermal_properties;
-      vector<vector<vector<xmatrix< double > > > > harmonicFC;
       //
       vector<string> subdirectories_apl_eos;
       vector<string> subdirectories_apl_gp;
