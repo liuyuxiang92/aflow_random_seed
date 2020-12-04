@@ -14,8 +14,7 @@
 
 #define _KVASP_VASP_SLEEP_   2
 #define _KVASP_WAIT_SLEEP_   10
-#define _KVASP_CHECK_SLEEP_  60
-//#define _KVASP_CHECK_SLEEP_  10
+#define _KVASP_CHECK_SLEEP_  30 //CO20201111  //60   //10
 #define KBIN_WRONG_ENTRY_STRING string("WRONG_ENTRY")
 #define KBIN_WRONG_ENTRY_NUMBER -123
 
@@ -3264,6 +3263,7 @@ namespace KBIN {
           vasp_start=FALSE;
         }
       }
+      KBIN::WaitFinished(xvasp,aflags,FileMESSAGE,2,true);  //CO20201111 - try twice and verbose
       if(LDEBUG) cerr << soliloquy << " " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << "  [2]" << endl;
 
       if(aurostd::FileEmpty(xvasp.Directory+"/vasp.out"))  {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  ERROR KBIN::VASP_Run: "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  Empty vasp.out ");return FALSE;}
@@ -3293,6 +3293,7 @@ namespace KBIN {
       if(nrun<maxrun) {  
         if(LDEBUG) cerr << soliloquy << " " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << "  checking warnings" << endl;
         xmessage.flag("REACHED_ACCURACY",aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","reached required accuracy"));
+        xwarning.flag("OUTCAR_INCOMPLETE",!KBIN::VASP_RunFinished(xvasp,aflags,FileMESSAGE,false));  //CO20201111
         xwarning.flag("KKSYM",aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","Reciprocal lattice and k-lattice belong to different class of lattices"));
         xwarning.flag("SGRCON",aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","VERY BAD NEWS! internal error in subroutine SGRCON"));
         xwarning.flag("NIRMAT",aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","Found some non-integer element in rotation matrix"));
@@ -3383,6 +3384,7 @@ namespace KBIN {
           if(wdebug) aus << "MMMMM  MESSAGE VASP_release=" << xwarning.getattachedscheme("SVERSION") << endl;
           if(wdebug) aus << "MMMMM  MESSAGE VASP_version=" << xwarning.getattachedscheme("DVERSION") << endl;
           if(wdebug) aus << "MMMMM  MESSAGE AFLOW_version=" << AFLOW_VERSION << endl;
+          if(wdebug || xwarning.flag("OUTCAR_INCOMPLETE")) aus << "MMMMM  MESSAGE xwarning.flag(\"OUTCAR_INCOMPLETE\")=" << xwarning.flag("OUTCAR_INCOMPLETE") << endl; //CO20201111
           if(wdebug || xwarning.flag("BRMIX")) aus << "MMMMM  MESSAGE xwarning.flag(\"BRMIX\")=" << xwarning.flag("BRMIX") << endl;
           if(wdebug || xwarning.flag("CSLOSHING")) aus << "MMMMM  MESSAGE xwarning.flag(\"CSLOSHING\")=" << xwarning.flag("CSLOSHING") << endl;
           if(wdebug || xwarning.flag("DAV")) aus << "MMMMM  MESSAGE xwarning.flag(\"DAV\")=" << xwarning.flag("DAV") << endl;
@@ -3451,6 +3453,16 @@ namespace KBIN {
 
         if(LDEBUG) cerr << soliloquy << " " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << "  [6]" << endl;
 
+        // ********* CHECK OUTCAR PROBLEMS ******************
+        if(LDEBUG) cerr << soliloquy << " " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << "  [CHECK OUTCAR PROBLEMS]" << endl;  //CO20201111
+        if(!xfixed.flag("ALL")) {
+          if(xwarning.flag("OUTCAR_INCOMPLETE") && !xfixed.flag("OUTCAR_INCOMPLETE")) {
+            KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  OUTCAR problems ");
+            aus << "WWWWW  RERUNNING TO FIX OUTCAR - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+            aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+            xfixed.flag("OUTCAR_INCOMPLETE",TRUE);xfixed.flag("ALL",TRUE);
+          }
+        }
         // ********* CHECK NBANDS PROBLEMS ******************
         if(LDEBUG) cerr << soliloquy << " " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << "  [CHECK NBANDS PROBLEMS]" << endl;
         if(!vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("NBANDS") && !xfixed.flag("ALL")) { // check NBANDS
@@ -3989,6 +4001,7 @@ namespace KBIN {
     aurostd::StringstreamClean(aus_exec);
     aus_exec << "cd " << xvasp.Directory << endl;
     aus_exec << "rm -f aflow.check_outcar.tmp " << endl;
+    //CO20201111 - not super efficient with cat/grep into file, but it's safe for the sapces, may change later
     if(aurostd::substring_present_file(xvasp.Directory+"/aflow.check_outcar.tmp",aurostd::RemoveWhiteSpaces("Total CPU time used (sec)"),TRUE)) {
       if(verbose) aus << "00000  MESSAGE RUN FINISHED (OUTCAR is complete) : " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       if(verbose) aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -4004,8 +4017,9 @@ namespace KBIN {
 } // namespace KBIN
 
 namespace KBIN {
-  void WaitFinished(_xvasp &xvasp,_aflags &aflags,ofstream &FileMESSAGE,bool verbose) {
-    while(!KBIN::VASP_RunFinished(xvasp,aflags,FileMESSAGE,verbose)) {
+  void WaitFinished(_xvasp &xvasp,_aflags &aflags,ofstream &FileMESSAGE,uint max_count,bool verbose) {
+    uint i=0;
+    while((i++)<max_count && !KBIN::VASP_RunFinished(xvasp,aflags,FileMESSAGE,verbose)) {
       aurostd::Sleep(_KVASP_CHECK_SLEEP_);
     }
   }
