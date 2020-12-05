@@ -488,42 +488,15 @@ namespace aflowML {
         else{throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown env: "+env,_RUNTIME_ERROR_);}
         i=0;
         has_NaN=false;
-        if(property_element=="lattice_constants"||property_element=="lattice_angles"){
-          { //so it goes out of scope
-            const xvector<double>& xvec=xel_cation.getPropertyXVectorDouble(property_element);
-            d=xvec[xvec.lrows+index_vec];
-            has_NaN=(has_NaN || aurostd::isNaN(d));
-            for(j=0;j<ncation;j++){xvec_env[xvec_env.lrows+(i++)]=d;}
-          }
-          { //so it goes out of scope
-            const xvector<double>& xvec=xel_anion.getPropertyXVectorDouble(property_element);
-            d=xvec[xvec.lrows+index_vec];
-            has_NaN=(has_NaN || aurostd::isNaN(d));
-            for(j=0;j<nanion;j++){xvec_env[xvec_env.lrows+(i++)]=d;}
-          }
-        }
-        else if(property_element=="energies_ionization"){
-          { //so it goes out of scope
-            const vector<double>& vec=xel_cation.getPropertyVectorDouble(property_element);
-            d=vec[index_vec];
-            has_NaN=(has_NaN || aurostd::isNaN(d));
-            for(j=0;j<ncation;j++){xvec_env[xvec_env.lrows+(i++)]=d;}
-          }
-          { //so it goes out of scope
-            const vector<double>& vec=xel_anion.getPropertyVectorDouble(property_element);
-            d=vec[index_vec];
-            has_NaN=(has_NaN || aurostd::isNaN(d));
-            for(j=0;j<nanion;j++){xvec_env[xvec_env.lrows+(i++)]=d;}
-          }
-        }
-        else{
-          d=xel_cation.getPropertyDouble(property_element);
-          has_NaN=(has_NaN || aurostd::isNaN(d));
-          for(j=0;j<ncation;j++){xvec_env[xvec_env.lrows+(i++)]=d;}
-          d=xel_anion.getPropertyDouble(property_element);
-          has_NaN=(has_NaN || aurostd::isNaN(d));
-          for(j=0;j<nanion;j++){xvec_env[xvec_env.lrows+(i++)]=d;}
-        }
+        //cation
+        d=xel_cation.getPropertyDouble(property_element,index_vec);
+        has_NaN=(has_NaN || aurostd::isNaN(d));
+        for(j=0;j<ncation;j++){xvec_env[xvec_env.lrows+(i++)]=d;}
+        //anion
+        d=xel_anion.getPropertyDouble(property_element,index_vec);
+        has_NaN=(has_NaN || aurostd::isNaN(d));
+        for(j=0;j<nanion;j++){xvec_env[xvec_env.lrows+(i++)]=d;}
+        //
         if(has_NaN==false && divide_by_adjacency){xvec_env/=std::ceil(M_X_bonds);}
         if(LDEBUG){
           cerr << soliloquy << " xvec[\""+property+"\"]=" << xvec_env << endl;
@@ -557,7 +530,7 @@ namespace aflowML {
     vector<string> vproperties_elements_full;aurostd::string2tokens(_AFLOW_XELEMENT_PROPERTIES_ALL_,vproperties_elements_full,",");
     vector<string> vproperties_elements_numbers;
 
-    //aurostd::string2tokens("symbol,Z,period,group,mass,volume_molar,volume,valence_std,valence_iupac,valence_PT,valence_s,valence_p,valence_d,valence_f,density_PT,spacegroup_number,variance_parameter_mass,lattice_constants,lattice_angles,radius_Saxena,radius_PT,radius_covalent_PT,radius_covalent,radius_VanDerWaals_PT,radii_Ghosh08,radii_Slatter,radii_Pyykko,conductivity_electrical,electronegativity_Pauling,hardness_chemical_Ghosh,electronegativity_Pearson,electronegativity_Ghosh,electronegativity_Allen,electron_affinity_PT,energies_ionization,scale_Pettifor,temperature_boiling,temperature_melting,enthalpy_fusion,enthalpy_vaporization,enthalpy_atomization_WE,energy_cohesive,specific_heat_PT,critical_pressure,critical_temperature_PT,thermal_expansion,conductivity_thermal,hardness_mechanical_Brinell,hardness_mechanical_Mohs,hardness_mechanical_Vickers,hardness_chemical_Pearson,hardness_chemical_Putz,hardness_chemical_RB,modulus_shear,modulus_Young,modulus_bulk,Poisson_ratio_PT,refractive_index",vproperties_elements,",");
+    //aurostd::string2tokens("symbol,Z,period,group,mass,volume_molar,volume,valence_std,valence_iupac,valence_PT,valence_s,valence_p,valence_d,valence_f,density_PT,spacegroup_number,variance_parameter_mass,lattice_constants,lattice_angles,radius_Saxena,radius_PT,radius_covalent_PT,radius_covalent,radius_VanDerWaals_PT,radii_Ghosh08,radii_Slatter,radii_Pyykko,conductivity_electrical,electronegativity_Pauling,hardness_chemical_Ghosh,electronegativity_Pearson,electronegativity_Ghosh,electronegativity_Allen,electron_affinity_PT,energies_ionization,chemical_scale_Pettifor,temperature_boiling,temperature_melting,enthalpy_fusion,enthalpy_vaporization,enthalpy_atomization_WE,energy_cohesive,specific_heat_PT,critical_pressure,critical_temperature_PT,thermal_expansion,conductivity_thermal,hardness_mechanical_Brinell,hardness_mechanical_Mohs,hardness_mechanical_Vickers,hardness_chemical_Pearson,hardness_chemical_Putz,hardness_chemical_RB,modulus_shear,modulus_Young,modulus_bulk,Poisson_ratio_PT,refractive_index",vproperties_elements,",");
     //number properties next
     for(j=0;j<vproperties_elements_full.size();j++){
       if(xel_N.getType(vproperties_elements_full[j])=="number"||xel_N.getType(vproperties_elements_full[j])=="numbers"){
@@ -754,7 +727,7 @@ namespace aflowML {
     double M_X_bonds=0.0;
     for(ielement=0;ielement<100;ielement++){
       for(ioxidation=0;ioxidation<10;ioxidation++){
-        xel_cation.populate(ielement);
+        xel_cation.populate(ielement,ioxidation);
         input_pre=xel_cation.symbol;
         input_pre+="_+"+aurostd::utype2string(ioxidation);
         if(LDEBUG){cerr << soliloquy << " input=" << input_pre << endl;}

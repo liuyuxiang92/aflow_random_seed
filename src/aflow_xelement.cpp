@@ -131,7 +131,7 @@ namespace pflow {
           if(c=="ALL" || c==aurostd::toupper("density_line_electron_WS_Miedema")) {units=xel.getUnits(c);vs.push_back(aurostd::PaddedPOST("density_line_electron_WS_Miedema="+aurostd::utype2string(xel.density_line_electron_WS_Miedema,_DOUBLE_WRITE_PRECISION_),len)+" // ("+units+") (n_{ws}^{1/3})");}
           if(c=="ALL" || c==aurostd::toupper("energy_surface_0K_Miedema")) {units=xel.getUnits(c);vs.push_back(aurostd::PaddedPOST("energy_surface_0K_Miedema="+aurostd::utype2string(xel.energy_surface_0K_Miedema,_DOUBLE_WRITE_PRECISION_),len)+(units.empty()?"":" // ("+units+")"));}
           //
-          if(c=="ALL" || c==aurostd::toupper("scale_Pettifor")) {units=xel.getUnits(c);vs.push_back(aurostd::PaddedPOST("scale_Pettifor="+aurostd::utype2string(xel.scale_Pettifor,_DOUBLE_WRITE_PRECISION_),len)+(units.empty()?"":" // ("+units+")"));} 
+          if(c=="ALL" || c==aurostd::toupper("chemical_scale_Pettifor")) {units=xel.getUnits(c);vs.push_back(aurostd::PaddedPOST("chemical_scale_Pettifor="+aurostd::utype2string(xel.chemical_scale_Pettifor,_DOUBLE_WRITE_PRECISION_),len)+(units.empty()?"":" // ("+units+")"));} 
           //
           if(c=="ALL" || c==aurostd::toupper("temperature_boiling")) {units=xel.getUnits(c);vs.push_back(aurostd::PaddedPOST("temperature_boiling="+aurostd::utype2string(xel.temperature_boiling,_DOUBLE_WRITE_PRECISION_),len)+(units.empty()?"":" // ("+units+")"));}
           if(c=="ALL" || c==aurostd::toupper("temperature_melting")) {units=xel.getUnits(c);vs.push_back(aurostd::PaddedPOST("temperature_melting="+aurostd::utype2string(xel.temperature_melting,_DOUBLE_WRITE_PRECISION_),len)+(units.empty()?"":" // ("+units+")"));}
@@ -277,7 +277,7 @@ namespace xelement {
     density_line_electron_WS_Miedema=NNN;              
     energy_surface_0K_Miedema=NNN;          
     //
-    scale_Pettifor=NNN;          
+    chemical_scale_Pettifor=NNN;          
     //
     temperature_boiling=NNN;         
     temperature_melting=NNN;         
@@ -370,7 +370,7 @@ namespace xelement {
     units_density_line_electron_WS_Miedema="";              
     units_energy_surface_0K_Miedema="";          
     //
-    units_scale_Pettifor="";          
+    units_chemical_scale_Pettifor="";          
     //
     units_temperature_boiling="";         
     units_temperature_melting="";         
@@ -471,7 +471,7 @@ namespace xelement {
     density_line_electron_WS_Miedema=b.density_line_electron_WS_Miedema;              
     energy_surface_0K_Miedema=b.energy_surface_0K_Miedema;          
     //
-    scale_Pettifor=b.scale_Pettifor;          
+    chemical_scale_Pettifor=b.chemical_scale_Pettifor;          
     //
     temperature_boiling=b.temperature_boiling;         
     temperature_melting=b.temperature_melting;         
@@ -564,7 +564,7 @@ namespace xelement {
     units_density_line_electron_WS_Miedema=b.units_density_line_electron_WS_Miedema;              
     units_energy_surface_0K_Miedema=b.units_energy_surface_0K_Miedema;          
     //
-    units_scale_Pettifor=b.units_scale_Pettifor;          
+    units_chemical_scale_Pettifor=b.units_chemical_scale_Pettifor;          
     //
     units_temperature_boiling=b.units_temperature_boiling;         
     units_temperature_melting=b.units_temperature_melting;         
@@ -661,7 +661,7 @@ namespace xelement {
     units_density_line_electron_WS_Miedema="d.u.^{1/3}"; //1 d.u. (density unit) = 10^-2 electrons/a.u.^3 = 6.748*10^22 electrons/cm^3; 1 a.u = 52.918 pm (first Bohr radius): https://cdsweb.cern.ch/record/747057/files/34081384.pdf
     units_energy_surface_0K_Miedema="mJ/m^2";          
     //
-    units_scale_Pettifor="";          
+    units_chemical_scale_Pettifor="";          
     //
     units_temperature_boiling="degC";  //Celsius        
     units_temperature_melting="degC";         
@@ -712,8 +712,8 @@ namespace xelement {
 
   // ********************************************************************************************************************************************************
 
-  xelement::xelement(const string& element) {free();populate(element);}  //CO20200520
-  xelement::xelement(uint ZZ) {free();populate(ZZ);} //CO20200520
+  xelement::xelement(const string& element,int oxidation_state) {free();populate(element,oxidation_state);}  //CO20200520
+  xelement::xelement(uint ZZ,int oxidation_state) {free();populate(ZZ,oxidation_state);} //CO20200520
 
   string xelement::getPropertyStringVector(const string& property,const string& delim,uint ncols) const { //CO20201111
     string c=aurostd::toupper(property);
@@ -801,7 +801,7 @@ namespace xelement {
     if(c==aurostd::toupper("density_line_electron_WS_Miedema")) return aurostd::utype2string(density_line_electron_WS_Miedema,_DOUBLE_WRITE_PRECISION_);
     if(c==aurostd::toupper("energy_surface_0K_Miedema")) return aurostd::utype2string(energy_surface_0K_Miedema,_DOUBLE_WRITE_PRECISION_);
     //
-    if(c==aurostd::toupper("scale_Pettifor")) return aurostd::utype2string(scale_Pettifor,_DOUBLE_WRITE_PRECISION_); 
+    if(c==aurostd::toupper("chemical_scale_Pettifor")) return aurostd::utype2string(chemical_scale_Pettifor,_DOUBLE_WRITE_PRECISION_); 
     //
     if(c==aurostd::toupper("temperature_boiling")) return aurostd::utype2string(temperature_boiling,_DOUBLE_WRITE_PRECISION_);
     if(c==aurostd::toupper("temperature_melting")) return aurostd::utype2string(temperature_melting,_DOUBLE_WRITE_PRECISION_);
@@ -842,7 +842,11 @@ namespace xelement {
     throw aurostd::xerror(_AFLOW_FILE_NAME_,"xelement::getPropertyString():","Property not found: "+property,_INPUT_ILLEGAL_);  //CO20200520
     return "";
   }
-  double xelement::getPropertyDouble(const string& property) const {
+  double xelement::getPropertyDouble(const string& property,int index) const {
+    //index if for xvector/vector properties
+    //NB: for xvector, index is between 0 and urows-1 (like vector)
+    //need to pick a standard for two container indices to minimize getter code
+    //otherwise, use getProperty(X)Vector()
     string c=aurostd::toupper(property);
     //if(c==aurostd::toupper("name")) return name;
     //if(c==aurostd::toupper("symbol")) return symbol;
@@ -870,8 +874,14 @@ namespace xelement {
     //if(c==aurostd::toupper("spacegroup")) return spacegroup;
     if(c==aurostd::toupper("spacegroup_number")) return spacegroup_number;  //UINT
     if(c==aurostd::toupper("variance_parameter_mass")) return variance_parameter_mass;
-    //if(c==aurostd::toupper("lattice_constants")) return lattice_constants;
-    //if(c==aurostd::toupper("lattice_angles")) return lattice_angles;
+    if(c==aurostd::toupper("lattice_constants")) {  //for xvectors, index must be between 0 and rows-1
+      if(index<0||index>=lattice_constants.rows){return NNN;} //out of bounds
+      return lattice_constants[lattice_constants.lrows+index];
+    }
+    if(c==aurostd::toupper("lattice_angles")) { //for xvectors, index must be between 0 and rows-1
+      if(index<0||index>=lattice_angles.rows){return NNN;} //out of bounds
+      return lattice_angles[lattice_angles.lrows+index];
+    }
     //if(c==aurostd::toupper("phase")) return phase;
     if(c==aurostd::toupper("radius_Saxena")) return radius_Saxena;
     if(c==aurostd::toupper("radius_PT")) return radius_PT;
@@ -888,15 +898,24 @@ namespace xelement {
     if(c==aurostd::toupper("electronegativity_Pearson")) return electronegativity_Pearson;
     if(c==aurostd::toupper("electronegativity_Ghosh")) return electronegativity_Ghosh;
     if(c==aurostd::toupper("electronegativity_Allen")) return electronegativity_Allen; //CO20200731
-    //if(c==aurostd::toupper("oxidation_states")) return oxidation_states;
-    //if(c==aurostd::toupper("oxidation_states_preferred")) return oxidation_states_preferred;
+    if(c==aurostd::toupper("oxidation_states")) {
+      if(index<0||index>=(int)oxidation_states.size()){return NNN;} //out of bounds
+      return oxidation_states[index];
+    }
+    if(c==aurostd::toupper("oxidation_states_preferred")) {
+      if(index<0||index>=(int)oxidation_states_preferred.size()){return NNN;} //out of bounds
+      return oxidation_states_preferred[index];
+    }
     if(c==aurostd::toupper("electron_affinity_PT")) return electron_affinity_PT;
-    //if(c==aurostd::toupper("energies_ionization")) return energies_ionization;
+    if(c==aurostd::toupper("energies_ionization")) {
+      if(index<0||index>=(int)energies_ionization.size()){return NNN;} //out of bounds
+      return energies_ionization[index];
+    }
     if(c==aurostd::toupper("work_function_Miedema")) return work_function_Miedema;
     if(c==aurostd::toupper("density_line_electron_WS_Miedema")) return density_line_electron_WS_Miedema;
     if(c==aurostd::toupper("energy_surface_0K_Miedema")) return energy_surface_0K_Miedema;
     //
-    if(c==aurostd::toupper("scale_Pettifor")) return scale_Pettifor; 
+    if(c==aurostd::toupper("chemical_scale_Pettifor")) return chemical_scale_Pettifor; 
     //
     if(c==aurostd::toupper("temperature_boiling")) return temperature_boiling;
     if(c==aurostd::toupper("temperature_melting")) return temperature_melting;
@@ -991,7 +1010,7 @@ namespace xelement {
     //if(c==aurostd::toupper("density_line_electron_WS_Miedema")) return density_line_electron_WS_Miedema;
     //if(c==aurostd::toupper("energy_surface_0K_Miedema")) return energy_surface_0K_Miedema;
     //
-    //if(c==aurostd::toupper("scale_Pettifor")) return scale_Pettifor; 
+    //if(c==aurostd::toupper("chemical_scale_Pettifor")) return chemical_scale_Pettifor; 
     //
     //if(c==aurostd::toupper("temperature_boiling")) return temperature_boiling;
     //if(c==aurostd::toupper("temperature_melting")) return temperature_melting;
@@ -1086,7 +1105,7 @@ namespace xelement {
     //if(c==aurostd::toupper("density_line_electron_WS_Miedema")) return density_line_electron_WS_Miedema;
     //if(c==aurostd::toupper("energy_surface_0K_Miedema")) return energy_surface_0K_Miedema;
     //
-    //if(c==aurostd::toupper("scale_Pettifor")) return scale_Pettifor; 
+    //if(c==aurostd::toupper("chemical_scale_Pettifor")) return chemical_scale_Pettifor; 
     //
     //if(c==aurostd::toupper("temperature_boiling")) return temperature_boiling;
     //if(c==aurostd::toupper("temperature_melting")) return temperature_melting;
@@ -1183,7 +1202,7 @@ namespace xelement {
     if(c==aurostd::toupper("density_line_electron_WS_Miedema")) return "number";
     if(c==aurostd::toupper("energy_surface_0K_Miedema")) return "number";
     //
-    if(c==aurostd::toupper("scale_Pettifor")) return "number"; 
+    if(c==aurostd::toupper("chemical_scale_Pettifor")) return "number"; 
     //
     if(c==aurostd::toupper("temperature_boiling")) return "number";
     if(c==aurostd::toupper("temperature_melting")) return "number";
@@ -1279,7 +1298,7 @@ namespace xelement {
     if(c==aurostd::toupper("density_line_electron_WS_Miedema")) return units_density_line_electron_WS_Miedema;
     if(c==aurostd::toupper("energy_surface_0K_Miedema")) return units_energy_surface_0K_Miedema;
     //
-    if(c==aurostd::toupper("scale_Pettifor")) return units_scale_Pettifor; 
+    if(c==aurostd::toupper("chemical_scale_Pettifor")) return units_chemical_scale_Pettifor; 
     //
     if(c==aurostd::toupper("temperature_boiling")) return units_temperature_boiling;
     if(c==aurostd::toupper("temperature_melting")) return units_temperature_melting;
@@ -1403,7 +1422,7 @@ namespace xelement {
       if(vproperties[i]==aurostd::toupper("density_line_electron_WS_Miedema")) {dptr=&density_line_electron_WS_Miedema;sptr=&units_density_line_electron_WS_Miedema;}
       if(vproperties[i]==aurostd::toupper("energy_surface_0K_Miedema")) {dptr=&energy_surface_0K_Miedema;sptr=&units_energy_surface_0K_Miedema;}
       //
-      if(vproperties[i]==aurostd::toupper("scale_Pettifor")) {dptr=&scale_Pettifor;sptr=&units_scale_Pettifor;}
+      if(vproperties[i]==aurostd::toupper("chemical_scale_Pettifor")) {dptr=&chemical_scale_Pettifor;sptr=&units_chemical_scale_Pettifor;}
       //
       if(vproperties[i]==aurostd::toupper("temperature_boiling")) {dptr=&temperature_boiling;sptr=&units_temperature_boiling;}
       if(vproperties[i]==aurostd::toupper("temperature_melting")) {dptr=&temperature_melting;sptr=&units_temperature_melting;}
@@ -1610,7 +1629,7 @@ namespace xelement {
 
   // ********************************************************************************************************************************************************
   // populate by name or symbol
-  void xelement::populate(const string& element) {  //CO20200520
+  void xelement::populate(const string& element,int oxidation_state) {  //CO20200520
     free();
     // DEFAULT
     verbose=FALSE;
@@ -1626,14 +1645,14 @@ namespace xelement {
       for(uint i=1;i<=103&&Z==0;i++)  //CO20200520
         if(aurostd::toupper(element)==aurostd::toupper(xelement(i).name)) Z=i;
     }
-    if(Z!=0) {(*this)=xelement(Z);loadDefaultUnits();return;}  //CO20200520
+    if(Z!=0) {(*this)=xelement(Z,oxidation_state);loadDefaultUnits();return;}  //CO20200520
 
     throw aurostd::xerror(_AFLOW_FILE_NAME_,"xelement::xelement():","Element symbol/name does not exist: "+element,_VALUE_ILLEGAL_); //CO20200520
   }
 
   // ********************************************************************************************************************************************************
   // populate by Z
-  void xelement::populate(uint ZZ) {  //CO20200520
+  void xelement::populate(uint ZZ,int oxidation_state) {  //CO20200520
     free();
     // DEFAULT
     verbose=FALSE;
@@ -1702,7 +1721,7 @@ namespace xelement {
       work_function_Miedema=5.2;
       density_line_electron_WS_Miedema=1.5;
       energy_surface_0K_Miedema=NNN;
-      scale_Pettifor=0;
+      chemical_scale_Pettifor=0;
       temperature_boiling=-252.87;
       temperature_melting=-259.14;
       enthalpy_fusion=0.558;  //CO20201111
@@ -1794,7 +1813,7 @@ namespace xelement {
       work_function_Miedema=NNN;
       density_line_electron_WS_Miedema=NNN;
       energy_surface_0K_Miedema=NNN;
-      scale_Pettifor=0;
+      chemical_scale_Pettifor=0;
       temperature_boiling=-268.93;
       temperature_melting=NNN;
       enthalpy_fusion=0.02;  //CO20201111
@@ -1888,7 +1907,7 @@ namespace xelement {
       work_function_Miedema=2.85;
       density_line_electron_WS_Miedema=0.98;
       energy_surface_0K_Miedema=530;
-      scale_Pettifor=0.45;
+      chemical_scale_Pettifor=0.45;
       temperature_boiling=1342;
       temperature_melting=180.54;
       enthalpy_fusion=3;  //CO20201111
@@ -1980,7 +1999,7 @@ namespace xelement {
       work_function_Miedema=4.20;
       density_line_electron_WS_Miedema=1.60;
       energy_surface_0K_Miedema=1900;
-      scale_Pettifor=1.50;
+      chemical_scale_Pettifor=1.50;
       temperature_boiling=2470;
       temperature_melting=1287;
       enthalpy_fusion=7.95;  //CO20201111
@@ -2073,7 +2092,7 @@ namespace xelement {
       work_function_Miedema=4.75;
       density_line_electron_WS_Miedema=1.55;
       energy_surface_0K_Miedema=NNN;
-      scale_Pettifor=2.00;
+      chemical_scale_Pettifor=2.00;
       temperature_boiling=4000;
       temperature_melting=2075;
       enthalpy_fusion=50;  //CO20201111
@@ -2165,7 +2184,7 @@ namespace xelement {
       work_function_Miedema=6.20;
       density_line_electron_WS_Miedema=1.90;
       energy_surface_0K_Miedema=NNN;
-      scale_Pettifor=2.50;
+      chemical_scale_Pettifor=2.50;
       temperature_boiling=4027;
       temperature_melting=3550;
       enthalpy_fusion=105;  //CO20201111 - SMALL DISCREPANCY PERIODICTABLE VS WEBELEMENTS: 117 kJ/mol
@@ -2257,7 +2276,7 @@ namespace xelement {
       work_function_Miedema=7.00;
       density_line_electron_WS_Miedema=1.60;
       energy_surface_0K_Miedema=NNN;
-      scale_Pettifor=3.00;
+      chemical_scale_Pettifor=3.00;
       temperature_boiling=-195.79;
       temperature_melting=-210.1;
       enthalpy_fusion=0.36;  //CO20201111
@@ -2349,7 +2368,7 @@ namespace xelement {
       work_function_Miedema=6.97;
       density_line_electron_WS_Miedema=1.70;
       energy_surface_0K_Miedema=NNN;
-      scale_Pettifor=3.50;
+      chemical_scale_Pettifor=3.50;
       temperature_boiling=-182.9;
       temperature_melting=-218.3;
       enthalpy_fusion=0.222;  //CO20201111
@@ -2441,7 +2460,7 @@ namespace xelement {
       work_function_Miedema=NNN;
       density_line_electron_WS_Miedema=NNN;
       energy_surface_0K_Miedema=NNN;
-      scale_Pettifor=4.00;
+      chemical_scale_Pettifor=4.00;
       temperature_boiling=-188.12;
       temperature_melting=-219.6;
       enthalpy_fusion=0.26;  //CO20201111
@@ -2533,7 +2552,7 @@ namespace xelement {
       work_function_Miedema=NNN;
       density_line_electron_WS_Miedema=NNN;
       energy_surface_0K_Miedema=NNN;
-      scale_Pettifor=0;
+      chemical_scale_Pettifor=0;
       temperature_boiling=-246.08;
       temperature_melting=-248.59;
       enthalpy_fusion=0.34;  //CO20201111
@@ -2627,7 +2646,7 @@ namespace xelement {
       work_function_Miedema=2.70;
       density_line_electron_WS_Miedema=0.82;
       energy_surface_0K_Miedema=260;
-      scale_Pettifor=0.40;
+      chemical_scale_Pettifor=0.40;
       temperature_boiling=883;
       temperature_melting=97.72;
       enthalpy_fusion=2.6;  //CO20201111
@@ -2719,7 +2738,7 @@ namespace xelement {
       work_function_Miedema=3.45;
       density_line_electron_WS_Miedema=1.17;
       energy_surface_0K_Miedema=790;
-      scale_Pettifor=1.28;
+      chemical_scale_Pettifor=1.28;
       temperature_boiling=1090;
       temperature_melting=650;
       enthalpy_fusion=8.7;  //CO20201111
@@ -2812,7 +2831,7 @@ namespace xelement {
       work_function_Miedema=4.20;
       density_line_electron_WS_Miedema=1.39;
       energy_surface_0K_Miedema=1200;
-      scale_Pettifor=1.66;
+      chemical_scale_Pettifor=1.66;
       temperature_boiling=2519;
       temperature_melting=660.32;
       enthalpy_fusion=10.7;  //CO20201111
@@ -2904,7 +2923,7 @@ namespace xelement {
       work_function_Miedema=4.70;
       density_line_electron_WS_Miedema=1.50;
       energy_surface_0K_Miedema=1290;
-      scale_Pettifor=1.92;
+      chemical_scale_Pettifor=1.92;
       temperature_boiling=2900;
       temperature_melting=1414;
       enthalpy_fusion=50.2;  //CO20201111
@@ -2996,7 +3015,7 @@ namespace xelement {
       work_function_Miedema=5.5;
       density_line_electron_WS_Miedema=1.65;
       energy_surface_0K_Miedema=NNN;
-      scale_Pettifor=2.18;
+      chemical_scale_Pettifor=2.18;
       temperature_boiling=280.5;
       temperature_melting=44.2;
       enthalpy_fusion=0.64;  //CO20201111
@@ -3088,7 +3107,7 @@ namespace xelement {
       work_function_Miedema=5.6;
       density_line_electron_WS_Miedema=1.46;
       energy_surface_0K_Miedema=NNN;
-      scale_Pettifor=2.44;
+      chemical_scale_Pettifor=2.44;
       temperature_boiling=444.72;
       temperature_melting=115.21;
       enthalpy_fusion=1.73;  //CO20201111
@@ -3180,7 +3199,7 @@ namespace xelement {
       work_function_Miedema=5.32;
       density_line_electron_WS_Miedema=0.34;
       energy_surface_0K_Miedema=1013;
-      scale_Pettifor=2.70;
+      chemical_scale_Pettifor=2.70;
       temperature_boiling=-34.04;
       temperature_melting=-101.5;
       enthalpy_fusion=3.2;  //CO20201111
@@ -3272,7 +3291,7 @@ namespace xelement {
       work_function_Miedema=NNN;
       density_line_electron_WS_Miedema=NNN;
       energy_surface_0K_Miedema=NNN;
-      scale_Pettifor=0;
+      chemical_scale_Pettifor=0;
       temperature_boiling=-185.8;
       temperature_melting=-189.3;
       enthalpy_fusion=1.18;  //CO20201111
@@ -3366,7 +3385,7 @@ namespace xelement {
       work_function_Miedema=2.25;
       density_line_electron_WS_Miedema=0.65;
       energy_surface_0K_Miedema=150;
-      scale_Pettifor=0.35;
+      chemical_scale_Pettifor=0.35;
       temperature_boiling=759;
       temperature_melting=63.38;
       enthalpy_fusion=2.33;  //CO20201111
@@ -3458,7 +3477,7 @@ namespace xelement {
       work_function_Miedema=2.55;
       density_line_electron_WS_Miedema=0.91;
       energy_surface_0K_Miedema=490;
-      scale_Pettifor=0.60;
+      chemical_scale_Pettifor=0.60;
       temperature_boiling=1484;
       temperature_melting=842;
       enthalpy_fusion=8.54;  //CO20201111
@@ -3551,7 +3570,7 @@ namespace xelement {
       work_function_Miedema=3.25;
       density_line_electron_WS_Miedema=1.27;
       energy_surface_0K_Miedema=1200;
-      scale_Pettifor=0.74;
+      chemical_scale_Pettifor=0.74;
       temperature_boiling=2830;
       temperature_melting=1541;
       enthalpy_fusion=16;  //CO20201111
@@ -3643,7 +3662,7 @@ namespace xelement {
       work_function_Miedema=3.65;
       density_line_electron_WS_Miedema=1.47;
       energy_surface_0K_Miedema=2050;
-      scale_Pettifor=0.79;
+      chemical_scale_Pettifor=0.79;
       temperature_boiling=3287;
       temperature_melting=1668;
       enthalpy_fusion=18.7;  //CO20201111
@@ -3735,7 +3754,7 @@ namespace xelement {
       work_function_Miedema=4.25;
       density_line_electron_WS_Miedema=1.64;
       energy_surface_0K_Miedema=2600;
-      scale_Pettifor=0.84;
+      chemical_scale_Pettifor=0.84;
       temperature_boiling=3407;
       temperature_melting=1910;
       enthalpy_fusion=22.8;  //CO20201111
@@ -3827,7 +3846,7 @@ namespace xelement {
       work_function_Miedema=4.65;
       density_line_electron_WS_Miedema=1.74;
       energy_surface_0K_Miedema=2400;
-      scale_Pettifor=0.89;
+      chemical_scale_Pettifor=0.89;
       temperature_boiling=2671;
       temperature_melting=1907;
       enthalpy_fusion=20.5;  //CO20201111
@@ -3919,7 +3938,7 @@ namespace xelement {
       work_function_Miedema=4.45;
       density_line_electron_WS_Miedema=1.61;
       energy_surface_0K_Miedema=1600;
-      scale_Pettifor=0.94;
+      chemical_scale_Pettifor=0.94;
       temperature_boiling=2061;
       temperature_melting=1246;
       enthalpy_fusion=13.2;  //CO20201111
@@ -3999,7 +4018,8 @@ namespace xelement {
       radii_Slatter=1.40;
       radii_Pyykko=1.16;
       conductivity_electrical=1E7;
-      electronegativity_Pauling=1.83;
+      if(oxidation_state==3){electronegativity_Pauling=1.96;} //CO20201111 - http://www.knowledgedoor.com/2/elements_handbook/pauling_electronegativity.html
+      else{electronegativity_Pauling=1.83;} //oxidation_state==2 (DEFAULT)  //CO20201111
       hardness_chemical_Ghosh=3.3559;
       electronegativity_Pearson=4.06;
       electronegativity_Ghosh=3.789;
@@ -4011,7 +4031,7 @@ namespace xelement {
       work_function_Miedema=4.93;
       density_line_electron_WS_Miedema=1.77;
       energy_surface_0K_Miedema=2550;
-      scale_Pettifor=0.99;
+      chemical_scale_Pettifor=0.99;
       temperature_boiling=2861;
       temperature_melting=1538;
       enthalpy_fusion=13.8;  //CO20201111
@@ -4103,7 +4123,7 @@ namespace xelement {
       work_function_Miedema=5.10;
       density_line_electron_WS_Miedema=1.75;
       energy_surface_0K_Miedema=2550;
-      scale_Pettifor=1.04;
+      chemical_scale_Pettifor=1.04;
       temperature_boiling=2927;
       temperature_melting=1495;
       enthalpy_fusion=16.2;  //CO20201111
@@ -4195,7 +4215,7 @@ namespace xelement {
       work_function_Miedema=5.20;
       density_line_electron_WS_Miedema=1.75;
       energy_surface_0K_Miedema=2450;
-      scale_Pettifor=1.09;
+      chemical_scale_Pettifor=1.09;
       temperature_boiling=2913;
       temperature_melting=1455;
       enthalpy_fusion=17.2;  //CO20201111
@@ -4275,7 +4295,8 @@ namespace xelement {
       radii_Slatter=1.35;
       radii_Pyykko=1.12;
       conductivity_electrical=5.9E7;
-      electronegativity_Pauling=1.90;
+      if(oxidation_state==2){electronegativity_Pauling=2.00;} //CO20201111 - http://www.knowledgedoor.com/2/elements_handbook/pauling_electronegativity.html
+      else{electronegativity_Pauling=1.90;} //oxidation_state==1 (DEFAULT) //CO20201111
       hardness_chemical_Ghosh=3.6544;
       electronegativity_Pearson=4.48;
       electronegativity_Ghosh=4.113;
@@ -4287,7 +4308,7 @@ namespace xelement {
       work_function_Miedema=4.55;
       density_line_electron_WS_Miedema=1.47;
       energy_surface_0K_Miedema=1850;
-      scale_Pettifor=1.20;
+      chemical_scale_Pettifor=1.20;
       temperature_boiling=2562;
       temperature_melting=1084.62;
       enthalpy_fusion=13.1;  //CO20201111
@@ -4379,7 +4400,7 @@ namespace xelement {
       work_function_Miedema=4.10;
       density_line_electron_WS_Miedema=1.32;
       energy_surface_0K_Miedema=1020;
-      scale_Pettifor=1.44;
+      chemical_scale_Pettifor=1.44;
       temperature_boiling=907;
       temperature_melting=419.53;
       enthalpy_fusion=7.35;  //CO20201111
@@ -4472,7 +4493,7 @@ namespace xelement {
       work_function_Miedema=4.10;
       density_line_electron_WS_Miedema=1.31;
       energy_surface_0K_Miedema=830;
-      scale_Pettifor=1.68;
+      chemical_scale_Pettifor=1.68;
       temperature_boiling=2204;
       temperature_melting=29.76;
       enthalpy_fusion=5.59;  //CO20201111
@@ -4564,7 +4585,7 @@ namespace xelement {
       work_function_Miedema=4.55;
       density_line_electron_WS_Miedema=1.37;
       energy_surface_0K_Miedema=1030;
-      scale_Pettifor=1.92;
+      chemical_scale_Pettifor=1.92;
       temperature_boiling=2820;
       temperature_melting=938.3;
       enthalpy_fusion=31.8;  //CO20201111
@@ -4656,7 +4677,7 @@ namespace xelement {
       work_function_Miedema=4.80;
       density_line_electron_WS_Miedema=1.44;
       energy_surface_0K_Miedema=1000;
-      scale_Pettifor=2.16;
+      chemical_scale_Pettifor=2.16;
       temperature_boiling=614;
       temperature_melting=817;
       enthalpy_fusion=27.7;  //CO20201111
@@ -4748,7 +4769,7 @@ namespace xelement {
       work_function_Miedema=5.17;
       density_line_electron_WS_Miedema=1.40;
       energy_surface_0K_Miedema=NNN;
-      scale_Pettifor=2.40;
+      chemical_scale_Pettifor=2.40;
       temperature_boiling=685;
       temperature_melting=221;
       enthalpy_fusion=5.4;  //CO20201111
@@ -4840,7 +4861,7 @@ namespace xelement {
       work_function_Miedema=5.20;
       density_line_electron_WS_Miedema=1.35;
       energy_surface_0K_Miedema=943;
-      scale_Pettifor=2.64;
+      chemical_scale_Pettifor=2.64;
       temperature_boiling=59;
       temperature_melting=-7.3;
       enthalpy_fusion=5.8;  //CO20201111
@@ -4932,7 +4953,7 @@ namespace xelement {
       work_function_Miedema=NNN;
       density_line_electron_WS_Miedema=NNN;
       energy_surface_0K_Miedema=NNN;
-      scale_Pettifor=0;
+      chemical_scale_Pettifor=0;
       temperature_boiling=-153.22;
       temperature_melting=-157.36;
       enthalpy_fusion=1.64;  //CO20201111
@@ -5026,7 +5047,7 @@ namespace xelement {
       work_function_Miedema=2.10;
       density_line_electron_WS_Miedema=0.60;
       energy_surface_0K_Miedema=120;
-      scale_Pettifor=0.30;
+      chemical_scale_Pettifor=0.30;
       temperature_boiling=688;
       temperature_melting=39.31;
       enthalpy_fusion=2.19;  //CO20201111
@@ -5118,7 +5139,7 @@ namespace xelement {
       work_function_Miedema=2.40;
       density_line_electron_WS_Miedema=0.84;
       energy_surface_0K_Miedema=430;
-      scale_Pettifor=0.55;
+      chemical_scale_Pettifor=0.55;
       temperature_boiling=1382;
       temperature_melting=777;
       enthalpy_fusion=8;  //CO20201111
@@ -5211,7 +5232,7 @@ namespace xelement {
       work_function_Miedema=3.20;
       density_line_electron_WS_Miedema=1.21;
       energy_surface_0K_Miedema=1100;
-      scale_Pettifor=0.70;
+      chemical_scale_Pettifor=0.70;
       temperature_boiling=3345;
       temperature_melting=1526;
       enthalpy_fusion=11.4;  //CO20201111
@@ -5303,7 +5324,7 @@ namespace xelement {
       work_function_Miedema=3.40;
       density_line_electron_WS_Miedema=1.39;
       energy_surface_0K_Miedema=1950;
-      scale_Pettifor=0.76;
+      chemical_scale_Pettifor=0.76;
       temperature_boiling=4409;
       temperature_melting=1855;
       enthalpy_fusion=21;  //CO20201111
@@ -5395,7 +5416,7 @@ namespace xelement {
       work_function_Miedema=4.00;
       density_line_electron_WS_Miedema=1.62;
       energy_surface_0K_Miedema=2700;
-      scale_Pettifor=0.82;
+      chemical_scale_Pettifor=0.82;
       temperature_boiling=4744;
       temperature_melting=2477;
       enthalpy_fusion=26.8;  //CO20201111
@@ -5475,7 +5496,11 @@ namespace xelement {
       radii_Slatter=1.45;
       radii_Pyykko=1.38;
       conductivity_electrical=2E7;
-      electronegativity_Pauling=2.16;
+      if(oxidation_state==6){electronegativity_Pauling=2.35;}  //CO20201111 - http://www.knowledgedoor.com/2/elements_handbook/pauling_electronegativity.html
+      else if(oxidation_state==5){electronegativity_Pauling=2.27;}  //CO20201111
+      else if(oxidation_state==4){electronegativity_Pauling=2.24;}  //CO20201111
+      else if(oxidation_state==3){electronegativity_Pauling=2.19;}  //CO20201111
+      else{electronegativity_Pauling=2.16;} //oxidation_state==2 (DEFAULT)  //CO20201111
       hardness_chemical_Ghosh=2.9221;
       electronegativity_Pearson=3.9;
       electronegativity_Ghosh=3.572;
@@ -5487,7 +5512,7 @@ namespace xelement {
       work_function_Miedema=4.65;
       density_line_electron_WS_Miedema=1.77;
       energy_surface_0K_Miedema=2950;
-      scale_Pettifor=0.88;
+      chemical_scale_Pettifor=0.88;
       temperature_boiling=4639;
       temperature_melting=2623;
       enthalpy_fusion=36;  //CO20201111
@@ -5579,7 +5604,7 @@ namespace xelement {
       work_function_Miedema=5.30;
       density_line_electron_WS_Miedema=1.81;
       energy_surface_0K_Miedema=3050;
-      scale_Pettifor=0.94;
+      chemical_scale_Pettifor=0.94;
       temperature_boiling=4265;
       temperature_melting=2157;
       enthalpy_fusion=23;  //CO20201111
@@ -5671,7 +5696,7 @@ namespace xelement {
       work_function_Miedema=5.40;
       density_line_electron_WS_Miedema=1.83;
       energy_surface_0K_Miedema=3050;
-      scale_Pettifor=1.00;
+      chemical_scale_Pettifor=1.00;
       temperature_boiling=4150;
       temperature_melting=2334;
       enthalpy_fusion=25.7;  //CO20201111
@@ -5763,7 +5788,7 @@ namespace xelement {
       work_function_Miedema=5.40;
       density_line_electron_WS_Miedema=1.76;
       energy_surface_0K_Miedema=2750;
-      scale_Pettifor=1.06;
+      chemical_scale_Pettifor=1.06;
       temperature_boiling=3695;
       temperature_melting=1964;
       enthalpy_fusion=21.7;  //CO20201111
@@ -5855,7 +5880,7 @@ namespace xelement {
       work_function_Miedema=5.45;
       density_line_electron_WS_Miedema=1.67;
       energy_surface_0K_Miedema=2100;
-      scale_Pettifor=1.12;
+      chemical_scale_Pettifor=1.12;
       temperature_boiling=2963;
       temperature_melting=1554.9;
       enthalpy_fusion=16.7;  //CO20201111
@@ -5947,7 +5972,7 @@ namespace xelement {
       work_function_Miedema=4.45;
       density_line_electron_WS_Miedema=1.39;
       energy_surface_0K_Miedema=1250;
-      scale_Pettifor=1.18;
+      chemical_scale_Pettifor=1.18;
       temperature_boiling=2162;
       temperature_melting=961.78;
       enthalpy_fusion=11.3;  //CO20201111
@@ -6039,7 +6064,7 @@ namespace xelement {
       work_function_Miedema=4.05;
       density_line_electron_WS_Miedema=1.24;
       energy_surface_0K_Miedema=780;
-      scale_Pettifor=1.36;
+      chemical_scale_Pettifor=1.36;
       temperature_boiling=767;
       temperature_melting=321.07;
       enthalpy_fusion=6.3;  //CO20201111
@@ -6132,7 +6157,7 @@ namespace xelement {
       work_function_Miedema=3.90;
       density_line_electron_WS_Miedema=1.17;
       energy_surface_0K_Miedema=690;
-      scale_Pettifor=1.60;
+      chemical_scale_Pettifor=1.60;
       temperature_boiling=2072;
       temperature_melting=156.6;
       enthalpy_fusion=3.26;  //CO20201111
@@ -6212,7 +6237,8 @@ namespace xelement {
       radii_Slatter=1.45;
       radii_Pyykko=1.40;
       conductivity_electrical=9.1E6;
-      electronegativity_Pauling=1.96;
+      if(oxidation_state==2){electronegativity_Pauling=1.80;} //CO20201111 - http://www.knowledgedoor.com/2/elements_handbook/pauling_electronegativity.html
+      else{electronegativity_Pauling=1.96;} //oxidation_state==4 (DEFAULT)  //CO20201111
       hardness_chemical_Ghosh=4.3332;
       electronegativity_Pearson=4.3;
       electronegativity_Ghosh=4.845;
@@ -6224,7 +6250,7 @@ namespace xelement {
       work_function_Miedema=4.15;
       density_line_electron_WS_Miedema=1.24;
       energy_surface_0K_Miedema=710;
-      scale_Pettifor=1.84;
+      chemical_scale_Pettifor=1.84;
       temperature_boiling=2602;
       temperature_melting=231.93;
       enthalpy_fusion=7;  //CO20201111
@@ -6316,7 +6342,7 @@ namespace xelement {
       work_function_Miedema=4.40;
       density_line_electron_WS_Miedema=1.26;
       energy_surface_0K_Miedema=680;
-      scale_Pettifor=2.08;
+      chemical_scale_Pettifor=2.08;
       temperature_boiling=1587;
       temperature_melting=630.63;
       enthalpy_fusion=19.7;  //CO20201111
@@ -6408,7 +6434,7 @@ namespace xelement {
       work_function_Miedema=4.72;
       density_line_electron_WS_Miedema=1.31;
       energy_surface_0K_Miedema=NNN;
-      scale_Pettifor=2.32;
+      chemical_scale_Pettifor=2.32;
       temperature_boiling=988;
       temperature_melting=449.51;
       enthalpy_fusion=17.5;  //CO20201111
@@ -6500,7 +6526,7 @@ namespace xelement {
       work_function_Miedema=5.33;
       density_line_electron_WS_Miedema=0.17;
       energy_surface_0K_Miedema=NNN;
-      scale_Pettifor=2.56;
+      chemical_scale_Pettifor=2.56;
       temperature_boiling=184.3;
       temperature_melting=113.7;
       enthalpy_fusion=7.76;  //CO20201111
@@ -6592,7 +6618,7 @@ namespace xelement {
       work_function_Miedema=NNN;
       density_line_electron_WS_Miedema=NNN;
       energy_surface_0K_Miedema=NNN;
-      scale_Pettifor=0;
+      chemical_scale_Pettifor=0;
       temperature_boiling=-108;
       temperature_melting=-111.8;
       enthalpy_fusion=2.3;  //CO20201111
@@ -6686,7 +6712,7 @@ namespace xelement {
       work_function_Miedema=1.95;
       density_line_electron_WS_Miedema=0.55;
       energy_surface_0K_Miedema=95;
-      scale_Pettifor=0.25;
+      chemical_scale_Pettifor=0.25;
       temperature_boiling=671;
       temperature_melting=28.44;
       enthalpy_fusion=2.09;  //CO20201111
@@ -6778,7 +6804,7 @@ namespace xelement {
       work_function_Miedema=2.32;
       density_line_electron_WS_Miedema=0.81;
       energy_surface_0K_Miedema=370;
-      scale_Pettifor=0.50;
+      chemical_scale_Pettifor=0.50;
       temperature_boiling=1870;
       temperature_melting=727;
       enthalpy_fusion=8;  //CO20201111
@@ -6871,7 +6897,7 @@ namespace xelement {
       work_function_Miedema=3.05;
       density_line_electron_WS_Miedema=1.09;
       energy_surface_0K_Miedema=900;
-      scale_Pettifor=0.7480;
+      chemical_scale_Pettifor=0.7480;
       temperature_boiling=3464;
       temperature_melting=919;
       enthalpy_fusion=6.3;  //CO20201111 - SMALL DISCREPANCY PERIODICTABLE VS WEBELEMENTS: 6.2 kJ/mol
@@ -6964,7 +6990,7 @@ namespace xelement {
       work_function_Miedema=3.18;
       density_line_electron_WS_Miedema=1.19;
       energy_surface_0K_Miedema=NNN;
-      scale_Pettifor=0.7460;
+      chemical_scale_Pettifor=0.7460;
       temperature_boiling=3360;
       temperature_melting=798;
       enthalpy_fusion=5.5;  //CO20201111
@@ -7056,7 +7082,7 @@ namespace xelement {
       work_function_Miedema=3.19;
       density_line_electron_WS_Miedema=1.20;
       energy_surface_0K_Miedema=NNN;
-      scale_Pettifor=0.7440;
+      chemical_scale_Pettifor=0.7440;
       temperature_boiling=3290;
       temperature_melting=931;
       enthalpy_fusion=6.9;  //CO20201111
@@ -7148,7 +7174,7 @@ namespace xelement {
       work_function_Miedema=3.19;
       density_line_electron_WS_Miedema=1.20;
       energy_surface_0K_Miedema=NNN;
-      scale_Pettifor=0.7420;
+      chemical_scale_Pettifor=0.7420;
       temperature_boiling=3100;
       temperature_melting=1021;
       enthalpy_fusion=7.1;  //CO20201111
@@ -7240,7 +7266,7 @@ namespace xelement {
       work_function_Miedema=3.19;
       density_line_electron_WS_Miedema=1.21;
       energy_surface_0K_Miedema=NNN;
-      scale_Pettifor=0.7400;
+      chemical_scale_Pettifor=0.7400;
       temperature_boiling=3000;
       temperature_melting=1100;
       enthalpy_fusion=7.7;  //CO20201111
@@ -7332,7 +7358,7 @@ namespace xelement {
       work_function_Miedema=3.20;
       density_line_electron_WS_Miedema=1.21;
       energy_surface_0K_Miedema=NNN;
-      scale_Pettifor=0.7380;
+      chemical_scale_Pettifor=0.7380;
       temperature_boiling=1803;
       temperature_melting=1072;
       enthalpy_fusion=8.5;  //CO20201111 - SMALL DISCREPANCY PERIODICTABLE VS WEBELEMENTS: 8.6 kJ/mol
@@ -7424,7 +7450,7 @@ namespace xelement {
       work_function_Miedema=3.20;
       density_line_electron_WS_Miedema=1.21;
       energy_surface_0K_Miedema=NNN;
-      scale_Pettifor=0.7360;
+      chemical_scale_Pettifor=0.7360;
       temperature_boiling=1527;
       temperature_melting=822;
       enthalpy_fusion=9.3;  //CO20201111 - SMALL DISCREPANCY PERIODICTABLE VS WEBELEMENTS: 9.2 kJ/mol
@@ -7516,7 +7542,7 @@ namespace xelement {
       work_function_Miedema=3.20;
       density_line_electron_WS_Miedema=1.21;
       energy_surface_0K_Miedema=NNN;
-      scale_Pettifor=0.7340;
+      chemical_scale_Pettifor=0.7340;
       temperature_boiling=3250;
       temperature_melting=1313;
       enthalpy_fusion=10;  //CO20201111
@@ -7608,7 +7634,7 @@ namespace xelement {
       work_function_Miedema=3.21;
       density_line_electron_WS_Miedema=1.22;
       energy_surface_0K_Miedema=NNN;
-      scale_Pettifor=0.7320;
+      chemical_scale_Pettifor=0.7320;
       temperature_boiling=3230;
       temperature_melting=1356;
       enthalpy_fusion=10.8;  //CO20201111
@@ -7700,7 +7726,7 @@ namespace xelement {
       work_function_Miedema=3.21;
       density_line_electron_WS_Miedema=1.22;
       energy_surface_0K_Miedema=NNN;
-      scale_Pettifor=0.7300;
+      chemical_scale_Pettifor=0.7300;
       temperature_boiling=2567;
       temperature_melting=1412;
       enthalpy_fusion=11.1;  //CO20201111
@@ -7792,7 +7818,7 @@ namespace xelement {
       work_function_Miedema=3.22;
       density_line_electron_WS_Miedema=1.22;
       energy_surface_0K_Miedema=NNN;
-      scale_Pettifor=0.7280;
+      chemical_scale_Pettifor=0.7280;
       temperature_boiling=2700;
       temperature_melting=1474;
       enthalpy_fusion=17;  //CO20201111
@@ -7884,7 +7910,7 @@ namespace xelement {
       work_function_Miedema=3.22;
       density_line_electron_WS_Miedema=1.23;
       energy_surface_0K_Miedema=NNN;
-      scale_Pettifor=0.7260;
+      chemical_scale_Pettifor=0.7260;
       temperature_boiling=2868;
       temperature_melting=1497;
       enthalpy_fusion=19.9;  //CO20201111
@@ -7976,7 +8002,7 @@ namespace xelement {
       work_function_Miedema=3.22;
       density_line_electron_WS_Miedema=1.23;
       energy_surface_0K_Miedema=NNN;
-      scale_Pettifor=0.7240;
+      chemical_scale_Pettifor=0.7240;
       temperature_boiling=1950;
       temperature_melting=1545;
       enthalpy_fusion=16.8;  //CO20201111
@@ -8068,7 +8094,7 @@ namespace xelement {
       work_function_Miedema=3.22;
       density_line_electron_WS_Miedema=1.23;
       energy_surface_0K_Miedema=NNN;
-      scale_Pettifor=0.7220;
+      chemical_scale_Pettifor=0.7220;
       temperature_boiling=1196;
       temperature_melting=819;
       enthalpy_fusion=7.7;  //CO20201111
@@ -8160,7 +8186,7 @@ namespace xelement {
       work_function_Miedema=3.22;
       density_line_electron_WS_Miedema=1.24;
       energy_surface_0K_Miedema=NNN;
-      scale_Pettifor=0.7200;
+      chemical_scale_Pettifor=0.7200;
       temperature_boiling=3402;
       temperature_melting=1663;
       enthalpy_fusion=22;  //CO20201111
@@ -8253,7 +8279,7 @@ namespace xelement {
       work_function_Miedema=3.55;
       density_line_electron_WS_Miedema=1.43;
       energy_surface_0K_Miedema=2200;
-      scale_Pettifor=0.775;
+      chemical_scale_Pettifor=0.775;
       temperature_boiling=4603;
       temperature_melting=2233;
       enthalpy_fusion=25.5;  //CO20201111
@@ -8345,7 +8371,7 @@ namespace xelement {
       work_function_Miedema=4.05;
       density_line_electron_WS_Miedema=1.63;
       energy_surface_0K_Miedema=3050;
-      scale_Pettifor=0.83;
+      chemical_scale_Pettifor=0.83;
       temperature_boiling=5458;
       temperature_melting=3017;
       enthalpy_fusion=36;  //CO20201111
@@ -8437,7 +8463,7 @@ namespace xelement {
       work_function_Miedema=4.80;
       density_line_electron_WS_Miedema=1.81;
       energy_surface_0K_Miedema=3300;
-      scale_Pettifor=0.885;
+      chemical_scale_Pettifor=0.885;
       temperature_boiling=5555;
       temperature_melting=3422;
       enthalpy_fusion=35;  //CO20201111
@@ -8529,7 +8555,7 @@ namespace xelement {
       work_function_Miedema=5.40;
       density_line_electron_WS_Miedema=1.86;
       energy_surface_0K_Miedema=3650;
-      scale_Pettifor=0.94;
+      chemical_scale_Pettifor=0.94;
       temperature_boiling=5596;
       temperature_melting=3186;
       enthalpy_fusion=33;  //CO20201111
@@ -8621,7 +8647,7 @@ namespace xelement {
       work_function_Miedema=5.40;
       density_line_electron_WS_Miedema=1.85;
       energy_surface_0K_Miedema=3500;
-      scale_Pettifor=0.995;
+      chemical_scale_Pettifor=0.995;
       temperature_boiling=5012;
       temperature_melting=3033;
       enthalpy_fusion=31;  //CO20201111
@@ -8713,7 +8739,7 @@ namespace xelement {
       work_function_Miedema=5.55;
       density_line_electron_WS_Miedema=1.83;
       energy_surface_0K_Miedema=3100;
-      scale_Pettifor=1.05;
+      chemical_scale_Pettifor=1.05;
       temperature_boiling=4428;
       temperature_melting=2466;
       enthalpy_fusion=26;  //CO20201111
@@ -8805,7 +8831,7 @@ namespace xelement {
       work_function_Miedema=5.65;
       density_line_electron_WS_Miedema=1.78;
       energy_surface_0K_Miedema=2550;
-      scale_Pettifor=1.105;
+      chemical_scale_Pettifor=1.105;
       temperature_boiling=3825;
       temperature_melting=1768.3;
       enthalpy_fusion=20;  //CO20201111
@@ -8897,7 +8923,7 @@ namespace xelement {
       work_function_Miedema=5.15;
       density_line_electron_WS_Miedema=1.57;
       energy_surface_0K_Miedema=1550;
-      scale_Pettifor=1.16;
+      chemical_scale_Pettifor=1.16;
       temperature_boiling=2856;
       temperature_melting=1064.18;
       enthalpy_fusion=12.5;  //CO20201111
@@ -8989,7 +9015,7 @@ namespace xelement {
       work_function_Miedema=4.20;
       density_line_electron_WS_Miedema=1.24;
       energy_surface_0K_Miedema=610;
-      scale_Pettifor=1.32;
+      chemical_scale_Pettifor=1.32;
       temperature_boiling=356.73;
       temperature_melting=-38.83;
       enthalpy_fusion=2.29;  //CO20201111
@@ -9070,7 +9096,8 @@ namespace xelement {
       radii_Slatter=1.90;
       radii_Pyykko=1.44;
       conductivity_electrical=6.7E6;
-      electronegativity_Pauling=1.62;
+      if(oxidation_state==3){electronegativity_Pauling=2.04;} //CO20201111 - http://www.knowledgedoor.com/2/elements_handbook/pauling_electronegativity.html
+      else{electronegativity_Pauling=1.62;} //oxidation_state==1 (DEFAULT)  //CO20201111
       hardness_chemical_Ghosh=1.7043;
       electronegativity_Pearson=3.2;
       electronegativity_Ghosh=4.719;
@@ -9082,7 +9109,7 @@ namespace xelement {
       work_function_Miedema=3.90;
       density_line_electron_WS_Miedema=1.12;
       energy_surface_0K_Miedema=610;
-      scale_Pettifor=1.56;
+      chemical_scale_Pettifor=1.56;
       temperature_boiling=1473;
       temperature_melting=304;
       enthalpy_fusion=4.2;  //CO20201111
@@ -9162,7 +9189,8 @@ namespace xelement {
       radii_Slatter=NNN;
       radii_Pyykko=1.44;
       conductivity_electrical=4.8E6;
-      electronegativity_Pauling=2.33;
+      if(oxidation_state==2){electronegativity_Pauling=1.87;} //CO20201111 - http://www.knowledgedoor.com/2/elements_handbook/pauling_electronegativity.html
+      else{electronegativity_Pauling=2.33;} //oxidation_state==4 (DEFAULT)  //CO20201111
       hardness_chemical_Ghosh=1.9414;
       electronegativity_Pearson=3.90;
       electronegativity_Ghosh=4.841;
@@ -9174,7 +9202,7 @@ namespace xelement {
       work_function_Miedema=4.10;
       density_line_electron_WS_Miedema=1.15;
       energy_surface_0K_Miedema=610;
-      scale_Pettifor=1.80;
+      chemical_scale_Pettifor=1.80;
       temperature_boiling=1749;
       temperature_melting=327.46;
       enthalpy_fusion=4.77;  //CO20201111
@@ -9266,7 +9294,7 @@ namespace xelement {
       work_function_Miedema=4.15;
       density_line_electron_WS_Miedema=1.16;
       energy_surface_0K_Miedema=550;
-      scale_Pettifor=2.04;
+      chemical_scale_Pettifor=2.04;
       temperature_boiling=1564;
       temperature_melting=271.3;
       enthalpy_fusion=10.9;  //CO20201111
@@ -9358,7 +9386,7 @@ namespace xelement {
       work_function_Miedema=NNN;
       density_line_electron_WS_Miedema=NNN;
       energy_surface_0K_Miedema=NNN;
-      scale_Pettifor=2.28;
+      chemical_scale_Pettifor=2.28;
       temperature_boiling=962;
       temperature_melting=254;
       enthalpy_fusion=13;  //CO20201111
@@ -9450,7 +9478,7 @@ namespace xelement {
       work_function_Miedema=NNN;
       density_line_electron_WS_Miedema=NNN;
       energy_surface_0K_Miedema=NNN;
-      scale_Pettifor=2.52;
+      chemical_scale_Pettifor=2.52;
       temperature_boiling=NNN;
       temperature_melting=302;
       enthalpy_fusion=6;  //CO20201111
@@ -9542,7 +9570,7 @@ namespace xelement {
       work_function_Miedema=NNN;
       density_line_electron_WS_Miedema=NNN;
       energy_surface_0K_Miedema=NNN;
-      scale_Pettifor=0;
+      chemical_scale_Pettifor=0;
       temperature_boiling=-61.7;
       temperature_melting=-71;
       enthalpy_fusion=3;  //CO20201111
@@ -9636,7 +9664,7 @@ namespace xelement {
       work_function_Miedema=NNN;
       density_line_electron_WS_Miedema=NNN;
       energy_surface_0K_Miedema=NNN;
-      scale_Pettifor=0;
+      chemical_scale_Pettifor=0;
       temperature_boiling=NNN;
       temperature_melting=NNN;
       enthalpy_fusion=2;  //CO20201111
@@ -9728,7 +9756,7 @@ namespace xelement {
       work_function_Miedema=NNN;
       density_line_electron_WS_Miedema=NNN;
       energy_surface_0K_Miedema=NNN;
-      scale_Pettifor=0;
+      chemical_scale_Pettifor=0;
       temperature_boiling=1737;
       temperature_melting=700;
       enthalpy_fusion=8;  //CO20201111
@@ -9821,7 +9849,7 @@ namespace xelement {
       work_function_Miedema=NNN;
       density_line_electron_WS_Miedema=NNN;
       energy_surface_0K_Miedema=NNN;
-      scale_Pettifor=0;
+      chemical_scale_Pettifor=0;
       temperature_boiling=3200;
       temperature_melting=1050;
       enthalpy_fusion=14;  //CO20201111
@@ -9914,7 +9942,7 @@ namespace xelement {
       work_function_Miedema=3.30;
       density_line_electron_WS_Miedema=1.28;
       energy_surface_0K_Miedema=NNN;
-      scale_Pettifor=0;
+      chemical_scale_Pettifor=0;
       temperature_boiling=4820;
       temperature_melting=1750;
       enthalpy_fusion=16;  //CO20201111
@@ -10006,7 +10034,7 @@ namespace xelement {
       work_function_Miedema=NNN;
       density_line_electron_WS_Miedema=NNN;
       energy_surface_0K_Miedema=NNN;
-      scale_Pettifor=0;
+      chemical_scale_Pettifor=0;
       temperature_boiling=4000;
       temperature_melting=1572;
       enthalpy_fusion=15;  //CO20201111
@@ -10098,7 +10126,7 @@ namespace xelement {
       work_function_Miedema=NNN;
       density_line_electron_WS_Miedema=NNN;
       energy_surface_0K_Miedema=NNN;
-      scale_Pettifor=0;
+      chemical_scale_Pettifor=0;
       temperature_boiling=3927;
       temperature_melting=1135;
       enthalpy_fusion=14;  //CO20201111
@@ -10190,7 +10218,7 @@ namespace xelement {
       work_function_Miedema=NNN;
       density_line_electron_WS_Miedema=NNN;
       energy_surface_0K_Miedema=NNN;
-      scale_Pettifor=0;
+      chemical_scale_Pettifor=0;
       temperature_boiling=4000;
       temperature_melting=644;
       enthalpy_fusion=10;  //CO20201111
@@ -10282,7 +10310,7 @@ namespace xelement {
       work_function_Miedema=NNN;
       density_line_electron_WS_Miedema=NNN;
       energy_surface_0K_Miedema=NNN;
-      scale_Pettifor=0;
+      chemical_scale_Pettifor=0;
       temperature_boiling=3230;
       temperature_melting=640;
       enthalpy_fusion=2.8;  //CO20201111 - taken from webelements (NNN from periodictable)
@@ -10374,7 +10402,7 @@ namespace xelement {
       work_function_Miedema=NNN;
       density_line_electron_WS_Miedema=NNN;
       energy_surface_0K_Miedema=NNN;
-      scale_Pettifor=0;
+      chemical_scale_Pettifor=0;
       temperature_boiling=2011;
       temperature_melting=1176;
       enthalpy_fusion=NNN;  //CO20201111
@@ -10466,7 +10494,7 @@ namespace xelement {
       work_function_Miedema=NNN;
       density_line_electron_WS_Miedema=NNN;
       energy_surface_0K_Miedema=NNN;
-      scale_Pettifor=0;
+      chemical_scale_Pettifor=0;
       temperature_boiling=3110;
       temperature_melting=1345;
       enthalpy_fusion=NNN;  //CO20201111
@@ -10558,7 +10586,7 @@ namespace xelement {
       work_function_Miedema=NNN;
       density_line_electron_WS_Miedema=NNN;
       energy_surface_0K_Miedema=NNN;
-      scale_Pettifor=0;
+      chemical_scale_Pettifor=0;
       temperature_boiling=NNN;
       temperature_melting=1050;
       enthalpy_fusion=NNN;  //CO20201111
@@ -10650,7 +10678,7 @@ namespace xelement {
       work_function_Miedema=NNN;
       density_line_electron_WS_Miedema=NNN;
       energy_surface_0K_Miedema=NNN;
-      scale_Pettifor=0;
+      chemical_scale_Pettifor=0;
       temperature_boiling=NNN;
       temperature_melting=900;
       enthalpy_fusion=NNN;  //CO20201111
@@ -10742,7 +10770,7 @@ namespace xelement {
       work_function_Miedema=NNN;
       density_line_electron_WS_Miedema=NNN;
       energy_surface_0K_Miedema=NNN;
-      scale_Pettifor=0;
+      chemical_scale_Pettifor=0;
       temperature_boiling=NNN;
       temperature_melting=860;
       enthalpy_fusion=NNN;  //CO20201111
@@ -10834,7 +10862,7 @@ namespace xelement {
       work_function_Miedema=NNN;
       density_line_electron_WS_Miedema=NNN;
       energy_surface_0K_Miedema=NNN;
-      scale_Pettifor=0;
+      chemical_scale_Pettifor=0;
       temperature_boiling=NNN;
       temperature_melting=1527;
       enthalpy_fusion=NNN;  //CO20201111
@@ -10926,7 +10954,7 @@ namespace xelement {
       work_function_Miedema=NNN;
       density_line_electron_WS_Miedema=NNN;
       energy_surface_0K_Miedema=NNN;
-      scale_Pettifor=0;
+      chemical_scale_Pettifor=0;
       temperature_boiling=NNN;
       temperature_melting=828;
       enthalpy_fusion=NNN;  //CO20201111
@@ -11018,7 +11046,7 @@ namespace xelement {
       work_function_Miedema=NNN;
       density_line_electron_WS_Miedema=NNN;
       energy_surface_0K_Miedema=NNN;
-      scale_Pettifor=0;
+      chemical_scale_Pettifor=0;
       temperature_boiling=NNN;
       temperature_melting=828;
       enthalpy_fusion=NNN;  //CO20201111
@@ -11110,7 +11138,7 @@ namespace xelement {
       work_function_Miedema=NNN;
       density_line_electron_WS_Miedema=NNN;
       energy_surface_0K_Miedema=NNN;
-      scale_Pettifor=0;
+      chemical_scale_Pettifor=0;
       temperature_boiling=NNN;
       temperature_melting=1627;
       enthalpy_fusion=NNN;  //CO20201111

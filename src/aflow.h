@@ -4644,23 +4644,23 @@ namespace makefile {
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
 // aflow_xelement.h stuff
-#define _AFLOW_XELEMENT_PROPERTIES_ALL_ "name,symbol,Z,period,group,series,block,mass,volume_molar,volume,area_molar_Miedema,valence_std,valence_iupac,valence_PT,valence_s,valence_p,valence_d,valence_f,density_PT,crystal,crystal_structure_PT,spacegroup,spacegroup_number,variance_parameter_mass,lattice_constants,lattice_angles,phase,radius_Saxena,radius_PT,radius_covalent_PT,radius_covalent,radius_VanDerWaals_PT,radii_Ghosh08,radii_Slatter,radii_Pyykko,conductivity_electrical,electronegativity_Pauling,hardness_chemical_Ghosh,electronegativity_Pearson,electronegativity_Ghosh,electronegativity_Allen,oxidation_states,oxidation_states_preferred,electron_affinity_PT,energies_ionization,work_function_Miedema,density_line_electron_WS_Miedema,energy_surface_0K_Miedema,scale_Pettifor,temperature_boiling,temperature_melting,enthalpy_fusion,enthalpy_vaporization,enthalpy_atomization_WE,energy_cohesive,specific_heat_PT,critical_pressure,critical_temperature_PT,thermal_expansion,conductivity_thermal,hardness_mechanical_Brinell,hardness_mechanical_Mohs,hardness_mechanical_Vickers,hardness_chemical_Pearson,hardness_chemical_Putz,hardness_chemical_RB,modulus_shear,modulus_Young,modulus_bulk,Poisson_ratio_PT,modulus_bulk_x_volume_molar_Miedema,magnetic_type_PT,susceptibility_magnetic_mass,susceptibility_magnetic_volume,susceptibility_magnetic_molar,temperature_Curie,refractive_index,color_PT,HHIP,HHIR,xray_scatt" //CO20201111
+#define _AFLOW_XELEMENT_PROPERTIES_ALL_ "name,symbol,Z,period,group,series,block,mass,volume_molar,volume,area_molar_Miedema,valence_std,valence_iupac,valence_PT,valence_s,valence_p,valence_d,valence_f,density_PT,crystal,crystal_structure_PT,spacegroup,spacegroup_number,variance_parameter_mass,lattice_constants,lattice_angles,phase,radius_Saxena,radius_PT,radius_covalent_PT,radius_covalent,radius_VanDerWaals_PT,radii_Ghosh08,radii_Slatter,radii_Pyykko,conductivity_electrical,electronegativity_Pauling,hardness_chemical_Ghosh,electronegativity_Pearson,electronegativity_Ghosh,electronegativity_Allen,oxidation_states,oxidation_states_preferred,electron_affinity_PT,energies_ionization,work_function_Miedema,density_line_electron_WS_Miedema,energy_surface_0K_Miedema,chemical_scale_Pettifor,temperature_boiling,temperature_melting,enthalpy_fusion,enthalpy_vaporization,enthalpy_atomization_WE,energy_cohesive,specific_heat_PT,critical_pressure,critical_temperature_PT,thermal_expansion,conductivity_thermal,hardness_mechanical_Brinell,hardness_mechanical_Mohs,hardness_mechanical_Vickers,hardness_chemical_Pearson,hardness_chemical_Putz,hardness_chemical_RB,modulus_shear,modulus_Young,modulus_bulk,Poisson_ratio_PT,modulus_bulk_x_volume_molar_Miedema,magnetic_type_PT,susceptibility_magnetic_mass,susceptibility_magnetic_volume,susceptibility_magnetic_molar,temperature_Curie,refractive_index,color_PT,HHIP,HHIR,xray_scatt" //CO20201111
 namespace xelement {
   class xelement { // simple class.. nothing fancy
     public:
-      // constructor destructor                              // constructor/destructor
-      xelement();                                            // default, just allocate
-      xelement(uint);                                        // look at it by Z
-      xelement(const string&);                               // look at it by symbol or name  //CO20200520
-      ~xelement();                                           // kill everything
-      const xelement& operator=(const xelement &b);          // copy
+      // constructor destructor                                       // constructor/destructor
+      xelement();                                                     // default, just allocate
+      xelement(uint Z,int oxidation_state=AUROSTD_MAX_INT);           // look at it by Z
+      xelement(const string&,int oxidation_state=AUROSTD_MAX_INT);    // look at it by symbol or name  //CO20200520
+      ~xelement();                                                    // kill everything
+      const xelement& operator=(const xelement &b);                   // copy
       void clear();
       void loadDefaultUnits();  //CO20201111
-      void populate(const string& element); //CO20200520
-      void populate(uint ZZ); //CO20200520
+      void populate(const string& element,int oxidation_state=AUROSTD_MAX_INT); //CO20200520
+      void populate(uint ZZ,int oxidation_state=AUROSTD_MAX_INT); //CO20200520
       string getPropertyStringVector(const string& property,const string& delim=",",uint ncols=AUROSTD_MAX_UINT) const; //CO20201111
       string getPropertyString(const string& property,const string& delim=",",uint ncols=AUROSTD_MAX_UINT) const; //CO20201111
-      double getPropertyDouble(const string& property) const;
+      double getPropertyDouble(const string& property,int index=AUROSTD_MAX_INT) const;
       const xvector<double>& getPropertyXVectorDouble(const string& property) const;
       const vector<double>& getPropertyVectorDouble(const string& property) const;
       string getType(const string& property) const; //CO20201111
@@ -4732,7 +4732,7 @@ namespace xelement {
       double work_function_Miedema;           // (V)        (phi^{\star} empirically-adjusted work function   Miedema Rule Table 1a Physica 100B 1-28 (1980) 10.1016/0378-4363(80)90054-6
       double density_line_electron_WS_Miedema;  // (d.u.)^1/3 n_{ws}^{1/3} (averaged electron density at the boundary of the Wigner-Seitz cell)^{1/3}  Miedema Rule Table 1a Physica 100B 1-28 (1980) 10.1016/0378-4363(80)90054-6
       double energy_surface_0K_Miedema;       // (mJ/m^2)   \gamma_s^0 surface energy at T=0   Miedema Rule Table 1a Physica 100B 1-28 (1980) 10.1016/0378-4363(80)90054-6
-      double scale_Pettifor;                  // Chemical Scale Pettifor Solid State Communications 51 31-34 (1984)
+      double chemical_scale_Pettifor;                  // Chemical Scale Pettifor Solid State Communications 51 31-34 (1984)
       //                                          
       double temperature_boiling;             // (Celsius), http://periodictable.com C:diamond, P:"YELLOW" Phosphorus, As:sublimates at this T.      //DU20190517
       double temperature_melting;             // (Celsius), http://periodictable.com He does not solidify at standard pressure,C: Value given for diamond form, P : Value given for "YELLOW" phosphorus form, S : Value given for monoclinic, beta form, Se: Value given for hexagonal, gray form, Bk: Value given for alpha form.           //DU20190517
@@ -4835,7 +4835,7 @@ namespace xelement {
       string units_density_line_electron_WS_Miedema;              
       string units_energy_surface_0K_Miedema;          
       //
-      string units_scale_Pettifor;          
+      string units_chemical_scale_Pettifor;          
       //
       string units_temperature_boiling;         
       string units_temperature_melting;         
