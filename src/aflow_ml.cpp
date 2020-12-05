@@ -530,7 +530,6 @@ namespace aflowML {
     vector<string> vproperties_elements_full;aurostd::string2tokens(_AFLOW_XELEMENT_PROPERTIES_ALL_,vproperties_elements_full,",");
     vector<string> vproperties_elements_numbers;
 
-    //aurostd::string2tokens("symbol,Z,period,group,mass,volume_molar,volume,valence_std,valence_iupac,valence_PT,valence_s,valence_p,valence_d,valence_f,density_PT,spacegroup_number,variance_parameter_mass,lattice_constants,lattice_angles,radius_Saxena,radius_PT,radius_covalent_PT,radius_covalent,radius_VanDerWaals_PT,radii_Ghosh08,radii_Slatter,radii_Pyykko,conductivity_electrical,electronegativity_Pauling,hardness_chemical_Ghosh,electronegativity_Pearson,electronegativity_Ghosh,electronegativity_Allen,electron_affinity_PT,energies_ionization,chemical_scale_Pettifor,temperature_boiling,temperature_melting,enthalpy_fusion,enthalpy_vaporization,enthalpy_atomization_WE,energy_cohesive,specific_heat_PT,critical_pressure,critical_temperature_PT,thermal_expansion,conductivity_thermal,hardness_mechanical_Brinell,hardness_mechanical_Mohs,hardness_mechanical_Vickers,hardness_chemical_Pearson,hardness_chemical_Putz,hardness_chemical_RB,modulus_shear,modulus_Young,modulus_bulk,Poisson_ratio_PT,refractive_index",vproperties_elements,",");
     //number properties next
     for(j=0;j<vproperties_elements_full.size();j++){
       if(xel_N.getType(vproperties_elements_full[j])=="number"||xel_N.getType(vproperties_elements_full[j])=="numbers"){
