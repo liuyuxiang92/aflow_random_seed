@@ -4727,13 +4727,13 @@ namespace xelement {
       vector<double> oxidation_states;
       //RF+SK20200410 END
 
-      double electron_affinity_PT;            // (kJ/mol)  http://periodictable.com       //DU20190517
-      vector<double> energies_ionization;     // (kJ/mol) http://periodictable.com //CO20201111
-      double work_function_Miedema;           // (V)        (phi^{\star} empirically-adjusted work function   Miedema Rule Table 1a Physica 100B 1-28 (1980) 10.1016/0378-4363(80)90054-6
+      double electron_affinity_PT;              // (kJ/mol)  http://periodictable.com       //DU20190517
+      vector<double> energies_ionization;       // (kJ/mol) http://periodictable.com //CO20201111
+      double work_function_Miedema;             // (V)        (phi^{\star} empirically-adjusted work function   Miedema Rule Table 1a Physica 100B 1-28 (1980) 10.1016/0378-4363(80)90054-6
       double density_line_electron_WS_Miedema;  // (d.u.)^1/3 n_{ws}^{1/3} (averaged electron density at the boundary of the Wigner-Seitz cell)^{1/3}  Miedema Rule Table 1a Physica 100B 1-28 (1980) 10.1016/0378-4363(80)90054-6
-      double energy_surface_0K_Miedema;       // (mJ/m^2)   \gamma_s^0 surface energy at T=0   Miedema Rule Table 1a Physica 100B 1-28 (1980) 10.1016/0378-4363(80)90054-6
-      double chemical_scale_Pettifor;           // Chemical Scale Pettifor Solid State Communications 51 31-34 (1984)
-      double Mendeleev_number;                  // D.G. Pettifor 1986 J. Phys. C: Solid State Phys. 19 285  10.1088/0022-3719/19/3/002 //CO20201111
+      double energy_surface_0K_Miedema;         // (mJ/m^2)   \gamma_s^0 surface energy at T=0   Miedema Rule Table 1a Physica 100B 1-28 (1980) 10.1016/0378-4363(80)90054-6
+      double chemical_scale_Pettifor;           // Chemical Scale Pettifor Solid State Communications 51 31-34 (1984) //updated with D.G. Pettifor 1986 J. Phys. C: Solid State Phys. 19 285  10.1088/0022-3719/19/3/002 //CO20201111
+      uint Mendeleev_number;                    // D.G. Pettifor 1986 J. Phys. C: Solid State Phys. 19 285  10.1088/0022-3719/19/3/002 //CO20201111
       //                                          
       double temperature_boiling;             // (Celsius), http://periodictable.com C:diamond, P:"YELLOW" Phosphorus, As:sublimates at this T.      //DU20190517
       double temperature_melting;             // (Celsius), http://periodictable.com He does not solidify at standard pressure,C: Value given for diamond form, P : Value given for "YELLOW" phosphorus form, S : Value given for monoclinic, beta form, Se: Value given for hexagonal, gray form, Bk: Value given for alpha form.           //DU20190517
