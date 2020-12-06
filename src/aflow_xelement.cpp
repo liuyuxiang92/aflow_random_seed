@@ -1434,8 +1434,8 @@ namespace xelement {
       if(vproperties[i]==aurostd::toupper("density_line_electron_WS_Miedema")) {dptr=&density_line_electron_WS_Miedema;sptr=&units_density_line_electron_WS_Miedema;}
       if(vproperties[i]==aurostd::toupper("energy_surface_0K_Miedema")) {dptr=&energy_surface_0K_Miedema;sptr=&units_energy_surface_0K_Miedema;}
       //
-      if(vproperties[i]==aurostd::toupper("chemical_scale_Pettifor")) {dptr=&chemical_scale_Pettifor;sptr=&units_chemical_scale_Pettifor;}
-      if(vproperties[i]==aurostd::toupper("Mendeleev_number")) {dptr=&Mendeleev_number;sptr=&units_Mendeleev_number;} //CO20201111
+      if(vproperties[i]==aurostd::toupper("chemical_scale_Pettifor")) continue; //CO20201111
+      if(vproperties[i]==aurostd::toupper("Mendeleev_number")) continue; //CO20201111
       //
       if(vproperties[i]==aurostd::toupper("temperature_boiling")) {dptr=&temperature_boiling;sptr=&units_temperature_boiling;}
       if(vproperties[i]==aurostd::toupper("temperature_melting")) {dptr=&temperature_melting;sptr=&units_temperature_melting;}
