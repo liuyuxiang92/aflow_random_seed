@@ -396,7 +396,7 @@ namespace aflowML {
       vector<string>& vheaders,
       vector<double>& vfeatures,
       bool vheaders_only){
-    bool LDEBUG=(FALSE || _DEBUG_ML_ || XHOST.DEBUG);
+    bool LDEBUG=(TRUE || _DEBUG_ML_ || XHOST.DEBUG);
     string soliloquy=XPID+"aflowML::insertElementalCombinationsCCE():";
     vheaders.clear();vfeatures.clear();
     
@@ -413,16 +413,8 @@ namespace aflowML {
       if(entry.vspecies[0]==xel_anion.symbol){index_cation=1;index_anion=0;}else{index_cation=0;index_anion=1;}
     }
 
-    //last is fastest iterator
     vector<int> vsizes;
-    vsizes.push_back((int)vproperties.size());
-    vsizes.push_back((int)venvs.size());
-    vsizes.push_back(_ENERGIES_IONIZATION_MAX_);  //index for (x)vector properties (lattice_constants, lattice_angles, energies_ionization), max is 5
-    vsizes.push_back((int)vions.size());
-    vsizes.push_back(2);  //M-X_bonds or not
-    vsizes.push_back((int)vstats.size());
-    
-    aurostd::xcombos xc(vsizes,'E');
+    aurostd::xcombos xc;
     uint count=0;
     bool divide_by_adjacency=false;
     string property="";
@@ -436,6 +428,32 @@ namespace aflowML {
     uint ncation=0,nanion=0,i=0,j=0;
     bool has_NaN=false;
     double d=0.0;
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //SINGLE
+    //last is fastest iterator
+    vsizes.clear();
+    vsizes.push_back((int)vproperties.size());
+    vsizes.push_back((int)venvs.size());
+    vsizes.push_back(_ENERGIES_IONIZATION_MAX_);  //index for (x)vector properties (lattice_constants, lattice_angles, energies_ionization), max is 5
+    vsizes.push_back((int)vions.size());
+    vsizes.push_back(2);  //M-X_bonds or not
+    vsizes.push_back((int)vstats.size());
+    
+    xc.reset(vsizes,'E');
+    count=0;
+    divide_by_adjacency=false;
+    property="";
+    index_property=0;
+    index_vec=0;
+    index_env=0;
+    index_ion=0;
+    index_adjacency=0;
+    index_stat=0;
+    xvec_env.clear();
+    ncation=0;nanion=0;i=0;j=0;
+    has_NaN=false;
+    d=0.0;
     while(xc.increment()){
       //
       const vector<int>& indices=xc.getCombo();
@@ -478,29 +496,31 @@ namespace aflowML {
       if(LDEBUG){cerr << soliloquy << " count_single=" << count++ << " " << property << endl;}
       vheaders.push_back(property);
       if(vheaders_only==false){
-        if(env=="crystal"){xvec_env.resize(entry.natoms);ncation=entry.vcomposition[index_cation];nanion=entry.vcomposition[index_anion];}
-        else if(env=="atomenv"){
-          xvec_env.resize((int)std::ceil(M_X_bonds)+1);
-          if(ion=="cation"){ncation=1;nanion=(uint)std::ceil(M_X_bonds);}
-          else if(ion=="anion"){ncation=(uint)std::ceil(M_X_bonds);nanion=1;}
-          else{throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown ion: "+ion,_RUNTIME_ERROR_);}
-        }
-        else{throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown env: "+env,_RUNTIME_ERROR_);}
-        i=0;
-        has_NaN=false;
-        //cation
-        d=xel_cation.getPropertyDouble(property_element,index_vec);
-        has_NaN=(has_NaN || aurostd::isNaN(d));
-        for(j=0;j<ncation;j++){xvec_env[xvec_env.lrows+(i++)]=d;}
-        //anion
-        d=xel_anion.getPropertyDouble(property_element,index_vec);
-        has_NaN=(has_NaN || aurostd::isNaN(d));
-        for(j=0;j<nanion;j++){xvec_env[xvec_env.lrows+(i++)]=d;}
-        //
-        if(has_NaN==false && divide_by_adjacency){xvec_env/=std::ceil(M_X_bonds);}
-        if(LDEBUG){
-          cerr << soliloquy << " xvec[\""+property+"\"]=" << xvec_env << endl;
-          cerr << soliloquy << " has_NaN=" << has_NaN << endl;
+        if(index_stat==0){  //do not waste cycles on recreating xvec over and over again
+          if(env=="crystal"){xvec_env.resize(entry.natoms);ncation=entry.vcomposition[index_cation];nanion=entry.vcomposition[index_anion];}
+          else if(env=="atomenv"){
+            xvec_env.resize((int)std::ceil(M_X_bonds)+1);
+            if(ion=="cation"){ncation=1;nanion=(uint)std::ceil(M_X_bonds);}
+            else if(ion=="anion"){ncation=(uint)std::ceil(M_X_bonds);nanion=1;}
+            else{throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown ion: "+ion,_RUNTIME_ERROR_);}
+          }
+          else{throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown env: "+env,_RUNTIME_ERROR_);}
+          i=0;
+          has_NaN=false;
+          //cation
+          d=xel_cation.getPropertyDouble(property_element,index_vec);
+          has_NaN=(has_NaN || aurostd::isNaN(d));
+          for(j=0;j<ncation;j++){xvec_env[xvec_env.lrows+(i++)]=d;}
+          //anion
+          d=xel_anion.getPropertyDouble(property_element,index_vec);
+          has_NaN=(has_NaN || aurostd::isNaN(d));
+          for(j=0;j<nanion;j++){xvec_env[xvec_env.lrows+(i++)]=d;}
+          //
+          if(has_NaN==false && divide_by_adjacency){xvec_env/=std::ceil(M_X_bonds);}
+          if(LDEBUG){
+            cerr << soliloquy << " xvec[\""+property+"\"]=" << xvec_env << endl;
+            cerr << soliloquy << " has_NaN=" << has_NaN << endl;
+          }
         }
         if(has_NaN){d=NNN;}
         else{d=getStatistic(xvec_env,stat);}
@@ -508,6 +528,177 @@ namespace aflowML {
         vfeatures.push_back(d);
       }
     }
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+    int index_property2=0;
+    int index_vec2=0;
+    int index_operation=0;
+    double d2=0.0;
+    double d3=0.0;
+
+    //convert to SI units for combinations
+    xelement::xelement xel_cation_SI=xel_cation;xel_cation_SI.convertUnits();
+    xelement::xelement xel_anion_SI=xel_anion;xel_anion_SI.convertUnits();
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //DOUBLE
+    //last is fastest iterator
+    vsizes.clear();
+    vsizes.push_back((int)vproperties.size());
+    vsizes.push_back((int)vproperties.size());
+    vsizes.push_back((int)venvs.size());
+    vsizes.push_back(_ENERGIES_IONIZATION_MAX_);  //index for (x)vector properties (lattice_constants, lattice_angles, energies_ionization), max is 5
+    vsizes.push_back(_ENERGIES_IONIZATION_MAX_);  //index for (x)vector properties (lattice_constants, lattice_angles, energies_ionization), max is 5
+    vsizes.push_back((int)vions.size());
+    vsizes.push_back(2);  //multiplication/division
+    vsizes.push_back(2);  //M-X_bonds or not
+    vsizes.push_back((int)vstats.size());
+    
+    xc.reset(vsizes,'E');
+    count=0;
+    divide_by_adjacency=false;
+    property="";
+    index_property=0;
+    index_property2=0;
+    index_vec=0;
+    index_vec2=0;
+    index_env=0;
+    index_ion=0;
+    index_operation=0;
+    index_adjacency=0;
+    index_stat=0;
+    xvec_env.clear();
+    ncation=0;nanion=0;i=0;j=0;
+    has_NaN=false;
+    d=0.0;
+    d2=0.0;
+    d3=0.0;
+    while(xc.increment()){
+      //
+      const vector<int>& indices=xc.getCombo();
+      //
+      index_property=indices[0];
+      index_property2=indices[1];
+      if(index_property2<=index_property){continue;}
+      index_env=indices[2];
+      index_vec=indices[3]; //order this way so we resize xvector as little as possible
+      index_vec2=indices[4]; //order this way so we resize xvector as little as possible
+      index_ion=indices[5];
+      index_operation=indices[6];
+      index_adjacency=indices[7];
+      index_stat=indices[8];
+      //
+      const string& property_element=vproperties[index_property];
+      const string& property_element2=vproperties[index_property2];
+      const string& env=venvs[index_env];
+      const string& ion=vions[index_ion];
+      divide_by_adjacency=(index_adjacency==1);
+      const string& stat=vstats[index_stat];
+      //
+      if(env=="crystal"&&index_ion>0){continue;}  //crystal does not need cation/anion  //ion!=vions[0]
+      if(!(
+            property_element=="lattice_constants"||
+            property_element=="lattice_angles"||
+            property_element=="energies_ionization"||
+            false)
+          &&index_vec>0){
+        continue;
+      }
+      if(!(
+            property_element2=="lattice_constants"||
+            property_element2=="lattice_angles"||
+            property_element2=="energies_ionization"||
+            false)
+          &&index_vec2>0){
+        continue;
+      }
+      if((property_element=="lattice_constants"||property_element=="lattice_angles")&&index_vec>2){continue;}
+      if((property_element2=="lattice_constants"||property_element2=="lattice_angles")&&index_vec2>2){continue;}
+      //
+      property="";
+      property+="(";
+      //
+      property+=property_element;
+      if(property_element=="lattice_constants"){property+="_"+vlattice_constants_variants[index_vec];}
+      else if(property_element=="lattice_angles"){property+="_"+vlattice_angles_variants[index_vec];}
+      else if(property_element=="energies_ionization"){property+="_"+aurostd::utype2string(index_vec+1);}
+      //
+      if(index_operation==0){property+="_*_";}
+      else{property+="_/_";}
+      //
+      property+=property_element2;
+      if(property_element2=="lattice_constants"){property+="_"+vlattice_constants_variants[index_vec2];}
+      else if(property_element2=="lattice_angles"){property+="_"+vlattice_angles_variants[index_vec2];}
+      else if(property_element2=="energies_ionization"){property+="_"+aurostd::utype2string(index_vec2+1);}
+      //
+      property+=")";
+      if(divide_by_adjacency){property+="_/_(M-X_bonds)";}
+      property+="_"+env;
+      if(env=="atomenv"){property+="_"+ion;}
+      property+="_"+stat;
+      //
+      if(LDEBUG){cerr << soliloquy << " count_double=" << count++ << " " << property << endl;}
+      vheaders.push_back(property);
+      if(vheaders_only==false){
+        if(index_stat==0){  //do not waste cycles on recreating xvec over and over again
+          if(env=="crystal"){xvec_env.resize(entry.natoms);ncation=entry.vcomposition[index_cation];nanion=entry.vcomposition[index_anion];}
+          else if(env=="atomenv"){
+            xvec_env.resize((int)std::ceil(M_X_bonds)+1);
+            if(ion=="cation"){ncation=1;nanion=(uint)std::ceil(M_X_bonds);}
+            else if(ion=="anion"){ncation=(uint)std::ceil(M_X_bonds);nanion=1;}
+            else{throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown ion: "+ion,_RUNTIME_ERROR_);}
+          }
+          else{throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown env: "+env,_RUNTIME_ERROR_);}
+          i=0;
+          has_NaN=false;
+          //cation
+          d=xel_cation_SI.getPropertyDouble(property_element,index_vec);
+          d2=xel_cation_SI.getPropertyDouble(property_element2,index_vec2);
+          has_NaN=(has_NaN || aurostd::isNaN(d));
+          has_NaN=(has_NaN || aurostd::isNaN(d2));
+          if(index_operation==0){d3=d*d2;} //multiplication
+          else{d3=d/d2;}  //division
+          //check issues with multiplication/division
+          if(!std::isfinite(d3)){
+            if(LDEBUG){
+              if(index_operation==0){cerr << soliloquy << " multiplication yields inf: " << d << " * " << d2 << endl;}
+              else{cerr << soliloquy << " division yields inf: " << d << " / " << d2 << endl;}
+            }
+            has_NaN=true;
+          }
+          //
+          for(j=0;j<ncation;j++){xvec_env[xvec_env.lrows+(i++)]=d3;}
+          //anion
+          d=xel_anion_SI.getPropertyDouble(property_element,index_vec);
+          d2=xel_anion_SI.getPropertyDouble(property_element2,index_vec2);
+          has_NaN=(has_NaN || aurostd::isNaN(d));
+          has_NaN=(has_NaN || aurostd::isNaN(d2));
+          if(index_operation==0){d3=d*d2;} //multiplication
+          else{d3=d/d2;}  //division
+          //check issues with multiplication/division
+          if(!std::isfinite(d3)){
+            if(LDEBUG){
+              if(index_operation==0){cerr << soliloquy << " multiplication yields inf: " << d << " * " << d2 << endl;}
+              else{cerr << soliloquy << " division yields inf: " << d << " / " << d2 << endl;}
+            }
+            has_NaN=true;
+          }
+          //
+          for(j=0;j<nanion;j++){xvec_env[xvec_env.lrows+(i++)]=d3;}
+          //
+          if(has_NaN==false && divide_by_adjacency){xvec_env/=std::ceil(M_X_bonds);}
+          if(LDEBUG){
+            cerr << soliloquy << " xvec[\""+property+"\"]=" << xvec_env << endl;
+            cerr << soliloquy << " has_NaN=" << has_NaN << endl;
+          }
+        }
+        if(has_NaN){d=NNN;}
+        else{d=getStatistic(xvec_env,stat);}
+        if(LDEBUG){cerr << soliloquy << " " << stat << "=" << d << endl;}
+        vfeatures.push_back(d);
+      }
+    }
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   }
   void writeCCECSV() {
     bool LDEBUG=(TRUE || _DEBUG_ML_ || XHOST.DEBUG);

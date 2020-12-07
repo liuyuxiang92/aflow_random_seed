@@ -1407,7 +1407,7 @@ namespace xelement {
       if(vproperties[i]==aurostd::toupper("crystal_structure_PT")) continue;
       if(vproperties[i]==aurostd::toupper("spacegroup")) continue;
       if(vproperties[i]==aurostd::toupper("spacegroup_number")) continue;
-      if(vproperties[i]==aurostd::toupper("variance_parameter_mass")) {dptr=&variance_parameter_mass;sptr=&units_variance_parameter_mass;}
+      if(vproperties[i]==aurostd::toupper("variance_parameter_mass")) continue;
       if(vproperties[i]==aurostd::toupper("lattice_constants")) {dxvptr=&lattice_constants;sptr=&units_lattice_constants;}
       if(vproperties[i]==aurostd::toupper("lattice_angles")) {dxvptr=&lattice_angles;sptr=&units_lattice_angles;}
       if(vproperties[i]==aurostd::toupper("phase")) continue;
@@ -1421,13 +1421,13 @@ namespace xelement {
       if(vproperties[i]==aurostd::toupper("radii_Pyykko")) {dptr=&radii_Pyykko;sptr=&units_radii_Pyykko;}
       //
       if(vproperties[i]==aurostd::toupper("conductivity_electrical")) {dptr=&conductivity_electrical;sptr=&units_conductivity_electrical;}
-      if(vproperties[i]==aurostd::toupper("electronegativity_Pauling")) {dptr=&electronegativity_Pauling;sptr=&units_electronegativity_Pauling;}
+      if(vproperties[i]==aurostd::toupper("electronegativity_Pauling")) continue;
       if(vproperties[i]==aurostd::toupper("hardness_chemical_Ghosh")) {dptr=&hardness_chemical_Ghosh;sptr=&units_hardness_chemical_Ghosh;}
       if(vproperties[i]==aurostd::toupper("electronegativity_Pearson")) {dptr=&electronegativity_Pearson;sptr=&units_electronegativity_Pearson;}
       if(vproperties[i]==aurostd::toupper("electronegativity_Ghosh")) {dptr=&electronegativity_Ghosh;sptr=&units_electronegativity_Ghosh;}
-      if(vproperties[i]==aurostd::toupper("electronegativity_Allen")) {dptr=&electronegativity_Allen;sptr=&units_electronegativity_Allen;}
-      if(vproperties[i]==aurostd::toupper("oxidation_states")) {dvptr=&oxidation_states;sptr=&units_oxidation_states;}
-      if(vproperties[i]==aurostd::toupper("oxidation_states_preferred")) {dvptr=&oxidation_states_preferred;sptr=&units_oxidation_states_preferred;}
+      if(vproperties[i]==aurostd::toupper("electronegativity_Allen")) continue;
+      if(vproperties[i]==aurostd::toupper("oxidation_states")) continue;
+      if(vproperties[i]==aurostd::toupper("oxidation_states_preferred")) continue;
       if(vproperties[i]==aurostd::toupper("electron_affinity_PT")) {dptr=&electron_affinity_PT;sptr=&units_electron_affinity_PT;}
       if(vproperties[i]==aurostd::toupper("energies_ionization")) {dvptr=&energies_ionization;sptr=&units_energies_ionization;}
       if(vproperties[i]==aurostd::toupper("work_function_Miedema")) {dptr=&work_function_Miedema;sptr=&units_work_function_Miedema;}
@@ -1463,7 +1463,7 @@ namespace xelement {
       //
       if(vproperties[i]==aurostd::toupper("magnetic_type_PT")) continue;
       if(vproperties[i]==aurostd::toupper("susceptibility_magnetic_mass")) {dptr=&susceptibility_magnetic_mass;sptr=&units_susceptibility_magnetic_mass;}
-      if(vproperties[i]==aurostd::toupper("susceptibility_magnetic_volume")) {dptr=&susceptibility_magnetic_volume;sptr=&units_susceptibility_magnetic_volume;}
+      if(vproperties[i]==aurostd::toupper("susceptibility_magnetic_volume")) continue;
       if(vproperties[i]==aurostd::toupper("susceptibility_magnetic_molar")) {dptr=&susceptibility_magnetic_molar;sptr=&units_susceptibility_magnetic_molar;}
       if(vproperties[i]==aurostd::toupper("temperature_Curie")) {dptr=&temperature_Curie;sptr=&units_temperature_Curie;}
       //
@@ -1482,39 +1482,39 @@ namespace xelement {
       }
       if(units_new=="SI"){
         if(units_old=="kg"){converted=true;}  //done
-        if(units_old=="m^3/mol"){converted=true;}  //done
-        if(units_old=="m^3/K"){converted=true;}  //done
-        if(units_old=="e-"){converted=true;}  //done
-        if(units_old=="rad"){converted=true;}  //done
-        if(units_old=="S/m"){converted=true;}  //done
-        if(units_old=="V"){converted=true;}  //done
-        if(units_old=="J/(kg K)"){converted=true;}  //done
-        if(units_old=="K"){converted=true;}  //done
-        if(units_old=="K^{-1}"){converted=true;}  //done
-        if(units_old=="W/(m K)"){converted=true;}  //done
+        else if(units_old=="m^3/mol"){converted=true;}  //done
+        else if(units_old=="m^3/K"){converted=true;}  //done
+        else if(units_old=="e-"){converted=true;}  //done
+        else if(units_old=="rad"){converted=true;}  //done
+        else if(units_old=="S/m"){converted=true;}  //done
+        else if(units_old=="V"){converted=true;}  //done
+        else if(units_old=="J/(kg K)"){converted=true;}  //done
+        else if(units_old=="K"){converted=true;}  //done
+        else if(units_old=="K^{-1}"){converted=true;}  //done
+        else if(units_old=="W/(m K)"){converted=true;}  //done
         //
-        if(units_old=="A^3"){
+        else if(units_old=="A^3"){
           dold=(*dptr);
           if(dold!=NNN && dold!=AUROSTD_NAN){(*dptr)*=std::pow(1e-10,3.0);}
           (*sptr)="m^3";
           if(LDEBUG){cerr << soliloquy << " converted " << dold << " (" << units_old << ") to " << (*dptr) << " (" << (*sptr) << ")" << endl;}
           converted=true;
         }
-        if(units_old=="cm^2"){
+        else if(units_old=="cm^2"){
           dold=(*dptr);
           if(dold!=NNN && dold!=AUROSTD_NAN){(*dptr)*=std::pow(1e-2,2.0);}
           (*sptr)="m^2";
           if(LDEBUG){cerr << soliloquy << " converted " << dold << " (" << units_old << ") to " << (*dptr) << " (" << (*sptr) << ")" << endl;}
           converted=true;
         }
-        if(units_old=="g/cm^3"){
+        else if(units_old=="g/cm^3"){
           dold=(*dptr);
           if(dold!=NNN && dold!=AUROSTD_NAN){(*dptr)*=1e-3*std::pow(1.0/1e-2,3.0);}
           (*sptr)="kg/m^3";
           if(LDEBUG){cerr << soliloquy << " converted " << dold << " (" << units_old << ") to " << (*dptr) << " (" << (*sptr) << ")" << endl;}
           converted=true;
         }
-        if(units_old=="pm"){
+        else if(units_old=="pm"){
           (*sptr)="m";
           if(dptr!=NULL){
             dold=(*dptr);
@@ -1533,35 +1533,35 @@ namespace xelement {
             throw aurostd::xerror(_AFLOW_FILE_NAME_,"xelement::convertUnits():","No pointer found",_RUNTIME_ERROR_);  //CO20200520
           }
         }
-        if(units_old=="A"){
+        else if(units_old=="A"){
           dold=(*dptr);
           if(dold!=NNN && dold!=AUROSTD_NAN){(*dptr)*=1e-10;}
           (*sptr)="m";
           if(LDEBUG){cerr << soliloquy << " converted " << dold << " (" << units_old << ") to " << (*dptr) << " (" << (*sptr) << ")" << endl;}
           converted=true;
         }
-        if(units_old=="nm"){
+        else if(units_old=="nm"){
           dold=(*dptr);
           if(dold!=NNN && dold!=AUROSTD_NAN){(*dptr)*=1e-9;}
           (*sptr)="m";
           if(LDEBUG){cerr << soliloquy << " converted " << dold << " (" << units_old << ") to " << (*dptr) << " (" << (*sptr) << ")" << endl;}
           converted=true;
         }
-        if(units_old=="eV"){
+        else if(units_old=="eV"){
           dold=(*dptr);
           if(dold!=NNN && dold!=AUROSTD_NAN){(*dptr)*=eV2J;}
           (*sptr)="J";
           if(LDEBUG){cerr << soliloquy << " converted " << dold << " (" << units_old << ") to " << (*dptr) << " (" << (*sptr) << ")" << endl;}
           converted=true;
         }
-        if(units_old=="eV/atom"){
+        else if(units_old=="eV/atom"){
           dold=(*dptr);
           if(dold!=NNN && dold!=AUROSTD_NAN){(*dptr)*=eV2J*(1.0/atom2mol);}
           (*sptr)="J/mol";
           if(LDEBUG){cerr << soliloquy << " converted " << dold << " (" << units_old << ") to " << (*dptr) << " (" << (*sptr) << ")" << endl;}
           converted=true;
         }
-        if(units_old=="kJ/mol"){
+        else if(units_old=="kJ/mol"){
           (*sptr)="J/mol";
           if(dptr!=NULL){
             dold=(*dptr);
@@ -1580,61 +1580,64 @@ namespace xelement {
             throw aurostd::xerror(_AFLOW_FILE_NAME_,"xelement::convertUnits():","No pointer found",_RUNTIME_ERROR_);  //CO20200520
           }
         }
-        if(units_old=="d.u.^{1/3}"){
+        else if(units_old=="d.u.^{1/3}"){
           dold=(*dptr);
           if(dold!=NNN && dold!=AUROSTD_NAN){(*dptr)*=1e-2*std::pow((1.0/bohr2angstrom)*1e10,3.0);}
           (*sptr)="e-/m^3";
           if(LDEBUG){cerr << soliloquy << " converted " << dold << " (" << units_old << ") to " << (*dptr) << " (" << (*sptr) << ")" << endl;}
           converted=true;
         }
-        if(units_old=="mJ/m^2"){
+        else if(units_old=="mJ/m^2"){
           dold=(*dptr);
           if(dold!=NNN && dold!=AUROSTD_NAN){(*dptr)*=1e-3;}
           (*sptr)="J/m^2";
           if(LDEBUG){cerr << soliloquy << " converted " << dold << " (" << units_old << ") to " << (*dptr) << " (" << (*sptr) << ")" << endl;}
           converted=true;
         }
-        if(units_old=="degC"){
+        else if(units_old=="degC"){
           dold=(*dptr);
           if(dold!=NNN && dold!=AUROSTD_NAN){(*dptr)+=273.15;}
           (*sptr)="K";
           if(LDEBUG){cerr << soliloquy << " converted " << dold << " (" << units_old << ") to " << (*dptr) << " (" << (*sptr) << ")" << endl;}
           converted=true;
         }
-        if(units_old=="atm"){
+        else if(units_old=="atm"){
           dold=(*dptr);
           if(dold!=NNN && dold!=AUROSTD_NAN){(*dptr)*=atm2Pa;}
           (*sptr)="Pa";
           if(LDEBUG){cerr << soliloquy << " converted " << dold << " (" << units_old << ") to " << (*dptr) << " (" << (*sptr) << ")" << endl;}
           converted=true;
         }
-        if(units_old=="MPa"){
+        else if(units_old=="MPa"){
           dold=(*dptr);
           if(dold!=NNN && dold!=AUROSTD_NAN){(*dptr)*=1e6;}
           (*sptr)="Pa";
           if(LDEBUG){cerr << soliloquy << " converted " << dold << " (" << units_old << ") to " << (*dptr) << " (" << (*sptr) << ")" << endl;}
           converted=true;
         }
-        if(units_old=="GPa"){
+        else if(units_old=="GPa"){
           dold=(*dptr);
           if(dold!=NNN && dold!=AUROSTD_NAN){(*dptr)*=1e9;}
           (*sptr)="Pa";
           if(LDEBUG){cerr << soliloquy << " converted " << dold << " (" << units_old << ") to " << (*dptr) << " (" << (*sptr) << ")" << endl;}
           converted=true;
         }
-        if(units_old=="e-/atom"){
+        else if(units_old=="e-/atom"){
           dold=(*dptr);
           if(dold!=NNN && dold!=AUROSTD_NAN){(*dptr)*=(1.0/atom2mol);}
           (*sptr)="e-/mol";
           if(LDEBUG){cerr << soliloquy << " converted " << dold << " (" << units_old << ") to " << (*dptr) << " (" << (*sptr) << ")" << endl;}
           converted=true;
         }
+        else{
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,"xelement::convertUnits():","Unknown units(_old) scheme: "+units_old,_RUNTIME_ERROR_);  //CO20200520
+        }
       }
       
       if(LDEBUG){cerr << soliloquy << " units_new=(" << (*sptr) << ")" << endl;}
 
       if(!converted){
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,"xelement::convertUnits():","Unknown units scheme: "+units_new,_INPUT_ILLEGAL_);  //CO20200520
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,"xelement::convertUnits():","Unknown units(_new) scheme: "+units_new,_INPUT_ILLEGAL_);  //CO20200520
       }
     }
   }
