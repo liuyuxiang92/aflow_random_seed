@@ -232,23 +232,23 @@ namespace apl {
     // check if the input IFCs have correct size
     uint natoms = _supercell.getInputStructure().atoms.size();
     if (IFC.size() != natoms){
-      message = "The supplied IFC has wrong size: ";
+      message = "The supplied IFC has the wrong size: ";
       message += aurostd::utype2string(IFC.size()) + " instead of ";
       message += aurostd::utype2string(natoms);
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _INDEX_MISMATCH_);
       for (uint i=0; i<natoms; i++){
         if (IFC[i].size() != natoms){
           message = "The supplied IFC["+aurostd::utype2string(i);
-          message += "] has wrong size: ";
+          message += "] has the wrong size: ";
           message += aurostd::utype2string(IFC.size()) + " instead of ";
           message += aurostd::utype2string(natoms);
           throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _INDEX_MISMATCH_);
         }
 
         for (uint j=0; j<natoms; j++){
-          if ((IFC[i][j].rows != 3) && (IFC[i][j].cols != 3)){
+          if ((IFC[i][j].rows != 3) || (IFC[i][j].cols != 3)){
             message = "The supplied IFC["+aurostd::utype2string(i)+"][";
-            message += aurostd::utype2string(j)+"] has wrong size: ";
+            message += aurostd::utype2string(j)+"] has the wrong size: ";
             message += aurostd::utype2string(IFC[i][j].rows)+"x"+aurostd::utype2string(IFC[i][j].cols);
             message += " instead of 3x3";
             throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _INDEX_MISMATCH_);
