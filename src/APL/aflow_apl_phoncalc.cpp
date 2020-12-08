@@ -210,14 +210,8 @@ namespace apl {
 namespace apl {
 
   void PhononCalculator::setHarmonicForceConstants(const ForceConstantCalculator& fc) {
-    _forceConstantMatrices = fc.getForceConstants();
-    _isPolarMaterial = fc.isPolarMaterial();
-    if (_isPolarMaterial) {
-      _bornEffectiveChargeTensor = fc.getBornEffectiveChargeTensor();
-      _dielectricTensor = fc.getDielectricTensor();
-      _inverseDielectricTensor = inverse(_dielectricTensor);
-      _recsqrtDielectricTensorDeterminant = 1.0/sqrt(determinant(_dielectricTensor));
-    }
+    setHarmonicForceConstants(fc.getForceConstants(), fc.getBornEffectiveChargeTensor(),
+       fc.getDielectricTensor(), fc.isPolarMaterial());//AS20201208
   }
 
   // AS20201204 BEGIN
