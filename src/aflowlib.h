@@ -237,9 +237,12 @@ namespace aflowlib {
       double modulus_bulk_qha_300K; //AS20200831
       double modulus_bulk_derivative_pressure_qha_300K; //AS20201008
       double heat_capacity_Cv_atom_qha_300K; //AS20201008
+      double heat_capacity_Cv_cell_qha_300K; //AS20201207
       double heat_capacity_Cp_atom_qha_300K; //AS20201008
+      double heat_capacity_Cp_cell_qha_300K; //AS20201207
       double volume_atom_qha_300K; //AS20201008
       double energy_free_atom_qha_300K; //AS20201008
+      double energy_free_cell_qha_300K; //AS20201207
       // BADER
       string bader_net_charges;vector<double> vbader_net_charges;//electrons
       string bader_atomic_volumes;vector<double> vbader_atomic_volumes;//Angst^3

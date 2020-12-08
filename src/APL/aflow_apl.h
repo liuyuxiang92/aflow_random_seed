@@ -1252,7 +1252,6 @@ namespace apl
       void   writeTphononDispersions(EOSmethod eos_method, QHAmethod qha_method,
           const string &directory=".");
       void   writeQHAresults(const string &directory=".");
-      void   removeDuplicateBlocksInThermoFile(const string &directory=".");
       // members
       xoption apl_options;
       xoption qha_options;

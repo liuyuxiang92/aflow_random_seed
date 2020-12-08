@@ -226,9 +226,12 @@ namespace aflowlib {
     modulus_bulk_qha_300K = b.modulus_bulk_qha_300K; //AS20200901
     modulus_bulk_derivative_pressure_qha_300K = b.modulus_bulk_derivative_pressure_qha_300K; //AS20201008
     heat_capacity_Cv_atom_qha_300K = b.heat_capacity_Cv_atom_qha_300K; //AS20201008
+    heat_capacity_Cv_cell_qha_300K = b.heat_capacity_Cv_cell_qha_300K; //AS20201207
     heat_capacity_Cp_atom_qha_300K = b.heat_capacity_Cp_atom_qha_300K; //AS20201008
+    heat_capacity_Cp_cell_qha_300K = b.heat_capacity_Cp_cell_qha_300K; //AS20201207
     volume_atom_qha_300K = b.volume_atom_qha_300K; //AS20201008
     energy_free_atom_qha_300K = b.energy_free_atom_qha_300K; //AS20201008
+    energy_free_cell_qha_300K = b.energy_free_cell_qha_300K; //AS20201207
     // BADER
     bader_net_charges=b.bader_net_charges;vbader_net_charges.clear();for(uint i=0;i<b.vbader_net_charges.size();i++) vbader_net_charges.push_back(b.vbader_net_charges.at(i));
     bader_atomic_volumes=b.bader_atomic_volumes;vbader_atomic_volumes.clear();for(uint i=0;i<b.vbader_atomic_volumes.size();i++) vbader_atomic_volumes.push_back(b.vbader_atomic_volumes.at(i));
@@ -498,9 +501,12 @@ namespace aflowlib {
     modulus_bulk_qha_300K = AUROSTD_NAN;//AS20200901
     modulus_bulk_derivative_pressure_qha_300K = AUROSTD_NAN;//AS20201008
     heat_capacity_Cv_atom_qha_300K = AUROSTD_NAN;//AS20201008
+    heat_capacity_Cv_cell_qha_300K = AUROSTD_NAN;//AS20201207
     heat_capacity_Cp_atom_qha_300K = AUROSTD_NAN;//AS20201008
+    heat_capacity_Cp_cell_qha_300K = AUROSTD_NAN;//AS20201207
     volume_atom_qha_300K = AUROSTD_NAN;//AS20201008
     energy_free_atom_qha_300K = AUROSTD_NAN;//AS20201008
+    energy_free_cell_qha_300K = AUROSTD_NAN;//AS20201207
     // BADER
     bader_net_charges.clear();vbader_net_charges.clear();
     bader_atomic_volumes.clear();vbader_atomic_volumes.clear();
@@ -898,9 +904,12 @@ namespace aflowlib {
         //AS20201008 BEGIN
         else if(keyword=="modulus_bulk_derivative_pressure_qha_300K") {modulus_bulk_derivative_pressure_qha_300K=aurostd::string2utype<double>(content);}
         else if(keyword=="heat_capacity_Cv_atom_qha_300K") {heat_capacity_Cv_atom_qha_300K=aurostd::string2utype<double>(content);}
+        else if(keyword=="heat_capacity_Cv_cell_qha_300K") {heat_capacity_Cv_cell_qha_300K=aurostd::string2utype<double>(content);}
         else if(keyword=="heat_capacity_Cp_atom_qha_300K") {heat_capacity_Cp_atom_qha_300K=aurostd::string2utype<double>(content);}
+        else if(keyword=="heat_capacity_Cp_cell_qha_300K") {heat_capacity_Cp_cell_qha_300K=aurostd::string2utype<double>(content);}
         else if(keyword=="volume_atom_qha_300K") {volume_atom_qha_300K=aurostd::string2utype<double>(content);}
         else if(keyword=="energy_free_atom_qha_300K") {energy_free_atom_qha_300K=aurostd::string2utype<double>(content);}
+        else if(keyword=="energy_free_cell_qha_300K") {energy_free_cell_qha_300K=aurostd::string2utype<double>(content);}
         //AS20201008 END
         // BADER
         else if(keyword=="bader_net_charges") {bader_net_charges=content;aurostd::string2tokens<double>(content,vbader_net_charges,",");}
@@ -1162,9 +1171,12 @@ namespace aflowlib {
       //AS20201008 BEGIN
       oss << "modulus_bulk_derivative_pressure_qha_300K" << modulus_bulk_derivative_pressure_qha_300K << (html?"<br>":"") << endl;
       oss << "heat_capacity_Cv_atom_qha_300K" << heat_capacity_Cv_atom_qha_300K << (html?"<br>":"") << endl;
+      oss << "heat_capacity_Cv_cell_qha_300K" << heat_capacity_Cv_cell_qha_300K << (html?"<br>":"") << endl;
       oss << "heat_capacity_Cp_atom_qha_300K" << heat_capacity_Cp_atom_qha_300K << (html?"<br>":"") << endl;
+      oss << "heat_capacity_Cp_cell_qha_300K" << heat_capacity_Cp_cell_qha_300K << (html?"<br>":"") << endl;
       oss << "volume_atom_qha_300K" << volume_atom_qha_300K << (html?"<br>":"") << endl;
       oss << "energy_free_atom_qha_300K" << energy_free_atom_qha_300K << (html?"<br>":"") << endl;
+      oss << "energy_free_cell_qha_300K" << energy_free_cell_qha_300K << (html?"<br>":"") << endl;
       //AS20201008 END
       // BADER
       oss << "bader_net_charges" << bader_net_charges << "  vbader_net_charges= ";for(uint j=0;j<vbader_net_charges.size();j++) oss << vbader_net_charges.at(j) << " "; oss << (html?"<br>":"") << endl; 
@@ -1420,9 +1432,12 @@ namespace aflowlib {
       //AS20201008 BEGIN
       if(modulus_bulk_derivative_pressure_qha_300K!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "modulus_bulk_derivative_pressure_qha_300K=" << modulus_bulk_derivative_pressure_qha_300K << eendl; //AS20201008
       if(heat_capacity_Cv_atom_qha_300K!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "heat_capacity_Cv_atom_qha_300K=" << heat_capacity_Cv_atom_qha_300K << eendl; //AS20201008
+      if(heat_capacity_Cv_cell_qha_300K!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "heat_capacity_Cv_cell_qha_300K=" << heat_capacity_Cv_cell_qha_300K << eendl; //AS20201207
       if(heat_capacity_Cp_atom_qha_300K!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "heat_capacity_Cp_atom_qha_300K=" << heat_capacity_Cp_atom_qha_300K << eendl; //AS20201008
+      if(heat_capacity_Cp_cell_qha_300K!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "heat_capacity_Cp_cell_qha_300K=" << heat_capacity_Cp_cell_qha_300K << eendl; //AS20201207
       if(volume_atom_qha_300K!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "volume_atom_qha_300K=" << volume_atom_qha_300K << eendl; //AS20201008
       if(energy_free_atom_qha_300K!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "energy_free_atom_qha_300K=" << energy_free_atom_qha_300K << eendl; //AS20201008
+      if(energy_free_cell_qha_300K!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "energy_free_cell_qha_300K=" << energy_free_cell_qha_300K << eendl; //AS20201207
       //AS20201008 END
       // BADER
       if(bader_net_charges.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "bader_net_charges=" << bader_net_charges << eendl;
@@ -3320,6 +3335,15 @@ namespace aflowlib {
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
+      if(heat_capacity_Cv_cell_qha_300K!=AUROSTD_NAN) {
+        sscontent_json << "\"heat_capacity_Cv_cell_qha_300K\":" << heat_capacity_Cv_cell_qha_300K;
+      } else {
+        if(PRINT_NULL) sscontent_json << "\"heat_capacity_Cv_cell_qha_300K\":null";
+      }
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
+      //////////////////////////////////////////////////////////////////////////
+
+      //////////////////////////////////////////////////////////////////////////
       if(heat_capacity_Cp_atom_qha_300K!=AUROSTD_NAN) {
         sscontent_json << "\"heat_capacity_Cp_atom_qha_300K\":" << heat_capacity_Cp_atom_qha_300K;
       } else {
@@ -3327,7 +3351,16 @@ namespace aflowlib {
       }
       vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
-      //
+
+      //////////////////////////////////////////////////////////////////////////
+      if(heat_capacity_Cp_cell_qha_300K!=AUROSTD_NAN) {
+        sscontent_json << "\"heat_capacity_Cp_cell_qha_300K\":" << heat_capacity_Cp_cell_qha_300K;
+      } else {
+        if(PRINT_NULL) sscontent_json << "\"heat_capacity_Cp_cell_qha_300K\":null";
+      }
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
+      //////////////////////////////////////////////////////////////////////////
+
       //////////////////////////////////////////////////////////////////////////
       if(volume_atom_qha_300K!=AUROSTD_NAN) {
         sscontent_json << "\"volume_atom_qha_300K\":" << volume_atom_qha_300K;
@@ -3346,6 +3379,14 @@ namespace aflowlib {
       vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
 
+      //////////////////////////////////////////////////////////////////////////
+      if(energy_free_cell_qha_300K!=AUROSTD_NAN) {
+        sscontent_json << "\"energy_free_cell_qha_300K\":" << energy_free_cell_qha_300K;
+      } else {
+        if(PRINT_NULL) sscontent_json << "\"energy_free_cell_qha_300K\":null";
+      }
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
+      //////////////////////////////////////////////////////////////////////////
       //AS20200901 END
 
       // BADER

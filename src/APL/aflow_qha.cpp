@@ -589,6 +589,13 @@ namespace apl
         }
       }
 
+      // we need to clean THERMO file from previous calculations, since calculated data from
+      // each QHA/EOS model is appended to the THERMO file and we do not want to mix
+      // results of calculations with potentially different parameters
+      if (eos_static_data_available){
+        aurostd::RemoveFile(currentDirectory+'/'+DEFAULT_QHA_FILE_PREFIX+DEFAULT_QHA_THERMO_FILE);
+      }
+
       // In a QHA calculation, the EOS flag performs APL calculations for a set of volumes.
       // This flag is used when one is interested in T-dependent properties.
       if (isEOS && isQHA){
@@ -728,8 +735,6 @@ namespace apl
           }
         }
       }
-
-      removeDuplicateBlocksInThermoFile(currentDirectory);
     }
     catch(aurostd::xerror &e){
       pflow::logger(e.whereFileName(),e.whereFunction(), e.what(), currentDirectory,
@@ -2826,12 +2831,12 @@ namespace apl
     file << blockname + "START" << std::endl;
     // write header
     file << setw(5)  << "#T[K]"          << setw(SW) << ' ' <<
-      setw(TW) << "V[A^3]"               << setw(SW) << ' ' <<
+      setw(TW) << "V[A^3/atom]"          << setw(SW) << ' ' <<
       setw(TW) << "F(V)[eV/atom]"        << setw(SW) << ' ' <<
       setw(TW) << "B[GPa]"               << setw(SW) << ' ' <<
       setw(TW) << "beta[10^-5/K]"        << setw(SW) << ' ' <<
-      setw(TW) << "Cv(V)[kB/atom]"       << setw(SW) << ' ' <<
-      setw(TW) << "Cp(V)[kB/atom]"       << setw(SW) << ' ' <<
+      setw(TW) << "Cv(V)[kB/cell]"       << setw(SW) << ' ' <<
+      setw(TW) << "Cp(V)[kB/cell]"       << setw(SW) << ' ' <<
       setw(TW) << "gamma(beta,B,Cv(V))"  << setw(SW) << ' ' <<
       setw(TW) << "Bprime";
     // the following properties are calculated only with a regular QHA calculation
@@ -2839,12 +2844,12 @@ namespace apl
       file  << setw(SW) << ' ' <<
         setw(TW) << "gamma(V,mesh)"                          << setw(SW) << ' ' <<
         setw(TW) << "beta(gamma(V,mesh),B,Cv(V))[10^-5/K]"   << setw(SW) << ' ' <<
-        setw(TW) << "Cv(V,mesh)[kB/atom]"                    << setw(SW) << ' ' <<
-        setw(TW) << "Cp(V,mesh)[kB/atom]"                    << setw(SW) << ' ' <<
+        setw(TW) << "Cv(V,mesh)[kB/cell]"                    << setw(SW) << ' ' <<
+        setw(TW) << "Cp(V,mesh)[kB/cell]"                    << setw(SW) << ' ' <<
         setw(TW) << "gamma(V0,mesh)"                         << setw(SW) << ' ' <<
         setw(TW) << "beta(gamma(V0,mesh),B,Cv(V0))[10^-5/K]" << setw(SW) << ' ' <<
-        setw(TW) << "Cv(V0,mesh)[kB/atom]"                   << setw(SW) << ' ' <<
-        setw(TW) << "Cp(V0,mesh)[kB/atom]";
+        setw(TW) << "Cv(V0,mesh)[kB/cell]"                   << setw(SW) << ' ' <<
+        setw(TW) << "Cp(V0,mesh)[kB/cell]";
     }
     file << std::endl;
 
@@ -2936,11 +2941,11 @@ namespace apl
       // write values to file
       file << setw(5)  << T                   << setw(SW) << ' ' <<
         setw(TW) << Veq                 << setw(SW) << ' ' <<
-        setw(TW) << Feq                 << setw(SW) << ' ' <<
+        setw(TW) << Feq                 << setw(SW) << ' ' << //[eV/atom]
         setw(TW) << B                   << setw(SW) << ' ' <<
         setw(TW) << beta * 1e5          << setw(SW) << ' ' << //[10^-5/K]
-        setw(TW) << CV                  << setw(SW) << ' ' <<
-        setw(TW) << CP                  << setw(SW) << ' ' <<
+        setw(TW) << CV*NatomsOrigCell   << setw(SW) << ' ' << //[kB/cell]
+        setw(TW) << CP*NatomsOrigCell   << setw(SW) << ' ' << //[kB/cell]
         setw(TW) << GP                  << setw(SW) << ' ' <<
         setw(TW) << Bp;
       // the following properties are calculated only with a regular QHA calculation
@@ -2948,12 +2953,12 @@ namespace apl
         file << setw(SW) << ' ' <<
           setw(TW) << GP_mesh_V              << setw(SW) << ' ' <<
           setw(TW) << beta_mesh_V * 1e5      << setw(SW) << ' ' << //[10^-5/K]
-          setw(TW) << CV_mesh_V              << setw(SW) << ' ' <<
-          setw(TW) << CP_mesh_V              << setw(SW) << ' ' <<
+          setw(TW) << CV_mesh_V*NatomsOrigCell << setw(SW) << ' ' << //[kB/cell]
+          setw(TW) << CP_mesh_V*NatomsOrigCell << setw(SW) << ' ' << //[kB/cell]
           setw(TW) << GP_mesh_V0             << setw(SW) << ' ' <<
           setw(TW) << beta_mesh_V0 * 1e5     << setw(SW) << ' ' << //[10^-5/K]
-          setw(TW) << CV_mesh_V0             << setw(SW) << ' ' <<
-          setw(TW) << CP_mesh_V0             << setw(SW);
+          setw(TW) << CV_mesh_V0*NatomsOrigCell << setw(SW) << ' ' << //[kB/cell]
+          setw(TW) << CP_mesh_V0*NatomsOrigCell << setw(SW); //[kB/cell]
       }
       file << std::endl;
     }
@@ -3350,73 +3355,30 @@ namespace apl
     aflow_qha_out << "[QHA_RESULTS]START" << endl;
     aflow_qha_out << "gruneisen_qha = " << grueneisen << endl;
     aflow_qha_out << "gruneisen_qha_300K = " << grueneisen_300K << endl;
-    aflow_qha_out << "thermal_expansion_qha_300K = " << thermal_expansion * 1e5;
-    aflow_qha_out << " (10^-5/K)" << endl;
+    aflow_qha_out << "thermal_expansion_qha_300K = " << thermal_expansion;
+    aflow_qha_out << " (1/K)" << endl;
     aflow_qha_out << "modulus_bulk_qha_300K = " << bulk_modulus;
     aflow_qha_out << " (GPa)" << endl;
     aflow_qha_out << "modulus_bulk_derivative_pressure_qha_300K = " << bprime << endl;
     aflow_qha_out << "heat_capacity_Cv_atom_qha_300K = " << CV;
     aflow_qha_out << " (kB/atom)" << endl;
+    aflow_qha_out << "heat_capacity_Cv_cell_qha_300K = " << CV * NatomsOrigCell;
+    aflow_qha_out << " (kB/cell)" << endl;
     aflow_qha_out << "heat_capacity_Cp_atom_qha_300K = " << CP;
     aflow_qha_out << " (kB/atom)" << endl;
+    aflow_qha_out << "heat_capacity_Cp_cell_qha_300K = " << CP * NatomsOrigCell;
+    aflow_qha_out << " (kB/cell)" << endl;
     aflow_qha_out << "volume_atom_qha_300K = " << volume;
     aflow_qha_out << " (A^3/atom)" << endl;
     aflow_qha_out << "energy_free_atom_qha_300K = " << free_energy;
     aflow_qha_out << " (eV/atom)" << endl;
+    aflow_qha_out << "energy_free_cell_qha_300K = " << free_energy * NatomsOrigCell;
+    aflow_qha_out << " (eV/cell)" << endl;
     aflow_qha_out << "[QHA_RESULTS]STOP" << endl;
     aflow_qha_out << AFLOWIN_SEPARATION_LINE << endl;
 
     string filename = directory + '/' + DEFAULT_QHA_FILE_PREFIX + "out";
     if (!aurostd::stringstream2file(aflow_qha_out, filename)){
-      msg = "Error writing to " + filename + " file.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function,msg,_FILE_ERROR_);
-    }
-  }
-
-  /// Removes duplicate blocks from aflow.qha.thermo.out file preserving the latest
-  /// block from a group of same blocks.
-  void QHA::removeDuplicateBlocksInThermoFile(const string &directory)
-  {
-    string msg="", function = XPID + "QHA::removeDuplicateBlocksInThermoFile():";
-    stringstream thermofile, block;
-    string thermofile_orig = "";
-    string filename = directory + '/' + DEFAULT_QHA_FILE_PREFIX+DEFAULT_QHA_THERMO_FILE;
-    aurostd::file2string(filename, thermofile_orig);
-    vector<string> blocks, qha_modes, eos_models;
-
-    qha_modes.push_back("QHA");
-    qha_modes.push_back("QHA3P");
-    qha_modes.push_back("QHANP");
-    qha_modes.push_back("SCQHA");
-    qha_modes.push_back("SCQHA_SC");
-
-    eos_models.push_back("SJ");
-    eos_models.push_back("BM2");
-    eos_models.push_back("BM3");
-    eos_models.push_back("BM4");
-    eos_models.push_back("M");
-
-    // define possible block keywords
-    for (uint i=0; i<qha_modes.size(); i++){
-      for (uint j=0; j<eos_models.size(); j++){
-        blocks.push_back("["+qha_modes[i]+"_"+eos_models[j]+"_THERMO]");
-      }
-    }
-
-    // read the last block for each keyword and save it to the thermofile
-    for (uint i=0; i<blocks.size(); i++){
-      if (aurostd::ExtractLastToStringstreamEXPLICIT(thermofile_orig, block,
-          blocks[i]+"START", blocks[i]+"STOP")){
-        thermofile << AFLOWIN_SEPARATION_LINE << std::endl;
-        thermofile << blocks[i] + "SYSTEM=" << system_title << std::endl;
-        thermofile << blocks[i]+"START" << std::endl;
-        thermofile << block.rdbuf();
-        thermofile << blocks[i]+"STOP" << std::endl;
-        thermofile << AFLOWIN_SEPARATION_LINE << std::endl;
-      }
-    }
-
-    if (!aurostd::stringstream2file(thermofile, filename)){
       msg = "Error writing to " + filename + " file.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function,msg,_FILE_ERROR_);
     }

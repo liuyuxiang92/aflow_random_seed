@@ -2697,8 +2697,8 @@ namespace plotter {
     string extensions[nprops] = {"volume_equilibrium_qha", "energy_free_qha",
       "modulus_bulk_qha", "thermal_expansion_qha", "cV_qha", "cP_qha",
       "gruneisen_parameter_qha"};
-    string yunits[nprops] = {"\\AA^{3}/atom", "eV/atom", "GPa", "$10^{-5}K^{-1}$",
-      "$k_B$/atom", "$k_B$/atom", ""};
+    string yunits[nprops] = {"\\AA$^{3}$/atom", "eV/atom", "GPa", "$10^{-5}K^{-1}$",
+      "$k_B$/cell", "$k_B$/cell", ""};
     string ymin[nprops] = {"", "", "", "", "0", "0", ""};
 
     // Get data

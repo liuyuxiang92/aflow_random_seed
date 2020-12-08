@@ -2407,6 +2407,13 @@ namespace init {
     XHOST.vschema.push_attached("SCHEMA::UNIT:ENERGY_FREE_ATOM_QHA_300K","eV/atom");
     XHOST.vschema.push_attached("SCHEMA::TYPE:ENERGY_FREE_ATOM_QHA_300K","number");
     //AS20201008 END
+    //
+    //AS20201207 BEGIN
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:ENERGY_FREE_CELL_QHA_300K","energy_free_cell_qha_300K");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:ENERGY_FREE_CELL_QHA_300K","eV/cell");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:ENERGY_FREE_CELL_QHA_300K","number");
+    //AS20201207 END
 
     // schema is CAPITAL, content is not necessarily
     XHOST.vschema.push_attached("SCHEMA::NAME:ENTHALPY_ATOM","enthalpy_atom");
@@ -2527,6 +2534,18 @@ namespace init {
     XHOST.vschema.push_attached("SCHEMA::UNIT:HEAT_CAPACITY_CV_ATOM_QHA_300K","kB/atom");
     XHOST.vschema.push_attached("SCHEMA::TYPE:HEAT_CAPACITY_CV_ATOM_QHA_300K","number");
     //AS20201008 END
+
+    //AS20201207 BEGIN
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:HEAT_CAPACITY_CP_CELL_QHA_300K","heat_capacity_Cv_cell_qha_300K");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:HEAT_CAPACITY_CP_CELL_QHA_300K","kB/cell");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:HEAT_CAPACITY_CP_CELL_QHA_300K","number");
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:HEAT_CAPACITY_CV_CELL_QHA_300K","heat_capacity_Cp_cell_qha_300K");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:HEAT_CAPACITY_CV_CELL_QHA_300K","kB/cell");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:HEAT_CAPACITY_CV_CELL_QHA_300K","number");
+    //AS20201207 END
 
     // schema is CAPITAL, content is not necessarily
     XHOST.vschema.push_attached("SCHEMA::NAME:KPOINTS","kpoints");
