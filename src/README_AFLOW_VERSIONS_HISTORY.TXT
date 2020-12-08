@@ -1,3 +1,8 @@
+3.2.6 - 2020/xx/xx
+        Location: http://materials.duke.edu/AFLOW/aflow.3.2.6.tar.xz
+        -- Added functionality to plot thermodynamic properties calculated by QHA with the SJ EOS model. (AS)
+        -- Added processing of QHA data to LIB2LIB and LIB2RAW. (AS)
+        -- Added a feature to employ fixed volume relaxation of QHA subcalculations. (AS)
 3.2.5 - 2020/09/25
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.5.tar.xz
         -- patched convert issue: security policy 'PDF' blocking conversion (SC)
@@ -11,9 +16,6 @@
         -- adding --lib2lib patches for AEL/AGL (CT)
         -- Added calculation of electronic contributions to the free energy. (AS)
         -- Added calculation of temperature-dependent phonon dispersions. (AS)
-        -- Added functionality to plot thermodynamic properties calculated by QHA with the SJ EOS model. (AS)
-        -- Added processing of QHA data to LIB2LIB and LIB2RAW. (AS)
-        -- Added a feature to employ fixed volume relaxation of QHA subcalculations. (AS)
         -- Implemented QHANP method (frequency-volume dependency is extrapolated by N-order Taylor expansion). (AS)
         -- Removed old QHA code, related infrastructure and dependencies. (AS)
         -- Fixed web output for README files and AFLOW banners. (ME)
