@@ -3159,6 +3159,9 @@ namespace chull {
     uint i_nary=0;
     if(i_alloy>m_naries[i_nary].m_alloys.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within alloys");}
     uint g_state=AUROSTD_MAX_UINT;
+    for(uint c=0;c<m_naries[i_nary].m_alloys[i_alloy].m_coord_groups.size();c++){
+      cerr << c << " m_naries[i_nary].m_alloys[i_alloy].m_coord_groups[c]: " << m_naries[i_nary].m_alloys[i_alloy].m_coord_groups[c] << endl;
+    }
     if(m_naries[i_nary].m_alloys[i_alloy].m_coord_groups.size()!=1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unexpected count of coordgroups for unaries, should only be 1");}
     uint i_coord_group=m_naries[i_nary].m_alloys[i_alloy].m_coord_groups[0];
     uint i_point=AUROSTD_MAX_UINT;
