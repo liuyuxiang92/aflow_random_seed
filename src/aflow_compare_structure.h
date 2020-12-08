@@ -71,6 +71,12 @@ struct structure_misfit {
   double magnetic_misfit;               //DX's magnetic misfit (inspired by Burzlaff's misfit; =1-(1-magnetic_displacement)(1-magnetic_failure))
   double magnetic_displacement;         //DX's magnetic displacement; captures differences between magnetic moment magnitude (and angle for non-collinear)
   double magnetic_failure;              //DX's magnetic failure; captures spin flip differences 
+  xmatrix<double> rotation;
+  xmatrix<double> basis_transformation;
+  xvector<double> origin_shift;
+  vector<uint> atom_map;
+  vector<uint> basis_map;
+  vector<double> distances_mapped;
 };
 namespace compare{
   structure_misfit initialize_misfit_struct(bool magnetic=false);
@@ -84,15 +90,26 @@ struct matching_structure {
 
 
 // ===== structure_matched struct ===== // DX20201119
-struct structure_representative {
+struct _structure_representative {
+  // intialization info
   string name;
   string compound;
-  string from;
-  bool generated;
+  vector<uint> stoichiometry;
+  uint natoms;
+  uint ntypes;
+  vector<string> elements;
+  string source;
+  bool is_structure_generated;
+  uint relaxation_step;
+  // structure info
   xstructure structure;
   vector<double> nearest_neighbor_distances;
+  vector<AtomEnvironment> environments_LFA;
+  string Pearson;
+  uint space_group;
   vector<GroupedWyckoffPosition> grouped_Wyckoff_positions;
   uint number_compounds_matching_structure;
+  // property info
   vector<string> properties_names;
   vector<string> properties_units;
   vector<string> properties_types;
@@ -101,7 +118,7 @@ struct structure_representative {
 
 // ===== structure_matched struct ===== // DX20201119
 // a friend of the structure_representative struct 
-struct structure_matched : structure_representative { // friend
+struct structure_matched : _structure_representative { // friend
   structure_misfit misfit_info;
   xmatrix<double> rotation;
   xmatrix<double> basis_transformation;
@@ -137,8 +154,8 @@ struct structure_matched {
 };
 */
 namespace compare{
-  structure_representative initializeStructureRepresentativeStruct();
-  structure_representative initializeStructureRepresentativeStruct(const xstructure& structure);
+  _structure_representative initializeStructureRepresentativeStruct();
+  _structure_representative initializeStructureRepresentativeStruct(const xstructure& structure);
   structure_matched initialize_structure_matched_struct();
   structure_matched initializeStructureMatched(const xstructure& structure);
 }
@@ -167,7 +184,7 @@ class StructurePrototype{
     const StructurePrototype& operator=(const StructurePrototype& b);                       // assignment operator
     StructurePrototype(const StructurePrototype& b);                                        // copy constructor
     int iomode;                                                                             // mode for printing
-    //structure_representative* structure_representative_struct;      
+    _structure_representative *structure_representative_struct;      
     string structure_representative_name;                                                   // name of representative structure
     string structure_representative_compound;                                               // compound name of representative structure (w/reduced stoichometry), e.g., Ag1Br2
     xstructure structure_representative;                                                    // xstructure of representative structure
@@ -192,6 +209,8 @@ class StructurePrototype{
     vector<string> aflow_parameter_list;                                                    // vector of strings corresponding to AFLOW parameter variables 
     vector<double> aflow_parameter_values;                                                  // vector of doubles corresponding to AFLOW parameter values
     vector<string> matching_aflow_prototypes;                                               // vector of strings indicating matching AFLOW prototype labels
+    //vector<structure_matched*> structures_duplicate_struct;      
+    vector<_structure_representative*> structures_duplicate_struct;      
     vector<string> structures_duplicate_names;                                              // vector of names for duplicate structures
     vector<string> structures_duplicate_compounds;                                          // vector of compounds names for duplicate structures (w/reduced stoichometry), e.g., Ag1Br2
     vector<xstructure> structures_duplicate;                                                // vector of xstructures for duplicate structures
@@ -201,6 +220,7 @@ class StructurePrototype{
     vector<vector<GroupedWyckoffPosition> > structures_duplicate_grouped_Wyckoff_positions; // Wyckoff positions grouped by site type
     vector<uint> number_compounds_matching_duplicate;                                       // vector of number of compounds that match with the duplicate structures
     vector<string> duplicate_comparison_logs; //DX20190506                                  // vector of comparison logs for duplicate structures, CAREFUL: very long string //DX20190506
+    vector<_structure_representative*> structures_family_struct;      
     vector<string> structures_family_names;                                                 // vector of names for structures within the same family
     vector<xstructure> structures_family;                                                   // vector of xstructures for structures within the same family
     vector<bool> structures_family_generated;                                               // vector of booleans indicating if xstructure is generated for structures within the same family
@@ -219,7 +239,9 @@ class StructurePrototype{
     // functions
     uint numberOfDuplicates() const; //DX20190506                                           // return the number of duplicate structures for this prototype (i.e., checks misfit value)
     string printRepresentativeStructure() const; //DX20201028                               // return the representative structure in a JSON format
+    string printRepresentativeStructureNEW() const;
     string printMatchedStructures(const string& mode) const; //DX20201028                   // return the matched structures in a JSON format
+    string printMatchedStructuresNEW(const string& mode) const; //DX20201028                   // return the matched structures in a JSON format
     uint numberOfComparisons(); //DX20181221                                                // return the number of comparisons for this prototype
     bool isSymmetryCalculated(); //DX20190228
     bool isLFAEnvironmentCalculated(); //DX20191105
@@ -237,33 +259,157 @@ class StructurePrototype{
     void copy(const StructurePrototype& b);                                                 // copy constructor
 };
 
-class XtalFinderCalculator{
+class XtalFinderCalculator : public xStream {
   public:
-    XtalFinderCalculator(uint num_proc_input=1);
+    // constructors
+    XtalFinderCalculator(uint num_proc_input=1, ostream& oss=cout);
+    XtalFinderCalculator(ofstream& FileMESSAGE, uint num_proc_input=1, ostream& oss=cout);
     XtalFinderCalculator(
-        const double& misfit_match_input,
-        const double& misfit_family_input,
-        uint num_proc_input=1);
+        double misfit_match_input,
+        double misfit_family_input,
+        uint num_proc_input=1,
+        ostream& oss=cout);
+    XtalFinderCalculator(
+        double misfit_match_input,
+        double misfit_family_input,
+        ofstream& FileMESSAGE,
+        uint num_proc_input=1,
+        ostream& oss=cout);
+    // destructors
     ~XtalFinderCalculator();                                                                  // destructor operator
+
+    // operator<<
     friend ostream& operator<<(ostream& oss, const XtalFinderCalculator& XtalFinderCalculator); // stringstream operator (printing)
+    
+    // copy/assignment
     const XtalFinderCalculator& operator=(const XtalFinderCalculator& b);                       // assignment operator
     XtalFinderCalculator(const XtalFinderCalculator& b);                                        // copy constructor
+    
     // attributes
     double misfit_match;
     double misfit_family;
     uint num_proc;
-    vector<structure_representative> structure_containers;  // stores structures in a container (pointer for easy manipulation and mobility)
+    vector<_structure_representative> structure_containers;  // stores structures in a container (pointer for easy manipulation and mobility)
     vector<structure_matched> structure_matched_containers;  // stores structures in a container (will make StructurePrototype a pointer to this)
     //DX20201130  - should we have this? vector<StructurePrototype> structure_prototypes; // stores the equivalent structure information
 
+    //load methods
+    void addStructureToContainer(const xstructure& xstr,
+      const string& structure_name,
+      const string& source,
+      uint relaxation_step,
+      bool same_species);
 
-    //methods
-    void compareStructures(structure_representative& str_rep,
-        structure_matched& str_matched, 
+    // set as structure representative
+    void addToStructureRepresentative(StructurePrototype& structure_tmp, uint container_index);
+    void addToStructureRepresentative(StructurePrototype& structure_tmp, _structure_representative* str_pointer);
+    // set as duplicate structure
+    void addToStructureDuplicate(StructurePrototype& structure_tmp, uint container_index);
+    void addToStructureDuplicate(StructurePrototype& structure_tmp, _structure_representative* str_pointer);
+    // set as same family structure
+    void addToStructureFamily(StructurePrototype& structure_tmp, uint container_index);
+    void addToStructureFamily(StructurePrototype& structure_tmp, _structure_representative* str_pointer);
+  
+    //vector<StructurePrototype> loadStructuresFromStructureList(const vector<string>& filenames, const vector<string>& magmoms_for_systems, bool same_species, ostream& logstream=cout); //DX20191122
+    vector<StructurePrototype> loadStructuresFromStructureList(const vector<string>& filenames, const vector<string>& magmoms_for_systems, bool same_species); //DX20190424 //DX20190801 - added vector<string>& magmoms_for_systems //DX20191122 - added ostream and consts
+    vector<StructurePrototype> loadStructuresFromDirectory(const string& directory, const vector<string>& magmoms_for_systems, bool same_species); //DX20190424 //DX20190801 - added vector<string>& magmoms_for_systems //DX20191122 - added ostream and consts
+    vector<StructurePrototype> loadStructuresFromFile(const string& filename, const vector<string>& magmoms_for_systems, bool same_species); //DX20190424 //DX20190801 - added vector<string>& magmoms_for_systems //DX20191122 - added ostream and consts
+    
+    //transform structures
+    void convertStructures(
+      const aurostd::xoption& comparison_options,
+      uint num_proc); //DX20201005
+    void GetPrimitiveStructures(uint start_index=0, uint end_index=AUROSTD_MAX_UINT); //DX20201005
+    void GetMinkowskiStructures(uint start_index=0, uint end_index=AUROSTD_MAX_UINT); //DX20201005
+    void GetNiggliStructures(uint start_index=0, uint end_index=AUROSTD_MAX_UINT); //DX20201005
+    
+    //analyze symmetry
+    bool isSymmetryCalculated(_structure_representative& structure);
+    void calculateSymmetry(_structure_representative& str_rep);
+    void calculateSymmetries(uint& num_proc);
+    void calculateSpaceGroups(uint start_index=0, uint end_index=AUROSTD_MAX_UINT, uint setting=0); //DX20191230 added setting
+    //analyze symmetry
+    bool isLFAEnvironmentCalculated(_structure_representative& structure);
+    void computeLFAEnvironment(_structure_representative& str_rep, bool unique_only=true);
+    void calculateLFAEnvironments(uint num_proc);
+    void computeLFAEnvironments(uint start_index=0, uint end_index=AUROSTD_MAX_UINT);
+
+    // group structures
+    vector<StructurePrototype> groupStructurePrototypes(
+      bool same_species,
+      bool ignore_symmetry,
+      bool ignore_Wyckoff,
+      bool ignore_environment,
+      bool ignore_environment_angles,
+      bool duplicates_removed); //DX20190731 - remove const and & //DX20190830 - added duplicates_removed //DX20200320 - added environment angles
+  
+    // reorder structures
+    void representativePrototypeForICSDRunsNEW(vector<StructurePrototype>& comparison_schemes);
+    void makeRepresentativeEvenPermutationNEW(vector<StructurePrototype>& comparison_schemes);
+  
+    vector<StructurePrototype> checkForBetterMatches(vector<StructurePrototype>& prototype_schemes, 
+      uint& num_proc, 
+      bool check_for_better_matches, 
+      bool same_species,
+      const aurostd::xoption& comparison_options, 
+      bool quiet);
+  
+    void appendStructurePrototypes(
+      vector<StructurePrototype>& comparison_schemes,
+      vector<StructurePrototype>& final_prototypes,
+      bool clean_unmatched, //DX20190506
+      bool quiet);
+  
+    // threads
+    bool splitComparisonIntoThreads(vector<StructurePrototype>& comparison_schemes, uint& num_proc,
+      vector<std::pair<uint,uint> >& start_indices,
+      vector<std::pair<uint,uint> >& end_indices);
+  
+    // run multiple structures
+    vector<StructurePrototype> runComparisonScheme(vector<StructurePrototype>& comparison_schemes, 
+      bool same_species, uint num_proc, const aurostd::xoption& comparison_options, 
+      bool quiet=false); //DX20200103 - condensed bools to xoptions
+    void runComparisonThreads(vector<StructurePrototype>& comparison_schemes, 
+      std::pair<uint,uint>& start_indices,
+      std::pair<uint,uint>& end_indices,
+      bool same_species, 
+      bool scale_volume, bool optimize_match,
+      bool store_comparison_logs); //DX20190822 - added comparison log bool
+
+    //compare methods
+    void compareStructures(_structure_representative& str_rep,
+        _structure_representative& str_matched, 
+        structure_misfit& match_info, 
         bool same_species,
         bool scale_volume,
         bool optimize_match);
-    void compareStructuresFromStructureList(vector<string>& filenames, vector<string>& magmoms_for_systems, ostream& oss, ofstream& FileMESSAGE, uint& num_proc, bool same_species, const aurostd::xoption& comparison_options); //DX20200103 - condensed bools to xoptions
+    vector<StructurePrototype> compareStructuresFromStructureList(const vector<string>& filenames, vector<string>& magmoms_for_systems, uint num_proc, bool same_species, const aurostd::xoption& comparison_options); //DX20200103 - condensed bools to xoptions
+    vector<StructurePrototype> compareStructuresFromDirectory(const string& directory, vector<string>& magmoms_for_systems, uint num_proc, bool same_species, const aurostd::xoption& comparison_options); //DX20200103 - condensed bools to xoptions
+    vector<StructurePrototype> compareStructuresFromFile(const string& filename, vector<string>& magmoms_for_systems, uint num_proc, bool same_species, const aurostd::xoption& comparison_options); //DX20200103 - condensed bools to xoptions
+  
+  // compare multiple structures
+  vector<StructurePrototype> compareMultipleStructures(vector<StructurePrototype>& all_structures, uint num_proc, bool same_species, const string& directory);
+  vector<StructurePrototype> compareMultipleStructures(vector<StructurePrototype>& all_structures, uint num_proc, bool same_species, const string& directory, const aurostd::xoption& comparison_options);
+  
+  // compare permuations
+  
+  vector<StructurePrototype> comparePermutations(
+      StructurePrototype& structure,
+      uint& num_proc,
+      bool optimize_match);
+  void generatePermutationStructures(_structure_representative& structure);
+  
+  // get aflow label
+  void getPrototypeDesignations(
+      vector<StructurePrototype>& prototypes,
+      uint start_index=0,
+      uint end_index=AUROSTD_MAX_UINT); //DX20191122
+  
+  //print
+  void printResults(ostream& ss_out,
+      const bool& same_species, 
+      const vector<StructurePrototype>& final_prototypes,
+      string mode);
   private:
     void free();                                                                            // free operator
     void copy(const XtalFinderCalculator& b);                                                 // copy constructor
@@ -343,7 +489,7 @@ namespace compare{
   vector<StructurePrototype> loadStructuresFromFile(const string& directory, const vector<string>& magmoms_for_systems, bool same_species, ostream& logstream=cout); //DX20191122
   vector<StructurePrototype> loadStructuresFromFile(const string& directory, const vector<string>& magmoms_for_systems, bool same_species, ofstream& FileMESSAGE, ostream& logstream=cout); //DX20190319 - added FileMESSAGE //DX20190801 - added vector<string>& magmoms_for_systems, //DX20191122 - added ostream and consts
   void generateStructures(vector<StructurePrototype>& structures, ostream& oss=cout, uint start_index=0, uint end_index=AUROSTD_MAX_UINT); //DX20191122
-  bool generateStructure(string& structure_name, string& structure_source, uint relaxation_step, xstructure& structure, ostream& oss); //DX20200429 - added relaxation_step
+  bool generateStructure(const string& structure_name, const string& structure_source, uint relaxation_step, xstructure& structure, ostream& oss); //DX20200429 - added relaxation_step
   void removeNonGeneratedStructures(vector<StructurePrototype>& structures); //DX20191105
   //DX20200727 [OBSOLETE] vector<uint> getStoichiometry(string& compositions, const bool& same_species);
   bool addAFLOWPrototypes2StructurePrototypeVector(vector<StructurePrototype>& all_structures, vector<string>& vlabel);
@@ -439,6 +585,9 @@ namespace compare{
   bool structuresCompatible(const StructurePrototype& structure1,
       const StructurePrototype& structure2, bool same_species, 
       bool ignore_symmetry, bool ignore_Wyckoff, bool ignore_environment, bool ignore_environment_angles); //DX20190730 //DX20200320 - added environment angles
+  bool structuresCompatible(const _structure_representative& structure1,
+      const _structure_representative& structure2, bool same_species, 
+      bool ignore_symmetry, bool ignore_Wyckoff, bool ignore_environment, bool ignore_environment_angles); //DX20201207
   vector<StructurePrototype> groupStructurePrototypes(vector<StructurePrototype>& structures, 
       bool same_species, bool ignore_symmetry, bool ignore_Wyckoff, bool ignore_environment, bool ignore_environment_angles, bool duplicates_removed); //DX20190731 - remove const and & //DX20190830 - added duplicates_removed //DX20200320 - added environment angles
 
@@ -454,6 +603,7 @@ namespace compare{
   void removeDuplicateCompounds(vector<StructurePrototype>& final_prototypes, vector<StructurePrototype>& duplicate_compound_comparisons);
 
   bool representativePrototypeForICSDRuns(vector<StructurePrototype>& comparison_schemes);
+  bool representativePrototypeForICSDRunsNEW(vector<StructurePrototype>& comparison_schemes); //DX20201207
   bool splitComparisonIntoThreads(vector<StructurePrototype>& comparison_schemes, uint& num_proc,
       vector<std::pair<uint,uint> >& start_indices,
       vector<std::pair<uint,uint> >& end_indices);
@@ -480,6 +630,7 @@ namespace compare{
       ostream& oss, ofstream& FileMESSAGE, bool quiet=false, ostream& logstream=cout); //DX20200103 - condensed bools to xoptions
   vector<std::pair<uint,uint> > calculateDivisors(const int& number);
   bool checkNumberOfGroupings(vector<StructurePrototype>& comparison_schemes, uint number);
+  bool checkNumberOfGroupingsNEW(vector<StructurePrototype>& comparison_schemes, uint number);
   void createStructurePermutations(vector<StructurePrototype>& comparison_schemes, const vector<vector<string> >& name_order,
       vector<vector<GroupedWyckoffPosition> >& permutation_grouped_Wyckoff_positions,
       const vector<xstructure>& vxstrs, const bool& same_species);
@@ -649,8 +800,9 @@ namespace compare{
       bool scale_volume, //DX20200422
       ostream& oss);
   void latticeSearch(
-      structure_representative& xstr_rep,
-      structure_matched& xstr_match,
+      _structure_representative& xstr_rep,
+      _structure_representative& xstr_match,
+      structure_misfit& match_info,
       int type_match,
       bool optimize_match,
       bool scale_volume, //DX20200422

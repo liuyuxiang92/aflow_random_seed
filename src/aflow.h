@@ -1532,6 +1532,9 @@ class xstructure {
     void ReScale(const double &in_scale);                         // Change scale but keep volume fixed
     void SetScale(const double &in_scale);                        // Change scale
     void UpdateCartesianCoordinates();                            //AS20200514
+    void ChangeBasis(const xmatrix<double>& transformation_matrix);
+    void Rotate(const xmatrix<double>& rm);
+    void TransformStructure(const xmatrix<double>& transformation_matrix, const xmatrix<double>& rotation);
     void SetVolume(const double &in_volume);                      // Change volume
     void SetAutoVolume(bool use_AFLOW_defaults_in=false);         // Change volume to sum of atoms  //CO20191010
     void InflateLattice(const double &coefficient);               // Inflate lattice

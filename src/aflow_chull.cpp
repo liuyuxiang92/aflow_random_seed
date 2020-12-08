@@ -19,7 +19,7 @@
 #include "aflow_chull_jupyter_requirements.cpp"  //MB20190305
 #include "aflow_chull_python.cpp"  //MB20190305
 
-#define _DEBUG_CHULL_ false  //CO20190116
+#define _DEBUG_CHULL_ true  //CO20190116
 
 #define _AFLOW_CHULL_PRINT_LOGO_1 TRUE
 #define _AFLOW_CHULL_PRINT_LOGO_2 FALSE
