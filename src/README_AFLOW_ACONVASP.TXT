@@ -88,7 +88,7 @@ LATEST VERSION OF THE FILE:                              materials.duke.edu/AFLO
  	       --module=[APL | QHA | AAPL]
          --apl_supercell=NxNxN
          --potim=XXX (default: DEFAULT_VASP_PREC_POTIM in .aflow.rc)  (VASP) 
-         --relax_type=[ALL | IONS | CELL_SHAPE | CELL_VOLUME | IONS_CELL_VOLUME] (overrides relax_mode) (VASP)
+         --relax_type=[ALL | IONS | CELL_SHAPE | CELL_VOLUME | IONS_CELL_VOLUME | IONS_CELL_SHAPE] (overrides relax_mode) (VASP)
          --relax_mode=[ENERGY | FORCES | ENERGY_FORCES | FORCES_ENERGY] (default: DEFAULT_VASP_FORCE_OPTION_RELAX_MODE_SCHEME in .aflow.rc) (VASP)
          --relax_count=XX (default: DEFAULT_VASP_FORCE_OPTION_RELAX_COUNT in .aflow.rc) (VASP)
          --run_relax_static
@@ -226,7 +226,7 @@ LATEST VERSION OF THE FILE:                              materials.duke.edu/AFLO
 
       RELAX_TYPE
         One of the RELAX_TYPEs specified in the AFLOW manual (VASP only).
-        [ALL | IONS | CELL_SHAPE | CELL_VOLUME | IONS_CELL_VOLUME] (overrides RELAX_MODE)
+        [ALL | IONS | CELL_SHAPE | CELL_VOLUME | IONS_CELL_VOLUME | IONS_CELL_SHAPE] (overrides RELAX_MODE)
 
       RELAX_MODE
         One of the RELAX_MODEs specified in the AFLOW manual (VASP only).

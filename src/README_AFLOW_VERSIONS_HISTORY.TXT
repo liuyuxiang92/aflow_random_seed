@@ -13,6 +13,7 @@
         -- Added calculation of temperature-dependent phonon dispersions. (AS)
         -- Added functionality to plot thermodynamic properties calculated by QHA with the SJ EOS model. (AS)
         -- Added processing of QHA data to LIB2LIB and LIB2RAW. (AS)
+        -- Added a feature to employ fixed volume relaxation of QHA subcalculations. (AS)
         -- Implemented QHANP method (frequency-volume dependency is extrapolated by N-order Taylor expansion). (AS)
         -- Removed old QHA code, related infrastructure and dependencies. (AS)
         -- Fixed web output for README files and AFLOW banners. (ME)

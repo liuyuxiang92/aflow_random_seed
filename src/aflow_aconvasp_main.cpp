@@ -2587,7 +2587,7 @@ namespace pflow {
     strstream << tab << xspaces << " " << "              --enmax_multiply=NNNN (default: VASP_PREC_ENMAX_XXXX in .aflow.rc)" << endl;
     strstream << tab << xspaces << " " << "              --pressure=0,1,2 (kB) (default:0.0)" << endl;
     strstream << tab << xspaces << " " << "              --potim=XXX (default 0.05) (VASP)" << endl;
-    strstream << tab << xspaces << " " << "              --relax_type=[ALL|IONS|CELL_SHAPE|CELL_VOLUME|IONS_CELL_VOLUME]" << endl;
+    strstream << tab << xspaces << " " << "              --relax_type=[ALL|IONS|CELL_SHAPE|CELL_VOLUME|IONS_CELL_VOLUME|IONS_CELL_SHAPE]" << endl;
     strstream << tab << xspaces << " " << "              --relax_mode=[ENERGY|FORCES|ENERGY_FORCES|FORCES_ENERGY] (default: DEFAULT_VASP_FORCE_OPTION_RELAX_MODE_SCHEME in .aflow.rc) (VASP)" << endl;
     strstream << tab << xspaces << " " << "              --relax_count=XX (default: DEFAULT_VASP_FORCE_OPTION_RELAX_COUNT in .aflow.rc) (VASP)" << endl;
     strstream << tab << xspaces << " " << "              --run_relax_static" << endl;

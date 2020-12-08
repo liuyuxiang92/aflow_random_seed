@@ -224,7 +224,7 @@ namespace apl {
     string function="PhononCalculator::setHarmonicForceConstants():";
     string message="";
     // check if the input IFCs have correct size
-    uint natoms = _supercell.getInputStructure().atoms.size();
+    uint natoms = _supercell.getNumberOfAtoms();
     if (IFC.size() != natoms){
       message = "The supplied IFC has the wrong size: ";
       message += aurostd::utype2string(IFC.size()) + " instead of ";
