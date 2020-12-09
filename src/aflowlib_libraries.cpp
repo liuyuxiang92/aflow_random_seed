@@ -6252,7 +6252,7 @@ namespace aflowlib {
       if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/aflow.pseudopotential_auid.out")) { ok=FALSE;obb << " no=aflow.pseudopotential_auid.out" << ".EXT"; }}
       if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/aflow.qmvasp.out")) { ok=FALSE;obb << " no=aflow.qmvasp.out" << ".EXT"; }}
       if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/INCAR.orig")) { ok=FALSE;obb << " no=INCAR.orig" << ".EXT"; }}
-      if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/POSCAR.orig")) { ok=FALSE;obb << " no=POSCAR.orig" << ".EXT"; }}
+      //[CO20201111 - not needed]if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/POSCAR.orig")) { ok=FALSE;obb << " no=POSCAR.orig" << ".EXT"; }}
     }
     // TEST RELAX1 RELAX2 RELAX3
     for(uint irelax=0;irelax<vrelax.size();irelax++) {
