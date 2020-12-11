@@ -14,7 +14,7 @@
 
 #define _KVASP_VASP_SLEEP_   2
 #define _KVASP_WAIT_SLEEP_   10
-#define _KVASP_CHECK_SLEEP_  30 //CO20201111  //60   //10
+//[CO20201111 created rc parameter VASP_CHECK_SLEEP]#define _KVASP_CHECK_SLEEP_  30 //CO20201111  //60   //10
 #define KBIN_WRONG_ENTRY_STRING string("WRONG_ENTRY")
 #define KBIN_WRONG_ENTRY_NUMBER -123
 
@@ -4034,7 +4034,7 @@ namespace KBIN {
   void WaitFinished(_xvasp &xvasp,_aflags &aflags,ofstream &FileMESSAGE,uint max_count,bool verbose) {
     uint i=0;
     while((i++)<max_count && !KBIN::VASP_RunFinished(xvasp,aflags,FileMESSAGE,verbose)) {
-      aurostd::Sleep(_KVASP_CHECK_SLEEP_);
+      aurostd::Sleep(VASP_CHECK_SLEEP); //CO20201111
     }
   }
 } // namespace KBIN

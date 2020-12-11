@@ -6849,6 +6849,11 @@ namespace aflowlib {
     //this also ensures we compress everything at the end
     if(run_directory){
       _aflags aflags;aflags.Directory=directory_LIB;
+      aflags.AFLOW_FORCE_RUN=true;  //CO20201111 - force module run
+      string aid_file=""; //CO20201111
+      if(aurostd::FileExist(aflags.Directory+"/ALREADY_IN_DATABASE",aid_file) || aurostd::EFileExist(aflags.Directory+"/ALREADY_IN_DATABASE",aid_file)) { //CO20201111 - fix some broken in database
+        aurostd::RemoveFile(aid_file);
+      }
 
       //save originals
       string _AFLOWIN_orig=_AFLOWIN_;
