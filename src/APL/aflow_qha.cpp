@@ -2835,8 +2835,8 @@ namespace apl
       setw(TW) << "F(V)[eV/atom]"        << setw(SW) << ' ' <<
       setw(TW) << "B[GPa]"               << setw(SW) << ' ' <<
       setw(TW) << "beta[10^-5/K]"        << setw(SW) << ' ' <<
-      setw(TW) << "Cv(V)[kB/cell]"       << setw(SW) << ' ' <<
-      setw(TW) << "Cp(V)[kB/cell]"       << setw(SW) << ' ' <<
+      setw(TW) << "Cv(V)[kB/atom]"       << setw(SW) << ' ' <<
+      setw(TW) << "Cp(V)[kB/atom]"       << setw(SW) << ' ' <<
       setw(TW) << "gamma(beta,B,Cv(V))"  << setw(SW) << ' ' <<
       setw(TW) << "Bprime";
     // the following properties are calculated only with a regular QHA calculation
@@ -2844,12 +2844,12 @@ namespace apl
       file  << setw(SW) << ' ' <<
         setw(TW) << "gamma(V,mesh)"                          << setw(SW) << ' ' <<
         setw(TW) << "beta(gamma(V,mesh),B,Cv(V))[10^-5/K]"   << setw(SW) << ' ' <<
-        setw(TW) << "Cv(V,mesh)[kB/cell]"                    << setw(SW) << ' ' <<
-        setw(TW) << "Cp(V,mesh)[kB/cell]"                    << setw(SW) << ' ' <<
+        setw(TW) << "Cv(V,mesh)[kB/atom]"                    << setw(SW) << ' ' <<
+        setw(TW) << "Cp(V,mesh)[kB/atom]"                    << setw(SW) << ' ' <<
         setw(TW) << "gamma(V0,mesh)"                         << setw(SW) << ' ' <<
         setw(TW) << "beta(gamma(V0,mesh),B,Cv(V0))[10^-5/K]" << setw(SW) << ' ' <<
-        setw(TW) << "Cv(V0,mesh)[kB/cell]"                   << setw(SW) << ' ' <<
-        setw(TW) << "Cp(V0,mesh)[kB/cell]";
+        setw(TW) << "Cv(V0,mesh)[kB/atom]"                   << setw(SW) << ' ' <<
+        setw(TW) << "Cp(V0,mesh)[kB/atom]";
     }
     file << std::endl;
 
@@ -2944,8 +2944,8 @@ namespace apl
         setw(TW) << Feq                 << setw(SW) << ' ' << //[eV/atom]
         setw(TW) << B                   << setw(SW) << ' ' <<
         setw(TW) << beta * 1e5          << setw(SW) << ' ' << //[10^-5/K]
-        setw(TW) << CV*NatomsOrigCell   << setw(SW) << ' ' << //[kB/cell]
-        setw(TW) << CP*NatomsOrigCell   << setw(SW) << ' ' << //[kB/cell]
+        setw(TW) << CV                  << setw(SW) << ' ' << //[kB/atom]
+        setw(TW) << CP                  << setw(SW) << ' ' << //[kB/atom]
         setw(TW) << GP                  << setw(SW) << ' ' <<
         setw(TW) << Bp;
       // the following properties are calculated only with a regular QHA calculation
@@ -2953,12 +2953,12 @@ namespace apl
         file << setw(SW) << ' ' <<
           setw(TW) << GP_mesh_V              << setw(SW) << ' ' <<
           setw(TW) << beta_mesh_V * 1e5      << setw(SW) << ' ' << //[10^-5/K]
-          setw(TW) << CV_mesh_V*NatomsOrigCell << setw(SW) << ' ' << //[kB/cell]
-          setw(TW) << CP_mesh_V*NatomsOrigCell << setw(SW) << ' ' << //[kB/cell]
+          setw(TW) << CV_mesh_V              << setw(SW) << ' ' << //[kB/atom]
+          setw(TW) << CP_mesh_V              << setw(SW) << ' ' << //[kB/atom]
           setw(TW) << GP_mesh_V0             << setw(SW) << ' ' <<
           setw(TW) << beta_mesh_V0 * 1e5     << setw(SW) << ' ' << //[10^-5/K]
-          setw(TW) << CV_mesh_V0*NatomsOrigCell << setw(SW) << ' ' << //[kB/cell]
-          setw(TW) << CP_mesh_V0*NatomsOrigCell << setw(SW); //[kB/cell]
+          setw(TW) << CV_mesh_V0             << setw(SW) << ' ' << //[kB/atom]
+          setw(TW) << CP_mesh_V0             << setw(SW); //[kB/atom]
       }
       file << std::endl;
     }
