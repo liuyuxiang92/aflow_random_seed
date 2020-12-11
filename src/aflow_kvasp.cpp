@@ -4015,7 +4015,7 @@ namespace KBIN {
     aurostd::StringstreamClean(aus_exec);
     aus_exec << "cd " << xvasp.Directory << endl;
     aus_exec << "rm -f aflow.check_outcar.tmp " << endl;
-    //CO20201111 - not super efficient with cat/grep into file, but it's safe for the sapces, may change later
+    //CO20201111 - not super efficient with cat/grep into file, but it's safe for the spaces, may change later
     if(aurostd::substring_present_file(xvasp.Directory+"/aflow.check_outcar.tmp",aurostd::RemoveWhiteSpaces("Total CPU time used (sec)"),TRUE)) {
       if(verbose) aus << "00000  MESSAGE RUN FINISHED (OUTCAR is complete) : " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       if(verbose) aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
