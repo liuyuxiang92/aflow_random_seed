@@ -230,6 +230,8 @@ namespace apl {
       message += aurostd::utype2string(IFC.size()) + " instead of ";
       message += aurostd::utype2string(natoms);
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _INDEX_MISMATCH_);
+    }
+    else {
       for (uint i=0; i<natoms; i++){
         if (IFC[i].size() != natoms){
           message = "The supplied IFC["+aurostd::utype2string(i);
@@ -253,18 +255,20 @@ namespace apl {
 
     _forceConstantMatrices = IFC;
     _isPolarMaterial = isPolar;
+    uint niatoms = _supercell.getNumberOfUniqueAtoms();
     if (isPolar){
-      if (bornEffectiveChargeTensor.size() != natoms){
-        message = "The supplied bornEffectiveChargeTensor has wrong size: ";
+      if (bornEffectiveChargeTensor.size() != niatoms){
+        message = "The supplied bornEffectiveChargeTensor has the wrong size: ";
         message += aurostd::utype2string(bornEffectiveChargeTensor.size()) + " instead of ";
-        message += aurostd::utype2string(natoms);
+        message += aurostd::utype2string(niatoms);
         throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _INDEX_MISMATCH_);
-
-        for (uint i=0; i<bornEffectiveChargeTensor.size(); i++){
-          if ((bornEffectiveChargeTensor[i].rows != 3) &&
+      }
+      else {
+        for (uint i=0; i<niatoms; i++){
+          if ((bornEffectiveChargeTensor[i].rows != 3) ||
               (bornEffectiveChargeTensor[i].cols != 3)){
             message = "The supplied bornEffectiveChargeTensor["+aurostd::utype2string(i);
-            message += "] has wrong size: ";
+            message += "] has the wrong size: ";
             message += aurostd::utype2string(bornEffectiveChargeTensor[i].rows);
             message += "x"+aurostd::utype2string(bornEffectiveChargeTensor[i].cols);
             message += " instead of 3x3";
@@ -273,8 +277,8 @@ namespace apl {
         }
       }
 
-      if ((dielectricTensor.rows != 3) && (dielectricTensor.cols != 3)){
-            message = "The supplied dielectricTensor has wrong size: ";
+      if ((dielectricTensor.rows != 3) || (dielectricTensor.cols != 3)){
+            message = "The supplied dielectricTensor has the wrong size: ";
             message += aurostd::utype2string(dielectricTensor.rows)+"x"+aurostd::utype2string(dielectricTensor.cols);
             message += " instead of 3x3";
             throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _INDEX_MISMATCH_);
