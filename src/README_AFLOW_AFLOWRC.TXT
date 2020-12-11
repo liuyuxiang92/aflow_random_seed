@@ -1609,6 +1609,11 @@ AFLOW_CORE_TEMPERATURE_REFRESH
   type: integer
   default: 5
 
+VASP_CHECK_SLEEP
+  description: Time (seconds) to wait for VASP to finish writing output files. Useful on clusters with NFS delays.
+  type: integer
+  default: 30
+
 ####################################################################################################
 DEFAULTS MACHINE DEPENDENT MPI
 
