@@ -738,10 +738,11 @@ LATTICES = (the ones with "")
             [ --oxidation_numbers=ox_num_1,ox_num_2,...]
             [ --print=json|out] (default is out)
 
-        Determines the CCE corrections for the structure in file STRUCT_FILE. It can be in any structure
-        format that AFLOW supports, e.g. VASP POSCAR, QE, AIMS, ABINIT, ELK, and CIF. For VASP, a VASP5
-        POSCAR is required or, if a VASP4 POSCAR is used, the species must be written on the right side
-        next to the coordinates for each atom.
+        Prints the results of the full CCE anaysis, i.e. cation coordination numbers, oxidation numbers,
+        and CCE corrections and formation enthalpies, for the given structure file. It can be in any
+        structure format that AFLOW supports, e.g. VASP POSCAR, QE, AIMS, ABINIT, ELK, and CIF. For VASP,
+        a VASP5 POSCAR is required or, if a VASP4 POSCAR is used, the species must be written on the right
+        side next to the coordinates for each atom.
         Precalculated DFT formation enthalpies can be provided as a comma separated list using the option
         --enthalpies_formation_dft= in eV/cell.
         Functionals for which corrections should be returned can be provided as a comma separated list 
