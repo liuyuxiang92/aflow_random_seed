@@ -1475,7 +1475,7 @@ namespace plotter {
   /// @param standalone_json_object controls if the output json file is
   /// a standalone object or a part of another json object (i.e. if opening
   /// and closing curly brackets are present or not)
-  void Dos2JSON(stringstream &json, xoption &xopt, const xDOSCAR &xdos,
+  void DOS2JSON(stringstream &json, xoption &xopt, const xDOSCAR &xdos,
       ofstream& FileMESSAGE, ostream &oss, bool standalone_json_object)
   {
     string directory = ".";
@@ -1727,7 +1727,7 @@ namespace plotter {
   /// "DIRECTORY" -- the directory name
   /// "NOSHIFT" -- if true energy is NOT shifted w.r.t Fermi energy
   /// "EFERMI" -- the value of Fermi energy
-  void Bands2JSON(stringstream &out, const xEIGENVAL &xeigen, const xKPOINTS &xkpts,
+  void bands2JSON(stringstream &out, const xEIGENVAL &xeigen, const xKPOINTS &xkpts,
       const vector<double> &distances, const vector<double> &segment_points,
       const xoption& plotoptions)
   {
@@ -1811,13 +1811,13 @@ namespace plotter {
 
   /// Converts DOS and BANDS data from xDOSCAR, xEIGENVAL and xKPOINTS files
   /// to JSON object
-  void BandsDos2JSON(stringstream &json, const xDOSCAR &xdos, const xEIGENVAL &xeigen,
+  void bandsDOS2JSON(stringstream &json, const xDOSCAR &xdos, const xEIGENVAL &xeigen,
       const xKPOINTS &xkpts, xoption &xopt, ofstream &FileMESSAGE, ostream &oss)
   {
     JSONbegin(json, "");
 
     // get DOS part of JSON
-    Dos2JSON(json, xopt, xdos, FileMESSAGE, oss, false);
+    DOS2JSON(json, xopt, xdos, FileMESSAGE, oss, false);
 
     // get BANDS part of JSON
     xstructure xstr = getStructureWithNames(xopt,FileMESSAGE,xdos.carstring,oss);
@@ -2019,7 +2019,7 @@ namespace plotter {
       generateBandPlotGNUPLOT(out, xeigen, distances, segment_points, labels, plotoptions);
     }
     else if (outformat == "JSON"){
-      Bands2JSON(out, xeigen, xkpts, distances, segment_points, plotoptions);
+      bands2JSON(out, xeigen, xkpts, distances, segment_points, plotoptions);
     }
   }
 
