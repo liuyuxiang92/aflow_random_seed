@@ -7133,6 +7133,125 @@ namespace aurostd {
 }  // namespace aurostd
 //CO END
 
+//AS20201214 BEGIN JSON
+namespace aurostd {
+  //***************************************************************************
+  //  addNumber
+  template <typename utype> void JSON::addNumber(const string &key, const utype value)
+  {
+    content.push_back("\"" + key + "\":" + aurostd::utype2string(value));
+  }
+
+  template void JSON::addNumber(const string &, const int);
+  template void JSON::addNumber(const string &, const uint);
+  template void JSON::addNumber(const string &, const double);
+
+  //***************************************************************************
+  //  addVector
+  template <typename utype> void JSON::addVector(const string &key, const utype &value)
+  {
+    content.push_back("\"" + key + "\":[" + aurostd::joinWDelimiter(value, ",") + "]");
+  }
+
+  template void JSON::addVector(const string &, const vector<int> &);
+  template void JSON::addVector(const string &, const vector<uint> &);
+  template void JSON::addVector(const string &, const deque<int> &);
+  template void JSON::addVector(const string &, const deque<uint> &);
+
+  void JSON::addVector(const string &key, const vector<double> &value, int precision,
+      bool roundoff, double tol)
+  {
+    content.push_back("\"" + key + "\":[");
+    content.back() += aurostd::joinWDelimiter(
+        aurostd::vecDouble2vecString(value, precision, roundoff, tol),",");
+    content.back() += "]";
+  }
+
+  void JSON::addVector(const string &key, const deque<double> &value, int precision,
+      bool roundoff, double tol)
+  {
+    content.push_back("\"" + key + "\":[");
+    content.back() += aurostd::joinWDelimiter(
+        aurostd::vecDouble2vecString(value, precision, roundoff, tol),",");
+    content.back() += "]";
+  }
+
+  //***************************************************************************
+  //  addMatrix
+  template <typename utype> void JSON::addMatrix(const string &key, const utype &value)
+  {
+    content.push_back("\"" + key + "\":[");
+    vector<string> matrix;
+    for (uint i=0; i<value.size(); i++){
+      matrix.push_back("[" + aurostd::joinWDelimiter(value[i], ",") + "]");
+    }
+    content.back() += aurostd::joinWDelimiter(matrix, ",");
+    content.back() += "]";
+  }
+
+  template void JSON::addMatrix(const string&, const vector<vector<uint> >&);
+  template void JSON::addMatrix(const string&, const vector<vector<int> >&);
+  template void JSON::addMatrix(const string&, const deque<deque<uint> >&);
+  template void JSON::addMatrix(const string&, const deque<deque<int> >&);
+
+  void JSON::addMatrix(const string &key, const vector<vector<double> > &value,
+      int precision, bool roundoff, double tol)
+  {
+    content.push_back("\"" + key + "\":[");
+    vector<string> matrix;
+    for (uint i=0; i<value.size(); i++){
+      matrix.push_back("[" + aurostd::joinWDelimiter(
+          aurostd::vecDouble2vecString(value[i], precision, roundoff, tol), ",") + "]");
+    }
+    content.back() += aurostd::joinWDelimiter(matrix, ",");
+    content.back() += "]";
+  }
+
+  void JSON::addMatrix(const string &key, const deque<deque<double> > &value,
+      int precision, bool roundoff, double tol)
+  {
+    content.push_back("\"" + key + "\":[");
+    vector<string> matrix;
+    for (uint i=0; i<value.size(); i++){
+      matrix.push_back("[" + aurostd::joinWDelimiter(
+          aurostd::vecDouble2vecString(value[i], precision, roundoff, tol), ",") + "]");
+    }
+    content.back() += aurostd::joinWDelimiter(matrix, ",");
+    content.back() += "]";
+  }
+
+  //***************************************************************************
+  void JSON::addString(const string &key, const string &value)
+  {
+    content.push_back("\"" + key + "\":" + "\"" + value + "\"");
+  }
+
+  //***************************************************************************
+  void JSON::addBool(const string &key, bool value)
+  {
+    content.push_back("\"" + key + "\":" + (value ? "true" : "false"));
+  }
+
+  //***************************************************************************
+  void JSON::addJSON(const string &key, JSON &value)
+  {
+    content.push_back("\"" + key + "\":" + value.toString());
+  }
+
+  //***************************************************************************
+  void JSON::mergeJSON(JSON &value)
+  {
+    content.push_back(value.toString());
+  }
+
+  //***************************************************************************
+  string JSON::toString()
+  {
+    return "{" + aurostd::joinWDelimiter(content, ",") + "}";
+  }
+}
+//AS20201214 END
+
 #endif  // _AURO_IMPLEMENTATIONS_
 
 // ***************************************************************************

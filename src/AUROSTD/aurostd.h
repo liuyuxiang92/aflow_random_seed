@@ -1465,6 +1465,37 @@ const std::string base64_chars =
 "0123456789+/";
 //CO END
 
+//AS20201214 BEGIN JSON
+namespace aurostd {
+  /// Class-container to output data into JSON format.
+  class JSON{
+    private:
+      vector<string> content;
+    public:
+      template <typename utype> void addNumber(const string &key, const utype value);
+      template <typename utype> void addVector(const string &key, const utype &value);
+      void addVector(const string &key, const vector<double> &value, 
+          int precision = AUROSTD_DEFAULT_PRECISION, bool roundoff = false,
+          double tol = AUROSTD_ROUNDOFF_TOL);
+      void addVector(const string &key, const deque<double> &value,
+          int precision = AUROSTD_DEFAULT_PRECISION, bool roundoff = false,
+          double tol = AUROSTD_ROUNDOFF_TOL);
+      template <typename utype> void addMatrix(const string &key, const utype &value);
+      void addMatrix(const string &key, const vector<vector<double> > &value,
+          int precision = AUROSTD_DEFAULT_PRECISION, bool roundoff = false,
+          double tol = AUROSTD_ROUNDOFF_TOL);
+      void addMatrix(const string &key, const deque<deque<double> > &value,
+          int precision = AUROSTD_DEFAULT_PRECISION, bool roundoff = false,
+          double tol = AUROSTD_ROUNDOFF_TOL);
+      void addString(const string &key, const string &value);
+      void addBool(const string &key, bool value);
+      void addJSON(const string &key, JSON &value);
+      void mergeJSON(JSON &value);
+      string toString();
+  };
+}
+//AS20201214 END
+
 #endif
 
 // ***************************************************************************
