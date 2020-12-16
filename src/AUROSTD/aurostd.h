@@ -1474,12 +1474,14 @@ namespace aurostd {
     public:
       template <typename utype> void addNumber(const string &key, const utype value);
       template <typename utype> void addVector(const string &key, const utype &value);
-      void addVector(const string &key, const vector<double> &value, 
+      void addVector(const string &key, const vector<double> &value,
           int precision = AUROSTD_DEFAULT_PRECISION, bool roundoff = false,
           double tol = AUROSTD_ROUNDOFF_TOL);
       void addVector(const string &key, const deque<double> &value,
           int precision = AUROSTD_DEFAULT_PRECISION, bool roundoff = false,
           double tol = AUROSTD_ROUNDOFF_TOL);
+      void addVector(const string &key, const vector<string> &value);
+      void addVector(const string &key, const deque<string> &value);
       template <typename utype> void addMatrix(const string &key, const utype &value);
       void addMatrix(const string &key, const vector<vector<double> > &value,
           int precision = AUROSTD_DEFAULT_PRECISION, bool roundoff = false,
@@ -1489,9 +1491,10 @@ namespace aurostd {
           double tol = AUROSTD_ROUNDOFF_TOL);
       void addString(const string &key, const string &value);
       void addBool(const string &key, bool value);
+      void addRaw(const string &value);
       void addJSON(const string &key, JSON &value);
       void mergeJSON(JSON &value);
-      string toString();
+      string toString(bool wrap=true);
   };
 }
 //AS20201214 END

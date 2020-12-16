@@ -1475,8 +1475,8 @@ namespace plotter {
   /// @param standalone_json_object controls if the output json file is
   /// a standalone object or a part of another json object (i.e. if opening
   /// and closing curly brackets are present or not)
-  void DOS2JSON(stringstream &json, xoption &xopt, const xDOSCAR &xdos,
-      ofstream& FileMESSAGE, ostream &oss, bool standalone_json_object)
+  aurostd::JSON DOS2JSON(xoption &xopt, const xDOSCAR &xdos, ofstream& FileMESSAGE,
+      ostream &oss)
   {
     string directory = ".";
     xopt.push_attached("DIRECTORY", directory);
@@ -1485,41 +1485,48 @@ namespace plotter {
     xstructure xstr = getStructureWithNames(xopt,FileMESSAGE,xdos.carstring,oss);
 
     string name = KBIN::ExtractSystemName(directory);
-    if (standalone_json_object) JSONbegin(json, "");
+    aurostd::JSON dos_json;
     // TDOS header begin
-    JSONnumber(json, "version", BANDS_DOS_JSON_VERSION);
-    JSONstring(json, "name", name);
-    JSONdeque(json,  "species", xstr.species);
-    JSONdeque(json,  "composition", xstr.num_each_type);
-    JSONnumber(json, "Emin", xdos.energy_min);
-    JSONnumber(json, "Emax", xdos.energy_max);
-    JSONnumber(json, "Efermi", xdos.Efermi);
-    JSONnumber(json, "DOS_grid", xdos.number_energies);
+    dos_json.addNumber("version", BANDS_DOS_JSON_VERSION);
+    dos_json.addString("name", name);
+    dos_json.addVector("species", xstr.species);
+    dos_json.addVector("composition", xstr.num_each_type);
+    dos_json.addNumber("Emin", xdos.energy_min);
+    dos_json.addNumber("Emax", xdos.energy_max);
+    dos_json.addNumber("Efermi", xdos.Efermi);
+    dos_json.addNumber("DOS_grid", xdos.number_energies);
     // TDOS header end
 
-    JSONbegin(json, "tDOS_data");
-    JSONbool(json,  "energies_shifted", !xopt.flag("NOSHIFT"));
-    JSONdeque(json, "energy",xopt.flag("NOSHIFT") ? xdos.venergy : xdos.venergyEf);
+    aurostd::JSON tdos_data;
+    tdos_data.addBool("energies_shifted", !xopt.flag("NOSHIFT"));
+    tdos_data.addVector("energy",xopt.flag("NOSHIFT") ? xdos.venergy : xdos.venergyEf);
     if (aurostd::substring2bool(xdos.carstring, "CAR")){
-      JSONstring(json, "x_unit", "EV");
-      JSONstring(json, "y_unit", "");
+      tdos_data.addString("x_unit", "EV");
+      tdos_data.addString("y_unit", "");
     }
     else if (aurostd::substring2bool(xdos.carstring, "PHON")){
-      JSONstring(json, "x_unit", "MEV");
-      JSONstring(json, "y_unit", "");
+      tdos_data.addString("x_unit", "MEV");
+      tdos_data.addString("y_unit", "");
     }
 
     if (xdos.spin){
-      JSONdeque(json, "spin_majority", xdos.vDOS[0][0][0]);
-      JSONdeque(json, "spin_minority", xdos.vDOS[0][0][1],true);
-      JSONdeque(json, "sum_spin_majority", xdos.viDOS[0]);
-      JSONdeque(json, "sum_spin_minority", xdos.viDOS[1],true);
+      tdos_data.addVector("spin_majority", xdos.vDOS[0][0][0]);
+      // negative for minority spin
+      deque<double> minority = xdos.vDOS[0][0][1];
+      for (uint i=0; i<minority.size(); i++) minority[i] *= -1;
+      tdos_data.addVector("spin_minority", minority);
+
+      tdos_data.addVector("sum_spin_majority", xdos.viDOS[0]);
+      // negative for minority spin
+      minority = xdos.viDOS[1];
+      for (uint i=0; i<minority.size(); i++) minority[i] *= -1;
+      tdos_data.addVector("sum_spin_minority", minority);
     }
     else{
-      JSONdeque(json, "tDOS", xdos.vDOS[0][0][0]);
-      JSONdeque(json, "sum", xdos.viDOS[0]);
+      tdos_data.addVector("tDOS", xdos.vDOS[0][0][0]);
+      tdos_data.addVector("sum", xdos.viDOS[0]);
     }
-    JSONend(json);
+    dos_json.addJSON("tDOS_data", tdos_data);
 
     // projected electronic DOS
     if (xdos.partial && aurostd::substring2bool(xdos.carstring, "CAR")){
@@ -1566,13 +1573,13 @@ namespace plotter {
       }
 
       // header of partial DOS
-      JSONbegin(json,  "pDOS_data");
-      JSONvector(json, "orbitals", orb_labels_out);
-      JSONbool(json,   "spin_polarized", xdos.spin);
-      JSONbool(json,   "energies_shifted", !xopt.flag("NOSHIFT"));
-      JSONdeque(json,  "energy", xopt.flag("NOSHIFT") ? xdos.venergy : xdos.venergyEf);
-      JSONstring(json, "x_unit", "EV");
-      JSONstring(json, "y_unit", "");
+      aurostd::JSON pdos_data;
+      pdos_data.addVector("orbitals", orb_labels_out);
+      pdos_data.addBool("spin_polarized", xdos.spin);
+      pdos_data.addBool("energies_shifted", !xopt.flag("NOSHIFT"));
+      pdos_data.addVector("energy",xopt.flag("NOSHIFT") ? xdos.venergy : xdos.venergyEf);
+      pdos_data.addString("x_unit", "EV");
+      pdos_data.addString("y_unit", "");
 
       // create a mapping of species to the ID of the first representative of
       // each group of the symmetry equivalent atoms, i.e. for SG #12 BaBiO3
@@ -1590,10 +1597,10 @@ namespace plotter {
       // write atom-projected DOS for each unique atom
       string label = "";
       for (uint species_id=0; species_id<xstr.species.size(); species_id++){
-        JSONbegin(json, xstr.species[species_id]);
+        aurostd::JSON species_json;
         for (uint iatom=0; iatom<map_species_to_iatoms[species_id].size(); iatom++){
           int atom_id = map_species_to_iatoms[species_id][iatom];
-          JSONbegin(json, aurostd::utype2string<int>(atom_id));
+          aurostd::JSON atom_json;
           atom_id++; // in vDOS atoms are indexed starting from 1
 
           if (xdos.isLSCOUPLING){
@@ -1601,28 +1608,44 @@ namespace plotter {
               // there are 4 spin channels
               for (uint spin=0; spin<xdos.vDOS[atom_id][orb].size(); spin++){
                 label = orb_labels[4*(orb-1) + spin];
-                JSONdeque(json, label, xdos.vDOS[atom_id][orb][spin]);
+                atom_json.addVector(label, xdos.vDOS[atom_id][orb][spin]);
               }
             }
 
-            JSONdeque(json, "total", xdos.vDOS[atom_id][0][0]);
+            atom_json.addVector("total", xdos.vDOS[atom_id][0][0]);
           }
           else{
             for (uint spin=0; spin<=xdos.spin; spin++){
               if (xdos.vDOS[atom_id].size()){
-                label = "total" + (xdos.spin ? "_"+SPIN_LABEL[spin] : "");
-                JSONdeque(json, label, xdos.vDOS[atom_id][0][spin], spin);
+                label = "total" + (xdos.spin ? "_"+ SPIN_LABEL[spin] : "");
+                if (spin){
+                  // negative for minority spin
+                  deque<double> minority = xdos.vDOS[atom_id][0][spin];
+                  for (uint i=0; i<minority.size(); i++) minority[i] *= -1;
+                  atom_json.addVector(label, minority);
+                }
+                else{
+                  atom_json.addVector(label, xdos.vDOS[atom_id][0][spin]);
+                }
               }
 
               for (uint orb=1; orb<xdos.vDOS[atom_id].size(); orb++){
-                label = orb_labels[orb-1] + (xdos.spin ? "_"+SPIN_LABEL[spin] : "");
-                JSONdeque(json, label, xdos.vDOS[atom_id][orb][spin], spin);
+                label = orb_labels[orb-1] + (xdos.spin ? "_"+ SPIN_LABEL[spin] : "");
+                if (spin){
+                  // negative for minority spin
+                  deque<double> minority = xdos.vDOS[atom_id][orb][spin];
+                  for (uint i=0; i<minority.size(); i++) minority[i] *= -1;
+                  atom_json.addVector(label, minority);
+                }
+                else{
+                  atom_json.addVector(label, xdos.vDOS[atom_id][orb][spin]);
+                }
               }
             }
           }
-          JSONend(json);
+          species_json.addJSON(aurostd::utype2string<int>(atom_id-1), atom_json);
         }
-        JSONend(json);
+        pdos_data.addJSON(xstr.species[species_id], species_json); 
       }
 
       // write the sum of DOS contributions for each orbital (s, p, d and f)
@@ -1638,12 +1661,12 @@ namespace plotter {
             // orbitals are grouped by 2*l+1 manifolds: loop to sum each group
             for (int i=0; i<2*l+1; i++){
               for (uint en=0; en<orb_dos[spin].size(); en++){
-                orb_dos[spin][en] += xdos.vDOS[0][norb-i][spin][en];
+                orb_dos[spin][en] += (xdos.spin ? -1 : 1)*xdos.vDOS[0][norb-i][spin][en]; // negative for minority spin
               }
             }
             label = "sum_" + ORBITALS[l];
             label += xdos.spin ? "_"+SPIN_LABEL[spin] : "";
-            JSONdeque(json, label, orb_dos[spin], spin);
+            pdos_data.addVector(label, orb_dos[spin]);
           }
         }
       }
@@ -1657,29 +1680,37 @@ namespace plotter {
               label = "sum_"+orb_labels[orb-1];
               label += xdos.spin ? "_"+SPIN_LABEL[spin] : "";
             }
-            JSONdeque(json, label, xdos.vDOS[0][orb][spin], spin);
+            if (spin){
+              // negative for minority spin
+              deque<double> minority = xdos.vDOS[0][orb][spin];
+              for (uint i=0; i<minority.size(); i++) minority[i] *= -1;
+              pdos_data.addVector(label, minority);
+            }
+            else{
+              pdos_data.addVector(label, xdos.vDOS[0][orb][spin]);
+            }
           }
         }
       }
-      JSONend(json);
+      dos_json.addJSON("pDOS_data", pdos_data);
     }
 
     // projected phonon DOS
     if (xdos.partial && aurostd::substring2bool(xdos.carstring, "PHON")){
       // header of partial DOS
-      JSONbegin(json,  "pDOS_data");
+      aurostd::JSON pdos_data;
       deque<string> projections;
       if (xdos.vDOS.size()>=2){
         for (uint j=1; j<xdos.vDOS[1].size(); j++){
           projections.push_back("projection_" + aurostd::utype2string(j));
         }
       }
-      JSONdeque(json,  "orbitals", projections);
-      JSONbool(json,   "spin_polarized", xdos.spin);
-      JSONbool(json,   "energies_shifted", !xopt.flag("NOSHIFT"));
-      JSONdeque(json,  "energy", xopt.flag("NOSHIFT") ? xdos.venergy : xdos.venergyEf);
-      JSONstring(json, "x_unit", "MEV");
-      JSONstring(json, "y_unit", "");
+      pdos_data.addVector("orbitals", projections);
+      pdos_data.addBool("spin_polarized", xdos.spin);
+      pdos_data.addBool("energies_shifted", !xopt.flag("NOSHIFT"));
+      pdos_data.addVector("energy", xopt.flag("NOSHIFT") ? xdos.venergy : xdos.venergyEf);
+      pdos_data.addString("x_unit", "MEV");
+      pdos_data.addString("y_unit", "");
 
       // create a mapping of species to the id of the first representative of
       // each group of the symmetry equivalent atoms, i.e. for SG #12 BaBiO3
@@ -1697,27 +1728,24 @@ namespace plotter {
       // write atom-projected DOS for each unique atom
       string label = "";
       for (uint species_id=0; species_id<xstr.species.size(); species_id++){
-        JSONbegin(json, xstr.species[species_id]);
+        aurostd::JSON species_json;
         for (uint iatom=0; iatom<map_species_to_iatoms[species_id].size(); iatom++){
           int atom_id = map_species_to_iatoms[species_id][iatom];
-          JSONbegin(json, aurostd::utype2string<int>(atom_id));
+          aurostd::JSON atom_json;
           atom_id++; // in vDOS atoms are indexed starting from 1
 
           for (uint p=1; p<xdos.vDOS[atom_id].size(); p++){
-            JSONdeque(json, projections[p-1], xdos.vDOS[atom_id][p][0]);
+            atom_json.addVector(projections[p-1], xdos.vDOS[atom_id][p][0]);
           }
-          JSONend(json);
+          species_json.addJSON(aurostd::utype2string<int>(atom_id-1), atom_json);
         }
-        JSONend(json);
+        pdos_data.addJSON(xstr.species[species_id], species_json);
       }
 
-      JSONend(json);
+      dos_json.addJSON("pDOS_data", pdos_data);
     }
 
-    if (standalone_json_object){
-      JSONend(json);
-      JSONfinish(json);
-    }
+    return dos_json;
   }
 
   /// Converts band structure data from xEIGENVAL and xKPOINTS to the file in
@@ -1727,7 +1755,7 @@ namespace plotter {
   /// "DIRECTORY" -- the directory name
   /// "NOSHIFT" -- if true energy is NOT shifted w.r.t Fermi energy
   /// "EFERMI" -- the value of Fermi energy
-  void bands2JSON(stringstream &out, const xEIGENVAL &xeigen, const xKPOINTS &xkpts,
+  aurostd::JSON bands2JSON(const xEIGENVAL &xeigen, const xKPOINTS &xkpts,
       const vector<double> &distances, const vector<double> &segment_points,
       const xoption& plotoptions)
   {
@@ -1741,16 +1769,17 @@ namespace plotter {
     string LattName = tokens[0];
 
     // write header
-    JSONstring(out, "title", name+" ("+LattName+")");
-    JSONnumber(out, "n_kpoints", xeigen.number_kpoints);
-    JSONnumber(out, "n_bands", xeigen.number_bands);
+    aurostd::JSON json;
+    json.addString("title", name+" ("+LattName+")");
+    json.addNumber("n_kpoints", xeigen.number_kpoints);
+    json.addNumber("n_bands", xeigen.number_bands);
     if(aurostd::substring2bool(xeigen.carstring, "CAR")){
-      JSONstring(out, "x_unit", "");
-      JSONstring(out, "y_unit", "EV");
+      json.addString("x_unit", "");
+      json.addString("y_unit", "EV");
     }
     else if(aurostd::substring2bool(xeigen.carstring, "PHON")){
-      JSONstring(out, "x_unit", "");
-      JSONstring(out, "y_unit", "MEV");
+      json.addString("x_unit", "");
+      json.addString("y_unit", "MEV");
     }
 
     static const int num = 4;
@@ -1777,11 +1806,11 @@ namespace plotter {
         labels_formated[j] = aurostd::StringSubst(labels_formated[j], "\\", "\\\\");
       }
 
-      JSONvector(out, tags[f], labels_formated);
+      json.addVector(tags[f], labels_formated);
     }
 
-    JSONvector(out, "kpoint_positions", segment_points);
-    JSONbool(out,  "energies_shifted", !plotoptions.flag("NOSHIFT"));
+    json.addVector("kpoint_positions", segment_points);
+    json.addBool("energies_shifted", !plotoptions.flag("NOSHIFT"));
 
     // write bands data
     string bandslabel = "";
@@ -1790,34 +1819,36 @@ namespace plotter {
       bandslabel = "bands_data";
       bandslabel += xeigen.spin ? (s ? "_minority" : "_majority") : "";
 
-      out << "     \"" + bandslabel + "\": [";
+      vector<vector<double> > bandsdata(distances.size(),
+          vector<double> (xeigen.number_bands + 1)); // +1 because the first element is the the distance, the others are energies for each band
+
       for (uint i=0; i<distances.size(); i++){
-        out << endl << "          [";
-        out << distances[i] << ",";
-        for (uint band=0; band<xeigen.number_bands; band++){
-          out << (plotoptions.flag("NOSHIFT") ? xeigen.venergy[i][band][s] :
-                 xeigen.venergy[i][band][s] - Efermi);
-          out << ",";
+        bandsdata[i][0] = distances[i];
+        if (plotoptions.flag("NOSHIFT")){
+          for (uint band=0; band<xeigen.number_bands; band++){
+            bandsdata[i][band+1] = xeigen.venergy[i][band][s];
+          }
         }
-        out.seekp(-1,out.cur);
-        out << "],";
+        else{
+          for (uint band=0; band<xeigen.number_bands; band++){
+            bandsdata[i][band+1] = xeigen.venergy[i][band][s] - Efermi;
+          }
+        }
       }
-      out.seekp(-1,out.cur);
-      out << endl;
-      out << "     ],";
+
+      json.addMatrix(bandslabel, bandsdata);
     }
-    out << endl;
+
+    return json;
   }
 
   /// Converts DOS and BANDS data from xDOSCAR, xEIGENVAL and xKPOINTS files
   /// to JSON object
-  void bandsDOS2JSON(stringstream &json, const xDOSCAR &xdos, const xEIGENVAL &xeigen,
+  aurostd::JSON bandsDOS2JSON(const xDOSCAR &xdos, const xEIGENVAL &xeigen,
       const xKPOINTS &xkpts, xoption &xopt, ofstream &FileMESSAGE, ostream &oss)
   {
-    JSONbegin(json, "");
-
     // get DOS part of JSON
-    DOS2JSON(json, xopt, xdos, FileMESSAGE, oss, false);
+    aurostd::JSON json = DOS2JSON(xopt, xdos, FileMESSAGE, oss);
 
     // get BANDS part of JSON
     xstructure xstr = getStructureWithNames(xopt,FileMESSAGE,xdos.carstring,oss);
@@ -1825,10 +1856,15 @@ namespace plotter {
     xopt.push_attached("OUTPUT_FORMAT","JSON");
     xopt.pop_attached("EFERMI");
     xopt.push_attached("EFERMI", aurostd::utype2string<double>(xdos.Efermi));
-    generateBandPlot(json, xeigen, xkpts, xstr, xopt);
+    stringstream json_stream;
+    generateBandPlot(json_stream, xeigen, xkpts, xstr, xopt);
+    string bands = json_stream.str();
+    if (bands.size() > 2){
+      bands = bands.substr(1, bands.size() - 2); // remove wrapping curly brackets
+    }
 
-    JSONend(json);
-    JSONfinish(json);
+    json.addRaw(bands);
+    return json;
   }
 
   // DOS ---------------------------------------------------------------------
@@ -2019,7 +2055,7 @@ namespace plotter {
       generateBandPlotGNUPLOT(out, xeigen, distances, segment_points, labels, plotoptions);
     }
     else if (outformat == "JSON"){
-      bands2JSON(out, xeigen, xkpts, distances, segment_points, plotoptions);
+      out << bands2JSON(xeigen, xkpts, distances, segment_points, plotoptions).toString();
     }
   }
 

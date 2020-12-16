@@ -3707,6 +3707,10 @@ bool comparison_kEn_str_band_type_dn(const kEn_st& k1, const kEn_st& k2);
 bool is_equal_position_kEn_str      (const kEn_st& k1, const kEn_st& k2);
 bool near_to                        (const xvector<double> & k1, const xvector<double> & k2, const vector<double> & max_distance);
 // [OBSOLETE] bool GetEffectiveMass(xOUTCAR& outcar,xDOSCAR& doscar,xEIGENVAL& eigenval,xstructure xstr,ostream& oss,const bool& osswrite);
+namespace aurostd {
+  class JSON; // forward-declaration of JSON class: later in plotter namespace JSON class
+  // defined in aurostd.h is not visible; dependencies race?
+}
 //-------------------------------------------------------------------------------------------------
 //ME20190614 - plotter functions
 namespace plotter {
@@ -3770,12 +3774,13 @@ namespace plotter {
   string getLatticeFromKpointsTitle(const string&);
   void shiftEfermiToZero(xEIGENVAL&, double);
   void setEMinMax(aurostd::xoption&, double, double);
-  void DOS2JSON(stringstream &json, xoption &xopt, xDOSCAR &xdos,
-      ofstream& FileMESSAGE, ostream &oss, bool standalone_json_object);//AS20201102
-  void bands2JSON(stringstream &out, const xEIGENVAL &xeigen, const xKPOINTS &xkpts,
+  aurostd::JSON DOS2JSON(xoption &xopt, const xDOSCAR &xdos, ofstream& FileMESSAGE,
+      ostream &oss);//AS20201102
+  aurostd::JSON bands2JSON(const xEIGENVAL &xeigen, const xKPOINTS &xkpts,
       const vector<double> &distances, const vector<double> &segment_points,
       const xoption& plotoptions);//AS2021102
-  void bandsDOS2JSON(stringstream &json, xDOSCAR &xdos, xEIGENVAL &xeigen, xKPOINTS &xkpts, xoption &xopt, ofstream &FileMESSAGE, ostream &oss);//AS20201102
+  aurostd::JSON bandsDOS2JSON(const xDOSCAR &xdos, const xEIGENVAL &xeigen,
+      const xKPOINTS &xkpts, xoption &xopt, ofstream &FileMESSAGE, ostream &oss);//AS20201102
 
   //AS20201111 BEGIN
   //JSON

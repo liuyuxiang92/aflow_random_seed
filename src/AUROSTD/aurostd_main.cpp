@@ -7176,6 +7176,20 @@ namespace aurostd {
     content.back() += "]";
   }
 
+  void JSON::addVector(const string &key, const vector<string> &value)
+  {
+    content.push_back("\"" + key + "\":[");
+    content.back() += aurostd::joinWDelimiter(aurostd::wrapVecEntries(value, "\""), ",");
+    content.back() += "]";
+  }
+
+  void JSON::addVector(const string &key, const deque<string> &value)
+  {
+    content.push_back("\"" + key + "\":[");
+    content.back() += aurostd::joinWDelimiter(aurostd::wrapVecEntries(value, "\""), ",");
+    content.back() += "]";
+  }
+
   //***************************************************************************
   //  addMatrix
   template <typename utype> void JSON::addMatrix(const string &key, const utype &value)
@@ -7233,21 +7247,32 @@ namespace aurostd {
   }
 
   //***************************************************************************
+  void JSON::addRaw(const string &value)
+  {
+    content.push_back(value);
+  }
+
+  //***************************************************************************
   void JSON::addJSON(const string &key, JSON &value)
   {
-    content.push_back("\"" + key + "\":" + value.toString());
+    content.push_back("\"" + key + "\":" + value.toString(true));
   }
 
   //***************************************************************************
   void JSON::mergeJSON(JSON &value)
   {
-    content.push_back(value.toString());
+    content.push_back(value.toString(false));
   }
 
   //***************************************************************************
-  string JSON::toString()
+  string JSON::toString(bool wrap)
   {
-    return "{" + aurostd::joinWDelimiter(content, ",") + "}";
+    if (wrap){
+      return "{" + aurostd::joinWDelimiter(content, ",") + "}";
+    }
+    else{
+      return aurostd::joinWDelimiter(content, ",");
+    }
   }
 }
 //AS20201214 END

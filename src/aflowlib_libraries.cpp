@@ -5475,18 +5475,15 @@ namespace aflowlib {
           && aurostd::EFileExist(directory_RAW+"/"+DEFAULT_QHA_FILE_PREFIX+DEFAULT_QHA_KPOINTS_FILE)){
         if (AFLOWLIB_VERBOSE) cout << MESSAGE << " converting T-dependent phonon dispersions to JSON format " << endl;
         stringstream json;
-        xoption xopt;
         xstructure xstr(directory_RAW+"/"+DEFAULT_APL_PHPOSCAR_FILE);
         xKPOINTS   xkpts(directory_RAW+"/"+DEFAULT_QHA_FILE_PREFIX+DEFAULT_QHA_KPOINTS_FILE);
         xEIGENVAL xeig(directory_RAW+"/"+DEFAULT_QHA_FILE_PREFIX+DEFAULT_QHA_PDIS_FILE+".T300K.out");
+        xoption xopt;
         xopt.push_attached("EFERMI","0.0");
         xopt.push_attached("OUTPUT_FORMAT","JSON");
         xopt.push_attached("DIRECTORY",directory_RAW);
         xopt.flag("NOSHIFT", true);
-        plotter::JSONbegin(json, "");
         plotter::generateBandPlot(json, xeig, xkpts, xstr, xopt);
-        plotter::JSONend(json);
-        plotter::JSONfinish(json);
 
         aurostd::stringstream2file(json, directory_RAW + "/"+DEFAULT_QHA_FILE_PREFIX+DEFAULT_QHA_PDIS_FILE+".T300K.json");
       }
