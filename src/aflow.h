@@ -3782,23 +3782,6 @@ namespace plotter {
   aurostd::JSON bandsDOS2JSON(const xDOSCAR &xdos, const xEIGENVAL &xeigen,
       const xKPOINTS &xkpts, xoption &xopt, ofstream &FileMESSAGE, ostream &oss);//AS20201102
 
-  //AS20201111 BEGIN
-  //JSON
-  void JSONbegin(stringstream &json, const string &name);
-  void JSONend(stringstream &json);
-  void JSONfinish(stringstream &json);
-  void JSONstring(stringstream &json, const string &name, const string &value);
-  void JSONbool(stringstream &json, const string &name, bool value);
-  template<typename utype> void JSONnumber(stringstream &json, const string &name, utype value);
-  template<typename utype> void JSONvector(stringstream &json, const string &name, const vector<utype> &value);
-  template<typename utype> void JSONvector(stringstream &json, const string &name,
-     const vector<vector<utype> > &value);
-  void JSONvector(stringstream &json, const string &name, vector<string> &value);
-  template<typename utype> void JSONdeque(stringstream &json, const string &name,
-      const deque<utype> &value, bool negate=false);
-  void JSONdeque(stringstream &json, const string &name, deque<string> &value);
-  //AS20201111 END
-
   // DOS
   void generateDosPlot(stringstream&, const xDOSCAR&, const aurostd::xoption&,ostream& oss=cout);  //CO20200404
   void generateDosPlot(stringstream&, const xDOSCAR&, const aurostd::xoption&,ofstream& FileMESSAGE,ostream& oss=cout);  //CO20200404

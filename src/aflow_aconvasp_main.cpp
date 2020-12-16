@@ -942,25 +942,6 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   } else {
     vpflow.args2addattachedscheme(argv,cmds,"PLOT_THERMO","--plotthermo=","./");
   }
-  if (aurostd::args2flag(argv, cmds, "--testjson")) {
-    xDOSCAR doscar;
-    doscar.GetPropertiesFile("DOSCAR.static.xz");
-
-    xEIGENVAL xeig("EIGENVAL.bands.xz");
-    xstructure xstr("POSCAR.static.xz");
-    xKPOINTS xkpts("KPOINTS.bands.xz");
-
-    xoption xopt;
-    xopt.push_attached("EFERMI","0.0");
-    xopt.push_attached("OUTPUT_FORMAT","JSON");
-    xopt.push_attached("DIRECTORY",".");
-    xopt.flag("NOSHIFT", false);
-
-    ofstream FileMESSAGE("/dev/null");
-//    cout << plotter::DOS2JSON(xopt, doscar, FileMESSAGE, cout).toString() << endl;
-    cout << plotter::bandsDOS2JSON(doscar, xeig, xkpts, xopt, FileMESSAGE, cout).toString() << endl;
-    exit(0);
-  }
   if (aurostd::args2flag(argv, cmds, "--plottcond|--plotthermalconductivity")) {
     vpflow.flag("PLOT_TCOND", true);
     vpflow.addattachedscheme("PLOT_TCOND", "./", true);
