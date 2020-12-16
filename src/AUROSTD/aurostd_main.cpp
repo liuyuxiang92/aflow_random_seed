@@ -4935,28 +4935,29 @@ namespace aurostd {
     return (bool) substring_present_file_FAST(FileName,strsub1,FALSE);
   }
 
-  bool WithinList(const vector<string>& list,const string& input) { //CO20181010
+  bool WithinList(const vector<string>& list,const string& input,bool sorted) { //CO20181010
     //for(uint i=0;i<list.size();i++){if(list[i]==input){return true;}}  OBSOLETE ME20190905
     //return false;  OBSOLETE ME20190905
-    int index;
-    return WithinList(list, input, index);
+    int index=-1;
+    return WithinList(list, input, index, sorted);
   }
-  bool WithinList(const vector<int>& list,int input) {  //CO20181010
+  bool WithinList(const vector<int>& list,int input,bool sorted) {  //CO20181010
     //for(uint i=0;i<list.size();i++){if(list[i]==input){return true;}}  OBSOLETE ME20190905
     //return false;  OBSOLETE ME20190905
-    int index;
-    return WithinList(list, input, index);
+    int index=-1;
+    return WithinList(list, input, index, sorted);
   }
-  bool WithinList(const vector<uint>& list,uint input) {  //CO20181010
+  bool WithinList(const vector<uint>& list,uint input,bool sorted) {  //CO20181010
     //for(uint i=0;i<list.size();i++){if(list[i]==input){return true;}}  OBSOLETE ME20190905
     //return false;  OBSOLETE ME20190905
-    int index;
-    return WithinList(list, input, index);
+    int index=-1;
+    return WithinList(list, input, index, sorted);
   }
 
   //ME20190813 - added versions that also determine the index of the item in the list
-  bool WithinList(const vector<string>& list, const string& input, int& index) {
+  bool WithinList(const vector<string>& list, const string& input, int& index, bool sorted) {
     for (int i = 0, nlist = (int) list.size(); i < nlist; i++) {
+      if(sorted && list[i]>input){break;} //CO20201111
       if(list[i]==input) {
         index = i;
         return true;
@@ -4966,8 +4967,9 @@ namespace aurostd {
     return false;
   }
 
-  bool WithinList(const vector<int>& list, int input, int& index) {
+  bool WithinList(const vector<int>& list, int input, int& index, bool sorted) {
     for (int i = 0, nlist = (int) list.size(); i < nlist; i++) {
+      if(sorted && list[i]>input){break;} //CO20201111
       if(list[i]==input) {
         index = i;
         return true;
@@ -4977,8 +4979,9 @@ namespace aurostd {
     return false;
   }
 
-  bool WithinList(const vector<uint>& list, uint input, int& index) {
+  bool WithinList(const vector<uint>& list, uint input, int& index, bool sorted) {
     for (int i = 0, nlist = (int) list.size(); i < nlist; i++) {
+      if(sorted && list[i]>input){break;} //CO20201111
       if(list[i]==input) {
         index = i;
         return true;

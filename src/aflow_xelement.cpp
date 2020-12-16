@@ -1355,7 +1355,7 @@ namespace xelement {
     //refer to:
     //https://en.wikipedia.org/wiki/SI_base_unit
     //https://en.wikipedia.org/wiki/SI_derived_unit
-    bool LDEBUG=(TRUE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy=XPID+"xelement::convertUnits():";
     if(LDEBUG){
       cerr << soliloquy << " property=" << property << endl;

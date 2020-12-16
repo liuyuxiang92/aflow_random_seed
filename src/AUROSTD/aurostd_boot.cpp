@@ -275,7 +275,7 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   //  sort2((unsigned long)1,v,v);sort2((unsigned long)1,xvd,xvi);sort2((unsigned long)1,xvi,xvd);
   o+=isequal(v,v)+isequal(v,v,(utype) 0)+isequal(v,v,x)+isdifferent(v,v)+isdifferent(v,v,x)+isinteger(v,x);swap(v,1,1);shiftlrows(v,1);
   getQuartiles(v,x,x,x);
-  o+=aurostd::mean(v);aurostd::meanWeighted(v,v);aurostd::meanWeighted(v,v,x);o+=aurostd::stddev(v);o+=aurostd::mode(v); //CO20190520
+  o+=aurostd::mean(v);aurostd::meanWeighted(v,v);aurostd::meanWeighted(v,v,x);o+=aurostd::var(v,1);o+=aurostd::stddev(v,1);o+=aurostd::mode(v);o+=aurostd::correlation_Pearson_fast(v,v);o+=aurostd::correlation_Pearson_slow(v,v);o+=aurostd::correlation_Pearson_fast(v,x,x,v,x,x); //CO20190520
   v=aurostd::box_filter_xv<utype>(1);v=aurostd::box_filter_xv<utype>(1,1); //CO20190520
   v=aurostd::gaussian_filter_xv<utype>(x);v=aurostd::gaussian_filter_xv<utype>(x,1);v=aurostd::gaussian_filter_xv<utype>(x,1,1); //CO20190520
   vector<uint> vii; //CO20190622
@@ -311,6 +311,7 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   m.clear();m.set(x);m.reset();m.reset();clear(m);reset(m);clear(m);set(m,x);abs(m);mabs(m);
   o+=det(m);o+=determinant(m);m=submatrix(m,1,1);submatrixInPlace(m,m,1,1);o+=minordet(m,1,1);o+=minordeterminant(m,1,1);v*m;m*v;
   vector<utype> vvv=xvector2vector(v);vector2xvector(vvv,1);
+  vector<string> vs;vxu=vector2xvector<utype>(vs,1); //CO20201111
   vector<vector<utype> > mvv=xmatrix2vectorvector(m);vectorvector2xmatrix(mvv);
   if(det(m)==0 || sum(m)==0) return FALSE;
   reshape(v);reshape(v,v);reshape(v,v,v);reshape(v,v,v,v);reshape(v,v,v,v,v);reshape(v,v,v,v,v,v);

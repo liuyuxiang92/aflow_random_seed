@@ -270,8 +270,8 @@ namespace aflowlib {
       string getPathAURL(ostream& oss=cout, bool load_from_common=false);                   // converts entry.aurl to url/path (common)
       string getPathAURL(ofstream& FileMESSAGE, ostream& oss, bool load_from_common=false); // converts entry.aurl to url/path (common)
       //ML stoich features
-      void getStoichFeatures(vector<string>& vheaders);
-      void getStoichFeatures(vector<string>& vheaders,vector<double>& vfeatures,bool vheaders_only=false);
+      void getStoichFeatures(vector<string>& vheaders,const string& e_props=_AFLOW_XELEMENT_PROPERTIES_ALL_);
+      void getStoichFeatures(vector<string>& vheaders,vector<double>& vfeatures,bool vheaders_only=false,const string& e_props=_AFLOW_XELEMENT_PROPERTIES_ALL_);
     private:                                                     //
       void free();                                               // free space
       void copy(const _aflowlib_entry& b);                       //
