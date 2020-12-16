@@ -63,23 +63,31 @@
 
 //DX20191212 - added 
 struct structure_misfit {
+  // quantitative similarity/cost functions 
   bool is_magnetic_misfit;              // boolean indicating if a magnetic system and using magnetic as misfit
   double misfit;                        // Burzlaff's structural misfit (=1-(1-lattice_deviation)(1-coordinate_displacement)(1-failure))
   double lattice_deviation;             // Burzlaff's lattice deviation, captures differences between lattices
   double coordinate_displacement;       // Burzlaff's coordinate displacement; captures differences between atom positions (relatively close together)
   double failure;                       // Burzlaff's figure of failure; captures differences between atom positions (significantly far apart)
-  double magnetic_misfit;               //DX's magnetic misfit (inspired by Burzlaff's misfit; =1-(1-magnetic_displacement)(1-magnetic_failure))
-  double magnetic_displacement;         //DX's magnetic displacement; captures differences between magnetic moment magnitude (and angle for non-collinear)
-  double magnetic_failure;              //DX's magnetic failure; captures spin flip differences 
+  double magnetic_misfit;               // DX's magnetic misfit (inspired by Burzlaff's misfit; =1-(1-magnetic_displacement)(1-magnetic_failure))
+  double magnetic_displacement;         // DX's magnetic displacement; captures differences between magnetic moment magnitude (and angle for non-collinear)
+  double magnetic_failure;              // DX's magnetic failure; captures spin flip differences 
+  // transformation info
+  double rescale_factor;
   xmatrix<double> rotation;
   xmatrix<double> basis_transformation;
   xvector<double> origin_shift;
+  // mapping info
   vector<uint> atom_map;
   vector<uint> basis_map;
   vector<double> distances_mapped;
+  vector<xvector<double> > vectors_mapped;
 };
 namespace compare{
   structure_misfit initialize_misfit_struct(bool magnetic=false);
+  string printAtomMappings(const structure_misfit& misfit_info);
+  string printUnmatchedAtoms(const structure_misfit& misfit_info,const xstructure& xstr1,const xstructure& xstr2);
+  void resizeMappingInfo(structure_misfit& str_mis);
 }
 
 //DX20200225 - temp struct; working on more robust scheme
@@ -293,12 +301,19 @@ class XtalFinderCalculator : public xStream {
     vector<structure_matched> structure_matched_containers;  // stores structures in a container (will make StructurePrototype a pointer to this)
     //DX20201130  - should we have this? vector<StructurePrototype> structure_prototypes; // stores the equivalent structure information
 
+    void getOptions(const aurostd::xoption& vpflow, aurostd::xoption& comparison_options);
+
     //load methods
     void addStructureToContainer(const xstructure& xstr,
       const string& structure_name,
       const string& source,
       uint relaxation_step,
       bool same_species);
+  
+    void addAFLOWPrototypes2container(const vector<string>& vlabel);
+
+    // remove methods
+    void removeStructureFromContainerByName(const string& structure_name);
 
     // set as structure representative
     void addToStructureRepresentative(StructurePrototype& structure_tmp, uint container_index);
@@ -311,9 +326,9 @@ class XtalFinderCalculator : public xStream {
     void addToStructureFamily(StructurePrototype& structure_tmp, _structure_representative* str_pointer);
   
     //vector<StructurePrototype> loadStructuresFromStructureList(const vector<string>& filenames, const vector<string>& magmoms_for_systems, bool same_species, ostream& logstream=cout); //DX20191122
-    vector<StructurePrototype> loadStructuresFromStructureList(const vector<string>& filenames, const vector<string>& magmoms_for_systems, bool same_species); //DX20190424 //DX20190801 - added vector<string>& magmoms_for_systems //DX20191122 - added ostream and consts
-    vector<StructurePrototype> loadStructuresFromDirectory(const string& directory, const vector<string>& magmoms_for_systems, bool same_species); //DX20190424 //DX20190801 - added vector<string>& magmoms_for_systems //DX20191122 - added ostream and consts
-    vector<StructurePrototype> loadStructuresFromFile(const string& filename, const vector<string>& magmoms_for_systems, bool same_species); //DX20190424 //DX20190801 - added vector<string>& magmoms_for_systems //DX20191122 - added ostream and consts
+    void loadStructuresFromStructureList(const vector<string>& filenames, const vector<string>& magmoms_for_systems, bool same_species); //DX20190424 //DX20190801 - added vector<string>& magmoms_for_systems //DX20191122 - added ostream and consts
+    void loadStructuresFromDirectory(const string& directory, const vector<string>& magmoms_for_systems, bool same_species); //DX20190424 //DX20190801 - added vector<string>& magmoms_for_systems //DX20191122 - added ostream and consts
+    void loadStructuresFromFile(const string& filename, const vector<string>& magmoms_for_systems, bool same_species); //DX20190424 //DX20190801 - added vector<string>& magmoms_for_systems //DX20191122 - added ostream and consts
     
     //transform structures
     void convertStructures(
@@ -328,11 +343,14 @@ class XtalFinderCalculator : public xStream {
     void calculateSymmetry(_structure_representative& str_rep);
     void calculateSymmetries(uint& num_proc);
     void calculateSpaceGroups(uint start_index=0, uint end_index=AUROSTD_MAX_UINT, uint setting=0); //DX20191230 added setting
-    //analyze symmetry
+    //analyze environment
     bool isLFAEnvironmentCalculated(_structure_representative& structure);
     void computeLFAEnvironment(_structure_representative& str_rep, bool unique_only=true);
     void calculateLFAEnvironments(uint num_proc);
     void computeLFAEnvironments(uint start_index=0, uint end_index=AUROSTD_MAX_UINT);
+    //analyze neighbors 
+    void getNearestNeighbors(uint num_proc);
+    void calculateNearestNeighbors(uint start_index=0, uint end_index=AUROSTD_MAX_UINT);
 
     // group structures
     vector<StructurePrototype> groupStructurePrototypes(
@@ -369,12 +387,17 @@ class XtalFinderCalculator : public xStream {
     vector<StructurePrototype> runComparisonScheme(vector<StructurePrototype>& comparison_schemes, 
       bool same_species, uint num_proc, const aurostd::xoption& comparison_options, 
       bool quiet=false); //DX20200103 - condensed bools to xoptions
+  
+    void runComparisons(
+      vector<StructurePrototype>& comparison_schemes, 
+      bool same_species, 
+      bool scale_volume,
+      bool optimize_match); 
     void runComparisonThreads(vector<StructurePrototype>& comparison_schemes, 
       std::pair<uint,uint>& start_indices,
       std::pair<uint,uint>& end_indices,
       bool same_species, 
-      bool scale_volume, bool optimize_match,
-      bool store_comparison_logs); //DX20190822 - added comparison log bool
+      bool scale_volume, bool optimize_match); //DX20190822 - added comparison log bool
 
     //compare methods
     void compareStructures(_structure_representative& str_rep,
@@ -388,10 +411,22 @@ class XtalFinderCalculator : public xStream {
     vector<StructurePrototype> compareStructuresFromFile(const string& filename, vector<string>& magmoms_for_systems, uint num_proc, bool same_species, const aurostd::xoption& comparison_options); //DX20200103 - condensed bools to xoptions
   
   // compare multiple structures
-  vector<StructurePrototype> compareMultipleStructures(vector<StructurePrototype>& all_structures, uint num_proc, bool same_species, const string& directory);
-  vector<StructurePrototype> compareMultipleStructures(vector<StructurePrototype>& all_structures, uint num_proc, bool same_species, const string& directory, const aurostd::xoption& comparison_options);
+  vector<StructurePrototype> compareMultipleStructures(uint num_proc, bool same_species, const string& directory);
+  vector<StructurePrototype> compareMultipleStructures(uint num_proc, bool same_species, const string& directory, const aurostd::xoption& comparison_options);
   
+  // compare2prototypes
+  string printMatchingPrototypes(xstructure& xstr, const aurostd::xoption& vpflow);
+  vector<StructurePrototype> compare2prototypes(const xstructure& xstrIN, const aurostd::xoption& vpflow); 
+  
+  // compare2prototypes
+  vector<StructurePrototype> compare2database(
+      const xstructure& xstrIN, const aurostd::xoption& vpflow);
+
   // compare permuations
+  vector<string> getUniquePermutations(xstructure& xstr);
+  vector<string> getUniquePermutations(xstructure& xstr, uint num_proc);
+  vector<string> getUniquePermutations(xstructure& xstr, uint num_proc, bool optimize_match);
+  vector<string> getUniquePermutations(xstructure& xstr, uint num_proc, bool optimize_match, bool print_misfit, aurostd::xoption& comparison_options);
   
   vector<StructurePrototype> comparePermutations(
       StructurePrototype& structure,
@@ -410,6 +445,64 @@ class XtalFinderCalculator : public xStream {
       const bool& same_species, 
       const vector<StructurePrototype>& final_prototypes,
       string mode);
+  
+  string printStructureMappingResults(
+      const structure_misfit& misfit_info,
+      const xstructure& xstr_reference,
+      const xstructure& xstr_mapped,
+      const string& mode="TEXT");
+  
+  string printAtomMappings(const structure_misfit& misfit_info,const xstructure& xstr1,const xstructure& xstr2);
+  string printUnmatchedAtoms(const structure_misfit& misfit_info,const xstructure& xstr1,const xstructure& xstr2);
+
+  // lattice search
+  void latticeSearch(
+      _structure_representative& xstr_rep,
+      _structure_representative& xstr_match,
+      structure_misfit& match_info,
+      bool same_species,
+      bool optimize_match,
+      bool scale_volume, //DX20200422
+      uint num_proc); //DX20201123
+  
+  // find translation vectors
+  void findSimilarTranslationVectors(
+      const xmatrix<double>& q1,
+      const xstructure& xstr_LFA_supercell, 
+      const xstructure& xstr,
+      vector<xvector<double> >& lattice_vecs);
+  
+  // similar lattices
+  bool buildSimilarLattices(
+      vector<xvector<double> >& translation_vectors,
+      xmatrix<double>& q1,
+      vector<xmatrix<double> >& lattices,
+      vector<double>& latt_devs,
+      bool optimize_match,
+      bool scale_volume);
+  
+  bool searchAtomMappings(
+      const xstructure& xstr1,
+      const vector<double>& all_nn1,
+      xstructure& xstr2,
+      const vector<double>& all_nn2,
+      const string& lfa,
+      vector<xmatrix<double> >& lattices,
+      vector<structure_misfit>& vstrs_matched,
+      const uint start_index, const uint end_index,
+      bool same_species,
+      bool optimize_match);
+  
+  // find matches (atoms) 
+  bool findMatch(
+      const xstructure& xstr1,
+      const xstructure& xstr2,
+      const vector<uint>& atom_indices_xstr1,
+      const vector<uint>& atom_indices_xstr2,
+      double minimum_interatomic_distance, //DX20200622
+      structure_misfit& mapping_info,
+      bool same_species);
+
   private:
     void free();                                                                            // free operator
     void copy(const XtalFinderCalculator& b);                                                 // copy constructor
@@ -691,6 +784,7 @@ namespace compare{
   bool sameSpecies(const xstructure& x1, const xstructure& x2, const bool& display); 
   void rescaleStructure(xstructure& x1, xstructure& x2);
   void atomicNumberDensity(xstructure& xstr1, xstructure& xstr2);
+  void atomicNumberDensity(xstructure& xstr1, xstructure& xstr2, double& rescale_factor); //DX20201215
   vector<string> fakeElements(const uint& number_of_species);
   //DX20200728 [OBSOLETE-MOVED TO XATOM] void fakeAtomsName(xstructure& x1);
   void printParameters(xstructure& xstr, ostream& oss);
@@ -698,6 +792,7 @@ namespace compare{
   vector<string> getLeastFrequentAtomSpecies(const xstructure& xstr);
   bool sortBySecondPair(const std::pair<string,uint>& a, const std::pair<string,uint>& b);
   vector<string> sortSpeciesByFrequency(const xstructure& xstr);
+  vector<uint> atomIndicesSortedByFrequency(const xstructure& xstr);
   bool checkTolerance(xvector<double> d1, xmatrix<double> Q2);
   bool checkABCTolerance(xvector<double> d1, xvector<double> d2);
   bool checkAngleTolerance(xvector<double> d1, xvector<double> d2);
@@ -727,6 +822,24 @@ namespace compare{
   //DX20191122 [COMBINED WITH AUROSTD FUNCTION] xvector<double> centroid(const vector<xvector<double> >& coordinates); //DX20200715
   //DX20191122 [COMBINED WITH AUROSTD FUNCTION] xvector<double> centroid(const vector<xvector<double> >& coordinates, const vector<double>& weights); //DX20200715
   //bool findMatch(const xstructure& xstr1, const xstructure& PROTO,vector<uint>& im1, vector<uint>& im2, vector<double>& min_dists, const int& type_match);
+  bool consistentAtomMappingType(
+    const _atom& atom1,
+    const _atom& atom2,
+    uint index_x1,
+    uint index_x2,
+    bool same_species,
+    bool is_collinear,
+    bool is_non_collinear); //DX20201209
+  bool consistentAtomMappingIndex(
+      uint index1,
+      uint index2,
+      vector<uint>& index1_list,
+      vector<uint>& index2_list); //DX20201209
+  bool consistentAtomSetMappings(
+      const string& atom1_name,
+      const string& atom2_name,
+      const vector<string>& vatoms1_name,
+      const vector<string>& vatoms2_name); //DX20201209
   bool findMatch(const deque<_atom>& xstr1_atoms, const deque<_atom>& PROTO_atoms,
       const xmatrix<double>& PROTO_lattice,
       double minimum_interatomic_distance, //DX20200622
@@ -766,11 +879,20 @@ namespace compare{
       const vector<double>& all_nn1, const vector<double>& all_nn_proto,
       const vector<uint>& indexMatch1, const vector<uint>& indexMatch2, vector<double>& min_dists,
       double& cd, double& fail_figure);
+  void coordinateDeviation(
+      structure_misfit& mapping_info,
+      const vector<double>& nn_xstr1,
+      const vector<double>& nn_xstr2); //DX20201210
   void magneticDeviation(const xstructure& xstr1, const xstructure& xstr2, 
       const vector<uint>& indexMatch1, const vector<uint>& indexMatch2,
       double& magnetic_deviation, double& magnetic_fail); //DX20190801
-  double computeMisfit(const double& dev, const double& dis, const double& fail);
-  double computeMagneticMisfit(const double dev, const double dis, const double fail, const double mag_dis, const double mag_fail); //DX20190801
+  void magneticDeviation(
+      const xstructure& xstr1, const xstructure& xstr2, 
+      structure_misfit& mapping_info); //DX20201210
+  double computeMisfit(const structure_misfit& mapping_info); //DX20201210
+  double computeMisfit(double dev, double dis, double fail);
+  double computeMisfitMagnetic(const structure_misfit& mapping_info); //DX20201210
+  double computeMisfitMagnetic(double dev,double dis,double fail,double mag_dis,double mag_fail); //DX20190801
   void printMatch(const vector<uint>& indexMatch1, const vector<uint>& indexMatch2,
       const vector<double>& distances,
       const xstructure& PROTO, const xstructure& xstr1, ostream& oss); //DX20190802 - added distances
@@ -780,8 +902,9 @@ namespace compare{
       const int& j, const int& k, const int& w);
   xstructure GetLFASupercell(const xstructure& xstr, const xvector<int>& dims, const string& lfa_name); //DX20190530
   //DX20191125 [OBSOLETE - MOVED TO XATOM] bool atomInCell(const _atom& atom); //DX20190717 
-  bool vectorPeriodic(const xvector<double>& vec, const xstructure& lfa_supercell, const int& i, 
-      const int& j);
+  //DX20201209 [OBSOELTE] bool vectorPeriodic(const xvector<double>& vec, const xstructure& lfa_supercell, const int& i, 
+  //DX20201209 [OBSOELTE]    const int& j);
+  bool vectorPeriodic(const xvector<double>& vec, const xstructure& lfa_supercell); //DX20201209
   // [OBSOLETE - DX20190717] void threadGeneration(const uint& num_proc,xmatrix<double>& q1, xstructure& xstr2, 
   // [OBSOLETE - DX20190717]                       vector<xstructure> &vprotos, xstructure &xstr1, const int& type_match, 
   // [OBSOLETE - DX20190717]                       const bool& optimize_match, double& minMis, ostream& oss);
@@ -835,6 +958,11 @@ namespace compare{
       const vector<xmatrix<double> >& candidate_lattices,
       vector<xmatrix<double> >& basis_transformations,
       vector<xmatrix<double> >& rotations); //DX20201015
+  void getLatticeTransformation(const xmatrix<double>& lattice_original, 
+      const xmatrix<double>& lattice_ideal,
+      const xmatrix<double>& candidate_lattice,
+      xmatrix<double>& basis_transformation,
+      xmatrix<double>& rotation); //DX20201015
   vector<xstructure> getTransformedStructures(
 		const xstructure& xstr,
 		const vector<xmatrix<double> >& basis_transformations,
@@ -877,9 +1005,11 @@ namespace compare{
   bool commonOriginSearch2(
       const xstructure& xstr1,
       const vector<double>& all_nn1,
+      xstructure& xstr2,
       const string& lfa,
       const int type_match,
-      vector<structure_matched>& vstrs_matched_transformed,
+      vector<xmatrix<double> >& lattices,
+      vector<structure_misfit>& vstrs_matched,
       const uint start_index, const uint end_index,
       bool optimize_match); //DX20201123
   // [OBSOLETE - DX20190717]bool structureSearch(const string& lfa,

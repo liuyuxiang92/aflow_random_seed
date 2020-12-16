@@ -1532,9 +1532,13 @@ class xstructure {
     void ReScale(const double &in_scale);                         // Change scale but keep volume fixed
     void SetScale(const double &in_scale);                        // Change scale
     void UpdateCartesianCoordinates();                            //AS20200514
-    void ChangeBasis(const xmatrix<double>& transformation_matrix);
-    void Rotate(const xmatrix<double>& rm);
+    void ChangeBasis(const xmatrix<double>& transformation_matrix);//DX20201215
+    void Rotate(const xmatrix<double>& rm);                       // DX20201215 - added modify-in-place variant
     void TransformStructure(const xmatrix<double>& transformation_matrix, const xmatrix<double>& rotation);
+    void TransformStructure(const xmatrix<double>& transformation_matrix, const xmatrix<double>& rotation, const xvector<double>& origin_shift);
+    void ShiftPos(const xvector<double>& shift,const int& flag);  // Shift origin by vector (Cartesian/fractional flag) //DX20201215 - added modify-in-place variant
+    void ShiftCPos(const xvector<double>& shift);                 // Shift origin by Cartesian vector //DX20201215 - added modify-in-place variant
+    void ShiftFPos(const xvector<double>& shift);                 // Shift origin by fractional vector //DX20201215 - added modify-in-place variant
     void SetVolume(const double &in_volume);                      // Change volume
     void SetAutoVolume(bool use_AFLOW_defaults_in=false);         // Change volume to sum of atoms  //CO20191010
     void InflateLattice(const double &coefficient);               // Inflate lattice
@@ -1544,7 +1548,7 @@ class xstructure {
     void DecorateWithFakeElements(void);                          // Decorate with fake elements - useful for prototypes //DX20200727
     vector<string> GetElements(bool clean_name=false,
         bool fake_names=false);                                   //DX20200724
-    vector<string> GetElementsFromAtomNames(bool clean_name);     //Dx20200724
+    vector<string> GetElementsFromAtomNames(bool clean_name);     //DX20200724
     vector<uint> GetReducedComposition(bool numerical_sort=false);//DX20200724
     string platon2sg(bool P_EQUAL=DEFAULT_PLATON_P_EQUAL,
         bool P_EXACT=DEFAULT_PLATON_P_EXACT,
@@ -1918,6 +1922,10 @@ void PolarDecomposition(const xmatrix<double>& transformation_matrix,
 xstructure TransformStructure(const xstructure& xstr,
     const xmatrix<double>& transformation_matrix,
     const xmatrix<double>& rotation); //DX20201125
+xstructure TransformStructure(const xstructure& xstr,
+    const xmatrix<double>& transformation_matrix,
+    const xmatrix<double>& rotation,
+    const xvector<double>& origin_shift); //DX20201125
 
 //CO20180420
 //for stream management with objects

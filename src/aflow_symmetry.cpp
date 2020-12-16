@@ -997,23 +997,27 @@ namespace SYM {
   }
   xvector<double> FPOSDistFromFPOS(const xvector<double>& fpos1,const xvector<double>& fpos2,
       const xmatrix<double>& lattice,const xmatrix<double>& c2f,const xmatrix<double>& f2c,bool skew){  //CO20190525
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy = XPID + "SYM::FPOSDistance():";
-    if(LDEBUG){
-      cerr << soliloquy << " fpos1=" << fpos1 << endl;
-      cerr << soliloquy << " fpos2=" << fpos2 << endl;
-    }
+    bool VERBOSE=FALSE; //DX20201210
+    string soliloquy = XPID + "SYM::FPOSDistFromFPOS():";
     xvector<double> min_fdiff;
     if(skew){
       xvector<double> cpos1 = f2c*fpos1;
       xvector<double> cpos2 = f2c*fpos2;
       xvector<double> min_cdiff = minimizeDistanceCartesianMethod(cpos1,cpos2,lattice); //DX20190613
       min_fdiff = c2f*min_cdiff;
+      if(VERBOSE){
+        cerr << soliloquy << " fpos1=" << fpos1 << endl;
+        cerr << soliloquy << " fpos2=" << fpos2 << endl;
+      }
     }
     else {
       xvector<double> min_fdiff = minimizeDistanceFractionalMethod(fpos1,fpos2); //DX20190613
-      if(LDEBUG){cerr << soliloquy << " fpos1-fpos2=" << (fpos1-fpos2) << endl;}
-      if(LDEBUG){cerr << soliloquy << " min_fdiff=" << min_fdiff << endl;}
+      if(VERBOSE){
+        cerr << soliloquy << " fpos1=" << fpos1 << endl;
+        cerr << soliloquy << " fpos2=" << fpos2 << endl;
+        cerr << soliloquy << " fpos1-fpos2=" << (fpos1-fpos2) << endl;
+        cerr << soliloquy << " min_fdiff=" << min_fdiff << endl;
+      }
     }
     return min_fdiff;
   }
@@ -1035,25 +1039,29 @@ namespace SYM {
   xvector<double> CPOSDistFromFPOS(const xvector<double>& fpos1,const xvector<double>& fpos2,
       const xmatrix<double>& lattice,const xmatrix<double>& f2c,bool skew){  //CO20190525
     bool VERBOSE=FALSE; //using LDEBUG would pollute output
-    string soliloquy = XPID + "SYM::CPOSDistance():";
-    if(VERBOSE){
-      cerr << soliloquy << " fpos1=" << fpos1 << endl;
-      cerr << soliloquy << " fpos2=" << fpos2 << endl;
-    }
+    string soliloquy = XPID + "SYM::CPOSDistFromFPOS():";
     xvector<double> min_cdiff;
     if(skew){
       xvector<double> cpos1 = f2c*fpos1;
       xvector<double> cpos2 = f2c*fpos2;
       min_cdiff = minimizeDistanceCartesianMethod(cpos1,cpos2,lattice); //DX20190613
-      if(VERBOSE){cerr << soliloquy << " cpos1-cpos2=" << (cpos1-cpos2) << endl;}
-      if(VERBOSE){cerr << soliloquy << " min_cdiff=" << min_cdiff << endl;}
+      if(VERBOSE){ //DX20201210 - only one if-statement, otherwise expensive
+        cerr << soliloquy << " fpos1=" << fpos1 << endl;
+        cerr << soliloquy << " fpos2=" << fpos2 << endl;
+        cerr << soliloquy << " cpos1-cpos2=" << (cpos1-cpos2) << endl;
+        cerr << soliloquy << " min_cdiff=" << min_cdiff << endl;
+      }
     }
     else {
       xvector<double> min_fdiff = minimizeDistanceFractionalMethod(fpos1,fpos2); //DX20190613
       min_cdiff = f2c*min_fdiff;
-      if(VERBOSE){cerr << soliloquy << " fpos1-fpos2=" << (fpos1-fpos2) << endl;}
-      if(VERBOSE){cerr << soliloquy << " min_fdiff=" << min_fdiff << endl;}
-      if(VERBOSE){cerr << soliloquy << " min_cdiff=" << min_cdiff << endl;}
+      if(VERBOSE){ //DX20201210 - only one if-statement, otherwise expensive
+        cerr << soliloquy << " fpos1=" << fpos1 << endl;
+        cerr << soliloquy << " fpos2=" << fpos2 << endl;
+        cerr << soliloquy << " fpos1-fpos2=" << (fpos1-fpos2) << endl;
+        cerr << soliloquy << " min_fdiff=" << min_fdiff << endl;
+        cerr << soliloquy << " min_cdiff=" << min_cdiff << endl;
+      }
     }
     return min_cdiff;
   }
