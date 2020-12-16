@@ -7054,6 +7054,12 @@ namespace aflowlib {
       string _AFLOWIN_orig=_AFLOWIN_;
       string _AFLOWLOCK_orig=_AFLOWLOCK_;
 
+      // a sanity check
+      if (vAflowInName.size() != vFileLockName.size()){
+        message << "vAflowInName.size()!=vFileLockName.size()";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _INDEX_MISMATCH_);
+      }
+
       //AS20200904 loop over all detected earlier submodules
       for (uint i=0; i<vAflowInName.size(); i++){
         //set env for RUN_Directory()

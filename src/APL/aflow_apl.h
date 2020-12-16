@@ -1184,7 +1184,7 @@ namespace apl
   enum QHAtype   {QHA_FD, QHA_EOS, QHA_TE};
 
   bool QHA_Get_AflowInName(string &AflowInName, const string &directory_LIB);
-  void linkAPLtoQHA();
+  //void linkAPLtoQHA();//AS20201216 OBSOLETE
 
   /// Calculates QHA-related properties
   ///
