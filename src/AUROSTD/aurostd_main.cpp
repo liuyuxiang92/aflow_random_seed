@@ -7133,32 +7133,43 @@ namespace aurostd {
 }  // namespace aurostd
 //CO END
 
-//AS20201214 BEGIN JSON
+//AS20201214 BEGIN JSONwriter
 namespace aurostd {
   //***************************************************************************
   //  addNumber
-  template <typename utype> void JSON::addNumber(const string &key, const utype value)
+  template <typename utype> void JSONwriter::addNumber(const string &key,
+      const utype value)
   {
     content.push_back("\"" + key + "\":" + aurostd::utype2string(value));
   }
 
-  template void JSON::addNumber(const string &, const int);
-  template void JSON::addNumber(const string &, const uint);
-  template void JSON::addNumber(const string &, const double);
+  template void JSONwriter::addNumber(const string &, const int);
+  template void JSONwriter::addNumber(const string &, const uint);
+  template void JSONwriter::addNumber(const string &, const double);
 
   //***************************************************************************
   //  addVector
-  template <typename utype> void JSON::addVector(const string &key, const utype &value)
+  template <typename utype> void JSONwriter::addVector(const string &key,
+      const utype &value)
   {
     content.push_back("\"" + key + "\":[" + aurostd::joinWDelimiter(value, ",") + "]");
   }
 
-  template void JSON::addVector(const string &, const vector<int> &);
-  template void JSON::addVector(const string &, const vector<uint> &);
-  template void JSON::addVector(const string &, const deque<int> &);
-  template void JSON::addVector(const string &, const deque<uint> &);
+  template void JSONwriter::addVector(const string &, const vector<int> &);
+  template void JSONwriter::addVector(const string &, const vector<uint> &);
+  template void JSONwriter::addVector(const string &, const deque<int> &);
+  template void JSONwriter::addVector(const string &, const deque<uint> &);
 
-  void JSON::addVector(const string &key, const vector<double> &value, int precision,
+  void JSONwriter::addVector(const string &key, const vector<double> &value,
+      int precision, bool roundoff, double tol)
+  {
+    content.push_back("\"" + key + "\":[");
+    content.back() += aurostd::joinWDelimiter(
+        aurostd::vecDouble2vecString(value, precision, roundoff, tol),",");
+    content.back() += "]";
+  }
+
+  void JSONwriter::addVector(const string &key, const deque<double> &value, int precision,
       bool roundoff, double tol)
   {
     content.push_back("\"" + key + "\":[");
@@ -7167,23 +7178,14 @@ namespace aurostd {
     content.back() += "]";
   }
 
-  void JSON::addVector(const string &key, const deque<double> &value, int precision,
-      bool roundoff, double tol)
-  {
-    content.push_back("\"" + key + "\":[");
-    content.back() += aurostd::joinWDelimiter(
-        aurostd::vecDouble2vecString(value, precision, roundoff, tol),",");
-    content.back() += "]";
-  }
-
-  void JSON::addVector(const string &key, const vector<string> &value)
+  void JSONwriter::addVector(const string &key, const vector<string> &value)
   {
     content.push_back("\"" + key + "\":[");
     content.back() += aurostd::joinWDelimiter(aurostd::wrapVecEntries(value, "\""), ",");
     content.back() += "]";
   }
 
-  void JSON::addVector(const string &key, const deque<string> &value)
+  void JSONwriter::addVector(const string &key, const deque<string> &value)
   {
     content.push_back("\"" + key + "\":[");
     content.back() += aurostd::joinWDelimiter(aurostd::wrapVecEntries(value, "\""), ",");
@@ -7192,7 +7194,8 @@ namespace aurostd {
 
   //***************************************************************************
   //  addMatrix
-  template <typename utype> void JSON::addMatrix(const string &key, const utype &value)
+  template <typename utype> void JSONwriter::addMatrix(const string &key,
+      const utype &value)
   {
     content.push_back("\"" + key + "\":[");
     vector<string> matrix;
@@ -7203,12 +7206,12 @@ namespace aurostd {
     content.back() += "]";
   }
 
-  template void JSON::addMatrix(const string&, const vector<vector<uint> >&);
-  template void JSON::addMatrix(const string&, const vector<vector<int> >&);
-  template void JSON::addMatrix(const string&, const deque<deque<uint> >&);
-  template void JSON::addMatrix(const string&, const deque<deque<int> >&);
+  template void JSONwriter::addMatrix(const string&, const vector<vector<uint> >&);
+  template void JSONwriter::addMatrix(const string&, const vector<vector<int> >&);
+  template void JSONwriter::addMatrix(const string&, const deque<deque<uint> >&);
+  template void JSONwriter::addMatrix(const string&, const deque<deque<int> >&);
 
-  void JSON::addMatrix(const string &key, const vector<vector<double> > &value,
+  void JSONwriter::addMatrix(const string &key, const vector<vector<double> > &value,
       int precision, bool roundoff, double tol)
   {
     content.push_back("\"" + key + "\":[");
@@ -7221,7 +7224,7 @@ namespace aurostd {
     content.back() += "]";
   }
 
-  void JSON::addMatrix(const string &key, const deque<deque<double> > &value,
+  void JSONwriter::addMatrix(const string &key, const deque<deque<double> > &value,
       int precision, bool roundoff, double tol)
   {
     content.push_back("\"" + key + "\":[");
@@ -7235,37 +7238,37 @@ namespace aurostd {
   }
 
   //***************************************************************************
-  void JSON::addString(const string &key, const string &value)
+  void JSONwriter::addString(const string &key, const string &value)
   {
     content.push_back("\"" + key + "\":" + "\"" + value + "\"");
   }
 
   //***************************************************************************
-  void JSON::addBool(const string &key, bool value)
+  void JSONwriter::addBool(const string &key, bool value)
   {
     content.push_back("\"" + key + "\":" + (value ? "true" : "false"));
   }
 
   //***************************************************************************
-  void JSON::addRaw(const string &value)
+  void JSONwriter::addRaw(const string &value)
   {
     content.push_back(value);
   }
 
   //***************************************************************************
-  void JSON::addJSON(const string &key, JSON &value)
+  void JSONwriter::addJSON(const string &key, JSONwriter &value)
   {
     content.push_back("\"" + key + "\":" + value.toString(true));
   }
 
   //***************************************************************************
-  void JSON::mergeJSON(JSON &value)
+  void JSONwriter::mergeJSON(JSONwriter &value)
   {
     content.push_back(value.toString(false));
   }
 
   //***************************************************************************
-  string JSON::toString(bool wrap)
+  string JSONwriter::toString(bool wrap)
   {
     if (wrap){
       return "{" + aurostd::joinWDelimiter(content, ",") + "}";

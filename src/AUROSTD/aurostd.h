@@ -1465,10 +1465,10 @@ const std::string base64_chars =
 "0123456789+/";
 //CO END
 
-//AS20201214 BEGIN JSON
+//AS20201214 BEGIN JSONwriter
 namespace aurostd {
   /// Class-container to output data into JSON format.
-  class JSON{
+  class JSONwriter{
     private:
       vector<string> content;
     public:
@@ -1492,8 +1492,8 @@ namespace aurostd {
       void addString(const string &key, const string &value);
       void addBool(const string &key, bool value);
       void addRaw(const string &value);
-      void addJSON(const string &key, JSON &value);
-      void mergeJSON(JSON &value);
+      void addJSON(const string &key, JSONwriter &value);
+      void mergeJSON(JSONwriter &value);
       string toString(bool wrap=true);
   };
 }

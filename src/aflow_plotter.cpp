@@ -1330,7 +1330,7 @@ namespace plotter {
   /// @param standalone_json_object controls if the output json file is
   /// a standalone object or a part of another json object (i.e. if opening
   /// and closing curly brackets are present or not)
-  aurostd::JSON DOS2JSON(xoption &xopt, const xDOSCAR &xdos, ofstream& FileMESSAGE,
+  aurostd::JSONwriter DOS2JSON(xoption &xopt, const xDOSCAR &xdos, ofstream& FileMESSAGE,
       ostream &oss)
   {
     string directory = ".";
@@ -1340,7 +1340,7 @@ namespace plotter {
     xstructure xstr = getStructureWithNames(xopt,FileMESSAGE,xdos.carstring,oss);
 
     string name = KBIN::ExtractSystemName(directory);
-    aurostd::JSON dos_json;
+    aurostd::JSONwriter dos_json;
     // TDOS header begin
     dos_json.addNumber("version", BANDS_DOS_JSON_VERSION);
     dos_json.addString("name", name);
@@ -1352,7 +1352,7 @@ namespace plotter {
     dos_json.addNumber("DOS_grid", xdos.number_energies);
     // TDOS header end
 
-    aurostd::JSON tdos_data;
+    aurostd::JSONwriter tdos_data;
     tdos_data.addBool("energies_shifted", !xopt.flag("NOSHIFT"));
     tdos_data.addVector("energy",xopt.flag("NOSHIFT") ? xdos.venergy : xdos.venergyEf);
     if (aurostd::substring2bool(xdos.carstring, "CAR")){
@@ -1428,7 +1428,7 @@ namespace plotter {
       }
 
       // header of partial DOS
-      aurostd::JSON pdos_data;
+      aurostd::JSONwriter pdos_data;
       pdos_data.addVector("orbitals", orb_labels_out);
       pdos_data.addBool("spin_polarized", xdos.spin);
       pdos_data.addBool("energies_shifted", !xopt.flag("NOSHIFT"));
@@ -1452,10 +1452,10 @@ namespace plotter {
       // write atom-projected DOS for each unique atom
       string label = "";
       for (uint species_id=0; species_id<xstr.species.size(); species_id++){
-        aurostd::JSON species_json;
+        aurostd::JSONwriter species_json;
         for (uint iatom=0; iatom<map_species_to_iatoms[species_id].size(); iatom++){
           int atom_id = map_species_to_iatoms[species_id][iatom];
-          aurostd::JSON atom_json;
+          aurostd::JSONwriter atom_json;
           atom_id++; // in vDOS atoms are indexed starting from 1
 
           if (xdos.isLSCOUPLING){
@@ -1553,7 +1553,7 @@ namespace plotter {
     // projected phonon DOS
     if (xdos.partial && aurostd::substring2bool(xdos.carstring, "PHON")){
       // header of partial DOS
-      aurostd::JSON pdos_data;
+      aurostd::JSONwriter pdos_data;
       deque<string> projections;
       if (xdos.vDOS.size()>=2){
         for (uint j=1; j<xdos.vDOS[1].size(); j++){
@@ -1583,10 +1583,10 @@ namespace plotter {
       // write atom-projected DOS for each unique atom
       string label = "";
       for (uint species_id=0; species_id<xstr.species.size(); species_id++){
-        aurostd::JSON species_json;
+        aurostd::JSONwriter species_json;
         for (uint iatom=0; iatom<map_species_to_iatoms[species_id].size(); iatom++){
           int atom_id = map_species_to_iatoms[species_id][iatom];
-          aurostd::JSON atom_json;
+          aurostd::JSONwriter atom_json;
           atom_id++; // in vDOS atoms are indexed starting from 1
 
           for (uint p=1; p<xdos.vDOS[atom_id].size(); p++){
@@ -1610,7 +1610,7 @@ namespace plotter {
   /// "DIRECTORY" -- the directory name
   /// "NOSHIFT" -- if true energy is NOT shifted w.r.t Fermi energy
   /// "EFERMI" -- the value of Fermi energy
-  aurostd::JSON bands2JSON(const xEIGENVAL &xeigen, const xKPOINTS &xkpts,
+  aurostd::JSONwriter bands2JSON(const xEIGENVAL &xeigen, const xKPOINTS &xkpts,
       const vector<double> &distances, const vector<double> &segment_points,
       const xoption& plotoptions)
   {
@@ -1624,7 +1624,7 @@ namespace plotter {
     string LattName = tokens[0];
 
     // write header
-    aurostd::JSON json;
+    aurostd::JSONwriter json;
     json.addString("title", name+" ("+LattName+")");
     json.addNumber("n_kpoints", xeigen.number_kpoints);
     json.addNumber("n_bands", xeigen.number_bands);
@@ -1699,11 +1699,11 @@ namespace plotter {
 
   /// Converts DOS and BANDS data from xDOSCAR, xEIGENVAL and xKPOINTS files
   /// to JSON object
-  aurostd::JSON bandsDOS2JSON(const xDOSCAR &xdos, const xEIGENVAL &xeigen,
+  aurostd::JSONwriter bandsDOS2JSON(const xDOSCAR &xdos, const xEIGENVAL &xeigen,
       const xKPOINTS &xkpts, xoption &xopt, ofstream &FileMESSAGE, ostream &oss)
   {
     // get DOS part of JSON
-    aurostd::JSON json = DOS2JSON(xopt, xdos, FileMESSAGE, oss);
+    aurostd::JSONwriter json = DOS2JSON(xopt, xdos, FileMESSAGE, oss);
 
     // get BANDS part of JSON
     xstructure xstr = getStructureWithNames(xopt,FileMESSAGE,xdos.carstring,oss);
