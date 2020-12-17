@@ -7136,29 +7136,20 @@ namespace aurostd {
 //AS20201214 BEGIN JSONwriter
 namespace aurostd {
   //***************************************************************************
-  //  addNumber
+  //  addNumber block
   template <typename utype> void JSONwriter::addNumber(const string &key,
       const utype value)
   {
     content.push_back("\"" + key + "\":" + aurostd::utype2string(value));
   }
 
-  template void JSONwriter::addNumber(const string &, const int);
-  template void JSONwriter::addNumber(const string &, const uint);
-  template void JSONwriter::addNumber(const string &, const double);
-
   //***************************************************************************
-  //  addVector
+  //  addVector block
   template <typename utype> void JSONwriter::addVector(const string &key,
       const utype &value)
   {
     content.push_back("\"" + key + "\":[" + aurostd::joinWDelimiter(value, ",") + "]");
   }
-
-  template void JSONwriter::addVector(const string &, const vector<int> &);
-  template void JSONwriter::addVector(const string &, const vector<uint> &);
-  template void JSONwriter::addVector(const string &, const deque<int> &);
-  template void JSONwriter::addVector(const string &, const deque<uint> &);
 
   void JSONwriter::addVector(const string &key, const vector<double> &value,
       int precision, bool roundoff, double tol)
@@ -7193,7 +7184,7 @@ namespace aurostd {
   }
 
   //***************************************************************************
-  //  addMatrix
+  //  addMatrix block
   template <typename utype> void JSONwriter::addMatrix(const string &key,
       const utype &value)
   {
@@ -7205,11 +7196,6 @@ namespace aurostd {
     content.back() += aurostd::joinWDelimiter(matrix, ",");
     content.back() += "]";
   }
-
-  template void JSONwriter::addMatrix(const string&, const vector<vector<uint> >&);
-  template void JSONwriter::addMatrix(const string&, const vector<vector<int> >&);
-  template void JSONwriter::addMatrix(const string&, const deque<deque<uint> >&);
-  template void JSONwriter::addMatrix(const string&, const deque<deque<int> >&);
 
   void JSONwriter::addMatrix(const string &key, const vector<vector<double> > &value,
       int precision, bool roundoff, double tol)
@@ -7256,12 +7242,14 @@ namespace aurostd {
   }
 
   //***************************************************************************
+  /// Adds JSON object as a new value (i.e. with curly braces)
   void JSONwriter::addJSON(const string &key, JSONwriter &value)
   {
     content.push_back("\"" + key + "\":" + value.toString(true));
   }
 
   //***************************************************************************
+  /// Merges/inserts a given JSON object (i.e. with no curly braces)
   void JSONwriter::mergeJSON(JSONwriter &value)
   {
     content.push_back(value.toString(false));
