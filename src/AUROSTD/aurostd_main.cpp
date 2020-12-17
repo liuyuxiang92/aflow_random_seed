@@ -7136,6 +7136,25 @@ namespace aurostd {
 //AS20201214 BEGIN JSONwriter
 namespace aurostd {
   //***************************************************************************
+  void JSONwriter::free() { content.clear(); }
+  void JSONwriter::clear() { free(); }
+  void JSONwriter::copy(const JSONwriter &jw){
+    content = jw.content;
+  }
+
+  JSONwriter::JSONwriter() { free(); }
+  JSONwriter::JSONwriter(const JSONwriter &jw)
+  {
+    free();
+    copy(jw);
+  }
+  JSONwriter::~JSONwriter() { free(); }
+
+  const JSONwriter& JSONwriter::operator=(const JSONwriter &jw){
+    copy(jw);
+    return *this;
+  }
+  //***************************************************************************
   //  addNumber block
   template <typename utype> void JSONwriter::addNumber(const string &key,
       const utype value)

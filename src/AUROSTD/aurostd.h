@@ -1471,7 +1471,14 @@ namespace aurostd {
   class JSONwriter{
     private:
       vector<string> content;
+      void free();
+      void copy(const JSONwriter &jw);
     public:
+      JSONwriter();
+      JSONwriter(const JSONwriter &jw);
+      ~JSONwriter();
+      const JSONwriter& operator=(const JSONwriter &jw);
+      void clear();
       template <typename utype> void addNumber(const string &key, const utype value);
       template <typename utype> void addVector(const string &key, const utype &value);
       void addVector(const string &key, const vector<double> &value,
