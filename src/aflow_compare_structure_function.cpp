@@ -3051,35 +3051,28 @@ namespace compare{
 
     // ---------------------------------------------------------------------------
     // calculate symmetry (if not already calculated)
-    cerr << structure.structure_representative_struct->space_group << endl;
     if(structure.structure_representative_struct->space_group==0){
       calculateSymmetry(*structure.structure_representative_struct);
     }
-    cerr << structure.structure_representative_struct->space_group << endl;
    
-    cerr << "nn dist" << endl;
     // ---------------------------------------------------------------------------
     // get nearest neighbor distances 
     if(structure.structure_representative_struct->nearest_neighbor_distances.size()==0){
       structure.structure_representative_struct->nearest_neighbor_distances = compare::computeNearestNeighbors(structure.structure_representative_struct->structure);
     }
-    cerr << "nn dist done" << endl;
  
     // ---------------------------------------------------------------------------
     // generate all permutation structures
-    XtalFinderCalculator xtal_finder_permutations;
-    xtal_finder_permutations.generatePermutationStructures(*structure.structure_representative_struct);
     //XtalFinderCalculator xtal_finder_permutations;
-    cerr << "gen" << endl;
-    //generatePermutationStructures(*structure.structure_representative_struct);
-    cerr << "gen done" << endl;
+    //xtal_finder_permutations.generatePermutationStructures(*structure.structure_representative_struct);
+    //XtalFinderCalculator xtal_finder_permutations;
+    generatePermutationStructures(*structure.structure_representative_struct);
       
-    cerr << "store naming" << endl;
     vector<vector<string> > name_order;
-    for(uint i=0;i<xtal_finder_permutations.structure_containers.size();i++){
+    for(uint i=0;i<structure_containers.size();i++){
       vector<string> vtmp_name; 
-      for(uint j=0;j<xtal_finder_permutations.structure_containers[i].name.size();j++){
-        stringstream ss_tmp; ss_tmp << xtal_finder_permutations.structure_containers[i].name[j];
+      for(uint j=0;j<structure_containers[i].name.size();j++){
+        stringstream ss_tmp; ss_tmp << structure_containers[i].name[j];
         vtmp_name.push_back(ss_tmp.str());
       }
       name_order.push_back(vtmp_name);
@@ -3111,7 +3104,7 @@ namespace compare{
       // ---------------------------------------------------------------------------
       // group comparable permutations
       vector<StructurePrototype> permutation_comparisons;
-      permutation_comparisons = xtal_finder_permutations.groupStructurePrototypes(same_species, 
+      permutation_comparisons = groupStructurePrototypes(same_species, 
           permutation_options.flag("COMPARISON_OPTIONS::IGNORE_SYMMETRY"), 
           permutation_options.flag("COMPARISON_OPTIONS::IGNORE_WYCKOFF"),
           permutation_options.flag("COMPARISON_OPTIONS::IGNORE_ENVIRONMENT_ANALYSIS"),
@@ -3126,7 +3119,7 @@ namespace compare{
 
       // ---------------------------------------------------------------------------
       // compare permutations
-      final_permutations = xtal_finder_permutations.runComparisonScheme(
+      final_permutations = runComparisonScheme(
           permutation_comparisons,
           same_species,
           num_proc,
@@ -3161,13 +3154,12 @@ namespace compare{
 
         // ---------------------------------------------------------------------------
         // check if better matchings; perhaps matched structures would have smaller misfits if matched to different representatives
-        final_permutations = xtal_finder_permutations.checkForBetterMatches(final_permutations,
+        final_permutations = checkForBetterMatches(final_permutations,
             num_proc,
             true, same_species,
             permutation_options,
             quiet); //DX20200103 - condensed booleans to xoptions
 
-        cerr << "DONE" << endl;
         // ---------------------------------------------------------------------------
         // check if NEW matched permutations are physically possible
         if(!compare::checkNumberOfGroupingsNEW(final_permutations, name_order.size())){
@@ -3198,7 +3190,7 @@ namespace compare{
       }
       else{ break; }
     }
-
+    
     if(VERBOSE){ for(uint i=0;i<final_permutations.size();i++){ cerr << "Final permutation groupings: " << final_permutations[i] << endl; } }
 
     return final_permutations;
@@ -3343,15 +3335,12 @@ namespace compare{
   void XtalFinderCalculator::generatePermutationStructures(_structure_representative& structure){
 
     //vector<StructurePrototype> permutation_structures;
-    cerr << "1" << endl;
     vector<string> names = pflow::fakeElements(structure.stoichiometry.size()); //DX20200728 - now in pflow
     vector<uint> indices = structure.stoichiometry;
     vector<vector<string> > name_order;  
     uint num_elements = structure.stoichiometry.size();
-    cerr << "2" << endl;
 
     bool is_symmetry_calculated = isSymmetryCalculated(structure);
-    cerr << "3" << endl;
 /*
     // Permutation algorithm based on Heap's algorithm (https://en.wikipedia.org/wiki/Heap%27s_algorithm)
     vector<int> new_indices;
@@ -3434,59 +3423,41 @@ namespace compare{
     }
 */
 
-    cerr << "4" << endl;
     vector<vector<int> > all_indices;
     vector<int> _indices;
     for(int i=0;i<num_elements;i++){_indices.push_back(i);}
     aurostd::xcombos indices_combos(_indices, true, 'P');
     while (indices_combos.increment()) all_indices.push_back(indices_combos.getCombo());
-    cerr << "5" << endl;
 
     //exit(1);
 
     // create permuted structure    
     for(uint i=0;i<all_indices.size();i++){
-    cerr << "6" << endl;
       xstructure xstr_tmp = structure.structure;
       deque<string> species; 
       for(uint j=0;j<all_indices[i].size();j++){
         species.push_back(names[all_indices[i][j]]);
       }
-    cerr << "6.1" << endl;
-    cerr << "species: " << aurostd::joinWDelimiter(species,",") << endl;
       xstr_tmp.SetSpecies(species);
       //DX TEST xstr_tmp.species_pp = species; //for vasp5 20190731
-    cerr << "6.333" << endl;
       xstr_tmp.species = species; //DX20190813
-    cerr << "6.667" << endl;
-    cerr << "6.2" << endl;
       xstr_tmp.species_pp = xstr_tmp.species; //for vasp5 20190731, after ordered
-      deque<int> sizes = SYM::arrange_atoms(xstr_tmp.atoms);
-    cerr << "6.3" << endl;
-      //LDEBUGfor(uint j=0;j<sizes.size();j++){cerr << "sizes[j]: " << sizes[j] << endl;}
-      cerr << "xstr_tmp: " << xstr_tmp << endl;
-      cerr << xstr_tmp.num_each_type.size() << endl;
-      cerr << xstr_tmp.species.size() << endl;
-      xstr_tmp = pflow::SetNumEachType(xstr_tmp, sizes);
-      cerr << "xstr_tmp: " << xstr_tmp << endl;
-      cerr << xstr_tmp.num_each_type.size() << endl;
-      cerr << xstr_tmp.species.size() << endl;
       xstr_tmp.SpeciesPutAlphabetic();
+      deque<int> sizes = SYM::arrange_atoms(xstr_tmp.atoms);
+      //LDEBUGfor(uint j=0;j<sizes.size();j++){cerr << "sizes[j]: " << sizes[j] << endl;}
+      xstr_tmp = pflow::SetNumEachType(xstr_tmp, sizes);
       //if (xstr_out.num_each_type.size() != names.size()){
       //  xstr_out = pflow::SetAllAtomNames(xstr_out, in_names);
       //}
       xstr_tmp.ReScale(1.0); //DX20190715
       xstr_tmp.BringInCell(); //DX20200707
      
-    cerr << "6.4" << endl;
       string system_name = aurostd::joinWDelimiter(species,"");
       stringstream ss_str; ss_str << "permutation of: " << xstr_tmp; //DX20190730
       addStructureToContainer(xstr_tmp,system_name,ss_str.str(),0,false);
-    cerr << "6.5" << endl;
 
       // for now compute, perhaps we can use index swap
       computeLFAEnvironment(structure_containers.back());
-    cerr << "6.6" << endl;
       
       if(is_symmetry_calculated){
         vector<GroupedWyckoffPosition> grouped_Wyckoff_positions; 
@@ -3496,12 +3467,10 @@ namespace compare{
         }
         structure_containers.back().grouped_Wyckoff_positions;
       }
-    cerr << "7" << endl;
       
       // copy over neighbor distances (it will be the same as the parent structure)
       // CANNOT DO, may change positions.... structure_containers.back().nearest_neighbor_distances = structure.nearest_neighbor_distances;
     }
-    cerr << "8" << endl;
   }
 
 //DX20190508 - added permutation string function - START
@@ -4385,7 +4354,7 @@ namespace compare{
 
     uint number_of_comparisons = 0;
     for(uint i=0;i<comparison_schemes.size();i++){ number_of_comparisons += comparison_schemes[i].numberOfComparisons(); }
-    cerr << "# of comparisons: " << number_of_comparisons << endl;
+    //cerr << "# of comparisons: " << number_of_comparisons << endl;
 
     if(number_of_comparisons==0){
       if(LDEBUG) {
@@ -7072,6 +7041,7 @@ namespace compare{
     uint j_min=0; uint j_max=0;
 
     for(uint i=i_min; i<=i_max; i++){
+      cerr << "i: " << i << endl;
       //xstructure structure_representative;
       _structure_representative structure_rep_tmp = *comparison_schemes[i].structure_representative_struct;
 
@@ -7085,7 +7055,7 @@ namespace compare{
       else {j_min=0; j_max=comparison_schemes[i].structures_duplicate_struct.size();} //-1 since in loop: j<=j_max
 
       for(uint j=j_min; j<j_max; j++){
-
+        cerr << "j: " << j << endl;
         // get representative structure 
         //cerr << "generated?: " << comparison_schemes[i].structure_representative_struct->is_structure_generated << endl;
         if(!structure_rep_tmp.is_structure_generated){
@@ -7126,13 +7096,17 @@ namespace compare{
             same_species, 
             scale_volume, 
             optimize_match); //DX20200103 - condensed booleans to xoptions
+        cerr << function_name << " Comparing " << structure_rep_tmp.name << " and " << structure_dup_tmp.name << " is done" <<  endl;
 
         // store the figure of misfit
         if(LDEBUG) { cerr << function_name << " Comparison complete, misfit = " << final_misfit_info.misfit << "." << endl; }
+        cerr << function_name << " Comparison complete, misfit = " << final_misfit_info.misfit << "." << endl;
         comparison_schemes[i].structure_misfits_duplicate[j]=final_misfit_info; //DX20191218
+        cerr << "STORED MISFIT" << endl;
         //NO LONGER STORE if(store_comparison_logs){comparison_schemes[i].duplicate_comparison_logs.push_back(tmp_oss.str());} //DX20190506
       }
     }
+    cerr << "DONE" << endl;
   }
 
 // ***************************************************************************
@@ -7487,7 +7461,6 @@ namespace compare{
     vector<std::thread*> threads;
 
 
-    cerr << num_comparison_threads << endl;
     // ---------------------------------------------------------------------------
     // THREADED VERSION - START
     if(num_comparison_threads>1){
@@ -7561,6 +7534,7 @@ namespace compare{
           quiet); //DX20200103 - condensed booleans to xoptions
     }
 
+
     // regroup comparisons based on misfit value
     if(num_mismatches==0 && !comparison_options.flag("COMPARISON_OPTIONS::SINGLE_COMPARISON_ROUND")){
       appendStructurePrototypes(comparison_schemes,
@@ -7568,21 +7542,30 @@ namespace compare{
           comparison_options.flag("COMPARISON_OPTIONS::CLEAN_UNMATCHED"),
           quiet); //DX20200103
     }
-    
+    cerr << "BEFORE WHILE LOOP" << endl; 
     // Loop: continue comparison until all strucutures are matched or all comparisons schemes exhaused
     while(num_mismatches!=0){
+      cerr << "REGROUP AGAIN" << endl; 
+      for(uint i=0;i<comparison_schemes.size();i++){ number_of_comparisons += comparison_schemes[i].numberOfComparisons(); }
+      cerr << "number_of_comparisons: " << number_of_comparisons << endl;
       // regroup comparisons based on misfit value
       appendStructurePrototypes(comparison_schemes, final_prototypes, comparison_options.flag("COMPARISON_OPTIONS::CLEAN_UNMATCHED"), quiet); //DX20200103
+      cerr << "DONE REGROUP" << endl; 
+      for(uint i=0;i<comparison_schemes.size();i++){ number_of_comparisons += comparison_schemes[i].numberOfComparisons(); }
+      cerr << "number_of_comparisons: " << number_of_comparisons << endl;
 
       // return if only one round of comparison is requested
       if(comparison_options.flag("COMPARISON_OPTIONS::SINGLE_COMPARISON_ROUND")){return final_prototypes;}
 
+      cerr << "ICSD RESORTING" << endl; 
       // reorder structures so minimum ICSD is the representative structure
       if(comparison_options.flag("COMPARISON_OPTIONS::ICSD_COMPARISON")){ representativePrototypeForICSDRunsNEW(comparison_schemes); }
+      cerr << "DONE ICSD RESORTING" << endl; 
 
       // split into threads
       number_of_comparisons=0;
       for(uint i=0;i<comparison_schemes.size();i++){ number_of_comparisons += comparison_schemes[i].numberOfComparisons(); }
+      cerr << "number_of_comparisons: " << number_of_comparisons << endl;
       num_comparison_threads = aurostd::min(num_proc,number_of_comparisons);
 
       if(number_of_comparisons>0){
@@ -7594,10 +7577,14 @@ namespace compare{
 #ifdef AFLOW_COMPARE_MULTITHREADS_ENABLE
         // THREADED VERISON - START
 
+        cerr << "num_comparison_threads: " << num_comparison_threads << endl;
         // split into threads
         start_indices.clear(); end_indices.clear();
         splitComparisonIntoThreads(comparison_schemes, num_comparison_threads, start_indices, end_indices);
         threads.clear();
+        for(uint n=0; n<num_comparison_threads; n++){
+          cerr << "start_indices: " << start_indices[n].first << " " << start_indices[n].second << " --> " << end_indices[n].first << " " << end_indices[n].second << endl;
+        }
         // run threads
         for(uint n=0; n<num_comparison_threads; n++){
           threads.push_back(new std::thread(&XtalFinderCalculator::runComparisonThreads,
@@ -7609,11 +7596,16 @@ namespace compare{
                 comparison_options.flag("COMPARISON_OPTIONS::SCALE_VOLUME"),
                 comparison_options.flag("COMPARISON_OPTIONS::OPTIMIZE_MATCH")));
         }        
+        cerr << "DONE THREADS [2]" << endl;
         // join threads
+          cerr << "t.size(): " << threads.size() << endl;
         for(uint t=0;t<threads.size();t++){
+          cerr << "t/nthreads=" << t << "/" << threads.size() << endl;
           threads[t]->join();
           delete threads[t];
+          cerr << "t=" << t << " deleted" << endl;
         }
+        cerr << "DONE THREADS JOIN [2]" << endl;
         // THREADED VERISON - END
 #else
         //SINGLE THREAD - START
@@ -7630,7 +7622,7 @@ namespace compare{
         //SINGLE THREAD - END
 #endif
       }
-
+      cerr << "DONE RUNNING AGAIN" << endl;
       // update number of mismatches
       num_mismatches_orig=num_mismatches;
       num_mismatches=compare::numberMismatches(comparison_schemes);
@@ -7653,7 +7645,6 @@ namespace compare{
     // append new prototype groupings
     appendStructurePrototypes(comparison_schemes, final_prototypes, comparison_options.flag("COMPARE_STRUCTURE::CLEAN_UNMATCHED"), quiet); //DX20200103
     //DX ORIG 20190303 - final_prototypes.insert(final_prototypes.end(),comparison_schemes.begin(),comparison_schemes.end());
-    
     return final_prototypes;
   }
 
@@ -8179,6 +8170,11 @@ namespace compare{
     }
     // Store newly generated schemes (not compared yet) into comparison_schemes
     comparison_schemes=tmp_list;
+      cerr << function_name << " Number of comparion sets: " << comparison_schemes.size() << endl;
+      stringstream ss_test;
+      compare::printResults(ss_test, true, comparison_schemes);
+      cerr << "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
+      cerr << ss_test.str() << endl;
   }
 
 // ***************************************************************************
@@ -13821,7 +13817,7 @@ namespace compare{
       xstr2_tmp = xstr2;
       all_nn2_test.clear();
 
-      cerr << "lattice dev: " << vstrs_matched[p].lattice_deviation << endl;
+      //cerr << "lattice dev: " << vstrs_matched[p].lattice_deviation << endl;
 
       //auto t1 = std::chrono::high_resolution_clock::now();
       // ---------------------------------------------------------------------------

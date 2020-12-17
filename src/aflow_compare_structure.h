@@ -426,7 +426,7 @@ class XtalFinderCalculator : public xStream {
   vector<string> getUniquePermutations(xstructure& xstr);
   vector<string> getUniquePermutations(xstructure& xstr, uint num_proc);
   vector<string> getUniquePermutations(xstructure& xstr, uint num_proc, bool optimize_match);
-  vector<string> getUniquePermutations(xstructure& xstr, uint num_proc, bool optimize_match, bool print_misfit, aurostd::xoption& comparison_options);
+  vector<string> getUniquePermutations(xstructure& xstr, uint num_proc, bool optimize_match, bool print_misfit, ostream& oss, aurostd::xoption& comparison_options);
   
   vector<StructurePrototype> comparePermutations(
       StructurePrototype& structure,
