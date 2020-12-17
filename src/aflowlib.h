@@ -282,6 +282,7 @@ namespace aflowlib {
   string VASPdirectory2auid(const string& directory,const string& aurl);   //CO20200624 - moving from inside _aflowlib_entry
   uint auid2vauid(const string auid, deque<string>& vauid);                // splits the auid into vauid
   string auid2directory(const string auid);                                // gives AUID directory from existence of vauid
+  void insertStoichStats(const vector<string> vstats,const xvector<double>& nspecies_xv,const xvector<double>& stoich_xv,vector<double>& vfeatures);  //CO20201111
 }
 
 // ***************************************************************************

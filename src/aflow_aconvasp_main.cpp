@@ -28,7 +28,6 @@
 #include "aflowlib.h"
 #include "aflow_gfa.h" //DF20190329
 #include "aflow_cce.h" //RF20200203
-#include "aflow_ml.h" //CO20200930
 #include "APL/aflow_apl.h"  //ME20200330
 
 extern double NearestNeighbour(const xstructure& a);
@@ -232,8 +231,6 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.flag("CCE_CORRECTION::GET_CATION_COORDINATION_NUMBERS", aurostd::args2flag(argv,cmds,"--get_cation_coordination_numbers|--get_cation_coord_nums|--get_cation_coordination_number|--get_cation_coord_num|--poscar2cation_coord_nums|--poscar2cation_coord_num")); //RF20200814
   vpflow.args2addattachedscheme(argv,cmds,"CCE_CORRECTION::DIST_TOL","--tolerance=|dist_tol=|distance_tolerance=|dist_tolerance=|distance_tol=",""); //RF20200819
   
-  vpflow.flag("AFLOWML::CCE_CSV",aurostd::args2flag(argv,cmds,"--cce_csv"));  //CO20200930
-
   vpflow.flag("CHECKINTEGRITIY",aurostd::args2flag(argv, cmds,"--check_integrity|--checki"));
   //DX20180806 [OBSOLETE] vpflow.flag("CIF",aurostd::args2flag(argv,cmds,"--cif"));
   //DX [OBSOLETE] - moved further up : vpflow.args2addattachedscheme(argv,cmds,"CIF","--cif=|--CIF=","");
@@ -547,6 +544,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   //DX20181004 - add compare2database - END
   //DX
 
+  vpflow.flag("AFLOWML::CoordCorrEnth_CSV",aurostd::args2flag(argv,cmds,"--coord_corr_enth_csv"));  //CO20200930
   vpflow.flag("CORNERS",aurostd::args2flag(argv,cmds,"--corner|--corners"));
 
   //DX20170901 [OBSOLETE] vpflow.flag("DATA",aurostd::args2flag(argv,cmds,"--data"));
@@ -1622,7 +1620,7 @@ namespace pflow {
     //CO
     if(argv.size()>=1 && !_PROGRAMRUN) {
       if(vpflow.flag("BADER")) {cout << bader_functions::BaderCalc(vpflow); _PROGRAMRUN=true;}
-      if(vpflow.flag("AFLOWML::CCE_CSV")) {aflowML::writeCCECSV(); _PROGRAMRUN=true;}  //CO20200930
+      if(vpflow.flag("AFLOWML::CoordCorrEnth_CSV")) {aflowML::writeCoordCorrEnthCSV(); _PROGRAMRUN=true;}  //CO20200930
       if(vpflow.flag("CHGCAR2JVXL")) {cout << pflow::CHGCAR2JVXL(vpflow); _PROGRAMRUN=true;}
       if(vpflow.flag("CHGDIFF")) {cout << pflow::CHGDIFF(vpflow); _PROGRAMRUN=true;}
       if(vpflow.flag("CHGSUM")) {cout << pflow::CHGSUM(vpflow); _PROGRAMRUN=true;}
