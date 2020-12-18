@@ -8028,6 +8028,7 @@ namespace compare{
   } 
 */
 
+/*
 // ***************************************************************************
 // NumberMismaches - Count the number of non-matches
 // ***************************************************************************
@@ -8048,7 +8049,7 @@ namespace compare{
     return num_mismatches;
   }
 }
-
+*/
 
 // ***************************************************************************
 // XtalFinderCalculator::numberMismaches - Count the number of non-matches
