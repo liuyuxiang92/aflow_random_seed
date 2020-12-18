@@ -205,6 +205,7 @@ namespace compare {
   }
 }
 
+/*
 // ***************************************************************************
 // compare::getUniquePermutations()
 // ***************************************************************************
@@ -356,6 +357,7 @@ namespace compare{
     return unique_permutations;
   }
 }
+*/
 
 // ***************************************************************************
 // XtalFinderCalculator::getUniquePermutations()
@@ -1022,6 +1024,7 @@ namespace compare {
   }
 }
 
+/*
 //DX20190314 - added new function - START
 // ***************************************************************************
 // compare::getMatchingPrototype - returns corresponding prototype label
@@ -1060,6 +1063,53 @@ namespace compare {
   }
 }
 //DX20190314 - added new function - START
+*/
+
+//DX20190314 - added new function - START
+// ***************************************************************************
+// compare::getMatchingPrototype - returns corresponding prototype label
+// ***************************************************************************
+namespace compare {
+  vector<string> getMatchingPrototypes(xstructure& xstr, string& catalog){ 
+
+    // Returns the matching prototype label, if any exists
+
+    aurostd::xoption vpflow;
+    vpflow.flag("COMPARE2PROTOTYPES",TRUE);
+
+    // ---------------------------------------------------------------------------
+    // specify catalog
+    vpflow.flag("COMPARE2PROTOTYPES::CATALOG",TRUE); //DX20190329 - need to make scheme before attaching, otherwise it doesn't work
+    vpflow.push_attached("COMPARE2PROTOTYPES::CATALOG",catalog); 
+
+    // ---------------------------------------------------------------------------
+    // do not calculate unique atom decorations
+    vpflow.flag("COMPARE2PROTOTYPES::DO_NOT_CALCULATE_UNIQUE_PERMUTATIONS",TRUE);
+
+    // ---------------------------------------------------------------------------
+    // quiet output
+    bool original_quiet = XHOST.QUIET;
+    XHOST.QUIET=TRUE;
+
+    // ---------------------------------------------------------------------------
+    // compare structure to AFLOW prototypes
+    XtalFinderCalculator xtal_finder;
+    vector<StructurePrototype> prototypes = xtal_finder.compare2prototypes(xstr,vpflow);
+
+    // ---------------------------------------------------------------------------
+    // global quiet back to default
+    XHOST.QUIET=original_quiet;
+
+    //return prototypes[0].structures_duplicate_names; // duplicates names are prototype labels 
+    vector<string> matching_prototypes;
+    for(uint i=0;i<prototypes[0].structures_duplicate_struct.size();i++){
+      matching_prototypes.push_back(prototypes[0].structures_duplicate_struct[i]->name);
+    }
+    return matching_prototypes; // duplicates names are prototype labels 
+  }
+}
+//DX20190314 - added new function - START
+
 
 //DX20190314 - added overloads for compare2prototypes - START
 // ***************************************************************************
@@ -1076,7 +1126,14 @@ namespace compare {
     // load input structure
     xstructure xstr(input,IOAFLOW_AUTO);
 
-    return compare2prototypes(xstr, vpflow, FileMESSAGE, logstream);
+    XtalFinderCalculator xtal_finder(
+        DEFAULT_XTALFINDER_MISFIT_MATCH,
+        DEFAULT_XTALFINDER_MISFIT_FAMILY,
+        FileMESSAGE,
+        1,
+        logstream);
+    return xtal_finder.compare2prototypes(xstr,vpflow);
+    //return compare2prototypes(xstr, vpflow, FileMESSAGE, logstream);
   }
 }
 
@@ -1096,6 +1153,7 @@ namespace compare {
   }
 }
 
+/*
 // ***************************************************************************
 // compare::printMatchingPrototypes - returns list of matching structures 
 // ***************************************************************************
@@ -1149,6 +1207,7 @@ namespace compare {
     return ss_out.str();
   }
 }
+*/
 
 // ***************************************************************************
 // XtalFinderCalculator::printMatchingPrototypes - returns list of matching structures 
@@ -1202,6 +1261,7 @@ namespace compare {
     return ss_out.str();
   }
 
+/*
 //DX20190314 - added overloads for compare2prototypes - END
 // ***************************************************************************
 // compare::compare2prototypes - identifies corresponding protos 
@@ -1498,6 +1558,7 @@ namespace compare {
     return final_prototypes; //DX20190314 - new return type
   }
 }
+*/
 
 // ***************************************************************************
 // XtalFinderCalculator::compare2prototypes - identifies corresponding protos 
@@ -1776,7 +1837,13 @@ namespace compare {
 
     // ---------------------------------------------------------------------------
     // main compare2database() function
-    vector<StructurePrototype> final_prototypes = compare::compare2database(xstrIN, vpflow, FileMESSAGE, logstream);
+    XtalFinderCalculator xtal_finder(
+        DEFAULT_XTALFINDER_MISFIT_MATCH,
+        DEFAULT_XTALFINDER_MISFIT_FAMILY,
+        FileMESSAGE,
+        1,
+        logstream);
+    vector<StructurePrototype> final_prototypes = xtal_finder.compare2database(xstrIN, vpflow);
 
     // ---------------------------------------------------------------------------
     // safety against bad input geometry files
@@ -1789,7 +1856,8 @@ namespace compare {
 
     // ---------------------------------------------------------------------------
     // database contains input structure
-    if(final_prototypes[0].structures_duplicate_names.size()){
+    //if(final_prototypes[0].structures_duplicate_names.size()){
+    if(final_prototypes[0].structures_duplicate_struct.size()){
       return true;
     }
 
@@ -1810,22 +1878,30 @@ namespace compare {
 
     // ---------------------------------------------------------------------------
     // main compare2database() function
-    vector<StructurePrototype> final_prototypes = compare::compare2database(xstrIN, vpflow, FileMESSAGE, logstream);
+    XtalFinderCalculator xtal_finder(
+        DEFAULT_XTALFINDER_MISFIT_MATCH,
+        DEFAULT_XTALFINDER_MISFIT_FAMILY,
+        FileMESSAGE,
+        1,
+        logstream);
+    vector<StructurePrototype> final_prototypes = xtal_finder.compare2database(xstrIN, vpflow);
 
 
     vector<matching_structure> matched_database_structures;
 
     // ---------------------------------------------------------------------------
     // database DOESN'T contain equivalent structure to input
-    if(!final_prototypes[0].structures_duplicate_names.size()){
+    //if(!final_prototypes[0].structures_duplicate_names.size()){
+    if(!final_prototypes[0].structures_duplicate_struct.size()){
       return matched_database_structures;
     }
 
     // ---------------------------------------------------------------------------
     // return equivalent structures to input
-    for(uint i=0;i<final_prototypes[0].structures_duplicate_names.size();i++){
+    //for(uint i=0;i<final_prototypes[0].structures_duplicate_names.size();i++){
+    for(uint i=0;i<final_prototypes[0].structures_duplicate_struct.size();i++){
       matching_structure database_entry;
-      database_entry.name = final_prototypes[0].structures_duplicate_names[i];
+      database_entry.name = final_prototypes[0].structures_duplicate_struct[i]->name;
       database_entry.misfit = final_prototypes[0].structure_misfits_duplicate[i].misfit;
       matched_database_structures.push_back(database_entry);
     }
@@ -1835,6 +1911,7 @@ namespace compare {
   }
 }
 
+/*
 // ***************************************************************************
 // compare::compare2database - compares database 
 // ***************************************************************************
@@ -2403,6 +2480,7 @@ namespace compare {
     return final_prototypes;
   }
 }
+*/
 
 // ***************************************************************************
 // XtalFinderCalculator::compare2database - compares database 
@@ -3073,12 +3151,12 @@ namespace compare {
     // ---------------------------------------------------------------------------
     // print results 
     stringstream ss_out;
-    compare::printResults(ss_out, same_species, final_prototypes);
+    xtal_finder_database.printResults(ss_out, same_species, final_prototypes, "text");
     stringstream ss_json;
-    compare::printResults(ss_json, same_species, final_prototypes, "json");
+    xtal_finder_database.printResults(ss_json, same_species, final_prototypes, "json");
 
     // DEBUG oss << ss_out.str();
-    message << "Number of structures in database matching with the input structure: " << final_prototypes[0].structures_duplicate.size() << "." << endl;
+    message << "Number of structures in database matching with the input structure: " << final_prototypes[0].structures_duplicate_struct.size() << "." << endl;
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
 
     //DX20190429 - added screen only option - START
@@ -4642,7 +4720,7 @@ namespace compare {
   }
 }
 //DX - COMPARE DATABASE ENTRIES - END
-
+/*
 //DX20190424 START
 // ***************************************************************************
 // compare::compareStructuresFromStructureList()
@@ -4665,6 +4743,7 @@ namespace compare {
   }
 }
 //DX20190424 END
+*/
 
 //DX20190424 START
 // ***************************************************************************
@@ -4690,6 +4769,7 @@ vector<StructurePrototype> XtalFinderCalculator::compareStructuresFromStructureL
 }
 //DX20190424 END
 
+/*
 // ***************************************************************************
 // compare::compareStructuresFromDirectory()
 // ***************************************************************************
@@ -4706,6 +4786,7 @@ namespace compare {
 
   }
 }
+*/
 
 // ***************************************************************************
 // XtalFinderCalculator::compareStructuresFromDirectory()
@@ -4725,6 +4806,7 @@ namespace compare {
 
   }
 
+/*
 // ***************************************************************************
 // compare::compareStructuresFromFile()
 // ***************************************************************************
@@ -4745,6 +4827,7 @@ namespace compare {
 
   }
 }
+*/
 
 // ***************************************************************************
 // XtalFinderCalculator::compareStructuresFromFile()
@@ -4767,6 +4850,8 @@ namespace compare {
 
   }
 
+//TO DO
+/*
 // ***************************************************************************
 // compare::getUniqueEntries() //DX20201111
 // ***************************************************************************
@@ -4816,7 +4901,9 @@ namespace compare {
 
   }
 }
+*/
 
+/*
 // ***************************************************************************
 // compare::compareMultipleStructures()
 // ***************************************************************************
@@ -5167,6 +5254,7 @@ namespace compare {
     return final_prototypes;
   }
 }
+*/
 
 // ***************************************************************************
 // compare::compareMultipleStructures()

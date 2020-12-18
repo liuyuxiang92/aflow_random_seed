@@ -28,15 +28,6 @@
 #warning "The multithread parts of AFLOW-COMPARE will be not included, since they need gcc 4.4 and higher (C++0x support)."
 #endif
 
-struct removeByIndex
-{
-  removeByIndex(const vector<uint>& a_indices2remove) : indices2remove(a_indices2remove) {}
-  vector<uint> indices2remove;
-  bool operator()(const uint index){
-    return aurostd::WithinList(indices2remove, index);
-  }
-};
-
 // ***************************************************************************
 // XtalFinderCalculator::getOptions() 
 // ***************************************************************************
@@ -218,6 +209,7 @@ namespace compare {
   }
 }
 
+/*
 // ***************************************************************************
 // initializeStructureMatched() 
 // ***************************************************************************
@@ -262,7 +254,7 @@ namespace compare {
     return str_match;
   }
 }
-
+*/
 /*
 // ***************************************************************************
 // initializeStructureRepresentative() 
@@ -307,13 +299,13 @@ StructurePrototype::StructurePrototype(){
 void StructurePrototype::free(){
   iomode=JSON_MODE;
   structure_representative_struct = NULL; //DX20201204
-  structure_representative_name="";
-  structure_representative_compound="";
-  structure_representative.clear(); //DX20191220 - uppercase to lowercase clear
-  structure_representative_generated=false;
-  structure_representative_source="";
-  structure_representative_relaxation_step=0; //DX20200429
-  number_compounds_matching_representative=0;
+  //structure_representative_name="";
+  //structure_representative_compound="";
+  //structure_representative.clear(); //DX20191220 - uppercase to lowercase clear
+  //structure_representative_generated=false;
+  //structure_representative_source="";
+  //structure_representative_relaxation_step=0; //DX20200429
+  //number_compounds_matching_representative=0;
   ntypes=0;
   elements.clear();
   stoichiometry.clear();
@@ -331,31 +323,31 @@ void StructurePrototype::free(){
   matching_aflow_prototypes.clear(); //DX20190724
   environments_LFA.clear(); //DX20190711
   structures_duplicate_struct.clear(); //DX20201207
-  structures_duplicate_names.clear();
-  structures_duplicate_compounds.clear();
-  structures_duplicate.clear();
-  structures_duplicate_generated.clear();
-  structures_duplicate_source.clear();
-  structures_duplicate_relaxation_step.clear(); //DX20200429
-  structures_duplicate_grouped_Wyckoff_positions.clear(); //DX20190813
-  number_compounds_matching_duplicate.clear();
-  duplicate_comparison_logs.clear(); //DX20190506
+  //structures_duplicate_names.clear();
+  //structures_duplicate_compounds.clear();
+  //structures_duplicate.clear();
+  //structures_duplicate_generated.clear();
+  //structures_duplicate_source.clear();
+  //structures_duplicate_relaxation_step.clear(); //DX20200429
+  //structures_duplicate_grouped_Wyckoff_positions.clear(); //DX20190813
+  //number_compounds_matching_duplicate.clear();
+  //duplicate_comparison_logs.clear(); //DX20190506
   structures_family_struct.clear(); //DX20201207
-  structures_family_names.clear();
-  structures_family.clear();
-  structures_family_generated.clear();
-  structures_family_source.clear();
-  structures_family_relaxation_step.clear(); //DX20200429
-  structures_family_grouped_Wyckoff_positions.clear(); //DX20190813
-  number_compounds_matching_family.clear();
-  family_comparison_logs.clear(); //DX20190506
+  //structures_family_names.clear();
+  //structures_family.clear();
+  //structures_family_generated.clear();
+  //structures_family_source.clear();
+  //structures_family_relaxation_step.clear(); //DX20200429
+  //structures_family_grouped_Wyckoff_positions.clear(); //DX20190813
+  //number_compounds_matching_family.clear();
+  //family_comparison_logs.clear(); //DX20190506
   structure_misfits_duplicate.clear(); //DX20191217
   structure_misfits_family.clear(); //DX20191217
   property_names.clear();
   property_units.clear();
-  properties_structure_representative.clear();
-  properties_structures_duplicate.clear();
-  properties_structures_family.clear(); //DX20190425
+  //properties_structure_representative.clear();
+  //properties_structures_duplicate.clear();
+  //properties_structures_family.clear(); //DX20190425
 }
 
 // ===== Destructor ===== //
@@ -373,13 +365,13 @@ void StructurePrototype::copy(const StructurePrototype& b) {
   iomode=b.iomode;
   //structure_representative_struct = new _structure_representative; //DX20201204 
   structure_representative_struct=b.structure_representative_struct; //DX20201204 
-  structure_representative_name=b.structure_representative_name; 
-  structure_representative_compound=b.structure_representative_compound; 
-  structure_representative=b.structure_representative; 
-  structure_representative_generated=b.structure_representative_generated; 
-  structure_representative_source=b.structure_representative_source;
-  structure_representative_relaxation_step=b.structure_representative_relaxation_step; //DX20200429
-  number_compounds_matching_representative=b.number_compounds_matching_representative;
+  //structure_representative_name=b.structure_representative_name; 
+  //structure_representative_compound=b.structure_representative_compound; 
+  //structure_representative=b.structure_representative; 
+  //structure_representative_generated=b.structure_representative_generated; 
+  //structure_representative_source=b.structure_representative_source;
+  //structure_representative_relaxation_step=b.structure_representative_relaxation_step; //DX20200429
+  //number_compounds_matching_representative=b.number_compounds_matching_representative;
   ntypes=b.ntypes;
   elements=b.elements;
   stoichiometry=b.stoichiometry;
@@ -397,31 +389,31 @@ void StructurePrototype::copy(const StructurePrototype& b) {
   matching_aflow_prototypes=b.matching_aflow_prototypes; //DX20190724
   environments_LFA=b.environments_LFA; //DX20190711
   structures_duplicate_struct=b.structures_duplicate_struct; //DX20201207
-  structures_duplicate_names=b.structures_duplicate_names;
-  structures_duplicate_compounds=b.structures_duplicate_compounds;
-  structures_duplicate=b.structures_duplicate;
-  structures_duplicate_generated=b.structures_duplicate_generated;
-  structures_duplicate_source=b.structures_duplicate_source;
-  structures_duplicate_relaxation_step=b.structures_duplicate_relaxation_step; //DX20200429
-  structures_duplicate_grouped_Wyckoff_positions=b.structures_duplicate_grouped_Wyckoff_positions; //DX20190813
-  number_compounds_matching_duplicate=b.number_compounds_matching_duplicate;
-  duplicate_comparison_logs=b.duplicate_comparison_logs; //DX20190506
+  //structures_duplicate_names=b.structures_duplicate_names;
+  //structures_duplicate_compounds=b.structures_duplicate_compounds;
+  //structures_duplicate=b.structures_duplicate;
+  //structures_duplicate_generated=b.structures_duplicate_generated;
+  //structures_duplicate_source=b.structures_duplicate_source;
+  //structures_duplicate_relaxation_step=b.structures_duplicate_relaxation_step; //DX20200429
+  //structures_duplicate_grouped_Wyckoff_positions=b.structures_duplicate_grouped_Wyckoff_positions; //DX20190813
+  //number_compounds_matching_duplicate=b.number_compounds_matching_duplicate;
+  //duplicate_comparison_logs=b.duplicate_comparison_logs; //DX20190506
   structures_family_struct=b.structures_family_struct; //DX20201207
-  structures_family_names=b.structures_family_names;
-  structures_family=b.structures_family;
-  structures_family_generated=b.structures_family_generated;
-  structures_family_source=b.structures_family_source;
-  structures_family_relaxation_step=b.structures_family_relaxation_step; //DX20200429
-  structures_family_grouped_Wyckoff_positions=b.structures_family_grouped_Wyckoff_positions; //DX20190813
-  number_compounds_matching_family=b.number_compounds_matching_family;
-  family_comparison_logs=b.family_comparison_logs; //DX20190506
+  //structures_family_names=b.structures_family_names;
+  //structures_family=b.structures_family;
+  //structures_family_generated=b.structures_family_generated;
+  //structures_family_source=b.structures_family_source;
+  //structures_family_relaxation_step=b.structures_family_relaxation_step; //DX20200429
+  //structures_family_grouped_Wyckoff_positions=b.structures_family_grouped_Wyckoff_positions; //DX20190813
+  //number_compounds_matching_family=b.number_compounds_matching_family;
+  //family_comparison_logs=b.family_comparison_logs; //DX20190506
   structure_misfits_duplicate=b.structure_misfits_duplicate; //DX20191217
   structure_misfits_family=b.structure_misfits_family; //DX20191217
   property_names=b.property_names;
   property_units=b.property_units;
-  properties_structure_representative=b.properties_structure_representative;
-  properties_structures_duplicate=b.properties_structures_duplicate;
-  properties_structures_family=b.properties_structures_family; //DX20190425
+  //properties_structure_representative=b.properties_structure_representative;
+  //properties_structures_duplicate=b.properties_structures_duplicate;
+  //properties_structures_family=b.properties_structures_family; //DX20190425
 }
 
 // ===== Assignment Operator (operator=) ===== //
@@ -726,6 +718,7 @@ ostream& operator<<(ostream& oss, const StructurePrototype& StructurePrototype){
   return oss;
 }
 
+/*
 // ***************************************************************************
 // StructurePrototype::numberOfDuplicatess() 
 // ***************************************************************************
@@ -742,7 +735,25 @@ uint StructurePrototype::numberOfDuplicates() const {
 
   return number_of_duplicates;
 }
+*/
+// ***************************************************************************
+// StructurePrototype::numberOfDuplicatess() 
+// ***************************************************************************
+uint XtalFinderCalculator::numberOfDuplicates(const StructurePrototype& prototype){
 
+  // Count the number of duplicate structures
+
+  uint number_of_duplicates = 0;
+  for(uint i=0;i<prototype.structure_misfits_duplicate.size();i++){
+    if(prototype.structure_misfits_duplicate[i].misfit<=misfit_match && (prototype.structure_misfits_duplicate[i].misfit+1.0)>1e-3 ){
+      number_of_duplicates+=1;
+    }
+  }
+
+  return number_of_duplicates;
+}
+
+/*
 // ***************************************************************************
 // StructurePrototype::printRepresentativeStructureStructure() 
 // ***************************************************************************
@@ -769,7 +780,7 @@ string StructurePrototype::printRepresentativeStructure() const {
   return "{" + aurostd::joinWDelimiter(vcontent_json,",") + "}";
 
 }
-
+*/
 // ***************************************************************************
 // StructurePrototype::printRepresentativeStructureStructure() 
 // ***************************************************************************
@@ -786,7 +797,8 @@ string StructurePrototype::printRepresentativeStructureNEW() const {
   vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
   // representative structure may not have properties
-  if(properties_structure_representative.size()){
+  //if(properties_structure_representative.size()){
+  if(structure_representative_struct->properties.size()){
     for(uint i=0;i<property_names.size();i++){
       sscontent_json << "\"" << property_names[i] << "\":\"" << structure_representative_struct->properties[i] << "\"" << eendl;
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
@@ -797,6 +809,7 @@ string StructurePrototype::printRepresentativeStructureNEW() const {
 
 }
 
+/*
 // ***************************************************************************
 // StructurePrototype::printMatchedStructure() 
 // ***************************************************************************
@@ -872,7 +885,7 @@ string StructurePrototype::printMatchedStructures(const string& mode) const {
 
   return aurostd::joinWDelimiter(vstructures,",");
 }
-
+*/
 // ***************************************************************************
 // StructurePrototype::printMatchedStructure() 
 // ***************************************************************************
@@ -1021,10 +1034,10 @@ bool StructurePrototype::calculateSymmetry(){
 
   Pearson = "";
   bool no_scan = false; //DX20191230
-  double use_tol = SYM::defaultTolerance(structure_representative); //DX20191230
-  space_group = structure_representative.SpaceGroup_ITC(use_tol,-1,SG_SETTING_ANRL,no_scan); //DX20191230
+  double use_tol = SYM::defaultTolerance(structure_representative_struct->structure); //DX20191230
+  space_group = structure_representative_struct->structure.SpaceGroup_ITC(use_tol,-1,SG_SETTING_ANRL,no_scan); //DX20191230
   vector<GroupedWyckoffPosition> tmp_grouped_Wyckoff_positions; 
-  compare::groupWyckoffPositions(structure_representative, tmp_grouped_Wyckoff_positions);
+  compare::groupWyckoffPositions(structure_representative_struct->structure, tmp_grouped_Wyckoff_positions);
   grouped_Wyckoff_positions = tmp_grouped_Wyckoff_positions;
   return true;
 }
@@ -1149,7 +1162,7 @@ void XtalFinderCalculator::addToStructureRepresentative(StructurePrototype& stru
   structure_tmp.stoichiometry = structure_tmp.structure_representative_struct->stoichiometry;
   structure_tmp.natoms = structure_tmp.structure_representative_struct->structure.atoms.size(); //DX20190425
   structure_tmp.ntypes = structure_tmp.structure_representative_struct->structure.num_each_type.size(); //DX20190425
-  structure_tmp.structure_representative_name = structure_tmp.structure_representative_struct->name; //DX20190425
+  //structure_tmp.structure_representative_name = structure_tmp.structure_representative_struct->name; //DX20190425
  
   // if calculated update symmetry and environment info
   structure_tmp.Pearson = structure_tmp.structure_representative_struct->Pearson;
@@ -1211,6 +1224,7 @@ bool StructurePrototype::initialize(const xstructure& xstr, const string& struct
 }
 */
 
+/*
 // ***************************************************************************
 // StructurePrototype::addStructurePrototypeAsDuplicate() 
 // ***************************************************************************
@@ -1251,6 +1265,7 @@ bool StructurePrototype::addStructurePrototypeAsDuplicate(StructurePrototype& b)
 
   return true;
 }
+*/
 
 // ***************************************************************************
 // XtalFinderCalculator::addToStructureDuplicate() 
@@ -1356,6 +1371,7 @@ void XtalFinderCalculator::addToStructureFamily(StructurePrototype& structure_tm
 
 }
 
+/*
 // ***************************************************************************
 // StructurePrototype::addStructurePrototypeAsFamilyStructure() 
 // ***************************************************************************
@@ -1396,6 +1412,7 @@ void StructurePrototype::putDuplicateAsFamily(uint index, bool keep_generated){
 
   return;
 }
+*/
 
 // ***************************************************************************
 // StructurePrototype::copyPrototypeInformation() 
@@ -1416,6 +1433,7 @@ bool StructurePrototype::copyPrototypeInformation(StructurePrototype& b){
   return true;
 }
 
+/*
 // ***************************************************************************
 // StructurePrototype::putDuplicateAsRepresentative() 
 // ***************************************************************************
@@ -1451,6 +1469,7 @@ bool StructurePrototype::putDuplicateAsRepresentative(StructurePrototype& b, uin
   }
   return true;
 }
+*/
 
 //DX [OBSOLETE]// ***************************************************************************
 //DX [OBSOLETE]// StructurePrototype::putRepresentativeAsDuplicate() 
@@ -1575,7 +1594,7 @@ bool StructurePrototype::removeNonDuplicate(uint& index){
   */
   return true;
 } 
-
+/*
 // ***************************************************************************
 // StructurePrototype::clearDuplicateInformation() 
 // ***************************************************************************
@@ -1607,6 +1626,7 @@ bool StructurePrototype::removeDuplicates(bool remove_duplicate_count){
 
   return true;
 }
+*/
 
 // ***************************************************************************
 // END:: Prototype Class
@@ -1647,7 +1667,7 @@ void XtalFinderCalculator::free(){
   num_proc=1;
 
   structure_containers.clear();
-  structure_matched_containers.clear();
+  //structure_matched_containers.clear();
 
   //DX should we have this? structure_prototypes.clear();
 }
@@ -1673,7 +1693,7 @@ void XtalFinderCalculator::copy(const XtalFinderCalculator& b) {
   misfit_family=b.misfit_family;
   num_proc=b.num_proc;
   structure_containers=b.structure_containers; //expensive, but necessary
-  structure_matched_containers=b.structure_matched_containers; //expensive, but necessary
+  //structure_matched_containers=b.structure_matched_containers; //expensive, but necessary
 }
 
 // ===== Assignment Operator (operator=) ===== //
@@ -1899,7 +1919,7 @@ namespace compare {
   }
 }
 
-
+/*
 // ***************************************************************************
 // loadStructuresFromDirectory() 
 // ***************************************************************************
@@ -1993,7 +2013,7 @@ namespace compare {
     return all_structures; 
   }
 }
-
+*/
 void XtalFinderCalculator::loadStructuresFromDirectory(const string& directory,
     const vector<string>& magmoms_for_systems, 
     bool same_species){
@@ -2060,6 +2080,8 @@ void XtalFinderCalculator::loadStructuresFromDirectory(const string& directory,
   //return all_structures;
 }
 
+//TODO
+/*
 // ***************************************************************************
 // loadStructuresFromAflowlibEntries
 // ***************************************************************************
@@ -2129,7 +2151,9 @@ namespace compare {
     return all_structures;
   }
 }
+*/
 
+/*
 // ***************************************************************************
 // loadStructuresFromFile() 
 // ***************************************************************************
@@ -2241,6 +2265,7 @@ namespace compare {
     return all_structures; 
   }
 }
+*/
 
   void XtalFinderCalculator::loadStructuresFromFile(const string& filename,
       const vector<string>& magmoms_for_systems, 
@@ -2330,6 +2355,7 @@ namespace compare {
   //return all_structures;
 }
 
+/*
 //DX20190424 START
 // ***************************************************************************
 // loadStructuresFromStructureList() 
@@ -2410,6 +2436,7 @@ namespace compare {
   }
 }
 //DX20190424 END
+*/
 
 //DX20190424 START
 // ***************************************************************************
@@ -2527,11 +2554,12 @@ namespace compare {
     if(end_index == AUROSTD_MAX_UINT){ end_index=structures.size(); }
 
     for(uint i=start_index;i<end_index;i++){
-      if(!structures[i].structure_representative_generated){
-        structures[i].structure_representative_generated = generateStructure(structures[i].structure_representative_name,
-            structures[i].structure_representative_source,
-            structures[i].structure_representative_relaxation_step, //DX20200429
-            structures[i].structure_representative,
+      if(!structures[i].structure_representative_struct->is_structure_generated){
+        structures[i].structure_representative_struct->is_structure_generated = generateStructure(
+            structures[i].structure_representative_struct->name,
+            structures[i].structure_representative_struct->source,
+            structures[i].structure_representative_struct->relaxation_step, //DX20200429
+            structures[i].structure_representative_struct->structure,
             oss);
       }
     }
@@ -2716,6 +2744,7 @@ namespace compare {
   }
 }
 
+/*
 //DX20191105 - remove non-generated structures - START
 // ***************************************************************************
 // removeNonGeneratedStructures 
@@ -2735,6 +2764,7 @@ namespace compare {
   }
 }
 //DX20191105 - remove non-generated structures - END
+*/
 
 //DX20191108 [OBOSLETE] // ***************************************************************************
 //DX20191108 [OBOSLETE] // SVD Decomposition 
@@ -2874,6 +2904,7 @@ namespace compare{
   }
 }
 
+/*
 // ***************************************************************************
 // comparePermutations 
 // ***************************************************************************
@@ -3033,6 +3064,7 @@ namespace compare{
     return final_permutations;
   }
 }
+*/
 
 // ***************************************************************************
 // comparePermutations 
@@ -3208,6 +3240,7 @@ namespace compare{
     
   }
 
+/*
 // ***************************************************************************
 // generatePermutationStructures
 // ***************************************************************************
@@ -3339,6 +3372,7 @@ namespace compare{
     return permutation_structures;
   }
 }
+*/
 
 // ***************************************************************************
 // generatePermutationStructures
@@ -3697,6 +3731,7 @@ namespace compare{
   }
 }
 
+/*
 // ***************************************************************************
 // makePermutations 
 // ***************************************************************************
@@ -3770,6 +3805,7 @@ namespace compare{
     return true;
   }
 }
+*/
 
 //DX20200727 [OBSOLETE] // ***************************************************************************
 //DX20200727 [OBSOLETE] //  Get Stoichiometry - Obtain stoichiometries from composition string
@@ -3828,6 +3864,7 @@ namespace compare{
 //DX20200727 [OBSOLETE]   }
 //DX20200727 [OBSOLETE] }
 
+/*
 // ***************************************************************************
 //  addAFLOWPrototypes2StructurePrototypeVector() 
 // ***************************************************************************
@@ -3892,6 +3929,7 @@ namespace compare{
     return true;
   }
 } 
+*/
 
 // ***************************************************************************
 // XtalFinderCalculator::addAFLOWPrototypes2container() 
@@ -4213,7 +4251,7 @@ namespace compare{
 //DX20191108 [OBSOLETE - switching to getThreadDistribution]   }
 //DX20191108 [OBSOLETE - switching to getThreadDistribution] }
 
-
+/*
 // ***************************************************************************
 // splitComparisonIntoThreads()
 // ***************************************************************************
@@ -4348,6 +4386,7 @@ namespace compare{
     return true;
   }
 }
+*/
 
 // ***************************************************************************
 // splitComparisonIntoThreads()
@@ -4482,6 +4521,7 @@ namespace compare{
     return true;
   }
 
+/*
 // ***************************************************************************
 // convertStructures()
 // ***************************************************************************
@@ -4628,6 +4668,7 @@ namespace compare {
     }
   }
 }
+*/
 
 // ***************************************************************************
 // convertStructures()
@@ -4768,6 +4809,7 @@ namespace compare {
     }
   }
 
+/*
 // ***************************************************************************
 // calculateSymmetries - Calculate Symmetries
 // ***************************************************************************
@@ -4824,6 +4866,7 @@ namespace compare{
     }
   }
 }
+*/
 
 //DX20191108 [OBSOLETE - switching to getThreadDistribution] // ***************************************************************************
 //DX20191108 [OBSOLETE - switching to getThreadDistribution] // splitTaskIntoThreads - 
@@ -4898,6 +4941,7 @@ namespace compare{
 //DX20191108 [OBSOLETE - switching to getThreadDistribution]   }
 //DX20191108 [OBSOLETE - switching to getThreadDistribution] }
 
+/*
 // ***************************************************************************
 // calculateSpaceGroupsInSetRange
 // ***************************************************************************
@@ -4922,6 +4966,7 @@ namespace compare {
     }
   }
 }
+*/
 
 // ***************************************************************************
 // calculateSpaceGroupsInSetRange
@@ -4946,6 +4991,7 @@ namespace compare {
     }
   }
 
+/*
 // ***************************************************************************
 // calculateSymmetries - Calculate Symmetries
 // ***************************************************************************
@@ -4994,6 +5040,7 @@ namespace compare{
 
   }
 }
+*/
 
 // ***************************************************************************
 // calculateSymmetries - Calculate Symmetries
@@ -5040,6 +5087,7 @@ namespace compare{
 
   }
 
+/*
 // ***************************************************************************
 // calculateLFAEnvironments()
 // ***************************************************************************
@@ -5103,6 +5151,7 @@ namespace compare{
 
   }
 }
+*/
 
 // ***************************************************************************
 // calculateLFAEnvironments()
@@ -5116,7 +5165,7 @@ namespace compare{
     if(end_index == AUROSTD_MAX_UINT){ end_index=structure_containers.size(); }
 
     for(uint i=start_index;i<end_index;i++){ //DX20191107 switching end index convention <= vs <
-      structure_containers[i].environments_LFA = compare::computeLFAEnvironment(structure_containers[i].structure);
+      computeLFAEnvironment(structure_containers[i]);
     }
   }
 
@@ -5222,6 +5271,7 @@ namespace compare{
     }
   }
 
+
 // ***************************************************************************
 // calculateSymmetry - Calculate Symmetry
 // ***************************************************************************
@@ -5248,6 +5298,7 @@ namespace compare{
     //}
   }
 }
+
 
 // ***************************************************************************
 // groupWyckoffPositions
@@ -5740,6 +5791,7 @@ namespace compare{
 }
 
 
+/*
 // ***************************************************************************
 // createStructurePrototypes - Group structures by Pearson symbol, then space group
 // ***************************************************************************
@@ -5955,7 +6007,9 @@ namespace compare{
     //}
   }
 }
+*/
 
+/*
 // ***************************************************************************
 // structuresCompatible - check compatiblity of structures 
 // ***************************************************************************
@@ -6008,6 +6062,7 @@ namespace compare{
     return false;
   }
 }
+*/
 
 // ***************************************************************************
 // structuresCompatible - check compatiblity of structures 
@@ -6062,6 +6117,7 @@ namespace compare{
   }
 }
 
+/*
 // ***************************************************************************
 // createStructurePrototypes - Group structures by Pearson symbol, then space group
 // ***************************************************************************
@@ -6144,6 +6200,7 @@ namespace compare{
     return comparison_schemes;
   }
 }
+*/
 
 // ***************************************************************************
 // createStructurePrototypes - Group structures by Pearson symbol, then space group
@@ -6212,7 +6269,7 @@ namespace compare{
     if(LDEBUG) {
       cerr << function_name << " Prepared comparison sets: " << endl;
       stringstream ss_test;
-      compare::printResults(ss_test, same_species, comparison_schemes);
+      printResults(ss_test, same_species, comparison_schemes, "text");
       cerr << ss_test.str() << endl;
     }
     // DEBUG for(uint i=0;i<comparison_schemes.size();i++){
@@ -6317,6 +6374,7 @@ namespace compare{
 //DX [OBSOLETE]  }
 //DX [OBSOLETE]}
 
+/*
 // ***************************************************************************
 // checkForBetterMatches 
 // ***************************************************************************
@@ -6478,6 +6536,7 @@ namespace compare{
     return prototype_schemes;
   }
 }
+*/
 
 // ***************************************************************************
 // checkForBetterMatches 
@@ -6524,8 +6583,8 @@ namespace compare{
           if(check_for_better_matches){ start_index = i+1; }
           for(uint k=start_index;k<prototype_schemes.size();k++){
             if(i!=k){ // don't perform the same comparison again //DX20200414
-              if(compare::structuresCompatible(prototype_schemes[i], //compares StructurePrototype objects
-                    prototype_schemes[k],
+              if(compare::structuresCompatible(*prototype_schemes[i].structure_representative_struct, //compares StructurePrototype objects
+                    *prototype_schemes[k].structure_representative_struct,
                     same_species,
                     check_better_matches_options.flag("COMPARISON_OPTIONS::IGNORE_SYMMETRY"),
                     check_better_matches_options.flag("COMPARISON_OPTIONS::IGNORE_WYCKOFF"),
@@ -6624,6 +6683,7 @@ namespace compare{
     return prototype_schemes;
   }
 
+/*
 // ***************************************************************************
 // compareDuplicateCompounds()
 // ***************************************************************************
@@ -6665,7 +6725,9 @@ namespace compare{
 
   }
 }
+*/
 
+/*
 // ***************************************************************************
 // createComparisonSchemeForDuplicateCompounds 
 // ***************************************************************************
@@ -6749,7 +6811,9 @@ namespace compare{
     return duplicate_check_schemes;
   }
 }
+*/
 
+/*
 // ***************************************************************************
 // removeDuplicateCompounds 
 // ***************************************************************************
@@ -6782,7 +6846,9 @@ namespace compare{
     }
   }
 }
+*/
 
+/*
 // ***************************************************************************
 // representativePrototypeForICSDRuns: Determine representative prototype for ICSD runs
 // ***************************************************************************
@@ -6863,6 +6929,7 @@ namespace compare{
     return true;
   }
 }
+*/
 
   void XtalFinderCalculator::representativePrototypeForICSDRunsNEW(vector<StructurePrototype>& comparison_schemes){
 
@@ -6946,6 +7013,7 @@ namespace compare{
     }
   }
 
+/*
 // ***************************************************************************
 // runComparisonThreads: Runs comparison threads
 // ***************************************************************************
@@ -7031,6 +7099,7 @@ namespace compare{
     }
   }
 }
+*/
 
 // ***************************************************************************
 // runComparisonThreads: Runs comparison threads
@@ -7179,6 +7248,7 @@ namespace compare{
     }
   }
 
+/*
 // ***************************************************************************
 // runComparisonScheme: Runs comparisons automatically 
 // ***************************************************************************
@@ -7443,6 +7513,7 @@ namespace compare{
     return final_prototypes;
   }
 }
+*/
 
 // ***************************************************************************
 // runComparisonScheme: Runs comparisons automatically 
@@ -7674,7 +7745,7 @@ namespace compare{
     return divisor_pairs;   
   }
 }
-
+/*
 // ***************************************************************************
 // calculateDivisors 
 // ***************************************************************************
@@ -7707,6 +7778,7 @@ namespace compare{
     return true;
   }
 }
+*/
 
 // ***************************************************************************
 // calculateDivisors 
@@ -7741,6 +7813,7 @@ namespace compare{
   }
 }
 
+/*
 // ***************************************************************************
 // createStructurePermutations - Group structures by Pearson symbol, then space group
 // ***************************************************************************
@@ -7826,7 +7899,9 @@ namespace compare{
     }
   }
 }
+*/
 
+/*
 // ***************************************************************************
 // makeRepresentativeEvenPermutation
 // ***************************************************************************
@@ -7889,6 +7964,7 @@ namespace compare{
     return true;
   } 
 }
+*/
 /*
 // ***************************************************************************
 // makeRepresentativeEvenPermutation
@@ -7993,6 +8069,7 @@ namespace compare{
     return num_mismatches;
   }
 
+/*
 // ***************************************************************************
 // appendStructurePrototypes - Create new structure prototypes after comparisons
 // ***************************************************************************
@@ -8100,6 +8177,7 @@ namespace compare{
     comparison_schemes=tmp_list;
   }
 }
+*/
 
 // ***************************************************************************
 // appendStructurePrototypes - Create new structure prototypes after comparisons
@@ -8276,6 +8354,8 @@ namespace compare{
     comparison_schemes=tmp_list;
   }
 
+//TODO
+/*
 // ***************************************************************************
 // checkPrototypes - Ensure prototypes of different SG are compared
 // ***************************************************************************
@@ -8373,7 +8453,9 @@ namespace compare{
     }
   }
 }
+*/
 
+/*
 // ***************************************************************************
 // printResults - Displays results for .txt file
 // ***************************************************************************
@@ -8550,6 +8632,7 @@ namespace compare{
     }
   }
 }
+*/
 
 // ***************************************************************************
 // printResults - Displays results for .txt file
@@ -8599,7 +8682,7 @@ namespace compare{
           ss_out << "  SG=#" << final_prototypes[j].space_group;
           // ORIG ss_out << "  Wyckoffs=" << compare::printWyckoffString(final_prototypes[j].grouped_Wyckoff_positions,true) << endl;
           ss_out << "  Wyckoffs=" << compare::printWyckoffString(final_prototypes[j].grouped_Wyckoff_positions,true); //DX20190228 - remove count
-          uint number_of_duplicates = final_prototypes[j].numberOfDuplicates(); //DX20190506 - made function
+          uint number_of_duplicates = numberOfDuplicates(final_prototypes[j]); //DX20190506 - made function
           ss_out << "  duplicate_compounds=" << number_of_duplicates << endl; //DX20190228 - add count
           if(final_prototypes[j].aflow_label.size()!=0){
             ss_out << "  aflow_label=" << final_prototypes[j].aflow_label << endl; 
@@ -8650,7 +8733,7 @@ namespace compare{
           }
           ss_out << "  SG=#" << final_prototypes[j].space_group;
           ss_out << "  Wyckoffs=" << compare::printWyckoffString(final_prototypes[j].grouped_Wyckoff_positions,true);
-          uint number_of_duplicates = final_prototypes[j].numberOfDuplicates(); //DX20190506 - made function
+          uint number_of_duplicates = numberOfDuplicates(final_prototypes[j]); //DX20190506 - made function
           ss_out << "  structures_duplicate=" << number_of_duplicates; //DX20190228 - add count
           uint number_duplicate_compounds = 0;
           for(uint k=0;k<final_prototypes[j].structures_duplicate_struct.size();k++){
@@ -8723,6 +8806,7 @@ namespace compare{
     }
   }
 
+/*
 // ***************************************************************************
 // printStructureMappingResults - Displays comprehensive mapping information
 // ***************************************************************************
@@ -8785,6 +8869,7 @@ namespace compare{
     }
   }
 } 
+*/
 
 // ***************************************************************************
 // XtalFinderCalculator::printStructureMappingResults()
@@ -9772,6 +9857,7 @@ namespace compare{
 //DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD]   } 
 //DX20200728 [MOVED TO XATOM AND EXTENDED AUROSTD] }
 
+/*
 // ***************************************************************************
 // Find Matches
 // ***************************************************************************
@@ -10061,6 +10147,7 @@ namespace compare{
     return true;
   }
 }
+*/
 
 // ***************************************************************************
 // Find Matches
@@ -10332,6 +10419,7 @@ namespace compare {
   }
 }
 
+/*
 // ***************************************************************************
 // clusterize
 // ***************************************************************************
@@ -10379,7 +10467,9 @@ namespace compare{
     }
   }
 }
+*/
 
+/*
 // ***************************************************************************
 // Same Atom Type
 // ***************************************************************************
@@ -10430,7 +10520,9 @@ namespace compare{
     else return false;
   }
 }
+*/
 
+/*
 // ***************************************************************************
 // Clean Match
 // ***************************************************************************
@@ -10455,6 +10547,7 @@ namespace compare{
     return false;
   }
 }
+*/
 
 // ***************************************************************************
 // Cell Diagonal
@@ -10516,6 +10609,7 @@ namespace compare{
   }
 }
 
+
 // ***************************************************************************
 // compute LFA environment 
 // ***************************************************************************
@@ -10564,6 +10658,7 @@ namespace compare{
     return all_environments_LFA;
   }
 }
+
 
 // ***************************************************************************
 // compute LFA environment 
@@ -11031,7 +11126,7 @@ namespace compare{
     return min_dist;
   }
 }
-
+/*
 // ***************************************************************************
 // Coordinates Deviation
 // ***************************************************************************
@@ -11124,7 +11219,7 @@ namespace compare{
     fail_figure=(nfail/(xstr1.atoms.size()+xstr2.atoms.size()));
   }   
 }
-
+*/
 // ***************************************************************************
 // Coordinates Deviation
 // ***************************************************************************
@@ -11225,6 +11320,7 @@ namespace compare{
   }   
 }
 
+/*
 // ***************************************************************************
 // Magnetic Deviation (beta)
 // ***************************************************************************
@@ -11307,6 +11403,7 @@ namespace compare{
     magnetic_fail = (double)(mag_fail_1+mag_fail_2)/(double)(xstr1.atoms.size()+xstr2.atoms.size());
   }
 }
+*/
 
 // ***************************************************************************
 // Magnetic Deviation (beta)
@@ -11526,6 +11623,7 @@ namespace compare{
     return output.str();
   }
 
+/*
 // ***************************************************************************
 // Print Matching Between Atoms
 // ***************************************************************************
@@ -11576,7 +11674,9 @@ namespace compare{
     }
   }
 }
+*/
 
+/*
 // ***************************************************************************
 // Bring Coordinate in the cell (Similar to xstructure.BringInCell())
 // ***************************************************************************
@@ -11598,6 +11698,7 @@ namespace compare{
     return coord;
   }
 }
+*/
 
 // ***************************************************************************
 // atomInCell() 
@@ -11660,6 +11761,7 @@ namespace compare{
   }
 }
 
+/*
 // ***************************************************************************
 // Determine if LFA Quadruplet is Periodic
 // ***************************************************************************
@@ -11713,6 +11815,7 @@ namespace compare{
     return true;
   }
 }
+*/
 
 // ***************************************************************************
 // GetLFASupercell
@@ -11773,6 +11876,7 @@ namespace compare{
   }
 }
 
+/*
 // ***************************************************************************
 // latticeAndOriginSearch
 // ***************************************************************************
@@ -12104,8 +12208,8 @@ namespace compare{
     }
   }
 }
-
-
+*/
+/*
 // ***************************************************************************
 // latticeAndOriginSearch [NEW WITH BASIS TRANSFORMATIONS]
 // ***************************************************************************
@@ -12423,7 +12527,8 @@ namespace compare{
     }
   }
 }
-
+*/
+/*
 // ***************************************************************************
 // latticeAndOriginSearch [NEW WITH BASIS TRANSFORMATIONS]
 // ***************************************************************************
@@ -12518,20 +12623,19 @@ namespace compare{
       // perhaps consider only creating them when we need to ... (i.e. inside commonOriginSearch function)
 			//vector<xstructure> vxstr2_transformed = getTransformedStructures(xstr_match.structure,basis_transformations,rotations);
 			
-      /*
-			// ---------------------------------------------------------------------------
-      // convert to structure_matched objects to store mapping info
-      vector<structure_matched> vstrs_matched_transformed;
-      //for(uint i=0;i<vxstr2_transformed.size();i++){
-        //structure_matched str_match_tmp = compare::initializeStructureMatched(vxstr2_transformed[i]);
-      for(uint i=0;i<basis_transformations.size();i++){
-        structure_matched str_match_tmp = compare::initializeStructureMatched(xstr_match.structure); // untransformed version
-        str_match_tmp.basis_transformation = basis_transformations[i];
-        str_match_tmp.rotation = rotations[i];
-        str_match_tmp.misfit_info.lattice_deviation = latt_devs[i]; 
-        vstrs_matched_transformed.push_back(str_match_tmp);
-      }
-      */
+			//// ---------------------------------------------------------------------------
+      //// convert to structure_matched objects to store mapping info
+      //vector<structure_matched> vstrs_matched_transformed;
+      ////for(uint i=0;i<vxstr2_transformed.size();i++){
+      //  //structure_matched str_match_tmp = compare::initializeStructureMatched(vxstr2_transformed[i]);
+      //for(uint i=0;i<basis_transformations.size();i++){
+      //  structure_matched str_match_tmp = compare::initializeStructureMatched(xstr_match.structure); // untransformed version
+      //  str_match_tmp.basis_transformation = basis_transformations[i];
+      //  str_match_tmp.rotation = rotations[i];
+      //  str_match_tmp.misfit_info.lattice_deviation = latt_devs[i]; 
+      //  vstrs_matched_transformed.push_back(str_match_tmp);
+      //}
+      //
 			// ---------------------------------------------------------------------------
       // convert to structure_matched objects to store mapping info
       //vector<structure_matched> vstrs_matched_transformed;
@@ -12651,7 +12755,7 @@ namespace compare{
                   
                 }
               }
-/*
+
               //find transformation info
               xmatrix<double> matched_basis_transformation = basis_transformations[matched_lattice_index]; //DX20201023 
               xmatrix<double> matched_rotation = rotations[matched_lattice_index]; //DX20201023 
@@ -12676,7 +12780,7 @@ namespace compare{
                 cerr << function_name << " rotated only (no basis transformation): " << rotate_only << endl;
                 cerr << function_name << " angles: " << Getabc_angles(rotate_only.lattice,DEGREES) << endl;
               }
-*/
+
               //// ---------------------------------------------------------------------------
               //// quick return if found a match
               //if(min_misfit_info.misfit<0.1 && !optimize_match){
@@ -12720,6 +12824,7 @@ namespace compare{
     }
   }
 }
+*/
 
 // ***************************************************************************
 // latticeAndOriginSearch [NEW WITH BASIS TRANSFORMATIONS]
@@ -13282,6 +13387,7 @@ namespace compare{
 // [OBSOLETE - DX20190717]   }  
 // [OBSOLETE - DX20190717] }
 
+  /*
 // ***************************************************************************
 // structureSearch
 // ***************************************************************************
@@ -13517,7 +13623,9 @@ namespace compare{
     return true;
   }  
 }
+*/
 
+/*
 // ***************************************************************************
 // commonOriginSearch
 // ***************************************************************************
@@ -13678,7 +13786,9 @@ namespace compare{
     return true;
   }  
 }
+*/
 
+/*
 // ***************************************************************************
 // commonOriginSearch
 // ***************************************************************************
@@ -13846,24 +13956,24 @@ namespace compare{
                 //TO FIX index_match_1 = map_index_str1;
                 //TO FIX index_match_2 = map_index_str2;
                 //
-               /* 
-                // store mapping info // this adds about a 1.5 seconds for BIG_TEST_LOTS_MORE
-                // resize
-                vstrs_matched_transformed[p].atom_map.resize(map_index_str2.size());
-                vstrs_matched_transformed[p].basis_map.resize(map_index_str2.size());
-                vstrs_matched_transformed[p].distances_mapped.resize(min_dists.size());
-                for(uint m=0;m<map_index_str1.size();m++){
-                  for(uint n=0;n<map_index_str1.size();n++){
-                    // placement indicates index of str1, so we need to order it
-                    if(map_index_str1[n]==m){
-                      vstrs_matched_transformed[p].atom_map[m]=map_index_str2[n];
-                      vstrs_matched_transformed[p].basis_map[m]=vstrs_matched_transformed[p].structure.atoms[map_index_str2[n]].type;
-                      vstrs_matched_transformed[p].distances_mapped[m]=min_dists[n];
-                      break;
-                    }
-                  }
-                }
-                */
+               // 
+               // // store mapping info // this adds about a 1.5 seconds for BIG_TEST_LOTS_MORE
+                //// resize
+               // vstrs_matched_transformed[p].atom_map.resize(map_index_str2.size());
+               // vstrs_matched_transformed[p].basis_map.resize(map_index_str2.size());
+               // vstrs_matched_transformed[p].distances_mapped.resize(min_dists.size());
+               // for(uint m=0;m<map_index_str1.size();m++){
+               //   for(uint n=0;n<map_index_str1.size();n++){
+               //     // placement indicates index of str1, so we need to order it
+               //     if(map_index_str1[n]==m){
+               //       vstrs_matched_transformed[p].atom_map[m]=map_index_str2[n];
+               //       vstrs_matched_transformed[p].basis_map[m]=vstrs_matched_transformed[p].structure.atoms[map_index_str2[n]].type;
+               //       vstrs_matched_transformed[p].distances_mapped[m]=min_dists[n];
+               //       break;
+               //     }
+               //   }
+               // }
+                
               //}
               // If we want to simply find a match and not find the best match, we can return early
               if(mis<0.1 && !optimize_match) {
@@ -13882,6 +13992,7 @@ namespace compare{
     return true;
   }  
 }
+*/
 
 // ***************************************************************************
 // XtalFinderCalculator::searchAtomMappings()
@@ -14201,7 +14312,7 @@ namespace compare{
     return true;
   }
 }
-
+/*
 // ***************************************************************************
 // Quadruplet Search
 // ***************************************************************************
@@ -14331,7 +14442,7 @@ namespace compare{
     } 
   }
 }
-
+*/
 // ***************************************************************************
 // Quadruplet Search
 // ***************************************************************************
@@ -14418,6 +14529,7 @@ namespace compare{
     } 
   }
 
+/*
 // ***************************************************************************
 // Build All Lattices [NEW]
 // ***************************************************************************
@@ -14596,6 +14708,7 @@ namespace compare{
     return true;
   }
 }
+*/
 
 // ***************************************************************************
 // XtalFinderCalculator::buildSimilarLattices() 
@@ -14771,6 +14884,7 @@ namespace compare{
     return true;
   }
 
+/*
 // ***************************************************************************
 // Build All Lattices
 // ***************************************************************************
@@ -14945,6 +15059,7 @@ namespace compare{
     return true;
   }
 }
+*/
 
 // ***************************************************************************
 // getLatticeTransformations()
@@ -15342,6 +15457,7 @@ namespace compare{
 // [OBSOLETE - DX20190717] }
 //---------------------------------------------------------------
 
+/*
 // ***************************************************************************
 // get prototype designations 
 // ***************************************************************************
@@ -15356,6 +15472,7 @@ namespace compare{
     }
   }
 }
+*/
 
 // ***************************************************************************
 // get prototype designations 

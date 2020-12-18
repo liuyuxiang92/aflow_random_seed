@@ -124,48 +124,11 @@ struct _structure_representative {
   vector<string> properties; //needs to be static variable type in AFLOW, not required for JSON
 };
 
-// ===== structure_matched struct ===== // DX20201119
-// a friend of the structure_representative struct 
-struct structure_matched : _structure_representative { // friend
-  structure_misfit misfit_info;
-  xmatrix<double> rotation;
-  xmatrix<double> basis_transformation;
-  xvector<double> origin_shift;
-  vector<uint> atom_map;
-  vector<uint> basis_map;
-  vector<double> distances_mapped;
-};
-/*
-// ===== structure_matched struct ===== // DX20201119
-struct structure_matched {
-  string name;
-  string compound;
-  string from;
-  bool generated;
-  xstructure structure;
-  vector<double> nearest_neighbor_distances;
-  vector<GroupedWyckoffPosition> grouped_Wyckoff_positions;
-  bool is_representative;
-  structure_misfit misfit_info;
-  xmatrix<double> rotation;
-  xmatrix<double> basis_transformation;
-  xvector<double> origin_shift;
-  vector<uint> atom_map;
-  vector<uint> basis_map;
-  vector<double> distances_mapped;
-  string comparison_log; // perhaps can print this on-the-fly instead of storing
-  uint number_compounds_matching_structure;
-  vector<string> properties_names;
-  vector<string> properties_units;
-  vector<string> properties_types;
-  vector<string> properties; //needs to be static variable type in AFLOW, not required for JSON
-};
-*/
 namespace compare{
   _structure_representative initializeStructureRepresentativeStruct();
   _structure_representative initializeStructureRepresentativeStruct(const xstructure& structure);
-  structure_matched initialize_structure_matched_struct();
-  structure_matched initializeStructureMatched(const xstructure& structure);
+  //structure_matched initialize_structure_matched_struct();
+  //structure_matched initializeStructureMatched(const xstructure& structure);
 }
 
 //DX 20201119
@@ -176,7 +139,7 @@ namespace compare{
 class CompareMatchedStructures{
   public:
     CompareMatchedStructures(const vector<string>& sorting_attributes) : sorting_attributes(sorting_attributes){}
-    bool operator()(const structure_matched *a, const structure_matched *b);
+    bool operator()(const _structure_representative *a, const _structure_representative *b);
   private:
     vector<string> sorting_attributes;
 };
@@ -193,13 +156,13 @@ class StructurePrototype{
     StructurePrototype(const StructurePrototype& b);                                        // copy constructor
     int iomode;                                                                             // mode for printing
     _structure_representative *structure_representative_struct;      
-    string structure_representative_name;                                                   // name of representative structure
-    string structure_representative_compound;                                               // compound name of representative structure (w/reduced stoichometry), e.g., Ag1Br2
-    xstructure structure_representative;                                                    // xstructure of representative structure
-    bool structure_representative_generated;                                                // boolean indicating if xstructure is generated
-    string structure_representative_source;                                                 // string indicating where structure came from, i.e., input, auid, aflow protos, etc.
-    uint structure_representative_relaxation_step;                                          // number specifying relaxation step of the representative structure (0=original, 1=one relaxation, 2=most relaxed)
-    uint number_compounds_matching_representative;                                          // number of compounds that match with the representative structure
+    //string structure_representative_name;                                                   // name of representative structure
+    //string structure_representative_compound;                                               // compound name of representative structure (w/reduced stoichometry), e.g., Ag1Br2
+    //xstructure structure_representative;                                                    // xstructure of representative structure
+    //bool structure_representative_generated;                                                // boolean indicating if xstructure is generated
+    //string structure_representative_source;                                                 // string indicating where structure came from, i.e., input, auid, aflow protos, etc.
+    //uint structure_representative_relaxation_step;                                          // number specifying relaxation step of the representative structure (0=original, 1=one relaxation, 2=most relaxed)
+    //uint number_compounds_matching_representative;                                          // number of compounds that match with the representative structure
     int ntypes;                                                                             // number of types in prototype
     vector<string> elements;                                                                // list of elements exhibiting in this protoype (from representative and duplicate structures)
     vector<uint> stoichiometry;                                                             // reduced stoichiometry of prototype
@@ -219,31 +182,31 @@ class StructurePrototype{
     vector<string> matching_aflow_prototypes;                                               // vector of strings indicating matching AFLOW prototype labels
     //vector<structure_matched*> structures_duplicate_struct;      
     vector<_structure_representative*> structures_duplicate_struct;      
-    vector<string> structures_duplicate_names;                                              // vector of names for duplicate structures
-    vector<string> structures_duplicate_compounds;                                          // vector of compounds names for duplicate structures (w/reduced stoichometry), e.g., Ag1Br2
-    vector<xstructure> structures_duplicate;                                                // vector of xstructures for duplicate structures
-    vector<bool> structures_duplicate_generated;                                            // vector of booleans indicating if xstructure is generated for duplicate structures
-    vector<string> structures_duplicate_source;                                             // vector of strings indicating where structure came from, i.e., input, auid, aflow protos, etc.
-    vector<uint> structures_duplicate_relaxation_step;                                      // vector of numbers specifying relaxation steps of the duplicate structures (0=original, 1=one relaxation, 2=most relaxed)
-    vector<vector<GroupedWyckoffPosition> > structures_duplicate_grouped_Wyckoff_positions; // Wyckoff positions grouped by site type
-    vector<uint> number_compounds_matching_duplicate;                                       // vector of number of compounds that match with the duplicate structures
-    vector<string> duplicate_comparison_logs; //DX20190506                                  // vector of comparison logs for duplicate structures, CAREFUL: very long string //DX20190506
+    //vector<string> structures_duplicate_names;                                              // vector of names for duplicate structures
+    //vector<string> structures_duplicate_compounds;                                          // vector of compounds names for duplicate structures (w/reduced stoichometry), e.g., Ag1Br2
+    //vector<xstructure> structures_duplicate;                                                // vector of xstructures for duplicate structures
+    //vector<bool> structures_duplicate_generated;                                            // vector of booleans indicating if xstructure is generated for duplicate structures
+    //vector<string> structures_duplicate_source;                                             // vector of strings indicating where structure came from, i.e., input, auid, aflow protos, etc.
+    //vector<uint> structures_duplicate_relaxation_step;                                      // vector of numbers specifying relaxation steps of the duplicate structures (0=original, 1=one relaxation, 2=most relaxed)
+    //vector<vector<GroupedWyckoffPosition> > structures_duplicate_grouped_Wyckoff_positions; // Wyckoff positions grouped by site type
+    //vector<uint> number_compounds_matching_duplicate;                                       // vector of number of compounds that match with the duplicate structures
+    //vector<string> duplicate_comparison_logs; //DX20190506                                  // vector of comparison logs for duplicate structures, CAREFUL: very long string //DX20190506
     vector<_structure_representative*> structures_family_struct;      
-    vector<string> structures_family_names;                                                 // vector of names for structures within the same family
-    vector<xstructure> structures_family;                                                   // vector of xstructures for structures within the same family
-    vector<bool> structures_family_generated;                                               // vector of booleans indicating if xstructure is generated for structures within the same family
-    vector<string> structures_family_source;                                                // vector of strings indicating where structure came from, i.e., input, auid, aflow protos, etc.
-    vector<uint> structures_family_relaxation_step;                                         // vector of numbers specifying relaxation steps of the same family structures (0=original, 1=one relaxation, 2=most relaxed)
-    vector<vector<GroupedWyckoffPosition> > structures_family_grouped_Wyckoff_positions;    // Wyckoff positions grouped by site type
-    vector<uint> number_compounds_matching_family;                                          // vector of number of compounds that match with the same family structures
-    vector<string> family_comparison_logs; //DX20190506                                     // vector of comparison logs for same family structures, CAREFUL: very long string //DX20190506
+    //vector<string> structures_family_names;                                                 // vector of names for structures within the same family
+    //vector<xstructure> structures_family;                                                   // vector of xstructures for structures within the same family
+    //vector<bool> structures_family_generated;                                               // vector of booleans indicating if xstructure is generated for structures within the same family
+    //vector<string> structures_family_source;                                                // vector of strings indicating where structure came from, i.e., input, auid, aflow protos, etc.
+    //vector<uint> structures_family_relaxation_step;                                         // vector of numbers specifying relaxation steps of the same family structures (0=original, 1=one relaxation, 2=most relaxed)
+    //vector<vector<GroupedWyckoffPosition> > structures_family_grouped_Wyckoff_positions;    // Wyckoff positions grouped by site type
+    //vector<uint> number_compounds_matching_family;                                          // vector of number of compounds that match with the same family structures
+    //vector<string> family_comparison_logs; //DX20190506                                     // vector of comparison logs for same family structures, CAREFUL: very long string //DX20190506
     vector<structure_misfit> structure_misfits_duplicate;                                   // vector of C++ structs containing broken-down structural misfit information between the duplicate and representative structures //DX20191217
     vector<structure_misfit> structure_misfits_family;                                      // vector of C++ structs containing broken-down structural misfit information between the family and representative structures //DX20191217
     vector<string> property_names;                                                          // vector of property names (if using AFLUX)
     vector<string> property_units;                                                          // vector of property units (if using AFLUX)
-    vector<string> properties_structure_representative;                                     // vector of property values for the representative structure (if using AFLUX)
-    vector<vector<string> > properties_structures_duplicate;                                // vector of property values for the duplicate structures (if using AFLUX)
-    vector<vector<string> > properties_structures_family; //DX20190506                      // vector of property values for the family structures (if using AFLUX) //DX20190425
+    //vector<string> properties_structure_representative;                                     // vector of property values for the representative structure (if using AFLUX)
+    //vector<vector<string> > properties_structures_duplicate;                                // vector of property values for the duplicate structures (if using AFLUX)
+    //vector<vector<string> > properties_structures_family; //DX20190506                      // vector of property values for the family structures (if using AFLUX) //DX20190425
     // functions
     uint numberOfDuplicates() const; //DX20190506                                           // return the number of duplicate structures for this prototype (i.e., checks misfit value)
     string printRepresentativeStructure() const; //DX20201028                               // return the representative structure in a JSON format
@@ -298,7 +261,7 @@ class XtalFinderCalculator : public xStream {
     double misfit_family;
     uint num_proc;
     vector<_structure_representative> structure_containers;  // stores structures in a container (pointer for easy manipulation and mobility)
-    vector<structure_matched> structure_matched_containers;  // stores structures in a container (will make StructurePrototype a pointer to this)
+    //vector<structure_matched> structure_matched_containers;  // stores structures in a container (will make StructurePrototype a pointer to this)
     //DX20201130  - should we have this? vector<StructurePrototype> structure_prototypes; // stores the equivalent structure information
 
     void getOptions(const aurostd::xoption& vpflow, aurostd::xoption& comparison_options);
@@ -385,6 +348,7 @@ class XtalFinderCalculator : public xStream {
   
     // count unmatched
     int numberMismatches(const vector<StructurePrototype>& comparison_schemes);
+    uint numberOfDuplicates(const StructurePrototype& prototype);
   
     // threads
     bool splitComparisonIntoThreads(vector<StructurePrototype>& comparison_schemes, uint& num_proc,
