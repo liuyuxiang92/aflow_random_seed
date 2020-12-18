@@ -1465,47 +1465,6 @@ const std::string base64_chars =
 "0123456789+/";
 //CO END
 
-//AS20201214 BEGIN JSONwriter
-namespace aurostd {
-  /// Class-container to output data into JSON format.
-  class JSONwriter{
-    private:
-      vector<string> content;
-      void free();
-      void copy(const JSONwriter &jw);
-    public:
-      JSONwriter();
-      JSONwriter(const JSONwriter &jw);
-      ~JSONwriter();
-      const JSONwriter& operator=(const JSONwriter &jw);
-      void clear();
-      template <typename utype> void addNumber(const string &key, const utype value);
-      template <typename utype> void addVector(const string &key, const utype &value);
-      void addVector(const string &key, const vector<double> &value,
-          int precision = AUROSTD_DEFAULT_PRECISION, bool roundoff = false,
-          double tol = AUROSTD_ROUNDOFF_TOL);
-      void addVector(const string &key, const deque<double> &value,
-          int precision = AUROSTD_DEFAULT_PRECISION, bool roundoff = false,
-          double tol = AUROSTD_ROUNDOFF_TOL);
-      void addVector(const string &key, const vector<string> &value);
-      void addVector(const string &key, const deque<string> &value);
-      template <typename utype> void addMatrix(const string &key, const utype &value);
-      void addMatrix(const string &key, const vector<vector<double> > &value,
-          int precision = AUROSTD_DEFAULT_PRECISION, bool roundoff = false,
-          double tol = AUROSTD_ROUNDOFF_TOL);
-      void addMatrix(const string &key, const deque<deque<double> > &value,
-          int precision = AUROSTD_DEFAULT_PRECISION, bool roundoff = false,
-          double tol = AUROSTD_ROUNDOFF_TOL);
-      void addString(const string &key, const string &value);
-      void addBool(const string &key, bool value);
-      void addRaw(const string &value);
-      void addJSON(const string &key, JSONwriter &value);
-      void mergeJSON(JSONwriter &value);
-      string toString(bool wrap=true);
-  };
-}
-//AS20201214 END
-
 #endif
 
 // ***************************************************************************
