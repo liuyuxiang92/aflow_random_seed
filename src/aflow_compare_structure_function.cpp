@@ -3470,7 +3470,7 @@ namespace compare{
 
     vector<vector<int> > all_indices;
     vector<int> _indices;
-    for(int i=0;i<num_elements;i++){_indices.push_back(i);}
+    for(uint i=0;i<num_elements;i++){_indices.push_back(i);}
     aurostd::xcombos indices_combos(_indices, true, 'P');
     while (indices_combos.increment()) all_indices.push_back(indices_combos.getCombo());
 
@@ -4682,12 +4682,16 @@ namespace compare {
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string function_name = XPID + "XtalFinderCalculator::convertStructures():";
-    if(LDEBUG) {cerr << function_name << " Number of threads=" << num_proc << endl;}
+    stringstream message;
+
+    message << "Converting structures standard representation (primitive, Minkowski, and/or Niggli).";
+    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
 
     uint number_of_structures = structure_containers.size();
 
 #ifdef AFLOW_COMPARE_MULTITHREADS_ENABLE
     // THREADED VERSION - START
+    if(LDEBUG) {cerr << function_name << " Number of threads=" << num_proc << endl;}
 
     // Distribute threads via indices
     vector<vector<int> > thread_distribution = getThreadDistribution(number_of_structures, num_proc);
@@ -4768,6 +4772,8 @@ namespace compare {
     // NONTHREADS - END
 
 #endif
+    message << "All structures converted.";
+    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_COMPLETE_);
   }
 
 // ***************************************************************************
@@ -5045,47 +5051,64 @@ namespace compare{
 // ***************************************************************************
 // calculateSymmetries - Calculate Symmetries
 // ***************************************************************************
-  void XtalFinderCalculator::calculateSymmetries(uint& num_proc){
+void XtalFinderCalculator::calculateSymmetries(uint num_proc){
 
-    // Calculates the symmetry (space group and Wyckoff positions) of each structure 
+  // Calculates the symmetry (space group and Wyckoff positions) of each structure 
 
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string function_name = XPID + "compare::calculateSymmetries():";
-    if(LDEBUG) {cerr << function_name << " Number of threads=" << num_proc << endl;}
+  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  string function_name = XPID + "XtalFinderCalculator::calculateSymmetries():";
+  stringstream message;
+
+  message << "Calculating the symmetries of the structure(s).";
+  pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
 
 #ifdef AFLOW_COMPARE_MULTITHREADS_ENABLE
-    // THREADED VERISON - START
+  // THREADED VERISON - START
+  if(LDEBUG) {cerr << function_name << " Number of threads=" << num_proc << endl;}
 
-    // Distribute threads via indices
-    uint number_of_structures = structure_containers.size();
-    uint num_threads = aurostd::min(num_proc,number_of_structures); // cannot have more threads than structures
-    //DX20191107 [switching to getThreadDistribution] - vector<uint> start_indices, end_indices;
-    //DX20191107 [switching to getThreadDistribution] - splitTaskIntoThreads(number_of_structures,num_threads,start_indices,end_indices); //DX20190530 - renamed
-    vector<vector<int> > thread_distribution = getThreadDistribution(number_of_structures, num_threads); //DX20191107 
+  // Distribute threads via indices
+  uint number_of_structures = structure_containers.size();
+  uint num_threads = aurostd::min(num_proc,number_of_structures); // cannot have more threads than structures
+  vector<vector<int> > thread_distribution = getThreadDistribution(number_of_structures, num_threads); //DX20191107 
 
-    // Run threads (DX20191108 thread pointer)
-    vector<std::thread*> threads;
-    for(uint n=0; n<num_threads; n++){
-      //DX20191107 [switching to getThreadDistribution] - threads.push_back(std::thread(compare::calculateSpaceGroupsInSetRange,std::ref(structures),std::ref(start_indices[n]),std::ref(end_indices[n])));
-      threads.push_back(new std::thread(&XtalFinderCalculator::calculateSpaceGroups,this,thread_distribution[n][0],thread_distribution[n][1],SG_SETTING_ANRL)); //DX20191107 [switching to getThreadDistribution] 
-    }
-    // Join threads
-    for(uint t=0;t<num_threads;t++){
-      threads[t]->join();
-      delete threads[t];
-    }
-    // THREADED VERISON - END
+  // Run threads (DX20191108 thread pointer)
+  vector<std::thread*> threads;
+  for(uint n=0; n<num_threads; n++){
+    threads.push_back(new std::thread(&XtalFinderCalculator::calculateSpaceGroups,this,thread_distribution[n][0],thread_distribution[n][1],SG_SETTING_ANRL)); //DX20191107 [switching to getThreadDistribution] 
+  }
+  // Join threads
+  for(uint t=0;t<num_threads;t++){
+    threads[t]->join();
+    delete threads[t];
+  }
+  // THREADED VERISON - END
 
 #else
-    // NON-THREADED VERSION - START
-    for(uint i=0; i<structure_containers.size(); i++){
-      structure_containers[i].calculateSymmetry(i,i+1); //hack to do one at a time
-    }   
-    // NON-THREADED VERSION - END
+
+  // NON-THREADED VERSION - START
+  for(uint i=0; i<structure_containers.size(); i++){
+    structure_containers[i].calculateSymmetry(i,i+1); //hack to do one at a time
+  }   
+  // NON-THREADED VERSION - END
 
 #endif
 
+  message << "Symmetries calculated.";
+  pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_COMPLETE_);
+
+}
+
+// ***************************************************************************
+// calculateSymmetries - Calculate Symmetries
+// ***************************************************************************
+void XtalFinderCalculator::setSymmetryPlaceholders(){
+  for(uint i=0;i<structure_containers.size();i++){
+    structure_containers[i].Pearson = "xX";
+    structure_containers[i].space_group = 0;
+    vector<GroupedWyckoffPosition> vGWyckoffPos_tmp;
+    structure_containers[i].grouped_Wyckoff_positions = vGWyckoffPos_tmp;
   }
+}
 
 /*
 // ***************************************************************************
@@ -5179,11 +5202,16 @@ namespace compare{
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string function_name = XPID + "compare::calculateLFAEnvironments():";
-    if(LDEBUG) {cerr << function_name << " Number of threads=" << num_proc << endl;}
+    stringstream message;
+      
+    message << "Calculating the environments of the structure(s).";
+    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
 
 #ifdef AFLOW_COMPARE_MULTITHREADS_ENABLE
     // THREADED VERISON - START
 
+    if(LDEBUG) {cerr << function_name << " Number of threads=" << num_proc << endl;}
+    
     // Distribute threads via indices
     uint number_of_structures = structure_containers.size();
     uint num_threads = aurostd::min(num_proc,number_of_structures); // cannot have more threads than structures
@@ -5208,6 +5236,8 @@ namespace compare{
     // NON-THREADED VERSION - END
 
 #endif
+      message << "Environments calculated.";
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_COMPLETE_);
 
   }
 
@@ -5221,11 +5251,15 @@ namespace compare{
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string function_name = XPID + "XtalFinderCalculator::calculateNearestNeighbors():";
-    if(LDEBUG) {cerr << function_name << " Number of threads=" << num_proc << endl;}
+    stringstream message;
+      
+    message << "Calculating the nearest neighbors of all the structure(s).";
+    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
 
 #ifdef AFLOW_COMPARE_MULTITHREADS_ENABLE
     // THREADED VERISON - START
 
+    if(LDEBUG) {cerr << function_name << " Number of threads=" << num_proc << endl;}
     // Distribute threads via indices
     uint number_of_structures = structure_containers.size();
     uint num_threads = aurostd::min(num_proc,number_of_structures); // cannot have more threads than structures
@@ -5252,6 +5286,8 @@ namespace compare{
     // NON-THREADED VERSION - END
 
 #endif
+      message << "Nearest neighbors information calculated.";
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_COMPLETE_);
 
   }
 
@@ -6217,6 +6253,10 @@ namespace compare{
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string function_name = XPID + "compare::groupStructurePrototypes():";
+    stringstream message; 
+
+    message << "Grouping sets of comparisons.";
+  pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
 
     // variable to store structure sets to compare 
     vector<StructurePrototype> comparison_schemes;
@@ -6283,6 +6323,8 @@ namespace compare{
     // DEBUG  cerr << i << "structures_duplicate_generated.size(): " << comparison_schemes[i].structures_duplicate_generated.size() << endl;
     // DEBUG  cerr << i << "structures_duplicate_source.size(): " << comparison_schemes[i].structures_duplicate_source.size() << endl;
     // DEBUG }
+  message << "Number of comparison groups: " << comparison_schemes.size() << ".";
+  pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
     return comparison_schemes;
   }
 
@@ -7121,8 +7163,6 @@ namespace compare{
     uint i_min=start_indices.first; uint i_max=end_indices.first;
     uint j_min=0; uint j_max=0;
 
-    uint count = 0;
-
     // to prevent nested multi-processes
     uint num_proc_orig = num_proc;
     num_proc=1;
@@ -7211,7 +7251,6 @@ namespace compare{
     // This is only possible for a non-threaded process, otherwise we may
     // run into thread overwriting problems. 
 
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
     string function_name = XPID + "XtalFinderCalculator::runComparisons():";
     stringstream message;
 
@@ -7528,7 +7567,10 @@ namespace compare{
     string function_name = XPID + "XtalFinderCalculator::runComparisonScheme():";
     stringstream message;
 
-    // print initial grouped sets of comparisons
+  message << "Running comparisons ...";
+  pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+  
+  // print initial grouped sets of comparisons
     if(LDEBUG) {
       cerr << function_name << " Number of comparison sets: " << comparison_schemes.size() << endl;
       stringstream ss_test;
@@ -7573,7 +7615,7 @@ namespace compare{
     }
     // ---------------------------------------------------------------------------
     // NON-THREADED VERISON
-    else if (num_comparison_threads=1){
+    else if (num_comparison_threads==1){
       if(LDEBUG) { cerr << function_name << " Non-threaded version." << endl; }
       runComparisons(comparison_schemes,
           same_species, 
@@ -7722,6 +7764,9 @@ namespace compare{
     // append new prototype groupings
     appendStructurePrototypesFAST(comparison_schemes, final_prototypes, comparison_options.flag("COMPARE_STRUCTURE::CLEAN_UNMATCHED"), quiet); //DX20200103
     //DX ORIG 20190303 - final_prototypes.insert(final_prototypes.end(),comparison_schemes.begin(),comparison_schemes.end());
+  
+    message << "Comparisons complete ...";
+    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_COMPLETE_);
     return final_prototypes;
   }
 
@@ -8891,26 +8936,26 @@ namespace compare{
     if(aurostd::toupper(mode) == "TEXT" || aurostd::toupper(mode) == "TXT"){
       output << endl <<"**************************** MAPPING RESULTS ****************************"<<endl;
       if(misfit_info.misfit<=misfit_match){
-        output << endl << "MISFIT:			" << misfit_info.misfit;
+        output << endl << "MISFIT:			 " << misfit_info.misfit;
         output << "  STRUCTURES ARE COMPATIBLE (0<misfit<=" << misfit_match << ")" << endl;
       }
       else if(misfit_info.misfit<=misfit_family){
-        output << endl << "MISFIT:      " << misfit_info.misfit;
+        output << endl << "MISFIT:       " << misfit_info.misfit;
         output << "  STRUCTURES ARE IN THE SAME FAMILY (" << misfit_match << "<misfit<=" << misfit_family << ")" << endl;
       }
       else {
-        output << endl <<"MISFIT:			" << misfit_info.misfit;
+        output << endl <<"MISFIT:			 " << misfit_info.misfit;
         output << "  STRUCTURES ARE INCOMPATIBLE (misfit>" << misfit_family << ", or no match found)" << endl;
       }
-      output << "----------------------------------------------------"<<endl;
-      output << "Figure of Deviation:    " << misfit_info.lattice_deviation << endl;
-      output << "Figure of Displacement: " << misfit_info.coordinate_displacement << endl;
-      output << "Figure of Failure:      " << misfit_info.failure << endl;
+      output << "-------------------------------------------------------------------------"<<endl;
+      output << "Lattice Deviation:       " << misfit_info.lattice_deviation << endl;
+      output << "Coordinate Displacement: " << misfit_info.coordinate_displacement << endl;
+      output << "Figure of Failure:       " << misfit_info.failure << endl;
       if(misfit_info.is_magnetic_misfit){
         output << "Figure of Magnetic Displacement:	" << misfit_info.magnetic_displacement << endl;
         output << "Figure of Magnetic Failure:	    " << misfit_info.magnetic_failure << endl;
       }
-      output << "----------------------------------------------------"<<endl;
+      output << "-------------------------------------------------------------------------"<<endl;
       output << "STRUCTURE TRANSFORMATION (test structure -> reference structure)" << endl;
       output << "Volume scaling factor:" << endl;
       output << misfit_info.rescale_factor << endl;
@@ -8922,7 +8967,6 @@ namespace compare{
       output << "Origin Shift:" << endl;
       output << misfit_info.origin_shift << endl;
       
-
       // apply transformations
       xstructure xstr_transformed = TransformStructure(xstr_mapped,
           misfit_info.basis_transformation,
@@ -8932,13 +8976,13 @@ namespace compare{
       // rescale
       xstr_transformed.InflateVolume(misfit_info.rescale_factor);
 
-      output << "----------------------------------------------------"<<endl;
+      output << "-------------------------------------------------------------------------"<<endl;
       output << printAtomMappings(misfit_info,xstr_reference,xstr_transformed);
       output << printUnmatchedAtoms(misfit_info,xstr_reference,xstr_transformed);
-      output << "----------------------------------------------------"<<endl;
+      output << "-------------------------------------------------------------------------"<<endl;
       output << "FINAL - REFERENCE STRUCTURE: " << endl;	
       output << xstr_reference << endl;
-      output << "----------------------------------------------------"<<endl;
+      output << "-------------------------------------------------------------------------"<<endl;
       output << "FINAL - MAPPED STRUCTURE: " << endl;
       output << xstr_transformed;
       //output << endl << "*********************  THE END - FINE  **********************" << endl << endl;
@@ -11557,13 +11601,27 @@ namespace compare{
     // This allows us to call them directly.
     // Lastly, the translational term, specific of each mapping, is printed.
 
-    stringstream output;
-    output << "Indices      Types        Distances                                 Mapping vector"<<endl;
+    stringstream output, index_map, element_map;
+
+    output << std::setiosflags(std::ios::fixed | std::ios::left);
+    
+    // header line
+    output << std::setw(15) << "Indices"
+      << std::setw(15) << "Types"
+      << std::setw(25) << "Distances (Angst.)"
+      << "Mapping vector (Cart.)" << endl;
+
+    // content
     for(uint i=0;i<misfit_info.atom_map.size();i++){
-      output << i<<"-"<<misfit_info.atom_map[i]<<"    ";
-      output << xstr1.atoms[i].name<<"-"<<xstr2.atoms[misfit_info.atom_map[i]].name<<"    ";
-      output << misfit_info.distances_mapped[i]<<"    ";
-      output << misfit_info.vectors_mapped[i] << endl;
+      index_map.str(""); element_map.str("");
+
+      index_map << i << "-" << misfit_info.atom_map[i];
+      element_map << xstr1.atoms[i].name << "-" << xstr2.atoms[misfit_info.atom_map[i]].name;
+      
+      output << std::setw(15) << index_map.str()
+        << std::setw(15) << element_map.str()
+        << std::setw(25) << misfit_info.distances_mapped[i]
+        << misfit_info.vectors_mapped[i] << endl;
     }
     return output.str();
   }
@@ -11599,7 +11657,7 @@ namespace compare{
     uint i=0, j=0;
     bool is_mapped = false;
 
-    output <<"----------------------------------------------------"<<endl;
+    output << "-------------------------------------------------------------------------"<<endl;
     output << "Missing Atoms in Reference structure:"<< endl;
     for(i=0;i<xstr1.atoms.size();i++){
       is_mapped=false;
@@ -12937,7 +12995,7 @@ namespace compare{
       }
 			// ---------------------------------------------------------------------------
       // CALCULATED LATER calculate attributes of structure 2 (volume, lattice parameters, nearest neighbor distances, etc.)
-      vector<double> all_nn2;
+      //vector<double> all_nn2;
       //if(xstr_match.nearest_neighbor_distances.size()==0){
       //  all_nn2 = compare::computeNearestNeighbors(xstr_match.structure); // nearest neighbor distances (invariant of origin shifts) 
       //  xstr_match.nearest_neighbor_distances = all_nn2;
@@ -13006,7 +13064,6 @@ namespace compare{
                       std::ref(xstr1_for_thread[n]),
                       std::ref(all_nn1),
                       std::ref(xstr2), //DX20201208
-                      std::ref(all_nn2),
                       std::ref(lfa_str2),
                       std::ref(lattices), //DX20201208
                       std::ref(vstrs_matched),
@@ -14002,7 +14059,6 @@ namespace compare{
       const xstructure& xstr1,
       const vector<double>& all_nn1,
       xstructure& xstr2,
-      const vector<double>& all_nn2,
       const string& lfa,
       vector<xmatrix<double> >& lattices,
       vector<structure_misfit>& vstrs_matched,
@@ -14739,7 +14795,6 @@ namespace compare{
     //DX20200422 - tol_vol used to be 0.1; now if we allow for volume scaling
     // then we make it larger to find matches in the same family misfit range (0.1<=misfit<=0.2)
     double tol_vol=0.1;
-    double q1_vol=det(q1); // volume //DX20201130
     double abs_det_q1=abs(det(q1)); // volume //DX20201130
     if(scale_volume){ tol_vol=(1.0/3.0); }
     double det_tol=tol_vol*abs_det_q1;
@@ -15275,7 +15330,7 @@ namespace compare{
 }
 
 // ***************************************************************************
-// getTransformedStructures()
+// compare::getTransformedStructures()
 // ***************************************************************************
 namespace compare{
   vector<xstructure> getTransformedStructures(
@@ -15283,8 +15338,8 @@ namespace compare{
       const vector<xmatrix<double> >& basis_transformations,
       const vector<xmatrix<double> >& rotations){
 
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string function_name = XPID + "compare::getTransformedStructures():";
+    //bool LDEBUG=(FALSE || XHOST.DEBUG);
+    //string function_name = XPID + "compare::getTransformedStructures():";
 
     vector<xstructure> vxstrs_transformed;
     xstructure xstr_transformed_tmp;
