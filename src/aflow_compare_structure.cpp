@@ -490,13 +490,13 @@ namespace compare{
       if(format=="text"){ //DX20190506
         ss_output << "Misfit values: " << endl; 
         stringstream ss_text;
-        compare::printResults(ss_text, same_species, final_permutations, "text");
+        printResults(ss_text, same_species, final_permutations, "text");
         ss_output << ss_text.str();
       }
       else if(format=="json"){ //DX20190506
         ss_output.str(""); // need to clear content abbreviated content from above
         stringstream ss_json;
-        compare::printResults(ss_json, same_species, final_permutations, "json");
+        printResults(ss_json, same_species, final_permutations, "json");
         ss_output << ss_json.str() << endl;
       }
     }

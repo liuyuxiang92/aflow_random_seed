@@ -16443,7 +16443,7 @@ vector<xvector<double> > GetBasisTransformationInternalTranslations(const xmatri
   // ---------------------------------------------------------------------------
   // check if the basis transformation makes the cell larger and find
   // corresponding internal translations
-  if(cell_volume_change-1.0>_ZERO_TOL_){
+  if(cell_volume_change-1.0>_AUROSTD_XSCALAR_TOLERANCE_INTEGER_){
   
     if(LDEBUG){ cerr << function_name << " cell size increases. Finding internal translations." << endl; }
 
@@ -16466,11 +16466,11 @@ vector<xvector<double> > GetBasisTransformationInternalTranslations(const xmatri
     // we need to check each vector and component (since the transformation
     // may not be unitary)
     xvector<uint> dims; 
-    for(int i=1;i<=lattice_shrink.ucols;i++){
+    for(int i=1;i<=lattice_shrink.rows;i++){
       bool all_components=false, x_component=false, y_component=false, z_component=false;
       xvector<double> tmp_orig = lattice_shrink(i);
       xvector<double> tmp = tmp_orig;
-      uint count_limit = 100;
+      uint count_limit = 50; // no more than count_limit internal translations in one direction
       uint count = 0;
       while(!all_components){
         count++;
@@ -16626,7 +16626,8 @@ void xstructure::ChangeBasis(const xmatrix<double>& transformation_matrix) {
 
   // ---------------------------------------------------------------------------
   // reduce the cell: remove any duplicate atoms
-  if(aurostd::abs(aurostd::det(transformation_matrix))-1.0 < -_ZERO_TOL_){
+  // use _AUROSTD_XSCALAR_TOLERANCE_IDENTITY_ to be consistent with 
+  if(aurostd::abs(aurostd::det(transformation_matrix))-1.0 < -_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_){
     if(LDEBUG){
       cerr << function_name << " removing duplicate atoms (cell has been reduced)." << endl;
     }
@@ -16675,7 +16676,7 @@ void xstructure::ChangeBasis(const xmatrix<double>& transformation_matrix) {
   }
   // ---------------------------------------------------------------------------
   // enlarge the cell: update the atom count information
-  else if(aurostd::abs(aurostd::det(transformation_matrix))-1.0 > _ZERO_TOL_){
+  else if(aurostd::abs(aurostd::det(transformation_matrix))-1.0 > _AUROSTD_XSCALAR_TOLERANCE_INTEGER_){
     if(LDEBUG){
       cerr << function_name << " cell size has increased (fixing atom counts)." << endl;
     }

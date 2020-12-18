@@ -471,7 +471,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   }
   
   if(vpflow.flag("COMPARE_PERMUTATION")) {
-    vpflow.flag("COMPARE_PERMUTATION::PRINT",aurostd::args2flag(argv,cmds,"--print"));
+    vpflow.flag("COMPARE_PERMUTATION::PRINT",aurostd::args2flag(argv,cmds,"--print|--misfit|--print_misfit"));
   }
     
   if(vpflow.flag("COMPARE2DATABASE")) {

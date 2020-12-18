@@ -28,6 +28,14 @@
 #warning "The multithread parts of AFLOW-COMPARE will be not included, since they need gcc 4.4 and higher (C++0x support)."
 #endif
 
+struct removeByIndex
+{
+  removeByIndex(const vector<uint>& a_indices2remove) : indices2remove(a_indices2remove) {}
+  vector<uint> indices2remove;
+  bool operator()(const uint index){
+    return aurostd::WithinList(indices2remove, index);
+  }
+};
 
 // ***************************************************************************
 // XtalFinderCalculator::getOptions() 
@@ -1529,8 +1537,11 @@ bool StructurePrototype::removeNonDuplicate(uint& index){
   
 
   //NEW
+  _structure_representative* tmp = structures_duplicate_struct[index];
+  cerr << "before removing: " << tmp << endl;
   structures_duplicate_struct.erase(structures_duplicate_struct.begin()+index);
   structure_misfits_duplicate.erase(structure_misfits_duplicate.begin()+index); //DX20191217
+  cerr << "after removing: " << tmp << endl;
   
   //ORIG 
 /*
@@ -3465,7 +3476,8 @@ namespace compare{
         for(uint j=0;j<grouped_Wyckoff_positions.size();j++){
           grouped_Wyckoff_positions[j].element=names[all_indices[i][j]];
         }
-        structure_containers.back().grouped_Wyckoff_positions;
+        structure_containers.back().grouped_Wyckoff_positions = grouped_Wyckoff_positions;
+        structure_containers.back().space_group = structure.space_group;
       }
       
       // copy over neighbor distances (it will be the same as the parent structure)
@@ -7040,8 +7052,13 @@ namespace compare{
     uint i_min=start_indices.first; uint i_max=end_indices.first;
     uint j_min=0; uint j_max=0;
 
+    uint count = 0;
+
+    // to prevent nested multi-processes
+    uint num_proc_orig = num_proc;
+    num_proc=1;
+
     for(uint i=i_min; i<=i_max; i++){
-      cerr << "i: " << i << endl;
       //xstructure structure_representative;
       _structure_representative structure_rep_tmp = *comparison_schemes[i].structure_representative_struct;
 
@@ -7055,7 +7072,6 @@ namespace compare{
       else {j_min=0; j_max=comparison_schemes[i].structures_duplicate_struct.size();} //-1 since in loop: j<=j_max
 
       for(uint j=j_min; j<j_max; j++){
-        cerr << "j: " << j << endl;
         // get representative structure 
         //cerr << "generated?: " << comparison_schemes[i].structure_representative_struct->is_structure_generated << endl;
         if(!structure_rep_tmp.is_structure_generated){
@@ -7087,6 +7103,7 @@ namespace compare{
         // call the main comparison function
         structure_misfit final_misfit_info = compare::initialize_misfit_struct(); //DX20191218
         if(LDEBUG) { cerr << function_name << " Comparing " << structure_rep_tmp.name << " and " << structure_dup_tmp.name <<  endl; }
+        { cerr << function_name << " Comparing " << structure_rep_tmp.name << " and " << structure_dup_tmp.name <<  endl; }
         //compare::aflowCompareStructure(1, structure_representative, //num_proc -> 1 for threads (not sure how it behaves otherwise)
         //    duplicate_structure,
         //    same_species, scale_volume, optimize_match, final_misfit, final_misfit_info, tmp_oss); //DX20191218 - added misfit_info
@@ -7096,17 +7113,18 @@ namespace compare{
             same_species, 
             scale_volume, 
             optimize_match); //DX20200103 - condensed booleans to xoptions
-        cerr << function_name << " Comparing " << structure_rep_tmp.name << " and " << structure_dup_tmp.name << " is done" <<  endl;
+        { cerr << function_name << " Comparing " << structure_rep_tmp.name << " and " << structure_dup_tmp.name <<  " done" <<  endl; }
+        { cerr << function_name << " Comparison complete, misfit = " << final_misfit_info.misfit << "." << endl; }
 
         // store the figure of misfit
         if(LDEBUG) { cerr << function_name << " Comparison complete, misfit = " << final_misfit_info.misfit << "." << endl; }
-        cerr << function_name << " Comparison complete, misfit = " << final_misfit_info.misfit << "." << endl;
         comparison_schemes[i].structure_misfits_duplicate[j]=final_misfit_info; //DX20191218
-        cerr << "STORED MISFIT" << endl;
         //NO LONGER STORE if(store_comparison_logs){comparison_schemes[i].duplicate_comparison_logs.push_back(tmp_oss.str());} //DX20190506
       }
     }
-    cerr << "DONE" << endl;
+    
+    // reset num process
+    num_proc=num_proc_orig;
   }
 
 // ***************************************************************************
@@ -7505,7 +7523,7 @@ namespace compare{
 #endif
 
     // count the number of mismatches (i.e. mis > 0.1)
-    int num_mismatches_orig=compare::numberMismatches(comparison_schemes);
+    int num_mismatches_orig=numberMismatches(comparison_schemes);
     int num_mismatches=num_mismatches_orig;
 
     //DX20190504 - added clean unmatched option - START
@@ -7537,36 +7555,32 @@ namespace compare{
 
     // regroup comparisons based on misfit value
     if(num_mismatches==0 && !comparison_options.flag("COMPARISON_OPTIONS::SINGLE_COMPARISON_ROUND")){
-      appendStructurePrototypes(comparison_schemes,
+      appendStructurePrototypesFAST(comparison_schemes,
           final_prototypes,
           comparison_options.flag("COMPARISON_OPTIONS::CLEAN_UNMATCHED"),
           quiet); //DX20200103
     }
-    cerr << "BEFORE WHILE LOOP" << endl; 
+
     // Loop: continue comparison until all strucutures are matched or all comparisons schemes exhaused
     while(num_mismatches!=0){
-      cerr << "REGROUP AGAIN" << endl; 
-      for(uint i=0;i<comparison_schemes.size();i++){ number_of_comparisons += comparison_schemes[i].numberOfComparisons(); }
-      cerr << "number_of_comparisons: " << number_of_comparisons << endl;
+      //for(uint i=0;i<comparison_schemes.size();i++){ number_of_comparisons += comparison_schemes[i].numberOfComparisons(); }
+      //cerr << "number_of_comparisons: " << number_of_comparisons << endl;
       // regroup comparisons based on misfit value
-      appendStructurePrototypes(comparison_schemes, final_prototypes, comparison_options.flag("COMPARISON_OPTIONS::CLEAN_UNMATCHED"), quiet); //DX20200103
-      cerr << "DONE REGROUP" << endl; 
-      for(uint i=0;i<comparison_schemes.size();i++){ number_of_comparisons += comparison_schemes[i].numberOfComparisons(); }
-      cerr << "number_of_comparisons: " << number_of_comparisons << endl;
+      appendStructurePrototypesFAST(comparison_schemes, final_prototypes, comparison_options.flag("COMPARISON_OPTIONS::CLEAN_UNMATCHED"), quiet); //DX20200103
+      //for(uint i=0;i<comparison_schemes.size();i++){ number_of_comparisons += comparison_schemes[i].numberOfComparisons(); }
+      //cerr << "number_of_comparisons: " << number_of_comparisons << endl;
 
       // return if only one round of comparison is requested
       if(comparison_options.flag("COMPARISON_OPTIONS::SINGLE_COMPARISON_ROUND")){return final_prototypes;}
 
-      cerr << "ICSD RESORTING" << endl; 
       // reorder structures so minimum ICSD is the representative structure
       if(comparison_options.flag("COMPARISON_OPTIONS::ICSD_COMPARISON")){ representativePrototypeForICSDRunsNEW(comparison_schemes); }
-      cerr << "DONE ICSD RESORTING" << endl; 
 
       // split into threads
       number_of_comparisons=0;
       for(uint i=0;i<comparison_schemes.size();i++){ number_of_comparisons += comparison_schemes[i].numberOfComparisons(); }
       cerr << "number_of_comparisons: " << number_of_comparisons << endl;
-      num_comparison_threads = aurostd::min(num_proc,number_of_comparisons);
+      num_comparison_threads = 1; //DX FORCE FOR TESTING aurostd::min(num_proc,number_of_comparisons);
 
       if(number_of_comparisons>0){
         if(!quiet){
@@ -7582,9 +7596,7 @@ namespace compare{
         start_indices.clear(); end_indices.clear();
         splitComparisonIntoThreads(comparison_schemes, num_comparison_threads, start_indices, end_indices);
         threads.clear();
-        for(uint n=0; n<num_comparison_threads; n++){
-          cerr << "start_indices: " << start_indices[n].first << " " << start_indices[n].second << " --> " << end_indices[n].first << " " << end_indices[n].second << endl;
-        }
+
         // run threads
         for(uint n=0; n<num_comparison_threads; n++){
           threads.push_back(new std::thread(&XtalFinderCalculator::runComparisonThreads,
@@ -7596,16 +7608,11 @@ namespace compare{
                 comparison_options.flag("COMPARISON_OPTIONS::SCALE_VOLUME"),
                 comparison_options.flag("COMPARISON_OPTIONS::OPTIMIZE_MATCH")));
         }        
-        cerr << "DONE THREADS [2]" << endl;
         // join threads
-          cerr << "t.size(): " << threads.size() << endl;
         for(uint t=0;t<threads.size();t++){
-          cerr << "t/nthreads=" << t << "/" << threads.size() << endl;
           threads[t]->join();
           delete threads[t];
-          cerr << "t=" << t << " deleted" << endl;
         }
-        cerr << "DONE THREADS JOIN [2]" << endl;
         // THREADED VERISON - END
 #else
         //SINGLE THREAD - START
@@ -7622,10 +7629,9 @@ namespace compare{
         //SINGLE THREAD - END
 #endif
       }
-      cerr << "DONE RUNNING AGAIN" << endl;
       // update number of mismatches
       num_mismatches_orig=num_mismatches;
-      num_mismatches=compare::numberMismatches(comparison_schemes);
+      num_mismatches=numberMismatches(comparison_schemes);
 
       if(num_mismatches > 0 && !quiet){
         message << "Number of unmatched structures: " << num_mismatches << ". Continuing comparisons ...";
@@ -7643,7 +7649,7 @@ namespace compare{
     // end of while loop
 
     // append new prototype groupings
-    appendStructurePrototypes(comparison_schemes, final_prototypes, comparison_options.flag("COMPARE_STRUCTURE::CLEAN_UNMATCHED"), quiet); //DX20200103
+    appendStructurePrototypesFAST(comparison_schemes, final_prototypes, comparison_options.flag("COMPARE_STRUCTURE::CLEAN_UNMATCHED"), quiet); //DX20200103
     //DX ORIG 20190303 - final_prototypes.insert(final_prototypes.end(),comparison_schemes.begin(),comparison_schemes.end());
     return final_prototypes;
   }
@@ -7967,6 +7973,26 @@ namespace compare{
   }
 }
 
+
+// ***************************************************************************
+// XtalFinderCalculator::numberMismaches - Count the number of non-matches
+// ***************************************************************************
+  int XtalFinderCalculator::numberMismatches(const vector<StructurePrototype>& comparison_schemes){
+
+    // Count the number of comparisons that have a misfit greater than 0.1
+    // i.e., not matching
+
+    int num_mismatches=0;
+    for(uint i=0; i<comparison_schemes.size(); i++){
+      for(uint j=0; j<comparison_schemes[i].structure_misfits_duplicate.size(); j++){
+        if(comparison_schemes[i].structure_misfits_duplicate[j].misfit > misfit_match || aurostd::isequal(comparison_schemes[i].structure_misfits_duplicate[j].misfit,AUROSTD_MAX_DOUBLE,1e-6)){
+          num_mismatches+=1;
+        }
+      }
+    }
+    return num_mismatches;
+  }
+
 // ***************************************************************************
 // appendStructurePrototypes - Create new structure prototypes after comparisons
 // ***************************************************************************
@@ -8170,11 +8196,84 @@ namespace compare{
     }
     // Store newly generated schemes (not compared yet) into comparison_schemes
     comparison_schemes=tmp_list;
-      cerr << function_name << " Number of comparion sets: " << comparison_schemes.size() << endl;
-      stringstream ss_test;
-      compare::printResults(ss_test, true, comparison_schemes);
-      cerr << "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
-      cerr << ss_test.str() << endl;
+  }
+
+// ***************************************************************************
+// appendStructurePrototypes - Create new structure prototypes after comparisons
+// ***************************************************************************
+  void XtalFinderCalculator::appendStructurePrototypesFAST(
+      vector<StructurePrototype>& comparison_schemes,
+      vector<StructurePrototype>& final_prototypes,
+      bool clean_unmatched, //DX20190506
+      bool quiet){
+
+    // This cleans the StrucuturePrototype objects by removing all the mismatches.
+    // Then, it takes the mismatches and makes them into new StructurePrototype objects
+    // to be compared.
+
+    //LDEBUG stringstream ss_test;
+    //LDEBUG compare::printResults(ss_test, true, comparison_schemes);
+    //LDEBUG cerr << ss_test.str() << endl;
+
+    ostringstream oss;
+    stringstream message;
+    string function_name = XPID + "XtalFinderCalculator::appendStructurePrototypes():";
+    
+    uint number_of_comparisons = comparison_schemes.size();
+
+    vector<StructurePrototype> tmp_list;
+    for(uint i=0; i<number_of_comparisons; i++){
+      bool first_mismatch=true;
+      for(uint j=0; j<comparison_schemes[i].structure_misfits_duplicate.size(); j++){
+        if(comparison_schemes[i].structure_misfits_duplicate[j].misfit > DEFAULT_XTALFINDER_MISFIT_MATCH){
+          // First, store any family prototype information
+          if(comparison_schemes[i].structure_misfits_duplicate[j].misfit <= DEFAULT_XTALFINDER_MISFIT_FAMILY){
+            addToStructureFamily(comparison_schemes[i],j); //DX20190814 - consolidated below into single function
+          }
+          // Take first mismatch and make as the representative structure in the new object
+          if(first_mismatch==true){
+            StructurePrototype str_proto_tmp;
+            str_proto_tmp.copyPrototypeInformation(comparison_schemes[i]);
+            addToStructureRepresentative(str_proto_tmp, comparison_schemes[i].structures_duplicate_struct[j]);
+            tmp_list.push_back(str_proto_tmp);
+            if(clean_unmatched){ comparison_schemes[i].removeNonDuplicate(j); j--; } //DX20190504 - put in if-statement
+            first_mismatch=false;
+          }
+          // If not the first mismatch, add as a proto structure in the new object
+          else if(first_mismatch==false){
+            tmp_list.back().copyDuplicate(comparison_schemes[i],j);
+            if(clean_unmatched){ comparison_schemes[i].removeNonDuplicate(j); j--; } //DX20190504 - put in if-statement
+          }
+        }
+      }
+      
+      // if not quiet, print the comparison results to the screen 
+      // (useful for long comparison times or if the program terminates early)
+      if(!quiet){
+        message << "Identified unique prototype: " << endl;
+        message << "   prototype=" << comparison_schemes[i].structure_representative_struct->name << endl;
+        if(comparison_schemes[i].structures_duplicate_struct.size()==0){
+          message << "   No duplicates. " << endl;
+        }
+        else {
+          message << "   " << setw(80) << std::left << "List of duplicates"
+            << setw(15) << std::left << "misfit value" << endl;
+          message << "   " << setw(80) << std::left 
+            << "-----------------------------------------------------------------------------------------------" << endl;
+          for(uint d=0;d<comparison_schemes[i].structures_duplicate_struct.size();d++){
+            message << "   " << setw(80) << std::left << comparison_schemes[i].structures_duplicate_struct[d]->name
+              << setw(15) << std::left << comparison_schemes[i].structure_misfits_duplicate[d].misfit << endl;
+          }
+        }
+        pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_RAW_); //DX+CO20201119
+      }
+
+      // Store finished (already compared) schemes in final_prototypes
+      final_prototypes.push_back(comparison_schemes[i]);
+    }
+    
+    // Store newly generated schemes (not compared yet) into comparison_schemes
+    comparison_schemes=tmp_list;
   }
 
 // ***************************************************************************
@@ -12881,7 +12980,11 @@ namespace compare{
 
               // ---------------------------------------------------------------------------
               // quick return if testing only one origin //DX20200715
-              if(!optimize_match && aurostd::isequal(match_info.misfit,AUROSTD_MAX_DOUBLE) && same_species){ test_one_origin_only=true;} //DX20201102 - need type_match==2 (otherwise we don't check different types)
+              //if(!optimize_match && aurostd::isequal(match_info.misfit,AUROSTD_MAX_DOUBLE) && same_species){ test_one_origin_only=true;} //DX20201102 - need type_match==2 (otherwise we don't check different types)
+              if(!optimize_match && aurostd::isequal(match_info.misfit,AUROSTD_MAX_DOUBLE)){
+                if(same_species){ test_one_origin_only=true;} //DX20190809 - need type match here; otherwise we may miss structure-type matches
+                else if(!same_species){ break; } //DX20201217 - move on to next LFA
+              }
               if(test_one_origin_only){
                 if(LDEBUG){cerr << function_name << " No mapping found. Searched only one origin. Terminating search early." << endl;}
                 return;
@@ -12892,7 +12995,11 @@ namespace compare{
           // ---------------------------------------------------------------------------
           // quick return if testing only one LFA set
           //DX20190702 - can i do this: if(!optimize_match && minMis==1){ test_one_lfa_only=true;}
-          if(!optimize_match && aurostd::isequal(match_info.misfit,AUROSTD_MAX_DOUBLE) && same_species){ test_one_lfa_only=true;} //DX20190809 - need type match here; otherwise we may miss structure-type matches
+          //if(!optimize_match && aurostd::isequal(match_info.misfit,AUROSTD_MAX_DOUBLE) && same_species){ test_one_lfa_only=true;} //DX20190809 - need type match here; otherwise we may miss structure-type matches
+          if(!optimize_match && aurostd::isequal(match_info.misfit,AUROSTD_MAX_DOUBLE)){
+            if(same_species){ test_one_lfa_only=true;} //DX20190809 - need type match here; otherwise we may miss structure-type matches
+            else if(!same_species){ break; } //DX20201217 - move on to next LFA
+          }
           if(test_one_lfa_only){
             if(LDEBUG){cerr << function_name << " No match found. Searched only one LFA set. Terminating search early." << endl;}
             return;
@@ -13816,7 +13923,7 @@ namespace compare{
       
       xstr2_tmp = xstr2;
       all_nn2_test.clear();
-
+      
       //cerr << "lattice dev: " << vstrs_matched[p].lattice_deviation << endl;
 
       //auto t1 = std::chrono::high_resolution_clock::now();
@@ -14872,7 +14979,6 @@ namespace compare{
           cerr << function_name << " metric_tensor_candidate: " << metric_tensor_candidate << endl;
 
       xmatrix<double> basis_transformation = GetBasisTransformation(lattice_original,candidate_lattices[i]);
-      cerr << "det: " << aurostd::det(basis_transformation) << endl;
       if(!aurostd::identical(metric_tensor_original,metric_tensor_candidate) || aurostd::det(basis_transformation)<0.0){
         // moved up xmatrix<double> basis_transformation = GetBasisTransformation(lattice_original,candidate_lattices[i]);
         
@@ -14971,9 +15077,20 @@ namespace compare{
       // check for negative determinant of basis transformations (indicates reflection)
       xmatrix<double> metric_tensor_candidate = MetricTensor(candidate_lattice);
 
-      basis_transformation = GetBasisTransformation(lattice_original,candidate_lattice);
-      if(!aurostd::identical(metric_tensor_original,metric_tensor_candidate) || aurostd::det(basis_transformation)<0.0){
+      xmatrix<double> basis_transformation_tmp = GetBasisTransformation(lattice_original,candidate_lattice);
+      if(!aurostd::identical(metric_tensor_original,metric_tensor_candidate) || aurostd::det(basis_transformation_tmp)<0.0){
         // moved up xmatrix<double> basis_transformation = GetBasisTransformation(lattice_original,candidate_lattices[i]);
+          
+        // if the volume change is not an integer, the basis transformation may include a deformation
+        // component which must be removed
+        if(!aurostd::isinteger(aurostd::det(basis_transformation_tmp))){
+          PolarDecomposition(basis_transformation_tmp, basis_transformation, deformation);
+        }
+        else{
+          basis_transformation = basis_transformation_tmp;
+        }
+
+        //exit(1);
         
         // ---------------------------------------------------------------------------
         // convert to new lattice 

@@ -377,6 +377,14 @@ class XtalFinderCalculator : public xStream {
       vector<StructurePrototype>& final_prototypes,
       bool clean_unmatched, //DX20190506
       bool quiet);
+    void appendStructurePrototypesFAST(
+      vector<StructurePrototype>& comparison_schemes,
+      vector<StructurePrototype>& final_prototypes,
+      bool clean_unmatched, //DX20190506
+      bool quiet);
+  
+    // count unmatched
+    int numberMismatches(const vector<StructurePrototype>& comparison_schemes);
   
     // threads
     bool splitComparisonIntoThreads(vector<StructurePrototype>& comparison_schemes, uint& num_proc,
