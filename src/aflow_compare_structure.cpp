@@ -98,10 +98,10 @@
 // ***************************************************************************
 
 // ***************************************************************************
-// compare::comparePermutations()
+// compare::compareAtomDecorations()
 // ***************************************************************************
 namespace compare {
-  string comparePermutations(istream& input, const aurostd::xoption& vpflow){
+  string compareAtomDecorations(istream& input, const aurostd::xoption& vpflow){
     ostringstream results_ss;
     ostringstream oss;
     ofstream FileMESSAGE; //DX20190319 - added FileMESSAGE
@@ -113,9 +113,9 @@ namespace compare {
     // FLAG: usage
     if(vpflow.flag("COMPARE_PERMUTATION::USAGE")) {
       //[CO20200624 - OBSOLETE]stringstream ss_usage;
-      //[CO20200624 - OBSOLETE]init::ErrorOption(ss_usage,vpflow.getattachedscheme("COMPARE_PERMUTATION"),"compare::comparePermutations()",aurostd::liststring2string(usage,options));
+      //[CO20200624 - OBSOLETE]init::ErrorOption(ss_usage,vpflow.getattachedscheme("COMPARE_PERMUTATION"),"compare::compareAtomDecorations()",aurostd::liststring2string(usage,options));
       //[CO20200624 - OBSOLETE]return ss_usage.str();
-      init::ErrorOption(vpflow.getattachedscheme("COMPARE_PERMUTATION"),"compare::comparePermutations()",aurostd::liststring2string(usage,options));
+      init::ErrorOption(vpflow.getattachedscheme("COMPARE_PERMUTATION"),"compare::compareAtomDecorations()",aurostd::liststring2string(usage,options));
     }
     
     // ---------------------------------------------------------------------------
@@ -272,17 +272,15 @@ vector<string> XtalFinderCalculator::getUniquePermutations(xstructure& xstr, uin
   // ---------------------------------------------------------------------------
   // load input structure
   stringstream xstr_ss; xstr_ss << xstr;
-  //addStructureToContainer(xstr, "input geometry", xstr_ss.str(), 0, same_species);
-  addStructureToContainer(xstr, "input geometry", xstr_ss.str(), 0, false); // false: so we can find decorations on systems without atoms
+  addStructure2container(xstr, "input geometry", xstr_ss.str(), 0, false); // false: so we can find decorations on systems without atoms
   StructurePrototype structure;
   uint container_index = 0;
-  addToStructureRepresentative(structure,container_index);
-
+  setStructureAsRepresentative(structure,container_index);
 
   // ---------------------------------------------------------------------------
   // get the unique atom decorations for the structure
   XtalFinderCalculator xtal_finder_permutations;
-  vector<StructurePrototype> final_permutations = xtal_finder_permutations.comparePermutations(structure,num_proc,optimize_match); //DX20190319 - added FileMESSAGE
+  vector<StructurePrototype> final_permutations = xtal_finder_permutations.compareAtomDecorations(structure,num_proc,optimize_match); //DX20190319 - added FileMESSAGE
 
   // ---------------------------------------------------------------------------
   // print results
@@ -877,7 +875,7 @@ vector<StructurePrototype> XtalFinderCalculator::compare2prototypes(
   // ---------------------------------------------------------------------------
   // add structure to container
   stringstream ss_input; ss_input << xstr;
-  addStructureToContainer(xstr, "input geometry", ss_input.str(), 0, false);
+  addStructure2container(xstr, "input geometry", ss_input.str(), 0, false);
 
   vector<StructurePrototype> all_structures;
 
@@ -980,7 +978,7 @@ vector<StructurePrototype> XtalFinderCalculator::compare2prototypes(
         cerr << "Finding unique atom decorations for " << final_prototypes[i].structure_representative_struct->name << ".";
       }        
       XtalFinderCalculator xtal_finder_permutations;
-      vector<StructurePrototype> final_permutations = xtal_finder_permutations.comparePermutations(final_prototypes[i],num_proc,comparison_options.flag("COMPARISON_OPTIONS::OPTIMIZE_MATCH"));
+      vector<StructurePrototype> final_permutations = xtal_finder_permutations.compareAtomDecorations(final_prototypes[i],num_proc,comparison_options.flag("COMPARISON_OPTIONS::OPTIMIZE_MATCH"));
       for(uint j=0;j<final_permutations.size();j++){
         vector<string> tmp_permutations; 
         tmp_permutations.push_back(final_permutations[j].structure_representative_struct->name); //push back representative permutation
@@ -1217,7 +1215,7 @@ vector<StructurePrototype> XtalFinderCalculator::compare2database(
   // ---------------------------------------------------------------------------
   // add structure to container
   stringstream ss_input; ss_input << xstr;
-  addStructureToContainer(xstr, "input geometry", ss_input.str(), 0, false);
+  addStructure2container(xstr, "input geometry", ss_input.str(), 0, false);
     
   // ---------------------------------------------------------------------------
   // symmetry
@@ -1399,7 +1397,7 @@ vector<StructurePrototype> XtalFinderCalculator::compare2database(
         deque<string> deque_species; for(uint j=0;j<species.size();j++){deque_species.push_back(species[j]);}
         entry.vstr[structure_index].SetSpecies(deque_species);
         string str_path = entry.getPathAURL(*p_FileMESSAGE,*p_oss,false);
-        addStructureToContainer(entry.vstr[structure_index], str_path, "aurl", relaxation_step, same_species);
+        addStructure2container(entry.vstr[structure_index], str_path, "aurl", relaxation_step, same_species);
         // store any properties 
         for(uint l=0;l<properties_response[i].size();l++){
           bool property_requested = false;
@@ -1879,7 +1877,7 @@ namespace compare {
           deque<string> deque_species; for(uint j=0;j<species.size();j++){deque_species.push_back(species[j]);}
           entry.vstr[structure_index].SetSpecies(deque_species);
           string str_path = entry.getPathAURL(FileMESSAGE,logstream,false);
-          xtal_finder.addStructureToContainer(entry.vstr[structure_index], str_path, "aurl", relaxation_step, same_species);
+          xtal_finder.addStructure2container(entry.vstr[structure_index], str_path, "aurl", relaxation_step, same_species);
           // store any properties 
           for(uint l=0;l<properties_response[i].size();l++){
             bool property_requested = false;
@@ -2469,7 +2467,7 @@ vector<StructurePrototype> XtalFinderCalculator::compareMultipleStructures(
           }
         }
         XtalFinderCalculator xtal_finder_permutations;
-        vector<StructurePrototype> final_permutations = xtal_finder_permutations.comparePermutations(final_prototypes[i],num_proc,comparison_options.flag("COMPARISON_OPTIONS::OPTIMIZE_MATCH"));
+        vector<StructurePrototype> final_permutations = xtal_finder_permutations.compareAtomDecorations(final_prototypes[i],num_proc,comparison_options.flag("COMPARISON_OPTIONS::OPTIMIZE_MATCH"));
         // store permutation results in main StructurePrototype object
         for(uint j=0;j<final_permutations.size();j++){
           vector<string> permutations_tmp; 

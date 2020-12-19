@@ -190,14 +190,11 @@ class StructurePrototype{
     bool isSymmetryCalculated(); //DX20190228
     bool isLFAEnvironmentCalculated(); //DX20191105
     bool calculateSymmetry(); //DX20190118                                                  // calculate space group symmetry and populate symmetry attributes for StructurePrototype
-    bool addStructurePrototypeAsDuplicate(StructurePrototype& b);                           // combine structure with another StructurePrototype object as a potential duplicate
     void putDuplicateAsFamily(uint index, bool keep_generated=false);                       // make duplicate structure a same family structure in the same StructurePrototypeObject //DX20190814 
-    bool copyPrototypeInformation(StructurePrototype& b);                                   // copy prototype information from one StructurePrototype object to another
-    bool putDuplicateAsRepresentative(StructurePrototype& b, uint& index);                  // make duplicate structure a representative structure in a new StructurePrototype object
-    //bool putRepresentativeAsDuplicate(StructurePrototype& b);                             // make representative structure a duplicate structure in a new StructurePrototype object //DX20190730
-    bool copyDuplicate(StructurePrototype& b, uint& index, bool copy_misfit=false);         // copy duplicate info to another StructurePrototype object
-    bool removeNonDuplicate(uint& index);                                                   // remove non-duplicate structures 
-    bool removeDuplicates(bool remove_duplicate_count);                                     // remove duplicate structure information
+    void copyPrototypeInformation(const StructurePrototype& b);                                   // copy prototype information from one StructurePrototype object to another
+    void copyDuplicate(const StructurePrototype& b, uint index, bool copy_misfit=false);         // copy duplicate info to another StructurePrototype object
+    void removeNonDuplicate(uint index);                                                   // remove non-duplicate structures 
+    //bool removeDuplicates(bool remove_duplicate_count);                                     // remove duplicate structure information
   private:
     void free();                                                                            // free operator
     void copy(const StructurePrototype& b);                                                 // copy constructor
@@ -253,7 +250,7 @@ class XtalFinderCalculator : public xStream {
 
     // ---------------------------------------------------------------------------
     // add structures to container
-    void addStructureToContainer(const xstructure& xstr,
+    void addStructure2container(const xstructure& xstr,
       const string& structure_name,
       const string& source,
       uint relaxation_step,
@@ -267,16 +264,16 @@ class XtalFinderCalculator : public xStream {
 
     // ---------------------------------------------------------------------------
     // set as structure representative
-    void addToStructureRepresentative(StructurePrototype& structure_tmp, uint container_index);
-    void addToStructureRepresentative(StructurePrototype& structure_tmp, _structure_representative* str_pointer);
+    void setStructureAsRepresentative(StructurePrototype& structure_tmp, uint container_index);
+    void setStructureAsRepresentative(StructurePrototype& structure_tmp, _structure_representative* str_pointer);
     // ---------------------------------------------------------------------------
     // set as duplicate structure
-    void addToStructureDuplicate(StructurePrototype& structure_tmp, uint container_index);
-    void addToStructureDuplicate(StructurePrototype& structure_tmp, _structure_representative* str_pointer);
+    void addStructure2duplicatesList(StructurePrototype& structure_tmp, uint container_index);
+    void addStructure2duplicatesList(StructurePrototype& structure_tmp, _structure_representative* str_pointer);
     // ---------------------------------------------------------------------------
     // set as same family structure
-    void addToStructureFamily(StructurePrototype& structure_tmp, uint container_index);
-    void addToStructureFamily(StructurePrototype& structure_tmp, _structure_representative* str_pointer);
+    void addStructure2sameFamilyList(StructurePrototype& structure_tmp, uint container_index);
+    void addStructure2sameFamilyList(StructurePrototype& structure_tmp, _structure_representative* str_pointer);
   
     // ---------------------------------------------------------------------------
     // load structure methods
@@ -287,9 +284,9 @@ class XtalFinderCalculator : public xStream {
     // ---------------------------------------------------------------------------
     // transform structures
     void convertStructures(const aurostd::xoption& comparison_options, uint num_proc); //DX20201005
-    void GetPrimitiveStructures(uint start_index=0, uint end_index=AUROSTD_MAX_UINT); //DX20201005
-    void GetMinkowskiStructures(uint start_index=0, uint end_index=AUROSTD_MAX_UINT); //DX20201005
-    void GetNiggliStructures(uint start_index=0, uint end_index=AUROSTD_MAX_UINT); //DX20201005
+    void getPrimitiveStructures(uint start_index=0, uint end_index=AUROSTD_MAX_UINT); //DX20201005
+    void getMinkowskiStructures(uint start_index=0, uint end_index=AUROSTD_MAX_UINT); //DX20201005
+    void getNiggliStructures(uint start_index=0, uint end_index=AUROSTD_MAX_UINT); //DX20201005
     
     // ---------------------------------------------------------------------------
     // analyze symmetry
@@ -406,8 +403,8 @@ class XtalFinderCalculator : public xStream {
   vector<string> getUniquePermutations(xstructure& xstr, uint num_proc);
   vector<string> getUniquePermutations(xstructure& xstr, uint num_proc, bool optimize_match);
   vector<string> getUniquePermutations(xstructure& xstr, uint num_proc, bool optimize_match, bool print_misfit, ostream& oss, aurostd::xoption& comparison_options);
-  vector<StructurePrototype> comparePermutations(StructurePrototype& structure, uint& num_proc, bool optimize_match);
-  void generatePermutationStructures(_structure_representative& structure);
+  vector<StructurePrototype> compareAtomDecorations(StructurePrototype& structure, uint num_proc, bool optimize_match);
+  void generateAtomPermutedStructures(_structure_representative& structure);
   
   // ---------------------------------------------------------------------------
   // get aflow label
@@ -532,7 +529,7 @@ namespace compare{
 
   // ---------------------------------------------------------------------------
   // permutaion comparisons
-  string comparePermutations(istream& input, const aurostd::xoption& vpflow); //DX //DX20181004
+  string compareAtomDecorations(istream& input, const aurostd::xoption& vpflow); //DX //DX20181004
 
   // ---------------------------------------------------------------------------
   // isopointal AFLOW prototype functions 

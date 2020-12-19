@@ -1758,7 +1758,7 @@ namespace pflow {
         if(!vpflow.getattachedscheme("COMPARE_STRUCTURE::FILE").empty()) {cout << compare::compareMultipleStructures(vpflow); _PROGRAMRUN=true;}
       }
       //DX20190425 END
-      if(vpflow.flag("COMPARE_PERMUTATION")) {cout << compare::comparePermutations(cin,vpflow); _PROGRAMRUN=true;} //DX20190201
+      if(vpflow.flag("COMPARE_PERMUTATION")) {cout << compare::compareAtomDecorations(cin,vpflow); _PROGRAMRUN=true;} //DX20190201
       if(vpflow.flag("GFA::INIT")){pflow::GLASS_FORMING_ABILITY(vpflow); _PROGRAMRUN=true;} //DF20190329 - GFA
       if(vpflow.flag("GENERATE_CERAMICS")){cout << pflow::GENERATE_CERAMICS_PRINT(vpflow) << endl; _PROGRAMRUN=true;} //CO20200731
       //DX+CO START
