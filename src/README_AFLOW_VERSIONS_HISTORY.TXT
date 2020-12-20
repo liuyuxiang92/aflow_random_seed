@@ -7,6 +7,11 @@
         -- exiting with error if VASP output files are corrupted after full aflow run (CO)
         -- removing POSCAR.orig from --xplug check, it's already in the aflow.in (CO)
         -- adding --force to LIB2LIB (CO)
+        -- number->basis (CO)
+        -- adding findClosedPackingPlane, to be finished (CO)
+        -- testing new structure enumeration algorithm, to be finished (CO)
+        -- removing whitespaces and hyphens from chull input injected from web (CO)
+        -- patching IsDirectory() and IsFile(), used to trip over directory/file permissions (CO)
 3.2.5 - 2020/09/25
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.5.tar.xz
         -- patched convert issue: security policy 'PDF' blocking conversion (SC)
@@ -66,11 +71,6 @@
         -- cleaning up all getElements() variants (CO+DX)
         -- adding aurostd_xparser.cpp .h (CO)
         -- adding enthlapy_formation_cce_300K_cell, enthlapy_formation_cce_300K_atom, enthlapy_formation_cce_0K_cell, and enthlapy_formation_cce_0K_cell to database (CO+RF)
-        -- number->basis (CO)
-        -- adding findClosedPackingPlane, to be finished (CO)
-        -- testing new structure enumeration algorithm, to be finished (CO)
-        -- removing whitespaces and hyphens from chull input injected from web (CO)
-        -- patching IsDirectory() and IsFile(), used to trip over directory/file permissions (CO)
         -- incorporating CCE into CHULL (CO)
         -- changed XHOST.vschema for aflowlib_date (CO+ME)
         -- changing NOTICE color blue to cyan (CO+ME)

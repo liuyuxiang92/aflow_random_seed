@@ -309,7 +309,7 @@ namespace aflowlib {
   string AFLUXCall(const aurostd::xoption& vpflow); //DX20190206 - add AFLUX functionality for command line   //CO20200520
   string AFLUXCall(const vector<string>& matchbook); //DX20190206 - add AFLUX functionality //CO20200520
   string AFLUXCall(const string& summons); //DX20190206 - add AFLUX functionality   //CO20200520
-  vector<vector<std::pair<string,string> > > getPropertiesFromAFLUXResponse(const string& response); //DX20190206 - get properties from AFLUX response
+  vector<vector<std::pair<string,string> > > getPropertiesFromAFLUXResponse(const string& response); //DX20190206 - get properties from AFLUX response  //CO20200520
   // [OBSOLETE] uint WEB_Aflowlib_Entry_PHP(string options,ostream& oss); //SC20200327
   uint WEB_Aflowlib_Entry(string options,ostream& oss); 
   // [OBSOLETE] uint WEB_Aflowlib_Entry_PHP3(string options,ostream& oss);  //SC20190813

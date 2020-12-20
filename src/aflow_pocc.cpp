@@ -2645,7 +2645,7 @@ namespace pocc {
 
   bool POccCalculator::iterateHNFMatrix(){
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || ENUMERATE_ALL_HNF || XHOST.DEBUG);
-    string soliloquy = XPID + "POccCalculator::iterateHNFMatrix()";
+    string soliloquy=XPID+"POccCalculator::iterateHNFMatrix():";
 
     xmatrix<double> _hnf_mat(3,3),duplicate_mat(3,3);
     xmatrix<double> superlattice(3,3), rotated_superlattice(3,3);

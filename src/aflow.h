@@ -2519,8 +2519,8 @@ void minimumCoordinationShell(const xstructure& xstr, uint center_index,
 //makefile tests
 bool EntryLoaderTest(ostream& oss=cout);  //CO20200520
 bool EntryLoaderTest(ofstream& FileMESSAGE,ostream& oss=cout);  //CO20200520
-bool CeramGenTest(ostream& oss=cout);
-bool CeramGenTest(ofstream& FileMESSAGE,ostream& oss=cout);
+bool CeramGenTest(ostream& oss=cout); //CO20200520
+bool CeramGenTest(ofstream& FileMESSAGE,ostream& oss=cout); //CO20200520
 bool EgapTest(ostream& oss=cout); //CO20200520
 bool EgapTest(ofstream& FileMESSAGE,ostream& oss=cout); //CO20200520
 bool gcdTest(ostream& oss=cout);  //CO20200520
