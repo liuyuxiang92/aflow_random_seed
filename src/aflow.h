@@ -135,6 +135,7 @@ static const string POCC_ARUN_TITLE_TAG=ARUN_TITLE_TAG+"POCC_";
 
 //XELEMENT_PROPERTIES_ALL (define early)
 #define _AFLOW_XELEMENT_PROPERTIES_ALL_ "name,symbol,Z,period,group,series,block,mass,volume_molar,volume,area_molar_Miedema,valence_std,valence_iupac,valence_PT,valence_s,valence_p,valence_d,valence_f,density_PT,crystal,crystal_structure_PT,spacegroup,spacegroup_number,variance_parameter_mass,lattice_constants,lattice_angles,phase,radius_Saxena,radius_PT,radius_covalent_PT,radius_covalent,radius_VanDerWaals_PT,radii_Ghosh08,radii_Slatter,radii_Pyykko,conductivity_electrical,electronegativity_Pauling,hardness_chemical_Ghosh,electronegativity_Pearson,electronegativity_Ghosh,electronegativity_Allen,oxidation_states,oxidation_states_preferred,electron_affinity_PT,energies_ionization,work_function_Miedema,density_line_electron_WS_Miedema,energy_surface_0K_Miedema,chemical_scale_Pettifor,Mendeleev_number,temperature_boiling,temperature_melting,enthalpy_fusion,enthalpy_vaporization,enthalpy_atomization_WE,energy_cohesive,specific_heat_PT,critical_pressure,critical_temperature_PT,thermal_expansion,conductivity_thermal,hardness_mechanical_Brinell,hardness_mechanical_Mohs,hardness_mechanical_Vickers,hardness_chemical_Pearson,hardness_chemical_Putz,hardness_chemical_RB,modulus_shear,modulus_Young,modulus_bulk,Poisson_ratio_PT,modulus_bulk_x_volume_molar_Miedema,magnetic_type_PT,susceptibility_magnetic_mass,susceptibility_magnetic_volume,susceptibility_magnetic_molar,temperature_Curie,refractive_index,color_PT,HHIP,HHIR,xray_scatt" //CO20201111
+#define _ENERGIES_IONIZATION_MAX_AFLOWMACHL_ 5
 
 // --------------------------------------------------------------------------
 // definitions for MULTHREADS
@@ -4908,9 +4909,9 @@ extern std::vector<xelement::xelement> velement;        // store starting from O
 #define _Y_CORR_THRESHOLD_STD_ 0.0
 #define _SELF_CORR_THRESHOLD_STD_ 0.95
 
-namespace aflowML {
+namespace aflowMachL {
   void insertElementalProperties(const vector<string>& vproperties,const xelement::xelement& xel,vector<string>& vitems);
-  void insertElementalPropertiesCoordCorrEnth(const vector<string>& vproperties,const xelement::xelement& xel,double M_X_bonds,double natoms_per_fu,vector<string>& vitems);
+  void insertElementalPropertiesCoordCE(const vector<string>& vproperties,const xelement::xelement& xel,double M_X_bonds,double natoms_per_fu,vector<string>& vitems);
   void insertCrystalProperties(const string& structure_path,const string& anion,const vector<string>& vheaders,vector<string>& vitems,const string& e_props=_AFLOW_XELEMENT_PROPERTIES_ALL_);
   double getStatistic(const xvector<double>& xvec,const string& stat);
   void insertElementalCombinations(const vector<string>& vproperties,vector<string>& vheaders);
@@ -4927,8 +4928,8 @@ namespace aflowML {
   void reduceFeatures(vector<vector<string> >& table,const string& yheader,uint icol2skip,double var_threshold=_VAR_THRESHOLD_STD_,double ycorr_threshold=_Y_CORR_THRESHOLD_STD_,double selfcorr_threshold=_SELF_CORR_THRESHOLD_STD_);
   void reduceFeatures(vector<vector<string> >& table,const string& yheader,const vector<uint>& vicol2skip,double var_threshold=_VAR_THRESHOLD_STD_,double ycorr_threshold=_Y_CORR_THRESHOLD_STD_,double selfcorr_threshold=_SELF_CORR_THRESHOLD_STD_);
   string reduceEProperties(double var_threshold=_VAR_THRESHOLD_STD_,double selfcorr_threshold=_SELF_CORR_THRESHOLD_STD_);
-  void writeCoordCorrEnthCSV();
-} // namespace aflowML
+  void writeCoordCECSV();
+} // namespace aflowMachL
 //CO20201111 - END
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------

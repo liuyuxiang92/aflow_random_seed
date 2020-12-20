@@ -544,7 +544,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   //DX20181004 - add compare2database - END
   //DX
 
-  vpflow.flag("AFLOWML::CoordCorrEnth_CSV",aurostd::args2flag(argv,cmds,"--coord_corr_enth_csv"));  //CO20200930
+  vpflow.flag("AFLOWMACHL::CoordCE_CSV",aurostd::args2flag(argv,cmds,"--coordce_csv"));  //CO20200930
   vpflow.flag("CORNERS",aurostd::args2flag(argv,cmds,"--corner|--corners"));
 
   //DX20170901 [OBSOLETE] vpflow.flag("DATA",aurostd::args2flag(argv,cmds,"--data"));
@@ -1620,7 +1620,7 @@ namespace pflow {
     //CO
     if(argv.size()>=1 && !_PROGRAMRUN) {
       if(vpflow.flag("BADER")) {cout << bader_functions::BaderCalc(vpflow); _PROGRAMRUN=true;}
-      if(vpflow.flag("AFLOWML::CoordCorrEnth_CSV")) {aflowML::writeCoordCorrEnthCSV(); _PROGRAMRUN=true;}  //CO20200930
+      if(vpflow.flag("AFLOWMACHL::CoordCE_CSV")) {aflowMachL::writeCoordCECSV(); _PROGRAMRUN=true;}  //CO20200930
       if(vpflow.flag("CHGCAR2JVXL")) {cout << pflow::CHGCAR2JVXL(vpflow); _PROGRAMRUN=true;}
       if(vpflow.flag("CHGDIFF")) {cout << pflow::CHGDIFF(vpflow); _PROGRAMRUN=true;}
       if(vpflow.flag("CHGSUM")) {cout << pflow::CHGSUM(vpflow); _PROGRAMRUN=true;}
