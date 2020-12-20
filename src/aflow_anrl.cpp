@@ -6747,14 +6747,6 @@ namespace anrl {
 
     // after you generate them you should try them with aflowSG  and if they are small with the pearson
 
-    //DX20200727 - START
-    // the lines below are a hack: we have to exit to print out the web string; otherwise xstructure/aflow.ins will fail
-    // future version will separate prototype vs web generation
-    if(!web.str().empty()){ //DX20200727 - this is a hack, future version will separate prototype vs web generation
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Printing web only.",_GENERIC_ERROR_);
-    }
-    //DX20200727 - END
-
     //DX NOT NEEDED: Parameters are always in RHL if(XHOST.vflag_pflow.flag("PROTO::RHL")) cout << "DX WE GOT RHL"<< endl;
     if(XHOST.vflag_pflow.flag("PROTO::HEX") && vproto_Pearson_symbol[ifound][1] == 'R') {
       vector<double> vparameters;
