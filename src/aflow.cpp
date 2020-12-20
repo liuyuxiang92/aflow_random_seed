@@ -1049,7 +1049,7 @@ namespace aflow {
     strstream << tab << " --mpi|-nompi|--serial " << endl;
     strstream << endl;
     strstream << " HOST ORIENTED OPTION" << endl;
-    strstream << tab << " --machine=beta|beta_openmpi|qrats|qflow|conrad|eos|materials|habana|aflowlib|ranger|kraken" << endl;
+    strstream << tab << " --machine=beta|beta_openmpi|qrats|qflow|x|conrad|eos|materials|habana|aflowlib|ranger|kraken" << endl;
     strstream << tab << "           marylou|parsons|jellium|ohad|host1" << endl;
     strstream << tab << "           raptor --np=N|diamond --np=N" << endl;
     strstream << "******* END RUNNING MODE ***************************************************************************" << endl;

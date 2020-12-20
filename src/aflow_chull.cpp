@@ -336,6 +336,11 @@ namespace chull {
         pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
         Krun=false;continue;/*return FALSE;*/
       }
+      if(XHOST.vflag_control.flag("WWW")&&velements.size()>6){ //CO20200404 - new web flag
+        message << velements.size() << "-dimensional hulls cannot be calculated through the web portal (max=6D), please download the AFLOW binary";
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+        Krun=false;continue;/*return FALSE;*/
+      }
       alloy=aurostd::joinWDelimiter(velements,"");
       if(vpflow.flag("CHULL::LOG")) {
         log_name = "aflow_" + aurostd::joinWDelimiter(velements,"") + "_hull.log";

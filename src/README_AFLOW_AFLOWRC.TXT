@@ -1722,6 +1722,21 @@ MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI
   type: string
   default: "/home/bin/"
 
+MPI_OPTIONS_DUKE_X
+  description: MPI options for --machine=x.
+  type: string
+  default: "ulimit -s unlimited "
+
+MPI_COMMAND_DUKE_X
+  description: MPI command for --machine=x.
+  type: string
+  default: "mpirun -n"
+
+MPI_BINARY_DIR_DUKE_X
+  description: MPI executable directory for --machine=x.
+  type: string
+  default: "/home/bin/"
+
 MPI_OPTIONS_MACHINE001
   description: MPI options for --machine=machine001.
   type: string
