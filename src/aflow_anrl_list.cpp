@@ -7,8 +7,7 @@
 
 #ifndef _AFLOW_ANRL_LIST_CPP // AFLOW_REMOVE_GREP
 #define _AFLOW_ANRL_LIST_CPP // AFLOW_REMOVE_GREP
-#include "../aflow.h" // AFLOW_REMOVE_GREP  //CO20200521
-
+#include "aflow.h" // AFLOW_REMOVE_GREP  //CO20200521
 
 // ***************************************************************************
 namespace anrl { 
@@ -264,7 +263,7 @@ namespace anrl {
     vproto.push_back("A_cP8_205_c;1;8;205;3;2;cP8;a,x1;-;N2;alpha-N2");
     vproto.push_back("AB_cP16_205_c_c;2;16;205;4;3;cP16;a,x1,x2;-;CuCl;SC16");
     vproto.push_back("AB2_cP12_205_a_c;2;12;205;4;2;cP12;a,x2;C2/-;FeS2/NaO2;Pyrite/NaO2 (ICSD #87178"); //DX20200703 - added binary oxide for R. Friedrich 
-    vproto.push_back("AB3C6_cI80_206_a_d_e;3;40;206;5;5;cI80;a,x2,x3,y3,z3;D5_3;(Mn,Fe)2O3;Bixbyite");
+    vproto.push_back("AB3C6_cI80_206_b_d_e;3;40;206;5;5;cI80;a,x2,x3,y3,z3;D5_3;(Mn,Fe)2O3;Bixbyite");
     vproto.push_back("A_cI16_206_c;1;8;206;3;2;cI16;a,x1;-;Si;BC8");
     vproto.push_back("A_cP20_213_cd;1;20;213;3;3;cP20;a,x1,y2;A13;Mn;betaMn");
     vproto.push_back("A3B4C_cP8_215_d_e_a;3;8;215;5;2;cP8;a,x3;H2_4;Cu3S4V;Sulvanite");
@@ -712,7 +711,7 @@ namespace anrl {
     vproto.push_back("A4B_mC20_15_2f_e;2;10;15;4;11;mC20;a,b/a,c/a,beta,y1,x2,y2,z2,x3,y3,z3;-;O4Os;O4Os (ICSD #23803)");
     vproto.push_back("A2B5_oP28_19_2a_5a;2;28;19;4;24;oP28;a,b/a,c/a,x1,y1,z1,x2,y2,z2,x3,y3,z3,x4,y4,z4,x5,y5,z5,x6,y6,z6,x7,y7,z7;-;As2O5;As2O5 (ICSD #654040)");
     vproto.push_back("A2B_oP24_33_4a_2a;2;24;33;4;21;oP24;a,b/a,c/a,x1,y1,z1,x2,y2,z2,x3,y3,z3,x4,y4,z4,x5,y5,z5,x6,y6,z6;-;O2Sb;O2Sb (ICSD #4109)");
-    vproto.push_back("AB3_oC32_40_c_3c;2;16;40;4;15;oC32;a,b/a,c/a,x1,y1,z1,x2,y2,z2,x3,y3,z3,x4,y4,z4;-;CrO3;CrO3 (ICSD #16031)");
+    vproto.push_back("AB3_oC16_40_b_a2b;2;8;40;4;10;oC16;a,b/a,c/a,z1,y2,z2,y3,z3,y4,z4;-;CrO3;CrO3 (ICSD #16031)"); //DX20200805 - created with bad geometry file; fixed
     vproto.push_back("A5B2_oP14_59_a2e_e;2;14;59;4;10;oP14;a,b/a,c/a,z1,y2,z2,y3,z3,y4,z4;-;O5V2;O5V2 (ICSD #60767)");
     vproto.push_back("AB_oC16_64_e_f;2;8;64;4;6;oC16;a,b/a,c/a,y1,y2,z2;-;KO;KO (ICSD #180559)");
     vproto.push_back("A4B3_tP28_135_gh_dh;2;28;135;4;7;tP28;a,c/a,x2,x3,y3,x4,y4;-;O4Pb3;O4Pb3:vs (ICSD #29094)");
@@ -758,6 +757,7 @@ namespace anrl {
     // ternaries
     vproto.push_back("ABC_oP12_62_c_c_c;3;12;62;5;9;oP12;a,b/a,c/a,x1,z1,x2,z2,x3,z3;-;CaLiN;CaLiN (ICSD #107304)");
     vproto.push_back("A2B2C_tI10_139_e_e_a;3;5;139;5;4;tI10;a,c/a,z2,z3;-;Ca2N2Zn;Ca2N2Zn (ICSD #69049)");
+    vproto.push_back("A3BC2_hP6_191_f_a_d;3;6;191;5;2;hP6;a,c/a;-;Na3TaTi2;Na3TaTi2 (ICSD #186418)");
     // done now produce
 
     // FROM PROTO LIST
@@ -1741,7 +1741,7 @@ namespace anrl {
         vparameters.push_back("5.9431,0.427"); //DX20200703 - binary oxide for R. Friedrich (ICSD #87178)
       }
       // ---------------------------------------------------------------------------
-      if(anrl_label=="AB3C6_cI80_206_a_d_e"){
+      if(anrl_label=="AB3C6_cI80_206_b_d_e"){
         vparameters.push_back("9.4,-0.0344,0.338,0.1,0.125");
       }
       // ---------------------------------------------------------------------------
@@ -3474,8 +3474,8 @@ namespace anrl {
         vparameters.push_back("5.6320569384,0.884841795441,2.16335540838,0.6753,0.1608,0.593,0.6454,0.8379,0.906,0.834,0.699,0.6957,0.9256,0.188,0.8093,0.9786,0.9654,0.0,0.6272,0.9994,0.7473");
       }
       // ---------------------------------------------------------------------------
-      if(anrl_label=="AB3_oC32_40_c_3c"){
-        vparameters.push_back("5.0629282861,1.7868030904,1.19920651493,0.0,0.09676,0.75,0.8841,0.0,0.5,0.8755,0.7677,0.25,0.3284,0.1078,0.75");
+      if(anrl_label=="AB3_oC16_40_b_a2b"){
+        vparameters.push_back("5.743,1.48999,0.833885,0.3841,0.90324,0.5,0.7323,0.3755,0.8922,0.8284");
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="A5B2_oP14_59_a2e_e"){
@@ -3653,6 +3653,10 @@ namespace anrl {
       if(anrl_label=="A2B2C_tI10_139_e_e_a"){
         vparameters.push_back("4.0191421247,3.53238454024,0.664,0.8545");
       }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3BC2_hP6_191_f_a_d"){
+        vparameters.push_back("5.3369,0.57059342");
+      }
 
     }
     if(library=="" && !keep_original_lattice_parameter){
@@ -3672,15 +3676,23 @@ namespace anrl {
           vparameters=tmp;
         }
         else{
-          message << "anrl::getANRLParameters(): ERROR - " << anrl_label << " does not have more than " << vparameters.size() << " choice(s).";
+          message << "anrl::getANRLParameters(): ERROR - " << anrl_label << " does not have more than " << vparameters.size() << " choice(s):";
+          for(uint i=0;i<vparameters.size();i++){
+            message << "  " << anrl_label << "-" << std::setw(3) << std::setfill('0') << i+1 << " : " << vparameters[i] << endl;
+          }
           throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name, message, _VALUE_RANGE_); //DX 20191118 - exit to throw
         }
       }
       else if((library=="" && choice==-1) || (vparameters.size() && (library=="part1" || library=="part2" || library=="misc"))){
+        // -------------------------------------------------------------------------
+        // we do not automatically assign the enumeration suffix to the label
+        // (even if there there is currently only one prototype with a label)
+        // otherwise, the command without the suffix may break in the future
+        // (cannot auto-assign when more than one choice, e.g., -001 or -002)
         message << "anrl::getANRLParameters(): ERROR - " << anrl_label << " has " << vparameters.size() << " preset parameter set(s): " << endl;
         for(uint i=0;i<vparameters.size();i++){
           message << "  " << anrl_label << "-" << std::setw(3) << std::setfill('0') << i+1 << " : " << vparameters[i] << endl;
-        }   
+        }
         message << "Rerun command and specify the parameters or the preset suffix, e.g., aflow --proto=" << anrl_label << "-" << std::setw(3) << std::setfill('0') << 1; //DX 20190826 - changed "./aflow" to "aflow"
         throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name, message, _VALUE_ERROR_); //DX 20191118 - exit to throw
       }

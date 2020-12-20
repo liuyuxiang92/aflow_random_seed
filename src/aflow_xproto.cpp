@@ -327,7 +327,9 @@ namespace aflowlib {
       uint prototype_number_of_species = aurostd::RemoveNumbers(compositions[i]).size();
       if(prototype_number_of_species == number_of_species || number_of_species==0){ //DX20191107 - add number_of_species==0 if stoich is not specified
 
-        vector<uint> unreduced_prototype_stoichiometry = composition2stoichiometry(compositions[i]); //DX20191125
+        //DX20200724 [OBSOLETE] vector<uint> unreduced_prototype_stoichiometry = composition2stoichiometry(compositions[i]); //DX20191125
+        vector<uint> unreduced_prototype_stoichiometry;
+        aurostd::getElements(compositions[i],unreduced_prototype_stoichiometry); //DX20200724
         vector<uint> prototype_stoichiometry; aurostd::reduceByGCD(unreduced_prototype_stoichiometry, prototype_stoichiometry); //DX20191125
         //DX20191125 [OBSOLETE] prototype_stoichiometry=compare::gcdStoich(prototype_stoichiometry);
 
@@ -632,7 +634,13 @@ namespace aflowlib {
         if(LDEBUG) cerr << soliloquy << " added default permutation designation to ANRL label; label=" << label << endl;
       }
       //DX20190708 END
+#if USE_HARDCODED_PROTOTYPES //DX20200831 - defined in aflow.h
+      // hard-coded prototype generator (requires ANRL/ subdirectory)
       return anrl::PrototypeANRL(oss,label,parameters,vatomX,vvolumeX,volume_in,mode,flip_option);
+#else
+      // generic prototype generator
+      return anrl::PrototypeANRL_Generator(label,parameters,vatomX,vvolumeX); // DX20200423
+#endif
     }
     // done
 

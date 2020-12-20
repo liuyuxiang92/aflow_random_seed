@@ -75,7 +75,7 @@ namespace KBIN {
     for(uint i=0;i<vtitel.size();i++) {
       aurostd::string2tokens(vtitel.at(i),tokens," ");
       if(tokens.size()!=4 && tokens.size()!=5) {
-        string function = XPID + "KBIN::VASP_RunPhonons_FROZSL";
+        string function = XPID + "KBIN::VASP_RunPhonons_FROZSL():";
         string message = "POTCAR KBIN_VASP_RunPhonons_FROZSL " + aurostd::joinWDelimiter(vtitel, ", ");
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
       }
@@ -766,6 +766,5 @@ namespace FROZSL {
 //   nohup aflow --DIRECTORY=./ &
 //   sleep 5
 //   mv LOCK LOCK.4
-
 
 

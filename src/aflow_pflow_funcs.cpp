@@ -45,7 +45,7 @@ string getGenericTitleXStructure(const xstructure& xstr,bool latex){ //CO2019052
   uint iat=0;
   int comp_prec=(int)ceil(log10(1.0/xstr.partial_occupation_stoich_tol));  //ceil ensures we round up above 1 //CO20181226
   bool atom_names=true;
-  
+
   for(uint i=0;i<xstr.atoms.size()&&atom_names;i++){if(xstr.atoms[i].cleanname.empty()){atom_names=false;}}
   for(uint itype=0;itype<xstr.num_each_type.size();itype++){
     for(uint j=0;j<(uint)xstr.num_each_type[itype];j++) {
@@ -3840,7 +3840,7 @@ namespace pflow {
                break;
              }
       default:{
-                throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"invalid CALCTYPE = "+rtp.calc_type,_INPUT_ILLEGAL_); //CO20200624
+                throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"invalid CALCTYPE = "+aurostd::utype2string(rtp.calc_type),_INPUT_ILLEGAL_); //CO20200624
               }
     }//switch
   }
@@ -7346,13 +7346,25 @@ namespace pflow {
 
   string prettyPrintCompound(const string& compound, vector_reduction_type vred, bool exclude1, filetype ftype) {  //char mode  //CO20190629
     vector<double> vcomposition;
-    vector<string> vspecies =  stringElements2VectorElements(compound, vcomposition);
+    vector<string> vspecies =  aurostd::getElements(compound, vcomposition);
     return prettyPrintCompound(vspecies, vcomposition, vred, exclude1, ftype);  //mode  //CO20190629
+  }
+
+  string prettyPrintCompound(const vector<string>& vspecies,const vector<uint>& vcomposition,vector_reduction_type vred,bool exclude1,filetype ftype) {  // overload //char mode //DX20200727
+    vector<double> vcomposition_dbl;
+    for(uint i=0;i<vcomposition.size();i++){vcomposition_dbl.push_back((double)vcomposition[i]);}
+    return prettyPrintCompound(vspecies,aurostd::vector2xvector<double>(vcomposition_dbl),vred,exclude1,ftype); //mode //CO20190629
   }
 
   // Moved here from the ConvexHull class
   string prettyPrintCompound(const vector<string>& vspecies,const vector<double>& vcomposition,vector_reduction_type vred,bool exclude1,filetype ftype) {  // overload //char mode //CO20190629
     return prettyPrintCompound(vspecies,aurostd::vector2xvector<double>(vcomposition),vred,exclude1,ftype); //mode //CO20190629
+  }
+
+  string prettyPrintCompound(const vector<string>& vspecies,const xvector<uint>& vcomposition,vector_reduction_type vred,bool exclude1,filetype ftype) {  // overload //char mode //DX20200727
+    xvector<double> vcomposition_dbl(vcomposition.rows);
+    for(int i=1;i<=vcomposition.rows;i++){vcomposition_dbl(i)=(double)vcomposition[i];}
+    return prettyPrintCompound(vspecies,vcomposition_dbl,vred,exclude1,ftype); //mode //CO20190629
   }
 
   string prettyPrintCompound(const vector<string>& vspecies,const xvector<double>& vcomposition,vector_reduction_type vred,bool exclude1,filetype ftype) {  // main function //char mode //CO20190629
@@ -7386,6 +7398,106 @@ namespace pflow {
       }
     }
     return output.str();
+  }
+}
+
+// ***************************************************************************
+// pflow::FakeElements()
+// ***************************************************************************
+namespace pflow{
+  vector<string> fakeElements(uint nspecies){
+
+    // Return vector of fake elements
+    // Useful for determining "elements" for prototypes
+
+    string function_name = XPID + "pflow::fakeElements():";
+
+    if(nspecies>26){
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"There are more than 26 species, this function must be modified to include more fake elements.",_RUNTIME_ERROR_);
+    }
+
+    vector<string> elements;
+    for(uint i=0;i<nspecies;i++){
+      stringstream ss_letter; ss_letter << char('A'+i); // cannot type cast char to string directly //DX20200907 - use ASCII
+      elements.push_back(ss_letter.str());
+    }
+
+    return elements;
+  }
+}
+
+// ***************************************************************************
+// pflow::getSymmetryTolerance() //DX20200820
+// ***************************************************************************
+namespace pflow{
+  double getSymmetryTolerance(const xstructure& xstr, const string& tolerance_string){
+
+    // Return the symmetry tolerance
+    // options:
+    //  1) tight = min_nn_dist/100
+    //  2) loose = min_nn_dist/10
+    //  1) number = user defined (Angstroms)
+
+    string function_name = XPID + "pflow::getSymmetryTolerance():";
+    stringstream message;
+
+    double default_tolerance=SYM::defaultTolerance(xstr);
+    double tolerance = AUROSTD_NAN;
+    if(!tolerance_string.empty()){
+      if(aurostd::toupper(tolerance_string[0]) == 'T'){ //Tight
+        tolerance=default_tolerance;
+      }
+      else if(aurostd::toupper(tolerance_string[0]) == 'L'){ //Loose
+        tolerance=default_tolerance*10.0;
+      }
+      else {
+        tolerance=aurostd::string2utype<double>(tolerance_string);
+      }
+    }
+    else {
+      tolerance = default_tolerance;
+    }
+    if(tolerance < 1e-10){
+      message << "Tolerance cannot be zero (i.e. less than 1e-10): tol=" << tolerance << ".";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_VALUE_RANGE_);
+    }
+
+    return tolerance;
+  }
+}
+
+// ***************************************************************************
+// pflow::getSymmetryToleranceSpectrum() //DX20200820
+// ***************************************************************************
+namespace pflow{
+  vector<double> getSymmetryToleranceSpectrum(const string& tolerance_range_string){
+
+    // Return the symmetry tolerance spectrum
+    // Expected input: "start:end:step"
+
+    string function_name = XPID + "pflow::getSymmetryToleranceSpectrum():";
+    stringstream message;
+
+    vector<double> tolerance_spectrum;
+
+    vector<string> tokens;
+    if(aurostd::string2tokens(tolerance_range_string,tokens,":") == 3){
+      double start = aurostd::string2utype<double>(tokens[0]);
+      double end = aurostd::string2utype<double>(tokens[1]);
+      uint nsteps = aurostd::string2utype<uint>(tokens[2])-1;
+      if(end<start){
+        message << "End of the range cannot be less than the beginning of the range: start=" << start << ", end=" << end;
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ILLEGAL_);
+      }
+      double interval = (end-start)/(double)nsteps;
+      for(uint i=0;i<=nsteps;i++){ tolerance_spectrum.push_back(start+((double)i*interval)); }
+    }
+    else{
+      message << "Expected three inputs: first=range_start, second=range_end, third=nsteps.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ILLEGAL_);
+    }
+
+    return tolerance_spectrum;
   }
 }
 

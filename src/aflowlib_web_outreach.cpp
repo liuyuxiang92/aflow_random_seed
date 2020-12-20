@@ -19,7 +19,7 @@
 #define AUTHOR_RECENT_ARTICLES  200
 #define AUTHOR_RECENT_YEARS     30
 
-#define MAX_YEAR_PRESENTATIONS  2019
+#define MAX_YEAR_PRESENTATIONS  2020
 
 // ******************************************************************************************************************************************************
 // _OUTREACH CLASS
@@ -1261,7 +1261,7 @@ void HT_CHECK_GRANTS(ostream& oss) {//,const vector<string>& vitems,string msg1,
     string function = XPID + "HT_CHECK_GRANTS():";
     string message = "No grants.";
     throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message);
-   }
+  }
   cerr << "LOADED " << voutreach.size() << " " << endl;
   string grant=vflag.getattachedscheme("GRANTS");
   //  if(mode==HTRESOURCE_MODE_NONE) {mode=HTRESOURCE_MODE_PHP_AUTHOR;} // by default
@@ -1382,12 +1382,7 @@ bool ProcessPhpLatexCv(void) {
     Arun=TRUE;
   }
 
-  if(Arun) {
-    string function = XPID + "ProcessPhpLatexCv():";
-    string message = "Arun == true";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message);
-  }
-  return TRUE;
+  return Arun;
 }
 
 

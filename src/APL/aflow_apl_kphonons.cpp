@@ -781,7 +781,7 @@ namespace KBIN {
     for (uint i = 0; i < kflags.KBIN_MODULE_OPTIONS.qhaflags.size(); i++) {
       const string& key = kflags.KBIN_MODULE_OPTIONS.qhaflags[i].keyword;
       message << (kflags.KBIN_MODULE_OPTIONS.qhaflags[i].isentry? "Setting" : "DEFAULT")
-      << " " << _ASTROPT_ << key << "=" << kflags.KBIN_MODULE_OPTIONS.qhaflags[i].xscheme;
+        << " " << _ASTROPT_ << key << "=" << kflags.KBIN_MODULE_OPTIONS.qhaflags[i].xscheme;
       pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, FileMESSAGE, oss);
       qhaopts.flag(key, kflags.KBIN_MODULE_OPTIONS.qhaflags[i].option);
       qhaopts.push_attached(key, kflags.KBIN_MODULE_OPTIONS.qhaflags[i].xscheme);
@@ -795,7 +795,7 @@ namespace KBIN {
       apl::QHA qha(xinput, qhaopts, aplopts, FileMESSAGE, oss);
 
       qha.system_title = phcalc._system;
-      qha.run(xflags, aflags, kflags, AflowIn);
+      qha.run(xflags, aflags, kflags);
       return;
     }
     //AS20200513 END
@@ -960,8 +960,8 @@ namespace KBIN {
         pdisc.initPathLattice("", aurostd::string2utype<int>(aplopts.getattachedscheme("DCPOINTS")));
       } else {
         pdisc.initPathCoords(aplopts.getattachedscheme("DCINITCOORDS"),
-          aplopts.getattachedscheme("DCINITCOORDSLABELS"),
-          aurostd::string2utype<int>(aplopts.getattachedscheme("DCPOINTS")), aplopts.flag("DCCORDS_CART"));
+            aplopts.getattachedscheme("DCINITCOORDSLABELS"),
+            aurostd::string2utype<int>(aplopts.getattachedscheme("DCPOINTS")), aplopts.flag("DCCORDS_CART"));
       }
       //ME20190501 Allow user to override path
       string USER_DC_USERPATH = aplopts.getattachedscheme("DCUSERPATH");
@@ -1023,7 +1023,7 @@ namespace KBIN {
           const vector<double>& idos = dosc.getIDOS();
           uint i = 0;
           for (i = 0; i < freqs.size(); i++) {
-            if (freqs[i] > -_ZERO_TOL_LOOSE_) break;
+            if (freqs[i] > -_FLOAT_TOL_) break;
           }
           if (i > 0) {
             double idos_percent = 100.0 * idos[i - 1]/idos.back();
@@ -1267,7 +1267,7 @@ namespace apl {
         message = "Start temperature is larger than end temperature.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
       }
-      if (tstep < _ZERO_TOL_LOOSE_) {
+      if (tstep < _FLOAT_TOL_) {
         message = "Temperature step cannot be zero or negative.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
       }
@@ -1404,7 +1404,7 @@ namespace apl {
     string option = "";
 
     pflow::logger(_AFLOW_FILE_NAME_, function, "Validating QHA paramters.", aflags,
-          FileMESSAGE, oss, _LOGGER_MESSAGE_);
+        FileMESSAGE, oss, _LOGGER_MESSAGE_);
 
     // EOS_DISTORTION_RANGE
     option = "EOS_DISTORTION_RANGE";
@@ -1421,6 +1421,28 @@ namespace apl {
       msg += " The end of the range of given volumes is smaller than the beginning.";
       msg += " Specify as " + option + "=" + AFLOWRC_DEFAULT_QHA_EOS_DISTORTION_RANGE;
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg, _INPUT_NUMBER_);
+    }
+
+    // EOS_MODEL
+    option = "EOS_MODEL";
+    string MODEL = aurostd::toupper(qhaopts.getattachedscheme(option));
+    aurostd::string2tokens(MODEL, tokens, ",");
+    if ((tokens.size()<1) || (tokens.size() > 5)){
+      string msg = "Wrong setting in " + _ASTROPT_QHA_ + option + ".";
+      msg += " Either no model was given or the number of given models is too big.";
+      msg += " Specify as "+option+"=SJ,BM2,BM3,BM4,M using each method once.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg, _INPUT_NUMBER_);
+    }
+
+    string token = "";
+    // note: different models could be used "simultaneously"
+    for (uint i=0; i<tokens.size(); i++){
+      token = aurostd::toupper(tokens[i]);
+      if (token == "SJ")  qhaopts.flag("EOS_MODEL:SJ",  true);
+      if (token == "BM2") qhaopts.flag("EOS_MODEL:BM2", true);
+      if (token == "BM3") qhaopts.flag("EOS_MODEL:BM3", true);
+      if (token == "BM4") qhaopts.flag("EOS_MODEL:BM4", true);
+      if (token == "M")   qhaopts.flag("EOS_MODEL:M",   true);
     }
 
     // GP_DISTORTION
@@ -1442,7 +1464,6 @@ namespace apl {
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg, _INPUT_NUMBER_);
     }
 
-    string token = "";
     // note: QHA, QHA3P and SCQHA could run "simultaneously"
     for (uint i=0; i<tokens.size(); i++){
       token = aurostd::toupper(tokens[i]);

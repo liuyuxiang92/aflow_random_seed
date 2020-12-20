@@ -998,9 +998,44 @@ DEFAULTS CCE
 
 DEFAULT_CCE_OX_METHOD
   description: Default method to determine oxidation numbers.
-  type: string
-  choices: "ELECTRONEGATIVITY_ALLEN", "BADER"
-  default: "ELECTRONEGATIVITY_ALLEN"
+  type: int
+  choices: 1 (ELECTRONEGATIVITY_ALLEN), 2 (BADER)
+  default: 1
+
+DEFAULT_CCE_NN_DIST_TOL_MULTI_ANION
+  description: Tolerance between shortest and longest bonds when testing for multi-anion compound in Ang.
+  type: double
+  default: 0.4
+
+DEFAULT_CCE_OX_TOL
+  description: Tolerance for sum of oxidation numbers to be considered as zero.
+  type: double
+  default: 0.001
+
+DEFAULT_CCE_SELF_DIST_TOL
+  description: Distance tolerance in Ang for neighbor screening to savely exclude the central atom itself.
+  type: double
+  default: 0.001
+
+DEFAULT_CCE_PEROX_CUTOFF
+  description: Upper bound for O-O bond length in peroxides in Ang.
+  type: double
+  default: 1.6
+
+DEFAULT_CCE_SUPEROX_CUTOFF
+  description: Upper bound for O-O bond length in superoxides in Ang.
+  type: double
+  default: 1.4
+
+DEFAULT_CCE_O2_MOLECULE_UPPER_CUTOFF
+  description: Upper bound for O-O bond length for molecular O2 in Ang.
+  type: double
+  default: 1.3
+
+DEFAULT_CCE_O2_MOLECULE_LOWER_CUTOFF
+  description: Lower bound for O-O bond length for molecular O2 in Ang.
+  type: double
+  default: 1.2
 
 ####################################################################################################
 DEFAULTS GFA
@@ -1019,7 +1054,7 @@ ARUN_DIRECTORY_PREFIX
 ####################################################################################################
 DEFAULTS POCC
 
-POCC_FILE_PREFIX
+DEFAULT_POCC_TEMPERATURE_STRING
   description: Temperature range over which POCC will perform post-processing. Scan 0 to 1200 (K) in 300 (K) increments. 0 is converted to _ZERO_TOL_ since T=0 exactly is undefined for the Boltzmann distribution.
   type: string
   default: "0:1200:300"
@@ -1314,7 +1349,7 @@ DEFAULT_APL_ADISP_NPERIODS
 DEFAULTS QHA
 
 DEFAULT_QHA_MODE
-  descriptions: Defines QHA mode to run (it is possible to run several modes simultaneously).
+  description: Defines QHA mode to run (it is possible to run several modes simultaneously).
   type: string
   choices: "QHA", "QHA3P", "SCHQA" or their comma-separated combination
   default: "QHA"
@@ -1328,6 +1363,12 @@ DEFAULT_QHA_EOS_DISTORTION_RANGE
   description: Sets the range of volumes and the volume increment for the set of EOS calculations.
   type: string
   default: "-12:16:3"
+
+DEFAULT_QHA_EOS_MODEL
+  description: Defines what equation of state model(s) to use for the E(V) relation fitting.
+  type: string
+  choices: "SJ", "BM3", "BM4", "M" or their comma-separated combination
+  default: "SJ,BM4"
 
 DEFAULT_QHA_GP_DISTORTION
   description: Sets the value of volume change (dV) for the calculation of the Grueneisen parameter using the finite difference method.
@@ -1567,6 +1608,11 @@ AFLOW_CORE_TEMPERATURE_REFRESH
   description: Refresh rate (seconds) for computer temperature readings.
   type: integer
   default: 5
+
+VASP_CHECK_SLEEP
+  description: Time (seconds) to wait for VASP to finish writing output files. Useful on clusters with NFS delays.
+  type: integer
+  default: 30
 
 ####################################################################################################
 DEFAULTS MACHINE DEPENDENT MPI

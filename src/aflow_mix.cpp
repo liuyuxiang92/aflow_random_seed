@@ -79,10 +79,10 @@ int MiscibilityHumeRotheryCheck(int speciesA,int speciesB) {// aflow_mix.cpp
   if(delta_radius<=0.15)                                        // cut-off is 15% on radius mismatch
     if(delta_electronegativity<=0.15)                           // cut-off is 15% on electronegativity mismatch
       if(delta_valence<=2)                                      // similar valnce, max mismatch is +-2
-	if(GetAtomCrystal(speciesA)==GetAtomCrystal(speciesB))  // same crystal structure
-	  return MISCIBILITY_SYSTEM_SOLUTION;
-  
-   return MISCIBILITY_SYSTEM_UNKNOWN; // impossible because it is one of the other before
+        if(GetAtomCrystal(speciesA)==GetAtomCrystal(speciesB))  // same crystal structure
+          return MISCIBILITY_SYSTEM_SOLUTION;
+
+  return MISCIBILITY_SYSTEM_UNKNOWN; // impossible because it is one of the other before
 }
 
 int MiscibilityHumeRotheryCheck(string speciesA,string speciesB) {// aflow_mix.cpp

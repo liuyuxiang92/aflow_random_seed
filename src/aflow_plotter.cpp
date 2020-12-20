@@ -29,9 +29,6 @@ using aurostd::xoption;
 
 static const string BANDDOS_SIZE = "8, 4.5";
 
-static const string POCC_TAG=":POCC_";
-static const string ARUN_TAG=":ARUN.";
-static const string POCC_ARUN_TAG=ARUN_TAG+"POCC_";
 static const string DEFAULT_IMAGE_FORMAT = "pdf";
 
 //////////////////////////////////////////////////////////////////////////////
@@ -412,7 +409,7 @@ namespace plotter {
     string default_title = plotoptions.getattachedscheme("DEFAULT_TITLE");
     if(LDEBUG) { cerr << soliloquy << " default_title=" << default_title << endl;}
     if (default_title.empty()) return default_title;
-    string title;
+    string title="";
     if (aurostd::substring2bool(default_title, "_ICSD_")) {  // Check if AFLOW ICSD format
       vector<string> tokens;
       aurostd::string2tokens(default_title, tokens, "_");
@@ -424,7 +421,7 @@ namespace plotter {
       } else { // Title not in ICSD format
         return aurostd::fixStringLatex(default_title, false, false);
       }
-    } else if (aurostd::substring2bool(default_title, POCC_TAG)) {  // Check if in POCC format
+    } else if (aurostd::substring2bool(default_title, POCC_TITLE_TAG)) {  // Check if in POCC format
       if(LDEBUG){cerr << soliloquy << " found POCC" << endl;}
       title = formatDefaultTitlePOCC(plotoptions,FileMESSAGE,oss); //CO20200404
     } else if (aurostd::substring2bool(default_title, ".")) {  // Check if AFLOW prototype format
@@ -446,7 +443,7 @@ namespace plotter {
         if (aurostd::WithinList(protos, proto)) {
           if(LDEBUG){cerr << soliloquy << " found proto in ANRL" << endl;}
           if (tokens.size() == 3) proto += "." + tokens[2];
-          vector<string> elements = pflow::stringElements2VectorElements(tokens[0]);
+          vector<string> elements = aurostd::getElements(tokens[0]);
           vector<double> composition = getCompositionFromANRLPrototype(proto);
           if(LDEBUG){
             cerr << soliloquy << " elements=" << aurostd::joinWDelimiter(elements,",") << endl;
@@ -462,7 +459,7 @@ namespace plotter {
           int index;
           if (aurostd::WithinList(protos, proto, index)) {
             proto = aurostd::fixStringLatex(proto, false, false); // Prevent LaTeX errors
-            vector<string> elements = pflow::stringElements2VectorElements(tokens[0]);
+            vector<string> elements = aurostd::getElements(tokens[0]);
             vector<double> composition = getCompositionFromHTQCPrototype(proto, comp[index]);
             if(LDEBUG){
               cerr << soliloquy << " elements=" << aurostd::joinWDelimiter(elements,",") << endl;
@@ -529,7 +526,7 @@ namespace plotter {
 
     // Now determine the composition
     vector<double> comp;
-    pflow::stringElements2VectorElements(compound, comp);
+    aurostd::getElements(compound, comp);
 
     // Finally, sort to match sequence
     vector<double> composition(comp.size());
@@ -556,14 +553,14 @@ namespace plotter {
     //convert to: --proto=AB3C_cP5_221_a_c_b:Cs_sv:Eu:I:Pb_d --pocc_params=S0-1xA_S1-1xC_S2-0.5xB-0.5xD
     //arun stuff separate
 
-    if(!aurostd::substring2bool(default_title,POCC_TAG)){  //use generic
-      message << "No POCC_TAG found [" << POCC_TAG << "], using generic SYSTEM name as title";pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, oss, _LOGGER_WARNING_); //CO20200404
+    if(!aurostd::substring2bool(default_title,POCC_TITLE_TAG)){  //use generic
+      message << "No POCC_TITLE_TAG found [" << POCC_TITLE_TAG << "], using generic SYSTEM name as title";pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, oss, _LOGGER_WARNING_); //CO20200404
       return aurostd::fixStringLatex(default_title, false, false);
     }
     //Get all the pieces of the default title
-    string::size_type t = default_title.find(POCC_TAG);
+    string::size_type t = default_title.find(POCC_TITLE_TAG);
     string elements_prototype_str = default_title.substr(0, t);  //contains elements and prototype
-    string pocc_params_arun_str = default_title.substr(t + POCC_TAG.length(), string::npos);  //pocc_params and ARUN(?)
+    string pocc_params_arun_str = default_title.substr(t + POCC_TITLE_TAG.length(), string::npos);  //pocc_params and ARUN(?)
     if(LDEBUG){
       cerr << soliloquy << " elements_prototype_str=" << elements_prototype_str << endl;
       cerr << soliloquy << " pocc_params_arun_str=" << pocc_params_arun_str << endl;
@@ -577,8 +574,9 @@ namespace plotter {
     string proto="";
     vector<string> velements;
     string pocc_params="";
-    string arun="";
-    string::size_type c;
+    string arun_pocc="";
+    string arun_module="";
+    string::size_type c=0,m=0;
     xstructure xstr;
     while(t!=string::npos && (t+1)<elements_prototype_str.length()){
       pps=elements_prototype_str.substr(0,t);
@@ -588,18 +586,26 @@ namespace plotter {
         cerr << soliloquy << " proto=" << proto << endl;
       }
 
-      velements=pflow::stringElements2VectorElements(pps,true,false,pp_string,true);  //clean, no sort_elements, pseudopotential string, keep_pp
+      velements=aurostd::getElements(pps,pp_string,true,false,true);  //clean, no sort_elements, pseudopotential string, keep_pp
       if(LDEBUG) { cerr << soliloquy << " velements=" << aurostd::joinWDelimiter(velements,",") << endl;}
 
       pocc_params=pocc_params_arun_str;
-      c=pocc_params_arun_str.find(POCC_ARUN_TAG);
+      c=pocc_params_arun_str.find(POCC_ARUN_TITLE_TAG);
       if(c!=string::npos && (c+1)<pocc_params_arun_str.length()){
         pocc_params=pocc_params_arun_str.substr(0,c);
-        arun=pocc_params_arun_str.substr(c+1,string::npos);
+        arun_pocc=pocc_params_arun_str.substr(c+1,string::npos);
+        if(LDEBUG){cerr << soliloquy << " arun_pocc(with-module)=" << arun_pocc << endl;}
+        m=arun_pocc.find(":");
+        if(m!=string::npos && (m+1)<arun_pocc.length()){
+          string arun_pocc_new=arun_pocc.substr(0,m);
+          arun_module=arun_pocc.substr(m+1,string::npos);
+          arun_pocc=arun_pocc_new;
+        }
       }
       if(LDEBUG){
         cerr << soliloquy << " pocc_params=" << pocc_params << endl;
-        cerr << soliloquy << " arun=" << arun << endl;
+        cerr << soliloquy << " arun_pocc=" << arun_pocc << endl;
+        cerr << soliloquy << " arun_module=" << arun_module << endl;
       }
 
       aurostd::xoption proto_flags;
@@ -644,12 +650,24 @@ namespace plotter {
     }
     new_title+=" ("+aurostd::fixStringLatex(proto,false,false);
 
-    if(!arun.empty()){
-      vector<string> tokens;
-      aurostd::string2tokens(arun,tokens,"_");
+    vector<string> tokens;
+    //ARUN.POCC_49
+    if(!arun_pocc.empty()){
+      aurostd::string2tokens(arun_pocc,tokens,"_");
       string pocc_hash="";
       if(tokens.size()>1){pocc_hash=tokens.back();}
       if(!pocc_hash.empty()){new_title+=":"+aurostd::fixStringLatex(pocc_hash,false,false);}
+    }
+    //arun_module=ARUN.AGL_6_SF_0.92
+    if(!arun_module.empty()){
+      aurostd::string2tokens(arun_module,tokens,"_");
+      string module_hash="";
+      if(tokens.size()>1){
+        vector<string> new_tokens;
+        for(uint i=2;i<tokens.size();i++){new_tokens.push_back(tokens[i]);}
+        module_hash=aurostd::joinWDelimiter(new_tokens,"_");
+      }
+      if(!module_hash.empty()){new_title+=":"+aurostd::fixStringLatex(module_hash,false,false);}
     }
 
     new_title+=")";
@@ -712,6 +730,10 @@ namespace plotter {
         vector<string> vstr;
         string directory = plotoptions.getattachedscheme("DIRECTORY");
         string extension = plotoptions.getattachedscheme("EXTENSION");
+        if(LDEBUG){
+          cerr << soliloquy << " directory=" << directory << endl;
+          cerr << soliloquy << " extension=" << extension << endl;
+        }
         if (aurostd::substring2bool(extension, "phdisp") || (extension == "phdos")) {
           aurostd::efile2vectorstring("PHPOSCAR", vstr);
         } else {
@@ -737,7 +759,7 @@ namespace plotter {
     el = proto.substr(0, t);
     proto = proto.substr(t + 1, string::npos);
     if (!generic) {
-      vector<string> elements = pflow::stringElements2VectorElements(el);
+      vector<string> elements = aurostd::getElements(el);
       if (elements.size() != composition.size()) {
         generic = true;
         broken = true;
@@ -902,18 +924,14 @@ namespace plotter {
     string soliloquy=XPID+"plotter::patchDefaultTitleAFLOWIN():"; //CO20200404
 
     const string& directory = plotoptions.getattachedscheme("DIRECTORY");
+    if (!aurostd::FileExist(directory + "/" + _AFLOWIN_)) return;  //ME20200922
     if(LDEBUG) { cerr << soliloquy << " directory=" << directory << endl;}
-    string aflowin_path=directory+"/"+_AFLOWIN_;
-    if(aurostd::FileExist(aflowin_path)){
-      string aflowin="";
-      aurostd::file2string(aflowin_path,aflowin);
-      string SYSTEM=aurostd::RemoveWhiteSpaces(aurostd::substring2string(aflowin,"[AFLOW]SYSTEM=",FALSE));
-      if(!SYSTEM.empty()){
-        if(LDEBUG) { cerr << soliloquy << " DEFAULT_TITLE(OLD)=" << plotoptions.getattachedscheme("DEFAULT_TITLE") << endl;}
-        plotoptions.pop_attached("DEFAULT_TITLE");
-        plotoptions.push_attached("DEFAULT_TITLE", SYSTEM);
-        if(LDEBUG) { cerr << soliloquy << " DEFAULT_TITLE(NEW)=" << plotoptions.getattachedscheme("DEFAULT_TITLE") << endl;}
-      }
+    string SYSTEM=KBIN::ExtractSystemName(directory); //CO20200731
+    if(!SYSTEM.empty()){
+      if(LDEBUG) { cerr << soliloquy << " DEFAULT_TITLE(OLD)=" << plotoptions.getattachedscheme("DEFAULT_TITLE") << endl;}
+      plotoptions.pop_attached("DEFAULT_TITLE");
+      plotoptions.push_attached("DEFAULT_TITLE", SYSTEM);
+      if(LDEBUG) { cerr << soliloquy << " DEFAULT_TITLE(NEW)=" << plotoptions.getattachedscheme("DEFAULT_TITLE") << endl;}
     }
   }
 
@@ -1165,9 +1183,10 @@ namespace plotter {
   // Extracts the structure from VASP input files, including species names.
   xstructure getStructureWithNames(const xoption& plotoptions,const string& carstring,ostream& oss) {ofstream FileMESSAGE;return getStructureWithNames(plotoptions,FileMESSAGE,carstring,oss);} //CO20200404
   xstructure getStructureWithNames(const xoption& plotoptions,ofstream& FileMESSAGE,const string& carstring,ostream& oss) { //CO20200404
-    bool LDEBUG=(FALSE || _DEBUG_PLOTTER_ || XHOST.DEBUG); 
+    bool LDEBUG=(FALSE || _DEBUG_PLOTTER_ || XHOST.DEBUG);
     string soliloquy="plotter::getStructureWithNames():";
     string directory = plotoptions.getattachedscheme("DIRECTORY");
+    if(LDEBUG){cerr << soliloquy << " directory(input)=" << directory << endl;}
     string poscar_file = "POSCAR"; //CO20200404
     std::stringstream poscar;
     //if (plotoptions.getattachedscheme("EXTENSION") == "phdos")
@@ -1182,7 +1201,9 @@ namespace plotter {
         arun = plotoptions.getattachedscheme("ARUN_DIRECTORY");  //relative path
         if(LDEBUG){cerr << soliloquy << " grabbing POSCAR from " << arun << endl;}
         directory+="/"+arun;
+        aurostd::StringSubst(directory,"/RAW/","/LIB/");  //read POSCAR from LIB, not RAW (may not have been processed yet)
       }
+      if(LDEBUG){cerr << soliloquy << " directory(POSCAR)=" << directory << endl;}
       aflowlib::vaspfile2stringstream(directory + "", poscar_file, poscar);  //CO20200404
     }
 

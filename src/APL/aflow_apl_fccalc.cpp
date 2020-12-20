@@ -928,7 +928,7 @@ namespace apl {
       message = "Could not save state into file " + filename + ".";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
-    
+
   }
 
   // ME20200501
@@ -1643,7 +1643,7 @@ namespace apl {
     for (uint k = 0; k < allDistortionsOfAtom.size(); k++) {
       testDistortion = testDistortion - aurostd::getVectorProjection(testDistortion, allDistortionsOfAtom[k]);
     }
-    if (aurostd::modulus(testDistortion) > _ZERO_TOL_LOOSE_) {
+    if (aurostd::modulus(testDistortion) > _FLOAT_TOL_) {
       // Normalize vector
       testDistortion = testDistortion / aurostd::modulus(testDistortion);
       // Store this vector (in Cartesian form!)
@@ -1661,7 +1661,7 @@ namespace apl {
         for (uint k = 0; k < allDistortionsOfAtom.size(); k++) {
           testDistortion = testDistortion - aurostd::getVectorProjection(testDistortion, allDistortionsOfAtom[k]);
         }
-        if (aurostd::modulus(testDistortion) > _ZERO_TOL_LOOSE_) {
+        if (aurostd::modulus(testDistortion) > _FLOAT_TOL_) {
           testDistortion = testDistortion / aurostd::modulus(testDistortion);
           allDistortionsOfAtom.push_back(testDistortion);
           //cout << "new symmetry generated distortion vector: " << testDistortion << std::endl;
@@ -1685,7 +1685,7 @@ namespace apl {
     for (uint i = 0; i < agroup.size(); i++) {
       rotated_distortion = agroup[i].Uc * _uniqueDistortions[atom_index][distortion_index];
       //cerr << "rdistortion : " << rotated_distortion << std::endl;
-      if (identical(_uniqueDistortions[atom_index][distortion_index], -rotated_distortion, _ZERO_TOL_LOOSE_)) {  //just mimicking Jahnatek tolerance here
+      if (identical(_uniqueDistortions[atom_index][distortion_index], -rotated_distortion, _FLOAT_TOL_)) {  //just mimicking Jahnatek tolerance here
         return FALSE;
         //need_minus = false;
         //break;
@@ -1868,7 +1868,7 @@ namespace apl {
             }
 
             // If the remaining vector is non-zero length, it is new independent direction, hence store it...
-            if (aurostd::modulus(testVec) > _ZERO_TOL_LOOSE_) {
+            if (aurostd::modulus(testVec) > _FLOAT_TOL_) {
               // Normalize to unit length
               double testVectorLength = aurostd::modulus(testVec);
               for (uint l = 0; l < _supercell->getNumberOfAtoms(); l++) {
@@ -2127,56 +2127,56 @@ namespace apl {
 
 namespace apl {
 
-   // Writes the forces into a VASP DYNMAT format
-   void ForceConstantCalculator::writeDYNMAT(const string& filename) {
-     string message = "Writing forces into file " + filename + ".";
-     pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
+  // Writes the forces into a VASP DYNMAT format
+  void ForceConstantCalculator::writeDYNMAT(const string& filename) {
+    string message = "Writing forces into file " + filename + ".";
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
 
-     stringstream outfile;
+    stringstream outfile;
 
-     // 1st line
-     outfile << _supercell->getNumberOfUniqueAtoms() << " ";
-     outfile << _supercell->getNumberOfAtoms() << " ";
-     int dof = 0;
-     for (uint i = 0; i < _uniqueDistortions.size(); i++)
-       dof += _uniqueDistortions[i].size();
-     outfile << dof << std::endl;
+    // 1st line
+    outfile << _supercell->getNumberOfUniqueAtoms() << " ";
+    outfile << _supercell->getNumberOfAtoms() << " ";
+    int dof = 0;
+    for (uint i = 0; i < _uniqueDistortions.size(); i++)
+      dof += _uniqueDistortions[i].size();
+    outfile << dof << std::endl;
 
-     // 2nd line
-     outfile << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
-     outfile << setprecision(3);
-     for (uint i = 0; i < _supercell->getNumberOfUniqueAtoms(); i++) {
-       if (i != 0) outfile << " ";
-       outfile << _supercell->getUniqueAtomMass(i);
-     }
-     outfile << std::endl;
+    // 2nd line
+    outfile << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
+    outfile << setprecision(3);
+    for (uint i = 0; i < _supercell->getNumberOfUniqueAtoms(); i++) {
+      if (i != 0) outfile << " ";
+      outfile << _supercell->getUniqueAtomMass(i);
+    }
+    outfile << std::endl;
 
-     // forces + 1 line info about distortion
-     for (uint i = 0; i < _supercell->getNumberOfUniqueAtoms(); i++) {
-       for (uint j = 0; j < _uniqueDistortions[i].size(); j++) {
-         // line info
-         outfile << (_supercell->getUniqueAtomID(i) + 1) << " ";
-         outfile << (j + 1) << " ";
-         xvector<double> shift(3);
-         shift = DISTORTION_MAGNITUDE * _uniqueDistortions[i][j];
-         outfile << setprecision(3);
-         outfile << shift(1) << " " << shift(2) << " " << shift(3) << std::endl;
-         // forces
-         outfile << setprecision(6);
-         for (uint k = 0; k < _supercell->getNumberOfAtoms(); k++)
-           outfile << setw(15) << _uniqueForces[i][j][k](1)
-             << setw(15) << _uniqueForces[i][j][k](2)
-             << setw(15) << _uniqueForces[i][j][k](3) << std::endl;
-       }
-     }
+    // forces + 1 line info about distortion
+    for (uint i = 0; i < _supercell->getNumberOfUniqueAtoms(); i++) {
+      for (uint j = 0; j < _uniqueDistortions[i].size(); j++) {
+        // line info
+        outfile << (_supercell->getUniqueAtomID(i) + 1) << " ";
+        outfile << (j + 1) << " ";
+        xvector<double> shift(3);
+        shift = DISTORTION_MAGNITUDE * _uniqueDistortions[i][j];
+        outfile << setprecision(3);
+        outfile << shift(1) << " " << shift(2) << " " << shift(3) << std::endl;
+        // forces
+        outfile << setprecision(6);
+        for (uint k = 0; k < _supercell->getNumberOfAtoms(); k++)
+          outfile << setw(15) << _uniqueForces[i][j][k](1)
+            << setw(15) << _uniqueForces[i][j][k](2)
+            << setw(15) << _uniqueForces[i][j][k](3) << std::endl;
+      }
+    }
 
-     aurostd::stringstream2file(outfile, filename);
-     if (!aurostd::FileExist(filename)) {
-       string function = "ForceConstantCalculator::writeDYNMAT()";
-       message = "Cannot open output file " + filename + ".";
-       throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
-     }
-   }
+    aurostd::stringstream2file(outfile, filename);
+    if (!aurostd::FileExist(filename)) {
+      string function = "ForceConstantCalculator::writeDYNMAT()";
+      message = "Cannot open output file " + filename + ".";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
+    }
+  }
 
   // [OBSOLETE]  //////////////////////////////////////////////////////////////////////////////
 
@@ -2223,9 +2223,9 @@ namespace apl {
   // [OBSOLETE]       for (int k = 0; k < _supercell->getNumberOfAtoms(); k++) {
   // [OBSOLETE]         int l = 0;
   // [OBSOLETE]         for (; l < _supercell->getNumberOfAtoms(); l++)
-  // [OBSOLETE]           if ((aurostd::abs(ix.atoms[k].cpos(1) - _supercell->getSupercellStructure().atoms[l].cpos(1)) < _ZERO_TOL_LOOSE_) &&
-  // [OBSOLETE]               (aurostd::abs(ix.atoms[k].cpos(2) - _supercell->getSupercellStructure().atoms[l].cpos(2)) < _ZERO_TOL_LOOSE_) &&
-  // [OBSOLETE]               (aurostd::abs(ix.atoms[k].cpos(3) - _supercell->getSupercellStructure().atoms[l].cpos(3)) < _ZERO_TOL_LOOSE_))
+  // [OBSOLETE]           if ((aurostd::abs(ix.atoms[k].cpos(1) - _supercell->getSupercellStructure().atoms[l].cpos(1)) < _FLOAT_TOL_) &&
+  // [OBSOLETE]               (aurostd::abs(ix.atoms[k].cpos(2) - _supercell->getSupercellStructure().atoms[l].cpos(2)) < _FLOAT_TOL_) &&
+  // [OBSOLETE]               (aurostd::abs(ix.atoms[k].cpos(3) - _supercell->getSupercellStructure().atoms[l].cpos(3)) < _FLOAT_TOL_))
   // [OBSOLETE]             break;
   // [OBSOLETE]         //CO, not really mapping error, just mismatch between structure read in (ix) and current supercell structure (should be exact)
   // [OBSOLETE]         if (l == _supercell->getNumberOfAtoms()) {

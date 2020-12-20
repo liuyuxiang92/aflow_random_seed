@@ -46,7 +46,7 @@ namespace pocc {
     //  cerr << v_temperatures.at(i) << endl;
     //}
     setAELOptions(ael_run_postprocess, ael_write_full_results);
-    if (ael_run_postprocess) { 
+    if (ael_run_postprocess) {
       generateElasticProperties(Bvoigt, Breuss, Bvrh, Gvoigt, Greuss, Gvrh, Poisson_ratio, elastic_tensor_list, compliance_tensor_list);
     } else {
       getElasticProperties(Bvoigt, Breuss, Bvrh, Gvoigt, Greuss, Gvrh, Poisson_ratio, elastic_tensor_list, compliance_tensor_list);
@@ -67,13 +67,12 @@ namespace pocc {
     ael_run_postprocess = false;
     ael_write_full_results = false;
 
-    if(XHOST.vflag_control.flag("AEL_RUN_POSTPROCESSING")){
-      ael_run_postprocess=true; //[CO20200502 - speed]XHOST.vflag_control.flag("AEL_RUN_POSTPROCESSING");
-    }  //command line input
-
-    if(XHOST.vflag_control.flag("AEL_WRITE_FULL_RESULTS")){
-      ael_write_full_results=true;  //[CO20200502 - speed]XHOST.vflag_control.flag("AEL_WRITE_FULL_RESULTS");
-    }  //command line input
+    //run postprocessing
+    ael_run_postprocess=(ael_run_postprocess || XHOST.vflag_control.flag("AEL_RUN_POSTPROCESSING") ); //CO20201026
+    ael_run_postprocess=(ael_run_postprocess || XHOST.POSTPROCESS ); //CO20201026
+    
+    //write extra output (debugging mostly)
+    ael_write_full_results=(ael_write_full_results || XHOST.vflag_control.flag("AEL_WRITE_FULL_RESULTS") ); //CO20201026
   }
 } // namespace pocc
 
@@ -85,7 +84,7 @@ namespace pocc {
   void POccCalculator::generateElasticProperties(vector<double>& Bvoigt, vector<double>& Breuss, vector<double>& Bvrh, vector<double>& Gvoigt, vector<double>& Greuss, vector<double>& Gvrh,vector<double>& Poisson_ratio, vector<vector<vector<double> > >& elastic_tensor_list,  vector<vector<vector<double> > >& compliance_tensor_list) {
     bool LDEBUG=(FALSE || _DEBUG_POCC_AEL_AGL_ || XHOST.DEBUG);
     string soliloquy="POccCalculator::generateElasticProperties():";
-    // [OBSOLETE] uint aelerror = 0;
+    uint aelerror = 0;
     if(LDEBUG) {
       cerr << soliloquy << " BEGIN" << endl;
     }
@@ -98,7 +97,7 @@ namespace pocc {
     double elastic_const = 0.0;
     vector<double> elastic_const_row;
     vector<vector<double> > elastic_tensor;
-    double compliance_const;
+    double compliance_const=0.0;
     vector<double> compliance_const_row;
     vector<vector<double> > compliance_tensor;
     unsigned long long int isupercell = 0;
@@ -127,7 +126,10 @@ namespace pocc {
       // [OBSOLETE] if (aelerror > 0) {
       // [OBSOLETE]   throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Problem with AEL calculation: [dir="+pocc_directory_abs+"]",_FILE_NOT_FOUND_);
       // [OBSOLETE] }
-      AEL_functions::AEL_Get_AflowInName(AflowInName, pocc_directory_abs, ael_aflowin_found);
+      aelerror = AEL_functions::AEL_Get_AflowInName(AflowInName, pocc_directory_abs, ael_aflowin_found);
+      if (aelerror != 0) {
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Problem finding AEL aflow.in filename [dir="+pocc_directory_abs+"]",_FILE_ERROR_);
+      }
       if (ael_aflowin_found) {
         if(aurostd::FileExist(pocc_directory_abs+"/ael.LOCK")) {
           FileLockName = "ael.LOCK";
@@ -222,7 +224,8 @@ namespace pocc {
         elastic_tensor.clear();
         compliance_tensor.clear();
       } else {
-        cerr << soliloquy << pocc_directory_abs << "/aflow.ael.out: File not found" << endl;
+        // [OBSOLETE] cerr << soliloquy << pocc_directory_abs << "/aflow.ael.out: File not found" << endl;
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Problem with AEL calculation: [dir="+pocc_directory_abs+"]",_FILE_NOT_FOUND_);
       }
     }
   }
@@ -597,7 +600,8 @@ namespace pocc {
       }
       // Write main results to a file
       ossmain << AFLOWIN_SEPARATION_LINE << endl;
-      ossmain << "[POCC_AEL_RESULTS]START" << endl;
+      //[CO20200731 - OBSOLETE]ossmain << "[POCC_AEL_RESULTS]START" << endl;
+      ossmain << "[POCC_AEL_RESULTS]START_TEMPERATURE=" << getTemperatureString(T) << "_K" << endl;
       ossmain << "pocc_ael_temperature=" << T << "  (K)" << endl; //CO20200502 - no getTemperatureString(T) needed here
       ossmain << "pocc_ael_poisson_ratio=" << Poisson_ratio_ave << endl;    
       ossmain << "pocc_ael_bulk_modulus_voigt=" << Bvoigt_ave << "  (GPa)" << endl;
@@ -607,30 +611,36 @@ namespace pocc {
       ossmain << "pocc_ael_bulk_modulus_vrh=" << Bvrh_ave << "  (GPa)" << endl;    
       ossmain << "pocc_ael_shear_modulus_vrh=" << Gvrh_ave << "  (GPa)" << endl;
       ossmain << "pocc_ael_youngs_modulus_vrh=" << Yvrh_ave << "  (GPa)" << endl;
-      ossmain << "[POCC_AEL_RESULTS]STOP" << endl;
+      //[CO20200731 - OBSOLETE]ossmain << "[POCC_AEL_RESULTS]STOP" << endl;
+      ossmain << "[POCC_AEL_RESULTS]STOP_TEMPERATURE=" << getTemperatureString(T) << "_K" << endl;
       ossmain << AFLOWIN_SEPARATION_LINE << endl;
-      ossmain << "[POCC_AEL_STIFFNESS_TENSOR]START" << endl;
+      //[CO20200731 - OBSOLETE]ossmain << "[POCC_AEL_STIFFNESS_TENSOR]START" << endl;
+      ossmain << "[POCC_AEL_STIFFNESS_TENSOR]START_TEMPERATURE=" << getTemperatureString(T) << "_K" << endl;
       for (uint j = 0; j < elastic_tensor_ave.size(); j++) {
         for (uint k = 0; k < elastic_tensor_ave.at(j).size(); k++) {
           ossmain << setw(15) << setprecision(6) << (elastic_tensor_ave.at(j).at(k));
         }
         ossmain << endl;
       }
-      ossmain << "[POCC_AEL_STIFFNESS_TENSOR]STOP" << endl;
+      //[CO20200731 - OBSOLETE]ossmain << "[POCC_AEL_STIFFNESS_TENSOR]STOP" << endl;
+      ossmain << "[POCC_AEL_STIFFNESS_TENSOR]STOP_TEMPERATURE=" << getTemperatureString(T) << "_K" << endl;
       ossmain << AFLOWIN_SEPARATION_LINE << endl;
-      ossmain << "[POCC_AEL_COMPLIANCE_TENSOR]START" << endl;
+      //[CO20200731 - OBSOLETE]ossmain << "[POCC_AEL_COMPLIANCE_TENSOR]START" << endl;
+      ossmain << "[POCC_AEL_COMPLIANCE_TENSOR]START_TEMPERATURE=" << getTemperatureString(T) << "_K" << endl;
       for (uint j = 0; j < compliance_tensor_ave.size(); j++) {
         for (uint k = 0; k < compliance_tensor_ave.at(j).size(); k++) {
           ossmain << setw(15) << setprecision(6) << (compliance_tensor_ave.at(j).at(k));
         }
         ossmain << endl;
       }
-      ossmain << "[POCC_AEL_COMPLIANCE_TENSOR]STOP" << endl;
+      //[CO20200731 - OBSOLETE]ossmain << "[POCC_AEL_COMPLIANCE_TENSOR]STOP" << endl;
+      ossmain << "[POCC_AEL_COMPLIANCE_TENSOR]STOP_TEMPERATURE=" << getTemperatureString(T) << "_K" << endl;
       ossmain << AFLOWIN_SEPARATION_LINE << endl;
       // Writes all results to a file
       if (ael_write_full_results) {
         ossfull << AFLOWIN_SEPARATION_LINE << endl;
-        ossfull << "[POCC_AEL_RESULTS]START" << endl;
+        //[CO20200731 - OBSOLETE]ossfull << "[POCC_AEL_RESULTS]START" << endl;
+        ossfull << "[POCC_AEL_RESULTS]START_TEMPERATURE=" << getTemperatureString(T) << "_K" << endl;
         ossfull << "pocc_ael_temperature=" << T << "  (K)" << endl; //CO20200502 - no getTemperatureString(T) needed here
         ossfull << "pocc_ael_bulk_modulus_voigt=" << Bvoigt_ave << "  (GPa)" << endl;
         ossfull << "pocc_ael_bulk_modulus_reuss=" << Breuss_ave  << "  (GPa)" << endl;
@@ -651,25 +661,30 @@ namespace pocc {
         ossfull << "pocc_ael_hardness_tian_voigt=" << Hv_Tian_voigt_ave << "  (GPa)" << endl;
         ossfull << "pocc_ael_hardness_tian_reuss=" << Hv_Tian_reuss_ave  << "  (GPa)" << endl;
         ossfull << "pocc_ael_hardness_tian_vrh=" << Hv_Tian_vrh_ave << "  (GPa)" << endl;
-        ossfull << "[POCC_AEL_RESULTS]STOP" << endl;
+        //[CO20200731 - OBSOLETE]ossfull << "[POCC_AEL_RESULTS]STOP" << endl;
+        ossfull << "[POCC_AEL_RESULTS]STOP_TEMPERATURE=" << getTemperatureString(T) << "_K" << endl;
         ossfull << AFLOWIN_SEPARATION_LINE << endl;
-        ossfull << "[POCC_AEL_STIFFNESS_TENSOR]START" << endl;
+        //[CO20200731 - OBSOLETE]ossfull << "[POCC_AEL_STIFFNESS_TENSOR]START" << endl;
+        ossfull << "[POCC_AEL_STIFFNESS_TENSOR]START_TEMPERATURE=" << getTemperatureString(T) << "_K" << endl;
         for (uint j = 0; j < elastic_tensor_ave.size(); j++) {
           for (uint k = 0; k < elastic_tensor_ave.at(j).size(); k++) {
             ossfull << setw(15) << setprecision(6) << (elastic_tensor_ave.at(j).at(k));
           }
           ossfull << endl;
         }
-        ossfull << "[POCC_AEL_STIFFNESS_TENSOR]STOP" << endl;
+        //[CO20200731 - OBSOLETE]ossfull << "[POCC_AEL_STIFFNESS_TENSOR]STOP" << endl;
+        ossfull << "[POCC_AEL_STIFFNESS_TENSOR]STOP_TEMPERATURE=" << getTemperatureString(T) << "_K" << endl;
         ossfull << AFLOWIN_SEPARATION_LINE << endl;
-        ossfull << "[POCC_AEL_COMPLIANCE_TENSOR]START" << endl;
+        //[CO20200731 - OBSOLETE]ossfull << "[POCC_AEL_COMPLIANCE_TENSOR]START" << endl;
+        ossfull << "[POCC_AEL_COMPLIANCE_TENSOR]START_TEMPERATURE=" << getTemperatureString(T) << "_K" << endl;
         for (uint j = 0; j < compliance_tensor_ave.size(); j++) {
           for (uint k = 0; k < compliance_tensor_ave.at(j).size(); k++) {
             ossfull << setw(15) << setprecision(6) << (compliance_tensor_ave.at(j).at(k));
           }
           ossfull << endl;
         }
-        ossfull << "[POCC_AEL_COMPLIANCE_TENSOR]STOP" << endl;
+        //[CO20200731 - OBSOLETE]ossfull << "[POCC_AEL_COMPLIANCE_TENSOR]STOP" << endl;
+        ossfull << "[POCC_AEL_COMPLIANCE_TENSOR]STOP_TEMPERATURE=" << getTemperatureString(T) << "_K" << endl;
         ossfull << AFLOWIN_SEPARATION_LINE << endl;
       }
     }
@@ -677,7 +692,8 @@ namespace pocc {
     aurostd::stringstream2file(ossmain, ofileafpoccaelname, "WRITE");
     if (ael_write_full_results) {
       ossfull << AFLOWIN_SEPARATION_LINE << endl;
-      ossfull << "[POCC_AEL_RESULTS]START" << endl;
+      //[CO20200731 - OBSOLETE]ossfull << "[POCC_AEL_RESULTS]START" << endl;
+      ossfull << "[POCC_AEL_RESULTS]START_TEMPERATURE=" << getTemperatureString(T) << "_K" << endl;
       ossfull << "pocc_ael_bulk_modulus_voigt_min=" << Bvoigt_min << "  (GPa)" << endl;
       ossfull << "pocc_ael_bulk_modulus_voigt_max=" << Bvoigt_max << "  (GPa)" << endl;    
       ossfull << "pocc_ael_bulk_modulus_reuss_min=" << Breuss_min  << "  (GPa)" << endl;
@@ -722,14 +738,17 @@ namespace pocc {
       ossfull << "pocc_ael_Cauchy_pressure=" << Cauchy_ave << endl;
       ossfull << "pocc_ael_cauchy_pressure_min=" << Cauchy_min << "  (GPa)" << endl;
       ossfull << "pocc_ael_cauchy_pressure_max=" << Cauchy_max << "  (GPa)" << endl;
-      ossfull << "[POCC_AEL_RESULTS]STOP" << endl;
+      //[CO20200731 - OBSOLETE]ossfull << "[POCC_AEL_RESULTS]STOP" << endl;
+      ossfull << "[POCC_AEL_RESULTS]STOP_TEMPERATURE=" << getTemperatureString(T) << "_K" << endl;
       ossfull << AFLOWIN_SEPARATION_LINE << endl;
-      ossfull << "[POCC_AEL_CONFIG_RESULTS]START" << endl;
+      //[CO20200731 - OBSOLETE]ossfull << "[POCC_AEL_CONFIG_RESULTS]START" << endl;
+      ossfull << "[POCC_AEL_CONFIG_RESULTS]START_TEMPERATURE=" << getTemperatureString(T) << "_K" << endl;
       ossfull << "# Config" << "  " << aurostd::PaddedPRE("Bvoigt(GPa)",2," ") << "  " << aurostd::PaddedPRE("Breuss(GPa)",2," ") << "  " << aurostd::PaddedPRE("Bvrh(GPa)",2," ") << "  " << aurostd::PaddedPRE("Gvoigt(GPa)",2," ") << "  " << aurostd::PaddedPRE("Greuss(GPa)",2," ") << "  " << aurostd::PaddedPRE("Gvrh(GPa)",2," ") << "  " << aurostd::PaddedPRE("Evoigt(GPa)",2," ") << "  " << aurostd::PaddedPRE("Ereuss(GPa)",2," ") << "  " << aurostd::PaddedPRE("Evrh(GPa)",2," ") << "  " << aurostd::PaddedPRE("Poisson_ratio",2," ") << "  " << aurostd::PaddedPRE("Hv_Teter(GPa)",2," ") << "  " << aurostd::PaddedPRE("Hv_Chen(GPa)",2," ") << "  " << aurostd::PaddedPRE("Hv_Tian(GPa)",2," ")  << "  " << aurostd::PaddedPRE("Pugh_modulus_ratio",2," ")  << "  " << aurostd::PaddedPRE("Cauchy_pressure(GPa)",2," ")<< endl;
       for (uint i = 0; i < Bvoigt.size(); i++) {
         ossfull << setw(8) << fixed << i << "  " << setw(11) << setprecision(3) << Bvoigt.at(i) << "  " << setw(11) << setprecision(3) << Breuss.at(i) << "  " << setw(9) << setprecision(3) << Bvrh.at(i)  << "  " << setw(11) << setprecision(3) << Gvoigt.at(i) << "  " << setw(11) << setprecision(3) << Greuss.at(i) << "  " << setw(9) << setprecision(3) << Gvrh.at(i) << "  " << setw(11) << setprecision(3) << Yvoigt.at(i) << "  " << setw(11) << setprecision(3) << Yreuss.at(i) << "  " << setw(9) << setprecision(3) << Yvrh.at(i)  << "  " << setw(13) << setprecision(6) << Poisson_ratio.at(i) << "  " << setw(13) << setprecision(3) << Hv_Teter_vrh.at(i) << "  " << setw(12) << setprecision(3) << Hv_Chen_vrh.at(i) << "  " << setw(12) << setprecision(3) << Hv_Tian_vrh.at(i) << "  " << setw(18) << setprecision(6) << Pugh_ratio.at(i)  << "  " << setw(20) << setprecision(3) << Cauchy_pressure.at(i) << endl;
       }
-      ossfull << "[POCC_AEL_CONFIG_RESULTS]STOP" << endl;
+      //[CO20200731 - OBSOLETE]ossfull << "[POCC_AEL_CONFIG_RESULTS]STOP" << endl;
+      ossfull << "[POCC_AEL_CONFIG_RESULTS]STOP_TEMPERATURE=" << getTemperatureString(T) << "_K" << endl;
       ossfull << AFLOWIN_SEPARATION_LINE << endl;
       string ofileafpoccaelfullname = m_aflags.Directory + "/aflow.pocc_ael_full.out";
       aurostd::stringstream2file(ossfull, ofileafpoccaelfullname, "WRITE");
@@ -786,13 +805,12 @@ namespace pocc {
     // [OBSOLETE] npressure = 0;
     // [OBSOLETE] spressure = 0.0;
 
-    if(XHOST.vflag_control.flag("AGL_RUN_POSTPROCESSING")){
-      agl_run_postprocess=XHOST.vflag_control.flag("AGL_RUN_POSTPROCESSING");
-    }  //command line input
+    //run postprocessing
+    agl_run_postprocess=( agl_run_postprocess || XHOST.vflag_control.flag("AGL_RUN_POSTPROCESSING") );  //CO20201026
+    agl_run_postprocess=( agl_run_postprocess || XHOST.POSTPROCESS );  //CO20201026
 
-    if(XHOST.vflag_control.flag("AGL_WRITE_FULL_RESULTS")){
-      agl_write_full_results=XHOST.vflag_control.flag("AGL_WRITE_FULL_RESULTS");
-    }  //command line input
+    //write extra output (debugging mostly)
+    agl_write_full_results=( agl_write_full_results || XHOST.vflag_control.flag("AGL_WRITE_FULL_RESULTS") );
 
     // [OBSOLETE] if(XHOST.vflag_control.flag("AGL_NTEMPERATURE")){
     // [OBSOLETE]   ntemperature=aurostd::string2utype<uint>(XHOST.vflag_control.getattachedscheme("AGL_NTEMPERATURE"));
@@ -820,7 +838,7 @@ namespace pocc {
   // [OBSOLETE] void POccCalculator::generateDebyeThermalProperties(uint ntemperature, double stemperature, uint npressure, double spressure, vector<double>& Debye_temperature, vector<double>& Debye_acoustic, vector<double>& Gruneisen, vector<double>& Cv300K, vector<double>& Cp300K, vector<double>& Fvib300K_atom, vector<double>& Fvib300K_cell, vector<double>& Svib300K_atom, vector<double>& Svib300K_cell, vector<double>& kappa300K, vector<vector<double> >& agl_temperatures, vector<vector<double> >& agl_gibbs_energies_atom, vector<vector<double> >& agl_vibrational_energies_atom)
   void POccCalculator::generateDebyeThermalProperties(vector<double>& Debye_temperature, vector<double>& Debye_acoustic, vector<double>& Gruneisen, vector<double>& Cv300K, vector<double>& Cp300K, vector<double>& Fvib300K_atom, vector<double>& Fvib300K_cell, vector<double>& Svib300K_atom, vector<double>& Svib300K_cell, vector<double>& kappa300K, vector<vector<double> >& agl_temperatures, vector<vector<double> >& agl_gibbs_energies_atom, vector<vector<double> >& agl_vibrational_energies_atom) {
     bool LDEBUG=(FALSE || _DEBUG_POCC_AEL_AGL_ || XHOST.DEBUG);
-    // [OBSOLETE] uint aglerror = 0;
+    uint aglerror = 0;
     string soliloquy="POccCalculator::generateDebyeThermalProperties():";
     if(LDEBUG) {
       cerr << soliloquy << " BEGIN" << endl;
@@ -864,7 +882,10 @@ namespace pocc {
       // [OBSOLETE]  throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Problem with AGL calculation: [dir="+pocc_directory_abs+"]",_FILE_NOT_FOUND_);
       // [OBSOLETE] }
       //CT20200722 Run AGL postprocessing through KBIN
-      AGL_functions::AGL_Get_AflowInName(AflowInName, pocc_directory_abs, agl_aflowin_found);
+      aglerror = AGL_functions::AGL_Get_AflowInName(AflowInName, pocc_directory_abs, agl_aflowin_found);
+      if (aglerror != 0) {
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Problem finding AGL aflow.in filename [dir="+pocc_directory_abs+"]",_FILE_ERROR_);
+      }
       if (agl_aflowin_found) {
         if(aurostd::FileExist(pocc_directory_abs+"/agl.LOCK")) {
           FileLockName = "agl.LOCK";
@@ -946,7 +967,8 @@ namespace pocc {
         agl_gibbs_energies_atom.push_back(agl_gibbs_energy_atom);
         agl_vibrational_energies_atom.push_back(agl_vibrational_energy_atom);
       } else {
-        cerr << soliloquy << pocc_directory_abs << "/aflow.agl.out: File not found" << endl;
+        // [OBSOLETE] cerr << soliloquy << pocc_directory_abs << "/aflow.agl.out: File not found" << endl;
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Problem with AGL calculation: [dir="+pocc_directory_abs+"]",_FILE_NOT_FOUND_);
       }
     }
   }
@@ -1194,10 +1216,11 @@ namespace pocc {
 
       // Writes all results to a file
       ossmain << AFLOWIN_SEPARATION_LINE << endl;
-      ossmain << "[POCC_AGL_RESULTS]START" << endl;
+      //[CO20200731 - OBSOLETE]ossmain << "[POCC_AGL_RESULTS]START" << endl;
+      ossmain << "[POCC_AGL_RESULTS]START_TEMPERATURE=" << getTemperatureString(T) << "_K" << endl;
       ossmain << "pocc_temperature=" << T << "  (K)" << endl;
-      ossmain << "pocc_agl_debye_temperature=" << Debye_temperature_ave << "  (K)" << endl;
-      ossmain << "pocc_agl_debye_acoustic=" << Debye_acoustic_ave << "  (K)" << endl;
+      ossmain << "pocc_agl_debye=" << Debye_temperature_ave << "  (K)" << endl; //CO20200731 - debye_temperature -> debye (matching old AGL designation)
+      ossmain << "pocc_agl_acoustic_debye=" << Debye_acoustic_ave << "  (K)" << endl; //CO20200731 - debye_acoustic -> acoustic_debye (matching old AGL designation)
       ossmain << "pocc_agl_gruneisen=" << Gruneisen_ave << endl;
       ossmain << "pocc_agl_heat_capacity_Cv_300K=" << Cv300K_ave << "  (kB/cell)" << endl;
       ossmain << "pocc_agl_heat_capacity_Cp_300K=" << Cp300K_ave << "  (kB/cell)" << endl;
@@ -1208,18 +1231,22 @@ namespace pocc {
       ossmain << "pocc_agl_thermal_conductivity_300K=" << kappa300K_ave << "  (W/m*K)" << endl;
       ossmain << "pocc_agl_gibbs_energy_atom_ave=" << gibbs_energy_atom_ave << "  (eV/atom)" << endl;
       ossmain << "pocc_agl_vibrational_energy_atom_ave=" << vibrational_energy_atom_ave << "  (meV/atom)" << endl;    
-      ossmain << "[POCC_AGL_RESULTS]STOP" << endl;
+      //[CO20200731 - OBSOLETE]ossmain << "[POCC_AGL_RESULTS]STOP" << endl;
+      ossmain << "[POCC_AGL_RESULTS]STOP_TEMPERATURE=" << getTemperatureString(T) << "_K" << endl;
       ossmain << AFLOWIN_SEPARATION_LINE << endl;
-      ossmain << "[POCC_AGL_ENERGIES_TEMPERATURE]START" << endl;
+      //[CO20200731 - OBSOLETE]ossmain << "[POCC_AGL_ENERGIES_TEMPERATURE]START" << endl;
+      ossmain << "[POCC_AGL_ENERGIES_TEMPERATURE]START_TEMPERATURE=" << getTemperatureString(T) << "_K" << endl;
       ossmain << "#   T(K)" << "  " << aurostd::PaddedPRE("G(eV/atom)",2," ") << "  " << aurostd::PaddedPRE("Fvib(meV/atom)",2," ") << endl;
       for (uint j = 0; j < agl_temperatures_ave.size(); j++) {
         ossmain << setw(8) << setprecision(2) << fixed << agl_temperatures_ave.at(j) << "  " << setw(10) << setprecision(4) << agl_gibbs_energies_atom_ave.at(j) << "  " << setw(14) << setprecision(4) << agl_vibrational_energies_atom_ave.at(j) << endl;
       }
-      ossmain << "[POCC_AGL_ENERGIES_TEMPERATURE]STOP" << endl;
+      //[CO20200731 - OBSOLETE]ossmain << "[POCC_AGL_ENERGIES_TEMPERATURE]STOP" << endl;
+      ossmain << "[POCC_AGL_ENERGIES_TEMPERATURE]STOP_TEMPERATURE=" << getTemperatureString(T) << "_K" << endl;
       ossmain << AFLOWIN_SEPARATION_LINE << endl;
       if (agl_write_full_results) {
         ossfull << AFLOWIN_SEPARATION_LINE << endl;
-        ossfull << "[POCC_AGL_RESULTS]START" << endl;
+        //[CO20200731 - OBSOLETE]ossfull << "[POCC_AGL_RESULTS]START" << endl;
+        ossfull << "[POCC_AGL_RESULTS]START_TEMPERATURE=" << getTemperatureString(T) << "_K" << endl;
         ossfull << "pocc_temperature=" << T << "  (K)" << endl;
         ossfull << "pocc_agl_debye_temperature=" << Debye_temperature_ave << "  (K)" << endl;
         ossfull << "pocc_agl_debye_acoustic=" << Debye_acoustic_ave << "  (K)" << endl;
@@ -1233,15 +1260,18 @@ namespace pocc {
         ossfull << "pocc_agl_thermal_conductivity_300K=" << kappa300K_ave << "  (W/m*K)" << endl;
         ossfull << "pocc_agl_gibbs_energy_atom_ave=" << gibbs_energy_atom_ave << "  (eV/atom)" << endl;
         ossfull << "pocc_agl_vibrational_energy_atom_ave=" << vibrational_energy_atom_ave << "  (meV/atom)" << endl;    
-        ossfull << "[POCC_AGL_RESULTS]STOP" << endl;
+        //[CO20200731 - OBSOLETE]ossfull << "[POCC_AGL_RESULTS]STOP" << endl;
+        ossfull << "[POCC_AGL_RESULTS]STOP_TEMPERATURE=" << getTemperatureString(T) << "_K" << endl;
         ossfull << AFLOWIN_SEPARATION_LINE << endl;
-        ossfull << "[POCC_AGL_ENERGIES_TEMPERATURE]START" << endl;
+        //[CO20200731 - OBSOLETE]ossfull << "[POCC_AGL_ENERGIES_TEMPERATURE]START" << endl;
+        ossfull << "[POCC_AGL_ENERGIES_TEMPERATURE]START_TEMPERATURE=" << getTemperatureString(T) << "_K" << endl;
         // Writes Gibbs and vibrational free energies to a file
         ossfull << "#   T(K)" << "  " << aurostd::PaddedPRE("G(eV/atom)",2," ") << "  " << aurostd::PaddedPRE("Fvib(meV/atom)",2," ") << endl;
         for (uint j = 0; j < agl_temperatures_ave.size(); j++) {
           ossfull << setw(8) << setprecision(2) << fixed << agl_temperatures_ave.at(j) << "  " << setw(10) << setprecision(4) << agl_gibbs_energies_atom_ave.at(j) << "  " << setw(14) << setprecision(4) << agl_vibrational_energies_atom_ave.at(j) << endl;
         }
-        ossfull << "[POCC_AGL_ENERGIES_TEMPERATURE]STOP" << endl;
+        //[CO20200731 - OBSOLETE]ossfull << "[POCC_AGL_ENERGIES_TEMPERATURE]STOP" << endl;
+        ossfull << "[POCC_AGL_ENERGIES_TEMPERATURE]STOP_TEMPERATURE=" << getTemperatureString(T) << "_K" << endl;
         ossfull << AFLOWIN_SEPARATION_LINE << endl;
       }
     }
@@ -1251,12 +1281,14 @@ namespace pocc {
     ossmain.str(std::string());
     if (agl_write_full_results) {
       ossfull << AFLOWIN_SEPARATION_LINE << endl;
-      ossfull << "[POCC_AGL_CONFIG_RESULTS]START" << endl;
+      //[CO20200731 - OBSOLETE]ossfull << "[POCC_AGL_CONFIG_RESULTS]START" << endl;
+      ossfull << "[POCC_AGL_CONFIG_RESULTS]START_TEMPERATURE=" << getTemperatureString(T) << "_K" << endl;
       ossfull << "# Config" << "  " << aurostd::PaddedPRE("Debye_temperature(K)",2," ") << "  " << aurostd::PaddedPRE("Debye_acoustic(K)",2," ") << "  " << aurostd::PaddedPRE("Gruneisen_parameter",2," ") << "  " << aurostd::PaddedPRE("Cv(kB/cell)",2," ") << "  " << aurostd::PaddedPRE("Cp(kB/cell)",2," ") << "  " << aurostd::PaddedPRE("Fvib/cell(meV/cell)",2," ") << "  " << aurostd::PaddedPRE("Fvib/atom(meV/atom)",2," ") << "  " << aurostd::PaddedPRE("Svib/cell(meV/cell*K)",2," ") << "  " << aurostd::PaddedPRE("Svib/atom(meV/atom*K)",2," ") << "  " << aurostd::PaddedPRE("Thermal_conductivity(W/(m*K))",2," ") << endl;
       for (uint i = 0; i < Debye_temperature.size(); i++) {
         ossfull << setw(8) << fixed << i << "  " << setw(20) << setprecision(3) << Debye_temperature.at(i) << "  " << setw(17) << setprecision(3) << Debye_acoustic.at(i) << "  " << setw(19) << setprecision(5) << Gruneisen.at(i)  << "  " << setw(11) << setprecision(4) << Cv300K.at(i) << "  " << setw(11) << setprecision(4) << Cp300K.at(i) << "  " << setw(19) << setprecision(4) << Fvib300K_cell.at(i) << "  " << setw(19) << setprecision(4) << Fvib300K_atom.at(i) << "  " << setw(21) << setprecision(5) << Svib300K_cell.at(i) << "  " << setw(21) << setprecision(6) << Svib300K_atom.at(i)  << "  " << setw(29) << setprecision(6) << kappa300K.at(i) << endl;
       }
-      ossfull << "[POCC_AGL_CONFIG_RESULTS]STOP" << endl;
+      //[CO20200731 - OBSOLETE]ossfull << "[POCC_AGL_CONFIG_RESULTS]STOP" << endl;
+      ossfull << "[POCC_AGL_CONFIG_RESULTS]STOP_TEMPERATURE=" << getTemperatureString(T) << "_K" << endl;
       ossfull << AFLOWIN_SEPARATION_LINE << endl;
       string ofileafpoccaglenergname = m_aflags.Directory + "/aflow.pocc_agl_full.out";
       aurostd::stringstream2file(ossfull, ofileafpoccaglenergname, "WRITE");

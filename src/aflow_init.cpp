@@ -85,7 +85,7 @@ namespace init {
     XHOST.home=aurostd::execute2string("cd && pwd");  //AS SOON AS POSSIBLE
     if(XHOST.home.empty()){XHOST.home=getenv("HOME");}  //CO20200624 - attempt 2
     XHOST.GENERATE_AFLOWIN_ONLY=aurostd::args2flag(argv,cmds,"--generate_aflowin_only");  //CT20180719
-    XHOST.POSTPROCESS=aurostd::args2flag(argv,cmds,"--lib2raw|--lib2lib");  //CO20200624
+    XHOST.POSTPROCESS=aurostd::args2attachedflag(argv,cmds,"--lib2raw=|--lib2lib=");  //CO20200624
     XHOST.ARUN_POSTPROCESS=aurostd::args2flag(argv,cmds,"--postprocess");  //CT20181212
 
     // AFLOWRC LOAD DEFAULTS FROM AFLOWRC.
@@ -853,7 +853,7 @@ namespace init {
     if(XHOST.vflag_control.flag("AGL_SPRESSURE")) XHOST.vflag_control.push_attached("AGL_SPRESSURE",aurostd::args2attachedstring(argv,"--agl_spressure=","1.0")); //CT20200323
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.getattachedscheme(\"AGL_SPRESSURE\")=" << XHOST.vflag_control.getattachedscheme("AGL_SPRESSURE") << endl;  //CT20200323
 
-    XHOST.AVOID_RUNNING_VASP=aurostd::args2attachedflag(argv,cmds,"--avoid_running_vasp");  //CO20200624 - VERY important, prevents VASP from running
+    XHOST.AVOID_RUNNING_VASP=aurostd::args2attachedflag(argv,cmds,"--avoid_running_vasp|--no_vasp|--novasp");  //CO20200624 - VERY important, prevents VASP from running
     if( XHOST.GENERATE_AFLOWIN_ONLY ||
         XHOST.POSTPROCESS || 
         XHOST.ARUN_POSTPROCESS ||
@@ -883,8 +883,8 @@ namespace init {
 
     // USEFUL shortcuts //SC20200319
     if(!aurostd::args2attachedflag(argv,"--np=")) {
-      deque<string> vshort; //  aurostd::string2tokens("1,2,4,5,6,7,8,9,10,12,14,16,20,24,28,30,32,40,44,48,50,52,56,60,64",vshort,",");
-      for(uint ishort=0;ishort<=64;ishort++)
+      deque<string> vshort; 
+      for(uint ishort=0;ishort<=128;ishort++)
         vshort.push_back(aurostd::utype2string(ishort));
       for(uint ishort=0;ishort<vshort.size();ishort++) {
         if(aurostd::args2flag(argv,cmds,"--multi="+vshort.at(ishort))) {  //SC20200319
@@ -1019,7 +1019,7 @@ namespace init {
   long _GetRAM(void) {
     struct sysinfo s;
     if(sysinfo(&s)!=0) {
-      string function = XPID + "init::_GetRAM()";
+      string function = XPID + "init::_GetRAM():";
       string message = "sysinfo error";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
     }
@@ -1034,7 +1034,7 @@ namespace init {
     uint64_t size;
     size_t len=sizeof(size);
     if(sysctl(mib,namelen,&size,&len,NULL,0)<0) {
-      string function = XPID + "init::GetRAM()";
+      string function = XPID + "init::GetRAM():";
       string message = "sysctl returned an error";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
     }
@@ -1061,28 +1061,42 @@ namespace init {
     if(LDEBUG) cerr << "00000  MESSAGE AFLOW INIT Loading data = [" << str2load << "]";
     if(LDEBUG) cerr.flush();
 
-
     string out;
     string aflow_data_path=aurostd::args2attachedstring(XHOST.argv,"--aflow_data_path=",(string) "");
     if(aflow_data_path=="") {
+      if(LDEBUG) cerr << endl;
+      if(LDEBUG) cerr << soliloquy << " XHOST.hostname=" << XHOST.hostname << endl;
+      if(LDEBUG) cerr << soliloquy << " XHOST.user=" << XHOST.user << endl;
+      if(LDEBUG) cerr << soliloquy << " XHOST.home=" << XHOST.home << endl;
+ 
       if(XHOST.hostname=="nietzsche.mems.duke.edu"&&XHOST.user=="auro"&&aurostd::FileExist(XHOST.home+"/work/AFLOW3/aflow_data")) {  //CO, special SC
-        out=aurostd::execute2string(string(XHOST.home+"/work/AFLOW3/aflow_data")+string(" ")+str2load);
-        if(LDEBUG) cerr << soliloquy << " FOUND " << XHOST.home << "/work/AFLOW3/aflow_data" << endl;
-        //       if(LDEBUG) cerr << soliloquy << " out=" << out << endl; 
-        if(LDEBUG) cerr << soliloquy << " str2load=" << str2load << endl; 
+	if(LDEBUG) cerr << soliloquy << " FOUND " << XHOST.home << "/work/AFLOW3/aflow_data" << endl;
+	//	if(LDEBUG) cerr << soliloquy << " out.length()=" << out.length() << endl;
+ 	out=aurostd::execute2string(XHOST.home+"/work/AFLOW3/aflow_data"+" "+str2load);
+	if(LDEBUG) cerr << soliloquy << " out.length()=" << out.length() << endl;
+	// 	vector<string> vout;aurostd::string2vectorstring(out,vout);
+	// 	if(LDEBUG) cerr << soliloquy << " vout.size()=" << vout.size() << endl;
+	// 	for(uint i=0;i<vout.size();i+=3) {
+	// 	  if(aurostd::substring2bool(vout.at(i),"LIB6") || aurostd::substring2bool(vout.at(i+1),"LIB6") || aurostd::substring2bool(vout.at(i+2),"LIB6")) 
+	// 	    cout << vout.at(i) << "    " << vout.at(i+1) << "    " << vout.at(i+2) << endl;
+	// 	}
+	// 	//       if(LDEBUG) cerr << soliloquy << " out=" << out << endl; 
+	// if(LDEBUG) cerr << soliloquy << " str2load=" << str2load << endl;
       } else {
-        if(LDEBUG) {cerr << soliloquy << " issuing command: " << XHOST.command("aflow_data") << " " << str2load << endl;}
+	//	cerr <<  soliloquy << " [2] " << endl;
+	if(LDEBUG) {cerr << soliloquy << " issuing command: " << XHOST.command("aflow_data") << " " << str2load << endl;}
         out=aurostd::execute2string(XHOST.command("aflow_data")+" "+str2load);
       }
     } else { // cerr << string(aflow_data_path+"/"+XHOST.command("aflow_data")) << endl;
+      //      cerr <<  soliloquy << " [3] " << endl;
       out=aurostd::execute2string(aflow_data_path+"/"+XHOST.command("aflow_data")+" "+str2load);
     }
     if(LDEBUG) cerr << soliloquy << " out.length()=" << out.length() << endl;
     if(LDEBUG) cerr.flush();
     if(LDEBUG) cerr << soliloquy << " XHOST_vLIBS.size()=" << XHOST_vLIBS.size() << endl;
 
-    if((str2load=="vLIBS" || str2load=="XHOST_vLIBS") && XHOST_vLIBS.size()!=3) {
-      for(uint i=0;i<XHOST_vLIBS.size();i++) XHOST_vLIBS.at(i).clear();
+    if((str2load=="vLIBS" || str2load=="XHOST_vLIBS")) { // && XHOST_vLIBS.size()!=3) {
+      if(XHOST_vLIBS.size()) for(uint i=0;i<XHOST_vLIBS.size();i++) XHOST_vLIBS.at(i).clear();
       XHOST_vLIBS.clear();
       XHOST_vLIBS.push_back(vector<string>()); // AURL
       XHOST_vLIBS.push_back(vector<string>()); // AUID
@@ -1092,6 +1106,9 @@ namespace init {
       string aurl,auid,loop;
       bool found=FALSE;
       aurostd::string2vectorstring(out,vout);
+      if(LDEBUG) cerr << soliloquy << " vout.size()=" << vout.size() << endl;
+      // make some checks if it  is divisible by three
+      
       for(uint i=0;i<vout.size();) {
         aurl=vout.at(i++);XHOST_vLIBS.at(0).push_back(aurl); // AURL
         auid=vout.at(i++);XHOST_vLIBS.at(1).push_back(auid); // AUID
@@ -1684,19 +1701,19 @@ string aflow_get_time_string(void) {
   //Www Mmm dd hh:mm:ss yyyy
   //Where Www is the weekday, Mmm the month (in letters), dd the day of the month, hh:mm:ss the time, and yyyy the year.
   //The string is followed by a new-line character ('\n') and terminated with a null-character.
-//[CO20200624 - OBSOLETE]#ifdef ALPHA
-//[CO20200624 - OBSOLETE]  ostringstream aus;
-//[CO20200624 - OBSOLETE]  string OUT;
-//[CO20200624 - OBSOLETE]  aus<<"date | sed \"s/ /_/g\" > "+XHOST.tmpfs+"/date."<< XHOST.ostrPID.str() << "." << XHOST.ostrTID.str() << " " <<endl;  //CO20200502 - threadID
-//[CO20200624 - OBSOLETE]  system(aus.str().c_str());
-//[CO20200624 - OBSOLETE]  ifstream FileAUS;
-//[CO20200624 - OBSOLETE]  string FileNameAUS=XHOST.tmpfs+"/date."+XHOST.ostrPID.str()+"."+XHOST.ostrTID.str();  //CO20200502 - threadID
-//[CO20200624 - OBSOLETE]  FileAUS.open(FileNameAUS.c_str(),std::ios::in);
-//[CO20200624 - OBSOLETE]  FileAUS >> OUT;
-//[CO20200624 - OBSOLETE]  FileAUS.clear();FileAUS.close();
-//[CO20200624 - OBSOLETE]  // return (char*) OUT.c_str();
-//[CO20200624 - OBSOLETE]  return string("NotAvailable \n");
-//[CO20200624 - OBSOLETE]#else
+  //[CO20200624 - OBSOLETE]#ifdef ALPHA
+  //[CO20200624 - OBSOLETE]  ostringstream aus;
+  //[CO20200624 - OBSOLETE]  string OUT;
+  //[CO20200624 - OBSOLETE]  aus<<"date | sed \"s/ /_/g\" > "+XHOST.tmpfs+"/date."<< XHOST.ostrPID.str() << "." << XHOST.ostrTID.str() << " " <<endl;  //CO20200502 - threadID
+  //[CO20200624 - OBSOLETE]  system(aus.str().c_str());
+  //[CO20200624 - OBSOLETE]  ifstream FileAUS;
+  //[CO20200624 - OBSOLETE]  string FileNameAUS=XHOST.tmpfs+"/date."+XHOST.ostrPID.str()+"."+XHOST.ostrTID.str();  //CO20200502 - threadID
+  //[CO20200624 - OBSOLETE]  FileAUS.open(FileNameAUS.c_str(),std::ios::in);
+  //[CO20200624 - OBSOLETE]  FileAUS >> OUT;
+  //[CO20200624 - OBSOLETE]  FileAUS.clear();FileAUS.close();
+  //[CO20200624 - OBSOLETE]  // return (char*) OUT.c_str();
+  //[CO20200624 - OBSOLETE]  return string("NotAvailable \n");
+  //[CO20200624 - OBSOLETE]#else
   long ltime=time(NULL);
 
   string date=string(ctime(&ltime));
@@ -1704,20 +1721,20 @@ string aflow_get_time_string(void) {
     if(date.at(date.length()-1)=='\n')
       date.erase(date.length()-1);
   return date;
-//[CO20200624 - OBSOLETE]#endif
+  //[CO20200624 - OBSOLETE]#endif
 }
 string aflow_convert_time_ctime2aurostd(const string& time_LOCK){ //CO20200624
   //refer to aflow_get_time_string()
   //convert Www Mmm dd hh:mm:ss yyyy style to aurostd::get_datetime() one
-  string soliloquy=XPID+"aflow_convert_time_LOCK2aflowlib():";
+  string soliloquy=XPID+"aflow_convert_time_ctime2aurostd():";
   bool LDEBUG=(FALSE || XHOST.DEBUG);
 
   if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
-  
+
   vector<string> tokens;
   aurostd::string2tokens(time_LOCK,tokens);
   if(tokens.size()!=5){return "";}
-  
+
   //https://en.cppreference.com/w/c/chrono/strftime
   //'Www Mmm dd hh:mm:ss yyyy' === '%a %b %d %H:%M:%S %Y'
   //https://stackoverflow.com/questions/19524720/using-strptime-converting-string-to-time-but-getting-garbage
@@ -1725,7 +1742,7 @@ string aflow_convert_time_ctime2aurostd(const string& time_LOCK){ //CO20200624
   if(!strptime(time_LOCK.c_str(),"%a %b %d %H:%M:%S %Y",&tstruct)){return "";}
 
   if(LDEBUG){cerr << soliloquy << " END" << endl;}
-  
+
   return aurostd::get_datetime(&tstruct);
 }
 
@@ -1807,21 +1824,15 @@ string Message(const string& list2print) {
   pthread_mutex_lock(&mutex_INIT_Message);
   // pthread_mutex_unlock(&mutex_INIT_Message);
   stringstream strout;
-  if(aurostd::substring2bool(list2print,"user") || aurostd::substring2bool(list2print,"USER")) strout << " - [user=" << XHOST.user << "]";
-  if(aurostd::substring2bool(list2print,"group") || aurostd::substring2bool(list2print,"GROUP")) strout << " - [group=" << XHOST.group << "]";
-  if(aurostd::substring2bool(list2print,"host") || aurostd::substring2bool(list2print,"HOST") || 
-      aurostd::substring2bool(list2print,"hostname") || aurostd::substring2bool(list2print,"HOSTNAME") ||
-      FALSE) strout << " - [host=" << XHOST.hostname << "]";
-  //[CO20200624 - redundant]if(aurostd::substring2bool(list2print,"hostname") || aurostd::substring2bool(list2print,"HOSTNAME")) strout << " - [host=" << XHOST.hostname << "]";
-  if(aurostd::substring2bool(list2print,"temperature")) if(init::GetTEMP()) for(uint i=0;i<XHOST.vTemperatureCore.size();i++) {strout << (i==0?" - [temp(C)=":"") << XHOST.vTemperatureCore.at(i) << (i<XHOST.vTemperatureCore.size()-1?",":"]");}
-  if(aurostd::substring2bool(list2print,"machine") || aurostd::substring2bool(list2print,"MACHINE")) strout << " - [host=" << XHOST.hostname << "]";
-  if(aurostd::substring2bool(list2print,"pid") || aurostd::substring2bool(list2print,"PID")) strout << " - [PID=" << XHOST.PID << "]";  //CO20200502
-  if(aurostd::substring2bool(list2print,"tid") || aurostd::substring2bool(list2print,"TID")) strout << " - [TID=" << XHOST.TID << "]";  //CO20200502
-  if(list2print.empty() || aurostd::substring2bool(list2print,"time") || aurostd::substring2bool(list2print,"TIME") || 
-      aurostd::substring2bool(list2print,"date") || aurostd::substring2bool(list2print,"DATE")) strout << " - [date=" << aflow_get_time_string() << "]";   //CO20200624
-  //[CO20200624 - redundant]if(aurostd::substring2bool(list2print,"date") || aurostd::substring2bool(list2print,"DATE")) strout << " - [date=" << aflow_get_time_string() << "]";
-  //  if(XHOST.maxmem>0.0 && XHOST.maxmem<100.0)
-  if(aurostd::substring2bool(list2print,"memory") && (XHOST.maxmem>0.0 && XHOST.maxmem<100)) strout << " - [mem=" << aurostd::utype2string<double>(AFLOW_checkMEMORY("vasp",XHOST.maxmem),4) << " (" << XHOST.maxmem << ")]"; //CO20170628 - slow otherwise!!!
+  string LIST2PRINT=aurostd::toupper(list2print); //CO+DX20200825
+  if(aurostd::substring2bool(LIST2PRINT,"USER")) strout << " - [user=" << XHOST.user << "]";
+  if(aurostd::substring2bool(LIST2PRINT,"GROUP")) strout << " - [group=" << XHOST.group << "]";
+  if(aurostd::substring2bool(LIST2PRINT,"HOST") || aurostd::substring2bool(LIST2PRINT,"HOSTNAME") || aurostd::substring2bool(LIST2PRINT,"MACHINE")) strout << " - [host=" << XHOST.hostname << "]";
+  if(aurostd::substring2bool(LIST2PRINT,"TEMPERATURE")) if(init::GetTEMP()) for(uint i=0;i<XHOST.vTemperatureCore.size();i++) {strout << (i==0?" - [temp(C)=":"") << XHOST.vTemperatureCore.at(i) << (i<XHOST.vTemperatureCore.size()-1?",":"]");}
+  if(aurostd::substring2bool(LIST2PRINT,"PID")) strout << " - [PID=" << XHOST.PID << "]";  //CO20200502
+  if(aurostd::substring2bool(LIST2PRINT,"TID")) strout << " - [TID=" << XHOST.TID << "]";  //CO20200502
+  if(LIST2PRINT.empty() || aurostd::substring2bool(LIST2PRINT,"TIME") || aurostd::substring2bool(LIST2PRINT,"DATE")) strout << " - [date=" << aflow_get_time_string() << "]";   //CO20200624
+  if(aurostd::substring2bool(LIST2PRINT,"MEMORY") && (XHOST.maxmem>0.0 && XHOST.maxmem<100)) strout << " - [mem=" << aurostd::utype2string<double>(AFLOW_checkMEMORY("vasp",XHOST.maxmem),4) << " (" << XHOST.maxmem << ")]"; //CO20170628 - slow otherwise!!!
   if(XHOST.vTemperatureCore.size()>0) if(max(XHOST.vTemperatureCore)>AFLOW_CORE_TEMPERATURE_BEEP) strout << " - [ERROR_TEMPERATURE=" << max(XHOST.vTemperatureCore) << ">" << AFLOW_CORE_TEMPERATURE_BEEP << "@ host=" << XHOST.hostname<< "]";
   // strout << endl;
   pthread_mutex_unlock(&mutex_INIT_Message);
@@ -1890,7 +1901,7 @@ namespace init {
     message << "Routine " << routine << ": Wrong number/type of input parameters (" << tokens_options.size();pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,_LOGGER_ERROR_);
     //[CO20200624 - OBSOLETE]oss << "ERROR: " << routine << ":" << endl;
     //[CO20200624 - OBSOLETE]oss << "       Wrong number/type of input parameters! (" << tokens_options.size() << ")" << endl;
-    
+
     //DX20200724 [OBSOLETE] return MessageOption(options,routine,vusage);
     MessageOption(options,routine,vusage); //DX20200724
     throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Incorrect usage.",_RUNTIME_ERROR_); //DX20200724
@@ -2068,6 +2079,42 @@ namespace init {
     XHOST.vschema.push_attached("SCHEMA::TYPE:AGL_THERMAL_EXPANSION_300K","number");
     nschema++;
 
+    // schema is CAPITAL, content is not necessarily //DX20200902
+    XHOST.vschema.push_attached("SCHEMA::NAME:ANRL_LABEL_ORIG","anrl_label_orig");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:ANRL_LABEL_ORIG","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:ANRL_LABEL_ORIG","string");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily //DX20200902
+    XHOST.vschema.push_attached("SCHEMA::NAME:ANRL_PARAMETER_LIST_ORIG","anrl_parameter_list_orig");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:ANRL_PARAMETER_LIST_ORIG","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:ANRL_PARAMETER_LIST_ORIG","strings");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily //DX20200902
+    XHOST.vschema.push_attached("SCHEMA::NAME:ANRL_PARAMETER_VALUES_ORIG","anrl_parameter_values_orig");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:ANRL_PARAMETER_VALUES_ORIG","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:ANRL_PARAMETER_VALUES_ORIG","numbers");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily //DX20200902
+    XHOST.vschema.push_attached("SCHEMA::NAME:ANRL_LABEL_RELAX","anrl_label_relax");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:ANRL_LABEL_RELAX","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:ANRL_LABEL_RELAX","string");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily //DX20200902
+    XHOST.vschema.push_attached("SCHEMA::NAME:ANRL_PARAMETER_LIST_RELAX","anrl_parameter_list_relax");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:ANRL_PARAMETER_LIST_RELAX","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:ANRL_PARAMETER_LIST_RELAX","strings");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily //DX20200902
+    XHOST.vschema.push_attached("SCHEMA::NAME:ANRL_PARAMETER_VALUES_RELAX","anrl_parameter_values_relax");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:ANRL_PARAMETER_VALUES_RELAX","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:ANRL_PARAMETER_VALUES_RELAX","numbers");
+    nschema++;
+
     // schema is CAPITAL, content is not necessarily
     XHOST.vschema.push_attached("SCHEMA::NAME:AUID","auid");
     XHOST.vschema.push_attached("SCHEMA::UNIT:AUID","");
@@ -2200,6 +2247,14 @@ namespace init {
     XHOST.vschema.push_attached("SCHEMA::TYPE:CATALOG","string");
     nschema++;
 
+    //CO20200829 START
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:COEFFICIENT_ENTROPY_STABILIZATION","coefficient_entropy_stabilization");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:COEFFICIENT_ENTROPY_STABILIZATION","eV/atom");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:COEFFICIENT_ENTROPY_STABILIZATION","number");
+    nschema++;
+    //CO20200829 END
+
     // schema is CAPITAL, content is not necessarily
     XHOST.vschema.push_attached("SCHEMA::NAME:CODE","code");
     XHOST.vschema.push_attached("SCHEMA::UNIT:CODE","");
@@ -2290,6 +2345,14 @@ namespace init {
     XHOST.vschema.push_attached("SCHEMA::TYPE:DFT_TYPE","string");
     nschema++;
 
+    //CO20200829 START
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:DISTANCE_HULL","distance_hull");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:DISTANCE_HULL","eV/atom");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:DISTANCE_HULL","number");
+    nschema++;
+    //CO20200829 END
+
     // schema is CAPITAL, content is not necessarily
     XHOST.vschema.push_attached("SCHEMA::NAME:EENTROPY_ATOM","eentropy_atom");
     XHOST.vschema.push_attached("SCHEMA::UNIT:EENTROPY_ATOM","eV/atom");
@@ -2362,6 +2425,38 @@ namespace init {
     XHOST.vschema.push_attached("SCHEMA::TYPE:ENTHALPY_FORMATION_CELL","number");
     nschema++;
 
+    //CO20200829 START
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:ENTHALPY_FORMATION_CCE_300K_CELL","enthalpy_formation_cce_300K_cell");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:ENTHALPY_FORMATION_CCE_300K_CELL","eV");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:ENTHALPY_FORMATION_CCE_300K_CELL","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:ENTHALPY_FORMATION_CCE_300K_ATOM","enthalpy_formation_cce_300K_atom");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:ENTHALPY_FORMATION_CCE_300K_ATOM","eV/atom");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:ENTHALPY_FORMATION_CCE_300K_ATOM","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:ENTHALPY_FORMATION_CCE_0K_CELL","enthalpy_formation_cce_0K_cell");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:ENTHALPY_FORMATION_CCE_0K_CELL","eV");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:ENTHALPY_FORMATION_CCE_0K_CELL","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:ENTHALPY_FORMATION_CCE_0K_ATOM","enthalpy_formation_cce_0K_atom");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:ENTHALPY_FORMATION_CCE_0K_ATOM","eV/atom");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:ENTHALPY_FORMATION_CCE_0K_ATOM","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:ENTROPY_FORMING_ABILITY","entropy_forming_ability");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:ENTROPY_FORMING_ABILITY","(eV/atom)^{-1}");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:ENTROPY_FORMING_ABILITY","number");
+    nschema++;
+    //CO20200829 END
+
     // schema is CAPITAL, content is not necessarily
     XHOST.vschema.push_attached("SCHEMA::NAME:ENTROPIC_TEMPERATURE","entropic_temperature");
     XHOST.vschema.push_attached("SCHEMA::UNIT:ENTROPIC_TEMPERATURE","K");
@@ -2391,6 +2486,14 @@ namespace init {
     XHOST.vschema.push_attached("SCHEMA::UNIT:GEOMETRY_ORIG","");
     XHOST.vschema.push_attached("SCHEMA::TYPE:GEOMETRY_ORIG","numbers");
     nschema++;
+
+    //CO20200829 START
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:GROUND_STATE","ground_state");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:GROUND_STATE","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:GROUND_STATE","bool");
+    nschema++;
+    //CO20200829 END
 
     // schema is CAPITAL, content is not necessarily
     XHOST.vschema.push_attached("SCHEMA::NAME:KPOINTS","kpoints");
@@ -2547,6 +2650,14 @@ namespace init {
     XHOST.vschema.push_attached("SCHEMA::UNIT:PEARSON_SYMBOL_SUPERLATTICE_ORIG","");
     XHOST.vschema.push_attached("SCHEMA::TYPE:PEARSON_SYMBOL_SUPERLATTICE_ORIG","string");
     nschema++;
+
+    //CO20200829 START
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:POCC_PARAMETERS","pocc_parameters");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:POCC_PARAMETERS","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:POCC_PARAMETERS","string");
+    nschema++;
+    //CO20200829 END
 
     // schema is CAPITAL, content is not necessarily
     XHOST.vschema.push_attached("SCHEMA::NAME:POINT_GROUP_HERMANN_MAUGUIN","point_group_Hermann_Mauguin");
@@ -2813,10 +2924,11 @@ namespace init {
     nschema++;
 
     // schema is CAPITAL, content is not necessarily
-    XHOST.vschema.push_attached("SCHEMA::NAME:TITLE","title");
-    XHOST.vschema.push_attached("SCHEMA::UNIT:TITLE","");
-    XHOST.vschema.push_attached("SCHEMA::TYPE:TITLE","string");
-    nschema++;
+    // OBSOLETE ME20200829
+    //XHOST.vschema.push_attached("SCHEMA::NAME:TITLE","title");
+    //XHOST.vschema.push_attached("SCHEMA::UNIT:TITLE","");
+    //XHOST.vschema.push_attached("SCHEMA::TYPE:TITLE","string");
+    //nschema++;
 
     // schema is CAPITAL, content is not necessarily
     XHOST.vschema.push_attached("SCHEMA::NAME:VALENCE_CELL_IUPAC","valence_cell_iupac");

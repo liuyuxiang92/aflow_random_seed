@@ -310,6 +310,8 @@
 #define         DEFAULT_AFLOW_LIBRARY_DIRECTORIES             XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_LIBRARY_DIRECTORIES")
 #define AFLOWRC_DEFAULT_AFLOW_PROJECTS_DIRECTORIES            string("/common/AUID,/common/ICSD,/common/LIB0,/common/LIB1,/common/LIB2,/common/LIB3,/common/LIB4,/common/LIB5,/common/LIB6,/common/LIB7,/common/LIB8,/common/LIB9")  // first is default, tokenized with ","
 #define         DEFAULT_AFLOW_PROJECTS_DIRECTORIES            XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_PROJECTS_DIRECTORIES")
+#define AFLOWRC_DEFAULT_AFLOWDATA_WEB_DIRECTORY               string("/www/AFLOWDATA")  //CO+ME20200731
+#define         DEFAULT_AFLOWDATA_WEB_DIRECTORY               XHOST.adefault.getattachedscheme("DEFAULT_AFLOWDATA_WEB_DIRECTORY") //CO+ME20200731
 
 // PLATON/FINDSYM // DONE
 #define AFLOWRC_DEFAULT_PLATON_P_EQUAL                        FALSE
@@ -580,6 +582,10 @@
 #define         DEFAULT_QHA_EOS                               XHOST.adefault.getattachedutype<bool>("DEFAULT_QHA_EOS")
 #define AFLOWRC_DEFAULT_QHA_EOS_DISTORTION_RANGE              string("-12:16:3")
 #define         DEFAULT_QHA_EOS_DISTORTION_RANGE              XHOST.adefault.getattachedscheme("DEFAULT_QHA_EOS_DISTORTION_RANGE")
+//AS20200818 BEGIN
+#define AFLOWRC_DEFAULT_QHA_EOS_MODEL                         string("SJ,BM4")
+#define         DEFAULT_QHA_EOS_MODEL                         XHOST.adefault.getattachedscheme("DEFAULT_QHA_EOS_MODEL")
+//AS20200818 END
 #define AFLOWRC_DEFAULT_QHA_GP_DISTORTION                     1.0
 #define         DEFAULT_QHA_GP_DISTORTION                     XHOST.adefault.getattachedutype<double>("DEFAULT_QHA_GP_DISTORTION")
 //AS20200602 BEGIN
@@ -781,8 +787,20 @@
 
 //RF20200413 START
 // DEFAULT CCE
-#define AFLOWRC_DEFAULT_CCE_OX_METHOD                         string("ELECTRONEGATIVITY_ALLEN")
-#define         DEFAULT_CCE_OX_METHOD                         XHOST.adefault.getattachedscheme("DEFAULT_CCE_OX_METHOD")
+#define AFLOWRC_DEFAULT_CCE_OX_METHOD                         1
+#define         DEFAULT_CCE_OX_METHOD                         XHOST.adefault.getattachedutype<int>("DEFAULT_CCE_OX_METHOD")
+#define AFLOWRC_DEFAULT_CCE_NN_DIST_TOL_MULTI_ANION           0.4
+#define         DEFAULT_CCE_NN_DIST_TOL_MULTI_ANION           XHOST.adefault.getattachedutype<double>("DEFAULT_CCE_NN_DIST_TOL_MULTI_ANION")
+#define AFLOWRC_DEFAULT_CCE_OX_TOL                            0.001
+#define         DEFAULT_CCE_OX_TOL                            XHOST.adefault.getattachedutype<double>("DEFAULT_CCE_OX_TOL")
+#define AFLOWRC_DEFAULT_CCE_PEROX_CUTOFF                      1.6
+#define         DEFAULT_CCE_PEROX_CUTOFF                      XHOST.adefault.getattachedutype<double>("DEFAULT_CCE_PEROX_CUTOFF")
+#define AFLOWRC_DEFAULT_CCE_SUPEROX_CUTOFF                    1.4
+#define         DEFAULT_CCE_SUPEROX_CUTOFF                    XHOST.adefault.getattachedutype<double>("DEFAULT_CCE_SUPEROX_CUTOFF")
+#define AFLOWRC_DEFAULT_CCE_O2_MOLECULE_UPPER_CUTOFF          1.3
+#define         DEFAULT_CCE_O2_MOLECULE_UPPER_CUTOFF          XHOST.adefault.getattachedutype<double>("DEFAULT_CCE_O2_MOLECULE_UPPER_CUTOFF")
+#define AFLOWRC_DEFAULT_CCE_O2_MOLECULE_LOWER_CUTOFF          1.2
+#define         DEFAULT_CCE_O2_MOLECULE_LOWER_CUTOFF          XHOST.adefault.getattachedutype<double>("DEFAULT_CCE_O2_MOLECULE_LOWER_CUTOFF")
 //RF20200413 END
 
 //DX20200709 - START
@@ -791,6 +809,12 @@
 #define         DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING    XHOST.adefault.getattachedutype<double>("DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING")
 //DX20200709 - END
 
+//DX20200720 - START
+// DEFAULT ANRL
+#define AFLOWRC_DEFAULT_ANRL_WYCKOFF_FRACTIONAL_TOL           1e-6 // tolerance for equivalent Wyckoff coordinates
+#define         DEFAULT_ANRL_WYCKOFF_FRACTIONAL_TOL           XHOST.adefault.getattachedutype<double>("DEFAULT_ANRL_WYCKOFF_FRACTIONAL_TOL")
+//DX20200720 - END
+
 // CORES // DONE
 #define AFLOWRC_AFLOW_CORE_TEMPERATURE_BEEP                   56.0    // Celsius
 #define         AFLOW_CORE_TEMPERATURE_BEEP                   XHOST.adefault.getattachedutype<double>("AFLOW_CORE_TEMPERATURE_BEEP") 
@@ -798,6 +822,10 @@
 #define         AFLOW_CORE_TEMPERATURE_HALT                   XHOST.adefault.getattachedutype<double>("AFLOW_CORE_TEMPERATURE_HALT") 
 #define AFLOWRC_AFLOW_CORE_TEMPERATURE_REFRESH                5.0    // seconds
 #define         AFLOW_CORE_TEMPERATURE_REFRESH                XHOST.adefault.getattachedutype<double>("AFLOW_CORE_TEMPERATURE_REFRESH") 
+
+// VASP MACHINE SETTINGS
+#define AFLOWRC_VASP_CHECK_SLEEP                              30    // seconds
+#define         VASP_CHECK_SLEEP                              XHOST.adefault.getattachedutype<double>("VASP_CHECK_SLEEP") 
 
 // MACHINE DEPENDENT MPI
 #define AFLOWRC_MPI_OPTIONS_DUKE_BETA_MPICH                   string("ulimit -s unlimited ") // DUKE_BETA_MPICH
@@ -1237,6 +1265,7 @@ namespace aflowrc {
     // AFLOW_LIBRARY AFLOW_PROJECT
     aflowrc::load_default("DEFAULT_AFLOW_LIBRARY_DIRECTORIES",AFLOWRC_DEFAULT_AFLOW_LIBRARY_DIRECTORIES);
     aflowrc::load_default("DEFAULT_AFLOW_PROJECTS_DIRECTORIES",AFLOWRC_DEFAULT_AFLOW_PROJECTS_DIRECTORIES);
+    aflowrc::load_default("DEFAULT_AFLOWDATA_WEB_DIRECTORY",AFLOWRC_DEFAULT_AFLOWDATA_WEB_DIRECTORY); //CO+ME20200731
 
     // DEFAULT PLATON/FINDSYM
     aflowrc::load_default("DEFAULT_PLATON_P_EQUAL",AFLOWRC_DEFAULT_PLATON_P_EQUAL);
@@ -1384,6 +1413,7 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_QHA_MODE", AFLOWRC_DEFAULT_QHA_MODE);
     aflowrc::load_default("DEFAULT_QHA_EOS", AFLOWRC_DEFAULT_QHA_EOS);
     aflowrc::load_default("DEFAULT_QHA_EOS_DISTORTION_RANGE", AFLOWRC_DEFAULT_QHA_EOS_DISTORTION_RANGE);
+    aflowrc::load_default("DEFAULT_QHA_EOS_MODEL", AFLOWRC_DEFAULT_QHA_EOS_MODEL);//AS20200818
     aflowrc::load_default("DEFAULT_QHA_GP_DISTORTION", AFLOWRC_DEFAULT_QHA_GP_DISTORTION);
     aflowrc::load_default("DEFAULT_QHA_TAYLOR_EXPANSION_ORDER", AFLOWRC_DEFAULT_QHA_TAYLOR_EXPANSION_ORDER);//AS20200602
     aflowrc::load_default("DEFAULT_QHA_INCLUDE_ELEC_CONTRIB", AFLOWRC_DEFAULT_QHA_INCLUDE_ELEC_CONTRIB);
@@ -1497,6 +1527,12 @@ namespace aflowrc {
     //RF20200413 START
     // DEFAULT CCE
     aflowrc::load_default("DEFAULT_CCE_OX_METHOD",AFLOWRC_DEFAULT_CCE_OX_METHOD);
+    aflowrc::load_default("DEFAULT_CCE_NN_DIST_TOL_MULTI_ANION",AFLOWRC_DEFAULT_CCE_NN_DIST_TOL_MULTI_ANION);
+    aflowrc::load_default("DEFAULT_CCE_OX_TOL",AFLOWRC_DEFAULT_CCE_OX_TOL);
+    aflowrc::load_default("DEFAULT_CCE_PEROX_CUTOFF",AFLOWRC_DEFAULT_CCE_PEROX_CUTOFF);
+    aflowrc::load_default("DEFAULT_CCE_SUPEROX_CUTOFF",AFLOWRC_DEFAULT_CCE_SUPEROX_CUTOFF);
+    aflowrc::load_default("DEFAULT_CCE_O2_MOLECULE_UPPER_CUTOFF",AFLOWRC_DEFAULT_CCE_O2_MOLECULE_UPPER_CUTOFF);
+    aflowrc::load_default("DEFAULT_CCE_O2_MOLECULE_LOWER_CUTOFF",AFLOWRC_DEFAULT_CCE_O2_MOLECULE_LOWER_CUTOFF);
     //RF20200413 END
 
     //DX20200709 - START
@@ -1504,10 +1540,18 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING",AFLOWRC_DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING);
     //DX20200709 - END
 
+    //DX20200720 - START
+    // DEFAULT ANRL
+    aflowrc::load_default("DEFAULT_ANRL_WYCKOFF_FRACTIONAL_TOL",AFLOWRC_DEFAULT_ANRL_WYCKOFF_FRACTIONAL_TOL);
+    //DX20200720 - END
+
     // DEFAULT CORE
     aflowrc::load_default("AFLOW_CORE_TEMPERATURE_BEEP",AFLOWRC_AFLOW_CORE_TEMPERATURE_BEEP);
     aflowrc::load_default("AFLOW_CORE_TEMPERATURE_HALT",AFLOWRC_AFLOW_CORE_TEMPERATURE_HALT);
     aflowrc::load_default("AFLOW_CORE_TEMPERATURE_REFRESH",AFLOWRC_AFLOW_CORE_TEMPERATURE_REFRESH);
+
+    // VASP MACHINE SETTINGS
+    aflowrc::load_default("VASP_CHECK_SLEEP",AFLOWRC_VASP_CHECK_SLEEP); //CO20201111
 
     // DEFAULT MACHINE DEPENDENT MPI
     aflowrc::load_default("MPI_OPTIONS_DUKE_BETA_MPICH",AFLOWRC_MPI_OPTIONS_DUKE_BETA_MPICH); 
@@ -1795,6 +1839,7 @@ namespace aflowrc {
     aflowrc << "// AFLOW_LIBRARY AFLOW_PROJECT" << endl;
     aflowrc << "DEFAULT_AFLOW_LIBRARY_DIRECTORIES=\"" << AFLOWRC_DEFAULT_AFLOW_LIBRARY_DIRECTORIES << "\"" << endl;
     aflowrc << "DEFAULT_AFLOW_PROJECTS_DIRECTORIES=\"" << AFLOWRC_DEFAULT_AFLOW_PROJECTS_DIRECTORIES << "\"" << endl;
+    aflowrc << "DEFAULT_AFLOWDATA_WEB_DIRECTORY=\"" << AFLOWRC_DEFAULT_AFLOWDATA_WEB_DIRECTORY << "\"" << endl; //CO+ME20200731
 
     aflowrc << " " << endl;
     aflowrc << "// DEFAULT PLATON/FINDSYM" << endl;
@@ -1944,6 +1989,7 @@ namespace aflowrc {
     aflowrc << "DEFAULT_QHA_MODE=\"" << AFLOWRC_DEFAULT_QHA_MODE << "\"" << endl;
     aflowrc << "DEFAULT_QHA_EOS=" << AFLOWRC_DEFAULT_QHA_EOS  << endl;
     aflowrc << "DEFAULT_QHA_EOS_DISTORTION_RANGE=\"" << AFLOWRC_DEFAULT_QHA_EOS_DISTORTION_RANGE << "\"" << endl;
+    aflowrc << "DEFAULT_QHA_EOS_MODEL=\"" << AFLOWRC_DEFAULT_QHA_EOS_MODEL << "\"" << endl;//AS20200818
     aflowrc << "DEFAULT_QHA_GP_DISTORTION=" << AFLOWRC_DEFAULT_QHA_GP_DISTORTION  << endl;
     aflowrc << "DEFAULT_QHA_TAYLOR_EXPANSION_ORDER=" << AFLOWRC_DEFAULT_QHA_TAYLOR_EXPANSION_ORDER  << endl;//AS20200602
     aflowrc << "DEFAULT_QHA_INCLUDE_ELEC_CONTRIB=" << AFLOWRC_DEFAULT_QHA_INCLUDE_ELEC_CONTRIB  << endl;
@@ -2047,7 +2093,13 @@ namespace aflowrc {
     //RF20200413 START
     aflowrc << " " << endl;
     aflowrc << "// DEFAULTS CCE" << endl;
-    aflowrc << "DEFAULT_CCE_OX_METHOD=\"" << AFLOWRC_DEFAULT_CCE_OX_METHOD << "\"" << "  // ELECTRONEGATIVITY_ALLEN, BADER" << endl;
+    aflowrc << "DEFAULT_CCE_OX_METHOD=" << AFLOWRC_DEFAULT_CCE_OX_METHOD << "" << "  // 1 - ELECTRONEGATIVITY_ALLEN, 2 - BADER" << endl;
+    aflowrc << "DEFAULT_CCE_NN_DIST_TOL_MULTI_ANION=" << AFLOWRC_DEFAULT_CCE_NN_DIST_TOL_MULTI_ANION << "" << "  // 0.4 Ang tolerance between shortest and longest bonds when testing for multi-anion compound" << endl;
+    aflowrc << "DEFAULT_CCE_OX_TOL=" << AFLOWRC_DEFAULT_CCE_OX_TOL << "" << "  // sum of oxidation states might not be exactly zero due to numerics" << endl;
+    aflowrc << "DEFAULT_CCE_PEROX_CUTOFF=" << AFLOWRC_DEFAULT_CCE_PEROX_CUTOFF << "" << "  // O-O bonds in peroxides for the studied examples are all shorter than 1.6 Ang" << endl;
+    aflowrc << "DEFAULT_CCE_SUPEROX_CUTOFF=" << AFLOWRC_DEFAULT_CCE_SUPEROX_CUTOFF << "" << "  // O-O bonds in superoxides for the studied examples are all shorter than 1.4 Ang" << endl;
+    aflowrc << "DEFAULT_CCE_O2_MOLECULE_UPPER_CUTOFF=" << AFLOWRC_DEFAULT_CCE_O2_MOLECULE_UPPER_CUTOFF << "" << "  // O-O bonds in the O2 molecule is about 1.21 Ang." << endl;
+    aflowrc << "DEFAULT_CCE_O2_MOLECULE_LOWER_CUTOFF=" << AFLOWRC_DEFAULT_CCE_O2_MOLECULE_LOWER_CUTOFF << "" << "  // O-O bonds in the O2 molecule is about 1.21 Ang." << endl;
     //RF20200413 END
 
     //DX20200708 - START
@@ -2056,11 +2108,19 @@ namespace aflowrc {
     aflowrc << "DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING=" << AFLOWRC_DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING << " // factor that divides minimum interatomic distance" << endl;
     //DX20200708 - END
 
+    //DX20200720 - START
+    aflowrc << " " << endl;
+    aflowrc << "// DEFAULTS ANRL" << endl;
+    aflowrc << "DEFAULT_ANRL_WYCKOFF_FRACTIONAL_TOL=" << AFLOWRC_DEFAULT_ANRL_WYCKOFF_FRACTIONAL_TOL << " // tolerance for equivalent Wyckoff coordinates" << endl;
+    //DX20200720 - END
+
     aflowrc << " " << endl;
     aflowrc << "// DEFAULTS CORE" << endl;
     aflowrc << "AFLOW_CORE_TEMPERATURE_BEEP=" << AFLOWRC_AFLOW_CORE_TEMPERATURE_BEEP << " // Celsius" << endl;
     aflowrc << "AFLOW_CORE_TEMPERATURE_HALT=" << AFLOWRC_AFLOW_CORE_TEMPERATURE_HALT << " // Celsius" << endl;
     aflowrc << "AFLOW_CORE_TEMPERATURE_REFRESH=" << AFLOWRC_AFLOW_CORE_TEMPERATURE_REFRESH << " // seconds"   << endl;
+    
+    aflowrc << "VASP_CHECK_SLEEP=" << AFLOWRC_VASP_CHECK_SLEEP << " // seconds"   << endl;  //CO20201111
 
     aflowrc << " " << endl;
     aflowrc << "// DEFAULTS MACHINE DEPENDENT MPI" << endl;
@@ -2329,6 +2389,7 @@ namespace aflowrc {
     if(LDEBUG) oss << "// AFLOW_LIBRARY AFLOW_PROJECT" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AFLOW_LIBRARY_DIRECTORIES\")=\"" << DEFAULT_AFLOW_LIBRARY_DIRECTORIES << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AFLOW_PROJECTS_DIRECTORIES\")=\"" << DEFAULT_AFLOW_PROJECTS_DIRECTORIES << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AFLOWDATA_WEB_DIRECTORY\")=\"" << DEFAULT_AFLOWDATA_WEB_DIRECTORY << "\"" << endl;  //CO+ME20200731
 
     if(LDEBUG) oss << "// DEFAULT PLATON/FINDSYM" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<bool>(\"DEFAULT_PLATON_P_EQUAL\")=" << DEFAULT_PLATON_P_EQUAL << endl;
@@ -2470,6 +2531,7 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_MODE\")=\"" << DEFAULT_QHA_MODE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_EOS\")=" << DEFAULT_QHA_EOS << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_EOS_DISTORTION_RANGE\")=\"" << DEFAULT_QHA_EOS_DISTORTION_RANGE << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_EOS_MODEL\")=\"" << DEFAULT_QHA_EOS_MODEL << "\"" << endl;//AS20200818
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_GP_DISTORTION\")=" << DEFAULT_QHA_GP_DISTORTION << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_TAYLOR_EXPANSION_ORDER\")=" << DEFAULT_QHA_TAYLOR_EXPANSION_ORDER << endl;//AS20200602
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_INCLUDE_ELEC_CONTRIB\")=" << DEFAULT_QHA_INCLUDE_ELEC_CONTRIB << endl;
@@ -2568,18 +2630,31 @@ namespace aflowrc {
 
     //RF20200413 START
     if(LDEBUG) oss << "// DEFAULTS CCE" << endl;
-    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_CCE_OX_METHOD\")=\"" << DEFAULT_CCE_OX_METHOD << "\"" << "               // ELECTRONEGATIVITY_ALLEN, BADER" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_CCE_OX_METHOD\")=\"" << DEFAULT_CCE_OX_METHOD << "\"" << "               // 1 - ELECTRONEGATIVITY_ALLEN, 2 - BADER" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_CCE_NN_DIST_TOL_MULTI_ANION\")=\"" << DEFAULT_CCE_NN_DIST_TOL_MULTI_ANION << "\"" << "               // 0.4 Ang tolerance between shortest and longest bonds when testing for multi-anion compound" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_CCE_OX_TOL\")=\"" << DEFAULT_CCE_OX_TOL << "\"" << "               // sum of oxidation states might not be exactly zero due to numerics" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_CCE_PEROX_CUTOFF\")=\"" << DEFAULT_CCE_PEROX_CUTOFF << "\"" << "               // O-O bonds in peroxides for the studied examples are all shorter than 1.6 Ang" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_CCE_SUPEROX_CUTOFF\")=\"" << DEFAULT_CCE_SUPEROX_CUTOFF << "\"" << "               // O-O bonds in superoxides for the studied examples are all shorter than 1.4 Ang" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_CCE_O2_MOLECULE_UPPER_CUTOFF\")=\"" << DEFAULT_CCE_O2_MOLECULE_UPPER_CUTOFF << "\"" << "               // O-O bonds in the O2 molecule is about 1.21 Ang." << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_CCE_O2_MOLECULE_LOWER_CUTOFF\")=\"" << DEFAULT_CCE_O2_MOLECULE_LOWER_CUTOFF << "\"" << "               // O-O bonds in the O2 molecule is about 1.21 Ang." << endl;
     //RF20200413 END
 
     //DX20200708 - START
     if(LDEBUG) oss << "// DEFAULTS XTALFINDER" << endl;
-    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING\")=\"" << DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING\")=" << DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING << endl;
+    //DX20200708 - END
+
+    //DX20200720 - START
+    if(LDEBUG) oss << "// DEFAULTS ANRL" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_ANRL_WYCKOFF_FRACTIONAL_TOL\")=" << DEFAULT_ANRL_WYCKOFF_FRACTIONAL_TOL << endl;
     //DX20200708 - END
 
     if(LDEBUG) oss << "// DEFAULT CORE" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<double>(\"AFLOW_CORE_TEMPERATURE_BEEP\")=" << AFLOW_CORE_TEMPERATURE_BEEP << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<double>(\"AFLOW_CORE_TEMPERATURE_HALT\")=" << AFLOW_CORE_TEMPERATURE_HALT << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<double>(\"AFLOW_CORE_TEMPERATURE_REFRESH\")=" << AFLOW_CORE_TEMPERATURE_REFRESH << endl;
+    
+    if(LDEBUG) oss << "XHOST.adefault.getattachedutype<double>(\"VASP_CHECK_SLEEP\")=" << VASP_CHECK_SLEEP << endl; //CO20201111
 
     if(LDEBUG) oss << "// DEFAULT MACHINE DEPENDENT MPI" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_OPTIONS_DUKE_BETA_MPICH\")=\"" << MPI_OPTIONS_DUKE_BETA_MPICH << "\"" << endl;

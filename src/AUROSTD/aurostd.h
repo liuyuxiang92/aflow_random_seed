@@ -168,8 +168,10 @@ using std::vector;
 #include "aurostd_xrandom.h"
 #include "aurostd_xoption.h"
 #include "aurostd_argv.h"
+#include "aurostd_xparser.h" //CO20200624
 #include "aurostd_xcombos.h"
 #include "aurostd_xerror.h" //ME20180627
+#include "aurostd_xfit.h" //AS20200824
 
 using aurostd::min;
 using aurostd::max;
@@ -380,6 +382,8 @@ namespace aurostd {
   string CleanStringASCII_20190712(const string& s) __xprototype; //CO20190712
   string CleanStringASCII_20190101(const string& s) __xprototype; //CO20190712
   void CleanStringASCII_InPlace(string& s) __xprototype;  //CO20190712
+  string RemoveTrailingCharacter(const string& s,char c); //CO+ME20200825
+  void RemoveTrailingCharacter_InPlace(string& s,char c); //CO+ME20200825
   string CGI_StringClean(const string& stringIN) __xprototype;
   string RemoveWhiteSpaces(const string& s) __xprototype;
   string RemoveWhiteSpaces(const string& s, const char toogle) __xprototype;
@@ -414,8 +418,9 @@ namespace aurostd {
   bool DirectoryMake(string Directory);
   bool SSH_DirectoryMake(string user, string machine,string Directory);
   bool DirectoryChmod(string chmod_string,string Directory);
-  bool DirectoryLS(string Directory,vector<string> &vfiles);
-  bool DirectoryLS(string Directory,deque<string> &vfiles);
+  bool SubDirectoryLS(const string& _Directory,vector<string>& vsubd);  //CO20200731
+  bool DirectoryLS(const string& Directory,vector<string> &vfiles);
+  bool DirectoryLS(const string& Directory,deque<string> &vfiles);
   bool DirectoryLocked(string directory,string="LOCK");
   bool DirectorySkipped(string directory);
   bool DirectoryWritable(string directory);
@@ -432,8 +437,8 @@ namespace aurostd {
   bool MatchCompressed(const string& CompressedFileName,const string& FileNameOUT);
   // [OBSOLETE]  bool DecompressFile(const string& CompressedFileName);
   bool efile2tempfile(string _FileNameIN, string& FileNameOUT); //CO20180220
-  bool IsCompressed(string FileNameIn,string& FileNameOut);
-  bool IsCompressed(string FileNameIn);
+  bool IsCompressed(const string& FileNameIn,string& FileNameOut);
+  bool IsCompressed(const string& FileNameIn);
   string GetCompressionExtension(const string& CompressedFileName);
   //CO END
   bool UncompressFile(const string& FileName,const string& command);  bool UncompressFile(const string& FileName); // with guess  
@@ -675,8 +680,8 @@ namespace aurostd {
   bool file2file(const string& _file,const string& destination); //CO20171025
   string file2md5sum(const string& _file); //SC20200326
   string file2auid(const string& _file); //SC20200326  
-  bool IsDirectory(string path);
-  bool IsFile(string path);
+  bool IsDirectory(const string& path);
+  bool IsFile(const string& path);
   //CO END
   bool RemoveFile(string FileNameOUTPUT);
   bool RemoveFile(const vector<string>& files); //CO
@@ -843,6 +848,7 @@ namespace aurostd { // aurostd_crc64.cpp
 // ***************************************************************************
 
 namespace aurostd {
+  string text2html(const string& str) __xprototype;  //ME20200921
   string html2latex(const string& str) __xprototype;
   string html2txt(const string& str) __xprototype;
   string string2latex(const string& str) __xprototype;
@@ -864,6 +870,7 @@ namespace aurostd {
   template<class utype1> void sort(vector<utype1>& arr);
   template<class utype1> void sort_remove_duplicates(vector<utype1>& arr);
   template<class utype1,class utype2> void sort(vector<utype1>& arr, vector<utype2>& brr);
+  template<class utype1,class utype2> void sort(deque<utype1>& arr, deque<utype2>& brr);  //CO20200915
   template<class utype1,class utype2,class utype3> void sort(vector<utype1>& arr, vector<utype2>& brr, vector<utype3>& crr);
   template<class utype1,class utype2,class utype3,class utype4> void sort(vector<utype1>& arr, vector<utype2>& brr, vector<utype3>& crr, vector<utype4>& drr);
 }

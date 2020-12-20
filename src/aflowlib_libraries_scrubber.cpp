@@ -122,6 +122,7 @@ namespace aflowlib {
         bool ICSD2LINK=TRUE;//TRUE;
         bool ZIPNOMIX=TRUE;
         bool BROKEN=FALSE;//TRUE; // VERY VERY SLOW
+	bool TOUCH=FALSE;
 
         deque<string> vext; aurostd::string2tokens(".xz",vext,",");
         deque<string> vcmd; aurostd::string2tokens("xzcat",vcmd,",");
@@ -343,7 +344,7 @@ namespace aflowlib {
             if(!aurostd::substring2bool(directory_LIB,"LDAU2")) {
               bool issueFOUND=FALSE;
               if(!issueFOUND) issueFOUND=!aurostd::substring2bool(aurostd::file2string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT),"species_pp_AUID");
-	      //  [OBSOLETE]              if(!issueFOUND) { if(aurostd::substring2bool(aurostd::file2string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT),"6bf17162620b7ce3")) { issueFOUND=TRUE; }} // Cl:PAW_PBE:17Jan2003 changed to diatom
+              //  [OBSOLETE]              if(!issueFOUND) { if(aurostd::substring2bool(aurostd::file2string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT),"6bf17162620b7ce3")) { issueFOUND=TRUE; }} // Cl:PAW_PBE:17Jan2003 changed to diatom
               //  [OBSOLETE] if(!issueFOUND) { if(aurostd::substring2bool(aurostd::file2string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT),"85ded82734544fa9")) { issueFOUND=TRUE; }} // O:PAW_PBE:08Apr2002 changed to diatom
               //  [OBSOLETE] if(!issueFOUND) { if(aurostd::substring2bool(aurostd::file2string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT),"5c530b0eaed90a00")) { issueFOUND=TRUE; }} // O:PAW_PBE_KIN:08Apr2002 changed to diatom
               //  [OBSOLETE] if(!issueFOUND) { if(aurostd::substring2bool(aurostd::file2string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT),"4ce4637079c90d89")) { issueFOUND=TRUE; }} // N:PAW_PBE_KIN:08Apr2002 changed to diatom
@@ -357,7 +358,8 @@ namespace aflowlib {
           }
 
           // RETOUCHING DATE OF AFLOW.IN TO REPRESENT AFLOW.END.OUT
-          if(FileExist_directory_LIB_AFLOW_IN && aurostd::FileExist(directory_LIB+"/aflow.end.out")) {
+          if(TOUCH) { // TOO MANY
+	  if(FileExist_directory_LIB_AFLOW_IN && aurostd::FileExist(directory_LIB+"/aflow.end.out")) {
             struct stat fileInfo_IN,fileInfo_OUT;
             stat(string(directory_LIB+"/"+_AFLOWIN_).c_str(), &fileInfo_IN);
             stat(string(directory_LIB+"/aflow.end.out").c_str(), &fileInfo_OUT);
@@ -375,6 +377,7 @@ namespace aflowlib {
               //  acout << "FIXED " << directory_LIB << endl;
             }
           }
+	  }
 
           // some step debug
           aurostd::ProgressBar(acerr,"aflowlib::LIB2SCRUB ",j,list2found.size(),1,1,1);

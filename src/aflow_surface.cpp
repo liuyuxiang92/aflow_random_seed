@@ -167,41 +167,41 @@ namespace surface {
       v1=a2*(1.0/k);v2=a3*(1.0/l);
       v3=v1+a1;v4=v2+a1;
       if(hkl!=surface::PlaneGetHKL(v1,v2,v3,a1,a2,a3)) {
-      isrhombus=TRUE;area=2.0*surface::TriangleArea(v1,v2,v3);
-    }
-    if(abs(h)>eps && abs(k)<eps && abs(l)>eps) {   // Y axis INFINITE
-      if(LDEBUG) cerr << "Y axis INFINITE - h0l" << endl;
-      v1=a1*(1.0/h);v2=a3*(1.0/l);
-      v3=v1+a2;v4=v2+a2;  
-      if(hkl!=surface::PlaneGetHKL(v1,v2,v3,a1,a2,a3)) {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"hkl problem in \"[Y] axis INFINITE\"",_INPUT_ILLEGAL_);}  //CO20200624
-      isrhombus=TRUE;area=2.0*surface::TriangleArea(v1,v2,v3);
-    }
-    if(abs(h)>eps && abs(k)>eps && abs(l)<eps) {   // Z axis INFINITE
-      if(LDEBUG) cerr << "Z axis INFINITE - hk0" << endl;
-      v1=a1*(1.0/h);v2=a2*(1.0/k);
-      v3=v1+a3;v4=v2+a3;
-      if(hkl!=surface::PlaneGetHKL(v1,v2,v3,a1,a2,a3)) {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"hkl problem in \"[Z] axis INFINITE\"",_INPUT_ILLEGAL_);}  //CO20200624
-      isrhombus=TRUE;area=2.0*surface::TriangleArea(v1,v2,v3);
-    }
-    if(abs(h)>eps && abs(k)<eps && abs(l)<eps) {   // YZ axis INFINITE
-      if(LDEBUG) cerr << "YZ axis INFINITE - h00" << endl;
-      v1=a1*(1.0/h);v2=v1+a2;v3=v1+a3;v4=v1+a2+a3;
-      isrhombus=TRUE;area=2.0*surface::TriangleArea(v1,v2,v3);
-    }
-    if(abs(h)<eps && abs(k)>eps && abs(l)<eps) {   // XZ axis INFINITE
-      if(LDEBUG) cerr << "XZ axis INFINITE - 0k0" << endl;
-      //v1=a2*(1.0/k);v2=v1+a1;v3=v1+a3;v4=v1+a1+a3;
-      v2=a2*(1.0/k);v1=v2+a1;v3=v2+a3;v4=v2+a1+a3;
-      isrhombus=TRUE;area=2.0*surface::TriangleArea(v1,v2,v3);
-    }
-    if(abs(h)<eps && abs(k)<eps && abs(l)>eps) {   // XY axis INFINITE
-      if(LDEBUG) cerr << "XY axis INFINITE - 00l" << endl;
-      //v1=a3*(1.0/l);v2=v1+a1;v3=v1+a2;v4=v1+a1+a2;
-      v3=a3*(1.0/l);v1=v3+a1;v2=v3+a2;v4=v3+a1+a2;
-      isrhombus=TRUE;area=2.0*surface::TriangleArea(v1,v2,v3);
-    }
-    if(abs(h)<eps && abs(k)<eps && abs(l)<eps) {   // XYZ axis INFINITE
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"h,k,l cannot be 0 0 0",_INPUT_ILLEGAL_);}  //CO20200624
+        isrhombus=TRUE;area=2.0*surface::TriangleArea(v1,v2,v3);
+      }
+      if(abs(h)>eps && abs(k)<eps && abs(l)>eps) {   // Y axis INFINITE
+        if(LDEBUG) cerr << "Y axis INFINITE - h0l" << endl;
+        v1=a1*(1.0/h);v2=a3*(1.0/l);
+        v3=v1+a2;v4=v2+a2;  
+        if(hkl!=surface::PlaneGetHKL(v1,v2,v3,a1,a2,a3)) {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"hkl problem in \"[Y] axis INFINITE\"",_INPUT_ILLEGAL_);}  //CO20200624
+        isrhombus=TRUE;area=2.0*surface::TriangleArea(v1,v2,v3);
+      }
+      if(abs(h)>eps && abs(k)>eps && abs(l)<eps) {   // Z axis INFINITE
+        if(LDEBUG) cerr << "Z axis INFINITE - hk0" << endl;
+        v1=a1*(1.0/h);v2=a2*(1.0/k);
+        v3=v1+a3;v4=v2+a3;
+        if(hkl!=surface::PlaneGetHKL(v1,v2,v3,a1,a2,a3)) {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"hkl problem in \"[Z] axis INFINITE\"",_INPUT_ILLEGAL_);}  //CO20200624
+        isrhombus=TRUE;area=2.0*surface::TriangleArea(v1,v2,v3);
+      }
+      if(abs(h)>eps && abs(k)<eps && abs(l)<eps) {   // YZ axis INFINITE
+        if(LDEBUG) cerr << "YZ axis INFINITE - h00" << endl;
+        v1=a1*(1.0/h);v2=v1+a2;v3=v1+a3;v4=v1+a2+a3;
+        isrhombus=TRUE;area=2.0*surface::TriangleArea(v1,v2,v3);
+      }
+      if(abs(h)<eps && abs(k)>eps && abs(l)<eps) {   // XZ axis INFINITE
+        if(LDEBUG) cerr << "XZ axis INFINITE - 0k0" << endl;
+        //v1=a2*(1.0/k);v2=v1+a1;v3=v1+a3;v4=v1+a1+a3;
+        v2=a2*(1.0/k);v1=v2+a1;v3=v2+a3;v4=v2+a1+a3;
+        isrhombus=TRUE;area=2.0*surface::TriangleArea(v1,v2,v3);
+      }
+      if(abs(h)<eps && abs(k)<eps && abs(l)>eps) {   // XY axis INFINITE
+        if(LDEBUG) cerr << "XY axis INFINITE - 00l" << endl;
+        //v1=a3*(1.0/l);v2=v1+a1;v3=v1+a2;v4=v1+a1+a2;
+        v3=a3*(1.0/l);v1=v3+a1;v2=v3+a2;v4=v3+a1+a2;
+        isrhombus=TRUE;area=2.0*surface::TriangleArea(v1,v2,v3);
+      }
+      if(abs(h)<eps && abs(k)<eps && abs(l)<eps) {   // XYZ axis INFINITE
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"h,k,l cannot be 0 0 0",_INPUT_ILLEGAL_);}  //CO20200624
     }
     for(int i=1;i<=3;i++) {
       if(abs(v1[i])<eps) v1[i]=0.0;
@@ -2012,7 +2012,6 @@ namespace slab {
     //[OBSOLETE CO20180727]    }
     //[OBSOLETE CO20180727]str_out.atoms.at(i).name=str_in.SpeciesLabel(j);
     //[OBSOLETE CO20180727]  }
-    //[OBSOLETE CO20180727]}
     //CO+DU20180705 STOP
     ////////////////////////////////////////////////////////////
 

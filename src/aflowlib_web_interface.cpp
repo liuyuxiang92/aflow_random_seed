@@ -26,208 +26,7 @@ namespace aflowlib {
   //  class _aflowlib_entry 
 
   _aflowlib_entry::_aflowlib_entry() {  // constructor PUBLIC
-    entry.clear();ventry.clear();
-    auid.clear();
-    vauid.clear();vauid.clear();
-    aurl.clear();vaurl.clear();
-    keywords.clear();vkeywords.clear();
-    aflowlib_date.clear();vaflowlib_date.clear(); //CO20200624 - adding LOCK date
-    aflowlib_version.clear();
-    aflowlib_entries.clear();vaflowlib_entries.clear();
-    aflowlib_entries_number=0;
-    aflow_version.clear();
-    catalog.clear();
-    data_api="aapi1.2"; // new version of the API
-    data_source="aflowlib";
-    data_language="";
-    error_status.clear();
-    author.clear();vauthor.clear();
-    calculation_cores=1;
-    calculation_memory=AUROSTD_NAN;
-    calculation_time=AUROSTD_NAN;
-    corresponding.clear();vcorresponding.clear();
-    loop.clear();vloop.clear();
-    node_CPU_Cores=AUROSTD_NAN;node_CPU_MHz=AUROSTD_NAN;node_CPU_Model.clear();node_RAM_GB=AUROSTD_NAN;
-    Bravais_lattice_orig.clear();Bravais_lattice_relax.clear();
-    code.clear();
-    composition.clear();vcomposition.clear();
-    compound.clear();
-    density=AUROSTD_NAN;
-    density_orig=AUROSTD_NAN; //DX20190124 - add original crystal info
-    dft_type.clear();vdft_type.clear();
-    eentropy_cell=AUROSTD_NAN;eentropy_atom=AUROSTD_NAN;
-    Egap=AUROSTD_NAN;Egap_fit=AUROSTD_NAN;
-    energy_cell=AUROSTD_NAN;energy_atom=AUROSTD_NAN;energy_atom_relax1=AUROSTD_NAN;
-    energy_cutoff=AUROSTD_NAN;
-    delta_electronic_energy_convergence=AUROSTD_NAN;
-    delta_electronic_energy_threshold=AUROSTD_NAN;
-    nkpoints=0;
-    nkpoints_irreducible=0;
-    kppra=0;
-    kpoints.clear();
-    kpoints_nnn_relax.clear();
-    kpoints_nnn_static.clear();
-    kpoints_pairs.clear();
-    kpoints_bands_path_grid=0;
-    enthalpy_cell=AUROSTD_NAN;enthalpy_atom=AUROSTD_NAN;
-    enthalpy_formation_cell=AUROSTD_NAN;enthalpy_formation_atom=AUROSTD_NAN;
-    enthalpy_formation_cce_300K_cell=AUROSTD_NAN;enthalpy_formation_cce_300K_atom=AUROSTD_NAN;  //CO20200624
-    enthalpy_formation_cce_0K_cell=AUROSTD_NAN;enthalpy_formation_cce_0K_atom=AUROSTD_NAN;  //CO20200624
-    entropic_temperature=AUROSTD_NAN;
-    files.clear();vfiles.clear();
-    files_LIB.clear();vfiles_LIB.clear();
-    files_RAW.clear();vfiles_RAW.clear();
-    files_WEB.clear();vfiles_WEB.clear();
-    forces.clear();vforces.clear();
-    Egap_type.clear();
-    geometry.clear();vgeometry.clear();
-    geometry_orig.clear();vgeometry_orig.clear(); //DX20190124 - add original crystal info
-    lattice_system_orig.clear();lattice_variation_orig.clear();lattice_system_relax.clear();lattice_variation_relax.clear();
-    ldau_TLUJ.clear();
-    vLDAU.resize(4);  //ME20190129
-    natoms=AUROSTD_NAN;
-    natoms_orig=AUROSTD_NAN; //DX20190124 - add original crystal info
-    nbondxx.clear();vnbondxx.clear();
-    nspecies=AUROSTD_NAN;
-    Pearson_symbol_orig.clear();Pearson_symbol_relax.clear();
-    positions_cartesian.clear();vpositions_cartesian.clear();
-    positions_fractional.clear();vpositions_fractional.clear();
-    pressure=AUROSTD_NAN;
-    stress_tensor.clear();vstress_tensor.clear();
-    pressure_residual=AUROSTD_NAN;
-    Pulay_stress=AUROSTD_NAN;
-    prototype.clear();
-    PV_cell=AUROSTD_NAN;PV_atom=AUROSTD_NAN;
-    scintillation_attenuation_length=AUROSTD_NAN;
-    sg.clear();sg2.clear();vsg.clear();vsg2.clear();  //CO20171202
-    spacegroup_orig.clear();spacegroup_relax.clear();
-    species.clear();vspecies.clear();
-    species_pp.clear();vspecies_pp.clear();
-    species_pp_version.clear();vspecies_pp_version.clear();
-    species_pp_ZVAL.clear();vspecies_pp_ZVAL.clear();
-    species_pp_AUID.clear();vspecies_pp_AUID.clear();
-    METAGGA.clear();
-    spin_cell=AUROSTD_NAN;spin_atom=AUROSTD_NAN;
-    spinD.clear();vspinD.clear();
-    spinD_magmom_orig.clear();vspinD_magmom_orig.clear();
-    spinF=AUROSTD_NAN;
-    sponsor.clear();vsponsor.clear();
-    stoichiometry.clear();vstoichiometry.clear();
-    valence_cell_std=AUROSTD_NAN;valence_cell_iupac=AUROSTD_NAN;
-    volume_cell=AUROSTD_NAN;volume_atom=AUROSTD_NAN;
-    volume_cell_orig=AUROSTD_NAN;volume_atom_orig=AUROSTD_NAN; //DX20190124 - add original crystal info
-    //DX20190124 - added original symmetry info - START
-    // SYMMETRY
-    crystal_family_orig="";
-    crystal_system_orig="";
-    crystal_class_orig="";
-    point_group_Hermann_Mauguin_orig="";
-    point_group_Schoenflies_orig="";
-    point_group_orbifold_orig="";
-    point_group_type_orig="";
-    point_group_order_orig=AUROSTD_NAN;
-    point_group_structure_orig="";
-    Bravais_lattice_lattice_type_orig="";
-    Bravais_lattice_lattice_variation_type_orig="";
-    Bravais_lattice_lattice_system_orig="";
-    Bravais_superlattice_lattice_type_orig="";
-    Bravais_superlattice_lattice_variation_type_orig="";
-    Bravais_superlattice_lattice_system_orig="";
-    Pearson_symbol_superlattice_orig="";
-    reciprocal_lattice_type_orig="";
-    reciprocal_lattice_variation_type_orig="";
-    reciprocal_geometry_orig.clear();vreciprocal_geometry_orig.clear();
-    reciprocal_volume_cell_orig=AUROSTD_NAN;
-    Wyckoff_letters_orig="";
-    Wyckoff_multiplicities_orig="";
-    Wyckoff_site_symmetries_orig="";
-    //DX20190124 - added original symmetry info - END
-    //DX20180823 - added more symmetry info - START
-    // SYMMETRY
-    crystal_family="";
-    crystal_system="";
-    crystal_class="";
-    point_group_Hermann_Mauguin="";
-    point_group_Schoenflies="";
-    point_group_orbifold="";
-    point_group_type="";
-    point_group_order=AUROSTD_NAN;
-    point_group_structure="";
-    Bravais_lattice_lattice_type="";
-    Bravais_lattice_lattice_variation_type="";
-    Bravais_lattice_lattice_system="";
-    Bravais_superlattice_lattice_type="";
-    Bravais_superlattice_lattice_variation_type="";
-    Bravais_superlattice_lattice_system="";
-    Pearson_symbol_superlattice="";
-    reciprocal_lattice_type="";
-    reciprocal_lattice_variation_type="";
-    reciprocal_geometry.clear();vreciprocal_geometry.clear();
-    reciprocal_volume_cell=AUROSTD_NAN;
-    Wyckoff_letters="";
-    Wyckoff_multiplicities="";
-    Wyckoff_site_symmetries="";
-    //DX20180823 - added more symmetry info - END
-    //DX20190209 - added anrl info - START
-    anrl_label_orig="";
-    anrl_parameter_list_orig="";
-    anrl_parameter_values_orig="";
-    anrl_label_relax="";
-    anrl_parameter_list_relax="";
-    anrl_parameter_values_relax="";
-    //DX20190209 - added anrl info - END
-    // AGL/AEL
-    agl_thermal_conductivity_300K=AUROSTD_NAN;
-    agl_debye=AUROSTD_NAN;
-    agl_acoustic_debye=AUROSTD_NAN;
-    agl_gruneisen=AUROSTD_NAN;
-    agl_heat_capacity_Cv_300K=AUROSTD_NAN;
-    agl_heat_capacity_Cp_300K=AUROSTD_NAN;
-    agl_thermal_expansion_300K=AUROSTD_NAN;
-    agl_bulk_modulus_static_300K=AUROSTD_NAN;
-    agl_bulk_modulus_isothermal_300K=AUROSTD_NAN;
-    agl_poisson_ratio_source=""; //CT20181212
-    agl_vibrational_free_energy_300K_cell=AUROSTD_NAN; //CT20181212
-    agl_vibrational_free_energy_300K_atom=AUROSTD_NAN; //CT20181212
-    agl_vibrational_entropy_300K_cell=AUROSTD_NAN; //CT20181212
-    agl_vibrational_entropy_300K_atom=AUROSTD_NAN; //CT20181212
-    ael_poisson_ratio=AUROSTD_NAN;
-    ael_bulk_modulus_voigt=AUROSTD_NAN;
-    ael_bulk_modulus_reuss=AUROSTD_NAN;
-    ael_shear_modulus_voigt=AUROSTD_NAN;
-    ael_shear_modulus_reuss=AUROSTD_NAN;
-    ael_bulk_modulus_vrh=AUROSTD_NAN;
-    ael_shear_modulus_vrh=AUROSTD_NAN;
-    ael_elastic_anisotropy=AUROSTD_NAN; //CO20181129
-    ael_youngs_modulus_vrh=AUROSTD_NAN; //CT20181212
-    ael_speed_sound_transverse=AUROSTD_NAN; //CT20181212
-    ael_speed_sound_longitudinal=AUROSTD_NAN; //CT20181212
-    ael_speed_sound_average=AUROSTD_NAN; //CT20181212
-    ael_pughs_modulus_ratio=AUROSTD_NAN; //CT20181212
-    ael_debye_temperature=AUROSTD_NAN; //CT20181212
-    ael_applied_pressure=AUROSTD_NAN; //CT20181212
-    ael_average_external_pressure=AUROSTD_NAN; //CT20181212
-    ael_stiffness_tensor.clear();  //ME20191105
-    ael_compliance_tensor.clear();  //ME20191105
-    // BADER
-    bader_net_charges.clear();vbader_net_charges.clear();
-    bader_atomic_volumes.clear();vbader_atomic_volumes.clear();
-    // legacy
-    server.clear();vserver.clear();vserverdir.clear();
-    icsd.clear();
-    stoich.clear();vstoich.clear();
-    // apennsy
-    structure_name.clear();  // apennsy
-    structure_description.clear();  // apennsy
-    distance_gnd=AUROSTD_NAN;  // apennsy
-    distance_tie=AUROSTD_NAN;  // apennsy
-    pureA=FALSE;pureB=FALSE;  // apennsy
-    fcc=FALSE; bcc=FALSE;hcp=FALSE;  // apennsy
-    stoich_a=AUROSTD_NAN;stoich_b=AUROSTD_NAN;  // apennsy
-    bond_aa=AUROSTD_NAN;bond_ab=AUROSTD_NAN;bond_bb=AUROSTD_NAN;  // apennsy
-    vNsgroup.clear();  // apennsy
-    vsgroup.clear();  // apennsy
-    vstr.clear();  // apennsy
+    free();
   }
   _aflowlib_entry::~_aflowlib_entry() { // destructor PUBLIC
     free();
@@ -238,6 +37,7 @@ namespace aflowlib {
     auid=b.auid;
     vauid=b.vauid;vauid.clear();for(uint i=0;i<b.vauid.size();i++) vauid.push_back(b.vauid.at(i));
     aurl=b.aurl;vaurl.clear();for(uint i=0;i<b.vaurl.size();i++) vaurl.push_back(b.vaurl.at(i));
+    system_name=b.system_name;
     vkeywords.clear();for(uint i=0;i<b.vkeywords.size();i++) vkeywords.push_back(b.vkeywords.at(i));
     aflowlib_date=b.aflowlib_date;vaflowlib_date.clear();for(uint i=0;i<b.vaflowlib_date.size();i++) vaflowlib_date.push_back(b.vaflowlib_date.at(i)); //CO20200624 - adding LOCK date
     aflowlib_version=b.aflowlib_version;
@@ -280,6 +80,7 @@ namespace aflowlib {
     enthalpy_formation_cell=b.enthalpy_formation_cell;enthalpy_formation_atom=b.enthalpy_formation_atom;
     enthalpy_formation_cce_300K_cell=b.enthalpy_formation_cce_300K_cell;enthalpy_formation_cce_300K_atom=b.enthalpy_formation_cce_300K_atom;  //CO20200624
     enthalpy_formation_cce_0K_cell=b.enthalpy_formation_cce_0K_cell;enthalpy_formation_cce_0K_atom=b.enthalpy_formation_cce_0K_atom;  //CO20200624
+    entropy_forming_ability=b.entropy_forming_ability;  //CO20200624
     entropic_temperature=b.entropic_temperature;
     files=b.files;vfiles.clear();for(uint i=0;i<b.vfiles.size();i++) vfiles.push_back(b.vfiles.at(i));
     files_LIB=b.files_LIB;vfiles_LIB.clear();for(uint i=0;i<b.vfiles_LIB.size();i++) vfiles_LIB.push_back(b.vfiles_LIB.at(i));
@@ -384,6 +185,7 @@ namespace aflowlib {
     anrl_parameter_list_relax=b.anrl_parameter_list_relax;
     anrl_parameter_values_relax=b.anrl_parameter_values_relax;
     //DX20190209 - added anrl info - END
+    pocc_parameters=b.pocc_parameters;  //CO20200731
     // AGL/AEL
     agl_thermal_conductivity_300K=b.agl_thermal_conductivity_300K;
     agl_debye=b.agl_debye;
@@ -452,46 +254,252 @@ namespace aflowlib {
   }
 
   void _aflowlib_entry::free() { // free PRIVATE
-    ventry.clear();
-    vauid.clear();
-    vaurl.clear();
-    vaflowlib_entries.clear();
-    vkeywords.clear();
-    vauthor.clear();
-    vcorresponding.clear();
-    vloop.clear();
-    vcomposition.clear(); // clear all vectors
-    vdft_type.clear(); // clear all vectors
-    vfiles.clear(); // clear all vectors
-    vfiles_LIB.clear(); // clear all vectors
-    vfiles_RAW.clear(); // clear all vectors
-    vfiles_WEB.clear(); // clear all vectors
-    vforces.clear(); // clear all vectors
-    vgeometry.clear(); // clear all vectors
-    vgeometry_orig.clear(); // clear all vectors //DX20190124 - add original crystal info
-    vstress_tensor.clear(); // clear all vectors
-    vnbondxx.clear(); // clear all vectors
-    vpositions_cartesian.clear(); // clear all vectors
-    vpositions_fractional.clear(); // clear all vectors
-    vspecies.clear(); // clear all vectors
-    vspecies_pp.clear(); // clear all vectors
-    vspecies_pp_version.clear(); // clear all vectors
-    vspecies_pp_ZVAL.clear(); // clear all vectors
-    vspecies_pp_AUID.clear(); // clear all vectors
-    vspinD.clear(); // clear all vectors
-    vspinD_magmom_orig.clear(); // clear all vectors
-    vsponsor.clear();
-    vstoichiometry.clear(); // clear all vectors
-    vreciprocal_geometry.clear(); // clear all vectors //DX20180824 - added reciprocal lattice parameters
+    //[CO20200829 - OBSOLETE]ventry.clear();
+    //[CO20200829 - OBSOLETE]vauid.clear();
+    //[CO20200829 - OBSOLETE]vaurl.clear();
+    //[CO20200829 - OBSOLETE]vaflowlib_entries.clear();
+    //[CO20200829 - OBSOLETE]vkeywords.clear();
+    //[CO20200829 - OBSOLETE]vauthor.clear();
+    //[CO20200829 - OBSOLETE]vcorresponding.clear();
+    //[CO20200829 - OBSOLETE]vloop.clear();
+    //[CO20200829 - OBSOLETE]vcomposition.clear(); // clear all vectors
+    //[CO20200829 - OBSOLETE]vdft_type.clear(); // clear all vectors
+    //[CO20200829 - OBSOLETE]vfiles.clear(); // clear all vectors
+    //[CO20200829 - OBSOLETE]vfiles_LIB.clear(); // clear all vectors
+    //[CO20200829 - OBSOLETE]vfiles_RAW.clear(); // clear all vectors
+    //[CO20200829 - OBSOLETE]vfiles_WEB.clear(); // clear all vectors
+    //[CO20200829 - OBSOLETE]vforces.clear(); // clear all vectors
+    //[CO20200829 - OBSOLETE]vgeometry.clear(); // clear all vectors
+    //[CO20200829 - OBSOLETE]vgeometry_orig.clear(); // clear all vectors //DX20190124 - add original crystal info
+    //[CO20200829 - OBSOLETE]vstress_tensor.clear(); // clear all vectors
+    //[CO20200829 - OBSOLETE]vnbondxx.clear(); // clear all vectors
+    //[CO20200829 - OBSOLETE]vpositions_cartesian.clear(); // clear all vectors
+    //[CO20200829 - OBSOLETE]vpositions_fractional.clear(); // clear all vectors
+    //[CO20200829 - OBSOLETE]vspecies.clear(); // clear all vectors
+    //[CO20200829 - OBSOLETE]vspecies_pp.clear(); // clear all vectors
+    //[CO20200829 - OBSOLETE]vspecies_pp_version.clear(); // clear all vectors
+    //[CO20200829 - OBSOLETE]vspecies_pp_ZVAL.clear(); // clear all vectors
+    //[CO20200829 - OBSOLETE]vspecies_pp_AUID.clear(); // clear all vectors
+    //[CO20200829 - OBSOLETE]vspinD.clear(); // clear all vectors
+    //[CO20200829 - OBSOLETE]vspinD_magmom_orig.clear(); // clear all vectors
+    //[CO20200829 - OBSOLETE]vsponsor.clear();
+    //[CO20200829 - OBSOLETE]vstoichiometry.clear(); // clear all vectors
+    //[CO20200829 - OBSOLETE]vreciprocal_geometry.clear(); // clear all vectors //DX20180824 - added reciprocal lattice parameters
+    //[CO20200829 - OBSOLETE]// BADER
+    //[CO20200829 - OBSOLETE]vbader_net_charges.clear();
+    //[CO20200829 - OBSOLETE]vbader_atomic_volumes.clear();
+    //[CO20200829 - OBSOLETE]// legacy
+    //[CO20200829 - OBSOLETE]vserver.clear();  // clear all vectors
+    //[CO20200829 - OBSOLETE]for(uint i=0;i<vserverdir.size();i++)
+    //[CO20200829 - OBSOLETE]  vserverdir.at(i).clear();
+    //[CO20200829 - OBSOLETE]vserverdir.clear();  // clear all vectors
+    //[CO20200829 - OBSOLETE]vstoich.clear(); // clear all vectors
+
+    entry.clear();ventry.clear();
+    auid.clear();
+    vauid.clear();vauid.clear();
+    aurl.clear();vaurl.clear();
+    system_name.clear();
+    keywords.clear();vkeywords.clear();
+    aflowlib_date.clear();vaflowlib_date.clear(); //CO20200624 - adding LOCK date
+    aflowlib_version.clear();
+    aflowlib_entries.clear();vaflowlib_entries.clear();
+    aflowlib_entries_number=0;
+    aflow_version.clear();
+    catalog.clear();
+    data_api="aapi1.2"; // new version of the API
+    data_source="aflowlib";
+    data_language="";
+    error_status.clear();
+    author.clear();vauthor.clear();
+    calculation_cores=1;
+    calculation_memory=AUROSTD_NAN;
+    calculation_time=AUROSTD_NAN;
+    corresponding.clear();vcorresponding.clear();
+    loop.clear();vloop.clear();
+    node_CPU_Cores=AUROSTD_NAN;node_CPU_MHz=AUROSTD_NAN;node_CPU_Model.clear();node_RAM_GB=AUROSTD_NAN;
+    Bravais_lattice_orig.clear();Bravais_lattice_relax.clear();
+    code.clear();
+    composition.clear();vcomposition.clear();
+    compound.clear();
+    density=AUROSTD_NAN;
+    density_orig=AUROSTD_NAN; //DX20190124 - add original crystal info
+    dft_type.clear();vdft_type.clear();
+    eentropy_cell=AUROSTD_NAN;eentropy_atom=AUROSTD_NAN;
+    Egap=AUROSTD_NAN;Egap_fit=AUROSTD_NAN;
+    energy_cell=AUROSTD_NAN;energy_atom=AUROSTD_NAN;energy_atom_relax1=AUROSTD_NAN;
+    energy_cutoff=AUROSTD_NAN;
+    delta_electronic_energy_convergence=AUROSTD_NAN;
+    delta_electronic_energy_threshold=AUROSTD_NAN;
+    nkpoints=0;
+    nkpoints_irreducible=0;
+    kppra=0;
+    kpoints.clear();
+    kpoints_nnn_relax.clear();
+    kpoints_nnn_static.clear();
+    kpoints_pairs.clear();
+    kpoints_bands_path_grid=0;
+    enthalpy_cell=AUROSTD_NAN;enthalpy_atom=AUROSTD_NAN;
+    enthalpy_formation_cell=AUROSTD_NAN;enthalpy_formation_atom=AUROSTD_NAN;
+    enthalpy_formation_cce_300K_cell=AUROSTD_NAN;enthalpy_formation_cce_300K_atom=AUROSTD_NAN;  //CO20200624
+    enthalpy_formation_cce_0K_cell=AUROSTD_NAN;enthalpy_formation_cce_0K_atom=AUROSTD_NAN;  //CO20200624
+    entropy_forming_ability=AUROSTD_NAN;  //CO20200624
+    entropic_temperature=AUROSTD_NAN;
+    files.clear();vfiles.clear();
+    files_LIB.clear();vfiles_LIB.clear();
+    files_RAW.clear();vfiles_RAW.clear();
+    files_WEB.clear();vfiles_WEB.clear();
+    forces.clear();vforces.clear();
+    Egap_type.clear();
+    geometry.clear();vgeometry.clear();
+    geometry_orig.clear();vgeometry_orig.clear(); //DX20190124 - add original crystal info
+    lattice_system_orig.clear();lattice_variation_orig.clear();lattice_system_relax.clear();lattice_variation_relax.clear();
+    ldau_TLUJ.clear();
+    vLDAU.resize(4);  //ME20190129
+    natoms=AUROSTD_NAN;
+    natoms_orig=AUROSTD_NAN; //DX20190124 - add original crystal info
+    nbondxx.clear();vnbondxx.clear();
+    nspecies=AUROSTD_NAN;
+    Pearson_symbol_orig.clear();Pearson_symbol_relax.clear();
+    positions_cartesian.clear();vpositions_cartesian.clear();
+    positions_fractional.clear();vpositions_fractional.clear();
+    pressure=AUROSTD_NAN;
+    stress_tensor.clear();vstress_tensor.clear();
+    pressure_residual=AUROSTD_NAN;
+    Pulay_stress=AUROSTD_NAN;
+    prototype.clear();
+    PV_cell=AUROSTD_NAN;PV_atom=AUROSTD_NAN;
+    scintillation_attenuation_length=AUROSTD_NAN;
+    sg.clear();sg2.clear();vsg.clear();vsg2.clear();  //CO20171202
+    spacegroup_orig.clear();spacegroup_relax.clear();
+    species.clear();vspecies.clear();
+    species_pp.clear();vspecies_pp.clear();
+    species_pp_version.clear();vspecies_pp_version.clear();
+    species_pp_ZVAL.clear();vspecies_pp_ZVAL.clear();
+    species_pp_AUID.clear();vspecies_pp_AUID.clear();
+    METAGGA.clear();
+    spin_cell=AUROSTD_NAN;spin_atom=AUROSTD_NAN;
+    spinD.clear();vspinD.clear();
+    spinD_magmom_orig.clear();vspinD_magmom_orig.clear();
+    spinF=AUROSTD_NAN;
+    sponsor.clear();vsponsor.clear();
+    stoichiometry.clear();vstoichiometry.clear();
+    valence_cell_std=AUROSTD_NAN;valence_cell_iupac=AUROSTD_NAN;
+    volume_cell=AUROSTD_NAN;volume_atom=AUROSTD_NAN;
+    volume_cell_orig=AUROSTD_NAN;volume_atom_orig=AUROSTD_NAN; //DX20190124 - add original crystal info
+    //DX20190124 - added original symmetry info - START
+    // SYMMETRY
+    crystal_family_orig="";
+    crystal_system_orig="";
+    crystal_class_orig="";
+    point_group_Hermann_Mauguin_orig="";
+    point_group_Schoenflies_orig="";
+    point_group_orbifold_orig="";
+    point_group_type_orig="";
+    point_group_order_orig=AUROSTD_NAN;
+    point_group_structure_orig="";
+    Bravais_lattice_lattice_type_orig="";
+    Bravais_lattice_lattice_variation_type_orig="";
+    Bravais_lattice_lattice_system_orig="";
+    Bravais_superlattice_lattice_type_orig="";
+    Bravais_superlattice_lattice_variation_type_orig="";
+    Bravais_superlattice_lattice_system_orig="";
+    Pearson_symbol_superlattice_orig="";
+    reciprocal_lattice_type_orig="";
+    reciprocal_lattice_variation_type_orig="";
+    reciprocal_geometry_orig.clear();vreciprocal_geometry_orig.clear();
+    reciprocal_volume_cell_orig=AUROSTD_NAN;
+    Wyckoff_letters_orig="";
+    Wyckoff_multiplicities_orig="";
+    Wyckoff_site_symmetries_orig="";
+    //DX20190124 - added original symmetry info - END
+    //DX20180823 - added more symmetry info - START
+    // SYMMETRY
+    crystal_family="";
+    crystal_system="";
+    crystal_class="";
+    point_group_Hermann_Mauguin="";
+    point_group_Schoenflies="";
+    point_group_orbifold="";
+    point_group_type="";
+    point_group_order=AUROSTD_NAN;
+    point_group_structure="";
+    Bravais_lattice_lattice_type="";
+    Bravais_lattice_lattice_variation_type="";
+    Bravais_lattice_lattice_system="";
+    Bravais_superlattice_lattice_type="";
+    Bravais_superlattice_lattice_variation_type="";
+    Bravais_superlattice_lattice_system="";
+    Pearson_symbol_superlattice="";
+    reciprocal_lattice_type="";
+    reciprocal_lattice_variation_type="";
+    reciprocal_geometry.clear();vreciprocal_geometry.clear();
+    reciprocal_volume_cell=AUROSTD_NAN;
+    Wyckoff_letters="";
+    Wyckoff_multiplicities="";
+    Wyckoff_site_symmetries="";
+    //DX20180823 - added more symmetry info - END
+    //DX20190209 - added anrl info - START
+    anrl_label_orig="";
+    anrl_parameter_list_orig="";
+    anrl_parameter_values_orig="";
+    anrl_label_relax="";
+    anrl_parameter_list_relax="";
+    anrl_parameter_values_relax="";
+    //DX20190209 - added anrl info - END
+    pocc_parameters=""; //CO20200731
+    // AGL/AEL
+    agl_thermal_conductivity_300K=AUROSTD_NAN;
+    agl_debye=AUROSTD_NAN;
+    agl_acoustic_debye=AUROSTD_NAN;
+    agl_gruneisen=AUROSTD_NAN;
+    agl_heat_capacity_Cv_300K=AUROSTD_NAN;
+    agl_heat_capacity_Cp_300K=AUROSTD_NAN;
+    agl_thermal_expansion_300K=AUROSTD_NAN;
+    agl_bulk_modulus_static_300K=AUROSTD_NAN;
+    agl_bulk_modulus_isothermal_300K=AUROSTD_NAN;
+    agl_poisson_ratio_source=""; //CT20181212
+    agl_vibrational_free_energy_300K_cell=AUROSTD_NAN; //CT20181212
+    agl_vibrational_free_energy_300K_atom=AUROSTD_NAN; //CT20181212
+    agl_vibrational_entropy_300K_cell=AUROSTD_NAN; //CT20181212
+    agl_vibrational_entropy_300K_atom=AUROSTD_NAN; //CT20181212
+    ael_poisson_ratio=AUROSTD_NAN;
+    ael_bulk_modulus_voigt=AUROSTD_NAN;
+    ael_bulk_modulus_reuss=AUROSTD_NAN;
+    ael_shear_modulus_voigt=AUROSTD_NAN;
+    ael_shear_modulus_reuss=AUROSTD_NAN;
+    ael_bulk_modulus_vrh=AUROSTD_NAN;
+    ael_shear_modulus_vrh=AUROSTD_NAN;
+    ael_elastic_anisotropy=AUROSTD_NAN; //CO20181129
+    ael_youngs_modulus_vrh=AUROSTD_NAN; //CT20181212
+    ael_speed_sound_transverse=AUROSTD_NAN; //CT20181212
+    ael_speed_sound_longitudinal=AUROSTD_NAN; //CT20181212
+    ael_speed_sound_average=AUROSTD_NAN; //CT20181212
+    ael_pughs_modulus_ratio=AUROSTD_NAN; //CT20181212
+    ael_debye_temperature=AUROSTD_NAN; //CT20181212
+    ael_applied_pressure=AUROSTD_NAN; //CT20181212
+    ael_average_external_pressure=AUROSTD_NAN; //CT20181212
+    ael_stiffness_tensor.clear();  //ME20191105
+    ael_compliance_tensor.clear();  //ME20191105
     // BADER
-    vbader_net_charges.clear();
-    vbader_atomic_volumes.clear();
+    bader_net_charges.clear();vbader_net_charges.clear();
+    bader_atomic_volumes.clear();vbader_atomic_volumes.clear();
     // legacy
-    vserver.clear();  // clear all vectors
-    for(uint i=0;i<vserverdir.size();i++)
-      vserverdir.at(i).clear();
-    vserverdir.clear();  // clear all vectors
-    vstoich.clear(); // clear all vectors
+    server.clear();vserver.clear();vserverdir.clear();
+    icsd.clear();
+    stoich.clear();vstoich.clear();
+    // apennsy
+    structure_name.clear();  // apennsy
+    structure_description.clear();  // apennsy
+    distance_gnd=AUROSTD_NAN;  // apennsy
+    distance_tie=AUROSTD_NAN;  // apennsy
+    pureA=FALSE;pureB=FALSE;  // apennsy
+    fcc=FALSE; bcc=FALSE;hcp=FALSE;  // apennsy
+    stoich_a=AUROSTD_NAN;stoich_b=AUROSTD_NAN;  // apennsy
+    bond_aa=AUROSTD_NAN;bond_ab=AUROSTD_NAN;bond_bb=AUROSTD_NAN;  // apennsy
+    vNsgroup.clear();  // apennsy
+    vsgroup.clear();  // apennsy
+    vstr.clear();  // apennsy
   } 
 
   void _aflowlib_entry::clear() {  // clear PRIVATE
@@ -502,7 +510,7 @@ namespace aflowlib {
   _aflowlib_entry::_aflowlib_entry(const string& file) { // constructur from file
     stringstream oss;
     if(!aurostd::FileExist(file)) { //SC20190813
-      string function = XPID + "aflowlib::_aflowlib_entry::aflowlib_entr():";
+      string function = XPID + "aflowlib::_aflowlib_entry::_aflowlib_entry():";
       string message = DEFAULT_FILE_AFLOWLIB_ENTRY_OUT + " not found =" + file;
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_NOT_FOUND_);
     }
@@ -567,7 +575,7 @@ namespace aflowlib {
         }
         //CO20180409 - added the else if's for speed, no need to go through more checks than necessary
         else if(keyword=="aurl") {aurl=content;aurostd::string2tokens(content,stokens,":");for(uint j=0;j<stokens.size();j++) vaurl.push_back(stokens.at(j));}
-        else if(keyword=="title") {title=content;}  //ME20190129
+        //else if(keyword=="title") {title=content;}  //ME20190129 // OBSOLETE ME20200829 - not used anymore
         else if(keyword=="keywords") {keywords=content;aurostd::string2tokens(content,stokens,",");for(uint j=0;j<stokens.size();j++) vkeywords.push_back(stokens.at(j));}
         else if(keyword=="aflowlib_date") {aflowlib_date=content;aurostd::string2tokens(content,stokens,",");for(uint j=0;j<stokens.size();j++) vaflowlib_date.push_back(stokens.at(j));} //CO20200624 - adding LOCK date
         else if(keyword=="aflowlib_version") {aflowlib_version=content;}
@@ -622,6 +630,7 @@ namespace aflowlib {
         else if(keyword=="enthalpy_formation_atom") {enthalpy_formation_atom=aurostd::string2utype<double>(content);}
         else if(keyword=="enthalpy_formation_cce_300K_atom") {enthalpy_formation_cce_300K_atom=aurostd::string2utype<double>(content);} //CO20200624
         else if(keyword=="enthalpy_formation_cce_0K_atom") {enthalpy_formation_cce_0K_atom=aurostd::string2utype<double>(content);} //CO20200624
+        else if(keyword=="entropy_forming_ability") {entropy_forming_ability=aurostd::string2utype<double>(content);} //CO20200624
         else if(keyword=="entropic_temperature") {entropic_temperature=aurostd::string2utype<double>(content);}
         else if(keyword=="files") {files=content;for(uint j=0;j<stokens.size();j++) vfiles.push_back(stokens.at(j));}
         else if(keyword=="files_LIB") {files_LIB=content;for(uint j=0;j<stokens.size();j++) vfiles_LIB.push_back(stokens.at(j));}
@@ -770,6 +779,7 @@ namespace aflowlib {
         else if(keyword=="anrl_parameter_list_relax") {anrl_parameter_list_relax=content;}
         else if(keyword=="anrl_parameter_values_relax") {anrl_parameter_values_relax=content;}
         //DX20190209 - added anrl info - END
+        else if(keyword=="pocc_parameters") {pocc_parameters=content;}  //CO20200731
         // AGL/AEL
         else if(keyword=="agl_thermal_conductivity_300K") {agl_thermal_conductivity_300K=aurostd::string2utype<double>(content);}
         else if(keyword=="agl_debye") {agl_debye=aurostd::string2utype<double>(content);}
@@ -897,7 +907,7 @@ namespace aflowlib {
       oss << "Keywords" << endl;
       oss << "auid=" << auid << (html?"<br>":"") << endl;
       oss << "aurl=" << aurl << (html?"<br>":"") << endl;
-      oss << "title=" << title << (html?"<br>":"") << endl;  //ME20190129
+      //oss << "title=" << title << (html?"<br>":"") << endl;  //ME20190129  // OBSOLETE ME20200829 - not used anymore
       oss << "keywords=" << keywords << (html?"<br>":"") << "  vkeywords= ";for(uint j=0;j<vkeywords.size();j++) oss << vkeywords.at(j) << " "; oss << (html?"<br>":"") << endl;
       oss << "Optional controls keywords (alphabetic order)" << endl;
       oss << "aflowlib_date=" << aflowlib_date << (html?"<br>":"") << endl; 
@@ -955,6 +965,7 @@ namespace aflowlib {
       oss << "enthalpy_formation_atom=" << enthalpy_formation_atom << (html?"<br>":"") << endl; 
       oss << "enthalpy_formation_cce_300K_atom=" << enthalpy_formation_cce_300K_atom << (html?"<br>":"") << endl;   //CO20200624
       oss << "enthalpy_formation_cce_0K_atom=" << enthalpy_formation_cce_0K_atom << (html?"<br>":"") << endl;   //CO20200624
+      oss << "entropy_forming_ability=" << entropy_forming_ability << (html?"<br>":"") << endl;   //CO20200624
       oss << "entropic_temperature=" << entropic_temperature << (html?"<br>":"") << endl; 
       // oss << "files=" << files << "  vfiles= ";for(uint j=0;j<vfiles.size();j++) oss << vfiles.at(j) << " "; oss << (html?"<br>":"") << endl;
       // oss << "files_LIB=" << files_LIB << "  vfiles_LIB= ";for(uint j=0;j<vfiles_LIB.size();j++) oss << vfiles_LIB.at(j) << " "; oss << (html?"<br>":"") << endl;
@@ -1071,6 +1082,7 @@ namespace aflowlib {
       oss << "anrl_parameter_list_relax" << anrl_parameter_list_relax << (html?"<br>":"") << endl;
       oss << "anrl_parameter_values_relax" << anrl_parameter_values_relax << (html?"<br>":"") << endl;
       //DX20190208 - added anrl info - END
+      oss << "pocc_parameters" << pocc_parameters << (html?"<br>":"") << endl;  //CO20200731
       // AGL/AEL
       oss << "agl_thermal_conductivity_300K" << agl_thermal_conductivity_300K << (html?"<br>":"") << endl; 
       oss << "agl_debye" << agl_debye << (html?"<br>":"") << endl; 
@@ -1129,8 +1141,8 @@ namespace aflowlib {
 
       if(auid.size()) sss << "" << "aurl=" << aurl << eendl;
       if(auid.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "auid=" << auid << eendl;
+      //if(!title.empty()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "title=" << title << eendl;  //ME20190125 // OBSOLETE ME20200829 - not used anymore
       if(data_api.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "data_api=" << data_api << eendl;
-      if(!title.empty()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "title=" << title << eendl;  //ME20190125
       if(data_source.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "data_source=" << data_source << eendl;
       if(data_language.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "data_language=" << data_language << eendl;
       if(error_status.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "error_status=" << error_status << eendl;
@@ -1211,6 +1223,7 @@ namespace aflowlib {
       if(enthalpy_formation_atom!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "enthalpy_formation_atom=" << enthalpy_formation_atom << eendl;
       if(enthalpy_formation_cce_300K_atom!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "enthalpy_formation_cce_300K_atom=" << enthalpy_formation_cce_300K_atom << eendl; //CO20200624
       if(enthalpy_formation_cce_0K_atom!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "enthalpy_formation_cce_0K_atom=" << enthalpy_formation_cce_0K_atom << eendl; //CO20200624
+      if(entropy_forming_ability!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "entropy_forming_ability=" << entropy_forming_ability << eendl; //CO20200624
       if(entropic_temperature!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "entropic_temperature=" << entropic_temperature << eendl;
       if(PV_cell!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "PV_cell=" << PV_cell << eendl;
       if(PV_atom!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "PV_atom=" << PV_atom << eendl;
@@ -1299,6 +1312,7 @@ namespace aflowlib {
       if(anrl_parameter_list_relax.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "anrl_parameter_list_relax=" << anrl_parameter_list_relax << eendl;
       if(anrl_parameter_values_relax.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "anrl_parameter_values_relax=" << anrl_parameter_values_relax << eendl;
       //DX20190208 - added anrl info - END
+      if(pocc_parameters.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "pocc_parameters=" << pocc_parameters << eendl; //CO20200731
       // AGL/AEL
       if(agl_thermal_conductivity_300K!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "agl_thermal_conductivity_300K=" << agl_thermal_conductivity_300K << eendl;
       if(agl_debye!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "agl_debye=" << agl_debye << eendl;
@@ -1404,12 +1418,13 @@ namespace aflowlib {
 
       //ME20190125 BEGIN
       //////////////////////////////////////////////////////////////////////////
-      if(!title.empty()) {
-        sscontent_json << "\"title\":\"" << title << "\"";
-      } else {
-        if(PRINT_NULL) sscontent_json << "\"title\":null";
-      }
-      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
+      // OBSOLETE ME20200829 - not used anymore
+      //if(!title.empty()) {
+      //  sscontent_json << "\"title\":\"" << title << "\"" << eendl;
+      //} else {
+      //  if(PRINT_NULL) sscontent_json << "\"title\":null" << eendl;
+      //}
+      //vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
       //////////////////////////////////////////////////////////////////////////
       //ME20190125 END
 
@@ -1997,7 +2012,7 @@ namespace aflowlib {
       }
       vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
-      
+
       //////////////////////////////////////////////////////////////////////////
       if(enthalpy_formation_cce_300K_cell!=AUROSTD_NAN) {  //CO20200624
         sscontent_json << "\"enthalpy_formation_cce_300K_cell\":" << enthalpy_formation_cce_300K_cell;
@@ -2006,7 +2021,7 @@ namespace aflowlib {
       }
       vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
-      
+
       //////////////////////////////////////////////////////////////////////////
       if(enthalpy_formation_cce_0K_cell!=AUROSTD_NAN) {  //CO20200624
         sscontent_json << "\"enthalpy_formation_cce_0K_cell\":" << enthalpy_formation_cce_0K_cell;
@@ -2024,7 +2039,7 @@ namespace aflowlib {
       }
       vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
-      
+
       //////////////////////////////////////////////////////////////////////////
       if(enthalpy_formation_cce_300K_atom!=AUROSTD_NAN) {  //CO20200624
         sscontent_json << "\"enthalpy_formation_cce_300K_atom\":" << enthalpy_formation_cce_300K_atom;
@@ -2033,12 +2048,21 @@ namespace aflowlib {
       }
       vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
-      
+
       //////////////////////////////////////////////////////////////////////////
       if(enthalpy_formation_cce_0K_atom!=AUROSTD_NAN) {  //CO20200624
         sscontent_json << "\"enthalpy_formation_cce_0K_atom\":" << enthalpy_formation_cce_0K_atom;
       } else {
         if(PRINT_NULL) sscontent_json << "\"enthalpy_formation_cce_0K_atom\":null";
+      }
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
+      //////////////////////////////////////////////////////////////////////////
+
+      //////////////////////////////////////////////////////////////////////////
+      if(entropy_forming_ability!=AUROSTD_NAN) {  //CO20200624
+        sscontent_json << "\"entropy_forming_ability\":" << entropy_forming_ability;
+      } else {
+        if(PRINT_NULL) sscontent_json << "\"entropy_forming_ability\":null";
       }
       vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
@@ -2868,6 +2892,16 @@ namespace aflowlib {
 
       //DX20190208 - added anrl info - END
 
+      //CO20200731
+      //////////////////////////////////////////////////////////////////////////
+      if(pocc_parameters.size()){
+        sscontent_json << "\"pocc_parameters\":\"" << pocc_parameters << "\"";
+      } else {
+        if(PRINT_NULL) sscontent_json << "\"pocc_parameters\":null";
+      }
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
+      //////////////////////////////////////////////////////////////////////////
+
       // AGL/AEL
       //////////////////////////////////////////////////////////////////////////
       if(agl_thermal_conductivity_300K!=AUROSTD_NAN) {
@@ -3243,7 +3277,7 @@ namespace aflowlib {
       }
       vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
-      
+
       //////////////////////////////////////////////////////////////////////////
       if(catalog.size()) {
         sscontent_json << "\"catalog\":\"" << catalog << "\"";
@@ -3701,24 +3735,18 @@ namespace aflowlib {
 // auid2present
 // **************************************************************************
 namespace aflowlib {
-  string _aflowlib_entry::directory2MetadataAUIDjsonfile(const string& directory,uint salt){  //CO20200624
+  string _aflowlib_entry::POCCdirectory2MetadataAUIDjsonfile(const string& directory,uint salt){  //CO20200624
     //CO20200624 - THIS IS HOW WE CREATE AUID FOR POCC STRUCTURES
     bool LDEBUG=(TRUE || XHOST.DEBUG);
-    string soliloquy=XPID+"_aflowlib_entry::directory2MetadataAUIDjsonfile():";
+    string soliloquy=XPID+"_aflowlib_entry::POCCdirectory2MetadataAUIDjsonfile():";
     stringstream message;
-    
+
     if(aurl.empty()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"AURL has not been calculated",_INPUT_MISSING_);}
 
     string system_name=KBIN::ExtractSystemName(directory);
     if(system_name.empty()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No system name found",_FILE_CORRUPT_);}
     if(LDEBUG){cerr << soliloquy << " system_name=" << system_name << endl;}
-    if(system_name.find(":TOL_")==string::npos){
-      int prec=3;
-      prec=(int)ceil(log10(1.0/DEFAULT_POCC_SITE_TOL));
-      system_name+=":TOL_"+aurostd::utype2string(DEFAULT_POCC_SITE_TOL,prec);
-      prec=(int)ceil(log10(1.0/DEFAULT_POCC_STOICH_TOL));
-      system_name+="_"+aurostd::utype2string(DEFAULT_POCC_STOICH_TOL,prec);
-    }
+    system_name=pocc::addDefaultPOCCTOL2string(system_name);
     if(LDEBUG){cerr << soliloquy << " system_name(with TOL)=" << system_name << endl;}
 
     _aflags aflags;aflags.Directory=directory;
@@ -3740,13 +3768,13 @@ namespace aflowlib {
     stringstream sscontent_json;
     string eendl="";
     vector<string> vcontent_json;
-    
+
     sscontent_json << "\"salt\":" << aurostd::utype2string(salt);vcontent_json.push_back(sscontent_json.str());aurostd::StringstreamClean(sscontent_json);
     sscontent_json << "\"aflow_type\":" << "\"aggregate\"";vcontent_json.push_back(sscontent_json.str());aurostd::StringstreamClean(sscontent_json);
     sscontent_json << "\"method\":" << "\"aflow_pocc\"";vcontent_json.push_back(sscontent_json.str());aurostd::StringstreamClean(sscontent_json);
     sscontent_json << "\"aggregate_parameters\":" << "\"" << system_name << "\"";vcontent_json.push_back(sscontent_json.str());aurostd::StringstreamClean(sscontent_json);
     sscontent_json << "\"aggregate_content\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(vauid_aruns,"\""),",") << "]";vcontent_json.push_back(sscontent_json.str());aurostd::StringstreamClean(sscontent_json);
-    
+
     string metadata_auid_json="";
     uint64_t crc=0;
 
@@ -3763,7 +3791,7 @@ namespace aflowlib {
       message << "CONFLICT POTENTIAL " << auid << " " << aurl_found << " " << aurl;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,_LOGGER_MESSAGE_);
       if(aurl_found!=aurl) { // avoid conflict with yourself
         salt++;
-        metadata_auid_json=directory2MetadataAUIDjsonfile(directory,salt);
+        metadata_auid_json=POCCdirectory2MetadataAUIDjsonfile(directory,salt);
         if(LDEBUG){cerr << soliloquy << " METADATA_AUID.JSON=" << endl << metadata_auid_json << endl;}
         //aurostd::string2file(metadata_auid_json,"metadata_auid.json");
         crc=aurostd::crc64(0,metadata_auid_json); // DONT TOUCH THIS
@@ -4041,7 +4069,7 @@ namespace aflowlib {
   }
 
   void _aflowlib_entry::GetSGROUP(string aflowlibentry) {
-    string function = XPID + "aflowlib::_aflowlib_entry::getSGROUP():";
+    string function = XPID + "aflowlib::_aflowlib_entry::GetSGROUP():";
     string message = "";
     vector<string> vaflowlib_entry;
     aurostd::string2tokens(aflowlibentry,vaflowlib_entry,"|");
@@ -4368,9 +4396,11 @@ namespace aflowlib {
     stringstream num_prec;
     vector<string> voptions;
     aurostd::string2tokens(options,voptions,",");
+    string errormsg = "";
     if(voptions.size()==0) {
-      init::ErrorOption(options,"aflowlib::WEB_Aflowlib_Entry","aflow --aflowlib=entry");  //CO20200624 - soft patch for FR+web
-      return 0; //CO20200624 - 0 is error here
+      errormsg = "--aflowlib= has no arguments.";
+      //init::ErrorOption(options,"aflowlib::WEB_Aflowlib_Entry","aflow --aflowlib=entry");  //CO20200624 - soft patch for FR+web // OBSOLETE - use errormsg instead
+      //[CO+ME20200731 - ErrorOption throws an error, so no need to return]return 0; //CO20200624 - 0 is error here
     } 
 
     // move on
@@ -4439,7 +4469,7 @@ namespace aflowlib {
       // START SEARCH
 
       vflags.flag("FLAG::FOUND",FALSE);
-      string catalog="",auid="",strtmp,errormsg="";
+      string catalog="",auid="",strtmp="";
 
       // **********************************************************************************************************
       // TRY AUID
@@ -4583,7 +4613,13 @@ namespace aflowlib {
           vflags.flag("FLAG::ICSD",TRUE);
           vflags.flag("FLAG::FOUND",TRUE);
           catalog=entry_tmp.catalog;
-          label=directory;
+          //ME20200923 - Use the last subdirectory or XHOST.label will be inconsistent.
+          //For example, using --aflowlib=7bed936e9d5a44ca results in XHOST.label = Ni1Sn1Ti1_ICSD_174568
+          //whereas using --aflowlib=174568 results in XHOST.label=FCC.Ni1Sn1Ti1_ICSD_174568
+          //[OBSOLETE] label=directory;
+          vector<string> tokens;
+          aurostd::string2tokens(directory, tokens, "/");
+          label = tokens.back();
           //	  cerr << directory_ICSD2LINK+"/RAW/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT << endl;
         }
         //ME20200707 - Restore

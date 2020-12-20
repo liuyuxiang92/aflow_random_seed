@@ -306,7 +306,7 @@ namespace KBIN {
 namespace AFLOW_PTHREADS {
   bool MULTI_sh(vector<string> argv) {
 
-    string function_name = "AFLOW_PTHREADS::MULTI_sh()";
+    string function_name=XPID+"AFLOW_PTHREADS::MULTI_sh()";
     stringstream message;
     ostringstream aus;
     _aflags aflags;
@@ -367,7 +367,7 @@ namespace AFLOW_PTHREADS {
 namespace AFLOW_PTHREADS {
   void *_threaded_COMMANDS(void *ptr) {
 
-    string function_name = "AFLOW_PTHREADS::_threaded_COMMANDS():";
+    string function_name=XPID+"AFLOW_PTHREADS::_threaded_COMMANDS():";
     stringstream message;
     if(AFLOW_PTHREADS::MULTISH_TIMESHARING_SEQUENTIAL_) {
       //cerr << XPID << "AFLOW_PTHREADS::MULTISH_TIMESHARING_SEQUENTIAL_ AFLOW_PTHREADS::_threaded_COMMANDS" << endl;
@@ -449,6 +449,7 @@ namespace AFLOW_PTHREADS {
 namespace aurostd {
   bool multithread_execute(deque<string> dcmds,int _NUM_THREADS,bool VERBOSE) {
     bool LDEBUG=TRUE;
+    string soliloquy=XPID+"aurostd::multithread_execute():";
     int NUM_THREADS=_NUM_THREADS;                                          // SAFETY
     if((int) dcmds.size()<=NUM_THREADS) NUM_THREADS=(uint) dcmds.size();   // SAFETY
 
@@ -460,10 +461,10 @@ namespace aurostd {
       AFLOW_PTHREADS::FLAG=TRUE;AFLOW_PTHREADS::MAX_PTHREADS=NUM_THREADS;  // prepare
       if(AFLOW_PTHREADS::MAX_PTHREADS>MAX_ALLOCATABLE_PTHREADS) AFLOW_PTHREADS::MAX_PTHREADS=MAX_ALLOCATABLE_PTHREADS; // check max
 
-      if(LDEBUG) cerr << "aurostd::multithread_execute: _NUM_THREADS=" << _NUM_THREADS << endl;
-      if(LDEBUG) cerr << "aurostd::multithread_execute: NUM_THREADS=" << NUM_THREADS << endl;
-      if(LDEBUG) cerr << "aurostd::multithread_execute: MAX_ALLOCATABLE_PTHREADS=" << MAX_ALLOCATABLE_PTHREADS << endl;
-      if(LDEBUG) cerr << "aurostd::multithread_execute: AFLOW_PTHREADS::MAX_PTHREADS=" << AFLOW_PTHREADS::MAX_PTHREADS << endl;
+      if(LDEBUG) cerr << soliloquy << " _NUM_THREADS=" << _NUM_THREADS << endl;
+      if(LDEBUG) cerr << soliloquy << " NUM_THREADS=" << NUM_THREADS << endl;
+      if(LDEBUG) cerr << soliloquy << " MAX_ALLOCATABLE_PTHREADS=" << MAX_ALLOCATABLE_PTHREADS << endl;
+      if(LDEBUG) cerr << soliloquy << " AFLOW_PTHREADS::MAX_PTHREADS=" << AFLOW_PTHREADS::MAX_PTHREADS << endl;
 
       _aflags aflags;
       AFLOW_PTHREADS::Clean_Threads();                                     // clean threads
@@ -615,8 +616,15 @@ namespace AFLOW_PTHREADS {
       vcommands.push_back(command);
     }
 
+    //CO20200825 - adding --np=XX functionality
+    int np=1;
+    if(XHOST.vflag_control.flag("XPLUG_NUM_THREADS")){
+      np=aurostd::string2utype<int>(XHOST.vflag_control.getattachedscheme("XPLUG_NUM_THREADS"));
+    }
+    if(np<1){np=1;}
+
     //  for(uint i=0;i<vcommands.size();i++) aurostd::execute(vcommands.at(i));
-    aurostd::multithread_execute(vcommands,PTHREADS_DEFAULT);
+    aurostd::multithread_execute(vcommands,np,true); //CO20200731 - PTHREADS_DEFAULT doesn't always work
 
     return TRUE;
   }
@@ -838,7 +846,7 @@ namespace sflow {
     }
 
     if(LDEBUG) cerr << function_name << " END" << endl;
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Throw for debugging purposes.",_GENERIC_ERROR_);
+    //throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Throw for debugging purposes.",_GENERIC_ERROR_);
   }  
 } // namespace sflow
 

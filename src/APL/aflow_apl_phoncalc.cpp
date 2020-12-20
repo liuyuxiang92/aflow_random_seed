@@ -580,7 +580,7 @@ namespace apl {
       xvector<xcomplex<double> > eigenvec(3), eigenvec_conj(3);
       xcomplex<double> prod;
       for (uint br = 0; br < nbranches; br++) {
-        if (omega[br + 1] > _ZERO_TOL_LOOSE_) {
+        if (omega[br + 1] > _FLOAT_TOL_) {
           eigenvec = eigenvectors.getcol(br + 1);
           eigenvec_conj = conj(eigenvec);
           for (uint i = 1; i < 4; i++) {
@@ -837,8 +837,8 @@ namespace apl {
 
     // to correct the q=\Gamma as a limit
     xvector<double> q(_q);
-    if (aurostd::modulus(q) < _ZERO_TOL_LOOSE_) {
-      q(1) = _ZERO_TOL_LOOSE_ * 1.001;
+    if (aurostd::modulus(q) < _FLOAT_TOL_) {
+      q(1) = _FLOAT_TOL_ * 1.001;
     }
 
     uint pcAtomsSize = pc.atoms.size();
@@ -847,7 +847,7 @@ namespace apl {
     uint _nBranches = getNumberOfBranches();
     xmatrix<xcomplex<double> > dynamicalMatrix(_nBranches, _nBranches);
 
-    if (aurostd::modulus(q) > _ZERO_TOL_LOOSE_) {
+    if (aurostd::modulus(q) > _FLOAT_TOL_) {
       if (calc_derivative) {  // reset derivative
         derivative.clear();
         xmatrix<xcomplex<double> > mat(_nBranches, _nBranches, 1, 1);
@@ -985,7 +985,7 @@ namespace apl {
 
             geg = scalar_product(g, _dielectricTensor * g);
 
-            if (aurostd::abs(geg) > _ZERO_TOL_LOOSE_ && geg / lambda2 / 4.0 < gmax) {
+            if (aurostd::abs(geg) > _FLOAT_TOL_ && geg / lambda2 / 4.0 < gmax) {
               double fac2 = fac * exp(-geg / lambda2 / 4.0) / geg;
 
               for (uint ipc1 = 0; ipc1 < pcAtomsSize; ipc1++) {
@@ -1027,7 +1027,7 @@ namespace apl {
     //      //xvector<double> rf = _supercell.getFPositionItsNearestImage(rc,zero,pc.lattice);
     //      //rc = F2C(pc.lattice,rf);
 
-    //      if( aurostd::modulus(rc) < _ZERO_TOL_LOOSE_ ) continue;
+    //      if( aurostd::modulus(rc) < _FLOAT_TOL_ ) continue;
 
     //      //
     //      xvector<double> delta = _inverseDielectricTensor * rc;
@@ -1077,7 +1077,7 @@ namespace apl {
         xvector<double> rc = SYM::minimizeDistanceCartesianMethod(sc.atoms[isc2].cpos, sc.atoms[isc1].cpos, sc.lattice);
         xvector<double> rf = F2C(sc.lattice, rc);
 
-        if (aurostd::modulus(rc) < _ZERO_TOL_LOOSE_) continue;
+        if (aurostd::modulus(rc) < _FLOAT_TOL_) continue;
 
         //
         xvector<double> delta = _inverseDielectricTensor * rc;
@@ -1211,12 +1211,12 @@ namespace apl {
   // Writes the group velocities into a file. Each row belongs to a q-point,
   // and each column triplet belongs to a phonon branch.
   void PhononCalculator::writeGroupVelocitiesToFile(const string& filename,
-    const vector<vector<xvector<double> > >& gvel) {
+      const vector<vector<xvector<double> > >& gvel) {
     vector<vector<double> > freqs;
     writeGroupVelocitiesToFile(filename, gvel, freqs);
   }
   void PhononCalculator::writeGroupVelocitiesToFile(const string& filename,
-    const vector<vector<xvector<double> > >& gvel, const vector<vector<double> >& freqs, const string& unit) {
+      const vector<vector<xvector<double> > >& gvel, const vector<vector<double> >& freqs, const string& unit) {
     if (gvel.size() == 0) return;  // Nothing to write
     string function = "apl::PhononCalculator::writeGroupVelocitiesToFile():";
     string message = "";

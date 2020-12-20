@@ -12,140 +12,11 @@
 // ---------------------------------------------------------------------------
 // _XELEMENT_PROTOTYPES_
 
-/* 
 // ***************************************************************************
 // ***************************************************************************
 // ***************************************************************************
 // XELEMENT
 // look into aflow.h for the definitions
-
-namespace xelement {
-class xelement { // simple class.. nothing fancy
-public:
-// constructor destructor                              // constructor/destructor
-xelement();                                            // default, just allocate
-xelement(uint);                                            // default, just allocate
-xelement(string);                                      // look at it by symbol or name
-~xelement();                                           // kill everything
-const xelement& operator=(const xelement &b);          // copy
-void clear();
-// content                                             // content
-bool verbose;
-// [AFLOW]START=DECLARATION
-int Z; 
-string symbol;                          // http://periodictable.com      //DU20190517
-string name;                            // http://periodictable.com      //DU20190517
-double Period;                          // http://periodictable.com      //DU20190517
-double Group;                           // http://periodictable.com      //DU20190517
-string Series;                          // http://periodictable.com For Nh,Fl,Mc,Lv,Ts Value is a guess based on periodic table trend.      //DU20190517 
-string Block;                           // http://periodictable.com      //DU20190517
-//                                          
-double mass;                            // (kg)
-double MolarVolume;                     // (m^3/mol) http://periodictable.com      //DU20190517
-double volume;                          // atomic volume in A^3 from the FCC vasp table and/or successive calculations
-double Miedema_Vm;                      // (V_m^{2/3} in (cm^2)) Miedema Rule Table 1a Physica 100B (1980) 1-28
-// for lanthines from J.A. Alonso and N.H. March. Electrons in Metals and Alloys, Academic Press, London (1989) (except La)
-double valence_std;                     // http://en.wikipedia.org/wiki/Valence_(chemistry) standard: number electrons minus closed shell at leff (noble gas)
-double valence_iupac;                   // http://en.wikipedia.org/wiki/Valence_(chemistry) IUPAC Maximum number of univalent atoms that may combine with an atom of the element under consideration, or with a fragment, or for which an atom of this element can be substituted.
-double valence_PT;                      //           http://periodictable.com      //DU20190517
-double Density_PT;                      // (g/cm^3)  http://periodictable.com      //DU20190517
-string crystal;                     // Ashcroft-Mermin                                                                                                                   
-string CrystalStr_PT;                   // http://periodictable.com      //DU20190517
-string space_group;                     // http://periodictable.com      //DU20190517
-uint space_group_number;                // http://periodictable.com      //DU20190517
-
-
-double Pearson_coefficient;             // Pearson mass deviation coefficient //ME20181020
-xvector<double> lattice_constant;       // (pm) http://periodictable.com      //DU20190517
-xvector<double> lattice_angle;          // (rad) http://periodictable.com      //DU20190517
-string phase;                           //      http://periodictable.com      //DU20190517
-double radius;                      // Saxena (nm)
-double radius_PT;                       // (pm)       http://periodictable.com      //DU20190517
-double radius_covalent_PT;              // (pm)       http://periodictable.com      //DU20190517
-double radius_covalent;             // (Angstrom) Dalton Trans. 2836, 2832-2838 (2008) //DX+CO20170904
-double radius_VanDerWaals_PT;           // (pm)       http://periodictable.com      //DU20190517
-double radii_Ghosh08;                    // (Angstrom) Journal of Molecular Structure: THEOCHEM 865, 60–67 (2008)      //DU20190517
-double radii_Slatter;                    // (Angstrom) J. of Chem. Phys. 41, 3199 (1964)      //DU20190517
-double radii_Pyykko;                     // (pm) single bond covalent radii  Chem. Eur. J. 15, 186-197 (2009)      //DU20190517
-//                                          
-double electrical_conductivity;          // (S/m)  http://periodictable.com  Value given for graphite. Diamond electrical conductivity is approximately 0.001.      //DU20190517
-double electronegativity_vec;           // Saxena
-double hardness_Ghosh;                   // (eV) Int. J. Quantum Chem 110, 1206-1213 (2010) Table III       //DU20190517
-double electronegativity_Pearson;                  // (eV) Inorg. Chem., 27(4), 734–740 (1988)      //DU20190517
-double electronegativity_Ghosh;                    // (eV) Journal of Theoretical and Computational Chemistry, 4, 21-33 (2005)      //DU20190517
-
-//RF+SK20200410 START
-// Allen electronegativities were chosen for CCE since the IUPAC definition of oxidation states seems to use Allen electronegativities and since they also gave the best results
-// https://en.wikipedia.org/wiki/Oxidation_state#Determination
-// since there were no Allen electronegativities available for f-elements besides Lu but these elements are usually very similar,
-// the Lu electronegativity was also used for the other f-elements listed (e.g. La)
-// this is confirmed by the Allred and Rochow electronegativities that are all very similar for all lanthanides
-double electronegativity_Allen;          // https://pubs.acs.org/doi/abs/10.1021/ja00207a003; https://pubs.acs.org/doi/10.1021/ja992866e; https://pubs.acs.org/doi/10.1021/ja9928677
-// preferred and all oxidation states of the elements according to the periodic table of the elements from Wiley-VCH, 5th edition (2012) with some modifications (e. g. for Cr, Cu, Fe, Ti)
-vector<double> oxidation_states_preferred;
-vector<double> oxidation_states;
-//RF+SK20200410 END
-
-double electron_affinity_PT;             // (kJ/mol)  http://periodictable.com       //DU20190517
-double Miedema_phi_star;                // (V)        (phi^\star   Miedema Rule Table 1a Physica 100B 1-28 (1980)
-double Miedema_nws;                     // (d.u.)^1/3 n_{ws}^{1/3} Miedema Rule Table 1a Physica 100B 1-28 (1980)
-double Miedema_gamma_s;                 // (mJ/m^2)   \gamma_s^0   Miedema Rule Table 1a Physica 100B 1-28 (1980)
-double Pettifor_scale;                  // Chemical Scale Pettifor Solid State Communications 51 31-34 (1984)
-//                                          
-double boiling_point;                   // (Celsius), http://periodictable.com C:diamond, P:"YELLOW" Phosphorus, As:sublimates at this T.      //DU20190517
-double melting_point;                   // (Celsius), http://periodictable.com He does not solidify at standard pressure,C: Value given for diamond form, P : Value given for "YELLOW" phosphorus form, S : Value given for monoclinic, beta form, Se: Value given for hexagonal, gray form, Bk: Value given for alpha form.           //DU20190517
-double vaporization_heat_PT;             // (kJ/mol)   http://periodictable.com      //DU20190517
-double specific_heat_PT;                 // (J/(kg.K)) http://periodictable.com Gas_Phase:H(H2),He,N(N2),O(O2),F(F2),Ne,Cl(Cl2),Ar,Kr,Tc,Xe,Rn,Ra,Pa -- Liquid_Phase:Br,Hg -- Solid Phase: B(rhombic),C(graphite),S(rhombic),P(phase of P.4),As(alpha),Se(hexagonal),Cd(gamma),Sn(gray),Li,In,Be,Na,Mg,Al,Si,K,Ca,Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Ga,Ge,Rb,Sr,Y,Zr,Nb,Mo,Ru,Rh,Pd,Ag,Sb,Te,I,Cs,Ba,La,Ce,Pr,Nd,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Hf,Ta,W,Re,Os,Ir,Pt,Au,Tl,Pb,Bi,Ac,Th,U.      //DU20190517 
-double critical_Pressure;                // (Atm)      http://periodictable.com Li,Na,K,Rb: Value estimated based on extrapolation.      //DU20190517
-double critical_Temperature_PT;          // (K)        http://periodictable.com Li,Na,K,Rb: Value estimated based on extrapolation.      //DU20190517
-double thermal_expansion;               // (K^{-1})   http://periodictable.com C:graphite      //DU20190517
-double thermal_conductivity;            // (W/(mK))   http://periodictable.com      //DU20190517
-//                                         
-double Brinelll_hardness;               // (MPa)  http://periodictable.com For Ge value is converted from Mohs scale      //DU20190517
-double Mohs_hardness;                   //        http://periodictable.com For C, value given for graphite. Diamond value is 10.0; For Pr, Nd, Sm, Eu, Gd, Tb, Dy, Ho, Er, Tm, Lu converted from Vickers scale.      //DU20190517
-double Vickers_hardness;                // (MPa)  http://periodictable.com For Si,Ge,As,Ru,Os converted from Brinell scale.      //DU20190517
-double Hardness_Pearson;                // (eV)   Inorg. Chem. 27(4) 734-740 (1988).      //DU20190517
-double Hardness_Putz;                   // (eV/atom) International Journal of Quantum Chemistry, Vol 106, 361–389 (2006), TABLE-V.      //DU20190517
-double Hardness_RB;                     // (eV)   Robles and Bartolotti, J. Am. Chem. Soc. 106, 3723-3727 (1984).      //DU20190517
-double shear_modulus;                    // (GPa)  http://periodictable.com      //DU20190517
-double Young_modulus;                    // (GPa)  http://periodictable.com      //DU20190517
-double bulk_modulus;                     // (GPa)  http://periodictable.com      //DU20190517
-double Poisson_ratio_PT;                 // (--)   http://periodictable.com      //DU20190517
-double Miedema_BVm;                     // (kJ/mole) BV_m Miedema Rule Table 1a Physica 100B 1-28 (1980) 
-//
-string Magnetic_Type_PT;                 //           http://periodictable.com       //DU20190517
-double Mass_Magnetic_Susceptibility;      // (m^3/K)   http://periodictable.com       //DU20190517
-double Volume_Magnetic_Susceptibility;    //           http://periodictable.com       //DU20190517
-double Molar_Magnetic_Susceptibility;     // (m^3/mol) http://periodictable.com       //DU20190517
-double Curie_point;                     // (K)       http://periodictable.com       //DU20190517
-//
-double refractive_index;                 // http://periodictable.com C:diamond      //DU20190517
-string color_PT;                        // http://periodictable.com      //DU20190517
-//
-double HHIP;                            // Chem. Mater. 25(15), 2911–2920 (2013) Herfindahl–Hirschman Index (HHI), HHIP: for elemental production, Uncertinities in HHI_P: C,O,F,Cl,Sc,Ga,Rb,Ru,Rh,Cs,Hf,Os,Ir,Tl.      //DU20190517
-double HHIR;                            // Chem. Mater. 25(15), 2911–2920 (2013) Herfindahl–Hirschman Index (HHI), HHIR: for elemental reserves,   Uncertinities in HHI_R: Be,C,N,O,F,Na,Mg,Al,Si,S,Cl,Ca,Sc,Ga,Ge,As,Rb,Sr,Ru,Rh,Pd,In,Cs,Hf,Os,Ir,Pt,Tl.      //DU20190517
-double xray_scatt;                  // shift+1 // All data collected from the NIST online tables: http://physics.nist.gov/PhysRefData/FFast/html/form.html//
-
-// Xray_scatt_vector All data collected from the NIST online tables
-// http://physics.nist.gov/PhysRefData/FFast/html/form.html
-// All data are ideally for f1 values for Cu-alpha (wavelength=1.5418A, E=8.0416keV).
-// These are for E=7.9026keV (Cu-alpha is wavelength=1.5418A, E=8.0416keV).
-
-// All data collected from the online tables:
-// http://www-cxro.lbl.gov/optical_constants/pert_form.html
-// All data are f1 values for Cu-alpha (wavelength=1.5418A, E=8.0416keV].
-
-// [AFLOW]STOP=DECLARATION
-// operators/functions                                    // operator/functions
-friend ostream& operator<<(ostream &,const xelement&);    // print
-xelement Iinitialize(uint Z);                      // function to clean up the name
-
-private:                                                    //
-void free();                                              // free space
-};
-}
-*/
-
 
 std::vector<xelement::xelement> velement(NUM_ELEMENTS);        // store starting from ONE
 
@@ -208,10 +79,12 @@ namespace pflow {
           if(c=="ALL" || c==aurostd::toupper("Group")) vs.push_back(aurostd::PaddedPOST("Group="+aurostd::utype2string(xelement::xelement(Z).Group),len));
           if(c=="ALL" || c==aurostd::toupper("Series")) vs.push_back(aurostd::PaddedPOST("Series="+xelement::xelement(Z).Series,len));
           if(c=="ALL" || c==aurostd::toupper("Block")) vs.push_back(aurostd::PaddedPOST("Block="+xelement::xelement(Z).Block,len));
+          //
           if(c=="ALL" || c==aurostd::toupper("mass")) vs.push_back(aurostd::PaddedPOST("mass="+aurostd::utype2string(xelement::xelement(Z).mass,prec),len)+"// (kg)");
           if(c=="ALL" || c==aurostd::toupper("MolarVolume")) vs.push_back(aurostd::PaddedPOST("MolarVolume="+aurostd::utype2string(xelement::xelement(Z).MolarVolume,prec),len)+"// (m^3/mol)");
           if(c=="ALL" || c==aurostd::toupper("volume")) vs.push_back(aurostd::PaddedPOST("volume="+aurostd::utype2string(xelement::xelement(Z).volume,prec),len)+"// A^3");
           if(c=="ALL" || c==aurostd::toupper("Miedema_Vm")) vs.push_back(aurostd::PaddedPOST("Miedema_Vm="+aurostd::utype2string(xelement::xelement(Z).Miedema_Vm,prec),len)+"// (V_m^{2/3} in (cm^2))");
+          //
           if(c=="ALL" || c==aurostd::toupper("valence_std")) vs.push_back(aurostd::PaddedPOST("valence_std="+aurostd::utype2string(xelement::xelement(Z).valence_std),len));
           if(c=="ALL" || c==aurostd::toupper("valence_iupac")) vs.push_back(aurostd::PaddedPOST("valence_iupac="+aurostd::utype2string(xelement::xelement(Z).valence_iupac),len));
           if(c=="ALL" || c==aurostd::toupper("valence_PT")) vs.push_back(aurostd::PaddedPOST("valence_PT="+aurostd::utype2string(xelement::xelement(Z).valence_PT),len));
@@ -220,7 +93,6 @@ namespace pflow {
           if(c=="ALL" || c==aurostd::toupper("CrystalStr_PT")) vs.push_back(aurostd::PaddedPOST("CrystalStr_PT="+xelement::xelement(Z).CrystalStr_PT,len));
           if(c=="ALL" || c==aurostd::toupper("space_group")) vs.push_back(aurostd::PaddedPOST("space_group="+xelement::xelement(Z).space_group,len));
           if(c=="ALL" || c==aurostd::toupper("space_group_number")) vs.push_back(aurostd::PaddedPOST("space_group_number="+aurostd::utype2string(xelement::xelement(Z).space_group_number),len));
-
           if(c=="ALL" || c==aurostd::toupper("Pearson_coefficient")) vs.push_back(aurostd::PaddedPOST("Pearson_coefficient="+aurostd::utype2string(xelement::xelement(Z).Pearson_coefficient,prec),len));
           if(c=="ALL" || c==aurostd::toupper("lattice_constant")) vs.push_back(aurostd::PaddedPOST("lattice_constant="+aurostd::utype2string(xelement::xelement(Z).lattice_constant[1],prec)+","+aurostd::utype2string(xelement::xelement(Z).lattice_constant[2],prec)+","+aurostd::utype2string(xelement::xelement(Z).lattice_constant[3],prec),len)+"// (pm)");
           if(c=="ALL" || c==aurostd::toupper("lattice_angle")) vs.push_back(aurostd::PaddedPOST("lattice_angle="+aurostd::utype2string(xelement::xelement(Z).lattice_angle[1],prec)+","+aurostd::utype2string(xelement::xelement(Z).lattice_angle[2],prec)+","+aurostd::utype2string(xelement::xelement(Z).lattice_angle[3],prec),len)+"// (rad)");
@@ -233,17 +105,22 @@ namespace pflow {
           if(c=="ALL" || c==aurostd::toupper("radii_Ghosh08")) vs.push_back(aurostd::PaddedPOST("radii_Ghosh08="+aurostd::utype2string(xelement::xelement(Z).radii_Ghosh08,prec),len)+"// (Angstrom)");
           if(c=="ALL" || c==aurostd::toupper("radii_Slatter")) vs.push_back(aurostd::PaddedPOST("radii_Slatter="+aurostd::utype2string(xelement::xelement(Z).radii_Slatter,prec),len)+"// (Angstrom)");
           if(c=="ALL" || c==aurostd::toupper("radii_Pyykko")) vs.push_back(aurostd::PaddedPOST("radii_Pyykko="+aurostd::utype2string(xelement::xelement(Z).radii_Pyykko,prec),len)+"// (pm)");
-
+          //
           if(c=="ALL" || c==aurostd::toupper("electrical_conductivity")) vs.push_back(aurostd::PaddedPOST("electrical_conductivity="+aurostd::utype2string(xelement::xelement(Z).electrical_conductivity,prec),len)+"// (S/m)");
           if(c=="ALL" || c==aurostd::toupper("electronegativity_vec")) vs.push_back(aurostd::PaddedPOST("electronegativity_vec="+aurostd::utype2string(xelement::xelement(Z).electronegativity_vec,prec),len));
           if(c=="ALL" || c==aurostd::toupper("hardness_Ghosh")) vs.push_back(aurostd::PaddedPOST("hardness_Ghosh="+aurostd::utype2string(xelement::xelement(Z).hardness_Ghosh,prec),len)+"// (eV)");
-          if(c=="ALL" || c==aurostd::toupper("electronegativity_Pearson")) vs.push_back(aurostd::PaddedPOST("electronegativity_Pearson="+aurostd::utype2string(xelement::xelement(Z).electronegativity_Pearson,prec),len)+"// (eV)");
-          if(c=="ALL" || c==aurostd::toupper("electronegativity_Ghosh")) vs.push_back(aurostd::PaddedPOST("electronegativity_Ghosh="+aurostd::utype2string(xelement::xelement(Z).electronegativity_Ghosh,prec),len)+"// (eV)");
+          if(c=="ALL" || c==aurostd::toupper("electronegativity_Pearson")) vs.push_back(aurostd::PaddedPOST("electronegativity_Pearson="+aurostd::utype2string(xelement::xelement(Z).electronegativity_Pearson,prec),len)); //+"// (eV)
+          if(c=="ALL" || c==aurostd::toupper("electronegativity_Ghosh")) vs.push_back(aurostd::PaddedPOST("electronegativity_Ghosh="+aurostd::utype2string(xelement::xelement(Z).electronegativity_Ghosh,prec),len)); //+"// (eV)
+          if(c=="ALL" || c==aurostd::toupper("electronegativity_Allen")) vs.push_back(aurostd::PaddedPOST("electronegativity_Allen="+aurostd::utype2string(xelement::xelement(Z).electronegativity_Allen,prec),len)); //CO20200731
+          if(c=="ALL" || c==aurostd::toupper("oxidation_states")) vs.push_back(aurostd::PaddedPOST("oxidation_states="+aurostd::joinWDelimiter(aurostd::vecDouble2vecString(xelement::xelement(Z).oxidation_states,prec),","),len)); //CO20200731
+          if(c=="ALL" || c==aurostd::toupper("oxidation_states_preferred")) vs.push_back(aurostd::PaddedPOST("oxidation_states_preferred="+aurostd::joinWDelimiter(aurostd::vecDouble2vecString(xelement::xelement(Z).oxidation_states_preferred,prec),","),len)); //CO20200731
           if(c=="ALL" || c==aurostd::toupper("electron_affinity_PT")) vs.push_back(aurostd::PaddedPOST("electron_affinity_PT="+aurostd::utype2string(xelement::xelement(Z).electron_affinity_PT,prec),len)+"// (kJ/mol)");
           if(c=="ALL" || c==aurostd::toupper("Miedema_phi_star")) vs.push_back(aurostd::PaddedPOST("Miedema_phi_star="+aurostd::utype2string(xelement::xelement(Z).Miedema_phi_star,prec),len)+"// (V) (phi^star)");
           if(c=="ALL" || c==aurostd::toupper("Miedema_nws")) vs.push_back(aurostd::PaddedPOST("Miedema_nws="+aurostd::utype2string(xelement::xelement(Z).Miedema_nws,prec),len)+"// (d.u.)^1/3 n_{ws}^{1/3}");
           if(c=="ALL" || c==aurostd::toupper("Miedema_gamma_s")) vs.push_back(aurostd::PaddedPOST("Miedema_gamma_s="+aurostd::utype2string(xelement::xelement(Z).Miedema_gamma_s,prec),len)+"// (mJ/m^2)");
+          //
           if(c=="ALL" || c==aurostd::toupper("Pettifor_scale")) vs.push_back(aurostd::PaddedPOST("Pettifor_scale="+aurostd::utype2string(xelement::xelement(Z).Pettifor_scale,prec),len)); 
+          //
           if(c=="ALL" || c==aurostd::toupper("boiling_point")) vs.push_back(aurostd::PaddedPOST("boiling_point="+aurostd::utype2string(xelement::xelement(Z).boiling_point,prec),len)+"// (Celsius)");
           if(c=="ALL" || c==aurostd::toupper("melting_point")) vs.push_back(aurostd::PaddedPOST("melting_point="+aurostd::utype2string(xelement::xelement(Z).melting_point,prec),len)+"// (Celsius)");
           if(c=="ALL" || c==aurostd::toupper("vaporization_heat_PT")) vs.push_back(aurostd::PaddedPOST("vaporization_heat_PT="+aurostd::utype2string(xelement::xelement(Z).vaporization_heat_PT,prec),len)+"// (kJ/mol)");
@@ -252,6 +129,7 @@ namespace pflow {
           if(c=="ALL" || c==aurostd::toupper("critical_Temperature_PT")) vs.push_back(aurostd::PaddedPOST("critical_Temperature_PT="+aurostd::utype2string(xelement::xelement(Z).critical_Temperature_PT,prec),len)+"// (K)"); 
           if(c=="ALL" || c==aurostd::toupper("thermal_expansion")) vs.push_back(aurostd::PaddedPOST("thermal_expansion="+aurostd::utype2string(xelement::xelement(Z).thermal_expansion,prec),len)+"// (K^{-1})");
           if(c=="ALL" || c==aurostd::toupper("thermal_conductivity")) vs.push_back(aurostd::PaddedPOST("thermal_conductivity="+aurostd::utype2string(xelement::xelement(Z).thermal_conductivity,prec),len)+"// (W/(mK))");
+          //
           if(c=="ALL" || c==aurostd::toupper("Brinelll_hardness")) vs.push_back(aurostd::PaddedPOST("Brinelll_hardness="+aurostd::utype2string(xelement::xelement(Z).Brinelll_hardness,prec),len)+"// (MPa)");
           if(c=="ALL" || c==aurostd::toupper("Mohs_hardness")) vs.push_back(aurostd::PaddedPOST("Mohs_hardness="+aurostd::utype2string(xelement::xelement(Z).Mohs_hardness,prec),len));
           if(c=="ALL" || c==aurostd::toupper("Vickers_hardness")) vs.push_back(aurostd::PaddedPOST("Vickers_hardness="+aurostd::utype2string(xelement::xelement(Z).Vickers_hardness,prec),len)+"// (MPa)");
@@ -263,15 +141,16 @@ namespace pflow {
           if(c=="ALL" || c==aurostd::toupper("bulk_modulus")) vs.push_back(aurostd::PaddedPOST("bulk_modulus="+aurostd::utype2string(xelement::xelement(Z).bulk_modulus,prec),len)+"// (GPa)");
           if(c=="ALL" || c==aurostd::toupper("Poisson_ratio_PT")) vs.push_back(aurostd::PaddedPOST("Poisson_ratio_PT="+aurostd::utype2string(xelement::xelement(Z).Poisson_ratio_PT,prec),len));
           if(c=="ALL" || c==aurostd::toupper("Miedema_BVm")) vs.push_back(aurostd::PaddedPOST("Miedema_BVm="+aurostd::utype2string(xelement::xelement(Z).Miedema_BVm,prec),len)+"// (kJ/mole)");
-
+          //
           if(c=="ALL" || c==aurostd::toupper("Magnetic_Type_PT")) vs.push_back(aurostd::PaddedPOST("Magnetic_Type_PT="+xelement::xelement(Z).Magnetic_Type_PT,len));
           if(c=="ALL" || c==aurostd::toupper("Mass_Magnetic_Susceptibility")) vs.push_back(aurostd::PaddedPOST("Mass_Magnetic_Susceptibility="+aurostd::utype2string(xelement::xelement(Z).Mass_Magnetic_Susceptibility,prec),len)+"// (m^3/K)");
           if(c=="ALL" || c==aurostd::toupper("Volume_Magnetic_Susceptibility")) vs.push_back(aurostd::PaddedPOST("Volume_Magnetic_Susceptibility="+aurostd::utype2string(xelement::xelement(Z).Volume_Magnetic_Susceptibility,prec),len));
           if(c=="ALL" || c==aurostd::toupper("Molar_Magnetic_Susceptibility")) vs.push_back(aurostd::PaddedPOST("Molar_Magnetic_Susceptibility="+aurostd::utype2string(xelement::xelement(Z).Molar_Magnetic_Susceptibility,prec),len)+"// (m^3/mol)");
           if(c=="ALL" || c==aurostd::toupper("Curie_point")) vs.push_back(aurostd::PaddedPOST("Curie_point="+aurostd::utype2string(xelement::xelement(Z).Curie_point,prec),len)+"// (K)");
-
+          //
           if(c=="ALL" || c==aurostd::toupper("refractive_index")) vs.push_back(aurostd::PaddedPOST("refractive_index="+aurostd::utype2string(xelement::xelement(Z).refractive_index,prec),len));
           if(c=="ALL" || c==aurostd::toupper("color_PT")) vs.push_back(aurostd::PaddedPOST("color_PT="+xelement::xelement(Z).color_PT,len));
+          //
           if(c=="ALL" || c==aurostd::toupper("HHIP")) vs.push_back(aurostd::PaddedPOST("HHIP="+aurostd::utype2string(xelement::xelement(Z).HHIP,prec),len));
           if(c=="ALL" || c==aurostd::toupper("HHIR")) vs.push_back(aurostd::PaddedPOST("HHIR="+aurostd::utype2string(xelement::xelement(Z).HHIR,prec),len));
           if(c=="ALL" || c==aurostd::toupper("xray_scatt")) vs.push_back(aurostd::PaddedPOST("xray_scatt="+aurostd::utype2string(xelement::xelement(Z).xray_scatt,prec),len)+"// shift+1");
@@ -464,11 +343,9 @@ namespace xelement {
     hardness_Ghosh=b.hardness_Ghosh;            
     electronegativity_Pearson=b.electronegativity_Pearson;           
     electronegativity_Ghosh=b.electronegativity_Ghosh;             
-
     electronegativity_Allen=b.electronegativity_Allen;  //RF+SK20200410
     oxidation_states=b.oxidation_states;  //RF+SK20200410
     oxidation_states_preferred=b.oxidation_states_preferred;  //RF+SK20200410
-
     electron_affinity_PT=b.electron_affinity_PT;      
     Miedema_phi_star=b.Miedema_phi_star;         
     Miedema_nws=b.Miedema_nws;              
@@ -5277,9 +5154,9 @@ namespace xelement {
       hardness_Ghosh=1.1571;
       electronegativity_Pearson=3.1;
       electronegativity_Ghosh=4.439;
-      electronegativity_Allen=1.09; //RF+SK20200410
-      oxidation_states.clear();oxidation_states.push_back(3);  //RF+SK20200410
-      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);  //RF+SK20200410
+      electronegativity_Allen=1.09; // RF+SK20200410; use value for Lu since no values are available for other lanthanides and they are all usually very similar chemically
+      oxidation_states.clear();oxidation_states.push_back(3);
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);
       electron_affinity_PT=48;
       Miedema_phi_star=3.05;
       Miedema_nws=1.09;
@@ -5361,9 +5238,9 @@ namespace xelement {
       hardness_Ghosh=1.3943;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=4.561;
-      electronegativity_Allen=NNN;  //RF+SK20200410
-      oxidation_states.clear();oxidation_states.push_back(NNN);  //RF+SK20200410
-      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
+      electronegativity_Allen=1.09; // RF+SK20200410; use value for Lu since no values are available for other lanthanides and they are all usually very similar chemically
+      oxidation_states.clear();oxidation_states.push_back(4); oxidation_states.push_back(3);
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);
       electron_affinity_PT=50;
       Miedema_phi_star=3.18;
       Miedema_nws=1.19;
@@ -5444,9 +5321,9 @@ namespace xelement {
       hardness_Ghosh=1.6315;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=4.682;
-      electronegativity_Allen=NNN;  //RF+SK20200410
-      oxidation_states.clear();oxidation_states.push_back(NNN);  //RF+SK20200410
-      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
+      electronegativity_Allen=1.09; // RF+SK20200410; use value for Lu since no values are available for other lanthanides and they are all usually very similar chemically
+      oxidation_states.clear();oxidation_states.push_back(4); oxidation_states.push_back(3);
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);
       electron_affinity_PT=50;
       Miedema_phi_star=3.19;
       Miedema_nws=1.20;
@@ -5527,9 +5404,9 @@ namespace xelement {
       hardness_Ghosh=1.8684;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=4.804;
-      electronegativity_Allen=NNN;  //RF+SK20200410
-      oxidation_states.clear();oxidation_states.push_back(NNN);  //RF+SK20200410
-      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
+      electronegativity_Allen=1.09; // RF+SK20200410; use value for Lu since no values are available for other lanthanides and they are all usually very similar chemically
+      oxidation_states.clear();oxidation_states.push_back(3);
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);
       electron_affinity_PT=50;
       Miedema_phi_star=3.19;
       Miedema_nws=1.20;
@@ -5610,9 +5487,9 @@ namespace xelement {
       hardness_Ghosh=2.1056;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=4.925;
-      electronegativity_Allen=NNN;  //RF+SK20200410
-      oxidation_states.clear();oxidation_states.push_back(NNN);  //RF+SK20200410
-      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
+      electronegativity_Allen=1.09; // RF+SK20200410; use value for Lu since no values are available for other lanthanides and they are all usually very similar chemically
+      oxidation_states.clear();oxidation_states.push_back(3);
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);
       electron_affinity_PT=50;
       Miedema_phi_star=3.19;
       Miedema_nws=1.21;
@@ -5693,9 +5570,9 @@ namespace xelement {
       hardness_Ghosh=2.3427;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=5.047;
-      electronegativity_Allen=NNN;  //RF+SK20200410
-      oxidation_states.clear();oxidation_states.push_back(NNN);  //RF+SK20200410
-      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
+      electronegativity_Allen=1.09; // RF+SK20200410; use value for Lu since no values are available for other lanthanides and they are all usually very similar chemically
+      oxidation_states.clear();oxidation_states.push_back(3); oxidation_states.push_back(2);
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);
       electron_affinity_PT=50;
       Miedema_phi_star=3.20;
       Miedema_nws=1.21;
@@ -5776,9 +5653,9 @@ namespace xelement {
       hardness_Ghosh=2.5798;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=5.168;
-      electronegativity_Allen=NNN;  //RF+SK20200410
-      oxidation_states.clear();oxidation_states.push_back(NNN);  //RF+SK20200410
-      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
+      electronegativity_Allen=1.09; // RF+SK20200410; use value for Lu since no values are available for other lanthanides and they are all usually very similar chemically
+      oxidation_states.clear();oxidation_states.push_back(3); oxidation_states.push_back(2);
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);
       electron_affinity_PT=50;
       Miedema_phi_star=3.20;
       Miedema_nws=1.21;
@@ -5859,9 +5736,9 @@ namespace xelement {
       hardness_Ghosh=2.8170;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=5.290;
-      electronegativity_Allen=NNN;  //RF+SK20200410
-      oxidation_states.clear();oxidation_states.push_back(NNN);  //RF+SK20200410
-      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
+      electronegativity_Allen=1.09; // RF+SK20200410; use value for Lu since no values are available for other lanthanides and they are all usually very similar chemically
+      oxidation_states.clear();oxidation_states.push_back(3);
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);
       electron_affinity_PT=50;
       Miedema_phi_star=3.20;
       Miedema_nws=1.21;
@@ -5942,9 +5819,9 @@ namespace xelement {
       hardness_Ghosh=3.0540;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=5.411;
-      electronegativity_Allen=NNN;  //RF+SK20200410
-      oxidation_states.clear();oxidation_states.push_back(NNN);  //RF+SK20200410
-      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
+      electronegativity_Allen=1.09; // RF+SK20200410; use value for Lu since no values are available for other lanthanides and they are all usually very similar chemically
+      oxidation_states.clear();oxidation_states.push_back(4); oxidation_states.push_back(3);
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);
       electron_affinity_PT=50;
       Miedema_phi_star=3.21;
       Miedema_nws=1.22;
@@ -6025,9 +5902,9 @@ namespace xelement {
       hardness_Ghosh=3.2912;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=5.533;
-      electronegativity_Allen=NNN;  //RF+SK20200410
-      oxidation_states.clear();oxidation_states.push_back(NNN);  //RF+SK20200410
-      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
+      electronegativity_Allen=1.09; // RF+SK20200410; use value for Lu since no values are available for other lanthanides and they are all usually very similar chemically
+      oxidation_states.clear();oxidation_states.push_back(3);
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);
       electron_affinity_PT=50;
       Miedema_phi_star=3.21;
       Miedema_nws=1.22;
@@ -6108,9 +5985,9 @@ namespace xelement {
       hardness_Ghosh=3.5283;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=5.654;
-      electronegativity_Allen=NNN;  //RF+SK20200410
-      oxidation_states.clear();oxidation_states.push_back(NNN);  //RF+SK20200410
-      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
+      electronegativity_Allen=1.09; // RF+SK20200410; use value for Lu since no values are available for other lanthanides and they are all usually very similar chemically
+      oxidation_states.clear();oxidation_states.push_back(3);
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);
       electron_affinity_PT=50;
       Miedema_phi_star=3.22;
       Miedema_nws=1.22;
@@ -6191,9 +6068,9 @@ namespace xelement {
       hardness_Ghosh=3.7655;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=5.776;
-      electronegativity_Allen=NNN;  //RF+SK20200410
-      oxidation_states.clear();oxidation_states.push_back(NNN);  //RF+SK20200410
-      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
+      electronegativity_Allen=1.09; // RF+SK20200410; use value for Lu since no values are available for other lanthanides and they are all usually very similar chemically
+      oxidation_states.clear();oxidation_states.push_back(3);
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);
       electron_affinity_PT=50;
       Miedema_phi_star=3.22;
       Miedema_nws=1.23;
@@ -6274,9 +6151,9 @@ namespace xelement {
       hardness_Ghosh=4.0026;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=5.897;
-      electronegativity_Allen=NNN;  //RF+SK20200410
-      oxidation_states.clear();oxidation_states.push_back(NNN);  //RF+SK20200410
-      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
+      electronegativity_Allen=1.09; // RF+SK20200410; use value for Lu since no values are available for other lanthanides and they are all usually very similar chemically
+      oxidation_states.clear();oxidation_states.push_back(3); oxidation_states.push_back(2);
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);
       electron_affinity_PT=50;
       Miedema_phi_star=3.22;
       Miedema_nws=1.23;
@@ -6357,9 +6234,9 @@ namespace xelement {
       hardness_Ghosh=4.2395;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=6.019;
-      electronegativity_Allen=NNN;  //RF+SK20200410
-      oxidation_states.clear();oxidation_states.push_back(NNN);  //RF+SK20200410
-      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(NNN);  //RF+SK20200410
+      electronegativity_Allen=1.09; // RF+SK20200410; use value for Lu since no values are available for other lanthanides and they are all usually very similar chemically
+      oxidation_states.clear();oxidation_states.push_back(3); oxidation_states.push_back(2);
+      oxidation_states_preferred.clear();oxidation_states_preferred.push_back(3);
       electron_affinity_PT=50;
       Miedema_phi_star=3.22;
       Miedema_nws=1.23;

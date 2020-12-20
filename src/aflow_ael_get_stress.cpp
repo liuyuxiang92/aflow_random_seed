@@ -124,31 +124,31 @@ namespace AEL_functions {
     //CT20200721 Calls function AEL_Get_AflowInName to find correct aflow.in filename
     AEL_functions::AEL_Get_AflowInName(AflowInName, directory_LIB, ael_aflowin_found);
     FileNameAFLOWIN = directory_LIB+"/"+AflowInName;
-    
+
     //CO20200502 STOP - CT, I am consolidating the following code with an outer loop, it should make it easier to patch in the future
 
     if (ael_aflowin_found) {
       // Set FileMESSAGE name
       //CT20200624 Moved down so LOCK file is only renamed if this is actually an AEL main directory and not an ARUN.AEL directory
       if(FileLockName.length() > 0) {
-	if (aurostd::FileExist(directory_LIB+"/"+FileLockName)) {
-	  aurostd::execute("mv "+aurostd::CleanFileName(directory_LIB+"/"+FileLockName+" ")+aurostd::CleanFileName(directory_LIB+"/"+FileLockName+".run"));   
-	}
-	string FileNameMessage=directory_LIB+"/"+FileLockName;
-	FileMESSAGE.open(FileNameMessage.c_str(),std::ios::app);
-      } else {
-	if (aurostd::FileExist(directory_LIB+"/ael.LOCK")) {
-	  aurostd::execute("mv "+aurostd::CleanFileName(directory_LIB+"/ael.LOCK ")+aurostd::CleanFileName(directory_LIB+"/ael.LOCK.run"));
-	  string FileNameMessage=directory_LIB+"/ael.LOCK";
-	  FileMESSAGE.open(FileNameMessage.c_str(),std::ios::app);
-	} else if (aurostd::FileExist(directory_LIB+"/agl.LOCK")) {
-	  aurostd::execute("mv "+aurostd::CleanFileName(directory_LIB+"/agl.LOCK ")+aurostd::CleanFileName(directory_LIB+"/agl.LOCK.run"));
-	  string FileNameMessage=directory_LIB+"/agl.LOCK";
+        if (aurostd::FileExist(directory_LIB+"/"+FileLockName)) {
+          aurostd::execute("mv "+aurostd::CleanFileName(directory_LIB+"/"+FileLockName+" ")+aurostd::CleanFileName(directory_LIB+"/"+FileLockName+".run"));   
+        }
+        string FileNameMessage=directory_LIB+"/"+FileLockName;
         FileMESSAGE.open(FileNameMessage.c_str(),std::ios::app);
-	} else {
-	  string FileNameMessage=directory_LIB+"/ael.LOCK";
-	  FileMESSAGE.open(FileNameMessage.c_str(),std::ios::app);
-	}
+      } else {
+        if (aurostd::FileExist(directory_LIB+"/ael.LOCK")) {
+          aurostd::execute("mv "+aurostd::CleanFileName(directory_LIB+"/ael.LOCK ")+aurostd::CleanFileName(directory_LIB+"/ael.LOCK.run"));
+          string FileNameMessage=directory_LIB+"/ael.LOCK";
+          FileMESSAGE.open(FileNameMessage.c_str(),std::ios::app);
+        } else if (aurostd::FileExist(directory_LIB+"/agl.LOCK")) {
+          aurostd::execute("mv "+aurostd::CleanFileName(directory_LIB+"/agl.LOCK ")+aurostd::CleanFileName(directory_LIB+"/agl.LOCK.run"));
+          string FileNameMessage=directory_LIB+"/agl.LOCK";
+          FileMESSAGE.open(FileNameMessage.c_str(),std::ios::app);
+        } else {
+          string FileNameMessage=directory_LIB+"/ael.LOCK";
+          FileMESSAGE.open(FileNameMessage.c_str(),std::ios::app);
+        }
       }
       // Search for AEL aflow.in filename      
       FileAFLOWIN.open(FileNameAFLOWIN.c_str(),std::ios::in);
@@ -306,6 +306,7 @@ namespace AEL_functions {
     string FileNameAFLOWIN = "", FileNameAFLOWINcheck = "", AflowInCheck = "";
     string FileNameMessage = "";
     string aflowinname = "";
+    uint aelerror = 0, filelength = 0;
     vector<string> vAflowInCheck;
     ael_aflowin_found = false;
     aurostd::xoption USER_AEL_POISSON_RATIO;
@@ -319,17 +320,23 @@ namespace AEL_functions {
       aflowinname = vaflowins.at(iaf);
       if((!ael_aflowin_found) && (aurostd::FileExist(directory_LIB+"/"+aflowinname))) {
         FileNameAFLOWINcheck = directory_LIB+"/"+aflowinname;
-        FileAFLOWINcheck.open(FileNameAFLOWINcheck.c_str(),std::ios::in);
-        FileAFLOWINcheck.clear();
-        FileAFLOWINcheck.seekg(0);
+        // [OBSOLETE] FileAFLOWINcheck.open(FileNameAFLOWINcheck.c_str(),std::ios::in);
+        // [OBSOLETE] FileAFLOWINcheck.clear();
+        // [OBSOLETE] FileAFLOWINcheck.seekg(0);
         AflowInCheck="";
-        char c;
+        // [OBSOLETE] char c;
         // READ aflowinname and put into AflowInCheck
-        while (FileAFLOWINcheck.get(c)) {
-          AflowInCheck+=c;
-        }
-        FileAFLOWINcheck.clear();
-        FileAFLOWINcheck.seekg(0);
+        // [OBSOLETE] while (FileAFLOWINcheck.get(c)) {
+        // [OBSOLETE]   AflowInCheck+=c;
+        // [OBSOLETE] }
+        // [OBSOLETE] FileAFLOWINcheck.clear();
+        // [OBSOLETE] FileAFLOWINcheck.seekg(0);
+        filelength=aurostd::file2string(FileNameAFLOWINcheck, AflowInCheck);
+        if (filelength > 0) {
+          aelerror = 0;
+        } else {
+          aelerror = 1;
+        }	
         AflowInCheck=aurostd::RemoveComments(AflowInCheck); // NOW Clean AFLOWIN
         vAflowInCheck.clear();
         aurostd::string2vectorstring(AflowInCheck,vAflowInCheck); 
@@ -340,7 +347,7 @@ namespace AEL_functions {
                 aurostd::substring2bool(vAflowInCheck[i],"[AFLOW_AEL]CALCS",TRUE) || aurostd::substring2bool(vAflowInCheck[i],"[VASP_AEL]CALCS",TRUE) || FALSE)){
             FileNameAFLOWIN = FileNameAFLOWINcheck;
             ael_aflowin_found = true;
-	    AflowInName = aflowinname;
+            AflowInName = aflowinname;
           } else if((aurostd::substring2bool(vAflowInCheck[i],"[AFLOW_AGL]CALC",TRUE) || aurostd::substring2bool(AflowInCheck,"[VASP_AGL]CALC",TRUE)) &&
               !(aurostd::substring2bool(vAflowInCheck[i],"[AFLOW_AGL]CALC_",TRUE) || aurostd::substring2bool(vAflowInCheck[i],"[VASP_AGL]CALC_",TRUE) ||
                 aurostd::substring2bool(vAflowInCheck[i],"[AFLOW_AGL]CALCS",TRUE) || aurostd::substring2bool(vAflowInCheck[i],"[VASP_AGL]CALCS",TRUE) || FALSE)){
@@ -352,14 +359,14 @@ namespace AEL_functions {
             if (USER_AEL_POISSON_RATIO.option) {
               FileNameAFLOWIN = FileNameAFLOWINcheck;
               ael_aflowin_found = true;
-	      AflowInName = aflowinname;
+              AflowInName = aflowinname;
             }
           }
         }
-	FileAFLOWINcheck.close();
+        FileAFLOWINcheck.close();
       }
     }
-    return 0;
+    return aelerror;
   }
 }
 

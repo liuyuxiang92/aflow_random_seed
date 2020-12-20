@@ -58,11 +58,11 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   if(vpflow.flag("AGROUP")){
     vpflow.flag("SYMMETRY::NO_SCAN",aurostd::args2flag(argv,cmds,"--no_scan"));
     if(aurostd::args2attachedflag(argv,"--sitepointgroup=|--agroup=")){ //DX20170803
-      vpflow.args2addattachedscheme(argv,cmds,"SYMMETRY::TOLERANCE","--sitepointgroup=|--agroup=","1");
+      vpflow.args2addattachedscheme(argv,cmds,"SYMMETRY::TOLERANCE","--sitepointgroup=|--agroup=",""); //DX20200907 - default is system specific, leaving empty
     }
     vpflow.flag("SYMMETRY::SCREEN_ONLY",aurostd::args2flag(argv,cmds,"--screen_only")); //DX20170803
     //DX20170921 - MAGNETIC SYMMETRY - START
-    vpflow.args2addattachedscheme(argv,cmds,"SYMMETRY::MAGNETIC","--mag=|--magnetic=|--magmom=","1"); //DX20170803
+    vpflow.args2addattachedscheme(argv,cmds,"SYMMETRY::MAGNETIC","--mag=|--magnetic=|--magmom=",""); //DX20170803
     //DX20170921 - MAGNETIC SYMMETRY - END
   }
   //DX20170818 - Added tolerance and no_scan options to Xgroups - END
@@ -161,11 +161,11 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   if(vpflow.flag("FULLSYMMETRY")){
     vpflow.flag("FULLSYMMETRY::NO_SCAN",aurostd::args2flag(argv,cmds,"--no_scan"));
     if(aurostd::args2attachedflag(argv,"--aflow-sym=|--AFLOW-SYM=|--AFLOWSYM=|--aflowSYM=|--aflowsym=|--full_symmetry=|--full_sym=|--fullsym=")){ //DX20170803
-      vpflow.args2addattachedscheme(argv,cmds,"FULLSYMMETRY::TOLERANCE","--aflow-sym=|--AFLOW-SYM=|--AFLOWSYM=|--aflowSYM=|--aflowsym=|--full_symmetry=|--full_sym=|--fullsym=","1"); //DX20170803
+      vpflow.args2addattachedscheme(argv,cmds,"FULLSYMMETRY::TOLERANCE","--aflow-sym=|--AFLOW-SYM=|--AFLOWSYM=|--aflowSYM=|--aflowsym=|--full_symmetry=|--full_sym=|--fullsym=",""); //DX20170803 //DX20200907 - default is system specific, leaving empty
     }
     vpflow.flag("FULLSYMMETRY::SCREEN_ONLY",aurostd::args2flag(argv,cmds,"--screen_only")); //DX20170803
     //DX20170921 - MAGNETIC SYMMETRY - START
-    vpflow.args2addattachedscheme(argv,cmds,"FULLSYMMETRY::MAGNETIC","--mag=|--magnetic=|--magmom=","1"); //DX20170803
+    vpflow.args2addattachedscheme(argv,cmds,"FULLSYMMETRY::MAGNETIC","--mag=|--magnetic=|--magmom=",""); //DX20170803
     //DX20170921 - MAGNETIC SYMMETRY - END
   }
   //DX+CO END
@@ -215,6 +215,22 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   // cerr << vpflow.getattachedscheme("CALCULATED") << endl;
 
   vpflow.flag("CART",aurostd::args2flag(argv,cmds,"--cart|-cart|-c|--cartesian"));
+
+  vpflow.flag("CCE_CORRECTION::USAGE",aurostd::args2flag(argv,cmds,"--cce_correction|--cce"));
+  vpflow.args2addattachedscheme(argv,cmds,"CCE_CORRECTION::POSCAR_PATH","--cce_correction=|--cce=","");
+  vpflow.flag("CCE_CORRECTION::POSCAR2CCE", aurostd::args2flag(argv,cmds,"--poscar2cce")); //ME
+  vpflow.flag("CCE_CORRECTION::GET_CCE_CORRECTION", aurostd::args2flag(argv,cmds,"--get_cce_correction|--get_cce_cor|--get_cce_corrections|--get_cce_cors"));
+  vpflow.flag("CCE_CORRECTION",vpflow.flag("CCE_CORRECTION::USAGE") || !vpflow.getattachedscheme("CCE_CORRECTION::POSCAR_PATH").empty());
+  if(vpflow.flag("CCE_CORRECTION") && aurostd::args2flag(argv,cmds,"--usage")){vpflow.flag("CCE_CORRECTION::USAGE",TRUE);}
+  vpflow.args2addattachedscheme(argv,cmds,"CCE_CORRECTION::ENTHALPIES_FORMATION_DFT","--enthalpies_formation_dft=|--enthalpy_formation_dft=|--dft_formation_enthalpies=|--dft_formation_energies=|--dft_formation_enthalpy=|--dft_formation_energy=|--dftes=|--dfte=","");
+  vpflow.args2addattachedscheme(argv,cmds,"CCE_CORRECTION::FUNCTIONALS","--functional=|--func=|--functionals=|--funcs=","");
+  vpflow.args2addattachedscheme(argv,cmds,"CCE_CORRECTION::OXIDATION_NUMBERS","--oxidation_numbers=|--ox_nums=|--oxidation_number=|--ox_num=","");
+  vpflow.args2addattachedscheme(argv,cmds,"CCE_CORRECTION::PRINT","--print=","OUT"); //ME
+  vpflow.flag("CCE_CORRECTION::UNIT_TEST",aurostd::args2flag(argv,cmds,"--cce_test")); //RF20200409
+  vpflow.flag("CCE_CORRECTION::GET_OXIDATION_NUMBERS", aurostd::args2flag(argv,cmds,"--get_oxidation_numbers|--get_ox_nums|--get_oxidation_number|--get_ox_num|--poscar2ox_nums|--poscar2ox_num")); //RF20200725
+  vpflow.flag("CCE_CORRECTION::GET_CATION_COORDINATION_NUMBERS", aurostd::args2flag(argv,cmds,"--get_cation_coordination_numbers|--get_cation_coord_nums|--get_cation_coordination_number|--get_cation_coord_num|--get_coordination_numbers_cation|--get_coordination_number_cation|--get_coordination_numbers_cations|--get_coordination_number_cations|--get_coord_num_cation|--get_coord_nums_cation|--get_coord_nums_cations|--get_coord_num_cations|--poscar2cation_coord_nums|--poscar2cation_coord_num")); //RF20200814
+  vpflow.args2addattachedscheme(argv,cmds,"CCE_CORRECTION::DIST_TOL","--tolerance=|dist_tol=|distance_tolerance=|dist_tolerance=|distance_tol=",""); //RF20200819
+
   vpflow.flag("CHECKINTEGRITIY",aurostd::args2flag(argv, cmds,"--check_integrity|--checki"));
   //DX20180806 [OBSOLETE] vpflow.flag("CIF",aurostd::args2flag(argv,cmds,"--cif"));
   //DX [OBSOLETE] - moved further up : vpflow.args2addattachedscheme(argv,cmds,"CIF","--cif=|--CIF=","");
@@ -292,10 +308,11 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     vpflow.flag("CHULL::INCLUDE_PAW_GGA",aurostd::args2flag(argv,cmds,"--include_paw_gga|--paw_gga")); //include entries calculated with PAW_GGA
     vpflow.flag("CHULL::SKIP_STRUCTURE_COMPARISON",aurostd::args2flag(argv,cmds,"--skip_structure_comparison|--skipstructruecomparison|--skipstructcomp|--ssc"));    //use entropic temperature instead of enthalpy of formation
     vpflow.flag("CHULL::SKIP_STABILITY_CRITERION_ANALYSIS",aurostd::args2flag(argv,cmds,"--skip_stability_criterion_analysis|--skip_stability_criterion|--skipstabilitycriterionanalysis|--skipstabilitycriterion|--skipscriterion|--sscriterion"));    //use entropic temperature instead of enthalpy of formation
-    vpflow.flag("CHULL::NPLUS1_ENTHALPY_GAIN",aurostd::args2flag(argv,cmds,"--n1eg|--n1enthalpygain|--np1|--nplus1|--nplusone")); //SK20200325 - skip all n-dimensional points and calculate new hull
+    vpflow.flag("CHULL::SKIP_N+1_ENTHALPY_GAIN_ANALYSIS",aurostd::args2flag(argv,cmds,"--skip_n_plus_1_enthalpy_gain_analysis|--skip_n_plus_1_energy_gain_analysis|--skipnplus1enthalpygainanalysis|--skipnplus1energygainanalysis|--skipnplus1|--snp1|--snpo"));    //use entropic temperature instead of enthalpy of formation
     vpflow.flag("CHULL::INCLUDE_SKEWED_HULLS",aurostd::args2flag(argv,cmds,"--include_skewed_hulls|--include_skewed|--ish"));    //use entropic temperature instead of enthalpy of formation
     vpflow.flag("CHULL::INCLUDE_UNRELIABLE_HULLS",aurostd::args2flag(argv,cmds,"--include_unreliable_hulls|--include_unreliable|--iuh"));    //use entropic temperature instead of enthalpy of formation
     vpflow.flag("CHULL::INCLUDE_OUTLIERS",aurostd::args2flag(argv,cmds,"--include_outliers|--io"));    //use entropic temperature instead of enthalpy of formation
+    vpflow.flag("CHULL::FORCE_OUTLIERS",aurostd::args2flag(argv,cmds,"--force_outliers|--fo"));
     vpflow.flag("CHULL::INCLUDE_ILL_CONVERGED",aurostd::args2flag(argv,cmds,"--include_ill_converged|--iic"));    //use entropic temperature instead of enthalpy of formation
     vpflow.flag("CHULL::LATEX_OUTPUT",aurostd::args2flag(argv,cmds,"--latex_output|--latexoutput"));    //verbose latex output (cout and FileMESSAGE)
     vpflow.flag("CHULL::LATEX_INTERACTIVE",aurostd::args2flag(argv,cmds,"--latex_interactive|--latexinteractive"));  //interact with latex (execute vs. execute2string)
@@ -339,8 +356,10 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     } else {vpflow.flag("CHULL::LATEX_DOC",TRUE);}   //default
     vpflow.args2addattachedscheme(argv,cmds,"CHULL::DIST2HULL","--distance_to_hull=|--distancetohull=|--distance2hull=|--dist2hull=|--d2h=",""); //calculate distance to hull for point
     vpflow.args2addattachedscheme(argv,cmds,"CHULL::STABILITY_CRITERION","--stability_criterion=|--stabilitycriterion=|--stable_criterion=|--scriterion=|--sc=",""); //calculate stable criterion for point
+    vpflow.args2addattachedscheme(argv,cmds,"CHULL::N+1_ENTHALPY_GAIN","--n+1_enthalpy_gain=|--n+1_energy_gain=|--n+1enthalpygain=|--n+1energygain=|--n+1egain=|--n1egain=|--n+1_enthalpygain=|--n+1+energygain=|--n+1_egain=",""); //calculate stable criterion for point
+    vpflow.flag("CHULL::CALCULATE_FAKE_HULL_N+1_ENTHALPY_GAIN",aurostd::args2flag(argv,cmds,"--fake_hull_np1eg")); //SK20200325 - skip all n-dimensional points and calculate new hull
     vpflow.args2addattachedscheme(argv,cmds,"CHULL::HULL_FORMATION_ENTHALPY","--hull_formation_enthalpy=|--hull_energy=",""); //calculate stable criterion for point
-    if(vpflow.flag("CHULL::STABILITY_CRITERION")||vpflow.flag("CHULL::HULL_FORMATION_ENTHALPY")){
+    if(vpflow.flag("CHULL::STABILITY_CRITERION")||vpflow.flag("CHULL::N+1_ENTHALPY_GAIN")||vpflow.flag("CHULL::HULL_FORMATION_ENTHALPY")){
       //vpflow.flag("CHULL::TEXT_DOC",FALSE);   //turn off  //leave on, as user might request json/text format output
       //vpflow.flag("CHULL::JSON_DOC",FALSE);   //turn off  //leave on, as user might request json/text format output
       vpflow.flag("CHULL::WEB_DOC",FALSE);    //turn off
@@ -410,7 +429,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   if(vpflow.flag("COMPARE_MATERIAL") || vpflow.flag("COMPARE_STRUCTURE")) {
     // structures appended to command
     if(aurostd::args2attachedflag(argv,"--compare_material=|--compare_materials=|--compare_structure=|--compare_structures=")){ //DX20170803
-      vpflow.args2addattachedscheme(argv,cmds,"COMPARE_STRUCTURE::STRUCTURE_LIST","--compare_material=|--compare_materials=|--compare_structure=|--compare_structures=","1");
+      vpflow.args2addattachedscheme(argv,cmds,"COMPARE_STRUCTURE::STRUCTURE_LIST","--compare_material=|--compare_materials=|--compare_structure=|--compare_structures=","");
     }
     // structures from directory
     if(XHOST.vflag_control.flag("DIRECTORY")) {
@@ -428,10 +447,10 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     //DX20190424 [OBSOLETE]if(vpflow.flag("COMPARE_MATERIAL") || vpflow.flag("COMPARE_STRUCTURE")) { //[CO20200106 - close bracket for indenting]}
     //DX20190424 [OBSOLETE]  //DX20190424 [OBSOLETE] vector<string> vinput;
     //DX20190424 [OBSOLETE]  if(vpflow.flag("COMPARE_MATERIAL")) {
-    //DX20190424 [OBSOLETE]    vpflow.args2addattachedscheme(argv,cmds,"COMPARE_STRUCTURE::STRUCTURES","--compare_material=|--compare_materials=","1");
+    //DX20190424 [OBSOLETE]    vpflow.args2addattachedscheme(argv,cmds,"COMPARE_STRUCTURE::STRUCTURES","--compare_material=|--compare_materials=","");
     //DX20190424 [OBSOLETE]  }
     //DX20190424 [OBSOLETE]  if(vpflow.flag("COMPARE_STRUCTURE")) {
-    //DX20190424 [OBSOLETE]    vpflow.args2addattachedscheme(argv,cmds,"COMPARE_STRUCTURE::STRUCTURES","--compare_structure=|--compare_structures=","1");
+    //DX20190424 [OBSOLETE]    vpflow.args2addattachedscheme(argv,cmds,"COMPARE_STRUCTURE::STRUCTURES","--compare_structure=|--compare_structures=","");
     //DX20190424 [OBSOLETE]  }
     //DX20190424 [OBSOLETE]  vector<string> vinput;
     //DX20190424 [OBSOLETE]  
@@ -447,7 +466,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     //DX20190424 [OBSOLETE]   vpflow.flag(scheme_name,TRUE);
     //DX20190424 [OBSOLETE] }
     vpflow.args2addattachedscheme(argv,cmds,"COMPARE_STRUCTURE::NP","--np=|--num_proc=","");
-    vpflow.args2addattachedscheme(argv,cmds,"COMPARE_STRUCTURE::MAGNETIC","--mag=|--magnetic=|--magmom=","1"); //DX20170803
+    vpflow.args2addattachedscheme(argv,cmds,"COMPARE_STRUCTURE::MAGNETIC","--mag=|--magnetic=|--magmom=",""); //DX20170803
     vpflow.flag("COMPARE_STRUCTURE::PRINT",aurostd::args2flag(argv,cmds,"--print"));
     vpflow.flag("COMPARE_STRUCTURE::SCREEN_ONLY",aurostd::args2flag(argv,cmds,"--screen_only")); //DX20170803
     vpflow.flag("COMPARE_STRUCTURE::OPTIMIZE_MATCH",aurostd::args2flag(argv,cmds,"--optimize|--optimize_match")); //DX20190201 - changed from fast_match to optimize_match
@@ -461,6 +480,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     vpflow.flag("COMPARE_STRUCTURE::MATCH_TO_AFLOW_PROTOS",aurostd::args2flag(argv,cmds,"--add_matching_aflow_prototypes|--add_matching_aflow_protos|--add_matching_prototypes|--add_matching_protos")); //DX20190724
     vpflow.flag("COMPARE_STRUCTURE::ADD_AFLOW_PROTOTYPE_DESIGNATION",aurostd::args2flag(argv,cmds,"--add_prototype_designation|--add_aflow_prototype_designation|--add_anrl_designation")); //DX20190724
     vpflow.flag("COMPARE_STRUCTURE::UNDECORATED_COMPARISON",aurostd::args2flag(argv,cmds,"--undecorated_comparison|--undecorated|--no_atom_decoration")); //DX20191212
+    vpflow.flag("COMPARE_STRUCTURE::DO_NOT_CALCULATE_UNIQUE_PERMUTATIONS",aurostd::args2flag(argv,cmds,"--ignore_atom_decoration_comparison|--ignore_decoration_comparison|--ignore_decorations")); //DX20190424
     vpflow.flag("COMPARE_STRUCTURE::USAGE",aurostd::args2flag(argv,cmds,"--usage")); //DX20190424
   }
   //DX20190424 [OBSOLETE]vpflow.flag("COMPARE_MATERIAL_DIRECTORY",aurostd::args2flag(argv,cmds,"--compare_material_directory|--compare_material_dir"));
@@ -531,7 +551,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   if(vpflow.flag("DATA")){ //DX20170901 - SGDATA + JSON
     vpflow.flag("DATA::NO_SCAN",aurostd::args2flag(argv,cmds,"--no_scan")); //DX20170901 - SGDATA + JSON
     if(aurostd::args2attachedflag(argv,"--data=")){ //DX20170901 - SGDATA + JSON
-      vpflow.args2addattachedscheme(argv,cmds,"DATA::TOLERANCE","--data=","1"); //DX20170901 - SGDATA + JSON
+      vpflow.args2addattachedscheme(argv,cmds,"DATA::TOLERANCE","--data=",""); //DX20170901 - SGDATA + JSON //DX20200907 - default is system specific, leaving empty
     } //DX20170901 - SGDATA + JSON
     if(aurostd::args2attachedflag(argv,"--setting=")){ 
       vpflow.args2addattachedscheme(argv,cmds,"DATA::SETTING","--setting=","1");
@@ -555,13 +575,13 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   if(vpflow.flag("EDATA")){ //DX20170901 - SGDATA + JSON
     vpflow.flag("DATA::NO_SCAN",aurostd::args2flag(argv,cmds,"--no_scan")); //DX20170901 - SGDATA + JSON
     if(aurostd::args2attachedflag(argv,"--edata=")){ //DX20170901 - SGDATA + JSON
-      vpflow.args2addattachedscheme(argv,cmds,"DATA::TOLERANCE","--edata=","1"); //DX20170901 - SGDATA + JSON
+      vpflow.args2addattachedscheme(argv,cmds,"DATA::TOLERANCE","--edata=",""); //DX20170901 - SGDATA + JSON //DX20200907 - default is system specific, leaving empty
     } //DX20170901 - SGDATA + JSON
     if(aurostd::args2attachedflag(argv,"--setting=")){ 
       vpflow.args2addattachedscheme(argv,cmds,"DATA::SETTING","--setting=","1");
     }
     //DX20171128 - MAGNETIC SYMMETRY - START
-    vpflow.args2addattachedscheme(argv,cmds,"DATA::MAGNETIC","--mag=|--magnetic=|--magmom=","1"); //DX20171128
+    vpflow.args2addattachedscheme(argv,cmds,"DATA::MAGNETIC","--mag=|--magnetic=|--magmom=",""); //DX20171128
     //DX20171128 - MAGNETIC SYMMETRY - END
   } //DX20170901 - SGDATA + JSON
   vpflow.flag("EDOS",aurostd::args2flag(argv,cmds,"--edos"));
@@ -575,10 +595,10 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   if(vpflow.flag("EQUIVALENT")){
     vpflow.flag("SYMMETRY::NO_SCAN",aurostd::args2flag(argv,cmds,"--no_scan"));
     if(aurostd::args2attachedflag(argv,"--equivalent=|--equiv=|--inequivalent=|--inequiv=|--iatoms=|--eatoms=")){ //DX20170803
-      vpflow.args2addattachedscheme(argv,cmds,"SYMMETRY::TOLERANCE","--equivalent=|--equiv=|--inequivalent=|--inequiv=|--iatoms=|--eatoms=","1");
+      vpflow.args2addattachedscheme(argv,cmds,"SYMMETRY::TOLERANCE","--equivalent=|--equiv=|--inequivalent=|--inequiv=|--iatoms=|--eatoms=",""); //DX20200907 - default is system specific, leaving empty
     }
     //DX20170921 - MAGNETIC SYMMETRY - START
-    vpflow.args2addattachedscheme(argv,cmds,"SYMMETRY::MAGNETIC","--mag=|--magnetic=|--magmom=","1"); //DX20170803
+    vpflow.args2addattachedscheme(argv,cmds,"SYMMETRY::MAGNETIC","--mag=|--magnetic=|--magmom=",""); //DX20170803
     //DX20170921 - MAGNETIC SYMMETRY - END
   }
   //DX20170818 - Added tolerance and no_scan options to Xgroups - END
@@ -593,11 +613,11 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   if(vpflow.flag("FGROUP")){
     vpflow.flag("SYMMETRY::NO_SCAN",aurostd::args2flag(argv,cmds,"--no_scan"));
     if(aurostd::args2attachedflag(argv,"--factorgroup=|--fgroup=")){ //DX20170803
-      vpflow.args2addattachedscheme(argv,cmds,"SYMMETRY::TOLERANCE","--factorgroup=|--fgroup=","1");
+      vpflow.args2addattachedscheme(argv,cmds,"SYMMETRY::TOLERANCE","--factorgroup=|--fgroup=",""); //DX20200907 - default is system specific, leaving empty
     }
     vpflow.flag("SYMMETRY::SCREEN_ONLY",aurostd::args2flag(argv,cmds,"--screen_only")); //DX20170803
     //DX20170921 - MAGNETIC SYMMETRY - START
-    vpflow.args2addattachedscheme(argv,cmds,"SYMMETRY::MAGNETIC","--mag=|--magnetic=|--magmom=","1"); //DX20170803
+    vpflow.args2addattachedscheme(argv,cmds,"SYMMETRY::MAGNETIC","--mag=|--magnetic=|--magmom=",""); //DX20170803
     //DX20170921 - MAGNETIC SYMMETRY - END
   }
   //DX20170818 - Added tolerance and no_scan options to Xgroups - END
@@ -617,6 +637,13 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     vpflow.args2addattachedscheme(argv,cmds,"GFA::AE_FILE","--atomic_environments_file=|--ae_file=|aef=","none");	//DF20190329
     vpflow.args2addattachedscheme(argv,cmds,"GFA::FORMATION_ENTHALPY_CUTOFF","--cutoff_formation_enthalpy=|--cutoff_enthalpy=|--cutoff_energy=|--cut=","0.05"); //DF20190619
   }	//DF20190329
+
+  vpflow.flag("GENERATE_CERAMICS",aurostd::args2flag(argv,cmds,"--generate_ceramics|--gen_ceram"));  //CO20200731
+  if(vpflow.flag("GENERATE_CERAMICS")){ //CO20200731
+    vpflow.args2addattachedscheme(argv,cmds,"GENERATE_CERAMICS::NON_METALS","--non_metals=|--nm=","C");
+    vpflow.args2addattachedscheme(argv,cmds,"GENERATE_CERAMICS::METALS","--metals=|--m=","Mo,Nb,Ta,V,W");
+    vpflow.args2addattachedscheme(argv,cmds,"GENERATE_CERAMICS::METAL_ARITY","--N=","5");
+  }
 
   vpflow.flag("GEOMETRY",aurostd::args2flag(argv,cmds,"--geometry|--abc_angles"));  //CO20190808
 
@@ -744,8 +771,14 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.args2addattachedscheme(argv,cmds,"LTCELL","--ltcell=","");
   vpflow.args2addattachedscheme(argv,cmds,"LTCELLFV","--ltcellfv=","");
 
-  vpflow.flag("LATTICE_TYPE",aurostd::args2flag(argv,cmds,"--lattice_type|--lattice|--lattice_crystal"));
-  vpflow.flag("LATTICE_LATTICE_TYPE",aurostd::args2flag(argv,cmds,"--lattice_lattice_type|--lattice_lattice"));
+  vpflow.args2addattachedscheme(argv,cmds,"LATTICE_TYPE","--lattice_type=|--lattice=|--lattice_crystal=",""); //DX20200820 - allow tolerance to be added
+  if(aurostd::args2attachedflag(argv,"--lattice_type=|--lattice=|--lattice_crystal=")){ //DX20200820 - add tolerance
+    vpflow.args2addattachedscheme(argv,cmds,"LATTICE::TOLERANCE","--lattice_type=|--lattice=|--lattice_crystal=",""); //DX20200907 - default is system specific, leaving empty
+  }
+  vpflow.args2addattachedscheme(argv,cmds,"LATTICE_LATTICE_TYPE","--lattice_lattice_type=|--lattice_lattice=",""); //DX20200820 - allow tolerance to be added
+  if(aurostd::args2attachedflag(argv,"--lattice_lattice_type=|--lattice_lattice=")){ //DX20200820 - add tolerance
+    vpflow.args2addattachedscheme(argv,cmds,"LATTICE_LATTICE::TOLERANCE","--lattice_lattice_type=|--lattice_lattice=",""); //DX20200907 - default is system specific, leaving empty
+  }
   vpflow.flag("LATTICE_HISTOGRAM",aurostd::args2flag(argv,cmds,"--latticehistogram"));
 
   //DX20181023 - list prototype labels - START
@@ -812,7 +845,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   if(vpflow.flag("PGROUP")){
     vpflow.flag("SYMMETRY::NO_SCAN",aurostd::args2flag(argv,cmds,"--no_scan"));
     if(aurostd::args2attachedflag(argv,"--pointgroup=|--pgroup=")){ //DX20170803
-      vpflow.args2addattachedscheme(argv,cmds,"SYMMETRY::TOLERANCE","--pointgroup=|--pgroup=","1");
+      vpflow.args2addattachedscheme(argv,cmds,"SYMMETRY::TOLERANCE","--pointgroup=|--pgroup=",""); //DX20200907 - default is system specific, leaving empty
     }
     vpflow.flag("SYMMETRY::SCREEN_ONLY",aurostd::args2flag(argv,cmds,"--screen_only")); //DX20170803
   }
@@ -823,11 +856,11 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   if(vpflow.flag("PGROUPX")){
     vpflow.flag("SYMMETRY::NO_SCAN",aurostd::args2flag(argv,cmds,"--no_scan"));
     if(aurostd::args2attachedflag(argv,"--pointgroup_crystal=|--pgroup_crystal=|--pgroup_xtal=|--pgroupx=|--pgroupX=")){ //DX20170803
-      vpflow.args2addattachedscheme(argv,cmds,"SYMMETRY::TOLERANCE","--pointgroup_crystal=|--pgroup_crystal=|--pgroup_xtal=|--pgroupx=|--pgroupX=","1");
+      vpflow.args2addattachedscheme(argv,cmds,"SYMMETRY::TOLERANCE","--pointgroup_crystal=|--pgroup_crystal=|--pgroup_xtal=|--pgroupx=|--pgroupX=",""); //DX20200907 - default is system specific, leaving empty
     }
     vpflow.flag("SYMMETRY::SCREEN_ONLY",aurostd::args2flag(argv,cmds,"--screen_only")); //DX20170803
     //DX20170921 - MAGNETIC SYMMETRY - START
-    vpflow.args2addattachedscheme(argv,cmds,"SYMMETRY::MAGNETIC","--mag=|--magnetic=|--magmom=","1"); //DX20170803
+    vpflow.args2addattachedscheme(argv,cmds,"SYMMETRY::MAGNETIC","--mag=|--magnetic=|--magmom=",""); //DX20170803
     //DX20170921 - MAGNETIC SYMMETRY - END
   }
   //DX20170818 - Added tolerance and no_scan options to Xgroups - END
@@ -837,7 +870,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   if(vpflow.flag("PGROUPK")){
     vpflow.flag("SYMMETRY::NO_SCAN",aurostd::args2flag(argv,cmds,"--no_scan"));
     if(aurostd::args2attachedflag(argv,"--pointgroupklattice=|--pgroupk=")){ //DX20170803
-      vpflow.args2addattachedscheme(argv,cmds,"SYMMETRY::TOLERANCE","--pointgroupklattice=|--pgroupk=","1");
+      vpflow.args2addattachedscheme(argv,cmds,"SYMMETRY::TOLERANCE","--pointgroupklattice=|--pgroupk=",""); //DX20200907 - default is system specific, leaving empty
     }
     vpflow.flag("SYMMETRY::SCREEN_ONLY",aurostd::args2flag(argv,cmds,"--screen_only")); //DX20170803
   }
@@ -847,7 +880,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   if(vpflow.flag("PGROUPK_PATTERSON")){
     vpflow.flag("SYMMETRY::NO_SCAN",aurostd::args2flag(argv,cmds,"--no_scan"));
     if(aurostd::args2attachedflag(argv,"--pointgroupk_Patterson=|--pgroupk_Patterson=")){ //DX20170803
-      vpflow.args2addattachedscheme(argv,cmds,"SYMMETRY::TOLERANCE","--pointgroupk_Patterson=|--pgroupk_Patterson=","1");
+      vpflow.args2addattachedscheme(argv,cmds,"SYMMETRY::TOLERANCE","--pointgroupk_Patterson=|--pgroupk_Patterson=",""); //DX20200907 - default is system specific, leaving empty
     }
     vpflow.flag("SYMMETRY::SCREEN_ONLY",aurostd::args2flag(argv,cmds,"--screen_only")); //DX20170803
   }
@@ -857,7 +890,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   if(vpflow.flag("PGROUPK_XTAL")){
     vpflow.flag("SYMMETRY::NO_SCAN",aurostd::args2flag(argv,cmds,"--no_scan"));
     if(aurostd::args2attachedflag(argv,"--pointgroupkcrystal=|--pgroupk_xtal=")){ //DX20170803
-      vpflow.args2addattachedscheme(argv,cmds,"SYMMETRY::TOLERANCE","--pointgroupkcrystal=|--pgroupk_xtal=","1");
+      vpflow.args2addattachedscheme(argv,cmds,"SYMMETRY::TOLERANCE","--pointgroupkcrystal=|--pgroupk_xtal=",""); //DX20200907 - default is system specific, leaving empty
     }
     vpflow.flag("SYMMETRY::SCREEN_ONLY",aurostd::args2flag(argv,cmds,"--screen_only")); //DX20170803
   }
@@ -1139,7 +1172,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.flag("PROTOINITIAL",aurostd::args2flag(argv,cmds,"--initial"));
 
   // PSEUDOPOTENTIAL CHECK
-  vpflow.args2addattachedscheme(argv,cmds,"PSEUDOPOTENTIALS_CHECK","--pseudopotentials_check=|--pp_check|--ppk=","");
+  vpflow.args2addattachedscheme(argv,cmds,"PSEUDOPOTENTIALS_CHECK","--pseudopotentials_check=|--pp_check=|--ppk=","");
   if(vpflow.flag("PSEUDOPOTENTIALS_CHECK")) {
     vpflow.flag("PSEUDOPOTENTIALS_CHECK::USAGE",aurostd::args2flag(argv,cmds,"--usage"));
   }
@@ -1160,7 +1193,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     vpflow.flag("CIF::USAGE",aurostd::args2flag(argv,cmds,"--usage|--USAGE"));
     vpflow.flag("CIF::NO_SYMMETRY",aurostd::args2flag(argv,cmds,"--no_symmetry|--no_sym"));
     if(aurostd::args2attachedflag(argv,"--cif=|--CIF=")){ //DX20170803
-      vpflow.args2addattachedscheme(argv,cmds,"CIF::TOLERANCE","--cif=|--CIF=","1");
+      vpflow.args2addattachedscheme(argv,cmds,"CIF::TOLERANCE","--cif=|--CIF=",""); //DX20200907 - default is system specific, leaving empty
     }
     if(aurostd::args2attachedflag(argv,"--setting=")){ 
       vpflow.args2addattachedscheme(argv,cmds,"CIF::SETTING","--setting=","1");
@@ -1189,18 +1222,6 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.args2addattachedscheme(argv,cmds,"RDF","--rdf=","");
   // [OBSOLETE]  vpflow.flag("RDFCMP",(aurostd::args2flag(argv,cmds,"--rdfcmp") && argv.at(1)=="--rdfcmp"));
   vpflow.args2addattachedscheme(argv,cmds,"RDFCMP","--rdfcmp=","");
-  vpflow.flag("REBUILDDB", aurostd::args2flag(argv,cmds,"--rebuild_database"));  //ME20191001
-
-  vpflow.flag("CCE_CORRECTION::USAGE",aurostd::args2flag(argv,cmds,"--cce_correction|--cce"));
-  vpflow.args2addattachedscheme(argv,cmds,"CCE_CORRECTION::POSCAR_PATH","--cce_correction=|--cce=","");
-  vpflow.flag("CCE_CORRECTION",vpflow.flag("CCE_CORRECTION::USAGE") || !vpflow.getattachedscheme("CCE_CORRECTION::POSCAR_PATH").empty());
-  if(vpflow.flag("CCE_CORRECTION") && aurostd::args2flag(argv,cmds,"--usage")){vpflow.flag("CCE_CORRECTION::USAGE",TRUE);}
-  vpflow.args2addattachedscheme(argv,cmds,"CCE_CORRECTION::DFT_FORMATION_ENERGIES","--dft_formation_energies=|--dfte=","");
-  vpflow.args2addattachedscheme(argv,cmds,"CCE_CORRECTION::FUNCTIONALS","--functional=|--func=|--functionals=","");
-  vpflow.args2addattachedscheme(argv,cmds,"CCE_CORRECTION::OXIDATION_NUMBERS","--oxidation_numbers=|--ox_nums=|--oxidation_number=","");
-  vpflow.flag("CCE_CORRECTION::POSCAR2CCE", aurostd::args2flag(argv,cmds,"--poscar2cce")); //ME
-  vpflow.args2addattachedscheme(argv,cmds,"CCE_CORRECTION::PRINT","--print=","OUT"); //ME
-  vpflow.flag("CCE_CORRECTION::TEST",aurostd::args2flag(argv,cmds,"--cce_test")); //RF20200409
 
   vpflow.flag("RMATOM",aurostd::args2flag(argv,cmds,"--rm_atom") && argv.at(1)=="--rm_atom");
   vpflow.flag("RMCOPIES",aurostd::args2flag(argv,cmds,"--rm_copies") && argv.at(1)=="--rm_copies");
@@ -1224,12 +1245,12 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   if(vpflow.flag("SGROUP")){
     vpflow.flag("SYMMETRY::NO_SCAN",aurostd::args2flag(argv,cmds,"--no_scan"));
     if(aurostd::args2attachedflag(argv,"--spacegroup=|--sgroup=")){ //DX20170803
-      vpflow.args2addattachedscheme(argv,cmds,"SYMMETRY::TOLERANCE","--spacegroup=|--sgroup=","1");
+      vpflow.args2addattachedscheme(argv,cmds,"SYMMETRY::TOLERANCE","--spacegroup=|--sgroup=",""); //DX20200907 - default is system specific, leaving empty
     }
     vpflow.args2addattachedscheme(argv,cmds,"SYMMETRY::SGROUP_RADIUS","--radius=","");  //DX20170803
     vpflow.flag("SYMMETRY::SCREEN_ONLY",aurostd::args2flag(argv,cmds,"--screen_only")); //DX20170803
     //DX20170921 - MAGNETIC SYMMETRY - START
-    vpflow.args2addattachedscheme(argv,cmds,"SYMMETRY::MAGNETIC","--mag=|--magnetic=|--magmom=","1"); //DX20170803
+    vpflow.args2addattachedscheme(argv,cmds,"SYMMETRY::MAGNETIC","--mag=|--magnetic=|--magmom=",""); //DX20170803
     //DX20170921 - MAGNETIC SYMMETRY - END
   }
   //DX20170818 - Added tolerance and no_scan options to Xgroups - END
@@ -1245,10 +1266,13 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   if(vpflow.flag("SG::AFLOW") || vpflow.flag("SG::AFLOW_LABEL") || vpflow.flag("SG::AFLOW_NUMBER")){
     vpflow.flag("SG::NO_SCAN",aurostd::args2flag(argv,cmds,"--no_scan"));
     if(aurostd::args2attachedflag(argv,"--aflowSG=|--aflowSG_label=|--aflowSG_number=")){
-      vpflow.args2addattachedscheme(argv,cmds,"SG::TOLERANCE","--aflowSG=|--aflowSG_label=|--aflowSG_number=","1");
+      vpflow.args2addattachedscheme(argv,cmds,"SG::TOLERANCE","--aflowSG=|--aflowSG_label=|--aflowSG_number=",""); //DX20200907 - default is system specific, leaving empty
+    }
+    if(aurostd::args2attachedflag(argv,"--tolerance_spectrum=|--tol_spectrum=")){
+      vpflow.args2addattachedscheme(argv,cmds,"SG::TOLERANCE_SPECTRUM","--tolerance_spectrum=|--tol_spectrum=","0.01:1.0:100"); //DX20200907 - added default
     }
     //DX20170921 - MAGNETIC SYMMETRY - START
-    vpflow.args2addattachedscheme(argv,cmds,"SG::MAGNETIC","--mag=|--magnetic=|--magmom=","1"); //DX20170803
+    vpflow.args2addattachedscheme(argv,cmds,"SG::MAGNETIC","--mag=|--magnetic=|--magmom=",""); //DX20170803
     //DX20170921 - MAGNETIC SYMMETRY - END
   }
   //DX20170926 - Create flags for SG functions - END
@@ -1289,13 +1313,13 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   if(vpflow.flag("SGDATA")){
     vpflow.flag("SGDATA::NO_SCAN",aurostd::args2flag(argv,cmds,"--no_scan")); //DX20170901 - SGDATA + JSON
     if(aurostd::args2attachedflag(argv,"--sgdata=|--space_group_data=")){
-      vpflow.args2addattachedscheme(argv,cmds,"SGDATA::TOLERANCE","--sgdata=|--space_group_data=","1");
+      vpflow.args2addattachedscheme(argv,cmds,"SGDATA::TOLERANCE","--sgdata=|--space_group_data=",""); //DX20200907 - default is system specific, leaving empty
     }
     if(aurostd::args2attachedflag(argv,"--setting=")){ 
       vpflow.args2addattachedscheme(argv,cmds,"SGDATA::SETTING","--setting=","1");
     }
     //DX20170921 - MAGNETIC SYMMETRY - START
-    vpflow.args2addattachedscheme(argv,cmds,"SGDATA::MAGNETIC","--mag=|--magnetic=|--magmom=","1"); //DX20170803
+    vpflow.args2addattachedscheme(argv,cmds,"SGDATA::MAGNETIC","--mag=|--magnetic=|--magmom=",""); //DX20170803
     //DX20170921 - MAGNETIC SYMMETRY - END
   }
   // [OBSOLETE] vpflow.flag("SLAB",aurostd::args2flag(argv,cmds,"--slab|--SLAB"));
@@ -1331,6 +1355,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   if(vpflow.flag("STRUCTURE2ANRL")){
     vpflow.args2addattachedscheme(argv,cmds,"STRUCTURE2ANRL::SETTING","--setting=","");
     vpflow.args2addattachedscheme(argv,cmds,"STRUCTURE2ANRL::TOLERANCE","--tolerance=",""); //DX20191028
+    vpflow.args2addattachedscheme(argv,cmds,"STRUCTURE2ANRL::TOLERANCE_SPECTRUM","--tolerance_spectrum=",""); //DX20200820
     vpflow.flag("STRUCTURE2ANRL::FORCE_WYCKOFF",aurostd::args2flag(argv,cmds,"--force_Wyckoff|--force_wyckoff|--force_Wyckoff_order|--force_wyckoff_order")); //DX20191028
   }
   //DX20190128 - add structure2ANRL - END
@@ -1361,7 +1386,12 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.flag("TERDATA_EXIST",aurostd::args2flag(argv,cmds,"--terdata_exist"));
 
   vpflow.flag("UFFENERGY",aurostd::args2flag(argv,cmds,"--uffenergy|--ue"));
+
+  //DATABASE
+  vpflow.flag("PATCHDB", aurostd::args2flag(argv,cmds,"--patch_database"));  //ME20200829
   vpflow.flag("UPDATEDB", aurostd::args2flag(argv,cmds,"--update_database"));  //ME20191001
+  vpflow.flag("REBUILDDB", aurostd::args2flag(argv,cmds,"--rebuild_database"));  //ME20191001
+  vpflow.args2addattachedscheme(argv,cmds,"DBPATCHFILES","--patchfiles=","");
 
   //DX20180710 - we do not want to run if the flag was used in proto - vpflow.flag("VASP",aurostd::args2flag(argv,cmds,"--vasp"));
   vpflow.flag("VASP",aurostd::args2flag(argv,cmds,"--vasp") && !vpflow.flag("PROTO_AFLOW") && !vpflow.flag("PROTO")); //DX20180710 - check if used in proto
@@ -1450,12 +1480,12 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     vpflow.flag("WYCCAR::SITE_SYMMETRIES_ONLY",aurostd::args2flag(argv,cmds,"--site_symmetries_only"));
     vpflow.flag("WYCCAR::MULTIPLICITIES_ONLY",aurostd::args2flag(argv,cmds,"--multiplicities_only"));
     if(aurostd::args2attachedflag(argv,"--wyccar=")){
-      vpflow.args2addattachedscheme(argv,cmds,"WYCCAR::TOLERANCE","--wyccar=","1");
+      vpflow.args2addattachedscheme(argv,cmds,"WYCCAR::TOLERANCE","--wyccar=",""); //DX20200907 - default is system specific, leaving empty
     }
     if(aurostd::args2attachedflag(argv,"--setting=")){
       vpflow.args2addattachedscheme(argv,cmds,"WYCCAR::SETTING","--setting=","1");
     }
-    vpflow.args2addattachedscheme(argv,cmds,"WYCCAR::MAGNETIC","--mag=|--magnetic=|--magmom=","1");
+    vpflow.args2addattachedscheme(argv,cmds,"WYCCAR::MAGNETIC","--mag=|--magnetic=|--magmom=","");
     //DX20180807 - added more wyccar flags (--usage, --no_scan, setting, --magmom) - END
   }
   // [OBSOLETE]  vpflow.flag("AFLOWSG",aurostd::args2flag(argv,cmds, "--aflowSG")); //RHT  // FIX
@@ -1618,6 +1648,7 @@ namespace pflow {
       if(vpflow.flag("COMPARE_PERMUTATION")) {cout << compare::comparePermutations(cin,vpflow); _PROGRAMRUN=true;} //DX20190201
       if(vpflow.flag("GFA::INIT")){pflow::GLASS_FORMING_ABILITY(vpflow); _PROGRAMRUN=true;} //DF20190329 - GFA
       if(vpflow.flag("FIND_CLOSED_PACKING_PLANE")){pflow::findClosedPackingPlane(cin); _PROGRAMRUN=true;} //COCO190808
+      if(vpflow.flag("GENERATE_CERAMICS")){cout << pflow::GENERATE_CERAMICS_PRINT(vpflow) << endl; _PROGRAMRUN=true;} //CO20200731
       //DX+CO START
       if(vpflow.flag("FULLSYMMETRY")) {pflow::CalculateFullSymmetry(cin,vpflow,cout); _PROGRAMRUN=true;}
       //DX+CO END
@@ -1639,20 +1670,6 @@ namespace pflow {
       if(vpflow.flag("JMOLGIF")) {pflow::JMOLAnimation(cin,argv); _PROGRAMRUN=true;}
       if(vpflow.flag("KPATH")) {pflow::KPATH(cin,aurostd::args2attachedutype<double>(argv,"--grid=",-1),XHOST.vflag_control.flag("WWW")); _PROGRAMRUN=true;} //CO20200329 - default value -1 so we can decide grid automatically  //CO20200404 - new web flag
       if(vpflow.flag("NANOPARTICLE")) {cout << pflow::NANOPARTICLE(cin,xvector<double>(0)); _PROGRAMRUN=true;}
-      //ME20191001 START
-      if (vpflow.flag("REBUILDDB") || vpflow.flag("UPDATEDB")) {
-        aflowlib::AflowDB db(DEFAULT_AFLOW_DB_FILE, DEFAULT_AFLOW_DB_DATA_PATH, DEFAULT_AFLOW_DB_LOCK_FILE);
-        if (db.rebuildDatabase(vpflow.flag("REBUILDDB"))) {
-          db.analyzeDatabase(DEFAULT_AFLOW_DB_STATS_FILE);
-        }
-        _PROGRAMRUN = true;
-      }
-      if (vpflow.flag("ANALYZEDB")) {
-        aflowlib::AflowDB db(DEFAULT_AFLOW_DB_FILE);
-        db.analyzeDatabase(DEFAULT_AFLOW_DB_STATS_FILE);
-        _PROGRAMRUN = true;
-      }
-      //ME20191001 END
       // [OBSOLETE CO20180703]if(vpflow.flag("QMVASP")) {pflow::QMVASP(argv); _PROGRAMRUN=true;}
       // [OBSOLETE] if(vpflow.flag("SG::FINDSYM_PRINT")) {pflow::FINDSYM(vpflow.getattachedscheme("SG::FINDSYM_PRINT"),0,cin); _PROGRAMRUN=true;}
       // [OBSOLETE] if(vpflow.flag("SG::FINDSYM_EXEC")) {pflow::FINDSYM(vpflow.getattachedscheme("SG::FINDSYM_EXEC"),1,cin); _PROGRAMRUN=true;}
@@ -1711,6 +1728,11 @@ namespace pflow {
       if(vpflow.flag("CAGES") && !AFLOW_PTHREADS::FLAG) {pflow::CAGES(aflags,vpflow.getattachedscheme("CAGES"),cin); _PROGRAMRUN=true;}
       if(vpflow.flag("CAGES") &&  AFLOW_PTHREADS::FLAG) {pflow::CAGES(aflags,vpflow.getattachedscheme("CAGES"),cin); _PROGRAMRUN=true;}
       if(vpflow.flag("CART")) {cout << pflow::CART(cin); _PROGRAMRUN=true;}
+      if(vpflow.flag("CCE_CORRECTION")) {cce::run(vpflow); _PROGRAMRUN=true;}
+      if(vpflow.flag("CCE_CORRECTION::POSCAR2CCE")) {cce::run(vpflow, std::cin); _PROGRAMRUN=true;} //ME20200508  //CO20201105
+      if(vpflow.flag("CCE_CORRECTION::GET_CCE_CORRECTION")) {cce::run(vpflow, std::cin); _PROGRAMRUN=true;} //RF20200916  //CO20201105
+      if(vpflow.flag("CCE_CORRECTION::GET_OXIDATION_NUMBERS")) {cce::run(vpflow, std::cin); _PROGRAMRUN=true;} //RF20200725 //CO20201105
+      if(vpflow.flag("CCE_CORRECTION::GET_CATION_COORDINATION_NUMBERS")) {cce::run(vpflow, std::cin); _PROGRAMRUN=true;} //RF20200814 //CO20201105
       if(vpflow.flag("CHECKINTEGRITIY")) {pflow::CheckIntegritiy(); _PROGRAMRUN=true;}
       if(vpflow.flag("CHANGESUFFIX")) {pflow::ChangeSuffix(vpflow.getattachedscheme("CHANGESUFFIX")); _PROGRAMRUN=true;} //KY20131222
       if(vpflow.flag("CIF") && !vpflow.flag("PROTO_AFLOW") && !vpflow.flag("PROTO")) {pflow::CIF(cin,vpflow); _PROGRAMRUN=true;} //DX20180806 - added vpflow
@@ -1726,8 +1748,8 @@ namespace pflow {
       if(vpflow.flag("CE::SUPERLATTICE")) {pflow::Superlattice(vpflow.getattachedscheme("CE::SUPERLATTICE")); _PROGRAMRUN=true;}
       if(vpflow.flag("CE::SQS")) {pflow::SQS(vpflow.getattachedscheme("CE::SQS")); _PROGRAMRUN=true;}
       // D
-      //DX20170901 [OBSOLETE] if(vpflow.flag("DATA")) {pflow::DATA("DATA",cin); _PROGRAMRUN=true;}
-      if(vpflow.flag("DATA")) {pflow::DATA("DATA",cin,vpflow,cout); _PROGRAMRUN=true;}
+      //DX20170901 [OBSOLETE] if(vpflow.flag("DATA")) {pflow::DATA(cin,"DATA"); _PROGRAMRUN=true;}
+      if(vpflow.flag("DATA")) {pflow::DATA(cin,vpflow,"DATA",cout); _PROGRAMRUN=true;}
       if(vpflow.flag("DATA1")) {pflow::DATA1(vpflow.getattachedscheme("DATA1"),cin); _PROGRAMRUN=true;}
       if(vpflow.flag("DATA2")) {pflow::DATA2(cin); _PROGRAMRUN=true;}
       if(vpflow.flag("DEBYE")) {pflow::DEBYE(vpflow.getattachedscheme("DEBYE")); _PROGRAMRUN=true;}
@@ -1736,8 +1758,8 @@ namespace pflow {
       if(vpflow.flag("DIST")) {pflow::DIST(vpflow.getattachedscheme("DIST"),cin); _PROGRAMRUN=true;}
       //if(DYNADIEL) {pflow::DYNADIEL(argv) ; _PROGRAMRUN=true ;} // CAMILO
       // E
-      //DX20170901 [OBSOLETE] if(vpflow.flag("EDATA")) {pflow::DATA("EDATA",cin); _PROGRAMRUN=true;}
-      if(vpflow.flag("EDATA")) {pflow::DATA("EDATA",cin,vpflow,cout); _PROGRAMRUN=true;}
+      //DX20170901 [OBSOLETE] if(vpflow.flag("EDATA")) {pflow::DATA(cin,"EDATA"); _PROGRAMRUN=true;}
+      if(vpflow.flag("EDATA")) {pflow::DATA(cin,vpflow,"EDATA",cout); _PROGRAMRUN=true;}
       if(vpflow.flag("EDOS")) {pflow::EDOS(argv); _PROGRAMRUN=true;}
       if(vpflow.flag("EFFMASS")) { pflow::EFFMASS(argv, cout) ; _PROGRAMRUN=true ; } // CAMILO
       //  if(vpflow.flag("EFFECTIVEMASS")) {pflow::EffectiveMass(argv,aurostd::args2string(argv,"--em","./"),cout); _PROGRAMRUN=true;}
@@ -1812,8 +1834,10 @@ namespace pflow {
       if(vpflow.flag("ISOPOINTAL_PROTOTYPES")) {cout << compare::isopointalPrototypes(cin, vpflow) << endl; _PROGRAMRUN=true;} //DX20200131
       // L
       if(vpflow.flag("LATTICEREDUCTION")) {cout << pflow::LATTICEREDUCTION(cin); _PROGRAMRUN=true;}
-      if(vpflow.flag("LATTICE_TYPE")) {cout << pflow::LATTICE_TYPE(cin); _PROGRAMRUN=true;}
-      if(vpflow.flag("LATTICE_LATTICE_TYPE")) {cout << pflow::LATTICE_LATTICE_TYPE(cin); _PROGRAMRUN=true;}
+      //DX20200820 [OBSOELTE] if(vpflow.flag("LATTICE_TYPE")) {cout << pflow::LATTICE_TYPE(cin); _PROGRAMRUN=true;}
+      //DX20200820 [OBSOELTE] if(vpflow.flag("LATTICE_LATTICE_TYPE")) {cout << pflow::LATTICE_LATTICE_TYPE(cin); _PROGRAMRUN=true;}
+      if(vpflow.flag("LATTICE_TYPE")) {cout << pflow::LATTICE_TYPE(cin,vpflow); _PROGRAMRUN=true;} //DX20200820 - added vpflow
+      if(vpflow.flag("LATTICE_LATTICE_TYPE")) {cout << pflow::LATTICE_LATTICE_TYPE(cin,vpflow); _PROGRAMRUN=true;} //DX20200820 - added vpflow
       if(vpflow.flag("LATTICE_HISTOGRAM")) {CheckLatticeHistogram(); _PROGRAMRUN=true;}
       if(vpflow.flag("LIST_PROTOTYPE_LABELS")) {cout << pflow::listPrototypeLabels(vpflow) << endl; _PROGRAMRUN=true;} //DX20190201
       if(vpflow.flag("LIB2RAW")) {XHOST.sensors_allowed=FALSE;aflowlib::LIB2RAW(vpflow.getattachedscheme("LIB2RAW"),vpflow.flag("FORCE"),vpflow.flag("LIB2RAW_LOCAL"));XHOST.sensors_allowed=TRUE; _PROGRAMRUN=true;}
@@ -1933,8 +1957,32 @@ namespace pflow {
       if(vpflow.flag("RMCOPIES")) {cout << pflow::RMCOPIES(cin); _PROGRAMRUN=true;}
       if(vpflow.flag("RSM")) {pflow::RSM(argv,cin); _PROGRAMRUN=true;}
       if(vpflow.flag("RASMOL")) {pflow::RASMOL(vpflow.getattachedscheme("RASMOL"),cin); _PROGRAMRUN=true;}
-      if(vpflow.flag("CCE_CORRECTION")) {cce::print_corrections(vpflow); _PROGRAMRUN=true;}
-      if(vpflow.flag("CCE_CORRECTION::POSCAR2CCE")) {cce::print_corrections(vpflow, std::cin); _PROGRAMRUN=true;} //ME20200508
+      //ME20191001 START
+      //ME20200829 - Added patch functionality
+      if (vpflow.flag("REBUILDDB") || vpflow.flag("UPDATEDB") || vpflow.flag("PATCHDB")) {
+        int return_code = 199;  // Placeholder: return code in the 100s do not run the analysis
+        aflowlib::AflowDB db(DEFAULT_AFLOW_DB_FILE, DEFAULT_AFLOW_DB_DATA_PATH, DEFAULT_AFLOW_DB_LOCK_FILE);
+        string patchfiles = vpflow.getattachedscheme("DBPATCHFILES");
+        // Hierarchy: rebuild > update > patch
+        if (vpflow.flag("REBUILDDB") || vpflow.flag("UPDATEDB")) {
+          return_code = db.rebuildDatabase(patchfiles, vpflow.flag("REBUILDDB"));
+        } else if (vpflow.flag("PATCHDB")) {
+          // false: do not check timestamps (always patch)
+          return_code = db.patchDatabase(patchfiles, false);
+        }
+        if ((return_code < 100) || (return_code >= 200)) {
+          db.analyzeDatabase(DEFAULT_AFLOW_DB_STATS_FILE);
+        }
+        _PROGRAMRUN = true;
+        return return_code;
+      }
+      if (vpflow.flag("ANALYZEDB")) {
+        aflowlib::AflowDB db(DEFAULT_AFLOW_DB_FILE);
+        db.analyzeDatabase(DEFAULT_AFLOW_DB_STATS_FILE);
+        _PROGRAMRUN = true;
+      }
+      //ME20191001 END
+
       if(vpflow.flag("RMATOM")) {cout << pflow::RMATOM(cin,aurostd::args2utype(argv,"--rm_atom",(int) (0))); _PROGRAMRUN=true;}
       // S
       if(vpflow.flag("SHELL")) {pflow::SHELL(vpflow.getattachedscheme("SHELL"),cin); _PROGRAMRUN=true;}
@@ -2268,7 +2316,7 @@ namespace pflow {
     strstream << tab << x << " --bzplotdata < POSCAR" << endl;
     strstream << tab << x << " --bzplotdatauseKPOINTS=KPOINTS < POSCAR" << endl;
     strstream << tab << x << " --cart [-c] < POSCAR" << endl;
-    strstream << tab << x << " [--cce (prints user instructions and exits)] --cce=POSCAR_FILE_PATH [--oxidation_numbers=ox_num_1,ox_num_2,...] [--dft_formation_energies=form_energy_1,form_energy_2,...] [--functionals=functional_1,functional_2,...]" << endl;
+    strstream << tab << x << " [--cce (prints user instructions and exits)] --cce=POSCAR_FILE_PATH [--oxidation_numbers=ox_num_1,ox_num_2,...] [--enthalpies_formation_dft=form_enthalpy_1,form_enthalpy_2,...] [--functionals=functional_1,functional_2,...]" << endl;
     strstream << tab << x << " [options] --chgcar2jvxl=|--c2j=CHGCAR11[,CHGCAR2,...]::CUTOFF1,CUTOFF2...[::DOWNSAMPLE1,DOWNSAMPLE2,...]|CHGCAR1,CUTOFF1[,DOWNSAMPLE1:CHGCAR2,CUTOFF2[,DOWNSAMPLE2:...]]|CHGCAR,CUTOFF[,DOWNSAMPLE]" << endl;
     strstream << tab << xspaces << " " << "options are:  --usage" << endl;
     strstream << tab << xspaces << " " << "              --output=|--o=OUTPUT_FILE" << endl;
@@ -2309,9 +2357,11 @@ namespace pflow {
     strstream << tab << xspaces << " " << "ANALYSIS OPTIONS:" << endl;
     strstream << tab << xspaces << " " << "              --distance_to_hull=|--distancetohull=|--distance2hull=|--dist2hull=|--d2h=aflow:bb0d45ab555bc208,aflow:fb9eaa58604ce774" << endl;
     strstream << tab << xspaces << " " << "              --stability_criterion=|--stabilitycriterion=|--stable_criterion=|--scriterion=|--sc=aflow:bb0d45ab555bc208,aflow:fb9eaa58604ce774" << endl;
+    strstream << tab << xspaces << " " << "              --n+1_enthalpy_gain=|--=|--n+1enthalpygain=|--n+1energygain=|--n+1egain=|--n1egain=|--n+1_enthalpygain=|--n+1+energygain=|--n+1_egain=aflow:bb0d45ab555bc208,aflow:fb9eaa58604ce774" << endl;
     strstream << tab << xspaces << " " << "              --hull_formation_enthalpy=|--hull_energy=0.25,0.25" << endl;
     strstream << tab << xspaces << " " << "              --skip_structure_comparison|--skipstructruecomparison|--skipstructcomp|--ssc" << endl;
     strstream << tab << xspaces << " " << "              --skip_stability_criterion_analysis|--skipstabilitycriterionanalysis|--skipscriterion|--sscriterion" << endl;
+    strstream << tab << xspaces << " " << "              --skip_n_plus_1_enthalpy_gain_analysis|--skip_n_plus_1_energy_gain_analysis|--skipnplus1enthalpygainanalysis|--skipnplus1energygainanalysis|--skipnplus1|--snp1|--snpo" << endl;
     strstream << tab << xspaces << " " << "              --include_skewed_hulls|--include_skewed|--ish" << endl;
     strstream << tab << xspaces << " " << "              --include_unreliable_hulls|--include_unreliable|--iuh" << endl;
     strstream << tab << xspaces << " " << "              --include_outliers|--io" << endl;
@@ -2352,6 +2402,7 @@ namespace pflow {
     strstream << tab << x << " --frac [-f,-d,--fract,--fractional,--direct] < POSCAR" << endl;
     strstream << tab << x << " --getTEMP [--runstat|--runbar|--refresh=X|--warning_beep=T|--warning_halt=T]" << endl;
     strstream << tab << x << " --gfa --alloy=CaCu [--ae_file=All_atomic_environments_read.dat] [--cutoff_energy=0.05]" << endl;
+    strstream << tab << x << " --generate_ceramics --nm=C --m=Mo,Nb,Ta,V,W -N=5" << endl; //CO20200731
     strstream << tab << x << " --gulp < POSCAR" << endl;
     strstream << tab << x << " --identical < POSCAR" << endl;
     strstream << tab << x << " --incell < POSCAR" << endl;
@@ -3115,27 +3166,8 @@ namespace pflow {
     } 
     //DX20170921 - MAGNETIC SYMMETRY - END
 
-    double default_tolerance=SYM::defaultTolerance(a);
-    double tolerance = AUROSTD_NAN;
-    if(vpflow.flag("SYMMETRY::TOLERANCE")){
-      string tolerance_string = vpflow.getattachedscheme("SYMMETRY::TOLERANCE");
-      if(aurostd::toupper(tolerance_string[0]) == 'T'){ //Tight
-        tolerance=default_tolerance;
-      }
-      else if(aurostd::toupper(tolerance_string[0]) == 'L'){ //Loose
-        tolerance=default_tolerance*10.0;
-      }
-      else {
-        tolerance=aurostd::string2utype<double>(vpflow.getattachedscheme("SYMMETRY::TOLERANCE"));
-      }
-    }
-    else {
-      tolerance = default_tolerance;
-    }
-    if(tolerance < 1e-10){
-      cerr << soliloquy << " ERROR: Tolerance cannot be zero (i.e. less than 1e-10) " << print_directory << "." << endl;
-      return 0;
-    }
+    // Set tolerance
+    double tolerance = pflow::getSymmetryTolerance(a,vpflow.getattachedscheme("SYMMETRY::TOLERANCE")); //DX20200820 - consolidated setting tolerance into a function
     //DX20170803 - Add format flag - START
     string format = "txt";
     if(XHOST.vflag_control.flag("PRINT_MODE::TXT")){
@@ -4969,6 +5001,7 @@ namespace pflow {
     if(LDEBUG) oss << soliloquy << "CHECK USAGE" << endl; 
     if(vpflow.flag("CHGSUM::USAGE")) {
       init::MessageOption(vpflow.getattachedscheme("CHGSUM"),"pflow::CHGSUM",aurostd::liststring2string(usage_usage,usage_options));
+      return oss.str();
     }
 
     // no input
@@ -5230,23 +5263,8 @@ namespace pflow {
     }
     else {
       //put tolerance flag check in loop to save time if we aren't calculating, defaultTolerance can be expensive
-      double default_tolerance=SYM::defaultTolerance(a); 
-      double tolerance = AUROSTD_NAN;
-      if(vpflow.flag("CIF::TOLERANCE")){
-        string tolerance_string = vpflow.getattachedscheme("CIF::TOLERANCE");
-        if(aurostd::toupper(tolerance_string[0]) == 'T'){ //Tight
-          tolerance=default_tolerance;
-        }
-        else if(aurostd::toupper(tolerance_string[0]) == 'L'){ //Loose
-          tolerance=default_tolerance*10.0;
-        }
-        else {
-          tolerance=aurostd::string2utype<double>(vpflow.getattachedscheme("CIF::TOLERANCE"));
-        }
-      }
-      else {
-        tolerance = default_tolerance;
-      }
+      double tolerance = pflow::getSymmetryTolerance(a,vpflow.getattachedscheme("CIF::TOLERANCE")); //DX20200820 - consolidated setting tolerance into a function
+      // get setting
       int setting = 0;
       if(vpflow.flag("CIF::SETTING")){
         int user_setting=aurostd::string2utype<int>(vpflow.getattachedscheme("CIF::SETTING"));
@@ -5414,7 +5432,7 @@ namespace pflow {
 // ***************************************************************************
 namespace pflow {
   //void DATA(string smode,istream& input)
-  bool DATA(string smode, istream& input, aurostd::xoption& vpflow, ostream& oss) {
+  bool DATA(istream& input,aurostd::xoption& vpflow,const string& smode,ostream& oss) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy = XPID + "pflow::DATA()";
     if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
@@ -5452,27 +5470,8 @@ namespace pflow {
       ProcessAndAddSpinToXstructure(a, magmom_info); //DX20191108 - condensed into a single function
     }
     //DX20171128 - MAGNETIC SYMMETRY - END
-    double default_tolerance=SYM::defaultTolerance(a);
-    double tolerance = AUROSTD_NAN;
-    if(vpflow.flag("DATA::TOLERANCE")){
-      string tolerance_string = vpflow.getattachedscheme("DATA::TOLERANCE");
-      if(aurostd::toupper(tolerance_string[0]) == 'T'){ //Tight
-        tolerance=default_tolerance;
-      }
-      else if(aurostd::toupper(tolerance_string[0]) == 'L'){ //Loose
-        tolerance=default_tolerance*10.0;
-      }
-      else {
-        tolerance=aurostd::string2utype<double>(vpflow.getattachedscheme("DATA::TOLERANCE"));
-      }
-    }
-    else {
-      tolerance = default_tolerance;
-    }
-    if(tolerance < 1e-10){
-      cerr << "ERROR: Tolerance cannot be zero (i.e. less than 1e-10) " << print_directory << "." << endl;
-      return 0;
-    }
+    // get tolerance  
+    double tolerance = pflow::getSymmetryTolerance(a,vpflow.getattachedscheme("DATA::TOLERANCE")); //DX20200820 - consolidated setting tolerance into a function
     //DX20180806 - added setting - START
     int setting = 0;
     if(vpflow.flag("DATA::SETTING")){
@@ -5503,7 +5502,7 @@ namespace pflow {
       cout << aflow::Banner("BANNER_TINY") << endl;
     }
     // pflow::PrintData(a,cerr,smode);
-    pflow::PrintData(a,oss,smode,tolerance,no_scan,setting,format); //DX cout to oss
+    pflow::PrintData(a,oss,tolerance,smode,no_scan,setting,format); //DX cout to oss
     return true;
   }
 } // namespace pflow
@@ -5850,26 +5849,8 @@ namespace pflow {
       ProcessAndAddSpinToXstructure(a, magmom_info); //DX20191108 - condensed into a single function
     } 
     //DX20170921 - MAGNETIC SYMMETRY - END
-    double default_tolerance=SYM::defaultTolerance(a);
-    double tolerance = AUROSTD_NAN;
-    if(vpflow.flag("SYMMETRY::TOLERANCE")){
-      string tolerance_string = vpflow.getattachedscheme("SYMMETRY::TOLERANCE");
-      if(aurostd::toupper(tolerance_string[0]) == 'T'){ //Tight
-        tolerance=default_tolerance;
-      }
-      else if(aurostd::toupper(tolerance_string[0]) == 'L'){ //Loose
-        tolerance=default_tolerance*10.0;
-      }
-      else {
-        tolerance=aurostd::string2utype<double>(vpflow.getattachedscheme("SYMMETRY::TOLERANCE"));
-      }
-    }
-    else {
-      tolerance = default_tolerance;
-    }
-    if(tolerance < 1e-10){
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Tolerance cannot be zero (i.e. less than 1e-10)",_INPUT_ILLEGAL_); //CO20200624
-    }
+    // get tolerance
+    double tolerance = pflow::getSymmetryTolerance(a,vpflow.getattachedscheme("SYMMETRY::TOLERANCE")); //DX20200820 - consolidated setting tolerance into a function
     //DX NOT REALLY NEEDED FOR THIS FUNCTION
     //DX20170803 - Add format flag - START
     string format = "txt";
@@ -6084,7 +6065,7 @@ namespace pflow {
       return FALSE;
     }
 
-    // MOVED DOWN A BIT if(!aflags.QUIET) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "Symmetry: starting tolerance " << _EPS_sym_ << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    // MOVED DOWN A BIT if(!aflags.QUIET) aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "Symmetry: starting tolerance " << _EPS_sym_ << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
     if(1 || a.dist_nn_min == AUROSTD_NAN){  //CO20171024 - always recalculate min_dist (SAFE)
       if(LDEBUG) cerr << XPID << "pflow::PerformFullSymmetry: CALCULATING MIN DISTANCE" << print_directory << endl;
@@ -6115,7 +6096,7 @@ namespace pflow {
     //}
     //a.sym_eps = SYM::defaultTolerance(a);
     double orig_tolerance = a.sym_eps;
-    if(!aflags.QUIET) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "Symmetry: starting tolerance " << a.sym_eps << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    if(!aflags.QUIET) aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "Symmetry: starting tolerance " << a.sym_eps << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
 
     while(symmetry_commensurate==FALSE){
@@ -6147,7 +6128,7 @@ namespace pflow {
                 return FALSE;
               }
             }
-            if(!aflags.QUIET) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUP Symmetry: changing tolerance to " << a.sym_eps << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+            if(!aflags.QUIET) aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUP Symmetry: changing tolerance to " << a.sym_eps << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
             aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
             continue;
           }
@@ -6168,7 +6149,7 @@ namespace pflow {
                 return FALSE;
               }
             }
-            if(!aflags.QUIET) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUPK Symmetry: changing tolerance to " << a.sym_eps << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+            if(!aflags.QUIET) aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUPK Symmetry: changing tolerance to " << a.sym_eps << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
             aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
             continue;
           }
@@ -6192,7 +6173,7 @@ namespace pflow {
               return FALSE;
             }
           }
-          if(!aflags.QUIET) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUP Symmetry: changing tolerance to " << a.sym_eps << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+          if(!aflags.QUIET) aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUP Symmetry: changing tolerance to " << a.sym_eps << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
           aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
           continue;
         }
@@ -6213,7 +6194,7 @@ namespace pflow {
                 return FALSE;
               }
             }
-            if(!aflags.QUIET) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: changing tolerance to " << a.sym_eps << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+            if(!aflags.QUIET) aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: changing tolerance to " << a.sym_eps << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
             aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
             continue;
           }
@@ -6235,7 +6216,7 @@ namespace pflow {
                 return FALSE;
               }
             }
-            if(!aflags.QUIET) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUP_XTAL Symmetry: changing tolerance to " << a.sym_eps << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+            if(!aflags.QUIET) aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUP_XTAL Symmetry: changing tolerance to " << a.sym_eps << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
             aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
             continue;
           }
@@ -6259,7 +6240,7 @@ namespace pflow {
               return FALSE;
             }
           }
-          if(!aflags.QUIET) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUP_XTAL Symmetry: changing tolerance to " << a.sym_eps << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+          if(!aflags.QUIET) aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUP_XTAL Symmetry: changing tolerance to " << a.sym_eps << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
           aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
           continue;
         }
@@ -6285,7 +6266,7 @@ namespace pflow {
                 return FALSE;
               }
             }
-            if(!aflags.QUIET) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUP_XTAL Symmetry: changing tolerance to " << a.sym_eps << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+            if(!aflags.QUIET) aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUP_XTAL Symmetry: changing tolerance to " << a.sym_eps << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
             aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
             continue;
           }
@@ -6306,7 +6287,7 @@ namespace pflow {
                 return FALSE;
               }
             }
-            if(!aflags.QUIET) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUPK_XTAL Symmetry: changing tolerance to " << a.sym_eps << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+            if(!aflags.QUIET) aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUPK_XTAL Symmetry: changing tolerance to " << a.sym_eps << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
             aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
             continue;
           }
@@ -6339,13 +6320,13 @@ namespace pflow {
       //[DX OBSOLETE]        return FALSE;
       //[DX OBSOLETE]      }
       //[DX OBSOLETE]    }
-      //[DX OBSOLETE]	  if(!aflags.QUIET) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUP_XTAL Symmetry: changing tolerance to " << a.sym_eps << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+      //[DX OBSOLETE]	  if(!aflags.QUIET) aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUP_XTAL Symmetry: changing tolerance to " << a.sym_eps << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       //[DX OBSOLETE]   aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
       //[DX OBSOLETE]	  continue;
       //[DX OBSOLETE]  }
       //[DX OBSOLETE]}
       //[DX OBSOLETE]else if(!space_and_point_group_match && derivative_structure){
-      //[DX OBSOLETE]  if(!aflags.QUIET) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUP_XTAL WARNING: Point Group Crystal of Original Cell: " << a.point_group_Hermann_Mauguin << " | Space Group of Primitive Cell: " << GetSpaceGroupName(a.space_group_ITC) << " -- This is a derivative structure." << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+      //[DX OBSOLETE]  if(!aflags.QUIET) aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUP_XTAL WARNING: Point Group Crystal of Original Cell: " << a.point_group_Hermann_Mauguin << " | Space Group of Primitive Cell: " << GetSpaceGroupName(a.space_group_ITC) << " -- This is a derivative structure." << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       //[DX OBSOLETE]  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
       //[DX OBSOLETE]}
       // Calculate Patterson Point Group 
@@ -6364,7 +6345,7 @@ namespace pflow {
                 return FALSE;
               }
             }
-            if(!aflags.QUIET) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUPK_PATTERSON Symmetry: changing tolerance to " << a.sym_eps << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+            if(!aflags.QUIET) aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUPK_PATTERSON Symmetry: changing tolerance to " << a.sym_eps << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
             aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
             continue;
           }
@@ -6372,11 +6353,11 @@ namespace pflow {
       } //DX20200129
       if(kflags.KBIN_SYMMETRY_CALCULATE_SGROUP){ //DX20170814
         if(kflags.KBIN_SYMMETRY_SGROUP_RADIUS>0.0) {
-          if(!aflags.QUIET) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "POSCAR SGROUP: found RADIUS=" << kflags.KBIN_SYMMETRY_SGROUP_RADIUS << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+          if(!aflags.QUIET) aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "POSCAR SGROUP: found RADIUS=" << kflags.KBIN_SYMMETRY_SGROUP_RADIUS << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
           aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
         } else {
           kflags.KBIN_SYMMETRY_SGROUP_RADIUS=KBIN_SYMMETRY_SGROUP_RADIUS_DEFAULT;
-          if(!aflags.QUIET) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "POSCAR SGROUP: Default RADIUS=" << kflags.KBIN_SYMMETRY_SGROUP_RADIUS << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+          if(!aflags.QUIET) aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "POSCAR SGROUP: Default RADIUS=" << kflags.KBIN_SYMMETRY_SGROUP_RADIUS << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
           aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
         }
         a.sgroup_radius=kflags.KBIN_SYMMETRY_SGROUP_RADIUS;
@@ -6395,7 +6376,7 @@ namespace pflow {
                 return FALSE;
               }
             }
-            if(!aflags.QUIET) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "SGROUP Symmetry: changing tolerance to " << a.sym_eps << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+            if(!aflags.QUIET) aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "SGROUP Symmetry: changing tolerance to " << a.sym_eps << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
             aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
             continue;
           }
@@ -6417,7 +6398,7 @@ namespace pflow {
                 return FALSE;
               }
             }
-            if(!aflags.QUIET) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "IATOMS ATOMS: changing tolerance to " << a.sym_eps << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+            if(!aflags.QUIET) aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "IATOMS ATOMS: changing tolerance to " << a.sym_eps << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
             aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
             continue;
           }
@@ -6447,7 +6428,7 @@ namespace pflow {
                 return FALSE;
               }
             }
-            if(!aflags.QUIET) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "IATOMS ATOMS: changing tolerance to " << a.sym_eps << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+            if(!aflags.QUIET) aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "IATOMS ATOMS: changing tolerance to " << a.sym_eps << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
             aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
             continue;
           }
@@ -6469,7 +6450,7 @@ namespace pflow {
                 return FALSE;
               }
             }
-            if(!aflags.QUIET) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "AGROUP Symmetry: changing tolerance to " << a.sym_eps << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+            if(!aflags.QUIET) aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "AGROUP Symmetry: changing tolerance to " << a.sym_eps << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
             aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
             continue;
           }
@@ -6553,27 +6534,9 @@ namespace pflow {
     } 
     //DX20170921 - MAGNETIC SYMMETRY - END
 
-    double default_tolerance=SYM::defaultTolerance(a);
-    double tolerance = AUROSTD_NAN;
-    if(vpflow.flag("FULLSYMMETRY::TOLERANCE")){
-      string tolerance_string = vpflow.getattachedscheme("FULLSYMMETRY::TOLERANCE");
-      if(aurostd::toupper(tolerance_string[0]) == 'T'){ //Tight
-        tolerance=default_tolerance;
-      }
-      else if(aurostd::toupper(tolerance_string[0]) == 'L'){ //Loose
-        tolerance=default_tolerance*10.0;
-      }
-      else {
-        tolerance=aurostd::string2utype<double>(vpflow.getattachedscheme("FULLSYMMETRY::TOLERANCE"));
-      }
-    }
-    else {
-      tolerance = default_tolerance;
-    }
-    if(tolerance < 1e-10){
-      cerr << XPID << "pflow::CalculateFullSymmetry: ERROR: Tolerance cannot be zero (i.e. less than 1e-10)" << endl;
-      return 0;
-    }
+    // get tolerance
+    double tolerance = pflow::getSymmetryTolerance(a,vpflow.getattachedscheme("FULLSYMMETRY::TOLERANCE")); //DX20200820 - consolidated setting tolerance into a function
+
     //DX20170803 - Add format flag - START
     string format = "txt";
     if(XHOST.vflag_control.flag("PRINT_MODE::TXT")){
@@ -6736,30 +6699,7 @@ namespace pflow {
 //force_fix: override if a column is present, this may be crucial to fix issues with write_inequivalent_flag
 namespace pflow {
   bool fixEmptyAtomNames(xstructure& xstr,bool force_fix) { //CO20190219
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy = XPID + "pflow::fixEmptyAtomNames():";
-    if(xstr.species.size()==xstr.species_pp.size()) { //CO20190218
-      for(uint itype=0;itype<xstr.species.size();itype++) {
-        if((force_fix || xstr.species.at(itype)=="") && xstr.species_pp.at(itype)!=""){
-          if(LDEBUG) {cerr << soliloquy << " xstr.species_pp.at(" << itype << ")=" << xstr.species_pp.at(itype) << endl;}
-          xstr.species.at(itype)=xstr.species_pp.at(itype); //KBIN::VASP_PseudoPotential_CleanName(xstr.species_pp.at(itype));  //CO20181226 KEEP PP INFO if available (auto aflow.in)
-        }
-      }
-    }  // cormac I`ll write a short pflow for this stuff
-    if(xstr.species.size()==xstr.num_each_type.size()){
-      int iatom=0;
-      for(uint itype=0;itype<xstr.num_each_type.size();itype++) {
-        string species=string(xstr.species.at(itype));
-        xstr.species.at(itype)=species;
-        for(int j=0;j<xstr.num_each_type.at(itype);j++) {
-          xstr.atoms.at(iatom).name=species;    // CONVASP_MODE
-          xstr.atoms.at(iatom).CleanName();
-          xstr.atoms.at(iatom).CleanSpin();
-          xstr.atoms.at(iatom).name_is_given=TRUE;
-          iatom++;
-        }
-      }
-    }
+    xstr.fixEmptyAtomNames(force_fix);
     return TRUE;
   }
 } // namespace pflow
@@ -8312,9 +8252,11 @@ namespace pflow {
 // pflow::LATTICE_TYPE
 // ***************************************************************************
 namespace pflow {
-  string LATTICE_TYPE(istream& input) {
+  string LATTICE_TYPE(istream& input, aurostd::xoption& vpflow) { //DX20200820
     stringstream sss;
     xstructure a(input,IOAFLOW_AUTO);
+    double tolerance = pflow::getSymmetryTolerance(a,vpflow.getattachedscheme("LATTICE::TOLERANCE")); //DX20200820 - consolidated setting tolerance into a function
+    a.sym_eps = tolerance; //DX20200820 - add tolerance
     //DX20170824 [OBSOLETE] a.GetLatticeType();
     xstructure str_sp,str_sc; //DX20170824 - Speed increase
     bool full_sym=false; //DX20170829 - Speed increase
@@ -8333,9 +8275,11 @@ namespace pflow {
 // pflow::LATTICE_LATTICE_TYPE
 // ***************************************************************************
 namespace pflow {
-  string LATTICE_LATTICE_TYPE(istream& input) {
+  string LATTICE_LATTICE_TYPE(istream& input, aurostd::xoption& vpflow) { //DX20200820
     stringstream sss;
     xstructure a(input,IOAFLOW_AUTO);
+    double tolerance = pflow::getSymmetryTolerance(a,vpflow.getattachedscheme("LATTICE_LATTICE::TOLERANCE")); //DX20200820 - consolidated setting tolerance into a function
+    a.sym_eps = tolerance; //DX20200820 - add tolerance
     //DX20170824 [OBSOLETE] a.GetLatticeType();
     xstructure str_sp,str_sc; //DX20170824 - Speed increase
     bool full_sym=false; //DX20170829 - Speed increase
@@ -8956,6 +8900,21 @@ namespace pflow {
 }  // namespace pflow
 
 namespace pflow {
+  uint SubLayersRestAPILS(const string& url,vector<string>& vsuburl){  //CO20200731 - mimicking SubDirectoryLS() in aurostd for REST-API
+    vector<string> vtokens,_vtokens;
+    aurostd::url2tokens(url+"/?aflowlib_entries",vtokens,",");
+    for(uint i=0;i<vtokens.size();i++){
+      aurostd::url2tokens(url+"/"+vtokens[i]+"/?aflowlib_entries",_vtokens,",");
+      if(_vtokens.size()>0){
+        vsuburl.push_back(url+"/"+vtokens[i]);
+        SubLayersRestAPILS(url+"/"+vtokens[i],vsuburl);
+      }
+    }
+    return vsuburl.size();
+  }
+}
+
+namespace pflow {
   // ***************************************************************************
   // pflow::loadLIBX(aurostd::xoption& vpflow,string elements,string server,
   // ofstream& FileMESSAGE, ostream& oss)
@@ -9031,7 +8990,7 @@ namespace pflow {
 
     string soliloquy = XPID + "pflow::loadLIBX():";
     vector<string> velements =
-      stringElements2VectorElements(elements, FileMESSAGE, true, true, composition_string, false, oss); //clean and sort, do not keep_pp  //CO20190712
+      aurostd::getElements(elements, composition_string, FileMESSAGE, true, true, false, oss); //clean and sort, do not keep_pp  //CO20190712
     //[CO20190712 - OBSOLETE]pflow::getAlphabeticVectorString(elements, FileMESSAGE, oss);
     return loadLIBX(vpflow, LIB, velements, server, entries, FileMESSAGE, oss);
   }
@@ -9189,7 +9148,7 @@ namespace pflow {
 
     string soliloquy = XPID + "pflow::loadLIBX():";
     vector<string> velements =
-      stringElements2VectorElements(elements, FileMESSAGE, true, true, composition_string, false, oss); //clean and sort, do not keep_pp  //CO20190712
+      aurostd::getElements(elements, composition_string, FileMESSAGE, true, true, false, oss); //clean and sort, do not keep_pp  //CO20190712
     //[CO20190712 - OBSOLETE]pflow::getAlphabeticVectorString(elements, FileMESSAGE, oss);
     return loadLIBX(vpflow, LIB, velements, server, entries, FileMESSAGE, oss);
   }
@@ -9265,7 +9224,7 @@ namespace pflow {
       aurostd::xoption& vpflow, string LIB, vector<string>& velements, string server,
       vector<vector<aflowlib::_aflowlib_entry> >& entries,
       ofstream& FileMESSAGE, ostream& oss) {  // main function
-
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy = XPID + "pflow::loadLIBX():";
     stringstream message;
 
@@ -9320,13 +9279,13 @@ namespace pflow {
     bool load_from_common = pflow::loadFromCommon(vpflow);
     bool override_load_from_common = false;
 
-    string LIB_path;  //will be actual directory path or URL, depending on machine
+    string LIB_path="";  //will be actual directory path or URL, depending on machine
     if(load_from_common) {
       if(!vpflow.flag("PFLOW::LOAD_ENTRIES_COMING_FROM_LOADENTRIESX")) {
         message << "Loading entries from COMMON";
         pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
       }
-      LIB_path = "/common/" + lib_name + "/RAW/";
+      LIB_path = "/common/" + lib_name + "/RAW";
       if(!aurostd::IsDirectory(LIB_path)) {
         load_from_common = false;
         message << LIB_path << " does not exist! Cannot load from COMMON, switching to API";
@@ -9345,9 +9304,9 @@ namespace pflow {
         return false;  //entries;
       }
       if(isICSD) {
-        LIB_path = server + "/AFLOWDATA/ICSD_WEB/";
+        LIB_path = server + "/AFLOWDATA/ICSD_WEB";
       } else {
-        LIB_path = server + "/AFLOWDATA/" + lib_name + "_RAW/";
+        LIB_path = server + "/AFLOWDATA/" + lib_name + "_RAW";
       }
     }
 
@@ -9355,17 +9314,18 @@ namespace pflow {
     // START Finding matches
     //////////////////////////////////////////////////////////////////////////
     aflowlib::_aflowlib_entry _aflowlib_tmp;
-    uint nary;
+    uint nary=0;
     uint total_count = 0;
-    string::size_type loc;
+    string::size_type loc=0;
     vector<string> input_velements;
     vector<double> input_vcomposition;
+    vector<string> vloadpaths;
     if(isICSD) {
       bool double_check_icsd = false;  //NOT NECESSARY for ICSD since we load from the calculation layer
       string symmetry_path, clean_icsd;
       vector<string> icsds, tokens, elements;
       for (uint i = 0; i < symmetries.size(); i++) {
-        symmetry_path = LIB_path + symmetries[i];
+        symmetry_path = LIB_path + "/" + symmetries[i];
         if(load_from_common && !aurostd::IsDirectory(symmetry_path)) { continue; }
         //not many symmetries, so this boolean placement won't impact much
         if(load_from_common) {aurostd::DirectoryLS(symmetry_path, icsds);}
@@ -9381,40 +9341,55 @@ namespace pflow {
             clean_icsd = icsds[j].substr(0,loc);  //get just compound
             if(compoundsBelong(velements, clean_icsd, input_velements, input_vcomposition, FileMESSAGE, oss, false, vpflow.flag("PFLOW::LOAD_ENTRIES_NON_ALPHABETICAL"), composition_string)) {  // NOT recommended, these are BS entries // no need to clean, ICSD compound format is already clean of pps
               // url2aflowlib has bad printing to screen options, so we mimic here
-
-              //if(vpflow.flag("PFLOW::LOAD_ENTRIES_ENTRY_OUTPUT")) {
-              message << "Loading " << (load_from_common ? "path" : "url") << "=" << symmetry_path << "/" << icsds[j];
-              pflow::logger(_AFLOW_FILE_NAME_, std::string("aurostd::") + std::string((load_from_common ? "file" : "url")) + std::string("2string():"), message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_,!vpflow.flag("PFLOW::LOAD_ENTRIES_ENTRY_OUTPUT")); //print to log anyway
-              //}
-              //complicated ternary operator, returns bool, but necessary to avoid double code
-              if(
-                  (load_from_common)
-                  ?
-                  //if load_from_common, check this bool
-                  (
-                   //(aurostd::FileExist(symmetry_path + "/" + icsds[j] + "/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) &&
-                   (aurostd::FileNotEmpty(symmetry_path + "/" + icsds[j] + "/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) &&
-                   (_aflowlib_tmp.file2aflowlib(symmetry_path + "/" + icsds[j] + "/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT, message) > 0) &&
-                   (double_check_icsd ? compoundsBelong(velements, _aflowlib_tmp.vspecies, FileMESSAGE, oss, vpflow.flag("PFLOW::LOAD_ENTRIES_NON_ALPHABETICAL")) : true)  //sometimes we find odd entries in the wrong LIBS, better to be safe, NOT NECESSARY for ICSD since we load from the calculation layer
-                  )
-                  :
-                  //if load_from_api, check this bool
-                  (
-                   (_aflowlib_tmp.url2aflowlib(symmetry_path + "/" + icsds[j], message, false) > 0) &&
-                   (double_check_icsd ? compoundsBelong(velements, _aflowlib_tmp.vspecies, FileMESSAGE, oss, vpflow.flag("PFLOW::LOAD_ENTRIES_NON_ALPHABETICAL")) : true)  //sometimes we find odd entries in the wrong LIBS, better to be safe, NOT NECESSARY for ICSD since we load from the calculation layer
-                  )) {
-                nary = _aflowlib_tmp.vspecies.size();
-                if(entries.size() < nary) { continue; }  //this entry is garbage (wrong directory)
-                entries[nary - 1].push_back(_aflowlib_tmp);
-                total_count++;
-                if(vpflow.flag("PFLOW::LOAD_ENTRIES_LOAD_XSTRUCTURES")) {
-                  if(!loadXstructures(entries[nary - 1].back(),FileMESSAGE,oss,vpflow.flag("PFLOW::LOAD_ENTRIES_LOAD_XSTRUCTURES_RELAXED_ONLY"))) {  //CO20171202 - let it decided whether to load from common or not
-                    entries[nary - 1].pop_back();
-                    total_count--;
+              vloadpaths.clear();
+              vloadpaths.push_back(symmetry_path+"/"+icsds[j]);
+              if(load_from_common) {aurostd::SubDirectoryLS(symmetry_path+"/"+icsds[j],vloadpaths);}
+              else {pflow::SubLayersRestAPILS(symmetry_path+"/"+icsds[j],vloadpaths);}
+              if(LDEBUG){cerr << soliloquy << " vloadpaths=" << aurostd::joinWDelimiter(vloadpaths,",") << endl;}
+              if(vloadpaths.size()>1 && vloadpaths[1]=="<!DOCTYPE"){ //CO20180627
+                message << "REST-API appears to be down";
+                pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+                return false;
+              }
+              for(uint k=0;k<vloadpaths.size();k++){
+                const string& load_path=vloadpaths[k];
+                message << "Loading " << (load_from_common ? "path" : "url") << "=" << load_path;
+                pflow::logger(_AFLOW_FILE_NAME_, std::string("aurostd::") + std::string((load_from_common ? "file" : "url")) + std::string("2string():"), message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_,!vpflow.flag("PFLOW::LOAD_ENTRIES_ENTRY_OUTPUT")); //print to log anyway
+                //complicated ternary operator, returns bool, but necessary to avoid double code
+                if(
+                    (load_from_common)
+                    ?
+                    //if load_from_common, check this bool
+                    //this part of the ternary operator will first look for a non-empty aflowlib.out, 
+                    //then try to load it
+                    //the last part checks that the loaded entry has a set of species that belong to the original query (protection)
+                    (
+                     //(aurostd::FileExist(load_path + "/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) &&
+                     (aurostd::FileNotEmpty(load_path + "/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) &&
+                     (_aflowlib_tmp.file2aflowlib(load_path + "/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT, message) > 0) &&
+                     (double_check_icsd ? compoundsBelong(velements, _aflowlib_tmp.vspecies, FileMESSAGE, oss, vpflow.flag("PFLOW::LOAD_ENTRIES_NON_ALPHABETICAL")) : true)  //sometimes we find odd entries in the wrong LIBS, better to be safe, NOT NECESSARY for ICSD since we load from the calculation layer
+                    )
+                    :
+                    //if load_from_api, check this bool
+                    //this part of the ternary operator loads in the url
+                    //the last part checks that the loaded entry has a set of species that belong to the original query (protection)
+                    (
+                     (_aflowlib_tmp.url2aflowlib(load_path, message, false) > 0) &&
+                     (double_check_icsd ? compoundsBelong(velements, _aflowlib_tmp.vspecies, FileMESSAGE, oss, vpflow.flag("PFLOW::LOAD_ENTRIES_NON_ALPHABETICAL")) : true)  //sometimes we find odd entries in the wrong LIBS, better to be safe, NOT NECESSARY for ICSD since we load from the calculation layer
+                    )) {
+                  nary = _aflowlib_tmp.vspecies.size();
+                  if(entries.size() < nary) { continue; }  //this entry is garbage (wrong directory)
+                  entries[nary - 1].push_back(_aflowlib_tmp);
+                  total_count++;
+                  if(vpflow.flag("PFLOW::LOAD_ENTRIES_LOAD_XSTRUCTURES")) {
+                    if(!loadXstructures(entries[nary - 1].back(),FileMESSAGE,oss,vpflow.flag("PFLOW::LOAD_ENTRIES_LOAD_XSTRUCTURES_RELAXED_ONLY"))) {  //CO20171202 - let it decided whether to load from common or not
+                      entries[nary - 1].pop_back();
+                      total_count--;
+                    }
                   }
                 }
+                message.str("");
               }
-              message.str("");
             }
           }
         }
@@ -9431,7 +9406,7 @@ namespace pflow {
         return false;
       }
       for (uint i = 0; i < systems.size(); i++) {
-        calculation_path = LIB_path + systems[i];
+        calculation_path = LIB_path + "/" + systems[i];
         if(load_from_common && !aurostd::IsDirectory(calculation_path)) { continue; }
         loc=systems[i].find(":");
         clean_system=systems[i].substr(0,loc);  //even if we don't find it, simply copy string
@@ -9445,39 +9420,56 @@ namespace pflow {
           }
           for (uint j = 0; j < calculations.size(); j++) {
             if(load_from_common && !aurostd::IsDirectory(calculation_path + "/" + calculations[j])) { continue; }
-            //if(vpflow.flag("PFLOW::LOAD_ENTRIES_ENTRY_OUTPUT")) {
-            message << "Loading " << (load_from_common ? "path" : "url") << "=" << calculation_path << "/" << calculations[j];
-            pflow::logger(_AFLOW_FILE_NAME_, std::string("aurostd::") + std::string((load_from_common ? "file" : "url")) + std::string("2string():"), message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_,!vpflow.flag("PFLOW::LOAD_ENTRIES_ENTRY_OUTPUT")); //print to log anyway
-            //}
-            //complicated ternary operator, returns bool, but necessary to avoid double code
-            if(
-                (load_from_common)
-                ?
-                //if load_from_common, check this bool
-                (
-                 //(aurostd::FileExist(calculation_path + "/" + calculations[j] + "/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) &&
-                 (aurostd::FileNotEmpty(calculation_path + "/" + calculations[j] + "/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) &&
-                 (_aflowlib_tmp.file2aflowlib(calculation_path + "/" + calculations[j] + "/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT, message) > 0) &&
-                 (double_check_lib ? compoundsBelong(velements, _aflowlib_tmp.vspecies, FileMESSAGE, oss, vpflow.flag("PFLOW::LOAD_ENTRIES_NON_ALPHABETICAL")) : true)  //sometimes we find odd entries in the wrong LIBS, better to be safe
-                )
-                :
-                //if load_from_api, check this bool
-                (
-                 (_aflowlib_tmp.url2aflowlib(calculation_path + "/" + calculations[j], message, false) > 0) &&
-                 (double_check_lib ? compoundsBelong(velements, _aflowlib_tmp.vspecies, FileMESSAGE, oss, vpflow.flag("PFLOW::LOAD_ENTRIES_NON_ALPHABETICAL")) : true)  //sometimes we find odd entries in the wrong LIBS, better to be safe
-                )) {
-              nary = _aflowlib_tmp.vspecies.size();
-              if(entries.size() < nary) { continue; }  //this entry is garbage (wrong directory)
-              entries[nary - 1].push_back(_aflowlib_tmp);
-              total_count++;
-              if(vpflow.flag("PFLOW::LOAD_ENTRIES_LOAD_XSTRUCTURES")) {
-                if(!loadXstructures(entries[nary - 1].back(),FileMESSAGE,oss,vpflow.flag("PFLOW::LOAD_ENTRIES_LOAD_XSTRUCTURES_RELAXED_ONLY"))) {  //CO20171202 - let it decided whether to load from common or not
-                  entries[nary - 1].pop_back();
-                  total_count--;
+            //if(vpflow.flag("PFLOW::LOAD_ENTRIES_ENTRY_OUTPUT"))
+            vloadpaths.clear();
+            vloadpaths.push_back(calculation_path+"/"+calculations[j]);
+            if(load_from_common) {aurostd::SubDirectoryLS(calculation_path+"/"+calculations[j],vloadpaths);}
+            else {pflow::SubLayersRestAPILS(calculation_path+"/"+calculations[j],vloadpaths);}
+            if(LDEBUG){cerr << soliloquy << " vloadpaths=" << aurostd::joinWDelimiter(vloadpaths,",") << endl;}
+            if(vloadpaths.size()>1 && vloadpaths[1]=="<!DOCTYPE"){ //CO20180627
+              message << "REST-API appears to be down";
+              pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+              return false;
+            }
+            for(uint k=0;k<vloadpaths.size();k++){
+              const string& load_path=vloadpaths[k];
+              message << "Loading " << (load_from_common ? "path" : "url") << "=" << load_path;
+              pflow::logger(_AFLOW_FILE_NAME_, std::string("aurostd::") + std::string((load_from_common ? "file" : "url")) + std::string("2string():"), message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_,!vpflow.flag("PFLOW::LOAD_ENTRIES_ENTRY_OUTPUT")); //print to log anyway
+              //complicated ternary operator, returns bool, but necessary to avoid double code
+              if(
+                  (load_from_common)
+                  ?
+                  //if load_from_common, check this bool
+                  //this part of the ternary operator will first look for a non-empty aflowlib.out, 
+                  //then try to load it
+                  //the last part checks that the loaded entry has a set of species that belong to the original query (protection)
+                  (
+                   //(aurostd::FileExist(load_path+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) &&
+                   (aurostd::FileNotEmpty(load_path+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) &&
+                   (_aflowlib_tmp.file2aflowlib(load_path+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT, message) > 0) &&
+                   (double_check_lib ? compoundsBelong(velements, _aflowlib_tmp.vspecies, FileMESSAGE, oss, vpflow.flag("PFLOW::LOAD_ENTRIES_NON_ALPHABETICAL")) : true)  //sometimes we find odd entries in the wrong LIBS, better to be safe
+                  )
+                  :
+                  //if load_from_api, check this bool
+                  //this part of the ternary operator loads in the url
+                  //the last part checks that the loaded entry has a set of species that belong to the original query (protection)
+                  (
+                   (_aflowlib_tmp.url2aflowlib(load_path, message, false) > 0) &&
+                   (double_check_lib ? compoundsBelong(velements, _aflowlib_tmp.vspecies, FileMESSAGE, oss, vpflow.flag("PFLOW::LOAD_ENTRIES_NON_ALPHABETICAL")) : true)  //sometimes we find odd entries in the wrong LIBS, better to be safe
+                  )) {
+                nary = _aflowlib_tmp.vspecies.size();
+                if(entries.size() < nary) { continue; }  //this entry is garbage (wrong directory)
+                entries[nary - 1].push_back(_aflowlib_tmp);
+                total_count++;
+                if(vpflow.flag("PFLOW::LOAD_ENTRIES_LOAD_XSTRUCTURES")) {
+                  if(!loadXstructures(entries[nary - 1].back(),FileMESSAGE,oss,vpflow.flag("PFLOW::LOAD_ENTRIES_LOAD_XSTRUCTURES_RELAXED_ONLY"))) {  //CO20171202 - let it decided whether to load from common or not
+                    entries[nary - 1].pop_back();
+                    total_count--;
+                  }
                 }
               }
+              message.str("");
             }
-            message.str("");
           }
         }
       }
@@ -9743,20 +9735,20 @@ namespace pflow {
   // sorting is generally NOT preferred as it would match unsorted compounds from database (NOT good)
 
   // vector
-  bool compoundsBelong(const vector<string>& velements2check, const string& input, ostream& oss, bool clean, bool sort_elements, compound_designation c_desig, bool shortcut_pp_string_AFLOW_database) {
+  bool compoundsBelong(const vector<string>& velements2check, const string& input, ostream& oss, bool clean, bool sort_elements, elements_string_type e_str_type, bool shortcut_pp_string_AFLOW_database) {
     ofstream FileMESSAGE;
-    return compoundsBelong(velements2check,input,FileMESSAGE,oss,clean,sort_elements,c_desig,shortcut_pp_string_AFLOW_database); }
-  bool compoundsBelong(const vector<string>& velements2check, const string& input, vector<string>& input_velements, vector<double>& input_vcomposition, ostream& oss, bool clean, bool sort_elements, compound_designation c_desig, bool shortcut_pp_string_AFLOW_database) {
+    return compoundsBelong(velements2check,input,FileMESSAGE,oss,clean,sort_elements,e_str_type,shortcut_pp_string_AFLOW_database); }
+  bool compoundsBelong(const vector<string>& velements2check, const string& input, vector<string>& input_velements, vector<double>& input_vcomposition, ostream& oss, bool clean, bool sort_elements, elements_string_type e_str_type, bool shortcut_pp_string_AFLOW_database) {
     ofstream FileMESSAGE;
-    return compoundsBelong(velements2check,input,input_velements,input_vcomposition,FileMESSAGE,oss,clean,sort_elements,c_desig,shortcut_pp_string_AFLOW_database);}
-  bool compoundsBelong(const vector<string>& velements2check, const string& input, ofstream& FileMESSAGE, ostream& oss, bool clean, bool sort_elements, compound_designation c_desig, bool shortcut_pp_string_AFLOW_database) {
+    return compoundsBelong(velements2check,input,input_velements,input_vcomposition,FileMESSAGE,oss,clean,sort_elements,e_str_type,shortcut_pp_string_AFLOW_database);}
+  bool compoundsBelong(const vector<string>& velements2check, const string& input, ofstream& FileMESSAGE, ostream& oss, bool clean, bool sort_elements, elements_string_type e_str_type, bool shortcut_pp_string_AFLOW_database) {
     vector<string> input_velements;
     vector<double> input_vcomposition;
-    return compoundsBelong(velements2check,input,input_velements,input_vcomposition,FileMESSAGE,oss,clean,sort_elements,c_desig,shortcut_pp_string_AFLOW_database);}
-  bool compoundsBelong(const vector<string>& velements2check, const string& input, vector<string>& input_velements, vector<double>& input_vcomposition, ofstream& FileMESSAGE, ostream& oss, bool clean, bool sort_elements, compound_designation c_desig, bool shortcut_pp_string_AFLOW_database) {
+    return compoundsBelong(velements2check,input,input_velements,input_vcomposition,FileMESSAGE,oss,clean,sort_elements,e_str_type,shortcut_pp_string_AFLOW_database);}
+  bool compoundsBelong(const vector<string>& velements2check, const string& input, vector<string>& input_velements, vector<double>& input_vcomposition, ofstream& FileMESSAGE, ostream& oss, bool clean, bool sort_elements, elements_string_type e_str_type, bool shortcut_pp_string_AFLOW_database) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy = XPID + "pflow::compoundsBelong():";
-    if(c_desig==pp_string && shortcut_pp_string_AFLOW_database==true){
+    if(e_str_type==pp_string && shortcut_pp_string_AFLOW_database==true){
       //pp_string parsing is slow because of LONG list of strings to substitute in VASP_PseudoPotential_CleanName()
       //instead, we are safe with faster composition_string parsing IFF we only remove _GW, which will confuse elementsFromCompositionString()
       //all other characters are eliminated because we only look for A-Z a-z from substrings created from capital letters
@@ -9765,10 +9757,10 @@ namespace pflow {
       //compoundsBelong is only used for loadEntries() (as of 20190712)
       string input_new=input;
       //aurostd::RemoveSubStringInPlace(input_new,"_GW");  //CO20190712
-      KBIN::VASP_PseudoPotential_CleanName_InPlace(input_new,true); //capital_letters_only==true
-      input_velements = stringElements2VectorElements(input_new, input_vcomposition, FileMESSAGE, clean, sort_elements, composition_string, false, oss); //use composition_string (FASTER) //do not keep_pp
+      aurostd::VASP_PseudoPotential_CleanName_InPlace(input_new,true); //capital_letters_only==true
+      input_velements = aurostd::getElements(input_new, input_vcomposition, composition_string, FileMESSAGE, clean, sort_elements, false, oss); //use composition_string (FASTER) //do not keep_pp
     }else{  //default
-      input_velements = stringElements2VectorElements(input, input_vcomposition, FileMESSAGE, clean, sort_elements, c_desig, false, oss); //do not keep_pp
+      input_velements = aurostd::getElements(input, input_vcomposition, e_str_type, FileMESSAGE, clean, sort_elements, false, oss); //do not keep_pp
     }
     if(LDEBUG) {cerr << soliloquy << " input=\"" << input << "\", elements=" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(input_velements,"\""),",") << endl;}
     return compoundsBelong(velements2check, input_velements, FileMESSAGE, oss, false); //already sorted
@@ -9982,284 +9974,6 @@ namespace pflow {
   }
 }  // namespace pflow
 
-// functions for making input alphabetic
-namespace pflow {
-  vector<string> getElements(const string& input){ //CO20190712 //borrowed from XATOM_SplitAlloySpecies() //slow since we create many strings, but definitely works
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy = XPID + "pflow::getElements():";
-    if(LDEBUG){cerr << soliloquy << " original input=\"" << input << "\"" << endl;}
-    string alloy=input;
-    //[CO20190712 - no need for multiple passes anymore]for(uint i=1;i<=2;i++){alloy=KBIN::VASP_PseudoPotential_CleanName(alloy);} //be certain you clean everything, especially _GW (worst offender)
-    KBIN::VASP_PseudoPotential_CleanName_InPlace(alloy); //be certain you clean everything, especially _GW (worst offender)
-    aurostd::RemoveNumbersInPlace(alloy);              // remove composition
-    if(LDEBUG){cerr << soliloquy << " cleaned input=\"" << alloy << "\"" << endl;}
-    vector<string> vspecies;
-    for(uint i=0;i<alloy.length();i++) {
-      if(alloy[i]>='A' && alloy[i]<='Z') vspecies.push_back("");
-      vspecies.back()+=alloy[i];
-    }
-    if(LDEBUG){cerr << soliloquy << " vspecies pre ASCII clean=" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(vspecies,"\""),",") << endl;}
-    for(uint i=0;i<vspecies.size();i++){aurostd::CleanStringASCII_InPlace(vspecies[i]);}
-    if(LDEBUG){cerr << soliloquy << " vspecies post ASCII clean=" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(vspecies,"\""),",") << endl;}
-    return vspecies;
-  }
-  //use only as a supplement for stringElements2VectorElements(), do NOT use outside
-  //this assumes a very simple Mn2Pd5, non-stoich is ok (e.g., Mn2.5Pd5)
-  //no pseudo potential specification
-  //no junk at the end (_ICSD_, :LDAU2, :PAW_PBE, .OLD, etc.), pre-process before
-  //this is FASTER than getElements(), but not as robust for general input (specialized)
-  void elementsFromCompositionString(const string& input,vector<string>& velements){vector<double> vcomposition;return elementsFromCompositionString(input,velements,vcomposition);}  //CO20190712
-  void elementsFromCompositionString(const string& input,vector<string>& velements,vector<double>& vcomposition){ //CO20190712
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy = XPID + "pflow::getElementsFromCompositionString():";
-    velements.clear();
-    vcomposition.clear();  //ME20190628
-
-    //////////////////////////////////////////////////////////////////////////////
-    // START Checks for correct input by counting number of uppercase letters
-    //////////////////////////////////////////////////////////////////////////////
-
-    if(LDEBUG) {cerr << soliloquy << " original input=" << input << endl;}
-
-    //CO20180409 - running through input twice, no need, simply check at the end
-    //uint numberOfElements = 0;
-    //for (uint i = 0; i < input.size(); i++) {
-    //  if(isupper(input[i])) {
-    //    numberOfElements++;
-    //  }
-    //}
-    //if(numberOfElements == 0) {
-    //  pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "Elements must be properly capitalized", FileMESSAGE, oss, _LOGGER_ERROR_);
-    //  return velements;
-    //}
-
-    //////////////////////////////////////////////////////////////////////////////
-    // END Checks for correct input by counting number of uppercase letters
-    //////////////////////////////////////////////////////////////////////////////
-
-    //////////////////////////////////////////////////////////////////////////////
-    // START Parsing input
-    //////////////////////////////////////////////////////////////////////////////
-
-    //CO20180316 - fixed this function to be simpler, too complicated before
-    string auxstr;
-    for (uint i = 0; i < input.size(); i++) {
-      if(isupper(input[i])) {
-        auxstr.clear();
-        auxstr+=input[i++];
-        while (((i < input.size()) && (input[i]>='a' && input[i]<='z') )){auxstr+=input[i++];}
-        i--;  //very important since we increase at the top of the loop (equivalent to i+j-1)
-        //while (((i < input.size()) && isalpha(input[i]) && !isupper(input[i]))){auxstr+=input[i++];}
-        //while(!(clean && !isalpha(input[i]))) //(input[i]=='_' || input[i]==':' || input[i]=='.' || isdigit(input[i]))))
-        //isalpha() saves us from all issues with VASP_PseudoPotential_CleanName() except, e.g., potpaw_PBE/Na, we took care of that above
-        //if(clean)
-        //{ //CO20200106 - patching for auto-indenting
-        //  auxstr = KBIN::VASP_PseudoPotential_CleanName(auxstr);  //fix vasp pp
-        //  //CO20180409 - again, no need to run through essentially a third time, we already cut at these characters
-        //  //look for bad characters and cut the string
-        //  //for(uint j=1;j<auxstr.size();j++){
-        //  //  if(auxstr[j]=='_' || auxstr[j]==':' || isdigit(auxstr[j])){auxstr=auxstr.substr(0,j);break;}  //fix aflow stuff like ':'
-        //  //}
-        //}
-        if(LDEBUG) {cerr << soliloquy << " element found: " << auxstr << endl;}
-        velements.push_back(auxstr);
-        //ME20190628 - get composition, too
-      } else if ( (input[i]>='0' && input[i]<='9') || (input[i] == '.')) {  //CO20190712 - just in case we have H.25 (not good form but try to catch anyway, never produced by aflow automatically)
-        auxstr.clear();
-        auxstr += input[i++];
-        while ((i < input.size()) && ( (input[i]>='0' && input[i]<='9') || (input[i] == '.'))) {auxstr += input[i++];}
-        i--;
-        if (LDEBUG) {
-          std::cerr << soliloquy << " found element count: " << auxstr << " of element " << (velements.size() - 1) << ".";
-          if (vcomposition.size() != velements.size()) {
-            std::cerr << " Will add ones to elements " << vcomposition.size() << " to " << (velements.size() - 2) << ".";
-          }
-          std::cerr << std::endl;
-        }
-        // Add implicit ones
-        for (uint i = vcomposition.size(); i < velements.size() - 1; i++){vcomposition.push_back(1.0);}
-        vcomposition.push_back(aurostd::string2utype<double>(auxstr));
-      }
-    }
-    // Add implicit ones
-    for (uint i = vcomposition.size(); i < velements.size(); i++) vcomposition.push_back(1.0);
-  }
-
-  //use only as a supplement for stringElements2VectorElements(), do NOT use outside
-  //this assumes Mn_pvPt
-  //no composition information
-  //no junk at the end (_ICSD_, :LDAU2, :PAW_PBE, .OLD, etc.), pre-process before
-  void elementsFromPPString(const string& input,vector<string>& velements,bool keep_pp){ //CO20190712
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy = XPID + "pflow::getElementsFromPPString():";
-    velements=getElements(input);
-    if(LDEBUG){cerr << soliloquy << " velements=" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(velements,"\""),",") << endl;}
-    if(keep_pp==false){return;}
-
-    //copy info into vspecies and clear velements
-    vector<string> vspecies;
-    for(uint i=0;i<velements.size();i++){vspecies.push_back(velements[i]);}
-    velements.clear();
-
-    //simply parse string around these elements
-    string::size_type loc1=0,loc2=string::npos;
-    vector<string> vCAPITAL_LETTERS_PP;
-    aurostd::string2tokens(CAPITAL_LETTERS_PP_LIST,vCAPITAL_LETTERS_PP,",");
-    bool found_CAPITAL_LETTERS_PP=false;
-    bool found_CAPITAL_LETTERS=false;
-    for(uint i=0;i<vspecies.size();i++){
-      if((i+1)>=vspecies.size()){loc2=string::npos;}
-      else{loc2=input.find(vspecies[i+1],loc1);}
-      while(loc2!=string::npos){
-        found_CAPITAL_LETTERS_PP=false;
-        for(uint j=0;j<vCAPITAL_LETTERS_PP.size()&&found_CAPITAL_LETTERS_PP==false;j++){
-          if((loc2-(vCAPITAL_LETTERS_PP[j].size()-1))<input.size()){continue;}
-          found_CAPITAL_LETTERS=true;
-          for(uint k=0;k<vCAPITAL_LETTERS_PP[j].size()&&found_CAPITAL_LETTERS==true;k++){
-            if(input[loc2-k]!=vCAPITAL_LETTERS_PP[j][vCAPITAL_LETTERS_PP[j].size()-k-1]){found_CAPITAL_LETTERS=false;}
-          }
-          if(found_CAPITAL_LETTERS){found_CAPITAL_LETTERS_PP=true;}
-        }
-        if(found_CAPITAL_LETTERS_PP==false){break;}
-        //[OBSOLETE] Do not pick W from _GW (tungsten)
-        //[OBSOLETE]if (!( (loc2-2)<input.size() && (input[loc2] == 'W') && (input[loc2-1] == 'G') && (input[loc2-2] == '_') )){break;} //(loc2-2)<input.size() because loc2 is utype, it's always >0, loc2-2 can wrap around to a big number though
-        loc2=input.find(vspecies[i],loc2+1);
-      }
-      if(LDEBUG){cerr << soliloquy << " loc1=" << loc1 << ", loc2=" << loc2 << endl;}
-      velements.push_back(input.substr(loc1,loc2-loc1));  //loc2-loc1 because it is the distance
-      loc1=loc2;
-    }
-
-    if(LDEBUG){cerr << soliloquy << " velements=" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(velements,"\""),",") << endl;}
-
-  }
-
-  // ***************************************************************************
-  // pflow::stringElements2VectorElements(string input,ostream&
-  // oss,ofstream& FileMESSAGE)
-  // ***************************************************************************
-  // returns UNSORTED vector<string> from string
-  vector<string> stringElements2VectorElements(const string& input,bool clean, bool sort_elements, compound_designation c_desig, bool keep_pp, ostream& oss) {  // overload
-    ofstream FileMESSAGE;
-    return stringElements2VectorElements(input, FileMESSAGE, clean, sort_elements, c_desig, keep_pp, oss);
-  }
-
-  //ME20190628 - added variant that also determines the composition
-  vector<string> stringElements2VectorElements(const string& input, vector<double>& vcomposition, bool clean, bool sort_elements, compound_designation c_desig, bool keep_pp, ostream& oss) {
-    ofstream FileMESSAGE;
-    return stringElements2VectorElements(input, vcomposition, FileMESSAGE, clean, sort_elements, c_desig, keep_pp, oss);
-  }
-
-  vector<string> stringElements2VectorElements(const string& input, ofstream& FileMESSAGE, bool clean, bool sort_elements, compound_designation c_desig, bool keep_pp, ostream& oss) {  // overload
-    vector<double> vcomposition;
-    return stringElements2VectorElements(input, vcomposition, FileMESSAGE, clean, sort_elements, c_desig, keep_pp, oss);
-  }
-
-  vector<string> stringElements2VectorElements(const string& _input, vector<double>& vcomposition,
-      ofstream& FileMESSAGE, bool clean, bool sort_elements, compound_designation c_desig, bool keep_pp, ostream& oss) { // main function
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy = XPID + "pflow::stringElements2VectorElements():";
-    vector<string> velements;
-    vcomposition.clear();  //ME20190628
-
-    //////////////////////////////////////////////////////////////////////////////
-    // START Checks for correct input by counting number of uppercase letters
-    //////////////////////////////////////////////////////////////////////////////
-
-    if(LDEBUG) {cerr << soliloquy << " original input=" << _input << endl;}
-
-    if(_input.empty()) {
-      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "Empty input", FileMESSAGE, oss, _LOGGER_ERROR_);
-      return velements;
-    }
-
-    string input=_input;
-
-    if(clean && (c_desig==composition_string || (c_desig==pp_string && keep_pp==false))){KBIN::VASP_PseudoPotential_CleanName_InPlace(input);}  //in case we run into potpaw_PBE/Na, but only works for single elements, must be before check for isupper(input[0])
-
-    if(!isupper(input[0])) {
-      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "Elements must be properly capitalized (input="+input+")", FileMESSAGE, oss, _LOGGER_ERROR_);
-      return velements;
-    }
-
-    //we have a LIB1 problem... grab first everything before :
-    //this is safe, as aflow generally introduces : in prototype, e.g., :LDAU2
-    //this is safe anyway because elements would be BEFORE :
-    if(clean){
-      //FAST
-      string::size_type loc;
-      //:
-      loc=input.find(':');input=input.substr(0,loc);
-      //_ICSD_
-      loc=input.find("_ICSD_");input=input.substr(0,loc);
-      //SLOW
-      //vector<string> tokens;
-      //aurostd::string2tokens(input,tokens,":");
-      //input=tokens[0];
-    }
-
-    if(LDEBUG) {cerr << soliloquy << " checking input=" << input << endl;}
-
-    //CO20180409 - running through input twice, no need, simply check at the end
-    //uint numberOfElements = 0;
-    //for (uint i = 0; i < input.size(); i++) {
-    //  if(isupper(input[i])) {
-    //    numberOfElements++;
-    //  }
-    //}
-    //if(numberOfElements == 0) {
-    //  pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "Elements must be properly capitalized", FileMESSAGE, oss, _LOGGER_ERROR_);
-    //  return velements;
-    //}
-
-    //////////////////////////////////////////////////////////////////////////////
-    // END Checks for correct input by counting number of uppercase letters
-    //////////////////////////////////////////////////////////////////////////////
-
-    //////////////////////////////////////////////////////////////////////////////
-    // START Parsing input
-    //////////////////////////////////////////////////////////////////////////////
-
-    if(c_desig==composition_string){elementsFromCompositionString(input,velements,vcomposition);}
-    else if(c_desig==pp_string){elementsFromPPString(input,velements,keep_pp);}
-    else{
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown compound designation",_INPUT_ILLEGAL_);
-    }
-
-    if(clean){
-      for(uint i=0;i<velements.size();i++){aurostd::CleanStringASCII_InPlace(velements[i]);}  //CO20190712 - extra cleaning from XATOM_SplitAlloySpecies
-    }
-
-    // Add implicit ones
-    for (uint i = vcomposition.size(); i < velements.size(); i++) vcomposition.push_back(1.0);
-
-    //////////////////////////////////////////////////////////////////////////////
-    // END Parsing input
-    //////////////////////////////////////////////////////////////////////////////
-
-    if(velements.size()==0){pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "No elements found", FileMESSAGE, oss, _LOGGER_ERROR_);}
-
-    if(sort_elements && velements.size()>1){
-      string etmp="";
-      double ctmp=0.0;
-      for(uint i=0;i<velements.size()-1;i++){
-        for(uint j=i+1;j<velements.size();j++){
-          if(velements[i]>velements[j]){
-            etmp=velements[j];  //fix old j
-            velements[j]=velements[i];  //swap
-            velements[i]=etmp;  //set i to old j
-            ctmp=vcomposition[j]; //fix old j
-            vcomposition[j]=vcomposition[i];  //swap
-            vcomposition[i]=ctmp; //set i to old j
-          }
-        }
-      }
-    }
-
-    return velements;
-  }
-}  // namespace pflow
-
 //[CO20190712 - OBSOLETE]namespace pflow {
 //[CO20190712 - OBSOLETE]  // ***************************************************************************
 //[CO20190712 - OBSOLETE]  // pflow::getAlphabeticVectorString(string input,ostream& oss,ofstream&
@@ -10274,7 +9988,7 @@ namespace pflow {
 //[CO20190712 - OBSOLETE]  vector<string> getAlphabeticVectorString(const string& input,
 //[CO20190712 - OBSOLETE]				      ofstream& FileMESSAGE, ostream& oss) {  // main function
 //[CO20190712 - OBSOLETE]    string soliloquy = XPID + "pflow::getAlphabeticVectorString():";
-//[CO20190712 - OBSOLETE]    vector<string> velements = stringElements2VectorElements(input, FileMESSAGE, oss);
+//[CO20190712 - OBSOLETE]    vector<string> velements = aurostd::getElements(input, FileMESSAGE, oss);
 //[CO20190712 - OBSOLETE]    sort(velements.begin(), velements.end());  // quicksort is much faster than insertion sort
 //[CO20190712 - OBSOLETE]    return velements;
 //[CO20190712 - OBSOLETE]  }
@@ -10291,7 +10005,7 @@ namespace pflow {
 //[CO20190712 - OBSOLETE]			      ofstream& FileMESSAGE, ostream& oss) {  // main function
 //[CO20190712 - OBSOLETE]    string soliloquy = XPID + "pflow::getAlphabeticString():";
 //[CO20190712 - OBSOLETE]    stringstream message;
-//[CO20190712 - OBSOLETE]    vector<string> velements = stringElements2VectorElements(input, FileMESSAGE, oss);
+//[CO20190712 - OBSOLETE]    vector<string> velements = aurostd::getElements(input, FileMESSAGE, oss);
 //[CO20190712 - OBSOLETE]    sort(velements.begin(), velements.end());  // quicksort is much faster than insertion sort
 //[CO20190712 - OBSOLETE]    return auorstd::joinWDelimiter(velements,"");
 //[CO20190712 - OBSOLETE]  }
@@ -10350,7 +10064,7 @@ namespace pflow {
       if(input == "A") {
         //get appropriate size, slightly inefficient (as we got this before), but it's cheap
         //string system = vpflow.getattachedscheme("PFLOW::ALLOY");  //CO20170908 - don't want to have to set this everytime
-        //vector<string> velements = pflow::stringElements2VectorElements(system, oss, FileMESSAGE);  //un-sorted, okay
+        //vector<string> velements = aurostd::getElements(system, oss, FileMESSAGE);  //un-sorted, okay
         string lib_count_string,load_lib_flag_name;
         //for (uint i = 0; i < velements.size() && i <= _AFLOW_LIB_MAX_; i++) //CO20170908 - simply load all, LoadEntries() limits appropriately by velements.size()
         for (uint lib = 1; lib <= _AFLOW_LIB_MAX_; lib++)
@@ -10521,7 +10235,8 @@ namespace pflow {
     }
     if(message_parts.size()==0){return;}
 
-    string soliloquy=aurostd::RemoveWhiteSpaces(function_name);
+    string soliloquy=function_name; // aurostd::RemoveWhiteSpaces(function_name);
+    
     string tag_code="00000";
     string tag_message="MESSAGE";
     if (type == _LOGGER_ERROR_) {
@@ -10543,7 +10258,7 @@ namespace pflow {
       tag_code="00000";
       tag_message="NOTICE";
     }
-      
+
     ostringstream stream;
     if(type == _LOGGER_RAW_) {
       for(uint i=0;i<message_parts.size();i++){stream << message_parts[i] << endl;} //CO20181226 //message;
@@ -11291,7 +11006,7 @@ namespace pflow {
       Platon_d2=aurostd::string2utype<double>(tokens.at(tokens.size()-2));
       Platon_d3=aurostd::string2utype<double>(tokens.at(tokens.size()-1));
     }
-    a.FakeNames();
+    a.DecorateWithElements(); //DX20200727 - FakeNames() -> DecorateWithElements();
     return a.platon2print(Platon_EQUAL,Platon_EXACT,Platon_ang,Platon_d1,Platon_d2,Platon_d3);
     // aflow --platon [EQUAL] [EXACT] [ang d1 d2 d3]
     // CALC ADDSYM (EQUAL) (EXACT) (ang d1 d2 d3)
@@ -12587,7 +12302,7 @@ namespace pflow {
             "                --list",
             "                --params=....  { check aflow --readme=anrl }",
             "                --hex          { check aflow --readme=anrl }"));
-        return true;  //CO20200624 - the option was expressed successfully
+      return true;  //CO20200624 - the option was expressed successfully
     }
     if(LDEBUG) cerr << soliloquy << " vpflow.getattachedscheme(\"PROTO_AFLOW::USAGE\")=" << vpflow.flag("PROTO_AFLOW::USAGE") << endl;
 
@@ -13062,12 +12777,114 @@ namespace pflow {
   }
 } // namespace pflow
 
+namespace pflow {
+  vector<string> GENERATE_CERAMICS(const vector<string>& _vnonmetals,const vector<string>& _vmetals,uint metal_arity){ //CO20200731
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy=XPID+"pflow::GENERATE_CERAMICS():";
+    if(LDEBUG){
+      cerr << soliloquy << " nonmetals=" << aurostd::joinWDelimiter(_vnonmetals,",") << endl;
+      cerr << soliloquy << " metals=" << aurostd::joinWDelimiter(_vmetals,",") << endl;
+      cerr << soliloquy << " metal_arity=" << metal_arity << endl;
+    }
+    if(_vnonmetals.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"vnonmetals.size()==0",_INPUT_MISSING_);} //CO20200624
+    if(_vmetals.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"vmetals.size()==0",_INPUT_MISSING_);} //CO20200624
+    vector<string> vnonmetals(_vnonmetals),vmetals(_vmetals);
+    std::sort(vnonmetals.begin(),vnonmetals.end()); //SORT FIRST
+    std::sort(vmetals.begin(),vmetals.end()); //SORT FIRST
+
+    uint i=0,j=0;
+
+    //get vmix
+    vector<string> vmix=vnonmetals;vmix.insert(vmix.end(),vmetals.begin(),vmetals.end());
+    std::sort(vmix.begin(),vmix.end());
+
+    //get vind_nm
+    vector<uint> vind_nm;
+    if(LDEBUG){cerr << soliloquy << " vmix=" << aurostd::joinWDelimiter(vmix,",") << endl;}
+    std::vector<string>::iterator it;
+    for(i=0;i<vnonmetals.size();i++){
+      it=std::find(vmix.begin(),vmix.end(),vnonmetals[i]);
+      vind_nm.push_back(it-vmix.begin());
+    }
+    if(LDEBUG){cerr << soliloquy << " vind_nm=" << aurostd::joinWDelimiter(vind_nm,",") << endl;}
+
+    //get vvinbetween
+    vector<vector<string> > vvinbetween;vvinbetween.resize(vnonmetals.size()+1);  //pre==vvinbetween[0], post==vvinbetween[-1]
+    for(i=0,j=0;i<vmix.size();i++){
+      if(aurostd::WithinList(vind_nm,i)){j++;continue;}
+      vvinbetween[j].push_back(vmix[i]);
+    }
+    if(LDEBUG){
+      for(i=0;i<vvinbetween.size();i++){
+        cerr << soliloquy << " vvinbetween[i=" << i << "]=" << aurostd::joinWDelimiter(vvinbetween[i],",") << endl;
+      }
+    }
+    //get vNinbetween
+    vector<uint> vNinbetween;vNinbetween.assign(vvinbetween.size(),0); //assign all 0
+    uint sum_species=0; //colons
+    //think of it as drops of water into separate cups, start with first and fill until you have no more water
+    sum_species=0;
+    for(i=0;i<vvinbetween.size()&&sum_species<metal_arity;i++){
+      for(j=0;j<vvinbetween[i].size()&&sum_species<metal_arity;j++){vNinbetween[i]++;sum_species++;}
+    }
+    if(LDEBUG){cerr << soliloquy << " vNinbetween=" << aurostd::joinWDelimiter(vNinbetween,",") << endl;}
+
+    //get vNinbetween_std
+    vector<uint> vNinbetween_std;vNinbetween_std.assign(vNinbetween.size(),0);vNinbetween_std.back()=metal_arity;
+
+    uint k=0; //index of nonmetals
+    vector<string> vcommands,vtmp;
+    string command="",tmp;
+    while(vcommands.size()<1e4){  //not simple as number of combinations since we could have 2 or more nonmetals
+      command="";
+
+      for(i=0,k=0;i<vNinbetween.size();i++){
+        tmp=aurostd::joinWDelimiter(vvinbetween[i],",");
+        vtmp.clear();
+        if(vNinbetween[i]>0){
+          if(!command.empty()){command+=":";}
+          for(j=0;j<vNinbetween[i];j++){vtmp.push_back(tmp);}
+          command+=aurostd::joinWDelimiter(vtmp,":");
+        }
+        if(k<vnonmetals.size()){
+          if(!command.empty()){command+=":";}
+          command+=vnonmetals[k++];
+        }
+      }
+
+      if(LDEBUG){cerr << soliloquy << " command=" << command << endl;}
+      vcommands.push_back(command);
+      if(vNinbetween==vNinbetween_std){break;}
+
+      //adjust vNinbetween
+      for(i=0;i<vNinbetween.size()-1;i++){
+        if(vNinbetween[i]==0){continue;}
+        vNinbetween[i]--;
+        vNinbetween[i+1]++;
+      }
+      if(LDEBUG){cerr << soliloquy << " vNinbetween=" << aurostd::joinWDelimiter(vNinbetween,",") << endl;}
+    }
+
+    return vcommands;
+  }
+  vector<string> GENERATE_CERAMICS(const aurostd::xoption& vpflow){ //CO20200731
+    vector<string> vnonmetals,vmetals;
+    string nonmetals=vpflow.getattachedscheme("GENERATE_CERAMICS::NON_METALS");aurostd::string2tokens(nonmetals,vnonmetals,",");
+    string metals=vpflow.getattachedscheme("GENERATE_CERAMICS::METALS");aurostd::string2tokens(metals,vmetals,",");
+    int metal_arity=vpflow.getattachedutype<uint>("GENERATE_CERAMICS::METAL_ARITY");
+    return GENERATE_CERAMICS(vnonmetals,vmetals,metal_arity);
+  }
+  string GENERATE_CERAMICS_PRINT(const aurostd::xoption& vpflow){ //CO20200731
+    return aurostd::joinWDelimiter(GENERATE_CERAMICS(vpflow),"\n");
+  }
+} // namespace pflow
+
 // ***************************************************************************
 // pflow::PSEUDOPOTENTIALS_CHECK
 // ***************************************************************************
 
 namespace pflow {
-  bool PSEUDOPOTENTIALS_CHECK(aurostd::xoption vpflow,string file,ostream& oss) { // too many options
+  bool PSEUDOPOTENTIALS_CHECK(const aurostd::xoption& vpflow,const string& file,ostream& oss) { // too many options
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy = XPID + "pflow::PSEUDOPOTENTIALS_CHECK():";
     if(LDEBUG) cerr << soliloquy << " BEGIN" << endl; 
@@ -13082,7 +12899,7 @@ namespace pflow {
       return true;  //CO20200624 - the option was expressed successfully
     }
     if(LDEBUG) cerr << soliloquy << " vpflow.getattachedscheme(\"PSEUDOPOTENTIALS_CHECK::USAGE\")=" << vpflow.flag("PSEUDOPOTENTIALS_CHECK::USAGE") << endl;
-    //if(LDEBUG) cerr << soliloquy << " file=" << file << endl;
+    if(LDEBUG) cerr << soliloquy << " file=" << file << endl;
     // now start
     if(aurostd::substring2bool(file,"POTCAR")) {
       XHOST.DEBUG=FALSE;
@@ -13788,36 +13605,46 @@ namespace pflow {
       //DX [OBSOLETE] 20170921 -  }
       //DX [OBSOLETE] 20170921 -}
       //DX END
-      double default_tolerance=SYM::defaultTolerance(a);
-      double tolerance = AUROSTD_NAN;
-      if(vpflow.flag("SG::TOLERANCE")){
-        string tolerance_string = vpflow.getattachedscheme("SG::TOLERANCE");
-        if(aurostd::toupper(tolerance_string[0]) == 'T'){ //Tight
-          tolerance=default_tolerance;
-        }
-        else if(aurostd::toupper(tolerance_string[0]) == 'L'){ //Loose
-          tolerance=default_tolerance*10.0;
-        }
-        else {
-          tolerance=aurostd::string2utype<double>(vpflow.getattachedscheme("SG::TOLERANCE"));
-        }
+
+      // get tolerance
+      double tolerance = pflow::getSymmetryTolerance(a,vpflow.getattachedscheme("SG::TOLERANCE")); //DX20200820 - consolidated setting tolerance into a function
+
+      bool tolerance_spectrum_analysis = false;
+      vector<double> tolerance_spectrum;
+      //DX20200817 - SPACEGROUP SPECTRUM - START
+      if(vpflow.flag("SG::TOLERANCE_SPECTRUM")){
+        tolerance_spectrum_analysis = true;
+        tolerance_spectrum = pflow::getSymmetryToleranceSpectrum(vpflow.getattachedscheme("SG::TOLERANCE_SPECTRUM"));
       }
-      else {
-        tolerance = default_tolerance;
+      else if(vpflow.flag("SG::TOLERANCE") && vpflow.flag("SG::TOLERANCE_SPECTRUM")){
+        message << "pflow::SG::ERROR: Cannot specify a single tolerance value and perform the tolerance spectrum at the same time. Please choose one or the other."; 
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,flag_name,message,_INPUT_ILLEGAL_);
       }
-      if(tolerance < 1e-10){
-        message << "pflow::SG::ERROR: Tolerance cannot be zero (i.e. less than 1e-10).";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,flag_name,message,_VALUE_RANGE_); //DX20200103 - return to xerror
-      }
+      //DX20200817 - SPACEGROUP SPECTRUM - END
       //DX20170926 - NO SCAN - START
       bool no_scan = false;
       if(vpflow.flag("SG::NO_SCAN")){
         no_scan = true;
       }
       //DX20170926 - NO SCAN - END
-      uint sgroup=a.SpaceGroup_ITC(tolerance,no_scan);
-      // [OBSOLETE] uint sgroup=a.SpaceGroup_ITC(false,argv);    
-      a.spacegroup=GetSpaceGroupName(sgroup,a.directory)+" #"+aurostd::utype2string(sgroup); //DX20190319 - put directory name
+      if(!tolerance_spectrum_analysis){
+        uint sgroup=a.SpaceGroup_ITC(tolerance,no_scan);
+        a.spacegroup=GetSpaceGroupName(sgroup,a.directory)+" #"+aurostd::utype2string(sgroup); //DX20190319 - put directory name
+      }
+      else{
+        // perform space group analysis through a range of tolerances //DX20200820
+        for(uint i=0;i<tolerance_spectrum.size();i++){
+          uint sgroup=a.SpaceGroup_ITC(tolerance_spectrum[i],no_scan);
+          try{
+            GetSpaceGroupName(sgroup,a.directory);
+            cout << "tol=" << tolerance_spectrum[i] << ": " << GetSpaceGroupName(sgroup,a.directory) << " #" << aurostd::utype2string(sgroup) << endl;
+          }
+          catch(aurostd::xerror& excpt) {
+            cout << "tol=" << tolerance_spectrum[i] << ": -" << endl;
+          }
+        }
+        return "";
+      }
       // [OBSOLETE] a.spacegroup=GetSpaceGroupName(a.SpaceGroup_ITC(false,argv))+" #"+aurostd::utype2string(a.SpaceGroup_ITC(false,argv)); //RHT
       //  return a.spacegroup; //RHT
     }
@@ -14017,27 +13844,9 @@ namespace pflow {
     } 
     //DX20170921 - MAGNETIC SYMMETRY - END
 
-    double default_tolerance=SYM::defaultTolerance(a);
-    double tolerance = AUROSTD_NAN;
-    if(vpflow.flag("SGDATA::TOLERANCE")){
-      string tolerance_string = vpflow.getattachedscheme("SGDATA::TOLERANCE");
-      if(aurostd::toupper(tolerance_string[0]) == 'T'){ //Tight
-        tolerance=default_tolerance;
-      }
-      else if(aurostd::toupper(tolerance_string[0]) == 'L'){ //Loose
-        tolerance=default_tolerance*10.0;
-      }
-      else {
-        tolerance=aurostd::string2utype<double>(vpflow.getattachedscheme("SGDATA::TOLERANCE"));
-      }
-    }
-    else {
-      tolerance = default_tolerance;
-    }
-    if(tolerance < 1e-10){
-      cerr << XPID << "pflow::SGDATA::ERROR: Tolerance cannot be zero (i.e. less than 1e-10) " << print_directory << "." << endl;
-      return 0;
-    }
+    // get tolerance
+    double tolerance = pflow::getSymmetryTolerance(a,vpflow.getattachedscheme("SGDATA::TOLERANCE")); //DX20200820 - consolidated setting tolerance into a function
+
     //DX20180806 - added setting - START
     int setting = 0;
     if(vpflow.flag("SGDATA::SETTING")){
@@ -14371,27 +14180,7 @@ namespace pflow {
     str.ReScale(1.0);
 
     // get tolerance
-    double default_tolerance=SYM::defaultTolerance(str);
-    double tolerance = AUROSTD_NAN;
-    if(vpflow.flag("WYCCAR::TOLERANCE")){
-      string tolerance_string = vpflow.getattachedscheme("WYCCAR::TOLERANCE");
-      if(aurostd::toupper(tolerance_string[0]) == 'T'){ //Tight
-        tolerance=default_tolerance;
-      }
-      else if(aurostd::toupper(tolerance_string[0]) == 'L'){ //Loose
-        tolerance=default_tolerance*10.0;
-      }
-      else {
-        tolerance=aurostd::string2utype<double>(vpflow.getattachedscheme("WYCCAR::TOLERANCE"));
-      }
-    }
-    else {
-      tolerance = default_tolerance;
-    }
-    if(tolerance < 1e-10){
-      cerr << XPID << "pflow::WYCCAR::ERROR: Tolerance cannot be zero (i.e. less than 1e-10)." << endl;
-      return 0;
-    }
+    double tolerance = pflow::getSymmetryTolerance(str,vpflow.getattachedscheme("WYCCAR::TOLERANCE")); //DX20200820 - consolidated setting tolerance into a function
 
     // get setting
     int setting = 0;
@@ -15861,7 +15650,7 @@ void helpIndividualOption(vector<string> & argv) {
 namespace pflow {
   double GetAtomicPlaneDist(const string& options,istream & cin) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy=XPID+"pflow::GetAtom():";  //CO20200624
+    string soliloquy=XPID+"pflow::GetAtomicPlaneDist():";  //CO20200624
     if(LDEBUG) cerr << soliloquy << " BEGIN" << endl;
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");

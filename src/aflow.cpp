@@ -78,6 +78,59 @@ bool EntryLoaderTest(ofstream& FileMESSAGE,ostream& oss){  //CO20200520
   return true;
 }
 
+bool CeramGenTest(ostream& oss){ofstream FileMESSAGE;return CeramGenTest(FileMESSAGE,oss);}  //CO20190520
+bool CeramGenTest(ofstream& FileMESSAGE,ostream& oss){  //CO20190520
+  string soliloquy="CeramGenTest():";
+  //bool LDEBUG=TRUE; // TRUE;
+  stringstream message;
+  _aflags aflags;aflags.Directory=".";
+
+  message << "Performing ceramics generation test";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+
+  //./aflow --generate_ceramics --nm=N,C --m=Co,Mo,Fe,Ru,Ni,Rh,Pt,Cu,Cr,V --N=5
+  vector<string> vnonmetals,vmetals;
+  aurostd::string2tokens("N,C",vnonmetals,",");aurostd::string2tokens("Co,Mo,Fe,Ru,Ni,Rh,Pt,Cu,Cr,V",vmetals,",");
+
+  vector<string> commands=pflow::GENERATE_CERAMICS(vnonmetals,vmetals,5);
+  if(commands.size()!=6){
+    message << "commands.size()!=6";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
+    return false;
+  }
+  //C:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:N
+  //C:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:N:Ni,Pt,Rh,Ru,V
+  //C:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:N:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V
+  //C:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:N:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V
+  //C:Co,Cr,Cu,Fe,Mo:N:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V
+  //C:N:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V
+
+  if(!aurostd::WithinList(commands,"C:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:N")){
+    message << "C:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:N not found";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
+    return false;
+  }
+  if(!aurostd::WithinList(commands,"C:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:N:Ni,Pt,Rh,Ru,V")){
+    message << "C:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:N:Ni,Pt,Rh,Ru,V not found";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
+    return false;
+  }
+  if(!aurostd::WithinList(commands,"C:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:N:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V")){
+    message << "C:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:N:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V not found";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
+    return false;
+  }
+  if(!aurostd::WithinList(commands,"C:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:N:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V")){
+    message << "C:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:N:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V not found";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
+    return false;
+  }
+  if(!aurostd::WithinList(commands,"C:Co,Cr,Cu,Fe,Mo:N:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V")){
+    message << "C:Co,Cr,Cu,Fe,Mo:N:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V not found";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
+    return false;
+  }
+  if(!aurostd::WithinList(commands,"C:N:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V")){
+    message << "C:N:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V not found";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
+    return false;
+  }
+
+  message << "Ceramics generation test successful";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_COMPLETE_);
+  return true;
+}
 bool EgapTest(ostream& oss){ofstream FileMESSAGE;return EgapTest(FileMESSAGE,oss);}  //CO20190520
 bool EgapTest(ofstream& FileMESSAGE,ostream& oss){  //CO20190520
   string soliloquy="EgapTest():";
@@ -322,11 +375,61 @@ bool smithTest(ofstream& FileMESSAGE,ostream& oss){  //CO20190520
   return TRUE; //CO20180419
 }
 
+bool coordinationTest(ostream& oss){ofstream FileMESSAGE;return coordinationTest(FileMESSAGE,oss);}  //CO20190520
+bool coordinationTest(ofstream& FileMESSAGE,ostream& oss){  //CO20190520
+  string soliloquy=XPID+"coordinationTest():";
+  bool LDEBUG=TRUE; // TRUE;
+  stringstream message;
+  _aflags aflags;aflags.Directory=".";
+
+  xstructure str("aflowlib.duke.edu:AFLOWDATA/ICSD_WEB/FCC/Cl1Na1_ICSD_240599","CONTCAR.relax.vasp",IOAFLOW_AUTO);
+  deque<deque<uint> > coordinations;
+  str.GetCoordinations(coordinations);
+  if(coordinations.size()<2){
+    if(LDEBUG){cerr << soliloquy << " coordinations not found" << endl;}
+    return FALSE;
+  }
+  if(coordinations[0].size()<2){
+    if(LDEBUG){cerr << soliloquy << " coordinations[0] not found" << endl;}
+    return FALSE;
+  }
+  if(coordinations[1].size()<2){
+    if(LDEBUG){cerr << soliloquy << " coordinations[1] not found" << endl;}
+    return FALSE;
+  }
+  //first iatom
+  //first shell
+  if(coordinations[0][0]!=6){
+    if(LDEBUG){cerr << soliloquy << " coordinations[0][0]!=6 (==" << coordinations[0][0] << ")" << endl;}
+    return FALSE;
+  }
+  //second shell
+  if(coordinations[0][1]!=12){
+    if(LDEBUG){cerr << soliloquy << " coordinations[0][1]!=12 (==" << coordinations[0][1] << ")" << endl;}
+    return FALSE;
+  }
+  //second iatom
+  //first shell
+  if(coordinations[1][0]!=6){
+    if(LDEBUG){cerr << soliloquy << " coordinations[1][0]!=6 (==" << coordinations[1][0] << ")" << endl;}
+    return FALSE;
+  }
+  //second shell
+  if(coordinations[1][1]!=12){
+    if(LDEBUG){cerr << soliloquy << " coordinations[1][1]!=12 (==" << coordinations[1][1] << ")" << endl;}
+    return FALSE;
+  }
+
+  message << "coordination test successful";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_COMPLETE_);
+  return TRUE; //CO20180419
+}
+
 int main(int _argc,char **_argv) {
   string soliloquy = XPID + "main():"; //CO20180419
   ostream& oss=cout;  //CO20180419
   try{
     bool LDEBUG=FALSE; // TRUE;
+    int return_code = 0;  //ME20200901
     if(LDEBUG) cerr << "AFLOW-MAIN [1]" << endl;
     std::vector<string> argv(aurostd::get_arguments_from_input(_argc,_argv));
     if(LDEBUG) cerr << "AFLOW-MAIN [2]" << endl;
@@ -492,9 +595,11 @@ int main(int _argc,char **_argv) {
       return 0; //CO20180419
     }
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_EntryLoader|--EntryLoader_test")) {return (EntryLoaderTest()?0:1);}  //CO20190601
+    if(!Arun && aurostd::args2flag(argv,cmds,"--test_CeramGen|--CeramGen_test")) {return (CeramGenTest()?0:1);}  //CO20190601
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_Egap|--Egap_test")) {return (EgapTest()?0:1);}  //CO20190601
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_gcd|--gcd_test")) {return (gcdTest()?0:1);}  //CO20190601
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_smith|--smith_test")) {return (smithTest()?0:1);}  //CO20190601
+    if(!Arun && aurostd::args2flag(argv,cmds,"--test_coordination|--coordination_test")) {return (coordinationTest()?0:1);}  //CO20190601
     if(!Arun && aurostd::args2flag(argv,cmds,"--test")) {
 
       if(XHOST.vext.size()!=XHOST.vcat.size()) {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"XHOST.vext.size()!=XHOST.vcat.size(), aborting.",_RUNTIME_ERROR_);}
@@ -755,92 +860,81 @@ int main(int _argc,char **_argv) {
 
     // **************************************************************
     // INTERCEPT HELP
+    // ME20200921 - Restructured to make web processing easier
+    stringstream banner_message;
     if(XHOST.vflag_control.flag("AFLOW_HELP")) {
-      cout << aflow::Banner("BANNER_BIG") << endl << aflow::Intro_HELP("aflow") << aflow::Banner("BANNER_BIG") << endl;
-      return 0;} // << endl; //CO20180419
-    if(XHOST.vflag_control.flag("AFLOW_EXCEPTIONS")) {
-      cout << aflow::Banner("BANNER_BIG") << endl << aflow::Banner("EXCEPTIONS") << endl;
+      banner_message << aflow::Banner("BANNER_BIG") << endl << aflow::Intro_HELP("aflow") << aflow::Banner("BANNER_BIG") << endl;
+    } else if(XHOST.vflag_control.flag("AFLOW_EXCEPTIONS")) {
+      banner_message << aflow::Banner("BANNER_BIG") << endl << aflow::Banner("EXCEPTIONS") << endl;
+    } else if(XHOST.vflag_control.flag("README_AFLOW_LICENSE_GPL3")) {
+      banner_message << aflow::License_Preamble_aflow() << endl;
+      banner_message << " " << endl;
+      banner_message << init::InitGlobalObject("README_AFLOW_LICENSE_GPL3_TXT") << endl;
+      banner_message << " " << endl;
+      banner_message << "*************************************************************************** " << endl;
+    } else if(XHOST.vflag_control.flag("README_AFLOW"))  {
+      banner_message << init::InitGlobalObject("README_AFLOW_TXT") << endl;
+    } else if(XHOST.vflag_control.flag("README_AFLOW_VERSIONS_HISTORY"))  {
+      banner_message << init::InitGlobalObject("README_AFLOW_VERSIONS_HISTORY_TXT") << endl;
+    } else if(XHOST.vflag_control.flag("README_AFLOW_PFLOW"))  {
+      banner_message << init::InitGlobalObject("README_AFLOW_PFLOW_TXT") << endl;
+    } else if(XHOST.vflag_control.flag("README_FROZSL"))  {
+      banner_message << init::InitGlobalObject("README_AFLOW_FROZSL_TXT") << endl;
+    } else if(XHOST.vflag_control.flag("README_APL"))  {
+      banner_message << init::InitGlobalObject("README_AFLOW_APL_TXT") << endl;
+    } else if(XHOST.vflag_control.flag("README_QHA"))  {
+      banner_message << init::InitGlobalObject("README_AFLOW_QHA_SCQHA_QHA3P_TXT") << endl;
+    } else if(XHOST.vflag_control.flag("README_AAPL"))  {
+      banner_message << init::InitGlobalObject("README_AFLOW_APL_TXT") << endl;
+    } else if(XHOST.vflag_control.flag("README_AGL"))  {
+      banner_message << init::InitGlobalObject("README_AFLOW_AGL_TXT") << endl;
+    } else if(XHOST.vflag_control.flag("README_AEL"))  {
+      banner_message << init::InitGlobalObject("README_AFLOW_AEL_TXT") << endl;
+    } else if(XHOST.vflag_control.flag("README_ANRL"))  {
+      banner_message << init::InitGlobalObject("README_AFLOW_ANRL_TXT") << endl;
+    } else if(XHOST.vflag_control.flag("README_COMPARE"))  { //CO20190401
+      banner_message << init::InitGlobalObject("README_AFLOW_COMPARE_TXT") << endl; //CO20190401
+    } else if(XHOST.vflag_control.flag("README_GFA"))  {
+      banner_message << init::InitGlobalObject("README_AFLOW_GFA_TXT") << endl;
+    } else if(XHOST.vflag_control.flag("README_SYMMETRY"))  {
+      banner_message << init::InitGlobalObject("README_AFLOW_SYM_TXT") << endl;
+    } else if(XHOST.vflag_control.flag("README_CCE"))  {
+      banner_message << init::InitGlobalObject("README_AFLOW_CCE_TXT") << endl;
+    } else if(XHOST.vflag_control.flag("README_CHULL"))  {
+      banner_message << init::InitGlobalObject("README_AFLOW_CHULL_TXT") << endl;
+    } else if(XHOST.vflag_control.flag("README_PARTIAL_OCCUPATION")) {
+      banner_message << init::InitGlobalObject("README_AFLOW_POCC_TXT") << endl;
+    } else if(XHOST.vflag_control.flag("README_APENNSY"))  {
+      banner_message << init::InitGlobalObject("README_AFLOW_APENNSY_TXT") << endl;
+    } else if(XHOST.vflag_control.flag("README_SCRIPTING"))  {
+      banner_message << init::InitGlobalObject("README_AFLOW_SCRIPTING_TXT") << endl;
+    } else if(XHOST.vflag_control.flag("README_EXCEPTIONS"))  {
+      banner_message << init::InitGlobalObject("README_AFLOW_EXCEPTIONS_TXT") << endl;
+    } else if(XHOST.vflag_control.flag("README_XAFLOW"))  {
+      banner_message << init::InitGlobalObject("README_AFLOW_XAFLOW_TXT") << endl;
+    } else if(XHOST.vflag_control.flag("README_AFLOWRC"))  {
+      banner_message << init::InitGlobalObject("README_AFLOW_AFLOWRC_TXT") << endl;
+    }
+
+    if (!banner_message.str().empty()) {
+      std::cout << (XHOST.vflag_control.flag("WWW")?aurostd::text2html(banner_message.str()):banner_message.str()) << std::endl;
       return 0;
-    }  //ME20180531
-    if(XHOST.vflag_control.flag("README_AFLOW_LICENSE_GPL3"))  {
-      cout << aflow::License_Preamble_aflow() << endl;
-      cout << " " << endl;
-      cout << init::InitGlobalObject("README_AFLOW_LICENSE_GPL3_TXT") << endl;
-      cout << " " << endl;
-      cout << "*************************************************************************** " << endl;
-      return 0;} // << endl; //CO20180419
-    if(XHOST.vflag_control.flag("README_AFLOW"))  {
-      cout << init::InitGlobalObject("README_AFLOW_TXT") << endl;
-      return 0;} // << endl; //CO20180419
-    if(XHOST.vflag_control.flag("README_AFLOW_VERSIONS_HISTORY"))  {
-      cout << init::InitGlobalObject("README_AFLOW_VERSIONS_HISTORY_TXT") << endl;
-      return 0;} // << endl; //CO20180419
-    if(XHOST.vflag_control.flag("README_AFLOW_PFLOW"))  {
-      cout << init::InitGlobalObject("README_AFLOW_PFLOW_TXT") << endl;
-      return 0;} // << endl; //CO20180419
-    if(XHOST.vflag_control.flag("README_FROZSL"))  {
-      cout << init::InitGlobalObject("README_AFLOW_FROZSL_TXT") << endl;
-      return 0;} // << endl; //CO20180419
-    if(XHOST.vflag_control.flag("README_APL"))  {
-      cout << init::InitGlobalObject("README_AFLOW_APL_TXT") << endl;
-      return 0;} // << endl; //CO20180419
-    if(XHOST.vflag_control.flag("README_QHA"))  {
-      cout << init::InitGlobalObject("README_AFLOW_QHA_SCQHA_QHA3P_TXT") << endl;
-      return 0;} // << endl; //CO20180419
-    if(XHOST.vflag_control.flag("README_AAPL"))  {
-      cout << init::InitGlobalObject("README_AFLOW_APL_TXT") << endl;
-      return 0;} // << endl; //CO20180419
-    if(XHOST.vflag_control.flag("README_AGL"))  {
-      cout << init::InitGlobalObject("README_AFLOW_AGL_TXT") << endl;
-      return 0;} // << endl; //CO20180419
-    if(XHOST.vflag_control.flag("README_AEL"))  {
-      cout << init::InitGlobalObject("README_AFLOW_AEL_TXT") << endl;
-      return 0;} // << endl; //CO20180419
-    if(XHOST.vflag_control.flag("README_ANRL"))  {
-      cout << init::InitGlobalObject("README_AFLOW_ANRL_TXT") << endl;
-      return 0;} // << endl; //CO20180419
-    if(XHOST.vflag_control.flag("README_COMPARE"))  { //CO20190401
-      cout << init::InitGlobalObject("README_AFLOW_COMPARE_TXT") << endl; //CO20190401
-      return 0;} // << endl; //CO20190401
-    if(XHOST.vflag_control.flag("README_GFA"))  {
-      cout << init::InitGlobalObject("README_AFLOW_GFA_TXT") << endl;
-      return 0;} // << endl; //CO20180419
-    if(XHOST.vflag_control.flag("README_SYMMETRY"))  {
-      cout << init::InitGlobalObject("README_AFLOW_SYM_TXT") << endl;
-      return 0;} // << endl; //CO20180419
-    if(XHOST.vflag_control.flag("README_CCE"))  {
-      cout << init::InitGlobalObject("README_AFLOW_CCE_TXT") << endl;
-      return 0;} // << endl; //CO20180419
-    if(XHOST.vflag_control.flag("README_CHULL"))  {
-      cout << init::InitGlobalObject("README_AFLOW_CHULL_TXT") << endl;
-      return 0;} // << endl; //CO20180419
-    if(XHOST.vflag_control.flag("README_PARTIAL_OCCUPATION")) {
-      cout << init::InitGlobalObject("README_AFLOW_POCC_TXT") << endl;
-      return 0;} // << endl; //CO20180419
-    if(XHOST.vflag_control.flag("README_APENNSY"))  {
-      cout << init::InitGlobalObject("README_AFLOW_APENNSY_TXT") << endl;
-      return 0;} // << endl; //CO20180419
-    if(XHOST.vflag_control.flag("README_SCRIPTING"))  {
-      cout << init::InitGlobalObject("README_AFLOW_SCRIPTING_TXT") << endl;
-      return 0;} // << endl; //CO20180419
-    if(XHOST.vflag_control.flag("README_EXCEPTIONS"))  {
-      cout << init::InitGlobalObject("README_AFLOW_EXCEPTIONS_TXT") << endl;
-      return 0;}  //ME20180531
-    if(XHOST.vflag_control.flag("README_XAFLOW"))  {
-      cout << init::InitGlobalObject("README_AFLOW_XAFLOW_TXT") << endl;
-      return 0;} // << endl; //CO20180419
-    if(XHOST.vflag_control.flag("README_AFLOWRC"))  {
-      cout << init::InitGlobalObject("README_AFLOW_AFLOWRC_TXT") << endl;
-      return 0;} // << endl; //CO20180419
+    }
 
     // **************************************************************
     // PHP-WEB AND CURRICULUM AND HIGH-THROUGHPUT STUFF
-    ProcessPhpLatexCv();
+    if (ProcessPhpLatexCv()) return 0;
     //  ProcessSecurityOptions(argv,cmds); OLD STUFF AFLOW SECURITY
 
     // **************************************************************
     bool VVERSION=aurostd::args2flag(argv,cmds,"-v|--version");
-    if(!Arun && VVERSION)  {Arun=TRUE;cout << aflow::Banner("AFLOW_VERSION");return 0;} // look for version IMMEDIATELY //CO20180419
+    //ME20200921 - Added web mode
+    if(!Arun && VVERSION)  {
+      // look for version IMMEDIATELY //CO20180419
+      Arun=TRUE;
+      cout << (XHOST.vflag_control.flag("WWW")?aurostd::text2html(aflow::Banner("AFLOW_VERSION")):aflow::Banner("AFLOW_VERSION"));
+      return 0;
+    }
     if(!Arun && XHOST.TEST) { Arun=TRUE;cerr << "test" << endl;return 0;} //CO20180419
 
     // [OBSOLETE]  if(!Arun && (aurostd::substring2bool(XHOST.progname,"aflow1") || aurostd::substring2bool(XHOST.progname,"aflowd1"))) {
@@ -863,11 +957,12 @@ int main(int _argc,char **_argv) {
     // **************************************************************
     // LAST RESOURCE PFLOW
     if(!Arun) { 
-      Arun=TRUE;pflow::main(argv,cmds);
+      Arun=TRUE;
+      return_code = pflow::main(argv,cmds);   //ME20200901 - use pflow::main return code for database handling
     }
     // **************************************************************
     // END
-    return (Arun?0:1); //Arun==TRUE is 1, so flip because return 0 is normal  //CO20190629 - more explicit return 0
+    return (Arun?return_code:1); //Arun==TRUE is 1, so flip because return 0 is normal  //CO20190629 - more explicit return 0//ME20200901 - use return_code
   }
   //CO20180729 - OBSOLETE - use xerror
   //[OBSOLETE]catch(AFLOWRuntimeError& re){
@@ -1231,6 +1326,8 @@ namespace aflow {
       oss << "       43                              mismatch                           _INDEX_MISMATCH_          " << endl;
       oss << "       50       Runtime Error          generic                            _RUNTIME_ERROR_           " << endl;
       oss << "       51                              not initialized                    _RUNTIME_INIT_            " << endl;
+      oss << "       52                              SQL error                          _RUNTIME_SQL_             " << endl;
+      oss << "       53                              busy                               _RUNTIME_BUSY_            " << endl;
       oss << "       60       Allocation Error       generic                            _ALLOC_ERROR_             " << endl;
       oss << "       61                              could not allocate memory          _ALLOC_ALLOCATE_          " << endl;
       oss << "       62                              insufficient memory                _ALLOC_INSUFFICIENT_      " << endl;

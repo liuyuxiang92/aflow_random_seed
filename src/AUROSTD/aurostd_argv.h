@@ -31,7 +31,7 @@ namespace aurostd {
   template<class utype> xvector<utype> args2xvectorutype(const vector<string>& argv,const string&,int) __xprototype;
   template<class utype> vector<utype> args2vectorutype(const vector<string>& argv,const string&) __xprototype;
   template<class utype> deque<utype> args2dequeutype(const deque<string>& argv,const string&) __xprototype;
- // args2vectorstring
+  // args2vectorstring
   string args2string(const vector<string>& argv,const string&,const string&) __xprototype;
   string args2string(const vector<string>& argv,vector<string>&,const string&,const string&) __xprototype;
   // args2vectorstring
