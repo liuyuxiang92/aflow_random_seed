@@ -324,7 +324,7 @@ class XtalFinderCalculator : public xStream {
     // ---------------------------------------------------------------------------
     // check for better structure matches 
     vector<StructurePrototype> checkForBetterMatches(vector<StructurePrototype>& prototype_schemes, 
-      uint& num_proc, 
+      uint num_proc, 
       bool check_for_better_matches, 
       bool same_species,
       const aurostd::xoption& comparison_options, 
@@ -350,10 +350,12 @@ class XtalFinderCalculator : public xStream {
   
     // ---------------------------------------------------------------------------
     // split comparisons into threads (2D-array splitting)
-    bool splitComparisonIntoThreads(vector<StructurePrototype>& comparison_schemes, uint& num_proc,
-      vector<std::pair<uint,uint> >& start_indices,
-      vector<std::pair<uint,uint> >& end_indices);
-  
+    bool splitComparisonIntoThreads(
+        vector<StructurePrototype>& comparison_schemes,
+        uint num_proc,
+        vector<std::pair<uint,uint> >& start_indices,
+        vector<std::pair<uint,uint> >& end_indices);
+
     // ---------------------------------------------------------------------------
     // run multiple structures
     vector<StructurePrototype> runComparisonScheme(vector<StructurePrototype>& comparison_schemes, 
@@ -416,7 +418,7 @@ class XtalFinderCalculator : public xStream {
   // ---------------------------------------------------------------------------
   // print
   void printResults(ostream& ss_out,
-      const bool& same_species, 
+      bool same_species, 
       const vector<StructurePrototype>& final_prototypes,
       string mode);
   string printStructureMappingResults(
@@ -548,9 +550,9 @@ namespace compare{
   
   // ---------------------------------------------------------------------------
   // functions for determining isopointal structures (same/compatible symmetry)
-  bool groupWyckoffPositions(const xstructure& xstr, vector<GroupedWyckoffPosition>& grouped_positions);
-  bool groupWyckoffPositions(const vector<wyckoffsite_ITC>& wyckoff_sites_ITC, vector<GroupedWyckoffPosition>& grouped_positions); //DX20200512
-  bool groupWyckoffPositionsFromGroupedString(uint space_group_number, uint setting, vector<vector<string> >& grouped_Wyckoff_string, vector<GroupedWyckoffPosition>& grouped_positions); //DX20200622 - removed pointer to uints
+  void groupWyckoffPositions(const xstructure& xstr, vector<GroupedWyckoffPosition>& grouped_positions);
+  void groupWyckoffPositions(const vector<wyckoffsite_ITC>& wyckoff_sites_ITC, vector<GroupedWyckoffPosition>& grouped_positions); //DX20200512
+  void groupWyckoffPositionsFromGroupedString(uint space_group_number, uint setting, vector<vector<string> >& grouped_Wyckoff_string, vector<GroupedWyckoffPosition>& grouped_positions); //DX20200622 - removed pointer to uints
   string printWyckoffString(const vector<GroupedWyckoffPosition>& grouped_positions, bool alphabetize=false);
   vector<GroupedWyckoffPosition> sortSiteSymmetryOfGroupedWyckoffPositions(const vector<GroupedWyckoffPosition>& grouped_Wyckoffs); //DX20190219
   bool matchableWyckoffPositions(const vector<GroupedWyckoffPosition>& temp_grouped_Wyckoffs,
@@ -574,7 +576,7 @@ namespace compare{
   // ---------------------------------------------------------------------------
   // comparing permutations/atom decorations 
   vector<std::pair<uint,uint> > calculateDivisors(const int& number);
-  bool checkNumberOfGroupingsNEW(vector<StructurePrototype>& comparison_schemes, uint number);
+  bool checkNumberOfGroupingsNEW(const vector<StructurePrototype>& comparison_schemes, uint number);
   // TODO (MOVE) void checkPrototypes(const uint& num_proc, const bool& same_species, vector<StructurePrototype>& final_prototypes);
   void generatePermutationString(const deque<uint>& stoichiometry, vector<string>& permutation); //DX20190508 //DX20191125 - changed from vector to deque
   void generatePermutationString(const vector<uint>& stoichiometry, vector<string>& permutation); //DX20190508
@@ -592,25 +594,23 @@ namespace compare{
   // ---------------------------------------------------------------------------
   // matchable species/types 
   bool matchableSpecies(const xstructure& xstr1, const xstructure& xstr2, const bool& same_species);
-  bool sameSpecies(const xstructure& x1, const xstructure& x2, const bool& display); 
+  bool sameSpecies(const xstructure& x1, const xstructure& x2, bool display); 
   
   // ---------------------------------------------------------------------------
   // structure scaling
   void rescaleStructure(xstructure& x1, xstructure& x2);
-  void atomicNumberDensity(xstructure& xstr1, xstructure& xstr2);
-  void atomicNumberDensity(xstructure& xstr1, xstructure& xstr2, double& rescale_factor); //DX20201215
-  void printParameters(xstructure& xstr, ostream& oss);
+  void atomicNumberDensity(const xstructure& xstr1, xstructure& xstr2);
+  void atomicNumberDensity(const xstructure& xstr1, xstructure& xstr2, double& rescale_factor); //DX20201215
+  void printParameters(const xstructure& xstr, ostream& oss);
   
   // ---------------------------------------------------------------------------
   // least-frequently occurring atom (LFA) functions
-  string leastFrequentAtom(const xstructure& xstr);
-  vector<string> getLeastFrequentAtomSpecies(const xstructure& xstr);
+  string getLeastFrequentAtomType(const xstructure& xstr, bool clean=true);
+  vector<string> getLeastFrequentAtomTypes(const xstructure& xstr, bool clean=true);
   bool sortBySecondPair(const std::pair<string,uint>& a, const std::pair<string,uint>& b);
   vector<string> sortSpeciesByFrequency(const xstructure& xstr);
   vector<uint> atomIndicesSortedByFrequency(const xstructure& xstr);
-  bool checkTolerance(xvector<double> d1, xmatrix<double> Q2);
-  bool checkABCTolerance(xvector<double> d1, xvector<double> d2);
-  bool checkAngleTolerance(xvector<double> d1, xvector<double> d2);
+  bool similarLatticeParameters(const xvector<double> d1, const xmatrix<double> d2);
   
   // ---------------------------------------------------------------------------
   // atom mapping functions 
@@ -661,8 +661,8 @@ namespace compare{
   bool compatibleNearestNeighborTypesEnvironments(const vector<vector<double> >& nn_lfa_with_types_1,
       const vector<vector<double> >& nn_lfa_with_types_2,
       int type_match);
-  vector<double> computeNearestNeighbors(xstructure& xstr);
-  double shortestDistance(const xstructure& xstr, const uint& k);
+  vector<double> computeNearestNeighbors(const xstructure& xstr);
+  double shortestDistance(const xstructure& xstr, uint k);
   
   // ---------------------------------------------------------------------------
   // cost functions
@@ -679,7 +679,7 @@ namespace compare{
   double computeMisfit(double dev, double dis, double fail);
   double computeMisfitMagnetic(const structure_misfit& mapping_info); //DX20201210
   double computeMisfitMagnetic(double dev,double dis,double fail,double mag_dis,double mag_fail); //DX20190801
-  double checkLatticeDeviation(double& xstr1_vol, xmatrix<double>& q2,vector<double>& D1,vector<double>& F1);
+  double checkLatticeDeviation(double& xstr1_vol, xmatrix<double>& q2, const vector<double>& D1, const vector<double>& F1);
   
   // ---------------------------------------------------------------------------
   // structure manipulation 
