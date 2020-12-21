@@ -1336,6 +1336,8 @@ namespace KBIN {
       if(aurostd::substring2bool(_vfiles[i],_AFLOWLOCK_)){continue;}
       if(aurostd::substring2bool(_vfiles[i],"SKIP")){continue;}
       if(aurostd::substring2bool(_vfiles[i],"aflow.in")){continue;}
+      if(aurostd::substring2bool(_vfiles[i],"aflow_") &&
+          aurostd::substring2bool(_vfiles[i],".in")){continue;} //AS20201023 do not compress files like aflow_qha.in
       if(aurostd::substring2bool(_vfiles[i],DEFAULT_AFLOW_END_OUT) || aurostd::substring2bool(_vfiles[i],"aflow.end.out")){continue;}  //CO20170613, file is special because it gets written after compression
       if(aurostd::substring2bool(_vfiles[i],_AFLOWIN_)){continue;}
       file_path=aflags.Directory + "/" + _vfiles[i];

@@ -1,5 +1,9 @@
-3.2.6 - 2020/XX/XX
+3.2.6 - 2020/xx/xx
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.6.tar.xz
+        -- Added functionality to plot thermodynamic properties calculated by QHA with the SJ EOS model. (AS)
+        -- Added processing of QHA data to LIB2LIB and LIB2RAW. (AS)
+        -- Added a feature to employ fixed volume relaxation of QHA subcalculations. (AS)
+        -- Added a JSONwriter class to output data in JSON format. (AS)
         -- adding KBIN::WaitFinished() after VASP runs to allow NFS to catch up (CO)
         -- setting _KVASP_CHECK_SLEEP_ to 30 seconds (CO)
         -- created rc parameter VASP_CHECK_SLEEP (CO)
