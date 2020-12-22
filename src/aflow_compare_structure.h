@@ -280,6 +280,7 @@ class XtalFinderCalculator : public xStream {
     void loadStructuresFromStructureList(const vector<string>& filenames, const vector<string>& magmoms_for_systems, bool same_species); //DX20190424 //DX20190801 - added vector<string>& magmoms_for_systems //DX20191122 - added ostream and consts
     void loadStructuresFromDirectory(const string& directory, const vector<string>& magmoms_for_systems, bool same_species); //DX20190424 //DX20190801 - added vector<string>& magmoms_for_systems //DX20191122 - added ostream and consts
     void loadStructuresFromFile(const string& filename, const vector<string>& magmoms_for_systems, bool same_species); //DX20190424 //DX20190801 - added vector<string>& magmoms_for_systems //DX20191122 - added ostream and consts
+    void loadStructuresFromAflowlibEntries(const vector<aflowlib::_aflowlib_entry>& entries, const vector<string>& magmoms_for_systems, bool same_species); //DX20201201
     
     // ---------------------------------------------------------------------------
     // transform structures
@@ -487,12 +488,6 @@ class XtalFinderCalculator : public xStream {
     void copy(const XtalFinderCalculator& b);                                                 // copy constructor
 };
   
-//vector<aflowlib::_aflowlib_entry> getUniqueEntries(vector<aflowlib::_aflowlib_entry>& entries, uint num_proc, bool same_species, bool scale_volume, bool optimize_match); //DX20201111
-//vector<aflowlib::_aflowlib_entry> getUniqueEntries(vector<aflowlib::_aflowlib_entry>& entries, ostream& oss, ofstream& FileMESSAGE, uint num_proc, bool same_species, bool scale_volume, bool optimize_match); //DX20201111
-//  vector<StructurePrototype> loadStructuresFromAflowlibEntries(const vector<aflowlib::_aflowlib_entry>& entries, const vector<string>& magmoms_for_systems, bool same_species, ostream& logstream=cout);
-//  vector<StructurePrototype> loadStructuresFromAflowlibEntries(const vector<aflowlib::_aflowlib_entry>& entries, const vector<string>& magmoms_for_systems, bool same_species, ofstream& FileMESSAGE, ostream& logstream=cout);
-
-
 namespace compare{
   // ---------------------------------------------------------------------------
   // pair-wise comparisons (for use by other AFLOW processes) 
@@ -521,6 +516,11 @@ namespace compare{
   // comparisons between entries in AFLOW database 
   string compareDatabaseEntries(const aurostd::xoption& vpflow, ostream& logstream=cout); //DX20191125
   string compareDatabaseEntries(const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream=cout); //DX20191125
+
+  // ---------------------------------------------------------------------------
+  // comparisons aflowlib entries
+  vector<aflowlib::_aflowlib_entry> getUniqueEntries(vector<aflowlib::_aflowlib_entry>& entries, uint num_proc, bool same_species, bool scale_volume, bool optimize_match); //DX20201111
+  vector<aflowlib::_aflowlib_entry> getUniqueEntries(vector<aflowlib::_aflowlib_entry>& entries, ostream& oss, ofstream& FileMESSAGE, uint num_proc, bool same_species, bool scale_volume, bool optimize_match); //DX20201111
 
   // ---------------------------------------------------------------------------
   // comparisons to AFLOW prototype library 

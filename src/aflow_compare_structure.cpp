@@ -2218,11 +2218,13 @@ vector<StructurePrototype> XtalFinderCalculator::compareStructuresFromFile(const
 
 }
 
-//TO DO
-/*
 // ***************************************************************************
 // compare::getUniqueEntries() //DX20201111
 // ***************************************************************************
+// Get structurally unique aflowlib entries. Helper function to GFA-code.
+// If needed, this function can be extended to read in some of the 
+// structural properties from the database (i.e., symmetry) and suppress the
+// on-the-fly analysis (potential speed-up).
 namespace compare {
   vector<aflowlib::_aflowlib_entry> getUniqueEntries(vector<aflowlib::_aflowlib_entry>& entries, uint num_proc, bool same_species, bool scale_volume, bool optimize_match){
     ostringstream oss;
@@ -2232,12 +2234,30 @@ namespace compare {
 }
 
 namespace compare {
-  vector<aflowlib::_aflowlib_entry> getUniqueEntries(vector<aflowlib::_aflowlib_entry>& entries, ostream& oss, ofstream& FileMESSAGE, uint num_proc, bool same_species, bool scale_volume, bool optimize_match){
+  vector<aflowlib::_aflowlib_entry> getUniqueEntries(vector<aflowlib::_aflowlib_entry>& entries,
+      ostream& oss,
+      ofstream& FileMESSAGE,
+      uint num_proc,
+      bool same_species,
+      bool scale_volume,
+      bool optimize_match){
+    
+    // ---------------------------------------------------------------------------
+    // instantiate XtalFinder calculator 
+    XtalFinderCalculator xtal_finder(
+        DEFAULT_XTALFINDER_MISFIT_MATCH,
+        DEFAULT_XTALFINDER_MISFIT_FAMILY,
+        FileMESSAGE,
+        num_proc,
+        oss);
 
     // ---------------------------------------------------------------------------
     // load structures from aflowlib entries
     vector<string> magmoms_for_systems; //DX20201111 - not included for now
-    vector<StructurePrototype> all_structures = compare::loadStructuresFromAflowlibEntries(entries, magmoms_for_systems, same_species, FileMESSAGE); //DX20190319 - added FileMESSAGE
+    xtal_finder.loadStructuresFromAflowlibEntries(
+        entries,
+        magmoms_for_systems,
+        same_species);
 
     // ---------------------------------------------------------------------------
     // directory to write results
@@ -2251,14 +2271,18 @@ namespace compare {
 
     // ---------------------------------------------------------------------------
     // compare structures returns vector<StructureProtoype> of unique/duplicate info
-    vector<StructurePrototype> grouped_structures = compare::compareMultipleStructures(all_structures, oss, FileMESSAGE, num_proc, same_species, directory, comparison_options); //DX20200103 - condensed booleans to xoptions
+    vector<StructurePrototype> grouped_structures = xtal_finder.compareMultipleStructures(
+        xtal_finder.num_proc,
+        same_species,
+        directory,
+        comparison_options);
 
     // ---------------------------------------------------------------------------
     // filter out duplicate aflowlib entries
     vector<aflowlib::_aflowlib_entry> entries_unique;
     for(uint i=0;i<grouped_structures.size();i++){
       for(uint j=0;j<entries.size();j++){
-        if(grouped_structures[i].structure_representative_name==entries[j].auid){
+        if(grouped_structures[i].structure_representative_struct->name==entries[j].auid){
           entries_unique.push_back(entries[j]);
           break;
         }
@@ -2266,10 +2290,8 @@ namespace compare {
     }
 
     return entries_unique;
-
   }
 }
-*/
 
 // ***************************************************************************
 // compare::compareMultipleStructures()

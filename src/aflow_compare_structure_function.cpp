@@ -36,7 +36,7 @@ void XtalFinderCalculator::getOptions(
 
   // Get options from vpflow (i.e., command-line)
   // Contains the options common to nearly all comparison functions
-  //
+
   string function_name = XPID + "XtalFinderCalculator::getOptions():";
   stringstream message;
 
@@ -1257,78 +1257,53 @@ void XtalFinderCalculator::loadStructuresFromDirectory(
   }
 }
 
-//TODO
-/*
 // ***************************************************************************
-// loadStructuresFromAflowlibEntries
+// XtalFinderCalculator::loadStructuresFromAflowlibEntries() //DX20201222
 // ***************************************************************************
-namespace compare {
-  vector<StructurePrototype> loadStructuresFromAflowlibEntries(
-      const vector<aflowlib::_aflowlib_entry>& entries,
-      const vector<string>& magmoms_for_systems,
-      bool same_species,
-      ostream& logstream){
-    ofstream FileMESSAGE;
-    return loadStructuresFromAflowlibEntries(entries, magmoms_for_systems, same_species, FileMESSAGE, logstream);
-  }
-}
+void XtalFinderCalculator::loadStructuresFromAflowlibEntries(
+    const vector<aflowlib::_aflowlib_entry>& entries,
+    const vector<string>& magmoms_for_systems,
+    bool same_species){
 
-namespace compare {
-  vector<StructurePrototype> loadStructuresFromAflowlibEntries(const vector<aflowlib::_aflowlib_entry>& entries,
-      const vector<string>& magmoms_for_systems,
-      bool same_species, ofstream& FileMESSAGE, ostream& logstream){
+  // Load all structures from aflowlib entries into a vector of
+  // XtalFinderCalculator.structure_containers
 
-    // load all structures from aflowlib entries into a vector of StructurePrototype object
+  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  string function_name = XPID + "XtalFinderCalculator::loadStructuresFromAflowlibEntries():";
+  stringstream message;
 
-    string function_name = XPID + "compare::loadStructuresFromAflowlibEntries():";
+  string structure_name = "", source = "aflowlib";
+  uint relaxation_step = 2; // input assumed to be most relaxed
 
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
-    stringstream message;
+  // ---------------------------------------------------------------------------
+  // loop through aflowlib entries
+  for(uint i=0;i<entries.size();i++){
+    if(LDEBUG) {cerr << function_name << " Loading entry " << i << ": " << entries[i].auid << endl;}
 
-    vector<StructurePrototype> all_structures;
-
-    // ---------------------------------------------------------------------------
-    // loop through aflowlib entries
-    for(uint i=0;i<entries.size();i++){
-      StructurePrototype structure_tmp;
-      if(LDEBUG) {cerr << "compare:: loading entry " << i << ": " << entries[i].auid << endl;}
-      try { structure_tmp.structure_representative = entries[i].vstr.back(); } //back() is the most relaxed structure
-      catch(aurostd::xerror& excpt) { message << "Could not load entry " << i << ": " << entries[i].auid << "...skipping entry"; pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_WARNING_);  continue; } //DX20190718
-      if(magmoms_for_systems.size()==entries.size()){
-        try { pflow::ProcessAndAddSpinToXstructure(structure_tmp.structure_representative, magmoms_for_systems[i]); } //DX20190801
-        catch(aurostd::xerror& excpt) { message << "Magnetic information could not be loaded (" << magmoms_for_systems[i] << "...skipping structure"; pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, _LOGGER_WARNING_); continue; } //DX20190801
-      }
-      structure_tmp.structure_representative.ReScale(1.0);
-      structure_tmp.structure_representative.BringInCell();
-      structure_tmp.structure_representative_name = entries[i].auid;
-      structure_tmp.structure_representative.SetSpecies(aurostd::vector2deque(entries[i].vspecies)); //DX20201118 - set species given by aflowlib_entries
-      structure_tmp.stoichiometry = structure_tmp.structure_representative.GetReducedComposition(!same_species);
-      structure_tmp.elements = structure_tmp.structure_representative.GetElements(true,true); // true: clean names
-      structure_tmp.natoms = structure_tmp.structure_representative.atoms.size(); //DX20190425
-      structure_tmp.ntypes = structure_tmp.structure_representative.num_each_type.size(); //DX20190425
-      structure_tmp.structure_representative_compound = pflow::prettyPrintCompound(structure_tmp.elements,structure_tmp.stoichiometry,no_vrt,false,txt_ft); //remove ones is true  //DX20190311 //DX20190313 - use xstr
-      // clean species
-      for(uint s=0;s<structure_tmp.structure_representative.species.size();s++){structure_tmp.structure_representative.species[s]=KBIN::VASP_PseudoPotential_CleanName(structure_tmp.structure_representative.species[s]); } //DX20190711
-      structure_tmp.structure_representative.SetSpecies(structure_tmp.structure_representative.species);
-      // check if fake names for same species comparison
-      if(structure_tmp.structure_representative.species[0]=="A" && same_species){
-        message << "Atomic species are missing for " << structure_tmp.structure_representative_name << " cannot perform material comparison; skipping structure.";
-        pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_WARNING_);
+    // load structure (if possible with try-catch)
+    xstructure xstr_tmp;
+    try { xstr_tmp = entries[i].vstr.back(); } //back() is the most relaxed structure
+    catch(aurostd::xerror& excpt) { 
+      message << "Could not load entry " << i << ": " << entries[i].auid << "...skipping entry";
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+      continue;
+    }
+    if(magmoms_for_systems.size()==entries.size()){
+      try { pflow::ProcessAndAddSpinToXstructure(xstr_tmp, magmoms_for_systems[i]); }
+      catch(aurostd::xerror& excpt) {
+        message << "Magnetic information could not be loaded (" << magmoms_for_systems[i] << "...skipping structure";
+        pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_); 
         continue;
       }
-      //DX20191105 [MOVED LATER - SAME AS SYMMETRY] structure_tmp.environments_LFA=compare::computeLFAEnvironment(structure_tmp.structure_representative); //DX20190711
-      structure_tmp.structure_representative_generated = true;
-      structure_tmp.structure_representative_source = "aflowlib";
-      structure_tmp.structure_representative_relaxation_step = 2; // input assumed to be unrelaxed
-      if(LDEBUG) {
-        cerr << function_name << " loaded structure " << i << endl;
-      }
-      all_structures.push_back(structure_tmp);
     }
-    return all_structures;
+    structure_name = entries[i].auid;
+
+    // adds the structure to a container in XtalFinderCalculator to be passed easily by reference
+    addStructure2container(xstr_tmp, structure_name, source, relaxation_step, same_species);
+
+    if(LDEBUG) {cerr << function_name << " Successfully loaded entry " << i << ": " << entries[i].auid << endl;}
   }
 }
-*/
 
 // ***************************************************************************
 // XtalFinderCalculator::loadStructuresFromFile() 
@@ -1959,7 +1934,9 @@ void XtalFinderCalculator::generateAtomPermutedStructures(
   vector<vector<int> > all_indices;
   vector<int> _indices;
   for(uint i=0;i<num_elements;i++){_indices.push_back(i);}
-  aurostd::xcombos indices_combos(_indices, true, 'P');
+  // use Heap's algorithm: swap lowest position index first (left-most)
+  // this is the preferred order for the representative atom decorations
+  aurostd::xcombos indices_combos(_indices, true, 'P', "HEAP");
   while (indices_combos.increment()) all_indices.push_back(indices_combos.getCombo());
 
   // create permuted structure    
@@ -4832,7 +4809,7 @@ namespace compare{
     // clean: cleans atom name (removes pseudopotential)
 
     // find minimum type count
-    uint type_count_min = aurostd::min(xstr.num_each_type);
+    int type_count_min = aurostd::min(xstr.num_each_type);
     
     // find the first species with this atom count
     for(uint i=0;i<xstr.num_each_type.size();i++){
@@ -4866,7 +4843,7 @@ namespace compare{
     vector<string> lfa_types; // lfa = least frequent atom
     
     // find minimum type count
-    uint type_count_min = aurostd::min(xstr.num_each_type);
+    int type_count_min = aurostd::min(xstr.num_each_type);
     
     // find the first species with this atom count
     for(uint i=0;i<xstr.num_each_type.size();i++){
@@ -5335,7 +5312,6 @@ namespace compare{
   }
 }
 
-
 // ***************************************************************************
 // compare::computeLFAEnvironment() 
 // ***************************************************************************
@@ -5394,42 +5370,42 @@ namespace compare{
 // XtalFinderCalculator structure container version
 void XtalFinderCalculator::computeLFAEnvironment(_structure_representative& str_rep, bool unique_only){
 
-    // ---------------------------------------------------------------------------
-    // determine all LFA atoms in the structure (could be more than one) 
-    vector<string> LFAs=compare::getLeastFrequentAtomTypes(str_rep.structure);
+  // ---------------------------------------------------------------------------
+  // determine all LFA atoms in the structure (could be more than one) 
+  vector<string> LFAs=compare::getLeastFrequentAtomTypes(str_rep.structure);
 
-    // ---------------------------------------------------------------------------
-    // compute all LFA environments, looping through each LFA type 
-    vector<AtomEnvironment> all_environments_LFA;
+  // ---------------------------------------------------------------------------
+  // compute all LFA environments, looping through each LFA type 
+  vector<AtomEnvironment> all_environments_LFA;
 
-    for(uint i=0;i<LFAs.size();i++){
-      //DX20191122 [OBSOLETE, moved functionality to XATOM] vector<AtomEnvironment> environments_LFA = getUniqueTypesAtomEnvironmentForLFA(xstr, LFAs[i], LFAs);
-      vector<AtomEnvironment> environments_LFA = getLFAAtomEnvironments(str_rep.structure, LFAs[i], LFAs, ATOM_ENVIRONMENT_MODE_1); //DX20191122
-      // ---------------------------------------------------------------------------
-      // may have non-primitive cell, but we only want unique/smallest set of information (fast)
-      if(unique_only){
-        for(uint j=0;j<environments_LFA.size();j++){
-          bool duplicate = false;
-          for(uint k=0;k<all_environments_LFA.size();k++){
-            if(compare::compatibleEnvironments(environments_LFA[j],all_environments_LFA[k],true,false,true)){ //DX20200401 - ignore_environment_angles=false
-              duplicate = true;
-              break;
-            }
-          }
-          if(!duplicate){
-            all_environments_LFA.push_back(environments_LFA[j]);
+  for(uint i=0;i<LFAs.size();i++){
+    //DX20191122 [OBSOLETE, moved functionality to XATOM] vector<AtomEnvironment> environments_LFA = getUniqueTypesAtomEnvironmentForLFA(xstr, LFAs[i], LFAs);
+    vector<AtomEnvironment> environments_LFA = getLFAAtomEnvironments(str_rep.structure, LFAs[i], LFAs, ATOM_ENVIRONMENT_MODE_1); //DX20191122
+    // ---------------------------------------------------------------------------
+    // may have non-primitive cell, but we only want unique/smallest set of information (fast)
+    if(unique_only){
+      for(uint j=0;j<environments_LFA.size();j++){
+        bool duplicate = false;
+        for(uint k=0;k<all_environments_LFA.size();k++){
+          if(compare::compatibleEnvironments(environments_LFA[j],all_environments_LFA[k],true,false,true)){ //DX20200401 - ignore_environment_angles=false
+            duplicate = true;
+            break;
           }
         }
-      }
-      // ---------------------------------------------------------------------------
-      // primitivized cell, push back all 
-      else{
-        all_environments_LFA.insert(all_environments_LFA.end(),environments_LFA.begin(),environments_LFA.end());
+        if(!duplicate){
+          all_environments_LFA.push_back(environments_LFA[j]);
+        }
       }
     }
-
-    str_rep.environments_LFA=all_environments_LFA;
+    // ---------------------------------------------------------------------------
+    // primitivized cell, push back all 
+    else{
+      all_environments_LFA.insert(all_environments_LFA.end(),environments_LFA.begin(),environments_LFA.end());
+    }
   }
+
+  str_rep.environments_LFA=all_environments_LFA;
+}
 
 // ***************************************************************************
 // compare::compatibleEnvironmentSets()
