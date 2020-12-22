@@ -254,17 +254,18 @@ vector<string> XtalFinderCalculator::getUniquePermutations(xstructure& xstr, uin
       //DX20191125 [OBSOLETE] vector<uint> reduced_stoichiometry = gcdStoich(xstr.num_each_type); //DX20190508
       deque<int> reduced_stoichiometry; aurostd::reduceByGCD(xstr.num_each_type, reduced_stoichiometry); //DX20191125
       deque<uint> reduced_stoichiometry_uint; for(uint i=0;i<reduced_stoichiometry.size(); i++){ reduced_stoichiometry_uint.push_back((uint)reduced_stoichiometry[i]); } //DX20191125
-      compare::generatePermutationString(reduced_stoichiometry_uint, unique_permutations); //DX20190508
-      //if(format=="text"){ //DX20190506
-      //  ss_output << "Unique atom decorations (" << unique_permutations.size() << "): " << endl; 
-      //  ss_output << " " << aurostd::joinWDelimiter(unique_permutations,"\n ") << endl;
-      //}
-      //if(format=="json"){ //DX20190506
-      //  ss_output << "{\"atom_decorations_equivalent\":["; 
-      //  ss_output << "[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(unique_permutations,"\""),",") << "]"; //DX20191125 - Vec to Dec
-      //  ss_output << "]}" << endl;
-      //}
-      //oss << ss_output.str();
+      //compare::generatePermutationString(reduced_stoichiometry_uint, unique_permutations); //DX20190508
+      unique_permutations = getSpeciesPermutedStrings(reduced_stoichiometry_uint); //DX20191125
+      if(format=="text"){ //DX20190506
+        ss_output << "Unique atom decorations (" << unique_permutations.size() << "): " << endl; 
+        ss_output << " " << aurostd::joinWDelimiter(unique_permutations,"\n ") << endl;
+      }
+      if(format=="json"){ //DX20190506
+        ss_output << "{\"atom_decorations_equivalent\":["; 
+        ss_output << "[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(unique_permutations,"\""),",") << "]"; //DX20191125 - Vec to Dec
+        ss_output << "]}" << endl;
+      }
+      oss << ss_output.str();
       return unique_permutations;
     }
   }
@@ -2500,7 +2501,9 @@ vector<StructurePrototype> XtalFinderCalculator::compareMultipleStructures(
         final_permutations.clear(); //DX20190624
       }
       else{
-        vector<string> unique_permutations; compare::generatePermutationString(final_prototypes[i].stoichiometry, unique_permutations); //DX20191125
+        //vector<string> unique_permutations; compare::generatePermutationString(final_prototypes[i].stoichiometry, unique_permutations); //DX20191125
+        XtalFinderCalculator xtal_finder_permutations;
+        vector<string> unique_permutations = xtal_finder_permutations.getSpeciesPermutedStrings(final_prototypes[i].stoichiometry); //DX20191125
         // store permutation results in main StructurePrototype object
         for(uint j=0;j<unique_permutations.size();j++){
           vector<string> permutations_tmp; permutations_tmp.push_back(unique_permutations[j]);

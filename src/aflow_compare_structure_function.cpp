@@ -1974,73 +1974,54 @@ void XtalFinderCalculator::generateAtomPermutedStructures(
     }
 
     // copy over neighbor distances (it will be the same as the parent structure)
-    // CANNOT DO, may change positions.... structure_containers.back().nearest_neighbor_distances = structure.nearest_neighbor_distances;
+    // CANNOT DO OUTRIGHT (update neighbor species). Need to think about this more carefully ... 
+    // structure_containers.back().nearest_neighbor_distances = structure.nearest_neighbor_distances;
   }
 }
 
-// TODO - CONSOLIDATE
-//DX20190508 - added permutation string function - START
 // ***************************************************************************
-// generatePermutationString
+// XtalFinderCalculator::getSpeciesPermutedStrings() //DX20201222
 // ***************************************************************************
-namespace compare{
-  //deque input
-  void generatePermutationString(const deque<uint>& stoichiometry, vector<string>& permutation){
-    vector<uint> stoichiometry_vstring = aurostd::deque2vector(stoichiometry);
-    generatePermutationString(stoichiometry_vstring, permutation);
-  }
+//deque input
+vector<string> XtalFinderCalculator::getSpeciesPermutedStrings(
+    const deque<uint>& stoichiometry){
+  vector<uint> stoichiometry_vstring = aurostd::deque2vector(stoichiometry);
+  return getSpeciesPermutedStrings(stoichiometry_vstring);
+}
 
-  //vector input
-  void generatePermutationString(const vector<uint>& stoichiometry, vector<string>& permutation){
+//vector input
+vector<string> XtalFinderCalculator::getSpeciesPermutedStrings(
+    const vector<uint>& stoichiometry){
 
-    vector<StructurePrototype> permutation_structures;
+  vector<string> species, species_permuted;
 
-    vector<string> names = pflow::fakeElements(stoichiometry.size()); //DX20200728 - now in pflow
-    vector<uint> indices = stoichiometry;
-    vector<vector<string> > name_order;  
-    uint num_elements = stoichiometry.size();
+  vector<string> names = pflow::fakeElements(stoichiometry.size()); //DX20200728 - now in pflow
+  vector<uint> indices = stoichiometry;
+  vector<vector<string> > name_order;  
+  uint num_elements = stoichiometry.size();
 
-    // Permutation algorithm based on Heap's algorithm (https://en.wikipedia.org/wiki/Heap%27s_algorithm)
-    vector<uint> new_indices;
-    for(uint i=0;i<num_elements;i++){new_indices.push_back(0);}
+  vector<vector<int> > all_indices;
+  vector<int> _indices;
+  for(uint i=0;i<num_elements;i++){_indices.push_back(i);}
 
-    name_order.push_back(names); 
+  // ---------------------------------------------------------------------------
+  // use Heap's algorithm: swap lowest position index first (left-most)
+  // this is the preferred order for the representative atom decorations
+  aurostd::xcombos indices_combos(_indices, true, 'P', "HEAP");
+  while (indices_combos.increment()) all_indices.push_back(indices_combos.getCombo());
 
-    uint i=0;
-    while(i<num_elements){
-      if(new_indices[i] < i){
-        if(i%2==0){
-          int swap1 = indices[0];
-          int swap2 = indices[i];
-          indices[0]=swap2; indices[i]=swap1;
-          string swap_name1 = names[0];
-          string swap_name2 = names[i];
-          names[0]=swap_name2; names[i]=swap_name1;
-        }
-        else {
-          int swap1 = indices[new_indices[i]];
-          int swap2 = indices[i];
-          indices[new_indices[i]]=swap2; indices[i]=swap1;
-          string swap_name1 = names[new_indices[i]];
-          string swap_name2 = names[i];
-          names[new_indices[i]]=swap_name2; names[i]=swap_name1;
-        }
-        name_order.push_back(names);
-        new_indices[i]++;
-        i=0;
-      } 
-      else {
-        new_indices[i]=0;
-        i++;
-      }   
+  // ---------------------------------------------------------------------------
+  // create permuted species strings 
+  for(uint i=0;i<all_indices.size();i++){
+    species.clear();
+    for(uint j=0;j<all_indices[i].size();j++){
+      species.push_back(names[all_indices[i][j]]);
     }
-
-    for(uint i=0;i<name_order.size();i++){ permutation.push_back(aurostd::joinWDelimiter(name_order[i],"")); }
-
-    return; 
+    species_permuted.push_back(aurostd::joinWDelimiter(species,"")); 
   }
+
+  return species_permuted;
 }
-//DX20190508 - added permutation string function - END
 
 // ***************************************************************************
 // generatePermutations 

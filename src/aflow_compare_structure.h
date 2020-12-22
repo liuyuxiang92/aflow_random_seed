@@ -408,6 +408,8 @@ class XtalFinderCalculator : public xStream {
   vector<string> getUniquePermutations(xstructure& xstr, uint num_proc, bool optimize_match, bool print_misfit, ostream& oss, aurostd::xoption& comparison_options);
   vector<StructurePrototype> compareAtomDecorations(StructurePrototype& structure, uint num_proc, bool optimize_match);
   void generateAtomPermutedStructures(_structure_representative& structure);
+  vector<string> getSpeciesPermutedStrings(const deque<uint>& stoichiometry);
+  vector<string> getSpeciesPermutedStrings(const vector<uint>& stoichiometry);
   
   // ---------------------------------------------------------------------------
   // get aflow label
