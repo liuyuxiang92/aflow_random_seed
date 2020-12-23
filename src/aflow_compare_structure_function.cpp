@@ -6103,7 +6103,6 @@ void XtalFinderCalculator::latticeSearch(
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   string function_name = XPID + "XtalFinderCalculator::latticeSearch():";
 
-  bool supercell_method = true; //DX20200330 - original method, but slow //DX20200827 - false method is not robust enough yet
   bool test_one_lfa_only = false; //DX20190318
   bool test_one_origin_only = false; //DX20200715
   //DX - SPEED UP BUT NOT ROBUST - if(type_match==2){ test_one_lfa_only=true;} //DX20190318
@@ -6200,7 +6199,7 @@ void XtalFinderCalculator::latticeSearch(
     //  all_nn2 = xstr_match.nearest_neighbor_distances;
     //}
     
-    if(supercell_method){
+    if(DEFAULT_XTALFINDER_SUPERCELL_METHOD){ // default = false
       // ---------------------------------------------------------------------------
       // calculate attributes of structure 1 (volume, lattice parameters, nearest neighbor distances, etc.)
       vector<double> D1,F1;
@@ -6474,10 +6473,6 @@ bool XtalFinderCalculator::searchAtomMappings(
   string function_name = XPID + "XtalFinderCalculator::searchAtomMappings():";
   stringstream message;
   
-  bool supercell_method = true; //DX20200330 - original method, but slow //DX20200827 - false method is not robust enough yet
-
-  //bool supercell_method = true; //DX20200330 //DX20200827 - false method is not robust enough yet
-
   // ---------------------------------------------------------------------------
   // check if magnetic comparison
   bool calculate_magnetic_misfit =(_CALCULATE_MAGNETIC_MISFIT_&& 
@@ -6497,7 +6492,7 @@ bool XtalFinderCalculator::searchAtomMappings(
     xstr2_tmp = xstr2;
     all_nn2_test.clear();
 
-    if(supercell_method){
+    if(DEFAULT_XTALFINDER_SUPERCELL_METHOD){
       xstr2_tmp = compare::supercell2newRepresentation(xstr2, lattices[p]);
       xstr2_tmp.dist_nn_min=SYM::minimumDistance(xstr2_tmp);
     }
@@ -6538,7 +6533,6 @@ bool XtalFinderCalculator::searchAtomMappings(
       cerr << "structure=" << xstr2_tmp << endl;
     }
 
-    cerr << "xstr2_tmp.dist_nn_min: " << xstr2_tmp.dist_nn_min << endl;
     double minimum_interatomic_distance = aurostd::min(xstr1.dist_nn_min,xstr2_tmp.dist_nn_min); //DX20200622
 
     if(compare::sameSpecies(xstr2_tmp,xstr1,false)){
