@@ -976,6 +976,14 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.args2addattachedscheme(argv, cmds, "PLOTTER::TITLE", "--title=", "");
   vpflow.args2addattachedscheme(argv, cmds, "PLOTTER::OUTFILE", "--outfile=", "");  //ME20200313 - user defined output file name
   //ME20190614 END
+  //AS20200909 BEGIN
+  if (aurostd::args2flag(argv, cmds, "--plotthermoqha")) {
+    vpflow.flag("PLOT_THERMO_QHA", true);
+    vpflow.addattachedscheme("PLOT_THERMO_QHA", "./", true);
+  } else {
+    vpflow.args2addattachedscheme(argv,cmds,"PLOT_THERMO_QHA","--plotthermoqha=","./");
+  }
+  //AS20200909 END
 
   vpflow.flag("POCC",aurostd::args2flag(argv,cmds,"--pocc") && argv.at(1)=="--pocc");
   vpflow.args2addattachedscheme(argv,cmds,"POCC_DOS","--pocc_dos=","./");
@@ -1511,6 +1519,9 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   // effective mass
   vpflow.flag("EFFECTIVEMASS",aurostd::args2flag(argv,cmds,"--effective-mass|--em"));// && (argv.size() == 3));
 
+  // QHA
+  //vpflow.flag("LINKAPLQHA",aurostd::args2flag(argv,cmds,"--link_apl_qha"));//AS20200908 //OBSOLETE AS20201211
+
   if(LDEBUG) cout << "PflowARGs: xscheme=" << vpflow.xscheme << endl;
   if(LDEBUG) cout << "PflowARGs: vxscheme.size()=" << vpflow.vxscheme.size() << endl;
   if(LDEBUG) cout << "PflowARGs: argv.size()=" << argv.size() << endl;
@@ -1672,6 +1683,8 @@ namespace pflow {
       // [OBSOLETE] if(vpflow.flag("SG::FINDSYM_PRINT")) {pflow::FINDSYM(vpflow.getattachedscheme("SG::FINDSYM_PRINT"),0,cin); _PROGRAMRUN=true;}
       // [OBSOLETE] if(vpflow.flag("SG::FINDSYM_EXEC")) {pflow::FINDSYM(vpflow.getattachedscheme("SG::FINDSYM_EXEC"),1,cin); _PROGRAMRUN=true;}
       // if(vpflow.flag("PROTO_GUS_CPP")) {pflow::PROTO_GUS_CPP(argv); _PROGRAMRUN=true;}
+      // QHA
+      //if(vpflow.flag("LINKAPLQHA")){apl::linkAPLtoQHA();_PROGRAMRUN=true;}//AS20200908 //OBSOLETE AS20201211
     }
     // *********************************************************************
     if(argv.size()>=2 && !_PROGRAMRUN) {
@@ -1901,6 +1914,9 @@ namespace pflow {
       if(vpflow.flag("PLOT_THERMO")) {aurostd::xoption plotopts=plotter::getPlotOptions(vpflow,"PLOT_THERMO"); plotter::PLOT_THERMO(plotopts); _PROGRAMRUN=true;}
       if(vpflow.flag("PLOT_TCOND")) {aurostd::xoption plotopts=plotter::getPlotOptions(vpflow,"PLOT_TCOND"); plotter::PLOT_TCOND(plotopts); _PROGRAMRUN=true;}
       //ME20190614 END
+      //AS20200909 BEGIN
+      if(vpflow.flag("PLOT_THERMO_QHA")) {aurostd::xoption plotopts=plotter::getPlotOptions(vpflow,"PLOT_THERMO_QHA"); plotter::PLOT_THERMO_QHA(plotopts); _PROGRAMRUN=true;}
+      //AS20200909 END
       if(vpflow.flag("PROTOS_ICSD")) {cout << aflowlib::PrototypesIcsdHelp(vpflow.getattachedscheme("PROTOS_ICSD"));cout << aflow::Banner("BANNER_BIG");return 1;}
       // if(POCCUPATION) {pflow::POCCUPATION(argv,cin); _PROGRAMRUN=true;}
       if(vpflow.flag("POCC_DOS")) {pocc::POCC_DOS(cout,vpflow.getattachedscheme("POCC_DOS")); _PROGRAMRUN=true;} 
@@ -2572,7 +2588,7 @@ namespace pflow {
     strstream << tab << xspaces << " " << "              --enmax_multiply=NNNN (default: VASP_PREC_ENMAX_XXXX in .aflow.rc)" << endl;
     strstream << tab << xspaces << " " << "              --pressure=0,1,2 (kB) (default:0.0)" << endl;
     strstream << tab << xspaces << " " << "              --potim=XXX (default 0.05) (VASP)" << endl;
-    strstream << tab << xspaces << " " << "              --relax_type=[ALL|IONS|CELL_SHAPE|CELL_VOLUME|IONS_CELL_VOLUME]" << endl;
+    strstream << tab << xspaces << " " << "              --relax_type=[ALL|IONS|CELL_SHAPE|CELL_VOLUME|IONS_CELL_VOLUME|IONS_CELL_SHAPE]" << endl;
     strstream << tab << xspaces << " " << "              --relax_mode=[ENERGY|FORCES|ENERGY_FORCES|FORCES_ENERGY] (default: DEFAULT_VASP_FORCE_OPTION_RELAX_MODE_SCHEME in .aflow.rc) (VASP)" << endl;
     strstream << tab << xspaces << " " << "              --relax_count=XX (default: DEFAULT_VASP_FORCE_OPTION_RELAX_COUNT in .aflow.rc) (VASP)" << endl;
     strstream << tab << xspaces << " " << "              --run_relax_static" << endl;

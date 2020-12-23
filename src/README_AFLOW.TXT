@@ -845,6 +845,9 @@ available modes: EXPLICIT, IMPLICIT, EXTERNAL
   aflow runs alternate relaxations volume/ions (relaxODD/relaxEVEN). I suggest
   to bump up N in [RELAX=N] so you achieve better convergence.
 
+ RELAX_IONS_CELL_SHAPE
+  Adapt INCAR to perform a run in which IONS and CELL_SHAPE are relaxed.
+
  RELAX_MODE=ENERGY   (DEFAULT)
   Adapt INCAR to perform a relaxed run minimizing the total energy
   IBRION=2       # relax with Conjugate Gradient

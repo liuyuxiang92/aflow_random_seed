@@ -3707,6 +3707,10 @@ bool comparison_kEn_str_band_type_dn(const kEn_st& k1, const kEn_st& k2);
 bool is_equal_position_kEn_str      (const kEn_st& k1, const kEn_st& k2);
 bool near_to                        (const xvector<double> & k1, const xvector<double> & k2, const vector<double> & max_distance);
 // [OBSOLETE] bool GetEffectiveMass(xOUTCAR& outcar,xDOSCAR& doscar,xEIGENVAL& eigenval,xstructure xstr,ostream& oss,const bool& osswrite);
+namespace aurostd {
+  class JSONwriter; // forward-declaration of JSONwriter class: later in plotter
+  // namespace JSONwriter class defined in aurostd.h is not visible; dependencies race?
+}
 //-------------------------------------------------------------------------------------------------
 //ME20190614 - plotter functions
 namespace plotter {
@@ -3770,6 +3774,13 @@ namespace plotter {
   string getLatticeFromKpointsTitle(const string&);
   void shiftEfermiToZero(xEIGENVAL&, double);
   void setEMinMax(aurostd::xoption&, double, double);
+  aurostd::JSONwriter DOS2JSON(xoption &xopt, const xDOSCAR &xdos, ofstream& FileMESSAGE,
+      ostream &oss);//AS20201102
+  aurostd::JSONwriter bands2JSON(const xEIGENVAL &xeigen, const xKPOINTS &xkpts,
+      const vector<double> &distances, const vector<double> &segment_points,
+      const xoption& plotoptions);//AS2021102
+  aurostd::JSONwriter bandsDOS2JSON(const xDOSCAR &xdos, const xEIGENVAL &xeigen,
+      const xKPOINTS &xkpts, xoption &xopt, ofstream &FileMESSAGE, ostream &oss);//AS20201102
 
   // DOS
   void generateDosPlot(stringstream&, const xDOSCAR&, const aurostd::xoption&,ostream& oss=cout);  //CO20200404
@@ -3815,6 +3826,12 @@ namespace plotter {
   void PLOT_TCOND(aurostd::xoption&,ofstream& FileMESSAGE,ostream& oss=cout); //CO20200404
   void PLOT_TCOND(aurostd::xoption&, stringstream&,ostream& oss=cout);  //CO20200404
   void PLOT_TCOND(aurostd::xoption&, stringstream&,ofstream& FileMESSAGE,ostream& oss=cout);  //CO20200404
+
+  // QHA properties plotter -------------------------------------------------
+  void PLOT_THERMO_QHA(aurostd::xoption&,ostream& oss=cout);  //AS20200909
+  void PLOT_THERMO_QHA(aurostd::xoption&,ofstream& FileMESSAGE,ostream& oss=cout); //AS20200909
+  void PLOT_THERMO_QHA(aurostd::xoption&, stringstream&,ostream& oss=cout); //AS2020909
+  void PLOT_THERMO_QHA(aurostd::xoption&, stringstream&,ofstream& FileMESSAGE,ostream& oss=cout); //AS20200909
 
   // General plots -----------------------------------------------------------
   void plotSingleFromSet(xoption&, stringstream&, const vector<vector<double> >&, int,ostream& oss=cout); //CO20200404

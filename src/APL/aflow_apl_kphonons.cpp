@@ -761,12 +761,14 @@ namespace KBIN {
     }
     //ME20200102 END
 
-    //ME20190626 - Convert projection directions for DOS to Cartesian
-    if ((USER_DOS_PROJECTIONS.size() > 0) && aplopts.flag("DOS_FRAC")) {
-      for (uint p = 0; p < USER_DOS_PROJECTIONS.size(); p++) {
-        USER_DOS_PROJECTIONS[p] = xinput.getXStr().f2c * USER_DOS_PROJECTIONS[p];
-      }
-    }
+    // AS20201203 BEGIN OBSOLETE
+    // //ME20190626 - Convert projection directions for DOS to Cartesian
+    // if ((USER_DOS_PROJECTIONS.size() > 0) && aplopts.flag("DOS_FRAC")) {
+    //   for (uint p = 0; p < USER_DOS_PROJECTIONS.size(); p++) {
+    //     USER_DOS_PROJECTIONS[p] = xinput.getXStr().f2c * USER_DOS_PROJECTIONS[p];
+    //   }
+    // }
+    // AS20201203 END OBSOLETE
 
     /////////////////////////////////////////////////////////////////////////////
     //                                                                         //
@@ -792,7 +794,8 @@ namespace KBIN {
 
     //AS20200513 BEGIN
     if (kflags.KBIN_PHONONS_CALCULATION_QHA){
-      apl::QHA qha(xinput, qhaopts, aplopts, FileMESSAGE, oss);
+      apl::QHA qha(supercell.getInputStructureLight(), xinput,
+          qhaopts, aplopts, FileMESSAGE, oss);
 
       qha.system_title = phcalc._system;
       qha.run(xflags, aflags, kflags);
@@ -985,7 +988,7 @@ namespace KBIN {
     if (aplopts.flag("DOS") || aplopts.flag("TP")) {
       // Calculate DOS
       if (!phcalc.getQMesh().initialized()) phcalc.initialize_qmesh(USER_DOS_MESH);
-      apl::DOSCalculator dosc(phcalc, aplopts.getattachedscheme("DOSMETHOD"), USER_DOS_PROJECTIONS);
+      apl::DOSCalculator dosc(phcalc, aplopts);//AS20201203 input parameters are passed via xoption
       dosc.calc(aurostd::string2utype<int>(aplopts.getattachedscheme("DOSPOINTS")), aurostd::string2utype<double>(aplopts.getattachedscheme("DOSSMEAR")));
       if (aplopts.flag("DOS")) {
         dosc.writePDOS(aflags.Directory);
