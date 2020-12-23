@@ -6317,11 +6317,15 @@ namespace aflowlib {
     aurostd::string2tokens(dir,dir_tokens,"/");
     string run_directory = dir_tokens[dir_tokens.size()-1];
     string sub_directory = dir+"/"+run_directory;
-    if(aurostd::FileExist(sub_directory)) {
-      obb << "This directory contains an identical subdirectory (subdir=" << sub_directory << "). Removing subdirectory." << endl;
-      oss << obb.str();
-      oss.flush();
-      aurostd::RemoveDirectory(sub_directory);
+    aurostd::StringSubst(sub_directory,"//","/"); //CO20201220
+    aurostd::StringSubst(sub_directory,"./","");  //CO20201220
+    if(!sub_directory.empty()&&sub_directory!="."){ //CO20201220
+      if(aurostd::FileExist(sub_directory)) {
+        obb << "This directory contains an identical subdirectory (subdir=" << sub_directory << "). Removing subdirectory." << endl;
+        oss << obb.str();
+        oss.flush();
+        aurostd::RemoveDirectory(sub_directory);
+      }
     }
     //DX+CO20191030 - check for identical subdirectories - END
 
