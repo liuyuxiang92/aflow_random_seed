@@ -320,7 +320,7 @@ class XtalFinderCalculator : public xStream {
     // ---------------------------------------------------------------------------
     // reorder structures
     void representativePrototypeForICSDRunsNEW(vector<StructurePrototype>& comparison_schemes);
-    void makeRepresentativeEvenPermutationNEW(vector<StructurePrototype>& comparison_schemes);
+    void makeRepresentativeEvenPermutation(vector<StructurePrototype>& comparison_schemes, const vector<string>& name_order);
   
     // ---------------------------------------------------------------------------
     // check for better structure matches 
@@ -346,7 +346,7 @@ class XtalFinderCalculator : public xStream {
   
     // ---------------------------------------------------------------------------
     // count matched/unmatched
-    int numberMismatches(const vector<StructurePrototype>& comparison_schemes);
+    uint numberOfMismatches(const vector<StructurePrototype>& comparison_schemes);
     uint numberOfDuplicates(const StructurePrototype& prototype);
   
     // ---------------------------------------------------------------------------
@@ -701,6 +701,9 @@ namespace compare{
 		const xstructure& xstr,
 		const vector<xmatrix<double> >& basis_transformations,
 		const vector<xmatrix<double> >& rotations); //DX20201119
+
+
+  xstructure supercell2newRepresentation(const xstructure& xstr_supercell, const xmatrix<double>& lattice);
 
 } // end namespace
 

@@ -1789,14 +1789,11 @@ vector<StructurePrototype> XtalFinderCalculator::compareAtomDecorations(
   // generate all permutation structures
   generateAtomPermutedStructures(*structure.structure_representative_struct);
 
-  vector<vector<string> > name_order;
+  // ---------------------------------------------------------------------------
+  // store decoration names 
+  vector<string> decoration_names;
   for(uint i=0;i<structure_containers.size();i++){
-    vector<string> vtmp_name; 
-    for(uint j=0;j<structure_containers[i].name.size();j++){
-      stringstream ss_tmp; ss_tmp << structure_containers[i].name[j];
-      vtmp_name.push_back(ss_tmp.str());
-    }
-    name_order.push_back(vtmp_name);
+    decoration_names.push_back(structure_containers[i].name);
   }
 
   // ---------------------------------------------------------------------------
@@ -1833,7 +1830,7 @@ vector<StructurePrototype> XtalFinderCalculator::compareAtomDecorations(
 
     // ---------------------------------------------------------------------------
     // [COME BACK DX] ensure the representative stucture is an even permutation
-    //xtal_finder_permutations.makeRepresentativeEvenPermutation(permutation_comparisons);
+    makeRepresentativeEvenPermutation(permutation_comparisons, decoration_names);
 
     if(VERBOSE){ for(uint i=0;i<permutation_comparisons.size();i++){ cerr << "Initial permutation groupings: " << permutation_comparisons[i] << endl; } }
 
@@ -1848,9 +1845,9 @@ vector<StructurePrototype> XtalFinderCalculator::compareAtomDecorations(
 
     // ---------------------------------------------------------------------------
     // check if matched permutations are physically possible
-    if(!compare::checkNumberOfGroupingsNEW(final_permutations, name_order.size())){
+    if(!compare::checkNumberOfGroupingsNEW(final_permutations, decoration_names.size())){
       if(!quiet || LDEBUG){
-        message << "Compared groupings of permutations do not follow number theory (# unique=" << final_permutations.size() << " vs # total=" << name_order.size() << ")" << endl;
+        message << "Compared groupings of permutations do not follow number theory (# unique=" << final_permutations.size() << " vs # total=" << decoration_names.size() << ")" << endl;
         // comprehensive output
         if(LDEBUG){ 
           for(uint i=0;i<final_permutations.size();i++){ message << final_permutations[i] << endl; } 
@@ -1881,8 +1878,8 @@ vector<StructurePrototype> XtalFinderCalculator::compareAtomDecorations(
 
       // ---------------------------------------------------------------------------
       // check if NEW matched permutations are physically possible
-      if(!compare::checkNumberOfGroupingsNEW(final_permutations, name_order.size())){
-        message << "Compared groupings of permutations do not follow number theory (# unique=" << final_permutations.size() << " vs # total=" << name_order.size() << ")" << endl;
+      if(!compare::checkNumberOfGroupingsNEW(final_permutations, decoration_names.size())){
+        message << "Compared groupings of permutations do not follow number theory (# unique=" << final_permutations.size() << " vs # total=" << decoration_names.size() << ")" << endl;
         // comprehensive output
         if(LDEBUG){ 
           for(uint i=0;i<final_permutations.size();i++){ message << final_permutations[i] << endl; } 
@@ -1922,27 +1919,35 @@ void XtalFinderCalculator::generateAtomPermutedStructures(
     _structure_representative& structure){
 
   // Generate all atom permuted variants of a given structure.
-  // Replace in-place Heap's algorithm with aurostd::xcombos.
+  // Moved Heap's algorithm into aurostd::xcombos.
+    
+  deque<string> species;
+  bool is_symmetry_calculated = isSymmetryCalculated(structure);
+
+  // ---------------------------------------------------------------------------
+  // get permuted species strings via Heap's algorithm: 
+  // swap lowest position index first (left-most)
+  vector<string> species_permuted = getSpeciesPermutedStrings(structure.stoichiometry);
 
   vector<string> names = pflow::fakeElements(structure.stoichiometry.size()); //DX20200728 - now in pflow
   vector<uint> indices = structure.stoichiometry;
-  vector<vector<string> > name_order;  
   uint num_elements = structure.stoichiometry.size();
-
-  bool is_symmetry_calculated = isSymmetryCalculated(structure);
 
   vector<vector<int> > all_indices;
   vector<int> _indices;
   for(uint i=0;i<num_elements;i++){_indices.push_back(i);}
+  
+  // ---------------------------------------------------------------------------
   // use Heap's algorithm: swap lowest position index first (left-most)
   // this is the preferred order for the representative atom decorations
   aurostd::xcombos indices_combos(_indices, true, 'P', "HEAP");
   while (indices_combos.increment()) all_indices.push_back(indices_combos.getCombo());
 
+  // ---------------------------------------------------------------------------
   // create permuted structure    
   for(uint i=0;i<all_indices.size();i++){
     xstructure xstr_tmp = structure.structure;
-    deque<string> species; 
+    species.clear();
     for(uint j=0;j<all_indices[i].size();j++){
       species.push_back(names[all_indices[i][j]]);
     }
@@ -1982,14 +1987,14 @@ void XtalFinderCalculator::generateAtomPermutedStructures(
 // ***************************************************************************
 // XtalFinderCalculator::getSpeciesPermutedStrings() //DX20201222
 // ***************************************************************************
-//deque input
+// deque input
 vector<string> XtalFinderCalculator::getSpeciesPermutedStrings(
     const deque<uint>& stoichiometry){
   vector<uint> stoichiometry_vstring = aurostd::deque2vector(stoichiometry);
   return getSpeciesPermutedStrings(stoichiometry_vstring);
 }
 
-//vector input
+// vector input
 vector<string> XtalFinderCalculator::getSpeciesPermutedStrings(
     const vector<uint>& stoichiometry){
 
@@ -1997,7 +2002,6 @@ vector<string> XtalFinderCalculator::getSpeciesPermutedStrings(
 
   vector<string> names = pflow::fakeElements(stoichiometry.size()); //DX20200728 - now in pflow
   vector<uint> indices = stoichiometry;
-  vector<vector<string> > name_order;  
   uint num_elements = stoichiometry.size();
 
   vector<vector<int> > all_indices;
@@ -2022,72 +2026,6 @@ vector<string> XtalFinderCalculator::getSpeciesPermutedStrings(
 
   return species_permuted;
 }
-
-// ***************************************************************************
-// generatePermutations 
-// ***************************************************************************
-namespace compare{
-  bool generatePermutations(uint& num_elements, vector<uint>& indices, vector<string>& names, vector<GroupedWyckoffPosition>& grouped_Wyckoff_positions, vector<vector<uint> >& permutations, vector<vector<string> >&name_order, vector<vector<GroupedWyckoffPosition> >& permutation_grouped_Wyckoff_positions){
-
-    // Permutation algorithm based on Heap's algorithm (https://en.wikipedia.org/wiki/Heap%27s_algorithm)
-
-    //vector<vector<int> > permutations;
-    vector<uint> new_indices;
-    for(uint i=0;i<indices.size();i++){new_indices.push_back(0);}
-
-    permutations.push_back(indices);
-    name_order.push_back(names);    
-    for(uint i=0;i<grouped_Wyckoff_positions.size();i++){grouped_Wyckoff_positions[i].element=names[i];}
-    permutation_grouped_Wyckoff_positions.push_back(grouped_Wyckoff_positions);
-
-    uint i=0;
-    while(i<num_elements){
-      if(new_indices[i] < i){
-        //LDEBUBcerr << "orig: ";
-        //for(uint n=0;n<indices.size();n++){cerr << indices[n] << " ";}
-        if(i%2==0){
-          //LDEBUBcerr << "even: swapping " << indices[0] << " and " << indices[i] << endl;
-          int swap1 = indices[0];
-          int swap2 = indices[i];
-          indices[0]=swap2; indices[i]=swap1;
-          string swap_name1 = names[0];
-          string swap_name2 = names[i];
-          //GroupedWyckoffPosition swap_position1 = grouped_Wyckoff_positions[0]; swap_position1.element = names[i];
-          //GroupedWyckoffPosition swap_position2 = grouped_Wyckoff_positions[i]; swap_position2.element = names[0];
-          names[0]=swap_name2; names[i]=swap_name1;
-          grouped_Wyckoff_positions[0].element=swap_name2; grouped_Wyckoff_positions[i].element=swap_name1;
-        }
-        else {
-          //LDEBUBcerr << "odd: swapping " << indices[new_indices[i]] << " and " << indices[i] << endl;
-          int swap1 = indices[new_indices[i]];
-          int swap2 = indices[i];
-          indices[new_indices[i]]=swap2; indices[i]=swap1;
-          string swap_name1 = names[new_indices[i]];
-          string swap_name2 = names[i];
-          //GroupedWyckoffPosition swap_position1 = grouped_Wyckoff_positions[new_indices[i]]; swap_position1.element = names[i];
-          //GroupedWyckoffPosition swap_position2 = grouped_Wyckoff_positions[i]; swap_position2.element = names[new_indices[i]];
-          names[new_indices[i]]=swap_name2; names[i]=swap_name1;
-          grouped_Wyckoff_positions[new_indices[i]].element=swap_name2; grouped_Wyckoff_positions[i].element=swap_name1;
-        }
-        //LDEBUBcerr << "storing: ";
-        //for(uint n=0;n<indices.size();n++){cerr << indices[n] << " ";}
-        //cerr << endl;
-        permutations.push_back(indices);
-        name_order.push_back(names);
-        permutation_grouped_Wyckoff_positions.push_back(grouped_Wyckoff_positions);
-        new_indices[i]++;
-        i=0;
-      } 
-      else {
-        //LDEBUBcerr << "moving on" << endl;
-        new_indices[i]=0;
-        i++;
-      }   
-    }
-    return true;
-  }
-}
-//ABOVE FUNCTION MAY NEED A DOUBLE CHECK
 
 // ***************************************************************************
 // arePermutationsComparableViaComposition() 
@@ -3769,8 +3707,8 @@ vector<StructurePrototype> XtalFinderCalculator::runComparisonScheme(
 
   // ---------------------------------------------------------------------------
   // count the number of mismatches (i.e. mis > 0.1)
-  int num_mismatches_orig=numberMismatches(comparison_schemes);
-  int num_mismatches=num_mismatches_orig;
+  uint num_mismatches_orig=numberOfMismatches(comparison_schemes);
+  uint num_mismatches=num_mismatches_orig;
 
   // ---------------------------------------------------------------------------
   //DX20190504 - added clean unmatched option - START
@@ -3881,7 +3819,7 @@ vector<StructurePrototype> XtalFinderCalculator::runComparisonScheme(
     
     // update number of mismatches
     num_mismatches_orig=num_mismatches;
-    num_mismatches=numberMismatches(comparison_schemes);
+    num_mismatches=numberOfMismatches(comparison_schemes);
 
     if(num_mismatches > 0 && !quiet){
       message << "Number of unmatched structures: " << num_mismatches << ". Continuing comparisons ...";
@@ -3973,74 +3911,64 @@ namespace compare{
   }
 }
 
-// TODO
-/*
 // ***************************************************************************
-// makeRepresentativeEvenPermutation
+// XtalFinderCalculator::makeRepresentativeEvenPermutation()
 // ***************************************************************************
-  void XtalFinderCalculator::makeRepresentativeEvenPermutation(vector<StructurePrototype>& comparison_schemes){ 
-    // Make sure the even permutation is the representative.  
-    // If there are multiple even permutations in a given set of comparisons,
-    // default to the mininum even permutation. (DX, may want to change default)
+void XtalFinderCalculator::makeRepresentativeEvenPermutation(
+    vector<StructurePrototype>& comparison_schemes,
+    const vector<string>& name_order){ 
 
-    for(uint i=0; i<comparison_schemes.size(); i++){	
-      //Find representative permutation number
-      uint representative_permutation_num = 0;
-      for(uint j=0; j<name_order.size(); j++){			
-        string name="";
-        for(uint k=0;k<name_order[j].size();k++){name+=name_order[j][k];}
-        if(comparison_schemes[i].structure_representative_name == name){
-          representative_permutation_num = j;
-          break;
-        }
+  // Make sure the even permutation is the representative.  
+  // If there are multiple even permutations in a given set of comparisons,
+  // default to the mininum even permutation. (DX, may want to change default)
+    
+  uint representative_permutation_num = 0, min_even_duplicate_permutation_num = AUROSTD_MAX_UINT;
+  uint duplicate_permutation_num = 0, min_duplicate_index = 0;
+
+  for(uint i=0; i<comparison_schemes.size(); i++){	
+    //Find representative permutation number
+    representative_permutation_num = 0;
+    for(uint j=0; j<name_order.size(); j++){			
+      if(comparison_schemes[i].structure_representative_struct->name == name_order[j]){
+        representative_permutation_num = j;
+        break;
       }
-      //Find proto (potential duplicate) permutation number
-      uint min_even_duplicate_permutation_num = 1e9;
-      uint duplicate_permutation_num = 0;
-      uint min_duplicate_index = 0;
-      for(uint p=0; p<comparison_schemes[i].structures_duplicate_names.size(); p++){
-        for(uint j=0; j<name_order.size(); j++){			
-          string name="";
-          for(uint k=0;k<name_order[j].size();k++){name+=name_order[j][k];}
-          if(comparison_schemes[i].structures_duplicate_names[p] == name){
-            duplicate_permutation_num = j;
-            // Check if proto is minimum/even permutation
-            if(duplicate_permutation_num < min_even_duplicate_permutation_num && duplicate_permutation_num%2 == 0){ 
-              min_duplicate_index = p;     
-              min_even_duplicate_permutation_num = duplicate_permutation_num;
-            }
+    }
+    // ---------------------------------------------------------------------------
+    // find duplicate permutation number
+    min_even_duplicate_permutation_num = AUROSTD_MAX_UINT;
+    duplicate_permutation_num = 0;
+    min_duplicate_index = 0;
+    for(uint p=0; p<comparison_schemes[i].structures_duplicate_struct.size(); p++){
+      for(uint j=0; j<name_order.size(); j++){			
+        if(comparison_schemes[i].structures_duplicate_struct[p]->name == name_order[j]){
+          duplicate_permutation_num = j;
+          // Check if proto is minimum/even permutation
+          if(duplicate_permutation_num < min_even_duplicate_permutation_num && duplicate_permutation_num%2 == 0){ 
+            min_duplicate_index = p;     
+            min_even_duplicate_permutation_num = duplicate_permutation_num;
           }
         }
       }
-      // If representative permutation is already even, only swap representative and proto if proto permutation is less and even
-      // Else replace automatically if proto permutation is not 1e9
-      if((representative_permutation_num%2 == 0 && min_even_duplicate_permutation_num < representative_permutation_num) ||
-          (representative_permutation_num%2 != 0 && min_even_duplicate_permutation_num != 1e9)){
-        comparison_schemes[i].structures_duplicate_names.push_back(comparison_schemes[i].structure_representative_name);  
-        comparison_schemes[i].structures_duplicate.push_back(comparison_schemes[i].structure_representative);  
-        comparison_schemes[i].structures_duplicate_generated.push_back(comparison_schemes[i].structure_representative_generated);  
-        comparison_schemes[i].structures_duplicate_source.push_back(comparison_schemes[i].structure_representative_source);
-        comparison_schemes[i].structures_duplicate_relaxation_step.push_back(comparison_schemes[i].structure_representative_relaxation_step); //DX20200429
-        comparison_schemes[i].structure_representative_name = comparison_schemes[i].structures_duplicate_names[min_duplicate_index];
-        comparison_schemes[i].structure_representative = comparison_schemes[i].structures_duplicate[min_duplicate_index];
-        comparison_schemes[i].structure_representative_generated = comparison_schemes[i].structures_duplicate_generated[min_duplicate_index];
-        comparison_schemes[i].structure_representative_source = comparison_schemes[i].structures_duplicate_source[min_duplicate_index];
-        comparison_schemes[i].structure_representative_relaxation_step = comparison_schemes[i].structures_duplicate_relaxation_step[min_duplicate_index]; //DX20200429
-        comparison_schemes[i].structures_duplicate_names.erase(comparison_schemes[i].structures_duplicate_names.begin()+min_duplicate_index);
-        comparison_schemes[i].structures_duplicate.erase(comparison_schemes[i].structures_duplicate.begin()+min_duplicate_index);
-        comparison_schemes[i].structures_duplicate_generated.erase(comparison_schemes[i].structures_duplicate_generated.begin()+min_duplicate_index);
-        comparison_schemes[i].structures_duplicate_source.erase(comparison_schemes[i].structures_duplicate_source.begin()+min_duplicate_index);
-        comparison_schemes[i].structures_duplicate_relaxation_step.erase(comparison_schemes[i].structures_duplicate_relaxation_step.begin()+min_duplicate_index); //DX20200429
-      }
     }
-    return true;
-  } 
-*/
+    // ---------------------------------------------------------------------------
+    // if representative permutation is already even, only swap representative
+    // and duplicate proto if proto permutation is less and even
+    // else replace automatically if proto permutation is not AUROSTD_MAX_DOUBLE
+    if((representative_permutation_num%2 == 0 && min_even_duplicate_permutation_num < representative_permutation_num) ||
+        (representative_permutation_num%2 != 0 && min_even_duplicate_permutation_num != AUROSTD_MAX_UINT)){
+      _structure_representative *str_container_tmp;
+      str_container_tmp = comparison_schemes[i].structure_representative_struct;
+      setStructureAsRepresentative(comparison_schemes[i],comparison_schemes[i].structures_duplicate_struct[min_duplicate_index]); 
+      comparison_schemes[i].structures_duplicate_struct[min_duplicate_index] = str_container_tmp; 
+    }
+  }
+} 
 
 // ***************************************************************************
-// XtalFinderCalculator::numberMismaches()
+// XtalFinderCalculator::numberOfMismatches()
 // ***************************************************************************
-int XtalFinderCalculator::numberMismatches(
+uint XtalFinderCalculator::numberOfMismatches(
     const vector<StructurePrototype>& comparison_schemes){
 
   // Count the number of comparisons that have a misfit greater than
@@ -6572,15 +6500,16 @@ void XtalFinderCalculator::latticeSearch(
   // ---------------------------------------------------------------------------
   // build possible lattices
   vector<xmatrix<double> > lattices;
-  //DX20201130 - vector<xmatrix<double> > clattices;
+  //vector<xmatrix<double> > clattices;
   vector<double> latt_devs;
-  //DX20201130 buildSimilarLattices(translation_vectors, xstr_rep.structure.lattice, abs_det_q1, abs_det_q1, abc_angles_q1, lattices, clattices, latt_devs, optimize_match, scale_volume); //DX20200422
+  
   buildSimilarLattices(translation_vectors,
       xstr1.lattice,
       lattices,
       latt_devs,
       optimize_match,
       scale_volume); //DX20200422
+  
   if(LDEBUG){cerr << function_name << " Number of lattices to compare: " << lattices.size() << endl;}
 
   if(lattices.size()>0){
@@ -6605,6 +6534,26 @@ void XtalFinderCalculator::latticeSearch(
     //else{
     //  all_nn2 = xstr_match.nearest_neighbor_distances;
     //}
+    
+    if(supercell_method){
+      // ---------------------------------------------------------------------------
+      // calculate attributes of structure 1 (volume, lattice parameters, nearest neighbor distances, etc.)
+      vector<double> D1,F1;
+      compare::cellDiagonal(xstr1,D1,F1,1); // cell diagonals
+      // convert to clattice representation
+      xstr1.lattice=GetClat(xstr1.a,xstr1.b,xstr1.c,xstr1.alpha,xstr1.beta,xstr1.gamma);
+    
+      for(uint iat=0; iat<xstr1.atoms.size(); iat++){
+        xstr1.atoms[iat].cpos=F2C(xstr1.scale*xstr1.lattice,xstr1.atoms[iat].fpos); //DX20200715 - add scale just in case
+      }
+      
+      // makes xstr2 a supercell
+      GenerateGridAtoms(xstr2,dims(1),dims(2),dims(3));
+      // ---------------------------------------------------------------------------
+      // update atoms
+      xstr2.atoms = xstr2.grid_atoms;
+      xstr2.grid_atoms.clear();
+    }
       
     // ---------------------------------------------------------------------------
     // create structure misfit objet for each lattice and add lattice deviation
@@ -7168,6 +7117,80 @@ namespace compare{
 }
 */
 
+namespace compare {
+  xstructure supercell2newRepresentation(const xstructure& xstr_supercell, const xmatrix<double>& lattice){
+      // ---------------------------------------------------------------------------
+      // make smaller lattice the new lattice in the supercell structure 
+      // note: lattices[p] are oriented wrt to supercell (it has to be), otherwise could break periodicity
+      xstructure proto=xstr_supercell; //DX20190530 - added "_supercell"; more descriptive
+      proto.lattice=lattice;
+
+      xmatrix<double> f2c, c2f;
+      // ---------------------------------------------------------------------------
+      // C2F - (i.e., will provide fractional coordinates wrt to new lattice) 
+      // AND remove all atoms outside unit cell based on fractional coordinates
+      // speed increase: ensure this is in cell before computing F2C 
+      // (don't calculate unnecessary matrix-vector multiplication)
+      // Note: C2F (done later) changes lattice to one that is aligned with Cartesian directions (a along +X, etc.) 
+      //       this is like rotating the global coordinates, therefore, fpos does not change
+
+      deque<_atom> new_basis_2;
+      // ---------------------------------------------------------------------------
+      // supercell method : orig, slow
+        c2f=inverse(proto.scale*trasp(proto.lattice)); //DX+CO20200429 - calculate outside loop [speed]
+        for(uint iat=0;iat<proto.atoms.size();iat++){
+          proto.atoms[iat].fpos=c2f*proto.atoms[iat].cpos; //DX+CO20200429 - C2F (matrix inverse + matrix multiplication) -> c2f (matrix multiplication)
+          if(atomInCell(proto.atoms[iat],0.05)){ //DX20191125 - soft cutoff, using robust MapAtom later on resulting subset
+            new_basis_2.push_back(proto.atoms[iat]);
+          }
+        }
+      xstructure proto_new;
+      proto_new.title=proto.title;
+
+      xvector<double> abc_angles=Getabc_angles(proto.lattice,DEGREES);
+      xmatrix<double> clattice = GetClat(abc_angles);
+      proto_new.lattice=clattice;
+
+      //DX NEW - START =======================
+      f2c = trasp(proto_new.lattice); //DX20190717
+      c2f = aurostd::inverse(trasp(proto_new.lattice)); //DX20190717
+      //DX20190717 [OBSOLETE] xmatrix<double> f2c = trasp(proto.lattice);
+      //DX20190717 [OBSOLETE] xmatrix<double> c2f = aurostd::inverse(trasp(proto.lattice));
+      bool skew = false;
+      double tol=0.01;
+
+      deque<_atom> new_basis;
+      xvector<double> tmp; //DX20200330 - declare outside loop
+      for(uint j=0;j<new_basis_2.size();j++){
+        bool duplicate_lattice_point=false;
+        for(uint a=0; a<new_basis.size(); a++){
+          tmp = BringInCell(new_basis_2[j].fpos,1e-10);
+          if(SYM::MapAtom(new_basis[a].fpos,tmp,proto_new.lattice,f2c,skew,tol)){
+            duplicate_lattice_point=true;
+            break;
+          }
+        }
+        if(duplicate_lattice_point==false){
+          new_basis_2[j].fpos = BringInCell(new_basis_2[j].fpos,1e-10);
+          new_basis_2[j].cpos = f2c*new_basis_2[j].fpos;
+          new_basis.push_back(new_basis_2[j]);
+        }
+      }
+      std::stable_sort(new_basis.begin(),new_basis.end(),sortAtomsNames); //DX20190709 - need to sort now
+      proto_new.atoms = new_basis;
+      proto_new.BringInCell(1e-10); 
+      proto_new.FixLattices();
+      proto_new.SpeciesPutAlphabetic();
+      deque<int> sizes = SYM::arrange_atoms(new_basis);
+      proto_new = pflow::SetNumEachType(proto_new, sizes);
+      proto_new.species = proto.species; //DX20190718
+      proto_new.MakeBasis(); //DX20200522
+      proto = proto_new;
+
+      return proto;
+    }
+}
+
 // ***************************************************************************
 // XtalFinderCalculator::searchAtomMappings()
 // ***************************************************************************
@@ -7186,6 +7209,8 @@ bool XtalFinderCalculator::searchAtomMappings(
   bool VERBOSE=FALSE;
   string function_name = XPID + "XtalFinderCalculator::searchAtomMappings():";
   stringstream message;
+  
+  bool supercell_method = true; //DX20200330 - original method, but slow //DX20200827 - false method is not robust enough yet
 
   //bool supercell_method = true; //DX20200330 //DX20200827 - false method is not robust enough yet
 
@@ -7208,6 +7233,11 @@ bool XtalFinderCalculator::searchAtomMappings(
     xstr2_tmp = xstr2;
     all_nn2_test.clear();
 
+    if(supercell_method){
+      xstr2_tmp = compare::supercell2newRepresentation(xstr2, lattices[p]);
+      xstr2_tmp.dist_nn_min=SYM::minimumDistance(xstr2_tmp);
+    }
+    else{
     //cerr << "lattice dev: " << vstrs_matched[p].lattice_deviation << endl;
 
     //auto t1 = std::chrono::high_resolution_clock::now();
@@ -7234,7 +7264,7 @@ bool XtalFinderCalculator::searchAtomMappings(
         continue;
       } 
     }
-
+    }
     //[CHRONO] auto t2 = std::chrono::high_resolution_clock::now();
     //[CHRONO] auto duration = std::chrono::duration_cast<std::chrono::microseconds>( t2 - t1 ).count();
     //[CHRONO] std::cout << "duration: " << duration << endl;
@@ -7244,6 +7274,7 @@ bool XtalFinderCalculator::searchAtomMappings(
       cerr << "structure=" << xstr2_tmp << endl;
     }
 
+    cerr << "xstr2_tmp.dist_nn_min: " << xstr2_tmp.dist_nn_min << endl;
     double minimum_interatomic_distance = aurostd::min(xstr1.dist_nn_min,xstr2_tmp.dist_nn_min); //DX20200622
 
     if(compare::sameSpecies(xstr2_tmp,xstr1,false)){
