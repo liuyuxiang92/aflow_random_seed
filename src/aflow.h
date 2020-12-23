@@ -2908,7 +2908,7 @@ namespace KBIN {
   bool VASP_Run(_xvasp &xvasp,_aflags &aflags,_kflags &kflags,_vflags &vflags,string relaxA,string relaxB,bool qmwrite,ofstream &FileMESSAGE);
   bool VASP_Run(_xvasp &xvasp,_aflags &aflags,_kflags &kflags,_vflags &vflags,string relaxA,bool qmwrite,ofstream &FileMESSAGE);
   bool VASP_RunFinished(_xvasp &xvasp,_aflags &aflags,ofstream &FileMESSAGE,bool=FALSE);
-  void WaitFinished(_xvasp &xvasp,_aflags &aflags,ofstream &FileMESSAGE,uint max_count=AUROSTD_MAX_UINT,bool=FALSE);
+  void WaitFinished(_xvasp &xvasp,_aflags &aflags,ofstream &FileMESSAGE,uint max_count=AUROSTD_MAX_UINT,bool=FALSE);  //CO20201220 - added max_count
   void VASP_Error(_xvasp &xvasp,string="",string="",string="");
   void VASP_Error(_xvasp &xvasp,ofstream &FileMESSAGE,string="",string="",string="");
   string VASP_Analyze(_xvasp &xvasp,bool qmwrite);

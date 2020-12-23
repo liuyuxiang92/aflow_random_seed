@@ -2026,6 +2026,7 @@ namespace KBIN {
                       if(xvasp.NRELAXING<xvasp.NRELAX)  {
                         Krun=KBIN::VASP_Run(xvasp,aflags,kflags,vflags,"relax"+aurostd::utype2string(xvasp.NRELAXING),"relax"+aurostd::utype2string(xvasp.NRELAXING),TRUE,FileMESSAGE);
                         if(!Krun) {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error [RELAXATION<]");return Krun;}
+                        if(!KBIN::VASP_RunFinished(xvasp,aflags,FileMESSAGE,true)){KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error (OUTCAR_INCOMPLETE) [RELAXATION<]");return Krun;} //CO20201111
                         KBIN::XVASP_INCAR_SPIN_REMOVE_RELAX(xvasp,aflags,vflags,xvasp.NRELAXING,FileMESSAGE);         // check if it is the case of turning off spin
                         KBIN::XVASP_KPOINTS_IBZKPT_UPDATE(xvasp,aflags,vflags,xvasp.NRELAXING,FileMESSAGE);           // check if it is the case of updating IBZKPT
                         //ME20190301 BEGIN
@@ -2102,6 +2103,7 @@ namespace KBIN {
                       if(xvasp.NRELAXING<xvasp.NRELAX)  {
                         Krun=KBIN::VASP_Run(xvasp,aflags,kflags,vflags,"relax"+aurostd::utype2string(xvasp.NRELAXING),"relax"+aurostd::utype2string(xvasp.NRELAXING),TRUE,FileMESSAGE);
                         if(!Krun) {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error [RELAX_STATIC_BANDS RELAXATION<]");return Krun;}
+                        if(!KBIN::VASP_RunFinished(xvasp,aflags,FileMESSAGE,true)){KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error (OUTCAR_INCOMPLETE) [RELAX_STATIC_BANDS RELAXATION<]");return Krun;} //CO20201111
                         //ME20190301 BEGIN
                         // CHGCAR/WAVECAR needs to be recycled if CHGCAR/WAVECAR=ON or VASP
                         // won't be able to read the files. Bug found by Rico Friedrich
@@ -2740,6 +2742,7 @@ namespace KBIN {
                     if(i<xvasp.NRELAX)  {
                       Krun=KBIN::VASP_Run(xvasp,aflags,kflags,vflags,"relax"+aurostd::utype2string(vrelax),"relax"+aurostd::utype2string(vrelax),TRUE,FileMESSAGE);
                       if(!Krun) {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error [KPOINT 4]");return Krun;}
+                      if(!KBIN::VASP_RunFinished(xvasp,aflags,FileMESSAGE,true)){KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error (OUTCAR_INCOMPLETE) [KPOINT 4]");return Krun;} //CO20201111
                     }
                     if(i==xvasp.NRELAX) {
                       Krun=KBIN::VASP_Run(xvasp,aflags,kflags,vflags,"relax"+aurostd::utype2string(vrelax),TRUE,FileMESSAGE);
@@ -3997,6 +4000,7 @@ namespace KBIN {
     bool Krun=TRUE;
     Krun=KBIN::VASP_Run(xvasp,aflags,kflags,vflags,FileMESSAGE);
     if(!Krun) {KBIN::VASP_Error(xvasp,"EEEEE  Error in  \"KBIN::VASP_Run(_xvasp &xvasp,_aflags &aflags,_kflags &kflags,_vflags &vflags,string relax,bool qmwrite,ofstream &FileMESSAGE)\"");}
+    //if(!KBIN::VASP_RunFinished(xvasp,aflags,FileMESSAGE,true)){KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  Error in  \"KBIN::VASP_Run(_xvasp &xvasp,_aflags &aflags,_kflags &kflags,_vflags &vflags,string relax,bool qmwrite,ofstream &FileMESSAGE)\" (OUTCAR_INCOMPLETE)");} //CO20201111
     //  if(!Krun) return Krun;
     if(_VASP_CONTCAR_SAVE_) KBIN::VASP_CONTCAR_Save(xvasp,string(relax));
     KBIN::VASP_Backup(xvasp,qmwrite,relax);
@@ -4014,6 +4018,7 @@ namespace KBIN {
     }
     Krun=KBIN::VASP_Run(xvasp,aflags,kflags,vflags,FileMESSAGE);
     if(!Krun) {KBIN::VASP_Error(xvasp,"EEEEE  Error in  \"KBIN::VASP_Run(_xvasp &xvasp,_aflags &aflags,_kflags &kflags,_vflags &vflags,string relaxA,string relaxB,bool qmwrite,ofstream &FileMESSAGE)\"");}
+    //if(!KBIN::VASP_RunFinished(xvasp,aflags,FileMESSAGE,true)){KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  Error in  \"KBIN::VASP_Run(_xvasp &xvasp,_aflags &aflags,_kflags &kflags,_vflags &vflags,string relaxA,string relaxB,bool qmwrite,ofstream &FileMESSAGE)\" (OUTCAR_INCOMPLETE)");} //CO20201111
     // if(!Krun) return Krun;
     if(_VASP_CONTCAR_SAVE_) KBIN::VASP_CONTCAR_Save(xvasp,string(relaxA));
     KBIN::VASP_Backup(xvasp,qmwrite,relaxA);
