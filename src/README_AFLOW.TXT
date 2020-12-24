@@ -193,7 +193,7 @@ aflow
    --machine=MACHINE
              MACHINE=duke_beta | beta
                      duke_beta_openmpi | beta_openmpi
-                     duke_qrats  | qrat
+                     duke_qrats  | qrats
                      duke_qflow  | qflow
                      duke_x  | x
                      duke_materials  | materials
