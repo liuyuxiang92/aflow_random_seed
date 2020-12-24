@@ -6349,7 +6349,8 @@ namespace aflowlib {
     for(uint iremdirname=0;iremdirname<vremdirname.size();iremdirname++) {
       for(uint irelax=0;irelax<vrelax.size();irelax++) {
         for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed
-          dir=aurostd::RemoveSubString(dir,"/"+vremdirname.at(iremdirname)+vrelax[irelax]+XHOST.vext[iext]);
+          dir=aurostd::RemoveSubString(dir,"/"+vremdirname[iremdirname]+vrelax[irelax]+XHOST.vext[iext]);
+
         }
         dir=aurostd::RemoveSubString(dir,"/"+vremdirname.at(iremdirname)+vrelax[irelax]);
       }
