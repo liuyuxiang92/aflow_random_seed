@@ -6352,7 +6352,8 @@ namespace aflowlib {
           dir=aurostd::RemoveSubString(dir,"/"+vremdirname[iremdirname]+vrelax[irelax]+XHOST.vext[iext]);
 
         }
-        dir=aurostd::RemoveSubString(dir,"/"+vremdirname.at(iremdirname)+vrelax[irelax]);
+        dir=aurostd::RemoveSubString(dir,"/"+vremdirname[iremdirname]+vrelax[irelax]);
+
       }
       dir=aurostd::RemoveSubString(dir,"/"+vremdirname.at(iremdirname));
     }
