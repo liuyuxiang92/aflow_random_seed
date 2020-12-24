@@ -1737,7 +1737,7 @@ namespace aurostd {
   // ***************************************************************************
   // Stefano Curtarolo
   // cleans file names from obvious things
-  string CleanFileName(string fileIN) {
+  string CleanFileName(const string& fileIN) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string fileOUT=fileIN;
     if(LDEBUG) cerr << "aurostd::CleanFileName: " << fileOUT << endl;

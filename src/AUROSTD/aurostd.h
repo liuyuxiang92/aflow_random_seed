@@ -429,7 +429,7 @@ namespace aurostd {
   string TmpFileCreate(void);
   string TmpDirectoryCreate(string prefix);
   string TmpDirectoryCreate(void);
-  string CleanFileName(string fileIN);
+  string CleanFileName(const string& fileIN);
   string ProperFileName(string fileIN);
   bool CopyFile(string file_from,string file_to);
   bool LinkFile(string file_from,string file_to);

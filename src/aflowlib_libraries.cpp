@@ -6476,7 +6476,7 @@ namespace aflowlib {
             if(LDEBUG){cerr << soliloquy << " tensor_stress=" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(tensor_stress,6),",") << endl;}
             if(tensor_stress.size()!=6){ ok=FALSE;obb << ". error(stress_tensor.size()==" << tensor_stress.size() << ")=OUTCAR"+vrelax[irelax]+".EXT";continue; }
             for(uint i=0;i<tensor_stress.size();i++){
-              if(abs(tensor_stress[i])>10){ ok=FALSE;obb << ". error(stress_tensor[i=" << i << "]==" << tensor_stress[i] << ")=OUTCAR"+vrelax[irelax]+".EXT";continue; }
+              if(abs(tensor_stress[i])>10){ ok=FALSE;obb << ". error(stress_tensor[i=" << i << "]==" << tensor_stress[i] << ">10kB)=OUTCAR"+vrelax[irelax]+".EXT";continue; }
             }
           }
         }
@@ -6499,8 +6499,7 @@ namespace aflowlib {
     vector<string> dir_tokens;
     aurostd::string2tokens(dir,dir_tokens,"/");
     string run_directory = dir_tokens[dir_tokens.size()-1];
-    string sub_directory = dir+"/"+run_directory;
-    aurostd::StringSubst(sub_directory,"//","/"); //CO20201220
+    string sub_directory = aurostd::CleanFileName(dir+"/"+run_directory); //CO20201220
     aurostd::StringSubst(sub_directory,"./","");  //CO20201220
     if(!sub_directory.empty()&&sub_directory!="."){ //CO20201220
       if(aurostd::FileExist(sub_directory)) {
