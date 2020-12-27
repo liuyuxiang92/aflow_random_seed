@@ -1605,17 +1605,33 @@ namespace chull {
 
   void ChullPoint::setGenCoords(const vector<string>& velements,const aflowlib::_aflowlib_entry& entry,bool formation_energy_coord) {
     string soliloquy=XPID+"ChullPoint::setGenCoords():";
+    if(entry.vcomposition.size()==0&&entry.vstoichiometry.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No vcomposition or vstoichiometry found for entry.auid="+entry.auid,_RUNTIME_ERROR_);}
     xvector<double> coord(velements.size());
-    double c_sum=0.0;
     bool found=false;
-    for(uint i=0,fl_size_i=entry.vcomposition.size();i<fl_size_i;i++){c_sum+=entry.vcomposition[i];}  //derive stoich exactly!
-    for(uint i=0,fl_size_i=velements.size();i<fl_size_i-1;i++){
-      found=false;
-      for(uint j=0,fl_size_j=entry.vspecies.size();j<fl_size_j && !found;j++){
-        if(velements[i]==entry.vspecies[j]){
-          coord[i+coord.lrows]=entry.vcomposition[j]/c_sum;
-          found=true;
+    if(entry.vcomposition.size()>0){
+      double c_sum=0.0;
+      for(uint i=0,fl_size_i=entry.vcomposition.size();i<fl_size_i;i++){c_sum+=entry.vcomposition[i];}  //derive stoich exactly!
+      if(c_sum==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"c_sum==0 (entry.auid="+entry.auid+",entry.aurl="+entry.aurl+")",_RUNTIME_ERROR_);}
+      for(uint i=0,fl_size_i=velements.size();i<fl_size_i-1;i++){
+        found=false;
+        for(uint j=0,fl_size_j=entry.vspecies.size();j<fl_size_j && !found;j++){
+          if(velements[i]==entry.vspecies[j]){
+            coord[i+coord.lrows]=entry.vcomposition[j]/c_sum;
+            found=true;
+          }
         }
+        //[might be from lower hull]if(!found){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"element not found: "+velements[i],_RUNTIME_ERROR_);}
+      }
+    }else{  //pocc structures have no vcomposition, only vstoichiometry
+      for(uint i=0,fl_size_i=velements.size();i<fl_size_i-1;i++){
+        found=false;
+        for(uint j=0,fl_size_j=entry.vspecies.size();j<fl_size_j && !found;j++){
+          if(velements[i]==entry.vspecies[j]){
+            coord[i+coord.lrows]=entry.vstoichiometry[j];
+            found=true;
+          }
+        }
+        //[might be from lower hull]if(!found){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"element not found: "+velements[i],_RUNTIME_ERROR_);}
       }
     }
     if(formation_energy_coord){coord[coord.urows]=H_f_atom(entry);} //entry.enthalpy_formation_atom
