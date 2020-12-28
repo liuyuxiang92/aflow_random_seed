@@ -126,44 +126,11 @@ namespace compare {
         FileMESSAGE,
         1,
         oss);
-    
+   
     // ---------------------------------------------------------------------------
     // create xoptions to contain all comparison options
     aurostd::xoption comparison_options = compare::loadDefaultComparisonOptions("permutation"); //DX20200103
     xtal_finder.getOptions(vpflow, comparison_options);
-
-    /*
-    // ---------------------------------------------------------------------------
-    // FLAG: misfit threshold //DX20201119
-    double misfit_match_threshold = DEFAULT_XTALFINDER_MISFIT_MATCH;
-    double misfit_family_threshold = DEFAULT_XTALFINDER_MISFIT_FAMILY;
-    if(vpflow.flag("COMPARE_PERMUTATION::MISFIT_MATCH")) {
-      misfit_match_threshold = aurostd::string2utype<double>(vpflow.getattachedscheme("COMPARE_PERMUTATION::MISFIT_MATCH"));
-      comparison_options.push_attached("COMPARISON_OPTIONS::MISFIT_MATCH",vpflow.getattachedscheme("COMPARE_PERMUTATION::MISFIT_MATCH"));
-    }
-    if(vpflow.flag("COMPARE_PERMUTATION::MISFIT_FAMILY")) {
-      misfit_family_threshold = aurostd::string2utype<double>(vpflow.getattachedscheme("COMPARE_PERMUTATION::MISFIT_FAMILY"));
-      comparison_options.push_attached("COMPARISON_OPTIONS::MISFIT_FAMILY",vpflow.getattachedscheme("COMPARE_PERMUTATION::MISFIT_FAMILY"));
-    }
-    // match threshold must be less than family threshold
-    if(misfit_match_threshold>misfit_family_threshold){
-      message << "Matching misfit threshold must be less than the same family threshold:"
-        << " misfit_match_threshold: " << misfit_match_threshold
-        << " misfit_family_threshold: " << misfit_family_threshold;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_INPUT_ILLEGAL_);
-    }
-    message << "Misfit theshold for matched structures: " << misfit_match_threshold << " (default: " << DEFAULT_XTALFINDER_MISFIT_MATCH << ")"; 
-    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
-    message << "Misfit theshold for structures in the same family: " << misfit_family_threshold << " (default: " << DEFAULT_XTALFINDER_MISFIT_FAMILY << ")";
-    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
-    */
-
-    // ---------------------------------------------------------------------------
-    // FLAG: number of processors (multithreading) 
-    uint num_proc=1; //defalut=1
-    if(vpflow.flag("COMPARE_PERMUTATION::NP")) {
-      num_proc=aurostd::string2utype<uint>(vpflow.getattachedscheme("COMPARE_PERMUTATION::NP"));
-    }
 
     // ---------------------------------------------------------------------------
     // FLAG: print misfit values for duplicate permutations 
@@ -186,9 +153,9 @@ namespace compare {
     // FLAG: optimize match (default: false)
     // bool optimize_match=false; // permutation comparisons do not need to have a best match; let's save time
     // ---------------------------------------------------------------------------
-    // optimize match (default: false)
+    //  optimize match (default: false)
     bool optimize_match=false;
-    if(vpflow.flag("COMPARE_PERMUTATION::OPTIMIZE_MATCH")) {
+    if(comparison_options.flag("COMPARISON_OPTIONS::OPTIMIZE_MATCH")) {
       optimize_match=true;
     }
 
@@ -198,8 +165,7 @@ namespace compare {
 
     // ---------------------------------------------------------------------------
     // calculate unique/duplicate permutations 
-    //vector<string> unique_permutations = compare::getUniquePermutations(xstr, num_proc, optimize_match, print_misfit, oss, FileMESSAGE); //DX20190319 - added FileMESSAGE
-    vector<string> unique_permutations = xtal_finder.getUniquePermutations(xstr, num_proc, optimize_match, print_misfit, results_ss, comparison_options); //DX20190319 - added FileMESSAGE
+    vector<string> unique_permutations = xtal_finder.getUniquePermutations(xstr, xtal_finder.num_proc, optimize_match, print_misfit, results_ss, comparison_options); //DX20190319 - added FileMESSAGE
 
     return results_ss.str();
   }
@@ -281,6 +247,9 @@ vector<string> XtalFinderCalculator::getUniquePermutations(xstructure& xstr, uin
   // ---------------------------------------------------------------------------
   // get the unique atom decorations for the structure
   XtalFinderCalculator xtal_finder_permutations;
+  xtal_finder_permutations.misfit_match = misfit_match; //copy misfit_match
+  xtal_finder_permutations.misfit_family = misfit_family; //copy misfit_family
+  xtal_finder_permutations.num_proc = num_proc; //copy num_proc
   vector<StructurePrototype> final_permutations = xtal_finder_permutations.compareAtomDecorations(structure,num_proc,optimize_match); //DX20190319 - added FileMESSAGE
 
   // ---------------------------------------------------------------------------
@@ -835,7 +804,7 @@ vector<StructurePrototype> XtalFinderCalculator::compare2prototypes(
     const xstructure& xstrIN,
     const aurostd::xoption& vpflow){ 
 
-  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_COMPARE_);
   string function_name = XPID + "XtalFinderCalculator::compare2prototypes():";
   stringstream message;
   bool quiet = false;
@@ -1083,7 +1052,7 @@ namespace compare {
 // load input structure
 vector<StructurePrototype> XtalFinderCalculator::compare2database(
     const xstructure& xstrIN, const aurostd::xoption& vpflow){
-  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_COMPARE_);
   
   string function_name = XPID + "XtalFinderCalculator::compare2database():";
   string directory = "";
@@ -1440,7 +1409,7 @@ namespace compare {
   string printCompare2Database(istream& input, const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream){xstructure xstr(input,IOAFLOW_AUTO);return printCompare2Database(xstr,vpflow,FileMESSAGE,logstream);}  //CO20200225
   string printCompare2Database(const xstructure& xstrIN, const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream){
 
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_COMPARE_);
     string function_name = "compare::printCompare2Database():";
     stringstream message;
     ostringstream oss;
@@ -1553,7 +1522,7 @@ namespace compare {
   }
 
   string compareDatabaseEntries(const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream){ //DX20191125 - added ofstream and ostream
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_COMPARE_);
 
     string function_name = XPID + "compare::compareDatabaseEntries():";
     string directory = ".";
@@ -2708,13 +2677,12 @@ void XtalFinderCalculator::compareStructures(
     bool scale_volume,
     bool optimize_match) {
 
-    // This is the main comparison function, which  compares two crystal structures
-    // and determines their level of similarity based on the idea discussed 
+    // This is the main comparison function that compares two crystal structures
+    // and determines their similarity level based on the idea discussed 
     // in H. Burzlaff's paper (Acta Cryst., A53, 217-224 (1997)).
 
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_COMPARE_);
     string function_name = XPID + "XtalFinderCalculator::compareStructures():";
-
 
     // ---------------------------------------------------------------------------
     // determine minimum interatomic distances of structures (resolution of atoms) //DX20200623

@@ -57,7 +57,7 @@ void XtalFinderCalculator::getOptions(
       << " misfit_family_threshold: " << misfit_family;
     throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_INPUT_ILLEGAL_);
   }
-  message << "Misfit theshold for matched structures: " << misfit_match << " (default: " << DEFAULT_XTALFINDER_MISFIT_MATCH << ")"; 
+  // message << "Misfit theshold for matched structures: " << misfit_match << " (default: " << DEFAULT_XTALFINDER_MISFIT_MATCH << ")"; 
   pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
   message << "Misfit theshold for structures in the same family: " << misfit_family << " (default: " << DEFAULT_XTALFINDER_MISFIT_FAMILY << ")";
   pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
@@ -205,6 +205,14 @@ namespace compare {
     str_rep.structure.ReScale(1.0); //DX20200707
     str_rep.structure.BringInCell(); //DX20200707
     
+    // ---------------------------------------------------------------------------
+    // initialize attributes
+    str_rep.name = "";
+    str_rep.compound = "";
+    str_rep.natoms = str_rep.structure.atoms.size();
+    str_rep.ntypes = str_rep.structure.num_each_type.size();
+    str_rep.number_compounds_matching_structure = 0;
+    
     vector<double> vec_null_double;
     str_rep.nearest_neighbor_distances = vec_null_double;
     return str_rep;
@@ -214,12 +222,17 @@ namespace compare {
 // ***************************************************************************
 // StructurePrototype Class 
 // ***************************************************************************
-// ===== Constructor ===== //
+
+// ***************************************************************************
+// StructurePrototype::StructurePrototype() (constructor)
+// ***************************************************************************
 StructurePrototype::StructurePrototype(){
   free();
 }
 
-// ===== Free  ===== //
+// ***************************************************************************
+// StructurePrototype::free()
+// ***************************************************************************
 void StructurePrototype::free(){
   iomode=JSON_MODE;
   natoms=0;
@@ -247,17 +260,23 @@ void StructurePrototype::free(){
   property_units.clear();
 }
 
-// ===== Destructor ===== //
+// ***************************************************************************
+// StructurePrototype::~StructurePrototype() (destructor)
+// ***************************************************************************
 StructurePrototype::~StructurePrototype(){ 
   free();
 }
 
-// ===== Copy Constructor ===== //
+// ***************************************************************************
+// StructurePrototype::StructurePrototype(...) (copy constructor)
+// ***************************************************************************
 StructurePrototype::StructurePrototype(const StructurePrototype& b){
   copy(b);
 }
 
-// ===== Copy Constructor Function ===== //
+// ***************************************************************************
+// StructurePrototype::copy()
+// ***************************************************************************
 void StructurePrototype::copy(const StructurePrototype& b) {
   iomode=b.iomode;
   ntypes=b.ntypes;
@@ -286,7 +305,7 @@ void StructurePrototype::copy(const StructurePrototype& b) {
 }
 
 // ***************************************************************************
-// StructurePrototype::operator=
+// StructurePrototype::operator= (assignment)
 // ***************************************************************************
 const StructurePrototype& StructurePrototype::operator=(const StructurePrototype& b){
   if(this!=&b){
@@ -297,7 +316,7 @@ const StructurePrototype& StructurePrototype::operator=(const StructurePrototype
 }
 
 // ***************************************************************************
-// StructurePrototype::operator<< 
+// StructurePrototype::operator<< (output/print) 
 // ***************************************************************************
 ostream& operator<<(ostream& oss, const StructurePrototype& StructurePrototype){
 
@@ -314,7 +333,7 @@ ostream& operator<<(ostream& oss, const StructurePrototype& StructurePrototype){
     vector<string> vcontent_json, tmp_vstring;
 
     // structure_representative 
-    sscontent_json << "\"structure_representative\":" << StructurePrototype.printRepresentativeStructureNEW() << eendl;
+    sscontent_json << "\"structure_representative\":" << StructurePrototype.printRepresentativeStructure() << eendl;
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
     // ntypes
@@ -408,12 +427,12 @@ ostream& operator<<(ostream& oss, const StructurePrototype& StructurePrototype){
 
     // duplicate info //DX20201218 - put into separate function
     string mode = "duplicate";
-    sscontent_json << "\"structures_duplicate\":[" << StructurePrototype.printMatchedStructuresNEW(mode) << "]";
+    sscontent_json << "\"structures_duplicate\":[" << StructurePrototype.printMatchedStructures(mode) << "]";
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
     
     // family info  //DX20201218 - put into separate function
     mode = "family";
-    sscontent_json << "\"structures_family\":[" << StructurePrototype.printMatchedStructuresNEW(mode) << "]";
+    sscontent_json << "\"structures_family\":[" << StructurePrototype.printMatchedStructures(mode) << "]";
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
     if(StructurePrototype.property_names.size()!=0){ //DX20190425 - only print if requested
@@ -442,7 +461,8 @@ uint XtalFinderCalculator::numberOfDuplicates(const StructurePrototype& prototyp
 
   uint number_of_duplicates = 0;
   for(uint i=0;i<prototype.structure_misfits_duplicate.size();i++){
-    if(prototype.structure_misfits_duplicate[i].misfit<=misfit_match && (prototype.structure_misfits_duplicate[i].misfit+1.0)>1e-3 ){
+    if(prototype.structure_misfits_duplicate[i].misfit<=misfit_match &&
+        (prototype.structure_misfits_duplicate[i].misfit+1.0)>1e-3 ){
       number_of_duplicates+=1;
     }
   }
@@ -453,7 +473,7 @@ uint XtalFinderCalculator::numberOfDuplicates(const StructurePrototype& prototyp
 // ***************************************************************************
 // StructurePrototype::printRepresentativeStructure() 
 // ***************************************************************************
-string StructurePrototype::printRepresentativeStructureNEW() const {
+string StructurePrototype::printRepresentativeStructure() const {
  
   // Print the representative structure information (JSON format)
 
@@ -482,7 +502,7 @@ string StructurePrototype::printRepresentativeStructureNEW() const {
 // ***************************************************************************
 // StructurePrototype::printMatchedStructure() 
 // ***************************************************************************
-string StructurePrototype::printMatchedStructuresNEW(const string& mode) const {
+string StructurePrototype::printMatchedStructures(const string& mode) const {
 
   // Print matched structure information (JSON format)
   // Generalized for duplicate or same family structure
@@ -665,7 +685,7 @@ void XtalFinderCalculator::addStructure2container(const xstructure& xstr,
   // Add crystal structure to XtalFinderCalculator container to
   // easily pass between functions.
     
-  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_COMPARE_);
   string function_name = XPID + "XtalFinderCalculator::addStructure2container():";
   stringstream message;
   
@@ -720,7 +740,7 @@ void XtalFinderCalculator::removeStructureFromContainerByName(
   // (i.e., once we remove by one element, the address/index are no longer
   // the same).
     
-  //bool LDEBUG=(FALSE || XHOST.DEBUG);
+  //bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_COMPARE_);
   //string function_name = XPID + "XtalFinderCalculator::removeStructureFromContainer():";
   //stringstream message;
   
@@ -748,7 +768,7 @@ void XtalFinderCalculator::setStructureAsRepresentative(StructurePrototype& stru
   // Point structure representative to a particular structure in the 
   // XtalFinderCalculator container.
     
-  //bool LDEBUG=(FALSE || XHOST.DEBUG);
+  //bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_COMPARE_);
   //string function_name = XPID + "XtalFinderCalculator::setStructureAsRepresentative():";
   //stringstream message;
   
@@ -1212,7 +1232,7 @@ void XtalFinderCalculator::loadStructuresFromDirectory(
   // Load all structures from a directory into 
   // XtalFinderCalculator.structure_containers
 
-  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_COMPARE_);
   string function_name = XPID + "XtalFinderCalculator::loadStructuresFromDirectory():";
   stringstream message;
 
@@ -1268,7 +1288,7 @@ void XtalFinderCalculator::loadStructuresFromAflowlibEntries(
   // Load all structures from aflowlib entries into a vector of
   // XtalFinderCalculator.structure_containers
 
-  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_COMPARE_);
   string function_name = XPID + "XtalFinderCalculator::loadStructuresFromAflowlibEntries():";
   stringstream message;
 
@@ -1319,7 +1339,7 @@ void XtalFinderCalculator::loadStructuresFromFile(
 
   string function_name = XPID + "XtalFinderCalculator::loadStructuresFromFile():";
 
-  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_COMPARE_);
   stringstream message;
 
   // ---------------------------------------------------------------------------
@@ -1396,7 +1416,7 @@ void XtalFinderCalculator::loadStructuresFromStructureList(
   // Load all structures from a vector of filenames into
   // XtalFinderCalculator.structure_containers
 
-  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_COMPARE_);
   string function_name = XPID + "XtalFinderCalculator::loadStructuresFromStructureList():";
   stringstream message;
 
@@ -1472,7 +1492,7 @@ namespace compare {
     // 3) input (cin)
     // 4) from files (directory, list of files, single file)
 
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_COMPARE_);
     string function_name = XPID + "compare::generateStructure():";
     ofstream FileMESSAGE;
     vector<string> tokens;
@@ -1641,7 +1661,7 @@ namespace compare{
     // In order for this to work, the following ICSD name format must be 
     // present in the string (e.g., Ag1_ICSD_#####)
 
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_COMPARE_);
     string function_name = XPID + "compare::findICSDName():";
 
     string ICSD_substring = "";
@@ -1755,7 +1775,7 @@ vector<StructurePrototype> XtalFinderCalculator::compareAtomDecorations(
   // Calculates the symmetry, if not already calculate (hence pass by
   // non-const reference).
 
-  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_COMPARE_);
   bool VERBOSE=false;
   string function_name = XPID + "XtalFinderCalculator::compareAtomDecorations():";
   stringstream message;
@@ -1845,7 +1865,7 @@ vector<StructurePrototype> XtalFinderCalculator::compareAtomDecorations(
 
     // ---------------------------------------------------------------------------
     // check if matched permutations are physically possible
-    if(!compare::checkNumberOfGroupingsNEW(final_permutations, decoration_names.size())){
+    if(!compare::checkNumberOfGroupings(final_permutations, decoration_names.size())){
       if(!quiet || LDEBUG){
         message << "Compared groupings of permutations do not follow number theory (# unique=" << final_permutations.size() << " vs # total=" << decoration_names.size() << ")" << endl;
         // comprehensive output
@@ -1878,7 +1898,7 @@ vector<StructurePrototype> XtalFinderCalculator::compareAtomDecorations(
 
       // ---------------------------------------------------------------------------
       // check if NEW matched permutations are physically possible
-      if(!compare::checkNumberOfGroupingsNEW(final_permutations, decoration_names.size())){
+      if(!compare::checkNumberOfGroupings(final_permutations, decoration_names.size())){
         message << "Compared groupings of permutations do not follow number theory (# unique=" << final_permutations.size() << " vs # total=" << decoration_names.size() << ")" << endl;
         // comprehensive output
         if(LDEBUG){ 
@@ -2119,7 +2139,7 @@ void XtalFinderCalculator::addAFLOWPrototypes2container(
   // comparison routine (more efficient, since we may not end up comparing all
   // of the prototype structures).
 
-  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_COMPARE_);
   string function_name = XPID + "XtalFinderCalculator::addAFLOWPrototypes2container():";
 
   for(uint i=0;i<vlabel.size();i++){
@@ -2149,6 +2169,7 @@ void XtalFinderCalculator::addAFLOWPrototypes2container(
         structure_tmp.is_structure_generated = false; // will be generated on-the-fly (faster)
         structure_tmp.source = "aflow_prototypes";
         structure_tmp.relaxation_step = 0; //DX20200429 - prototypes are unrelaxed
+        structure_tmp.number_compounds_matching_structure = 0;
         structure_containers.push_back(structure_tmp);
       }
     }
@@ -2164,6 +2185,7 @@ void XtalFinderCalculator::addAFLOWPrototypes2container(
       structure_tmp.is_structure_generated = false; // will be generated on-the-fly 
       structure_tmp.source = "aflow_prototypes";
       structure_tmp.relaxation_step = 0; //DX20200429 - prototypes are unrelaxed
+      structure_tmp.number_compounds_matching_structure = 0;
       structure_containers.push_back(structure_tmp);
     }
   }
@@ -2190,7 +2212,7 @@ bool XtalFinderCalculator::splitComparisonIntoThreads(
   // split comparisons into threads via indices
   string function_name = XPID + "XtalFinderCalculator::splitComparisonIntoThreads():";
   stringstream message;
-  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_COMPARE_);
 
   bool safety_check=false; // safety check if split incorrectly
 
@@ -2324,7 +2346,7 @@ void XtalFinderCalculator::convertStructures(
   // The unit cell conversion routines are in aflow_xatom; this function
   // is a wrapper for the XtalFinderCalculator class.
 
-  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_COMPARE_);
   string function_name = XPID + "XtalFinderCalculator::convertStructures():";
   stringstream message;
 
@@ -2502,7 +2524,7 @@ void XtalFinderCalculator::calculateSymmetries(uint num_proc){
   // Calculates the symmetry (space group and Wyckoff positions) of each
   // structure 
 
-  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_COMPARE_);
   string function_name = XPID + "XtalFinderCalculator::calculateSymmetries():";
   stringstream message;
 
@@ -2592,7 +2614,7 @@ void XtalFinderCalculator::calculateLFAEnvironments(uint num_proc){
   // Calculates the LFA environments for a structure and
   // stores it in the structure container
 
-  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_COMPARE_);
   string function_name = XPID + "XtalFinderCalculator::calculateLFAEnvironments():";
   stringstream message;
 
@@ -2643,7 +2665,7 @@ void XtalFinderCalculator::getNearestNeighbors(uint num_proc){
   // Calculates the LFA environments for a structure and
   // stores it in the structure container
 
-  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_COMPARE_);
   string function_name = XPID + "XtalFinderCalculator::calculateNearestNeighbors():";
   stringstream message;
 
@@ -2869,7 +2891,7 @@ namespace compare{
     // with one another, i.e., checks if the Wyckoff multiplicities and site 
     // symmetries are the same.  Comparing the same species is optional.
 
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_COMPARE_);
     string function_name = XPID + "compare::matchableWyckoffPositions():";
 
     // ---------------------------------------------------------------------------
@@ -3029,7 +3051,7 @@ namespace compare{
       vector<vector<vector<string> > > grouped_possible_Wyckoff_letters,
       vector<vector<string> > grouped_Wyckoff_letters){
     
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_COMPARE_);
     string function_name = XPID + "compare::matchableWyckoffPositionSet():";
 
     bool all_Wyckoffs_matched = false;
@@ -3218,7 +3240,7 @@ vector<StructurePrototype> XtalFinderCalculator::groupStructurePrototypes(
   // possible "duplicates". The misfit values are set to AUROSTD_MAX_DOUBLE
   // until compared.
 
-  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_COMPARE_);
   string function_name = XPID + "XtalFinderCalculator::groupStructurePrototypes():";
   stringstream message; 
 
@@ -3306,7 +3328,7 @@ vector<StructurePrototype> XtalFinderCalculator::checkForBetterMatches(
   // Checks if compounds/structures match better with another prototype group
   // i.e., checks if misfit is smaller when grouped to another prototype
 
-  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_COMPARE_);
   string function_name = XPID + "XtalFinderCalculator::checkForBetterMatches():";
   stringstream message;
 
@@ -3318,7 +3340,7 @@ vector<StructurePrototype> XtalFinderCalculator::checkForBetterMatches(
   check_better_matches_options.flag("COMPARISON_OPTIONS::IGNORE_ENVIRONMENT_ANGLES",TRUE); //always true for this function //DX20200320
 
   double misfit_min = 0.01; // used for check_for_better_matches : this is quite strict; if too expensive, make more loose
-  double misfit_max = DEFAULT_XTALFINDER_MISFIT_MATCH; // used for check_for_better_matches : otherwise we will compare same family structures which have already been moved (if using !clean_unmatched)
+  double misfit_max = misfit_match; // used for check_for_better_matches : otherwise we will compare same family structures which have already been moved (if using !clean_unmatched)
 
   // ---------------------------------------------------------------------------
   // check which structures could potentially match to others based on misfit
@@ -3326,8 +3348,9 @@ vector<StructurePrototype> XtalFinderCalculator::checkForBetterMatches(
 
   for(uint i=0;i<prototype_schemes.size();i++){
     for(uint j=0;j<prototype_schemes[i].structures_duplicate_struct.size();j++){
-      if((check_for_better_matches && prototype_schemes[i].structure_misfits_duplicate[j].misfit > misfit_min && prototype_schemes[i].structure_misfits_duplicate[j].misfit < misfit_max) || // find better match
-          (!check_for_better_matches && (prototype_schemes[i].structure_misfits_duplicate[j].misfit > 0.1 || aurostd::isequal(prototype_schemes[i].structure_misfits_duplicate[j].misfit,1.0,1e-6) || aurostd::isequal(prototype_schemes[i].structure_misfits_duplicate[j].misfit,AUROSTD_MAX_DOUBLE,1e-6)))){   // find a match //DX20191218
+      if((check_for_better_matches && prototype_schemes[i].structure_misfits_duplicate[j].misfit > misfit_min && 
+            prototype_schemes[i].structure_misfits_duplicate[j].misfit < misfit_max) || // find better match
+          (!check_for_better_matches && (prototype_schemes[i].structure_misfits_duplicate[j].misfit > misfit_max || aurostd::isequal(prototype_schemes[i].structure_misfits_duplicate[j].misfit,1.0,1e-6) || aurostd::isequal(prototype_schemes[i].structure_misfits_duplicate[j].misfit,AUROSTD_MAX_DOUBLE,1e-6)))){   // find a match //DX20191218
         StructurePrototype str_proto_tmp;
         bool found_new_match=false;
         // ---------------------------------------------------------------------------
@@ -3408,7 +3431,8 @@ vector<StructurePrototype> XtalFinderCalculator::checkForBetterMatches(
           prototype_schemes[j].structure_misfits_duplicate.back()=other_matches_schemes[i].structure_misfits_duplicate[min_index]; //DX20191218
         }
         // remove from old representative
-        if(check_better_matches_options.flag("COMPARISON_OPTIONS::CLEAN_UNMATCHED") && prototype_schemes[j].structure_representative_struct->name == other_matches_schemes[i].structures_duplicate_struct[0]->name){
+        //DX20201223 [OBSOLETE] if(check_better_matches_options.flag("COMPARISON_OPTIONS::CLEAN_UNMATCHED") && prototype_schemes[j].structure_representative_struct->name == other_matches_schemes[i].structures_duplicate_struct[0]->name){
+        if(prototype_schemes[j].structure_representative_struct->name == other_matches_schemes[i].structures_duplicate_struct[0]->name){ //DX20201223 - always remove the old match
           for(uint k=0;k<prototype_schemes[j].structures_duplicate_struct.size();k++){
             if(prototype_schemes[j].structures_duplicate_struct[k]->name == other_matches_schemes[i].structure_representative_struct->name){
               if(!quiet || LDEBUG){
@@ -3488,7 +3512,7 @@ void XtalFinderCalculator::runComparisonThreads(
   // the single comparison only (prevents threads from accessing on the same
   // memory block) 
 
-  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_COMPARE_);
   string function_name = XPID + "XtalFinderCalculator::runComparisonThreads():";
   stringstream message;
 
@@ -3631,7 +3655,7 @@ vector<StructurePrototype> XtalFinderCalculator::runComparisonScheme(
   // Compares and regroups similar structures until all structures are
   // matched or the comparisons are exhausted.
 
-  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_COMPARE_);
   string function_name = XPID + "XtalFinderCalculator::runComparisonScheme():";
   stringstream message;
 
@@ -3743,7 +3767,7 @@ vector<StructurePrototype> XtalFinderCalculator::runComparisonScheme(
   // ---------------------------------------------------------------------------
   // regroup comparisons based on misfit value
   if(num_mismatches==0 && !comparison_options.flag("COMPARISON_OPTIONS::SINGLE_COMPARISON_ROUND")){
-    appendStructurePrototypesFAST(comparison_schemes,
+    appendStructurePrototypes(comparison_schemes,
         final_prototypes,
         comparison_options.flag("COMPARISON_OPTIONS::CLEAN_UNMATCHED"),
         quiet); //DX20200103
@@ -3753,7 +3777,7 @@ vector<StructurePrototype> XtalFinderCalculator::runComparisonScheme(
   // Loop: continue comparison until all strucutures are matched or all comparisons schemes exhaused
   while(num_mismatches!=0){
     // regroup comparisons based on misfit value
-    appendStructurePrototypesFAST(
+    appendStructurePrototypes(
         comparison_schemes,
         final_prototypes,
         comparison_options.flag("COMPARISON_OPTIONS::CLEAN_UNMATCHED"),
@@ -3837,7 +3861,7 @@ vector<StructurePrototype> XtalFinderCalculator::runComparisonScheme(
   // end of while loop
 
   // append new prototype groupings
-  appendStructurePrototypesFAST(
+  appendStructurePrototypes(
       comparison_schemes,
       final_prototypes,
       comparison_options.flag("COMPARE_STRUCTURE::CLEAN_UNMATCHED"),
@@ -3874,7 +3898,7 @@ namespace compare{
 // compare::checkNumberOfGroupings()
 // ***************************************************************************
 namespace compare{
-  bool checkNumberOfGroupingsNEW(
+  bool checkNumberOfGroupings(
       const vector<StructurePrototype>& comparison_schemes,
       uint number){
 
@@ -3993,95 +4017,13 @@ void XtalFinderCalculator::appendStructurePrototypes(
     vector<StructurePrototype>& final_prototypes,
     bool clean_unmatched, //DX20190506
     bool quiet){
-
-  // This "cleans" the StrucuturePrototype objects by removing all the
-  // structures that do not match with the representative structure.
-  // Then, it takes the mismatched structures and puts them into new
-  // StructurePrototype objects to be compared.
-
-
-  bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string function_name = XPID + "XtalFinderCalculator::appendStructurePrototypes():";
-  stringstream message;
- 
-  if(LDEBUG){
-    stringstream ss_test;
-    printResults(ss_test, true, comparison_schemes, "text");
-    cerr << ss_test.str() << endl;
-  }
-
-  vector<StructurePrototype> tmp_list;
-  for(uint i=0; i<comparison_schemes.size(); i++){
-    bool first_mismatch=true;
-    for(uint j=0; j<comparison_schemes[i].structure_misfits_duplicate.size(); j++){
-      if(comparison_schemes[i].structure_misfits_duplicate[j].misfit > DEFAULT_XTALFINDER_MISFIT_MATCH){
-        // First, store any family prototype information
-        if(comparison_schemes[i].structure_misfits_duplicate[j].misfit <= DEFAULT_XTALFINDER_MISFIT_FAMILY){
-          addStructure2sameFamilyList(comparison_schemes[i],j); //DX20190814 - consolidated below into single function
-        }
-        // Take first mismatch and make as the representative structure in the new object
-        if(first_mismatch==true){
-          StructurePrototype str_proto_tmp;
-          str_proto_tmp.copyPrototypeInformation(comparison_schemes[i]);
-          setStructureAsRepresentative(str_proto_tmp, comparison_schemes[i].structures_duplicate_struct[j]);
-          tmp_list.push_back(str_proto_tmp);
-          if(clean_unmatched){ comparison_schemes[i].removeNonDuplicate(j); j--; } //DX20190504 - put in if-statement
-          first_mismatch=false;
-        }
-        // If not the first mismatch, add as a proto structure in the new object
-        else if(first_mismatch==false){
-          tmp_list.back().copyDuplicate(comparison_schemes[i],j);
-          if(clean_unmatched){ comparison_schemes[i].removeNonDuplicate(j); j--; } //DX20190504 - put in if-statement
-        }
-      }
-    }
-    //DX20201221 [OBSOLETE - REMOVED IF-STATEMENT TO DELETE XSTRUCTURES, NO LONGER NECESSARY WITH STRUCTURE CONTAINER] 
-
-    // if not quiet, print the comparison results to the screen 
-    // (useful for long comparison times or if the program terminates early)
-    if(!quiet){
-      message << "Identified unique prototype: " << endl;
-      message << "   prototype=" << comparison_schemes[i].structure_representative_struct->name << endl;
-      if(comparison_schemes[i].structures_duplicate_struct.size()==0){
-        message << "   No duplicates. " << endl;
-      }
-      else {
-        message << "   " << setw(80) << std::left << "List of duplicates"
-          << setw(15) << std::left << "misfit value" << endl;
-        message << "   " << setw(80) << std::left 
-          << "-----------------------------------------------------------------------------------------------" << endl;
-        for(uint d=0;d<comparison_schemes[i].structures_duplicate_struct.size();d++){
-          message << "   " << setw(80) << std::left << comparison_schemes[i].structures_duplicate_struct[d]->name
-            << setw(15) << std::left << comparison_schemes[i].structure_misfits_duplicate[d].misfit << endl;
-        }
-      }
-      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_RAW_); //DX+CO20201119
-    }
-
-    // Store finished (already compared) schemes in final_prototypes
-    final_prototypes.push_back(comparison_schemes[i]);
-    comparison_schemes.erase(comparison_schemes.begin()+i);
-    i--;
-  }
-  // Store newly generated schemes (not compared yet) into comparison_schemes
-  comparison_schemes=tmp_list;
-}
-
-// ***************************************************************************
-// appendStructurePrototypes - Create new structure prototypes after comparisons
-// ***************************************************************************
-void XtalFinderCalculator::appendStructurePrototypesFAST(
-    vector<StructurePrototype>& comparison_schemes,
-    vector<StructurePrototype>& final_prototypes,
-    bool clean_unmatched, //DX20190506
-    bool quiet){
   
   // This "cleans" the StrucuturePrototype objects by removing all the
   // structures that do not match with the representative structure.
   // Then, it takes the mismatched structures and puts them into new
   // StructurePrototype objects to be compared.
 
-  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_COMPARE_);
   string function_name = XPID + "XtalFinderCalculator::appendStructurePrototypes():";
   stringstream message;
 
@@ -4097,9 +4039,9 @@ void XtalFinderCalculator::appendStructurePrototypesFAST(
   for(uint i=0; i<number_of_comparisons; i++){
     bool first_mismatch=true;
     for(uint j=0; j<comparison_schemes[i].structure_misfits_duplicate.size(); j++){
-      if(comparison_schemes[i].structure_misfits_duplicate[j].misfit > DEFAULT_XTALFINDER_MISFIT_MATCH){
+      if(comparison_schemes[i].structure_misfits_duplicate[j].misfit > misfit_match){
         // First, store any family prototype information
-        if(comparison_schemes[i].structure_misfits_duplicate[j].misfit <= DEFAULT_XTALFINDER_MISFIT_FAMILY){
+        if(comparison_schemes[i].structure_misfits_duplicate[j].misfit <= misfit_family){
           addStructure2sameFamilyList(comparison_schemes[i],j); //DX20190814 - consolidated below into single function
         }
         // Take first mismatch and make as the representative structure in the new object
@@ -4146,6 +4088,12 @@ void XtalFinderCalculator::appendStructurePrototypesFAST(
 
   // Store newly generated schemes (not compared yet) into comparison_schemes
   comparison_schemes=tmp_list;
+  
+  if(LDEBUG){
+    stringstream ss_test;
+    printResults(ss_test, true, comparison_schemes, "text");
+    cerr << ss_test.str() << endl;
+  }
 }
 
 //TODO
@@ -4529,7 +4477,7 @@ namespace compare{
     // Determine if it is possible to match species based on the number of
     // atom types (i.e, reduced stoichiometries are equal)
 
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_COMPARE_);
     string function_name = XPID + "compare::matchableSpecies():";
     
     deque<int> stoich1; //DX20191125
@@ -4593,7 +4541,7 @@ namespace compare{
 
     // Determine if the structures have the same types and counts of species
 
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_COMPARE_);
     string function_name = XPID + "compare::sameSpecies():";
 
     bool VERBOSE = (display && LDEBUG); //DX20191125
@@ -4918,7 +4866,7 @@ bool XtalFinderCalculator::findMatch(
   // C |      C1, C2     with A,B,C,D 
   // D |      D1, D2    
 
-  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_COMPARE_);
   bool VERBOSE=false;
 
   string function_name = XPID + "XtalFinderCalculator::findMatch():";
@@ -5139,7 +5087,7 @@ namespace compare {
     // Do this by seeing if there is a drift/residual between the mapping
     // vectors and subtract the drift (rigid shift) from all positions
 
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_COMPARE_);
     string function_name = XPID + "compare::minimizeMatchingDistances():";
 
     // ---------------------------------------------------------------------------
@@ -5403,7 +5351,7 @@ namespace compare{
     // exact_match      : signals if an exact match (remove duplicates) or conversely 
     //                    if it possible to match later via structure comparison
 
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_COMPARE_);
     bool VERBOSE=false;
     string function_name = XPID + "compare::compatibleEnvironments():";
 
@@ -5689,7 +5637,7 @@ namespace compare{
     // updates coordinate displacement and fail
 
     string function_name = XPID + "compare::coordinateDeviation():";
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_COMPARE_);
 
     uint j=0;
     double num=0.0, den=0.0, nfail=0.0;
@@ -5753,7 +5701,7 @@ namespace compare{
     // BETA functionality: determine magnetic deviation between magnetic
     // structures
     
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_COMPARE_);
     string function_name = XPID + "compare::magneticDeviation():";
     
     double _NON_COLLINEAR_ANGLE_DEGREE_TOL_ = 10.0;
@@ -6036,7 +5984,7 @@ namespace compare{
     // Build a supercell comprised only of LFA atoms
     // to speed up translation vector search
 
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_COMPARE_);
     string function_name = XPID + "compare::GetLFASupercell():";
 
     // ---------------------------------------------------------------------------
@@ -6100,7 +6048,7 @@ void XtalFinderCalculator::latticeSearch(
 
   // Performs lattice and origin search
 
-  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_COMPARE_);
   string function_name = XPID + "XtalFinderCalculator::latticeSearch():";
 
   bool test_one_lfa_only = false; //DX20190318
@@ -6468,7 +6416,7 @@ bool XtalFinderCalculator::searchAtomMappings(
     bool same_species,
     bool optimize_match){
 
-  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_COMPARE_);
   bool VERBOSE=FALSE;
   string function_name = XPID + "XtalFinderCalculator::searchAtomMappings():";
   stringstream message;
@@ -6492,41 +6440,44 @@ bool XtalFinderCalculator::searchAtomMappings(
     xstr2_tmp = xstr2;
     all_nn2_test.clear();
 
+
+    // ---------------------------------------------------------------------------
+    // two possible comparison methods
+    // 1) supercell method: find new unit cell representation via supercell
+    //    expansion (slow, robust, well-tested)
+    // 2) transformation method: perform basis transformation and rotation
+    //    to a new unit cell representation (fast, robust, new)
+    // 1 = supercell method
     if(DEFAULT_XTALFINDER_SUPERCELL_METHOD){
       xstr2_tmp = compare::supercell2newRepresentation(xstr2, lattices[p]);
       xstr2_tmp.dist_nn_min=SYM::minimumDistance(xstr2_tmp);
     }
+    // 2 = transformation method (default)
     else{
-    //cerr << "lattice dev: " << vstrs_matched[p].lattice_deviation << endl;
-
-    //auto t1 = std::chrono::high_resolution_clock::now();
-    // ---------------------------------------------------------------------------
-    // identify basis transformation from xstr2 to its new lattice
-    // then determine the rotation between xstr2's new lattice and xstr1
-    compare::getLatticeTransformation(xstr2_tmp.lattice,
-        xstr1.lattice,
-        lattices[p],
-        vstrs_matched[p].basis_transformation,
-        vstrs_matched[p].rotation);
-
-    // ---------------------------------------------------------------------------
-    // now transform xstr2 into its new representation 
-    try{
-      xstr2_tmp.TransformStructure(
+      // ---------------------------------------------------------------------------
+      // identify basis transformation from xstr2 to its new lattice
+      // then determine the rotation between xstr2's new lattice and xstr1
+      compare::getLatticeTransformation(xstr2_tmp.lattice,
+          xstr1.lattice,
+          lattices[p],
           vstrs_matched[p].basis_transformation,
           vstrs_matched[p].rotation);
+
+      // ---------------------------------------------------------------------------
+      // now transform xstr2 into its new representation 
+      try{
+        xstr2_tmp.TransformStructure(
+            vstrs_matched[p].basis_transformation,
+            vstrs_matched[p].rotation);
+      }
+      catch(aurostd::xerror& re){
+        if(LDEBUG){
+          message << "The basis transformation does not preserve crystal periodicity (different number of atoms). Skipping transformation.";
+          pflow::logger(_AFLOW_FILE_NAME_, function_name, message, std::cerr, _LOGGER_WARNING_);
+          continue;
+        } 
+      }
     }
-    catch(aurostd::xerror& re){
-      if(LDEBUG){
-        message << "The basis transformation does not preserve crystal periodicity (different number of atoms). Skipping transformation.";
-        pflow::logger(_AFLOW_FILE_NAME_, function_name, message, std::cerr, _LOGGER_WARNING_);
-        continue;
-      } 
-    }
-    }
-    //[CHRONO] auto t2 = std::chrono::high_resolution_clock::now();
-    //[CHRONO] auto duration = std::chrono::duration_cast<std::chrono::microseconds>( t2 - t1 ).count();
-    //[CHRONO] std::cout << "duration: " << duration << endl;
 
     if(LDEBUG){
       cerr << "compare::structureSearch: Trying structure " << p << endl;
@@ -6564,9 +6515,6 @@ bool XtalFinderCalculator::searchAtomMappings(
                 minimum_interatomic_distance,
                 vstrs_matched[p],                
                 same_species)){
-            //[CHRONO] auto t3 = std::chrono::high_resolution_clock::now();
-            //[CHRONO] auto duration = std::chrono::duration_cast<std::chrono::microseconds>( t3 - t2 ).count();
-            //[CHRONO] std::cout << "duration[1]: " << duration << endl;
 
             if(VERBOSE){
               for(uint m=0;m<vstrs_matched[p].atom_map.size();m++){
@@ -6586,14 +6534,9 @@ bool XtalFinderCalculator::searchAtomMappings(
               all_nn_calculated = true;
               //cerr << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(all_nn2_test),",") << endl;
             }
-            //[CHRONO] auto t4 = std::chrono::high_resolution_clock::now();
-            //[CHRONO] duration = std::chrono::duration_cast<std::chrono::microseconds>( t4 - t3 ).count();
-            //[CHRONO] std::cout << "duration[2]: " << duration << endl;
-            // calculate coordinate deviation
-            //DX ORIG coordinateDeviation(xstr1,xstr2_tmp,all_nn1_resorted,all_nn_str2_resorted,map_index_str1,map_index_str2,min_dists,cd,f); //DX20200713 - used resorted nn's
 
             // ---------------------------------------------------------------------------
-            compare::coordinateDeviation(vstrs_matched[p],all_nn1,all_nn2_test); //DX20200713 - used resorted nn's
+            compare::coordinateDeviation(vstrs_matched[p],all_nn1,all_nn2_test);
 
             // ---------------------------------------------------------------------------
             // calculate misfit
@@ -6602,23 +6545,27 @@ bool XtalFinderCalculator::searchAtomMappings(
               compare::magneticDeviation(xstr1,xstr2_tmp,vstrs_matched[p]);
               mis=vstrs_matched[p].magnetic_misfit=compare::computeMisfitMagnetic(vstrs_matched[p]);
               if(LDEBUG){
-                cerr << "with spin: mis,latt_dev,cd,f,mag_dis,mag_fail: " << vstrs_matched[p].magnetic_misfit << ", " <<vstrs_matched[p].lattice_deviation << ", " << vstrs_matched[p].coordinate_displacement << ", " << vstrs_matched[p].failure << ", " << vstrs_matched[p].magnetic_displacement << ", " << vstrs_matched[p].magnetic_failure <<  endl;
+                cerr << "with spin: mis,latt_dev,cd,f,mag_dis,mag_fail: "
+                  << vstrs_matched[p].magnetic_misfit << ", " 
+                  << vstrs_matched[p].lattice_deviation << ", "
+                  << vstrs_matched[p].coordinate_displacement << ", "
+                  << vstrs_matched[p].failure << ", "
+                  << vstrs_matched[p].magnetic_displacement << ", "
+                  << vstrs_matched[p].magnetic_failure <<  endl;
               }
             }
             else{
               mis=vstrs_matched[p].misfit=compare::computeMisfit(vstrs_matched[p]);
               if(LDEBUG){
-                cerr << "mis,latt_dev,cd,f: " << vstrs_matched[p].misfit << ", " <<vstrs_matched[p].lattice_deviation << ", " << vstrs_matched[p].coordinate_displacement << ", " << vstrs_matched[p].failure <<  endl;
+                cerr << "mis,latt_dev,cd,f: "
+                  << vstrs_matched[p].misfit << ", "
+                  << vstrs_matched[p].lattice_deviation << ", "
+                  << vstrs_matched[p].coordinate_displacement << ", "
+                  << vstrs_matched[p].failure << endl;
               }
             }
 
-            //[CHRONO] auto t5 = std::chrono::high_resolution_clock::now();
-            //[CHRONO] duration = std::chrono::duration_cast<std::chrono::microseconds>( t5 - t4 ).count();
-            //[CHRONO] std::cout << "duration[3]: " << duration << endl;
-            //TO FIX index_match_1 = map_index_str1;
-            //TO FIX index_match_2 = map_index_str2;
-            //
-            // If we want to simply find a match and not find the best match, we can return early
+            // If we want to simply find a match and not find the best match, return early
             if(mis<misfit_match && !optimize_match) {
               return true;
             }
@@ -6781,7 +6728,7 @@ void XtalFinderCalculator::findSimilarTranslationVectors(
   // This function scans through the possible lattice points to find a
   // lattice that is commensurate with the reference structure (xstr1). 
 
-  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_COMPARE_);
   string function_name = XPID + "XtalFinderCalculator::findSimilarTranslationVectors():";
   
   bool relative_tolerance=true;
@@ -6856,187 +6803,6 @@ void XtalFinderCalculator::findSimilarTranslationVectors(
   } 
 }
 
-/*
-// ***************************************************************************
-// Build All Lattices [NEW]
-// ***************************************************************************
-namespace compare{
-  bool buildSimilarLattices(vector<xvector<double> >& translation_vectors,
-      xmatrix<double>& q1,
-      //DX20201130 double& xstr1_vol,
-      //DX20201130 double& abs_det_q1,
-      //DX20201130 xvector<double>& abc_angles_q1,
-      vector<xmatrix<double> >& lattices,
-      //DX20201130 vector<xmatrix<double> >& clattices,
-      vector<double>& latt_devs,
-      bool optimize_match,
-      bool scale_volume){ //DX20200422 - scale_volume
-
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
-    bool VERBOSE=false;
-    string function_name = XPID + "compare::buildSimilarLattices():";
-
-    // ---------------------------------------------------------------------------
-    // sort via smallest misfit for speed up
-    bool sort_via_lattice_deviation = true; //DX20190626 - speed increase
-    bool relative_tolerance = false; //DX20190703
-
-    vector<double> D1,F1;
-    cellDiagonal(q1,D1,F1,1);
-
-    // ---------------------------------------------------------------------------
-    // volume of unit cell tolerance
-    //DX20200422 - tol_vol used to be 0.1; now if we allow for volume scaling
-    // then we make it larger to find matches in the same family misfit range (0.1<=misfit<=0.2)
-    double tol_vol=0.1;
-    double q1_vol=det(q1); // volume //DX20201130
-    double abs_det_q1=abs(det(q1)); // volume //DX20201130
-    if(scale_volume){ tol_vol=(1.0/3.0); }
-    double det_tol=tol_vol*abs_det_q1;
-
-    // ---------------------------------------------------------------------------
-    // tolerance for lattice vectors: relative or absolute 
-    double tol_a=1e9; double tol_b=1e9; double tol_c=1e9;
-    xvector<double> abc_angles_q1=Getabc_angles(q1,DEGREES); // lattice parameters //DX20201130
-    if(relative_tolerance){
-      tol_a=abc_angles_q1[1]*0.3;
-      tol_b=abc_angles_q1[2]*0.3;
-      tol_c=abc_angles_q1[3]*0.3;
-    }
-    else{
-      tol_a=1.0; tol_b=1.0; tol_c=1.0; // 1 Angstrom
-    }
-
-    // ---------------------------------------------------------------------------
-    // LDEBUG: print lattice tolerances 
-    if(LDEBUG) {
-      if(relative_tolerance){
-        cerr << function_name << " Tolerance for a (Angstroms): " << tol_a << endl;
-        cerr << function_name << " Tolerance for b (Angstroms): " << tol_b << endl;
-        cerr << function_name << " Tolerance for c (Angstroms): " << tol_c << endl;
-        cerr << function_name << " Tolerance for alpha (degrees): " << abc_angles_q1[4]*0.3 << endl;
-        cerr << function_name << " Tolerance for beta (degrees): " << abc_angles_q1[5]*0.3 << endl;
-        cerr << function_name << " Tolerance for gamma (degrees): " << abc_angles_q1[6]*0.3 << endl;
-      }
-      else{
-        cerr << function_name << " Tolerance for a (Angstroms): " << tol_a << endl;
-        cerr << function_name << " Tolerance for b (Angstroms): " << tol_b << endl;
-        cerr << function_name << " Tolerance for c (Angstroms): " << tol_c << endl;
-        cerr << function_name << " Tolerance for alpha (degrees): " << 5 << endl;
-        cerr << function_name << " Tolerance for beta (degrees): " << 5 << endl;
-        cerr << function_name << " Tolerance for gamma (degrees): " << 5 << endl;
-      }
-    }
-
-    xmatrix<double> tmp_lattice(3,3);
-    //DX20201130 xmatrix<double> tmp_clatt(3,3);
-
-    // ---------------------------------------------------------------------------
-    // compute lenths of possible lattices before-hand (faster than on-the-fly)
-    int store=0;
-    vector<double> translations_mod;
-    for(uint i=0;i<translation_vectors.size();i++){
-      translations_mod.push_back(aurostd::modulus(translation_vectors[i]));
-    }
-    if(LDEBUG) { cerr << function_name << " Number of lattice vectors: " << translation_vectors.size() << endl; }
-
-    // ---------------------------------------------------------------------------
-    // build all possible unit cells with combinations of lattice vectors 
-    // (order matters, hence not upper triangular)
-    for(uint i=0;i<translation_vectors.size();i++){
-      // ---------------------------------------------------------------------------
-      // check lattice vector length: a
-      if(abs(translations_mod[i]-abc_angles_q1[1])<tol_a){ //check a
-        for(uint j=0;j<translation_vectors.size();j++){
-          if(j!=i){
-            // ---------------------------------------------------------------------------
-            // check lattice vector length: b
-            if(abs(translations_mod[j]-abc_angles_q1[2])<tol_b){ // check b
-              for(uint k=0;k<translation_vectors.size();k++){
-                if(k!=i && k!=j){
-                  // ---------------------------------------------------------------------------
-                  // check lattice vector length: c
-                  if(abs(translations_mod[k]-abc_angles_q1[3])<tol_c){ //check c
-                    tmp_lattice = SYM::xvec2xmat(translation_vectors[i],translation_vectors[j],translation_vectors[k]);         
-                    // ---------------------------------------------------------------------------
-                    // check determinant 
-                    if(abs(abs_det_q1-abs(det(tmp_lattice))) < det_tol){ //check determinant/volume
-                      xvector<double> abc_angles_q2=Getabc_angles(tmp_lattice,DEGREES);
-                      // ---------------------------------------------------------------------------
-                      // check angles
-                      if(checkTolerance(abc_angles_q1,abc_angles_q2)==false){
-                        double tmp_latt_dev = checkLatticeDeviation(abs_det_q1,tmp_lattice,D1,F1);
-                        // ---------------------------------------------------------------------------
-                        // check lattice deviation (time-saver) 
-                        // case 1: NOT optimize match: keep lattices with deviation smaller than Burzlaff's matching requirement)
-                        //         otherwise, there is no possible way that it could match with anything 
-                        // case 2: optimize match: keep lattices with deviation smaller than Burzlaff's same-family requirement)
-                        // otherwise, there is no possible way that it could match with anything or be in the same-family
-                        if((!optimize_match && tmp_latt_dev <= 0.1) || (optimize_match && tmp_latt_dev <= 0.2)) { //fast match doesn't care about finding same family information //DX20190318 - removed unique since it doesn't exist yet
-                          // ---------------------------------------------------------------------------
-                          // now check uniqueness (this is more expensive than checking lattice deviation, hence why it is further in nesting) 
-                          bool unique = true;
-                          uint placement_index = lattices.size(); //DX20190626 //default to the end
-                          for(uint t=0;t<lattices.size();t++){
-                            if(identical(tmp_lattice,lattices[t],1e-10)){
-                              unique=false;
-                              break;
-                            }
-                            // store placement/index based on lattice deviation 
-                            if(sort_via_lattice_deviation && tmp_latt_dev < latt_devs[t] && placement_index == lattices.size()){ // third condition necessary; otherwise it could move down in order
-                              placement_index = t;
-                            }
-                          }
-                          if(unique){
-                            // ---------------------------------------------------------------------------
-                            // order/re-order by minimum lattice deviation (speed increase: more likely to find matches faster) 
-                            // append to the end 
-                            if(placement_index==lattices.size()){ // push_back: either it is the first or it goes to the end
-                              lattices.push_back(tmp_lattice); // stores original original orientation
-                              //DX20201130 tmp_clatt=GetClat(abc_angles_q2[1],abc_angles_q2[2],abc_angles_q2[3],abc_angles_q2[4],abc_angles_q2[5],abc_angles_q2[6]);
-                              //DX20201130 clattices.push_back(tmp_clatt); // store Cartesian lattice, alignes with XYZ coordinates
-                              latt_devs.push_back(tmp_latt_dev);
-                            }
-                            // insert to certain location via index 
-                            else{
-                              lattices.insert(lattices.begin()+placement_index, tmp_lattice); // stores original original orientation
-                              //DX20201130 tmp_clatt=GetClat(abc_angles_q2[1],abc_angles_q2[2],abc_angles_q2[3],abc_angles_q2[4],abc_angles_q2[5],abc_angles_q2[6]);
-                              //DX20201130 clattices.insert(clattices.begin()+placement_index, tmp_clatt); // store Cartesian lattice, alignes with XYZ coordinates
-                              latt_devs.insert(latt_devs.begin()+placement_index, tmp_latt_dev);
-                            }
-                            store++;
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-
-    // ---------------------------------------------------------------------------
-    // print lattices and corresponding lattice deviation 
-    if(VERBOSE){
-      cerr << "q1: " << q1 << endl;
-      cerr << "det(q1): " << det(q1) << endl;
-      cerr << "abc angles q1: " << abc_angles_q1 << endl;
-      for(uint i=0;i<lattices.size();i++){
-        //DX20201130 cerr << function_name << endl << " lattice: " << endl << lattices[i] << endl << " clattice: " << clattices[i] << endl << " volume: " << det(lattices[i]) << endl << " lattice deviation: " << endl << latt_devs[i] << endl;
-        cerr << function_name << endl << " lattice: " << endl << lattices[i] << endl << " volume: " << det(lattices[i]) << endl << " lattice deviation: " << endl << latt_devs[i] << endl;
-        xvector<double> abc_angles_q2=Getabc_angles(lattices[i],DEGREES);
-        cerr << "abc angles: " << abc_angles_q2 << endl;
-      }
-    }
-
-    return true;
-  }
-}
-*/
-
 // ***************************************************************************
 // XtalFinderCalculator::buildSimilarLattices() 
 // ***************************************************************************
@@ -7048,7 +6814,7 @@ bool XtalFinderCalculator::buildSimilarLattices(
     bool optimize_match,
     bool scale_volume){
 
-  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_COMPARE_);
   bool VERBOSE=false;
   string function_name = XPID + "XtalFinderCalculator::buildSimilarLattices():";
 
@@ -7213,185 +6979,8 @@ bool XtalFinderCalculator::buildSimilarLattices(
     return true;
   }
 
-/*
 // ***************************************************************************
-// Build All Lattices
-// ***************************************************************************
-namespace compare{
-  bool buildSimilarLattices(vector<xvector<double> >& translation_vectors,
-      xmatrix<double>& q1,
-      double& xstr1_vol,
-      double& abs_det_q1,
-      xvector<double>& abc_angles_q1,
-      vector<xmatrix<double> >& lattices,
-      vector<xmatrix<double> >& clattices,
-      vector<double>& latt_devs,
-      bool optimize_match,
-      bool scale_volume){ //DX20200422 - scale_volume
-
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
-    bool VERBOSE=false;
-    string function_name = XPID + "compare::buildSimilarLattices():";
-
-    // ---------------------------------------------------------------------------
-    // sort via smallest misfit for speed up
-    bool sort_via_lattice_deviation = true; //DX20190626 - speed increase
-    bool relative_tolerance = false; //DX20190703
-
-    vector<double> D1,F1;
-    cellDiagonal(q1,D1,F1,1);
-
-    // ---------------------------------------------------------------------------
-    // volume of unit cell tolerance
-    //DX20200422 - tol_vol used to be 0.1; now if we allow for volume scaling
-    // then we make it larger to find matches in the same family misfit range (0.1<=misfit<=0.2)
-    double tol_vol=0.1;
-    if(scale_volume){ tol_vol=(1.0/3.0); }
-    double det_tol=tol_vol*abs_det_q1;
-
-    // ---------------------------------------------------------------------------
-    // tolerance for lattice vectors: relative or absolute 
-    double tol_a=1e9; double tol_b=1e9; double tol_c=1e9;
-    if(relative_tolerance){
-      tol_a=abc_angles_q1[1]*0.3;
-      tol_b=abc_angles_q1[2]*0.3;
-      tol_c=abc_angles_q1[3]*0.3;
-    }
-    else{
-      tol_a=1.0; tol_b=1.0; tol_c=1.0; // 1 Angstrom
-    }
-
-    // ---------------------------------------------------------------------------
-    // LDEBUG: print lattice tolerances 
-    if(LDEBUG) {
-      if(relative_tolerance){
-        cerr << function_name << " Tolerance for a (Angstroms): " << tol_a << endl;
-        cerr << function_name << " Tolerance for b (Angstroms): " << tol_b << endl;
-        cerr << function_name << " Tolerance for c (Angstroms): " << tol_c << endl;
-        cerr << function_name << " Tolerance for alpha (degrees): " << abc_angles_q1[4]*0.3 << endl;
-        cerr << function_name << " Tolerance for beta (degrees): " << abc_angles_q1[5]*0.3 << endl;
-        cerr << function_name << " Tolerance for gamma (degrees): " << abc_angles_q1[6]*0.3 << endl;
-      }
-      else{
-        cerr << function_name << " Tolerance for a (Angstroms): " << tol_a << endl;
-        cerr << function_name << " Tolerance for b (Angstroms): " << tol_b << endl;
-        cerr << function_name << " Tolerance for c (Angstroms): " << tol_c << endl;
-        cerr << function_name << " Tolerance for alpha (degrees): " << 5 << endl;
-        cerr << function_name << " Tolerance for beta (degrees): " << 5 << endl;
-        cerr << function_name << " Tolerance for gamma (degrees): " << 5 << endl;
-      }
-    }
-
-    xmatrix<double> tmp_lattice(3,3);
-    xmatrix<double> tmp_clatt(3,3);
-
-    // ---------------------------------------------------------------------------
-    // compute lenths of possible lattices before-hand (faster than on-the-fly)
-    int store=0;
-    vector<double> translations_mod;
-    for(uint i=0;i<translation_vectors.size();i++){
-      translations_mod.push_back(aurostd::modulus(translation_vectors[i]));
-    }
-    if(LDEBUG) { cerr << function_name << " Number of lattice vectors: " << translation_vectors.size() << endl; }
-
-    // ---------------------------------------------------------------------------
-    // build all possible unit cells with combinations of lattice vectors 
-    // (order matters, hence not upper triangular)
-    for(uint i=0;i<translation_vectors.size();i++){
-      // ---------------------------------------------------------------------------
-      // check lattice vector length: a
-      if(abs(translations_mod[i]-abc_angles_q1[1])<tol_a){ //check a
-        for(uint j=0;j<translation_vectors.size();j++){
-          if(j!=i){
-            // ---------------------------------------------------------------------------
-            // check lattice vector length: b
-            if(abs(translations_mod[j]-abc_angles_q1[2])<tol_b){ // check b
-              for(uint k=0;k<translation_vectors.size();k++){
-                if(k!=i && k!=j){
-                  // ---------------------------------------------------------------------------
-                  // check lattice vector length: c
-                  if(abs(translations_mod[k]-abc_angles_q1[3])<tol_c){ //check c
-                    tmp_lattice = SYM::xvec2xmat(translation_vectors[i],translation_vectors[j],translation_vectors[k]);         
-                    // ---------------------------------------------------------------------------
-                    // check determinant 
-                    if(abs(abs_det_q1-abs(det(tmp_lattice))) < det_tol){ //check determinant/volume
-                      xvector<double> abc_angles_q2=Getabc_angles(tmp_lattice,DEGREES);
-                      // ---------------------------------------------------------------------------
-                      // check angles
-                      if(checkTolerance(abc_angles_q1,abc_angles_q2)==false){
-                        double tmp_latt_dev = checkLatticeDeviation(xstr1_vol,tmp_lattice,D1,F1);
-                        // ---------------------------------------------------------------------------
-                        // check lattice deviation (time-saver) 
-                        // case 1: NOT optimize match: keep lattices with deviation smaller than Burzlaff's matching requirement)
-                        //         otherwise, there is no possible way that it could match with anything 
-                        // case 2: optimize match: keep lattices with deviation smaller than Burzlaff's same-family requirement)
-                        // otherwise, there is no possible way that it could match with anything or be in the same-family
-                        if((!optimize_match && tmp_latt_dev <= 0.1) || (optimize_match && tmp_latt_dev <= 0.2)) { //fast match doesn't care about finding same family information //DX20190318 - removed unique since it doesn't exist yet
-                          // ---------------------------------------------------------------------------
-                          // now check uniqueness (this is more expensive than checking lattice deviation, hence why it is further in nesting) 
-                          bool unique = true;
-                          uint placement_index = lattices.size(); //DX20190626 //default to the end
-                          for(uint t=0;t<lattices.size();t++){
-                            if(identical(tmp_lattice,lattices[t],1e-10)){
-                              unique=false;
-                              break;
-                            }
-                            // store placement/index based on lattice deviation 
-                            if(sort_via_lattice_deviation && tmp_latt_dev < latt_devs[t] && placement_index == lattices.size()){ // third condition necessary; otherwise it could move down in order
-                              placement_index = t;
-                            }
-                          }
-                          if(unique){
-                            // ---------------------------------------------------------------------------
-                            // order/re-order by minimum lattice deviation (speed increase: more likely to find matches faster) 
-                            // append to the end 
-                            if(placement_index==lattices.size()){ // push_back: either it is the first or it goes to the end
-                              lattices.push_back(tmp_lattice); // stores original original orientation
-                              tmp_clatt=GetClat(abc_angles_q2[1],abc_angles_q2[2],abc_angles_q2[3],abc_angles_q2[4],abc_angles_q2[5],abc_angles_q2[6]);
-                              clattices.push_back(tmp_clatt); // store Cartesian lattice, alignes with XYZ coordinates
-                              latt_devs.push_back(tmp_latt_dev);
-                            }
-                            // insert to certain location via index 
-                            else{
-                              lattices.insert(lattices.begin()+placement_index, tmp_lattice); // stores original original orientation
-                              tmp_clatt=GetClat(abc_angles_q2[1],abc_angles_q2[2],abc_angles_q2[3],abc_angles_q2[4],abc_angles_q2[5],abc_angles_q2[6]);
-                              clattices.insert(clattices.begin()+placement_index, tmp_clatt); // store Cartesian lattice, alignes with XYZ coordinates
-                              latt_devs.insert(latt_devs.begin()+placement_index, tmp_latt_dev);
-                            }
-                            store++;
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-
-    // ---------------------------------------------------------------------------
-    // print lattices and corresponding lattice deviation 
-    if(VERBOSE){
-      cerr << "q1: " << q1 << endl;
-      cerr << "det(q1): " << det(q1) << endl;
-      cerr << "abc angles q1: " << abc_angles_q1 << endl;
-      for(uint i=0;i<lattices.size();i++){
-        cerr << function_name << endl << " lattice: " << endl << lattices[i] << endl << " clattice: " << clattices[i] << endl << " volume: " << det(lattices[i]) << endl << " lattice deviation: " << endl << latt_devs[i] << endl;
-        xvector<double> abc_angles_q2=Getabc_angles(lattices[i],DEGREES);
-        cerr << "abc angles: " << abc_angles_q2 << endl;
-      }
-    }
-
-    return true;
-  }
-}
-*/
-
-// ***************************************************************************
-// getLatticeTransformations()
+// compare::getLatticeTransformations()
 // ***************************************************************************
 namespace compare{
   void getLatticeTransformations(const xmatrix<double>& lattice_original, 
@@ -7400,7 +6989,7 @@ namespace compare{
       vector<xmatrix<double> >& basis_transformations,
       vector<xmatrix<double> >& rotations){
      
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_COMPARE_);
     string function_name = XPID + "compare::getLatticeTransformations():";
         
     xmatrix<double> basis_transformation, rotation, deformation;
@@ -7455,13 +7044,6 @@ namespace compare{
           cerr << function_name << " metric_tensor_ideal: " << metric_tensor_ideal << endl;
         }
 
-        //if(!aurostd::identical(metric_tensor_new,metric_tensor_ideal,1.0)){
-        //  cerr << "NOT EQUAL: diff=" << metric_tensor_new - metric_tensor_ideal << endl;
-        //  xmatrix<double> basis_transformation2ideal = GetBasisTransformation(lattice_new,lattice_ideal);
-        //  xmatrix<double> basis_no_rotation = extractRotationFromBasisChange(basis_transformation2ideal);
-        //  basis_transformation = basis_no_rotation*basis_transformation;
-        //  lattice_new = basis_transformation*lattice_original;
-        //}
         basis_transformations.push_back(basis_transformation);
         
         // ---------------------------------------------------------------------------
@@ -7515,7 +7097,7 @@ namespace compare{
       xmatrix<double>& basis_transformation,
       xmatrix<double>& rotation){
      
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_COMPARE_);
     string function_name = XPID + "compare::getLatticeTransformation():";
         
     xmatrix<double> deformation;
@@ -7562,14 +7144,6 @@ namespace compare{
         cerr << function_name << " metric_tensor_new: " << metric_tensor_new << endl;
         cerr << function_name << " metric_tensor_ideal: " << metric_tensor_ideal << endl;
       }
-
-      //if(!aurostd::identical(metric_tensor_new,metric_tensor_ideal,1.0)){
-      //  cerr << "NOT EQUAL: diff=" << metric_tensor_new - metric_tensor_ideal << endl;
-      //  xmatrix<double> basis_transformation2ideal = GetBasisTransformation(lattice_new,lattice_ideal);
-      //  xmatrix<double> basis_no_rotation = extractRotationFromBasisChange(basis_transformation2ideal);
-      //  basis_transformation = basis_no_rotation*basis_transformation;
-      //  lattice_new = basis_transformation*lattice_original;
-      //}
 
       // ---------------------------------------------------------------------------
       // then rotate to the ideal lattice 
@@ -7618,7 +7192,7 @@ namespace compare{
       const vector<xmatrix<double> >& basis_transformations,
       const vector<xmatrix<double> >& rotations){
 
-    //bool LDEBUG=(FALSE || XHOST.DEBUG);
+    //bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_COMPARE_);
     //string function_name = XPID + "compare::getTransformedStructures():";
 
     vector<xstructure> vxstrs_transformed;

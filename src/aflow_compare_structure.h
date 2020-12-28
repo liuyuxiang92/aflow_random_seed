@@ -33,6 +33,8 @@
 #define _COMPARE_DATABASE_GEOMETRY_RELAX1_ 1
 #define _COMPARE_DATABASE_GEOMETRY_MOST_RELAXED_ 2
 
+#define _DEBUG_COMPARE_ false  //DX20201223
+
 //// ===== GroupedWyckoffPosition Class ===== //
 //DX20191120 [MOVED TO aflow.h]
 
@@ -183,18 +185,15 @@ class StructurePrototype{
     // functions
     uint numberOfDuplicates() const; //DX20190506                                           // return the number of duplicate structures for this prototype (i.e., checks misfit value)
     string printRepresentativeStructure() const; //DX20201028                               // return the representative structure in a JSON format
-    string printRepresentativeStructureNEW() const;
     string printMatchedStructures(const string& mode) const; //DX20201028                   // return the matched structures in a JSON format
-    string printMatchedStructuresNEW(const string& mode) const; //DX20201028                   // return the matched structures in a JSON format
     uint numberOfComparisons(); //DX20181221                                                // return the number of comparisons for this prototype
     bool isSymmetryCalculated(); //DX20190228
     bool isLFAEnvironmentCalculated(); //DX20191105
     bool calculateSymmetry(); //DX20190118                                                  // calculate space group symmetry and populate symmetry attributes for StructurePrototype
     void putDuplicateAsFamily(uint index, bool keep_generated=false);                       // make duplicate structure a same family structure in the same StructurePrototypeObject //DX20190814 
-    void copyPrototypeInformation(const StructurePrototype& b);                                   // copy prototype information from one StructurePrototype object to another
-    void copyDuplicate(const StructurePrototype& b, uint index, bool copy_misfit=false);         // copy duplicate info to another StructurePrototype object
-    void removeNonDuplicate(uint index);                                                   // remove non-duplicate structures 
-    //bool removeDuplicates(bool remove_duplicate_count);                                     // remove duplicate structure information
+    void copyPrototypeInformation(const StructurePrototype& b);                             // copy prototype information from one StructurePrototype object to another
+    void copyDuplicate(const StructurePrototype& b, uint index, bool copy_misfit=false);    // copy duplicate info to another StructurePrototype object
+    void removeNonDuplicate(uint index);                                                    // remove non-duplicate structures 
   private:
     void free();                                                                            // free operator
     void copy(const StructurePrototype& b);                                                 // copy constructor
@@ -334,11 +333,6 @@ class XtalFinderCalculator : public xStream {
     // ---------------------------------------------------------------------------
     // append unmatched structures into new groups
     void appendStructurePrototypes(
-      vector<StructurePrototype>& comparison_schemes,
-      vector<StructurePrototype>& final_prototypes,
-      bool clean_unmatched, //DX20190506
-      bool quiet);
-    void appendStructurePrototypesFAST(
       vector<StructurePrototype>& comparison_schemes,
       vector<StructurePrototype>& final_prototypes,
       bool clean_unmatched, //DX20190506
@@ -578,7 +572,7 @@ namespace compare{
   // ---------------------------------------------------------------------------
   // comparing permutations/atom decorations 
   vector<std::pair<uint,uint> > calculateDivisors(const int& number);
-  bool checkNumberOfGroupingsNEW(const vector<StructurePrototype>& comparison_schemes, uint number);
+  bool checkNumberOfGroupings(const vector<StructurePrototype>& comparison_schemes, uint number);
   // TODO (MOVE) void checkPrototypes(const uint& num_proc, const bool& same_species, vector<StructurePrototype>& final_prototypes);
   void generatePermutationString(const deque<uint>& stoichiometry, vector<string>& permutation); //DX20190508 //DX20191125 - changed from vector to deque
   void generatePermutationString(const vector<uint>& stoichiometry, vector<string>& permutation); //DX20190508
