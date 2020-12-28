@@ -4096,106 +4096,83 @@ void XtalFinderCalculator::appendStructurePrototypes(
   }
 }
 
-//TODO
-/*
 // ***************************************************************************
-// checkPrototypes - Ensure prototypes of different SG are compared
+// XtalFinderCalculator::combinePrototypesOfDifferentSymmetry()
 // ***************************************************************************
-namespace compare{
-  void checkPrototypes(const uint& num_proc, const bool& same_species, 
-      vector<StructurePrototype>& final_prototypes){
+void XtalFinderCalculator::combinePrototypesOfDifferentSymmetry( 
+    vector<StructurePrototype>& final_prototypes,
+    bool same_species,
+    uint num_proc) {
 
-    // Checks to see if prototypes of different space groups are similar. 
-    // If they are, then we combine the StructurePrototype objects into one.
-    // When combining, we keep the "representative" prototype as the one with a higher 
-    // symmetry (i.e. higher space group).
-    // This is an optional function; we may not want to do this when 
-    // comparing prototypes or comparing material properties 
+  // Checks to see if prototypes of different space groups are similar. 
+  // If they are, combine the StructurePrototype objects into one.
+  // When combining, we keep the "representative" prototype as the one with a higher 
+  // symmetry (i.e. higher space group).
+  // This is an optional function; we may not want to do this when 
+  // comparing prototypes or comparing material properties 
 
-    for(uint i=0;i<final_prototypes.size();i++){
-      vector<int> store_indices;
-      vector<double> store_misfits;
-      int min_index=-1;
-      double min_misfit=AUROSTD_MAX_DOUBLE;
-      structure_misfit min_misfit_info = compare::initialize_misfit_struct(); //DX20191218
-      for(uint j=i;j<final_prototypes.size();j++){
-        ostringstream tmp_oss;
-        tmp_oss.clear();
-        if(
-            // If same_species==true
-            (same_species==true && 
-             matchableSpecies(final_prototypes[i].structure_representative,final_prototypes[j].structure_representative,same_species)==true &&
-             final_prototypes[i].stoichiometry==final_prototypes[j].stoichiometry && 
-             final_prototypes[i].Pearson==final_prototypes[j].Pearson &&
-             !matchableSpaceGroups(final_prototypes[i].space_group,final_prototypes[j].space_group)) ||
-            // If same_species==false
-            (same_species==false && 
-             final_prototypes[i].stoichiometry==final_prototypes[j].stoichiometry &&
-             final_prototypes[i].Pearson==final_prototypes[j].Pearson && 
-             !matchableSpaceGroups(final_prototypes[i].space_group,final_prototypes[j].space_group))
-          ){
-          double final_misfit=AUROSTD_MAX_DOUBLE;
-          structure_misfit final_misfit_info = compare::initialize_misfit_struct(); //DX20191218
-          bool scale_volume=true; //default is true
-          bool optimize_match=false; //default is false
-          aflowCompareStructure(num_proc, final_prototypes[i].structure_representative, 
-              final_prototypes[j].structure_representative, same_species, 
-              scale_volume, optimize_match, final_misfit, final_misfit_info, tmp_oss); //DX20191122 - move ostream to end  //DX20191218 - added misfit_info
-          if(final_misfit < min_misfit){
-            min_misfit_info=final_misfit_info; //DX20191218
-            min_misfit=final_misfit;
-            min_index=j;
-          }
+  int nprototypes=(int)final_prototypes.size();
+
+  for(int i=0;i<nprototypes;i++){
+    int min_index=-1;
+    double min_misfit=AUROSTD_MAX_DOUBLE;
+    structure_misfit min_misfit_info = compare::initialize_misfit_struct(); //DX20191218
+    for(uint j=i;j<final_prototypes.size();j++){
+      if(
+          // If same_species==true
+          (same_species==true && 
+           compare::matchableSpecies(final_prototypes[i].structure_representative_struct->structure,final_prototypes[j].structure_representative_struct->structure,same_species)==true &&
+           final_prototypes[i].stoichiometry==final_prototypes[j].stoichiometry && 
+           final_prototypes[i].Pearson==final_prototypes[j].Pearson &&
+           !compare::matchableSpaceGroups(final_prototypes[i].space_group,final_prototypes[j].space_group)) ||
+          // If same_species==false
+          (same_species==false && 
+           final_prototypes[i].stoichiometry==final_prototypes[j].stoichiometry &&
+           final_prototypes[i].Pearson==final_prototypes[j].Pearson && 
+           !compare::matchableSpaceGroups(final_prototypes[i].space_group,final_prototypes[j].space_group))
+        ){
+        double final_misfit=AUROSTD_MAX_DOUBLE;
+        structure_misfit final_misfit_info = compare::initialize_misfit_struct(); //DX20191218
+        bool scale_volume=true; //default is true
+        bool optimize_match=false; //default is false
+        compare::aflowCompareStructure(num_proc, final_prototypes[i].structure_representative_struct->structure, 
+            final_prototypes[j].structure_representative_struct->structure, same_species, 
+            scale_volume, optimize_match, final_misfit, final_misfit_info); //DX20191122 - move ostream to end  //DX20191218 - added misfit_info
+        if(final_misfit < min_misfit){
+          min_misfit_info=final_misfit_info; //DX20191218
+          min_misfit=final_misfit;
+          min_index=j;
         }
       }
-      // If one prototype is similar to another, add to one with higher space group
-      if(min_misfit!=AUROSTD_MAX_DOUBLE){
-        int sg_ind=-1;
-        uint other_ind=-1;
-        if(final_prototypes[i].space_group > final_prototypes[min_index].space_group){
-          sg_ind=i;
-          other_ind=min_index;
-        }
-        else {
-          sg_ind=min_index;
-          other_ind=i;
-        }
-        // Transfer info to prototype with higher space group
-        final_prototypes[sg_ind].structures_duplicate_names.push_back(final_prototypes[other_ind].structure_representative_name);
-        final_prototypes[sg_ind].structures_duplicate_names.insert(final_prototypes[sg_ind].structures_duplicate_names.end(),
-            final_prototypes[other_ind].structures_duplicate_names.begin(),
-            final_prototypes[other_ind].structures_duplicate_names.end());
-        final_prototypes[sg_ind].structures_duplicate.push_back(final_prototypes[other_ind].structure_representative);
-        final_prototypes[sg_ind].structures_duplicate.insert(final_prototypes[sg_ind].structures_duplicate.end(),
-            final_prototypes[other_ind].structures_duplicate.begin(),
-            final_prototypes[other_ind].structures_duplicate.end());
-        final_prototypes[sg_ind].structures_duplicate_compounds.push_back(final_prototypes[other_ind].structure_representative_compound);
-        final_prototypes[sg_ind].structures_duplicate_compounds.insert(final_prototypes[sg_ind].structures_duplicate_compounds.end(),
-            final_prototypes[other_ind].structures_duplicate_compounds.begin(),
-            final_prototypes[other_ind].structures_duplicate_compounds.end());
-        final_prototypes[sg_ind].structures_duplicate_generated.push_back(final_prototypes[other_ind].structure_representative_generated);
-        final_prototypes[sg_ind].structures_duplicate_generated.insert(final_prototypes[sg_ind].structures_duplicate_generated.end(),
-            final_prototypes[other_ind].structures_duplicate_generated.begin(),
-            final_prototypes[other_ind].structures_duplicate_generated.end());
-        final_prototypes[sg_ind].structures_duplicate_source.push_back(final_prototypes[other_ind].structure_representative_source);
-        final_prototypes[sg_ind].structures_duplicate_source.insert(final_prototypes[sg_ind].structures_duplicate_source.end(),
-            final_prototypes[other_ind].structures_duplicate_source.begin(),
-            final_prototypes[other_ind].structures_duplicate_source.end());
-        final_prototypes[sg_ind].structures_duplicate_relaxation_step.push_back(final_prototypes[other_ind].structure_representative_relaxation_step); //DX20200429
-        final_prototypes[sg_ind].structures_duplicate_relaxation_step.insert(final_prototypes[sg_ind].structures_duplicate_relaxation_step.end(), //DX20200429
-            final_prototypes[other_ind].structures_duplicate_relaxation_step.begin(), //DX20200429
-            final_prototypes[other_ind].structures_duplicate_relaxation_step.end()); //DX20200429
-        // Delete the prototype with the lower space group
-        final_prototypes.erase(final_prototypes.begin()+other_ind);
-        // If the index deleted was less than the initial loop (i), then need to reduce iterator
-        if(other_ind<=i){
-          i--;
-        }
+    }
+    // If one prototype is similar to another, add to one with higher space group
+    if(min_misfit!=AUROSTD_MAX_DOUBLE){
+      int sg_ind=-1;
+      int other_ind=-1;
+      if(final_prototypes[i].space_group > final_prototypes[min_index].space_group){
+        sg_ind=i;
+        other_ind=min_index;
+      }
+      else {
+        sg_ind=min_index;
+        other_ind=i;
+      }
+      // Transfer info to prototype with higher space group
+      addStructure2duplicatesList(final_prototypes[sg_ind], final_prototypes[other_ind].structure_representative_struct);
+      final_prototypes[sg_ind].structure_misfits_duplicate.push_back(min_misfit_info);
+      for(uint j=0;j<final_prototypes[other_ind].structures_duplicate_struct.size();j++){
+        addStructure2duplicatesList(final_prototypes[sg_ind], final_prototypes[other_ind].structures_duplicate_struct[j]);
+        final_prototypes[sg_ind].structure_misfits_duplicate.push_back(final_prototypes[other_ind].structure_misfits_duplicate[j]); //this is the approximate misfit to the new representative ...
+      }
+      // Delete the prototype with the lower space group
+      final_prototypes.erase(final_prototypes.begin()+other_ind);
+      // If the index deleted was less than the initial loop (i), then need to reduce iterator
+      if(other_ind<=i){
+        i--;
       }
     }
   }
 }
-*/
 
 // ***************************************************************************
 // XtalFinderCalculator::printResults()

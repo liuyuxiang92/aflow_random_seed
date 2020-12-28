@@ -329,6 +329,7 @@ class XtalFinderCalculator : public xStream {
       bool same_species,
       const aurostd::xoption& comparison_options, 
       bool quiet);
+    void combinePrototypesOfDifferentSymmetry(vector<StructurePrototype>& final_prototypes, bool same_species, uint num_proc);
   
     // ---------------------------------------------------------------------------
     // append unmatched structures into new groups
@@ -573,7 +574,6 @@ namespace compare{
   // comparing permutations/atom decorations 
   vector<std::pair<uint,uint> > calculateDivisors(const int& number);
   bool checkNumberOfGroupings(const vector<StructurePrototype>& comparison_schemes, uint number);
-  // TODO (MOVE) void checkPrototypes(const uint& num_proc, const bool& same_species, vector<StructurePrototype>& final_prototypes);
   void generatePermutationString(const deque<uint>& stoichiometry, vector<string>& permutation); //DX20190508 //DX20191125 - changed from vector to deque
   void generatePermutationString(const vector<uint>& stoichiometry, vector<string>& permutation); //DX20190508
   bool generatePermutations(uint& num_elements, vector<uint>& indices, vector<string>& names, vector<GroupedWyckoffPosition>& grouped_Wyckoff_positions, vector<vector<uint> >& permutations, vector<vector<string> >&name_order, vector<vector<GroupedWyckoffPosition> >& permutation_grouped_Wyckoff_positions);
