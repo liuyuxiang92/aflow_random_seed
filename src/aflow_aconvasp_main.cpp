@@ -1541,6 +1541,8 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
 
   //  vpflow.flag("XXX",aurostd::args2flag(argv,cmds,"--xxx"));
   vpflow.flag("XFIXX",(aurostd::args2flag(argv,cmds,"--xfixX|--xfixx") && argv.size()==4));
+  
+  vpflow.flag("XTALFINDER_PYTHON",aurostd::args2attachedflag(argv,cmds,"--aflow_xtalfinder_python|--xtalfinder_python")); //DX20201228
 
   vpflow.flag("XXX",(aurostd::args2flag(argv,cmds,"--xxx")));
   if(vpflow.flag("XXX")) cout << "XXX" << endl;
@@ -2161,6 +2163,7 @@ namespace pflow {
       if(vpflow.flag("PLOT_XRAY_FILE")) {pflow::PLOT_XRAY(vpflow); _PROGRAMRUN=true;} //CO20190520
       if(vpflow.flag("XRD_DIST")) {pflow::GetAtomicPlaneDist(vpflow.getattachedscheme("XRD_DIST"),cin); _PROGRAMRUN=true;}
       if(vpflow.flag("XELEMENT")) {pflow::XelementPrint(vpflow.getattachedscheme("XELEMENT"),cout); _PROGRAMRUN=true;}
+      if(vpflow.flag("XTALFINDER_PYTHON")){ compare::writePythonScript(cout); _PROGRAMRUN=true;}
       // Y
       // Z
       if(vpflow.flag("ZVAL")) {pflow::ZVAL("ZVAL,"+vpflow.getattachedscheme("ZVAL")); _PROGRAMRUN=true;}

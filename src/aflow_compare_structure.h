@@ -704,6 +704,8 @@ namespace compare{
 
 
   xstructure supercell2newRepresentation(const xstructure& xstr_supercell, const xmatrix<double>& lattice);
+  
+  void writePythonScript(ostream& oss); //DX20201228
 
 } // end namespace
 

@@ -16,6 +16,7 @@
 #include "aflow_pflow.h"
 #include "aflow_compare_structure.h"
 #include "aflow_symmetry_spacegroup.h"
+#include "aflow_xtalfinder_python.cpp" //DX20201228
 #include <chrono>
 
 #undef AFLOW_COMPARE_MULTITHREADS_ENABLE
@@ -7221,6 +7222,30 @@ void XtalFinderCalculator::getPrototypeDesignations(
 
   for(uint i=start_index;i<end_index;i++){ //DX20191107 switching end index convention <= vs <
     anrl::structure2anrl(prototypes[i].structure_representative_struct->structure,false); //DX20190829 - false for do not recalulate symmetry, save time
+  }
+}
+
+// ******************************************************************************
+// compare::writePythonScript() //DX20201228
+// ******************************************************************************
+namespace compare {
+  void writePythonScript(ostream& oss){
+
+    // Writes AFLOW-XtalFinder Python script in a subdirectory
+
+    string function_name = XPID+"compare::writePythonScript():";
+
+    string directory = aurostd::getPWD();
+    string xtalfinder_python_subdir = "AFLOW_XTALFINDER_PYTHON";
+    string python_dir = directory + "/" + xtalfinder_python_subdir;
+
+    aurostd::DirectoryMake(python_dir);
+
+    pflow::logger(_AFLOW_FILE_NAME_, function_name, "Writing out python script to: "+python_dir, oss, _LOGGER_NOTICE_);
+    stringstream output;
+
+    output << AFLOW_XTALFINDER_PYTHON_PY;
+    aurostd::stringstream2file(output, python_dir+"/"+"aflow_xtalfinder_python.py");
   }
 }
 

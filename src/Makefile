@@ -809,6 +809,17 @@ aflow_sym_python.cpp: aflow_sym_python.py Makefile
 	echo "\";" >> $@
 	echo "#endif // _AFLOW_SYM_PYTHON_CPP_" >> $@
 #DX20201228 - END
+#DX20201228 - START
+aflow_xtalfinder_python.cpp: aflow_xtalfinder_python.py Makefile
+	rm -rf $@
+	echo "#ifndef _AFLOW_XTALFINDER_PYTHON_CPP_" >> $@
+	echo "#define _AFLOW_XTALFINDER_PYTHON_CPP_" >> $@
+	echo "// $@ automatic generated" >> $@
+	echo "std::string AFLOW_XTALFINDER_PYTHON_PY=\"\\" >> $@
+	cat $< | perl -p -e 's/\r//g' | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\"/\\"/g' >> $@
+	echo "\";" >> $@
+	echo "#endif // _AFLOW_XTALFINDER_PYTHON_CPP_" >> $@
+#DX20201228 - END
 aflow_mix_nomix_table.cpp: Makefile $(AFLOW_HPPS) $(AUROSTD_HPPS)
 	rm -rf nomix.tmp
 	find $(PROJECT_DIRECTORY_GNDSTATE)/NOMIX/ -name aflow.in | sed "s/\/common\/$(PROJECT_DIRECTORY_GNDSTATE)\/NOMIX\/LIB2\/LIB\///g" | sed "s/aflow.in//g" >> nomix.tmp
