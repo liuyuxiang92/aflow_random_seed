@@ -798,6 +798,17 @@ aflow_chull_python.cpp: aflow_chull_python.py Makefile
 	echo "\";" >> $@
 	echo "#endif // _AFLOW_CHULL_PYTHON_CPP_" >> $@
 #MB 190301 - END
+#DX20201228 - START
+aflow_sym_python.cpp: aflow_sym_python.py Makefile
+	rm -rf $@
+	echo "#ifndef _AFLOW_SYM_PYTHON_CPP_" >> $@
+	echo "#define _AFLOW_SYM_PYTHON_CPP_" >> $@
+	echo "// $@ automatic generated" >> $@
+	echo "std::string AFLOW_SYM_PYTHON_PY=\"\\" >> $@
+	cat $< | perl -p -e 's/\r//g' | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\"/\\"/g' >> $@
+	echo "\";" >> $@
+	echo "#endif // _AFLOW_SYM_PYTHON_CPP_" >> $@
+#DX20201228 - END
 aflow_mix_nomix_table.cpp: Makefile $(AFLOW_HPPS) $(AUROSTD_HPPS)
 	rm -rf nomix.tmp
 	find $(PROJECT_DIRECTORY_GNDSTATE)/NOMIX/ -name aflow.in | sed "s/\/common\/$(PROJECT_DIRECTORY_GNDSTATE)\/NOMIX\/LIB2\/LIB\///g" | sed "s/aflow.in//g" >> nomix.tmp
@@ -970,7 +981,7 @@ dataclean:
 	rm -f aflow_data aflow_data_*
 .PHONY: clean_autogen
 clean_autogen:
-	rm -rf aflowlib_webapp_entry.cpp aflowlib_webapp_bands.cpp aflow_chull_jupyter.cpp aflow_chull_jupyter_plotter.cpp aflow_chull_python.cpp aflow_chull_jupyter_requirements.cpp aflow_data_readme.cpp aflow_readme_aflow.cpp aflow_readme_aconvasp.cpp aflow_readme_apennsy.cpp aflow_readme_proto.cpp aflow_xproto_icsd_lib.cpp aflow_matlab_funcs.cpp aflow_gnuplot_funcs.cpp aflow_data_*cpp *.dat
+	rm -rf aflowlib_webapp_entry.cpp aflowlib_webapp_bands.cpp aflow_chull_jupyter.cpp aflow_chull_jupyter_plotter.cpp aflow_chull_python.cpp aflow_chull_jupyter_requirements.cpp aflow_sym_python.cpp aflow_data_readme.cpp aflow_readme_aflow.cpp aflow_readme_aconvasp.cpp aflow_readme_apennsy.cpp aflow_readme_proto.cpp aflow_xproto_icsd_lib.cpp aflow_matlab_funcs.cpp aflow_gnuplot_funcs.cpp aflow_data_*cpp *.dat
 ###################################################################################################
 
 ###################################################################################################

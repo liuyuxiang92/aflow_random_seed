@@ -13,7 +13,7 @@ AUROSTD/aurostd.o: $(AUROSTD_CPPS) $(AUROSTD_HPPS) SQLITE/aflow_sqlite.h SQLITE/
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
 SYMBOLICCPLUSPLUS/symbolic_main.o: $(SYMBOLIC_CPPS) $(AUROSTD_HPPS) SQLITE/aflow_sqlite.h SQLITE/sqlite3.h $(SYMBOLIC_HPPS) aflow.h aflow_aflowrc.cpp aflow_apennsy.h aflow_compare_structure.h aflow_pflow.h aflowlib.h
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
-aflow.o: aflow.cpp $(AFLOW_H_DEPS) aflow_pocc.h aflow_test.cpp
+aflow.o: aflow.cpp $(AFLOW_H_DEPS) SYMBOLICCPLUSPLUS/array.h SYMBOLICCPLUSPLUS/cloning.h SYMBOLICCPLUSPLUS/constants.h SYMBOLICCPLUSPLUS/derive.h SYMBOLICCPLUSPLUS/equation.h SYMBOLICCPLUSPLUS/functions.h SYMBOLICCPLUSPLUS/identity.h SYMBOLICCPLUSPLUS/integrate.h SYMBOLICCPLUSPLUS/matnorm.h SYMBOLICCPLUSPLUS/matrix.h SYMBOLICCPLUSPLUS/multinomial.h SYMBOLICCPLUSPLUS/number.h SYMBOLICCPLUSPLUS/polynomial.h SYMBOLICCPLUSPLUS/product.h SYMBOLICCPLUSPLUS/quatern.h SYMBOLICCPLUSPLUS/rational.h SYMBOLICCPLUSPLUS/solve.h SYMBOLICCPLUSPLUS/sum.h SYMBOLICCPLUSPLUS/symbol.h SYMBOLICCPLUSPLUS/symbolic.h SYMBOLICCPLUSPLUS/symbolic_main.h SYMBOLICCPLUSPLUS/symbolicc++.h SYMBOLICCPLUSPLUS/symerror.h SYMBOLICCPLUSPLUS/symmatrix.h SYMBOLICCPLUSPLUS/vecnorm.h SYMBOLICCPLUSPLUS/vector.h SYMBOLICCPLUSPLUS/verylong.h aflow_anrl.h aflow_pocc.h aflow_symbolic.h aflow_symmetry_spacegroup.h aflow_test.cpp
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
 aflow_aconvasp.o: aflow_aconvasp.cpp $(AFLOW_H_DEPS)
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
@@ -181,7 +181,7 @@ aflowlib_libraries.o: aflowlib_libraries.cpp $(AFLOW_H_DEPS) aflow_ael_elasticit
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
 aflowlib_libraries_scrubber.o: aflowlib_libraries_scrubber.cpp $(AFLOW_H_DEPS)
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
-aflowlib_web_interface.o: aflowlib_web_interface.cpp $(AFLOW_H_DEPS) aflow_pocc.h aflowlib_webapp_bands.cpp aflowlib_webapp_entry.cpp
+aflowlib_web_interface.o: aflowlib_web_interface.cpp $(AFLOW_H_DEPS) aflow_pocc.h aflow_symmetry_spacegroup.h aflowlib_webapp_bands.cpp aflowlib_webapp_entry.cpp
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
 aflowlib_web_outreach.o: aflowlib_web_outreach.cpp $(AFLOW_H_DEPS)
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@

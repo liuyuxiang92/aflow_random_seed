@@ -4222,6 +4222,8 @@ namespace SYM {
   bool CalculateInequivalentAtoms_20160801(ofstream &FileMESSAGE,xstructure &a,bool rely_on_basis,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,double _eps_,string format="txt"); // EQUIVALENT ATOMS _IATOMS_ //DX  
   bool CalculateInequivalentAtoms_20160101(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss); // EQUIVALENT ATOMS _IATOMS_ //DX
   //DX+CO END
+  
+  void writePythonScript(ostream& oss); //DX20201228
 }
 string AgroupSymmetryToJson(vector<vector<_sym_op> >& group, char& mode); //DX20170803 - For Python wrapper
 string EquivalentAtomsToJson(vector<vector<int> >& iatoms); //DX20170803 - For Python wrapper

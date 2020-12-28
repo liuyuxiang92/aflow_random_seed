@@ -3039,6 +3039,13 @@ namespace pflow {
     string aliases = "";
     string sym_specific_options = "";
     string options = "";
+
+    //DX20201228 - print python script
+    if(XHOST.vflag_control.flag("PRINT_MODE::PYTHON")){
+      SYM::writePythonScript(oss);
+      return false;
+    }
+
     // AGROUP
     if(vpflow.flag("AGROUP")){
       mode = _AGROUP_;
@@ -6604,6 +6611,13 @@ namespace pflow {
 namespace pflow {
   // COMMAND LINE SYMMETRY CALCULATION, calls main function PerformFullSymmetry()!!!!!!!!!!!
   bool CalculateFullSymmetry(istream& input, aurostd::xoption& vpflow, ostream& oss){ //overload
+
+    //DX20201228 - print Python script
+    if(XHOST.vflag_control.flag("PRINT_MODE::PYTHON")){
+      SYM::writePythonScript(oss);
+      return false;
+    }
+
     xstructure a(input,IOAFLOW_AUTO);
 
     //default aflags for command line
@@ -6634,7 +6648,14 @@ namespace pflow {
             aurostd::liststring2string("aflow --aflow-sym|--AFLOW-SYM|--AFLOWSYM|--aflowSYM|--aflowsym|--full_symmetry|--full_sym|--fullsym[=tolerance|=tight|=loose] [--no_scan] [--print=txt|--print=json] [--screen_only] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR  default: tolerance=(minimum_interatomic_distance)/100.0, print=txt")); //DX20200724 - removed return
         return false; //CO20200624 - there has been NO calculation of symmetry
       }
+		}
+
+    //DX20201228 - print Python script
+    if(XHOST.vflag_control.flag("PRINT_MODE::PYTHON")){
+      SYM::writePythonScript(oss);
+      return false;
     }
+
     //DX20170804 - need to rescale, so we make a fast copy and calculate
     xstructure a(_a);
     a.ReScale(1.0);

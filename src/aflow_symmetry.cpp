@@ -28,6 +28,7 @@ using aurostd::isequal;
 //DX+CO START
 #include "aflow_symmetry_spacegroup.h"
 //DX+CO END
+#include "aflow_sym_python.cpp" //DX20201228
 
 #define  _NO_SCALE_LATTICE_PGROUP_
 
@@ -8806,6 +8807,30 @@ bool KBIN_StepSymmetryPerform_20160101(xstructure& a,string AflowIn,ofstream &Fi
   return Krun;
 }
 #endif
+
+// ******************************************************************************
+// SYM::writePythonScript() //DX20201228
+// ******************************************************************************
+namespace SYM {
+  void writePythonScript(ostream& oss){
+
+    // Writes AFLOW-SYM Python script in a subdirectory
+
+    string function_name = XPID+"SYM::writePythonScript():";
+
+    string directory = aurostd::getPWD();
+    string sym_python_subdir = "AFLOW_SYM_PYTHON";
+    string python_dir = directory + "/" + sym_python_subdir;
+
+    aurostd::DirectoryMake(python_dir);
+
+    pflow::logger(_AFLOW_FILE_NAME_, function_name, "Writing out python script to: "+python_dir, oss, _LOGGER_NOTICE_);
+    stringstream output;
+
+    output << AFLOW_SYM_PYTHON_PY;
+    aurostd::stringstream2file(output, python_dir+"/"+"aflow_sym_python.py");
+  }
+}
 
 // --------------------------------------------------------------------------
 // --------------------------------------------------------------------------
