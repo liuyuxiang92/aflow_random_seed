@@ -4242,7 +4242,7 @@ namespace chull {
       outliers.clear();
     }
 
-    bool found_outlier;
+    bool found_outlier=false;
     vector<uint> points_to_remove;
     uint valid_count=0;
     for(uint i_coord_group=0,fl_size_i_coord_group=m_coord_groups.size();i_coord_group<fl_size_i_coord_group;i_coord_group++){

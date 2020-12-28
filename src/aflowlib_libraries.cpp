@@ -6476,7 +6476,7 @@ namespace aflowlib {
             if(LDEBUG){cerr << soliloquy << " tensor_stress=" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(tensor_stress,6),",") << endl;}
             if(tensor_stress.size()!=6){ ok=FALSE;obb << ". error(stress_tensor.size()==" << tensor_stress.size() << ")=OUTCAR"+vrelax[irelax]+".EXT";continue; }
             for(uint i=0;i<tensor_stress.size();i++){
-              if(abs(tensor_stress[i])>10){ ok=FALSE;obb << ". error(stress_tensor[i=" << i << "]==" << tensor_stress[i] << ">10kB)=OUTCAR"+vrelax[irelax]+".EXT";continue; }
+              if(abs(tensor_stress[i])>10){ ok=FALSE;obb << ". error(abs(stress_tensor[i=" << i << "])==" << abs(tensor_stress[i]) << ">10kB)=OUTCAR"+vrelax[irelax]+".EXT";continue; }
             }
           }
         }
