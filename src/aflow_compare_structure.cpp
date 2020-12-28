@@ -2133,7 +2133,7 @@ vector<StructurePrototype> XtalFinderCalculator::compareStructuresFromStructureL
 
   // ---------------------------------------------------------------------------
   // directory to write results
-  string directory = "."; // for now this is fixed
+  string directory = aurostd::getPWD();
 
   // ---------------------------------------------------------------------------
   // load structures appended to command
@@ -2174,7 +2174,7 @@ vector<StructurePrototype> XtalFinderCalculator::compareStructuresFromFile(const
 
   // ---------------------------------------------------------------------------
   // directory to write results
-  string directory = "."; // for now this is fixed
+  string directory = aurostd::getPWD();
 
   // ---------------------------------------------------------------------------
   // load structures in file
@@ -2488,129 +2488,180 @@ vector<StructurePrototype> XtalFinderCalculator::compareMultipleStructures(
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
 
 #ifdef AFLOW_COMPARE_MULTITHREADS_ENABLE
-      // ---------------------------------------------------------------------------
-      // split task into threads 
-      uint number_of_structures = final_prototypes.size();
-      uint number_of_threads = aurostd::min(num_proc,number_of_structures); // cannot have more threads than structures
-      vector<vector<int> > thread_distribution = getThreadDistribution(number_of_structures, number_of_threads); //DX20191107 
-
-      // ---------------------------------------------------------------------------
-      // [THREADED] determine AFLOW standard designation 
-      vector<std::thread*> threads;
-      for(uint n=0; n<number_of_threads; n++){
-        threads.push_back(new std::thread(&XtalFinderCalculator::getPrototypeDesignations,this,std::ref(final_prototypes),thread_distribution[n][0], thread_distribution[n][1])); //DX20191107
-      }
-      for(uint t=0;t<threads.size();t++){
-        threads[t]->join();
-        delete threads[t];
-      }
-
-      // ---------------------------------------------------------------------------
-      // update once all are collected (safer) 
-      for(uint i=0;i<final_prototypes.size();i++){
-        final_prototypes[i].aflow_label = final_prototypes[i].structure_representative_struct->structure.prototype;
-        final_prototypes[i].aflow_parameter_list = final_prototypes[i].structure_representative_struct->structure.prototype_parameter_list;
-        final_prototypes[i].aflow_parameter_values = final_prototypes[i].structure_representative_struct->structure.prototype_parameter_values;
-      }
-#else
-      // ---------------------------------------------------------------------------
-      // [NON-THREADED] determine AFLOW standard designation 
-      for(uint i=0;i<final_prototypes.size();i++){
-        anrl::structure2anrl(final_prototypes[i].structure_representative_struct->structure,false); //DX20190829 - false for recalculate_symmetry
-        final_prototypes[i].aflow_label = final_prototypes[i].structure_representative_struct->structure.prototype;
-        final_prototypes[i].aflow_parameter_list = final_prototypes[i].structure_representative_struct->structure.prototype_parameter_list;
-        final_prototypes[i].aflow_parameter_values = final_prototypes[i].structure_representative_struct->structure.prototype_parameter_values;
-      }
-#endif
-    }
-
+    // ---------------------------------------------------------------------------
+    // split task into threads 
+    uint number_of_structures = final_prototypes.size();
+    uint number_of_threads = aurostd::min(num_proc,number_of_structures); // cannot have more threads than structures
+    vector<vector<int> > thread_distribution = getThreadDistribution(number_of_structures, number_of_threads); //DX20191107 
 
     // ---------------------------------------------------------------------------
-    // for testing/development; in case the subsequent analyses fails, checkpoint file 
-    bool store_checkpoint=false;
-    if(store_checkpoint){
-      stringstream ss_json;
-      printResults(ss_json, same_species, final_prototypes, "json");
-      stringstream ss_out;
-      printResults(ss_out, same_species, final_prototypes, "text");
-      aurostd::stringstream2file(ss_json,directory+"/structure_comparison_output.json");
-      aurostd::stringstream2file(ss_out,directory+"/structure_comparison_output.out");
-      message << "RESULTS: See [tmp]" << directory << "/structure_comparison_output.out" << " or " << directory << "/structure_comparison_output.json" << " for list of unique/duplicate structures.";
-      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_COMPLETE_);
+    // [THREADED] determine AFLOW standard designation 
+    vector<std::thread*> threads;
+    for(uint n=0; n<number_of_threads; n++){
+      threads.push_back(new std::thread(&XtalFinderCalculator::getPrototypeDesignations,this,std::ref(final_prototypes),thread_distribution[n][0], thread_distribution[n][1])); //DX20191107
+    }
+    for(uint t=0;t<threads.size();t++){
+      threads[t]->join();
+      delete threads[t];
     }
 
-    if(comparison_options.flag("COMPARISON_OPTIONS::MATCH_TO_AFLOW_PROTOS")){
+    // ---------------------------------------------------------------------------
+    // update once all are collected (safer) 
+    for(uint i=0;i<final_prototypes.size();i++){
+      final_prototypes[i].aflow_label = final_prototypes[i].structure_representative_struct->structure.prototype;
+      final_prototypes[i].aflow_parameter_list = final_prototypes[i].structure_representative_struct->structure.prototype_parameter_list;
+      final_prototypes[i].aflow_parameter_values = final_prototypes[i].structure_representative_struct->structure.prototype_parameter_values;
+    }
+#else
+    // ---------------------------------------------------------------------------
+    // [NON-THREADED] determine AFLOW standard designation 
+    for(uint i=0;i<final_prototypes.size();i++){
+      anrl::structure2anrl(final_prototypes[i].structure_representative_struct->structure,false); //DX20190829 - false for recalculate_symmetry
+      final_prototypes[i].aflow_label = final_prototypes[i].structure_representative_struct->structure.prototype;
+      final_prototypes[i].aflow_parameter_list = final_prototypes[i].structure_representative_struct->structure.prototype_parameter_list;
+      final_prototypes[i].aflow_parameter_values = final_prototypes[i].structure_representative_struct->structure.prototype_parameter_values;
+    }
+#endif
+  }
 
-      //DEPARATE FUNCTION?!?!?
-      message << "Determining if representative structures map to any of the AFLOW prototypes.";
-      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+  // ---------------------------------------------------------------------------
+  // for testing/development; in case the subsequent analyses fails, checkpoint file 
+  bool store_checkpoint=false;
+  if(store_checkpoint){
+    stringstream ss_json;
+    printResults(ss_json, same_species, final_prototypes, "json");
+    stringstream ss_out;
+    printResults(ss_out, same_species, final_prototypes, "text");
+    aurostd::stringstream2file(ss_json,directory+"/structure_comparison_output.json");
+    aurostd::stringstream2file(ss_out,directory+"/structure_comparison_output.out");
+    message << "RESULTS: See [tmp]" << directory << "/structure_comparison_output.out" << " or " << directory << "/structure_comparison_output.json" << " for list of unique/duplicate structures.";
+    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_COMPLETE_);
+  }
 
-      aurostd::xoption vpflow_protos;
-      vpflow_protos.flag("COMPARE2PROTOTYPES",TRUE);
+  if(comparison_options.flag("COMPARISON_OPTIONS::MATCH_TO_AFLOW_PROTOS")){
 
-      // ---------------------------------------------------------------------------
-      // specify catalog
-      vpflow_protos.flag("COMPARE2PROTOTYPES::CATALOG",TRUE);
-      vpflow_protos.push_attached("COMPARE2PROTOTYPES::CATALOG","all"); 
+    //SEPARATE FUNCTION?!?!?
+    message << "Determining if representative structures map to any of the AFLOW prototypes.";
+    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
 
-      // ---------------------------------------------------------------------------
-      // specify number of processors
-      vpflow_protos.flag("COMPARE2PROTOTYPES::NP",TRUE);
-      vpflow_protos.push_attached("COMPARE2PROTOTYPES::NP",aurostd::utype2string<uint>(num_proc)); 
+    aurostd::xoption vpflow_protos;
+    vpflow_protos.flag("COMPARE2PROTOTYPES",TRUE);
 
-      // ---------------------------------------------------------------------------
-      // do not calculate unique atom decorations since this was already done
-      vpflow_protos.flag("COMPARE2PROTOTYPES::DO_NOT_CALCULATE_UNIQUE_PERMUTATIONS",TRUE);
+    // ---------------------------------------------------------------------------
+    // specify catalog
+    vpflow_protos.flag("COMPARE2PROTOTYPES::CATALOG",TRUE);
+    vpflow_protos.push_attached("COMPARE2PROTOTYPES::CATALOG","all"); 
 
-      // ---------------------------------------------------------------------------
-      // match to AFLOW prototypes 
-      for(uint i=0;i<final_prototypes.size();i++){
-        XtalFinderCalculator xtal_finder_protos(misfit_match,misfit_family,*p_FileMESSAGE,num_proc,*p_oss);
-        //vector<StructurePrototype> matching_protos = compare::compare2prototypes(final_prototypes[i].structure_representative, vpflow_protos);
-        vector<StructurePrototype> matching_protos = xtal_finder_protos.compare2prototypes(final_prototypes[i].structure_representative_struct->structure, vpflow_protos);
-        for(uint j=0;j<matching_protos[0].structures_duplicate_struct.size();j++){
-          final_prototypes[i].matching_aflow_prototypes.push_back(matching_protos[0].structures_duplicate_struct[j]->name);
-        }
+    // ---------------------------------------------------------------------------
+    // specify number of processors
+    vpflow_protos.flag("COMPARE2PROTOTYPES::NP",TRUE);
+    vpflow_protos.push_attached("COMPARE2PROTOTYPES::NP",aurostd::utype2string<uint>(num_proc)); 
+
+    // ---------------------------------------------------------------------------
+    // do not calculate unique atom decorations since this was already done
+    vpflow_protos.flag("COMPARE2PROTOTYPES::DO_NOT_CALCULATE_UNIQUE_PERMUTATIONS",TRUE);
+
+    // ---------------------------------------------------------------------------
+    // match to AFLOW prototypes 
+    for(uint i=0;i<final_prototypes.size();i++){
+      XtalFinderCalculator xtal_finder_protos(misfit_match,misfit_family,*p_FileMESSAGE,num_proc,*p_oss);
+      //vector<StructurePrototype> matching_protos = compare::compare2prototypes(final_prototypes[i].structure_representative, vpflow_protos);
+      vector<StructurePrototype> matching_protos = xtal_finder_protos.compare2prototypes(final_prototypes[i].structure_representative_struct->structure, vpflow_protos);
+      for(uint j=0;j<matching_protos[0].structures_duplicate_struct.size();j++){
+        final_prototypes[i].matching_aflow_prototypes.push_back(matching_protos[0].structures_duplicate_struct[j]->name);
       }
     }
-
-    return final_prototypes;
   }
 
-
-// ***************************************************************************
-// compare::aflowCompareStructure - MAIN FUNCTION
-// ***************************************************************************
-namespace compare {
-  bool aflowCompareStructure(const xstructure& xstr1, const xstructure& xstr2, bool same_species) { //DX20191108 - remove const & from bools //DX20191122 - move ostream to end
-    uint num_proc=1;
-    double final_misfit=AUROSTD_MAX_DOUBLE;
-    bool scale_volume=true; //default is true
-    bool optimize_match=false; //default is false
-    return aflowCompareStructure(num_proc, xstr1, xstr2, same_species, scale_volume, optimize_match, final_misfit); //DX20191122 - move ostream to end
-  }
+  return final_prototypes;
 }
 
+// ***************************************************************************
+// XtalFinderCalculator::groupSimilarXstructures()
+// ***************************************************************************
+vector<vector<uint> > XtalFinderCalculator::groupSimilarXstructures(
+    const vector<xstructure>& vxstrs,
+    bool same_species,
+    bool scale_volume) {
+
+  // Compares a vector of xstructures and groups the indices of the 
+  // xstructures by structural similarity
+
+  uint nstrs= vxstrs.size();
+
+  stringstream structure_name;
+  string source = "input"; 
+  uint relaxation_step = 0; //unknowable
+  string directory = aurostd::getPWD();
+
+  // add structures to containers
+  for(uint i=0;i<nstrs;i++){
+    structure_name.str("");
+    structure_name << i; // name by index
+    addStructure2container(vxstrs[i], structure_name.str(), source, relaxation_step, same_species);
+  }
+    
+  // ---------------------------------------------------------------------------
+  // set comparison options 
+  aurostd::xoption comparison_options = compare::loadDefaultComparisonOptions();
+  comparison_options.flag("COMPARISON_OPTIONS::SCALE_VOLUME",scale_volume);
+  
+  // ---------------------------------------------------------------------------
+  // compare structures returns vector<StructureProtoype> of unique/duplicate info
+  vector<StructurePrototype> grouped_structures = compareMultipleStructures(
+      num_proc,
+      same_species,
+      directory,
+      comparison_options); //DX20200103 - condensed booleans to xoptions 
+
+  // ---------------------------------------------------------------------------
+  // group indices based on structural similarity
+  vector<vector<uint> > grouped_indices;
+  vector<uint> structure_indices_equivalent;
+  for(uint i=0;i<grouped_structures.size();i++){
+    structure_indices_equivalent.clear();
+    structure_indices_equivalent.push_back(aurostd::string2utype<uint>(grouped_structures[i].structure_representative_struct->name));
+    for(uint j=0;j<grouped_structures[i].structures_duplicate_struct.size();j++){
+      structure_indices_equivalent.push_back(aurostd::string2utype<uint>(grouped_structures[i].structures_duplicate_struct[j]->name));
+    }
+    grouped_indices.push_back(structure_indices_equivalent);
+  }
+
+  return grouped_indices;
+}
+
+// ***************************************************************************
+// compare::structuresMatch()
+// ***************************************************************************
 namespace compare {
-  bool aflowCompareStructure(const xstructure& xstr1, const xstructure& xstr2, bool same_species, bool scale_volume, bool optimize_match) { //DX20191108 - remove const & from bools //DX20191122 - move ostream to end
-    uint num_proc = 1;
+  //bool aflowCompareStructure(const xstructure& xstr1, const xstructure& xstr2, bool same_species, uint num_proc) { //DX20191108 - remove const & from bools //DX20191122 - move ostream to end
+  bool structuresMatch(const xstructure& xstr1, const xstructure& xstr2, bool same_species, uint num_proc) { //DX20191108 - remove const & from bools //DX20191122 - move ostream to end
     double final_misfit = AUROSTD_MAX_DOUBLE;
-    return aflowCompareStructure(num_proc, xstr1, xstr2, same_species, scale_volume, optimize_match, final_misfit); //DX20191122 - move ostream to end and add default
+    bool scale_volume=true; //default is true
+    bool optimize_match=false; //default is false
+    return aflowCompareStructure(xstr1, xstr2, same_species, scale_volume, optimize_match, final_misfit, num_proc); //DX20191122 - move ostream to end
+  }
+}
+
+namespace compare {
+  //bool aflowCompareStructure(const xstructure& xstr1, const xstructure& xstr2, bool same_species, bool scale_volume, bool optimize_match, uint num_proc) { //DX20191108 - remove const & from bools //DX20191122 - move ostream to end
+  bool structuresMatch(const xstructure& xstr1, const xstructure& xstr2, bool same_species, bool scale_volume, bool optimize_match, uint num_proc) { //DX20191108 - remove const & from bools //DX20191122 - move ostream to end
+    double final_misfit = AUROSTD_MAX_DOUBLE;
+    return aflowCompareStructure(xstr1, xstr2, same_species, scale_volume, optimize_match, final_misfit, num_proc); //DX20191122 - move ostream to end and add default
   }
 }
 
 
 // ***************************************************************************
-// compare::aflowCompareStructure - MAIN FUNCTION
+// compare::getMisfitBetweenStructures() - MAIN FUNCTION
 // ***************************************************************************
 namespace compare {
-  double aflowCompareStructureMisfit(const xstructure& xstr1, const xstructure& xstr2, bool same_species) { //DX20191108 - remove const & from bools
-    uint num_proc=1;
+  //double aflowCompareStructureMisfit(const xstructure& xstr1, const xstructure& xstr2, bool same_species, uint num_proc) { //DX20191108 - remove const & from bools
+  double getMisfitBetweenStructures(const xstructure& xstr1, const xstructure& xstr2, bool same_species, uint num_proc) { //DX20191108 - remove const & from bools
     double final_misfit=AUROSTD_MAX_DOUBLE;
     bool scale_volume=true; //default is true
     bool optimize_match=false; //default is false
-    ostringstream comparison_log; //DX20191202 
-    aflowCompareStructure(num_proc, xstr1, xstr2, same_species, scale_volume, optimize_match, final_misfit); //DX20191122 - move ostream to end
+    aflowCompareStructure(xstr1, xstr2, same_species, scale_volume, optimize_match, final_misfit, num_proc); //DX20191122 - move ostream to end
     return final_misfit;
   }
 }
@@ -2619,14 +2670,14 @@ namespace compare {
 // compare::aflowCompareStructure - MAIN FUNCTION
 // ***************************************************************************
 namespace compare {
-  bool aflowCompareStructure(const uint& num_proc, const xstructure& xstr1, const xstructure& xstr2, 
-      bool same_species, bool scale_volume, bool optimize_match, 
-      double& final_misfit) {
-
+  //double aflowCompareStructureMisfit(const xstructure& xstr1, const xstructure& xstr2, bool same_species, uint num_proc) { //DX20191108 - remove const & from bools
+  structure_misfit getTransformationBetweenStructures(const xstructure& xstr1, const xstructure& xstr2, bool same_species, uint num_proc) { //DX20191108 - remove const & from bools
+    double final_misfit=AUROSTD_MAX_DOUBLE;
+    bool scale_volume=true; //default is true
+    bool optimize_match=false; //default is false
     structure_misfit final_misfit_info = compare::initialize_misfit_struct(); //DX20191218
-    
-
-    return aflowCompareStructure(num_proc, xstr1, xstr2, same_species, scale_volume, optimize_match, final_misfit, final_misfit_info); //DX20191122 - move ostream to end
+    aflowCompareStructure(xstr1, xstr2, same_species, scale_volume, optimize_match, final_misfit, final_misfit_info, num_proc); //DX20191122 - move ostream to end
+    return final_misfit_info;
   }
 }
 
@@ -2634,9 +2685,32 @@ namespace compare {
 // compare::aflowCompareStructure - MAIN FUNCTION
 // ***************************************************************************
 namespace compare {
-  bool aflowCompareStructure(const uint& num_proc, const xstructure& xstr1, const xstructure& xstr2, 
-      bool same_species, bool scale_volume, bool optimize_match, 
-      double& final_misfit, structure_misfit& final_misfit_info) { //DX20191108 - remove const & from bools //DX20191122 - move ostream to end and add default
+  bool aflowCompareStructure(const xstructure& xstr1,
+      const xstructure& xstr2, 
+      bool same_species,
+      bool scale_volume,
+      bool optimize_match, 
+      double& final_misfit,
+      uint num_proc) {
+
+    structure_misfit final_misfit_info = compare::initialize_misfit_struct(); //DX20191218
+
+    return aflowCompareStructure(xstr1, xstr2, same_species, scale_volume, optimize_match, final_misfit, final_misfit_info, num_proc); //DX20191122 - move ostream to end
+  }
+}
+
+// ***************************************************************************
+// compare::aflowCompareStructure - MAIN FUNCTION
+// ***************************************************************************
+namespace compare {
+  bool aflowCompareStructure(const xstructure& xstr1,
+      const xstructure& xstr2, 
+      bool same_species,
+      bool scale_volume,
+      bool optimize_match, 
+      double& final_misfit,
+      structure_misfit& final_misfit_info,
+      uint num_proc) { //DX20191108 - remove const & from bools //DX20191122 - move ostream to end and add default
 
     _structure_representative str_rep = compare::initializeStructureRepresentativeStruct(xstr1); 
     _structure_representative str_matched = compare::initializeStructureRepresentativeStruct(xstr2); 
@@ -2657,7 +2731,7 @@ namespace compare {
     for(uint i=0;i<str_rep.structure.atoms.size();i++){ str_rep.structure.atoms[i].name=KBIN::VASP_PseudoPotential_CleanName(str_rep.structure.atoms[i].name); }
     for(uint i=0;i<str_matched.structure.atoms.size();i++){ str_matched.structure.atoms[i].name=KBIN::VASP_PseudoPotential_CleanName(str_matched.structure.atoms[i].name); }
 
-    XtalFinderCalculator xtal_finder;
+    XtalFinderCalculator xtal_finder(num_proc);
     xtal_finder.compareStructures(str_rep,str_matched,final_misfit_info,same_species,scale_volume,optimize_match);
 
     final_misfit = final_misfit_info.misfit;

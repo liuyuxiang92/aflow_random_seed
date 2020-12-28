@@ -11467,7 +11467,7 @@ xstructure GetPrimitiveVASP(const xstructure& a,double tol) {
     b.ReScale(1.0); b.ShiftOriginToAtom(0); b.BringInCell(); //fast clean for comparison
     cerr << "NEW STRUCTURE " << endl;
     cerr << b;
-    cerr << "STRUCTURES IDENTICAL = " << (compare::aflowCompareStructure(a,b,true) ? "TRUE" : "FALSE") << endl;
+    cerr << "STRUCTURES IDENTICAL = " << (compare::structuresMatch(a,b,true) ? "TRUE" : "FALSE") << endl;
     cerr << "-----------------------------------------------------------------------" << endl;
   }
   return b;

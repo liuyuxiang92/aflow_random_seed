@@ -4097,7 +4097,7 @@ namespace slab {
     }
     if(!aurostd::isequal(min_dist,min_dist_orig)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Minimum distance changed (test)",_INPUT_ERROR_);}
 
-    bool structures_match=compare::aflowCompareStructure(xstr_slab_correct,xstr_slab_test,true,false,false);
+    bool structures_match=compare::structuresMatch(xstr_slab_correct,xstr_slab_test,true,false,false);
     if(LDEBUG){cerr << soliloquy << " structures_match=" << structures_match << endl;}
     if(!structures_match){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Structures do not match",_RUNTIME_ERROR_);}
     message << "Slab test successful";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_COMPLETE_);

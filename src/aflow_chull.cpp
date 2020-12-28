@@ -19,7 +19,7 @@
 #include "aflow_chull_jupyter_requirements.cpp"  //MB20190305
 #include "aflow_chull_python.cpp"  //MB20190305
 
-#define _DEBUG_CHULL_ true  //CO20190116
+#define _DEBUG_CHULL_ false  //CO20190116
 
 #define _AFLOW_CHULL_PRINT_LOGO_1 TRUE
 #define _AFLOW_CHULL_PRINT_LOGO_2 FALSE
@@ -5820,7 +5820,7 @@ namespace chull {
       cerr << soliloquy << " structure 2" << endl;
       cerr << b;
     }
-    bool are_equivalent=compare::aflowCompareStructure(a,b,true,false,false); //match species and use fast match, but not scale volume, two structures with different volumes (pressures) are different! //DX20180123 - added fast_match = true //DX20190318 - not fast_match but optimized_match=false
+    bool are_equivalent=compare::structuresMatch(a,b,true,false,false); //match species and use fast match, but not scale volume, two structures with different volumes (pressures) are different! //DX20180123 - added fast_match = true //DX20190318 - not fast_match but optimized_match=false
     if(LDEBUG) {cerr << soliloquy << " structures are " << (are_equivalent?"":"NOT ") << "equivalent" << endl;}
     return are_equivalent;
   }

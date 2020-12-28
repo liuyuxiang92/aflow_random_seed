@@ -4135,9 +4135,15 @@ void XtalFinderCalculator::combinePrototypesOfDifferentSymmetry(
         structure_misfit final_misfit_info = compare::initialize_misfit_struct(); //DX20191218
         bool scale_volume=true; //default is true
         bool optimize_match=false; //default is false
-        compare::aflowCompareStructure(num_proc, final_prototypes[i].structure_representative_struct->structure, 
-            final_prototypes[j].structure_representative_struct->structure, same_species, 
-            scale_volume, optimize_match, final_misfit, final_misfit_info); //DX20191122 - move ostream to end  //DX20191218 - added misfit_info
+        compare::aflowCompareStructure(
+            final_prototypes[i].structure_representative_struct->structure, 
+            final_prototypes[j].structure_representative_struct->structure,
+            same_species, 
+            scale_volume,
+            optimize_match,
+            final_misfit,
+            final_misfit_info,
+            num_proc); //DX20191122 - move ostream to end  //DX20191218 - added misfit_info
         if(final_misfit < min_misfit){
           min_misfit_info=final_misfit_info; //DX20191218
           min_misfit=final_misfit;

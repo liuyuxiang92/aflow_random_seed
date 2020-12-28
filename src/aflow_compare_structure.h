@@ -479,6 +479,10 @@ class XtalFinderCalculator : public xStream {
       double minimum_interatomic_distance, //DX20200622
       structure_misfit& mapping_info,
       bool same_species);
+  
+  // ---------------------------------------------------------------------------
+  // helper functions for external use
+  vector<vector<uint> > groupSimilarXstructures(const vector<xstructure>& vxstrs, bool same_species=true, bool scale_volume=true);
 
   private:
     void free();                                                                            // free operator
@@ -489,13 +493,15 @@ namespace compare{
   // ---------------------------------------------------------------------------
   // pair-wise comparisons (for use by other AFLOW processes) 
   string compareMultipleStructures(const aurostd::xoption& vpflow, ostream& logstream=cout); //DX //DX20190425
-  bool aflowCompareStructure(const uint& num_proc, const xstructure& xstr1, const xstructure& xstr2, 
-      bool same_species, bool scale_volume, bool optimize_match, double& final_misfit); //Main function //DX20191108 - remove const & from bools
-  bool aflowCompareStructure(const uint& num_proc, const xstructure& xstr1, const xstructure& xstr2, 
-      bool same_species, bool scale_volume, bool optimize_match, double& final_misfit, structure_misfit& final_misfit_info); //Main function //DX20191108 - remove const & from bools 
-  bool aflowCompareStructure(const xstructure& xstr1, const xstructure& xstr2, bool same_species); //Overco, returns true (match), false (no match) //DX20191108 - remove const & from bools
-  bool aflowCompareStructure(const xstructure& xstr1, const xstructure& xstr2, bool same_species, bool scale_volume, bool optmize_match);  //DX20191108 - remove const & from bools
-  double aflowCompareStructureMisfit(const xstructure& xstr1, const xstructure& xstr2, bool same_species, bool optimize_match); //Overloaded, returns misfit value //DX20191108 - remove const & from bools
+  bool aflowCompareStructure(const xstructure& xstr1, const xstructure& xstr2, bool same_species, bool scale_volume, bool optimize_match, double& final_misfit, uint num_proc=1); //Main function //DX20191108 - remove const & from bools
+  bool aflowCompareStructure(const xstructure& xstr1, const xstructure& xstr2, bool same_species, bool scale_volume, bool optimize_match, double& final_misfit, structure_misfit& final_misfit_info, uint num_proc=1); //Main function //DX20191108 - remove const & from bools 
+  //bool aflowCompareStructure(const xstructure& xstr1, const xstructure& xstr2, bool same_species, uint num_proc=1); //Overco, returns true (match), false (no match) //DX20191108 - remove const & from bools
+  //bool aflowCompareStructure(const xstructure& xstr1, const xstructure& xstr2, bool same_species, bool scale_volume, bool optmize_match, uint num_proc=1);  //DX20191108 - remove const & from bools
+  bool structuresMatch(const xstructure& xstr1, const xstructure& xstr2, bool same_species, uint num_proc=1); //Overco, returns true (match), false (no match) //DX20191108 - remove const & from bools
+  bool structuresMatch(const xstructure& xstr1, const xstructure& xstr2, bool same_species, bool scale_volume, bool optmize_match, uint num_proc=1);  //DX20191108 - remove const & from bools
+  //double aflowCompareStructureMisfit(const xstructure& xstr1, const xstructure& xstr2, bool same_species, bool optimize_match, uint num_proc=1); //Overloaded, returns misfit value //DX20191108 - remove const & from bools
+  double getMisfitBetweenStructures(const xstructure& xstr1, const xstructure& xstr2, bool same_species, bool optimize_match, uint num_proc=1); //Overloaded, returns misfit value //DX20191108 - remove const & from bools
+  structure_misfit getTransformationBetweenStructures(const xstructure& xstr1, const xstructure& xstr2, bool same_species, bool optimize_match, uint num_proc=1); //Overloaded, returns misfit value //DX20191108 - remove const & from bools
 
   // ---------------------------------------------------------------------------
   // comparisons to AFLOW database 

@@ -1107,7 +1107,7 @@ namespace pflow {
             equal_E=true;
           }
           else if (tEForm[j]<tEForm[i]){
-            if(compare::aflowCompareStructure(tVStructure[i].back(),tVStructure[j].back(),true,false,true)==true){
+            if(compare::structuresMatch(tVStructure[i].back(),tVStructure[j].back(),true,false,true)==true){
               break;
             }
           }
