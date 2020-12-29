@@ -8,16 +8,11 @@
 // Written by David Hicks (david.hicks@duke.edu) 
 // Contributors: Carlo De Santo
 
-#include<fstream>
-#include<iostream>
-#include<vector>
-#include<string>
 #include "aflow.h"
 #include "aflow_pflow.h"
 #include "aflow_compare_structure.h"
 #include "aflow_symmetry_spacegroup.h"
 #include "aflow_xtalfinder_python.cpp" //DX20201228
-#include <chrono>
 
 #undef AFLOW_COMPARE_MULTITHREADS_ENABLE
 
@@ -25,7 +20,7 @@
 #define AFLOW_COMPARE_MULTITHREADS_ENABLE 1
 #include <thread>
 #else
-#warning "The multithread parts of AFLOW-COMPARE will be not included, since they need gcc 4.4 and higher (C++0x support)."
+#warning "The multithread parts of AFLOW-XtalFinder will be not included, since they need gcc 4.4 and higher (C++0x support)."
 #endif
 
 // ***************************************************************************
@@ -981,7 +976,20 @@ const XtalFinderCalculator& XtalFinderCalculator::operator=(const XtalFinderCalc
 // ***************************************************************************
 // XtalFinderCalculator::operator<< (output/print)
 // ***************************************************************************
-// TODO
+ostream& operator<<(ostream& oss, const XtalFinderCalculator& xtalfinder){
+
+  oss << "XtalFinderCalculator:" << endl;
+  oss << " misfit match: " << xtalfinder.misfit_match << endl;
+  oss << " misfit family: " << xtalfinder.misfit_family << endl;
+  oss << " number of processors: " << xtalfinder.num_proc << endl;
+  oss << " structures in container (" << xtalfinder.structure_containers.size() << "):" << endl;
+  for(uint i=0;i<xtalfinder.structure_containers.size();i++){
+    oss << "  " << xtalfinder.structure_containers[i].name
+      << " (compound=" << xtalfinder.structure_containers[i].compound
+      << ", SG=" << xtalfinder.structure_containers[i].space_group << ")" << endl;
+  }
+  return oss;
+}
 
 // ***************************************************************************
 // END:: XtalFinderCalculator Class

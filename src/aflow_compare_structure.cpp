@@ -4,16 +4,10 @@
 // *           Aflow DAVID HICKS - Duke University 2014-2020                 *
 // *                                                                         *
 // ***************************************************************************
-// AFLOW-XtalMatch (compare crystal structures)
+// AFLOW-XtalFinder (compare crystal structures)
 // Written by David Hicks (david.hicks@duke.edu) 
 // Contributors: Carlo De Santo
 
-#include<fstream>
-#include<iostream>
-#include<vector>
-#include<string>
-#include<exception>
-#include<algorithm>
 #include "aflow.h"
 #include "aflow_pflow.h"
 #include "aflow_compare_structure.h"
@@ -25,7 +19,7 @@
 #define AFLOW_COMPARE_MULTITHREADS_ENABLE 1
 #include <thread>
 #else
-#warning "The multithread parts of AFLOW-COMPARE will be not included, since they need gcc 4.4 and higher (C++0x support)."
+#warning "The multithread parts of AFLOW-XtalFinder will be not included, since they need gcc 4.4 and higher (C++0x support)."
 #endif
 
 // ***************************************************************************
@@ -1643,7 +1637,6 @@ namespace compare {
 
     // ---------------------------------------------------------------------------
     // FLAG: specify the geometry file to grab (orig, relax1, relax2, static, bands, POSCAR, CONTCAR)
-    //DX TODO 
     string geometry_file = "";
     if(vpflow.flag("COMPARE_DATABASE_ENTRIES::GEOMETRY_FILE")) {
       geometry_file = vpflow.getattachedscheme("COMPARE_DATABASE_ENTRIES::GEOMETRY_FILE");
@@ -2408,7 +2401,6 @@ vector<vector<uint> > XtalFinderCalculator::groupSimilarXstructures(
 // compare::structuresMatch()
 // ***************************************************************************
 namespace compare {
-  //bool aflowCompareStructure(const xstructure& xstr1, const xstructure& xstr2, bool same_species, uint num_proc) { //DX20191108 - remove const & from bools //DX20191122 - move ostream to end
   bool structuresMatch(const xstructure& xstr1, const xstructure& xstr2, bool same_species, uint num_proc) { //DX20191108 - remove const & from bools //DX20191122 - move ostream to end
     double final_misfit = AUROSTD_MAX_DOUBLE;
     bool scale_volume=true; //default is true
@@ -2418,7 +2410,6 @@ namespace compare {
 }
 
 namespace compare {
-  //bool aflowCompareStructure(const xstructure& xstr1, const xstructure& xstr2, bool same_species, bool scale_volume, bool optimize_match, uint num_proc) { //DX20191108 - remove const & from bools //DX20191122 - move ostream to end
   bool structuresMatch(const xstructure& xstr1, const xstructure& xstr2, bool same_species, bool scale_volume, bool optimize_match, uint num_proc) { //DX20191108 - remove const & from bools //DX20191122 - move ostream to end
     double final_misfit = AUROSTD_MAX_DOUBLE;
     return aflowCompareStructure(xstr1, xstr2, same_species, scale_volume, optimize_match, final_misfit, num_proc); //DX20191122 - move ostream to end and add default
@@ -2427,10 +2418,9 @@ namespace compare {
 
 
 // ***************************************************************************
-// compare::getMisfitBetweenStructures() - MAIN FUNCTION
+// compare::getMisfitBetweenStructures()
 // ***************************************************************************
 namespace compare {
-  //double aflowCompareStructureMisfit(const xstructure& xstr1, const xstructure& xstr2, bool same_species, uint num_proc) { //DX20191108 - remove const & from bools
   double getMisfitBetweenStructures(const xstructure& xstr1, const xstructure& xstr2, bool same_species, uint num_proc) { //DX20191108 - remove const & from bools
     double final_misfit=AUROSTD_MAX_DOUBLE;
     bool scale_volume=true; //default is true
@@ -2441,7 +2431,7 @@ namespace compare {
 }
 
 // ***************************************************************************
-// compare::aflowCompareStructure - MAIN FUNCTION
+// compare::getTransformationBetweenStructures()
 // ***************************************************************************
 namespace compare {
   //double aflowCompareStructureMisfit(const xstructure& xstr1, const xstructure& xstr2, bool same_species, uint num_proc) { //DX20191108 - remove const & from bools
@@ -2515,7 +2505,7 @@ namespace compare {
 }
 
 // ***************************************************************************
-// compare::aflowCompareStructure - MAIN FUNCTION
+// XtalFinderCalculator::compareStructures() - MAIN COMPARISON FUNCTION
 // ***************************************************************************
 void XtalFinderCalculator::compareStructures(
     _structure_representative& str_rep,
@@ -2525,42 +2515,42 @@ void XtalFinderCalculator::compareStructures(
     bool scale_volume,
     bool optimize_match) {
 
-    // This is the main comparison function that compares two crystal structures
-    // and determines their similarity level based on the idea discussed 
-    // in H. Burzlaff's paper (Acta Cryst., A53, 217-224 (1997)).
+  // This is the main comparison function that compares two crystal structures
+  // and determines their similarity level based on the idea discussed 
+  // in H. Burzlaff's paper (Acta Cryst., A53, 217-224 (1997)).
 
-    bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_COMPARE_);
-    string function_name = XPID + "XtalFinderCalculator::compareStructures():";
+  bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_COMPARE_);
+  string function_name = XPID + "XtalFinderCalculator::compareStructures():";
 
-    // ---------------------------------------------------------------------------
-    // determine minimum interatomic distances of structures (resolution of atoms) //DX20200623
-    // //DX20200715 - may need to rescale this if the structures are being scaled later....
-    if(str_rep.structure.dist_nn_min==AUROSTD_NAN){ 
-      if(str_rep.nearest_neighbor_distances.size()){ str_rep.structure.dist_nn_min=aurostd::min(str_rep.nearest_neighbor_distances); }
-      else{ str_rep.structure.dist_nn_min=SYM::minimumDistance(str_rep.structure); }
-    }
-    if(str_matched.structure.dist_nn_min==AUROSTD_NAN){ 
-      if(str_matched.nearest_neighbor_distances.size()){ str_matched.structure.dist_nn_min=aurostd::min(str_matched.nearest_neighbor_distances); }
-      else{ str_matched.structure.dist_nn_min=SYM::minimumDistance(str_matched.structure); }
-    }
-    
-    // ---------------------------------------------------------------------------
-    // determine if structures are matchable (same species and/or same stoichiometry)
-    if(same_species == true){
-      // if atoms are not labeled in either structure; assign fake names
-      if(str_rep.structure.atoms.at(0).name == "" || str_matched.structure.atoms.at(0).name == ""){ 
-        if(LDEBUG) {cerr << function_name << " Atoms are not labeled. Assigning fake element names." << endl;}
-        str_rep.structure.DecorateWithFakeElements();
-        str_matched.structure.DecorateWithFakeElements();
-      }
-    }
-    if(compare::matchableSpecies(str_rep.structure,str_matched.structure,same_species)==true){
-      if(LDEBUG) {cerr << function_name << " Searching for new representation of test structure ..."<<endl;} 
-      latticeSearch(str_rep,str_matched,match_info,same_species,optimize_match,scale_volume,num_proc); //DX20190530 //DX20200422 - scale_volume added
-    }
+  // ---------------------------------------------------------------------------
+  // determine minimum interatomic distances of structures (resolution of atoms) //DX20200623
+  // //DX20200715 - may need to rescale this if the structures are being scaled later....
+  if(str_rep.structure.dist_nn_min==AUROSTD_NAN){ 
+    if(str_rep.nearest_neighbor_distances.size()){ str_rep.structure.dist_nn_min=aurostd::min(str_rep.nearest_neighbor_distances); }
+    else{ str_rep.structure.dist_nn_min=SYM::minimumDistance(str_rep.structure); }
+  }
+  if(str_matched.structure.dist_nn_min==AUROSTD_NAN){ 
+    if(str_matched.nearest_neighbor_distances.size()){ str_matched.structure.dist_nn_min=aurostd::min(str_matched.nearest_neighbor_distances); }
+    else{ str_matched.structure.dist_nn_min=SYM::minimumDistance(str_matched.structure); }
   }
 
-// AFLOW-XtalMatch (compare crystal structures)
+  // ---------------------------------------------------------------------------
+  // determine if structures are matchable (same species and/or same stoichiometry)
+  if(same_species == true){
+    // if atoms are not labeled in either structure; assign fake names
+    if(str_rep.structure.atoms.at(0).name == "" || str_matched.structure.atoms.at(0).name == ""){ 
+      if(LDEBUG) {cerr << function_name << " Atoms are not labeled. Assigning fake element names." << endl;}
+      str_rep.structure.DecorateWithFakeElements();
+      str_matched.structure.DecorateWithFakeElements();
+    }
+  }
+  if(compare::matchableSpecies(str_rep.structure,str_matched.structure,same_species)==true){
+    if(LDEBUG) {cerr << function_name << " Searching for new representation of test structure ..."<<endl;} 
+    latticeSearch(str_rep,str_matched,match_info,same_species,optimize_match,scale_volume,num_proc); //DX20190530 //DX20200422 - scale_volume added
+  }
+}
+
+// AFLOW-XtalFinder (compare crystal structures)
 // Written by David Hicks (david.hicks@duke.edu) 
 // Contributors: Carlo De Santo
 // ***************************************************************************

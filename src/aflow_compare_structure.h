@@ -8,12 +8,8 @@
 // Written by David Hicks (david.hicks@duke.edu) 
 // Contributors: Carlo De Santo
 
-#include<iostream>
-#include "aflow_pflow.h"
 #include "aflow.h"
-//#include <math.h> //CO20191217 - this is a STANDARD library  //ME20200514 - not needed
-#include<vector>
-#include<string>
+#include "aflow_pflow.h"
 
 #ifndef __AFLOW_COMPARE_STRUCTURE_H_
 #define __AFLOW_COMPARE_STRUCTURE_H_
