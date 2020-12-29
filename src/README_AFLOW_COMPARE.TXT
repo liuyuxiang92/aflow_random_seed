@@ -23,12 +23,13 @@ AFLOW-XtalFinder identifies and classifies crystallographic prototypes, regardle
 The code maps structures to their ideal prototype designation, determining their internal degrees of
 freedom consistent with the International Tables for Crystallography (ITC).
 
-To ensure uniqueness, structures are compared based on symmetry (isopointal analysis),
+To ensure uniqueness, structures are compared based on
+symmetry (isopointal analysis),
 atom environment (isoconfigurational snapshots), and
 geometric structure (complete isoconfigurational analysis).
 Structural similarity is quantified via a crystal misfit criteria.
 
-The AFLOW-XtalFinder functionalities are briefly described below.
+The AFLOW-XtalFinder functionalities are described below.
 
 ----------------------------------------------------------------------
 PROTOTYPING TOOLS
@@ -56,7 +57,7 @@ Structures that match beyond 0.2 have poor structure-property correlation.
 See XtalFinder article for details.
 
 ----------------------------------------------------------------------
-COMPARISON MODES
+SUPER-TYPE COMPARISON MODES
 The module offers four comparison modes:
 
   1) material-type   : maps same element types onto one another, revealing duplicate compounds
@@ -66,8 +67,8 @@ The module offers four comparison modes:
 
 ----------------------------------------------------------------------
 MULTIPLE COMPARISONS
-AFLOW-XtalFinder can automatically compare multiple compounds in a single command.
-Structures are automatically grouped into comparison sets by stoichiometry,
+AFLOW-XtalFinder can compare multiple compounds in a single command.
+Structures are automatically grouped into comparison sets via stoichiometry,
 species (if applicable), symmetry (space group number and Wyckoff positions), and atomic environment.
 Compounds are compared until each structure is matched or all possible comparisons have been exhausted.
 
@@ -97,15 +98,16 @@ Use the --np=<number> flag to specify the number of threads for multithreaded co
 ****************************************************************************************************
 LIST OF AFLOW-XtalFinder COMMANDS:
 
-  aflow --compare2database        : Returns AFLOW database entries that match with the structure
-  aflow --compare2prototypes      : Returns AFLOW prototypes that match with the structure
-  aflow --compare_materials       : Compares materials (mapping alike atomic species) and
-                                    returns their level of similarity
-  aflow --compare_structures      : Compares structures (ignore species in mapping) and returns their level
-                                    of similarity
-  aflow --prototype               : Returns AFLOW label/parameters/parameter values of the structure
-  aflow --isopointal_prototypes   : Returns all isopointal (i.e., same symmetry) to input structure
-  aflow --unique_atom_decorations : Returns the unique atom decorations for the structure
+  aflow --compare2database         : Returns AFLOW database entries that match with an input structure
+  aflow --compare2prototypes       : Returns AFLOW prototypes that match with an input structure
+  aflow --compare_database_entries : Compares entries in the AFLOW.org repository
+  aflow --compare_materials        : Compares materials (mapping alike atomic species) and
+                                     returns their level of similarity
+  aflow --compare_structures       : Compares structures (ignore species in mapping) and returns their level
+                                     of similarity
+  aflow --isopointal_prototypes    : Returns all isopointal (i.e., same symmetry) to input structure
+  aflow --prototype                : Returns AFLOW label/parameters/parameter values of the structure
+  aflow --unique_atom_decorations  : Returns the unique atom decorations for the structure
 
 For details on usage, see the "AFLOW COMMANDS USAGE" section below.
 
@@ -122,7 +124,7 @@ since we must explore the entire search space.
 
 METHODS FOR ENHANCING COMPUTATION SPEED:
   1) Increase the number of processors (--np=xx)
-  2) Convert structures to a primitive or more orthogonal representation
+  2) Convert structures to a primitive or more orthogonal lattice representation
      via the following options:
        --primitivize : convert the crystal to a primitive representation
        --niggli      : convert the crystal to the Niggli representation
@@ -143,15 +145,13 @@ Steps:
        using Burzlaff's criteria. (This part is parallel if more than one
        processor is specified.)
     7) Once a commensurate lattice is found (i.e., similar lattice vector lengths
-       and volume to structure1), remove atoms outside of the cell and
-       check atom positions inside the new cell.
-       Check we can have a one-to-one mapping.
-       Check that the lattice chosen preserves periodicity.
+       and volume to structure1), transform structure2 to its new
+       representation.
     8) Of the best match (smallest misfit (mis)):
-       If mis <= 0.1:
+       If mis <= epsilon_match:
          Structures similar. Print out new representation of
          structure2 and the figure of misfit
-       else if 0.1 < mis <=0.2:
+       else if epsilon_match < mis <=epsilon_family:
          Structures in the same family (possible symmetric
          group-subgroup relation). Print out new representation
          of structure2 and the figure of misfit
@@ -185,12 +185,33 @@ General options - applicable to all commands - is listed at the bottom of this s
 
         [COMPARE2DATABASE_OPTIONS] : Options specific to this command:
 
-            [--properties=enthalpy_atom,natoms,...]          : Specify the properties via their API keyword to print the corresponding
-                                                               values with the comparison results.
             [--catalog=lib1|lib2|lib3|lib4|lib6|lib7|icsd]   : Restrict the entries to compare with to a specific catalog/library
                                                                (e.g., `lib1', `lib2', `lib3', `icsd', etc.).
+            [--properties=enthalpy_atom,natoms,...]          : Specify the properties via their API keyword to print the corresponding
+                                                               values with the comparison results.
             [--relaxation_step=original|relax1|most_relaxed] : Compare geometries from a particular step in the DFT relaxation.
                                                                Allows numeric or string input (e.g., 0->original, 1->relax1, 2->most_relaxed).
+    
+
+    aflow --compare_database_entries [GENERAL_COMPARISON_OPTIONS] [COMPARE_DATABASE_ENTRIES_OPTIONS]
+        Compares structures in the AFLOW.org repository and groups entries into structurally similar materials.
+        Entries can be queried by arity, alloy systems, stoichiometry, and space group.
+        Material properties can be extracted from the database and printed (via AFLUX), highlighting structure-property relationships.
+        Performs material-type comparisons or structure-type comparisons (by adding the --structure_comparison option).
+
+        [COMPARE_DATABASE_ENTRIES_OPTIONS] : Options specific to this command:
+
+            [--alloy=AgAlMn...]                              : Specify the alloy system(s) to extract from the database and compare.
+            [--nspecies=3]                                   : Specify the arity group (number of species) to extract from the database and compare.
+            [--catalog=lib1|lib2|lib3|lib4|lib6|lib7|icsd]   : Restrict the entries to compare with to a specific catalog/library
+                                                               (e.g., `lib1', `lib2', `lib3', `icsd', etc.).
+            [--properties=enthalpy_atom,natoms,...]          : Specify the properties via their API keyword to print the corresponding
+                                                               values with the comparison results.
+            [--relaxation_step=original|relax1|most_relaxed] : Compare geometries from a particular step in the DFT relaxation.
+                                                               Allows numeric or string input (e.g., 0->original, 1->relax1, 2->most_relaxed).
+            [--space_group=225,186,227,...]                  : Specify the space group(s) of the structures to extract and compare.
+                                                               More than one space group can be specified.
+            [--stoichiometry=1:2:3:...]                      : Specify the stoichiometric ratio of the structures to extract and compare.
 
 
     aflow --compare2prototypes [GENERAL_COMPARISON_OPTIONS] [COMPARE2PROTOTYPES_OPTIONS] < file
@@ -264,36 +285,38 @@ General options - applicable to all commands - is listed at the bottom of this s
 
     [GENERAL_COMPARISON_OPTIONS] : Generic options for all commands (unless indicated otherwise):
 
-        [--misfit_match=0.1] : Specify the misfit threshold for matching structures (default: 0.1).
-        [--misfit_match=0.2] : Specify the misfit threshold for structures within the same family (default: 0.2).
-        [--np=16|--num_proc=16] : Allocate the number of processors/threads for the task.
-        [--np=16|--num_proc=16] : Allocate the number of processors/threads for the task.
-        [--optimize_match] : Explore all lattice and origin choices to find the best matching representation, i.e., minimizes misfit value.
-        [--no_scale_volume] : Suppresses volume rescaling during structure matching; identifies differences due to volume expansion or compression of a structure.
-        [--ignore_symmetry] : Neglects symmetry analysis (both space group and Wyckoff positions) for grouping comparisons.
-        [--ignore_Wyckoff] : Neglects Wyckoff symmetry (site symmetry) for filtering comparisons, but considers the space group number.
-        [--ignore_environment] : Neglects LFA environment analysis for filtering comparisons.
-        [--keep_unmatched!] : Retains misfit information of unmatched structures (i.e., misfit>0.1).
-        [--match_to_aflow_prototypes!] : Identifies matching AFLOW prototypes to the representative structure.  The option does not apply to
-          --unique_atom_decorations or --compare2prototypes (redundant).
+        [--misfit_match=0.1]                    : Specify the misfit threshold for matching structures (default: 0.1).
+        [--misfit_match=0.2]                    : Specify the misfit threshold for structures within the same family (default: 0.2).
+        [--np=16|--num_proc=16]                 : Allocate the number of processors/threads for the task.
+        [--optimize_match]                      : Explore all lattice and origin choices to find the best matching representation, i.e., minimizes misfit value.
+        [--no_scale_volume]                     : Suppresses volume rescaling during structure matching; identifies differences due to volume expansion or compression of a structure.
+        [--ignore_symmetry]                     : Neglects symmetry analysis (both space group and Wyckoff positions) for grouping comparisons.
+        [--ignore_Wyckoff]                      : Neglects Wyckoff symmetry (site symmetry) for filtering comparisons, but considers the space group number.
+        [--ignore_environment]                  : Neglects LFA environment analysis for filtering comparisons.
+        [--keep_unmatched!]                     : Retains misfit information of unmatched structures (i.e., misfit>0.1).
+        [--match_to_aflow_prototypes!]          : Identifies matching AFLOW prototypes to the representative structure.  The option does not apply to
+                                                  --unique_atom_decorations or --compare2prototypes (redundant).
         [--magmom=<m1,m2,...|INCAR|OUTCAR>:...] : Specifies the magnetic moment for each structure (collinear or non-collinear) delimited by colons,
-          signaling a magnetic-type comparison. The option does not apply to --compare_structures since the atom type is neglected.
-          AFLOW-XtalFinder supports three input formats for the magnetic moment:
-              1) explicit declaration via comma-separated string m_{1},m_{2},...m_{n} (m_{1,x},m_{1,y},m_{1,z},m_{2,x},...m_{n,z} for non-collinear)
-              2) read from a VASP INCAR, or
-              3) read from a VASP OUTCAR.
-            Additional magnetic moment readers for other ab initio codes will be available in future versions.
-        [--add_aflow_prototype_designation] : Casts prototype structure into the AFLOW standard designation.  The option does not apply to commands
-          --unique_atom_decorations or --prototype! (redundant).
-        [--remove_duplicate_compounds] : For structure-type comparisons, duplicate compounds are identified first
-          (via a material-type comparison without volume scaling), then remaining unique compounds are compared, removing duplicate bias.
-        [--ICSD] : Only if ICSD structures: ensure the representative structure is the entry with the smallest ICSD number
-        [--print] : For comparing two structures, additional comparison information is printed, including atom mappings, distances between matched atoms,
-          and the transformed structures in the closest matching representation.
-        [--print=TEXT|JSON] : For comparing multiple structures, the results printed to the relevant files are formatted into human-readable
-          text or JSON, respectively.  By default, AFLOW-XtalFinder writes the output in both formats.
-        [--quiet|--q] : Suppresses the log information for the comparisons.
-        [--screen_only] : Prints the comparison results to the screen and does not write to any files.
+                                                  signaling a magnetic-type comparison. The option does not apply to --compare_structures since the atom type is neglected.
+                                                  AFLOW-XtalFinder supports three input formats for the magnetic moment:
+                                                   1) explicit declaration via comma-separated string m_{1},m_{2},...m_{n} (m_{1,x},m_{1,y},m_{1,z},m_{2,x},...m_{n,z} for non-collinear)
+                                                   2) read from a VASP INCAR, or
+                                                   3) read from a VASP OUTCAR.
+                                                  Additional magnetic moment readers for other ab initio codes will be available in future versions.
+        [--add_aflow_prototype_designation]     : Casts prototype structure into the AFLOW standard designation.  The option does not apply to commands
+                                                  --unique_atom_decorations or --prototype! (redundant).
+        [--remove_duplicate_compounds]          : For structure-type comparisons, duplicate compounds are identified first
+                                                  (via a material-type comparison without volume scaling), then remaining unique compounds are compared, removing duplicate bias.
+        [--ICSD]                                : Only if ICSD structures: ensure the representative structure is the entry with the smallest ICSD number
+        [--print]                               : For comparing two structures, additional comparison information is printed, including atom mappings, distances between matched atoms,
+                                                  and the transformed structures in the closest matching representation.
+        [--print=TEXT|JSON]                     : For comparing multiple structures, the results printed to the relevant files are formatted into human-readable
+                                                  text or JSON, respectively.  By default, AFLOW-XtalFinder writes the output in both formats.
+        [--quiet|--q]                           : Suppresses the log information for the comparisons.
+        [--screen_only]                         : Prints the comparison results to the screen and does not write to any files.
+        [--primitivize]                         : Primitivize structures (enhance comparison speed).
+        [--minkowski]                           : Perform Minkowski lattice reduction on the structures (enhance comparison speed).
+        [--niggli]                              : Perform Niggli lattice reduction on the structures (enhance comparison speed).
 
 
 For additional information contact: David Hicks (david.hicks@duke.edu)

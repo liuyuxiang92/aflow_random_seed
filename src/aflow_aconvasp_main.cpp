@@ -440,13 +440,11 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     //input values
     vpflow.args2addattachedscheme(argv,cmds,"COMPARE_DATABASE_ENTRIES::ALLOY","--compare_alloy=|--alloy=","");
     vpflow.args2addattachedscheme(argv,cmds,"COMPARE_DATABASE_ENTRIES::ARITY","--arity=|--nspecies=","");
-    vpflow.args2addattachedscheme(argv,cmds,"COMPARE_DATABASE_ENTRIES::SPECIES","--species=|--alloy=","");
-    vpflow.args2addattachedscheme(argv,cmds,"COMPARE_DATABASE_ENTRIES::PROPERTY_LIST","--properties=|--property_list=|--property=","");
-    vpflow.args2addattachedscheme(argv,cmds,"COMPARE_DATABASE_ENTRIES::GEOMETRY_FILE","--geometry_file=|--file=","");
-    vpflow.args2addattachedscheme(argv,cmds,"COMPARE_DATABASE_ENTRIES::RELAXATION_STEP","--relaxation_step=|--relaxation=","");
     vpflow.args2addattachedscheme(argv,cmds,"COMPARE_DATABASE_ENTRIES::CATALOG","--catalog=|--library=","");
-    vpflow.args2addattachedscheme(argv,cmds,"COMPARE_DATABASE_ENTRIES::STOICHIOMETRY","--stoichiometry=","");
+    vpflow.args2addattachedscheme(argv,cmds,"COMPARE_DATABASE_ENTRIES::PROPERTY_LIST","--properties=|--property_list=|--property=","");
+    vpflow.args2addattachedscheme(argv,cmds,"COMPARE_DATABASE_ENTRIES::RELAXATION_STEP","--relaxation_step=|--relaxation=","");
     vpflow.args2addattachedscheme(argv,cmds,"COMPARE_DATABASE_ENTRIES::SPACE_GROUP","--space_group=|--spacegroup=|--sg=","");
+    vpflow.args2addattachedscheme(argv,cmds,"COMPARE_DATABASE_ENTRIES::STOICHIOMETRY","--stoichiometry=","");
     vpflow.args2addattachedscheme(argv,cmds,"COMPARE_DATABASE_ENTRIES::WYCKOFF","--Wyckoff=|--wyckoff=","");
   }
   if(vpflow.flag("COMPARE_MATERIAL") || vpflow.flag("COMPARE_STRUCTURE")) {

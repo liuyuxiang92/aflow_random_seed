@@ -1099,15 +1099,6 @@ vector<StructurePrototype> XtalFinderCalculator::compare2database(
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
   }
 
-  // ---------------------------------------------------------------------------
-  // FLAG: specify the geometry file to grab (orig, relax1, relax2, static, bands, POSCAR, CONTCAR)
-  string geometry_file = "";
-  if(vpflow.flag("COMPARE2DATABASE::GEOMETRY_FILE")) {
-    geometry_file = vpflow.getattachedscheme("COMPARE2DATABASE::GEOMETRY_FILE");
-    message << "OPTIONS: Structure type (POSCAR.orig, POSCAR.relax1, POSCAR.relax2, CONTCAR.relax1, ...): " << geometry_file << endl; 
-    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
-  }
-    
   uint relaxation_step = _COMPARE_DATABASE_GEOMETRY_MOST_RELAXED_;
   bool load_most_relaxed_structure_only = true; 
   if(vpflow.flag("COMPARE2DATABASE::RELAXATION_STEP")) {
@@ -1632,15 +1623,6 @@ namespace compare {
       matchbook.insert(matchbook.end(), property_list.begin(), property_list.end());
 
       message << "OPTIONS: Extracting the following properties: " << aurostd::joinWDelimiter(property_list,", "); 
-      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
-    }
-
-    // ---------------------------------------------------------------------------
-    // FLAG: specify the geometry file to grab (orig, relax1, relax2, static, bands, POSCAR, CONTCAR)
-    string geometry_file = "";
-    if(vpflow.flag("COMPARE_DATABASE_ENTRIES::GEOMETRY_FILE")) {
-      geometry_file = vpflow.getattachedscheme("COMPARE_DATABASE_ENTRIES::GEOMETRY_FILE");
-      message << "OPTIONS: Structure type (POSCAR.orig, POSCAR.relax1, POSCAR.relax2, CONTCAR.relax1, ...): " << geometry_file << endl; 
       pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     }
 
