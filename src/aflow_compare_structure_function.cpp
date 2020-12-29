@@ -485,8 +485,8 @@ string StructurePrototype::printRepresentativeStructure() const {
 
   // representative structure may not have properties
   if(structure_representative_struct->properties.size()){
-    for(uint i=0;i<property_names.size();i++){
-      sscontent_json << "\"" << property_names[i] << "\":\"" << structure_representative_struct->properties[i] << "\"" << eendl;
+    for(uint i=0;i<structure_representative_struct->properties.size();i++){
+      sscontent_json << "\"" << structure_representative_struct->properties_names[i] << "\":\"" << structure_representative_struct->properties[i] << "\"" << eendl;
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
     }
   }
@@ -531,8 +531,8 @@ string StructurePrototype::printMatchedStructures(const string& mode) const {
       }
       sscontent_json << "\"number_compounds_matching_structure\":" << structures_duplicate_struct[j]->number_compounds_matching_structure << eendl;
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-      for(uint i=0;i<property_names.size();i++){
-        sscontent_json << "\"" << property_names[i] << "\":\"" << structures_duplicate_struct[j]->properties[i] << "\"" << eendl;
+      for(uint i=0;i<structures_duplicate_struct[j]->properties.size();i++){
+        sscontent_json << "\"" << structures_duplicate_struct[j]->properties_names[i] << "\":\"" << structures_duplicate_struct[j]->properties[i] << "\"" << eendl;
         vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
       }
       vstructures.push_back("{" + aurostd::joinWDelimiter(vcontent_json,",") + "}");
@@ -562,8 +562,8 @@ string StructurePrototype::printMatchedStructures(const string& mode) const {
       }
       sscontent_json << "\"number_compounds_matching_entry\":" << structures_family_struct[j]->number_compounds_matching_structure << eendl;
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-      for(uint i=0;i<property_names.size();i++){
-        sscontent_json << "\"" << property_names[i] << "\":\"" << structures_family_struct[j]->properties[i] << "\"" << eendl;
+      for(uint i=0;i<structures_family_struct[j]->properties.size();i++){
+        sscontent_json << "\"" << structures_family_struct[j]->properties_names[i] << "\":\"" << structures_family_struct[j]->properties[i] << "\"" << eendl;
         vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
       }
       vstructures.push_back("{" + aurostd::joinWDelimiter(vcontent_json,",") + "}");
@@ -3876,7 +3876,7 @@ vector<StructurePrototype> XtalFinderCalculator::runComparisonScheme(
       comparison_options.flag("COMPARE_STRUCTURE::CLEAN_UNMATCHED"),
       quiet); //DX20200103
   
-  message << "Comparisons complete ...";
+  message << "Comparisons complete!";
   pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_COMPLETE_);
 
   return final_prototypes;
@@ -4234,21 +4234,53 @@ void XtalFinderCalculator::printResults(
       }
       ss_out << endl;
       ss_out << "# ";
-      if(same_species==true){
-        ss_out << final_prototypes[j].structure_representative_struct->compound; //DX20190311
-        ss_out << "  SG=#" << final_prototypes[j].space_group;
-        // ORIG ss_out << "  Wyckoffs=" << compare::printWyckoffString(final_prototypes[j].grouped_Wyckoff_positions,true) << endl;
-        ss_out << "  Wyckoffs=" << compare::printWyckoffString(final_prototypes[j].grouped_Wyckoff_positions,true); //DX20190228 - remove count
+
+      // ---------------------------------------------------------------------------
+      // print compound or stoichometry of prototype
+      if(same_species==true){ ss_out << final_prototypes[j].structure_representative_struct->compound; }
+      else if(same_species==false){ ss_out << aurostd::joinWDelimiter(final_prototypes[j].stoichiometry,":"); }
+      
+      // ---------------------------------------------------------------------------
+      // print space group and Wyckoff positions of prototype
+      ss_out << "  SG=#" << final_prototypes[j].space_group;
+      ss_out << "  Wyckoffs=" << compare::printWyckoffString(final_prototypes[j].grouped_Wyckoff_positions,true); //DX20190228 - remove count
+      
+      // ---------------------------------------------------------------------------
+      // print number of duplicate compounds/stuctures (material-/structure-type)
+      if(same_species){
         uint number_of_duplicates = numberOfDuplicates(final_prototypes[j]); //DX20190506 - made function
-        ss_out << "  duplicate_compounds=" << number_of_duplicates << endl; //DX20190228 - add count
-        if(final_prototypes[j].aflow_label.size()!=0){
+        ss_out << "  compounds_duplicate=" << number_of_duplicates << endl; //DX20190228 - add count
+      }
+      else if(!same_species){
+        uint number_of_duplicates = numberOfDuplicates(final_prototypes[j]); //DX20190506 - made function
+        ss_out << "  structures_duplicate=" << number_of_duplicates;
+        uint number_duplicate_compounds = 0;
+        for(uint k=0;k<final_prototypes[j].structures_duplicate_struct.size();k++){
+          number_duplicate_compounds+=final_prototypes[j].structures_duplicate_struct[k]->number_compounds_matching_structure;
+        }
+        number_duplicate_compounds+= number_of_duplicates+final_prototypes[j].structure_representative_struct->number_compounds_matching_structure; //DX20190321 - need to update variable, otherwise may not enter if statement
+        if(number_duplicate_compounds!=0){
+          ss_out << "  duplicate_compounds=" << number_duplicate_compounds; //DX20190228 - add count
+        }
+        ss_out << endl;
+      } 
+      
+      // ---------------------------------------------------------------------------
+      // print prototype designation info
+      if(final_prototypes[j].aflow_label.size()!=0){
           ss_out << "  aflow_label=" << final_prototypes[j].aflow_label << endl; 
           ss_out << "  aflow_parameter_list=" << aurostd::joinWDelimiter(final_prototypes[j].aflow_parameter_list,",") << endl; 
           ss_out << "  aflow_parameter_values=" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(final_prototypes[j].aflow_parameter_values,8,roff),",") << endl;
         } 
+      
+      // ---------------------------------------------------------------------------
+      // print matching AFLOW prototype labels
         if(final_prototypes[j].matching_aflow_prototypes.size()!=0){
           ss_out << "  matching_aflow_prototypes=" << aurostd::joinWDelimiter(final_prototypes[j].matching_aflow_prototypes,",") << endl; 
         } 
+      
+      // ---------------------------------------------------------------------------
+      // print properties of representative structure (database comparisons only)
         if(final_prototypes[j].structure_representative_struct->properties.size()!=0){
           ss_out << "  " << setw(structure_spacing) << std::left << "structure";
           ss_out << setw(misfit_spacing) << std::right << "misfit";
@@ -4269,7 +4301,22 @@ void XtalFinderCalculator::printResults(
           }
           ss_out << endl;
         }
-        ss_out << "  " << setw(structure_spacing) << std::left << "prototype="+final_prototypes[j].structure_representative_struct->name;
+
+      // ---------------------------------------------------------------------------
+      // print representative structure
+      ss_out << "  " << setw(structure_spacing) << std::left << "prototype="+final_prototypes[j].structure_representative_struct->name;
+      
+      // ---------------------------------------------------------------------------
+      // print unique atom decorations
+        // perhaps add which permutations are duplicates
+        if(final_prototypes[j].atom_decorations_equivalent.size()!=0){
+          //ss_out << endl << "  " << setw(structure_spacing) << std::left << "unique atom decorations="+aurostd::joinWDelimiter(final_prototypes[j].atom_decorations_equivalent,",");
+          vector<string> unique_decorations;
+          for(uint d=0;d<final_prototypes[j].atom_decorations_equivalent.size();d++){ unique_decorations.push_back(final_prototypes[j].atom_decorations_equivalent[d][0]); }
+          ss_out << endl << "  " << setw(structure_spacing) << std::left << "unique atom decorations="+aurostd::joinWDelimiter(unique_decorations,",");
+        }
+
+        //ss_out << "  " << setw(structure_spacing) << std::left << "prototype="+final_prototypes[j].structure_representative_struct->name;
         if(final_prototypes[j].structure_representative_struct->properties.size()!=0){
           ss_out << setw(misfit_spacing) << std::right << "-";
           for(uint l=0;l<final_prototypes[j].structure_representative_struct->properties.size();l++){
@@ -4277,16 +4324,10 @@ void XtalFinderCalculator::printResults(
           }
         }
         //ss_out << endl;
-      }
+      //}
+    /*
       else if(same_species==false){
-        for(uint k=0;k<final_prototypes[j].stoichiometry.size();k++){
-          if(k==0){
-            ss_out << final_prototypes[j].stoichiometry[k];
-          }
-          else {
-            ss_out << ":" << final_prototypes[j].stoichiometry[k];
-          }
-        }
+        ss_out << aurostd::joinWDelimiter(final_prototypes[j].stoichiometry,":");
         ss_out << "  SG=#" << final_prototypes[j].space_group;
         ss_out << "  Wyckoffs=" << compare::printWyckoffString(final_prototypes[j].grouped_Wyckoff_positions,true);
         uint number_of_duplicates = numberOfDuplicates(final_prototypes[j]); //DX20190506 - made function
@@ -4317,6 +4358,7 @@ void XtalFinderCalculator::printResults(
           ss_out << endl << "  " << setw(structure_spacing) << std::left << "unique atom decorations="+aurostd::joinWDelimiter(unique_decorations,",");
         }
       }
+      */
       ss_out << endl;
       ss_out << std::string(indent_spacing+structure_spacing+misfit_spacing, '-');
       if(final_prototypes[j].property_names.size()!=0){
@@ -7230,6 +7272,64 @@ void XtalFinderCalculator::getPrototypeDesignations(
 
   for(uint i=start_index;i<end_index;i++){ //DX20191107 switching end index convention <= vs <
     anrl::structure2anrl(prototypes[i].structure_representative_struct->structure,false); //DX20190829 - false for do not recalulate symmetry, save time
+  }
+}
+
+// ******************************************************************************
+// XtalFinderCalculator::writeComparisonOutputFile //DX20201229
+// ******************************************************************************
+void XtalFinderCalculator::writeComparisonOutputFile(const stringstream& ss_output,
+    const string& directory,
+    const string& format,
+    const string& comparison_mode,
+    bool same_species){
+
+  // Writes comparison results to an output file
+
+  string function_name = XPID+"XtalFinderCalculator::writeComparisonOutputFile():";
+  stringstream message;
+
+  string file_prefix = "", contents_info = "";
+
+  // ---------------------------------------------------------------------------
+  // determine file prefix based on the comparison type (same species or not)
+  // and the mode (structures being compared)
+  if(same_species){
+    contents_info = "materials";
+    if(comparison_mode=="compare_input"){ file_prefix = DEFAULT_XTALFINDER_FILE_MATERIAL; }
+    if(comparison_mode=="duplicate_compounds"){ file_prefix = DEFAULT_XTALFINDER_FILE_DUPLICATE; }
+    if(comparison_mode=="compare2database"){ file_prefix = DEFAULT_XTALFINDER_FILE_MATERIAL_COMPARE2DATABASE; contents_info += " in the database"; }
+    if(comparison_mode=="compare_database_entries"){ file_prefix = DEFAULT_XTALFINDER_FILE_MATERIAL_DATABASE; contents_info += " in the database"; }
+  }
+  else if(!same_species){
+    contents_info = "structures";
+    if(comparison_mode=="compare_input"){ file_prefix = DEFAULT_XTALFINDER_FILE_STRUCTURE; }
+    if(comparison_mode=="compare2database"){ file_prefix = DEFAULT_XTALFINDER_FILE_STRUCTURE_COMPARE2DATABASE; contents_info += " in the database"; }
+    if(comparison_mode=="compare_database_entries"){ file_prefix = DEFAULT_XTALFINDER_FILE_STRUCTURE_DATABASE; contents_info += " in the database"; }
+  }
+
+  // ---------------------------------------------------------------------------
+  // write JSON
+  if(aurostd::toupper(format)=="JSON"){
+    aurostd::stringstream2file(ss_output,directory+"/"+file_prefix+".json");
+    message << "RESULTS: See " << directory << "/"+file_prefix+".json" << " for list of unique/duplicate " << contents_info << ".";
+    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_COMPLETE_);
+  }
+  // ---------------------------------------------------------------------------
+  // write TEXT file (human-readable)
+  else if(aurostd::toupper(format)=="TXT" || aurostd::toupper(format)=="TEXT"){
+    aurostd::stringstream2file(ss_output,directory+"/"+file_prefix+".out");
+    message << "RESULTS: See " << directory << "/"+file_prefix+".out" << " for list of unique/duplicate " << contents_info << ".";
+    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_COMPLETE_);
+  }
+  // ---------------------------------------------------------------------------
+  // unexpected file specifications, write to logger rather than lose the
+  // information
+  else{
+    message << "Unexpected file specifications. Printing results to the log rather than writing to a file.";
+    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+    message << ss_output.str();
+    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_RAW_);
   }
 }
 

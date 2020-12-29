@@ -116,8 +116,8 @@ NOTE ON STRUCTURE SIZE VS SPEED
 
 The number of atoms in the system generally increases the computational expense
 of the comparisons.  Namely, it is dependent on the least frequently occurring
-atom (LFA) in the crystal. If LFA>20 or there are many LFAs, then the comparison
-time will increase. In general, the algorithm terminates as soon as a match is found
+atom (LFA) in the crystal. If LFA>20 or there are many LFA-types, then the comparison
+time will increase. By default, the algorithm terminates as soon as a match is found
 (unless you request the optimal match via the --optimize_match option).
 However, this does not improve the speed of the comparison when a match cannot be found,
 since we must explore the entire search space.
@@ -127,8 +127,8 @@ METHODS FOR ENHANCING COMPUTATION SPEED:
   2) Convert structures to a primitive or more orthogonal lattice representation
      via the following options:
        --primitivize : convert the crystal to a primitive representation
-       --niggli      : convert the crystal to the Niggli representation
        --minkowski   : convert the crystal to the Minkowski representation
+       --niggli      : convert the crystal to the Niggli representation
 
 ********************************************************************************
 OVERVIEW OF COMPARISON ALGORITHM

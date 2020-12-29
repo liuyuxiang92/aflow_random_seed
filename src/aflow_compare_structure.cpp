@@ -23,72 +23,7 @@
 #endif
 
 // ***************************************************************************
-// AFLOW COMMANDS 
-// ***************************************************************************
-
-// ======== Single Comparison ======== //
-
-// aflow --compare_material=POSCAR_1,POSCAR_2
-//       Description: Compares POSCAR_1 to POSCAR_2 if the ratios are 
-//                    commensurate and types of atoms are the same 
-//                    (i.e. same material). 
-
-// aflow --compare_structure=POSCAR_1,POSCAR_2
-//       Description: Compares POSCAR_1 to POSCAR_2 (no requirement on type 
-//                    of atoms, just stoichiometry ratios). 
-
-// ======== Directory Comparison ======== //
-
-// aflow --compare_material_directory|--compare_material_dir
-//       Description: Determines the unique materials (same atomic species) 
-//                     within a given directory. Returns a JSON and TXT file 
-//                     with the results. Default Directory: "."
-
-// aflow --compare_structure_directory|--compare_structure_dir
-//       Description: Determines the unique structure prototypes within a 
-//                    given directory. Returns a JSON and TXT file with the 
-//                    results. Default Directory: "."
-
-// OPTIONS:
-//       -D "PATH":   User can specify a specific directory to compare. 
-//                    Output will be placed there also.
-
-// ***************************************************************************
-// OPTIONS FOR ALL AFLOW COMMANDS
-// ***************************************************************************
-// --np=xx          : Number of processors. Algorithm is thread-friendly. 
-//                    (Default: 8 processors)
-
-// ***************************************************************************
-// OVERVIEW OF ALGORITHM
-// ***************************************************************************
-// This algorithm takes two crystal structures and compares them to one another
-// and determines their level of similarity as described by H. Burzlaff 
-// (see his paper for more information: Acta Cryst., A53, 217-224 (1997)).
-
-// Steps:
-//   1) Scale volumes of two structures to be commensurate
-//   2) Determine the least frequently occuring atom (LFA)
-//   3) Shift the least frequently occuring atom (LFA) for 
-//      both structures; these will be used to indicate our lattice
-//   4) Create a 3x3x3 supercell of structure2
-//   5) Search for all possible quadruplets of LFA atoms in the 
-//      supercell and see if we can match it with structure1 
-//      using Burzlaff's criteria
-//   6) Once possible quadruplet/lattice is found, check contents
-//      of lattice (i.e. atoms). Check we can have a one-to-one 
-//      mapping
-//   7) Of the best match (smallest misfit (mis)):
-//      If mis <= 0.1:
-//        Structures similar. Print out new representation of 
-//        structure2 and the figure of misfit
-//      else if 0.1 < mis <=0.2:  
-//        Structures in the same family (possible symmetric
-//        group-subgroup relation). Print out new representation 
-//        of structure2 and the figure of misfit
-//      else mis>0.2:
-//        Structures are not the same. Print "No match"
-
+// SEE README_AFLOW_COMPARE.TXT FOR THE FULL LIST OF AFLOW COMMANDS 
 // ***************************************************************************
 
 // ***************************************************************************
@@ -317,10 +252,9 @@ namespace compare {
 
     // This function compares multiple structures (i.e., more than two).
 
-    bool LDEBUG=(false || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_COMPARE_);
     string function_name = XPID + "compare::compareMultipleStructures():";
     ostringstream oss;
-    //DX20200103 ostream& logstream = cout;
     stringstream message;
     ofstream FileMESSAGE;
 
@@ -548,40 +482,18 @@ namespace compare {
     }
 
     // ---------------------------------------------------------------------------
-    // write results to files
-    if(same_species==true){
-      if(format=="json"){
-        aurostd::stringstream2file(ss_json,directory+"/"+DEFAULT_XTALFINDER_FILE_MATERIAL+".json");
-        message << "RESULTS: See " << directory << "/"+DEFAULT_XTALFINDER_FILE_MATERIAL+".json" << " for list of unique/duplicate materials.";
-      }
-      else if(format=="txt"){
-        aurostd::stringstream2file(ss_out,directory+"/"+DEFAULT_XTALFINDER_FILE_MATERIAL+".out");
-        message << "RESULTS: See " << directory << "/"+DEFAULT_XTALFINDER_FILE_MATERIAL+".out" << " for list of unique/duplicate materials.";
-      }
-      else if(format=="both"){
-        aurostd::stringstream2file(ss_json,directory+"/"+DEFAULT_XTALFINDER_FILE_MATERIAL+".json");
-        aurostd::stringstream2file(ss_out,directory+"/"+DEFAULT_XTALFINDER_FILE_MATERIAL+".out");
-        message << "RESULTS: See " << directory << "/"+DEFAULT_XTALFINDER_FILE_MATERIAL+".out" << " or " << directory << "/"+DEFAULT_XTALFINDER_FILE_MATERIAL+".json" << " for list of unique/duplicate materials.";
-      }
-      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_COMPLETE_);
+    // write results to files //DX20201229 - consolidated into functions
+    if(format=="json"){
+      xtal_finder.writeComparisonOutputFile(ss_json, directory, "JSON", "compare_input", same_species);
     }
-    else if(same_species==false){
-      if(format=="json"){
-        aurostd::stringstream2file(ss_json,directory+"/"+DEFAULT_XTALFINDER_FILE_STRUCTURE+".json");
-        message << "RESULTS: See " << directory << "/"+DEFAULT_XTALFINDER_FILE_STRUCTURE+".json" << " for list of unique/duplicate structures.";
-      }
-      else if(format=="txt"){
-        aurostd::stringstream2file(ss_out,directory+"/"+DEFAULT_XTALFINDER_FILE_STRUCTURE+".out");
-        message << "RESULTS: See " << directory << "/"+DEFAULT_XTALFINDER_FILE_STRUCTURE+".out" << " for list of unique/duplicate structures.";
-      }
-      else if(format=="both"){
-        aurostd::stringstream2file(ss_json,directory+"/"+DEFAULT_XTALFINDER_FILE_STRUCTURE+".json");
-        aurostd::stringstream2file(ss_out,directory+"/"+DEFAULT_XTALFINDER_FILE_STRUCTURE+".out");
-        message << "RESULTS: See " << directory << "/"+DEFAULT_XTALFINDER_FILE_STRUCTURE+".out" << " or " << directory << "/"+DEFAULT_XTALFINDER_FILE_STRUCTURE+".json" << " for list of unique/duplicate structures.";
-      }
-      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_COMPLETE_);
+    else if(format=="text"){
+      xtal_finder.writeComparisonOutputFile(ss_out, directory, "TEXT", "compare_input", same_species);
     }
-    //DX20190429 - added format options - END
+    else if(format=="both"){
+      xtal_finder.writeComparisonOutputFile(ss_json, directory, "JSON", "compare_input", same_species);
+      xtal_finder.writeComparisonOutputFile(ss_out, directory, "TEXT", "compare_input", same_species);
+    }
+    
     return oss.str();
   }
 }
@@ -1302,8 +1214,6 @@ vector<StructurePrototype> XtalFinderCalculator::compare2database(
     property_units.push_back(XHOST.vschema.getattachedscheme(schema_unit));
   }
 
-  message << "Total number of candidate structures from database: " << auids.size();
-  pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
   message << "Loading structures ... ";
   pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
 
@@ -1392,7 +1302,7 @@ vector<StructurePrototype> XtalFinderCalculator::compare2database(
       }
     }
   }
-  message << "Total number of candidate structures loaded: " << all_structures.size(); //DX20190403
+  message << "Total number of candidate structures loaded: " << structure_containers.size(); //DX20190403
   pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_); //DX20190403
 
   /*
@@ -1508,39 +1418,19 @@ namespace compare {
     //DX20190429 - added screen only option - END
 
     // ---------------------------------------------------------------------------
-    // write results to files
-    if(same_species){  
-      if(format=="json"){
-        aurostd::stringstream2file(ss_json,DEFAULT_XTALFINDER_FILE_MATERIAL_COMPARE2DATABASE+".json");
-        message << "RESULTS: See " << DEFAULT_XTALFINDER_FILE_MATERIAL_COMPARE2DATABASE << ".json for list of unique/duplicate materials in database.";
-      }
-      else if(format=="txt"){
-        aurostd::stringstream2file(ss_out,DEFAULT_XTALFINDER_FILE_MATERIAL_COMPARE2DATABASE+".out");
-        message << "RESULTS: See " << DEFAULT_XTALFINDER_FILE_MATERIAL_COMPARE2DATABASE << ".out for list of unique/duplicate materials in database.";
-      }
-      else if(format=="both"){
-        aurostd::stringstream2file(ss_json,DEFAULT_XTALFINDER_FILE_MATERIAL_COMPARE2DATABASE+".json");
-        aurostd::stringstream2file(ss_out,DEFAULT_XTALFINDER_FILE_MATERIAL_COMPARE2DATABASE+".out");
-        message << "RESULTS: See " << DEFAULT_XTALFINDER_FILE_MATERIAL_COMPARE2DATABASE << ".out or " << DEFAULT_XTALFINDER_FILE_MATERIAL_COMPARE2DATABASE << ".json for list of unique/duplicate materials in database.";
-      }
+    // write results to files //DX20201229 - consolidated into functions
+    string directory = aurostd::getPWD();
+    if(format=="json"){
+      xtal_finder_database.writeComparisonOutputFile(ss_json, directory, "JSON", "compare2database", same_species);
     }
-    else {
-      if(format=="json"){
-        aurostd::stringstream2file(ss_json,DEFAULT_XTALFINDER_FILE_STRUCTURE_COMPARE2DATABASE+".json");
-        message << "RESULTS: See " << DEFAULT_XTALFINDER_FILE_STRUCTURE_COMPARE2DATABASE << ".json for list of unique/duplicate structures in database.";
-      }
-      else if(format=="txt"){
-        aurostd::stringstream2file(ss_out,DEFAULT_XTALFINDER_FILE_STRUCTURE_COMPARE2DATABASE+".out");
-        message << "RESULTS: See " << DEFAULT_XTALFINDER_FILE_STRUCTURE_COMPARE2DATABASE << ".out for list of unique/duplicate structures in database.";
-      }
-      else if(format=="both"){
-        aurostd::stringstream2file(ss_json,DEFAULT_XTALFINDER_FILE_STRUCTURE_COMPARE2DATABASE+".json");
-        aurostd::stringstream2file(ss_out,DEFAULT_XTALFINDER_FILE_STRUCTURE_COMPARE2DATABASE+".out");
-        message << "RESULTS: See " << DEFAULT_XTALFINDER_FILE_STRUCTURE_COMPARE2DATABASE << ".out or " << DEFAULT_XTALFINDER_FILE_STRUCTURE_COMPARE2DATABASE << ".json for list of unique/duplicate structures in database.";
-      }
+    else if(format=="text"){
+      xtal_finder_database.writeComparisonOutputFile(ss_out, directory, "TEXT", "compare2database", same_species);
     }
-    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_COMPLETE_);
-
+    else if(format=="both"){
+      xtal_finder_database.writeComparisonOutputFile(ss_json, directory, "JSON", "compare2database", same_species);
+      xtal_finder_database.writeComparisonOutputFile(ss_out, directory, "TEXT", "compare2database", same_species);
+    }
+    
     return oss.str();
 
   }
@@ -1918,18 +1808,9 @@ namespace compare {
     xtal_finder.printResults(ss_json, same_species, final_prototypes, "json");
 
     // ---------------------------------------------------------------------------
-    // write results to files
-    if(!structure_comparison){  
-      aurostd::stringstream2file(ss_json,directory+"/"+DEFAULT_XTALFINDER_FILE_MATERIAL_DATABASE+".json");
-      aurostd::stringstream2file(ss_out,directory+"/"+DEFAULT_XTALFINDER_FILE_MATERIAL_DATABASE+".out");
-      message << "RESULTS: See " << DEFAULT_XTALFINDER_FILE_MATERIAL_DATABASE << ".out or " << DEFAULT_XTALFINDER_FILE_MATERIAL_DATABASE << ".json for list of unique/duplicate materials in database.";
-    }
-    else{
-      aurostd::stringstream2file(ss_json,directory+"/"+DEFAULT_XTALFINDER_FILE_STRUCTURE_DATABASE+".json");
-      aurostd::stringstream2file(ss_out,directory+"/"+DEFAULT_XTALFINDER_FILE_STRUCTURE_DATABASE+".out");
-      message << "RESULTS: See " << DEFAULT_XTALFINDER_FILE_STRUCTURE_DATABASE << ".out or " << DEFAULT_XTALFINDER_FILE_STRUCTURE_DATABASE << ".json for list of unique/duplicate structures in database.";
-    }
-    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_COMPLETE_);
+    // write results to files //DX20201229 - consolidated into functions
+    xtal_finder.writeComparisonOutputFile(ss_out, directory, "TEXT", "compare_database_entries", !structure_comparison);
+    xtal_finder.writeComparisonOutputFile(ss_json, directory, "JSON", "compare_database_entries", !structure_comparison);
 
     return oss.str();
 
@@ -2099,7 +1980,7 @@ vector<StructurePrototype> XtalFinderCalculator::compareMultipleStructures(
     const string& directory,
     const aurostd::xoption& comparison_options){ //DX20200103 - condensed booleans to xoptions //DX20200226 - added logstream
 
-  bool LDEBUG=(false || XHOST.DEBUG);
+  bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_COMPARE_);
   string function_name = XPID + "XtalFinderCalculator::compareMultipleStructures():";
   stringstream message;
   bool quiet = false;
@@ -2177,31 +2058,24 @@ vector<StructurePrototype> XtalFinderCalculator::compareMultipleStructures(
       unique_compounds[i].structure_representative_struct->number_compounds_matching_structure = unique_compounds[i].numberOfComparisons();
     }
 
-    // prepare JSON output
-    stringstream ss_json_remove_duplicates;
-    printResults(ss_json_remove_duplicates, tmp_same_species, unique_compounds, "json");
-
-    // prepare TEXT (.out) output
-    stringstream ss_out_remove_duplicates;
-    printResults(ss_out_remove_duplicates, tmp_same_species, unique_compounds, "txt");
-
-    // write results to files
+    // ---------------------------------------------------------------------------
+    // write results to files //DX20201229 - consolidated into functions
+    stringstream ss_json_remove_duplicates, ss_out_remove_duplicates;
+    
     if(XHOST.vflag_control.flag("PRINT_MODE::JSON")){
-      aurostd::stringstream2file(ss_json_remove_duplicates,directory+"/"+DEFAULT_XTALFINDER_FILE_DUPLICATE+".json");
-      message << "RESULTS: See " << directory << "/"+DEFAULT_XTALFINDER_FILE_DUPLICATE+".json for list of unique/duplicate structures.";
-      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_COMPLETE_);
+      printResults(ss_json_remove_duplicates, tmp_same_species, unique_compounds, "json");
+      writeComparisonOutputFile(ss_json_remove_duplicates, directory, "JSON", "duplicate_compounds", true);
     }
     else if(XHOST.vflag_control.flag("PRINT_MODE::TXT")){
-      aurostd::stringstream2file(ss_out_remove_duplicates,directory+"/"+DEFAULT_XTALFINDER_FILE_DUPLICATE+".out");
-      message << "RESULTS: See " << directory << "/"+DEFAULT_XTALFINDER_FILE_DUPLICATE+".out for list of unique/duplicate structures.";
-      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_COMPLETE_);
+      printResults(ss_out_remove_duplicates, tmp_same_species, unique_compounds, "txt");
+      writeComparisonOutputFile(ss_out_remove_duplicates, directory, "TEXT", "duplicate_compounds", true);
     }
-    else {
-      aurostd::stringstream2file(ss_json_remove_duplicates,directory+"/"+DEFAULT_XTALFINDER_FILE_DUPLICATE+".json");
-      aurostd::stringstream2file(ss_out_remove_duplicates,directory+"/"+DEFAULT_XTALFINDER_FILE_DUPLICATE+".out");
-      message << "RESULTS: See " << directory << "/"+DEFAULT_XTALFINDER_FILE_DUPLICATE+".out" << " or " << directory << "/"+DEFAULT_XTALFINDER_FILE_DUPLICATE+".json" << " for list of unique/duplicate structures.";
-      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_COMPLETE_);
-    }
+    else{
+      printResults(ss_json_remove_duplicates, tmp_same_species, unique_compounds, "json");
+      writeComparisonOutputFile(ss_json_remove_duplicates, directory, "JSON", "duplicate_compounds", true);
+      printResults(ss_out_remove_duplicates, tmp_same_species, unique_compounds, "txt");
+      writeComparisonOutputFile(ss_out_remove_duplicates, directory, "TEXT", "duplicate_compounds", true);
+    } 
 
     // ---------------------------------------------------------------------------
     // remove duplicates in structure container
@@ -2239,9 +2113,7 @@ vector<StructurePrototype> XtalFinderCalculator::compareMultipleStructures(
 
   // ---------------------------------------------------------------------------
   // return if there are no similar structures
-  if(final_prototypes.size()==0){
-    return final_prototypes;
-  }
+  if(final_prototypes.size()==0){ return final_prototypes; }
   comparison_schemes.clear();
 
   // ---------------------------------------------------------------------------
@@ -2253,7 +2125,6 @@ vector<StructurePrototype> XtalFinderCalculator::compareMultipleStructures(
 
   // ---------------------------------------------------------------------------
   // get unique atom decorations prototype (representative) structures
-  //
   // SEPARATE FUNCTION?????
   if(!same_species && comparison_options.flag("COMPARISON_OPTIONS::CALCULATE_UNIQUE_PERMUTATIONS")){ 
     message << "Determining the unique atom decorations for each prototype.";
@@ -2282,7 +2153,6 @@ vector<StructurePrototype> XtalFinderCalculator::compareMultipleStructures(
         final_permutations.clear(); //DX20190624
       }
       else{
-        //vector<string> unique_permutations; compare::generatePermutationString(final_prototypes[i].stoichiometry, unique_permutations); //DX20191125
         XtalFinderCalculator xtal_finder_permutations;
         vector<string> unique_permutations = xtal_finder_permutations.getSpeciesPermutedStrings(final_prototypes[i].stoichiometry); //DX20191125
         // store permutation results in main StructurePrototype object
@@ -2295,7 +2165,7 @@ vector<StructurePrototype> XtalFinderCalculator::compareMultipleStructures(
   }
 
   if(comparison_options.flag("COMPARISON_OPTIONS::ADD_AFLOW_PROTOTYPE_DESIGNATION")){
-// SEPARATE FUNCTION????
+    // SEPARATE FUNCTION????
     message << "Determining the AFLOW standard designation.";
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
 
@@ -2377,7 +2247,6 @@ vector<StructurePrototype> XtalFinderCalculator::compareMultipleStructures(
     // match to AFLOW prototypes 
     for(uint i=0;i<final_prototypes.size();i++){
       XtalFinderCalculator xtal_finder_protos(misfit_match,misfit_family,*p_FileMESSAGE,num_proc,*p_oss);
-      //vector<StructurePrototype> matching_protos = compare::compare2prototypes(final_prototypes[i].structure_representative, vpflow_protos);
       vector<StructurePrototype> matching_protos = xtal_finder_protos.compare2prototypes(final_prototypes[i].structure_representative_struct->structure, vpflow_protos);
       for(uint j=0;j<matching_protos[0].structures_duplicate_struct.size();j++){
         final_prototypes[i].matching_aflow_prototypes.push_back(matching_protos[0].structures_duplicate_struct[j]->name);
@@ -2443,10 +2312,14 @@ vector<vector<uint> > XtalFinderCalculator::groupSimilarXstructures(
 }
 
 // ***************************************************************************
-// compare::structuresMatch()
+// compare::structuresMatch() //DX20201228 - renamed
 // ***************************************************************************
 namespace compare {
-  bool structuresMatch(const xstructure& xstr1, const xstructure& xstr2, bool same_species, uint num_proc) { //DX20191108 - remove const & from bools //DX20191122 - move ostream to end
+  bool structuresMatch(const xstructure& xstr1,
+      const xstructure& xstr2,
+      bool same_species,
+      uint num_proc) {
+
     double final_misfit = AUROSTD_MAX_DOUBLE;
     bool scale_volume=true; //default is true
     bool optimize_match=false; //default is false
@@ -2455,7 +2328,13 @@ namespace compare {
 }
 
 namespace compare {
-  bool structuresMatch(const xstructure& xstr1, const xstructure& xstr2, bool same_species, bool scale_volume, bool optimize_match, uint num_proc) { //DX20191108 - remove const & from bools //DX20191122 - move ostream to end
+  bool structuresMatch(const xstructure& xstr1,
+      const xstructure& xstr2,
+      bool same_species,
+      bool scale_volume,
+      bool optimize_match,
+      uint num_proc) {
+
     double final_misfit = AUROSTD_MAX_DOUBLE;
     return aflowCompareStructure(xstr1, xstr2, same_species, scale_volume, optimize_match, final_misfit, num_proc); //DX20191122 - move ostream to end and add default
   }
@@ -2463,10 +2342,14 @@ namespace compare {
 
 
 // ***************************************************************************
-// compare::getMisfitBetweenStructures()
+// compare::getMisfitBetweenStructures() //DX20201228 - renamed 
 // ***************************************************************************
 namespace compare {
-  double getMisfitBetweenStructures(const xstructure& xstr1, const xstructure& xstr2, bool same_species, uint num_proc) { //DX20191108 - remove const & from bools
+  double getMisfitBetweenStructures(const xstructure& xstr1,
+      const xstructure& xstr2,
+      bool same_species,
+      uint num_proc) {
+
     double final_misfit=AUROSTD_MAX_DOUBLE;
     bool scale_volume=true; //default is true
     bool optimize_match=false; //default is false
@@ -2476,15 +2359,14 @@ namespace compare {
 }
 
 // ***************************************************************************
-// compare::getTransformationBetweenStructures()
+// compare::getTransformationBetweenStructures() //DX20201229
 // ***************************************************************************
 namespace compare {
-  //double aflowCompareStructureMisfit(const xstructure& xstr1, const xstructure& xstr2, bool same_species, uint num_proc) { //DX20191108 - remove const & from bools
   structure_misfit getTransformationBetweenStructures(const xstructure& xstr1, const xstructure& xstr2, bool same_species, uint num_proc) { //DX20191108 - remove const & from bools
     double final_misfit=AUROSTD_MAX_DOUBLE;
     bool scale_volume=true; //default is true
     bool optimize_match=false; //default is false
-    structure_misfit final_misfit_info = compare::initialize_misfit_struct(); //DX20191218
+    structure_misfit final_misfit_info = compare::initialize_misfit_struct();
     aflowCompareStructure(xstr1, xstr2, same_species, scale_volume, optimize_match, final_misfit, final_misfit_info, num_proc); //DX20191122 - move ostream to end
     return final_misfit_info;
   }

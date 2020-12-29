@@ -393,7 +393,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   // [OBSOLETE] vpflow.flag("COMPARE",aurostd::args2flag(argv,cmds,"--compare"));
   vpflow.args2addattachedscheme(argv,cmds,"COMPARE","--compare=","");
 
-  //DX20201220 - reorder comparison functions - START
+  //DX20201220 - put all comparison functions prior to general options - START
   vpflow.flag("COMPARE_DATABASE_ENTRIES",aurostd::args2attachedflag(argv,cmds,"--compare_database_entries"));
   vpflow.flag("COMPARE_MATERIAL",aurostd::args2attachedflag(argv,cmds,"--compare_material|--compare_materials")); //DX20190424 - added plural variant
   vpflow.flag("COMPARE_STRUCTURE",aurostd::args2attachedflag(argv,cmds,"--compare_structure|--compare_structures")); //DX20190424 - added plural variant
@@ -475,7 +475,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   if(vpflow.flag("COMPARE2PROTOTYPES")) {
     vpflow.args2addattachedscheme(argv,cmds,"COMPARE2PROTOTYPES::CATALOG","--catalog=|--library=","");
   }
-  //DX20201220 - reorder comparison functions - END
+  //DX20201220 - put all comparison functions prior to general options - END
 
   vpflow.flag("CORNERS",aurostd::args2flag(argv,cmds,"--corner|--corners"));
 

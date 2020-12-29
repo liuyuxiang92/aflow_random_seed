@@ -481,10 +481,19 @@ class XtalFinderCalculator : public xStream {
   // ---------------------------------------------------------------------------
   // helper functions for external use
   vector<vector<uint> > groupSimilarXstructures(const vector<xstructure>& vxstrs, bool same_species=true, bool scale_volume=true);
+  
+  // ---------------------------------------------------------------------------
+  // write output to file 
+  void writeComparisonOutputFile(const stringstream& ss_output,
+      const string& directory,
+      const string& format,
+      const string& comparison_mode,
+      bool same_species);
+
 
   private:
-    void free();                                                                            // free operator
-    void copy(const XtalFinderCalculator& b);                                                 // copy constructor
+    void free();                              // free operator
+    void copy(const XtalFinderCalculator& b); // copy constructor
 };
   
 namespace compare{
