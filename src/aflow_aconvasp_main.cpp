@@ -9882,9 +9882,15 @@ namespace pflow {
          !aurostd::EWithinList(files,"CONTCAR.relax",efile) &&
          TRUE)
       ) {
-      message << "path=" << path << " missing structure files. Ignoring entry";
-      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, oss, _LOGGER_WARNING_);
-      return false;
+      if(entry.prototype.find("POCC")!=string::npos){ //POCC entries have no composition
+        message << "path=" << path << " is a POCC-structure and has no structure files. Ignoring entry";
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+        return false;
+      }else{
+        message << "path=" << path << " missing structure files. Ignoring entry";
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, oss, _LOGGER_WARNING_);
+        return false;
+      }
     }
     if (!relaxed_only) {
       //////////////////////////////////////////////////////////////////////////

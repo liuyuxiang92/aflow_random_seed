@@ -13,7 +13,10 @@
         -- adding --force to LIB2LIB (CO)
         -- adding max=6D for chull online (CO)
         -- adding --machine=x settings (CO)
-        -- added stress tensor check in --xplug
+        -- added stress tensor check in --xplug (CO)
+        -- added --no_fancy_print flag (CO)
+        -- redirected fancy print to appropriate stream (CO)
+        -- added support for new pocc database entries in _aflowlib_entry (CO)
 3.2.5 - 2020/09/25
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.5.tar.xz
         -- patched convert issue: security policy 'PDF' blocking conversion (SC)

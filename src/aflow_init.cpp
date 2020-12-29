@@ -987,6 +987,9 @@ namespace init {
     XHOST.vflag_control.flag("WWW",aurostd::args2flag(argv,cmds,"--www|--web|--web_mode|--php|--html|-www|-web|-web_mode|-php|-html"));  //CO20200404
     if(XHOST.user=="www-data"){XHOST.vflag_control.flag("WWW",true);} //CO20201215
 
+    //FANCY_PRINT
+    XHOST.vflag_control.flag("NO_FANCY_PRINT",aurostd::args2flag(argv,cmds,"--no_fancy_print|--nofancyprint"));  //CO20200404
+
     // DEFAULT options
     if(INIT_VERBOSE) oss << "--- DEFAULTSs --- " << endl;
     if(INIT_VERBOSE) aflowrc::print_aflowrc(oss,INIT_VERBOSE || XHOST.DEBUG);

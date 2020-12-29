@@ -1525,11 +1525,13 @@ namespace chull {
   }
 
   uint ChullPoint::loadXstructures(bool relaxed_only) {  //load relaxed only
+    if(m_entry.prototype.find("POCC")!=string::npos){return false;} //POCC entries have no composition
     if(!pflow::loadXstructures(m_entry,*p_FileMESSAGE,*p_oss,relaxed_only)){return false;}
     return m_entry.vstr.size();
   }
 
   bool ChullPoint::getMostRelaxedXstructure(xstructure& xstr) const { //this is const!
+    if(m_entry.prototype.find("POCC")!=string::npos){return false;} //POCC entries have no composition
     aflowlib::_aflowlib_entry entry; entry.auid=m_entry.auid; entry.aurl=m_entry.aurl;  //fast copy
     if(!pflow::loadXstructures(entry,*p_FileMESSAGE,*p_oss,true)){return false;}
     if(entry.vstr.size()==1){xstr=entry.vstr[0]; return true;}
@@ -3473,11 +3475,13 @@ namespace chull {
     LOGGER_TYPE=_LOGGER_OPTION_;
     //tests of stupidity
     if(entry.vspecies.size()!=entry.vcomposition.size()){
-      //throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Bad entry ("+entry.auid+") - vspecies.size!=vcomposition.size()"); //let's not break the code for one bad entry
-      reason="Entry (auid="+entry.auid+") is ill-defined: vspecies.size()!=vcomposition.size()";
-      reason+=" (please report on AFLOW Forum: aflow.org/forum)";
-      LOGGER_TYPE=_LOGGER_WARNING_;
-      return false;
+      if(entry.prototype.find("POCC")==string::npos){ //POCC entries have no composition
+        //throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Bad entry ("+entry.auid+") - vspecies.size!=vcomposition.size()"); //let's not break the code for one bad entry
+        reason="Entry (auid="+entry.auid+") is ill-defined: vspecies.size()!=vcomposition.size()";
+        reason+=" (please report on AFLOW Forum: aflow.org/forum)";
+        LOGGER_TYPE=_LOGGER_WARNING_;
+        return false;
+      }
     }
     bool found=false;
     for(uint j=0,fl_size_j=entry.vspecies.size();j<fl_size_j;j++){
@@ -6820,12 +6824,16 @@ namespace chull {
 
   string ConvexHull::prettyPrintCompound(const aflowlib::_aflowlib_entry& entry,vector_reduction_type vred,bool exclude1,filetype ftype) const {  // overload
     if(entry.vspecies.size()!=entry.vcomposition.size()) {
-      string soliloquy=XPID+"ConvexHull::prettyPrintCompound():";
-      stringstream message;
-      message << "Entry (auid=" << entry.auid << ") is ill-defined: vspecies.size()!=vcomposition.size()";
-      message << " (please report on AFLOW Forum: aflow.org/forum)";
-      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
-      return entry.compound;
+      if(entry.prototype.find("POCC")!=string::npos){ //POCC entries have no composition
+        return pflow::prettyPrintCompound(entry.vspecies,entry.vstoichiometry,no_vrt,exclude1,ftype);  //pass in stoichiometry and do not reduce
+      }else{
+        string soliloquy=XPID+"ConvexHull::prettyPrintCompound():";
+        stringstream message;
+        message << "Entry (auid=" << entry.auid << ") is ill-defined: vspecies.size()!=vcomposition.size()";
+        message << " (please report on AFLOW Forum: aflow.org/forum)";
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+        return entry.compound;
+      }
     }
     return pflow::prettyPrintCompound(entry.vspecies,entry.vcomposition,vred,exclude1,ftype);  //ME20190628
   }
@@ -11124,7 +11132,7 @@ namespace chull {
       if(H_f_atom(point)!=AUROSTD_NAN && point.m_entry.entropy_forming_ability!=AUROSTD_NAN && nonZeroWithinTol(point.m_entry.entropy_forming_ability)){
         tmp_precision=precision;
         if(ftype==latex_ft){tmp_precision=0;tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);}
-        value=aurostd::utype2string( sqrt(H_f_atom(point) / point.m_entry.entropy_forming_ability) ,tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM);
+        value=aurostd::utype2string( sqrt(-H_f_atom(point) / point.m_entry.entropy_forming_ability) ,tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM);
       }
     }
     else {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown property");}
