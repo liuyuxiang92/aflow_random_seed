@@ -414,6 +414,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     vpflow.args2addattachedscheme(argv,cmds,"COMPARE::NP","--np=|--num_proc=","");
     vpflow.args2addattachedscheme(argv,cmds,"COMPARE::MAGNETIC","--mag=|--magnetic=|--magmom=",""); //DX20170803
     // booleans
+    vpflow.flag("COMPARE::USAGE",aurostd::args2flag(argv,cmds,"--usage"));
     vpflow.flag("COMPARE::OPTIMIZE_MATCH",aurostd::args2flag(argv,cmds,"--optimize|--optimize_match")); //DX20190201 - changed from fast_match to optimize_match
     vpflow.flag("COMPARE::NO_SCALE_VOLUME",aurostd::args2flag(argv,cmds,"--no_scale_volume"));
     vpflow.flag("COMPARE::KEEP_UNMATCHED",aurostd::args2flag(argv,cmds,"--keep_unmatched")); //DX20190424
@@ -433,7 +434,6 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   }
 
   if(vpflow.flag("COMPARE_DATABASE_ENTRIES")) {
-    vpflow.flag("COMPARE_DATABASE_ENTRIES::USAGE",aurostd::args2flag(argv,cmds,"--usage")); //DX20190424
     // FUNCTION_SPECIFIC
     //booleans
     vpflow.flag("COMPARE_DATABASE_ENTRIES::STRUCTURE",aurostd::args2flag(argv,cmds,"--structure|--structure_comparison|--ignore_species"));
@@ -448,7 +448,6 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     vpflow.args2addattachedscheme(argv,cmds,"COMPARE_DATABASE_ENTRIES::WYCKOFF","--Wyckoff=|--wyckoff=","");
   }
   if(vpflow.flag("COMPARE_MATERIAL") || vpflow.flag("COMPARE_STRUCTURE")) {
-    vpflow.flag("COMPARE_STRUCTURE::USAGE",aurostd::args2flag(argv,cmds,"--usage")); //DX20190424
     vpflow.flag("COMPARE_STRUCTURE::PRINT",aurostd::args2flag(argv,cmds,"--print"));
     // structures appended to command
     if(aurostd::args2attachedflag(argv,"--compare_material=|--compare_materials=|--compare_structure=|--compare_structures=")){ //DX20170803
@@ -466,11 +465,10 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     }
   }
   if(vpflow.flag("COMPARE_PERMUTATION")) {
-    vpflow.flag("COMPARE_PERMUTATION::PRINT",aurostd::args2flag(argv,cmds,"--print|--misfit|--print_misfit"));
+    vpflow.flag("COMPARE_PERMUTATION::PRINT",aurostd::args2flag(argv,cmds,"--print_misfit|--print|--misfit"));
   }
   if(vpflow.flag("COMPARE2DATABASE")) {
     vpflow.args2addattachedscheme(argv,cmds,"COMPARE2DATABASE::PROPERTY_LIST","--properties=|--property_list=|--property=","");
-    vpflow.args2addattachedscheme(argv,cmds,"COMPARE2DATABASE::GEOMETRY_FILE","--geometry_file=|--file=","");
     vpflow.args2addattachedscheme(argv,cmds,"COMPARE2DATABASE::RELAXATION_STEP","--relaxation_step=|--relaxation=","");
     vpflow.args2addattachedscheme(argv,cmds,"COMPARE2DATABASE::CATALOG","--catalog=|--library=","");
   }
@@ -662,8 +660,9 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.flag("INWS",aurostd::args2flag(argv,cmds,"--inwignerseitz|--inws"));
 
   //DX20200131 - add isopointal prototype function - START
-  vpflow.flag("ISOPOINTAL_PROTOTYPES",aurostd::args2attachedflag(argv,cmds,"--isopointal_prototypes|--get_isopointal_prototypes"));
+  vpflow.flag("ISOPOINTAL_PROTOTYPES",aurostd::args2attachedflag(argv,cmds,"--get_isopointal_prototypes|--isopointal_prototypes|--get_same_symmetry_prototypes"));
   if(vpflow.flag("ISOPOINTAL_PROTOTYPES")) {
+    vpflow.flag("ISOPOINTAL_PROTOTYPES::USAGE",aurostd::args2flag(argv,cmds,"--usage"));
     vpflow.args2addattachedscheme(argv,cmds,"ISOPOINTAL_PROTOTYPES::CATALOG","--catalog=|--library=","");
   }
   //DX20200131 - add isopointal prototype function - END
@@ -1293,26 +1292,6 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   }
   //DX20190128 - add structure2ANRL - END
 
-  /*
-  //DX20181004 - add structure2proto - START
-  vpflow.flag("COMPARE2PROTOTYPES",aurostd::args2attachedflag(argv,cmds,"--compare2protos|--compare2prototypes"));
-  if(vpflow.flag("COMPARE2PROTOTYPES")) {
-    vpflow.args2addattachedscheme(argv,cmds,"COMPARE2PROTOTYPES::MISFIT_MATCH","--misfit_match=",""); //DX20201118
-    vpflow.args2addattachedscheme(argv,cmds,"COMPARE2PROTOTYPES::MISFIT_FAMILY","--misfit_family=",""); //DX20201118
-    vpflow.args2addattachedscheme(argv,cmds,"COMPARE2PROTOTYPES::NP","--np=|--num_proc=","");
-    vpflow.args2addattachedscheme(argv,cmds,"COMPARE2PROTOTYPES::CATALOG","--catalog=|--library=","");
-    vpflow.flag("COMPARE2PROTOTYPES::IGNORE_SYMMETRY",aurostd::args2flag(argv,cmds,"--ignore_symmetry"));
-    vpflow.flag("COMPARE2PROTOTYPES::IGNORE_WYCKOFF",aurostd::args2flag(argv,cmds,"--ignore_wyckoff|--ignore_Wyckoff"));
-    vpflow.flag("COMPARE2PROTOTYPES::IGNORE_ENVIRONMENT_ANALYSIS",aurostd::args2flag(argv,cmds,"--ignore_environment|--ignore_environment_analysis|--ignore_env")); //DX20190807
-    vpflow.flag("COMPARE2PROTOTYPES::PRIMITIVIZE",aurostd::args2flag(argv,cmds,"--primitive|--primitivize|--prim")); //DX20201006
-    vpflow.flag("COMPARE2PROTOTYPES::MINKOWSKI",aurostd::args2flag(argv,cmds,"--minkowski|--minkowski_reduction|--minkowski_lattice_reduction")); //DX20201006
-    vpflow.flag("COMPARE2PROTOTYPES::NIGGLI",aurostd::args2flag(argv,cmds,"--niggli|--niggli_reduction|--niggli_lattice_reduction")); //DX20201006
-    vpflow.flag("COMPARE2PROTOTYPES::PRINT",aurostd::args2flag(argv,cmds,"--print"));
-    vpflow.flag("COMPARE2PROTOTYPES::SCREEN_ONLY",aurostd::args2flag(argv,cmds,"--screen_only")); //DX20170803
-  }
-  //DX20181004 - add structure2proto - END
-  */
-
   vpflow.flag("SUMPDOS",(aurostd::args2flag(argv,cmds,"--sumpdos") && argv.at(1)=="--sumpdos"));
 
   // [OBSOLETE] vpflow.flag("SUPERCELL",aurostd::args2flag(argv,cmds,"--supercell"));
@@ -1567,25 +1546,9 @@ namespace pflow {
       if(vpflow.flag("CHGDIFF")) {cout << pflow::CHGDIFF(vpflow); _PROGRAMRUN=true;}
       if(vpflow.flag("CHGSUM")) {cout << pflow::CHGSUM(vpflow); _PROGRAMRUN=true;}
       if(vpflow.flag("CLEAVAGE_ENERGY")) {pflow::CleavageEnergyCalculation(vpflow,cin); _PROGRAMRUN=true;} //CO20190520
-      //DX
-      //DX20190424 [OBSOLETE] if(vpflow.flag("COMPARE_MATERIAL_DIRECTORY")) {cout << pflow::compareStructureDirectory(vpflow); _PROGRAMRUN=true;}
-      //DX20190424 [OBSOLETE] if(vpflow.flag("COMPARE_STRUCTURE_DIRECTORY")) {cout << pflow::compareStructureDirectory(vpflow); _PROGRAMRUN=true;}
-      //DX20190424 [OBSOLETE] if(vpflow.flag("COMPARE_MATERIAL_FILE")) {cout << pflow::compareStructureDirectory(vpflow); _PROGRAMRUN=true;}
-      //DX20190424 [OBSOLETE] if(vpflow.flag("COMPARE_STRUCTURE_FILE")) {cout << pflow::compareStructureDirectory(vpflow); _PROGRAMRUN=true;}
-      //DX20190424 [OBSOLETE] if(vpflow.flag("COMPARE_MATERIAL")) {cout << pflow::compareStructures(vpflow); _PROGRAMRUN=true;}
-      //DX20190424 [OBSOLETE] if(vpflow.flag("COMPARE_STRUCTURE")) {cout << pflow::compareStructures(vpflow); _PROGRAMRUN=true;}
       //DX20190425 START
       if(vpflow.flag("COMPARE_DATABASE_ENTRIES")) {cout << compare::compareDatabaseEntries(vpflow); _PROGRAMRUN=true;}
-      if(vpflow.flag("COMPARE_MATERIAL") || vpflow.flag("COMPARE_STRUCTURE")){
-        if(!vpflow.getattachedscheme("COMPARE_STRUCTURE::STRUCTURE_LIST").empty()) {
-          //vector<string> vinput;
-          //if(aurostd::string2tokens(vpflow.getattachedscheme("COMPARE_STRUCTURE::STRUCTURE_LIST"),vinput,",")==2){cout << pflow::compareStructures(vpflow); _PROGRAMRUN=true;}
-          //else {cout << pflow::compareMultipleStructures(vpflow); _PROGRAMRUN=true;}
-          cout << compare::compareMultipleStructures(vpflow); _PROGRAMRUN=true;
-        } //CO20200106 - patching for auto-indenting
-        if(!vpflow.getattachedscheme("COMPARE_STRUCTURE::DIRECTORY").empty()) {cout << compare::compareMultipleStructures(vpflow); _PROGRAMRUN=true;}
-        if(!vpflow.getattachedscheme("COMPARE_STRUCTURE::FILE").empty()) {cout << compare::compareMultipleStructures(vpflow); _PROGRAMRUN=true;}
-      }
+      if(vpflow.flag("COMPARE_MATERIAL") || vpflow.flag("COMPARE_STRUCTURE")){ cout << compare::compareMultipleStructures(vpflow); _PROGRAMRUN=true;}
       //DX20190425 END
       if(vpflow.flag("COMPARE_PERMUTATION")) {cout << compare::compareAtomDecorations(cin,vpflow); _PROGRAMRUN=true;} //DX20190201
       if(vpflow.flag("GFA::INIT")){pflow::GLASS_FORMING_ABILITY(vpflow); _PROGRAMRUN=true;} //DF20190329 - GFA

@@ -100,16 +100,20 @@ namespace compare {
     ostringstream oss;
     ofstream FileMESSAGE; //DX20190319 - added FileMESSAGE
 
-    string usage="aflow --compare_permutation<POSCAR";
-    string options="[--usage] [--np=<number>] [--print_misfit]";
-
     // ---------------------------------------------------------------------------
     // FLAG: usage
-    if(vpflow.flag("COMPARE_PERMUTATION::USAGE")) {
-      //[CO20200624 - OBSOLETE]stringstream ss_usage;
-      //[CO20200624 - OBSOLETE]init::ErrorOption(ss_usage,vpflow.getattachedscheme("COMPARE_PERMUTATION"),"compare::compareAtomDecorations()",aurostd::liststring2string(usage,options));
-      //[CO20200624 - OBSOLETE]return ss_usage.str();
-      init::ErrorOption(vpflow.getattachedscheme("COMPARE_PERMUTATION"),"compare::compareAtomDecorations()",aurostd::liststring2string(usage,options));
+    if(vpflow.flag("COMPARE::USAGE")) {
+      string usage="aflow --compare_atom_decorations|--unique_atom_decorations [GENERAL_COMPARISON_OPTIONS] < file";
+      string options_function_string = "unique_atom_decorations_options: [--print_misfit]"; 
+
+      vector<string> options, options_general, options_function;
+      aurostd::string2tokens(GENERAL_OPTIONS_LIST,options_general," ");
+      aurostd::string2tokens(options_function_string,options_function," ");
+      options.push_back(usage);
+      options.insert(options.end(), options_general.begin(), options_general.end());
+      options.insert(options.end(), options_function.begin(), options_function.end());
+      
+      init::ErrorOption("--usage","compare::compareAtomDecorations()",options);
     }
     
     // ---------------------------------------------------------------------------
@@ -211,10 +215,8 @@ vector<string> XtalFinderCalculator::getUniquePermutations(xstructure& xstr, uin
   // quick check: check if any sites have the same number of atoms; if not, then no need to try comparing
   if(!print_misfit){
     if(!compare::arePermutationsComparableViaComposition(xstr)){ //DX20190624 - put into function
-      //DX20191125 [OBSOLETE] vector<uint> reduced_stoichiometry = gcdStoich(xstr.num_each_type); //DX20190508
       deque<int> reduced_stoichiometry; aurostd::reduceByGCD(xstr.num_each_type, reduced_stoichiometry); //DX20191125
       deque<uint> reduced_stoichiometry_uint; for(uint i=0;i<reduced_stoichiometry.size(); i++){ reduced_stoichiometry_uint.push_back((uint)reduced_stoichiometry[i]); } //DX20191125
-      //compare::generatePermutationString(reduced_stoichiometry_uint, unique_permutations); //DX20190508
       unique_permutations = getSpeciesPermutedStrings(reduced_stoichiometry_uint); //DX20191125
       if(format=="text"){ //DX20190506
         ss_output << "Unique atom decorations (" << unique_permutations.size() << "): " << endl; 
@@ -341,24 +343,23 @@ namespace compare {
 
     // ---------------------------------------------------------------------------
     // FLAG: usage
-    if(vpflow.flag("COMPARE_STRUCTURE::USAGE")) {
-      //[CO20200624 - OBSOLETE]stringstream ss_usage;
+    if(vpflow.flag("COMPARE::USAGE")) {
+      string usage = "";
       // material-type comparisons
-      if(vpflow.flag("COMPARE_MATERIAL_DIRECTORY")){
-        string usage_material_comparison="aflow --compare_materials -D <dir_path>";
-        string options_material_comparison="[--usage] [--np=|--num_proc=<number>] [--optimize_match] [--no_scale_volume] [--ignore_symmetry] [--ignore_Wyckoff]";
-        //[CO20200624 - OBSOLETE]init::ErrorOption(ss_usage,vpflow.getattachedscheme("COMPARE_STRUCTURE"),"compare::compareMultipleStructures()",aurostd::liststring2string(usage_material_comparison,options_material_comparison));
-        init::ErrorOption(vpflow.getattachedscheme("COMPARE_STRUCTURE"),"compare::compareMultipleStructures()",aurostd::liststring2string(usage_material_comparison,options_material_comparison));
+      if(vpflow.flag("COMPARE_MATERIAL")){
+        cerr << "1" << endl;
+        usage="aflow --compare_materials=str1,str2,str3,... | aflow --compare_materials -D <dir_path> | aflow --compare_materials -F=<filename>";
       }
       // structure-type comparisons
-      else if(vpflow.flag("COMPARE_STRUCTURE_DIRECTORY")){
-        string usage_structure_comparison="aflow --compare_structures -D <dir_path>";
-        string options_structure_comparison="[--usage] [--np=|--num_proc=<number>] [--optimize_match] [--no_scale_volume] [--ignore_symmetry] [--ignore_Wyckoff] [--remove_duplicates|--remove_duplicate_compounds]";
-        //[CO20200624 - OBSOLETE]init::ErrorOption(ss_usage,vpflow.getattachedscheme("COMPARE_STRUCTURE"),"compare::compareMultipleStructures()",aurostd::liststring2string(usage_structure_comparison,options_structure_comparison));
-        init::ErrorOption(vpflow.getattachedscheme("COMPARE_STRUCTURE"),"compare::compareMultipleStructures()",aurostd::liststring2string(usage_structure_comparison,options_structure_comparison));
+      else if(vpflow.flag("COMPARE_STRUCTURE")){
+        cerr << "2" << endl;
+        usage="aflow --compare_structures=str1,str2,str3,... | aflow --compare_structures -D <dir_path> | aflow --compare_structures -F=<filename>";
       }
-      //[CO20200624 - OBSOLETE]return ss_usage.str();
-      return "";
+      vector<string> options, options_general;
+      aurostd::string2tokens(GENERAL_OPTIONS_LIST,options_general," ");
+      options.push_back(usage);
+      options.insert(options.end(), options_general.begin(), options_general.end());
+      init::ErrorOption("--usage","compare::compareMultipleStructures()",options);
     }
 
     // ---------------------------------------------------------------------------
@@ -591,9 +592,20 @@ namespace compare {
 namespace compare {
   string isopointalPrototypes(istream& input, const aurostd::xoption& vpflow){ 
 
-    string function_name = "compare::IsopointalPrototypes():";
-    string usage="aflow --isopointal_prototypes|--get_isopointal_prototypes < POSCAR";
-    string options="";
+    string function_name = "compare::isopointalPrototypes():";
+      
+    // ---------------------------------------------------------------------------
+    // FLAG: usage
+    if(vpflow.flag("ISOPOINTAL_PROTOTYPES::USAGE")) {
+      string usage="aflow --get_isopointal_prototypes|--isopointal_prototypes|--get_same_symmetry_prototypes < file";
+      string options_function_string = "options: [--catalog=aflow|htqc|all]";
+      vector<string> options, options_function;
+      aurostd::string2tokens(options_function_string,options_function," ");
+      options.push_back(usage);
+      options.insert(options.end(), options_function.begin(), options_function.end());
+      
+      init::ErrorOption("--usage","compare::isopointalPrototypes()",options);
+    }
 
     // ---------------------------------------------------------------------------
     // load input structure
@@ -728,6 +740,22 @@ namespace compare {
 // ***************************************************************************
 namespace compare {
   string printMatchingPrototypes(istream& input, const aurostd::xoption& vpflow){ 
+  
+    // ---------------------------------------------------------------------------
+    // FLAG: usage
+    if(vpflow.flag("COMPARE::USAGE")) {
+      string usage="aflow --compare2prototypes|--compare2protos [GENERAL_COMPARISON_OPTIONS] [COMPARE2PROTOTYPES_OPTIONS] < file";
+      string options_function_string = "compare2protos_options: [--catalog=aflow|htqc|all]";
+
+      vector<string> options, options_general, options_function;
+      aurostd::string2tokens(GENERAL_OPTIONS_LIST,options_general," ");
+      aurostd::string2tokens(options_function_string,options_function," ");
+      options.push_back(usage);
+      options.insert(options.end(), options_general.begin(), options_general.end());
+      options.insert(options.end(), options_function.begin(), options_function.end());
+
+      init::ErrorOption("--usage","compare::printMatchingPrototypes()",options);
+    }
 
     // ---------------------------------------------------------------------------
     // load input structure
@@ -802,11 +830,6 @@ vector<StructurePrototype> XtalFinderCalculator::compare2prototypes(
   string function_name = XPID + "XtalFinderCalculator::compare2prototypes():";
   stringstream message;
   bool quiet = false;
-
-  string directory="";
-
-  string usage="aflow --compare2protos|--compare2prototypes < POSCAR";
-  string options="";
 
   xstructure xstr = xstrIN; //DX20200226 - copy
 
@@ -1052,9 +1075,6 @@ vector<StructurePrototype> XtalFinderCalculator::compare2database(
   string directory = "";
   stringstream message;
     
-  string usage="aflow --compare2database < POSCAR";
-  string options="";
-
   vector<StructurePrototype> final_prototypes; //DX20200225
   xstructure xstr = xstrIN; //copy //DX20200225
 
@@ -1390,8 +1410,38 @@ vector<StructurePrototype> XtalFinderCalculator::compare2database(
 // ***************************************************************************
 namespace compare {
   // load input structure
-  string printCompare2Database(istream& input, const aurostd::xoption& vpflow, ostream& logstream){xstructure xstr(input,IOAFLOW_AUTO); ofstream FileMESSAGE; return printCompare2Database(xstr,vpflow,FileMESSAGE,logstream);}  //DX20200225
-  string printCompare2Database(istream& input, const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream){xstructure xstr(input,IOAFLOW_AUTO);return printCompare2Database(xstr,vpflow,FileMESSAGE,logstream);}  //CO20200225
+  string printCompare2Database(istream& input, const aurostd::xoption& vpflow, ostream& logstream){
+    
+    // ---------------------------------------------------------------------------
+    // FLAG: usage
+    if(vpflow.flag("COMPARE::USAGE")) {
+      string usage="aflow --compare2database [GENERAL_COMPARISON_OPTIONS] [COMPARE2DATABASE_OPTIONS] < file";
+      string options_function_string = "compare2database_options: [--catalog=lib1|lib2|lib3|lib4|lib6|lib7|icsd] [--properties=enthalpy_atom,natoms,...] [--relaxation_step=original|relax1|most_relaxed]";
+
+      vector<string> options, options_general, options_function;
+      aurostd::string2tokens(GENERAL_OPTIONS_LIST,options_general," ");
+      aurostd::string2tokens(options_function_string,options_function," ");
+      options.push_back(usage);
+      options.insert(options.end(), options_general.begin(), options_general.end());
+      options.insert(options.end(), options_function.begin(), options_function.end());
+
+      init::ErrorOption("--usage","compare::printCompare2Database()",options);
+    }
+
+    xstructure xstr(input,IOAFLOW_AUTO);
+    ofstream FileMESSAGE;
+    return printCompare2Database(xstr,vpflow,FileMESSAGE,logstream);
+  }  //DX20200225
+}  
+
+namespace compare {
+  string printCompare2Database(istream& input, const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream){
+    xstructure xstr(input,IOAFLOW_AUTO);
+    return printCompare2Database(xstr,vpflow,FileMESSAGE,logstream);
+  }  //CO20200225
+}
+
+namespace compare {
   string printCompare2Database(const xstructure& xstrIN, const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream){
 
     bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_COMPARE_);
@@ -1400,7 +1450,7 @@ namespace compare {
     ostringstream oss;
 
     if(LDEBUG){cerr << function_name << " BEGIN" << endl;}  //CO20200508
-
+    
     // ---------------------------------------------------------------------------
     // main compare2database() function
     XtalFinderCalculator xtal_finder_database(DEFAULT_XTALFINDER_MISFIT_MATCH,DEFAULT_XTALFINDER_MISFIT_FAMILY,FileMESSAGE,1,logstream);
@@ -1510,12 +1560,25 @@ namespace compare {
     bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_COMPARE_);
 
     string function_name = XPID + "compare::compareDatabaseEntries():";
-    string directory = ".";
+    string directory = aurostd::getPWD(); //DX20201229
     stringstream message;
     stringstream oss;
 
-    string usage="aflow --compare_database_entries < POSCAR";
-    string options="";
+    // ---------------------------------------------------------------------------
+    // FLAG: usage
+    if(vpflow.flag("COMPARE::USAGE")) {
+      string usage="aflow --compare_database_entries [GENERAL_COMPARISON_OPTIONS] [COMPARE_DATABASE_ENTRIES_OPTIONS] < file";
+      string options_function_string = "compare_database_entries_options: [--alloy=AgAlMn...] [--nspecies=3] [--catalog=lib1|lib2|lib3|lib4|lib6|lib7|icsd] [--properties=enthalpy_atom,natoms,...] [--relaxation_step=original|relax1|most_relaxed] [--space_group=225,186,227,...] [--stoichiometry=1:2:3:...]";
+
+      vector<string> options, options_general, options_function;
+      aurostd::string2tokens(GENERAL_OPTIONS_LIST,options_general," ");
+      aurostd::string2tokens(options_function_string,options_function," ");
+      options.push_back(usage);
+      options.insert(options.end(), options_general.begin(), options_general.end());
+      options.insert(options.end(), options_function.begin(), options_function.end());
+
+      init::ErrorOption("--usage","compare::compareDatabaseEntries()",options);
+    }
 
     vector<string> tokens,sub_tokens;
     vector<string> matchbook; //aflux - filter/get properties

@@ -98,16 +98,16 @@ Use the --np=<number> flag to specify the number of threads for multithreaded co
 ****************************************************************************************************
 LIST OF AFLOW-XtalFinder COMMANDS:
 
-  aflow --compare2database         : Returns AFLOW database entries that match with an input structure
-  aflow --compare2prototypes       : Returns AFLOW prototypes that match with an input structure
-  aflow --compare_database_entries : Compares entries in the AFLOW.org repository
-  aflow --compare_materials        : Compares materials (mapping alike atomic species) and
-                                     returns their level of similarity
-  aflow --compare_structures       : Compares structures (ignore species in mapping) and returns their level
-                                     of similarity
-  aflow --isopointal_prototypes    : Returns all isopointal (i.e., same symmetry) to input structure
-  aflow --prototype                : Returns AFLOW label/parameters/parameter values of the structure
-  aflow --unique_atom_decorations  : Returns the unique atom decorations for the structure
+  aflow --compare2database          : Returns AFLOW database entries that match with an input structure
+  aflow --compare2prototypes        : Returns AFLOW prototypes that match with an input structure
+  aflow --compare_database_entries  : Compares entries in the AFLOW.org repository
+  aflow --compare_materials         : Compares materials (mapping alike atomic species) and
+                                      returns their level of similarity
+  aflow --compare_structures        : Compares structures (ignore species in mapping) and returns their level
+                                      of similarity
+  aflow --get_isopointal_prototypes : Returns all isopointal (i.e., same symmetry) to input structure
+  aflow --prototype                 : Returns AFLOW label/parameters/parameter values of the structure
+  aflow --unique_atom_decorations   : Returns the unique atom decorations for the structure
 
 For details on usage, see the "AFLOW COMMANDS USAGE" section below.
 
@@ -265,7 +265,7 @@ General options - applicable to all commands - is listed at the bottom of this s
               (default: aflow).
 
 
-    aflow --isopointal_prototype [ISOPOINTAL_OPTIONS] < file
+    aflow --get_isopointal_prototype [ISOPOINTAL_OPTIONS] < file
         Returns the prototype labels that are isopointal (i.e. same symmetry) as the input structure.
         In this case, the same symmetry means that the structures have commensurate:
           1) space groups (equivalent or enantiomorphic pairs) and
@@ -308,7 +308,7 @@ General options - applicable to all commands - is listed at the bottom of this s
         [--remove_duplicate_compounds]          : For structure-type comparisons, duplicate compounds are identified first
                                                   (via a material-type comparison without volume scaling), then remaining unique compounds are compared, removing duplicate bias.
         [--ICSD]                                : Only if ICSD structures: ensure the representative structure is the entry with the smallest ICSD number
-        [--print]                               : For comparing two structures, additional comparison information is printed, including atom mappings, distances between matched atoms,
+        [--print_mapping|--print_map|--print]   : For comparing two structures, additional comparison information is printed, including atom mappings, distances between matched atoms,
                                                   and the transformed structures in the closest matching representation.
         [--print=TEXT|JSON]                     : For comparing multiple structures, the results printed to the relevant files are formatted into human-readable
                                                   text or JSON, respectively.  By default, AFLOW-XtalFinder writes the output in both formats.

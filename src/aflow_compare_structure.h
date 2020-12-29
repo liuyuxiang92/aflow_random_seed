@@ -29,6 +29,8 @@
 #define _COMPARE_DATABASE_GEOMETRY_RELAX1_ 1
 #define _COMPARE_DATABASE_GEOMETRY_MOST_RELAXED_ 2
 
+#define GENERAL_OPTIONS_LIST "general_options: [--usage] [--misfit_match=0.1] [--misfit_match=0.2] [--np=16|--num_proc=16] [--optimize_match] [--no_scale_volume] [--ignore_symmetry] [--ignore_Wyckoff] [--ignore_environment] [--keep_unmatched!] [--match_to_aflow_prototypes!] [--magmom=<m1,m2,...|INCAR|OUTCAR>:...] [--add_aflow_prototype_designation] [--remove_duplicate_compounds] [--ICSD] [--print_mapping] [--print=TEXT|JSON] [--quiet|--q] [--screen_only] [--primitivize] [--minkowski] [--niggli]"
+
 #define _DEBUG_COMPARE_ false  //DX20201223
 
 //// ===== GroupedWyckoffPosition Class ===== //
