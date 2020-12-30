@@ -4250,16 +4250,16 @@ void XtalFinderCalculator::printResults(
     int num_properties = 0;
     for(uint j=0; j<final_prototypes.size(); j++){ num_properties = aurostd::max((int)final_prototypes[j].property_names.size(),num_properties); }
 
+    // ---------------------------------------------------------------------------
+    // set length of separators based on table width
     string equal_line_separator = std::string(indent_spacing+structure_spacing+misfit_spacing+(num_properties*property_spacing), '=');
     string dash_line_separator = std::string(indent_spacing+structure_spacing+misfit_spacing+(num_properties*property_spacing), '-');
 
     for(uint j=0; j<final_prototypes.size(); j++){
+      
+      // ---------------------------------------------------------------------------
+      // start of new prototype
       ss_out << equal_line_separator << endl;
-      //ss_out << std::string(indent_spacing+structure_spacing+misfit_spacing, '=');
-      //if(final_prototypes[j].property_names.size()!=0){
-      //  ss_out << std::string(final_prototypes[j].property_names.size()*property_spacing, '=');
-      //}
-      //ss_out << endl;
       ss_out << "# ";
 
       // ---------------------------------------------------------------------------
@@ -4302,98 +4302,49 @@ void XtalFinderCalculator::printResults(
 
       // ---------------------------------------------------------------------------
       // print matching AFLOW prototype labels
-        if(final_prototypes[j].matching_aflow_prototypes.size()!=0){
-          ss_out << "  matching_aflow_prototypes=" << aurostd::joinWDelimiter(final_prototypes[j].matching_aflow_prototypes,",") << endl;
-        }
+      if(final_prototypes[j].matching_aflow_prototypes.size()!=0){
+        ss_out << "  matching_aflow_prototypes=" << aurostd::joinWDelimiter(final_prototypes[j].matching_aflow_prototypes,",") << endl;
+      }
+      
+      // ---------------------------------------------------------------------------
+      // print unique atom decorations
+      // perhaps add which permutations are duplicates
+      if(final_prototypes[j].atom_decorations_equivalent.size()!=0){
+        vector<string> unique_decorations;
+        for(uint d=0;d<final_prototypes[j].atom_decorations_equivalent.size();d++){ unique_decorations.push_back(final_prototypes[j].atom_decorations_equivalent[d][0]); }
+        ss_out << "  " << setw(structure_spacing) << std::left << "atom_decorations_unique="+aurostd::joinWDelimiter(unique_decorations,",") << endl;
+      }
 
       // ---------------------------------------------------------------------------
       // print properties of representative structure (database comparisons only)
-        if(final_prototypes[j].structure_representative_struct->properties.size()!=0){
-          ss_out << "  " << setw(structure_spacing) << std::left << "structure";
-          ss_out << setw(misfit_spacing) << std::right << "misfit";
-          for(uint l=0;l<final_prototypes[j].structure_representative_struct->properties_names.size();l++){
-            if(final_prototypes[j].structure_representative_struct->properties_units[l].size()!=0){
-              ss_out << setw(property_spacing) << std::right
-                << final_prototypes[j].structure_representative_struct->properties_names[l]+"("+final_prototypes[j].structure_representative_struct->properties_units[l]+")";
-            }
-            else {ss_out << setw(property_spacing) << std::right << final_prototypes[j].structure_representative_struct->properties_names[l];}
+      if(final_prototypes[j].structure_representative_struct->properties.size()!=0){
+        ss_out << "  " << setw(structure_spacing) << std::left << "structure";
+        ss_out << setw(misfit_spacing) << std::right << "misfit";
+        for(uint l=0;l<final_prototypes[j].structure_representative_struct->properties_names.size();l++){
+          if(final_prototypes[j].structure_representative_struct->properties_units[l].size()!=0){
+            ss_out << setw(property_spacing) << std::right
+              << final_prototypes[j].structure_representative_struct->properties_names[l]+"("+final_prototypes[j].structure_representative_struct->properties_units[l]+")";
           }
-          ss_out << endl;
-        }
-        //if(final_prototypes[j].structure_representative_struct->properties.size()!=0){
-          //ss_out << std::string(indent_spacing+structure_spacing+misfit_spacing, '-');
-          //if(final_prototypes[j].structure_representative_struct->properties_names.size()!=0){
-          //  ss_out << std::string(final_prototypes[j].structure_representative_struct->properties.size()*property_spacing, '-');
-          //  ss_out << std::string(final_prototypes[j].structure_representative_struct->properties_names.size()*property_spacing, '-');
-          //}
-          //ss_out << endl;
-          ss_out << dash_line_separator << endl;
-        //}
-
-      // ---------------------------------------------------------------------------
-      // print representative structure
-      ss_out << "  " << setw(structure_spacing) << std::left << "prototype="+final_prototypes[j].structure_representative_struct->name;
-
-      // ---------------------------------------------------------------------------
-      // print unique atom decorations
-        // perhaps add which permutations are duplicates
-        if(final_prototypes[j].atom_decorations_equivalent.size()!=0){
-          //ss_out << endl << "  " << setw(structure_spacing) << std::left << "unique atom decorations="+aurostd::joinWDelimiter(final_prototypes[j].atom_decorations_equivalent,",");
-          vector<string> unique_decorations;
-          for(uint d=0;d<final_prototypes[j].atom_decorations_equivalent.size();d++){ unique_decorations.push_back(final_prototypes[j].atom_decorations_equivalent[d][0]); }
-          ss_out << endl << "  " << setw(structure_spacing) << std::left << "unique atom decorations="+aurostd::joinWDelimiter(unique_decorations,",");
-        }
-
-        //ss_out << "  " << setw(structure_spacing) << std::left << "prototype="+final_prototypes[j].structure_representative_struct->name;
-        ss_out << dash_line_separator << endl;
-        //if(final_prototypes[j].structure_representative_struct->properties.size()!=0){
-        //  ss_out << setw(misfit_spacing) << std::right << "-";
-        //  for(uint l=0;l<final_prototypes[j].structure_representative_struct->properties.size();l++){
-        //    ss_out << setw(property_spacing) << std::right << final_prototypes[j].structure_representative_struct->properties[l];
-        //  }
-        //}
-        //ss_out << endl;
-      //}
-    /*
-      else if(same_species==false){
-        ss_out << aurostd::joinWDelimiter(final_prototypes[j].stoichiometry,":");
-        ss_out << "  SG=#" << final_prototypes[j].space_group;
-        ss_out << "  Wyckoffs=" << compare::printWyckoffString(final_prototypes[j].grouped_Wyckoff_positions,true);
-        uint number_of_duplicates = numberOfDuplicates(final_prototypes[j]); //DX20190506 - made function
-        ss_out << "  structures_duplicate=" << number_of_duplicates; //DX20190228 - add count
-        uint number_duplicate_compounds = 0;
-        for(uint k=0;k<final_prototypes[j].structures_duplicate_struct.size();k++){
-          number_duplicate_compounds+=final_prototypes[j].structures_duplicate_struct[k]->number_compounds_matching_structure;
-        }
-        number_duplicate_compounds+= number_of_duplicates+final_prototypes[j].structure_representative_struct->number_compounds_matching_structure; //DX20190321 - need to update variable, otherwise may not enter if statement
-        if(number_duplicate_compounds!=0){
-          ss_out << "  duplicate_compounds=" << number_duplicate_compounds; //DX20190228 - add count
+          else {ss_out << setw(property_spacing) << std::right << final_prototypes[j].structure_representative_struct->properties_names[l];}
         }
         ss_out << endl;
-        if(final_prototypes[j].aflow_label.size()!=0){
-          ss_out << "  aflow_label=" << final_prototypes[j].aflow_label << endl;
-          ss_out << "  aflow_parameter_list=" << aurostd::joinWDelimiter(final_prototypes[j].aflow_parameter_list,",") << endl;
-          ss_out << "  aflow_parameter_values=" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(final_prototypes[j].aflow_parameter_values,8,roff),",") << endl;
-        }
-        if(final_prototypes[j].matching_aflow_prototypes.size()!=0){
-          ss_out << "  matching_aflow_prototypes=" << aurostd::joinWDelimiter(final_prototypes[j].matching_aflow_prototypes,",") << endl;
-        }
-        ss_out << "  " << setw(structure_spacing) << std::left << "prototype="+final_prototypes[j].structure_representative_struct->name;
-        // perhaps add which permutations are duplicates
-        if(final_prototypes[j].atom_decorations_equivalent.size()!=0){
-          //ss_out << endl << "  " << setw(structure_spacing) << std::left << "unique atom decorations="+aurostd::joinWDelimiter(final_prototypes[j].atom_decorations_equivalent,",");
-          vector<string> unique_decorations;
-          for(uint d=0;d<final_prototypes[j].atom_decorations_equivalent.size();d++){ unique_decorations.push_back(final_prototypes[j].atom_decorations_equivalent[d][0]); }
-          ss_out << endl << "  " << setw(structure_spacing) << std::left << "unique atom decorations="+aurostd::joinWDelimiter(unique_decorations,",");
+        ss_out << dash_line_separator << endl;
+      }
+      
+      // ---------------------------------------------------------------------------
+      // print representative structure
+      ss_out << "  " << setw(structure_spacing) << std::left << "prototype="+final_prototypes[j].structure_representative_struct->name; 
+      if(final_prototypes[j].structure_representative_struct->properties.size()!=0){
+        ss_out << setw(misfit_spacing) << std::right << "-";
+        for(uint l=0;l<final_prototypes[j].structure_representative_struct->properties.size();l++){
+          ss_out << setw(property_spacing) << std::right << final_prototypes[j].structure_representative_struct->properties[l];
         }
       }
-      */
-      //ss_out << endl;
-      //ss_out << std::string(indent_spacing+structure_spacing+misfit_spacing, '-');
-      //if(final_prototypes[j].property_names.size()!=0){
-      //  ss_out << std::string(final_prototypes[j].property_names.size()*property_spacing, '-');
-      //}
-      //ss_out << endl;
+      ss_out << endl;
+      ss_out << dash_line_separator << endl;
+      
+      // ---------------------------------------------------------------------------
+      // print duplicate structures [header]
       if(final_prototypes[j].structures_duplicate_struct.size()!=0 && final_prototypes[j].structure_representative_struct->properties.size()==0){
         ss_out << "  " << setw(structure_spacing) << std::left << "list of duplicates";
         ss_out << setw(misfit_spacing) << std::right << "misfit";
@@ -4409,12 +4360,12 @@ void XtalFinderCalculator::printResults(
           }
           else {ss_out << setw(property_spacing) << std::right << final_prototypes[j].property_names[l];}
         }
-        ss_out << endl;
-        //ss_out << std::string(indent_spacing+structure_spacing+misfit_spacing, '-');
-        //ss_out << std::string(final_prototypes[j].property_names.size()*property_spacing, '-');
-        //ss_out << endl;
       }
+      ss_out << endl;
       ss_out << dash_line_separator << endl;
+      
+      // ---------------------------------------------------------------------------
+      // print duplicate structures [content]
       if(final_prototypes[j].structures_duplicate_struct.size()>0){
         for(uint k=0;k<final_prototypes[j].structures_duplicate_struct.size();k++){
           ss_out << "  " << setw(structure_spacing) << std::left << final_prototypes[j].structures_duplicate_struct[k]->name
