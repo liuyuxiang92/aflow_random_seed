@@ -1238,8 +1238,8 @@ namespace chull {
   //bool lessEqualZero(double val,bool soft_cutoff){return ( soft_cutoff? val<=-ZERO_TOL : val<=0.0 );}
   bool greaterEqualZero(double val){return (val>=0.0);}
   bool lessEqualZero(double val){return (val<=0.0);}
-  bool notPositive(double val,bool soft_cutoff,double tol){return (soft_cutoff? val<=-tol : lessEqualZero(val));} //DX20201008 - this breaks for GFA: AlCuMo: val=-2.122E-314, perhaps flip to val<=-tol
-  bool notNegative(double val,bool soft_cutoff,double tol){return (soft_cutoff? val>=tol : greaterEqualZero(val));} //DX20201008 - if changing above, perhaps change to val>=tol
+  bool notPositive(double val,bool soft_cutoff,double tol){return (soft_cutoff? val<=tol : lessEqualZero(val));}
+  bool notNegative(double val,bool soft_cutoff,double tol){return (soft_cutoff? val>=-tol : greaterEqualZero(val));}
   bool zeroWithinTol(double val,double tol){return notPositive(abs(val),true,tol);}
   bool nonZeroWithinTol(double val,double tol){return !zeroWithinTol(val,tol);}
 
@@ -3159,9 +3159,6 @@ namespace chull {
     uint i_nary=0;
     if(i_alloy>m_naries[i_nary].m_alloys.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within alloys");}
     uint g_state=AUROSTD_MAX_UINT;
-    for(uint c=0;c<m_naries[i_nary].m_alloys[i_alloy].m_coord_groups.size();c++){
-      cerr << c << " m_naries[i_nary].m_alloys[i_alloy].m_coord_groups[c]: " << m_naries[i_nary].m_alloys[i_alloy].m_coord_groups[c] << endl;
-    }
     if(m_naries[i_nary].m_alloys[i_alloy].m_coord_groups.size()!=1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unexpected count of coordgroups for unaries, should only be 1");}
     uint i_coord_group=m_naries[i_nary].m_alloys[i_alloy].m_coord_groups[0];
     uint i_point=AUROSTD_MAX_UINT;

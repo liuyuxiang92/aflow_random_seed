@@ -4598,6 +4598,7 @@ namespace aflowlib {
     // are simply mirror images of one another (structurally the same)
     // The summons are formatted differently depending on the relaxation type
     // (i.e. placement of comma(s) or lack thereof)
+    // May need to be reformatted later with AFLOW+AFLUX integration
 
     string space_group_summons = "";
     // check if enantiomorphic space group

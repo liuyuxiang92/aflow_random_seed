@@ -277,12 +277,10 @@ namespace compare {
       string usage = "";
       // material-type comparisons
       if(vpflow.flag("COMPARE_MATERIAL")){
-        cerr << "1" << endl;
         usage="aflow --compare_materials=str1,str2,str3,... | aflow --compare_materials -D <dir_path> | aflow --compare_materials -F=<filename>";
       }
       // structure-type comparisons
       else if(vpflow.flag("COMPARE_STRUCTURE")){
-        cerr << "2" << endl;
         usage="aflow --compare_structures=str1,str2,str3,... | aflow --compare_structures -D <dir_path> | aflow --compare_structures -F=<filename>";
       }
       vector<string> options, options_general;
@@ -2022,7 +2020,7 @@ vector<StructurePrototype> XtalFinderCalculator::compareMultipleStructures(
   }
 
   // ---------------------------------------------------------------------------
-  // calculate LFA environments of  database entries
+  // calculate LFA environments of database entries
   // if already calculated, do not recalculate
   bool all_environments_calculated = true;
   for(uint i=0;i<structure_containers.size();i++){ all_environments_calculated = (all_environments_calculated&&isLFAEnvironmentCalculated(structure_containers[i])); } //DX20200810
@@ -2280,7 +2278,7 @@ vector<vector<uint> > XtalFinderCalculator::groupSimilarXstructures(
 
   stringstream structure_name;
   string source = "input";
-  uint relaxation_step = 0; //unknowable
+  uint relaxation_step = 0; // unknowable from input
   string directory = aurostd::getPWD();
 
   // add structures to containers
