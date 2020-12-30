@@ -11132,7 +11132,7 @@ namespace chull {
       if(H_f_atom(point)!=AUROSTD_NAN && point.m_entry.entropy_forming_ability!=AUROSTD_NAN && nonZeroWithinTol(point.m_entry.entropy_forming_ability)){
         tmp_precision=precision;
         if(ftype==latex_ft){tmp_precision=0;tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);}
-        value=aurostd::utype2string( sqrt(-H_f_atom(point) / point.m_entry.entropy_forming_ability) ,tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM);
+        value=aurostd::utype2string( sqrt(point.getDist2Hull() / point.m_entry.entropy_forming_ability) ,tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM);
       }
     }
     else {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown property");}
