@@ -986,8 +986,8 @@ vector<StructurePrototype> XtalFinderCalculator::compare2database(
 
   vector<string> tokens,sub_tokens;
   vector<string> matchbook; //aflux - filter/get properties
-  vector<string> schema; //get metadata of properties (e.g., units)
-  vector<string> property_units;
+  vector<string> schema; //get metadata of properties (e.g., units and types)
+  vector<string> property_units, property_types;
 
   bool same_species = true;
 
@@ -1201,13 +1201,16 @@ vector<StructurePrototype> XtalFinderCalculator::compare2database(
   //::print(compounds);
 
   // ---------------------------------------------------------------------------
-  // get schema from xoptions, i.e., metadata (for the units)
-  string schema_unit = "";
+  // get schema from xoptions, i.e., metadata (for the units and types)
+  // DX20201230 - added type 
+  string schema_unit = "", schema_type = "";
   for(uint p=0;p<property_list.size();p++){
     schema_unit = "SCHEMA::UNIT:" + aurostd::toupper(property_list[p]);
+    schema_type = "SCHEMA::TYPE:" + aurostd::toupper(property_list[p]);
     property_units.push_back(XHOST.vschema.getattachedscheme(schema_unit));
+    property_types.push_back(XHOST.vschema.getattachedscheme(schema_type));
   }
-
+  
   message << "Loading structures ... ";
   pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
 
@@ -1287,6 +1290,7 @@ vector<StructurePrototype> XtalFinderCalculator::compare2database(
             structure_containers.back().properties.push_back(properties_response[i][l].second);
             structure_containers.back().properties_names = property_list;
             structure_containers.back().properties_units = property_units;
+            structure_containers.back().properties_types = property_types;
           }
         }
       }
@@ -1299,13 +1303,10 @@ vector<StructurePrototype> XtalFinderCalculator::compare2database(
   message << "Total number of candidate structures loaded: " << structure_containers.size(); //DX20190403
   pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_); //DX20190403
 
-  /*
-    // ---------------------------------------------------------------------------
-    // only compare entries to the input representation, the rest are extraneous comparisons
-    vector<StructurePrototype> input_structure_comparison_scheme_only; input_structure_comparison_scheme_only.push_back(comparison_schemes[0]);
-    message << "Number of structures to compare to input structure: " << input_structure_comparison_scheme_only[0].structures_duplicate_names.size();
-    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
-*/
+  // ---------------------------------------------------------------------------
+  // only compare entries to the input representation, the rest are extraneous comparisons
+  comparison_options.flag("COMPARISON_OPTIONS::PRINT_MATCHES_TO_INPUT_ONLY",TRUE);
+
   return compareMultipleStructures(num_proc, same_species, directory, comparison_options); //DX20200103 - condensed booleans to xoptions
 }
 
@@ -1466,8 +1467,8 @@ namespace compare {
 
     vector<string> tokens,sub_tokens;
     vector<string> matchbook; //aflux - filter/get properties
-    vector<string> schema; //get metadata of properties (e.g., units)
-    vector<string> property_units;
+    vector<string> schema; //get metadata of properties (e.g., units and types)
+    vector<string> property_units, property_types;
 
     bool same_species = true;
 
@@ -1780,6 +1781,7 @@ namespace compare {
               xtal_finder.structure_containers.back().properties.push_back(properties_response[i][l].second);
               xtal_finder.structure_containers.back().properties_names = property_list;
               xtal_finder.structure_containers.back().properties_units = property_units;
+              xtal_finder.structure_containers.back().properties_types = property_types;
             }
           }
         }
@@ -2449,8 +2451,7 @@ void XtalFinderCalculator::compareStructures(
     bool optimize_match) {
 
   // This is the main comparison function that compares two crystal structures
-  // and determines their similarity level based on the idea discussed
-  // in H. Burzlaff's paper (Acta Cryst., A53, 217-224 (1997)).
+  // and determines their similarity level
 
   bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_COMPARE_);
   string function_name = XPID + "XtalFinderCalculator::compareStructures():";

@@ -467,6 +467,33 @@ uint XtalFinderCalculator::numberOfDuplicates(const StructurePrototype& prototyp
 }
 
 // ***************************************************************************
+// StructurePrototype::printPropertiesOfStructure() //DX20201230
+// ***************************************************************************
+string StructurePrototype::printPropertiesOfStructure(
+    structure_container* str_pointer) const {
+
+  // Print the properties of the structure (JSON format)
+
+  vector<string> tokens;
+  aurostd::JSONwriter json;
+
+  if(str_pointer->properties.size()){
+    for(uint i=0;i<str_pointer->properties.size();i++){
+      if(str_pointer->properties_types[i] == "number"){ json.addNumber(str_pointer->properties_names[i], str_pointer->properties[i]); } 
+      else if(str_pointer->properties_types[i] == "numbers" || str_pointer->properties_types[i] == "strings"){ 
+        aurostd::string2tokens(str_pointer->properties[i],tokens,",");
+        json.addVector(str_pointer->properties_names[i], tokens); 
+      } 
+      else if(str_pointer->properties_types[i] == "string"){ json.addString(str_pointer->properties_names[i], str_pointer->properties[i]); } 
+      else { json.addString(str_pointer->properties_names[i], str_pointer->properties[i]); }  // when all else fails: treat as string
+    }
+  }
+
+  return json.toString(false);
+
+}
+
+// ***************************************************************************
 // StructurePrototype::printRepresentativeStructure() //DX20201115
 // ***************************************************************************
 string StructurePrototype::printRepresentativeStructure() const {
@@ -485,10 +512,7 @@ string StructurePrototype::printRepresentativeStructure() const {
 
   // representative structure may not have properties
   if(structure_representative->properties.size()){
-    for(uint i=0;i<structure_representative->properties.size();i++){
-      sscontent_json << "\"" << structure_representative->properties_names[i] << "\":\"" << structure_representative->properties[i] << "\"" << eendl;
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-    }
+    vcontent_json.push_back(printPropertiesOfStructure(structure_representative));
   }
 
   return "{" + aurostd::joinWDelimiter(vcontent_json,",") + "}";
@@ -531,9 +555,8 @@ string StructurePrototype::printMatchedStructures(const string& mode) const {
       }
       sscontent_json << "\"number_compounds_matching_structure\":" << structures_duplicate[j]->number_compounds_matching_structure << eendl;
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-      for(uint i=0;i<structures_duplicate[j]->properties.size();i++){
-        sscontent_json << "\"" << structures_duplicate[j]->properties_names[i] << "\":\"" << structures_duplicate[j]->properties[i] << "\"" << eendl;
-        vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      if(structures_duplicate[j]->properties.size()){
+        vcontent_json.push_back(printPropertiesOfStructure(structures_duplicate[j]));
       }
       vstructures.push_back("{" + aurostd::joinWDelimiter(vcontent_json,",") + "}");
       vcontent_json.clear();
@@ -562,9 +585,8 @@ string StructurePrototype::printMatchedStructures(const string& mode) const {
       }
       sscontent_json << "\"number_compounds_matching_entry\":" << structures_family[j]->number_compounds_matching_structure << eendl;
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-      for(uint i=0;i<structures_family[j]->properties.size();i++){
-        sscontent_json << "\"" << structures_family[j]->properties_names[i] << "\":\"" << structures_family[j]->properties[i] << "\"" << eendl;
-        vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      if(structures_family[j]->properties.size()){
+        vcontent_json.push_back(printPropertiesOfStructure(structures_family[j]));
       }
       vstructures.push_back("{" + aurostd::joinWDelimiter(vcontent_json,",") + "}");
       vcontent_json.clear();
@@ -790,6 +812,7 @@ void XtalFinderCalculator::setStructureAsRepresentative(StructurePrototype& stru
   // properties
   structure_tmp.property_names = structure_tmp.structure_representative->properties_names;
   structure_tmp.property_units = structure_tmp.structure_representative->properties_units;
+  structure_tmp.property_types = structure_tmp.structure_representative->properties_types;
 
 }
 
@@ -1203,6 +1226,7 @@ namespace compare {
       comparison_options.flag("COMPARISON_OPTIONS::IGNORE_ENVIRONMENT_ANALYSIS",FALSE); // duplicate permutations should have the same environment
       comparison_options.flag("COMPARISON_OPTIONS::IGNORE_ENVIRONMENT_ANGLES",FALSE); //DX20200320
       comparison_options.flag("COMPARISON_OPTIONS::CLEAN_UNMATCHED",TRUE); // remove unmatched structures from object
+      comparison_options.flag("COMPARISON_OPTIONS::PRINT_MATCHES_TO_INPUT_ONLY",FALSE); // only print matches to the input structure (database comparisons) //DX20201230
       comparison_options.flag("COMPARISON_OPTIONS::REMOVE_DUPLICATE_COMPOUNDS",FALSE);
       comparison_options.flag("COMPARISON_OPTIONS::MATCH_TO_AFLOW_PROTOS",FALSE);
       comparison_options.flag("COMPARISON_OPTIONS::ADD_AFLOW_PROTOTYPE_DESIGNATION",FALSE);
@@ -1225,6 +1249,7 @@ namespace compare {
       comparison_options.flag("COMPARISON_OPTIONS::IGNORE_ENVIRONMENT_ANALYSIS",FALSE);
       comparison_options.flag("COMPARISON_OPTIONS::IGNORE_ENVIRONMENT_ANGLES",FALSE); //DX20200320
       comparison_options.flag("COMPARISON_OPTIONS::CLEAN_UNMATCHED",TRUE);
+      comparison_options.flag("COMPARISON_OPTIONS::PRINT_MATCHES_TO_INPUT_ONLY",FALSE); // only print matches to the input structure (database comparisons) //DX20201230
       comparison_options.flag("COMPARISON_OPTIONS::REMOVE_DUPLICATE_COMPOUNDS",FALSE);
       comparison_options.flag("COMPARISON_OPTIONS::MATCH_TO_AFLOW_PROTOS",FALSE);
       comparison_options.flag("COMPARISON_OPTIONS::ADD_AFLOW_PROTOTYPE_DESIGNATION",FALSE);
@@ -1832,7 +1857,7 @@ vector<StructurePrototype> XtalFinderCalculator::compareAtomDecorations(
   // ---------------------------------------------------------------------------
   // get nearest neighbor distances
   if(structure.structure_representative->nearest_neighbor_distances.size()==0){
-    structure.structure_representative->nearest_neighbor_distances = compare::computeNearestNeighbors(structure.structure_representative->structure);
+    structure.structure_representative->nearest_neighbor_distances = NearestNeighbours(structure.structure_representative->structure);
   }
 
   // ---------------------------------------------------------------------------
@@ -2729,7 +2754,7 @@ void XtalFinderCalculator::getNearestNeighbors(uint num_proc){
 #else
   // NON-THREADED VERSION - START
   for(uint i=0;i<structure_containers.size();i++){
-    structure_containers[i].nearest_neighbor_distances = compare::computeNearestNeighbors(structure_containers[i].structure); // nearest neighbor distances (invariant of origin shifts)
+    structure_containers[i].nearest_neighbor_distances = NearestNeighbours(structure_containers[i].structure); // nearest neighbor distances (invariant of origin shifts)
   }
   // NON-THREADED VERSION - END
 
@@ -2752,7 +2777,7 @@ void XtalFinderCalculator::calculateNearestNeighbors(uint start_index, uint end_
   if(end_index == AUROSTD_MAX_UINT){ end_index=structure_containers.size(); }
 
   for(uint i=start_index;i<end_index;i++){ //DX20191107 switching end index convention <= vs <
-    structure_containers[i].nearest_neighbor_distances = compare::computeNearestNeighbors(structure_containers[i].structure); // nearest neighbor distances (invariant of origin shifts)
+    structure_containers[i].nearest_neighbor_distances = NearestNeighbours(structure_containers[i].structure); // nearest neighbor distances (invariant of origin shifts)
   }
 }
 
@@ -3688,6 +3713,9 @@ vector<StructurePrototype> XtalFinderCalculator::runComparisonScheme(
   bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_COMPARE_);
   string function_name = XPID + "XtalFinderCalculator::runComparisonScheme():";
   stringstream message;
+  
+  // create new object for comparisons
+  vector<StructurePrototype> final_prototypes;
 
   message << "Running comparisons ...";
   pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
@@ -3771,13 +3799,23 @@ vector<StructurePrototype> XtalFinderCalculator::runComparisonScheme(
     return comparison_schemes;
   }
   //DX20190504 - added clean unmatched option - END
+      
+  // ---------------------------------------------------------------------------
+  // if print only matches to the input structure //DX20201230
+  if(comparison_options.flag("COMPARISON_OPTIONS::PRINT_MATCHES_TO_INPUT_ONLY") && comparison_schemes.size()){
+    appendStructurePrototypes(comparison_schemes,
+        final_prototypes,
+        comparison_options.flag("COMPARISON_OPTIONS::CLEAN_UNMATCHED"),
+        quiet);
+    vector<StructurePrototype> input_prototype_only;
+    input_prototype_only.push_back(final_prototypes[0]);
+    return input_prototype_only;
+  }
 
   if(num_mismatches > 0 && !comparison_options.flag("COMPARISON_OPTIONS::SINGLE_COMPARISON_ROUND") && !quiet){
     message << "Number of unmatched structures: " << num_mismatches << ". Continuing comparisons ...";
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
   }
-  // create new object for comparisons
-  vector<StructurePrototype> final_prototypes;
 
   // ---------------------------------------------------------------------------
   // For this first iteration: LFA may have incorrectly grouped, so we need to check if the structures belong to other groups
@@ -4670,69 +4708,9 @@ namespace compare{
 }
 
 // ***************************************************************************
-// compare::getLeastFrequentAtomType()
+// DX20201230 - moved the following functions to aflow_xatom.cpp
+// compare::getLeastFrequentAtomType() & compare::getLeastFrequentAtomTypes()
 // ***************************************************************************
-namespace compare{
-  string getleastFrequentAtomType(const xstructure& xstr, bool clean) {
-
-    // The least frequent atom set it is the minimum set of atoms that
-    // exhibit the crystal periodicity (useful for finding alternative
-    // lattices and translations).
-    // clean: cleans atom name (removes pseudopotential)
-
-    // find minimum type count
-    int type_count_min = aurostd::min(xstr.num_each_type);
-
-    // find the first species with this atom count
-    for(uint i=0;i<xstr.num_each_type.size();i++){
-      if(xstr.num_each_type[i] == type_count_min){
-        if(clean){ return KBIN::VASP_PseudoPotential_CleanName(xstr.species[i]); }
-        else{ return xstr.species[i]; }
-      }
-    }
-
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,"compare::getLeastFrequentAtomType():","Least frequent atom type not found. Bad xstructure.",_INPUT_ERROR_);
-
-  }
-}
-
-// ***************************************************************************
-// getLeastFreqentAtomSpecies
-// ***************************************************************************
-namespace compare{
-  vector<string> getLeastFrequentAtomTypes(const xstructure& xstr, bool clean) {
-
-    // This least frequent atom function finds all possible least frequent atoms
-    // for an xstructure and stores them in a vector. All of these LFAs are used
-    // in the quadruplet search.
-    // We may not need to search over multiple LFAs during the quadruplet search.
-    // If a match is not found for one LFA, it won't be found for another since
-    // we need to map all atoms in one structure to the other structure. We will
-    // leave this implementation in for now, but may speed up the quadruplet
-    // search if we consider only one LFA.
-    // clean: cleans atom name (removes pseudopotential)
-
-    vector<string> lfa_types; // lfa = least frequent atom
-
-    // find minimum type count
-    int type_count_min = aurostd::min(xstr.num_each_type);
-
-    // find the first species with this atom count
-    for(uint i=0;i<xstr.num_each_type.size();i++){
-      if(xstr.num_each_type[i] == type_count_min){
-        if(clean){ lfa_types.push_back(KBIN::VASP_PseudoPotential_CleanName(xstr.species[i])); }
-        else{ lfa_types.push_back(xstr.species[i]); }
-      }
-    }
-
-    if(lfa_types.size() == 0){
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,"compare::getLeastFrequentAtomTypes():","Least frequent atom type not found. Bad xstructure.",_INPUT_ERROR_);
-    }
-
-    return lfa_types;
-
-  }
-}
 
 // ***************************************************************************
 // compare::sortBySecondPair()
@@ -5244,7 +5222,7 @@ void XtalFinderCalculator::computeLFAEnvironment(structure_container& str_rep, b
 
   // ---------------------------------------------------------------------------
   // determine all LFA atoms in the structure (could be more than one)
-  vector<string> LFAs=compare::getLeastFrequentAtomTypes(str_rep.structure);
+  vector<string> LFAs=getLeastFrequentAtomTypes(str_rep.structure);
 
   // ---------------------------------------------------------------------------
   // compute all LFA environments, looping through each LFA type
@@ -5561,82 +5539,11 @@ namespace compare{
 // shortestDistanceRestrictType()
 // ***************************************************************************
 
-// ***************************************************************************
-// compare::computeNearestNeighbor()
-// ***************************************************************************
-namespace compare{
-  vector<double> computeNearestNeighbors(const xstructure& xstr){
-
-    // Determine the nearest neighbor distances centered on each atom
-    // of the structure (needed for misfit calculation)
-
-    vector<double> all_nn_distances;
-    double nn = AUROSTD_MAX_DOUBLE;
-
-    for(uint i=0;i<xstr.atoms.size();i++){
-      nn = shortestDistance(xstr,i);
-      all_nn_distances.push_back(nn);
-    }
-    return all_nn_distances;
-  }
-}
 
 // ***************************************************************************
-// compare::shortestDistance()
+// DX20191122 [MOVED THE FOLLOWING FUNCTIONS INTO XPROTO]:
+// compare::shortestDistance() -> double NearestNeighbourToAtom()
 // ***************************************************************************
-namespace compare{
-  double shortestDistance(const xstructure& xstr, uint k) {
-
-    // Find the minimum interatomic distance in the structure to atom k
-    // (perhaps integrate with SYM::minimumDistance())
-
-    double min_dist=AUROSTD_MAX_DOUBLE;
-    double prev_min_dist=0; //DX20190716
-    xmatrix<double> lattice = xstr.lattice; //NEW
-
-    //DX speed increase
-    //perhaps can speed up even more, since the lattice doesn't change for the xstr...
-    vector<xvector<double> > l1, l2, l3;
-    vector<int> a_index, b_index, c_index;
-    xvector<int> dims(3); //DX20190710 - use robust method
-    dims[1]=dims[2]=dims[3]=0; //reset
-
-    xvector<double> tmp_coord, incell_dist, a_component, ab_component; //DX20200329
-    double incell_mod=AUROSTD_MAX_DOUBLE;
-
-    for(uint ii=0; ii<xstr.atoms.size(); ii++){
-      if(ii!=k){
-        if(min_dist<prev_min_dist){
-          if(!(dims[1]==1 && dims[2]==1 && dims[3]==1)){
-            resetLatticeDimensions(lattice,min_dist,dims,l1,l2,l3,a_index,b_index,c_index);
-            prev_min_dist=min_dist;
-          }
-        }
-        incell_dist = xstr.atoms[k].cpos-xstr.atoms[ii].cpos;
-        incell_mod = aurostd::modulus(incell_dist);
-        if(incell_mod<min_dist){
-          if(!(dims[1]==1 && dims[2]==1 && dims[3]==1)){
-            resetLatticeDimensions(lattice,incell_mod,dims,l1,l2,l3,a_index,b_index,c_index);
-          }
-          prev_min_dist=incell_mod;
-        }
-        //DX20180423 - running vector in each loop saves computations; fewer duplicate operations
-        for(uint m=0;m<l1.size();m++){
-          a_component = incell_dist + l1[m];    //DX : coord1-coord2+a*lattice(1)
-          for(uint n=0;n<l2.size();n++){
-            ab_component = a_component + l2[n]; //DX : coord1-coord2+a*lattice(1) + (b*lattice(2))
-            for(uint p=0;p<l3.size();p++){
-              tmp_coord = ab_component + l3[p]; //DX : coord1-coord2+a*lattice(1) + (b*lattice(2)) + (c*lattice(3))
-              min_dist=aurostd::min(min_dist,aurostd::modulus(tmp_coord));
-            }
-          }
-        }
-      }
-    }
-
-    return min_dist;
-  }
-}
 
 // ***************************************************************************
 // Coordinates Deviation
@@ -6094,8 +6001,8 @@ void XtalFinderCalculator::latticeSearch(
   // determine least-frequently occuring atom type (LFA) for each structure
   // (there may be more than one)
   // perhaps put in _structure_rep object
-  vector<string> LFA_str1=compare::getLeastFrequentAtomTypes(xstr1);
-  vector<string> LFA_str2=compare::getLeastFrequentAtomTypes(xstr2);
+  vector<string> LFA_str1=getLeastFrequentAtomTypes(xstr1);
+  vector<string> LFA_str2=getLeastFrequentAtomTypes(xstr2);
   string lfa_str1=LFA_str1[0]; //initialize
   string lfa_str2=LFA_str2[0]; //initialize
 
@@ -6145,7 +6052,7 @@ void XtalFinderCalculator::latticeSearch(
     // calculate attributes of structure 1 (volume, lattice parameters, nearest neighbor distances, etc.)
     vector<double> all_nn1;
     if(xstr_rep.nearest_neighbor_distances.size()==0){ // use xstr_rep so we only calculate once
-      all_nn1 = compare::computeNearestNeighbors(xstr_rep.structure); // nearest neighbor distances (invariant of origin shifts)
+      all_nn1 = NearestNeighbours(xstr_rep.structure); // nearest neighbor distances (invariant of origin shifts)
       xstr_rep.nearest_neighbor_distances = all_nn1;
     }
     else{
@@ -6155,7 +6062,7 @@ void XtalFinderCalculator::latticeSearch(
     // CALCULATED LATER calculate attributes of structure 2 (volume, lattice parameters, nearest neighbor distances, etc.)
     //vector<double> all_nn2;
     //if(xstr_match.nearest_neighbor_distances.size()==0){
-    //  all_nn2 = compare::computeNearestNeighbors(xstr_match.structure); // nearest neighbor distances (invariant of origin shifts)
+    //  all_nn2 = NearestNeighbours(xstr_match.structure); // nearest neighbor distances (invariant of origin shifts)
     //  xstr_match.nearest_neighbor_distances = all_nn2;
     //}
     //else{
@@ -6545,7 +6452,7 @@ bool XtalFinderCalculator::searchAtomMappings(
             // BUT, we would need to rescale since atomicNumberDensity can change the
             // nn distances
             if(!all_nn_calculated){
-              all_nn2_test = compare::computeNearestNeighbors(xstr2_tmp);
+              all_nn2_test = NearestNeighbours(xstr2_tmp);
               all_nn_calculated = true;
               //cerr << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(all_nn2_test),",") << endl;
             }

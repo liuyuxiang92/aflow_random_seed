@@ -181,12 +181,14 @@ class StructurePrototype{
     // properties stored in structure containers
     vector<string> property_names;                                                          // vector of property names (if using AFLUX)
     vector<string> property_units;                                                          // vector of property units (if using AFLUX)
+    vector<string> property_types;                                                          // vector of property types (if using AFLUX) //DX20201230
     
     // ---------------------------------------------------------------------------
     // functions
     uint numberOfDuplicates() const; //DX20190506                                           // return the number of duplicate structures for this prototype (i.e., checks misfit value)
     string printRepresentativeStructure() const; //DX20201028                               // return the representative structure in a JSON format
     string printMatchedStructures(const string& mode) const; //DX20201028                   // return the matched structures in a JSON format
+    string printPropertiesOfStructure(structure_container* str_pointer) const;
     uint numberOfComparisons(); //DX20181221                                                // return the number of comparisons for this prototype
     bool isSymmetryCalculated(); //DX20190228
     bool isLFAEnvironmentCalculated(); //DX20191105
@@ -618,8 +620,6 @@ namespace compare{
   
   // ---------------------------------------------------------------------------
   // least-frequently occurring atom (LFA) functions
-  string getLeastFrequentAtomType(const xstructure& xstr, bool clean=true);
-  vector<string> getLeastFrequentAtomTypes(const xstructure& xstr, bool clean=true);
   bool sortBySecondPair(const std::pair<string,uint>& a, const std::pair<string,uint>& b);
   vector<string> sortSpeciesByFrequency(const xstructure& xstr);
   vector<uint> atomIndicesSortedByFrequency(const xstructure& xstr);
@@ -674,8 +674,6 @@ namespace compare{
   bool compatibleNearestNeighborTypesEnvironments(const vector<vector<double> >& nn_lfa_with_types_1,
       const vector<vector<double> >& nn_lfa_with_types_2,
       int type_match);
-  vector<double> computeNearestNeighbors(const xstructure& xstr);
-  double shortestDistance(const xstructure& xstr, uint k);
   
   // ---------------------------------------------------------------------------
   // cost functions

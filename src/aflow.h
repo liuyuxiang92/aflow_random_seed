@@ -1265,6 +1265,9 @@ void GetUnitCellRep(const xvector<double>& ppos,xvector<double>& p_cell0,xvector
 string xstructure2json(xstructure& xstr); //DX20170831 - xstructure2json
 string atom2json(_atom& atom, int coord_flag, int poccupation); //DX20170831 - atom2json
 
+string getLeastFrequentAtomType(const xstructure& xstr, bool clean=true); //DX20201230 - moved from XtalFinder
+vector<string> getLeastFrequentAtomTypes(const xstructure& xstr, bool clean=true); //DX20201230 - moved from XtalFinder
+
 // --------------------------------------------------------------------------
 class _sym_op {
   public:
@@ -2578,6 +2581,8 @@ namespace aflowlib {
   string PrototypeCleanLatticeString(const string& latticeIN);
 }
 double NearestNeighbour(const xstructure &str_in);
+vector<double> NearestNeighbours(const xstructure& xstr); //DX20201230 - moved from XtalFinder
+double NearestNeighbourToAtom(const xstructure& xstr, uint k); //DX20201230 - moved from XtalFinder
 
 // for HTQC
 #define STRUCTURE_MODE_NONE             0

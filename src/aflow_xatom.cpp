@@ -1232,6 +1232,62 @@ uint XATOM_SplitAlloyPseudoPotentials(const string& alloy_in, vector<string> &sp
 //DX20200724 [OBSOLETE] }
 //DX20200724 [OBSOLETE] //DX composition2stoichiometry - 20181009 - END
 
+// ***************************************************************************
+// getLeastFrequentAtomType() //DX20201230 - moved from XtalFinder
+// ***************************************************************************
+string getLeastFrequentAtomType(const xstructure& xstr, bool clean) {
+
+  // The least frequent atom set it is the minimum set of atoms that
+  // exhibit the crystal periodicity (useful for finding alternative
+  // lattices and translations).
+  // clean: cleans atom name (removes pseudopotential)
+  // single LFA version
+
+  // find minimum type count
+  int type_count_min = aurostd::min(xstr.num_each_type);
+
+  // find the first species with this atom count
+  for(uint i=0;i<xstr.num_each_type.size();i++){
+    if(xstr.num_each_type[i] == type_count_min){
+      if(clean){ return KBIN::VASP_PseudoPotential_CleanName(xstr.species[i]); }
+      else{ return xstr.species[i]; }
+    }
+  }
+
+  throw aurostd::xerror(_AFLOW_FILE_NAME_,"getLeastFrequentAtomType():","Least frequent atom type not found. Bad xstructure.",_INPUT_ERROR_);
+}
+
+// ***************************************************************************
+// getLeastFrequentAtomTypes() //DX20201230 - moved from XtalFinder
+// ***************************************************************************
+vector<string> getLeastFrequentAtomTypes(const xstructure& xstr, bool clean) {
+  
+  // The least frequent atom set it is the minimum set of atoms that
+  // exhibit the crystal periodicity (useful for finding alternative
+  // lattices and translations).
+  // clean: cleans atom name (removes pseudopotential)
+  // multiple LFA version
+
+  vector<string> lfa_types; // lfa = least frequent atom
+
+  // find minimum type count
+  int type_count_min = aurostd::min(xstr.num_each_type);
+
+  // find the first species with this atom count
+  for(uint i=0;i<xstr.num_each_type.size();i++){
+    if(xstr.num_each_type[i] == type_count_min){
+      if(clean){ lfa_types.push_back(KBIN::VASP_PseudoPotential_CleanName(xstr.species[i])); }
+      else{ lfa_types.push_back(xstr.species[i]); }
+    }
+  }
+
+  if(lfa_types.size() == 0){
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,"getLeastFrequentAtomTypes():","Least frequent atom type not found. Bad xstructure.",_INPUT_ERROR_);
+  }
+
+  return lfa_types;
+}
+
 // **************************************************************************
 // Function xstructure::GetElements() //DX20200728
 // **************************************************************************

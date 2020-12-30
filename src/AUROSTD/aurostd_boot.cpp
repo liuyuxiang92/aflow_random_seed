@@ -132,6 +132,7 @@ template<class utype> bool initialize_scalar(utype d) {
   opt.args2addattachedscheme<utype>(vs,"","",u);
 
   aurostd::JSONwriter jw; jw.addNumber("", d);//AS20201217
+  jw.addNumber("", s); //DX20201230 - enables a string to be written as a number
   return (o<0);
 }
 

@@ -2325,6 +2325,81 @@ double NearestNeighbour(const xstructure &str_in) {
 }
 
 // ***************************************************************************
+// NearestNeighours() //DX20201230 - moved from XtalFinder 
+// ***************************************************************************
+vector<double> NearestNeighbours(const xstructure& xstr){
+
+  // Determine the nearest neighbor distances centered on each atom
+  // of the structure (needed for XtalFinder)
+
+  vector<double> all_nn_distances;
+  double nn = AUROSTD_MAX_DOUBLE;
+
+  for(uint i=0;i<xstr.atoms.size();i++){
+    nn = NearestNeighbourToAtom(xstr,i);
+    all_nn_distances.push_back(nn);
+  }
+  return all_nn_distances;
+}
+
+// ***************************************************************************
+// NearestNeighbourToAtom() //DX20201230 - moved from XtalFinder
+// ***************************************************************************
+double NearestNeighbourToAtom(const xstructure& xstr, uint k) {
+
+  // Find the minimum interatomic distance in the structure to atom k
+  // Different than SYM::minimumDistance(): only considers one atom index
+  // in minimization routine, as opposed to global minimimum
+  // (considering one atom only affords speed ups)
+
+  double min_dist=AUROSTD_MAX_DOUBLE;
+  double prev_min_dist=0; //DX20190716
+  xmatrix<double> lattice = xstr.lattice; //NEW
+
+  //DX speed increase
+  //perhaps can speed up even more, since the lattice doesn't change for the xstr...
+  vector<xvector<double> > l1, l2, l3;
+  vector<int> a_index, b_index, c_index;
+  xvector<int> dims(3); //DX20190710 - use robust method
+  dims[1]=dims[2]=dims[3]=0; //reset
+
+  xvector<double> tmp_coord, incell_dist, a_component, ab_component; //DX20200329
+  double incell_mod=AUROSTD_MAX_DOUBLE;
+
+  for(uint ii=0; ii<xstr.atoms.size(); ii++){
+    if(ii!=k){
+      if(min_dist<prev_min_dist){
+        if(!(dims[1]==1 && dims[2]==1 && dims[3]==1)){
+          resetLatticeDimensions(lattice,min_dist,dims,l1,l2,l3,a_index,b_index,c_index);
+          prev_min_dist=min_dist;
+        }
+      }
+      incell_dist = xstr.atoms[k].cpos-xstr.atoms[ii].cpos;
+      incell_mod = aurostd::modulus(incell_dist);
+      if(incell_mod<min_dist){
+        if(!(dims[1]==1 && dims[2]==1 && dims[3]==1)){
+          resetLatticeDimensions(lattice,incell_mod,dims,l1,l2,l3,a_index,b_index,c_index);
+        }
+        prev_min_dist=incell_mod;
+      }
+      //DX20180423 - running vector in each loop saves computations; fewer duplicate operations
+      for(uint m=0;m<l1.size();m++){
+        a_component = incell_dist + l1[m];    //DX : coord1-coord2+a*lattice(1)
+        for(uint n=0;n<l2.size();n++){
+          ab_component = a_component + l2[n]; //DX : coord1-coord2+a*lattice(1) + (b*lattice(2))
+          for(uint p=0;p<l3.size();p++){
+            tmp_coord = ab_component + l3[p]; //DX : coord1-coord2+a*lattice(1) + (b*lattice(2)) + (c*lattice(3))
+            min_dist=aurostd::min(min_dist,aurostd::modulus(tmp_coord));
+          }
+        }
+      }
+    }
+  }
+
+  return min_dist;
+}
+
+// ***************************************************************************
 // ***************************************************************************
 string* LOAD_Library_ICSD(string file) {  // LOAD ONE BY ONE
   bool LDEBUG=(FALSE || XHOST.DEBUG);
