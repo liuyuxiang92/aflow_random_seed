@@ -198,7 +198,7 @@ class StructurePrototype{
 };
 
 // ***************************************************************************
-// Class: XtalFinderCalculator 
+// Class: XtalFinderCalculator //DX20201201
 // ***************************************************************************
 // This is the main calculator class for XtalFinder 
 // Carries "universal" attributes to the comparison functions:
@@ -398,8 +398,9 @@ class XtalFinderCalculator : public xStream {
   vector<string> getUniquePermutations(xstructure& xstr);
   vector<string> getUniquePermutations(xstructure& xstr, uint num_proc);
   vector<string> getUniquePermutations(xstructure& xstr, uint num_proc, bool optimize_match);
-  vector<string> getUniquePermutations(xstructure& xstr, uint num_proc, bool optimize_match, bool print_misfit, ostream& oss, aurostd::xoption& comparison_options);
+  vector<string> getUniquePermutations(xstructure& xstr, uint num_proc, bool print_misfit, ostream& oss, aurostd::xoption& comparison_options);
   vector<StructurePrototype> compareAtomDecorations(StructurePrototype& structure, uint num_proc, bool optimize_match);
+  vector<StructurePrototype> compareAtomDecorations(StructurePrototype& structure, uint num_proc, aurostd::xoption& permutation_options);
   void generateAtomPermutedStructures(_structure_representative& structure);
   vector<string> getSpeciesPermutedStrings(const deque<uint>& stoichiometry);
   vector<string> getSpeciesPermutedStrings(const vector<uint>& stoichiometry);

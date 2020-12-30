@@ -83,22 +83,12 @@ namespace compare {
     //DX20190504 END
 
     // ---------------------------------------------------------------------------
-    // FLAG: optimize match (default: false)
-    // bool optimize_match=false; // permutation comparisons do not need to have a best match; let's save time
-    // ---------------------------------------------------------------------------
-    //  optimize match (default: false)
-    bool optimize_match=false;
-    if(comparison_options.flag("COMPARISON_OPTIONS::OPTIMIZE_MATCH")) {
-      optimize_match=true;
-    }
-
-    // ---------------------------------------------------------------------------
     // load structure
     xstructure xstr(input,IOAFLOW_AUTO);
 
     // ---------------------------------------------------------------------------
     // calculate unique/duplicate permutations
-    vector<string> unique_permutations = xtal_finder.getUniquePermutations(xstr, xtal_finder.num_proc, optimize_match, print_misfit, results_ss, comparison_options); //DX20190319 - added FileMESSAGE
+    vector<string> unique_permutations = xtal_finder.getUniquePermutations(xstr, xtal_finder.num_proc, print_misfit, results_ss, comparison_options);
 
     return results_ss.str();
   }
@@ -106,7 +96,7 @@ namespace compare {
 
 
 // ***************************************************************************
-// XtalFinderCalculator::getUniquePermutations()
+// XtalFinderCalculator::getUniquePermutations() //DX20201201
 // ***************************************************************************
 vector<string> XtalFinderCalculator::getUniquePermutations(xstructure& xstr){
   uint num_proc=1;
@@ -120,12 +110,18 @@ vector<string> XtalFinderCalculator::getUniquePermutations(xstructure& xstr, uin
 
 vector<string> XtalFinderCalculator::getUniquePermutations(xstructure& xstr, uint num_proc, bool optimize_match){
   bool print_misfit=false;
-  aurostd::xoption comparison_options = compare::loadDefaultComparisonOptions("permutation"); //DX20200103
+  aurostd::xoption comparison_options = compare::loadDefaultComparisonOptions("permutation");
+  comparison_options.flag("COMPARISON_OPTIONS::OPTIMIZE_MATCH",optimize_match);
   stringstream oss;
-  return getUniquePermutations(xstr, num_proc, optimize_match, print_misfit, oss, comparison_options); //DX20190319 - added FileMESSAGE
+  return getUniquePermutations(xstr, num_proc, print_misfit, oss, comparison_options);
 }
 
-vector<string> XtalFinderCalculator::getUniquePermutations(xstructure& xstr, uint num_proc, bool optimize_match, bool print_misfit, ostream& oss, aurostd::xoption& comparison_options){ //DX20190319 - added FileMESSAGE
+vector<string> XtalFinderCalculator::getUniquePermutations(
+    xstructure& xstr,
+    uint num_proc,
+    bool print_misfit,
+    ostream& oss,
+    aurostd::xoption& comparison_options){
 
   vector<string> unique_permutations;
   stringstream ss_output; //DX20190506
@@ -181,7 +177,7 @@ vector<string> XtalFinderCalculator::getUniquePermutations(xstructure& xstr, uin
   xtal_finder_permutations.misfit_match = misfit_match; //copy misfit_match
   xtal_finder_permutations.misfit_family = misfit_family; //copy misfit_family
   xtal_finder_permutations.num_proc = num_proc; //copy num_proc
-  vector<StructurePrototype> final_permutations = xtal_finder_permutations.compareAtomDecorations(structure,num_proc,optimize_match); //DX20190319 - added FileMESSAGE
+  vector<StructurePrototype> final_permutations = xtal_finder_permutations.compareAtomDecorations(structure,num_proc,comparison_options);
 
   // ---------------------------------------------------------------------------
   // print results
@@ -1818,11 +1814,15 @@ namespace compare {
 }
 //DX - COMPARE DATABASE ENTRIES - END
 
-//DX20190424 START
 // ***************************************************************************
-// XtalFinderCalculator::compareStructuresFromStructureList()
+// XtalFinderCalculator::compareStructuresFromStructureList() //DX20201201
 // ***************************************************************************
-vector<StructurePrototype> XtalFinderCalculator::compareStructuresFromStructureList(const vector<string>& filenames, vector<string>& magmoms_for_systems, uint num_proc, bool same_species, const aurostd::xoption& comparison_options){ //DX20200103 - condensed booleans to xoptions
+vector<StructurePrototype> XtalFinderCalculator::compareStructuresFromStructureList(
+    const vector<string>& filenames,
+    vector<string>& magmoms_for_systems,
+    uint num_proc,
+    bool same_species,
+    const aurostd::xoption& comparison_options){
 
   // ---------------------------------------------------------------------------
   // directory to write results
@@ -1837,15 +1837,19 @@ vector<StructurePrototype> XtalFinderCalculator::compareStructuresFromStructureL
 
   // ---------------------------------------------------------------------------
   // compare structures returns vector<StructureProtoype> of unique/duplicate info
-  return compareMultipleStructures(num_proc, same_species, directory, comparison_options); //DX20200103 - condensed booleans to xoptions
+  return compareMultipleStructures(num_proc, same_species, directory, comparison_options);
 
 }
-//DX20190424 END
 
 // ***************************************************************************
-// XtalFinderCalculator::compareStructuresFromDirectory()
+// XtalFinderCalculator::compareStructuresFromDirectory() //DX20201201
 // ***************************************************************************
-vector<StructurePrototype> XtalFinderCalculator::compareStructuresFromDirectory(const string& directory, vector<string>& magmoms_for_systems, uint num_proc, bool same_species, const aurostd::xoption& comparison_options){
+vector<StructurePrototype> XtalFinderCalculator::compareStructuresFromDirectory(
+    const string& directory,
+    vector<string>& magmoms_for_systems,
+    uint num_proc,
+    bool same_species,
+    const aurostd::xoption& comparison_options){
 
   // ---------------------------------------------------------------------------
   // load structures in directory
@@ -1856,14 +1860,19 @@ vector<StructurePrototype> XtalFinderCalculator::compareStructuresFromDirectory(
 
   // ---------------------------------------------------------------------------
   // compare structures returns vector<StructureProtoype> of unique/duplicate info
-  return compareMultipleStructures(num_proc, same_species, directory, comparison_options); //DX20200103 - condensed booleans to xoptions
+  return compareMultipleStructures(num_proc, same_species, directory, comparison_options);
 
 }
 
 // ***************************************************************************
-// XtalFinderCalculator::compareStructuresFromFile()
+// XtalFinderCalculator::compareStructuresFromFile() //DX20201201
 // ***************************************************************************
-vector<StructurePrototype> XtalFinderCalculator::compareStructuresFromFile(const string& filename, vector<string>& magmoms_for_systems, uint num_proc, bool same_species, const aurostd::xoption& comparison_options){ //DX20200103 - condensed booleans to xoptions
+vector<StructurePrototype> XtalFinderCalculator::compareStructuresFromFile(
+    const string& filename,
+    vector<string>& magmoms_for_systems,
+    uint num_proc,
+    bool same_species,
+    const aurostd::xoption& comparison_options){
 
   // ---------------------------------------------------------------------------
   // directory to write results
@@ -1924,7 +1933,7 @@ namespace compare {
 
     // ---------------------------------------------------------------------------
     // directory to write results
-    string directory = "."; // for now this is fixed
+    string directory = aurostd::getPWD();
 
     // ---------------------------------------------------------------------------
     // default comparison options
@@ -1957,11 +1966,11 @@ namespace compare {
 }
 
 // ***************************************************************************
-// compare::compareMultipleStructures()
+// compare::compareMultipleStructures() //DX20201201
 // ***************************************************************************
 vector<StructurePrototype> XtalFinderCalculator::compareMultipleStructures(
     uint num_proc, bool same_species,
-    const string& directory){ //DX20190319 - added FileMESSAGE //DX20200226 - added logstream
+    const string& directory){
 
   // ---------------------------------------------------------------------------
   // create xoptions to contain all comparison options
@@ -1970,7 +1979,7 @@ vector<StructurePrototype> XtalFinderCalculator::compareMultipleStructures(
     comparison_options.flag("COMPARISON_OPTIONS::REMOVE_DUPLICATE_COMPOUNDS",TRUE);
   }
 
-  return compareMultipleStructures(num_proc, same_species, directory, comparison_options);   //CO20200508
+  return compareMultipleStructures(num_proc, same_species, directory, comparison_options);
 
 }
 
@@ -1978,7 +1987,7 @@ vector<StructurePrototype> XtalFinderCalculator::compareMultipleStructures(
     uint num_proc,
     bool same_species,
     const string& directory,
-    const aurostd::xoption& comparison_options){ //DX20200103 - condensed booleans to xoptions //DX20200226 - added logstream
+    const aurostd::xoption& comparison_options){
 
   bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_COMPARE_);
   string function_name = XPID + "XtalFinderCalculator::compareMultipleStructures():";
@@ -2024,7 +2033,7 @@ vector<StructurePrototype> XtalFinderCalculator::compareMultipleStructures(
   // ---------------------------------------------------------------------------
   // get nearest neighbor info, can perhaps only calculate this if necessary
   // (i.e., if we know we will perform a comparison)
-  // if already calculated, do not recalculate
+  // if already calculated, do not recalculate //DX20201201
   bool all_neighbors_calculated = true;
   for(uint i=0;i<structure_containers.size();i++){ all_neighbors_calculated = (all_neighbors_calculated&&(structure_containers[i].nearest_neighbor_distances.size()!=0)); } //DX20200925 - gcc-10 warnings
   if(!all_neighbors_calculated){
@@ -2048,7 +2057,7 @@ vector<StructurePrototype> XtalFinderCalculator::compareMultipleStructures(
         num_proc,
         tmp_same_species,
         directory,
-        remove_duplicates_options); //DX20200103 - condensed booleans to xoptions
+        remove_duplicates_options);
 
     message << "Duplicate materials removed.";
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
@@ -2125,7 +2134,6 @@ vector<StructurePrototype> XtalFinderCalculator::compareMultipleStructures(
 
   // ---------------------------------------------------------------------------
   // get unique atom decorations prototype (representative) structures
-  // SEPARATE FUNCTION?????
   if(!same_species && comparison_options.flag("COMPARISON_OPTIONS::CALCULATE_UNIQUE_PERMUTATIONS")){
     message << "Determining the unique atom decorations for each prototype.";
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
@@ -2136,7 +2144,11 @@ vector<StructurePrototype> XtalFinderCalculator::compareMultipleStructures(
            compare::arePermutationsComparableViaSymmetry(final_prototypes[i].grouped_Wyckoff_positions))){
         // check if xstructure is generated; if not, make it
         if(!final_prototypes[i].structure_representative_struct->is_structure_generated){
-          if(!compare::generateStructure(final_prototypes[i].structure_representative_struct->name,final_prototypes[i].structure_representative_struct->source,final_prototypes[i].structure_representative_struct->relaxation_step,final_prototypes[i].structure_representative_struct->structure,*p_oss)){ //DX20200429
+          if(!compare::generateStructure(
+                final_prototypes[i].structure_representative_struct->name,
+                final_prototypes[i].structure_representative_struct->source,
+                final_prototypes[i].structure_representative_struct->relaxation_step,
+                final_prototypes[i].structure_representative_struct->structure,*p_oss)){ //DX20200429
             message << "Could not generate structure (" << final_prototypes[i].structure_representative_struct->name << ").";
             throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_RUNTIME_ERROR_);
           }
@@ -2210,19 +2222,15 @@ vector<StructurePrototype> XtalFinderCalculator::compareMultipleStructures(
   // for testing/development; in case the subsequent analyses fails, checkpoint file
   bool store_checkpoint=false;
   if(store_checkpoint){
-    stringstream ss_json;
+    stringstream ss_json, ss_out;
     printResults(ss_json, same_species, final_prototypes, "json");
-    stringstream ss_out;
+    writeComparisonOutputFile(ss_json, directory, "JSON", "compare_input", same_species);
     printResults(ss_out, same_species, final_prototypes, "text");
-    aurostd::stringstream2file(ss_json,directory+"/"+DEFAULT_XTALFINDER_FILE_STRUCTURE+".json");
-    aurostd::stringstream2file(ss_out,directory+"/"+DEFAULT_XTALFINDER_FILE_STRUCTURE+".out");
-    message << "RESULTS: See [tmp]" << directory << "/"+DEFAULT_XTALFINDER_FILE_STRUCTURE+".out" << " or " << directory << "/"+DEFAULT_XTALFINDER_FILE_STRUCTURE+".json" << " for list of unique/duplicate structures.";
-    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_COMPLETE_);
+    writeComparisonOutputFile(ss_out, directory, "TEXT", "compare_input", same_species);
   }
 
   if(comparison_options.flag("COMPARISON_OPTIONS::MATCH_TO_AFLOW_PROTOS")){
 
-    //SEPARATE FUNCTION?!?!?
     message << "Determining if representative structures map to any of the AFLOW prototypes.";
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
 
@@ -2258,7 +2266,7 @@ vector<StructurePrototype> XtalFinderCalculator::compareMultipleStructures(
 }
 
 // ***************************************************************************
-// XtalFinderCalculator::groupSimilarXstructures()
+// XtalFinderCalculator::groupSimilarXstructures() //DX20201229
 // ***************************************************************************
 vector<vector<uint> > XtalFinderCalculator::groupSimilarXstructures(
     const vector<xstructure>& vxstrs,

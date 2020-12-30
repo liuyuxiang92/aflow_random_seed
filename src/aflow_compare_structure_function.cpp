@@ -1785,12 +1785,23 @@ namespace compare{
 }
 
 // ***************************************************************************
-// XtalFinderCalculator::compareAtomDecorations()
+// XtalFinderCalculator::compareAtomDecorations() //DX20201215
 // ***************************************************************************
 vector<StructurePrototype> XtalFinderCalculator::compareAtomDecorations(
     StructurePrototype& structure,
     uint num_proc,
     bool optimize_match){
+  
+  aurostd::xoption permutation_options = compare::loadDefaultComparisonOptions("permutation");
+  permutation_options.flag("COMPARISON_OPTIONS::OPTIMIZE_MATCH",optimize_match);
+
+  return compareAtomDecorations(structure,num_proc,permutation_options);
+}
+
+vector<StructurePrototype> XtalFinderCalculator::compareAtomDecorations(
+    StructurePrototype& structure,
+    uint num_proc,
+    aurostd::xoption& permutation_options){
 
   // Compare the atom decorations for a given structure.
   // Calculates the symmetry, if not already calculate (hence pass by
@@ -1805,8 +1816,6 @@ vector<StructurePrototype> XtalFinderCalculator::compareAtomDecorations(
   // options for atom decoration (permutation) comparisons
   bool same_species = true; // permutation comparisons must compare the same species
   bool quiet = true; //true
-  aurostd::xoption permutation_options = compare::loadDefaultComparisonOptions("permutation");
-  permutation_options.flag("COMPARISON_OPTIONS::OPTIMIZE_MATCH",optimize_match);
 
   vector<StructurePrototype> final_permutations;
 
