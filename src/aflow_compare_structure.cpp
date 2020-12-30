@@ -184,9 +184,9 @@ vector<string> XtalFinderCalculator::getUniquePermutations(
   if(format=="text"){ //DX20190506
     ss_output << "Unique atom decorations (" << final_permutations.size() << "): " << endl;
     for(uint j=0;j<final_permutations.size();j++){
-      ss_output << " " << final_permutations[j].structure_representative_struct->name;
-      for (uint k=0;k<final_permutations[j].structures_duplicate_struct.size();k++){
-        ss_output << " = " << final_permutations[j].structures_duplicate_struct[k]->name;
+      ss_output << " " << final_permutations[j].structure_representative->name;
+      for (uint k=0;k<final_permutations[j].structures_duplicate.size();k++){
+        ss_output << " = " << final_permutations[j].structures_duplicate[k]->name;
       }
       ss_output << endl;
     }
@@ -199,9 +199,9 @@ vector<string> XtalFinderCalculator::getUniquePermutations(
     for(uint j=0;j<final_permutations.size();j++){
       stringstream sstmp;
       vector<string> equivalent_permutations;
-      equivalent_permutations.push_back(final_permutations[j].structure_representative_struct->name);
-      for(uint k=0;k<final_permutations[j].structures_duplicate_struct.size();k++){
-        equivalent_permutations.push_back(final_permutations[j].structures_duplicate_struct[k]->name);
+      equivalent_permutations.push_back(final_permutations[j].structure_representative->name);
+      for(uint k=0;k<final_permutations[j].structures_duplicate.size();k++){
+        equivalent_permutations.push_back(final_permutations[j].structures_duplicate[k]->name);
       }
       sstmp << "[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(equivalent_permutations,"\""),",") << "]";
       vcontent_json.push_back(sstmp.str()); sstmp.str("");
@@ -232,7 +232,7 @@ vector<string> XtalFinderCalculator::getUniquePermutations(
   // ---------------------------------------------------------------------------
   // store unique atom decorations in vector
   for(uint j=0;j<final_permutations.size();j++){
-    unique_permutations.push_back(final_permutations[j].structure_representative_struct->name);
+    unique_permutations.push_back(final_permutations[j].structure_representative->name);
   }
 
   // update oss
@@ -444,8 +444,8 @@ namespace compare {
     if(file_list.size()==2){
       // return abbreviated results (i.e., misfit value along with match, same family, or no match text
       double final_misfit = AUROSTD_MAX_DOUBLE;
-      if(final_prototypes[0].structure_misfits_duplicate.size()==1){
-        final_misfit =  final_prototypes[0].structure_misfits_duplicate[0].misfit;
+      if(final_prototypes[0].mapping_info_duplicate.size()==1){
+        final_misfit =  final_prototypes[0].mapping_info_duplicate[0].misfit;
       }
       if(final_misfit <= xtal_finder.misfit_match && (final_misfit+1.0)> 1e-3){
         message << final_misfit << " : " << "MATCH" << endl;
@@ -466,10 +466,10 @@ namespace compare {
         pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_COMPLETE_);
       }
       if(print){
-        if(final_prototypes[0].structure_misfits_duplicate.size()==1){
-          oss << xtal_finder.printStructureMappingResults(final_prototypes[0].structure_misfits_duplicate[0],
-              final_prototypes[0].structure_representative_struct->structure,
-              final_prototypes[0].structures_duplicate_struct[0]->structure);
+        if(final_prototypes[0].mapping_info_duplicate.size()==1){
+          oss << xtal_finder.printStructureMappingResults(final_prototypes[0].mapping_info_duplicate[0],
+              final_prototypes[0].structure_representative->structure,
+              final_prototypes[0].structures_duplicate[0]->structure);
         }
       }
       return oss.str();
@@ -608,8 +608,8 @@ namespace compare {
     XHOST.QUIET=original_quiet;
 
     vector<string> matching_prototypes;
-    for(uint i=0;i<prototypes[0].structures_duplicate_struct.size();i++){
-      matching_prototypes.push_back(prototypes[0].structures_duplicate_struct[i]->name);
+    for(uint i=0;i<prototypes[0].structures_duplicate.size();i++){
+      matching_prototypes.push_back(prototypes[0].structures_duplicate[i]->name);
     }
     return matching_prototypes; // duplicates names are prototype labels
   }
@@ -861,21 +861,21 @@ vector<StructurePrototype> XtalFinderCalculator::compare2prototypes(
 
     for(uint i=0;i<final_prototypes.size();i++){
       // check if xstructure is generated; if not, make it
-      if(!final_prototypes[i].structure_representative_struct->is_structure_generated){
-        if(!compare::generateStructure(final_prototypes[i].structure_representative_struct->name,final_prototypes[i].structure_representative_struct->source,final_prototypes[i].structure_representative_struct->relaxation_step,final_prototypes[i].structure_representative_struct->structure,*p_oss)){ //DX20200429
-          message << "Could not generate structure (" << final_prototypes[i].structure_representative_struct->name << ").";
+      if(!final_prototypes[i].structure_representative->is_structure_generated){
+        if(!compare::generateStructure(final_prototypes[i].structure_representative->name,final_prototypes[i].structure_representative->source,final_prototypes[i].structure_representative->relaxation_step,final_prototypes[i].structure_representative->structure,*p_oss)){ //DX20200429
+          message << "Could not generate structure (" << final_prototypes[i].structure_representative->name << ").";
           throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_RUNTIME_ERROR_);
         }
       }
       if(LDEBUG){ //DX20190601 - added LDEBUG
-        cerr << "Finding unique atom decorations for " << final_prototypes[i].structure_representative_struct->name << ".";
+        cerr << "Finding unique atom decorations for " << final_prototypes[i].structure_representative->name << ".";
       }
       XtalFinderCalculator xtal_finder_permutations;
       vector<StructurePrototype> final_permutations = xtal_finder_permutations.compareAtomDecorations(final_prototypes[i],num_proc,comparison_options.flag("COMPARISON_OPTIONS::OPTIMIZE_MATCH"));
       for(uint j=0;j<final_permutations.size();j++){
         vector<string> tmp_permutations;
-        tmp_permutations.push_back(final_permutations[j].structure_representative_struct->name); //push back representative permutation
-        for(uint d=0;d<final_permutations[j].structures_duplicate_struct.size();d++){ tmp_permutations.push_back(final_permutations[j].structures_duplicate_struct[d]->name); } //push back equivalent permutations
+        tmp_permutations.push_back(final_permutations[j].structure_representative->name); //push back representative permutation
+        for(uint d=0;d<final_permutations[j].structures_duplicate.size();d++){ tmp_permutations.push_back(final_permutations[j].structures_duplicate[d]->name); } //push back equivalent permutations
         final_prototypes[i].atom_decorations_equivalent.push_back(tmp_permutations);
       }
     }
@@ -916,7 +916,7 @@ namespace compare {
     // ---------------------------------------------------------------------------
     // database contains input structure
     //if(final_prototypes[0].structures_duplicate_names.size()){
-    if(final_prototypes[0].structures_duplicate_struct.size()){
+    if(final_prototypes[0].structures_duplicate.size()){
       return true;
     }
 
@@ -952,16 +952,16 @@ namespace compare {
 
     // ---------------------------------------------------------------------------
     // database DOESN'T contain equivalent structure to input
-    if(!final_prototypes[0].structures_duplicate_struct.size()){
+    if(!final_prototypes[0].structures_duplicate.size()){
       return matched_database_structures;
     }
 
     // ---------------------------------------------------------------------------
     // return equivalent structures to input
-    for(uint i=0;i<final_prototypes[0].structures_duplicate_struct.size();i++){
+    for(uint i=0;i<final_prototypes[0].structures_duplicate.size();i++){
       matching_structure database_entry;
-      database_entry.name = final_prototypes[0].structures_duplicate_struct[i]->name;
-      database_entry.misfit = final_prototypes[0].structure_misfits_duplicate[i].misfit;
+      database_entry.name = final_prototypes[0].structures_duplicate[i]->name;
+      database_entry.misfit = final_prototypes[0].mapping_info_duplicate[i].misfit;
       matched_database_structures.push_back(database_entry);
     }
 
@@ -1398,7 +1398,7 @@ namespace compare {
     xtal_finder_database.printResults(ss_json, same_species, final_prototypes, "json");
 
     // DEBUG oss << ss_out.str();
-    message << "Number of structures in database matching with the input structure: " << final_prototypes[0].structures_duplicate_struct.size() << "." << endl;
+    message << "Number of structures in database matching with the input structure: " << final_prototypes[0].structures_duplicate.size() << "." << endl;
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
 
     //DX20190429 - added screen only option - START
@@ -1952,7 +1952,7 @@ namespace compare {
     vector<aflowlib::_aflowlib_entry> entries_unique;
     for(uint i=0;i<grouped_structures.size();i++){
       for(uint j=0;j<entries.size();j++){
-        if(grouped_structures[i].structure_representative_struct->name==entries[j].auid){
+        if(grouped_structures[i].structure_representative->name==entries[j].auid){
           entries_unique.push_back(entries[j]);
           break;
         }
@@ -2062,7 +2062,7 @@ vector<StructurePrototype> XtalFinderCalculator::compareMultipleStructures(
 
     // include duplicate compounds count in object
     for(uint i=0;i<unique_compounds.size();i++){
-      unique_compounds[i].structure_representative_struct->number_compounds_matching_structure = unique_compounds[i].numberOfComparisons();
+      unique_compounds[i].structure_representative->number_compounds_matching_structure = unique_compounds[i].numberOfComparisons();
     }
 
     // ---------------------------------------------------------------------------
@@ -2088,8 +2088,8 @@ vector<StructurePrototype> XtalFinderCalculator::compareMultipleStructures(
     // remove duplicates in structure container
     vector<string> duplicates_name;
     for(uint i=0;i<unique_compounds.size();i++){
-      for(uint j=0;j<unique_compounds[i].structures_duplicate_struct.size();j++){
-        duplicates_name.push_back(unique_compounds[i].structures_duplicate_struct[j]->name);
+      for(uint j=0;j<unique_compounds[i].structures_duplicate.size();j++){
+        duplicates_name.push_back(unique_compounds[i].structures_duplicate[j]->name);
       }
     }
     for(uint i=0;i<duplicates_name.size();i++){
@@ -2141,13 +2141,13 @@ vector<StructurePrototype> XtalFinderCalculator::compareMultipleStructures(
           (comparison_options.flag("COMPARISON_OPTIONS::IGNORE_SYMMETRY") ||
            compare::arePermutationsComparableViaSymmetry(final_prototypes[i].grouped_Wyckoff_positions))){
         // check if xstructure is generated; if not, make it
-        if(!final_prototypes[i].structure_representative_struct->is_structure_generated){
+        if(!final_prototypes[i].structure_representative->is_structure_generated){
           if(!compare::generateStructure(
-                final_prototypes[i].structure_representative_struct->name,
-                final_prototypes[i].structure_representative_struct->source,
-                final_prototypes[i].structure_representative_struct->relaxation_step,
-                final_prototypes[i].structure_representative_struct->structure,*p_oss)){ //DX20200429
-            message << "Could not generate structure (" << final_prototypes[i].structure_representative_struct->name << ").";
+                final_prototypes[i].structure_representative->name,
+                final_prototypes[i].structure_representative->source,
+                final_prototypes[i].structure_representative->relaxation_step,
+                final_prototypes[i].structure_representative->structure,*p_oss)){ //DX20200429
+            message << "Could not generate structure (" << final_prototypes[i].structure_representative->name << ").";
             throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_RUNTIME_ERROR_);
           }
         }
@@ -2156,8 +2156,8 @@ vector<StructurePrototype> XtalFinderCalculator::compareMultipleStructures(
         // store permutation results in main StructurePrototype object
         for(uint j=0;j<final_permutations.size();j++){
           vector<string> permutations_tmp;
-          permutations_tmp.push_back(final_permutations[j].structure_representative_struct->name); //push back representative permutation
-          for(uint d=0;d<final_permutations[j].structures_duplicate_struct.size();d++){ permutations_tmp.push_back(final_permutations[j].structures_duplicate_struct[d]->name); } //push back equivalent permutations
+          permutations_tmp.push_back(final_permutations[j].structure_representative->name); //push back representative permutation
+          for(uint d=0;d<final_permutations[j].structures_duplicate.size();d++){ permutations_tmp.push_back(final_permutations[j].structures_duplicate[d]->name); } //push back equivalent permutations
           final_prototypes[i].atom_decorations_equivalent.push_back(permutations_tmp);
         }
         final_permutations.clear(); //DX20190624
@@ -2200,18 +2200,18 @@ vector<StructurePrototype> XtalFinderCalculator::compareMultipleStructures(
     // ---------------------------------------------------------------------------
     // update once all are collected (safer)
     for(uint i=0;i<final_prototypes.size();i++){
-      final_prototypes[i].aflow_label = final_prototypes[i].structure_representative_struct->structure.prototype;
-      final_prototypes[i].aflow_parameter_list = final_prototypes[i].structure_representative_struct->structure.prototype_parameter_list;
-      final_prototypes[i].aflow_parameter_values = final_prototypes[i].structure_representative_struct->structure.prototype_parameter_values;
+      final_prototypes[i].aflow_label = final_prototypes[i].structure_representative->structure.prototype;
+      final_prototypes[i].aflow_parameter_list = final_prototypes[i].structure_representative->structure.prototype_parameter_list;
+      final_prototypes[i].aflow_parameter_values = final_prototypes[i].structure_representative->structure.prototype_parameter_values;
     }
 #else
     // ---------------------------------------------------------------------------
     // [NON-THREADED] determine AFLOW standard designation
     for(uint i=0;i<final_prototypes.size();i++){
-      anrl::structure2anrl(final_prototypes[i].structure_representative_struct->structure,false); //DX20190829 - false for recalculate_symmetry
-      final_prototypes[i].aflow_label = final_prototypes[i].structure_representative_struct->structure.prototype;
-      final_prototypes[i].aflow_parameter_list = final_prototypes[i].structure_representative_struct->structure.prototype_parameter_list;
-      final_prototypes[i].aflow_parameter_values = final_prototypes[i].structure_representative_struct->structure.prototype_parameter_values;
+      anrl::structure2anrl(final_prototypes[i].structure_representative->structure,false); //DX20190829 - false for recalculate_symmetry
+      final_prototypes[i].aflow_label = final_prototypes[i].structure_representative->structure.prototype;
+      final_prototypes[i].aflow_parameter_list = final_prototypes[i].structure_representative->structure.prototype_parameter_list;
+      final_prototypes[i].aflow_parameter_values = final_prototypes[i].structure_representative->structure.prototype_parameter_values;
     }
 #endif
   }
@@ -2253,9 +2253,9 @@ vector<StructurePrototype> XtalFinderCalculator::compareMultipleStructures(
     // match to AFLOW prototypes
     for(uint i=0;i<final_prototypes.size();i++){
       XtalFinderCalculator xtal_finder_protos(misfit_match,misfit_family,*p_FileMESSAGE,num_proc,*p_oss);
-      vector<StructurePrototype> matching_protos = xtal_finder_protos.compare2prototypes(final_prototypes[i].structure_representative_struct->structure, vpflow_protos);
-      for(uint j=0;j<matching_protos[0].structures_duplicate_struct.size();j++){
-        final_prototypes[i].matching_aflow_prototypes.push_back(matching_protos[0].structures_duplicate_struct[j]->name);
+      vector<StructurePrototype> matching_protos = xtal_finder_protos.compare2prototypes(final_prototypes[i].structure_representative->structure, vpflow_protos);
+      for(uint j=0;j<matching_protos[0].structures_duplicate.size();j++){
+        final_prototypes[i].matching_aflow_prototypes.push_back(matching_protos[0].structures_duplicate[j]->name);
       }
     }
   }
@@ -2307,9 +2307,9 @@ vector<vector<uint> > XtalFinderCalculator::groupSimilarXstructures(
   vector<uint> structure_indices_equivalent;
   for(uint i=0;i<grouped_structures.size();i++){
     structure_indices_equivalent.clear();
-    structure_indices_equivalent.push_back(aurostd::string2utype<uint>(grouped_structures[i].structure_representative_struct->name));
-    for(uint j=0;j<grouped_structures[i].structures_duplicate_struct.size();j++){
-      structure_indices_equivalent.push_back(aurostd::string2utype<uint>(grouped_structures[i].structures_duplicate_struct[j]->name));
+    structure_indices_equivalent.push_back(aurostd::string2utype<uint>(grouped_structures[i].structure_representative->name));
+    for(uint j=0;j<grouped_structures[i].structures_duplicate.size();j++){
+      structure_indices_equivalent.push_back(aurostd::string2utype<uint>(grouped_structures[i].structures_duplicate[j]->name));
     }
     grouped_indices.push_back(structure_indices_equivalent);
   }
@@ -2368,11 +2368,11 @@ namespace compare {
 // compare::getTransformationBetweenStructures() //DX20201229
 // ***************************************************************************
 namespace compare {
-  structure_misfit getTransformationBetweenStructures(const xstructure& xstr1, const xstructure& xstr2, bool same_species, uint num_proc) { //DX20191108 - remove const & from bools
+  structure_mapping_info getTransformationBetweenStructures(const xstructure& xstr1, const xstructure& xstr2, bool same_species, uint num_proc) { //DX20191108 - remove const & from bools
     double final_misfit=AUROSTD_MAX_DOUBLE;
     bool scale_volume=true; //default is true
     bool optimize_match=false; //default is false
-    structure_misfit final_misfit_info = compare::initialize_misfit_struct();
+    structure_mapping_info final_misfit_info = compare::initialize_misfit_struct();
     aflowCompareStructure(xstr1, xstr2, same_species, scale_volume, optimize_match, final_misfit, final_misfit_info, num_proc); //DX20191122 - move ostream to end
     return final_misfit_info;
   }
@@ -2390,7 +2390,7 @@ namespace compare {
       double& final_misfit,
       uint num_proc) {
 
-    structure_misfit final_misfit_info = compare::initialize_misfit_struct(); //DX20191218
+    structure_mapping_info final_misfit_info = compare::initialize_misfit_struct(); //DX20191218
 
     return aflowCompareStructure(xstr1, xstr2, same_species, scale_volume, optimize_match, final_misfit, final_misfit_info, num_proc); //DX20191122 - move ostream to end
   }
@@ -2406,11 +2406,11 @@ namespace compare {
       bool scale_volume,
       bool optimize_match,
       double& final_misfit,
-      structure_misfit& final_misfit_info,
+      structure_mapping_info& final_misfit_info,
       uint num_proc) { //DX20191108 - remove const & from bools //DX20191122 - move ostream to end and add default
 
-    _structure_representative str_rep = compare::initializeStructureRepresentativeStruct(xstr1);
-    _structure_representative str_matched = compare::initializeStructureRepresentativeStruct(xstr2);
+    structure_container str_rep = compare::initializeStructureContainer(xstr1);
+    structure_container str_matched = compare::initializeStructureContainer(xstr2);
 
     // clean structures
     str_rep.structure.FixLattices();
@@ -2441,9 +2441,9 @@ namespace compare {
 // XtalFinderCalculator::compareStructures() - MAIN COMPARISON FUNCTION
 // ***************************************************************************
 void XtalFinderCalculator::compareStructures(
-    _structure_representative& str_rep,
-    _structure_representative& str_matched,
-    structure_misfit& match_info,
+    structure_container& str_rep,
+    structure_container& str_matched,
+    structure_mapping_info& match_info,
     bool same_species,
     bool scale_volume,
     bool optimize_match) {

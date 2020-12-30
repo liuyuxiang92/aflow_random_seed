@@ -40,13 +40,13 @@
 //DX20191120 [MOVED TO aflow.h]
 
 // ***************************************************************************
-// Struct: structure_misfit  //DX20191212 //DX20201218 - updated
+// Struct: structure_mapping_info  //DX20191212 //DX20201218 - updated
 // ***************************************************************************
 // Stores the structural similarity between two structures
 // (i.e., the representative structure and a matched structure)
 // The basis transformation, rotation, origin shift, and atom mapping
 // information is also stored (new as of 20201218).
-struct structure_misfit {
+struct structure_mapping_info {
   // quantitative similarity/cost functions 
   double misfit;                             // structural misfit (=1-(1-lattice_deviation)(1-coordinate_displacement)(1-failure)) (see Burzlaff)
   double lattice_deviation;                  // lattice deviation, captures differences between lattices
@@ -69,13 +69,13 @@ struct structure_misfit {
 };
 
 // ***************************************************************************
-// structure_misfit functions
+// structure_mapping_info functions
 // ***************************************************************************
 namespace compare{
-  structure_misfit initialize_misfit_struct(bool magnetic=false);
-  string printAtomMappings(const structure_misfit& misfit_info);
-  string printUnmatchedAtoms(const structure_misfit& misfit_info,const xstructure& xstr1,const xstructure& xstr2);
-  void resizeMappingInfo(structure_misfit& str_mis);
+  structure_mapping_info initialize_misfit_struct(bool magnetic=false);
+  string printAtomMappings(const structure_mapping_info& misfit_info);
+  string printUnmatchedAtoms(const structure_mapping_info& misfit_info,const xstructure& xstr1,const xstructure& xstr2);
+  void resizeMappingInfo(structure_mapping_info& str_mis);
 }
 
 //DX20200225 - temp struct; working on more robust scheme
@@ -85,9 +85,9 @@ struct matching_structure {
 };
 
 // ***************************************************************************
-// Struct: _structure_representative //DX20201218
+// Struct: structure_container //DX20201218
 // ***************************************************************************
-struct _structure_representative {
+struct structure_container {
   // intialization info
   string name;                                                  // name of structure
   string compound;                                              // compound name of structure
@@ -116,19 +116,19 @@ struct _structure_representative {
 
 // ---------------------------------------------------------------------------
 namespace compare{
-  _structure_representative initializeStructureRepresentativeStruct();
-  _structure_representative initializeStructureRepresentativeStruct(const xstructure& structure);
+  structure_container initializeStructureContainer();
+  structure_container initializeStructureContainer(const xstructure& structure);
 }
 
 //DX 20201119
-// ===== CompapareMatchedStructures Class ===== //
+// ===== CompapareStructureContainers Class ===== //
 // This class is necessary to pass an argument to the sorting function;
 // the other solution is to use std::bind, but this is not available for early G++ versions
 // see https://stackoverflow.com/questions/26444216/is-it-possible-to-use-stdsort-with-a-sort-function-that-takes-extra-arguments
-class CompareMatchedStructures{
+class CompareStructureContainers{
   public:
-    CompareMatchedStructures(const vector<string>& sorting_attributes) : sorting_attributes(sorting_attributes){}
-    bool operator()(const _structure_representative *a, const _structure_representative *b);
+    CompareStructureContainers(const vector<string>& sorting_attributes) : sorting_attributes(sorting_attributes){}
+    bool operator()(const structure_container *a, const structure_container *b);
   private:
     vector<string> sorting_attributes;
 };
@@ -171,11 +171,14 @@ class StructurePrototype{
     
     // ---------------------------------------------------------------------------
     // structures
-    _structure_representative *structure_representative_struct;                             // structural information for representative structure 
-    vector<_structure_representative*> structures_duplicate_struct;                         // structural information for the duplicate structures    
-    vector<_structure_representative*> structures_family_struct;                            // structural information for the same family structures
-    vector<structure_misfit> structure_misfits_duplicate;                                   // structural misfit and transformation information between the duplicate and representative structures
-    vector<structure_misfit> structure_misfits_family;                                      // structural misfit and transformation information between the family and representative structures
+    structure_container *structure_representative;                                          // structural information for representative structure 
+    vector<structure_container*> structures_duplicate;                                      // structural information for the duplicate structures    
+    vector<structure_container*> structures_family;                                         // structural information for the same family structures
+    vector<structure_mapping_info> mapping_info_duplicate;                                  // structural misfit and transformation information between the duplicate and representative structures
+    vector<structure_mapping_info> mapping_info_family;                                     // structural misfit and transformation information between the family and representative structures
+    
+    // ---------------------------------------------------------------------------
+    // properties stored in structure containers
     vector<string> property_names;                                                          // vector of property names (if using AFLUX)
     vector<string> property_units;                                                          // vector of property units (if using AFLUX)
     
@@ -239,7 +242,7 @@ class XtalFinderCalculator : public xStream {
     double misfit_match;
     double misfit_family;
     uint num_proc;
-    vector<_structure_representative> structure_containers;  // stores structures in a container (pointer for easy manipulation and mobility)
+    vector<structure_container> structure_containers;  // stores structures in a container (pointer for easy manipulation and mobility)
 
     // ---------------------------------------------------------------------------
     // get command line options
@@ -262,15 +265,15 @@ class XtalFinderCalculator : public xStream {
     // ---------------------------------------------------------------------------
     // set as structure representative
     void setStructureAsRepresentative(StructurePrototype& structure_tmp, uint container_index);
-    void setStructureAsRepresentative(StructurePrototype& structure_tmp, _structure_representative* str_pointer);
+    void setStructureAsRepresentative(StructurePrototype& structure_tmp, structure_container* str_pointer);
     // ---------------------------------------------------------------------------
     // set as duplicate structure
     void addStructure2duplicatesList(StructurePrototype& structure_tmp, uint container_index);
-    void addStructure2duplicatesList(StructurePrototype& structure_tmp, _structure_representative* str_pointer);
+    void addStructure2duplicatesList(StructurePrototype& structure_tmp, structure_container* str_pointer);
     // ---------------------------------------------------------------------------
     // set as same family structure
     void addStructure2sameFamilyList(StructurePrototype& structure_tmp, uint container_index);
-    void addStructure2sameFamilyList(StructurePrototype& structure_tmp, _structure_representative* str_pointer);
+    void addStructure2sameFamilyList(StructurePrototype& structure_tmp, structure_container* str_pointer);
   
     // ---------------------------------------------------------------------------
     // load structure methods
@@ -288,15 +291,15 @@ class XtalFinderCalculator : public xStream {
     
     // ---------------------------------------------------------------------------
     // analyze symmetry
-    bool isSymmetryCalculated(_structure_representative& structure);
-    void calculateSymmetry(_structure_representative& str_rep);
+    bool isSymmetryCalculated(structure_container& structure);
+    void calculateSymmetry(structure_container& str_rep);
     void calculateSymmetries(uint num_proc);
     void calculateSpaceGroups(uint start_index=0, uint end_index=AUROSTD_MAX_UINT, uint setting=0); //DX20191230 added setting
     void setSymmetryPlaceholders();
     // ---------------------------------------------------------------------------
     // analyze environment
-    bool isLFAEnvironmentCalculated(_structure_representative& structure);
-    void computeLFAEnvironment(_structure_representative& str_rep, bool unique_only=true);
+    bool isLFAEnvironmentCalculated(structure_container& structure);
+    void computeLFAEnvironment(structure_container& str_rep, bool unique_only=true);
     void calculateLFAEnvironments(uint num_proc);
     void computeLFAEnvironments(uint start_index=0, uint end_index=AUROSTD_MAX_UINT);
     // ---------------------------------------------------------------------------
@@ -368,9 +371,9 @@ class XtalFinderCalculator : public xStream {
 
     // ---------------------------------------------------------------------------
     // compare methods
-    void compareStructures(_structure_representative& str_rep,
-        _structure_representative& str_matched, 
-        structure_misfit& match_info, 
+    void compareStructures(structure_container& str_rep,
+        structure_container& str_matched, 
+        structure_mapping_info& match_info, 
         bool same_species,
         bool scale_volume,
         bool optimize_match);
@@ -401,7 +404,7 @@ class XtalFinderCalculator : public xStream {
   vector<string> getUniquePermutations(xstructure& xstr, uint num_proc, bool print_misfit, ostream& oss, aurostd::xoption& comparison_options);
   vector<StructurePrototype> compareAtomDecorations(StructurePrototype& structure, uint num_proc, bool optimize_match);
   vector<StructurePrototype> compareAtomDecorations(StructurePrototype& structure, uint num_proc, aurostd::xoption& permutation_options);
-  void generateAtomPermutedStructures(_structure_representative& structure);
+  void generateAtomPermutedStructures(structure_container& structure);
   vector<string> getSpeciesPermutedStrings(const deque<uint>& stoichiometry);
   vector<string> getSpeciesPermutedStrings(const vector<uint>& stoichiometry);
   
@@ -419,19 +422,19 @@ class XtalFinderCalculator : public xStream {
       const vector<StructurePrototype>& final_prototypes,
       string mode);
   string printStructureMappingResults(
-      const structure_misfit& misfit_info,
+      const structure_mapping_info& misfit_info,
       const xstructure& xstr_reference,
       const xstructure& xstr_mapped,
       const string& mode="TEXT");
-  string printAtomMappings(const structure_misfit& misfit_info,const xstructure& xstr1,const xstructure& xstr2);
-  string printUnmatchedAtoms(const structure_misfit& misfit_info,const xstructure& xstr1,const xstructure& xstr2);
+  string printAtomMappings(const structure_mapping_info& misfit_info,const xstructure& xstr1,const xstructure& xstr2);
+  string printUnmatchedAtoms(const structure_mapping_info& misfit_info,const xstructure& xstr1,const xstructure& xstr2);
 
   // ---------------------------------------------------------------------------
   // lattice search
   void latticeSearch(
-      _structure_representative& xstr_rep,
-      _structure_representative& xstr_match,
-      structure_misfit& match_info,
+      structure_container& xstr_rep,
+      structure_container& xstr_match,
+      structure_mapping_info& match_info,
       bool same_species,
       bool optimize_match,
       bool scale_volume, //DX20200422
@@ -463,7 +466,7 @@ class XtalFinderCalculator : public xStream {
       xstructure& xstr2,
       const string& lfa,
       vector<xmatrix<double> >& lattices,
-      vector<structure_misfit>& vstrs_matched,
+      vector<structure_mapping_info>& vstrs_matched,
       const uint start_index, const uint end_index,
       bool same_species,
       bool optimize_match);
@@ -476,7 +479,7 @@ class XtalFinderCalculator : public xStream {
       const vector<uint>& atom_indices_xstr1,
       const vector<uint>& atom_indices_xstr2,
       double minimum_interatomic_distance, //DX20200622
-      structure_misfit& mapping_info,
+      structure_mapping_info& mapping_info,
       bool same_species);
   
   // ---------------------------------------------------------------------------
@@ -502,14 +505,14 @@ namespace compare{
   // pair-wise comparisons (for use by other AFLOW processes) 
   string compareMultipleStructures(const aurostd::xoption& vpflow, ostream& logstream=cout); //DX //DX20190425
   bool aflowCompareStructure(const xstructure& xstr1, const xstructure& xstr2, bool same_species, bool scale_volume, bool optimize_match, double& final_misfit, uint num_proc=1); //Main function //DX20191108 - remove const & from bools
-  bool aflowCompareStructure(const xstructure& xstr1, const xstructure& xstr2, bool same_species, bool scale_volume, bool optimize_match, double& final_misfit, structure_misfit& final_misfit_info, uint num_proc=1); //Main function //DX20191108 - remove const & from bools 
+  bool aflowCompareStructure(const xstructure& xstr1, const xstructure& xstr2, bool same_species, bool scale_volume, bool optimize_match, double& final_misfit, structure_mapping_info& final_misfit_info, uint num_proc=1); //Main function //DX20191108 - remove const & from bools 
   //bool aflowCompareStructure(const xstructure& xstr1, const xstructure& xstr2, bool same_species, uint num_proc=1); //Overco, returns true (match), false (no match) //DX20191108 - remove const & from bools
   //bool aflowCompareStructure(const xstructure& xstr1, const xstructure& xstr2, bool same_species, bool scale_volume, bool optmize_match, uint num_proc=1);  //DX20191108 - remove const & from bools
   bool structuresMatch(const xstructure& xstr1, const xstructure& xstr2, bool same_species, uint num_proc=1); //Overco, returns true (match), false (no match) //DX20191108 - remove const & from bools
   bool structuresMatch(const xstructure& xstr1, const xstructure& xstr2, bool same_species, bool scale_volume, bool optmize_match, uint num_proc=1);  //DX20191108 - remove const & from bools
   //double aflowCompareStructureMisfit(const xstructure& xstr1, const xstructure& xstr2, bool same_species, bool optimize_match, uint num_proc=1); //Overloaded, returns misfit value //DX20191108 - remove const & from bools
   double getMisfitBetweenStructures(const xstructure& xstr1, const xstructure& xstr2, bool same_species, bool optimize_match, uint num_proc=1); //Overloaded, returns misfit value //DX20191108 - remove const & from bools
-  structure_misfit getTransformationBetweenStructures(const xstructure& xstr1, const xstructure& xstr2, bool same_species, bool optimize_match, uint num_proc=1); //Overloaded, returns misfit value //DX20191108 - remove const & from bools
+  structure_mapping_info getTransformationBetweenStructures(const xstructure& xstr1, const xstructure& xstr2, bool same_species, bool optimize_match, uint num_proc=1); //Overloaded, returns misfit value //DX20191108 - remove const & from bools
 
   // ---------------------------------------------------------------------------
   // comparisons to AFLOW database 
@@ -580,8 +583,8 @@ namespace compare{
       vector<vector<vector<string> > >& grouped_possible_Wyckoff_letters,
       vector<string>& prototype_labels, vector<uint>& species_counts,
       vector<uint>& space_groups);
-  bool structuresCompatible(const _structure_representative& structure1,
-      const _structure_representative& structure2, bool same_species, 
+  bool structuresCompatible(const structure_container& structure1,
+      const structure_container& structure2, bool same_species, 
       bool ignore_symmetry, bool ignore_Wyckoff, bool ignore_environment, bool ignore_environment_angles); //DX20201207
 
   // ---------------------------------------------------------------------------
@@ -679,15 +682,15 @@ namespace compare{
   double latticeDeviation(const vector<double>& diag_sum1,const vector<double>& diag_sum2, 
       const vector<double>& diag_diff1,const vector<double>& diag_diff2); 
   void coordinateDeviation(
-      structure_misfit& mapping_info,
+      structure_mapping_info& mapping_info,
       const vector<double>& nn_xstr1,
       const vector<double>& nn_xstr2); //DX20201210
   void magneticDeviation(
       const xstructure& xstr1, const xstructure& xstr2, 
-      structure_misfit& mapping_info); //DX20201210
-  double computeMisfit(const structure_misfit& mapping_info); //DX20201210
+      structure_mapping_info& mapping_info); //DX20201210
+  double computeMisfit(const structure_mapping_info& mapping_info); //DX20201210
   double computeMisfit(double dev, double dis, double fail);
-  double computeMisfitMagnetic(const structure_misfit& mapping_info); //DX20201210
+  double computeMisfitMagnetic(const structure_mapping_info& mapping_info); //DX20201210
   double computeMisfitMagnetic(double dev,double dis,double fail,double mag_dis,double mag_fail); //DX20190801
   double checkLatticeDeviation(double& xstr1_vol, xmatrix<double>& q2, const vector<double>& D1, const vector<double>& F1);
   
