@@ -1405,6 +1405,11 @@ DEFAULT_QHA_IGNORE_IMAGINARY
   type: bool
   default: 0
 
+DEFAULT_QHA_RELAX_IONS_CELL
+  description: Defines if ions and cell shape will be relaxed in QHA-related subcalculations.
+  type: bool
+  default: 0
+
 DEFAULT_QHA_FILE_PREFIX
   description: QHA file prefix. All QHA output files start with this prefix.
   type: string
@@ -1452,8 +1457,23 @@ DEFAULT_QHA_FREQS_FILE
 
 DEFAULT_QHA_FVT_FILE
   description: Output file for temperature- and volume-dependent free energy.
-  type:
+  type: string
   default: "FVT.out"
+
+DEFAULT_QHA_PDIS_FILE
+  description: Output file for temperature-dependent phonon dispersion relations.
+  type: string
+  default: "dispersion_phonon"
+
+DEFAULT_QHA_PDOS_FILE
+  description: Output file for temperature-dependent phonon DOS.
+  type: string
+  default: "dos_phonon"
+
+DEFAULT_QHA_KPOINTS_FILE
+  description: Output file for path in the BZ used to calculated temperature-dependent phonon dispersion relations.
+  type: string
+  default: "kpoints.out"
 
 ####################################################################################################
 DEFAULTS AAPL
@@ -1608,6 +1628,11 @@ AFLOW_CORE_TEMPERATURE_REFRESH
   description: Refresh rate (seconds) for computer temperature readings.
   type: integer
   default: 5
+
+VASP_CHECK_SLEEP
+  description: Time (seconds) to wait for VASP to finish writing output files. Useful on clusters with NFS delays.
+  type: integer
+  default: 30
 
 ####################################################################################################
 DEFAULTS MACHINE DEPENDENT MPI

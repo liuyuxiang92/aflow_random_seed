@@ -2712,7 +2712,7 @@ namespace SYM {
     ostringstream aus;
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     DEBUG_SYMMETRY=DEBUG_SYMMETRY || LDEBUG;    
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUP_CRYSTAL Symmetry: BEGIN " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUP_CRYSTAL Symmetry: BEGIN " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
 
     if(DEBUG_SYMMETRY) cerr << "DEBUG: SYM::CalculatePointGroupCrystal [0]" << endl;
@@ -2755,12 +2755,12 @@ namespace SYM {
     if(DEBUG_SYMMETRY) cerr << "DEBUG: SYM::CalculatePointGroupCrystal [2]" << endl;
 
     // PGROUP_XTAL
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " ---------------------------------------------------------------------------" << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " ---------------------------------------------------------------------------" << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
     //cerr << "********************************************************" << endl;
     //cerr << "a.pgroup_xtal.size(): " << a.pgroup_xtal.size() << endl;
     for(uint kk=1;kk<=a.pgroup_xtal.size();kk++) {  // shift by 1 to use [kk-1]...
-      aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " " ;
+      aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " " ;
       aus << a.pgroup_xtal[kk-1].str_type << " theta=";
       if(a.pgroup_xtal[kk-1].angle<100) aus << " ";
       if(a.pgroup_xtal[kk-1].angle<10)  aus << " ";
@@ -2808,7 +2808,7 @@ namespace SYM {
     string function_name = "SYM::CalculatePointGroupKPatterson()";
 
     ostringstream aus;
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUPK_PATTERSON Symmetry: BEGIN " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUPK_PATTERSON Symmetry: BEGIN " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
 
     // ---------------------------------------------------------------------------
@@ -2922,10 +2922,10 @@ namespace SYM {
 
     // ---------------------------------------------------------------------------
     // PGROUPK_PATTERSON
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " ---------------------------------------------------------------------------" << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " ---------------------------------------------------------------------------" << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
     for(uint kk=1;kk<=a.pgroupk_Patterson.size();kk++) {  // shift by 1 to use [kk-1]...
-      aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " " ;
+      aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " " ;
       aus << a.pgroupk_Patterson[kk-1].str_type << " theta=";
       if(a.pgroupk_Patterson[kk-1].angle<100) aus << " ";
       if(a.pgroupk_Patterson[kk-1].angle<10)  aus << " ";
@@ -2935,8 +2935,8 @@ namespace SYM {
       aus    << endl;  // remember vectors start from 0
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
     }
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: unique point group operations " << a.pgroupk_Patterson.size() << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: END " << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: unique point group operations " << a.pgroupk_Patterson.size() << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: END " << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
     if(_write_) Krun=Krun && KBIN_SymmetryWrite(FileMESSAGE,a,aflags,_PGROUPK_PATTERSON_,osswrite,oss,format);
     string pgname = "";  
@@ -3327,23 +3327,23 @@ namespace SYM {
 
 
     // ------------------------------------------------------------------------------------------- PRINTING AND LEAVING
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << message
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message
       << " ---------------------------------------------------------------------------" << endl;
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << message
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message
       << " Symmetry: unique point group operations " << a.pgroup_xtal.size() << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: " << operations << endl;
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: Crystal Family = " << a.crystal_family << endl;
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: Crystal System = " << a.crystal_system << endl;
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: Crystal Class = " << a.point_group_crystal_class << endl;
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: Schoenflies notation = " << a.point_group_Shoenflies << endl;
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: Hermann Mauguin notation = " << a.point_group_Hermann_Mauguin << endl; //"   - " << a.title << endl;
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: Orbifold = " << a.point_group_orbifold << endl;
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: Point Group Type = " << a.point_group_type << endl;
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: Point Group Order = " << a.point_group_order << endl;
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: Point Group Structure = " << a.point_group_structure << endl;
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " ---------------------------------------------------------------------------" << endl;
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: END " << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << message
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: " << operations << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: Crystal Family = " << a.crystal_family << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: Crystal System = " << a.crystal_system << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: Crystal Class = " << a.point_group_crystal_class << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: Schoenflies notation = " << a.point_group_Shoenflies << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: Hermann Mauguin notation = " << a.point_group_Hermann_Mauguin << endl; //"   - " << a.title << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: Orbifold = " << a.point_group_orbifold << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: Point Group Type = " << a.point_group_type << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: Point Group Order = " << a.point_group_order << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: Point Group Structure = " << a.point_group_structure << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " ---------------------------------------------------------------------------" << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: END " << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message
       << " ---------------------------------------------------------------------------" << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
     if(_write_) Krun=Krun && KBIN_SymmetryWrite(FileMESSAGE,a,aflags,_PGROUP_XTAL_,osswrite,oss,format);
@@ -3361,7 +3361,7 @@ namespace SYM {
     ostringstream aus;
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     DEBUG_SYMMETRY=DEBUG_SYMMETRY || LDEBUG;    
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUP_CRYSTAL Symmetry: BEGIN " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUP_CRYSTAL Symmetry: BEGIN " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
 
     if(DEBUG_SYMMETRY) cerr << "DEBUG: SYM::CalculatePointGroupCrystal [0]" << endl;
@@ -3402,12 +3402,12 @@ namespace SYM {
     if(DEBUG_SYMMETRY) cerr << "DEBUG: SYM::CalculatePointGroupCrystal [2]" << endl;
 
     // PGROUP_XTAL
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " ---------------------------------------------------------------------------" << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " ---------------------------------------------------------------------------" << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
     //cerr << "********************************************************" << endl;
     //cerr << "a.pgroup_xtal.size(): " << a.pgroup_xtal.size() << endl;
     for(uint kk=1;kk<=a.pgroup_xtal.size();kk++) {  // shift by 1 to use [kk-1]...
-      aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " " ;
+      aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " " ;
       aus << a.pgroup_xtal[kk-1].str_type << " theta=";
       if(a.pgroup_xtal[kk-1].angle<100) aus << " ";
       if(a.pgroup_xtal[kk-1].angle<10)  aus << " ";
@@ -3694,23 +3694,23 @@ namespace SYM {
 
 
     // ------------------------------------------------------------------------------------------- PRINTING AND LEAVING
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << message
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message
       << " ---------------------------------------------------------------------------" << endl;
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << message
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message
       << " Symmetry: unique point group operations " << a.pgroup_xtal.size() << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: " << operations << endl;
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: Crystal Family = " << a.crystal_family << endl;
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: Crystal System = " << a.crystal_system << endl;
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: Crystal Class = " << a.point_group_crystal_class << endl;
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: Schoenflies notation = " << a.point_group_Shoenflies << endl;
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: Hermann Mauguin notation = " << a.point_group_Hermann_Mauguin << endl; //"   - " << a.title << endl;
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: Orbifold = " << a.point_group_orbifold << endl;
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: Point Group Type = " << a.point_group_type << endl;
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: Point Group Order = " << a.point_group_order << endl;
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: Point Group Structure = " << a.point_group_structure << endl;
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " ---------------------------------------------------------------------------" << endl;
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: END " << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << message
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: " << operations << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: Crystal Family = " << a.crystal_family << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: Crystal System = " << a.crystal_system << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: Crystal Class = " << a.point_group_crystal_class << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: Schoenflies notation = " << a.point_group_Shoenflies << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: Hermann Mauguin notation = " << a.point_group_Hermann_Mauguin << endl; //"   - " << a.title << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: Orbifold = " << a.point_group_orbifold << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: Point Group Type = " << a.point_group_type << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: Point Group Order = " << a.point_group_order << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: Point Group Structure = " << a.point_group_structure << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " ---------------------------------------------------------------------------" << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: END " << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message
       << " ---------------------------------------------------------------------------" << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
     if(_write_) Krun=Krun && KBIN_SymmetryWrite(FileMESSAGE,a,aflags,_PGROUP_XTAL_,osswrite,oss,format);
@@ -3725,7 +3725,7 @@ namespace SYM {
     ostringstream aus;
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     DEBUG_SYMMETRY=DEBUG_SYMMETRY || LDEBUG;    
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUP_CRYSTAL Symmetry: BEGIN " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUP_CRYSTAL Symmetry: BEGIN " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
 
     if(DEBUG_SYMMETRY) cerr << "DEBUG: SYM::CalculatePointGroupCrystal [0]" << endl;
@@ -3775,7 +3775,7 @@ namespace SYM {
         //DX+CO START
         SYM::AddSymmetryToStructure(a,Uc,Uf,ctau,ftau,ctrasl,ftrasl,basis_atoms_map,basis_types_map,true,_PGROUP_XTAL_);   // in kk the number of pgroup_xtal
         //DX+CO END
-        // aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUP_XTL " << a.pgroup_xtal[kk-1].str_type
+        // aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUP_XTL " << a.pgroup_xtal[kk-1].str_type
         // << " theta="; if(a.pgroup_xtal[kk-1].angle<100) aus << " "; if(a.pgroup_xtal[kk-1].angle<10) aus << " ";
         // aus << a.pgroup_xtal[kk-1].angle << " " << " r=(" << a.pgroup_xtal[kk-1].axis << ")"
         // << endl;  // remember vectors start from 0
@@ -3787,10 +3787,10 @@ namespace SYM {
     if(DEBUG_SYMMETRY) cerr << "DEBUG: SYM::CalculatePointGroupCrystal [2]" << endl;
 
     // PGROUP_XTAL
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " ---------------------------------------------------------------------------" << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " ---------------------------------------------------------------------------" << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
     for(uint kk=1;kk<=a.pgroup_xtal.size();kk++) {  // shift by 1 to use [kk-1]...
-      aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " " ;
+      aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " " ;
       aus << a.pgroup_xtal[kk-1].str_type << " theta=";
       if(a.pgroup_xtal[kk-1].angle<100) aus << " ";
       if(a.pgroup_xtal[kk-1].angle<10)  aus << " ";
@@ -4077,23 +4077,23 @@ namespace SYM {
 
 
     // ------------------------------------------------------------------------------------------- PRINTING AND LEAVING
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << message
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message
       << " ---------------------------------------------------------------------------" << endl;
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << message
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message
       << " Symmetry: unique point group operations " << a.pgroup_xtal.size() << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: " << operations << endl;
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: Crystal Family = " << a.crystal_family << endl;
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: Crystal System = " << a.crystal_system << endl;
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: Crystal Class = " << a.point_group_crystal_class << endl;
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: Schoenflies notation = " << a.point_group_Shoenflies << endl;
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: Hermann Mauguin notation = " << a.point_group_Hermann_Mauguin << endl; //"   - " << a.title << endl;
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: Orbifold = " << a.point_group_orbifold << endl;
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: Point Group Type = " << a.point_group_type << endl;
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: Point Group Order = " << a.point_group_order << endl;
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: Point Group Structure = " << a.point_group_structure << endl;
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " ---------------------------------------------------------------------------" << endl;
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: END " << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << message
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: " << operations << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: Crystal Family = " << a.crystal_family << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: Crystal System = " << a.crystal_system << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: Crystal Class = " << a.point_group_crystal_class << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: Schoenflies notation = " << a.point_group_Shoenflies << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: Hermann Mauguin notation = " << a.point_group_Hermann_Mauguin << endl; //"   - " << a.title << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: Orbifold = " << a.point_group_orbifold << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: Point Group Type = " << a.point_group_type << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: Point Group Order = " << a.point_group_order << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: Point Group Structure = " << a.point_group_structure << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " ---------------------------------------------------------------------------" << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: END " << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message
       << " ---------------------------------------------------------------------------" << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
     if(_write_) Krun=Krun && KBIN_SymmetryWrite(FileMESSAGE,a,aflags,_PGROUP_XTAL_,osswrite,oss);
@@ -4319,7 +4319,7 @@ namespace SYM {
     bool Krun=TRUE;
     string pgroup_type="PGROUP";
     if(a.title=="KLATTICE") pgroup_type="PGROUP_KLATTICE";
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << pgroup_type << " Symmetry: BEGIN " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << pgroup_type << " Symmetry: BEGIN " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
     // generic variables
     //  double _eps_=_EPS_; optional
@@ -4383,7 +4383,7 @@ namespace SYM {
     //  dims(i)=3;
     //}
     //DX ===
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << pgroup_type << " Symmetry: inside sphere, dimensions = [" << dims[1] << "," << dims[2] << "," << dims[3] << "]   radius=" << radius << "  " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << pgroup_type << " Symmetry: inside sphere, dimensions = [" << dims[1] << "," << dims[2] << "," << dims[3] << "]   radius=" << radius << "  " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
     // ------------------------------------------------------------------------------
     // seek for lattice points within the sphere with radius
@@ -4428,7 +4428,7 @@ namespace SYM {
         }
       }
     }
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << pgroup_type << " Symmetry: found " << grid_clattice.size() << " vectors inside radius" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << pgroup_type << " Symmetry: found " << grid_clattice.size() << " vectors inside radius" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
     // ------------------------------------------------------------------------------
     // for each set of three lattice points within the sphere see which one has the
@@ -4503,7 +4503,7 @@ namespace SYM {
                           if(sym_found==FALSE) {                                 // new operation, generate and save it
                             clear(ctau);clear(ftau);clear(ctrasl);clear(ftrasl);
                             kk=SYM::AddSymmetryToStructure(a,Uc,Uf,ctau,ftau,ctrasl,ftrasl,basis_atoms_map,basis_types_map,false,_PGROUP_,FALSE);  // kk number pgroups
-                            aus << (aflags.QUIET?"":"00000  MESSAGE ") << pgroup_type << " " << a.pgroup[kk-1].str_type
+                            aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << pgroup_type << " " << a.pgroup[kk-1].str_type
                               << " theta=";
                             if(a.pgroup[kk-1].angle<100) aus << " ";
                             if(a.pgroup[kk-1].angle<10) aus << " ";
@@ -4566,8 +4566,8 @@ namespace SYM {
     grid_flattice.clear();
     // ------------------------------------------------------------------------------
     // Printing and leaving
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << pgroup_type << " Symmetry: unique point group operations " << a.pgroup.size() << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << pgroup_type << " Symmetry: END " << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << pgroup_type << " Symmetry: unique point group operations " << a.pgroup.size() << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << pgroup_type << " Symmetry: END " << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
     if(_write_) Krun=Krun && KBIN_SymmetryWrite(FileMESSAGE,a,aflags,_PGROUP_,osswrite,oss,format);
     string pgname = ""; //DX20170906
@@ -4594,7 +4594,7 @@ namespace SYM {
     bool Krun=TRUE;
     string pgroup_type="PGROUP";
     if(a.title=="KLATTICE") pgroup_type="PGROUP_KLATTICE";
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << pgroup_type << " Symmetry: BEGIN " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << pgroup_type << " Symmetry: BEGIN " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
     // generic variables
     //  double _eps_=_EPS_; optional
@@ -4649,7 +4649,7 @@ namespace SYM {
     radius=RadiusSphereLattice(lattice);  // smarter !
     dims=LatticeDimensionSphere(lattice,radius);
     // for(i=1;i<=3;i++) if(dims(i)>3)dims(i)=3; // check for safety
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << pgroup_type << " Symmetry: inside sphere, dimensions = [" << dims[1] << "," << dims[2] << "," << dims[3] << "]   radius=" << radius << "  " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << pgroup_type << " Symmetry: inside sphere, dimensions = [" << dims[1] << "," << dims[2] << "," << dims[3] << "]   radius=" << radius << "  " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
     // ------------------------------------------------------------------------------
     // seek for lattice points within the sphere with radius
@@ -4685,7 +4685,7 @@ namespace SYM {
         }
       }
     }
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << pgroup_type << " Symmetry: found " << grid_clattice.size() << " vectors inside radius" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << pgroup_type << " Symmetry: found " << grid_clattice.size() << " vectors inside radius" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
     // ------------------------------------------------------------------------------
     // for each set of three lattice points within the sphere see which one has the
@@ -4734,7 +4734,7 @@ namespace SYM {
                           if(sym_found==FALSE) {                                 // new operation, generate and save it
                             clear(ctau);clear(ftau);clear(ctrasl);clear(ftrasl);
                             kk=SYM::AddSymmetryToStructure(a,Uc,Uf,ctau,ftau,ctrasl,ftrasl,basis_atoms_map,basis_types_map,false,_PGROUP_);  // kk number pgroups
-                            aus << (aflags.QUIET?"":"00000  MESSAGE ") << pgroup_type << " " << a.pgroup[kk-1].str_type
+                            aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << pgroup_type << " " << a.pgroup[kk-1].str_type
                               << " theta=";
                             if(a.pgroup[kk-1].angle<100) aus << " ";
                             if(a.pgroup[kk-1].angle<10) aus << " ";
@@ -4793,8 +4793,8 @@ namespace SYM {
     grid_flattice.clear();
     // ------------------------------------------------------------------------------
     // Printing and leaving
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << pgroup_type << " Symmetry: unique point group operations " << a.pgroup.size() << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << pgroup_type << " Symmetry: END " << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << pgroup_type << " Symmetry: unique point group operations " << a.pgroup.size() << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << pgroup_type << " Symmetry: END " << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
     if(_write_) Krun=Krun && KBIN_SymmetryWrite(FileMESSAGE,a,aflags,_PGROUP_,osswrite,oss);
     return Krun;
@@ -5053,7 +5053,7 @@ namespace SYM {
       // clean up pgroupk                                                     // just initialize
       reciprocal_xstr.pgroup.clear();
       reciprocal_xstr.pgroup_calculated=FALSE;                               // just initialize
-      aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: BEGIN " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+      aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: BEGIN " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       uint kk=0;
       xmatrix<double> Uf, Uc;
 
@@ -5065,7 +5065,7 @@ namespace SYM {
         Uf = trasp(inverse(real_xstr.pgroup[i].Uf)); //DX20170905 - Faster/more direct calculation of reciprocal Uf (see D.E. Sands Vectors and Tensors in Cryst.)
         Uc = real_xstr.pgroup[i].Uc; //DX20170905 - Faster/more direct calculation of reciprocal Uf (see D.E. Sands Vectors and Tensors in Cryst.)
         kk=SYM::AddSymmetryToStructure(reciprocal_xstr,Uc,Uf,ctau,ftau,ctrasl,ftrasl,basis_atoms_map,basis_types_map,false,_PGROUP_,FALSE);  // kk number pgroups
-        aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " " << reciprocal_xstr.pgroup[kk-1].str_type
+        aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " " << reciprocal_xstr.pgroup[kk-1].str_type
           << " theta=";
         if(reciprocal_xstr.pgroup[kk-1].angle<100) aus << " ";
         if(reciprocal_xstr.pgroup[kk-1].angle<10) aus << " ";
@@ -5080,8 +5080,8 @@ namespace SYM {
         Uf=reciprocal_xstr.pgroup[k].Uf;
         roundoff(reciprocal_xstr.pgroup[k].Uc,_EPS_roundoff_);
       }
-      aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: unique point group operations " << reciprocal_xstr.pgroup.size() << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-      aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: END " << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+      aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: unique point group operations " << reciprocal_xstr.pgroup.size() << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+      aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: END " << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
       return true;
     }
@@ -5090,7 +5090,7 @@ namespace SYM {
 
       string message="PGROUPK_XTAL";
 
-      aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: BEGIN " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+      aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: BEGIN " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       uint kk=0;
       xmatrix<double> Uf, Uc;
 
@@ -5102,7 +5102,7 @@ namespace SYM {
         Uf = trasp(inverse(real_xstr.pgroup_xtal[i].Uf)); //DX20170905 - Faster/more direct calculation of reciprocal Uf (see D.E. Sands Vectors and Tensors in Cryst.)
         Uc = real_xstr.pgroup_xtal[i].Uc; //DX20170905 - Faster/more direct calculation of reciprocal Uf (see D.E. Sands Vectors and Tensors in Cryst.)
         kk=SYM::AddSymmetryToStructure(reciprocal_xstr,Uc,Uf,ctau,ftau,ctrasl,ftrasl,basis_atoms_map,basis_types_map,false,_PGROUP_XTAL_,FALSE);  // kk number pgroups
-        aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " " << reciprocal_xstr.pgroup_xtal[kk-1].str_type
+        aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " " << reciprocal_xstr.pgroup_xtal[kk-1].str_type
           << " theta=";
         if(reciprocal_xstr.pgroup_xtal[kk-1].angle<100) aus << " ";
         if(reciprocal_xstr.pgroup_xtal[kk-1].angle<10) aus << " ";
@@ -5117,8 +5117,8 @@ namespace SYM {
         Uf=reciprocal_xstr.pgroup_xtal[k].Uf;
         roundoff(reciprocal_xstr.pgroup_xtal[k].Uc,_EPS_roundoff_);
       }
-      aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: unique point group operations " << reciprocal_xstr.pgroup_xtal.size() << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-      aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: END " << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+      aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: unique point group operations " << reciprocal_xstr.pgroup_xtal.size() << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+      aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: END " << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
       return true;
     }
@@ -5456,12 +5456,12 @@ namespace SYM {
 
     if(a.pgroup_calculated==FALSE) Krun=Krun && SYM::CalculatePointGroup(FileMESSAGE,a,aflags,_write_,osswrite,oss,format); // NEED POINT GROUP
 
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: BEGIN " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: BEGIN " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
     a.fgroup.clear();
     a.fgroup_calculated=FALSE;
 
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: generating translations " << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: generating translations " << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
 
     if(LDEBUG) {cerr << soliloquy << " DEBUG breaking up by types" << endl;}
@@ -5535,7 +5535,7 @@ namespace SYM {
           if(sym_found==FALSE) {                                          // new operation, generate and save it
             uint kk;
             kk=SYM::AddSymmetryToStructure(a,symOp.Uc,symOp.Uf,symOp.ctau,symOp.ftau,symOp.ctrasl,symOp.ftrasl,basis_atoms_map,basis_types_map,true,_FGROUP_,FALSE);        // in kk there is the number _0 point group
-            aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP " << a.fgroup[kk-1].str_type;
+            aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP " << a.fgroup[kk-1].str_type;
             aus << " theta="; if(a.fgroup[kk-1].angle<100) aus << " "; if(a.fgroup[kk-1].angle<10) aus << " ";
             aus << a.fgroup[kk-1].angle << " " << " r=(" << a.fgroup[kk-1].axis << ")";
             // aus      << "  fshift=(" << fshift << ")  ";
@@ -5563,18 +5563,18 @@ namespace SYM {
       for(uint ii=0;ii<a.fgroup.size();ii++)
         if(aurostd::identical(a.fgroup[ii].Uf,a.fgroup[0].Uf)){unities++;}    // check unity 0 is always unity //DX used to be _eps_/10.0  //DX20171207 - Use xmatrix identical eps
       if(unities>1) {
-        aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: Cell not primitive: as big as " << unities << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+        aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: Cell not primitive: as big as " << unities << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
       }
       for(uint ii=0+1;ii<a.fgroup.size();ii++) // avoid origin
         if(aurostd::identical(a.fgroup[ii].Uf,a.fgroup[0].Uf)) { //DX used to be _eps_/10.0  //DX20171207 - Use xmatrix identical eps
-          aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: non-primitive internal translation ftau=(" << a.fgroup[ii].ftau << ") " << endl;  
+          aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: non-primitive internal translation ftau=(" << a.fgroup[ii].ftau << ") " << endl;  
           aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
         }
     }
     // Printing and leaving
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: unique factor group operations " << a.fgroup.size() << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: END " << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: unique factor group operations " << a.fgroup.size() << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: END " << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
 
     if(_write_) Krun=Krun && KBIN_SymmetryWrite(FileMESSAGE,a,aflags,_FGROUP_,osswrite,oss,format);
@@ -5611,7 +5611,7 @@ namespace SYM {
     if(a.pgroup_calculated==FALSE) Krun=Krun && SYM::CalculatePointGroup(FileMESSAGE,a,aflags,_write_,osswrite,oss,_eps_); // NEED POINT GROUP
     _eps_=5*_eps_; // factor group builds up errors
 
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: BEGIN " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: BEGIN " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
     // clean up fgroup    // just initialize
     a.fgroup.clear();
@@ -5621,7 +5621,7 @@ namespace SYM {
 
     // prepare all the possible shifts
 
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: generating translations " << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: generating translations " << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
 
     // 143  Cu2S3Si1_ICSD_24132 ICSD_24132    HEX
@@ -5704,9 +5704,9 @@ namespace SYM {
 
     //  cerr << vfshifts.size() << endl;
 
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: found test translations = " << vfshifts.size() << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: found test translations = " << vfshifts.size() << endl;
     for(uint ifshift=0;ifshift<vfshifts.size();ifshift++) { //SC
-      //   aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: translations " << vfshifts.at(ifshift) << endl;
+      //   aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: translations " << vfshifts.at(ifshift) << endl;
     }
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
 
@@ -5777,7 +5777,7 @@ namespace SYM {
           if(sym_found==FALSE) {                                          // new operation, generate and save it
             uint kk;
             kk=SYM::AddSymmetryToStructure(a,Uc,Uf,ctau,ftau,ctrasl,ftrasl,basis_atoms_map,basis_types_map,true,_FGROUP_);        // in kk there is the number _0 point group
-            aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP " << a.fgroup[kk-1].str_type;
+            aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP " << a.fgroup[kk-1].str_type;
             aus << " theta="; if(a.fgroup[kk-1].angle<100) aus << " "; if(a.fgroup[kk-1].angle<10) aus << " ";
             aus << a.fgroup[kk-1].angle << " " << " r=(" << a.fgroup[kk-1].axis << ")";
             // aus	<< "  fshift=(" << fshift << ")  ";
@@ -5805,18 +5805,18 @@ namespace SYM {
       for(uint ii=0;ii<a.fgroup.size();ii++)
         if(aurostd::identical(a.fgroup[ii].Uf,a.fgroup[0].Uf,_eps_/10.0)) {unities++;}    // check unity 0 is always unity
       if(unities>1) {
-        aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: Cell not primitive: as big as " << unities << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+        aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: Cell not primitive: as big as " << unities << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
       }
       for(uint ii=0+1;ii<a.fgroup.size();ii++) // avoid origin
         if(aurostd::identical(a.fgroup[ii].Uf,a.fgroup[0].Uf,_eps_/10.0)) {
-          aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: non-primitive internal translation ftau=(" << a.fgroup[ii].ftau << ") " << endl;  
+          aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: non-primitive internal translation ftau=(" << a.fgroup[ii].ftau << ") " << endl;  
           aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
         }
     }
     // Printing and leaving
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: unique factor group operations " << a.fgroup.size() << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: END " << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: unique factor group operations " << a.fgroup.size() << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: END " << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
 
     if(_write_) Krun=Krun && KBIN_SymmetryWrite(FileMESSAGE,a,aflags,_FGROUP_,osswrite,oss);
@@ -5849,7 +5849,7 @@ namespace SYM {
 
     if(a.pgroup_calculated==FALSE) Krun=Krun && SYM::CalculatePointGroup(FileMESSAGE,a,aflags,_write_,osswrite,oss); // NEED POINT GROUP
 
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: BEGIN " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: BEGIN " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
     // clean up fgroup    // just initialize
     a.fgroup.clear();
@@ -5859,7 +5859,7 @@ namespace SYM {
     vfshifts.clear();
     // prepare all the possible shifts
 
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: generating translations " << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: generating translations " << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
 
     // 143  Cu2S3Si1_ICSD_24132 ICSD_24132    HEX
@@ -5916,9 +5916,9 @@ namespace SYM {
     }
     cerr << vfshifts.size() << endl;
 
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: found test translations = " << vfshifts.size() << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: found test translations = " << vfshifts.size() << endl;
     for(uint ifshift=0;ifshift<vfshifts.size();ifshift++) { //SC
-      // aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: translations " << vfshifts.at(ifshift) << endl;
+      // aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: translations " << vfshifts.at(ifshift) << endl;
     }
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
 
@@ -5980,7 +5980,7 @@ namespace SYM {
             if(sym_found==FALSE) {                                          // new operation, generate and save it
               uint kk;
               kk=SYM::AddSymmetryToStructure(a,Uc,Uf,ctau,ftau,ctrasl,ftrasl,basis_atoms_map,basis_types_map,true,_FGROUP_);        // in kk there is the number _0 point group
-              aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP " << a.fgroup[kk-1].str_type;
+              aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP " << a.fgroup[kk-1].str_type;
               aus << " theta="; if(a.fgroup[kk-1].angle<100) aus << " "; if(a.fgroup[kk-1].angle<10) aus << " ";
               aus << a.fgroup[kk-1].angle << " " << " r=(" << a.fgroup[kk-1].axis << ")";
               aus	<< "  fshift=(" << a.fgroup[kk-1].ftau << ")  ";
@@ -6011,7 +6011,7 @@ namespace SYM {
     //   }
 
     //   // add next ones
-    //   aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: composition " << endl;
+    //   aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: composition " << endl;
     //   aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
     //   for(uint prr=0;prr<4;prr++)
     //   for(uint fg1=1;fg1<a.fgroup.size();fg1++) {
@@ -6060,7 +6060,7 @@ namespace SYM {
     // 	if(sym_found==FALSE) {                                          // new operation, generate and save it
     // 	  uint kk;
     // 	  kk=SYM::AddSymmetryToStructure(a,Uc,Uf,ctau,ftau,ctrasl,ftrasl,basis_atoms_map,basis_types_map,true,_FGROUP_);        // in kk there is the number _0 point group
-    // 	  aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP " << a.fgroup[kk-1].str_type;
+    // 	  aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP " << a.fgroup[kk-1].str_type;
     // 	  aus << " theta="; if(a.fgroup[kk-1].angle<100) aus << " "; if(a.fgroup[kk-1].angle<10) aus << " ";
     // 	  aus << a.fgroup[kk-1].angle << " " << " r=(" << a.fgroup[kk-1].axis << ")";
     // 	  aus	<< "  fshift=(" << a.fgroup[kk-1].ftau << ")  ";
@@ -6081,8 +6081,8 @@ namespace SYM {
     a.fgroup_calculated=TRUE;
     // ------------------------------------------------------------------------------
     // Printing and leaving
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: unique factor group operations " << a.fgroup.size() << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: END " << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: unique factor group operations " << a.fgroup.size() << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: END " << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
     if(_write_) Krun=Krun && KBIN_SymmetryWrite(FileMESSAGE,a,aflags,_FGROUP_,osswrite,oss);
     return Krun;
@@ -6114,7 +6114,7 @@ namespace SYM {
     xmatrix<double> c2f(3,3);c2f=inverse(trasp(a.lattice));
     if(a.pgroup_calculated==FALSE) Krun=Krun && SYM::CalculatePointGroup(FileMESSAGE,a,aflags,_write_,osswrite,oss); // NEED POINT GROUP
 
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: BEGIN " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: BEGIN " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
     // clean up fgroup                                // just initialize
     a.fgroup.clear();
@@ -6136,9 +6136,9 @@ namespace SYM {
           }
     fshift.clear();
 
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: found test translations = " << vfshifts.size() << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: found test translations = " << vfshifts.size() << endl;
     for(uint ifshift=0;ifshift<vfshifts.size();ifshift++) { //SC
-      aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: translations " << vfshifts.at(ifshift) << endl;
+      aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: translations " << vfshifts.at(ifshift) << endl;
     }
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
 
@@ -6199,7 +6199,7 @@ namespace SYM {
                 if(sym_found==FALSE) {                                          // new operation, generate and save it
                   uint kk;
                   kk=SYM::AddSymmetryToStructure(a,Uc,Uf,ctau,ftau,ctrasl,ftrasl,basis_atoms_map,basis_types_map,true,_FGROUP_);        // in kk there is the number _0 point group
-                  aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP " << a.fgroup[kk-1].str_type
+                  aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP " << a.fgroup[kk-1].str_type
                     << " theta="; if(a.fgroup[kk-1].angle<100) aus << " "; if(a.fgroup[kk-1].angle<10) aus << " ";
                   aus << a.fgroup[kk-1].angle << " " << " r=(" << a.fgroup[kk-1].axis << ")"
                     << "  fshift=(" << fshift << ")"
@@ -6220,8 +6220,8 @@ namespace SYM {
     a.fgroup_calculated=TRUE;
     // ------------------------------------------------------------------------------
     // Printing and leaving
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: unique factor group operations " << a.fgroup.size() << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: END " << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: unique factor group operations " << a.fgroup.size() << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: END " << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
     if(_write_) Krun=Krun && KBIN_SymmetryWrite(FileMESSAGE,a,aflags,_FGROUP_,osswrite,oss);
     return Krun;
@@ -6256,7 +6256,7 @@ namespace SYM {
     xmatrix<double> c2f(3,3);c2f=inverse(trasp(a.lattice));
     if(a.pgroup_calculated==FALSE) Krun=Krun && SYM::CalculatePointGroup(FileMESSAGE,a,aflags,_write_,osswrite,oss); // NEED POINT GROUP
 
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: BEGIN " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: BEGIN " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
     // clean up fgroup                                // just initialize
     a.fgroup.clear();
@@ -6276,9 +6276,9 @@ namespace SYM {
         }
     fshift.clear();
 
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: found test translations = " << vfshifts.size() << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: found test translations = " << vfshifts.size() << endl;
     for(uint ifshift=0;ifshift<vfshifts.size();ifshift++) { //SC
-      // aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: translations " << vfshifts.at(ifshift) << endl;
+      // aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: translations " << vfshifts.at(ifshift) << endl;
     }
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
 
@@ -6343,7 +6343,7 @@ namespace SYM {
                   if(sym_found==FALSE) {                                          // new operation, generate and save it
                     uint kk;
                     kk=SYM::AddSymmetryToStructure(a,Uc,Uf,ctau,ftau,ctrasl,ftrasl,basis_atoms_map,basis_types_map,true,_FGROUP_);        // in kk there is the number _0 point group
-                    aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP " << a.fgroup[kk-1].str_type
+                    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP " << a.fgroup[kk-1].str_type
                       << " theta="; if(a.fgroup[kk-1].angle<100) aus << " "; if(a.fgroup[kk-1].angle<10) aus << " ";
                     aus << a.fgroup[kk-1].angle << " " << " r=(" << a.fgroup[kk-1].axis << ")"
                       << "  fshift=(" << a.fgroup[kk-1].ftau << ")"
@@ -6364,8 +6364,8 @@ namespace SYM {
     a.fgroup_calculated=TRUE;
     // ------------------------------------------------------------------------------
     // Printing and leaving
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: unique factor group operations " << a.fgroup.size() << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: END " << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: unique factor group operations " << a.fgroup.size() << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: END " << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
     if(_write_) Krun=Krun && KBIN_SymmetryWrite(FileMESSAGE,a,aflags,_FGROUP_,osswrite,oss);
     return Krun;
@@ -6402,7 +6402,7 @@ namespace SYM {
     xmatrix<double> c2f(3,3);c2f=inverse(trasp(a.lattice));
     if(a.pgroup_calculated==FALSE) Krun=Krun && SYM::CalculatePointGroup(FileMESSAGE,a,aflags,_write_,osswrite,oss); // NEED POINT GROUP
 
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: BEGIN " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: BEGIN " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
     // clean up fgroup                                // just initialize
     a.fgroup.clear();
@@ -6470,7 +6470,7 @@ namespace SYM {
               { //CO20200106 - patching for auto-indenting
                 uint kk;
                 kk=SYM::AddSymmetryToStructure(a,Uc,Uf,ctau,ftau,ctrasl,ftrasl,basis_atoms_map,basis_types_map,true,_FGROUP_);        // in kk there is the number _0 point group
-                aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP " << a.fgroup[kk-1].str_type
+                aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP " << a.fgroup[kk-1].str_type
                   << " theta="; if(a.fgroup[kk-1].angle<100) aus << " "; if(a.fgroup[kk-1].angle<10) aus << " ";
                 aus << a.fgroup[kk-1].angle << " " << " r=(" << a.fgroup[kk-1].axis << ")"
                   << "  ftau=(" << a.fgroup[kk-1].ftau << ")"
@@ -6490,8 +6490,8 @@ namespace SYM {
     a.fgroup_calculated=TRUE;
     // ------------------------------------------------------------------------------
     // Printing and leaving
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: unique factor group operations " << a.fgroup.size() << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: END " << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: unique factor group operations " << a.fgroup.size() << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: END " << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
     if(_write_) Krun=Krun && KBIN_SymmetryWrite(FileMESSAGE,a,aflags,_FGROUP_,osswrite,oss);
     return Krun;
@@ -6542,20 +6542,20 @@ namespace SYM {
     if(a.pgroup_calculated==FALSE) Krun=Krun && SYM::CalculatePointGroup(FileMESSAGE,a,aflags,_write_,osswrite,oss,format);  // NEED POINT GROUP
     if(a.fgroup_calculated==FALSE) Krun=Krun && SYM::CalculateFactorGroup(FileMESSAGE,a,aflags,_write_,osswrite,oss,format); // NEED FACTOR GROUP
 
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << "SGROUP Symmetry: BEGIN " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "SGROUP Symmetry: BEGIN " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
     // clean up sgroup                                // just initialize
     a.sgroup.clear();
     a.sgroup_calculated=FALSE;
     if(a.sgroup_radius<=0.1) {
-      aus << (aflags.QUIET?"":"00000  MESSAGE ") << "SGROUP Symmetry: picking default normalized radius = " << _calculate_symmetry_default_sgroup_radius_<< "  " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+      aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "SGROUP Symmetry: picking default normalized radius = " << _calculate_symmetry_default_sgroup_radius_<< "  " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
       a.sgroup_radius=_calculate_symmetry_default_sgroup_radius_*MaxStructureLattice(a);
     }
     dims=LatticeDimensionSphere(a.lattice,a.sgroup_radius);
     // for(i=1;i<=3;i++) if(dims(i)>3)dims(i)=3;
     a.sgroup_radius_dims=dims;
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << "SGROUP Symmetry: inside sphere (radius=" << a.sgroup_radius << ", dims = [" << dims[1] << "," << dims[2] << "," << dims[3] << "]) " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "SGROUP Symmetry: inside sphere (radius=" << a.sgroup_radius << ", dims = [" << dims[1] << "," << dims[2] << "," << dims[3] << "]) " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
     // all symmetry operations are done within the fractional coordinate system
     // since translations back into the unit cell are straightforward
@@ -6596,7 +6596,7 @@ namespace SYM {
                 return FALSE;
               }
               if(0) { // some printing
-                aus << (aflags.QUIET?"":"00000  MESSAGE ") << "Sgroup " << a.sgroup[kk-1].str_type
+                aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "Sgroup " << a.sgroup[kk-1].str_type
                   << " theta="; if(a.sgroup[kk-1].angle<100) aus << " "; if(a.sgroup[kk-1].angle<10) aus << " ";
                 aus << a.sgroup[kk-1].angle << " " << " r=(" << a.sgroup[kk-1].axis << ")"
                   << "  ftau=(" << a.sgroup[kk-1].ftau << ")"
@@ -6613,8 +6613,8 @@ namespace SYM {
     a.sgroup_calculated=TRUE;
     // ------------------------------------------------------------------------------
     // Printing and leaving
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << "SGROUP Symmetry: unique space group operations " << a.sgroup.size() << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << "SGROUP Symmetry: END " << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "SGROUP Symmetry: unique space group operations " << a.sgroup.size() << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "SGROUP Symmetry: END " << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
     // ------------------------------------------------------------------------------
     if(_write_) Krun=Krun && KBIN_SymmetryWrite(FileMESSAGE,a,aflags,_SGROUP_,osswrite,oss,format);
@@ -6647,20 +6647,20 @@ namespace SYM {
     if(a.pgroup_calculated==FALSE) Krun=Krun && SYM::CalculatePointGroup(FileMESSAGE,a,aflags,_write_,osswrite,oss);  // NEED POINT GROUP
     if(a.fgroup_calculated==FALSE) Krun=Krun && SYM::CalculateFactorGroup(FileMESSAGE,a,aflags,_write_,osswrite,oss); // NEED FACTOR GROUP
 
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << "SGROUP Symmetry: BEGIN " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "SGROUP Symmetry: BEGIN " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
     // clean up sgroup                                // just initialize
     a.sgroup.clear();
     a.sgroup_calculated=FALSE;
     if(a.sgroup_radius<=0.1) {
-      aus << (aflags.QUIET?"":"00000  MESSAGE ") << "SGROUP Symmetry: picking default normalized radius = " << _calculate_symmetry_default_sgroup_radius_<< "  " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+      aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "SGROUP Symmetry: picking default normalized radius = " << _calculate_symmetry_default_sgroup_radius_<< "  " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
       a.sgroup_radius=_calculate_symmetry_default_sgroup_radius_*MaxStructureLattice(a);
     }
     dims=LatticeDimensionSphere(a.lattice,a.sgroup_radius);
     // for(i=1;i<=3;i++) if(dims(i)>3)dims(i)=3;
     a.sgroup_radius_dims=dims;
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << "SGROUP Symmetry: inside sphere (radius=" << a.sgroup_radius << ", dims = [" << dims[1] << "," << dims[2] << "," << dims[3] << "]) " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "SGROUP Symmetry: inside sphere (radius=" << a.sgroup_radius << ", dims = [" << dims[1] << "," << dims[2] << "," << dims[3] << "]) " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
     // all symmetry operations are done within the fractional coordinate system
     // since translations back into the unit cell are straightforward
@@ -6701,7 +6701,7 @@ namespace SYM {
                 return FALSE;
               }
               if(0) { // some printing
-                aus << (aflags.QUIET?"":"00000  MESSAGE ") << "Sgroup " << a.sgroup[kk-1].str_type
+                aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "Sgroup " << a.sgroup[kk-1].str_type
                   << " theta="; if(a.sgroup[kk-1].angle<100) aus << " "; if(a.sgroup[kk-1].angle<10) aus << " ";
                 aus << a.sgroup[kk-1].angle << " " << " r=(" << a.sgroup[kk-1].axis << ")"
                   << "  ftau=(" << a.sgroup[kk-1].ftau << ")"
@@ -6718,8 +6718,8 @@ namespace SYM {
     a.sgroup_calculated=TRUE;
     // ------------------------------------------------------------------------------
     // Printing and leaving
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << "SGROUP Symmetry: unique space group operations " << a.sgroup.size() << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << "SGROUP Symmetry: END " << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "SGROUP Symmetry: unique space group operations " << a.sgroup.size() << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "SGROUP Symmetry: END " << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
     // ------------------------------------------------------------------------------
     if(_write_) Krun=Krun && KBIN_SymmetryWrite(FileMESSAGE,a,aflags,_SGROUP_,osswrite,oss);
@@ -6773,7 +6773,7 @@ namespace SYM {
     ostringstream aus;
     bool Krun=TRUE;
 
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << "IATOMS ATOMS:  BEGIN " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "IATOMS ATOMS:  BEGIN " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
 
     a.LatticeReduction_avoid=TRUE; // so it does not mess up the min angles SC20100115
@@ -6863,9 +6863,9 @@ namespace SYM {
     a.iatoms_calculated=TRUE;
     // ------------------------------------------------------------------------------
     // Printing and leaving
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << "IATOMS ATOMS: number of inequivalent atoms = " << a.iatoms.size() << "   " << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "IATOMS ATOMS: number of inequivalent atoms = " << a.iatoms.size() << "   " << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     for(uint iat1=0;iat1<a.iatoms.size();iat1++) {
-      aus << (aflags.QUIET?"":"00000  MESSAGE ") << "IATOMS ATOMS: [";
+      aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "IATOMS ATOMS: [";
       if(a.iatoms.at(iat1).at(0)<10){ 
         aus << "0"; 
       }
@@ -6875,7 +6875,7 @@ namespace SYM {
       }
       aus << endl;
     }
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << "IATOMS ATOMS: END " << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "IATOMS ATOMS: END " << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
     // ------------------------------------------------------------------------------
     if(_write_) Krun=Krun && KBIN_SymmetryWrite(FileMESSAGE,a,aflags,_IATOMS_,osswrite,oss,format);
@@ -6894,7 +6894,7 @@ namespace SYM {
     a=BringInCell(a);
     //  a=BringInWignerSeitz(a);
 
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << "IATOMS ATOMS:  BEGIN " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "IATOMS ATOMS:  BEGIN " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
     double eps=MinStructureLattice(a)/100.0;
 
@@ -6967,9 +6967,9 @@ namespace SYM {
     a.iatoms_calculated=TRUE;
     // ------------------------------------------------------------------------------
     // Printing and leaving
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << "IATOMS ATOMS: number of inequivalent atoms = " << a.iatoms.size() << "   " << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "IATOMS ATOMS: number of inequivalent atoms = " << a.iatoms.size() << "   " << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     for(uint iat1=0;iat1<a.iatoms.size();iat1++) {
-      aus << (aflags.QUIET?"":"00000  MESSAGE ") << "IATOMS ATOMS: [";
+      aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "IATOMS ATOMS: [";
       if(a.iatoms.at(iat1).at(0)<10){ 
         aus << "0"; 
       }
@@ -6979,7 +6979,7 @@ namespace SYM {
       }
       aus << endl;
     }
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << "IATOMS ATOMS: END " << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "IATOMS ATOMS: END " << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
     // ------------------------------------------------------------------------------
     if(_write_) Krun=Krun && KBIN_SymmetryWrite(FileMESSAGE,a,aflags,_IATOMS_,osswrite,oss);
@@ -7047,7 +7047,7 @@ namespace SYM {
     if(a.iatoms_calculated==FALSE) Krun=Krun && SYM::CalculateInequivalentAtoms(FileMESSAGE,a,aflags,_write_,osswrite,oss,format); // NEED EQUIV ATOMS
     //a.write_inequivalent_flag=TRUE;
 
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << "AGROUP Symmetry: BEGIN " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "AGROUP Symmetry: BEGIN " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
 
     // ------------------------------------------------------------------------------
@@ -7076,8 +7076,8 @@ namespace SYM {
       //} else {
       //  iat=iiat;
       //}
-      aus << (aflags.QUIET?"":"00000  MESSAGE ") << "AGROUP ---------------------------------------------------------------------------" << endl;
-      aus << (aflags.QUIET?"":"00000  MESSAGE ") << "AGROUP " << "[site="; if(iat<10) aus << "0"; aus << iat << "] ";
+      aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "AGROUP ---------------------------------------------------------------------------" << endl;
+      aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "AGROUP " << "[site="; if(iat<10) aus << "0"; aus << iat << "] ";
       aus << ATOM_INDICATOR << iiat << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
       if(0) {if(iat<10) oss << "0"; oss << iat << "["; if(a.atoms.at(iat).equivalent<10) oss << "0";  oss << a.atoms.at(iat).equivalent << "]";}
@@ -7114,7 +7114,7 @@ namespace SYM {
 
             // some verbose  
             //	  cerr << "F " << iiat << " " <<  pg << "/" << a.pgroup_xtal.size() << " " << kk << endl; //DX+CO
-            aus << (aflags.QUIET?"":"00000  MESSAGE ") << "AGROUP " << "[site="; if(iat<10) aus << "0"; aus << iat << "] ";
+            aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "AGROUP " << "[site="; if(iat<10) aus << "0"; aus << iat << "] ";
             aus << a.agroup[iat][kk-1].str_type << " theta=";                                        // remember vectors start from 0
             if(a.agroup[iat][kk-1].angle<100) aus << " ";                                            // remember vectors start from 0
             if(a.agroup[iat][kk-1].angle<10) aus << " ";                                             // remember vectors start from 0
@@ -7126,21 +7126,21 @@ namespace SYM {
           }
         }
       }
-      aus << (aflags.QUIET?"":"00000  MESSAGE ") << "AGROUP " << "[site="; if(iat<10) aus << "0"; aus << iat << "] ";
+      aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "AGROUP " << "[site="; if(iat<10) aus << "0"; aus << iat << "] ";
       //aus << "unique site point group operations " << a.agroup.at(iat).size() << " (#pg=" << pgroup.size() << ")  " << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aus << "unique site point group operations " << a.agroup.at(iat).size() << " (#pg_xtal=" << a.pgroup_xtal.size() << ")  " << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;  //DX+CO
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);    
     }
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << "AGROUP ---------------------------------------------------------------------------" << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "AGROUP ---------------------------------------------------------------------------" << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);    
     // ------------------------------------------------------------------------------
     if(iatoms_only){
-      aus << (aflags.QUIET?"":"00000  MESSAGE ") << "AGROUP SYMMETRY: propagating to equivalent sites" << endl;
+      aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "AGROUP SYMMETRY: propagating to equivalent sites" << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);    
       if(!CalculateSitePointGroup_EquivalentSites(a,CALCULATION_MODE!=1,_eps_)){
         return FALSE; 
       }
-      aus << (aflags.QUIET?"":"00000  MESSAGE ") << "AGROUP ---------------------------------------------------------------------------" << endl;
+      aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "AGROUP ---------------------------------------------------------------------------" << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);    
     }
     //since iatoms calculated, for (CALCULATION_MODE == 2) we can do a quick validatity check
@@ -7165,16 +7165,16 @@ namespace SYM {
     // summary
     // ------------------------------------------------------------------------------
     // Printing and leaving
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << "AGROUP number of inequivalent atoms = " << a.iatoms.size() << "   " << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "AGROUP number of inequivalent atoms = " << a.iatoms.size() << "   " << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     for(uint iat1=0;iat1<a.iatoms.size();iat1++) {
-      aus << (aflags.QUIET?"":"00000  MESSAGE ") << "AGROUP [";
+      aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "AGROUP [";
       if(a.iatoms.at(iat1).at(0)<10) aus << "0"; 
       aus << a.iatoms.at(iat1).at(0) << "] ";
       for(uint iat2=0;iat2<a.iatoms.at(iat1).size();iat2++)
         aus << a.iatoms.at(iat1).at(iat2) << "(" << a.agroup.at(a.iatoms.at(iat1).at(iat2)).size() << ")" << " ";
       aus << endl;
     }
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << "AGROUP Symmetry: END " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "AGROUP Symmetry: END " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
     if(_write_) Krun=Krun && KBIN_SymmetryWrite(FileMESSAGE,a,aflags,_AGROUP_,osswrite,oss,format);
     return Krun;
@@ -7201,7 +7201,7 @@ namespace SYM {
     if(a.iatoms_calculated==FALSE) Krun=Krun && SYM::CalculateInequivalentAtoms(FileMESSAGE,a,aflags,_write_,osswrite,oss); // NEED EQUIV ATOMS
     a.write_inequivalent_flag=TRUE;
 
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << "AGROUP Symmetry: BEGIN " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "AGROUP Symmetry: BEGIN " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
 
     //  double _eps_=MaxStructureLattice(a)/1000.0;
@@ -7221,8 +7221,8 @@ namespace SYM {
 
     for(uint iiat=0;iiat<a.iatoms.size();iiat++) {
       iat=a.iatoms.at(iiat).at(0);
-      aus << (aflags.QUIET?"":"00000  MESSAGE ") << "AGROUP ---------------------------------------------------------------------------" << endl;
-      aus << (aflags.QUIET?"":"00000  MESSAGE ") << "AGROUP " << "[site="; if(iat<10) aus << "0"; aus << iat << "] ";
+      aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "AGROUP ---------------------------------------------------------------------------" << endl;
+      aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "AGROUP " << "[site="; if(iat<10) aus << "0"; aus << iat << "] ";
       aus << "ineq atom #=" << iiat << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
       if(0) {if(iat<10) oss << "0"; oss << iat << "["; if(a.atoms.at(iat).equivalent<10) oss << "0";  oss << a.atoms.at(iat).equivalent << "]";}
@@ -7261,7 +7261,7 @@ namespace SYM {
 
             // some verbose  
             //	  cerr << "F " << iiat << " " <<  pg << "/" << a.pgroup.size() << " " << kk << endl;
-            aus << (aflags.QUIET?"":"00000  MESSAGE ") << "AGROUP " << "[site="; if(iat<10) aus << "0"; aus << iat << "] ";
+            aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "AGROUP " << "[site="; if(iat<10) aus << "0"; aus << iat << "] ";
             aus << a.agroup[iat][kk-1].str_type << " theta=";                                        // remember vectors start from 0
             if(a.agroup[iat][kk-1].angle<100) aus << " ";                                            // remember vectors start from 0
             if(a.agroup[iat][kk-1].angle<10) aus << " ";                                             // remember vectors start from 0
@@ -7273,11 +7273,11 @@ namespace SYM {
           }
         }
       }
-      aus << (aflags.QUIET?"":"00000  MESSAGE ") << "AGROUP " << "[site="; if(iat<10) aus << "0"; aus << iat << "] ";
+      aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "AGROUP " << "[site="; if(iat<10) aus << "0"; aus << iat << "] ";
       aus << "unique site point group operations " << a.agroup.at(iat).size() << " (#pg=" << a.pgroup.size() << ")  " << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);    
     }
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << "AGROUP ---------------------------------------------------------------------------" << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "AGROUP ---------------------------------------------------------------------------" << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);    
     // ------------------------------------------------------------------------------
     for(uint iat=0;iat<a.atoms.size();iat++) {
@@ -7291,16 +7291,16 @@ namespace SYM {
     // summary
     // ------------------------------------------------------------------------------
     // Printing and leaving
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << "AGROUP number of inequivalent atoms = " << a.iatoms.size() << "   " << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "AGROUP number of inequivalent atoms = " << a.iatoms.size() << "   " << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     for(uint iat1=0;iat1<a.iatoms.size();iat1++) {
-      aus << (aflags.QUIET?"":"00000  MESSAGE ") << "AGROUP [";
+      aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "AGROUP [";
       if(a.iatoms.at(iat1).at(0)<10) aus << "0";
       aus << a.iatoms.at(iat1).at(0) << "] ";
       for(uint iat2=0;iat2<a.iatoms.at(iat1).size();iat2++)
         aus << a.iatoms.at(iat1).at(iat2) << "(" << a.agroup.at(a.iatoms.at(iat1).at(iat2)).size() << ")" << " ";
       aus << endl;
     }
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << "AGROUP Symmetry: END " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "AGROUP Symmetry: END " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
     if(_write_) Krun=Krun && KBIN_SymmetryWrite(FileMESSAGE,a,aflags,_AGROUP_,osswrite,oss);
     return Krun;
@@ -8279,15 +8279,15 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
   ofstream FileOUTPUT;string FileNameOUTPUT;
   // ------------------------------------------------------------------------------
   // writing aflow.pgroup
-  if(mode==_PGROUP_) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUP Symmetry: writing BEGIN " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-  if(mode==_PGROUPK_) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUPK Symmetry: writing BEGIN " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-  if(mode==_FGROUP_) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: writing BEGIN " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-  if(mode==_SGROUP_) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "SGROUP Symmetry: writing BEGIN " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-  if(mode==_AGROUP_) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "AGROUP Symmetry: writing BEGIN " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-  if(mode==_IATOMS_) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "IATOMS Symmetry: writing BEGIN " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-  if(mode==_PGROUP_XTAL_) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUP_XTAL Symmetry: writing BEGIN " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-  if(mode==_PGROUPK_XTAL_) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUPK_XTAL Symmetry: writing BEGIN " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl; //DX20171205 - Added pgroupk_xtal
-  if(mode==_PGROUPK_PATTERSON_) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUPK_PATTERSON Symmetry: writing BEGIN " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl; //DX20200129
+  if(mode==_PGROUP_) aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUP Symmetry: writing BEGIN " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+  if(mode==_PGROUPK_) aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUPK Symmetry: writing BEGIN " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+  if(mode==_FGROUP_) aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: writing BEGIN " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+  if(mode==_SGROUP_) aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "SGROUP Symmetry: writing BEGIN " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+  if(mode==_AGROUP_) aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "AGROUP Symmetry: writing BEGIN " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+  if(mode==_IATOMS_) aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "IATOMS Symmetry: writing BEGIN " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+  if(mode==_PGROUP_XTAL_) aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUP_XTAL Symmetry: writing BEGIN " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+  if(mode==_PGROUPK_XTAL_) aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUPK_XTAL Symmetry: writing BEGIN " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl; //DX20171205 - Added pgroupk_xtal
+  if(mode==_PGROUPK_PATTERSON_) aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUPK_PATTERSON Symmetry: writing BEGIN " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl; //DX20200129
   aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
   if(aurostd::toupper(format)=="TXT" || aurostd::toupper(format)=="TEXT"){ //DX20200206
     if(mode==_PGROUP_) FileNameOUTPUT=aflags.Directory+"/"+DEFAULT_AFLOW_PGROUP_OUT;
@@ -8335,7 +8335,7 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
       FileOUTPUT.flush();
     }                                                       //DX20170802
     FileOUTPUT.clear();FileOUTPUT.close();
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUP Symmetry: writing END " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUP Symmetry: writing END " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
   }
   if(mode==_PGROUP_XTAL_) {
     if(aurostd::toupper(format)=="TXT" || aurostd::toupper(format)=="TEXT"){ //DX20200206
@@ -8356,7 +8356,7 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
       FileOUTPUT.flush();                                   //DX20170802
     }                                                       //DX20170802
     FileOUTPUT.clear();FileOUTPUT.close();
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUP_XTAL Symmetry: writing END " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUP_XTAL Symmetry: writing END " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
   }
   //DX20171205 - Added pgroupk_xtal - START
   if(mode==_PGROUPK_XTAL_) {
@@ -8378,7 +8378,7 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
       FileOUTPUT.flush();                                   //DX20170802
     }                                                       //DX20170802
     FileOUTPUT.clear();FileOUTPUT.close();
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUPK_XTAL Symmetry: writing END " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUPK_XTAL Symmetry: writing END " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
   }
   //DX20171205 - Added pgroupk_xtal - END
   if(mode==_PGROUPK_) {
@@ -8400,7 +8400,7 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
       FileOUTPUT.flush();                                   //DX20170802
     }                                                       //DX20170802
     FileOUTPUT.clear();FileOUTPUT.close();
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUPK Symmetry: writing END " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUPK Symmetry: writing END " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
   }
   if(mode==_PGROUPK_PATTERSON_) { //DX20200129
     if(aurostd::toupper(format)=="TXT" || aurostd::toupper(format)=="TEXT"){ //DX20200206
@@ -8421,7 +8421,7 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
       FileOUTPUT.flush();                                   //DX20170802
     }                                                       //DX20170802
     FileOUTPUT.clear();FileOUTPUT.close();
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUPK_PATTERSON Symmetry: writing END " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUPK_PATTERSON Symmetry: writing END " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
   }
   if(mode==_FGROUP_) {
     if(aurostd::toupper(format)=="TXT" || aurostd::toupper(format)=="TEXT"){ //DX20200206
@@ -8442,7 +8442,7 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
       FileOUTPUT.flush();                                   //DX20170802
     }                                                       //DX20170802
     FileOUTPUT.clear();FileOUTPUT.close();
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: writing END " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: writing END " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
   }
   if(mode==_SGROUP_) {
     if(aurostd::toupper(format)=="TXT" || aurostd::toupper(format)=="TEXT"){ //DX20200206
@@ -8465,7 +8465,7 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
       FileOUTPUT.flush();                                   //DX20170802
     }                                                       //DX20170802
     FileOUTPUT.clear();FileOUTPUT.close();
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << "SGROUP Symmetry: writing END " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "SGROUP Symmetry: writing END " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
   }
   if(mode==_AGROUP_) {
     if(aurostd::toupper(format)=="TXT" || aurostd::toupper(format)=="TEXT"){ //DX20200206
@@ -8490,7 +8490,7 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
       FileOUTPUT.flush();                                   //DX20170802
     }                                                       //DX20170802
     FileOUTPUT.clear();FileOUTPUT.close();
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << "AGROUP Symmetry: writing END " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "AGROUP Symmetry: writing END " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
   }
   if(mode==_IATOMS_) {
     if(aurostd::toupper(format)=="TXT" || aurostd::toupper(format)=="TEXT"){ //DX20200206
@@ -8515,7 +8515,7 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
       FileOUTPUT.flush();                                   //DX20170802
     }                                                       //DX20170802
     FileOUTPUT.clear();FileOUTPUT.close();
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << "IATOMS Symmetry: writing END " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "IATOMS Symmetry: writing END " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
 
   }
   aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
@@ -8787,11 +8787,11 @@ bool KBIN_StepSymmetryPerform_20160101(xstructure& a,string AflowIn,ofstream &Fi
     Krun=(Krun && SYM::CalculatePointGroupCrystal(FileMESSAGE,a,aflags,kflags.KBIN_SYMMETRY_PGROUP_XTAL_WRITE,osswrite,oss));
     // space group
     if(kflags.KBIN_SYMMETRY_SGROUP_RADIUS>0.0) {
-      if(!aflags.QUIET) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "POSCAR SGROUP: found RADIUS="<<kflags.KBIN_SYMMETRY_SGROUP_RADIUS<<" " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+      if(!aflags.QUIET) aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "POSCAR SGROUP: found RADIUS="<<kflags.KBIN_SYMMETRY_SGROUP_RADIUS<<" " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
     } else {
       kflags.KBIN_SYMMETRY_SGROUP_RADIUS=KBIN_SYMMETRY_SGROUP_RADIUS_DEFAULT;
-      if(!aflags.QUIET) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "POSCAR SGROUP: Default RADIUS="<<kflags.KBIN_SYMMETRY_SGROUP_RADIUS<<" " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+      if(!aflags.QUIET) aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "POSCAR SGROUP: Default RADIUS="<<kflags.KBIN_SYMMETRY_SGROUP_RADIUS<<" " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
     }
     a.sgroup_radius=kflags.KBIN_SYMMETRY_SGROUP_RADIUS;

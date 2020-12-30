@@ -3013,6 +3013,7 @@ namespace KBIN {
       if(vflags.KBIN_VASP_FORCE_OPTION_RELAX_TYPE.flag("IONS")==FALSE && vflags.KBIN_VASP_FORCE_OPTION_RELAX_TYPE.flag("CELL_SHAPE")==TRUE  && vflags.KBIN_VASP_FORCE_OPTION_RELAX_TYPE.flag("CELL_VOLUME")==TRUE)  isif=6;
       if(vflags.KBIN_VASP_FORCE_OPTION_RELAX_TYPE.flag("IONS")==FALSE && vflags.KBIN_VASP_FORCE_OPTION_RELAX_TYPE.flag("CELL_SHAPE")==FALSE && vflags.KBIN_VASP_FORCE_OPTION_RELAX_TYPE.flag("CELL_VOLUME")==TRUE)  isif=7;
       if(vflags.KBIN_VASP_FORCE_OPTION_RELAX_TYPE.flag("ALL")) isif=3;
+      if(vflags.KBIN_VASP_FORCE_OPTION_RELAX_TYPE.flag("IONS_CELL_SHAPE")) isif=4;//AS20201208
     }
     if(vflags.KBIN_VASP_FORCE_OPTION_RELAX_TYPE.flag("IONS_CELL_VOLUME")) {  // whatever is the number
       if(aurostd::_isodd(number)) isif=7;  // VOLUME
@@ -3629,13 +3630,13 @@ namespace KBIN {
   int XVASP_INCAR_GetNBANDS(_xvasp& xvasp,bool ispin) {
     vector<double> vZVAL;
     double ZVAL=GetZVAL(xvasp.POTCAR,vZVAL);
-    // // cout << "00000  MESSAGE POTCAR ZVAL max   = " << ZVAL << endl;
+    // // cout << XPID << "00000  MESSAGE POTCAR ZVAL max   = " << ZVAL << endl;
     int nbands;
     nbands=GetNBANDS((int) ZVAL,(int) xvasp.str.atoms.size(),5,ispin);
     nbands=GetNBANDS((int) ZVAL,(int) xvasp.str.atoms.size(),5,TRUE);  // SAFETY
     // nbands=nbands+20+nbands/5; // MORE SAFETY
-    // cout << "00000  MESSAGE POTCAR NBANDS = " << nbands << endl;
-    if(!XHOST.QUIET) cout << "00000  MESSAGE-OPTION  [VASP_FORCE_OPTION]NBANDS  = " << nbands << endl;
+    // cout << XPID << "00000  MESSAGE POTCAR NBANDS = " << nbands << endl;
+    if(!XHOST.QUIET) cout << XPID << "00000  MESSAGE-OPTION  [VASP_FORCE_OPTION]NBANDS  = " << nbands << endl;
     return nbands;
   }
 }

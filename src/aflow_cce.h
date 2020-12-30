@@ -63,10 +63,12 @@ namespace cce {
   // for command line use, 
   // use inside AFLOW providing directory path or xstructure & functional string or flags and istream for web tool, 
   // and CCE core function called by all other main CCE functions
+  void run(aurostd::xoption& flags, ostream& oss=std::cout);  //CO20201105
+  void run(aurostd::xoption& flags, std::istream& ist, ostream& oss=std::cout); //CO20201105
   void print_corrections(aurostd::xoption& flags, ostream& oss=std::cout);
-  void print_corrections(xstructure& structure, aurostd::xoption& flags);
+  void print_corrections(xstructure& structure, aurostd::xoption& flags, ostream& oss=std::cout);  //CO20201105
   void print_corrections(xstructure& structure, aurostd::xoption& flags, aurostd::xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss=std::cout);
-  void print_corrections(aurostd::xoption& flags, std::istream& ist); // ME20200213
+  void print_corrections(aurostd::xoption& flags, std::istream& ist, ostream& oss=std::cout); // ME20200213 //CO20201105
   void print_cation_coordination_numbers(aurostd::xoption& flags, std::istream& ist, ostream& oss=std::cout);
   void print_oxidation_numbers(aurostd::xoption& flags, std::istream& ist, ostream& oss=std::cout);
   vector<double> calculate_corrections(const string& directory_path);

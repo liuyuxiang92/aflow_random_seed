@@ -2434,11 +2434,11 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
   if(!(xvasp.AVASP_flag_RUN_STATIC==TRUE || xvasp.AVASP_flag_RUN_STATIC_BANDS==TRUE)){
     if(xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_TYPE")){  //CO20180214
       aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]RELAX_"+xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::RELAX_TYPE"),_aflowinpad_);
-      aflowin << "// ALL | IONS | CELL_SHAPE | CELL_VOLUME | IONS_CELL_VOLUME " << endl;
+      aflowin << "// ALL | IONS | CELL_SHAPE | CELL_VOLUME | IONS_CELL_VOLUME | IONS_CELL_SHAPE " << endl;
     } else {
       if(xvasp.aopts.flag("FLAG::VOLUME_PRESERVED")==FALSE){
         aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]RELAX_ALL",_aflowinpad_);
-        aflowin << "// ALL | IONS | CELL_SHAPE | CELL_VOLUME | IONS_CELL_VOLUME " << endl;
+        aflowin << "// ALL | IONS | CELL_SHAPE | CELL_VOLUME | IONS_CELL_VOLUME | IONS_CELL_SHAPE " << endl;
       } //CO20181226 - melding from below - I am interpreting this as: if not volume_preserved, then you probably want RELAX_ALL
     }
     // RELAX_MODE
@@ -4152,7 +4152,7 @@ bool AVASP_MakeSingleAFLOWIN_20180101(_xvasp& xvasp_in,stringstream &_aflowin,bo
   // RELAX_TYPE
   if(xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_TYPE")){  //CO20180214
     aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]RELAX_"+xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::RELAX_TYPE"),_aflowinpad_);
-    aflowin << "// ALL | IONS | CELL_SHAPE | CELL_VOLUME | IONS_CELL_VOLUME " << endl;
+    aflowin << "// ALL | IONS | CELL_SHAPE | CELL_VOLUME | IONS_CELL_VOLUME | IONS_CELL_SHAPE " << endl;
   } else {
     // RELAX_MODE
     if(xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_MODE")) {

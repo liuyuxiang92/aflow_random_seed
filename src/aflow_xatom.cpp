@@ -11202,7 +11202,7 @@ void xstructure::NiggliUnitCellForm(void) {
     FixLattices();
     Niggli_has_failed=FALSE;
   } else {
-    if(!XHOST.QUIET) cout << "00000  MESSAGE NIGGLI Form already Calculated: skipping" << endl;
+    if(!XHOST.QUIET) cout << XPID << "00000  MESSAGE NIGGLI Form already Calculated: skipping" << endl;
   }
 }
 
@@ -11262,7 +11262,7 @@ void xstructure::MinkowskiBasisReduction(void) {
     Minkowski_calculated=TRUE;
     Minkowski_has_failed=FALSE;
   } else {
-    //    if(!QUIET) cout << "00000  MESSAGE MINKOWSKI Basis Reduction already Calculated: skipping" << endl;
+    //    if(!QUIET) cout << XPID << "00000  MESSAGE MINKOWSKI Basis Reduction already Calculated: skipping" << endl;
   }
 }
 
@@ -11308,7 +11308,7 @@ void xstructure::LatticeReduction(void) {
     LatticeReduction_calculated=TRUE;
     LatticeReduction_has_failed=FALSE;
   } else {
-    //   if(!QUIET) cout << "00000  MESSAGE LATTICE Basis Reduction already Calculated: skipping" << endl;
+    //   if(!QUIET) cout << XPID << "00000  MESSAGE LATTICE Basis Reduction already Calculated: skipping" << endl;
   }
 }
 

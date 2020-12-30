@@ -1,5 +1,16 @@
-3.2.6 - 2020/09/25
-        Location: http://materials.duke.edu/AFLOW/aflow.3.2.5.tar.xz
+3.2.6 - 2020/xx/xx
+        Location: http://materials.duke.edu/AFLOW/aflow.3.2.6.tar.xz
+        -- Added functionality to plot thermodynamic properties calculated by QHA with the SJ EOS model. (AS)
+        -- Added processing of QHA data to LIB2LIB and LIB2RAW. (AS)
+        -- Added a feature to employ fixed volume relaxation of QHA subcalculations. (AS)
+        -- Added a JSONwriter class to output data in JSON format. (AS)
+        -- adding KBIN::WaitFinished() after VASP runs to allow NFS to catch up (CO)
+        -- setting _KVASP_CHECK_SLEEP_ to 30 seconds (CO)
+        -- created rc parameter VASP_CHECK_SLEEP (CO)
+        -- checking if VASP output files printed correctly, retrying if it fails (CO)
+        -- exiting with error if VASP output files are corrupted after full aflow run (CO)
+        -- removing POSCAR.orig from --xplug check, it's already in the aflow.in (CO)
+        -- adding --force to LIB2LIB (CO)
         -- added check_prototype_generator (and --PrototypeGenerator_test) to the Makefile to ensure all AFLOW prototypes can be generated (DX)
         -- updated README_AFLOW_ANRL.TXT with symbolic prototype generator info (DX)
         -- added --space_group=|--sg= flag to compare database entries; can handle multiple space group inputs (DX)

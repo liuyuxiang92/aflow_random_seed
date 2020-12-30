@@ -130,6 +130,8 @@ template<class utype> bool initialize_scalar(utype d) {
   opt.getattachedutype<utype>("");
   opt.args2addattachedscheme<utype>(vs,vs,"","",u);
   opt.args2addattachedscheme<utype>(vs,"","",u);
+
+  aurostd::JSONwriter jw; jw.addNumber("", d);//AS20201217
   return (o<0);
 }
 
@@ -517,6 +519,10 @@ bool initialize_templates_never_call_this_procedure(bool flag) {
     mxdouble=xmatrixutype2double(mxint);  //CO20191201
     mxint=xmatrixdouble2utype<int>(mxdouble);   //CO20191201
     vector<int> vi;getElements("MnPd",vi);getElements("MnPd",vi,pp_string);getElements("MnPd",vi,pp_string,FileMESSAGE); //CO20200624
+    aurostd::JSONwriter jwi; jwi.addVector("",vi);//AS20201217
+    deque<int> di; jwi.addVector("",di);//AS20201217
+    vector<vector<int> > vvi; jwi.addMatrix("",vvi);//AS20201217
+    deque<deque<int> > ddi; jwi.addMatrix("",ddi);
 #endif
 #ifdef AUROSTD_INITIALIZE_UINT
     o+=aurostd::string2utype<uint>(aurostd::utype2string<uint>(uint())+aurostd::utype2string<uint>(uint(),int()));
@@ -529,6 +535,10 @@ bool initialize_templates_never_call_this_procedure(bool flag) {
     mxdouble=xmatrixutype2double(mxuint);  //CO20191201
     mxuint=xmatrixdouble2utype<uint>(mxdouble);   //CO20191201
     vector<uint> vui;getElements("MnPd",vui);getElements("MnPd",vui,pp_string);getElements("MnPd",vui,pp_string,FileMESSAGE); //CO20200624
+    aurostd::JSONwriter jwui; jwui.addVector("",vui);//AS20201217
+    deque<uint> dui; jwui.addVector("",dui);//AS20201217
+    vector<vector<uint> > vvui; jwui.addMatrix("",vvui);//AS20201217
+    deque<deque<uint> > ddui; jwui.addMatrix("",ddui);//AS20201217
 #endif
 #ifdef AUROSTD_INITIALIZE_FLOAT
     if(1) { // AUROSTD_INITIALIZE_FLOAT
