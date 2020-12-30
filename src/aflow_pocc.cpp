@@ -883,6 +883,8 @@ namespace pocc {
     unsigned long long int isupercell=0;
     for(std::list<POccSuperCellSet>::iterator it=l_supercell_sets.begin();it!=l_supercell_sets.end();++it){
       isupercell=std::distance(l_supercell_sets.begin(),it);
+      if(LDEBUG){cerr << soliloquy << " degeneracy[isupercell=" << isupercell << "]=" << (*it).getDegeneracy() << endl;}
+      if(LDEBUG){cerr << soliloquy << " m_energy_dft[isupercell=" << isupercell << "]=" << (*it).m_energy_dft << endl;}
       (*it).m_probability=(*it).getDegeneracy()*exp( -( (*it).m_energy_dft-m_energy_dft_ground ) / (KBOLTZEV*temperature) ) / denom;
       prob_total+=(*it).m_probability;
       if(LDEBUG){cerr << soliloquy << " prob[isupercell=" << isupercell << "]=" << (*it).m_probability << endl;}
@@ -943,7 +945,7 @@ namespace pocc {
     if(m_ARUN_directories.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_ARUN_directories.size()==0",_RUNTIME_ERROR_);}
     if(m_ARUN_directories.size()!=l_supercell_sets.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_ARUN_directories.size()!=l_supercell_sets.size()",_RUNTIME_ERROR_);}
 
-    setPOccStructureProbabilities(temperature);
+    setPOccStructureProbabilities(temperature); //done in calculateRELAXProperties() - repetita iuvant
 
     xDOSCAR xdoscar;
     string DOSCAR_file="";
@@ -1105,6 +1107,37 @@ namespace pocc {
     if(LDEBUG){cerr << soliloquy << " END" << endl;}
   }
 
+  void POccCalculator::calculateRELAXProperties(double temperature){
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
+    string soliloquy=XPID+"POccCalculator::calculateRELAXProperties():";
+
+    if(m_ARUN_directories.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_ARUN_directories.size()==0",_RUNTIME_ERROR_);}
+
+    //get most relaxed outcar
+    uint i=0,max=10,max_found=0;
+    for(i=max;i<=max;i--){
+      if(aurostd::EFileExist(m_aflags.Directory+"/"+m_ARUN_directories[0]+"/OUTCAR.relax"+aurostd::utype2string(i))){
+        max_found=i;
+        break;
+      }
+    }
+    if(max_found==0){return;} //no runs completed
+
+    string OUTCAR_relax="OUTCAR.relax"+aurostd::utype2string(max_found);
+    if(LDEBUG){cerr << soliloquy << " OUTCAR_relax=" << OUTCAR_relax << endl;}
+
+    bool found_all_OUTCARs=true;
+    for(unsigned long long int isupercell=0;isupercell<m_ARUN_directories.size()&&found_all_OUTCARs==true;isupercell++){
+      if(!aurostd::EFileExist(m_aflags.Directory+"/"+m_ARUN_directories[isupercell]+"/"+OUTCAR_relax)){
+        if(LDEBUG){cerr << soliloquy << " " << OUTCAR_relax << " not found in "+m_ARUN_directories[isupercell] << endl;}
+        found_all_OUTCARs=false;
+      }
+    }
+    if(!found_all_OUTCARs){return;}
+
+    setPOccStructureProbabilities(temperature);
+  }
+
   void POccCalculator::calculateSTATICProperties(double temperature){
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     string soliloquy=XPID+"POccCalculator::calculateSTATICProperties():";
@@ -1114,7 +1147,6 @@ namespace pocc {
     bool found_all_OUTCARs=true;
     for(unsigned long long int isupercell=0;isupercell<m_ARUN_directories.size()&&found_all_OUTCARs==true;isupercell++){
       if(!aurostd::EFileExist(m_aflags.Directory+"/"+m_ARUN_directories[isupercell]+"/OUTCAR.static")){
-        cerr << m_aflags.Directory+"/"+m_ARUN_directories[isupercell]+"/OUTCAR.static" << endl;
         if(LDEBUG){cerr << soliloquy << " OUTCAR.static not found in "+m_ARUN_directories[isupercell] << endl;}
         found_all_OUTCARs=false;
       }
@@ -1512,18 +1544,19 @@ namespace pocc {
       aurostd::RemoveFile(m_aflags.Directory+"/"+POCC_FILE_PREFIX+POCC_OUT_FILE); //clear file
       writeResults(); //write temperature-independent properties first
       for(uint itemp=0;itemp<v_temperatures.size();itemp++){
+        calculateRELAXProperties(v_temperatures[itemp]);
         calculateSTATICProperties(v_temperatures[itemp]);
         writeResults(v_temperatures[itemp]);  //write temperature-dependent properties next
       }
     }
-    if (m_kflags.KBIN_PHONONS_CALCULATION_AEL) {
+    if (m_kflags.KBIN_PHONONS_CALCULATION_AEL) { //CT20200319
       if(LDEBUG){cerr << soliloquy << "Running AEL postprocessing" << endl;}
       calculateElasticProperties(v_temperatures);
-    } //CT20200319
-    if (m_kflags.KBIN_PHONONS_CALCULATION_AGL) {
+    }
+    if (m_kflags.KBIN_PHONONS_CALCULATION_AGL) { //CT20200323
       if(LDEBUG){cerr << "Running AGL postprocessing" << endl;}
       calculateDebyeThermalProperties(v_temperatures);
-    } //CT20200323
+    }
 
     //END: TEMPERATURE DEPENDENT PROPERTIES
 

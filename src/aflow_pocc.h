@@ -650,6 +650,7 @@ namespace pocc {
       bool QMVASPsFound() const;
       void setDFTEnergies();
       void setEFA();
+      void calculateRELAXProperties(double temperature=300);
       void calculateSTATICProperties(double temperature=300);
       void setPOccStructureProbabilities(double temperature=300); //room temperature
       string getTemperatureString(double temperature) const;
