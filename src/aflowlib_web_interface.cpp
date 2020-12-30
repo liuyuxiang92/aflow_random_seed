@@ -4644,6 +4644,7 @@ namespace aflowlib {
       vflags.flag("FLAG::AGL",FALSE);            // will setup later
       vflags.flag("FLAG::AEL",FALSE);            // will setup later
       vflags.flag("FLAG::BADER",FALSE);          // will setup later
+      vflags.flag("FLAG::POCC",FALSE);           // will setup later  //CO20201220
 
       // check if ICSD inside (anyway)
       string lattices[]={"BCC","BCT","CUB","FCC","HEX","MCL","MCLC","ORC","ORCC","ORCF","ORCI","RHL","TET","TRI"};
@@ -4922,6 +4923,8 @@ namespace aflowlib {
         vflags.flag("FLAG::AGL",aurostd::substring2bool(aentry.vloop,"agl"));
         vflags.flag("FLAG::AEL",aurostd::substring2bool(aentry.vloop,"ael"));
         vflags.flag("FLAG::BADER",aurostd::substring2bool(aentry.vloop,"bader"));
+        vflags.flag("FLAG::POCC",aurostd::substring2bool(aentry.vloop,"pocc")); //CO20201220
+        if(vflags.flag("FLAG::POCC")){vflags.flag("FLAG::JMOL",FALSE);} //CO20201220 - no POSCAR/CIF to plot for PARTCAR (yet)
       }
       stringstream aflowlib_json;
       if(vflags.flag("FLAG::FOUND")) {
