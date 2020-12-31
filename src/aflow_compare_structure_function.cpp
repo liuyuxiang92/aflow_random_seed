@@ -6187,12 +6187,6 @@ void XtalFinderCalculator::latticeSearch(
               if(vstrs_matched[p].misfit<=match_info.misfit){
                 match_info = vstrs_matched[p];
                 match_info.origin_shift += shift_xstr1; //DX20201215 + or -?
-                //match_info.basis_transformation=vstrs_matched[p].basis_transformation;
-                //match_info.rotation=vstrs_matched[p].rotation;
-                //match_info.origin_shift = vstrs_matched[p].origin_shift;
-                //match_info.atom_map = vstrs_matched[p].atom_map;
-                //match_info.basis_map = vstrs_matched[p].basis_map;
-                //match_info.distances_mapped = vstrs_matched[p].distances_mapped;
               }
             }
 
@@ -6237,6 +6231,9 @@ void XtalFinderCalculator::latticeSearch(
   //}
 }
 
+// ***************************************************************************
+// compare::supercell2newRepresentation() //DX20201231
+// ***************************************************************************
 namespace compare {
   xstructure supercell2newRepresentation(const xstructure& xstr_supercell, const xmatrix<double>& lattice){
       // ---------------------------------------------------------------------------
