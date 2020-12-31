@@ -6458,10 +6458,12 @@ namespace aflowlib {
       }
     }
     //CO20201220 START - look for stress tensor
-    if(ok) {
+    bool check_stensor=true;
+    if(dir.find("ARUN.AEL")!=string::npos||dir.find("ARUN.AGL")!=string::npos){check_stensor=false;}  //do not check stensor for AEL_AGL calculations
+    if(ok && check_stensor) {
       bool found=false;
       deque<string> vtokens;
-      deque<double> tensor_stress;
+      deque<double> stensor;
       for(uint irelax=vrelax.size()-1;irelax<vrelax.size()&&!found;irelax--) {  //go backwards
         if(vrelax[irelax].find("relax")==string::npos){continue;}
         for(uint iext=1;iext<XHOST.vext.size()&&!found;iext++) { // SKIP uncompressed
@@ -6471,12 +6473,12 @@ namespace aflowlib {
             aurostd::string2tokens(aurostd::execute2string(XHOST.vcat[iext]+" \""+dir+"/OUTCAR"+vrelax[irelax]+XHOST.vext[iext]+"\" | grep 'in kB' | tail -1"),vtokens," ");
             if(vtokens.size()==0){ ok=FALSE;obb << ". error(no stress tensor found)=OUTCAR"+vrelax[irelax]+".EXT";continue; }
             for(uint i=0;i<vtokens.size();i++){
-              if(aurostd::isfloat(vtokens[i])){tensor_stress.push_back(aurostd::string2utype<double>(vtokens[i]));}
+              if(aurostd::isfloat(vtokens[i])){stensor.push_back(aurostd::string2utype<double>(vtokens[i]));}
             }
-            if(LDEBUG){cerr << soliloquy << " tensor_stress=" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(tensor_stress,6),",") << endl;}
-            if(tensor_stress.size()!=6){ ok=FALSE;obb << ". error(stress_tensor.size()==" << tensor_stress.size() << ")=OUTCAR"+vrelax[irelax]+".EXT";continue; }
-            for(uint i=0;i<tensor_stress.size();i++){
-              if(abs(tensor_stress[i])>10){ ok=FALSE;obb << ". error(abs(stress_tensor[i=" << i << "])==" << abs(tensor_stress[i]) << ">10kB)=OUTCAR"+vrelax[irelax]+".EXT";continue; }
+            if(LDEBUG){cerr << soliloquy << " stensor=" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(stensor,6),",") << endl;}
+            if(stensor.size()!=6){ ok=FALSE;obb << ". error(stress_tensor.size()==" << stensor.size() << ")=OUTCAR"+vrelax[irelax]+".EXT";continue; }
+            for(uint i=0;i<stensor.size();i++){
+              if(abs(stensor[i])>10){ ok=FALSE;obb << ". error(abs(stress_tensor[i=" << i << "])==" << abs(stensor[i]) << ">10kB)=OUTCAR"+vrelax[irelax]+".EXT";continue; }
             }
           }
         }
