@@ -6942,7 +6942,7 @@ namespace compare{
         // ---------------------------------------------------------------------------
         // if the volume change is not an integer, the basis transformation may include a deformation
         // component which must be removed
-        if(!aurostd::isinteger(aurostd::det(basis_transformation_tmp))){
+        if(!aurostd::isinteger(aurostd::det(basis_transformation_tmp)) && aurostd::det(basis_transformation_tmp) > 1.0){
           PolarDecomposition(basis_transformation_tmp, basis_transformation, deformation);
         }
         else{
@@ -7041,7 +7041,7 @@ namespace compare{
       // ---------------------------------------------------------------------------
       // if the volume change is not an integer, the basis transformation may include a deformation
       // component which must be removed
-      if(!aurostd::isinteger(aurostd::det(basis_transformation_tmp))){
+      if(!aurostd::isinteger(aurostd::det(basis_transformation_tmp)) && aurostd::det(basis_transformation_tmp) > 1.0){
         PolarDecomposition(basis_transformation_tmp, basis_transformation, deformation);
       }
       else{
