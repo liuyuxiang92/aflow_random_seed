@@ -6168,23 +6168,10 @@ void XtalFinderCalculator::latticeSearch(
             uint start_index=0;
             uint end_index=vstrs_matched_transformed.size();  //DX20191107 switching end point convention
             if(LDEBUG){cerr << function_name << " Searching for possible matching structures [NON-THREADED VERSION]" << endl;}
-            //structureSearch(lfa_str2,all_nn1,xstr_supercell,vvprotos[n],xstr1_for_thread[n],type_match,possible_minMis[n],
-            //                lattices,clattices,latt_devs,optimize_match,start_index,end_index);
-            //compare::commonOriginSearch2(
-            //    xstr1_for_thread[n],
-            //    all_nn1,
-            //    xstr2, //DX20201208
-            //    lfa_str2,
-            //    type_match,
-            //    vstrs_matched_transformed,
-            //    start_index,
-            //    end_index,
-            //    optimize_match);
             searchAtomMappings(
                 xstr1_for_thread[n],
                 all_nn1,
                 xstr2, //DX20201208
-                all_nn2,
                 lfa_str2,
                 lattices
                 vstrs_matched,
@@ -6361,7 +6348,6 @@ bool XtalFinderCalculator::searchAtomMappings(
 
     xstr2_tmp = xstr2;
     all_nn2_test.clear();
-
 
     // ---------------------------------------------------------------------------
     // two possible comparison methods
