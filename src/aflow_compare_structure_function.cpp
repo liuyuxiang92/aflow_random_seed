@@ -130,7 +130,7 @@ void XtalFinderCalculator::getOptions(
 
   // ---------------------------------------------------------------------------
   // FLAG: get AFLOW ANRL designation for unique structures
-  if(vpflow.flag("COMPARE_DATABASE_ENTRIES::ADD_AFLOW_PROTOTYPE_DESIGNATION")) {
+  if(vpflow.flag("COMPARE::ADD_AFLOW_PROTOTYPE_DESIGNATION")) {
     comparison_options.flag("COMPARISON_OPTIONS::ADD_AFLOW_PROTOTYPE_DESIGNATION",TRUE);
     message << "OPTIONS: Cast unique structures into AFLOW standard designation.";
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
@@ -138,7 +138,7 @@ void XtalFinderCalculator::getOptions(
 
   // ---------------------------------------------------------------------------
   // FLAG: UNDECORATED
-  if(vpflow.flag("COMPARE_DATABASE_ENTRIES::UNDECORATED_COMPARISON")) {
+  if(vpflow.flag("COMPARE::UNDECORATED_COMPARISON")) {
     comparison_options.flag("COMPARISON_OPTIONS::UNDECORATED_COMPARISON",TRUE);
     message << "OPTIONS: Undecorated comparison; compare structures as if they had one atom-type.";
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);

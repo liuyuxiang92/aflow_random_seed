@@ -772,16 +772,18 @@ vector<StructurePrototype> XtalFinderCalculator::compare2prototypes(
 
   vector<StructurePrototype> all_structures;
 
+  cerr << "xstr.space_group_ITC: " << xstr.space_group_ITC << endl;
+  cerr << "comparison_options.flag(\"COMPARISON_OPTIONS::IGNORE_SYMMETRY\"): " << comparison_options.flag("COMPARISON_OPTIONS::IGNORE_SYMMETRY") << endl;
   // ---------------------------------------------------------------------------
   // symmetry
   if(!comparison_options.flag("COMPARISON_OPTIONS::IGNORE_SYMMETRY") && (xstr.space_group_ITC<1 || xstr.space_group_ITC>230)){ //DX20190829 - don't recalculate symmetry if already calculated //DX20191220 - put range instead of ==0
     calculateSymmetries(1);  //1: one structure -> one processor
   }
   else if(!comparison_options.flag("COMPARISON_OPTIONS::IGNORE_SYMMETRY") && xstr.space_group_ITC>=1 && xstr.space_group_ITC<=230){ //DX20191220 - put range instead of !=0
-    setSymmetryPlaceholders();
+    getSymmetryInfoFromXstructure(structure_containers[0]);
   }
   else{
-    getSymmetryInfoFromXstructure(structure_containers[0]);
+    setSymmetryPlaceholders();
   }
 
   if(LDEBUG) {
