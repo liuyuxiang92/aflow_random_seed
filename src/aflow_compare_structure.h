@@ -298,6 +298,7 @@ class XtalFinderCalculator : public xStream {
     void calculateSymmetries(uint num_proc);
     void calculateSpaceGroups(uint start_index=0, uint end_index=AUROSTD_MAX_UINT, uint setting=0); //DX20191230 added setting
     void setSymmetryPlaceholders();
+    void getSymmetryInfoFromXstructure(structure_container& str_rep); //DX20210104
     // ---------------------------------------------------------------------------
     // analyze environment
     bool isLFAEnvironmentCalculated(structure_container& structure);

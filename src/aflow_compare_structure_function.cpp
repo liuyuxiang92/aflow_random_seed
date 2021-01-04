@@ -695,6 +695,20 @@ void XtalFinderCalculator::calculateSymmetry(structure_container& str_rep){
 }
 
 // ***************************************************************************
+// XtalFinderCalculator::getSymmetryInfoFromXstructure() //DX20210104
+// ***************************************************************************
+void XtalFinderCalculator::getSymmetryInfoFromXstructure(structure_container& str_rep){
+
+  // Get the symmetry info from xstructure
+
+  str_rep.Pearson = "";
+  str_rep.space_group = str_rep.structure.space_group_ITC;
+  vector<GroupedWyckoffPosition> tmp_grouped_Wyckoff_positions;
+  compare::groupWyckoffPositions(str_rep.structure, tmp_grouped_Wyckoff_positions);
+  str_rep.grouped_Wyckoff_positions = tmp_grouped_Wyckoff_positions;
+}
+
+// ***************************************************************************
 // XtalFinderCalculator::addStructure2container()
 // ***************************************************************************
 void XtalFinderCalculator::addStructure2container(

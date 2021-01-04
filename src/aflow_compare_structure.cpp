@@ -591,7 +591,7 @@ namespace compare {
 
     // ---------------------------------------------------------------------------
     // do not calculate unique atom decorations
-    vpflow.flag("COMPARE2PROTOTYPES::DO_NOT_CALCULATE_UNIQUE_PERMUTATIONS",TRUE);
+    vpflow.flag("COMPARISON_OPTIONS::DO_NOT_CALCULATE_UNIQUE_PERMUTATIONS",TRUE);
 
     // ---------------------------------------------------------------------------
     // quiet output
@@ -694,7 +694,7 @@ string XtalFinderCalculator::printMatchingPrototypes(xstructure& xstr, const aur
   // ---------------------------------------------------------------------------
   // FLAG: print format
   bool screen_only = false;
-  if(vpflow.flag("COMPARE2PROTOTYPES::SCREEN_ONLY")) {
+  if(vpflow.flag("COMPARISON_OPTIONS::SCREEN_ONLY")) {
     screen_only=true;
   }
   //DX20190425 - added screen only flag - END
@@ -780,6 +780,9 @@ vector<StructurePrototype> XtalFinderCalculator::compare2prototypes(
   else if(!comparison_options.flag("COMPARISON_OPTIONS::IGNORE_SYMMETRY") && xstr.space_group_ITC>=1 && xstr.space_group_ITC<=230){ //DX20191220 - put range instead of !=0
     setSymmetryPlaceholders();
   }
+  else{
+    getSymmetryInfoFromXstructure(structure_containers[0]);
+  }
 
   if(LDEBUG) {
     cerr << function_name << " Wyckoff positions of input structure:" << endl;
@@ -814,7 +817,8 @@ vector<StructurePrototype> XtalFinderCalculator::compare2prototypes(
   }
   // find prototypes based on stoichiometry, space group, and Wyckoff positions only (recommended/default)
   else {
-    message << "Load prototypes with the same stoichiometry, space group, and Wyckoff positions as the input.";
+    message << "Load prototypes with the same stoichiometry (" << aurostd::joinWDelimiter(stoichiometry,":") << ")"
+      << ", space group (" << space_group_num << "), and Wyckoff positions as the input.";
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
     vlabel = aflowlib::GetPrototypesBySymmetry(stoichiometry, space_group_num, grouped_Wyckoff_positions, prototype_space_groups, SG_SETTING_ANRL, catalog);
   }
@@ -2244,12 +2248,12 @@ vector<StructurePrototype> XtalFinderCalculator::compareMultipleStructures(
 
     // ---------------------------------------------------------------------------
     // specify number of processors
-    vpflow_protos.flag("COMPARE2PROTOTYPES::NP",TRUE);
-    vpflow_protos.push_attached("COMPARE2PROTOTYPES::NP",aurostd::utype2string<uint>(num_proc));
+    vpflow_protos.flag("COMPARISON_OPTIONS::NP",TRUE);
+    vpflow_protos.push_attached("COMPARISON_OPTIONS::NP",aurostd::utype2string<uint>(num_proc));
 
     // ---------------------------------------------------------------------------
     // do not calculate unique atom decorations since this was already done
-    vpflow_protos.flag("COMPARE2PROTOTYPES::DO_NOT_CALCULATE_UNIQUE_PERMUTATIONS",TRUE);
+    vpflow_protos.flag("COMPARISON_OPTIONS::DO_NOT_CALCULATE_UNIQUE_PERMUTATIONS",TRUE);
 
     // ---------------------------------------------------------------------------
     // match to AFLOW prototypes
