@@ -5734,38 +5734,46 @@ namespace pocc {
       for(uint i=0;i<types2pc_map.size();i++){species.push_back(elements_std[i]);}
       if(LDEBUG) {cerr << soliloquy << " species_std         =" << aurostd::joinWDelimiter(species,",") << endl;}
 
-      //this section of the code is complicated, there are two layers of mapping occurring at once
-      //in resorting the elements_set
-      bool resort_standard_elements_set=false;  //the approach here is WRONG, we need structure comparison
+      //RENAMING SPECIES TO ELIMINATE CHEMISTRY-SPECIFIC UFF ENERGIES
+      //this code is technically a hack and does NOT work in general: true fix is structure comparison
+      //the biggest problem: the parent structure defines the volume for the cluster used to find the UFF energies
+      //the volume defines the bond distances and thus which pairs are bonded/non-bonded
+      //we need to make sure the parent structure is re-decorated as consistently as possible given different input decorations
+      //useful test:
+      // Ba_svHf_pvNb_svOSnTi_svZr_sv:PAW_PBE/AB3C_cP5_221_a_c_b.BAC:POCC_S0-1xD_P3-1xA_P4-0.2xB-0.2xC-0.2xE-0.2xF-0.2xG
+      // vs.
+      // Ba_svHf_pvOSnTi_svY_svZr_sv:PAW_PBE/AB3C_cP5_221_a_c_b.BAC:POCC_S0-1xC_P3-1xA_P4-0.2xB-0.2xD-0.2xE-0.2xF-0.2xG
+      bool resort_standard_elements_set=true;  //the approach here is WRONG, we need structure comparison
       if(resort_standard_elements_set==true){
+        uint site=0,itype=0,occ=0;
         vector<string> species_orig;  //keep orig species
         for(uint i=0;i<species.size();i++){species_orig.push_back(species[i]);}
-        vector<uint> occupant2species_map;  //maps occupants (m_pocc_sites) to species (types) in order of m_pocc_sites
+        vector<uint> occupant2species_map;  //maps occupants (m_pocc_sites) to species (types) in order of m_pocc_sites, NOT NEEDED
         species.clear();species.resize(species_orig.size());  //make room for species before you fill, need occupant2species_map to dictate where new species go
         vector<POccUnit> m_pocc_sites_resorted;   //make copy of m_pocc_sites for reshuffling
-        for(uint site=0;site<m_pocc_sites.size();site++){
-          for(uint occ=0;occ<m_pocc_sites[site].v_occupants.size();occ++){occupant2species_map.push_back(m_pocc_sites[site].v_types[occ]);}
+        for(site=0;site<m_pocc_sites.size();site++){
+          for(occ=0;occ<m_pocc_sites[site].v_occupants.size();occ++){occupant2species_map.push_back(m_pocc_sites[site].v_types[occ]);}
           m_pocc_sites_resorted.push_back(m_pocc_sites[site]);
         }
         if(LDEBUG) {
           cerr << soliloquy << " occupant2species_map=" << aurostd::joinWDelimiter(occupant2species_map,",") << endl;
           cerr << soliloquy << " original m_pocc_sites" << endl;
-          for(uint site=0;site<m_pocc_sites_resorted.size();site++){
+          for(site=0;site<m_pocc_sites_resorted.size();site++){
             cerr << soliloquy << " site=" << site << " occupants: ";
-            for(uint occ=0;occ<m_pocc_sites_resorted[site].v_occupants.size();occ++){
+            for(occ=0;occ<m_pocc_sites_resorted[site].v_occupants.size();occ++){
               cerr << xstr_pocc.atoms[m_pocc_sites_resorted[site].v_occupants[occ]].name << " ";
             }
             cerr << endl;
           }
         }
 
-        std::stable_sort(m_pocc_sites_resorted.begin(),m_pocc_sites_resorted.end(),sortPOccSites);
+        std::stable_sort(m_pocc_sites_resorted.rbegin(),m_pocc_sites_resorted.rend(),sortPOccSites);  //ascending order, fewer occupant-sites get populated first (sublattice anions)
 
         if(LDEBUG) {
           cerr << soliloquy << " sorted m_pocc_sites" << endl;
-          for(uint site=0;site<m_pocc_sites_resorted.size();site++){
+          for(site=0;site<m_pocc_sites_resorted.size();site++){
             cerr << soliloquy << " site=" << site << " occupants: ";
-            for(uint occ=0;occ<m_pocc_sites_resorted[site].v_occupants.size();occ++){
+            for(occ=0;occ<m_pocc_sites_resorted[site].v_occupants.size();occ++){
               cerr << xstr_pocc.atoms[m_pocc_sites_resorted[site].v_occupants[occ]].name << " ";
             }
             cerr << endl;
@@ -5775,13 +5783,47 @@ namespace pocc {
         uint iocc2spec=0;
         vector<uint> types_added;
         uint type=0;
-        for(uint site=0;site<m_pocc_sites_resorted.size();site++){
-          for(uint itype=0;itype<m_pocc_sites_resorted[site].v_types.size();itype++){
+
+        //0. prioritize anions to preserve the sublattice
+        vector<string> vanions;
+        aurostd::string2tokens("B,C,N,O",vanions,",");
+        for(site=0;site<m_pocc_sites_resorted.size();site++){
+          if(m_pocc_sites_resorted[site].v_types.size()!=m_pocc_sites_resorted[site].v_occupants.size()){
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_pocc_sites_resorted[site].v_types.size()!=m_pocc_sites_resorted[site].v_occupants.size()",_RUNTIME_ERROR_);
+          }
+          for(itype=0;itype<m_pocc_sites_resorted[site].v_types.size();itype++){
             type=m_pocc_sites_resorted[site].v_types[itype];
-            if(LDEBUG) {cerr << soliloquy << " type=" << type << endl;}
+            const string& occupant=xstr_pocc.atoms[m_pocc_sites_resorted[site].v_occupants[itype]].name;
+            if(!aurostd::WithinList(types_added,type) && aurostd::WithinList(vanions,occupant)){
+              if(LDEBUG){cerr << soliloquy << " mapping " << occupant << " to " << species_orig[iocc2spec] << endl;}
+              species[type]=species_orig[iocc2spec++];
+              types_added.push_back(type);
+            }
+          }
+        }
+
+        //1. prioritize the first occupant of every site, these occupants will define the parent lattice volume (and thus bond lengths)
+        for(site=0;site<m_pocc_sites_resorted.size();site++){
+          itype=0;
+          type=m_pocc_sites_resorted[site].v_types[itype];
+          const string& occupant=xstr_pocc.atoms[m_pocc_sites_resorted[site].v_occupants[itype]].name;
+          if(!aurostd::WithinList(types_added,type)){
+            if(LDEBUG){cerr << soliloquy << " mapping " << occupant << " to " << species_orig[iocc2spec] << endl;}
+            species[type]=species_orig[iocc2spec++];
+            types_added.push_back(type);
+          }
+        }
+
+        //LAST. get remaining species
+        for(site=0;site<m_pocc_sites_resorted.size();site++){
+          for(itype=0;itype<m_pocc_sites_resorted[site].v_types.size();itype++){
+            type=m_pocc_sites_resorted[site].v_types[itype];
+            const string& occupant=xstr_pocc.atoms[m_pocc_sites_resorted[site].v_occupants[itype]].name;
             if(!aurostd::WithinList(types_added,type)){
+              if(LDEBUG){cerr << soliloquy << " mapping " << occupant << " to " << species_orig[iocc2spec] << endl;}
               //species[occupant2species_map[iocc2spec++]]=species_orig[type];
-              species[type]=species_orig[occupant2species_map[iocc2spec++]];
+              //species[type]=species_orig[occupant2species_map[iocc2spec++]];
+              species[type]=species_orig[iocc2spec++];
               types_added.push_back(type);
             }
           }

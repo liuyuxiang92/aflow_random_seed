@@ -18,6 +18,7 @@
         -- redirected fancy print to appropriate stream (CO)
         -- added support for new pocc database entries in _aflowlib_entry (CO)
         -- added support for non-static pocc runs (CO)
+        -- more robust patch to chemistry-specific UFF energies (CO)
 3.2.5 - 2020/09/25
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.5.tar.xz
         -- patched convert issue: security policy 'PDF' blocking conversion (SC)
