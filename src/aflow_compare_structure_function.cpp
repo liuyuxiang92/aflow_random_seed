@@ -3861,7 +3861,7 @@ vector<StructurePrototype> XtalFinderCalculator::runComparisonScheme(
     number_of_comparisons=0;
     for(uint i=0;i<comparison_schemes.size();i++){ number_of_comparisons += comparison_schemes[i].numberOfComparisons(); }
     if(LDEBUG){ cerr << function_name << " number_of_comparisons: " << number_of_comparisons << endl; }
-    //num_comparison_threads = 1; //DX FORCE FOR TESTING aurostd::min(num_proc,number_of_comparisons);
+    num_comparison_threads = aurostd::min(num_proc,number_of_comparisons);
 
     if(number_of_comparisons>0){
       if(!quiet){
