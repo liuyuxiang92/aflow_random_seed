@@ -406,13 +406,10 @@ namespace xelement {
 
   xelement::xelement(const string& element) {free();populate(element);}  //CO20200520
   xelement::xelement(uint ZZ) {free();populate(ZZ);} //CO20200520
-
+  
   // ********************************************************************************************************************************************************
-  // populate by name or symbol
-  void xelement::populate(const string& element) {  //CO20200520
-    free();
-    // DEFAULT
-    verbose=FALSE;
+  // check if input is element
+  uint xelement::isElement(const string& element) const {  //CO20200520
     uint Z=0;
 
     // try with symbol
@@ -425,8 +422,17 @@ namespace xelement {
       for(uint i=1;i<=103&&Z==0;i++)  //CO20200520
         if(aurostd::toupper(element)==aurostd::toupper(xelement(i).name)) Z=i;
     }
+    return Z;
+  }
+
+  // ********************************************************************************************************************************************************
+  // populate by name or symbol
+  void xelement::populate(const string& element) {  //CO20200520
+    free();
+    // DEFAULT
+    verbose=FALSE;
+    uint Z=isElement(element);
     if(Z!=0) {(*this)=xelement(Z);return;}  //CO20200520
-    
     throw aurostd::xerror(_AFLOW_FILE_NAME_,"xelement::xelement():","Element symbol/name does not exist: "+element,_VALUE_ILLEGAL_); //CO20200520
   }
 

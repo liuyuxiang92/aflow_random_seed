@@ -4656,6 +4656,7 @@ namespace xelement {
       ~xelement();                                           // kill everything
       const xelement& operator=(const xelement &b);          // copy
       void clear();
+      uint isElement(const string& element) const;  //CO20201220
       void populate(const string& element); //CO20200520
       void populate(uint ZZ); //CO20200520
       // content                                             // content

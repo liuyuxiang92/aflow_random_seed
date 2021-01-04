@@ -68,12 +68,32 @@ bool EntryLoaderTest(ofstream& FileMESSAGE,ostream& oss){  //CO20200520
   message << "Performing EntryLoader test";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
 
   string sinput="",soutput="";
+  vector<aflowlib::_aflowlib_entry> entries;
   aurostd::xoption elflags;
+  aflowlib::EntryLoader el;
 
-  sinput="species(Mn,Pd)";
+  if(0){
+    sinput="species(Mn,Pd)";
+    el.initialize(sinput,elflags,FileMESSAGE,oss);
+    el.retrieveOutput(soutput);
+    if(soutput.empty()){
+      message << "string output empty";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
+      return false;
+    }
+    message << "string output = \""+soutput+"\"";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+    el.retrieveOutput(entries);
+  }
 
-  aflowlib::EntryLoader el(sinput,elflags,FileMESSAGE,oss);
-  el.retrieveOutput(soutput);
+
+  sinput="MnPdPt";
+  el.initialize(sinput,elflags,FileMESSAGE,oss);
+  //el.retrieveOutput(soutput);
+  //if(soutput.empty()){
+  //  message << "string output empty";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
+  //  return false;
+  //}
+  //message << "string output = \""+soutput+"\"";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+  el.retrieveOutput(entries);
 
   return true;
 }

@@ -403,7 +403,7 @@ namespace aurostd {
     return aurostd::string2utype<utype>(getattachedscheme(xscheme));
   }
 
-  uint xoption::opattachedscheme(string _xscheme,string attached,bool operation) {
+  uint xoption::opattachedscheme(const string& _xscheme,const string& attached,bool operation) {
     bool VERBOSE=(FALSE || VERBOSE_XOPTION); //DX20200907 - LDEBUG to VERBOSE; decouple from XHOST.DEBUG;
     if(operation==TRUE) {
       if(VERBOSE) cerr << "DEBUG - aurostd::xoption::opattachedscheme: ADD=" << aurostd::toupper(_xscheme) << endl;
@@ -439,11 +439,11 @@ namespace aurostd {
   // [OBSOLETE]   return opattachedscheme(_xscheme,"",FALSE);
   // [OBSOLETE] }
 
-  uint xoption::push_attached(string _xscheme,string attached) {
+  uint xoption::push_attached(const string& _xscheme,const string& attached) {
     return opattachedscheme(_xscheme,attached,TRUE);
   }
 
-  uint xoption::pop_attached(string _xscheme) {
+  uint xoption::pop_attached(const string& _xscheme) {
     return opattachedscheme(_xscheme,"",FALSE);
   }
 

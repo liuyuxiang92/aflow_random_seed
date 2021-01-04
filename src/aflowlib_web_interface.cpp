@@ -355,7 +355,7 @@ namespace aflowlib {
     geometry_orig.clear();vgeometry_orig.clear(); //DX20190124 - add original crystal info
     lattice_system_orig.clear();lattice_variation_orig.clear();lattice_system_relax.clear();lattice_variation_relax.clear();
     ldau_TLUJ.clear();
-    vLDAU.resize(4);  //ME20190129
+    vLDAU.clear();vLDAU.resize(4);  //ME20190129  //CO20201220 - clearing first
     natoms=AUROSTD_NAN;
     natoms_orig=AUROSTD_NAN; //DX20190124 - add original crystal info
     nbondxx.clear();vnbondxx.clear();
@@ -503,8 +503,9 @@ namespace aflowlib {
   } 
 
   void _aflowlib_entry::clear() {  // clear PRIVATE
-    _aflowlib_entry _temp;
-    copy(_temp);
+    //[CO20201220 - too slow]_aflowlib_entry _temp;
+    //[CO20201220 - too slow]copy(_temp);
+    free();
   }
 
   _aflowlib_entry::_aflowlib_entry(const string& file) { // constructur from file
@@ -903,7 +904,7 @@ namespace aflowlib {
     vNsgroup.clear();vsgroup.clear();vstr.clear();  // apennsy
     // DONE
     if(0) {							
-      bool html=TRUE;
+      bool html=FALSE; //TRUE;  //CO20201220
       oss << "Keywords" << endl;
       oss << "auid=" << auid << (html?"<br>":"") << endl;
       oss << "aurl=" << aurl << (html?"<br>":"") << endl;
@@ -931,8 +932,8 @@ namespace aflowlib {
       oss << "node_CPU_Model=" << node_CPU_Model << (html?"<br>":"") << endl; 
       oss << "node_RAM_GB=" << node_RAM_GB << (html?"<br>":"") << endl; 
       oss << "Optional materials keywords (alphabetic order)" << endl;
-      oss << "Bravais_lattice_orig" << Bravais_lattice_orig << (html?"<br>":"") << endl;
-      oss << "Bravais_lattice_relax" << Bravais_lattice_relax << (html?"<br>":"") << endl;
+      oss << "Bravais_lattice_orig=" << Bravais_lattice_orig << (html?"<br>":"") << endl;
+      oss << "Bravais_lattice_relax=" << Bravais_lattice_relax << (html?"<br>":"") << endl;
       oss << "code=" << code << (html?"<br>":"") << endl;
       oss << "composition=" << composition << "  vcomposition= ";for(uint j=0;j<vcomposition.size();j++) oss << vcomposition.at(j) << " "; oss << (html?"<br>":"") << endl;
       oss << "compound=" << compound << (html?"<br>":"") << endl;
@@ -974,21 +975,21 @@ namespace aflowlib {
       // oss << "forces=" << forces << "  vforces= ";for(uint j=0;j<vforces.size();j++) oss << vforces.at(j) << " "; oss << (html?"<br>":"") << endl;
       oss << "geometry=" << geometry << "  vgeometry= ";for(uint j=0;j<vgeometry.size();j++) oss << vgeometry.at(j) << " "; oss << (html?"<br>":"") << endl;
       oss << "geometry_orig=" << geometry_orig << "  vgeometry_orig= ";for(uint j=0;j<vgeometry_orig.size();j++) oss << vgeometry_orig.at(j) << " "; oss << (html?"<br>":"") << endl;
-      oss << "lattice_system_orig" << lattice_system_orig << (html?"<br>":"") << endl;
-      oss << "lattice_variation_orig" << lattice_variation_orig << (html?"<br>":"") << endl;
-      oss << "lattice_system_relax" << lattice_system_relax << (html?"<br>":"") << endl;
-      oss << "lattice_variation_relax" << lattice_variation_relax << (html?"<br>":"") << endl;
+      oss << "lattice_system_orig=" << lattice_system_orig << (html?"<br>":"") << endl;
+      oss << "lattice_variation_orig=" << lattice_variation_orig << (html?"<br>":"") << endl;
+      oss << "lattice_system_relax=" << lattice_system_relax << (html?"<br>":"") << endl;
+      oss << "lattice_variation_relax=" << lattice_variation_relax << (html?"<br>":"") << endl;
       oss << "ldau_TLUJ=" << ldau_TLUJ << (html?"<br>":"") << endl;      
-      if (vLDAU[0].size()) {oss << "ldau_type=" << ((int) vLDAU[0][0]) << (html?"<br>":"") << endl;}  //ME20190129
-      if (vLDAU[1].size()) {oss << "ldau_l="; oss << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vLDAU[1], 0), ",") << (html?"<br>":"") << endl;}  //ME20190129
-      if (vLDAU[2].size()) {oss << "ldau_u="; oss << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vLDAU[2], 9), ",") << (html?"<br>":"") << endl;}  //ME20190129
-      if (vLDAU[3].size()) {oss << "ldau_j="; oss << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vLDAU[3], 9), ",") << (html?"<br>":"") << endl;}  //ME20190129
+      if (vLDAU.size()>0 && vLDAU[0].size()) {oss << "ldau_type=" << ((int) vLDAU[0][0]) << (html?"<br>":"") << endl;}  //ME20190129
+      if (vLDAU.size()>1 && vLDAU[1].size()) {oss << "ldau_l="; oss << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vLDAU[1], 0), ",") << (html?"<br>":"") << endl;}  //ME20190129
+      if (vLDAU.size()>2 && vLDAU[2].size()) {oss << "ldau_u="; oss << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vLDAU[2], 9), ",") << (html?"<br>":"") << endl;}  //ME20190129
+      if (vLDAU.size()>3 && vLDAU[3].size()) {oss << "ldau_j="; oss << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vLDAU[3], 9), ",") << (html?"<br>":"") << endl;}  //ME20190129
       oss << "natoms=" << natoms << (html?"<br>":"") << endl;
       oss << "natoms_orig=" << natoms_orig << (html?"<br>":"") << endl; //DX20190124 - add original crystal info
       oss << "nbondxx=" << nbondxx << "  vnbondxx= ";for(uint j=0;j<vnbondxx.size();j++) oss << vnbondxx.at(j) << " "; oss << (html?"<br>":"") << endl;
       oss << "nspecies=" << nspecies << (html?"<br>":"") << endl;
-      oss << "Pearson_symbol_orig" << Pearson_symbol_orig << (html?"<br>":"") << endl;
-      oss << "Pearson_symbol_relax" << Pearson_symbol_relax << (html?"<br>":"") << endl;
+      oss << "Pearson_symbol_orig=" << Pearson_symbol_orig << (html?"<br>":"") << endl;
+      oss << "Pearson_symbol_relax=" << Pearson_symbol_relax << (html?"<br>":"") << endl;
       // oss << "positions_cartesian=" << positions_cartesian << "  vpositions_cartesian= ";for(uint j=0;j<vpositions_cartesian.size();j++) oss << vpositions_cartesian.at(j) << " "; oss << (html?"<br>":"") << endl;
       // oss << "positions_fractional=" << positions_fractional << "  vpositions_fractional= ";for(uint j=0;j<vpositions_fractional.size();j++) oss << vpositions_fractional.at(j) << " "; oss << (html?"<br>":"") << endl;
       oss << "pressure=" << pressure << (html?"<br>":"") << endl; 
@@ -1024,103 +1025,103 @@ namespace aflowlib {
       oss << "volume_atom_orig=" << volume_atom_orig << (html?"<br>":"") << endl; //DX20190124 - add original crystal info
       //DX20190124 - added original symmetry info - START
       // SYMMETRY
-      oss << "crystal_family_orig" << crystal_family_orig << (html?"<br>":"") << endl;
-      oss << "crystal_system_orig" << crystal_system_orig << (html?"<br>":"") << endl;
-      oss << "crystal_class_orig" << crystal_class_orig << (html?"<br>":"") << endl;
-      oss << "point_group_Hermann_Mauguin_orig" << point_group_Hermann_Mauguin_orig << (html?"<br>":"") << endl;
-      oss << "point_group_Schoenflies_orig" << point_group_Schoenflies_orig << (html?"<br>":"") << endl;
-      oss << "point_group_orbifold_orig" << point_group_orbifold_orig << (html?"<br>":"") << endl;
-      oss << "point_group_type_orig" << point_group_type_orig << (html?"<br>":"") << endl;
-      oss << "point_group_order_orig" << point_group_order_orig << (html?"<br>":"") << endl;
-      oss << "point_group_structure_orig" << point_group_structure_orig << (html?"<br>":"") << endl;
-      oss << "Bravais_lattice_lattice_type_orig" << Bravais_lattice_lattice_type_orig << (html?"<br>":"") << endl;
-      oss << "Bravais_lattice_lattice_variation_type_orig" << Bravais_lattice_lattice_variation_type_orig << (html?"<br>":"") << endl;
-      oss << "Bravais_lattice_lattice_system_orig" << Bravais_lattice_lattice_system_orig << (html?"<br>":"") << endl;
-      oss << "Bravais_superlattice_lattice_type_orig" << Bravais_superlattice_lattice_type_orig << (html?"<br>":"") << endl;
-      oss << "Bravais_superlattice_lattice_variation_type_orig" << Bravais_superlattice_lattice_variation_type_orig << (html?"<br>":"") << endl;
-      oss << "Bravais_superlattice_lattice_system_orig" << Bravais_superlattice_lattice_system_orig << (html?"<br>":"") << endl;
-      oss << "Pearson_symbol_superlattice_orig" << Pearson_symbol_superlattice_orig << (html?"<br>":"") << endl;
+      oss << "crystal_family_orig=" << crystal_family_orig << (html?"<br>":"") << endl;
+      oss << "crystal_system_orig=" << crystal_system_orig << (html?"<br>":"") << endl;
+      oss << "crystal_class_orig=" << crystal_class_orig << (html?"<br>":"") << endl;
+      oss << "point_group_Hermann_Mauguin_orig=" << point_group_Hermann_Mauguin_orig << (html?"<br>":"") << endl;
+      oss << "point_group_Schoenflies_orig=" << point_group_Schoenflies_orig << (html?"<br>":"") << endl;
+      oss << "point_group_orbifold_orig=" << point_group_orbifold_orig << (html?"<br>":"") << endl;
+      oss << "point_group_type_orig=" << point_group_type_orig << (html?"<br>":"") << endl;
+      oss << "point_group_order_orig=" << point_group_order_orig << (html?"<br>":"") << endl;
+      oss << "point_group_structure_orig=" << point_group_structure_orig << (html?"<br>":"") << endl;
+      oss << "Bravais_lattice_lattice_type_orig=" << Bravais_lattice_lattice_type_orig << (html?"<br>":"") << endl;
+      oss << "Bravais_lattice_lattice_variation_type_orig=" << Bravais_lattice_lattice_variation_type_orig << (html?"<br>":"") << endl;
+      oss << "Bravais_lattice_lattice_system_orig=" << Bravais_lattice_lattice_system_orig << (html?"<br>":"") << endl;
+      oss << "Bravais_superlattice_lattice_type_orig=" << Bravais_superlattice_lattice_type_orig << (html?"<br>":"") << endl;
+      oss << "Bravais_superlattice_lattice_variation_type_orig=" << Bravais_superlattice_lattice_variation_type_orig << (html?"<br>":"") << endl;
+      oss << "Bravais_superlattice_lattice_system_orig=" << Bravais_superlattice_lattice_system_orig << (html?"<br>":"") << endl;
+      oss << "Pearson_symbol_superlattice_orig=" << Pearson_symbol_superlattice_orig << (html?"<br>":"") << endl;
       oss << "reciprocal_geometry_orig=" << reciprocal_geometry_orig << "  vreciprocal_geometry_orig= ";for(uint j=0;j<vreciprocal_geometry_orig.size();j++) oss << vreciprocal_geometry_orig.at(j) << " "; oss << (html?"<br>":"") << endl;
       oss << "reciprocal_volume_cell_orig=" << reciprocal_volume_cell_orig << (html?"<br>":"") << endl; 
-      oss << "reciprocal_lattice_type_orig" << reciprocal_lattice_type_orig << (html?"<br>":"") << endl;
-      oss << "reciprocal_lattice_variation_type_orig" << reciprocal_lattice_variation_type_orig << (html?"<br>":"") << endl;
-      oss << "Wyckoff_letters_orig" << Wyckoff_letters_orig << (html?"<br>":"") << endl;
-      oss << "Wyckoff_multiplicities_orig" << Wyckoff_multiplicities_orig << (html?"<br>":"") << endl;
-      oss << "Wyckoff_site_symmetries_orig" << Wyckoff_site_symmetries_orig << (html?"<br>":"") << endl;
+      oss << "reciprocal_lattice_type_orig=" << reciprocal_lattice_type_orig << (html?"<br>":"") << endl;
+      oss << "reciprocal_lattice_variation_type_orig=" << reciprocal_lattice_variation_type_orig << (html?"<br>":"") << endl;
+      oss << "Wyckoff_letters_orig=" << Wyckoff_letters_orig << (html?"<br>":"") << endl;
+      oss << "Wyckoff_multiplicities_orig=" << Wyckoff_multiplicities_orig << (html?"<br>":"") << endl;
+      oss << "Wyckoff_site_symmetries_orig=" << Wyckoff_site_symmetries_orig << (html?"<br>":"") << endl;
       //DX20190124 - added original symmetry info - END
       //DX20180823 - added more symmetry info - START
       // SYMMETRY
-      oss << "crystal_family" << crystal_family << (html?"<br>":"") << endl;
-      oss << "crystal_system" << crystal_system << (html?"<br>":"") << endl;
-      oss << "crystal_class" << crystal_class << (html?"<br>":"") << endl;
-      oss << "point_group_Hermann_Mauguin" << point_group_Hermann_Mauguin << (html?"<br>":"") << endl;
-      oss << "point_group_Schoenflies" << point_group_Schoenflies << (html?"<br>":"") << endl;
-      oss << "point_group_orbifold" << point_group_orbifold << (html?"<br>":"") << endl;
-      oss << "point_group_type" << point_group_type << (html?"<br>":"") << endl;
-      oss << "point_group_order" << point_group_order << (html?"<br>":"") << endl;
-      oss << "point_group_structure" << point_group_structure << (html?"<br>":"") << endl;
-      oss << "Bravais_lattice_lattice_type" << Bravais_lattice_lattice_type << (html?"<br>":"") << endl;
-      oss << "Bravais_lattice_lattice_variation_type" << Bravais_lattice_lattice_variation_type << (html?"<br>":"") << endl;
-      oss << "Bravais_lattice_lattice_system" << Bravais_lattice_lattice_system << (html?"<br>":"") << endl;
-      oss << "Bravais_superlattice_lattice_type" << Bravais_superlattice_lattice_type << (html?"<br>":"") << endl;
-      oss << "Bravais_superlattice_lattice_variation_type" << Bravais_superlattice_lattice_variation_type << (html?"<br>":"") << endl;
-      oss << "Bravais_superlattice_lattice_system" << Bravais_superlattice_lattice_system << (html?"<br>":"") << endl;
-      oss << "Pearson_symbol_superlattice" << Pearson_symbol_superlattice << (html?"<br>":"") << endl;
+      oss << "crystal_family=" << crystal_family << (html?"<br>":"") << endl;
+      oss << "crystal_system=" << crystal_system << (html?"<br>":"") << endl;
+      oss << "crystal_class=" << crystal_class << (html?"<br>":"") << endl;
+      oss << "point_group_Hermann_Mauguin=" << point_group_Hermann_Mauguin << (html?"<br>":"") << endl;
+      oss << "point_group_Schoenflies=" << point_group_Schoenflies << (html?"<br>":"") << endl;
+      oss << "point_group_orbifold=" << point_group_orbifold << (html?"<br>":"") << endl;
+      oss << "point_group_type=" << point_group_type << (html?"<br>":"") << endl;
+      oss << "point_group_order=" << point_group_order << (html?"<br>":"") << endl;
+      oss << "point_group_structure=" << point_group_structure << (html?"<br>":"") << endl;
+      oss << "Bravais_lattice_lattice_type=" << Bravais_lattice_lattice_type << (html?"<br>":"") << endl;
+      oss << "Bravais_lattice_lattice_variation_type=" << Bravais_lattice_lattice_variation_type << (html?"<br>":"") << endl;
+      oss << "Bravais_lattice_lattice_system=" << Bravais_lattice_lattice_system << (html?"<br>":"") << endl;
+      oss << "Bravais_superlattice_lattice_type=" << Bravais_superlattice_lattice_type << (html?"<br>":"") << endl;
+      oss << "Bravais_superlattice_lattice_variation_type=" << Bravais_superlattice_lattice_variation_type << (html?"<br>":"") << endl;
+      oss << "Bravais_superlattice_lattice_system=" << Bravais_superlattice_lattice_system << (html?"<br>":"") << endl;
+      oss << "Pearson_symbol_superlattice=" << Pearson_symbol_superlattice << (html?"<br>":"") << endl;
       oss << "reciprocal_geometry=" << reciprocal_geometry << "  vreciprocal_geometry= ";for(uint j=0;j<vreciprocal_geometry.size();j++) oss << vreciprocal_geometry.at(j) << " "; oss << (html?"<br>":"") << endl;
       oss << "reciprocal_volume_cell=" << reciprocal_volume_cell << (html?"<br>":"") << endl; 
-      oss << "reciprocal_lattice_type" << reciprocal_lattice_type << (html?"<br>":"") << endl;
-      oss << "reciprocal_lattice_variation_type" << reciprocal_lattice_variation_type << (html?"<br>":"") << endl;
-      oss << "Wyckoff_letters" << Wyckoff_letters << (html?"<br>":"") << endl;
-      oss << "Wyckoff_multiplicities" << Wyckoff_multiplicities << (html?"<br>":"") << endl;
-      oss << "Wyckoff_site_symmetries" << Wyckoff_site_symmetries << (html?"<br>":"") << endl;
+      oss << "reciprocal_lattice_type=" << reciprocal_lattice_type << (html?"<br>":"") << endl;
+      oss << "reciprocal_lattice_variation_type=" << reciprocal_lattice_variation_type << (html?"<br>":"") << endl;
+      oss << "Wyckoff_letters=" << Wyckoff_letters << (html?"<br>":"") << endl;
+      oss << "Wyckoff_multiplicities=" << Wyckoff_multiplicities << (html?"<br>":"") << endl;
+      oss << "Wyckoff_site_symmetries=" << Wyckoff_site_symmetries << (html?"<br>":"") << endl;
       //DX20180823 - added more symmetry info - END
       //DX20190208 - added anrl info - START
-      oss << "anrl_label_orig" << anrl_label_orig << (html?"<br>":"") << endl;
-      oss << "anrl_parameter_list_orig" << anrl_parameter_list_orig << (html?"<br>":"") << endl;
-      oss << "anrl_parameter_values_orig" << anrl_parameter_values_orig << (html?"<br>":"") << endl;
-      oss << "anrl_label_relax" << anrl_label_relax << (html?"<br>":"") << endl;
-      oss << "anrl_parameter_list_relax" << anrl_parameter_list_relax << (html?"<br>":"") << endl;
-      oss << "anrl_parameter_values_relax" << anrl_parameter_values_relax << (html?"<br>":"") << endl;
+      oss << "anrl_label_orig=" << anrl_label_orig << (html?"<br>":"") << endl;
+      oss << "anrl_parameter_list_orig=" << anrl_parameter_list_orig << (html?"<br>":"") << endl;
+      oss << "anrl_parameter_values_orig=" << anrl_parameter_values_orig << (html?"<br>":"") << endl;
+      oss << "anrl_label_relax=" << anrl_label_relax << (html?"<br>":"") << endl;
+      oss << "anrl_parameter_list_relax=" << anrl_parameter_list_relax << (html?"<br>":"") << endl;
+      oss << "anrl_parameter_values_relax=" << anrl_parameter_values_relax << (html?"<br>":"") << endl;
       //DX20190208 - added anrl info - END
-      oss << "pocc_parameters" << pocc_parameters << (html?"<br>":"") << endl;  //CO20200731
+      oss << "pocc_parameters=" << pocc_parameters << (html?"<br>":"") << endl;  //CO20200731
       // AGL/AEL
-      oss << "agl_thermal_conductivity_300K" << agl_thermal_conductivity_300K << (html?"<br>":"") << endl; 
-      oss << "agl_debye" << agl_debye << (html?"<br>":"") << endl; 
-      oss << "agl_acoustic_debye" << agl_acoustic_debye << (html?"<br>":"") << endl; 
-      oss << "agl_gruneisen" << agl_gruneisen << (html?"<br>":"") << endl; 
-      oss << "agl_heat_capacity_Cv_300K" << agl_heat_capacity_Cv_300K << (html?"<br>":"") << endl; 
-      oss << "agl_heat_capacity_Cp_300K" << agl_heat_capacity_Cp_300K << (html?"<br>":"") << endl; 
-      oss << "agl_thermal_expansion_300K" << agl_thermal_expansion_300K << (html?"<br>":"") << endl; 
-      oss << "agl_bulk_modulus_static_300K" << agl_bulk_modulus_static_300K << (html?"<br>":"") << endl; 
-      oss << "agl_bulk_modulus_isothermal_300K" << agl_bulk_modulus_isothermal_300K << (html?"<br>":"") << endl; 
-      oss << "agl_poisson_ratio_source" << agl_poisson_ratio_source << (html?"<br>":"") << endl; //CT20181212
-      oss << "agl_vibrational_free_energy_300K_cell" << agl_vibrational_free_energy_300K_cell << (html?"<br>":"") << endl; //CT20181212
-      oss << "agl_vibrational_free_energy_300K_atom" << agl_vibrational_free_energy_300K_atom << (html?"<br>":"") << endl; //CT20181212 
-      oss << "agl_vibrational_entropy_300K_cell" << agl_vibrational_entropy_300K_cell << (html?"<br>":"") << endl; //CT20181212 
-      oss << "agl_vibrational_entropy_300K_atom" << agl_vibrational_entropy_300K_atom << (html?"<br>":"") << endl; //CT20181212 
-      oss << "ael_poisson_ratio" << ael_poisson_ratio << (html?"<br>":"") << endl; 
-      oss << "ael_bulk_modulus_voigt" << ael_bulk_modulus_voigt << (html?"<br>":"") << endl; 
-      oss << "ael_bulk_modulus_reuss" << ael_bulk_modulus_reuss << (html?"<br>":"") << endl; 
-      oss << "ael_shear_modulus_voigt" << ael_shear_modulus_voigt << (html?"<br>":"") << endl; 
-      oss << "ael_shear_modulus_reuss" << ael_shear_modulus_reuss << (html?"<br>":"") << endl; 
-      oss << "ael_bulk_modulus_vrh" << ael_bulk_modulus_vrh << (html?"<br>":"") << endl; 
-      oss << "ael_shear_modulus_vrh" << ael_shear_modulus_vrh << (html?"<br>":"") << endl; 
-      oss << "ael_elastic_anisotropy" << ael_elastic_anisotropy << (html?"<br>":"") << endl; //CO20181129
-      oss << "ael_youngs_modulus_vrh" << ael_youngs_modulus_vrh << (html?"<br>":"") << endl; //CT20181212 
-      oss << "ael_speed_sound_transverse" << ael_speed_sound_transverse << (html?"<br>":"") << endl; //CT20181212 
-      oss << "ael_speed_sound_longitudinal" << ael_speed_sound_longitudinal << (html?"<br>":"") << endl; //CT20181212 
-      oss << "ael_speed_sound_average" << ael_speed_sound_average << (html?"<br>":"") << endl; //CT20181212
-      oss << "ael_pughs_modulus_ratio" << ael_pughs_modulus_ratio << (html?"<br>":"") << endl; //CT20181212 
-      oss << "ael_debye_temperature" << ael_debye_temperature << (html?"<br>":"") << endl; //CT20181212 
-      oss << "ael_applied_pressure" << ael_applied_pressure << (html?"<br>":"") << endl; //CT20181212 
-      oss << "ael_average_external_pressure" << ael_average_external_pressure << (html?"<br>":"") << endl; //CT20181212 
+      oss << "agl_thermal_conductivity_300K=" << agl_thermal_conductivity_300K << (html?"<br>":"") << endl; 
+      oss << "agl_debye=" << agl_debye << (html?"<br>":"") << endl; 
+      oss << "agl_acoustic_debye=" << agl_acoustic_debye << (html?"<br>":"") << endl; 
+      oss << "agl_gruneisen=" << agl_gruneisen << (html?"<br>":"") << endl; 
+      oss << "agl_heat_capacity_Cv_300K=" << agl_heat_capacity_Cv_300K << (html?"<br>":"") << endl; 
+      oss << "agl_heat_capacity_Cp_300K=" << agl_heat_capacity_Cp_300K << (html?"<br>":"") << endl; 
+      oss << "agl_thermal_expansion_300K=" << agl_thermal_expansion_300K << (html?"<br>":"") << endl; 
+      oss << "agl_bulk_modulus_static_300K=" << agl_bulk_modulus_static_300K << (html?"<br>":"") << endl; 
+      oss << "agl_bulk_modulus_isothermal_300K=" << agl_bulk_modulus_isothermal_300K << (html?"<br>":"") << endl; 
+      oss << "agl_poisson_ratio_source=" << agl_poisson_ratio_source << (html?"<br>":"") << endl; //CT20181212
+      oss << "agl_vibrational_free_energy_300K_cell=" << agl_vibrational_free_energy_300K_cell << (html?"<br>":"") << endl; //CT20181212
+      oss << "agl_vibrational_free_energy_300K_atom=" << agl_vibrational_free_energy_300K_atom << (html?"<br>":"") << endl; //CT20181212 
+      oss << "agl_vibrational_entropy_300K_cell=" << agl_vibrational_entropy_300K_cell << (html?"<br>":"") << endl; //CT20181212 
+      oss << "agl_vibrational_entropy_300K_atom=" << agl_vibrational_entropy_300K_atom << (html?"<br>":"") << endl; //CT20181212 
+      oss << "ael_poisson_ratio=" << ael_poisson_ratio << (html?"<br>":"") << endl; 
+      oss << "ael_bulk_modulus_voigt=" << ael_bulk_modulus_voigt << (html?"<br>":"") << endl; 
+      oss << "ael_bulk_modulus_reuss=" << ael_bulk_modulus_reuss << (html?"<br>":"") << endl; 
+      oss << "ael_shear_modulus_voigt=" << ael_shear_modulus_voigt << (html?"<br>":"") << endl; 
+      oss << "ael_shear_modulus_reuss=" << ael_shear_modulus_reuss << (html?"<br>":"") << endl; 
+      oss << "ael_bulk_modulus_vrh=" << ael_bulk_modulus_vrh << (html?"<br>":"") << endl; 
+      oss << "ael_shear_modulus_vrh=" << ael_shear_modulus_vrh << (html?"<br>":"") << endl; 
+      oss << "ael_elastic_anisotropy=" << ael_elastic_anisotropy << (html?"<br>":"") << endl; //CO20181129
+      oss << "ael_youngs_modulus_vrh=" << ael_youngs_modulus_vrh << (html?"<br>":"") << endl; //CT20181212 
+      oss << "ael_speed_sound_transverse=" << ael_speed_sound_transverse << (html?"<br>":"") << endl; //CT20181212 
+      oss << "ael_speed_sound_longitudinal=" << ael_speed_sound_longitudinal << (html?"<br>":"") << endl; //CT20181212 
+      oss << "ael_speed_sound_average=" << ael_speed_sound_average << (html?"<br>":"") << endl; //CT20181212
+      oss << "ael_pughs_modulus_ratio=" << ael_pughs_modulus_ratio << (html?"<br>":"") << endl; //CT20181212 
+      oss << "ael_debye_temperature=" << ael_debye_temperature << (html?"<br>":"") << endl; //CT20181212 
+      oss << "ael_applied_pressure=" << ael_applied_pressure << (html?"<br>":"") << endl; //CT20181212 
+      oss << "ael_average_external_pressure=" << ael_average_external_pressure << (html?"<br>":"") << endl; //CT20181212 
       //ME20191105 BEGIN
-      oss << "ael_stiffness_tensor = "; for (int i = 1; i <= 6; i++) {for (int j = 1; j <= 6; j++) oss << ael_stiffness_tensor[i][j]; oss << (html?"<br>":"") << endl;} //ME20191105
-      oss << "ael_compliance_tensor = "; for (int i = 1; i <= 6; i++) {for (int j = 1; j <= 6; j++) oss << ael_compliance_tensor[i][j]; oss << (html?"<br>":"") << endl;} //ME20191105
+      oss << "ael_stiffness_tensor="; for (int i = ael_stiffness_tensor.lrows; i <= ael_stiffness_tensor.urows; i++) {for (int j = ael_stiffness_tensor.lcols; j <= ael_stiffness_tensor.ucols; j++) {oss << ael_stiffness_tensor[i][j] << " ";} oss << (html?"<br>":"") << endl;} //ME20191105  //CO20201220
+      oss << "ael_compliance_tensor="; for (int i = ael_compliance_tensor.lrows; i <= ael_compliance_tensor.urows; i++) {for (int j = ael_compliance_tensor.lcols; j <= ael_compliance_tensor.ucols; j++) {oss << ael_compliance_tensor[i][j] << " ";} oss << (html?"<br>":"") << endl;} //ME20191105  //CO20201220
       //ME20191105 END
       // BADER
-      oss << "bader_net_charges" << bader_net_charges << "  vbader_net_charges= ";for(uint j=0;j<vbader_net_charges.size();j++) oss << vbader_net_charges.at(j) << " "; oss << (html?"<br>":"") << endl; 
-      oss << "bader_atomic_volumes" << bader_atomic_volumes << "  vbader_atomic_volumes= ";for(uint j=0;j<vbader_atomic_volumes.size();j++) oss << vbader_atomic_volumes.at(j) << " "; oss << (html?"<br>":"") << endl; 
+      oss << "bader_net_charges=" << bader_net_charges << "  vbader_net_charges= ";for(uint j=0;j<vbader_net_charges.size();j++) oss << vbader_net_charges.at(j) << " "; oss << (html?"<br>":"") << endl; 
+      oss << "bader_atomic_volumes=" << bader_atomic_volumes << "  vbader_atomic_volumes= ";for(uint j=0;j<vbader_atomic_volumes.size();j++) oss << vbader_atomic_volumes.at(j) << " "; oss << (html?"<br>":"") << endl; 
       // legacy
       oss << "server=" << server << (html?"<br>":"") << "  vserver= ";for(uint j=0;j<vserver.size();j++) oss << vserver.at(j) << " "; oss << (html?"<br>":"") << endl;
       oss << "icsd=" << icsd << (html?"<br>":"") << endl;
@@ -4207,9 +4208,10 @@ namespace aflowlib {
 
 //AFLUX integration
 //FR+CO20180329
+#define _DEBUG_AFLUX_ true
 namespace aflowlib {
   bool APIget::establish(){
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || _DEBUG_AFLUX_ || XHOST.DEBUG);
     struct hostent * host = gethostbyname( Domain.c_str() );
 
     //[CO20181226 - OBSOLETE]PORT=80;  //CO20180401
@@ -4256,8 +4258,8 @@ namespace aflowlib {
   void APIget::reset( string a_Summons, string a_API_Path, string a_Domain ) {
     if( a_Summons == "#" ) {
       Summons = "";
-      API_Path = "/search/API/?";
-      Domain = "aflowlib.duke.edu";
+      API_Path = _AFLUX_API_PATH_; //[CO20201220 - OBSOLETE]"/search/API/?";
+      Domain = AFLOWLIB_SERVER_DEFAULT;
     } else {
       Summons = a_Summons;
       if( ! a_API_Path.empty() ) API_Path = a_API_Path;
@@ -4265,21 +4267,21 @@ namespace aflowlib {
     }
   }
   ostream& operator<<( ostream& output, APIget& a ) { 
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
-    char cur;
+    bool LDEBUG=(FALSE || _DEBUG_AFLUX_ || XHOST.DEBUG);
+    unsigned char cur;
     bool responsedata = false;
     bool waslinefeed = false;
     if( a.establish() ) {
       while ( ! responsedata ) { //discard headers
         read(a.sock, &cur, 1);
-        if(LDEBUG){cerr << "aflowlib::APIget::operator<<():" << " cur=" << (int)cur << endl;}
-        if( waslinefeed  && cur == '\r') responsedata = true;
+        if(LDEBUG){cerr << "aflowlib::APIget::operator<<()[headers]:" << " cur='" << cur << "'" << endl;}
+        if( waslinefeed && cur == '\r') responsedata = true;
         if( cur == '\n' ) waslinefeed = true;
         else waslinefeed = false;
       };
       read(a.sock, &cur, 1); //discard final \n in header \r\n\r\n
       while ( read(a.sock, &cur, 1) > 0 ) output << cur;
-      if(LDEBUG){cerr << "aflowlib::APIget::operator<<():" << " cur=" << (int)cur << endl;}
+      if(LDEBUG){cerr << "aflowlib::APIget::operator<<()[data]:" << " cur='" << cur << "'" << endl;}
       close(a.sock);
     }
     return output;
@@ -4319,8 +4321,8 @@ namespace aflowlib {
   }
   string AFLUXCall(const string& _summons){
     // Performs AFLUX call based on summons input
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string function_name = XPID + "AFLUXCall()";
+    bool LDEBUG=(TRUE || XHOST.DEBUG);
+    string function_name = XPID + "AFLUXCall():";
 
     // percent encoding (otherwise it will not work)
     // NOT NEEDED - aurostd::StringSubst(summons,"\'","%27"); // percent encoding for "'" 
@@ -4329,19 +4331,33 @@ namespace aflowlib {
     aurostd::StringSubst(summons,"#","%23");  // percent encoding for "#"
 
     if(LDEBUG) {
-      cerr << function_name << ": Summons=\"" << summons << "\"" << endl;
-      cerr << function_name << ": Performing call ... please be patient ..." << endl;
+      cerr << function_name << " Summons=\"" << summons << "\"" << endl;
+      cerr << function_name << " Performing call ... please be patient ..." << endl;
     }
 
     //CO20200520 - added attempts and sleep
-    aflowlib::APIget API_socket(summons);
-    stringstream response_ss;
     string response_str="";
     uint attempts=0;
-    while(response_str.empty() && (++attempts)<10){
-      response_ss << API_socket;response_str=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(response_ss.str());
-      if(attempts>1){aurostd::Sleep(2);}
+    if(0){
+      stringstream response_ss;
+      aflowlib::APIget API_socket(summons);
+      while(response_str.empty() && (++attempts)<10){
+        if(LDEBUG){cerr << function_name << " attempt=" << attempts << endl;}
+        response_ss << API_socket;response_str=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(response_ss.str());
+        if(attempts>1){aurostd::Sleep(2);}
+      }
     }
+    bool response=false;
+    string url=AFLOWLIB_SERVER_DEFAULT+"/"+_AFLUX_API_PATH_+summons;
+    aurostd::StringSubst(url,"//","/");
+    if(LDEBUG){cerr << function_name << " url=" << url << endl;}
+    while((response==false || response_str.empty()) && (++attempts)<10){
+      if(LDEBUG){cerr << function_name << " attempt=" << attempts << endl;}
+      response=aurostd::url2string(url,response_str,true);
+      response_str=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(response_str);
+      if(response==false || response_str.empty()){aurostd::Sleep(2);}
+    }
+    
     return response_str;
   }
 }
@@ -4386,6 +4402,154 @@ namespace aflowlib {
 }
 
 //DX+FR20190206 - AFLUX functionality via command line - END
+
+namespace aflowlib {  //CO20201220
+  // ***************************************************************************
+  // mergeEntries()
+  // ***************************************************************************
+  //simple helper function for loading multiple libraries together, will take
+  //combinations of nested vectors and convert them to other nested vectors
+  //naries is output, entries_new is input
+  //these assume vector<aflowlib::_aflowlib_entry> entries_new is all of the same
+  //type, e.g., binaries of MnPd (e.g., MnPd2, Mn2Pd, etc., similar structure to LIBS)
+  //also assumes ordered vector<vector<vector<aflowlib::_aflowlib_entry> > >& naries
+  //outer most - unary, binary, etc.
+  //next outer - species match, Mn, Pd, MnPd, etc.
+  //inner most - entries
+  bool mergeEntries(vector<vector<vector<aflowlib::_aflowlib_entry> > >& naries,const vector<vector<vector<aflowlib::_aflowlib_entry> > >& entries_new) {
+    for (uint i = 0; i < entries_new.size(); i++) {
+      if(!mergeEntries(naries, entries_new[i], true)) { return false; }  //structured data
+    }
+    return true;
+  }
+  bool mergeEntries(vector<vector<vector<aflowlib::_aflowlib_entry> > >& naries,const vector<vector<aflowlib::_aflowlib_entry> >& entries_new,bool entries_new_same_type) {
+    for (uint i = 0; i < entries_new.size(); i++) {
+      if(naries.size() <= i + 1) {
+        naries.push_back(vector<vector<aflowlib::_aflowlib_entry> >(0));
+      }
+      if(!mergeEntries(naries[i], entries_new[i], entries_new_same_type, true)) {  //triple vector<> naries implies this structure
+        return false;
+      }
+    }
+    return true;
+  }
+  bool mergeEntries(vector<vector<vector<aflowlib::_aflowlib_entry> > >& naries,const vector<aflowlib::_aflowlib_entry>& entries_new,bool entries_new_same_type) {
+    if(!entries_new.size()) { return true; }
+    int index_layer1=-1, index_layer2=-1;
+    if(entries_new_same_type) {
+      if(!mergeEntries(naries, entries_new[0], index_layer1, index_layer2)) { return false; }
+      for (uint i = 1; i < entries_new.size(); i++) { naries[index_layer1][index_layer2].push_back(entries_new[i]); }
+    } else {
+      for (uint i = 0; i < entries_new.size(); i++) {
+        if(!entries_new[i].vspecies.size()) { return false; }  //what the heck is this?
+        if(!mergeEntries(naries, entries_new[i], index_layer1, index_layer2)) { return false; }
+      }
+    }
+    return true;
+  }
+  bool mergeEntries(vector<vector<vector<aflowlib::_aflowlib_entry> > >& naries,const aflowlib::_aflowlib_entry& entry_new) {
+    int index_layer1 = -1;
+    int index_layer2 = -1;
+    return mergeEntries(naries, entry_new, index_layer1, index_layer2);
+  }
+  bool mergeEntries(vector<vector<vector<aflowlib::_aflowlib_entry> > >& naries,const aflowlib::_aflowlib_entry& entry_new,int& index_layer1,int& index_layer2) {
+    if(!entry_new.vspecies.size()) { return false; }    //what the heck is this?
+    while (naries.size() < entry_new.vspecies.size()) {  //assumes entries_new all have the same vspecies.size()
+      naries.push_back(vector<vector<aflowlib::_aflowlib_entry> >(0));
+    }
+    index_layer1 = entry_new.vspecies.size() - 1;
+    return mergeEntries(naries[index_layer1], entry_new, index_layer2, true);  //triple vector<> naries implies this structure
+  }
+  //naries takes on two forms depending on sort_by_species
+  //if sort_by_species==true, then naries is truly a single nary (unary, binary, etc.) with
+  //the second layer consisting of different species
+  //otherwise, naries is the total entries (similar to naries above), where second layer
+  //is unaries, binary, etc. (no layer with different species)
+  //if sort_by_species and we are coming from LIBs (entries_new_same_type==true), then we don't need to check every entry, we already
+  //know they have the same type (binary of same species)
+  bool mergeEntries(vector<vector<aflowlib::_aflowlib_entry> >& naries,const vector<vector<vector<aflowlib::_aflowlib_entry> > >& entries_new,bool sort_by_species) {
+    for (uint i = 0; i < entries_new.size(); i++) {
+      if(!mergeEntries(naries, entries_new[i], true, sort_by_species)) { return false; }
+    }
+    return true;
+  }
+  bool mergeEntries(vector<vector<aflowlib::_aflowlib_entry> >& naries,const vector<vector<aflowlib::_aflowlib_entry> >& entries_new,bool entries_new_same_type,bool sort_by_species) {
+    for (uint i = 0; i < entries_new.size(); i++) {
+      if(!mergeEntries(naries, entries_new[i], entries_new_same_type, sort_by_species)) { return false; }
+    }
+    return true;
+  }
+  bool mergeEntries(vector<vector<aflowlib::_aflowlib_entry> >& naries,const vector<aflowlib::_aflowlib_entry>& entries_new,bool entries_new_same_type,bool sort_by_species) {
+    if(!entries_new.size()) { return true; }
+    int index;
+    if(entries_new_same_type) {
+      if(!mergeEntries(naries, entries_new[0], index, sort_by_species)) { return false; }
+      for (uint i = 1; i < entries_new.size(); i++) { naries[index].push_back(entries_new[i]); }
+    } else {
+      for (uint i = 0; i < entries_new.size(); i++) {
+        if(!mergeEntries(naries, entries_new[i], index, sort_by_species)) { return false; }
+      }
+    }
+    return true;
+  }
+  //naries takes on two forms depending on sort_by_species
+  //if sort_by_species==true, then naries is truly a single nary (unary, binary, etc.) with
+  //the second layer consisting of different species
+  //otherwise, naries is the total entries (similar to naries above), where second layer
+  //is unaries, binary, etc. (no layer with different species)
+  bool mergeEntries(vector<vector<aflowlib::_aflowlib_entry> >& naries,const aflowlib::_aflowlib_entry& entry_new,bool sort_by_species) {
+    int index = -1;
+    return mergeEntries(naries, entry_new, index, sort_by_species);
+  }
+  bool mergeEntries(vector<vector<aflowlib::_aflowlib_entry> >& naries,const aflowlib::_aflowlib_entry& entry_new,int& index,bool sort_by_species) {
+    if(!entry_new.vspecies.size()) { return false; }
+    index = -1;
+    if(sort_by_species) {
+      //all of naries is unary, binary, etc., now just need to index species
+      for (uint i = 0; i < naries.size() && index == -1; i++) {
+        //test of stupidity
+        if(naries[i][0].vspecies.size() != entry_new.vspecies.size()) { return false; }
+        if(naries[i][0].vspecies == entry_new.vspecies) { index = i; }
+      }
+      if(index == -1) {
+        naries.push_back(vector<aflowlib::_aflowlib_entry>(0));
+        index = naries.size() - 1;
+      }
+    } else {
+      //just need to create space for unary, binary, etc.
+      while (naries.size() < entry_new.vspecies.size()) {
+        naries.push_back(vector<aflowlib::_aflowlib_entry>(0));
+      }
+      index = entry_new.vspecies.size() - 1;
+    }
+    naries[index].push_back(entry_new);
+    return true;
+  }
+  bool mergeEntries(vector<aflowlib::_aflowlib_entry>& naries,const vector<vector<vector<aflowlib::_aflowlib_entry> > >& entries_new) {
+    for (uint i = 0; i < entries_new.size(); i++) {
+      for (uint j = 0; j < entries_new[i].size(); j++) {
+        if(!mergeEntries(naries, entries_new[i][j])) { return false; }
+      }
+    }
+    return true;
+  }
+  bool mergeEntries(vector<aflowlib::_aflowlib_entry>& naries,const vector<vector<aflowlib::_aflowlib_entry> >& entries_new) {
+    for (uint i = 0; i < entries_new.size(); i++) {
+      if(!mergeEntries(naries, entries_new[i])) { return false; }
+    }
+    return true;
+  }
+  bool mergeEntries(vector<aflowlib::_aflowlib_entry>& naries,const vector<aflowlib::_aflowlib_entry>& entries_new) {
+    for (uint i = 0; i < entries_new.size(); i++) {
+      if(!mergeEntries(naries, entries_new[i])) { return false; }
+    }
+    return true;
+  }
+  bool mergeEntries(vector<aflowlib::_aflowlib_entry>& naries,const aflowlib::_aflowlib_entry& entry_new) {
+    naries.push_back(entry_new);
+    return true;
+  }
+}  // namespace pflow
 
 namespace aflowlib {
   uint WEB_Aflowlib_Entry(string options,ostream& oss) {

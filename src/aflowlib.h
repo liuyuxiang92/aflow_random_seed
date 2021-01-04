@@ -283,6 +283,8 @@ namespace aflowlib {
 
 // ***************************************************************************
 // AFLUX STUFF
+//#define _AFLUX_API_PATH_ "/~frose/dev/aflux/src/?" //[CO20201220 - OBSOLETE]"/search/API/?"
+#define _AFLUX_API_PATH_ "/API/aflux/v1.0/?" //[CO20201220 - OBSOLETE]"/search/API/?"
 namespace aflowlib {
   class APIget {
     private:
@@ -294,10 +296,32 @@ namespace aflowlib {
       string Domain;
       bool establish();
     public:
-      APIget( string a_Summons="", string a_API_Path="/search/API/?", string a_Domain="aflowlib.duke.edu" ) : PORT(80),Summons(a_Summons),API_Path(a_API_Path),Domain(a_Domain) {}; //CO20181226
+      APIget( string a_Summons="", string a_API_Path=_AFLUX_API_PATH_, string a_Domain=AFLOWLIB_SERVER_DEFAULT ) : PORT(80),Summons(a_Summons),API_Path(a_API_Path),Domain(a_Domain) {}; //CO20181226
       void reset( string a_Summons="#", string a_API_Path="", string a_Domain="" );
       friend ostream& operator<<( ostream& output, APIget& a );
   };
+}
+
+namespace aflowlib {  //CO20201220
+  ////////////////////////////////////////////////////////////////////////////////
+  //merge vector entries lists
+  //3-vec
+  bool mergeEntries(vector<vector<vector<aflowlib::_aflowlib_entry> > >& naries, const vector<vector<vector<aflowlib::_aflowlib_entry> > >& entries_new);
+  bool mergeEntries(vector<vector<vector<aflowlib::_aflowlib_entry> > >& naries, const vector<vector<aflowlib::_aflowlib_entry> >& entries_new, bool entries_new_same_type = false);
+  bool mergeEntries(vector<vector<vector<aflowlib::_aflowlib_entry> > >& naries, const vector<aflowlib::_aflowlib_entry>& entries_new, bool entries_new_same_type = false);
+  bool mergeEntries(vector<vector<vector<aflowlib::_aflowlib_entry> > >& naries, const aflowlib::_aflowlib_entry& entries_new);
+  bool mergeEntries(vector<vector<vector<aflowlib::_aflowlib_entry> > >& naries, const aflowlib::_aflowlib_entry& entries_new, int& index_layer1, int& index_layer2);
+  //2-vec
+  bool mergeEntries(vector<vector<aflowlib::_aflowlib_entry> >& naries, const vector<vector<vector<aflowlib::_aflowlib_entry> > >& entries_new, bool sort_by_species = true);
+  bool mergeEntries(vector<vector<aflowlib::_aflowlib_entry> >& naries, const vector<vector<aflowlib::_aflowlib_entry> >& entries_new, bool entries_new_same_type = false, bool sort_by_species = true);
+  bool mergeEntries(vector<vector<aflowlib::_aflowlib_entry> >& naries, const vector<aflowlib::_aflowlib_entry>& entries_new, bool entries_new_same_type = false, bool sort_by_species = true);
+  bool mergeEntries(vector<vector<aflowlib::_aflowlib_entry> >& naries, const aflowlib::_aflowlib_entry& entry_new, bool sort_by_species = true);
+  bool mergeEntries(vector<vector<aflowlib::_aflowlib_entry> >& naries, const aflowlib::_aflowlib_entry& entry_new, int& index, bool sort_by_species = true);
+  //1-vec
+  bool mergeEntries(vector<aflowlib::_aflowlib_entry>& naries, const vector<vector<vector<aflowlib::_aflowlib_entry> > >& entries_new);
+  bool mergeEntries(vector<aflowlib::_aflowlib_entry>& naries, const vector<vector<aflowlib::_aflowlib_entry> >& entries_new);
+  bool mergeEntries(vector<aflowlib::_aflowlib_entry>& naries, const vector<aflowlib::_aflowlib_entry>& entries_new);
+  bool mergeEntries(vector<aflowlib::_aflowlib_entry>& naries, const aflowlib::_aflowlib_entry& entry_new);
 }
 
 // ***************************************************************************

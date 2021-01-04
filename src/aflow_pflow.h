@@ -270,26 +270,6 @@ namespace pflow {
   bool loadLIBX(aurostd::xoption& vpflow, string LIB, vector<string>& velements, string server, vector<vector<aflowlib::_aflowlib_entry> >& entries, ostream& oss=cout);
   bool loadLIBX(aurostd::xoption& vpflow, string LIB, vector<string>& velements, string server, vector<vector<aflowlib::_aflowlib_entry> >& entries, ofstream& FileMESSAGE, ostream& oss=cout);
   ////////////////////////////////////////////////////////////////////////////////
-  //merge vector entries lists
-  bool mergeEntries(vector<vector<vector<aflowlib::_aflowlib_entry> > >& naries, vector<vector<vector<aflowlib::_aflowlib_entry> > >& new_entries);
-  bool mergeEntries(vector<vector<vector<aflowlib::_aflowlib_entry> > >& naries, vector<vector<aflowlib::_aflowlib_entry> >& new_entries, bool assume_same_type = false);
-  bool mergeEntries(vector<vector<vector<aflowlib::_aflowlib_entry> > >& naries, vector<aflowlib::_aflowlib_entry>& new_entries, bool assume_same_type = false);
-  bool mergeEntries(vector<vector<vector<aflowlib::_aflowlib_entry> > >& naries, aflowlib::_aflowlib_entry& new_entries);
-  bool mergeEntries(vector<vector<vector<aflowlib::_aflowlib_entry> > >& naries, aflowlib::_aflowlib_entry& new_entries, int& match1, int& match2);
-  bool mergeEntries(vector<vector<aflowlib::_aflowlib_entry> >& naries, vector<vector<aflowlib::_aflowlib_entry> >& new_entries, bool assume_same_type = false, bool sort_by_species = true);
-  bool mergeEntries(vector<vector<aflowlib::_aflowlib_entry> >& naries, vector<aflowlib::_aflowlib_entry>& new_entries, bool assume_same_type = false, bool sort_by_species = true);
-  bool mergeEntries(vector<vector<aflowlib::_aflowlib_entry> >& naries, aflowlib::_aflowlib_entry& new_entry, int& match, bool sort_by_species = true);
-  bool mergeEntries(vector<vector<aflowlib::_aflowlib_entry> >& naries, aflowlib::_aflowlib_entry& new_entry, bool sort_by_species = true);
-  bool mergeEntries(vector<aflowlib::_aflowlib_entry>& naries, vector<aflowlib::_aflowlib_entry>& new_entries);
-  bool mergeEntries(vector<aflowlib::_aflowlib_entry>& naries, aflowlib::_aflowlib_entry& new_entry);
-  //start combining
-  bool mergeEntries(vector<vector<aflowlib::_aflowlib_entry> >& naries, vector<vector<vector<aflowlib::_aflowlib_entry> > >& new_entries, bool sort_by_species = true);
-  bool mergeEntries(vector<aflowlib::_aflowlib_entry>& naries, vector<vector<vector<aflowlib::_aflowlib_entry> > >& new_entries);
-  bool mergeEntries(vector<aflowlib::_aflowlib_entry>& naries, vector<aflowlib::_aflowlib_entry>& new_entries);
-  //trivial
-  bool mergeEntries(vector<aflowlib::_aflowlib_entry>& naries, vector<vector<vector<aflowlib::_aflowlib_entry> > >& new_entries);
-  bool mergeEntries(vector<aflowlib::_aflowlib_entry>& naries, vector<vector<aflowlib::_aflowlib_entry> >& new_entries);
-  ////////////////////////////////////////////////////////////////////////////////
   //get elemental combinations (recursively)
   //[OBSOLETE CO20180528]void getCombination(const vector<string>& velements, vector<string>& combination, vector<vector<string> >& combinations, uint offset, uint nary);
   vector<vector<string> > elementalCombinations(const vector<string>& velements, uint nary);

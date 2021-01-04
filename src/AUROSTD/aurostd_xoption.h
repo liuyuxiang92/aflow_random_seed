@@ -58,11 +58,11 @@ namespace aurostd {
       bool flag(void) const;       // return if there is any scheme inside //CO20180101 //SC20191227
       // attached stuff..
       bool isdefined(string) const;                                    //SC20200114
-      uint opattachedscheme(string,string,bool);                       // add/remove attached_scheme if flag=TRUE, then returns vghost.size()
+      uint opattachedscheme(const string&,const string&,bool);                       // add/remove attached_scheme if flag=TRUE, then returns vghost.size()
       uint addattachedscheme(string scheme,string attached,bool flag); // add attached_scheme if flag=TRUE, then returns vghost.size()
       // [OBSOLETE] uint purgeattachedscheme(string check);            // remove attached_scheme, then returns vghost.size() - same as pop_attached
-      uint push_attached(string scheme,string attached);               // add attached_scheme, then returns vghost.size() - like addattachedscheme with flag=TRUE
-      uint pop_attached(string check);                                 // remove attached_scheme, then returns vghost.size()
+      uint push_attached(const string& scheme,const string& attached);               // add attached_scheme, then returns vghost.size() - like addattachedscheme with flag=TRUE
+      uint pop_attached(const string& check);                                 // remove attached_scheme, then returns vghost.size()
       string getattachedscheme(const string& scheme) const; //CO20180101
       template<class utype> utype getattachedutype(const string& scheme) const;  //CO20200731
       bool args2addattachedscheme(vector<string> &argv,const string scheme,const string& _s_search,string string_default); 

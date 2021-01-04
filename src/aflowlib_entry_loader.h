@@ -32,9 +32,11 @@ namespace aflowlib {
       
       //attributes
       bool m_initialized;
+      bool m_input_processed;
       aurostd::xoption m_elflags;
       string m_sinput;
       _aflags m_aflags; //NOT an input, it's not required, just for directory manipulation
+      vector<vector<vector<aflowlib::_aflowlib_entry> > > m_ventries; //organize as 3-layer, always easier to go from 3-layer to 1-layer
       
       //initializers
       bool initialize(ostream& oss);
@@ -58,9 +60,9 @@ namespace aflowlib {
 
       //getters
       void retrieveOutput(string& soutput);
-      void retrieveOutput(vector<aflowlib::_aflowlib_entry>& entries);
-      void retrieveOutput(vector<vector<aflowlib::_aflowlib_entry> >& entries);
-      void retrieveOutput(vector<vector<vector<aflowlib::_aflowlib_entry> > >& entries);
+      void retrieveOutput(vector<aflowlib::_aflowlib_entry>& ventries);
+      void retrieveOutput(vector<vector<aflowlib::_aflowlib_entry> >& ventries);
+      void retrieveOutput(vector<vector<vector<aflowlib::_aflowlib_entry> > >& ventries);
     private:
       //NECESSARY private CLASS METHODS - START
       void free();
@@ -68,6 +70,10 @@ namespace aflowlib {
       //NECESSARY END CLASS METHODS - END
 
       void processInput();
+      void sanitizeAFLUXSummons();
+      void AFLUXSummons2Entries();
+      void setAFLUXSummons4ElementsString();
+      void loadEntries();
   };
 } // namespace aflowlib
 
