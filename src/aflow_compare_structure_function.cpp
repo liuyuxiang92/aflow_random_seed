@@ -6250,7 +6250,11 @@ void XtalFinderCalculator::latticeSearch(
 // ***************************************************************************
 namespace compare {
   xstructure supercell2newRepresentation(const xstructure& xstr_supercell, const xmatrix<double>& lattice){
-      // ---------------------------------------------------------------------------
+      
+    // Converts a supercell to a new representation
+    // Wrapper for foldAtomsInCell
+
+    // ---------------------------------------------------------------------------
       // make smaller lattice the new lattice in the supercell structure
       // note: lattices[p] are oriented wrt to supercell (it has to be), otherwise could break periodicity
       xstructure proto=xstr_supercell; //DX20190530 - added "_supercell"; more descriptive
@@ -6368,7 +6372,7 @@ bool XtalFinderCalculator::searchAtomMappings(
     //    to a new unit cell representation (fast, robust, new)
     // 1 = supercell method
     if(DEFAULT_XTALFINDER_SUPERCELL_METHOD){
-      xstr2_tmp = compare::supercell2newRepresentation(xstr2, lattices[p]);
+      xstr2_tmp = foldAtomsInCellXstructure(xstr2, lattices[p], false, 0.01, false);
       xstr2_tmp.dist_nn_min=SYM::minimumDistance(xstr2_tmp);
     }
     // 2 = transformation method (default)

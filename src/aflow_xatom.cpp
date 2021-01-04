@@ -11386,6 +11386,25 @@ xmatrix<double> LatticeReduction(const xmatrix<double>& lattice) {
 //DX20190214 [OBSOLETE]   double tol = _SYM_TOL_;
 //DX20190214 [OBSOLETE]   return foldAtomsInCell(atoms, c2f_new, f2c_new, skew, tol);
 //DX20190214 [OBSOLETE]}
+xstructure foldAtomsInCellXstructure(const xstructure& a,const xmatrix<double>& lattice_new, bool skew, double tol, bool check_min_dists) { //DX20210104
+      
+  xstructure b=a; //copy
+  
+  b.atoms = foldAtomsInCell(a, lattice_new, skew, tol, check_min_dists); // fold atoms in
+
+  // update xstructure info
+  b.lattice=lattice_new;
+  std::stable_sort(b.atoms.begin(),b.atoms.end(),sortAtomsNames);
+  b.BringInCell();
+  b.FixLattices();
+  b.SpeciesPutAlphabetic();
+  deque<int> sizes = SYM::arrange_atoms(b.atoms);
+  b = pflow::SetNumEachType(b, sizes);
+  b.species = b.species;
+  b.MakeBasis();
+
+  return b;
+}
 
 deque<_atom> foldAtomsInCell(const xstructure& a,const xmatrix<double>& lattice_new, bool skew, double tol, bool check_min_dists) { //CO20190520 - removed pointers for bools and doubles, added const where possible //DX20190619 = added check_min_dists bool
   bool LDEBUG=(FALSE || XHOST.DEBUG);
@@ -11450,26 +11469,34 @@ deque<_atom> foldAtomsInCell(const deque<_atom>& atoms,const xmatrix<double>& la
     //[CO20190520 - this case is not needed]  atoms_in_cell.back().ijk(1)=0; atoms_in_cell.back().ijk(2)=0; atoms_in_cell.back().ijk(3)=0;
     //[CO20190520 - this case is not needed]} else {  //[CO20200106 - close bracket for indenting]}
     //bool duplicate_atom = false;
-    tmp.fpos = BringInCell(c2f_new * atoms[j].cpos);
-    tmp.cpos = f2c_new * tmp.fpos;
-    //[OBSOLETE]for (uint a = 0; a < atoms_in_cell.size(); a++) {
-    //[OBSOLETE]  if(MapAtomsInNewCell(atoms_in_cell[a], tmp, c2f_orig, f2c_new, skew, tol))
-    //[OBSOLETE]  if(MapAtoms(atoms_in_cell[a], tmp, c2f_orig, f2c_new, skew, tol))
-    //[OBSOLETE]  { //CO20200106 - patching for auto-indenting
-    //[OBSOLETE]    duplicate_atom = true;
-    //[OBSOLETE]    break;
-    //[OBSOLETE]  }
-    //[OBSOLETE]}
-    //[OBSOLETE]if(duplicate_atom == false) {
-    if(!SYM::MapAtom(atoms_in_cell,tmp,false,lattice_new,f2c_new,skew,tol)){ //DX20190619 - lattice_new and f2c_new as input
-      //[OBSOLETE]atoms[j].fpos = tmp.fpos; //BringInCell(tmp.fpos);
-      //[OBSOLETE]atoms[j].cpos = tmp.cpos; //f2c_new * atoms[j].fpos;
-      atoms_in_cell.push_back(atoms[j]);
-      atoms_in_cell.back().fpos = tmp.fpos;
-      atoms_in_cell.back().cpos = tmp.cpos;
-      atoms_in_cell.back().ijk(1)=0; atoms_in_cell.back().ijk(2)=0; atoms_in_cell.back().ijk(3)=0;
+    tmp.fpos = c2f_new * atoms[j].cpos; //DX20210104
+    // ---------------------------------------------------------------------------
+    // quickly find which atoms are inside cell
+    // folding them in would result in duplicate positions; avoids unnecessary
+    // matrix multiplication
+    // use soft-cutoff here and robust MapAtom later
+    if(atomInCell(tmp,0.05)){ //DX20210104
+      tmp.fpos = BringInCell(tmp.fpos); //DX20210104
+      tmp.cpos = f2c_new * tmp.fpos;
+      //[OBSOLETE]for (uint a = 0; a < atoms_in_cell.size(); a++) {
+      //[OBSOLETE]  if(MapAtomsInNewCell(atoms_in_cell[a], tmp, c2f_orig, f2c_new, skew, tol))
+      //[OBSOLETE]  if(MapAtoms(atoms_in_cell[a], tmp, c2f_orig, f2c_new, skew, tol))
+      //[OBSOLETE]  { //CO20200106 - patching for auto-indenting
+      //[OBSOLETE]    duplicate_atom = true;
+      //[OBSOLETE]    break;
+      //[OBSOLETE]  }
+      //[OBSOLETE]}
+      //[OBSOLETE]if(duplicate_atom == false) {
+      if(!SYM::MapAtom(atoms_in_cell,tmp,false,lattice_new,f2c_new,skew,tol)){ //DX20190619 - lattice_new and f2c_new as input
+        //[OBSOLETE]atoms[j].fpos = tmp.fpos; //BringInCell(tmp.fpos);
+        //[OBSOLETE]atoms[j].cpos = tmp.cpos; //f2c_new * atoms[j].fpos;
+        atoms_in_cell.push_back(atoms[j]);
+        atoms_in_cell.back().fpos = tmp.fpos;
+        atoms_in_cell.back().cpos = tmp.cpos;
+        atoms_in_cell.back().ijk(1)=0; atoms_in_cell.back().ijk(2)=0; atoms_in_cell.back().ijk(3)=0;
+      }
+      //[CO20190520 - this case is not needed]}
     }
-    //[CO20190520 - this case is not needed]}
   }
 
   if(check_min_dists){ //DX20190613
