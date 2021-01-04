@@ -5735,7 +5735,7 @@ namespace pocc {
       if(LDEBUG) {cerr << soliloquy << " species_std         =" << aurostd::joinWDelimiter(species,",") << endl;}
 
       //RENAMING SPECIES TO ELIMINATE CHEMISTRY-SPECIFIC UFF ENERGIES
-      //this code is technically a hack and does NOT work in general: true fix is structure comparison
+      //this code is NOT a general fix: true fix is structure comparison
       //the biggest problem: the parent structure defines the volume for the cluster used to find the UFF energies
       //the volume defines the bond distances and thus which pairs are bonded/non-bonded
       //we need to make sure the parent structure is re-decorated as consistently as possible given different input decorations
@@ -5784,18 +5784,26 @@ namespace pocc {
         vector<uint> types_added;
         uint type=0;
 
-        //0. prioritize anions to preserve the sublattice
+        //0. prioritize anion sublattice, must find a sublattice full of anions
         vector<string> vanions;
         aurostd::string2tokens("B,C,N,O",vanions,",");
+        bool sublattice_found=false;
         for(site=0;site<m_pocc_sites_resorted.size();site++){
           if(m_pocc_sites_resorted[site].v_types.size()!=m_pocc_sites_resorted[site].v_occupants.size()){
             throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_pocc_sites_resorted[site].v_types.size()!=m_pocc_sites_resorted[site].v_occupants.size()",_RUNTIME_ERROR_);
           }
-          for(itype=0;itype<m_pocc_sites_resorted[site].v_types.size();itype++){
+          sublattice_found=(m_pocc_sites_resorted[site].v_types.size()>0);  //set to true first
+          for(itype=0;itype<m_pocc_sites_resorted[site].v_types.size()&&sublattice_found==true;itype++){
             type=m_pocc_sites_resorted[site].v_types[itype];
             const string& occupant=xstr_pocc.atoms[m_pocc_sites_resorted[site].v_occupants[itype]].name;
-            if(!aurostd::WithinList(types_added,type) && aurostd::WithinList(vanions,occupant)){
-              if(LDEBUG){cerr << soliloquy << " mapping " << occupant << " to " << species_orig[iocc2spec] << endl;}
+            if(!aurostd::WithinList(vanions,occupant)){sublattice_found=false;}
+          }
+          if(sublattice_found){
+            itype=0;  //prioritize first species of sublattice for parent structure
+            type=m_pocc_sites_resorted[site].v_types[itype];
+            const string& occupant=xstr_pocc.atoms[m_pocc_sites_resorted[site].v_occupants[itype]].name;
+            if(!aurostd::WithinList(types_added,type)){
+              if(LDEBUG){cerr << soliloquy << " mapping " << occupant << " to " << species_orig[iocc2spec] << " [sublattice]" << endl;}
               species[type]=species_orig[iocc2spec++];
               types_added.push_back(type);
             }
@@ -5808,7 +5816,7 @@ namespace pocc {
           type=m_pocc_sites_resorted[site].v_types[itype];
           const string& occupant=xstr_pocc.atoms[m_pocc_sites_resorted[site].v_occupants[itype]].name;
           if(!aurostd::WithinList(types_added,type)){
-            if(LDEBUG){cerr << soliloquy << " mapping " << occupant << " to " << species_orig[iocc2spec] << endl;}
+            if(LDEBUG){cerr << soliloquy << " mapping " << occupant << " to " << species_orig[iocc2spec] << " [first-occupant]" << endl;}
             species[type]=species_orig[iocc2spec++];
             types_added.push_back(type);
           }
@@ -5820,7 +5828,7 @@ namespace pocc {
             type=m_pocc_sites_resorted[site].v_types[itype];
             const string& occupant=xstr_pocc.atoms[m_pocc_sites_resorted[site].v_occupants[itype]].name;
             if(!aurostd::WithinList(types_added,type)){
-              if(LDEBUG){cerr << soliloquy << " mapping " << occupant << " to " << species_orig[iocc2spec] << endl;}
+              if(LDEBUG){cerr << soliloquy << " mapping " << occupant << " to " << species_orig[iocc2spec] << " [remaining]" << endl;}
               //species[occupant2species_map[iocc2spec++]]=species_orig[type];
               //species[type]=species_orig[occupant2species_map[iocc2spec++]];
               species[type]=species_orig[iocc2spec++];
