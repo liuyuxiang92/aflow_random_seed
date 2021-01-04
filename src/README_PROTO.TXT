@@ -1963,6 +1963,115 @@ AB4C_cF24_216_a_e_c-001.ABC/CAB/BCA              cF24      F-43m               -
 A3B4C4_cI22_217_b_c_c-001.{ABC}                  cI22      I-43m               -         Ca3Ga4Ni4           #217      metallic; Ca3Ga4Ni4, ICSD #58899
 A3BC_cP15_221_ag_c_d-001.{ABC}                   cP15      Pm-3m               -         Ga3Os1Tb1           #221      metallic; Ga3Os1Tb1, ICSD #412144
 
+*****************************************************************************************************************************************************
+ANRL - metal borides - BINARIES
+
+ANRL Label                                       Pearson   SG symbol           Struk     Prototype           SG #      notes
+----------------------------------------------------------------------------------------------------------------------------------------------------
+A4B_mC10_12_j_a-001.{AB}                         mC10      C2/m                -         B4Mn1               #12       metal-boride; B4Mn1, ICSD #15079 equivalent to 1034.AB,1034.BA [HTQC]
+A2B_mC12_12_2i_i-002.{AB}                        mC12      C2/m                -         B2Mo1               #12       metal-boride; B2Mo1, ICSD #418398 equivalent to 1041.AB,1041.BA [HTQC]
+A5B2_mC14_12_a2i_i-002.{AB}                      mC14      C2/m                -         B5W2                #12       metal-boride; B5W2, ICSD #20326 equivalent to 1019.AB,1019.BA,1046.AB,1046.BA [HTQC]
+A3B4_mC28_15_ef_2f-001.{AB}                      mC28      C2/c                -         B3Ni4               #15       metal-boride; B3Ni4, ICSD #24308 equivalent to 1071.AB,1071.BA [HTQC]
+A3B4_mC28_15_ef_2f-002.{AB}                      mC28      C2/c                -         B3Ni4               #15       metal-boride; B3Ni4, ICSD #150561 equivalent to 1070.AB,1070.BA [HTQC]
+A4B_oP10_58_2g_a-001.{AB}                        oP10      Pnnm                -         B4Cr1               #58       metal-boride; B4Cr1, ICSD #186851 equivalent to 1055.AB,1055.BA,1056.AB,1056.BA [HTQC]
+A2B_oP6_59_e_a-001.{AB}                          oP6       Pmmn                -         B2Ru1               #59       metal-boride; B2Ru1, ICSD #31871 equivalent to 1018.AB,1018.BA [HTQC]
+AB_oP8_62_c_c-007.{AB}                           oP8       Pnma                -         B1Ti1               #62       metal-boride; B1Ti1, ICSD #24701 equivalent to 256,1020.AB,1020.BA,1050.AB,1050.BA [HTQC]
+AB_oP8_62_c_c-008.{AB}                           oP8       Pnma                -         B1Li1               #62       metal-boride; B1Li1, ICSD #153291 equivalent to 1049.AB,1049.BA [HTQC]
+AB_oP8_62_c_c-009.{AB}                           oP8       Pnma                -         B1Co1               #62       metal-boride; B1Co1, ICSD #612863 equivalent to 256,1020.AB,1020.BA,1047.AB,1047.BA,1050.AB,1050.BA [HTQC]
+A2B_oP12_62_d_c-001.{AB}                         oP12      Pnma                -         B2Fe1               #62       metal-boride; B2Fe1, ICSD #425310 equivalent to 1066.AB,1066.BA [HTQC]
+AB_oC8_63_a_c-001.{AB}                           oC8       Cmcm                -         B1Rh1               #63       metal-boride; B1Rh1, ICSD #150732 equivalent to 1029.AB,1029.BA [HTQC]
+AB3_oC16_63_c_cf-001.{AB}                        oC16      Cmcm                -         B1Re3               #63       metal-boride; B1Re3, ICSD #43662 equivalent to 1022.AB,1022.BA [HTQC]
+A3B2_oC20_63_3c_2c-001.{AB}                      oC20      Cmcm                -         B3V2                #63       metal-boride; B3V2, ICSD #79258 equivalent to 1012.AB,1012.BA [HTQC]
+A6B5_oC22_65_i2j_aij-001.{AB}                    oC22      Cmmm                -         B6Ta5               #65       metal-boride; B6Ta5, ICSD #68538 equivalent to 1058.AB,1058.BA [HTQC]
+A4B_oI10_71_n_a-001.{AB}                         oI10      Immm                -         B4Cr1               #71       metal-boride; B4Cr1, ICSD #24353 equivalent to 1033.AB,1033.BA [HTQC]
+A4B3_oI14_71_ef_af-001.{AB}                      oI14      Immm                -         B4Nb3               #71       metal-boride; B4Nb3, ICSD #76631 equivalent to 1045.AB,1045.BA [HTQC]
+A4B3_oI14_71_ef_af-002.{AB}                      oI14      Immm                -         B4Mn3               #71       metal-boride; B4Mn3, ICSD #614732 
+A11B_tI24_119_aegi_d-001.{AB}                    tI24      I-4m2               -         B11Li1              #119      metal-boride; B11Li1, ICSD #164844 equivalent to 1062.AB,1062.BA [HTQC]
+A11B_tI24_119_aegi_d-002.{AB}                    tI24      I-4m2               -         B11Li1              #119      metal-boride; B11Li1, ICSD #164845 equivalent to 1063.AB,1063.BA [HTQC]
+AB2_tI12_121_ab_i-001.{AB}                       tI12      I-42m               -         B1Fe2               #121      metal-boride; B1Fe2, ICSD #16809 equivalent to 1037.AB,1037.BA [HTQC]
+A12B_tI26_139_jm_a-001.{AB}                      tI26      I4/mmm              -         B12Sc1              #139      metal-boride; B12Sc1, ICSD #615424 equivalent to 1068.AB,1068.BA [HTQC]
+AB2_tI12_140_b_h-001.{AB}                        tI12      I4/mcm              -         B1Fe2               #140      metal-boride; B1Fe2, ICSD #160789 equivalent to 1036.AB,1036.BA [HTQC]
+AB2_tI12_140_b_h-002.{AB}                        tI12      I4/mcm              -         B1Fe2               #140      metal-boride; B1Fe2, ICSD #160790 
+AB2_tI12_140_c_h-001.{AB}                        tI12      I4/mcm              -         B1Ti2               #140      metal-boride; B1Ti2, ICSD #189385 equivalent to 1040.AB,1040.BA [HTQC]
+A4B5_hR9_160_ab_2ab-001.{AB}                     hR9       R3m                 -         B4Li5               #160      metal-boride; B4Li5, ICSD #23041 
+A11B_hR12_160_2a3b_a-001.{AB}                    hR12      R3m                 -         B11Li1              #160      metal-boride; B11Li1, ICSD #164842 equivalent to 1060.AB,1060.BA [HTQC]
+AB_hR4_166_c_c-003.{AB}                          hR4       R-3m                -         B2Li2               #166      metal-boride; B2Li2, ICSD #1 equivalent to 537,538,1032.AB,1032.BA [HTQC]
+A2B_hR6_166_2c_c-001.{AB}                        hR6       R-3m                -         B4Mo2               #166      metal-boride; B4Mo2, ICSD #39554 equivalent to 1043.AB,1043.BA,1078.AB,1078.BA [HTQC]
+A5B2_hR7_166_a2c_c-002.{AB}                      hR7       R-3m                -         B5W2                #166      metal-boride; B5W2, ICSD #20326 
+A3B_hR8_166_f_c-001.{AB}                         hR8       R-3m                -         B3Mo1               #166      metal-boride; B3Mo1, ICSD #167734 equivalent to 1052.AB,1052.BA [HTQC]
+AB3_hP8_182_c_g-002.{AB}                         hP8       P6_{3}22            -         B1Fe3               #182      metal-boride; B1Fe3, ICSD #184958 equivalent to 1048.AB,1048.BA,1262.AB,1262.BA,1263.AB,1263.BA [HTQC]
+A2B_hP3_191_d_a-001.{AB}                         hP3       P6/mmm              -         B2Zr1               #191      metal-boride; B2Zr1, ICSD #169458 equivalent to 1011.AB,1011.BA [HTQC]
+A2B_hP3_191_d_a-002.{AB}                         hP3       P6/mmm              -         B2Ca1               #191      metal-boride; B2Ca1, ICSD #186764 
+A2B_hP3_191_d_a-003.{AB}                         hP3       P6/mmm              -         B2Nb1               #191      metal-boride; B2Nb1, ICSD #614887 equivalent to 519,520,1028.AB,1028.BA [HTQC]
+AB_hP4_194_a_c-002.{AB}                          hP4       P6_{3}/mmc          -         B1Pt1               #194      metal-boride; B1Pt1, ICSD #24363 equivalent to 1016.AB,1016.BA [HTQC]
+A2B_hP6_194_f_c-001.{AB}                         hP6       P6_{3}/mmc          -         B2Re1               #194      metal-boride; B2Re1, ICSD #23871 equivalent to 694.AB,694.BA,1017.AB,1017.BA [HTQC]
+AB_hP8_194_bc_f-001.{AB}                         hP8       P6_{3}/mmc          -         B2Li2               #194      metal-boride; B2Li2, ICSD #2 equivalent to 1051.AB,1051.BA [HTQC]
+A3B_hP8_194_af_c-001.{AB}                        hP8       P6_{3}/mmc          -         B3Re1               #194      metal-boride; B3Re1, ICSD #24361 equivalent to 1053.AB,1053.BA [HTQC]
+A3B2_hP10_194_cf_f-002.{AB}                      hP10      P6_{3}/mmc          -         B3Ru2               #194      metal-boride; B3Ru2, ICSD #23715 equivalent to 1023.AB,1023.BA [HTQC]
+A4B_hP10_194_2f_c-001.{AB}                       hP10      P6_{3}/mmc          -         B4Mo1               #194      metal-boride; B4Mo1, ICSD #167735 equivalent to 1057.AB,1057.BA [HTQC]
+A3B2_hP10_194_bf_f-001.{AB}                      hP10      P6_{3}/mmc          -         B3Ru2               #194      metal-boride; B3Ru2, ICSD #108082 
+A2B_hP12_194_bcf_f-001.{AB}                      hP12      P6_{3}/mmc          -         B2W1                #194      metal-boride; B2W1, ICSD #23716 equivalent to 1067.AB,1067.BA [HTQC]
+A5B2_hP14_194_fg_e-001.{AB}                      hP14      P6_{3}/mmc          -         B5Mo2               #194      metal-boride; B5Mo2, ICSD #167733 equivalent to 1072.AB,1072.BA [HTQC]
+A11B_cF48_216_aeg_b-001.{AB}                     cF48      F-43m               -         B11Li1              #216      metal-boride; B11Li1, ICSD #164841 equivalent to 1059.AB,1059.BA [HTQC]
+A11B_cF48_216_aef_d-001.{AB}                     cF48      F-43m               -         B11Li1              #216      metal-boride; B11Li1, ICSD #164843 equivalent to 1061.AB,1061.BA [HTQC]
+
+*****************************************************************************************************************************************************
+ANRL - metal borides - TERNARIES
+
+ANRL Label                                       Pearson   SG symbol           Struk     Prototype           SG #      notes
+----------------------------------------------------------------------------------------------------------------------------------------------------
+A4B2C_aP7_2_2i_i_a-001.{ABC}                     aP7       P-1                 -         B4Co2Mo1            #2        metal-boride; B4Co2Mo1, ICSD #44175
+A5B2C3_mC20_5_b2c_c_ac-001.{ABC}                 mC20      C2                  -         B5Ca2Os3            #5        metal-boride; B5Ca2Os3, ICSD #59227
+A3BC_mP10_11_3e_e_e-001.{ABC}                    mP10      P2_{1}/m            -         B3Er1Mo1            #11       metal-boride; B3Er1Mo1, ICSD #65932
+A2BC3_mC12_12_g_a_df-001.{ABC}                   mC12      C2/m                -         B2Er1Ir3            #12       metal-boride; B2Er1Ir3, ICSD #44230
+A4B2C5_mC22_12_2i_i_aj-001.{ABC}                 mC22      C2/m                -         B4La2Ni5            #12       metal-boride; B4La2Ni5, ICSD #63501
+A4B2C5_mC22_12_2i_i_aj-002.{ABC}                 mC22      C2/m                -         B4La2Ni5            #12       metal-boride; B4La2Ni5, ICSD #170618
+A2B2C_mC20_15_f_f_e-001.{ABC}                    mC20      C2/c                -         B2Ni2Tb1            #15       metal-boride; B2Ni2Tb1, ICSD #57003
+ABC_oF48_43_b_b_b-001.{ABC}                      oF48      Fdd2                -         B1Cu1Ir1            #43       metal-boride; B1Cu1Ir1, ICSD #75029
+AB4C_oP6_47_d_rt_a-001.ABC/CAB/BCA               oP6       Pmmm                -         Al1B4Yb1            #47       metal-boride; Al1B4Yb1, ICSD #181368
+AB4C3_oP8_47_a_qr_dt-001.{ABC}                   oP8       Pmmm                -         Al1B4Cr3            #47       metal-boride; Al1B4Cr3, ICSD #20082
+A3B4C_oP16_47_qrs_qrst_ad-001.{ABC}              oP16      Pmmm                -         B3Ir4Zn1            #47       metal-boride; B3Ir4Zn1, ICSD #71640
+A2B2C3_oP14_55_h_h_ag-001.{ABC}                  oP14      Pbam                -         B2Li2Rh3            #55       metal-boride; B2Li2Rh3, ICSD #417442
+AB2C_oP16_62_c_d_c-003.{ABC}                     oP16      Pnma                -         B1Co2Fe1            #62       metal-boride; B1Co2Fe1, ICSD #603579
+A2BC_oP16_62_2c_c_c-001.{ABC}                    oP16      Pnma                -         B2Co1Nb1            #62       metal-boride; B2Co1Nb1, ICSD #41893
+A2BC_oP16_62_d_c_c-001.{ABC}                     oP16      Pnma                -         B2Ce1Ru1            #62       metal-boride; B2Ce1Ru1, ICSD #612853
+ABC_oC12_63_c_c_c-002.{ABC}                      oC12      Cmcm                -         Al1B1Mo1            #63       metal-boride; Al1B1Mo1, ICSD #16777
+ABC_oC12_63_c_c_c-003.{ABC}                      oC12      Cmcm                -         B1Nb1Ni1            #63       metal-boride; B1Nb1Ni1, ICSD #43005
+A3BC_oC20_63_3c_c_c-001.{ABC}                    oC20      Cmcm                -         B3Co1V1             #63       metal-boride; B3Co1V1, ICSD #44188
+A3BC3_oC28_63_cf_a_cf-002.{ABC}                  oC28      Cmcm                -         B3Co1W3             #63       metal-boride; B3Co1W3, ICSD #25753
+A4BC3_oC32_63_2cf_a_cf-001.{ABC}                 oC32      Cmcm                -         B4Mg1Os3            #63       metal-boride; B4Mg1Os3, ICSD #91243
+AB2C2_oC10_65_a_i_j-001.{ABC}                    oC10      Cmmm                -         Al1B2Cr2            #65       metal-boride; Al1B2Cr2, ICSD #20083
+A2BC3_oC12_65_i_a_cf-001.{ABC}                   oC12      Cmmm                -         B2Ce1Rh3            #65       metal-boride; B2Ce1Rh3, ICSD #40777
+A2B2C3_oC14_65_j_j_ai-001.{ABC}                  oC14      Cmmm                -         Al2B2Ru3            #65       metal-boride; Al2B2Ru3, ICSD #43843
+A6B2C3_oC22_65_gp_j_ah-001.{ABC}                 oC22      Cmmm                -         B6Er2Ni3            #65       metal-boride; B6Er2Ni3, ICSD #65737
+ABC4_oC24_65_i_bc_jkm-001.{ABC}                  oC24      Cmmm                -         B1Nd1Ni4            #65       metal-boride; B1Nd1Ni4, ICSD #20882
+AB4C_oC24_65_h_gip_j-001.{ABC}                   oC24      Cmmm                -         Al1B4Yb1            #65       metal-boride; Al1B4Yb1, ICSD #167533
+A4B2C5_oF44_69_o_g_acf-001.{ABC}                 oF44      Fmmm                -         B4Ca2Rh5            #69       metal-boride; B4Ca2Rh5, ICSD #66768
+A2B2C_oF40_70_g_e_a-001.{ABC}                    oF40      Fddd                -         B2Rh2Sr1            #70       metal-boride; B2Rh2Sr1, ICSD #8153
+A2BC2_oF40_70_f_a_e-001.{ABC}                    oF40      Fddd                -         B2Nd1Os2            #70       metal-boride; B2Nd1Os2, ICSD #601369
+ABC_oF48_70_e_f_c-001.{ABC}                      oF48      Fddd                -         B1Ir1Li1            #70       metal-boride; B1Ir1Li1, ICSD #75027
+A2BC2_oI10_71_h_a_f-001.{ABC}                    oI10      Immm                -         B2Co1W2             #71       metal-boride; B2Co1W2, ICSD #16776
+A4B2C_oI14_71_ef_f_a-001.{ABC}                   oI14      Immm                -         B4Fe2Mo1            #71       metal-boride; B4Fe2Mo1, ICSD #44293
+A4B2C_oI14_71_ef_f_a-002.{ABC}                   oI14      Immm                -         B4Mn2W1             #71       metal-boride; B4Mn2W1, ICSD #614782
+A6BC2_oI18_71_hn_a_f-001.{ABC}                   oI18      Immm                -         B6Ce1Cr2            #71       metal-boride; B6Ce1Cr2, ICSD #16203
+A6BC2_oI18_71_hn_a_f-002.{ABC}                   oI18      Immm                -         B6Ce1Cr2            #71       metal-boride; B6Ce1Cr2, ICSD #81544
+ABC3_tP5_99_a_b_ac-001.{ABC}                     tP5       P4mm                -         B1Ce1Pt3            #99       metal-boride; B1Ce1Pt3, ICSD #95049
+A2BC2_tI10_139_e_a_d-001.{ABC}                   tI10      I4/mmm              -         B2Ba1Rh2            #139      metal-boride; B2Ba1Rh2, ICSD #8155
+A2B2C_tI10_139_d_e_a-001.{ABC}                   tI10      I4/mmm              -         B2Ir2Zn1            #139      metal-boride; B2Ir2Zn1, ICSD #71642
+A2B2C_tI10_139_e_d_a-001.{ABC}                   tI10      I4/mmm              -         B2Co2Dy1            #139      metal-boride; B2Co2Dy1, ICSD #612907
+A2B3C7_hR12_166_c_bc_ah-001.{ABC}                hR12      R-3m                -         B2Ca3Ni7            #166      metal-boride; B2Ca3Ni7, ICSD #36505
+A6B3C4_hR13_166_g_ac_2c-001.{ABC}                hR13      R-3m                -         B6Fe3Pr4            #166      metal-boride; B6Fe3Pr4, ICSD #614152
+A4BC3_hP16_176_bh_c_h-001.{ABC}                  hP16      P6_{3}/m            -         B4Hf1Ir3            #176      metal-boride; B4Hf1Ir3, ICSD #1518
+ABC2_hP12_180_d_c_i-001.{ABC}                    hP12      P6_{2}22            -         B1Ce1Pt2            #180      metal-boride; B1Ce1Pt2, ICSD #90403
+ABC_hP9_189_ac_f_g-001.{ABC}                     hP9       P-62m               -         B1Fe1Nb1            #189      metal-boride; B1Fe1Nb1, ICSD #20298
+A2B6C5_hP13_189_ab_i_df-001.{ABC}                hP13      P-62m               -         B2Rh6Sn5            #189      metal-boride; B2Rh6Sn5, ICSD #77352
+ABC3_hP15_189_bc_f_fk-001.{ABC}                  hP15      P-62m               -         B1Li1Pt3            #189      metal-boride; B1Li1Pt3, ICSD #68091
+ABC3_hP10_191_c_ab_i-001.{ABC}                   hP10      P6/mmm              -         B1Na1Pt3            #191      metal-boride; B1Na1Pt3, ICSD #68092
+AB4C_hP12_191_d_ci_ab-001.{ABC}                  hP12      P6/mmm              -         B1Ni4Y1             #191      metal-boride; B1Ni4Y1, ICSD #16515
+ABC4_hP12_191_c_ab_di-001.{ABC}                  hP12      P6/mmm              -         B1Ca1Ni4            #191      metal-boride; B1Ca1Ni4, ICSD #36504
+A2B7C_cF40_225_c_bd_a.{ABC}                      cF40      Fm-3m               -         B2Pd7Y1             #225      metal-boride; B2Pd7Y1, ICSD #260147
+
+
 ****************************************************************************************************
 ****************************************************************************************************
 ****************************************************************************************************
