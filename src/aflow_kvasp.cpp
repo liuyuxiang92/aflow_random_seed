@@ -2016,7 +2016,7 @@ namespace KBIN {
                   aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
                   Krun=KBIN::VASP_Run(xvasp,aflags,kflags,vflags,"relax2paw_gga",TRUE,FileMESSAGE);
                   if(!Krun) {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error [PAWGGA2 REL]");return Krun;}
-                  if(!KBIN::VASP_RunFinished(xvasp,aflags,FileMESSAGE,true)){KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error (OUTCAR_INCOMPLETE) [PAWGGA2 REL]");return Krun;} //CO20201111
+                  //[CO20210104 - OUTCAR has already been moved to OUTCAR.RELAX, check is inside VASP_RUN()]if(!KBIN::VASP_RunFinished(xvasp,aflags,FileMESSAGE,true)){KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error (OUTCAR_INCOMPLETE) [PAWGGA2 REL]");return Krun;} //CO20201111
                   aus << "22222  END        - " <<  xvasp.Directory << " - K=[" << xvasp.str.kpoints_k1 << " " << xvasp.str.kpoints_k2 << " " << xvasp.str.kpoints_k3 << "]" << " - " << kflags.KBIN_BIN << " - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
                   aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
                 } else {
@@ -2031,7 +2031,7 @@ namespace KBIN {
                       if(xvasp.NRELAXING<xvasp.NRELAX)  {
                         Krun=KBIN::VASP_Run(xvasp,aflags,kflags,vflags,"relax"+aurostd::utype2string(xvasp.NRELAXING),"relax"+aurostd::utype2string(xvasp.NRELAXING),TRUE,FileMESSAGE);
                         if(!Krun) {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error [RELAXATION<]");return Krun;}
-                        if(!KBIN::VASP_RunFinished(xvasp,aflags,FileMESSAGE,true)){KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error (OUTCAR_INCOMPLETE) [RELAXATION<]");return Krun;} //CO20201111
+                        //[CO20210104 - OUTCAR has already been moved to OUTCAR.RELAX, check is inside VASP_RUN()]if(!KBIN::VASP_RunFinished(xvasp,aflags,FileMESSAGE,true)){KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error (OUTCAR_INCOMPLETE) [RELAXATION<]");return Krun;} //CO20201111
                         KBIN::XVASP_INCAR_SPIN_REMOVE_RELAX(xvasp,aflags,vflags,xvasp.NRELAXING,FileMESSAGE);         // check if it is the case of turning off spin
                         KBIN::XVASP_KPOINTS_IBZKPT_UPDATE(xvasp,aflags,vflags,xvasp.NRELAXING,FileMESSAGE);           // check if it is the case of updating IBZKPT
                         //ME20190301 BEGIN
@@ -2055,7 +2055,7 @@ namespace KBIN {
                       if(xvasp.NRELAXING==xvasp.NRELAX) {
                         Krun=KBIN::VASP_Run(xvasp,aflags,kflags,vflags,"relax"+aurostd::utype2string(xvasp.NRELAXING),TRUE,FileMESSAGE);
                         if(!Krun) {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error [RELAXATION=]");return Krun;}
-                        if(!KBIN::VASP_RunFinished(xvasp,aflags,FileMESSAGE,true)){KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error (OUTCAR_INCOMPLETE) [RELAXATION=]");return Krun;} //CO20201111
+                        //[CO20210104 - OUTCAR has already been moved to OUTCAR.RELAX, check is inside VASP_RUN()]if(!KBIN::VASP_RunFinished(xvasp,aflags,FileMESSAGE,true)){KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error (OUTCAR_INCOMPLETE) [RELAXATION=]");return Krun;} //CO20201111
                         KBIN::XVASP_INCAR_SPIN_REMOVE_RELAX(xvasp,aflags,vflags,xvasp.NRELAXING,FileMESSAGE);  //ME20190610 - or else SPIN_REMOVE_RELAX_2 won't work
                       }
                       KBIN::XVASP_INCAR_ADJUST_ICHARG(xvasp, vflags, aflags, xvasp.NRELAXING, FileMESSAGE);  //ME20191028
@@ -2108,7 +2108,7 @@ namespace KBIN {
                       if(xvasp.NRELAXING<xvasp.NRELAX)  {
                         Krun=KBIN::VASP_Run(xvasp,aflags,kflags,vflags,"relax"+aurostd::utype2string(xvasp.NRELAXING),"relax"+aurostd::utype2string(xvasp.NRELAXING),TRUE,FileMESSAGE);
                         if(!Krun) {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error [RELAX_STATIC_BANDS RELAXATION<]");return Krun;}
-                        if(!KBIN::VASP_RunFinished(xvasp,aflags,FileMESSAGE,true)){KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error (OUTCAR_INCOMPLETE) [RELAX_STATIC_BANDS RELAXATION<]");return Krun;} //CO20201111
+                        //[CO20210104 - OUTCAR has already been moved to OUTCAR.RELAX, check is inside VASP_RUN()]if(!KBIN::VASP_RunFinished(xvasp,aflags,FileMESSAGE,true)){KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error (OUTCAR_INCOMPLETE) [RELAX_STATIC_BANDS RELAXATION<]");return Krun;} //CO20201111
                         //ME20190301 BEGIN
                         // CHGCAR/WAVECAR needs to be recycled if CHGCAR/WAVECAR=ON or VASP
                         // won't be able to read the files. Bug found by Rico Friedrich
@@ -2130,7 +2130,7 @@ namespace KBIN {
                       if(xvasp.NRELAXING==xvasp.NRELAX) {
                         Krun=KBIN::VASP_Run(xvasp,aflags,kflags,vflags,"relax"+aurostd::utype2string(xvasp.NRELAXING),TRUE,FileMESSAGE);
                         if(!Krun) {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error [RELAX_STATIC_BANDS RELAXATION=]");return Krun;}
-                        if(!KBIN::VASP_RunFinished(xvasp,aflags,FileMESSAGE,true)){KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error (OUTCAR_INCOMPLETE) [RELAX_STATIC_BANDS RELAXATION=]");return Krun;} //CO20201111
+                        //[CO20210104 - OUTCAR has already been moved to OUTCAR.RELAX, check is inside VASP_RUN()]if(!KBIN::VASP_RunFinished(xvasp,aflags,FileMESSAGE,true)){KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error (OUTCAR_INCOMPLETE) [RELAX_STATIC_BANDS RELAXATION=]");return Krun;} //CO20201111
                       }
                       KBIN::XVASP_INCAR_ADJUST_ICHARG(xvasp, vflags, aflags, xvasp.NRELAXING, FileMESSAGE);  //ME20191028
                       xvasp_spin_evolution.push_back(xvasp.str.qm_mag_atom); // keep track of spins
@@ -2701,7 +2701,7 @@ namespace KBIN {
                 aurostd::stringstream2file(xvasp.KPOINTS,string(xvasp.Directory+"/KPOINTS"));   // BACKUP KPOINTS
                 Krun=KBIN::VASP_Run(xvasp,aflags,kflags,vflags,relaxfile,relaxfile,FALSE,FileMESSAGE);
                 if(!Krun) {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error [KPOINTS 1]");return Krun;}
-                if(!KBIN::VASP_RunFinished(xvasp,aflags,FileMESSAGE,true)){KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error (OUTCAR_INCOMPLETE) [KPOINTS 1]");return Krun;} //CO20201111
+                //[CO20210104 - OUTCAR has already been moved to OUTCAR.RELAX, check is inside VASP_RUN()]if(!KBIN::VASP_RunFinished(xvasp,aflags,FileMESSAGE,true)){KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error (OUTCAR_INCOMPLETE) [KPOINTS 1]");return Krun;} //CO20201111
                 // 2nd step: 1/2
                 kk1=3*(kbak_k1+1)/4;kk2=3*(kbak_k2+1)/4;kk3=3*(kbak_k3+1)/4;
                 relax="11111b ";relaxfile="relax1";
@@ -2713,7 +2713,7 @@ namespace KBIN {
                 aurostd::stringstream2file(xvasp.KPOINTS,string(xvasp.Directory+"/KPOINTS"));   // BACKUP KPOINTS
                 Krun=KBIN::VASP_Run(xvasp,aflags,kflags,vflags,relaxfile,relaxfile,FALSE,FileMESSAGE);
                 if(!Krun) {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error [KPOINTS 2]");return Krun;}
-                if(!KBIN::VASP_RunFinished(xvasp,aflags,FileMESSAGE,true)){KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error (OUTCAR_INCOMPLETE) [KPOINTS 2]");return Krun;} //CO20201111
+                //[CO20210104 - OUTCAR has already been moved to OUTCAR.RELAX, check is inside VASP_RUN()]if(!KBIN::VASP_RunFinished(xvasp,aflags,FileMESSAGE,true)){KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error (OUTCAR_INCOMPLETE) [KPOINTS 2]");return Krun;} //CO20201111
                 // 3rd step: 1/2
                 kk1=kbak_k1;kk2=kbak_k2;kk3=kbak_k3;
                 relax="11111c ";relaxfile="relax1";
@@ -2731,7 +2731,7 @@ namespace KBIN {
                   aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
                   Krun=KBIN::VASP_Run(xvasp,aflags,kflags,vflags,"relax2paw_gga",FALSE,FileMESSAGE);
                   if(!Krun) {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error [KPOINTS PAWGGA2]");return Krun;}
-                  if(!KBIN::VASP_RunFinished(xvasp,aflags,FileMESSAGE,true)){KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error (OUTCAR_INCOMPLETE) [KPOINTS PAWGGA2]");return Krun;} //CO20201111
+                  //[CO20210104 - OUTCAR has already been moved to OUTCAR.RELAX, check is inside VASP_RUN()]if(!KBIN::VASP_RunFinished(xvasp,aflags,FileMESSAGE,true)){KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error (OUTCAR_INCOMPLETE) [KPOINTS PAWGGA2]");return Krun;} //CO20201111
                   aus << "22222  END        - " <<  xvasp.Directory << " - K=[" << xvasp.str.kpoints_k1 << " " << xvasp.str.kpoints_k2 << " " << xvasp.str.kpoints_k3 << "]" << " - " << kflags.KBIN_BIN << " - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
                   aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
                 }
@@ -2747,12 +2747,12 @@ namespace KBIN {
                     if(i<xvasp.NRELAX)  {
                       Krun=KBIN::VASP_Run(xvasp,aflags,kflags,vflags,"relax"+aurostd::utype2string(vrelax),"relax"+aurostd::utype2string(vrelax),TRUE,FileMESSAGE);
                       if(!Krun) {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error [KPOINT 4]");return Krun;}
-                      if(!KBIN::VASP_RunFinished(xvasp,aflags,FileMESSAGE,true)){KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error (OUTCAR_INCOMPLETE) [KPOINT 4]");return Krun;} //CO20201111
+                      //[CO20210104 - OUTCAR has already been moved to OUTCAR.RELAX, check is inside VASP_RUN()]if(!KBIN::VASP_RunFinished(xvasp,aflags,FileMESSAGE,true)){KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error (OUTCAR_INCOMPLETE) [KPOINT 4]");return Krun;} //CO20201111
                     }
                     if(i==xvasp.NRELAX) {
                       Krun=KBIN::VASP_Run(xvasp,aflags,kflags,vflags,"relax"+aurostd::utype2string(vrelax),TRUE,FileMESSAGE);
                       if(!Krun) {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error [KPOINTS 5]");return Krun;}
-                      if(!KBIN::VASP_RunFinished(xvasp,aflags,FileMESSAGE,true)){KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error (OUTCAR_INCOMPLETE) [KPOINTS 5]");return Krun;} //CO20201111
+                      //[CO20210104 - OUTCAR has already been moved to OUTCAR.RELAX, check is inside VASP_RUN()]if(!KBIN::VASP_RunFinished(xvasp,aflags,FileMESSAGE,true)){KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error (OUTCAR_INCOMPLETE) [KPOINTS 5]");return Krun;} //CO20201111
                     }
                     vrelax++;
                   }
@@ -4017,7 +4017,7 @@ namespace KBIN {
   bool VASP_Run(_xvasp &xvasp,_aflags &aflags,_kflags &kflags,_vflags &vflags,string relaxA,string relaxB,bool qmwrite,ofstream &FileMESSAGE) {        // AFLOW_FUNCTION_IMPLEMENTATION
     bool Krun=TRUE;
     if(relaxA!=relaxB) {
-      string function = XPID + "KBIN::VASP_run()";
+      string function = XPID + "KBIN::VASP_run():";
       string message = "relaxA (" + relaxA + ") != relaxB (" + relaxB + ")";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
     }
