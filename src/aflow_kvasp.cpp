@@ -1999,8 +1999,8 @@ namespace KBIN {
                 aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
                 Krun=KBIN::VASP_Run(xvasp,aflags,kflags,vflags,FileMESSAGE);
                 if(!Krun) {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error [STATIC]");return Krun;}
-                if(!KBIN::VASP_RunFinished(xvasp,aflags,FileMESSAGE,true)){KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error (OUTCAR_INCOMPLETE) [STATIC]");return Krun;} //CO20201111
                 //	    if(_VASP_CONTCAR_SAVE_) KBIN::VASP_CONTCAR_Save(xvasp,string("static"));
+                if(!KBIN::VASP_RunFinished(xvasp,aflags,FileMESSAGE,true)){KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error (OUTCAR_INCOMPLETE) [STATIC]");return Krun;} //CO20201111 //AFTER CONTCAR_SAVE_
                 bool qmwrite=TRUE;
                 KBIN::VASP_Backup(xvasp,qmwrite,string("static"));
               }		
@@ -2347,8 +2347,8 @@ namespace KBIN {
                   aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
                   Krun=KBIN::VASP_Run(xvasp,aflags,kflags,vflags,FileMESSAGE);
                   if(!Krun) {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error [RELAX_STATIC_BANDS STATIC]");return Krun;}
-                  if(!KBIN::VASP_RunFinished(xvasp,aflags,FileMESSAGE,true)){KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error (OUTCAR_INCOMPLETE) [RELAX_STATIC_BANDS STATIC]");return Krun;} //CO20201111
                   //	    if(_VASP_CONTCAR_SAVE_) KBIN::VASP_CONTCAR_Save(xvasp,string("static"));
+                  if(!KBIN::VASP_RunFinished(xvasp,aflags,FileMESSAGE,true)){KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error (OUTCAR_INCOMPLETE) [RELAX_STATIC_BANDS STATIC]");return Krun;} //CO20201111  //AFTER CONTCAR_SAVE_
                   bool qmwrite=TRUE;
                   KBIN::VASP_Backup(xvasp,qmwrite,string("static"));
                   xvasp_spin_evolution.push_back(xvasp.str.qm_mag_atom); // keep track of spins
@@ -2407,8 +2407,8 @@ namespace KBIN {
                   vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.push("EDDRMM");	// dont mess up KPOINTS in bands
                   Krun=KBIN::VASP_Run(xvasp,aflags,kflags,vflags,FileMESSAGE);
                   if(!Krun) {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error [RELAX_STATIC_BANDS BANDS]");return Krun;}
-                  if(!KBIN::VASP_RunFinished(xvasp,aflags,FileMESSAGE,true)){KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error (OUTCAR_INCOMPLETE) [RELAX_STATIC_BANDS BANDS]");return Krun;} //CO20201111
                   //  if(_VASP_CONTCAR_SAVE_) KBIN::VASP_CONTCAR_Save(xvasp,string("bands"));
+                  if(!KBIN::VASP_RunFinished(xvasp,aflags,FileMESSAGE,true)){KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error (OUTCAR_INCOMPLETE) [RELAX_STATIC_BANDS BANDS]");return Krun;} //CO20201111 //AFTER CONTCAR_SAVE_
                   bool qmwrite=FALSE;
                   KBIN::VASP_Backup(xvasp,qmwrite,string("bands"));
                   xvasp_spin_evolution.push_back(xvasp.str.qm_mag_atom); // keep track of spins
@@ -2633,8 +2633,8 @@ namespace KBIN {
                 vrelax++;
                 Krun=KBIN::VASP_Run(xvasp,aflags,kflags,vflags,FileMESSAGE);
                 if(!Krun) {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error [DELSOL]");return Krun;}
-                if(!KBIN::VASP_RunFinished(xvasp,aflags,FileMESSAGE,true)){KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error (OUTCAR_INCOMPLETE) [DELSOL]");return Krun;} //CO20201111
                 //	    if(_VASP_CONTCAR_SAVE_) KBIN::VASP_CONTCAR_Save(xvasp,string("dsolp"));
+                if(!KBIN::VASP_RunFinished(xvasp,aflags,FileMESSAGE,true)){KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error (OUTCAR_INCOMPLETE) [DELSOL]");return Krun;} //CO20201111 //AFTER CONTCAR_SAVE_
                 bool qmwrite=FALSE;
                 KBIN::VASP_Backup(xvasp,qmwrite,string("dsolp"));
 
@@ -2656,8 +2656,8 @@ namespace KBIN {
                 vrelax++;
                 Krun=KBIN::VASP_Run(xvasp,aflags,kflags,vflags,FileMESSAGE);
                 if(!Krun) {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error [DELSOL minus]");return Krun;}
-                if(!KBIN::VASP_RunFinished(xvasp,aflags,FileMESSAGE,true)){KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error (OUTCAR_INCOMPLETE) [DELSOL minus]");return Krun;} //CO20201111
                 //	    if(_VASP_CONTCAR_SAVE_) KBIN::VASP_CONTCAR_Save(xvasp,string("dsolm"));
+                if(!KBIN::VASP_RunFinished(xvasp,aflags,FileMESSAGE,true)){KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error (OUTCAR_INCOMPLETE) [DELSOL minus]");return Krun;} //CO20201111 //AFTER CONTCAR_SAVE_
                 qmwrite=FALSE;
                 KBIN::VASP_Backup(xvasp,qmwrite,string("dsolm"));		
                 // FINISHED
@@ -4005,9 +4005,9 @@ namespace KBIN {
     bool Krun=TRUE;
     Krun=KBIN::VASP_Run(xvasp,aflags,kflags,vflags,FileMESSAGE);
     if(!Krun) {KBIN::VASP_Error(xvasp,"EEEEE  Error in  \"KBIN::VASP_Run(_xvasp &xvasp,_aflags &aflags,_kflags &kflags,_vflags &vflags,string relax,bool qmwrite,ofstream &FileMESSAGE)\"");}
-    if(!KBIN::VASP_RunFinished(xvasp,aflags,FileMESSAGE,true)){KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  Error in  \"KBIN::VASP_Run(_xvasp &xvasp,_aflags &aflags,_kflags &kflags,_vflags &vflags,string relax,bool qmwrite,ofstream &FileMESSAGE)\" (OUTCAR_INCOMPLETE)");} //CO20201111
     //  if(!Krun) return Krun;
     if(_VASP_CONTCAR_SAVE_) KBIN::VASP_CONTCAR_Save(xvasp,string(relax));
+    if(!KBIN::VASP_RunFinished(xvasp,aflags,FileMESSAGE,true)){KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  Error in  \"KBIN::VASP_Run(_xvasp &xvasp,_aflags &aflags,_kflags &kflags,_vflags &vflags,string relax,bool qmwrite,ofstream &FileMESSAGE)\" (OUTCAR_INCOMPLETE)");} //CO20201111  //AFTER CONTCAR_SAVE_
     KBIN::VASP_Backup(xvasp,qmwrite,relax);
     return Krun;
   }
@@ -4023,9 +4023,9 @@ namespace KBIN {
     }
     Krun=KBIN::VASP_Run(xvasp,aflags,kflags,vflags,FileMESSAGE);
     if(!Krun) {KBIN::VASP_Error(xvasp,"EEEEE  Error in  \"KBIN::VASP_Run(_xvasp &xvasp,_aflags &aflags,_kflags &kflags,_vflags &vflags,string relaxA,string relaxB,bool qmwrite,ofstream &FileMESSAGE)\"");}
-    if(!KBIN::VASP_RunFinished(xvasp,aflags,FileMESSAGE,true)){KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  Error in  \"KBIN::VASP_Run(_xvasp &xvasp,_aflags &aflags,_kflags &kflags,_vflags &vflags,string relaxA,string relaxB,bool qmwrite,ofstream &FileMESSAGE)\" (OUTCAR_INCOMPLETE)");} //CO20201111
     // if(!Krun) return Krun;
     if(_VASP_CONTCAR_SAVE_) KBIN::VASP_CONTCAR_Save(xvasp,string(relaxA));
+    if(!KBIN::VASP_RunFinished(xvasp,aflags,FileMESSAGE,true)){KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  Error in  \"KBIN::VASP_Run(_xvasp &xvasp,_aflags &aflags,_kflags &kflags,_vflags &vflags,string relaxA,string relaxB,bool qmwrite,ofstream &FileMESSAGE)\" (OUTCAR_INCOMPLETE)");} //CO20201111 //AFTER CONTCAR_SAVE_
     KBIN::VASP_Backup(xvasp,qmwrite,relaxA);
     KBIN::VASP_Recycle(xvasp,relaxB);
     return Krun;
