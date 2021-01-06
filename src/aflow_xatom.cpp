@@ -2884,12 +2884,10 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
       oss.unsetf(ios_base::floatfield);
       oss << " "; //<< std::defaultfloat;
       if(a.neg_scale_second){oss << (-1)*a.partial_occupation_HNF;}
-      else {
-        oss << a.partial_occupation_site_tol;
-        if(1||a.scale_third.isentry){  //CO20170803 - stoich tol //always print
-          oss << " "; 
-          oss << a.partial_occupation_stoich_tol;
-        }
+      else{oss << a.partial_occupation_site_tol;}
+      if(1||a.scale_third.isentry){  //CO20170803 - stoich tol //always print
+        oss << " "; 
+        oss << a.partial_occupation_stoich_tol;
       }
       oss << std::fixed;
     }
