@@ -312,7 +312,8 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     vpflow.flag("CHULL::INCLUDE_SKEWED_HULLS",aurostd::args2flag(argv,cmds,"--include_skewed_hulls|--include_skewed|--ish"));    //use entropic temperature instead of enthalpy of formation
     vpflow.flag("CHULL::INCLUDE_UNRELIABLE_HULLS",aurostd::args2flag(argv,cmds,"--include_unreliable_hulls|--include_unreliable|--iuh"));    //use entropic temperature instead of enthalpy of formation
     vpflow.flag("CHULL::INCLUDE_OUTLIERS",aurostd::args2flag(argv,cmds,"--include_outliers|--io"));    //use entropic temperature instead of enthalpy of formation
-    vpflow.flag("CHULL::FORCE_OUTLIERS",aurostd::args2flag(argv,cmds,"--force_outliers|--fo"));
+    //[CO20210105 - OBSOLETE]vpflow.flag("CHULL::FORCE_OUTLIERS",aurostd::args2flag(argv,cmds,"--force_outliers|--fo"));
+    vpflow.flag("CHULL::STRICT_OUTLIER_ANALYSIS",aurostd::args2flag(argv,cmds,"--strict_outlier_analysis|--soa"));
     vpflow.flag("CHULL::INCLUDE_ILL_CONVERGED",aurostd::args2flag(argv,cmds,"--include_ill_converged|--iic"));    //use entropic temperature instead of enthalpy of formation
     vpflow.flag("CHULL::LATEX_OUTPUT",aurostd::args2flag(argv,cmds,"--latex_output|--latexoutput"));    //verbose latex output (cout and FileMESSAGE)
     vpflow.flag("CHULL::LATEX_INTERACTIVE",aurostd::args2flag(argv,cmds,"--latex_interactive|--latexinteractive"));  //interact with latex (execute vs. execute2string)
@@ -2379,6 +2380,7 @@ namespace pflow {
     strstream << tab << xspaces << " " << "              --include_skewed_hulls|--include_skewed|--ish" << endl;
     strstream << tab << xspaces << " " << "              --include_unreliable_hulls|--include_unreliable|--iuh" << endl;
     strstream << tab << xspaces << " " << "              --include_outliers|--io" << endl;
+    strstream << tab << xspaces << " " << "              --strict_outlier_analysis|--soa" << endl;
     strstream << tab << xspaces << " " << "              --include_ill_converged|--iic" << endl;
     strstream << tab << xspaces << " " << "              --force" << endl;
     strstream << endl;

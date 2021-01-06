@@ -135,9 +135,9 @@ namespace chull {
     usage_options.push_back("--include_skewed_hulls|--include_skewed|--ish");
     usage_options.push_back("--include_unreliable_hulls|--include_unreliable|--iuh");
     usage_options.push_back("--include_outliers|--io");
+    usage_options.push_back("--strict_outlier_analysis|--soa");
     usage_options.push_back("--include_ill_converged|--iic");
     usage_options.push_back("--force");
-    usage_options.push_back("--force_outliers");
     usage_options.push_back(" ");
     usage_options.push_back("LATEX/PDF/PNG OPTIONS:");
     usage_options.push_back("--image_only|--imageonly|--image");
@@ -990,14 +990,14 @@ namespace chull {
     if(vpflow.flag("CHULL::INCLUDE_OUTLIERS")) {
       pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::INCLUDE_OUTLIERS set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
     }
+    if(vpflow.flag("CHULL::STRICT_OUTLIER_ANALYSIS")) {
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::STRICT_OUTLIER_ANALYSIS set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
+    }
     if(vpflow.flag("CHULL::INCLUDE_ILL_CONVERGED")) {
       pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::INCLUDE_ILL_CONVERGED set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
     }
     if(vpflow.flag("FORCE")) {
       pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::FORCE set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
-    }
-    if(vpflow.flag("CHULL::FORCE_OUTLIERS")) {
-      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::FORCE_OUTLIERS set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
     }
   }
 } // namespace chull
@@ -3724,16 +3724,15 @@ namespace chull {
     //nice solution here! but only works for odd counts
     //http://en.cppreference.com/w/cpp/algorithm/nth_element
     bool iqr_method=true; //unfortunately, MAD is normal distribution dependent, NOT our case here
-    //[CHECK COUNT ELSEWHERE]bool force_outlier_test=false;  //override binary alloy statistics check
 
     uint iqr_count_threshold=4; //3 results in degenerate quartile indices
     if((uint)energies.rows<iqr_count_threshold){ //ALWAYS not enough points to do statistics (need 3 quartiles)
       message << "Not enough degrees of freedom for outlier detection analysis per interquartile-range (count=" << energies.rows << " < " << iqr_count_threshold << ")";
       if(m_cflags.flag("FAKE_HULL")){aurostd::StringstreamClean(message);}  //don't want to see these errors, they are expected
-      else if(m_cflags.flag("FORCE")||m_cflags.flag("CHULL::FORCE_OUTLIERS")){
-        message << ", skipping outlier analysis";pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+      else if(m_cflags.flag("CHULL::STRICT_OUTLIER_ANALYSIS")&&(!m_cflags.flag("FORCE"))){
+        message << " (results may not be reliable). Terminating hull analysis.";throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);
       } else {
-        message << ". Override with --force_outliers (results may not be reliable).";throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);
+        message << ", skipping outlier analysis.";pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
       }
       return;
     }
@@ -3896,10 +3895,10 @@ namespace chull {
       if(points_to_consider.size()<binaries_half_hull_threshold){
         message << "Not enough degrees of freedom for outlier detection analysis per user defined threshold (count=" << points_to_consider.size() << " < " << binaries_half_hull_threshold << ")";
         if(m_cflags.flag("FAKE_HULL")){aurostd::StringstreamClean(message);}  //don't want to see these errors, they are expected
-        else if(m_cflags.flag("FORCE")||m_cflags.flag("CHULL::FORCE_OUTLIERS")){
-          message << ", skipping outlier analysis";pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+        else if(m_cflags.flag("CHULL::STRICT_OUTLIER_ANALYSIS")&&(!m_cflags.flag("FORCE"))){
+          message << " (results may not be reliable). Terminating hull analysis.";throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);
         } else {
-          message << ". Override with --force_outliers (results may not be reliable).";throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);
+          message << ", skipping outlier analysis.";pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
         }
         vector<uint> outliers;
         return outliers;
