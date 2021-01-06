@@ -2455,6 +2455,7 @@ namespace chull {
     m_equilibrium_phases.clear();
     m_calculated_equivalent_g_states=false;
     m_equivalent_g_states.clear();
+    m_sym_equivalent_g_states.clear();
     m_stability_criterion=AUROSTD_MAX_DOUBLE;
     m_n_plus_1_enthalpy_gain=AUROSTD_MAX_DOUBLE;
     m_icsd_g_state=false;
@@ -2480,6 +2481,7 @@ namespace chull {
     for(uint i=0,fl_size_i=m_equilibrium_phases.size();i<fl_size_i;i++){m_equilibrium_phases.clear();} m_equilibrium_phases.clear(); for(uint i=0;i<b.m_equilibrium_phases.size();i++){m_equilibrium_phases.push_back(b.m_equilibrium_phases[i]);}
     m_calculated_equivalent_g_states=b.m_calculated_equivalent_g_states;
     m_equivalent_g_states.clear(); for(uint i=0,fl_size_i=b.m_equivalent_g_states.size();i<fl_size_i;i++){m_equivalent_g_states.push_back(b.m_equivalent_g_states[i]);}
+    m_sym_equivalent_g_states.clear(); for(uint i=0,fl_size_i=b.m_sym_equivalent_g_states.size();i<fl_size_i;i++){m_sym_equivalent_g_states.push_back(b.m_sym_equivalent_g_states[i]);}
     m_stability_criterion=b.m_stability_criterion;
     m_n_plus_1_enthalpy_gain=b.m_n_plus_1_enthalpy_gain;
     m_icsd_g_state=b.m_icsd_g_state;
@@ -2649,7 +2651,11 @@ namespace chull {
   ConvexHull::ConvexHull(const aurostd::xoption& vpflow,const vector<ChullPoint>& vpoints,const vector<string>& velements,ofstream& FileMESSAGE,ostream& oss,bool formation_energy_hull,bool add_artificial_unaries) : xStream(FileMESSAGE,oss),m_initialized(false) {initialize(vpflow,vpoints,velements,formation_energy_hull,add_artificial_unaries);}
   ConvexHull::ConvexHull(const ConvexHull& b) : xStream(*b.getOFStream(),*b.getOSS()) {copy(b);}
 
-  ConvexHull::~ConvexHull() {xStream::free();free();}
+  ConvexHull::~ConvexHull() {
+    xStream::free();
+    free();
+    m_allowed_dft_types.clear();
+  }
 
   const ConvexHull& ConvexHull::operator=(const ConvexHull& other) {
     if(this!=&other) {copy(other);}

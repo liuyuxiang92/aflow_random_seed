@@ -30,6 +30,10 @@ namespace aflowlib {
   }
   _aflowlib_entry::~_aflowlib_entry() { // destructor PUBLIC
     free();
+
+    data_api.clear();
+    data_source.clear();
+    for(uint i=0;i<vLDAU.size();i++){vLDAU[i].clear();}vLDAU.clear(); //CO20210104 clear()
   }
 
   void _aflowlib_entry::copy(const _aflowlib_entry& b) { // copy PRIVATE
@@ -340,16 +344,14 @@ namespace aflowlib {
     dft_type.clear();vdft_type.clear();
     eentropy_cell=AUROSTD_NAN;eentropy_atom=AUROSTD_NAN;
     Egap=AUROSTD_NAN;Egap_fit=AUROSTD_NAN;
+    Egap_type.clear();
     energy_cell=AUROSTD_NAN;energy_atom=AUROSTD_NAN;energy_atom_relax1=AUROSTD_NAN;
     energy_cutoff=AUROSTD_NAN;
     delta_electronic_energy_convergence=AUROSTD_NAN;
     delta_electronic_energy_threshold=AUROSTD_NAN;
-    nkpoints=0;
-    nkpoints_irreducible=0;
-    kppra=0;
+    nkpoints=0;nkpoints_irreducible=0;kppra=0;
     kpoints.clear();
-    kpoints_nnn_relax.clear();
-    kpoints_nnn_static.clear();
+    kpoints_nnn_relax.clear();kpoints_nnn_static.clear();
     kpoints_pairs.clear();
     kpoints_bands_path_grid=0;
     enthalpy_cell=AUROSTD_NAN;enthalpy_atom=AUROSTD_NAN;
@@ -363,12 +365,11 @@ namespace aflowlib {
     files_RAW.clear();vfiles_RAW.clear();
     files_WEB.clear();vfiles_WEB.clear();
     forces.clear();vforces.clear();
-    Egap_type.clear();
     geometry.clear();vgeometry.clear();
     geometry_orig.clear();vgeometry_orig.clear(); //DX20190124 - add original crystal info
     lattice_system_orig.clear();lattice_variation_orig.clear();lattice_system_relax.clear();lattice_variation_relax.clear();
     ldau_TLUJ.clear();
-    vLDAU.resize(4);  //ME20190129
+    for(uint i=0;i<vLDAU.size();i++){vLDAU[i].clear();}vLDAU.clear(); vLDAU.resize(4);  //ME20190129  //CO20210104 clear()
     natoms=AUROSTD_NAN;
     natoms_orig=AUROSTD_NAN; //DX20190124 - add original crystal info
     nbondxx.clear();vnbondxx.clear();
@@ -402,65 +403,65 @@ namespace aflowlib {
     volume_cell_orig=AUROSTD_NAN;volume_atom_orig=AUROSTD_NAN; //DX20190124 - add original crystal info
     //DX20190124 - added original symmetry info - START
     // SYMMETRY
-    crystal_family_orig="";
-    crystal_system_orig="";
-    crystal_class_orig="";
-    point_group_Hermann_Mauguin_orig="";
-    point_group_Schoenflies_orig="";
-    point_group_orbifold_orig="";
-    point_group_type_orig="";
+    crystal_family_orig.clear();
+    crystal_system_orig.clear();
+    crystal_class_orig.clear();
+    point_group_Hermann_Mauguin_orig.clear();
+    point_group_Schoenflies_orig.clear();
+    point_group_orbifold_orig.clear();
+    point_group_type_orig.clear();
     point_group_order_orig=AUROSTD_NAN;
-    point_group_structure_orig="";
-    Bravais_lattice_lattice_type_orig="";
-    Bravais_lattice_lattice_variation_type_orig="";
-    Bravais_lattice_lattice_system_orig="";
-    Bravais_superlattice_lattice_type_orig="";
-    Bravais_superlattice_lattice_variation_type_orig="";
-    Bravais_superlattice_lattice_system_orig="";
-    Pearson_symbol_superlattice_orig="";
-    reciprocal_lattice_type_orig="";
-    reciprocal_lattice_variation_type_orig="";
+    point_group_structure_orig.clear();
+    Bravais_lattice_lattice_type_orig.clear();
+    Bravais_lattice_lattice_variation_type_orig.clear();
+    Bravais_lattice_lattice_system_orig.clear();
+    Bravais_superlattice_lattice_type_orig.clear();
+    Bravais_superlattice_lattice_variation_type_orig.clear();
+    Bravais_superlattice_lattice_system_orig.clear();
+    Pearson_symbol_superlattice_orig.clear();
     reciprocal_geometry_orig.clear();vreciprocal_geometry_orig.clear();
     reciprocal_volume_cell_orig=AUROSTD_NAN;
-    Wyckoff_letters_orig="";
-    Wyckoff_multiplicities_orig="";
-    Wyckoff_site_symmetries_orig="";
+    reciprocal_lattice_type_orig.clear();
+    reciprocal_lattice_variation_type_orig.clear();
+    Wyckoff_letters_orig.clear();
+    Wyckoff_multiplicities_orig.clear();
+    Wyckoff_site_symmetries_orig.clear();
     //DX20190124 - added original symmetry info - END
     //DX20180823 - added more symmetry info - START
     // SYMMETRY
-    crystal_family="";
-    crystal_system="";
-    crystal_class="";
-    point_group_Hermann_Mauguin="";
-    point_group_Schoenflies="";
-    point_group_orbifold="";
-    point_group_type="";
+    crystal_family.clear();
+    crystal_system.clear();
+    crystal_class.clear();
+    point_group_Hermann_Mauguin.clear();
+    point_group_Schoenflies.clear();
+    point_group_orbifold.clear();
+    point_group_type.clear();
     point_group_order=AUROSTD_NAN;
-    point_group_structure="";
-    Bravais_lattice_lattice_type="";
-    Bravais_lattice_lattice_variation_type="";
-    Bravais_lattice_lattice_system="";
-    Bravais_superlattice_lattice_type="";
-    Bravais_superlattice_lattice_variation_type="";
-    Bravais_superlattice_lattice_system="";
-    Pearson_symbol_superlattice="";
-    reciprocal_lattice_type="";
-    reciprocal_lattice_variation_type="";
+    point_group_structure.clear();
+    Bravais_lattice_lattice_type.clear();
+    Bravais_lattice_lattice_variation_type.clear();
+    Bravais_lattice_lattice_system.clear();
+    Bravais_superlattice_lattice_type.clear();
+    Bravais_superlattice_lattice_variation_type.clear();
+    Bravais_superlattice_lattice_system.clear();
+    Pearson_symbol_superlattice.clear();
     reciprocal_geometry.clear();vreciprocal_geometry.clear();
     reciprocal_volume_cell=AUROSTD_NAN;
-    Wyckoff_letters="";
-    Wyckoff_multiplicities="";
-    Wyckoff_site_symmetries="";
+    reciprocal_lattice_type.clear();
+    reciprocal_lattice_variation_type.clear();
+    Wyckoff_letters.clear();
+    Wyckoff_multiplicities.clear();
+    Wyckoff_site_symmetries.clear();
     //DX20180823 - added more symmetry info - END
     //DX20190209 - added anrl info - START
-    anrl_label_orig="";
-    anrl_parameter_list_orig="";
-    anrl_parameter_values_orig="";
-    anrl_label_relax="";
-    anrl_parameter_list_relax="";
-    anrl_parameter_values_relax="";
+    anrl_label_orig.clear();
+    anrl_parameter_list_orig.clear();
+    anrl_parameter_values_orig.clear();
+    anrl_label_relax.clear();
+    anrl_parameter_list_relax.clear();
+    anrl_parameter_values_relax.clear();
     //DX20190209 - added anrl info - END
-    pocc_parameters=""; //CO20200731
+    pocc_parameters.clear(); //CO20200731
     // AGL/AEL
     agl_thermal_conductivity_300K=AUROSTD_NAN;
     agl_debye=AUROSTD_NAN;
@@ -471,7 +472,7 @@ namespace aflowlib {
     agl_thermal_expansion_300K=AUROSTD_NAN;
     agl_bulk_modulus_static_300K=AUROSTD_NAN;
     agl_bulk_modulus_isothermal_300K=AUROSTD_NAN;
-    agl_poisson_ratio_source=""; //CT20181212
+    agl_poisson_ratio_source.clear(); //CT20181212
     agl_vibrational_free_energy_300K_cell=AUROSTD_NAN; //CT20181212
     agl_vibrational_free_energy_300K_atom=AUROSTD_NAN; //CT20181212
     agl_vibrational_entropy_300K_cell=AUROSTD_NAN; //CT20181212
@@ -520,7 +521,7 @@ namespace aflowlib {
     distance_gnd=AUROSTD_NAN;  // apennsy
     distance_tie=AUROSTD_NAN;  // apennsy
     pureA=FALSE;pureB=FALSE;  // apennsy
-    fcc=FALSE; bcc=FALSE;hcp=FALSE;  // apennsy
+    fcc=FALSE;bcc=FALSE;hcp=FALSE;  // apennsy
     stoich_a=AUROSTD_NAN;stoich_b=AUROSTD_NAN;  // apennsy
     bond_aa=AUROSTD_NAN;bond_ab=AUROSTD_NAN;bond_bb=AUROSTD_NAN;  // apennsy
     vNsgroup.clear();  // apennsy
