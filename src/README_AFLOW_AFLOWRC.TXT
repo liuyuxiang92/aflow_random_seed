@@ -848,7 +848,7 @@ DEFAULT_CHULL_PERFORM_OUTLIER_ANALYSIS
 DEFAULT_CHULL_OUTLIER_ANALYSIS_COUNT_THRESHOLD_BINARIES
   description: Defines the minimum number of entries for a reliable outlier analysis. Only phases stable with respect to their end-members are considered for the outlier analysis (below the zero H_f tie-line).
   type: integer
-  default: 50
+  default: 75
 
 DEFAULT_CHULL_OUTLIER_MULTIPLIER
   description: Defines the bounds beyond the interquartile range for which points are considered outliers.
