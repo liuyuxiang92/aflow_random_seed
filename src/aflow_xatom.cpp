@@ -11475,7 +11475,7 @@ deque<_atom> foldAtomsInCell(const deque<_atom>& atoms,const xmatrix<double>& la
     // folding them in would result in duplicate positions; avoids unnecessary
     // matrix multiplication
     // use soft-cutoff here and robust MapAtom later
-    if(atomInCell(tmp,0.05)){ //DX20210104
+    //if(atomInCell(tmp,0.05)){ //DX20210104
       tmp.fpos = BringInCell(tmp.fpos); //DX20210104
       tmp.cpos = f2c_new * tmp.fpos;
       //[OBSOLETE]for (uint a = 0; a < atoms_in_cell.size(); a++) {
@@ -11496,7 +11496,7 @@ deque<_atom> foldAtomsInCell(const deque<_atom>& atoms,const xmatrix<double>& la
         atoms_in_cell.back().ijk(1)=0; atoms_in_cell.back().ijk(2)=0; atoms_in_cell.back().ijk(3)=0;
       }
       //[CO20190520 - this case is not needed]}
-    }
+    //}
   }
 
   if(check_min_dists){ //DX20190613

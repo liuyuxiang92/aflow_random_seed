@@ -591,7 +591,7 @@ namespace compare {
 
     // ---------------------------------------------------------------------------
     // do not calculate unique atom decorations
-    vpflow.flag("COMPARISON_OPTIONS::DO_NOT_CALCULATE_UNIQUE_PERMUTATIONS",TRUE);
+    vpflow.flag("COMPARE::DO_NOT_CALCULATE_UNIQUE_PERMUTATIONS",TRUE);
 
     // ---------------------------------------------------------------------------
     // quiet output
@@ -2253,7 +2253,7 @@ vector<StructurePrototype> XtalFinderCalculator::compareMultipleStructures(
 
     // ---------------------------------------------------------------------------
     // do not calculate unique atom decorations since this was already done
-    vpflow_protos.flag("COMPARISON_OPTIONS::DO_NOT_CALCULATE_UNIQUE_PERMUTATIONS",TRUE);
+    vpflow_protos.flag("COMPARE::DO_NOT_CALCULATE_UNIQUE_PERMUTATIONS",TRUE);
 
     // ---------------------------------------------------------------------------
     // match to AFLOW prototypes

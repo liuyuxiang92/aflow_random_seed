@@ -6255,75 +6255,76 @@ namespace compare {
     // Wrapper for foldAtomsInCell
 
     // ---------------------------------------------------------------------------
-      // make smaller lattice the new lattice in the supercell structure
-      // note: lattices[p] are oriented wrt to supercell (it has to be), otherwise could break periodicity
-      xstructure proto=xstr_supercell; //DX20190530 - added "_supercell"; more descriptive
-      proto.lattice=lattice;
+    // make smaller lattice the new lattice in the supercell structure
+    // note: lattices[p] are oriented wrt to supercell (it has to be), otherwise could break periodicity
+    xstructure proto=xstr_supercell; //DX20190530 - added "_supercell"; more descriptive
+    proto.lattice=lattice;
 
-      xmatrix<double> f2c, c2f;
-      // ---------------------------------------------------------------------------
-      // C2F - (i.e., will provide fractional coordinates wrt to new lattice)
-      // AND remove all atoms outside unit cell based on fractional coordinates
-      // speed increase: ensure this is in cell before computing F2C
-      // (don't calculate unnecessary matrix-vector multiplication)
-      // Note: C2F (done later) changes lattice to one that is aligned with Cartesian directions (a along +X, etc.)
-      //       this is like rotating the global coordinates, therefore, fpos does not change
+    xmatrix<double> f2c, c2f;
+    // ---------------------------------------------------------------------------
+    // C2F - (i.e., will provide fractional coordinates wrt to new lattice)
+    // AND remove all atoms outside unit cell based on fractional coordinates
+    // speed increase: ensure this is in cell before computing F2C
+    // (don't calculate unnecessary matrix-vector multiplication)
+    // Note: C2F (done later) changes lattice to one that is aligned with Cartesian directions (a along +X, etc.)
+    //       this is like rotating the global coordinates, therefore, fpos does not change
 
-      deque<_atom> new_basis_2;
-      // ---------------------------------------------------------------------------
-      // supercell method : orig, slow
-        c2f=inverse(proto.scale*trasp(proto.lattice)); //DX+CO20200429 - calculate outside loop [speed]
-        for(uint iat=0;iat<proto.atoms.size();iat++){
-          proto.atoms[iat].fpos=c2f*proto.atoms[iat].cpos; //DX+CO20200429 - C2F (matrix inverse + matrix multiplication) -> c2f (matrix multiplication)
-          if(atomInCell(proto.atoms[iat],0.05)){ //DX20191125 - soft cutoff, using robust MapAtom later on resulting subset
-            new_basis_2.push_back(proto.atoms[iat]);
-          }
-        }
-      xstructure proto_new;
-      proto_new.title=proto.title;
+    deque<_atom> new_basis_2;
+    // ---------------------------------------------------------------------------
+    // supercell method : orig, slow
+    c2f=inverse(proto.scale*trasp(proto.lattice)); //DX+CO20200429 - calculate outside loop [speed]
+    for(uint iat=0;iat<proto.atoms.size();iat++){
+      proto.atoms[iat].fpos=c2f*proto.atoms[iat].cpos; //DX+CO20200429 - C2F (matrix inverse + matrix multiplication) -> c2f (matrix multiplication)
+      if(atomInCell(proto.atoms[iat],0.05)){ //DX20191125 - soft cutoff, using robust MapAtom later on resulting subset
+        new_basis_2.push_back(proto.atoms[iat]);
+      }
+    }
+    xstructure proto_new;
+    proto_new.title=proto.title;
 
-      xvector<double> abc_angles=Getabc_angles(proto.lattice,DEGREES);
-      xmatrix<double> clattice = GetClat(abc_angles);
-      proto_new.lattice=clattice;
+    xvector<double> abc_angles=Getabc_angles(proto.lattice,DEGREES);
+    xmatrix<double> clattice = GetClat(abc_angles);
+    proto_new.lattice=clattice;
 
-      //DX NEW - START =======================
-      f2c = trasp(proto_new.lattice); //DX20190717
-      c2f = aurostd::inverse(trasp(proto_new.lattice)); //DX20190717
-      //DX20190717 [OBSOLETE] xmatrix<double> f2c = trasp(proto.lattice);
-      //DX20190717 [OBSOLETE] xmatrix<double> c2f = aurostd::inverse(trasp(proto.lattice));
-      bool skew = false;
-      double tol=0.01;
+    //DX NEW - START =======================
+    f2c = trasp(proto_new.lattice); //DX20190717
+    c2f = aurostd::inverse(trasp(proto_new.lattice)); //DX20190717
+    //DX20190717 [OBSOLETE] xmatrix<double> f2c = trasp(proto.lattice);
+    //DX20190717 [OBSOLETE] xmatrix<double> c2f = aurostd::inverse(trasp(proto.lattice));
+    bool skew = false;
+    double tol=0.01;
 
-      deque<_atom> new_basis;
-      xvector<double> tmp; //DX20200330 - declare outside loop
-      for(uint j=0;j<new_basis_2.size();j++){
-        bool duplicate_lattice_point=false;
-        for(uint a=0; a<new_basis.size(); a++){
-          tmp = BringInCell(new_basis_2[j].fpos,1e-10);
-          if(SYM::MapAtom(new_basis[a].fpos,tmp,proto_new.lattice,f2c,skew,tol)){
-            duplicate_lattice_point=true;
-            break;
-          }
-        }
-        if(duplicate_lattice_point==false){
-          new_basis_2[j].fpos = BringInCell(new_basis_2[j].fpos,1e-10);
-          new_basis_2[j].cpos = f2c*new_basis_2[j].fpos;
-          new_basis.push_back(new_basis_2[j]);
+    // DIDN'T WORK ... deque<_atom> new_basis = foldAtomsInCell(new_basis_2, proto_new.lattice, skew, tol, false);
+    deque<_atom> new_basis;
+    xvector<double> tmp; //DX20200330 - declare outside loop
+    for(uint j=0;j<new_basis_2.size();j++){
+      bool duplicate_lattice_point=false;
+      for(uint a=0; a<new_basis.size(); a++){
+        tmp = BringInCell(new_basis_2[j].fpos,1e-10);
+        if(SYM::MapAtom(new_basis[a].fpos,tmp,proto_new.lattice,f2c,skew,tol)){
+          duplicate_lattice_point=true;
+          break;
         }
       }
-      std::stable_sort(new_basis.begin(),new_basis.end(),sortAtomsNames); //DX20190709 - need to sort now
-      proto_new.atoms = new_basis;
-      proto_new.BringInCell(1e-10);
-      proto_new.FixLattices();
-      proto_new.SpeciesPutAlphabetic();
-      deque<int> sizes = SYM::arrange_atoms(new_basis);
-      proto_new = pflow::SetNumEachType(proto_new, sizes);
-      proto_new.species = proto.species; //DX20190718
-      proto_new.MakeBasis(); //DX20200522
-      proto = proto_new;
-
-      return proto;
+      if(duplicate_lattice_point==false){
+        new_basis_2[j].fpos = BringInCell(new_basis_2[j].fpos,1e-10);
+        new_basis_2[j].cpos = f2c*new_basis_2[j].fpos;
+        new_basis.push_back(new_basis_2[j]);
+      }
     }
+    std::stable_sort(new_basis.begin(),new_basis.end(),sortAtomsNames); //DX20190709 - need to sort now
+    proto_new.atoms = new_basis;
+    proto_new.BringInCell(1e-10);
+    proto_new.FixLattices();
+    proto_new.SpeciesPutAlphabetic();
+    deque<int> sizes = SYM::arrange_atoms(new_basis);
+    proto_new = pflow::SetNumEachType(proto_new, sizes);
+    proto_new.species = proto.species; //DX20190718
+    proto_new.MakeBasis(); //DX20200522
+    proto = proto_new;
+
+    return proto;
+  }
 }
 
 // ***************************************************************************
@@ -6372,7 +6373,8 @@ bool XtalFinderCalculator::searchAtomMappings(
     //    to a new unit cell representation (fast, robust, new)
     // 1 = supercell method
     if(DEFAULT_XTALFINDER_SUPERCELL_METHOD){
-      xstr2_tmp = foldAtomsInCellXstructure(xstr2, lattices[p], false, 0.01, false);
+      xstr2_tmp = compare::supercell2newRepresentation(xstr2, lattices[p]);
+      //xstr2_tmp = foldAtomsInCellXstructure(xstr2, lattices[p], false, 0.01, false);
       xstr2_tmp.dist_nn_min=SYM::minimumDistance(xstr2_tmp);
     }
     // 2 = transformation method (default)
@@ -6934,11 +6936,15 @@ namespace compare{
       // if the metric tensors ARE NOT equal: change of basis between lattices
       // DX20201203 - metric tensors do not identify reflections... need to add
       // check for negative determinant of basis transformations (indicates reflection)
+      // DX20210105 - negative determinant is not enough (could have two negatives in determinant)
+      // more robust: use definition of SO(3) to find pure rotations: R*R^T=I
+      // Need both negative determinant and SO(3) check
       xmatrix<double> metric_tensor_candidate = MetricTensor(candidate_lattices[i]);
       if(LDEBUG){ cerr << function_name << " metric_tensor_candidate: " << metric_tensor_candidate << endl; }
 
       xmatrix<double> basis_transformation_tmp = GetBasisTransformation(lattice_original,candidate_lattices[i]);
-      if(!aurostd::identical(metric_tensor_original,metric_tensor_candidate) || aurostd::det(basis_transformation_tmp)<0.0){
+      //if(!aurostd::identical(metric_tensor_original,metric_tensor_candidate) || aurostd::det(basis_transformation_tmp)<0.0){
+      if(!aurostd::identical(metric_tensor_original,metric_tensor_candidate) || aurostd::det(basis_transformation_tmp)<0.0 || !aurostd::isidentity(basis_transformation_tmp*trasp(basis_transformation_tmp))){
 
         // ---------------------------------------------------------------------------
         // if the volume change is not an integer, the basis transformation may include a deformation
@@ -7034,10 +7040,14 @@ namespace compare{
     // if the metric tensors ARE NOT equal: change of basis between lattices
     // DX20201203 - metric tensors do not identify reflections... need to add
     // check for negative determinant of basis transformations (indicates reflection)
+    // DX20210105 - negative determinant is not enough (could have two negatives in determinant)
+    // more robust: use definition of SO(3) to find pure rotations: R*R^T=I
+    // Need both negative determinant and SO(3) check
     xmatrix<double> metric_tensor_candidate = MetricTensor(candidate_lattice);
 
     xmatrix<double> basis_transformation_tmp = GetBasisTransformation(lattice_original,candidate_lattice);
-    if(!aurostd::identical(metric_tensor_original,metric_tensor_candidate) || aurostd::det(basis_transformation_tmp)<0.0){
+    //if(!aurostd::identical(metric_tensor_original,metric_tensor_candidate) || aurostd::det(basis_transformation_tmp)<0.0){
+    if(!aurostd::identical(metric_tensor_original,metric_tensor_candidate) || aurostd::det(basis_transformation_tmp)<0.0 || !aurostd::isidentity(basis_transformation_tmp*trasp(basis_transformation_tmp))){
 
       // ---------------------------------------------------------------------------
       // if the volume change is not an integer, the basis transformation may include a deformation
