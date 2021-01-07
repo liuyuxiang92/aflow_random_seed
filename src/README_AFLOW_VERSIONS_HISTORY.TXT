@@ -1,3 +1,6 @@
+3.2.5 - 2020/12/30
+        Location: http://materials.duke.edu/AFLOW/aflow.3.2.5.tar.xz
+	-- Bibtex for publications - aflowlib.h aflowlib_web_outreach.cpp (SC)
 3.2.5 - 2020/09/25
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.5.tar.xz
         -- patched convert issue: security policy 'PDF' blocking conversion (SC)
