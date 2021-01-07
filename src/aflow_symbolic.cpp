@@ -329,8 +329,8 @@ namespace anrl {
     // ---------------------------------------------------------------------------
     // base-centered monoclinic (mC)
     if(lattice_and_centering == "mC"){
-      lattice = ((1/2*a, -(1.0/2.0)*b, _SYMBOLIC_ZERO_),
-          (1.0/2.0*a, (1.0/2.0)*b, _SYMBOLIC_ZERO_),
+      lattice = (((1.0/2.0)*a, -(1.0/2.0)*b, _SYMBOLIC_ZERO_), //DX20210106 - need parentheses and floats
+          ((1.0/2.0)*a, (1.0/2.0)*b, _SYMBOLIC_ZERO_),
           (c*cos(beta), _SYMBOLIC_ZERO_ , c*sin(beta)));
     }
 
