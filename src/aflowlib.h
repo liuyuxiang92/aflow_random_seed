@@ -427,7 +427,7 @@ namespace aflowlib {
 #define HTRESOURCE_MODE_PHP_AUTHOR   4
 #define HTRESOURCE_MODE_PHP_THRUST   5
 #define HTRESOURCE_MODE_PHP_ALLOY    6
-
+ 
 // ***************************************************************************
 // _OUTREACH CLASS
 class _outreach {
@@ -445,6 +445,7 @@ class _outreach {
     // [OBSOLETE] inside  XHOST.vflag_control.flag("PRINT_MODE::LATEX");
     // [OBSOLETE] inside  XHOST.vflag_control.flag("PRINT_MODE::HTML");
     // [OBSOLETE] bool print_doi; inside  XHOST.vflag_control.flag("PRINT_MODE::DOI");
+    // [OBSOLETE] bool print_bibtex; inside  XHOST.vflag_control.flag("PRINT_MODE::BIBTEX"); //SC20201228
     // [OBSOLETE] bool print_pdf; inside  XHOST.vflag_control.flag("PRINT_MODE::PDF");
     // [OBSOLETE] bool print_wnumber; inside  XHOST.vflag_control.flag("PRINT_MODE::NUMBER");
     uint wnumber;
@@ -452,7 +453,7 @@ class _outreach {
     uint year;
     vector<string> vauthor;
     string title;
-    string journal,link,arxiv,supplementary,bibtex;
+    string journal,link,arxiv,supplementary; 
     string place,date;
     string type;   // ARTICLE PRESENTATION_TALK PRESENTATION_SEMINAR PRESENTATION_COLLOQUIUM PRESENTATION_KEYNOTE PRESENTATION_PLENARY PRESENTATION_TUTORIAL PRESENTATION_CONTRIBUTED PRESENTATION_POSTER
     bool _isinvited;       // YES
@@ -461,6 +462,7 @@ class _outreach {
     string abstract;       // if available and in LaTeX
     string pdf;
     string doi;
+    string bibtex,bibtex_journal,bibtex_volume,bibtex_issue,bibtex_pages,bibtex_year;  //SC20201228
     vector<string> vextra_html,vextra_latex;
     vector<string> vkeyword,vsponsor,valloy;
     // operators/functions                                    // operator/functions

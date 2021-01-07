@@ -1,5 +1,5 @@
-3.2.6 - 2020/xx/xx
-        Location: http://materials.duke.edu/AFLOW/aflow.3.2.6.tar.xz
+3.2.7 - 2020/xx/xx
+        Location: http://materials.duke.edu/AFLOW/aflow.3.2.7.tar.xz
         -- Added functionality to plot thermodynamic properties calculated by QHA with the SJ EOS model. (AS)
         -- Added processing of QHA data to LIB2LIB and LIB2RAW. (AS)
         -- Added a feature to employ fixed volume relaxation of QHA subcalculations. (AS)
@@ -21,6 +21,9 @@
         -- more robust patch to chemistry-specific UFF energies (CO)
         -- changing chull binary count statistics threshold to 75 (CO)
         -- defaulting to skipping chull statistics analysis if not enough points are present (CO)
+3.2.6 - 2020/12/30
+        Location: http://materials.duke.edu/AFLOW/aflow.3.2.6.tar.xz
+        -- Bibtex for publications - aflowlib.h aflowlib_web_outreach.cpp (SC)
 3.2.5 - 2020/09/25
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.5.tar.xz
         -- patched convert issue: security policy 'PDF' blocking conversion (SC)

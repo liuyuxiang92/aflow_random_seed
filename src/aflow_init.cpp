@@ -767,6 +767,7 @@ namespace init {
     XHOST.vflag_control.flag("PRINT_MODE::LATEX",aurostd::args2flag(XHOST.argv,cmds,"--print=latex|--print_latex"));
     XHOST.vflag_control.flag("PRINT_MODE::YEAR",aurostd::args2flag(XHOST.argv,cmds,"--print=year|--print_year"));
     XHOST.vflag_control.flag("PRINT_MODE::DOI",aurostd::args2flag(XHOST.argv,cmds,"--print=doi|--print_doi"));
+    XHOST.vflag_control.flag("PRINT_MODE::BIBTEX",aurostd::args2flag(XHOST.argv,cmds,"--print=bibtex|--print_bibtex"));
     XHOST.vflag_control.flag("PRINT_MODE::EXTRA",aurostd::args2flag(argv,cmds,"--print=extra|--print=vextra_html|--print_vextra_html"));
     XHOST.vflag_control.flag("PRINT_MODE::NUMBER",aurostd::args2flag(XHOST.argv,cmds,"--print=number|--print_number"));
     XHOST.vflag_control.flag("PRINT_MODE::HYPERLINKS",aurostd::args2flag(XHOST.argv,cmds,"--print=hyperlinks|--print_hyperlinks|--print=hyperlink|--print_hyperlink"));
@@ -785,6 +786,7 @@ namespace init {
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"PRINT_MODE::LATEX\")=" << XHOST.vflag_control.flag("PRINT_MODE::LATEX") << endl;
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"PRINT_MODE::YEAR\")=" << XHOST.vflag_control.flag("PRINT_MODE::YEAR") << endl;
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"PRINT_MODE::DOI\")=" << XHOST.vflag_control.flag("PRINT_MODE::DOI") << endl;
+    if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"PRINT_MODE::BIBTEX\")=" << XHOST.vflag_control.flag("PRINT_MODE::BIBTEX") << endl;
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"PRINT_MODE::EXTRA\")=" << XHOST.vflag_control.flag("PRINT_MODE::EXTRA") << endl;
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"PRINT_MODE::NUMBER\")=" << XHOST.vflag_control.flag("PRINT_MODE::NUMBER") << endl;
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"PRINT_MODE::HYPERLINKS\")=" << XHOST.vflag_control.flag("PRINT_MODE::HYPERLINKS") << endl;
