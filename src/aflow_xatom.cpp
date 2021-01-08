@@ -11469,34 +11469,26 @@ deque<_atom> foldAtomsInCell(const deque<_atom>& atoms,const xmatrix<double>& la
     //[CO20190520 - this case is not needed]  atoms_in_cell.back().ijk(1)=0; atoms_in_cell.back().ijk(2)=0; atoms_in_cell.back().ijk(3)=0;
     //[CO20190520 - this case is not needed]} else {  //[CO20200106 - close bracket for indenting]}
     //bool duplicate_atom = false;
-    tmp.fpos = c2f_new * atoms[j].cpos; //DX20210104
-    // ---------------------------------------------------------------------------
-    // quickly find which atoms are inside cell
-    // folding them in would result in duplicate positions; avoids unnecessary
-    // matrix multiplication
-    // use soft-cutoff here and robust MapAtom later
-    //if(atomInCell(tmp,0.05)){ //DX20210104
-      tmp.fpos = BringInCell(tmp.fpos); //DX20210104
-      tmp.cpos = f2c_new * tmp.fpos;
-      //[OBSOLETE]for (uint a = 0; a < atoms_in_cell.size(); a++) {
-      //[OBSOLETE]  if(MapAtomsInNewCell(atoms_in_cell[a], tmp, c2f_orig, f2c_new, skew, tol))
-      //[OBSOLETE]  if(MapAtoms(atoms_in_cell[a], tmp, c2f_orig, f2c_new, skew, tol))
-      //[OBSOLETE]  { //CO20200106 - patching for auto-indenting
-      //[OBSOLETE]    duplicate_atom = true;
-      //[OBSOLETE]    break;
-      //[OBSOLETE]  }
-      //[OBSOLETE]}
-      //[OBSOLETE]if(duplicate_atom == false) {
-      if(!SYM::MapAtom(atoms_in_cell,tmp,false,lattice_new,f2c_new,skew,tol)){ //DX20190619 - lattice_new and f2c_new as input
-        //[OBSOLETE]atoms[j].fpos = tmp.fpos; //BringInCell(tmp.fpos);
-        //[OBSOLETE]atoms[j].cpos = tmp.cpos; //f2c_new * atoms[j].fpos;
-        atoms_in_cell.push_back(atoms[j]);
-        atoms_in_cell.back().fpos = tmp.fpos;
-        atoms_in_cell.back().cpos = tmp.cpos;
-        atoms_in_cell.back().ijk(1)=0; atoms_in_cell.back().ijk(2)=0; atoms_in_cell.back().ijk(3)=0;
-      }
-      //[CO20190520 - this case is not needed]}
-    //}
+    tmp.fpos = BringInCell(c2f_new * atoms[j].cpos);
+    tmp.cpos = f2c_new * tmp.fpos;
+    //[OBSOLETE]for (uint a = 0; a < atoms_in_cell.size(); a++) {
+    //[OBSOLETE]  if(MapAtomsInNewCell(atoms_in_cell[a], tmp, c2f_orig, f2c_new, skew, tol))
+    //[OBSOLETE]  if(MapAtoms(atoms_in_cell[a], tmp, c2f_orig, f2c_new, skew, tol))
+    //[OBSOLETE]  { //CO20200106 - patching for auto-indenting
+    //[OBSOLETE]    duplicate_atom = true;
+    //[OBSOLETE]    break;
+    //[OBSOLETE]  }
+    //[OBSOLETE]}
+    //[OBSOLETE]if(duplicate_atom == false) {
+    if(!SYM::MapAtom(atoms_in_cell,tmp,false,lattice_new,f2c_new,skew,tol)){ //DX20190619 - lattice_new and f2c_new as input
+      //[OBSOLETE]atoms[j].fpos = tmp.fpos; //BringInCell(tmp.fpos);
+      //[OBSOLETE]atoms[j].cpos = tmp.cpos; //f2c_new * atoms[j].fpos;
+      atoms_in_cell.push_back(atoms[j]);
+      atoms_in_cell.back().fpos = tmp.fpos;
+      atoms_in_cell.back().cpos = tmp.cpos;
+      atoms_in_cell.back().ijk(1)=0; atoms_in_cell.back().ijk(2)=0; atoms_in_cell.back().ijk(3)=0;
+    }
+    //[CO20190520 - this case is not needed]}
   }
 
   if(check_min_dists){ //DX20190613
@@ -16753,7 +16745,6 @@ void xstructure::ChangeBasis(const xmatrix<double>& transformation_matrix) {
         << " original: " << natoms_orig
         << " transformed: " << natoms_transformed
         << "; check the transformation matrix or same-atom tolerance.";
-      cerr << "message: " << message.str() << endl;
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
     }
   }

@@ -6294,24 +6294,24 @@ namespace compare {
     bool skew = false;
     double tol=0.01;
 
-    // DIDN'T WORK ... deque<_atom> new_basis = foldAtomsInCell(new_basis_2, proto_new.lattice, skew, tol, false);
-    deque<_atom> new_basis;
-    xvector<double> tmp; //DX20200330 - declare outside loop
-    for(uint j=0;j<new_basis_2.size();j++){
-      bool duplicate_lattice_point=false;
-      for(uint a=0; a<new_basis.size(); a++){
-        tmp = BringInCell(new_basis_2[j].fpos,1e-10);
-        if(SYM::MapAtom(new_basis[a].fpos,tmp,proto_new.lattice,f2c,skew,tol)){
-          duplicate_lattice_point=true;
-          break;
-        }
-      }
-      if(duplicate_lattice_point==false){
-        new_basis_2[j].fpos = BringInCell(new_basis_2[j].fpos,1e-10);
-        new_basis_2[j].cpos = f2c*new_basis_2[j].fpos;
-        new_basis.push_back(new_basis_2[j]);
-      }
-    }
+    deque<_atom> new_basis = foldAtomsInCell(new_basis_2, proto.lattice, proto_new.lattice, skew, tol, false);
+    //DX20210108 [OBSOLETE] deque<_atom> new_basis;
+    //DX20210108 [OBSOLETE] xvector<double> tmp; //DX20200330 - declare outside loop
+    //DX20210108 [OBSOLETE] for(uint j=0;j<new_basis_2.size();j++){
+    //DX20210108 [OBSOLETE]   bool duplicate_lattice_point=false;
+    //DX20210108 [OBSOLETE]   for(uint a=0; a<new_basis.size(); a++){
+    //DX20210108 [OBSOLETE]     tmp = BringInCell(new_basis_2[j].fpos,1e-10);
+    //DX20210108 [OBSOLETE]     if(SYM::MapAtom(new_basis[a].fpos,tmp,proto_new.lattice,f2c,skew,tol)){
+    //DX20210108 [OBSOLETE]       duplicate_lattice_point=true;
+    //DX20210108 [OBSOLETE]       break;
+    //DX20210108 [OBSOLETE]     }
+    //DX20210108 [OBSOLETE]   }
+    //DX20210108 [OBSOLETE]   if(duplicate_lattice_point==false){
+    //DX20210108 [OBSOLETE]     new_basis_2[j].fpos = BringInCell(new_basis_2[j].fpos,1e-10);
+    //DX20210108 [OBSOLETE]     new_basis_2[j].cpos = f2c*new_basis_2[j].fpos;
+    //DX20210108 [OBSOLETE]     new_basis.push_back(new_basis_2[j]);
+    //DX20210108 [OBSOLETE]   }
+    //DX20210108 [OBSOLETE] }
     std::stable_sort(new_basis.begin(),new_basis.end(),sortAtomsNames); //DX20190709 - need to sort now
     proto_new.atoms = new_basis;
     proto_new.BringInCell(1e-10);
@@ -6917,105 +6917,21 @@ namespace compare{
     bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_COMPARE_);
     string function_name = XPID + "compare::getLatticeTransformations():";
 
-    xmatrix<double> basis_transformation, rotation, deformation;
-
-    // ---------------------------------------------------------------------------
-    // calculate the metric tensor of the original lattice
-    xmatrix<double> metric_tensor_original = MetricTensor(lattice_original);
-    xmatrix<double> metric_tensor_ideal = MetricTensor(lattice_ideal);
-    if(LDEBUG){
-      cerr << function_name << " metric_tensor_original: " << metric_tensor_original << endl;
-      cerr << function_name << " metric_tensor_ideal: " << metric_tensor_ideal << endl;
-    }
+    xmatrix<double> basis_transformation, rotation;
 
     // ---------------------------------------------------------------------------
     // cycle through candidate lattices and determine transformations
     for(uint i=0;i<candidate_lattices.size();i++){
+      
+      getLatticeTransformation(lattice_original,
+          lattice_ideal,
+          candidate_lattices[i],
+          basis_transformation,
+          rotation);
 
-      // ---------------------------------------------------------------------------
-      // if the metric tensors ARE NOT equal: change of basis between lattices
-      // DX20201203 - metric tensors do not identify reflections... need to add
-      // check for negative determinant of basis transformations (indicates reflection)
-      // DX20210105 - negative determinant is not enough (could have two negatives in determinant)
-      // more robust: use definition of SO(3) to find pure rotations: R*R^T=I
-      // Need both negative determinant and SO(3) check
-      xmatrix<double> metric_tensor_candidate = MetricTensor(candidate_lattices[i]);
-      if(LDEBUG){ cerr << function_name << " metric_tensor_candidate: " << metric_tensor_candidate << endl; }
+      basis_transformations.push_back(basis_transformation);
+      rotations.push_back(rotation);
 
-      xmatrix<double> basis_transformation_tmp = GetBasisTransformation(lattice_original,candidate_lattices[i]);
-      double theta=acos((aurostd::trace(basis_transformation_tmp)-1.0)/2.0);
-      //if(!aurostd::identical(metric_tensor_original,metric_tensor_candidate) || aurostd::det(basis_transformation_tmp)<0.0){
-      if(!aurostd::identical(metric_tensor_original,metric_tensor_candidate) ||
-          aurostd::det(basis_transformation_tmp) < 0.0 ||
-          !aurostd::isidentity(basis_transformation_tmp*trasp(basis_transformation_tmp)) ||
-          aurostd::abs(theta-PI) < 1e-2){
-
-        // ---------------------------------------------------------------------------
-        // if the volume change is not an integer, the basis transformation may include a deformation
-        // component which must be removed
-        if(!aurostd::isinteger(aurostd::det(basis_transformation_tmp)) && aurostd::det(basis_transformation_tmp) > 1.0){
-          PolarDecomposition(basis_transformation_tmp, basis_transformation, deformation);
-        }
-        else{
-          basis_transformation = basis_transformation_tmp;
-        }
-
-        // ---------------------------------------------------------------------------
-        // convert to new lattice
-        xmatrix<double> lattice_new = basis_transformation*lattice_original;
-
-        if(LDEBUG){
-          cerr << function_name << " i: " << i << endl;
-          cerr << function_name << " lattice new: " << lattice_new << endl;
-          cerr << function_name << " lattice ideal: " << lattice_ideal << endl;
-          // ---------------------------------------------------------------------------
-          // calculate the metric tensors, they should be equal after the basis
-          // transformation
-          xmatrix<double> metric_tensor_new = MetricTensor(lattice_new);
-          xmatrix<double> metric_tensor_ideal = MetricTensor(lattice_ideal);
-          cerr << function_name << " metric_tensor_new: " << metric_tensor_new << endl;
-          cerr << function_name << " metric_tensor_ideal: " << metric_tensor_ideal << endl;
-        }
-
-        basis_transformations.push_back(basis_transformation);
-
-        // ---------------------------------------------------------------------------
-        // then rotate to the ideal lattice
-        xmatrix<double> rotation_tmp = trasp(GetRotation(lattice_new,lattice_ideal)); // use trasp for AFLOW convention
-
-        // ---------------------------------------------------------------------------
-        // since we are rotating to the ideal lattice, the GetRotation() function
-        // may incorporate a "deformation" component in the matrix
-        // we can differentiate this with a polar decomposition T=R*U
-        // T: original matrix, R: pure rotation, U: deformation matrix
-        PolarDecomposition(rotation_tmp, rotation, deformation);
-
-        rotations.push_back(rotation);
-      }
-
-      // ---------------------------------------------------------------------------
-      // if the metric tensors ARE equal: simple rotation between lattices
-      else{
-
-        if(LDEBUG){
-          cerr << function_name << " i: " << i << " rotation only (no basis transformation)!" << endl;
-        }
-        basis_transformations.push_back(aurostd::eye<double>());
-
-        // ---------------------------------------------------------------------------
-        // since we are rotating to the ideal lattice, the GetRotation() function
-        // may incorporate a "deformation" component in the matrix
-        // we can differentiate this with a polar decomposition T=R*U
-        // T: original matrix, R: pure rotation, U: deformation matrix
-        xmatrix<double> rotation_tmp = trasp(GetRotation(lattice_original,lattice_ideal)); // use trasp for AFLOW convention
-        PolarDecomposition(rotation_tmp, rotation, deformation);
-
-        if(LDEBUG){
-          cerr << function_name << " rotation: " << rotation << endl;
-        }
-
-        rotations.push_back(rotation);
-      }
     }
   }
 }
