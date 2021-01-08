@@ -410,13 +410,8 @@ bool PrototypeGeneratorTest(ofstream& FileMESSAGE,ostream& oss,bool check_symmet
   stringstream message;
   _aflags aflags;aflags.Directory=aurostd::getPWD();
 
-  message << "Testing generation of all AFLOW prototypes";
+  message << "Testing generation of all AFLOW prototypes" << (check_symmetry?" AND checking symmetry of all generated AFLOW prototypes":"");
   pflow::logger(_AFLOW_FILE_NAME_,function_name,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-
-  if(check_symmetry){
-    message << "AND checking symmetry all generated AFLOW prototypes";
-    pflow::logger(_AFLOW_FILE_NAME_,function_name,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-  }
 
   vector<string> prototype_labels, compositions;
   vector<uint> space_group_numbers;
