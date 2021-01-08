@@ -151,7 +151,7 @@ Steps:
        If mis <= epsilon_match:
          Structures similar. Print out new representation of
          structure2 and the figure of misfit
-       else if epsilon_match < mis <=epsilon_family:
+       else if epsilon_match < mis <= epsilon_family:
          Structures in the same family (possible symmetric
          group-subgroup relation). Print out new representation
          of structure2 and the figure of misfit
