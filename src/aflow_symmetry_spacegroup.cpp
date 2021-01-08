@@ -1554,7 +1554,7 @@ namespace SYM {
         }
         // =============== RHOMBOHEDRAL =============== //
         //  else {  //[CO20200106 - close bracket for indenting]}
-        else if(((mcount == 3 || mcount == 4 || mcount == 5) && !continue_ortho && three_six_count!=0 && fourcount == 0)) {
+        else if(((mcount == 3 || mcount == 4 || mcount == 5 || mcount == 6) && !continue_ortho && three_six_count!=0 && fourcount == 0)) { //DX20210107 - added mcount==6
           symmetryfound = true;
           // On the second iteration, this section is now equivalent to the hexagonal section above.
           // Need a slightly larger expansion to get lattice basis in HEX setting
@@ -2111,7 +2111,6 @@ namespace SYM {
           possible_latt_a_b.push_back(twofold_lattice_vectors[i]);
         }
       }
-
       for (uint i = 0; i < possible_latt_a_b.size(); i++) {
         for (uint j = 0; j < possible_latt_a_b.size(); j++) {
           tmpa = possible_latt_a_b[i];
@@ -2148,26 +2147,27 @@ namespace SYM {
           if(LDEBUG) { cerr << function_name << " One or more of the lattice vectors is null" << endl; }
           return false;
         }
-      } else {
-        break;
       }
-    }
+      else {
+        //DX20210107 [OBSOLETE - do not break, store all possible conventional lattice possibilites]
 
-    // ==== Orient into positive quadrant ==== //
-    orientVectorsPositiveQuadrant(conv_lattice_vec_a, tol); //DX20190215 - _SYM_TOL_ to tol
-    orientVectorsPositiveQuadrant(conv_lattice_vec_b, tol); //DX20190215 - _SYM_TOL_ to tol
+        // ==== Orient into positive quadrant ==== //
+        orientVectorsPositiveQuadrant(conv_lattice_vec_a, tol); //DX20190215 - _SYM_TOL_ to tol
+        orientVectorsPositiveQuadrant(conv_lattice_vec_b, tol); //DX20190215 - _SYM_TOL_ to tol
 
-    // Order lattice vectors so that the a vector has a positive x coordinate
-    if(conv_lattice_vec_b(1) > tol && conv_lattice_vec_b(2) < tol && conv_lattice_vec_b(3) < tol) { //DX20190215 - _SYM_TOL_ to tol
-      xvector<double> tmp = conv_lattice_vec_a;
-      conv_lattice_vec_a = conv_lattice_vec_b;
-      conv_lattice_vec_b = tmp;
-    }
+        // Order lattice vectors so that the a vector has a positive x coordinate
+        if(conv_lattice_vec_b(1) > tol && conv_lattice_vec_b(2) < tol && conv_lattice_vec_b(3) < tol) { //DX20190215 - _SYM_TOL_ to tol
+          xvector<double> tmp = conv_lattice_vec_a;
+          conv_lattice_vec_a = conv_lattice_vec_b;
+          conv_lattice_vec_b = tmp;
+        }
 
-    // === Proceed if lattice vectors are not null === //
-    CL = xvec2xmat(conv_lattice_vec_a, conv_lattice_vec_b, conv_lattice_vec_c);
-    candidate_lattice_vectors.push_back(CL);
-    candidate_lattice_chars.push_back('t');
+        // === Proceed if lattice vectors are not null === //
+        CL = xvec2xmat(conv_lattice_vec_a, conv_lattice_vec_b, conv_lattice_vec_c);
+        candidate_lattice_vectors.push_back(CL);
+        candidate_lattice_chars.push_back('t');
+      } //DX20210107
+    } //DX20210107
 
     return true;
   }

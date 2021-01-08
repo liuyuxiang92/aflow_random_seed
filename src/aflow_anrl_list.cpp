@@ -1293,7 +1293,7 @@ namespace anrl {
     vproto.push_back("ABC2_mP16_14_e_e_2e;3;16;14;5;16;mP16;a,b/a,c/a,beta,x1,y1,z1,x2,y2,z2,x3,y3,z3,x4,y4,z4;-;Ce1Li1O2;Ce1Li1O2 (ICSD #47116)");
     vproto.push_back("ABC2_mC16_15_e_e_f;3;8;15;5;9;mC16;a,b/a,c/a,beta,y1,y2,x3,y3,z3;-/-/-;Bi1Na1O2/Bi1K1O2/Bi1Cs1O2;Bi1Na1O2 (ICSD #10317)/Bi1K1O2 (ICSD #16239)/Bi1Cs1O2 (ICSD #406564)");
     vproto.push_back("AB2C_mC16_15_e_f_e;3;8;15;5;9;mC16;a,b/a,c/a,beta,y1,y2,x3,y3,z3;-;Bi1O2Rb1;Bi1O2Rb1 (ICSD #407208)");
-    vproto.push_back("ABC3_mC20_15_a_e_ef;3;10;15;5;9;mC20;a,b/a,c/a,beta,y2,y3,x4,y4,z4;-;Al1La1O3;Al1La1O3 (ICSD #90542)");
+    vproto.push_back("ABC3_mC20_15_a_e_ef;3;10;15;5;9;mC20;a,b/a,c/a,beta,y2,y3,x4,y4,z4;-;Al1La1O3;Al1La1O3 (ICSD #180415)");
     vproto.push_back("A2B2C_mC20_15_ac_f_e;3;10;15;5;8;mC20;a,b/a,c/a,beta,y3,x4,y4,z4;-;Cu2O2Pb1;Cu2O2Pb1 (ICSD #400657)");
     vproto.push_back("ABC4_mC24_15_a_e_2f;3;12;15;5;11;mC24;a,b/a,c/a,beta,y2,x3,y3,z3,x4,y4,z4;-;Hg1Mo1O4;Hg1Mo1O4 (ICSD #2533)");
     vproto.push_back("ABC4_mC24_15_e_e_2f;3;12;15;5;12;mC24;a,b/a,c/a,beta,y1,y2,x3,y3,z3,x4,y4,z4;-;La1Nb1O4;La1Nb1O4 (ICSD #10123)");
@@ -1303,7 +1303,6 @@ namespace anrl {
     vproto.push_back("A3B4C_mC32_15_cf_2f_e;3;16;15;5;14;mC32;a,b/a,c/a,beta,y2,x3,y3,z3,x4,y4,z4,x5,y5,z5;-;Ag3O4V1;Ag3O4V1 (ICSD #249417)");
     vproto.push_back("A2B5C_mC32_15_f_e2f_c;3;16;15;5;14;mC32;a,b/a,c/a,beta,y2,x3,y3,z3,x4,y4,z4,x5,y5,z5;-;Fe2O5Ti1;Fe2O5Ti1 (ICSD #24416)");
     vproto.push_back("ABC2_mC32_15_2e_2e_2f;3;16;15;5;14;mC32;a,b/a,c/a,beta,y1,y2,y3,y4,x5,y5,z5,x6,y6,z6;-;Er1Na1O2;Er1Na1O2 (ICSD #2739)");
-    vproto.push_back("AB3C_oP5_25_d_abc_a;3;5;25;5;8;oP5;a,b/a,c/a,z1,z2,z3,z4,z5;-;Ba1O3Ti1;Ba1O3Ti1 (ICSD #99737)");
     vproto.push_back("A3B4C_oP16_31_ab_2ab_a;3;16;31;5;17;oP16;a,b/a,c/a,y1,z1,y2,z2,y3,z3,y4,z4,x5,y5,z5,x6,y6,z6;-;Li3O4V1;Li3O4V1 (ICSD #19002)");
     vproto.push_back("ABC3_oC20_36_a_a_3a;3;10;36;5;13;oC20;a,b/a,c/a,y1,z1,y2,z2,y3,z3,y4,z4,y5,z5;-;Ca1Ir1O3;Ca1Ir1O3 (ICSD #159030)");
     vproto.push_back("AB3C_oC20_36_a_ab_a;3;10;36;5;12;oC20;a,b/a,c/a,y1,z1,y2,z2,y3,z3,x4,y4,z4;-;Mg1O3V1;Mg1O3V1 (ICSD #284)");
@@ -1357,7 +1356,6 @@ namespace anrl {
     vproto.push_back("A2BC_oC16_67_m_g_a;3;8;67;5;6;oC16;a,b/a,c/a,z2,y3,z3;-;Ba2Na1O1;Ba2Na1O1 (ICSD #411905)");
     vproto.push_back("A2B3C2_oF28_69_h_ah_g;3;7;69;5;6;oF28;a,b/a,c/a,x2,y3,y4;-;Cu2O3Sr2;Cu2O3Sr2 (ICSD #68676)");
     vproto.push_back("AB4C2_oF28_69_a_cg_g;3;7;69;5;5;oF28;a,b/a,c/a,x3,x4;-;Ni1O4Pr2;Ni1O4Pr2 (ICSD #81577)");
-    vproto.push_back("AB3C_oF40_69_h_fgi_d;3;10;69;5;6;oF40;a,b/a,c/a,x3,y4,z5;-;Ca1O3Ti1;Ca1O3Ti1 (ICSD #162919)");
     vproto.push_back("A4BC_oF48_70_h_b_a;3;12;70;5;6;oF48;a,b/a,c/a,x3,y3,z3;-;O4Tb1V1;O4Tb1V1 (ICSD #88369)");
     vproto.push_back("A2BC4_oF56_70_d_a_h;3;14;70;5;6;oF56;a,b/a,c/a,x3,y3,z3;-;Cr2Mg1O4;Cr2Mg1O4 (ICSD #290589)");
     vproto.push_back("AB2C4_oF56_70_a_g_h;3;14;70;5;7;oF56;a,b/a,c/a,z2,x3,y3,z3;-;Mo1Na2O4;Mo1Na2O4 (ICSD #151971)");
@@ -6427,7 +6425,7 @@ namespace anrl {
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="AB3C_mP5_6_b_2ab_a"){
-        vparameters.push_back("3.9619,1,1.0027764,90,0.4792,0.9948,0.9948,0.4792,0.5093,0.5093,0,0,0.4915,0.4915");  // 001, ternary metal-oxide prototype (ICSD #186460)
+        vparameters.push_back("3.9729,0.99723124,0.99723124,90,0.0052,0.4792,0.5208,0.9948,0.4907,0.5093,0,0,0.5085,0.4915");  // 001, ternary metal-oxide prototype (ICSD #186460)
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="A2BC3_mC12_8_2a_a_3a"){
@@ -6689,7 +6687,7 @@ namespace anrl {
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="ABC3_mC20_15_a_e_ef"){
-        vparameters.push_back("9.3762,0.57816599,0.81721806,144.7213,0.5,0.020079253,0.76003963,0.26003963,0.27007925");  // 001, ternary metal-oxide prototype (ICSD #90542)
+        vparameters.push_back("9.15,0.57897268,0.81843716,144.6223,0.5,0.0304,0.2329,0.7329,0.7177");  // 001, ternary metal-oxide prototype (ICSD #180415)
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="A2B2C_mC20_15_ac_f_e"){
@@ -6726,10 +6724,6 @@ namespace anrl {
       // ---------------------------------------------------------------------------
       if(anrl_label=="ABC2_mC32_15_2e_2e_2f"){
         vparameters.push_back("6.5992,1.9896351,0.91223179,124.3691,0.054,0.312,0.562,0.812,0.24,0.9375,0.23,0.25,0.688,0.2");  // 001, ternary metal-oxide prototype (ICSD #2739)
-      }
-      // ---------------------------------------------------------------------------
-      if(anrl_label=="AB3C_oP5_25_d_abc_a"){
-        vparameters.push_back("4.0557,1,1.0030574,0.0035693301,0.51264626,0.50498652,0.50498652,0.0098113737");  // 001, ternary metal-oxide prototype (ICSD #99737)
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="A3B4C_oP16_31_ab_2ab_a"){
@@ -6947,10 +6941,6 @@ namespace anrl {
       // ---------------------------------------------------------------------------
       if(anrl_label=="AB4C2_oF28_69_a_cg_g"){
         vparameters.push_back("12.8464,0.45590204,0.45093567,0.169,0.3591");  // 001, ternary metal-oxide prototype (ICSD #81577)
-      }
-      // ---------------------------------------------------------------------------
-      if(anrl_label=="AB3C_oF40_69_h_fgi_d"){
-        vparameters.push_back("7.7557,1.0011991,1,0.2835,0.25,0.7835");  // 001, ternary metal-oxide prototype (ICSD #162919)
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="A4BC_oF48_70_h_b_a"){
