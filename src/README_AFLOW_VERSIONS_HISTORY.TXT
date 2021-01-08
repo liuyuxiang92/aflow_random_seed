@@ -1,5 +1,6 @@
 3.2.6 - 2020/xx/xx
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.6.tar.xz
+        -- Added additional AEL and AGL properties to database. (ME)
         -- Added functionality to plot thermodynamic properties calculated by QHA with the SJ EOS model. (AS)
         -- Added processing of QHA data to LIB2LIB and LIB2RAW. (AS)
         -- Added a feature to employ fixed volume relaxation of QHA subcalculations. (AS)
