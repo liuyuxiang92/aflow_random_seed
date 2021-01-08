@@ -6943,8 +6943,12 @@ namespace compare{
       if(LDEBUG){ cerr << function_name << " metric_tensor_candidate: " << metric_tensor_candidate << endl; }
 
       xmatrix<double> basis_transformation_tmp = GetBasisTransformation(lattice_original,candidate_lattices[i]);
+      double theta=acos((aurostd::trace(basis_transformation_tmp)-1.0)/2.0);
       //if(!aurostd::identical(metric_tensor_original,metric_tensor_candidate) || aurostd::det(basis_transformation_tmp)<0.0){
-      if(!aurostd::identical(metric_tensor_original,metric_tensor_candidate) || aurostd::det(basis_transformation_tmp)<0.0 || !aurostd::isidentity(basis_transformation_tmp*trasp(basis_transformation_tmp))){
+      if(!aurostd::identical(metric_tensor_original,metric_tensor_candidate) ||
+          aurostd::det(basis_transformation_tmp) < 0.0 ||
+          !aurostd::isidentity(basis_transformation_tmp*trasp(basis_transformation_tmp)) ||
+          aurostd::abs(theta-PI) < 1e-2){
 
         // ---------------------------------------------------------------------------
         // if the volume change is not an integer, the basis transformation may include a deformation
@@ -7046,8 +7050,12 @@ namespace compare{
     xmatrix<double> metric_tensor_candidate = MetricTensor(candidate_lattice);
 
     xmatrix<double> basis_transformation_tmp = GetBasisTransformation(lattice_original,candidate_lattice);
+    double theta=acos((aurostd::trace(basis_transformation_tmp)-1.0)/2.0);
     //if(!aurostd::identical(metric_tensor_original,metric_tensor_candidate) || aurostd::det(basis_transformation_tmp)<0.0){
-    if(!aurostd::identical(metric_tensor_original,metric_tensor_candidate) || aurostd::det(basis_transformation_tmp)<0.0 || !aurostd::isidentity(basis_transformation_tmp*trasp(basis_transformation_tmp))){
+    if(!aurostd::identical(metric_tensor_original,metric_tensor_candidate) ||
+        aurostd::det(basis_transformation_tmp) < 0.0 ||
+        !aurostd::isidentity(basis_transformation_tmp*trasp(basis_transformation_tmp)) ||
+        aurostd::abs(theta-PI) < 1e-2){
 
       // ---------------------------------------------------------------------------
       // if the volume change is not an integer, the basis transformation may include a deformation
