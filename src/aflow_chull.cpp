@@ -996,6 +996,9 @@ namespace chull {
     if(vpflow.flag("CHULL::INCLUDE_ILL_CONVERGED")) {
       pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::INCLUDE_ILL_CONVERGED set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
     }
+    if(vpflow.flag("CHULL::CALCULATE_HIGHEST_DIMENSION_ONLY")) {
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::CALCULATE_HIGHEST_DIMENSION_ONLY set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
+    }
     if(vpflow.flag("FORCE")) {
       pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::FORCE set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
     }
@@ -6185,10 +6188,18 @@ namespace chull {
     if(LDEBUG) {cerr << soliloquy << " starting" << endl;}
     //we first run through alloy hulls IF stoich_coords, grabbing hull_members
     if(m_has_stoich_coords){
-      message << "Calculating the hull(s) in increasing dimensionality (stoichiometric coordinates)";
-      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
       if(!m_naries.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Points have yet to be structured");}
-      for(uint i_nary=1,fl_size_i_nary=m_naries.size();i_nary<fl_size_i_nary;i_nary++){ //start at binaries
+      bool calc_highest_hull_only=m_cflags.flag("CHULL::CALCULATE_HIGHEST_DIMENSION_ONLY");
+      uint i_nary_start=1;  //start at binaries
+      if(calc_highest_hull_only){
+        i_nary_start=m_naries.size()-1;
+        message << "Calculating the highest dimensional hull ONLY (stoichiometric coordinates)";
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+      }else{
+        message << "Calculating the hull(s) in increasing dimensionality (stoichiometric coordinates)";
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+      }
+      for(uint i_nary=i_nary_start,fl_size_i_nary=m_naries.size();i_nary<fl_size_i_nary;i_nary++){
         for(uint i_alloy=0,fl_size_i_alloy=m_naries[i_nary].m_alloys.size();i_alloy<fl_size_i_alloy;i_alloy++){
           message << "Calculating " << pflow::arity_string(i_nary+1,false,false) << " hull for";
           if(m_velements.size()){message << " " << aurostd::joinWDelimiter(alloyToElements(i_nary,i_alloy),"-");}
@@ -6196,7 +6207,11 @@ namespace chull {
           pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
           cleanHull();
           setElementsPresent(i_nary,i_alloy); //m_has_stoich_coords only
-          preparePointsForHullCalculation(i_nary,i_alloy);  //will have unary duplicates, but don't worry, we remove in calculateFacets()
+          if(calc_highest_hull_only){
+            preparePointsForHullCalculation();  //inject all points
+          }else{
+            preparePointsForHullCalculation(i_nary,i_alloy);  //will have unary duplicates, but don't worry, we remove in calculateFacets()
+          }
           calculateFacets();
           message << pflow::arity_string(i_nary+1,true,false) << " hull calculated for";
           if(m_velements.size()){message << " " << aurostd::joinWDelimiter(alloyToElements(i_nary,i_alloy),"-");}
@@ -10965,7 +10980,9 @@ namespace chull {
         //need to grab from coord_group
         uint i_coord_group=AUROSTD_MAX_UINT;
         if(!getCoordGroupIndex(point,i_coord_group)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coordgroup index not set");}
-        if(m_coord_groups[i_coord_group].m_equilibrium_phases.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Equilibrium phases not set");}
+        if(!m_cflags.flag("CHULL::CALCULATE_HIGHEST_DIMENSION_ONLY")){
+          if(m_coord_groups[i_coord_group].m_equilibrium_phases.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Equilibrium phases not set");}
+        }
         vector<string> compounds,_compounds;
         uint i_point=AUROSTD_MAX_UINT;
         const vector<vector<uint> >& equilibrium_phases=m_coord_groups[i_coord_group].m_equilibrium_phases;
@@ -10991,7 +11008,9 @@ namespace chull {
         //need to grab from coord_group
         uint i_coord_group=AUROSTD_MAX_UINT;
         if(!getCoordGroupIndex(point,i_coord_group)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coordgroup index not set");}
-        if(m_coord_groups[i_coord_group].m_equilibrium_phases.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Equilibrium phases not set");}
+        if(!m_cflags.flag("CHULL::CALCULATE_HIGHEST_DIMENSION_ONLY")){
+          if(m_coord_groups[i_coord_group].m_equilibrium_phases.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Equilibrium phases not set");}
+        }
         vector<string> auids,_auids;
         uint i_point=AUROSTD_MAX_UINT;
         const vector<vector<uint> >& equilibrium_phases=m_coord_groups[i_coord_group].m_equilibrium_phases;
@@ -11311,7 +11330,9 @@ namespace chull {
       ventries.push_back(vector<vector<vector<string> > >(0));
       for(uint i_alloy=0,fl_size_i_alloy=m_naries[i_nary].m_alloys.size();i_alloy<fl_size_i_alloy;i_alloy++){
         if(!m_naries[i_nary].m_alloys[i_alloy].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized nary[i_nary="+aurostd::utype2string(i_nary)+",i_alloy="+aurostd::utype2string(i_alloy)+"]");}
-        if(m_naries[i_nary].m_alloys[i_alloy].m_facets.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No facets found in nary[i_nary="+aurostd::utype2string(i_nary)+",i_alloy="+aurostd::utype2string(i_alloy)+"]");}
+        if(!m_cflags.flag("CHULL::CALCULATE_HIGHEST_DIMENSION_ONLY")){
+          if(m_naries[i_nary].m_alloys[i_alloy].m_facets.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No facets found in nary[i_nary="+aurostd::utype2string(i_nary)+",i_alloy="+aurostd::utype2string(i_alloy)+"]");}
+        }
         if(LDEBUG) {cerr << soliloquy << " looking at i_nary=" << i_nary << ",i_alloy=" << i_alloy << endl;}
         ventries.back().push_back(vector<vector<string> >(0));
         for(uint i=0,fl_size_i=m_naries[i_nary].m_alloys[i_alloy].m_facets.size();i<fl_size_i;i++){

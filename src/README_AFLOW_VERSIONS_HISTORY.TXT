@@ -21,6 +21,7 @@
         -- more robust patch to chemistry-specific UFF energies (CO)
         -- changing chull binary count statistics threshold to 75 (CO)
         -- defaulting to skipping chull statistics analysis if not enough points are present (CO)
+        -- adding --calculate_highest_dimension_only to chull analysis (CO)
 3.2.6 - 2020/12/30
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.6.tar.xz
         -- Bibtex for publications - aflowlib.h aflowlib_web_outreach.cpp (SC)
