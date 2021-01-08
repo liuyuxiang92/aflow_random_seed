@@ -1,6 +1,6 @@
-3.2.6 - 2020/xx/xx
-        Location: http://materials.duke.edu/AFLOW/aflow.3.2.6.tar.xz
-        -- Added additional AEL and AGL properties to database. (ME)
+3.2.7 - 2020/xx/xx
+        Location: http://materials.duke.edu/AFLOW/aflow.3.2.7.tar.xz
+        -- Added additional AEL and AGL properties to the AFLOW schema. (ME)
         -- Added functionality to plot thermodynamic properties calculated by QHA with the SJ EOS model. (AS)
         -- Added processing of QHA data to LIB2LIB and LIB2RAW. (AS)
         -- Added a feature to employ fixed volume relaxation of QHA subcalculations. (AS)
@@ -12,6 +12,9 @@
         -- exiting with error if VASP output files are corrupted after full aflow run (CO)
         -- removing POSCAR.orig from --xplug check, it's already in the aflow.in (CO)
         -- adding --force to LIB2LIB (CO)
+3.2.6 - 2020/12/30
+        Location: http://materials.duke.edu/AFLOW/aflow.3.2.6.tar.xz
+        -- Bibtex for publications - aflowlib.h aflowlib_web_outreach.cpp (SC)
 3.2.5 - 2020/09/25
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.5.tar.xz
         -- patched convert issue: security policy 'PDF' blocking conversion (SC)
