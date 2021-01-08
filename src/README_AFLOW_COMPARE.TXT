@@ -164,7 +164,7 @@ OVERVIEW OF MULTIPLE COMPARISON SCHEME
 Steps:
     1) Read in all files in file list, directory, or structures concatenated into a file.
     2) Obtain stoichiometry/species/space group.
-    3) Compare structures that have same stoichiometry, species (if applicable), space group, and
+    3) Compare structures that have the same stoichiometry, species (if applicable), space group, and
        LFA environment by picking a representative structure and comparing it with the other structures.
     4) If any of the structures did not match the representative, create another group of
        comparisons for the ones that did not match. Continue until all structures are
