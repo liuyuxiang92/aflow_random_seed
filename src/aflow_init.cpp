@@ -2116,9 +2116,9 @@ namespace init {
     nschema++;
 
     // schema is CAPITAL, content is not necessarily
-    XHOST.vschema.push_attached("SCHEMA::NAME:AGL_THERMAL_CONDUCTIVITY_300K","agl_poisson_ratio_source");
-    XHOST.vschema.push_attached("SCHEMA::UNIT:AGL_THERMAL_CONDUCTIVITY_300K","");
-    XHOST.vschema.push_attached("SCHEMA::TYPE:AGL_THERMAL_CONDUCTIVITY_300K","string");
+    XHOST.vschema.push_attached("SCHEMA::NAME:AGL_POISSON_RATIO_SOURCE","agl_poisson_ratio_source");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AGL_POISSON_RATIO_SOURCE","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AGL_POISSON_RATIO_SOURCE","string");
     nschema++;
 
     // schema is CAPITAL, content is not necessarily
