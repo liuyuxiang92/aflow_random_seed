@@ -1299,18 +1299,72 @@ namespace chull {
 
 namespace chull {
   //--------------------------------------------------------------------------------
+  // class ChullPointLight
+  //--------------------------------------------------------------------------------
+  //--------------------------------------------------------------------------------
+  // constructor
+  //--------------------------------------------------------------------------------
+  ChullPointLight::ChullPointLight(ostream& oss) : xStream(oss),m_initialized(false) {;}
+  ChullPointLight::ChullPointLight(ofstream& FileMESSAGE,ostream& oss) : xStream(FileMESSAGE,oss),m_initialized(false) {;}
+  ChullPointLight::ChullPointLight(const ChullPointLight& b) : xStream(*b.getOFStream(),*b.getOSS()) {copy(b);} // copy PUBLIC  //upcasting is allowed, works for ChullPointLight and ChullPoint
+
+  ChullPointLight::~ChullPointLight() {xStream::free();free();}
+
+  const ChullPointLight& ChullPointLight::operator=(const ChullPointLight& other) { //upcasting is allowed, works for ChullPointLight and ChullPoint
+    if(this!=&other) {copy(other);}
+    return *this;
+  }
+  bool ChullPointLight::operator<(const ChullPointLight& other) const {
+    //NB: this is ALWAYS sorted in descending order of stoich, no need to make options for ascending order
+    //but, sorts in ascending order for energy
+    string soliloquy=XPID+"ChullPointLight::operator<():";
+    if(m_coords.lrows!=other.m_coords.lrows){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_coords.lrows!=other.m_coords.lrows");}
+    if(m_coords.rows!=other.m_coords.rows){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_coords.rows!=other.m_coords.rows");}
+    for(int i=m_coords.lrows;i<=m_coords.urows;i++){if(m_coords[i]!=other.m_coords[i]){return (m_coords[i]<other.m_coords[i]);}}
+    return false;
+  }
+
+  void ChullPointLight::clear() {free();}  //clear PUBLIC
+  void ChullPointLight::free() {
+    m_initialized=false;
+    m_coords.clear();
+    m_has_stoich_coords=false;
+    m_formation_energy_coord=false;
+    m_is_artificial=false;
+    m_has_entry=false;
+    m_i_nary=AUROSTD_MAX_UINT;
+    m_i_alloy=AUROSTD_MAX_UINT;
+    h_coords.clear();
+  }
+
+  void ChullPointLight::copy(const ChullPointLight& b) {  //copy PRIVATE  //upcasting is allowed, works for ChullPointLight and ChullPoint
+    xStream::copy(b);
+    m_initialized=b.m_initialized;
+    m_coords=b.m_coords;
+    m_has_stoich_coords=b.m_has_stoich_coords;
+    m_formation_energy_coord=b.m_formation_energy_coord;
+    m_is_artificial=b.m_is_artificial;
+    m_has_entry=b.m_has_entry;
+    m_i_nary=b.m_i_nary;
+    m_i_alloy=b.m_i_alloy;
+    h_coords=b.h_coords;
+  }
+  
+  double ChullPointLight::getLastCoord() const {return m_coords[m_coords.urows];}
+
+  //--------------------------------------------------------------------------------
   // class ChullPoint
   //--------------------------------------------------------------------------------
   //--------------------------------------------------------------------------------
   // constructor
   //--------------------------------------------------------------------------------
-  ChullPoint::ChullPoint(ostream& oss,bool has_stoich_coords,bool formation_energy_coord,bool is_artificial) : xStream(oss),m_initialized(false) {initialize(has_stoich_coords,formation_energy_coord,is_artificial);}
-  ChullPoint::ChullPoint(const xvector<double>& coord,ostream& oss,bool has_stoich_coords,bool formation_energy_coord,bool is_artificial) : xStream(oss),m_initialized(false) {initialize(coord,has_stoich_coords,formation_energy_coord,is_artificial);}
-  ChullPoint::ChullPoint(const vector<string>& velements,const aflowlib::_aflowlib_entry& entry,ostream& oss,bool formation_energy_coord) : xStream(oss),m_initialized(false) {initialize(velements,entry,formation_energy_coord);}
-  ChullPoint::ChullPoint(ofstream& FileMESSAGE,ostream& oss,bool has_stoich_coords,bool formation_energy_coord,bool is_artificial) : xStream(FileMESSAGE,oss),m_initialized(false) {initialize(has_stoich_coords,formation_energy_coord,is_artificial);}
-  ChullPoint::ChullPoint(const xvector<double>& coord,ofstream& FileMESSAGE,ostream& oss,bool has_stoich_coords,bool formation_energy_coord,bool is_artificial) : xStream(FileMESSAGE,oss),m_initialized(false) {initialize(coord,has_stoich_coords,formation_energy_coord,is_artificial);}
-  ChullPoint::ChullPoint(const vector<string>& velements,const aflowlib::_aflowlib_entry& entry,ofstream& FileMESSAGE,ostream& oss,bool formation_energy_coord) : xStream(FileMESSAGE,oss),m_initialized(false) {initialize(velements,entry,formation_energy_coord);}
-  ChullPoint::ChullPoint(const ChullPoint& b) : xStream(*b.getOFStream(),*b.getOSS()) {copy(b);} // copy PUBLIC
+  ChullPoint::ChullPoint(ostream& oss,bool has_stoich_coords,bool formation_energy_coord,bool is_artificial) : ChullPointLight(oss) {initialize(has_stoich_coords,formation_energy_coord,is_artificial);}
+  ChullPoint::ChullPoint(const xvector<double>& coord,ostream& oss,bool has_stoich_coords,bool formation_energy_coord,bool is_artificial) : ChullPointLight(oss) {initialize(coord,has_stoich_coords,formation_energy_coord,is_artificial);}
+  ChullPoint::ChullPoint(const vector<string>& velements,const aflowlib::_aflowlib_entry& entry,ostream& oss,bool formation_energy_coord) : ChullPointLight(oss) {initialize(velements,entry,formation_energy_coord);}
+  ChullPoint::ChullPoint(ofstream& FileMESSAGE,ostream& oss,bool has_stoich_coords,bool formation_energy_coord,bool is_artificial) : ChullPointLight(FileMESSAGE,oss) {initialize(has_stoich_coords,formation_energy_coord,is_artificial);}
+  ChullPoint::ChullPoint(const xvector<double>& coord,ofstream& FileMESSAGE,ostream& oss,bool has_stoich_coords,bool formation_energy_coord,bool is_artificial) : ChullPointLight(FileMESSAGE,oss) {initialize(coord,has_stoich_coords,formation_energy_coord,is_artificial);}
+  ChullPoint::ChullPoint(const vector<string>& velements,const aflowlib::_aflowlib_entry& entry,ofstream& FileMESSAGE,ostream& oss,bool formation_energy_coord) : ChullPointLight(FileMESSAGE,oss) {initialize(velements,entry,formation_energy_coord);}
+  ChullPoint::ChullPoint(const ChullPoint& b) : xStream(*b.getOFStream(),*b.getOSS()),ChullPointLight(b) {copy(b);} // copy PUBLIC
 
   ChullPoint::~ChullPoint() {xStream::free();free();}
 
@@ -1319,16 +1373,20 @@ namespace chull {
     return *this;
   }
 
-  void ChullPoint::HullCopy(const ChullPoint& b){ //copies ALL chull stuff, no entry data
-    xStream::copy(b);
-    m_initialized=b.m_initialized;
-    m_coords=b.m_coords;
-    m_has_stoich_coords=b.m_has_stoich_coords;
-    m_has_entry=b.m_has_entry;
-    m_formation_energy_coord=b.m_formation_energy_coord;
-    m_is_artificial=b.m_is_artificial;
-    m_i_nary=b.m_i_nary;
-    m_i_alloy=b.m_i_alloy;
+  void ChullPoint::clear() {free();}  //clear PUBLIC
+  void ChullPoint::free() {
+    ChullPointLight::free();
+    m_entry.clear(); if(m_entry.vsg.size()==0){m_entry.vsg.push_back(NOSG);} if(m_entry.vsg2.size()==0){m_entry.vsg2.push_back(NOSG);}  //hack so it doesn't break with front(),back(),[0]
+    s_coords.clear();
+    c_coords.clear();
+    m_elements_present.clear();
+    cleanPointForHullTransfer();
+  }
+
+  void ChullPoint::copy(const ChullPoint& b) {  //copy PRIVATE
+    //xStream::copy(b); //done inside ChullPointLight::copy()
+    ChullPointLight::copy(b);
+    m_entry=b.m_entry; if(m_entry.vsg.size()==0){m_entry.vsg.push_back(NOSG);} if(m_entry.vsg2.size()==0){m_entry.vsg2.push_back(NOSG);}  //hack so it doesn't break with front(),back(),[0]
     m_i_coord_group=b.m_i_coord_group;
     s_coords=b.s_coords;
     c_coords=b.c_coords;
@@ -1341,48 +1399,7 @@ namespace chull {
     //[OBSOLETE - reduce by frac_vrt always! so use coord_group values]m_decomp_coefs=b.m_decomp_coefs;
     m_stability_criterion=b.m_stability_criterion;
     m_n_plus_1_enthalpy_gain=b.m_n_plus_1_enthalpy_gain;
-    h_coords=b.h_coords;
   }
-
-  bool ChullPoint::operator<(const ChullPoint& other) const {
-    //NB: this is ALWAYS sorted in descending order of stoich, no need to make options for ascending order
-    //but, sorts in ascending order for energy
-    string soliloquy=XPID+"ChullPoint::operator<():";
-    if(m_coords.lrows!=other.m_coords.lrows){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_coords.lrows!=other.m_coords.lrows");}
-    if(m_coords.rows!=other.m_coords.rows){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_coords.rows!=other.m_coords.rows");}
-    for(int i=m_coords.lrows;i<=m_coords.urows;i++){if(m_coords[i]!=other.m_coords[i]){return (m_coords[i]<other.m_coords[i]);}}
-    return false;
-  }
-
-  void ChullPoint::clear() {ChullPoint a;copy(a);}  //clear PUBLIC
-  void ChullPoint::free() {
-    m_initialized=false;
-    m_coords.clear();
-    m_has_stoich_coords=false;
-    m_entry.clear(); if(m_entry.vsg.size()==0){m_entry.vsg.push_back(NOSG);} if(m_entry.vsg2.size()==0){m_entry.vsg2.push_back(NOSG);}  //hack so it doesn't break with front(),back(),[0]
-    m_has_entry=false;
-    m_formation_energy_coord=false;
-    m_is_artificial=false;
-    m_i_nary=AUROSTD_MAX_UINT;
-    s_coords.clear();
-    c_coords.clear();
-    m_elements_present.clear();
-    //see xStream::free()
-    //p_oss=NULL;
-    //p_FileMESSAGE=NULL;
-    //f_new_ofstream=false;
-    cleanPointForHullTransfer();
-  }
-
-  void ChullPoint::copy(const ChullPoint& b) {  //copy PRIVATE
-    HullCopy(b);  //copies ALL chull stuff, no entry data
-    m_entry=b.m_entry; if(m_entry.vsg.size()==0){m_entry.vsg.push_back(NOSG);} if(m_entry.vsg2.size()==0){m_entry.vsg2.push_back(NOSG);}  //hack so it doesn't break with front(),back(),[0]
-  }
-
-  //MOVED TO xStream
-  //void ChullPoint::setOFStream(ofstream& FileMESSAGE){p_FileMESSAGE=&FileMESSAGE;}
-  //void ChullPoint::setOSS(ostream& oss) {p_oss=&oss;}
-
 
   bool ChullPoint::initialize(ostream& oss,bool has_stoich_coords,bool formation_energy_coord,bool is_artificial) {
     xStream::initialize(oss);
@@ -1542,7 +1559,6 @@ namespace chull {
   }
 
   //small get()'s of fundamental types get copies, otherwise const&
-  double ChullPoint::getLastCoord() const {return m_coords[m_coords.urows];}
   uint ChullPoint::getDim() const {return m_coords.rows;}
   bool ChullPoint::isUnary() const {return m_i_nary==0;}
   double ChullPoint::getFormationEnthalpy() const {return H_f_atom(*this,_std_);} //m_entry.enthalpy_formation_atom;
@@ -1757,7 +1773,7 @@ namespace chull {
   // constructor
   //--------------------------------------------------------------------------------
   FacetPoint::FacetPoint() {free();}
-  FacetPoint::FacetPoint(const ChullPoint& point,uint index,bool full_copy){initialize(point,index,full_copy);}  //need BOTH point and index, otherwise, just use point/index independently
+  FacetPoint::FacetPoint(const ChullPointLight& point,uint index){initialize(point,index);}  //need BOTH point and index, otherwise, just use point/index independently
   FacetPoint::FacetPoint(const FacetPoint& b) {copy(b);}  // copy PUBLIC
   FacetPoint::~FacetPoint() {free();}
 
@@ -1781,9 +1797,8 @@ namespace chull {
     ch_point=b.ch_point;
   }
 
-  void FacetPoint::initialize(const ChullPoint& point,uint index,bool full_copy) {
-    if(full_copy){ch_point=point;}
-    else {ch_point.HullCopy(point);} //fast copy of just hull relevant data, not extra entry data, for this, use index in ConvexHull
+  void FacetPoint::initialize(const ChullPointLight& point,uint index) {
+    ch_point=point;
     ch_index=index;
     m_initialized=true;
   }
@@ -1793,12 +1808,12 @@ namespace chull {
 namespace chull {
   bool sortThermoPoints::operator() (const FacetPoint& fpi,const FacetPoint& fpj) const{
     string soliloquy=XPID+"chull::sortThermoPoints::operator():";
-    const ChullPoint& ci=fpi.ch_point;
-    const ChullPoint& cj=fpj.ch_point;
+    const ChullPointLight& ci=fpi.ch_point;
+    const ChullPointLight& cj=fpj.ch_point;
     return (*this).operator()(ci,cj);
   }
 
-  bool sortThermoPoints::operator() (const ChullPoint& ci,const ChullPoint& cj) const{
+  bool sortThermoPoints::operator() (const ChullPointLight& ci,const ChullPointLight& cj) const{  //upcasting is allowed, works for ChullPointLight and ChullPoint
     string soliloquy=XPID+"chull::sortThermoPoints::operator():";
     if(!(ci.m_initialized && cj.m_initialized)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Points not initialized");}
     //do not first sort binaries from ternaries, screws up facet sorting
@@ -1948,7 +1963,7 @@ namespace chull {
     return isPointOutside(f_point.ch_point);
   }
 
-  bool ChullFacet::isPointOutside(const ChullPoint& point) const {
+  bool ChullFacet::isPointOutside(const ChullPointLight& point) const {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
     string soliloquy=XPID+"ChullFacet::isPointOutside():";
     if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Facet not initialized");}
@@ -1986,7 +2001,7 @@ namespace chull {
   }
 
   //sign depends on normal, if normal vector and point are in the same half-space, point-plane distance is positive, negative otherwise
-  double ChullFacet::getSignedPointPlaneDistance(const ChullPoint& point) const {return getSignedPointPlaneDistance(point.h_coords);}
+  double ChullFacet::getSignedPointPlaneDistance(const ChullPointLight& point) const {return getSignedPointPlaneDistance(point.h_coords);}
   double ChullFacet::getSignedPointPlaneDistance(const xvector<double>& point) const {
     string soliloquy=XPID+"ChullFacet::getSignedPointPlaneDistance():";
     if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Facet not initialized");}
@@ -1995,7 +2010,7 @@ namespace chull {
     return scalar_product(m_normal,diff);
   }
 
-  double ChullFacet::getSignedVerticalDistanceToZero(const ChullPoint& point) const {
+  double ChullFacet::getSignedVerticalDistanceToZero(const ChullPointLight& point) const {
     //get energy of facet at stoichiometry of input (point)
     string soliloquy=XPID+"ChullFacet::getSignedVerticalDistanceToZero():";
     return getSignedVerticalDistanceToZero(point.h_coords);
@@ -2025,7 +2040,7 @@ namespace chull {
     return dist;
   }
 
-  double ChullFacet::getSignedVerticalDistance(const ChullPoint& point) const {
+  double ChullFacet::getSignedVerticalDistance(const ChullPointLight& point) const {
     string soliloquy=XPID+"ChullFacet::getSignedVerticalDistance():";
     if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized facet");}
     if(!point.m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized point");}
@@ -2074,13 +2089,13 @@ namespace chull {
   //void ChullFacet::setOFStream(ofstream& FileMESSAGE){p_FileMESSAGE=&FileMESSAGE;}
   //void ChullFacet::setOSS(ostream& oss) {p_oss=&oss;}
 
-  void ChullFacet::addVertex(const ChullPoint& point,uint index) {FacetPoint fp(point,index,false);return addVertex(fp);} //no need for full copy
+  void ChullFacet::addVertex(const ChullPointLight& point,uint index) {FacetPoint fp(point,index);return addVertex(fp);} //no need for full copy
   void ChullFacet::addVertex(const FacetPoint& fp){
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
     stringstream message;
     string soliloquy=XPID+"ChullFacet::addVertex():";
     if(!fp.m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized facetpoint");}
-    const ChullPoint& point=fp.ch_point;
+    const ChullPointLight& point=fp.ch_point;
     if(m_vertices.size()==0){
       m_has_stoich_coords=point.m_has_stoich_coords;
       m_formation_energy_coord=point.m_formation_energy_coord;

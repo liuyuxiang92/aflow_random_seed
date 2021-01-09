@@ -303,6 +303,7 @@ namespace pocc {
       //NECESSARY PUBLIC CLASS METHODS - START
       //constructors - START
       POccCalculatorTemplate();
+      POccCalculatorTemplate(const POccCalculatorTemplate& b);
       //constructors - STOP
       ~POccCalculatorTemplate();
       //NECESSARY PUBLIC CLASS METHODS - END

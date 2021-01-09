@@ -4732,6 +4732,7 @@ namespace pocc {
   // constructor
   //--------------------------------------------------------------------------------
   POccCalculatorTemplate::POccCalculatorTemplate() {;}
+  POccCalculatorTemplate::POccCalculatorTemplate(const POccCalculatorTemplate& b) {copy(b);} // copy PUBLIC
   POccCalculatorTemplate::~POccCalculatorTemplate() {free();}
 
   void POccCalculatorTemplate::free() {
