@@ -103,6 +103,8 @@ namespace chull {
   double H_f_atom(const aflowlib::_aflowlib_entry& entry, char units=_std_);
   double T_S(const ChullPoint& point);
   double T_S(const aflowlib::_aflowlib_entry& entry);
+  double EFA(const ChullPoint& point, char units=_std_);
+  double EFA(const aflowlib::_aflowlib_entry& entry, char units=_std_);
   double isoMaxLatentHeat(const ChullPoint& point, double x, char units=_std_);
   double isoMaxLatentHeat(const aflowlib::_aflowlib_entry& entry, double x, char units=_std_);
   ////////////////////////////////////////////////////////////////////////////////
@@ -255,12 +257,14 @@ namespace chull {
       bool isUnary() const;
       double getFormationEnthalpy() const;
       double getEntropicTemperature() const;
+      double getEntropyFormingAbility() const;
       const vector<string>& getVSG() const;
       const string& getSG() const;
       double getDist2Hull(char units=_std_) const;
       double getStabilityCriterion(char units=_std_) const;
       double getRelativeStabilityCriterion() const;
       double getNPlus1EnthalpyGain(char units=_std_) const;
+      double getEntropyStabilizationCoefficient(char units=_std_) const;
 
       //setters
       void setHullCoords();

@@ -1207,16 +1207,38 @@ namespace chull {
     throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No formation energy available for ChullPoint",_INPUT_ILLEGAL_);
     return AUROSTD_NAN;
   }
-  double H_f_atom(const aflowlib::_aflowlib_entry& entry, char units){return convertUnits(entry.enthalpyFormationAtom(0),units);}  //entry.enthalpy_formation_atom - ADDING CCE @ 0K
-  double T_S(const ChullPoint& point){
-    if(point.m_has_entry){return T_S(point.m_entry);}
-    return AUROSTD_NAN;
+  double H_f_atom(const aflowlib::_aflowlib_entry& entry, char units){
+    double d_tmp=entry.enthalpyFormationAtom(0);  //entry.enthalpy_formation_atom - ADDING CCE @ 0K
+    if(d_tmp==AUROSTD_NAN){return AUROSTD_NAN;}
+    return convertUnits(d_tmp,units);
   }
-  double T_S(const aflowlib::_aflowlib_entry& entry){return entry.entropic_temperature;}
-  double isoMaxLatentHeat(const ChullPoint& point, double x, char units){return isoMaxLatentHeat(point.m_entry,x,units);}
+  double T_S(const ChullPoint& point){
+    if(!point.m_has_entry){return AUROSTD_NAN;}
+    return T_S(point.m_entry);
+  }
+  double T_S(const aflowlib::_aflowlib_entry& entry){
+    double d_tmp=entry.entropic_temperature;
+    if(d_tmp==AUROSTD_NAN){return AUROSTD_NAN;}
+    return d_tmp;
+  }
+  double EFA(const ChullPoint& point, char units){
+    if(!point.m_has_entry){return AUROSTD_NAN;}
+    return EFA(point.m_entry,units);
+  }
+  double EFA(const aflowlib::_aflowlib_entry& entry, char units){
+    double d_tmp=entry.entropy_forming_ability;
+    if(d_tmp==AUROSTD_NAN){return AUROSTD_NAN;}
+    return convertUnits(d_tmp,units);
+  }
+  double isoMaxLatentHeat(const ChullPoint& point, double x, char units){
+    if(!point.m_has_entry){return AUROSTD_NAN;}
+    return isoMaxLatentHeat(point.m_entry,x,units);
+  }
   double isoMaxLatentHeat(const aflowlib::_aflowlib_entry& entry, double x, char units){
-    double iso_max=((double)KBOLTZEV)*T_S(entry)*(x*log(x)+(1.0-x)*log(1.0-x));
-    return convertUnits(iso_max,units);
+    if(T_S(entry)==AUROSTD_NAN){return AUROSTD_NAN;}
+    if(x<=0||x>=1.0){return AUROSTD_NAN;} //protect log()
+    double d_tmp=((double)KBOLTZEV)*T_S(entry)*(x*log(x)+(1.0-x)*log(1.0-x));
+    return convertUnits(d_tmp,units);
   }
 
   int roundDouble(double doub, int multiple, bool up) {
@@ -1563,13 +1585,16 @@ namespace chull {
   bool ChullPoint::isUnary() const {return m_i_nary==0;}
   double ChullPoint::getFormationEnthalpy() const {return H_f_atom(*this,_std_);} //m_entry.enthalpy_formation_atom;
   double ChullPoint::getEntropicTemperature() const {return T_S(*this);} //m_entry.entropic_temperature;
+  double ChullPoint::getEntropyFormingAbility() const {return EFA(*this,_std_);} //m_entry.entropic_temperature;
   const vector<string>& ChullPoint::getVSG() const {return m_entry.vsg2;}
   const string& ChullPoint::getSG() const {return getVSG().back();}  //tight tolerance fine!  //vsg === LOOSE //vsg2 === TIGHT // doesn't make sense
   double ChullPoint::getDist2Hull(char units) const {
+    if(m_dist_2_hull==AUROSTD_MAX_DOUBLE){return AUROSTD_MAX_DOUBLE;}
     if(m_formation_energy_coord){return convertUnits(m_dist_2_hull,units);}
     else {return m_dist_2_hull;}  //no unit conversions coded yet here
   }
   double ChullPoint::getStabilityCriterion(char units) const {
+    if(m_stability_criterion==AUROSTD_MAX_DOUBLE){return AUROSTD_MAX_DOUBLE;}
     if(m_formation_energy_coord){return convertUnits(m_stability_criterion,units);}
     else {return m_stability_criterion;}  //no unit conversions coded yet here
   }
@@ -1585,8 +1610,21 @@ namespace chull {
     return abs(m_stability_criterion/getLastCoord()); //abs() because they are generally opposite signs //delivers as decimal, show as percentage
   }
   double ChullPoint::getNPlus1EnthalpyGain(char units) const {
+    if(m_n_plus_1_enthalpy_gain==AUROSTD_MAX_DOUBLE){return AUROSTD_MAX_DOUBLE;}
     if(m_formation_energy_coord){return convertUnits(m_n_plus_1_enthalpy_gain,units);}
     else {return m_n_plus_1_enthalpy_gain;}  //no unit conversions coded yet here
+  }
+  double ChullPoint::getEntropyStabilizationCoefficient(char units) const {
+    bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
+    string soliloquy=XPID+"ChullPoint::getEntropyStabilizationCoefficient():";
+    if(getDist2Hull()==AUROSTD_MAX_DOUBLE){return AUROSTD_MAX_DOUBLE;}
+    if(getEntropyFormingAbility()==AUROSTD_NAN){return AUROSTD_MAX_DOUBLE;}
+    if(zeroWithinTol(getEntropyFormingAbility())){return AUROSTD_MAX_DOUBLE;} //protect from division by zero
+    if(LDEBUG) {
+      cerr << soliloquy << " dist2hull=" << getDist2Hull() << endl;
+      cerr << soliloquy << " EFA=" << getEntropyFormingAbility() << endl;
+    }
+    return convertUnits(sqrt(getDist2Hull() / getEntropyFormingAbility()),units);
   }
 
   //since we don't check ALL attributes of entry, then we weed out MORE
@@ -9555,8 +9593,8 @@ namespace chull {
             ////////////////////////////////////////////////////////////////////
 
             if(meta_labels) {
-              uint tmp_precision=0;
-              double tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);
+              uint precision_tmp=0;
+              double tmp_roundoff_tol=5.0*pow(10,-((int)precision_tmp)-1);
               // no node option
 
               // get node position
@@ -9580,14 +9618,14 @@ namespace chull {
               // enthalpy of formation, row 4
               // no need for precision for next few columns, leave it same way
               // as received from AFLOW
-              node_content_ss << "$H_{\\mathrm{f}}$=" << aurostd::utype2string(chull::H_f_atom(point,_m_),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM) << " meV/atom";
+              node_content_ss << "$H_{\\mathrm{f}}$=" << aurostd::utype2string(chull::H_f_atom(point,_m_),precision_tmp,true,tmp_roundoff_tol,FIXED_STREAM) << " meV/atom";
               //num_ss << chull::H_f_atom(point,_m_);
               //node_content_ss << "$H_{\\mathrm{f}}$=" << num_ss.str() << " meV/atom";
               //num_ss.str("");
               // shortstack newline
               node_content_ss << "\\\\";
               // entropic temperature, row 5
-              node_content_ss << "$T_{\\mathrm{S}}$=" << aurostd::utype2string(chull::T_S(point),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM) << " K";
+              node_content_ss << "$T_{\\mathrm{S}}$=" << aurostd::utype2string(chull::T_S(point),precision_tmp,true,tmp_roundoff_tol,FIXED_STREAM) << " K";
               //num_ss << chull::T_S(point);
               //node_content_ss << "$T_{\\mathrm{S}}$=" << num_ss.str() << " K";
               //num_ss.str("");
@@ -9596,9 +9634,9 @@ namespace chull {
                 // shortstack newline
                 node_content_ss << "\\\\";
                 if(m_formation_energy_hull) {
-                  node_content_ss << "$" << getDelta(helvetica_font) << " H_{\\mathrm{f}}$=" << aurostd::utype2string(point.getDist2Hull(_m_),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM) << " meV/atom";  //CHULL_PRECISION
+                  node_content_ss << "$" << getDelta(helvetica_font) << " H_{\\mathrm{f}}$=" << aurostd::utype2string(point.getDist2Hull(_m_),precision_tmp,true,tmp_roundoff_tol,FIXED_STREAM) << " meV/atom";  //CHULL_PRECISION
                 } else {
-                  node_content_ss << "$" << getDelta(helvetica_font) << " T_{\\mathrm{S}}$=" << aurostd::utype2string(point.getDist2Hull(_std_),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM) << " K"; //CHULL_PRECISION
+                  node_content_ss << "$" << getDelta(helvetica_font) << " T_{\\mathrm{S}}$=" << aurostd::utype2string(point.getDist2Hull(_std_),precision_tmp,true,tmp_roundoff_tol,FIXED_STREAM) << " K"; //CHULL_PRECISION
                 }
               }
               node_content_ss << "}";
@@ -10251,7 +10289,7 @@ namespace chull {
       stringstream scriterion_data_ss,np1_data_ss;
       //uint num_cols_scriterion=2;
       //uint num_cols_np1=3;
-      uint tmp_precision;
+      uint precision_tmp=0;
       double tmp_roundoff_tol;
       if(compounds_column_report){pdftable_font_sizes="\\fontsize{4}{6}\\selectfont";}
       else {pdftable_font_sizes="\\fontsize{5}{7}\\selectfont";}
@@ -10460,17 +10498,17 @@ namespace chull {
                 _report_data_ss << " " << "(ground-state)"; // if ground-state
                 if(m_coord_groups[i_coord_group].m_stability_criterion<AUROSTD_NAN){
                   print_scriterion=true;
-                  tmp_precision=0;
-                  tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);
+                  precision_tmp=0;
+                  tmp_roundoff_tol=5.0*pow(10,-((int)precision_tmp)-1);
                   //scriterion_data_ss << "$\\mathit{\\Delta}_{\\mathrm{sc}}="; //this delta is okay, should be italicized
                   scriterion_data_ss << "$\\delta_{\\mathrm{sc}}="; //this delta is okay, should be italicized
-                  scriterion_data_ss << aurostd::utype2string(convertUnits(m_coord_groups[i_coord_group].m_stability_criterion,(m_formation_energy_hull?_m_:_std_)),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM);
+                  scriterion_data_ss << aurostd::utype2string(convertUnits(m_coord_groups[i_coord_group].m_stability_criterion,(m_formation_energy_hull?_m_:_std_)),precision_tmp,true,tmp_roundoff_tol,FIXED_STREAM);
                   scriterion_data_ss << "$~" << (m_formation_energy_hull?string("meV/atom"):string("K"));
                 }
                 if(m_coord_groups[i_coord_group].m_i_nary>=1 && m_coord_groups[i_coord_group].m_n_plus_1_enthalpy_gain<AUROSTD_NAN){ //print binaries anyway... //print only for ternaries and up, binaries is trivial formation enthalpy (save space)
                   print_np1=true;
-                  tmp_precision=0;
-                  tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);
+                  precision_tmp=0;
+                  tmp_roundoff_tol=5.0*pow(10,-((int)precision_tmp)-1);
                   //np1_data_ss << "$\\mathit{\\Delta}_{\\mathrm{sc}}="; //this delta is okay, should be italicized
                   if(0){
                     np1_data_ss << "$\\Delta H[N|\\{1,\\cdots,N-1\\}]="; //this delta is okay, should be italicized
@@ -10483,7 +10521,7 @@ namespace chull {
                     else if(m_coord_groups[i_coord_group].m_i_nary>3){np1_data_ss << "\\{1,\\cdots," << m_coord_groups[i_coord_group].m_i_nary << "\\}";}
                     np1_data_ss << "]=";
                   }
-                  np1_data_ss << aurostd::utype2string(convertUnits(m_coord_groups[i_coord_group].m_n_plus_1_enthalpy_gain,(m_formation_energy_hull?_m_:_std_)),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM);
+                  np1_data_ss << aurostd::utype2string(convertUnits(m_coord_groups[i_coord_group].m_n_plus_1_enthalpy_gain,(m_formation_energy_hull?_m_:_std_)),precision_tmp,true,tmp_roundoff_tol,FIXED_STREAM);
                   np1_data_ss << "$~" << (m_formation_energy_hull?string("meV/atom"):string("K"));
                 }
               } else {
@@ -10854,9 +10892,9 @@ namespace chull {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
     string soliloquy=XPID+"ConvexHull::grabCHPointProperty():";
     if(LDEBUG) {cerr << soliloquy << " start" << endl;}
-    uint precision,tmp_precision;
-    precision=tmp_precision=COEF_PRECISION;
+    uint precision=COEF_PRECISION,precision_tmp=COEF_PRECISION;
     double tmp_roundoff_tol=5.0*pow(10,-((int)precision)-1);
+    double d_tmp=0.0;
     string value="";
     string equilibrium_phases_delimiter="-";
     string string_wrapper="";
@@ -10926,19 +10964,19 @@ namespace chull {
       value=aurostd::wrapString(value,string_wrapper);
     }
     else if(property=="spin_atom"){
-      tmp_precision=precision;
-      if(ftype==latex_ft){tmp_precision=2;tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);}
-      value=aurostd::utype2string(point.m_entry.spin_atom,tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM);
+      precision_tmp=precision;
+      if(ftype==latex_ft){precision_tmp=2;tmp_roundoff_tol=5.0*pow(10,-((int)precision_tmp)-1);}
+      value=aurostd::utype2string(point.m_entry.spin_atom,precision_tmp,true,tmp_roundoff_tol,FIXED_STREAM);
     }
     else if(property=="enthalpy_formation_atom"){
-      tmp_precision=precision;
-      if(ftype==latex_ft){tmp_precision=0;tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);}
-      value=aurostd::utype2string(H_f_atom(point,_m_),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM);
+      precision_tmp=precision;
+      if(ftype==latex_ft){precision_tmp=0;tmp_roundoff_tol=5.0*pow(10,-((int)precision_tmp)-1);}
+      value=aurostd::utype2string(H_f_atom(point,_m_),precision_tmp,true,tmp_roundoff_tol,FIXED_STREAM);
     }
     else if(property=="entropic_temperature"){
-      tmp_precision=precision;
-      if(ftype==latex_ft){tmp_precision=0;tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);}
-      value=aurostd::utype2string(point.m_entry.entropic_temperature,tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM);
+      precision_tmp=precision;
+      if(ftype==latex_ft){precision_tmp=0;tmp_roundoff_tol=5.0*pow(10,-((int)precision_tmp)-1);}
+      value=aurostd::utype2string(point.m_entry.entropic_temperature,precision_tmp,true,tmp_roundoff_tol,FIXED_STREAM);
     }
     else if(property=="ground_state"){value=(point.isGState()?"true":"false");}
     else if(property=="equivalent_structures_auid"){
@@ -11110,9 +11148,9 @@ namespace chull {
             for(int i=m_coord_groups[i_coord_group].m_decomp_coefs.lrows;i<=m_coord_groups[i_coord_group].m_decomp_coefs.urows;i++){
               if(nonZeroWithinTol(m_coord_groups[i_coord_group].m_decomp_coefs[i])){nonzero_coefs.push_back(m_coord_groups[i_coord_group].m_decomp_coefs[i]);}
             }
-            tmp_precision=precision;
-            tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);
-            value=aurostd::wrapString(aurostd::joinWDelimiter(aurostd::vecDouble2vecString(nonzero_coefs,tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM),","),list_prefix,list_suffix);
+            precision_tmp=precision;
+            tmp_roundoff_tol=5.0*pow(10,-((int)precision_tmp)-1);
+            value=aurostd::wrapString(aurostd::joinWDelimiter(aurostd::vecDouble2vecString(nonzero_coefs,precision_tmp,true,tmp_roundoff_tol,FIXED_STREAM),","),list_prefix,list_suffix);
           }
         }
       }
@@ -11127,22 +11165,31 @@ namespace chull {
       value=aurostd::utype2string(i_nary);  //no precision needed here, simple uint
     }
     else if(property=="enthalpy_formation_atom_difference"){
-      tmp_precision=precision;
-      if(ftype==latex_ft){tmp_precision=0;tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);}
-      value=aurostd::utype2string(point.getDist2Hull(_m_),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM);
+      d_tmp=point.getDist2Hull(_m_);
+      if(d_tmp!=AUROSTD_MAX_DOUBLE){
+        precision_tmp=precision;
+        if(ftype==latex_ft){precision_tmp=0;tmp_roundoff_tol=5.0*pow(10,-((int)precision_tmp)-1);}
+        value=aurostd::utype2string(d_tmp,precision_tmp,true,tmp_roundoff_tol,FIXED_STREAM);
+      }
     }
     else if(property=="entropic_temperature_difference"){
-      tmp_precision=precision;
-      if(ftype==latex_ft){tmp_precision=0;tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);}
-      value=aurostd::utype2string(point.getDist2Hull(_std_),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM); //will never be _m_ units
+      d_tmp=point.getDist2Hull(_std_);
+      if(d_tmp!=AUROSTD_MAX_DOUBLE){
+        precision_tmp=precision;
+        if(ftype==latex_ft){precision_tmp=0;tmp_roundoff_tol=5.0*pow(10,-((int)precision_tmp)-1);}
+        value=aurostd::utype2string(d_tmp,precision_tmp,true,tmp_roundoff_tol,FIXED_STREAM); //will never be _m_ units
+      }
     }
     else if(property=="stability_criterion"){
       if(m_cflags.flag("CHULL::SKIP_STABILITY_CRITERION_ANALYSIS")||point.getStabilityCriterion(_m_)>=AUROSTD_NAN){value=null_value;}
       else {
         if(point.isGState()){
-          tmp_precision=precision;
-          if(ftype==latex_ft){tmp_precision=0;tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);}
-          value=aurostd::utype2string(point.getStabilityCriterion(_m_),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM); //can be _m_ units, but smart enough to switch if T_S
+          d_tmp=point.getStabilityCriterion(_m_);
+          if(d_tmp!=AUROSTD_MAX_DOUBLE){
+            precision_tmp=precision;
+            if(ftype==latex_ft){precision_tmp=0;tmp_roundoff_tol=5.0*pow(10,-((int)precision_tmp)-1);}
+            value=aurostd::utype2string(d_tmp,precision_tmp,true,tmp_roundoff_tol,FIXED_STREAM); //can be _m_ units, but smart enough to switch if T_S
+          }
         }
       }
     }
@@ -11150,9 +11197,12 @@ namespace chull {
       if(m_cflags.flag("CHULL::SKIP_STABILITY_CRITERION_ANALYSIS")||point.getRelativeStabilityCriterion()>=AUROSTD_NAN){value=null_value;}
       else {
         if(point.isGState()){
-          tmp_precision=precision;
-          if(ftype==latex_ft){tmp_precision=0;tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);}
-          value=aurostd::utype2string(point.getRelativeStabilityCriterion(),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM); //delivers as decimal, show as percentage  //CO20180409 - not showing as fraction anymore, not necessarily out of 100%
+          d_tmp=point.getRelativeStabilityCriterion();
+          if(d_tmp!=AUROSTD_MAX_DOUBLE){
+            precision_tmp=precision;
+            if(ftype==latex_ft){precision_tmp=0;tmp_roundoff_tol=5.0*pow(10,-((int)precision_tmp)-1);}
+            value=aurostd::utype2string(d_tmp,precision_tmp,true,tmp_roundoff_tol,FIXED_STREAM); //delivers as decimal, show as percentage  //CO20180409 - not showing as fraction anymore, not necessarily out of 100%
+          }
         }
       }
     }
@@ -11160,18 +11210,21 @@ namespace chull {
       if(m_cflags.flag("CHULL::SKIP_N+1_ENTHALPY_GAIN_ANALYSIS")||point.getNPlus1EnthalpyGain(_m_)>=AUROSTD_NAN){value=null_value;}
       else {
         if(point.isGState()){
-          tmp_precision=precision;
-          if(ftype==latex_ft){tmp_precision=0;tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);}
-          value=aurostd::utype2string(point.getNPlus1EnthalpyGain(_m_),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM); //delivers as decimal, show as percentage  //CO20180409 - not showing as fraction anymore, not necessarily out of 100%
+          d_tmp=point.getNPlus1EnthalpyGain(_m_);
+          if(d_tmp!=AUROSTD_MAX_DOUBLE){
+            precision_tmp=precision;
+            if(ftype==latex_ft){precision_tmp=0;tmp_roundoff_tol=5.0*pow(10,-((int)precision_tmp)-1);}
+            value=aurostd::utype2string(d_tmp,precision_tmp,true,tmp_roundoff_tol,FIXED_STREAM); //delivers as decimal, show as percentage  //CO20180409 - not showing as fraction anymore, not necessarily out of 100%
+          }
         }
       }
     }
     else if(property=="entropy_stabilization_coefficient"){
-      //check that H_f and EFA are set and EFA!=0 (division by 0)
-      if(H_f_atom(point)!=AUROSTD_NAN && point.m_entry.entropy_forming_ability!=AUROSTD_NAN && nonZeroWithinTol(point.m_entry.entropy_forming_ability)){
-        tmp_precision=precision;
-        if(ftype==latex_ft){tmp_precision=0;tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);}
-        value=aurostd::utype2string( sqrt(point.getDist2Hull() / point.m_entry.entropy_forming_ability) ,tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM);
+      d_tmp=point.getEntropyStabilizationCoefficient();
+      if(d_tmp!=AUROSTD_MAX_DOUBLE){
+        precision_tmp=precision;
+        if(ftype==latex_ft){precision_tmp=0;tmp_roundoff_tol=5.0*pow(10,-((int)precision_tmp)-1);}
+        value=aurostd::utype2string(d_tmp,precision_tmp,true,tmp_roundoff_tol,FIXED_STREAM);
       }
     }
     else {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown property");}
