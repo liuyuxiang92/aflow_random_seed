@@ -457,6 +457,31 @@ namespace chull {
       //speed ups for command line options
       if(vpflow.flag("CHULL::DIST2HULL") || vpflow.flag("CHULL::STABILITY_CRITERION") || vpflow.flag("CHULL::N+1_ENTHALPY_GAIN") || vpflow.flag("CHULL::HULL_FORMATION_ENTHALPY")) {
         vpflow.flag("CHULL::SKIP_THERMO_PROPERTIES_EXTRACTION",true);
+        message << "Skipping thermodynamic properties extraction";pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+      }
+      
+      //skip calculating all of the lower dimensional hulls
+      //this works if you are finding the hull_energy somewhere in the middle of the hull
+      //the edges are problematic (lower dimensional hulls)
+      //so only skip calculating these hulls if you are calculating hull_energy of the ND hull
+      if(0){  //not actually faster, lower dimensional hulls reduce number of points in ND hull
+        if(vpflow.flag("CHULL::HULL_FORMATION_ENTHALPY")){
+          vector<double> _coords;
+          aurostd::string2tokens<double>(vpflow.getattachedscheme("CHULL::HULL_FORMATION_ENTHALPY"), _coords, ",");
+          if(_coords.size()==velements.size()-1||_coords.size()==velements.size()){
+            double sum=0.0;
+            for(uint ia=0;ia<(velements.size()-1)&&ia<_coords.size();ia++){sum+=_coords[ia];}
+            if(LDEBUG){
+              cerr << soliloquy << " coords=" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(_coords,4),",") << endl;
+              cerr << soliloquy << " sum=" << sum << endl;
+              cerr << soliloquy << " coord_last=" << (1.0-sum) << endl;
+            }
+            if((1.0-sum)>ZERO_COEF_TOL){
+              vpflow.flag("CHULL::CALCULATE_HIGHEST_DIMENSION_ONLY",true);
+              message << "Calculating the highest dimensional hull ONLY";pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+            }
+          }
+        }
       }
 
       ////////////////////////////////////////////////////////////////////////////
@@ -703,7 +728,7 @@ namespace chull {
         aurostd::string2tokens<double>(vpflow.getattachedscheme("CHULL::HULL_FORMATION_ENTHALPY"), _coords, ",");
         for(uint j=0,fl_size_j=_coords.size();j<fl_size_j&&j<dimension;j++){coords[j+coords.lrows]=_coords[j];}
         if(LDEBUG) {cerr << soliloquy << " coords=" << coords << endl;}
-        double dist2hull;
+        double dist2hull=0.0;
         //NB: to anyone who is using the convex hull object
         //outside of declaration/initialization, all functions should be wrapped
         //in try/catch's to avoid hard exits
