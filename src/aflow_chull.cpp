@@ -464,19 +464,26 @@ namespace chull {
       //this works if you are finding the hull_energy somewhere in the middle of the hull
       //the edges are problematic (lower dimensional hulls)
       //so only skip calculating these hulls if you are calculating hull_energy of the ND hull
-      if(0){  //not actually faster, lower dimensional hulls reduce number of points in ND hull
+      if(0){  //not actually faster, lower dimensional hulls reduce number of points in ND hull, tested 7D-hull: 45 mins vs. 1 hr
         if(vpflow.flag("CHULL::HULL_FORMATION_ENTHALPY")){
           vector<double> _coords;
           aurostd::string2tokens<double>(vpflow.getattachedscheme("CHULL::HULL_FORMATION_ENTHALPY"), _coords, ",");
           if(_coords.size()==velements.size()-1||_coords.size()==velements.size()){
+            bool at_edge=false;
             double sum=0.0;
-            for(uint ia=0;ia<(velements.size()-1)&&ia<_coords.size();ia++){sum+=_coords[ia];}
+            for(uint ia=0;ia<(velements.size()-1)&&ia<_coords.size();ia++){
+              if(abs(_coords[ia])<ZERO_COEF_TOL||abs(1.0-_coords[ia])<ZERO_COEF_TOL){at_edge=true;}
+              sum+=_coords[ia];
+            }
+            double coord_last=1.0-sum;
+            at_edge=(at_edge || (abs(coord_last)<ZERO_COEF_TOL||abs(1.0-coord_last)<ZERO_COEF_TOL));
             if(LDEBUG){
               cerr << soliloquy << " coords=" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(_coords,4),",") << endl;
               cerr << soliloquy << " sum=" << sum << endl;
-              cerr << soliloquy << " coord_last=" << (1.0-sum) << endl;
+              cerr << soliloquy << " coord_last=" << coord_last << endl;
+              cerr << soliloquy << " at_edge=" << at_edge << endl;
             }
-            if((1.0-sum)>ZERO_COEF_TOL){
+            if(at_edge==false){
               vpflow.flag("CHULL::CALCULATE_HIGHEST_DIMENSION_ONLY",true);
               message << "Calculating the highest dimensional hull ONLY";pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
             }
