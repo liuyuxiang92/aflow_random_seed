@@ -843,7 +843,8 @@ vector<StructurePrototype> XtalFinderCalculator::compare2prototypes(
       comparison_options.flag("COMPARISON_OPTIONS::IGNORE_WYCKOFF"),
       comparison_options.flag("COMPARISON_OPTIONS::IGNORE_ENVIRONMENT_ANALYSIS"),
       comparison_options.flag("COMPARISON_OPTIONS::IGNORE_ENVIRONMENT_ANGLES"), //DX20200320 - added environment angles
-      false); //DX20200103 - condensed booleans to xoptions
+      false,
+      quiet); //DX20200103 - condensed booleans to xoptions
 
   // ---------------------------------------------------------------------------
   // compare structures
@@ -1037,7 +1038,7 @@ vector<StructurePrototype> XtalFinderCalculator::compare2database(
       relaxation_step = _COMPARE_DATABASE_GEOMETRY_ORIGINAL_;
       load_most_relaxed_structure_only = false;
     }
-    if(aurostd::substring2bool(aurostd::tolower(vpflow.getattachedscheme("COMPARE2DATABASE::RELAXATION_STEP")), "relax1") ||
+    else if(aurostd::substring2bool(aurostd::tolower(vpflow.getattachedscheme("COMPARE2DATABASE::RELAXATION_STEP")), "relax1") ||
         aurostd::substring2bool(aurostd::tolower(vpflow.getattachedscheme("COMPARE2DATABASE::RELAXATION_STEP")), "middle_relax") ||
         vpflow.getattachedscheme("COMPARE2DATABASE::RELAXATION_STEP") == "1"){
       relaxation_step = _COMPARE_DATABASE_GEOMETRY_RELAX1_;
@@ -1384,7 +1385,7 @@ namespace compare {
     // ---------------------------------------------------------------------------
     // FLAG: print format
     bool screen_only = false;
-    if(vpflow.flag("COMPARE2DATABASE::SCREEN_ONLY")) {
+    if(vpflow.flag("COMPARE::SCREEN_ONLY")) {
       screen_only=true;
     }
 
@@ -1588,7 +1589,7 @@ namespace compare {
         relaxation_step = _COMPARE_DATABASE_GEOMETRY_ORIGINAL_;
         load_most_relaxed_structure_only = false;
       }
-      if(aurostd::substring2bool(aurostd::tolower(vpflow.getattachedscheme("COMPARE_DATABASE_ENTRIES::RELAXATION_STEP")), "relax1") ||
+      else if(aurostd::substring2bool(aurostd::tolower(vpflow.getattachedscheme("COMPARE_DATABASE_ENTRIES::RELAXATION_STEP")), "relax1") ||
           aurostd::substring2bool(aurostd::tolower(vpflow.getattachedscheme("COMPARE_DATABASE_ENTRIES::RELAXATION_STEP")), "middle_relax") ||
           vpflow.getattachedscheme("COMPARE_DATABASE_ENTRIES::RELAXATION_STEP") == "1"){
         relaxation_step = _COMPARE_DATABASE_GEOMETRY_RELAX1_;
@@ -2112,7 +2113,8 @@ vector<StructurePrototype> XtalFinderCalculator::compareMultipleStructures(
       comparison_options.flag("COMPARISON_OPTIONS::IGNORE_WYCKOFF"),
       comparison_options.flag("COMPARISON_OPTIONS::IGNORE_ENVIRONMENT_ANALYSIS"),
       comparison_options.flag("COMPARISON_OPTIONS::IGNORE_ENVIRONMENT_ANGLES"), //DX20200320 - added environment angles
-      false); //DX20200103 - condensed booleans to xoptions
+      false,
+      quiet); //DX20200103 - condensed booleans to xoptions
 
   // ---------------------------------------------------------------------------
   // if ICSD comparison, make structure with minimum ICSD number the representative structure

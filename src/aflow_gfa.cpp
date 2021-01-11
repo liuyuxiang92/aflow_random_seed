@@ -30,8 +30,8 @@
 //gfa
 // [OBSOLETE] #define _ZTOL_ 0.05 //Tolerance for positive formation enthalpies - was originally 0.05
 //[CO20190628]#define KbT 0.025 // setting for room temperature - 0.025, could also be human body temperature - 0.0267
-#define TEMPERATURE 300.0 //Kelvin //CO20190628 //DX20201005 - needs to be a float/double (not integer)
-#define KbT (KBOLTZEV*TEMPERATURE) // setting for room temperature - 0.025, could also be human body temperature - 0.0267 //CO20190628 //DX20201006 - need parentheses around macro multiplication
+//DX20210111 [OBSOLETE - moved to xscalar] #define TEMPERATURE 300.0 //Kelvin //CO20190628 //DX20201005 - needs to be a float/double (not integer)
+//DX20210111 [OBSOLETE - moved to xscalar] #define KbT (KBOLTZEV*TEMPERATURE) // setting for room temperature - 0.025, could also be human body temperature - 0.0267 //CO20190628 //DX20201006 - need parentheses around macro multiplication
 
 /********DEFINITIONS**********/
 
@@ -936,15 +936,15 @@ namespace pflow {
                 }
               }
 
-              if(LDEBUG){ cerr << soliloquy << " exp(-abs(El_ref-Egs[X])/KbT)*weight*(1.0-dotProduct): " << exp(-abs(El_ref-Egs[X])/KbT)*weight*(1.0-dotProduct) << endl; }
+              if(LDEBUG){ cerr << soliloquy << " exp(-abs(El_ref-Egs[X])/kBT)*weight*(1.0-dotProduct): " << exp(-abs(El_ref-Egs[X])/kBT_ROOM)*weight*(1.0-dotProduct) << endl; }
 
-              gfa[X]=gfa[X]+exp(-abs(El_ref-Egs[X])/KbT)*weight*(1.0-dotProduct);
+              gfa[X]=gfa[X]+exp(-abs(El_ref-Egs[X])/kBT_ROOM)*weight*(1.0-dotProduct);
               if(LDEBUG){ cerr << soliloquy << " gfa[X]: " << gfa[X] << endl; }
               sampling[X]=sampling[X]+weight;
 
               weight_avgDP.push_back(weight);
               if(weight_avgDP.back()<-0.0000001){cout << "ERROR: weight_avgDP.back() = " << weight_avgDP.back() << ", weight = " << weight << endl;}
-              VEavg.push_back(El_ref/KbT);
+              VEavg.push_back(El_ref/kBT_ROOM);
 
             }	  
           }

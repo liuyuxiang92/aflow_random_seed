@@ -51,8 +51,14 @@ namespace aurostd {
   // be different, see http://combos.org/perm
   //
   // Two algorithms are currently supported:
-  //  1) Shen - lexicographical order (default), e.g., first swap 1234 -> 1243 (doi:10.1007/BF01940170)
-  //  2) Heap - swap left-most first (fastest), e.g., first swap 1234 -> 2134 (https://en.wikipedia.org/wiki/Heap%27s_algorithm)
+  //  1) Shen - lexicographical order (default)
+  //            reference: doi:10.1007/BF01940170
+  //            first swap: 1234 -> 1243
+  //            example use case(s): POSCARs and POCC algorithm
+  //  2) Heap - swap left-most first (fastest, minimum number of swaps)
+  //            reference: https://en.wikipedia.org/wiki/Heap%27s_algorithm
+  //            first swap: 1234 -> 2134
+  //            example use case(s): finding representative atom decorations/permutations for prototypes
   //
   // If new algorithms are added, update the algorithms_xcombos enum.
 

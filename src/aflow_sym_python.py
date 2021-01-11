@@ -15,11 +15,16 @@ class Symmetry:
                 shell=True 
             ) 
         except subprocess.CalledProcessError: 
-            print('Error aflow executable not found at: ' + self.aflow_executable) 
+            raise AssertionError('aflow executable not found: ' + self.aflow_executable)
 
+    def get_filepath(self, filename):
+        if os.path.exists(input_file.name):
+            return os.path.realpath(filename)
+        else:
+            raise OSError(filename + ' not found')
 
-    def get_symmetry(self, input_file, tol=None, magmoms=None): 
-        fpath = os.path.realpath(input_file.name) 
+    def get_symmetry(self, input_file, tol=None, magmoms=None):
+        fpath = get_filepath(input_file.name)
         command = ' --aflowSYM' 
         output = '' 
 
@@ -37,7 +42,7 @@ class Symmetry:
 
 
     def get_edata(self, input_file, tol=None, magmoms=None): 
-        fpath = os.path.realpath(input_file.name) 
+        fpath = get_filepath(input_file.name)
         command = ' --edata' 
         output = '' 
 
@@ -54,7 +59,7 @@ class Symmetry:
         return res_json 
 
     def get_sgdata(self, input_file, tol=None, magmoms=None): 
-        fpath = os.path.realpath(input_file.name) 
+        fpath = get_filepath(input_file.name)
         command = ' --sgdata' 
         output = '' 
 

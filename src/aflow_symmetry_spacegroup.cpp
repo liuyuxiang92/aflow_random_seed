@@ -1505,7 +1505,7 @@ namespace SYM {
 
         // =============== TETRAGONAL =============== //
         //else if(((mcount == 4 || mcount == 5 || mcount == 6 || mcount == 7 || mcount == 8) && fourcount != 0) || crystalsystem == "TETRAGONAL")
-        else if(((mcount == 3 || mcount == 4 || mcount == 5 || mcount == 6 || mcount == 7 || mcount == 8) && fourcount != 0) || crystalsystem == "TETRAGONAL")
+        else if(((mcount >= 3 && mcount <= 8) && fourcount != 0) || crystalsystem == "TETRAGONAL")
         { //CO20200106 - patching for auto-indenting
           symmetryfound = true;
           crystalsystem = "TETRAGONAL";
@@ -1519,7 +1519,7 @@ namespace SYM {
         }
 
         // =============== ORTHORHOMBIC/RHOMBOHEDRAL =============== //
-        else if(((mcount == 3 || mcount == 4 || mcount == 5) && continue_ortho && fourcount == 0) || crystalsystem == "ORTHORHOMBIC") {
+        else if(((mcount >= 3 && mcount <= 5) && continue_ortho && fourcount == 0) || crystalsystem == "ORTHORHOMBIC") {
           symmetryfound = true;
           if(LDEBUG) { cerr << "SYM::ConventionalCell: ORTHO/RHOMB [dir=" << xstr.directory << "]." << endl; }
           // ===== Check between orthorhombic and rhombohedral ===== //
@@ -1554,7 +1554,7 @@ namespace SYM {
         }
         // =============== RHOMBOHEDRAL =============== //
         //  else {  //[CO20200106 - close bracket for indenting]}
-        else if(((mcount == 3 || mcount == 4 || mcount == 5 || mcount == 6) && !continue_ortho && three_six_count!=0 && fourcount == 0)) { //DX20210107 - added mcount==6
+        else if(((mcount >= 3 && mcount <= 6) && !continue_ortho && three_six_count!=0 && fourcount == 0)) { //DX20210107 - added mcount==6
           symmetryfound = true;
           // On the second iteration, this section is now equivalent to the hexagonal section above.
           // Need a slightly larger expansion to get lattice basis in HEX setting
@@ -1588,7 +1588,7 @@ namespace SYM {
         }
 
         // =============== MONOCLINIC =============== //
-        else if(((mcount == 1 || mcount == 2 || mcount == 3) && !continue_ortho && three_six_count==0) || crystalsystem == "MONOCLINIC")
+        else if(((mcount >= 1 && mcount <= 3) && !continue_ortho && three_six_count==0) || crystalsystem == "MONOCLINIC")
           //else if(((mcount == 1 || mcount == 2 || mcount == 3) && three_six_count==0) || crystalsystem == "MONOCLINIC") //DX20180613 - can be orthogonal and still be monoclinic 
         { //CO20200106 - patching for auto-indenting
           symmetryfound = true;

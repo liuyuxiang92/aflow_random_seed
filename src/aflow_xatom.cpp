@@ -11271,8 +11271,8 @@ xmatrix<double> NiggliUnitCellForm(const xmatrix<double>& lattice) {
 // ***************************************************************************
 void GetNiggliStructures(vector<xstructure>& structures, uint start_index, uint end_index){
 
-  // if end index is default (i.e., AUROSTD_MAX_UINT), then compute Niggli cell for all structures
-  if(end_index == AUROSTD_MAX_UINT){ end_index=structures.size(); }
+  // if end index is greater than structures.size(), then compute Niggli cell for all structures
+  if(end_index > structures.size()){ end_index=structures.size(); }
 
   for(uint i=start_index;i<end_index;i++){
     structures[i].NiggliUnitCellForm();
@@ -11336,8 +11336,8 @@ xmatrix<double> MinkowskiBasisReduction(const xmatrix<double>& lattice) {
 // ***************************************************************************
 void GetMinkowskiStructures(vector<xstructure>& structures, uint start_index, uint end_index){
 
-  // if end index is default (i.e., AUROSTD_MAX_UINT), then compute Minkowski cell for all structures
-  if(end_index == AUROSTD_MAX_UINT){ end_index=structures.size(); }
+  // if end index is greater than structures.size(), then compute Minkowski cell for all structures
+  if(end_index > structures.size()){ end_index=structures.size(); }
 
   for(uint i=start_index;i<end_index;i++){
     structures[i].MinkowskiBasisReduction();
@@ -11416,8 +11416,8 @@ deque<_atom> foldAtomsInCell(const xstructure& a,const xmatrix<double>& lattice_
 
   deque<_atom> atoms_orig=a.atoms;  //need to make a copy for the pointer
   deque<_atom>* ptr_atoms=&atoms_orig;
-  xstructure atomic_grid; //stays empty if not needed
   if(!fold_in_only){
+    xstructure atomic_grid; //stays empty if not needed //DX+ME20210111 - added inside if-statement
     double radius=RadiusSphereLattice(lattice_new);
     xvector<int> dims=LatticeDimensionSphere(a.lattice,radius);//int dim=max(dims)+1; //dim=3;  //CO20190520
     if(LDEBUG){
@@ -13241,8 +13241,8 @@ void xstructure::GetPrimitive3(void) {
 // ***************************************************************************
 void GetPrimitiveStructures(vector<xstructure>& structures, uint start_index, uint end_index){
 
-  // if end index is default (i.e., AUROSTD_MAX_UINT), then compute primitive cell for all structures
-  if(end_index == AUROSTD_MAX_UINT){ end_index=structures.size(); }
+  // if end index is greater than structures.size(), then compute primitive cell for all structures
+  if(end_index > structures.size()){ end_index=structures.size(); }
 
   for(uint i=start_index;i<end_index;i++){
     structures[i].GetPrimitive();

@@ -83,6 +83,10 @@
 //AS20200427 - QHA-related conversion factors
 #define eV2GPa (E_ELECTRON*1e21)    // [eV/A^3] --> [GPa]
 
+//DX20210111 - GFA factors
+#define TEMPERATURE_ROOM 300.0               // K
+#define kBT_ROOM (KBOLTZEV*TEMPERATURE_ROOM) // 0.025
+
 // ----------------------------------------------------------------------------
 // ------------------------------------------------------------------ constants
 

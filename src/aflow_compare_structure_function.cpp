@@ -1516,8 +1516,8 @@ void XtalFinderCalculator::loadStructuresFromStructureList(
 namespace compare {
   void generateStructures(vector<StructurePrototype>& structures, ostream& oss, uint start_index, uint end_index){
 
-    // if end index is default (i.e., AUROSTD_MAX_UINT), then generate over entire range
-    if(end_index == AUROSTD_MAX_UINT){ end_index=structures.size(); }
+    // if end index is greater than structures.size(), then generate over entire range
+    if(end_index > structures.size()){ end_index=structures.size(); }
 
     for(uint i=start_index;i<end_index;i++){
       if(!structures[i].structure_representative->is_structure_generated){
@@ -1915,7 +1915,8 @@ vector<StructurePrototype> XtalFinderCalculator::compareAtomDecorations(
         permutation_options.flag("COMPARISON_OPTIONS::IGNORE_WYCKOFF"),
         permutation_options.flag("COMPARISON_OPTIONS::IGNORE_ENVIRONMENT_ANALYSIS"),
         permutation_options.flag("COMPARISON_OPTIONS::IGNORE_ENVIRONMENT_ANGLES"), //DX20200320
-        false); //DX20200103 - condensed booleans to xoptions
+        false,
+        quiet); //DX20200103 - condensed booleans to xoptions
 
     // ---------------------------------------------------------------------------
     // [COME BACK DX] ensure the representative stucture is an even permutation
@@ -2516,9 +2517,9 @@ void XtalFinderCalculator::convertStructures(
 // ***************************************************************************
 void XtalFinderCalculator::getPrimitiveStructures(uint start_index, uint end_index){
 
-  // If end index is the default value (i.e., AUROSTD_MAX_UINT), then compute
+  // If end index is greater than structure_containers.size(), then compute
   // Primitive cell for all structures
-  if(end_index == AUROSTD_MAX_UINT){ end_index=structure_containers.size(); }
+  if(end_index > structure_containers.size()){ end_index=structure_containers.size(); }
 
   for(uint i=start_index;i<end_index;i++){
     structure_containers[i].structure.GetPrimitive();
@@ -2530,9 +2531,9 @@ void XtalFinderCalculator::getPrimitiveStructures(uint start_index, uint end_ind
 // ***************************************************************************
 void XtalFinderCalculator::getMinkowskiStructures(uint start_index, uint end_index){
 
-  // If end index is the default value (i.e., AUROSTD_MAX_UINT), then compute
+  // If end index is greater than structure_containers.size(), then compute
   // Minkowski cell for all structures
-  if(end_index == AUROSTD_MAX_UINT){ end_index=structure_containers.size(); }
+  if(end_index > structure_containers.size()){ end_index=structure_containers.size(); }
 
   for(uint i=start_index;i<end_index;i++){
     structure_containers[i].structure.MinkowskiBasisReduction();
@@ -2544,10 +2545,9 @@ void XtalFinderCalculator::getMinkowskiStructures(uint start_index, uint end_ind
 // ***************************************************************************
 void XtalFinderCalculator::getNiggliStructures(uint start_index, uint end_index){
 
-  // If end index is the default value (i.e., AUROSTD_MAX_UINT), then compute
+  // If end index is greater than structure_containers.size(), then compute
   // Niggli cell for all structures
-
-  if(end_index == AUROSTD_MAX_UINT){ end_index=structure_containers.size(); }
+  if(end_index > structure_containers.size()){ end_index=structure_containers.size(); }
 
   for(uint i=start_index;i<end_index;i++){
     structure_containers[i].structure.NiggliUnitCellForm();
@@ -2572,9 +2572,9 @@ void XtalFinderCalculator::calculateSpaceGroups(uint start_index, uint end_index
 
   bool no_scan = false; //DX20191230
 
-  // If end index is the default value (i.e., AUROSTD_MAX_UINT), then compute
+  // If end index is greater than structure_containers.size(), then compute
   // symmetry for all structures in the containers
-  if(end_index == AUROSTD_MAX_UINT){ end_index=structure_containers.size(); }
+  if(end_index > structure_containers.size()){ end_index=structure_containers.size(); }
 
   for(uint i=start_index;i<end_index;i++){ //DX20191107 - switching convention <= vs <
     double use_tol = SYM::defaultTolerance(structure_containers[i].structure); //DX20191230
@@ -2665,9 +2665,9 @@ void XtalFinderCalculator::computeLFAEnvironments(uint start_index, uint end_ind
   // Calculates the LFA environments for a structure and
   // stores it in the structure container
 
-  // If end index is the default value (i.e., AUROSTD_MAX_UINT), then compute
+  // If end index is greater than structure_containers.size(), then compute
   // the LFA environment analysis for all structures
-  if(end_index == AUROSTD_MAX_UINT){ end_index=structure_containers.size(); }
+  if(end_index > structure_containers.size()){ end_index=structure_containers.size(); }
 
   for(uint i=start_index;i<end_index;i++){ //DX20191107 switching end index convention <= vs <
     computeLFAEnvironment(structure_containers[i]);
@@ -2786,9 +2786,9 @@ void XtalFinderCalculator::calculateNearestNeighbors(uint start_index, uint end_
   // Calculates the nearest neighbor information for a structure and
   // stores it in the structure container
 
-  // If end index is the default (i.e., AUROSTD_MAX_UINT), then compute the
+  // If end index is greater than structure_containers.size(), then compute
   // nearest neighbor analysis for all structures
-  if(end_index == AUROSTD_MAX_UINT){ end_index=structure_containers.size(); }
+  if(end_index > structure_containers.size()){ end_index=structure_containers.size(); }
 
   for(uint i=start_index;i<end_index;i++){ //DX20191107 switching end index convention <= vs <
     structure_containers[i].nearest_neighbor_distances = NearestNeighbours(structure_containers[i].structure); // nearest neighbor distances (invariant of origin shifts)
@@ -3300,7 +3300,8 @@ vector<StructurePrototype> XtalFinderCalculator::groupStructurePrototypes(
     bool ignore_Wyckoff,
     bool ignore_environment,
     bool ignore_environment_angles, //DX20200320
-    bool duplicates_removed){ //DX20190829 - added duplicates_removed
+    bool duplicates_removed,
+    bool quiet){ //DX20190829 - added duplicates_removed
 
   // Populates the structure information into the StructurePrototype object.
   // It groups structure based on their species, stoichiometry, number of
@@ -3313,8 +3314,10 @@ vector<StructurePrototype> XtalFinderCalculator::groupStructurePrototypes(
   string function_name = XPID + "XtalFinderCalculator::groupStructurePrototypes():";
   stringstream message;
 
-  message << "Grouping sets of comparisons.";
-  pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+  if(!quiet){
+    message << "Grouping sets of comparisons.";
+    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+  }
 
   // variable to store structure sets to compare
   vector<StructurePrototype> comparison_schemes;
@@ -3377,8 +3380,10 @@ vector<StructurePrototype> XtalFinderCalculator::groupStructurePrototypes(
     cerr << ss_test.str() << endl;
   }
 
-  message << "Number of comparison groups: " << comparison_schemes.size() << ".";
-  pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+  if(!quiet){
+    message << "Number of comparison groups: " << comparison_schemes.size() << ".";
+    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+  }
 
   return comparison_schemes;
 }
@@ -3401,8 +3406,10 @@ vector<StructurePrototype> XtalFinderCalculator::checkForBetterMatches(
   string function_name = XPID + "XtalFinderCalculator::checkForBetterMatches():";
   stringstream message;
 
-  message << "Check if initial structure groupings match better (lower similarity metric) with other groups." << endl;
-  pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+  if(!quiet){
+    message << "Check if initial structure groupings match better (lower similarity metric) with other groups." << endl;
+    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+  }
 
   // ---------------------------------------------------------------------------
   // create xoptions to contain all comparison options
@@ -3738,8 +3745,10 @@ vector<StructurePrototype> XtalFinderCalculator::runComparisonScheme(
   // create new object for comparisons
   vector<StructurePrototype> final_prototypes;
 
-  message << "Running comparisons ...";
-  pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+  if(!quiet){
+    message << "Running comparisons ...";
+    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+  }
 
   // ---------------------------------------------------------------------------
   // print initial grouped sets of comparisons
@@ -3956,8 +3965,10 @@ vector<StructurePrototype> XtalFinderCalculator::runComparisonScheme(
       comparison_options.flag("COMPARE_STRUCTURE::CLEAN_UNMATCHED"),
       quiet); //DX20200103
 
-  message << "Comparisons complete!";
-  pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_COMPLETE_);
+  if(!quiet){
+    message << "Comparisons complete!";
+    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_COMPLETE_);
+  }
 
   return final_prototypes;
 }
@@ -7096,9 +7107,9 @@ void XtalFinderCalculator::getPrototypeDesignations(
     uint start_index,
     uint end_index){
 
-  // If end index is the default value (i.e., AUROSTD_MAX_UINT), then
+  // If end index is greater than prototypes.size(), then
   // determine prototoype designation for all structures
-  if(end_index == AUROSTD_MAX_UINT){ end_index=prototypes.size(); }
+  if(end_index > prototypes.size()){ end_index=prototypes.size(); }
 
   for(uint i=start_index;i<end_index;i++){ //DX20191107 switching end index convention <= vs <
     anrl::structure2anrl(prototypes[i].structure_representative->structure,false); //DX20190829 - false for do not recalulate symmetry, save time

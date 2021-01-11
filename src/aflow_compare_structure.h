@@ -318,7 +318,8 @@ class XtalFinderCalculator : public xStream {
       bool ignore_Wyckoff,
       bool ignore_environment,
       bool ignore_environment_angles,
-      bool duplicates_removed); //DX20190731 - remove const and & //DX20190830 - added duplicates_removed //DX20200320 - added environment angles
+      bool duplicates_removed,
+      bool quiet=false); //DX20190731 - remove const and & //DX20190830 - added duplicates_removed //DX20200320 - added environment angles
   
     // ---------------------------------------------------------------------------
     // reorder structures

@@ -4614,6 +4614,9 @@ namespace aflowlib {
       else if(relaxation_step==_COMPARE_DATABASE_GEOMETRY_MOST_RELAXED_){
         space_group_summons = "*%27," + GetSpaceGroupName(space_group_number) + "%20%23" + aurostd::utype2string<int>(space_group_number) + "%27";
       }
+      else{
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, "aflowlib::getSpaceGroupAFLUXSummons():", "Unexpected relaxation step input: " + _COMPARE_DATABASE_GEOMETRY_MOST_RELAXED_, _FILE_NOT_FOUND_);
+      }
     }
     else { // need to get enantiomorph too
       if(relaxation_step==_COMPARE_DATABASE_GEOMETRY_ORIGINAL_){
@@ -4627,6 +4630,9 @@ namespace aflowlib {
       else if(relaxation_step==_COMPARE_DATABASE_GEOMETRY_MOST_RELAXED_){
         space_group_summons = "*%27," + GetSpaceGroupName(space_group_number) + "%20%23" + aurostd::utype2string<int>(space_group_number) + "%27";
         space_group_summons += ":*%27," + GetSpaceGroupName(enantiomorph_space_group_number) + "%20%23" + aurostd::utype2string<int>(enantiomorph_space_group_number) + "%27";
+      }
+      else{
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, "aflowlib::getSpaceGroupAFLUXSummons():", "Unexpected relaxation step input: " + _COMPARE_DATABASE_GEOMETRY_MOST_RELAXED_, _FILE_NOT_FOUND_);
       }
     }
 
