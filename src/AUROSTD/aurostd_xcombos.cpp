@@ -45,6 +45,16 @@ namespace aurostd {
   // 
   //--------------------------------------------------------------------------------
 
+  //--------------------------------------------------------------------------------
+  // Permutation algorithms
+  // Depending on which algorithm is used, the swapping order for permutations can
+  // be different, see http://combos.org/perm
+  //
+  // Two algorithms are currently supported:
+  //  1) Shen - lexicographical order (default), e.g., first swap 1234 -> 1243 (doi:10.1007/BF01940170)
+  //  2) Heap - swap left-most first (fastest), e.g., first swap 1234 -> 2134 (https://en.wikipedia.org/wiki/Heap%27s_algorithm)
+  //
+  // If new algorithms are added, update the algorithms_xcombos enum.
 
   //------------------------------------------------------------------------------
   // constructor
@@ -301,7 +311,7 @@ namespace aurostd {
     if(m_exhausted) {return;}
     if(m_algorithm==shen_alg_xcombos){
       //Shen, MK. BIT (1962) 2(228). doi:10.1007/BF01940170
-      //note this will generate next permutation in lexicographical order (left to right)
+      //note this will generate next permutation in lexicographical order (left to right), e.g., first swap 1234 -> 1243
       int _i=-1;
       int _j=-1;
       for(int i=1;i<m_choose;i++) {if(m_current[i-1]<m_current[i]&&(i>_i)){_i=i;}}
@@ -314,7 +324,7 @@ namespace aurostd {
     }
     else if (m_algorithm==heap_alg_xcombos){ //DX20201222 - added this algorithm
       //Heap, B.R. (1963): https://en.wikipedia.org/wiki/Heap%27s_algorithm
-      //note this will generate permutation by swapping lowest position index (left-most position)
+      //note this will generate permutation by swapping lowest position index (left-most position), e.g., first swap 1234 -> 2134
       bool found_permutation=false;
       uint count=0, safety = m_choose; //DX20210111 - smarter saftey; each increment should swap no more than m_choose times
       while(!found_permutation&&count<=safety){
