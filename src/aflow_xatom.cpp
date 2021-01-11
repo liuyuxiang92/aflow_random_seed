@@ -1449,7 +1449,7 @@ xvector<double> getCentroidOfStructurePBC(const deque<_atom>& atoms,
   // fpos
   else{
     for(uint i=0;i<atoms.size();i++){ coordinates.push_back(atoms[i].fpos); }
-    cell = aurostd::eye<double>(); // use unit cube
+    cell = aurostd::eye<double>(3,3); // use unit cube
   }
 
   // ---------------------------------------------------------------------------
@@ -5645,7 +5645,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     if(LDEBUG) cerr << soliloquy << " CIF" << endl;
     a.scale=1.0; 
     a.neg_scale=FALSE; 
-    a.lattice=aurostd::eye<double>(); //CO20190520
+    a.lattice=aurostd::eye<double>(3,3); //CO20190520
 
     a.spacegroupnumber=0;
     a.spacegroupnumberoption=0;
@@ -5955,7 +5955,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     // START FROM CELL
     a.scale=1.0; // standard
     a.neg_scale=FALSE; // standard
-    a.lattice=aurostd::eye<double>();//CO20190520
+    a.lattice=aurostd::eye<double>(3,3);//CO20190520
 
     uint lat_count=0;
     //get lattice first, if available (c2f,f2c)
@@ -15239,16 +15239,17 @@ void xstructure::Rotate(const xmatrix<double>& rm) {
   (*this).FixLattices();  //CO20190409 - so we don't need to keep redefining f2c/c2f
   const xmatrix<double>& f2c=(*this).f2c; //CO20190520
   const xmatrix<double>& c2f=(*this).c2f; //CO20190520
-  for(int ia=0;ia<(int)(*this).atoms.size();ia++){(*this).atoms.at(ia).cpos=f2c*(*this).atoms.at(ia).fpos;}  //CO20190409 - so we don't need to keep redefining f2c/c2f
+  uint natoms = (*this).atoms.size(); //DX+ME20210111 - set variable to optimize for-loops
+  for(uint ia=0;ia<natoms;ia++){(*this).atoms[ia].cpos=f2c*(*this).atoms[ia].fpos;}  //CO20190409 - so we don't need to keep redefining f2c/c2f
   //[CO20190409 - OBSOLETE]for(int ia=0;ia<(int)b.atoms.size();ia++)
   //[CO20190409 - OBSOLETE]  b.atoms.at(ia).cpos=F2C(b.lattice,b.atoms.at(ia).fpos);
   //Get R_0(q)
   xvector<double> r_orig(3);
   r_orig=rm*(*this).origin;
   // Assign new cartesian positions
-  for(int ia=0;ia<(int)(*this).atoms.size();ia++){(*this).atoms.at(ia).cpos+=(-r_orig+(*this).origin);}
+  for(uint ia=0;ia<natoms;ia++){(*this).atoms[ia].cpos+=(-r_orig+(*this).origin);}
   // Get all the direct coords.
-  for(int ia=0;ia<(int)(*this).atoms.size();ia++){(*this).atoms.at(ia).fpos=c2f*(*this).atoms.at(ia).cpos;}  //CO20190409 - so we don't need to keep redefining f2c/c2f
+  for(uint ia=0;ia<natoms;ia++){(*this).atoms[ia].fpos=c2f*(*this).atoms[ia].cpos;}  //CO20190409 - so we don't need to keep redefining f2c/c2f
   //[CO20190409 - OBSOLETE]for(int ia=0;ia<(int)b.atoms.size();ia++)
   //[CO20190409 - OBSOLETE]  b.atoms.at(ia).fpos=C2F(b.lattice,b.atoms.at(ia).cpos);
   return;
@@ -15313,26 +15314,29 @@ xstructure GetLTFVCell(const xvector<double>& nvec, const double phi, const xstr
 // DX20201215 - added in-place methods
 
 // make a copy
-xstructure ShiftPos(const xstructure& a,const xvector<double>& shift, const int& flag) {
+xstructure ShiftPos(const xstructure& a,const xvector<double>& shift, int flag) {
   xstructure b(a);
   b.ShiftPos(shift, flag);
   return b;
 }
 
 // modify in-place //DX2021215
-void xstructure::ShiftPos(const xvector<double>& shift, const int& flag) {
+void xstructure::ShiftPos(const xvector<double>& shift, int flag) {
+  uint natoms = (*this).atoms.size(); //DX+ME20210111 - make variable to optimize for-loops
   if(flag==FALSE) { // Cartesian shift
     (*this).coord_flag=TRUE;
-    for(uint ia=0;ia<(*this).atoms.size();ia++) {
+    xmatrix<double> c2f=(*this).scale*inverse(trasp((*this).lattice)); //DX+ME20210111
+    for(uint ia=0;ia<natoms;ia++) {
       (*this).atoms.at(ia).cpos=(*this).atoms.at(ia).cpos+shift;
-      (*this).atoms.at(ia).fpos=C2F((*this).lattice,(*this).atoms.at(ia).cpos);
+      (*this).atoms.at(ia).fpos=c2f*(*this).atoms.at(ia).cpos; //DX+ME20210111 - use pre-calculated c2f, optimize
     }
   }
   if(flag==TRUE) { // Direct coords shift
     (*this).coord_flag=FALSE;
-    for(uint ia=0;ia<(*this).atoms.size();ia++) {
-      (*this).atoms.at(ia).fpos=(*this).atoms.at(ia).fpos+shift;
-      (*this).atoms.at(ia).cpos=F2C((*this).lattice,(*this).atoms.at(ia).fpos);
+    xmatrix<double> f2c=(*this).scale*trasp((*this).lattice); //DX+ME20210111
+    for(uint ia=0;ia<natoms;ia++) {
+      (*this).atoms[ia].fpos=(*this).atoms[ia].fpos+shift;
+      (*this).atoms[ia].cpos=f2c*(*this).atoms[ia].fpos; //DX+ME20210111 - use pre-calculated f2c, optimize
     }
   }
 }
@@ -15346,10 +15350,12 @@ xstructure ShiftCPos(const xstructure& a,const xvector<double>& shift) {
 
 // modify in-place //DX2021215
 void xstructure::ShiftCPos(const xvector<double>& shift) {
+  uint natoms = (*this).atoms.size(); //DX20210111 - make variable to optimize for-loops
+  xmatrix<double> c2f=(*this).scale*inverse(trasp((*this).lattice)); //DX+ME20210111
   (*this).coord_flag=TRUE;
-  for(uint ia=0;ia<(*this).atoms.size();ia++) {
-    (*this).atoms.at(ia).cpos=(*this).atoms.at(ia).cpos+shift;
-    (*this).atoms.at(ia).fpos=C2F((*this).lattice,(*this).atoms.at(ia).cpos);
+  for(uint ia=0;ia<natoms;ia++) {
+    (*this).atoms[ia].cpos=(*this).atoms[ia].cpos+shift;
+    (*this).atoms[ia].fpos=c2f*(*this).atoms[ia].cpos; //DX+ME20210111 - use pre-calculated c2f, optimize
   }
 }
 
@@ -15362,10 +15368,12 @@ xstructure ShiftFPos(const xstructure& a,const xvector<double>& shift) {
 
 // modify in-place //DX2021215
 void xstructure::ShiftFPos(const xvector<double>& shift) {
+  uint natoms = (*this).atoms.size(); //DX20210111 - make variable to optimize for-loops
+  xmatrix<double> f2c=(*this).scale*trasp((*this).lattice); //DX+ME20210111
   (*this).coord_flag=FALSE;
-  for(uint ia=0;ia<(*this).atoms.size();ia++) {
-    (*this).atoms.at(ia).fpos=(*this).atoms.at(ia).fpos+shift;
-    (*this).atoms.at(ia).cpos=F2C((*this).lattice,(*this).atoms.at(ia).fpos);
+  for(uint ia=0;ia<natoms;ia++) {
+    (*this).atoms[ia].fpos=(*this).atoms[ia].fpos+shift;
+    (*this).atoms[ia].cpos=f2c*(*this).atoms[ia].fpos; //DX+ME20210111 - use pre-calculated f2c, optimize
   }
 }
 
@@ -16530,7 +16538,7 @@ vector<xvector<double> > GetBasisTransformationInternalTranslations(const xmatri
     // to get translations take the "larger cell" in fractional coordinates
     // and perform the inverse operation (Q) to see how small it gets,
     // then these are the internal translations
-    xmatrix<double> lattice_frac = aurostd::eye<double>();
+    xmatrix<double> lattice_frac = aurostd::eye<double>(3,3);
     xmatrix<double> lattice_shrink = inverse_transform*lattice_frac;
    
     if(LDEBUG){ cerr << function_name << " shrunken lattice: " << lattice_shrink << endl; }
@@ -16700,9 +16708,14 @@ void xstructure::ChangeBasis(const xmatrix<double>& transformation_matrix) {
   }
 
   // ---------------------------------------------------------------------------
+  // calculate change in basis transformation determinant
+  // (shift to 1 to easily see if reduces or expands)
+  double basis_transformation_det_change = aurostd::abs(aurostd::det(transformation_matrix))-1.0;
+
+  // ---------------------------------------------------------------------------
   // reduce the cell: remove any duplicate atoms
   // use _AUROSTD_XSCALAR_TOLERANCE_IDENTITY_ to be consistent with 
-  if(aurostd::abs(aurostd::det(transformation_matrix))-1.0 < -_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_){
+  if(basis_transformation_det_change < -_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_){
     if(LDEBUG){
       cerr << function_name << " removing duplicate atoms (cell has been reduced)." << endl;
     }
@@ -16729,17 +16742,10 @@ void xstructure::ChangeBasis(const xmatrix<double>& transformation_matrix) {
         new_basis.push_back(atom_basis[j]);
       }
     }
-    // update atom counts/order/types/etc.
-    std::stable_sort(new_basis.begin(),new_basis.end(),sortAtomsNames);
-    (*this).atoms = new_basis;
-    (*this).SpeciesPutAlphabetic();
-    deque<int> sizes = SYM::arrange_atoms(new_basis);
-    (*this) = pflow::SetNumEachType((*this), sizes);
-    //xstr_transformed.species = xstr.species;
-    (*this).MakeBasis();
+    new_basis = atom_basis;
       
     // check atom count
-    uint natoms_transformed = (*this).atoms.size();
+    uint natoms_transformed = atom_basis.size();
     if(natoms_orig%natoms_transformed!=0){
       message << "Number of atoms is no longer an integer multiple with respect to the input structure"
         << " original: " << natoms_orig
@@ -16750,20 +16756,13 @@ void xstructure::ChangeBasis(const xmatrix<double>& transformation_matrix) {
   }
   // ---------------------------------------------------------------------------
   // enlarge the cell: update the atom count information
-  else if(aurostd::abs(aurostd::det(transformation_matrix))-1.0 > _AUROSTD_XSCALAR_TOLERANCE_INTEGER_){
+  else if(basis_transformation_det_change > _AUROSTD_XSCALAR_TOLERANCE_INTEGER_){
     if(LDEBUG){
-      cerr << function_name << " cell size has increased (fixing atom counts)." << endl;
+      cerr << function_name << " cell size has increased." << endl;
     }
-    // update atom counts/order/types/etc.
-    std::stable_sort(atom_basis.begin(),atom_basis.end(),sortAtomsNames);
-    (*this).atoms = atom_basis;
-    (*this).SpeciesPutAlphabetic();
-    deque<int> sizes = SYM::arrange_atoms(atom_basis);
-    (*this) = pflow::SetNumEachType((*this), sizes);
-    (*this).MakeBasis();
       
     // check atom count
-    uint natoms_transformed = (*this).atoms.size();
+    uint natoms_transformed = atom_basis.size();
     if(natoms_transformed%natoms_orig!=0){
       message << "Number of atoms is no longer an integer multiple with respect to the input structure"
         << " original: " << natoms_orig
@@ -16772,6 +16771,21 @@ void xstructure::ChangeBasis(const xmatrix<double>& transformation_matrix) {
       cerr << "message: " << message.str() << endl;
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
     }
+  }
+
+  // ---------------------------------------------------------------------------
+  // if the number of atoms changed, update the atom counts/order/types/etc.
+  if(!aurostd::isequal(basis_transformation_det_change, _AUROSTD_XSCALAR_TOLERANCE_INTEGER_)){
+    if(LDEBUG){
+      cerr << function_name << " updating atom count information." << endl;
+    }
+    // update atom counts/order/types/etc.
+    std::stable_sort(atom_basis.begin(),atom_basis.end(),sortAtomsNames);
+    (*this).atoms = atom_basis;
+    (*this).SpeciesPutAlphabetic();
+    deque<int> sizes = SYM::arrange_atoms(atom_basis);
+    (*this) = pflow::SetNumEachType((*this), sizes);
+    (*this).MakeBasis();
   }
   // ---------------------------------------------------------------------------
   // if the transformation preserves the volume, one-to-one mappings
@@ -16835,7 +16849,7 @@ void PolarDecomposition(const xmatrix<double>& transformation_matrix,
 
   // ---------------------------------------------------------------------------
   // build diagonal matrix 
-  xmatrix<double> Diag_matrix = aurostd::eye<double>();
+  xmatrix<double> Diag_matrix = aurostd::eye<double>(3,3);
   Diag_matrix[1][1] = aurostd::sqrt(diag(1));
   Diag_matrix[2][2] = aurostd::sqrt(diag(2));
   Diag_matrix[3][3] = aurostd::sqrt(diag(3));

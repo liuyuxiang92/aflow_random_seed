@@ -1539,7 +1539,7 @@ class xstructure {
     void Rotate(const xmatrix<double>& rm);                       // DX20201215 - added modify-in-place variant
     void TransformStructure(const xmatrix<double>& transformation_matrix, const xmatrix<double>& rotation);
     void TransformStructure(const xmatrix<double>& transformation_matrix, const xmatrix<double>& rotation, const xvector<double>& origin_shift);
-    void ShiftPos(const xvector<double>& shift,const int& flag);  // Shift origin by vector (Cartesian/fractional flag) //DX20201215 - added modify-in-place variant
+    void ShiftPos(const xvector<double>& shift, int flag);        // Shift origin by vector (Cartesian/fractional flag) //DX20201215 - added modify-in-place variant
     void ShiftCPos(const xvector<double>& shift);                 // Shift origin by Cartesian vector //DX20201215 - added modify-in-place variant
     void ShiftFPos(const xvector<double>& shift);                 // Shift origin by fractional vector //DX20201215 - added modify-in-place variant
     void SetVolume(const double &in_volume);                      // Change volume
@@ -2495,7 +2495,7 @@ void CalculateSymmetryPointGroupKPatterson(xstructure& str);  //ME20200129
 xstructure Rotate(const xstructure& a,const xmatrix<double>& rm);
 xstructure GetLTCell(const xmatrix<double>& lt,const xstructure& str);
 xstructure GetLTFVCell(const xvector<double>& nvec,const double phi,const xstructure& str);
-xstructure ShiftPos(const xstructure& a,const xvector<double>& shift,const int& flag);
+xstructure ShiftPos(const xstructure& a,const xvector<double>& shift, int flag);
 xstructure ShiftCPos(const xstructure& a,const xvector<double>& shift);
 xstructure ShiftFPos(const xstructure& a,const xvector<double>& shift);
 double MaxStructureLattice(const xstructure& str);
