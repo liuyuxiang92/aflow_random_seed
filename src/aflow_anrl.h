@@ -49,7 +49,7 @@ namespace anrl{
   bool structureAndLabelConsistent(const xstructure& _xstr,
       const string& label_input,
       string& label_and_params_calculated,
-      const double& tolerance_sym_input=AUROSTD_MAX_DOUBLE); //DX20201105 - added tolerance input
+      double tolerance_sym_input=AUROSTD_MAX_DOUBLE); //DX20201105 - added tolerance input
 }
 
 // Symbolic functions are defined in aflow_symbolic.cpp
