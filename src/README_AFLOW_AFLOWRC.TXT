@@ -1606,10 +1606,68 @@ DEFAULT_AAPL_TCOND_PLOT_FILE
 ####################################################################################################
 DEFAULTS XTALFINDER
 
+DEFAULT_XTALFINDER_MISFIT_MATCH
+  description: Similarity threshold for similar structures.
+  type: double
+  default: 0.1
+
+DEFAULT_XTALFINDER_MISFIT_FAMILY
+  description: Similarity threshold for structures in the same family-type.
+  type: double
+  default: 0.2
+
+DEFAULT_XTALFINDER_MISFIT_SUPERCELL_METHOD
+  description: Supercell method for converting crystal structures into a new representation (well-tested, but slow). The alternative (default) is the transformation method (fast).
+  type: bool
+  default: 0
+
 DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING
   description: Scaling factor that divides the minimum interatomic distance, establishing when mapped atoms are sufficiently close and other mappings do not need to be explored.
   type: double
   default: 4.0
+
+DEFAULT_XTALFINDER_FILE_MATERIAL
+  description: Ouput file prefix for comparing materials (map alike atomic species).
+  type: string
+  default: "material_comparison_output"
+
+DEFAULT_XTALFINDER_FILE_STRUCTURE
+  description: Ouput file prefix for comparing structures (ignore atomic species).
+  type: string
+  default: "structure_comparison_output"
+
+DEFAULT_XTALFINDER_FILE_DUPLICATE
+  description: Ouput file prefix for finding duplicate compounds (map alike atomic species and do not scale volumes).
+  type: string
+  default: "duplicate_comparison_output"
+
+DEFAULT_XTALFINDER_FILE_MATERIAL_COMPARE2DATABASE
+  description: Ouput file prefix for comparing an input material to the AFLOW.org repository (map alike atomic species).
+  type: string
+  default: "material_comparison_compare2database_output"
+
+DEFAULT_XTALFINDER_FILE_STRUCTURE_COMPARE2DATABASE
+  description: Ouput file prefix for comparing an input structure to the AFLOW.org repository (ignore atomic species).
+  type: string
+  default: "structure_comparison_compare2database_output"
+
+DEFAULT_XTALFINDER_FILE_MATERIAL_DATABASE
+  description: Ouput file prefix for comparing materials in the AFLOW.org repository (map alike atomic species).
+  type: string
+  default: "material_comparison_database_output"
+
+DEFAULT_XTALFINDER_FILE_STRUCTURE_DATABASE
+  description: Ouput file prefix for comparing structures in the AFLOW.org repository (ignore atomic species).
+  type: string
+  default: "structure_comparison_database_output"
+
+####################################################################################################
+DEFAULTS ANRL
+
+DEFAULT_ANRL_WYCKOFF_FRACTIONAL_TOL
+  description: Fractional tolerance value for identifying equivalent Wyckoff coordinates.
+  type: double
+  default: 1e-6
 
 ####################################################################################################
 DEFAULTS CORE

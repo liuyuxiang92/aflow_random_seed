@@ -433,34 +433,37 @@ bool PrototypeGeneratorTest(ofstream& FileMESSAGE,ostream& oss,bool check_symmet
     if(LDEBUG){ cerr << "Number of parameters for label=" << prototype_labels[i] << ": " << parameter_sets.size() << endl; }
 
     for(uint j=0;j<parameter_sets.size();j++){
+      xstructure xstr;
       try{
         xstructure xstr = aflowlib::PrototypeLibraries(oss,prototype_labels[i],parameter_sets[j],1);
-
-        // check symmetry
-        if(check_symmetry){
-          if(LDEBUG){ cerr << "Check that the generated structure is consistent with the label=" << prototype_labels[i] << ": " << parameter_sets.size() << endl; }
-
-          // symmetry tolerances
-          // some prototype require special tolerance values
-          stringstream label_input_ss; label_input_ss << prototype_labels[i] << "-" << std::setw(3) << std::setfill('0') << j+1;
-          string label_input = label_input_ss.str();
-          double tolerance_sym = anrl::specialCaseSymmetryTolerances(label_input);
-
-          string updated_label_and_params = "";
-          if(!anrl::structureAndLabelConsistent(xstr, prototype_labels[i], updated_label_and_params, tolerance_sym)){ //DX20201105 - added symmetry tolerance
-            // if changes symmetry, give the appropriate label
-            message << "The structure has a higher symmetry than indicated by the label. ";
-            message << "The correct label and parameters for this structure are:" << endl;
-            message << updated_label_and_params << endl;
-            message << "Please feed this label and set of parameters into the prototype generator.";
-            throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
-          }
-        }
       }
       catch(aurostd::xerror& excpt){
         message << "Could not generate prototype=" << prototype_labels[i] << " given parameters=" << parameter_sets[j] << "; check inputs or the symbolic generator.";
-        pflow::logger(_AFLOW_FILE_NAME_,function_name,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+        pflow::logger(_AFLOW_FILE_NAME_,function_name,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
         return false;
+      }
+
+      // check symmetry
+      if(check_symmetry){
+        if(LDEBUG){ cerr << "Check that the generated structure is consistent with the label=" << prototype_labels[i] << ": " << parameter_sets.size() << endl; }
+
+        // symmetry tolerances
+        // some prototype require special tolerance values
+        stringstream label_input_ss; label_input_ss << prototype_labels[i] << "-" << std::setw(3) << std::setfill('0') << j+1;
+        string label_input = label_input_ss.str();
+        double tolerance_sym = anrl::specialCaseSymmetryTolerances(label_input);
+
+        string updated_label_and_params = "";
+        if(!anrl::structureAndLabelConsistent(xstr, prototype_labels[i], updated_label_and_params, tolerance_sym)){ //DX20201105 - added symmetry tolerance
+          // if changes symmetry, give the appropriate label
+          message << "The structure has a higher symmetry than indicated by the label ";
+          message << "(orig: proto=" << prototype_labels[i] << " and " << parameter_sets[j] << "). ";
+          message << "The correct label and parameters for this structure are:" << endl;
+          message << updated_label_and_params << endl;
+          message << "Please feed this label and set of parameters into the prototype generator.";
+          pflow::logger(_AFLOW_FILE_NAME_,function_name,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
+          return false;
+        }
       }
     }
   }

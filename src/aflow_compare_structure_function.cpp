@@ -2029,7 +2029,7 @@ void XtalFinderCalculator::generateAtomPermutedStructures(
   // ---------------------------------------------------------------------------
   // use Heap's algorithm: swap lowest position index first (left-most)
   // this is the preferred order for the representative atom decorations
-  aurostd::xcombos indices_combos(_indices, true, 'P', "HEAP");
+  aurostd::xcombos indices_combos(_indices, true, 'P', heap_alg_xcombos);
   while (indices_combos.increment()) all_indices.push_back(indices_combos.getCombo());
 
   // ---------------------------------------------------------------------------
@@ -2100,7 +2100,7 @@ vector<string> XtalFinderCalculator::getSpeciesPermutedStrings(
   // ---------------------------------------------------------------------------
   // use Heap's algorithm: swap lowest position index first (left-most)
   // this is the preferred order for the representative atom decorations
-  aurostd::xcombos indices_combos(_indices, true, 'P', "HEAP");
+  aurostd::xcombos indices_combos(_indices, true, 'P', heap_alg_xcombos);
   while (indices_combos.increment()) all_indices.push_back(indices_combos.getCombo());
 
   // ---------------------------------------------------------------------------
@@ -3401,6 +3401,9 @@ vector<StructurePrototype> XtalFinderCalculator::checkForBetterMatches(
   string function_name = XPID + "XtalFinderCalculator::checkForBetterMatches():";
   stringstream message;
 
+  message << "Check if initial structure groupings match better (lower similarity metric) with other groups." << endl;
+  pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+
   // ---------------------------------------------------------------------------
   // create xoptions to contain all comparison options
   aurostd::xoption check_better_matches_options = comparison_options; //DX20200103
@@ -3464,6 +3467,10 @@ vector<StructurePrototype> XtalFinderCalculator::checkForBetterMatches(
       }
     }
   }
+
+  // ---------------------------------------------------------------------------
+  // if no alternative matches found, return immediately //DX20210111
+  if(comparison_groups.size() > 0){ return prototype_schemes; }
 
   // ---------------------------------------------------------------------------
   // compare structures
@@ -6914,8 +6921,8 @@ namespace compare{
       vector<xmatrix<double> >& basis_transformations,
       vector<xmatrix<double> >& rotations){
 
-    bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_COMPARE_);
-    string function_name = XPID + "compare::getLatticeTransformations():";
+    //bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_COMPARE_);
+    //string function_name = XPID + "compare::getLatticeTransformations():";
 
     xmatrix<double> basis_transformation, rotation;
 

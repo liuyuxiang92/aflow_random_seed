@@ -10,6 +10,11 @@
 #ifndef _AUROSTD_XCOMBOS_H_
 #define _AUROSTD_XCOMBOS_H_
 
+enum algorithm_xcombos { //DX20210111
+  shen_alg_xcombos,                               // lexicographical order (left to right); Shen, MK. BIT (1962) 2(228). doi:10.1007/BF01940170
+  heap_alg_xcombos                                // swap left-most positions first (fast); Heap, B.R. (1963): https://en.wikipedia.org/wiki/Heap%27s_algorithm
+};
+
 namespace aurostd {
   class xcombos {
     private:
@@ -27,7 +32,7 @@ namespace aurostd {
       bool m_started;
       bool m_exhausted; //all possibilities explored
       char m_mode; // C: combinations, E: enumeration, P: permutations,
-      string m_algorithm; // allow use of different algorithms (Shen, Heap, etc.) //DX20201222
+      algorithm_xcombos m_algorithm; // allow use of different algorithms (Shen, Heap, etc.) //DX20201222
 
       //for permutations
       vector<int> m_current;
@@ -54,7 +59,7 @@ namespace aurostd {
       //NECESSARY PUBLIC CLASS METHODS - START
       //constructors - START
       xcombos();
-      xcombos(const vector<int>& vec, bool sort=TRUE, char mode='P', const string& algorithm="SHEN");      //permutations //DX20201222 - added algorithm
+      xcombos(const vector<int>& vec, bool sort=TRUE, char mode='P', algorithm_xcombos algorithm=shen_alg_xcombos);      //permutations //DX20201222 - added algorithm
       xcombos(int choice_count,int choose_count, char mode='C', bool rpt=FALSE); //combinations, m choose n, m=choice_count, n=choose_count
       xcombos(const vector<int>& vec, char mode); // enumerations
       xcombos(const xcombos& b);
@@ -64,7 +69,7 @@ namespace aurostd {
       const xcombos& operator=(const xcombos& other) ;
       xcombos& operator++();
       void reset(); //reset with same parameters
-      void reset(vector<int> vec,bool sort=TRUE, char mode='P', const string& algorithm="SHEN"); //reset with permutations //DX20201222 - added algorithm
+      void reset(vector<int> vec,bool sort=TRUE, char mode='P', algorithm_xcombos algorithm=shen_alg_xcombos); //reset with permutations //DX20201222 - added algorithm
       void reset(int choice_count,int choose_count, char mode='C', bool rpt=FALSE); //reset with combinations
       void reset(vector<int> vec, char mode); // reset with enumerations
       const vector<int>& getCombo() const; //grab current possibility - ME20190703 use const & (faster)
