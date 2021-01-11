@@ -15240,16 +15240,21 @@ void xstructure::Rotate(const xmatrix<double>& rm) {
   const xmatrix<double>& f2c=(*this).f2c; //CO20190520
   const xmatrix<double>& c2f=(*this).c2f; //CO20190520
   uint natoms = (*this).atoms.size(); //DX+ME20210111 - set variable to optimize for-loops
-  for(uint ia=0;ia<natoms;ia++){(*this).atoms[ia].cpos=f2c*(*this).atoms[ia].fpos;}  //CO20190409 - so we don't need to keep redefining f2c/c2f
+  //DX+ME20210111 [OBSOLETE - consolidate into one for-loop, below] for(uint ia=0;ia<natoms;ia++){(*this).atoms[ia].cpos=f2c*(*this).atoms[ia].fpos;}  //CO20190409 - so we don't need to keep redefining f2c/c2f
   //[CO20190409 - OBSOLETE]for(int ia=0;ia<(int)b.atoms.size();ia++)
   //[CO20190409 - OBSOLETE]  b.atoms.at(ia).cpos=F2C(b.lattice,b.atoms.at(ia).fpos);
   //Get R_0(q)
   xvector<double> r_orig(3);
   r_orig=rm*(*this).origin;
   // Assign new cartesian positions
-  for(uint ia=0;ia<natoms;ia++){(*this).atoms[ia].cpos+=(-r_orig+(*this).origin);}
+  //DX+ME20210111 [OBSOLETE - consolidate into one for-loop, below] for(uint ia=0;ia<natoms;ia++){(*this).atoms[ia].cpos+=(-r_orig+(*this).origin);}
   // Get all the direct coords.
-  for(uint ia=0;ia<natoms;ia++){(*this).atoms[ia].fpos=c2f*(*this).atoms[ia].cpos;}  //CO20190409 - so we don't need to keep redefining f2c/c2f
+  //DX+ME20210111 [OBSOLETE - consolidate into one for-loop, below] for(uint ia=0;ia<natoms;ia++){(*this).atoms[ia].fpos=c2f*(*this).atoms[ia].cpos;}  //CO20190409 - so we don't need to keep redefining f2c/c2f
+  for(uint ia=0;ia<natoms;ia++){ //DX+ME20210111 consolidate into one for-loop
+    (*this).atoms[ia].cpos=f2c*(*this).atoms[ia].fpos;
+    (*this).atoms[ia].cpos+=(-r_orig+(*this).origin);
+    (*this).atoms[ia].fpos=c2f*(*this).atoms[ia].cpos;
+  }
   //[CO20190409 - OBSOLETE]for(int ia=0;ia<(int)b.atoms.size();ia++)
   //[CO20190409 - OBSOLETE]  b.atoms.at(ia).fpos=C2F(b.lattice,b.atoms.at(ia).cpos);
   return;
