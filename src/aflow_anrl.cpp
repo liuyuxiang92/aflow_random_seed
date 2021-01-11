@@ -1671,7 +1671,7 @@ namespace anrl {
   bool structureAndLabelConsistent(const xstructure& _xstr,
       const string& label_input,
       string& label_and_params_calculated,
-      const double& tolerance_sym_input){ //DX20201105
+      double tolerance_sym_input){ //DX20201105
 
     // Checks if the created structure is consistent with the label;
     // it is possible that the provided parameters elevate the structure
