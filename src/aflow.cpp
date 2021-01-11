@@ -435,7 +435,7 @@ bool PrototypeGeneratorTest(ofstream& FileMESSAGE,ostream& oss,bool check_symmet
     for(uint j=0;j<parameter_sets.size();j++){
       xstructure xstr;
       try{
-        xstructure xstr = aflowlib::PrototypeLibraries(oss,prototype_labels[i],parameter_sets[j],1);
+        xstr = aflowlib::PrototypeLibraries(oss,prototype_labels[i],parameter_sets[j],1);
       }
       catch(aurostd::xerror& excpt){
         message << "Could not generate prototype=" << prototype_labels[i] << " given parameters=" << parameter_sets[j] << "; check inputs or the symbolic generator.";
