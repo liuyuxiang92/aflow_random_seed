@@ -16658,6 +16658,8 @@ void xstructure::ChangeBasis(const xmatrix<double>& transformation_matrix) {
   }
 
   uint natoms_orig = (*this).atoms.size();
+  uint natoms_transformed = 0;
+  bool is_integer_multiple_transformation = true;
 
   // ---------------------------------------------------------------------------
   // transform the lattice 
@@ -16706,13 +16708,7 @@ void xstructure::ChangeBasis(const xmatrix<double>& transformation_matrix) {
       
     // check atom count
     uint natoms_transformed = atom_basis.size();
-    if(natoms_orig%natoms_transformed!=0){
-      message << "Number of atoms is no longer an integer multiple with respect to the input structure"
-        << " original: " << natoms_orig
-        << " transformed: " << natoms_transformed
-        << "; check the transformation matrix or same-atom tolerance.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
-    }
+    if(natoms_orig%natoms_transformed!=0){ is_integer_multiple_transformation = false; }
   }
   // ---------------------------------------------------------------------------
   // enlarge the cell: update the atom count information
@@ -16723,14 +16719,17 @@ void xstructure::ChangeBasis(const xmatrix<double>& transformation_matrix) {
       
     // check atom count
     uint natoms_transformed = atom_basis.size();
-    if(natoms_transformed%natoms_orig!=0){
-      message << "Number of atoms is no longer an integer multiple with respect to the input structure"
-        << " original: " << natoms_orig
-        << " transformed: " << natoms_transformed
-        << "; check the transformation matrix or same-atom tolerance.";
-      cerr << "message: " << message.str() << endl;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
-    }
+    if(natoms_transformed%natoms_orig!=0){ is_integer_multiple_transformation = false; }
+  }
+
+  // ---------------------------------------------------------------------------
+  // is integer multiple transformation (reduce or enlarge)
+  if(!is_integer_multiple_transformation){
+    message << "Number of atoms is no longer an integer multiple with respect to the input structure"
+      << " original: " << natoms_orig
+      << " transformed: " << natoms_transformed
+      << "; check the transformation matrix or same-atom tolerance.";
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
   }
 
   // ---------------------------------------------------------------------------
