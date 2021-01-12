@@ -406,30 +406,27 @@ namespace compare {
     // if only two comparisons and text only, print mismatch information
     if(file_list.size()==2){
       // return abbreviated results (i.e., misfit value along with match, same family, or no match text
-      double final_misfit = AUROSTD_MAX_DOUBLE;
       if(final_prototypes[0].mapping_info_duplicate.size()==1){
-        final_misfit =  final_prototypes[0].mapping_info_duplicate[0].misfit;
-      }
-      if(final_misfit <= xtal_finder.misfit_match && (final_misfit+1.0)> 1e-3){
-        message << final_misfit << " : " << "MATCH" << endl;
-      }
-      else if(final_misfit > xtal_finder.misfit_match && final_misfit <= xtal_finder.misfit_family){
-        message << final_misfit << " : " << "SAME FAMILY" << endl;
-      }
-      else if(final_misfit > xtal_finder.misfit_family && final_misfit <= 1.0){
-        message << final_misfit << " : " << "NOT A MATCH" << endl;
-      }
-      else if(aurostd::isequal(final_misfit,AUROSTD_MAX_DOUBLE) || (final_misfit+1.0) < 1e-3){
-        message << "UNMATCHABLE" << endl;
-      }
-      if(XHOST.QUIET){
-        oss << message.str();
-      }
-      else {
-        pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_COMPLETE_);
-      }
-      if(print){
-        if(final_prototypes[0].mapping_info_duplicate.size()==1){
+        double final_misfit = final_prototypes[0].mapping_info_duplicate[0].misfit;
+        if(final_misfit <= xtal_finder.misfit_match && (final_misfit+1.0)> 1e-3){
+          message << final_misfit << " : " << "MATCH" << endl;
+        }
+        else if(final_misfit > xtal_finder.misfit_match && final_misfit <= xtal_finder.misfit_family){
+          message << final_misfit << " : " << "SAME FAMILY" << endl;
+        }
+        else if(final_misfit > xtal_finder.misfit_family && final_misfit <= 1.0){
+          message << final_misfit << " : " << "NOT A MATCH" << endl;
+        }
+        else if(aurostd::isequal(final_misfit,AUROSTD_MAX_DOUBLE) || (final_misfit+1.0) < 1e-3){
+          message << "UNMATCHABLE" << endl;
+        }
+        if(XHOST.QUIET){
+          oss << message.str();
+        }
+        else {
+          pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_COMPLETE_);
+        }
+        if(print){
           oss << xtal_finder.printStructureMappingResults(final_prototypes[0].mapping_info_duplicate[0],
               final_prototypes[0].structure_representative->structure,
               final_prototypes[0].structures_duplicate[0]->structure);
