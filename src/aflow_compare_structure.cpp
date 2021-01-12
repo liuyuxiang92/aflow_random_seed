@@ -70,18 +70,6 @@ namespace compare {
     bool print_misfit=false; //defalut=false
     if(vpflow.flag("COMPARE_PERMUTATION::PRINT")) { print_misfit=true; }
 
-    //DX20190504 START
-    // ---------------------------------------------------------------------------
-    // FLAG: print format
-    string format = "text";
-    if(XHOST.vflag_control.flag("PRINT_MODE::TXT")){
-      format = "text";
-    }
-    else if(XHOST.vflag_control.flag("PRINT_MODE::JSON")){
-      format = "json";
-    }
-    //DX20190504 END
-
     // ---------------------------------------------------------------------------
     // load structure
     xstructure xstr(input,IOAFLOW_AUTO);
@@ -129,12 +117,12 @@ vector<string> XtalFinderCalculator::getUniquePermutations(
   //DX20190506 START
   // ---------------------------------------------------------------------------
   // print format
-  string format = "text";
+  filetype format = txt_ft;
   if(XHOST.vflag_control.flag("PRINT_MODE::TXT")){
-    format = "text";
+    format = txt_ft;
   }
   if(XHOST.vflag_control.flag("PRINT_MODE::JSON")){
-    format = "json";
+    format = json_ft;
   }
   //DX20190506 END
 
@@ -149,11 +137,11 @@ vector<string> XtalFinderCalculator::getUniquePermutations(
       deque<int> reduced_stoichiometry; aurostd::reduceByGCD(xstr.num_each_type, reduced_stoichiometry); //DX20191125
       deque<uint> reduced_stoichiometry_uint; for(uint i=0;i<reduced_stoichiometry.size(); i++){ reduced_stoichiometry_uint.push_back((uint)reduced_stoichiometry[i]); } //DX20191125
       unique_permutations = getSpeciesPermutedStrings(reduced_stoichiometry_uint); //DX20191125
-      if(format=="text"){ //DX20190506
+      if(format==txt_ft){ //DX20190506
         ss_output << "Unique atom decorations (" << unique_permutations.size() << "): " << endl;
         ss_output << " " << aurostd::joinWDelimiter(unique_permutations,"\n ") << endl;
       }
-      if(format=="json"){ //DX20190506
+      if(format==json_ft){ //DX20190506
         ss_output << "{\"atom_decorations_equivalent\":[";
         ss_output << "[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(unique_permutations,"\""),",") << "]"; //DX20191125 - Vec to Dec
         ss_output << "]}" << endl;
@@ -181,7 +169,7 @@ vector<string> XtalFinderCalculator::getUniquePermutations(
 
   // ---------------------------------------------------------------------------
   // print results
-  if(format=="text"){ //DX20190506
+  if(format==txt_ft){ //DX20190506
     ss_output << "Unique atom decorations (" << final_permutations.size() << "): " << endl;
     for(uint j=0;j<final_permutations.size();j++){
       ss_output << " " << final_permutations[j].structure_representative->name;
@@ -192,7 +180,7 @@ vector<string> XtalFinderCalculator::getUniquePermutations(
     }
   }
   //DX20190506 START
-  else if(format=="json"){
+  else if(format==json_ft){
     stringstream sscontent_json;
     vector<string> vcontent_json;
     sscontent_json << "\"atom_decorations_equivalent\":[";
@@ -215,13 +203,13 @@ vector<string> XtalFinderCalculator::getUniquePermutations(
   // ---------------------------------------------------------------------------
   // print misfit results
   if(print_misfit){
-    if(format=="text"){ //DX20190506
+    if(format==txt_ft){ //DX20190506
       ss_output << "Misfit values: " << endl;
       stringstream ss_text;
       printResults(ss_text, same_species, final_permutations, "text");
       ss_output << ss_text.str();
     }
-    else if(format=="json"){ //DX20190506
+    else if(format==json_ft){ //DX20190506
       ss_output.str(""); // need to clear content abbreviated content from above
       stringstream ss_json;
       printResults(ss_json, same_species, final_permutations, "json");
@@ -375,17 +363,15 @@ namespace compare {
 
     //DX20190425 - added print and screen only flag - START
     // ---------------------------------------------------------------------------
-    // FLAG: print format
-    string format = "both";
-    if(XHOST.vflag_control.flag("PRINT_MODE::TXT")){
-      format = "txt";
-    }
-    else if(XHOST.vflag_control.flag("PRINT_MODE::JSON")){
-      format = "json";
-    }
+    // FLAG: print format (default is to write both), set the relevant bools
+    // to false when another is specified
+    bool write_txt = true;
+    bool write_json = true;
+    if(XHOST.vflag_control.flag("PRINT_MODE::TXT")){ write_json = false; }
+    else if(XHOST.vflag_control.flag("PRINT_MODE::JSON")){ write_txt = false; }
 
     // ---------------------------------------------------------------------------
-    // FLAG: print format
+    // FLAG: print2screen
     bool screen_only = false;
     if(vpflow.flag("COMPARE::SCREEN_ONLY")) {
       screen_only=true;
@@ -419,25 +405,6 @@ namespace compare {
       final_prototypes = xtal_finder.compareStructuresFromFile(filename, magmoms_for_systems, xtal_finder.num_proc, same_species, comparison_options); //DX20200103 - condensed booleans to xoptions
     }
 
-    // ---------------------------------------------------------------------------
-    // prepare JSON output
-    stringstream ss_json;
-    xtal_finder.printResults(ss_json, same_species, final_prototypes, "json");
-
-    // ---------------------------------------------------------------------------
-    // prepare TEXT (.out) output
-    stringstream ss_out;
-    xtal_finder.printResults(ss_out, same_species, final_prototypes, "txt");
-
-    //DX20190429 - added screen only option - START
-    // ---------------------------------------------------------------------------
-    // write results to screen and return immediately (do not write file)
-    if(screen_only){
-      if(format=="json"){ return ss_json.str(); }
-      // default is txt
-      else { return ss_out.str(); }
-    }
-    //DX20190429 - added screen only option - END
     //DX20190429 - added format options - START
     // ---------------------------------------------------------------------------
     // if only two comparisons and text only, print mismatch information
@@ -476,16 +443,23 @@ namespace compare {
     }
 
     // ---------------------------------------------------------------------------
+    // prepare both JSON and TEXT outputs (we may end up printing both)
+    stringstream ss_json, ss_out;
+    xtal_finder.printResults(ss_json, same_species, final_prototypes, "json");
+    xtal_finder.printResults(ss_out, same_species, final_prototypes, "txt");
+
+    //DX20190429 - added screen only option - START
+    // ---------------------------------------------------------------------------
+    // write results to screen and return immediately (do not write file)
+    if(screen_only) {
+      if(write_json){ return ss_json.str(); }
+      if(write_txt){ return ss_out.str(); }
+    }
+    // ---------------------------------------------------------------------------
     // write results to files //DX20201229 - consolidated into functions
-    if(format=="json"){
-      xtal_finder.writeComparisonOutputFile(ss_json, directory, "JSON", "compare_input", same_species);
-    }
-    else if(format=="text"){
-      xtal_finder.writeComparisonOutputFile(ss_out, directory, "TEXT", "compare_input", same_species);
-    }
-    else if(format=="both"){
-      xtal_finder.writeComparisonOutputFile(ss_json, directory, "JSON", "compare_input", same_species);
-      xtal_finder.writeComparisonOutputFile(ss_out, directory, "TEXT", "compare_input", same_species);
+    else{
+      if(write_json){ xtal_finder.writeComparisonOutputFile(ss_json, directory, "JSON", "compare_input", same_species); }
+      if(write_txt){ xtal_finder.writeComparisonOutputFile(ss_out, directory, "TEXT", "compare_input", same_species); }
     }
 
     return oss.str();
@@ -678,51 +652,17 @@ namespace compare {
 // ***************************************************************************
 string XtalFinderCalculator::printMatchingPrototypes(xstructure& xstr, const aurostd::xoption& vpflow){
 
-  //DX20190425 - added print flag - START
-  // ---------------------------------------------------------------------------
-  // FLAG: print format
-  string format = "both";
-  if(XHOST.vflag_control.flag("PRINT_MODE::TXT")){
-    format = "txt";
-  }
-  else if(XHOST.vflag_control.flag("PRINT_MODE::JSON")){
-    format = "json";
-  }
-  //DX20190425 - added print flag - END
-
-  //DX20190425 - added screen only flag - START
-  // ---------------------------------------------------------------------------
-  // FLAG: print format
-  bool screen_only = false;
-  if(vpflow.flag("COMPARISON_OPTIONS::SCREEN_ONLY")) {
-    screen_only=true;
-  }
-  //DX20190425 - added screen only flag - END
-
   vector<StructurePrototype> prototypes = compare2prototypes(xstr,vpflow);
 
   // ---------------------------------------------------------------------------
-  // print results
-  //DX20190509 [OBSOLETE-moved down] stringstream ss_out;
+  // print results (use XHOST flags since only checking once)
   bool same_species = false; //default for prototypes
-  stringstream ss_json;
-  printResults(ss_json, same_species, prototypes, "json");
+  stringstream ss_output;
+  if(XHOST.vflag_control.flag("PRINT_MODE::JSON")){ printResults(ss_output, same_species, prototypes, "json"); }
+  else if(XHOST.vflag_control.flag("PRINT_MODE::TXT")){ printResults(ss_output, same_species, prototypes, "txt"); }
+  else{ printResults(ss_output, same_species, prototypes, "txt"); }; //text by default
 
-  stringstream ss_out;
-  printResults(ss_out, same_species, prototypes, "txt");
-
-  //DX20190429 - added screen only option - START
-  // ---------------------------------------------------------------------------
-  // write results to screen and return immediately (do not write file)
-  if(screen_only){
-    if(format=="json"){ return ss_json.str(); }
-    // default is txt
-    else { return ss_out.str(); }
-  }
-  //DX20190429 - added screen only option - END
-
-  if(format=="json"){ return ss_json.str(); }
-  return ss_out.str();
+  return ss_output.str();
 }
 
 // ***************************************************************************
@@ -1375,14 +1315,12 @@ namespace compare {
     }
 
     // ---------------------------------------------------------------------------
-    // FLAG: print format
-    string format = "both";
-    if(XHOST.vflag_control.flag("PRINT_MODE::TXT")){
-      format = "txt";
-    }
-    else if(XHOST.vflag_control.flag("PRINT_MODE::JSON")){
-      format = "json";
-    }
+    // FLAG: print format (default is to write both), set the relevant bools
+    // to false when another is specified
+    bool write_txt = true;
+    bool write_json = true;
+    if(XHOST.vflag_control.flag("PRINT_MODE::TXT")){ write_json = false; }
+    else if(XHOST.vflag_control.flag("PRINT_MODE::JSON")){ write_txt = false; }
 
     // ---------------------------------------------------------------------------
     // FLAG: print format
@@ -1398,39 +1336,28 @@ namespace compare {
       same_species = false;
     }
 
-    // ---------------------------------------------------------------------------
-    // print results
-    stringstream ss_out;
-    xtal_finder_database.printResults(ss_out, same_species, final_prototypes, "text");
-    stringstream ss_json;
-    xtal_finder_database.printResults(ss_json, same_species, final_prototypes, "json");
-
     // DEBUG oss << ss_out.str();
     message << "Number of structures in database matching with the input structure: " << final_prototypes[0].structures_duplicate.size() << "." << endl;
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+    
+    // ---------------------------------------------------------------------------
+    // print results
+    stringstream ss_out, ss_json;
+    xtal_finder_database.printResults(ss_out, same_species, final_prototypes, "text");
+    xtal_finder_database.printResults(ss_json, same_species, final_prototypes, "json");
 
-    //DX20190429 - added screen only option - START
     // ---------------------------------------------------------------------------
     // write results to screen and return immediately (do not write file)
     if(screen_only){
-      if(format=="json"){ return ss_json.str(); }
-      // default is txt
-      else { return ss_out.str(); }
+      if(write_json){ return ss_json.str(); }
+      if(write_txt){ return ss_out.str(); }
     }
-    //DX20190429 - added screen only option - END
-
     // ---------------------------------------------------------------------------
     // write results to files //DX20201229 - consolidated into functions
-    string directory = aurostd::getPWD();
-    if(format=="json"){
-      xtal_finder_database.writeComparisonOutputFile(ss_json, directory, "JSON", "compare2database", same_species);
-    }
-    else if(format=="text"){
-      xtal_finder_database.writeComparisonOutputFile(ss_out, directory, "TEXT", "compare2database", same_species);
-    }
-    else if(format=="both"){
-      xtal_finder_database.writeComparisonOutputFile(ss_json, directory, "JSON", "compare2database", same_species);
-      xtal_finder_database.writeComparisonOutputFile(ss_out, directory, "TEXT", "compare2database", same_species);
+    else{
+      string directory = aurostd::getPWD();
+      if(write_json){ xtal_finder_database.writeComparisonOutputFile(ss_json, directory, "JSON", "compare2database", same_species); }
+      if(write_txt){ xtal_finder_database.writeComparisonOutputFile(ss_out, directory, "TEXT", "compare2database", same_species); }
     }
 
     return oss.str();
@@ -1470,6 +1397,21 @@ namespace compare {
       options.insert(options.end(), options_function.begin(), options_function.end());
 
       init::ErrorOption("--usage","compare::compareDatabaseEntries()",options);
+    }
+
+    // ---------------------------------------------------------------------------
+    // FLAG: print format (default is to write both), set the relevant bools
+    // to false when another is specified
+    bool write_txt = true;
+    bool write_json = true;
+    if(XHOST.vflag_control.flag("PRINT_MODE::TXT")){ write_json = false; }
+    else if(XHOST.vflag_control.flag("PRINT_MODE::JSON")){ write_txt = false; }
+
+    // ---------------------------------------------------------------------------
+    // FLAG: print2screen
+    bool screen_only = false;
+    if(vpflow.flag("COMPARE::SCREEN_ONLY")) {
+      screen_only=true;
     }
 
     vector<string> tokens,sub_tokens;
@@ -1805,15 +1747,22 @@ namespace compare {
 
     // ---------------------------------------------------------------------------
     // print results
-    stringstream ss_out;
+    stringstream ss_out, ss_json;
     xtal_finder.printResults(ss_out, same_species, final_prototypes, "text");
-    stringstream ss_json;
     xtal_finder.printResults(ss_json, same_species, final_prototypes, "json");
 
     // ---------------------------------------------------------------------------
+    // write results to screen and return immediately (do not write file)
+    if(screen_only) {
+      if(write_json){ return ss_json.str(); }
+      if(write_txt){ return ss_out.str(); }
+    }
+    // ---------------------------------------------------------------------------
     // write results to files //DX20201229 - consolidated into functions
-    xtal_finder.writeComparisonOutputFile(ss_out, directory, "TEXT", "compare_database_entries", !structure_comparison);
-    xtal_finder.writeComparisonOutputFile(ss_json, directory, "JSON", "compare_database_entries", !structure_comparison);
+    else{
+      if(write_txt){ xtal_finder.writeComparisonOutputFile(ss_out, directory, "TEXT", "compare_database_entries", !structure_comparison); }
+      if(write_json){ xtal_finder.writeComparisonOutputFile(ss_json, directory, "JSON", "compare_database_entries", !structure_comparison); }
+    }
 
     return oss.str();
 
