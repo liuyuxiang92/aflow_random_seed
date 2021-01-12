@@ -3354,7 +3354,7 @@ namespace aurostd {
       xmatrix<utype>& rotation,
       xmatrix<utype>& deformation) {
 
-    // Decompose a lattice transformation into its rotation and deformation
+    // Decompose a transformation into its rotation and deformation
     // matrices: T=R*U (where T=original matrix, R=rotation, U=deformation).
     // Procedure:
     // 1) T^2 = trasp(T)*T=trasp(R*U)*(R*U)=trasp(U)*trasp(R)*R*U=trasp(U)*U
@@ -3363,9 +3363,22 @@ namespace aurostd {
     //    http://en.wikipedia.org/wiki/Square_root_of_a_matrix#By_diagonalization
     // 3) R = T*inverse(U)
     // Following ref: http://www.continuummechanics.org/polardecomposition.html
+    // Generalized for an nxn matrix.
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string function_name = XPID + "aurostd::polarDecomposition():";
+    stringstream message;
+
+    // ---------------------------------------------------------------------------
+    // analysis is only works for a square matrix
+    if(!transformation_matrix.issquare){
+      message << "The transformation matrix must be a square matrix.";
+      throw xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_ERROR_);
+    }
+
+    // ---------------------------------------------------------------------------
+    // save matrix dimension
+    uint dimension = transformation_matrix.lrows;
 
     // ---------------------------------------------------------------------------
     // square the matrix
@@ -3378,7 +3391,7 @@ namespace aurostd {
     // (not sure how sensitive the deformation is, we may not be able to do this)
     if(aurostd::isidentity(T_squared)){
       rotation = transformation_matrix;
-      deformation = aurostd::eye<utype>(3,3); //DX+ME20210111
+      deformation = aurostd::eye<utype>(dimension,dimension); //DX+ME20210111
       return;
     }
 
@@ -3398,16 +3411,16 @@ namespace aurostd {
 
     // ---------------------------------------------------------------------------
     // build diagonal matrix
-    xmatrix<utype> Diag_matrix = aurostd::eye<utype>(3,3);
-    Diag_matrix[1][1] = aurostd::sqrt(diag(1));
-    Diag_matrix[2][2] = aurostd::sqrt(diag(2));
-    Diag_matrix[3][3] = aurostd::sqrt(diag(3));
+    xmatrix<utype> diag_matrix = aurostd::eye<utype>(dimension,dimension);
+    for(uint i=0;i<dimension;i++){
+      diag_matrix[dimension][dimension] = aurostd::sqrt(diag(dimension));
+    }
 
-    if(LDEBUG){ cerr << function_name << " Diag_matrix: " << Diag_matrix << endl; }
+    if(LDEBUG){ cerr << function_name << " diag_matrix: " << diag_matrix << endl; }
 
     // ---------------------------------------------------------------------------
     // find deformation (U) via U=v*D*inverse(v);
-    deformation = eigen_vec*Diag_matrix*aurostd::inverse(eigen_vec);
+    deformation = eigen_vec*diag_matrix*aurostd::inverse(eigen_vec);
 
     if(LDEBUG){ cerr << function_name << " deformation matrix (U): " << deformation << endl; }
 
