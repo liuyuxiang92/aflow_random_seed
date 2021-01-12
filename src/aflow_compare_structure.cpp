@@ -969,13 +969,13 @@ vector<StructurePrototype> XtalFinderCalculator::compare2database(
   uint relaxation_step = _COMPARE_DATABASE_GEOMETRY_MOST_RELAXED_;
   bool load_most_relaxed_structure_only = true;
   if(vpflow.flag("COMPARE2DATABASE::RELAXATION_STEP")) {
-    if(aurostd::substring2bool(aurostd::tolower(vpflow.getattachedscheme("COMPARE2DATABASE::RELAXATION_STEP")), "orig") ||
+    if(aurostd::tolower(vpflow.getattachedscheme("COMPARE2DATABASE::RELAXATION_STEP")).find("orig") != std::string::npos ||
         vpflow.getattachedscheme("COMPARE2DATABASE::RELAXATION_STEP") == "0"){
       relaxation_step = _COMPARE_DATABASE_GEOMETRY_ORIGINAL_;
       load_most_relaxed_structure_only = false;
     }
-    else if(aurostd::substring2bool(aurostd::tolower(vpflow.getattachedscheme("COMPARE2DATABASE::RELAXATION_STEP")), "relax1") ||
-        aurostd::substring2bool(aurostd::tolower(vpflow.getattachedscheme("COMPARE2DATABASE::RELAXATION_STEP")), "middle_relax") ||
+    else if(aurostd::tolower(vpflow.getattachedscheme("COMPARE2DATABASE::RELAXATION_STEP")).find("relax1") != std::string::npos ||
+        aurostd::tolower(vpflow.getattachedscheme("COMPARE2DATABASE::RELAXATION_STEP")).find("middle_relax") != std::string::npos ||
         vpflow.getattachedscheme("COMPARE2DATABASE::RELAXATION_STEP") == "1"){
       relaxation_step = _COMPARE_DATABASE_GEOMETRY_RELAX1_;
       load_most_relaxed_structure_only = false;
@@ -1441,11 +1441,11 @@ namespace compare {
     if(vpflow.flag("COMPARE_DATABASE_ENTRIES::ALLOY")){
       string alloy_string = vpflow.getattachedscheme("COMPARE_DATABASE_ENTRIES::ALLOY");
       // split by comma
-      if(aurostd::substring2bool(alloy_string,",")){
+      if(alloy_string.find(",") != std::string::npos){
         aurostd::string2tokens(alloy_string,species,",");
       }
       // split by colon
-      else if(aurostd::substring2bool(alloy_string,":")){
+      else if(alloy_string.find(":") != std::string::npos){
         aurostd::string2tokens(alloy_string,species,":");
       }
       // split by alloy species (no delimiter)
@@ -1521,13 +1521,13 @@ namespace compare {
     uint relaxation_step = _COMPARE_DATABASE_GEOMETRY_MOST_RELAXED_;
     bool load_most_relaxed_structure_only = true;
     if(vpflow.flag("COMPARE_DATABASE_ENTRIES::RELAXATION_STEP")) {
-      if(aurostd::substring2bool(aurostd::tolower(vpflow.getattachedscheme("COMPARE_DATABASE_ENTRIES::RELAXATION_STEP")), "orig") ||
+      if(aurostd::tolower(vpflow.getattachedscheme("COMPARE_DATABASE_ENTRIES::RELAXATION_STEP")).find("orig") != std::string::npos ||
           vpflow.getattachedscheme("COMPARE_DATABASE_ENTRIES::RELAXATION_STEP") == "0" ){
         relaxation_step = _COMPARE_DATABASE_GEOMETRY_ORIGINAL_;
         load_most_relaxed_structure_only = false;
       }
-      else if(aurostd::substring2bool(aurostd::tolower(vpflow.getattachedscheme("COMPARE_DATABASE_ENTRIES::RELAXATION_STEP")), "relax1") ||
-          aurostd::substring2bool(aurostd::tolower(vpflow.getattachedscheme("COMPARE_DATABASE_ENTRIES::RELAXATION_STEP")), "middle_relax") ||
+      else if(aurostd::tolower(vpflow.getattachedscheme("COMPARE_DATABASE_ENTRIES::RELAXATION_STEP")).find("relax1") != std::string::npos ||
+          aurostd::tolower(vpflow.getattachedscheme("COMPARE_DATABASE_ENTRIES::RELAXATION_STEP")).find("middle_relax") != std::string::npos ||
           vpflow.getattachedscheme("COMPARE_DATABASE_ENTRIES::RELAXATION_STEP") == "1"){
         relaxation_step = _COMPARE_DATABASE_GEOMETRY_RELAX1_;
         load_most_relaxed_structure_only = false;

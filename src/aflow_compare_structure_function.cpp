@@ -1445,15 +1445,15 @@ void XtalFinderCalculator::loadStructuresFromFile(
   uint structure_count = 0;
   stringstream geometry;geometry.clear();geometry.str(std::string());
   for(uint i=0;i<lines.size();i++){
-    if(aurostd::substring2bool(lines[i],START)){
+    if(lines[i].find(START) != std::string::npos){
       geometry.clear();geometry.str("");
       structure_lines_found = true;
       structure_count+=1;
     }
-    else if(structure_lines_found && !aurostd::substring2bool(lines[i],STOP)){
+    else if(structure_lines_found && lines[i].find(STOP) == std::string::npos){
       geometry << lines[i] << endl;
     }
-    else if(aurostd::substring2bool(lines[i],STOP)){
+    else if(lines[i].find(STOP) != std::string::npos){
       structure_lines_found = false;
       structure_lines.push_back(geometry.str());
     }
@@ -1585,7 +1585,7 @@ namespace compare {
     }
     // ---------------------------------------------------------------------------
     // load from AURL
-    else if(aurostd::substring2bool(structure_source, "aurl")){
+    else if(structure_source.find("aurl") != std::string::npos){
       //DX20200225 - check if relaxation_step is appended
       uint relaxation_step = _COMPARE_DATABASE_GEOMETRY_MOST_RELAXED_; //default
       bool load_most_relaxed_structure_only = true;
@@ -1645,7 +1645,7 @@ namespace compare {
     }
     // ---------------------------------------------------------------------------
     // load from file containing list of structures (like aflow.in or pocc)
-    else if(aurostd::substring2bool(structure_name,"file structure ")){
+    else if(structure_name.find("file structure ") != std::string::npos){
       aurostd::string2tokens(structure_name,tokens,"#");
       string structure_designation = aurostd::RemoveWhiteSpaces(tokens[1]);
       uint structure_number=0; uint number_of_structures=0;
@@ -1668,15 +1668,15 @@ namespace compare {
       uint structure_count = 0;
       stringstream geometry;geometry.clear();geometry.str(std::string());
       for(uint i=0;i<lines.size();i++){
-        if(aurostd::substring2bool(lines[i],START)){
+        if(lines[i].find(START) != std::string::npos){
           stringstream geometry;geometry.clear();geometry.str(std::string());
           structure_lines = true;
           structure_count+=1;
         }
-        else if(structure_lines && structure_count==structure_number && !aurostd::substring2bool(lines[i],STOP)){
+        else if(structure_lines && structure_count==structure_number && lines[i].find(STOP) == std::string::npos){
           geometry << lines[i] << endl;
         }
-        else if(aurostd::substring2bool(lines[i],STOP) && structure_lines){
+        else if(lines[i].find(STOP) != std::string::npos && structure_lines){
           structure_lines = false;
           xstructure xstr(geometry);
           structure = xstr;
@@ -1693,7 +1693,7 @@ namespace compare {
     }
     // ---------------------------------------------------------------------------
     // load permutation
-    else if(aurostd::substring2bool(structure_source, "permutation of: ")){
+    else if(structure_source.find("permutation of: ") != std::string::npos){
       //cerr << "permutation generator: " << structure_source << endl;
       //cerr << "permutation of: " << structure_name << endl;
       string tmp_source = structure_source;

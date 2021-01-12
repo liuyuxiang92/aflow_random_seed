@@ -3378,7 +3378,7 @@ namespace aurostd {
 
     // ---------------------------------------------------------------------------
     // save matrix dimension
-    uint dimension = transformation_matrix.lrows;
+    uint dimension = transformation_matrix.rows;
 
     // ---------------------------------------------------------------------------
     // square the matrix
@@ -3397,8 +3397,8 @@ namespace aurostd {
 
     // ---------------------------------------------------------------------------
     // find square root of matrix via diagonalization method
-    xvector<utype> diag; //diag: vector of diagonal components
-    xmatrix<utype> eigen_vec; //eigen_vec: matrix with eigen vectors as columns
+    xvector<utype> diag(dimension); //diag: vector of diagonal components
+    xmatrix<utype> eigen_vec(dimension,dimension); //eigen_vec: matrix with eigen vectors as columns
 
     // ---------------------------------------------------------------------------
     // Jacobi
