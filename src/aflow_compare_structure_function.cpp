@@ -525,7 +525,7 @@ string StructurePrototype::printPropertiesOfStructure(
   vector<string> tokens;
   aurostd::JSONwriter json;
 
-  if(str_pointer->properties.size()){
+  if(str_pointer->properties.size()>0){
     for(uint i=0;i<str_pointer->properties.size();i++){
       if(str_pointer->properties_types[i] == "number"){ json.addNumber(str_pointer->properties_names[i], str_pointer->properties[i]); } 
       else if(str_pointer->properties_types[i] == "numbers" || str_pointer->properties_types[i] == "strings"){ 
@@ -559,7 +559,7 @@ string StructurePrototype::printRepresentativeStructure() const {
   vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
   // representative structure may not have properties
-  if(structure_representative->properties.size()){
+  if(structure_representative->properties.size()>0){
     vcontent_json.push_back(printPropertiesOfStructure(structure_representative));
   }
 
@@ -603,7 +603,7 @@ string StructurePrototype::printMatchedStructures(matched_structure_type_xtalfin
       }
       sscontent_json << "\"number_compounds_matching_structure\":" << structures_duplicate[j]->number_compounds_matching_structure << eendl;
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-      if(structures_duplicate[j]->properties.size()){
+      if(structures_duplicate[j]->properties.size()>0){
         vcontent_json.push_back(printPropertiesOfStructure(structures_duplicate[j]));
       }
       vstructures.push_back("{" + aurostd::joinWDelimiter(vcontent_json,",") + "}");
@@ -633,7 +633,7 @@ string StructurePrototype::printMatchedStructures(matched_structure_type_xtalfin
       }
       sscontent_json << "\"number_compounds_matching_entry\":" << structures_family[j]->number_compounds_matching_structure << eendl;
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-      if(structures_family[j]->properties.size()){
+      if(structures_family[j]->properties.size()>0){
         vcontent_json.push_back(printPropertiesOfStructure(structures_family[j]));
       }
       vstructures.push_back("{" + aurostd::joinWDelimiter(vcontent_json,",") + "}");
@@ -892,7 +892,7 @@ void XtalFinderCalculator::addStructure2duplicatesList(StructurePrototype& struc
   structure_tmp.mapping_info_duplicate.push_back(temp_misfit_info);
 
   // update properties
-  if(structure_tmp.structures_duplicate.back()->properties.size()){
+  if(structure_tmp.structures_duplicate.back()->properties.size()>0){
     for(uint i=0;i<structure_tmp.structures_duplicate.back()->properties_names.size();i++){
       if(!aurostd::WithinList(structure_tmp.property_names, structure_tmp.structures_duplicate.back()->properties_names[i])){
         structure_tmp.property_names.push_back(structure_tmp.structures_duplicate.back()->properties_names[i]);
