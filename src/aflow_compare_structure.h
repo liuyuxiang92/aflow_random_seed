@@ -40,6 +40,19 @@
 //DX20191120 [MOVED TO aflow.h]
 
 // ***************************************************************************
+// output_file_xtalfinder (enum) //DX20210112
+// ***************************************************************************
+// Determines the file prefix for writing the results
+// Added "xf" to the end of the variable names to help avoid clashing in
+// global namespace
+enum output_file_xtalfinder {
+  compare_input_xf,                // DEFAULT_XTALFINDER_FILE_MATERIAL prefix
+  duplicate_compounds_xf,          // DEFAULT_XTALFINDER_FILE_DUPLICATE prefix
+  compare2database_xf,             // DEFAULT_XTALFINDER_FILE_MATERIAL_COMPARE2DATABASE prefix
+  compare_database_entries_xf      // DEFAULT_XTALFINDER_FILE_MATERIAL_DATABASE prefix
+};
+
+// ***************************************************************************
 // Struct: structure_mapping_info  //DX20191212 //DX20201218 - updated
 // ***************************************************************************
 // Stores the structural similarity between two structures
@@ -498,8 +511,8 @@ class XtalFinderCalculator : public xStream {
   // write output to file 
   void writeComparisonOutputFile(const stringstream& ss_output,
       const string& directory,
-      const string& format,
-      const string& comparison_mode,
+      filetype format,
+      output_file_xtalfinder comparison_mode,
       bool same_species);
 
 

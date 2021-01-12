@@ -458,8 +458,8 @@ namespace compare {
     // ---------------------------------------------------------------------------
     // write results to files //DX20201229 - consolidated into functions
     else{
-      if(write_json){ xtal_finder.writeComparisonOutputFile(ss_json, directory, "JSON", "compare_input", same_species); }
-      if(write_txt){ xtal_finder.writeComparisonOutputFile(ss_out, directory, "TEXT", "compare_input", same_species); }
+      if(write_json){ xtal_finder.writeComparisonOutputFile(ss_json, directory, json_ft, compare_input_xf, same_species); }
+      if(write_txt){ xtal_finder.writeComparisonOutputFile(ss_out, directory, txt_ft, compare_input_xf, same_species); }
     }
 
     return oss.str();
@@ -1356,8 +1356,8 @@ namespace compare {
     // write results to files //DX20201229 - consolidated into functions
     else{
       string directory = aurostd::getPWD();
-      if(write_json){ xtal_finder_database.writeComparisonOutputFile(ss_json, directory, "JSON", "compare2database", same_species); }
-      if(write_txt){ xtal_finder_database.writeComparisonOutputFile(ss_out, directory, "TEXT", "compare2database", same_species); }
+      if(write_json){ xtal_finder_database.writeComparisonOutputFile(ss_json, directory, json_ft, compare2database_xf, same_species); }
+      if(write_txt){ xtal_finder_database.writeComparisonOutputFile(ss_out, directory, txt_ft, compare2database_xf, same_species); }
     }
 
     return oss.str();
@@ -1760,8 +1760,8 @@ namespace compare {
     // ---------------------------------------------------------------------------
     // write results to files //DX20201229 - consolidated into functions
     else{
-      if(write_txt){ xtal_finder.writeComparisonOutputFile(ss_out, directory, "TEXT", "compare_database_entries", !structure_comparison); }
-      if(write_json){ xtal_finder.writeComparisonOutputFile(ss_json, directory, "JSON", "compare_database_entries", !structure_comparison); }
+      if(write_txt){ xtal_finder.writeComparisonOutputFile(ss_out, directory, txt_ft, compare_database_entries_xf, !structure_comparison); }
+      if(write_json){ xtal_finder.writeComparisonOutputFile(ss_json, directory, json_ft, compare_database_entries_xf, !structure_comparison); }
     }
 
     return oss.str();
@@ -2034,17 +2034,17 @@ vector<StructurePrototype> XtalFinderCalculator::compareMultipleStructures(
 
     if(XHOST.vflag_control.flag("PRINT_MODE::JSON")){
       printResults(ss_json_remove_duplicates, tmp_same_species, unique_compounds, "json");
-      writeComparisonOutputFile(ss_json_remove_duplicates, directory, "JSON", "duplicate_compounds", true);
+      writeComparisonOutputFile(ss_json_remove_duplicates, directory, json_ft, duplicate_compounds_xf, true);
     }
     else if(XHOST.vflag_control.flag("PRINT_MODE::TXT")){
       printResults(ss_out_remove_duplicates, tmp_same_species, unique_compounds, "txt");
-      writeComparisonOutputFile(ss_out_remove_duplicates, directory, "TEXT", "duplicate_compounds", true);
+      writeComparisonOutputFile(ss_out_remove_duplicates, directory, txt_ft, duplicate_compounds_xf, true);
     }
     else{
       printResults(ss_json_remove_duplicates, tmp_same_species, unique_compounds, "json");
-      writeComparisonOutputFile(ss_json_remove_duplicates, directory, "JSON", "duplicate_compounds", true);
+      writeComparisonOutputFile(ss_json_remove_duplicates, directory, json_ft, duplicate_compounds_xf, true);
       printResults(ss_out_remove_duplicates, tmp_same_species, unique_compounds, "txt");
-      writeComparisonOutputFile(ss_out_remove_duplicates, directory, "TEXT", "duplicate_compounds", true);
+      writeComparisonOutputFile(ss_out_remove_duplicates, directory, txt_ft, duplicate_compounds_xf, true);
     }
 
     // ---------------------------------------------------------------------------
@@ -2186,9 +2186,9 @@ vector<StructurePrototype> XtalFinderCalculator::compareMultipleStructures(
   if(store_checkpoint){
     stringstream ss_json, ss_out;
     printResults(ss_json, same_species, final_prototypes, "json");
-    writeComparisonOutputFile(ss_json, directory, "JSON", "compare_input", same_species);
+    writeComparisonOutputFile(ss_json, directory, json_ft, compare_input_xf, same_species);
     printResults(ss_out, same_species, final_prototypes, "text");
-    writeComparisonOutputFile(ss_out, directory, "TEXT", "compare_input", same_species);
+    writeComparisonOutputFile(ss_out, directory, txt_ft, compare_input_xf, same_species);
   }
 
   if(comparison_options.flag("COMPARISON_OPTIONS::MATCH_TO_AFLOW_PROTOS")){

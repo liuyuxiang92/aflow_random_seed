@@ -7135,8 +7135,8 @@ void XtalFinderCalculator::getPrototypeDesignations(
 // ******************************************************************************
 void XtalFinderCalculator::writeComparisonOutputFile(const stringstream& ss_output,
     const string& directory,
-    const string& format,
-    const string& comparison_mode,
+    filetype format,
+    output_file_xtalfinder comparison_mode,
     bool same_species){
 
   // Writes comparison results to an output file
@@ -7151,28 +7151,28 @@ void XtalFinderCalculator::writeComparisonOutputFile(const stringstream& ss_outp
   // and the mode (structures being compared)
   if(same_species){
     contents_info = "materials";
-    if(comparison_mode=="compare_input"){ file_prefix = DEFAULT_XTALFINDER_FILE_MATERIAL; }
-    if(comparison_mode=="duplicate_compounds"){ file_prefix = DEFAULT_XTALFINDER_FILE_DUPLICATE; }
-    if(comparison_mode=="compare2database"){ file_prefix = DEFAULT_XTALFINDER_FILE_MATERIAL_COMPARE2DATABASE; contents_info += " in the database"; }
-    if(comparison_mode=="compare_database_entries"){ file_prefix = DEFAULT_XTALFINDER_FILE_MATERIAL_DATABASE; contents_info += " in the database"; }
+    if(comparison_mode==compare_input_xf){ file_prefix = DEFAULT_XTALFINDER_FILE_MATERIAL; }
+    if(comparison_mode==duplicate_compounds_xf){ file_prefix = DEFAULT_XTALFINDER_FILE_DUPLICATE; }
+    if(comparison_mode==compare2database_xf){ file_prefix = DEFAULT_XTALFINDER_FILE_MATERIAL_COMPARE2DATABASE; contents_info += " in the database"; }
+    if(comparison_mode==compare_database_entries_xf){ file_prefix = DEFAULT_XTALFINDER_FILE_MATERIAL_DATABASE; contents_info += " in the database"; }
   }
   else if(!same_species){
     contents_info = "structures";
-    if(comparison_mode=="compare_input"){ file_prefix = DEFAULT_XTALFINDER_FILE_STRUCTURE; }
-    if(comparison_mode=="compare2database"){ file_prefix = DEFAULT_XTALFINDER_FILE_STRUCTURE_COMPARE2DATABASE; contents_info += " in the database"; }
-    if(comparison_mode=="compare_database_entries"){ file_prefix = DEFAULT_XTALFINDER_FILE_STRUCTURE_DATABASE; contents_info += " in the database"; }
+    if(comparison_mode==compare_input_xf){ file_prefix = DEFAULT_XTALFINDER_FILE_STRUCTURE; }
+    if(comparison_mode==compare2database_xf){ file_prefix = DEFAULT_XTALFINDER_FILE_STRUCTURE_COMPARE2DATABASE; contents_info += " in the database"; }
+    if(comparison_mode==compare_database_entries_xf){ file_prefix = DEFAULT_XTALFINDER_FILE_STRUCTURE_DATABASE; contents_info += " in the database"; }
   }
 
   // ---------------------------------------------------------------------------
   // write JSON
-  if(aurostd::toupper(format)=="JSON"){
+  if(format==json_ft){
     aurostd::stringstream2file(ss_output,directory+"/"+file_prefix+".json");
     message << "RESULTS: See " << directory << "/"+file_prefix+".json" << " for list of unique/duplicate " << contents_info << ".";
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_COMPLETE_);
   }
   // ---------------------------------------------------------------------------
   // write TEXT file (human-readable)
-  else if(aurostd::toupper(format)=="TXT" || aurostd::toupper(format)=="TEXT"){
+  else if(format==txt_ft){
     aurostd::stringstream2file(ss_output,directory+"/"+file_prefix+".out");
     message << "RESULTS: See " << directory << "/"+file_prefix+".out" << " for list of unique/duplicate " << contents_info << ".";
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_COMPLETE_);
