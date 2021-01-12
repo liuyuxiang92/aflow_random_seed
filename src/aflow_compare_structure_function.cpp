@@ -6995,7 +6995,7 @@ namespace compare{
       // if the volume change is not an integer, the basis transformation may include a deformation
       // component which must be removed
       if(!aurostd::isinteger(aurostd::det(basis_transformation_tmp)) && aurostd::det(basis_transformation_tmp) > 1.0){
-        PolarDecomposition(basis_transformation_tmp, basis_transformation, deformation);
+        aurostd::polarDecomposition(basis_transformation_tmp, basis_transformation, deformation);
       }
       else{
         basis_transformation = basis_transformation_tmp;
@@ -7029,7 +7029,7 @@ namespace compare{
       // may incorporate a "deformation" component in the matrix
       // we can differentiate this with a polar decomposition T=R*U
       // T: original matrix, R: pure rotation, U: deformation matrix
-      PolarDecomposition(rotation_tmp, rotation, deformation);
+      aurostd::polarDecomposition(rotation_tmp, rotation, deformation);
 
     }
 
@@ -7048,7 +7048,7 @@ namespace compare{
       // we can differentiate this with a polar decomposition T=R*U
       // T: original matrix, R: pure rotation, U: deformation matrix
       xmatrix<double> rotation_tmp = trasp(GetRotation(lattice_original,lattice_ideal)); // use trasp for AFLOW convention
-      PolarDecomposition(rotation_tmp, rotation, deformation);
+      aurostd::polarDecomposition(rotation_tmp, rotation, deformation);
 
       if(LDEBUG){
         cerr << function_name << " rotation: " << rotation << endl;

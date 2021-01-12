@@ -3348,6 +3348,88 @@ namespace aurostd {  // namespace aurostd
 } // namespace aurostd
 
 // ----------------------------------------------------------------------------
+// DX20201125
+namespace aurostd {
+  template<class utype> void polarDecomposition(const xmatrix<utype>& transformation_matrix,
+      xmatrix<utype>& rotation,
+      xmatrix<utype>& deformation) {
+
+    // Decompose a lattice transformation into its rotation and deformation
+    // matrices: T=R*U (where T=original matrix, R=rotation, U=deformation).
+    // Procedure:
+    // 1) T^2 = trasp(T)*T=trasp(R*U)*(R*U)=trasp(U)*trasp(R)*R*U=trasp(U)*U
+    //    (since trasp(R)*R=I, i.e. orthogonal matrix)
+    // 2) U = sqrt(trap(U)*U), using diagonalization technique:
+    //    http://en.wikipedia.org/wiki/Square_root_of_a_matrix#By_diagonalization
+    // 3) R = T*inverse(U)
+    // Following ref: http://www.continuummechanics.org/polardecomposition.html
+
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string function_name = XPID + "aurostd::polarDecomposition():";
+
+    // ---------------------------------------------------------------------------
+    // square the matrix
+    xmatrix<utype> T_squared = trasp(transformation_matrix)*transformation_matrix;
+
+    if(LDEBUG){ cerr << function_name << " T^2: " << T_squared << endl; }
+
+    // ---------------------------------------------------------------------------
+    // if T^2 is the identity, then this is a unitary transformation, no deformation
+    // (not sure how sensitive the deformation is, we may not be able to do this)
+    if(aurostd::isidentity(T_squared)){
+      rotation = transformation_matrix;
+      deformation = aurostd::eye<utype>(3,3); //DX+ME20210111
+      return;
+    }
+
+    // ---------------------------------------------------------------------------
+    // find square root of matrix via diagonalization method
+    xvector<utype> diag; //diag: vector of diagonal components
+    xmatrix<utype> eigen_vec; //eigen_vec: matrix with eigen vectors as columns
+
+    // ---------------------------------------------------------------------------
+    // Jacobi
+    jacobi(T_squared, diag, eigen_vec);
+
+    if(LDEBUG){
+      cerr << function_name << " diag: " << diag << endl;
+      cerr << function_name << " eigen_vec: " << eigen_vec << endl;
+    }
+
+    // ---------------------------------------------------------------------------
+    // build diagonal matrix
+    xmatrix<utype> Diag_matrix = aurostd::eye<utype>(3,3);
+    Diag_matrix[1][1] = aurostd::sqrt(diag(1));
+    Diag_matrix[2][2] = aurostd::sqrt(diag(2));
+    Diag_matrix[3][3] = aurostd::sqrt(diag(3));
+
+    if(LDEBUG){ cerr << function_name << " Diag_matrix: " << Diag_matrix << endl; }
+
+    // ---------------------------------------------------------------------------
+    // find deformation (U) via U=v*D*inverse(v);
+    deformation = eigen_vec*Diag_matrix*aurostd::inverse(eigen_vec);
+
+    if(LDEBUG){ cerr << function_name << " deformation matrix (U): " << deformation << endl; }
+
+    // ---------------------------------------------------------------------------
+    // find rotation (R) via R=T*inverse(U)
+    rotation = transformation_matrix*aurostd::inverse(deformation);
+
+    if(LDEBUG){ cerr << function_name << " rotation matrix (R): " << rotation << endl; }
+
+    // ---------------------------------------------------------------------------
+    // verify conditions of an orthogonal matrix
+    if(LDEBUG){
+      // R^T==R^-1
+      cerr << function_name << " transpose(R): " << aurostd::trasp(rotation) << endl;
+      cerr << function_name << " inverse(R): " << aurostd::inverse(rotation) << endl;
+      // R*R^T=I
+      cerr << function_name << " identity (R*R^T=I): " << rotation*trasp(rotation) << endl;
+    }
+  }
+}
+
+// ----------------------------------------------------------------------------
 
 namespace aurostd {  // namespace aurostd
   template<class utype>                                      //  std::cout operator <<
