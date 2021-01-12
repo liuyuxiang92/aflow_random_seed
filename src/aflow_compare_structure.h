@@ -145,6 +145,7 @@ class StructurePrototype{
     // constructor/destructor/copy/assignment/operator<<
     StructurePrototype();                                                                   // constructor operator
     ~StructurePrototype();                                                                  // destructor operator
+    void clear();                                                                           // clear
     friend ostream& operator<<(ostream& oss, const StructurePrototype& StructurePrototype); // stringstream operator (printing)
     const StructurePrototype& operator=(const StructurePrototype& b);                       // assignment operator
     StructurePrototype(const StructurePrototype& b);                                        // copy constructor
@@ -231,6 +232,9 @@ class XtalFinderCalculator : public xStream {
     // ---------------------------------------------------------------------------
     // destructors
     ~XtalFinderCalculator();
+    // ---------------------------------------------------------------------------
+    // clear
+    void clear();
     // ---------------------------------------------------------------------------
     // operator<<
     friend ostream& operator<<(ostream& oss, const XtalFinderCalculator& XtalFinderCalculator);

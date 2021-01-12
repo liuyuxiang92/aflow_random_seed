@@ -264,6 +264,13 @@ StructurePrototype::~StructurePrototype(){
 }
 
 // ***************************************************************************
+// StructurePrototype::clear() (clear)
+// ***************************************************************************
+void StructurePrototype::clear(){
+  free();
+}
+
+// ***************************************************************************
 // StructurePrototype::StructurePrototype(...) (copy constructor)
 // ***************************************************************************
 StructurePrototype::StructurePrototype(const StructurePrototype& b){
@@ -992,6 +999,13 @@ void XtalFinderCalculator::free(){
 // ***************************************************************************
 XtalFinderCalculator::~XtalFinderCalculator(){
   xStream::free();
+  free();
+}
+
+// ***************************************************************************
+// XtalFinderCalculator::clear() (clear)
+// ***************************************************************************
+void XtalFinderCalculator::clear(){
   free();
 }
 

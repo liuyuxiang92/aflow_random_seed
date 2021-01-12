@@ -864,6 +864,8 @@ vector<StructurePrototype> XtalFinderCalculator::compare2prototypes(
     message << "Identifying unique atom decorations for representative structures ...";
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
 
+    XtalFinderCalculator xtal_finder_permutations;
+
     for(uint i=0;i<final_prototypes.size();i++){
       // check if xstructure is generated; if not, make it
       if(!final_prototypes[i].structure_representative->is_structure_generated){
@@ -875,7 +877,7 @@ vector<StructurePrototype> XtalFinderCalculator::compare2prototypes(
       if(LDEBUG){ //DX20190601 - added LDEBUG
         cerr << "Finding unique atom decorations for " << final_prototypes[i].structure_representative->name << ".";
       }
-      XtalFinderCalculator xtal_finder_permutations;
+      xtal_finder_permutations.clear();
       vector<StructurePrototype> final_permutations = xtal_finder_permutations.compareAtomDecorations(final_prototypes[i],num_proc,comparison_options.flag("COMPARISON_OPTIONS::OPTIMIZE_MATCH"));
       for(uint j=0;j<final_permutations.size();j++){
         vector<string> tmp_permutations;
