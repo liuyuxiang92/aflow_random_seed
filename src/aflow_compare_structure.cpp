@@ -962,6 +962,8 @@ vector<StructurePrototype> XtalFinderCalculator::compare2database(
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
   }
 
+  // ---------------------------------------------------------------------------
+  // FLAG: get relaxation step
   uint relaxation_step = _COMPARE_DATABASE_GEOMETRY_MOST_RELAXED_;
   bool load_most_relaxed_structure_only = true;
   if(vpflow.flag("COMPARE2DATABASE::RELAXATION_STEP")) {
@@ -992,15 +994,10 @@ vector<StructurePrototype> XtalFinderCalculator::compare2database(
 
   // ---------------------------------------------------------------------------
   // FLAG: catalog (icsd, lib1, lib2, lib3, ...)
-  string catalog = "";
-  string catalog_summons = "";
   if(vpflow.flag("COMPARE2DATABASE::CATALOG")) {
-    catalog = aurostd::tolower(vpflow.getattachedscheme("COMPARE2DATABASE::CATALOG")); //DX20190329 -- added tolower
-    if(catalog != "all"){ //DX20190329 - added if-statement since AFLUX doesn't use "all"
-      catalog_summons = "catalog(\'" + catalog + "\')";
-      vmatchbook.push_back(catalog_summons);
-    } //DX20190329 - added if-statement since AFLUX doesn't use "all"
-    message << "OPTIONS: Catalog/library (icsd, lib1, lib2, lib3, ...): " << catalog << endl;
+    string catalog = aurostd::tolower(vpflow.getattachedscheme("COMPARE2DATABASE::CATALOG"));
+    if(catalog != "all"){ vmatchbook.push_back("catalog(\'" + catalog + "\')"); }
+    message << "OPTIONS: Specify catalog/library (icsd, lib1, lib2, lib3, ...): " << catalog << " (default=all)" << endl;
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
   }
 
@@ -1012,81 +1009,38 @@ vector<StructurePrototype> XtalFinderCalculator::compare2database(
     comparison_options.flag("COMPARISON_OPTIONS::CLEAN_UNMATCHED",FALSE);
   }
   //DX20190508 - added keep unmatched - END
+  
+  // ---------------------------------------------------------------------------
+  // AFLUX matchbook preparations: add number of species and species
+  vmatchbook.push_back("nspecies(" + aurostd::utype2string<uint>(structure_containers[0].ntypes) + ")");
+  if(same_species){ vmatchbook.push_back("species(" + aurostd::joinWDelimiter(structure_containers[0].elements,",") + ")"); }
 
   // ---------------------------------------------------------------------------
-  // fix species (remove pseudopotentials, etc.)
-  //string species_str = aurostd::joinWDelimiter(xstr.species, ""); //DX20200212
-  //vector<string> vspecies = aurostd::getElements(species_str); //DX20200212
-  //xstr.species = aurostd::vector2deque(vspecies); //DX20200212 - needed to perform material comparisons with database entries
-  //xstr.SetSpecies(xstr.species);
-
-  //DX20190329 - added species check - START
-  // check if fake names for same species comparison
-  //if(LDEBUG){cerr << function_name << " input structure species=" << aurostd::joinWDelimiter(vspecies,",") << endl;}
-  //if(vspecies[0]=="A" && !structure_comparison){
-  //  message << "Atomic species are missing for the input structure. Cannot compare to database materials without species.";
-  //  pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
-  //  return final_prototypes; //empty //DX20200225
-  //}
-  //DX20190329 - added species check - END
-
-  //// ---------------------------------------------------------------------------
-  //// add structure to container
-  //stringstream ss_input; ss_input << xstr;
-  //addStructure2container(xstr, "input geometry", ss_input.str(), 0, false);
-
-  // ---------------------------------------------------------------------------
-  // symmetry
-  if(!comparison_options.flag("COMPARISON_OPTIONS::IGNORE_SYMMETRY") && (structure_containers[0].structure.space_group_ITC<1 || structure_containers[0].structure.space_group_ITC>230)){ //DX20190829 - don't recalculate symmetry if already calculated //DX20191220 - put range instead of ==0
-    calculateSymmetries(1);  //1: one structure -> one processor
-  }
-  else if(!comparison_options.flag("COMPARISON_OPTIONS::IGNORE_SYMMETRY") && structure_containers[0].structure.space_group_ITC>=1 && structure_containers[0].structure.space_group_ITC<=230){ //DX20191220 - put range instead of !=0
-    setSymmetryPlaceholders();
-  }
-
-  if(LDEBUG) {
-    cerr << function_name << " Wyckoff positions of input structure:" << endl;
-    for(uint i=0;i<structure_containers[0].grouped_Wyckoff_positions.size();i++){
-      cerr << structure_containers[0].grouped_Wyckoff_positions[i] << endl;
+  // AFLUX matchbook preparations: add space group symmetry
+  bool ignore_symmetry = comparison_options.flag("COMPARISON_OPTIONS::IGNORE_SYMMETRY");
+  if(!ignore_symmetry){
+    if(!isSymmetryCalculated(structure_containers[0])){ calculateSymmetries(1); }  //1: one structure -> one processor
+    
+    if(LDEBUG) {
+      cerr << function_name << " Wyckoff positions of input structure:" << endl;
+      for(uint i=0;i<structure_containers[0].grouped_Wyckoff_positions.size();i++){
+        cerr << structure_containers[0].grouped_Wyckoff_positions[i] << endl;
+      }
     }
+    
+    // add space group query to AFLUX matchbook: get entries with compatible space groups, i.e., same or enantiomorph
+    vmatchbook.push_back(aflowlib::getSpaceGroupAFLUXSummons(structure_containers[0].space_group,relaxation_step));
   }
+  else if(ignore_symmetry){ setSymmetryPlaceholders(); }
 
   // ---------------------------------------------------------------------------
-  // get stoichiometries
-  vector<uint> stoichiometry = structure_containers[0].stoichiometry; // xstr.GetReducedComposition(!same_species);
-  uint stoichiometry_sum = aurostd::sum(stoichiometry);
-  vector<double> normalized_stoichiometry;
-  for(uint i=0;i<stoichiometry.size();i++){normalized_stoichiometry.push_back((double)stoichiometry[i]/(double)stoichiometry_sum);}
-
-  // ---------------------------------------------------------------------------
-  // AFLUX matchbook preparations: get entries with compatible space groups, i.e., same or enantiomorph
-  if(!comparison_options.flag("COMPARISON_OPTIONS::IGNORE_SYMMETRY")){
-    //string space_group_summons = aflowlib::getSpaceGroupAFLUXSummons(space_group_number,relaxation_step); //DX20200929 - consolidated formatting to a function
-    string space_group_summons = aflowlib::getSpaceGroupAFLUXSummons(structure_containers[0].space_group,relaxation_step); //DX20200929 - consolidated formatting to a function
-    vmatchbook.push_back(space_group_summons);
-  }
-
-  // ---------------------------------------------------------------------------
-  // AFLUX matchbook preparations: get aurl for entry
-  string aurl = "aurl";
-  vmatchbook.push_back(aurl);
-
-  // ---------------------------------------------------------------------------
-  // AFLUX matchbook preparations: get species and number of species
-  string species_summons = "";
-  if(same_species){
-    species_summons = "species(" + aurostd::joinWDelimiter(structure_containers[0].elements,",") + ")"; //DX20200212
-  }
-  string nspecies_summons = "nspecies(" + aurostd::utype2string<uint>(structure_containers[0].ntypes) + ")";
-  vmatchbook.push_back(species_summons);
-  vmatchbook.push_back(nspecies_summons);
+  // AFLUX matchbook preparations: add aurl for entry
+  vmatchbook.push_back("aurl");
 
   // ---------------------------------------------------------------------------
   // AFLUX matchbook preparations: format AFLUX output
-  string aflux_format = "format(aflow)";
-  string paging = "paging(0)";
-  vmatchbook.push_back(aflux_format);
-  vmatchbook.push_back(paging);
+  vmatchbook.push_back("format(aflow)");
+  vmatchbook.push_back("paging(0)");
 
   // ---------------------------------------------------------------------------
   // construct aflux summons, i.e., combine matchbook
@@ -1180,7 +1134,7 @@ vector<StructurePrototype> XtalFinderCalculator::compare2database(
     // second, check if stoichiometries are compatible
     // note: do not include in AFLUX matchbook, we would need to specify a range of compatible stoichs (could be expensive)
     // instead: filter on stoichiometry after recieving AFLUX response
-    if(compare::sameStoichiometry(stoichiometry,tmp_reduced_stoich)){
+    if(compare::sameStoichiometry(structure_containers[0].stoichiometry,tmp_reduced_stoich)){
       aflowlib::_aflowlib_entry entry; entry.auid=auids[i]; entry.aurl=aurls[i];
       vector<string> structure_files;
       if(!pflow::loadXstructures(entry,structure_files,*p_FileMESSAGE,*p_oss,load_most_relaxed_structure_only)){
