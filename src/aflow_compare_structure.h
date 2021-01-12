@@ -40,6 +40,17 @@
 //DX20191120 [MOVED TO aflow.h]
 
 // ***************************************************************************
+// matched_structure_type_xtalfinder (enum) //DX20210112
+// ***************************************************************************
+// Enum to easily toggle between duplicate and same family structure matches
+// Added "xf" to the end of the variable names to help avoid clashing in
+// global namespace
+enum matched_structure_type_xtalfinder {
+  duplicate_structure_xf,                // duplicate structures (misfit < misfit_match)
+  family_structure_xf                    // same family structures (misfit_match < misfit < misfit_family)
+};
+
+// ***************************************************************************
 // output_file_xtalfinder (enum) //DX20210112
 // ***************************************************************************
 // Determines the file prefix for writing the results
@@ -201,7 +212,7 @@ class StructurePrototype{
     // functions
     uint numberOfDuplicates() const; //DX20190506                                           // return the number of duplicate structures for this prototype (i.e., checks misfit value)
     string printRepresentativeStructure() const; //DX20201028                               // return the representative structure in a JSON format
-    string printMatchedStructures(const string& mode) const; //DX20201028                   // return the matched structures in a JSON format
+    string printMatchedStructures(matched_structure_type_xtalfinder mode) const;            // return the matched structures in a JSON format //DX20201028
     string printPropertiesOfStructure(structure_container* str_pointer) const;
     uint numberOfComparisons(); //DX20181221                                                // return the number of comparisons for this prototype
     bool isSymmetryCalculated(); //DX20190228
@@ -268,6 +279,10 @@ class XtalFinderCalculator : public xStream {
     void getOptions(const aurostd::xoption& vpflow, aurostd::xoption& comparison_options);
 
     // ---------------------------------------------------------------------------
+    // get command line options
+    string getSpaceGroupMatchbookFromOptions(const aurostd::xoption& vpflow, bool relaxation_step);
+
+    // ---------------------------------------------------------------------------
     // add structures to container
     void addStructure2container(const xstructure& xstr,
       const string& structure_name,
@@ -280,8 +295,8 @@ class XtalFinderCalculator : public xStream {
     void addDatabaseEntry2container(
         aflowlib::_aflowlib_entry& entry,
         const vector<string>& species,
-        bool same_species,
-        uint relaxation_step);
+        uint relaxation_step,
+        bool same_species);
 
     // ---------------------------------------------------------------------------
     // remove methods

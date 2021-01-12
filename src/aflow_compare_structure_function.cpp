@@ -187,6 +187,47 @@ void XtalFinderCalculator::getOptions(
 }
 
 // ***************************************************************************
+// XtalFinderCalculator::getSpaceGroupMatchbookFromOptions() //DX20210112
+// ***************************************************************************
+string XtalFinderCalculator::getSpaceGroupMatchbookFromOptions(
+    const aurostd::xoption& vpflow,
+    bool relaxation_step){
+
+  string function_name = XPID + "XtalFinderCalculator::getSpaceGroupMatchbookFromOptions():";
+  stringstream message;
+
+  // ---------------------------------------------------------------------------
+  // FLAG: specify space group
+  vector<uint> vspace_groups_uint;
+  if(vpflow.flag("COMPARE_DATABASE_ENTRIES::SPACE_GROUP")){
+
+    string space_group_input = vpflow.getattachedscheme("COMPARE_DATABASE_ENTRIES::SPACE_GROUP");
+    message << "OPTIONS: Requesting the following space groups: " << space_group_input;
+    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+
+    vector<string> vspace_group_strings;
+    aurostd::string2tokens(space_group_input,vspace_group_strings,",");
+
+    uint sg_tmp = 0;
+    for(uint i=0;i<vspace_group_strings.size();i++){
+      sg_tmp = aurostd::string2utype<uint>(vspace_group_strings[i]);
+      if(sg_tmp<1 || sg_tmp>230){
+        message << "Invalid space group requested: " << vspace_group_strings[i] << ". Please check input.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_ERROR_);
+      }
+      vspace_groups_uint.push_back(sg_tmp);
+    }
+  }
+
+  // if nothing, return empty matchbook
+  if(vspace_groups_uint.size()==0){ return ""; }
+
+  // ---------------------------------------------------------------------------
+  // AFLUX matchbook preparations: get space group(s)
+  return aflowlib::getSpaceGroupAFLUXSummons(vspace_groups_uint, relaxation_step);
+}
+
+// ***************************************************************************
 // initializeStructureRepresentative() //DX20201115
 // ***************************************************************************
 namespace compare {
@@ -274,7 +315,9 @@ void StructurePrototype::clear(){
 // StructurePrototype::StructurePrototype(...) (copy constructor)
 // ***************************************************************************
 StructurePrototype::StructurePrototype(const StructurePrototype& b){
-  copy(b);
+  if(this!=&b){
+    copy(b);
+  }
 }
 
 // ***************************************************************************
@@ -429,13 +472,11 @@ ostream& operator<<(ostream& oss, const StructurePrototype& StructurePrototype){
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
     // duplicate info //DX20201218 - put into separate function
-    string mode = "duplicate";
-    sscontent_json << "\"structures_duplicate\":[" << StructurePrototype.printMatchedStructures(mode) << "]";
+    sscontent_json << "\"structures_duplicate\":[" << StructurePrototype.printMatchedStructures(duplicate_structure_xf) << "]";
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
     // family info  //DX20201218 - put into separate function
-    mode = "family";
-    sscontent_json << "\"structures_family\":[" << StructurePrototype.printMatchedStructures(mode) << "]";
+    sscontent_json << "\"structures_family\":[" << StructurePrototype.printMatchedStructures(family_structure_xf) << "]";
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
     if(StructurePrototype.property_names.size()!=0){ //DX20190425 - only print if requested
@@ -529,7 +570,7 @@ string StructurePrototype::printRepresentativeStructure() const {
 // ***************************************************************************
 // StructurePrototype::printMatchedStructure() //DX20201115
 // ***************************************************************************
-string StructurePrototype::printMatchedStructures(const string& mode) const {
+string StructurePrototype::printMatchedStructures(matched_structure_type_xtalfinder mode) const {
 
   // Print matched structure information (JSON format)
   // Generalized for duplicate or same family structure
@@ -540,7 +581,7 @@ string StructurePrototype::printMatchedStructures(const string& mode) const {
   vector<string> vcontent_json, vstructures;
 
   // print duplicate structure information
-  if(mode == "duplicate"){
+  if(mode == duplicate_structure_xf){
     for(uint j=0;j<structures_duplicate.size();j++){
       sscontent_json << "\"name\":" << "\"" << structures_duplicate[j]->name << "\"" << eendl;
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
@@ -570,7 +611,7 @@ string StructurePrototype::printMatchedStructures(const string& mode) const {
     }
   }
   // print same family structure information
-  else if(mode == "family"){
+  else if(mode == family_structure_xf){
     for(uint j=0;j<structures_family.size();j++){
       sscontent_json << "\"name\":" << "\"" << structures_family[j]->name << "\"" << eendl;
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
@@ -620,9 +661,7 @@ bool StructurePrototype::isSymmetryCalculated(){
 
   // Check if the space group symmetry is calculated for prototype
 
-  if(space_group<1 || space_group>230){return false;} //DX20191220
-
-  return true;
+  return (space_group>0 && space_group<231);
 }
 
 // ***************************************************************************
@@ -633,9 +672,7 @@ bool XtalFinderCalculator::isSymmetryCalculated(structure_container& structure){
   // Check if the space group symmetry is calculated for particular
   // structure in container
 
-  if(structure.space_group<1 || structure.space_group>230){return false;} //DX20191220
-
-  return true;
+  return (structure.space_group>0 && structure.space_group<231);
 }
 
 // ***************************************************************************
@@ -645,9 +682,7 @@ bool StructurePrototype::isLFAEnvironmentCalculated(){
 
   // Check if the LFA environment is calculated for prototype
 
-  if(environments_LFA.size()==0){return false;}
-
-  return true;
+  return (environments_LFA.size()>0);
 }
 
 // ***************************************************************************
@@ -659,9 +694,7 @@ bool XtalFinderCalculator::isLFAEnvironmentCalculated(
   // Check if the LFA environment is calculated for particular
   // structure in container
 
-  if(structure.environments_LFA.size()==0){return false;}
-
-  return true;
+  return (structure.environments_LFA.size()>0);
 }
 
 // ***************************************************************************
@@ -945,7 +978,7 @@ void StructurePrototype::copyDuplicate(const StructurePrototype& b,
 // ***************************************************************************
 void StructurePrototype::removeNonDuplicate(uint index){
 
-  // If structure (b.duplicateure[index]) does not match with the
+  // If structure (b.duplicate[index]) does not match with the
   // original representative structure (i.e., misfit>misfit_match),
   // remove from scheme
 
@@ -2281,8 +2314,8 @@ void XtalFinderCalculator::addAFLOWPrototypes2container(
 void XtalFinderCalculator::addDatabaseEntry2container(
     aflowlib::_aflowlib_entry& entry,
     const vector<string>& species,
-    bool same_species,
-    uint relaxation_step){
+    uint relaxation_step,
+    bool same_species){
 
   // Add the AFLOW entry to the vector of structure containers objects
   // Note: this may change with new AFLUX integration.
@@ -2328,8 +2361,8 @@ void XtalFinderCalculator::addDatabaseEntry2container(
         if(LDEBUG){cerr << function_name << " loaded relax1 structure: " << structure_files[1] << endl;}
       }
       else if(relaxation_step == _COMPARE_DATABASE_GEOMETRY_MOST_RELAXED_ &&
-          (structure_files[1] == "POSCAR.relax2" ||
-           structure_files[1] == "CONTCAR.relax1")){
+          (structure_files[2] == "POSCAR.relax2" ||
+           structure_files[2] == "CONTCAR.relax1")){
         structure_index = 2;
         if(LDEBUG){cerr << function_name << " loaded most relaxed structure: " << structure_files[2] << endl;}
       }
