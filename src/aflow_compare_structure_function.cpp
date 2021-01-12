@@ -2215,7 +2215,7 @@ namespace compare{
 void XtalFinderCalculator::addAFLOWPrototypes2container(
     const vector<string>& vlabel){
 
-  // Add the AFLOW prototypes to the vector of StructurePrototype objects
+  // Add the AFLOW prototypes to the vector of structure_container objects
   // Note: The AFLOW labels should already be filtered to the relevant
   // strutures for comparison.
   // This does NOT generate the AFLOW prototype structure; it only stores
@@ -2273,6 +2273,83 @@ void XtalFinderCalculator::addAFLOWPrototypes2container(
       structure_containers.push_back(structure_tmp);
     }
   }
+}
+
+// ***************************************************************************
+// XtalFinderCalculator::addDatabaseEntry2container
+// ***************************************************************************
+void XtalFinderCalculator::addDatabaseEntry2container(
+    aflowlib::_aflowlib_entry& entry,
+    const vector<string>& species,
+    bool same_species,
+    uint relaxation_step){
+
+  // Add the AFLOW entry to the vector of structure containers objects
+  // Note: this may change with new AFLUX integration.
+
+  bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_COMPARE_);
+  string function_name = XPID + "XtalFinderCalculator::addDatabaseEntry2container():";
+  stringstream message;  
+
+  // ---------------------------------------------------------------------------
+  // load xstructures from pflow::loadXstructures()
+  bool load_most_relaxed_structure_only = false;
+  if(relaxation_step==_COMPARE_DATABASE_GEOMETRY_MOST_RELAXED_){ load_most_relaxed_structure_only = true; }
+
+  vector<string> structure_files;
+  if(!pflow::loadXstructures(entry,structure_files,*p_FileMESSAGE,*p_oss,load_most_relaxed_structure_only)){
+    message << "Could not load structure (auid=" << entry.auid << ") ... skipping...";
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_RUNTIME_ERROR_);
+  }
+
+  // ---------------------------------------------------------------------------
+  // ensure the correct relaxation type was extracted
+  if(load_most_relaxed_structure_only && entry.vstr.size()!=1){
+    message << "Expected only one structure to be loaded (the most relaxed structure). " << entry.vstr.size() << " were returned. Unexpected code behavior.";
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_RUNTIME_ERROR_);
+  }
+
+  uint structure_index = 0;
+  if(load_most_relaxed_structure_only){
+    structure_index = 0;
+  }
+  else{
+    if(entry.vstr.size()==3 && structure_files.size()==3){
+      if(relaxation_step == _COMPARE_DATABASE_GEOMETRY_ORIGINAL_ &&
+          (structure_files[0] == "POSCAR.orig" ||
+           structure_files[0] == "POSCAR.relax1")){
+        structure_index = 0;
+        if(LDEBUG){cerr << function_name << " loaded original structure: " << structure_files[0] << endl;}
+      }
+      else if(relaxation_step == _COMPARE_DATABASE_GEOMETRY_RELAX1_ &&
+          (structure_files[1] == "POSCAR.relax2" ||
+           structure_files[1] == "CONTCAR.relax1")){
+        structure_index = 1;
+        if(LDEBUG){cerr << function_name << " loaded relax1 structure: " << structure_files[1] << endl;}
+      }
+      else if(relaxation_step == _COMPARE_DATABASE_GEOMETRY_MOST_RELAXED_ &&
+          (structure_files[1] == "POSCAR.relax2" ||
+           structure_files[1] == "CONTCAR.relax1")){
+        structure_index = 2;
+        if(LDEBUG){cerr << function_name << " loaded most relaxed structure: " << structure_files[2] << endl;}
+      }
+      else{
+        message << "Unexpected file names: " << aurostd::joinWDelimiter(structure_files, ",") << ". Cannot verify relaxation based on filename.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_RUNTIME_ERROR_);
+      }
+    }
+    else{
+      message << "Expected three structures to be loaded (original, relax1, and the most relaxed). " << entry.vstr.size() << " were returned. Unexpected code behavior.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_RUNTIME_ERROR_);
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // store entry from database into the structure_container object
+  deque<string> deque_species = aurostd::vector2deque(species);
+  entry.vstr[structure_index].SetSpecies(deque_species);
+  string str_path = entry.getPathAURL(*p_FileMESSAGE,*p_oss,false);
+  addStructure2container(entry.vstr[structure_index], str_path, "aurl", relaxation_step, same_species);
 }
 
 // ***************************************************************************

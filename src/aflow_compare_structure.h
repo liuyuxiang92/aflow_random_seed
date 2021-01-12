@@ -277,6 +277,12 @@ class XtalFinderCalculator : public xStream {
   
     void addAFLOWPrototypes2container(const vector<string>& vlabel);
 
+    void addDatabaseEntry2container(
+        aflowlib::_aflowlib_entry& entry,
+        const vector<string>& species,
+        bool same_species,
+        uint relaxation_step);
+
     // ---------------------------------------------------------------------------
     // remove methods
     void removeStructureFromContainerByName(const string& structure_name);
