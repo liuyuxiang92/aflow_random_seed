@@ -16692,7 +16692,8 @@ void xstructure::ChangeBasis(const xmatrix<double>& transformation_matrix) {
 
   // ---------------------------------------------------------------------------
   // reduce the cell: remove any duplicate atoms
-  // use _AUROSTD_XSCALAR_TOLERANCE_IDENTITY_ to be consistent with 
+  // use _AUROSTD_XSCALAR_TOLERANCE_IDENTITY_ to be consistent with AUROSTD's
+  // isinteger tolerance
   if(basis_transformation_det_change < -_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_){
     if(LDEBUG){
       cerr << function_name << " removing duplicate atoms (cell has been reduced)." << endl;
