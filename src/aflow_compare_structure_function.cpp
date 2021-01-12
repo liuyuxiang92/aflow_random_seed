@@ -3389,9 +3389,7 @@ vector<StructurePrototype> XtalFinderCalculator::groupStructurePrototypes(
   }
   if(LDEBUG) {
     cerr << function_name << " Prepared comparison sets: " << endl;
-    stringstream ss_test;
-    printResults(ss_test, same_species, comparison_schemes, "text");
-    cerr << ss_test.str() << endl;
+    cerr << printResults(comparison_schemes, same_species, txt_ft) << endl;
   }
 
   if(!quiet){
@@ -3768,10 +3766,8 @@ vector<StructurePrototype> XtalFinderCalculator::runComparisonScheme(
   // print initial grouped sets of comparisons
   if(LDEBUG) {
     cerr << function_name << " Number of comparison sets: " << comparison_schemes.size() << endl;
-    stringstream ss_test;
-    printResults(ss_test, same_species, comparison_schemes, "text");
     cerr << "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
-    cerr << ss_test.str() << endl;
+    cerr << printResults(comparison_schemes, same_species, txt_ft) << endl;
   }
 
   uint number_of_comparisons = 0;
@@ -4142,9 +4138,7 @@ void XtalFinderCalculator::appendStructurePrototypes(
   stringstream message;
 
   if(LDEBUG){
-    stringstream ss_test;
-    printResults(ss_test, true, comparison_schemes, "text");
-    cerr << ss_test.str() << endl;
+    cerr << printResults(comparison_schemes, true, txt_ft) << endl;
   }
 
   uint number_of_comparisons = comparison_schemes.size();
@@ -4204,9 +4198,7 @@ void XtalFinderCalculator::appendStructurePrototypes(
   comparison_schemes=tmp_list;
 
   if(LDEBUG){
-    stringstream ss_test;
-    printResults(ss_test, true, comparison_schemes, "text");
-    cerr << ss_test.str() << endl;
+    cerr << printResults(comparison_schemes, true, txt_ft) << endl;
   }
 }
 
@@ -4297,22 +4289,22 @@ void XtalFinderCalculator::combinePrototypesOfDifferentSymmetry(
 // ***************************************************************************
 // XtalFinderCalculator::printResults()
 // ***************************************************************************
-void XtalFinderCalculator::printResults(
-    ostream& ss_out,
-    bool same_species,
+string XtalFinderCalculator::printResults(
     const vector<StructurePrototype>& final_prototypes,
-    string mode){
+    bool same_species,
+    filetype format){
 
-  // Print the comparison results in either a JSON or TXT format
+  // Print the comparison results in a JSON (json_ft) or TXT (txt_ft) format
   // In general, the structure along with the misfit value is printed
   // If material properties are provided, then the properties will be displayed
   // next to the misfit value
 
+  stringstream ss_out;
   bool roff=true; //round off
 
   // ---------------------------------------------------------------------------
-  // JSON MODE
-  if(aurostd::tolower(mode)=="json"){ //case insensitive
+  // json format
+  if(format==json_ft){
     ss_out << "[" << endl;
     for(uint j=0; j<final_prototypes.size(); j++){
       ss_out << final_prototypes[j];
@@ -4324,9 +4316,8 @@ void XtalFinderCalculator::printResults(
   }
 
   // ---------------------------------------------------------------------------
-  // TEXT MODE
-  else if(aurostd::tolower(mode)=="txt" || aurostd::tolower(mode)=="text"){ //case insensitive
-    // TXT MODE
+  // text format
+  else if(format==txt_ft){
     int indent_spacing = 2;
     int structure_spacing = 80; // structure name spacing
     int misfit_spacing = 15;
@@ -4467,6 +4458,7 @@ void XtalFinderCalculator::printResults(
       }
     }
   }
+  return ss_out.str();
 }
 
 // ***************************************************************************
@@ -7133,7 +7125,7 @@ void XtalFinderCalculator::getPrototypeDesignations(
 // ******************************************************************************
 // XtalFinderCalculator::writeComparisonOutputFile //DX20201229
 // ******************************************************************************
-void XtalFinderCalculator::writeComparisonOutputFile(const stringstream& ss_output,
+void XtalFinderCalculator::writeComparisonOutputFile(const string& output,
     const string& directory,
     filetype format,
     output_file_xtalfinder comparison_mode,
@@ -7166,14 +7158,14 @@ void XtalFinderCalculator::writeComparisonOutputFile(const stringstream& ss_outp
   // ---------------------------------------------------------------------------
   // write JSON
   if(format==json_ft){
-    aurostd::stringstream2file(ss_output,directory+"/"+file_prefix+".json");
+    aurostd::string2file(output,directory+"/"+file_prefix+".json");
     message << "RESULTS: See " << directory << "/"+file_prefix+".json" << " for list of unique/duplicate " << contents_info << ".";
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_COMPLETE_);
   }
   // ---------------------------------------------------------------------------
   // write TEXT file (human-readable)
   else if(format==txt_ft){
-    aurostd::stringstream2file(ss_output,directory+"/"+file_prefix+".out");
+    aurostd::string2file(output,directory+"/"+file_prefix+".out");
     message << "RESULTS: See " << directory << "/"+file_prefix+".out" << " for list of unique/duplicate " << contents_info << ".";
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_COMPLETE_);
   }
@@ -7183,7 +7175,7 @@ void XtalFinderCalculator::writeComparisonOutputFile(const stringstream& ss_outp
   else{
     message << "Unexpected file specifications. Printing results to the log rather than writing to a file.";
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
-    message << ss_output.str();
+    message << output;
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_RAW_);
   }
 }

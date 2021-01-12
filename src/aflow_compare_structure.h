@@ -438,10 +438,10 @@ class XtalFinderCalculator : public xStream {
   
   // ---------------------------------------------------------------------------
   // print
-  void printResults(ostream& ss_out,
-      bool same_species, 
+  string printResults(
       const vector<StructurePrototype>& final_prototypes,
-      string mode);
+      bool same_species,
+      filetype format);
   string printStructureMappingResults(
       const structure_mapping_info& misfit_info,
       const xstructure& xstr_reference,
@@ -509,7 +509,7 @@ class XtalFinderCalculator : public xStream {
   
   // ---------------------------------------------------------------------------
   // write output to file 
-  void writeComparisonOutputFile(const stringstream& ss_output,
+  void writeComparisonOutputFile(const string& output,
       const string& directory,
       filetype format,
       output_file_xtalfinder comparison_mode,
