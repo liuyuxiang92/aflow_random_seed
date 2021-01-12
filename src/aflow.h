@@ -1919,9 +1919,6 @@ xmatrix<double> GetBasisTransformation(const xmatrix<double>& lattice_original, 
 vector<xvector<double> > GetBasisTransformationInternalTranslations(const xmatrix<double>& basis_transformation); //DX20201124
 xmatrix<double> GetRotation(const xmatrix<double>& lattice_original, const xmatrix<double>& lattice_new); //DX20201015
 xstructure ChangeBasis(const xstructure& xstr, const xmatrix<double>& transformation_matrix); //DX20201015
-void PolarDecomposition(const xmatrix<double>& transformation_matrix,
-    xmatrix<double>& rotation,
-    xmatrix<double>& deformation); //DX20201026
 xstructure TransformStructure(const xstructure& xstr,
     const xmatrix<double>& transformation_matrix,
     const xmatrix<double>& rotation); //DX20201125

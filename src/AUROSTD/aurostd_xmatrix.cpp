@@ -3413,10 +3413,6 @@ namespace aurostd {
     // build diagonal matrix
     xmatrix<utype> diag_matrix = aurostd::eye<utype>(dimension,dimension);
     for(uint i=0;i<dimension;i++){
-      if(diag(dimension)<-_ZERO_TOL_){
-        message << "The diagonal elements should be positive; square root should be real.";
-        throw xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
-      }
       diag_matrix[dimension][dimension] = aurostd::sqrt(diag(dimension));
     }
 
