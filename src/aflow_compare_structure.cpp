@@ -2004,6 +2004,11 @@ vector<StructurePrototype> XtalFinderCalculator::compareMultipleStructures(
   message << "Total number of structures to compare: " << structure_containers.size();
   pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
 
+  if(structure_containers.size() == 0){
+    message << "No structures to compare.";
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_RUNTIME_ERROR_);
+  }
+
   // ---------------------------------------------------------------------------
   // convert to structures to certain representations //DX20201006
   // conversion type(s) is indicated in the comparison_options flag

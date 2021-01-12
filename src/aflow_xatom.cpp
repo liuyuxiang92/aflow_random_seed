@@ -16523,9 +16523,9 @@ vector<xvector<double> > GetBasisTransformationInternalTranslations(const xmatri
   stringstream message;
 
   vector<xvector<double> > translations;
-  
+
   double cell_volume_change = aurostd::abs(aurostd::det(basis_transformation));
-  
+
   if(LDEBUG){ cerr << function_name << " changed in cell volume from basis transformation: " << cell_volume_change << endl; }
 
   // ---------------------------------------------------------------------------
@@ -16549,49 +16549,22 @@ vector<xvector<double> > GetBasisTransformationInternalTranslations(const xmatri
     if(LDEBUG){ cerr << function_name << " shrunken lattice: " << lattice_shrink << endl; }
 
     // ---------------------------------------------------------------------------
-    // determine number of times the internal translation needs to be applied to
-    // get to the boundary of the new cell;
-    // we need to check each vector and component (since the transformation
-    // may not be unitary)
-    xvector<uint> dims; 
-    for(int i=1;i<=lattice_shrink.rows;i++){
-      bool all_components=false, x_component=false, y_component=false, z_component=false;
-      xvector<double> tmp_orig = lattice_shrink(i);
-      xvector<double> tmp = tmp_orig;
-      uint count_limit = 50; // no more than count_limit internal translations in one direction
-      uint count = 0;
-      while(!all_components){
-        count++;
-        if(aurostd::isinteger(tmp[1])){
-          x_component = true;
-        }
-        if(aurostd::isinteger(tmp[2])){
-          y_component = true;
-        }
-        if(aurostd::isinteger(tmp[3])){
-          z_component = true;
-        }
-        if(x_component && y_component && z_component){
-          all_components = true;
-        }
-        tmp+=tmp_orig;
-        //safety
-        if(count>count_limit){
-          message << "Could not identify number of times to bring internal translation to unit cell boundary:" << tmp;
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
-        }
-      }
-      dims[i]=count;
-    }
-    
+    // Now that we have the shortest internal translations from lattice shrink
+    // (forms a basis), we need to find all the internal translations inside this
+    // cell via linear combinations of this basis.
+    // To determine how many combinations we need (i.e. how far to expand), we can
+    // use LatticeDimensionSphere(). Since lattice_shrink is in fractional
+    // coordinates, we need to find the necessary dimensions in each direction
+    // to fill the cell (i.e., the unit box). //DX20210111
+    xvector<int> dims=LatticeDimensionSphere(lattice_shrink,1.0);
     if(LDEBUG){ cerr << function_name << " number of times to apply each internal translation: " << dims[1] << "," << dims[2] << "," << dims[3] << endl; }
 
-    for(uint a=0;a<dims[1];a++){
+    for(int a=0;a<dims[1];a++){
       translations.push_back((double)a*lattice_shrink(1));
-      for(uint b=0;b<dims[2];b++){
+      for(int b=0;b<dims[2];b++){
         translations.push_back((double)b*lattice_shrink(2));
         translations.push_back((double)a*lattice_shrink(1)+(double)b*lattice_shrink(2));
-        for(uint c=0;c<dims[3];c++){
+        for(int c=0;c<dims[3];c++){
           translations.push_back((double)c*lattice_shrink(3));
           translations.push_back((double)a*lattice_shrink(1)+(double)c*lattice_shrink(3));
           translations.push_back((double)b*lattice_shrink(2)+(double)c*lattice_shrink(3));
@@ -16636,8 +16609,8 @@ vector<xvector<double> > GetBasisTransformationInternalTranslations(const xmatri
   else{
     // use null vector
     if(LDEBUG){ cerr << function_name << " cell size remains the same or reduced. No internal translations." << endl; }
-    xvector<double> null;
-    translations.push_back(null);
+    xvector<double> null_xvector;
+    translations.push_back(null_xvector);
   }
   return translations;
 }
@@ -16672,12 +16645,12 @@ xstructure ChangeBasis(const xstructure& xstr, const xmatrix<double>& transforma
 // modifies in-place (efficient)
 void xstructure::ChangeBasis(const xmatrix<double>& transformation_matrix) {
 
+  // if the transformation matrix is the identity, don't do anything
+  if(aurostd::isidentity(transformation_matrix)){ return; }
+
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   string function_name = XPID + "xstructure::ChangeBasis():";
   stringstream message;
-
-  // if the transformation matrix is the identity, don't do anything
-  if(aurostd::isidentity(transformation_matrix)){ return; }
 
   if(LDEBUG){
     cerr << function_name << " structure BEFORE basis transformation:" << endl;
@@ -16747,7 +16720,7 @@ void xstructure::ChangeBasis(const xmatrix<double>& transformation_matrix) {
         new_basis.push_back(atom_basis[j]);
       }
     }
-    new_basis = atom_basis;
+    atom_basis = new_basis;
       
     // check atom count
     uint natoms_transformed = atom_basis.size();
