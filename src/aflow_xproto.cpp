@@ -257,7 +257,7 @@ namespace aflowlib {
         }
       }
     }
-    if(library == "all" || library == "anrl"){
+    if(library == "all" || library == "aflow" || library == "anrl"){
       vector<string> vproto,vlabel; 
       vector<uint>   vproto_nspecies,vproto_natoms,vproto_spacegroup,vproto_nunderscores,vproto_nparameters; 
       vector<string> vproto_Pearson_symbol,vproto_params,vproto_Strukturbericht,vproto_prototype,vproto_dialect;

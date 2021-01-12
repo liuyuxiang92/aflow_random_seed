@@ -749,11 +749,11 @@ vector<StructurePrototype> XtalFinderCalculator::compare2prototypes(
   string catalog="all";
   if(vpflow.flag("COMPARE2PROTOTYPES::CATALOG")) {
     catalog=aurostd::tolower(vpflow.getattachedscheme("COMPARE2PROTOTYPES::CATALOG"));
-    if(catalog!="htqc" && catalog!="anrl" && catalog!="all"){
+    if(catalog != "aflow" && catalog!="htqc" && catalog!="anrl" && catalog!="all"){
       message << "Catalog/library can only be htqc, anrl, or all.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_INPUT_ILLEGAL_);
     }
-    message << "OPTIONS: Catalog/library (htqc, anrl, or all): " << catalog << endl;
+    message << "OPTIONS: Catalog/library (htqc, aflow, or all): " << catalog << endl;
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
   }
 
