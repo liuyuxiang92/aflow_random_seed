@@ -440,10 +440,8 @@ class XtalFinderCalculator : public xStream {
 
   // ---------------------------------------------------------------------------
   // compare permuations
-  vector<string> getUniquePermutations(xstructure& xstr);
-  vector<string> getUniquePermutations(xstructure& xstr, uint num_proc);
-  vector<string> getUniquePermutations(xstructure& xstr, uint num_proc, bool optimize_match);
-  vector<string> getUniquePermutations(xstructure& xstr, uint num_proc, bool print_misfit, ostream& oss, aurostd::xoption& comparison_options);
+  vector<string> getUniquePermutations(xstructure& xstr, uint num_proc=1, bool optimize_match=false);
+  vector<string> getUniquePermutations(xstructure& xstr, aurostd::xoption& comparison_options, stringstream& results_ss, uint num_proc=1, bool print_misfit=false);
   vector<StructurePrototype> compareAtomDecorations(StructurePrototype& structure, uint num_proc, bool optimize_match);
   vector<StructurePrototype> compareAtomDecorations(StructurePrototype& structure, uint num_proc, aurostd::xoption& permutation_options);
   void generateAtomPermutedStructures(structure_container& structure);

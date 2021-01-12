@@ -31,7 +31,6 @@
 // ***************************************************************************
 namespace compare {
   string compareAtomDecorations(istream& input, const aurostd::xoption& vpflow){
-    ostringstream results_ss;
     ostringstream oss;
     ofstream FileMESSAGE; //DX20190319 - added FileMESSAGE
 
@@ -76,7 +75,8 @@ namespace compare {
 
     // ---------------------------------------------------------------------------
     // calculate unique/duplicate permutations
-    vector<string> unique_permutations = xtal_finder.getUniquePermutations(xstr, xtal_finder.num_proc, print_misfit, results_ss, comparison_options);
+    stringstream results_ss;
+    vector<string> unique_permutations = xtal_finder.getUniquePermutations(xstr, comparison_options, results_ss, xtal_finder.num_proc, print_misfit);
 
     return results_ss.str();
   }
@@ -86,30 +86,20 @@ namespace compare {
 // ***************************************************************************
 // XtalFinderCalculator::getUniquePermutations() //DX20201201
 // ***************************************************************************
-vector<string> XtalFinderCalculator::getUniquePermutations(xstructure& xstr){
-  uint num_proc=1;
-  return getUniquePermutations(xstr, num_proc);
-}
-
-vector<string> XtalFinderCalculator::getUniquePermutations(xstructure& xstr, uint num_proc){
-  bool optimize_match=false;
-  return getUniquePermutations(xstr, num_proc, optimize_match);
-}
-
 vector<string> XtalFinderCalculator::getUniquePermutations(xstructure& xstr, uint num_proc, bool optimize_match){
   bool print_misfit=false;
   aurostd::xoption comparison_options = compare::loadDefaultComparisonOptions("permutation");
   comparison_options.flag("COMPARISON_OPTIONS::OPTIMIZE_MATCH",optimize_match);
-  stringstream oss;
-  return getUniquePermutations(xstr, num_proc, print_misfit, oss, comparison_options);
+  stringstream results_ss;
+  return getUniquePermutations(xstr, comparison_options, results_ss, num_proc, print_misfit);
 }
 
 vector<string> XtalFinderCalculator::getUniquePermutations(
     xstructure& xstr,
+    aurostd::xoption& comparison_options,
+    stringstream& results_ss,
     uint num_proc,
-    bool print_misfit,
-    ostream& oss,
-    aurostd::xoption& comparison_options){
+    bool print_misfit){
 
   vector<string> unique_permutations;
   stringstream ss_output; //DX20190506
@@ -146,7 +136,7 @@ vector<string> XtalFinderCalculator::getUniquePermutations(
         ss_output << "[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(unique_permutations,"\""),",") << "]"; //DX20191125 - Vec to Dec
         ss_output << "]}" << endl;
       }
-      oss << ss_output.str();
+      results_ss << ss_output.str();
       return unique_permutations;
     }
   }
@@ -219,8 +209,8 @@ vector<string> XtalFinderCalculator::getUniquePermutations(
     unique_permutations.push_back(final_permutations[j].structure_representative->name);
   }
 
-  // update oss
-  oss << ss_output.str();
+  // update results_ss
+  results_ss << ss_output.str();
   return unique_permutations;
 }
 
