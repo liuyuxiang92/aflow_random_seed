@@ -14,7 +14,7 @@ class XtalFinder:
                 shell=True
             )
         except subprocess.CalledProcessError:
-            raise AssertionError('aflow executable not found: ' + self.aflow_executable)
+            raise OSError('aflow executable not found: ' + self.aflow_executable)
 
 
     def check_path(self, path):

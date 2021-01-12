@@ -15,7 +15,7 @@ class Symmetry:
                 shell=True 
             ) 
         except subprocess.CalledProcessError: 
-            raise AssertionError('aflow executable not found: ' + self.aflow_executable)
+            raise OSError('aflow executable not found: ' + self.aflow_executable)
 
     def get_filepath(self, filename):
         if os.path.exists(input_file.name):
