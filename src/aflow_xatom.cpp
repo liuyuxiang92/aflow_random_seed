@@ -16661,6 +16661,7 @@ void xstructure::ChangeBasis(const xmatrix<double>& transformation_matrix) {
 
   // ---------------------------------------------------------------------------
   // transform the lattice 
+  xmatrix<double> lattice_orig = (*this).lattice;
   (*this).lattice = transformation_matrix*(*this).lattice;
   (*this).FixLattices();
  
@@ -16698,29 +16699,9 @@ void xstructure::ChangeBasis(const xmatrix<double>& transformation_matrix) {
     if(LDEBUG){
       cerr << function_name << " removing duplicate atoms (cell has been reduced)." << endl;
     }
-    deque<_atom> new_basis;
-    xvector<double> tmp;
     bool skew = false;
     double tol=0.01;
-    bool duplicate_lattice_point=false;
-    //double tol=(*this).dist_nn_min;
-    //if((*this).dist_nn_min == AUROSTD_MAX_DOUBLE){ tol = SYM::minimumDistance((*this)); }
-    //cerr << "tol: " << tol << endl;
-    for(uint j=0;j<atom_basis.size();j++){
-      duplicate_lattice_point=false;
-      for(uint a=0; a<new_basis.size(); a++){
-        //tmp = BringInCell(atom_basis[j].fpos,1e-10);
-        if(SYM::MapAtom(new_basis[a].fpos,atom_basis[j].fpos,(*this).lattice,(*this).f2c,skew,tol)){
-          duplicate_lattice_point=true;
-          break;
-        }
-      }
-      if(duplicate_lattice_point==false){
-        //atom_basis[j].fpos = BringInCell(atom_basis[j].fpos,1e-10);
-        //atom_basis[j].cpos = xstr_transformed.f2c*atom_basis[j].fpos;
-        new_basis.push_back(atom_basis[j]);
-      }
-    }
+    deque<_atom> new_basis = foldAtomsInCell(atom_basis, lattice_orig, (*this).lattice, skew, tol, false); //false: don't check atom mappings (slow)
     atom_basis = new_basis;
       
     // check atom count
