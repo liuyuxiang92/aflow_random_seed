@@ -3412,8 +3412,8 @@ namespace aurostd {
     // ---------------------------------------------------------------------------
     // build diagonal matrix
     xmatrix<utype> diag_matrix = aurostd::eye<utype>(dimension,dimension);
-    for(uint i=0;i<dimension;i++){
-      diag_matrix[dimension][dimension] = aurostd::sqrt(diag(dimension));
+    for(uint i=1;i<=dimension;i++){
+      diag_matrix[i][i] = aurostd::sqrt(diag(i));
     }
 
     if(LDEBUG){ cerr << function_name << " diag_matrix: " << diag_matrix << endl; }
