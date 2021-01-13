@@ -16719,16 +16719,16 @@ void xstructure::ChangeBasis(const xmatrix<double>& transformation_matrix) {
     atom_basis = new_basis;
       
     // check atom count
-    uint natoms_transformed = atom_basis.size();
-    if(natoms_orig%natoms_transformed!=0){ is_integer_multiple_transformation = false; }
+    natoms_transformed = atom_basis.size();
+    is_integer_multiple_transformation = (natoms_orig%natoms_transformed==0);
   }
   // ---------------------------------------------------------------------------
   // enlarge the cell: update the atom count information
   else if(basis_transformation_det_change > _AUROSTD_XSCALAR_TOLERANCE_INTEGER_){
     if(LDEBUG){ cerr << function_name << " cell size has increased." << endl; }
     // check atom count
-    uint natoms_transformed = atom_basis.size();
-    if(natoms_transformed%natoms_orig!=0){ is_integer_multiple_transformation = false; }
+    natoms_transformed = atom_basis.size();
+    is_integer_multiple_transformation = (natoms_transformed%natoms_orig==0);
   }
 
   // ---------------------------------------------------------------------------
