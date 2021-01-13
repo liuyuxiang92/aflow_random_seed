@@ -7095,21 +7095,21 @@ namespace compare{
     xmatrix<double> metric_tensor_ideal = MetricTensor(lattice_ideal);
 
     // ---------------------------------------------------------------------------
-    // if the metric tensors ARE NOT equal: change of basis between lattices
-    // DX20201203 - metric tensors do not identify reflections... need to add
-    // check for negative determinant of basis transformations (indicates reflection)
-    // DX20210105 - negative determinant is not enough (could have two negatives in determinant)
-    // more robust: use definition of SO(3) to find pure rotations: R*R^T=I
-    // Need both negative determinant and SO(3) check
+    // checks to determine if the lattice basis changed (as opposed to rotated)
+    // 1) check if the metric tensors are different
+    //    DX20201203 - metric tensors do not identify reflections
+    // 2) check for negative determinant of basis transformation, indicates reflection
+    //    DX2021015 - could have two negatives in determinant
+    // 3) check if R*R^T!=I, property of SO(3)
+    // 4) check if rotation angle is pi
     xmatrix<double> metric_tensor_candidate = MetricTensor(candidate_lattice);
-
     xmatrix<double> basis_transformation_tmp = GetBasisTransformation(lattice_original,candidate_lattice);
     double theta=acos((aurostd::trace(basis_transformation_tmp)-1.0)/2.0);
-    //if(!aurostd::identical(metric_tensor_original,metric_tensor_candidate) || aurostd::det(basis_transformation_tmp)<0.0){
+
     if(!aurostd::identical(metric_tensor_original,metric_tensor_candidate) ||
         aurostd::det(basis_transformation_tmp) < 0.0 ||
         !aurostd::isidentity(basis_transformation_tmp*trasp(basis_transformation_tmp)) ||
-        aurostd::abs(theta-PI) < 1e-2){
+        aurostd::isequal(theta,PI,1e-2){
 
       // ---------------------------------------------------------------------------
       // if the volume change is not an integer, the basis transformation may include a deformation
@@ -7257,16 +7257,38 @@ void XtalFinderCalculator::writeComparisonOutputFile(const string& output,
   // and the mode (structures being compared)
   if(same_species){
     contents_info = "materials";
-    if(comparison_mode==compare_input_xf){ file_prefix = DEFAULT_XTALFINDER_FILE_MATERIAL; }
-    if(comparison_mode==duplicate_compounds_xf){ file_prefix = DEFAULT_XTALFINDER_FILE_DUPLICATE; }
-    if(comparison_mode==compare2database_xf){ file_prefix = DEFAULT_XTALFINDER_FILE_MATERIAL_COMPARE2DATABASE; contents_info += " in the database"; }
-    if(comparison_mode==compare_database_entries_xf){ file_prefix = DEFAULT_XTALFINDER_FILE_MATERIAL_DATABASE; contents_info += " in the database"; }
+    switch(comparison_mode){
+      case(compare_input_xf):
+        file_prefix = DEFAULT_XTALFINDER_FILE_MATERIAL;
+        break;
+      case(duplicate_compounds_xf):
+        file_prefix = DEFAULT_XTALFINDER_FILE_DUPLICATE;
+        break;
+      case(compare2database_xf):
+        file_prefix = DEFAULT_XTALFINDER_FILE_MATERIAL_COMPARE2DATABASE;
+        contents_info += " in the database";
+        break;
+      case(compare_database_entries_xf):
+        file_prefix = DEFAULT_XTALFINDER_FILE_MATERIAL_DATABASE;
+        contents_info += " in the database";
+        break;
+    }
   }
   else if(!same_species){
     contents_info = "structures";
-    if(comparison_mode==compare_input_xf){ file_prefix = DEFAULT_XTALFINDER_FILE_STRUCTURE; }
-    if(comparison_mode==compare2database_xf){ file_prefix = DEFAULT_XTALFINDER_FILE_STRUCTURE_COMPARE2DATABASE; contents_info += " in the database"; }
-    if(comparison_mode==compare_database_entries_xf){ file_prefix = DEFAULT_XTALFINDER_FILE_STRUCTURE_DATABASE; contents_info += " in the database"; }
+    switch(comparison_mode){
+      case(compare_input_xf):
+        file_prefix = DEFAULT_XTALFINDER_FILE_STRUCTURE;
+        break;
+      case(compare2database_xf):
+        file_prefix = DEFAULT_XTALFINDER_FILE_STRUCTURE_COMPARE2DATABASE;
+        contents_info += " in the database";
+        break;
+      case(compare_database_entries_xf):
+        file_prefix = DEFAULT_XTALFINDER_FILE_STRUCTURE_DATABASE;
+        contents_info += " in the database";
+        break;
+    }
   }
 
   // ---------------------------------------------------------------------------
