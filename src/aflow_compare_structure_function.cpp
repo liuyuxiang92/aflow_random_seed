@@ -5874,9 +5874,7 @@ namespace compare{
 namespace compare{
   double computeMisfit(double dev, double dis, double fail) {
 
-    double mis=0.0;
-    mis=1-((1-dev)*(1-dis)*(1-fail));
-    return mis;
+    return 1-((1-dev)*(1-dis)*(1-fail));
   }
 }
 
@@ -5904,9 +5902,7 @@ namespace compare{
   double computeMisfitMagnetic(
       double dev, double dis, double fail, double mag_dis, double mag_fail) {
 
-    double mis=0.0;
-    mis=1-((1-dev)*(1-dis)*(1-fail)*(1-mag_dis)*(1-mag_fail));
-    return mis;
+    return 1-((1-dev)*(1-dis)*(1-fail)*(1-mag_dis)*(1-mag_fail));
   }
 }
 
@@ -6053,8 +6049,7 @@ namespace compare{
       // match not found, violates periodicity, return immediately
       else { return false; }
     }
-    if(count == natoms){ return true; }
-    return false;
+    return (count == natoms);
   }
 }
 
@@ -6239,9 +6234,10 @@ void XtalFinderCalculator::latticeSearch(
       compare::cellDiagonal(xstr1,D1,F1,1); // cell diagonals
       // convert to clattice representation
       xstr1.lattice=GetClat(xstr1.a,xstr1.b,xstr1.c,xstr1.alpha,xstr1.beta,xstr1.gamma);
+      xmatrix<double> f2c = xstr1.scale*trasp(xstr.lattice); //DX+ME20210113 - calculate outside, fast
 
       for(uint iat=0; iat<xstr1.atoms.size(); iat++){
-        xstr1.atoms[iat].cpos=F2C(xstr1.scale*xstr1.lattice,xstr1.atoms[iat].fpos); //DX20200715 - add scale just in case
+        xstr1.atoms[iat].cpos=f2c*xstr1.atoms[iat].fpos;
       }
 
       // makes xstr2 a supercell
@@ -6365,7 +6361,7 @@ void XtalFinderCalculator::latticeSearch(
             //if(!optimize_match && aurostd::isequal(match_info.misfit,AUROSTD_MAX_DOUBLE) && same_species){ test_one_origin_only=true;} //DX20201102 - need type_match==2 (otherwise we don't check different types)
             if(!optimize_match && aurostd::isequal(match_info.misfit,AUROSTD_MAX_DOUBLE)){
               if(same_species){ test_one_origin_only=true;} //DX20190809 - need type match here; otherwise we may miss structure-type matches
-              else if(!same_species){ break; } //DX20201217 - move on to next LFA
+              else { break; } //DX20201217 - move on to next LFA
             }
             if(test_one_origin_only){
               if(LDEBUG){cerr << function_name << " No mapping found. Searched only one origin. Terminating search early." << endl;}
@@ -6683,42 +6679,37 @@ namespace compare{
 
     // ---------------------------------------------------------------------------
     // check species mapping
-    if(same_species){ // same species
-      if(atom1.name != atom2.name){
-        if(VERBOSE){
-          string function_name = XPID + "compare::consistentAtomMapping():";
-          cerr << "xstr1 atom " << index_x1 << ": " << atom1.name << "; xstr2 atom " << index_x2 << " " << atom2.name << endl;
-          cerr << "xstr1 basis " << index_x1 << ": " << atom1.type << "; xstr2 basis " << index_x2 << " " << atom2.type << endl;
-          cerr << function_name << " WARNING: Matching species are not the same type, throwing out match (same species comparison)" << endl;
-        }
-        return false;
+    if(same_species && (atom1.name != atom2.name)){
+      if(VERBOSE){
+        string function_name = XPID + "compare::consistentAtomMapping():";
+        cerr << "xstr1 atom " << index_x1 << ": " << atom1.name << "; xstr2 atom " << index_x2 << " " << atom2.name << endl;
+        cerr << "xstr1 basis " << index_x1 << ": " << atom1.type << "; xstr2 basis " << index_x2 << " " << atom2.type << endl;
+        cerr << function_name << " WARNING: Matching species are not the same type, throwing out match (same species comparison)" << endl;
       }
+      return false;
     }
 
     // ---------------------------------------------------------------------------
     // check spin mapping
     if(!_CALCULATE_MAGNETIC_MISFIT_){
       // check collinear spin
-      if(is_collinear){
-        if(aurostd::abs(atom1.spin-atom2.spin)>_SPIN_TOL_){
-          if(VERBOSE){
-            string function_name = XPID + "compare::consistentAtomMappingType():";
-            cerr << function_name << " WARNING: Matching atoms do not have the same collinear spin, throwing out match" << endl;
-          }
-          return false;
+      if(is_collinear && (aurostd::abs(atom1.spin-atom2.spin)>_SPIN_TOL_)){
+        if(VERBOSE){
+          string function_name = XPID + "compare::consistentAtomMappingType():";
+          cerr << function_name << " WARNING: Matching atoms do not have the same collinear spin, throwing out match" << endl;
         }
+        return false;
       }
       // check non_collinear spin
-      else if(is_non_collinear){
-        if(aurostd::abs(atom1.noncoll_spin(1)-atom2.noncoll_spin(1))>_SPIN_TOL_ ||
-            aurostd::abs(atom1.noncoll_spin(2)-atom2.noncoll_spin(2))>_SPIN_TOL_ ||
-            aurostd::abs(atom1.noncoll_spin(3)-atom2.noncoll_spin(3))>_SPIN_TOL_){
-          if(VERBOSE){
-            string function_name = XPID + "compare::consistentAtomMappingType():";
-            cerr << function_name << " WARNING: Matching atoms do not have the same non-collinear spin, throwing out match" << endl;
-          }
-          return false;
+      else if(is_non_collinear &&
+          (aurostd::abs(atom1.noncoll_spin(1)-atom2.noncoll_spin(1))>_SPIN_TOL_ ||
+           aurostd::abs(atom1.noncoll_spin(2)-atom2.noncoll_spin(2))>_SPIN_TOL_ ||
+           aurostd::abs(atom1.noncoll_spin(3)-atom2.noncoll_spin(3))>_SPIN_TOL_)){
+        if(VERBOSE){
+          string function_name = XPID + "compare::consistentAtomMappingType():";
+          cerr << function_name << " WARNING: Matching atoms do not have the same non-collinear spin, throwing out match" << endl;
         }
+        return false;
       }
     }
     return true;
@@ -6774,16 +6765,14 @@ namespace compare{
     bool VERBOSE=FALSE;
 
     for(uint i=0;i<vatoms1_name.size();i++){
-      if(atom1_name == vatoms1_name[i]){
-        if(atom2_name != vatoms2_name[i]){
-          if(VERBOSE){
-            string function_name = XPID + "compare::consistentAtomSetMappings():";
-            cerr << function_name << " WARNING: Matching one type of atom to more than one type: "
-              << atom1_name << " == " << atom2_name << " | "
-              << vatoms1_name[i] << " == " << vatoms2_name[i] << endl;
-          }
-          return false;
+      if(atom1_name == vatoms1_name[i] && atom2_name != vatoms2_name[i]){
+        if(VERBOSE){
+          string function_name = XPID + "compare::consistentAtomSetMappings():";
+          cerr << function_name << " WARNING: Matching one type of atom to more than one type: "
+            << atom1_name << " == " << atom2_name << " | "
+            << vatoms1_name[i] << " == " << vatoms2_name[i] << endl;
         }
+        return false;
       }
     }
     return true;
