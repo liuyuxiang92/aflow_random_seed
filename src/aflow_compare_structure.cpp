@@ -2161,24 +2161,8 @@ namespace compare {
       structure_mapping_info& final_misfit_info,
       uint num_proc) { //DX20191108 - remove const & from bools //DX20191122 - move ostream to end and add default
 
-    structure_container str_rep = compare::initializeStructureContainer(xstr1);
-    structure_container str_matched = compare::initializeStructureContainer(xstr2);
-
-    // clean structures
-    str_rep.structure.FixLattices();
-    str_matched.structure.FixLattices();
-    str_rep.structure.ReScale(1.0);
-    str_matched.structure.ReScale(1.0);
-    str_rep.structure.BringInCell(); //DX20190329 - need to ensure incell; otherwise supercell expansion breaks
-    str_matched.structure.BringInCell(); //DX20190329 - need to ensure incell; otherwise supercell expansion breaks
-
-    // ---------------------------------------------------------------------------
-    // clean atom names (remove pseudopotential information)
-    for(uint i=0;i<str_rep.structure.species.size();i++){ str_rep.structure.species[i]=KBIN::VASP_PseudoPotential_CleanName(str_rep.structure.species[i]); }
-    for(uint i=0;i<str_matched.structure.species.size();i++){ str_matched.structure.species[i]=KBIN::VASP_PseudoPotential_CleanName(str_matched.structure.species[i]); }
-
-    for(uint i=0;i<str_rep.structure.atoms.size();i++){ str_rep.structure.atoms[i].name=KBIN::VASP_PseudoPotential_CleanName(str_rep.structure.atoms[i].name); }
-    for(uint i=0;i<str_matched.structure.atoms.size();i++){ str_matched.structure.atoms[i].name=KBIN::VASP_PseudoPotential_CleanName(str_matched.structure.atoms[i].name); }
+    structure_container str_rep = compare::initializeStructureContainer(xstr1, same_species);
+    structure_container str_matched = compare::initializeStructureContainer(xstr2, same_species);
 
     XtalFinderCalculator xtal_finder(num_proc);
     xtal_finder.compareStructures(str_rep,str_matched,final_misfit_info,same_species,scale_volume,optimize_match);
@@ -2220,7 +2204,7 @@ void XtalFinderCalculator::compareStructures(
 
   // ---------------------------------------------------------------------------
   // determine if structures are matchable (same species and/or same stoichiometry)
-  if(same_species == true){
+  if(same_species){
     // if atoms are not labeled in either structure; assign fake names
     if(str_rep.structure.atoms.at(0).name == "" || str_matched.structure.atoms.at(0).name == ""){
       if(LDEBUG) {cerr << function_name << " Atoms are not labeled. Assigning fake element names." << endl;}

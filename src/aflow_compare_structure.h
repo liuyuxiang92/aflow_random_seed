@@ -141,7 +141,7 @@ struct structure_container {
 // ---------------------------------------------------------------------------
 namespace compare{
   structure_container initializeStructureContainer();
-  structure_container initializeStructureContainer(const xstructure& structure);
+  structure_container initializeStructureContainer(const xstructure& structure, bool same_species);
 }
 
 //DX 20201119

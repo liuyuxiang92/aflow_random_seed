@@ -228,30 +228,48 @@ string XtalFinderCalculator::getSpaceGroupMatchbookFromOptions(
 }
 
 // ***************************************************************************
-// initializeStructureRepresentative() //DX20201115
+// initializeStructureContainer() //DX20201115
 // ***************************************************************************
 namespace compare {
   structure_container initializeStructureContainer(
-      const xstructure& structure){
+      const xstructure& structure,
+      bool same_species){
 
     structure_container str_rep;
     str_rep.structure = structure;
 
     // ---------------------------------------------------------------------------
-    // pre-condition structures
+    // pre-condition structure
+    str_rep.structure.FixLattices();
     str_rep.structure.ReScale(1.0);
     str_rep.structure.BringInCell();
 
     // ---------------------------------------------------------------------------
+    // set element/stoichiometry attributes
+    str_rep.stoichiometry = str_rep.structure.GetReducedComposition(!same_species);
+    str_rep.elements = str_rep.structure.GetElements(true,true); // true: clean names and assign fake names
+    str_rep.compound = pflow::prettyPrintCompound(str_rep.elements,str_rep.stoichiometry,no_vrt,false,txt_ft); //remove ones is true  //DX20190311 //DX20190313 - use xstr //eventually redundant
+    // update xstructure species
+    if(str_rep.structure.species.size()==0){
+      deque<string> deque_species; for(uint j=0;j<str_rep.elements.size();j++){deque_species.push_back(str_rep.elements[j]);}
+      str_rep.structure.SetSpecies(deque_species);
+      str_rep.structure.SpeciesPutAlphabetic();
+    }
+    // clean species
+    else{
+      for(uint s=0;s<str_rep.structure.species.size();s++){str_rep.structure.species[s]=KBIN::VASP_PseudoPotential_CleanName(str_rep.structure.species[s]); } //DX20190711
+      str_rep.structure.SetSpecies(str_rep.structure.species);
+    }
+
+    // ---------------------------------------------------------------------------
     // initialize attributes
     str_rep.name = "";
-    str_rep.compound = "";
     str_rep.natoms = str_rep.structure.atoms.size();
     str_rep.ntypes = str_rep.structure.num_each_type.size();
     str_rep.number_compounds_matching_structure = 0;
 
-    vector<double> vec_null_double;
-    str_rep.nearest_neighbor_distances = vec_null_double;
+    vector<double> zero_vec_double;
+    str_rep.nearest_neighbor_distances = zero_vec_double;
     return str_rep;
   }
 }
@@ -781,36 +799,22 @@ void XtalFinderCalculator::addStructure2container(
   stringstream message;
 
   structure_container str_rep_tmp;
-  str_rep_tmp = compare::initializeStructureContainer(xstr);
+
+  // ---------------------------------------------------------------------------
+  // adds information to container and pre-conditions xstructure
+  str_rep_tmp = compare::initializeStructureContainer(xstr,same_species);
   str_rep_tmp.name = structure_name;
   str_rep_tmp.is_structure_generated = true;
   str_rep_tmp.source = source;
   str_rep_tmp.relaxation_step = relaxation_step;
 
-  str_rep_tmp.stoichiometry = str_rep_tmp.structure.GetReducedComposition(!same_species);
-  str_rep_tmp.elements = str_rep_tmp.structure.GetElements(true,true); // true: clean names and assign fake names
-  str_rep_tmp.compound = pflow::prettyPrintCompound(str_rep_tmp.elements,str_rep_tmp.stoichiometry,no_vrt,false,txt_ft); //remove ones is true  //DX20190311 //DX20190313 - use xstr //eventually redundant
-  // update xstructure species
-  if(str_rep_tmp.structure.species.size()==0){
-    deque<string> deque_species; for(uint j=0;j<str_rep_tmp.elements.size();j++){deque_species.push_back(str_rep_tmp.elements[j]);}
-    str_rep_tmp.structure.SetSpecies(deque_species);
-    str_rep_tmp.structure.SpeciesPutAlphabetic();
-  }
-  // clean species
-  else{
-    for(uint s=0;s<str_rep_tmp.structure.species.size();s++){str_rep_tmp.structure.species[s]=KBIN::VASP_PseudoPotential_CleanName(str_rep_tmp.structure.species[s]); } //DX20190711
-    str_rep_tmp.structure.SetSpecies(str_rep_tmp.structure.species);
-  }
+  // ---------------------------------------------------------------------------
   // check if fake names for same species comparison
   if(!pflow::realElements(str_rep_tmp.structure) && same_species){
     message << "Atomic species are not real/physical " << str_rep_tmp.name << " cannot perform material comparison; skipping strucutre.";
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
     return; // not storing structure
   }
-
-  str_rep_tmp.natoms = str_rep_tmp.structure.atoms.size();
-  str_rep_tmp.ntypes = str_rep_tmp.structure.species.size();
-  str_rep_tmp.number_compounds_matching_structure = 0;
 
   if(LDEBUG){ cerr << function_name << " loaded " << structure_name << " structure." << endl; }
 
