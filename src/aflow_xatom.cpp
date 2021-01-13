@@ -15339,31 +15339,18 @@ xstructure GetLTFVCell(const xvector<double>& nvec, const double phi, const xstr
 // DX20201215 - added in-place methods
 
 // make a copy
-xstructure ShiftPos(const xstructure& a,const xvector<double>& shift, int flag) {
+xstructure ShiftPos(const xstructure& a,const xvector<double>& shift, bool is_frac) { //DX20210113 - "int flag" to "bool is_frac"
   xstructure b(a);
-  b.ShiftPos(shift, flag);
+  b.ShiftPos(shift, is_frac);
   return b;
 }
 
 // modify in-place //DX2021215
-void xstructure::ShiftPos(const xvector<double>& shift, int flag) {
-  uint natoms = (*this).atoms.size(); //DX+ME20210111 - make variable to optimize for-loops
-  if(flag==FALSE) { // Cartesian shift
-    (*this).coord_flag=TRUE;
-    xmatrix<double> c2f=(*this).scale*inverse(trasp((*this).lattice)); //DX+ME20210111
-    for(uint ia=0;ia<natoms;ia++) {
-      (*this).atoms.at(ia).cpos=(*this).atoms.at(ia).cpos+shift;
-      (*this).atoms.at(ia).fpos=c2f*(*this).atoms.at(ia).cpos; //DX+ME20210111 - use pre-calculated c2f, optimize
-    }
-  }
-  if(flag==TRUE) { // Direct coords shift
-    (*this).coord_flag=FALSE;
-    xmatrix<double> f2c=(*this).scale*trasp((*this).lattice); //DX+ME20210111
-    for(uint ia=0;ia<natoms;ia++) {
-      (*this).atoms[ia].fpos=(*this).atoms[ia].fpos+shift;
-      (*this).atoms[ia].cpos=f2c*(*this).atoms[ia].fpos; //DX+ME20210111 - use pre-calculated f2c, optimize
-    }
-  }
+void xstructure::ShiftPos(const xvector<double>& shift, bool is_frac) {
+  // Cartesian shift
+  if(is_frac==FALSE) { (*this).ShiftCPos(shift); } //DX20210113 - use function, reduce code
+  // Direct coords shift
+  else { (*this).ShiftFPos(shift); } //DX20210113 - use function, reduce code
 }
 
 // make a copy
