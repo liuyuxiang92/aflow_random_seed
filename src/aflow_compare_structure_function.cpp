@@ -6376,7 +6376,7 @@ void XtalFinderCalculator::latticeSearch(
         //if(!optimize_match && aurostd::isequal(match_info.misfit,AUROSTD_MAX_DOUBLE) && same_species){ test_one_lfa_only=true;} //DX20190809 - need type match here; otherwise we may miss structure-type matches
         if(!optimize_match && aurostd::isequal(match_info.misfit,AUROSTD_MAX_DOUBLE)){
           if(same_species){ test_one_lfa_only=true;} //DX20190809 - need type match here; otherwise we may miss structure-type matches
-          else if(!same_species){ break; } //DX20201217 - move on to next LFA
+          else { break; } //DX20201217 - move on to next LFA
         }
         if(test_one_lfa_only){
           if(LDEBUG){cerr << function_name << " No match found. Searched only one LFA set. Terminating search early." << endl;}
@@ -7274,7 +7274,7 @@ void XtalFinderCalculator::writeComparisonOutputFile(const string& output,
         break;
     }
   }
-  else if(!same_species){
+  else {
     contents_info = "structures";
     switch(comparison_mode){
       case(compare_input_xf):
