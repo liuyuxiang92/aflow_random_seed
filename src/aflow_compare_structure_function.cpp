@@ -1926,13 +1926,13 @@ vector<StructurePrototype> XtalFinderCalculator::compareAtomDecorations(
 
   // ---------------------------------------------------------------------------
   // calculate symmetry (if not already calculated)
-  if(!isSymmetryCalculated(structure.structure_representative)){
+  if(!isSymmetryCalculated(*structure.structure_representative)){
     calculateSymmetry(*structure.structure_representative);
   }
 
   // ---------------------------------------------------------------------------
   // get nearest neighbor distances
-  if(!areNearestNeighborDistancesCalculated(structure.structure_representative)){
+  if(!areNearestNeighborsCalculated(*structure.structure_representative)){
     structure.structure_representative->nearest_neighbor_distances = NearestNeighbours(structure.structure_representative->structure);
   }
 
@@ -2574,7 +2574,7 @@ void XtalFinderCalculator::convertStructures(
   // ---------------------------------------------------------------------------
   // primitivize (do this first)
   bool all_structures_primitivized = true;
-  for(uint i=0;i<number_of_structures;i++){ all_structures_primitivized = (all_structures_primitivized&&structure_containers[i].structure.primitive_calculated); }
+  for(uint i=0;i<number_of_structures && all_structures_primitivized; i++){ all_structures_primitivized = structure_containers[i].structure.primitive_calculated; }
   if(comparison_options.flag("COMPARISON_OPTIONS::PRIMITIVIZE") && !all_structures_primitivized){
     // Run threads
     vector<std::thread*> threads;
@@ -3309,14 +3309,14 @@ namespace compare{
                   break;
                 }
               }
-              if(Wyckoff_matched==true){break;}
+              if(Wyckoff_matched){break;}
             }
           }
           if(matched_Wyckoffs==grouped_possible_Wyckoff_letters[i].size() && matched_Wyckoffs==grouped_Wyckoff_letters[m].size()){
             matched_set=true;
           }
         }
-        if(matched_set==true){
+        if(matched_set){
           number_of_matched_sets++;
           matched_set=false;
         }
@@ -3390,15 +3390,15 @@ namespace compare{
     // ---------------------------------------------------------------------------
     // check if species/stoichiometries are compatible
     //DX20190430 - this may take longer, use compound if(same_species==true && matchableSpecies(structures[i].structure_representative,comparison_schemes[j].structure_representative,same_species)==true)
-    if(same_species==true && structure1.compound!=structure2.compound) //DX20190430 - quicker //DX20190702 - changed to "!=" and "false" for speed increase
+    if(same_species && structure1.compound!=structure2.compound) //DX20190430 - quicker //DX20190702 - changed to "!=" and "false" for speed increase
     { //CO20200106 - patching for auto-indenting
       return false;
     }
-    else if(same_species==false && structure1.stoichiometry!=structure2.stoichiometry){ //DX20190702 - changed to "!=" and "false" for speed increase
+    else if(!same_species && structure1.stoichiometry!=structure2.stoichiometry){ //DX20190702 - changed to "!=" and "false" for speed increase
       return false;
     }
     // if already removed duplicate compounds, then structures were already compared, so don't compare again
-    else if(same_species==false && duplicates_removed && structure1.compound==structure2.compound){
+    else if(!same_species && duplicates_removed && structure1.compound==structure2.compound){
       return false;
     }
     // check if number of atoms are integer multiples of one another (elements only; compounds verified with stoich) //DX20200421
@@ -3487,7 +3487,7 @@ vector<StructurePrototype> XtalFinderCalculator::groupStructurePrototypes(
             ignore_environment_angles,
             duplicates_removed)){ //DX20190829 - added duplicates_removed //DX20200320 - added environment angles
 
-        if(same_species==false){
+        if(!same_species){
           for(uint e=0;e<structure_containers[i].elements.size();e++){
             bool already_in=false;
             for(uint f=0;f<comparison_schemes[j].elements.size();f++){
@@ -3496,7 +3496,7 @@ vector<StructurePrototype> XtalFinderCalculator::groupStructurePrototypes(
                 break;
               }
             }
-            if(already_in==false){
+            if(!already_in){
               comparison_schemes[j].elements.push_back(structure_containers[i].elements[e]);
             }
           }
@@ -3506,7 +3506,7 @@ vector<StructurePrototype> XtalFinderCalculator::groupStructurePrototypes(
         break;
       }
     }
-    if(scheme_created==false){
+    if(!scheme_created){
       StructurePrototype str_proto_tmp;
       setStructureAsRepresentative(str_proto_tmp,i);
       comparison_schemes.push_back(str_proto_tmp);
@@ -3693,7 +3693,7 @@ void XtalFinderCalculator::representativePrototypeForICSDRunsNEW(
   // representative structure (normally the oldest).
 
   for(uint i=0;i<comparison_schemes.size();i++){
-    if(comparison_schemes[i].structures_duplicate.size()){
+    if(comparison_schemes[i].structures_duplicate.size()>0){
       vector<string> ICSD_entries;
       ICSD_entries.push_back(compare::findICSDName(comparison_schemes[i].structure_representative->name));
       for(uint j=0;j<comparison_schemes[i].structures_duplicate.size();j++){
@@ -4278,7 +4278,7 @@ void XtalFinderCalculator::appendStructurePrototypes(
           addStructure2sameFamilyList(comparison_schemes[i],j); //DX20190814 - consolidated below into single function
         }
         // Take first mismatch and make as the representative structure in the new object
-        if(first_mismatch==true){
+        if(first_mismatch){
           StructurePrototype str_proto_tmp;
           str_proto_tmp.copyPrototypeInformation(comparison_schemes[i]);
           setStructureAsRepresentative(str_proto_tmp, comparison_schemes[i].structures_duplicate[j]);
@@ -4287,7 +4287,7 @@ void XtalFinderCalculator::appendStructurePrototypes(
           first_mismatch=false;
         }
         // If not the first mismatch, add as a proto structure in the new object
-        else if(first_mismatch==false){
+        else if(!first_mismatch){
           tmp_list.back().copyDuplicate(comparison_schemes[i],j);
           if(clean_unmatched){ comparison_schemes[i].removeNonDuplicate(j); j--; } //DX20190504 - put in if-statement
         }
@@ -4342,22 +4342,22 @@ void XtalFinderCalculator::combinePrototypesOfDifferentSymmetry(
   // This is an optional function; we may not want to do this when
   // comparing prototypes or comparing material properties
 
-  int nprototypes=(int)final_prototypes.size();
+  uint nprototypes=final_prototypes.size();
 
-  for(int i=0;i<nprototypes;i++){
+  for(uint i=0;i<nprototypes;i++){
     int min_index=-1;
     double min_misfit=AUROSTD_MAX_DOUBLE;
     structure_mapping_info min_misfit_info = compare::initialize_misfit_struct(); //DX20191218
     for(uint j=i;j<final_prototypes.size();j++){
       if(
           // If same_species==true
-          (same_species==true &&
-           compare::matchableSpecies(final_prototypes[i].structure_representative->structure,final_prototypes[j].structure_representative->structure,same_species)==true &&
+          (same_species &&
+           compare::matchableSpecies(final_prototypes[i].structure_representative->structure,final_prototypes[j].structure_representative->structure,same_species) &&
            final_prototypes[i].stoichiometry==final_prototypes[j].stoichiometry &&
            final_prototypes[i].Pearson==final_prototypes[j].Pearson &&
            !compare::matchableSpaceGroups(final_prototypes[i].space_group,final_prototypes[j].space_group)) ||
           // If same_species==false
-          (same_species==false &&
+          (!same_species &&
            final_prototypes[i].stoichiometry==final_prototypes[j].stoichiometry &&
            final_prototypes[i].Pearson==final_prototypes[j].Pearson &&
            !compare::matchableSpaceGroups(final_prototypes[i].space_group,final_prototypes[j].space_group))
@@ -4404,7 +4404,7 @@ void XtalFinderCalculator::combinePrototypesOfDifferentSymmetry(
       // Delete the prototype with the lower space group
       final_prototypes.erase(final_prototypes.begin()+other_ind);
       // If the index deleted was less than the initial loop (i), then need to reduce iterator
-      if(other_ind<=i){
+      if(other_ind<=(int)i){
         i--;
       }
     }
@@ -4464,8 +4464,8 @@ string XtalFinderCalculator::printResults(
 
       // ---------------------------------------------------------------------------
       // print compound or stoichometry of prototype
-      if(same_species==true){ ss_out << final_prototypes[j].structure_representative->compound; }
-      else if(same_species==false){ ss_out << aurostd::joinWDelimiter(final_prototypes[j].stoichiometry,":"); }
+      if(same_species){ ss_out << final_prototypes[j].structure_representative->compound; }
+      else { ss_out << aurostd::joinWDelimiter(final_prototypes[j].stoichiometry,":"); }
 
       // ---------------------------------------------------------------------------
       // print space group and Wyckoff positions of prototype
@@ -4478,7 +4478,7 @@ string XtalFinderCalculator::printResults(
         uint number_of_duplicates = numberOfDuplicates(final_prototypes[j]); //DX20190506 - made function
         ss_out << "  compounds_duplicate=" << number_of_duplicates << endl; //DX20190228 - add count
       }
-      else if(!same_species){
+      else {
         uint number_of_duplicates = numberOfDuplicates(final_prototypes[j]); //DX20190506 - made function
         ss_out << "  structures_duplicate=" << number_of_duplicates;
         uint number_duplicate_compounds = 0;
@@ -4708,7 +4708,7 @@ namespace compare{
       }
       // ---------------------------------------------------------------------------
       // same species: check if atoms and reduced stoichiometries are the same
-      if(same_species==true){
+      if(same_species){
         bool commensurate=false;
         for(uint i=0; i<stoich1.size(); i++){
           for(uint j=0; j<stoich2.size(); j++){
@@ -6153,7 +6153,7 @@ void XtalFinderCalculator::latticeSearch(
 
   // ---------------------------------------------------------------------------
   // scale volumes of structures
-  if(scale_volume==true){compare::atomicNumberDensity(xstr1, xstr2, match_info.rescale_factor);}
+  if(scale_volume){compare::atomicNumberDensity(xstr1, xstr2, match_info.rescale_factor);}
 
   // ensure cleared
   //xstr_match.misfit_info = compare::initialize_misfit_struct();

@@ -2228,7 +2228,7 @@ void XtalFinderCalculator::compareStructures(
       str_matched.structure.DecorateWithFakeElements();
     }
   }
-  if(compare::matchableSpecies(str_rep.structure,str_matched.structure,same_species)==true){
+  if(compare::matchableSpecies(str_rep.structure,str_matched.structure,same_species)){
     if(LDEBUG) {cerr << function_name << " Searching for new representation of test structure ..."<<endl;}
     latticeSearch(str_rep,str_matched,match_info,same_species,optimize_match,scale_volume,num_proc); //DX20190530 //DX20200422 - scale_volume added
   }
