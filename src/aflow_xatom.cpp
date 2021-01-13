@@ -16698,9 +16698,8 @@ void xstructure::ChangeBasis(const xmatrix<double>& transformation_matrix) {
   // use _AUROSTD_XSCALAR_TOLERANCE_IDENTITY_ to be consistent with AUROSTD's
   // isinteger tolerance
   if(basis_transformation_det_change < -_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_){
-    if(LDEBUG){
-      cerr << function_name << " removing duplicate atoms (cell has been reduced)." << endl;
-    }
+    if(LDEBUG){ cerr << function_name << " removing duplicate atoms (cell has been reduced)." << endl; }
+
     bool skew = false;
     double tol=0.01;
     deque<_atom> new_basis = foldAtomsInCell(atom_basis, lattice_orig, (*this).lattice, skew, tol, false); //false: don't check atom mappings (slow)
@@ -16713,10 +16712,7 @@ void xstructure::ChangeBasis(const xmatrix<double>& transformation_matrix) {
   // ---------------------------------------------------------------------------
   // enlarge the cell: update the atom count information
   else if(basis_transformation_det_change > _AUROSTD_XSCALAR_TOLERANCE_INTEGER_){
-    if(LDEBUG){
-      cerr << function_name << " cell size has increased." << endl;
-    }
-      
+    if(LDEBUG){ cerr << function_name << " cell size has increased." << endl; }
     // check atom count
     uint natoms_transformed = atom_basis.size();
     if(natoms_transformed%natoms_orig!=0){ is_integer_multiple_transformation = false; }
@@ -16735,9 +16731,7 @@ void xstructure::ChangeBasis(const xmatrix<double>& transformation_matrix) {
   // ---------------------------------------------------------------------------
   // if the number of atoms changed, update the atom counts/order/types/etc.
   if(!aurostd::isequal(basis_transformation_det_change, _AUROSTD_XSCALAR_TOLERANCE_INTEGER_)){
-    if(LDEBUG){
-      cerr << function_name << " updating atom count information." << endl;
-    }
+    if(LDEBUG){ cerr << function_name << " updating atom count information." << endl; }
     // update atom counts/order/types/etc.
     std::stable_sort(atom_basis.begin(),atom_basis.end(),sortAtomsNames);
     (*this).atoms = atom_basis;
@@ -16749,9 +16743,7 @@ void xstructure::ChangeBasis(const xmatrix<double>& transformation_matrix) {
   // ---------------------------------------------------------------------------
   // if the transformation preserves the volume, one-to-one mappings
   else{
-    if(LDEBUG){
-      cerr << function_name << " cell size remains the same (updating atom positions)." << endl;
-    }
+    if(LDEBUG){ cerr << function_name << " cell size remains the same (updating atom positions)." << endl; }
     (*this).atoms = atom_basis;
   }
 
