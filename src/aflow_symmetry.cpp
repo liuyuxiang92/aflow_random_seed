@@ -2203,7 +2203,8 @@ namespace SYM {
   bool AtomsEquivalent_20160101(xstructure& str, _atom& atom1, _atom& atom2, double& eps) {
     // if(modulus(atom1.fpos-atom2.fpos)<ep s&& atom1.type==atom2.type) return TRUE;
     string function_name = XPID + "SYM::AtomsEquivalent():";
-    if(!str.pgroup_calculated || !str.fgroup_calculated || !str.sgroup_calculated) {
+    //DX20210111 [OBSOLETE - sgroup is not needed] if(!str.pgroup_calculated || !str.fgroup_calculated || !str.sgroup_calculated) {
+    if(!str.pgroup_calculated || !str.fgroup_calculated) { //DX20210111 - remove sgroup
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Symmetry must have been calculated",_RUNTIME_ERROR_);
     }
     _atom tatom;
@@ -2221,7 +2222,8 @@ namespace SYM {
 
   bool AtomsEquivalent(xstructure& str, _atom& a, _atom& b, bool skew, double tol){ //CO20190520 - removed pointers for bools and doubles, added const where possible
     string function_name = XPID + "SYM::AtomsEquivalent():";
-    if(!str.pgroup_calculated || !str.fgroup_calculated || !str.sgroup_calculated) {
+    //DX20210111 [OBSOLETE - sgroup is not needed] if(!str.pgroup_calculated || !str.fgroup_calculated || !str.sgroup_calculated) {
+    if(!str.pgroup_calculated || !str.fgroup_calculated) { //DX20210111 - removed sgroup
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Symmetry must have been calculated",_RUNTIME_ERROR_);
     }
     _atom tatom;
@@ -2242,7 +2244,8 @@ namespace SYM {
 namespace SYM {
   bool AtomsEquivalent_Basis(xstructure& str, int atom1_indx,int atom2_indx){
     string function_name = XPID + "SYM::AtomsEquivalent_Basis():";
-    if(!str.pgroup_calculated || !str.fgroup_calculated || !str.sgroup_calculated) {
+    //DX20210111 [OBSOLETE - sgroup is not needed] if(!str.pgroup_calculated || !str.fgroup_calculated || !str.sgroup_calculated) {
+    if(!str.pgroup_calculated || !str.fgroup_calculated) { //DX20210111 - remove sgroup
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Symmetry must have been calculated",_RUNTIME_ERROR_);
     }
     for(uint fg=0;fg<str.fgroup.size();fg++) {
@@ -6779,7 +6782,7 @@ namespace SYM {
     a.LatticeReduction_avoid=TRUE; // so it does not mess up the min angles SC20100115
     if(a.pgroup_calculated==FALSE) Krun=Krun && SYM::CalculatePointGroup(FileMESSAGE,a,aflags,_write_,osswrite,oss,format);  // NEED POINT GROUP
     if(a.fgroup_calculated==FALSE) Krun=Krun && SYM::CalculateFactorGroup(FileMESSAGE,a,aflags,_write_,osswrite,oss,format); // NEED FACTOR GROUP
-    if(a.sgroup_calculated==FALSE) Krun=Krun && SYM::CalculateSpaceGroup(FileMESSAGE,a,aflags,FALSE,osswrite,oss,format);    // NEED SPACE GROUP
+    //DX20210112 [OBSOLETE - sgroup not used in this function] if(a.sgroup_calculated==FALSE) Krun=Krun && SYM::CalculateSpaceGroup(FileMESSAGE,a,aflags,FALSE,osswrite,oss,format);    // NEED SPACE GROUP
     //DX NO MORE a.sgroup_calculated=true; //DX NEED TO DO THIS BETTER
 
     // ------------------------------------------------------------------------------
