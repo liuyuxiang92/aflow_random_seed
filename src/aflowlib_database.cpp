@@ -1058,7 +1058,7 @@ namespace aflowlib {
 
     vector<DBStats> db_stats(ncatalogs + 1);
     DBStats& total_stats = db_stats[0];  // Declare to make code more legible
-    total_stats = initDBStats("\"total\"", columns, loops);;
+    total_stats = initDBStats("\"total\"", columns, loops);
 
     for (uint c = 0; c < ncatalogs; c++) {
       DBStats& catalog_stats = db_stats[c+1];  // Declare to make code more legible
@@ -1075,10 +1075,8 @@ namespace aflowlib {
       for (uint i = 0; i < total_stats.columns.size(); i++) {
         total_stats.count[i][0] += catalog_stats.count[i][0];
         total_stats.count[i][1] += catalog_stats.count[i][1];
-        //std::cout << total_stats.columns[i] << " " << total_stats.types[i] << std::endl;
         if ((catalog_stats.types[i] != "bool") && (catalog_stats.count[i][0] + catalog_stats.count[i][1] > 0)) {
           if (total_stats.types[i] == "number") {
-            //std::cout << total_stats.max[i] << " | " << total_stats.min[i] << std::endl;
             if (total_stats.max[i].empty()) total_stats.max[i] = catalog_stats.max[i];
             else if (aurostd::string2utype<double>(catalog_stats.max[i]) > aurostd::string2utype<double>(total_stats.max[i])) total_stats.max[i] = catalog_stats.max[i];
 
@@ -1090,7 +1088,7 @@ namespace aflowlib {
           uint nset = total_stats.set[i].size();
           for (uint s = 0; s < catalog_stats.set[i].size(); s++) {
             if ((nset <= _DEFAULT_SET_LIMIT_) && !aurostd::WithinList(total_stats.set[i], catalog_stats.set[i][s])) {
-              total_stats.set[s].push_back(catalog_stats.set[i][s]);
+              total_stats.set[i].push_back(catalog_stats.set[i][s]);
               nset++;
             }
           }
