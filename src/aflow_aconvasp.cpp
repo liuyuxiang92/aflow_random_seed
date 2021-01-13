@@ -702,12 +702,7 @@ namespace pflow {
 namespace pflow {
   xstructure SetNumEachType(const xstructure& a, const deque<int>& in_num_each_type) {
     xstructure b(a);
-    b.num_each_type.clear();
-    b.comp_each_type.clear();
-    for(uint i=0;i<in_num_each_type.size();i++) {
-      b.num_each_type.push_back(in_num_each_type.at(i));
-      b.comp_each_type.push_back(in_num_each_type.at(i));
-    }
+    b.SetNumEachType(in_num_each_type); //DX20210113 - created xstructure method
     return b;
   }
 }

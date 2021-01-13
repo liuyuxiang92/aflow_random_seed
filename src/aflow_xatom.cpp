@@ -11386,23 +11386,31 @@ xmatrix<double> LatticeReduction(const xmatrix<double>& lattice) {
 //DX20190214 [OBSOLETE]   double tol = _SYM_TOL_;
 //DX20190214 [OBSOLETE]   return foldAtomsInCell(atoms, c2f_new, f2c_new, skew, tol);
 //DX20190214 [OBSOLETE]}
-xstructure foldAtomsInCellXstructure(const xstructure& a,const xmatrix<double>& lattice_new, bool skew, double tol, bool check_min_dists) { //DX20210104
-      
-  xstructure b=a; //copy
-  
-  b.atoms = foldAtomsInCell(a, lattice_new, skew, tol, check_min_dists); // fold atoms in
+
+// foldAtomsInCellXstructureInPlace()
+// modify xstructure in-place
+void xstructure::foldAtomsInCellXstructureInPlace(const xmatrix<double>& lattice_new, bool skew, double tol, bool check_min_dists) { //DX20210104
+
+  deque<_atom> atoms = foldAtomsInCell((*this), lattice_new, skew, tol, check_min_dists); // fold atoms in
 
   // update xstructure info
-  b.lattice=lattice_new;
-  std::stable_sort(b.atoms.begin(),b.atoms.end(),sortAtomsNames);
-  b.BringInCell();
-  b.FixLattices();
-  b.SpeciesPutAlphabetic();
-  deque<int> sizes = SYM::arrange_atoms(b.atoms);
-  b = pflow::SetNumEachType(b, sizes);
-  b.species = b.species;
-  b.MakeBasis();
+  (*this).lattice=lattice_new;
+  std::stable_sort((*this).atoms.begin(),(*this).atoms.end(),sortAtomsNames);
+  (*this).BringInCell();
+  (*this).FixLattices();
+  (*this).SpeciesPutAlphabetic();
+  deque<int> sizes = SYM::arrange_atoms((*this).atoms);
+  (*this) = pflow::SetNumEachType((*this), sizes);
+  (*this).species = (*this).species;
+  (*this).MakeBasis();
+}
 
+// foldAtomsInCellXstructure()
+// xstructure copy
+xstructure foldAtomsInCellXstructure(const xstructure& a,const xmatrix<double>& lattice_new, bool skew, double tol, bool check_min_dists) { //DX20210104
+
+  xstructure b=a; //copy
+  b.foldAtomsInCellXstructureInPlace(lattice_new, skew, tol, check_min_dists); // fold atoms in
   return b;
 }
 
@@ -13432,6 +13440,18 @@ void xstructure::SetAutoVolume(bool use_AFLOW_defaults_in) {  //CO20191010
   }
   SetVolume(volume);
   if(LDEBUG) {cerr << soliloquy << " volume_new=" << GetVolume() << endl;}
+}
+
+// ***************************************************************************
+// Function SetNumEachType //DX20210113 (from pflow, added in-place variant)
+// ***************************************************************************
+void xstructure::SetNumEachType(const deque<int>& in_num_each_type) {
+  (*this).num_each_type.clear();
+  (*this).comp_each_type.clear();
+  for(uint i=0;i<in_num_each_type.size();i++) {
+    (*this).num_each_type.push_back(in_num_each_type[i]);
+    (*this).comp_each_type.push_back(in_num_each_type[i]);
+  }
 }
 
 // ***************************************************************************

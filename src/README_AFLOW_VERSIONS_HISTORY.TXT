@@ -52,6 +52,7 @@
         -- created function to identify the internal translations when converting to a larger unit cell: GetBasisTransformationInternalTranslations() (DX)
         -- added PolarDecomposition() function to separate the rotation and deformation components of a transformation (DX)
         -- added functions to transform structures based on transformation matrix, rotation, and origin shift: TransformStructure() (DX)
+        -- added foldAtomsInCell() and SetNumEachType() in-place-modification overloads (DX)
 3.2.6 - 2020/12/30
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.6.tar.xz
         -- Bibtex for publications - aflowlib.h aflowlib_web_outreach.cpp (SC)

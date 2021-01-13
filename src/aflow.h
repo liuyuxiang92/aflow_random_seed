@@ -1544,8 +1544,14 @@ class xstructure {
     void ShiftFPos(const xvector<double>& shift);                 // Shift origin by fractional vector //DX20201215 - added modify-in-place variant
     void SetVolume(const double &in_volume);                      // Change volume
     void SetAutoVolume(bool use_AFLOW_defaults_in=false);         // Change volume to sum of atoms  //CO20191010
+    void SetNumEachType(const deque<int>& in_num_each_type);      // Set number of each types (in-place modification) //DX20210113
     void InflateLattice(const double &coefficient);               // Inflate lattice
     void InflateVolume(const double &coefficient);                // Inflate volume
+    void foldAtomsInCellXstructureInPlace(                        // fold atoms into new cell representation //DX20210113
+        const xmatrix<double>& lattice_new,
+        bool skew,
+        double tol,
+        bool check_min_dists=true);
     string platon2print(bool,bool,double,double,double,double);   // Create Platon input file >=51108
     void DecorateWithElements(void);                              // Decorate with elements (alphabetic order) - useful for platon
     void DecorateWithFakeElements(void);                          // Decorate with fake elements - useful for prototypes //DX20200727
