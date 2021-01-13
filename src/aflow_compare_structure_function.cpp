@@ -23,6 +23,9 @@
 #warning "The multithread parts of AFLOW-XtalFinder will be not included, since they need gcc 4.4 and higher (C++0x support)."
 #endif
 
+//// for multi-threads
+//static int task_counter = 0;
+
 // ***************************************************************************
 // XtalFinderCalculator::getOptions() //DX20201201
 // ***************************************************************************
@@ -812,7 +815,7 @@ void XtalFinderCalculator::addStructure2container(
 
   // ---------------------------------------------------------------------------
   // check if fake names for same species comparison
-  if(!pflow::realElements(str_rep_tmp.structure) && same_species){
+  if(same_species && !pflow::realElements(str_rep_tmp.structure)){
     message << "Atomic species are not real/physical " << str_rep_tmp.name << " cannot perform material comparison; skipping strucutre.";
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
     return; // not storing structure
@@ -2569,6 +2572,33 @@ void XtalFinderCalculator::convertStructures(
   pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
 
   uint number_of_structures = structure_containers.size();
+
+  /*
+  // ---------------------------------------------------------------------------
+  // primitivize (do this first)
+  bool calculate_primitive = comparison_options.flag("COMPARISON_OPTIONS::PRIMITIVIZE");
+  vector<bool> is_primitive_vec;
+  if(calculate_primitive){
+    is_primitive_vec.resize(number_of_structures,false);
+    for(uint i=0;i<number_of_structures;i++){ is_primitive_vec[i] = structure_containers[i].structure.primitive_calculated; }
+  }
+  // ---------------------------------------------------------------------------
+  // Minkowski (second)
+  bool calculate_Minkowski = comparison_options.flag("COMPARISON_OPTIONS::MINKOWSKI");
+  vector<bool> is_Minkowski_vec;
+  if(calculate_Minkowski){
+    is_Minkowski_vec.resize(number_of_structures,false);
+    for(uint i=0;i<number_of_structures;i++){ is_Minkowski_vec[i] = structure_containers[i].structure.Minkowski_calculated; }
+  }
+  // ---------------------------------------------------------------------------
+  // Niggli (last)
+  bool calculate_Niggli = comparison_options.flag("COMPARISON_OPTIONS::NIGGLI");
+  vector<bool> is_Niggli_vec;
+  if(calculate_Niggli){
+    is_Niggli_vec.resize(number_of_structures,false);
+    for(uint i=0;i<number_of_structures;i++){ is_Niggli_vec[i] = structure_containers[i].structure.Niggli_calculated; }
+  }
+  */
 
 #ifdef AFLOW_COMPARE_MULTITHREADS_ENABLE
   // THREADED VERSION - START
