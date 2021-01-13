@@ -1957,6 +1957,18 @@ namespace init {
     uint nschema=0;
 
     // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:AEL_APPLIED_PRESSURE","ael_applied_pressure");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AEL_APPLIED_PRESSURE","GPa");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AEL_APPLIED_PRESSURE","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:AEL_AVERAGE_EXTERNAL_PRESSURE","ael_average_external_pressure");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AEL_AVERAGE_EXTERNAL_PRESSURE","GPa");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AEL_AVERAGE_EXTERNAL_PRESSURE","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
     XHOST.vschema.push_attached("SCHEMA::NAME:AEL_BULK_MODULUS_REUSS","ael_bulk_modulus_reuss");
     XHOST.vschema.push_attached("SCHEMA::UNIT:AEL_BULK_MODULUS_REUSS","GPa");
     XHOST.vschema.push_attached("SCHEMA::TYPE:AEL_BULK_MODULUS_REUSS","number");
@@ -1981,6 +1993,12 @@ namespace init {
     nschema++;
 
     // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:AEL_DEBYE_TEMPERATURE","ael_debye_temperature");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AEL_DEBYE_TEMPERATURE","K");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AEL_DEBYE_TEMPERATURE","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
     XHOST.vschema.push_attached("SCHEMA::NAME:AEL_ELASTIC_ANISOTROPY","ael_elastic_anisotropy");
     XHOST.vschema.push_attached("SCHEMA::UNIT:AEL_ELASTIC_ANISOTROPY","");
     XHOST.vschema.push_attached("SCHEMA::TYPE:AEL_ELASTIC_ANISOTROPY","number");
@@ -1990,6 +2008,12 @@ namespace init {
     XHOST.vschema.push_attached("SCHEMA::NAME:AEL_POISSON_RATIO","ael_poisson_ratio");
     XHOST.vschema.push_attached("SCHEMA::UNIT:AEL_POISSON_RATIO","");
     XHOST.vschema.push_attached("SCHEMA::TYPE:AEL_POISSON_RATIO","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:AEL_PUGHS_MODULUS_RATIO","ael_pughs_modulus_ratio");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AEL_PUGHS_MODULUS_RATIO","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AEL_PUGHS_MODULUS_RATIO","number");
     nschema++;
 
     // schema is CAPITAL, content is not necessarily
@@ -2011,9 +2035,33 @@ namespace init {
     nschema++;
 
     // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:AEL_SPEED_SOUND_AVERAGE","ael_speed_sound_average");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AEL_SPEED_SOUND_AVERAGE","m/s");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AEL_SPEED_SOUND_AVERAGE","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:AEL_SPEED_SOUND_LONGITUDINAL","ael_speed_sound_longitudinal");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AEL_SPEED_SOUND_LONGITUDINAL","m/s");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AEL_SPEED_SOUND_LONGITUDINAL","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:AEL_SPEED_SOUND_TRANSVERSE","ael_speed_sound_transverse");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AEL_SPEED_SOUND_TRANSVERSE","m/s");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AEL_SPEED_SOUND_TRANSVERSE","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
     XHOST.vschema.push_attached("SCHEMA::NAME:AEL_STIFFNESS_TENSOR","ael_stiffness_tensor");
     XHOST.vschema.push_attached("SCHEMA::UNIT:AEL_STIFFNESS_TENSOR","");
     XHOST.vschema.push_attached("SCHEMA::TYPE:AEL_STIFFNESS_TENSOR","numbers");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:AEL_YOUNGS_MODULUS_VRH","ael_youngs_modulus_vrh");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AEL_YOUNGS_MODULUS_VRH","GPa");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AEL_YOUNGS_MODULUS_VRH","number");
     nschema++;
 
     // schema is CAPITAL, content is not necessarily
@@ -2077,6 +2125,12 @@ namespace init {
     nschema++;
 
     // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:AGL_POISSON_RATIO_SOURCE","agl_poisson_ratio_source");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AGL_POISSON_RATIO_SOURCE","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AGL_POISSON_RATIO_SOURCE","string");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
     XHOST.vschema.push_attached("SCHEMA::NAME:AGL_THERMAL_CONDUCTIVITY_300K","agl_thermal_conductivity_300K");
     XHOST.vschema.push_attached("SCHEMA::UNIT:AGL_THERMAL_CONDUCTIVITY_300K","W/(m K)");
     XHOST.vschema.push_attached("SCHEMA::TYPE:AGL_THERMAL_CONDUCTIVITY_300K","number");
@@ -2086,6 +2140,30 @@ namespace init {
     XHOST.vschema.push_attached("SCHEMA::NAME:AGL_THERMAL_EXPANSION_300K","agl_thermal_expansion_300K");
     XHOST.vschema.push_attached("SCHEMA::UNIT:AGL_THERMAL_EXPANSION_300K","K^-1");
     XHOST.vschema.push_attached("SCHEMA::TYPE:AGL_THERMAL_EXPANSION_300K","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:AGL_VIBRATIONAL_ENTROPY_300K_ATOM","agl_vibrational_entropy_300K_atom");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AGL_VIBRATIONAL_ENTROPY_300K_ATOM","meV/(K atom)");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AGL_VIBRATIONAL_ENTROPY_300K_ATOM","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:AGL_VIBRATIONAL_ENTROPY_300K_CELL","agl_vibrational_entropy_300K_cell");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AGL_VIBRATIONAL_ENTROPY_300K_CELL","meV/(K cell)");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AGL_VIBRATIONAL_ENTROPY_300K_CELL","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:AGL_VIBRATIONAL_FREE_ENERGY_300K_ATOM","agl_vibrational_free_energy_300K_atom");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AGL_VIBRATIONAL_FREE_ENERGY_300K_ATOM","meV/atom");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AGL_VIBRATIONAL_FREE_ENERGY_300K_ATOM","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:AGL_VIBRATIONAL_FREE_ENERGY_300K_CELL","agl_vibrational_free_energy_300K_cell");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AGL_VIBRATIONAL_FREE_ENERGY_300K_CELL","meV/cell");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AGL_VIBRATIONAL_FREE_ENERGY_300K_CELL","number");
     nschema++;
 
     // schema is CAPITAL, content is not necessarily //DX20200902
