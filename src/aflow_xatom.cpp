@@ -16566,16 +16566,25 @@ vector<xvector<double> > GetBasisTransformationInternalTranslations(const xmatri
     xvector<int> dims=LatticeDimensionSphere(lattice_shrink,1.0);
     if(LDEBUG){ cerr << function_name << " number of times to apply each internal translation: " << dims[1] << "," << dims[2] << "," << dims[3] << endl; }
 
+    // ---------------------------------------------------------------------------
+    // create all linear combinations of translations, filter out duplicates later
+    xvector<double> a_vec=lattice_shrink(1);
+    xvector<double> b_vec=lattice_shrink(2);
+    xvector<double> c_vec=lattice_shrink(3);
+    xvector<double> a_vec_scaled, b_vec_scaled, c_vec_scaled;
     for(int a=0;a<dims[1];a++){
-      translations.push_back((double)a*lattice_shrink(1));
+      a_vec_scaled = (double)a*a_vec;
+      translations.push_back(a_vec_scaled);
       for(int b=0;b<dims[2];b++){
-        translations.push_back((double)b*lattice_shrink(2));
-        translations.push_back((double)a*lattice_shrink(1)+(double)b*lattice_shrink(2));
+        b_vec_scaled = (double)b*b_vec;
+        translations.push_back(b_vec_scaled);
+        translations.push_back(a_vec_scaled+b_vec_scaled);
         for(int c=0;c<dims[3];c++){
-          translations.push_back((double)c*lattice_shrink(3));
-          translations.push_back((double)a*lattice_shrink(1)+(double)c*lattice_shrink(3));
-          translations.push_back((double)b*lattice_shrink(2)+(double)c*lattice_shrink(3));
-          translations.push_back((double)a*lattice_shrink(1)+(double)b*lattice_shrink(2)+(double)c*lattice_shrink(3));
+          c_vec_scaled = (double)c*c_vec;
+          translations.push_back(c_vec_scaled);
+          translations.push_back(a_vec_scaled+c_vec_scaled);
+          translations.push_back(b_vec_scaled+c_vec_scaled);
+          translations.push_back(a_vec_scaled+b_vec_scaled+c_vec_scaled);
         }
       }
     }
@@ -16594,11 +16603,8 @@ vector<xvector<double> > GetBasisTransformationInternalTranslations(const xmatri
     for(uint t=0;t<translations.size();t++){
       xvector<double> translation_incell = BringInCell(translations[t]);
       unique = true;
-      for(uint u=0;u<unique_translations.size();u++){
-        if(aurostd::isequal(translation_incell,unique_translations[u])){
-          unique = false;
-          break;
-        }
+      for(uint u=0;u<unique_translations.size() && unique ;u++){
+        unique = !(aurostd::isequal(translation_incell,unique_translations[u]));
       }
       if(unique){ unique_translations.push_back(translation_incell); }
     }
