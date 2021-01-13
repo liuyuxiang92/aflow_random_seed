@@ -532,7 +532,6 @@ string StructurePrototype::printPropertiesOfStructure(
         aurostd::string2tokens(str_pointer->properties[i],tokens,",");
         json.addVector(str_pointer->properties_names[i], tokens); 
       } 
-      else if(str_pointer->properties_types[i] == "string"){ json.addString(str_pointer->properties_names[i], str_pointer->properties[i]); } 
       else { json.addString(str_pointer->properties_names[i], str_pointer->properties[i]); }  // when all else fails: treat as string
     }
   }
