@@ -85,6 +85,8 @@ void XtalFinderCalculator::getOptions(
   // keeps results of each comparison
   if(vpflow.flag("COMPARE::KEEP_UNMATCHED")) {
     comparison_options.flag("COMPARISON_OPTIONS::CLEAN_UNMATCHED",FALSE);
+    message << "OPTIONS: Keep unmatched structure comparisons (reveals mappings despite being above the misfit_match threshold).";
+    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
   }
 
   // ---------------------------------------------------------------------------
