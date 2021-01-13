@@ -802,8 +802,8 @@ void XtalFinderCalculator::addStructure2container(
     str_rep_tmp.structure.SetSpecies(str_rep_tmp.structure.species);
   }
   // check if fake names for same species comparison
-  if(str_rep_tmp.structure.species[0]=="A" && same_species){
-    message << "Atomic species are missing for " << str_rep_tmp.name << " cannot perform material comparison; skipping strucutre.";
+  if(!pflow::realElements(str_rep_tmp.structure) && same_species){
+    message << "Atomic species are not real/physical " << str_rep_tmp.name << " cannot perform material comparison; skipping strucutre.";
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
     return; // not storing structure
   }
@@ -2081,7 +2081,7 @@ void XtalFinderCalculator::generateAtomPermutedStructures(
   // swap lowest position index first (left-most)
   vector<string> species_permuted = getSpeciesPermutedStrings(structure.stoichiometry);
 
-  vector<string> names = pflow::fakeElements(structure.stoichiometry.size()); //DX20200728 - now in pflow
+  vector<string> names = pflow::getFakeElements(structure.stoichiometry.size()); //DX20200728 - now in pflow
   vector<uint> indices = structure.stoichiometry;
   uint num_elements = structure.stoichiometry.size();
 
@@ -2152,7 +2152,7 @@ vector<string> XtalFinderCalculator::getSpeciesPermutedStrings(
 
   vector<string> species, species_permuted;
 
-  vector<string> names = pflow::fakeElements(stoichiometry.size()); //DX20200728 - now in pflow
+  vector<string> names = pflow::getFakeElements(stoichiometry.size()); //DX20200728 - now in pflow
   vector<uint> indices = stoichiometry;
   uint num_elements = stoichiometry.size();
 
@@ -2296,7 +2296,7 @@ void XtalFinderCalculator::addAFLOWPrototypes2container(
         structure_tmp.stoichiometry = structure_containers[0].stoichiometry;
         structure_tmp.space_group = structure_containers[0].space_group; // same as representative structure (either will be the same, or we are forcing it to be for the ignore_symmetry/ignore_Wyckoff run)
         structure_tmp.grouped_Wyckoff_positions = structure_containers[0].grouped_Wyckoff_positions;
-        structure_tmp.elements = pflow::fakeElements(structure_containers[0].stoichiometry.size()); //DX20200728 - now in pflow
+        structure_tmp.elements = pflow::getFakeElements(structure_containers[0].stoichiometry.size()); //DX20200728 - now in pflow
         structure_tmp.compound = pflow::prettyPrintCompound(structure_tmp.elements,structure_tmp.stoichiometry,no_vrt,true,txt_ft); //remove ones is true
         structure_tmp.is_structure_generated = false; // will be generated on-the-fly (faster)
         structure_tmp.source = "aflow_prototypes";
@@ -2312,7 +2312,7 @@ void XtalFinderCalculator::addAFLOWPrototypes2container(
       structure_tmp.stoichiometry = structure_containers[0].stoichiometry;
       structure_tmp.space_group = structure_containers[0].space_group; // same as representative structure (either will be the same, or we are forcing it to be for the ignore_symmetry/ignore_Wyckoff run)
       structure_tmp.grouped_Wyckoff_positions = structure_containers[0].grouped_Wyckoff_positions;
-      structure_tmp.elements = pflow::fakeElements(structure_containers[0].stoichiometry.size()); //DX20200728 - now in pflow
+      structure_tmp.elements = pflow::getFakeElements(structure_containers[0].stoichiometry.size()); //DX20200728 - now in pflow
       structure_tmp.compound = pflow::prettyPrintCompound(structure_tmp.elements,structure_tmp.stoichiometry,no_vrt,true,txt_ft); //remove ones is true
       structure_tmp.is_structure_generated = false; // will be generated on-the-fly
       structure_tmp.source = "aflow_prototypes";
@@ -6234,7 +6234,7 @@ void XtalFinderCalculator::latticeSearch(
       compare::cellDiagonal(xstr1,D1,F1,1); // cell diagonals
       // convert to clattice representation
       xstr1.lattice=GetClat(xstr1.a,xstr1.b,xstr1.c,xstr1.alpha,xstr1.beta,xstr1.gamma);
-      xmatrix<double> f2c = xstr1.scale*trasp(xstr.lattice); //DX+ME20210113 - calculate outside, fast
+      xmatrix<double> f2c = xstr1.scale*trasp(xstr1.lattice); //DX+ME20210113 - calculate outside, fast
 
       for(uint iat=0; iat<xstr1.atoms.size(); iat++){
         xstr1.atoms[iat].cpos=f2c*xstr1.atoms[iat].fpos;
@@ -7109,7 +7109,7 @@ namespace compare{
     if(!aurostd::identical(metric_tensor_original,metric_tensor_candidate) ||
         aurostd::det(basis_transformation_tmp) < 0.0 ||
         !aurostd::isidentity(basis_transformation_tmp*trasp(basis_transformation_tmp)) ||
-        aurostd::isequal(theta,PI,1e-2){
+        aurostd::isequal(theta,PI,1e-2)){
 
       // ---------------------------------------------------------------------------
       // if the volume change is not an integer, the basis transformation may include a deformation
@@ -7279,6 +7279,8 @@ void XtalFinderCalculator::writeComparisonOutputFile(const string& output,
     switch(comparison_mode){
       case(compare_input_xf):
         file_prefix = DEFAULT_XTALFINDER_FILE_STRUCTURE;
+        break;
+      case(duplicate_compounds_xf):
         break;
       case(compare2database_xf):
         file_prefix = DEFAULT_XTALFINDER_FILE_STRUCTURE_COMPARE2DATABASE;

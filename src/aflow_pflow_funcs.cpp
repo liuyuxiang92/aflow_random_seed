@@ -7354,15 +7354,15 @@ namespace pflow {
 }
 
 // ***************************************************************************
-// pflow::FakeElements()
+// pflow::getFakeElements()
 // ***************************************************************************
 namespace pflow{
-  vector<string> fakeElements(uint nspecies){
+  vector<string> getFakeElements(uint nspecies){
 
     // Return vector of fake elements
     // Useful for determining "elements" for prototypes
 
-    string function_name = XPID + "pflow::fakeElements():";
+    string function_name = XPID + "pflow::getFakeElements():";
 
     if(nspecies>26){
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"There are more than 26 species, this function must be modified to include more fake elements.",_RUNTIME_ERROR_);
@@ -7379,6 +7379,40 @@ namespace pflow{
 }
 
 // ***************************************************************************
+// pflow::realElements()
+// ***************************************************************************
+namespace pflow{
+  bool realElements(const xstructure& xstr){
+
+    // Determine if elements in the xstructure are real/physical.
+    // Uses xelement
+
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string function_name = XPID + "pflow::realElements():";
+    stringstream message;
+
+    if(xstr.species.size() > 0){
+      xelement::xelement element;
+      uint nspecies = xstr.species.size();
+      for(uint i=0;i<nspecies;i++){
+        try{
+          element = xelement::xelement(KBIN::VASP_PseudoPotential_CleanName(xstr.species[i]));
+        }
+        catch(aurostd::xerror& re){
+          if(LDEBUG){ cerr << function_name << xstr.species[i] << " is not a real element." << endl; }
+          return false;
+        }
+      }
+    }
+    else{
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"The species are empty.",_INPUT_NUMBER_);
+    }
+
+    return true;
+  }
+}
+
+// ***************************************************************************
 // pflow::getSymmetryTolerance() //DX20200820
 // ***************************************************************************
 namespace pflow{
@@ -7388,7 +7422,7 @@ namespace pflow{
     // options:
     //  1) tight = min_nn_dist/100
     //  2) loose = min_nn_dist/10
-    //  1) number = user defined (Angstroms)
+    //  3) number = user defined (Angstroms)
 
     string function_name = XPID + "pflow::getSymmetryTolerance():";
     stringstream message;

@@ -15086,7 +15086,7 @@ void xstructure::DecorateWithFakeElements(){
   string function_name = XPID + "xstructure::DecorateWithFakeElements():";
 
   // get fake elements
-  vector<string> fake_elements = pflow::fakeElements(num_each_type.size());
+  vector<string> fake_elements = pflow::getFakeElements(num_each_type.size());
 
   // update species atom names;
   SetSpecies(aurostd::vector2deque(fake_elements));
