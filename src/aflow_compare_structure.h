@@ -345,6 +345,7 @@ class XtalFinderCalculator : public xStream {
     void computeLFAEnvironments(uint start_index=0, uint end_index=AUROSTD_MAX_UINT);
     // ---------------------------------------------------------------------------
     // analyze neighbors 
+    bool areNearestNeighborsCalculated(structure_container& structure);
     void getNearestNeighbors(uint num_proc);
     void calculateNearestNeighbors(uint start_index=0, uint end_index=AUROSTD_MAX_UINT);
 

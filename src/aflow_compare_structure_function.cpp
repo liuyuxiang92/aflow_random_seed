@@ -701,6 +701,18 @@ bool XtalFinderCalculator::isLFAEnvironmentCalculated(
 }
 
 // ***************************************************************************
+// XtalFinderCalculator::areNearestNeighborsCalculated()
+// ***************************************************************************
+bool XtalFinderCalculator::areNearestNeighborsCalculated(
+    structure_container& structure){
+
+  // Check if the nearest neighbor distances have been calculated for
+  // particular structure in container
+
+  return (structure.nearest_neighbor_distances.size()>0);
+}
+
+// ***************************************************************************
 // StructurePrototype::calculateSymmetry()
 // ***************************************************************************
 bool StructurePrototype::calculateSymmetry(){
@@ -1914,13 +1926,13 @@ vector<StructurePrototype> XtalFinderCalculator::compareAtomDecorations(
 
   // ---------------------------------------------------------------------------
   // calculate symmetry (if not already calculated)
-  if(structure.structure_representative->space_group==0){
+  if(!isSymmetryCalculated(structure.structure_representative)){
     calculateSymmetry(*structure.structure_representative);
   }
 
   // ---------------------------------------------------------------------------
   // get nearest neighbor distances
-  if(structure.structure_representative->nearest_neighbor_distances.size()==0){
+  if(!areNearestNeighborDistancesCalculated(structure.structure_representative)){
     structure.structure_representative->nearest_neighbor_distances = NearestNeighbours(structure.structure_representative->structure);
   }
 
