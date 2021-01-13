@@ -659,6 +659,8 @@ uint StructurePrototype::numberOfComparisons(){
 bool StructurePrototype::isSymmetryCalculated(){
 
   // Check if the space group symmetry is calculated for prototype
+  // If the space group is calculated, then the Wyckoff positions are also
+  // calculated (by construction)
 
   return (space_group>0 && space_group<231);
 }
@@ -670,6 +672,8 @@ bool XtalFinderCalculator::isSymmetryCalculated(structure_container& structure){
 
   // Check if the space group symmetry is calculated for particular
   // structure in container
+  // If the space group is calculated, then the Wyckoff positions are also
+  // calculated (by construction)
 
   return (structure.space_group>0 && structure.space_group<231);
 }
@@ -977,7 +981,7 @@ void StructurePrototype::copyDuplicate(const StructurePrototype& b,
 // ***************************************************************************
 void StructurePrototype::removeNonDuplicate(uint index){
 
-  // If structure (b.duplicate[index]) does not match with the
+  // If structure (structures_duplicate[index]) does not match with the
   // original representative structure (i.e., misfit>misfit_match),
   // remove from scheme
 
