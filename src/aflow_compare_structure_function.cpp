@@ -2659,9 +2659,9 @@ void XtalFinderCalculator::convertStructures(
   for(uint n=0; n<num_proc; n++){
     threads.push_back(new std::thread(&XtalFinderCalculator::performStructureConversions,
           this,
-          calculate_primitive_vec,
-          calculate_Minkowski_vec,
-          calculate_Niggli_vec));
+          std::ref(calculate_primitive_vec),
+          std::ref(calculate_Minkowski_vec),
+          std::ref(calculate_Niggli_vec)));
   }
   // Join threads
   for(uint t=0;t<num_proc;t++){
