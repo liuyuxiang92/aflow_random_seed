@@ -25,7 +25,7 @@ static std::mutex _mutex_;
 #warning "The multithread parts of AFLOW-XtalFinder will be not included, since they need gcc 4.4 and higher (C++0x support)."
 #endif
 
-// for multi-threads
+// for multi-threads on-the-fly scheme (explanation in AAPL/aflow_aapl_tcond.cpp, developed by M. Esters (ME))
 static int task_counter = 0;
 
 // ***************************************************************************
@@ -2564,6 +2564,8 @@ void XtalFinderCalculator::performStructureConversions(
 
   // Perform primitivizations, Minkowski reductions, or Niggli reductions
   // on the structures indicated by the corresponding vector of booleans
+  // NOTE: This on-the-fly threaded scheme follows the procedure
+  // discussed in AAPL/aflow_aapl_tcond.cpp, developed by M. Esters (ME).
 
   int i = AUROSTD_MAX_INT;
   int nstructures = calculate_primitive_vec.size();
