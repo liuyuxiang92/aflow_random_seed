@@ -324,6 +324,10 @@ class XtalFinderCalculator : public xStream {
     
     // ---------------------------------------------------------------------------
     // transform structures
+    void performStructureConversions(
+        const vector<bool> calculate_primitive_vec,
+        const vector<bool> calculate_Minkowski_vec,
+        const vector<bool> calculate_Niggli_vec); //DX20210113
     void convertStructures(const aurostd::xoption& comparison_options, uint num_proc); //DX20201005
     void getPrimitiveStructures(uint start_index=0, uint end_index=AUROSTD_MAX_UINT); //DX20201005
     void getMinkowskiStructures(uint start_index=0, uint end_index=AUROSTD_MAX_UINT); //DX20201005

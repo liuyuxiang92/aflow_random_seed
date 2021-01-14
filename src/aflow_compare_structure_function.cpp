@@ -19,12 +19,14 @@
 #if GCC_VERSION >= 40400   // added two zeros
 #define AFLOW_COMPARE_MULTITHREADS_ENABLE 1
 #include <thread>
+#include <mutex>
+static std::mutex _mutex_;
 #else
 #warning "The multithread parts of AFLOW-XtalFinder will be not included, since they need gcc 4.4 and higher (C++0x support)."
 #endif
 
-//// for multi-threads
-//static int task_counter = 0;
+// for multi-threads
+static int task_counter = 0;
 
 // ***************************************************************************
 // XtalFinderCalculator::getOptions() //DX20201201
@@ -2553,6 +2555,48 @@ bool XtalFinderCalculator::splitComparisonIntoThreads(
 }
 
 // ***************************************************************************
+// XtalFinderCalculator::performStructureConversions() //DX20210113
+// ***************************************************************************
+void XtalFinderCalculator::performStructureConversions(
+    const vector<bool> calculate_primitive_vec,
+    const vector<bool> calculate_Minkowski_vec,
+    const vector<bool> calculate_Niggli_vec){
+
+  // Perform primitivizations, Minkowski reductions, or Niggli reductions
+  // on the structures indicated by the corresponding vector of booleans
+
+  int i = AUROSTD_MAX_INT;
+  int nstructures = calculate_primitive_vec.size();
+
+  if(task_counter < nstructures){
+#ifdef AFLOW_COMPARE_MULTITHREADS_ENABLE
+    std::unique_lock<std::mutex> lock(_mutex_);
+#endif
+    i = task_counter++;
+  }
+  else {
+    return;
+  }
+
+  while (task_counter < nstructures){
+    // ---------------------------------------------------------------------------
+    // primitivize
+    if(calculate_primitive_vec[i]){ structure_containers[i].structure.GetPrimitive(); }
+    // ---------------------------------------------------------------------------
+    // Minkowski
+    if(calculate_Minkowski_vec[i]){ structure_containers[i].structure.MinkowskiBasisReduction(); }
+    // ---------------------------------------------------------------------------
+    // Niggli
+    if(calculate_Niggli_vec[i]){ structure_containers[i].structure.NiggliUnitCellForm(); }
+
+#ifdef AFLOW_COMPARE_MULTITHREADS_ENABLE
+    std::unique_lock<std::mutex> lock(_mutex_);
+#endif
+    i = task_counter++;
+  }
+}
+
+// ***************************************************************************
 // XtalFinderCalculator::convertStructures()
 // ***************************************************************************
 void XtalFinderCalculator::convertStructures(
@@ -2573,114 +2617,66 @@ void XtalFinderCalculator::convertStructures(
 
   uint number_of_structures = structure_containers.size();
 
-  /*
   // ---------------------------------------------------------------------------
   // primitivize (do this first)
-  bool calculate_primitive = comparison_options.flag("COMPARISON_OPTIONS::PRIMITIVIZE");
-  vector<bool> is_primitive_vec;
-  if(calculate_primitive){
-    is_primitive_vec.resize(number_of_structures,false);
-    for(uint i=0;i<number_of_structures;i++){ is_primitive_vec[i] = structure_containers[i].structure.primitive_calculated; }
+  vector<bool> calculate_primitive_vec;
+  calculate_primitive_vec.resize(number_of_structures,false);
+  if(comparison_options.flag("COMPARISON_OPTIONS::PRIMITIVIZE")){
+    for(uint i=0;i<number_of_structures;i++){
+      calculate_primitive_vec[i] = !structure_containers[i].structure.primitive_calculated;
+    }
   }
+  
   // ---------------------------------------------------------------------------
   // Minkowski (second)
-  bool calculate_Minkowski = comparison_options.flag("COMPARISON_OPTIONS::MINKOWSKI");
-  vector<bool> is_Minkowski_vec;
-  if(calculate_Minkowski){
-    is_Minkowski_vec.resize(number_of_structures,false);
-    for(uint i=0;i<number_of_structures;i++){ is_Minkowski_vec[i] = structure_containers[i].structure.Minkowski_calculated; }
+  vector<bool> calculate_Minkowski_vec;
+  calculate_Minkowski_vec.resize(number_of_structures,false);
+  if(comparison_options.flag("COMPARISON_OPTIONS::MINKOWSKI")){
+    for(uint i=0;i<number_of_structures;i++){
+      calculate_Minkowski_vec[i] = !structure_containers[i].structure.Minkowski_calculated;
+    }
   }
+  
   // ---------------------------------------------------------------------------
   // Niggli (last)
-  bool calculate_Niggli = comparison_options.flag("COMPARISON_OPTIONS::NIGGLI");
-  vector<bool> is_Niggli_vec;
-  if(calculate_Niggli){
-    is_Niggli_vec.resize(number_of_structures,false);
-    for(uint i=0;i<number_of_structures;i++){ is_Niggli_vec[i] = structure_containers[i].structure.Niggli_calculated; }
+  vector<bool> calculate_Niggli_vec;
+  calculate_Niggli_vec.resize(number_of_structures,false);
+  if(comparison_options.flag("COMPARISON_OPTIONS::NIGGLI")){
+    for(uint i=0;i<number_of_structures;i++){
+      calculate_Niggli_vec[i] = !structure_containers[i].structure.Niggli_calculated;
+    }
   }
-  */
+  task_counter = 0;
 
 #ifdef AFLOW_COMPARE_MULTITHREADS_ENABLE
   // THREADED VERSION - START
   if(LDEBUG) {cerr << function_name << " Number of threads=" << num_proc << endl;}
-
-  // Distribute threads via indices
-  vector<vector<int> > thread_distribution = getThreadDistribution(number_of_structures, num_proc);
-
-  // ---------------------------------------------------------------------------
-  // primitivize (do this first)
-  bool all_structures_primitivized = true;
-  for(uint i=0;i<number_of_structures && all_structures_primitivized; i++){ all_structures_primitivized = structure_containers[i].structure.primitive_calculated; }
-  if(comparison_options.flag("COMPARISON_OPTIONS::PRIMITIVIZE") && !all_structures_primitivized){
-    // Run threads
-    vector<std::thread*> threads;
-    for(uint n=0; n<num_proc; n++){
-      threads.push_back(new std::thread(&XtalFinderCalculator::getPrimitiveStructures,this,thread_distribution[n][0],thread_distribution[n][1]));
-    }
-    // Join threads
-    for(uint t=0;t<num_proc;t++){
-      threads[t]->join();
-      delete threads[t];
-    }
+    
+  // Run threads
+  vector<std::thread*> threads;
+  for(uint n=0; n<num_proc; n++){
+    threads.push_back(new std::thread(&XtalFinderCalculator::performStructureConversions,
+          this,
+          calculate_primitive_vec,
+          calculate_Minkowski_vec,
+          calculate_Niggli_vec));
   }
-
-  // ---------------------------------------------------------------------------
-  // Minkowski (second)
-  bool all_structures_Minkowski_reduced = true;
-  for(uint i=0;i<number_of_structures;i++){ all_structures_Minkowski_reduced = (all_structures_Minkowski_reduced&&structure_containers[i].structure.Minkowski_calculated); }
-  if(comparison_options.flag("COMPARISON_OPTIONS::MINKOWSKI") && !all_structures_Minkowski_reduced){
-    // Run threads
-    vector<std::thread*> threads;
-    for(uint n=0; n<num_proc; n++){
-      threads.push_back(new std::thread(&XtalFinderCalculator::getMinkowskiStructures,this,thread_distribution[n][0],thread_distribution[n][1]));
-    }
-    // Join threads
-    for(uint t=0;t<num_proc;t++){
-      threads[t]->join();
-      delete threads[t];
-    }
-  }
-
-  // ---------------------------------------------------------------------------
-  // Niggli (last)
-  bool all_structures_Niggli_reduced = true;
-  for(uint i=0;i<number_of_structures;i++){ all_structures_Niggli_reduced = (all_structures_Niggli_reduced&&structure_containers[i].structure.Niggli_calculated); }
-  if(comparison_options.flag("COMPARISON_OPTIONS::NIGGLI") && !all_structures_Niggli_reduced){
-    // Run threads
-    vector<std::thread*> threads;
-    for(uint n=0; n<num_proc; n++){
-      threads.push_back(new std::thread(&XtalFinderCalculator::getNiggliStructures,this,thread_distribution[n][0],thread_distribution[n][1]));
-    }
-    // Join threads
-    for(uint t=0;t<num_proc;t++){
-      threads[t]->join();
-      delete threads[t];
-    }
+  // Join threads
+  for(uint t=0;t<num_proc;t++){
+    threads[t]->join();
+    delete threads[t];
   }
 
   // THREADED VERSION - END
-
 #else
   // NONTHREADS - START
 
   // ---------------------------------------------------------------------------
-  // primitivize (do this first)
-  for(uint i=0; i<number_of_structures; i++){
-    structure_containers[i].structure.GetPrimitive();
-  }
-
-  // ---------------------------------------------------------------------------
-  // Minkowski (second)
-  for(uint i=0; i<number_of_structures; i++){
-    structure_containers[i].structure.MinkowskiBasisReduction();
-  }
-
-  // ---------------------------------------------------------------------------
-  // Niggli (last)
-  for(uint i=0; i<number_of_structures; i++){
-    structure_containers[i].structure.NiggliUnitCellForm();
-  }
-  // NONTHREADS - END
+  // perform the relevant structure conversions
+  performStructureConversions(
+      calculate_primitive_vec,
+      calculate_Minkowski_vec,
+      calculate_Niggli_vec);
 
 #endif
   message << "All structures converted.";
@@ -2694,6 +2690,7 @@ void XtalFinderCalculator::getPrimitiveStructures(uint start_index, uint end_ind
 
   // If end index is greater than structure_containers.size(), then compute
   // Primitive cell for all structures
+  // Used for pre-distributed threads
   if(end_index > structure_containers.size()){ end_index=structure_containers.size(); }
 
   for(uint i=start_index;i<end_index;i++){
@@ -2708,6 +2705,7 @@ void XtalFinderCalculator::getMinkowskiStructures(uint start_index, uint end_ind
 
   // If end index is greater than structure_containers.size(), then compute
   // Minkowski cell for all structures
+  // Used for pre-distributed threads
   if(end_index > structure_containers.size()){ end_index=structure_containers.size(); }
 
   for(uint i=start_index;i<end_index;i++){
@@ -2722,6 +2720,7 @@ void XtalFinderCalculator::getNiggliStructures(uint start_index, uint end_index)
 
   // If end index is greater than structure_containers.size(), then compute
   // Niggli cell for all structures
+  // Used for pre-distributed threads
   if(end_index > structure_containers.size()){ end_index=structure_containers.size(); }
 
   for(uint i=start_index;i<end_index;i++){
