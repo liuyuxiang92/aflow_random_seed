@@ -8,6 +8,15 @@
 //
 // This class calculates the thermal conductivity of a material using the
 // Boltzmann Transport Equation (BTE).
+//
+// Notes on the threaded scheme: usually, getThreadDistribution() is used to
+// distribute the bins over the threads before executing the function inside
+// the threads. This works well for homogeneous load distributions but is very
+// inefficient for inhomogeneous systems such as AAPL. The threading scheme
+// used here redistributes on-the-fly: it keeps track of the next available
+// task using a static counter (task_counter). When one thread finished its
+// task, it grabs the next available one and increases the counter. To avoid
+// race conditions, the assignment is protected by a unique lock/mutex.
 
 #include "aflow_apl.h"
 
@@ -18,9 +27,14 @@
 #define AFLOW_APL_MULTITHREADS_ENABLE
 #include <thread>
 #include <mutex>
+static std::mutex m;
 #else
 #warning "The multithread parts of APL will not be included, since they need gcc 4.4 and higher (C++0x support)."
 #endif
+
+// Counters for threaded functions
+static unsigned long long int progress_bar_counter = 0;
+static int task_counter = 0;
 
 #define _DEBUG_AAPL_TCOND_ false
 
@@ -31,7 +45,6 @@ static const string _AAPL_TCOND_MODULE_ = "AAPL";
 static const int max_iter = 250;  // Maximum number of iterations for the iterative BTE solution
 static const aurostd::xcomplex<double> iONE(0.0, 1.0);  // imaginary number
 static const double TCOND_ITER_THRESHOLD = 1e-4;  // Convergence criterion for thermal conductivity
-static unsigned long long int progress_bar_counter = 0;
 
 using aurostd::xcomplex;
 using aurostd::xmatrix;
@@ -431,8 +444,8 @@ namespace apl {
     pflow::logger(_AFLOW_FILE_NAME_, _AAPL_TCOND_MODULE_, message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
 #ifdef AFLOW_APL_MULTITHREADS_ENABLE
     int ncpus = _pc->getNCPUs();
+    if (ncpus > nIQPs) ncpus = nIQPs;
     vector<std::thread*> threads;
-    vector<vector<int> > thread_dist;
 #endif
     _qm->generateTetrahedra();
     // The conjugate is necessary because the three-phonon scattering processes
@@ -451,20 +464,20 @@ namespace apl {
     phase_space.clear();
     phase_space.resize(nIQPs, vector<vector<vector<double> > >(nBranches, vector<vector<double> >(4, vector<double>(2, 0.0))));
     progress_bar_counter = 0;
+    task_counter = 0;
     pflow::updateProgressBar(progress_bar_counter, nIQPs, *_pc->getOSS());
 #ifdef AFLOW_APL_MULTITHREADS_ENABLE
-    thread_dist = getThreadDistribution(nIQPs, ncpus);
     threads.clear();
     for (int icpu = 0; icpu < ncpus; icpu++) {
       threads.push_back(new std::thread(&TCONDCalculator::calculateTransitionProbabilitiesPhonon, this,
-            thread_dist[icpu][0], thread_dist[icpu][1], std::ref(phase_space), std::ref(phases)));
+            std::ref(phase_space), std::ref(phases)));
     }
     for (uint t = 0; t < threads.size(); t++) {
       threads[t]->join();
       delete threads[t];
     }
 #else
-    calculateTransitionProbabilitiesPhonon(0, nIQPs, phase_space, phases);
+    calculateTransitionProbabilitiesPhonon(phase_space, phases);
 #endif
 
     if (calc_isotope) {
@@ -489,19 +502,18 @@ namespace apl {
         scattering_rates_isotope.clear();
         scattering_rates_isotope.resize(nIQPs, vector<double>(nBranches));
 
+        task_counter = 0;
 #ifdef AFLOW_APL_MULTITHREADS_ENABLE
-        thread_dist = getThreadDistribution(nIQPs, ncpus);
         threads.clear();
         for (int icpu = 0; icpu < ncpus; icpu++) {
-          threads.push_back(new std::thread(&TCONDCalculator::calculateTransitionProbabilitiesIsotope, this,
-                thread_dist[icpu][0], thread_dist[icpu][1]));
+          threads.push_back(new std::thread(&TCONDCalculator::calculateTransitionProbabilitiesIsotope, this));
         }
         for (uint t = 0; t < threads.size(); t++) {
           threads[t]->join();
           delete threads[t];
         }
 #else
-        calculateTransitionProbabilitiesIsotope(0, nIQPs);
+        calculateTransitionProbabilitiesIsotope();
 #endif
       }
     }
@@ -552,9 +564,20 @@ namespace apl {
   // phase space for three-phonon scattering processes. It uses the inversion
   // symmetry of the q-point grid and the transposition symmetry of the
   // scattering matrix elements to reduce the computational cost.
-  void TCONDCalculator::calculateTransitionProbabilitiesPhonon(int startIndex, int endIndex,
+  void TCONDCalculator::calculateTransitionProbabilitiesPhonon(
       vector<vector<vector<vector<double> > > >& phase_space,
       const vector<vector<vector<xcomplex<double> > > >& phases) {
+    // Set up index for threaded execution
+    int i = AUROSTD_MAX_INT;
+    if (task_counter < nIQPs) {
+#ifdef AFLOW_DB_MULTITHREADS_ENABLE
+      std::unique_lock<std::mutex> lk(m);  // For thread-safe assignment
+#endif
+      i = task_counter++;
+    } else {  // All bins are already distributed, so return
+      return;
+    }
+
     // Prepare and precompute
     const Supercell& scell = _pc->getSupercell();
     const vector<vector<int> >& clusters = _pc->getClusters(3);
@@ -609,7 +632,7 @@ namespace apl {
     bool calc = true;
 
     // Start calculation
-    for (int i = startIndex; i < endIndex; i++) {
+    while (i < nIQPs) {
       qpts[0] = _qm->getIbzqpts()[i];
       // Get the q-point q" that fulfills q - q' - q" = G. Due to the inversion
       // symmetry of the q-point grid, q + q' - q" = G does not need to be
@@ -751,9 +774,10 @@ namespace apl {
         }
       }
 #ifdef AFLOW_DB_MULTITHREADS_ENABLE
-      std::unique_lock<std::mutex> lk(m);  // For thread-safe progress bar writing
+      std::unique_lock<std::mutex> lk(m);  // For thread-safe progress bar writing and assignment
 #endif
-      progress_bar_counter += 1;;
+      i = task_counter++;
+      progress_bar_counter++;
       pflow::updateProgressBar(progress_bar_counter, nIQPs, *_pc->getOSS());
     }
   }
@@ -761,7 +785,18 @@ namespace apl {
   //calculateTransitionProbabilitiesIsotope///////////////////////////////////
   // Calculates the intrinsic transition probabilities/scattering rates of
   // the isotope scattering processes.
-  void TCONDCalculator::calculateTransitionProbabilitiesIsotope(int startIndex, int endIndex) {
+  void TCONDCalculator::calculateTransitionProbabilitiesIsotope() {
+    // Set up index for threaded execution
+    int i = AUROSTD_MAX_INT;
+    if (task_counter < nIQPs) {
+#ifdef AFLOW_DB_MULTITHREADS_ENABLE
+      std::unique_lock<std::mutex> lk(m);  // For thread-safe assignment
+#endif
+      i = task_counter++;
+    } else {  // All bins are already distributed, so return
+      return;
+    }
+
     // Prepare
     const xstructure& pcell = _pc->getInputCellStructure();
     uint natoms = pcell.atoms.size();
@@ -775,7 +810,7 @@ namespace apl {
     int q1 = 0, q2 = 0, br1 = 0, br2 = 0, b = 0, e = 0;
     xcomplex<double> eig;
 
-    for (int i = startIndex; i < endIndex; i++) {
+    while (task_counter < nIQPs) {
       q1 = _qm->getIbzqpts()[i];
       for (br1 = 0; br1 < nBranches; br1++) {
         prefactor = freq[q1][br1] * freq[q1][br1] * PI/2.0;
@@ -814,6 +849,10 @@ namespace apl {
           }
         }
       }
+#ifdef AFLOW_DB_MULTITHREADS_ENABLE
+      std::unique_lock<std::mutex> lk(m);  // For thread-safe assignment
+#endif
+      i = task_counter++;
     }
   }
 
@@ -1089,14 +1128,15 @@ namespace apl {
   // significantly faster.
   vector<vector<double> > TCONDCalculator::calculateAnharmonicRates(const vector<vector<double> >& occ) {
     vector<vector<double> > rates(nIQPs, vector<double>(nBranches, 0.0));
+    task_counter = 0;
 #ifdef AFLOW_APL_MULTITHREADS_ENABLE
     int ncpus = _pc->getNCPUs();
+    if (ncpus > nIQPs) ncpus = nIQPs;
     vector<std::thread*> threads;
     vector<vector<int> > thread_dist = getThreadDistribution(nIQPs, ncpus);
     threads.clear();
     for (int icpu = 0; icpu < ncpus; icpu++) {
       threads.push_back(new std::thread(&TCONDCalculator::calcAnharmRates, this,
-            thread_dist[icpu][0], thread_dist[icpu][1],
             std::ref(occ), std::ref(rates)));
     }
     for (int icpu = 0; icpu < ncpus; icpu++) {
@@ -1104,23 +1144,36 @@ namespace apl {
       delete threads[icpu];
     }
 #else
-    calcAnharmRates(0, nIQPs, occ, rates);
+    calcAnharmRates(occ, rates);
 #endif
     return rates;
   }
 
-  void TCONDCalculator::calcAnharmRates(int startIndex, int endIndex,
-      const vector<vector<double> >& occ,
-      vector<vector<double> >& rates) {
+  void TCONDCalculator::calcAnharmRates(const vector<vector<double> >& occ, vector<vector<double> >& rates) {
+    // Set up index for threaded execution
+    int i = AUROSTD_MAX_INT;
+    if (task_counter < nIQPs) {
+#ifdef AFLOW_DB_MULTITHREADS_ENABLE
+      std::unique_lock<std::mutex> lk(m);  // For thread-safe assignment
+#endif
+      i = task_counter++;
+    } else {  // All bins are already distributed, so return
+      return;
+    }
+
     vector<int> qpts(3), branches(3);
     int sign = -1;
 
-    for (int i = startIndex; i < endIndex; i++) {
+    while (i < nIQPs) {
       qpts[0] = _qm->getIbzqpts()[i];
       for (uint p = 0, nprocs = processes[i].size(); p < nprocs; p++) {
         getProcess(processes[i][p], qpts, branches, sign);
         rates[i][branches[0]] += intr_trans_probs[i][p] * getOccupationTerm(occ, sign, qpts, branches);
       }
+#ifdef AFLOW_DB_MULTITHREADS_ENABLE
+      std::unique_lock<std::mutex> lk(m);  // For thread-safe assignment
+#endif
+      i = task_counter++;
     }
   }
 
@@ -1186,12 +1239,11 @@ namespace apl {
 #endif
 
     vector<vector<xvector<double> > > delta(nIQPs, vector<xvector<double> >(nBranches, xvector<double>(3)));
+    task_counter = 0;
 #ifdef AFLOW_APL_MULTITHREADS_ENABLE
-    thread_dist = getThreadDistribution(nIQPs, ncpus);
     threads.clear();
     for (int icpu = 0; icpu < ncpus; icpu++) {
       threads.push_back(new std::thread(&TCONDCalculator::calculateDelta, this,
-            thread_dist[icpu][0], thread_dist[icpu][1], 
             std::ref(occ), std::ref(mfd), std::ref(delta)));
     }
     for (int icpu = 0; icpu < ncpus; icpu++) {
@@ -1199,7 +1251,7 @@ namespace apl {
       delete threads[icpu];
     }
 #else
-    calculateDelta(0, nIQPs, occ, mfd, delta);
+    calculateDelta(occ, mfd, delta);
 #endif
 
     correctMFD(rates, delta, mfd);
@@ -1209,15 +1261,25 @@ namespace apl {
   // Calculates the correction vector (delta) to the mean free displacement.
   // Only irreducible q-points need to be calculated since deltas of
   // equivalent q-points are related by symmetry.
-  void TCONDCalculator::calculateDelta(int startIndex, int endIndex, 
-      const vector<vector<double> >& occ,
+  void TCONDCalculator::calculateDelta(const vector<vector<double> >& occ,
       const vector<vector<xvector<double> > >& mfd,
       vector<vector<xvector<double> > >& delta) {
+    // Set up index for threaded execution
+    int i = AUROSTD_MAX_INT;
+    if (task_counter < nIQPs) {
+#ifdef AFLOW_DB_MULTITHREADS_ENABLE
+      std::unique_lock<std::mutex> lk(m);  // For thread-safe assignment
+#endif
+      i = task_counter++;
+    } else {  // All bins are already distributed, so return
+      return;
+    }
+
     xvector<double> correction(3);
     vector<int> qpts(3), branches(3);
     int sign = -1;
 
-    for (int i = startIndex; i < endIndex; i++) {
+    while (i < nIQPs) {
       qpts[0] = _qm->getIbzqpts()[i];
       for (uint p = 0, nprocs = processes[i].size(); p < nprocs; p++) {
         getProcess(processes[i][p], qpts, branches, sign);
@@ -1252,6 +1314,10 @@ namespace apl {
       for (int br = 0; br < nBranches; br++) {
         delta[i][br] = Uc * delta[i][br];
       }
+#ifdef AFLOW_DB_MULTITHREADS_ENABLE
+      std::unique_lock<std::mutex> lk(m);  // For thread-safe assignment
+#endif
+      i = task_counter++;
     }
   }
 
