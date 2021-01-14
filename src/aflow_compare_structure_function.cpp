@@ -2558,9 +2558,9 @@ bool XtalFinderCalculator::splitComparisonIntoThreads(
 // XtalFinderCalculator::performStructureConversions() //DX20210113
 // ***************************************************************************
 void XtalFinderCalculator::performStructureConversions(
-    const vector<bool> calculate_primitive_vec,
-    const vector<bool> calculate_Minkowski_vec,
-    const vector<bool> calculate_Niggli_vec){
+    const vector<bool>& calculate_primitive_vec,
+    const vector<bool>& calculate_Minkowski_vec,
+    const vector<bool>& calculate_Niggli_vec){
 
   // Perform primitivizations, Minkowski reductions, or Niggli reductions
   // on the structures indicated by the corresponding vector of booleans
