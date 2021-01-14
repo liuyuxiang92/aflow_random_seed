@@ -273,6 +273,43 @@ class XtalFinderCalculator : public xStream {
     double misfit_family;
     uint num_proc;
     vector<structure_container> structure_containers;  // stores structures in a container (pointer for easy manipulation and mobility)
+    
+    // ---------------------------------------------------------------------------
+    // compare methods
+    void compareStructures(structure_container& str_rep,
+        structure_container& str_matched, 
+        structure_mapping_info& match_info, 
+        bool same_species,
+        bool scale_volume,
+        bool optimize_match);
+    vector<StructurePrototype> compareStructuresFromStructureList(const vector<string>& filenames, vector<string>& magmoms_for_systems, uint num_proc, bool same_species, const aurostd::xoption& comparison_options); //DX20200103 - condensed bools to xoptions
+    vector<StructurePrototype> compareStructuresFromDirectory(const string& directory, vector<string>& magmoms_for_systems, uint num_proc, bool same_species, const aurostd::xoption& comparison_options); //DX20200103 - condensed bools to xoptions
+    vector<StructurePrototype> compareStructuresFromFile(const string& filename, vector<string>& magmoms_for_systems, uint num_proc, bool same_species, const aurostd::xoption& comparison_options); //DX20200103 - condensed bools to xoptions
+  
+    // ---------------------------------------------------------------------------
+    // compare multiple structures
+    vector<StructurePrototype> compareMultipleStructures(uint num_proc, bool same_species, const string& directory);
+    vector<StructurePrototype> compareMultipleStructures(uint num_proc, bool same_species, const string& directory, const aurostd::xoption& comparison_options);
+
+    // ---------------------------------------------------------------------------
+    // compare2prototypes
+    string printMatchingPrototypes(xstructure& xstr, const aurostd::xoption& vpflow);
+    vector<StructurePrototype> compare2prototypes(const xstructure& xstrIN, const aurostd::xoption& vpflow); 
+
+    // ---------------------------------------------------------------------------
+    // compare2database
+    vector<StructurePrototype> compare2database(
+        const xstructure& xstrIN, const aurostd::xoption& vpflow);
+
+    // ---------------------------------------------------------------------------
+    // compare permuations
+    vector<string> getUniquePermutations(xstructure& xstr, uint num_proc=1, bool optimize_match=false);
+    vector<string> getUniquePermutations(xstructure& xstr, aurostd::xoption& comparison_options, stringstream& results_ss, uint num_proc=1, bool print_misfit=false);
+    void compareAtomDecorations(StructurePrototype& structure, uint num_proc, bool optimize_match);
+    void compareAtomDecorations(StructurePrototype& structure, uint num_proc, aurostd::xoption& permutation_options);
+    void generateAtomPermutedStructures(structure_container& structure);
+    vector<string> getSpeciesPermutedStrings(const deque<uint>& stoichiometry);
+    vector<string> getSpeciesPermutedStrings(const vector<uint>& stoichiometry);
 
     // ---------------------------------------------------------------------------
     // get command line options
@@ -368,6 +405,14 @@ class XtalFinderCalculator : public xStream {
     // reorder structures
     void representativePrototypeForICSDRunsNEW(vector<StructurePrototype>& comparison_schemes);
     void makeRepresentativeEvenPermutation(vector<StructurePrototype>& comparison_schemes, const vector<string>& name_order);
+    
+    // ---------------------------------------------------------------------------
+    // find duplicate compounds //DX20210114
+    void findDuplicateCompounds(
+        uint num_proc,
+        bool remove_duplicates,
+        const string& directory,
+        const aurostd::xoption& comparison_options);
   
     // ---------------------------------------------------------------------------
     // check for better structure matches 
@@ -416,42 +461,6 @@ class XtalFinderCalculator : public xStream {
       bool same_species, 
       bool scale_volume, bool optimize_match); //DX20190822 - added comparison log bool
 
-    // ---------------------------------------------------------------------------
-    // compare methods
-    void compareStructures(structure_container& str_rep,
-        structure_container& str_matched, 
-        structure_mapping_info& match_info, 
-        bool same_species,
-        bool scale_volume,
-        bool optimize_match);
-    vector<StructurePrototype> compareStructuresFromStructureList(const vector<string>& filenames, vector<string>& magmoms_for_systems, uint num_proc, bool same_species, const aurostd::xoption& comparison_options); //DX20200103 - condensed bools to xoptions
-    vector<StructurePrototype> compareStructuresFromDirectory(const string& directory, vector<string>& magmoms_for_systems, uint num_proc, bool same_species, const aurostd::xoption& comparison_options); //DX20200103 - condensed bools to xoptions
-    vector<StructurePrototype> compareStructuresFromFile(const string& filename, vector<string>& magmoms_for_systems, uint num_proc, bool same_species, const aurostd::xoption& comparison_options); //DX20200103 - condensed bools to xoptions
-  
-  // ---------------------------------------------------------------------------
-  // compare multiple structures
-  vector<StructurePrototype> compareMultipleStructures(uint num_proc, bool same_species, const string& directory);
-  vector<StructurePrototype> compareMultipleStructures(uint num_proc, bool same_species, const string& directory, const aurostd::xoption& comparison_options);
-  
-  // ---------------------------------------------------------------------------
-  // compare2prototypes
-  string printMatchingPrototypes(xstructure& xstr, const aurostd::xoption& vpflow);
-  vector<StructurePrototype> compare2prototypes(const xstructure& xstrIN, const aurostd::xoption& vpflow); 
-  
-  // ---------------------------------------------------------------------------
-  // compare2database
-  vector<StructurePrototype> compare2database(
-      const xstructure& xstrIN, const aurostd::xoption& vpflow);
-
-  // ---------------------------------------------------------------------------
-  // compare permuations
-  vector<string> getUniquePermutations(xstructure& xstr, uint num_proc=1, bool optimize_match=false);
-  vector<string> getUniquePermutations(xstructure& xstr, aurostd::xoption& comparison_options, stringstream& results_ss, uint num_proc=1, bool print_misfit=false);
-  vector<StructurePrototype> compareAtomDecorations(StructurePrototype& structure, uint num_proc, bool optimize_match);
-  vector<StructurePrototype> compareAtomDecorations(StructurePrototype& structure, uint num_proc, aurostd::xoption& permutation_options);
-  void generateAtomPermutedStructures(structure_container& structure);
-  vector<string> getSpeciesPermutedStrings(const deque<uint>& stoichiometry);
-  vector<string> getSpeciesPermutedStrings(const vector<uint>& stoichiometry);
   
   // ---------------------------------------------------------------------------
   // get aflow label

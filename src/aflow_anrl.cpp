@@ -2199,9 +2199,9 @@ namespace anrl {
     str.scale=1.0;
     str.lattice = lattice_primitive;
     str.atoms = atoms_primitive_cell;
+    str.dist_nn_min = SYM::minimumDistance(str); //DX20210114 - calculate dist_nn_min before default tolerance, defaultTolerance will use dist_nn_min
     str.sym_eps = SYM::defaultTolerance(str); // need sym_eps for AddAtom later (otherwise it breaks for systems like A12B6C_cF608_210_4h_2h_e)
     str.sym_eps_calculated = true; //DX20200929
-    str.dist_nn_min = str.sym_eps*100; //DX20200929
 
     // ---------------------------------------------------------------------------
     // add ANRL info to xstructure

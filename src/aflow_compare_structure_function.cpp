@@ -29,6 +29,301 @@ static std::mutex _mutex_;
 static int task_counter = 0;
 
 // ***************************************************************************
+// XtalFinderCalculator::compareStructures() - MAIN COMPARISON FUNCTION
+// ***************************************************************************
+void XtalFinderCalculator::compareStructures(
+    structure_container& str_rep,
+    structure_container& str_matched,
+    structure_mapping_info& match_info,
+    bool same_species,
+    bool scale_volume,
+    bool optimize_match) {
+
+  // This is the main comparison function that analyzes similarity between
+  // two crystal structures
+
+  bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_COMPARE_);
+  string function_name = XPID + "XtalFinderCalculator::compareStructures():";
+
+  // ---------------------------------------------------------------------------
+  // determine minimum interatomic distances of structures (resolution of atoms) //DX20200623
+  // //DX20200715 - may need to rescale this if the structures are being scaled later....
+  if(str_rep.structure.dist_nn_min==AUROSTD_NAN){
+    if(str_rep.nearest_neighbor_distances.size()){ str_rep.structure.dist_nn_min=aurostd::min(str_rep.nearest_neighbor_distances); }
+    else{ str_rep.structure.dist_nn_min=SYM::minimumDistance(str_rep.structure); }
+  }
+  if(str_matched.structure.dist_nn_min==AUROSTD_NAN){
+    if(str_matched.nearest_neighbor_distances.size()){ str_matched.structure.dist_nn_min=aurostd::min(str_matched.nearest_neighbor_distances); }
+    else{ str_matched.structure.dist_nn_min=SYM::minimumDistance(str_matched.structure); }
+  }
+
+  if(compare::matchableSpecies(str_rep.structure,str_matched.structure,same_species)){
+    if(LDEBUG) {cerr << function_name << " Searching for new representation of test structure ..."<<endl;}
+    latticeSearch(str_rep,str_matched,match_info,same_species,optimize_match,scale_volume,num_proc); //DX20190530 //DX20200422 - scale_volume added
+  }
+}
+
+// ***************************************************************************
+// XtalFinderCalculator::compareMultipleStructures() //DX20201201
+// ***************************************************************************
+vector<StructurePrototype> XtalFinderCalculator::compareMultipleStructures(
+    uint num_proc, bool same_species,
+    const string& directory){
+
+  // ---------------------------------------------------------------------------
+  // create xoptions to contain all comparison options
+  aurostd::xoption comparison_options = compare::loadDefaultComparisonOptions();
+  if(!same_species){
+    comparison_options.flag("COMPARISON_OPTIONS::REMOVE_DUPLICATE_COMPOUNDS",TRUE);
+  }
+
+  return compareMultipleStructures(num_proc, same_species, directory, comparison_options);
+
+}
+
+vector<StructurePrototype> XtalFinderCalculator::compareMultipleStructures(
+    uint num_proc,
+    bool same_species,
+    const string& directory,
+    const aurostd::xoption& comparison_options){
+
+  bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_COMPARE_);
+  string function_name = XPID + "XtalFinderCalculator::compareMultipleStructures():";
+  stringstream message;
+  bool quiet = false;
+
+  if(LDEBUG){cerr << function_name << " BEGIN" << endl;}  //CO20200508
+
+  message << "Total number of structures to compare: " << structure_containers.size();
+  pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+
+  if(structure_containers.size() == 0){
+    message << "No structures to compare.";
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_RUNTIME_ERROR_);
+  }
+
+  // ---------------------------------------------------------------------------
+  // convert to structures to certain representations //DX20201006
+  // conversion type(s) is indicated in the comparison_options flag
+  if(comparison_options.flag("COMPARISON_OPTIONS::PRIMITIVIZE") ||
+      comparison_options.flag("COMPARISON_OPTIONS::MINKOWSKI") ||
+      comparison_options.flag("COMPARISON_OPTIONS::NIGGLI")){
+    convertStructures(comparison_options,num_proc);
+  }
+
+  // ---------------------------------------------------------------------------
+  // calculate symmetries of structures
+  // if already calculated, do not recalculate
+  bool all_symmetries_calculated = true;
+  for(uint i=0;i<structure_containers.size();i++){ all_symmetries_calculated = (all_symmetries_calculated&&isSymmetryCalculated(structure_containers[i])); } //DX20200810
+
+  if(!comparison_options.flag("COMPARISON_OPTIONS::IGNORE_SYMMETRY") && !all_symmetries_calculated){
+    calculateSymmetries(num_proc);
+  }
+  else if(!all_symmetries_calculated){
+    setSymmetryPlaceholders();
+  }
+
+  // ---------------------------------------------------------------------------
+  // calculate LFA environments of database entries
+  // if already calculated, do not recalculate
+  bool all_environments_calculated = true;
+  for(uint i=0;i<structure_containers.size();i++){ all_environments_calculated = (all_environments_calculated&&isLFAEnvironmentCalculated(structure_containers[i])); } //DX20200810
+  if(!comparison_options.flag("COMPARISON_OPTIONS::IGNORE_ENVIRONMENT_ANALYSIS") && !all_environments_calculated){
+    calculateLFAEnvironments(num_proc);
+  }
+
+  // ---------------------------------------------------------------------------
+  // get nearest neighbor info, can perhaps only calculate this if necessary
+  // (i.e., if we know we will perform a comparison)
+  // if already calculated, do not recalculate //DX20201201
+  bool all_neighbors_calculated = true;
+  for(uint i=0;i<structure_containers.size();i++){ all_neighbors_calculated = (all_neighbors_calculated&&(structure_containers[i].nearest_neighbor_distances.size()!=0)); } //DX20200925 - gcc-10 warnings
+  if(!all_neighbors_calculated){
+    getNearestNeighbors(num_proc);
+  }
+
+  // ---------------------------------------------------------------------------
+  // remove duplicate compounds first; recursion of this function
+  if(comparison_options.flag("COMPARISON_OPTIONS::REMOVE_DUPLICATE_COMPOUNDS")){
+    findDuplicateCompounds(num_proc, true, directory, comparison_options); //true: remove duplicates
+  }
+
+  // ---------------------------------------------------------------------------
+  // group structures based on stoichiometry and symmetry (unless ignoring symmetry/Wyckoff)
+  vector<StructurePrototype> comparison_schemes = groupStructurePrototypes(
+      same_species,
+      comparison_options.flag("COMPARISON_OPTIONS::IGNORE_SYMMETRY"),
+      comparison_options.flag("COMPARISON_OPTIONS::IGNORE_WYCKOFF"),
+      comparison_options.flag("COMPARISON_OPTIONS::IGNORE_ENVIRONMENT_ANALYSIS"),
+      comparison_options.flag("COMPARISON_OPTIONS::IGNORE_ENVIRONMENT_ANGLES"), //DX20200320 - added environment angles
+      false,
+      quiet); //DX20200103 - condensed booleans to xoptions
+
+  // ---------------------------------------------------------------------------
+  // if ICSD comparison, make structure with minimum ICSD number the representative structure
+  if(comparison_options.flag("COMPARISON_OPTIONS::ICSD_COMPARISON")){
+    representativePrototypeForICSDRunsNEW(comparison_schemes);
+  }
+
+  // ---------------------------------------------------------------------------
+  // compare structures
+  vector<StructurePrototype> final_prototypes = runComparisonScheme(comparison_schemes, same_species, num_proc, comparison_options, quiet); //DX20200103 - condensed booleans to xoptions
+
+  // ---------------------------------------------------------------------------
+  // return if there are no similar structures
+  if(final_prototypes.size()==0){ return final_prototypes; }
+  comparison_schemes.clear();
+
+  // ---------------------------------------------------------------------------
+  // combine prototypes regardless of having different space groups
+  // BETA TESTING (perhaps we shouldn't do this) - compare::checkPrototypes(num_proc,same_species,final_prototypes);
+
+  message << "Number of unique prototypes: " << final_prototypes.size() << " (out of " << structure_containers.size() << " structures).";
+  pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_COMPLETE_);
+
+  // ---------------------------------------------------------------------------
+  // get unique atom decorations prototype (representative) structures
+  if(!same_species && comparison_options.flag("COMPARISON_OPTIONS::CALCULATE_UNIQUE_PERMUTATIONS")){
+
+    message << "Determining the unique atom decorations for each prototype.";
+    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+    // find unique atom decorations of prototype
+    for(uint i=0;i<final_prototypes.size();i++){
+      XtalFinderCalculator xtal_finder_permutations;
+      xtal_finder_permutations.compareAtomDecorations(final_prototypes[i],num_proc,comparison_options.flag("COMPARISON_OPTIONS::OPTIMIZE_MATCH"));
+      
+      /*if(compare::arePermutationsComparableViaComposition(final_prototypes[i].stoichiometry) &&
+          (comparison_options.flag("COMPARISON_OPTIONS::IGNORE_SYMMETRY") ||
+           compare::arePermutationsComparableViaSymmetry(final_prototypes[i].grouped_Wyckoff_positions))){
+        // check if xstructure is generated; if not, make it
+        if(!final_prototypes[i].structure_representative->is_structure_generated){
+          if(!compare::generateStructure(
+                final_prototypes[i].structure_representative->name,
+                final_prototypes[i].structure_representative->source,
+                final_prototypes[i].structure_representative->relaxation_step,
+                final_prototypes[i].structure_representative->structure,*p_oss)){ //DX20200429
+            message << "Could not generate structure (" << final_prototypes[i].structure_representative->name << ").";
+            throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_RUNTIME_ERROR_);
+          }
+        }
+        XtalFinderCalculator xtal_finder_permutations;
+        vector<StructurePrototype> final_permutations = xtal_finder_permutations.compareAtomDecorations(final_prototypes[i],num_proc,comparison_options.flag("COMPARISON_OPTIONS::OPTIMIZE_MATCH"));
+        // store permutation results in main StructurePrototype object
+        for(uint j=0;j<final_permutations.size();j++){
+          vector<string> permutations_tmp;
+          permutations_tmp.push_back(final_permutations[j].structure_representative->name); //push back representative permutation
+          for(uint d=0;d<final_permutations[j].structures_duplicate.size();d++){ permutations_tmp.push_back(final_permutations[j].structures_duplicate[d]->name); } //push back equivalent permutations
+          final_prototypes[i].atom_decorations_equivalent.push_back(permutations_tmp);
+        }
+        final_permutations.clear(); //DX20190624
+      }
+      else{
+        XtalFinderCalculator xtal_finder_permutations;
+        vector<string> unique_permutations = xtal_finder_permutations.getSpeciesPermutedStrings(final_prototypes[i].stoichiometry); //DX20191125
+        // store permutation results in main StructurePrototype object
+        for(uint j=0;j<unique_permutations.size();j++){
+          vector<string> permutations_tmp; permutations_tmp.push_back(unique_permutations[j]);
+          final_prototypes[i].atom_decorations_equivalent.push_back(permutations_tmp);
+        }
+      }
+      */
+    }
+  }
+
+  if(comparison_options.flag("COMPARISON_OPTIONS::ADD_AFLOW_PROTOTYPE_DESIGNATION")){
+    // SEPARATE FUNCTION????
+    message << "Determining the AFLOW standard designation.";
+    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+
+#ifdef AFLOW_COMPARE_MULTITHREADS_ENABLE
+    // ---------------------------------------------------------------------------
+    // split task into threads
+    uint number_of_structures = final_prototypes.size();
+    uint number_of_threads = aurostd::min(num_proc,number_of_structures); // cannot have more threads than structures
+    vector<vector<int> > thread_distribution = getThreadDistribution(number_of_structures, number_of_threads); //DX20191107
+
+    // ---------------------------------------------------------------------------
+    // [THREADED] determine AFLOW standard designation
+    vector<std::thread*> threads;
+    for(uint n=0; n<number_of_threads; n++){
+      threads.push_back(new std::thread(&XtalFinderCalculator::getPrototypeDesignations,this,std::ref(final_prototypes),thread_distribution[n][0], thread_distribution[n][1])); //DX20191107
+    }
+    for(uint t=0;t<threads.size();t++){
+      threads[t]->join();
+      delete threads[t];
+    }
+
+    // ---------------------------------------------------------------------------
+    // update once all are collected (safer)
+    //for(uint i=0;i<final_prototypes.size();i++){
+    //  final_prototypes[i].aflow_label = final_prototypes[i].structure_representative->structure.prototype;
+    //  final_prototypes[i].aflow_parameter_list = final_prototypes[i].structure_representative->structure.prototype_parameter_list;
+    //  final_prototypes[i].aflow_parameter_values = final_prototypes[i].structure_representative->structure.prototype_parameter_values;
+    //}
+#else
+    // ---------------------------------------------------------------------------
+    // [NON-THREADED] determine AFLOW standard designation
+    for(uint i=0;i<final_prototypes.size();i++){
+      anrl::structure2anrl(final_prototypes[i].structure_representative->structure,false); //DX20190829 - false for recalculate_symmetry
+      final_prototypes[i].aflow_label = final_prototypes[i].structure_representative->structure.prototype;
+      final_prototypes[i].aflow_parameter_list = final_prototypes[i].structure_representative->structure.prototype_parameter_list;
+      final_prototypes[i].aflow_parameter_values = final_prototypes[i].structure_representative->structure.prototype_parameter_values;
+    }
+#endif
+  }
+
+  // ---------------------------------------------------------------------------
+  // for testing/development; in case the subsequent analyses fails, checkpoint file
+  bool store_checkpoint=false;
+  if(store_checkpoint){
+    string results_json = printResults(final_prototypes, same_species, json_ft);
+    writeComparisonOutputFile(results_json, directory, json_ft, compare_input_xf, same_species);
+    string results_txt = printResults(final_prototypes, same_species, txt_ft);
+    writeComparisonOutputFile(results_txt, directory, txt_ft, compare_input_xf, same_species);
+  }
+
+  if(comparison_options.flag("COMPARISON_OPTIONS::MATCH_TO_AFLOW_PROTOS")){
+
+    message << "Determining if representative structures map to any of the AFLOW prototypes.";
+    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+
+    aurostd::xoption vpflow_protos;
+    vpflow_protos.flag("COMPARE2PROTOTYPES",TRUE);
+
+    // ---------------------------------------------------------------------------
+    // specify catalog
+    vpflow_protos.flag("COMPARE2PROTOTYPES::CATALOG",TRUE);
+    vpflow_protos.push_attached("COMPARE2PROTOTYPES::CATALOG","all");
+
+    // ---------------------------------------------------------------------------
+    // specify number of processors
+    vpflow_protos.flag("COMPARISON_OPTIONS::NP",TRUE);
+    vpflow_protos.push_attached("COMPARISON_OPTIONS::NP",aurostd::utype2string<uint>(num_proc));
+
+    // ---------------------------------------------------------------------------
+    // do not calculate unique atom decorations since this was already done
+    vpflow_protos.flag("COMPARE::DO_NOT_CALCULATE_UNIQUE_PERMUTATIONS",TRUE);
+
+    // ---------------------------------------------------------------------------
+    // match to AFLOW prototypes
+    for(uint i=0;i<final_prototypes.size();i++){
+      XtalFinderCalculator xtal_finder_protos(misfit_match,misfit_family,*p_FileMESSAGE,num_proc,*p_oss);
+      vector<StructurePrototype> matching_protos = xtal_finder_protos.compare2prototypes(final_prototypes[i].structure_representative->structure, vpflow_protos);
+      if(matching_protos.size()>0){
+        for(uint j=0;j<matching_protos[0].structures_duplicate.size();j++){
+          final_prototypes[i].matching_aflow_prototypes.push_back(matching_protos[0].structures_duplicate[j]->name);
+        }
+      }
+    }
+  }
+
+  return final_prototypes;
+}
+
+
+
+// ***************************************************************************
 // XtalFinderCalculator::getOptions() //DX20201201
 // ***************************************************************************
 void XtalFinderCalculator::getOptions(
@@ -191,6 +486,7 @@ void XtalFinderCalculator::getOptions(
     message << "OPTIONS: Do not calculate unique atom decorations.";
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
   }
+  
 }
 
 // ***************************************************************************
@@ -1899,7 +2195,7 @@ namespace compare{
 // ***************************************************************************
 // XtalFinderCalculator::compareAtomDecorations() //DX20201215
 // ***************************************************************************
-vector<StructurePrototype> XtalFinderCalculator::compareAtomDecorations(
+void XtalFinderCalculator::compareAtomDecorations(
     StructurePrototype& structure,
     uint num_proc,
     bool optimize_match){
@@ -1907,10 +2203,10 @@ vector<StructurePrototype> XtalFinderCalculator::compareAtomDecorations(
   aurostd::xoption permutation_options = compare::loadDefaultComparisonOptions("permutation");
   permutation_options.flag("COMPARISON_OPTIONS::OPTIMIZE_MATCH",optimize_match);
 
-  return compareAtomDecorations(structure,num_proc,permutation_options);
+  compareAtomDecorations(structure,num_proc,permutation_options);
 }
 
-vector<StructurePrototype> XtalFinderCalculator::compareAtomDecorations(
+void XtalFinderCalculator::compareAtomDecorations(
     StructurePrototype& structure,
     uint num_proc,
     aurostd::xoption& permutation_options){
@@ -1934,11 +2230,27 @@ vector<StructurePrototype> XtalFinderCalculator::compareAtomDecorations(
   // ---------------------------------------------------------------------------
   // get stoichiometry
   vector<uint> stoichiometry = structure.structure_representative->structure.GetReducedComposition();
-
+    
   // ---------------------------------------------------------------------------
   // calculate symmetry (if not already calculated)
   if(!isSymmetryCalculated(*structure.structure_representative)){
     calculateSymmetry(*structure.structure_representative);
+  }
+  
+  // ---------------------------------------------------------------------------
+  // check if permutations of the structure are compatible via
+  // stoichiometry and/or symmetry, if not, return early
+  if(!compare::arePermutationsComparableViaComposition(stoichiometry) ||
+      (!permutation_options.flag("COMPARISON_OPTIONS::IGNORE_SYMMETRY") ||
+       !compare::arePermutationsComparableViaSymmetry(structure.grouped_Wyckoff_positions))){
+
+    vector<string> unique_permutations = getSpeciesPermutedStrings(stoichiometry); //DX20191125
+    // store permutation results in main StructurePrototype object
+    for(uint j=0;j<unique_permutations.size();j++){
+      vector<string> permutations_tmp; permutations_tmp.push_back(unique_permutations[j]);
+      structure.atom_decorations_equivalent.push_back(permutations_tmp);
+    }
+    return;
   }
 
   // ---------------------------------------------------------------------------
@@ -2071,8 +2383,17 @@ vector<StructurePrototype> XtalFinderCalculator::compareAtomDecorations(
   }
 
   if(VERBOSE){ for(uint i=0;i<final_permutations.size();i++){ cerr << "Final permutation groupings: " << final_permutations[i] << endl; } }
+       
+  // ---------------------------------------------------------------------------
+  // store results
+  for(uint j=0;j<final_permutations.size();j++){
+    vector<string> permutations_tmp;
+    permutations_tmp.push_back(final_permutations[j].structure_representative->name); //push back representative permutation
+    for(uint d=0;d<final_permutations[j].structures_duplicate.size();d++){ permutations_tmp.push_back(final_permutations[j].structures_duplicate[d]->name); } //push back equivalent permutations
+    structure.atom_decorations_equivalent.push_back(permutations_tmp);
+  }
 
-  return final_permutations;
+  //return final_permutations;
 }
 
 // ***************************************************************************
@@ -3563,6 +3884,85 @@ vector<StructurePrototype> XtalFinderCalculator::groupStructurePrototypes(
 }
 
 // ***************************************************************************
+// XtalFinderCalculator::findDuplicateCompounds()
+// ***************************************************************************
+void XtalFinderCalculator::findDuplicateCompounds(
+    uint num_proc,
+    bool remove_duplicates,
+    const string& directory,
+    const aurostd::xoption& comparison_options){
+  
+  // This function finds the duplicate compounds (material type comparison)
+  // and writes the results to a file and stores the duplicate count information
+  // for the structures.
+  // Includes an option to remove the duplicates to avoid biased statistics
+  
+  //bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_COMPARE_);
+  string function_name = XPID + "XtalFinderCalculator::findDuplicateCompounds():";
+  stringstream message;
+    
+  // ---------------------------------------------------------------------------
+  // prepare options 
+  bool tmp_same_species = true;
+  aurostd::xoption remove_duplicates_options = comparison_options;
+  remove_duplicates_options.flag("COMPARISON_OPTIONS::SCALE_VOLUME",FALSE);
+  remove_duplicates_options.flag("COMPARISON_OPTIONS::REMOVE_DUPLICATE_COMPOUNDS",FALSE);
+  remove_duplicates_options.flag("COMPARISON_OPTIONS::CALCULATE_UNIQUE_PERMUTATIONS",FALSE);
+  remove_duplicates_options.flag("COMPARISON_OPTIONS::MATCH_TO_AFLOW_PROTOS",FALSE);
+  remove_duplicates_options.flag("COMPARISON_OPTIONS::ADD_AFLOW_PROTOTYPE_DESIGNATION",FALSE);
+
+  // ---------------------------------------------------------------------------
+  // run multiple comparison function 
+  message << "Comparing to remove duplicate materials.";
+  pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+  vector<StructurePrototype> unique_compounds = compareMultipleStructures(
+      num_proc,
+      tmp_same_species,
+      directory,
+      remove_duplicates_options);
+
+  message << "Duplicate materials removed.";
+  pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+
+  // ---------------------------------------------------------------------------
+  // include duplicate compounds count in object
+  for(uint i=0;i<unique_compounds.size();i++){
+    unique_compounds[i].structure_representative->number_compounds_matching_structure = unique_compounds[i].numberOfComparisons();
+  }
+
+  // ---------------------------------------------------------------------------
+  // write results to files //DX20201229 - consolidated into functions
+  if(XHOST.vflag_control.flag("PRINT_MODE::JSON")){
+    string results_json = printResults(unique_compounds, tmp_same_species, json_ft);
+    writeComparisonOutputFile(results_json, directory, json_ft, duplicate_compounds_xf, true);
+  }
+  else if(XHOST.vflag_control.flag("PRINT_MODE::TXT")){
+    string results_txt = printResults(unique_compounds, tmp_same_species, txt_ft);
+    writeComparisonOutputFile(results_txt, directory, txt_ft, duplicate_compounds_xf, true);
+  }
+  else{
+    string results_json = printResults(unique_compounds, tmp_same_species, json_ft);
+    writeComparisonOutputFile(results_json, directory, json_ft, duplicate_compounds_xf, true);
+    string results_txt = printResults(unique_compounds, tmp_same_species, txt_ft);
+    writeComparisonOutputFile(results_txt, directory, txt_ft, duplicate_compounds_xf, true);
+  }
+
+  // ---------------------------------------------------------------------------
+  // remove duplicates in structure container
+  if(remove_duplicates){
+    vector<string> duplicates_name;
+    for(uint i=0;i<unique_compounds.size();i++){
+      for(uint j=0;j<unique_compounds[i].structures_duplicate.size();j++){
+        duplicates_name.push_back(unique_compounds[i].structures_duplicate[j]->name);
+      }
+    }
+    for(uint i=0;i<duplicates_name.size();i++){
+      removeStructureFromContainerByName(duplicates_name[i]);
+    }
+  }
+}
+
+// ***************************************************************************
 // XtalFinderCalculator::checkForBetterMatches()
 // ***************************************************************************
 vector<StructurePrototype> XtalFinderCalculator::checkForBetterMatches(
@@ -4004,7 +4404,7 @@ vector<StructurePrototype> XtalFinderCalculator::runComparisonScheme(
       
   // ---------------------------------------------------------------------------
   // if print only matches to the input structure //DX20201230
-  if(comparison_options.flag("COMPARISON_OPTIONS::PRINT_MATCHES_TO_INPUT_ONLY") && comparison_schemes.size()){
+  if(comparison_options.flag("COMPARISON_OPTIONS::PRINT_MATCHES_TO_INPUT_ONLY") && comparison_schemes.size()>0){
     appendStructurePrototypes(comparison_schemes,
         final_prototypes,
         comparison_options.flag("COMPARISON_OPTIONS::CLEAN_UNMATCHED"),
@@ -7255,6 +7655,79 @@ namespace compare{
     return latticeDeviation(D1,D2,F1,F2);
   }
 }
+/*
+// ***************************************************************************
+// XtalFinderCalculator::calculatePrototypeDesignations()
+// ***************************************************************************
+void XtalFinderCalculator::calculatePrototypeDesignations(
+    vector<StructurePrototype>& prototypes,
+    uint num_proc){
+   
+  task_counter = 0;
+  // ---------------------------------------------------------------------------
+    // split task into threads
+    uint number_of_structures = prototypes.size();
+    uint number_of_threads = aurostd::min(num_proc,number_of_structures); // cannot have more threads than structures
+    //PRE-DISTRIBUTED vector<vector<int> > thread_distribution = getThreadDistribution(number_of_structures, number_of_threads); //DX20191107
+    
+  // ---------------------------------------------------------------------------
+  // [THREADED] determine AFLOW standard designation
+    vector<std::thread*> threads;
+    for(uint n=0; n<number_of_threads; n++){
+      threads.push_back(new std::thread(&XtalFinderCalculator::getPrototypeDesignations,this,std::ref(final_prototypes),thread_distribution[n][0], thread_distribution[n][1])); //DX20191107
+      //PRE-DISTRIBUTED threads.push_back(new std::thread(&XtalFinderCalculator::getPrototypeDesignations,this,std::ref(final_prototypes),thread_distribution[n][0], thread_distribution[n][1])); //DX20191107
+    }
+    for(uint t=0;t<threads.size();t++){
+      threads[t]->join();
+      delete threads[t];
+    }
+
+    // ---------------------------------------------------------------------------
+    // update once all are collected (safer)
+    for(uint i=0;i<final_prototypes.size();i++){
+      final_prototypes[i].aflow_label = final_prototypes[i].structure_representative->structure.prototype;
+      final_prototypes[i].aflow_parameter_list = final_prototypes[i].structure_representative->structure.prototype_parameter_list;
+      final_prototypes[i].aflow_parameter_values = final_prototypes[i].structure_representative->structure.prototype_parameter_values;
+    }
+
+
+}
+
+// ***************************************************************************
+// XtalFinderCalculator::getPrototypeDesignations()
+// ***************************************************************************
+void XtalFinderCalculator::getPrototypeDesignations(
+    vector<StructurePrototype>& prototypes){
+
+  // NOTE: This on-the-fly threaded scheme follows the procedure
+  // discussed in AAPL/aflow_aapl_tcond.cpp, developed by M. Esters (ME).
+
+  int i = AUROSTD_MAX_INT;
+  int nstructures = prototypes.size();
+
+  if(task_counter < nstructures){
+#ifdef AFLOW_COMPARE_MULTITHREADS_ENABLE
+    std::unique_lock<std::mutex> lock(_mutex_);
+#endif
+    i = task_counter++;
+  }
+  else {
+    return;
+  }
+
+  while (task_counter < nstructures){
+    anrl::structure2anrl(prototypes[i].structure_representative->structure,false); //DX20190829 - false for do not recalulate symmetry, save time
+    
+    final_prototypes[i].aflow_label = final_prototypes[i].structure_representative->structure.prototype;
+    final_prototypes[i].aflow_parameter_list = final_prototypes[i].structure_representative->structure.prototype_parameter_list;
+    final_prototypes[i].aflow_parameter_values = final_prototypes[i].structure_representative->structure.prototype_parameter_values;
+#ifdef AFLOW_COMPARE_MULTITHREADS_ENABLE
+    std::unique_lock<std::mutex> lock(_mutex_);
+#endif
+    i = task_counter++;
+  }
+}
+*/
 
 // ***************************************************************************
 // XtalFinderCalculator::getPrototypeDesignations()
@@ -7270,6 +7743,9 @@ void XtalFinderCalculator::getPrototypeDesignations(
 
   for(uint i=start_index;i<end_index;i++){ //DX20191107 switching end index convention <= vs <
     anrl::structure2anrl(prototypes[i].structure_representative->structure,false); //DX20190829 - false for do not recalulate symmetry, save time
+    prototypes[i].aflow_label = prototypes[i].structure_representative->structure.prototype;
+    prototypes[i].aflow_parameter_list = prototypes[i].structure_representative->structure.prototype_parameter_list;
+    prototypes[i].aflow_parameter_values = prototypes[i].structure_representative->structure.prototype_parameter_values;
   }
 }
 

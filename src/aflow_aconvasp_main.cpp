@@ -2852,7 +2852,7 @@ namespace pflow {
     //DX20201228 - print python script
     if(XHOST.vflag_control.flag("PRINT_MODE::PYTHON")){
       SYM::writePythonScript(oss);
-      return false;
+      return true;
     }
 
     // AGROUP
@@ -6424,7 +6424,7 @@ namespace pflow {
     //DX20201228 - print Python script
     if(XHOST.vflag_control.flag("PRINT_MODE::PYTHON")){
       SYM::writePythonScript(oss);
-      return false;
+      return true;
     }
 
     xstructure a(input,IOAFLOW_AUTO);
@@ -6462,7 +6462,7 @@ namespace pflow {
     //DX20201228 - print Python script
     if(XHOST.vflag_control.flag("PRINT_MODE::PYTHON")){
       SYM::writePythonScript(oss);
-      return false;
+      return true;
     }
 
     //DX20170804 - need to rescale, so we make a fast copy and calculate

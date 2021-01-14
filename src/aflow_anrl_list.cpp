@@ -759,6 +759,7 @@ namespace anrl {
     vproto.push_back("A2B2C_tI10_139_e_e_a;3;5;139;5;4;tI10;a,c/a,z2,z3;-/-/-;Ca2N2Zn/N2Sr2Zn1/Ba2N2Zn1;Ca2N2Zn (ICSD #69049)/N2Sr2Zn1 (ICSD #80376)/Ba2N2Zn1 (ICSD #80377)"); //DX20201016 - added two metal-nitride prototypes
     vproto.push_back("A3BC2_hP6_191_f_a_d;3;6;191;5;2;hP6;a,c/a;-;Na3TaTi2;Na3TaTi2 (ICSD #186418)");
 
+#if !(USE_HARDCODED_PROTOTYPES) //DX20210114 - these new prototypes are not hard-coded
     // -------------------------------------------------------------------------
     // metal-nitride prototypes (from DX) //DX20201016
     // -------------------------------------------------------------------------
@@ -1486,6 +1487,7 @@ namespace anrl {
     vproto.push_back("A6B8C_cF60_225_d_f_a;3;15;225;5;2;cF60;a,x3;-;Cu6O8Pb1;Cu6O8Pb1 (ICSD #280596)");
     vproto.push_back("A4B3C_cF64_225_f_d_ab;3;16;225;5;2;cF64;a,x4;-;O4Pd3Tl1;O4Pd3Tl1 (ICSD #2275)");
     vproto.push_back("AB2C_cF64_227_c_e_d;3;16;227;5;2;cF64;a,x3;-;Li1O2Ti1;Li1O2Ti1 (ICSD #48128)");
+#endif
     // done now produce
 
     // FROM PROTO LIST
@@ -4511,6 +4513,7 @@ namespace anrl {
         vparameters.push_back("5.3369,0.57059342");
       }
 
+#if !(USE_HARDCODED_PROTOTYPES) //DX20210114 - these new prototypes are not hard-coded
       // -------------------------------------------------------------------------
       // metal-nitride prototypes (from DX)
       // ---------------------------------------------------------------------------
@@ -7491,6 +7494,7 @@ namespace anrl {
       if(anrl_label=="AB2C_cF64_227_c_e_d"){
         vparameters.push_back("8.3756,0.2552");  // 001, ternary metal-oxide prototype (ICSD #48128)
       }
+#endif
     }
     if(library=="" && !keep_original_lattice_parameter){
       //DX 20190314 - loop over parameters - START
