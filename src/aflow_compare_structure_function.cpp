@@ -4616,6 +4616,9 @@ void XtalFinderCalculator::appendStructurePrototypes(
   string function_name = XPID + "XtalFinderCalculator::appendStructurePrototypes():";
   stringstream message;
 
+  uint DUPLICATE_NAME_WIDTH = 100, MISFIT_WIDTH=15;
+  string dash_line_separator = std::string(DUPLICATE_NAME_WIDTH+MISFIT_WIDTH, '-');
+
   if(LDEBUG){
     cerr << printResults(comparison_schemes, true, txt_ft) << endl;
   }
@@ -4657,13 +4660,13 @@ void XtalFinderCalculator::appendStructurePrototypes(
         message << "   No duplicates. " << endl;
       }
       else {
-        message << "   " << setw(80) << std::left << "List of duplicates"
-          << setw(15) << std::left << "misfit value" << endl;
-        message << "   " << setw(80) << std::left
-          << "-----------------------------------------------------------------------------------------------" << endl;
+        message << "   " << setw(DUPLICATE_NAME_WIDTH) << std::left << "List of duplicates"
+          << setw(MISFIT_WIDTH) << std::left << "misfit value" << endl;
+        message << "   " << setw(DUPLICATE_NAME_WIDTH) << std::left
+          << dash_line_separator << endl;
         for(uint d=0;d<comparison_schemes[i].structures_duplicate.size();d++){
-          message << "   " << setw(80) << std::left << comparison_schemes[i].structures_duplicate[d]->name
-            << setw(15) << std::left << comparison_schemes[i].mapping_info_duplicate[d].misfit << endl;
+          message << "   " << setw(DUPLICATE_NAME_WIDTH) << std::left << comparison_schemes[i].structures_duplicate[d]->name
+            << setw(MISFIT_WIDTH) << std::left << comparison_schemes[i].mapping_info_duplicate[d].misfit << endl;
         }
       }
       pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_RAW_); //DX+CO20201119
@@ -4798,7 +4801,7 @@ string XtalFinderCalculator::printResults(
   // text format
   else if(format==txt_ft){
     int indent_spacing = 2;
-    int structure_spacing = 80; // structure name spacing
+    int structure_spacing = 100; // structure name spacing
     int misfit_spacing = 15;
     int property_spacing = 35;
     int num_properties = 0;

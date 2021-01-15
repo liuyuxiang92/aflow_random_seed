@@ -190,12 +190,10 @@ vector<string> XtalFinderCalculator::getUniquePermutations(
     if(format==txt_ft){ //DX20190506
       ss_output << "Misfit values: " << endl;
       ss_output << misfit_results << endl;
-      // TO DOss_output << printResults(final_permutations, same_species, txt_ft);
     }
     else if(format==json_ft){ //DX20190506
       ss_output.str(""); // need to clear content abbreviated content from above
       ss_output << misfit_results << endl;
-      // TO DOss_output << printResults(final_permutations, same_species, json_ft) << endl;
     }
   }
 
