@@ -29,7 +29,7 @@
 #define _COMPARE_DATABASE_GEOMETRY_RELAX1_ 1
 #define _COMPARE_DATABASE_GEOMETRY_MOST_RELAXED_ 2
 
-#define GENERAL_OPTIONS_LIST "general_options: [--usage] [--misfit_match=0.1] [--misfit_match=0.2] [--np=16|--num_proc=16] [--optimize_match] [--no_scale_volume] [--ignore_symmetry] [--ignore_Wyckoff] [--ignore_environment] [--keep_unmatched!] [--match_to_aflow_prototypes!] [--magmom=<m1,m2,...|INCAR|OUTCAR>:...] [--add_aflow_prototype_designation] [--remove_duplicate_compounds] [--ICSD] [--print_mapping] [--print=TEXT|JSON] [--quiet|--q] [--screen_only] [--primitivize] [--minkowski] [--niggli]"
+#define GENERAL_OPTIONS_LIST "general_options: [--usage] [--misfit_match=0.1] [--misfit_match=0.2] [--np=16|--num_proc=16] [--optimize_match] [--no_scale_volume] [--ignore_symmetry] [--ignore_Wyckoff] [--ignore_environment] [--keep_unmatched!] [--match_to_aflow_prototypes!] [--magmom=<m1,m2,...|INCAR|OUTCAR>:...] [--add_aflow_prototype_designation] [--remove_duplicate_compounds] [--ICSD] [--print_mapping|--print] [--print=TEXT|JSON] [--quiet|--q] [--screen_only] [--primitivize] [--minkowski] [--niggli]"
 
 #define _DEBUG_COMPARE_ false  //DX20201223
 
@@ -295,6 +295,12 @@ class XtalFinderCalculator : public xStream {
     // compare2prototypes
     string printMatchingPrototypes(xstructure& xstr, const aurostd::xoption& vpflow);
     vector<StructurePrototype> compare2prototypes(const xstructure& xstrIN, const aurostd::xoption& vpflow); 
+    void calculateMatchingAFLOWPrototypes(
+      vector<StructurePrototype>& prototypes,
+      uint num_proc);
+    void getMatchingAFLOWPrototypes(
+      vector<StructurePrototype>& prototypes,
+      aurostd::xoption vpflow_protos);
 
     // ---------------------------------------------------------------------------
     // compare2database
@@ -464,7 +470,9 @@ class XtalFinderCalculator : public xStream {
   
   // ---------------------------------------------------------------------------
   // get aflow label
-  void getPrototypeDesignations(
+  void calculatePrototypeDesignations(vector<StructurePrototype>& prototypes,uint num_proc);
+  void getPrototypeDesignations(vector<StructurePrototype>& prototypes);
+  void getPrototypeDesignationsPreDistributed(
       vector<StructurePrototype>& prototypes,
       uint start_index=0,
       uint end_index=AUROSTD_MAX_UINT); //DX20191122
