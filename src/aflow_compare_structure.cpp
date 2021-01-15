@@ -118,7 +118,7 @@ vector<string> XtalFinderCalculator::getUniquePermutations(
 
   // ---------------------------------------------------------------------------
   // permutation comparisons must compare the same species
-  bool same_species=true;
+  //bool same_species=true;
 
   // ---------------------------------------------------------------------------
   // quick check: check if any sites have the same number of atoms; if not, then no need to try comparing
@@ -155,8 +155,10 @@ vector<string> XtalFinderCalculator::getUniquePermutations(
   xtal_finder_permutations.misfit_match = misfit_match; //copy misfit_match
   xtal_finder_permutations.misfit_family = misfit_family; //copy misfit_family
   xtal_finder_permutations.num_proc = num_proc; //copy num_proc
+  
+  string misfit_results = "";
   //vector<StructurePrototype> final_permutations = xtal_finder_permutations.compareAtomDecorations(structure,num_proc,comparison_options);
-  xtal_finder_permutations.compareAtomDecorations(structure,num_proc,comparison_options);
+  xtal_finder_permutations.compareAtomDecorations(structure,misfit_results,num_proc,comparison_options);
 
   // ---------------------------------------------------------------------------
   // print results
@@ -187,10 +189,12 @@ vector<string> XtalFinderCalculator::getUniquePermutations(
   if(print_misfit){
     if(format==txt_ft){ //DX20190506
       ss_output << "Misfit values: " << endl;
+      ss_output << misfit_results << endl;
       // TO DOss_output << printResults(final_permutations, same_species, txt_ft);
     }
     else if(format==json_ft){ //DX20190506
       ss_output.str(""); // need to clear content abbreviated content from above
+      ss_output << misfit_results << endl;
       // TO DOss_output << printResults(final_permutations, same_species, json_ft) << endl;
     }
   }

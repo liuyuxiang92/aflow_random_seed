@@ -313,6 +313,7 @@ class XtalFinderCalculator : public xStream {
     vector<string> getUniquePermutations(xstructure& xstr, aurostd::xoption& comparison_options, stringstream& results_ss, uint num_proc=1, bool print_misfit=false);
     void compareAtomDecorations(StructurePrototype& structure, uint num_proc, bool optimize_match);
     void compareAtomDecorations(StructurePrototype& structure, uint num_proc, aurostd::xoption& permutation_options);
+    void compareAtomDecorations(StructurePrototype& structure, string& misfit_results, uint num_proc, aurostd::xoption& permutation_options);
     void generateAtomPermutedStructures(structure_container& structure);
     vector<string> getSpeciesPermutedStrings(const deque<uint>& stoichiometry);
     vector<string> getSpeciesPermutedStrings(const vector<uint>& stoichiometry);

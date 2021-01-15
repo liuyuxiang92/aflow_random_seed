@@ -2098,11 +2098,21 @@ void XtalFinderCalculator::compareAtomDecorations(
   aurostd::xoption permutation_options = compare::loadDefaultComparisonOptions("permutation");
   permutation_options.flag("COMPARISON_OPTIONS::OPTIMIZE_MATCH",optimize_match);
 
-  compareAtomDecorations(structure,num_proc,permutation_options);
+  return compareAtomDecorations(structure,num_proc,permutation_options);
 }
 
 void XtalFinderCalculator::compareAtomDecorations(
     StructurePrototype& structure,
+    uint num_proc,
+    aurostd::xoption& permutation_options){
+
+  string misfit_result = "";
+  return compareAtomDecorations(structure,misfit_result,num_proc,permutation_options);
+}
+
+void XtalFinderCalculator::compareAtomDecorations(
+    StructurePrototype& structure,
+    string& misfit_results,
     uint num_proc,
     aurostd::xoption& permutation_options){
 
@@ -2128,16 +2138,16 @@ void XtalFinderCalculator::compareAtomDecorations(
     
   // ---------------------------------------------------------------------------
   // calculate symmetry (if not already calculated)
-  if(!isSymmetryCalculated(*structure.structure_representative)){
+  bool ignore_symmetry = permutation_options.flag("COMPARISON_OPTIONS::IGNORE_SYMMETRY");
+  if(!ignore_symmetry && !isSymmetryCalculated(*structure.structure_representative)){
     calculateSymmetry(*structure.structure_representative);
   }
-  
+ 
   // ---------------------------------------------------------------------------
   // check if permutations of the structure are compatible via
   // stoichiometry and/or symmetry, if not, return early
   if(!compare::arePermutationsComparableViaComposition(stoichiometry) ||
-      (!permutation_options.flag("COMPARISON_OPTIONS::IGNORE_SYMMETRY") ||
-       !compare::arePermutationsComparableViaSymmetry(structure.grouped_Wyckoff_positions))){
+      (!ignore_symmetry && !compare::arePermutationsComparableViaSymmetry(structure.structure_representative->grouped_Wyckoff_positions))){
 
     vector<string> unique_permutations = getSpeciesPermutedStrings(stoichiometry); //DX20191125
     // store permutation results in main StructurePrototype object
@@ -2147,11 +2157,11 @@ void XtalFinderCalculator::compareAtomDecorations(
     }
     return;
   }
-
+    
   // ---------------------------------------------------------------------------
-  // get nearest neighbor distances
-  if(!areNearestNeighborsCalculated(*structure.structure_representative)){
-    structure.structure_representative->nearest_neighbor_distances = NearestNeighbours(structure.structure_representative->structure);
+  // get LFA environments
+  if(!isLFAEnvironmentCalculated(*structure.structure_representative)){
+    computeLFAEnvironment(*structure.structure_representative);
   }
 
   // ---------------------------------------------------------------------------
@@ -2203,7 +2213,7 @@ void XtalFinderCalculator::compareAtomDecorations(
     makeRepresentativeEvenPermutation(permutation_comparisons, decoration_names);
 
     if(VERBOSE){ for(uint i=0;i<permutation_comparisons.size();i++){ cerr << "Initial permutation groupings: " << permutation_comparisons[i] << endl; } }
-
+  
     // ---------------------------------------------------------------------------
     // compare permutations
     final_permutations = runComparisonScheme(
@@ -2212,7 +2222,7 @@ void XtalFinderCalculator::compareAtomDecorations(
         num_proc,
         permutation_options,
         quiet); //DX20200103 - condensed booleans to xoptions
-
+    
     // ---------------------------------------------------------------------------
     // check if matched permutations are physically possible
     if(!compare::checkNumberOfGroupings(final_permutations, decoration_names.size())){
@@ -2287,8 +2297,19 @@ void XtalFinderCalculator::compareAtomDecorations(
     for(uint d=0;d<final_permutations[j].structures_duplicate.size();d++){ permutations_tmp.push_back(final_permutations[j].structures_duplicate[d]->name); } //push back equivalent permutations
     structure.atom_decorations_equivalent.push_back(permutations_tmp);
   }
+  
+  // ---------------------------------------------------------------------------
+  // print format
+  filetype format = txt_ft;
+  if(XHOST.vflag_control.flag("PRINT_MODE::TXT")){
+    format = txt_ft;
+  }
+  if(XHOST.vflag_control.flag("PRINT_MODE::JSON")){
+    format = json_ft;
+  }
+  misfit_results = printResults(final_permutations, true, format);
 
-  //return final_permutations;
+  //DX20210115 [OBSOLETE] return final_permutations;
 }
 
 // ***************************************************************************
@@ -3876,7 +3897,7 @@ vector<StructurePrototype> XtalFinderCalculator::checkForBetterMatches(
   string function_name = XPID + "XtalFinderCalculator::checkForBetterMatches():";
   stringstream message;
 
-  if(!quiet){
+  if(!quiet || LDEBUG){
     message << "Check if initial structure groupings match better (lower similarity metric) with other groups." << endl;
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
   }
@@ -3947,7 +3968,7 @@ vector<StructurePrototype> XtalFinderCalculator::checkForBetterMatches(
 
   // ---------------------------------------------------------------------------
   // if no alternative matches found, return immediately //DX20210111
-  if(comparison_groups.size() > 0){ return prototype_schemes; }
+  if(comparison_groups.size() == 0){ return prototype_schemes; }
 
   // ---------------------------------------------------------------------------
   // compare structures
@@ -3957,7 +3978,7 @@ vector<StructurePrototype> XtalFinderCalculator::checkForBetterMatches(
       num_proc,
       check_better_matches_options,
       quiet); //DX20200103 - condensed booleans to xoptions
-
+  
   // ---------------------------------------------------------------------------
   // check if there are any better matches and reorganize if necessary
   // the original match is stored in the first position
@@ -4320,7 +4341,7 @@ vector<StructurePrototype> XtalFinderCalculator::runComparisonScheme(
   // OR after removing duplicate compounds these compounds remain separate, so for !same_species comparisons we need to check
   // if they should match with other groups
   if(!comparison_options.flag("COMPARISON_OPTIONS::IGNORE_ENVIRONMENT_ANALYSIS") ||
-      comparison_options.flag("COMPARISON_OPTIONS::CHECK_OTHER_GROUPING")){
+      comparison_options.flag("COMPARISON_OPTIONS::CHECK_OTHER_GROUPINGS")){
     aurostd::xoption check_better_matches_options = comparison_options;
     check_better_matches_options.flag("COMPARISON_OPTIONS::IGNORE_ENVIRONMENT_ANALYSIS",FALSE); //DX20200320 - changed from true to false
     comparison_schemes = checkForBetterMatches(comparison_schemes, num_proc,
