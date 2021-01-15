@@ -1135,10 +1135,9 @@ namespace apl {
       void getWeightsLT(double, const vector<double>&, vector<double>&);
       void calculateTransitionProbabilities();
       vector<vector<vector<xcomplex<double> > > > calculatePhases(bool=false);
-      void calculateTransitionProbabilitiesPhonon(int, int,
-          vector<vector<vector<vector<double> > > >&,
+      void calculateTransitionProbabilitiesPhonon(vector<vector<vector<vector<double> > > >&,
           const vector<vector<vector<xcomplex<double> > > >&);
-      void calculateTransitionProbabilitiesIsotope(int, int);
+      void calculateTransitionProbabilitiesIsotope();
       vector<vector<double> > calculateTransitionProbabilitiesBoundary();
       void getProcess(const vector<int>&, vector<int>&, vector<int>&, int&);
       xmatrix<double> calculateThermalConductivityTensor(double, vector<vector<double> >&, vector<vector<double> >&);
@@ -1146,14 +1145,13 @@ namespace apl {
       vector<vector<double> > calculateAnharmonicRates(const vector<vector<double> >&);
       vector<vector<double> > calculateTotalRates(const vector<vector<double> >&, vector<vector<double> >&);
       double getOccupationTerm(const vector<vector<double> >&, int, const vector<int>&, const vector<int>&);
-      void calcAnharmRates(int, int, const vector<vector<double> >&, vector<vector<double> >&);
+      void calcAnharmRates(const vector<vector<double> >&, vector<vector<double> >&);
       vector<vector<xvector<double> > > getMeanFreeDispRTA(const vector<vector<double> >&);
       xmatrix<double> calcTCOND(double, const vector<vector<double> >&,
           const vector<vector<xvector<double> > >&);
       void getMeanFreeDispFull(const vector<vector<double> >&,
           const vector<vector<double> >&, vector<vector<xvector<double> > >&);
-      void calculateDelta(int, int, const vector<vector<double> >&,
-          const vector<vector<xvector<double> > >&, vector<vector<xvector<double> > >&);
+      void calculateDelta(const vector<vector<double> >&, const vector<vector<xvector<double> > >&, vector<vector<xvector<double> > >&);
       void correctMFD(const vector<vector<double> >&, const vector<vector<xvector<double> > >&, vector<vector<xvector<double> > >&);
 
       void writeTempIndepOutput(const string&, string, const string&, const vector<vector<double> >&);
