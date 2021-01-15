@@ -1,6 +1,7 @@
 3.2.7 - 2020/xx/xx
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.7.tar.xz
         -- Added additional AEL and AGL properties to the AFLOW schema. (ME)
+        -- implemented new on-the-fly threading scheme into AAPL (ME)
         -- Added functionality to plot thermodynamic properties calculated by QHA with the SJ EOS model. (AS)
         -- Added processing of QHA data to LIB2LIB and LIB2RAW. (AS)
         -- Added a feature to employ fixed volume relaxation of QHA subcalculations. (AS)
