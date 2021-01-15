@@ -810,7 +810,7 @@ namespace apl {
     int q1 = 0, q2 = 0, br1 = 0, br2 = 0, b = 0, e = 0;
     xcomplex<double> eig;
 
-    while (task_counter < nIQPs) {
+    while (i < nIQPs) {
       q1 = _qm->getIbzqpts()[i];
       for (br1 = 0; br1 < nBranches; br1++) {
         prefactor = freq[q1][br1] * freq[q1][br1] * PI/2.0;
