@@ -6707,13 +6707,11 @@ void xstructure::MakeTypes(void) {
 // update species and basis at the end
 
 void xstructure::AddAtoms(const deque<_atom>& atoms_in, bool check_present) { //DX20210129
-  bool LDEBUG=(FALSE || XHOST.DEBUG); 
-
-  // check that this atom is not already present
-  xvector<double> a1(3),a2(3),a3(3),aijk(3);
-  a1=lattice(1);a2=lattice(2);a3=lattice(3);
 
   if(check_present){
+    // check that this atom is not already present
+    xvector<double> a1(3),a2(3),a3(3),aijk(3);
+    a1=lattice(1);a2=lattice(2);a3=lattice(3);
     for(uint iat=0;iat<atoms_in.size();iat++){
       bool FOUND_POSITION=FALSE;
       for(uint jat=iat+1;jat<atoms_in.size()&&FOUND_POSITION==FALSE;jat++){
@@ -6822,7 +6820,7 @@ void xstructure::AddAtom(const _atom& atom, bool check_present) {
     if(atom.name==species.at(isp)) {FOUND_SPECIES=TRUE;species_position=isp;}
 
   if(FOUND_SPECIES==FALSE) {
-    if(LDEBUG) cerr << "AddAtom new_specie=" << atom.name << endl;
+    if(LDEBUG) cerr << "AddAtom new_species=" << atom.name << endl;
     num_each_type.push_back(1);
     comp_each_type.push_back(atom.partial_occupation_value);
     species.push_back(atom.name); // cerr << "AddAtom=" << atom.name << endl;
@@ -7056,6 +7054,8 @@ void xstructure::RemoveCartesianCopies(double tol) {
 // xstructure::AddCorners
 // **************************************************************************
 void xstructure::AddCorners(void) {
+  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  string soliloquy=XPID+"xstructure::AddCorners()";
   xstructure str;
   BringInCell();str=*this;
   while(atoms.size()) RemoveAtom(0);   
@@ -7066,8 +7066,12 @@ void xstructure::AddCorners(void) {
           _atom atom=str.atoms.at(iat);
           atom.fpos[1]+=i;atom.fpos[2]+=j;atom.fpos[3]+=k;
           atom.cpos=F2C(lattice,atom.fpos);
-          if(atom.fpos[1]<=1.0 && atom.fpos[2]<=1.0 && atom.fpos[3]<=1.0) AddAtom(atom);
-          //	    if(aurostd::isequal(atom.fpos[1],1.0,0.02) && atom.fpos[2]<1.0 && atom.fpos[3]<1.0)   AddAtom(atom);	    //AddAtom(atom);
+          if(LDEBUG){cerr << soliloquy << " atom.fpos=" << atom.fpos;}
+          if(atom.fpos[1]<=1.0 && atom.fpos[2]<=1.0 && atom.fpos[3]<=1.0){
+            if(LDEBUG){cerr << " : adding atom";}
+            AddAtom(atom,false);  //CO20210116 - do NOT check if atom is already there
+          }
+          if(LDEBUG){cerr << endl;}
         }
       }
     }
