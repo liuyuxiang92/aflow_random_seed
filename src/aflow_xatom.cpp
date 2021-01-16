@@ -16937,7 +16937,7 @@ void xstructure::TransformStructure(
   // ---------------------------------------------------------------------------
   // rotate
   bool coordinate_flag = (*this).coord_flag; // store original coordinate-type
-  (*this).ShiftPos(origin_shift,false);
+  (*this).ShiftPos(origin_shift,false); //is_frac=false
   (*this).coord_flag=coordinate_flag; // set back to original coordinate-type
   if(LDEBUG){ cerr << function_name << " structure after shifting origin: " << (*this) << endl; }
 }

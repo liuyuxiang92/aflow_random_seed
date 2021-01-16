@@ -213,7 +213,8 @@ class StructurePrototype{
     uint numberOfDuplicates() const; //DX20190506                                           // return the number of duplicate structures for this prototype (i.e., checks misfit value)
     string printRepresentativeStructure() const; //DX20201028                               // return the representative structure in a JSON format
     string printMatchedStructures(matched_structure_type_xtalfinder mode) const;            // return the matched structures in a JSON format //DX20201028
-    string printPropertiesOfStructure(structure_container* str_pointer) const;
+    string printPropertiesOfStructure(structure_container* str_pointer) const;              // return properties of structure in a JSON format
+    string printStructureTransformationInformation(const structure_mapping_info& misfit_info) const; // return structure transformation information between structure and representative in JSON format
     uint numberOfComparisons(); //DX20181221                                                // return the number of comparisons for this prototype
     bool isSymmetryCalculated(); //DX20190228
     bool isLFAEnvironmentCalculated(); //DX20191105

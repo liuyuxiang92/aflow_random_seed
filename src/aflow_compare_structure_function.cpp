@@ -757,6 +757,41 @@ string StructurePrototype::printPropertiesOfStructure(
 }
 
 // ***************************************************************************
+// StructurePrototype::printStructureTransformationInformation() //DX20210115
+// ***************************************************************************
+string StructurePrototype::printStructureTransformationInformation(
+    const structure_mapping_info& misfit_info) const {
+
+  // Print the structure transformation information
+  // between this structure and the representative structure (JSON format)
+
+  vector<string> tokens;
+  aurostd::JSONwriter json;
+
+  bool roff = true;
+  // basis transformation
+  // TODO - need xmatrix version - json.addMatrix("basis_transformation", misfit_info.basis_transformation);
+  json.addNumber("basis_transformation", "["+aurostd::xmatDouble2String(misfit_info.basis_transformation,5,roff)+"]"); //hack
+
+  // rotation
+  // TODO - need xmatrix version - json.addMatrix("rotation", misfit_info.rotation);
+  json.addNumber("rotation", "["+aurostd::xmatDouble2String(misfit_info.rotation,5,roff)+"]"); //hack
+
+  // origin_shift
+  // TODO - need xvector version - json.addVector("origin_shift", misfit_info.origin_shift);
+  json.addNumber("origin_shift", "["+aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(misfit_info.origin_shift,5,roff),",")+"]"); //hack
+
+  // atom map
+  json.addVector("atom_map", misfit_info.atom_map);
+
+  // basis map
+  json.addVector("basis_map", misfit_info.basis_map);
+
+  return json.toString(false);
+
+}
+
+// ***************************************************************************
 // StructurePrototype::printRepresentativeStructure() //DX20201115
 // ***************************************************************************
 string StructurePrototype::printRepresentativeStructure() const {
@@ -795,6 +830,8 @@ string StructurePrototype::printMatchedStructures(matched_structure_type_xtalfin
   stringstream sscontent_json;
   vector<string> vcontent_json, vstructures;
 
+  bool print_transformation = true;
+
   // print duplicate structure information
   if(mode == duplicate_structure_xf){
     for(uint j=0;j<structures_duplicate.size();j++){
@@ -820,6 +857,10 @@ string StructurePrototype::printMatchedStructures(matched_structure_type_xtalfin
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
       if(structures_duplicate[j]->properties.size()>0){
         vcontent_json.push_back(printPropertiesOfStructure(structures_duplicate[j]));
+      }
+      // print structure transformation info
+      if(print_transformation){
+        vcontent_json.push_back(printStructureTransformationInformation(mapping_info_duplicate[j])); //DX20210115
       }
       vstructures.push_back("{" + aurostd::joinWDelimiter(vcontent_json,",") + "}");
       vcontent_json.clear();
@@ -850,6 +891,10 @@ string StructurePrototype::printMatchedStructures(matched_structure_type_xtalfin
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
       if(structures_family[j]->properties.size()>0){
         vcontent_json.push_back(printPropertiesOfStructure(structures_family[j]));
+      }
+      // print structure transformation info
+      if(print_transformation){
+        vcontent_json.push_back(printStructureTransformationInformation(mapping_info_family[j])); //DX20210115
       }
       vstructures.push_back("{" + aurostd::joinWDelimiter(vcontent_json,",") + "}");
       vcontent_json.clear();
@@ -6921,10 +6966,13 @@ bool XtalFinderCalculator::searchAtomMappings(
       vector<uint> atom_index_xstr2 = compare::atomIndicesSortedByFrequency(xstr2_tmp);
 
       bool all_nn_calculated = false;
+      xvector<double> shift_xstr2;
       for(uint iat=0; iat<xstr2_tmp.atoms.size();iat++){
         if(xstr2_tmp.atoms[iat].name==lfa){
+          shift_xstr2 = -xstr2_tmp.atoms[iat].cpos; //DX20201215
           xstr2_tmp.ShiftOriginToAtom(iat);
-          vstrs_matched[p].origin_shift = -xstr2_tmp.atoms[iat].cpos; //DX20201215
+          //vstrs_matched[p].origin_shift = -xstr2_tmp.atoms[iat].cpos; //DX20201215
+          vstrs_matched[p].origin_shift += shift_xstr2; //DX20201215
           // need to get shift from here
           xstr2_tmp.BringInCell(1e-10);
           if(VERBOSE){
@@ -7381,6 +7429,9 @@ bool XtalFinderCalculator::buildSimilarLattices(
         }
       }
     }
+
+    // ---------------------------------------------------------------------------
+    // if any are identity, put it first
 
     // ---------------------------------------------------------------------------
     // print lattices and corresponding lattice deviation
