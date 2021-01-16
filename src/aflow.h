@@ -1538,7 +1538,7 @@ class xstructure {
     void ChangeBasis(const xmatrix<double>& transformation_matrix);//DX20201215
     void Rotate(const xmatrix<double>& rm);                       // DX20201215 - added modify-in-place variant
     void TransformStructure(const xmatrix<double>& transformation_matrix, const xmatrix<double>& rotation);
-    void TransformStructure(const xmatrix<double>& transformation_matrix, const xmatrix<double>& rotation, const xvector<double>& origin_shift);
+    void TransformStructure(const xmatrix<double>& transformation_matrix, const xmatrix<double>& rotation, const xvector<double>& origin_shift, bool is_shift_frac=false);
     void ShiftPos(const xvector<double>& shift, bool is_frac);    // Shift origin by vector (Cartesian/fractional boolean) //DX20201215 - added modify-in-place variant
     void ShiftCPos(const xvector<double>& shift);                 // Shift origin by Cartesian vector //DX20201215 - added modify-in-place variant
     void ShiftFPos(const xvector<double>& shift);                 // Shift origin by fractional vector //DX20201215 - added modify-in-place variant
@@ -1931,7 +1931,8 @@ xstructure TransformStructure(const xstructure& xstr,
 xstructure TransformStructure(const xstructure& xstr,
     const xmatrix<double>& transformation_matrix,
     const xmatrix<double>& rotation,
-    const xvector<double>& origin_shift); //DX20201125
+    const xvector<double>& origin_shift,
+    bool is_shift_frac=false); //DX20201125
 
 //CO20180420
 //for stream management with objects

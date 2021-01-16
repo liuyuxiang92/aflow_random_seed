@@ -16895,9 +16895,10 @@ xstructure TransformStructure(const xstructure& xstr,
 xstructure TransformStructure(const xstructure& xstr,
     const xmatrix<double>& transformation_matrix,
     const xmatrix<double>& rotation,
-    const xvector<double>& origin_shift){
+    const xvector<double>& origin_shift,
+    bool is_shift_frac){
   xstructure xstr_transformed = xstr;
-  xstr_transformed.TransformStructure(transformation_matrix, rotation, origin_shift);
+  xstr_transformed.TransformStructure(transformation_matrix, rotation, origin_shift, is_shift_frac);
   return xstr_transformed;
 }
 
@@ -16914,7 +16915,8 @@ void xstructure::TransformStructure(
 void xstructure::TransformStructure(
     const xmatrix<double>& transformation_matrix,
     const xmatrix<double>& rotation,
-    const xvector<double>& origin_shift) {
+    const xvector<double>& origin_shift,
+    bool is_shift_frac) {
 
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   string function_name = XPID + "xstructure::TransformStructure():";
@@ -16937,8 +16939,9 @@ void xstructure::TransformStructure(
   // ---------------------------------------------------------------------------
   // rotate
   bool coordinate_flag = (*this).coord_flag; // store original coordinate-type
-  (*this).ShiftPos(origin_shift,false); //is_frac=false
+  (*this).ShiftPos(origin_shift,is_shift_frac);
   (*this).coord_flag=coordinate_flag; // set back to original coordinate-type
+  (*this).BringInCell(); //DX20210116
   if(LDEBUG){ cerr << function_name << " structure after shifting origin: " << (*this) << endl; }
 }
 

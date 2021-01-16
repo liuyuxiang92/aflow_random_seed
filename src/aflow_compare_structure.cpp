@@ -385,6 +385,11 @@ namespace compare {
       final_prototypes = xtal_finder.compareStructuresFromFile(filename, magmoms_for_systems, xtal_finder.num_proc, same_species, comparison_options); //DX20200103 - condensed booleans to xoptions
     }
 
+    // ---------------------------------------------------------------------------
+    // prepare both JSON and TEXT outputs (we may end up printing both)
+    string results_json = xtal_finder.printResults(final_prototypes, same_species, json_ft);
+    string results_txt = xtal_finder.printResults(final_prototypes, same_species, txt_ft);
+
     //DX20190429 - added format options - START
     // ---------------------------------------------------------------------------
     // if only two comparisons and text only, print mismatch information
@@ -415,14 +420,13 @@ namespace compare {
               final_prototypes[0].structure_representative->structure,
               final_prototypes[0].structures_duplicate[0]->structure);
         }
+        else if(screen_only) {
+          if(write_json){ return results_json; }
+          if(write_txt){ return results_txt; }
+        }
       }
       return oss.str();
     }
-
-    // ---------------------------------------------------------------------------
-    // prepare both JSON and TEXT outputs (we may end up printing both)
-    string results_json = xtal_finder.printResults(final_prototypes, same_species, json_ft);
-    string results_txt = xtal_finder.printResults(final_prototypes, same_species, txt_ft);
 
     //DX20190429 - added screen only option - START
     // ---------------------------------------------------------------------------

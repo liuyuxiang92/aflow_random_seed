@@ -5037,16 +5037,18 @@ string XtalFinderCalculator::printStructureMappingResults(
     output << misfit_info.basis_transformation << endl;
     output << "Rotation:" << endl;
     output << misfit_info.rotation << endl;
-    output << "Origin Shift:" << endl;
+    output << "Origin Shift: " << ((xstr_mapped.coord_flag==_COORDS_CARTESIAN_) ? "(Cart.)" : "(Frac.)") << endl;
     output << misfit_info.origin_shift << endl;
 
-    // apply transformations to xstructure
-    xstructure xstr_transformed = TransformStructure(xstr_mapped,
-        misfit_info.basis_transformation,
-        misfit_info.rotation,
-        misfit_info.origin_shift);
+    xstructure xstr_transformed = xstr_mapped;
     // rescale transformed structure
     xstr_transformed.InflateVolume(misfit_info.rescale_factor);
+    // apply transformations to xstructure
+    xstr_transformed.TransformStructure(
+        misfit_info.basis_transformation,
+        misfit_info.rotation,
+        misfit_info.origin_shift,
+        xstr_mapped.coord_flag);
 
     // mapping information
     output << "-------------------------------------------------------------------------"<<endl;
@@ -5612,7 +5614,8 @@ bool XtalFinderCalculator::findMatch(
   if((aurostd::sum(new_mapping_distances)-aurostd::sum(mapping_info.distances_mapped)) < _ZERO_TOL_){
     mapping_info.distances_mapped = new_mapping_distances;
     mapping_info.vectors_mapped = new_mapping_vectors;
-    mapping_info.origin_shift -= origin_shift_test;
+    mapping_info.origin_shift -= xstr2.c2f*origin_shift_test;
+    mapping_info.origin_shift = BringInCell(mapping_info.origin_shift);
   }
   else{
     if(LDEBUG){
@@ -6687,9 +6690,11 @@ void XtalFinderCalculator::latticeSearch(
         // //DX20200715 - now explore all shifts, cannot just test one
         for(uint i=0;i<xstr1.atoms.size();i++){
           if(xstr1.atoms[i].name==lfa_str1){
+            //CART - shift_xstr1 += xstr1.atoms[i].cpos; //need to store all shifts
+            //CART - shift_xstr1 = xstr1.f2c*BringInCell(xstr1.c2f*shift_xstr1); // convert to fractional, bring in cell, convert to cartesian
+            shift_xstr1 += xstr1.atoms[i].fpos; //need to store all shifts
+            shift_xstr1 = BringInCell(shift_xstr1);
             xstr1.ShiftOriginToAtom(i);
-            shift_xstr1 = xstr1.atoms[i].cpos;
-
             xstr1.BringInCell(1e-10);
 
             // ---------------------------------------------------------------------------
@@ -6747,7 +6752,11 @@ void XtalFinderCalculator::latticeSearch(
             for(uint p=0;p<vstrs_matched.size();p++){
               if(vstrs_matched[p].misfit<=match_info.misfit){
                 match_info = vstrs_matched[p];
-                match_info.origin_shift += shift_xstr1; //DX20201215 + or -?
+                match_info.origin_shift = BringInCell(match_info.origin_shift+shift_xstr1);
+                // if xstr2 was given in Cartesian coordinates, convert shift //DX20210116
+                if(xstr2.coord_flag==_COORDS_CARTESIAN_){
+                  match_info.origin_shift = F2C(trasp(match_info.rotation*trasp((match_info.basis_transformation*xstr2.lattice))),match_info.origin_shift); // convert lattice to new basis, rotate, then do F2C
+                }
               }
             }
 
@@ -6969,10 +6978,10 @@ bool XtalFinderCalculator::searchAtomMappings(
       xvector<double> shift_xstr2;
       for(uint iat=0; iat<xstr2_tmp.atoms.size();iat++){
         if(xstr2_tmp.atoms[iat].name==lfa){
-          shift_xstr2 = -xstr2_tmp.atoms[iat].cpos; //DX20201215
+          shift_xstr2 += -xstr2_tmp.atoms[iat].fpos; //DX20201215
+          shift_xstr2 = BringInCell(shift_xstr2); // convert to fractional, bring in cell, convert to cartesian
           xstr2_tmp.ShiftOriginToAtom(iat);
-          //vstrs_matched[p].origin_shift = -xstr2_tmp.atoms[iat].cpos; //DX20201215
-          vstrs_matched[p].origin_shift += shift_xstr2; //DX20201215
+          vstrs_matched[p].origin_shift = shift_xstr2; //DX20201215
           // need to get shift from here
           xstr2_tmp.BringInCell(1e-10);
           if(VERBOSE){
