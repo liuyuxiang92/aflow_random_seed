@@ -884,7 +884,7 @@ namespace compare {
 
     // ---------------------------------------------------------------------------
     // database DOESN'T contain equivalent structure to input
-    if(!final_prototypes[0].structures_duplicate.size() == 0){
+    if(final_prototypes[0].structures_duplicate.size() != 0){
       return matched_database_structures;
     }
 

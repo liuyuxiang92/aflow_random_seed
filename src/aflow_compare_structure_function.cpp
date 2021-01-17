@@ -837,20 +837,20 @@ string StructurePrototype::printMatchedStructures(matched_structure_type_xtalfin
     for(uint j=0;j<structures_duplicate.size();j++){
       sscontent_json << "\"name\":" << "\"" << structures_duplicate[j]->name << "\"" << eendl;
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-      sscontent_json << "\"misfit\":" << aurostd::utype2string<double>(mapping_info_duplicate[j].misfit,AUROSTD_ROUNDOFF_TOL,roff) << eendl;
+      sscontent_json << "\"misfit\":" << aurostd::utype2string<double>(mapping_info_duplicate[j].misfit,(double)AUROSTD_ROUNDOFF_TOL,roff) << eendl;
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-      sscontent_json << "\"lattice_deviation\":" << aurostd::utype2string<double>(mapping_info_duplicate[j].lattice_deviation,AUROSTD_ROUNDOFF_TOL,roff) << eendl;
+      sscontent_json << "\"lattice_deviation\":" << aurostd::utype2string<double>(mapping_info_duplicate[j].lattice_deviation,(double)AUROSTD_ROUNDOFF_TOL,roff) << eendl;
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-      sscontent_json << "\"coordinate_displacement\":" << aurostd::utype2string<double>(mapping_info_duplicate[j].coordinate_displacement,AUROSTD_ROUNDOFF_TOL,roff) << eendl;
+      sscontent_json << "\"coordinate_displacement\":" << aurostd::utype2string<double>(mapping_info_duplicate[j].coordinate_displacement,(double)AUROSTD_ROUNDOFF_TOL,roff) << eendl;
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-      sscontent_json << "\"failure\":" << aurostd::utype2string<double>(mapping_info_duplicate[j].failure,AUROSTD_ROUNDOFF_TOL,roff) << eendl;
+      sscontent_json << "\"failure\":" << aurostd::utype2string<double>(mapping_info_duplicate[j].failure,(double)AUROSTD_ROUNDOFF_TOL,roff) << eendl;
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
       if(mapping_info_duplicate[j].is_magnetic_misfit){
         // [BETA] sscontent_json << "\"misfit_magnetic\":" << mapping_info_duplicate[j].magnetic_misfit << eendl;
         // [BETA] vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-        sscontent_json << "\"displacement_magnetic\":" << aurostd::utype2string<double>(mapping_info_duplicate[j].magnetic_displacement,AUROSTD_ROUNDOFF_TOL,roff) << eendl;
+        sscontent_json << "\"displacement_magnetic\":" << aurostd::utype2string<double>(mapping_info_duplicate[j].magnetic_displacement,(double)AUROSTD_ROUNDOFF_TOL,roff) << eendl;
         vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-        sscontent_json << "\"failure_magnetic\":" << aurostd::utype2string<double>(mapping_info_duplicate[j].magnetic_failure,AUROSTD_ROUNDOFF_TOL,roff) << eendl;
+        sscontent_json << "\"failure_magnetic\":" << aurostd::utype2string<double>(mapping_info_duplicate[j].magnetic_failure,(double)AUROSTD_ROUNDOFF_TOL,roff) << eendl;
         vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
       }
       sscontent_json << "\"number_compounds_matching_structure\":" << structures_duplicate[j]->number_compounds_matching_structure << eendl;
@@ -871,20 +871,20 @@ string StructurePrototype::printMatchedStructures(matched_structure_type_xtalfin
     for(uint j=0;j<structures_family.size();j++){
       sscontent_json << "\"name\":" << "\"" << structures_family[j]->name << "\"" << eendl;
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-      sscontent_json << "\"misfit\":" << aurostd::utype2string<double>(mapping_info_family[j].misfit,AUROSTD_ROUNDOFF_TOL,roff) << eendl;
+      sscontent_json << "\"misfit\":" << aurostd::utype2string<double>(mapping_info_family[j].misfit,(double)AUROSTD_ROUNDOFF_TOL,roff) << eendl;
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-      sscontent_json << "\"lattice_deviation\":" << aurostd::utype2string<double>(mapping_info_family[j].lattice_deviation,AUROSTD_ROUNDOFF_TOL,roff) << eendl;
+      sscontent_json << "\"lattice_deviation\":" << aurostd::utype2string<double>(mapping_info_family[j].lattice_deviation,(double)AUROSTD_ROUNDOFF_TOL,roff) << eendl;
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-      sscontent_json << "\"coordinate_displacement\":" << aurostd::utype2string<double>(mapping_info_family[j].coordinate_displacement,AUROSTD_ROUNDOFF_TOL,roff) << eendl;
+      sscontent_json << "\"coordinate_displacement\":" << aurostd::utype2string<double>(mapping_info_family[j].coordinate_displacement,(double)AUROSTD_ROUNDOFF_TOL,roff) << eendl;
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-      sscontent_json << "\"failure\":" << aurostd::utype2string<double>(mapping_info_family[j].failure,AUROSTD_ROUNDOFF_TOL,roff) << eendl;
+      sscontent_json << "\"failure\":" << aurostd::utype2string<double>(mapping_info_family[j].failure,(double)AUROSTD_ROUNDOFF_TOL,roff) << eendl;
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
       if(mapping_info_family[j].is_magnetic_misfit){
         // [BETA] sscontent_json << "\"misfit_magnetic\":" << mapping_info_family[j].magnetic_misfit << eendl;
         // [BETA] vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-        sscontent_json << "\"displacement_magnetic\":" << aurostd::utype2string<double>(mapping_info_family[j].magnetic_displacement,AUROSTD_ROUNDOFF_TOL,roff) << eendl;
+        sscontent_json << "\"displacement_magnetic\":" << aurostd::utype2string<double>(mapping_info_family[j].magnetic_displacement,(double)AUROSTD_ROUNDOFF_TOL,roff) << eendl;
         vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-        sscontent_json << "\"failure_magnetic\":" << aurostd::utype2string<double>(mapping_info_family[j].magnetic_failure,AUROSTD_ROUNDOFF_TOL,roff) << eendl;
+        sscontent_json << "\"failure_magnetic\":" << aurostd::utype2string<double>(mapping_info_family[j].magnetic_failure,(double)AUROSTD_ROUNDOFF_TOL,roff) << eendl;
         vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
       }
       sscontent_json << "\"number_compounds_matching_entry\":" << structures_family[j]->number_compounds_matching_structure << eendl;
@@ -3086,9 +3086,11 @@ void XtalFinderCalculator::calculateSymmetries(uint num_proc){
 
 #else
 
+  if(LDEBUG) {cerr << function_name << " Non-threaded version: " << num_proc << endl;}
+  
   // NON-THREADED VERSION - START
   for(uint i=0; i<structure_containers.size(); i++){
-    structure_containers[i].calculateSymmetry(i,i+1); //hack to do one at a time
+    calculateSymmetry(structure_containers[i]);
   }
   // NON-THREADED VERSION - END
 
@@ -3175,9 +3177,9 @@ void XtalFinderCalculator::calculateLFAEnvironments(uint num_proc){
   // THREADED VERISON - END
 
 #else
-  // NON-THREADED VERSION - START
+  // NON-THREADED VERSION
+  if(LDEBUG) {cerr << function_name << " Non-threaded version: " << num_proc << endl;}
   computeLFAEnvironments(); //DX20191122 - for all structures
-  // NON-THREADED VERSION - END
 
 #endif
   message << "Environments calculated.";
@@ -3226,6 +3228,7 @@ void XtalFinderCalculator::getNearestNeighbors(uint num_proc){
 
 #else
   // NON-THREADED VERSION - START
+  if(LDEBUG) {cerr << function_name << " Non-threaded version: " << num_proc << endl;}
   for(uint i=0;i<structure_containers.size();i++){
     structure_containers[i].nearest_neighbor_distances = NearestNeighbours(structure_containers[i].structure); // nearest neighbor distances (invariant of origin shifts)
   }
@@ -6732,14 +6735,14 @@ void XtalFinderCalculator::latticeSearch(
             // non-threaded
             uint n=0;
             uint start_index=0;
-            uint end_index=vstrs_matched_transformed.size();  //DX20191107 switching end point convention
+            uint end_index=vstrs_matched.size();  //DX20191107 switching end point convention
             if(LDEBUG){cerr << function_name << " Searching for possible matching structures [NON-THREADED VERSION]" << endl;}
             searchAtomMappings(
                 xstr1_for_thread[n],
                 all_nn1,
                 xstr2, //DX20201208
                 lfa_str2,
-                lattices
+                lattices,
                 vstrs_matched,
                 start_index,
                 end_index,
@@ -7651,6 +7654,7 @@ void XtalFinderCalculator::calculatePrototypeDesignations(
   pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
    
   task_counter = 0;
+#ifdef AFLOW_COMPARE_MULTITHREADS_ENABLE
   // ---------------------------------------------------------------------------
   // split task into threads
   uint number_of_structures = prototypes.size();
@@ -7668,6 +7672,10 @@ void XtalFinderCalculator::calculatePrototypeDesignations(
     threads[t]->join();
     delete threads[t];
   }
+#else
+  // NON-THREADED
+  getPrototypeDesignations(prototypes);
+#endif
 
 }
 
@@ -7757,15 +7765,16 @@ void XtalFinderCalculator::calculateMatchingAFLOWPrototypes(
   // do not calculate unique atom decorations since this was already done
   vpflow_protos.flag("COMPARE::DO_NOT_CALCULATE_UNIQUE_PERMUTATIONS",TRUE);
   
+  bool quiet_orig = XHOST.QUIET;
+  XHOST.QUIET=true;
+
+  task_counter = 0;
+#ifdef AFLOW_COMPARE_MULTITHREADS_ENABLE
   // split task into threads
   uint number_of_structures = prototypes.size();
   uint number_of_threads = aurostd::min(num_proc,number_of_structures); // cannot have more threads than structures
   //PRE-DISTRIBUTED vector<vector<int> > thread_distribution = getThreadDistribution(number_of_structures, number_of_threads); //DX20191107
 
-  bool quiet_orig = XHOST.QUIET;
-  XHOST.QUIET=true;
-
-  task_counter = 0;
   // [THREADED] determine AFLOW standard designation
   vector<std::thread*> threads;
   for(uint n=0; n<number_of_threads; n++){
@@ -7776,7 +7785,10 @@ void XtalFinderCalculator::calculateMatchingAFLOWPrototypes(
     threads[t]->join();
     delete threads[t];
   }
-
+#else
+  // NON-THREADED
+  getMatchingAFLOWPrototypes(prototypes,vpflow_protos);
+#endif
   XHOST.QUIET=quiet_orig;
 }
 
