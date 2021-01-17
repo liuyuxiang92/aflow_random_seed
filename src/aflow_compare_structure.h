@@ -567,7 +567,7 @@ class XtalFinderCalculator : public xStream {
 namespace compare{
   // ---------------------------------------------------------------------------
   // pair-wise comparisons (for use by other AFLOW processes) 
-  string compareMultipleStructures(const aurostd::xoption& vpflow, ostream& logstream=cout); //DX //DX20190425
+  string compareInputStructures(const aurostd::xoption& vpflow, ostream& logstream=cout); //DX //DX20190425
   bool aflowCompareStructure(const xstructure& xstr1, const xstructure& xstr2, bool same_species, bool scale_volume, bool optimize_match, double& final_misfit, uint num_proc=1); //Main function //DX20191108 - remove const & from bools
   bool aflowCompareStructure(const xstructure& xstr1, const xstructure& xstr2, bool same_species, bool scale_volume, bool optimize_match, double& final_misfit, structure_mapping_info& final_misfit_info, uint num_proc=1); //Main function //DX20191108 - remove const & from bools 
   //bool aflowCompareStructure(const xstructure& xstr1, const xstructure& xstr2, bool same_species, uint num_proc=1); //Overco, returns true (match), false (no match) //DX20191108 - remove const & from bools

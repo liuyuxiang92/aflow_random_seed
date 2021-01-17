@@ -1559,7 +1559,7 @@ namespace pflow {
       if(vpflow.flag("CLEAVAGE_ENERGY")) {pflow::CleavageEnergyCalculation(vpflow,cin); _PROGRAMRUN=true;} //CO20190520
       //DX20190425 START
       if(vpflow.flag("COMPARE_DATABASE_ENTRIES")) {cout << compare::compareDatabaseEntries(vpflow); _PROGRAMRUN=true;}
-      if(vpflow.flag("COMPARE_MATERIAL") || vpflow.flag("COMPARE_STRUCTURE")){ cout << compare::compareMultipleStructures(vpflow); _PROGRAMRUN=true;}
+      if(vpflow.flag("COMPARE_MATERIAL") || vpflow.flag("COMPARE_STRUCTURE")){ cout << compare::compareInputStructures(vpflow); _PROGRAMRUN=true;}
       //DX20190425 END
       if(vpflow.flag("COMPARE_PERMUTATION")) {cout << compare::compareAtomDecorations(cin,vpflow); _PROGRAMRUN=true;} //DX20190201
       if(vpflow.flag("GFA::INIT")){pflow::GLASS_FORMING_ABILITY(vpflow); _PROGRAMRUN=true;} //DF20190329 - GFA

@@ -209,15 +209,15 @@ vector<string> XtalFinderCalculator::getUniquePermutations(
 }
 
 // ***************************************************************************
-// compare::compareMultipleStructures()
+// compare::compareInputStructures()
 // ***************************************************************************
 namespace compare {
-  string compareMultipleStructures(const aurostd::xoption& vpflow, ostream& logstream){ //DX20190425 - changed name, more general
+  string compareInputStructures(const aurostd::xoption& vpflow, ostream& logstream){ //DX20190425 - changed name, more general
 
     // This function compares multiple structures (i.e., more than two).
 
     bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_COMPARE_);
-    string function_name = XPID + "compare::compareMultipleStructures():";
+    string function_name = XPID + "compare::compareInputStructures():";
     ostringstream oss;
     stringstream message;
     ofstream FileMESSAGE;
@@ -255,7 +255,7 @@ namespace compare {
       aurostd::string2tokens(GENERAL_OPTIONS_LIST,options_general," ");
       options.push_back(usage);
       options.insert(options.end(), options_general.begin(), options_general.end());
-      init::ErrorOption("--usage","compare::compareMultipleStructures()",options);
+      init::ErrorOption("--usage","compare::compareInputStructures()",options);
     }
 
     // ---------------------------------------------------------------------------
@@ -1871,7 +1871,7 @@ namespace compare {
 }
 
 // ***************************************************************************
-// compare::aflowCompareStructure - MAIN FUNCTION
+// compare::aflowCompareStructure
 // ***************************************************************************
 namespace compare {
   bool aflowCompareStructure(const xstructure& xstr1,
