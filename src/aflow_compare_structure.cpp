@@ -987,6 +987,7 @@ vector<StructurePrototype> XtalFinderCalculator::compare2database(
     string relaxation_name = "";
     if(relaxation_step == _COMPARE_DATABASE_GEOMETRY_ORIGINAL_){ relaxation_name = "original"; }
     else if(relaxation_step == _COMPARE_DATABASE_GEOMETRY_RELAX1_){ relaxation_name = "relax1"; }
+    else { throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, "Unexpected relaxation step input: "+aurostd::utype2string<uint>(relaxation_step)+".", _INPUT_ERROR_); }
     message << "The " << relaxation_name << " structures will be extracted; the properties will not correspond to these structures. Proceed with caution.";
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
   }
@@ -1327,11 +1328,6 @@ namespace compare {
     aurostd::xoption comparison_options = compare::loadDefaultComparisonOptions(); //DX20200103
     xtal_finder.getOptions(vpflow, comparison_options);
 
-    //TODO
-    // ===== FLAG: STOICHIOMETRY ===== //
-    //string alloy_string = vpflow.getattachedscheme("COMPARE_ALLOY::ALLOY");
-    //TODO
-
     // ---------------------------------------------------------------------------
     // FLAG: type of comparison (material-type or structure-type)
     bool same_species = true;
@@ -1410,7 +1406,29 @@ namespace compare {
     uint arity=0; //Defalut=0 : all
     if(vpflow.flag("COMPARE_DATABASE_ENTRIES::ARITY")) {
       arity=aurostd::string2utype<uint>(vpflow.getattachedscheme("COMPARE_DATABASE_ENTRIES::ARITY"));
+      message << "OPTIONS: Getting entries with nspecies=" << arity;
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
       if(arity!=0){ vmatchbook.push_back("nspecies(" + aurostd::utype2string<uint>(arity) + ")"); }
+    }
+
+    // ---------------------------------------------------------------------------
+    // FLAG : stoichiometry
+    // Note: not added to vmatchbook, checked when entries are returned (more robust)
+    vector<uint> stoichiometry_reduced, stoichiometry_input;
+    if(vpflow.flag("COMPARE_DATABASE_ENTRIES::STOICHIOMETRY")){
+      vector<string> stoichiometry_vstring;
+      aurostd::string2tokens(vpflow.getattachedscheme("COMPARE_DATABASE_ENTRIES::STOICHIOMETRY"), stoichiometry_vstring,":");
+      for(uint i=0;i<stoichiometry_vstring.size();i++){ stoichiometry_input.push_back(aurostd::string2utype<uint>(stoichiometry_vstring[i])); }
+      // check input for consistency with arity (if given)
+      if(arity!=0 && arity!=stoichiometry_input.size()){
+        message << "arity=" << arity << " and stoichiometry=" << aurostd::joinWDelimiter(stoichiometry_input,":") << " do not match.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ERROR_);
+      }
+      aurostd::reduceByGCD(stoichiometry_input, stoichiometry_reduced);
+      // if structure comparison, sort stoichiometry, otherwise perserve order
+      if(!same_species){ std::sort(stoichiometry_reduced.begin(),stoichiometry_reduced.end()); }
+      message << "OPTIONS: Getting entries with stoichiometry=" << aurostd::joinWDelimiter(stoichiometry_reduced,":");
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     }
 
     // ---------------------------------------------------------------------------
@@ -1430,7 +1448,9 @@ namespace compare {
       else{
         species = aurostd::getElements(alloy_string); //DX20191106
       }
-      if(species.size()!=0){ vmatchbook.push_back("species(" + aurostd::joinWDelimiter(species,",") + ")"); }
+      if(species.size()!=0){
+        vmatchbook.push_back("species(" + aurostd::joinWDelimiter(species,",") + ")");
+      }
     }
 
     // ---------------------------------------------------------------------------
@@ -1503,35 +1523,53 @@ namespace compare {
     // ---------------------------------------------------------------------------
     // load and store entries from the database
     for(uint i=0; i<auids.size(); i++){
-  
-    // ---------------------------------------------------------------------------
-    // first, get stoichiometry from entry
-    vector<double> vcomposition;
-    vector<string> species = aurostd::getElements(compounds[i], vcomposition);
-    if(LDEBUG){cerr << function_name << " species=" << aurostd::joinWDelimiter(species,",") << endl;}
-    
-      // ---------------------------------------------------------------------------
-      // load structures from aflowlib_entry
-      try {
-        aflowlib::_aflowlib_entry entry; entry.auid=auids[i]; entry.aurl=aurls[i];
-        xtal_finder.addDatabaseEntry2container(entry, species, relaxation_step, same_species);
-      }
-      // if cannot load one, keep going
-      catch(aurostd::xerror& re){
-        continue;
-      }
 
-      // store any properties
-      for(uint l=0;l<properties_response[i].size();l++){
-        bool property_requested = false;
-        for(uint m=0;m<property_list.size();m++){
-          if(properties_response[i][l].first == property_list[m]){ property_requested=true; break;}
+      // ---------------------------------------------------------------------------
+      // first, get stoichiometry from entry
+      vector<double> vcomposition;
+      vector<string> species = aurostd::getElements(compounds[i], vcomposition);
+      if(LDEBUG){cerr << function_name << " species=" << aurostd::joinWDelimiter(species,",") << endl;}
+
+      vector<uint> tmp_stoich;
+      for(uint j=0;j<vcomposition.size();j++){
+        if(aurostd::isinteger(vcomposition[j])){ tmp_stoich.push_back((uint)aurostd::nint(vcomposition[j])); }
+        else {
+          message << "Expected natoms in " << auids[i] << " to be an integer.";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_RUNTIME_ERROR_);
         }
-        if(property_requested){
-          xtal_finder.structure_containers.back().properties.push_back(properties_response[i][l].second);
-          xtal_finder.structure_containers.back().properties_names = property_list;
-          xtal_finder.structure_containers.back().properties_units = property_units;
-          xtal_finder.structure_containers.back().properties_types = property_types;
+      }
+      vector<uint> tmp_reduced_stoich; aurostd::reduceByGCD(tmp_stoich, tmp_reduced_stoich); //DX20191125
+      if(!same_species){ std::sort(tmp_reduced_stoich.begin(),tmp_reduced_stoich.end()); }
+
+      // ---------------------------------------------------------------------------
+      // second, check if stoichiometries are compatible (if given)
+      // note: do not include in AFLUX matchbook, we would need to specify a range of compatible stoichs (could be expensive)
+      // instead: filter on stoichiometry after recieving AFLUX response
+      if(stoichiometry_reduced.size()==0 || compare::sameStoichiometry(stoichiometry_reduced,tmp_reduced_stoich)){
+
+        // ---------------------------------------------------------------------------
+        // load structures from aflowlib_entry
+        try {
+          aflowlib::_aflowlib_entry entry; entry.auid=auids[i]; entry.aurl=aurls[i];
+          xtal_finder.addDatabaseEntry2container(entry, species, relaxation_step, same_species);
+        }
+        // if cannot load one, keep going
+        catch(aurostd::xerror& re){
+          continue;
+        }
+
+        // store any properties
+        for(uint l=0;l<properties_response[i].size();l++){
+          bool property_requested = false;
+          for(uint m=0;m<property_list.size();m++){
+            if(properties_response[i][l].first == property_list[m]){ property_requested=true; break;}
+          }
+          if(property_requested){
+            xtal_finder.structure_containers.back().properties.push_back(properties_response[i][l].second);
+            xtal_finder.structure_containers.back().properties_names = property_list;
+            xtal_finder.structure_containers.back().properties_units = property_units;
+            xtal_finder.structure_containers.back().properties_types = property_types;
+          }
         }
       }
     }
