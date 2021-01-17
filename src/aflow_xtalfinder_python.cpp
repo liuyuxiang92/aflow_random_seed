@@ -18,10 +18,26 @@ class XtalFinder: \n\
                 shell=True \n\
             ) \n\
         except subprocess.CalledProcessError: \n\
-            print \"Error aflow executable not found at: \" + self.aflow_executable \n\
+            raise OSError('aflow executable not found: ' + self.aflow_executable) \n\
+ \n\
+ \n\
+    def check_path(self, path): \n\
+        if type(path) == str: \n\
+            if os.path.exists(path): \n\
+                return os.path.realpath(path) \n\
+            else: \n\
+                raise OSError(filename + ' not found') \n\
+        elif type(path) == list: \n\
+            for p in path: \n\
+                if not os.path.exists(p): \n\
+                    raise OSError(path + ' not found') \n\
+            return ','.join(path) \n\
+        else: \n\
+            raise TypeError('The path to input file/files/directory must be a string or a list.') \n\
+ \n\
  \n\
     def get_prototype_label(self, input_file, options=None): \n\
-        fpath = os.path.realpath(input_file) \n\
+        fpath = self.check_path(input_file) \n\
         command = ' --prototype' \n\
         output = '' \n\
  \n\
@@ -36,7 +52,8 @@ class XtalFinder: \n\
         return res_json \n\
  \n\
     def compare_materials(self, input_files, options=None): \n\
-        command = ' --compare_materials=' + ','.join(input_files) \n\
+        fpath = self.check_path(input_files) \n\
+        command = ' --compare_materials=' + fpath \n\
         output = '' \n\
  \n\
         if options: \n\
@@ -50,7 +67,8 @@ class XtalFinder: \n\
         return res_json \n\
  \n\
     def compare_materials_directory(self, directory, options=None): \n\
-        command = ' --compare_materials -D ' + directory \n\
+        fpath = self.check_path(directory) \n\
+        command = ' --compare_materials -D ' + fpath \n\
         output = '' \n\
  \n\
         if options: \n\
@@ -64,7 +82,8 @@ class XtalFinder: \n\
         return res_json \n\
  \n\
     def compare_materials_file(self, filename, options=None): \n\
-        command = ' --compare_materials -F=' + filename \n\
+        fpath = self.check_path(filename) \n\
+        command = ' --compare_materials -F=' + fpath \n\
         output = '' \n\
  \n\
         if options: \n\
@@ -78,7 +97,8 @@ class XtalFinder: \n\
         return res_json \n\
  \n\
     def compare_structures(self, input_files, options=None): \n\
-        command = ' --compare_structures=' + ','.join(input_files) \n\
+        fpath = self.check_path(input_files) \n\
+        command = ' --compare_structures=' + fpath \n\
         output = '' \n\
  \n\
         if options: \n\
@@ -92,7 +112,8 @@ class XtalFinder: \n\
         return res_json \n\
  \n\
     def compare_structures_directory(self, directory, options=None): \n\
-        command = ' --compare_structures -D ' + directory \n\
+        fpath = self.check_path(directory) \n\
+        command = ' --compare_structures -D ' + fpath \n\
         output = '' \n\
  \n\
         if options: \n\
@@ -106,7 +127,8 @@ class XtalFinder: \n\
         return res_json \n\
  \n\
     def compare_structures_file(self, filename, options=None): \n\
-        command = ' --compare_structures -F=' + filename \n\
+        fpath = self.check_path(filename) \n\
+        command = ' --compare_structures -F=' + fpath \n\
         output = '' \n\
  \n\
         if options: \n\
@@ -120,7 +142,7 @@ class XtalFinder: \n\
         return res_json \n\
  \n\
     def compare2database(self, input_file, options=None): \n\
-        fpath = os.path.realpath(input_file) \n\
+        fpath = self.check_path(input_file) \n\
         command = ' --compare2database' \n\
         output = '' \n\
  \n\
@@ -135,7 +157,7 @@ class XtalFinder: \n\
         return res_json \n\
  \n\
     def compare2prototypes(self, input_file, options=None): \n\
-        fpath = os.path.realpath(input_file) \n\
+        fpath = self.check_path(input_file) \n\
         command = ' --compare2prototypes' \n\
         output = '' \n\
  \n\
@@ -150,7 +172,7 @@ class XtalFinder: \n\
         return res_json \n\
  \n\
     def get_isopointal_prototypes(self, input_file, options=None): \n\
-        fpath = os.path.realpath(input_file) \n\
+        fpath = self.check_path(input_file) \n\
         command = ' --isopointal_prototype' \n\
         output = '' \n\
  \n\
@@ -165,7 +187,7 @@ class XtalFinder: \n\
         return res_json \n\
  \n\
     def get_unique_atom_decorations(self, input_file, options=None): \n\
-        fpath = os.path.realpath(input_file) \n\
+        fpath = self.check_path(input_file) \n\
         command = ' --unique_atom_decorations' \n\
         output = '' \n\
  \n\

@@ -1513,6 +1513,18 @@ check_aflow_xtal_finder:
 	@echo "Running aflow_xtal_finder - compare2protos test 1" && ANSWER=2 && RESULT=$$(./aflow --proto=A2B3_hR10_167_c_e:Al:O --params=-1,2.72957758313,0.36,0.5561 | ./aflow --compare2protos --print=txt --catalog=anrl --quiet) && NUM_MATCHING_PROTOS=$$(echo $$RESULT | awk -F'duplicate_compounds=' '{print $$2}' | awk '{print $$1}') && \
 		if [ "$$NUM_MATCHING_PROTOS" -ne "$$ANSWER" ]; then "aflow_xtal_finder did not return $$ANSWER for './aflow --proto=A2B3_hR10_167_c_e:Al:O --params=-1,2.72957758313,0.36,0.5561 | ./aflow --compare2protos --print=txt --catalog=anrl --quiet', found $$NUM_MATCHING_PROTOS instead" && exit 1; fi
 	@echo "aflow_xtal_finder - compare2protos test 1 passed!"
+	@echo "Running aflow_xtal_finder - compare magnetic configurations test 1 (antiferro vs antiferro)" && ANSWER="MATCH" && RESULT=$$(./aflow --proto=A_cI2_229_a:Cr | ./aflow --sconv >A_cI2_229_a_sconv.poscar ; ./aflow --compare_materials=A_cI2_229_a_sconv.poscar,A_cI2_229_a_sconv.poscar --magmoms=-1,1:1,-1 --quiet) && MATCH=$$(echo $$RESULT | awk '{print $$3}') && \
+		if [ $$MATCH != $$ANSWER ]; then "aflow_xtal_finder did not return $$ANSWER for './aflow --proto=A_cI2_229_a:Cr | ./aflow --sconv >A_cI2_229_a_sconv.poscar ; ./aflow --compare_materials=A_cI2_229_a_sconv.poscar,A_cI2_229_a_sconv.poscar --magmoms=-1,1:1,-1 --quiet', found $$MATCH instead" && exit 1; fi
+	@echo "aflow_xtal_finder - compare magnetic configuration test 1 (antiferro vs antiferro) passed!"
+	@rm -f A_cI2_229_a_sconv.poscar
+	@echo "Running aflow_xtal_finder - compare magnetic configurations test 2 (ferro vs antiferro)" && ANSWER="UNMATCHABLE" && RESULT=$$(./aflow --proto=A_cI2_229_a:Cr | ./aflow --sconv >A_cI2_229_a_sconv.poscar ; ./aflow --compare_materials=A_cI2_229_a_sconv.poscar,A_cI2_229_a_sconv.poscar --magmoms=1,1:1,-1 --quiet) && MATCH=$$(echo $$RESULT | awk '{print $$1}') && \
+		if [ $$MATCH != $$ANSWER ]; then "aflow_xtal_finder did not return $$ANSWER for './aflow --proto=A_cI2_229_a:Cr | ./aflow --sconv >A_cI2_229_a_sconv.poscar ; ./aflow --compare_materials=A_cI2_229_a_sconv.poscar,A_cI2_229_a_sconv.poscar --magmoms=1,1:1,-1 --quiet', found $$MATCH instead" && exit 1; fi
+	@echo "aflow_xtal_finder - compare magnetic configuration test 2 (ferro vs antiferro) passed!"
+	@rm -f A_cI2_229_a_sconv.poscar
+	@echo "Running aflow_xtal_finder - compare magnetic configurations test 3 (ferro-up vs ferro-down)" && ANSWER="UNMATCHABLE" && RESULT=$$(./aflow --proto=A_cI2_229_a:Cr | ./aflow --sconv >A_cI2_229_a_sconv.poscar ; ./aflow --compare_materials=A_cI2_229_a_sconv.poscar,A_cI2_229_a_sconv.poscar --magmoms=1,1:-1,-1 --quiet) && MATCH=$$(echo $$RESULT | awk '{print $$1}') && \
+		if [ $$MATCH != $$ANSWER ]; then "aflow_xtal_finder did not return $$ANSWER for './aflow --proto=A_cI2_229_a:Cr | ./aflow --sconv >A_cI2_229_a_sconv.poscar ; ./aflow --compare_materials=A_cI2_229_a_sconv.poscar,A_cI2_229_a_sconv.poscar --magmoms=1,1:-1,-1 --quiet', found $$MATCH instead" && exit 1; fi
+	@echo "aflow_xtal_finder - compare magnetic configuration test 3 (ferro-up vs ferro-down) passed!"
+	@rm -f A_cI2_229_a_sconv.poscar
 .PHONY: check_prototype_generator
 check_prototype_generator:
 	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
