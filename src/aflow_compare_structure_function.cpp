@@ -2955,6 +2955,7 @@ void XtalFinderCalculator::convertStructures(
   // THREADED VERSION - END
 #else
   // NONTHREADS - START
+  if(LDEBUG) {cerr << function_name << " Non-threaded version. Number of threads=" << num_proc << endl;}
 
   // ---------------------------------------------------------------------------
   // perform the relevant structure conversions
@@ -7655,6 +7656,7 @@ void XtalFinderCalculator::calculatePrototypeDesignations(
    
   task_counter = 0;
 #ifdef AFLOW_COMPARE_MULTITHREADS_ENABLE
+  if(LDEBUG) {cerr << function_name << " Number of threads=" << num_proc << endl;}
   // ---------------------------------------------------------------------------
   // split task into threads
   uint number_of_structures = prototypes.size();
@@ -7674,6 +7676,7 @@ void XtalFinderCalculator::calculatePrototypeDesignations(
   }
 #else
   // NON-THREADED
+  if(LDEBUG) {cerr << function_name << " Non-threaded version. Number of threads=" << num_proc << endl;}
   getPrototypeDesignations(prototypes);
 #endif
 
