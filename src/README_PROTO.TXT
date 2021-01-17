@@ -2091,8 +2091,6 @@ A3B4_mP14_11_3e_4e-001.{AB}                      mP14      P2_{1}/m            -
 A5B2_mP14_11_5e_2e-001.{AB}                      mP14      P2_{1}/m            -         O5V2                #11       metal-oxide; O5V2, ICSD #59960 
 AB2_mC6_12_a_i-002.{AB}                          mC6       C2/m                -         Hg1O2               #12       metal-oxide; Hg1O2, ICSD #48214 
 AB2_mC6_12_a_i-003.{AB}                          mC6       C2/m                -         Ni1O2               #12       metal-oxide; Ni1O2, ICSD #88720 
-AB2_mC6_12_a_i-004.{AB}                          mC6       C2/m                -         Cu1O2               #12       metal-oxide; Cu1O2, ICSD #96699 (from uncorrected ICSD) 
-AB2_mC6_12_a_i-005.{AB}                          mC6       C2/m                -         Cu1O2               #12       metal-oxide; Cu1O2, ICSD #96699 (from uncorrected ICSD)
 AB2_mC12_12_i_2i-001.{AB}                        mC12      C2/m                -         Nd2O4               #12       metal-oxide; Nd2O4, ICSD #62228 
 AB2_mC12_12_i_2i-002.{AB}                        mC12      C2/m                -         O1Tl2               #12       metal-oxide; O1Tl2, ICSD #77699 
 AB2_mC18_12_ai_3i-001.{AB}                       mC18      C2/m                -         Mn1O2               #12       metal-oxide; Mn1O2, ICSD #150462 
@@ -2106,7 +2104,6 @@ A2B_mC24_12_4i_2i-003.{AB}                       mC24      C2/m                -
 A2B_mC24_12_2ij_gi-001.{AB}                      mC24      C2/m                -         O2V1                #12       metal-oxide; O2V1, ICSD #34416 
 A5B8_mC26_12_ahi_2ij-001.{AB}                    mC26      C2/m                -         Mn5O8               #12       metal-oxide; Mn5O8, ICSD #16956 
 A5B3_mC32_12_5i_3i-002.{AB}                      mC32      C2/m                -         O5Ti3               #12       metal-oxide; O5Ti3, ICSD #26492 
-A2B3_mP10_13_g_eg-001.{AB}                       mP10      P2/c                -         Al2O3               #13       metal-oxide; Al2O3, ICSD #169722 (updated structure from ICSD in 2015)
 A4B3_mP14_13_2g_ag-001.{AB}                      mP14      P2/c                -         O4Sn3               #13       metal-oxide; O4Sn3, ICSD #174299 
 AB_mP8_14_ad_e-001.{AB}                          mP8       P2_{1}/c            -         Ag1O1               #14       metal-oxide; Ag1O1, ICSD #43741 
 A2B_mP12_14_2e_e-005.{AB}                        mP12      P2_{1}/c            -         O2Zr1               #14       metal-oxide; O2Zr1, ICSD #15983 
@@ -2122,7 +2119,6 @@ A3B_mP16_14_3e_e-005.{AB}                        mP16      P2_{1}/c            -
 AB_mC8_15_c_e-002.{AB}                           mC8       C2/c                -         Ag1O1               #15       metal-oxide; Ag1O1, ICSD #27659 
 AB_mC8_15_a_e-002.{AB}                           mC8       C2/c                -         Cu1O1               #15       metal-oxide; Cu1O1, ICSD #67850 
 AB2_mC12_15_c_f-001.{AB}                         mC12      C2/c                -         K1O2                #15       metal-oxide; K1O2, ICSD #38230 
-A2B3_mC20_15_f_ef-001.{AB}                       mC20      C2/c                -         Al2O3               #15       metal-oxide; Al2O3, ICSD #169722 (old structure from ICSD 2011, updated in 2015)
 AB2_mC24_15_ae_2f-001.{AB}                       mC24      C2/c                -         Bi2O4               #15       metal-oxide; Bi2O4, ICSD #79500 
 A5B3_mC32_15_e2f_cf-001.{AB}                     mC32      C2/c                -         O5V3                #15       metal-oxide; O5V3, ICSD #15899 
 A5B3_mC32_15_e2f_af-001.{AB}                     mC32      C2/c                -         O5V3                #15       metal-oxide; O5V3, ICSD #32587 
@@ -2234,9 +2230,7 @@ ANRL Label                                       Pearson   SG symbol           S
 ----------------------------------------------------------------------------------------------------------------------------------------------------
 AB3C_aP5_1_a_3a_a-001.{ABC}                      aP5       P1                  -         Cu1O3V1             #1        metal-oxide; Cu1O3V1, ICSD #9414 
 ABC3_aP10_1_2a_2a_6a-001.{ABC}                   aP10      P1                  -         Ca1Fe1O3            #1        metal-oxide; Ca1Fe1O3, ICSD #92339 
-A8B3C2_aP13_1_8a_3a_2a-001.{ABC}                 aP13      P1                  -         O8Sr3V2             #1        metal-oxide; O8Sr3V2, ICSD #73258 (old structure)
 A2B4C_aP14_1_4a_8a_2a-001.{ABC}                  aP14      P1                  -         Al2O4Pb1            #1        metal-oxide; Al2O4Pb1, ICSD #33532 
-A7B6C_aP14_1_7a_6a_a-001.{ABC}                   aP14      P1                  -         Li7O6Ta1            #1        metal-oxide; Li7O6Ta1, ICSD #74950 (old structure)
 A2BC4_aP14_1_4a_2a_8a-001.{ABC}                  aP14      P1                  -         Cr2Ni1O4            #1        metal-oxide; Cr2Ni1O4, ICSD #280061 
 AB4C3_aP16_1_2a_8a_6a-001.{ABC}                  aP16      P1                  -         Co1Na4O3            #1        metal-oxide; Co1Na4O3, ICSD #10473 
 AB6C2_aP9_2_a_3i_i-001.{ABC}                     aP9       P-1                 -         Cu1O6V2             #2        metal-oxide; Cu1O6V2, ICSD #28151 
@@ -2520,7 +2514,6 @@ A2BC4_tI28_141_d_a_h-003.{ABC}                   tI28      I4_{1}/amd          -
 ABC2_tI32_141_c_d_h-001.ABC/BCA/CAB              tI32      I4_{1}/amd          -         Li1Mn1O2            #141      metal-oxide; Li1Mn1O2, ICSD #40486 
 AB2C_tI32_141_d_h_c-001.ABC/BCA/CAB              tI32      I4_{1}/amd          -         Li1O2Ti1            #141      metal-oxide; Li1O2Ti1, ICSD #164158 
 ABC3_hR5_146_a_a_b-001.{ABC}                     hR5       R3                  -         Bi1Fe1O3            #146      metal-oxide; Bi1Fe1O3, ICSD #162264 
-A7B6C_hR14_146_a2b_2b_a-001.{ABC}                hR14      R3                  -         Li7O6Ta1            #146      metal-oxide; Li7O6Ta1, ICSD #74950 (new, correct structure)
 A3B9C4_hR16_146_3a_3b_4a-001.{ABC}               hR16      R3                  -         Ba3O9Yb4            #146      metal-oxide; Ba3O9Yb4, ICSD #33239 
 A3B9C4_hR16_146_3a_3b_4a-002.{ABC}               hR16      R3                  -         Ba3O9Y4             #146      metal-oxide; Ba3O9Y4, ICSD #87118 
 A3B4C9_hR16_146_3a_4a_3b-001.{ABC}               hR16      R3                  -         Ba3Ho4O9            #146      metal-oxide; Ba3Ho4O9, ICSD #33807 
@@ -2568,7 +2561,6 @@ A3B2C8_hR13_166_ac_c_ch-001.{ABC}                hR13      R-3m                -
 A2B8C3_hR13_166_c_ch_e-001.{ABC}                 hR13      R-3m                -         Ca2O8Pt3            #166      metal-oxide; Ca2O8Pt3, ICSD #65412 
 A4B8C_hR13_166_bd_ch_a-001.{ABC}                 hR13      R-3m                -         Ni4O8Sr1            #166      metal-oxide; Ni4O8Sr1, ICSD #40469 
 A8B3C2_hR13_166_ch_ac_c-001.{ABC}                hR13      R-3m                -         O8Pb3V2             #166      metal-oxide; O8Pb3V2, ICSD #27651 
-A8B3C2_hR13_166_ch_ac_c-002.{ABC}                hR13      R-3m                -         O8Sr3V2             #166      metal-oxide; O8Sr3V2, ICSD #73258 (new, correct structure)
 AB4C2_hR14_166_c_ch_ad-001.{ABC}                 hR14      R-3m                -         Al1O4V2             #166      metal-oxide; Al1O4V2, ICSD #151457 
 AB3C_hR15_166_bc_dh_ac-001.{ABC}                 hR15      R-3m                -         Ba1O3Ru1            #166      metal-oxide; Ba1O3Ru1, ICSD #10253 
 A3BC4_hR16_167_e_a_be-001.{ABC}                  hR16      R-3c                -         Ba3Ni1O4            #167      metal-oxide; Ba3Ni1O4, ICSD #30662 
