@@ -870,7 +870,8 @@ uint xstructure::GetPrimitiveCell(void) {
   if(atom_count == 1 || atoms_by_type[index_for_smallest_group].size() == 1) {
     prim_lattice = SYM::xvec2xmat(lattice_basis[0], lattice_basis[1], lattice_basis[2]);
     foundbasis = true;
-    numofatoms = SYM::arrange_atoms(atomic_basis_);
+    sort(atomic_basis_.begin(), atomic_basis_.end(), sortAtomsTypes);
+    numofatoms = ::GetNumEachType(atomic_basis_);
     basistypes = numofatoms;
   }
 
@@ -963,7 +964,8 @@ uint xstructure::GetPrimitiveCell(void) {
     if(num_of_candidates == 3) {
       prim_lattice = SYM::xvec2xmat(lattice_basis[0], lattice_basis[1], lattice_basis[2]);
       foundbasis = true;
-      numofatoms = SYM::arrange_atoms(atomic_basis_);
+      sort(atomic_basis_.begin(), atomic_basis_.end(), sortAtomsTypes);
+      numofatoms = ::GetNumEachType(atomic_basis_);
       basistypes = numofatoms;
 
     } else {
@@ -1042,7 +1044,8 @@ uint xstructure::GetPrimitiveCell(void) {
         foundbasis = false;
       } else {
         //Overwrite basis types (update it for primitive cell):
-        numofatoms = SYM::arrange_atoms(newbasis);
+        sort(newbasis.begin(), newbasis.end(), sortAtomsTypes);
+        numofatoms = ::GetNumEachType(newbasis);
         basistypes = numofatoms;
         atomic_basis_.clear();
         atomic_basis_ = newbasis;
@@ -1667,7 +1670,8 @@ namespace SYM {
         }
 
         // ========== Rearrange atoms/Store ========== //
-        deque<int> sizes = SYM::arrange_atoms(conventional_basis_atoms);
+        sort(conventional_basis_atoms.begin(), conventional_basis_atoms.end(), sortAtomsTypes);
+        deque<int> sizes = GetNumEachType(conventional_basis_atoms);
 
         xstr_out.lattice_label_ITC = lattice_char;
         xstr_out.lattice = CL;
@@ -1699,7 +1703,7 @@ namespace SYM {
         //DX20190410 END
 
         // Set number of each type
-        pflow::SetNumEachType(xstr_out, sizes);
+        xstr_out.SetNumEachType(sizes);
         if(xstr_out.num_each_type.size() != in_names.size()) {
           xstr_out = pflow::SetAllAtomNames(xstr_out, in_names);
         }
@@ -4418,32 +4422,8 @@ namespace SYM {
 //}
 
 // ***************************************************************************
-// arrange atoms
+// //DX20210118 [OBSOLETE - now GetNumEachType in xatom] SYM::arrange_atoms
 // ***************************************************************************
-namespace SYM {
-  deque<int> arrange_atoms(deque<_atom>& atoms) {
-    deque<int> sizes;
-    deque<_atom> atoms_arranged;
-    vector<int> types;
-    for (uint i = 0; i < atoms.size(); i++) {
-      if(!invec<int>(types, atoms[i].type)) {
-        types.push_back(atoms[i].type);
-      }
-    }
-    for (uint i = 0; i < types.size(); i++) {
-      int count = 0;
-      for (uint j = 0; j < atoms.size(); j++) {
-        if(types[i] == atoms[j].type) {
-          atoms_arranged.push_back(atoms[j]);
-          count++;
-        }
-      }
-      sizes.push_back(count);
-    }
-    atoms = atoms_arranged;
-    return sizes;
-  }
-}
 
 #endif
 

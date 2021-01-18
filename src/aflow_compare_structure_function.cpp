@@ -1998,8 +1998,8 @@ namespace compare {
       for(uint j=0;j<structure_name.size();j++){stringstream ss_site; ss_site << structure_name[j]; species.push_back(ss_site.str());}
       xstr.SetSpecies(species);
       xstr.SpeciesPutAlphabetic();
-      deque<int> sizes = SYM::arrange_atoms(xstr.atoms);
-      pflow::SetNumEachType(xstr, sizes);
+      deque<int> sizes = GetNumEachType(xstr.atoms);
+      xstr.SetNumEachType(sizes);
       structure = xstr;
     }
     // ---------------------------------------------------------------------------
@@ -2401,8 +2401,8 @@ void XtalFinderCalculator::generateAtomPermutedStructures(
     xstr_tmp.species = species; //DX20190813
     xstr_tmp.species_pp = xstr_tmp.species; //for vasp5 20190731, after ordered
     xstr_tmp.SpeciesPutAlphabetic();
-    deque<int> sizes = SYM::arrange_atoms(xstr_tmp.atoms);
-    pflow::SetNumEachType(xstr_tmp, sizes);
+    deque<int> sizes = GetNumEachType(xstr_tmp.atoms);
+    xstr_tmp.SetNumEachType(sizes);
     xstr_tmp.ReScale(1.0); //DX20190715
     xstr_tmp.BringInCell(); //DX20200707
 
@@ -6515,7 +6515,7 @@ namespace compare{
     // update atoms
     xstr_LFA_supercell.atoms = xstr_LFA_supercell.grid_atoms;
     xstr_LFA_supercell.grid_atoms.clear();
-    //xstr_LFA_supercell = pflow::SetNumEachType(xstr_LFA_supercell, sizes);
+    //xstr_LFA_supercell.SetNumEachType(sizes);
 
     if(LDEBUG){cerr << function_name << " Number of LFAs in supercell: " << xstr_LFA_supercell.atoms.size() << endl;}
 
@@ -6877,8 +6877,8 @@ namespace compare {
     proto_new.BringInCell(1e-10);
     proto_new.FixLattices();
     proto_new.SpeciesPutAlphabetic();
-    deque<int> sizes = SYM::arrange_atoms(new_basis);
-    pflow::SetNumEachType(proto_new, sizes);
+    deque<int> sizes = GetNumEachType(new_basis);
+    proto_new.SetNumEachType(sizes);
     proto_new.species = proto.species; //DX20190718
     proto_new.MakeBasis(); //DX20200522
     proto = proto_new;

@@ -2884,7 +2884,8 @@ namespace pflow {
       vector<string> names(nat,"H");
       vector<int> names_were_given(nat,FALSE);
       str=pflow::SetLat(str,lat_vec[is]);
-      str=pflow::SetNumEachType(str,num_each_type);
+      //DX20210118 [Use xstructure method, perhaps others can be changed in the future] str=pflow::SetNumEachType(str,num_each_type);
+      str.SetNumEachType(num_each_type);
       str=pflow::AddAllAtomPos(str,fpos_vec[is],0);
       str=pflow::SetAllAtomNames(str,names);
       str=pflow::SetNamesWereGiven(str,names_were_given);
@@ -3281,9 +3282,9 @@ namespace pflow {
       aurostd::matrix<double> lat1=pflow::GetLat(str1);  //CO20200404 pflow::matrix()->aurostd::matrix()
       xmatrix<double> xlat1(3,3);xlat1=str1.lattice;
       aurostd::matrix<double> cpos2=pflow::GetCpos(str2);  //CO20200404 pflow::matrix()->aurostd::matrix()
-      deque<int> num_each_type_1=pflow::GetNumEachType(str1);
+      deque<int> num_each_type_1=str1.num_each_type; //DX20210119 pflow::GetNumEachType() -> xstructure.num_each_type
       int num_types_1=num_each_type_1.size();
-      deque<int> num_each_type_2=pflow::GetNumEachType(str2);
+      deque<int> num_each_type_2=str2.num_each_type; //DX20210119 pflow::GetNumEachType() -> xstructure.num_each_type
       int num_types_2=num_each_type_2.size();
       // Loop over str2 atoms, assign them a type and c/d positions in an atom.
       int cnt=0;
@@ -3392,7 +3393,7 @@ namespace pflow {
     // we must only do this the first time this set function is
     // called.  This is controlled by the first_set parameter.
     if(rtp.first_set) {
-      int ntypes = pflow::GetNumEachType(str).size();
+      int ntypes = str.num_each_type.size(); //DX20210119 pflow::GetNumEachType() -> xstructure.num_each_type
       aurostd::matrix<double> tmp; //CO20200404 pflow::matrix()->aurostd::matrix()
       int size;
       // Set sphtex_tex
@@ -3558,7 +3559,7 @@ namespace pflow {
     // Do atoms
     str=ReScale(str,1.0);
     aurostd::matrix<double> cpos=pflow::GetCpos(str);  //CO20200404 pflow::matrix()->aurostd::matrix()
-    deque<int> num_each_type=pflow::GetNumEachType(str);
+    deque<int> num_each_type=str.num_each_type; //DX20210119 pflow::GetNumEachType() -> xstructure.num_each_type
     //int nat=(int)cpos.size();
     int ntype=(int)num_each_type.size();
     int cnt=0;

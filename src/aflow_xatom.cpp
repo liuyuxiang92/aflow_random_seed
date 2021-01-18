@@ -11399,8 +11399,8 @@ void xstructure::foldAtomsInCell(const xmatrix<double>& lattice_new, bool skew, 
   (*this).BringInCell();
   (*this).FixLattices();
   (*this).SpeciesPutAlphabetic();
-  deque<int> sizes = SYM::arrange_atoms((*this).atoms);
-  pflow::SetNumEachType((*this), sizes);
+  deque<int> sizes = (*this).GetNumEachType();
+  (*this).SetNumEachType(sizes);
   (*this).species = (*this).species;
   (*this).MakeBasis();
 }
@@ -13556,15 +13556,43 @@ void xstructure::SetAutoVolume(bool use_AFLOW_defaults_in) {  //CO20191010
 }
 
 // ***************************************************************************
+// Function GetNumEachType //DX20210118
+// ***************************************************************************
+// Get the number of each types based on atom.type
+// Generalized for structures where the atoms are not in alphabetical order
+// Updated form of SYM::arrange_atoms()
+deque<int> GetNumEachType(const deque<_atom>& atoms) {
+
+  vector<int> types; //aurostd::WithinList wants a vector
+  deque<int> num_each_type;
+  int match_index = 0;
+  for (uint i=0; i<atoms.size(); i++) {
+    if(aurostd::WithinList(types,atoms[i].type,match_index)){
+      num_each_type[match_index] += 1;
+    }
+    else{
+      types.push_back(atoms[i].type);
+      num_each_type.push_back(1);
+    }
+  }
+
+  return num_each_type;
+}
+
+// xstructure method
+// different than just returning xstr.num_each_type
+// if the xstructure has been transformed, num_each_type may not be accurate
+// need to get counts based on deque<_atom>
+deque<int> xstructure::GetNumEachType() {
+  return ::GetNumEachType((*this).atoms);
+}
+
+// ***************************************************************************
 // Function SetNumEachType //DX20210113 (from pflow, added in-place variant)
 // ***************************************************************************
 void xstructure::SetNumEachType(const deque<int>& in_num_each_type) {
-  (*this).num_each_type.clear();
-  (*this).comp_each_type.clear();
-  for(uint i=0;i<in_num_each_type.size();i++) {
-    (*this).num_each_type.push_back(in_num_each_type[i]);
-    (*this).comp_each_type.push_back(in_num_each_type[i]);
-  }
+  (*this).num_each_type = in_num_each_type;
+  //DX20210118 [CANNOT DO THIS - overwrites site occupation] (*this).comp_each_type = in_num_each_type;
 }
 
 // ***************************************************************************
@@ -16862,8 +16890,8 @@ void xstructure::ChangeBasis(const xmatrix<double>& transformation_matrix) {
     std::stable_sort(atom_basis.begin(),atom_basis.end(),sortAtomsNames);
     (*this).atoms = atom_basis;
     (*this).SpeciesPutAlphabetic();
-    deque<int> sizes = SYM::arrange_atoms(atom_basis);
-    pflow::SetNumEachType((*this), sizes);
+    deque<int> sizes = (*this).GetNumEachType();
+    (*this).SetNumEachType(sizes);
     (*this).MakeBasis();
   }
   // ---------------------------------------------------------------------------

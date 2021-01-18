@@ -1242,6 +1242,7 @@ double GetAtomXrayScatt(const uint& atnum);
 vector<string> GetGroupOfAtoms(string& group_name); //DX20181220 
 double GetCompoundAttenuationLength(const vector<string>& species,const vector<double>& composition,const double& density);  // density in g/cm^3, return in cm
 double GetCompoundAttenuationLength(const deque<string>& _species,const deque<int>& _composition,const double& density);  // density in g/cm^3, return in cm
+deque<int> GetNumEachType(const deque<_atom>& atoms); //DX20210118
 //DX+CO START
 //DX20190214 [OBSOLETE]bool isequalRHT(const _atom& a, const _atom& b,double=_SYM_TOL_);       // bool equality only checks 'coord' and 'name' (RHT)  //RHT
 //DX+CO END
@@ -1544,6 +1545,7 @@ class xstructure {
     void ShiftFPos(const xvector<double>& shift);                 // Shift origin by fractional vector //DX20201215 - added modify-in-place variant
     void SetVolume(const double &in_volume);                      // Change volume
     void SetAutoVolume(bool use_AFLOW_defaults_in=false);         // Change volume to sum of atoms  //CO20191010
+    deque<int> GetNumEachType();                                  // Get number of each types based on deque<_atom> //DX20210118
     void SetNumEachType(const deque<int>& in_num_each_type);      // Set number of each types (in-place modification) //DX20210113
     void InflateLattice(const double &coefficient);               // Inflate lattice
     void InflateVolume(const double &coefficient);                // Inflate volume
@@ -4617,8 +4619,8 @@ namespace pflow {
   // [RF20200415 - duplicate from xatom]vector<double> GetSpins(const xstructure& a);
   aurostd::matrix<double> GetFpos(const xstructure& str);  //CO20200404 pflow::matrix()->aurostd::matrix()
   aurostd::matrix<double> GetCpos(const xstructure& str);  //CO20200404 pflow::matrix()->aurostd::matrix()
-  xstructure SetNumEachType(const xstructure& a,const deque<int>& in_num_each_type);
-  deque<int> GetNumEachType(const xstructure& a);
+  //DX20210118 [OBSOLETE - expensive to make copy] xstructure SetNumEachType(const xstructure& a,const deque<int>& in_num_each_type);
+  //DX20210118 [OBSOLETE - use xstructure method] deque<int> GetNumEachType(const xstructure& a);
   xstructure SetLat(const xstructure& a,const aurostd::matrix<double>& in_lat);  //CO20200404 pflow::matrix()->aurostd::matrix()
   aurostd::matrix<double> GetLat(const xstructure& a); //CO20200404 pflow::matrix()->aurostd::matrix()
   double GetScale(const xstructure& a);
