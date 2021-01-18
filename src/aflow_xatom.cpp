@@ -11387,7 +11387,7 @@ xmatrix<double> LatticeReduction(const xmatrix<double>& lattice) {
 //DX20190214 [OBSOLETE]   return foldAtomsInCell(atoms, c2f_new, f2c_new, skew, tol);
 //DX20190214 [OBSOLETE]}
 
-// foldAtomsInCellXstructureInPlace()
+// xstructure::foldAtomsInCell()
 // modify xstructure in-place
 void xstructure::foldAtomsInCell(const xmatrix<double>& lattice_new, bool skew, double tol, bool check_min_dists) { //DX20210104
 
@@ -11399,19 +11399,9 @@ void xstructure::foldAtomsInCell(const xmatrix<double>& lattice_new, bool skew, 
   (*this).BringInCell();
   (*this).FixLattices();
   (*this).SpeciesPutAlphabetic();
-  deque<int> sizes = (*this).GetNumEachType();
-  (*this).SetNumEachType(sizes);
+  (*this).SetNumEachType();
   (*this).species = (*this).species;
   (*this).MakeBasis();
-}
-
-// foldAtomsInCellXstructure()
-// xstructure copy
-xstructure foldAtomsInCellXstructure(const xstructure& a,const xmatrix<double>& lattice_new, bool skew, double tol, bool check_min_dists) { //DX20210104
-
-  xstructure b=a; //copy
-  b.foldAtomsInCell(lattice_new, skew, tol, check_min_dists); // fold atoms in
-  return b;
 }
 
 deque<_atom> foldAtomsInCell(const xstructure& a,const xmatrix<double>& lattice_new, bool skew, double tol, bool check_min_dists) { //CO20190520 - removed pointers for bools and doubles, added const where possible //DX20190619 = added check_min_dists bool
@@ -13590,6 +13580,12 @@ deque<int> xstructure::GetNumEachType() {
 // ***************************************************************************
 // Function SetNumEachType //DX20210113 (from pflow, added in-place variant)
 // ***************************************************************************
+// Set the number of each type in xstructure
+// empty input: determine based on deque<_atom>
+void xstructure::SetNumEachType() {
+  (*this).num_each_type = (*this).GetNumEachType();
+}
+// deque<int> input
 void xstructure::SetNumEachType(const deque<int>& in_num_each_type) {
   (*this).num_each_type = in_num_each_type;
   //DX20210118 [CANNOT DO THIS - overwrites site occupation] (*this).comp_each_type = in_num_each_type;
@@ -16890,8 +16886,7 @@ void xstructure::ChangeBasis(const xmatrix<double>& transformation_matrix) {
     std::stable_sort(atom_basis.begin(),atom_basis.end(),sortAtomsNames);
     (*this).atoms = atom_basis;
     (*this).SpeciesPutAlphabetic();
-    deque<int> sizes = (*this).GetNumEachType();
-    (*this).SetNumEachType(sizes);
+    (*this).SetNumEachType();
     (*this).MakeBasis();
   }
   // ---------------------------------------------------------------------------

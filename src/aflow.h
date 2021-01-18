@@ -1546,7 +1546,8 @@ class xstructure {
     void SetVolume(const double &in_volume);                      // Change volume
     void SetAutoVolume(bool use_AFLOW_defaults_in=false);         // Change volume to sum of atoms  //CO20191010
     deque<int> GetNumEachType();                                  // Get number of each types based on deque<_atom> //DX20210118
-    void SetNumEachType(const deque<int>& in_num_each_type);      // Set number of each types (in-place modification) //DX20210113
+    void SetNumEachType();                                        // Set number of each types, uses GetNumEachType() (in-place modification) //DX20210113
+    void SetNumEachType(const deque<int>& in_num_each_type);      // Set number of each types, based on input (in-place modification) //DX20210113
     void InflateLattice(const double &coefficient);               // Inflate lattice
     void InflateVolume(const double &coefficient);                // Inflate volume
     void foldAtomsInCell(                        // fold atoms into new cell representation //DX20210113
@@ -2407,7 +2408,6 @@ xstructure LatticeReduction(const xstructure& a);
 xmatrix<double> LatticeReduction(const xmatrix<double>& lattice);
 //CO20170807 START
 //DX20190214 [OBSOLETE] deque<_atom> foldAtomsInCell(deque<_atom>& atoms, xmatrix<double>& c2f_new, xmatrix<double>& f2c_new, bool skew); //CO20190520 - removed pointers for bools and doubles, added const where possible
-xstructure foldAtomsInCellXstructure(const xstructure& a,const xmatrix<double>& lattice_new, bool skew, double tol, bool check_min_dists=true); //DX20210104 - added overload
 deque<_atom> foldAtomsInCell(const xstructure& a, const xmatrix<double>& lattice_new, bool skew, double tol, bool check_min_dists=true); //CO20190520 - removed pointers for bools and doubles, added const where possible //DX20190619 - added check_min_dists bool
 deque<_atom> foldAtomsInCell(const deque<_atom>& atoms, const xmatrix<double>& lattice_orig, const xmatrix<double>& lattice_new, bool skew, double tol, bool check_min_dists=true); //CO20190520 - removed pointers for bools and doubles, added const where possible //DX20190619 = added check_min_dists bool
 xstructure GetPrimitiveVASP(const xstructure& a);

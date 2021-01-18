@@ -1998,8 +1998,7 @@ namespace compare {
       for(uint j=0;j<structure_name.size();j++){stringstream ss_site; ss_site << structure_name[j]; species.push_back(ss_site.str());}
       xstr.SetSpecies(species);
       xstr.SpeciesPutAlphabetic();
-      deque<int> sizes = GetNumEachType(xstr.atoms);
-      xstr.SetNumEachType(sizes);
+      xstr.SetNumEachType();
       structure = xstr;
     }
     // ---------------------------------------------------------------------------
@@ -2401,8 +2400,7 @@ void XtalFinderCalculator::generateAtomPermutedStructures(
     xstr_tmp.species = species; //DX20190813
     xstr_tmp.species_pp = xstr_tmp.species; //for vasp5 20190731, after ordered
     xstr_tmp.SpeciesPutAlphabetic();
-    deque<int> sizes = GetNumEachType(xstr_tmp.atoms);
-    xstr_tmp.SetNumEachType(sizes);
+    xstr_tmp.SetNumEachType();
     xstr_tmp.ReScale(1.0); //DX20190715
     xstr_tmp.BringInCell(); //DX20200707
 
@@ -6877,8 +6875,7 @@ namespace compare {
     proto_new.BringInCell(1e-10);
     proto_new.FixLattices();
     proto_new.SpeciesPutAlphabetic();
-    deque<int> sizes = GetNumEachType(new_basis);
-    proto_new.SetNumEachType(sizes);
+    proto_new.SetNumEachType();
     proto_new.species = proto.species; //DX20190718
     proto_new.MakeBasis(); //DX20200522
     proto = proto_new;

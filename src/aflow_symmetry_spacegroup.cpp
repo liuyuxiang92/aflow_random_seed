@@ -1671,7 +1671,6 @@ namespace SYM {
 
         // ========== Rearrange atoms/Store ========== //
         sort(conventional_basis_atoms.begin(), conventional_basis_atoms.end(), sortAtomsTypes);
-        deque<int> sizes = GetNumEachType(conventional_basis_atoms);
 
         xstr_out.lattice_label_ITC = lattice_char;
         xstr_out.lattice = CL;
@@ -1703,7 +1702,7 @@ namespace SYM {
         //DX20190410 END
 
         // Set number of each type
-        xstr_out.SetNumEachType(sizes);
+        xstr_out.SetNumEachType();
         if(xstr_out.num_each_type.size() != in_names.size()) {
           xstr_out = pflow::SetAllAtomNames(xstr_out, in_names);
         }
