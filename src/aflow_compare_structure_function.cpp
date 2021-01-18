@@ -7647,7 +7647,7 @@ void XtalFinderCalculator::calculatePrototypeDesignations(
     vector<StructurePrototype>& prototypes,
     uint num_proc){
   
-  //bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_COMPARE_);
+  bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_COMPARE_);
   string function_name = XPID + "XtalFinderCalculator::calculatePrototypeDesignations():";
   stringstream message;
 
