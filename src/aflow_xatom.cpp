@@ -11389,9 +11389,9 @@ xmatrix<double> LatticeReduction(const xmatrix<double>& lattice) {
 
 // foldAtomsInCellXstructureInPlace()
 // modify xstructure in-place
-void xstructure::foldAtomsInCellXstructureInPlace(const xmatrix<double>& lattice_new, bool skew, double tol, bool check_min_dists) { //DX20210104
+void xstructure::foldAtomsInCell(const xmatrix<double>& lattice_new, bool skew, double tol, bool check_min_dists) { //DX20210104
 
-  deque<_atom> atoms = foldAtomsInCell((*this), lattice_new, skew, tol, check_min_dists); // fold atoms in
+  (*this).atoms = ::foldAtomsInCell((*this), lattice_new, skew, tol, check_min_dists); // fold atoms in //DX20210118 - specify global namespace
 
   // update xstructure info
   (*this).lattice=lattice_new;
@@ -11400,7 +11400,7 @@ void xstructure::foldAtomsInCellXstructureInPlace(const xmatrix<double>& lattice
   (*this).FixLattices();
   (*this).SpeciesPutAlphabetic();
   deque<int> sizes = SYM::arrange_atoms((*this).atoms);
-  (*this) = pflow::SetNumEachType((*this), sizes);
+  pflow::SetNumEachType((*this), sizes);
   (*this).species = (*this).species;
   (*this).MakeBasis();
 }
@@ -11410,7 +11410,7 @@ void xstructure::foldAtomsInCellXstructureInPlace(const xmatrix<double>& lattice
 xstructure foldAtomsInCellXstructure(const xstructure& a,const xmatrix<double>& lattice_new, bool skew, double tol, bool check_min_dists) { //DX20210104
 
   xstructure b=a; //copy
-  b.foldAtomsInCellXstructureInPlace(lattice_new, skew, tol, check_min_dists); // fold atoms in
+  b.foldAtomsInCell(lattice_new, skew, tol, check_min_dists); // fold atoms in
   return b;
 }
 
@@ -16828,7 +16828,7 @@ void xstructure::ChangeBasis(const xmatrix<double>& transformation_matrix) {
 
     bool skew = false;
     double tol=0.01;
-    deque<_atom> new_basis = foldAtomsInCell(atom_basis, lattice_orig, (*this).lattice, skew, tol, false); //false: don't check atom mappings (slow)
+    deque<_atom> new_basis = ::foldAtomsInCell(atom_basis, lattice_orig, (*this).lattice, skew, tol, false); //false: don't check atom mappings (slow) //DX20210118 - add global namespace
     atom_basis = new_basis;
       
     // check atom count
@@ -16863,7 +16863,7 @@ void xstructure::ChangeBasis(const xmatrix<double>& transformation_matrix) {
     (*this).atoms = atom_basis;
     (*this).SpeciesPutAlphabetic();
     deque<int> sizes = SYM::arrange_atoms(atom_basis);
-    (*this) = pflow::SetNumEachType((*this), sizes);
+    pflow::SetNumEachType((*this), sizes);
     (*this).MakeBasis();
   }
   // ---------------------------------------------------------------------------

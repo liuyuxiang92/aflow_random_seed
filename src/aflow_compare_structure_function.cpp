@@ -1999,7 +1999,7 @@ namespace compare {
       xstr.SetSpecies(species);
       xstr.SpeciesPutAlphabetic();
       deque<int> sizes = SYM::arrange_atoms(xstr.atoms);
-      xstr = pflow::SetNumEachType(xstr, sizes);
+      pflow::SetNumEachType(xstr, sizes);
       structure = xstr;
     }
     // ---------------------------------------------------------------------------
@@ -2402,7 +2402,7 @@ void XtalFinderCalculator::generateAtomPermutedStructures(
     xstr_tmp.species_pp = xstr_tmp.species; //for vasp5 20190731, after ordered
     xstr_tmp.SpeciesPutAlphabetic();
     deque<int> sizes = SYM::arrange_atoms(xstr_tmp.atoms);
-    xstr_tmp = pflow::SetNumEachType(xstr_tmp, sizes);
+    pflow::SetNumEachType(xstr_tmp, sizes);
     xstr_tmp.ReScale(1.0); //DX20190715
     xstr_tmp.BringInCell(); //DX20200707
 
@@ -6878,7 +6878,7 @@ namespace compare {
     proto_new.FixLattices();
     proto_new.SpeciesPutAlphabetic();
     deque<int> sizes = SYM::arrange_atoms(new_basis);
-    proto_new = pflow::SetNumEachType(proto_new, sizes);
+    pflow::SetNumEachType(proto_new, sizes);
     proto_new.species = proto.species; //DX20190718
     proto_new.MakeBasis(); //DX20200522
     proto = proto_new;

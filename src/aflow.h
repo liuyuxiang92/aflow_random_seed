@@ -1547,7 +1547,7 @@ class xstructure {
     void SetNumEachType(const deque<int>& in_num_each_type);      // Set number of each types (in-place modification) //DX20210113
     void InflateLattice(const double &coefficient);               // Inflate lattice
     void InflateVolume(const double &coefficient);                // Inflate volume
-    void foldAtomsInCellXstructureInPlace(                        // fold atoms into new cell representation //DX20210113
+    void foldAtomsInCell(                        // fold atoms into new cell representation //DX20210113
         const xmatrix<double>& lattice_new,
         bool skew,
         double tol,
