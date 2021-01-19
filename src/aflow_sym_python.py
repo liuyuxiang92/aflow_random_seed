@@ -40,7 +40,6 @@ class Symmetry:
         res_json = json.loads(output) 
         return res_json 
 
-
     def get_edata(self, input_file, tol=None, magmoms=None): 
         fpath = get_filepath(input_file.name)
         command = ' --edata' 
