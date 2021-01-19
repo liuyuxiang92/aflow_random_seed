@@ -11395,12 +11395,10 @@ void xstructure::foldAtomsInCell(const xmatrix<double>& lattice_new, bool skew, 
 
   // update xstructure info
   (*this).lattice=lattice_new;
-  std::stable_sort((*this).atoms.begin(),(*this).atoms.end(),sortAtomsNames);
   (*this).BringInCell();
   (*this).FixLattices();
   (*this).SpeciesPutAlphabetic();
   (*this).SetNumEachType();
-  (*this).species = (*this).species;
   (*this).MakeBasis();
 }
 
@@ -11501,6 +11499,9 @@ deque<_atom> foldAtomsInCell(const deque<_atom>& atoms,const xmatrix<double>& la
     }
     if(!aurostd::isequal(min_dist_orig,min_dist_new,0.1)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Minimum distance changed, check that atoms are not rotated",_RUNTIME_ERROR_);}
   }
+
+  // sort atoms //DX+CO20210119
+  std::stable_sort(atoms_in_cell.begin(),atoms_in_cell.end(),sortAtomsNames);
 
   return atoms_in_cell;
 }
