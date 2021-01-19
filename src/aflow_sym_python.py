@@ -18,16 +18,15 @@ class Symmetry:
             raise OSError('aflow executable not found: ' + self.aflow_executable)
 
     def get_filepath(self, filename):
-        if os.path.exists(input_file.name):
+        if os.path.exists(filename):
             return os.path.realpath(filename)
         else:
             raise OSError(filename + ' not found')
 
     def get_symmetry(self, input_file, tol=None, magmoms=None):
-        fpath = get_filepath(input_file.name)
+        fpath = self.get_filepath(input_file)
         command = ' --aflowSYM' 
         output = '' 
-
 
         if tol: 
             command += '=' + str(tol) 
@@ -41,10 +40,9 @@ class Symmetry:
         return res_json 
 
     def get_edata(self, input_file, tol=None, magmoms=None): 
-        fpath = get_filepath(input_file.name)
+        fpath = self.get_filepath(input_file)
         command = ' --edata' 
         output = '' 
-
 
         if tol: 
             command += '=' + str(tol) 
@@ -58,10 +56,9 @@ class Symmetry:
         return res_json 
 
     def get_sgdata(self, input_file, tol=None, magmoms=None): 
-        fpath = get_filepath(input_file.name)
+        fpath = self.get_filepath(input_file)
         command = ' --sgdata' 
         output = '' 
-
 
         if tol: 
             command += '=' + str(tol) 
