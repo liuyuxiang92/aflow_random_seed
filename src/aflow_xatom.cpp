@@ -15763,10 +15763,11 @@ xstructure input2QExstr(istream& input) {
   return a;
 }
 
-xstructure input2VASPxstr(istream& input) {
+xstructure input2VASPxstr(istream& input,bool vasp5) {  //CO20210119 - added vasp5
   xstructure a(input,IOAFLOW_AUTO);
   //  if(a.iomode==IOQE_AUTO || a.iomode==IOQE_GEOM)
   a.xstructure2vasp();
+  if(vasp5){a.is_vasp4_poscar_format=false;a.is_vasp5_poscar_format=true;}  //CO20210119
   //  cerr << a.title << endl;
   return a;
 }

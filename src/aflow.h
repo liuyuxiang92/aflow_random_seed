@@ -2488,7 +2488,7 @@ xvector<double> r_lattice(const xstructure& str,const xvector<int>& ijk);
 xstructure input2AIMSxstr(istream& input);
 xstructure input2ABINITxstr(istream& input);
 xstructure input2QExstr(istream& input);
-xstructure input2VASPxstr(istream& input);
+xstructure input2VASPxstr(istream& input,bool vasp5=false);
 xstructure input2ELKxstr(istream& input); //DX20200313
 
 // ----------------------------------------------------------------------------
