@@ -420,10 +420,14 @@ namespace compare {
               final_prototypes[0].structure_representative->structure,
               final_prototypes[0].structures_duplicate[0]->structure);
         }
-        else if(screen_only) {
-          if(write_json){ return results_json; }
-          if(write_txt){ return results_txt; }
-        }
+      }
+      else{
+        message << "UNMATCHABLE" << endl;
+        pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_COMPLETE_);
+      }
+      if(screen_only) {
+        if(write_json){ return results_json; }
+        if(write_txt){ return results_txt; }
       }
       return oss.str();
     }

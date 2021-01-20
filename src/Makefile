@@ -1504,6 +1504,16 @@ check_aflow_xtal_finder:
 	@echo "Running aflow_xtal_finder - ideal prototyper test 3" && ANSWER="ABC4_mP12_13_e_a_2g" && RESULT=$$(./aflow --proto=ABC4_mP12_13_e_a_2g --params=8.6244,0.500336,1.63361,145.35,0.5182,0.2986,0.0278,0.0003,0.2821,0.4045,0.2366 | ./aflow --prototype) && AFLOW_LABEL=$$(echo $$RESULT | grep "AFLOW label" | awk '{print $$4}') && \
 		if [ $$AFLOW_LABEL != $$ANSWER ]; then "aflow_xtal_finder did not return $$ANSWER for './aflow --proto=ABC4_mP12_13_e_a_2g --params=8.6244,0.500336,1.63361,145.35,0.5182,0.2986,0.0278,0.0003,0.2821,0.4045,0.2366 | ./aflow --prototype', found $$AFLOW_LABEL instead" && exit 1; fi
 	@echo "aflow_xtal_finder - ideal prototyper test 3 passed!"
+	@echo "Running aflow_xtal_finder - compare materials test 1 (different cell sizes)" && ANSWER="MATCH" && RESULT=$$(./aflow --proto=AB_cF8_225_a_b:Cl:Na > AB_cF8_225_a_b.poscar; cat AB_cF8_225_a_b.poscar | ./aflow --supercell=4,1,1 > AB_cF8_225_a_b_411_supercell.poscar; ./aflow --compare_materials=AB_cF8_225_a_b.poscar,AB_cF8_225_a_b_411_supercell.poscar --quiet) && MATCH=$$(echo $$RESULT | awk '{print $$3}') && \
+		if [ $$MATCH != $$ANSWER ]; then "aflow_xtal_finder did not return $$ANSWER for './aflow --proto=AB_cF8_225_a_b:Cl:Na > AB_cF8_225_a_b; cat AB_cF8_225_a_b.poscar | ./aflow --supercell=4,1,1 > AB_cF8_225_a_b_411_supercell.poscar; ./aflow --compare_materials=AB_cF8_225_a_b.poscar,AB_cF8_225_a_b_411_supercell.poscar --quiet', found $$MATCH instead" && exit 1; fi
+	@echo "aflow_xtal_finder - compare_materials test 1 (different cell sizes) passed!"
+	@rm -f AB_cF8_225_a_b.poscar
+	@rm -f AB_cF8_225_a_b_411_supercell.poscar
+	@echo "Running aflow_xtal_finder - compare materials test 2 (different cell sizes)" && ANSWER="MATCH" && RESULT=$$(./aflow --proto=AB_cF8_225_a_b:Cl:Na > AB_cF8_225_a_b.poscar; cat AB_cF8_225_a_b.poscar | ./aflow --supercell=4,1,1 > AB_cF8_225_a_b_411_supercell.poscar; ./aflow --compare_materials=AB_cF8_225_a_b_411_supercell.poscar,AB_cF8_225_a_b.poscar --quiet) && MATCH=$$(echo $$RESULT | awk '{print $$3}') && \
+		if [ $$MATCH != $$ANSWER ]; then "aflow_xtal_finder did not return $$ANSWER for './aflow --proto=AB_cF8_225_a_b:Cl:Na > AB_cF8_225_a_b; cat AB_cF8_225_a_b.poscar | ./aflow --supercell=4,1,1 > AB_cF8_225_a_b_411_supercell.poscar; ./aflow --compare_materials=AB_cF8_225_a_b_411_supercell.poscar,AB_cF8_225_a_b.poscar --quiet', found $$MATCH instead" && exit 1; fi
+	@echo "aflow_xtal_finder - compare_materials test 2 (different cell sizes) passed!"
+	@rm -f AB_cF8_225_a_b.poscar
+	@rm -f AB_cF8_225_a_b_411_supercell.poscar
 	@echo "Running aflow_xtal_finder - compare atom decorations test 1" && ANSWER=3 && RESULT=$$(./aflow --proto=ABCD_cF16_216_c_d_b_a | ./aflow --unique_atom_decorations --print_misfit --quiet) && NUM_UNIQUE_DECORATIONS=$$(echo $$RESULT | grep "Unique atom decorations" | cut -d '(' -f2 | cut -d ')' -f1) && \
 		if [ "$$NUM_UNIQUE_DECORATIONS" -ne "$$ANSWER" ]; then "aflow_xtal_finder did not return $$ANSWER for './aflow --proto=ABCD_cF16_216_c_d_b_a | ./aflow --unique_atom_decorations --print_misfit --quiet', found $$NUM_UNIQUE_DECORATIONS instead" && exit 1; fi
 	@echo "aflow_xtal_finder test - compare atom decorations test 1 passed!"
