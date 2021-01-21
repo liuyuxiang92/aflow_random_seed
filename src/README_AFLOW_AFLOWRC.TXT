@@ -1632,7 +1632,7 @@ DEFAULT_XTALFINDER_FILE_MATERIAL
   default: "material_comparison_output"
 
 DEFAULT_XTALFINDER_FILE_STRUCTURE
-  description: Ouput file prefix for comparing structures (ignore atomic species).
+  description: Output file prefix for comparing structures (ignore atomic species).
   type: string
   default: "structure_comparison_output"
 
