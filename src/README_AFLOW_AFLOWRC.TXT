@@ -1627,7 +1627,7 @@ DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING
   default: 4.0
 
 DEFAULT_XTALFINDER_FILE_MATERIAL
-  description: Ouput file prefix for comparing materials (map alike atomic species).
+  description: Output file prefix for comparing materials (map alike atomic species).
   type: string
   default: "material_comparison_output"
 
