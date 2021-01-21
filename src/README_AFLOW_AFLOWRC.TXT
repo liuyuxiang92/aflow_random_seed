@@ -1647,7 +1647,7 @@ DEFAULT_XTALFINDER_FILE_MATERIAL_COMPARE2DATABASE
   default: "material_comparison_compare2database_output"
 
 DEFAULT_XTALFINDER_FILE_STRUCTURE_COMPARE2DATABASE
-  description: Ouput file prefix for comparing an input structure to the AFLOW.org repository (ignore atomic species).
+  description: Output file prefix for comparing an input structure to the AFLOW.org repository (ignore atomic species).
   type: string
   default: "structure_comparison_compare2database_output"
 
