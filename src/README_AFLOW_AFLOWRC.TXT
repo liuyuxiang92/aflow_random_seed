@@ -1637,7 +1637,7 @@ DEFAULT_XTALFINDER_FILE_STRUCTURE
   default: "structure_comparison_output"
 
 DEFAULT_XTALFINDER_FILE_DUPLICATE
-  description: Ouput file prefix for finding duplicate compounds (map alike atomic species and do not scale volumes).
+  description: Output file prefix for finding duplicate compounds (map alike atomic species and do not scale volumes).
   type: string
   default: "duplicate_comparison_output"
 
