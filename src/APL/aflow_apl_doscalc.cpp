@@ -27,11 +27,11 @@ namespace apl {
     free();
   }
 
-  DOSCalculator::DOSCalculator(PhononCalculator& pc, const string& method, const vector<xvector<double> >& projections) {
+  DOSCalculator::DOSCalculator(PhononCalculator& pc, const xoption &aplopts) {
     free();
     _pc = &pc;
     _pc_set = true;
-    initialize(projections, method);
+    initialize(aplopts);
   }
 
   DOSCalculator::DOSCalculator(const DOSCalculator& that) {
@@ -99,15 +99,44 @@ namespace apl {
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  void DOSCalculator::initialize(const vector<xvector<double> >& projections, const string& method) {
+  void DOSCalculator::initialize(const xoption &aplopts){
     string function = "apl::DOSCalculator::initialize():";
     string message = "";
     if (!_pc_set) {
       message = "PhononCalculator pointer not set.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
     }
-    _bzmethod = method;
-    _projections = projections;
+    //AS20200312 BEGIN: now initialization parameters are passed using xoption
+    _bzmethod = aplopts.getattachedscheme("DOSMETHOD");
+
+    // projections
+    if (aplopts.flag("DOS_PROJECT")) {
+      if (aplopts.flag("DOS_CART") || aplopts.flag("DOS_FRAC")) {
+        string projscheme = "";
+        if (aplopts.flag("DOS_CART")){
+          projscheme = aplopts.getattachedscheme("DOSPROJECTIONS_CART");
+        } else {
+          projscheme = aplopts.getattachedscheme("DOSPROJECTIONS_FRAC");
+        }
+        vector<string> tokens;
+        aurostd::string2tokens(projscheme, tokens, "; ");
+        vector<double> proj;
+        for (uint i = 0; i < tokens.size(); i++) {
+          aurostd::string2tokens(tokens[i], proj, ", ");
+          _projections.push_back(aurostd::vector2xvector<double>(proj));
+        }
+      } else {
+        xvector<double> proj(3);
+        _projections.push_back(proj);
+      }
+    }
+
+    if ((_projections.size() > 0) && aplopts.flag("DOS_FRAC")) {
+      for (uint p = 0; p < _projections.size(); p++) {
+        _projections[p] = _pc->getInputCellStructure().f2c * _projections[p];
+      }
+    }
+    //AS20200312 END
     _system = _pc->_system;
 
     if (!_pc->getSupercell().isConstructed()) {

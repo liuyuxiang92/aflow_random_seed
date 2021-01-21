@@ -521,11 +521,14 @@ namespace apl {
       // Initializers
       void initialize_qmesh(const vector<int>&, bool=true, bool=true);
       void initialize_qmesh(const xvector<int>&, bool=true, bool=true);
-      void initialize_supercell(const xstructure&);
+      void initialize_supercell(const xstructure&, bool verbose=true);//AS20200908
       void initialize_supercell(const string&);
 
       // IFCs
       void setHarmonicForceConstants(const ForceConstantCalculator&);
+      void setHarmonicForceConstants(const vector<vector<xmatrix<double> > > &);//AS20201204
+      void setHarmonicForceConstants(const vector<vector<xmatrix<double> > > &,
+            const vector<xmatrix<double> >&, const xmatrix<double> &, bool isPolar=true);//AS20201204
       void awake();
       void setAnharmonicForceConstants(const AnharmonicIFCs&);
       void readAnharmonicIFCs(string);
@@ -655,6 +658,7 @@ namespace apl {
       xEIGENVAL createEIGENVAL();
       void writePHEIGENVAL(const string&);
       void writePHKPOINTS(const string&);
+      xKPOINTS getPHKPOINTS();//AS20201110
       //ME20190614 STOP
       //[OBSOLETE PN20180705]std::vector<double> get_path() { return path; }                   //[PN]
       //[OBSOLETE PN20180705]std::vector<int> get_path_segment() { return path_segment; }      //[PN]
@@ -697,12 +701,12 @@ namespace apl {
 
     public:
       DOSCalculator();
-      DOSCalculator(PhononCalculator&, const string&, const vector<xvector<double> >&);
+      DOSCalculator(PhononCalculator&, const xoption&);//AS20201203 input parameters are passed via xoption
       DOSCalculator(const DOSCalculator&);
       DOSCalculator& operator=(const DOSCalculator&);
       ~DOSCalculator();
       void clear(PhononCalculator&);
-      void initialize(const vector<xvector<double> >&, const string&);
+      void initialize(const xoption&);//AS20201203 input parameters are passed via xoption
       void calc(int);
       void calc(int, double);
       void calc(int, double, double, double);  //ME20200203
@@ -1131,10 +1135,9 @@ namespace apl {
       void getWeightsLT(double, const vector<double>&, vector<double>&);
       void calculateTransitionProbabilities();
       vector<vector<vector<xcomplex<double> > > > calculatePhases(bool=false);
-      void calculateTransitionProbabilitiesPhonon(int, int,
-          vector<vector<vector<vector<double> > > >&,
+      void calculateTransitionProbabilitiesPhonon(vector<vector<vector<vector<double> > > >&,
           const vector<vector<vector<xcomplex<double> > > >&);
-      void calculateTransitionProbabilitiesIsotope(int, int);
+      void calculateTransitionProbabilitiesIsotope();
       vector<vector<double> > calculateTransitionProbabilitiesBoundary();
       void getProcess(const vector<int>&, vector<int>&, vector<int>&, int&);
       xmatrix<double> calculateThermalConductivityTensor(double, vector<vector<double> >&, vector<vector<double> >&);
@@ -1142,14 +1145,13 @@ namespace apl {
       vector<vector<double> > calculateAnharmonicRates(const vector<vector<double> >&);
       vector<vector<double> > calculateTotalRates(const vector<vector<double> >&, vector<vector<double> >&);
       double getOccupationTerm(const vector<vector<double> >&, int, const vector<int>&, const vector<int>&);
-      void calcAnharmRates(int, int, const vector<vector<double> >&, vector<vector<double> >&);
+      void calcAnharmRates(const vector<vector<double> >&, vector<vector<double> >&);
       vector<vector<xvector<double> > > getMeanFreeDispRTA(const vector<vector<double> >&);
       xmatrix<double> calcTCOND(double, const vector<vector<double> >&,
           const vector<vector<xvector<double> > >&);
       void getMeanFreeDispFull(const vector<vector<double> >&,
           const vector<vector<double> >&, vector<vector<xvector<double> > >&);
-      void calculateDelta(int, int, const vector<vector<double> >&,
-          const vector<vector<xvector<double> > >&, vector<vector<xvector<double> > >&);
+      void calculateDelta(const vector<vector<double> >&, const vector<vector<xvector<double> > >&, vector<vector<xvector<double> > >&);
       void correctMFD(const vector<vector<double> >&, const vector<vector<xvector<double> > >&, vector<vector<xvector<double> > >&);
 
       void writeTempIndepOutput(const string&, string, const string&, const vector<vector<double> >&);
@@ -1179,6 +1181,9 @@ namespace apl
   enum QHAmethod {QHA_CALC, QHA3P_CALC, SCQHA_CALC, QHANP_CALC};
   enum QHAtype   {QHA_FD, QHA_EOS, QHA_TE};
 
+  bool QHA_Get_AflowInName(string &AflowInName, const string &directory_LIB);
+  //void linkAPLtoQHA();//AS20201216 OBSOLETE
+
   /// Calculates QHA-related properties
   ///
   /// This class will substitute old QHA class.
@@ -1188,57 +1193,63 @@ namespace apl
     public:
       QHA(ostream& oss=std::cout);
       QHA(const QHA& qha);
-      QHA(_xinput &xinput, xoption &qhaopts, xoption &aplopts, ofstream &FileMESSAGE,
-          ostream &oss=std::cout);
-      void initialize(_xinput &xinput, xoption &qhaopts, xoption &aplopts,
-          ofstream &FileMESSAGE, ostream &oss);
+      QHA(const xstructure &struc, _xinput &xinput, xoption &qhaopts, xoption &aplopts,
+          ofstream &FileMESSAGE, ostream &oss=std::cout);
+      void initialize(const xstructure &struc, _xinput &xinput, xoption &qhaopts,
+          xoption &aplopts, ofstream &FileMESSAGE, ostream &oss);
       ~QHA();
       const QHA& operator=(const QHA &qha);
       void run(_xflags &xflags, _aflags &aflags, _kflags &kflags);
       void clear();
       double calcFrequencyFit(double V, xvector<double> &xomega);
+      double calcGrueneisen(double V, xvector<double> &xomega);
       double calcGrueneisen(double V, xvector<double> &xomega, double &w);
       double calcGrueneisenFD(const xvector<double> &xomega);
       void   calcCVandGP(double T, double &CV, double &GP);
       void   calcCVandGPfit(double T, double V, double &CV, double &GP);
-      double FreeEnergy(double T, int id);
-      double FreeEnergyFit(double T, double V, EOSmethod eos_method, QHAmethod method);
-      double electronicFreeEnergy(double T, int id);
-      double ChemicalPotential(double T, int Vid);
-      double IDOS(double e, double T, xEIGENVAL &eig);
-      xvector<double> electronicFreeEnergySommerfeld(double T);
-      xvector<double> DOSatEf();
-      double InternalEnergyFit(double T, double V, EOSmethod method);
+      double calcGPinfFit(double V);
+      double calcFreeEnergy(double T, int id);
+      double calcFreeEnergyFit(double T, double V, EOSmethod eos_method, QHAmethod method);
+      double calcElectronicFreeEnergy(double T, int id);
+      double calcChemicalPotential(double T, int Vid);
+      double calcIDOS(double e, double T, xEIGENVAL &eig);
+      xvector<double> calcElectronicFreeEnergySommerfeld(double T);
+      xvector<double> calcDOSatEf();
+      double calcInternalEnergyFit(double T, double V, EOSmethod method);
       xvector<double> fitToEOSmodel(xvector<double> &E, EOSmethod method);
       double evalEOSmodel(double V, const xvector<double> &p, EOSmethod eos_method);
-      double BulkModulus(double V, const xvector<double> &parameters, EOSmethod method);
-      double Bprime(double V, const xvector<double> &parameters, EOSmethod method);
-      double EOS2Pressure(double V, const xvector<double> &parameters, EOSmethod method);
-      double EquilibriumVolume(const xvector<double> &parameters, EOSmethod method);
-      double Entropy(double T, double V, EOSmethod eos_method, QHAmethod method);
+      double calcBulkModulus(double V, const xvector<double> &parameters, EOSmethod method);
+      double calcBprime(double V, const xvector<double> &parameters, EOSmethod method);
+      double calcEOS2Pressure(double V, const xvector<double> &parameters, EOSmethod method);
+      double calcEquilibriumVolume(const xvector<double> &parameters, EOSmethod method);
+      double calcEntropy(double T, double V, EOSmethod eos_method, QHAmethod method);
       double getEqVolumeT(double T, EOSmethod eos_method, QHAmethod method);
-      double ThermalExpansion(double T, EOSmethod eos_method, QHAmethod method);
-      double IsochoricSpecificHeat(double T, double V, EOSmethod eos_method, 
+      double calcThermalExpansion(double T, EOSmethod eos_method, QHAmethod method);
+      double calcIsochoricSpecificHeat(double T, double V, EOSmethod eos_method, 
           QHAmethod qha_method);
       // QHA3P and SCQHA and QHANP
       double extrapolateFrequency(double V, const xvector<double> &xomega, QHAmethod qha_method);
       double extrapolateGrueneisen(double V, const xvector<double> &xomega, QHAmethod qha_method);
       // QHA3P
-      double FreeEnergyTaylorExpansion(double T, int Vid, QHAmethod qha_method);
-      double InternalEnergyTaylorExpansion(double T, double V, QHAmethod qha_method);
+      double calcFreeEnergyTaylorExpansion(double T, int Vid, QHAmethod qha_method);
+      double calcInternalEnergyTaylorExpansion(double T, double V, QHAmethod qha_method);
       // SCQHA
-      double VPgamma(double T, double V);
-      double SCQHAgetEquilibriumVolume(double T, EOSmethod method);
-      double SCQHAgetEquilibriumVolume(double T, double Vguess, xvector<double> &fit_params, EOSmethod method);
-      void   RunSCQHA(EOSmethod method, bool all_iterations_self_consistent=true);
+      double calcVPgamma(double T, double V);
+      double calcSCQHAequilibriumVolume(double T, EOSmethod method);
+      double calcSCQHAequilibriumVolume(double T, double Vguess, xvector<double> &fit_params, EOSmethod method);
+      void   runSCQHA(EOSmethod method, bool all_iterations_self_consistent=true,
+          const string &directory=".");
       // output
-      void   writeThermalProperties(EOSmethod eos_method, QHAmethod qha_method);
-      void   writeFVT();
+      void   writeThermalProperties(EOSmethod eos_method, QHAmethod qha_method, 
+          const string &directory=".");
+      void   writeFVT(const string &directory=".");
       void   writeGPpath(double V, const string &directory=".");
-      void   writeAverageGPfiniteDifferences();
-      void   writeGPmeshFD();
-      void   writeFrequencies();
-      void   writeTphononDispersions(EOSmethod eos_method, QHAmethod qha_method);
+      void   writeAverageGPfiniteDifferences(const string &directory=".");
+      void   writeGPmeshFD(const string &directory=".");
+      void   writeFrequencies(const string &directory=".");
+      void   writeTphononDispersions(EOSmethod eos_method, QHAmethod qha_method,
+          const string &directory=".");
+      void   writeQHAresults(const string &directory=".");
       // members
       xoption apl_options;
       xoption qha_options;
@@ -1251,7 +1262,7 @@ namespace apl
       bool isEOS;
       bool isGP_FD;
       bool ignore_imaginary;
-      bool runQHA, runQHA3P, runSCQHA, runQHANP;
+      bool isQHA, isQHA3P, isSCQHA, isQHANP;
       bool isInitialized;
       bool includeElectronicContribution;
       bool doSommerfeldExpansion;

@@ -3013,6 +3013,7 @@ namespace KBIN {
       if(vflags.KBIN_VASP_FORCE_OPTION_RELAX_TYPE.flag("IONS")==FALSE && vflags.KBIN_VASP_FORCE_OPTION_RELAX_TYPE.flag("CELL_SHAPE")==TRUE  && vflags.KBIN_VASP_FORCE_OPTION_RELAX_TYPE.flag("CELL_VOLUME")==TRUE)  isif=6;
       if(vflags.KBIN_VASP_FORCE_OPTION_RELAX_TYPE.flag("IONS")==FALSE && vflags.KBIN_VASP_FORCE_OPTION_RELAX_TYPE.flag("CELL_SHAPE")==FALSE && vflags.KBIN_VASP_FORCE_OPTION_RELAX_TYPE.flag("CELL_VOLUME")==TRUE)  isif=7;
       if(vflags.KBIN_VASP_FORCE_OPTION_RELAX_TYPE.flag("ALL")) isif=3;
+      if(vflags.KBIN_VASP_FORCE_OPTION_RELAX_TYPE.flag("IONS_CELL_SHAPE")) isif=4;//AS20201208
     }
     if(vflags.KBIN_VASP_FORCE_OPTION_RELAX_TYPE.flag("IONS_CELL_VOLUME")) {  // whatever is the number
       if(aurostd::_isodd(number)) isif=7;  // VOLUME

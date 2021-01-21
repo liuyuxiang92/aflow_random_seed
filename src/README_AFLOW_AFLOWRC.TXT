@@ -1405,6 +1405,11 @@ DEFAULT_QHA_IGNORE_IMAGINARY
   type: bool
   default: 0
 
+DEFAULT_QHA_RELAX_IONS_CELL
+  description: Defines if ions and cell shape will be relaxed in QHA-related subcalculations.
+  type: bool
+  default: 0
+
 DEFAULT_QHA_FILE_PREFIX
   description: QHA file prefix. All QHA output files start with this prefix.
   type: string
@@ -1452,8 +1457,23 @@ DEFAULT_QHA_FREQS_FILE
 
 DEFAULT_QHA_FVT_FILE
   description: Output file for temperature- and volume-dependent free energy.
-  type:
+  type: string
   default: "FVT.out"
+
+DEFAULT_QHA_PDIS_FILE
+  description: Output file for temperature-dependent phonon dispersion relations.
+  type: string
+  default: "dispersion_phonon"
+
+DEFAULT_QHA_PDOS_FILE
+  description: Output file for temperature-dependent phonon DOS.
+  type: string
+  default: "dos_phonon"
+
+DEFAULT_QHA_KPOINTS_FILE
+  description: Output file for path in the BZ used to calculated temperature-dependent phonon dispersion relations.
+  type: string
+  default: "kpoints.out"
 
 ####################################################################################################
 DEFAULTS AAPL
@@ -1586,10 +1606,68 @@ DEFAULT_AAPL_TCOND_PLOT_FILE
 ####################################################################################################
 DEFAULTS XTALFINDER
 
+DEFAULT_XTALFINDER_MISFIT_MATCH
+  description: Similarity threshold for similar structures.
+  type: double
+  default: 0.1
+
+DEFAULT_XTALFINDER_MISFIT_FAMILY
+  description: Similarity threshold for structures in the same family-type.
+  type: double
+  default: 0.2
+
+DEFAULT_XTALFINDER_MISFIT_SUPERCELL_METHOD
+  description: Supercell method for converting crystal structures into a new representation (well-tested, but slow). The alternative (default) is the transformation method (fast).
+  type: bool
+  default: 0
+
 DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING
   description: Scaling factor that divides the minimum interatomic distance, establishing when mapped atoms are sufficiently close and other mappings do not need to be explored.
   type: double
   default: 4.0
+
+DEFAULT_XTALFINDER_FILE_MATERIAL
+  description: Output file prefix for comparing materials (map alike atomic species).
+  type: string
+  default: "material_comparison_output"
+
+DEFAULT_XTALFINDER_FILE_STRUCTURE
+  description: Output file prefix for comparing structures (ignore atomic species).
+  type: string
+  default: "structure_comparison_output"
+
+DEFAULT_XTALFINDER_FILE_DUPLICATE
+  description: Output file prefix for finding duplicate compounds (map alike atomic species and do not scale volumes).
+  type: string
+  default: "duplicate_comparison_output"
+
+DEFAULT_XTALFINDER_FILE_MATERIAL_COMPARE2DATABASE
+  description: Output file prefix for comparing an input material to the AFLOW.org repository (map alike atomic species).
+  type: string
+  default: "material_comparison_compare2database_output"
+
+DEFAULT_XTALFINDER_FILE_STRUCTURE_COMPARE2DATABASE
+  description: Output file prefix for comparing an input structure to the AFLOW.org repository (ignore atomic species).
+  type: string
+  default: "structure_comparison_compare2database_output"
+
+DEFAULT_XTALFINDER_FILE_MATERIAL_DATABASE
+  description: Output file prefix for comparing materials in the AFLOW.org repository (map alike atomic species).
+  type: string
+  default: "material_comparison_database_output"
+
+DEFAULT_XTALFINDER_FILE_STRUCTURE_DATABASE
+  description: Output file prefix for comparing structures in the AFLOW.org repository (ignore atomic species).
+  type: string
+  default: "structure_comparison_database_output"
+
+####################################################################################################
+DEFAULTS ANRL
+
+DEFAULT_ANRL_WYCKOFF_FRACTIONAL_TOL
+  description: Fractional tolerance value for identifying equivalent Wyckoff coordinates.
+  type: double
+  default: 1e-6
 
 ####################################################################################################
 DEFAULTS CORE

@@ -730,6 +730,7 @@ namespace aurostd {
   //  std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > utype2string(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > from) __xprototype;
   template<typename utype> string utype2string(const utype& from) __xprototype;
   template<typename utype> string utype2string(const utype& from,int precision) __xprototype;
+  template<typename utype> string utype2string(const utype& from,int precision,char FORMAT) __xprototype; //DX20201028 - this declaration was missing
   string utype2string(double from,bool roff);
   string utype2string(double from,int precision,bool roff);
   string utype2string(double from,bool roff,double tol);

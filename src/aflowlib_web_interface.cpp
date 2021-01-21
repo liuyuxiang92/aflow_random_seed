@@ -12,6 +12,7 @@
 #define _AFLOWLIB_WEB_INTERFACE_CPP_
 #include "aflow.h"
 #include "aflow_pocc.h" //CO20200624
+#include "aflow_symmetry_spacegroup.h" //DX20200929
 #include "aflowlib_webapp_entry.cpp"  //CO20170622 - BH JMOL stuff
 #include "aflowlib_webapp_bands.cpp"  //CO20180305 - GG bands stuff
 
@@ -178,12 +179,12 @@ namespace aflowlib {
     Wyckoff_site_symmetries=b.Wyckoff_site_symmetries;
     //DX20180823 - added more symmetry info - END
     //DX20190209 - added anrl info - START
-    anrl_label_orig=b.anrl_label_orig;
-    anrl_parameter_list_orig=b.anrl_parameter_list_orig;
-    anrl_parameter_values_orig=b.anrl_parameter_values_orig;
-    anrl_label_relax=b.anrl_label_relax;
-    anrl_parameter_list_relax=b.anrl_parameter_list_relax;
-    anrl_parameter_values_relax=b.anrl_parameter_values_relax;
+    aflow_prototype_label_orig=b.aflow_prototype_label_orig;
+    aflow_prototype_parameter_list_orig=b.aflow_prototype_parameter_list_orig;
+    aflow_prototype_parameter_values_orig=b.aflow_prototype_parameter_values_orig;
+    aflow_prototype_label_relax=b.aflow_prototype_label_relax;
+    aflow_prototype_parameter_list_relax=b.aflow_prototype_parameter_list_relax;
+    aflow_prototype_parameter_values_relax=b.aflow_prototype_parameter_values_relax;
     //DX20190209 - added anrl info - END
     pocc_parameters=b.pocc_parameters;  //CO20200731
     // AGL/AEL
@@ -219,6 +220,19 @@ namespace aflowlib {
     ael_average_external_pressure=b.ael_average_external_pressure; //CT20181212
     ael_stiffness_tensor = b.ael_stiffness_tensor;  //ME20191105
     ael_compliance_tensor = b.ael_compliance_tensor;  //ME20191105
+    // QHA
+    gruneisen_qha = b.gruneisen_qha; //AS20200901
+    gruneisen_qha_300K = b.gruneisen_qha_300K; //AS20200903
+    thermal_expansion_qha_300K = b.thermal_expansion_qha_300K; //AS20200901
+    modulus_bulk_qha_300K = b.modulus_bulk_qha_300K; //AS20200901
+    modulus_bulk_derivative_pressure_qha_300K = b.modulus_bulk_derivative_pressure_qha_300K; //AS20201008
+    heat_capacity_Cv_atom_qha_300K = b.heat_capacity_Cv_atom_qha_300K; //AS20201008
+    heat_capacity_Cv_cell_qha_300K = b.heat_capacity_Cv_cell_qha_300K; //AS20201207
+    heat_capacity_Cp_atom_qha_300K = b.heat_capacity_Cp_atom_qha_300K; //AS20201008
+    heat_capacity_Cp_cell_qha_300K = b.heat_capacity_Cp_cell_qha_300K; //AS20201207
+    volume_atom_qha_300K = b.volume_atom_qha_300K; //AS20201008
+    energy_free_atom_qha_300K = b.energy_free_atom_qha_300K; //AS20201008
+    energy_free_cell_qha_300K = b.energy_free_cell_qha_300K; //AS20201207
     // BADER
     bader_net_charges=b.bader_net_charges;vbader_net_charges.clear();for(uint i=0;i<b.vbader_net_charges.size();i++) vbader_net_charges.push_back(b.vbader_net_charges.at(i));
     bader_atomic_volumes=b.bader_atomic_volumes;vbader_atomic_volumes.clear();for(uint i=0;i<b.vbader_atomic_volumes.size();i++) vbader_atomic_volumes.push_back(b.vbader_atomic_volumes.at(i));
@@ -440,12 +454,12 @@ namespace aflowlib {
     Wyckoff_site_symmetries="";
     //DX20180823 - added more symmetry info - END
     //DX20190209 - added anrl info - START
-    anrl_label_orig="";
-    anrl_parameter_list_orig="";
-    anrl_parameter_values_orig="";
-    anrl_label_relax="";
-    anrl_parameter_list_relax="";
-    anrl_parameter_values_relax="";
+    aflow_prototype_label_orig="";
+    aflow_prototype_parameter_list_orig="";
+    aflow_prototype_parameter_values_orig="";
+    aflow_prototype_label_relax="";
+    aflow_prototype_parameter_list_relax="";
+    aflow_prototype_parameter_values_relax="";
     //DX20190209 - added anrl info - END
     pocc_parameters=""; //CO20200731
     // AGL/AEL
@@ -481,6 +495,19 @@ namespace aflowlib {
     ael_average_external_pressure=AUROSTD_NAN; //CT20181212
     ael_stiffness_tensor.clear();  //ME20191105
     ael_compliance_tensor.clear();  //ME20191105
+    // QHA
+    gruneisen_qha = AUROSTD_NAN;//AS20200901
+    gruneisen_qha_300K = AUROSTD_NAN;//AS20200903
+    thermal_expansion_qha_300K = AUROSTD_NAN;//AS20200901
+    modulus_bulk_qha_300K = AUROSTD_NAN;//AS20200901
+    modulus_bulk_derivative_pressure_qha_300K = AUROSTD_NAN;//AS20201008
+    heat_capacity_Cv_atom_qha_300K = AUROSTD_NAN;//AS20201008
+    heat_capacity_Cv_cell_qha_300K = AUROSTD_NAN;//AS20201207
+    heat_capacity_Cp_atom_qha_300K = AUROSTD_NAN;//AS20201008
+    heat_capacity_Cp_cell_qha_300K = AUROSTD_NAN;//AS20201207
+    volume_atom_qha_300K = AUROSTD_NAN;//AS20201008
+    energy_free_atom_qha_300K = AUROSTD_NAN;//AS20201008
+    energy_free_cell_qha_300K = AUROSTD_NAN;//AS20201207
     // BADER
     bader_net_charges.clear();vbader_net_charges.clear();
     bader_atomic_volumes.clear();vbader_atomic_volumes.clear();
@@ -773,12 +800,12 @@ namespace aflowlib {
         else if(keyword=="Wyckoff_site_symmetries") {Wyckoff_site_symmetries=content;}
         //DX20180823 - added more symmetry info - END
         //DX20190209 - added anrl info - START
-        else if(keyword=="anrl_label_orig") {anrl_label_orig=content;}
-        else if(keyword=="anrl_parameter_list_orig") {anrl_parameter_list_orig=content;}
-        else if(keyword=="anrl_parameter_values_orig") {anrl_parameter_values_orig=content;}
-        else if(keyword=="anrl_label_relax") {anrl_label_relax=content;}
-        else if(keyword=="anrl_parameter_list_relax") {anrl_parameter_list_relax=content;}
-        else if(keyword=="anrl_parameter_values_relax") {anrl_parameter_values_relax=content;}
+        else if(keyword=="aflow_prototype_label_orig") {aflow_prototype_label_orig=content;}
+        else if(keyword=="aflow_prototype_parameter_list_orig") {aflow_prototype_parameter_list_orig=content;}
+        else if(keyword=="aflow_prototype_parameter_values_orig") {aflow_prototype_parameter_values_orig=content;}
+        else if(keyword=="aflow_prototype_label_relax") {aflow_prototype_label_relax=content;}
+        else if(keyword=="aflow_prototype_parameter_list_relax") {aflow_prototype_parameter_list_relax=content;}
+        else if(keyword=="aflow_prototype_parameter_values_relax") {aflow_prototype_parameter_values_relax=content;}
         //DX20190209 - added anrl info - END
         else if(keyword=="pocc_parameters") {pocc_parameters=content;}  //CO20200731
         // AGL/AEL
@@ -869,6 +896,23 @@ namespace aflowlib {
           ael_compliance_tensor = tensor;
         }
         //ME20191105 END
+        //AS20200901 BEGIN
+        // QHA
+        else if(keyword=="gruneisen_qha") {gruneisen_qha=aurostd::string2utype<double>(content);}
+        else if(keyword=="gruneisen_qha_300K") {gruneisen_qha_300K=aurostd::string2utype<double>(content);}
+        else if(keyword=="thermal_expansion_qha_300K") {thermal_expansion_qha_300K=aurostd::string2utype<double>(content);}
+        else if(keyword=="modulus_bulk_qha_300K") {modulus_bulk_qha_300K=aurostd::string2utype<double>(content);}
+        //AS20200901 END
+        //AS20201008 BEGIN
+        else if(keyword=="modulus_bulk_derivative_pressure_qha_300K") {modulus_bulk_derivative_pressure_qha_300K=aurostd::string2utype<double>(content);}
+        else if(keyword=="heat_capacity_Cv_atom_qha_300K") {heat_capacity_Cv_atom_qha_300K=aurostd::string2utype<double>(content);}
+        else if(keyword=="heat_capacity_Cv_cell_qha_300K") {heat_capacity_Cv_cell_qha_300K=aurostd::string2utype<double>(content);}
+        else if(keyword=="heat_capacity_Cp_atom_qha_300K") {heat_capacity_Cp_atom_qha_300K=aurostd::string2utype<double>(content);}
+        else if(keyword=="heat_capacity_Cp_cell_qha_300K") {heat_capacity_Cp_cell_qha_300K=aurostd::string2utype<double>(content);}
+        else if(keyword=="volume_atom_qha_300K") {volume_atom_qha_300K=aurostd::string2utype<double>(content);}
+        else if(keyword=="energy_free_atom_qha_300K") {energy_free_atom_qha_300K=aurostd::string2utype<double>(content);}
+        else if(keyword=="energy_free_cell_qha_300K") {energy_free_cell_qha_300K=aurostd::string2utype<double>(content);}
+        //AS20201008 END
         // BADER
         else if(keyword=="bader_net_charges") {bader_net_charges=content;aurostd::string2tokens<double>(content,vbader_net_charges,",");}
         else if(keyword=="bader_atomic_volumes") {bader_atomic_volumes=content;aurostd::string2tokens<double>(content,vbader_atomic_volumes,",");}
@@ -1076,12 +1120,12 @@ namespace aflowlib {
       oss << "Wyckoff_site_symmetries=" << Wyckoff_site_symmetries << (html?"<br>":"") << endl;
       //DX20180823 - added more symmetry info - END
       //DX20190208 - added anrl info - START
-      oss << "anrl_label_orig=" << anrl_label_orig << (html?"<br>":"") << endl;
-      oss << "anrl_parameter_list_orig=" << anrl_parameter_list_orig << (html?"<br>":"") << endl;
-      oss << "anrl_parameter_values_orig=" << anrl_parameter_values_orig << (html?"<br>":"") << endl;
-      oss << "anrl_label_relax=" << anrl_label_relax << (html?"<br>":"") << endl;
-      oss << "anrl_parameter_list_relax=" << anrl_parameter_list_relax << (html?"<br>":"") << endl;
-      oss << "anrl_parameter_values_relax=" << anrl_parameter_values_relax << (html?"<br>":"") << endl;
+      oss << "aflow_prototype_label_orig=" << aflow_prototype_label_orig << (html?"<br>":"") << endl;
+      oss << "aflow_prototype_parameter_list_orig=" << aflow_prototype_parameter_list_orig << (html?"<br>":"") << endl;
+      oss << "aflow_prototype_parameter_values_orig=" << aflow_prototype_parameter_values_orig << (html?"<br>":"") << endl;
+      oss << "aflow_prototype_label_relax=" << aflow_prototype_label_relax << (html?"<br>":"") << endl;
+      oss << "aflow_prototype_parameter_list_relax=" << aflow_prototype_parameter_list_relax << (html?"<br>":"") << endl;
+      oss << "aflow_prototype_parameter_values_relax=" << aflow_prototype_parameter_values_relax << (html?"<br>":"") << endl;
       //DX20190208 - added anrl info - END
       oss << "pocc_parameters=" << pocc_parameters << (html?"<br>":"") << endl;  //CO20200731
       // AGL/AEL
@@ -1119,6 +1163,23 @@ namespace aflowlib {
       oss << "ael_stiffness_tensor="; for (int i = ael_stiffness_tensor.lrows; i <= ael_stiffness_tensor.urows; i++) {for (int j = ael_stiffness_tensor.lcols; j <= ael_stiffness_tensor.ucols; j++) {oss << ael_stiffness_tensor[i][j] << " ";} oss << (html?"<br>":"") << endl;} //ME20191105  //CO20201220
       oss << "ael_compliance_tensor="; for (int i = ael_compliance_tensor.lrows; i <= ael_compliance_tensor.urows; i++) {for (int j = ael_compliance_tensor.lcols; j <= ael_compliance_tensor.ucols; j++) {oss << ael_compliance_tensor[i][j] << " ";} oss << (html?"<br>":"") << endl;} //ME20191105  //CO20201220
       //ME20191105 END
+      //AS20200901 BEGIN
+      //QHA
+      oss << "gruneisen_qha" << gruneisen_qha << (html?"<br>":"") << endl;
+      oss << "gruneisen_qha_300K" << gruneisen_qha_300K << (html?"<br>":"") << endl;
+      oss << "thermal_expansion_qha_300K" << thermal_expansion_qha_300K << (html?"<br>":"") << endl;
+      oss << "modulus_bulk_qha_300K" << modulus_bulk_qha_300K << (html?"<br>":"") << endl;
+      //AS20200901 END
+      //AS20201008 BEGIN
+      oss << "modulus_bulk_derivative_pressure_qha_300K" << modulus_bulk_derivative_pressure_qha_300K << (html?"<br>":"") << endl;
+      oss << "heat_capacity_Cv_atom_qha_300K" << heat_capacity_Cv_atom_qha_300K << (html?"<br>":"") << endl;
+      oss << "heat_capacity_Cv_cell_qha_300K" << heat_capacity_Cv_cell_qha_300K << (html?"<br>":"") << endl;
+      oss << "heat_capacity_Cp_atom_qha_300K" << heat_capacity_Cp_atom_qha_300K << (html?"<br>":"") << endl;
+      oss << "heat_capacity_Cp_cell_qha_300K" << heat_capacity_Cp_cell_qha_300K << (html?"<br>":"") << endl;
+      oss << "volume_atom_qha_300K" << volume_atom_qha_300K << (html?"<br>":"") << endl;
+      oss << "energy_free_atom_qha_300K" << energy_free_atom_qha_300K << (html?"<br>":"") << endl;
+      oss << "energy_free_cell_qha_300K" << energy_free_cell_qha_300K << (html?"<br>":"") << endl;
+      //AS20201008 END
       // BADER
       oss << "bader_net_charges=" << bader_net_charges << "  vbader_net_charges= ";for(uint j=0;j<vbader_net_charges.size();j++) oss << vbader_net_charges.at(j) << " "; oss << (html?"<br>":"") << endl; 
       oss << "bader_atomic_volumes=" << bader_atomic_volumes << "  vbader_atomic_volumes= ";for(uint j=0;j<vbader_atomic_volumes.size();j++) oss << vbader_atomic_volumes.at(j) << " "; oss << (html?"<br>":"") << endl; 
@@ -1306,12 +1367,12 @@ namespace aflowlib {
       if(Wyckoff_site_symmetries.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "Wyckoff_site_symmetries=" << Wyckoff_site_symmetries << eendl;
       //DX20180823 - added more symmetry info - END
       //DX20190208 - added anrl info - START
-      if(anrl_label_orig.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "anrl_label_orig=" << anrl_label_orig << eendl;
-      if(anrl_parameter_list_orig.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "anrl_parameter_list_orig=" << anrl_parameter_list_orig << eendl;
-      if(anrl_parameter_values_orig.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "anrl_parameter_values_orig=" << anrl_parameter_values_orig << eendl;
-      if(anrl_label_relax.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "anrl_label_relax=" << anrl_label_relax << eendl;
-      if(anrl_parameter_list_relax.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "anrl_parameter_list_relax=" << anrl_parameter_list_relax << eendl;
-      if(anrl_parameter_values_relax.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "anrl_parameter_values_relax=" << anrl_parameter_values_relax << eendl;
+      if(aflow_prototype_label_orig.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "aflow_prototype_label_orig=" << aflow_prototype_label_orig << eendl;
+      if(aflow_prototype_parameter_list_orig.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "aflow_prototype_parameter_list_orig=" << aflow_prototype_parameter_list_orig << eendl;
+      if(aflow_prototype_parameter_values_orig.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "aflow_prototype_parameter_values_orig=" << aflow_prototype_parameter_values_orig << eendl;
+      if(aflow_prototype_label_relax.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "aflow_prototype_label_relax=" << aflow_prototype_label_relax << eendl;
+      if(aflow_prototype_parameter_list_relax.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "aflow_prototype_parameter_list_relax=" << aflow_prototype_parameter_list_relax << eendl;
+      if(aflow_prototype_parameter_values_relax.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "aflow_prototype_parameter_values_relax=" << aflow_prototype_parameter_values_relax << eendl;
       //DX20190208 - added anrl info - END
       if(pocc_parameters.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "pocc_parameters=" << pocc_parameters << eendl; //CO20200731
       // AGL/AEL
@@ -1363,6 +1424,23 @@ namespace aflowlib {
         }
       }
       //ME20191105 END
+      //AS20200901 BEGIN
+      //QHA
+      if(gruneisen_qha!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "gruneisen_qha=" << gruneisen_qha << eendl; //AS20200901
+      if(gruneisen_qha_300K!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "gruneisen_qha_300K=" << gruneisen_qha_300K << eendl; //AS20200901
+      if(thermal_expansion_qha_300K!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "thermal_expansion_qha_300K=" << thermal_expansion_qha_300K << eendl; //AS20200901
+      if(modulus_bulk_qha_300K!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "modulus_bulk_qha_300K=" << modulus_bulk_qha_300K << eendl; //AS20200901
+      //AS20200901 END
+      //AS20201008 BEGIN
+      if(modulus_bulk_derivative_pressure_qha_300K!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "modulus_bulk_derivative_pressure_qha_300K=" << modulus_bulk_derivative_pressure_qha_300K << eendl; //AS20201008
+      if(heat_capacity_Cv_atom_qha_300K!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "heat_capacity_Cv_atom_qha_300K=" << heat_capacity_Cv_atom_qha_300K << eendl; //AS20201008
+      if(heat_capacity_Cv_cell_qha_300K!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "heat_capacity_Cv_cell_qha_300K=" << heat_capacity_Cv_cell_qha_300K << eendl; //AS20201207
+      if(heat_capacity_Cp_atom_qha_300K!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "heat_capacity_Cp_atom_qha_300K=" << heat_capacity_Cp_atom_qha_300K << eendl; //AS20201008
+      if(heat_capacity_Cp_cell_qha_300K!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "heat_capacity_Cp_cell_qha_300K=" << heat_capacity_Cp_cell_qha_300K << eendl; //AS20201207
+      if(volume_atom_qha_300K!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "volume_atom_qha_300K=" << volume_atom_qha_300K << eendl; //AS20201008
+      if(energy_free_atom_qha_300K!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "energy_free_atom_qha_300K=" << energy_free_atom_qha_300K << eendl; //AS20201008
+      if(energy_free_cell_qha_300K!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "energy_free_cell_qha_300K=" << energy_free_cell_qha_300K << eendl; //AS20201207
+      //AS20201008 END
       // BADER
       if(bader_net_charges.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "bader_net_charges=" << bader_net_charges << eendl;
       if(bader_atomic_volumes.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "bader_atomic_volumes=" << bader_atomic_volumes << eendl;
@@ -2840,54 +2918,54 @@ namespace aflowlib {
       //DX20190208 - added anrl info - START
       // ANRL
       //////////////////////////////////////////////////////////////////////////
-      if(anrl_label_orig.size()){
-        sscontent_json << "\"anrl_label_orig\":\"" << anrl_label_orig << "\"";
+      if(aflow_prototype_label_orig.size()){
+        sscontent_json << "\"aflow_prototype_label_orig\":\"" << aflow_prototype_label_orig << "\"";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"anrl_label_orig\":null";
+        if(PRINT_NULL) sscontent_json << "\"aflow_prototype_label_orig\":null";
       }
       vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
       //////////////////////////////////////////////////////////////////////////
-      if(anrl_parameter_list_orig.size()){
-        vector<string> anrl_parameters_vector_orig; aurostd::string2tokens(anrl_parameter_list_orig,anrl_parameters_vector_orig,",");
-        sscontent_json << "\"anrl_parameter_list_orig\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(anrl_parameters_vector_orig,"\""),",") << "]";
+      if(aflow_prototype_parameter_list_orig.size()){
+        vector<string> aflow_prototype_parameters_vector_orig; aurostd::string2tokens(aflow_prototype_parameter_list_orig,aflow_prototype_parameters_vector_orig,",");
+        sscontent_json << "\"aflow_prototype_parameter_list_orig\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(aflow_prototype_parameters_vector_orig,"\""),",") << "]";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"anrl_parameter_list_orig\":null";
+        if(PRINT_NULL) sscontent_json << "\"aflow_prototype_parameter_list_orig\":null";
       }
       vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
       //////////////////////////////////////////////////////////////////////////
-      if(anrl_parameter_values_orig.size()){
-        vector<string> anrl_values_vector_orig; aurostd::string2tokens(anrl_parameter_values_orig,anrl_values_vector_orig,",");
-        sscontent_json << "\"anrl_parameter_values_orig\":[" << aurostd::joinWDelimiter(anrl_values_vector_orig,",") << "]";
+      if(aflow_prototype_parameter_values_orig.size()){
+        vector<string> aflow_prototype_values_vector_orig; aurostd::string2tokens(aflow_prototype_parameter_values_orig,aflow_prototype_values_vector_orig,",");
+        sscontent_json << "\"aflow_prototype_parameter_values_orig\":[" << aurostd::joinWDelimiter(aflow_prototype_values_vector_orig,",") << "]";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"anrl_parameter_values_orig\":null";
+        if(PRINT_NULL) sscontent_json << "\"aflow_prototype_parameter_values_orig\":null";
       }
       vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
       //////////////////////////////////////////////////////////////////////////
-      if(anrl_label_relax.size()){
-        sscontent_json << "\"anrl_label_relax\":\"" << anrl_label_relax << "\"";
+      if(aflow_prototype_label_relax.size()){
+        sscontent_json << "\"aflow_prototype_label_relax\":\"" << aflow_prototype_label_relax << "\"";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"anrl_label_relax\":null";
+        if(PRINT_NULL) sscontent_json << "\"aflow_prototype_label_relax\":null";
       }
       vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
       //////////////////////////////////////////////////////////////////////////
-      if(anrl_parameter_list_relax.size()){
-        vector<string> anrl_parameters_vector_relax; aurostd::string2tokens(anrl_parameter_list_relax,anrl_parameters_vector_relax,",");
-        sscontent_json << "\"anrl_parameter_list_relax\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(anrl_parameters_vector_relax,"\""),",") << "]";
+      if(aflow_prototype_parameter_list_relax.size()){
+        vector<string> aflow_prototype_parameters_vector_relax; aurostd::string2tokens(aflow_prototype_parameter_list_relax,aflow_prototype_parameters_vector_relax,",");
+        sscontent_json << "\"aflow_prototype_parameter_list_relax\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(aflow_prototype_parameters_vector_relax,"\""),",") << "]";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"anrl_parameter_list_relax\":null";
+        if(PRINT_NULL) sscontent_json << "\"aflow_prototype_parameter_list_relax\":null";
       }
       vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
       //////////////////////////////////////////////////////////////////////////
-      if(anrl_parameter_values_relax.size()){
-        vector<string> anrl_values_vector_relax; aurostd::string2tokens(anrl_parameter_values_relax,anrl_values_vector_relax,",");
-        sscontent_json << "\"anrl_parameter_values_relax\":[" << aurostd::joinWDelimiter(anrl_values_vector_relax,",") << "]";
+      if(aflow_prototype_parameter_values_relax.size()){
+        vector<string> aflow_prototype_values_vector_relax; aurostd::string2tokens(aflow_prototype_parameter_values_relax,aflow_prototype_values_vector_relax,",");
+        sscontent_json << "\"aflow_prototype_parameter_values_relax\":[" << aurostd::joinWDelimiter(aflow_prototype_values_vector_relax,",") << "]";
       } else {
-        if(PRINT_NULL) sscontent_json << "\"anrl_parameter_values_relax\":null";
+        if(PRINT_NULL) sscontent_json << "\"aflow_prototype_parameter_values_relax\":null";
       }
       vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
@@ -3201,6 +3279,117 @@ namespace aflowlib {
         if (PRINT_NULL) sscontent_json << "\"ael_compliance_tensor\":null";
       }
       vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
+
+      //AS20200901 BEGIN
+      // QHA
+      //////////////////////////////////////////////////////////////////////////
+      if(gruneisen_qha!=AUROSTD_NAN) {
+        sscontent_json << "\"gruneisen_qha\":" << gruneisen_qha;
+      } else {
+        if(PRINT_NULL) sscontent_json << "\"gruneisen_qha\":null";
+      }
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
+      //////////////////////////////////////////////////////////////////////////
+
+      //////////////////////////////////////////////////////////////////////////
+      if(gruneisen_qha_300K!=AUROSTD_NAN) {
+        sscontent_json << "\"gruneisen_qha_300K\":" << gruneisen_qha_300K;
+      } else {
+        if(PRINT_NULL) sscontent_json << "\"gruneisen_qha_300K\":null";
+      }
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
+      //////////////////////////////////////////////////////////////////////////
+
+      //////////////////////////////////////////////////////////////////////////
+      if(thermal_expansion_qha_300K!=AUROSTD_NAN) {
+        sscontent_json << "\"thermal_expansion_qha_300K\":" << thermal_expansion_qha_300K;
+      } else {
+        if(PRINT_NULL) sscontent_json << "\"thermal_expansion_qha_300K\":null";
+      }
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
+      //////////////////////////////////////////////////////////////////////////
+
+      //////////////////////////////////////////////////////////////////////////
+      if(modulus_bulk_qha_300K!=AUROSTD_NAN) {
+        sscontent_json << "\"modulus_bulk_qha_300K\":" << modulus_bulk_qha_300K;
+      } else {
+        if(PRINT_NULL) sscontent_json << "\"modulus_bulk_qha_300K\":null";
+      }
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
+      //////////////////////////////////////////////////////////////////////////
+
+      //////////////////////////////////////////////////////////////////////////
+      if(modulus_bulk_derivative_pressure_qha_300K!=AUROSTD_NAN) {
+        sscontent_json << "\"modulus_bulk_derivative_pressure_qha_300K\":" << modulus_bulk_derivative_pressure_qha_300K;
+      } else {
+        if(PRINT_NULL) sscontent_json << "\"modulus_bulk_derivative_pressure_qha_300K\":null";
+      }
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
+      //////////////////////////////////////////////////////////////////////////
+
+      //////////////////////////////////////////////////////////////////////////
+      if(heat_capacity_Cv_atom_qha_300K!=AUROSTD_NAN) {
+        sscontent_json << "\"heat_capacity_Cv_atom_qha_300K\":" << heat_capacity_Cv_atom_qha_300K;
+      } else {
+        if(PRINT_NULL) sscontent_json << "\"heat_capacity_Cv_atom_qha_300K\":null";
+      }
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
+      //////////////////////////////////////////////////////////////////////////
+
+      //////////////////////////////////////////////////////////////////////////
+      if(heat_capacity_Cv_cell_qha_300K!=AUROSTD_NAN) {
+        sscontent_json << "\"heat_capacity_Cv_cell_qha_300K\":" << heat_capacity_Cv_cell_qha_300K;
+      } else {
+        if(PRINT_NULL) sscontent_json << "\"heat_capacity_Cv_cell_qha_300K\":null";
+      }
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
+      //////////////////////////////////////////////////////////////////////////
+
+      //////////////////////////////////////////////////////////////////////////
+      if(heat_capacity_Cp_atom_qha_300K!=AUROSTD_NAN) {
+        sscontent_json << "\"heat_capacity_Cp_atom_qha_300K\":" << heat_capacity_Cp_atom_qha_300K;
+      } else {
+        if(PRINT_NULL) sscontent_json << "\"heat_capacity_Cp_atom_qha_300K\":null";
+      }
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
+      //////////////////////////////////////////////////////////////////////////
+
+      //////////////////////////////////////////////////////////////////////////
+      if(heat_capacity_Cp_cell_qha_300K!=AUROSTD_NAN) {
+        sscontent_json << "\"heat_capacity_Cp_cell_qha_300K\":" << heat_capacity_Cp_cell_qha_300K;
+      } else {
+        if(PRINT_NULL) sscontent_json << "\"heat_capacity_Cp_cell_qha_300K\":null";
+      }
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
+      //////////////////////////////////////////////////////////////////////////
+
+      //////////////////////////////////////////////////////////////////////////
+      if(volume_atom_qha_300K!=AUROSTD_NAN) {
+        sscontent_json << "\"volume_atom_qha_300K\":" << volume_atom_qha_300K;
+      } else {
+        if(PRINT_NULL) sscontent_json << "\"volume_atom_qha_300K\":null";
+      }
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
+      //////////////////////////////////////////////////////////////////////////
+
+      //////////////////////////////////////////////////////////////////////////
+      if(energy_free_atom_qha_300K!=AUROSTD_NAN) {
+        sscontent_json << "\"energy_free_atom_qha_300K\":" << energy_free_atom_qha_300K;
+      } else {
+        if(PRINT_NULL) sscontent_json << "\"energy_free_atom_qha_300K\":null";
+      }
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
+      //////////////////////////////////////////////////////////////////////////
+
+      //////////////////////////////////////////////////////////////////////////
+      if(energy_free_cell_qha_300K!=AUROSTD_NAN) {
+        sscontent_json << "\"energy_free_cell_qha_300K\":" << energy_free_cell_qha_300K;
+      } else {
+        if(PRINT_NULL) sscontent_json << "\"energy_free_cell_qha_300K\":null";
+      }
+      vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
+      //////////////////////////////////////////////////////////////////////////
+      //AS20200901 END
 
       // BADER
       //////////////////////////////////////////////////////////////////////////
@@ -4550,6 +4739,75 @@ namespace aflowlib {  //CO20201220
     return true;
   }
 }  // namespace pflow
+
+//DX20200929 - START
+namespace aflowlib {
+  string getSpaceGroupAFLUXSummons(vector<uint>& space_groups, uint relaxation_step){
+
+    vector<string> vsummons(space_groups.size());
+
+    for(uint i=0;i<space_groups.size();i++){
+      vsummons[i] = getSpaceGroupAFLUXSummons(space_groups[i], relaxation_step, false); //false - signals more than one space group
+    }
+    return "sg2(" + aurostd::joinWDelimiter(vsummons,":") + ")";
+  }
+}
+
+namespace aflowlib {
+  string getSpaceGroupAFLUXSummons(uint space_group_number, uint relaxation_step, bool only_one_sg){
+
+    // Formats the space group summons for an AFLUX matchbook
+    // This also grabs the relative enantiomorphs, since they
+    // are simply mirror images of one another (structurally the same)
+    // The summons are formatted differently depending on the relaxation type
+    // (i.e. placement of comma(s) or lack thereof)
+    // May need to be reformatted later with AFLOW+AFLUX integration
+
+    string space_group_summons = "";
+    // check if enantiomorphic space group
+    uint enantiomorph_space_group_number = SYM::getEnantiomorphSpaceGroupNumber(space_group_number);
+    if(space_group_number == enantiomorph_space_group_number){
+      // relaxed: need to match last in string, i.e., "*,<sg_symbol> <sg_number>" (comma necessary or we may grab the orig symmetry)
+      if(relaxation_step==_COMPARE_DATABASE_GEOMETRY_ORIGINAL_){
+        space_group_summons = "%27" + GetSpaceGroupName(space_group_number) + "%20%23" + aurostd::utype2string<int>(space_group_number) + ",%27*";
+      }
+      else if(relaxation_step==_COMPARE_DATABASE_GEOMETRY_RELAX1_){
+        space_group_summons = "*%27," + GetSpaceGroupName(space_group_number) + "%20%23" + aurostd::utype2string<int>(space_group_number) + ",%27*";
+      }
+      else if(relaxation_step==_COMPARE_DATABASE_GEOMETRY_MOST_RELAXED_){
+        space_group_summons = "*%27," + GetSpaceGroupName(space_group_number) + "%20%23" + aurostd::utype2string<int>(space_group_number) + "%27";
+      }
+      else{
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, "aflowlib::getSpaceGroupAFLUXSummons():", "Unexpected relaxation step input: " + _COMPARE_DATABASE_GEOMETRY_MOST_RELAXED_, _FILE_NOT_FOUND_);
+      }
+    }
+    else { // need to get enantiomorph too
+      if(relaxation_step==_COMPARE_DATABASE_GEOMETRY_ORIGINAL_){
+        space_group_summons = "%27" + GetSpaceGroupName(space_group_number) + "%20%23" + aurostd::utype2string<int>(space_group_number) + ",%27*";
+        space_group_summons += ":%27" + GetSpaceGroupName(enantiomorph_space_group_number) + "%20%23" + aurostd::utype2string<int>(enantiomorph_space_group_number) + ",%27*";
+      }
+      else if(relaxation_step==_COMPARE_DATABASE_GEOMETRY_RELAX1_){
+        space_group_summons = "*%27," + GetSpaceGroupName(space_group_number) + "%20%23" + aurostd::utype2string<int>(space_group_number) + ",%27*";
+        space_group_summons += ":*%27," + GetSpaceGroupName(enantiomorph_space_group_number) + "%20%23" + aurostd::utype2string<int>(enantiomorph_space_group_number) + ",%27*";
+      }
+      else if(relaxation_step==_COMPARE_DATABASE_GEOMETRY_MOST_RELAXED_){
+        space_group_summons = "*%27," + GetSpaceGroupName(space_group_number) + "%20%23" + aurostd::utype2string<int>(space_group_number) + "%27";
+        space_group_summons += ":*%27," + GetSpaceGroupName(enantiomorph_space_group_number) + "%20%23" + aurostd::utype2string<int>(enantiomorph_space_group_number) + "%27";
+      }
+      else{
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, "aflowlib::getSpaceGroupAFLUXSummons():", "Unexpected relaxation step input: " + _COMPARE_DATABASE_GEOMETRY_MOST_RELAXED_, _FILE_NOT_FOUND_);
+      }
+    }
+
+    // ---------------------------------------------------------------------------
+    // if there is only one space group in the query, put summons in sg2();
+    // otherwise this is down outside this function
+    if(only_one_sg) { space_group_summons = "sg2(" + space_group_summons + ")"; }
+
+    return space_group_summons;
+  }
+}
+//DX20200929 - END
 
 namespace aflowlib {
   uint WEB_Aflowlib_Entry(string options,ostream& oss) {

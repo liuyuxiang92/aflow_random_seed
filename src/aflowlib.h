@@ -189,12 +189,12 @@ namespace aflowlib {
       string Wyckoff_site_symmetries;
       //DX20180823 - added more symmetry info - END
       //DX20190208 - added anrl info - START
-      string anrl_label_orig;
-      string anrl_parameter_list_orig;
-      string anrl_parameter_values_orig;
-      string anrl_label_relax;
-      string anrl_parameter_list_relax;
-      string anrl_parameter_values_relax;
+      string aflow_prototype_label_orig; //DX20201001 - renamed
+      string aflow_prototype_parameter_list_orig; //DX20201001 - renamed
+      string aflow_prototype_parameter_values_orig; //DX20201001 - renamed
+      string aflow_prototype_label_relax; //DX20201001 - renamed
+      string aflow_prototype_parameter_list_relax; //DX20201001 - renamed
+      string aflow_prototype_parameter_values_relax; //DX20201001 - renamed
       //DX20190208 - added anrl info - END
       string pocc_parameters; //CO20200731
       // AGL/AEL
@@ -230,6 +230,19 @@ namespace aflowlib {
       double ael_average_external_pressure; // (GPa) //CT20181212
       xmatrix<double> ael_stiffness_tensor;  //ME20191105
       xmatrix<double> ael_compliance_tensor;  //ME20191105
+      // QHA  //AS20200831
+      double gruneisen_qha; //AS20200831
+      double gruneisen_qha_300K; //AS20200903
+      double thermal_expansion_qha_300K; //AS20200831
+      double modulus_bulk_qha_300K; //AS20200831
+      double modulus_bulk_derivative_pressure_qha_300K; //AS20201008
+      double heat_capacity_Cv_atom_qha_300K; //AS20201008
+      double heat_capacity_Cv_cell_qha_300K; //AS20201207
+      double heat_capacity_Cp_atom_qha_300K; //AS20201008
+      double heat_capacity_Cp_cell_qha_300K; //AS20201207
+      double volume_atom_qha_300K; //AS20201008
+      double energy_free_atom_qha_300K; //AS20201008
+      double energy_free_cell_qha_300K; //AS20201207
       // BADER
       string bader_net_charges;vector<double> vbader_net_charges;//electrons
       string bader_atomic_volumes;vector<double> vbader_atomic_volumes;//Angst^3
@@ -334,6 +347,8 @@ namespace aflowlib {
   string AFLUXCall(const vector<string>& matchbook); //DX20190206 - add AFLUX functionality //CO20200520
   string AFLUXCall(const string& summons); //DX20190206 - add AFLUX functionality   //CO20200520
   vector<vector<std::pair<string,string> > > getPropertiesFromAFLUXResponse(const string& response); //DX20190206 - get properties from AFLUX response  //CO20200520
+  string getSpaceGroupAFLUXSummons(vector<uint>& space_groups, uint relaxation_step); //DX20200929
+  string getSpaceGroupAFLUXSummons(uint space_group_number, uint relaxation_step, bool only_one_sg=true); //DX20200929
   // [OBSOLETE] uint WEB_Aflowlib_Entry_PHP(string options,ostream& oss); //SC20200327
   uint WEB_Aflowlib_Entry(string options,ostream& oss); 
   // [OBSOLETE] uint WEB_Aflowlib_Entry_PHP3(string options,ostream& oss);  //SC20190813
@@ -421,6 +436,7 @@ namespace aflowlib {
   bool LIB2RAW_Loop_Bader(const string& directory_LIB,const string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry&,const string& MESSAGE);
   bool LIB2RAW_Loop_AGL(const string& directory_LIB,const string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry&,const string& MESSAGE);
   bool LIB2RAW_Loop_AEL(const string& directory_LIB,const string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry&,const string& MESSAGE);
+  bool LIB2RAW_Loop_QHA(const string& directory_LIB,const string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry& data,const string& MESSAGE);  //AS20200831
   bool LIB2RAW_Loop_LOCK(const string& directory_LIB,const string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry& data,const string& MESSAGE);
   bool LIB2RAW_Loop_POCC(const string& directory_LIB,const string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry& data,const string& MESSAGE);  //CO20200624
   bool LIB2RAW_Loop_PATCH(const string& directory_LIB,const string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry& data,const string& MESSAGE);
@@ -438,7 +454,7 @@ namespace aflowlib {
 #define HTRESOURCE_MODE_PHP_AUTHOR   4
 #define HTRESOURCE_MODE_PHP_THRUST   5
 #define HTRESOURCE_MODE_PHP_ALLOY    6
-
+ 
 // ***************************************************************************
 // _OUTREACH CLASS
 class _outreach {
@@ -456,6 +472,7 @@ class _outreach {
     // [OBSOLETE] inside  XHOST.vflag_control.flag("PRINT_MODE::LATEX");
     // [OBSOLETE] inside  XHOST.vflag_control.flag("PRINT_MODE::HTML");
     // [OBSOLETE] bool print_doi; inside  XHOST.vflag_control.flag("PRINT_MODE::DOI");
+    // [OBSOLETE] bool print_bibtex; inside  XHOST.vflag_control.flag("PRINT_MODE::BIBTEX"); //SC20201228
     // [OBSOLETE] bool print_pdf; inside  XHOST.vflag_control.flag("PRINT_MODE::PDF");
     // [OBSOLETE] bool print_wnumber; inside  XHOST.vflag_control.flag("PRINT_MODE::NUMBER");
     uint wnumber;
@@ -463,7 +480,7 @@ class _outreach {
     uint year;
     vector<string> vauthor;
     string title;
-    string journal,link,arxiv,supplementary,bibtex;
+    string journal,link,arxiv,supplementary; 
     string place,date;
     string type;   // ARTICLE PRESENTATION_TALK PRESENTATION_SEMINAR PRESENTATION_COLLOQUIUM PRESENTATION_KEYNOTE PRESENTATION_PLENARY PRESENTATION_TUTORIAL PRESENTATION_CONTRIBUTED PRESENTATION_POSTER
     bool _isinvited;       // YES
@@ -472,6 +489,7 @@ class _outreach {
     string abstract;       // if available and in LaTeX
     string pdf;
     string doi;
+    string bibtex,bibtex_journal,bibtex_volume,bibtex_issue,bibtex_pages,bibtex_year;  //SC20201228
     vector<string> vextra_html,vextra_latex;
     vector<string> vkeyword,vsponsor,valloy;
     // operators/functions                                    // operator/functions

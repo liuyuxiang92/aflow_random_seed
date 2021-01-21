@@ -1242,6 +1242,7 @@ double GetAtomXrayScatt(const uint& atnum);
 vector<string> GetGroupOfAtoms(string& group_name); //DX20181220 
 double GetCompoundAttenuationLength(const vector<string>& species,const vector<double>& composition,const double& density);  // density in g/cm^3, return in cm
 double GetCompoundAttenuationLength(const deque<string>& _species,const deque<int>& _composition,const double& density);  // density in g/cm^3, return in cm
+deque<int> GetNumEachType(const deque<_atom>& atoms); //DX20210118
 //DX+CO START
 //DX20190214 [OBSOLETE]bool isequalRHT(const _atom& a, const _atom& b,double=_SYM_TOL_);       // bool equality only checks 'coord' and 'name' (RHT)  //RHT
 //DX+CO END
@@ -1264,6 +1265,9 @@ void GetUnitCellRep(const xvector<double>& ppos,xvector<double>& p_cell0,xvector
 
 string xstructure2json(xstructure& xstr); //DX20170831 - xstructure2json
 string atom2json(_atom& atom, int coord_flag, int poccupation); //DX20170831 - atom2json
+
+string getLeastFrequentAtomType(const xstructure& xstr, bool clean=true); //DX20201230 - moved from XtalFinder
+vector<string> getLeastFrequentAtomTypes(const xstructure& xstr, bool clean=true); //DX20201230 - moved from XtalFinder
 
 // --------------------------------------------------------------------------
 class _sym_op {
@@ -1506,7 +1510,13 @@ class xstructure {
     void Standard_Conventional_UnitCellForm(void);                // Reduce the Unit Cell to Standard Conventional Form
     void GetStandardConventional(void);                           // stub for void Standard_Conventional_UnitCellForm(void);
     void NiggliUnitCellForm(void);                                // Reduce the Unit Cell to Niggli Form
+    void GetNiggliStructures(vector<xstructure>& structures,
+        uint start_index=0,
+        uint end_index=AUROSTD_MAX_UINT); //DX20201006
     void MinkowskiBasisReduction(void);                           // Reduce the Basis to the max orthogonality (Minkowski)
+    void GetMinkowskiStructures(vector<xstructure>& structures,
+        uint start_index=0,
+        uint end_index=AUROSTD_MAX_UINT); //DX20201006
     void LatticeReduction(void);                                  // Lattice Reduction to Max Orthogonality (MINK) and then Niggly Form
     //DX20190905 [OBSOLETE] void BringInCell(void);                                       // Bring all the atoms in the origin
     //DX20190905 [OBSOLETE] void BringInCell(double);                                     // Bring all the atoms in the origin
@@ -1518,21 +1528,39 @@ class xstructure {
     void GetPrimitive1(void);                                     // Make it primitive, if possible
     void GetPrimitive2(void);                                     // Make it primitive, if possible
     void GetPrimitive3(void);                                     // Make it primitive, if possible
+    void GetPrimitiveStructures(vector<xstructure>& structures,
+        uint start_index=0,
+        uint end_index=AUROSTD_MAX_UINT); //DX20201006
     uint GetPrimitiveCell(void);                                  // Make it primitive, if possible. Returns 1 if routine fails (RHT)   //RHT
     double MinDist(void);                                         // get minimum interatomic distance -- CO20171024
     void ReScale(const double &in_scale);                         // Change scale but keep volume fixed
     void SetScale(const double &in_scale);                        // Change scale
     void UpdateCartesianCoordinates();                            //AS20200514
+    void ChangeBasis(const xmatrix<double>& transformation_matrix);//DX20201215
+    void Rotate(const xmatrix<double>& rm);                       // DX20201215 - added modify-in-place variant
+    void TransformStructure(const xmatrix<double>& transformation_matrix, const xmatrix<double>& rotation);
+    void TransformStructure(const xmatrix<double>& transformation_matrix, const xmatrix<double>& rotation, const xvector<double>& origin_shift, bool is_shift_frac=false);
+    void ShiftPos(const xvector<double>& shift, bool is_frac);    // Shift origin by vector (Cartesian/fractional boolean) //DX20201215 - added modify-in-place variant
+    void ShiftCPos(const xvector<double>& shift);                 // Shift origin by Cartesian vector //DX20201215 - added modify-in-place variant
+    void ShiftFPos(const xvector<double>& shift);                 // Shift origin by fractional vector //DX20201215 - added modify-in-place variant
     void SetVolume(const double &in_volume);                      // Change volume
     void SetAutoVolume(bool use_AFLOW_defaults_in=false);         // Change volume to sum of atoms  //CO20191010
+    deque<int> GetNumEachType();                                  // Get number of each types based on deque<_atom> //DX20210118
+    void SetNumEachType();                                        // Set number of each types, uses GetNumEachType() (in-place modification) //DX20210113
+    void SetNumEachType(const deque<int>& in_num_each_type);      // Set number of each types, based on input (in-place modification) //DX20210113
     void InflateLattice(const double &coefficient);               // Inflate lattice
     void InflateVolume(const double &coefficient);                // Inflate volume
+    void foldAtomsInCell(                        // fold atoms into new cell representation //DX20210113
+        const xmatrix<double>& lattice_new,
+        bool skew,
+        double tol,
+        bool check_min_dists=true);
     string platon2print(bool,bool,double,double,double,double);   // Create Platon input file >=51108
     void DecorateWithElements(void);                              // Decorate with elements (alphabetic order) - useful for platon
     void DecorateWithFakeElements(void);                          // Decorate with fake elements - useful for prototypes //DX20200727
     vector<string> GetElements(bool clean_name=false,
         bool fake_names=false);                                   //DX20200724
-    vector<string> GetElementsFromAtomNames(bool clean_name);     //Dx20200724
+    vector<string> GetElementsFromAtomNames(bool clean_name);     //DX20200724
     vector<uint> GetReducedComposition(bool numerical_sort=false);//DX20200724
     string platon2sg(bool P_EQUAL=DEFAULT_PLATON_P_EQUAL,
         bool P_EXACT=DEFAULT_PLATON_P_EXACT,
@@ -1631,6 +1659,7 @@ class xstructure {
     //  ----------------------------------------------------------------------------------------
     bool is_vasp4_poscar_format;                                  // flags for VASP4*
     bool is_vasp5_poscar_format;                                  // flags for VASP5*
+    bool primitive_calculated;                                    // flags for calculation //DX20201007
     bool Niggli_calculated;                                       // flags for calculation
     bool Niggli_avoid;                                            // flags for avoiding the calculation
     bool Minkowski_calculated;                                    // flags for calculation
@@ -1860,6 +1889,7 @@ class xstructure {
     void GetNeighData(const deque<_atom>& in_atom_vec,const double& rmin, const double& rmax,deque<deque<_atom> >& neigh_mat);
     // GetStrNeighData collects all the neighbor data out to some cutoff and stores it for each atom in the structure.
     void GetStrNeighData(const double cutoff,deque<deque<_atom> >& neigh_mat) const; //RF+CO20200513
+
     // ----------------------------------------------------------------------------------------
     // OUTPUT/ERROR FLAGS                                         // --------------------------------------
     bool Niggli_has_failed;                                       // Niggli has failed ?
@@ -1892,6 +1922,20 @@ void GetCoordinations(const xstructure& xstr_in,deque<deque<uint> >& i_neighbors
 void GetCoordinations(const xstructure& xstr_in,deque<_atom>& atoms_cell,deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,deque<deque<uint> >& coordinations,double rmax,double rmin,double tol,bool prim,bool unique_only); //CO2020914
 
 void LightCopy(const xstructure&, xstructure&);  //ME20200220
+    
+// LATTICE/BASIS TRANSFORMATIONS
+xmatrix<double> GetBasisTransformation(const xmatrix<double>& lattice_original, const xmatrix<double>& lattice_new); //DX20201015
+vector<xvector<double> > GetBasisTransformationInternalTranslations(const xmatrix<double>& basis_transformation); //DX20201124
+xmatrix<double> GetRotation(const xmatrix<double>& lattice_original, const xmatrix<double>& lattice_new); //DX20201015
+xstructure ChangeBasis(const xstructure& xstr, const xmatrix<double>& transformation_matrix); //DX20201015
+xstructure TransformStructure(const xstructure& xstr,
+    const xmatrix<double>& transformation_matrix,
+    const xmatrix<double>& rotation); //DX20201125
+xstructure TransformStructure(const xstructure& xstr,
+    const xmatrix<double>& transformation_matrix,
+    const xmatrix<double>& rotation,
+    const xvector<double>& origin_shift,
+    bool is_shift_frac=false); //DX20201125
 
 //CO20180420
 //for stream management with objects
@@ -2457,7 +2501,7 @@ void CalculateSymmetryPointGroupKPatterson(xstructure& str);  //ME20200129
 xstructure Rotate(const xstructure& a,const xmatrix<double>& rm);
 xstructure GetLTCell(const xmatrix<double>& lt,const xstructure& str);
 xstructure GetLTFVCell(const xvector<double>& nvec,const double phi,const xstructure& str);
-xstructure ShiftPos(const xstructure& a,const xvector<double>& shift,const int& flag);
+xstructure ShiftPos(const xstructure& a,const xvector<double>& shift, bool is_frac); //DX20210111
 xstructure ShiftCPos(const xstructure& a,const xvector<double>& shift);
 xstructure ShiftFPos(const xstructure& a,const xvector<double>& shift);
 double MaxStructureLattice(const xstructure& str);
@@ -2529,6 +2573,8 @@ bool smithTest(ostream& oss=cout);  //CO20200520
 bool smithTest(ofstream& FileMESSAGE,ostream& oss=cout);  //CO20200520
 bool coordinationTest(ostream& oss=cout);
 bool coordinationTest(ofstream& FileMESSAGE,ostream& oss=cout);
+bool PrototypeGeneratorTest(ostream& oss=cout, bool check_symmetry=false); //DX20200928
+bool PrototypeGeneratorTest(ofstream& FileMESSAGE,ostream& oss=cout, bool check_symmetry=false); //DX20200928
 
 // ----------------------------------------------------------------------------
 // Structure Prototypes
@@ -2544,6 +2590,8 @@ namespace aflowlib {
   string PrototypeCleanLatticeString(const string& latticeIN);
 }
 double NearestNeighbour(const xstructure &str_in);
+vector<double> NearestNeighbours(const xstructure& xstr); //DX20201230 - moved from XtalFinder
+double NearestNeighbourToAtom(const xstructure& xstr, uint k); //DX20201230 - moved from XtalFinder
 
 // for HTQC
 #define STRUCTURE_MODE_NONE             0
@@ -3709,6 +3757,10 @@ bool comparison_kEn_str_band_type_dn(const kEn_st& k1, const kEn_st& k2);
 bool is_equal_position_kEn_str      (const kEn_st& k1, const kEn_st& k2);
 bool near_to                        (const xvector<double> & k1, const xvector<double> & k2, const vector<double> & max_distance);
 // [OBSOLETE] bool GetEffectiveMass(xOUTCAR& outcar,xDOSCAR& doscar,xEIGENVAL& eigenval,xstructure xstr,ostream& oss,const bool& osswrite);
+namespace aurostd {
+  class JSONwriter; // forward-declaration of JSONwriter class: later in plotter
+  // namespace JSONwriter class defined in aurostd.h is not visible; dependencies race?
+}
 //-------------------------------------------------------------------------------------------------
 //ME20190614 - plotter functions
 namespace plotter {
@@ -3772,6 +3824,13 @@ namespace plotter {
   string getLatticeFromKpointsTitle(const string&);
   void shiftEfermiToZero(xEIGENVAL&, double);
   void setEMinMax(aurostd::xoption&, double, double);
+  aurostd::JSONwriter DOS2JSON(xoption &xopt, const xDOSCAR &xdos, ofstream& FileMESSAGE,
+      ostream &oss);//AS20201102
+  aurostd::JSONwriter bands2JSON(const xEIGENVAL &xeigen, const xKPOINTS &xkpts,
+      const vector<double> &distances, const vector<double> &segment_points,
+      const xoption& plotoptions);//AS2021102
+  aurostd::JSONwriter bandsDOS2JSON(const xDOSCAR &xdos, const xEIGENVAL &xeigen,
+      const xKPOINTS &xkpts, xoption &xopt, ofstream &FileMESSAGE, ostream &oss);//AS20201102
 
   // DOS
   void generateDosPlot(stringstream&, const xDOSCAR&, const aurostd::xoption&,ostream& oss=cout);  //CO20200404
@@ -3817,6 +3876,12 @@ namespace plotter {
   void PLOT_TCOND(aurostd::xoption&,ofstream& FileMESSAGE,ostream& oss=cout); //CO20200404
   void PLOT_TCOND(aurostd::xoption&, stringstream&,ostream& oss=cout);  //CO20200404
   void PLOT_TCOND(aurostd::xoption&, stringstream&,ofstream& FileMESSAGE,ostream& oss=cout);  //CO20200404
+
+  // QHA properties plotter -------------------------------------------------
+  void PLOT_THERMO_QHA(aurostd::xoption&,ostream& oss=cout);  //AS20200909
+  void PLOT_THERMO_QHA(aurostd::xoption&,ofstream& FileMESSAGE,ostream& oss=cout); //AS20200909
+  void PLOT_THERMO_QHA(aurostd::xoption&, stringstream&,ostream& oss=cout); //AS2020909
+  void PLOT_THERMO_QHA(aurostd::xoption&, stringstream&,ofstream& FileMESSAGE,ostream& oss=cout); //AS20200909
 
   // General plots -----------------------------------------------------------
   void plotSingleFromSet(xoption&, stringstream&, const vector<vector<double> >&, int,ostream& oss=cout); //CO20200404
@@ -4188,6 +4253,8 @@ namespace SYM {
   bool CalculateInequivalentAtoms_20160801(ofstream &FileMESSAGE,xstructure &a,bool rely_on_basis,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,double _eps_,string format="txt"); // EQUIVALENT ATOMS _IATOMS_ //DX  
   bool CalculateInequivalentAtoms_20160101(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss); // EQUIVALENT ATOMS _IATOMS_ //DX
   //DX+CO END
+  
+  void writePythonScript(ostream& oss); //DX20201228
 }
 string AgroupSymmetryToJson(vector<vector<_sym_op> >& group, char& mode); //DX20170803 - For Python wrapper
 string EquivalentAtomsToJson(vector<vector<int> >& iatoms); //DX20170803 - For Python wrapper
@@ -4554,8 +4621,8 @@ namespace pflow {
   // [RF20200415 - duplicate from xatom]vector<double> GetSpins(const xstructure& a);
   aurostd::matrix<double> GetFpos(const xstructure& str);  //CO20200404 pflow::matrix()->aurostd::matrix()
   aurostd::matrix<double> GetCpos(const xstructure& str);  //CO20200404 pflow::matrix()->aurostd::matrix()
-  xstructure SetNumEachType(const xstructure& a,const deque<int>& in_num_each_type);
-  deque<int> GetNumEachType(const xstructure& a);
+  //DX20210118 [OBSOLETE - expensive to make copy] xstructure SetNumEachType(const xstructure& a,const deque<int>& in_num_each_type);
+  //DX20210118 [OBSOLETE - use xstructure method] deque<int> GetNumEachType(const xstructure& a);
   xstructure SetLat(const xstructure& a,const aurostd::matrix<double>& in_lat);  //CO20200404 pflow::matrix()->aurostd::matrix()
   aurostd::matrix<double> GetLat(const xstructure& a); //CO20200404 pflow::matrix()->aurostd::matrix()
   double GetScale(const xstructure& a);

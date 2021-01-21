@@ -91,7 +91,7 @@ using aurostd::getElements; //CO20200624
 template<class utype> bool initialize_scalar(utype d) {
   string s="";
   utype u=0;
-  u+=aurostd::string2utype<utype>(aurostd::utype2string<utype>(utype())+aurostd::utype2string<utype>(utype(),int()));
+  u+=aurostd::string2utype<utype>(aurostd::utype2string<utype>(utype())+aurostd::utype2string<utype>(utype(),int())+aurostd::utype2string<utype>(utype(),int(),DEFAULT_STREAM)); //DX20201028 - added third variant containing format
   u+=aurostd::substring2utype<utype>(s,s,1)+aurostd::substring2utype<utype>(s,s,s,1);
   u+=aurostd::substring2utype<utype>(s,s)+aurostd::substring2utype<utype>(s,s,s);
   double o=0;
@@ -130,6 +130,9 @@ template<class utype> bool initialize_scalar(utype d) {
   opt.getattachedutype<utype>("");
   opt.args2addattachedscheme<utype>(vs,vs,"","",u);
   opt.args2addattachedscheme<utype>(vs,"","",u);
+
+  aurostd::JSONwriter jw; jw.addNumber("", d);//AS20201217
+  jw.addNumber("", s); //DX20201230 - enables a string to be written as a number
   return (o<0);
 }
 
@@ -299,7 +302,7 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
 
   // initialize matrices
   utype* mstar;mstar=NULL;
-  aurostd::xmatrix<utype> m(2),n(2),mm,mmm(2,3),mmmmm(1,2,3,4),m5(1,2,mstar),mkron;		//CO20190329 - clang doesn't like x=x, changing to x=y
+  aurostd::xmatrix<utype> m(2),n(2),mm,mmm(2,3),m3(3,3),mmmmm(1,2,3,4),m5(1,2,mstar),mkron;		//CO20190329 - clang doesn't like x=x, changing to x=y
   xdouble(m);xint(m);m=+m;m=-m;o+=m(1)[1];o+=m(1,1);o+=m[1][1];m=identity(m);m=identity(x,1,1);m=identity(x,1);
   vv=m.getcol(1);vv=m.getdiag(0,1);m.setrow(v);m.setcol(v);m.setmat(n);m.setmat(v);m=n;m=m+n;m=m-n;m=m*n;v=v*m;adjointInPlace(m,n);n=adjoint(m);m=inverseByAdjoint(m);m=inverse(m);isNonInvertible(m);m=reduce_to_shortest_basis(m);		//CO20190329 - clang doesn't like x=x, changing to x=y  //CO20191110  //CO20191201  //CO20200127
   m*=(utype)5;m/=(utype)6;  //CO20190911
@@ -325,6 +328,7 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   //ME20190718 - norms
   aurostd::l1_norm(m);aurostd::frobenius_norm(m);aurostd::l2_norm(m);aurostd::linf_norm(m);
   // aurostd::trunc(m);aurostd::round(m);
+  polarDecomposition(m3,m3,m3); //DX20210111
 
   //[ME20180627 START]
   std::vector<int> stdv(3, 3),stdv2(2, 3),vind(3, 1),vind2(2),stdv0(3, 0); std::vector<utype> vut(3);
@@ -518,6 +522,10 @@ bool initialize_templates_never_call_this_procedure(bool flag) {
     mxdouble=xmatrixutype2double(mxint);  //CO20191201
     mxint=xmatrixdouble2utype<int>(mxdouble);   //CO20191201
     vector<int> vi;getElements("MnPd",vi);getElements("MnPd",vi,pp_string);getElements("MnPd",vi,pp_string,FileMESSAGE); //CO20200624
+    aurostd::JSONwriter jwi; jwi.addVector("",vi);//AS20201217
+    deque<int> di; jwi.addVector("",di);//AS20201217
+    vector<vector<int> > vvi; jwi.addMatrix("",vvi);//AS20201217
+    deque<deque<int> > ddi; jwi.addMatrix("",ddi);
 #endif
 #ifdef AUROSTD_INITIALIZE_UINT
     o+=aurostd::string2utype<uint>(aurostd::utype2string<uint>(uint())+aurostd::utype2string<uint>(uint(),int()));
@@ -530,6 +538,10 @@ bool initialize_templates_never_call_this_procedure(bool flag) {
     mxdouble=xmatrixutype2double(mxuint);  //CO20191201
     mxuint=xmatrixdouble2utype<uint>(mxdouble);   //CO20191201
     vector<uint> vui;getElements("MnPd",vui);getElements("MnPd",vui,pp_string);getElements("MnPd",vui,pp_string,FileMESSAGE); //CO20200624
+    aurostd::JSONwriter jwui; jwui.addVector("",vui);//AS20201217
+    deque<uint> dui; jwui.addVector("",dui);//AS20201217
+    vector<vector<uint> > vvui; jwui.addMatrix("",vvui);//AS20201217
+    deque<deque<uint> > ddui; jwui.addMatrix("",ddui);//AS20201217
 #endif
 #ifdef AUROSTD_INITIALIZE_FLOAT
     if(1) { // AUROSTD_INITIALIZE_FLOAT

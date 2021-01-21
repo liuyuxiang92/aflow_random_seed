@@ -697,29 +697,29 @@ namespace pflow {
 }
 
 // ***************************************************************************
-// Function SetNumEachType
+// DX20210118 [OBSOLETE - no need to make a copy, improved in xatom] Function SetNumEachType
 // ***************************************************************************
-namespace pflow {
-  xstructure SetNumEachType(const xstructure& a, const deque<int>& in_num_each_type) {
-    xstructure b(a);
-    b.num_each_type.clear();
-    b.comp_each_type.clear();
-    for(uint i=0;i<in_num_each_type.size();i++) {
-      b.num_each_type.push_back(in_num_each_type.at(i));
-      b.comp_each_type.push_back(in_num_each_type.at(i));
-    }
-    return b;
-  }
-}
+//DX20210118 [OBSOLETE] namespace pflow {
+//DX20210118 [OBSOLETE]  xstructure SetNumEachType(const xstructure& a, const deque<int>& in_num_each_type) {
+//DX20210118 [OBSOLETE]    xstructure b(a);
+//DX20210118 [OBSOLETE]    b.num_each_type.clear();
+//DX20210118 [OBSOLETE]    b.comp_each_type.clear();
+//DX20210118 [OBSOLETE]    for(uint i=0;i<in_num_each_type.size();i++) {
+//DX20210118 [OBSOLETE]      b.num_each_type.push_back(in_num_each_type.at(i));
+//DX20210118 [OBSOLETE]      b.comp_each_type.push_back(in_num_each_type.at(i));
+//DX20210118 [OBSOLETE]    }
+//DX20210118 [OBSOLETE]    return b;
+//DX20210118 [OBSOLETE]  }
+//DX20210118 [OBSOLETE]}
 
 // ***************************************************************************
-// Function GetNumEachType
+// //DX20210118 [OBSOLETE - just use xstructure attribute] Function GetNumEachType
 // ***************************************************************************
-namespace pflow {
-  deque<int> GetNumEachType(const xstructure& a) {
-    return a.num_each_type;
-  }
-}
+//DX20210118 [OBSOLETE] namespace pflow {
+//DX20210118 [OBSOLETE]   deque<int> GetNumEachType(const xstructure& a) {
+//DX20210118 [OBSOLETE]     return a.num_each_type;
+//DX20210118 [OBSOLETE]   }
+//DX20210118 [OBSOLETE] }
 
 // ***************************************************************************
 // Function AddAllAtomPos

@@ -2036,6 +2036,14 @@ namespace aurostd {
         aurostd::execute("subst "+from_cmd+" "+to_cmd+" \""+dir+"/ael_aflow.in\"");
         aurostd::RemoveFile("\""+dir+"/\"*~");
       }
+    //AS20201023 BEGIN
+    if(aurostd::FileExist(dir+"/aflow_qha.in"))
+      if(aurostd::substring_present_file_FAST(dir+"/aflow_qha.in",from_cmd)) {
+        if(VERBOSE) { cout << message << "aurostd::ZIP2ZIP: " << from_ext << "->"+to_ext+" " << dir << "/aflow_qha.in" << " " << endl; cout.flush(); }
+        aurostd::execute("subst "+from_cmd+" "+to_cmd+" \""+dir+"/aflow_qha.in\"");
+        aurostd::RemoveFile("\""+dir+"/\"*~");
+      }
+    //AS20201023 END
     if(aurostd::FileExist(dir+"/LOCK"))
       if(aurostd::substring_present_file_FAST(dir+"/LOCK",from_cmd)) {
         if(VERBOSE) { cout << message << "aurostd::ZIP2ZIP: " << from_ext << "->"+to_ext+" " << dir << "/LOCK" << " " << endl; cout.flush(); }
