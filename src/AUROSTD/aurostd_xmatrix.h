@@ -628,7 +628,8 @@ namespace aurostd {
   template<class utype> void
     polarDecomposition(const xmatrix<utype>& transformation_matrix,
     xmatrix<utype>& rotation,
-    xmatrix<utype>& deformation); __xprototype;
+    xmatrix<utype>& deformation,
+    bool check_orthogonal_rotation=true); __xprototype;
 }
 
 namespace aurostd {

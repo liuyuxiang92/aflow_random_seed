@@ -3352,7 +3352,8 @@ namespace aurostd {  // namespace aurostd
 namespace aurostd {
   template<class utype> void polarDecomposition(const xmatrix<utype>& transformation_matrix,
       xmatrix<utype>& rotation,
-      xmatrix<utype>& deformation) {
+      xmatrix<utype>& deformation,
+      bool check_orthogonal_rotation) {
 
     // Decompose a transformation into its rotation and deformation
     // matrices: T=R*U (where T=original matrix, R=rotation, U=deformation).
@@ -3431,13 +3432,20 @@ namespace aurostd {
     if(LDEBUG){ cerr << function_name << " rotation matrix (R): " << rotation << endl; }
 
     // ---------------------------------------------------------------------------
-    // verify conditions of an orthogonal matrix
-    if(LDEBUG){
-      // R^T==R^-1
-      cerr << function_name << " transpose(R): " << aurostd::trasp(rotation) << endl;
-      cerr << function_name << " inverse(R): " << aurostd::inverse(rotation) << endl;
-      // R*R^T=I
-      cerr << function_name << " identity (R*R^T=I): " << rotation*trasp(rotation) << endl;
+    // verify conditions of an orthogonal matrix for rotation
+    if(check_orthogonal_rotation){
+      xmatrix<utype> identity_matrix = rotation*trasp(rotation);
+      if(LDEBUG){
+        // R^T==R^-1
+        cerr << function_name << " transpose(R): " << aurostd::trasp(rotation) << endl;
+        cerr << function_name << " inverse(R): " << aurostd::inverse(rotation) << endl;
+        // R*R^T=I
+        cerr << function_name << " identity? (R*R^T=I): " << identity_matrix << endl;
+      }
+      if(!aurostd::isidentity(identity_matrix)){
+        message << "Extracted rotation should be an orthgonal matrix (R*R^T==I): " << identity_matrix << endl;
+        throw xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
+      }
     }
   }
 }

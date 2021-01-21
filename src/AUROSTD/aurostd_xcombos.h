@@ -36,8 +36,6 @@ namespace aurostd {
 
       //for permutations
       vector<int> m_current;
-      vector<int> m_stack_state; //DX20201222 - Heap's algorithm
-      int m_stack_pointer; //DX20201222 - Heap's algorithm
 
       //for combinations
       vector<int> m_p;

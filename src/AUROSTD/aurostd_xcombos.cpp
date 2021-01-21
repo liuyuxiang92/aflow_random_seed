@@ -84,8 +84,6 @@ namespace aurostd {
     m_started=FALSE;
     m_exhausted=FALSE;
     m_current.clear();
-    m_stack_state.clear(); //DX20201222 - Heap's algorithm
-    m_stack_pointer=0;; //DX20201222 - Heap's algorithm
     m_indices.clear();
     m_p.clear();
     m_x=0;
@@ -106,8 +104,6 @@ namespace aurostd {
     m_started=b.m_started;
     m_exhausted=b.m_exhausted;
     m_current=b.m_current;
-    m_stack_state=b.m_stack_state; //DX20201222
-    m_stack_pointer=b.m_stack_pointer; //DX20201222
     m_p=b.m_p;
     m_x=b.m_x;
     m_y=b.m_y;
@@ -231,8 +227,8 @@ namespace aurostd {
         m_indices[i] = i;
       }
       // for Heap's algorithm //DX20201222
-      m_stack_state.clear();
-      m_stack_state.resize(m_input.size(),0);
+      m_p.clear();
+      m_p.resize(m_input.size(),0);
       n_choices = (int)m_input.size(); //DX+ME20210111
       m_choose = (int)m_input.size(); //DX+ME20210111
     } else {
@@ -335,22 +331,22 @@ namespace aurostd {
       uint count=0, safety = m_choose; //DX20210111 - smarter saftey; each increment should swap no more than m_choose times
       while(!found_permutation&&count<=safety){
         count++;
-        if(m_stack_pointer>=m_choose){ m_exhausted=TRUE; return; } //stop condition
-        if(m_stack_state[m_stack_pointer] < m_stack_pointer){
-          if(m_stack_pointer%2==0){
-            std::swap(m_current[0],m_current[m_stack_pointer]);
+        if(m_x>=m_choose){ m_exhausted=TRUE; return; } //stop condition
+        if(m_p[m_x] < m_x){
+          if(m_x%2==0){
+            std::swap(m_current[0],m_current[m_x]);
           }
           else{
-            std::swap(m_current[m_stack_state[m_stack_pointer]],m_current[m_stack_pointer]);
+            std::swap(m_current[m_p[m_x]],m_current[m_x]);
           }
-          m_stack_state[m_stack_pointer]+=1;
-          m_stack_pointer=0;
+          m_p[m_x]+=1;
+          m_x=0;
           found_permutation = true;
           if(LDEBUG) {cerr << "xcombos::incrementPermutation(): [HEAP] m_current: " << aurostd::joinWDelimiter(m_current, ",") << endl;}
         }
         else{
-          m_stack_state[m_stack_pointer]=0;
-          m_stack_pointer+=1;
+          m_p[m_x]=0;
+          m_x+=1;
         }
       }
       if(count>safety){
