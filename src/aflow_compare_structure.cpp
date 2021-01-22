@@ -1401,7 +1401,6 @@ namespace compare {
     if(catalog=="" || catalog=="icsd" || catalog=="all"){ //DX20191108 - needs to be outside of loop
       comparison_options.flag("COMPARISON_OPTIONS::ICSD_COMPARISON",TRUE);
     }
-    
     // ---------------------------------------------------------------------------
     // FLAG: specify number of species
     uint arity=0; //Defalut=0 : all
