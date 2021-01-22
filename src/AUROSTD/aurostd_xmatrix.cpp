@@ -3443,7 +3443,7 @@ namespace aurostd {
         cerr << function_name << " identity? (R*R^T=I): " << identity_matrix << endl;
       }
       if(!aurostd::isidentity(identity_matrix)){
-        message << "Extracted rotation should be an orthgonal matrix (R*R^T==I): " << identity_matrix << endl;
+        message << "Extracted rotation should be an orthogonal matrix (R*R^T==I): " << identity_matrix << endl;
         throw xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
       }
     }
