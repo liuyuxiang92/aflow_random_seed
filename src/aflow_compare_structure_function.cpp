@@ -3229,7 +3229,7 @@ void XtalFinderCalculator::getNearestNeighbors(uint num_proc){
   // NON-THREADED VERSION - START
   if(LDEBUG) {cerr << function_name << " Non-threaded version: " << num_proc << endl;}
   for(uint i=0;i<structure_containers.size();i++){
-    structure_containers[i].nearest_neighbor_distances = NearestNeighbours(structure_containers[i].structure); // nearest neighbor distances (invariant of origin shifts)
+    structure_containers[i].nearest_neighbor_distances = NearestNeighbors(structure_containers[i].structure); // nearest neighbor distances (invariant of origin shifts)
   }
   // NON-THREADED VERSION - END
 
@@ -3252,7 +3252,7 @@ void XtalFinderCalculator::calculateNearestNeighbors(uint start_index, uint end_
   if(end_index > structure_containers.size()){ end_index=structure_containers.size(); }
 
   for(uint i=start_index;i<end_index;i++){ //DX20191107 switching end index convention <= vs <
-    structure_containers[i].nearest_neighbor_distances = NearestNeighbours(structure_containers[i].structure); // nearest neighbor distances (invariant of origin shifts)
+    structure_containers[i].nearest_neighbor_distances = NearestNeighbors(structure_containers[i].structure); // nearest neighbor distances (invariant of origin shifts)
   }
 }
 
@@ -6112,7 +6112,7 @@ namespace compare{
 
 // ***************************************************************************
 // DX20191122 [MOVED THE FOLLOWING FUNCTIONS INTO XPROTO]:
-// compare::shortestDistance() -> double NearestNeighbourToAtom()
+// compare::shortestDistance() -> double NearestNeighborToAtom()
 // ***************************************************************************
 
 // ***************************************************************************
@@ -6133,7 +6133,7 @@ namespace compare{
 
     uint j=0;
     double num=0.0, den=0.0, nfail=0.0;
-    double dd=0.0, nn1=0.0, nn2=0.0; //dd=delta distance, nn=nearest neighbour
+    double dd=0.0, nn1=0.0, nn2=0.0; //dd=delta distance, nn=nearest neighbor
     int fail1=0, fail2=0;
     for(j=0; j<mapping_info.atom_map.size(); j++){
       nn1 = nn_xstr1[j]; // placement is x1
@@ -6617,7 +6617,7 @@ void XtalFinderCalculator::latticeSearch(
     // calculate attributes of structure 1 (volume, lattice parameters, nearest neighbor distances, etc.)
     vector<double> all_nn1;
     if(xstr_rep.nearest_neighbor_distances.size()==0){ // use xstr_rep so we only calculate once
-      all_nn1 = NearestNeighbours(xstr_rep.structure); // nearest neighbor distances (invariant of origin shifts)
+      all_nn1 = NearestNeighbors(xstr_rep.structure); // nearest neighbor distances (invariant of origin shifts)
       xstr_rep.nearest_neighbor_distances = all_nn1;
     }
     else{
@@ -6627,7 +6627,7 @@ void XtalFinderCalculator::latticeSearch(
     // CALCULATED LATER calculate attributes of structure 2 (volume, lattice parameters, nearest neighbor distances, etc.)
     //vector<double> all_nn2;
     //if(xstr_match.nearest_neighbor_distances.size()==0){
-    //  all_nn2 = NearestNeighbours(xstr_match.structure); // nearest neighbor distances (invariant of origin shifts)
+    //  all_nn2 = NearestNeighbors(xstr_match.structure); // nearest neighbor distances (invariant of origin shifts)
     //  xstr_match.nearest_neighbor_distances = all_nn2;
     //}
     //else{
@@ -7015,7 +7015,7 @@ bool XtalFinderCalculator::searchAtomMappings(
             // BUT, we would need to rescale since atomicNumberDensity can change the
             // nn distances
             if(!all_nn_calculated){
-              all_nn2_test = NearestNeighbours(xstr2_tmp);
+              all_nn2_test = NearestNeighbors(xstr2_tmp);
               all_nn_calculated = true;
               //cerr << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(all_nn2_test),",") << endl;
             }

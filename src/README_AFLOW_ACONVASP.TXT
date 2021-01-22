@@ -380,7 +380,7 @@ LATEST VERSION OF THE FILE:                              materials.duke.edu/AFLO
         Outputs to standard out the angles for each atom triplet
         made up of neighors within a distance cutoff of each other.  
         Actually, since this can be huge, only the first MAX_NUM_ANGLE-1
-        neighbours within d are used.  MAX_NUM_ANGLE=21 at present and
+        neighbors within d are used.  MAX_NUM_ANGLE=21 at present and
         can be set in aflow_pflow_print.cpp
 
   aflow --bader -D DIRECTORY
@@ -852,8 +852,8 @@ LATTICES = (the ones with "")
         This compares the characteristics of two POSCAR files and is  
         useful for determining if the files are the same.  Characteristics
         compared include number of atoms, number of types, total volume,  
-        volume per atom, lattice parameters, number of neighbours of each
-        pair type out to rcut, differences in bond lengths for neighbours
+        volume per atom, lattice parameters, number of neighbors of each
+        pair type out to rcut, differences in bond lengths for neighbors
         of each pair type out to cutoff, and space groups.  For rcut<0 the
         cutoff is set to 4*(Wigner-Seitz radius of each atom) (this is the  
         radius such that num atom spheres occupies the whole volume).
@@ -1708,7 +1708,7 @@ LATTICES = (the ones with "")
   aflow --incompact < POSCAR
         Similar to --incell
         Outputs to standard out a POSCAR file where all the
-        atoms are mapped through the unit and neighbours cells
+        atoms are mapped through the unit and neighbors cells
         to minimixe the shortest possible bond with an adjacent atom
         This option is very useful if you run big and complicate
         molecules where atoms exit of the unit cell and you have

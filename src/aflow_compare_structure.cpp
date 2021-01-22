@@ -406,7 +406,7 @@ namespace compare {
         else if(final_misfit > xtal_finder.misfit_family && final_misfit <= 1.0){
           message << final_misfit << " : " << "NOT A MATCH" << endl;
         }
-        else if(aurostd::isequal(final_misfit,AUROSTD_MAX_DOUBLE) || (final_misfit+1.0) < 1e-3){
+        else{
           message << "UNMATCHABLE" << endl;
         }
         if(XHOST.QUIET){
@@ -423,7 +423,10 @@ namespace compare {
       }
       else{
         message << "UNMATCHABLE" << endl;
-        pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_COMPLETE_);
+        if(XHOST.QUIET){ oss << message.str(); }
+        else{
+          pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_COMPLETE_);
+        }
       }
       if(screen_only) {
         if(write_json){ return results_json; }

@@ -3437,13 +3437,13 @@ namespace aurostd {
       xmatrix<utype> identity_matrix = rotation*trasp(rotation);
       if(LDEBUG){
         // R^T==R^-1
-        cerr << function_name << " transpose(R): " << aurostd::trasp(rotation) << endl;
-        cerr << function_name << " inverse(R): " << aurostd::inverse(rotation) << endl;
+        cerr << function_name << " transpose(R):" << endl << aurostd::trasp(rotation) << endl;
+        cerr << function_name << " inverse(R):" << endl << aurostd::inverse(rotation) << endl;
         // R*R^T=I
-        cerr << function_name << " identity? (R*R^T=I): " << identity_matrix << endl;
+        cerr << function_name << " identity? (R*R^T=I):" << endl << identity_matrix << endl;
       }
       if(!aurostd::isidentity(identity_matrix)){
-        message << "Extracted rotation should be an orthogonal matrix (R*R^T==I): " << identity_matrix << endl;
+        message << "Extracted rotation should be an orthogonal matrix (R*R^T==I):" << endl << identity_matrix;
         throw xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
       }
     }

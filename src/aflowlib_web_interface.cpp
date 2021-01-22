@@ -4579,7 +4579,7 @@ namespace aflowlib {
 
 //DX20200929 - START
 namespace aflowlib {
-  string getSpaceGroupAFLUXSummons(vector<uint>& space_groups, uint relaxation_step){
+  string getSpaceGroupAFLUXSummons(const vector<uint>& space_groups, uint relaxation_step){
 
     vector<string> vsummons(space_groups.size());
 

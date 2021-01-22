@@ -175,9 +175,9 @@ extern string _AFLOWLOCK_;
 
 #define KBIN_SUBDIRECTORIES           string("ARUN.")
 
-#define KBIN_NEIGHBOURS_MAX_NUMBER      30000
-#define KBIN_NEIGHBOURS_RADIUS_DEFAULT 3.0
-#define KBIN_NEIGHBOURS_DRADIUS_DEFAULT 0.1
+//DX20210122 [OBSOLETE] #define KBIN_NEIGHBORS_MAX_NUMBER      30000
+//DX20210122 [OBSOLETE] #define KBIN_NEIGHBORS_RADIUS_DEFAULT 3.0
+//DX20210122 [OBSOLETE] #define KBIN_NEIGHBORS_DRADIUS_DEFAULT 0.1
 
 #define ALIEN_INPUT_FILE_NAME_DEFAULT  "./input"
 #define ALIEN_EXTERNAL_INPUT_DEFAULT   "../input_external"
@@ -778,11 +778,11 @@ class _kflags {
     bool  KBIN_SYMMETRY_AGROUP_WRITE;      // taken TRUE by default
     bool  KBIN_SYMMETRY_IATOMS_WRITE;      // taken TRUE by default
     double KBIN_SYMMETRY_SGROUP_RADIUS;
-    // neighbours operation lists
-    bool  KBIN_NEIGHBOURS_CALCULATION;
-    bool  KBIN_NEIGHBOURS_WRITE;
-    double KBIN_NEIGHBOURS_RADIUS;
-    double KBIN_NEIGHBOURS_DRADIUS;
+    //DX20210122 [OBSOLETE] // neighbors operation lists
+    //DX20210122 [OBSOLETE] bool  KBIN_NEIGHBORS_CALCULATION;
+    //DX20210122 [OBSOLETE] bool  KBIN_NEIGHBORS_WRITE;
+    //DX20210122 [OBSOLETE] double KBIN_NEIGHBORS_RADIUS;
+    //DX20210122 [OBSOLETE] double KBIN_NEIGHBORS_DRADIUS;
     // pocc operation lists
     bool   KBIN_POCC;
     bool   KBIN_POCC_CALCULATION;
@@ -1152,7 +1152,7 @@ class _atom { // simple class.. nothing fancy
     // for partial occupation                              // partial occupation
     double partial_occupation_value;                       // partial occupation
     bool   partial_occupation_flag;                        // partial occupation
-    int shell;                                             // neighbour shell number
+    int shell;                                             // neighbor shell number
     // printing
     bool   verbose;                                        // verbose in printing
     bool   print_RHT;                                      // a printer for coord and name (general position)   //RHT
@@ -1260,7 +1260,7 @@ uint XATOM_SplitAlloySpecies(const string& alloy_in, vector<string> &speciesX, v
 uint XATOM_SplitAlloyPseudoPotentials(const string& alloy_in, vector<string> &species_ppX);
 uint XATOM_SplitAlloyPseudoPotentials(const string& alloy_in, vector<string> &species_ppX, vector<double> &natomsX);
 //DX20200724 [OBSOLETE] vector<uint> composition2stoichiometry(string& composition); //DX20181009
-// neighbour things
+// neighbor things
 void GetUnitCellRep(const xvector<double>& ppos,xvector<double>& p_cell0,xvector<int>& ijk,const xmatrix<double>& lattice,const bool coord_flag);
 
 string xstructure2json(xstructure& xstr); //DX20170831 - xstructure2json
@@ -1851,16 +1851,16 @@ class xstructure {
     vector<int> grid_atoms_sc2pcMap;                              //CO20170804 - mapping between grid_atoms (sc) and atoms (pc)
     vector<int> grid_atoms_pc2scMap;                              //CO20170804 - mapping between grid_atoms (sc) and atoms (pc)
     // ----------------------------------------------------------------------------------------
-    // NEIGHBOURS OBEJCTS EXPERIMENTAL/UNFINISHED                 // NEIGHBOURS OBEJCTS   WORKING EXPERIMENTAL
-    void neighbours_clear(void);                                  // NN create/clean all the vectors
-    void neighbours_calculate(void);                              // NN shift data from QM to GEOM
-    bool neighbours_calculated;                                   // NN calculation
-    double neighbours_radius;                                     // radius of application
-    double neighbours_dradius;                                    // delta radius of shell (bins)
-    vector<vector<double> > neighbours_atoms_func_r_vs_nn;        // contains function distance vs neighbours (each atom)
-    vector<vector<int> > neighbours_atoms_func_num_vs_nn;         // contains function distance vs neighbours (each atom)
-    vector<double> neighbours_func_r_vs_nn;                       // contains function distance vs neighbours (all atoms)
-    vector<int> neighbours_func_num_vs_nn;                        // contains function number vs neighbours (all atoms)
+    // NEIGHBORS OBEJCTS EXPERIMENTAL/UNFINISHED                 // NEIGHBORS OBEJCTS   WORKING EXPERIMENTAL
+    //DX20210122 [OBSOLETE] void neighbors_clear(void);                                  // NN create/clean all the vectors
+    //DX20210122 [OBSOLETE] void neighbors_calculate(void);                              // NN shift data from QM to GEOM
+    //DX20210122 [OBSOLETE] bool neighbors_calculated;                                   // NN calculation
+    //DX20210122 [OBSOLETE] double neighbors_radius;                                     // radius of application
+    //DX20210122 [OBSOLETE] double neighbors_dradius;                                    // delta radius of shell (bins)
+    vector<vector<double> > neighbors_atoms_func_r_vs_nn;        // contains function distance vs neighbors (each atom)
+    vector<vector<int> > neighbors_atoms_func_num_vs_nn;         // contains function distance vs neighbors (each atom)
+    vector<double> neighbors_func_r_vs_nn;                       // contains function distance vs neighbors (all atoms)
+    vector<int> neighbors_func_num_vs_nn;                        // contains function number vs neighbors (all atoms)
     // xvector<int> ndims;                                        // dimension of the radius (in +- integers)
     // std::deque<_atom> ashell;                                 // all the atoms in the shell
     // std::deque<deque<_atom> > natoms;                        // vector of vectors
@@ -1884,7 +1884,7 @@ class xstructure {
     void GetCoordinations(deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,deque<deque<uint> >& coordinations,double rmax,double rmin=0.0,double tol=0.5,bool prim=true,bool unique_only=true);  //CO20200912
     void GetCoordinations(deque<_atom>& atoms_cell,deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,deque<deque<uint> >& coordinations,double rmax,double rmin=0.0,double tol=0.5,bool prim=true,bool unique_only=true);  //CO20200912
     //
-    // NEIGHBOURS OBEJCTS OLD-ACONVASP BUT WORKS                  // NEIGHBOURS OBEJCTS 
+    // NEIGHBORS OBEJCTS OLD-ACONVASP BUT WORKS                  // NEIGHBORS OBEJCTS 
     // GetNeighData collects all the neighbor data between rmin and rmax and stores it for each atom in a vector of atom objects in order of increasing distance.  
     void GetNeighData(const deque<_atom>& in_atom_vec,const double& rmin, const double& rmax,deque<deque<_atom> >& neigh_mat);
     // GetStrNeighData collects all the neighbor data out to some cutoff and stores it for each atom in the structure.
@@ -2587,9 +2587,9 @@ bool PrototypeGeneratorTest(ofstream& FileMESSAGE,ostream& oss=cout, bool check_
 namespace aflowlib {
   string PrototypeCleanLatticeString(const string& latticeIN);
 }
-double NearestNeighbour(const xstructure &str_in);
-vector<double> NearestNeighbours(const xstructure& xstr); //DX20201230 - moved from XtalFinder
-double NearestNeighbourToAtom(const xstructure& xstr, uint k); //DX20201230 - moved from XtalFinder
+double NearestNeighbor(const xstructure &str_in);
+vector<double> NearestNeighbors(const xstructure& xstr); //DX20201230 - moved from XtalFinder
+double NearestNeighborToAtom(const xstructure& xstr, uint k); //DX20201230 - moved from XtalFinder
 
 // for HTQC
 #define STRUCTURE_MODE_NONE             0
@@ -4367,9 +4367,9 @@ namespace LATTICE {
 }
 
 // ----------------------------------------------------------------------------
-// neighbours prototypes
-// aflow_neighbours.cpp
-bool StepNeighboursPerform(xstructure& a,string AflowIn,ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags);
+// neighbors prototypes
+// aflow_neighbors.cpp
+bool StepNeighborsPerform(xstructure& a,string AflowIn,ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags);
 
 // ----------------------------------------------------------------------------
 // surface prototypes
@@ -4389,8 +4389,8 @@ namespace surface {
   double GetPlaneDensityAtoms(const xstructure& _str,const xvector<double>& hkl,const double& roughness);
   double GetPlaneDensityBBonds(const xstructure& _str,const xvector<double>& hkl,const double& roughness,const double& bbdistance,const int& type_at1,const int& type_at2);
   double GetPlaneDensityBBonds(const xstructure& _str,const xvector<double>& hkl,const double& roughness,const double& bbdistance);
-  double GetNNeighbours(const xstructure& _str,const int& type_at1,const int& type_at2);
-  double GetNNeighbours(const xstructure& _str);
+  double GetNNeighbors(const xstructure& _str,const int& type_at1,const int& type_at2);
+  double GetNNeighbors(const xstructure& _str);
   string PrintHKLSigma(int num_types,int num_types_combinations);
   string PrintHKLSigmaBB(int num_types,int num_types_combinations,const double& bbfrac,const double& bbdistance,const xmatrix<double>& bbdistances);
   bool GetSurfaceHKL(const xstructure& _str,_aflags& aflags,const xvector<double>& _hkl,vector<vector<double> >& planesreducible,vector<vector<double> >& planesirreducible,ostream& oss);

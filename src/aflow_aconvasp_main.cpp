@@ -30,7 +30,7 @@
 #include "aflow_cce.h" //RF20200203
 #include "APL/aflow_apl.h"  //ME20200330
 
-extern double NearestNeighbour(const xstructure& a);
+extern double NearestNeighbor(const xstructure& a);
 
 // ***************************************************************************
 using aurostd::FileExist;
@@ -2646,7 +2646,7 @@ namespace pflow {
     strstream << tab << x << " --superlattice=structure_type,n_min,n_max < POSCAR" << endl;
     strstream << tab << x << " --superlattice=VASP,structure_type,A,B < superlattice_name (CHECK) ???" << endl;
     strstream << tab << x << " --cluster=structure_type,n_min,n_max,m_min,m_max" << endl;
-    strstream << tab << x << " --special-quasirandom-structure=..|--sqs=structure_type,atom_num,neighbour_num,sl_num_min,sl_num_max,A,B" << endl;
+    strstream << tab << x << " --special-quasirandom-structure=..|--sqs=structure_type,atom_num,neighbor_num,sl_num_min,sl_num_max,A,B" << endl;
     strstream << tab << x << " --special-quasirandom-structure=..|--sqs=structure_type n1 n2 < POSCAR (CHECK)" << endl;
     strstream << endl;
     strstream << " TERNARY CONVEX HULL (only for duke.edu computers)" << endl;
@@ -10672,7 +10672,7 @@ namespace pflow {
 namespace pflow {
   double NNDIST(istream& input) {
     xstructure a(input,IOAFLOW_AUTO);
-    return(NearestNeighbour(a));
+    return(NearestNeighbor(a));
   }
 } // namespace pflow
 

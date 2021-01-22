@@ -54,6 +54,7 @@
         -- added PolarDecomposition() function to separate the rotation and deformation components of a transformation (DX)
         -- added functions to transform structures based on transformation matrix, rotation, and origin shift: TransformStructure() (DX)
         -- added foldAtomsInCell() and SetNumEachType() in-place-modification overloads (DX)
+        -- removed obsolete neighbor variables/functions, e.g., removed AFLOW_NEIGHBORS keywords in aflow.in (not used), removed unused xstructure neighbor attributes, removed aflow_neighbours.cpp (DX)
         -- implemented new on-the-fly threading scheme into AAPL (ME)
 3.2.6 - 2020/12/30
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.6.tar.xz

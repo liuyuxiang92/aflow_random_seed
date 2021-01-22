@@ -124,8 +124,8 @@ since we must explore the entire search space.
 
 METHODS FOR ENHANCING COMPUTATION SPEED:
   1) Increase the number of processors (--np=xx)
-  2) Convert structures to a primitive or more orthogonal lattice representation
-     via the following options:
+  2) Convert structures to a primitive and/or more orthogonal lattice representations
+     via the following options (conversions can be combined):
        --primitivize : convert the crystal to a primitive representation
        --minkowski   : convert the crystal to the Minkowski representation
        --niggli      : convert the crystal to the Niggli representation
@@ -286,7 +286,7 @@ General options - applicable to all commands - is listed at the bottom of this s
     [GENERAL_COMPARISON_OPTIONS] : Generic options for all commands (unless indicated otherwise):
 
         [--misfit_match=0.1]                    : Specify the misfit threshold for matching structures (default: 0.1).
-        [--misfit_match=0.2]                    : Specify the misfit threshold for structures within the same family (default: 0.2).
+        [--misfit_family=0.2]                   : Specify the misfit threshold for structures within the same family (default: 0.2).
         [--np=16|--num_proc=16]                 : Allocate the number of processors/threads for the task.
         [--optimize_match]                      : Explore all lattice and origin choices to find the best matching representation, i.e., minimizes misfit value.
         [--no_scale_volume]                     : Suppresses volume rescaling during structure matching; identifies differences due to volume expansion or compression of a structure.

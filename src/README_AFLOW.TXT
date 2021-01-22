@@ -516,15 +516,6 @@ by hand. You can put everything inside aflow.in
  //DX and CO - END
 
 ******************************************************
-[AFLOW_NEIGHBOURS]KEYWORD    OPTIONAL
- Keyword to specify parameters. After [AFLOW_NEIGHBOURS]
- you can put
- CALCULATION         OPTIONAL
- WRITE               OPTIONAL
- RADIUS=XXX          OPTIONAL, default XXX=5.0
- DRADIUS=XXX         OPTIONAL, default XXX=0.1
-
-******************************************************
 
 [AFLOW_APL]CALC             OPTIONAL
  Calculate harmonic phonons. Read README_AFLOW_APL.TXT.
@@ -1380,10 +1371,6 @@ EXAMPLE
 [AFLOW_SYMMETRY]CALC 
 #[AFLOW_SYMMETRY]SGROUP_WRITE 
 #[AFLOW_SYMMETRY]SGROUP_RADIUS=7.77 
-[AFLOW] ************************************************************************************************************************** 
-#[AFLOW_NEIGHBOURS]CALC 
-[AFLOW_NEIGHBOURS]RADIUS=7.7 
-[AFLOW_NEIGHBOURS]DRADIUS=0.1 
 [AFLOW] ************************************************************************************************************************** 
 #[AFLOW_APL]CALC                                      // README_AFLOW_APL.TXT
 [AFLOW_APL]ENGINE=DM                                  // README_AFLOW_APL.TXT

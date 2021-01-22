@@ -357,8 +357,8 @@ namespace KBIN {
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,oss);
     } //CT20200520 - added warning
     // ---------------------------------------------------------
-    // parameters for NEIGHBOURS
-    kflags.KBIN_NEIGHBOURS_CALCULATION  = aurostd::substring2bool(AflowIn,"[AFLOW_NEIGHBOURS]CALC",TRUE) || aurostd::substring2bool(AflowIn, "[AFLOW_NEIGHBORS]CALC");  //ME20190107 - Added American spelling
+    // parameters for NEIGHBORS
+    //DX20210122 [OBSOLETE] kflags.KBIN_NEIGHBORS_CALCULATION  = aurostd::substring2bool(AflowIn,"[AFLOW_NEIGHBOURS]CALC",TRUE) || aurostd::substring2bool(AflowIn, "[AFLOW_NEIGHBORS]CALC");  //ME20190107 - Added American spelling
     // ---------------------------------------------------------
     // parameters for POCC CALCULATIONS, KESONG YANG
     kflags.KBIN_POCC=FALSE;
@@ -1765,7 +1765,7 @@ namespace KBIN {
           //    return FALSE;
         }
         // ***************************************************************************
-        // DO THE SYMMETRY NEIGHBOURS CALCULATION
+        // DO THE SYMMETRY NEIGHBORS CALCULATION
         //if(!kflags.KBIN_PHONONS_CALCULATION_FROZSL) { //[CO20200106 - close bracket for indenting]}
         //DX
 
@@ -1782,7 +1782,7 @@ namespace KBIN {
           ) {  //CO, do internally
           //DX
           if(Krun) Krun=KBIN_StepSymmetryPerform(xvasp.str,AflowIn,FileMESSAGE,aflags,kflags,TRUE,cout); // DO THE SYMMETRY CALCULATION
-          if(Krun) Krun=StepNeighboursPerform(xvasp.str,AflowIn,FileMESSAGE,aflags,kflags); // DO THE NEIGHBOURS CALCULATION
+          //DX20210122 [OBSOLETE - function doesn't calculate anything, removed] if(Krun) Krun=StepNeighborsPerform(xvasp.str,AflowIn,FileMESSAGE,aflags,kflags); // DO THE NEIGHBORS CALCULATION
           //DX
           //cerr << "KBIN GEN SYMMETRY OF AFLOWIN: " << aflags.KBIN_GEN_SYMMETRY_OF_AFLOWIN << endl;
           if(aflags.KBIN_GEN_SYMMETRY_OF_AFLOWIN){
@@ -3835,12 +3835,12 @@ namespace KBIN {
             xfixed.flag("EXCCOR",TRUE);xfixed.flag("ALL",TRUE);
           }
         }
-        // ********* NEAREST NEIGHBOUR ATOMS PROBLEMS ******************
-        if(LDEBUG) cerr << soliloquy << " " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << "  [CHECK NEAREST NEIGHBOUR ATOMS PROBLEMS]" << endl;
+        // ********* NEAREST NEIGHBOR ATOMS PROBLEMS ******************
+        if(LDEBUG) cerr << soliloquy << " " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << "  [CHECK NEAREST NEIGHBOR ATOMS PROBLEMS]" << endl;
         if(!vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("NATOMS") && !xfixed.flag("ALL")) { // OPTIONS FOR NATOMS
           if(xwarning.flag("NATOMS") && !xfixed.flag("NATOMS")) {  // Apply only ONCE
-            KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  NEAREST-NEIGHBOURS ATOMS problems ");
-            aus << "WWWWW  FIX  NEAREST-NEIGHBOURS ATOMS - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+            KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  NEAREST-NEIGHBORS ATOMS problems ");
+            aus << "WWWWW  FIX  NEAREST-NEIGHBORS ATOMS - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
             aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
             KBIN::XVASP_Afix_GENERIC("NATOMS",xvasp,kflags,vflags);
             xfixed.flag("NATOMS",TRUE);xfixed.flag("ALL",TRUE);

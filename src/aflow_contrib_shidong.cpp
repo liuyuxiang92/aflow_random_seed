@@ -2637,10 +2637,10 @@ void GenerateAflowInputFile(string structure_type,
   input_file << "#[AFLOW_SYMMETRY]SGROUP_WRITE " << endl;
   input_file << "#[AFLOW_SYMMETRY]SGROUP_RADIUS=7.77 " << endl;
   input_file << AFLOWIN_SEPARATION_LINE << endl;
-  input_file << "#[AFLOW_NEIGHBOURS]CALC " << endl;
-  input_file << "[AFLOW_NEIGHBOURS]RADIUS=7.7 " << endl;
-  input_file << "[AFLOW_NEIGHBOURS]DRADIUS=0.1 " << endl;
-  input_file << AFLOWIN_SEPARATION_LINE << endl;
+  //DX20210122 [OBSOLETE] input_file << "#[AFLOW_NEIGHBOURS]CALC " << endl;
+  //DX20210122 [OBSOLETE] input_file << "[AFLOW_NEIGHBOURS]RADIUS=7.7 " << endl;
+  //DX20210122 [OBSOLETE] input_file << "[AFLOW_NEIGHBOURS]DRADIUS=0.1 " << endl;
+  //DX20210122 [OBSOLETE] input_file << AFLOWIN_SEPARATION_LINE << endl;
   input_file << "[AFLOW] # Phonons calculations are not implemented yet. They will be included in aflow4." << endl;
   input_file << "#[AFLOW_PHONONS]CALC " << endl;
   input_file << AFLOWIN_SEPARATION_LINE << endl;
@@ -2742,7 +2742,7 @@ void CheckAllInputFileExistence(string structure_type) {
 
     cerr << "The cluster data file is missing\n"
       << "Please use the command\n"
-      << "    aflow --cluster structure_type minimun_site_num maximun_site_num minimum_nearest_neighbour maximun_nearest_neighbour \n"
+      << "    aflow --cluster structure_type minimun_site_num maximun_site_num minimum_nearest_neighbor maximun_nearest_neighbor \n"
       << "to generate it\n";
 
     myfile.close();

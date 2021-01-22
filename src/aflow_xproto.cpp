@@ -579,7 +579,7 @@ namespace aflowlib {
   }
 } // namespace aflowlib
 
-//double NearestNeighbour(const xstructure &str_in);
+//double NearestNeighbor(const xstructure &str_in);
 
 // ***************************************************************************
 namespace aflowlib {
@@ -2031,7 +2031,7 @@ namespace aflowlib {
         }
       }
       if(mode==LIBRARY_MODE_ICSD) {
-        double nn_dist=NearestNeighbour(str); //CO+DX20200213
+        double nn_dist=NearestNeighbor(str); //CO+DX20200213
         if(nn_dist<_XPROTO_TOO_CLOSE_ERROR_){ //CO+DX20200213
           if(flip_option==FALSE && SpaceGroupOptionRequired(str.spacegroupnumber)==TRUE) {  //CO+DX20200213
             // *voss << "AFLOW WARNING (aflow_xproto.cpp): label=" << label << " WRONG NNdist too close =" << nn_dist << "   *************"  << endl;
@@ -2145,12 +2145,12 @@ namespace aflowlib {
     // check for nndist
 
     if(LDEBUG) { *voss << "DEBUG: (aflowlib::PrototypeLibraries) [7] nndist" << endl; }
-    //DX20181119 [OBSOLETE] if(NearestNeighbour(str)<_XPROTO_TOO_CLOSE_ERROR_)
-    if(!fictitious_system && NearestNeighbour(str)<_XPROTO_TOO_CLOSE_ERROR_) //DX20181119 - check if real atoms are used first
+    //DX20181119 [OBSOLETE] if(NearestNeighbor(str)<_XPROTO_TOO_CLOSE_ERROR_)
+    if(!fictitious_system && NearestNeighbor(str)<_XPROTO_TOO_CLOSE_ERROR_) //DX20181119 - check if real atoms are used first
     { //CO20200106 - patching for auto-indenting
       //   str.SetCoordinates(_COORDS_CARTESIAN_);
       //  *voss << str << endl;
-      message << "Nearest neighbors are too close: label=" << label << ", NNdist=" << NearestNeighbour(str) << ", spacegroup=" << str.spacegroupnumber << ", option=" << str.spacegroupnumberoption << endl;
+      message << "Nearest neighbors are too close: label=" << label << ", NNdist=" << NearestNeighbor(str) << ", spacegroup=" << str.spacegroupnumber << ", option=" << str.spacegroupnumberoption << endl;
       message << str << endl;
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_RUNTIME_ERROR_);
     }
@@ -3838,9 +3838,9 @@ namespace aflowlib {
         }
       }
       if(PARAMS->mode==LIBRARY_MODE_ICSD) {
-        if(NearestNeighbour(str)<_XPROTO_TOO_CLOSE_ERROR_ && PARAMS->flip_option==FALSE && SpaceGroupOptionRequired(str.spacegroupnumber)==TRUE) {
-          // *voss << "AFLOW WARNING (aflow_xproto.cpp): PARAMS->label=" << PARAMS->label << " WRONG NNdist too close =" << NearestNeighbour(str) << "   *************"  << endl;
-          *voss << "AFLOW WARNING (aflow_xproto.cpp): Too close NNdist(" << NearestNeighbour(str) << "), Spacegroup=" << str.spacegroupnumber << " option=" << str.spacegroupnumberoption << " not enough, try PARAMS->flip_option " << endl;
+        if(NearestNeighbor(str)<_XPROTO_TOO_CLOSE_ERROR_ && PARAMS->flip_option==FALSE && SpaceGroupOptionRequired(str.spacegroupnumber)==TRUE) {
+          // *voss << "AFLOW WARNING (aflow_xproto.cpp): PARAMS->label=" << PARAMS->label << " WRONG NNdist too close =" << NearestNeighbor(str) << "   *************"  << endl;
+          *voss << "AFLOW WARNING (aflow_xproto.cpp): Too close NNdist(" << NearestNeighbor(str) << "), Spacegroup=" << str.spacegroupnumber << " option=" << str.spacegroupnumberoption << " not enough, try PARAMS->flip_option " << endl;
           xstructure str_flipped;
           str_flipped=aflowlib::PrototypeLibraries(*voss,PARAMS->label,PARAMS->parameters,PARAMS->vatomX,PARAMS->vvolumeX,PARAMS->volume_in,PARAMS->mode,TRUE);
           str_flipped.title+=" (sg.opt flipped)";
@@ -3944,10 +3944,10 @@ namespace aflowlib {
     // check for nndist
 
     if(LDEBUG) *voss << "DEBUG: (aflowlib::PrototypeLibraries) [7] nndist" << endl;
-    if(NearestNeighbour(str)<_XPROTO_TOO_CLOSE_ERROR_) {
+    if(NearestNeighbor(str)<_XPROTO_TOO_CLOSE_ERROR_) {
       //   str.SetCoordinates(_COORDS_CARTESIAN_);
       //  *voss << str << endl;
-      message << "Nearest neighbors are too close: label=" << PARAMS->label << ", NNdist=" << NearestNeighbour(str) << ", spacegroup=" << str.spacegroupnumber << ", option=" << str.spacegroupnumberoption << endl;
+      message << "Nearest neighbors are too close: label=" << PARAMS->label << ", NNdist=" << NearestNeighbor(str) << ", spacegroup=" << str.spacegroupnumber << ", option=" << str.spacegroupnumberoption << endl;
       message << str << endl;
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_RUNTIME_ERROR_);
     }

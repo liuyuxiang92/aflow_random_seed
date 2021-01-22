@@ -189,7 +189,7 @@ ostream& operator<<(ostream& oss,const _atom& atom) {
       oss << "order_parameter_atom=" << atom.order_parameter_atom << endl;
       oss << "partial_occupation_value=" << atom.partial_occupation_value << endl;
       oss << "partial_occupation_flag=" << atom.partial_occupation_flag << endl;
-      oss << "nearest_neighbour_shell_num= " << atom.shell << endl;
+      oss << "nearest_neighbor_shell_num= " << atom.shell << endl;
     }
     if(atom.print_cartesian==TRUE) {
       if(atom.verbose) oss << "cartesian" << endl;
@@ -2463,18 +2463,18 @@ void xstructure::free() { //DX20191220 - moved all initializations from constuct
   lijk_cpos.clear();
   lijk_fpos.clear();
   lijk_dims.clear();
-  // NEIGHBOURS ------------------------
-  neighbours_calculated=FALSE;
-  neighbours_radius=0.0;
-  neighbours_dradius=0.0;
-  for(uint i=0;i<neighbours_atoms_func_r_vs_nn.size();i++)
-    neighbours_atoms_func_r_vs_nn.at(i).clear();
-  neighbours_atoms_func_r_vs_nn.clear();
-  for(uint i=0;i<neighbours_atoms_func_num_vs_nn.size();i++)
-    neighbours_atoms_func_num_vs_nn.at(i).clear();
-  neighbours_atoms_func_num_vs_nn.clear();
-  neighbours_func_r_vs_nn.clear();                   // contains function distance vs neighbours (all atoms)
-  neighbours_func_num_vs_nn.clear();                    // contains function number vs neighbours (all atoms)
+  // NEIGHBOR ------------------------
+  //DX20210122 [OBSOLETE] neighbors_calculated=FALSE;
+  //DX20210122 [OBSOLETE] neighbors_radius=0.0;
+  //DX20210122 [OBSOLETE] neighbors_dradius=0.0;
+  for(uint i=0;i<neighbors_atoms_func_r_vs_nn.size();i++)
+    neighbors_atoms_func_r_vs_nn.at(i).clear();
+  neighbors_atoms_func_r_vs_nn.clear();
+  for(uint i=0;i<neighbors_atoms_func_num_vs_nn.size();i++)
+    neighbors_atoms_func_num_vs_nn.at(i).clear();
+  neighbors_atoms_func_num_vs_nn.clear();
+  neighbors_func_r_vs_nn.clear();                   // contains function distance vs neighbors (all atoms)
+  neighbors_func_num_vs_nn.clear();                    // contains function number vs neighbors (all atoms)
   // OUTPUT/ERROR ----------------------
   Niggli_has_failed=FALSE;
   Minkowski_has_failed=FALSE;
@@ -2799,26 +2799,26 @@ void xstructure::copy(const xstructure& bstr) {
     lijk_fpos.push_back(bstr.lijk_fpos.at(i));
   }
   lijk_dims=bstr.lijk_dims;
-  // NEIGHBOURS ------------------------
-  neighbours_calculated=bstr.neighbours_calculated;
-  neighbours_radius=bstr.neighbours_radius;
-  neighbours_dradius=bstr.neighbours_dradius;
-  //  for(uint i=0;i<neighbours_atoms_func_r_vs_nn.size();i++)
-  //   neighbours_atoms_func_r_vs_nn.at(i).clear();
-  neighbours_atoms_func_r_vs_nn.clear();
-  for(uint i=0;i<bstr.neighbours_atoms_func_r_vs_nn.size();i++)
-    neighbours_atoms_func_r_vs_nn.push_back(bstr.neighbours_atoms_func_r_vs_nn.at(i));
-  //  for(uint i=0;i<neighbours_atoms_func_num_vs_nn.size();i++)
-  //   neighbours_atoms_func_num_vs_nn.at(i).clear();
-  neighbours_atoms_func_num_vs_nn.clear();
-  for(uint i=0;i<bstr.neighbours_atoms_func_num_vs_nn.size();i++)
-    neighbours_atoms_func_num_vs_nn.push_back(bstr.neighbours_atoms_func_num_vs_nn.at(i));
-  neighbours_func_r_vs_nn.clear();
-  for(uint i=0;i<bstr.neighbours_func_r_vs_nn.size();i++)
-    neighbours_func_r_vs_nn.push_back(bstr.neighbours_func_r_vs_nn.at(i));
-  neighbours_func_num_vs_nn.clear();
-  for(uint i=0;i<bstr.neighbours_func_num_vs_nn.size();i++)
-    neighbours_func_num_vs_nn.push_back(bstr.neighbours_func_num_vs_nn.at(i));
+  // NEIGHBOR ------------------------
+  //DX20210122 [OBSOLETE] neighbors_calculated=bstr.neighbors_calculated;
+  //DX20210122 [OBSOLETE] neighbors_radius=bstr.neighbors_radius;
+  //DX20210122 [OBSOLETE] neighbors_dradius=bstr.neighbors_dradius;
+  //  for(uint i=0;i<neighbors_atoms_func_r_vs_nn.size();i++)
+  //   neighbors_atoms_func_r_vs_nn.at(i).clear();
+  neighbors_atoms_func_r_vs_nn.clear();
+  for(uint i=0;i<bstr.neighbors_atoms_func_r_vs_nn.size();i++)
+    neighbors_atoms_func_r_vs_nn.push_back(bstr.neighbors_atoms_func_r_vs_nn.at(i));
+  //  for(uint i=0;i<neighbors_atoms_func_num_vs_nn.size();i++)
+  //   neighbors_atoms_func_num_vs_nn.at(i).clear();
+  neighbors_atoms_func_num_vs_nn.clear();
+  for(uint i=0;i<bstr.neighbors_atoms_func_num_vs_nn.size();i++)
+    neighbors_atoms_func_num_vs_nn.push_back(bstr.neighbors_atoms_func_num_vs_nn.at(i));
+  neighbors_func_r_vs_nn.clear();
+  for(uint i=0;i<bstr.neighbors_func_r_vs_nn.size();i++)
+    neighbors_func_r_vs_nn.push_back(bstr.neighbors_func_r_vs_nn.at(i));
+  neighbors_func_num_vs_nn.clear();
+  for(uint i=0;i<bstr.neighbors_func_num_vs_nn.size();i++)
+    neighbors_func_num_vs_nn.push_back(bstr.neighbors_func_num_vs_nn.at(i));
   // OUTPUT/ERROR ----------------------
   Niggli_has_failed=bstr.Niggli_has_failed;
   Minkowski_has_failed=bstr.Minkowski_has_failed;
@@ -6299,7 +6299,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
   a.sgroup_calculated=FALSE;
   a.grid_atoms_calculated=FALSE;
   a.lijk_calculated=FALSE;
-  a.neighbours_calculated=FALSE;
+  //DX20210122 [OBSOLETE] a.neighbors_calculated=FALSE;
   //DX20180712 START
   // ANRL SYMBOLIC MATH
   a.symbolic_math_representation_only=FALSE;
@@ -11907,7 +11907,7 @@ void xstructure::BringInCell(double tolerance, double upper_bound, double lower_
 // Function BringInCompact
 // ***************************************************************************
 // Make a structure where all the atoms are all the
-// atoms are mapped through the unit and neighbours cells
+// atoms are mapped through the unit and neighbors cells
 // to minimixe the shortest possible bond with an adjacent atom
 // This option is very useful if you run big and complicate
 // molecules where atoms exit of the unit cell and you have
@@ -11942,9 +11942,9 @@ xstructure _old_BringInCompact(const xstructure& a) {
         // scan over all the reference atoms
       }                                             // scan over all the reference atoms
 
-      for(int i1=-1;i1<=1;i1++)                     // roll over first neighbour cells
-        for(int j1=-1;j1<=1;j1++)                   // roll over first neighbour cells
-          for(int k1=-1;k1<=1;k1++) {               // roll over first neighbour cells
+      for(int i1=-1;i1<=1;i1++)                     // roll over first neighbor cells
+        for(int j1=-1;j1<=1;j1++)                   // roll over first neighbor cells
+          for(int k1=-1;k1<=1;k1++) {               // roll over first neighbor cells
             adtstpos(1)=sstr.atoms.at(i).fpos(1)+i1;
             adtstpos(2)=sstr.atoms.at(i).fpos(2)+j1;
             adtstpos(3)=sstr.atoms.at(i).fpos(3)+k1;      // test the atom
@@ -11996,9 +11996,9 @@ void xstructure::BringInCompact(void) {
         // scan over all the reference atoms
       }                                             // scan over all the reference atoms
 
-      for(int i1=-1;i1<=1;i1++)                     // roll over first neighbour cells
-        for(int j1=-1;j1<=1;j1++)                   // roll over first neighbour cells
-          for(int k1=-1;k1<=1;k1++) {               // roll over first neighbour cells
+      for(int i1=-1;i1<=1;i1++)                     // roll over first neighbor cells
+        for(int j1=-1;j1<=1;j1++)                   // roll over first neighbor cells
+          for(int k1=-1;k1<=1;k1++) {               // roll over first neighbor cells
             adtstpos(1)=atoms.at(i).fpos(1)+i1;
             adtstpos(2)=atoms.at(i).fpos(2)+j1;
             adtstpos(3)=atoms.at(i).fpos(3)+k1;      // test the atom
@@ -12587,8 +12587,8 @@ xstructure GetPrimitiveMULTITHREAD(const xstructure& _a,double tolerance) {  // 
   if(!aurostd::isinteger(fraction_atoms,0.01)) return _a;
 
   // nearest too close
-  if(NearestNeighbour(b)<5.0*tolerance)  return _a;
-  if(NearestNeighbour(b)<0.1)  return _a;
+  if(NearestNeighbor(b)<5.0*tolerance)  return _a;
+  if(NearestNeighbor(b)<0.1)  return _a;
 
   // no messed up volume
   double fraction=Volume(a)/Volume(b);
@@ -13257,22 +13257,22 @@ double xstructure::MinDist(void) {
 }
 
 // ***************************************************************************
-// Function NearestNeighbour() // moved from aflow_xproto.cpp
+// Function NearestNeighbor() // moved from aflow_xproto.cpp
 // ***************************************************************************
-double NearestNeighbour(const xstructure &str_in) {
+double NearestNeighbor(const xstructure &str_in) {
   return SYM::minimumDistance(str_in);
   //[CO20171024 OBSOLETE]xstructure str(str_in);
-  //[CO20171024 OBSOLETE]// if(LDEBUG) { cerr << "NearestNeighbour 1" << endl; }
+  //[CO20171024 OBSOLETE]// if(LDEBUG) { cerr << "NearestNeighbor 1" << endl; }
   //[CO20171024 OBSOLETE]// if(LDEBUG) { cerr << str.scale << endl; }
   //[CO20171024 OBSOLETE]str.ReScale(1.0);
   //[CO20171024 OBSOLETE]xvector<int> ndims(3);
-  //[CO20171024 OBSOLETE]// str.neighbours_radius=RadiusSphereLattice(str.lattice);
-  //[CO20171024 OBSOLETE]// str.neighbours_radius=max(modulus(str.lattice(1)),modulus(str.lattice(2)),modulus(str.lattice(3)));
-  //[CO20171024 OBSOLETE]// ndims=LatticeDimensionSphere(str.lattice,str.neighbours_radius);
+  //[CO20171024 OBSOLETE]// str.neighbors_radius=RadiusSphereLattice(str.lattice);
+  //[CO20171024 OBSOLETE]// str.neighbors_radius=max(modulus(str.lattice(1)),modulus(str.lattice(2)),modulus(str.lattice(3)));
+  //[CO20171024 OBSOLETE]// ndims=LatticeDimensionSphere(str.lattice,str.neighbors_radius);
   //[CO20171024 OBSOLETE]ndims[1]=ndims[2]=ndims[3]=1;
   //[CO20171024 OBSOLETE]deque<_atom> vatoms;
   //[CO20171024 OBSOLETE]_atom atom;
-  //[CO20171024 OBSOLETE]// if(LDEBUG) { cerr << "NearestNeighbour 2" << endl; }
+  //[CO20171024 OBSOLETE]// if(LDEBUG) { cerr << "NearestNeighbor 2" << endl; }
   //[CO20171024 OBSOLETE]for(int i=-ndims[1];i<=ndims[1];i++) {
   //[CO20171024 OBSOLETE]  for(int j=-ndims[2];j<=ndims[2];j++) {
   //[CO20171024 OBSOLETE]    for(int k=-ndims[3];k<=ndims[3];k++) {
@@ -13295,9 +13295,9 @@ double NearestNeighbour(const xstructure &str_in) {
 }
 
 // ***************************************************************************
-// Function NearestNeighbours() //DX20201230 - moved from XtalFinder 
+// Function NearestNeighbors() //DX20201230 - moved from XtalFinder 
 // ***************************************************************************
-vector<double> NearestNeighbours(const xstructure& xstr){
+vector<double> NearestNeighbors(const xstructure& xstr){
 
   // Determine the nearest neighbor distances centered on each atom
   // of the structure (needed for XtalFinder)
@@ -13306,16 +13306,16 @@ vector<double> NearestNeighbours(const xstructure& xstr){
   double nn = AUROSTD_MAX_DOUBLE;
 
   for(uint i=0;i<xstr.atoms.size();i++){
-    nn = NearestNeighbourToAtom(xstr,i);
+    nn = NearestNeighborToAtom(xstr,i);
     all_nn_distances.push_back(nn);
   }
   return all_nn_distances;
 }
 
 // ***************************************************************************
-// Function NearestNeighbourToAtom() //DX20201230 - moved from XtalFinder
+// Function NearestNeighborToAtom() //DX20201230 - moved from XtalFinder
 // ***************************************************************************
-double NearestNeighbourToAtom(const xstructure& xstr, uint k) {
+double NearestNeighborToAtom(const xstructure& xstr, uint k) {
 
   // Find the minimum interatomic distance in the structure to atom k
   // Different than SYM::minimumDistance(): only considers one atom index
