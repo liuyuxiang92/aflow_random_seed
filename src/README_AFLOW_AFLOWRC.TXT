@@ -1617,7 +1617,7 @@ DEFAULT_XTALFINDER_MISFIT_FAMILY
   default: 0.2
 
 DEFAULT_XTALFINDER_MISFIT_SUPERCELL_METHOD
-  description: Supercell method for converting crystal structures into a new representation (well-tested, but slow). The alternative (default) is the transformation method (fast).
+  description: Supercell method for converting crystal structures into a new representation (well tested, but slow). The alternative (default) is the transformation method (fast).
   type: bool
   default: 0
 
