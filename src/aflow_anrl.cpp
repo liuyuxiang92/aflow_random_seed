@@ -2089,7 +2089,7 @@ namespace anrl {
     // partition in parameter values
     vector<string> vparameters_temp;
     aurostd::string2tokens(parameters,vparameters_temp,",");
-    if(aurostd::string2utype<double>(vparameters_temp[0])<=0.0){ //DX20201104 - was missing
+    if(aurostd::string2utype<double>(vparameters_temp[0]) < _ZERO_TOL_){ //DX20201104 - was missing
       scale_volume_by_species=true;
       vparameters_temp[0]="1.0"; //fix
       parameters=aurostd::joinWDelimiter(vparameters_temp,",");
