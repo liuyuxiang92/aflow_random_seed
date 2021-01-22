@@ -116,7 +116,7 @@ NOTE ON STRUCTURE SIZE VS SPEED
 
 The number of atoms in the system generally increases the computational expense
 of the comparisons.  Namely, it is dependent on the least frequently occurring
-atom (LFA) in the crystal. If LFA>20 or there are many LFA-types, then the comparison
+atom (LFA) in the crystal. If LFA>20 or there are many LFA types, then the comparison
 time will increase. By default, the algorithm terminates as soon as a match is found
 (unless you request the optimal match via the --optimize_match option).
 However, this does not improve the speed of the comparison when a match cannot be found,
