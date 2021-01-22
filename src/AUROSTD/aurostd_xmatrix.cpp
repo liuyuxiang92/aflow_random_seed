@@ -3360,7 +3360,7 @@ namespace aurostd {
     // Procedure:
     // 1) T^2 = trasp(T)*T=trasp(R*U)*(R*U)=trasp(U)*trasp(R)*R*U=trasp(U)*U
     //    (since trasp(R)*R=I, i.e. orthogonal matrix)
-    // 2) U = sqrt(trap(U)*U), using diagonalization technique:
+    // 2) U = sqrt(trasp(U)*U), using diagonalization technique:
     //    http://en.wikipedia.org/wiki/Square_root_of_a_matrix#By_diagonalization
     // 3) R = T*inverse(U)
     // Following ref: http://www.continuummechanics.org/polardecomposition.html
