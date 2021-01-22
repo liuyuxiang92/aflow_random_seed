@@ -1553,7 +1553,7 @@ namespace compare {
           aflowlib::_aflowlib_entry entry; entry.auid=auids[i]; entry.aurl=aurls[i];
           xtal_finder.addDatabaseEntry2container(entry, species, relaxation_step, same_species);
         }
-        // if cannot load one, keep going
+        // if structure cannot be loaded, keep going
         catch(aurostd::xerror& re){
           continue;
         }
