@@ -814,7 +814,7 @@ aflow_sym_python.cpp: aflow_sym_python.py Makefile
 	rm -rf $@
 	echo "#ifndef _AFLOW_SYM_PYTHON_CPP_" >> $@
 	echo "#define _AFLOW_SYM_PYTHON_CPP_" >> $@
-	echo "// $@ automatic generated" >> $@
+	echo "// $@ automatically generated" >> $@
 	echo "std::string AFLOW_SYM_PYTHON_PY=\"\\" >> $@
 	cat $< | perl -p -e 's/\r//g' | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\"/\\"/g' >> $@
 	echo "\";" >> $@
