@@ -2467,14 +2467,14 @@ void xstructure::free() { //DX20191220 - moved all initializations from constuct
   //DX20210122 [OBSOLETE] neighbors_calculated=FALSE;
   //DX20210122 [OBSOLETE] neighbors_radius=0.0;
   //DX20210122 [OBSOLETE] neighbors_dradius=0.0;
-  for(uint i=0;i<neighbors_atoms_func_r_vs_nn.size();i++)
-    neighbors_atoms_func_r_vs_nn.at(i).clear();
-  neighbors_atoms_func_r_vs_nn.clear();
-  for(uint i=0;i<neighbors_atoms_func_num_vs_nn.size();i++)
-    neighbors_atoms_func_num_vs_nn.at(i).clear();
-  neighbors_atoms_func_num_vs_nn.clear();
-  neighbors_func_r_vs_nn.clear();                   // contains function distance vs neighbors (all atoms)
-  neighbors_func_num_vs_nn.clear();                    // contains function number vs neighbors (all atoms)
+  //DX20210122 [OBSOLETE] for(uint i=0;i<neighbors_atoms_func_r_vs_nn.size();i++)
+  //DX20210122 [OBSOLETE]   neighbors_atoms_func_r_vs_nn.at(i).clear();
+  //DX20210122 [OBSOLETE] neighbors_atoms_func_r_vs_nn.clear();
+  //DX20210122 [OBSOLETE] for(uint i=0;i<neighbors_atoms_func_num_vs_nn.size();i++)
+  //DX20210122 [OBSOLETE]   neighbors_atoms_func_num_vs_nn.at(i).clear();
+  //DX20210122 [OBSOLETE] neighbors_atoms_func_num_vs_nn.clear();
+  //DX20210122 [OBSOLETE] neighbors_func_r_vs_nn.clear();                   // contains function distance vs neighbors (all atoms)
+  //DX20210122 [OBSOLETE] neighbors_func_num_vs_nn.clear();                    // contains function number vs neighbors (all atoms)
   // OUTPUT/ERROR ----------------------
   Niggli_has_failed=FALSE;
   Minkowski_has_failed=FALSE;
@@ -2805,20 +2805,20 @@ void xstructure::copy(const xstructure& bstr) {
   //DX20210122 [OBSOLETE] neighbors_dradius=bstr.neighbors_dradius;
   //  for(uint i=0;i<neighbors_atoms_func_r_vs_nn.size();i++)
   //   neighbors_atoms_func_r_vs_nn.at(i).clear();
-  neighbors_atoms_func_r_vs_nn.clear();
-  for(uint i=0;i<bstr.neighbors_atoms_func_r_vs_nn.size();i++)
-    neighbors_atoms_func_r_vs_nn.push_back(bstr.neighbors_atoms_func_r_vs_nn.at(i));
+  //DX20210122 [OBSOLETE] neighbors_atoms_func_r_vs_nn.clear();
+  //DX20210122 [OBSOLETE] for(uint i=0;i<bstr.neighbors_atoms_func_r_vs_nn.size();i++)
+  //DX20210122 [OBSOLETE]   neighbors_atoms_func_r_vs_nn.push_back(bstr.neighbors_atoms_func_r_vs_nn.at(i));
   //  for(uint i=0;i<neighbors_atoms_func_num_vs_nn.size();i++)
   //   neighbors_atoms_func_num_vs_nn.at(i).clear();
-  neighbors_atoms_func_num_vs_nn.clear();
-  for(uint i=0;i<bstr.neighbors_atoms_func_num_vs_nn.size();i++)
-    neighbors_atoms_func_num_vs_nn.push_back(bstr.neighbors_atoms_func_num_vs_nn.at(i));
-  neighbors_func_r_vs_nn.clear();
-  for(uint i=0;i<bstr.neighbors_func_r_vs_nn.size();i++)
-    neighbors_func_r_vs_nn.push_back(bstr.neighbors_func_r_vs_nn.at(i));
-  neighbors_func_num_vs_nn.clear();
-  for(uint i=0;i<bstr.neighbors_func_num_vs_nn.size();i++)
-    neighbors_func_num_vs_nn.push_back(bstr.neighbors_func_num_vs_nn.at(i));
+  //DX20210122 [OBSOLETE] neighbors_atoms_func_num_vs_nn.clear();
+  //DX20210122 [OBSOLETE] for(uint i=0;i<bstr.neighbors_atoms_func_num_vs_nn.size();i++)
+  //DX20210122 [OBSOLETE]   neighbors_atoms_func_num_vs_nn.push_back(bstr.neighbors_atoms_func_num_vs_nn.at(i));
+  //DX20210122 [OBSOLETE] neighbors_func_r_vs_nn.clear();
+  //DX20210122 [OBSOLETE] for(uint i=0;i<bstr.neighbors_func_r_vs_nn.size();i++)
+  //DX20210122 [OBSOLETE]   neighbors_func_r_vs_nn.push_back(bstr.neighbors_func_r_vs_nn.at(i));
+  //DX20210122 [OBSOLETE] neighbors_func_num_vs_nn.clear();
+  //DX20210122 [OBSOLETE] for(uint i=0;i<bstr.neighbors_func_num_vs_nn.size();i++)
+  //DX20210122 [OBSOLETE]   neighbors_func_num_vs_nn.push_back(bstr.neighbors_func_num_vs_nn.at(i));
   // OUTPUT/ERROR ----------------------
   Niggli_has_failed=bstr.Niggli_has_failed;
   Minkowski_has_failed=bstr.Minkowski_has_failed;

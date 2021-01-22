@@ -975,8 +975,8 @@ namespace aflowlib {
       oss << "node_CPU_Model=" << node_CPU_Model << (html?"<br>":"") << endl; 
       oss << "node_RAM_GB=" << node_RAM_GB << (html?"<br>":"") << endl; 
       oss << "Optional materials keywords (alphabetic order)" << endl;
-      oss << "Bravais_lattice_orig" << Bravais_lattice_orig << (html?"<br>":"") << endl;
-      oss << "Bravais_lattice_relax" << Bravais_lattice_relax << (html?"<br>":"") << endl;
+      oss << "Bravais_lattice_orig=" << Bravais_lattice_orig << (html?"<br>":"") << endl;
+      oss << "Bravais_lattice_relax=" << Bravais_lattice_relax << (html?"<br>":"") << endl;
       oss << "code=" << code << (html?"<br>":"") << endl;
       oss << "composition=" << composition << "  vcomposition= ";for(uint j=0;j<vcomposition.size();j++) oss << vcomposition.at(j) << " "; oss << (html?"<br>":"") << endl;
       oss << "compound=" << compound << (html?"<br>":"") << endl;
@@ -1018,21 +1018,21 @@ namespace aflowlib {
       // oss << "forces=" << forces << "  vforces= ";for(uint j=0;j<vforces.size();j++) oss << vforces.at(j) << " "; oss << (html?"<br>":"") << endl;
       oss << "geometry=" << geometry << "  vgeometry= ";for(uint j=0;j<vgeometry.size();j++) oss << vgeometry.at(j) << " "; oss << (html?"<br>":"") << endl;
       oss << "geometry_orig=" << geometry_orig << "  vgeometry_orig= ";for(uint j=0;j<vgeometry_orig.size();j++) oss << vgeometry_orig.at(j) << " "; oss << (html?"<br>":"") << endl;
-      oss << "lattice_system_orig" << lattice_system_orig << (html?"<br>":"") << endl;
-      oss << "lattice_variation_orig" << lattice_variation_orig << (html?"<br>":"") << endl;
-      oss << "lattice_system_relax" << lattice_system_relax << (html?"<br>":"") << endl;
-      oss << "lattice_variation_relax" << lattice_variation_relax << (html?"<br>":"") << endl;
+      oss << "lattice_system_orig=" << lattice_system_orig << (html?"<br>":"") << endl;
+      oss << "lattice_variation_orig=" << lattice_variation_orig << (html?"<br>":"") << endl;
+      oss << "lattice_system_relax=" << lattice_system_relax << (html?"<br>":"") << endl;
+      oss << "lattice_variation_relax=" << lattice_variation_relax << (html?"<br>":"") << endl;
       oss << "ldau_TLUJ=" << ldau_TLUJ << (html?"<br>":"") << endl;      
-      if (vLDAU[0].size()) {oss << "ldau_type=" << ((int) vLDAU[0][0]) << (html?"<br>":"") << endl;}  //ME20190129
-      if (vLDAU[1].size()) {oss << "ldau_l="; oss << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vLDAU[1], 0), ",") << (html?"<br>":"") << endl;}  //ME20190129
-      if (vLDAU[2].size()) {oss << "ldau_u="; oss << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vLDAU[2], 9), ",") << (html?"<br>":"") << endl;}  //ME20190129
-      if (vLDAU[3].size()) {oss << "ldau_j="; oss << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vLDAU[3], 9), ",") << (html?"<br>":"") << endl;}  //ME20190129
+      if (vLDAU.size()>0 && vLDAU[0].size()) {oss << "ldau_type=" << ((int) vLDAU[0][0]) << (html?"<br>":"") << endl;}  //ME20190129
+      if (vLDAU.size()>1 && vLDAU[1].size()) {oss << "ldau_l="; oss << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vLDAU[1], 0), ",") << (html?"<br>":"") << endl;}  //ME20190129
+      if (vLDAU.size()>2 && vLDAU[2].size()) {oss << "ldau_u="; oss << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vLDAU[2], 9), ",") << (html?"<br>":"") << endl;}  //ME20190129
+      if (vLDAU.size()>3 && vLDAU[3].size()) {oss << "ldau_j="; oss << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vLDAU[3], 9), ",") << (html?"<br>":"") << endl;}  //ME20190129
       oss << "natoms=" << natoms << (html?"<br>":"") << endl;
       oss << "natoms_orig=" << natoms_orig << (html?"<br>":"") << endl; //DX20190124 - add original crystal info
       oss << "nbondxx=" << nbondxx << "  vnbondxx= ";for(uint j=0;j<vnbondxx.size();j++) oss << vnbondxx.at(j) << " "; oss << (html?"<br>":"") << endl;
       oss << "nspecies=" << nspecies << (html?"<br>":"") << endl;
-      oss << "Pearson_symbol_orig" << Pearson_symbol_orig << (html?"<br>":"") << endl;
-      oss << "Pearson_symbol_relax" << Pearson_symbol_relax << (html?"<br>":"") << endl;
+      oss << "Pearson_symbol_orig=" << Pearson_symbol_orig << (html?"<br>":"") << endl;
+      oss << "Pearson_symbol_relax=" << Pearson_symbol_relax << (html?"<br>":"") << endl;
       // oss << "positions_cartesian=" << positions_cartesian << "  vpositions_cartesian= ";for(uint j=0;j<vpositions_cartesian.size();j++) oss << vpositions_cartesian.at(j) << " "; oss << (html?"<br>":"") << endl;
       // oss << "positions_fractional=" << positions_fractional << "  vpositions_fractional= ";for(uint j=0;j<vpositions_fractional.size();j++) oss << vpositions_fractional.at(j) << " "; oss << (html?"<br>":"") << endl;
       oss << "pressure=" << pressure << (html?"<br>":"") << endl; 
@@ -1068,120 +1068,120 @@ namespace aflowlib {
       oss << "volume_atom_orig=" << volume_atom_orig << (html?"<br>":"") << endl; //DX20190124 - add original crystal info
       //DX20190124 - added original symmetry info - START
       // SYMMETRY
-      oss << "crystal_family_orig" << crystal_family_orig << (html?"<br>":"") << endl;
-      oss << "crystal_system_orig" << crystal_system_orig << (html?"<br>":"") << endl;
-      oss << "crystal_class_orig" << crystal_class_orig << (html?"<br>":"") << endl;
-      oss << "point_group_Hermann_Mauguin_orig" << point_group_Hermann_Mauguin_orig << (html?"<br>":"") << endl;
-      oss << "point_group_Schoenflies_orig" << point_group_Schoenflies_orig << (html?"<br>":"") << endl;
-      oss << "point_group_orbifold_orig" << point_group_orbifold_orig << (html?"<br>":"") << endl;
-      oss << "point_group_type_orig" << point_group_type_orig << (html?"<br>":"") << endl;
-      oss << "point_group_order_orig" << point_group_order_orig << (html?"<br>":"") << endl;
-      oss << "point_group_structure_orig" << point_group_structure_orig << (html?"<br>":"") << endl;
-      oss << "Bravais_lattice_lattice_type_orig" << Bravais_lattice_lattice_type_orig << (html?"<br>":"") << endl;
-      oss << "Bravais_lattice_lattice_variation_type_orig" << Bravais_lattice_lattice_variation_type_orig << (html?"<br>":"") << endl;
-      oss << "Bravais_lattice_lattice_system_orig" << Bravais_lattice_lattice_system_orig << (html?"<br>":"") << endl;
-      oss << "Bravais_superlattice_lattice_type_orig" << Bravais_superlattice_lattice_type_orig << (html?"<br>":"") << endl;
-      oss << "Bravais_superlattice_lattice_variation_type_orig" << Bravais_superlattice_lattice_variation_type_orig << (html?"<br>":"") << endl;
-      oss << "Bravais_superlattice_lattice_system_orig" << Bravais_superlattice_lattice_system_orig << (html?"<br>":"") << endl;
-      oss << "Pearson_symbol_superlattice_orig" << Pearson_symbol_superlattice_orig << (html?"<br>":"") << endl;
-      oss << "reciprocal_geometry_orig=" << reciprocal_geometry_orig << "  vreciprocal_geometry_orig= ";for(uint j=0;j<vreciprocal_geometry_orig.size();j++) oss << vreciprocal_geometry_orig.at(j) << " "; oss << (html?"<br>":"") << endl;
-      oss << "reciprocal_volume_cell_orig=" << reciprocal_volume_cell_orig << (html?"<br>":"") << endl; 
-      oss << "reciprocal_lattice_type_orig" << reciprocal_lattice_type_orig << (html?"<br>":"") << endl;
-      oss << "reciprocal_lattice_variation_type_orig" << reciprocal_lattice_variation_type_orig << (html?"<br>":"") << endl;
-      oss << "Wyckoff_letters_orig" << Wyckoff_letters_orig << (html?"<br>":"") << endl;
-      oss << "Wyckoff_multiplicities_orig" << Wyckoff_multiplicities_orig << (html?"<br>":"") << endl;
-      oss << "Wyckoff_site_symmetries_orig" << Wyckoff_site_symmetries_orig << (html?"<br>":"") << endl;
+      oss << "crystal_family_orig=" << crystal_family_orig << (html?"<br>":"") << endl;
+      oss << "crystal_system_orig=" << crystal_system_orig << (html?"<br>":"") << endl;
+      oss << "crystal_class_orig=" << crystal_class_orig << (html?"<br>":"") << endl;
+      oss << "point_group_Hermann_Mauguin_orig=" << point_group_Hermann_Mauguin_orig << (html?"<br>":"") << endl;
+      oss << "point_group_Schoenflies_orig=" << point_group_Schoenflies_orig << (html?"<br>":"") << endl;
+      oss << "point_group_orbifold_orig=" << point_group_orbifold_orig << (html?"<br>":"") << endl;
+      oss << "point_group_type_orig=" << point_group_type_orig << (html?"<br>":"") << endl;
+      oss << "point_group_order_orig=" << point_group_order_orig << (html?"<br>":"") << endl;
+      oss << "point_group_structure_orig=" << point_group_structure_orig << (html?"<br>":"") << endl;
+      oss << "Bravais_lattice_lattice_type_orig=" << Bravais_lattice_lattice_type_orig << (html?"<br>":"") << endl;
+      oss << "Bravais_lattice_lattice_variation_type_orig=" << Bravais_lattice_lattice_variation_type_orig << (html?"<br>":"") << endl;
+      oss << "Bravais_lattice_lattice_system_orig=" << Bravais_lattice_lattice_system_orig << (html?"<br>":"") << endl;
+      oss << "Bravais_superlattice_lattice_type_orig=" << Bravais_superlattice_lattice_type_orig << (html?"<br>":"") << endl;
+      oss << "Bravais_superlattice_lattice_variation_type_orig=" << Bravais_superlattice_lattice_variation_type_orig << (html?"<br>":"") << endl;
+      oss << "Bravais_superlattice_lattice_system_orig=" << Bravais_superlattice_lattice_system_orig << (html?"<br>":"") << endl;
+      oss << "Pearson_symbol_superlattice_orig=" << Pearson_symbol_superlattice_orig << (html?"<br>":"") << endl;
+      oss << "reciprocal_geometry_orig==" << reciprocal_geometry_orig << "  vreciprocal_geometry_orig= ";for(uint j=0;j<vreciprocal_geometry_orig.size();j++) oss << vreciprocal_geometry_orig.at(j) << " "; oss << (html?"<br>":"") << endl;
+      oss << "reciprocal_volume_cell_orig==" << reciprocal_volume_cell_orig << (html?"<br>":"") << endl; 
+      oss << "reciprocal_lattice_type_orig=" << reciprocal_lattice_type_orig << (html?"<br>":"") << endl;
+      oss << "reciprocal_lattice_variation_type_orig=" << reciprocal_lattice_variation_type_orig << (html?"<br>":"") << endl;
+      oss << "Wyckoff_letters_orig=" << Wyckoff_letters_orig << (html?"<br>":"") << endl;
+      oss << "Wyckoff_multiplicities_orig=" << Wyckoff_multiplicities_orig << (html?"<br>":"") << endl;
+      oss << "Wyckoff_site_symmetries_orig=" << Wyckoff_site_symmetries_orig << (html?"<br>":"") << endl;
       //DX20190124 - added original symmetry info - END
       //DX20180823 - added more symmetry info - START
       // SYMMETRY
-      oss << "crystal_family" << crystal_family << (html?"<br>":"") << endl;
-      oss << "crystal_system" << crystal_system << (html?"<br>":"") << endl;
-      oss << "crystal_class" << crystal_class << (html?"<br>":"") << endl;
-      oss << "point_group_Hermann_Mauguin" << point_group_Hermann_Mauguin << (html?"<br>":"") << endl;
-      oss << "point_group_Schoenflies" << point_group_Schoenflies << (html?"<br>":"") << endl;
-      oss << "point_group_orbifold" << point_group_orbifold << (html?"<br>":"") << endl;
-      oss << "point_group_type" << point_group_type << (html?"<br>":"") << endl;
-      oss << "point_group_order" << point_group_order << (html?"<br>":"") << endl;
-      oss << "point_group_structure" << point_group_structure << (html?"<br>":"") << endl;
-      oss << "Bravais_lattice_lattice_type" << Bravais_lattice_lattice_type << (html?"<br>":"") << endl;
-      oss << "Bravais_lattice_lattice_variation_type" << Bravais_lattice_lattice_variation_type << (html?"<br>":"") << endl;
-      oss << "Bravais_lattice_lattice_system" << Bravais_lattice_lattice_system << (html?"<br>":"") << endl;
-      oss << "Bravais_superlattice_lattice_type" << Bravais_superlattice_lattice_type << (html?"<br>":"") << endl;
-      oss << "Bravais_superlattice_lattice_variation_type" << Bravais_superlattice_lattice_variation_type << (html?"<br>":"") << endl;
-      oss << "Bravais_superlattice_lattice_system" << Bravais_superlattice_lattice_system << (html?"<br>":"") << endl;
-      oss << "Pearson_symbol_superlattice" << Pearson_symbol_superlattice << (html?"<br>":"") << endl;
-      oss << "reciprocal_geometry=" << reciprocal_geometry << "  vreciprocal_geometry= ";for(uint j=0;j<vreciprocal_geometry.size();j++) oss << vreciprocal_geometry.at(j) << " "; oss << (html?"<br>":"") << endl;
-      oss << "reciprocal_volume_cell=" << reciprocal_volume_cell << (html?"<br>":"") << endl; 
-      oss << "reciprocal_lattice_type" << reciprocal_lattice_type << (html?"<br>":"") << endl;
-      oss << "reciprocal_lattice_variation_type" << reciprocal_lattice_variation_type << (html?"<br>":"") << endl;
-      oss << "Wyckoff_letters" << Wyckoff_letters << (html?"<br>":"") << endl;
-      oss << "Wyckoff_multiplicities" << Wyckoff_multiplicities << (html?"<br>":"") << endl;
-      oss << "Wyckoff_site_symmetries" << Wyckoff_site_symmetries << (html?"<br>":"") << endl;
+      oss << "crystal_family=" << crystal_family << (html?"<br>":"") << endl;
+      oss << "crystal_system=" << crystal_system << (html?"<br>":"") << endl;
+      oss << "crystal_class=" << crystal_class << (html?"<br>":"") << endl;
+      oss << "point_group_Hermann_Mauguin=" << point_group_Hermann_Mauguin << (html?"<br>":"") << endl;
+      oss << "point_group_Schoenflies=" << point_group_Schoenflies << (html?"<br>":"") << endl;
+      oss << "point_group_orbifold=" << point_group_orbifold << (html?"<br>":"") << endl;
+      oss << "point_group_type=" << point_group_type << (html?"<br>":"") << endl;
+      oss << "point_group_order=" << point_group_order << (html?"<br>":"") << endl;
+      oss << "point_group_structure=" << point_group_structure << (html?"<br>":"") << endl;
+      oss << "Bravais_lattice_lattice_type=" << Bravais_lattice_lattice_type << (html?"<br>":"") << endl;
+      oss << "Bravais_lattice_lattice_variation_type=" << Bravais_lattice_lattice_variation_type << (html?"<br>":"") << endl;
+      oss << "Bravais_lattice_lattice_system=" << Bravais_lattice_lattice_system << (html?"<br>":"") << endl;
+      oss << "Bravais_superlattice_lattice_type=" << Bravais_superlattice_lattice_type << (html?"<br>":"") << endl;
+      oss << "Bravais_superlattice_lattice_variation_type=" << Bravais_superlattice_lattice_variation_type << (html?"<br>":"") << endl;
+      oss << "Bravais_superlattice_lattice_system=" << Bravais_superlattice_lattice_system << (html?"<br>":"") << endl;
+      oss << "Pearson_symbol_superlattice=" << Pearson_symbol_superlattice << (html?"<br>":"") << endl;
+      oss << "reciprocal_geometry==" << reciprocal_geometry << "  vreciprocal_geometry= ";for(uint j=0;j<vreciprocal_geometry.size();j++) oss << vreciprocal_geometry.at(j) << " "; oss << (html?"<br>":"") << endl;
+      oss << "reciprocal_volume_cell==" << reciprocal_volume_cell << (html?"<br>":"") << endl; 
+      oss << "reciprocal_lattice_type=" << reciprocal_lattice_type << (html?"<br>":"") << endl;
+      oss << "reciprocal_lattice_variation_type=" << reciprocal_lattice_variation_type << (html?"<br>":"") << endl;
+      oss << "Wyckoff_letters=" << Wyckoff_letters << (html?"<br>":"") << endl;
+      oss << "Wyckoff_multiplicities=" << Wyckoff_multiplicities << (html?"<br>":"") << endl;
+      oss << "Wyckoff_site_symmetries=" << Wyckoff_site_symmetries << (html?"<br>":"") << endl;
       //DX20180823 - added more symmetry info - END
       //DX20190208 - added anrl info - START
-      oss << "aflow_prototype_label_orig" << aflow_prototype_label_orig << (html?"<br>":"") << endl;
-      oss << "aflow_prototype_parameter_list_orig" << aflow_prototype_parameter_list_orig << (html?"<br>":"") << endl;
-      oss << "aflow_prototype_parameter_values_orig" << aflow_prototype_parameter_values_orig << (html?"<br>":"") << endl;
-      oss << "aflow_prototype_label_relax" << aflow_prototype_label_relax << (html?"<br>":"") << endl;
-      oss << "aflow_prototype_parameter_list_relax" << aflow_prototype_parameter_list_relax << (html?"<br>":"") << endl;
-      oss << "aflow_prototype_parameter_values_relax" << aflow_prototype_parameter_values_relax << (html?"<br>":"") << endl;
+      oss << "aflow_prototype_label_orig=" << aflow_prototype_label_orig << (html?"<br>":"") << endl;
+      oss << "aflow_prototype_parameter_list_orig=" << aflow_prototype_parameter_list_orig << (html?"<br>":"") << endl;
+      oss << "aflow_prototype_parameter_values_orig=" << aflow_prototype_parameter_values_orig << (html?"<br>":"") << endl;
+      oss << "aflow_prototype_label_relax=" << aflow_prototype_label_relax << (html?"<br>":"") << endl;
+      oss << "aflow_prototype_parameter_list_relax=" << aflow_prototype_parameter_list_relax << (html?"<br>":"") << endl;
+      oss << "aflow_prototype_parameter_values_relax=" << aflow_prototype_parameter_values_relax << (html?"<br>":"") << endl;
       //DX20190208 - added anrl info - END
-      oss << "pocc_parameters" << pocc_parameters << (html?"<br>":"") << endl;  //CO20200731
+      oss << "pocc_parameters=" << pocc_parameters << (html?"<br>":"") << endl;  //CO20200731
       // AGL/AEL
-      oss << "agl_thermal_conductivity_300K" << agl_thermal_conductivity_300K << (html?"<br>":"") << endl; 
-      oss << "agl_debye" << agl_debye << (html?"<br>":"") << endl; 
-      oss << "agl_acoustic_debye" << agl_acoustic_debye << (html?"<br>":"") << endl; 
-      oss << "agl_gruneisen" << agl_gruneisen << (html?"<br>":"") << endl; 
-      oss << "agl_heat_capacity_Cv_300K" << agl_heat_capacity_Cv_300K << (html?"<br>":"") << endl; 
-      oss << "agl_heat_capacity_Cp_300K" << agl_heat_capacity_Cp_300K << (html?"<br>":"") << endl; 
-      oss << "agl_thermal_expansion_300K" << agl_thermal_expansion_300K << (html?"<br>":"") << endl; 
-      oss << "agl_bulk_modulus_static_300K" << agl_bulk_modulus_static_300K << (html?"<br>":"") << endl; 
-      oss << "agl_bulk_modulus_isothermal_300K" << agl_bulk_modulus_isothermal_300K << (html?"<br>":"") << endl; 
-      oss << "agl_poisson_ratio_source" << agl_poisson_ratio_source << (html?"<br>":"") << endl; //CT20181212
-      oss << "agl_vibrational_free_energy_300K_cell" << agl_vibrational_free_energy_300K_cell << (html?"<br>":"") << endl; //CT20181212
-      oss << "agl_vibrational_free_energy_300K_atom" << agl_vibrational_free_energy_300K_atom << (html?"<br>":"") << endl; //CT20181212 
-      oss << "agl_vibrational_entropy_300K_cell" << agl_vibrational_entropy_300K_cell << (html?"<br>":"") << endl; //CT20181212 
-      oss << "agl_vibrational_entropy_300K_atom" << agl_vibrational_entropy_300K_atom << (html?"<br>":"") << endl; //CT20181212 
-      oss << "ael_poisson_ratio" << ael_poisson_ratio << (html?"<br>":"") << endl; 
-      oss << "ael_bulk_modulus_voigt" << ael_bulk_modulus_voigt << (html?"<br>":"") << endl; 
-      oss << "ael_bulk_modulus_reuss" << ael_bulk_modulus_reuss << (html?"<br>":"") << endl; 
-      oss << "ael_shear_modulus_voigt" << ael_shear_modulus_voigt << (html?"<br>":"") << endl; 
-      oss << "ael_shear_modulus_reuss" << ael_shear_modulus_reuss << (html?"<br>":"") << endl; 
-      oss << "ael_bulk_modulus_vrh" << ael_bulk_modulus_vrh << (html?"<br>":"") << endl; 
-      oss << "ael_shear_modulus_vrh" << ael_shear_modulus_vrh << (html?"<br>":"") << endl; 
-      oss << "ael_elastic_anisotropy" << ael_elastic_anisotropy << (html?"<br>":"") << endl; //CO20181129
-      oss << "ael_youngs_modulus_vrh" << ael_youngs_modulus_vrh << (html?"<br>":"") << endl; //CT20181212 
-      oss << "ael_speed_sound_transverse" << ael_speed_sound_transverse << (html?"<br>":"") << endl; //CT20181212 
-      oss << "ael_speed_sound_longitudinal" << ael_speed_sound_longitudinal << (html?"<br>":"") << endl; //CT20181212 
-      oss << "ael_speed_sound_average" << ael_speed_sound_average << (html?"<br>":"") << endl; //CT20181212
-      oss << "ael_pughs_modulus_ratio" << ael_pughs_modulus_ratio << (html?"<br>":"") << endl; //CT20181212 
-      oss << "ael_debye_temperature" << ael_debye_temperature << (html?"<br>":"") << endl; //CT20181212 
-      oss << "ael_applied_pressure" << ael_applied_pressure << (html?"<br>":"") << endl; //CT20181212 
-      oss << "ael_average_external_pressure" << ael_average_external_pressure << (html?"<br>":"") << endl; //CT20181212 
+      oss << "agl_thermal_conductivity_300K=" << agl_thermal_conductivity_300K << (html?"<br>":"") << endl; 
+      oss << "agl_debye=" << agl_debye << (html?"<br>":"") << endl; 
+      oss << "agl_acoustic_debye=" << agl_acoustic_debye << (html?"<br>":"") << endl; 
+      oss << "agl_gruneisen=" << agl_gruneisen << (html?"<br>":"") << endl; 
+      oss << "agl_heat_capacity_Cv_300K=" << agl_heat_capacity_Cv_300K << (html?"<br>":"") << endl; 
+      oss << "agl_heat_capacity_Cp_300K=" << agl_heat_capacity_Cp_300K << (html?"<br>":"") << endl; 
+      oss << "agl_thermal_expansion_300K=" << agl_thermal_expansion_300K << (html?"<br>":"") << endl; 
+      oss << "agl_bulk_modulus_static_300K=" << agl_bulk_modulus_static_300K << (html?"<br>":"") << endl; 
+      oss << "agl_bulk_modulus_isothermal_300K=" << agl_bulk_modulus_isothermal_300K << (html?"<br>":"") << endl; 
+      oss << "agl_poisson_ratio_source=" << agl_poisson_ratio_source << (html?"<br>":"") << endl; //CT20181212
+      oss << "agl_vibrational_free_energy_300K_cell=" << agl_vibrational_free_energy_300K_cell << (html?"<br>":"") << endl; //CT20181212
+      oss << "agl_vibrational_free_energy_300K_atom=" << agl_vibrational_free_energy_300K_atom << (html?"<br>":"") << endl; //CT20181212 
+      oss << "agl_vibrational_entropy_300K_cell=" << agl_vibrational_entropy_300K_cell << (html?"<br>":"") << endl; //CT20181212 
+      oss << "agl_vibrational_entropy_300K_atom=" << agl_vibrational_entropy_300K_atom << (html?"<br>":"") << endl; //CT20181212 
+      oss << "ael_poisson_ratio=" << ael_poisson_ratio << (html?"<br>":"") << endl; 
+      oss << "ael_bulk_modulus_voigt=" << ael_bulk_modulus_voigt << (html?"<br>":"") << endl; 
+      oss << "ael_bulk_modulus_reuss=" << ael_bulk_modulus_reuss << (html?"<br>":"") << endl; 
+      oss << "ael_shear_modulus_voigt=" << ael_shear_modulus_voigt << (html?"<br>":"") << endl; 
+      oss << "ael_shear_modulus_reuss=" << ael_shear_modulus_reuss << (html?"<br>":"") << endl; 
+      oss << "ael_bulk_modulus_vrh=" << ael_bulk_modulus_vrh << (html?"<br>":"") << endl; 
+      oss << "ael_shear_modulus_vrh=" << ael_shear_modulus_vrh << (html?"<br>":"") << endl; 
+      oss << "ael_elastic_anisotropy=" << ael_elastic_anisotropy << (html?"<br>":"") << endl; //CO20181129
+      oss << "ael_youngs_modulus_vrh=" << ael_youngs_modulus_vrh << (html?"<br>":"") << endl; //CT20181212 
+      oss << "ael_speed_sound_transverse=" << ael_speed_sound_transverse << (html?"<br>":"") << endl; //CT20181212 
+      oss << "ael_speed_sound_longitudinal=" << ael_speed_sound_longitudinal << (html?"<br>":"") << endl; //CT20181212 
+      oss << "ael_speed_sound_average=" << ael_speed_sound_average << (html?"<br>":"") << endl; //CT20181212
+      oss << "ael_pughs_modulus_ratio=" << ael_pughs_modulus_ratio << (html?"<br>":"") << endl; //CT20181212 
+      oss << "ael_debye_temperature=" << ael_debye_temperature << (html?"<br>":"") << endl; //CT20181212 
+      oss << "ael_applied_pressure=" << ael_applied_pressure << (html?"<br>":"") << endl; //CT20181212 
+      oss << "ael_average_external_pressure=" << ael_average_external_pressure << (html?"<br>":"") << endl; //CT20181212 
       //ME20191105 BEGIN
-      oss << "ael_stiffness_tensor = "; for (int i = 1; i <= 6; i++) {for (int j = 1; j <= 6; j++) oss << ael_stiffness_tensor[i][j]; oss << (html?"<br>":"") << endl;} //ME20191105
-      oss << "ael_compliance_tensor = "; for (int i = 1; i <= 6; i++) {for (int j = 1; j <= 6; j++) oss << ael_compliance_tensor[i][j]; oss << (html?"<br>":"") << endl;} //ME20191105
+      oss << "ael_stiffness_tensor="; for (int i = 1; i <= 6; i++) {for (int j = 1; j <= 6; j++) oss << ael_stiffness_tensor[i][j]; oss << (html?"<br>":"") << endl;} //ME20191105
+      oss << "ael_compliance_tensor="; for (int i = 1; i <= 6; i++) {for (int j = 1; j <= 6; j++) oss << ael_compliance_tensor[i][j]; oss << (html?"<br>":"") << endl;} //ME20191105
       //ME20191105 END
       //AS20200901 BEGIN
       //QHA
-      oss << "gruneisen_qha" << gruneisen_qha << (html?"<br>":"") << endl;
-      oss << "gruneisen_qha_300K" << gruneisen_qha_300K << (html?"<br>":"") << endl;
-      oss << "thermal_expansion_qha_300K" << thermal_expansion_qha_300K << (html?"<br>":"") << endl;
-      oss << "modulus_bulk_qha_300K" << modulus_bulk_qha_300K << (html?"<br>":"") << endl;
+      oss << "gruneisen_qha=" << gruneisen_qha << (html?"<br>":"") << endl;
+      oss << "gruneisen_qha_300K=" << gruneisen_qha_300K << (html?"<br>":"") << endl;
+      oss << "thermal_expansion_qha_300K=" << thermal_expansion_qha_300K << (html?"<br>":"") << endl;
+      oss << "modulus_bulk_qha_300K=" << modulus_bulk_qha_300K << (html?"<br>":"") << endl;
       //AS20200901 END
       //AS20201008 BEGIN
-      oss << "modulus_bulk_derivative_pressure_qha_300K" << modulus_bulk_derivative_pressure_qha_300K << (html?"<br>":"") << endl;
-      oss << "heat_capacity_Cv_atom_qha_300K" << heat_capacity_Cv_atom_qha_300K << (html?"<br>":"") << endl;
-      oss << "heat_capacity_Cv_cell_qha_300K" << heat_capacity_Cv_cell_qha_300K << (html?"<br>":"") << endl;
-      oss << "heat_capacity_Cp_atom_qha_300K" << heat_capacity_Cp_atom_qha_300K << (html?"<br>":"") << endl;
-      oss << "heat_capacity_Cp_cell_qha_300K" << heat_capacity_Cp_cell_qha_300K << (html?"<br>":"") << endl;
-      oss << "volume_atom_qha_300K" << volume_atom_qha_300K << (html?"<br>":"") << endl;
-      oss << "energy_free_atom_qha_300K" << energy_free_atom_qha_300K << (html?"<br>":"") << endl;
-      oss << "energy_free_cell_qha_300K" << energy_free_cell_qha_300K << (html?"<br>":"") << endl;
+      oss << "modulus_bulk_derivative_pressure_qha_300K=" << modulus_bulk_derivative_pressure_qha_300K << (html?"<br>":"") << endl;
+      oss << "heat_capacity_Cv_atom_qha_300K=" << heat_capacity_Cv_atom_qha_300K << (html?"<br>":"") << endl;
+      oss << "heat_capacity_Cv_cell_qha_300K=" << heat_capacity_Cv_cell_qha_300K << (html?"<br>":"") << endl;
+      oss << "heat_capacity_Cp_atom_qha_300K=" << heat_capacity_Cp_atom_qha_300K << (html?"<br>":"") << endl;
+      oss << "heat_capacity_Cp_cell_qha_300K=" << heat_capacity_Cp_cell_qha_300K << (html?"<br>":"") << endl;
+      oss << "volume_atom_qha_300K=" << volume_atom_qha_300K << (html?"<br>":"") << endl;
+      oss << "energy_free_atom_qha_300K=" << energy_free_atom_qha_300K << (html?"<br>":"") << endl;
+      oss << "energy_free_cell_qha_300K=" << energy_free_cell_qha_300K << (html?"<br>":"") << endl;
       //AS20201008 END
       // BADER
-      oss << "bader_net_charges" << bader_net_charges << "  vbader_net_charges= ";for(uint j=0;j<vbader_net_charges.size();j++) oss << vbader_net_charges.at(j) << " "; oss << (html?"<br>":"") << endl; 
-      oss << "bader_atomic_volumes" << bader_atomic_volumes << "  vbader_atomic_volumes= ";for(uint j=0;j<vbader_atomic_volumes.size();j++) oss << vbader_atomic_volumes.at(j) << " "; oss << (html?"<br>":"") << endl; 
+      oss << "bader_net_charges=" << bader_net_charges << "  vbader_net_charges= ";for(uint j=0;j<vbader_net_charges.size();j++) oss << vbader_net_charges.at(j) << " "; oss << (html?"<br>":"") << endl; 
+      oss << "bader_atomic_volumes=" << bader_atomic_volumes << "  vbader_atomic_volumes= ";for(uint j=0;j<vbader_atomic_volumes.size();j++) oss << vbader_atomic_volumes.at(j) << " "; oss << (html?"<br>":"") << endl; 
       // legacy
       oss << "server=" << server << (html?"<br>":"") << "  vserver= ";for(uint j=0;j<vserver.size();j++) oss << vserver.at(j) << " "; oss << (html?"<br>":"") << endl;
       oss << "icsd=" << icsd << (html?"<br>":"") << endl;

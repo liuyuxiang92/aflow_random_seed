@@ -41,7 +41,7 @@ namespace compare {
       string options_function_string = "unique_atom_decorations_options: [--print_misfit]";
 
       vector<string> options, options_general, options_function;
-      aurostd::string2tokens(GENERAL_OPTIONS_LIST,options_general," ");
+      aurostd::string2tokens(GENERAL_XTALFINDER_OPTIONS_LIST,options_general," ");
       aurostd::string2tokens(options_function_string,options_function," ");
       options.push_back(usage);
       options.insert(options.end(), options_general.begin(), options_general.end());
@@ -252,7 +252,7 @@ namespace compare {
         usage="aflow --compare_structures=str1,str2,str3,... | aflow --compare_structures -D <dir_path> | aflow --compare_structures -F=<filename>";
       }
       vector<string> options, options_general;
-      aurostd::string2tokens(GENERAL_OPTIONS_LIST,options_general," ");
+      aurostd::string2tokens(GENERAL_XTALFINDER_OPTIONS_LIST,options_general," ");
       options.push_back(usage);
       options.insert(options.end(), options_general.begin(), options_general.end());
       init::ErrorOption("--usage","compare::compareInputStructures()",options);
@@ -615,7 +615,7 @@ namespace compare {
       string options_function_string = "compare2protos_options: [--catalog=aflow|htqc|all]";
 
       vector<string> options, options_general, options_function;
-      aurostd::string2tokens(GENERAL_OPTIONS_LIST,options_general," ");
+      aurostd::string2tokens(GENERAL_XTALFINDER_OPTIONS_LIST,options_general," ");
       aurostd::string2tokens(options_function_string,options_function," ");
       options.push_back(usage);
       options.insert(options.end(), options_general.begin(), options_general.end());
@@ -761,7 +761,7 @@ vector<StructurePrototype> XtalFinderCalculator::compare2prototypes(
   }
 
   //DX20190830 - to avoid multiple threads being spun-up (here and in aflow_xproto.cpp), turn of aflow_pthreads
-  uint uint_backup=AFLOW_PTHREADS::MAX_PTHREADS;
+  uint nthreads_original=AFLOW_PTHREADS::MAX_PTHREADS;
   AFLOW_PTHREADS::MAX_PTHREADS=1;
 
   //compare::addAFLOWPrototypes2StructurePrototypeVector(all_structures, vlabel);
@@ -782,7 +782,7 @@ vector<StructurePrototype> XtalFinderCalculator::compare2prototypes(
   // compare structures
   final_prototypes = runComparisonScheme(comparison_schemes, same_species, num_proc, comparison_options, quiet); //DX20200103 - condensed booleans to xoptions
 
-  AFLOW_PTHREADS::MAX_PTHREADS = uint_backup; //DX20190830 - set back to original setting
+  AFLOW_PTHREADS::MAX_PTHREADS = nthreads_original; //DX20190830 - set back to original setting
 
   // ---------------------------------------------------------------------------
   // return if there are no similar structures
@@ -854,14 +854,8 @@ namespace compare {
     }
 
     // ---------------------------------------------------------------------------
-    // database contains input structure
-    if(final_prototypes[0].structures_duplicate.size() == 0){
-      return true;
-    }
-
-    // ---------------------------------------------------------------------------
-    // database DOESN'T contain equivalent structure in input
-    return false;
+    // return if the database contains an equivalent structure to the input
+    return (final_prototypes[0].structures_duplicate.size() != 0);
 
   }
 }
@@ -891,7 +885,7 @@ namespace compare {
 
     // ---------------------------------------------------------------------------
     // database DOESN'T contain equivalent structure to input
-    if(final_prototypes[0].structures_duplicate.size() != 0){
+    if(final_prototypes[0].structures_duplicate.size() == 0){ //DX20210122 - "==" not "!="
       return matched_database_structures;
     }
 
@@ -1041,7 +1035,7 @@ vector<StructurePrototype> XtalFinderCalculator::compare2database(
     // add space group query to AFLUX matchbook: get entries with compatible space groups, i.e., same or enantiomorph
     vmatchbook.push_back(aflowlib::getSpaceGroupAFLUXSummons(structure_containers[0].space_group,relaxation_step));
   }
-  else if(ignore_symmetry){ setSymmetryPlaceholders(); }
+  else { setSymmetryPlaceholders(); }
 
   // ---------------------------------------------------------------------------
   // AFLUX matchbook preparations: add aurl for entry
@@ -1177,7 +1171,7 @@ namespace compare {
       string options_function_string = "compare2database_options: [--catalog=lib1|lib2|lib3|lib4|lib6|lib7|icsd] [--properties=enthalpy_atom,natoms,...] [--relaxation_step=original|relax1|most_relaxed]";
 
       vector<string> options, options_general, options_function;
-      aurostd::string2tokens(GENERAL_OPTIONS_LIST,options_general," ");
+      aurostd::string2tokens(GENERAL_XTALFINDER_OPTIONS_LIST,options_general," ");
       aurostd::string2tokens(options_function_string,options_function," ");
       options.push_back(usage);
       options.insert(options.end(), options_general.begin(), options_general.end());
@@ -1295,7 +1289,7 @@ namespace compare {
       string options_function_string = "compare_database_entries_options: [--alloy=AgAlMn...] [--nspecies=3] [--catalog=lib1|lib2|lib3|lib4|lib6|lib7|icsd] [--properties=enthalpy_atom,natoms,...] [--relaxation_step=original|relax1|most_relaxed] [--space_group=225,186,227,...] [--stoichiometry=1:2:3:...]";
 
       vector<string> options, options_general, options_function;
-      aurostd::string2tokens(GENERAL_OPTIONS_LIST,options_general," ");
+      aurostd::string2tokens(GENERAL_XTALFINDER_OPTIONS_LIST,options_general," ");
       aurostd::string2tokens(options_function_string,options_function," ");
       options.push_back(usage);
       options.insert(options.end(), options_general.begin(), options_general.end());

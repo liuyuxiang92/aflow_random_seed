@@ -1857,10 +1857,10 @@ class xstructure {
     //DX20210122 [OBSOLETE] bool neighbors_calculated;                                   // NN calculation
     //DX20210122 [OBSOLETE] double neighbors_radius;                                     // radius of application
     //DX20210122 [OBSOLETE] double neighbors_dradius;                                    // delta radius of shell (bins)
-    vector<vector<double> > neighbors_atoms_func_r_vs_nn;        // contains function distance vs neighbors (each atom)
-    vector<vector<int> > neighbors_atoms_func_num_vs_nn;         // contains function distance vs neighbors (each atom)
-    vector<double> neighbors_func_r_vs_nn;                       // contains function distance vs neighbors (all atoms)
-    vector<int> neighbors_func_num_vs_nn;                        // contains function number vs neighbors (all atoms)
+    //DX20210122 [OBSOLETE] vector<vector<double> > neighbors_atoms_func_r_vs_nn;        // contains function distance vs neighbors (each atom)
+    //DX20210122 [OBSOLETE] vector<vector<int> > neighbors_atoms_func_num_vs_nn;         // contains function distance vs neighbors (each atom)
+    //DX20210122 [OBSOLETE] vector<double> neighbors_func_r_vs_nn;                       // contains function distance vs neighbors (all atoms)
+    //DX20210122 [OBSOLETE] vector<int> neighbors_func_num_vs_nn;                        // contains function number vs neighbors (all atoms)
     // xvector<int> ndims;                                        // dimension of the radius (in +- integers)
     // std::deque<_atom> ashell;                                 // all the atoms in the shell
     // std::deque<deque<_atom> > natoms;                        // vector of vectors
