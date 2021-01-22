@@ -52,7 +52,7 @@ Particular ranges of the misfit are adopted from Burzlaff and Malinovsky's work,
 By default:
   epsilon_match = 0.1 and
   epsilon_family = 0.2
-In general, structures that match within 0.1 will have enthalpies within 5meV/atom.
+In general, structures that match within 0.1 will have enthalpies within 5 meV/atom.
 Structures that match beyond 0.2 have poor structure-property correlation.
 See XtalFinder article for details.
 
