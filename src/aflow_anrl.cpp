@@ -1601,7 +1601,7 @@ namespace anrl {
     // symmetry tolerances for specific prototypes
     // some parameter values can be "close" to higher symmetry points,
     // causing structures to fall into higher symmetries when analyzed with
-    // certain tolerance; occurs for certain AFLOW Prototype Encyclopedia
+    // certain tolerances; occurs for certain AFLOW Prototype Encyclopedia
     // structures 
 
     // ---------------------------------------------------------------------------
