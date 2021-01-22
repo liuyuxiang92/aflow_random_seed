@@ -1612,7 +1612,7 @@ DEFAULT_XTALFINDER_MISFIT_MATCH
   default: 0.1
 
 DEFAULT_XTALFINDER_MISFIT_FAMILY
-  description: Similarity threshold for structures in the same family-type.
+  description: Similarity threshold for structures in the same family.
   type: double
   default: 0.2
 
