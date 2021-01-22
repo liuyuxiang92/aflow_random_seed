@@ -3371,7 +3371,7 @@ namespace aurostd {
     stringstream message;
 
     // ---------------------------------------------------------------------------
-    // analysis is only works for a square matrix
+    // analysis only works for a square matrix
     if(!transformation_matrix.issquare){
       message << "The transformation matrix must be a square matrix.";
       throw xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_ERROR_);
