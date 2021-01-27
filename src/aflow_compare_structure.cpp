@@ -701,8 +701,8 @@ vector<StructurePrototype> XtalFinderCalculator::compare2prototypes(
   addStructure2container(xstr, "input geometry", ss_input.str(), 0, false);
 
   // check if structure is loaded;
-  if(structure_containers.size() == 0){
-    message << "No structures were loaded. Nothing to compare.";
+  if(structure_containers.size() != 1){
+    message << "Input structure was not loaded. Nothing to compare.";
     throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_RUNTIME_ERROR_);
   }
 
@@ -932,8 +932,8 @@ vector<StructurePrototype> XtalFinderCalculator::compare2database(
   addStructure2container(xstrIN, "input geometry", ss_input.str(), 0, false);
 
   // check if structure is loaded;
-  if(structure_containers.size() == 0){
-    message << "No structures were loaded. Nothing to compare.";
+  if(structure_containers.size() != 1){
+    message << "Input structure was not loaded. Nothing to compare.";
     throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_RUNTIME_ERROR_);
   }
 
