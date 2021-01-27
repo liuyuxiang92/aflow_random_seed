@@ -969,7 +969,7 @@ bool XtalFinderCalculator::areNearestNeighborsCalculated(
     structure_container& structure){
 
   // Check if the nearest neighbor distances have been calculated for
-  // particular structure in container
+  // a particular structure in the container
 
   return (structure.nearest_neighbor_distances.size()>0);
 }
