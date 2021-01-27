@@ -1836,10 +1836,10 @@ namespace compare {
       bool same_species,
       uint num_proc) {
 
-    double final_misfit = AUROSTD_MAX_DOUBLE;
+    double misfit_final = AUROSTD_MAX_DOUBLE;
     bool scale_volume=true; //default is true
     bool optimize_match=false; //default is false
-    return aflowCompareStructure(xstr1, xstr2, same_species, scale_volume, optimize_match, final_misfit, num_proc); //DX20191122 - move ostream to end
+    return aflowCompareStructure(xstr1, xstr2, same_species, scale_volume, optimize_match, misfit_final, num_proc); //DX20191122 - move ostream to end
   }
 }
 
@@ -1851,8 +1851,8 @@ namespace compare {
       bool optimize_match,
       uint num_proc) {
 
-    double final_misfit = AUROSTD_MAX_DOUBLE;
-    return aflowCompareStructure(xstr1, xstr2, same_species, scale_volume, optimize_match, final_misfit, num_proc); //DX20191122 - move ostream to end and add default
+    double misfit_final = AUROSTD_MAX_DOUBLE;
+    return aflowCompareStructure(xstr1, xstr2, same_species, scale_volume, optimize_match, misfit_final, num_proc); //DX20191122 - move ostream to end and add default
   }
 }
 
@@ -1866,11 +1866,11 @@ namespace compare {
       bool same_species,
       uint num_proc) {
 
-    double final_misfit=AUROSTD_MAX_DOUBLE;
+    double misfit_final=AUROSTD_MAX_DOUBLE;
     bool scale_volume=true; //default is true
     bool optimize_match=false; //default is false
-    aflowCompareStructure(xstr1, xstr2, same_species, scale_volume, optimize_match, final_misfit, num_proc); //DX20191122 - move ostream to end
-    return final_misfit;
+    aflowCompareStructure(xstr1, xstr2, same_species, scale_volume, optimize_match, misfit_final, num_proc); //DX20191122 - move ostream to end
+    return misfit_final;
   }
 }
 
@@ -1879,12 +1879,12 @@ namespace compare {
 // ***************************************************************************
 namespace compare {
   structure_mapping_info getTransformationBetweenStructures(const xstructure& xstr1, const xstructure& xstr2, bool same_species, uint num_proc) { //DX20191108 - remove const & from bools
-    double final_misfit=AUROSTD_MAX_DOUBLE;
+    double misfit_final=AUROSTD_MAX_DOUBLE;
     bool scale_volume=true; //default is true
     bool optimize_match=false; //default is false
-    structure_mapping_info final_misfit_info = compare::initialize_misfit_struct();
-    aflowCompareStructure(xstr1, xstr2, same_species, scale_volume, optimize_match, final_misfit, final_misfit_info, num_proc); //DX20191122 - move ostream to end
-    return final_misfit_info;
+    structure_mapping_info misfit_info_final = compare::initialize_misfit_struct();
+    aflowCompareStructure(xstr1, xstr2, same_species, scale_volume, optimize_match, misfit_final, misfit_info_final, num_proc); //DX20191122 - move ostream to end
+    return misfit_info_final;
   }
 }
 
@@ -1897,12 +1897,12 @@ namespace compare {
       bool same_species,
       bool scale_volume,
       bool optimize_match,
-      double& final_misfit,
+      double& misfit_final,
       uint num_proc) {
 
-    structure_mapping_info final_misfit_info = compare::initialize_misfit_struct(); //DX20191218
+    structure_mapping_info misfit_info_final = compare::initialize_misfit_struct(); //DX20191218
 
-    return aflowCompareStructure(xstr1, xstr2, same_species, scale_volume, optimize_match, final_misfit, final_misfit_info, num_proc); //DX20191122 - move ostream to end
+    return aflowCompareStructure(xstr1, xstr2, same_species, scale_volume, optimize_match, misfit_final, misfit_info_final, num_proc); //DX20191122 - move ostream to end
   }
 }
 
@@ -1915,18 +1915,18 @@ namespace compare {
       bool same_species,
       bool scale_volume,
       bool optimize_match,
-      double& final_misfit,
-      structure_mapping_info& final_misfit_info,
+      double& misfit_final,
+      structure_mapping_info& misfit_info_final,
       uint num_proc) { //DX20191108 - remove const & from bools //DX20191122 - move ostream to end and add default
 
     structure_container str_rep = compare::initializeStructureContainer(xstr1, same_species);
     structure_container str_matched = compare::initializeStructureContainer(xstr2, same_species);
 
     XtalFinderCalculator xtal_finder(num_proc);
-    xtal_finder.compareStructures(str_rep,str_matched,final_misfit_info,same_species,scale_volume,optimize_match);
+    xtal_finder.compareStructures(str_rep,str_matched,misfit_info_final,same_species,scale_volume,optimize_match);
 
-    final_misfit = final_misfit_info.misfit;
-    return(final_misfit<=xtal_finder.misfit_match);
+    misfit_final = misfit_info_final.misfit;
+    return(misfit_final<=xtal_finder.misfit_match);
 
   }
 }
