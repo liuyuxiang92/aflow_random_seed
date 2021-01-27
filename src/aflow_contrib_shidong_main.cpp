@@ -751,7 +751,7 @@ namespace pflow {
 
         message << "The cluster data file is missing" << endl;
         message << "Please use the command" << endl;
-        message << "    aflow --cluster=structure_type,minimun_site_num,maximun_site_num,minimum_nearest_neighbor,maximun_nearest_neighbor" << endl;
+        message << "    aflow --cluster=structure_type,minimun_site_num,maximum_site_num,minimum_nearest_neighbor,maximum_nearest_neighbor" << endl;
         message << "to generate it";
         throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_FILE_CORRUPT_); //CO20200624
 

@@ -2742,7 +2742,7 @@ void CheckAllInputFileExistence(string structure_type) {
 
     cerr << "The cluster data file is missing\n"
       << "Please use the command\n"
-      << "    aflow --cluster structure_type minimun_site_num maximun_site_num minimum_nearest_neighbor maximun_nearest_neighbor \n"
+      << "    aflow --cluster structure_type minimun_site_num maximum_site_num minimum_nearest_neighbor maximum_nearest_neighbor \n"
       << "to generate it\n";
 
     myfile.close();
@@ -2782,7 +2782,7 @@ void CheckAllInputFileExistence(string structure_type) {
   if( flag_SL_cal ) {
     cerr << "One or more input files for superlattice calculations are missing.\n"
       << "Please run the command \n"
-      << "    aflow --sl structure_type mininum_atom_in_unit_cell maximun_atom_in_unit_cell \n"
+      << "    aflow --sl structure_type mininum_atom_in_unit_cell maximum_atom_in_unit_cell \n"
       << "to obtained them\n";
   }
 

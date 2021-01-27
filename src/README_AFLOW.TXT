@@ -81,7 +81,7 @@ aflow
                 launched to perform the task in a multitasking fashion.
 
    --npmax      With this option, aflow starts a number of concurrent runs
-                equal to the maximun numbers of processors.
+                equal to the maximum numbers of processors.
 
    --multish    Very useful option for scripting.
                 if you have a "file" containing a gazillion of instructions,

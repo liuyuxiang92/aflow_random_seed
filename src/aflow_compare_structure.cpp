@@ -52,11 +52,12 @@ namespace compare {
 
     // ---------------------------------------------------------------------------
     // instantiate XtalFinder calculator
+    uint ncpus_default = 1; // initialize with one cpu; default
     XtalFinderCalculator xtal_finder(
         DEFAULT_XTALFINDER_MISFIT_MATCH,
         DEFAULT_XTALFINDER_MISFIT_FAMILY,
         FileMESSAGE,
-        1,
+        ncpus_default,
         oss);
 
     // ---------------------------------------------------------------------------
@@ -224,13 +225,14 @@ namespace compare {
 
     if(LDEBUG){cerr << function_name << " BEGIN" << endl;}  //CO20200508
 
+    uint ncpus_default = 1; // initialize with one cpu; default
     // ---------------------------------------------------------------------------
     // instantiate XtalFinder calculator
     XtalFinderCalculator xtal_finder(
         DEFAULT_XTALFINDER_MISFIT_MATCH,
         DEFAULT_XTALFINDER_MISFIT_FAMILY,
         FileMESSAGE,
-        1,
+        ncpus_default,
         logstream);
 
     // ---------------------------------------------------------------------------
@@ -592,11 +594,12 @@ namespace compare {
     // load input structure
     xstructure xstr(input,IOAFLOW_AUTO);
 
+    uint ncpus_default = 1; // initialize with one cpu; default
     XtalFinderCalculator xtal_finder(
         DEFAULT_XTALFINDER_MISFIT_MATCH,
         DEFAULT_XTALFINDER_MISFIT_FAMILY,
         FileMESSAGE,
-        1,
+        ncpus_default,
         logstream);
     return xtal_finder.compare2prototypes(xstr,vpflow);
   }
@@ -836,11 +839,12 @@ namespace compare {
 
     // ---------------------------------------------------------------------------
     // main compare2database() function
+    uint ncpus_default = 1; // initialize with one cpu; default
     XtalFinderCalculator xtal_finder(
         DEFAULT_XTALFINDER_MISFIT_MATCH,
         DEFAULT_XTALFINDER_MISFIT_FAMILY,
         FileMESSAGE,
-        1,
+        ncpus_default,
         logstream);
     vector<StructurePrototype> final_prototypes = xtal_finder.compare2database(xstrIN, vpflow);
 
@@ -870,11 +874,12 @@ namespace compare {
 
     // ---------------------------------------------------------------------------
     // instantiate class
+    uint ncpus_default = 1; // initialize with one cpu; default
     XtalFinderCalculator xtal_finder(
         DEFAULT_XTALFINDER_MISFIT_MATCH,
         DEFAULT_XTALFINDER_MISFIT_FAMILY,
         FileMESSAGE,
-        1,
+        ncpus_default,
         logstream);
 
     // ---------------------------------------------------------------------------
@@ -1317,11 +1322,12 @@ namespace compare {
 
     // ---------------------------------------------------------------------------
     // instantiate XtalFinder calculator
+    uint ncpus_default = 1; // initialize with one cpu; default
     XtalFinderCalculator xtal_finder(
         DEFAULT_XTALFINDER_MISFIT_MATCH,
         DEFAULT_XTALFINDER_MISFIT_FAMILY,
         FileMESSAGE,
-        1,
+        ncpus_default,
         logstream);
 
     // ---------------------------------------------------------------------------
