@@ -6405,7 +6405,7 @@ namespace aflowlib {
       if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/aflow.iatoms.out")) { ok=FALSE;obb << " no=aflow.iatoms.out" << ".EXT"; }}
       if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/aflow.pgroup.out")) { ok=FALSE;obb << " no=aflow.pgroup.out" << ".EXT"; }}
       if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/aflow.pgroup_xtal.out")) { ok=FALSE;obb << " no=aflow.pgroup_xtal.out" << ".EXT"; }}
-      if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/aflow.pseudopotential_auid.out")) { ok=FALSE;obb << " no=aflow.pseudopotential_auid.out" << ".EXT"; }}
+      //[CO20210126 - LIB2RAW_Loop_PATCH() fixes this]if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/aflow.pseudopotential_auid.out")) { ok=FALSE;obb << " no=aflow.pseudopotential_auid.out" << ".EXT"; }}
       if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/aflow.qmvasp.out")) { ok=FALSE;obb << " no=aflow.qmvasp.out" << ".EXT"; }}
       if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/INCAR.orig")) { ok=FALSE;obb << " no=INCAR.orig" << ".EXT"; }}
       //[CO20201111 - not needed]if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/POSCAR.orig")) { ok=FALSE;obb << " no=POSCAR.orig" << ".EXT"; }}
