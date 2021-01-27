@@ -604,17 +604,17 @@ namespace compare{
   // comparisons to AFLOW prototype library 
   vector<StructurePrototype> compare2prototypes(istream& input, const aurostd::xoption& vpflow, ostream& logstream=cout); //DX20181004 //DX20190314 - changed return value
   vector<StructurePrototype> compare2prototypes(istream& input, const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream=cout); //DX20181004 //DX20190314 - changed return value
-  string printMatchingPrototypes(istream& cin, const aurostd::xoption& vpflow); //DX20190314 
-  vector<string> getMatchingPrototypes(xstructure& xstr, string& catalog); //DX20190314 
+  string printMatchingPrototypes(istream& cin, const aurostd::xoption& vpflow); //DX20190314
+  vector<string> getMatchingPrototypes(xstructure& xstr, const string& catalog); //DX20190314
 
   // ---------------------------------------------------------------------------
   // permutaion comparisons
-  string compareAtomDecorations(istream& input, const aurostd::xoption& vpflow); //DX //DX20181004
+  string compareAtomDecorations(istream& input, const aurostd::xoption& vpflow); //DX20181004
 
   // ---------------------------------------------------------------------------
   // isopointal AFLOW prototype functions 
-  string isopointalPrototypes(istream& input, const aurostd::xoption& vpflow); //DX20200131 
-  vector<string> getIsopointalPrototypes(xstructure& xstr, string& catalog); //DX20200131 
+  string isopointalPrototypes(istream& input, const aurostd::xoption& vpflow); //DX20200131
+  vector<string> getIsopointalPrototypes(xstructure& xstr, const string& catalog); //DX20200131
 
   // ---------------------------------------------------------------------------
   // comparison options

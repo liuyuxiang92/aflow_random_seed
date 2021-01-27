@@ -398,15 +398,15 @@ namespace compare {
     if(file_list.size()==2){
       // return abbreviated results (i.e., misfit value along with match, same family, or no match text
       if(final_prototypes[0].mapping_info_duplicate.size()==1){
-        double final_misfit = final_prototypes[0].mapping_info_duplicate[0].misfit;
-        if(final_misfit <= xtal_finder.misfit_match && (final_misfit+1.0)> 1e-3){
-          message << final_misfit << " : " << "MATCH" << endl;
+        double misfit_final = final_prototypes[0].mapping_info_duplicate[0].misfit;
+        if(misfit_final <= xtal_finder.misfit_match && (misfit_final+1.0)> 1e-3){
+          message << misfit_final << " : " << "MATCH" << endl;
         }
-        else if(final_misfit > xtal_finder.misfit_match && final_misfit <= xtal_finder.misfit_family){
-          message << final_misfit << " : " << "SAME FAMILY" << endl;
+        else if(misfit_final > xtal_finder.misfit_match && misfit_final <= xtal_finder.misfit_family){
+          message << misfit_final << " : " << "SAME FAMILY" << endl;
         }
-        else if(final_misfit > xtal_finder.misfit_family && final_misfit <= 1.0){
-          message << final_misfit << " : " << "NOT A MATCH" << endl;
+        else if(misfit_final > xtal_finder.misfit_family && misfit_final <= 1.0){
+          message << misfit_final << " : " << "NOT A MATCH" << endl;
         }
         else{
           message << "UNMATCHABLE" << endl;
@@ -507,7 +507,7 @@ namespace compare {
 // compare::getIsopointalPrototypes - returns corresponding prototype label
 // ***************************************************************************
 namespace compare {
-  vector<string> getIsopointalPrototypes(xstructure& xstr, string& catalog){
+  vector<string> getIsopointalPrototypes(xstructure& xstr, const string& catalog){
 
     string function_name = "compare::getIsopointalPrototypes():";
 
@@ -540,7 +540,7 @@ namespace compare {
 // compare::getMatchingPrototype - returns corresponding prototype label
 // ***************************************************************************
 namespace compare {
-  vector<string> getMatchingPrototypes(xstructure& xstr, string& catalog){
+  vector<string> getMatchingPrototypes(xstructure& xstr, const string& catalog){
 
     // Returns the matching prototype label, if any exists
 
@@ -699,6 +699,12 @@ vector<StructurePrototype> XtalFinderCalculator::compare2prototypes(
   // add structure to container
   stringstream ss_input; ss_input << xstr;
   addStructure2container(xstr, "input geometry", ss_input.str(), 0, false);
+
+  // check if structure is loaded;
+  if(structure_containers.size() == 0){
+    message << "No structures were loaded. Nothing to compare.";
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_RUNTIME_ERROR_);
+  }
 
   vector<StructurePrototype> final_prototypes;
 
@@ -924,6 +930,12 @@ vector<StructurePrototype> XtalFinderCalculator::compare2database(
   // add input structure to container
   stringstream ss_input; ss_input << xstrIN;
   addStructure2container(xstrIN, "input geometry", ss_input.str(), 0, false);
+
+  // check if structure is loaded;
+  if(structure_containers.size() == 0){
+    message << "No structures were loaded. Nothing to compare.";
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_RUNTIME_ERROR_);
+  }
 
   // ---------------------------------------------------------------------------
   // create xoptions to contain all comparison options
