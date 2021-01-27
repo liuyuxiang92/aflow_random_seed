@@ -2660,10 +2660,7 @@ void XtalFinderCalculator::addDatabaseEntry2container(
   }
 
   uint structure_index = 0;
-  if(load_most_relaxed_structure_only){
-    structure_index = 0;
-  }
-  else{
+  if(!load_most_relaxed_structure_only){
     if(entry.vstr.size()==3 && structure_files.size()==3){
       if(relaxation_step == _COMPARE_DATABASE_GEOMETRY_ORIGINAL_ &&
           (structure_files[0] == "POSCAR.orig" ||
