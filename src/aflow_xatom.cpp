@@ -16663,6 +16663,11 @@ xmatrix<double> GetBasisTransformation(const xmatrix<double>& lattice_original, 
 // **************************************************************************
 vector<xvector<double> > GetBasisTransformationInternalTranslations(const xmatrix<double>& basis_transformation) {
 
+  // Given a basis transformation matrix determine all the internal lattice
+  // translation(s). This is necessary if the basis transformation increases
+  // the volume of the cell, otherwise, there are no internal translations
+  // (return immediately).
+
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   string function_name = XPID + "GetBasisTransformationInternalTranslations():";
   stringstream message;

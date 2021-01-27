@@ -1508,7 +1508,8 @@ namespace SYM {
 
         // =============== TETRAGONAL =============== //
         //else if(((mcount == 4 || mcount == 5 || mcount == 6 || mcount == 7 || mcount == 8) && fourcount != 0) || crystalsystem == "TETRAGONAL")
-        else if(((mcount >= 3 && mcount <= 8) && fourcount != 0) || crystalsystem == "TETRAGONAL")
+        //DX20210126 [OBSOLETE - go up to mcount==9] else if(((mcount >= 3 && mcount <= 8) && fourcount != 0) || crystalsystem == "TETRAGONAL")
+        else if(((mcount >= 3 && mcount <= 9) && fourcount != 0) || crystalsystem == "TETRAGONAL")
         { //CO20200106 - patching for auto-indenting
           symmetryfound = true;
           crystalsystem = "TETRAGONAL";

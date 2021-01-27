@@ -49,11 +49,11 @@ void XtalFinderCalculator::compareStructures(
   // determine minimum interatomic distances of structures (resolution of atoms) //DX20200623
   // //DX20200715 - may need to rescale this if the structures are being scaled later....
   if(str_rep.structure.dist_nn_min==AUROSTD_NAN){
-    if(str_rep.nearest_neighbor_distances.size()){ str_rep.structure.dist_nn_min=aurostd::min(str_rep.nearest_neighbor_distances); }
+    if(str_rep.nearest_neighbor_distances.size() > 0){ str_rep.structure.dist_nn_min=aurostd::min(str_rep.nearest_neighbor_distances); }
     else{ str_rep.structure.dist_nn_min=SYM::minimumDistance(str_rep.structure); }
   }
   if(str_matched.structure.dist_nn_min==AUROSTD_NAN){
-    if(str_matched.nearest_neighbor_distances.size()){ str_matched.structure.dist_nn_min=aurostd::min(str_matched.nearest_neighbor_distances); }
+    if(str_matched.nearest_neighbor_distances.size() > 0){ str_matched.structure.dist_nn_min=aurostd::min(str_matched.nearest_neighbor_distances); }
     else{ str_matched.structure.dist_nn_min=SYM::minimumDistance(str_matched.structure); }
   }
 
@@ -200,7 +200,7 @@ vector<StructurePrototype> XtalFinderCalculator::compareMultipleStructures(
   }
 
   // ---------------------------------------------------------------------------
-  // for testing/development; in case the subsequent analyses fails, checkpoint file
+  // for testing/development; in case the subsequent analyses fail, checkpoint file
   bool store_checkpoint=false;
   if(store_checkpoint){
     string results_json = printResults(final_prototypes, same_species, json_ft);
@@ -465,6 +465,7 @@ namespace compare {
     str_rep.natoms = str_rep.structure.atoms.size();
     str_rep.ntypes = str_rep.structure.num_each_type.size();
     str_rep.number_compounds_matching_structure = 0;
+    str_rep.space_group = 0; //DX20210126
 
     vector<double> zero_vec_double;
     str_rep.nearest_neighbor_distances = zero_vec_double;
@@ -919,7 +920,7 @@ uint StructurePrototype::numberOfComparisons(){
 // ***************************************************************************
 bool StructurePrototype::isSymmetryCalculated(){
 
-  // Check if the space group symmetry is calculated for prototype
+  // Check if the space group symmetry is calculated for the prototype
   // If the space group is calculated, then the Wyckoff positions are also
   // calculated (by construction)
 
@@ -931,8 +932,8 @@ bool StructurePrototype::isSymmetryCalculated(){
 // ***************************************************************************
 bool XtalFinderCalculator::isSymmetryCalculated(structure_container& structure){
 
-  // Check if the space group symmetry is calculated for particular
-  // structure in container
+  // Check if the space group symmetry is calculated for a particular
+  // structure in the container
   // If the space group is calculated, then the Wyckoff positions are also
   // calculated (by construction)
 
@@ -944,7 +945,7 @@ bool XtalFinderCalculator::isSymmetryCalculated(structure_container& structure){
 // ***************************************************************************
 bool StructurePrototype::isLFAEnvironmentCalculated(){
 
-  // Check if the LFA environment is calculated for prototype
+  // Check if the LFA environment is calculated for the prototype
 
   return (environments_LFA.size()>0);
 }
@@ -955,8 +956,8 @@ bool StructurePrototype::isLFAEnvironmentCalculated(){
 bool XtalFinderCalculator::isLFAEnvironmentCalculated(
     structure_container& structure){
 
-  // Check if the LFA environment is calculated for particular
-  // structure in container
+  // Check if the LFA environment is calculated for a particular
+  // structure in the container
 
   return (structure.environments_LFA.size()>0);
 }
@@ -1201,7 +1202,11 @@ void StructurePrototype::copyPrototypeInformation(const StructurePrototype& b){
 
   // Copy prototype information to new StructurePrototype object
   // (i.e., stoichiometry, number of types, Pearson symbol, space group,
-  // and Wyckoff positions).
+  // and Wyckoff positions). When a structure does not match with its
+  // original comparison group, it is moved to its own StructurePrototype
+  // object and we need to update the symmetry and environment info.
+  // This is different than the copy constructor, which would copy over all
+  // attributes (including duplicate structures, mapping info, etc.).
 
   //elements=comparison_schemes[i].elements;
   stoichiometry=b.stoichiometry;
@@ -1984,6 +1989,7 @@ namespace compare {
     else if(structure_name=="input geometry"){
       stringstream sss; sss << structure_source;
       xstructure xstr(sss);
+      structure.clear(); //DX20210127
       structure = xstr;
     }
     // ---------------------------------------------------------------------------
@@ -2161,7 +2167,7 @@ void XtalFinderCalculator::compareAtomDecorations(
     aurostd::xoption& permutation_options){
 
   // Compare the atom decorations for a given structure.
-  // Calculates the symmetry, if not already calculate (hence pass by
+  // Calculates the symmetry, if not already calculated (hence pass by
   // non-const reference).
 
   bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_COMPARE_);
@@ -2221,6 +2227,11 @@ void XtalFinderCalculator::compareAtomDecorations(
 
   // ---------------------------------------------------------------------------
   // loop over grouping modes
+  // atom permutations must obey Lagrange's theorem (divisor theory)
+  // initial atom groupings by LFA environment are fast, but may result in
+  // groupings that violate divisor theory; if this is the case we need to
+  // regroup without considering the LFA environment
+  //
   // mode=0: use LFA environment to filter
   // mode=1: if incommensurate groupings, then ignore LFA environment in grouping
   for(uint mode=0;mode<2;mode++){
@@ -7867,6 +7878,10 @@ void XtalFinderCalculator::writeComparisonOutputFile(const string& output,
         file_prefix = DEFAULT_XTALFINDER_FILE_MATERIAL_DATABASE;
         contents_info += " in the database";
         break;
+      default:
+        // if not specified, write somewhere as opposed to throwing an error
+        file_prefix = DEFAULT_XTALFINDER_FILE_MATERIAL;
+        break;
     }
   }
   else {
@@ -7884,6 +7899,10 @@ void XtalFinderCalculator::writeComparisonOutputFile(const string& output,
       case(compare_database_entries_xf):
         file_prefix = DEFAULT_XTALFINDER_FILE_STRUCTURE_DATABASE;
         contents_info += " in the database";
+        break;
+      default:
+        // if not specified, write somewhere as opposed to throwing an error
+        file_prefix = DEFAULT_XTALFINDER_FILE_STRUCTURE;
         break;
     }
   }
