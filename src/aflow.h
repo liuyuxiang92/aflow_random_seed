@@ -1478,7 +1478,7 @@ class xstructure {
     void SetCoordinates(int mode);                                // change coordinates
     void MakeBasis(void);                                         // make basis for atoms (basis and number)
     void MakeTypes(void);                                         // refresh types based on num_each_type  //CO20180420
-    void AddAtom(const _atom& atom);                              // adding an atom
+    void AddAtom(const _atom& atom,bool check_present=true);           // adding an atom
     void AddAtom_POCC(const _atom& atom);                         // adding an atom FOR POCC ONLY
     void RemoveAtom(const uint& iat);                             // deleting an atom (index)
     void RemoveAtom(vector<uint>& v_atoms_to_remove);             // deleting many atoms (indices)
@@ -2488,7 +2488,7 @@ xvector<double> r_lattice(const xstructure& str,const xvector<int>& ijk);
 xstructure input2AIMSxstr(istream& input);
 xstructure input2ABINITxstr(istream& input);
 xstructure input2QExstr(istream& input);
-xstructure input2VASPxstr(istream& input);
+xstructure input2VASPxstr(istream& input,bool vasp5=false);
 xstructure input2ELKxstr(istream& input); //DX20200313
 
 // ----------------------------------------------------------------------------

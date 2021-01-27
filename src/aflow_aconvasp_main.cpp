@@ -1403,7 +1403,8 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.args2addattachedscheme(argv,cmds,"DBPATCHFILES","--patchfiles=","");
 
   //DX20180710 - we do not want to run if the flag was used in proto - vpflow.flag("VASP",aurostd::args2flag(argv,cmds,"--vasp"));
-  vpflow.flag("VASP",aurostd::args2flag(argv,cmds,"--vasp") && !vpflow.flag("PROTO_AFLOW") && !vpflow.flag("PROTO")); //DX20180710 - check if used in proto
+  vpflow.flag("VASP",aurostd::args2flag(argv,cmds,"--vasp|--vasp4") && !vpflow.flag("PROTO_AFLOW") && !vpflow.flag("PROTO")); //DX20180710 - check if used in proto //CO20210119 - added vasp4
+  vpflow.flag("VASP5",aurostd::args2flag(argv,cmds,"--vasp5") && !vpflow.flag("PROTO_AFLOW") && !vpflow.flag("PROTO")); //DX20180710 - check if used in proto //CO20210119 - added vasp5
 
   //ME20200330
   vpflow.flag("VISUALIZE_PHONONS", aurostd::args2flag(argv,cmds,"--visualize_phonons"));
@@ -2051,7 +2052,7 @@ namespace pflow {
       // U
       if(vpflow.flag("UFFENERGY")) {pocc::UFFENERGY(cin); _PROGRAMRUN=true;}
       // V
-      if(vpflow.flag("VASP")) {cout << input2VASPxstr(cin); _PROGRAMRUN=true;}
+      if(vpflow.flag("VASP")||vpflow.flag("VASP5")) {cout << input2VASPxstr(cin,vpflow.flag("VASP5")); _PROGRAMRUN=true;} //added bool for vasp5
       if(vpflow.flag("VISUALIZE_PHONONS")) {apl::createAtomicDisplacementSceneFile(vpflow); _PROGRAMRUN=true;} //ME20200330
       if(vpflow.flag("VOLUME::EQUAL")) {cout << pflow::VOLUME("VOLUME::EQUAL,"+vpflow.getattachedscheme("VOLUME::EQUAL"),cin); _PROGRAMRUN=true;} 
       if(vpflow.flag("VOLUME::MULTIPLY_EQUAL")) {cout << pflow::VOLUME("VOLUME::MULTIPLY_EQUAL,"+vpflow.getattachedscheme("VOLUME::MULTIPLY_EQUAL"),cin); _PROGRAMRUN=true;} 

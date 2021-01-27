@@ -6642,34 +6642,36 @@ void xstructure::MakeTypes(void) {
 // **************************************************************************
 // This adds an atom to the structure.
 
-void xstructure::AddAtom(const _atom& atom) {
+void xstructure::AddAtom(const _atom& atom,bool check_present) {
   bool LDEBUG=(FALSE || XHOST.DEBUG); 
   _atom btom;btom=atom;
 
-  // check that this atom is not already present
-  xvector<double> a1(3),a2(3),a3(3),aijk(3);
-  a1=lattice(1);a2=lattice(2);a3=lattice(3);
+  if(check_present){  //CO20210116 - AddCorners() should NOT check
+    // check that this atom is not already present
+    xvector<double> a1(3),a2(3),a3(3),aijk(3);
+    a1=lattice(1);a2=lattice(2);a3=lattice(3);
 
-  bool FOUND_POSITION=FALSE;
-  for(uint iat=0;iat<atoms.size()&&FOUND_POSITION==FALSE;iat++)
-    if(atoms.at(iat).type==atom.type && atoms.at(iat).name==atom.name)
-      for(int i=-1;i<=1&&FOUND_POSITION==FALSE;i++)
-        for(int j=-1;j<=1&&FOUND_POSITION==FALSE;j++)
-          for(int k=-1;k<=1&&FOUND_POSITION==FALSE;k++) {
-            aijk[1]=i;aijk[2]=j;aijk[3]=k;
-            //	if(aurostd::modulus(atoms.at(iat).cpos-(((double)i)*a1+((double)j)*a2+((double)k)*a3+atom.cpos))<0.1) FOUND_POSITION=TRUE;
-            //DX+CO START    
-            //DX if(aurostd::modulus(atoms.at(iat).fpos-(aijk+atom.fpos))<0.01) FOUND_POSITION=TRUE;
-            if((*this).sym_eps!=AUROSTD_NAN && (*this).sym_eps<AUROSTD_NAN && (*this).sym_eps>1e-10){ //DX20171201 - Added (*this).sym_eps>1e-10 //DX20180215 - added (*this).sym_eps<AUROSTD_NAN (needed) 
-              if(aurostd::modulus((*this).f2c*(atoms.at(iat).fpos-(aijk+atom.fpos)))<=(*this).sym_eps) FOUND_POSITION=TRUE; //DX
+    bool FOUND_POSITION=FALSE;
+    for(uint iat=0;iat<atoms.size()&&FOUND_POSITION==FALSE;iat++)
+      if(atoms.at(iat).type==atom.type && atoms.at(iat).name==atom.name)
+        for(int i=-1;i<=1&&FOUND_POSITION==FALSE;i++)
+          for(int j=-1;j<=1&&FOUND_POSITION==FALSE;j++)
+            for(int k=-1;k<=1&&FOUND_POSITION==FALSE;k++) {
+              aijk[1]=i;aijk[2]=j;aijk[3]=k;
+              //	if(aurostd::modulus(atoms.at(iat).cpos-(((double)i)*a1+((double)j)*a2+((double)k)*a3+atom.cpos))<0.1) FOUND_POSITION=TRUE;
+              //DX+CO START    
+              //DX if(aurostd::modulus(atoms.at(iat).fpos-(aijk+atom.fpos))<0.01) FOUND_POSITION=TRUE;
+              if((*this).sym_eps!=AUROSTD_NAN && (*this).sym_eps<AUROSTD_NAN && (*this).sym_eps>1e-10){ //DX20171201 - Added (*this).sym_eps>1e-10 //DX20180215 - added (*this).sym_eps<AUROSTD_NAN (needed) 
+                if(aurostd::modulus((*this).f2c*(atoms.at(iat).fpos-(aijk+atom.fpos)))<=(*this).sym_eps) FOUND_POSITION=TRUE; //DX
+              }
+              else { 
+                //if(aurostd::modulus(atoms.at(iat).fpos-(aijk+atom.fpos))<1e-10) FOUND_POSITION=TRUE; //DX
+                if(aurostd::modulus(atoms.at(iat).cpos-(((double)i)*a1+((double)j)*a2+((double)k)*a3+atom.cpos))<0.1) FOUND_POSITION=TRUE; //DX20171201
+              }
+              //DX+CO END
             }
-            else { 
-              //if(aurostd::modulus(atoms.at(iat).fpos-(aijk+atom.fpos))<1e-10) FOUND_POSITION=TRUE; //DX
-              if(aurostd::modulus(atoms.at(iat).cpos-(((double)i)*a1+((double)j)*a2+((double)k)*a3+atom.cpos))<0.1) FOUND_POSITION=TRUE; //DX20171201
-            }
-            //DX+CO END
-          }
-  if(FOUND_POSITION==TRUE) return; // found no need to add it further
+    if(FOUND_POSITION==TRUE) return; // found no need to add it further
+  }
 
   // now found that it does not exist check type
   //  cerr << "AddAtom new atom" << endl;
@@ -6894,6 +6896,8 @@ void xstructure::RemoveCartesianCopies(double tol) {
 // xstructure::AddCorners
 // **************************************************************************
 void xstructure::AddCorners(void) {
+  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  string soliloquy=XPID+"xstructure::AddCorners()";
   xstructure str;
   BringInCell();str=*this;
   while(atoms.size()) RemoveAtom(0);   
@@ -6904,8 +6908,12 @@ void xstructure::AddCorners(void) {
           _atom atom=str.atoms.at(iat);
           atom.fpos[1]+=i;atom.fpos[2]+=j;atom.fpos[3]+=k;
           atom.cpos=F2C(lattice,atom.fpos);
-          if(atom.fpos[1]<=1.0 && atom.fpos[2]<=1.0 && atom.fpos[3]<=1.0) AddAtom(atom);
-          //	    if(aurostd::isequal(atom.fpos[1],1.0,0.02) && atom.fpos[2]<1.0 && atom.fpos[3]<1.0)   AddAtom(atom);	    //AddAtom(atom);
+          if(LDEBUG){cerr << soliloquy << " atom.fpos=" << atom.fpos;}
+          if(atom.fpos[1]<=1.0 && atom.fpos[2]<=1.0 && atom.fpos[3]<=1.0){
+            if(LDEBUG){cerr << " : adding atom";}
+            AddAtom(atom,false);  //CO20210116 - do NOT check if atom is already there
+          }
+          if(LDEBUG){cerr << endl;}
         }
       }
     }
@@ -15755,10 +15763,11 @@ xstructure input2QExstr(istream& input) {
   return a;
 }
 
-xstructure input2VASPxstr(istream& input) {
+xstructure input2VASPxstr(istream& input,bool vasp5) {  //CO20210119 - added vasp5
   xstructure a(input,IOAFLOW_AUTO);
   //  if(a.iomode==IOQE_AUTO || a.iomode==IOQE_GEOM)
   a.xstructure2vasp();
+  if(vasp5){a.is_vasp4_poscar_format=false;a.is_vasp5_poscar_format=true;}  //CO20210119
   //  cerr << a.title << endl;
   return a;
 }

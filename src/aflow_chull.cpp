@@ -10996,9 +10996,12 @@ namespace chull {
       value=aurostd::wrapString(value,string_wrapper);
     }
     else if(property=="spin_atom"){
-      precision_tmp=precision;
-      if(ftype==latex_ft){precision_tmp=2;tmp_roundoff_tol=5.0*pow(10,-((int)precision_tmp)-1);}
-      value=aurostd::utype2string(point.m_entry.spin_atom,precision_tmp,true,tmp_roundoff_tol,FIXED_STREAM);
+      d_tmp=point.m_entry.spin_atom;
+      if(d_tmp!=AUROSTD_NAN){
+        precision_tmp=precision;
+        if(ftype==latex_ft){precision_tmp=2;tmp_roundoff_tol=5.0*pow(10,-((int)precision_tmp)-1);}
+        value=aurostd::utype2string(d_tmp,precision_tmp,true,tmp_roundoff_tol,FIXED_STREAM);
+      }
     }
     else if(property=="enthalpy_formation_atom"){
       precision_tmp=precision;

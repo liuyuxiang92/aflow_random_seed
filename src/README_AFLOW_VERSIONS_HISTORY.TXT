@@ -1,5 +1,7 @@
 3.2.7 - 2020/xx/xx
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.7.tar.xz
+        -- Added additional AEL and AGL properties to the AFLOW schema. (ME)
+        -- implemented new on-the-fly threading scheme into AAPL (ME)
         -- Added functionality to plot thermodynamic properties calculated by QHA with the SJ EOS model. (AS)
         -- Added processing of QHA data to LIB2LIB and LIB2RAW. (AS)
         -- Added a feature to employ fixed volume relaxation of QHA subcalculations. (AS)
@@ -23,6 +25,8 @@
         -- defaulting to skipping chull statistics analysis if not enough points are present (CO)
         -- adding --calculate_highest_dimension_only to chull analysis (CO)
         -- created ChullPointLight() which reduces memory load and speeds up chull calculations (CO)
+        -- adding bool check_present to AddAtom() for AddCorners() (CO)
+        -- adding --vasp5 option (CO)
 3.2.6 - 2020/12/30
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.6.tar.xz
         -- Bibtex for publications - aflowlib.h aflowlib_web_outreach.cpp (SC)
