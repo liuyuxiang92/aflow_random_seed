@@ -703,8 +703,8 @@ namespace pflow {
   string PrintRTencFile(const pflow::rtparams& rt_params, ostringstream& rtenc_file);
   string CreateRTmpgFile(const pflow::rtparams& rt_params, const string& encfile);
   void RayTraceManager(vector<string>);
-  aurostd::matrix<double> GetRotationMatrix(const vector<double>& angles); //CO20200404 pflow::matrix()->aurostd::matrix()
-  void RotateStrVec(vector<xstructure>& str_vec, const vector<double>& rot);
+  //DX20210127 [OBSOLETE - moved to aflow.h] aurostd::matrix<double> GetRotationMatrix(const vector<double>& angles); //CO20200404 pflow::matrix()->aurostd::matrix()
+  //DX20210127 [OBSOLETE - moved to aflow.h] void RotateStrVec(vector<xstructure>& str_vec, const vector<double>& rot);
 
 }
 

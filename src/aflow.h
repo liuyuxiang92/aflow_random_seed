@@ -1936,6 +1936,8 @@ xstructure TransformStructure(const xstructure& xstr,
     const xmatrix<double>& rotation,
     const xvector<double>& origin_shift,
     bool is_shift_frac=false); //DX20201125
+aurostd::matrix<double> GetRotationMatrix(const vector<double>& angles); //CO20200404 pflow::matrix()->aurostd::matrix()  //DX20210127 - moved from pflow
+void RotateStrVec(vector<xstructure>& str_vec, const vector<double>& rot);  //DX20210127 - moved from pflow
 
 //CO20180420
 //for stream management with objects
