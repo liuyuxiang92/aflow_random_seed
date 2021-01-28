@@ -1054,7 +1054,7 @@ void XtalFinderCalculator::addStructure2container(
 
   // ---------------------------------------------------------------------------
   // check if fake names for same species comparison
-  if(same_species && !pflow::realElements(str_rep_tmp.structure)){
+  if(same_species && !pflow::hasRealElements(str_rep_tmp.structure)){
     message << "Atomic species are not real/physical " << str_rep_tmp.name << " cannot perform material comparison; skipping strucutre.";
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
     return; // not storing structure

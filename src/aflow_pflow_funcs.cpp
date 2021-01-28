@@ -7303,16 +7303,16 @@ namespace pflow{
 }
 
 // ***************************************************************************
-// pflow::realElements()
+// pflow::hasRealElements()
 // ***************************************************************************
 namespace pflow{
-  bool realElements(const xstructure& xstr){
+  bool hasRealElements(const xstructure& xstr){
 
     // Determine if elements in the xstructure are real/physical.
     // Uses xelement
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string function_name = XPID + "pflow::realElements():";
+    string function_name = XPID + "pflow::hasRealElements():";
     stringstream message;
 
     if(xstr.species.size() > 0){
