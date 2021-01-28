@@ -1237,11 +1237,12 @@ uint XATOM_SplitAlloyPseudoPotentials(const string& alloy_in, vector<string> &sp
 // ***************************************************************************
 string getLeastFrequentAtomType(const xstructure& xstr, bool clean) {
 
-  // The least frequent atom set it is the minimum set of atoms that
-  // exhibit the crystal periodicity (useful for finding alternative
-  // lattices and translations).
+  // The least frequent atom type is the species with the smallest
+  // concentration in the crystal. The atoms of this type are the minimal set
+  // of atoms that exhibit the crystal periodicity (useful for finding
+  // alternative lattices and translations).
   // clean: cleans atom name (removes pseudopotential)
-  // single LFA version
+  // Returns online ONE LFA type, the first (could be more than one)
 
   // find minimum type count
   int type_count_min = aurostd::min(xstr.num_each_type);
@@ -1262,11 +1263,12 @@ string getLeastFrequentAtomType(const xstructure& xstr, bool clean) {
 // ***************************************************************************
 vector<string> getLeastFrequentAtomTypes(const xstructure& xstr, bool clean) {
   
-  // The least frequent atom set it is the minimum set of atoms that
-  // exhibit the crystal periodicity (useful for finding alternative
-  // lattices and translations).
+  // The least frequent atom type is the species with the smallest
+  // concentration in the crystal. The atoms of this type are the minimal set
+  // of atoms that exhibit the crystal periodicity (useful for finding
+  // alternative lattices and translations).
   // clean: cleans atom name (removes pseudopotential)
-  // multiple LFA version
+  // Returns ALL LFA types (could be more than one)
 
   vector<string> lfa_types; // lfa = least frequent atom
 

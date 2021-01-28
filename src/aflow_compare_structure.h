@@ -430,13 +430,13 @@ class XtalFinderCalculator : public xStream {
       bool same_species,
       const aurostd::xoption& comparison_options, 
       bool quiet);
-    void combinePrototypesOfDifferentSymmetry(vector<StructurePrototype>& final_prototypes, bool same_species, uint num_proc);
+    void combinePrototypesOfDifferentSymmetry(vector<StructurePrototype>& prototypes_final, bool same_species, uint num_proc);
   
     // ---------------------------------------------------------------------------
     // append unmatched structures into new groups
     void appendStructurePrototypes(
       vector<StructurePrototype>& comparison_schemes,
-      vector<StructurePrototype>& final_prototypes,
+      vector<StructurePrototype>& prototypes_final,
       bool clean_unmatched, //DX20190506
       bool quiet);
   
@@ -482,7 +482,7 @@ class XtalFinderCalculator : public xStream {
   // ---------------------------------------------------------------------------
   // print
   string printResults(
-      const vector<StructurePrototype>& final_prototypes,
+      const vector<StructurePrototype>& prototypes_final,
       bool same_species,
       filetype format);
   string printStructureMappingResults(
