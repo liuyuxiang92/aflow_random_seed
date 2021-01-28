@@ -4103,8 +4103,8 @@ void XtalFinderCalculator::representativePrototypeForICSDRunsNEW(
 // ***************************************************************************
 void XtalFinderCalculator::runComparisonThreads(
     vector<StructurePrototype>& comparison_schemes,
-    std::pair<uint,uint>& start_indices,
-    std::pair<uint,uint>& end_indices,
+    const std::pair<uint,uint>& start_indices,
+    const std::pair<uint,uint>& end_indices,
     bool same_species,
     bool scale_volume,
     bool optimize_match){
@@ -4494,7 +4494,7 @@ vector<StructurePrototype> XtalFinderCalculator::runComparisonScheme(
 // compare::calculateDivisors()
 // ***************************************************************************
 namespace compare{
-  vector<std::pair<uint,uint> > calculateDivisors(const uint& number){
+  vector<std::pair<uint,uint> > calculateDivisors(uint number){
 
     // Determine the divisors for a number
     // Used to check if the number of permutations follows number theory
@@ -5221,9 +5221,8 @@ namespace compare{
       double& rescale_factor) {
 
     //cerr << xstr1.Volume()/xstr1.atoms.size() << " vs " << xstr2.Volume()/xstr2.atoms.size() << endl;
-    double scale=(xstr1.Volume()/xstr1.atoms.size())/(xstr2.Volume()/xstr2.atoms.size());
-    xstr2.InflateVolume(scale); //already updates cartesian coordinates
-    rescale_factor=scale; //DX20201215
+    rescale_factor=(xstr1.Volume()/xstr1.atoms.size())/(xstr2.Volume()/xstr2.atoms.size()); //DX20201215 - store rescale factor
+    xstr2.InflateVolume(rescale_factor); //already updates cartesian coordinates
     // update Cartesian coordinates
     //DX20201210 [OBSOLETE - INFLATE VOLUME ACCOUNTS FOR THIS NOW] for(uint i=0; i<xstr2.atoms.size(); i++){
     //DX20201210 [OBSOLETE - INFLATE VOLUME ACCOUNTS FOR THIS NOW]  xstr2.atoms[i].cpos=F2C(xstr2.lattice,xstr2.atoms[i].fpos);
@@ -5658,17 +5657,16 @@ namespace compare {
 // ***************************************************************************
 // Vectorial sums and differences of the lattice basis vectors.
 namespace compare{
-  void cellDiagonal(xstructure& xstr,
+  void cellDiagonal(const xstructure& xstr,
       vector<double>& diag_sum,
       vector<double>& diag_diff,
       const double& scale) {
 
-    xmatrix<double> lattice = xstr.lattice;
-    cellDiagonal(lattice, diag_sum, diag_diff, scale);
+    cellDiagonal(xstr.lattice, diag_sum, diag_diff, scale);
   }
 }
 namespace compare{
-  void cellDiagonal(xmatrix<double>& lattice,
+  void cellDiagonal(const xmatrix<double>& lattice,
       vector<double>& diag_sum,
       vector<double>& diag_diff,
       const double& scale) {
@@ -6193,7 +6191,7 @@ namespace compare{
       // collinear
       if(!is_non_collinear){
         double magmom_diff = aurostd::abs(xstr1.atoms[j].spin-xstr2.atoms[mapping_info.atom_map[j]].spin);
-        if(magmom_diff>1e-6){ //to account for -0.0 vs 0.0
+        if(magmom_diff>_ZERO_TOL_){ //to account for -0.0 vs 0.0
           if(std::signbit(xstr1.atoms[j].spin) == std::signbit(xstr2.atoms[mapping_info.atom_map[j]].spin)){
             magmom_num += magmom_diff;
             magmom_den += aurostd::abs(xstr1.atoms[j].spin)+aurostd::abs(xstr2.atoms[mapping_info.atom_map[j]].spin);
@@ -6221,7 +6219,7 @@ namespace compare{
       else if(is_non_collinear){
         double magmom_diff = aurostd::modulus(xstr1.atoms[j].noncoll_spin-xstr2.atoms[mapping_info.atom_map[j]].noncoll_spin);
         double angle_between_non_collinear_spins = rad2deg*aurostd::angle(xstr1.atoms[j].noncoll_spin,xstr2.atoms[mapping_info.atom_map[j]].noncoll_spin);
-        if(magmom_diff>1e-6){ //to account for -0.0 vs 0.0
+        if(magmom_diff>_ZERO_TOL_){ //to account for -0.0 vs 0.0
           if(angle_between_non_collinear_spins<=_NON_COLLINEAR_ANGLE_DEGREE_TOL_){
             magmom_num += magmom_diff;
             magmom_den += aurostd::modulus(xstr1.atoms[j].noncoll_spin)+aurostd::modulus(xstr2.atoms[mapping_info.atom_map[j]].noncoll_spin);
@@ -6871,7 +6869,7 @@ namespace compare {
 bool XtalFinderCalculator::searchAtomMappings(
     const xstructure& xstr1,
     const vector<double>& all_nn1,
-    xstructure& xstr2,
+    const xstructure& xstr2,
     const string& lfa,
     vector<xmatrix<double> >& lattices,
     vector<structure_mapping_info>& vstrs_matched,
@@ -7119,8 +7117,8 @@ namespace compare{
   bool consistentAtomMappingIndex(
       uint index1,
       uint index2,
-      vector<uint>& index1_list,
-      vector<uint>& index2_list){
+      const vector<uint>& index1_list,
+      const vector<uint>& index2_list){
 
     bool VERBOSE=FALSE;
 
@@ -7266,8 +7264,8 @@ void XtalFinderCalculator::findSimilarTranslationVectors(
 // XtalFinderCalculator::buildSimilarLattices()
 // ***************************************************************************
 bool XtalFinderCalculator::buildSimilarLattices(
-    vector<xvector<double> >& translation_vectors,
-    xmatrix<double>& q1,
+    const vector<xvector<double> >& translation_vectors,
+    const xmatrix<double>& q1,
     vector<xmatrix<double> >& lattices,
     vector<double>& latt_devs,
     bool optimize_match,
@@ -7605,8 +7603,8 @@ namespace compare{
 // ***************************************************************************
 namespace compare{
   double checkLatticeDeviation(
-      double& xstr1_vol,
-      xmatrix<double>& q2,
+      const double& xstr1_vol,
+      const xmatrix<double>& q2,
       const vector<double>& D1,
       const vector<double>& F1){
 

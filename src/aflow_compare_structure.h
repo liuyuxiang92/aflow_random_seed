@@ -464,8 +464,8 @@ class XtalFinderCalculator : public xStream {
       bool scale_volume,
       bool optimize_match); 
     void runComparisonThreads(vector<StructurePrototype>& comparison_schemes, 
-      std::pair<uint,uint>& start_indices,
-      std::pair<uint,uint>& end_indices,
+      const std::pair<uint,uint>& start_indices,
+      const std::pair<uint,uint>& end_indices,
       bool same_species, 
       bool scale_volume, bool optimize_match); //DX20190822 - added comparison log bool
 
@@ -515,8 +515,8 @@ class XtalFinderCalculator : public xStream {
   // ---------------------------------------------------------------------------
   // similar lattices
   bool buildSimilarLattices(
-      vector<xvector<double> >& translation_vectors,
-      xmatrix<double>& q1,
+      const vector<xvector<double> >& translation_vectors,
+      const xmatrix<double>& q1,
       vector<xmatrix<double> >& lattices,
       vector<double>& latt_devs,
       bool optimize_match,
@@ -527,7 +527,7 @@ class XtalFinderCalculator : public xStream {
   bool searchAtomMappings(
       const xstructure& xstr1,
       const vector<double>& all_nn1,
-      xstructure& xstr2,
+      const xstructure& xstr2,
       const string& lfa,
       vector<xmatrix<double> >& lattices,
       vector<structure_mapping_info>& vstrs_matched,
@@ -653,7 +653,7 @@ namespace compare{
 
   // ---------------------------------------------------------------------------
   // comparing permutations/atom decorations 
-  vector<std::pair<uint,uint> > calculateDivisors(const int& number);
+  vector<std::pair<uint,uint> > calculateDivisors(uint number);
   bool checkNumberOfGroupings(const vector<StructurePrototype>& comparison_schemes, uint number);
   void generatePermutationString(const deque<uint>& stoichiometry, vector<string>& permutation); //DX20190508 //DX20191125 - changed from vector to deque
   void generatePermutationString(const vector<uint>& stoichiometry, vector<string>& permutation); //DX20190508
@@ -699,8 +699,8 @@ namespace compare{
   bool consistentAtomMappingIndex(
       uint index1,
       uint index2,
-      vector<uint>& index1_list,
-      vector<uint>& index2_list); //DX20201209
+      const vector<uint>& index1_list,
+      const vector<uint>& index2_list); //DX20201209
   bool consistentAtomSetMappings(
       const string& atom1_name,
       const string& atom2_name,
@@ -711,8 +711,8 @@ namespace compare{
   
   // ---------------------------------------------------------------------------
   // lattice similarity 
-  void cellDiagonal(xstructure& xstr, vector<double>& diag_sum, vector<double>& diag_diff, const double& scale);
-  void cellDiagonal(xmatrix<double>& lattice, vector<double>& diag_sum, vector<double>& diag_diff, const double& scale);
+  void cellDiagonal(const xstructure& xstr, vector<double>& diag_sum, vector<double>& diag_diff, const double& scale);
+  void cellDiagonal(const xmatrix<double>& lattice, vector<double>& diag_sum, vector<double>& diag_diff, const double& scale);
   
   // ---------------------------------------------------------------------------
   // environment analysis (near isoconfigurational analysis) 
@@ -751,7 +751,7 @@ namespace compare{
   double computeMisfit(double dev, double dis, double fail);
   double computeMisfitMagnetic(const structure_mapping_info& mapping_info); //DX20201210
   double computeMisfitMagnetic(double dev,double dis,double fail,double mag_dis,double mag_fail); //DX20190801
-  double checkLatticeDeviation(double& xstr1_vol, xmatrix<double>& q2, const vector<double>& D1, const vector<double>& F1);
+  double checkLatticeDeviation(const double& xstr1_vol, const xmatrix<double>& q2, const vector<double>& D1, const vector<double>& F1);
   
   // ---------------------------------------------------------------------------
   // structure manipulation 
