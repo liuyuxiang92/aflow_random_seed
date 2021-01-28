@@ -4537,7 +4537,7 @@ namespace aflowlib {
 }
 
 namespace aflowlib {
-  vector<vector<std::pair<string,string> > > getPropertiesFromAFLUXResponse(string& response){
+  vector<vector<std::pair<string,string> > > getPropertiesFromAFLUXResponse(const string& response){
 
     // Puts list of keyword-value pairs into a vector corresponding to each entry
     // Assumes the response format to be "format(aflow)", i.e., "|" delimiter
