@@ -319,9 +319,9 @@ namespace aflowlib {
   uint auid2present(string auid,string& aurl,int mode=1); // returns json.size() if found...
   bool AflowlibLocator(const string& in,string& out,const string& mode);
   string AflowlibLocator(string options,string mode);
-  string AFLUXCall(aurostd::xoption& vpflow); //DX20190206 - add AFLUX functionality for command line 
-  string AFLUXCall(vector<string>& matchbook); //DX20190206 - add AFLUX functionality
-  string AFLUXCall(string& summons); //DX20190206 - add AFLUX functionality 
+  string AFLUXCall(const aurostd::xoption& vpflow); //DX20190206 - add AFLUX functionality for command line 
+  string AFLUXCall(const vector<string>& matchbook); //DX20190206 - add AFLUX functionality
+  string AFLUXCall(const string& summons); //DX20190206 - add AFLUX functionality 
   vector<vector<std::pair<string,string> > > getPropertiesFromAFLUXResponse(const string& response); //DX20190206 - get properties from AFLUX response
   string getSpaceGroupAFLUXSummons(const vector<uint>& space_groups, uint relaxation_step); //DX20200929
   string getSpaceGroupAFLUXSummons(uint space_group_number, uint relaxation_step, bool only_one_sg=true); //DX20200929

@@ -4473,7 +4473,7 @@ namespace aflowlib {
 //DX+FR20190206 - AFLUX functionality via command line - START
 // ***************************************************************************
 namespace aflowlib {
-  string AFLUXCall(aurostd::xoption& vpflow){
+  string AFLUXCall(const aurostd::xoption& vpflow){
 
     // Performs AFLUX call based on summons input from command line
 
@@ -4502,7 +4502,7 @@ namespace aflowlib {
 }
 
 namespace aflowlib {
-  string AFLUXCall(vector<string>& matchbook){
+  string AFLUXCall(const vector<string>& matchbook){
 
     // Performs AFLUX call based on vector of matchbook entries
     string summons = aurostd::joinWDelimiter(matchbook,",");
@@ -4512,15 +4512,14 @@ namespace aflowlib {
 }
 
 namespace aflowlib {
-  string AFLUXCall(string& summons){
-
+  string AFLUXCall(const string& _summons){
     // Performs AFLUX call based on summons input
-
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string function_name = XPID + "AFLUXCall()";
+    bool LDEBUG=(TRUE || XHOST.DEBUG);
+    string function_name = XPID + "AFLUXCall():";
 
     // percent encoding (otherwise it will not work)
     // NOT NEEDED - aurostd::StringSubst(summons,"\'","%27"); // percent encoding for "'" 
+    string summons(_summons);   //CO20200520
     aurostd::StringSubst(summons," ","%20");  // percent encoding for space 
     aurostd::StringSubst(summons,"#","%23");  // percent encoding for "#"
 
