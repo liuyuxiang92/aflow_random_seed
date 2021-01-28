@@ -728,9 +728,9 @@ namespace aurostd {
   //  string utype2string(std::basic_string<char, std::char_traits<char>, std::allocator<char> > from) __xprototype;
   //string utype2string(string from) __xprototype;
   //  std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > utype2string(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > from) __xprototype;
-  template<typename utype> string utype2string(const utype& from) __xprototype;
-  template<typename utype> string utype2string(const utype& from,int precision) __xprototype;
-  template<typename utype> string utype2string(const utype& from,int precision,char FORMAT) __xprototype; //DX20201028 - this declaration was missing
+  //DX20210128 [OBSOLETE - use default arguments] template<typename utype> string utype2string(const utype& from) __xprototype;
+  //DX20210128 [OBSOLETE - use default arguments] template<typename utype> string utype2string(const utype& from,int precision) __xprototype;
+  template<typename utype> string utype2string(const utype& from,int precision=AUROSTD_DEFAULT_PRECISION,char FORMAT=DEFAULT_STREAM) __xprototype; //DX20201028 - this declaration was missing //DX20210128 - add defaults
   string utype2string(double from,bool roff);
   string utype2string(double from,int precision,bool roff);
   string utype2string(double from,bool roff,double tol);
