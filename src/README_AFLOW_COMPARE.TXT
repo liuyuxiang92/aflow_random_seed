@@ -211,7 +211,7 @@ General options - applicable to all commands - is listed at the bottom of this s
                                                                Allows numeric or string input (e.g., 0->original, 1->relax1, 2->most_relaxed).
             [--space_group=225,186,227,...]                  : Specify the space group(s) of the structures to extract and compare.
                                                                More than one space group can be specified.
-            [--stoichiometry=1:2:3:...]                      : Specify the stoichiometric ratio of the structures to extract and compare.
+            [--stoichiometry=1,2,3,...]                      : Specify the stoichiometric ratio of the structures to extract and compare.
 
 
     aflow --compare2prototypes [GENERAL_COMPARISON_OPTIONS] [COMPARE2PROTOTYPES_OPTIONS] < file

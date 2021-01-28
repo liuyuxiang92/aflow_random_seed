@@ -8269,13 +8269,13 @@ namespace pflow {
     }
 
     // ----- stoichiometry ----- //
-    vector<uint> stoichiometry; //default: <empty>=any; other options: x:x:...
+    vector<uint> stoichiometry; //default: <empty>=any; other options: x,x,...
     if(vpflow.flag("LIST_PROTOTYPE_LABELS::STOICHIOMETRY")){
       mode = 2;
-      aurostd::string2tokens(vpflow.getattachedscheme("LIST_PROTOTYPE_LABELS::STOICHIOMETRY"),tokens,":");
+      aurostd::string2tokens(vpflow.getattachedscheme("LIST_PROTOTYPE_LABELS::STOICHIOMETRY"),tokens,",");
       for(uint i=0;i<tokens.size();i++){ stoichiometry.push_back(aurostd::string2utype<uint>(tokens[i])); }
       if(arity!=0 && arity!=stoichiometry.size()){
-        message << "arity=" << arity << " and stoichiometry=" << aurostd::joinWDelimiter(stoichiometry,":") << " do not match.";
+        message << "arity=" << arity << " and stoichiometry=" << aurostd::joinWDelimiter(stoichiometry,",") << " do not match.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ERROR_); //DX20191107 - exit -> throw
       }
       std::sort(stoichiometry.begin(),stoichiometry.end()); // must sort to properly filter

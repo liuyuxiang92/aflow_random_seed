@@ -2795,13 +2795,13 @@ LATTICES = (the ones with "")
           (default: anrl).
   
 
-  aflow --prototype_labels|--proto_labels [--library=htqc|anrl|all] [--arity=|--number_of_species=|--species_count=<number>] [--stoichiometry=|--stoich=<number>:<number>:...] [--space_group_number=|--space_group=|--sg=<number>] 
+  aflow --prototype_labels|--proto_labels [--library=htqc|anrl|all] [--arity=|--number_of_species=|--species_count=<number>] [--stoichiometry=|--stoich=<number>,<number>,...] [--space_group_number=|--space_group=|--sg=<number>] 
         Returns a list of the AFLOW prototype labels.
         The labels can be filtered by arity, stoichiometry, and space group.
         options:
           [--library] : specify library/catalog, i.e., htqc, anrl, or all (default=all)
           [--arity=<number>] : specify 1=unary, 2=binary, 3=ternary, etc.
-          [--stoichiometry=<number>:<number>:...] : specify the stoichiometry
+          [--stoichiometry=<number>,<number>,...] : specify the stoichiometry
           [--space_group_number=<number>] : specify the space group number
 
   aflow --prototypermult | --PROTOTYPERMULT <POSCAR

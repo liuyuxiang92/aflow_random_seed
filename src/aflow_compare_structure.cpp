@@ -1303,7 +1303,7 @@ namespace compare {
     // FLAG: usage
     if(vpflow.flag("COMPARE::USAGE")) {
       string usage="aflow --compare_database_entries [GENERAL_COMPARISON_OPTIONS] [COMPARE_DATABASE_ENTRIES_OPTIONS] < file";
-      string options_function_string = "compare_database_entries_options: [--alloy=AgAlMn...] [--nspecies=3] [--catalog=lib1|lib2|lib3|lib4|lib6|lib7|icsd] [--properties=enthalpy_atom,natoms,...] [--relaxation_step=original|relax1|most_relaxed] [--space_group=225,186,227,...] [--stoichiometry=1:2:3:...]";
+      string options_function_string = "compare_database_entries_options: [--alloy=AgAlMn...] [--nspecies=3] [--catalog=lib1|lib2|lib3|lib4|lib6|lib7|icsd] [--properties=enthalpy_atom,natoms,...] [--relaxation_step=original|relax1|most_relaxed] [--space_group=225,186,227,...] [--stoichiometry=1,2,3,...]";
 
       vector<string> options, options_general, options_function;
       aurostd::string2tokens(GENERAL_XTALFINDER_OPTIONS_LIST,options_general," ");
@@ -1435,17 +1435,17 @@ namespace compare {
     vector<uint> stoichiometry_reduced, stoichiometry_input;
     if(vpflow.flag("COMPARE_DATABASE_ENTRIES::STOICHIOMETRY")){
       vector<string> stoichiometry_vstring;
-      aurostd::string2tokens(vpflow.getattachedscheme("COMPARE_DATABASE_ENTRIES::STOICHIOMETRY"), stoichiometry_vstring,":");
+      aurostd::string2tokens(vpflow.getattachedscheme("COMPARE_DATABASE_ENTRIES::STOICHIOMETRY"), stoichiometry_vstring,",");
       for(uint i=0;i<stoichiometry_vstring.size();i++){ stoichiometry_input.push_back(aurostd::string2utype<uint>(stoichiometry_vstring[i])); }
       // check input for consistency with arity (if given)
       if(arity!=0 && arity!=stoichiometry_input.size()){
-        message << "arity=" << arity << " and stoichiometry=" << aurostd::joinWDelimiter(stoichiometry_input,":") << " do not match.";
+        message << "arity=" << arity << " and stoichiometry=" << aurostd::joinWDelimiter(stoichiometry_input,",") << " do not match.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ERROR_);
       }
       aurostd::reduceByGCD(stoichiometry_input, stoichiometry_reduced);
       // if structure comparison, sort stoichiometry, otherwise perserve order
       if(!same_species){ std::sort(stoichiometry_reduced.begin(),stoichiometry_reduced.end()); }
-      message << "OPTIONS: Getting entries with stoichiometry=" << aurostd::joinWDelimiter(stoichiometry_reduced,":");
+      message << "OPTIONS: Getting entries with stoichiometry=" << aurostd::joinWDelimiter(stoichiometry_reduced,",");
       pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     }
 

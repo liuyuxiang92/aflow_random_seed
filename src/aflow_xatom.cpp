@@ -16744,10 +16744,12 @@ xmatrix<double> GetBasisTransformation(const xmatrix<double>& lattice_original, 
 // **************************************************************************
 vector<xvector<double> > GetBasisTransformationInternalTranslations(const xmatrix<double>& basis_transformation) {
 
-  // Given a basis transformation matrix determine all the internal lattice
+  // Given a basis transformation matrix, determine any internal lattice
   // translation(s). This is necessary if the basis transformation increases
   // the volume of the cell, otherwise, there are no internal translations
   // (return immediately).
+  // Another way to think of this: if you expand your lattice/cell, this
+  // function finds all the lattice points in the new cell
 
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   string function_name = XPID + "GetBasisTransformationInternalTranslations():";
@@ -16862,13 +16864,20 @@ xmatrix<double> GetRotation(const xmatrix<double>& lattice_original, const xmatr
 // **************************************************************************
 // Function ChangeBasis() //DX20201015
 // **************************************************************************
-// Convert a structure into a new representation based on the input
-// transformation matrix.
+// Convert a structure (lattice and atom positions) into a new representation
+// based on the input transformation matrix.
+// The transformation matrix is generally NOT a unitary transformation -
+// it can change the volume of the cell - otherwise it would be a rotation
+// (use Rotate() instead).
 // The procedure is generalized for transformations that enlarge (supercell)
 // or reduce (primitivize) the structure.
 // Enlarging the cell: search for unique internal translations based on 
 // transformation matrix.
 // Reducing the cell: remove duplicate atom positions.
+// Example transformation matrix (4x1x1 supercell expansion):
+//   -4.0000e+00  0.0000e+00  0.0000e+00
+//   -1.0000e+00  0.0000e+00  1.0000e+00
+//   -1.0000e+00  1.0000e+00  0.0000e+00
 
 // ---------------------------------------------------------------------------
 // returns new xstructure (makes a copy)
