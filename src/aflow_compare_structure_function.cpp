@@ -1540,7 +1540,7 @@ namespace compare{
 // loadDefaultComparisonOptions()
 // ***************************************************************************
 namespace compare {
-  aurostd::xoption loadDefaultComparisonOptions(string mode){ //DX20200103
+  aurostd::xoption loadDefaultComparisonOptions(const string& mode){ //DX20200103
 
     aurostd::xoption comparison_options;
 
@@ -2029,7 +2029,7 @@ namespace compare {
 // Find ICSD name - Find ICSD name
 // ***************************************************************************
 namespace compare{
-  string findICSDName(string& name){
+  string findICSDName(const string& name){
 
     // Find ICSD substring within path name
     // In order for this to work, the following ICSD name format must be
@@ -2070,7 +2070,7 @@ namespace compare{
 // Find Minimum ICSD Entry - Find the minimum ICSD number in a set of names
 // ***************************************************************************
 namespace compare{
-  string findMinimumICSDEntry(vector<string>& ICSD_entries){
+  string findMinimumICSDEntry(const vector<string>& ICSD_entries){
 
     // Identify the structure with the minimum ICSD number (to use
     // as the representative structure in the comparison)
@@ -2107,33 +2107,6 @@ namespace compare{
       }
     }
     return min_ICSD;
-  }
-}
-
-// ***************************************************************************
-// compare::groupSameRatios() [POSSIBLY OBSOLETE, CHECK]
-// ***************************************************************************
-namespace compare{
-  bool groupSameRatios(vector<int>& stoich, vector<int>& unique_stoich, vector<vector<int> >& type_index){
-
-    // Map two sets of stoichiometries with one another
-
-    for(uint i=0;i<stoich.size();i++){
-      bool stoich_stored = false;
-      for(uint j=0;j<unique_stoich.size();j++){
-        if(stoich[i] == unique_stoich[j]){
-          stoich_stored = true;
-          type_index[j].push_back(i);
-          break;
-        }
-      }
-      if(!stoich_stored){
-        unique_stoich.push_back(stoich[i]);
-        vector<int> tmp; tmp.push_back(i);
-        type_index.push_back(tmp);
-      }
-    }
-    return true;
   }
 }
 
@@ -2504,7 +2477,7 @@ namespace compare{
 
 // vector<uint> stoichiometry version
 namespace compare{
-  bool arePermutationsComparableViaComposition(vector<uint>& composition, bool reduce_composition){
+  bool arePermutationsComparableViaComposition(const vector<uint>& composition, bool reduce_composition){
 
     // ---------------------------------------------------------------------------
     // reduce stoichiometry first if necessary
@@ -2529,7 +2502,7 @@ namespace compare{
 // arePermutationsComparableViaSymmetry()
 // ***************************************************************************
 namespace compare{
-  bool arePermutationsComparableViaSymmetry(vector<GroupedWyckoffPosition>& grouped_Wyckoff_positions){
+  bool arePermutationsComparableViaSymmetry(const vector<GroupedWyckoffPosition>& grouped_Wyckoff_positions){
 
     // Check if permutations of a structure are possible via symmetry
     // (Wyckoff positions) i.e., check if there are matchable Wyckoff
@@ -3325,7 +3298,7 @@ namespace compare{
   void groupWyckoffPositionsFromGroupedString(
       uint space_group_number,
       uint setting,
-      vector<vector<string> >& grouped_Wyckoff_string,
+      const vector<vector<string> >& grouped_Wyckoff_string,
       vector<GroupedWyckoffPosition>& grouped_positions){
 
     // Groups the Wyckoff positions via species
@@ -3511,7 +3484,7 @@ namespace compare{
 // compare::convertANRLWyckoffString2GroupedPositions()
 // ***************************************************************************
 namespace compare{
-  vector<vector<string> > convertANRLWyckoffString2GroupedPositions(string label){
+  vector<vector<string> > convertANRLWyckoffString2GroupedPositions(const string& label){
 
     // Converts the ANRL Wyckoff string to a grouped Wyckoff position object
     // ANRL Wyckoff string example: a2b_4bcd_e2f3g
@@ -3561,7 +3534,7 @@ namespace compare{
 // ***************************************************************************
 namespace compare{
   vector<vector<string> > convertWyckoffString2GroupedPositions(
-      string Wyckoff_letter_string){
+      const string& Wyckoff_letter_string){
 
     // Groups the Wyckoff positions via species
     // Obtains information from the string of the following form: a,f,g;b,c;a,a
@@ -3586,8 +3559,8 @@ namespace compare{
 // ***************************************************************************
 namespace compare{
   bool matchableWyckoffPositionSet(
-      vector<vector<vector<string> > > grouped_possible_Wyckoff_letters,
-      vector<vector<string> > grouped_Wyckoff_letters){
+      const vector<vector<vector<string> > >& grouped_possible_Wyckoff_letters,
+      const vector<vector<string> >& grouped_Wyckoff_letters){
 
     bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_COMPARE_);
     string function_name = XPID + "compare::matchableWyckoffPositionSet():";

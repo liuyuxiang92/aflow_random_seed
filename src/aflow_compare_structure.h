@@ -618,7 +618,7 @@ namespace compare{
 
   // ---------------------------------------------------------------------------
   // comparison options
-  aurostd::xoption loadDefaultComparisonOptions(string mode=""); //DX20200103
+  aurostd::xoption loadDefaultComparisonOptions(const string& mode=""); //DX20200103
   
   // ---------------------------------------------------------------------------
   // geneate structures 
@@ -630,16 +630,16 @@ namespace compare{
   // functions for determining isopointal structures (same/compatible symmetry)
   void groupWyckoffPositions(const xstructure& xstr, vector<GroupedWyckoffPosition>& grouped_positions);
   void groupWyckoffPositions(const vector<wyckoffsite_ITC>& wyckoff_sites_ITC, vector<GroupedWyckoffPosition>& grouped_positions); //DX20200512
-  void groupWyckoffPositionsFromGroupedString(uint space_group_number, uint setting, vector<vector<string> >& grouped_Wyckoff_string, vector<GroupedWyckoffPosition>& grouped_positions); //DX20200622 - removed pointer to uints
+  void groupWyckoffPositionsFromGroupedString(uint space_group_number, uint setting, const vector<vector<string> >& grouped_Wyckoff_string, vector<GroupedWyckoffPosition>& grouped_positions); //DX20200622 - removed pointer to uints
   string printWyckoffString(const vector<GroupedWyckoffPosition>& grouped_positions, bool alphabetize=false);
   vector<GroupedWyckoffPosition> sortSiteSymmetryOfGroupedWyckoffPositions(const vector<GroupedWyckoffPosition>& grouped_Wyckoffs); //DX20190219
   bool matchableWyckoffPositions(const vector<GroupedWyckoffPosition>& temp_grouped_Wyckoffs,
       const vector<GroupedWyckoffPosition>& representative_grouped_Wyckoffs,
       bool same_species);
-  bool matchableWyckoffPositionSet(vector<vector<vector<string> > > grouped_possible_Wyckoff_letters,
-      vector<vector<string> > grouped_Wyckoff_letters);
-  vector<vector<string> > convertANRLWyckoffString2GroupedPositions(string label);
-  vector<vector<string> > convertWyckoffString2GroupedPositions(string Wyckoff_letter_string);
+  bool matchableWyckoffPositionSet(const vector<vector<vector<string> > >& grouped_possible_Wyckoff_letters,
+      const vector<vector<string> >& grouped_Wyckoff_letters);
+  vector<vector<string> > convertANRLWyckoffString2GroupedPositions(const string& label);
+  vector<vector<string> > convertWyckoffString2GroupedPositions(const string& Wyckoff_letter_string);
   bool sameStoichiometry(const vector<uint>& stoich1, const vector<uint>& stoich2);
   bool matchableSpaceGroups(uint space_group_1, uint space_group_2);
   bool matchableEnantiomorphicSpaceGroups(uint space_group_1, uint space_group_2);
@@ -659,14 +659,13 @@ namespace compare{
   void generatePermutationString(const vector<uint>& stoichiometry, vector<string>& permutation); //DX20190508
   bool generatePermutations(uint& num_elements, vector<uint>& indices, vector<string>& names, vector<GroupedWyckoffPosition>& grouped_Wyckoff_positions, vector<vector<uint> >& permutations, vector<vector<string> >&name_order, vector<vector<GroupedWyckoffPosition> >& permutation_grouped_Wyckoff_positions);
   bool arePermutationsComparableViaComposition(const xstructure& xstr); //DX20190624 
-  bool arePermutationsComparableViaComposition(vector<uint>& composition, bool reduce_composition=false); //DX20190624
-  bool arePermutationsComparableViaSymmetry(vector<GroupedWyckoffPosition>& grouped_Wyckoff_positions); //DX20190624
-  bool groupSameRatios(vector<int>& stoich, vector<int>& unique_stoich, vector<vector<int> >& type_index);
+  bool arePermutationsComparableViaComposition(const vector<uint>& composition, bool reduce_composition=false); //DX20190624
+  bool arePermutationsComparableViaSymmetry(const vector<GroupedWyckoffPosition>& grouped_Wyckoff_positions); //DX20190624
 
   // ---------------------------------------------------------------------------
   // ICSD comparisons 
-  string findICSDName(string& name);
-  string findMinimumICSDEntry(vector<string>& ICSD_entries);
+  string findICSDName(const string& name);
+  string findMinimumICSDEntry(const vector<string>& ICSD_entries);
 
   // ---------------------------------------------------------------------------
   // matchable species/types 
