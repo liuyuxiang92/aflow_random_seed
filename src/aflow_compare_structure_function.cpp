@@ -1941,7 +1941,7 @@ namespace compare {
         //DX20210129 [OBSOLETE] xstructure xstr(sss);
         //DX20210129 [OBSOLETE] structure = xstr;
         structure.clear(); //DX20210129
-        structure.reset(sss); //DX20210129
+        structure.initialize(sss); //DX20210129
       }
       catch(aurostd::xerror& excpt) { cerr << "Could not load structure " << structure_name << "...skipping structure"; return false; } //DX20190718
     }
@@ -1994,7 +1994,7 @@ namespace compare {
       //DX20210129 [OBSOLETE] structure.clear(); //DX20210127
       //DX20210129 [OBSOLETE] structure = xstr;
       structure.clear(); //DX20210129
-      structure.reset(sss); //DX20210129
+      structure.initialize(sss); //DX20210129
     }
     // ---------------------------------------------------------------------------
     // load permutation
@@ -2005,7 +2005,7 @@ namespace compare {
       stringstream sss; sss << aurostd::StringSubst(tmp_source, "permutation of: ", "");
       //DX20210129 [OBSOLETE] xstructure xstr(sss);
       structure.clear(); //DX20210129
-      structure.reset(sss); //DX20210129
+      structure.initialize(sss); //DX20210129
       deque<string> species;
       for(uint j=0;j<structure_name.size();j++){stringstream ss_site; ss_site << structure_name[j]; species.push_back(ss_site.str());}
       structure.SetSpecies(species);

@@ -397,7 +397,7 @@ namespace compare {
     //DX20190429 - added format options - START
     // ---------------------------------------------------------------------------
     // if only two comparisons and text only, print mismatch information
-    if(file_list.size()==2){
+    if(file_list.size()==2 && prototypes_final.size() > 0){
       // return abbreviated results (i.e., misfit value along with match, same family, or no match text
       if(prototypes_final[0].mapping_info_duplicate.size()==1){
         double misfit_final = prototypes_final[0].mapping_info_duplicate[0].misfit;

@@ -1473,7 +1473,7 @@ namespace aflowlib {
       vector<string> sg_tokens;
       stringstream ss_helper;
       vector<vector<string> > vvs;
-      vector<string> vs;
+      vector<string> vs, vs2, vcontent_tmp; //DX20210129 - added vs2, content_tmp
       bool odd_xvec_count;
 
       //////////////////////////////////////////////////////////////////////////
@@ -2648,16 +2648,17 @@ namespace aflowlib {
 
       //////////////////////////////////////////////////////////////////////////
       if(Wyckoff_letters_orig.size()){
-        vector<string> Wyckoff_letters_orig_set; 
-        aurostd::string2tokens(Wyckoff_letters_orig,Wyckoff_letters_orig_set,";");
-        vector<string> tmp_content;
-        for(uint w=0;w<Wyckoff_letters_orig_set.size();w++){
-          vector<string> Wyckoff_tokens;
-          aurostd::string2tokens(Wyckoff_letters_orig_set[w],Wyckoff_tokens,",");
-          tmp_content.push_back("["+aurostd::joinWDelimiter(aurostd::wrapVecEntries(Wyckoff_tokens,"\""),",")+"]");
+        vs.clear();
+        aurostd::string2tokens(Wyckoff_letters_orig,vs,";");
+        vcontent_tmp.clear();
+        for(uint w=0;w<vs.size();w++){
+          vs2.clear();
+          aurostd::string2tokens(vs[w],vs2,",");
+          vcontent_tmp.push_back("["+aurostd::joinWDelimiter(aurostd::wrapVecEntries(vs2,"\""),",")+"]");
         }
-        sscontent_json << "\"Wyckoff_letters_orig\":[" << aurostd::joinWDelimiter(tmp_content,",") << "]";
+        sscontent_json << "\"Wyckoff_letters_orig\":[" << aurostd::joinWDelimiter(vcontent_tmp,",") << "]";
         //DX20190129 [OBSOLETE] sscontent_json << "\"Wyckoff_letters_orig\":\"" << Wyckoff_letters_orig << "\"";
+        vs.clear(); vs2.clear(); vcontent_tmp.clear();
       } else {
         if(PRINT_NULL) sscontent_json << "\"Wyckoff_letters_orig\":null";
       }
@@ -2665,16 +2666,17 @@ namespace aflowlib {
 
       //////////////////////////////////////////////////////////////////////////
       if(Wyckoff_multiplicities_orig.size()){
-        vector<string> Wyckoff_multiplicities_orig_set; 
-        aurostd::string2tokens(Wyckoff_multiplicities_orig,Wyckoff_multiplicities_orig_set,";");
-        vector<string> tmp_content;
-        for(uint w=0;w<Wyckoff_multiplicities_orig_set.size();w++){
-          vector<string> Wyckoff_tokens;
-          aurostd::string2tokens(Wyckoff_multiplicities_orig_set[w],Wyckoff_tokens,",");
-          tmp_content.push_back("["+aurostd::joinWDelimiter(Wyckoff_tokens,",")+"]");
+        vs.clear();
+        aurostd::string2tokens(Wyckoff_multiplicities_orig,vs,";");
+        vcontent_tmp.clear();
+        for(uint w=0;w<vs.size();w++){
+          vs2.clear();
+          aurostd::string2tokens(vs[w],vs2,",");
+          vcontent_tmp.push_back("["+aurostd::joinWDelimiter(vs2,",")+"]");
         }
-        sscontent_json << "\"Wyckoff_multiplicities_orig\":[" << aurostd::joinWDelimiter(tmp_content,",") << "]";
+        sscontent_json << "\"Wyckoff_multiplicities_orig\":[" << aurostd::joinWDelimiter(vcontent_tmp,",") << "]";
         //DX20190129 [OBSOLETE] sscontent_json << "\"Wyckoff_multiplicities_orig\":\"" << Wyckoff_multiplicities_orig << "\"";
+        vs.clear(); vs2.clear(); vcontent_tmp.clear();
       } else {
         if(PRINT_NULL) sscontent_json << "\"Wyckoff_multiplicities_orig\":null";
       }
@@ -2682,16 +2684,17 @@ namespace aflowlib {
 
       //////////////////////////////////////////////////////////////////////////
       if(Wyckoff_site_symmetries_orig.size()){
-        vector<string> Wyckoff_site_symmetries_orig_set; 
-        aurostd::string2tokens(Wyckoff_site_symmetries_orig,Wyckoff_site_symmetries_orig_set,";");
-        vector<string> tmp_content;
-        for(uint w=0;w<Wyckoff_site_symmetries_orig_set.size();w++){
-          vector<string> Wyckoff_tokens;
-          aurostd::string2tokens(Wyckoff_site_symmetries_orig_set[w],Wyckoff_tokens,",");
-          tmp_content.push_back("["+aurostd::joinWDelimiter(aurostd::wrapVecEntries(Wyckoff_tokens,"\""),",")+"]");
+        vs.clear();
+        aurostd::string2tokens(Wyckoff_site_symmetries_orig,vs,";");
+        vcontent_tmp.clear();
+        for(uint w=0;w<vs.size();w++){
+          vs2.clear();
+          aurostd::string2tokens(vs[w],vs2,",");
+          vcontent_tmp.push_back("["+aurostd::joinWDelimiter(aurostd::wrapVecEntries(vs2,"\""),",")+"]");
         }
-        sscontent_json << "\"Wyckoff_site_symmetries_orig\":[" << aurostd::joinWDelimiter(tmp_content,",") << "]";
+        sscontent_json << "\"Wyckoff_site_symmetries_orig\":[" << aurostd::joinWDelimiter(vcontent_tmp,",") << "]";
         //DX20190129 [OBSOLETE] sscontent_json << "\"Wyckoff_site_symmetries_orig\":\"" << Wyckoff_site_symmetries_orig << "\"";
+        vs.clear(); vs2.clear(); vcontent_tmp.clear();
       } else {
         if(PRINT_NULL) sscontent_json << "\"Wyckoff_site_symmetries_orig\":null";
       }
@@ -2865,16 +2868,17 @@ namespace aflowlib {
 
       //////////////////////////////////////////////////////////////////////////
       if(Wyckoff_letters.size()){
-        vector<string> Wyckoff_letters_set; 
-        aurostd::string2tokens(Wyckoff_letters,Wyckoff_letters_set,";");
-        vector<string> tmp_content;
-        for(uint w=0;w<Wyckoff_letters_set.size();w++){
-          vector<string> Wyckoff_tokens;
-          aurostd::string2tokens(Wyckoff_letters_set[w],Wyckoff_tokens,",");
-          tmp_content.push_back("["+aurostd::joinWDelimiter(aurostd::wrapVecEntries(Wyckoff_tokens,"\""),",")+"]");
+        vs.clear();
+        aurostd::string2tokens(Wyckoff_letters,vs,";");
+        vcontent_tmp.clear();
+        for(uint w=0;w<vs.size();w++){
+          vs2.clear();
+          aurostd::string2tokens(vs[w],vs2,",");
+          vcontent_tmp.push_back("["+aurostd::joinWDelimiter(aurostd::wrapVecEntries(vs2,"\""),",")+"]");
         }
-        sscontent_json << "\"Wyckoff_letters\":[" << aurostd::joinWDelimiter(tmp_content,",") << "]";
+        sscontent_json << "\"Wyckoff_letters\":[" << aurostd::joinWDelimiter(vcontent_tmp,",") << "]";
         //DX20190129 [OBSOLETE] sscontent_json << "\"Wyckoff_letters\":\"" << Wyckoff_letters << "\"";
+        vs.clear(); vs2.clear(); vcontent_tmp.clear();
       } else {
         if(PRINT_NULL) sscontent_json << "\"Wyckoff_letters\":null";
       }
@@ -2882,16 +2886,17 @@ namespace aflowlib {
 
       //////////////////////////////////////////////////////////////////////////
       if(Wyckoff_multiplicities.size()){
-        vector<string> Wyckoff_multiplicities_set; 
-        aurostd::string2tokens(Wyckoff_multiplicities,Wyckoff_multiplicities_set,";");
-        vector<string> tmp_content;
-        for(uint w=0;w<Wyckoff_multiplicities_set.size();w++){
-          vector<string> Wyckoff_tokens;
-          aurostd::string2tokens(Wyckoff_multiplicities_set[w],Wyckoff_tokens,",");
-          tmp_content.push_back("["+aurostd::joinWDelimiter(Wyckoff_tokens,",")+"]");
+        vs.clear();
+        aurostd::string2tokens(Wyckoff_multiplicities,vs,";");
+        vcontent_tmp.clear();
+        for(uint w=0;w<vs.size();w++){
+          vs2.clear();
+          aurostd::string2tokens(vs[w],vs2,",");
+          vcontent_tmp.push_back("["+aurostd::joinWDelimiter(vs2,",")+"]");
         }
-        sscontent_json << "\"Wyckoff_multiplicities\":[" << aurostd::joinWDelimiter(tmp_content,",") << "]";
+        sscontent_json << "\"Wyckoff_multiplicities\":[" << aurostd::joinWDelimiter(vcontent_tmp,",") << "]";
         //DX20190129 [OBSOLETE] sscontent_json << "\"Wyckoff_multiplicities\":\"" << Wyckoff_multiplicities << "\"";
+        vs.clear(); vs2.clear(); vcontent_tmp.clear();
       } else {
         if(PRINT_NULL) sscontent_json << "\"Wyckoff_multiplicities\":null";
       }
@@ -2899,16 +2904,17 @@ namespace aflowlib {
 
       //////////////////////////////////////////////////////////////////////////
       if(Wyckoff_site_symmetries.size()){
-        vector<string> Wyckoff_site_symmetries_set; 
-        aurostd::string2tokens(Wyckoff_site_symmetries,Wyckoff_site_symmetries_set,";");
-        vector<string> tmp_content;
-        for(uint w=0;w<Wyckoff_site_symmetries_set.size();w++){
-          vector<string> Wyckoff_tokens;
-          aurostd::string2tokens(Wyckoff_site_symmetries_set[w],Wyckoff_tokens,",");
-          tmp_content.push_back("["+aurostd::joinWDelimiter(aurostd::wrapVecEntries(Wyckoff_tokens,"\""),",")+"]");
+        vs.clear();
+        aurostd::string2tokens(Wyckoff_site_symmetries,vs,";");
+        vcontent_tmp.clear();
+        for(uint w=0;w<vs.size();w++){
+          vs2.clear();
+          aurostd::string2tokens(vs[w],vs2,",");
+          vcontent_tmp.push_back("["+aurostd::joinWDelimiter(aurostd::wrapVecEntries(vs2,"\""),",")+"]");
         }
-        sscontent_json << "\"Wyckoff_site_symmetries\":[" << aurostd::joinWDelimiter(tmp_content,",") << "]";
+        sscontent_json << "\"Wyckoff_site_symmetries\":[" << aurostd::joinWDelimiter(vcontent_tmp,",") << "]";
         //DX20190129 [OBSOLETE] sscontent_json << "\"Wyckoff_site_symmetries\":\"" << Wyckoff_site_symmetries << "\"";
+        vs.clear(); vs2.clear(); vcontent_tmp.clear();
       } else {
         if(PRINT_NULL) sscontent_json << "\"Wyckoff_site_symmetries\":null";
       }
@@ -2926,8 +2932,9 @@ namespace aflowlib {
 
       //////////////////////////////////////////////////////////////////////////
       if(aflow_prototype_parameter_list_orig.size()){
-        vector<string> aflow_prototype_parameters_vector_orig; aurostd::string2tokens(aflow_prototype_parameter_list_orig,aflow_prototype_parameters_vector_orig,",");
-        sscontent_json << "\"aflow_prototype_parameter_list_orig\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(aflow_prototype_parameters_vector_orig,"\""),",") << "]";
+        vs.clear(); aurostd::string2tokens(aflow_prototype_parameter_list_orig,vs,",");
+        sscontent_json << "\"aflow_prototype_parameter_list_orig\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(vs,"\""),",") << "]";
+        vs.clear();
       } else {
         if(PRINT_NULL) sscontent_json << "\"aflow_prototype_parameter_list_orig\":null";
       }
@@ -2935,8 +2942,9 @@ namespace aflowlib {
 
       //////////////////////////////////////////////////////////////////////////
       if(aflow_prototype_parameter_values_orig.size()){
-        vector<string> aflow_prototype_values_vector_orig; aurostd::string2tokens(aflow_prototype_parameter_values_orig,aflow_prototype_values_vector_orig,",");
-        sscontent_json << "\"aflow_prototype_parameter_values_orig\":[" << aurostd::joinWDelimiter(aflow_prototype_values_vector_orig,",") << "]";
+        vs.clear(); aurostd::string2tokens(aflow_prototype_parameter_values_orig,vs,",");
+        sscontent_json << "\"aflow_prototype_parameter_values_orig\":[" << aurostd::joinWDelimiter(vs,",") << "]";
+        vs.clear();
       } else {
         if(PRINT_NULL) sscontent_json << "\"aflow_prototype_parameter_values_orig\":null";
       }
@@ -2952,8 +2960,9 @@ namespace aflowlib {
 
       //////////////////////////////////////////////////////////////////////////
       if(aflow_prototype_parameter_list_relax.size()){
-        vector<string> aflow_prototype_parameters_vector_relax; aurostd::string2tokens(aflow_prototype_parameter_list_relax,aflow_prototype_parameters_vector_relax,",");
-        sscontent_json << "\"aflow_prototype_parameter_list_relax\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(aflow_prototype_parameters_vector_relax,"\""),",") << "]";
+        vs.clear(); aurostd::string2tokens(aflow_prototype_parameter_list_relax,vs,",");
+        sscontent_json << "\"aflow_prototype_parameter_list_relax\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(vs,"\""),",") << "]";
+        vs.clear();
       } else {
         if(PRINT_NULL) sscontent_json << "\"aflow_prototype_parameter_list_relax\":null";
       }
@@ -2961,8 +2970,9 @@ namespace aflowlib {
 
       //////////////////////////////////////////////////////////////////////////
       if(aflow_prototype_parameter_values_relax.size()){
-        vector<string> aflow_prototype_values_vector_relax; aurostd::string2tokens(aflow_prototype_parameter_values_relax,aflow_prototype_values_vector_relax,",");
-        sscontent_json << "\"aflow_prototype_parameter_values_relax\":[" << aurostd::joinWDelimiter(aflow_prototype_values_vector_relax,",") << "]";
+        vs.clear(); aurostd::string2tokens(aflow_prototype_parameter_values_relax,vs,",");
+        sscontent_json << "\"aflow_prototype_parameter_values_relax\":[" << aurostd::joinWDelimiter(vs,",") << "]";
+        vs.clear();
       } else {
         if(PRINT_NULL) sscontent_json << "\"aflow_prototype_parameter_values_relax\":null";
       }

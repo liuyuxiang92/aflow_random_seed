@@ -2498,22 +2498,25 @@ xstructure::xstructure(string structure_title) {
 
 // ifstream/istream
 xstructure::xstructure(istream& _input,int _iomode) {
-  free(); //DX20191220 - added free to initialize
-  (*this).iomode=_iomode;
-  _input >> (*this);
+  (*this).initialize(_input, _iomode);
+  //DX20210129 [OBSOLETE - done in initialize] free(); //DX20191220 - added free to initialize
+  //DX20210129 [OBSOLETE - done in initialize] (*this).iomode=_iomode;
+  //DX20210129 [OBSOLETE - done in initialize] _input >> (*this);
 }
 
 xstructure::xstructure(ifstream& _input,int _iomode) {
-  free(); //DX20191220 - added free to initialize
-  (*this).iomode=_iomode;
-  _input >> (*this);
+  (*this).initialize(_input, _iomode);
+  //DX20210129 [OBSOLETE - done in initialize] free(); //DX20191220 - added free to initialize
+  //DX20210129 [OBSOLETE - done in initialize] (*this).iomode=_iomode;
+  //DX20210129 [OBSOLETE - done in initialize] _input >> (*this);
 }
 
-xstructure::xstructure(stringstream& __input,int _iomode) {
-  free(); //DX20191220 - added free to initialize
-  (*this).iomode=_iomode;
-  stringstream _input(__input.str());
-  _input >> (*this);
+xstructure::xstructure(const stringstream& __input,int _iomode) { //DX20210129 - added const
+  (*this).initialize(__input, _iomode); //DX20210129
+  //DX20210129 [OBSOLETE - done in initialize] free(); //DX20191220 - added free to initialize
+  //DX20210129 [OBSOLETE - done in initialize] (*this).iomode=_iomode;
+  //DX20210129 [OBSOLETE - done in initialize] stringstream _input(__input.str());
+  //DX20210129 [OBSOLETE - done in initialize] _input >> (*this);
 }
 
 xstructure::xstructure(const string& _input,int _iomode) {
@@ -2897,7 +2900,19 @@ void xstructure::ClearSpecies() { //CO20180420 - helps with pocc, match with Add
   species_mass.clear();
 }
 
-void xstructure::reset(stringstream& __input,int _iomode) { //DX20210129 - reset structure; avoid copying of xstructure
+void xstructure::initialize(istream& _input,int _iomode) { //DX20210129 - initialize structure; avoid copying of xstructure
+  free(); //DX20191220 - added free to initialize
+  (*this).iomode=_iomode;
+  _input >> (*this);
+}
+
+void xstructure::initialize(ifstream& _input,int _iomode) { //DX20210129 - initialize structure; avoid copying of xstructure
+  free(); //DX20191220 - added free to initialize
+  (*this).iomode=_iomode;
+  _input >> (*this);
+}
+
+void xstructure::initialize(const stringstream& __input,int _iomode) { //DX20210129 - initialize structure; avoid copying of xstructure
   free(); //DX20191220 - added free to initialize
   (*this).iomode=_iomode;
   stringstream _input(__input.str());
