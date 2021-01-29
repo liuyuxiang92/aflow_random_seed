@@ -347,10 +347,12 @@ namespace compare {
     // ---------------------------------------------------------------------------
     // FLAG: print format (default is to write both), set the relevant bools
     // to false when another is specified
-    bool write_txt = true;
-    bool write_json = true;
-    if(XHOST.vflag_control.flag("PRINT_MODE::TXT")){ write_json = false; }
-    else if(XHOST.vflag_control.flag("PRINT_MODE::JSON")){ write_txt = false; }
+    bool write_txt = false;
+    bool write_json = false;
+    if(XHOST.vflag_control.flag("PRINT_MODE::TXT")){ write_txt = true; }
+    if(XHOST.vflag_control.flag("PRINT_MODE::JSON")){ write_json = true; }
+    // if not specified, write both by default
+    if(!write_txt && !write_json){ write_txt = true; write_json = true; }
 
     // ---------------------------------------------------------------------------
     // FLAG: print2screen
@@ -1234,13 +1236,15 @@ namespace compare {
     // ---------------------------------------------------------------------------
     // FLAG: print format (default is to write both), set the relevant bools
     // to false when another is specified
-    bool write_txt = true;
-    bool write_json = true;
-    if(XHOST.vflag_control.flag("PRINT_MODE::TXT")){ write_json = false; }
-    else if(XHOST.vflag_control.flag("PRINT_MODE::JSON")){ write_txt = false; }
+    bool write_txt = false;
+    bool write_json = false;
+    if(XHOST.vflag_control.flag("PRINT_MODE::TXT")){ write_txt = true; }
+    if(XHOST.vflag_control.flag("PRINT_MODE::JSON")){ write_json = true; }
+    // if not specified, write both by default
+    if(!write_txt && !write_json){ write_txt = true; write_json = true; }
 
     // ---------------------------------------------------------------------------
-    // FLAG: print format
+    // FLAG: print2screen
     bool screen_only = false;
     if(vpflow.flag("COMPARE::SCREEN_ONLY")) {
       screen_only=true;
@@ -1318,10 +1322,12 @@ namespace compare {
     // ---------------------------------------------------------------------------
     // FLAG: print format (default is to write both), set the relevant bools
     // to false when another is specified
-    bool write_txt = true;
-    bool write_json = true;
-    if(XHOST.vflag_control.flag("PRINT_MODE::TXT")){ write_json = false; }
-    else if(XHOST.vflag_control.flag("PRINT_MODE::JSON")){ write_txt = false; }
+    bool write_txt = false;
+    bool write_json = false;
+    if(XHOST.vflag_control.flag("PRINT_MODE::TXT")){ write_txt = true; }
+    if(XHOST.vflag_control.flag("PRINT_MODE::JSON")){ write_json = true; }
+    // if not specified, write both by default
+    if(!write_txt && !write_json){ write_txt = true; write_json = true; }
 
     // ---------------------------------------------------------------------------
     // FLAG: print2screen

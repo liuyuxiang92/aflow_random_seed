@@ -2897,6 +2897,13 @@ void xstructure::ClearSpecies() { //CO20180420 - helps with pocc, match with Add
   species_mass.clear();
 }
 
+void xstructure::reset(stringstream& __input,int _iomode) { //DX20210129 - reset structure; avoid copying of xstructure
+  free(); //DX20191220 - added free to initialize
+  (*this).iomode=_iomode;
+  stringstream _input(__input.str());
+  _input >> (*this);
+}
+
 // **************************************************************************
 // Xstructure operator<< OUTPUT_XSTRUCTURE_OUTPUT 
 // **************************************************************************
@@ -11414,6 +11421,7 @@ deque<_atom> foldAtomsInCell(const xstructure& a,const xmatrix<double>& lattice_
 
   deque<_atom> atoms_orig=a.atoms;  //need to make a copy for the pointer
   deque<_atom>* ptr_atoms=&atoms_orig;
+  deque<_atom> atoms=*ptr_atoms; //DX20210129 - this need to be done before if-statement since we put atomic_grid inside if-statement
   if(!fold_in_only){
     xstructure atomic_grid; //stays empty if not needed //DX+ME20210111 - added inside if-statement
     double radius=RadiusSphereLattice(lattice_new);
@@ -11435,8 +11443,9 @@ deque<_atom> foldAtomsInCell(const xstructure& a,const xmatrix<double>& lattice_
     atomic_grid.GenerateGridAtoms(dims[1],dims[2],dims[3]); //much faster than supercell
     if(LDEBUG) {cerr << soliloquy << " atomic grid built" << endl;}
     ptr_atoms=&atomic_grid.grid_atoms;  //CO20190808 - GenerateGridAtoms() populates grid_atoms, not atoms
+    atoms=*ptr_atoms; //DX20210129 - set inside if-statement, otherwise, grid atoms goes out of scope
   }
-  const deque<_atom> atoms=*ptr_atoms;
+  //DX20210129 [OBOSLETE] const deque<_atom> atoms=*ptr_atoms;
 
   return foldAtomsInCell(atoms,a.lattice,lattice_new,skew,tol,check_min_dists); //DX20190619 = added check_min_dists bool
 }

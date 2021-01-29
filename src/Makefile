@@ -1184,6 +1184,7 @@ check_full:
 	$(MAKE) check_AFLOWSYM
 	$(MAKE) check_edata
 	$(MAKE) check_aflow_xtal_finder
+	$(MAKE) check_fold_atoms_in_cell_routine
 	$(MAKE) check_prototype_generator
 	$(MAKE) check_aflow_gcc_compatibility
 	$(MAKE) check_cce
@@ -1535,6 +1536,10 @@ check_aflow_xtal_finder:
 		if [ $$MATCH != $$ANSWER ]; then "aflow_xtal_finder did not return $$ANSWER for './aflow --proto=A_cI2_229_a:Cr | ./aflow --sconv >A_cI2_229_a_sconv.poscar ; ./aflow --compare_materials=A_cI2_229_a_sconv.poscar,A_cI2_229_a_sconv.poscar --magmoms=1,1:-1,-1 --quiet', found $$MATCH instead" && exit 1; fi
 	@echo "aflow_xtal_finder - compare magnetic configuration test 3 (ferro-up vs ferro-down) passed!"
 	@rm -f A_cI2_229_a_sconv.poscar
+.PHONY: check_fold_atoms_in_cell_routine
+check_fold_atoms_in_cell_routine:
+	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
+	./aflow --FoldAtomsInCell_test
 .PHONY: check_prototype_generator
 check_prototype_generator:
 	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi

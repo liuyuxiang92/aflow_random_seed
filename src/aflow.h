@@ -1494,6 +1494,7 @@ class xstructure {
     void clear(void);                                             // clear everything //DX20191220 - uppercase to lowercase clear
     void clean(void);                                             // performs stringstream clean //DX20191220 - uppercase to lowercase clean
     void ClearSpecies(void);                                      // Clear all the symmetry
+    void reset(stringstream& __input,int=IOVASP_POSCAR);          // Reset xstructure based on input (avoids copying xstructure); //DX20210129
     void ShiftOriginToAtom(const int& iat);                       // Shift the origin to atom(iat)
     void IdenticalAtoms(void);                                    // Make identical atoms
     void SwapCoordinates(const uint& i,const uint& j);            // Permute Coordinates i with j
@@ -2575,6 +2576,8 @@ bool coordinationTest(ostream& oss=cout);
 bool coordinationTest(ofstream& FileMESSAGE,ostream& oss=cout);
 bool PrototypeGeneratorTest(ostream& oss=cout, bool check_symmetry=false); //DX20200928
 bool PrototypeGeneratorTest(ofstream& FileMESSAGE,ostream& oss=cout, bool check_symmetry=false); //DX20200928
+bool FoldAtomsInCellTest(ostream& oss=cout); //DX20210129
+bool FoldAtomsInCellTest(ofstream& FileMESSAGE,ostream& oss=cout); //DX20210129
 
 // ----------------------------------------------------------------------------
 // Structure Prototypes

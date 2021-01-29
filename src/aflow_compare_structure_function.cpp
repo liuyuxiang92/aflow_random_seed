@@ -1938,8 +1938,10 @@ namespace compare {
       stringstream sss;
       aurostd::efile2stringstream(structure_name,sss);
       try{
-        xstructure xstr(sss);
-        structure = xstr;
+        //DX20210129 [OBSOLETE] xstructure xstr(sss);
+        //DX20210129 [OBSOLETE] structure = xstr;
+        structure.clear(); //DX20210129
+        structure.reset(sss); //DX20210129
       }
       catch(aurostd::xerror& excpt) { cerr << "Could not load structure " << structure_name << "...skipping structure"; return false; } //DX20190718
     }
@@ -1988,9 +1990,11 @@ namespace compare {
     // load from input (istream, e.g., from 'cat' or redirect '<')
     else if(structure_name=="input geometry"){
       stringstream sss; sss << structure_source;
-      xstructure xstr(sss);
-      structure.clear(); //DX20210127
-      structure = xstr;
+      //DX20210129 [OBSOLETE] xstructure xstr(sss);
+      //DX20210129 [OBSOLETE] structure.clear(); //DX20210127
+      //DX20210129 [OBSOLETE] structure = xstr;
+      structure.clear(); //DX20210129
+      structure.reset(sss); //DX20210129
     }
     // ---------------------------------------------------------------------------
     // load permutation
@@ -1999,13 +2003,15 @@ namespace compare {
       //cerr << "permutation of: " << structure_name << endl;
       string tmp_source = structure_source;
       stringstream sss; sss << aurostd::StringSubst(tmp_source, "permutation of: ", "");
-      xstructure xstr(sss);
+      //DX20210129 [OBSOLETE] xstructure xstr(sss);
+      structure.clear(); //DX20210129
+      structure.reset(sss); //DX20210129
       deque<string> species;
       for(uint j=0;j<structure_name.size();j++){stringstream ss_site; ss_site << structure_name[j]; species.push_back(ss_site.str());}
-      xstr.SetSpecies(species);
-      xstr.SpeciesPutAlphabetic();
-      xstr.SetNumEachType();
-      structure = xstr;
+      structure.SetSpecies(species);
+      structure.SpeciesPutAlphabetic();
+      structure.SetNumEachType();
+      //DX20210129 [OBSOLETE] structure = xstr;
     }
     // ---------------------------------------------------------------------------
     // load-type not accounted for
@@ -2383,8 +2389,7 @@ void XtalFinderCalculator::generateAtomPermutedStructures(
     //DX TEST xstr_tmp.species_pp = species; //for vasp5 20190731
     xstr_tmp.species = species; //DX20190813
     xstr_tmp.species_pp = xstr_tmp.species; //for vasp5 20190731, after ordered
-    xstr_tmp.SpeciesPutAlphabetic();
-    xstr_tmp.SetNumEachType();
+    xstr_tmp.SpeciesPutAlphabetic(); // updates num each type
     xstr_tmp.ReScale(1.0); //DX20190715
     xstr_tmp.BringInCell(); //DX20200707
 
@@ -5012,38 +5017,41 @@ string XtalFinderCalculator::printStructureMappingResults(
       output << "Figure of Magnetic Failure:	    " << misfit_info.magnetic_failure << endl;
     }
     // transformation information (basis transformation, rotation, and origin shift)
-    output << "-------------------------------------------------------------------------"<<endl;
-    output << "STRUCTURE TRANSFORMATION (test structure -> reference structure)" << endl;
-    output << "Volume scaling factor:" << endl;
-    output << misfit_info.rescale_factor << endl;
-    output << "Basis Transformation:" << endl;
-    output << misfit_info.basis_transformation << endl;
-    output << "Rotation:" << endl;
-    output << misfit_info.rotation << endl;
-    output << "Origin Shift: " << ((xstr_mapped.coord_flag==_COORDS_CARTESIAN_) ? "(Cart.)" : "(Frac.)") << endl;
-    output << misfit_info.origin_shift << endl;
+    // (note: transformation info is not available with the supercell method)
+    if(!DEFAULT_XTALFINDER_SUPERCELL_METHOD){
+      output << "-------------------------------------------------------------------------"<<endl;
+      output << "STRUCTURE TRANSFORMATION (test structure -> reference structure)" << endl;
+      output << "Volume scaling factor:" << endl;
+      output << misfit_info.rescale_factor << endl;
+      output << "Basis Transformation:" << endl;
+      output << misfit_info.basis_transformation << endl;
+      output << "Rotation:" << endl;
+      output << misfit_info.rotation << endl;
+      output << "Origin Shift: " << ((xstr_mapped.coord_flag==_COORDS_CARTESIAN_) ? "(Cart.)" : "(Frac.)") << endl;
+      output << misfit_info.origin_shift << endl;
 
-    xstructure xstr_transformed = xstr_mapped;
-    // rescale transformed structure
-    xstr_transformed.InflateVolume(misfit_info.rescale_factor);
-    // apply transformations to xstructure
-    xstr_transformed.TransformStructure(
-        misfit_info.basis_transformation,
-        misfit_info.rotation,
-        misfit_info.origin_shift,
-        xstr_mapped.coord_flag);
+      xstructure xstr_transformed = xstr_mapped;
+      // rescale transformed structure
+      xstr_transformed.InflateVolume(misfit_info.rescale_factor);
+      // apply transformations to xstructure
+      xstr_transformed.TransformStructure(
+          misfit_info.basis_transformation,
+          misfit_info.rotation,
+          misfit_info.origin_shift,
+          xstr_mapped.coord_flag);
 
-    // mapping information
-    output << "-------------------------------------------------------------------------"<<endl;
-    output << printAtomMappings(misfit_info,xstr_reference,xstr_transformed);
-    output << printUnmatchedAtoms(misfit_info,xstr_reference,xstr_transformed);
-    // closest matching representation of structures
-    output << "-------------------------------------------------------------------------"<<endl;
-    output << "FINAL - REFERENCE STRUCTURE: " << endl;	
-    output << xstr_reference << endl;
-    output << "-------------------------------------------------------------------------"<<endl;
-    output << "FINAL - MAPPED STRUCTURE: " << endl;
-    output << xstr_transformed;
+      // mapping information
+      output << "-------------------------------------------------------------------------"<<endl;
+      output << printAtomMappings(misfit_info,xstr_reference,xstr_transformed);
+      output << printUnmatchedAtoms(misfit_info,xstr_reference,xstr_transformed);
+      // closest matching representation of structures
+      output << "-------------------------------------------------------------------------"<<endl;
+      output << "FINAL - REFERENCE STRUCTURE: " << endl;	
+      output << xstr_reference << endl;
+      output << "-------------------------------------------------------------------------"<<endl;
+      output << "FINAL - MAPPED STRUCTURE: " << endl;
+      output << xstr_transformed;
+    }
   }
 
   return output.str();
@@ -6831,32 +6839,28 @@ namespace compare {
     bool skew = false;
     double tol=0.01;
 
-    deque<_atom> new_basis = foldAtomsInCell(new_basis_2, proto.lattice, proto_new.lattice, skew, tol, false);
-    //DX20210108 [OBSOLETE] deque<_atom> new_basis;
-    //DX20210108 [OBSOLETE] xvector<double> tmp; //DX20200330 - declare outside loop
-    //DX20210108 [OBSOLETE] for(uint j=0;j<new_basis_2.size();j++){
-    //DX20210108 [OBSOLETE]   bool duplicate_lattice_point=false;
-    //DX20210108 [OBSOLETE]   for(uint a=0; a<new_basis.size(); a++){
-    //DX20210108 [OBSOLETE]     tmp = BringInCell(new_basis_2[j].fpos,1e-10);
-    //DX20210108 [OBSOLETE]     if(SYM::MapAtom(new_basis[a].fpos,tmp,proto_new.lattice,f2c,skew,tol)){
-    //DX20210108 [OBSOLETE]       duplicate_lattice_point=true;
-    //DX20210108 [OBSOLETE]       break;
-    //DX20210108 [OBSOLETE]     }
-    //DX20210108 [OBSOLETE]   }
-    //DX20210108 [OBSOLETE]   if(duplicate_lattice_point==false){
-    //DX20210108 [OBSOLETE]     new_basis_2[j].fpos = BringInCell(new_basis_2[j].fpos,1e-10);
-    //DX20210108 [OBSOLETE]     new_basis_2[j].cpos = f2c*new_basis_2[j].fpos;
-    //DX20210108 [OBSOLETE]     new_basis.push_back(new_basis_2[j]);
-    //DX20210108 [OBSOLETE]   }
-    //DX20210108 [OBSOLETE] }
+    //DX2021029 [OBSOLETE - doesn't work because of pre-filtering above] deque<_atom> new_basis = foldAtomsInCell(new_basis_2, proto.lattice, proto_new.lattice, skew, tol, false);
+    deque<_atom> new_basis;
+    xvector<double> tmp; //DX20200330 - declare outside loop
+    for(uint j=0;j<new_basis_2.size();j++){
+      bool duplicate_lattice_point=false;
+      for(uint a=0; a<new_basis.size(); a++){
+        tmp = BringInCell(new_basis_2[j].fpos,1e-10);
+        if(SYM::MapAtom(new_basis[a].fpos,tmp,proto_new.lattice,f2c,skew,tol)){
+          duplicate_lattice_point=true;
+          break;
+        }
+      }
+      if(duplicate_lattice_point==false){
+        new_basis_2[j].fpos = BringInCell(new_basis_2[j].fpos,1e-10);
+        new_basis_2[j].cpos = f2c*new_basis_2[j].fpos;
+        new_basis.push_back(new_basis_2[j]);
+      }
+    }
     std::stable_sort(new_basis.begin(),new_basis.end(),sortAtomsNames); //DX20190709 - need to sort now
-    proto_new.atoms = new_basis;
-    proto_new.BringInCell(1e-10);
-    proto_new.FixLattices();
-    proto_new.SpeciesPutAlphabetic();
-    proto_new.SetNumEachType();
-    proto_new.species = proto.species; //DX20190718
-    proto_new.MakeBasis(); //DX20200522
+    for(uint i=0;i<new_basis.size();i++){
+      proto_new.AddAtom(new_basis[i]);
+    }
     proto = proto_new;
 
     return proto;
