@@ -13,6 +13,8 @@
         -- removing POSCAR.orig from --xplug check, it's already in the aflow.in (CO)
         -- adding --force to LIB2LIB (CO)
         -- implemented new on-the-fly threading scheme into AAPL (ME)
+        -- Fixed bug with assignment of normal and umklapp processes for phase space calculations. (ME)
+        -- Added bounds to inCell() function. (ME)
 3.2.6 - 2020/12/30
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.6.tar.xz
         -- Bibtex for publications - aflowlib.h aflowlib_web_outreach.cpp (SC)
