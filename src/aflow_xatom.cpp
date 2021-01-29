@@ -13362,12 +13362,15 @@ double NearestNeighborToAtom(const xstructure& xstr, uint k) {
   xvector<double> tmp_coord, incell_dist, a_component, ab_component; //DX20200329
   double incell_mod=AUROSTD_MAX_DOUBLE;
 
-  for(uint ii=0; ii<xstr.atoms.size(); ii++){
+  uint ii=0, m=0, n=0, p=0, m_size=0, n_size=0, p_size=0;
+
+  for(ii=0; ii<xstr.atoms.size(); ii++){
     if(ii!=k){
       if(min_dist<prev_min_dist){
         if(!(dims[1]==1 && dims[2]==1 && dims[3]==1)){
           resetLatticeDimensions(lattice,min_dist,dims,l1,l2,l3,a_index,b_index,c_index);
           prev_min_dist=min_dist;
+          m_size = l1.size(); n_size = l2.size(); p_size = l3.size();
         }
       }
       incell_dist = xstr.atoms[k].cpos-xstr.atoms[ii].cpos;
@@ -13375,15 +13378,16 @@ double NearestNeighborToAtom(const xstructure& xstr, uint k) {
       if(incell_mod<min_dist){
         if(!(dims[1]==1 && dims[2]==1 && dims[3]==1)){
           resetLatticeDimensions(lattice,incell_mod,dims,l1,l2,l3,a_index,b_index,c_index);
+          m_size = l1.size(); n_size = l2.size(); p_size = l3.size();
         }
         prev_min_dist=incell_mod;
       }
       //DX20180423 - running vector in each loop saves computations; fewer duplicate operations
-      for(uint m=0;m<l1.size();m++){
+      for(m=0;m<m_size;m++){
         a_component = incell_dist + l1[m];    //DX : coord1-coord2+a*lattice(1)
-        for(uint n=0;n<l2.size();n++){
+        for(n=0;n<n_size;n++){
           ab_component = a_component + l2[n]; //DX : coord1-coord2+a*lattice(1) + (b*lattice(2))
-          for(uint p=0;p<l3.size();p++){
+          for(p=0;p<p_size;p++){
             tmp_coord = ab_component + l3[p]; //DX : coord1-coord2+a*lattice(1) + (b*lattice(2)) + (c*lattice(3))
             min_dist=aurostd::min(min_dist,aurostd::modulus(tmp_coord));
           }
