@@ -828,6 +828,8 @@ namespace init {
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.getattachedscheme(\"ARUNS2SKIP\")=" << XHOST.vflag_control.getattachedscheme("ARUNS2SKIP") << endl;  //CO20200624
     XHOST.vflag_control.flag("NEGLECT_CCE",aurostd::args2attachedflag(argv,"--neglect_cce|--no_cce|--neglectcce|--nocce")); //CO20210115
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"NEGLECT_CCE\")=" << XHOST.vflag_control.flag("NEGLECT_CCE") << endl;  //CO20210115
+    XHOST.vflag_control.flag("FORCE_POCC",aurostd::args2attachedflag(argv,"--force_pocc")); //CO20210115
+    if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"FORCE_POCC\")=" << XHOST.vflag_control.flag("FORCE_POCC") << endl;  //CO20210115
 
     // [CT20200320] run full AEL post-processing for POCC
     XHOST.vflag_control.flag("AEL_RUN_POSTPROCESSING",aurostd::args2flag(XHOST.argv,cmds,"--ael_run_postprocessing"));  //CT20200320

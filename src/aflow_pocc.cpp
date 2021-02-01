@@ -1922,7 +1922,7 @@ namespace pocc {
   POccCalculator::POccCalculator(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,const _kflags& kflags,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(FileMESSAGE,oss),m_initialized(false) {initialize(xstr_pocc,pocc_flags,aflags,kflags);}
   POccCalculator::POccCalculator(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(FileMESSAGE,oss),m_initialized(false) {initialize(xstr_pocc,pocc_flags,aflags,vflags);}
   POccCalculator::POccCalculator(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(FileMESSAGE,oss),m_initialized(false) {initialize(xstr_pocc,pocc_flags,aflags,kflags,vflags);}
-  POccCalculator::POccCalculator(const POccCalculator& b) : xStream(*b.getOFStream(),*b.getOSS()) {copy(b);} // copy PUBLIC
+  POccCalculator::POccCalculator(const POccCalculator& b) : POccCalculatorTemplate(),xStream(*b.getOFStream(),*b.getOSS()) {copy(b);} // copy PUBLIC
 
   POccCalculator::~POccCalculator() {xStream::free();free();}
 
@@ -4759,7 +4759,13 @@ namespace pocc {
   void POccCalculatorTemplate::setAFlags(const _aflags& aflags) {m_aflags.clear();m_aflags=aflags;}
 
   void POccCalculatorTemplate::setPOccStructure(const xstructure& _xstr_pocc){
+    string soliloquy=XPID+"POccCalculatorTemplate::setPOccStructure():";
     xstr_pocc=_xstr_pocc;
+    if(!pflow::checkAnionSublattice(xstr_pocc)){  //CO20210201
+      if(!XHOST.vflag_control.flag("FORCE_POCC")){
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Found non-anion in anion sublattice. Please check (and run with --force_pocc).",_VALUE_ILLEGAL_);
+      }
+    }
     types2pc_map=getTypes2PCMap(xstr_pocc);     //get types2pc_map
     xvector<double> _stoich_each_type(xstr_pocc.stoich_each_type.size()-1,0);stoich_each_type=_stoich_each_type;
     for(uint i=0;i<xstr_pocc.stoich_each_type.size();i++){stoich_each_type[i]=xstr_pocc.stoich_each_type[i];}
@@ -6247,7 +6253,7 @@ namespace pocc {
   POccUFFEnergyAnalyzer::POccUFFEnergyAnalyzer(const xstructure& xstr_pocc,const xstructure& xstr_nopocc,const vector<string>& species_redecoration,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(FileMESSAGE,oss),m_initialized(false) {initialize(xstr_pocc,xstr_nopocc,species_redecoration,aflags);}
   POccUFFEnergyAnalyzer::POccUFFEnergyAnalyzer(const xstructure& xstr_pocc,const xstructure& xstr_nopocc,const vector<string>& species_redecoration,const aurostd::xoption& pocc_flags,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(FileMESSAGE,oss),m_initialized(false) {initialize(xstr_pocc,xstr_nopocc,species_redecoration,pocc_flags,aflags);}
 
-  POccUFFEnergyAnalyzer::POccUFFEnergyAnalyzer(const POccUFFEnergyAnalyzer& b) : xStream(*b.getOFStream(),*b.getOSS()) {copy(b);} // copy PUBLIC
+  POccUFFEnergyAnalyzer::POccUFFEnergyAnalyzer(const POccUFFEnergyAnalyzer& b) : POccCalculatorTemplate(),xStream(*b.getOFStream(),*b.getOSS()) {copy(b);} // copy PUBLIC
 
   POccUFFEnergyAnalyzer::~POccUFFEnergyAnalyzer() {free();}
 

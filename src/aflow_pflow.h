@@ -408,6 +408,7 @@ namespace pflow {
   bool sortPOCCOccs(const string& occ1,const string& occ2); //CO20181226
   bool FIX_PRECISION_POCC(const string& occ,string& new_occ); //CO20181226
   void FIX_POCC_PARAMS(const xstructure& xstr,string& pocc_params); //CO20181226
+  bool checkAnionSublattice(const xstructure& xstr);  //CO20210201
   bool convertXStr2POCC(xstructure& xstr,const string& pocc_params,const vector<string>& vspecies,const vector<double>& vvolumes);  //CO20181226
   xstructure PROTO_LIBRARIES(aurostd::xoption vpflow);
   bool PROTO_AFLOW(aurostd::xoption vpflow,bool flag_REVERSE);  // too many options

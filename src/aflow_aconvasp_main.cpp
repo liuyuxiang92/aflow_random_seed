@@ -11702,6 +11702,50 @@ namespace pflow {
 // ***************************************************************************
 // ./aflow --proto=T0009.ABC:Br:Cl:Cs_sv:I:Pb_d:Sm --pocc_params=S0-1xC_S1-0.5xE-0.5xF_S2-0.3333xA-0.3333xB-0.3333xD
 namespace pflow {
+  bool checkAnionSublattice(const xstructure& xstr){  //CO20210201
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy=XPID+"pflow::checkAnionSublattice():";
+    vector<string> vanions;aurostd::string2tokens("B,C,N,O",vanions,",");
+    vector<vector<string> > voccupants;
+    vector<xvector<double> > vsites;  //cpos
+    vector<bool> vanions_found;
+    uint i=0,j=0;
+    bool found=false;
+    for(i=0;i<xstr.atoms.size();i++){
+      found=false;
+      for(j=0;j<voccupants.size()&&!found;j++){
+        if(aurostd::modulus(vsites[j]-xstr.atoms[i].cpos)<_AFLOW_POCC_ZERO_TOL_){
+          if(!aurostd::WithinList(voccupants[j],xstr.atoms[i].cleanname)){
+            voccupants[j].push_back(xstr.atoms[i].cleanname);
+            if(aurostd::WithinList(vanions,xstr.atoms[i].cleanname)){vanions_found[j]=true;}
+            found=true;
+          }
+        }
+      }
+      if(!found){
+        vsites.push_back(xstr.atoms[i].cpos);
+        voccupants.push_back(vector<string>(0));
+        voccupants.back().push_back(xstr.atoms[i].cleanname);
+        vanions_found.push_back(aurostd::WithinList(vanions,xstr.atoms[i].cleanname));
+      }
+    }
+    if(vsites.size()!=voccupants.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"vsites.size()!=voccupants.size()",_RUNTIME_ERROR_);}
+    if(vsites.size()!=vanions_found.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"vsites.size()!=vanions_found.size()",_RUNTIME_ERROR_);}
+    if(LDEBUG){
+      for(j=0;j<voccupants.size();j++){cerr << soliloquy << " site=" << j << " occupants=" << aurostd::joinWDelimiter(voccupants[j],",") << " [ANIONS_SUBLATTICE=" << vanions_found[j] << "]" << endl;}
+    }
+    for(j=0;j<voccupants.size();j++){
+      if(vanions_found[j]){
+        for(i=0;i<voccupants[j].size();i++){
+          if(!aurostd::WithinList(vanions,voccupants[j][i])){
+            if(LDEBUG){cerr << soliloquy << " found non-anion in anion_sublattice: " << voccupants[j][i] << endl;}
+            return false;
+          }
+        }
+      }
+    }
+    return true;
+  }
   bool convertXStr2POCC(xstructure& xstr,const string& pocc_params,const vector<string>& _vspecies,const vector<double>& vvolumes){ //CO20181226
     if(pocc_params.empty()){return false;}
     vector<string> vspecies;
@@ -12219,6 +12263,11 @@ namespace pflow {
       pflow::FIX_POCC_PARAMS(str,pocc_parameters);
       convertXStr2POCC(str,pocc_parameters,vstr_orig,vnum_orig);
       setPOCCTOL(str,pocc_tol);
+      if(!pflow::checkAnionSublattice(str)){ //CO20210201
+        if(!XHOST.vflag_control.flag("FORCE_POCC")){
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Found non-anion in anion sublattice. Please check (and run with --force_pocc).",_VALUE_ILLEGAL_);
+        }
+      }
     }
 
     if(LDEBUG) for(uint i=0;i<str.species.size();i++) if(str.species.at(i)!="") cerr << "DEBUG specie(" << i << ")=" << str.species.at(i) << endl;

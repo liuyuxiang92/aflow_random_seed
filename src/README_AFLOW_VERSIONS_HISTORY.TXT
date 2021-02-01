@@ -27,6 +27,7 @@
         -- created ChullPointLight() which reduces memory load and speeds up chull calculations (CO)
         -- adding bool check_present to AddAtom() for AddCorners() (CO)
         -- adding --vasp5 option (CO)
+        -- added check for sublattice decorations and --force_pocc to override check (CO)
 3.2.6 - 2020/12/30
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.6.tar.xz
         -- Bibtex for publications - aflowlib.h aflowlib_web_outreach.cpp (SC)

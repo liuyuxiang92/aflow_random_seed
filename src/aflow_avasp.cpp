@@ -1761,6 +1761,11 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
           pflow::FIX_POCC_PARAMS(xvasp.str,xvasp.AVASP_pocc_parameters);
           pflow::convertXStr2POCC(xvasp.str,xvasp.AVASP_pocc_parameters,species_pp_orig,species_volume_orig);
           pflow::setPOCCTOL(xvasp.str,xvasp.AVASP_pocc_tol);
+          if(!pflow::checkAnionSublattice(xvasp.str)){  //CO20210201
+            if(!XHOST.vflag_control.flag("FORCE_POCC")){
+              throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Found non-anion in anion sublattice. Please check (and run with --force_pocc).",_VALUE_ILLEGAL_);
+            }
+          }
           if(LDEBUG) {cerr << soliloquy << "POCC structure" << endl << xvasp.str << endl;}
         } else {
           xvasp.str=aflowlib::PrototypeLibraries(oaus,xvasp.AVASP_label,xvasp.AVASP_parameters,xvasp.str.species_pp,xvasp.str.species_volume,xvasp.AVASP_volume_in,xvasp_in.AVASP_prototype_mode); 
