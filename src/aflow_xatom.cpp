@@ -6863,20 +6863,19 @@ void xstructure::AddAtom(const _atom& atom, bool check_present) {
   }
   if(1) {
     // sort by types and partial occupation (highest occupation first)
-    std::stable_sort(atoms.begin(), atoms.end(), sortAtomsTypes);
-    //DX20210202 [OBSOLETE] std::deque<_atom>::iterator it=atoms.begin();
-    //DX20210202 [OBSOLETE] for(uint iat=0;iat<atoms.size()&&!found;iat++,it++) {
-    //DX20210202 [OBSOLETE]   if(iat<atoms.size()-1) {
-    //DX20210202 [OBSOLETE]     //	cerr << "HERE0 iat=" << iat << "  atoms[iat].type=" << atoms[iat].type << "  btom.type=" << btom.type << endl;
-    //DX20210202 [OBSOLETE]     if((atoms[iat].type==btom.type && atoms.at(iat+1).type!=btom.type) || 
-    //DX20210202 [OBSOLETE]         (atoms[iat].type==btom.type && atoms.at(iat+1).partial_occupation_value<btom.partial_occupation_value)) {  //CO20180705 - for pocc sorting, larger pocc ahead of smaller pocc
-    //DX20210202 [OBSOLETE]       //	if(LDEBUG)
-    //DX20210202 [OBSOLETE]       //	  cerr << "HERE1 iat=" << iat << "  atoms[iat].type=" << atoms[iat].type << "  btom.type=" << btom.type << endl;//" atoms.begin()=" <<  long(atoms.begin()) << endl;
-    //DX20210202 [OBSOLETE]       atoms.insert(it+1,btom);  // it is iterator, fine for insert.
-    //DX20210202 [OBSOLETE]       found=TRUE;
-    //DX20210202 [OBSOLETE]     }
-    //DX20210202 [OBSOLETE]   }
-    //DX20210202 [OBSOLETE] }
+    std::deque<_atom>::iterator it=atoms.begin();
+    for(uint iat=0;iat<atoms.size()&&!found;iat++,it++) {
+      if(iat<atoms.size()-1) {
+        //	cerr << "HERE0 iat=" << iat << "  atoms[iat].type=" << atoms[iat].type << "  btom.type=" << btom.type << endl;
+        if((atoms[iat].type==btom.type && atoms.at(iat+1).type!=btom.type) || 
+            (atoms[iat].type==btom.type && atoms.at(iat+1).partial_occupation_value<btom.partial_occupation_value)) {  //CO20180705 - for pocc sorting, larger pocc ahead of smaller pocc
+          //	if(LDEBUG)
+          //	  cerr << "HERE1 iat=" << iat << "  atoms[iat].type=" << atoms[iat].type << "  btom.type=" << btom.type << endl;//" atoms.begin()=" <<  long(atoms.begin()) << endl;
+          atoms.insert(it+1,btom);  // it is iterator, fine for insert.
+          found=TRUE;
+        }
+      }
+    }
   }
   // if never found add at the end
   if(!found) atoms.push_back(btom);
