@@ -1109,8 +1109,14 @@ void XtalFinderCalculator::setStructureAsRepresentative(StructurePrototype& stru
   // XtalFinderCalculator container.
 
   //bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_COMPARE_);
-  //string function_name = XPID + "XtalFinderCalculator::setStructureAsRepresentative():";
-  //stringstream message;
+
+  // check pointer is not null
+  if(str_pointer == NULL){
+    string function_name = XPID + "XtalFinderCalculator::setStructureAsRepresentative():";
+    stringstream message;
+    message << "Input is a null pointer.";
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_ERROR_);
+  }
 
   // point to the input
   structure_tmp.structure_representative = str_pointer;
@@ -1148,6 +1154,14 @@ void XtalFinderCalculator::addStructure2duplicatesList(StructurePrototype& struc
 void XtalFinderCalculator::addStructure2duplicatesList(StructurePrototype& structure_tmp,
     structure_container* str_pointer){
 
+  // check pointer is not null
+  if(str_pointer == NULL){
+    string function_name = XPID + "XtalFinderCalculator::addStructure2duplicatesList():";
+    stringstream message;
+    message << "Input is a null pointer.";
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_ERROR_);
+  }
+
   structure_tmp.structures_duplicate.push_back(str_pointer);
 
   // initialize
@@ -1174,6 +1188,14 @@ void XtalFinderCalculator::addStructure2sameFamilyList(StructurePrototype& struc
 
   // Index corresponds to element in StructurePrototype object.
 
+  // check pointer is not null
+  if(structure_tmp.structures_duplicate[index] == NULL){
+    string function_name = XPID + "XtalFinderCalculator::addStructure2sameFamilyList():";
+    stringstream message;
+    message << "Pointer at index " << index << " is a null pointer.";
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_ERROR_);
+  }
+
   structure_tmp.structures_family.push_back(structure_tmp.structures_duplicate[index]);
 
   // add misfit
@@ -1186,6 +1208,14 @@ void XtalFinderCalculator::addStructure2sameFamilyList(StructurePrototype& struc
 
   // Similar to variant above, but this resets the misfit object
   // (so it cannot be combined with function above).
+
+  // check pointer is not null
+  if(str_pointer == NULL){
+    string function_name = XPID + "XtalFinderCalculator::addStructure2sameFamilyList():";
+    stringstream message;
+    message << "Input is a null pointer.";
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_ERROR_);
+  }
 
   structure_tmp.structures_family.push_back(str_pointer);
 
@@ -1225,6 +1255,14 @@ void StructurePrototype::copyDuplicate(const StructurePrototype& b,
     bool copy_misfit){ //DX20190730 - added copy_misfit option
 
   // Copy structure at index as a potential duplicate in this object
+
+  // check pointer is not null
+  if(b.structures_duplicate[index] == NULL){
+    string function_name = XPID + "StructurePrototype::copyDuplicate():";
+    stringstream message;
+    message << "Pointer at index " << index << " is a null pointer.";
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_ERROR_);
+  }
 
   // point to the structure in the container at correponding index
   structures_duplicate.push_back(b.structures_duplicate[index]);

@@ -1483,10 +1483,8 @@ class xstructure {
     void SetCoordinates(int mode);                                // change coordinates
     void MakeBasis(void);                                         // make basis for atoms (basis and number)
     void MakeTypes(void);                                         // refresh types based on num_each_type  //CO20180420
-    void AddAtom(const _atom& atom,
-        bool check_atom_overlap=true);                            // adding an atom //DX20210129 - add option to check atom overlap
-    void AddAtoms(const deque<_atom>& atom,
-        bool check_atom_overlap=true);                            // adding a deque<_atom> //DX20210201
+    void AddAtom(const _atom& atom,bool check_present=true);      // adding an atom
+    void AddAtoms(const deque<_atom>& atom,bool check_present=true);// adding a deque<_atom> //DX20210201
     void AddAtom_POCC(const _atom& atom);                         // adding an atom FOR POCC ONLY
     void RemoveAtom(const uint& iat);                             // deleting an atom (index)
     void RemoveAtom(vector<uint>& v_atoms_to_remove);             // deleting many atoms (indices)

@@ -6705,17 +6705,15 @@ void xstructure::MakeTypes(void) {
 // This adds a deque<_atom> to the structure.
 // More efficient than adding one atom at a time (AddAtom);
 // update species and basis at the end
-// By default, we check if the atoms overlap, but this is often checked
-// externally (e.g., symmetry routines, etc.), so an input has been
-// added to toggle this check
-void xstructure::AddAtoms(const deque<_atom>& atoms_in, bool check_atom_overlap) { //DX20210129 - added check_atom_overlap
+
+void xstructure::AddAtoms(const deque<_atom>& atoms_in, bool check_present) { //DX20210129
   bool LDEBUG=(FALSE || XHOST.DEBUG); 
 
   // check that this atom is not already present
   xvector<double> a1(3),a2(3),a3(3),aijk(3);
   a1=lattice(1);a2=lattice(2);a3=lattice(3);
 
-  if(check_atom_overlap){ //DX20210129
+  if(check_present){
     for(uint iat=0;iat<atoms_in.size();iat++){
       bool FOUND_POSITION=FALSE;
       for(uint jat=iat+1;jat<atoms_in.size()&&FOUND_POSITION==FALSE;jat++){
@@ -6783,19 +6781,17 @@ void xstructure::AddAtoms(const deque<_atom>& atoms_in, bool check_atom_overlap)
 // xstructure::AddAtom
 // **************************************************************************
 // This adds an atom to the structure.
-// By default, we check if the atoms overlap, but this is often checked
-// externally (e.g., symmetry routines, etc.), so an input has been
-// added to toggle this check
-void xstructure::AddAtom(const _atom& atom, bool check_atom_overlap) { //DX20210129 - added check_atom_overlap
+
+void xstructure::AddAtom(const _atom& atom, bool check_present) {
   bool LDEBUG=(FALSE || XHOST.DEBUG); 
   //DX20210202 _atom btom;btom=atom;
   _atom btom=atom; //DX20210202
 
-  // check that this atom is not already present
-  xvector<double> a1(3),a2(3),a3(3),aijk(3);
-  a1=lattice(1);a2=lattice(2);a3=lattice(3);
+  if(check_present){ //CO20210116 - AddCorners() should NOT check
+    // check that this atom is not already present
+    xvector<double> a1(3),a2(3),a3(3),aijk(3);
+    a1=lattice(1);a2=lattice(2);a3=lattice(3);
 
-  if(check_atom_overlap){ //DX20210129
     bool FOUND_POSITION=FALSE;
     for(uint iat=0;iat<atoms.size()&&FOUND_POSITION==FALSE;iat++)
       if(atoms[iat].type==atom.type && atoms[iat].name==atom.name)
@@ -6966,7 +6962,7 @@ void xstructure::RemoveAtoms(void) { //DX20210129
   order_parameter_atoms.clear();
 }
 
-void xstructure::ReplaceAtoms(const deque<_atom>& new_atoms, bool check_atom_overlap){ //CO20190520 //DX20210129 - added check_atom_overlap
+void xstructure::ReplaceAtoms(const deque<_atom>& new_atoms, bool check_present){ //CO20190520 //DX20210129 - added check_present
   //this is the SAFEST/CLEANEST way to replace atoms in an xstructure
   //it takes care of num_each_type, species, etc.
   bool LDEBUG=(FALSE || XHOST.DEBUG);
@@ -6980,8 +6976,8 @@ void xstructure::ReplaceAtoms(const deque<_atom>& new_atoms, bool check_atom_ove
   RemoveAtoms(); //DX20210129 - remove all atoms and clear species variables
   
   if(LDEBUG) cerr << soliloquy << " adding new atoms" << endl;
-  //DX20210202 [OBSOLETE] for(uint i=0;i<new_atoms.size();i++){AddAtom(new_atoms[i], check_atom_overlap);}  //adding atoms
-  AddAtoms(new_atoms, check_atom_overlap);  //adding atoms
+  //DX20210202 [OBSOLETE] for(uint i=0;i<new_atoms.size();i++){AddAtom(new_atoms[i]);}  //adding atoms
+  AddAtoms(new_atoms, check_present);  //adding atoms
     
   (*this).SpeciesPutAlphabetic(); //DX20210129
 }
