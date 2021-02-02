@@ -1266,7 +1266,6 @@ void GetUnitCellRep(const xvector<double>& ppos,xvector<double>& p_cell0,xvector
 string xstructure2json(xstructure& xstr); //DX20170831 - xstructure2json
 string atom2json(_atom& atom, int coord_flag, int poccupation); //DX20170831 - atom2json
 
-string getLeastFrequentAtomType(const xstructure& xstr, bool clean=true); //DX20201230 - moved from XtalFinder
 vector<string> getLeastFrequentAtomTypes(const xstructure& xstr, bool clean=true); //DX20201230 - moved from XtalFinder
 
 // --------------------------------------------------------------------------
@@ -1485,11 +1484,14 @@ class xstructure {
     void SetCoordinates(int mode);                                // change coordinates
     void MakeBasis(void);                                         // make basis for atoms (basis and number)
     void MakeTypes(void);                                         // refresh types based on num_each_type  //CO20180420
-    void AddAtom(const _atom& atom);                              // adding an atom
+    void AddAtom(const _atom& atom,
+        bool check_atom_overlap=true);                            // adding an atom //DX20210129 - add option to check atom overlap
     void AddAtom_POCC(const _atom& atom);                         // adding an atom FOR POCC ONLY
     void RemoveAtom(const uint& iat);                             // deleting an atom (index)
     void RemoveAtom(vector<uint>& v_atoms_to_remove);             // deleting many atoms (indices)
-    void ReplaceAtoms(const deque<_atom>& new_atoms);             // replace all atoms SAFELY/CLEANLY
+    void RemoveAtoms(void);                                       // removes all atoms //DX20210129
+    void ReplaceAtoms(const deque<_atom>& new_atoms,
+        bool check_atom_overlap=true);                            // replace all atoms SAFELY/CLEANLY //DX20210129 - added option to check atom overlap
     void RemoveCopies(double=1.0e-3);                             // deleting atoms too close F/C
     void RemoveFractionalCopies(double=1.0e-3);                   // deleting atoms too close F
     void RemoveCartesianCopies(double=1.0e-3);                    // deleting atoms too close C

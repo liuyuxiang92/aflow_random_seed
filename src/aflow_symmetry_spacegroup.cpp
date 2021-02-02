@@ -822,7 +822,7 @@ uint xstructure::GetPrimitiveCell(void) {
 
   int atom_count = (*this).atoms.size();
   deque<_atom> atomic_basis_;
-  deque<int> basistypes;
+  //DX20210129 [OBSOLETE] deque<int> basistypes;
 
   // Copy deque<_atoms> atoms (IN XSTRUCTURE) to atomic_basis_ to manipulate free of xstructure
   for (int i = 0; i < atom_count; i++) {
@@ -871,8 +871,8 @@ uint xstructure::GetPrimitiveCell(void) {
     prim_lattice = SYM::xvec2xmat(lattice_basis[0], lattice_basis[1], lattice_basis[2]);
     foundbasis = true;
     sort(atomic_basis_.begin(), atomic_basis_.end(), sortAtomsTypes);
-    numofatoms = ::GetNumEachType(atomic_basis_);
-    basistypes = numofatoms;
+    //DX20210129 [OBSOLETE] numofatoms = ::GetNumEachType(atomic_basis_);
+    //DX20210129 [OBSOLETE] basistypes = numofatoms;
   }
 
   deque<_atom> newbasis;
@@ -965,8 +965,8 @@ uint xstructure::GetPrimitiveCell(void) {
       prim_lattice = SYM::xvec2xmat(lattice_basis[0], lattice_basis[1], lattice_basis[2]);
       foundbasis = true;
       sort(atomic_basis_.begin(), atomic_basis_.end(), sortAtomsTypes);
-      numofatoms = ::GetNumEachType(atomic_basis_);
-      basistypes = numofatoms;
+      //DX20210129 [OBSOLETE] numofatoms = ::GetNumEachType(atomic_basis_);
+      //DX20210129 [OBSOLETE] basistypes = numofatoms;
 
     } else {
       //Here because the original poscar is not primitive
@@ -1045,8 +1045,8 @@ uint xstructure::GetPrimitiveCell(void) {
       } else {
         //Overwrite basis types (update it for primitive cell):
         sort(newbasis.begin(), newbasis.end(), sortAtomsTypes);
-        numofatoms = ::GetNumEachType(newbasis);
-        basistypes = numofatoms;
+        //DX20210129 [OBSOLETE] numofatoms = ::GetNumEachType(newbasis);
+        //DX20210129 [OBSOLETE] basistypes = numofatoms;
         atomic_basis_.clear();
         atomic_basis_ = newbasis;
         if(atomic_basis_.size() == 0) {
@@ -1060,40 +1060,43 @@ uint xstructure::GetPrimitiveCell(void) {
   if(foundbasis == false) { return 1; }
 
   // ===== Put contents back in xstructure ===== //
-  deque<int> numtypes;
-  for (uint i = 0; i < basistypes.size(); i++) {
-    numtypes.push_back(basistypes[i]);
-  }
+  //DX20210129 [OBSOLETE] deque<int> numtypes;
+  //DX20210129 [OBSOLETE] for (uint i = 0; i < basistypes.size(); i++) {
+  //DX20210129 [OBSOLETE]   numtypes.push_back(basistypes[i]);
+  //DX20210129 [OBSOLETE] }
 
-  if(newbasis.size() > 0) {  //IF A NEW BASIS EXISTS (CELL WAS NOT PRIMITIVE) THEN OVERWRITE a.atoms
-    // cerr << "USING NEW BASIS" << endl;
-    // Remove old basis
-    while ((*this).atoms.size() > 0) {
-      (*this).RemoveAtom((uint)0);
-    }
-    (*this).species.clear(); //DX
-    for (uint i = 0; i < newbasis.size(); i++) {
-      _atom tmp_atom = newbasis[i]; //DX20191011 - initialized instead of setting individually below
-      //DX20191011 [OBSOLETE] tmp_atom.fpos = newbasis[i].fpos;
-      //DX20191011 [OBSOLETE] tmp_atom.cpos = newbasis[i].cpos;
-      //DX20191011 [OBSOLETE] tmp_atom.name = newbasis[i].name;
-      //DX20191011 [OBSOLETE] tmp_atom.type = newbasis[i].type;
-      //DX20191011 [OBSOLETE] tmp_atom.name_is_given = true;
-      //DX20191011 [OBSOLETE] tmp_atom.spin = newbasis[i].spin; //DX20170921 - magnetic sym
-      tmp_atom.spin_is_given = false; //DX20170921 - magnetic sym
-      if(aurostd::abs(tmp_atom.spin)>_ZERO_TOL_){
-        tmp_atom.spin_is_given = true; //DX20170921 - magnetic sym
-      }
-      tmp_atom.noncoll_spin = newbasis[i].noncoll_spin; //DX20171205 - magnetic sym (non-collinear)
-      tmp_atom.noncoll_spin_is_given = false; //DX20171205 - magnetic sym (non-collinear)
-      if(aurostd::abs(tmp_atom.noncoll_spin(1))>_ZERO_TOL_ || aurostd::abs(tmp_atom.noncoll_spin(2))>_ZERO_TOL_ || aurostd::abs(tmp_atom.noncoll_spin(3))>_ZERO_TOL_){
-        tmp_atom.noncoll_spin_is_given = true; //DX20171205 - magnetic sym (non-collinear) //DX20191108 - fixed typo, should be noncoll_spin_is_given not spin_is_given
-      }
-      (*this).AddAtom(tmp_atom);
-    }
-  }
-  (*this).num_each_type = numtypes;
   (*this).lattice = prim_lattice;
+  if(newbasis.size() > 0) {  //IF A NEW BASIS EXISTS (CELL WAS NOT PRIMITIVE) THEN OVERWRITE a.atoms
+    sort(newbasis.begin(), newbasis.end(), sortAtomsTypes);
+    (*this).ReplaceAtoms(newbasis, false);
+    //DX20210129 [OBSOLETE] // cerr << "USING NEW BASIS" << endl;
+    //DX20210129 [OBSOLETE] // Remove old basis
+    //DX20210129 [OBSOLETE] while ((*this).atoms.size() > 0) {
+    //DX20210129 [OBSOLETE]   (*this).RemoveAtom((uint)0);
+    //DX20210129 [OBSOLETE] }
+    //DX20210129 [OBSOLETE] (*this).species.clear(); //DX
+    //DX20210129 [OBSOLETE] for (uint i = 0; i < newbasis.size(); i++) {
+    //DX20210129 [OBSOLETE]   _atom tmp_atom = newbasis[i]; //DX20191011 - initialized instead of setting individually below
+    //DX20210129 [OBSOLETE]   //DX20191011 [OBSOLETE] tmp_atom.fpos = newbasis[i].fpos;
+    //DX20210129 [OBSOLETE]   //DX20191011 [OBSOLETE] tmp_atom.cpos = newbasis[i].cpos;
+    //DX20210129 [OBSOLETE]   //DX20191011 [OBSOLETE] tmp_atom.name = newbasis[i].name;
+    //DX20210129 [OBSOLETE]   //DX20191011 [OBSOLETE] tmp_atom.type = newbasis[i].type;
+    //DX20210129 [OBSOLETE]   //DX20191011 [OBSOLETE] tmp_atom.name_is_given = true;
+    //DX20210129 [OBSOLETE]   //DX20191011 [OBSOLETE] tmp_atom.spin = newbasis[i].spin; //DX20170921 - magnetic sym
+    //DX20210129 [OBSOLETE]   tmp_atom.spin_is_given = false; //DX20170921 - magnetic sym
+    //DX20210129 [OBSOLETE]   if(aurostd::abs(tmp_atom.spin)>_ZERO_TOL_){
+    //DX20210129 [OBSOLETE]     tmp_atom.spin_is_given = true; //DX20170921 - magnetic sym
+    //DX20210129 [OBSOLETE]   }
+    //DX20210129 [OBSOLETE]   tmp_atom.noncoll_spin = newbasis[i].noncoll_spin; //DX20171205 - magnetic sym (non-collinear)
+    //DX20210129 [OBSOLETE]   tmp_atom.noncoll_spin_is_given = false; //DX20171205 - magnetic sym (non-collinear)
+    //DX20210129 [OBSOLETE]   if(aurostd::abs(tmp_atom.noncoll_spin(1))>_ZERO_TOL_ || aurostd::abs(tmp_atom.noncoll_spin(2))>_ZERO_TOL_ || aurostd::abs(tmp_atom.noncoll_spin(3))>_ZERO_TOL_){
+    //DX20210129 [OBSOLETE]     tmp_atom.noncoll_spin_is_given = true; //DX20171205 - magnetic sym (non-collinear) //DX20191108 - fixed typo, should be noncoll_spin_is_given not spin_is_given
+    //DX20210129 [OBSOLETE]   }
+    //DX20210129 [OBSOLETE]   (*this).AddAtom(tmp_atom);
+    //DX20210129 [OBSOLETE] }
+  }
+  //DX20210129 [OBSOLETE] (*this).num_each_type = numtypes;
+  //DX20210129 [moved earlier] (*this).lattice = prim_lattice;
   if(LDEBUG) {
     cerr << "xstructure::GetPrimitiveCell(): New primitivized cell:" << endl;
     cerr << (*this) << endl;
@@ -1681,15 +1684,17 @@ namespace SYM {
           conventional_basis_atoms[c].fpos = C2F(xstr_out.lattice, conventional_basis_atoms[c].cpos);
           in_names.push_back(conventional_basis_atoms[c].name);
         }
-        //Remove old atomic basis
-        while (xstr_out.atoms.size() > 0) {
-          xstr_out.RemoveAtom((uint)0);
-        }
-        xstr_out.species.clear();
-        // Add new atomic basis
-        for (uint c = 0; c < conventional_basis_atoms.size(); c++) {
-          xstr_out.AddAtom(conventional_basis_atoms[c]);
-        }
+
+        xstr_out.ReplaceAtoms(conventional_basis_atoms, false); //DX20210129
+        //DX20210129 [OBSOLETE] //Remove old atomic basis
+        //DX20210129 [OBSOLETE] while (xstr_out.atoms.size() > 0) {
+        //DX20210129 [OBSOLETE]   xstr_out.RemoveAtom((uint)0);
+        //DX20210129 [OBSOLETE] }
+        //DX20210129 [OBSOLETE] xstr_out.species.clear();
+        //DX20210129 [OBSOLETE] // Add new atomic basis
+        //DX20210129 [OBSOLETE] for (uint c = 0; c < conventional_basis_atoms.size(); c++) {
+        //DX20210129 [OBSOLETE]   xstr_out.AddAtom(conventional_basis_atoms[c]);
+        //DX20210129 [OBSOLETE] }
 
         //DX20190410 START
         // Check if AddAtom removed atoms
@@ -1703,7 +1708,7 @@ namespace SYM {
         //DX20190410 END
 
         // Set number of each type
-        xstr_out.SetNumEachType();
+        //DX20210129 [OBSOLETE - ReplaceAtoms takes care of this] xstr_out.SetNumEachType();
         if(xstr_out.num_each_type.size() != in_names.size()) {
           xstr_out = pflow::SetAllAtomNames(xstr_out, in_names);
         }

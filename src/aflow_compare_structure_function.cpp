@@ -5266,7 +5266,7 @@ namespace compare{
 
 // ***************************************************************************
 // DX20201230 - moved the following functions to aflow_xatom.cpp
-// compare::getLeastFrequentAtomType() & compare::getLeastFrequentAtomTypes()
+// compare::getLeastFrequentAtomTypes()
 // ***************************************************************************
 
 // ***************************************************************************
