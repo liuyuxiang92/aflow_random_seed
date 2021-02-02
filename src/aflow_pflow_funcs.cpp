@@ -2884,8 +2884,8 @@ namespace pflow {
       vector<string> names(nat,"H");
       vector<int> names_were_given(nat,FALSE);
       str=pflow::SetLat(str,lat_vec[is]);
-      //DX20210118 [Use xstructure method, perhaps others can be changed in the future] str=pflow::SetNumEachType(str,num_each_type);
-      str.SetNumEachType(num_each_type);
+      //DX20210118 [OBSOLETE] str=pflow::SetNumEachType(str,num_each_type);
+      str.num_each_type = num_each_type; //DX20210202 - replace SetNumEachType
       str=pflow::AddAllAtomPos(str,fpos_vec[is],0);
       str=pflow::SetAllAtomNames(str,names);
       str=pflow::SetNamesWereGiven(str,names_were_given);

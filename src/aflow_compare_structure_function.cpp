@@ -2010,7 +2010,7 @@ namespace compare {
       for(uint j=0;j<structure_name.size();j++){stringstream ss_site; ss_site << structure_name[j]; species.push_back(ss_site.str());}
       structure.SetSpecies(species);
       structure.SpeciesPutAlphabetic();
-      structure.SetNumEachType();
+      //DX20210202 [OBSOLETE] structure.SetNumEachType();
       //DX20210129 [OBSOLETE] structure = xstr;
     }
     // ---------------------------------------------------------------------------
@@ -6500,7 +6500,6 @@ namespace compare{
     // update atoms
     xstr_LFA_supercell.atoms = xstr_LFA_supercell.grid_atoms;
     xstr_LFA_supercell.grid_atoms.clear();
-    //xstr_LFA_supercell.SetNumEachType(sizes);
 
     if(LDEBUG){cerr << function_name << " Number of LFAs in supercell: " << xstr_LFA_supercell.atoms.size() << endl;}
 

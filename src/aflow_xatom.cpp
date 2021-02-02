@@ -6705,6 +6705,9 @@ void xstructure::MakeTypes(void) {
 // This adds a deque<_atom> to the structure.
 // More efficient than adding one atom at a time (AddAtom);
 // update species and basis at the end
+// By default, we check if the atoms overlap, but this is often checked
+// externally (e.g., symmetry routines, etc.), so an input has been
+// added to toggle this check
 void xstructure::AddAtoms(const deque<_atom>& atoms_in, bool check_atom_overlap) { //DX20210129 - added check_atom_overlap
   bool LDEBUG=(FALSE || XHOST.DEBUG); 
 
@@ -6770,50 +6773,9 @@ void xstructure::AddAtoms(const deque<_atom>& atoms_in, bool check_atom_overlap)
       num_each_type[species_position]++;
       comp_each_type[species_position]+=atoms[iat].partial_occupation_value;
     }
-    //DX20210202 [OBSOLETE] if(btom.name_is_given) {
-    //DX20210202 [OBSOLETE]   btom.CleanName();
-    //DX20210202 [OBSOLETE]   //DX20170921 - Need to keep spin info  btom.CleanSpin();
-    //DX20210202 [OBSOLETE] }
   }
   GetStoich();  //CO20170724
-
-  // OLD STYLE
-  //  atoms.push_back(btom);  MakeBasis(); return;
-
-  // NEW STYLE
-  //DX20210202 [OBSOLETE] bool found=FALSE;
-  //DX20210202 [OBSOLETE] if(0)  for(uint iat=0;iat<atoms.size()&&!found;iat++) {
-  //DX20210202 [OBSOLETE]   if(iat<atoms.size()-1) {
-  //DX20210202 [OBSOLETE]     if(atoms[iat].type==btom.type && atoms.at(iat+1).type!=btom.type) {
-  //DX20210202 [OBSOLETE]       //	if(LDEBUG)
-  //DX20210202 [OBSOLETE]       cerr << "HERE1 iat=" << iat << "  atoms[iat].type=" << atoms[iat].type << "  btom.type=" << btom.type << endl;//" atoms.begin()=" <<  long(atoms.begin()) << endl;
-  //DX20210202 [OBSOLETE]       atoms.insert(iat+atoms.begin()+1,btom); // potential problem  with CAST
-  //DX20210202 [OBSOLETE]       found=TRUE;
-  //DX20210202 [OBSOLETE]     }
-  //DX20210202 [OBSOLETE]   }
-  //DX20210202 [OBSOLETE] }
-  //DX20210202 [OBSOLETE] if(1) {
-    // sort by types and partial occupation (highest occupation first)
-    std::stable_sort(atoms.begin(), atoms.end(), sortAtomsTypes);
-    //DX20210201 [OBSOLETE] std::deque<_atom>::iterator it=atoms.begin();
-    //DX20210201 [OBSOLETE] for(uint iat=0;iat<atoms.size()&&!found;iat++,it++) {
-    //DX20210201 [OBSOLETE]   if(iat<atoms.size()-1) {
-    //DX20210201 [OBSOLETE]     //	cerr << "HERE0 iat=" << iat << "  atoms[iat].type=" << atoms[iat].type << "  btom.type=" << btom.type << endl;
-    //DX20210201 [OBSOLETE]     if((atoms[iat].type==btom.type && atoms.at[iat+1].type!=btom.type) || 
-    //DX20210201 [OBSOLETE]         (atoms[iat].type==btom.type && atoms.at[iat+1].partial_occupation_value<btom.partial_occupation_value)) {  //CO20180705 - for pocc sorting, larger pocc ahead of smaller pocc
-    //DX20210201 [OBSOLETE]       //	if(LDEBUG)
-    //DX20210201 [OBSOLETE]       //	  cerr << "HERE1 iat=" << iat << "  atoms[iat].type=" << atoms[iat].type << "  btom.type=" << btom.type << endl;//" atoms.begin()=" <<  long(atoms.begin()) << endl;
-    //DX20210201 [OBSOLETE]       atoms.insert(it+1,btom);  // it is iterator, fine for insert.
-    //DX20210201 [OBSOLETE]       found=TRUE;
-    //DX20210201 [OBSOLETE]     }
-    //DX20210201 [OBSOLETE]   }
-    //DX20210201 [OBSOLETE] }
-  //DX20210202 [OBSOLETE] }
-  // if never found add at the end
-  //DX20210201 [OBSOLETE] if(!found) atoms.push_back(btom);
-  // 
-  //  atoms.push_back(btom);
-  // done
+  std::stable_sort(atoms.begin(), atoms.end(), sortAtomsTypes);
   MakeBasis(); // need to update NUMBER and BASIS
 }
 
@@ -6821,7 +6783,9 @@ void xstructure::AddAtoms(const deque<_atom>& atoms_in, bool check_atom_overlap)
 // xstructure::AddAtom
 // **************************************************************************
 // This adds an atom to the structure.
-
+// By default, we check if the atoms overlap, but this is often checked
+// externally (e.g., symmetry routines, etc.), so an input has been
+// added to toggle this check
 void xstructure::AddAtom(const _atom& atom, bool check_atom_overlap) { //DX20210129 - added check_atom_overlap
   bool LDEBUG=(FALSE || XHOST.DEBUG); 
   //DX20210202 _atom btom;btom=atom;
@@ -13716,52 +13680,6 @@ void xstructure::SetAutoVolume(bool use_AFLOW_defaults_in) {  //CO20191010
 }
 
 // ***************************************************************************
-// Function GetNumEachType //DX20210118
-// ***************************************************************************
-// Get the number of each types based on atom.type
-// Generalized for structures where the atoms are not in alphabetical order
-// Updated form of SYM::arrange_atoms()
-deque<int> GetNumEachType(const deque<_atom>& atoms) {
-
-  vector<int> types; //aurostd::WithinList wants a vector
-  deque<int> num_each_type;
-  int match_index = 0;
-  for (uint i=0; i<atoms.size(); i++) {
-    if(aurostd::WithinList(types,atoms[i].type,match_index)){
-      num_each_type[match_index] += 1;
-    }
-    else{
-      types.push_back(atoms[i].type);
-      num_each_type.push_back(1);
-    }
-  }
-
-  return num_each_type;
-}
-
-// xstructure method
-// different than just returning xstr.num_each_type
-// if the xstructure has been transformed, num_each_type may not be accurate
-// need to get counts based on deque<_atom>
-deque<int> xstructure::GetNumEachType() {
-  return ::GetNumEachType((*this).atoms);
-}
-
-// ***************************************************************************
-// Function SetNumEachType //DX20210113 (from pflow, added in-place variant)
-// ***************************************************************************
-// Set the number of each type in xstructure
-// empty input: determine based on deque<_atom>
-void xstructure::SetNumEachType() {
-  (*this).num_each_type = (*this).GetNumEachType();
-}
-// deque<int> input
-void xstructure::SetNumEachType(const deque<int>& in_num_each_type) {
-  (*this).num_each_type = in_num_each_type;
-  //DX20210118 [CANNOT DO THIS - overwrites site occupation] (*this).comp_each_type = in_num_each_type;
-}
-
-// ***************************************************************************
 // Function InflateLattice
 // ***************************************************************************
 void xstructure::InflateLattice(const double &coefficient) {
@@ -17144,14 +17062,12 @@ void xstructure::ChangeBasis(const xmatrix<double>& transformation_matrix) {
   }
 
   // ---------------------------------------------------------------------------
-  // if the number of atoms changed, update the atom counts/order/types/etc.
+  // if the number of atoms changed (i.e., change in determinant is zero),
+  // update the atom counts/order/types/etc.
   if(!aurostd::isequal(aurostd::abs(basis_transformation_det_change), _ZERO_TOL_, _AUROSTD_XSCALAR_TOLERANCE_INTEGER_)){
     if(LDEBUG){ cerr << function_name << " updating atom count information." << endl; }
     std::stable_sort(atom_basis.begin(),atom_basis.end(),sortAtomsNames); //DX20210129
     (*this).ReplaceAtoms(atom_basis, false); //false: check_atom_overlap
-    //(*this).atoms = atom_basis;
-    //(*this).SpeciesPutAlphabetic(); //DX20210129
-    //(*this).SetNumEachType(); //DX20210129
   }
   // ---------------------------------------------------------------------------
   // if the transformation preserves the volume, one-to-one mappings
