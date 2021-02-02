@@ -6700,13 +6700,132 @@ void xstructure::MakeTypes(void) {
 }
 
 // **************************************************************************
+// xstructure::AddAtoms() //DX20210202
+// **************************************************************************
+// This adds a deque<_atom> to the structure.
+// More efficient than adding one atom at a time (AddAtom);
+// update species and basis at the end
+void xstructure::AddAtoms(const deque<_atom>& atoms_in, bool check_atom_overlap) { //DX20210129 - added check_atom_overlap
+  bool LDEBUG=(FALSE || XHOST.DEBUG); 
+
+  // check that this atom is not already present
+  xvector<double> a1(3),a2(3),a3(3),aijk(3);
+  a1=lattice(1);a2=lattice(2);a3=lattice(3);
+
+  if(check_atom_overlap){ //DX20210129
+    for(uint iat=0;iat<atoms_in.size();iat++){
+      bool FOUND_POSITION=FALSE;
+      for(uint jat=iat+1;jat<atoms_in.size()&&FOUND_POSITION==FALSE;jat++){
+        if(atoms_in[iat].type==atoms_in[jat].type && atoms_in[iat].name==atoms_in[jat].name){
+          for(int i=-1;i<=1&&FOUND_POSITION==FALSE;i++){
+            for(int j=-1;j<=1&&FOUND_POSITION==FALSE;j++){
+              for(int k=-1;k<=1&&FOUND_POSITION==FALSE;k++) {
+                aijk[1]=i;aijk[2]=j;aijk[3]=k;
+                //	if(aurostd::modulus(atoms_in[iat].cpos-(((double)i)*a1+((double)j)*a2+((double)k)*a3+atoms_in[jat].cpos))<0.1) FOUND_POSITION=TRUE;
+                //DX+CO START    
+                //DX if(aurostd::modulus(atoms_in[iat].fpos-(aijk+atoms_in[jat].fpos))<0.01) FOUND_POSITION=TRUE;
+                if((*this).sym_eps!=AUROSTD_NAN && (*this).sym_eps<AUROSTD_NAN && (*this).sym_eps>1e-10){ //DX20171201 - Added (*this).sym_eps>1e-10 //DX20180215 - added (*this).sym_eps<AUROSTD_NAN (needed) 
+                  if(aurostd::modulus((*this).f2c*(atoms_in[iat].fpos-(aijk+atoms_in[jat].fpos)))<=(*this).sym_eps) FOUND_POSITION=TRUE; //DX
+                }
+                else { 
+                  //if(aurostd::modulus(atoms[iat].fpos-(aijk+atom.fpos))<1e-10) FOUND_POSITION=TRUE; //DX
+                  if(aurostd::modulus(atoms_in[iat].cpos-(((double)i)*a1+((double)j)*a2+((double)k)*a3+atoms_in[jat].cpos))<0.1) FOUND_POSITION=TRUE; //DX20171201
+                }
+                //DX+CO END
+              }
+            }
+          }
+        }
+      }
+      if(FOUND_POSITION){ continue; } // found no need to add it further
+      else{ atoms.push_back(atoms_in[iat]); }
+    }
+  }
+  else{
+    atoms = atoms_in;
+  }
+
+  for(uint iat=0;iat<atoms.size();iat++){
+    // now found that it does not exist check type
+    //  cerr << "AddAtom new atom" << endl;
+    bool FOUND_SPECIES=FALSE;
+    uint species_position=0;
+    for(uint isp=0;isp<species.size()&&FOUND_SPECIES==FALSE;isp++)
+      if(atoms[iat].name==species[isp]) {FOUND_SPECIES=TRUE;species_position=isp;}
+
+    if(FOUND_SPECIES==FALSE) {
+      if(LDEBUG) cerr << "AddAtom new_species=" << atoms[iat].name << endl;
+      num_each_type.push_back(1);
+      comp_each_type.push_back(atoms[iat].partial_occupation_value);
+      species.push_back(atoms[iat].name); // cerr << "AddAtom=" << atom.name << endl;
+      species_pp.push_back(atoms[iat].name); // cerr << "AddAtom=" << atom.name << endl;
+      species_pp_type.push_back(""); // cerr << "AddAtom=" << atom.name << endl;
+      species_pp_version.push_back(""); // cerr << "AddAtom=" << atom.name << endl;
+      species_pp_ZVAL.push_back(0.0); // cerr << "AddAtom=" << atom.name << endl;
+      species_pp_vLDAU.push_back(deque<double>()); // cerr << "AddAtom=" << atom.name << endl;
+      species_volume.push_back(GetAtomVolume(atoms[iat].name)); // cerr << "AddAtom=" << atom.name << endl;
+      species_mass.push_back(GetAtomMass(atoms[iat].name)); // cerr << "AddAtom=" << atom.name << endl;
+    } else {
+      if(LDEBUG) cerr << "AddAtom increasing species_position " << species_position << endl;
+      num_each_type[species_position]++;
+      comp_each_type[species_position]+=atoms[iat].partial_occupation_value;
+    }
+    //DX20210202 [OBSOLETE] if(btom.name_is_given) {
+    //DX20210202 [OBSOLETE]   btom.CleanName();
+    //DX20210202 [OBSOLETE]   //DX20170921 - Need to keep spin info  btom.CleanSpin();
+    //DX20210202 [OBSOLETE] }
+  }
+  GetStoich();  //CO20170724
+
+  // OLD STYLE
+  //  atoms.push_back(btom);  MakeBasis(); return;
+
+  // NEW STYLE
+  //DX20210202 [OBSOLETE] bool found=FALSE;
+  //DX20210202 [OBSOLETE] if(0)  for(uint iat=0;iat<atoms.size()&&!found;iat++) {
+  //DX20210202 [OBSOLETE]   if(iat<atoms.size()-1) {
+  //DX20210202 [OBSOLETE]     if(atoms[iat].type==btom.type && atoms.at(iat+1).type!=btom.type) {
+  //DX20210202 [OBSOLETE]       //	if(LDEBUG)
+  //DX20210202 [OBSOLETE]       cerr << "HERE1 iat=" << iat << "  atoms[iat].type=" << atoms[iat].type << "  btom.type=" << btom.type << endl;//" atoms.begin()=" <<  long(atoms.begin()) << endl;
+  //DX20210202 [OBSOLETE]       atoms.insert(iat+atoms.begin()+1,btom); // potential problem  with CAST
+  //DX20210202 [OBSOLETE]       found=TRUE;
+  //DX20210202 [OBSOLETE]     }
+  //DX20210202 [OBSOLETE]   }
+  //DX20210202 [OBSOLETE] }
+  //DX20210202 [OBSOLETE] if(1) {
+    // sort by types and partial occupation (highest occupation first)
+    std::stable_sort(atoms.begin(), atoms.end(), sortAtomsTypes);
+    //DX20210201 [OBSOLETE] std::deque<_atom>::iterator it=atoms.begin();
+    //DX20210201 [OBSOLETE] for(uint iat=0;iat<atoms.size()&&!found;iat++,it++) {
+    //DX20210201 [OBSOLETE]   if(iat<atoms.size()-1) {
+    //DX20210201 [OBSOLETE]     //	cerr << "HERE0 iat=" << iat << "  atoms[iat].type=" << atoms[iat].type << "  btom.type=" << btom.type << endl;
+    //DX20210201 [OBSOLETE]     if((atoms[iat].type==btom.type && atoms.at[iat+1].type!=btom.type) || 
+    //DX20210201 [OBSOLETE]         (atoms[iat].type==btom.type && atoms.at[iat+1].partial_occupation_value<btom.partial_occupation_value)) {  //CO20180705 - for pocc sorting, larger pocc ahead of smaller pocc
+    //DX20210201 [OBSOLETE]       //	if(LDEBUG)
+    //DX20210201 [OBSOLETE]       //	  cerr << "HERE1 iat=" << iat << "  atoms[iat].type=" << atoms[iat].type << "  btom.type=" << btom.type << endl;//" atoms.begin()=" <<  long(atoms.begin()) << endl;
+    //DX20210201 [OBSOLETE]       atoms.insert(it+1,btom);  // it is iterator, fine for insert.
+    //DX20210201 [OBSOLETE]       found=TRUE;
+    //DX20210201 [OBSOLETE]     }
+    //DX20210201 [OBSOLETE]   }
+    //DX20210201 [OBSOLETE] }
+  //DX20210202 [OBSOLETE] }
+  // if never found add at the end
+  //DX20210201 [OBSOLETE] if(!found) atoms.push_back(btom);
+  // 
+  //  atoms.push_back(btom);
+  // done
+  MakeBasis(); // need to update NUMBER and BASIS
+}
+
+// **************************************************************************
 // xstructure::AddAtom
 // **************************************************************************
 // This adds an atom to the structure.
 
 void xstructure::AddAtom(const _atom& atom, bool check_atom_overlap) { //DX20210129 - added check_atom_overlap
   bool LDEBUG=(FALSE || XHOST.DEBUG); 
-  _atom btom;btom=atom;
+  //DX20210202 _atom btom;btom=atom;
+  _atom btom=atom; //DX20210202
 
   // check that this atom is not already present
   xvector<double> a1(3),a2(3),a3(3),aijk(3);
@@ -6758,8 +6877,8 @@ void xstructure::AddAtom(const _atom& atom, bool check_atom_overlap) { //DX20210
     // cerr << num_each_type.size() << " " <<  btom.type << endl;
     // cerr << comp_each_type.size() << " " <<  btom.type << endl;
     if(LDEBUG) cerr << "AddAtom increasing species_position " << species_position << endl;
-    num_each_type.at(species_position)++;
-    comp_each_type.at(species_position)+=atom.partial_occupation_value;
+    num_each_type[species_position]++;
+    comp_each_type[species_position]+=atom.partial_occupation_value;
   }
   if(btom.name_is_given) {
     btom.CleanName();
@@ -6783,19 +6902,21 @@ void xstructure::AddAtom(const _atom& atom, bool check_atom_overlap) { //DX20210
     }
   }
   if(1) {
-    std::deque<_atom>::iterator it=atoms.begin();
-    for(uint iat=0;iat<atoms.size()&&!found;iat++,it++) {
-      if(iat<atoms.size()-1) {
-        //	cerr << "HERE0 iat=" << iat << "  atoms[iat].type=" << atoms[iat].type << "  btom.type=" << btom.type << endl;
-        if((atoms[iat].type==btom.type && atoms.at(iat+1).type!=btom.type) || 
-            (atoms[iat].type==btom.type && atoms.at(iat+1).partial_occupation_value<btom.partial_occupation_value)) {  //CO20180705 - for pocc sorting, larger pocc ahead of smaller pocc
-          //	if(LDEBUG)
-          //	  cerr << "HERE1 iat=" << iat << "  atoms[iat].type=" << atoms[iat].type << "  btom.type=" << btom.type << endl;//" atoms.begin()=" <<  long(atoms.begin()) << endl;
-          atoms.insert(it+1,btom);  // it is iterator, fine for insert.
-          found=TRUE;
-        }
-      }
-    }
+    // sort by types and partial occupation (highest occupation first)
+    std::stable_sort(atoms.begin(), atoms.end(), sortAtomsTypes);
+    //DX20210202 [OBSOLETE] std::deque<_atom>::iterator it=atoms.begin();
+    //DX20210202 [OBSOLETE] for(uint iat=0;iat<atoms.size()&&!found;iat++,it++) {
+    //DX20210202 [OBSOLETE]   if(iat<atoms.size()-1) {
+    //DX20210202 [OBSOLETE]     //	cerr << "HERE0 iat=" << iat << "  atoms[iat].type=" << atoms[iat].type << "  btom.type=" << btom.type << endl;
+    //DX20210202 [OBSOLETE]     if((atoms[iat].type==btom.type && atoms.at(iat+1).type!=btom.type) || 
+    //DX20210202 [OBSOLETE]         (atoms[iat].type==btom.type && atoms.at(iat+1).partial_occupation_value<btom.partial_occupation_value)) {  //CO20180705 - for pocc sorting, larger pocc ahead of smaller pocc
+    //DX20210202 [OBSOLETE]       //	if(LDEBUG)
+    //DX20210202 [OBSOLETE]       //	  cerr << "HERE1 iat=" << iat << "  atoms[iat].type=" << atoms[iat].type << "  btom.type=" << btom.type << endl;//" atoms.begin()=" <<  long(atoms.begin()) << endl;
+    //DX20210202 [OBSOLETE]       atoms.insert(it+1,btom);  // it is iterator, fine for insert.
+    //DX20210202 [OBSOLETE]       found=TRUE;
+    //DX20210202 [OBSOLETE]     }
+    //DX20210202 [OBSOLETE]   }
+    //DX20210202 [OBSOLETE] }
   }
   // if never found add at the end
   if(!found) atoms.push_back(btom);
@@ -6877,18 +6998,8 @@ void xstructure::RemoveAtoms(void) { //DX20210129
   // atom/species variable; faster than removing one at a time
 
   atoms.clear();
-  num_each_type.clear();
-  comp_each_type.clear();
-  species.clear();
-  species_pp.clear();
-  species_pp_type.clear();
-  species_pp_version.clear();
-  species_pp_ZVAL.clear();
-  species_pp_vLDAU.clear();
-  species_volume.clear();
-  species_mass.clear();
+  ClearSpecies(); //clears everything species related
   order_parameter_atoms.clear();
-  stoich_each_type.clear();
 }
 
 void xstructure::ReplaceAtoms(const deque<_atom>& new_atoms, bool check_atom_overlap){ //CO20190520 //DX20210129 - added check_atom_overlap
@@ -6905,7 +7016,8 @@ void xstructure::ReplaceAtoms(const deque<_atom>& new_atoms, bool check_atom_ove
   RemoveAtoms(); //DX20210129 - remove all atoms and clear species variables
   
   if(LDEBUG) cerr << soliloquy << " adding new atoms" << endl;
-  for(uint i=0;i<new_atoms.size();i++){AddAtom(new_atoms[i], check_atom_overlap);}  //adding atoms
+  //DX20210202 [OBSOLETE] for(uint i=0;i<new_atoms.size();i++){AddAtom(new_atoms[i], check_atom_overlap);}  //adding atoms
+  AddAtoms(new_atoms, check_atom_overlap);  //adding atoms
     
   (*this).SpeciesPutAlphabetic(); //DX20210129
 }
@@ -17033,7 +17145,7 @@ void xstructure::ChangeBasis(const xmatrix<double>& transformation_matrix) {
 
   // ---------------------------------------------------------------------------
   // if the number of atoms changed, update the atom counts/order/types/etc.
-  if(!aurostd::isequal(basis_transformation_det_change, _AUROSTD_XSCALAR_TOLERANCE_INTEGER_)){
+  if(!aurostd::isequal(aurostd::abs(basis_transformation_det_change), _ZERO_TOL_, _AUROSTD_XSCALAR_TOLERANCE_INTEGER_)){
     if(LDEBUG){ cerr << function_name << " updating atom count information." << endl; }
     std::stable_sort(atom_basis.begin(),atom_basis.end(),sortAtomsNames); //DX20210129
     (*this).ReplaceAtoms(atom_basis, false); //false: check_atom_overlap
@@ -17043,6 +17155,7 @@ void xstructure::ChangeBasis(const xmatrix<double>& transformation_matrix) {
   }
   // ---------------------------------------------------------------------------
   // if the transformation preserves the volume, one-to-one mappings
+  // no need to update species/types/etc. (i.e., ReplaceAtoms() is not needed)
   else{
     if(LDEBUG){ cerr << function_name << " cell size remains the same (updating atom positions)." << endl; }
     (*this).atoms = atom_basis;
