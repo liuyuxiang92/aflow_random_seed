@@ -1127,7 +1127,7 @@ namespace pocc {
     if(LDEBUG){cerr << soliloquy << " OUTCAR_relax=" << OUTCAR_relax << endl;}
 
     bool found_all_OUTCARs=true;
-    for(unsigned long long int isupercell=0;isupercell<m_ARUN_directories.size()&&found_all_OUTCARs==true;isupercell++){
+    for(unsigned long long int isupercell=0;isupercell<m_ARUN_directories.size()&&found_all_OUTCARs;isupercell++){
       if(!aurostd::EFileExist(m_aflags.Directory+"/"+m_ARUN_directories[isupercell]+"/"+OUTCAR_relax)){
         if(LDEBUG){cerr << soliloquy << " " << OUTCAR_relax << " not found in "+m_ARUN_directories[isupercell] << endl;}
         found_all_OUTCARs=false;
