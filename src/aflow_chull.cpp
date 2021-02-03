@@ -316,6 +316,29 @@ namespace chull {
     //////////////////////////////////////////////////////////////////////////////
 
     //////////////////////////////////////////////////////////////////////////////
+    // START Adding --sc=XX to CHULL::NEGLECT if --output=web
+    //////////////////////////////////////////////////////////////////////////////
+    if(vpflow.flag("CHULL::STABILITY_CRITERION")&&vpflow.flag("CHULL::WEB_DOC")){
+      string sc_input=vpflow.getattachedscheme("CHULL::STABILITY_CRITERION");
+      if(vpflow.flag("CHULL::NEGLECT")){
+        string neglect=vpflow.getattachedscheme("CHULL::NEGLECT");
+        if(!neglect.empty()){neglect+=",";}
+        neglect+=sc_input;
+        vpflow.pop_attached("CHULL::NEGLECT");
+        vpflow.push_attached("CHULL::NEGLECT",neglect);
+        vpflow.flag("CHULL::NEGLECT",true); //repetita iuvant
+      }else{
+        vpflow.flag("CHULL::NEGLECT",true);
+        vpflow.push_attached("CHULL::NEGLECT",sc_input);
+      }
+      if(LDEBUG){cerr << soliloquy << " vpflow.getattachedscheme(\"CHULL::NEGLECT\")=" << vpflow.getattachedscheme("CHULL::NEGLECT") << endl;}
+    }
+    //////////////////////////////////////////////////////////////////////////////
+    // END Adding --sc=XX to CHULL::NEGLECT if --output=web
+    //////////////////////////////////////////////////////////////////////////////
+
+
+    //////////////////////////////////////////////////////////////////////////////
     // START Looping over hull inputs and creating desired output
     //////////////////////////////////////////////////////////////////////////////
     bool Krun=true;
@@ -11693,17 +11716,18 @@ namespace chull {
     main_JSON_file="aflow_"+input; //SK20200406
     //[SK20200325 - OBSOLETE]main_JSON_file="aflow_"+input+"_hull_web.json"; //WSCHMITT20190620
     //SK20200331 START
-    bool sc_requested=m_cflags.flag("CHULL::NEGLECT");  //only neglect feature via web
+    bool sc_requested=m_cflags.flag("CHULL::STABILITY_CRITERION");  //only neglect feature via web
     bool n1eg_requested=m_cflags.flag("CHULL::CALCULATE_FAKE_HULL_N+1_ENTHALPY_GAIN");
     vector<string> sc_point;
     string delimiter="";
     // naming stability criterion files
     if(sc_requested) {
-      aurostd::string2tokens(m_cflags.getattachedscheme("CHULL::NEGLECT"),sc_point,",");
+      aurostd::string2tokens(m_cflags.getattachedscheme("CHULL::STABILITY_CRITERION"),sc_point,",");
       std::sort(sc_point.begin(),sc_point.end()); //CO20200404 - this sort is NOT necessary, as web only removes 1 point a time, but this is SAFE
       delimiter = "_sc_";
       // limiting to the characters after "aflow:" because ":" is a reserved character for php query calls, also shortening queries
       main_JSON_file=main_JSON_file + delimiter + sc_point[0].substr(6); // restricting to single auid to limit file name growth, the substr(6) removes 'aflow:' from string which would cause issues for the filename/web
+      if(LDEBUG){cerr << soliloquy << " main_JSON_file=" << main_JSON_file << endl;}
     }
     // naming n+1 enthalpy gain files
     if (n1eg_requested) {
