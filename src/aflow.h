@@ -1484,11 +1484,11 @@ class xstructure {
     void MakeBasis(void);                                         // make basis for atoms (basis and number)
     void MakeTypes(void);                                         // refresh types based on num_each_type  //CO20180420
     void AddAtom(const _atom& atom,bool check_present=true);      // adding an atom
-    void AddAtoms(const deque<_atom>& atom,bool check_present=true);// adding a deque<_atom> //CO20210129 //DX20210201
+    void AddAtom(const deque<_atom>& atom,bool check_present=true);// adding a deque<_atom> //CO20210129 //DX20210201
     void AddAtom_POCC(const _atom& atom);                         // adding an atom FOR POCC ONLY
     void RemoveAtom(const uint& iat);                             // deleting an atom (index)
     void RemoveAtom(vector<uint>& v_atoms_to_remove);             // deleting many atoms (indices)
-    void RemoveAtoms(void);                                       // removes all atoms //DX20210129
+    void RemoveAtom(void);                                        // removes all atoms //DX20210129
     void ReplaceAtoms(const deque<_atom>& new_atoms,
         bool check_atom_overlap=true);                            // replace all atoms SAFELY/CLEANLY //DX20210129 - added option to check atom overlap
     void RemoveCopies(double=1.0e-3);                             // deleting atoms too close F/C
@@ -1507,6 +1507,7 @@ class xstructure {
     bool SpeciesPutAlphabetic(void);                              // Put Species in alphabetic
     string SpeciesString(void);                                   // Gives a string with the list of all the species
     uint SetSpecies(const std::deque<string>& vspecies);          // Set the species
+    void UpdateSpecies(const _atom& atom);                        // Update species from atom (consolidated from AddAtom) //DX20210202
     void GetLatticeType(xstructure& sp,xstructure& sc);           // Get all lattices
     void GetLatticeType(void);                                    // Get all lattices
     void Standard_Primitive_UnitCellForm(void);                   // Reduce the Unit Cell to Standard Primitive Form

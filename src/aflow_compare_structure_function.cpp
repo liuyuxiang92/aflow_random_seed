@@ -1125,6 +1125,7 @@ void XtalFinderCalculator::setStructureAsRepresentative(StructurePrototype& stru
   structure_tmp.stoichiometry = structure_tmp.structure_representative->stoichiometry;
   structure_tmp.natoms = structure_tmp.structure_representative->structure.atoms.size();
   structure_tmp.ntypes = structure_tmp.structure_representative->structure.num_each_type.size();
+  structure_tmp.elements = structure_tmp.structure_representative->elements;
 
   // update symmetry and environment info
   structure_tmp.Pearson = structure_tmp.structure_representative->Pearson;
@@ -3835,14 +3836,7 @@ vector<StructurePrototype> XtalFinderCalculator::groupStructurePrototypes(
 
         if(!same_species){
           for(uint e=0;e<structure_containers[i].elements.size();e++){
-            bool already_in=false;
-            for(uint f=0;f<comparison_schemes[j].elements.size();f++){
-              if(structure_containers[i].elements[e]==comparison_schemes[j].elements[f]){
-                already_in=true;
-                break;
-              }
-            }
-            if(!already_in){
+            if(!aurostd::WithinList(comparison_schemes[j].elements,structure_containers[i].elements[e])){
               comparison_schemes[j].elements.push_back(structure_containers[i].elements[e]);
             }
           }
@@ -5034,25 +5028,25 @@ string XtalFinderCalculator::printStructureMappingResults(
     output << endl <<"**************************** MAPPING RESULTS ****************************"<<endl;
     // structural misfit information
     if(misfit_info.misfit<=misfit_match){
-      output << endl << "MISFIT:			 " << misfit_info.misfit;
-      output << "  STRUCTURES ARE COMPATIBLE (0<misfit<=" << misfit_match << ")" << endl;
+      output << endl << "MISFIT:			 " << aurostd::roundoff(misfit_info.misfit,AUROSTD_ROUNDOFF_TOL);
+      output << "  STRUCTURES ARE COMPATIBLE (0<misfit<=" << aurostd::roundoff(misfit_match,AUROSTD_ROUNDOFF_TOL) << ")" << endl;
     }
     else if(misfit_info.misfit<=misfit_family){
-      output << endl << "MISFIT:       " << misfit_info.misfit;
-      output << "  STRUCTURES ARE IN THE SAME FAMILY (" << misfit_match << "<misfit<=" << misfit_family << ")" << endl;
+      output << endl << "MISFIT:       " << aurostd::roundoff(misfit_info.misfit,AUROSTD_ROUNDOFF_TOL);
+      output << "  STRUCTURES ARE IN THE SAME FAMILY (" << aurostd::roundoff(misfit_match,AUROSTD_ROUNDOFF_TOL) << "<misfit<=" << aurostd::roundoff(misfit_family,AUROSTD_ROUNDOFF_TOL) << ")" << endl;
     }
     else {
-      output << endl <<"MISFIT:			 " << misfit_info.misfit;
-      output << "  STRUCTURES ARE INCOMPATIBLE (misfit>" << misfit_family << ", or no match found)" << endl;
+      output << endl <<"MISFIT:			 " << aurostd::roundoff(misfit_info.misfit,AUROSTD_ROUNDOFF_TOL);
+      output << "  STRUCTURES ARE INCOMPATIBLE (misfit>" << aurostd::roundoff(misfit_family,AUROSTD_ROUNDOFF_TOL) << ", or no match found)" << endl;
     }
     output << "-------------------------------------------------------------------------"<<endl;
-    output << "Lattice Deviation:       " << misfit_info.lattice_deviation << endl;
-    output << "Coordinate Displacement: " << misfit_info.coordinate_displacement << endl;
-    output << "Figure of Failure:       " << misfit_info.failure << endl;
+    output << "Lattice Deviation:       " << aurostd::roundoff(misfit_info.lattice_deviation,AUROSTD_ROUNDOFF_TOL) << endl;
+    output << "Coordinate Displacement: " << aurostd::roundoff(misfit_info.coordinate_displacement,AUROSTD_ROUNDOFF_TOL) << endl;
+    output << "Figure of Failure:       " << aurostd::roundoff(misfit_info.failure,AUROSTD_ROUNDOFF_TOL) << endl;
     // magnetic misfit information
     if(misfit_info.is_magnetic_misfit){
-      output << "Figure of Magnetic Displacement:	" << misfit_info.magnetic_displacement << endl;
-      output << "Figure of Magnetic Failure:	    " << misfit_info.magnetic_failure << endl;
+      output << "Figure of Magnetic Displacement:	" << aurostd::roundoff(misfit_info.magnetic_displacement,AUROSTD_ROUNDOFF_TOL) << endl;
+      output << "Figure of Magnetic Failure:	    " << aurostd::roundoff(misfit_info.magnetic_failure,AUROSTD_ROUNDOFF_TOL) << endl;
     }
     // transformation information (basis transformation, rotation, and origin shift)
     // (note: transformation info is not available with the supercell method)
@@ -5060,13 +5054,13 @@ string XtalFinderCalculator::printStructureMappingResults(
       output << "-------------------------------------------------------------------------"<<endl;
       output << "STRUCTURE TRANSFORMATION (test structure -> reference structure)" << endl;
       output << "Volume scaling factor:" << endl;
-      output << misfit_info.rescale_factor << endl;
+      output << aurostd::roundoff(misfit_info.rescale_factor,AUROSTD_ROUNDOFF_TOL) << endl;
       output << "Basis Transformation:" << endl;
-      output << misfit_info.basis_transformation << endl;
+      output << aurostd::roundoff(misfit_info.basis_transformation,AUROSTD_ROUNDOFF_TOL) << endl;
       output << "Rotation:" << endl;
-      output << misfit_info.rotation << endl;
+      output << aurostd::roundoff(misfit_info.rotation,AUROSTD_ROUNDOFF_TOL) << endl;
       output << "Origin Shift: " << ((xstr_mapped.coord_flag==_COORDS_CARTESIAN_) ? "(Cart.)" : "(Frac.)") << endl;
-      output << misfit_info.origin_shift << endl;
+      output << aurostd::roundoff(misfit_info.origin_shift,AUROSTD_ROUNDOFF_TOL) << endl;
 
       xstructure xstr_transformed = xstr_mapped;
       // rescale transformed structure
@@ -6368,8 +6362,8 @@ string XtalFinderCalculator::printAtomMappings(
 
     output << std::setw(15) << index_map.str()
       << std::setw(15) << element_map.str()
-      << std::setw(25) << misfit_info.distances_mapped[i]
-      << misfit_info.vectors_mapped[i] << endl;
+      << std::setw(25) << aurostd::roundoff(misfit_info.distances_mapped[i],AUROSTD_ROUNDOFF_TOL)
+      << aurostd::roundoff(misfit_info.vectors_mapped[i],AUROSTD_ROUNDOFF_TOL) << endl;
   }
   return output.str();
 }
@@ -7424,8 +7418,12 @@ bool XtalFinderCalculator::buildSimilarLattices(
                             unique=false;
                             break;
                           }
+                          // if lattices are equal (no transformation/rotation) between the structures, make this first //DX20210203
+                          if(identical(tmp_lattice,q1)){
+                            placement_index = 0;
+                          }
                           // store placement/index based on lattice deviation
-                          if(sort_via_lattice_deviation && tmp_latt_dev < latt_devs[t] && placement_index == lattices.size()){ // third condition necessary; otherwise it could move down in order
+                          else if(sort_via_lattice_deviation && tmp_latt_dev < latt_devs[t] && placement_index == lattices.size()){ // third condition necessary; otherwise it could move down in order
                             placement_index = t;
                           }
                         }
