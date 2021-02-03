@@ -13838,33 +13838,30 @@ bool uniqueAtomInCell(_atom& atom, deque<_atom>& atoms){
 // ***************************************************************************
 // atomInCell() 
 // ***************************************************************************
-bool atomInCell(const _atom& atom, double tolerance){ 
+bool atomInCell(const _atom& atom, double tolerance, double upper_bound, double lower_bound) { //ME+DX20210203 - added bounds
 
   // check if the atom is in the unit cell based on fractional coordinates
   // if you use the non-default tolerance (i.e., _ZERO_TOL_), this alone is not robust 
-  // and should be used in tandem with SYM::MapAtom() to account for periodic boundary conditions
-  // filtering with this function with soft cutoffs before MapAtom() is faster, 
-  // especially if there are many atoms to check (e.g., 20,000)
   // Note: check over each component and returning false immediately (faster)
 
-  return inCell(atom.fpos, tolerance);
+  return inCell(atom.fpos, tolerance, upper_bound, lower_bound);
 
 }
 
 // ***************************************************************************
 // inCell() 
 // ***************************************************************************
-bool inCell(const xvector<double>& pos_vec, double tolerance){ 
+// ME20210128 - Added bounds
+bool inCell(const xvector<double>& pos_vec, double tolerance, double upper_bound, double lower_bound) {
 
   // check if the position is in the unit cell based on fractional coordinates
   // if you use the non-default tolerance (i.e., _ZERO_TOL_), this alone is not robust 
-  // and should be used in tandem with SYM::MapAtom() to account for periodic boundary conditions
-  // filtering with this function with soft cutoffs before MapAtom() is faster, 
-  // especially if there are many positions to check (e.g., 20,000)
   // Note: check over each component and returning false immediately (faster)
 
   for(uint f=1;f<4;f++){
-    if(pos_vec[f] > 1.0+tolerance || pos_vec[f] < -tolerance){ //allows tunable cutoff
+    // ME20210128: Used to be pos_vec[f] > 1.0 + tolerance.
+    // Adjusted to use the same cut-off criterion as bringInCell
+    if((pos_vec[f] - upper_bound) >= -tolerance || (pos_vec[f] - lower_bound) < -tolerance){ //allows tunable cutoff
       return false;
     }
   }

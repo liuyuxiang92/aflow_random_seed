@@ -6851,7 +6851,7 @@ namespace compare {
     c2f=inverse(proto.scale*trasp(proto.lattice)); //DX+CO20200429 - calculate outside loop [speed]
     for(uint iat=0;iat<proto.atoms.size();iat++){
       proto.atoms[iat].fpos=c2f*proto.atoms[iat].cpos; //DX+CO20200429 - C2F (matrix inverse + matrix multiplication) -> c2f (matrix multiplication)
-      if(atomInCell(proto.atoms[iat],0.05)){ //DX20191125 - soft cutoff, using robust MapAtom later on resulting subset
+      if(atomInCell(proto.atoms[iat],_ZERO_TOL_,1.05,-0.05)){ //DX20210203 - modified to new function inputs; soft cutoff between 1.05 to -0.05, using robust MapAtom later on resulting subset
         new_basis_2.push_back(proto.atoms[iat]);
       }
     }

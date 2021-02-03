@@ -460,7 +460,7 @@ namespace apl {
     processes.resize(nIQPs);
     intr_trans_probs.clear();
     intr_trans_probs.resize(nIQPs);
-    // Phase space for each (1) q-point, (2) branch, (3) type (AAA, AAO, etc.), and (4) sign (normal, umklapp)
+    // Phase space for each (1) q-point, (2) branch, (3) type (AAA, AAO, etc.), and (4) (normal, umklapp)
     phase_space.clear();
     phase_space.resize(nIQPs, vector<vector<vector<double> > >(nBranches, vector<vector<double> >(4, vector<double>(2, 0.0))));
     progress_bar_counter = 0;
@@ -626,6 +626,8 @@ namespace apl {
     xcomplex<double> matrix, prefactor, eigen;
     vector<vector<double> > weights(3, vector<double>(nQPs)), frequencies(3, vector<double>(nQPs));
     vector<int> qpts(3), proc(2), lastq(nQPs);
+    xvector<double> fpos_diff(3);
+    vector<bool> is_umklapp(nQPs);
     int iat = 0, j = 0, e = 0, q = 0, p = 0, w = 0, lq = 0, b = 0;
     uint c = 0, crt = 0, br = 0;
     double transprob = 0.0, freq_ref = 0.0, prod = 0.0;
@@ -637,7 +639,11 @@ namespace apl {
       // Get the q-point q" that fulfills q - q' - q" = G. Due to the inversion
       // symmetry of the q-point grid, q + q' - q" = G does not need to be
       // evaluated since for each q' there is also a (-q') on the grid.
-      for (q = 0; q < nQPs; q++) lastq[q] = _qm->getQPointIndex(_qm->getQPoint(qpts[0]).fpos - _qm->getQPoint(q).fpos);
+      for (q = 0; q < nQPs; q++) {
+        fpos_diff = _qm->getQPoint(qpts[0]).fpos - _qm->getQPoint(q).fpos;
+        is_umklapp[q] = !inCell(fpos_diff, _ZERO_TOL_, 0.5, -0.5);
+        lastq[q] = _qm->getQPointIndex(fpos_diff);
+      }
 
       for (br = 0; br < nbr; br++) {
         freq_ref = freq[qpts[0]][branches[br][0]];
@@ -649,8 +655,8 @@ namespace apl {
         for (q = 0; q < nQPs; q++) {
           lq = lastq[q];
           frequencies[0][q] = -freq[q][branches[br][1]] + freq[lq][branches[br][2]];
-          frequencies[1][q] = freq[q][branches[br][1]] - freq[lq][branches[br][2]];
-          frequencies[2][q] = freq[q][branches[br][1]] + freq[lq][branches[br][2]];
+          frequencies[1][q] =  freq[q][branches[br][1]] - freq[lq][branches[br][2]];
+          frequencies[2][q] =  freq[q][branches[br][1]] + freq[lq][branches[br][2]];
         }
 
         for (j = 0; j < 3; j++) getWeightsLT(freq_ref, frequencies[j], weights[j]);
@@ -675,14 +681,17 @@ namespace apl {
             for (j = 0; j < 3; j++) {
               if (branches[br][j] > 2) p++;
             }
-            phase_space[i][branches[br][0]][p][0] += weights[0][q];
-            phase_space[i][branches[br][0]][p][0] += weights[1][q];
+            j = (is_umklapp[q_minus[q]]?1:0);
+            phase_space[i][branches[br][0]][p][j] += weights[0][q];
+            j = (is_umklapp[q_minus[lq]]?1:0);
+            phase_space[i][branches[br][0]][p][j] += weights[1][q];
             // No need for the factor 1/2 since permutations are eliminated.
             // This intrinsically prevents double-counting.
-            phase_space[i][branches[br][0]][p][1] += weights[2][q];
+            j = (is_umklapp[q]?1:0);
+            phase_space[i][branches[br][0]][p][j] += weights[2][q];
             // If any frequency in the process is zero or not real, the process
-            // contribute to the thermal conductivity tensor (they do contribute
-            // to the scattering phase space though).
+            // does not contribute to the thermal conductivity tensor (it does
+            // contribute to the scattering phase space though).
             for (j = 0; j < 3; j++) {
               if (freq[qpts[j]][branches[br][j]] < _FLOAT_TOL_) break;
             }
