@@ -61,12 +61,12 @@ namespace aurostd{
     return dp;
   }
 
-  /// Constructs the Vandermonde matrix with columns up to a given order n.
+  /// Constructs the Vandermonde matrix with columns up to a given number of columns n.
   /// Vandermonde matrix:
-  /// 1 x1^2 x1^3 .. x1^n
-  /// 1 x2^2 x2^3 .. x2^n
+  /// 1 x1^2 x1^3 .. x1^(n-1)
+  /// 1 x2^2 x2^3 .. x2^(n-1)
   /// ...
-  /// 1 xm^2 xm^3 .. xm^n
+  /// 1 xm^2 xm^3 .. xm^(n-1)
   /// where m is the size of x array
   xmatrix<double> Vandermonde_matrix(const xvector<double> &x, int n)
   {

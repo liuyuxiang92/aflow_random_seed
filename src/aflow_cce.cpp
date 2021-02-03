@@ -848,7 +848,7 @@ namespace cce {
   //                           STRUCTURAL ANALYSIS                           //
   //                                                                         //
   /////////////////////////////////////////////////////////////////////////////
-  // counting the number of anion neighbours (multiple anion species possible) for each cation
+  // counting the number of anion neighbors (multiple anion species possible) for each cation
 
   //determine_anion_species////////////////////////////////////////////////////////
   // determine anion species

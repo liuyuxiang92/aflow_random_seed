@@ -176,7 +176,7 @@
 #define         DEFAULT_AIMS_BIN                        XHOST.adefault.getattachedscheme("DEFAULT_AIMS_BIN")
 
 // POTCARS // DONE
-#define AFLOWRC_DEFAULT_VASP_POTCAR_DIRECTORIES               string("/common/VASP,/common/AFLOW/VASP,/home/aflow/common/AFLOW/VASP,/fslhome/fslcollab8/group/VASP,/fslhome/glh43/src/,/share/home/00470/tg457283/common/AFLOW/VASP/,/share/home/00457/tg457357/common/AFLOW/VASP/,/home/mehl/bin/AFLOW/VASP/,~/common/VASP/,~/common/AFLOW/VASP/,/nics/a/proj/aflow/common/AFLOW/VASP/,/home/users/aflow/common/VASP,/share/apps/AFLOW3/VASP,/projects/kyang-group/common/VASP,/home/Tools/src/vasp/,/somewhere/")  // first is default, tokenized with "," //DX20190107 - added CMU path
+#define AFLOWRC_DEFAULT_VASP_POTCAR_DIRECTORIES               string("/common/VASP,/common/AFLOW/VASP,/home/aflow/common/AFLOW/VASP,/fslhome/fslcollab8/group/VASP,/fslhome/glh43/src/,/share/home/00470/tg457283/common/AFLOW/VASP/,/share/home/00457/tg457357/common/AFLOW/VASP/,/home/mehl/bin/AFLOW/VASP/,~/common/VASP/,~/common/AFLOW/VASP/,/home/aflow/common/VASP/,/nics/a/proj/aflow/common/AFLOW/VASP/,/home/users/aflow/common/VASP,/share/apps/AFLOW3/VASP,/projects/kyang-group/common/VASP,/home/Tools/src/vasp/,/somewhere/")  // first is default, tokenized with "," //DX20190107 - added CMU path
 #define         DEFAULT_VASP_POTCAR_DIRECTORIES               XHOST.adefault.getattachedscheme("DEFAULT_VASP_POTCAR_DIRECTORIES")
 #define AFLOWRC_DEFAULT_VASP_POTCAR_DATE                      string("current")
 #define         DEFAULT_VASP_POTCAR_DATE                      XHOST.adefault.getattachedscheme("DEFAULT_VASP_POTCAR_DATE")
@@ -364,7 +364,7 @@
 #define         DEFAULT_CHULL_COUNT_THRESHOLD_BINARIES                    XHOST.adefault.getattachedutype<int>("DEFAULT_CHULL_COUNT_THRESHOLD_BINARIES")
 #define AFLOWRC_DEFAULT_CHULL_PERFORM_OUTLIER_ANALYSIS                    TRUE
 #define         DEFAULT_CHULL_PERFORM_OUTLIER_ANALYSIS                    XHOST.adefault.getattachedutype<bool>("DEFAULT_CHULL_PERFORM_OUTLIER_ANALYSIS")
-#define AFLOWRC_DEFAULT_CHULL_OUTLIER_ANALYSIS_COUNT_THRESHOLD_BINARIES   50
+#define AFLOWRC_DEFAULT_CHULL_OUTLIER_ANALYSIS_COUNT_THRESHOLD_BINARIES   75
 #define         DEFAULT_CHULL_OUTLIER_ANALYSIS_COUNT_THRESHOLD_BINARIES   XHOST.adefault.getattachedutype<int>("DEFAULT_CHULL_OUTLIER_ANALYSIS_COUNT_THRESHOLD_BINARIES")
 #define AFLOWRC_DEFAULT_CHULL_OUTLIER_MULTIPLIER                          3.25
 #define         DEFAULT_CHULL_OUTLIER_MULTIPLIER                          XHOST.adefault.getattachedutype<double>("DEFAULT_CHULL_OUTLIER_MULTIPLIER")
@@ -581,14 +581,14 @@
 #define AFLOWRC_DEFAULT_QHA_EOS_DISTORTION_RANGE              string("-12:16:3")
 #define         DEFAULT_QHA_EOS_DISTORTION_RANGE              XHOST.adefault.getattachedscheme("DEFAULT_QHA_EOS_DISTORTION_RANGE")
 //AS20200818 BEGIN
-#define AFLOWRC_DEFAULT_QHA_EOS_MODEL                         string("SJ,BM4")
+#define AFLOWRC_DEFAULT_QHA_EOS_MODEL                         string("SJ")
 #define         DEFAULT_QHA_EOS_MODEL                         XHOST.adefault.getattachedscheme("DEFAULT_QHA_EOS_MODEL")
 //AS20200818 END
 #define AFLOWRC_DEFAULT_QHA_GP_DISTORTION                     1.0
 #define         DEFAULT_QHA_GP_DISTORTION                     XHOST.adefault.getattachedutype<double>("DEFAULT_QHA_GP_DISTORTION")
 //AS20200602 BEGIN
-#define AFLOWRC_DEFAULT_QHA_TAYLOR_EXPANSION_ORDER             2
-#define         DEFAULT_QHA_TAYLOR_EXPANSION_ORDER             XHOST.adefault.getattachedutype<double>("DEFAULT_QHA_TAYLOR_EXPANSION_ORDER")
+#define AFLOWRC_DEFAULT_QHA_TAYLOR_EXPANSION_ORDER            2
+#define         DEFAULT_QHA_TAYLOR_EXPANSION_ORDER            XHOST.adefault.getattachedutype<double>("DEFAULT_QHA_TAYLOR_EXPANSION_ORDER")
 //AS20200602 END
 #define AFLOWRC_DEFAULT_QHA_INCLUDE_ELEC_CONTRIB              FALSE
 #define         DEFAULT_QHA_INCLUDE_ELEC_CONTRIB              XHOST.adefault.getattachedutype<bool>("DEFAULT_QHA_INCLUDE_ELEC_CONTRIB")
@@ -596,13 +596,17 @@
 #define AFLOWRC_DEFAULT_QHA_SOMMERFELD_EXPANSION              FALSE
 #define         DEFAULT_QHA_SOMMERFELD_EXPANSION              XHOST.adefault.getattachedutype<bool>("DEFAULT_QHA_SOMMERFELD_EXPANSION")
 //AS20200528 END
-#define AFLOWRC_DEFAULT_QHA_PDIS_T                            string("50,100,600")
+#define AFLOWRC_DEFAULT_QHA_PDIS_T                            string("300")
 #define         DEFAULT_QHA_PDIS_T                            XHOST.adefault.getattachedscheme("DEFAULT_QHA_PDIS_T")
 //AS20200508 BEGIN
 #define AFLOWRC_DEFAULT_QHA_GP_FINITE_DIFF                    FALSE
 #define         DEFAULT_QHA_GP_FINITE_DIFF                    XHOST.adefault.getattachedutype<bool>("DEFAULT_QHA_GP_FINITE_DIFF")
 #define AFLOWRC_DEFAULT_QHA_IGNORE_IMAGINARY                  FALSE
 #define         DEFAULT_QHA_IGNORE_IMAGINARY                  XHOST.adefault.getattachedutype<bool>("DEFAULT_QHA_IGNORE_IMAGINARY")
+//AS20201123 BEGIN
+#define AFLOWRC_DEFAULT_QHA_RELAX_IONS_CELL                   FALSE
+#define         DEFAULT_QHA_RELAX_IONS_CELL                   XHOST.adefault.getattachedutype<bool>("DEFAULT_QHA_RELAX_IONS_CELL")
+//AS20201123 END
 
 //// DEFAULT QHA FILES
 #define AFLOWRC_DEFAULT_QHA_FILE_PREFIX                       string("aflow.qha.")
@@ -628,6 +632,18 @@
 #define AFLOWRC_DEFAULT_QHA_FVT_FILE                          string("FVT.out")
 #define         DEFAULT_QHA_FVT_FILE                          XHOST.adefault.getattachedscheme("DEFAULT_QHA_FVT_FILE")
 //AS20200508 END
+//AS20201022 BEGIN
+#define AFLOWRC_DEFAULT_QHA_PDIS_FILE                         string("dispersion_phonon")
+#define         DEFAULT_QHA_PDIS_FILE                         XHOST.adefault.getattachedscheme("DEFAULT_QHA_PDIS_FILE")
+//AS20201022 END
+//AS20201201 BEGIN
+#define AFLOWRC_DEFAULT_QHA_PDOS_FILE                         string("dos_phonon")
+#define         DEFAULT_QHA_PDOS_FILE                         XHOST.adefault.getattachedscheme("DEFAULT_QHA_PDOS_FILE")
+//AS20201201 END
+//AS20201112 BEGIN
+#define AFLOWRC_DEFAULT_QHA_KPOINTS_FILE                      string("kpoints.out")
+#define         DEFAULT_QHA_KPOINTS_FILE                      XHOST.adefault.getattachedscheme("DEFAULT_QHA_KPOINTS_FILE")
+//AS20201112 
 
 // DEFAULT AAPL
 //// DEFAULT AAPL VALUES
@@ -801,11 +817,31 @@
 #define         DEFAULT_CCE_O2_MOLECULE_LOWER_CUTOFF          XHOST.adefault.getattachedutype<double>("DEFAULT_CCE_O2_MOLECULE_LOWER_CUTOFF")
 //RF20200413 END
 
-//DX20200709 - START
 // DEFAULT XTALFINDER
+#define AFLOWRC_DEFAULT_XTALFINDER_MISFIT_MATCH               0.1 // values below this threshold: similar structures have similar properties // DX20201118
+#define         DEFAULT_XTALFINDER_MISFIT_MATCH               XHOST.adefault.getattachedutype<double>("DEFAULT_XTALFINDER_MISFIT_MATCH") //DX20201118
+#define AFLOWRC_DEFAULT_XTALFINDER_MISFIT_FAMILY              0.2 // values above this threshold: matched structures do not have similar properties //DX20201118
+#define         DEFAULT_XTALFINDER_MISFIT_FAMILY              XHOST.adefault.getattachedutype<double>("DEFAULT_XTALFINDER_MISFIT_FAMILY") //DX20201118
+#define AFLOWRC_DEFAULT_XTALFINDER_SUPERCELL_METHOD           FALSE // supercell method for comparing (robust, but slow, superceded by transformation method)
+#define         DEFAULT_XTALFINDER_SUPERCELL_METHOD           XHOST.adefault.getattachedutype<bool>("DEFAULT_XTALFINDER_SUPERCELL_METHOD") //DX20201223
+//DX20200709 - START
 #define AFLOWRC_DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING    4.0 // factor that divides minimum interatomic distance
 #define         DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING    XHOST.adefault.getattachedutype<double>("DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING")
 //DX20200709 - END
+#define AFLOWRC_DEFAULT_XTALFINDER_FILE_MATERIAL                    string("material_comparison_output") // results file prefix
+#define         DEFAULT_XTALFINDER_FILE_MATERIAL                    XHOST.adefault.getattachedscheme("DEFAULT_XTALFINDER_FILE_MATERIAL") //DX20201228
+#define AFLOWRC_DEFAULT_XTALFINDER_FILE_STRUCTURE                   string("structure_comparison_output") // results file prefix
+#define         DEFAULT_XTALFINDER_FILE_STRUCTURE                   XHOST.adefault.getattachedscheme("DEFAULT_XTALFINDER_FILE_STRUCTURE") //DX20201228
+#define AFLOWRC_DEFAULT_XTALFINDER_FILE_DUPLICATE                   string("duplicate_compounds_output") // results file prefix
+#define         DEFAULT_XTALFINDER_FILE_DUPLICATE                   XHOST.adefault.getattachedscheme("DEFAULT_XTALFINDER_FILE_DUPLICATE") //DX20201228
+#define AFLOWRC_DEFAULT_XTALFINDER_FILE_MATERIAL_COMPARE2DATABASE   string("material_comparison_compare2database_output") // results file prefix
+#define         DEFAULT_XTALFINDER_FILE_MATERIAL_COMPARE2DATABASE   XHOST.adefault.getattachedscheme("DEFAULT_XTALFINDER_FILE_MATERIAL_COMPARE2DATABASE") //DX20201228
+#define AFLOWRC_DEFAULT_XTALFINDER_FILE_STRUCTURE_COMPARE2DATABASE  string("structure_comparison_compare2database_output") // results file prefix
+#define         DEFAULT_XTALFINDER_FILE_STRUCTURE_COMPARE2DATABASE  XHOST.adefault.getattachedscheme("DEFAULT_XTALFINDER_FILE_STRUCTURE_COMPARE2DATABASE") //DX20201228
+#define AFLOWRC_DEFAULT_XTALFINDER_FILE_MATERIAL_DATABASE           string("material_comparison_database_output") // results file prefix
+#define         DEFAULT_XTALFINDER_FILE_MATERIAL_DATABASE           XHOST.adefault.getattachedscheme("DEFAULT_XTALFINDER_FILE_MATERIAL_DATABASE") //DX20201228
+#define AFLOWRC_DEFAULT_XTALFINDER_FILE_STRUCTURE_DATABASE          string("structure_comparison_database_output") // results file prefix
+#define         DEFAULT_XTALFINDER_FILE_STRUCTURE_DATABASE          XHOST.adefault.getattachedscheme("DEFAULT_XTALFINDER_FILE_STRUCTURE_DATABASE") //DX20201228
 
 //DX20200720 - START
 // DEFAULT ANRL
@@ -875,6 +911,15 @@
 #define AFLOWRC_MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI             string("/home/bin/") // DUKE_QFLOW_MPICH
 #define         MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI             XHOST.adefault.getattachedscheme("MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI")
 
+//CO20201220 X START
+#define AFLOWRC_MPI_OPTIONS_DUKE_X                            string("ulimit -s unlimited ") // DUKE_X_MPICH
+#define         MPI_OPTIONS_DUKE_X                            XHOST.adefault.getattachedscheme("MPI_OPTIONS_DUKE_X")
+#define AFLOWRC_MPI_COMMAND_DUKE_X                            string("mpirun -n") // DUKE_X_MPICH
+#define         MPI_COMMAND_DUKE_X                            XHOST.adefault.getattachedscheme("MPI_COMMAND_DUKE_X")
+#define AFLOWRC_MPI_BINARY_DIR_DUKE_X                         string("/home/bin/") // DUKE_X_MPICH
+#define         MPI_BINARY_DIR_DUKE_X                         XHOST.adefault.getattachedscheme("MPI_BINARY_DIR_DUKE_X")
+//CO20201220 X STOP
+
 //DX20190509 - MACHINE001 - START
 #define AFLOWRC_MPI_OPTIONS_MACHINE001                        string("") // MACHINE001
 #define         MPI_OPTIONS_MACHINE001                        XHOST.adefault.getattachedscheme("MPI_OPTIONS_MACHINE001")
@@ -892,6 +937,15 @@
 #define AFLOWRC_MPI_BINARY_DIR_MACHINE002                    string("~/bin/") // MACHINE002
 #define         MPI_BINARY_DIR_MACHINE002                    XHOST.adefault.getattachedscheme("MPI_BINARY_DIR_MACHINE002")
 //DX20190509 - MACHINE002 - END
+
+//DX20201005 - MACHINE003 - START
+#define AFLOWRC_MPI_OPTIONS_MACHINE003                       string("") // MACHINE003
+#define         MPI_OPTIONS_MACHINE003                       XHOST.adefault.getattachedscheme("MPI_OPTIONS_MACHINE003")
+#define AFLOWRC_MPI_COMMAND_MACHINE003                       string("/p/app/intel/parallel_studio_xe_2018_update1/impi/2018.1.163/intel64/bin/mpirun -np") // MACHINE003
+#define         MPI_COMMAND_MACHINE003                       XHOST.adefault.getattachedscheme("MPI_COMMAND_MACHINE003")
+#define AFLOWRC_MPI_BINARY_DIR_MACHINE003                    string("~/bin/") // MACHINE003
+#define         MPI_BINARY_DIR_MACHINE003                    XHOST.adefault.getattachedscheme("MPI_BINARY_DIR_MACHINE003")
+//DX20201005 - MACHINE003 - END
 
 #define AFLOWRC_MPI_OPTIONS_MPCDF_EOS                         string("ulimit -s unlimited ") // MPCDF_EOS_MPICH
 #define         MPI_OPTIONS_MPCDF_EOS                         XHOST.adefault.getattachedscheme("MPI_OPTIONS_MPCDF_EOS")
@@ -1418,6 +1472,7 @@ namespace aflowrc {
     //AS20200508 BEGIN
     aflowrc::load_default("DEFAULT_QHA_GP_FINITE_DIFF", AFLOWRC_DEFAULT_QHA_GP_FINITE_DIFF);
     aflowrc::load_default("DEFAULT_QHA_IGNORE_IMAGINARY", AFLOWRC_DEFAULT_QHA_IGNORE_IMAGINARY);
+    aflowrc::load_default("DEFAULT_QHA_RELAX_IONS_CELL", AFLOWRC_DEFAULT_QHA_RELAX_IONS_CELL);//AS20201123
     //// DEFAULT QHA FILES
     aflowrc::load_default("DEFAULT_QHA_FILE_PREFIX", AFLOWRC_DEFAULT_QHA_FILE_PREFIX);
     //AS20200709 BEGIN
@@ -1432,6 +1487,9 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_QHA_FREQS_FILE", AFLOWRC_DEFAULT_QHA_FREQS_FILE);
     aflowrc::load_default("DEFAULT_QHA_FVT_FILE", AFLOWRC_DEFAULT_QHA_FVT_FILE);
     //AS20200508 END
+    aflowrc::load_default("DEFAULT_QHA_PDIS_FILE", AFLOWRC_DEFAULT_QHA_PDIS_FILE);//AS20201022
+    aflowrc::load_default("DEFAULT_QHA_PDOS_FILE", AFLOWRC_DEFAULT_QHA_PDOS_FILE);//AS20201201
+    aflowrc::load_default("DEFAULT_QHA_KPOINTS_FILE", AFLOWRC_DEFAULT_QHA_KPOINTS_FILE);//AS20201112
 
     // DEFAULT AAPL
     //// DEFAULT AAPL VALUES
@@ -1531,10 +1589,18 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_CCE_O2_MOLECULE_LOWER_CUTOFF",AFLOWRC_DEFAULT_CCE_O2_MOLECULE_LOWER_CUTOFF);
     //RF20200413 END
 
-    //DX20200709 - START
     // DEFAULT XTALFINDER
-    aflowrc::load_default("DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING",AFLOWRC_DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING);
-    //DX20200709 - END
+    aflowrc::load_default("DEFAULT_XTALFINDER_MISFIT_MATCH",AFLOWRC_DEFAULT_XTALFINDER_MISFIT_MATCH); //DX20201118
+    aflowrc::load_default("DEFAULT_XTALFINDER_MISFIT_FAMILY",AFLOWRC_DEFAULT_XTALFINDER_MISFIT_FAMILY); //DX20201118
+    aflowrc::load_default("DEFAULT_XTALFINDER_SUPERCELL_METHOD",AFLOWRC_DEFAULT_XTALFINDER_SUPERCELL_METHOD); //DX20201223
+    aflowrc::load_default("DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING",AFLOWRC_DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING); //DX20200709
+    aflowrc::load_default("DEFAULT_XTALFINDER_FILE_MATERIAL",AFLOWRC_DEFAULT_XTALFINDER_FILE_MATERIAL); //DX20201228
+    aflowrc::load_default("DEFAULT_XTALFINDER_FILE_STRUCTURE",AFLOWRC_DEFAULT_XTALFINDER_FILE_STRUCTURE); //DX20201228
+    aflowrc::load_default("DEFAULT_XTALFINDER_FILE_DUPLICATE",AFLOWRC_DEFAULT_XTALFINDER_FILE_DUPLICATE); //DX20201228
+    aflowrc::load_default("DEFAULT_XTALFINDER_FILE_MATERIAL_COMPARE2DATABASE",AFLOWRC_DEFAULT_XTALFINDER_FILE_MATERIAL_COMPARE2DATABASE); //DX20201228
+    aflowrc::load_default("DEFAULT_XTALFINDER_FILE_STRUCTURE_COMPARE2DATABASE",AFLOWRC_DEFAULT_XTALFINDER_FILE_STRUCTURE_COMPARE2DATABASE); //DX20201228
+    aflowrc::load_default("DEFAULT_XTALFINDER_FILE_MATERIAL_DATABASE",AFLOWRC_DEFAULT_XTALFINDER_FILE_MATERIAL_DATABASE); //DX20201228
+    aflowrc::load_default("DEFAULT_XTALFINDER_FILE_STRUCTURE_DATABASE",AFLOWRC_DEFAULT_XTALFINDER_FILE_STRUCTURE_DATABASE); //DX20201228
 
     //DX20200720 - START
     // DEFAULT ANRL
@@ -1577,6 +1643,12 @@ namespace aflowrc {
     aflowrc::load_default("MPI_OPTIONS_DUKE_QFLOW_OPENMPI",AFLOWRC_MPI_OPTIONS_DUKE_QFLOW_OPENMPI); 
     aflowrc::load_default("MPI_COMMAND_DUKE_QFLOW_OPENMPI",AFLOWRC_MPI_COMMAND_DUKE_QFLOW_OPENMPI); 
     aflowrc::load_default("MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI",AFLOWRC_MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI); 
+    
+    //CO20201220 X START
+    aflowrc::load_default("MPI_OPTIONS_DUKE_X",AFLOWRC_MPI_OPTIONS_DUKE_X); 
+    aflowrc::load_default("MPI_COMMAND_DUKE_X",AFLOWRC_MPI_COMMAND_DUKE_X); 
+    aflowrc::load_default("MPI_BINARY_DIR_DUKE_X",AFLOWRC_MPI_BINARY_DIR_DUKE_X); 
+    //CO20201220 X STOP
 
     //DX20190509 - MACHINE001 - START
     aflowrc::load_default("MPI_OPTIONS_MACHINE001",AFLOWRC_MPI_OPTIONS_MACHINE001); 
@@ -1589,6 +1661,12 @@ namespace aflowrc {
     aflowrc::load_default("MPI_COMMAND_MACHINE002",AFLOWRC_MPI_COMMAND_MACHINE002);
     aflowrc::load_default("MPI_BINARY_DIR_MACHINE002",AFLOWRC_MPI_BINARY_DIR_MACHINE002);
     //DX20190509 - MACHINE002 - END
+
+    //DX20201005 - MACHINE003 - START
+    aflowrc::load_default("MPI_OPTIONS_MACHINE003",AFLOWRC_MPI_OPTIONS_MACHINE003);
+    aflowrc::load_default("MPI_COMMAND_MACHINE003",AFLOWRC_MPI_COMMAND_MACHINE003);
+    aflowrc::load_default("MPI_BINARY_DIR_MACHINE003",AFLOWRC_MPI_BINARY_DIR_MACHINE003);
+    //DX20201005 - MACHINE003 - END
 
     //DX20190107 - CMU EULER - START
     aflowrc::load_default("MPI_OPTIONS_CMU_EULER",AFLOWRC_MPI_OPTIONS_CMU_EULER); 
@@ -1993,6 +2071,7 @@ namespace aflowrc {
     //AS20200508 BEGIN
     aflowrc << "DEFAULT_QHA_GP_FINITE_DIFF=" << AFLOWRC_DEFAULT_QHA_GP_FINITE_DIFF  << endl;
     aflowrc << "DEFAULT_QHA_IGNORE_IMAGINARY=" << AFLOWRC_DEFAULT_QHA_IGNORE_IMAGINARY  << endl;
+    aflowrc << "DEFAULT_QHA_RELAX_IONS_CELL=" << AFLOWRC_DEFAULT_QHA_RELAX_IONS_CELL  << endl;//AS20201123
     aflowrc << "DEFAULT_QHA_FILE_PREFIX=\"" << AFLOWRC_DEFAULT_QHA_FILE_PREFIX << "\"" << endl;
     //AS20200709 BEGIN
     aflowrc << "DEFAULT_QHA3P_FILE_PREFIX=\"" << AFLOWRC_DEFAULT_QHA3P_FILE_PREFIX << "\"" << endl;
@@ -2006,6 +2085,9 @@ namespace aflowrc {
     aflowrc << "DEFAULT_QHA_FREQS_FILE=\"" << AFLOWRC_DEFAULT_QHA_FREQS_FILE << "\"" << endl;
     aflowrc << "DEFAULT_QHA_FVT_FILE=\"" << AFLOWRC_DEFAULT_QHA_FVT_FILE << "\"" << endl;
     //AS20200508 END
+    aflowrc << "DEFAULT_QHA_PDIS_FILE=\"" << AFLOWRC_DEFAULT_QHA_PDIS_FILE << "\"" << endl;//AS20201022
+    aflowrc << "DEFAULT_QHA_PDOS_FILE=\"" << AFLOWRC_DEFAULT_QHA_PDOS_FILE << "\"" << endl;//AS20201201
+    aflowrc << "DEFAULT_QHA_KPOINTS_FILE=\"" << AFLOWRC_DEFAULT_QHA_KPOINTS_FILE << "\"" << endl;//AS20201112
 
     aflowrc << " " << endl;
     aflowrc << "// DEFAULTS AAPL" << endl;
@@ -2097,11 +2179,19 @@ namespace aflowrc {
     aflowrc << "DEFAULT_CCE_O2_MOLECULE_LOWER_CUTOFF=" << AFLOWRC_DEFAULT_CCE_O2_MOLECULE_LOWER_CUTOFF << "" << "  // O-O bonds in the O2 molecule is about 1.21 Ang." << endl;
     //RF20200413 END
 
-    //DX20200708 - START
     aflowrc << " " << endl;
     aflowrc << "// DEFAULTS XTALFINDER" << endl;
-    aflowrc << "DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING=" << AFLOWRC_DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING << " // factor that divides minimum interatomic distance" << endl;
-    //DX20200708 - END
+    aflowrc << "DEFAULT_XTALFINDER_MISFIT_MATCH=" << AFLOWRC_DEFAULT_XTALFINDER_MISFIT_MATCH << " // values below this threshold: similar structures have similar properties" << endl; //DX20201118
+    aflowrc << "DEFAULT_XTALFINDER_MISFIT_FAMILY=" << AFLOWRC_DEFAULT_XTALFINDER_MISFIT_FAMILY << " // values above this threshold: matched structures do not have similar properties" << endl; //DX20201118
+    aflowrc << "DEFAULT_XTALFINDER_SUPERCELL_METHOD=" << AFLOWRC_DEFAULT_XTALFINDER_SUPERCELL_METHOD << " // // supercell method for comparing (robust, but slow, superceded by transformation method)" << endl; //DX20201223
+    aflowrc << "DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING=" << AFLOWRC_DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING << " // factor that divides minimum interatomic distance" << endl; //DX20201118
+    aflowrc << "DEFAULT_XTALFINDER_FILE_MATERIAL=" << AFLOWRC_DEFAULT_XTALFINDER_FILE_MATERIAL << " // results file prefix" << endl; //DX20201118
+    aflowrc << "DEFAULT_XTALFINDER_FILE_STRUCTURE=" << AFLOWRC_DEFAULT_XTALFINDER_FILE_STRUCTURE << " // results file prefix" << endl; //DX20201118
+    aflowrc << "DEFAULT_XTALFINDER_FILE_DUPLICATE=" << AFLOWRC_DEFAULT_XTALFINDER_FILE_DUPLICATE << " // results file prefix" << endl; //DX20201118
+    aflowrc << "DEFAULT_XTALFINDER_FILE_MATERIAL_COMPARE2DATABASE=" << AFLOWRC_DEFAULT_XTALFINDER_FILE_MATERIAL_COMPARE2DATABASE << " // results file prefix" << endl; //DX20201118
+    aflowrc << "DEFAULT_XTALFINDER_FILE_STRUCTURE_COMPARE2DATABASE=" << AFLOWRC_DEFAULT_XTALFINDER_FILE_STRUCTURE_COMPARE2DATABASE << " // results file prefix" << endl; //DX20201118
+    aflowrc << "DEFAULT_XTALFINDER_FILE_MATERIAL_DATABASE=" << AFLOWRC_DEFAULT_XTALFINDER_FILE_MATERIAL_DATABASE << " // results file prefix" << endl; //DX20201118
+    aflowrc << "DEFAULT_XTALFINDER_FILE_STRUCTURE_DATABASE=" << AFLOWRC_DEFAULT_XTALFINDER_FILE_STRUCTURE_DATABASE << " // results file prefix" << endl; //DX20201118
 
     //DX20200720 - START
     aflowrc << " " << endl;
@@ -2146,6 +2236,12 @@ namespace aflowrc {
     aflowrc << "MPI_OPTIONS_DUKE_QFLOW_OPENMPI=\"" << AFLOWRC_MPI_OPTIONS_DUKE_QFLOW_OPENMPI << "\"" << "  // DUKE_QFLOW_OPENMPI" << endl;
     aflowrc << "MPI_COMMAND_DUKE_QFLOW_OPENMPI=\"" << AFLOWRC_MPI_COMMAND_DUKE_QFLOW_OPENMPI << "\"" << "  // DUKE_QFLOW_OPENMPI" << endl;
     aflowrc << "MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI=\"" << AFLOWRC_MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI << "\"" << "  // DUKE_QFLOW_OPENMPI" << endl; 
+    
+    //CO20201220 X START
+    aflowrc << "MPI_OPTIONS_DUKE_X=\"" << AFLOWRC_MPI_OPTIONS_DUKE_X << "\"" << "  // DUKE_X" << endl;
+    aflowrc << "MPI_COMMAND_DUKE_X=\"" << AFLOWRC_MPI_COMMAND_DUKE_X << "\"" << "  // DUKE_X" << endl;
+    aflowrc << "MPI_BINARY_DIR_DUKE_X=\"" << AFLOWRC_MPI_BINARY_DIR_DUKE_X << "\"" << "  // DUKE_X" << endl; 
+    //CO20201220 X STOP
 
     //DX20190509 - MACHINE001 - START
     aflowrc << "MPI_OPTIONS_MACHINE001=\"" << AFLOWRC_MPI_OPTIONS_MACHINE001 << "\"" << "// MACHINE001" << endl;
@@ -2158,6 +2254,12 @@ namespace aflowrc {
     aflowrc << "MPI_COMMAND_MACHINE002=\"" << AFLOWRC_MPI_COMMAND_MACHINE002 << "\"" << "// MACHINE002" << endl;
     aflowrc << "MPI_BINARY_DIR_MACHINE002=\"" << AFLOWRC_MPI_BINARY_DIR_MACHINE002 << "\"" << "// MACHINE002" << endl;
     //DX20190509 - MACHINE002 - START
+
+    //DX20201005 - MACHINE003 - START
+    aflowrc << "MPI_OPTIONS_MACHINE003=\"" << AFLOWRC_MPI_OPTIONS_MACHINE003 << "\"" << "// MACHINE003" << endl;
+    aflowrc << "MPI_COMMAND_MACHINE003=\"" << AFLOWRC_MPI_COMMAND_MACHINE003 << "\"" << "// MACHINE003" << endl;
+    aflowrc << "MPI_BINARY_DIR_MACHINE003=\"" << AFLOWRC_MPI_BINARY_DIR_MACHINE003 << "\"" << "// MACHINE003" << endl;
+    //DX20201005 - MACHINE003 - START
 
     //DX20190107 - CMU EULER - START
     aflowrc << "MPI_OPTIONS_CMU_EULER=\"" << AFLOWRC_MPI_OPTIONS_CMU_EULER << "\"" << "// CMU_EULER" << endl;
@@ -2534,6 +2636,7 @@ namespace aflowrc {
     //AS20200508 BEGIN
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_GP_FINITE_DIFF\")=" << DEFAULT_QHA_GP_FINITE_DIFF << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_IGNORE_IMAGINARY\")=" << DEFAULT_QHA_IGNORE_IMAGINARY << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_RELAX_IONS_CELL\")=" << DEFAULT_QHA_IGNORE_IMAGINARY << endl;//AS20201123
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_FILE_PREFIX\")=\"" << DEFAULT_QHA_FILE_PREFIX << "\"" << endl;
     //AS20200709 BEGIN
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA3P_FILE_PREFIX\")=\"" << DEFAULT_QHA3P_FILE_PREFIX << "\"" << endl;
@@ -2545,8 +2648,11 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_GP_AVG_FILE\")=\"" << DEFAULT_QHA_GP_AVG_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_THERMO_FILE\")=\"" << DEFAULT_QHA_THERMO_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_FREQS_FILE\")=\"" << DEFAULT_QHA_FREQS_FILE << "\"" << endl;
-    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_FVT\")=\"" << DEFAULT_QHA_FVT_FILE << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_FVT_FILE\")=\"" << DEFAULT_QHA_FVT_FILE << "\"" << endl;
     //AS20200508 END
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_PDIS_FILE\")=\"" << DEFAULT_QHA_PDIS_FILE << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_PDOS_FILE\")=\"" << DEFAULT_QHA_PDOS_FILE << "\"" << endl;//AS20201201
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_KPOINTS_FILE\")=\"" << DEFAULT_QHA_KPOINTS_FILE << "\"" << endl;//AS20201112
     if(LDEBUG) oss << "// DEFAULTS AAPL" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AAPL_BTE\")=\"" << DEFAULT_AAPL_BTE << "\"" << endl;
     //[ME20181226]if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AAPL_BZMETHOD\")=\"" << DEFAULT_AAPL_BZMETHOD << "\"" << endl;
@@ -2635,7 +2741,17 @@ namespace aflowrc {
 
     //DX20200708 - START
     if(LDEBUG) oss << "// DEFAULTS XTALFINDER" << endl;
-    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING\")=" << DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_XTALFINDER_MISFIT_MATCH\")=" << DEFAULT_XTALFINDER_MISFIT_MATCH << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_XTALFINDER_MISFIT_FAMILY\")=" << DEFAULT_XTALFINDER_MISFIT_FAMILY << endl; //DX20201118
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_XTALFINDER_SUPERCELL_METHOD\")=" << DEFAULT_XTALFINDER_SUPERCELL_METHOD << endl; //DX20201223
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING\")=" << DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING << endl; //DX20201118
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_XTALFINDER_FILE_MATERIAL\")=" << DEFAULT_XTALFINDER_FILE_MATERIAL << endl; //DX20201118
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_XTALFINDER_FILE_STRUCTURE\"=" << DEFAULT_XTALFINDER_FILE_STRUCTURE << endl; //DX20201118
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_XTALFINDER_FILE_DUPLICATE\")=" << DEFAULT_XTALFINDER_FILE_DUPLICATE << endl; //DX20201118
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_XTALFINDER_FILE_MATERIAL_COMPARE2DATABASE\")=" << DEFAULT_XTALFINDER_FILE_MATERIAL_COMPARE2DATABASE << endl; //DX20201118
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_XTALFINDER_FILE_STRUCTURE_COMPARE2DATABASE\")=" << DEFAULT_XTALFINDER_FILE_STRUCTURE_COMPARE2DATABASE << endl; //DX20201118
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_XTALFINDER_FILE_MATERIAL_DATABASE\")=" << DEFAULT_XTALFINDER_FILE_MATERIAL_DATABASE << endl; //DX20201118
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_XTALFINDER_FILE_STRUCTURE_DATABASE\")=" << DEFAULT_XTALFINDER_FILE_STRUCTURE_DATABASE << endl; //DX20201118
     //DX20200708 - END
 
     //DX20200720 - START
@@ -2678,6 +2794,12 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_OPTIONS_DUKE_QFLOW_OPENMPI\")=\"" << MPI_OPTIONS_DUKE_QFLOW_OPENMPI << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_COMMAND_DUKE_QFLOW_OPENMPI\")=\"" << MPI_COMMAND_DUKE_QFLOW_OPENMPI << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI\")=\"" << MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI << "\"" << endl;
+    
+    //CO20201220 X START
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_OPTIONS_DUKE_X\")=\"" << MPI_OPTIONS_DUKE_X << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_COMMAND_DUKE_X\")=\"" << MPI_COMMAND_DUKE_X << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_BINARY_DIR_DUKE_X\")=\"" << MPI_BINARY_DIR_DUKE_X << "\"" << endl;
+    //CO20201220 X STOP
 
     //DX20190509 - MACHINE001 - START
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_OPTIONS_MACHINE001\")=\"" << MPI_OPTIONS_MACHINE001 << "\"" << endl;
@@ -2690,6 +2812,12 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_COMMAND_MACHINE002\")=\"" << MPI_COMMAND_MACHINE002 << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_BINARY_DIR_MACHINE002\")=\"" << MPI_BINARY_DIR_MACHINE002 << "\"" << endl;
     //DX20190509 - MACHINE002 - END
+
+    //DX20201005 - MACHINE003 - START
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_OPTIONS_MACHINE003\")=\"" << MPI_OPTIONS_MACHINE003 << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_COMMAND_MACHINE003\")=\"" << MPI_COMMAND_MACHINE003 << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_BINARY_DIR_MACHINE003\")=\"" << MPI_BINARY_DIR_MACHINE003 << "\"" << endl;
+    //DX20201005 - MACHINE003 - END
 
     //DX20190107 - CMU EULER - START
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_OPTIONS_CMU_EULER\")=\"" << MPI_OPTIONS_CMU_EULER << "\"" << endl;

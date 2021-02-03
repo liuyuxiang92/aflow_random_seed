@@ -429,6 +429,11 @@ namespace init {
       oss << "MPI_OPTIONS_DUKE_QFLOW_OPENMPI=" << MPI_OPTIONS_DUKE_QFLOW_OPENMPI << "\"" << endl;
       oss << "MPI_COMMAND_DUKE_QFLOW_OPENMPI=" << MPI_COMMAND_DUKE_QFLOW_OPENMPI << "\"" << endl;
       oss << "MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI=" << MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI << "\"" << endl;
+      //CO20201220 X START
+      oss << "MPI_OPTIONS_DUKE_X=" << MPI_OPTIONS_DUKE_X << "\"" << endl;
+      oss << "MPI_COMMAND_DUKE_X=" << MPI_COMMAND_DUKE_X << "\"" << endl;
+      oss << "MPI_BINARY_DIR_DUKE_X=" << MPI_BINARY_DIR_DUKE_X << "\"" << endl;
+      //CO20201220 X STOP
       oss << "MPI_OPTIONS_MPCDF_EOS=" << MPI_OPTIONS_MPCDF_EOS << "\"" << endl;
       oss << "MPI_COMMAND_MPCDF_EOS=" << MPI_COMMAND_MPCDF_EOS << "\"" << endl;
       oss << "MPI_NCPUS_MPCDF_EOS=" << MPI_NCPUS_MPCDF_EOS << "\"" << endl;
@@ -460,6 +465,11 @@ namespace init {
       oss << "MPI_COMMAND_MACHINE002=" << MPI_COMMAND_MACHINE002 << "\"" << endl;
       oss << "MPI_BINARY_DIR_MACHINE002=" << MPI_BINARY_DIR_MACHINE002 << "\"" << endl;
       //DX20190509 - MACHINE002 - END
+      //DX20201005 - MACHINE003 - START
+      oss << "MPI_OPTIONS_MACHINE003=" << MPI_OPTIONS_MACHINE003 << "\"" << endl;
+      oss << "MPI_COMMAND_MACHINE003=" << MPI_COMMAND_MACHINE003 << "\"" << endl;
+      oss << "MPI_BINARY_DIR_MACHINE003=" << MPI_BINARY_DIR_MACHINE003 << "\"" << endl;
+      //DX20201005 - MACHINE003 - END
       //DX20190107 - CMU EULER - START
       oss << "MPI_OPTIONS_CMU_EULER=" << MPI_OPTIONS_CMU_EULER << "\"" << endl;
       oss << "MPI_COMMAND_CMU_EULER=" << MPI_COMMAND_CMU_EULER << "\"" << endl;
@@ -759,9 +769,11 @@ namespace init {
     XHOST.vflag_control.flag("PRINT_MODE::HTML",aurostd::args2flag(XHOST.argv,cmds,"--print=html|--print_html")); 
     XHOST.vflag_control.flag("PRINT_MODE::TXT",aurostd::args2flag(XHOST.argv,cmds,"--print=txt|--print_txt")); 
     XHOST.vflag_control.flag("PRINT_MODE::JSON",aurostd::args2flag(XHOST.argv,cmds,"--print=json|--print_json")); //DX20170907 - Add json
+    XHOST.vflag_control.flag("PRINT_MODE::PYTHON",aurostd::args2flag(XHOST.argv,cmds,"--print=python|--print_python")); //DX20201228 - add Python
     XHOST.vflag_control.flag("PRINT_MODE::LATEX",aurostd::args2flag(XHOST.argv,cmds,"--print=latex|--print_latex"));
     XHOST.vflag_control.flag("PRINT_MODE::YEAR",aurostd::args2flag(XHOST.argv,cmds,"--print=year|--print_year"));
     XHOST.vflag_control.flag("PRINT_MODE::DOI",aurostd::args2flag(XHOST.argv,cmds,"--print=doi|--print_doi"));
+    XHOST.vflag_control.flag("PRINT_MODE::BIBTEX",aurostd::args2flag(XHOST.argv,cmds,"--print=bibtex|--print_bibtex"));
     XHOST.vflag_control.flag("PRINT_MODE::EXTRA",aurostd::args2flag(argv,cmds,"--print=extra|--print=vextra_html|--print_vextra_html"));
     XHOST.vflag_control.flag("PRINT_MODE::NUMBER",aurostd::args2flag(XHOST.argv,cmds,"--print=number|--print_number"));
     XHOST.vflag_control.flag("PRINT_MODE::HYPERLINKS",aurostd::args2flag(XHOST.argv,cmds,"--print=hyperlinks|--print_hyperlinks|--print=hyperlink|--print_hyperlink"));
@@ -777,9 +789,11 @@ namespace init {
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"PRINT_MODE::HTML\")=" << XHOST.vflag_control.flag("PRINT_MODE::HTML") << endl;
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"PRINT_MODE::TXT\")=" << XHOST.vflag_control.flag("PRINT_MODE::TXT") << endl;
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"PRINT_MODE::JSON\")=" << XHOST.vflag_control.flag("PRINT_MODE::JSON") << endl; //DX20170907 - Add json
+    if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"PRINT_MODE::PYTHON\")=" << XHOST.vflag_control.flag("PRINT_MODE::PYTHON") << endl; //DX20170907 - add Python
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"PRINT_MODE::LATEX\")=" << XHOST.vflag_control.flag("PRINT_MODE::LATEX") << endl;
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"PRINT_MODE::YEAR\")=" << XHOST.vflag_control.flag("PRINT_MODE::YEAR") << endl;
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"PRINT_MODE::DOI\")=" << XHOST.vflag_control.flag("PRINT_MODE::DOI") << endl;
+    if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"PRINT_MODE::BIBTEX\")=" << XHOST.vflag_control.flag("PRINT_MODE::BIBTEX") << endl;
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"PRINT_MODE::EXTRA\")=" << XHOST.vflag_control.flag("PRINT_MODE::EXTRA") << endl;
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"PRINT_MODE::NUMBER\")=" << XHOST.vflag_control.flag("PRINT_MODE::NUMBER") << endl;
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"PRINT_MODE::HYPERLINKS\")=" << XHOST.vflag_control.flag("PRINT_MODE::HYPERLINKS") << endl;
@@ -819,6 +833,10 @@ namespace init {
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"ARUNS2SKIP\")=" << XHOST.vflag_control.flag("ARUNS2SKIP") << endl;  //CO20200624
     if(XHOST.vflag_control.flag("ARUNS2SKIP")) XHOST.vflag_control.push_attached("ARUNS2SKIP",aurostd::args2attachedstring(argv,"--aruns2skip=|--arun2skip=","")); //CO20200624
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.getattachedscheme(\"ARUNS2SKIP\")=" << XHOST.vflag_control.getattachedscheme("ARUNS2SKIP") << endl;  //CO20200624
+    XHOST.vflag_control.flag("NEGLECT_CCE",aurostd::args2attachedflag(argv,"--neglect_cce|--no_cce|--neglectcce|--nocce")); //CO20210115
+    if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"NEGLECT_CCE\")=" << XHOST.vflag_control.flag("NEGLECT_CCE") << endl;  //CO20210115
+    XHOST.vflag_control.flag("FORCE_POCC",aurostd::args2attachedflag(argv,"--force_pocc")); //CO20210115
+    if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"FORCE_POCC\")=" << XHOST.vflag_control.flag("FORCE_POCC") << endl;  //CO20210115
 
     // [CT20200320] run full AEL post-processing for POCC
     XHOST.vflag_control.flag("AEL_RUN_POSTPROCESSING",aurostd::args2flag(XHOST.argv,cmds,"--ael_run_postprocessing"));  //CT20200320
@@ -980,6 +998,10 @@ namespace init {
 
     // LOADING ANRL WEB
     XHOST.vflag_control.flag("WWW",aurostd::args2flag(argv,cmds,"--www|--web|--web_mode|--php|--html|-www|-web|-web_mode|-php|-html"));  //CO20200404
+    if(XHOST.user=="www-data"){XHOST.vflag_control.flag("WWW",true);} //CO20201215
+
+    //FANCY_PRINT
+    XHOST.vflag_control.flag("NO_FANCY_PRINT",aurostd::args2flag(argv,cmds,"--no_fancy_print|--nofancyprint"));  //CO20200404
 
     // DEFAULT options
     if(INIT_VERBOSE) oss << "--- DEFAULTSs --- " << endl;
@@ -1948,6 +1970,18 @@ namespace init {
     uint nschema=0;
 
     // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:AEL_APPLIED_PRESSURE","ael_applied_pressure");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AEL_APPLIED_PRESSURE","GPa");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AEL_APPLIED_PRESSURE","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:AEL_AVERAGE_EXTERNAL_PRESSURE","ael_average_external_pressure");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AEL_AVERAGE_EXTERNAL_PRESSURE","GPa");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AEL_AVERAGE_EXTERNAL_PRESSURE","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
     XHOST.vschema.push_attached("SCHEMA::NAME:AEL_BULK_MODULUS_REUSS","ael_bulk_modulus_reuss");
     XHOST.vschema.push_attached("SCHEMA::UNIT:AEL_BULK_MODULUS_REUSS","GPa");
     XHOST.vschema.push_attached("SCHEMA::TYPE:AEL_BULK_MODULUS_REUSS","number");
@@ -1972,6 +2006,12 @@ namespace init {
     nschema++;
 
     // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:AEL_DEBYE_TEMPERATURE","ael_debye_temperature");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AEL_DEBYE_TEMPERATURE","K");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AEL_DEBYE_TEMPERATURE","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
     XHOST.vschema.push_attached("SCHEMA::NAME:AEL_ELASTIC_ANISOTROPY","ael_elastic_anisotropy");
     XHOST.vschema.push_attached("SCHEMA::UNIT:AEL_ELASTIC_ANISOTROPY","");
     XHOST.vschema.push_attached("SCHEMA::TYPE:AEL_ELASTIC_ANISOTROPY","number");
@@ -1981,6 +2021,12 @@ namespace init {
     XHOST.vschema.push_attached("SCHEMA::NAME:AEL_POISSON_RATIO","ael_poisson_ratio");
     XHOST.vschema.push_attached("SCHEMA::UNIT:AEL_POISSON_RATIO","");
     XHOST.vschema.push_attached("SCHEMA::TYPE:AEL_POISSON_RATIO","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:AEL_PUGHS_MODULUS_RATIO","ael_pughs_modulus_ratio");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AEL_PUGHS_MODULUS_RATIO","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AEL_PUGHS_MODULUS_RATIO","number");
     nschema++;
 
     // schema is CAPITAL, content is not necessarily
@@ -2002,9 +2048,33 @@ namespace init {
     nschema++;
 
     // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:AEL_SPEED_SOUND_AVERAGE","ael_speed_sound_average");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AEL_SPEED_SOUND_AVERAGE","m/s");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AEL_SPEED_SOUND_AVERAGE","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:AEL_SPEED_SOUND_LONGITUDINAL","ael_speed_sound_longitudinal");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AEL_SPEED_SOUND_LONGITUDINAL","m/s");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AEL_SPEED_SOUND_LONGITUDINAL","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:AEL_SPEED_SOUND_TRANSVERSE","ael_speed_sound_transverse");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AEL_SPEED_SOUND_TRANSVERSE","m/s");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AEL_SPEED_SOUND_TRANSVERSE","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
     XHOST.vschema.push_attached("SCHEMA::NAME:AEL_STIFFNESS_TENSOR","ael_stiffness_tensor");
     XHOST.vschema.push_attached("SCHEMA::UNIT:AEL_STIFFNESS_TENSOR","");
     XHOST.vschema.push_attached("SCHEMA::TYPE:AEL_STIFFNESS_TENSOR","numbers");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:AEL_YOUNGS_MODULUS_VRH","ael_youngs_modulus_vrh");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AEL_YOUNGS_MODULUS_VRH","GPa");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AEL_YOUNGS_MODULUS_VRH","number");
     nschema++;
 
     // schema is CAPITAL, content is not necessarily
@@ -2068,6 +2138,12 @@ namespace init {
     nschema++;
 
     // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:AGL_POISSON_RATIO_SOURCE","agl_poisson_ratio_source");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AGL_POISSON_RATIO_SOURCE","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AGL_POISSON_RATIO_SOURCE","string");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
     XHOST.vschema.push_attached("SCHEMA::NAME:AGL_THERMAL_CONDUCTIVITY_300K","agl_thermal_conductivity_300K");
     XHOST.vschema.push_attached("SCHEMA::UNIT:AGL_THERMAL_CONDUCTIVITY_300K","W/(m K)");
     XHOST.vschema.push_attached("SCHEMA::TYPE:AGL_THERMAL_CONDUCTIVITY_300K","number");
@@ -2079,40 +2155,64 @@ namespace init {
     XHOST.vschema.push_attached("SCHEMA::TYPE:AGL_THERMAL_EXPANSION_300K","number");
     nschema++;
 
-    // schema is CAPITAL, content is not necessarily //DX20200902
-    XHOST.vschema.push_attached("SCHEMA::NAME:ANRL_LABEL_ORIG","anrl_label_orig");
-    XHOST.vschema.push_attached("SCHEMA::UNIT:ANRL_LABEL_ORIG","");
-    XHOST.vschema.push_attached("SCHEMA::TYPE:ANRL_LABEL_ORIG","string");
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:AGL_VIBRATIONAL_ENTROPY_300K_ATOM","agl_vibrational_entropy_300K_atom");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AGL_VIBRATIONAL_ENTROPY_300K_ATOM","meV/(K atom)");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AGL_VIBRATIONAL_ENTROPY_300K_ATOM","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:AGL_VIBRATIONAL_ENTROPY_300K_CELL","agl_vibrational_entropy_300K_cell");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AGL_VIBRATIONAL_ENTROPY_300K_CELL","meV/(K cell)");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AGL_VIBRATIONAL_ENTROPY_300K_CELL","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:AGL_VIBRATIONAL_FREE_ENERGY_300K_ATOM","agl_vibrational_free_energy_300K_atom");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AGL_VIBRATIONAL_FREE_ENERGY_300K_ATOM","meV/atom");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AGL_VIBRATIONAL_FREE_ENERGY_300K_ATOM","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:AGL_VIBRATIONAL_FREE_ENERGY_300K_CELL","agl_vibrational_free_energy_300K_cell");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AGL_VIBRATIONAL_FREE_ENERGY_300K_CELL","meV/cell");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AGL_VIBRATIONAL_FREE_ENERGY_300K_CELL","number");
     nschema++;
 
     // schema is CAPITAL, content is not necessarily //DX20200902
-    XHOST.vschema.push_attached("SCHEMA::NAME:ANRL_PARAMETER_LIST_ORIG","anrl_parameter_list_orig");
-    XHOST.vschema.push_attached("SCHEMA::UNIT:ANRL_PARAMETER_LIST_ORIG","");
-    XHOST.vschema.push_attached("SCHEMA::TYPE:ANRL_PARAMETER_LIST_ORIG","strings");
+    XHOST.vschema.push_attached("SCHEMA::NAME:AFLOW_PROTOTYPE_LABEL_ORIG","aflow_prototype_label_orig"); //DX20201001 - updated keyword
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AFLOW_PROTOTYPE_LABEL_ORIG",""); //DX20201001 - updated keyword
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AFLOW_PROTOTYPE_LABEL_ORIG","string"); //DX20201001 - updated keyword
     nschema++;
 
     // schema is CAPITAL, content is not necessarily //DX20200902
-    XHOST.vschema.push_attached("SCHEMA::NAME:ANRL_PARAMETER_VALUES_ORIG","anrl_parameter_values_orig");
-    XHOST.vschema.push_attached("SCHEMA::UNIT:ANRL_PARAMETER_VALUES_ORIG","");
-    XHOST.vschema.push_attached("SCHEMA::TYPE:ANRL_PARAMETER_VALUES_ORIG","numbers");
+    XHOST.vschema.push_attached("SCHEMA::NAME:AFLOW_PROTOTYPE_PARAMETER_LIST_ORIG","aflow_prototype_parameter_list_orig"); //DX20201001 - updated keyword
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AFLOW_PROTOTYPE_PARAMETER_LIST_ORIG",""); //DX20201001 - updated keyword
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AFLOW_PROTOTYPE_PARAMETER_LIST_ORIG","strings"); //DX20201001 - updated keyword
     nschema++;
 
     // schema is CAPITAL, content is not necessarily //DX20200902
-    XHOST.vschema.push_attached("SCHEMA::NAME:ANRL_LABEL_RELAX","anrl_label_relax");
-    XHOST.vschema.push_attached("SCHEMA::UNIT:ANRL_LABEL_RELAX","");
-    XHOST.vschema.push_attached("SCHEMA::TYPE:ANRL_LABEL_RELAX","string");
+    XHOST.vschema.push_attached("SCHEMA::NAME:AFLOW_PROTOTYPE_PARAMETER_VALUES_ORIG","aflow_prototype_parameter_values_orig"); //DX20201001 - updated keyword
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AFLOW_PROTOTYPE_PARAMETER_VALUES_ORIG",""); //DX20201001 - updated keyword
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AFLOW_PROTOTYPE_PARAMETER_VALUES_ORIG","numbers"); //DX20201001 - updated keyword
     nschema++;
 
     // schema is CAPITAL, content is not necessarily //DX20200902
-    XHOST.vschema.push_attached("SCHEMA::NAME:ANRL_PARAMETER_LIST_RELAX","anrl_parameter_list_relax");
-    XHOST.vschema.push_attached("SCHEMA::UNIT:ANRL_PARAMETER_LIST_RELAX","");
-    XHOST.vschema.push_attached("SCHEMA::TYPE:ANRL_PARAMETER_LIST_RELAX","strings");
+    XHOST.vschema.push_attached("SCHEMA::NAME:AFLOW_PROTOTYPE_LABEL_RELAX","aflow_prototype_label_relax"); //DX20201001 - updated keyword
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AFLOW_PROTOTYPE_LABEL_RELAX",""); //DX20201001 - updated keyword
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AFLOW_PROTOTYPE_LABEL_RELAX","string"); //DX20201001 - updated keyword
     nschema++;
 
     // schema is CAPITAL, content is not necessarily //DX20200902
-    XHOST.vschema.push_attached("SCHEMA::NAME:ANRL_PARAMETER_VALUES_RELAX","anrl_parameter_values_relax");
-    XHOST.vschema.push_attached("SCHEMA::UNIT:ANRL_PARAMETER_VALUES_RELAX","");
-    XHOST.vschema.push_attached("SCHEMA::TYPE:ANRL_PARAMETER_VALUES_RELAX","numbers");
+    XHOST.vschema.push_attached("SCHEMA::NAME:AFLOW_PROTOTYPE_PARAMETER_LIST_RELAX","aflow_prototype_parameter_list_relax"); //DX20201001 - updated keyword
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AFLOW_PROTOTYPE_PARAMETER_LIST_RELAX",""); //DX20201001 - updated keyword
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AFLOW_PROTOTYPE_PARAMETER_LIST_RELAX","strings"); //DX20201001 - updated keyword
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily //DX20200902
+    XHOST.vschema.push_attached("SCHEMA::NAME:AFLOW_PROTOTYPE_PARAMETER_VALUES_RELAX","aflow_prototype_parameter_values_relax"); //DX20201001 - updated keyword
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AFLOW_PROTOTYPE_PARAMETER_VALUES_RELAX",""); //DX20201001 - updated keyword
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AFLOW_PROTOTYPE_PARAMETER_VALUES_RELAX","numbers"); //DX20201001 - updated keyword
     nschema++;
 
     // schema is CAPITAL, content is not necessarily
@@ -2401,6 +2501,20 @@ namespace init {
     XHOST.vschema.push_attached("SCHEMA::TYPE:ENERGY_CUTOFF","number");
     nschema++;
 
+    //AS20201008 BEGIN
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:ENERGY_FREE_ATOM_QHA_300K","energy_free_atom_qha_300K");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:ENERGY_FREE_ATOM_QHA_300K","eV/atom");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:ENERGY_FREE_ATOM_QHA_300K","number");
+    //AS20201008 END
+    //
+    //AS20201207 BEGIN
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:ENERGY_FREE_CELL_QHA_300K","energy_free_cell_qha_300K");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:ENERGY_FREE_CELL_QHA_300K","eV/cell");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:ENERGY_FREE_CELL_QHA_300K","number");
+    //AS20201207 END
+
     // schema is CAPITAL, content is not necessarily
     XHOST.vschema.push_attached("SCHEMA::NAME:ENTHALPY_ATOM","enthalpy_atom");
     XHOST.vschema.push_attached("SCHEMA::UNIT:ENTHALPY_ATOM","eV/atom");
@@ -2495,6 +2609,44 @@ namespace init {
     nschema++;
     //CO20200829 END
 
+    //AS20200915
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:GRUNEISEN_QHA","gruneisen_qha");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:GRUNEISEN_QHA","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:GRUNEISEN_QHA","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:GRUNEISEN_QHA_300K","gruneisen_qha_300K");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:GRUNEISEN_QHA_300K","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:GRUNEISEN_QHA_300K","number");
+    nschema++;
+    //AS20200915 END
+
+    //AS20201008 BEGIN
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:HEAT_CAPACITY_CP_ATOM_QHA_300K","heat_capacity_Cv_atom_qha_300K");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:HEAT_CAPACITY_CP_ATOM_QHA_300K","kB/atom");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:HEAT_CAPACITY_CP_ATOM_QHA_300K","number");
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:HEAT_CAPACITY_CV_ATOM_QHA_300K","heat_capacity_Cp_atom_qha_300K");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:HEAT_CAPACITY_CV_ATOM_QHA_300K","kB/atom");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:HEAT_CAPACITY_CV_ATOM_QHA_300K","number");
+    //AS20201008 END
+
+    //AS20201207 BEGIN
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:HEAT_CAPACITY_CP_CELL_QHA_300K","heat_capacity_Cv_cell_qha_300K");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:HEAT_CAPACITY_CP_CELL_QHA_300K","kB/cell");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:HEAT_CAPACITY_CP_CELL_QHA_300K","number");
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:HEAT_CAPACITY_CV_CELL_QHA_300K","heat_capacity_Cp_cell_qha_300K");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:HEAT_CAPACITY_CV_CELL_QHA_300K","kB/cell");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:HEAT_CAPACITY_CV_CELL_QHA_300K","number");
+    //AS20201207 END
+
     // schema is CAPITAL, content is not necessarily
     XHOST.vschema.push_attached("SCHEMA::NAME:KPOINTS","kpoints");
     XHOST.vschema.push_attached("SCHEMA::UNIT:KPOINTS","");
@@ -2584,6 +2736,21 @@ namespace init {
     XHOST.vschema.push_attached("SCHEMA::UNIT:LOOP","");
     XHOST.vschema.push_attached("SCHEMA::TYPE:LOOP","strings");
     nschema++;
+
+    //AS20200915 BEGIN
+    XHOST.vschema.push_attached("SCHEMA::NAME:MODULUS_BULK_QHA_300K","modulus_bulk_qha_300K");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:MODULUS_BULK_QHA_300K","GPa");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:MODULUS_BULK_QHA_300K","number");
+    nschema++;
+    //AS20200915 END
+    
+    //AS20201008 BEGIN
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:MODULUS_BULK_DERIVATIVE_PRESSURE_QHA_300K","modulus_bulk_derivative_pressure_qha_300K");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:MODULUS_BULK_DERIVATIVE_PRESSURE_QHA_300K","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:MODULUS_BULK_DERIVATIVE_PRESSURE_QHA_300K","number");
+    nschema++;
+    //AS20201008 END
 
     // schema is CAPITAL, content is not necessarily
     XHOST.vschema.push_attached("SCHEMA::NAME:NATOMS","natoms");
@@ -2923,6 +3090,14 @@ namespace init {
     XHOST.vschema.push_attached("SCHEMA::TYPE:STRESS_TENSOR","numbers");
     nschema++;
 
+    //AS20200915 BEGIN
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:THERMAL_EXPANSION_QHA_300K","thermal_expansion_qha_300K");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:THERMAL_EXPANSION_QHA_300K","K^-1");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:THERMAL_EXPANSION_QHA_300K","number");
+    nschema++;
+    //AS20200915 END
+
     // schema is CAPITAL, content is not necessarily
     // OBSOLETE ME20200829
     //XHOST.vschema.push_attached("SCHEMA::NAME:TITLE","title");
@@ -2947,6 +3122,13 @@ namespace init {
     XHOST.vschema.push_attached("SCHEMA::UNIT:VOLUME_ATOM","A^3/atom");
     XHOST.vschema.push_attached("SCHEMA::TYPE:VOLUME_ATOM","number");
     nschema++;
+
+    //AS20201008 BEGIN
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:VOLUME_ATOM_QHA_300K","volume_atom_qha_300K");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:VOLUME_ATOM_QHA_300K","A^3/atom");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:VOLUME_ATOM_QHA_300K","number");
+    //AS20201008 END
 
     // schema is CAPITAL, content is not necessarily
     XHOST.vschema.push_attached("SCHEMA::NAME:VOLUME_CELL","volume_cell");

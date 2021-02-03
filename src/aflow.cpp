@@ -27,6 +27,7 @@
 #include "aflow.h"
 #include "aflow_pflow.h"
 #include "aflow_pocc.h"  //CO20200624
+#include "aflow_anrl.h"  //DX20201104
 
 //#define  __XOPTIMIZE
 //#include "aflow_array.h"
@@ -402,6 +403,149 @@ bool coordinationTest(ofstream& FileMESSAGE,ostream& oss){  //CO20190520
   return TRUE; //CO20180419
 }
 
+bool PrototypeGeneratorTest(ostream& oss, bool check_symmetry){ofstream FileMESSAGE;return PrototypeGeneratorTest(FileMESSAGE,oss,check_symmetry);} //DX20200925
+bool PrototypeGeneratorTest(ofstream& FileMESSAGE,ostream& oss,bool check_symmetry){  //DX20200925
+  string function_name="PrototypeGeneratorTest():";
+  bool LDEBUG=FALSE; // TRUE;
+  stringstream message;
+  _aflags aflags;aflags.Directory=aurostd::getPWD();
+
+  message << "Testing generation of all AFLOW prototypes" << (check_symmetry?" AND checking symmetry of all generated AFLOW prototypes":"");
+  pflow::logger(_AFLOW_FILE_NAME_,function_name,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+
+  vector<string> prototype_labels, compositions;
+  vector<uint> space_group_numbers;
+  vector<vector<vector<string> > > grouped_Wyckoff_letters;
+  string library = "anrl";
+
+  uint num_protos = aflowlib::GetAllPrototypeLabels(prototype_labels,
+      compositions,
+      space_group_numbers,
+      grouped_Wyckoff_letters,
+      library);
+
+  message << "Number of prototype labels = " << num_protos << " (each may have multiple parameter sets)";
+  pflow::logger(_AFLOW_FILE_NAME_,function_name,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+
+  for(uint i=0;i<num_protos;i++){
+    // get parameters
+    vector<string> parameter_sets = anrl::getANRLParameters(prototype_labels[i],"all");
+    if(LDEBUG){ cerr << "Number of parameters for label=" << prototype_labels[i] << ": " << parameter_sets.size() << endl; }
+
+    for(uint j=0;j<parameter_sets.size();j++){
+      xstructure xstr;
+      try{
+        xstr = aflowlib::PrototypeLibraries(oss,prototype_labels[i],parameter_sets[j],1);
+      }
+      catch(aurostd::xerror& excpt){
+        message << "Could not generate prototype=" << prototype_labels[i] << " given parameters=" << parameter_sets[j] << "; check inputs or the symbolic generator.";
+        pflow::logger(_AFLOW_FILE_NAME_,function_name,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
+        return false;
+      }
+
+      // check symmetry
+      if(check_symmetry){
+        if(LDEBUG){ cerr << "Check that the generated structure is consistent with the label=" << prototype_labels[i] << ": " << parameter_sets.size() << endl; }
+
+        // symmetry tolerances
+        // some prototype require special tolerance values
+        stringstream label_input_ss; label_input_ss << prototype_labels[i] << "-" << std::setw(3) << std::setfill('0') << j+1;
+        string label_input = label_input_ss.str();
+        double tolerance_sym = anrl::specialCaseSymmetryTolerances(label_input);
+
+        string updated_label_and_params = "";
+        if(!anrl::structureAndLabelConsistent(xstr, prototype_labels[i], updated_label_and_params, tolerance_sym)){ //DX20201105 - added symmetry tolerance
+          // if changes symmetry, give the appropriate label
+          message << "The structure has a higher symmetry than indicated by the label ";
+          message << "(orig: proto=" << prototype_labels[i] << " and " << parameter_sets[j] << "). ";
+          message << "The correct label and parameters for this structure are:" << endl;
+          message << updated_label_and_params << endl;
+          message << "Please feed this label and set of parameters into the prototype generator.";
+          pflow::logger(_AFLOW_FILE_NAME_,function_name,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
+          return false;
+        }
+      }
+    }
+  }
+  message << "Successfully generated all prototypes!";
+  pflow::logger(_AFLOW_FILE_NAME_,function_name,message,aflags,FileMESSAGE,oss,_LOGGER_COMPLETE_);
+
+  return true;
+}
+
+bool FoldAtomsInCellTest(ostream& oss){ofstream FileMESSAGE;return FoldAtomsInCellTest(FileMESSAGE,oss);} //DX20210129
+bool FoldAtomsInCellTest(ofstream& FileMESSAGE,ostream& oss){ //DX20210129
+  string function_name="FoldAtomsInCellTest():";
+  //bool LDEBUG=FALSE; // TRUE;
+  stringstream message;
+  _aflags aflags;aflags.Directory=aurostd::getPWD();
+
+  // ---------------------------------------------------------------------------
+  // generate rocksalt structure
+  string prototype_label = "AB_cF8_225_a_b"; 
+  vector<string> parameter_sets = anrl::getANRLParameters(prototype_label,"all");
+
+  if(parameter_sets.size() != 1){
+    message << "Expected only one parameter set for the rocksalt structure (" << prototype_label << ") # different parameter sets=" << parameter_sets.size() << ".";
+    pflow::logger(_AFLOW_FILE_NAME_,function_name,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
+    return false;
+  }
+
+  xstructure xstr;
+  try{
+    xstr = aflowlib::PrototypeLibraries(oss,prototype_label,parameter_sets[0],1);
+  }
+  catch(aurostd::xerror& excpt){
+    message << "Could not generate prototype=" << prototype_label << " given parameters=" << parameter_sets[0] << "; check inputs or the symbolic generator.";
+    pflow::logger(_AFLOW_FILE_NAME_,function_name,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
+    return false;
+  }
+
+  // set fold atoms in cell variables
+  bool skew = false;
+  double tol = 0.01;
+  bool check_min_dists = false;
+
+  // ---------------------------------------------------------------------------
+  // test 1: expand cell
+  // create 3x1x1 supercell expansion matrix
+  xmatrix<double> supercell_matrix = aurostd::eye<double>(3,3);
+  supercell_matrix(1,1)=3.0;
+  xmatrix<double> lattice_new = supercell_matrix*xstr.lattice; // transform lattice
+
+  xstructure xstr_supercell = xstr;
+  xstr_supercell.foldAtomsInCell(lattice_new, skew, tol, check_min_dists);
+
+  bool same_species = true;
+  if(compare::structuresMatch(xstr,xstr_supercell,same_species)){
+    message << "Successfully expanded rocksalt structure into a 3x1x1 supercell via foldAtomsInCell().";
+    pflow::logger(_AFLOW_FILE_NAME_,function_name,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+  }
+  else{
+    message << "Expanded rocksalt structure is not equivalent to the original structure; bad expansion.";
+    pflow::logger(_AFLOW_FILE_NAME_,function_name,message,aflags,FileMESSAGE,oss,_LOGGER_WARNING_);
+    return false;
+  }
+
+  // ---------------------------------------------------------------------------
+  // test 2: reduce cell
+  // convert supercell back to original lattice
+  xstructure xstr_reduced = xstr_supercell;
+  xstr_reduced.foldAtomsInCell(xstr.lattice, skew, tol, check_min_dists);
+
+  if(compare::structuresMatch(xstr,xstr_reduced,same_species)){
+    message << "Successfully reduced 3x1x1 rocksalt structure into a primitive form via foldAtomsInCell().";
+    pflow::logger(_AFLOW_FILE_NAME_,function_name,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+  }
+  else{
+    message << "Reduced 3x1x1 rocksalt structure is not equivalent to the original structure; bad reduction.";
+    pflow::logger(_AFLOW_FILE_NAME_,function_name,message,aflags,FileMESSAGE,oss,_LOGGER_WARNING_);
+    return false;
+  }
+
+  return true;
+}
+
 int main(int _argc,char **_argv) {
   string soliloquy = XPID + "main():"; //CO20180419
   ostream& oss=cout;  //CO20180419
@@ -577,6 +721,9 @@ int main(int _argc,char **_argv) {
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_gcd|--gcd_test")) {return (gcdTest()?0:1);}  //CO20190601
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_smith|--smith_test")) {return (smithTest()?0:1);}  //CO20190601
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_coordination|--coordination_test")) {return (coordinationTest()?0:1);}  //CO20190601
+    if(!Arun && aurostd::args2flag(argv,cmds,"--test_PrototypeGenerator|--PrototypeGenerator_test")) {return (PrototypeGeneratorTest()?0:1);}  //DX20200928
+    if(!Arun && aurostd::args2flag(argv,cmds,"--test_PrototypeSymmetry|--PrototypeSymmetry_test")) {return (PrototypeGeneratorTest(cout,true)?0:1);}  //DX20201105
+    if(!Arun && aurostd::args2flag(argv,cmds,"--test_FoldAtomsInCell|--FoldAtomsInCell_test")) {return (FoldAtomsInCellTest(cout)?0:1);}  //DX20210129
     if(!Arun && aurostd::args2flag(argv,cmds,"--test")) {
 
       if(XHOST.vext.size()!=XHOST.vcat.size()) {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"XHOST.vext.size()!=XHOST.vcat.size(), aborting.",_RUNTIME_ERROR_);}
@@ -1049,7 +1196,7 @@ namespace aflow {
     strstream << tab << " --mpi|-nompi|--serial " << endl;
     strstream << endl;
     strstream << " HOST ORIENTED OPTION" << endl;
-    strstream << tab << " --machine=beta|beta_openmpi|qrats|qflow|conrad|eos|materials|habana|aflowlib|ranger|kraken" << endl;
+    strstream << tab << " --machine=beta|beta_openmpi|qrats|qflow|x|conrad|eos|materials|habana|aflowlib|ranger|kraken" << endl;
     strstream << tab << "           marylou|parsons|jellium|ohad|host1" << endl;
     strstream << tab << "           raptor --np=N|diamond --np=N" << endl;
     strstream << "******* END RUNNING MODE ***************************************************************************" << endl;

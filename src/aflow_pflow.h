@@ -408,6 +408,7 @@ namespace pflow {
   bool sortPOCCOccs(const string& occ1,const string& occ2); //CO20181226
   bool FIX_PRECISION_POCC(const string& occ,string& new_occ); //CO20181226
   void FIX_POCC_PARAMS(const xstructure& xstr,string& pocc_params); //CO20181226
+  bool checkAnionSublattice(const xstructure& xstr);  //CO20210201
   bool convertXStr2POCC(xstructure& xstr,const string& pocc_params,const vector<string>& vspecies,const vector<double>& vvolumes);  //CO20181226
   xstructure PROTO_LIBRARIES(aurostd::xoption vpflow);
   bool PROTO_AFLOW(aurostd::xoption vpflow,bool flag_REVERSE);  // too many options
@@ -703,8 +704,8 @@ namespace pflow {
   string PrintRTencFile(const pflow::rtparams& rt_params, ostringstream& rtenc_file);
   string CreateRTmpgFile(const pflow::rtparams& rt_params, const string& encfile);
   void RayTraceManager(vector<string>);
-  aurostd::matrix<double> GetRotationMatrix(const vector<double>& angles); //CO20200404 pflow::matrix()->aurostd::matrix()
-  void RotateStrVec(vector<xstructure>& str_vec, const vector<double>& rot);
+  //DX20210127 [OBSOLETE - moved to aflow.h] aurostd::matrix<double> GetRotationMatrix(const vector<double>& angles); //CO20200404 pflow::matrix()->aurostd::matrix()
+  //DX20210127 [OBSOLETE - moved to aflow.h] void RotateStrVec(vector<xstructure>& str_vec, const vector<double>& rot);
 
 }
 
@@ -921,7 +922,8 @@ namespace pflow {
 }  // namespace pflow
 
 namespace pflow {
-  vector<string> fakeElements(uint nspecies); //DX20200728
+  vector<string> getFakeElements(uint nspecies); //DX20200728
+  bool hasRealElements(const xstructure& xstr); //DX20210113
   double getSymmetryTolerance(const xstructure& xstr, const string& tolerance_string);
   vector<double> getSymmetryToleranceSpectrum(const string& tolerance_range_string);
 }
