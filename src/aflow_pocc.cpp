@@ -1115,11 +1115,9 @@ namespace pocc {
 
     //get most relaxed outcar
     uint i=0,max=10,max_found=0;
-    for(i=max;i<=max;i--){
-      if(aurostd::EFileExist(m_aflags.Directory+"/"+m_ARUN_directories[0]+"/OUTCAR.relax"+aurostd::utype2string(i))){
-        max_found=i;
-        break;
-      }
+    for(i=1;i<=max;i++){  //i=max;i<=max;i--
+      if(aurostd::EFileExist(m_aflags.Directory+"/"+m_ARUN_directories[0]+"/OUTCAR.relax"+aurostd::utype2string(i))){max_found=i;}
+      else{break;}
     }
     if(max_found==0){return;} //no runs completed
 
