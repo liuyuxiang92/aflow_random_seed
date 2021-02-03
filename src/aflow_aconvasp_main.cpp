@@ -9823,6 +9823,9 @@ namespace pflow {
       return false;
     }
 
+    vector<string> vspecies=entry.vspecies;
+    if(vspecies.empty()){vspecies=entry.getSpeciesAURL(FileMESSAGE,oss);}
+
     xstructure xstrAux;
     stringstream ss;
     vector<string> files;
@@ -9875,7 +9878,15 @@ namespace pflow {
           if ( (is_url_path ? 
                 aurostd::eurl2stringstream(path+"/"+efile,ss,false) : 
                 aurostd::efile2stringstream(path+"/"+efile,ss)) ) {
-            try{ xstrAux = xstructure(ss, IOVASP_AUTO); structure_files.push_back(poscar_files_orig[i]); } //DX20191210 - added try-catch //DX20200224 - added structure_files tag
+            try{ 
+              xstrAux = xstructure(ss, IOVASP_AUTO);
+              if(xstrAux.GetElementsFromAtomNames().size()==0){
+                if(vspecies.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"could not extract species from AURL",_INPUT_ERROR_);}
+                xstrAux.SetSpecies(aurostd::vector2deque(vspecies));
+              }
+              if(LDEBUG){cerr << soliloquy << " xstrAux=" << endl;cerr << xstrAux << endl;}
+              structure_files.push_back(poscar_files_orig[i]); 
+            } //DX20191210 - added try-catch //DX20200224 - added structure_files tag
             catch(aurostd::xerror& excpt) { 
               xstrAux.clear(); //clear it if it is garbage //DX20191220 - uppercase to lowercase clear
               message << poscar_files_orig[i] << ": Path exists, but could not load structure (e.g., URL timeout or bad structure file)."; 
@@ -9907,7 +9918,15 @@ namespace pflow {
           if ( (is_url_path ? 
                 aurostd::eurl2stringstream(path+"/"+efile,ss,false) : 
                 aurostd::efile2stringstream(path+"/"+efile,ss)) ) {
-            try{ xstrAux = xstructure(ss, IOVASP_AUTO); structure_files.push_back(poscar_files_relax_mid[i]); } //DX20191210 - added try-catch //DX20200224 - added structure_files tag
+            try{ 
+              xstrAux = xstructure(ss, IOVASP_AUTO); 
+              if(xstrAux.GetElementsFromAtomNames().size()==0){
+                if(vspecies.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"could not extract species from AURL",_INPUT_ERROR_);}
+                xstrAux.SetSpecies(aurostd::vector2deque(vspecies));
+              }
+              if(LDEBUG){cerr << soliloquy << " xstrAux=" << endl;cerr << xstrAux << endl;}
+              structure_files.push_back(poscar_files_relax_mid[i]); 
+            } //DX20191210 - added try-catch //DX20200224 - added structure_files tag
             catch(aurostd::xerror& excpt) { 
               xstrAux.clear(); //clear it if it is garbage //DX20191220 - uppercase to lowercase clear
               message << poscar_files_relax_mid[i] << ": Path exists, but could not load structure (e.g., URL timeout or bad structure file)."; 
@@ -9940,7 +9959,15 @@ namespace pflow {
         if ( (is_url_path ? 
               aurostd::eurl2stringstream(path+"/"+efile,ss,false) : 
               aurostd::efile2stringstream(path+"/"+efile,ss)) ) {
-          try{ xstrAux = xstructure(ss, IOVASP_AUTO); structure_files.push_back(poscar_files_relax_final[i]); } //DX20191210 - added try-catch //DX20200224 - added structure_files tag
+          try{ 
+            xstrAux = xstructure(ss, IOVASP_AUTO); 
+            if(xstrAux.GetElementsFromAtomNames().size()==0){
+              if(vspecies.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"could not extract species from AURL",_INPUT_ERROR_);}
+              xstrAux.SetSpecies(aurostd::vector2deque(vspecies));
+            }
+            if(LDEBUG){cerr << soliloquy << " xstrAux=" << endl;cerr << xstrAux << endl;}
+            structure_files.push_back(poscar_files_relax_final[i]); 
+          } //DX20191210 - added try-catch //DX20200224 - added structure_files tag
           catch(aurostd::xerror& excpt) { 
             xstrAux.clear(); //clear it if it is garbage //DX20191220 - uppercase to lowercase clear
             message << poscar_files_relax_final[i] << ": Path exists, but could not load structure (e.g., URL timeout or bad structure file)."; 

@@ -1562,7 +1562,7 @@ class xstructure {
     void DecorateWithFakeElements(void);                          // Decorate with fake elements - useful for prototypes //DX20200727
     vector<string> GetElements(bool clean_name=false,
         bool fake_names=false);                                   //DX20200724
-    vector<string> GetElementsFromAtomNames(bool clean_name);     //DX20200724
+    vector<string> GetElementsFromAtomNames(bool clean_name=true);//DX20200724
     vector<uint> GetReducedComposition(bool numerical_sort=false);//DX20200724
     string platon2sg(bool P_EQUAL=DEFAULT_PLATON_P_EQUAL,
         bool P_EXACT=DEFAULT_PLATON_P_EXACT,

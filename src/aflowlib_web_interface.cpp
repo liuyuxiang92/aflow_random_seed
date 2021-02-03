@@ -3931,6 +3931,51 @@ namespace aflowlib {
     path_full=server+"/"+path;
     return path_full;
   }
+  vector<string> _aflowlib_entry::getSpeciesAURL(ostream& oss){ //CO20200404
+    ofstream FileMESSAGE;
+    return getSpeciesAURL(FileMESSAGE, oss);
+  }
+  vector<string> _aflowlib_entry::getSpeciesAURL(ofstream& FileMESSAGE,ostream& oss){  //CO20200404
+    bool LDEBUG=(TRUE || XHOST.DEBUG);
+    string soliloquy=XPID+"_aflowlib_entry::getSpeciesAURL():";
+    stringstream message;
+
+    if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
+
+    vector<string> vspecies;
+    if(aurl.empty()){return vspecies;}
+    vector<string> tokens;
+    aurostd::string2tokens(aurl,tokens,":");
+
+    //erase first item (aflowlib.duke.edu), join others, assume we're okay...
+    tokens.erase(tokens.begin());
+    string path=aurostd::joinWDelimiter(tokens,":");
+    if(LDEBUG){cerr << soliloquy << " path=" << path << endl;}
+    
+    //split by /
+    aurostd::string2tokens(path,tokens,"/");
+    if(tokens.size()<4){
+      message << "Odd AURL format for entry " << auid << ": " << aurl;
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, oss, _LOGGER_WARNING_);
+      return vspecies;
+    }
+    string species_string="";
+    if(path.find("_ICSD_")!=string::npos){  //if ICSD: AFLOWDATA/ICSD_WEB/HEX/Te2Zr1_ICSD_653213
+      species_string=tokens[3];
+      string::size_type loc;loc=species_string.find("_ICSD_");
+      species_string=species_string.substr(0,loc);
+    }
+    else{ //otherwise: AFLOWDATA/LIB2_RAW/TeZr_sv/10
+      species_string=tokens[2];
+      //fix LIB1: Zr_sv:PAW_PBE:07Sep2000
+      string::size_type loc;loc=species_string.find(":");
+      species_string=species_string.substr(0,loc);
+    }
+    
+    vspecies=aurostd::getElements(species_string);
+    if(LDEBUG){cerr << soliloquy << " vspecies=" << aurostd::joinWDelimiter(vspecies,",") << endl;}
+    return vspecies;
+  }
 }
 
 // **************************************************************************
