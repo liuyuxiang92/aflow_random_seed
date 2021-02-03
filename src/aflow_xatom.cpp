@@ -6703,47 +6703,72 @@ void xstructure::MakeTypes(void) {
 // xstructure::AddAtom() //DX20210202
 // **************************************************************************
 // This adds a deque<_atom> to the structure.
-// More efficient than adding one atom at a time (AddAtom);
-// update species and basis at the end
+// More efficient than adding one atom at a time (AddAtom): use more
+// efficient for-loop for atoms (upper-triangular) and update species/basis
+// info once at the end
 
 void xstructure::AddAtom(const deque<_atom>& atoms_in, bool check_present) { //DX20210129
   //bool LDEBUG=(FALSE || XHOST.DEBUG);
 
   if(check_present){
-    // check that this atom is not already present
-    xvector<double> a1(3),a2(3),a3(3),aijk(3);
-    a1=lattice(1);a2=lattice(2);a3=lattice(3);
+    // use sym_eps if available; if not, use tenth of an Angstrom
+    // (since this function adds atoms iteratively, we cannot use minimumDistance,
+    // because it would change as we add new atoms) //DX20210202
+    double tol=(*this).sym_eps;
+    if(tol>=AUROSTD_NAN || tol<_ZERO_TOL_){ tol = 0.1; } // tenth of Angstrom
+
+    // it is more efficient to use a double for-loop (upper-triangular)
+    // as opposed to MapAtom(deque<_atom>, _atom); otherwise you check atoms
+    // end up checking twice //DX20210202
+    bool FOUND_POSITION=FALSE;
     for(uint iat=0;iat<atoms_in.size();iat++){
-      bool FOUND_POSITION=FALSE;
+      FOUND_POSITION=FALSE;
       for(uint jat=iat+1;jat<atoms_in.size()&&FOUND_POSITION==FALSE;jat++){
-        if(atoms_in[iat].type==atoms_in[jat].type && atoms_in[iat].name==atoms_in[jat].name){
-          for(int i=-1;i<=1&&FOUND_POSITION==FALSE;i++){
-            for(int j=-1;j<=1&&FOUND_POSITION==FALSE;j++){
-              for(int k=-1;k<=1&&FOUND_POSITION==FALSE;k++) {
-                aijk[1]=i;aijk[2]=j;aijk[3]=k;
-                //	if(aurostd::modulus(atoms_in[iat].cpos-(((double)i)*a1+((double)j)*a2+((double)k)*a3+atoms_in[jat].cpos))<0.1) FOUND_POSITION=TRUE;
-                //DX+CO START    
-                //DX if(aurostd::modulus(atoms_in[iat].fpos-(aijk+atoms_in[jat].fpos))<0.01) FOUND_POSITION=TRUE;
-                if((*this).sym_eps!=AUROSTD_NAN && (*this).sym_eps<AUROSTD_NAN && (*this).sym_eps>1e-10){ //DX20171201 - Added (*this).sym_eps>1e-10 //DX20180215 - added (*this).sym_eps<AUROSTD_NAN (needed) 
-                  if(aurostd::modulus((*this).f2c*(atoms_in[iat].fpos-(aijk+atoms_in[jat].fpos)))<=(*this).sym_eps) FOUND_POSITION=TRUE; //DX
-                }
-                else { 
-                  //if(aurostd::modulus(atoms[iat].fpos-(aijk+atom.fpos))<1e-10) FOUND_POSITION=TRUE; //DX
-                  if(aurostd::modulus(atoms_in[iat].cpos-(((double)i)*a1+((double)j)*a2+((double)k)*a3+atoms_in[jat].cpos))<0.1) FOUND_POSITION=TRUE; //DX20171201
-                }
-                //DX+CO END
-              }
-            }
-          }
-        }
+        if(SYM::MapAtom(atoms_in[iat], atoms_in[jat], true, (*this).lattice, false, tol)){ FOUND_POSITION=TRUE; }
       }
-      if(FOUND_POSITION){ continue; } // found no need to add it further
+      if(FOUND_POSITION){ continue; }
       else{ atoms.push_back(atoms_in[iat]); }
     }
   }
   else{
     atoms = atoms_in;
   }
+
+  //DX20210202 [OBSOLETE - use MapAtom] if(check_present){
+  //DX20210202 [OBSOLETE - use MapAtom]   // check that this atom is not already present
+  //DX20210202 [OBSOLETE - use MapAtom]   xvector<double> a1(3),a2(3),a3(3),aijk(3);
+  //DX20210202 [OBSOLETE - use MapAtom]   a1=lattice(1);a2=lattice(2);a3=lattice(3);
+  //DX20210202 [OBSOLETE - use MapAtom]   for(uint iat=0;iat<atoms_in.size();iat++){
+  //DX20210202 [OBSOLETE - use MapAtom]     bool FOUND_POSITION=FALSE;
+  //DX20210202 [OBSOLETE - use MapAtom]     for(uint jat=iat+1;jat<atoms_in.size()&&FOUND_POSITION==FALSE;jat++){
+  //DX20210202 [OBSOLETE - use MapAtom]       if(atoms_in[iat].type==atoms_in[jat].type && atoms_in[iat].name==atoms_in[jat].name){
+  //DX20210202 [OBSOLETE - use MapAtom]         for(int i=-1;i<=1&&FOUND_POSITION==FALSE;i++){
+  //DX20210202 [OBSOLETE - use MapAtom]           for(int j=-1;j<=1&&FOUND_POSITION==FALSE;j++){
+  //DX20210202 [OBSOLETE - use MapAtom]             for(int k=-1;k<=1&&FOUND_POSITION==FALSE;k++) {
+  //DX20210202 [OBSOLETE - use MapAtom]               aijk[1]=i;aijk[2]=j;aijk[3]=k;
+  //DX20210202 [OBSOLETE - use MapAtom]               //	if(aurostd::modulus(atoms_in[iat].cpos-(((double)i)*a1+((double)j)*a2+((double)k)*a3+atoms_in[jat].cpos))<0.1) FOUND_POSITION=TRUE;
+  //DX20210202 [OBSOLETE - use MapAtom]               //DX+CO START
+  //DX20210202 [OBSOLETE - use MapAtom]               //DX if(aurostd::modulus(atoms_in[iat].fpos-(aijk+atoms_in[jat].fpos))<0.01) FOUND_POSITION=TRUE;
+  //DX20210202 [OBSOLETE - use MapAtom]               if((*this).sym_eps!=AUROSTD_NAN && (*this).sym_eps<AUROSTD_NAN && (*this).sym_eps>1e-10){ //DX20171201 - Added (*this).sym_eps>1e-10 //DX20180215 - added (*this).sym_eps<AUROSTD_NAN (needed) 
+  //DX20210202 [OBSOLETE - use MapAtom]                 if(aurostd::modulus((*this).f2c*(atoms_in[iat].fpos-(aijk+atoms_in[jat].fpos)))<=(*this).sym_eps) FOUND_POSITION=TRUE; //DX
+  //DX20210202 [OBSOLETE - use MapAtom]               }
+  //DX20210202 [OBSOLETE - use MapAtom]               else {
+  //DX20210202 [OBSOLETE - use MapAtom]                 //if(aurostd::modulus(atoms[iat].fpos-(aijk+atom.fpos))<1e-10) FOUND_POSITION=TRUE; //DX
+  //DX20210202 [OBSOLETE - use MapAtom]                 if(aurostd::modulus(atoms_in[iat].cpos-(((double)i)*a1+((double)j)*a2+((double)k)*a3+atoms_in[jat].cpos))<0.1) FOUND_POSITION=TRUE; //DX20171201
+  //DX20210202 [OBSOLETE - use MapAtom]               }
+  //DX20210202 [OBSOLETE - use MapAtom]               //DX+CO END
+  //DX20210202 [OBSOLETE - use MapAtom]             }
+  //DX20210202 [OBSOLETE - use MapAtom]           }
+  //DX20210202 [OBSOLETE - use MapAtom]         }
+  //DX20210202 [OBSOLETE - use MapAtom]       }
+  //DX20210202 [OBSOLETE - use MapAtom]     }
+  //DX20210202 [OBSOLETE - use MapAtom]     if(FOUND_POSITION){ continue; } // found no need to add it further
+  //DX20210202 [OBSOLETE - use MapAtom]     else{ atoms.push_back(atoms_in[iat]); }
+  //DX20210202 [OBSOLETE - use MapAtom]   }
+  //DX20210202 [OBSOLETE - use MapAtom] }
+  //DX20210202 [OBSOLETE - use MapAtom] else{
+  //DX20210202 [OBSOLETE - use MapAtom]   atoms = atoms_in;
+  //DX20210202 [OBSOLETE - use MapAtom] }
 
   // update the species: update num/comp each type or add new species
   for(uint iat=0;iat<atoms.size();iat++){
@@ -6765,31 +6790,39 @@ void xstructure::AddAtom(const _atom& atom, bool check_present) {
   _atom btom=atom; //DX20210202
 
   if(check_present){ //CO20210116 - AddCorners() should NOT check
-    // check that this atom is not already present
-    xvector<double> a1(3),a2(3),a3(3),aijk(3);
-    a1=lattice(1);a2=lattice(2);a3=lattice(3);
-
-    bool FOUND_POSITION=FALSE;
-    for(uint iat=0;iat<atoms.size()&&FOUND_POSITION==FALSE;iat++)
-      if(atoms[iat].type==atom.type && atoms[iat].name==atom.name)
-        for(int i=-1;i<=1&&FOUND_POSITION==FALSE;i++)
-          for(int j=-1;j<=1&&FOUND_POSITION==FALSE;j++)
-            for(int k=-1;k<=1&&FOUND_POSITION==FALSE;k++) {
-              aijk[1]=i;aijk[2]=j;aijk[3]=k;
-              //	if(aurostd::modulus(atoms[iat].cpos-(((double)i)*a1+((double)j)*a2+((double)k)*a3+atom.cpos))<0.1) FOUND_POSITION=TRUE;
-              //DX+CO START    
-              //DX if(aurostd::modulus(atoms[iat].fpos-(aijk+atom.fpos))<0.01) FOUND_POSITION=TRUE;
-              if((*this).sym_eps!=AUROSTD_NAN && (*this).sym_eps<AUROSTD_NAN && (*this).sym_eps>1e-10){ //DX20171201 - Added (*this).sym_eps>1e-10 //DX20180215 - added (*this).sym_eps<AUROSTD_NAN (needed) 
-                if(aurostd::modulus((*this).f2c*(atoms[iat].fpos-(aijk+atom.fpos)))<=(*this).sym_eps) FOUND_POSITION=TRUE; //DX
-              }
-              else { 
-                //if(aurostd::modulus(atoms[iat].fpos-(aijk+atom.fpos))<1e-10) FOUND_POSITION=TRUE; //DX
-                if(aurostd::modulus(atoms[iat].cpos-(((double)i)*a1+((double)j)*a2+((double)k)*a3+atom.cpos))<0.1) FOUND_POSITION=TRUE; //DX20171201
-              }
-              //DX+CO END
-            }
-    if(FOUND_POSITION==TRUE) return; // found no need to add it further
+    // use sym_eps if available; if not, use tenth of an Angstrom
+    // (since this function adds atoms iteratively, we cannot use minimumDistance,
+    // because it would change as we add new atoms) //DX20210202
+    double tol=(*this).sym_eps;
+    if(tol>=AUROSTD_NAN || tol<_ZERO_TOL_){ tol = 0.1; } // tenth of Angstrom
+    if(SYM::MapAtom((*this).atoms, atom, true, (*this).lattice, false, tol)){ return; }
   }
+
+  //DX20210202 [OBSOLETE - use MapAtom] if(check_present){ //CO20210116 - AddCorners() should NOT check
+  //DX20210202 [OBSOLETE - use MapAtom]   // check that this atom is not already present
+  //DX20210202 [OBSOLETE - use MapAtom]   xvector<double> a1(3),a2(3),a3(3),aijk(3);
+  //DX20210202 [OBSOLETE - use MapAtom]   a1=lattice(1);a2=lattice(2);a3=lattice(3);
+  //DX20210202 [OBSOLETE - use MapAtom]   bool FOUND_POSITION=FALSE;
+  //DX20210202 [OBSOLETE - use MapAtom]   for(uint iat=0;iat<atoms.size()&&FOUND_POSITION==FALSE;iat++)
+  //DX20210202 [OBSOLETE - use MapAtom]     if(atoms[iat].type==atom.type && atoms[iat].name==atom.name)
+  //DX20210202 [OBSOLETE - use MapAtom]       for(int i=-1;i<=1&&FOUND_POSITION==FALSE;i++)
+  //DX20210202 [OBSOLETE - use MapAtom]         for(int j=-1;j<=1&&FOUND_POSITION==FALSE;j++)
+  //DX20210202 [OBSOLETE - use MapAtom]           for(int k=-1;k<=1&&FOUND_POSITION==FALSE;k++) {
+  //DX20210202 [OBSOLETE - use MapAtom]             aijk[1]=i;aijk[2]=j;aijk[3]=k;
+  //DX20210202 [OBSOLETE - use MapAtom]             //	if(aurostd::modulus(atoms[iat].cpos-(((double)i)*a1+((double)j)*a2+((double)k)*a3+atom.cpos))<0.1) FOUND_POSITION=TRUE;
+  //DX20210202 [OBSOLETE - use MapAtom]             //DX+CO START
+  //DX20210202 [OBSOLETE - use MapAtom]             //DX if(aurostd::modulus(atoms[iat].fpos-(aijk+atom.fpos))<0.01) FOUND_POSITION=TRUE;
+  //DX20210202 [OBSOLETE - use MapAtom]             if((*this).sym_eps!=AUROSTD_NAN && (*this).sym_eps<AUROSTD_NAN && (*this).sym_eps>1e-10){ //DX20171201 - Added (*this).sym_eps>1e-10 //DX20180215 - added (*this).sym_eps<AUROSTD_NAN (needed) 
+  //DX20210202 [OBSOLETE - use MapAtom]               if(aurostd::modulus((*this).f2c*(atoms[iat].fpos-(aijk+atom.fpos)))<=(*this).sym_eps) FOUND_POSITION=TRUE; //DX
+  //DX20210202 [OBSOLETE - use MapAtom]             }
+  //DX20210202 [OBSOLETE - use MapAtom]             else {
+  //DX20210202 [OBSOLETE - use MapAtom]               //if(aurostd::modulus(atoms[iat].fpos-(aijk+atom.fpos))<1e-10) FOUND_POSITION=TRUE; //DX
+  //DX20210202 [OBSOLETE - use MapAtom]               if(aurostd::modulus(atoms[iat].cpos-(((double)i)*a1+((double)j)*a2+((double)k)*a3+atom.cpos))<0.1) FOUND_POSITION=TRUE; //DX20171201
+  //DX20210202 [OBSOLETE - use MapAtom]             }
+  //DX20210202 [OBSOLETE - use MapAtom]             //DX+CO END
+  //DX20210202 [OBSOLETE - use MapAtom]           }
+  //DX20210202 [OBSOLETE - use MapAtom]   if(FOUND_POSITION==TRUE) return; // found no need to add it further
+  //DX20210202 [OBSOLETE - use MapAtom] }
 
   // update the species: update num/comp each type or add new species
   UpdateSpecies(atom); //DX20210202 - consolidated code below into function
