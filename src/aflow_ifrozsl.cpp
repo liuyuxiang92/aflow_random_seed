@@ -113,7 +113,7 @@ namespace KBIN {
       xvasp_aus.aopts.flag("FLAG::ALGO_SET",TRUE);
       xvasp_aus.AVASP_flag_TYPE=vflags.KBIN_VASP_FORCE_OPTION_TYPE;
       xvasp_aus.aopts.flag("FLAG::AVASP_SYMMETRY=OFF",TRUE);
-      xvasp_aus.aopts.flag("FLAG::AVASP_NEIGHBOURS=OFF",TRUE);
+      xvasp_aus.aopts.flag("FLAG::AVASP_NEIGHBORS=OFF",TRUE);
       xvasp_aus.aopts.flag("FLAG::AVASP_APL=OFF",TRUE);
       // xvasp_aus.aopts.flag("AVASP_flag_CONVERT_UNIT_CELL_STANDARD_PRIMITIVE",FALSE);
       // xvasp_aus.aopts.flag("AVASP_flag_CONVERT_UNIT_CELL_MINKOWSKI",FALSE);

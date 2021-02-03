@@ -257,7 +257,7 @@ namespace aflowlib {
         }
       }
     }
-    if(library == "all" || library == "anrl"){
+    if(library == "all" || library == "aflow" || library == "anrl"){
       vector<string> vproto,vlabel; 
       vector<uint>   vproto_nspecies,vproto_natoms,vproto_spacegroup,vproto_nunderscores,vproto_nparameters; 
       vector<string> vproto_Pearson_symbol,vproto_params,vproto_Strukturbericht,vproto_prototype,vproto_dialect;
@@ -324,6 +324,11 @@ namespace aflowlib {
     vector<string> prototype_labels, filtered_prototype_labels, tokens;
     uint number_of_prototypes = GetAllPrototypeLabels(prototype_labels, compositions, all_space_group_numbers, all_grouped_Wyckoff_letters, library);
     for(uint i=0;i<number_of_prototypes;i++){
+      // ---------------------------------------------------------------------------
+      // handle corner cases //DX20200929
+      if(compositions[i].find("sigma") != std::string::npos){
+        aurostd::StringSubst(compositions[i],"sigma","A");
+      }
       uint prototype_number_of_species = aurostd::RemoveNumbers(compositions[i]).size();
       if(prototype_number_of_species == number_of_species || number_of_species==0){ //DX20191107 - add number_of_species==0 if stoich is not specified
 
@@ -574,7 +579,7 @@ namespace aflowlib {
   }
 } // namespace aflowlib
 
-//double NearestNeighbour(const xstructure &str_in);
+//double NearestNeighbor(const xstructure &str_in);
 
 // ***************************************************************************
 namespace aflowlib {
@@ -2026,7 +2031,7 @@ namespace aflowlib {
         }
       }
       if(mode==LIBRARY_MODE_ICSD) {
-        double nn_dist=NearestNeighbour(str); //CO+DX20200213
+        double nn_dist=NearestNeighbor(str); //CO+DX20200213
         if(nn_dist<_XPROTO_TOO_CLOSE_ERROR_){ //CO+DX20200213
           if(flip_option==FALSE && SpaceGroupOptionRequired(str.spacegroupnumber)==TRUE) {  //CO+DX20200213
             // *voss << "AFLOW WARNING (aflow_xproto.cpp): label=" << label << " WRONG NNdist too close =" << nn_dist << "   *************"  << endl;
@@ -2140,12 +2145,12 @@ namespace aflowlib {
     // check for nndist
 
     if(LDEBUG) { *voss << "DEBUG: (aflowlib::PrototypeLibraries) [7] nndist" << endl; }
-    //DX20181119 [OBSOLETE] if(NearestNeighbour(str)<_XPROTO_TOO_CLOSE_ERROR_)
-    if(!fictitious_system && NearestNeighbour(str)<_XPROTO_TOO_CLOSE_ERROR_) //DX20181119 - check if real atoms are used first
+    //DX20181119 [OBSOLETE] if(NearestNeighbor(str)<_XPROTO_TOO_CLOSE_ERROR_)
+    if(!fictitious_system && NearestNeighbor(str)<_XPROTO_TOO_CLOSE_ERROR_) //DX20181119 - check if real atoms are used first
     { //CO20200106 - patching for auto-indenting
       //   str.SetCoordinates(_COORDS_CARTESIAN_);
       //  *voss << str << endl;
-      message << "Nearest neighbors are too close: label=" << label << ", NNdist=" << NearestNeighbour(str) << ", spacegroup=" << str.spacegroupnumber << ", option=" << str.spacegroupnumberoption << endl;
+      message << "Nearest neighbors are too close: label=" << label << ", NNdist=" << NearestNeighbor(str) << ", spacegroup=" << str.spacegroupnumber << ", option=" << str.spacegroupnumberoption << endl;
       message << str << endl;
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_RUNTIME_ERROR_);
     }
@@ -2282,42 +2287,7 @@ namespace aflowlib {
   }
 } // namespace aflowlib
 
-// ***************************************************************************
-
-double NearestNeighbour(const xstructure &str_in) {
-  return SYM::minimumDistance(str_in);
-  //[CO20171024 OBSOLETE]xstructure str(str_in);
-  //[CO20171024 OBSOLETE]// if(LDEBUG) { cerr << "NearestNeighbour 1" << endl; }
-  //[CO20171024 OBSOLETE]// if(LDEBUG) { cerr << str.scale << endl; }
-  //[CO20171024 OBSOLETE]str.ReScale(1.0);
-  //[CO20171024 OBSOLETE]xvector<int> ndims(3);
-  //[CO20171024 OBSOLETE]// str.neighbours_radius=RadiusSphereLattice(str.lattice);
-  //[CO20171024 OBSOLETE]// str.neighbours_radius=max(modulus(str.lattice(1)),modulus(str.lattice(2)),modulus(str.lattice(3)));
-  //[CO20171024 OBSOLETE]// ndims=LatticeDimensionSphere(str.lattice,str.neighbours_radius);
-  //[CO20171024 OBSOLETE]ndims[1]=ndims[2]=ndims[3]=1;
-  //[CO20171024 OBSOLETE]deque<_atom> vatoms;
-  //[CO20171024 OBSOLETE]_atom atom;
-  //[CO20171024 OBSOLETE]// if(LDEBUG) { cerr << "NearestNeighbour 2" << endl; }
-  //[CO20171024 OBSOLETE]for(int i=-ndims[1];i<=ndims[1];i++) {
-  //[CO20171024 OBSOLETE]  for(int j=-ndims[2];j<=ndims[2];j++) {
-  //[CO20171024 OBSOLETE]    for(int k=-ndims[3];k<=ndims[3];k++) {
-  //[CO20171024 OBSOLETE]for(uint iat=0;iat<str.atoms.size();iat++) {
-  //[CO20171024 OBSOLETE]  atom=str.atoms.at(iat);
-  //[CO20171024 OBSOLETE]  atom.cpos=atom.cpos+i*str.lattice(1)+j*str.lattice(2)+k*str.lattice(3);
-  //[CO20171024 OBSOLETE]  vatoms.push_back(atom);
-  //[CO20171024 OBSOLETE]}
-  //[CO20171024 OBSOLETE]    }
-  //[CO20171024 OBSOLETE]  }
-  //[CO20171024 OBSOLETE]}
-  //[CO20171024 OBSOLETE]double nndist=RadiusSphereLattice(str.lattice);
-  //[CO20171024 OBSOLETE]for(uint i=0;i<vatoms.size();i++) {
-  //[CO20171024 OBSOLETE]  for(uint j=0;j<vatoms.size();j++) {
-  //[CO20171024 OBSOLETE]    if(i!=j)
-  //[CO20171024 OBSOLETE]if(modulus(vatoms.at(i).cpos-vatoms.at(j).cpos) < nndist) nndist=modulus(vatoms.at(i).cpos-vatoms.at(j).cpos);
-  //[CO20171024 OBSOLETE]  }
-  //[CO20171024 OBSOLETE]}
-  //[CO20171024 OBSOLETE]return nndist;
-}
+//DX20210114 [MOVED NearestNeighbor() to aflow_xatom.cpp]
 
 // ***************************************************************************
 // ***************************************************************************
@@ -3868,9 +3838,9 @@ namespace aflowlib {
         }
       }
       if(PARAMS->mode==LIBRARY_MODE_ICSD) {
-        if(NearestNeighbour(str)<_XPROTO_TOO_CLOSE_ERROR_ && PARAMS->flip_option==FALSE && SpaceGroupOptionRequired(str.spacegroupnumber)==TRUE) {
-          // *voss << "AFLOW WARNING (aflow_xproto.cpp): PARAMS->label=" << PARAMS->label << " WRONG NNdist too close =" << NearestNeighbour(str) << "   *************"  << endl;
-          *voss << "AFLOW WARNING (aflow_xproto.cpp): Too close NNdist(" << NearestNeighbour(str) << "), Spacegroup=" << str.spacegroupnumber << " option=" << str.spacegroupnumberoption << " not enough, try PARAMS->flip_option " << endl;
+        if(NearestNeighbor(str)<_XPROTO_TOO_CLOSE_ERROR_ && PARAMS->flip_option==FALSE && SpaceGroupOptionRequired(str.spacegroupnumber)==TRUE) {
+          // *voss << "AFLOW WARNING (aflow_xproto.cpp): PARAMS->label=" << PARAMS->label << " WRONG NNdist too close =" << NearestNeighbor(str) << "   *************"  << endl;
+          *voss << "AFLOW WARNING (aflow_xproto.cpp): Too close NNdist(" << NearestNeighbor(str) << "), Spacegroup=" << str.spacegroupnumber << " option=" << str.spacegroupnumberoption << " not enough, try PARAMS->flip_option " << endl;
           xstructure str_flipped;
           str_flipped=aflowlib::PrototypeLibraries(*voss,PARAMS->label,PARAMS->parameters,PARAMS->vatomX,PARAMS->vvolumeX,PARAMS->volume_in,PARAMS->mode,TRUE);
           str_flipped.title+=" (sg.opt flipped)";
@@ -3974,10 +3944,10 @@ namespace aflowlib {
     // check for nndist
 
     if(LDEBUG) *voss << "DEBUG: (aflowlib::PrototypeLibraries) [7] nndist" << endl;
-    if(NearestNeighbour(str)<_XPROTO_TOO_CLOSE_ERROR_) {
+    if(NearestNeighbor(str)<_XPROTO_TOO_CLOSE_ERROR_) {
       //   str.SetCoordinates(_COORDS_CARTESIAN_);
       //  *voss << str << endl;
-      message << "Nearest neighbors are too close: label=" << PARAMS->label << ", NNdist=" << NearestNeighbour(str) << ", spacegroup=" << str.spacegroupnumber << ", option=" << str.spacegroupnumberoption << endl;
+      message << "Nearest neighbors are too close: label=" << PARAMS->label << ", NNdist=" << NearestNeighbor(str) << ", spacegroup=" << str.spacegroupnumber << ", option=" << str.spacegroupnumberoption << endl;
       message << str << endl;
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_RUNTIME_ERROR_);
     }

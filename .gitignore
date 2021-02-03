@@ -59,6 +59,8 @@ src/aflow_data_aflow_potcars.cpp
 src/aflow_data_latex.cpp
 src/aflow_data_readme.cpp
 src/aflow_data_extra.cpp
+src/aflow_sym_python.cpp
+src/aflow_xtalfinder_python.cpp
 
 # OS-specific
 *.swp

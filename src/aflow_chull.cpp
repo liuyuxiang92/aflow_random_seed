@@ -598,7 +598,7 @@ namespace chull {
       ////////////////////////////////////////////////////////////////////////////
       // START Stability criterion calculation
       ////////////////////////////////////////////////////////////////////////////
-      if(vpflow.flag("CHULL::STABILITY_CRITERION")) {
+      if(vpflow.flag("CHULL::STABILITY_CRITERION")&&(!vpflow.flag("CHULL::WEB_DOC"))) { //CO20210201 - chull-web SS plotter
         message << "Starting stable criterion calculation of " << vpflow.getattachedscheme("CHULL::STABILITY_CRITERION");
         message << " on " << vinputs[i] << " hull";
         pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
@@ -5935,7 +5935,7 @@ namespace chull {
       cerr << soliloquy << " structure 2" << endl;
       cerr << b;
     }
-    bool are_equivalent=compare::aflowCompareStructure(a,b,true,false,false); //match species and use fast match, but not scale volume, two structures with different volumes (pressures) are different! //DX20180123 - added fast_match = true //DX20190318 - not fast_match but optimized_match=false
+    bool are_equivalent=compare::structuresMatch(a,b,true,false,false); //match species and use fast match, but not scale volume, two structures with different volumes (pressures) are different! //DX20180123 - added fast_match = true //DX20190318 - not fast_match but optimized_match=false
     if(LDEBUG) {cerr << soliloquy << " structures are " << (are_equivalent?"":"NOT ") << "equivalent" << endl;}
     return are_equivalent;
   }

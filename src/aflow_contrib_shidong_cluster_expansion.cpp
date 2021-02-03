@@ -124,7 +124,7 @@ cecluster & cecluster::operator=(const cecluster & cecluster_in) {
 }
 
 int cecluster::GetNNNum(vector<double> NN_distance) {
-  // get the largest neareast neighbour shell index in a cluster
+  // get the largest neareast neighbor shell index in a cluster
 
   vector< vector<int> > str;
   const int atom_num = 2;
@@ -759,13 +759,13 @@ int ceallclusters::SetCluster( const int& SiteNum_low, const int& SiteNum_up,
   start = clock();
   //////////////////////////////////////////////////////////////
 
-  GetNearestNeighbour(NNNum_up);
+  GetNearestNeighbor(NNNum_up);
   cerr << "Number of atom " << atom_list.size() << endl;
 
   //////////////////////////////////////////////////////////////
   end = clock();
   diff = (end - start)/ CLOCKS_PER_SEC;
-  cerr << "GetNearestNeighbour Time: " << diff << " s\n";
+  cerr << "GetNearestNeighbor Time: " << diff << " s\n";
   //////////////////////////////////////////////////////////////
 
   //////////////////////////////////////////////////////////////
@@ -824,12 +824,12 @@ int ceallclusters::SetCluster( string & filename) {
   return num_rep_cluster;
 }
 
-int ceallclusters::GetNearestNeighbour(int NNNum) {
-  // get the neareast neighbour distances up to NNNum-th order
+int ceallclusters::GetNearestNeighbor(int NNNum) {
+  // get the neareast neighbor distances up to NNNum-th order
   //
-  // The nearest neighbour distance is calculated by populating atoms
+  // The nearest neighbor distance is calculated by populating atoms
   // next to the one in origin
-  // The maximum index number needed to get all nearest neighbour distance lesser
+  // The maximum index number needed to get all nearest neighbor distance lesser
   // lesser than NNNum is sqrt(NNNum*2)
   // see http://www.chem.lsu.edu/htdocs/people/sfwatkins/MERLOT/cubic_neighbors/cubic_near_neighbors.html
   // for details
@@ -921,7 +921,7 @@ int ceallclusters::GenerateAllCluster(int SiteNum_low, int SiteNum_up,
       cluster_tmp.site_num = site_index;
 
       if(site_index == 1) {
-        // one atom has no nearest neighbour
+        // one atom has no nearest neighbor
         cluster_tmp.pair_name = "1 0";
         cluster_tmp.structure.atoms.push_back(atom_list.at(0));
         cluster_tmp.structure.indices.push_back(0);
@@ -968,7 +968,7 @@ int ceallclusters::GenerateAllCluster(int SiteNum_low, int SiteNum_up,
         for(NN_index = NNNum_low; NN_index < NN_up + 1; NN_index++) {
           if(cluster_tmp.NNNum == NN_index) {
 
-            cluster_tmp.pair_name.append(aurostd::utype2string(cluster_tmp.NNNum)); // neareset neighbour shell index
+            cluster_tmp.pair_name.append(aurostd::utype2string(cluster_tmp.NNNum)); // neareset neighbor shell index
 
             rep_cluster.push_back(cluster_tmp);
 
@@ -3947,7 +3947,7 @@ double ceSL::IsSQS(int site_num, int NNNum) {
   // the smaller the is figure of merit, the better is the chance that
   // the structure is an SQS
   // check upto the correlation of "site_num" cluster with largest Nearest
-  // neighbour number of value "NNNum"
+  // neighbor number of value "NNNum"
 
   SQScluster cmp_cluster;
   SQS_figure_of_merit = 0.0;

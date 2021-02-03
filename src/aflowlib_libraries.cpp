@@ -4110,18 +4110,18 @@ namespace aflowlib {
         xstructure str_anrl = str;
         uint setting=SG_SETTING_ANRL;
         anrl::structure2anrl(str_anrl, anrl_symmetry_tolerance, setting); 
-        if(data.anrl_label_orig.empty()) { // anrl label 
-          data.anrl_label_orig = str_anrl.prototype; 
+        if(data.aflow_prototype_label_orig.empty()) { // anrl label 
+          data.aflow_prototype_label_orig = str_anrl.prototype; 
         }
-        if(data.anrl_parameter_list_orig.empty()) { // anrl parameter list
-          data.anrl_parameter_list_orig = aurostd::joinWDelimiter(str_anrl.prototype_parameter_list,","); 
+        if(data.aflow_prototype_parameter_list_orig.empty()) { // anrl parameter list
+          data.aflow_prototype_parameter_list_orig = aurostd::joinWDelimiter(str_anrl.prototype_parameter_list,","); 
         }
-        if(data.anrl_parameter_values_orig.empty()) { // anrl parameter values
-          data.anrl_parameter_values_orig = aurostd::joinWDelimiter(aurostd::vecDouble2vecString(str_anrl.prototype_parameter_values,_AFLOWLIB_DATA_DOUBLE_PREC_),","); 
+        if(data.aflow_prototype_parameter_values_orig.empty()) { // anrl parameter values
+          data.aflow_prototype_parameter_values_orig = aurostd::joinWDelimiter(aurostd::vecDouble2vecString(str_anrl.prototype_parameter_values,_AFLOWLIB_DATA_DOUBLE_PREC_),","); 
         }
-        if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.ORIG] ANRL Label = " << data.anrl_label_orig << endl;
-        if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.ORIG] ANRL parameter list = " << data.anrl_parameter_list_orig << endl;
-        if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.ORIG] ANRL parameter values = " << data.anrl_parameter_values_orig << endl;
+        if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.ORIG] ANRL Label = " << data.aflow_prototype_label_orig << endl;
+        if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.ORIG] ANRL parameter list = " << data.aflow_prototype_parameter_list_orig << endl;
+        if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.ORIG] ANRL parameter values = " << data.aflow_prototype_parameter_values_orig << endl;
         //DX20190208 - add ANRL label/parameters/parameter values - END
       }
     }
@@ -4137,62 +4137,62 @@ namespace aflowlib {
         TXT2="\";groundstate_energy="+aurostd::utype2string<double>(data.enthalpy_atom,7)+";volume_atom="+aurostd::utype2string<double>(data.volume_atom,7);
         if(aurostd::abs(data.spin_atom)<0.1) { TXT2+=";spin_atom=0.0;} // "; } else { TXT2+=";spin_atom="+aurostd::utype2string<double>(data.spin_atom,7)+";} // ";}
         TXT2+=str_relax.species_pp_version.at(0);
-        if(data.anrl_label_orig!="") cout << data.anrl_label_orig << endl;
+        if(data.aflow_prototype_label_orig!="") cout << data.aflow_prototype_label_orig << endl;
 
         // cerr << data.nspecies << endl; 
-        // cerr << "\"" << data.anrl_label_orig << "\"" << endl; 
+        // cerr << "\"" << data.aflow_prototype_label_orig << "\"" << endl; 
         // cerr << str_relax.species.at(0) << endl;
 
         // A1
-        if(data.anrl_label_orig=="A_cF4_225_a" && (s=="Ac" || s=="Ag" || s=="Al" || s=="Au" || s=="Ca" || s=="Cu" || s=="Ir" || s=="La" || s=="Ni" || s=="Pb" || s=="Pd" || s=="Pt" || s=="Rh" || s=="Sr" || s=="Yb" || s=="Ar" || s=="Ne" || s=="Xe" || s=="Kr")) { // A1
+        if(data.aflow_prototype_label_orig=="A_cF4_225_a" && (s=="Ac" || s=="Ag" || s=="Al" || s=="Au" || s=="Ca" || s=="Cu" || s=="Ir" || s=="La" || s=="Ni" || s=="Pb" || s=="Pd" || s=="Pt" || s=="Rh" || s=="Sr" || s=="Yb" || s=="Ar" || s=="Ne" || s=="Xe" || s=="Kr")) { // A1
           cout << TXT1 << "A1" << TXT2 << endl;}
         // A2
-        if(data.anrl_label_orig=="A_cI2_229_a" && (s=="Ba" || s=="Cr" || s=="Fe" || s=="K" || s=="Li" || s=="Mo" || s=="Na" || s=="Nb" || s=="Ta" || s=="V" || s=="W" || s=="Cs" || s=="Eu")) { // A2
+        if(data.aflow_prototype_label_orig=="A_cI2_229_a" && (s=="Ba" || s=="Cr" || s=="Fe" || s=="K" || s=="Li" || s=="Mo" || s=="Na" || s=="Nb" || s=="Ta" || s=="V" || s=="W" || s=="Cs" || s=="Eu")) { // A2
           cout << TXT1 << "A2" << TXT2 << endl;}
         // A3
-        if(data.anrl_label_orig=="A_hP2_194_c" && (s=="Be" || s=="Cd" || s=="Co" || s=="Dy" || s=="Hf" || s=="Hg" || s=="Ho" || s=="Mg" || s=="Os" || s=="Re" || s=="Ru" || s=="Sc" || s=="Tc" || s=="Ti" || s=="Tl" || s=="Y" || s=="Zn" || s=="Zr" || s=="He")) { // A3
+        if(data.aflow_prototype_label_orig=="A_hP2_194_c" && (s=="Be" || s=="Cd" || s=="Co" || s=="Dy" || s=="Hf" || s=="Hg" || s=="Ho" || s=="Mg" || s=="Os" || s=="Re" || s=="Ru" || s=="Sc" || s=="Tc" || s=="Ti" || s=="Tl" || s=="Y" || s=="Zn" || s=="Zr" || s=="He")) { // A3
           cout << TXT1 << "A3" << TXT2 << endl;}
         // A4
-        if(data.anrl_label_orig=="A_cF8_227_a" && (s=="Ge" || s=="Si")) { // A4 
+        if(data.aflow_prototype_label_orig=="A_cF8_227_a" && (s=="Ge" || s=="Si")) { // A4 
           cout << TXT1 << "A4" << TXT2 << endl;}
         // A5
-        if(data.anrl_label_orig=="A_tI4_141_a" && (s=="Sn")) { // A5 
+        if(data.aflow_prototype_label_orig=="A_tI4_141_a" && (s=="Sn")) { // A5 
           cout << TXT1 << "A5" << TXT2 << endl;}
         // A6
-        if(data.anrl_label_orig=="A_tI2_139_a" && (s=="In")) { // A6
+        if(data.aflow_prototype_label_orig=="A_tI2_139_a" && (s=="In")) { // A6
           cout << TXT1 << "A6" << TXT2 << endl;}
         // A7
-        if(data.anrl_label_orig=="A_hR2_166_c" && (s=="As" || s=="Bi" || s=="Sb" || s=="P")) { // A7 P??
+        if(data.aflow_prototype_label_orig=="A_hR2_166_c" && (s=="As" || s=="Bi" || s=="Sb" || s=="P")) { // A7 P??
           cout << TXT1 << "A7" << TXT2 << endl;}
         // A8
-        if(data.anrl_label_orig=="A_hP3_152_a" && (s=="Se" || s=="Te")) { // A8
+        if(data.aflow_prototype_label_orig=="A_hP3_152_a" && (s=="Se" || s=="Te")) { // A8
           cout << TXT1 << "A8" << TXT2 << endl;}
         // A9
-        if(data.anrl_label_orig=="A_hP4_194_bc" && (s=="C")) { // A9
+        if(data.aflow_prototype_label_orig=="A_hP4_194_bc" && (s=="C")) { // A9
           cout << TXT1 << "A9" << TXT2 << endl;}
         // A10
-        if(data.anrl_label_orig=="A_hR1_166_a" && (s=="Hg")) { // A10
+        if(data.aflow_prototype_label_orig=="A_hR1_166_a" && (s=="Hg")) { // A10
           cout << TXT1 << "A10" << TXT2 << endl;}
         // A11
-        if(data.anrl_label_orig=="A_oC8_64_f" && (s=="Ga" || s=="Br")) { // A11 
+        if(data.aflow_prototype_label_orig=="A_oC8_64_f" && (s=="Ga" || s=="Br")) { // A11 
           cout << TXT1 << "A11" << TXT2 << endl;}
         // A12
-        if(data.anrl_label_orig=="A_cI58_217_ac2g" && (s=="Mn")) { // A12
+        if(data.aflow_prototype_label_orig=="A_cI58_217_ac2g" && (s=="Mn")) { // A12
           cout << TXT1 << "A12" << TXT2 << endl;} 
         // diatom (A_tP2_123_g) just RICO choice
-        if(data.anrl_label_orig=="A_tP2_123_g" && (s=="O" || s=="N" || s=="F" || s=="H" || s=="Cl")) { // diatom //  cat /tmp/xscrubber_ppAUID.LIB1 | grep diatom | grep '/O'
+        if(data.aflow_prototype_label_orig=="A_tP2_123_g" && (s=="O" || s=="N" || s=="F" || s=="H" || s=="Cl")) { // diatom //  cat /tmp/xscrubber_ppAUID.LIB1 | grep diatom | grep '/O'
           cout << TXT1 << "diatom" << TXT2 << endl;} 
         // A14
-        if(data.anrl_label_orig=="A_oC8_64_f" && (s=="I")) { // A14
+        if(data.aflow_prototype_label_orig=="A_oC8_64_f" && (s=="I")) { // A14
           cout << TXT1 << "A14" << TXT2 << endl;}
         // A16
-        if(data.anrl_label_orig=="A_oF128_70_4h" && (s=="S")) { // A16
+        if(data.aflow_prototype_label_orig=="A_oF128_70_4h" && (s=="S")) { // A16
           cout << TXT1 << "A16" << TXT2 << endl;}
-        if(data.anrl_label_orig=="A_hR12_166_2h" && (s=="B")) { // ICSD_56992
+        if(data.aflow_prototype_label_orig=="A_hR12_166_2h" && (s=="B")) { // ICSD_56992
           cout << TXT1 << "ICSD_56992" << TXT2 << endl;}
-        if(data.anrl_label_orig=="A_hR3_166_ac" && (s=="Sm")) { // C19
+        if(data.aflow_prototype_label_orig=="A_hR3_166_ac" && (s=="Sm")) { // C19
           cout << TXT1 << "C19" << TXT2 << endl;}
-        if(data.anrl_label_orig=="" && (s=="Xe")) { // ISOLATED
+        if(data.aflow_prototype_label_orig=="" && (s=="Xe")) { // ISOLATED
           cout << TXT1 << "isolated" << TXT2 << endl;}
 
       }
@@ -4426,19 +4426,19 @@ namespace aflowlib {
         xstructure str_anrl = str;
         uint setting=SG_SETTING_ANRL;
         anrl::structure2anrl(str_anrl, anrl_symmetry_tolerance, setting); 
-        if(data.anrl_label_relax.empty()) { // anrl label 
-          data.anrl_label_relax = str_anrl.prototype; 
+        if(data.aflow_prototype_label_relax.empty()) { // anrl label 
+          data.aflow_prototype_label_relax = str_anrl.prototype; 
         }
-        if(data.anrl_parameter_list_relax.empty()) { // anrl parameter list
-          data.anrl_parameter_list_relax = aurostd::joinWDelimiter(str_anrl.prototype_parameter_list,","); 
+        if(data.aflow_prototype_parameter_list_relax.empty()) { // anrl parameter list
+          data.aflow_prototype_parameter_list_relax = aurostd::joinWDelimiter(str_anrl.prototype_parameter_list,","); 
         }
-        if(data.anrl_parameter_values_relax.empty()) { // anrl parameter values
-          data.anrl_parameter_values_relax = aurostd::joinWDelimiter(aurostd::vecDouble2vecString(str_anrl.prototype_parameter_values,_AFLOWLIB_DATA_DOUBLE_PREC_),","); 
+        if(data.aflow_prototype_parameter_values_relax.empty()) { // anrl parameter values
+          data.aflow_prototype_parameter_values_relax = aurostd::joinWDelimiter(aurostd::vecDouble2vecString(str_anrl.prototype_parameter_values,_AFLOWLIB_DATA_DOUBLE_PREC_),","); 
         }
         //DX20190208 - add ANRL label/parameters/parameter values - END
-        if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.RELAX] ANRL Label = " << data.anrl_label_relax << endl;
-        if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.RELAX] ANRL parameter list = " << data.anrl_parameter_list_relax << endl;
-        if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.RELAX] ANRL parameter values = " << data.anrl_parameter_values_relax << endl;
+        if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.RELAX] ANRL Label = " << data.aflow_prototype_label_relax << endl;
+        if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.RELAX] ANRL parameter list = " << data.aflow_prototype_parameter_list_relax << endl;
+        if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.RELAX] ANRL parameter values = " << data.aflow_prototype_parameter_values_relax << endl;
       }
     }
     if(LDEBUG) cerr << soliloquy << " [17]" << endl;
@@ -4669,18 +4669,18 @@ namespace aflowlib {
         xstructure str_anrl = str;
         uint setting=SG_SETTING_ANRL;
         anrl::structure2anrl(str_anrl, anrl_symmetry_tolerance, setting); 
-        if(data.anrl_label_relax.empty()) { // anrl label 
-          data.anrl_label_relax = str_anrl.prototype; 
+        if(data.aflow_prototype_label_relax.empty()) { // anrl label 
+          data.aflow_prototype_label_relax = str_anrl.prototype; 
         }
-        if(data.anrl_parameter_list_relax.empty()) { // anrl parameter list
-          data.anrl_parameter_list_relax = aurostd::joinWDelimiter(str_anrl.prototype_parameter_list,","); 
+        if(data.aflow_prototype_parameter_list_relax.empty()) { // anrl parameter list
+          data.aflow_prototype_parameter_list_relax = aurostd::joinWDelimiter(str_anrl.prototype_parameter_list,","); 
         }
-        if(data.anrl_parameter_values_relax.empty()) { // anrl parameter values
-          data.anrl_parameter_values_relax = aurostd::joinWDelimiter(aurostd::vecDouble2vecString(str_anrl.prototype_parameter_values,_AFLOWLIB_DATA_DOUBLE_PREC_),","); 
+        if(data.aflow_prototype_parameter_values_relax.empty()) { // anrl parameter values
+          data.aflow_prototype_parameter_values_relax = aurostd::joinWDelimiter(aurostd::vecDouble2vecString(str_anrl.prototype_parameter_values,_AFLOWLIB_DATA_DOUBLE_PREC_),","); 
         }
-        if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.BANDS] ANRL Label = " << data.anrl_label_relax << endl;
-        if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.BANDS] ANRL parameter list = " << data.anrl_parameter_list_relax << endl;
-        if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.BANDS] ANRL parameter values = " << data.anrl_parameter_values_relax << endl;
+        if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.BANDS] ANRL Label = " << data.aflow_prototype_label_relax << endl;
+        if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.BANDS] ANRL parameter list = " << data.aflow_prototype_parameter_list_relax << endl;
+        if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.BANDS] ANRL parameter values = " << data.aflow_prototype_parameter_values_relax << endl;
         //DX20190208 - add ANRL label/parameters/parameter values - END
       }
     }
@@ -5950,11 +5950,11 @@ namespace aflowlib {
     //anrl properties
     xstructure xstr_anrl=xstr_pocc_parent;  //make a copy so functions don't pollute structure
     anrl::structure2anrl(xstr_anrl,xstr_anrl.sym_eps,SG_SETTING_ANRL);
-    data.anrl_label_orig=xstr_anrl.prototype;
-    if(AFLOWLIB_VERBOSE && !data.anrl_label_orig.empty()) cout << MESSAGE << " anrl_label_orig=" << data.anrl_label_orig << endl;
-    data.anrl_parameter_list_orig=aurostd::joinWDelimiter(xstr_anrl.prototype_parameter_list,",");
-    if(AFLOWLIB_VERBOSE && !data.anrl_parameter_list_orig.empty()) cout << MESSAGE << " anrl_parameter_list_orig=" << data.anrl_parameter_list_orig << endl;
-    //build data.anrl_parameter_values_orig from scratch
+    data.aflow_prototype_label_orig=xstr_anrl.prototype;
+    if(AFLOWLIB_VERBOSE && !data.aflow_prototype_label_orig.empty()) cout << MESSAGE << " aflow_prototype_label_orig=" << data.aflow_prototype_label_orig << endl;
+    data.aflow_prototype_parameter_list_orig=aurostd::joinWDelimiter(xstr_anrl.prototype_parameter_list,",");
+    if(AFLOWLIB_VERBOSE && !data.aflow_prototype_parameter_list_orig.empty()) cout << MESSAGE << " aflow_prototype_parameter_list_orig=" << data.aflow_prototype_parameter_list_orig << endl;
+    //build data.aflow_prototype_parameter_values_orig from scratch
     if(LDEBUG){cerr << soliloquy << " prototype_parameter_values(PARENT)=" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(xstr_anrl.prototype_parameter_values,_AFLOWLIB_DATA_DOUBLE_PREC_),",") << endl;}
     vector<double> prototype_parameter_values=xstr_anrl.prototype_parameter_values;
     if(prototype_parameter_values.empty()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"ANRL parameter values builder failed: prototype_parameter_values.empty()",_RUNTIME_ERROR_);}
@@ -5962,8 +5962,8 @@ namespace aflowlib {
     if(prototype_parameter_values.size()!=xstr_anrl.prototype_parameter_values.size()){
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"ANRL parameter values builder failed: prototype_parameter_values.size()!=xstr_anrl.prototype_parameter_values.size()",_RUNTIME_ERROR_);
     }
-    data.anrl_parameter_values_orig=aurostd::joinWDelimiter(aurostd::vecDouble2vecString(prototype_parameter_values,_AFLOWLIB_DATA_DOUBLE_PREC_),",");
-    if(AFLOWLIB_VERBOSE && !data.anrl_parameter_values_orig.empty()) cout << MESSAGE << " anrl_parameter_values_orig=" << data.anrl_parameter_values_orig << endl;
+    data.aflow_prototype_parameter_values_orig=aurostd::joinWDelimiter(aurostd::vecDouble2vecString(prototype_parameter_values,_AFLOWLIB_DATA_DOUBLE_PREC_),",");
+    if(AFLOWLIB_VERBOSE && !data.aflow_prototype_parameter_values_orig.empty()) cout << MESSAGE << " aflow_prototype_parameter_values_orig=" << data.aflow_prototype_parameter_values_orig << endl;
 
     //get other _atom/_cell properties
     double data_natoms=0.0; //needs to be double for pocc

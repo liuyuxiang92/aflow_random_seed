@@ -548,7 +548,7 @@ namespace pflow {
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()!=7 && tokens.size()!=3) {
-      init::ErrorOption(options,soliloquy,aurostd::liststring2string("aflow --sqs=structure_type,atom_num,neighbour_num,sl_num_min,sl_num_max,A,B | --special-quasirandom-structure=...","aflow --sqs=structure_type n1 n2 < POSCAR | --special-quasirandom-structure=..."));
+      init::ErrorOption(options,soliloquy,aurostd::liststring2string("aflow --sqs=structure_type,atom_num,neighbor_num,sl_num_min,sl_num_max,A,B | --special-quasirandom-structure=...","aflow --sqs=structure_type n1 n2 < POSCAR | --special-quasirandom-structure=..."));
     } 
 
     string structure_type;
@@ -751,7 +751,7 @@ namespace pflow {
 
         message << "The cluster data file is missing" << endl;
         message << "Please use the command" << endl;
-        message << "    aflow --cluster=structure_type,minimun_site_num,maximun_site_num,minimum_nearest_neighbour,maximun_nearest_neighbour" << endl;
+        message << "    aflow --cluster=structure_type,minimun_site_num,maximum_site_num,minimum_nearest_neighbor,maximum_nearest_neighbor" << endl;
         message << "to generate it";
         throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_FILE_CORRUPT_); //CO20200624
 

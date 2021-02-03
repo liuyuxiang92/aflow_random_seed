@@ -817,11 +817,31 @@
 #define         DEFAULT_CCE_O2_MOLECULE_LOWER_CUTOFF          XHOST.adefault.getattachedutype<double>("DEFAULT_CCE_O2_MOLECULE_LOWER_CUTOFF")
 //RF20200413 END
 
-//DX20200709 - START
 // DEFAULT XTALFINDER
+#define AFLOWRC_DEFAULT_XTALFINDER_MISFIT_MATCH               0.1 // values below this threshold: similar structures have similar properties // DX20201118
+#define         DEFAULT_XTALFINDER_MISFIT_MATCH               XHOST.adefault.getattachedutype<double>("DEFAULT_XTALFINDER_MISFIT_MATCH") //DX20201118
+#define AFLOWRC_DEFAULT_XTALFINDER_MISFIT_FAMILY              0.2 // values above this threshold: matched structures do not have similar properties //DX20201118
+#define         DEFAULT_XTALFINDER_MISFIT_FAMILY              XHOST.adefault.getattachedutype<double>("DEFAULT_XTALFINDER_MISFIT_FAMILY") //DX20201118
+#define AFLOWRC_DEFAULT_XTALFINDER_SUPERCELL_METHOD           FALSE // supercell method for comparing (robust, but slow, superceded by transformation method)
+#define         DEFAULT_XTALFINDER_SUPERCELL_METHOD           XHOST.adefault.getattachedutype<bool>("DEFAULT_XTALFINDER_SUPERCELL_METHOD") //DX20201223
+//DX20200709 - START
 #define AFLOWRC_DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING    4.0 // factor that divides minimum interatomic distance
 #define         DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING    XHOST.adefault.getattachedutype<double>("DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING")
 //DX20200709 - END
+#define AFLOWRC_DEFAULT_XTALFINDER_FILE_MATERIAL                    string("material_comparison_output") // results file prefix
+#define         DEFAULT_XTALFINDER_FILE_MATERIAL                    XHOST.adefault.getattachedscheme("DEFAULT_XTALFINDER_FILE_MATERIAL") //DX20201228
+#define AFLOWRC_DEFAULT_XTALFINDER_FILE_STRUCTURE                   string("structure_comparison_output") // results file prefix
+#define         DEFAULT_XTALFINDER_FILE_STRUCTURE                   XHOST.adefault.getattachedscheme("DEFAULT_XTALFINDER_FILE_STRUCTURE") //DX20201228
+#define AFLOWRC_DEFAULT_XTALFINDER_FILE_DUPLICATE                   string("duplicate_compounds_output") // results file prefix
+#define         DEFAULT_XTALFINDER_FILE_DUPLICATE                   XHOST.adefault.getattachedscheme("DEFAULT_XTALFINDER_FILE_DUPLICATE") //DX20201228
+#define AFLOWRC_DEFAULT_XTALFINDER_FILE_MATERIAL_COMPARE2DATABASE   string("material_comparison_compare2database_output") // results file prefix
+#define         DEFAULT_XTALFINDER_FILE_MATERIAL_COMPARE2DATABASE   XHOST.adefault.getattachedscheme("DEFAULT_XTALFINDER_FILE_MATERIAL_COMPARE2DATABASE") //DX20201228
+#define AFLOWRC_DEFAULT_XTALFINDER_FILE_STRUCTURE_COMPARE2DATABASE  string("structure_comparison_compare2database_output") // results file prefix
+#define         DEFAULT_XTALFINDER_FILE_STRUCTURE_COMPARE2DATABASE  XHOST.adefault.getattachedscheme("DEFAULT_XTALFINDER_FILE_STRUCTURE_COMPARE2DATABASE") //DX20201228
+#define AFLOWRC_DEFAULT_XTALFINDER_FILE_MATERIAL_DATABASE           string("material_comparison_database_output") // results file prefix
+#define         DEFAULT_XTALFINDER_FILE_MATERIAL_DATABASE           XHOST.adefault.getattachedscheme("DEFAULT_XTALFINDER_FILE_MATERIAL_DATABASE") //DX20201228
+#define AFLOWRC_DEFAULT_XTALFINDER_FILE_STRUCTURE_DATABASE          string("structure_comparison_database_output") // results file prefix
+#define         DEFAULT_XTALFINDER_FILE_STRUCTURE_DATABASE          XHOST.adefault.getattachedscheme("DEFAULT_XTALFINDER_FILE_STRUCTURE_DATABASE") //DX20201228
 
 //DX20200720 - START
 // DEFAULT ANRL
@@ -917,6 +937,15 @@
 #define AFLOWRC_MPI_BINARY_DIR_MACHINE002                    string("~/bin/") // MACHINE002
 #define         MPI_BINARY_DIR_MACHINE002                    XHOST.adefault.getattachedscheme("MPI_BINARY_DIR_MACHINE002")
 //DX20190509 - MACHINE002 - END
+
+//DX20201005 - MACHINE003 - START
+#define AFLOWRC_MPI_OPTIONS_MACHINE003                       string("") // MACHINE003
+#define         MPI_OPTIONS_MACHINE003                       XHOST.adefault.getattachedscheme("MPI_OPTIONS_MACHINE003")
+#define AFLOWRC_MPI_COMMAND_MACHINE003                       string("/p/app/intel/parallel_studio_xe_2018_update1/impi/2018.1.163/intel64/bin/mpirun -np") // MACHINE003
+#define         MPI_COMMAND_MACHINE003                       XHOST.adefault.getattachedscheme("MPI_COMMAND_MACHINE003")
+#define AFLOWRC_MPI_BINARY_DIR_MACHINE003                    string("~/bin/") // MACHINE003
+#define         MPI_BINARY_DIR_MACHINE003                    XHOST.adefault.getattachedscheme("MPI_BINARY_DIR_MACHINE003")
+//DX20201005 - MACHINE003 - END
 
 #define AFLOWRC_MPI_OPTIONS_MPCDF_EOS                         string("ulimit -s unlimited ") // MPCDF_EOS_MPICH
 #define         MPI_OPTIONS_MPCDF_EOS                         XHOST.adefault.getattachedscheme("MPI_OPTIONS_MPCDF_EOS")
@@ -1560,10 +1589,18 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_CCE_O2_MOLECULE_LOWER_CUTOFF",AFLOWRC_DEFAULT_CCE_O2_MOLECULE_LOWER_CUTOFF);
     //RF20200413 END
 
-    //DX20200709 - START
     // DEFAULT XTALFINDER
-    aflowrc::load_default("DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING",AFLOWRC_DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING);
-    //DX20200709 - END
+    aflowrc::load_default("DEFAULT_XTALFINDER_MISFIT_MATCH",AFLOWRC_DEFAULT_XTALFINDER_MISFIT_MATCH); //DX20201118
+    aflowrc::load_default("DEFAULT_XTALFINDER_MISFIT_FAMILY",AFLOWRC_DEFAULT_XTALFINDER_MISFIT_FAMILY); //DX20201118
+    aflowrc::load_default("DEFAULT_XTALFINDER_SUPERCELL_METHOD",AFLOWRC_DEFAULT_XTALFINDER_SUPERCELL_METHOD); //DX20201223
+    aflowrc::load_default("DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING",AFLOWRC_DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING); //DX20200709
+    aflowrc::load_default("DEFAULT_XTALFINDER_FILE_MATERIAL",AFLOWRC_DEFAULT_XTALFINDER_FILE_MATERIAL); //DX20201228
+    aflowrc::load_default("DEFAULT_XTALFINDER_FILE_STRUCTURE",AFLOWRC_DEFAULT_XTALFINDER_FILE_STRUCTURE); //DX20201228
+    aflowrc::load_default("DEFAULT_XTALFINDER_FILE_DUPLICATE",AFLOWRC_DEFAULT_XTALFINDER_FILE_DUPLICATE); //DX20201228
+    aflowrc::load_default("DEFAULT_XTALFINDER_FILE_MATERIAL_COMPARE2DATABASE",AFLOWRC_DEFAULT_XTALFINDER_FILE_MATERIAL_COMPARE2DATABASE); //DX20201228
+    aflowrc::load_default("DEFAULT_XTALFINDER_FILE_STRUCTURE_COMPARE2DATABASE",AFLOWRC_DEFAULT_XTALFINDER_FILE_STRUCTURE_COMPARE2DATABASE); //DX20201228
+    aflowrc::load_default("DEFAULT_XTALFINDER_FILE_MATERIAL_DATABASE",AFLOWRC_DEFAULT_XTALFINDER_FILE_MATERIAL_DATABASE); //DX20201228
+    aflowrc::load_default("DEFAULT_XTALFINDER_FILE_STRUCTURE_DATABASE",AFLOWRC_DEFAULT_XTALFINDER_FILE_STRUCTURE_DATABASE); //DX20201228
 
     //DX20200720 - START
     // DEFAULT ANRL
@@ -1624,6 +1661,12 @@ namespace aflowrc {
     aflowrc::load_default("MPI_COMMAND_MACHINE002",AFLOWRC_MPI_COMMAND_MACHINE002);
     aflowrc::load_default("MPI_BINARY_DIR_MACHINE002",AFLOWRC_MPI_BINARY_DIR_MACHINE002);
     //DX20190509 - MACHINE002 - END
+
+    //DX20201005 - MACHINE003 - START
+    aflowrc::load_default("MPI_OPTIONS_MACHINE003",AFLOWRC_MPI_OPTIONS_MACHINE003);
+    aflowrc::load_default("MPI_COMMAND_MACHINE003",AFLOWRC_MPI_COMMAND_MACHINE003);
+    aflowrc::load_default("MPI_BINARY_DIR_MACHINE003",AFLOWRC_MPI_BINARY_DIR_MACHINE003);
+    //DX20201005 - MACHINE003 - END
 
     //DX20190107 - CMU EULER - START
     aflowrc::load_default("MPI_OPTIONS_CMU_EULER",AFLOWRC_MPI_OPTIONS_CMU_EULER); 
@@ -2136,11 +2179,19 @@ namespace aflowrc {
     aflowrc << "DEFAULT_CCE_O2_MOLECULE_LOWER_CUTOFF=" << AFLOWRC_DEFAULT_CCE_O2_MOLECULE_LOWER_CUTOFF << "" << "  // O-O bonds in the O2 molecule is about 1.21 Ang." << endl;
     //RF20200413 END
 
-    //DX20200708 - START
     aflowrc << " " << endl;
     aflowrc << "// DEFAULTS XTALFINDER" << endl;
-    aflowrc << "DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING=" << AFLOWRC_DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING << " // factor that divides minimum interatomic distance" << endl;
-    //DX20200708 - END
+    aflowrc << "DEFAULT_XTALFINDER_MISFIT_MATCH=" << AFLOWRC_DEFAULT_XTALFINDER_MISFIT_MATCH << " // values below this threshold: similar structures have similar properties" << endl; //DX20201118
+    aflowrc << "DEFAULT_XTALFINDER_MISFIT_FAMILY=" << AFLOWRC_DEFAULT_XTALFINDER_MISFIT_FAMILY << " // values above this threshold: matched structures do not have similar properties" << endl; //DX20201118
+    aflowrc << "DEFAULT_XTALFINDER_SUPERCELL_METHOD=" << AFLOWRC_DEFAULT_XTALFINDER_SUPERCELL_METHOD << " // // supercell method for comparing (robust, but slow, superceded by transformation method)" << endl; //DX20201223
+    aflowrc << "DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING=" << AFLOWRC_DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING << " // factor that divides minimum interatomic distance" << endl; //DX20201118
+    aflowrc << "DEFAULT_XTALFINDER_FILE_MATERIAL=" << AFLOWRC_DEFAULT_XTALFINDER_FILE_MATERIAL << " // results file prefix" << endl; //DX20201118
+    aflowrc << "DEFAULT_XTALFINDER_FILE_STRUCTURE=" << AFLOWRC_DEFAULT_XTALFINDER_FILE_STRUCTURE << " // results file prefix" << endl; //DX20201118
+    aflowrc << "DEFAULT_XTALFINDER_FILE_DUPLICATE=" << AFLOWRC_DEFAULT_XTALFINDER_FILE_DUPLICATE << " // results file prefix" << endl; //DX20201118
+    aflowrc << "DEFAULT_XTALFINDER_FILE_MATERIAL_COMPARE2DATABASE=" << AFLOWRC_DEFAULT_XTALFINDER_FILE_MATERIAL_COMPARE2DATABASE << " // results file prefix" << endl; //DX20201118
+    aflowrc << "DEFAULT_XTALFINDER_FILE_STRUCTURE_COMPARE2DATABASE=" << AFLOWRC_DEFAULT_XTALFINDER_FILE_STRUCTURE_COMPARE2DATABASE << " // results file prefix" << endl; //DX20201118
+    aflowrc << "DEFAULT_XTALFINDER_FILE_MATERIAL_DATABASE=" << AFLOWRC_DEFAULT_XTALFINDER_FILE_MATERIAL_DATABASE << " // results file prefix" << endl; //DX20201118
+    aflowrc << "DEFAULT_XTALFINDER_FILE_STRUCTURE_DATABASE=" << AFLOWRC_DEFAULT_XTALFINDER_FILE_STRUCTURE_DATABASE << " // results file prefix" << endl; //DX20201118
 
     //DX20200720 - START
     aflowrc << " " << endl;
@@ -2203,6 +2254,12 @@ namespace aflowrc {
     aflowrc << "MPI_COMMAND_MACHINE002=\"" << AFLOWRC_MPI_COMMAND_MACHINE002 << "\"" << "// MACHINE002" << endl;
     aflowrc << "MPI_BINARY_DIR_MACHINE002=\"" << AFLOWRC_MPI_BINARY_DIR_MACHINE002 << "\"" << "// MACHINE002" << endl;
     //DX20190509 - MACHINE002 - START
+
+    //DX20201005 - MACHINE003 - START
+    aflowrc << "MPI_OPTIONS_MACHINE003=\"" << AFLOWRC_MPI_OPTIONS_MACHINE003 << "\"" << "// MACHINE003" << endl;
+    aflowrc << "MPI_COMMAND_MACHINE003=\"" << AFLOWRC_MPI_COMMAND_MACHINE003 << "\"" << "// MACHINE003" << endl;
+    aflowrc << "MPI_BINARY_DIR_MACHINE003=\"" << AFLOWRC_MPI_BINARY_DIR_MACHINE003 << "\"" << "// MACHINE003" << endl;
+    //DX20201005 - MACHINE003 - START
 
     //DX20190107 - CMU EULER - START
     aflowrc << "MPI_OPTIONS_CMU_EULER=\"" << AFLOWRC_MPI_OPTIONS_CMU_EULER << "\"" << "// CMU_EULER" << endl;
@@ -2684,7 +2741,17 @@ namespace aflowrc {
 
     //DX20200708 - START
     if(LDEBUG) oss << "// DEFAULTS XTALFINDER" << endl;
-    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING\")=" << DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_XTALFINDER_MISFIT_MATCH\")=" << DEFAULT_XTALFINDER_MISFIT_MATCH << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_XTALFINDER_MISFIT_FAMILY\")=" << DEFAULT_XTALFINDER_MISFIT_FAMILY << endl; //DX20201118
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_XTALFINDER_SUPERCELL_METHOD\")=" << DEFAULT_XTALFINDER_SUPERCELL_METHOD << endl; //DX20201223
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING\")=" << DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING << endl; //DX20201118
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_XTALFINDER_FILE_MATERIAL\")=" << DEFAULT_XTALFINDER_FILE_MATERIAL << endl; //DX20201118
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_XTALFINDER_FILE_STRUCTURE\"=" << DEFAULT_XTALFINDER_FILE_STRUCTURE << endl; //DX20201118
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_XTALFINDER_FILE_DUPLICATE\")=" << DEFAULT_XTALFINDER_FILE_DUPLICATE << endl; //DX20201118
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_XTALFINDER_FILE_MATERIAL_COMPARE2DATABASE\")=" << DEFAULT_XTALFINDER_FILE_MATERIAL_COMPARE2DATABASE << endl; //DX20201118
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_XTALFINDER_FILE_STRUCTURE_COMPARE2DATABASE\")=" << DEFAULT_XTALFINDER_FILE_STRUCTURE_COMPARE2DATABASE << endl; //DX20201118
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_XTALFINDER_FILE_MATERIAL_DATABASE\")=" << DEFAULT_XTALFINDER_FILE_MATERIAL_DATABASE << endl; //DX20201118
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_XTALFINDER_FILE_STRUCTURE_DATABASE\")=" << DEFAULT_XTALFINDER_FILE_STRUCTURE_DATABASE << endl; //DX20201118
     //DX20200708 - END
 
     //DX20200720 - START
@@ -2745,6 +2812,12 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_COMMAND_MACHINE002\")=\"" << MPI_COMMAND_MACHINE002 << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_BINARY_DIR_MACHINE002\")=\"" << MPI_BINARY_DIR_MACHINE002 << "\"" << endl;
     //DX20190509 - MACHINE002 - END
+
+    //DX20201005 - MACHINE003 - START
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_OPTIONS_MACHINE003\")=\"" << MPI_OPTIONS_MACHINE003 << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_COMMAND_MACHINE003\")=\"" << MPI_COMMAND_MACHINE003 << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_BINARY_DIR_MACHINE003\")=\"" << MPI_BINARY_DIR_MACHINE003 << "\"" << endl;
+    //DX20201005 - MACHINE003 - END
 
     //DX20190107 - CMU EULER - START
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_OPTIONS_CMU_EULER\")=\"" << MPI_OPTIONS_CMU_EULER << "\"" << endl;

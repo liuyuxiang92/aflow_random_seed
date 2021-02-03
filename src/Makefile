@@ -809,6 +809,28 @@ aflow_cce_python.cpp: aflow_cce_python.py Makefile
 	echo "\";" >> $@
 	echo "#endif // _AFLOW_CCE_PYTHON_CPP_" >> $@
 #CO20201105 - END
+#DX20201228 - START
+aflow_sym_python.cpp: aflow_sym_python.py Makefile
+	rm -rf $@
+	echo "#ifndef _AFLOW_SYM_PYTHON_CPP_" >> $@
+	echo "#define _AFLOW_SYM_PYTHON_CPP_" >> $@
+	echo "// $@ automatically generated" >> $@
+	echo "std::string AFLOW_SYM_PYTHON_PY=\"\\" >> $@
+	cat $< | perl -p -e 's/\r//g' | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\"/\\"/g' >> $@
+	echo "\";" >> $@
+	echo "#endif // _AFLOW_SYM_PYTHON_CPP_" >> $@
+#DX20201228 - END
+#DX20201228 - START
+aflow_xtalfinder_python.cpp: aflow_xtalfinder_python.py Makefile
+	rm -rf $@
+	echo "#ifndef _AFLOW_XTALFINDER_PYTHON_CPP_" >> $@
+	echo "#define _AFLOW_XTALFINDER_PYTHON_CPP_" >> $@
+	echo "// $@ automatically generated" >> $@
+	echo "std::string AFLOW_XTALFINDER_PYTHON_PY=\"\\" >> $@
+	cat $< | perl -p -e 's/\r//g' | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\"/\\"/g' >> $@
+	echo "\";" >> $@
+	echo "#endif // _AFLOW_XTALFINDER_PYTHON_CPP_" >> $@
+#DX20201228 - END
 aflow_mix_nomix_table.cpp: Makefile $(AFLOW_HPPS) $(AUROSTD_HPPS)
 	rm -rf nomix.tmp
 	find $(PROJECT_DIRECTORY_GNDSTATE)/NOMIX/ -name aflow.in | sed "s/\/common\/$(PROJECT_DIRECTORY_GNDSTATE)\/NOMIX\/LIB2\/LIB\///g" | sed "s/aflow.in//g" >> nomix.tmp
@@ -987,7 +1009,7 @@ datainstall:
 redata: datainstall
 .PHONY: clean_autogen
 clean_autogen:
-	rm -rf aflowlib_webapp_entry.cpp aflowlib_webapp_bands.cpp aflow_chull_jupyter.cpp aflow_chull_jupyter_plotter.cpp aflow_chull_python.cpp aflow_chull_jupyter_requirements.cpp aflow_cce_python.cpp aflow_data_readme.cpp aflow_readme_aflow.cpp aflow_readme_aconvasp.cpp aflow_readme_apennsy.cpp aflow_readme_proto.cpp aflow_xproto_icsd_lib.cpp aflow_matlab_funcs.cpp aflow_gnuplot_funcs.cpp aflow_data_*cpp *.dat
+	rm -rf aflowlib_webapp_entry.cpp aflowlib_webapp_bands.cpp aflow_chull_jupyter.cpp aflow_chull_jupyter_plotter.cpp aflow_chull_python.cpp aflow_chull_jupyter_requirements.cpp aflow_cce_python.cpp aflow_sym_python.cpp aflow_xtalfinder_python.cpp aflow_data_readme.cpp aflow_readme_aflow.cpp aflow_readme_aconvasp.cpp aflow_readme_apennsy.cpp aflow_readme_proto.cpp aflow_xproto_icsd_lib.cpp aflow_matlab_funcs.cpp aflow_gnuplot_funcs.cpp aflow_data_*cpp *.dat
 ###################################################################################################
 
 ###################################################################################################
@@ -1161,7 +1183,9 @@ check_full:
 	$(MAKE) check_aflowSG
 	$(MAKE) check_AFLOWSYM
 	$(MAKE) check_edata
-	$(MAKE) check_aflow_xtal_match
+	$(MAKE) check_aflow_xtal_finder
+	$(MAKE) check_fold_atoms_in_cell_routine
+	$(MAKE) check_prototype_generator
 	$(MAKE) check_aflow_gcc_compatibility
 	$(MAKE) check_cce
 	$(MAKE) check_pocc
@@ -1486,12 +1510,57 @@ check_edata:
 	@echo "Running edata test 1" && ANSWER=1 RESULT=$$(./aflow --proto=AB2_tI6_139_a_e:Os:Rh --params=2.7095,4.27466,0.662829 | ./aflow --edata | grep "BRAVAIS LATTICE OF THE LATTICE (pgroup)" | wc -l | sed 's/^ *//') && \
 		if [ "$$ANSWER" -ne "$$RESULT" ]; then "edata did not finish successfully" && exit 1; fi
 	@echo "edata test 1 passed!"
-.PHONY: check_aflow_xtal_match
-check_aflow_xtal_match:
+.PHONY: check_aflow_xtal_finder
+check_aflow_xtal_finder:
 	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
-	@echo "Running aflow_xtal_match test 1" && ANSWER=1 && RESULT=$$(./aflow --proto=A2B3_hR10_167_c_e:Al:O --params=-1,2.72957758313,0.36,0.5561 | ./aflow --compare2protos --print=txt --catalog=anrl --quiet) && NUM_MATCHING_PROTOS=$$(echo $$RESULT | awk -F'duplicate_compounds=' '{print $$2}' | awk '{print $$1}') && \
-		if [ "$$NUM_MATCHING_PROTOS" -ne "$$ANSWER" ]; then "aflow_xtal_match did not return $$ANSWER for './aflow --proto=A2B3_hR10_167_c_e:Al:O --params=-1,2.72957758313,0.36,0.5561 | ./aflow --compare2protos --print=txt --catalog=anrl --quiet', found $$NUM_MATCHING_PROTOS instead" && exit 1; fi
-	@echo "aflow_xtal_match test 1 passed!"
+	@echo "Running aflow_xtal_finder - ideal prototyper test 1" && ANSWER="A2B3_hR10_167_c_e" && RESULT=$$(./aflow --proto=A2B3_hR10_167_c_e:Al:O --params=5.22337,2.72958,0.64784,0.9439 | ./aflow --prototype) && AFLOW_LABEL=$$(echo $$RESULT | grep "AFLOW label" | awk '{print $$4}') && \
+		if [ $$AFLOW_LABEL != $$ANSWER ]; then "aflow_xtal_finder did not return $$ANSWER for './aflow --proto=A2B3_hR10_167_c_e:Al:O --params=5.22337,2.72958,0.64784,0.9439 | ./aflow --prototype', found $$AFLOW_LABEL instead" && exit 1; fi
+	@echo "aflow_xtal_finder - ideal prototyper test 1 passed!"
+	@echo "Running aflow_xtal_finder - ideal prototyper test 2" && ANSWER="AB18C8_cF108_225_a_eh_f" && RESULT=$$(./aflow --proto=AB18C8_cF108_225_a_eh_f --params=10.3439,0.325,0.65833,0.16 | ./aflow --prototype) && AFLOW_LABEL=$$(echo $$RESULT | grep "AFLOW label" | awk '{print $$4}') && \
+		if [ $$AFLOW_LABEL != $$ANSWER ]; then "aflow_xtal_finder did not return $$ANSWER for './aflow --proto=AB18C8_cF108_225_a_eh_f --params=10.3439,0.325,0.65833,0.16 | ./aflow --prototype', found $$AFLOW_LABEL instead" && exit 1; fi
+	@echo "aflow_xtal_finder - ideal prototyper test 2 passed!"
+	@echo "Running aflow_xtal_finder - ideal prototyper test 3" && ANSWER="ABC4_mP12_13_e_a_2g" && RESULT=$$(./aflow --proto=ABC4_mP12_13_e_a_2g --params=8.6244,0.500336,1.63361,145.35,0.5182,0.2986,0.0278,0.0003,0.2821,0.4045,0.2366 | ./aflow --prototype) && AFLOW_LABEL=$$(echo $$RESULT | grep "AFLOW label" | awk '{print $$4}') && \
+		if [ $$AFLOW_LABEL != $$ANSWER ]; then "aflow_xtal_finder did not return $$ANSWER for './aflow --proto=ABC4_mP12_13_e_a_2g --params=8.6244,0.500336,1.63361,145.35,0.5182,0.2986,0.0278,0.0003,0.2821,0.4045,0.2366 | ./aflow --prototype', found $$AFLOW_LABEL instead" && exit 1; fi
+	@echo "aflow_xtal_finder - ideal prototyper test 3 passed!"
+	@echo "Running aflow_xtal_finder - compare materials test 1 (different cell sizes)" && ANSWER="MATCH" && RESULT=$$(./aflow --proto=AB_cF8_225_a_b:Cl:Na > AB_cF8_225_a_b.poscar; cat AB_cF8_225_a_b.poscar | ./aflow --supercell=4,1,1 > AB_cF8_225_a_b_411_supercell.poscar; ./aflow --compare_materials=AB_cF8_225_a_b.poscar,AB_cF8_225_a_b_411_supercell.poscar --quiet) && MATCH=$$(echo $$RESULT | awk '{print $$3}') && \
+		if [ $$MATCH != $$ANSWER ]; then "aflow_xtal_finder did not return $$ANSWER for './aflow --proto=AB_cF8_225_a_b:Cl:Na > AB_cF8_225_a_b; cat AB_cF8_225_a_b.poscar | ./aflow --supercell=4,1,1 > AB_cF8_225_a_b_411_supercell.poscar; ./aflow --compare_materials=AB_cF8_225_a_b.poscar,AB_cF8_225_a_b_411_supercell.poscar --quiet', found $$MATCH instead" && exit 1; fi
+	@echo "aflow_xtal_finder - compare_materials test 1 (different cell sizes) passed!"
+	@rm -f AB_cF8_225_a_b.poscar
+	@rm -f AB_cF8_225_a_b_411_supercell.poscar
+	@echo "Running aflow_xtal_finder - compare materials test 2 (different cell sizes)" && ANSWER="MATCH" && RESULT=$$(./aflow --proto=AB_cF8_225_a_b:Cl:Na > AB_cF8_225_a_b.poscar; cat AB_cF8_225_a_b.poscar | ./aflow --supercell=4,1,1 > AB_cF8_225_a_b_411_supercell.poscar; ./aflow --compare_materials=AB_cF8_225_a_b_411_supercell.poscar,AB_cF8_225_a_b.poscar --quiet) && MATCH=$$(echo $$RESULT | awk '{print $$3}') && \
+		if [ $$MATCH != $$ANSWER ]; then "aflow_xtal_finder did not return $$ANSWER for './aflow --proto=AB_cF8_225_a_b:Cl:Na > AB_cF8_225_a_b; cat AB_cF8_225_a_b.poscar | ./aflow --supercell=4,1,1 > AB_cF8_225_a_b_411_supercell.poscar; ./aflow --compare_materials=AB_cF8_225_a_b_411_supercell.poscar,AB_cF8_225_a_b.poscar --quiet', found $$MATCH instead" && exit 1; fi
+	@echo "aflow_xtal_finder - compare_materials test 2 (different cell sizes) passed!"
+	@rm -f AB_cF8_225_a_b.poscar
+	@rm -f AB_cF8_225_a_b_411_supercell.poscar
+	@echo "Running aflow_xtal_finder - compare atom decorations test 1" && ANSWER=3 && RESULT=$$(./aflow --proto=ABCD_cF16_216_c_d_b_a | ./aflow --unique_atom_decorations --print_misfit --quiet) && NUM_UNIQUE_DECORATIONS=$$(echo $$RESULT | grep "Unique atom decorations" | cut -d '(' -f2 | cut -d ')' -f1) && \
+		if [ "$$NUM_UNIQUE_DECORATIONS" -ne "$$ANSWER" ]; then "aflow_xtal_finder did not return $$ANSWER for './aflow --proto=ABCD_cF16_216_c_d_b_a | ./aflow --unique_atom_decorations --print_misfit --quiet', found $$NUM_UNIQUE_DECORATIONS instead" && exit 1; fi
+	@echo "aflow_xtal_finder test - compare atom decorations test 1 passed!"
+	@echo "Running aflow_xtal_finder - compare atom decorations test 2 " && ANSWER=3 && RESULT=$$(./aflow --proto=ABC_hP3_156_a_c_b --params=4.346,1.57271,4.44089e-16,0.4227,0.7214 | ./aflow --unique_atom_decorations --print_misfit --optimize --quiet) && NUM_UNIQUE_DECORATIONS=$$(echo $$RESULT | grep "Unique atom decorations" | cut -d '(' -f2 | cut -d ')' -f1) && \
+		if [ "$$NUM_UNIQUE_DECORATIONS" -ne "$$ANSWER" ]; then "aflow_xtal_finder did not return $$ANSWER for './aflow --proto=ABC_hP3_156_a_c_b --params=4.346,1.57271,4.44089e-16,0.4227,0.7214 | ./aflow --unique_atom_decorations --print_misfit --optimize --quiet', found $$NUM_UNIQUE_DECORATIONS instead" && exit 1; fi
+	@echo "aflow_xtal_finder - compare atom decorations test 1 passed!"
+	@echo "Running aflow_xtal_finder - compare2protos test 1" && ANSWER=2 && RESULT=$$(./aflow --proto=A2B3_hR10_167_c_e:Al:O --params=-1,2.72957758313,0.36,0.5561 | ./aflow --compare2protos --print=txt --catalog=anrl --quiet) && NUM_MATCHING_PROTOS=$$(echo $$RESULT | awk -F'duplicate_compounds=' '{print $$2}' | awk '{print $$1}') && \
+		if [ "$$NUM_MATCHING_PROTOS" -ne "$$ANSWER" ]; then "aflow_xtal_finder did not return $$ANSWER for './aflow --proto=A2B3_hR10_167_c_e:Al:O --params=-1,2.72957758313,0.36,0.5561 | ./aflow --compare2protos --print=txt --catalog=anrl --quiet', found $$NUM_MATCHING_PROTOS instead" && exit 1; fi
+	@echo "aflow_xtal_finder - compare2protos test 1 passed!"
+	@echo "Running aflow_xtal_finder - compare magnetic configurations test 1 (antiferro vs antiferro)" && ANSWER="MATCH" && RESULT=$$(./aflow --proto=A_cI2_229_a:Cr | ./aflow --sconv >A_cI2_229_a_sconv.poscar ; ./aflow --compare_materials=A_cI2_229_a_sconv.poscar,A_cI2_229_a_sconv.poscar --magmoms=-1,1:1,-1 --quiet) && MATCH=$$(echo $$RESULT | awk '{print $$3}') && \
+		if [ $$MATCH != $$ANSWER ]; then "aflow_xtal_finder did not return $$ANSWER for './aflow --proto=A_cI2_229_a:Cr | ./aflow --sconv >A_cI2_229_a_sconv.poscar ; ./aflow --compare_materials=A_cI2_229_a_sconv.poscar,A_cI2_229_a_sconv.poscar --magmoms=-1,1:1,-1 --quiet', found $$MATCH instead" && exit 1; fi
+	@echo "aflow_xtal_finder - compare magnetic configuration test 1 (antiferro vs antiferro) passed!"
+	@rm -f A_cI2_229_a_sconv.poscar
+	@echo "Running aflow_xtal_finder - compare magnetic configurations test 2 (ferro vs antiferro)" && ANSWER="UNMATCHABLE" && RESULT=$$(./aflow --proto=A_cI2_229_a:Cr | ./aflow --sconv >A_cI2_229_a_sconv.poscar ; ./aflow --compare_materials=A_cI2_229_a_sconv.poscar,A_cI2_229_a_sconv.poscar --magmoms=1,1:1,-1 --quiet) && MATCH=$$(echo $$RESULT | awk '{print $$1}') && \
+		if [ $$MATCH != $$ANSWER ]; then "aflow_xtal_finder did not return $$ANSWER for './aflow --proto=A_cI2_229_a:Cr | ./aflow --sconv >A_cI2_229_a_sconv.poscar ; ./aflow --compare_materials=A_cI2_229_a_sconv.poscar,A_cI2_229_a_sconv.poscar --magmoms=1,1:1,-1 --quiet', found $$MATCH instead" && exit 1; fi
+	@echo "aflow_xtal_finder - compare magnetic configuration test 2 (ferro vs antiferro) passed!"
+	@rm -f A_cI2_229_a_sconv.poscar
+	@echo "Running aflow_xtal_finder - compare magnetic configurations test 3 (ferro-up vs ferro-down)" && ANSWER="UNMATCHABLE" && RESULT=$$(./aflow --proto=A_cI2_229_a:Cr | ./aflow --sconv >A_cI2_229_a_sconv.poscar ; ./aflow --compare_materials=A_cI2_229_a_sconv.poscar,A_cI2_229_a_sconv.poscar --magmoms=1,1:-1,-1 --quiet) && MATCH=$$(echo $$RESULT | awk '{print $$1}') && \
+		if [ $$MATCH != $$ANSWER ]; then "aflow_xtal_finder did not return $$ANSWER for './aflow --proto=A_cI2_229_a:Cr | ./aflow --sconv >A_cI2_229_a_sconv.poscar ; ./aflow --compare_materials=A_cI2_229_a_sconv.poscar,A_cI2_229_a_sconv.poscar --magmoms=1,1:-1,-1 --quiet', found $$MATCH instead" && exit 1; fi
+	@echo "aflow_xtal_finder - compare magnetic configuration test 3 (ferro-up vs ferro-down) passed!"
+	@rm -f A_cI2_229_a_sconv.poscar
+.PHONY: check_fold_atoms_in_cell_routine
+check_fold_atoms_in_cell_routine:
+	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
+	./aflow --FoldAtomsInCell_test
+.PHONY: check_prototype_generator
+check_prototype_generator:
+	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
+	./aflow --PrototypeGenerator_test
 #RF20200302 - START
 .PHONY: check_cce
 check_cce:

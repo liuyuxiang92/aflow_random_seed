@@ -465,6 +465,11 @@ namespace init {
       oss << "MPI_COMMAND_MACHINE002=" << MPI_COMMAND_MACHINE002 << "\"" << endl;
       oss << "MPI_BINARY_DIR_MACHINE002=" << MPI_BINARY_DIR_MACHINE002 << "\"" << endl;
       //DX20190509 - MACHINE002 - END
+      //DX20201005 - MACHINE003 - START
+      oss << "MPI_OPTIONS_MACHINE003=" << MPI_OPTIONS_MACHINE003 << "\"" << endl;
+      oss << "MPI_COMMAND_MACHINE003=" << MPI_COMMAND_MACHINE003 << "\"" << endl;
+      oss << "MPI_BINARY_DIR_MACHINE003=" << MPI_BINARY_DIR_MACHINE003 << "\"" << endl;
+      //DX20201005 - MACHINE003 - END
       //DX20190107 - CMU EULER - START
       oss << "MPI_OPTIONS_CMU_EULER=" << MPI_OPTIONS_CMU_EULER << "\"" << endl;
       oss << "MPI_COMMAND_CMU_EULER=" << MPI_COMMAND_CMU_EULER << "\"" << endl;
@@ -764,6 +769,7 @@ namespace init {
     XHOST.vflag_control.flag("PRINT_MODE::HTML",aurostd::args2flag(XHOST.argv,cmds,"--print=html|--print_html")); 
     XHOST.vflag_control.flag("PRINT_MODE::TXT",aurostd::args2flag(XHOST.argv,cmds,"--print=txt|--print_txt")); 
     XHOST.vflag_control.flag("PRINT_MODE::JSON",aurostd::args2flag(XHOST.argv,cmds,"--print=json|--print_json")); //DX20170907 - Add json
+    XHOST.vflag_control.flag("PRINT_MODE::PYTHON",aurostd::args2flag(XHOST.argv,cmds,"--print=python|--print_python")); //DX20201228 - add Python
     XHOST.vflag_control.flag("PRINT_MODE::LATEX",aurostd::args2flag(XHOST.argv,cmds,"--print=latex|--print_latex"));
     XHOST.vflag_control.flag("PRINT_MODE::YEAR",aurostd::args2flag(XHOST.argv,cmds,"--print=year|--print_year"));
     XHOST.vflag_control.flag("PRINT_MODE::DOI",aurostd::args2flag(XHOST.argv,cmds,"--print=doi|--print_doi"));
@@ -783,6 +789,7 @@ namespace init {
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"PRINT_MODE::HTML\")=" << XHOST.vflag_control.flag("PRINT_MODE::HTML") << endl;
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"PRINT_MODE::TXT\")=" << XHOST.vflag_control.flag("PRINT_MODE::TXT") << endl;
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"PRINT_MODE::JSON\")=" << XHOST.vflag_control.flag("PRINT_MODE::JSON") << endl; //DX20170907 - Add json
+    if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"PRINT_MODE::PYTHON\")=" << XHOST.vflag_control.flag("PRINT_MODE::PYTHON") << endl; //DX20170907 - add Python
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"PRINT_MODE::LATEX\")=" << XHOST.vflag_control.flag("PRINT_MODE::LATEX") << endl;
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"PRINT_MODE::YEAR\")=" << XHOST.vflag_control.flag("PRINT_MODE::YEAR") << endl;
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"PRINT_MODE::DOI\")=" << XHOST.vflag_control.flag("PRINT_MODE::DOI") << endl;
@@ -2173,39 +2180,39 @@ namespace init {
     nschema++;
 
     // schema is CAPITAL, content is not necessarily //DX20200902
-    XHOST.vschema.push_attached("SCHEMA::NAME:ANRL_LABEL_ORIG","anrl_label_orig");
-    XHOST.vschema.push_attached("SCHEMA::UNIT:ANRL_LABEL_ORIG","");
-    XHOST.vschema.push_attached("SCHEMA::TYPE:ANRL_LABEL_ORIG","string");
+    XHOST.vschema.push_attached("SCHEMA::NAME:AFLOW_PROTOTYPE_LABEL_ORIG","aflow_prototype_label_orig"); //DX20201001 - updated keyword
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AFLOW_PROTOTYPE_LABEL_ORIG",""); //DX20201001 - updated keyword
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AFLOW_PROTOTYPE_LABEL_ORIG","string"); //DX20201001 - updated keyword
     nschema++;
 
     // schema is CAPITAL, content is not necessarily //DX20200902
-    XHOST.vschema.push_attached("SCHEMA::NAME:ANRL_PARAMETER_LIST_ORIG","anrl_parameter_list_orig");
-    XHOST.vschema.push_attached("SCHEMA::UNIT:ANRL_PARAMETER_LIST_ORIG","");
-    XHOST.vschema.push_attached("SCHEMA::TYPE:ANRL_PARAMETER_LIST_ORIG","strings");
+    XHOST.vschema.push_attached("SCHEMA::NAME:AFLOW_PROTOTYPE_PARAMETER_LIST_ORIG","aflow_prototype_parameter_list_orig"); //DX20201001 - updated keyword
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AFLOW_PROTOTYPE_PARAMETER_LIST_ORIG",""); //DX20201001 - updated keyword
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AFLOW_PROTOTYPE_PARAMETER_LIST_ORIG","strings"); //DX20201001 - updated keyword
     nschema++;
 
     // schema is CAPITAL, content is not necessarily //DX20200902
-    XHOST.vschema.push_attached("SCHEMA::NAME:ANRL_PARAMETER_VALUES_ORIG","anrl_parameter_values_orig");
-    XHOST.vschema.push_attached("SCHEMA::UNIT:ANRL_PARAMETER_VALUES_ORIG","");
-    XHOST.vschema.push_attached("SCHEMA::TYPE:ANRL_PARAMETER_VALUES_ORIG","numbers");
+    XHOST.vschema.push_attached("SCHEMA::NAME:AFLOW_PROTOTYPE_PARAMETER_VALUES_ORIG","aflow_prototype_parameter_values_orig"); //DX20201001 - updated keyword
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AFLOW_PROTOTYPE_PARAMETER_VALUES_ORIG",""); //DX20201001 - updated keyword
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AFLOW_PROTOTYPE_PARAMETER_VALUES_ORIG","numbers"); //DX20201001 - updated keyword
     nschema++;
 
     // schema is CAPITAL, content is not necessarily //DX20200902
-    XHOST.vschema.push_attached("SCHEMA::NAME:ANRL_LABEL_RELAX","anrl_label_relax");
-    XHOST.vschema.push_attached("SCHEMA::UNIT:ANRL_LABEL_RELAX","");
-    XHOST.vschema.push_attached("SCHEMA::TYPE:ANRL_LABEL_RELAX","string");
+    XHOST.vschema.push_attached("SCHEMA::NAME:AFLOW_PROTOTYPE_LABEL_RELAX","aflow_prototype_label_relax"); //DX20201001 - updated keyword
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AFLOW_PROTOTYPE_LABEL_RELAX",""); //DX20201001 - updated keyword
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AFLOW_PROTOTYPE_LABEL_RELAX","string"); //DX20201001 - updated keyword
     nschema++;
 
     // schema is CAPITAL, content is not necessarily //DX20200902
-    XHOST.vschema.push_attached("SCHEMA::NAME:ANRL_PARAMETER_LIST_RELAX","anrl_parameter_list_relax");
-    XHOST.vschema.push_attached("SCHEMA::UNIT:ANRL_PARAMETER_LIST_RELAX","");
-    XHOST.vschema.push_attached("SCHEMA::TYPE:ANRL_PARAMETER_LIST_RELAX","strings");
+    XHOST.vschema.push_attached("SCHEMA::NAME:AFLOW_PROTOTYPE_PARAMETER_LIST_RELAX","aflow_prototype_parameter_list_relax"); //DX20201001 - updated keyword
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AFLOW_PROTOTYPE_PARAMETER_LIST_RELAX",""); //DX20201001 - updated keyword
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AFLOW_PROTOTYPE_PARAMETER_LIST_RELAX","strings"); //DX20201001 - updated keyword
     nschema++;
 
     // schema is CAPITAL, content is not necessarily //DX20200902
-    XHOST.vschema.push_attached("SCHEMA::NAME:ANRL_PARAMETER_VALUES_RELAX","anrl_parameter_values_relax");
-    XHOST.vschema.push_attached("SCHEMA::UNIT:ANRL_PARAMETER_VALUES_RELAX","");
-    XHOST.vschema.push_attached("SCHEMA::TYPE:ANRL_PARAMETER_VALUES_RELAX","numbers");
+    XHOST.vschema.push_attached("SCHEMA::NAME:AFLOW_PROTOTYPE_PARAMETER_VALUES_RELAX","aflow_prototype_parameter_values_relax"); //DX20201001 - updated keyword
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AFLOW_PROTOTYPE_PARAMETER_VALUES_RELAX",""); //DX20201001 - updated keyword
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AFLOW_PROTOTYPE_PARAMETER_VALUES_RELAX","numbers"); //DX20201001 - updated keyword
     nschema++;
 
     // schema is CAPITAL, content is not necessarily

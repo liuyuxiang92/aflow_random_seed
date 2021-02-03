@@ -822,7 +822,7 @@ uint xstructure::GetPrimitiveCell(void) {
 
   int atom_count = (*this).atoms.size();
   deque<_atom> atomic_basis_;
-  deque<int> basistypes;
+  //DX20210129 [OBSOLETE] deque<int> basistypes;
 
   // Copy deque<_atoms> atoms (IN XSTRUCTURE) to atomic_basis_ to manipulate free of xstructure
   for (int i = 0; i < atom_count; i++) {
@@ -870,8 +870,9 @@ uint xstructure::GetPrimitiveCell(void) {
   if(atom_count == 1 || atoms_by_type[index_for_smallest_group].size() == 1) {
     prim_lattice = SYM::xvec2xmat(lattice_basis[0], lattice_basis[1], lattice_basis[2]);
     foundbasis = true;
-    numofatoms = SYM::arrange_atoms(atomic_basis_);
-    basistypes = numofatoms;
+    sort(atomic_basis_.begin(), atomic_basis_.end(), sortAtomsTypes);
+    //DX20210129 [OBSOLETE] numofatoms = ::GetNumEachType(atomic_basis_);
+    //DX20210129 [OBSOLETE] basistypes = numofatoms;
   }
 
   deque<_atom> newbasis;
@@ -963,8 +964,9 @@ uint xstructure::GetPrimitiveCell(void) {
     if(num_of_candidates == 3) {
       prim_lattice = SYM::xvec2xmat(lattice_basis[0], lattice_basis[1], lattice_basis[2]);
       foundbasis = true;
-      numofatoms = SYM::arrange_atoms(atomic_basis_);
-      basistypes = numofatoms;
+      sort(atomic_basis_.begin(), atomic_basis_.end(), sortAtomsTypes);
+      //DX20210129 [OBSOLETE] numofatoms = ::GetNumEachType(atomic_basis_);
+      //DX20210129 [OBSOLETE] basistypes = numofatoms;
 
     } else {
       //Here because the original poscar is not primitive
@@ -1030,7 +1032,7 @@ uint xstructure::GetPrimitiveCell(void) {
       double same_atom_tol = (*this).dist_nn_min - 0.1;  //min_dist itself will consider nn atom to be the same, needs to be slightly smaller.`
       //Now get atoms inside of new, reduced basis:
       //[CO20190520]newbasis = foldAtomsInCell(expanded_basis, c2f, f2c, skew, same_atom_tol); //CO20180409
-      newbasis = foldAtomsInCell(expanded_basis, (*this).lattice, lattice_basis_xmat, skew, same_atom_tol,false); //CO20180409 //DX20190619 - false->do not check min dists (expensive)
+      newbasis = ::foldAtomsInCell(expanded_basis, (*this).lattice, lattice_basis_xmat, skew, same_atom_tol,false); //CO20180409 //DX20190619 - false->do not check min dists (expensive)
       //DEBUG
       //cerr << "newbasis.size(): " << newbasis.size() << endl;
       //for(uint n=0;n<newbasis.size();n++){
@@ -1042,8 +1044,9 @@ uint xstructure::GetPrimitiveCell(void) {
         foundbasis = false;
       } else {
         //Overwrite basis types (update it for primitive cell):
-        numofatoms = SYM::arrange_atoms(newbasis);
-        basistypes = numofatoms;
+        sort(newbasis.begin(), newbasis.end(), sortAtomsTypes);
+        //DX20210129 [OBSOLETE] numofatoms = ::GetNumEachType(newbasis);
+        //DX20210129 [OBSOLETE] basistypes = numofatoms;
         atomic_basis_.clear();
         atomic_basis_ = newbasis;
         if(atomic_basis_.size() == 0) {
@@ -1057,40 +1060,43 @@ uint xstructure::GetPrimitiveCell(void) {
   if(foundbasis == false) { return 1; }
 
   // ===== Put contents back in xstructure ===== //
-  deque<int> numtypes;
-  for (uint i = 0; i < basistypes.size(); i++) {
-    numtypes.push_back(basistypes[i]);
-  }
+  //DX20210129 [OBSOLETE] deque<int> numtypes;
+  //DX20210129 [OBSOLETE] for (uint i = 0; i < basistypes.size(); i++) {
+  //DX20210129 [OBSOLETE]   numtypes.push_back(basistypes[i]);
+  //DX20210129 [OBSOLETE] }
 
-  if(newbasis.size() > 0) {  //IF A NEW BASIS EXISTS (CELL WAS NOT PRIMITIVE) THEN OVERWRITE a.atoms
-    // cerr << "USING NEW BASIS" << endl;
-    // Remove old basis
-    while ((*this).atoms.size() > 0) {
-      (*this).RemoveAtom((uint)0);
-    }
-    (*this).species.clear(); //DX
-    for (uint i = 0; i < newbasis.size(); i++) {
-      _atom tmp_atom = newbasis[i]; //DX20191011 - initialized instead of setting individually below
-      //DX20191011 [OBSOLETE] tmp_atom.fpos = newbasis[i].fpos;
-      //DX20191011 [OBSOLETE] tmp_atom.cpos = newbasis[i].cpos;
-      //DX20191011 [OBSOLETE] tmp_atom.name = newbasis[i].name;
-      //DX20191011 [OBSOLETE] tmp_atom.type = newbasis[i].type;
-      //DX20191011 [OBSOLETE] tmp_atom.name_is_given = true;
-      //DX20191011 [OBSOLETE] tmp_atom.spin = newbasis[i].spin; //DX20170921 - magnetic sym
-      tmp_atom.spin_is_given = false; //DX20170921 - magnetic sym
-      if(aurostd::abs(tmp_atom.spin)>_ZERO_TOL_){
-        tmp_atom.spin_is_given = true; //DX20170921 - magnetic sym
-      }
-      tmp_atom.noncoll_spin = newbasis[i].noncoll_spin; //DX20171205 - magnetic sym (non-collinear)
-      tmp_atom.noncoll_spin_is_given = false; //DX20171205 - magnetic sym (non-collinear)
-      if(aurostd::abs(tmp_atom.noncoll_spin(1))>_ZERO_TOL_ || aurostd::abs(tmp_atom.noncoll_spin(2))>_ZERO_TOL_ || aurostd::abs(tmp_atom.noncoll_spin(3))>_ZERO_TOL_){
-        tmp_atom.noncoll_spin_is_given = true; //DX20171205 - magnetic sym (non-collinear) //DX20191108 - fixed typo, should be noncoll_spin_is_given not spin_is_given
-      }
-      (*this).AddAtom(tmp_atom);
-    }
-  }
-  (*this).num_each_type = numtypes;
   (*this).lattice = prim_lattice;
+  if(newbasis.size() > 0) {  //IF A NEW BASIS EXISTS (CELL WAS NOT PRIMITIVE) THEN OVERWRITE a.atoms
+    sort(newbasis.begin(), newbasis.end(), sortAtomsTypes);
+    (*this).ReplaceAtoms(newbasis, false);
+    //DX20210129 [OBSOLETE] // cerr << "USING NEW BASIS" << endl;
+    //DX20210129 [OBSOLETE] // Remove old basis
+    //DX20210129 [OBSOLETE] while ((*this).atoms.size() > 0) {
+    //DX20210129 [OBSOLETE]   (*this).RemoveAtom((uint)0);
+    //DX20210129 [OBSOLETE] }
+    //DX20210129 [OBSOLETE] (*this).species.clear(); //DX
+    //DX20210129 [OBSOLETE] for (uint i = 0; i < newbasis.size(); i++) {
+    //DX20210129 [OBSOLETE]   _atom tmp_atom = newbasis[i]; //DX20191011 - initialized instead of setting individually below
+    //DX20210129 [OBSOLETE]   //DX20191011 [OBSOLETE] tmp_atom.fpos = newbasis[i].fpos;
+    //DX20210129 [OBSOLETE]   //DX20191011 [OBSOLETE] tmp_atom.cpos = newbasis[i].cpos;
+    //DX20210129 [OBSOLETE]   //DX20191011 [OBSOLETE] tmp_atom.name = newbasis[i].name;
+    //DX20210129 [OBSOLETE]   //DX20191011 [OBSOLETE] tmp_atom.type = newbasis[i].type;
+    //DX20210129 [OBSOLETE]   //DX20191011 [OBSOLETE] tmp_atom.name_is_given = true;
+    //DX20210129 [OBSOLETE]   //DX20191011 [OBSOLETE] tmp_atom.spin = newbasis[i].spin; //DX20170921 - magnetic sym
+    //DX20210129 [OBSOLETE]   tmp_atom.spin_is_given = false; //DX20170921 - magnetic sym
+    //DX20210129 [OBSOLETE]   if(aurostd::abs(tmp_atom.spin)>_ZERO_TOL_){
+    //DX20210129 [OBSOLETE]     tmp_atom.spin_is_given = true; //DX20170921 - magnetic sym
+    //DX20210129 [OBSOLETE]   }
+    //DX20210129 [OBSOLETE]   tmp_atom.noncoll_spin = newbasis[i].noncoll_spin; //DX20171205 - magnetic sym (non-collinear)
+    //DX20210129 [OBSOLETE]   tmp_atom.noncoll_spin_is_given = false; //DX20171205 - magnetic sym (non-collinear)
+    //DX20210129 [OBSOLETE]   if(aurostd::abs(tmp_atom.noncoll_spin(1))>_ZERO_TOL_ || aurostd::abs(tmp_atom.noncoll_spin(2))>_ZERO_TOL_ || aurostd::abs(tmp_atom.noncoll_spin(3))>_ZERO_TOL_){
+    //DX20210129 [OBSOLETE]     tmp_atom.noncoll_spin_is_given = true; //DX20171205 - magnetic sym (non-collinear) //DX20191108 - fixed typo, should be noncoll_spin_is_given not spin_is_given
+    //DX20210129 [OBSOLETE]   }
+    //DX20210129 [OBSOLETE]   (*this).AddAtom(tmp_atom);
+    //DX20210129 [OBSOLETE] }
+  }
+  //DX20210129 [OBSOLETE] (*this).num_each_type = numtypes;
+  //DX20210129 [moved earlier] (*this).lattice = prim_lattice;
   if(LDEBUG) {
     cerr << "xstructure::GetPrimitiveCell(): New primitivized cell:" << endl;
     cerr << (*this) << endl;
@@ -1505,7 +1511,8 @@ namespace SYM {
 
         // =============== TETRAGONAL =============== //
         //else if(((mcount == 4 || mcount == 5 || mcount == 6 || mcount == 7 || mcount == 8) && fourcount != 0) || crystalsystem == "TETRAGONAL")
-        else if(((mcount == 3 || mcount == 4 || mcount == 5 || mcount == 6 || mcount == 7 || mcount == 8) && fourcount != 0) || crystalsystem == "TETRAGONAL")
+        //DX20210126 [OBSOLETE - go up to mcount==9] else if(((mcount >= 3 && mcount <= 8) && fourcount != 0) || crystalsystem == "TETRAGONAL")
+        else if(((mcount >= 3 && mcount <= 9) && fourcount != 0) || crystalsystem == "TETRAGONAL")
         { //CO20200106 - patching for auto-indenting
           symmetryfound = true;
           crystalsystem = "TETRAGONAL";
@@ -1519,7 +1526,7 @@ namespace SYM {
         }
 
         // =============== ORTHORHOMBIC/RHOMBOHEDRAL =============== //
-        else if(((mcount == 3 || mcount == 4 || mcount == 5) && continue_ortho && fourcount == 0) || crystalsystem == "ORTHORHOMBIC") {
+        else if(((mcount >= 3 && mcount <= 5) && continue_ortho && fourcount == 0) || crystalsystem == "ORTHORHOMBIC") {
           symmetryfound = true;
           if(LDEBUG) { cerr << "SYM::ConventionalCell: ORTHO/RHOMB [dir=" << xstr.directory << "]." << endl; }
           // ===== Check between orthorhombic and rhombohedral ===== //
@@ -1554,7 +1561,7 @@ namespace SYM {
         }
         // =============== RHOMBOHEDRAL =============== //
         //  else {  //[CO20200106 - close bracket for indenting]}
-        else if(((mcount == 3 || mcount == 4 || mcount == 5) && !continue_ortho && three_six_count!=0 && fourcount == 0)) {
+        else if(((mcount >= 3 && mcount <= 6) && !continue_ortho && three_six_count!=0 && fourcount == 0)) { //DX20210107 - added mcount==6
           symmetryfound = true;
           // On the second iteration, this section is now equivalent to the hexagonal section above.
           // Need a slightly larger expansion to get lattice basis in HEX setting
@@ -1588,7 +1595,7 @@ namespace SYM {
         }
 
         // =============== MONOCLINIC =============== //
-        else if(((mcount == 1 || mcount == 2 || mcount == 3) && !continue_ortho && three_six_count==0) || crystalsystem == "MONOCLINIC")
+        else if(((mcount >= 1 && mcount <= 3) && !continue_ortho && three_six_count==0) || crystalsystem == "MONOCLINIC")
           //else if(((mcount == 1 || mcount == 2 || mcount == 3) && three_six_count==0) || crystalsystem == "MONOCLINIC") //DX20180613 - can be orthogonal and still be monoclinic 
         { //CO20200106 - patching for auto-indenting
           symmetryfound = true;
@@ -1667,7 +1674,7 @@ namespace SYM {
         }
 
         // ========== Rearrange atoms/Store ========== //
-        deque<int> sizes = SYM::arrange_atoms(conventional_basis_atoms);
+        sort(conventional_basis_atoms.begin(), conventional_basis_atoms.end(), sortAtomsTypes);
 
         xstr_out.lattice_label_ITC = lattice_char;
         xstr_out.lattice = CL;
@@ -1677,15 +1684,17 @@ namespace SYM {
           conventional_basis_atoms[c].fpos = C2F(xstr_out.lattice, conventional_basis_atoms[c].cpos);
           in_names.push_back(conventional_basis_atoms[c].name);
         }
-        //Remove old atomic basis
-        while (xstr_out.atoms.size() > 0) {
-          xstr_out.RemoveAtom((uint)0);
-        }
-        xstr_out.species.clear();
-        // Add new atomic basis
-        for (uint c = 0; c < conventional_basis_atoms.size(); c++) {
-          xstr_out.AddAtom(conventional_basis_atoms[c]);
-        }
+
+        xstr_out.ReplaceAtoms(conventional_basis_atoms, false); //DX20210129
+        //DX20210129 [OBSOLETE] //Remove old atomic basis
+        //DX20210129 [OBSOLETE] while (xstr_out.atoms.size() > 0) {
+        //DX20210129 [OBSOLETE]   xstr_out.RemoveAtom((uint)0);
+        //DX20210129 [OBSOLETE] }
+        //DX20210129 [OBSOLETE] xstr_out.species.clear();
+        //DX20210129 [OBSOLETE] // Add new atomic basis
+        //DX20210129 [OBSOLETE] for (uint c = 0; c < conventional_basis_atoms.size(); c++) {
+        //DX20210129 [OBSOLETE]   xstr_out.AddAtom(conventional_basis_atoms[c]);
+        //DX20210129 [OBSOLETE] }
 
         //DX20190410 START
         // Check if AddAtom removed atoms
@@ -1699,7 +1708,7 @@ namespace SYM {
         //DX20190410 END
 
         // Set number of each type
-        xstr_out = pflow::SetNumEachType(xstr_out, sizes);
+        //DX20210129 [OBSOLETE - ReplaceAtoms takes care of this] xstr_out.SetNumEachType();
         if(xstr_out.num_each_type.size() != in_names.size()) {
           xstr_out = pflow::SetAllAtomNames(xstr_out, in_names);
         }
@@ -2111,7 +2120,6 @@ namespace SYM {
           possible_latt_a_b.push_back(twofold_lattice_vectors[i]);
         }
       }
-
       for (uint i = 0; i < possible_latt_a_b.size(); i++) {
         for (uint j = 0; j < possible_latt_a_b.size(); j++) {
           tmpa = possible_latt_a_b[i];
@@ -2148,26 +2156,27 @@ namespace SYM {
           if(LDEBUG) { cerr << function_name << " One or more of the lattice vectors is null" << endl; }
           return false;
         }
-      } else {
-        break;
       }
-    }
+      else {
+        //DX20210107 [OBSOLETE - do not break, store all possible conventional lattice possibilites]
 
-    // ==== Orient into positive quadrant ==== //
-    orientVectorsPositiveQuadrant(conv_lattice_vec_a, tol); //DX20190215 - _SYM_TOL_ to tol
-    orientVectorsPositiveQuadrant(conv_lattice_vec_b, tol); //DX20190215 - _SYM_TOL_ to tol
+        // ==== Orient into positive quadrant ==== //
+        orientVectorsPositiveQuadrant(conv_lattice_vec_a, tol); //DX20190215 - _SYM_TOL_ to tol
+        orientVectorsPositiveQuadrant(conv_lattice_vec_b, tol); //DX20190215 - _SYM_TOL_ to tol
 
-    // Order lattice vectors so that the a vector has a positive x coordinate
-    if(conv_lattice_vec_b(1) > tol && conv_lattice_vec_b(2) < tol && conv_lattice_vec_b(3) < tol) { //DX20190215 - _SYM_TOL_ to tol
-      xvector<double> tmp = conv_lattice_vec_a;
-      conv_lattice_vec_a = conv_lattice_vec_b;
-      conv_lattice_vec_b = tmp;
-    }
+        // Order lattice vectors so that the a vector has a positive x coordinate
+        if(conv_lattice_vec_b(1) > tol && conv_lattice_vec_b(2) < tol && conv_lattice_vec_b(3) < tol) { //DX20190215 - _SYM_TOL_ to tol
+          xvector<double> tmp = conv_lattice_vec_a;
+          conv_lattice_vec_a = conv_lattice_vec_b;
+          conv_lattice_vec_b = tmp;
+        }
 
-    // === Proceed if lattice vectors are not null === //
-    CL = xvec2xmat(conv_lattice_vec_a, conv_lattice_vec_b, conv_lattice_vec_c);
-    candidate_lattice_vectors.push_back(CL);
-    candidate_lattice_chars.push_back('t');
+        // === Proceed if lattice vectors are not null === //
+        CL = xvec2xmat(conv_lattice_vec_a, conv_lattice_vec_b, conv_lattice_vec_c);
+        candidate_lattice_vectors.push_back(CL);
+        candidate_lattice_chars.push_back('t');
+      } //DX20210107
+    } //DX20210107
 
     return true;
   }
@@ -4418,32 +4427,8 @@ namespace SYM {
 //}
 
 // ***************************************************************************
-// arrange atoms
+// //DX20210118 [OBSOLETE - now GetNumEachType in xatom] SYM::arrange_atoms
 // ***************************************************************************
-namespace SYM {
-  deque<int> arrange_atoms(deque<_atom>& atoms) {
-    deque<int> sizes;
-    deque<_atom> atoms_arranged;
-    vector<int> types;
-    for (uint i = 0; i < atoms.size(); i++) {
-      if(!invec<int>(types, atoms[i].type)) {
-        types.push_back(atoms[i].type);
-      }
-    }
-    for (uint i = 0; i < types.size(); i++) {
-      int count = 0;
-      for (uint j = 0; j < atoms.size(); j++) {
-        if(types[i] == atoms[j].type) {
-          atoms_arranged.push_back(atoms[j]);
-          count++;
-        }
-      }
-      sizes.push_back(count);
-    }
-    atoms = atoms_arranged;
-    return sizes;
-  }
-}
 
 #endif
 
