@@ -1127,7 +1127,7 @@ namespace pocc {
     if(LDEBUG){cerr << soliloquy << " OUTCAR_relax=" << OUTCAR_relax << endl;}
 
     bool found_all_OUTCARs=true;
-    for(unsigned long long int isupercell=0;isupercell<m_ARUN_directories.size()&&found_all_OUTCARs==true;isupercell++){
+    for(unsigned long long int isupercell=0;isupercell<m_ARUN_directories.size()&&found_all_OUTCARs;isupercell++){
       if(!aurostd::EFileExist(m_aflags.Directory+"/"+m_ARUN_directories[isupercell]+"/"+OUTCAR_relax)){
         if(LDEBUG){cerr << soliloquy << " " << OUTCAR_relax << " not found in "+m_ARUN_directories[isupercell] << endl;}
         found_all_OUTCARs=false;
@@ -5800,7 +5800,7 @@ namespace pocc {
             throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_pocc_sites_resorted[site].v_types.size()!=m_pocc_sites_resorted[site].v_occupants.size()",_RUNTIME_ERROR_);
           }
           sublattice_found=(m_pocc_sites_resorted[site].v_types.size()>0);  //set to true first
-          for(itype=0;itype<m_pocc_sites_resorted[site].v_types.size()&&sublattice_found==true;itype++){
+          for(itype=0;itype<m_pocc_sites_resorted[site].v_types.size()&&sublattice_found;itype++){
             type=m_pocc_sites_resorted[site].v_types[itype];
             const string& occupant=xstr_pocc.atoms[m_pocc_sites_resorted[site].v_occupants[itype]].name;
             if(!aurostd::WithinList(vanions,occupant)){sublattice_found=false;}
