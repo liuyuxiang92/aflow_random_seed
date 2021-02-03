@@ -6707,6 +6707,7 @@ void xstructure::MakeTypes(void) {
 // update species and basis at the end
 
 void xstructure::AddAtoms(const deque<_atom>& atoms_in, bool check_present) { //DX20210129
+  bool LDEBUG=(FALSE || XHOST.DEBUG);
 
   if(check_present){
     // check that this atom is not already present
@@ -6950,7 +6951,7 @@ void xstructure::RemoveAtom(vector<uint>& v_atoms_to_remove) { //CO20181226
   }
 }
 
-void xstructure::RemoveAtoms(void) { //DX20210129
+void xstructure::RemoveAtom(void) { //DX20210129
   // Removes all atoms from an xstructure and clears the related
   // atom/species variable; faster than removing one at a time
 
@@ -6970,7 +6971,7 @@ void xstructure::ReplaceAtoms(const deque<_atom>& new_atoms, bool check_present)
   //DX20210129 [OBSOLETE - remove all at once]   RemoveAtom(i);
   //DX20210129 [OBSOLETE - remove all at once] }
   if(LDEBUG) cerr << soliloquy << " removing all atoms" << endl;
-  RemoveAtoms(); //DX20210129 - remove all atoms and clear species variables
+  RemoveAtom(); //DX20210129 - remove all atoms and clear species variables
   
   if(LDEBUG) cerr << soliloquy << " adding new atoms" << endl;
   //DX20210202 [OBSOLETE] for(uint i=0;i<new_atoms.size();i++){AddAtom(new_atoms[i]);}  //adding atoms

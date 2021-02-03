@@ -1488,7 +1488,7 @@ class xstructure {
     void AddAtom_POCC(const _atom& atom);                         // adding an atom FOR POCC ONLY
     void RemoveAtom(const uint& iat);                             // deleting an atom (index)
     void RemoveAtom(vector<uint>& v_atoms_to_remove);             // deleting many atoms (indices)
-    void RemoveAtoms(void);                                       // removes all atoms //DX20210129
+    void RemoveAtom(void);                                        // removes all atoms //DX20210129
     void ReplaceAtoms(const deque<_atom>& new_atoms,
         bool check_atom_overlap=true);                            // replace all atoms SAFELY/CLEANLY //DX20210129 - added option to check atom overlap
     void RemoveCopies(double=1.0e-3);                             // deleting atoms too close F/C
