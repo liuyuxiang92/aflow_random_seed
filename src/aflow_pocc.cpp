@@ -5808,8 +5808,8 @@ namespace pocc {
           if(sublattice_found){
             itype=0;  //prioritize first species of sublattice for parent structure
             type=m_pocc_sites_resorted[site].v_types[itype];
-            const string& occupant=xstr_pocc.atoms[m_pocc_sites_resorted[site].v_occupants[itype]].name;
             if(!aurostd::WithinList(types_added,type)){
+              const string& occupant=xstr_pocc.atoms[m_pocc_sites_resorted[site].v_occupants[itype]].name;
               if(LDEBUG){cerr << soliloquy << " mapping " << occupant << " to " << species_orig[iocc2spec] << " [sublattice]" << endl;}
               species[type]=species_orig[iocc2spec++];
               types_added.push_back(type);
@@ -5821,8 +5821,8 @@ namespace pocc {
         for(site=0;site<m_pocc_sites_resorted.size();site++){
           itype=0;
           type=m_pocc_sites_resorted[site].v_types[itype];
-          const string& occupant=xstr_pocc.atoms[m_pocc_sites_resorted[site].v_occupants[itype]].name;
           if(!aurostd::WithinList(types_added,type)){
+            const string& occupant=xstr_pocc.atoms[m_pocc_sites_resorted[site].v_occupants[itype]].name;
             if(LDEBUG){cerr << soliloquy << " mapping " << occupant << " to " << species_orig[iocc2spec] << " [first-occupant]" << endl;}
             species[type]=species_orig[iocc2spec++];
             types_added.push_back(type);
@@ -5833,8 +5833,8 @@ namespace pocc {
         for(site=0;site<m_pocc_sites_resorted.size();site++){
           for(itype=0;itype<m_pocc_sites_resorted[site].v_types.size();itype++){
             type=m_pocc_sites_resorted[site].v_types[itype];
-            const string& occupant=xstr_pocc.atoms[m_pocc_sites_resorted[site].v_occupants[itype]].name;
             if(!aurostd::WithinList(types_added,type)){
+              const string& occupant=xstr_pocc.atoms[m_pocc_sites_resorted[site].v_occupants[itype]].name;
               if(LDEBUG){cerr << soliloquy << " mapping " << occupant << " to " << species_orig[iocc2spec] << " [remaining]" << endl;}
               //species[occupant2species_map[iocc2spec++]]=species_orig[type];
               //species[type]=species_orig[occupant2species_map[iocc2spec++]];
