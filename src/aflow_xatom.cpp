@@ -6710,6 +6710,10 @@ void xstructure::MakeTypes(void) {
 void xstructure::AddAtom(const deque<_atom>& atoms_in, bool check_present) { //DX20210129
   //bool LDEBUG=(FALSE || XHOST.DEBUG);
 
+  uint natoms_xstr = atoms.size();
+  const deque<_atom>* ptr_atoms = &atoms_in;
+  deque<_atom> atoms_unique;
+
   if(check_present){
     // use sym_eps if available; if not, use tenth of an Angstrom
     // (since this function adds atoms iteratively, we cannot use minimumDistance,
@@ -6717,6 +6721,7 @@ void xstructure::AddAtom(const deque<_atom>& atoms_in, bool check_present) { //D
     double tol=(*this).sym_eps;
     if(tol>=AUROSTD_NAN || tol<_ZERO_TOL_){ tol = 0.1; } // tenth of Angstrom
 
+    // first check if the input atoms are unique
     // it is more efficient to use a double for-loop (upper-triangular)
     // as opposed to MapAtom(deque<_atom>, _atom); otherwise you check atoms
     // end up checking twice //DX20210202
@@ -6727,11 +6732,16 @@ void xstructure::AddAtom(const deque<_atom>& atoms_in, bool check_present) { //D
         if(SYM::MapAtom(atoms_in[iat], atoms_in[jat], true, (*this).lattice, false, tol)){ FOUND_POSITION=TRUE; }
       }
       if(FOUND_POSITION){ continue; }
-      else{ atoms.push_back(atoms_in[iat]); }
+      // now check if any atoms in the xstructure are duplicates with the input atoms
+      else if(natoms_xstr != 0){
+        if(!SYM::MapAtom(atoms, atoms_unique[iat], true, (*this).lattice, false, tol)){
+          atoms_unique.push_back(atoms_in[iat]);
+        }
+      }
+      // if no atoms in the xstructure, just add to the unique list
+      else{ atoms_unique.push_back(atoms_in[iat]); }
     }
-  }
-  else{
-    atoms = atoms_in;
+    ptr_atoms=&atoms_unique;
   }
 
   //DX20210202 [OBSOLETE - use MapAtom] if(check_present){
@@ -6771,9 +6781,18 @@ void xstructure::AddAtom(const deque<_atom>& atoms_in, bool check_present) { //D
   //DX20210202 [OBSOLETE - use MapAtom] }
 
   // update the species: update num/comp each type or add new species
-  for(uint iat=0;iat<atoms.size();iat++){
-    UpdateSpecies(atoms[iat]); //DX20210202 - consolidated code below into function
+  for(uint iat=0;iat<ptr_atoms->size();iat++){
+    UpdateSpecies(ptr_atoms->at(iat)); //DX20210202 - consolidated code below into function
   }
+
+  // add atoms to xstructure
+  if(natoms_xstr == 0){ atoms = *ptr_atoms; } //if possible, do assignment instead of push_back (faster)
+  else{ 
+    for(uint iat=0;iat<ptr_atoms->size();iat++){
+      atoms.push_back(ptr_atoms->at(iat));
+    }
+  }
+
   GetStoich();  //CO20170724
   std::stable_sort(atoms.begin(), atoms.end(), sortAtomsTypes);
   MakeBasis(); // need to update NUMBER and BASIS
