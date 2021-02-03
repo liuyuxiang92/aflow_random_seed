@@ -11699,7 +11699,7 @@ namespace pflow {
   bool checkAnionSublattice(const xstructure& xstr){  //CO20210201
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy=XPID+"pflow::checkAnionSublattice():";
-    vector<string> vanions;aurostd::string2tokens("B,C,N,O",vanions,",");
+    vector<string> vanions;aurostd::string2tokens(POCC_ANIONS_LIST,vanions,",");
     vector<vector<string> > voccupants;
     vector<xvector<double> > vsites;  //cpos
     vector<bool> vanions_found;

@@ -5791,7 +5791,7 @@ namespace pocc {
 
         //0. prioritize anion sublattice, must find a sublattice full of anions
         vector<string> vanions;
-        aurostd::string2tokens("B,C,N,O",vanions,",");
+        aurostd::string2tokens(POCC_ANIONS_LIST,vanions,",");
         bool sublattice_found=false;
         for(site=0;site<m_pocc_sites_resorted.size();site++){
           if(m_pocc_sites_resorted[site].v_types.size()!=m_pocc_sites_resorted[site].v_occupants.size()){

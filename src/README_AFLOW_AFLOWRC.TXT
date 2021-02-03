@@ -1129,6 +1129,11 @@ POCC_DOSCAR_FILE
   type: string
   default: "DOSCAR.pocc"
 
+POCC_ANIONS_LIST
+  description: List of elements that could be considered anions.
+  type: string
+  default: "B,C,N,O"
+
 ####################################################################################################
 DEFAULTS APL
 
