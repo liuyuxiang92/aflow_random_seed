@@ -37,6 +37,7 @@ const std::string LATEX_COLORS_TO_AVOID = "black,white,yellow,darkgray,gray,ligh
 //[CO20180819 - MOVED TO AFLOWRC]const bool IGNORE_BAD_DATABASE = true;        //skip bad entries
 const bool CORRECT_BAD_DATABASE = true;                                        //make minor corrections, carried over from apennsy (SC)
 const bool PRINT_DIST2HULL_COL_TEX = false;                                    //print Dist2hull column in tex, there's no need because it's not used for anything in the image
+const bool GET_DECOMPOSITION_POLYMORPHS = true;                                //print decomposition information for polymorphs
 
 // LATEX PRINTING MODES
 const char ADDPLOT_MODE_HULL_POINTS = 'P';
@@ -5673,8 +5674,14 @@ namespace chull {
     if(!m_naries[i_nary].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized nary");}
     if(!m_naries[i_nary].m_alloys[i_alloy].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized alloy");}
     if(i_coord_group>m_coord_groups.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within coordgroups");}
-    if(m_coord_groups[i_coord_group].m_is_on_hull){return;}
     if(m_coord_groups[i_coord_group].m_nearest_facet>m_facets.size()-1){setNearestFacet(i_nary,i_alloy,i_coord_group);}
+    
+    if(m_coord_groups[i_coord_group].m_is_on_hull){
+      if(!isViablePoint(m_coord_groups[i_coord_group].m_hull_member)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No hull member set for m_coord_group["+aurostd::utype2string(i_coord_group)+"]");}
+      vector<uint> dcomp_phases;dcomp_phases.push_back(m_coord_groups[i_coord_group].m_hull_member);
+      m_coord_groups[i_coord_group].m_decomp_phases=dcomp_phases;
+      return;
+    }
 
     uint i_facet=m_coord_groups[i_coord_group].m_nearest_facet;
     ChullFacet& facet=m_facets[i_facet];
@@ -5690,7 +5697,7 @@ namespace chull {
   xvector<double> ConvexHull::getDecompositionCoefficients(const ChullPoint& point,vector_reduction_type vred) const{
     string soliloquy=XPID+"ConvexHull::getDecompositionCoefficients():";
     if(!point.m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized point");}
-    if(point.m_is_on_hull){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No decomposition coefficients for hull members");}
+    //[returns self]if(point.m_is_on_hull){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No decomposition coefficients for hull members");}
     uint i_coord_group=AUROSTD_MAX_UINT;
     bool found_coord_group=getCoordGroupIndex(point,i_coord_group);
     if(found_coord_group){  //composition has already been considered by hull, might be g-state
@@ -5751,8 +5758,14 @@ namespace chull {
     if(!m_naries[i_nary].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized nary");}
     if(!m_naries[i_nary].m_alloys[i_alloy].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized alloy");}
     if(i_coord_group>m_coord_groups.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within coordgroups");}
-    if(m_coord_groups[i_coord_group].m_is_on_hull){return;}
     if(m_coord_groups[i_coord_group].m_decomp_phases.size()==0){setDecompositionPhases(i_nary,i_alloy,i_coord_group);}
+    
+    if(m_coord_groups[i_coord_group].m_is_on_hull){
+      xvector<double> dcomp_coefs(2);
+      dcomp_coefs[dcomp_coefs.lrows]=dcomp_coefs[dcomp_coefs.lrows+1]=1.0;
+      m_coord_groups[i_coord_group].m_decomp_coefs=dcomp_coefs;
+      return;
+    }
 
     //we get different coefficients between stoich and composition
     //ALWAYS use composition (even POCC, simply won't reduce), and do NOT mix stoich + composition
@@ -6173,6 +6186,8 @@ namespace chull {
       //very important that you do not simply go through all facet points and find equilibrium points
       //this will overwrite binary information with ternary information
       //proceed safely with i_coord_group's
+      setDecompositionPhases(i_nary,i_alloy,i_coord_group);
+      setDecompositionCoefficients(i_nary,i_alloy,i_coord_group);
       setEquilibriumPhases(i_nary,i_alloy,i_coord_group);
       setSymEquivalentGStates(i_nary,i_alloy,i_coord_group);
       setEquivalentGStates(i_nary,i_alloy,i_coord_group);
@@ -11143,11 +11158,11 @@ namespace chull {
     }
     else if(property=="phases_decomposition_compound"){
       if(!(ftype==txt_ft || ftype==json_ft)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No latex rule defined for "+property);}
-      if(!point.isGState()){
+      if(GET_DECOMPOSITION_POLYMORPHS||!point.isGState()){
         //need to grab from coord_group
         uint i_coord_group=AUROSTD_MAX_UINT;
         if(!getCoordGroupIndex(point,i_coord_group)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coordgroup index not set");}
-        if(!m_coord_groups[i_coord_group].m_is_on_hull){
+        if(GET_DECOMPOSITION_POLYMORPHS||!m_coord_groups[i_coord_group].m_is_on_hull){
           if(m_coord_groups[i_coord_group].m_decomp_phases.size()){
             vector<string> compounds;
             uint i_point=AUROSTD_MAX_UINT;
@@ -11168,11 +11183,11 @@ namespace chull {
     }
     else if(property=="phases_decomposition_auid"){
       if(!(ftype==txt_ft || ftype==json_ft)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No latex rule defined for "+property);}
-      if(!point.isGState()){
+      if(GET_DECOMPOSITION_POLYMORPHS||!point.isGState()){
         //need to grab from coord_group
         uint i_coord_group=AUROSTD_MAX_UINT;
         if(!getCoordGroupIndex(point,i_coord_group)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coordgroup index not set");}
-        if(!m_coord_groups[i_coord_group].m_is_on_hull){
+        if(GET_DECOMPOSITION_POLYMORPHS||!m_coord_groups[i_coord_group].m_is_on_hull){
           if(m_coord_groups[i_coord_group].m_decomp_phases.size()){
             vector<string> auids;
             uint i_point=AUROSTD_MAX_UINT;
@@ -11193,11 +11208,11 @@ namespace chull {
     }
     else if(property=="phases_decomposition_coefficient"){
       if(!(ftype==txt_ft || ftype==json_ft)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No latex rule defined for "+property);}
-      if(!point.isGState()){
+      if(GET_DECOMPOSITION_POLYMORPHS||!point.isGState()){
         //need to grab from coord_group
         uint i_coord_group=AUROSTD_MAX_UINT;
         if(!getCoordGroupIndex(point,i_coord_group)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coordgroup index not set");}
-        if(!m_coord_groups[i_coord_group].m_is_on_hull){
+        if(GET_DECOMPOSITION_POLYMORPHS||!m_coord_groups[i_coord_group].m_is_on_hull){
           if(m_coord_groups[i_coord_group].m_decomp_phases.size()){
             vector<double> nonzero_coefs;
             //[OBSOLETE - reduce by frac_vrt always! so use coord_group values]for(int i=point.m_decomp_coefs.lrows;i<=point.m_decomp_coefs.urows;i++){
