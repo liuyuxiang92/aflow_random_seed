@@ -10698,6 +10698,43 @@ uint xstructure::SetSpecies(const deque<string>& vspecies) {
   return vspecies.size();
 }
 
+/*
+// ***************************************************************************
+// Function UpdateSpecies() //DX20210202 [from AddAtom, consolidate to function]
+// ***************************************************************************
+void xstructure::UpdateSpecies(const _atom& atom){
+   
+  // Update the species info based on the atom input
+  // If the species is already in xstructure, update the number of types
+  // and composition of each type, otherwise, add the new species info
+  
+  bool LDEBUG=(FALSE || XHOST.DEBUG); 
+
+  bool FOUND_SPECIES=FALSE;
+  uint species_position=0;
+  for(uint isp=0;isp<species.size()&&FOUND_SPECIES==FALSE;isp++)
+    if(atoms[iat].name==species[isp]) {FOUND_SPECIES=TRUE;species_position=isp;}
+
+  if(FOUND_SPECIES==FALSE) {
+    if(LDEBUG) cerr << "AddAtom new_species=" << atoms[iat].name << endl;
+    num_each_type.push_back(1);
+    comp_each_type.push_back(atoms[iat].partial_occupation_value);
+    species.push_back(atoms[iat].name); // cerr << "AddAtom=" << atom.name << endl;
+    species_pp.push_back(atoms[iat].name); // cerr << "AddAtom=" << atom.name << endl;
+    species_pp_type.push_back(""); // cerr << "AddAtom=" << atom.name << endl;
+    species_pp_version.push_back(""); // cerr << "AddAtom=" << atom.name << endl;
+    species_pp_ZVAL.push_back(0.0); // cerr << "AddAtom=" << atom.name << endl;
+    species_pp_vLDAU.push_back(deque<double>()); // cerr << "AddAtom=" << atom.name << endl;
+    species_volume.push_back(GetAtomVolume(atoms[iat].name)); // cerr << "AddAtom=" << atom.name << endl;
+    species_mass.push_back(GetAtomMass(atoms[iat].name)); // cerr << "AddAtom=" << atom.name << endl;
+  } else {
+    if(LDEBUG) cerr << "AddAtom increasing species_position " << species_position << endl;
+    num_each_type[species_position]++;
+    comp_each_type[species_position]+=atoms[iat].partial_occupation_value;
+  }
+}
+*/
+
 // ***************************************************************************
 // NIGGLI NIGGLI NIGGLI NIGGLI NIGGLI NIGGLI NIGGLI NIGGLI NIGGLI NIGGLI NIGGL
 // ***************************************************************************
