@@ -386,7 +386,7 @@ namespace aflowlib {
     PV_cell=AUROSTD_NAN;PV_atom=AUROSTD_NAN;
     scintillation_attenuation_length=AUROSTD_NAN;
     sg.clear();sg2.clear();vsg.clear();vsg2.clear();  //CO20171202
-    spacegroup_orig.clear();spacegroup_relax.clear();
+    spacegroup_orig=AUROSTD_NAN;spacegroup_relax=AUROSTD_NAN; //CO20201111
     species.clear();vspecies.clear();
     species_pp.clear();vspecies_pp.clear();
     species_pp_version.clear();vspecies_pp_version.clear();
@@ -712,8 +712,8 @@ namespace aflowlib {
         else if(keyword=="scintillation_attenuation_length") {scintillation_attenuation_length=aurostd::string2utype<double>(content);}
         else if(keyword=="sg") {sg=content;for(uint j=0;j<stokens.size();j++) vsg.push_back(stokens.at(j));} //CO20180101
         else if(keyword=="sg2") {sg2=content;for(uint j=0;j<stokens.size();j++) vsg2.push_back(stokens.at(j));} //CO20180101
-        else if(keyword=="spacegroup_orig") {spacegroup_orig=content;}
-        else if(keyword=="spacegroup_relax") {spacegroup_relax=content;}
+        else if(keyword=="spacegroup_orig") {spacegroup_orig=aurostd::string2utype<int>(content);}  //CO20201111
+        else if(keyword=="spacegroup_relax") {spacegroup_relax=aurostd::string2utype<int>(content);}  //CO20201111
         else if(keyword=="species") {species=content;for(uint j=0;j<stokens.size();j++) vspecies.push_back(stokens.at(j));}
         else if(keyword=="species_pp") {species_pp=content;for(uint j=0;j<stokens.size();j++) vspecies_pp.push_back(stokens.at(j));}
         else if(keyword=="species_pp_version") {species_pp_version=content;for(uint j=0;j<stokens.size();j++) vspecies_pp_version.push_back(stokens.at(j));}
@@ -1301,8 +1301,8 @@ namespace aflowlib {
       if(nbondxx.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "nbondxx=" << nbondxx << eendl;
       if(sg.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "sg=" << sg << eendl;
       if(sg2.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "sg2=" << sg2 << eendl;
-      if(spacegroup_orig.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "spacegroup_orig=" << spacegroup_orig << eendl;
-      if(spacegroup_relax.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "spacegroup_relax=" << spacegroup_relax << eendl;
+      if(spacegroup_orig!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "spacegroup_orig=" << spacegroup_orig << eendl; //CO20201111
+      if(spacegroup_relax!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "spacegroup_relax=" << spacegroup_relax << eendl;  //CO20201111
       if(forces.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "forces=" << forces << eendl;
       if(positions_cartesian.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "positions_cartesian=" << positions_cartesian << eendl;
       if(positions_fractional.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "positions_fractional=" << positions_fractional << eendl;
@@ -2291,7 +2291,7 @@ namespace aflowlib {
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
-      if(spacegroup_orig.size()) {
+      if(spacegroup_orig!=AUROSTD_NAN) {  //CO20201111
         sscontent_json << "\"spacegroup_orig\":" << spacegroup_orig;
       } else {
         if(PRINT_NULL) sscontent_json << "\"spacegroup_orig\":null";
@@ -2300,7 +2300,7 @@ namespace aflowlib {
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
-      if(spacegroup_relax.size()) {
+      if(spacegroup_relax!=AUROSTD_NAN) { //CO20201111
         sscontent_json << "\"spacegroup_relax\":" << spacegroup_relax;
       } else {
         if(PRINT_NULL) sscontent_json << "\"spacegroup_relax\":null";
@@ -4121,7 +4121,9 @@ namespace aflowlib {
 
     return TRUE;
   }
+}
 
+namespace aflowlib {
   bool json2aflowlib(const string& json,string key,string& value) { //SC20200415
     // return TRUE if something has been found
     value="";

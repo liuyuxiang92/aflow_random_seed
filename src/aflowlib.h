@@ -119,7 +119,7 @@ namespace aflowlib {
       double PV_cell,PV_atom;
       double scintillation_attenuation_length;
       string sg,sg2;vector<string> vsg,vsg2; //CO20180101
-      string spacegroup_orig,spacegroup_relax;
+      uint spacegroup_orig,spacegroup_relax;
       string species;vector<string> vspecies;
       string species_pp;vector<string> vspecies_pp;
       string species_pp_version;vector<string> vspecies_pp_version;
@@ -267,7 +267,7 @@ namespace aflowlib {
       void clear();                                              // free space
       uint Load(const stringstream& stream,ostream& oss);        // load from stringstream it std is cout
       uint Load(const string& entry,ostream& oss);               // load from string it std is cout
-      uint file2aflowlib(const string& file,ostream& oss);       // load from file
+      uint file2aflowlib(const string& file,ostream& oss=std::cout);       // load from file
       uint url2aflowlib(const string& url,ostream& oss,bool=TRUE); // load from the web (VERBOSE)
       string aflowlib2string(string="out");                      //
       string aflowlib2file(string file,string="out");            //
@@ -283,6 +283,9 @@ namespace aflowlib {
       string getPathAURL(ofstream& FileMESSAGE, ostream& oss, bool load_from_common=false); // converts entry.aurl to url/path (common)
       vector<string> getSpeciesAURL(ostream& oss);                                          //CO20210201 - extracts species from aurl
       vector<string> getSpeciesAURL(ofstream& FileMESSAGE,ostream& oss);                    //CO20210201 - extracts species from aurl
+      //ML stoich features
+      void getStoichFeatures(vector<string>& vheaders,const string& e_props=_AFLOW_XELEMENT_PROPERTIES_ALL_);
+      void getStoichFeatures(vector<string>& vheaders,vector<double>& vfeatures,bool vheaders_only=false,const string& e_props=_AFLOW_XELEMENT_PROPERTIES_ALL_);
     private:                                                     //
       void free();                                               // free space
       void copy(const _aflowlib_entry& b);                       //
@@ -293,6 +296,7 @@ namespace aflowlib {
   string VASPdirectory2auid(const string& directory,const string& aurl);   //CO20200624 - moving from inside _aflowlib_entry
   uint auid2vauid(const string auid, deque<string>& vauid);                // splits the auid into vauid
   string auid2directory(const string auid);                                // gives AUID directory from existence of vauid
+  void insertStoichStats(const vector<string> vstats,const xvector<double>& nspecies_xv,const xvector<double>& stoich_xv,vector<double>& vfeatures);  //CO20201111
 }
 
 // ***************************************************************************

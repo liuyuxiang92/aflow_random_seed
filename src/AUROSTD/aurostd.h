@@ -95,6 +95,10 @@ using std::vector;
 #define SWAP(a,b) {temp=(a);(a)=(b);(b)=temp;}
 #endif
 
+#ifndef NNN
+#define NNN -123456
+#endif
+
 #ifndef AUROSTD_NAN
 #define AUROSTD_NAN 1E9
 #endif
@@ -781,12 +785,12 @@ namespace aurostd {
   bool substring2bool(const vector<string>& vstrstream, const string& strsub1);
   bool substring2bool(const deque<string>& vstrstream, const string& strsub1);
   bool substring2bool(const stringstream& strstream, const string& strsub1);
-  bool WithinList(const vector<string>& list,const string& input);  //CO20181010
-  bool WithinList(const vector<int>& list,int input); //CO20181010
-  bool WithinList(const vector<uint>& list,uint input); //CO20181010
-  bool WithinList(const vector<string>&, const string&, int&);  //ME20190905
-  bool WithinList(const vector<int>&, int, int&);  //ME20190905
-  bool WithinList(const vector<uint>&, uint, int&);  //ME20190905
+  bool WithinList(const vector<string>& list,const string& input,bool sorted=false);  //CO20181010
+  bool WithinList(const vector<int>& list,int input,bool sorted=false); //CO20181010
+  bool WithinList(const vector<uint>& list,uint input,bool sorted=false); //CO20181010
+  bool WithinList(const vector<string>&, const string&, int&,bool sorted=false);  //ME20190905
+  bool WithinList(const vector<int>&, int, int&,bool sorted=false);  //ME20190905
+  bool WithinList(const vector<uint>&, uint, int&,bool sorted=false);  //ME20190905
   bool EWithinList(const vector<string>& list,const string& input); //CO20200223
   bool EWithinList(const vector<string>& list, const string& input, string& output); //CO20200223
   bool substring_present_file(const string& FileName, const string& strsub1) ;

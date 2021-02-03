@@ -232,7 +232,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.flag("CCE_CORRECTION::GET_OXIDATION_NUMBERS", aurostd::args2flag(argv,cmds,"--get_oxidation_numbers|--get_ox_nums|--get_oxidation_number|--get_ox_num|--poscar2ox_nums|--poscar2ox_num")); //RF20200725
   vpflow.flag("CCE_CORRECTION::GET_CATION_COORDINATION_NUMBERS", aurostd::args2flag(argv,cmds,"--get_cation_coordination_numbers|--get_cation_coord_nums|--get_cation_coordination_number|--get_cation_coord_num|--get_coordination_numbers_cation|--get_coordination_number_cation|--get_coordination_numbers_cations|--get_coordination_number_cations|--get_coord_num_cation|--get_coord_nums_cation|--get_coord_nums_cations|--get_coord_num_cations|--poscar2cation_coord_nums|--poscar2cation_coord_num")); //RF20200814
   vpflow.args2addattachedscheme(argv,cmds,"CCE_CORRECTION::DIST_TOL","--tolerance=|dist_tol=|distance_tolerance=|dist_tolerance=|distance_tol=",""); //RF20200819
-
+  
   vpflow.flag("CHECKINTEGRITIY",aurostd::args2flag(argv, cmds,"--check_integrity|--checki"));
   //DX20180806 [OBSOLETE] vpflow.flag("CIF",aurostd::args2flag(argv,cmds,"--cif"));
   //DX [OBSOLETE] - moved further up : vpflow.args2addattachedscheme(argv,cmds,"CIF","--cif=|--CIF=","");
@@ -482,6 +482,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   }
   //DX20201220 - put all comparison functions prior to general options - END
 
+  vpflow.flag("AFLOWMACHL::CoordCE_CSV",aurostd::args2flag(argv,cmds,"--coordce_csv"));  //CO20200930
   vpflow.flag("CORNERS",aurostd::args2flag(argv,cmds,"--corner|--corners"));
 
   //DX20170901 [OBSOLETE] vpflow.flag("DATA",aurostd::args2flag(argv,cmds,"--data"));
@@ -1559,6 +1560,7 @@ namespace pflow {
     //CO
     if(argv.size()>=1 && !_PROGRAMRUN) {
       if(vpflow.flag("BADER")) {cout << bader_functions::BaderCalc(vpflow); _PROGRAMRUN=true;}
+      if(vpflow.flag("AFLOWMACHL::CoordCE_CSV")) {aflowMachL::writeCoordCECSV(); _PROGRAMRUN=true;}  //CO20200930
       if(vpflow.flag("CHGCAR2JVXL")) {cout << pflow::CHGCAR2JVXL(vpflow); _PROGRAMRUN=true;}
       if(vpflow.flag("CHGDIFF")) {cout << pflow::CHGDIFF(vpflow); _PROGRAMRUN=true;}
       if(vpflow.flag("CHGSUM")) {cout << pflow::CHGSUM(vpflow); _PROGRAMRUN=true;}
