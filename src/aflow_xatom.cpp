@@ -6700,14 +6700,14 @@ void xstructure::MakeTypes(void) {
 }
 
 // **************************************************************************
-// xstructure::AddAtoms() //DX20210202
+// xstructure::AddAtom() //DX20210202
 // **************************************************************************
 // This adds a deque<_atom> to the structure.
 // More efficient than adding one atom at a time (AddAtom);
 // update species and basis at the end
 
-void xstructure::AddAtoms(const deque<_atom>& atoms_in, bool check_present) { //DX20210129
-  bool LDEBUG=(FALSE || XHOST.DEBUG);
+void xstructure::AddAtom(const deque<_atom>& atoms_in, bool check_present) { //DX20210129
+  //bool LDEBUG=(FALSE || XHOST.DEBUG);
 
   if(check_present){
     // check that this atom is not already present
@@ -6745,31 +6745,9 @@ void xstructure::AddAtoms(const deque<_atom>& atoms_in, bool check_present) { //
     atoms = atoms_in;
   }
 
+  // update the species: update num/comp each type or add new species
   for(uint iat=0;iat<atoms.size();iat++){
-    // now found that it does not exist check type
-    //  cerr << "AddAtom new atom" << endl;
-    bool FOUND_SPECIES=FALSE;
-    uint species_position=0;
-    for(uint isp=0;isp<species.size()&&FOUND_SPECIES==FALSE;isp++)
-      if(atoms[iat].name==species[isp]) {FOUND_SPECIES=TRUE;species_position=isp;}
-
-    if(FOUND_SPECIES==FALSE) {
-      if(LDEBUG) cerr << "AddAtom new_species=" << atoms[iat].name << endl;
-      num_each_type.push_back(1);
-      comp_each_type.push_back(atoms[iat].partial_occupation_value);
-      species.push_back(atoms[iat].name); // cerr << "AddAtom=" << atom.name << endl;
-      species_pp.push_back(atoms[iat].name); // cerr << "AddAtom=" << atom.name << endl;
-      species_pp_type.push_back(""); // cerr << "AddAtom=" << atom.name << endl;
-      species_pp_version.push_back(""); // cerr << "AddAtom=" << atom.name << endl;
-      species_pp_ZVAL.push_back(0.0); // cerr << "AddAtom=" << atom.name << endl;
-      species_pp_vLDAU.push_back(deque<double>()); // cerr << "AddAtom=" << atom.name << endl;
-      species_volume.push_back(GetAtomVolume(atoms[iat].name)); // cerr << "AddAtom=" << atom.name << endl;
-      species_mass.push_back(GetAtomMass(atoms[iat].name)); // cerr << "AddAtom=" << atom.name << endl;
-    } else {
-      if(LDEBUG) cerr << "AddAtom increasing species_position " << species_position << endl;
-      num_each_type[species_position]++;
-      comp_each_type[species_position]+=atoms[iat].partial_occupation_value;
-    }
+    UpdateSpecies(atoms[iat]); //DX20210202 - consolidated code below into function
   }
   GetStoich();  //CO20170724
   std::stable_sort(atoms.begin(), atoms.end(), sortAtomsTypes);
@@ -6782,7 +6760,7 @@ void xstructure::AddAtoms(const deque<_atom>& atoms_in, bool check_present) { //
 // This adds an atom to the structure.
 
 void xstructure::AddAtom(const _atom& atom, bool check_present) {
-  bool LDEBUG=(FALSE || XHOST.DEBUG); 
+  //bool LDEBUG=(FALSE || XHOST.DEBUG); 
   //DX20210202 _atom btom;btom=atom;
   _atom btom=atom; //DX20210202
 
@@ -6813,32 +6791,9 @@ void xstructure::AddAtom(const _atom& atom, bool check_present) {
     if(FOUND_POSITION==TRUE) return; // found no need to add it further
   }
 
-  // now found that it does not exist check type
-  //  cerr << "AddAtom new atom" << endl;
-  bool FOUND_SPECIES=FALSE;
-  uint species_position=0;
-  for(uint isp=0;isp<species.size()&&FOUND_SPECIES==FALSE;isp++)
-    if(atom.name==species.at(isp)) {FOUND_SPECIES=TRUE;species_position=isp;}
+  // update the species: update num/comp each type or add new species
+  UpdateSpecies(atom); //DX20210202 - consolidated code below into function
 
-  if(FOUND_SPECIES==FALSE) {
-    if(LDEBUG) cerr << "AddAtom new_species=" << atom.name << endl;
-    num_each_type.push_back(1);
-    comp_each_type.push_back(atom.partial_occupation_value);
-    species.push_back(atom.name); // cerr << "AddAtom=" << atom.name << endl;
-    species_pp.push_back(atom.name); // cerr << "AddAtom=" << atom.name << endl;
-    species_pp_type.push_back(""); // cerr << "AddAtom=" << atom.name << endl;
-    species_pp_version.push_back(""); // cerr << "AddAtom=" << atom.name << endl;
-    species_pp_ZVAL.push_back(0.0); // cerr << "AddAtom=" << atom.name << endl;
-    species_pp_vLDAU.push_back(deque<double>()); // cerr << "AddAtom=" << atom.name << endl;
-    species_volume.push_back(GetAtomVolume(atom.name)); // cerr << "AddAtom=" << atom.name << endl;
-    species_mass.push_back(GetAtomMass(atom.name)); // cerr << "AddAtom=" << atom.name << endl;
-  } else {
-    // cerr << num_each_type.size() << " " <<  btom.type << endl;
-    // cerr << comp_each_type.size() << " " <<  btom.type << endl;
-    if(LDEBUG) cerr << "AddAtom increasing species_position " << species_position << endl;
-    num_each_type[species_position]++;
-    comp_each_type[species_position]+=atom.partial_occupation_value;
-  }
   if(btom.name_is_given) {
     btom.CleanName();
     //DX20170921 - Need to keep spin info  btom.CleanSpin();
@@ -6975,7 +6930,7 @@ void xstructure::ReplaceAtoms(const deque<_atom>& new_atoms, bool check_present)
   
   if(LDEBUG) cerr << soliloquy << " adding new atoms" << endl;
   //DX20210202 [OBSOLETE] for(uint i=0;i<new_atoms.size();i++){AddAtom(new_atoms[i]);}  //adding atoms
-  AddAtoms(new_atoms, check_present);  //adding atoms
+  AddAtom(new_atoms, check_present);  //adding atoms
     
   (*this).SpeciesPutAlphabetic(); //DX20210129
 }
@@ -10698,7 +10653,6 @@ uint xstructure::SetSpecies(const deque<string>& vspecies) {
   return vspecies.size();
 }
 
-/*
 // ***************************************************************************
 // Function UpdateSpecies() //DX20210202 [from AddAtom, consolidate to function]
 // ***************************************************************************
@@ -10707,33 +10661,33 @@ void xstructure::UpdateSpecies(const _atom& atom){
   // Update the species info based on the atom input
   // If the species is already in xstructure, update the number of types
   // and composition of each type, otherwise, add the new species info
-  
+  // This code was copied from AddAtom
+
   bool LDEBUG=(FALSE || XHOST.DEBUG); 
 
   bool FOUND_SPECIES=FALSE;
   uint species_position=0;
   for(uint isp=0;isp<species.size()&&FOUND_SPECIES==FALSE;isp++)
-    if(atoms[iat].name==species[isp]) {FOUND_SPECIES=TRUE;species_position=isp;}
+    if(atom.name==species[isp]) {FOUND_SPECIES=TRUE;species_position=isp;}
 
   if(FOUND_SPECIES==FALSE) {
-    if(LDEBUG) cerr << "AddAtom new_species=" << atoms[iat].name << endl;
+    if(LDEBUG) cerr << "UpdateSpecies new_species=" << atom.name << endl;
     num_each_type.push_back(1);
-    comp_each_type.push_back(atoms[iat].partial_occupation_value);
-    species.push_back(atoms[iat].name); // cerr << "AddAtom=" << atom.name << endl;
-    species_pp.push_back(atoms[iat].name); // cerr << "AddAtom=" << atom.name << endl;
-    species_pp_type.push_back(""); // cerr << "AddAtom=" << atom.name << endl;
-    species_pp_version.push_back(""); // cerr << "AddAtom=" << atom.name << endl;
-    species_pp_ZVAL.push_back(0.0); // cerr << "AddAtom=" << atom.name << endl;
-    species_pp_vLDAU.push_back(deque<double>()); // cerr << "AddAtom=" << atom.name << endl;
-    species_volume.push_back(GetAtomVolume(atoms[iat].name)); // cerr << "AddAtom=" << atom.name << endl;
-    species_mass.push_back(GetAtomMass(atoms[iat].name)); // cerr << "AddAtom=" << atom.name << endl;
+    comp_each_type.push_back(atom.partial_occupation_value);
+    species.push_back(atom.name); // cerr << "UpdateSpecies=" << atom.name << endl;
+    species_pp.push_back(atom.name); // cerr << "UpdateSpecies=" << atom.name << endl;
+    species_pp_type.push_back(""); // cerr << "UpdateSpecies=" << atom.name << endl;
+    species_pp_version.push_back(""); // cerr << "UpdateSpecies=" << atom.name << endl;
+    species_pp_ZVAL.push_back(0.0); // cerr << "UpdateSpecies=" << atom.name << endl;
+    species_pp_vLDAU.push_back(deque<double>()); // cerr << "UpdateSpecies=" << atom.name << endl;
+    species_volume.push_back(GetAtomVolume(atom.name)); // cerr << "UpdateSpecies=" << atom.name << endl;
+    species_mass.push_back(GetAtomMass(atom.name)); // cerr << "UpdateSpecies=" << atom.name << endl;
   } else {
-    if(LDEBUG) cerr << "AddAtom increasing species_position " << species_position << endl;
+    if(LDEBUG) cerr << "UpdateSpecies increasing species_position " << species_position << endl;
     num_each_type[species_position]++;
-    comp_each_type[species_position]+=atoms[iat].partial_occupation_value;
+    comp_each_type[species_position]+=atom.partial_occupation_value;
   }
 }
-*/
 
 // ***************************************************************************
 // NIGGLI NIGGLI NIGGLI NIGGLI NIGGLI NIGGLI NIGGLI NIGGLI NIGGLI NIGGLI NIGGL
