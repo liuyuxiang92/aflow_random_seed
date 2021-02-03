@@ -4601,12 +4601,12 @@ namespace aurostd {
   //   return (string) stream2stream<string>(from);
   // }
 
-  template<typename utype> string utype2string(const utype& from) {
-    return (string) stream2stream<string>(from);
-  }
-  template<typename utype> string utype2string(const utype& from,int precision) {
-    return (string) stream2stream<string>(from,precision);
-  }
+  //DX20210128 [OBSOLETE - use default arguments] template<typename utype> string utype2string(const utype& from) {
+  //DX20210128 [OBSOLETE - use default arguments]   return (string) stream2stream<string>(from);
+  //DX20210128 [OBSOLETE - use default arguments] }
+  //DX20210128 [OBSOLETE - use default arguments] template<typename utype> string utype2string(const utype& from,int precision) {
+  //DX20210128 [OBSOLETE - use default arguments]   return (string) stream2stream<string>(from,precision);
+  //DX20210128 [OBSOLETE - use default arguments]}
   template<typename utype> string utype2string(const utype& from,int precision,char FORMAT) { //see DEFAULT_STREAM, FIXED_STREAM, SCIENTIFIC_STREAM
     return (string) stream2stream<string>(from,precision,FORMAT);
   }

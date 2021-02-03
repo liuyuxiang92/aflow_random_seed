@@ -18,6 +18,7 @@
 //#define _EPS_ 0.02  // seems to work in the mean time of a self correcting one
 #define _EPS_roundoff_ _DOUBLE_TOL_ //CO20200731 //1.0e-8
 #define COMPILE_SLIM
+#define DEBUG_MINIMUM_DISTANCE false //DX+CO20210114
 
 using aurostd::isdiagonal;
 //DX+CO START
@@ -28,6 +29,7 @@ using aurostd::isequal;
 //DX+CO START
 #include "aflow_symmetry_spacegroup.h"
 //DX+CO END
+#include "aflow_sym_python.cpp" //DX20201228
 
 #define  _NO_SCALE_LATTICE_PGROUP_
 
@@ -68,6 +70,8 @@ namespace SYM {
     return dist_min;
   }
   double minimumDistance(const deque<_atom>& atoms,const xmatrix<double>& lattice,double scale){
+
+    //DX20201130 - commented nested LDEBUG if-statements, notable speed increase (a few seconds for systems with >50 atoms)
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string function_name = XPID + "SYM::minimumDistance()";
     double min_dist=AUROSTD_MAX_DOUBLE;
@@ -110,7 +114,9 @@ namespace SYM {
           for(uint b=0;b<lattice_lengths[j].size();b++){
             min_dist = aurostd::min(min_dist,aurostd::modulus(lattice_lengths[i][a]+lattice_lengths[j][b]));
             min_dist = aurostd::min(min_dist,aurostd::modulus(lattice_lengths[i][a]-lattice_lengths[j][b]));
+#ifdef DEBUG_MINIMUM_DISTANCE
             if(LDEBUG) {cerr << function_name << " lattice_vectors: a=" << lattice_indices[i][a] << ",b=" << lattice_indices[j][b] << "; min_dist=" << min_dist << endl;}
+#endif
           }
         }
       }
@@ -159,7 +165,9 @@ namespace SYM {
                 min_dist = aurostd::min(min_dist,aurostd::modulus(subtracted-lattice_lengths[k][c]));
                 min_dist = aurostd::min(min_dist,aurostd::modulus(added-lattice_lengths[k][c]));
                 min_dist = aurostd::min(min_dist,aurostd::modulus(subtracted+lattice_lengths[k][c]));
+#ifdef DEBUG_MINIMUM_DISTANCE
                 if(LDEBUG) {cerr << function_name << " lattice_vectors: a=" << lattice_indices[i][a] << ",b=" << lattice_indices[j][b] << ",c=" << lattice_indices[k][c] << "; min_dist=" << min_dist << endl;}
+#endif
               }
             }
           }  
@@ -229,7 +237,9 @@ namespace SYM {
             for(uint p=0;p<l3.size();p++){
               tmp = ab_component + l3[p];                       //DX : coord1-coord2+a*lattice(1) + (b*lattice(2)) + (c*lattice(3))
               min_dist=aurostd::min(min_dist,aurostd::modulus(tmp));
+#ifdef DEBUG_MINIMUM_DISTANCE
               if(LDEBUG) {cerr << function_name << " atoms[" << i << "," << k << "]: a=" << a_index[m] << ",b=" << b_index[n] << ",c=" << c_index[p] << "; min_dist=" << min_dist << "; this_dist=" << aurostd::modulus(tmp) << endl;}
+#endif
             }
           }
         }
@@ -995,23 +1005,27 @@ namespace SYM {
   }
   xvector<double> FPOSDistFromFPOS(const xvector<double>& fpos1,const xvector<double>& fpos2,
       const xmatrix<double>& lattice,const xmatrix<double>& c2f,const xmatrix<double>& f2c,bool skew){  //CO20190525
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy = XPID + "SYM::FPOSDistance():";
-    if(LDEBUG){
-      cerr << soliloquy << " fpos1=" << fpos1 << endl;
-      cerr << soliloquy << " fpos2=" << fpos2 << endl;
-    }
+    bool VERBOSE=FALSE; //DX20201210
+    string soliloquy = XPID + "SYM::FPOSDistFromFPOS():";
     xvector<double> min_fdiff;
     if(skew){
       xvector<double> cpos1 = f2c*fpos1;
       xvector<double> cpos2 = f2c*fpos2;
       xvector<double> min_cdiff = minimizeDistanceCartesianMethod(cpos1,cpos2,lattice); //DX20190613
       min_fdiff = c2f*min_cdiff;
+      if(VERBOSE){
+        cerr << soliloquy << " fpos1=" << fpos1 << endl;
+        cerr << soliloquy << " fpos2=" << fpos2 << endl;
+      }
     }
     else {
       xvector<double> min_fdiff = minimizeDistanceFractionalMethod(fpos1,fpos2); //DX20190613
-      if(LDEBUG){cerr << soliloquy << " fpos1-fpos2=" << (fpos1-fpos2) << endl;}
-      if(LDEBUG){cerr << soliloquy << " min_fdiff=" << min_fdiff << endl;}
+      if(VERBOSE){
+        cerr << soliloquy << " fpos1=" << fpos1 << endl;
+        cerr << soliloquy << " fpos2=" << fpos2 << endl;
+        cerr << soliloquy << " fpos1-fpos2=" << (fpos1-fpos2) << endl;
+        cerr << soliloquy << " min_fdiff=" << min_fdiff << endl;
+      }
     }
     return min_fdiff;
   }
@@ -1033,25 +1047,29 @@ namespace SYM {
   xvector<double> CPOSDistFromFPOS(const xvector<double>& fpos1,const xvector<double>& fpos2,
       const xmatrix<double>& lattice,const xmatrix<double>& f2c,bool skew){  //CO20190525
     bool VERBOSE=FALSE; //using LDEBUG would pollute output
-    string soliloquy = XPID + "SYM::CPOSDistance():";
-    if(VERBOSE){
-      cerr << soliloquy << " fpos1=" << fpos1 << endl;
-      cerr << soliloquy << " fpos2=" << fpos2 << endl;
-    }
+    string soliloquy = XPID + "SYM::CPOSDistFromFPOS():";
     xvector<double> min_cdiff;
     if(skew){
       xvector<double> cpos1 = f2c*fpos1;
       xvector<double> cpos2 = f2c*fpos2;
       min_cdiff = minimizeDistanceCartesianMethod(cpos1,cpos2,lattice); //DX20190613
-      if(VERBOSE){cerr << soliloquy << " cpos1-cpos2=" << (cpos1-cpos2) << endl;}
-      if(VERBOSE){cerr << soliloquy << " min_cdiff=" << min_cdiff << endl;}
+      if(VERBOSE){ //DX20201210 - only one if-statement, otherwise expensive
+        cerr << soliloquy << " fpos1=" << fpos1 << endl;
+        cerr << soliloquy << " fpos2=" << fpos2 << endl;
+        cerr << soliloquy << " cpos1-cpos2=" << (cpos1-cpos2) << endl;
+        cerr << soliloquy << " min_cdiff=" << min_cdiff << endl;
+      }
     }
     else {
       xvector<double> min_fdiff = minimizeDistanceFractionalMethod(fpos1,fpos2); //DX20190613
       min_cdiff = f2c*min_fdiff;
-      if(VERBOSE){cerr << soliloquy << " fpos1-fpos2=" << (fpos1-fpos2) << endl;}
-      if(VERBOSE){cerr << soliloquy << " min_fdiff=" << min_fdiff << endl;}
-      if(VERBOSE){cerr << soliloquy << " min_cdiff=" << min_cdiff << endl;}
+      if(VERBOSE){ //DX20201210 - only one if-statement, otherwise expensive
+        cerr << soliloquy << " fpos1=" << fpos1 << endl;
+        cerr << soliloquy << " fpos2=" << fpos2 << endl;
+        cerr << soliloquy << " fpos1-fpos2=" << (fpos1-fpos2) << endl;
+        cerr << soliloquy << " min_fdiff=" << min_fdiff << endl;
+        cerr << soliloquy << " min_cdiff=" << min_cdiff << endl;
+      }
     }
     return min_cdiff;
   }
@@ -2192,7 +2210,8 @@ namespace SYM {
   bool AtomsEquivalent_20160101(xstructure& str, _atom& atom1, _atom& atom2, double& eps) {
     // if(modulus(atom1.fpos-atom2.fpos)<ep s&& atom1.type==atom2.type) return TRUE;
     string function_name = XPID + "SYM::AtomsEquivalent():";
-    if(!str.pgroup_calculated || !str.fgroup_calculated || !str.sgroup_calculated) {
+    //DX20210111 [OBSOLETE - sgroup is not needed] if(!str.pgroup_calculated || !str.fgroup_calculated || !str.sgroup_calculated)
+    if(!str.pgroup_calculated || !str.fgroup_calculated) { //DX20210111 - remove sgroup
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Symmetry must have been calculated",_RUNTIME_ERROR_);
     }
     _atom tatom;
@@ -2210,7 +2229,8 @@ namespace SYM {
 
   bool AtomsEquivalent(xstructure& str, _atom& a, _atom& b, bool skew, double tol){ //CO20190520 - removed pointers for bools and doubles, added const where possible
     string function_name = XPID + "SYM::AtomsEquivalent():";
-    if(!str.pgroup_calculated || !str.fgroup_calculated || !str.sgroup_calculated) {
+    //DX20210111 [OBSOLETE - sgroup is not needed] if(!str.pgroup_calculated || !str.fgroup_calculated || !str.sgroup_calculated)
+    if(!str.pgroup_calculated || !str.fgroup_calculated) { //DX20210111 - removed sgroup
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Symmetry must have been calculated",_RUNTIME_ERROR_);
     }
     _atom tatom;
@@ -2231,7 +2251,8 @@ namespace SYM {
 namespace SYM {
   bool AtomsEquivalent_Basis(xstructure& str, int atom1_indx,int atom2_indx){
     string function_name = XPID + "SYM::AtomsEquivalent_Basis():";
-    if(!str.pgroup_calculated || !str.fgroup_calculated || !str.sgroup_calculated) {
+    //DX20210111 [OBSOLETE - sgroup is not needed] if(!str.pgroup_calculated || !str.fgroup_calculated || !str.sgroup_calculated)
+    if(!str.pgroup_calculated || !str.fgroup_calculated) { //DX20210111 - remove sgroup
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Symmetry must have been calculated",_RUNTIME_ERROR_);
     }
     for(uint fg=0;fg<str.fgroup.size();fg++) {
@@ -6768,7 +6789,7 @@ namespace SYM {
     a.LatticeReduction_avoid=TRUE; // so it does not mess up the min angles SC20100115
     if(a.pgroup_calculated==FALSE) Krun=Krun && SYM::CalculatePointGroup(FileMESSAGE,a,aflags,_write_,osswrite,oss,format);  // NEED POINT GROUP
     if(a.fgroup_calculated==FALSE) Krun=Krun && SYM::CalculateFactorGroup(FileMESSAGE,a,aflags,_write_,osswrite,oss,format); // NEED FACTOR GROUP
-    if(a.sgroup_calculated==FALSE) Krun=Krun && SYM::CalculateSpaceGroup(FileMESSAGE,a,aflags,FALSE,osswrite,oss,format);    // NEED SPACE GROUP
+    //DX20210112 [OBSOLETE - sgroup not used in this function] if(a.sgroup_calculated==FALSE) Krun=Krun && SYM::CalculateSpaceGroup(FileMESSAGE,a,aflags,FALSE,osswrite,oss,format);    // NEED SPACE GROUP
     //DX NO MORE a.sgroup_calculated=true; //DX NEED TO DO THIS BETTER
 
     // ------------------------------------------------------------------------------
@@ -8796,6 +8817,30 @@ bool KBIN_StepSymmetryPerform_20160101(xstructure& a,string AflowIn,ofstream &Fi
   return Krun;
 }
 #endif
+
+// ******************************************************************************
+// SYM::writePythonScript() //DX20201228
+// ******************************************************************************
+namespace SYM {
+  void writePythonScript(ostream& oss){
+
+    // Writes AFLOW-SYM Python script in a subdirectory
+
+    string function_name = XPID+"SYM::writePythonScript():";
+
+    string directory = aurostd::getPWD();
+    string sym_python_subdir = "AFLOW_SYM_PYTHON";
+    string python_dir = directory + "/" + sym_python_subdir;
+
+    aurostd::DirectoryMake(python_dir);
+
+    pflow::logger(_AFLOW_FILE_NAME_, function_name, "Writing out python script to: "+python_dir, oss, _LOGGER_NOTICE_);
+    stringstream output;
+
+    output << AFLOW_SYM_PYTHON_PY;
+    aurostd::stringstream2file(output, python_dir+"/"+"aflow_sym_python.py");
+  }
+}
 
 // --------------------------------------------------------------------------
 // --------------------------------------------------------------------------

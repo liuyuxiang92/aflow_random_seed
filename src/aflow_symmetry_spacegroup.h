@@ -131,7 +131,7 @@ namespace SYM {
   };
 
   //atom class manipulation function
-  deque<int> arrange_atoms(deque<_atom>& atoms);
+  //DX20210118 [OBSOLETE - now GetNumEachType in xatom] deque<int> arrange_atoms(deque<_atom>& atoms);
 
   //Screw (Screw Operation)
   class Screw {

@@ -149,7 +149,7 @@ class cecluster {
         // reload operators
         cecluster & operator=(const cecluster & cecluster_in);
 
-         // get the largest neareast neighbour shell index in a cluster
+         // get the largest neareast neighbor shell index in a cluster
         int GetNNNum(vector<double> NN_distance);
         double ClusterDistance(); // get the sum of distance of any two atoms in a cluster
 };
@@ -217,8 +217,8 @@ class ceallclusters {
         // return the number of rep_cluster
         int GetRepresentCluster();
 
-        int GetNearestNeighbour(int NNNum); // return the number of atoms generated
-        int GetNearestNeighbour();
+        int GetNearestNeighbor(int NNNum); // return the number of atoms generated
+        int GetNearestNeighbor();
 
         void GetClusterDistance(); // add the third index in pair_name
         int EquivalentCluster(const vector<_sym_op> pgroup);

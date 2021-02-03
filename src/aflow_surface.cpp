@@ -400,7 +400,7 @@ namespace surface {
   } // namespace surface
 
   namespace surface {
-    double GetNNeighbours(const xstructure& _str,const int& type_at1,const int& type_at2) {
+    double GetNNeighbors(const xstructure& _str,const int& type_at1,const int& type_at2) {
       xstructure str(_str);
       str=ReScale(BringInCell(_str),1.0);
       xvector<double> a1(3),a2(3),a3(3),rrr1(3),rrr2(3);                // lattice vectors and vectors
@@ -433,8 +433,8 @@ namespace surface {
   } // namespace surface
 
   namespace surface {
-    double GetNNeighbours(const xstructure& _str) {
-      return surface::GetNNeighbours(_str,-1,-1);
+    double GetNNeighbors(const xstructure& _str) {
+      return surface::GetNNeighbors(_str,-1,-1);
     }
   } // namespace surface
 
@@ -673,11 +673,11 @@ namespace surface {
       oss.setf(std::ios::fixed,std::ios::floatfield);
       oss.precision(_oss_short_precision_aflow_surface_);
 
-      double nndist=surface::GetNNeighbours(str);
+      double nndist=surface::GetNNeighbors(str);
       xmatrix<double> nndists(num_types-1,num_types-1,0,0),bbdistances(num_types-1,num_types-1,0,0);
       for(int it1=0;it1<num_types;it1++)
         for(int it2=it1;it2<num_types;it2++)
-          nndists(it1,it2)=surface::GetNNeighbours(str,it1,it2);
+          nndists(it1,it2)=surface::GetNNeighbors(str,it1,it2);
 
 
       //  if(mode==3 || mode==4) { // all three are given
@@ -803,11 +803,11 @@ namespace surface {
         FFF.setf(std::ios::fixed,std::ios::floatfield);
         FFF.precision(_oss_short_precision_aflow_surface_);
 
-        double nndist=surface::GetNNeighbours(str);
+        double nndist=surface::GetNNeighbors(str);
         xmatrix<double> nndists(num_types-1,num_types-1,0,0),bbdistances(num_types-1,num_types-1,0,0);
         for(int it1=0;it1<num_types;it1++)
           for(int it2=it1;it2<num_types;it2++)
-            nndists(it1,it2)=surface::GetNNeighbours(str,it1,it2);
+            nndists(it1,it2)=surface::GetNNeighbors(str,it1,it2);
 
         if(LDEBUG) cerr << "surface::GetSurfaceHKLSearch: [2] " <<   endl;
 
@@ -842,7 +842,7 @@ namespace surface {
             //   oss << banner << endl; // ----------------------------------------------------------------
             oss << surface::PrintNNdists(num_types,num_types_combinations,bbfrac,nndist,nndists);
             oss << "hklmax=" << hklmax << endl;
-            oss << "bbdistance=" << bbdistance/nndist << "  surface::GetNNeighbours=" << surface::GetNNeighbours(str) << " real_bbdistance=" << bbdistance << endl;
+            oss << "bbdistance=" << bbdistance/nndist << "  surface::GetNNeighbors=" << surface::GetNNeighbors(str) << " real_bbdistance=" << bbdistance << endl;
             oss << "step=" << step << endl;
             oss << "SCANNING TRIVIAL PLANES" << endl;
             oss << surface::PrintHKLSigmaBB(num_types,num_types_combinations,bbfrac,bbdistance,bbdistances);
@@ -856,7 +856,7 @@ namespace surface {
             if(search_complete) FFF << "COMPLETE SEARCH" << endl;
             FFF << surface::PrintNNdists(num_types,num_types_combinations,bbfrac,nndist,nndists);
             FFF << "hklmax=" << hklmax << endl;
-            FFF << "bbdistance=" << bbdistance/nndist << "  surface::GetNNeighbours=" << surface::GetNNeighbours(str) << " real_bbdistance=" << bbdistance << endl;
+            FFF << "bbdistance=" << bbdistance/nndist << "  surface::GetNNeighbors=" << surface::GetNNeighbors(str) << " real_bbdistance=" << bbdistance << endl;
             FFF << "step=" << step << endl;
             FFF << "SCANNING TRIVIAL PLANES" << endl;
             FFF << surface::PrintHKLSigmaBB(num_types,num_types_combinations,bbfrac,bbdistance,bbdistances);
@@ -3703,7 +3703,8 @@ namespace slab {
 
     if(LDEBUG) {cerr << soliloquy << " starting" << endl;}
 
-    int xy_dims=1;          //dimensions of supercell in x-y dimensions
+    int xy_dims=1;                //dimensions of supercell in x-y dimensions
+    xvector<double> zero_xvector; //zero xvector //DX20201124
 
     xstructure xstr_bulk(xstr_in);xstr_bulk.ReScale(1.0); //do NOT modify further
     double min_dist=xstr_bulk.dist_nn_min;
@@ -3841,7 +3842,8 @@ namespace slab {
 
     //clean up structure
     xstr_slab_origbasis.ReScale(1.0);
-    xstr_slab_origbasis.ShiftOriginToAtom(0);xstr_slab_origbasis.origin=0.0; //reset origin
+    //DX20201124 [OBSOLETE - origin is an xvector not double] xstr_slab_origbasis.ShiftOriginToAtom(0);xstr_slab_origbasis.origin=0.0; //reset origin
+    xstr_slab_origbasis.ShiftOriginToAtom(0); xstr_slab_origbasis.origin=zero_xvector; //reset origin //DX20201124
     xstr_slab_origbasis.BringInCell();
     xstr_slab_origbasis.clean(); //DX20191220 - uppercase to lowercase clean
 
@@ -3861,7 +3863,8 @@ namespace slab {
 
     //clean up structure
     xstr_slab_newbasis.ReScale(1.0);
-    xstr_slab_newbasis.ShiftOriginToAtom(0);xstr_slab_newbasis.origin=0.0; //reset origin
+    //DX20201124 [OBSOLETE - origin is an xvector not double] xstr_slab_newbasis.ShiftOriginToAtom(0);xstr_slab_newbasis.origin=0.0; //reset origin
+    xstr_slab_newbasis.ShiftOriginToAtom(0); xstr_slab_newbasis.origin=zero_xvector; //reset origin
     xstr_slab_newbasis.BringInCell();
     xstr_slab_newbasis.clean(); //DX20191220 - uppercase to lowercase clean
 
@@ -3928,7 +3931,8 @@ namespace slab {
 
     //clean up structure
     xstr_slab.ReScale(1.0);
-    xstr_slab.ShiftOriginToAtom(0);xstr_slab.origin=0.0; //reset origin
+    //DX20201124 [OBSOLETE - origin is an xvector not double] xstr_slab.ShiftOriginToAtom(0);xstr_slab.origin=0.0; //reset origin
+    xstr_slab.ShiftOriginToAtom(0); xstr_slab.origin=zero_xvector; //reset origin //DX20201124
     xstr_slab.BringInCell();
     //xstr_slab.clean();  //clear origin! //do not clear ijk! origin is okay here, only a problem for Rotate() //DX20191220 - uppercase to lowercase clean
 
@@ -4093,7 +4097,7 @@ namespace slab {
     }
     if(!aurostd::isequal(min_dist,min_dist_orig)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Minimum distance changed (test)",_INPUT_ERROR_);}
 
-    bool structures_match=compare::aflowCompareStructure(xstr_slab_correct,xstr_slab_test,true,false,false);
+    bool structures_match=compare::structuresMatch(xstr_slab_correct,xstr_slab_test,true,false,false);
     if(LDEBUG){cerr << soliloquy << " structures_match=" << structures_match << endl;}
     if(!structures_match){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Structures do not match",_RUNTIME_ERROR_);}
     message << "Slab test successful";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_COMPLETE_);

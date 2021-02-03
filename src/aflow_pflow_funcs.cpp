@@ -2884,7 +2884,8 @@ namespace pflow {
       vector<string> names(nat,"H");
       vector<int> names_were_given(nat,FALSE);
       str=pflow::SetLat(str,lat_vec[is]);
-      str=pflow::SetNumEachType(str,num_each_type);
+      //DX20210118 [OBSOLETE] str=pflow::SetNumEachType(str,num_each_type);
+      str.num_each_type = num_each_type; //DX20210202 - replace SetNumEachType
       str=pflow::AddAllAtomPos(str,fpos_vec[is],0);
       str=pflow::SetAllAtomNames(str,names);
       str=pflow::SetNamesWereGiven(str,names_were_given);
@@ -3281,9 +3282,9 @@ namespace pflow {
       aurostd::matrix<double> lat1=pflow::GetLat(str1);  //CO20200404 pflow::matrix()->aurostd::matrix()
       xmatrix<double> xlat1(3,3);xlat1=str1.lattice;
       aurostd::matrix<double> cpos2=pflow::GetCpos(str2);  //CO20200404 pflow::matrix()->aurostd::matrix()
-      deque<int> num_each_type_1=pflow::GetNumEachType(str1);
+      deque<int> num_each_type_1=str1.num_each_type; //DX20210119 pflow::GetNumEachType() -> xstructure.num_each_type
       int num_types_1=num_each_type_1.size();
-      deque<int> num_each_type_2=pflow::GetNumEachType(str2);
+      deque<int> num_each_type_2=str2.num_each_type; //DX20210119 pflow::GetNumEachType() -> xstructure.num_each_type
       int num_types_2=num_each_type_2.size();
       // Loop over str2 atoms, assign them a type and c/d positions in an atom.
       int cnt=0;
@@ -3392,7 +3393,7 @@ namespace pflow {
     // we must only do this the first time this set function is
     // called.  This is controlled by the first_set parameter.
     if(rtp.first_set) {
-      int ntypes = pflow::GetNumEachType(str).size();
+      int ntypes = str.num_each_type.size(); //DX20210119 pflow::GetNumEachType() -> xstructure.num_each_type
       aurostd::matrix<double> tmp; //CO20200404 pflow::matrix()->aurostd::matrix()
       int size;
       // Set sphtex_tex
@@ -3558,7 +3559,7 @@ namespace pflow {
     // Do atoms
     str=ReScale(str,1.0);
     aurostd::matrix<double> cpos=pflow::GetCpos(str);  //CO20200404 pflow::matrix()->aurostd::matrix()
-    deque<int> num_each_type=pflow::GetNumEachType(str);
+    deque<int> num_each_type=str.num_each_type; //DX20210119 pflow::GetNumEachType() -> xstructure.num_each_type
     //int nat=(int)cpos.size();
     int ntype=(int)num_each_type.size();
     int cnt=0;
@@ -3799,89 +3800,12 @@ namespace pflow {
 }
 
 // ***************************************************************************
-// GetRotationMatrix
+// GetRotationMatrix [OBSOLETE - moved to xatom]
 // ***************************************************************************
-// This gets a rotation matrix from 3 angles assumed
-// to represent a rotation around x, then y, then z.
-// Angles are assumed to be in radians.
-namespace pflow {
-  aurostd::matrix<double> GetRotationMatrix(const vector<double>& angles) {  //CO20200404 pflow::matrix()->aurostd::matrix()
-    // Sin and cos.
-    vector<double> sn(3,0.0);
-    vector<double> cs(3,0.0);
-    for(int ic=0;ic<3;ic++) {
-      sn[ic]=sin(angles[ic]);
-      cs[ic]=cos(angles[ic]);
-    }
-    // Set rotation matrix (do x, then y, then z rotation).
-    aurostd::matrix<double> xm(3,3);pflow::VVset(xm,0.0);  //CO20200404 pflow::matrix()->aurostd::matrix()
-    aurostd::matrix<double> ym(3,3);pflow::VVset(ym,0.0);  //CO20200404 pflow::matrix()->aurostd::matrix()
-    aurostd::matrix<double> zm(3,3);pflow::VVset(zm,0.0);  //CO20200404 pflow::matrix()->aurostd::matrix()
-
-    xm[0][0]=1;
-    xm[1][1]=cs[0];
-    xm[1][2]=-sn[0];
-    xm[2][1]=sn[0];
-    xm[2][2]=cs[0];
-
-    ym[0][0]=cs[1];
-    ym[0][2]=sn[1];
-    ym[1][1]=1;
-    ym[2][0]=-sn[1];
-    ym[2][2]=cs[1];
-
-    zm[0][0]=cs[2];
-    zm[0][1]=-sn[2];
-    zm[1][0]=sn[2];
-    zm[1][1]=cs[2];
-    zm[2][2]=1;
-
-    aurostd::matrix<double> rm;  //CO20200404 pflow::matrix()->aurostd::matrix()
-    rm=pflow::MMmult(zm,pflow::MMmult(ym,xm));
-    return rm;
-  }
-}
 
 // ***************************************************************************
-// RotateStrVec
+// RotateStrVec //DX20210127 [OBSOLETE - moved to xatom]
 // ***************************************************************************
-// This rotates each structure in the vstr.
-// The rotation goes from an initial to a final set of angles
-// in steps of the primitive rotation.
-// The primitive rotation is the rotation around x, y, then z
-// by the amount of change given in rot divided by the number
-// of structures - 1.  All frames are initially rotated
-// according to the initial rotation angles.  The rotation is
-// then done as one primitive rotation per frame.
-namespace pflow {
-  void RotateStrVec(vector<xstructure>& vstr, const vector<double>& rot) {
-    // Get initial rotation matrix.
-    vector<double> angles(3);
-    for(int ic=0;ic<3;ic++) {
-      angles[ic]=rot[2*ic];
-      angles[ic]=angles[ic]*TWOPI/360.0;
-    }
-    aurostd::matrix<double> irm=GetRotationMatrix(angles); //CO20200404 pflow::matrix()->aurostd::matrix()
-
-    // get primitive rotation matrix.
-    int s=vstr.size()-1;
-    if(s<1) s=1;
-    for(int ic=0;ic<3;ic++) {
-      angles[ic]=(rot[2*ic+1]-rot[2*ic])/(s);
-      angles[ic]=angles[ic]*TWOPI/360.0;
-    }
-    aurostd::matrix<double> prm=GetRotationMatrix(angles); //CO20200404 pflow::matrix()->aurostd::matrix()
-    aurostd::matrix<double> rm=irm;  //CO20200404 pflow::matrix()->aurostd::matrix()
-    xmatrix<double> xprm(3,3); xprm=aurostd::matrix2xmatrix(prm);  //CO20200404 pflow::matrix()->aurostd::matrix()
-    xmatrix<double> xrm(3,3);  xrm=aurostd::matrix2xmatrix(rm);  //CO20200404 pflow::matrix()->aurostd::matrix()
-    for(int is=0;is<(int)vstr.size();is++) {
-      //    xrm=aurostd::matrix2xmatrix(rm); //CO20200404 pflow::matrix()->aurostd::matrix()
-      //   vstr[is]=Rotate(vstr[is],xrm);
-      vstr[is]=Rotate(vstr[is],aurostd::matrix2xmatrix(rm)); //CO20200404 pflow::matrix()->aurostd::matrix()
-      rm=pflow::MMmult(prm,rm);
-    }
-  }
-}
 
 // ***************************************************************************
 // PROJDATA PROJDATA PROJDATA PROJDATA PROJDATA PROJDATA PROJDATA PROJDATA PRO
@@ -7354,15 +7278,15 @@ namespace pflow {
 }
 
 // ***************************************************************************
-// pflow::FakeElements()
+// pflow::getFakeElements()
 // ***************************************************************************
 namespace pflow{
-  vector<string> fakeElements(uint nspecies){
+  vector<string> getFakeElements(uint nspecies){
 
     // Return vector of fake elements
     // Useful for determining "elements" for prototypes
 
-    string function_name = XPID + "pflow::fakeElements():";
+    string function_name = XPID + "pflow::getFakeElements():";
 
     if(nspecies>26){
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"There are more than 26 species, this function must be modified to include more fake elements.",_RUNTIME_ERROR_);
@@ -7379,6 +7303,40 @@ namespace pflow{
 }
 
 // ***************************************************************************
+// pflow::hasRealElements()
+// ***************************************************************************
+namespace pflow{
+  bool hasRealElements(const xstructure& xstr){
+
+    // Determine if elements in the xstructure are real/physical.
+    // Uses xelement
+
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string function_name = XPID + "pflow::hasRealElements():";
+    stringstream message;
+
+    if(xstr.species.size() > 0){
+      xelement::xelement element;
+      uint nspecies = xstr.species.size();
+      for(uint i=0;i<nspecies;i++){
+        try{
+          element = xelement::xelement(KBIN::VASP_PseudoPotential_CleanName(xstr.species[i]));
+        }
+        catch(aurostd::xerror& re){
+          if(LDEBUG){ cerr << function_name << xstr.species[i] << " is not a real element." << endl; }
+          return false;
+        }
+      }
+    }
+    else{
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"The species are empty.",_INPUT_NUMBER_);
+    }
+
+    return true;
+  }
+}
+
+// ***************************************************************************
 // pflow::getSymmetryTolerance() //DX20200820
 // ***************************************************************************
 namespace pflow{
@@ -7388,7 +7346,7 @@ namespace pflow{
     // options:
     //  1) tight = min_nn_dist/100
     //  2) loose = min_nn_dist/10
-    //  1) number = user defined (Angstroms)
+    //  3) number = user defined (Angstroms)
 
     string function_name = XPID + "pflow::getSymmetryTolerance():";
     stringstream message;
