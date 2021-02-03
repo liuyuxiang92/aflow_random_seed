@@ -1642,7 +1642,6 @@ namespace aflowMachL {
     //    }
     //  }
     //  cerr << vinputs.size() << endl;
-    //  exit(0);
     //}
     
     //std::sort(vicol2remove.begin(),vicol2remove.end());vicol2remove.erase( std::unique( vicol2remove.begin(), vicol2remove.end() ), vicol2remove.end() );  //get unique values
