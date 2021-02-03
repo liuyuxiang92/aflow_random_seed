@@ -1675,7 +1675,7 @@ namespace chull {
     string soliloquy=XPID+"ChullPoint::getEntropyStabilizationCoefficient():";
     if(getDist2Hull()==AUROSTD_MAX_DOUBLE){return AUROSTD_MAX_DOUBLE;}
     if(getEntropyFormingAbility()==AUROSTD_NAN){return AUROSTD_MAX_DOUBLE;}
-    if(zeroWithinTol(getEntropyFormingAbility())){return AUROSTD_MAX_DOUBLE;} //protect from division by zero
+    if(zeroWithinTol(getEntropyFormingAbility())){return 0.0;} //protect from division by zero
     if(LDEBUG) {
       cerr << soliloquy << " dist2hull=" << getDist2Hull() << endl;
       cerr << soliloquy << " EFA=" << getEntropyFormingAbility() << endl;
