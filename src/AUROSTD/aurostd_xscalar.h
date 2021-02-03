@@ -83,6 +83,10 @@
 //AS20200427 - QHA-related conversion factors
 #define eV2GPa (E_ELECTRON*1e21)    // [eV/A^3] --> [GPa]
 
+//DX20210111 - GFA factors
+#define TEMPERATURE_ROOM 300.0               // K
+#define kBT_ROOM (KBOLTZEV*TEMPERATURE_ROOM) // 0.025
+
 // ----------------------------------------------------------------------------
 // ------------------------------------------------------------------ constants
 
@@ -105,6 +109,8 @@
 
 #define _AUROSTD_XSCALAR_TOLERANCE_IDENTITY_ 1.0e-6
 #define _AUROSTD_XSCALAR_TOLERANCE_ROUNDOFF_ 1.0e-6
+
+#define _AUROSTD_XSCALAR_TOLERANCE_INTEGER_ 1.0e-2 //DX20201217
 
 // ----------------------------------------------------------------------------
 // ------------------------- primitives for template<class utype> xscalar<utype>
@@ -158,18 +164,18 @@ namespace aurostd {
   void GCD(long double a,long double b,long double& gcd,long double tolerance=0.01);  //CO20191201
   int LCM(int a,int b); //CO20190520
 
-  template<class utype> bool _isinteger(utype,utype=(utype)0.01) __xprototype;  //CO20191201
-  //bool isinteger(bool x,bool tolerance=(bool)0.01); //CO20191201
-  //bool isinteger(char x,char tolerance=(char)0.01); //CO20191201
-  bool isinteger(uint x,uint tolerance=(uint)0.01); //CO20191201  //CO20191201 - obvious but define for boot
-  bool isinteger(int x,int tolerance=(int)0.01);  //CO20191201  //CO20191201 - obvious but define for boot
-  bool isinteger(long int x,long int tolerance=(long)0.01); //CO20191201  //CO20191201 - obvious but define for boot
-  bool isinteger(unsigned long int x,unsigned long int tolerance=(unsigned long)0.01); //CO20191201  //CO20191201 - obvious but define for boot
-  bool isinteger(long long int x,long long int tolerance=(long long int)0.01);  //CO20191201  //CO20191201 - obvious but define for boot
-  bool isinteger(unsigned long long int x,unsigned long long int tolerance=(unsigned long long int)0.01); //CO20191201  //CO20191201 - obvious but define for boot
-  bool isinteger(float x,float tolerance=(float)0.01);  //CO20191201
-  bool isinteger(double x,double tolerance=(double)0.01); //CO20191201
-  bool isinteger(long double x,long double tolerance=(long double)0.01);  //CO20191201
+  template<class utype> bool _isinteger(utype,utype=(utype)_AUROSTD_XSCALAR_TOLERANCE_INTEGER_) __xprototype;  //CO20191201
+  //bool isinteger(bool x,bool tolerance=(bool)_AUROSTD_XSCALAR_TOLERANCE_INTEGER_); //CO20191201
+  //bool isinteger(char x,char tolerance=(char)_AUROSTD_XSCALAR_TOLERANCE_INTEGER_); //CO20191201
+  bool isinteger(uint x,uint tolerance=(uint)_AUROSTD_XSCALAR_TOLERANCE_INTEGER_); //CO20191201  //CO20191201 - obvious but define for boot
+  bool isinteger(int x,int tolerance=(int)_AUROSTD_XSCALAR_TOLERANCE_INTEGER_);  //CO20191201  //CO20191201 - obvious but define for boot
+  bool isinteger(long int x,long int tolerance=(long)_AUROSTD_XSCALAR_TOLERANCE_INTEGER_); //CO20191201  //CO20191201 - obvious but define for boot
+  bool isinteger(unsigned long int x,unsigned long int tolerance=(unsigned long)_AUROSTD_XSCALAR_TOLERANCE_INTEGER_); //CO20191201  //CO20191201 - obvious but define for boot
+  bool isinteger(long long int x,long long int tolerance=(long long int)_AUROSTD_XSCALAR_TOLERANCE_INTEGER_);  //CO20191201  //CO20191201 - obvious but define for boot
+  bool isinteger(unsigned long long int x,unsigned long long int tolerance=(unsigned long long int)_AUROSTD_XSCALAR_TOLERANCE_INTEGER_); //CO20191201  //CO20191201 - obvious but define for boot
+  bool isinteger(float x,float tolerance=(float)_AUROSTD_XSCALAR_TOLERANCE_INTEGER_);  //CO20191201
+  bool isinteger(double x,double tolerance=(double)_AUROSTD_XSCALAR_TOLERANCE_INTEGER_); //CO20191201
+  bool isinteger(long double x,long double tolerance=(long double)_AUROSTD_XSCALAR_TOLERANCE_INTEGER_);  //CO20191201
 
   template<class utype> bool _iszero(utype a,utype tol=(utype)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_);  //CO20191201
   //bool iszero(bool x,bool tolerance); //CO20191201

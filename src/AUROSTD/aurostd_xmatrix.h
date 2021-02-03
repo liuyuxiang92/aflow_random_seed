@@ -623,6 +623,13 @@ namespace aurostd {
       return minM;
     }
   //AS20200512 END
+
+  //DX20210111 - added polarDecomposition() function
+  template<class utype> void
+    polarDecomposition(const xmatrix<utype>& transformation_matrix,
+    xmatrix<utype>& rotation,
+    xmatrix<utype>& deformation,
+    bool check_orthogonal_rotation=true); __xprototype;
 }
 
 namespace aurostd {

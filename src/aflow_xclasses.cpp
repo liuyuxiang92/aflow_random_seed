@@ -539,10 +539,10 @@ _kflags::_kflags() {
   KBIN_SYMMETRY_AGROUP_WRITE                       = FALSE;
   KBIN_SYMMETRY_IATOMS_WRITE                       = FALSE;
   KBIN_SYMMETRY_SGROUP_RADIUS                      = 0.0;
-  KBIN_NEIGHBOURS_CALCULATION                      = FALSE;
-  KBIN_NEIGHBOURS_WRITE                            = FALSE;
-  KBIN_NEIGHBOURS_RADIUS                           = 0.0;
-  KBIN_NEIGHBOURS_DRADIUS                          = 0.0;
+  //DX20210122 [OBSOLETE] KBIN_NEIGHBORS_CALCULATION                       = FALSE;
+  //DX20210122 [OBSOLETE] KBIN_NEIGHBORS_WRITE                             = FALSE;
+  //DX20210122 [OBSOLETE] KBIN_NEIGHBORS_RADIUS                            = 0.0;
+  //DX20210122 [OBSOLETE] KBIN_NEIGHBORS_DRADIUS                           = 0.0;
   KBIN_POCC                                        = FALSE;
   KBIN_POCC_CALCULATION                            = FALSE;
   KBIN_POCC_TEMPERATURE_STRING                     = "";  //CO20191110
@@ -649,10 +649,10 @@ void _kflags::copy(const _kflags& b) {
   KBIN_SYMMETRY_AGROUP_WRITE                       = b.KBIN_SYMMETRY_AGROUP_WRITE;
   KBIN_SYMMETRY_IATOMS_WRITE                       = b.KBIN_SYMMETRY_IATOMS_WRITE;
   KBIN_SYMMETRY_SGROUP_RADIUS                      = b.KBIN_SYMMETRY_SGROUP_RADIUS;
-  KBIN_NEIGHBOURS_CALCULATION                      = b.KBIN_NEIGHBOURS_CALCULATION;
-  KBIN_NEIGHBOURS_WRITE                            = b.KBIN_NEIGHBOURS_WRITE;
-  KBIN_NEIGHBOURS_RADIUS                           = b.KBIN_NEIGHBOURS_RADIUS;
-  KBIN_NEIGHBOURS_DRADIUS                          = b.KBIN_NEIGHBOURS_DRADIUS;
+  //DX20210122 [OBSOLETE] KBIN_NEIGHBORS_CALCULATION                       = b.KBIN_NEIGHBORS_CALCULATION;
+  //DX20210122 [OBSOLETE] KBIN_NEIGHBORS_WRITE                             = b.KBIN_NEIGHBORS_WRITE;
+  //DX20210122 [OBSOLETE] KBIN_NEIGHBORS_RADIUS                            = b.KBIN_NEIGHBORS_RADIUS;
+  //DX20210122 [OBSOLETE] KBIN_NEIGHBORS_DRADIUS                           = b.KBIN_NEIGHBORS_DRADIUS;
   KBIN_POCC                                        = b.KBIN_POCC;
   KBIN_POCC_CALCULATION                            = b.KBIN_POCC_CALCULATION; //CO20191110
   KBIN_POCC_TEMPERATURE_STRING                     = b.KBIN_POCC_TEMPERATURE_STRING; //CO20191110
@@ -1275,8 +1275,8 @@ _xvasp::_xvasp() {
   aopts.flag("FLAG::KPOINTS_PRESERVED",FALSE);           // DEFAULT VALUES
   aopts.flag("FLAG::WAVECAR_PRESERVED",FALSE);           // DEFAULT VALUES
   aopts.flag("FLAG::WAVEDER_PRESERVED",FALSE);           // DEFAULT VALUES
-  aopts.flag("FLAG::AVASP_SYMMETRY=OFF",FALSE);         // DEFAULT VALUES   //CO20170601
-  aopts.flag("FLAG::AVASP_NEIGHBOURS=OFF",FALSE);        // DEFAULT VALUES  //CO20170601
+  aopts.flag("FLAG::AVASP_SYMMETRY=OFF",FALSE);          // DEFAULT VALUES   //CO20170601
+  //DX20210122 [OBSOLETE] aopts.flag("FLAG::AVASP_NEIGHBORS=OFF",FALSE);         // DEFAULT VALUES  //CO20170601
   aopts.flag("FLAG::AVASP_APL=OFF",FALSE);               // DEFAULT VALUES  //CO20170601
   aopts.flag("FLAG::AVASP_QHA=OFF",FALSE);               // DEFAULT VALUES  //CO20170601
   aopts.flag("FLAG::AVASP_AAPL=OFF",FALSE);              // DEFAULT VALUES  //CO20170601
