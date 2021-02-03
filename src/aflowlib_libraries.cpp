@@ -6349,9 +6349,11 @@ namespace aflowlib {
     for(uint iremdirname=0;iremdirname<vremdirname.size();iremdirname++) {
       for(uint irelax=0;irelax<vrelax.size();irelax++) {
         for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed
-          dir=aurostd::RemoveSubString(dir,"/"+vremdirname.at(iremdirname)+vrelax.at(irelax)+XHOST.vext.at(iext));
+          dir=aurostd::RemoveSubString(dir,"/"+vremdirname[iremdirname]+vrelax[irelax]+XHOST.vext[iext]);
+
         }
-        dir=aurostd::RemoveSubString(dir,"/"+vremdirname.at(iremdirname)+vrelax.at(irelax));
+        dir=aurostd::RemoveSubString(dir,"/"+vremdirname[iremdirname]+vrelax[irelax]);
+
       }
       dir=aurostd::RemoveSubString(dir,"/"+vremdirname.at(iremdirname));
     }
@@ -6392,9 +6394,9 @@ namespace aflowlib {
     if(ok) { obb << ".";if(aurostd::FileExist(dir+"/OSZICAR")) { ok=FALSE;obb << " yes=OSZICAR"; }}
     if(ok) { obb << ".";if(aurostd::FileExist(dir+"/POTCAR")) { ok=FALSE;obb << " yes=POTCAR"; }}
     for(uint irelax=0;irelax<vrelax.size();irelax++) {
-      if(ok) { obb << ".";if(aurostd::FileExist(dir+"/OUTCAR"+vrelax.at(irelax))) { ok=FALSE;obb << " yes=OUTCAR"+vrelax.at(irelax); }}
-      if(ok) { obb << ".";if(aurostd::FileExist(dir+"/OSZICAR"+vrelax.at(irelax))) { ok=FALSE;obb << " yes=OSZICAR"+vrelax.at(irelax); }}
-      if(ok) { obb << ".";if(aurostd::FileExist(dir+"/POTCAR"+vrelax.at(irelax))) { ok=FALSE;obb << " yes=POTCAR"+vrelax.at(irelax); }}
+      if(ok) { obb << ".";if(aurostd::FileExist(dir+"/OUTCAR"+vrelax[irelax])) { ok=FALSE;obb << " yes=OUTCAR"+vrelax[irelax]; }}
+      if(ok) { obb << ".";if(aurostd::FileExist(dir+"/OSZICAR"+vrelax[irelax])) { ok=FALSE;obb << " yes=OSZICAR"+vrelax[irelax]; }}
+      if(ok) { obb << ".";if(aurostd::FileExist(dir+"/POTCAR"+vrelax[irelax])) { ok=FALSE;obb << " yes=POTCAR"+vrelax[irelax]; }}
     }
     // TEST COMPRESS
     if(ok) { obb << "z";  // check all the outputs
@@ -6403,58 +6405,87 @@ namespace aflowlib {
       if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/aflow.iatoms.out")) { ok=FALSE;obb << " no=aflow.iatoms.out" << ".EXT"; }}
       if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/aflow.pgroup.out")) { ok=FALSE;obb << " no=aflow.pgroup.out" << ".EXT"; }}
       if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/aflow.pgroup_xtal.out")) { ok=FALSE;obb << " no=aflow.pgroup_xtal.out" << ".EXT"; }}
-      if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/aflow.pseudopotential_auid.out")) { ok=FALSE;obb << " no=aflow.pseudopotential_auid.out" << ".EXT"; }}
+      //[CO20210126 - LIB2RAW_Loop_PATCH() fixes this]if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/aflow.pseudopotential_auid.out")) { ok=FALSE;obb << " no=aflow.pseudopotential_auid.out" << ".EXT"; }}
       if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/aflow.qmvasp.out")) { ok=FALSE;obb << " no=aflow.qmvasp.out" << ".EXT"; }}
       if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/INCAR.orig")) { ok=FALSE;obb << " no=INCAR.orig" << ".EXT"; }}
       //[CO20201111 - not needed]if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/POSCAR.orig")) { ok=FALSE;obb << " no=POSCAR.orig" << ".EXT"; }}
     }
     // TEST RELAX1 RELAX2 RELAX3
     for(uint irelax=0;irelax<vrelax.size();irelax++) {
-      if(ok && aurostd::EFileExist(dir+"/OUTCAR"+vrelax.at(irelax))) { // relax1 relax2 relax3
-        if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/OUTCAR"+vrelax.at(irelax))) { ok=FALSE;print=FALSE;obb << " no=OUTCAR"+vrelax.at(irelax)+".EXT"; }}
-        if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/OSZICAR"+vrelax.at(irelax))) { ok=FALSE;obb << " no=OSZICAR"+vrelax.at(irelax)+".EXT"; }}
-        if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/vasp.out"+vrelax.at(irelax))) { ok=FALSE;obb << " no=vasp.out"+vrelax.at(irelax)+".EXT"; }}
-        if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/INCAR"+vrelax.at(irelax))) { ok=FALSE;obb << " no=INCAR"+vrelax.at(irelax)+".EXT"; }}
-        //      if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/EIGENVAL"+vrelax.at(irelax))) { ok=FALSE;obb << " no=EIGENVAL"+vrelax.at(irelax)+".EXT"; }}
-        if(vrelax.at(irelax)==".static")
-          if(ok) { obb << "d"; if(!aurostd::EFileExist(dir+"/DOSCAR"+vrelax.at(irelax))) { ok=FALSE;obb << " no=DOSCAR"+vrelax.at(irelax)+".EXT"; }}
-        // "OUTCAR"+vrelax.at(irelax)+".EXT"  //CO20200106 - patching for auto-indenting (quotes)
+      if(ok && aurostd::EFileExist(dir+"/OUTCAR"+vrelax[irelax])) { // relax1 relax2 relax3
+        if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/OUTCAR"+vrelax[irelax])) { ok=FALSE;print=FALSE;obb << " no=OUTCAR"+vrelax[irelax]+".EXT"; }}
+        if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/OSZICAR"+vrelax[irelax])) { ok=FALSE;obb << " no=OSZICAR"+vrelax[irelax]+".EXT"; }}
+        if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/vasp.out"+vrelax[irelax])) { ok=FALSE;obb << " no=vasp.out"+vrelax[irelax]+".EXT"; }}
+        if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/INCAR"+vrelax[irelax])) { ok=FALSE;obb << " no=INCAR"+vrelax[irelax]+".EXT"; }}
+        //      if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/EIGENVAL"+vrelax[irelax])) { ok=FALSE;obb << " no=EIGENVAL"+vrelax[irelax]+".EXT"; }}
+        if(vrelax[irelax]==".static")
+          if(ok) { obb << "d"; if(!aurostd::EFileExist(dir+"/DOSCAR"+vrelax[irelax])) { ok=FALSE;obb << " no=DOSCAR"+vrelax[irelax]+".EXT"; }}
+        // "OUTCAR"+vrelax[irelax]+".EXT"  //CO20200106 - patching for auto-indenting (quotes)
         obb << ".";
         if(ok) { obb << "o";  // check Answer 4 or 5 in OUTCAR.RELAX.EXT
           for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed
-            if(aurostd::FileExist(dir+"/OUTCAR"+vrelax.at(irelax)+XHOST.vext.at(iext))) {
-              answer=aurostd::execute2utype<int>(XHOST.vcat.at(iext)+" \""+dir+"/OUTCAR"+vrelax.at(irelax)+XHOST.vext.at(iext)+"\" | grep -c \"(sec)\" ");
-              if(answer==0){answer=aurostd::execute2utype<int>(XHOST.vcat.at(iext)+" \""+dir+"/OUTCAR"+vrelax.at(irelax)+XHOST.vext.at(iext)+"\" | grep -c \"(sec)\" ");} //CO20200501 - soft patch, this could STILL break if xcat does NOT load anything
-              if(answer!=4 && answer!=5) { ok=FALSE;obb << ". error(" << answer << ")=OUTCAR"+vrelax.at(irelax)+".EXT"; }}
+            if(aurostd::FileExist(dir+"/OUTCAR"+vrelax[irelax]+XHOST.vext[iext])) {
+              answer=aurostd::execute2utype<int>(XHOST.vcat[iext]+" \""+dir+"/OUTCAR"+vrelax[irelax]+XHOST.vext[iext]+"\" | grep -c \"(sec)\" ");
+              if(answer==0){answer=aurostd::execute2utype<int>(XHOST.vcat[iext]+" \""+dir+"/OUTCAR"+vrelax[irelax]+XHOST.vext[iext]+"\" | grep -c \"(sec)\" ");} //CO20200501 - soft patch, this could STILL break if xcat does NOT load anything
+              if(answer!=4 && answer!=5) { ok=FALSE;obb << ". error(" << answer << ")=OUTCAR"+vrelax[irelax]+".EXT"; }}
           }
         }
         obb << ".";
         if(ok) { obb << "v"; // TEST VASP.OUT
           for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed
-            if(aurostd::FileExist(dir+"/vasp.out"+vrelax.at(irelax)+XHOST.vext.at(iext))) {
-              answer=aurostd::execute2utype<int>(XHOST.vcat.at(iext)+" \""+dir+"/vasp.out"+vrelax.at(irelax)+XHOST.vext.at(iext)+"\" | grep -c \"The distance between some ions is very small\" ");
-              if(answer!=0) { ok=FALSE;obb << ". ions=vasp.out"+vrelax.at(irelax)+".EXT"; }}
+            if(aurostd::FileExist(dir+"/vasp.out"+vrelax[irelax]+XHOST.vext[iext])) {
+              answer=aurostd::execute2utype<int>(XHOST.vcat[iext]+" \""+dir+"/vasp.out"+vrelax[irelax]+XHOST.vext[iext]+"\" | grep -c \"The distance between some ions is very small\" ");
+              if(answer!=0) { ok=FALSE;obb << ". ions=vasp.out"+vrelax[irelax]+".EXT"; }}
           }
         }
         obb << ".";
       }
       if(ok) {// obb << "b"; // TEST "+vbroken.at(ibroken)+"
         for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed
-          if(aurostd::FileExist(dir+"/OUTCAR"+vrelax.at(irelax)+XHOST.vext.at(iext))) {
-            //	    cerr << soliloquy << " " << string("ls "+dir+"/*"+vrelax.at(irelax)+XHOST.vext.at(iext)) << endl;
-            aurostd::string2dequestring(aurostd::execute2string("ls "+dir+"/*"+vrelax.at(irelax)+XHOST.vext.at(iext)),vbroken);
+          if(aurostd::FileExist(dir+"/OUTCAR"+vrelax[irelax]+XHOST.vext[iext])) {
+            //	    cerr << soliloquy << " " << string("ls "+dir+"/*"+vrelax[irelax]+XHOST.vext[iext]) << endl;
+            aurostd::string2dequestring(aurostd::execute2string("ls "+dir+"/*"+vrelax[irelax]+XHOST.vext[iext]),vbroken);
             for(uint ibroken=0;ibroken<vbroken.size();ibroken++) {
               //      cerr << soliloquy << " " << "[" << vbroken.at(ibroken) << "]" << endl;
               if(ok && aurostd::FileExist(vbroken.at(ibroken))) {
                 obb << "b";
-                //		answer=aurostd::execute2utype<int>(XHOST.vcat.at(iext)+" \""+dir+"/"+vbroken.at(ibroken)+"\" 2>&1 | grep -c \"Unexpected end of input\" ");
-                answer=aurostd::execute2utype<int>(XHOST.vcat.at(iext)+" \""+vbroken.at(ibroken)+"\" 2>&1 | grep -c \"Unexpected end of input\" ");
+                //		answer=aurostd::execute2utype<int>(XHOST.vcat[iext]+" \""+dir+"/"+vbroken.at(ibroken)+"\" 2>&1 | grep -c \"Unexpected end of input\" ");
+                answer=aurostd::execute2utype<int>(XHOST.vcat[iext]+" \""+vbroken.at(ibroken)+"\" 2>&1 | grep -c \"Unexpected end of input\" ");
                 if(answer!=0) { ok=FALSE;obb << ". Broken_file="+vbroken.at(ibroken)+".EXT"; }}
             }
           }
         } 
       }
     }
+    //CO20201220 START - look for stress tensor
+    bool check_stensor=true;
+    if(dir.find("ARUN.AEL")!=string::npos||dir.find("ARUN.AGL")!=string::npos){check_stensor=false;}  //do not check stensor for AEL_AGL calculations
+    if(ok && check_stensor) {
+      bool found=false;
+      deque<string> vtokens;
+      deque<double> stensor;
+      for(uint irelax=vrelax.size()-1;irelax<vrelax.size()&&!found;irelax--) {  //go backwards
+        if(vrelax[irelax].find("relax")==string::npos){continue;}
+        for(uint iext=1;iext<XHOST.vext.size()&&!found;iext++) { // SKIP uncompressed
+          if(aurostd::FileExist(dir+"/OUTCAR"+vrelax[irelax]+XHOST.vext[iext])) {
+            found=true;
+            if(LDEBUG){cerr << soliloquy << " looking at most relaxed OUTCAR=" << "OUTCAR"+vrelax[irelax]+XHOST.vext[iext] << endl;}
+            aurostd::string2tokens(aurostd::execute2string(XHOST.vcat[iext]+" \""+dir+"/OUTCAR"+vrelax[irelax]+XHOST.vext[iext]+"\" | grep 'in kB' | tail -1"),vtokens," ");
+            if(vtokens.size()==0){ ok=FALSE;obb << ". error(no stress tensor found)=OUTCAR"+vrelax[irelax]+".EXT";continue; }
+            for(uint i=0;i<vtokens.size();i++){
+              if(aurostd::isfloat(vtokens[i])){stensor.push_back(aurostd::string2utype<double>(vtokens[i]));}
+            }
+            if(LDEBUG){cerr << soliloquy << " stensor=" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(stensor,6),",") << endl;}
+            if(stensor.size()!=6){ ok=FALSE;obb << ". error(stress_tensor.size()==" << stensor.size() << ")=OUTCAR"+vrelax[irelax]+".EXT";continue; }
+            for(uint i=0;i<stensor.size();i++){
+              if(abs(stensor[i])>10){ ok=FALSE;obb << ". error(abs(stress_tensor[i=" << i << "])==" << abs(stensor[i]) << ">10kB)=OUTCAR"+vrelax[irelax]+".EXT";continue; }
+            }
+          }
+        }
+      }
+    }
+    //CO20201220 STOP - look for stress tensor
+
     // DONE
     if(ok==TRUE) obb << " good";
     if(ok==FALSE) obb << " bad";
@@ -6470,12 +6501,15 @@ namespace aflowlib {
     vector<string> dir_tokens;
     aurostd::string2tokens(dir,dir_tokens,"/");
     string run_directory = dir_tokens[dir_tokens.size()-1];
-    string sub_directory = dir+"/"+run_directory;
-    if(aurostd::FileExist(sub_directory)) {
-      obb << "This directory contains an identical subdirectory (subdir=" << sub_directory << "). Removing subdirectory." << endl;
-      oss << obb.str();
-      oss.flush();
-      aurostd::RemoveDirectory(sub_directory);
+    string sub_directory = aurostd::CleanFileName(dir+"/"+run_directory); //CO20201220
+    aurostd::StringSubst(sub_directory,"./","");  //CO20201220
+    if(!sub_directory.empty()&&sub_directory!="."){ //CO20201220
+      if(aurostd::FileExist(sub_directory)) {
+        obb << "This directory contains an identical subdirectory (subdir=" << sub_directory << "). Removing subdirectory." << endl;
+        oss << obb.str();
+        oss.flush();
+        aurostd::RemoveDirectory(sub_directory);
+      }
     }
     //DX+CO20191030 - check for identical subdirectories - END
 

@@ -193,8 +193,9 @@ aflow
    --machine=MACHINE
              MACHINE=duke_beta | beta
                      duke_beta_openmpi | beta_openmpi
-                     duke_qrats  | qrat
+                     duke_qrats  | qrats
                      duke_qflow  | qflow
+                     duke_x  | x
                      duke_materials  | materials
                      duke_aflowlib  | aflowlib 
                      duke_habana  | habana
@@ -286,7 +287,7 @@ similar aflow.in's and you want to add/remove options in a very short time.
 HOST: fix default things for the HOST
 
  [AFLOW_HOST]MACHINE
-  MACHINE=DUKE_BETA | DUKE_BETA_OPENMPI | DUKE_QRATS | DUKE_QFLOW | DUKE_MATERIALS | 
+  MACHINE=DUKE_BETA | DUKE_BETA_OPENMPI | DUKE_QRATS | DUKE_QFLOW | DUKE_X | DUKE_MATERIALS | 
                       DUKE_AFLOWLIB  | DUKE_HABANA | DOD_CONRAD | DOD_ONYX | DOD_GORDON | DOD_COPPER | 
                       DOD_GAFFNEY | DOD_KOEHR | DOD_MUSTANG | DOD_EULER |
                       MPCDF_EOS  | MPCDF_DRACO  | MPCDF_COBRA  | MPCDF_HYDRA  |

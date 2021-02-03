@@ -31,6 +31,10 @@ namespace aflowlib {
   }
   _aflowlib_entry::~_aflowlib_entry() { // destructor PUBLIC
     free();
+
+    data_api.clear();
+    data_source.clear();
+    for(uint i=0;i<vLDAU.size();i++){vLDAU[i].clear();}vLDAU.clear(); //CO20210104 clear()
   }
 
   void _aflowlib_entry::copy(const _aflowlib_entry& b) { // copy PRIVATE
@@ -341,16 +345,14 @@ namespace aflowlib {
     dft_type.clear();vdft_type.clear();
     eentropy_cell=AUROSTD_NAN;eentropy_atom=AUROSTD_NAN;
     Egap=AUROSTD_NAN;Egap_fit=AUROSTD_NAN;
+    Egap_type.clear();
     energy_cell=AUROSTD_NAN;energy_atom=AUROSTD_NAN;energy_atom_relax1=AUROSTD_NAN;
     energy_cutoff=AUROSTD_NAN;
     delta_electronic_energy_convergence=AUROSTD_NAN;
     delta_electronic_energy_threshold=AUROSTD_NAN;
-    nkpoints=0;
-    nkpoints_irreducible=0;
-    kppra=0;
+    nkpoints=0;nkpoints_irreducible=0;kppra=0;
     kpoints.clear();
-    kpoints_nnn_relax.clear();
-    kpoints_nnn_static.clear();
+    kpoints_nnn_relax.clear();kpoints_nnn_static.clear();
     kpoints_pairs.clear();
     kpoints_bands_path_grid=0;
     enthalpy_cell=AUROSTD_NAN;enthalpy_atom=AUROSTD_NAN;
@@ -364,12 +366,11 @@ namespace aflowlib {
     files_RAW.clear();vfiles_RAW.clear();
     files_WEB.clear();vfiles_WEB.clear();
     forces.clear();vforces.clear();
-    Egap_type.clear();
     geometry.clear();vgeometry.clear();
     geometry_orig.clear();vgeometry_orig.clear(); //DX20190124 - add original crystal info
     lattice_system_orig.clear();lattice_variation_orig.clear();lattice_system_relax.clear();lattice_variation_relax.clear();
     ldau_TLUJ.clear();
-    vLDAU.resize(4);  //ME20190129
+    for(uint i=0;i<vLDAU.size();i++){vLDAU[i].clear();}vLDAU.clear(); vLDAU.resize(4);  //ME20190129  //CO20210104 clear()
     natoms=AUROSTD_NAN;
     natoms_orig=AUROSTD_NAN; //DX20190124 - add original crystal info
     nbondxx.clear();vnbondxx.clear();
@@ -403,65 +404,65 @@ namespace aflowlib {
     volume_cell_orig=AUROSTD_NAN;volume_atom_orig=AUROSTD_NAN; //DX20190124 - add original crystal info
     //DX20190124 - added original symmetry info - START
     // SYMMETRY
-    crystal_family_orig="";
-    crystal_system_orig="";
-    crystal_class_orig="";
-    point_group_Hermann_Mauguin_orig="";
-    point_group_Schoenflies_orig="";
-    point_group_orbifold_orig="";
-    point_group_type_orig="";
+    crystal_family_orig.clear();
+    crystal_system_orig.clear();
+    crystal_class_orig.clear();
+    point_group_Hermann_Mauguin_orig.clear();
+    point_group_Schoenflies_orig.clear();
+    point_group_orbifold_orig.clear();
+    point_group_type_orig.clear();
     point_group_order_orig=AUROSTD_NAN;
-    point_group_structure_orig="";
-    Bravais_lattice_lattice_type_orig="";
-    Bravais_lattice_lattice_variation_type_orig="";
-    Bravais_lattice_lattice_system_orig="";
-    Bravais_superlattice_lattice_type_orig="";
-    Bravais_superlattice_lattice_variation_type_orig="";
-    Bravais_superlattice_lattice_system_orig="";
-    Pearson_symbol_superlattice_orig="";
-    reciprocal_lattice_type_orig="";
-    reciprocal_lattice_variation_type_orig="";
+    point_group_structure_orig.clear();
+    Bravais_lattice_lattice_type_orig.clear();
+    Bravais_lattice_lattice_variation_type_orig.clear();
+    Bravais_lattice_lattice_system_orig.clear();
+    Bravais_superlattice_lattice_type_orig.clear();
+    Bravais_superlattice_lattice_variation_type_orig.clear();
+    Bravais_superlattice_lattice_system_orig.clear();
+    Pearson_symbol_superlattice_orig.clear();
     reciprocal_geometry_orig.clear();vreciprocal_geometry_orig.clear();
     reciprocal_volume_cell_orig=AUROSTD_NAN;
-    Wyckoff_letters_orig="";
-    Wyckoff_multiplicities_orig="";
-    Wyckoff_site_symmetries_orig="";
+    reciprocal_lattice_type_orig.clear();
+    reciprocal_lattice_variation_type_orig.clear();
+    Wyckoff_letters_orig.clear();
+    Wyckoff_multiplicities_orig.clear();
+    Wyckoff_site_symmetries_orig.clear();
     //DX20190124 - added original symmetry info - END
     //DX20180823 - added more symmetry info - START
     // SYMMETRY
-    crystal_family="";
-    crystal_system="";
-    crystal_class="";
-    point_group_Hermann_Mauguin="";
-    point_group_Schoenflies="";
-    point_group_orbifold="";
-    point_group_type="";
+    crystal_family.clear();
+    crystal_system.clear();
+    crystal_class.clear();
+    point_group_Hermann_Mauguin.clear();
+    point_group_Schoenflies.clear();
+    point_group_orbifold.clear();
+    point_group_type.clear();
     point_group_order=AUROSTD_NAN;
-    point_group_structure="";
-    Bravais_lattice_lattice_type="";
-    Bravais_lattice_lattice_variation_type="";
-    Bravais_lattice_lattice_system="";
-    Bravais_superlattice_lattice_type="";
-    Bravais_superlattice_lattice_variation_type="";
-    Bravais_superlattice_lattice_system="";
-    Pearson_symbol_superlattice="";
-    reciprocal_lattice_type="";
-    reciprocal_lattice_variation_type="";
+    point_group_structure.clear();
+    Bravais_lattice_lattice_type.clear();
+    Bravais_lattice_lattice_variation_type.clear();
+    Bravais_lattice_lattice_system.clear();
+    Bravais_superlattice_lattice_type.clear();
+    Bravais_superlattice_lattice_variation_type.clear();
+    Bravais_superlattice_lattice_system.clear();
+    Pearson_symbol_superlattice.clear();
     reciprocal_geometry.clear();vreciprocal_geometry.clear();
     reciprocal_volume_cell=AUROSTD_NAN;
-    Wyckoff_letters="";
-    Wyckoff_multiplicities="";
-    Wyckoff_site_symmetries="";
+    reciprocal_lattice_type.clear();
+    reciprocal_lattice_variation_type.clear();
+    Wyckoff_letters.clear();
+    Wyckoff_multiplicities.clear();
+    Wyckoff_site_symmetries.clear();
     //DX20180823 - added more symmetry info - END
     //DX20190209 - added anrl info - START
-    aflow_prototype_label_orig="";
-    aflow_prototype_parameter_list_orig="";
-    aflow_prototype_parameter_values_orig="";
-    aflow_prototype_label_relax="";
-    aflow_prototype_parameter_list_relax="";
-    aflow_prototype_parameter_values_relax="";
+    aflow_prototype_label_orig.clear();
+    aflow_prototype_parameter_list_orig.clear();
+    aflow_prototype_parameter_values_orig.clear();
+    aflow_prototype_label_relax.clear();
+    aflow_prototype_parameter_list_relax.clear();
+    aflow_prototype_parameter_values_relax.clear();
     //DX20190209 - added anrl info - END
-    pocc_parameters=""; //CO20200731
+    pocc_parameters.clear(); //CO20200731
     // AGL/AEL
     agl_thermal_conductivity_300K=AUROSTD_NAN;
     agl_debye=AUROSTD_NAN;
@@ -472,7 +473,7 @@ namespace aflowlib {
     agl_thermal_expansion_300K=AUROSTD_NAN;
     agl_bulk_modulus_static_300K=AUROSTD_NAN;
     agl_bulk_modulus_isothermal_300K=AUROSTD_NAN;
-    agl_poisson_ratio_source=""; //CT20181212
+    agl_poisson_ratio_source.clear(); //CT20181212
     agl_vibrational_free_energy_300K_cell=AUROSTD_NAN; //CT20181212
     agl_vibrational_free_energy_300K_atom=AUROSTD_NAN; //CT20181212
     agl_vibrational_entropy_300K_cell=AUROSTD_NAN; //CT20181212
@@ -521,7 +522,7 @@ namespace aflowlib {
     distance_gnd=AUROSTD_NAN;  // apennsy
     distance_tie=AUROSTD_NAN;  // apennsy
     pureA=FALSE;pureB=FALSE;  // apennsy
-    fcc=FALSE; bcc=FALSE;hcp=FALSE;  // apennsy
+    fcc=FALSE;bcc=FALSE;hcp=FALSE;  // apennsy
     stoich_a=AUROSTD_NAN;stoich_b=AUROSTD_NAN;  // apennsy
     bond_aa=AUROSTD_NAN;bond_ab=AUROSTD_NAN;bond_bb=AUROSTD_NAN;  // apennsy
     vNsgroup.clear();  // apennsy
@@ -3522,13 +3523,17 @@ namespace aflowlib {
 //CO20200624 - CCE corrections
 namespace aflowlib {
   double _aflowlib_entry::enthalpyFormationCell(int T) const { //CO20200624
-    if(T==300 && enthalpy_formation_cce_300K_cell!=AUROSTD_NAN) return enthalpy_formation_cce_300K_cell;
-    if(T==0 && enthalpy_formation_cce_0K_cell!=AUROSTD_NAN) return enthalpy_formation_cce_0K_cell;
+    if(!XHOST.vflag_control.flag("NEGLECT_CCE")){ //CO20210115
+      if(T==300 && enthalpy_formation_cce_300K_cell!=AUROSTD_NAN) return enthalpy_formation_cce_300K_cell;
+      if(T==0 && enthalpy_formation_cce_0K_cell!=AUROSTD_NAN) return enthalpy_formation_cce_0K_cell;
+    }
     return enthalpy_formation_cell;
   }
   double _aflowlib_entry::enthalpyFormationAtom(int T) const { //CO20200624
-    if(T==300 && enthalpy_formation_cce_300K_atom!=AUROSTD_NAN) return enthalpy_formation_cce_300K_atom;
-    if(T==0 && enthalpy_formation_cce_0K_atom!=AUROSTD_NAN) return enthalpy_formation_cce_0K_atom;
+    if(!XHOST.vflag_control.flag("NEGLECT_CCE")){ //CO20210115
+      if(T==300 && enthalpy_formation_cce_300K_atom!=AUROSTD_NAN) return enthalpy_formation_cce_300K_atom;
+      if(T==0 && enthalpy_formation_cce_0K_atom!=AUROSTD_NAN) return enthalpy_formation_cce_0K_atom;
+    }
     return enthalpy_formation_atom;
   }
 }
@@ -3926,6 +3931,51 @@ namespace aflowlib {
     path_full=server+"/"+path;
     return path_full;
   }
+  vector<string> _aflowlib_entry::getSpeciesAURL(ostream& oss){ //CO20200404
+    ofstream FileMESSAGE;
+    return getSpeciesAURL(FileMESSAGE, oss);
+  }
+  vector<string> _aflowlib_entry::getSpeciesAURL(ofstream& FileMESSAGE,ostream& oss){  //CO20200404
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy=XPID+"_aflowlib_entry::getSpeciesAURL():";
+    stringstream message;
+
+    if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
+
+    vector<string> vspecies;
+    if(aurl.empty()){return vspecies;}
+    vector<string> tokens;
+    aurostd::string2tokens(aurl,tokens,":");
+
+    //erase first item (aflowlib.duke.edu), join others, assume we're okay...
+    tokens.erase(tokens.begin());
+    string path=aurostd::joinWDelimiter(tokens,":");
+    if(LDEBUG){cerr << soliloquy << " path=" << path << endl;}
+    
+    //split by /
+    aurostd::string2tokens(path,tokens,"/");
+    if(tokens.size()<4){
+      message << "Odd AURL format for entry " << auid << ": " << aurl;
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, oss, _LOGGER_WARNING_);
+      return vspecies;
+    }
+    string species_string="";
+    if(path.find("_ICSD_")!=string::npos){  //if ICSD: AFLOWDATA/ICSD_WEB/HEX/Te2Zr1_ICSD_653213
+      species_string=tokens[3];
+      string::size_type loc;loc=species_string.find("_ICSD_");
+      species_string=species_string.substr(0,loc);
+    }
+    else{ //otherwise: AFLOWDATA/LIB2_RAW/TeZr_sv/10
+      species_string=tokens[2];
+      //fix LIB1: Zr_sv:PAW_PBE:07Sep2000
+      string::size_type loc;loc=species_string.find(":");
+      species_string=species_string.substr(0,loc);
+    }
+    
+    vspecies=aurostd::getElements(species_string);
+    if(LDEBUG){cerr << soliloquy << " vspecies=" << aurostd::joinWDelimiter(vspecies,",") << endl;}
+    return vspecies;
+  }
 }
 
 // **************************************************************************
@@ -3936,7 +3986,7 @@ namespace aflowlib {
 namespace aflowlib {
   string _aflowlib_entry::POCCdirectory2MetadataAUIDjsonfile(const string& directory,uint salt){  //CO20200624
     //CO20200624 - THIS IS HOW WE CREATE AUID FOR POCC STRUCTURES
-    bool LDEBUG=(TRUE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy=XPID+"_aflowlib_entry::POCCdirectory2MetadataAUIDjsonfile():";
     stringstream message;
 
@@ -4723,6 +4773,7 @@ namespace aflowlib {
       vflags.flag("FLAG::AGL",FALSE);            // will setup later
       vflags.flag("FLAG::AEL",FALSE);            // will setup later
       vflags.flag("FLAG::BADER",FALSE);          // will setup later
+      vflags.flag("FLAG::POCC",FALSE);           // will setup later  //CO20201220
 
       // check if ICSD inside (anyway)
       string lattices[]={"BCC","BCT","CUB","FCC","HEX","MCL","MCLC","ORC","ORCC","ORCF","ORCI","RHL","TET","TRI"};
@@ -5001,6 +5052,8 @@ namespace aflowlib {
         vflags.flag("FLAG::AGL",aurostd::substring2bool(aentry.vloop,"agl"));
         vflags.flag("FLAG::AEL",aurostd::substring2bool(aentry.vloop,"ael"));
         vflags.flag("FLAG::BADER",aurostd::substring2bool(aentry.vloop,"bader"));
+        vflags.flag("FLAG::POCC",aurostd::substring2bool(aentry.vloop,"pocc")); //CO20201220
+        if(vflags.flag("FLAG::POCC")){vflags.flag("FLAG::JMOL",FALSE);} //CO20201220 - no POSCAR/CIF to plot for PARTCAR (yet)
       }
       stringstream aflowlib_json;
       if(vflags.flag("FLAG::FOUND")) {

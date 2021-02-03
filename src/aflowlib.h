@@ -48,8 +48,7 @@ namespace aflowlib {
       const _aflowlib_entry& operator=(const _aflowlib_entry &b); // copy
       // CONTROL
       string entry;vector<string> ventry;                       // ventry split by "|"
-      string auid;                                              // AFLOW UNIQUE IDENTIFIER
-      deque<string> vauid;                                      // AFLOW UNIQUE IDENTIFIER SPLIT
+      string auid;deque<string> vauid;                          // AFLOW UNIQUE IDENTIFIER // AFLOW UNIQUE IDENTIFIER SPLIT
       string aurl;deque<string> vaurl;                          // AFLOW RESEARCH LOCATOR and TOKENS
       string system_name;                                       //ME20190125 - system_name of the calculation
       string keywords;deque<string> vkeywords;                  // keywords inside
@@ -262,9 +261,9 @@ namespace aflowlib {
       vector<uint> vNsgroup;                            // vNsgroups
       vector<string> vsgroup;                           // vsgroups
       vector<xstructure> vstr;                          // vstructures
+      // functions
       bool FixDescription(void);                        // fix description names
       void GetSGROUP(string aflowlibentry);             // disassemble SG
-      // functions
       void clear();                                              // free space
       uint Load(const stringstream& stream,ostream& oss);        // load from stringstream it std is cout
       uint Load(const string& entry,ostream& oss);               // load from string it std is cout
@@ -282,6 +281,8 @@ namespace aflowlib {
       bool ignoreBadDatabase(string& reason) const;                                         //CO20171202 - apennsy fixes
       string getPathAURL(ostream& oss=cout, bool load_from_common=false);                   // converts entry.aurl to url/path (common)
       string getPathAURL(ofstream& FileMESSAGE, ostream& oss, bool load_from_common=false); // converts entry.aurl to url/path (common)
+      vector<string> getSpeciesAURL(ostream& oss);                                          //CO20210201 - extracts species from aurl
+      vector<string> getSpeciesAURL(ofstream& FileMESSAGE,ostream& oss);                    //CO20210201 - extracts species from aurl
     private:                                                     //
       void free();                                               // free space
       void copy(const _aflowlib_entry& b);                       //

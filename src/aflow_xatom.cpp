@@ -1315,10 +1315,14 @@ vector<string> xstructure::GetElementsFromAtomNames(bool clean_name){
 
   string function_name = XPID + "xstructure::GetSpeciesFromAtomName():";
 
-  uint iat=0;
   vector<string> species;
+	if(atoms.size()==0){ return species; }
+	if(!atoms[0].name_is_given) { return species; }
+
+  uint iat=0;
+  string species_tmp = "";
   for(uint i=0;i<num_each_type.size();i++){
-    string species_tmp = atoms[iat].name; //always the first in the species set
+    species_tmp = atoms[iat].name; //always the first in the species set
     for(int j=0;j<num_each_type[i];j++){
       // check all atoms of the same type have the same name
       if(atoms[iat].name!=species_tmp){
@@ -2943,12 +2947,10 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
       oss.unsetf(ios_base::floatfield);
       oss << " "; //<< std::defaultfloat;
       if(a.neg_scale_second){oss << (-1)*a.partial_occupation_HNF;}
-      else {
-        oss << a.partial_occupation_site_tol;
-        if(1||a.scale_third.isentry){  //CO20170803 - stoich tol //always print
-          oss << " "; 
-          oss << a.partial_occupation_stoich_tol;
-        }
+      else{oss << a.partial_occupation_site_tol;}
+      if(1||a.scale_third.isentry){  //CO20170803 - stoich tol //always print
+        oss << " "; 
+        oss << a.partial_occupation_stoich_tol;
       }
       oss << std::fixed;
     }
@@ -16273,10 +16275,11 @@ xstructure input2QExstr(istream& input) {
   return a;
 }
 
-xstructure input2VASPxstr(istream& input) {
+xstructure input2VASPxstr(istream& input,bool vasp5) {  //CO20210119 - added vasp5
   xstructure a(input,IOAFLOW_AUTO);
   //  if(a.iomode==IOQE_AUTO || a.iomode==IOQE_GEOM)
   a.xstructure2vasp();
+  if(vasp5){a.is_vasp4_poscar_format=false;a.is_vasp5_poscar_format=true;}  //CO20210119
   //  cerr << a.title << endl;
   return a;
 }

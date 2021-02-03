@@ -429,6 +429,11 @@ namespace init {
       oss << "MPI_OPTIONS_DUKE_QFLOW_OPENMPI=" << MPI_OPTIONS_DUKE_QFLOW_OPENMPI << "\"" << endl;
       oss << "MPI_COMMAND_DUKE_QFLOW_OPENMPI=" << MPI_COMMAND_DUKE_QFLOW_OPENMPI << "\"" << endl;
       oss << "MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI=" << MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI << "\"" << endl;
+      //CO20201220 X START
+      oss << "MPI_OPTIONS_DUKE_X=" << MPI_OPTIONS_DUKE_X << "\"" << endl;
+      oss << "MPI_COMMAND_DUKE_X=" << MPI_COMMAND_DUKE_X << "\"" << endl;
+      oss << "MPI_BINARY_DIR_DUKE_X=" << MPI_BINARY_DIR_DUKE_X << "\"" << endl;
+      //CO20201220 X STOP
       oss << "MPI_OPTIONS_MPCDF_EOS=" << MPI_OPTIONS_MPCDF_EOS << "\"" << endl;
       oss << "MPI_COMMAND_MPCDF_EOS=" << MPI_COMMAND_MPCDF_EOS << "\"" << endl;
       oss << "MPI_NCPUS_MPCDF_EOS=" << MPI_NCPUS_MPCDF_EOS << "\"" << endl;
@@ -828,6 +833,10 @@ namespace init {
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"ARUNS2SKIP\")=" << XHOST.vflag_control.flag("ARUNS2SKIP") << endl;  //CO20200624
     if(XHOST.vflag_control.flag("ARUNS2SKIP")) XHOST.vflag_control.push_attached("ARUNS2SKIP",aurostd::args2attachedstring(argv,"--aruns2skip=|--arun2skip=","")); //CO20200624
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.getattachedscheme(\"ARUNS2SKIP\")=" << XHOST.vflag_control.getattachedscheme("ARUNS2SKIP") << endl;  //CO20200624
+    XHOST.vflag_control.flag("NEGLECT_CCE",aurostd::args2attachedflag(argv,"--neglect_cce|--no_cce|--neglectcce|--nocce")); //CO20210115
+    if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"NEGLECT_CCE\")=" << XHOST.vflag_control.flag("NEGLECT_CCE") << endl;  //CO20210115
+    XHOST.vflag_control.flag("FORCE_POCC",aurostd::args2attachedflag(argv,"--force_pocc")); //CO20210115
+    if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"FORCE_POCC\")=" << XHOST.vflag_control.flag("FORCE_POCC") << endl;  //CO20210115
 
     // [CT20200320] run full AEL post-processing for POCC
     XHOST.vflag_control.flag("AEL_RUN_POSTPROCESSING",aurostd::args2flag(XHOST.argv,cmds,"--ael_run_postprocessing"));  //CT20200320
@@ -989,6 +998,10 @@ namespace init {
 
     // LOADING ANRL WEB
     XHOST.vflag_control.flag("WWW",aurostd::args2flag(argv,cmds,"--www|--web|--web_mode|--php|--html|-www|-web|-web_mode|-php|-html"));  //CO20200404
+    if(XHOST.user=="www-data"){XHOST.vflag_control.flag("WWW",true);} //CO20201215
+
+    //FANCY_PRINT
+    XHOST.vflag_control.flag("NO_FANCY_PRINT",aurostd::args2flag(argv,cmds,"--no_fancy_print|--nofancyprint"));  //CO20200404
 
     // DEFAULT options
     if(INIT_VERBOSE) oss << "--- DEFAULTSs --- " << endl;

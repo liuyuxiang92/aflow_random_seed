@@ -848,7 +848,7 @@ DEFAULT_CHULL_PERFORM_OUTLIER_ANALYSIS
 DEFAULT_CHULL_OUTLIER_ANALYSIS_COUNT_THRESHOLD_BINARIES
   description: Defines the minimum number of entries for a reliable outlier analysis. Only phases stable with respect to their end-members are considered for the outlier analysis (below the zero H_f tie-line).
   type: integer
-  default: 50
+  default: 75
 
 DEFAULT_CHULL_OUTLIER_MULTIPLIER
   description: Defines the bounds beyond the interquartile range for which points are considered outliers.
@@ -1128,6 +1128,11 @@ POCC_DOSCAR_FILE
   description: Name for ensemble average DOSCAR.
   type: string
   default: "DOSCAR.pocc"
+
+POCC_ANIONS_LIST
+  description: List of elements that could be considered anions.
+  type: string
+  default: "B,C,N,O"
 
 ####################################################################################################
 DEFAULTS APL
@@ -1797,6 +1802,21 @@ MPI_COMMAND_DUKE_QFLOW_OPENMPI
 
 MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI
   description: MPI executable directory for --machine=qflow.
+  type: string
+  default: "/home/bin/"
+
+MPI_OPTIONS_DUKE_X
+  description: MPI options for --machine=x.
+  type: string
+  default: "ulimit -s unlimited "
+
+MPI_COMMAND_DUKE_X
+  description: MPI command for --machine=x.
+  type: string
+  default: "mpirun -n"
+
+MPI_BINARY_DIR_DUKE_X
+  description: MPI executable directory for --machine=x.
   type: string
   default: "/home/bin/"
 

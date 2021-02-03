@@ -1484,7 +1484,7 @@ class xstructure {
     void MakeBasis(void);                                         // make basis for atoms (basis and number)
     void MakeTypes(void);                                         // refresh types based on num_each_type  //CO20180420
     void AddAtom(const _atom& atom,bool check_present=true);      // adding an atom
-    void AddAtom(const deque<_atom>& atom,bool check_present=true);// adding a deque<_atom> //DX20210201
+    void AddAtom(const deque<_atom>& atom,bool check_present=true);// adding a deque<_atom> //CO20210129 //DX20210201
     void AddAtom_POCC(const _atom& atom);                         // adding an atom FOR POCC ONLY
     void RemoveAtom(const uint& iat);                             // deleting an atom (index)
     void RemoveAtom(vector<uint>& v_atoms_to_remove);             // deleting many atoms (indices)
@@ -1562,7 +1562,7 @@ class xstructure {
     void DecorateWithFakeElements(void);                          // Decorate with fake elements - useful for prototypes //DX20200727
     vector<string> GetElements(bool clean_name=false,
         bool fake_names=false);                                   //DX20200724
-    vector<string> GetElementsFromAtomNames(bool clean_name);     //DX20200724
+    vector<string> GetElementsFromAtomNames(bool clean_name=true);//DX20200724
     vector<uint> GetReducedComposition(bool numerical_sort=false);//DX20200724
     string platon2sg(bool P_EQUAL=DEFAULT_PLATON_P_EQUAL,
         bool P_EXACT=DEFAULT_PLATON_P_EXACT,
@@ -2536,7 +2536,7 @@ xvector<double> r_lattice(const xstructure& str,const xvector<int>& ijk);
 xstructure input2AIMSxstr(istream& input);
 xstructure input2ABINITxstr(istream& input);
 xstructure input2QExstr(istream& input);
-xstructure input2VASPxstr(istream& input);
+xstructure input2VASPxstr(istream& input,bool vasp5=false);
 xstructure input2ELKxstr(istream& input); //DX20200313
 
 // ----------------------------------------------------------------------------
@@ -2962,7 +2962,7 @@ namespace KBIN {
   bool VASP_Run(_xvasp &xvasp,_aflags &aflags,_kflags &kflags,_vflags &vflags,string relaxA,string relaxB,bool qmwrite,ofstream &FileMESSAGE);
   bool VASP_Run(_xvasp &xvasp,_aflags &aflags,_kflags &kflags,_vflags &vflags,string relaxA,bool qmwrite,ofstream &FileMESSAGE);
   bool VASP_RunFinished(_xvasp &xvasp,_aflags &aflags,ofstream &FileMESSAGE,bool=FALSE);
-  void WaitFinished(_xvasp &xvasp,_aflags &aflags,ofstream &FileMESSAGE,uint max_count=AUROSTD_MAX_UINT,bool=FALSE);
+  void WaitFinished(_xvasp &xvasp,_aflags &aflags,ofstream &FileMESSAGE,uint max_count=AUROSTD_MAX_UINT,bool=FALSE);  //CO20201220 - added max_count
   void VASP_Error(_xvasp &xvasp,string="",string="",string="");
   void VASP_Error(_xvasp &xvasp,ofstream &FileMESSAGE,string="",string="",string="");
   string VASP_Analyze(_xvasp &xvasp,bool qmwrite);

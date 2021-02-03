@@ -314,7 +314,8 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     vpflow.flag("CHULL::INCLUDE_SKEWED_HULLS",aurostd::args2flag(argv,cmds,"--include_skewed_hulls|--include_skewed|--ish"));    //use entropic temperature instead of enthalpy of formation
     vpflow.flag("CHULL::INCLUDE_UNRELIABLE_HULLS",aurostd::args2flag(argv,cmds,"--include_unreliable_hulls|--include_unreliable|--iuh"));    //use entropic temperature instead of enthalpy of formation
     vpflow.flag("CHULL::INCLUDE_OUTLIERS",aurostd::args2flag(argv,cmds,"--include_outliers|--io"));    //use entropic temperature instead of enthalpy of formation
-    vpflow.flag("CHULL::FORCE_OUTLIERS",aurostd::args2flag(argv,cmds,"--force_outliers|--fo"));
+    //[CO20210105 - OBSOLETE]vpflow.flag("CHULL::FORCE_OUTLIERS",aurostd::args2flag(argv,cmds,"--force_outliers|--fo"));
+    vpflow.flag("CHULL::STRICT_OUTLIER_ANALYSIS",aurostd::args2flag(argv,cmds,"--strict_outlier_analysis|--soa"));
     vpflow.flag("CHULL::INCLUDE_ILL_CONVERGED",aurostd::args2flag(argv,cmds,"--include_ill_converged|--iic"));    //use entropic temperature instead of enthalpy of formation
     vpflow.flag("CHULL::LATEX_OUTPUT",aurostd::args2flag(argv,cmds,"--latex_output|--latexoutput"));    //verbose latex output (cout and FileMESSAGE)
     vpflow.flag("CHULL::LATEX_INTERACTIVE",aurostd::args2flag(argv,cmds,"--latex_interactive|--latexinteractive"));  //interact with latex (execute vs. execute2string)
@@ -346,6 +347,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
           vpflow.flag("CHULL::WEB_DOC",TRUE);     //turn on
           //[WSCHMITT20190620 - stability criterion error otherwise for Pd1]vpflow.flag("CHULL::SKIP_STRUCTURE_COMPARISON",TRUE); //the app cannot handle more than one g-state in the visualization
           vpflow.flag("FORCE",TRUE); //just include everything!
+          XHOST.vflag_control.flag("WWW",true); //CO20201215
           //vpflow.flag("CHULL::INCLUDE_UNRELIABLE",TRUE); //we include colors on the website
         } else if(out_form.at(0)=='L'||(out_form.at(0)=='P'&&out_form!="PNG")||out_form=="PDF"){    //Latex or Pdf
           vpflow.flag("CHULL::LATEX_DOC",TRUE);   //turn on default
@@ -360,11 +362,12 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     vpflow.args2addattachedscheme(argv,cmds,"CHULL::STABILITY_CRITERION","--stability_criterion=|--stabilitycriterion=|--stable_criterion=|--scriterion=|--sc=",""); //calculate stable criterion for point
     vpflow.args2addattachedscheme(argv,cmds,"CHULL::N+1_ENTHALPY_GAIN","--n+1_enthalpy_gain=|--n+1_energy_gain=|--n+1enthalpygain=|--n+1energygain=|--n+1egain=|--n1egain=|--n+1_enthalpygain=|--n+1+energygain=|--n+1_egain=",""); //calculate stable criterion for point
     vpflow.flag("CHULL::CALCULATE_FAKE_HULL_N+1_ENTHALPY_GAIN",aurostd::args2flag(argv,cmds,"--fake_hull_np1eg")); //SK20200325 - skip all n-dimensional points and calculate new hull
+    vpflow.flag("CHULL::CALCULATE_HIGHEST_DIMENSION_ONLY",aurostd::args2flag(argv,cmds,"--calculate_highest_dimension_only|--calc_ND_only")); //CO20210407
     vpflow.args2addattachedscheme(argv,cmds,"CHULL::HULL_FORMATION_ENTHALPY","--hull_formation_enthalpy=|--hull_energy=",""); //calculate stable criterion for point
     if(vpflow.flag("CHULL::STABILITY_CRITERION")||vpflow.flag("CHULL::N+1_ENTHALPY_GAIN")||vpflow.flag("CHULL::HULL_FORMATION_ENTHALPY")){
       //vpflow.flag("CHULL::TEXT_DOC",FALSE);   //turn off  //leave on, as user might request json/text format output
       //vpflow.flag("CHULL::JSON_DOC",FALSE);   //turn off  //leave on, as user might request json/text format output
-      vpflow.flag("CHULL::WEB_DOC",FALSE);    //turn off
+      //[CO20210201 - chull-web SS plotter]vpflow.flag("CHULL::WEB_DOC",FALSE);    //turn off
       vpflow.flag("CHULL::LATEX_DOC",FALSE);  //turn off
     }
     if(vpflow.flag("CHULL::LATEX_DOC")||vpflow.flag("CHULL::PNG_IMAGE")) {   //latex specific options
@@ -1323,7 +1326,8 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.args2addattachedscheme(argv,cmds,"DBPATCHFILES","--patchfiles=","");
 
   //DX20180710 - we do not want to run if the flag was used in proto - vpflow.flag("VASP",aurostd::args2flag(argv,cmds,"--vasp"));
-  vpflow.flag("VASP",aurostd::args2flag(argv,cmds,"--vasp") && !vpflow.flag("PROTO_AFLOW") && !vpflow.flag("PROTO")); //DX20180710 - check if used in proto
+  vpflow.flag("VASP",aurostd::args2flag(argv,cmds,"--vasp|--vasp4") && !vpflow.flag("PROTO_AFLOW") && !vpflow.flag("PROTO")); //DX20180710 - check if used in proto //CO20210119 - added vasp4
+  vpflow.flag("VASP5",aurostd::args2flag(argv,cmds,"--vasp5") && !vpflow.flag("PROTO_AFLOW") && !vpflow.flag("PROTO")); //DX20180710 - check if used in proto //CO20210119 - added vasp5
 
   //ME20200330
   vpflow.flag("VISUALIZE_PHONONS", aurostd::args2flag(argv,cmds,"--visualize_phonons"));
@@ -1958,7 +1962,7 @@ namespace pflow {
       // U
       if(vpflow.flag("UFFENERGY")) {pocc::UFFENERGY(cin); _PROGRAMRUN=true;}
       // V
-      if(vpflow.flag("VASP")) {cout << input2VASPxstr(cin); _PROGRAMRUN=true;}
+      if(vpflow.flag("VASP")||vpflow.flag("VASP5")) {cout << input2VASPxstr(cin,vpflow.flag("VASP5")); _PROGRAMRUN=true;} //added bool for vasp5
       if(vpflow.flag("VISUALIZE_PHONONS")) {apl::createAtomicDisplacementSceneFile(vpflow); _PROGRAMRUN=true;} //ME20200330
       if(vpflow.flag("VOLUME::EQUAL")) {cout << pflow::VOLUME("VOLUME::EQUAL,"+vpflow.getattachedscheme("VOLUME::EQUAL"),cin); _PROGRAMRUN=true;} 
       if(vpflow.flag("VOLUME::MULTIPLY_EQUAL")) {cout << pflow::VOLUME("VOLUME::MULTIPLY_EQUAL,"+vpflow.getattachedscheme("VOLUME::MULTIPLY_EQUAL"),cin); _PROGRAMRUN=true;} 
@@ -2289,6 +2293,7 @@ namespace pflow {
     strstream << tab << xspaces << " " << "              --include_skewed_hulls|--include_skewed|--ish" << endl;
     strstream << tab << xspaces << " " << "              --include_unreliable_hulls|--include_unreliable|--iuh" << endl;
     strstream << tab << xspaces << " " << "              --include_outliers|--io" << endl;
+    strstream << tab << xspaces << " " << "              --strict_outlier_analysis|--soa" << endl;
     strstream << tab << xspaces << " " << "              --include_ill_converged|--iic" << endl;
     strstream << tab << xspaces << " " << "              --force" << endl;
     strstream << endl;
@@ -9818,6 +9823,9 @@ namespace pflow {
       return false;
     }
 
+    vector<string> vspecies=entry.vspecies;
+    if(vspecies.empty()){vspecies=entry.getSpeciesAURL(FileMESSAGE,oss);}
+
     xstructure xstrAux;
     stringstream ss;
     vector<string> files;
@@ -9848,9 +9856,15 @@ namespace pflow {
          !aurostd::EWithinList(files,"CONTCAR.relax",efile) &&
          TRUE)
       ) {
-      message << "path=" << path << " missing structure files. Ignoring entry";
-      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, oss, _LOGGER_WARNING_);
-      return false;
+      if(entry.prototype.find("POCC")!=string::npos){ //POCC entries have no composition
+        message << "path=" << path << " is a POCC-structure and has no structure files. Ignoring entry";
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+        return false;
+      }else{
+        message << "path=" << path << " missing structure files. Ignoring entry";
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, oss, _LOGGER_WARNING_);
+        return false;
+      }
     }
     if (!relaxed_only) {
       //////////////////////////////////////////////////////////////////////////
@@ -9864,7 +9878,15 @@ namespace pflow {
           if ( (is_url_path ? 
                 aurostd::eurl2stringstream(path+"/"+efile,ss,false) : 
                 aurostd::efile2stringstream(path+"/"+efile,ss)) ) {
-            try{ xstrAux = xstructure(ss, IOVASP_AUTO); structure_files.push_back(poscar_files_orig[i]); } //DX20191210 - added try-catch //DX20200224 - added structure_files tag
+            try{ 
+              xstrAux = xstructure(ss, IOVASP_AUTO);
+              if(xstrAux.GetElementsFromAtomNames().size()==0){
+                if(vspecies.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"could not extract species from AURL",_INPUT_ERROR_);}
+                xstrAux.SetSpecies(aurostd::vector2deque(vspecies));
+              }
+              if(LDEBUG){cerr << soliloquy << " xstrAux=" << endl;cerr << xstrAux << endl;}
+              structure_files.push_back(poscar_files_orig[i]); 
+            } //DX20191210 - added try-catch //DX20200224 - added structure_files tag
             catch(aurostd::xerror& excpt) { 
               xstrAux.clear(); //clear it if it is garbage //DX20191220 - uppercase to lowercase clear
               message << poscar_files_orig[i] << ": Path exists, but could not load structure (e.g., URL timeout or bad structure file)."; 
@@ -9896,7 +9918,15 @@ namespace pflow {
           if ( (is_url_path ? 
                 aurostd::eurl2stringstream(path+"/"+efile,ss,false) : 
                 aurostd::efile2stringstream(path+"/"+efile,ss)) ) {
-            try{ xstrAux = xstructure(ss, IOVASP_AUTO); structure_files.push_back(poscar_files_relax_mid[i]); } //DX20191210 - added try-catch //DX20200224 - added structure_files tag
+            try{ 
+              xstrAux = xstructure(ss, IOVASP_AUTO); 
+              if(xstrAux.GetElementsFromAtomNames().size()==0){
+                if(vspecies.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"could not extract species from AURL",_INPUT_ERROR_);}
+                xstrAux.SetSpecies(aurostd::vector2deque(vspecies));
+              }
+              if(LDEBUG){cerr << soliloquy << " xstrAux=" << endl;cerr << xstrAux << endl;}
+              structure_files.push_back(poscar_files_relax_mid[i]); 
+            } //DX20191210 - added try-catch //DX20200224 - added structure_files tag
             catch(aurostd::xerror& excpt) { 
               xstrAux.clear(); //clear it if it is garbage //DX20191220 - uppercase to lowercase clear
               message << poscar_files_relax_mid[i] << ": Path exists, but could not load structure (e.g., URL timeout or bad structure file)."; 
@@ -9929,7 +9959,15 @@ namespace pflow {
         if ( (is_url_path ? 
               aurostd::eurl2stringstream(path+"/"+efile,ss,false) : 
               aurostd::efile2stringstream(path+"/"+efile,ss)) ) {
-          try{ xstrAux = xstructure(ss, IOVASP_AUTO); structure_files.push_back(poscar_files_relax_final[i]); } //DX20191210 - added try-catch //DX20200224 - added structure_files tag
+          try{ 
+            xstrAux = xstructure(ss, IOVASP_AUTO); 
+            if(xstrAux.GetElementsFromAtomNames().size()==0){
+              if(vspecies.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"could not extract species from AURL",_INPUT_ERROR_);}
+              xstrAux.SetSpecies(aurostd::vector2deque(vspecies));
+            }
+            if(LDEBUG){cerr << soliloquy << " xstrAux=" << endl;cerr << xstrAux << endl;}
+            structure_files.push_back(poscar_files_relax_final[i]); 
+          } //DX20191210 - added try-catch //DX20200224 - added structure_files tag
           catch(aurostd::xerror& excpt) { 
             xstrAux.clear(); //clear it if it is garbage //DX20191220 - uppercase to lowercase clear
             message << poscar_files_relax_final[i] << ": Path exists, but could not load structure (e.g., URL timeout or bad structure file)."; 
@@ -11658,6 +11696,50 @@ namespace pflow {
 // ***************************************************************************
 // ./aflow --proto=T0009.ABC:Br:Cl:Cs_sv:I:Pb_d:Sm --pocc_params=S0-1xC_S1-0.5xE-0.5xF_S2-0.3333xA-0.3333xB-0.3333xD
 namespace pflow {
+  bool checkAnionSublattice(const xstructure& xstr){  //CO20210201
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy=XPID+"pflow::checkAnionSublattice():";
+    vector<string> vanions;aurostd::string2tokens(POCC_ANIONS_LIST,vanions,",");
+    vector<vector<string> > voccupants;
+    vector<xvector<double> > vsites;  //cpos
+    vector<bool> vanions_found;
+    uint i=0,j=0;
+    bool found=false;
+    for(i=0;i<xstr.atoms.size();i++){
+      found=false;
+      for(j=0;j<voccupants.size()&&!found;j++){
+        if(aurostd::modulus(vsites[j]-xstr.atoms[i].cpos)<_AFLOW_POCC_ZERO_TOL_){
+          if(!aurostd::WithinList(voccupants[j],xstr.atoms[i].cleanname)){
+            voccupants[j].push_back(xstr.atoms[i].cleanname);
+            if(aurostd::WithinList(vanions,xstr.atoms[i].cleanname)){vanions_found[j]=true;}
+            found=true;
+          }
+        }
+      }
+      if(!found){
+        vsites.push_back(xstr.atoms[i].cpos);
+        voccupants.push_back(vector<string>(0));
+        voccupants.back().push_back(xstr.atoms[i].cleanname);
+        vanions_found.push_back(aurostd::WithinList(vanions,xstr.atoms[i].cleanname));
+      }
+    }
+    if(vsites.size()!=voccupants.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"vsites.size()!=voccupants.size()",_RUNTIME_ERROR_);}
+    if(vsites.size()!=vanions_found.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"vsites.size()!=vanions_found.size()",_RUNTIME_ERROR_);}
+    if(LDEBUG){
+      for(j=0;j<voccupants.size();j++){cerr << soliloquy << " site=" << j << " occupants=" << aurostd::joinWDelimiter(voccupants[j],",") << " [ANIONS_SUBLATTICE=" << vanions_found[j] << "]" << endl;}
+    }
+    for(j=0;j<voccupants.size();j++){
+      if(vanions_found[j]){
+        for(i=0;i<voccupants[j].size();i++){
+          if(!aurostd::WithinList(vanions,voccupants[j][i])){
+            if(LDEBUG){cerr << soliloquy << " found non-anion in anion_sublattice: " << voccupants[j][i] << endl;}
+            return false;
+          }
+        }
+      }
+    }
+    return true;
+  }
   bool convertXStr2POCC(xstructure& xstr,const string& pocc_params,const vector<string>& _vspecies,const vector<double>& vvolumes){ //CO20181226
     if(pocc_params.empty()){return false;}
     vector<string> vspecies;
@@ -12175,6 +12257,11 @@ namespace pflow {
       pflow::FIX_POCC_PARAMS(str,pocc_parameters);
       convertXStr2POCC(str,pocc_parameters,vstr_orig,vnum_orig);
       setPOCCTOL(str,pocc_tol);
+      if(!pflow::checkAnionSublattice(str)){ //CO20210201
+        if(!XHOST.vflag_control.flag("FORCE_POCC")){
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Found non-anion in anion sublattice. Please check (and run with --force_pocc).",_VALUE_ILLEGAL_);
+        }
+      }
     }
 
     if(LDEBUG) for(uint i=0;i<str.species.size();i++) if(str.species.at(i)!="") cerr << "DEBUG specie(" << i << ")=" << str.species.at(i) << endl;
