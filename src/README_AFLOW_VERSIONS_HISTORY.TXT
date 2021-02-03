@@ -56,6 +56,8 @@
         -- added foldAtomsInCell() and SetNumEachType() in-place-modification overloads (DX)
         -- removed obsolete neighbor variables/functions, e.g., removed AFLOW_NEIGHBORS keywords in aflow.in (not used), removed unused xstructure neighbor attributes, removed aflow_neighbours.cpp (DX)
         -- implemented new on-the-fly threading scheme into AAPL (ME)
+        -- Fixed bug with assignment of normal and umklapp processes for phase space calculations. (ME)
+        -- Added bounds to inCell() function. (ME)
 3.2.6 - 2020/12/30
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.6.tar.xz
         -- Bibtex for publications - aflowlib.h aflowlib_web_outreach.cpp (SC)
