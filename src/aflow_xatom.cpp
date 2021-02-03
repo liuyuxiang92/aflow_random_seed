@@ -1315,10 +1315,14 @@ vector<string> xstructure::GetElementsFromAtomNames(bool clean_name){
 
   string function_name = XPID + "xstructure::GetSpeciesFromAtomName():";
 
-  uint iat=0;
   vector<string> species;
+	if(atoms.size()==0){ return species; }
+	if(!atoms[0].name_is_given) { return species; }
+
+  uint iat=0;
+  string species_tmp = "";
   for(uint i=0;i<num_each_type.size();i++){
-    string species_tmp = atoms[iat].name; //always the first in the species set
+    species_tmp = atoms[iat].name; //always the first in the species set
     for(int j=0;j<num_each_type[i];j++){
       // check all atoms of the same type have the same name
       if(atoms[iat].name!=species_tmp){
