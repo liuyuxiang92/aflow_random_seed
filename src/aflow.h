@@ -4728,6 +4728,7 @@ namespace xelement {
       xelement();                                                     // default, just allocate
       xelement(uint Z,int oxidation_state=AUROSTD_MAX_INT);           // look at it by Z
       xelement(const string&,int oxidation_state=AUROSTD_MAX_INT);    // look at it by symbol or name  //CO20200520
+      xelement(const xelement& b);                                    //CO20210201 copy
       ~xelement();                                                    // kill everything
       const xelement& operator=(const xelement &b);                   // copy
       void clear();

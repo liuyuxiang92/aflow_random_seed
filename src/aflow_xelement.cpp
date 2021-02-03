@@ -720,6 +720,7 @@ namespace xelement {
 
   xelement::xelement(const string& element,int oxidation_state) {free();populate(element,oxidation_state);}  //CO20200520
   xelement::xelement(uint ZZ,int oxidation_state) {free();populate(ZZ,oxidation_state);} //CO20200520
+  xelement::xelement(const xelement& b){copy(b);} //CO20210201
 
   string xelement::getPropertyStringVector(const string& property,const string& delim,uint ncols) const { //CO20201111
     string c=aurostd::toupper(property);
