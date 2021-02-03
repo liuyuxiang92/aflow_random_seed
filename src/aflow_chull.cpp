@@ -3848,7 +3848,7 @@ namespace chull {
       message << "Not enough degrees of freedom for outlier detection analysis per interquartile-range (count=" << energies.rows << " < " << iqr_count_threshold << ")";
       if(m_cflags.flag("FAKE_HULL")){aurostd::StringstreamClean(message);}  //don't want to see these errors, they are expected
       else if(m_cflags.flag("CHULL::STRICT_OUTLIER_ANALYSIS")&&(!m_cflags.flag("FORCE"))){
-        message << " (results may not be reliable). Terminating hull analysis.";throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);
+        message << " (results may not be reliable). Terminating hull analysis.";throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_RANGE_);
       } else {
         message << ", skipping outlier analysis.";pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
       }
@@ -4014,7 +4014,7 @@ namespace chull {
         message << "Not enough degrees of freedom for outlier detection analysis per user defined threshold (count=" << points_to_consider.size() << " < " << binaries_half_hull_threshold << ")";
         if(m_cflags.flag("FAKE_HULL")){aurostd::StringstreamClean(message);}  //don't want to see these errors, they are expected
         else if(m_cflags.flag("CHULL::STRICT_OUTLIER_ANALYSIS")&&(!m_cflags.flag("FORCE"))){
-          message << " (results may not be reliable). Terminating hull analysis.";throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);
+          message << " (results may not be reliable). Terminating hull analysis.";throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_RANGE_);
         } else {
           message << ", skipping outlier analysis.";pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
         }
@@ -5677,7 +5677,7 @@ namespace chull {
     if(m_coord_groups[i_coord_group].m_nearest_facet>m_facets.size()-1){setNearestFacet(i_nary,i_alloy,i_coord_group);}
     
     if(m_coord_groups[i_coord_group].m_is_on_hull){
-      if(!isViablePoint(m_coord_groups[i_coord_group].m_hull_member)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No hull member set for m_coord_group["+aurostd::utype2string(i_coord_group)+"]");}
+      if(!isViablePoint(m_coord_groups[i_coord_group].m_hull_member)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No hull member set for m_coord_group["+aurostd::utype2string(i_coord_group)+"]",_RUNTIME_ERROR_);}
       vector<uint> dcomp_phases;dcomp_phases.push_back(m_coord_groups[i_coord_group].m_hull_member);
       m_coord_groups[i_coord_group].m_decomp_phases=dcomp_phases;
       return;
