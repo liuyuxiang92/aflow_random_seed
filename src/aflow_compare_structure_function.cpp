@@ -1125,6 +1125,7 @@ void XtalFinderCalculator::setStructureAsRepresentative(StructurePrototype& stru
   structure_tmp.stoichiometry = structure_tmp.structure_representative->stoichiometry;
   structure_tmp.natoms = structure_tmp.structure_representative->structure.atoms.size();
   structure_tmp.ntypes = structure_tmp.structure_representative->structure.num_each_type.size();
+  structure_tmp.elements = structure_tmp.structure_representative->elements;
 
   // update symmetry and environment info
   structure_tmp.Pearson = structure_tmp.structure_representative->Pearson;
@@ -3835,14 +3836,7 @@ vector<StructurePrototype> XtalFinderCalculator::groupStructurePrototypes(
 
         if(!same_species){
           for(uint e=0;e<structure_containers[i].elements.size();e++){
-            bool already_in=false;
-            for(uint f=0;f<comparison_schemes[j].elements.size();f++){
-              if(structure_containers[i].elements[e]==comparison_schemes[j].elements[f]){
-                already_in=true;
-                break;
-              }
-            }
-            if(!already_in){
+            if(!aurostd::WithinList(comparison_schemes[j].elements,structure_containers[i].elements[e])){
               comparison_schemes[j].elements.push_back(structure_containers[i].elements[e]);
             }
           }
