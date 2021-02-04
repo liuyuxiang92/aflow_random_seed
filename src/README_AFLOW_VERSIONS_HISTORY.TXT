@@ -1,4 +1,4 @@
-3.2.7 - 2020/02/04
+3.2.7 - 2021/02/04
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.7.tar.xz
         -- Added additional AEL and AGL properties to the AFLOW schema. (ME)
         -- implemented new on-the-fly threading scheme into AAPL (ME)
