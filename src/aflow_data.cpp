@@ -101,8 +101,8 @@ extern std::string README_AFLOW_AFLOWRC_TXT;
 
 // LINKED #include "aflow_data_latex.cpp"  // created automatically
 extern std::string f144468a7ccc2d3a72ba44000715efdb;
-extern std::string d0f1b0e47f178ae627a388d3bf65d2d2;
-extern std::string decf00ca3ad2fe494eea8e543e929068;
+// [OBSOLETE] extern std::string d0f1b0e47f178ae627a388d3bf65d2d2;
+// [OBSOLETE] extern std::string decf00ca3ad2fe494eea8e543e929068;
 
 // LINKED #include "aflow_data_aflow_potcars.cpp"  // created automatically
 extern bool AFLOW_PSEUDOPOTENTIALS;
@@ -282,8 +282,8 @@ int main(int _argc,char **_argv) {
       cout << aurostd::PaddedPOST("AFLOW_PSEUDOPOTENTIALS_TXT",40) << " size=" << aurostd::PaddedPOST(aurostd::utype2string(AFLOW_PSEUDOPOTENTIALS_TXT.size()),10) << "lines=" << aurostd::string2vectorstring(AFLOW_PSEUDOPOTENTIALS_TXT,vtemp) << "       BASE64" << endl;
       cout << aurostd::PaddedPOST("AFLOW_PSEUDOPOTENTIALS_LIST_TXT",40) << " size=" << aurostd::PaddedPOST(aurostd::utype2string(AFLOW_PSEUDOPOTENTIALS_LIST_TXT.size()),10) << "lines=" << aurostd::string2vectorstring(AFLOW_PSEUDOPOTENTIALS_LIST_TXT,vtemp) << endl;
       cout << aurostd::PaddedPOST("f144468a7ccc2d3a72ba44000715efdb",40) << " size=" << aurostd::PaddedPOST(aurostd::utype2string(f144468a7ccc2d3a72ba44000715efdb.size()),10) << "lines=" << aurostd::string2vectorstring(f144468a7ccc2d3a72ba44000715efdb,vtemp) << endl;
-      cout << aurostd::PaddedPOST("d0f1b0e47f178ae627a388d3bf65d2d2",40) << " size=" << aurostd::PaddedPOST(aurostd::utype2string(d0f1b0e47f178ae627a388d3bf65d2d2.size()),10) << "lines=" << aurostd::string2vectorstring(d0f1b0e47f178ae627a388d3bf65d2d2,vtemp) << endl;
-      cout << aurostd::PaddedPOST("decf00ca3ad2fe494eea8e543e929068",40) << " size=" << aurostd::PaddedPOST(aurostd::utype2string(decf00ca3ad2fe494eea8e543e929068.size()),10) << "lines=" << aurostd::string2vectorstring(decf00ca3ad2fe494eea8e543e929068,vtemp) << endl;
+// [OBSOLETE]       cout << aurostd::PaddedPOST("d0f1b0e47f178ae627a388d3bf65d2d2",40) << " size=" << aurostd::PaddedPOST(aurostd::utype2string(d0f1b0e47f178ae627a388d3bf65d2d2.size()),10) << "lines=" << aurostd::string2vectorstring(d0f1b0e47f178ae627a388d3bf65d2d2,vtemp) << endl;
+// [OBSOLETE]       cout << aurostd::PaddedPOST("decf00ca3ad2fe494eea8e543e929068",40) << " size=" << aurostd::PaddedPOST(aurostd::utype2string(decf00ca3ad2fe494eea8e543e929068.size()),10) << "lines=" << aurostd::string2vectorstring(decf00ca3ad2fe494eea8e543e929068,vtemp) << endl;
 
 #ifdef ICSD
       cout << aurostd::PaddedPOST("amir_natan_icsd_1_ary",40) << " size=" << aurostd::PaddedPOST(aurostd::utype2string(icsd_1_ary.size()),10) << "lines=" << aurostd::string2vectorstring(icsd_1_ary,vtemp) << endl;
@@ -471,8 +471,8 @@ int main(int _argc,char **_argv) {
     //      std::string base64Decoder(std::string const& encoded_string);
 
     if(!found && argvi=="f144468a7ccc2d3a72ba44000715efdb") {found=TRUE;pstr=&f144468a7ccc2d3a72ba44000715efdb;} // << endl;
-    if(!found && argvi=="d0f1b0e47f178ae627a388d3bf65d2d2") {found=TRUE;pstr=&d0f1b0e47f178ae627a388d3bf65d2d2;} // << endl;
-    if(!found && argvi=="decf00ca3ad2fe494eea8e543e929068") {found=TRUE;pstr=&decf00ca3ad2fe494eea8e543e929068;} // << endl;
+// [OBSOLETE]     if(!found && argvi=="d0f1b0e47f178ae627a388d3bf65d2d2") {found=TRUE;pstr=&d0f1b0e47f178ae627a388d3bf65d2d2;} // << endl;
+// [OBSOLETE]     if(!found && argvi=="decf00ca3ad2fe494eea8e543e929068") {found=TRUE;pstr=&decf00ca3ad2fe494eea8e543e929068;} // << endl;
 #ifdef ICSD
     if(!found && argvi=="amir_natan_icsd_1_ary") {found=TRUE;pstr=&icsd_1_ary;} // << endl;
     if(!found && argvi=="amir_natan_icsd_2_ary") {found=TRUE;pstr=&icsd_2_ary;} // << endl;

@@ -5260,9 +5260,9 @@ namespace aurostd {
     string out=str;
     aurostd::StringSubst(out,"_","\\_");
     aurostd::StringSubst(out,"<sub>","$_{");aurostd::StringSubst(out,"</sub>","}$");
-    aurostd::StringSubst(out,"<i>","{\\it ");aurostd::StringSubst(out,"</i>","}");
-    aurostd::StringSubst(out,"<b>","{\\bf "); aurostd::StringSubst(out,"</b>","}");
-    aurostd::StringSubst(out,"<blink>","{\\bf "); aurostd::StringSubst(out,"</blink>","}");
+    aurostd::StringSubst(out,"<i>","\\textit{");aurostd::StringSubst(out,"</i>","}");
+    aurostd::StringSubst(out,"<b>","\\textbf{"); aurostd::StringSubst(out,"</b>","}");
+    aurostd::StringSubst(out,"<blink>","\\textbf{"); aurostd::StringSubst(out,"</blink>","}");
     aurostd::StringSubst(out,"MgB2","MgB$_2$");
     aurostd::StringSubst(out,"Schuttler","Sch\\\"uttler");
     aurostd::StringSubst(out,"Csányi","Cs\\'anyi");aurostd::StringSubst(out,"Csanyi","Cs\\'anyi");
@@ -5417,8 +5417,8 @@ namespace aurostd {
     aurostd::StringSubst(out,"\\&","&");
     aurostd::StringSubst(out,"MgB$_2$","MgB<sub>2</sub>");
     //  aurostd::StringSubst(out,"<sub>","$_{");aurostd::StringSubst(out,"</sub>","}$");
-    //  aurostd::StringSubst(out,"<i>","{\\it ");aurostd::StringSubst(out,"</i>","}");
-    // aurostd::StringSubst(out,"<b>","{\\bf "); aurostd::StringSubst(out,"</b>","}");
+    //  aurostd::StringSubst(out,"<i>","\\textit{");aurostd::StringSubst(out,"</i>","}");
+    // aurostd::StringSubst(out,"<b>","\\textbf{"); aurostd::StringSubst(out,"</b>","}");
     // aurostd::StringSubst(out,"&","\\&");
     //  aurostd::StringSubst(out,"Schuttler","Sch\\\"uttler");
     //  aurostd::StringSubst(out,"Csányi","Cs\\'anyi");aurostd::StringSubst(out,"Csanyi","Cs\\'anyi");
