@@ -32,10 +32,10 @@ namespace aurostd {
 #define _INDEX_MISMATCH_      43
 #define _RUNTIME_ERROR_       50
 #define _RUNTIME_INIT_        51
-#define _RUNTIME_EXTERNAL_MISS_     52 //CO20200531
-#define _RUNTIME_EXTERNAL_FAIL_     53 //CO20200531
-#define _RUNTIME_SQL_         54
-#define _RUNTIME_BUSY_        55
+#define _RUNTIME_SQL_         52
+#define _RUNTIME_BUSY_        53
+#define _RUNTIME_EXTERNAL_MISS_     54 //CO20200531
+#define _RUNTIME_EXTERNAL_FAIL_     55 //CO20200531
 #define _ALLOC_ERROR_         60
 #define _ALLOC_ALLOCATE_      61
 #define _ALLOC_INSUFFICIENT_  62

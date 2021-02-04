@@ -1450,10 +1450,10 @@ namespace aflow {
       oss << "       43                              mismatch                           _INDEX_MISMATCH_          " << endl;
       oss << "       50       Runtime Error          generic                            _RUNTIME_ERROR_           " << endl;
       oss << "       51                              not initialized                    _RUNTIME_INIT_            " << endl;
-      oss << "       52                              external command not found         _RUNTIME_EXTERNAL_MISS_   " << endl;  //CO20200531
-      oss << "       53                              external command failed            _RUNTIME_EXTERNAL_FAIL_   " << endl;  //CO20200531
-      oss << "       54                              SQL error                          _RUNTIME_SQL_             " << endl;
-      oss << "       55                              busy                               _RUNTIME_BUSY_            " << endl;
+      oss << "       52                              SQL error                          _RUNTIME_SQL_             " << endl;
+      oss << "       53                              busy                               _RUNTIME_BUSY_            " << endl;
+      oss << "       54                              external command not found         _RUNTIME_EXTERNAL_MISS_   " << endl;  //CO20200531
+      oss << "       55                              external command failed            _RUNTIME_EXTERNAL_FAIL_   " << endl;  //CO20200531
       oss << "       60       Allocation Error       generic                            _ALLOC_ERROR_             " << endl;
       oss << "       61                              could not allocate memory          _ALLOC_ALLOCATE_          " << endl;
       oss << "       62                              insufficient memory                _ALLOC_INSUFFICIENT_      " << endl;

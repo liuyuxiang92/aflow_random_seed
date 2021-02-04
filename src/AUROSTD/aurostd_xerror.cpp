@@ -34,7 +34,7 @@ namespace aurostd {
     {"file not found", "wrong format", "file corrupt", "", "", "", "", "", ""},
     {"illegal value", "out of range", "", "", "", "", "", "", ""},
     {"illegal value", "out of bounds", "mismatch", "", "", "", "", "", ""},
-    {"not initialized", "external command not found", "external command failed", "SQL error", "busy", "", "", "", ""}, //CO20200531
+    {"not initialized", "SQL error", "busy", "external command not found", "external command failed", "", "", "", ""}, //CO20200531
     {"could not allocate", "insufficient memory", "", "", "", "", "", "", ""}};
 
   //Constructors////////////////////////////////////////////////////////////////
