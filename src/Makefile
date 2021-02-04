@@ -23,7 +23,7 @@
 #
 # ***************************************************************************
 
-VERSNUMBER=3.2.3
+VERSNUMBER=3.2.7
 
 # MAKEFILE FOR AFLOW3
 # FOR FROZSL -lmkl_lapack95_ilp64 -lmkl_core -lmkl_intel_lp64 -lmkl_sequential
@@ -144,6 +144,9 @@ SQLITE_OBJ=$(SQLITE_C:.c=.o)
 #MAKEFILES=Makefile Makefile.aflow	#CO20200508 - special makefile variable, DO NOT USE
 MFS=Makefile Makefile.aflow
 
+#for incrementing within a recipe
+COUNTER_FILE=.aflow_counter
+
 #CO20200508 - all MUST come first
 #CO20200508 - .PHONY rules do NOT get 'Makefile' as dependence
 .PHONY: all
@@ -166,7 +169,7 @@ static_no_pdf: aflow aflow_data
 #	[CO20200513 - KEEP rm command in case we do 'make -j' first]
 	rm -rf $(SQLITE_OBJ) aflow aflow_data
 	$(MAKE) LIBS_AFLOW="$(LIBS_AFLOW_STATIC)" FLAGS_STATIC_POST="$(FLAGS_STATIC)"
-#	$(CC) -DSQLITE_ENABLE_JSON1 -c $(SQLITE_C) $(LIBS) $(FLAGS_STATIC)	#CO190401 - $(LIBS) -lpthreads not needed, issues with clang++ (mac)
+#	$(CC) -DSQLITE_ENABLE_JSON1 -c $(SQLITE_C) $(LIBS) $(FLAGS_STATIC)	#CO20190401 - $(LIBS) -lpthreads not needed, issues with clang++ (mac)
 #	$(MAKE) $(SQLITE_OBJ) FLAGS_STATIC_POST="$(FLAGS_STATIC)"
 #	rm -f aflow
 #	$(MAKE) aflow LIBS_AFLOW="$(LIBS_AFLOW_STATIC)"
@@ -194,7 +197,7 @@ $(SQLITE_OBJ): $(SQLITE_C) Makefile
 	$(CC) $(SQLITE_OPTS) -c $< -o $@ $(FLAGS_STATIC_POST)
 #	$(CC) -DSQLITE_ENABLE_JSON1 -DSQLITE_OMIT_LOAD_EXTENSION -o $@ -c $< $(LIBS)	#-DSQLITE_OMIT_LOAD_EXTENSION doesn't really work amalgamation
 #	$(CC) -DSQLITE_ENABLE_JSON1 -o $@ -c $< $(LIBS)
-#	$(CC) -DSQLITE_ENABLE_JSON1 -c $< $(LIBS)	#CO190401 - $(LIBS) -lpthreads not needed, issues with clang++ (mac)
+#	$(CC) -DSQLITE_ENABLE_JSON1 -c $< $(LIBS)	#CO20190401 - $(LIBS) -lpthreads not needed, issues with clang++ (mac)
 #	$(CC) $(SQLITE_OPTS) -c $<
 #	cp sqlite3.o ./SQLITE/
 #CO20200508 - catch all rule
@@ -205,6 +208,26 @@ $(SQLITE_OBJ): $(SQLITE_C) Makefile
 %.o: %.cpp Makefile
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
 #	touch $@
+###################################################################################################
+# commands to cut/paste to generate stuff SC20200601
+pseudo: 
+	rm -f aflow_xpseudopotentials_data.cpp
+	touch aflow_xpseudopotentials.cpp aflow_xpseudopotentials_data.cpp
+	make -j
+	rm -f aflow_xpseudopotentials_data.cpp
+	./aflow --scrub=POTCAR --FILE `find /common/VASP/pot_LDA/ -name POTCAR |sort ` >> aflow_xpseudopotentials_data.cpp
+	./aflow --scrub=POTCAR --FILE `find /common/VASP/pot_GGA/ -name POTCAR |sort ` >> aflow_xpseudopotentials_data.cpp
+	./aflow --scrub=POTCAR --FILE `find /common/VASP/potpaw_LDA/ -name POTCAR |sort ` >> aflow_xpseudopotentials_data.cpp
+	./aflow --scrub=POTCAR --FILE `find /common/VASP/potpaw_GGA/ -name POTCAR |sort ` >> aflow_xpseudopotentials_data.cpp
+	./aflow --scrub=POTCAR --FILE `find /common/VASP/potpaw_PBE/ -name POTCAR |sort ` >> aflow_xpseudopotentials_data.cpp
+	./aflow --scrub=POTCAR --FILE `find /common/VASP/potpaw_LDA.54/ -name POTCAR |sort ` >> aflow_xpseudopotentials_data.cpp
+	./aflow --scrub=POTCAR --FILE `find /common/VASP/potpaw_PBE.54/ -name POTCAR |sort ` >> aflow_xpseudopotentials_data.cpp
+	touch aflow_xpseudopotentials.cpp aflow_xpseudopotentials_data.cpp
+	# subst "/common/VASP/" "" aflow_xpseudopotentials_data.cpp
+	cat aflow_xpseudopotentials_data.cpp | grep -c TITEL
+	cat aflow_xpseudopotentials_data.cpp | grep structure | grep -v N/A | wc
+	make -j
+
 ###################################################################################################
 .PHONY: extra
 extra:	findsym frozsl apl2agr platon subst
@@ -529,12 +552,6 @@ aflow_data_latex.cpp: Makefile
 	echo "std::string f144468a7ccc2d3a72ba44000715efdb=\"\\" >> $@
 	if [ -f ../AFLOW3_NONFREE/EXTRA/LATEX/f144468a7ccc2d3a72ba44000715efdb ]; then cat ../AFLOW3_NONFREE/EXTRA/LATEX/f144468a7ccc2d3a72ba44000715efdb* | perl -p -e 's/\\/\\\\/g' | perl -p -e 's/\"/\\\"/g' | perl -p -e 's/\n/ \\n\\\n/g' >> $@ ; fi
 	echo "\";" >> $@
-	echo "std::string d0f1b0e47f178ae627a388d3bf65d2d2=\"\\" >> $@
-	if [ -f ../AFLOW3_NONFREE/EXTRA/LATEX/d0f1b0e47f178ae627a388d3bf65d2d2 ]; then cat ../AFLOW3_NONFREE/EXTRA/LATEX/d0f1b0e47f178ae627a388d3bf65d2d2 | perl -p -e 's/\\/\\\\/g' | perl -p -e 's/\"/\\\"/g' | perl -p -e 's/\n/ \\n\\\n/g' >> $@ ; fi
-	echo "\";" >> $@
-	echo "std::string decf00ca3ad2fe494eea8e543e929068=\"\\" >> $@
-	if [ -f ../AFLOW3_NONFREE/EXTRA/LATEX/decf00ca3ad2fe494eea8e543e929068 ]; then cat ../AFLOW3_NONFREE/EXTRA/LATEX/decf00ca3ad2fe494eea8e543e929068 | perl -p -e 's/\\/\\\\/g' | perl -p -e 's/\"/\\\"/g' | perl -p -e 's/\n/ \\n\\\n/g' >> $@ ; fi
-	echo "\";" >> $@
 	echo "#endif // _AFLOW_DATA_LATEX_CPP_" >> $@
 aflow_data_readme.cpp: README_AFLOW_LICENSE_GPL3.TXT README_AFLOW_ACONVASP.TXT README_AFLOW_APL.TXT README_AFLOW_QHA_SCQHA_QHA3P.TXT README_AFLOW_AGL.TXT README_AFLOW_AEL.TXT README_AFLOW_POCC.TXT README_AFLOW_ANRL.TXT README_AFLOW_COMPARE.TXT README_AFLOW_GFA.TXT README_AFLOW.TXT README_PROTO.TXT README_AFLOW_APENNSY.TXT README_AFLOW_FROZSL.TXT README_AFLOW_SCRIPTING.TXT README_AFLOW_SYM.TXT README_AFLOW_CCE.TXT README_AFLOW_CHULL.TXT README_AFLOW_XAFLOW.TXT README_AFLOW_AFLOWRC.TXT README_AFLOW_EXCEPTIONS.TXT README_CONTRIBS.TXT README_AFLOW_VERSIONS_HISTORY.TXT Makefile
 	rm -rf $@
@@ -731,7 +748,7 @@ aflowlib_webapp_bands.cpp: aflowlib_webapp_bands.js Makefile
 	echo "\";" >> $@
 	echo "#endif // _AFLOWLIB_WEBAPP_BANDS_CPP_" >> $@
 #CO20180305 - END
-#MB 190301 - START
+#MB20190301 - START
 aflow_chull_jupyter.cpp: aflow_chull_jupyter.json Makefile
 	rm -rf $@
 	echo "#ifndef _AFLOW_CHULL_JUPYTER_CPP_" >> $@
@@ -741,8 +758,8 @@ aflow_chull_jupyter.cpp: aflow_chull_jupyter.json Makefile
 	cat $< | perl -p -e 's/\r//g' | perl -p -e 's/\\n/\\\\n/g' | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\"/\\"/g' >> $@	
 	echo "\";" >> $@
 	echo "#endif // _AFLOW_CHULL_JUPYTER_CPP_" >> $@
-#MB 190301 - END
-#MB 190301 - START
+#MB20190301 - END
+#MB20190301 - START
 aflow_chull_jupyter_plotter.cpp: aflow_chull_jupyter_plotter.py Makefile
 	rm -rf $@
 	echo "#ifndef _AFLOW_CHULL_JUPYTER_PLOTTER_CPP_" >> $@
@@ -752,8 +769,8 @@ aflow_chull_jupyter_plotter.cpp: aflow_chull_jupyter_plotter.py Makefile
 	cat $< | perl -p -e 's/\r//g' | perl -p -e 's/\\d/\\\\d/g' | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\"/\\"/g' >> $@
 	echo "\";" >> $@
 	echo "#endif // _AFLOW_CHULL_JUPYTER_PLOTTER_CPP_" >> $@
-#MB 190301 - END
-#MB 190301 - START
+#MB20190301 - END
+#MB20190301 - START
 aflow_chull_jupyter_requirements.cpp: aflow_chull_jupyter_requirements.txt Makefile
 	rm -rf $@
 	echo "#ifndef _AFLOW_CHULL_JUPYTER_REQUIREMENTS_CPP_" >> $@
@@ -763,8 +780,8 @@ aflow_chull_jupyter_requirements.cpp: aflow_chull_jupyter_requirements.txt Makef
 	cat $< | perl -p -e 's/\r//g' | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\"/\\"/g' >> $@
 	echo "\";" >> $@
 	echo "#endif // _AFLOW_CHULL_JUPYTER_REQUIREMENTS_CPP_" >> $@
-#MB 190301 - END
-#MB 190301 - START
+#MB20190301 - END
+#MB20190301 - START
 aflow_chull_python.cpp: aflow_chull_python.py Makefile
 	rm -rf $@
 	echo "#ifndef _AFLOW_CHULL_PYTHON_CPP_" >> $@
@@ -774,7 +791,40 @@ aflow_chull_python.cpp: aflow_chull_python.py Makefile
 	cat $< | perl -p -e 's/\r//g' | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\"/\\"/g' >> $@
 	echo "\";" >> $@
 	echo "#endif // _AFLOW_CHULL_PYTHON_CPP_" >> $@
-#MB 190301 - END
+#MB20190301 - END
+#CO20201105 - START
+aflow_cce_python.cpp: aflow_cce_python.py Makefile
+	rm -rf $@
+	echo "#ifndef _AFLOW_CCE_PYTHON_CPP_" >> $@
+	echo "#define _AFLOW_CCE_PYTHON_CPP_" >> $@
+	echo "// $@ automatic generated" >> $@
+	echo "std::string AFLOW_CCE_PYTHON_PY=\"\\" >> $@
+	cat $< | perl -p -e 's/\r//g' | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\"/\\"/g' >> $@
+	echo "\";" >> $@
+	echo "#endif // _AFLOW_CCE_PYTHON_CPP_" >> $@
+#CO20201105 - END
+#DX20201228 - START
+aflow_sym_python.cpp: aflow_sym_python.py Makefile
+	rm -rf $@
+	echo "#ifndef _AFLOW_SYM_PYTHON_CPP_" >> $@
+	echo "#define _AFLOW_SYM_PYTHON_CPP_" >> $@
+	echo "// $@ automatically generated" >> $@
+	echo "std::string AFLOW_SYM_PYTHON_PY=\"\\" >> $@
+	cat $< | perl -p -e 's/\r//g' | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\"/\\"/g' >> $@
+	echo "\";" >> $@
+	echo "#endif // _AFLOW_SYM_PYTHON_CPP_" >> $@
+#DX20201228 - END
+#DX20201228 - START
+aflow_xtalfinder_python.cpp: aflow_xtalfinder_python.py Makefile
+	rm -rf $@
+	echo "#ifndef _AFLOW_XTALFINDER_PYTHON_CPP_" >> $@
+	echo "#define _AFLOW_XTALFINDER_PYTHON_CPP_" >> $@
+	echo "// $@ automatically generated" >> $@
+	echo "std::string AFLOW_XTALFINDER_PYTHON_PY=\"\\" >> $@
+	cat $< | perl -p -e 's/\r//g' | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\"/\\"/g' >> $@
+	echo "\";" >> $@
+	echo "#endif // _AFLOW_XTALFINDER_PYTHON_CPP_" >> $@
+#DX20201228 - END
 aflow_mix_nomix_table.cpp: Makefile $(AFLOW_HPPS) $(AUROSTD_HPPS)
 	rm -rf nomix.tmp
 	find $(PROJECT_DIRECTORY_GNDSTATE)/NOMIX/ -name aflow.in | sed "s/\/common\/$(PROJECT_DIRECTORY_GNDSTATE)\/NOMIX\/LIB2\/LIB\///g" | sed "s/aflow.in//g" >> nomix.tmp
@@ -859,7 +909,7 @@ backup: realclean clean icsdclean
 	if [ -f $(EXTRA_FREE)/GUS/Makefile ]; then $(MAKE) -C $(EXTRA_FREE)/GUS realclean ; fi
 	mkdir -p aflow.$(VERSNUMBER)
 #	mkdir -p aflow.$(VERSNUMBER)/SOURCES
-	cp -drvf a*cpp a*.h *.js *.json *.py *.txt README* Makefile* APL* ANRL* AUROSTD* SQLITE* aflow.$(VERSNUMBER)
+	cp -drvf a*cpp a*.h *.js *.json *.py *.txt README* Makefile* APL* ANRL* AUROSTD* SQLITE* SYMBOLICCPLUSPLUS* aflow.$(VERSNUMBER)
 # no EXTRA in SRC	if [ -d $(EXTRA_FREE) ]; then cp -drvf $(EXTRA_FREE) aflow.$(VERSNUMBER) ; fi
 	if [ -d SOURCE ]; then cp -drvf SOURCE aflow.$(VERSNUMBER) ; fi
 	tar Jcfvp aflow.$(VERSNUMBER).tar.xz aflow.$(VERSNUMBER)
@@ -872,7 +922,7 @@ www:	web
 .PHONY: web
 web:	realclean
 	rm -rvf aflow3.tar.xz aflow_test.tar.xz aflow3 ~/aflow3.tar.xz ~/aflow_test.tar.xz ~/aflow3
-	tar Jcfvp ~/aflow3.tar.xz Makefile* *cpp *.h *.js *.json *.py *.txt READ* APL* ANRL* AUROSTD* SQLITE*
+	tar Jcfvp ~/aflow3.tar.xz Makefile* *cpp *.h *.js *.json *.py *.txt READ* APL* ANRL* AUROSTD* SQLITE* SYMBOLICCPLUSPLUS*
 # no EXTRA IN SRC	if [ -d $(EXTRA_FREE) ]; then tar Jcfvp ~/aflow3.tar.xz Makefile *cpp *.h *.js *.json *.py *.txt READ* APL ANRL* AUROSTD SQLITE $(EXTRA_FREE) ; fi
 # no other SOURCES in SRC	if [ -d SOURCES ]; then tar Jcfvp ~/aflow3.tar.xz Makefile *cpp *.h *.js *.json *.py *.txt READ* APL ANRL* AUROSTD SQLITE $(EXTRA_FREE) SOURCES ; fi
 	if [ -d /www/AFLOW ]; then cp README_AFLOW.TXT /www/AFLOW ; fi
@@ -930,9 +980,9 @@ patch_makefile2: Makefile
 ###################################################################################################
 .PHONY: clean
 clean:
-	rm -rf *~ *.o *.o-* *.rpo AUROSTD/*~ AUROSTD/*.o AUROSTD/*.rpo ./APL/*~ ./APL/*o ./APL/*a ./ANRL/*~ ./ANRL/*o ./ANRL/*a ./ANRL*/*~ ./ANRL*/*o ./ANRL*/*a ./SQLITE/*o aflow aflow_data aflowd aflow2 aflowd2 aflow1 aflowd1 aflow.exe aconvasp apennsy aflow_convasp* *.eps *.pdf *ps *aux *dvi *log *m *tex nohup* core* VASP_TEST* GRND_TEST* xa xb xc xd xe xf aflow.out* core* *~ \#* *.o aflow_pennsy *.eps *.pdf *ps *aux *dvi *log *m *tex *exe aurostd_xtensor_extra.cpp aflow_data_*cpp xaflowauto boo* xlist* _xdat `find . -name *~`
+	rm -rf *~ *.o *.o-* *.rpo AUROSTD/*~ AUROSTD/*.o AUROSTD/*.rpo ./APL/*~ ./APL/*o ./APL/*a ./ANRL/*~ ./ANRL/*o ./ANRL/*a ./ANRL*/*~ ./ANRL*/*o ./ANRL*/*a ./SQLITE/*o SYMBOLICCPLUSPLUS/*~ SYMBOLICCPLUSPLUS/*.o aflow aflow_data aflowd aflow2 aflowd2 aflow1 aflowd1 aflow.exe aconvasp apennsy aflow_convasp* *.eps *.pdf *ps *aux *dvi *log *m *tex nohup* core* VASP_TEST* GRND_TEST* xa xb xc xd xe xf aflow.out* core* *~ \#* *.o aflow_pennsy *.eps *.pdf *ps *aux *dvi *log *m *tex *exe aurostd_xtensor_extra.cpp aflow_data_*cpp xaflowauto boo* xlist* _xdat `find . -name *~`
 	rm -rfv `find . -name "LOCK*" | grep -v TESTS | grep -v SOURCES` *.out aflow.rasmol.xyz* aflow_potcar.cpp aflow_xpotcar.cpp aflow3.tar.xz ./AFLOWDATA ./LIBRARY* *html *toc *m *.jpg *.gif *.png
-	rm -rfv ./APL/*~ ./ANRL/*~ ./ANRL*/*~ ./SQLITE/*~ ../AFLOW3_NONFREE/BIN/* ./EXTRA/GUS/*~ ./EXTRA/GUS/*.o 
+	rm -rfv ./APL/*~ ./ANRL/*~ ./ANRL*/*~ ./SQLITE/*~ ./SYMBOLICCPLUSPLUS/*~ ../AFLOW3_NONFREE/BIN/* ./EXTRA/GUS/*~ ./EXTRA/GUS/*.o
 .PHONY: realclean
 realclean: clean
 	$(MAKE) clean_autogen
@@ -945,9 +995,15 @@ realclean: clean
 .PHONY: dataclean
 dataclean:
 	rm -f aflow_data aflow_data_*
+datainstall:
+	rm -f aflow_data aflow_data_*
+	make data
+	cp -f aflow_data $(BIN)/
+	ls -las $(BIN)/aflow_data*
+redata: datainstall
 .PHONY: clean_autogen
 clean_autogen:
-	rm -rf aflowlib_webapp_entry.cpp aflowlib_webapp_bands.cpp aflow_chull_jupyter.cpp aflow_chull_jupyter_plotter.cpp aflow_chull_python.cpp aflow_chull_jupyter_requirements.cpp aflow_data_readme.cpp aflow_readme_aflow.cpp aflow_readme_aconvasp.cpp aflow_readme_apennsy.cpp aflow_readme_proto.cpp aflow_xproto_icsd_lib.cpp aflow_matlab_funcs.cpp aflow_gnuplot_funcs.cpp aflow_data_*cpp *.dat
+	rm -rf aflowlib_webapp_entry.cpp aflowlib_webapp_bands.cpp aflow_chull_jupyter.cpp aflow_chull_jupyter_plotter.cpp aflow_chull_python.cpp aflow_chull_jupyter_requirements.cpp aflow_cce_python.cpp aflow_sym_python.cpp aflow_xtalfinder_python.cpp aflow_data_readme.cpp aflow_readme_aflow.cpp aflow_readme_aconvasp.cpp aflow_readme_apennsy.cpp aflow_readme_proto.cpp aflow_xproto_icsd_lib.cpp aflow_matlab_funcs.cpp aflow_gnuplot_funcs.cpp aflow_data_*cpp *.dat
 ###################################################################################################
 
 ###################################################################################################
@@ -1058,7 +1114,7 @@ vasp:	all
 
 ###################################################################################################
 #EMAIL VERSION UPDATES
-#CO190131 - START
+#CO20190131 - START
 .PHONY: send_version_updates_email
 send_version_updates_email:
 	rm -f version_updates_email.txt
@@ -1066,8 +1122,8 @@ send_version_updates_email:
 	[ -s version_updates_email.txt ]
 	cat version_updates_email.txt | mail -r aflow@materials.duke.edu -s "AFLOW Code Update: v$(VERSNUMBER)" aflow+int+737+2740356048620877160@groups.io
 	rm -f version_updates_email.txt
-#CO190131 - STOP
-#CO190218 - START
+#CO20190131 - STOP
+#CO20190218 - START
 version_updates_email.txt: README_AFLOW_VERSIONS_HISTORY.TXT Makefile
 	rm -f $(@:.txt=_tmp.txt)
 	@file_content=""; \
@@ -1084,7 +1140,7 @@ version_updates_email.txt: README_AFLOW_VERSIONS_HISTORY.TXT Makefile
 			file_content="$$line"; \
 		fi; \
 	done < README_AFLOW_VERSIONS_HISTORY.TXT; \
-	line_count=$$(echo $$file_content | wc -l); \
+	line_count=$$(echo $$file_content | wc -l | sed 's/^ *//'); \
 	IFS=; \
 	file_content=$$(echo $$file_content | head -n $$(( $$line_count - 1 ))); \
 	if [ -z "$$file_content" ]; then echo "ERROR - No relevant version content found. Exiting."; exit 1; fi; \
@@ -1099,7 +1155,7 @@ version_updates_email.txt: README_AFLOW_VERSIONS_HISTORY.TXT Makefile
 	echo "" >> $@
 	echo "Thanks," >> $@
 	echo "AFLOW Dev" >> $@
-#CO190218 - STOP
+#CO20190218 - STOP
 ###################################################################################################
 
 ###################################################################################################
@@ -1109,16 +1165,21 @@ check:
 	$(MAKE) check_proto
 .PHONY: check_full
 check_full:
+	$(MAKE) check_CeramGen
 	#[WAITING FOR ICSD LIB2RAW REDO]$(MAKE) check_Egap
+	$(MAKE) check_aflow_exits
 	$(MAKE) check_gcd
 	$(MAKE) check_smith
+	$(MAKE) check_coordination
 	$(MAKE) check_proto
 	$(MAKE) check_slab
 	$(MAKE) check_chull
 	$(MAKE) check_aflowSG
 	$(MAKE) check_AFLOWSYM
 	$(MAKE) check_edata
-	$(MAKE) check_aflow_xtal_match
+	$(MAKE) check_aflow_xtal_finder
+	$(MAKE) check_fold_atoms_in_cell_routine
+	$(MAKE) check_prototype_generator
 	$(MAKE) check_aflow_gcc_compatibility
 	$(MAKE) check_cce
 	$(MAKE) check_pocc
@@ -1138,221 +1199,418 @@ check_proto:
 #	./aflow --checki | grep FAIL
 .PHONY: check_Egap
 check_Egap:
+	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
 	./aflow --Egap_test
+.PHONY: check_CeramGen
+check_CeramGen:
+	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
+	./aflow --CeramGen_test
 .PHONY: check_gcd
 check_gcd:
+	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
 	./aflow --gcd_test
 .PHONY: check_smith
 check_smith:
+	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
 	./aflow --smith_test
+.PHONY: check_coordination
+check_coordination:
+	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
+	./aflow --coordination_test
 .PHONY: check_slab
 check_slab:
+	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
 	./aflow --slab_test
 .PHONY: check_chull
 check_chull:
-	@echo "Running CHULL test 1 - stability criterion of Mn2PdPt" && ANSWER="32." && SC=$$(./aflow --chull --alloy=MnPdPt --sc=aflow:fb9eaa58604ce774 --screen_only --o=t | cut -d' ' -f2) && \
-		if [ -z "$$SC" ]; then echo "CHULL did not return a stability criterion, the REST-API may be down, please check  './aflow --chull --alloy=MnPdPt --sc=aflow:fb9eaa58604ce774 --screen_only --o=t'" && exit 0; fi && \
-		if [ -n "$${SC##$$ANSWER*}" ]; then echo "CHULL did not return a stability criterion of ~$$(echo $$ANSWER + 0 | bc) meV/atom for Mn2PdPt './aflow --chull --alloy=MnPdPt --sc=aflow:fb9eaa58604ce774 --screen_only --o=t', found $$SC instead" && exit 1; fi
+	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
+	@rm -f $(COUNTER_FILE) && echo "STARTING CHULL" >> $(COUNTER_FILE)
+	@ALLOY="MnPd" && COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running CHULL test $$COUNTER - text/json output files for $$ALLOY" | tee -a $(COUNTER_FILE) && COMMAND="./aflow --chull --alloy=$$ALLOY --o=j,t" RESPONSE=$$(eval "$$COMMAND") && \
+		if [ -z "$${RESPONSE##*REST-API appears to be down*}" ]; then echo "CHULL did not return text/json output files, the REST-API may be down, please check '$$COMMAND'" && exit 0; fi && \
+		if [ ! -f "aflow_$${ALLOY}_hull.json" ] || [ ! -f "aflow_$${ALLOY}_hull.txt" ]; then echo "CHULL did not return $$ALLOY text/json output files. Try: '$$COMMAND'" && exit 1; fi && \
+		rm -f aflow_$${ALLOY}_hull.json aflow_$${ALLOY}_hull.txt
+#travis does not have pdflatex
+	@ALLOY="MnPd" && if [ -z "$$TRAVIS" ]; then COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running CHULL test $$COUNTER - PDF output for $$ALLOY" | tee -a $(COUNTER_FILE) && COMMAND="./aflow --chull --alloy=$$ALLOY --o=p" RESPONSE=$$(eval "$$COMMAND") && \
+		if [ -z "$${RESPONSE##*REST-API appears to be down*}" ]; then echo "CHULL did not return a PDF, the REST-API may be down, please check '$$COMMAND'" && exit 0; fi && \
+		if [ ! -f "aflow_$${ALLOY}_hull.pdf" ]; then echo "CHULL did not return a PDF for $$ALLOY. Try: '$$COMMAND'" && exit 1; fi && \
+		rm -f aflow_$${ALLOY}_hull.pdf; fi
+	@ALLOY="AgAuCd" && COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running CHULL test $$COUNTER - text/json output files for $$ALLOY" | tee -a $(COUNTER_FILE) && COMMAND="./aflow --chull --alloy=$$ALLOY --o=j,t" RESPONSE=$$(eval "$$COMMAND") && \
+		if [ -z "$${RESPONSE##*REST-API appears to be down*}" ]; then echo "CHULL did not return text/json output files, the REST-API may be down, please check '$$COMMAND'" && exit 0; fi && \
+		if [ ! -f "aflow_$${ALLOY}_hull.json" ] || [ ! -f "aflow_$${ALLOY}_hull.txt" ]; then echo "CHULL did not return $$ALLOY text/json output files. Try: '$$COMMAND'" && exit 1; fi && \
+		rm -f aflow_$${ALLOY}_hull.json aflow_$${ALLOY}_hull.txt
+#travis does not have pdflatex
+	@ALLOY="AgAuCd" && if [ -z "$$TRAVIS" ]; then COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running CHULL test $$COUNTER - PDF output for $$ALLOY" | tee -a $(COUNTER_FILE) && COMMAND="./aflow --chull --alloy=$$ALLOY --o=p" RESPONSE=$$(eval "$$COMMAND") && \
+		if [ -z "$${RESPONSE##*REST-API appears to be down*}" ]; then echo "CHULL did not return a PDF, the REST-API may be down, please check '$$COMMAND'" && exit 0; fi && \
+		if [ ! -f "aflow_$${ALLOY}_hull.pdf" ]; then echo "CHULL did not return a PDF for $$ALLOY. Try: '$$COMMAND'" && exit 1; fi && \
+		rm -f aflow_$${ALLOY}_hull.pdf; fi
+	@ALLOY="AlCo" && COMPOUND="Al17Co12" && COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running CHULL test $$COUNTER - distance from hull of $$COMPOUND" | tee -a $(COUNTER_FILE) && ANSWER="242." && COMMAND="./aflow --chull --alloy=$$ALLOY --d2h=aflow:ef70a469857d3c47" RESPONSE=$$(eval "$$COMMAND --screen_only --o=t" | cut -d' ' -f2) && \
+		if [ -z "$$RESPONSE" ]; then echo "CHULL did not return a distance, the REST-API may be down, please check '$$COMMAND'" && exit 0; fi && \
+		if [ -n "$${RESPONSE##$$ANSWER*}" ]; then echo "CHULL did not return a distance of ~$$(echo $$ANSWER + 0 | bc) meV/atom for $$COMPOUND, found $$RESPONSE instead. Try: '$$COMMAND'" && exit 1; fi
+	@ALLOY="MnPd" && COMPOUND="Mn2Pd3" && COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running CHULL test $$COUNTER - distance from hull of $$COMPOUND" | tee -a $(COUNTER_FILE) && ANSWER="62." && COMMAND="./aflow --chull --alloy=$$ALLOY --d2h=aflow:9001c322296fc162" RESPONSE=$$(eval "$$COMMAND --screen_only --o=t" | cut -d' ' -f2) && \
+		if [ -z "$$RESPONSE" ]; then echo "CHULL did not return a distance, the REST-API may be down, please check '$$COMMAND'" && exit 0; fi && \
+		if [ -n "$${RESPONSE##$$ANSWER*}" ]; then echo "CHULL did not return a distance of ~$$(echo $$ANSWER + 0 | bc) meV/atom for $$COMPOUND, found $$RESPONSE instead. Try: '$$COMMAND'" && exit 1; fi
+	@ALLOY="TeZr" && COMPOUND="Te2Zr" && COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running CHULL test $$COUNTER - stability criterion of $$COMPOUND" | tee -a $(COUNTER_FILE) && ANSWER="49." && COMMAND="./aflow --chull --alloy=$$ALLOY --sc=aflow:570e80d4daa0a9d4" && RESPONSE=$$(eval "$$COMMAND --screen_only --o=t" | cut -d' ' -f2) && \
+		if [ -z "$$RESPONSE" ]; then echo "CHULL did not return a stability criterion, the REST-API may be down, please check '$$COMMAND'" && exit 0; fi && \
+		if [ -n "$${RESPONSE##$$ANSWER*}" ]; then echo "CHULL did not return a stability criterion of ~$$(echo $$ANSWER + 0 | bc) meV/atom for $$COMPOUND, found $$RESPONSE instead. Try: '$$COMMAND'" && exit 1; fi
+	@ALLOY="MnPd" && COMPOUND="Mn3Pd5" && COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running CHULL test $$COUNTER - stability criterion of $$COMPOUND" | tee -a $(COUNTER_FILE) && ANSWER="13." && COMMAND="./aflow --chull --alloy=$$ALLOY --sc=aflow:4fc97e549ca17d4e" && RESPONSE=$$(eval "$$COMMAND --screen_only --o=t" | cut -d' ' -f2) && \
+		if [ -z "$$RESPONSE" ]; then echo "CHULL did not return a stability criterion, the REST-API may be down, please check '$$COMMAND'" && exit 0; fi && \
+		if [ -n "$${RESPONSE##$$ANSWER*}" ]; then echo "CHULL did not return a stability criterion of ~$$(echo $$ANSWER + 0 | bc) meV/atom for $$COMPOUND, found $$RESPONSE instead. Try: '$$COMMAND'" && exit 1; fi
+	@ALLOY="MnPdPt" && COMPOUND="Mn2PdPt" && COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running CHULL test $$COUNTER - stability criterion of $$COMPOUND" | tee -a $(COUNTER_FILE) && ANSWER="32." && COMMAND="./aflow --chull --alloy=$$ALLOY --sc=aflow:fb9eaa58604ce774" && RESPONSE=$$(eval "$$COMMAND --screen_only --o=t" | cut -d' ' -f2) && \
+		if [ -z "$$RESPONSE" ]; then echo "CHULL did not return a stability criterion, the REST-API may be down, please check '$$COMMAND'" && exit 0; fi && \
+		if [ -n "$${RESPONSE##$$ANSWER*}" ]; then echo "CHULL did not return a stability criterion of ~$$(echo $$ANSWER + 0 | bc) meV/atom for $$COMPOUND, found $$RESPONSE instead. Try: '$$COMMAND'" && exit 1; fi
+	@ALLOY="MnPd" && STOICH="x=0.25" && COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running CHULL test $$COUNTER - $$ALLOY hull energy at $$STOICH" | tee -a $(COUNTER_FILE) && ANSWER="-235." && COMMAND="./aflow --chull --alloy=$$ALLOY --hull_energy=0.25" && RESPONSE=$$(eval "$$COMMAND --screen_only --o=t" | cut -d' ' -f2) && \
+		if [ -z "$$RESPONSE" ]; then echo "CHULL did not return a hull energy, the REST-API may be down, please check '$$COMMAND'" && exit 0; fi && \
+		if [ -n "$${RESPONSE##$$ANSWER*}" ]; then echo "CHULL did not return a $$ALLOY hull energy of ~$$(echo $$ANSWER + 0 | bc) meV/atom at $$STOICH, found $$RESPONSE instead. Try: '$$COMMAND'" && exit 1; fi
+	@ALLOY="CuZr" && STOICH="x=0.5" && COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running CHULL test $$COUNTER - $$ALLOY hull energy at $$STOICH" | tee -a $(COUNTER_FILE) && ANSWER="-158." && COMMAND="./aflow --chull --alloy=$$ALLOY --hull_energy=0.5" && RESPONSE=$$(eval "$$COMMAND --screen_only --o=t" | cut -d' ' -f2) && \
+		if [ -z "$$RESPONSE" ]; then echo "CHULL did not return a hull energy, the REST-API may be down, please check '$$COMMAND'" && exit 0; fi && \
+		if [ -n "$${RESPONSE##$$ANSWER*}" ]; then echo "CHULL did not return a $$ALLOY hull energy of ~$$(echo $$ANSWER + 0 | bc) meV/atom at $$STOICH, found $$RESPONSE instead. Try: '$$COMMAND'" && exit 1; fi
+	@ALLOY="MnPdPt" && COMPOUND="Mn2PdPt" && COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running CHULL test $$COUNTER - N+1 enthalpy gain of $$COMPOUND" | tee -a $(COUNTER_FILE) && ANSWER="32." && COMMAND="./aflow --chull --alloy=$$ALLOY --n+1_enthalpy_gain=aflow:fb9eaa58604ce774" && RESPONSE=$$(eval "$$COMMAND --screen_only --o=t" | cut -d' ' -f2) && \
+		if [ -z "$$RESPONSE" ]; then echo "CHULL did not return an enthalpy gain, the REST-API may be down, please check '$$COMMAND'" && exit 0; fi && \
+		if [ -n "$${RESPONSE##$$ANSWER*}" ]; then echo "CHULL did not return an enthalpy gain of ~$$(echo $$ANSWER + 0 | bc) meV/atom for $$COMPOUND, found $$RESPONSE instead. Try: '$$COMMAND'" && exit 1; fi
 	@echo "CHULL tests passed"
+	@rm -f $(COUNTER_FILE)
 .PHONY: check_pocc
 check_pocc:
-	@echo "Running POCC test 1 - unique structures count of C5HfMoNbTaTi" && ANSWER=49 && COUNT=$$(./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Mo:Nb:Ta:Ti --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
-		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for './aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique', found $$COUNT instead" && exit 1; fi
-	@echo "Running POCC test 2 - unique structures count of C5HfMoNbTaV" && ANSWER=49 && COUNT=$$(./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Mo:Nb:Ta:V --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
-		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for './aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique', found $$COUNT instead" && exit 1; fi
-	@echo "Running POCC test 3 - unique structures count of C5HfMoNbTaW" && ANSWER=49 && COUNT=$$(./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Mo:Nb:Ta:W --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
-		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for './aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique', found $$COUNT instead" && exit 1; fi
-	@echo "Running POCC test 4 - unique structures count of C5HfMoNbTaZr" && ANSWER=49 && COUNT=$$(./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Mo:Nb:Ta:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
-		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for './aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique', found $$COUNT instead" && exit 1; fi
-	@echo "Running POCC test 5 - unique structures count of C5HfMoNbTiV" && ANSWER=49 && COUNT=$$(./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Mo:Nb:Ti:V --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
-		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for './aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique', found $$COUNT instead" && exit 1; fi
-	@echo "Running POCC test 6 - unique structures count of C5HfMoNbTiW" && ANSWER=49 && COUNT=$$(./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Mo:Nb:Ti:W --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
-		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for './aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique', found $$COUNT instead" && exit 1; fi
-	@echo "Running POCC test 7 - unique structures count of C5HfMoNbTiZr" && ANSWER=49 && COUNT=$$(./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Mo:Nb:Ti:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
-		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for './aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique', found $$COUNT instead" && exit 1; fi
-	@echo "Running POCC test 8 - unique structures count of C5HfMoNbVW" && ANSWER=49 && COUNT=$$(./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Mo:Nb:V:W --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
-		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for './aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique', found $$COUNT instead" && exit 1; fi
-	@echo "Running POCC test 9 - unique structures count of C5HfMoNbVZr" && ANSWER=49 && COUNT=$$(./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Mo:Nb:V:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
-		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for './aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique', found $$COUNT instead" && exit 1; fi
-	@echo "Running POCC test 10 - unique structures count of C5HfMoNbWZr" && ANSWER=49 && COUNT=$$(./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Mo:Nb:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
-		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for './aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique', found $$COUNT instead" && exit 1; fi
-	@echo "Running POCC test 11 - unique structures count of C5HfMoTaTiV" && ANSWER=49 && COUNT=$$(./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Mo:Ta:Ti:V --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
-		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for './aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique', found $$COUNT instead" && exit 1; fi
-	@echo "Running POCC test 12 - unique structures count of C5HfMoTaTiW" && ANSWER=49 && COUNT=$$(./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Mo:Ta:Ti:W --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
-		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for './aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique', found $$COUNT instead" && exit 1; fi
-	@echo "Running POCC test 13 - unique structures count of C5HfMoTaTiZr" && ANSWER=49 && COUNT=$$(./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Mo:Ta:Ti:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
-		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for './aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique', found $$COUNT instead" && exit 1; fi
-	@echo "Running POCC test 14 - unique structures count of C5HfMoTaVW" && ANSWER=49 && COUNT=$$(./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Mo:Ta:V:W --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
-		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for './aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique', found $$COUNT instead" && exit 1; fi
-	@echo "Running POCC test 15 - unique structures count of C5HfMoTaVZr" && ANSWER=49 && COUNT=$$(./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Mo:Ta:V:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
-		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for './aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique', found $$COUNT instead" && exit 1; fi
-	@echo "Running POCC test 16 - unique structures count of C5HfMoTaWZr" && ANSWER=49 && COUNT=$$(./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Mo:Ta:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
-		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for './aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique', found $$COUNT instead" && exit 1; fi
-	@echo "Running POCC test 17 - unique structures count of C5HfMoTiVW" && ANSWER=49 && COUNT=$$(./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Mo:Ti:V:W --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
-		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for './aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique', found $$COUNT instead" && exit 1; fi
-	@echo "Running POCC test 18 - unique structures count of C5HfMoTiVZr" && ANSWER=49 && COUNT=$$(./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Mo:Ti:V:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
-		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for './aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique', found $$COUNT instead" && exit 1; fi
-	@echo "Running POCC test 19 - unique structures count of C5HfMoTiWZr" && ANSWER=49 && COUNT=$$(./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
-		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for './aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique', found $$COUNT instead" && exit 1; fi
-	@echo "Running POCC test 20 - unique structures count of C5HfMoVWZr" && ANSWER=49 && COUNT=$$(./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Mo:V:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
-		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for './aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique', found $$COUNT instead" && exit 1; fi
-	@echo "Running POCC test 21 - unique structures count of C5HfNbTaTiV" && ANSWER=49 && COUNT=$$(./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Nb:Ta:Ti:V --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
-		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for './aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique', found $$COUNT instead" && exit 1; fi
-	@echo "Running POCC test 22 - unique structures count of C5HfNbTaTiW" && ANSWER=49 && COUNT=$$(./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Nb:Ta:Ti:W --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
-		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for './aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique', found $$COUNT instead" && exit 1; fi
-	@echo "Running POCC test 23 - unique structures count of C5HfNbTaTiZr" && ANSWER=49 && COUNT=$$(./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Nb:Ta:Ti:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
-		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for './aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique', found $$COUNT instead" && exit 1; fi
-	@echo "Running POCC test 24 - unique structures count of C5HfNbTaVW" && ANSWER=49 && COUNT=$$(./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Nb:Ta:V:W --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
-		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for './aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique', found $$COUNT instead" && exit 1; fi
-	@echo "Running POCC test 25 - unique structures count of C5HfNbTaVZr" && ANSWER=49 && COUNT=$$(./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Nb:Ta:V:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
-		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for './aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique', found $$COUNT instead" && exit 1; fi
-	@echo "Running POCC test 26 - unique structures count of C5HfNbTaWZr" && ANSWER=49 && COUNT=$$(./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Nb:Ta:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
-		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for './aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique', found $$COUNT instead" && exit 1; fi
-	@echo "Running POCC test 27 - unique structures count of C5HfNbTiVW" && ANSWER=49 && COUNT=$$(./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Nb:Ti:V:W --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
-		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for './aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique', found $$COUNT instead" && exit 1; fi
-	@echo "Running POCC test 28 - unique structures count of C5HfNbTiVZr" && ANSWER=49 && COUNT=$$(./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Nb:Ti:V:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
-		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for './aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique', found $$COUNT instead" && exit 1; fi
-	@echo "Running POCC test 29 - unique structures count of C5HfNbTiWZr" && ANSWER=49 && COUNT=$$(./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Nb:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
-		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for './aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique', found $$COUNT instead" && exit 1; fi
-	@echo "Running POCC test 30 - unique structures count of C5HfNbVWZr" && ANSWER=49 && COUNT=$$(./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Nb:V:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
-		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for './aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique', found $$COUNT instead" && exit 1; fi
-	@echo "Running POCC test 31 - unique structures count of C5HfTaTiVW" && ANSWER=49 && COUNT=$$(./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Ta:Ti:V:W --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
-		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for './aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique', found $$COUNT instead" && exit 1; fi
-	@echo "Running POCC test 32 - unique structures count of C5HfTaTiVZr" && ANSWER=49 && COUNT=$$(./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Ta:Ti:V:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
-		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for './aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique', found $$COUNT instead" && exit 1; fi
-	@echo "Running POCC test 33 - unique structures count of C5HfTaTiWZr" && ANSWER=49 && COUNT=$$(./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Ta:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
-		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for './aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique', found $$COUNT instead" && exit 1; fi
-	@echo "Running POCC test 34 - unique structures count of C5HfTaVWZr" && ANSWER=49 && COUNT=$$(./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Ta:V:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
-		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for './aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique', found $$COUNT instead" && exit 1; fi
-	@echo "Running POCC test 35 - unique structures count of C5HfTiVWZr" && ANSWER=49 && COUNT=$$(./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Ti:V:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
-		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for './aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique', found $$COUNT instead" && exit 1; fi
-	@echo "Running POCC test 36 - unique structures count of C5MoNbTaTiV" && ANSWER=49 && COUNT=$$(./aflow --proto=AB_cF8_225_a_b.AB:C:Mo:Nb:Ta:Ti:V --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
-		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for './aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique', found $$COUNT instead" && exit 1; fi
-	@echo "Running POCC test 37 - unique structures count of C5MoNbTaTiW" && ANSWER=49 && COUNT=$$(./aflow --proto=AB_cF8_225_a_b.AB:C:Mo:Nb:Ta:Ti:W --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
-		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for './aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique', found $$COUNT instead" && exit 1; fi
-	@echo "Running POCC test 38 - unique structures count of C5MoNbTaTiZr" && ANSWER=49 && COUNT=$$(./aflow --proto=AB_cF8_225_a_b.AB:C:Mo:Nb:Ta:Ti:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
-		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for './aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique', found $$COUNT instead" && exit 1; fi
-	@echo "Running POCC test 39 - unique structures count of C5MoNbTaVW" && ANSWER=49 && COUNT=$$(./aflow --proto=AB_cF8_225_a_b.AB:C:Mo:Nb:Ta:V:W --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
-		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for './aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique', found $$COUNT instead" && exit 1; fi
-	@echo "Running POCC test 40 - unique structures count of C5MoNbTaVZr" && ANSWER=49 && COUNT=$$(./aflow --proto=AB_cF8_225_a_b.AB:C:Mo:Nb:Ta:V:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
-		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for './aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique', found $$COUNT instead" && exit 1; fi
-	@echo "Running POCC test 41 - unique structures count of C5MoNbTaWZr" && ANSWER=49 && COUNT=$$(./aflow --proto=AB_cF8_225_a_b.AB:C:Mo:Nb:Ta:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
-		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for './aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique', found $$COUNT instead" && exit 1; fi
-	@echo "Running POCC test 42 - unique structures count of C5MoNbTiVW" && ANSWER=49 && COUNT=$$(./aflow --proto=AB_cF8_225_a_b.AB:C:Mo:Nb:Ti:V:W --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
-		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for './aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique', found $$COUNT instead" && exit 1; fi
-	@echo "Running POCC test 43 - unique structures count of C5MoNbTiVZr" && ANSWER=49 && COUNT=$$(./aflow --proto=AB_cF8_225_a_b.AB:C:Mo:Nb:Ti:V:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
-		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for './aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique', found $$COUNT instead" && exit 1; fi
-	@echo "Running POCC test 44 - unique structures count of C5MoNbTiWZr" && ANSWER=49 && COUNT=$$(./aflow --proto=AB_cF8_225_a_b.AB:C:Mo:Nb:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
-		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for './aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique', found $$COUNT instead" && exit 1; fi
-	@echo "Running POCC test 45 - unique structures count of C5MoNbVWZr" && ANSWER=49 && COUNT=$$(./aflow --proto=AB_cF8_225_a_b.AB:C:Mo:Nb:V:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
-		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for './aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique', found $$COUNT instead" && exit 1; fi
-	@echo "Running POCC test 46 - unique structures count of C5MoTaTiVW" && ANSWER=49 && COUNT=$$(./aflow --proto=AB_cF8_225_a_b.AB:C:Mo:Ta:Ti:V:W --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
-		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for './aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique', found $$COUNT instead" && exit 1; fi
-	@echo "Running POCC test 47 - unique structures count of C5MoTaTiVZr" && ANSWER=49 && COUNT=$$(./aflow --proto=AB_cF8_225_a_b.AB:C:Mo:Ta:Ti:V:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
-		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for './aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique', found $$COUNT instead" && exit 1; fi
-	@echo "Running POCC test 48 - unique structures count of C5MoTaTiWZr" && ANSWER=49 && COUNT=$$(./aflow --proto=AB_cF8_225_a_b.AB:C:Mo:Ta:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
-		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for './aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique', found $$COUNT instead" && exit 1; fi
-	@echo "Running POCC test 49 - unique structures count of C5MoTaVWZr" && ANSWER=49 && COUNT=$$(./aflow --proto=AB_cF8_225_a_b.AB:C:Mo:Ta:V:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
-		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for './aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique', found $$COUNT instead" && exit 1; fi
-	@echo "Running POCC test 50 - unique structures count of C5MoTiVWZr" && ANSWER=49 && COUNT=$$(./aflow --proto=AB_cF8_225_a_b.AB:C:Mo:Ti:V:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
-		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for './aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique', found $$COUNT instead" && exit 1; fi
-	@echo "Running POCC test 51 - unique structures count of C5NbTaTiVW" && ANSWER=49 && COUNT=$$(./aflow --proto=AB_cF8_225_a_b.AB:C:Nb:Ta:Ti:V:W --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
-		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for './aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique', found $$COUNT instead" && exit 1; fi
-	@echo "Running POCC test 52 - unique structures count of C5NbTaTiVZr" && ANSWER=49 && COUNT=$$(./aflow --proto=AB_cF8_225_a_b.AB:C:Nb:Ta:Ti:V:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
-		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for './aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique', found $$COUNT instead" && exit 1; fi
-	@echo "Running POCC test 53 - unique structures count of C5NbTaTiWZr" && ANSWER=49 && COUNT=$$(./aflow --proto=AB_cF8_225_a_b.AB:C:Nb:Ta:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
-		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for './aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique', found $$COUNT instead" && exit 1; fi
-	@echo "Running POCC test 54 - unique structures count of C5NbTaVWZr" && ANSWER=49 && COUNT=$$(./aflow --proto=AB_cF8_225_a_b.AB:C:Nb:Ta:V:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
-		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for './aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique', found $$COUNT instead" && exit 1; fi
-	@echo "Running POCC test 55 - unique structures count of C5NbTiVWZr" && ANSWER=49 && COUNT=$$(./aflow --proto=AB_cF8_225_a_b.AB:C:Nb:Ti:V:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
-		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for './aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique', found $$COUNT instead" && exit 1; fi
-	@echo "Running POCC test 56 - unique structures count of C5TaTiVWZr" && ANSWER=49 && COUNT=$$(./aflow --proto=AB_cF8_225_a_b.AB:C:Ta:Ti:V:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
-		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for './aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique', found $$COUNT instead" && exit 1; fi
-	@echo "Running POCC test 57 - unique structures count of C5CrMoTaVW" && ANSWER=49 && COUNT=$$(./aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ta:V:W --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
-		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for './aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique', found $$COUNT instead" && exit 1; fi
-	@echo "Running POCC test 58 - unique structures count of C5CrMoNbTaW" && ANSWER=49 && COUNT=$$(./aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Nb:Ta:W --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
-		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for './aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique', found $$COUNT instead" && exit 1; fi
-	@echo "Running POCC test 59 - unique structures count of C5CrMoNbVW" && ANSWER=49 && COUNT=$$(./aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Nb:V:W --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
-		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for './aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique', found $$COUNT instead" && exit 1; fi
-	@echo "Running POCC test 60 - unique structures count of C5CrHfTaWZr" && ANSWER=49 && COUNT=$$(./aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Hf:Ta:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
-		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for './aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique', found $$COUNT instead" && exit 1; fi
-	@echo "Running POCC test 61 - unique structures count of C5CrHfMoTiW" && ANSWER=49 && COUNT=$$(./aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Hf:Mo:Ti:W --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
-		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for './aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique', found $$COUNT instead" && exit 1; fi
-	@echo "Running POCC test 62 - unique structures count of C5CrMoTiWZr" && ANSWER=49 && COUNT=$$(./aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
-		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for './aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique', found $$COUNT instead" && exit 1; fi
+	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
+	@rm -f $(COUNTER_FILE) && echo "STARTING POCC" >> $(COUNTER_FILE)
+#Mg_(x)Zn_(1-x)O and ZnS_(1-x)Se_(x)
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt Mg0.75Zn0.25O" | tee -a $(COUNTER_FILE) && ANSWER=7 && COMMAND="./aflow --proto=201:Mg:O:Zn --pocc_params=P0-1xB_P1-0.75xA-0.25xC | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of wurtzite ZnS0.25Se0.75" | tee -a $(COUNTER_FILE) && ANSWER=7 && COMMAND="./aflow --proto=218:S:Se:Zn --pocc_params=S0-1xC_S1-0.75xB-0.25xA | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+#travis needs aflow-data in the path
+	@if [ -n "$$TRAVIS" ] || [ "$$CI" = true ]; then export PATH=$$(pwd):$$PATH; fi && COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - aflow.in generator with different pocc_params" | tee -a $(COUNTER_FILE) && ANSWER=2 && AFLOW_BIN=$$(pwd)/aflow && TEMPDIR=$$(mktemp -d) && AFLOWDATA_DIR="./AFLOWDATA" && COMMAND="$$AFLOW_BIN --aflow_proto=AB_cF8_225_a_b.AB:C:Hf:N:Zr --pocc_params=S0-1xA_S1-0.5xB-0.5xD,S0-0.5xA-0.5xC_S1-0.5xB-0.5xD --generate_aflowin_only" && COUNT=$$(cd $$TEMPDIR && eval "$$COMMAND" >/dev/null 2>&1 && find $$AFLOWDATA_DIR -name aflow.in | wc -l) && rm -rf $$TEMPDIR && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER new aflow.in's for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@if [ -n "$$TRAVIS" ] || [ "$$CI" = true ]; then export PATH=$$(pwd):$$PATH; fi && COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - bcc/fcc Fe_(x)Cu_(1-x) aflow.in generator with different concentrations" | tee -a $(COUNTER_FILE) && ANSWER=22 && AFLOW_BIN=$$(pwd)/aflow && TEMPDIR=$$(mktemp -d) && AFLOWDATA_DIR="./AFLOWDATA" && COMMAND="$$AFLOW_BIN --aflow_proto=bcc,fcc:Cu:Fe --pocc_params=P0-0.1xA-0.9xB,P0-0.2xA-0.8xB,P0-0.25xA-0.75xB,P0-0.333xA-0.667xB,P0-0.4xA-0.6xB,P0-0.5xA-0.5xB,P0-0.6xA-0.4xB,P0-0.667xA-0.333xB,P0-0.75xA-0.25xB,P0-0.8xA-0.2xB,P0-0.9xA-0.1xB --generate_aflowin_only" && COUNT=$$(cd $$TEMPDIR && eval "$$COMMAND" >/dev/null 2>&1 && find $$AFLOWDATA_DIR -name aflow.in | wc -l) && rm -rf $$TEMPDIR && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER new aflow.in's for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+#bcc Fe_(x)Cu_(1-x)
+	@if [ -n "$$TRAVIS" ] || [ "$$CI" = true ]; then export PATH=$$(pwd):$$PATH; fi && COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - bcc Fe0.1Cu0.9 aflow.in generator" | tee -a $(COUNTER_FILE) && ANSWER=18 && AFLOW_BIN=$$(pwd)/aflow && TEMPDIR=$$(mktemp -d) && AFLOWDATA_DIR="./AFLOWDATA/Cu_pvFe_pv/bcc:POCC_P0-0.1xA-0.9xB" && COMMAND="$$AFLOW_BIN --aflow_proto=bcc:Cu:Fe --pocc_params=P0-0.1xA-0.9xB --generate_aflowin_only && cd $$AFLOWDATA_DIR && $$AFLOW_BIN --run --generate_aflowin_only" && COUNT=$$(cd $$TEMPDIR && eval "$$COMMAND" >/dev/null 2>&1 && find ARUN.POCC_* -name aflow.in | wc -l) && rm -rf $$TEMPDIR && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER new aflow.in's for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@if [ -n "$$TRAVIS" ] || [ "$$CI" = true ]; then export PATH=$$(pwd):$$PATH; fi && COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - bcc Fe0.2Cu0.8 aflow.in generator" | tee -a $(COUNTER_FILE) && ANSWER=5 && AFLOW_BIN=$$(pwd)/aflow && TEMPDIR=$$(mktemp -d) && AFLOWDATA_DIR="./AFLOWDATA/Cu_pvFe_pv/bcc:POCC_P0-0.2xA-0.8xB" && COMMAND="$$AFLOW_BIN --aflow_proto=bcc:Cu:Fe --pocc_params=P0-0.2xA-0.8xB --generate_aflowin_only && cd $$AFLOWDATA_DIR && $$AFLOW_BIN --run --generate_aflowin_only" && COUNT=$$(cd $$TEMPDIR && eval "$$COMMAND" >/dev/null 2>&1 && find ARUN.POCC_* -name aflow.in | wc -l) && rm -rf $$TEMPDIR && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER new aflow.in's for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@if [ -n "$$TRAVIS" ] || [ "$$CI" = true ]; then export PATH=$$(pwd):$$PATH; fi && COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - bcc Fe0.25Cu0.75 aflow.in generator" | tee -a $(COUNTER_FILE) && ANSWER=7 && AFLOW_BIN=$$(pwd)/aflow && TEMPDIR=$$(mktemp -d) && AFLOWDATA_DIR="./AFLOWDATA/Cu_pvFe_pv/bcc:POCC_P0-0.25xA-0.75xB" && COMMAND="$$AFLOW_BIN --aflow_proto=bcc:Cu:Fe --pocc_params=P0-0.25xA-0.75xB --generate_aflowin_only && cd $$AFLOWDATA_DIR && $$AFLOW_BIN --run --generate_aflowin_only" && COUNT=$$(cd $$TEMPDIR && eval "$$COMMAND" >/dev/null 2>&1 && find ARUN.POCC_* -name aflow.in | wc -l) && rm -rf $$TEMPDIR && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER new aflow.in's for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@if [ -n "$$TRAVIS" ] || [ "$$CI" = true ]; then export PATH=$$(pwd):$$PATH; fi && COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - bcc Fe0.333Cu0.667 aflow.in generator" | tee -a $(COUNTER_FILE) && ANSWER=3 && AFLOW_BIN=$$(pwd)/aflow && TEMPDIR=$$(mktemp -d) && AFLOWDATA_DIR="./AFLOWDATA/Cu_pvFe_pv/bcc:POCC_P0-0.333xA-0.667xB" && COMMAND="$$AFLOW_BIN --aflow_proto=bcc:Cu:Fe --pocc_params=P0-0.333xA-0.667xB --generate_aflowin_only && cd $$AFLOWDATA_DIR && $$AFLOW_BIN --run --generate_aflowin_only" && COUNT=$$(cd $$TEMPDIR && eval "$$COMMAND" >/dev/null 2>&1 && find ARUN.POCC_* -name aflow.in | wc -l) && rm -rf $$TEMPDIR && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER new aflow.in's for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@if [ -n "$$TRAVIS" ] || [ "$$CI" = true ]; then export PATH=$$(pwd):$$PATH; fi && COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - bcc Fe0.4Cu0.6 aflow.in generator" | tee -a $(COUNTER_FILE) && ANSWER=9 && AFLOW_BIN=$$(pwd)/aflow && TEMPDIR=$$(mktemp -d) && AFLOWDATA_DIR="./AFLOWDATA/Cu_pvFe_pv/bcc:POCC_P0-0.4xA-0.6xB" && COMMAND="$$AFLOW_BIN --aflow_proto=bcc:Cu:Fe --pocc_params=P0-0.4xA-0.6xB --generate_aflowin_only && cd $$AFLOWDATA_DIR && $$AFLOW_BIN --run --generate_aflowin_only" && COUNT=$$(cd $$TEMPDIR && eval "$$COMMAND" >/dev/null 2>&1 && find ARUN.POCC_* -name aflow.in | wc -l) && rm -rf $$TEMPDIR && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER new aflow.in's for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@if [ -n "$$TRAVIS" ] || [ "$$CI" = true ]; then export PATH=$$(pwd):$$PATH; fi && COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - bcc Fe0.5Cu0.5 aflow.in generator" | tee -a $(COUNTER_FILE) && ANSWER=2 && AFLOW_BIN=$$(pwd)/aflow && TEMPDIR=$$(mktemp -d) && AFLOWDATA_DIR="./AFLOWDATA/Cu_pvFe_pv/bcc:POCC_P0-0.5xA-0.5xB" && COMMAND="$$AFLOW_BIN --aflow_proto=bcc:Cu:Fe --pocc_params=P0-0.5xA-0.5xB --generate_aflowin_only && cd $$AFLOWDATA_DIR && $$AFLOW_BIN --run --generate_aflowin_only" && COUNT=$$(cd $$TEMPDIR && eval "$$COMMAND" >/dev/null 2>&1 && find ARUN.POCC_* -name aflow.in | wc -l) && rm -rf $$TEMPDIR && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER new aflow.in's for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@if [ -n "$$TRAVIS" ] || [ "$$CI" = true ]; then export PATH=$$(pwd):$$PATH; fi && COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - bcc Fe0.6Cu0.4 aflow.in generator" | tee -a $(COUNTER_FILE) && ANSWER=9 && AFLOW_BIN=$$(pwd)/aflow && TEMPDIR=$$(mktemp -d) && AFLOWDATA_DIR="./AFLOWDATA/Cu_pvFe_pv/bcc:POCC_P0-0.6xA-0.4xB" && COMMAND="$$AFLOW_BIN --aflow_proto=bcc:Cu:Fe --pocc_params=P0-0.6xA-0.4xB --generate_aflowin_only && cd $$AFLOWDATA_DIR && $$AFLOW_BIN --run --generate_aflowin_only" && COUNT=$$(cd $$TEMPDIR && eval "$$COMMAND" >/dev/null 2>&1 && find ARUN.POCC_* -name aflow.in | wc -l) && rm -rf $$TEMPDIR && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER new aflow.in's for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@if [ -n "$$TRAVIS" ] || [ "$$CI" = true ]; then export PATH=$$(pwd):$$PATH; fi && COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - bcc Fe0.667Cu0.333 aflow.in generator" | tee -a $(COUNTER_FILE) && ANSWER=3 && AFLOW_BIN=$$(pwd)/aflow && TEMPDIR=$$(mktemp -d) && AFLOWDATA_DIR="./AFLOWDATA/Cu_pvFe_pv/bcc:POCC_P0-0.667xA-0.333xB" && COMMAND="$$AFLOW_BIN --aflow_proto=bcc:Cu:Fe --pocc_params=P0-0.667xA-0.333xB --generate_aflowin_only && cd $$AFLOWDATA_DIR && $$AFLOW_BIN --run --generate_aflowin_only" && COUNT=$$(cd $$TEMPDIR && eval "$$COMMAND" >/dev/null 2>&1 && find ARUN.POCC_* -name aflow.in | wc -l) && rm -rf $$TEMPDIR && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER new aflow.in's for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@if [ -n "$$TRAVIS" ] || [ "$$CI" = true ]; then export PATH=$$(pwd):$$PATH; fi && COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - bcc Fe0.75Cu0.25 aflow.in generator" | tee -a $(COUNTER_FILE) && ANSWER=7 && AFLOW_BIN=$$(pwd)/aflow && TEMPDIR=$$(mktemp -d) && AFLOWDATA_DIR="./AFLOWDATA/Cu_pvFe_pv/bcc:POCC_P0-0.75xA-0.25xB" && COMMAND="$$AFLOW_BIN --aflow_proto=bcc:Cu:Fe --pocc_params=P0-0.75xA-0.25xB --generate_aflowin_only && cd $$AFLOWDATA_DIR && $$AFLOW_BIN --run --generate_aflowin_only" && COUNT=$$(cd $$TEMPDIR && eval "$$COMMAND" >/dev/null 2>&1 && find ARUN.POCC_* -name aflow.in | wc -l) && rm -rf $$TEMPDIR && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER new aflow.in's for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@if [ -n "$$TRAVIS" ] || [ "$$CI" = true ]; then export PATH=$$(pwd):$$PATH; fi && COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - bcc Fe0.8Cu0.2 aflow.in generator" | tee -a $(COUNTER_FILE) && ANSWER=5 && AFLOW_BIN=$$(pwd)/aflow && TEMPDIR=$$(mktemp -d) && AFLOWDATA_DIR="./AFLOWDATA/Cu_pvFe_pv/bcc:POCC_P0-0.8xA-0.2xB" && COMMAND="$$AFLOW_BIN --aflow_proto=bcc:Cu:Fe --pocc_params=P0-0.8xA-0.2xB --generate_aflowin_only && cd $$AFLOWDATA_DIR && $$AFLOW_BIN --run --generate_aflowin_only" && COUNT=$$(cd $$TEMPDIR && eval "$$COMMAND" >/dev/null 2>&1 && find ARUN.POCC_* -name aflow.in | wc -l) && rm -rf $$TEMPDIR && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER new aflow.in's for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@if [ -n "$$TRAVIS" ] || [ "$$CI" = true ]; then export PATH=$$(pwd):$$PATH; fi && COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - bcc Fe0.9Cu0.1 aflow.in generator" | tee -a $(COUNTER_FILE) && ANSWER=18 && AFLOW_BIN=$$(pwd)/aflow && TEMPDIR=$$(mktemp -d) && AFLOWDATA_DIR="./AFLOWDATA/Cu_pvFe_pv/bcc:POCC_P0-0.9xA-0.1xB" && COMMAND="$$AFLOW_BIN --aflow_proto=bcc:Cu:Fe --pocc_params=P0-0.9xA-0.1xB --generate_aflowin_only && cd $$AFLOWDATA_DIR && $$AFLOW_BIN --run --generate_aflowin_only" && COUNT=$$(cd $$TEMPDIR && eval "$$COMMAND" >/dev/null 2>&1 && find ARUN.POCC_* -name aflow.in | wc -l) && rm -rf $$TEMPDIR && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER new aflow.in's for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+#fcc Fe_(x)_Cu_(1-x)
+	@if [ -n "$$TRAVIS" ] || [ "$$CI" = true ]; then export PATH=$$(pwd):$$PATH; fi && COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - fcc Fe0.1Cu0.9 aflow.in generator" | tee -a $(COUNTER_FILE) && ANSWER=18 && AFLOW_BIN=$$(pwd)/aflow && TEMPDIR=$$(mktemp -d) && AFLOWDATA_DIR="./AFLOWDATA/Cu_pvFe_pv/fcc:POCC_P0-0.1xA-0.9xB" && COMMAND="$$AFLOW_BIN --aflow_proto=fcc:Cu:Fe --pocc_params=P0-0.1xA-0.9xB --generate_aflowin_only && cd $$AFLOWDATA_DIR && $$AFLOW_BIN --run --generate_aflowin_only" && COUNT=$$(cd $$TEMPDIR && eval "$$COMMAND" >/dev/null 2>&1 && find ARUN.POCC_* -name aflow.in | wc -l) && rm -rf $$TEMPDIR && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER new aflow.in's for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@if [ -n "$$TRAVIS" ] || [ "$$CI" = true ]; then export PATH=$$(pwd):$$PATH; fi && COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - fcc Fe0.2Cu0.8 aflow.in generator" | tee -a $(COUNTER_FILE) && ANSWER=5 && AFLOW_BIN=$$(pwd)/aflow && TEMPDIR=$$(mktemp -d) && AFLOWDATA_DIR="./AFLOWDATA/Cu_pvFe_pv/fcc:POCC_P0-0.2xA-0.8xB" && COMMAND="$$AFLOW_BIN --aflow_proto=fcc:Cu:Fe --pocc_params=P0-0.2xA-0.8xB --generate_aflowin_only && cd $$AFLOWDATA_DIR && $$AFLOW_BIN --run --generate_aflowin_only" && COUNT=$$(cd $$TEMPDIR && eval "$$COMMAND" >/dev/null 2>&1 && find ARUN.POCC_* -name aflow.in | wc -l) && rm -rf $$TEMPDIR && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER new aflow.in's for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@if [ -n "$$TRAVIS" ] || [ "$$CI" = true ]; then export PATH=$$(pwd):$$PATH; fi && COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - fcc Fe0.25Cu0.75 aflow.in generator" | tee -a $(COUNTER_FILE) && ANSWER=7 && AFLOW_BIN=$$(pwd)/aflow && TEMPDIR=$$(mktemp -d) && AFLOWDATA_DIR="./AFLOWDATA/Cu_pvFe_pv/fcc:POCC_P0-0.25xA-0.75xB" && COMMAND="$$AFLOW_BIN --aflow_proto=fcc:Cu:Fe --pocc_params=P0-0.25xA-0.75xB --generate_aflowin_only && cd $$AFLOWDATA_DIR && $$AFLOW_BIN --run --generate_aflowin_only" && COUNT=$$(cd $$TEMPDIR && eval "$$COMMAND" >/dev/null 2>&1 && find ARUN.POCC_* -name aflow.in | wc -l) && rm -rf $$TEMPDIR && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER new aflow.in's for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@if [ -n "$$TRAVIS" ] || [ "$$CI" = true ]; then export PATH=$$(pwd):$$PATH; fi && COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - fcc Fe0.333Cu0.667 aflow.in generator" | tee -a $(COUNTER_FILE) && ANSWER=3 && AFLOW_BIN=$$(pwd)/aflow && TEMPDIR=$$(mktemp -d) && AFLOWDATA_DIR="./AFLOWDATA/Cu_pvFe_pv/fcc:POCC_P0-0.333xA-0.667xB" && COMMAND="$$AFLOW_BIN --aflow_proto=fcc:Cu:Fe --pocc_params=P0-0.333xA-0.667xB --generate_aflowin_only && cd $$AFLOWDATA_DIR && $$AFLOW_BIN --run --generate_aflowin_only" && COUNT=$$(cd $$TEMPDIR && eval "$$COMMAND" >/dev/null 2>&1 && find ARUN.POCC_* -name aflow.in | wc -l) && rm -rf $$TEMPDIR && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER new aflow.in's for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@if [ -n "$$TRAVIS" ] || [ "$$CI" = true ]; then export PATH=$$(pwd):$$PATH; fi && COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - fcc Fe0.4Cu0.6 aflow.in generator" | tee -a $(COUNTER_FILE) && ANSWER=9 && AFLOW_BIN=$$(pwd)/aflow && TEMPDIR=$$(mktemp -d) && AFLOWDATA_DIR="./AFLOWDATA/Cu_pvFe_pv/fcc:POCC_P0-0.4xA-0.6xB" && COMMAND="$$AFLOW_BIN --aflow_proto=fcc:Cu:Fe --pocc_params=P0-0.4xA-0.6xB --generate_aflowin_only && cd $$AFLOWDATA_DIR && $$AFLOW_BIN --run --generate_aflowin_only" && COUNT=$$(cd $$TEMPDIR && eval "$$COMMAND" >/dev/null 2>&1 && find ARUN.POCC_* -name aflow.in | wc -l) && rm -rf $$TEMPDIR && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER new aflow.in's for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@if [ -n "$$TRAVIS" ] || [ "$$CI" = true ]; then export PATH=$$(pwd):$$PATH; fi && COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - fcc Fe0.5Cu0.5 aflow.in generator" | tee -a $(COUNTER_FILE) && ANSWER=2 && AFLOW_BIN=$$(pwd)/aflow && TEMPDIR=$$(mktemp -d) && AFLOWDATA_DIR="./AFLOWDATA/Cu_pvFe_pv/fcc:POCC_P0-0.5xA-0.5xB" && COMMAND="$$AFLOW_BIN --aflow_proto=fcc:Cu:Fe --pocc_params=P0-0.5xA-0.5xB --generate_aflowin_only && cd $$AFLOWDATA_DIR && $$AFLOW_BIN --run --generate_aflowin_only" && COUNT=$$(cd $$TEMPDIR && eval "$$COMMAND" >/dev/null 2>&1 && find ARUN.POCC_* -name aflow.in | wc -l) && rm -rf $$TEMPDIR && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER new aflow.in's for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@if [ -n "$$TRAVIS" ] || [ "$$CI" = true ]; then export PATH=$$(pwd):$$PATH; fi && COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - fcc Fe0.6Cu0.4 aflow.in generator" | tee -a $(COUNTER_FILE) && ANSWER=9 && AFLOW_BIN=$$(pwd)/aflow && TEMPDIR=$$(mktemp -d) && AFLOWDATA_DIR="./AFLOWDATA/Cu_pvFe_pv/fcc:POCC_P0-0.6xA-0.4xB" && COMMAND="$$AFLOW_BIN --aflow_proto=fcc:Cu:Fe --pocc_params=P0-0.6xA-0.4xB --generate_aflowin_only && cd $$AFLOWDATA_DIR && $$AFLOW_BIN --run --generate_aflowin_only" && COUNT=$$(cd $$TEMPDIR && eval "$$COMMAND" >/dev/null 2>&1 && find ARUN.POCC_* -name aflow.in | wc -l) && rm -rf $$TEMPDIR && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER new aflow.in's for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@if [ -n "$$TRAVIS" ] || [ "$$CI" = true ]; then export PATH=$$(pwd):$$PATH; fi && COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - fcc Fe0.667Cu0.333 aflow.in generator" | tee -a $(COUNTER_FILE) && ANSWER=3 && AFLOW_BIN=$$(pwd)/aflow && TEMPDIR=$$(mktemp -d) && AFLOWDATA_DIR="./AFLOWDATA/Cu_pvFe_pv/fcc:POCC_P0-0.667xA-0.333xB" && COMMAND="$$AFLOW_BIN --aflow_proto=fcc:Cu:Fe --pocc_params=P0-0.667xA-0.333xB --generate_aflowin_only && cd $$AFLOWDATA_DIR && $$AFLOW_BIN --run --generate_aflowin_only" && COUNT=$$(cd $$TEMPDIR && eval "$$COMMAND" >/dev/null 2>&1 && find ARUN.POCC_* -name aflow.in | wc -l) && rm -rf $$TEMPDIR && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER new aflow.in's for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@if [ -n "$$TRAVIS" ] || [ "$$CI" = true ]; then export PATH=$$(pwd):$$PATH; fi && COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - fcc Fe0.75Cu0.25 aflow.in generator" | tee -a $(COUNTER_FILE) && ANSWER=7 && AFLOW_BIN=$$(pwd)/aflow && TEMPDIR=$$(mktemp -d) && AFLOWDATA_DIR="./AFLOWDATA/Cu_pvFe_pv/fcc:POCC_P0-0.75xA-0.25xB" && COMMAND="$$AFLOW_BIN --aflow_proto=fcc:Cu:Fe --pocc_params=P0-0.75xA-0.25xB --generate_aflowin_only && cd $$AFLOWDATA_DIR && $$AFLOW_BIN --run --generate_aflowin_only" && COUNT=$$(cd $$TEMPDIR && eval "$$COMMAND" >/dev/null 2>&1 && find ARUN.POCC_* -name aflow.in | wc -l) && rm -rf $$TEMPDIR && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER new aflow.in's for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@if [ -n "$$TRAVIS" ] || [ "$$CI" = true ]; then export PATH=$$(pwd):$$PATH; fi && COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - fcc Fe0.8Cu0.2 aflow.in generator" | tee -a $(COUNTER_FILE) && ANSWER=5 && AFLOW_BIN=$$(pwd)/aflow && TEMPDIR=$$(mktemp -d) && AFLOWDATA_DIR="./AFLOWDATA/Cu_pvFe_pv/fcc:POCC_P0-0.8xA-0.2xB" && COMMAND="$$AFLOW_BIN --aflow_proto=fcc:Cu:Fe --pocc_params=P0-0.8xA-0.2xB --generate_aflowin_only && cd $$AFLOWDATA_DIR && $$AFLOW_BIN --run --generate_aflowin_only" && COUNT=$$(cd $$TEMPDIR && eval "$$COMMAND" >/dev/null 2>&1 && find ARUN.POCC_* -name aflow.in | wc -l) && rm -rf $$TEMPDIR && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER new aflow.in's for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@if [ -n "$$TRAVIS" ] || [ "$$CI" = true ]; then export PATH=$$(pwd):$$PATH; fi && COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - fcc Fe0.9Cu0.1 aflow.in generator" | tee -a $(COUNTER_FILE) && ANSWER=18 && AFLOW_BIN=$$(pwd)/aflow && TEMPDIR=$$(mktemp -d) && AFLOWDATA_DIR="./AFLOWDATA/Cu_pvFe_pv/fcc:POCC_P0-0.9xA-0.1xB" && COMMAND="$$AFLOW_BIN --aflow_proto=fcc:Cu:Fe --pocc_params=P0-0.9xA-0.1xB --generate_aflowin_only && cd $$AFLOWDATA_DIR && $$AFLOW_BIN --run --generate_aflowin_only" && COUNT=$$(cd $$TEMPDIR && eval "$$COMMAND" >/dev/null 2>&1 && find ARUN.POCC_* -name aflow.in | wc -l) && rm -rf $$TEMPDIR && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER new aflow.in's for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+#testing P vs. S
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - optimized HNF value of cementite C5MoNbTaVW" | tee -a $(COUNTER_FILE) && ANSWER=5 && COMMAND="./aflow --proto=AB3_oP16_62_c_cd-001.AB:C:Mo:Nb:Ta:V:W --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --hnf" && COUNT=$$(eval "$$COMMAND" | grep 'Optimized HNF value = ' | tail -1 | awk -F 'value = ' '{print $$2}' | cut -d ' ' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return an HNF value of $$ANSWER for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+#5-metal carbides
+	@if [ -n "$$TRAVIS" ] || [ "$$CI" = true ]; then export PATH=$$(pwd):$$PATH; fi && COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - 5-metal rocksalt refractory carbide aflow.in generator" | tee -a $(COUNTER_FILE) && ANSWER=56 && AFLOW_BIN=$$(pwd)/aflow && TEMPDIR=$$(mktemp -d) && AFLOWDATA_DIR="./AFLOWDATA" && COMMAND="$$AFLOW_BIN --aflow_proto=AB_cF8_225_a_b.AB:C:Hf,Mo,Nb,Ta,Ti,V,W,Zr:Hf,Mo,Nb,Ta,Ti,V,W,Zr:Hf,Mo,Nb,Ta,Ti,V,W,Zr:Hf,Mo,Nb,Ta,Ti,V,W,Zr:Hf,Mo,Nb,Ta,Ti,V,W,Zr --pocc_params=P0-1xA_P1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF --generate_aflowin_only" && COUNT=$$(cd $$TEMPDIR && eval "$$COMMAND" >/dev/null 2>&1 && find $$AFLOWDATA_DIR -name aflow.in | wc -l) && rm -rf $$TEMPDIR && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER new aflow.in's for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - optimized HNF value of rocksalt C2HfNb" | tee -a $(COUNTER_FILE) && ANSWER=2 && COMMAND="./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Nb --pocc_params=S0-1xA_S1-0.5xB-0.5xC | ./aflow --hnf" && COUNT=$$(eval "$$COMMAND" | grep 'Optimized HNF value = ' | tail -1 | awk -F 'value = ' '{print $$2}' | cut -d ' ' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return an HNF value of $$ANSWER for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt C2HfNb" | tee -a $(COUNTER_FILE) && ANSWER=2 && COMMAND="./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Nb --pocc_params=S0-1xA_S1-0.5xB-0.5xC | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return an HNF value of $$ANSWER for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt C5HfMoNbTaTi" | tee -a $(COUNTER_FILE) && ANSWER=49 && COMMAND="./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Mo:Nb:Ta:Ti --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt C5HfMoNbTaV" | tee -a $(COUNTER_FILE) && ANSWER=49 && COMMAND="./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Mo:Nb:Ta:V --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt C5HfMoNbTaW" | tee -a $(COUNTER_FILE) && ANSWER=49 && COMMAND="./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Mo:Nb:Ta:W --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt C5HfMoNbTaZr" | tee -a $(COUNTER_FILE) && ANSWER=49 && COMMAND="./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Mo:Nb:Ta:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt C5HfMoNbTiV" | tee -a $(COUNTER_FILE) && ANSWER=49 && COMMAND="./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Mo:Nb:Ti:V --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt C5HfMoNbTiW" | tee -a $(COUNTER_FILE) && ANSWER=49 && COMMAND="./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Mo:Nb:Ti:W --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt C5HfMoNbTiZr" | tee -a $(COUNTER_FILE) && ANSWER=49 && COMMAND="./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Mo:Nb:Ti:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt C5HfMoNbVW" | tee -a $(COUNTER_FILE) && ANSWER=49 && COMMAND="./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Mo:Nb:V:W --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt C5HfMoNbVZr" | tee -a $(COUNTER_FILE) && ANSWER=49 && COMMAND="./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Mo:Nb:V:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt C5HfMoNbWZr" | tee -a $(COUNTER_FILE) && ANSWER=49 && COMMAND="./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Mo:Nb:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt C5HfMoTaTiV" | tee -a $(COUNTER_FILE) && ANSWER=49 && COMMAND="./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Mo:Ta:Ti:V --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt C5HfMoTaTiW" | tee -a $(COUNTER_FILE) && ANSWER=49 && COMMAND="./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Mo:Ta:Ti:W --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt C5HfMoTaTiZr" | tee -a $(COUNTER_FILE) && ANSWER=49 && COMMAND="./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Mo:Ta:Ti:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt C5HfMoTaVW" | tee -a $(COUNTER_FILE) && ANSWER=49 && COMMAND="./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Mo:Ta:V:W --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt C5HfMoTaVZr" | tee -a $(COUNTER_FILE) && ANSWER=49 && COMMAND="./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Mo:Ta:V:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt C5HfMoTaWZr" | tee -a $(COUNTER_FILE) && ANSWER=49 && COMMAND="./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Mo:Ta:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt C5HfMoTiVW" | tee -a $(COUNTER_FILE) && ANSWER=49 && COMMAND="./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Mo:Ti:V:W --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt C5HfMoTiVZr" | tee -a $(COUNTER_FILE) && ANSWER=49 && COMMAND="./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Mo:Ti:V:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt C5HfMoTiWZr" | tee -a $(COUNTER_FILE) && ANSWER=49 && COMMAND="./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt C5HfMoVWZr" | tee -a $(COUNTER_FILE) && ANSWER=49 && COMMAND="./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Mo:V:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt C5HfNbTaTiV" | tee -a $(COUNTER_FILE) && ANSWER=49 && COMMAND="./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Nb:Ta:Ti:V --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt C5HfNbTaTiW" | tee -a $(COUNTER_FILE) && ANSWER=49 && COMMAND="./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Nb:Ta:Ti:W --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt C5HfNbTaTiZr" | tee -a $(COUNTER_FILE) && ANSWER=49 && COMMAND="./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Nb:Ta:Ti:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt C5HfNbTaVW" | tee -a $(COUNTER_FILE) && ANSWER=49 && COMMAND="./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Nb:Ta:V:W --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt C5HfNbTaVZr" | tee -a $(COUNTER_FILE) && ANSWER=49 && COMMAND="./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Nb:Ta:V:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt C5HfNbTaWZr" | tee -a $(COUNTER_FILE) && ANSWER=49 && COMMAND="./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Nb:Ta:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt C5HfNbTiVW" | tee -a $(COUNTER_FILE) && ANSWER=49 && COMMAND="./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Nb:Ti:V:W --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt C5HfNbTiVZr" | tee -a $(COUNTER_FILE) && ANSWER=49 && COMMAND="./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Nb:Ti:V:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt C5HfNbTiWZr" | tee -a $(COUNTER_FILE) && ANSWER=49 && COMMAND="./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Nb:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt C5HfNbVWZr" | tee -a $(COUNTER_FILE) && ANSWER=49 && COMMAND="./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Nb:V:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt C5HfTaTiVW" | tee -a $(COUNTER_FILE) && ANSWER=49 && COMMAND="./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Ta:Ti:V:W --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt C5HfTaTiVZr" | tee -a $(COUNTER_FILE) && ANSWER=49 && COMMAND="./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Ta:Ti:V:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt C5HfTaTiWZr" | tee -a $(COUNTER_FILE) && ANSWER=49 && COMMAND="./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Ta:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt C5HfTaVWZr" | tee -a $(COUNTER_FILE) && ANSWER=49 && COMMAND="./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Ta:V:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt C5HfTiVWZr" | tee -a $(COUNTER_FILE) && ANSWER=49 && COMMAND="./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Ti:V:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt C5MoNbTaTiV" | tee -a $(COUNTER_FILE) && ANSWER=49 && COMMAND="./aflow --proto=AB_cF8_225_a_b.AB:C:Mo:Nb:Ta:Ti:V --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt C5MoNbTaTiW" | tee -a $(COUNTER_FILE) && ANSWER=49 && COMMAND="./aflow --proto=AB_cF8_225_a_b.AB:C:Mo:Nb:Ta:Ti:W --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt C5MoNbTaTiZr" | tee -a $(COUNTER_FILE) && ANSWER=49 && COMMAND="./aflow --proto=AB_cF8_225_a_b.AB:C:Mo:Nb:Ta:Ti:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - optimized HNF value of rocksalt C5MoNbTaVW" | tee -a $(COUNTER_FILE) && ANSWER=5 && COMMAND="./aflow --proto=AB_cF8_225_a_b.AB:C:Mo:Nb:Ta:V:W --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --hnf" && COUNT=$$(eval "$$COMMAND" | grep 'Optimized HNF value = ' | tail -1 | awk -F 'value = ' '{print $$2}' | cut -d ' ' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return an HNF value of $$ANSWER for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt C5MoNbTaVW" | tee -a $(COUNTER_FILE) && ANSWER=49 && COMMAND="./aflow --proto=AB_cF8_225_a_b.AB:C:Mo:Nb:Ta:V:W --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@if [ -n "$$TRAVIS" ] || [ "$$CI" = true ]; then export PATH=$$(pwd):$$PATH; fi && COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - aflow.in generator of rocksalt C5MoNbTaVW" | tee -a $(COUNTER_FILE) && ANSWER=49 && AFLOW_BIN=$$(pwd)/aflow && TEMPDIR=$$(mktemp -d) && AFLOWDATA_DIR="./AFLOWDATA/CMo_pvNb_svTa_pvV_svW_pv:PAW_PBE/AB_cF8_225_a_b.AB:POCC_P0-1xA_P1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF" && COMMAND="$$AFLOW_BIN --aflow_proto=AB_cF8_225_a_b.AB:C:Mo:Nb:Ta:V:W --pocc_params=P0-1xA_P1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF --generate_aflowin_only && cd $$AFLOWDATA_DIR && $$AFLOW_BIN --run --generate_aflowin_only" && COUNT=$$(cd $$TEMPDIR && eval "$$COMMAND" >/dev/null && find ARUN.POCC_* -name aflow.in | wc -l) && rm -rf $$TEMPDIR && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER new aflow.in's for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt C5MoNbTaVZr" | tee -a $(COUNTER_FILE) && ANSWER=49 && COMMAND="./aflow --proto=AB_cF8_225_a_b.AB:C:Mo:Nb:Ta:V:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt C5MoNbTaWZr" | tee -a $(COUNTER_FILE) && ANSWER=49 && COMMAND="./aflow --proto=AB_cF8_225_a_b.AB:C:Mo:Nb:Ta:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt C5MoNbTiVW" | tee -a $(COUNTER_FILE) && ANSWER=49 && COMMAND="./aflow --proto=AB_cF8_225_a_b.AB:C:Mo:Nb:Ti:V:W --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt C5MoNbTiVZr" | tee -a $(COUNTER_FILE) && ANSWER=49 && COMMAND="./aflow --proto=AB_cF8_225_a_b.AB:C:Mo:Nb:Ti:V:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt C5MoNbTiWZr" | tee -a $(COUNTER_FILE) && ANSWER=49 && COMMAND="./aflow --proto=AB_cF8_225_a_b.AB:C:Mo:Nb:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt C5MoNbVWZr" | tee -a $(COUNTER_FILE) && ANSWER=49 && COMMAND="./aflow --proto=AB_cF8_225_a_b.AB:C:Mo:Nb:V:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt C5MoTaTiVW" | tee -a $(COUNTER_FILE) && ANSWER=49 && COMMAND="./aflow --proto=AB_cF8_225_a_b.AB:C:Mo:Ta:Ti:V:W --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt C5MoTaTiVZr" | tee -a $(COUNTER_FILE) && ANSWER=49 && COMMAND="./aflow --proto=AB_cF8_225_a_b.AB:C:Mo:Ta:Ti:V:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt C5MoTaTiWZr" | tee -a $(COUNTER_FILE) && ANSWER=49 && COMMAND="./aflow --proto=AB_cF8_225_a_b.AB:C:Mo:Ta:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt C5MoTaVWZr" | tee -a $(COUNTER_FILE) && ANSWER=49 && COMMAND="./aflow --proto=AB_cF8_225_a_b.AB:C:Mo:Ta:V:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt C5MoTiVWZr" | tee -a $(COUNTER_FILE) && ANSWER=49 && COMMAND="./aflow --proto=AB_cF8_225_a_b.AB:C:Mo:Ti:V:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt C5NbTaTiVW" | tee -a $(COUNTER_FILE) && ANSWER=49 && COMMAND="./aflow --proto=AB_cF8_225_a_b.AB:C:Nb:Ta:Ti:V:W --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt C5NbTaTiVZr" | tee -a $(COUNTER_FILE) && ANSWER=49 && COMMAND="./aflow --proto=AB_cF8_225_a_b.AB:C:Nb:Ta:Ti:V:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt C5NbTaTiWZr" | tee -a $(COUNTER_FILE) && ANSWER=49 && COMMAND="./aflow --proto=AB_cF8_225_a_b.AB:C:Nb:Ta:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt C5NbTaVWZr" | tee -a $(COUNTER_FILE) && ANSWER=49 && COMMAND="./aflow --proto=AB_cF8_225_a_b.AB:C:Nb:Ta:V:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt C5NbTiVWZr" | tee -a $(COUNTER_FILE) && ANSWER=49 && COMMAND="./aflow --proto=AB_cF8_225_a_b.AB:C:Nb:Ti:V:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt C5TaTiVWZr" | tee -a $(COUNTER_FILE) && ANSWER=49 && COMMAND="./aflow --proto=AB_cF8_225_a_b.AB:C:Ta:Ti:V:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt C5CrMoTaVW" | tee -a $(COUNTER_FILE) && ANSWER=49 && COMMAND="./aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ta:V:W --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt C5CrMoNbTaW" | tee -a $(COUNTER_FILE) && ANSWER=49 && COMMAND="./aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Nb:Ta:W --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt C5CrMoNbVW" | tee -a $(COUNTER_FILE) && ANSWER=49 && COMMAND="./aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Nb:V:W --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt C5CrHfTaWZr" | tee -a $(COUNTER_FILE) && ANSWER=49 && COMMAND="./aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Hf:Ta:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt C5CrHfMoTiW" | tee -a $(COUNTER_FILE) && ANSWER=49 && COMMAND="./aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Hf:Mo:Ti:W --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt C5CrMoTiWZr" | tee -a $(COUNTER_FILE) && ANSWER=49 && COMMAND="./aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+#5-metal borides
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt B10CrHfMoNbTa" | tee -a $(COUNTER_FILE) && ANSWER=84 && COMMAND="./aflow --proto=AB2_hP3_191_a_d-001.BA:B:Cr:Hf:Mo:Nb:Ta --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+#3-metal carbonitrides
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt C3N3Hf2Ta2Ti2" | tee -a $(COUNTER_FILE) && ANSWER=1356 && COMMAND="./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:N:Ta:Ti --pocc_params=S0-0.5xA-0.5xC_S1-0.333xB-0.333xD-0.333xE | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt C3N3Ta2Ti2Zr2" | tee -a $(COUNTER_FILE) && ANSWER=1356 && COMMAND="./aflow --proto=AB_cF8_225_a_b.AB:C:N:Ta:Ti:Zr --pocc_params=S0-0.5xA-0.5xB_S1-0.333xC-0.333xD-0.333xE | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt C3N3Nb2Ta2Ti2" | tee -a $(COUNTER_FILE) && ANSWER=1356 && COMMAND="./aflow --proto=AB_cF8_225_a_b.AB:C:N:Nb:Ta:Ti --pocc_params=S0-0.5xA-0.5xB_S1-0.333xC-0.333xD-0.333xE | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt C3N3Hf2Nb2Zr2" | tee -a $(COUNTER_FILE) && ANSWER=1356 && COMMAND="./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:N:Nb:Zr --pocc_params=S0-0.5xA-0.5xC_S1-0.333xB-0.333xD-0.333xE | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+#5-metal perovskite oxides
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt Ba5HfNbSnTiZrO15" | tee -a $(COUNTER_FILE) && ANSWER=49 && COMMAND="./aflow --proto=AB3C_cP5_221_a_c_b.BAC:Ba:Hf:Nb:O:Sn:Ti:Zr --pocc_params=S0-1xD_S1-1xA_S2-0.2xB-0.2xC-0.2xE-0.2xF-0.2xG | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
+	@COUNTER=$$(cat $(COUNTER_FILE) | wc -l | sed 's/^ *//') && echo "Running POCC test $$COUNTER - unique structures count of rocksalt Ba5HfSnTiYZrO15" | tee -a $(COUNTER_FILE) && ANSWER=49 && COMMAND="./aflow --proto=AB3C_cP5_221_a_c_b.BAC:Ba:Hf:O:Sn:Ti:Y:Zr --pocc_params=S0-1xC_S1-1xA_S2-0.2xB-0.2xD-0.2xE-0.2xF-0.2xG | ./aflow --pocc_count_unique" && COUNT=$$(eval "$$COMMAND" | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
+		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for '$$COMMAND', found $$COUNT instead" && exit 1; fi
 	@echo "POCC tests passed"
+	@rm -f $(COUNTER_FILE)
 .PHONY: check_aflowSG
 check_aflowSG:
+	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
 	@echo "Running aflowSG test 1" && ANSWER="Pm-3m #221" && RESULT=$$(./aflow --proto=AB_cP2_221_b_a:Cl:Cs | ./aflow --aflowSG) && \
 		if [ "$$RESULT" != "$$ANSWER" ]; then "aflowSG did not return $$ANSWER for './aflow --proto=AB_cP2_221_b_a:Cl:Cs | ./aflow --aflowSG', found $$RESULT instead" && exit 1; fi
 	@echo "aflowSG test 1 passed!"
 .PHONY: check_AFLOWSYM
 check_AFLOWSYM:
+	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
 	@echo "Running aflowSYM test 1" && ANSWER_PGROUPS=8 && ANSWER_PGROUPKS=8 && ANSWER_FGROUPS=4 && ANSWER_PGROUP_XTALS=4 && ANSWER_PGROUPK_XTALS=4 && ANSWER_AGROUPS=24 && ANSWER_SGROUPS=108 && RESULT=$$(./aflow --proto=ABC2_mP8_10_ac_eh_mn-001:Au:Ag:Te | ./aflow --aflowSYM --screen_only) && COUNT_PGROUPS=$$(echo $$RESULT | awk -F'pgroup ' '{print NF-1}') && COUNT_PGROUPKS=$$(echo $$RESULT | awk -F'pgroupk ' '{print NF-1}') && COUNT_FGROUPS=$$(echo $$RESULT | awk -F'fgroup ' '{print NF-1}') && COUNT_PGROUP_XTALS=$$(echo $$RESULT | awk -F'pgroup_xtal ' '{print NF-1}') && COUNT_PGROUPK_XTALS=$$(echo $$RESULT | awk -F'pgroupk_xtal ' '{print NF-1}') && COUNT_AGROUPS=$$(echo $$RESULT | awk -F'agroup ' '{print NF-1}') && COUNT_SGROUPS=$$(echo $$RESULT | awk -F'sgroup ' '{print NF-1}') && \
 		if [ "$$ANSWER_PGROUPS" -ne "$$COUNT_PGROUPS" ] || [ "$$ANSWER_PGROUPKS" -ne "$$COUNT_PGROUPKS" ] || [ "$$ANSWER_FGROUPS" -ne "$$COUNT_FGROUPS" ] || [ "$$ANSWER_PGROUP_XTALS" -ne "$$COUNT_PGROUP_XTALS" ] || [ "$$ANSWER_PGROUPK_XTALS" -ne "$$COUNT_PGROUPK_XTALS" ] || [ "$$ANSWER_AGROUPS" -ne "$$COUNT_AGROUPS" ] || [ "$$ANSWER_SGROUPS" -ne "$$COUNT_SGROUPS" ]; then "aflowSYM did not return one of the correct group cardinalities for './aflow --proto=ABC2_mP8_10_ac_eh_mn-001:Au:Ag:Te | ./aflow --aflowSYM --screen_only'; (ANSWER==FOUND) $$ANSWER_PGROUPS==$$COUNT_PGROUPS, $$ANSWER_PGROUPKS==$$COUNT_PGROUPKS, $$ANSWER_FGROUPS==$$COUNT_FGROUPS, $$ANSWER_PGROUP_XTALS==$$COUNT_PGROUP_XTALS, $$ANSWER_PGROUPK_XTALS==$$COUNT_PGROUPK_XTALS, $$ANSWER_AGROUPS==$$COUNT_AGROUPS, $$ANSWER_SGROUPS==$$COUNT_SGROUPS"  && exit 1; fi
 	@echo "aflowSYM test 1 passed!"
 .PHONY: check_edata
 check_edata:
-	@echo "Running edata test 1" && ANSWER=1 RESULT=$$(./aflow --proto=AB2_tI6_139_a_e:Os:Rh --params=2.7095,4.27466,0.662829 | ./aflow --edata | grep "BRAVAIS LATTICE OF THE LATTICE (pgroup)" | wc -l) && \
+	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
+	@echo "Running edata test 1" && ANSWER=1 RESULT=$$(./aflow --proto=AB2_tI6_139_a_e:Os:Rh --params=2.7095,4.27466,0.662829 | ./aflow --edata | grep "BRAVAIS LATTICE OF THE LATTICE (pgroup)" | wc -l | sed 's/^ *//') && \
 		if [ "$$ANSWER" -ne "$$RESULT" ]; then "edata did not finish successfully" && exit 1; fi
 	@echo "edata test 1 passed!"
-.PHONY: check_aflow_xtal_match
-check_aflow_xtal_match:
-	@echo "Running aflow_xtal_match test 1" && ANSWER=1 && RESULT=$$(./aflow --proto=A2B3_hR10_167_c_e:Al:O --params=-1,2.72957758313,0.36,0.5561 | ./aflow --compare2protos --print=txt --catalog=anrl --quiet) && NUM_MATCHING_PROTOS=$$(echo $$RESULT | awk -F'duplicate_compounds=' '{print $$2}' | awk '{print $$1}') && \
-		if [ "$$NUM_MATCHING_PROTOS" -ne "$$ANSWER" ]; then "aflow_xtal_match did not return $$ANSWER for './aflow --proto=A2B3_hR10_167_c_e:Al:O --params=-1,2.72957758313,0.36,0.5561 | ./aflow --compare2protos --print=txt --catalog=anrl --quiet', found $$NUM_MATCHING_PROTOS instead" && exit 1; fi
-	@echo "aflow_xtal_match test 1 passed!"
+.PHONY: check_aflow_xtal_finder
+check_aflow_xtal_finder:
+	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
+	@echo "Running aflow_xtal_finder - ideal prototyper test 1" && ANSWER="A2B3_hR10_167_c_e" && RESULT=$$(./aflow --proto=A2B3_hR10_167_c_e:Al:O --params=5.22337,2.72958,0.64784,0.9439 | ./aflow --prototype) && AFLOW_LABEL=$$(echo $$RESULT | grep "AFLOW label" | awk '{print $$4}') && \
+		if [ $$AFLOW_LABEL != $$ANSWER ]; then "aflow_xtal_finder did not return $$ANSWER for './aflow --proto=A2B3_hR10_167_c_e:Al:O --params=5.22337,2.72958,0.64784,0.9439 | ./aflow --prototype', found $$AFLOW_LABEL instead" && exit 1; fi
+	@echo "aflow_xtal_finder - ideal prototyper test 1 passed!"
+	@echo "Running aflow_xtal_finder - ideal prototyper test 2" && ANSWER="AB18C8_cF108_225_a_eh_f" && RESULT=$$(./aflow --proto=AB18C8_cF108_225_a_eh_f --params=10.3439,0.325,0.65833,0.16 | ./aflow --prototype) && AFLOW_LABEL=$$(echo $$RESULT | grep "AFLOW label" | awk '{print $$4}') && \
+		if [ $$AFLOW_LABEL != $$ANSWER ]; then "aflow_xtal_finder did not return $$ANSWER for './aflow --proto=AB18C8_cF108_225_a_eh_f --params=10.3439,0.325,0.65833,0.16 | ./aflow --prototype', found $$AFLOW_LABEL instead" && exit 1; fi
+	@echo "aflow_xtal_finder - ideal prototyper test 2 passed!"
+	@echo "Running aflow_xtal_finder - ideal prototyper test 3" && ANSWER="ABC4_mP12_13_e_a_2g" && RESULT=$$(./aflow --proto=ABC4_mP12_13_e_a_2g --params=8.6244,0.500336,1.63361,145.35,0.5182,0.2986,0.0278,0.0003,0.2821,0.4045,0.2366 | ./aflow --prototype) && AFLOW_LABEL=$$(echo $$RESULT | grep "AFLOW label" | awk '{print $$4}') && \
+		if [ $$AFLOW_LABEL != $$ANSWER ]; then "aflow_xtal_finder did not return $$ANSWER for './aflow --proto=ABC4_mP12_13_e_a_2g --params=8.6244,0.500336,1.63361,145.35,0.5182,0.2986,0.0278,0.0003,0.2821,0.4045,0.2366 | ./aflow --prototype', found $$AFLOW_LABEL instead" && exit 1; fi
+	@echo "aflow_xtal_finder - ideal prototyper test 3 passed!"
+	@echo "Running aflow_xtal_finder - compare materials test 1 (different cell sizes)" && ANSWER="MATCH" && RESULT=$$(./aflow --proto=AB_cF8_225_a_b:Cl:Na > AB_cF8_225_a_b.poscar; cat AB_cF8_225_a_b.poscar | ./aflow --supercell=4,1,1 > AB_cF8_225_a_b_411_supercell.poscar; ./aflow --compare_materials=AB_cF8_225_a_b.poscar,AB_cF8_225_a_b_411_supercell.poscar --quiet) && MATCH=$$(echo $$RESULT | awk '{print $$3}') && \
+		if [ $$MATCH != $$ANSWER ]; then "aflow_xtal_finder did not return $$ANSWER for './aflow --proto=AB_cF8_225_a_b:Cl:Na > AB_cF8_225_a_b; cat AB_cF8_225_a_b.poscar | ./aflow --supercell=4,1,1 > AB_cF8_225_a_b_411_supercell.poscar; ./aflow --compare_materials=AB_cF8_225_a_b.poscar,AB_cF8_225_a_b_411_supercell.poscar --quiet', found $$MATCH instead" && exit 1; fi
+	@echo "aflow_xtal_finder - compare_materials test 1 (different cell sizes) passed!"
+	@rm -f AB_cF8_225_a_b.poscar
+	@rm -f AB_cF8_225_a_b_411_supercell.poscar
+	@echo "Running aflow_xtal_finder - compare materials test 2 (different cell sizes)" && ANSWER="MATCH" && RESULT=$$(./aflow --proto=AB_cF8_225_a_b:Cl:Na > AB_cF8_225_a_b.poscar; cat AB_cF8_225_a_b.poscar | ./aflow --supercell=4,1,1 > AB_cF8_225_a_b_411_supercell.poscar; ./aflow --compare_materials=AB_cF8_225_a_b_411_supercell.poscar,AB_cF8_225_a_b.poscar --quiet) && MATCH=$$(echo $$RESULT | awk '{print $$3}') && \
+		if [ $$MATCH != $$ANSWER ]; then "aflow_xtal_finder did not return $$ANSWER for './aflow --proto=AB_cF8_225_a_b:Cl:Na > AB_cF8_225_a_b; cat AB_cF8_225_a_b.poscar | ./aflow --supercell=4,1,1 > AB_cF8_225_a_b_411_supercell.poscar; ./aflow --compare_materials=AB_cF8_225_a_b_411_supercell.poscar,AB_cF8_225_a_b.poscar --quiet', found $$MATCH instead" && exit 1; fi
+	@echo "aflow_xtal_finder - compare_materials test 2 (different cell sizes) passed!"
+	@rm -f AB_cF8_225_a_b.poscar
+	@rm -f AB_cF8_225_a_b_411_supercell.poscar
+	@echo "Running aflow_xtal_finder - compare atom decorations test 1" && ANSWER=3 && RESULT=$$(./aflow --proto=ABCD_cF16_216_c_d_b_a | ./aflow --unique_atom_decorations --print_misfit --quiet) && NUM_UNIQUE_DECORATIONS=$$(echo $$RESULT | grep "Unique atom decorations" | cut -d '(' -f2 | cut -d ')' -f1) && \
+		if [ "$$NUM_UNIQUE_DECORATIONS" -ne "$$ANSWER" ]; then "aflow_xtal_finder did not return $$ANSWER for './aflow --proto=ABCD_cF16_216_c_d_b_a | ./aflow --unique_atom_decorations --print_misfit --quiet', found $$NUM_UNIQUE_DECORATIONS instead" && exit 1; fi
+	@echo "aflow_xtal_finder test - compare atom decorations test 1 passed!"
+	@echo "Running aflow_xtal_finder - compare atom decorations test 2 " && ANSWER=3 && RESULT=$$(./aflow --proto=ABC_hP3_156_a_c_b --params=4.346,1.57271,4.44089e-16,0.4227,0.7214 | ./aflow --unique_atom_decorations --print_misfit --optimize --quiet) && NUM_UNIQUE_DECORATIONS=$$(echo $$RESULT | grep "Unique atom decorations" | cut -d '(' -f2 | cut -d ')' -f1) && \
+		if [ "$$NUM_UNIQUE_DECORATIONS" -ne "$$ANSWER" ]; then "aflow_xtal_finder did not return $$ANSWER for './aflow --proto=ABC_hP3_156_a_c_b --params=4.346,1.57271,4.44089e-16,0.4227,0.7214 | ./aflow --unique_atom_decorations --print_misfit --optimize --quiet', found $$NUM_UNIQUE_DECORATIONS instead" && exit 1; fi
+	@echo "aflow_xtal_finder - compare atom decorations test 1 passed!"
+	@echo "Running aflow_xtal_finder - compare2protos test 1" && ANSWER=2 && RESULT=$$(./aflow --proto=A2B3_hR10_167_c_e:Al:O --params=-1,2.72957758313,0.36,0.5561 | ./aflow --compare2protos --print=txt --catalog=anrl --quiet) && NUM_MATCHING_PROTOS=$$(echo $$RESULT | awk -F'duplicate_compounds=' '{print $$2}' | awk '{print $$1}') && \
+		if [ "$$NUM_MATCHING_PROTOS" -ne "$$ANSWER" ]; then "aflow_xtal_finder did not return $$ANSWER for './aflow --proto=A2B3_hR10_167_c_e:Al:O --params=-1,2.72957758313,0.36,0.5561 | ./aflow --compare2protos --print=txt --catalog=anrl --quiet', found $$NUM_MATCHING_PROTOS instead" && exit 1; fi
+	@echo "aflow_xtal_finder - compare2protos test 1 passed!"
+	@echo "Running aflow_xtal_finder - compare magnetic configurations test 1 (antiferro vs antiferro)" && ANSWER="MATCH" && RESULT=$$(./aflow --proto=A_cI2_229_a:Cr | ./aflow --sconv >A_cI2_229_a_sconv.poscar ; ./aflow --compare_materials=A_cI2_229_a_sconv.poscar,A_cI2_229_a_sconv.poscar --magmoms=-1,1:1,-1 --quiet) && MATCH=$$(echo $$RESULT | awk '{print $$3}') && \
+		if [ $$MATCH != $$ANSWER ]; then "aflow_xtal_finder did not return $$ANSWER for './aflow --proto=A_cI2_229_a:Cr | ./aflow --sconv >A_cI2_229_a_sconv.poscar ; ./aflow --compare_materials=A_cI2_229_a_sconv.poscar,A_cI2_229_a_sconv.poscar --magmoms=-1,1:1,-1 --quiet', found $$MATCH instead" && exit 1; fi
+	@echo "aflow_xtal_finder - compare magnetic configuration test 1 (antiferro vs antiferro) passed!"
+	@rm -f A_cI2_229_a_sconv.poscar
+	@echo "Running aflow_xtal_finder - compare magnetic configurations test 2 (ferro vs antiferro)" && ANSWER="UNMATCHABLE" && RESULT=$$(./aflow --proto=A_cI2_229_a:Cr | ./aflow --sconv >A_cI2_229_a_sconv.poscar ; ./aflow --compare_materials=A_cI2_229_a_sconv.poscar,A_cI2_229_a_sconv.poscar --magmoms=1,1:1,-1 --quiet) && MATCH=$$(echo $$RESULT | awk '{print $$1}') && \
+		if [ $$MATCH != $$ANSWER ]; then "aflow_xtal_finder did not return $$ANSWER for './aflow --proto=A_cI2_229_a:Cr | ./aflow --sconv >A_cI2_229_a_sconv.poscar ; ./aflow --compare_materials=A_cI2_229_a_sconv.poscar,A_cI2_229_a_sconv.poscar --magmoms=1,1:1,-1 --quiet', found $$MATCH instead" && exit 1; fi
+	@echo "aflow_xtal_finder - compare magnetic configuration test 2 (ferro vs antiferro) passed!"
+	@rm -f A_cI2_229_a_sconv.poscar
+	@echo "Running aflow_xtal_finder - compare magnetic configurations test 3 (ferro-up vs ferro-down)" && ANSWER="UNMATCHABLE" && RESULT=$$(./aflow --proto=A_cI2_229_a:Cr | ./aflow --sconv >A_cI2_229_a_sconv.poscar ; ./aflow --compare_materials=A_cI2_229_a_sconv.poscar,A_cI2_229_a_sconv.poscar --magmoms=1,1:-1,-1 --quiet) && MATCH=$$(echo $$RESULT | awk '{print $$1}') && \
+		if [ $$MATCH != $$ANSWER ]; then "aflow_xtal_finder did not return $$ANSWER for './aflow --proto=A_cI2_229_a:Cr | ./aflow --sconv >A_cI2_229_a_sconv.poscar ; ./aflow --compare_materials=A_cI2_229_a_sconv.poscar,A_cI2_229_a_sconv.poscar --magmoms=1,1:-1,-1 --quiet', found $$MATCH instead" && exit 1; fi
+	@echo "aflow_xtal_finder - compare magnetic configuration test 3 (ferro-up vs ferro-down) passed!"
+	@rm -f A_cI2_229_a_sconv.poscar
+.PHONY: check_fold_atoms_in_cell_routine
+check_fold_atoms_in_cell_routine:
+	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
+	./aflow --FoldAtomsInCell_test
+.PHONY: check_prototype_generator
+check_prototype_generator:
+	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
+	./aflow --PrototypeGenerator_test
 #RF20200302 - START
 .PHONY: check_cce
 check_cce:
+	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
 	@echo "Performing 'aflow --cce' test"
 	@echo "Running CCE test 1: MgO"
-	@./aflow --proto=AB_cF8_225_a_b:Mg:O --params=4.253 > POSCAR_proto_Mg1O1_ICSD_159378; ANSWER=0.801,0.763,0.015,-0.025,-0.014,-0.054,-6.235,-6.197,-6.235,-6.195,-6.235,-6.195; RESULT=$$(./aflow --cce=POSCAR_proto_Mg1O1_ICSD_159378 --cce_test --dft_formation_energies=-5.434,-6.220,-6.249 --functionals=PBE,LDA,SCAN --oxidation_numbers=2,-2); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 1 failed!, check CCE on POSCAR_proto_Mg1O1_ICSD_159378"; else echo "CCE test 1 passed!"; rm -f POSCAR_proto_Mg1O1_ICSD_159378 ; fi
+	@./aflow --proto=AB_cF8_225_a_b:Mg:O --params=4.253 > POSCAR_proto_Mg1O1_ICSD_159378; ANSWER=0.801,0.763,0.015,-0.025,-0.014,-0.054,-6.235,-6.197,-6.235,-6.195,-6.235,-6.195; RESULT=$$(./aflow --cce=POSCAR_proto_Mg1O1_ICSD_159378 --cce_test --dft_formation_energies=-5.434,-6.220,-6.249 --functionals=PBE,LDA,SCAN --oxidation_numbers=2,-2); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 1 failed!, check CCE on POSCAR_proto_Mg1O1_ICSD_159378" && exit 1; else echo "CCE test 1 passed!"; rm -f POSCAR_proto_Mg1O1_ICSD_159378 ; fi
 	@echo "Running CCE test 2: Ti3O5"
-	@wget --quiet http://aflowlib.duke.edu/AFLOWDATA/ICSD_WEB/MCLC/O5Ti3_ICSD_75193/CONTCAR.relax.vasp; ANSWER=-3.210,-3.532,3.638,3.338,-3.134,-3.454,-50.754,-50.432,-51.234,-50.934,-50.870,-50.550; mv CONTCAR.relax.vasp CONTCAR.relax.vasp_O5Ti3_ICSD_75193; RESULT=$$(./aflow --cce=CONTCAR.relax.vasp_O5Ti3_ICSD_75193 --cce_test --dft_formation_energies=-53.964,-47.596,-54.004 --functionals=LDA,PBE,SCAN); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 2 failed!, check CCE on CONTCAR.relax.vasp_O5Ti3_ICSD_75193"; else echo "CCE test 2 passed!"; rm -f CONTCAR.relax.vasp_O5Ti3_ICSD_75193 ; fi
+	@wget --quiet http://aflowlib.duke.edu/AFLOWDATA/ICSD_WEB/MCLC/O5Ti3_ICSD_75193/CONTCAR.relax.vasp; ANSWER=-3.210,-3.532,3.638,3.338,-3.134,-3.454,-50.754,-50.432,-51.234,-50.934,-50.870,-50.550; mv CONTCAR.relax.vasp CONTCAR.relax.vasp_O5Ti3_ICSD_75193; RESULT=$$(./aflow --cce=CONTCAR.relax.vasp_O5Ti3_ICSD_75193 --cce_test --dft_formation_energies=-53.964,-47.596,-54.004 --functionals=LDA,PBE,SCAN); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 2 failed!, check CCE on CONTCAR.relax.vasp_O5Ti3_ICSD_75193" && exit 1; else echo "CCE test 2 passed!"; rm -f CONTCAR.relax.vasp_O5Ti3_ICSD_75193 ; fi
 	@echo "Running CCE test 3: Mg2SiO4"
-	@./aflow --proto=A2B4C_oP28_62_ac_2cd_c:Mg:O:Si --params=10.193,0.586382811734,0.466202295693,0.2774,-0.0085,0.0913,0.7657,0.4474,0.2215,0.094,0.4262,0.1628,0.0331,0.2777 > POSCAR_proto_Mg2O4Si1_ICSD_83793; ANSWER=10.456,9.912,-0.252,-0.824,-0.444,-1.020,-89.916,-89.372,-89.860,-89.288,-90.000,-89.424; RESULT=$$(./aflow --cce=POSCAR_proto_Mg2O4Si1_ICSD_83793 --cce_test --dft_formation_energies=-79.46,-90.112,-90.444 --functionals=PBE,LDA,SCAN --oxidation_numbers=2,2,2,2,2,2,2,2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,4,4,4,4); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 3 failed!, check CCE on POSCAR_proto_Mg2O4Si1_ICSD_83793"; else echo "CCE test 3 passed!"; rm -f POSCAR_proto_Mg2O4Si1_ICSD_83793 ; fi
+	@./aflow --proto=A2B4C_oP28_62_ac_2cd_c:Mg:O:Si --params=10.193,0.586382811734,0.466202295693,0.2774,-0.0085,0.0913,0.7657,0.4474,0.2215,0.094,0.4262,0.1628,0.0331,0.2777 > POSCAR_proto_Mg2O4Si1_ICSD_83793; ANSWER=10.456,9.912,-0.252,-0.824,-0.444,-1.020,-89.916,-89.372,-89.860,-89.288,-90.000,-89.424; RESULT=$$(./aflow --cce=POSCAR_proto_Mg2O4Si1_ICSD_83793 --cce_test --dft_formation_energies=-79.46,-90.112,-90.444 --functionals=PBE,LDA,SCAN --oxidation_numbers=2,2,2,2,2,2,2,2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,4,4,4,4); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 3 failed!, check CCE on POSCAR_proto_Mg2O4Si1_ICSD_83793" && exit 1; else echo "CCE test 3 passed!"; rm -f POSCAR_proto_Mg2O4Si1_ICSD_83793 ; fi
 	@echo "Running CCE test 4: BaTiO3"
-	@./aflow --proto=AB3C_cP5_221_a_c_b:Ba:O:Ti --params=4.033 > POSCAR_proto_Ba1O3Ti1_ICSD_187292; ANSWER=2.063,1.981,-0.461,-0.553,-0.692,-0.783,-17.513,-17.431,-17.180,-17.088,-17.010,-16.919; RESULT=$$(./aflow --cce=POSCAR_proto_Ba1O3Ti1_ICSD_187292 --cce_test --dft_formation_energies=-15.450,-17.641,-17.702 --functionals=PBE,LDA,SCAN); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 4 failed!, check CCE on POSCAR_proto_Ba1O3Ti1_ICSD_187292"; else echo "CCE test 4 passed!"; rm -f POSCAR_proto_Ba1O3Ti1_ICSD_187292 ; fi
+	@./aflow --proto=AB3C_cP5_221_a_c_b:Ba:O:Ti --params=4.033 > POSCAR_proto_Ba1O3Ti1_ICSD_187292; ANSWER=2.063,1.981,-0.461,-0.553,-0.692,-0.783,-17.513,-17.431,-17.180,-17.088,-17.010,-16.919; RESULT=$$(./aflow --cce=POSCAR_proto_Ba1O3Ti1_ICSD_187292 --cce_test --dft_formation_energies=-15.450,-17.641,-17.702 --functionals=PBE,LDA,SCAN); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 4 failed!, check CCE on POSCAR_proto_Ba1O3Ti1_ICSD_187292" && exit 1; else echo "CCE test 4 passed!"; rm -f POSCAR_proto_Ba1O3Ti1_ICSD_187292 ; fi
 	@echo "Running CCE test 5: Na2WO4"
-	@./aflow --proto=A2BC4_cF56_227_d_a_e:Na:W:O --params=9.0433,0.260612 > POSCAR_proto_Na2O4W1_ICSD_44524; ANSWER=2.014,1.843,-1.765,-1.963,-1.359,-1.561,-32.470,-32.299,-31.827,-31.629,-32.513,-32.311; RESULT=$$(./aflow --cce=POSCAR_proto_Na2O4W1_ICSD_44524 --cce_test --dft_formation_energies=-30.456,-33.592,-33.872 --functionals=PBE,LDA,SCAN --oxidation_numbers=1,1,1,1,-2,-2,-2,-2,-2,-2,-2,-2,6,6); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 5 failed!, check CCE on POSCAR_proto_Na2O4W1_ICSD_44524"; else echo "CCE test 5 passed!"; rm -f POSCAR_proto_Na2O4W1_ICSD_44524 ; fi
+	@./aflow --proto=A2BC4_cF56_227_d_a_e:Na:W:O --params=9.0433,0.260612 > POSCAR_proto_Na2O4W1_ICSD_44524; ANSWER=2.014,1.843,-1.765,-1.963,-1.359,-1.561,-32.470,-32.299,-31.827,-31.629,-32.513,-32.311; RESULT=$$(./aflow --cce=POSCAR_proto_Na2O4W1_ICSD_44524 --cce_test --dft_formation_energies=-30.456,-33.592,-33.872 --functionals=PBE,LDA,SCAN --oxidation_numbers=1,1,1,1,-2,-2,-2,-2,-2,-2,-2,-2,6,6); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 5 failed!, check CCE on POSCAR_proto_Na2O4W1_ICSD_44524" && exit 1; else echo "CCE test 5 passed!"; rm -f POSCAR_proto_Na2O4W1_ICSD_44524 ; fi
 	@echo "Running CCE test 6: PbMoO4"
-	@wget --quiet http://aflowlib.duke.edu/AFLOWDATA/ICSD_WEB/BCT/Mo1O4Pb1_ICSD_89034/CONTCAR.relax.vasp; ANSWER=-2.922,-3.054,-0.332,-0.430,-4.468,-4.608,-21.832,-21.700,-22.330,-22.232,-21.104,-20.964; mv CONTCAR.relax.vasp CONTCAR.relax.vasp_Mo1O4Pb1_ICSD_89034; RESULT=$$(./aflow --cce=CONTCAR.relax.vasp_Mo1O4Pb1_ICSD_89034 --cce_test --dft_formation_energies=-24.754,-22.662,-25.572 --functionals=SCAN,PBE,LDA); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 6 failed!, check CCE on CONTCAR.relax.vasp_Mo1O4Pb1_ICSD_89034"; else echo "CCE test 6 passed!"; rm -f CONTCAR.relax.vasp_Mo1O4Pb1_ICSD_89034 ; fi
+	@wget --quiet http://aflowlib.duke.edu/AFLOWDATA/ICSD_WEB/BCT/Mo1O4Pb1_ICSD_89034/CONTCAR.relax.vasp; ANSWER=-2.922,-3.054,-0.332,-0.430,-4.468,-4.608,-21.832,-21.700,-22.330,-22.232,-21.104,-20.964; mv CONTCAR.relax.vasp CONTCAR.relax.vasp_Mo1O4Pb1_ICSD_89034; RESULT=$$(./aflow --cce=CONTCAR.relax.vasp_Mo1O4Pb1_ICSD_89034 --cce_test --dft_formation_energies=-24.754,-22.662,-25.572 --functionals=SCAN,PBE,LDA); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 6 failed!, check CCE on CONTCAR.relax.vasp_Mo1O4Pb1_ICSD_89034" && exit 1; else echo "CCE test 6 passed!"; rm -f CONTCAR.relax.vasp_Mo1O4Pb1_ICSD_89034 ; fi
 	@echo "Running CCE test 7: Fe3O4"
-	@./aflow --proto=A3B4_cF56_227_ad_e:Fe:O --params=8.3886,0.745448 > POSCAR_proto_Fe3O4_ICSD_263007; ANSWER=5.381,5.246,1.832,1.654,-1.084,-1.263,-23.575,-23.440,-23.068,-22.890,-24.320,-24.141; RESULT=$$(./aflow --cce=POSCAR_proto_Fe3O4_ICSD_263007 --cce_test --dft_formation_energies=-18.194,-21.236,-25.404 --functionals=PBE,LDA,SCAN); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 7 failed!, check CCE on POSCAR_proto_Fe3O4_ICSD_263007"; else echo "CCE test 7 passed!"; rm -f POSCAR_proto_Fe3O4_ICSD_263007 ; fi
+	@./aflow --proto=A3B4_cF56_227_ad_e:Fe:O --params=8.3886,0.745448 > POSCAR_proto_Fe3O4_ICSD_263007; ANSWER=5.381,5.246,1.832,1.654,-1.084,-1.263,-23.575,-23.440,-23.068,-22.890,-24.320,-24.141; RESULT=$$(./aflow --cce=POSCAR_proto_Fe3O4_ICSD_263007 --cce_test --dft_formation_energies=-18.194,-21.236,-25.404 --functionals=PBE,LDA,SCAN); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 7 failed!, check CCE on POSCAR_proto_Fe3O4_ICSD_263007" && exit 1; else echo "CCE test 7 passed!"; rm -f POSCAR_proto_Fe3O4_ICSD_263007 ; fi
 	@echo "Running CCE test 8: Ca2V2O7"
-	@wget --quiet http://aflowlib.duke.edu/AFLOWDATA/ICSD_WEB/TRI/Ca2O7V2_ICSD_421266/CONTCAR.relax.vasp; ANSWER=2.600,2.264,-4.675,-5.073,-4.499,-4.881,-64.422,-64.086,-64.113,-63.715,-65.011,-64.629; mv CONTCAR.relax.vasp CONTCAR.relax.vasp_Ca2O7V2_ICSD_421266; RESULT=$$(./aflow --cce=CONTCAR.relax.vasp_Ca2O7V2_ICSD_421266 --cce_test --dft_formation_energies=-61.822,-68.788,-69.51 --functionals=PBE,LDA,SCAN); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 8 failed!, check CCE on CONTCAR.relax.vasp_Ca2O7V2_ICSD_421266"; else echo "CCE test 8 passed!"; rm -f CONTCAR.relax.vasp_Ca2O7V2_ICSD_421266 ; fi
+	@wget --quiet http://aflowlib.duke.edu/AFLOWDATA/ICSD_WEB/TRI/Ca2O7V2_ICSD_421266/CONTCAR.relax.vasp; ANSWER=2.600,2.264,-4.675,-5.073,-4.499,-4.881,-64.422,-64.086,-64.113,-63.715,-65.011,-64.629; mv CONTCAR.relax.vasp CONTCAR.relax.vasp_Ca2O7V2_ICSD_421266; RESULT=$$(./aflow --cce=CONTCAR.relax.vasp_Ca2O7V2_ICSD_421266 --cce_test --dft_formation_energies=-61.822,-68.788,-69.51 --functionals=PBE,LDA,SCAN); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 8 failed!, check CCE on CONTCAR.relax.vasp_Ca2O7V2_ICSD_421266" && exit 1; else echo "CCE test 8 passed!"; rm -f CONTCAR.relax.vasp_Ca2O7V2_ICSD_421266 ; fi
 	@echo "Running CCE test 9: CuFeO2"
-	@wget --quiet http://aflowlib.duke.edu/AFLOWDATA/ICSD_WEB/RHL/Cu1Fe1O2_ICSD_246912/CONTCAR.relax.vasp; ANSWER=1.242,1.210,0.146,0.097,-0.266,-0.307,-5.152; mv CONTCAR.relax.vasp CONTCAR.relax.vasp_Cu1Fe1O2_ICSD_246912; RESULT=$$(./aflow --cce=CONTCAR.relax.vasp_Cu1Fe1O2_ICSD_246912 --cce_test); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 9 failed!, check CCE on CONTCAR.relax.vasp_Cu1Fe1O2_ICSD_246912"; else echo "CCE test 9 passed!"; rm -f CONTCAR.relax.vasp_Cu1Fe1O2_ICSD_246912 ; fi
+	@wget --quiet http://aflowlib.duke.edu/AFLOWDATA/ICSD_WEB/RHL/Cu1Fe1O2_ICSD_246912/CONTCAR.relax.vasp; ANSWER=1.242,1.210,0.146,0.097,-0.266,-0.307,-5.152; mv CONTCAR.relax.vasp CONTCAR.relax.vasp_Cu1Fe1O2_ICSD_246912; RESULT=$$(./aflow --cce=CONTCAR.relax.vasp_Cu1Fe1O2_ICSD_246912 --cce_test); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 9 failed!, check CCE on CONTCAR.relax.vasp_Cu1Fe1O2_ICSD_246912" && exit 1; else echo "CCE test 9 passed!"; rm -f CONTCAR.relax.vasp_Cu1Fe1O2_ICSD_246912 ; fi
 	@echo "Running CCE test 10: MnMoO4"
-	@wget --quiet http://aflowlib.duke.edu/AFLOWDATA/ICSD_WEB/MCL/Mn1Mo1O4_ICSD_61078/CONTCAR.relax.vasp; ANSWER=2.452,2.293,-0.852,-1.058,-3.459,-3.669,-24.390,-24.231,-25.458,-25.252,-24.891,-24.681; mv CONTCAR.relax.vasp CONTCAR.relax.vasp_Mn1Mo1O4_ICSD_61078; RESULT=$$(./aflow --cce=CONTCAR.relax.vasp_Mn1Mo1O4_ICSD_61078 --cce_test --dft_formation_energies=-21.938,-26.31,-28.35 --functionals=PBE,LDA,SCAN); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 10 failed!, check CCE on CONTCAR.relax.vasp_Mn1Mo1O4_ICSD_61078"; else echo "CCE test 10 passed!"; rm -f CONTCAR.relax.vasp_Mn1Mo1O4_ICSD_61078 ; fi
+	@wget --quiet http://aflowlib.duke.edu/AFLOWDATA/ICSD_WEB/MCL/Mn1Mo1O4_ICSD_61078/CONTCAR.relax.vasp; ANSWER=2.452,2.293,-0.852,-1.058,-3.459,-3.669,-24.390,-24.231,-25.458,-25.252,-24.891,-24.681; mv CONTCAR.relax.vasp CONTCAR.relax.vasp_Mn1Mo1O4_ICSD_61078; RESULT=$$(./aflow --cce=CONTCAR.relax.vasp_Mn1Mo1O4_ICSD_61078 --cce_test --dft_formation_energies=-21.938,-26.31,-28.35 --functionals=PBE,LDA,SCAN); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 10 failed!, check CCE on CONTCAR.relax.vasp_Mn1Mo1O4_ICSD_61078" && exit 1; else echo "CCE test 10 passed!"; rm -f CONTCAR.relax.vasp_Mn1Mo1O4_ICSD_61078 ; fi
 	@echo "Running CCE test 11: KO2"
-	@wget --quiet http://aflowlib.duke.edu/AFLOWDATA/ICSD_WEB/BCT/K1O2_ICSD_38245/CONTCAR.relax.vasp; ANSWER=0.285,0.259,-0.532,-0.571,-0.084,-0.118,-2.949,-2.923,-2.949,-2.910,-2.949,-2.915; mv CONTCAR.relax.vasp CONTCAR.relax.vasp_K1O2_ICSD_38245; RESULT=$$(./aflow --cce=CONTCAR.relax.vasp_K1O2_ICSD_38245 --cce_test --dft_formation_energies=-2.664,-3.481,-3.033 --functionals=PBE,LDA,SCAN); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 11 failed!, check CCE on CONTCAR.relax.vasp_K1O2_ICSD_38245"; else echo "CCE test 11 passed!"; rm -f CONTCAR.relax.vasp_K1O2_ICSD_38245 ; fi
+	@wget --quiet http://aflowlib.duke.edu/AFLOWDATA/ICSD_WEB/BCT/K1O2_ICSD_38245/CONTCAR.relax.vasp; ANSWER=0.285,0.259,-0.532,-0.571,-0.084,-0.118,-2.949,-2.923,-2.949,-2.910,-2.949,-2.915; mv CONTCAR.relax.vasp CONTCAR.relax.vasp_K1O2_ICSD_38245; RESULT=$$(./aflow --cce=CONTCAR.relax.vasp_K1O2_ICSD_38245 --cce_test --dft_formation_energies=-2.664,-3.481,-3.033 --functionals=PBE,LDA,SCAN); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 11 failed!, check CCE on CONTCAR.relax.vasp_K1O2_ICSD_38245" && exit 1; else echo "CCE test 11 passed!"; rm -f CONTCAR.relax.vasp_K1O2_ICSD_38245 ; fi
 	@echo "Running CCE test 12: Li2O"
-	@./aflow --proto=AB2_cF12_225_a_c:O:Li --params=4.5709 > POSCAR_proto_Li2O1_ICSD_642216; ANSWER=0.613,0.563,-0.123,-0.178,-0.094,-0.149,-6.197,-6.147,-6.197,-6.142,-6.197,-6.142; RESULT=$$(./aflow --cce=POSCAR_proto_Li2O1_ICSD_642216 --cce_test --dft_formation_energies=-5.584,-6.320,-6.291 --functionals=PBE,LDA,SCAN); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 12 failed!, check CCE on POSCAR_proto_Li2O1_ICSD_642216"; else echo "CCE test 12 passed!"; rm -f POSCAR_proto_Li2O1_ICSD_642216 ; fi
+	@./aflow --proto=AB2_cF12_225_a_c:O:Li --params=4.5709 > POSCAR_proto_Li2O1_ICSD_642216; ANSWER=0.613,0.563,-0.123,-0.178,-0.094,-0.149,-6.197,-6.147,-6.197,-6.142,-6.197,-6.142; RESULT=$$(./aflow --cce=POSCAR_proto_Li2O1_ICSD_642216 --cce_test --dft_formation_energies=-5.584,-6.320,-6.291 --functionals=PBE,LDA,SCAN); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 12 failed!, check CCE on POSCAR_proto_Li2O1_ICSD_642216" && exit 1; else echo "CCE test 12 passed!"; rm -f POSCAR_proto_Li2O1_ICSD_642216 ; fi
 	@echo "Running CCE test 13: Li2O2"
-	@wget --quiet http://aflowlib.duke.edu/AFLOWDATA/ICSD_WEB/HEX/Li2O2_ICSD_152183/CONTCAR.relax.vasp; ANSWER=1.653,1.518,-0.601,-0.756,0.198,0.048,-13.139,-13.004,-13.141,-12.986,-13.140,-12.990; mv CONTCAR.relax.vasp CONTCAR.relax.vasp_Li2O2_ICSD_152183; RESULT=$$(./aflow --cce=CONTCAR.relax.vasp_Li2O2_ICSD_152183 --cce_test --dft_formation_energies=-11.486,-13.742,-12.942 --functionals=PBE,LDA,SCAN); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 13 failed!, check CCE on CONTCAR.relax.vasp_Li2O2_ICSD_152183"; else echo "CCE test 13 passed!"; rm -f CONTCAR.relax.vasp_Li2O2_ICSD_152183 ; fi
+	@wget --quiet http://aflowlib.duke.edu/AFLOWDATA/ICSD_WEB/HEX/Li2O2_ICSD_152183/CONTCAR.relax.vasp; ANSWER=1.653,1.518,-0.601,-0.756,0.198,0.048,-13.139,-13.004,-13.141,-12.986,-13.140,-12.990; mv CONTCAR.relax.vasp CONTCAR.relax.vasp_Li2O2_ICSD_152183; RESULT=$$(./aflow --cce=CONTCAR.relax.vasp_Li2O2_ICSD_152183 --cce_test --dft_formation_energies=-11.486,-13.742,-12.942 --functionals=PBE,LDA,SCAN); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 13 failed!, check CCE on CONTCAR.relax.vasp_Li2O2_ICSD_152183" && exit 1; else echo "CCE test 13 passed!"; rm -f CONTCAR.relax.vasp_Li2O2_ICSD_152183 ; fi
 	@echo "Running CCE test 14: CaFe2O4"
-	@wget --quiet http://aflowlib.duke.edu/AFLOWDATA/ICSD_WEB/ORC/Ca1Fe2O4_ICSD_159751/CONTCAR.relax.vasp; ANSWER=11.217,10.817,-0.437,-1.000,-3.853,-4.340,-69.230; mv CONTCAR.relax.vasp CONTCAR.relax.vasp_Ca1Fe2O4_ICSD_159751; RESULT=$$(./aflow --cce=CONTCAR.relax.vasp_Ca1Fe2O4_ICSD_159751 --cce_test); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 14 failed!, check CCE on CONTCAR.relax.vasp_Ca1Fe2O4_ICSD_159751"; else echo "CCE test 14 passed!"; rm -f CONTCAR.relax.vasp_Ca1Fe2O4_ICSD_159751 ; fi
+	@wget --quiet http://aflowlib.duke.edu/AFLOWDATA/ICSD_WEB/ORC/Ca1Fe2O4_ICSD_159751/CONTCAR.relax.vasp; ANSWER=11.217,10.817,-0.437,-1.000,-3.853,-4.340,-69.230; mv CONTCAR.relax.vasp CONTCAR.relax.vasp_Ca1Fe2O4_ICSD_159751; RESULT=$$(./aflow --cce=CONTCAR.relax.vasp_Ca1Fe2O4_ICSD_159751 --cce_test); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 14 failed!, check CCE on CONTCAR.relax.vasp_Ca1Fe2O4_ICSD_159751" && exit 1; else echo "CCE test 14 passed!"; rm -f CONTCAR.relax.vasp_Ca1Fe2O4_ICSD_159751 ; fi
 	@echo "Running CCE test 15: Ca2Fe2O5"
-	@wget --quiet http://aflowlib.duke.edu/AFLOWDATA/ICSD_WEB/ORC/Ca2Fe2O5_ICSD_161509/CONTCAR.relax.vasp; ANSWER=11.602,11.151,-1.072,-1.676,-3.684,-4.214,-81.087; mv CONTCAR.relax.vasp CONTCAR.relax.vasp_Ca2Fe2O5_ICSD_161509; RESULT=$$(./aflow --cce=CONTCAR.relax.vasp_Ca2Fe2O5_ICSD_161509 --cce_test); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 15 failed!, check CCE on CONTCAR.relax.vasp_Ca2Fe2O5_ICSD_161509"; else echo "CCE test 15 passed!"; rm -f CONTCAR.relax.vasp_Ca2Fe2O5_ICSD_161509 ; fi
+	@wget --quiet http://aflowlib.duke.edu/AFLOWDATA/ICSD_WEB/ORC/Ca2Fe2O5_ICSD_161509/CONTCAR.relax.vasp; ANSWER=11.602,11.151,-1.072,-1.676,-3.684,-4.214,-81.087; mv CONTCAR.relax.vasp CONTCAR.relax.vasp_Ca2Fe2O5_ICSD_161509; RESULT=$$(./aflow --cce=CONTCAR.relax.vasp_Ca2Fe2O5_ICSD_161509 --cce_test); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 15 failed!, check CCE on CONTCAR.relax.vasp_Ca2Fe2O5_ICSD_161509" && exit 1; else echo "CCE test 15 passed!"; rm -f CONTCAR.relax.vasp_Ca2Fe2O5_ICSD_161509 ; fi
 	@echo "Running CCE test 16: FeTiO3"
-	@./aflow --proto=AB3C_hR10_148_c_f_c:Fe:O:Ti --params=5.08264,2.77119,0.648852,0.852345,0.436666,0.768665,0.0556432 > POSCAR_proto_Fe1O3Ti1_ICSD_187688; ANSWER=3.402,3.240,0.414,0.258,-1.258,-1.442,-25.786,-25.624,-25.612,-25.456,-25.808,-25.624; RESULT=$$(./aflow --cce=POSCAR_proto_Fe1O3Ti1_ICSD_187688 --cce_test --dft_formation_energies=-22.384,-25.198,-27.066 --functionals=PBE,LDA,SCAN); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 16 failed!, check CCE on POSCAR_proto_Fe1O3Ti1_ICSD_187688"; else echo "CCE test 16 passed!"; rm -f POSCAR_proto_Fe1O3Ti1_ICSD_187688 ; fi
+	@./aflow --proto=AB3C_hR10_148_c_f_c:Fe:O:Ti --params=5.08264,2.77119,0.648852,0.852345,0.436666,0.768665,0.0556432 > POSCAR_proto_Fe1O3Ti1_ICSD_187688; ANSWER=3.402,3.240,0.414,0.258,-1.258,-1.442,-25.786,-25.624,-25.612,-25.456,-25.808,-25.624; RESULT=$$(./aflow --cce=POSCAR_proto_Fe1O3Ti1_ICSD_187688 --cce_test --dft_formation_energies=-22.384,-25.198,-27.066 --functionals=PBE,LDA,SCAN); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 16 failed!, check CCE on POSCAR_proto_Fe1O3Ti1_ICSD_187688" && exit 1; else echo "CCE test 16 passed!"; rm -f POSCAR_proto_Fe1O3Ti1_ICSD_187688 ; fi
 	@echo "Running CCE test 17: BaO2"
-	@wget --quiet http://aflowlib.duke.edu/AFLOWDATA/ICSD_WEB/BCT/Ba1O2_ICSD_24248/CONTCAR.relax.vasp; ANSWER=1.055,1.043,-6.638,-6.626,-6.743; mv CONTCAR.relax.vasp CONTCAR.relax.vasp_Ba1O2_ICSD_24248; RESULT=$$(./aflow --cce=CONTCAR.relax.vasp_Ba1O2_ICSD_24248 --cce_test --dft_formation_energies=-5.583,0 --functionals=PBE+U_ICSD,exp); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 17 failed!, check CCE on CONTCAR.relax.vasp_Ba1O2_ICSD_24248"; else echo "CCE test 17 passed!"; rm -f CONTCAR.relax.vasp_Ba1O2_ICSD_24248 ; fi
+	@wget --quiet http://aflowlib.duke.edu/AFLOWDATA/ICSD_WEB/BCT/Ba1O2_ICSD_24248/CONTCAR.relax.vasp; ANSWER=1.055,1.043,-6.638,-6.626,-6.743; mv CONTCAR.relax.vasp CONTCAR.relax.vasp_Ba1O2_ICSD_24248; RESULT=$$(./aflow --cce=CONTCAR.relax.vasp_Ba1O2_ICSD_24248 --cce_test --dft_formation_energies=-5.583,0 --functionals=PBE+U:ICSD,exp); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 17 failed!, check CCE on CONTCAR.relax.vasp_Ba1O2_ICSD_24248" && exit 1; else echo "CCE test 17 passed!"; rm -f CONTCAR.relax.vasp_Ba1O2_ICSD_24248 ; fi
 	@echo "Running CCE test 18: NaO2"
-	@wget --quiet http://aflowlib.duke.edu/AFLOWDATA/ICSD_WEB/CUB/Na1O2_ICSD_87178/CONTCAR.relax.vasp; ANSWER=-0.205,-0.310,-9.363,-9.258,-5.972; mv CONTCAR.relax.vasp CONTCAR.relax.vasp_Na1O2_ICSD_87178; RESULT=$$(./aflow --cce=CONTCAR.relax.vasp_Na1O2_ICSD_87178 --cce_test --dft_formation_energies=-9.568,0 --functionals=PBE+U_ICSD,exp); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 18 failed!, check CCE on CONTCAR.relax.vasp_Na1O2_ICSD_87178"; else echo "CCE test 18 passed!"; rm -f CONTCAR.relax.vasp_Na1O2_ICSD_87178 ; fi
+	@wget --quiet http://aflowlib.duke.edu/AFLOWDATA/ICSD_WEB/CUB/Na1O2_ICSD_87178/CONTCAR.relax.vasp; ANSWER=-0.205,-0.310,-9.363,-9.258,-5.972; mv CONTCAR.relax.vasp CONTCAR.relax.vasp_Na1O2_ICSD_87178; RESULT=$$(./aflow --cce=CONTCAR.relax.vasp_Na1O2_ICSD_87178 --cce_test --dft_formation_energies=-9.568,0 --functionals=PBE+U:ICSD,exp); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 18 failed!, check CCE on CONTCAR.relax.vasp_Na1O2_ICSD_87178" && exit 1; else echo "CCE test 18 passed!"; rm -f CONTCAR.relax.vasp_Na1O2_ICSD_87178 ; fi
 	@echo "Running CCE test 19: HfN"
-	@./aflow --proto=AB_cF8_225_a_b:Hf:N --params=4.4938 > POSCAR_proto_Hf1N1_ICSD_53025; ANSWER=0.359,0.338,-0.557,-0.581,-0.086,-0.109,0.356,0.335,-3.872,-3.851,-3.872,-3.848,-3.872,-3.849,-3.872,-3.851,-3.872; RESULT=$$(./aflow --cce=POSCAR_proto_Hf1N1_ICSD_53025 --cce_test --dft_formation_energies=-3.513,-4.429,-3.958,-3.516,0 --functionals=PBE,LDA,SCAN,PBE+U_ICSD,exp); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 19 failed!, check CCE on POSCAR_proto_Hf1N1_ICSD_53025"; else echo "CCE test 19 passed!"; rm -f POSCAR_proto_Hf1N1_ICSD_53025 ; fi
+	@./aflow --proto=AB_cF8_225_a_b:Hf:N --params=4.4938 > POSCAR_proto_Hf1N1_ICSD_53025; ANSWER=0.359,0.338,-0.557,-0.581,-0.086,-0.109,0.356,0.335,-3.872,-3.851,-3.872,-3.848,-3.872,-3.849,-3.872,-3.851,-3.872; RESULT=$$(./aflow --cce=POSCAR_proto_Hf1N1_ICSD_53025 --cce_test --dft_formation_energies=-3.513,-4.429,-3.958,-3.516,0 --functionals=PBE,LDA,SCAN,PBE+U:ICSD,exp); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 19 failed!, check CCE on POSCAR_proto_Hf1N1_ICSD_53025" && exit 1; else echo "CCE test 19 passed!"; rm -f POSCAR_proto_Hf1N1_ICSD_53025 ; fi
 	@echo "Running CCE test 20: LiCaN"
-	@wget --quiet http://aflowlib.duke.edu/AFLOWDATA/ICSD_WEB/ORC/Ca1Li1N1_ICSD_107304/CONTCAR.relax.vasp; ANSWER=0.834,0.653,-2.298,-2.474,-1.133,-1.311,0.960,0.792,-8.794,-8.613,-8.814,-8.638,-8.787,-8.609,-8.840,-8.672,-8.518; mv CONTCAR.relax.vasp CONTCAR.relax.vasp_Ca1Li1N1_ICSD_107304; RESULT=$$(./aflow --cce=CONTCAR.relax.vasp_Ca1Li1N1_ICSD_107304 --cce_test --dft_formation_energies=-7.960,-11.112,-9.920,-7.880,0 --functionals=PBE,LDA,SCAN,PBE+U_ICSD,exp); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 20 failed!, check CCE on CONTCAR.relax.vasp_Ca1Li1N1_ICSD_107304"; else echo "CCE test 20 passed!"; rm -f CONTCAR.relax.vasp_Ca1Li1N1_ICSD_107304 ; fi
+	@wget --quiet http://aflowlib.duke.edu/AFLOWDATA/ICSD_WEB/ORC/Ca1Li1N1_ICSD_107304/CONTCAR.relax.vasp; ANSWER=0.834,0.653,-2.298,-2.474,-1.133,-1.311,0.960,0.792,-8.794,-8.613,-8.814,-8.638,-8.787,-8.609,-8.840,-8.672,-8.518; mv CONTCAR.relax.vasp CONTCAR.relax.vasp_Ca1Li1N1_ICSD_107304; RESULT=$$(./aflow --cce=CONTCAR.relax.vasp_Ca1Li1N1_ICSD_107304 --cce_test --dft_formation_energies=-7.960,-11.112,-9.920,-7.880,0 --functionals=PBE,LDA,SCAN,PBE+U:ICSD,exp); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 20 failed!, check CCE on CONTCAR.relax.vasp_Ca1Li1N1_ICSD_107304" && exit 1; else echo "CCE test 20 passed!"; rm -f CONTCAR.relax.vasp_Ca1Li1N1_ICSD_107304 ; fi
 #RF20200302 - STOP
 .PHONY: check_aflow_gcc_compatibility
 check_aflow_gcc_compatibility:
 ifeq ($(UNAME),Linux)
-	@echo "Running aflow_gcc_compatibility test 1: no 'nullptr'" && ANSWER=0 && NUMBER_NULLPTRS=$$(find . -name '*.h' -o -name '*.cpp' | xargs grep -P '^(?=[\s]*+[^//])[^//]*(nullptr)' | wc -l) && \
-		if [ "$$NUMBER_NULLPTRS" -ne "$$ANSWER" ]; then echo "Found $$NUMBER_NULLPTRS in the source code; this is not backwards compatible with older GCC version. Please swap with 'NULL' and recompile." && exit; fi
+	@echo "Running aflow_gcc_compatibility test 1: no 'nullptr'" && ANSWER=0 && NUMBER_NULLPTRS=$$(find . -name '*.h' -o -name '*.cpp' | xargs grep -P '^(?=[\s]*+[^//])[^//]*(nullptr)' | wc -l | sed 's/^ *//') && \
+		if [ "$$NUMBER_NULLPTRS" -ne "$$ANSWER" ]; then echo "Found $$NUMBER_NULLPTRS nullptrs in the source code; this is not backwards compatible with older GCC version. Please swap with 'NULL' and recompile." && exit 1; fi
 	@echo "aflow_gcc_compatibility test 1 passed!"
 else
 	@echo "aflow_gcc_compatibility test 1 (no 'nullptr') requires GNU grep, try: find . -name '*.h' -o -name '*.cpp' | xargs grep -P '^(?=[\s]*+[^//])[^//]*(nullptr)'"
 endif
+check_aflow_exits:
+	@echo "Running aflow_exits test 1: NO 'exit()'" && ANSWER=0 && NUMBER_EXITS=$$(find . -name '*.h' -o -name '*.cpp' | xargs grep 'exit(' | wc -l | sed 's/^ *//') && \
+		if [ "$$NUMBER_EXITS" -ne "$$ANSWER" ]; then echo "Found $$NUMBER_EXITS exits in the source code. Please swap with 'aurostd::xerror()' and recompile." && exit 1; fi
 ###################################################################################################

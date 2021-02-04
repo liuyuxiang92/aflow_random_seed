@@ -37,16 +37,17 @@ int MiscibilityExperimentsCheck(string speciesA,string speciesB) {// aflow_mix.c
 // ***************************************************************************
 // Miedema
 int MiscibilityMiedemaCheck(int speciesA,int speciesB) {// aflow_mix.cpp
+  string soliloquy=XPID+"MiscibilityMiedemaCheck():";
   double ratio;
   // cerr << endl << "DEBUG " << speciesA << " " << speciesB << endl;
   // cerr << "DEBUG " << GetAtomSymbol(speciesA) << " " << GetAtomSymbol(speciesB) << endl;
   // cerr << "DEBUG " << GetAtomName(speciesA) << " " << GetAtomName(speciesB) << endl;
   //  cerr << speciesA << " " << speciesB << endl;
   if(speciesA==speciesB) return MISCIBILITY_SYSTEM_MISCIBLE; // A is obviously miscibile with itself
-  if(vatom_miedema_phi_star.at(speciesA)==NNN) {cerr << "APENNSY ERROR (aflow_mix.cpp): vatom_miedema_phi_star.at(speciesA) undefined" << endl;exit(0);}
-  if(vatom_miedema_phi_star.at(speciesB)==NNN) {cerr << "APENNSY ERROR (aflow_mix.cpp): vatom_miedema_phi_star.at(speciesB) undefined" << endl;exit(0);}
-  if(vatom_miedema_nws.at(speciesA)==NNN) {cerr << "APENNSY ERROR (aflow_mix.cpp): vatom_miedema_nws.at(speciesA) undefined" << endl;exit(0);}
-  if(vatom_miedema_nws.at(speciesB)==NNN) {cerr << "APENNSY ERROR (aflow_mix.cpp): vatom_miedema_nws.at(speciesB) undefined" << endl;exit(0);}
+  if(vatom_miedema_phi_star.at(speciesA)==NNN) {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"vatom_miedema_phi_star.at(speciesA) undefined",_INPUT_ILLEGAL_);} //CO20200624
+  if(vatom_miedema_phi_star.at(speciesB)==NNN) {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"vatom_miedema_phi_star.at(speciesB) undefined",_INPUT_ILLEGAL_);} //CO20200624
+  if(vatom_miedema_nws.at(speciesA)==NNN) {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"vatom_miedema_nws.at(speciesA) undefined",_INPUT_ILLEGAL_);} //CO20200624
+  if(vatom_miedema_nws.at(speciesB)==NNN) {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"vatom_miedema_nws.at(speciesB) undefined",_INPUT_ILLEGAL_);} //CO20200624
   ratio=(vatom_miedema_phi_star.at(speciesA)-vatom_miedema_phi_star.at(speciesB))/(vatom_miedema_nws.at(speciesA)-vatom_miedema_nws.at(speciesB));
   // cerr << "DEBUG " << vatom_miedema_phi_star.at(speciesA) << " " << vatom_miedema_phi_star.at(speciesB) << endl;
   // cerr << "DEBUG " << vatom_miedema_nws.at(speciesA) << " " << vatom_miedema_nws.at(speciesB) << endl;
@@ -78,10 +79,10 @@ int MiscibilityHumeRotheryCheck(int speciesA,int speciesB) {// aflow_mix.cpp
   if(delta_radius<=0.15)                                        // cut-off is 15% on radius mismatch
     if(delta_electronegativity<=0.15)                           // cut-off is 15% on electronegativity mismatch
       if(delta_valence<=2)                                      // similar valnce, max mismatch is +-2
-	if(GetAtomCrystal(speciesA)==GetAtomCrystal(speciesB))  // same crystal structure
-	  return MISCIBILITY_SYSTEM_SOLUTION;
-  
-   return MISCIBILITY_SYSTEM_UNKNOWN; // impossible because it is one of the other before
+        if(GetAtomCrystal(speciesA)==GetAtomCrystal(speciesB))  // same crystal structure
+          return MISCIBILITY_SYSTEM_SOLUTION;
+
+  return MISCIBILITY_SYSTEM_UNKNOWN; // impossible because it is one of the other before
 }
 
 int MiscibilityHumeRotheryCheck(string speciesA,string speciesB) {// aflow_mix.cpp

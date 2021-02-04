@@ -599,8 +599,9 @@ namespace aurostd {
   // namespace aurostd
   bool factorial(bool x) {
     if(_isfloat(x)) {
-      cerr << _AUROSTD_XLIBS_ERROR_ << " factorial(bool) implemented only for bool !" << endl;
-      exit(0);
+      string function = XPID + "aurostd::factorial():";
+      string message = "factorial(bool) implemented only for bool !";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
     }
     return TRUE;
   }
@@ -664,6 +665,25 @@ namespace aurostd {
 }
 
 // ***************************************************************************
+// Function ishex
+// ***************************************************************************
+// ME20200707
+// Quick check if the string is a hexadecimal string
+namespace aurostd {
+  bool _ishex(const string& hexstr) {
+    uint istart = 0;
+    uint str_len = hexstr.size();
+    // Also process hexadecimal numbers with the '0x' prefix.
+    if ((str_len > 2) && (hexstr[0] == '0') && hexstr[1] == 'x') istart = 2;
+    for (uint i = istart; i < str_len; i++) {
+      // Return false if chars aren't '0-9' or 'a-f' - https://www.asciitable.com/
+      if ((hexstr[i] < 48) || ((hexstr[i] > 57) && (hexstr[i] < 97)) || (hexstr[i] > 102)) return false;
+    }
+    return true;
+  }
+}
+
+// ***************************************************************************
 // Function isodd
 // ***************************************************************************
 namespace aurostd {
@@ -671,8 +691,9 @@ namespace aurostd {
   template<class utype>
     bool _isodd(utype x) {
       if(_isfloat(x)) {
-        cerr << _AUROSTD_XLIBS_ERROR_ << " _isodd implemented only for integers !" << endl;
-        exit(0);
+        string function = XPID + "aurostd::factorial():";
+        string message = "_isodd implemented only for integers !";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
       }
       if(!mod(x,(utype) 2)) return FALSE;
       else return TRUE;
@@ -707,8 +728,9 @@ namespace aurostd {
   template<class utype>
     bool _iseven(utype x) {
       if(_isfloat(x)) {
-        cerr << _AUROSTD_XLIBS_ERROR_ << " _iseven implemented only for integers !" << endl;
-        exit(0);
+        string function = XPID + "aurostd::factorial():";
+        string message = "_iseven implemented only for integers !";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
       }
       if(mod(x,(utype) 2)) return FALSE;
       else return TRUE;
@@ -943,18 +965,29 @@ namespace aurostd{
     if (T>_ZERO_TOL_){
       return 1/(1+std::exp((E-mu)/(KBOLTZEV*T)));
     }
-    else
-      // At T=0 FD transforms to Heaviside step function
-      if (E<mu){
-        return 1;
-      }
-      else if (E>mu){
-        return 0;
-      }
-      else return 0.5;
+    //[//CO20200731 - what else is there?]else
+    // At T=0 FD transforms to Heaviside step function
+    if (E<mu) return 1;
+    else if (E>mu) return 0;
+    //CO20200731 - what else is there?else 
+    return 0.5;
   }
 }
 //AS20200513 END
+
+//CO20201111 - binomial coefficient
+namespace aurostd {
+  template<class utype>
+    utype nCk(utype n,utype k) {
+      return factorial(n)/( factorial(k)*factorial(n-k) );
+    }
+}
+
+//CO20201111 - BEGIN
+namespace aurostd {
+  bool isNaN(double d){return aurostd::isequal(d,(double)NNN)||aurostd::isequal(d,(double)AUROSTD_NAN)||aurostd::isequal(d,(double)AUROSTD_MAX_DOUBLE);}
+}
+//CO20201111 - END
 
 #endif // _AUROSTD_XSCALAR_CPP_
 

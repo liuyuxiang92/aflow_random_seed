@@ -848,7 +848,7 @@ DEFAULT_CHULL_PERFORM_OUTLIER_ANALYSIS
 DEFAULT_CHULL_OUTLIER_ANALYSIS_COUNT_THRESHOLD_BINARIES
   description: Defines the minimum number of entries for a reliable outlier analysis. Only phases stable with respect to their end-members are considered for the outlier analysis (below the zero H_f tie-line).
   type: integer
-  default: 50
+  default: 75
 
 DEFAULT_CHULL_OUTLIER_MULTIPLIER
   description: Defines the bounds beyond the interquartile range for which points are considered outliers.
@@ -998,9 +998,44 @@ DEFAULTS CCE
 
 DEFAULT_CCE_OX_METHOD
   description: Default method to determine oxidation numbers.
-  type: string
-  choices: "ELECTRONEGATIVITY_ALLEN", "BADER"
-  default: "ELECTRONEGATIVITY_ALLEN"
+  type: int
+  choices: 1 (ELECTRONEGATIVITY_ALLEN), 2 (BADER)
+  default: 1
+
+DEFAULT_CCE_NN_DIST_TOL_MULTI_ANION
+  description: Tolerance between shortest and longest bonds when testing for multi-anion compound in Ang.
+  type: double
+  default: 0.4
+
+DEFAULT_CCE_OX_TOL
+  description: Tolerance for sum of oxidation numbers to be considered as zero.
+  type: double
+  default: 0.001
+
+DEFAULT_CCE_SELF_DIST_TOL
+  description: Distance tolerance in Ang for neighbor screening to savely exclude the central atom itself.
+  type: double
+  default: 0.001
+
+DEFAULT_CCE_PEROX_CUTOFF
+  description: Upper bound for O-O bond length in peroxides in Ang.
+  type: double
+  default: 1.6
+
+DEFAULT_CCE_SUPEROX_CUTOFF
+  description: Upper bound for O-O bond length in superoxides in Ang.
+  type: double
+  default: 1.4
+
+DEFAULT_CCE_O2_MOLECULE_UPPER_CUTOFF
+  description: Upper bound for O-O bond length for molecular O2 in Ang.
+  type: double
+  default: 1.3
+
+DEFAULT_CCE_O2_MOLECULE_LOWER_CUTOFF
+  description: Lower bound for O-O bond length for molecular O2 in Ang.
+  type: double
+  default: 1.2
 
 ####################################################################################################
 DEFAULTS GFA
@@ -1019,7 +1054,7 @@ ARUN_DIRECTORY_PREFIX
 ####################################################################################################
 DEFAULTS POCC
 
-POCC_FILE_PREFIX
+DEFAULT_POCC_TEMPERATURE_STRING
   description: Temperature range over which POCC will perform post-processing. Scan 0 to 1200 (K) in 300 (K) increments. 0 is converted to _ZERO_TOL_ since T=0 exactly is undefined for the Boltzmann distribution.
   type: string
   default: "0:1200:300"
@@ -1093,6 +1128,11 @@ POCC_DOSCAR_FILE
   description: Name for ensemble average DOSCAR.
   type: string
   default: "DOSCAR.pocc"
+
+POCC_ANIONS_LIST
+  description: List of elements that could be considered anions.
+  type: string
+  default: "B,C,N,O"
 
 ####################################################################################################
 DEFAULTS APL
@@ -1255,6 +1295,16 @@ DEFAULT_APL_HSKPTS_FILE
   type: string
   default: "hskpoints.out"
 
+DEFAULT_APL_MSQRDISP_FILE
+  description: Output file for the mean square displacements.
+  type: string
+  default: "displacements.out"
+
+DEFAULT_APL_GVEL_FILE
+  description: Output file for the group velocities.
+  type: string
+  default: "group_velocities.out"
+
 DEFAULT_APL_PHDOSCAR_FILE
   description: Output file for the phonon DOS in VASP DOSCAR format.
   type: string
@@ -1304,7 +1354,7 @@ DEFAULT_APL_ADISP_NPERIODS
 DEFAULTS QHA
 
 DEFAULT_QHA_MODE
-  descriptions: Defines QHA mode to run (it is possible to run several modes simultaneously).
+  description: Defines QHA mode to run (it is possible to run several modes simultaneously).
   type: string
   choices: "QHA", "QHA3P", "SCHQA" or their comma-separated combination
   default: "QHA"
@@ -1319,17 +1369,33 @@ DEFAULT_QHA_EOS_DISTORTION_RANGE
   type: string
   default: "-12:16:3"
 
+DEFAULT_QHA_EOS_MODEL
+  description: Defines what equation of state model(s) to use for the E(V) relation fitting.
+  type: string
+  choices: "SJ", "BM3", "BM4", "M" or their comma-separated combination
+  default: "SJ,BM4"
+
 DEFAULT_QHA_GP_DISTORTION
   description: Sets the value of volume change (dV) for the calculation of the Grueneisen parameter using the finite difference method.
   type: double
   default: 1.0
+
+DEFAULT_QHA_TAYLOR_EXPANSION_ORDER
+  description: Sets the order of Taylor expansion that is used by QHANP method.
+  type: int
+  default: 2
 
 DEFAULT_QHA_INCLUDE_ELEC_CONTRIB
   description: Defines if electronic contribution to the free energy is included.
   type: bool
   default: 0
 
-DEFAULT_QHA_SCQHA_PDIS_T
+DEFAULT_QHA_SOMMERFELD_EXPANSION
+  description: Defines if electronic contribution to the free energy is calculated using the Sommerfeld expansion.
+  type: bool
+  default: 0
+
+DEFAULT_QHA_PDIS_T
   description: Defines the set of temperatures to calculate the temperature-dependent phonon band structure with the SCQHA method.
   type: string
   default: "50,100,600"
@@ -1344,10 +1410,30 @@ DEFAULT_QHA_IGNORE_IMAGINARY
   type: bool
   default: 0
 
+DEFAULT_QHA_RELAX_IONS_CELL
+  description: Defines if ions and cell shape will be relaxed in QHA-related subcalculations.
+  type: bool
+  default: 0
+
 DEFAULT_QHA_FILE_PREFIX
   description: QHA file prefix. All QHA output files start with this prefix.
   type: string
   default: "aflow.qha."
+
+DEFAULT_QHA3P_FILE_PREFIX
+  description: QHA3P file prefix. All QHA3P output files start with this prefix.
+  type: string
+  default: "aflow.qha3p."
+
+DEFAULT_QHANP_FILE_PREFIX
+  description: QHANP file prefix. All QHANP output files start with this prefix.
+  type: string
+  default: "aflow.qhanp."
+
+DEFAULT_SCQHA_FILE_PREFIX
+  description: SCQHA file prefix. All SCQHA output files start with this prefix.
+  type: string
+  default: "aflow.scqha."
 
 DEFAULT_QHA_GP_PATH_FILE
   description: Output file for mode-resolved Grueneisen parameter dispersion curve.
@@ -1376,8 +1462,23 @@ DEFAULT_QHA_FREQS_FILE
 
 DEFAULT_QHA_FVT_FILE
   description: Output file for temperature- and volume-dependent free energy.
-  type:
+  type: string
   default: "FVT.out"
+
+DEFAULT_QHA_PDIS_FILE
+  description: Output file for temperature-dependent phonon dispersion relations.
+  type: string
+  default: "dispersion_phonon"
+
+DEFAULT_QHA_PDOS_FILE
+  description: Output file for temperature-dependent phonon DOS.
+  type: string
+  default: "dos_phonon"
+
+DEFAULT_QHA_KPOINTS_FILE
+  description: Output file for path in the BZ used to calculated temperature-dependent phonon dispersion relations.
+  type: string
+  default: "kpoints.out"
 
 ####################################################################################################
 DEFAULTS AAPL
@@ -1452,23 +1553,13 @@ DEFAULT_AAPL_FILE_PREFIX
   type: string
   default: "aflow.aapl."
 
-DEFAULT_AAPL_QPOINTS_FILE
-  description: Output file for the q-points used for thermal conductivity calculations.
-  type: string
-  default: "qpoints.out"
-
 DEFAULT_AAPL_IRRQPTS_FILE
   description: Output file for the irreducible q-points used for thermal conductivity calculations.
   type: string
   default: "irred_qpoints.out"
 
-DEFAULT_AAPL_FREQ_FILE
-  description: Output file for the harmonic frequencies of the phonon modes used for thermal conductivity calculations.
-  type: string
-  default: "frequencies.out"
-
 DEFAULT_AAPL_GVEL_FILE
-  description: Output file for the group velocities of the phonon modes used for thermal conductivity calculations.
+  description: Output file for the group velocities of the phonon modes and frequencies used for thermal conductivity calculations.
   type: string
   default: "group_velocities.out"
 
@@ -1518,6 +1609,72 @@ DEFAULT_AAPL_TCOND_PLOT_FILE
   default: "thermal_conductivity.plt"
 
 ####################################################################################################
+DEFAULTS XTALFINDER
+
+DEFAULT_XTALFINDER_MISFIT_MATCH
+  description: Similarity threshold for similar structures.
+  type: double
+  default: 0.1
+
+DEFAULT_XTALFINDER_MISFIT_FAMILY
+  description: Similarity threshold for structures in the same family.
+  type: double
+  default: 0.2
+
+DEFAULT_XTALFINDER_MISFIT_SUPERCELL_METHOD
+  description: Supercell method for converting crystal structures into a new representation (well tested, but slow). The alternative (default) is the transformation method (fast).
+  type: bool
+  default: 0
+
+DEFAULT_XTALFINDER_SAFE_ATOM_MATCH_SCALING
+  description: Scaling factor that divides the minimum interatomic distance, establishing when mapped atoms are sufficiently close and other mappings do not need to be explored.
+  type: double
+  default: 4.0
+
+DEFAULT_XTALFINDER_FILE_MATERIAL
+  description: Output file prefix for comparing materials (map alike atomic species).
+  type: string
+  default: "material_comparison_output"
+
+DEFAULT_XTALFINDER_FILE_STRUCTURE
+  description: Output file prefix for comparing structures (ignore atomic species).
+  type: string
+  default: "structure_comparison_output"
+
+DEFAULT_XTALFINDER_FILE_DUPLICATE
+  description: Output file prefix for finding duplicate compounds (map alike atomic species and do not scale volumes).
+  type: string
+  default: "duplicate_comparison_output"
+
+DEFAULT_XTALFINDER_FILE_MATERIAL_COMPARE2DATABASE
+  description: Output file prefix for comparing an input material to the AFLOW.org repository (map alike atomic species).
+  type: string
+  default: "material_comparison_compare2database_output"
+
+DEFAULT_XTALFINDER_FILE_STRUCTURE_COMPARE2DATABASE
+  description: Output file prefix for comparing an input structure to the AFLOW.org repository (ignore atomic species).
+  type: string
+  default: "structure_comparison_compare2database_output"
+
+DEFAULT_XTALFINDER_FILE_MATERIAL_DATABASE
+  description: Output file prefix for comparing materials in the AFLOW.org repository (map alike atomic species).
+  type: string
+  default: "material_comparison_database_output"
+
+DEFAULT_XTALFINDER_FILE_STRUCTURE_DATABASE
+  description: Output file prefix for comparing structures in the AFLOW.org repository (ignore atomic species).
+  type: string
+  default: "structure_comparison_database_output"
+
+####################################################################################################
+DEFAULTS ANRL
+
+DEFAULT_ANRL_WYCKOFF_FRACTIONAL_TOL
+  description: Fractional tolerance value for identifying equivalent Wyckoff coordinates.
+  type: double
+  default: 1e-6
+
+####################################################################################################
 DEFAULTS CORE
 
 AFLOW_CORE_TEMPERATURE_BEEP
@@ -1534,6 +1691,11 @@ AFLOW_CORE_TEMPERATURE_REFRESH
   description: Refresh rate (seconds) for computer temperature readings.
   type: integer
   default: 5
+
+VASP_CHECK_SLEEP
+  description: Time (seconds) to wait for VASP to finish writing output files. Useful on clusters with NFS delays.
+  type: integer
+  default: 30
 
 ####################################################################################################
 DEFAULTS MACHINE DEPENDENT MPI
@@ -1640,6 +1802,21 @@ MPI_COMMAND_DUKE_QFLOW_OPENMPI
 
 MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI
   description: MPI executable directory for --machine=qflow.
+  type: string
+  default: "/home/bin/"
+
+MPI_OPTIONS_DUKE_X
+  description: MPI options for --machine=x.
+  type: string
+  default: "ulimit -s unlimited "
+
+MPI_COMMAND_DUKE_X
+  description: MPI command for --machine=x.
+  type: string
+  default: "mpirun -n"
+
+MPI_BINARY_DIR_DUKE_X
+  description: MPI executable directory for --machine=x.
   type: string
   default: "/home/bin/"
 

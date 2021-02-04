@@ -212,35 +212,35 @@ namespace estructure {
     //  OUTCAR.static
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << XPID << "estructure::PLOT_DOS: BEGIN" << endl;
+    string function_name = XPID + "estructure::PLOT_DOS():";
+    if(LDEBUG) cerr << function_name << " BEGIN" << endl;
 
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     double DOS_Emin=DEFAULT_DOS_EMIN,DOS_Emax=DEFAULT_DOS_EMAX,DOSSCALE=DEFAULT_DOS_SCALE;  // some defaults
 
-    if(LDEBUG) cerr << XPID << "estructure::PLOT_DOS: options=[" << options << "]" << endl;
-    if(LDEBUG) cerr << XPID << "estructure::PLOT_DOS: tokens.size()=" << tokens.size() << endl;
-    if(LDEBUG) for(uint i=0;i<tokens.size();i++) cerr << XPID << "estructure::PLOT_DOS: tokens.at(i)=" << tokens.at(i) << endl;
+    if(LDEBUG) cerr << function_name << " options=[" << options << "]" << endl;
+    if(LDEBUG) cerr << function_name << " tokens.size()=" << tokens.size() << endl;
+    if(LDEBUG) for(uint i=0;i<tokens.size();i++) cerr << function_name << " tokens.at(i)=" << tokens.at(i) << endl;
 
     double DOSMAX=0.0;
     string directory="./", ICSDName, DOSCARfile, OUTCARfile,  stmp, line;
     stringstream straus, strline, dosfile, ss_outcar, ss_doscar; //, stringstreamtmp, strline;  
 
     if(tokens.size()<1) {
-      init::ErrorOption(cout,options,"estructure::PLOT_DOS","aflow --plotdos[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]]");
-      exit(0);
+      init::ErrorOption(options,function_name,"aflow --plotdos[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]]");
     }
     if(tokens.size()>=1) directory = tokens.at(0);
     if(tokens.size()>=2) DOS_Emin = aurostd::string2utype<double>(tokens.at(1)); 
     if(tokens.size()>=3) DOS_Emax = aurostd::string2utype<double>(tokens.at(2));
     if(tokens.size()>=4) DOSSCALE = aurostd::string2utype<double>(tokens.at(3));
 
-    if(LDEBUG) cerr << XPID << "estructure::PLOT_DOS: directory=[" << directory << "]" << endl;
-    if(LDEBUG) cerr << XPID << "estructure::PLOT_DOS: DOS_Emin=" << DOS_Emin << endl;
-    if(LDEBUG) cerr << XPID << "estructure::PLOT_DOS: DOS_Emax=" << DOS_Emax << endl;
-    if(LDEBUG) cerr << XPID << "estructure::PLOT_DOS: DOSSCALE=" << DOSSCALE << endl;
+    if(LDEBUG) cerr << function_name << " directory=[" << directory << "]" << endl;
+    if(LDEBUG) cerr << function_name << " DOS_Emin=" << DOS_Emin << endl;
+    if(LDEBUG) cerr << function_name << " DOS_Emax=" << DOS_Emax << endl;
+    if(LDEBUG) cerr << function_name << " DOSSCALE=" << DOSSCALE << endl;
 
-    cout << XPID << "estructure::PLOT_DOS: working in directory=" << directory << endl;
+    cout << function_name << " working in directory=" << directory << endl;
 
     ICSDName=KBIN::ExtractSystemName(directory); //Get SystemName
 
@@ -254,8 +254,7 @@ namespace estructure {
     double Efermi;
     //CO20180216 - this function needs PDOS
     if(!(estructure::GET_DOS_DATA(ss_doscar, ss_outcar, Efermi, TDOS, TOTALPDOS) && TOTALPDOS.size()>0)){
-      cerr << "ERROR: DOSCAR extraction failed, perhaps there is no PDOS" << endl;
-      exit(1);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"DOSCAR extraction failed, perhaps there is no PDOS",_INPUT_MISSING_);
     }
 
     vector<vector<double> > vvDOS;
@@ -362,7 +361,7 @@ namespace estructure {
     }
     // aurostd::RemoveFile(ICSDName + "_DOS.eps"); // [CORMAC]
     if(aurostd::FileExist(ICSDName+"_DOS.eps"))  aurostd::execute(DEFAULT_KZIP_BIN+" -9f " + ICSDName + "_DOS.eps"); // [CORMAC]
-    if(LDEBUG) cerr << XPID << "estructure::PLOT_DOS: END" << endl;
+    if(LDEBUG) cerr << function_name << " END" << endl;
   }
 }
 
@@ -375,6 +374,8 @@ namespace estructure {
     //Usage: aflow --plotdosweb[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]]
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string function_name = XPID + "estructure::PLOT_DOSWEB():";
+    stringstream message;
     bool isLSCOUPLING=FALSE;
     int DOSGRID, NIONS;
     double Efermi, Emax, Emin;
@@ -382,31 +383,30 @@ namespace estructure {
     string directory="./", ICSDName="AFLOW_DOS_WEB",  stmp, line;
     stringstream straus, strline, dosfile; //, stringstreamtmp, strline;  
 
-    if(LDEBUG) cerr << XPID << "estructure::PLOT_DOSWEB: BEGIN" << endl;
+    if(LDEBUG) cerr << function_name << " BEGIN" << endl;
 
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     double DOS_Emin=DEFAULT_DOS_EMIN,DOS_Emax=DEFAULT_DOS_EMAX,DOSSCALE=DEFAULT_DOS_SCALE;  // some defaults
 
-    if(LDEBUG) cerr << XPID << "estructure::PLOT_DOSWEB: options=[" << options << "]" << endl;
-    if(LDEBUG) cerr << XPID << "estructure::PLOT_DOSWEB: tokens.size()=" << tokens.size() << endl;
-    if(LDEBUG) for(uint i=0;i<tokens.size();i++) cerr << XPID << "estructure::PLOT_DOSWEB: tokens.at(i)=" << tokens.at(i) << endl;
+    if(LDEBUG) cerr << function_name << " options=[" << options << "]" << endl;
+    if(LDEBUG) cerr << function_name << " tokens.size()=" << tokens.size() << endl;
+    if(LDEBUG) for(uint i=0;i<tokens.size();i++) cerr << function_name << " tokens.at(i)=" << tokens.at(i) << endl;
 
     if(tokens.size()<1) {
-      init::ErrorOption(cout,options,"estructure::PLOT_DOSWEB","aflow --plotdosweb[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]]");
-      exit(0);
+      init::ErrorOption(options,function_name,"aflow --plotdosweb[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]]");
     }
     if(tokens.size()>=1) directory = tokens.at(0);
     if(tokens.size()>=2) DOS_Emin = aurostd::string2utype<double>(tokens.at(1)); 
     if(tokens.size()>=3) DOS_Emax = aurostd::string2utype<double>(tokens.at(2));
     if(tokens.size()>=4) DOSSCALE = aurostd::string2utype<double>(tokens.at(3));
 
-    if(LDEBUG) cerr << XPID << "estructure::PLOT_DOSWEB: directory=[" << directory << "]" << endl;
-    if(LDEBUG) cerr << XPID << "estructure::PLOT_DOSWEB: DOS_Emin=" << DOS_Emin << endl;
-    if(LDEBUG) cerr << XPID << "estructure::PLOT_DOSWEB: DOS_Emax=" << DOS_Emax << endl;
-    if(LDEBUG) cerr << XPID << "estructure::PLOT_DOSWEB: DOSSCALE=" << DOSSCALE << endl;
+    if(LDEBUG) cerr << function_name << " directory=[" << directory << "]" << endl;
+    if(LDEBUG) cerr << function_name << " DOS_Emin=" << DOS_Emin << endl;
+    if(LDEBUG) cerr << function_name << " DOS_Emax=" << DOS_Emax << endl;
+    if(LDEBUG) cerr << function_name << " DOSSCALE=" << DOSSCALE << endl;
 
-    cout << XPID << "estructure::PLOT_DOSWEB: working in directory=" << directory << endl;
+    cout << function_name << " working in directory=" << directory << endl;
 
     //READ DOSCAR.static
     bool found=FALSE;
@@ -421,8 +421,8 @@ namespace estructure {
     }
 
     if(!found) {
-      cerr << XPID << "ERROR: estructure::PLOT_DOSWEB: DOSCAR[.static][.EXT] not found in the directory, aborting."<< endl;
-      exit(0);
+      message << "DOSCAR[.static][.EXT] not found in the directory, aborting.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_FILE_NOT_FOUND_);
     }
 
     int TotalNumberDOSCAR = aurostd::GetNLinesString(dosfile);
@@ -432,7 +432,10 @@ namespace estructure {
     dosfile >> stmp; getline(dosfile, stmp);
     dosfile >> Emax >> Emin >> DOSGRID >> Efermi >> stmp; getline(dosfile, stmp);
 
-    if(TotalNumberDOSCAR < DOSGRID) exit(1);
+    if(TotalNumberDOSCAR < DOSGRID) {
+      message << "TotalNumberDOSCAR (" << TotalNumberDOSCAR << ") is less than the DOSGRID (" << DOSGRID << ").";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_VALUE_RANGE_);
+    }
     bool FLAG_PDOS = false;
     NIONS = (int (TotalNumberDOSCAR-5)/(DOSGRID+1))-1;
     if(NIONS>1) FLAG_PDOS = true;
@@ -1160,8 +1163,7 @@ namespace estructure {
         }
       }
       else {
-        cout << "ERROR..., PLS. CHECK TOTALPDOS! Aborting!" << endl;
-        exit(0);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Unexpected size of the TOTALPDOS. Please check.",_VALUE_RANGE_);
       }
       fin.close();
 
@@ -1361,7 +1363,7 @@ namespace estructure {
       aurostd::execute(XHOST.command("convert")+" -background white ./" + ICSDName + "_DOS.eps ./" + ICSDName + "_DOS.png");
       aurostd::execute(XHOST.command("epstopdf")+" ./" + ICSDName + "_DOS.eps ");
     }
-    if(LDEBUG) cerr << XPID << "estructure::PLOT_DOSWEB: END" << endl;
+    if(LDEBUG) cerr << function_name << " END" << endl;
   }
 } // namespace estructure
 
@@ -1379,15 +1381,16 @@ namespace estructure {
     //  POSCAR.static
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << XPID << "estructure::PLOT_PEDOSALL_AFLOWLIB: BEGIN" << endl;
+    string function_name = XPID + "estructure::PLOT_PEDOSALL_AFLOWLIB():";
+    if(LDEBUG) cerr << function_name << " BEGIN" << endl;
 
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     double DOS_Emin=DEFAULT_DOS_EMIN,DOS_Emax=DEFAULT_DOS_EMAX,DOSSCALE=DEFAULT_DOS_SCALE;  // some defaults
 
-    if(LDEBUG) cerr << XPID << "estructure::PLOT_PEDOSALL_AFLOWLIB: options=[" << options << "]" << endl;
-    if(LDEBUG) cerr << XPID << "estructure::PLOT_PEDOSALL_AFLOWLIB: tokens.size()=" << tokens.size() << endl;
-    if(LDEBUG) for(uint i=0;i<tokens.size();i++) cerr << XPID << "estructure::PLOT_PEDOSALL_AFLOWLIB: tokens.at(i)=" << tokens.at(i) << endl;
+    if(LDEBUG) cerr << function_name << " options=[" << options << "]" << endl;
+    if(LDEBUG) cerr << function_name << " tokens.size()=" << tokens.size() << endl;
+    if(LDEBUG) for(uint i=0;i<tokens.size();i++) cerr << function_name << " tokens.at(i)=" << tokens.at(i) << endl;
 
     int NIONS, Natom;
     string directory="./", ICSDName, DOSCARfile, OUTCARfile, POSCARfile, stmp, line;
@@ -1395,20 +1398,19 @@ namespace estructure {
     stringstream ss_doscar, ss_poscar, ss_outcar; 
 
     if(tokens.size()<1) {
-      init::ErrorOption(cout,options,"estructure::PLOT_PEDOSALL_AFLOWLIB","aflow --plotpedosall_nonquivalent[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]");
-      exit(0);
+      init::ErrorOption(options,function_name,"aflow --plotpedosall_nonquivalent[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]");
     }
     if(tokens.size()>=1) directory = tokens.at(0);
     if(tokens.size()>=2) DOS_Emin = aurostd::string2utype<double>(tokens.at(1)); 
     if(tokens.size()>=3) DOS_Emax = aurostd::string2utype<double>(tokens.at(2));
     if(tokens.size()>=4) DOSSCALE = aurostd::string2utype<double>(tokens.at(3));
 
-    if(LDEBUG) cerr << XPID << "estructure::PLOT_PEDOSALL_AFLOWLIB: directory=[" << directory << "]" << endl;
-    if(LDEBUG) cerr << XPID << "estructure::PLOT_PEDOSALL_AFLOWLIB: DOS_Emin=" << DOS_Emin << endl;
-    if(LDEBUG) cerr << XPID << "estructure::PLOT_PEDOSALL_AFLOWLIB: DOS_Emax=" << DOS_Emax << endl;
-    if(LDEBUG) cerr << XPID << "estructure::PLOT_PEDOSALL_AFLOWLIB: DOSSCALE=" << DOSSCALE << endl;
+    if(LDEBUG) cerr << function_name << " directory=[" << directory << "]" << endl;
+    if(LDEBUG) cerr << function_name << " DOS_Emin=" << DOS_Emin << endl;
+    if(LDEBUG) cerr << function_name << " DOS_Emax=" << DOS_Emax << endl;
+    if(LDEBUG) cerr << function_name << " DOSSCALE=" << DOSSCALE << endl;
 
-    cout << XPID << "estructure::PLOT_PEDOSALL_AFLOWLIB: working in directory=" << directory << endl;
+    cout << function_name << " working in directory=" << directory << endl;
 
     //Get the atomic lable for each atom
     vector<string> AtomicName=KBIN::ExtractAtomicSpecies(directory);
@@ -1455,8 +1457,8 @@ namespace estructure {
 
     bool isLSCOUPLING = pedos_outcar.isLSCOUPLING; 
     if(isLSCOUPLING) {   
-      cerr << "ERROR - estructure::PLOT_PEDOSALL_AFLOWLIB:" << endl;
-      cerr << "Not working on isLSCOUPLING now!"; exit(0);} 
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Not working on isLSCOUPLING now!",_RUNTIME_ERROR_);
+    }
     NIONS = pedos_outcar.NIONS;
     //Efermi = pedos_outcar.Efermi;
 
@@ -1473,7 +1475,7 @@ namespace estructure {
       string str_out = aurostd::PaddedPRE(aurostd::utype2string(Natom),(uint) (1+log10(NIONS)),"0") + "/" 
         + aurostd::PaddedPRE(aurostd::utype2string(NIONS),(uint) (1+log10(NIONS)),"0") + "/"
         + AtomicName[Natom-1] + " atom!";
-      cout << XPID << "estructure::PLOT_PEDOSALL_AFLOWLIB: working on " << str_out << endl;
+      cout << function_name << " working on " << str_out << endl;
 
       // cerr << "i=" << i << endl;
       // cerr << "InequiAtomTypePlot.size()=" << InequiAtomTypePlot.size() << endl;
@@ -1486,7 +1488,7 @@ namespace estructure {
       //************************************************************************************************************************
       //----------------------GETTING PDOS DATA-------------------------
       if(Natom>0 && Natom<=NIONS) {
-        if(LDEBUG) cerr << XPID << "estructure::PLOT_PEDOSALL_AFLOWLIB: [1]" << endl;
+        if(LDEBUG) cerr << function_name << " [1]" << endl;
         //Generate the Name for PDOS
         string PDOSNAME = "PEDOS_"+aurostd::PaddedPRE(aurostd::utype2string(Natom),(uint) (1+log10(NIONS)),"0")+
           "_" + aurostd::PaddedPRE(aurostd::utype2string(NIONS),(uint) (1+log10(NIONS)),"0") + "_" 
@@ -1547,8 +1549,8 @@ namespace estructure {
       //PostProcess
       ss_doscar.seekg (0, ios_base::beg);
     }
-    if(LDEBUG) cerr << XPID << "estructure::PLOT_PEDOSALL_AFLOWLIB: END" << endl;
-    cout << XPID << "estructure::PLOT_PEDOSALL_AFLOWLIB: END" << endl;
+    if(LDEBUG) cerr << function_name << " END" << endl;
+    cout << function_name << " END" << endl;
   } // function
 }
 
@@ -1563,7 +1565,8 @@ namespace estructure {
     //  DOSCAR.static
     //  OUTCAR.static
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << XPID << "estructure::PLOT_PEDOSALL: BEGIN" << endl;
+    string function_name = XPID + "estructure::PLOT_PEDOSALL():";
+    if(LDEBUG) cerr << function_name << " BEGIN" << endl;
     int  NIONS;
     string OUTCARfile, stmp, line, directory;
     stringstream straus, strline, ss_outcar; //, stringstreamtmp, strline;  
@@ -1572,23 +1575,22 @@ namespace estructure {
     aurostd::string2tokens(options,tokens,",");
     double DOS_Emin=DEFAULT_DOS_EMIN,DOS_Emax=DEFAULT_DOS_EMAX,DOSSCALE=DEFAULT_DOS_SCALE;  // some defaults
 
-    if(LDEBUG) cerr << XPID << "estructure::PLOT_PEDOSALL: options=[" << options << "]" << endl;
-    if(LDEBUG) cerr << XPID << "estructure::PLOT_PEDOSALL: tokens.size()=" << tokens.size() << endl;
-    if(LDEBUG) for(uint i=0;i<tokens.size();i++) cerr << XPID << "estructure::PLOT_PEDOSALL: tokens.at(i)=" << tokens.at(i) << endl;
+    if(LDEBUG) cerr << function_name << " options=[" << options << "]" << endl;
+    if(LDEBUG) cerr << function_name << " tokens.size()=" << tokens.size() << endl;
+    if(LDEBUG) for(uint i=0;i<tokens.size();i++) cerr << function_name << " tokens.at(i)=" << tokens.at(i) << endl;
 
     if(tokens.size()<1) {
-      init::ErrorOption(cout,options,"estructure::PLOT_PEDOSALL","aflow --plotpedosall[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]");
-      exit(0);
+      init::ErrorOption(options,function_name,"aflow --plotpedosall[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]");
     }
     if(tokens.size()>=1) directory = tokens.at(0);
     if(tokens.size()>=2) DOS_Emin = aurostd::string2utype<double>(tokens.at(1)); 
     if(tokens.size()>=3) DOS_Emax = aurostd::string2utype<double>(tokens.at(2));
     if(tokens.size()>=4) DOSSCALE = aurostd::string2utype<double>(tokens.at(3));
 
-    if(LDEBUG) cerr << XPID << "estructure::PLOT_PEDOSALL: directory=[" << directory << "]" << endl;
-    if(LDEBUG) cerr << XPID << "estructure::PLOT_PEDOSALL: DOS_Emin=" << DOS_Emin << endl;
-    if(LDEBUG) cerr << XPID << "estructure::PLOT_PEDOSALL: DOS_Emax=" << DOS_Emax << endl;
-    if(LDEBUG) cerr << XPID << "estructure::PLOT_PEDOSALL: DOSSCALE=" << DOSSCALE << endl;
+    if(LDEBUG) cerr << function_name << " directory=[" << directory << "]" << endl;
+    if(LDEBUG) cerr << function_name << " DOS_Emin=" << DOS_Emin << endl;
+    if(LDEBUG) cerr << function_name << " DOS_Emax=" << DOS_Emax << endl;
+    if(LDEBUG) cerr << function_name << " DOSSCALE=" << DOSSCALE << endl;
 
     string command_postfix="";
     if(tokens.size()>=2) command_postfix+=","+tokens.at(1);
@@ -1600,7 +1602,7 @@ namespace estructure {
 
 
     NIONS = pedos_outcar.NIONS;
-    if(LDEBUG) cerr << XPID << "estructure::PLOT_PEDOSALL: NIONS=" << NIONS << endl;
+    if(LDEBUG) cerr << function_name << " NIONS=" << NIONS << endl;
 
     string command_local;
     for (int i=1; i<=NIONS; i++) {
@@ -1608,12 +1610,12 @@ namespace estructure {
       command_local+=","+aurostd::utype2string(i);
       command_local+=command_postfix;
       estructure::PLOT_PEDOS(command_local);
-      cout << XPID << "estructure::estructure::PLOT_PEDOSALL: working on " 
+      cout << function_name << " working on "
         << aurostd::PaddedPRE(aurostd::utype2string(i),(uint) (1+log10(NIONS)),"0")
         << "/" << aurostd::PaddedPRE(aurostd::utype2string(NIONS),(uint) (1+log10(NIONS)),"0") << " atom!" <<  endl;
     }
-    // done now exit
-    if(LDEBUG) cerr << XPID << "estructure::PLOT_PEDOSALL: END" << endl;
+    // done now
+    if(LDEBUG) cerr << function_name << " END" << endl;
   }
 }
 
@@ -1630,20 +1632,21 @@ namespace estructure {
     //  OUTCAR.static
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << XPID << "estructure::PLOT_PEDOS: BEGIN" << endl;
+    string function_name = XPID + "estructure::PLOT_PEDOS():";
+    stringstream message;
+    if(LDEBUG) cerr << function_name << " BEGIN" << endl;
 
     string numatom="1",directory="./";  // some defaults 
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     double DOS_Emin=DEFAULT_DOS_EMIN,DOS_Emax=DEFAULT_DOS_EMAX,DOSSCALE=DEFAULT_DOS_SCALE;  // some defaults
 
-    if(LDEBUG) cerr << XPID << "estructure::PLOT_PEDOS: options=[" << options << "]" << endl;
-    if(LDEBUG) cerr << XPID << "estructure::PLOT_PEDOS: tokens.size()=" << tokens.size() << endl;
-    if(LDEBUG) for(uint i=0;i<tokens.size();i++) cerr << XPID << "estructure::PLOT_PEDOS: tokens.at(i)=" << tokens.at(i) << endl;
+    if(LDEBUG) cerr << function_name << " options=[" << options << "]" << endl;
+    if(LDEBUG) cerr << function_name << " tokens.size()=" << tokens.size() << endl;
+    if(LDEBUG) for(uint i=0;i<tokens.size();i++) cerr << function_name << " tokens.at(i)=" << tokens.at(i) << endl;
 
     if(tokens.size()<1) {
-      init::ErrorOption(cout,options,"estructure::PLOT_PEDOS","aflow --plotpedos[=directory[,number_atom[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]]");
-      exit(0);
+      init::ErrorOption(options,function_name,"aflow --plotpedos[=directory[,number_atom[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]]");
     }
     if(tokens.size()>=1) directory = tokens.at(0);
     if(tokens.size()>=2) numatom = tokens.at(1);
@@ -1651,11 +1654,11 @@ namespace estructure {
     if(tokens.size()>=4) DOS_Emax = aurostd::string2utype<double>(tokens.at(3));
     if(tokens.size()>=5) DOSSCALE = aurostd::string2utype<double>(tokens.at(4));
 
-    if(LDEBUG) cerr << XPID << "estructure::PLOT_PEDOS: directory=[" << directory << "]" << endl;
-    if(LDEBUG) cerr << XPID << "estructure::PLOT_PEDOS: numatom=[" << numatom << "]" << endl;
-    if(LDEBUG) cerr << XPID << "estructure::PLOT_PEDOS: DOS_Emin=" << DOS_Emin << endl;
-    if(LDEBUG) cerr << XPID << "estructure::PLOT_PEDOS: DOS_Emax=" << DOS_Emax << endl;
-    if(LDEBUG) cerr << XPID << "estructure::PLOT_PEDOS: DOSSCALE=" << DOSSCALE << endl;
+    if(LDEBUG) cerr << function_name << " directory=[" << directory << "]" << endl;
+    if(LDEBUG) cerr << function_name << " numatom=[" << numatom << "]" << endl;
+    if(LDEBUG) cerr << function_name << " DOS_Emin=" << DOS_Emin << endl;
+    if(LDEBUG) cerr << function_name << " DOS_Emax=" << DOS_Emax << endl;
+    if(LDEBUG) cerr << function_name << " DOSSCALE=" << DOSSCALE << endl;
 
     int NIONS, Natom;
     //double Emax, Emin;
@@ -1663,7 +1666,7 @@ namespace estructure {
     string ICSDName, DOSCARfile, OUTCARfile, POSCARfile, stmp, line;
     stringstream straus, strline, dosfile, ss_outcar, ss_doscar; //, stringstreamtmp, strline;  
 
-    cout << XPID << "estructure::PLOT_PEDOS: working in directory=" << directory << endl;
+    cout << function_name << " working in directory=" << directory << endl;
     ICSDName=KBIN::ExtractSystemName(directory); //Get SystemName
     //Get the atomic lable for each atom
     vector<string> AtomicName= KBIN::ExtractAtomicSpecies(directory);
@@ -1671,37 +1674,37 @@ namespace estructure {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     xOUTCAR pedos_outcar; pedos_outcar.GetPropertiesFile(aflowlib::vaspfile2stringstream(directory,"OUTCAR"));
 
-    bool isLSCOUPLING = pedos_outcar.isLSCOUPLING; if(isLSCOUPLING) {
-      cerr << "ERROR - estructure::PLOT_PEDOS: Not working on isLSCOUPLING now!"; exit(0);} 
+    bool isLSCOUPLING = pedos_outcar.isLSCOUPLING;
+    if(isLSCOUPLING) {
+      message << "Not working on isLSCOUPLING now!";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
+    }
     NIONS = pedos_outcar.NIONS;
     //Efermi = pedos_outcar.Efermi;
 
     //Judge whether a proper parameter is input
     if(!( numatom[0] >= '0' && numatom[0] <= '9')) {
-      cout << "ERROR - estructure::PLOT_PEDOS: " << endl;
       //CO20170830 - let's not insult the user?
       //cout << "I HOPE YOU KNOW, WHAT YOU ARE  DOING! You had better read the manual of aconvasp carefully!" << endl;
       //cout << "I REFUSE TO CONTINUE WITH THIS SICK JOB...,BYE!!!<----" << endl;
       //cout << "Anyway, I still give you a promot, the second input must be a digit!"<< endl;
-      cout << "The second input must be a digit!"<< endl;
-      exit(0);
+      message << "The second input must be a digit!";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ILLEGAL_);
     }
     Natom=aurostd::string2utype<int>(numatom); //directory
     if(Natom > NIONS) {
-      cout << "ERROR - estructure::PLOT_PEDOS: " << endl;
-      cout << "The number you put excceds the number of ions (" << NIONS << ")!" << endl;
       //CO20170830 - let's not insult the user?
       //cout << "The number you put excceds the number of ions (" << NIONS << ")!!" << endl;
       //cout << "How silly you are!!!" << endl;
-      exit(0);
+      message << "The number you put excceds the number of ions (" << NIONS << ")!";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_VALUE_RANGE_);
     }
     if(Natom==0) {
-      cout << "ERROR - estructure::PLOT_PEDOS: " << endl;
-      cout << "No input! If you want to plot TDOS, use 'aflow --plotdos " + directory +"'" << endl;
       //CO20170830 - let's not insult the user?
       //cout << "You input 0! I guess you want to plot TDOS, so I recommend you to use 'aflow --plotdos " + directory +"'" << endl;
       //cout << "I do not want to produce TDOS in this way! BYE!!!..." << endl;
-      exit(0);
+      message << "No input! If you want to plot TDOS, use 'aflow --plotdos " + directory +"'";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_MISSING_);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1713,7 +1716,7 @@ namespace estructure {
     string str_out = aurostd::PaddedPRE(aurostd::utype2string(Natom),(uint) (1+log10(NIONS)),"0") + "/" 
       + aurostd::PaddedPRE(aurostd::utype2string(NIONS),(uint) (1+log10(NIONS)),"0") + "/"
       + AtomicName[Natom-1] + " atom!";
-    cerr << XPID << "estructure::PLOT_PEDOS: working on " << str_out << endl;
+    cerr << function_name << " working on " << str_out << endl;
 
     //************************************************************************************************************************
     // Get PDOS
@@ -1776,7 +1779,7 @@ namespace estructure {
     } //If loop
     dosfile.seekg (0, ios_base::beg);
     //PostProcess
-    if(LDEBUG) cerr << XPID << "estructure::PLOT_PEDOS: END" << endl;
+    if(LDEBUG) cerr << function_name << " END" << endl;
   } // function
 }
 
@@ -1890,14 +1893,16 @@ namespace estructure {
     //   OUTCAR.static
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << XPID << "estructure::PLOT_BAND: BEGIN" << endl;
+    string function_name = XPID + "estructure::PLOT_BAND():";
+    stringstream message;
+    if(LDEBUG) cerr << function_name << " BEGIN" << endl;
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     double DOS_Emin=DEFAULT_DOS_EMIN,DOS_Emax=DEFAULT_DOS_EMAX,DOSSCALE=DEFAULT_DOS_SCALE;  // some defaults
 
-    if(LDEBUG) cerr << XPID << "estructure::PLOT_BAND: options=[" << options << "]" << endl;
-    if(LDEBUG) cerr << XPID << "estructure::PLOT_BAND: tokens.size()=" << tokens.size() << endl;
-    if(LDEBUG) for(uint i=0;i<tokens.size();i++) cerr << XPID << "estructure::PLOT_BAND: tokens.at(i)=" << tokens.at(i) << endl;
+    if(LDEBUG) cerr << function_name << " options=[" << options << "]" << endl;
+    if(LDEBUG) cerr << function_name << " tokens.size()=" << tokens.size() << endl;
+    if(LDEBUG) for(uint i=0;i<tokens.size();i++) cerr << function_name << " tokens.at(i)=" << tokens.at(i) << endl;
 
     //bool isLSCOUPLING=FALSE;
     int ISPIN=1,NIONS, NELECT, Nbands, NKPOINTS, KPOINTSGRID;
@@ -1907,28 +1912,27 @@ namespace estructure {
     stringstream straus, stringstreamtmp, strline, dosfile, ss_outcar, ss_doscar, ss_engenval, ss_kpoints; 
 
     if(tokens.size()<1) {
-      init::ErrorOption(cout,options,"estructure::PLOT_BAND","aflow --plotband[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]]");
-      exit(0);
+      init::ErrorOption(options,function_name,"aflow --plotband[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]]");
     }
     if(tokens.size()>=1) directory = tokens.at(0);
     if(tokens.size()>=2) DOS_Emin = aurostd::string2utype<double>(tokens.at(1)); 
     if(tokens.size()>=3) DOS_Emax = aurostd::string2utype<double>(tokens.at(2));
     if(tokens.size()>=4) DOSSCALE = aurostd::string2utype<double>(tokens.at(3));
 
-    if(LDEBUG) cerr << XPID << "estructure::PLOT_BAND: directory=[" << directory << "]" << endl;
-    if(LDEBUG) cerr << XPID << "estructure::PLOT_BAND: DOS_Emin=" << DOS_Emin << endl;
-    if(LDEBUG) cerr << XPID << "estructure::PLOT_BAND: DOS_Emax=" << DOS_Emax << endl;
-    if(LDEBUG) cerr << XPID << "estructure::PLOT_BAND: DOSSCALE=" << DOSSCALE << endl;
+    if(LDEBUG) cerr << function_name << " directory=[" << directory << "]" << endl;
+    if(LDEBUG) cerr << function_name << " DOS_Emin=" << DOS_Emin << endl;
+    if(LDEBUG) cerr << function_name << " DOS_Emax=" << DOS_Emax << endl;
+    if(LDEBUG) cerr << function_name << " DOSSCALE=" << DOSSCALE << endl;
 
-    cout << XPID << "estructure::PLOT_BAND: working in directory=" << directory << endl;
+    cout << function_name << " working in directory=" << directory << endl;
 
     ICSDName=KBIN::ExtractSystemName(directory); //Get SystemName
 
-    if(LDEBUG) cerr << XPID << "estructure::PLOT_BAND [2]" << endl;
+    if(LDEBUG) cerr << function_name << " [2]" << endl;
     // cout << aurostd::execute2string("ls "+s) << endl;
     aflowlib::vaspfile2stringstream(directory, "OUTCAR", ss_outcar);
 
-    if(LDEBUG) cerr << XPID << "estructure::PLOT_BAND [3]" << endl;
+    if(LDEBUG) cerr << function_name << " [3]" << endl;
 
     //GET Fermi Level, Number of IONS
     //GET lattice vector and reciprocal lattice vectors
@@ -1956,22 +1960,22 @@ namespace estructure {
       }
     }
 
-    if(LDEBUG) cerr << XPID << "estructure::PLOT_BAND [4]" << endl;
+    if(LDEBUG) cerr << function_name << " [4]" << endl;
     aflowlib::vaspfile2stringstream(directory, "DOSCAR", ss_doscar);
-    if(LDEBUG) cerr << XPID << "estructure::PLOT_BAND [4b]" << endl;
+    if(LDEBUG) cerr << function_name << " [4b]" << endl;
     vector<vector<double> > TDOS;
     vector<vector<double> > TOTALPDOS;
     //CO20180216 - this function needs PDOS
     if(!(estructure::GET_DOS_DATA(ss_doscar, ss_outcar, Efermi, TDOS, TOTALPDOS) && TOTALPDOS.size()>0)){
-      cerr << "ERROR: DOSCAR extraction failed, perhaps there is no PDOS" << endl;
-      exit(1);
+      message << "DOSCAR extraction failed, perhaps there is no PDOS";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_MISSING_);
     }
 
     vector<vector<double> > vvDOS;
     CombineTDOSAndTOTALPDOS(TDOS, TOTALPDOS, vvDOS);
     DOSMAX = aurostd::FindMaxIn2DvectorExcept1stColumn(vvDOS, DOS_Emin, DOS_Emax);
 
-    if(LDEBUG) cerr << XPID << "estructure::PLOT_BAND [5]" << endl;
+    if(LDEBUG) cerr << function_name << " [5]" << endl;
 
     //Writing into file
     string str_PDOS = aurostd::vector2string(vvDOS); //TOTALPDOS);  //CO20170830 - plot both tdos and pdos!
@@ -1985,11 +1989,11 @@ namespace estructure {
     //-----------------------------------------------------------------------
     //DOSMAX = aurostd::FindMaxIn2DvectorExcept1stColumn(TOTALPDOS, DOS_Emin, DOS_Emax);  //CO20170830 - we want max for TOTAL now
     //-------------------------------------------------------------------------------------------------------------------------------------------------
-    if(LDEBUG) cerr << XPID << "estructure::PLOT_BAND [6]" << endl;
+    if(LDEBUG) cerr << function_name << " [6]" << endl;
 
     //***********************************DEALING WITH BANDSDATA**************************************************************
     aflowlib::vaspfile2stringstream(directory, "EIGENVAL", ss_engenval);
-    //  cout << ss_engenval.str() << endl;exit(0);
+    //  cout << ss_engenval.str() << endl;throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Throw for debugging purposes.",_GENERIC_ERROR_);
 
     //Read FLAG of SPIN, if SPIN=1,Non-spin-polarized; IF SPIN=2, spin-polarized
     ss_engenval >> stmp >> stmp >> stmp >> ISPIN;	
@@ -2040,8 +2044,8 @@ namespace estructure {
       }
     }
     else {
-      cerr << "Can not detect spin flag! Error, Aborting!" << endl;
-      exit(0);
+      message << "Can not detect spin flag! Error, Aborting!";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
     }
 
     //READ KPOINTS	
@@ -2110,14 +2114,14 @@ namespace estructure {
 
     //Check number of kpoints
 
+    if(LDEBUG) cerr << function_name << " [7]" << endl;
     if((count/2)*KPOINTSGRID!=NKPOINTS) {
-      if(LDEBUG) cerr << XPID << "estructure::PLOT_BAND [16]" << endl;
-      cout << "ERROR: Please check your KPOINTS.bands file and EIGENVALE.bands. file! Their kpoints number are different!!!" << endl;
-      cout << "KPOINTSGRID=" << KPOINTSGRID << endl;
-      cout << "count=" << count << endl;
-      cout << "(count/2)*KPOINTSGRID=" << (count/2)*KPOINTSGRID << endl;
-      cout << "NKPOINTS=" << NKPOINTS << endl;
-      exit(0);
+      message << "Please check your KPOINTS.bands and EIGENVAL.bands files! The number of kpoints are different!!!" << endl;
+      message << "KPOINTSGRID=" << KPOINTSGRID << endl;
+      message << "count=" << count << endl;
+      message << "(count/2)*KPOINTSGRID=" << (count/2)*KPOINTSGRID << endl;
+      message << "NKPOINTS=" << NKPOINTS << endl;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_VALUE_ERROR_);
     }
 
     //Calcuating klinedirect from the direct points
@@ -2423,14 +2427,16 @@ namespace estructure {
     //  OUTCAR.static
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << XPID << "estructure::PLOT_BAND2: BEGIN" << endl;
+    string function_name = XPID + "estructure::PLOT_BAND2():";
+    stringstream message;
+    if(LDEBUG) cerr << function_name << " BEGIN" << endl;
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     double DOS_Emin=DEFAULT_DOS_EMIN,DOS_Emax=DEFAULT_DOS_EMAX,DOSSCALE=DEFAULT_DOS_SCALE;  // some defaults
 
-    if(LDEBUG) cerr << XPID << "estructure::PLOT_BAND2: options=[" << options << "]" << endl;
-    if(LDEBUG) cerr << XPID << "estructure::PLOT_BAND2: tokens.size()=" << tokens.size() << endl;
-    if(LDEBUG) for(uint i=0;i<tokens.size();i++) cerr << XPID << "estructure::PLOT_BAND2: tokens.at(i)=" << tokens.at(i) << endl;
+    if(LDEBUG) cerr << function_name << " options=[" << options << "]" << endl;
+    if(LDEBUG) cerr << function_name << " tokens.size()=" << tokens.size() << endl;
+    if(LDEBUG) for(uint i=0;i<tokens.size();i++) cerr << function_name << " tokens.at(i)=" << tokens.at(i) << endl;
 
     //bool isLSCOUPLING=FALSE;
     int ISPIN=1,NIONS, NELECT, Nbands, NKPOINTS, KPOINTSGRID;
@@ -2440,8 +2446,7 @@ namespace estructure {
     stringstream straus, stringstreamtmp, strline, dosfile, ss_outcar, ss_doscar, ss_engenval, ss_kpoints; 
 
     if(tokens.size()<1) {
-      init::ErrorOption(cout,options,"estructure::PLOT_BAND2","aflow --plotband2[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]]");
-      exit(0);
+      init::ErrorOption(options,function_name,"aflow --plotband2[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]]");
     }
     if(tokens.size()>=1) directory = tokens.at(0);
     if(tokens.size()>=2) DOS_Emin = aurostd::string2utype<double>(tokens.at(1)); 
@@ -2453,12 +2458,12 @@ namespace estructure {
     // [OBSOLETE]    if(DOS_Emax<=-999.9) DOS_Emax=DEFAULT_DOS_EMAX;
     // [OBSOLETE]    if(DOSSCALE<=-999.9) DOSSCALE=DEFAULT_DOS_SCALE;
 
-    if(LDEBUG) cerr << XPID << "estructure::PLOT_BAND2: directory=[" << directory << "]" << endl;
-    if(LDEBUG) cerr << XPID << "estructure::PLOT_BAND2: DOS_Emin=" << DOS_Emin << endl;
-    if(LDEBUG) cerr << XPID << "estructure::PLOT_BAND2: DOS_Emax=" << DOS_Emax << endl;
-    if(LDEBUG) cerr << XPID << "estructure::PLOT_BAND2: DOSSCALE=" << DOSSCALE << endl;
+    if(LDEBUG) cerr << function_name << " directory=[" << directory << "]" << endl;
+    if(LDEBUG) cerr << function_name << " DOS_Emin=" << DOS_Emin << endl;
+    if(LDEBUG) cerr << function_name << " DOS_Emax=" << DOS_Emax << endl;
+    if(LDEBUG) cerr << function_name << " DOSSCALE=" << DOSSCALE << endl;
 
-    cerr << XPID << "estructure::PLOT_BAND2: working in directory=" << directory << endl;
+    cerr << function_name << " working in directory=" << directory << endl;
 
     ICSDName=KBIN::ExtractSystemName(directory); //Get SystemName
 
@@ -2495,8 +2500,8 @@ namespace estructure {
     vector<vector<double> >  TOTALPDOS_SPIN;
     //CO20180216 - this function needs PDOS
     if(!(estructure::GET_DOS_DATA(ss_doscar, ss_outcar, Efermi, TDOS, TOTALPDOS_SPIN) && TOTALPDOS_SPIN.size()>0)){
-      cerr << "ERROR: DOSCAR extraction failed, perhaps there is no PDOS" << endl;
-      exit(1);
+      message << "DOSCAR extraction failed, perhaps there is no PDOS" << endl;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_MISSING_);
     }
 
     vector<vector<double> >  TOTALPDOS;
@@ -2589,8 +2594,8 @@ namespace estructure {
       }
     }
     else {
-      cerr << "Can not detect spin flag! Error, Aborting!" << endl;
-      exit(0);
+      message << "Can not detect spin flag! Error, Aborting!";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
     }
 
     //READ KPOINTS	
@@ -2658,9 +2663,9 @@ namespace estructure {
 
     //Check number of kpoints
     if((count/2)*KPOINTSGRID!=NKPOINTS) {
-      //  if(LDEBUG) cerr << XPID << "estructure::PLOT_BAND [26]" << endl;
-      cout << "ERROR: Please check your KPOINTS.bands file and EIGENVALE.bands. file! Their kpoints number are different!!!" << endl;
-      exit(0);
+      //  if(LDEBUG) cerr << function_name << " [26]" << endl;
+      message << "ERROR: Please check your KPOINTS.bands and EIGENVALE.bands files! The number of kpoints are different!!!";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_VALUE_ERROR_);
     }
 
     //Calcuating klinedirect from the direct points
@@ -2913,7 +2918,7 @@ namespace estructure {
     if(!XHOST.vflag_control.flag("KEEP::EPS")) { 
       aurostd::RemoveFile(ICSDName + ".eps");
     }
-    if(LDEBUG) cerr << XPID << "estructure::PLOT_BAND2: END" << endl;
+    if(LDEBUG) cerr << function_name << " END" << endl;
   }
 }
 
@@ -2931,15 +2936,17 @@ namespace estructure {
     //  OUTCAR.bands
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << XPID << "estructure::PLOT_BAND_SPINSPLIT: BEGIN" << endl;
+    string function_name = XPID + "estructure::PLOT_BAND_SPINSPLIT():";
+    stringstream message;
+    if(LDEBUG) cerr << function_name << " BEGIN" << endl;
 
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     double DOS_Emin=DEFAULT_DOS_EMIN,DOS_Emax=DEFAULT_DOS_EMAX,DOSSCALE=DEFAULT_DOS_SCALE;  // some defaults
 
-    if(LDEBUG) cerr << XPID << "estructure::PLOT_BAND_SPINSPLIT: options=[" << options << "]" << endl;
-    if(LDEBUG) cerr << XPID << "estructure::PLOT_BAND_SPINSPLIT: tokens.size()=" << tokens.size() << endl;
-    if(LDEBUG) for(uint i=0;i<tokens.size();i++) cerr << XPID << "estructure::PLOT_BAND_SPINSPLIT: tokens.at(i)=" << tokens.at(i) << endl;
+    if(LDEBUG) cerr << function_name << " options=[" << options << "]" << endl;
+    if(LDEBUG) cerr << function_name << " tokens.size()=" << tokens.size() << endl;
+    if(LDEBUG) for(uint i=0;i<tokens.size();i++) cerr << function_name << " tokens.at(i)=" << tokens.at(i) << endl;
 
     int ISPIN=1,NIONS, NELECT, Nbands, NKPOINTS, KPOINTSGRID;
     double Efermi, ftmp, ftmpup, ftmpdn;
@@ -2950,20 +2957,19 @@ namespace estructure {
     stringstream straus, stringstreamtmp, strline; //, dosfile; //, stringstreamtmp, strline;  
 
     if(tokens.size()<1) {
-      init::ErrorOption(cout,options,"estructure::PLOT_BAND_SPINSPLIT","aflow -plotband_spinsplit[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]");
-      exit(0);
+      init::ErrorOption(options,function_name,"aflow -plotband_spinsplit[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]");
     }
     if(tokens.size()>=1) directory = tokens.at(0);
     if(tokens.size()>=2) DOS_Emin = aurostd::string2utype<double>(tokens.at(1)); 
     if(tokens.size()>=3) DOS_Emax = aurostd::string2utype<double>(tokens.at(2));
     if(tokens.size()>=4) DOSSCALE = aurostd::string2utype<double>(tokens.at(3));
 
-    if(LDEBUG) cerr << XPID << "estructure::PLOT_BAND_SPINSPLIT: directory=[" << directory << "]" << endl;
-    if(LDEBUG) cerr << XPID << "estructure::PLOT_BAND_SPINSPLIT: DOS_Emin=" << DOS_Emin << endl;
-    if(LDEBUG) cerr << XPID << "estructure::PLOT_BAND_SPINSPLIT: DOS_Emax=" << DOS_Emax << endl;
-    if(LDEBUG) cerr << XPID << "estructure::PLOT_BAND_SPINSPLIT: DOSSCALE=" << DOSSCALE << endl;
+    if(LDEBUG) cerr << function_name << " directory=[" << directory << "]" << endl;
+    if(LDEBUG) cerr << function_name << " DOS_Emin=" << DOS_Emin << endl;
+    if(LDEBUG) cerr << function_name << " DOS_Emax=" << DOS_Emax << endl;
+    if(LDEBUG) cerr << function_name << " DOSSCALE=" << DOSSCALE << endl;
 
-    cout << XPID << "estructure::PLOT_BAND_SPINSPLIT: working in directory=" << directory << endl;
+    cout << function_name << " working in directory=" << directory << endl;
 
     ICSDName=KBIN::ExtractSystemName(directory); //Get SystemName
 
@@ -2977,7 +2983,10 @@ namespace estructure {
       if(!found&&aurostd::FileExist(directory+"/OUTCAR"+XHOST.vext.at(iext)))
         found=aurostd::efile2stringstream(directory+"/OUTCAR"+XHOST.vext.at(iext),straus);
     }  
-    if(!found) {cerr << XPID << "ERROR: estructure::PLOT_BAND_SPINSPLI: OUTCAR[.bands][.EXT] not found in the directory, aborting."<< endl;exit(0);}
+    if(!found) {
+      message << "OUTCAR[.bands][.EXT] not found in the directory, aborting.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_FILE_NOT_FOUND_);
+    }
 
     //GET Fermi Level, Number of IONS
     //GET lattice vector and reciprocal lattice vectors
@@ -3016,7 +3025,10 @@ namespace estructure {
       if(!found&&aurostd::FileExist(directory+"/EIGENVAL"+XHOST.vext.at(iext)))
         found=aurostd::efile2stringstream(directory+"/EIGENVAL"+XHOST.vext.at(iext),straus);
     }
-    if(!found) {cerr << XPID << "ERROR: estructure::PLOT_BAND_SPINSPLI: EIGENVAL[.bands][.EXT] not found in the directory, aborting."<< endl;exit(0);}
+    if(!found) {
+      message << "EIGENVAL[.bands][.EXT] not found in the directory, aborting.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_FILE_NOT_FOUND_);
+    }
 
     //Read FLAG of SPIN, if SPIN=1,Non-spin-polarized; IF SPIN=2, spin-polarized
     straus >> stmp >> stmp >> stmp >> ISPIN;	
@@ -3067,8 +3079,8 @@ namespace estructure {
       }
     }
     else {
-      cerr << "Can not detect spin flag! Error, Aborting!" << endl;
-      exit(0);
+      message << "Can not detect spin flag! Error, Aborting!";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
     }
 
     //READ KPOINTS	
@@ -3081,7 +3093,10 @@ namespace estructure {
       if(!found&&aurostd::FileExist(directory+"/KPOINTS"+XHOST.vext.at(iext)))
         found=aurostd::efile2stringstream(directory+"/KPOINTS"+XHOST.vext.at(iext),straus);
     }
-    if(!found) {cerr << XPID << "ERROR: estructure::PLOT_BAND_SPINSPLI: KPOINTS[.bands][.EXT] not found in the directory, aborting."<< endl;exit(0);}
+    if(!found) {
+      message << "KPOINTS[.bands][.EXT] not found in the directory, aborting.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_FILE_NOT_FOUND_);
+    }
 
     straus >> LattName >> stmp; getline(straus, stmp);
     straus >> KPOINTSGRID >> stmp >> stmp >> stmp; getline(straus, stmp);
@@ -3145,11 +3160,11 @@ namespace estructure {
 
     //Check number of kpoints
     if((count/2)*KPOINTSGRID!=NKPOINTS) {
-      //    if(LDEBUG) cerr << XPID << "estructure::PLOT_BAND [36]" << endl;
-      cout << "ERROR: Please check your KPOINTS.bands file and EIGENVALE.bands. file! Their kpoints number are different!!!" << endl;
-      cout << "KPOINTSGRID=" << KPOINTSGRID << endl;
-      cout << "NKPOINTS=" << NKPOINTS << endl;
-      exit(0);
+      //    if(LDEBUG) cerr << function_name << " [36]" << endl;
+      message << "Please check your KPOINTS.bands and EIGENVAL.bands files! The number of kpoints are different!!!" << endl;
+      message << "KPOINTSGRID=" << KPOINTSGRID << endl;
+      message << "NKPOINTS=" << NKPOINTS << endl;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_VALUE_ERROR_);
     }
 
     //Calcuating klinedirect from the direct points
@@ -3539,6 +3554,8 @@ namespace estructure {
   void CombineTDOSAndTOTALPDOS(const vector<vector<double> >& TDOS, const vector<vector<double> >& TOTALPDOS, vector<vector<double> >& vvDOS) {
     //format of vvDOS, s, p, d , f, total
     //similar function POCC_COMBINE_TDOS_PDOS_ONEDOS
+
+    string function_name = XPID + "estructure::CombineTDOSAndTOTALPDOS():";
     vvDOS.clear();
     int Ncolumns = TOTALPDOS.at(0).size();
     for (uint i=0; i<TOTALPDOS.size();i++) {
@@ -3552,8 +3569,7 @@ namespace estructure {
         vtmp.push_back(TDOS[i][2]);
       }
       else {
-        cout << "ERROR..., PLS. CHECK TOTALPDOS! Aborting!" << endl;
-        exit(0);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Unexpected size of the TOTALPDOS. Please check.",_VALUE_RANGE_);
       }
       vvDOS.push_back(vtmp);
     }
@@ -3565,13 +3581,13 @@ namespace estructure {
 // ***************************************************************************
 namespace estructure {
   double GET_PDOSDATA(const string& str_dir, vector<vector<vector<double> > >& PDOS) {
+    string function_name = XPID + "estructure::GET_PDOSDATA():";
     double Efermi;
     vector<vector<double> > TDOS;
     vector<vector<double> > TOTALPDOS;
     //CO20180216 - this function needs PDOS
     if(!(estructure::GET_DOS_DATA(str_dir, Efermi, TDOS, TOTALPDOS, PDOS) && TOTALPDOS.size()>0)){
-      cerr << "ERROR: DOSCAR extraction failed, perhaps there is no PDOS" << endl;
-      exit(1);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"DOSCAR extraction failed, perhaps there is no PDOS",_INPUT_MISSING_);
     }
     return Efermi;
   }
@@ -3582,13 +3598,13 @@ namespace estructure {
 // ***************************************************************************
 namespace estructure {
   double GET_TOTALPDOSDATA(const string& str_dir, vector<vector<double> >& TOTALPDOS) {
+    string function_name = XPID + "estructure::GET_TOTALPDOSDATA():";
     double  Efermi;
     vector<vector<double> > TDOS;
     vector<vector<vector<double> > > PDOS;
     //CO20180216 - this function needs PDOS
     if(!(estructure::GET_DOS_DATA(str_dir, Efermi, TDOS, TOTALPDOS, PDOS) && TOTALPDOS.size()>0)){
-      cerr << "ERROR: DOSCAR extraction failed, perhaps there is no PDOS" << endl;
-      exit(1);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"DOSCAR extraction failed, perhaps there is no PDOS",_INPUT_MISSING_);
     }
     return Efermi;
   }
@@ -3599,13 +3615,13 @@ namespace estructure {
 // ***************************************************************************
 namespace estructure {
   double GET_TDOSDATA(const string& str_dir, vector<vector<double> >& TDOS) {
+    string function_name = XPID + "estructure::GET_TDOSDATA():";
     double Efermi;
     vector<vector<double> > TOTALPDOS;
     vector<vector<vector<double> > > PDOS;
     //CO20180216 - this function needs PDOS
     if(!(estructure::GET_DOS_DATA(str_dir, Efermi, TDOS, TOTALPDOS, PDOS) && TOTALPDOS.size()>0)){
-      cerr << "ERROR: DOSCAR extraction failed, perhaps there is no PDOS" << endl;
-      exit(1);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"DOSCAR extraction failed, perhaps there is no PDOS",_INPUT_MISSING_);
     }
     return Efermi;
   }
@@ -3616,13 +3632,13 @@ namespace estructure {
 // ***************************************************************************
 namespace estructure {
   double GET_PDOSDATA(stringstream& ss_dosfile, stringstream& ss_outfile, vector<vector<vector<double> > >& PDOS) {
+    string function_name = XPID + "estructure::GET_PDOSDATA():";
     double Efermi;
     vector<vector<double> > TDOS;
     vector<vector<double> > TOTALPDOS;
     //CO20180216 - this function needs PDOS
     if(!(estructure::GET_DOS_DATA(ss_dosfile, ss_outfile, Efermi, TDOS, TOTALPDOS, PDOS) && TOTALPDOS.size()>0)){
-      cerr << "ERROR: DOSCAR extraction failed, perhaps there is no PDOS" << endl;
-      exit(1);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"DOSCAR extraction failed, perhaps there is no PDOS",_INPUT_MISSING_);
     }
     return Efermi;
   }
@@ -3633,13 +3649,13 @@ namespace estructure {
 // ***************************************************************************
 namespace estructure {
   double GET_TOTALPDOSDATA(stringstream& ss_dosfile, stringstream& ss_outfile, vector<vector<double> >& TOTALPDOS) {
+    string function_name = XPID + "estructure::GET_TOTALPDOSDATA():";
     double Efermi;
     vector<vector<double> > TDOS;
     vector<vector<vector<double> > > PDOS;
     //CO20180216 - this function needs PDOS
     if(!(estructure::GET_DOS_DATA(ss_dosfile, ss_outfile, Efermi, TDOS, TOTALPDOS, PDOS) && TOTALPDOS.size()>0)){
-      cerr << "ERROR: DOSCAR extraction failed, perhaps there is no PDOS" << endl;
-      exit(1);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"DOSCAR extraction failed, perhaps there is no PDOS",_INPUT_MISSING_);
     }
     return Efermi;
   }
@@ -3650,13 +3666,13 @@ namespace estructure {
 // ***************************************************************************
 namespace estructure {
   double GET_TDOSDATA(stringstream& ss_dosfile, stringstream& ss_outfile, vector<vector<double> >& TDOS) {
+    string function_name = XPID + "estructure::GET_TDOSDATA():";
     double Efermi;
     vector<vector<double> > TOTALPDOS;
     vector<vector<vector<double> > > PDOS;
     //CO20180216 - this function needs PDOS
     if(!(estructure::GET_DOS_DATA(ss_dosfile, ss_outfile, Efermi, TDOS, TOTALPDOS, PDOS) && TOTALPDOS.size()>0)){
-      cerr << "ERROR: DOSCAR extraction failed, perhaps there is no PDOS" << endl;
-      exit(1);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"DOSCAR extraction failed, perhaps there is no PDOS",_INPUT_MISSING_);
     }
     return Efermi;
   }
@@ -3667,8 +3683,8 @@ namespace estructure {
 namespace estructure {
   bool GET_DOS_DATA(const string& str_dir, double& Efermi, vector<vector<double> >& TDOS, vector<vector<double> >& TOTALPDOS, vector<vector<vector<double> > >& PDOS) {
     stringstream ss_dosfile, ss_outfile, ss_line;
-    if(aflowlib::VaspFileExist(str_dir, "OUTCAR")) aflowlib::vaspfile2stringstream(str_dir, "OUTCAR", ss_outfile); //Not exit even OUTCAR does not exist
-    aflowlib::vaspfile2stringstream(str_dir, "DOSCAR", ss_dosfile); //exit if DOSCAR does not exist
+    if(aflowlib::VaspFileExist(str_dir, "OUTCAR")) aflowlib::vaspfile2stringstream(str_dir, "OUTCAR", ss_outfile); //Not return even OUTCAR does not exist
+    aflowlib::vaspfile2stringstream(str_dir, "DOSCAR", ss_dosfile); //return if DOSCAR does not exist
     return estructure::GET_DOS_DATA(ss_dosfile, ss_outfile, Efermi, TDOS, TOTALPDOS, PDOS);
   }
 }
@@ -3720,7 +3736,7 @@ namespace estructure {
     //CO20180217 - I added the (-6) because header is 6 lines
     //usually, DOSGRID is 301, and TotNoDOSCAR is 307, so 307-6 == 301 ! conservation of lines
     //therefore TotNoDOSCAR-6 should never be less than DOSGRID, but at least equal
-    if(TotNoDOSCAR-6 < DOSGRID) {cerr << "DOSCAR is cut-off, likely an IO problem" << endl; return false;} //"DOSCAR is not intergrated!" << endl; /*exit(1)*/return false;  //CO20180216
+    if(TotNoDOSCAR-6 < DOSGRID) {cerr << "DOSCAR is cut-off, likely an IO problem" << endl; return false;} //"DOSCAR is not intergrated!" << endl; return false;  //CO20180216
     bool FLAG_PDOS = false;
     if(NIONS==0) NIONS = (int (TotNoDOSCAR-5)/(DOSGRID+1))-1; //if OUTCAR does not exist
     //CO20180217
@@ -3780,7 +3796,7 @@ namespace estructure {
     //************************************************************************************************************************
     //----------------------GETTING PDOS DATA-------------------------
     //vector<vector<vector<double> > > PDOS(NIONS);
-    //if(!FLAG_PDOS) { cerr << "Partial DOS has not been calculated yet or your DOSCAR file is damaged!" << endl; /*exit(1)*/return false;} //CO20180216 //we may not have PDOS in static anymore, see AGL
+    //if(!FLAG_PDOS) { cerr << "Partial DOS has not been calculated yet or your DOSCAR file is damaged!" << endl; return false;} //CO20180216 //we may not have PDOS in static anymore, see AGL
     if(FLAG_PDOS) {
       PDOS.resize(NIONS);
       getline(ss_dosfile, line); //Negelecting the title line after the TDOS
@@ -4478,6 +4494,7 @@ namespace estructure{
   // Converts a DOSCAR.static file into json format.
   bool DOSDATA_JSON(aurostd::xoption& vpflow,ostream& oss){
     bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string function_name = XPID + "estructure::DOSDATA_JSON():";
     vector<string> tokens;
     aurostd::string2tokens(vpflow.getattachedscheme("DOSDATA2JSON"),tokens,",");
     bool SUCCESS=TRUE;
@@ -4486,7 +4503,7 @@ namespace estructure{
     for(uint i=0;i<tokens.size();i++){
       directory = aurostd::CleanFileName(tokens[i]);
       if(!aurostd::IsDirectory(directory)){
-        cerr << XPID << "estructure::DOSDATA_JSON: directory does not exist = " << directory << endl;
+        cerr << function_name << " directory does not exist = " << directory << endl;
         continue;
       }
       directories.push_back(directory);
@@ -4496,7 +4513,7 @@ namespace estructure{
     if(directories.size()>1){oss << "[" << std::endl;}
     for(uint i=0;i<directories.size();i++){
       directory=directories[i];
-      if(LDEBUG) cerr << XPID << "estructure::DOSDATA_JSON: working in directory=" << directory << endl;
+      if(LDEBUG) cerr << function_name << " working in directory=" << directory << endl;
       //oss << "{" << std::endl;  //CO20171025
       SUCCESS = SUCCESS && DOSDATA_JSON(vpflow,directory,json,true); //CO20171025
       oss << json.str(); json.str("");
@@ -4511,6 +4528,7 @@ namespace estructure{
   //Takes in a ofstream and spits out the revelevent JSON about the DOS. 
   bool DOSDATA_JSON(aurostd::xoption& vpflow, string directory, stringstream& json,bool wrapping_brackets){ //CO20171025
     bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string function_name = XPID + "estructure::DOSDATA_JSON():";
     //bool isLSCOUPLING=FALSE;
     int DOSGRID; //, NIONS;
     double Efermi, Emax, Emin;
@@ -4522,29 +4540,28 @@ namespace estructure{
     //stringstream straus, strline, dosfile; //, stringstreamtmp, strline; 
     stringstream dosfile;//,iatomsfile;
 
-    if(LDEBUG) cerr << XPID << "estructure::DOSDATA_JSON: BEGIN" << endl;
+    if(LDEBUG) cerr << function_name << " BEGIN" << endl;
 
     vector<string> tokens;
     aurostd::string2tokens(vpflow.getattachedscheme("DOSDATA2JSON::PARAMS"),tokens,",");
     double DOS_Emin=DEFAULT_DOS_EMIN,DOS_Emax=DEFAULT_DOS_EMAX,DOSSCALE=DEFAULT_DOS_SCALE;  // some defaults
 
-    if(LDEBUG) cerr << XPID << "estructure::DOSDATA_JSON: options=[" << vpflow.getattachedscheme("DOSDATA2JSON::PARAMS") << "]" << endl;
-    if(LDEBUG) cerr << XPID << "estructure::DOSDATA_JSON: tokens.size()=" << tokens.size() << endl;
-    if(LDEBUG) for(uint i=0;i<tokens.size();i++) cerr << XPID << "estructure::PLOT_DOSWEB: tokens.at(i)=" << tokens.at(i) << endl;
+    if(LDEBUG) cerr << function_name << " options=[" << vpflow.getattachedscheme("DOSDATA2JSON::PARAMS") << "]" << endl;
+    if(LDEBUG) cerr << function_name << " tokens.size()=" << tokens.size() << endl;
+    if(LDEBUG) for(uint i=0;i<tokens.size();i++) cerr << function_name << " tokens.at(i)=" << tokens.at(i) << endl;
 
     //if(tokens.size()>0) {
-    //  init::ErrorOption(cout,options,"estructure::DOSDATA_JSON","aflow --plotdosweb[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]]");
-    //  exit(0);
+    //  init::ErrorOption(options,"estructure::DOSDATA_JSON","aflow --plotdosweb[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]]");
     //}
     //if(tokens.size()>=1) directory = tokens.at(0);
     if(tokens.size()>=1) DOS_Emin = aurostd::string2utype<double>(tokens.at(0)); 
     if(tokens.size()>=2) DOS_Emax = aurostd::string2utype<double>(tokens.at(1));
     if(tokens.size()>=3) DOSSCALE = aurostd::string2utype<double>(tokens.at(2));
 
-    if(LDEBUG) cerr << XPID << "estructure::DOSDATA_JSON: directory=[" << directory << "]" << endl;
-    if(LDEBUG) cerr << XPID << "estructure::DOSDATA_JSON: DOS_Emin=" << DOS_Emin << endl;
-    if(LDEBUG) cerr << XPID << "estructure::DOSDATA_JSON: DOS_Emax=" << DOS_Emax << endl;
-    if(LDEBUG) cerr << XPID << "estructure::DOSDATA_JSON: DOSSCALE=" << DOSSCALE << endl;
+    if(LDEBUG) cerr << function_name << " directory=[" << directory << "]" << endl;
+    if(LDEBUG) cerr << function_name << " DOS_Emin=" << DOS_Emin << endl;
+    if(LDEBUG) cerr << function_name << " DOS_Emax=" << DOS_Emax << endl;
+    if(LDEBUG) cerr << function_name << " DOSSCALE=" << DOSSCALE << endl;
 
     //READ DOSCAR.static
     bool found=FALSE;
@@ -4559,9 +4576,8 @@ namespace estructure{
     }
 
     if(!found) {
-      cerr << XPID << "ERROR: estructure::DOSDATA_JSON: DOSCAR[.static][.EXT] not found in the directory, aborting."<< endl;
+      cerr << function_name << " ERROR: DOSCAR[.static][.EXT] not found in the directory, aborting."<< endl;
       return FALSE;
-      //exit(0);
     }
 
     //CO20171025 START
@@ -4578,14 +4594,13 @@ namespace estructure{
     }
 
     if(POSCAR_file.empty()) {
-      cerr << XPID << "ERROR: estructure::DOSDATA_JSON: POSCAR[.static][.EXT] not found in the directory, aborting."<< endl;
+      cerr << function_name << " ERROR: POSCAR[.static][.EXT] not found in the directory, aborting."<< endl;
       return FALSE;
-      //exit(0);
     }
 
     xstructure xstr(POSCAR_file,IOVASP_POSCAR);
     if(!xstr.CalculateSymmetry()){
-      cerr << XPID << "ERROR: estructure::DOSDATA_JSON: Unable to calculate symmetry of structure found in POSCAR, aborting." << endl;
+      cerr << function_name << " ERROR: Unable to calculate symmetry of structure found in POSCAR, aborting." << endl;
       return FALSE;
     }
 
@@ -4605,9 +4620,8 @@ namespace estructure{
     //[OBSOLETE]  bool iatomsfound=FALSE;
     //[OBSOLETE]  if(!iatomsfound&&aurostd::FileExist(directory+"/aflow.iatoms.out"+XHOST.vext.at(iext))) iatomsfound=aurostd::efile2stringstream(directory+"/aflow.iatoms.out"+XHOST.vext.at(iext),iatomsfile);
     //[OBSOLETE]  if(!iatomsfound) {
-    //[OBSOLETE]    cerr << XPID << "ERROR: estructure::DOSDATA_JSON: aflow.iatoms.out"+XHOST.vext.at(iext)+" not found in the directory, aborting."<< endl;
+    //[OBSOLETE]    cerr << function_name << " ERROR: aflow.iatoms.out"+XHOST.vext.at(iext)+" not found in the directory, aborting."<< endl;
     //[OBSOLETE]    return FALSE;
-    //[OBSOLETE]    //exit(0);
     //[OBSOLETE]  }
     //[OBSOLETE]  vector<int> iatoms;
     //[OBSOLETE]  for(int i=0;i<3;i++) getline(iatomsfile,stmp);
@@ -5464,6 +5478,7 @@ namespace estructure {
 
   bool BANDSDATA_JSON(aurostd::xoption& vpflow,ostream& oss){
     bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string function_name = XPID + "estructure::BANDSDATA_JSON():";
     vector<string> tokens;
     aurostd::string2tokens(vpflow.getattachedscheme("BANDSDATA2JSON"),tokens,",");
     bool SUCCESS=TRUE;
@@ -5472,7 +5487,7 @@ namespace estructure {
     for(uint i=0;i<tokens.size();i++){
       directory = aurostd::CleanFileName(tokens[i]);
       if(!aurostd::IsDirectory(directory)){
-        cerr << XPID << "estructure::BANDSDATA_JSON: directory does not exist = " << directory << endl;
+        cerr << function_name << " directory does not exist = " << directory << endl;
         continue;
       }
       directories.push_back(directory);
@@ -5482,7 +5497,7 @@ namespace estructure {
     if(directories.size()>1){oss << "[" << std::endl;}
     for(uint i=0;i<directories.size();i++){
       directory=directories[i];
-      if(LDEBUG) cerr << XPID << "estructure::BANDSDATA_JSON: working in directory=" << directory << endl;
+      if(LDEBUG) cerr << function_name << " working in directory=" << directory << endl;
       //oss << "{" << std::endl; //CO20171025
       SUCCESS = SUCCESS && BANDSDATA_JSON(vpflow,directory,json,true); //CO20171025
       oss << json.str(); json.str("");
@@ -5496,7 +5511,9 @@ namespace estructure {
 
   bool BANDSDATA_JSON(aurostd::xoption& vpflow, string directory, stringstream& json,bool wrapping_brackets){ //CO20171025
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << XPID << "estructure::BANDSDATA_JSON: BEGIN" << endl;
+    string function_name = XPID + "estructure::BANDSDATA_JSON():";
+    stringstream message;
+    if(LDEBUG) cerr << function_name << " BEGIN" << endl;
 
     if(vpflow.flag("BANDSDATA2JSON")){;} //dummy load
 
@@ -5506,7 +5523,7 @@ namespace estructure {
     //vector<string> tokens;
     //aurostd::string2tokens(options,tokens,",");
 
-    //if(LDEBUG) cerr << XPID << "estructure::BANDSDATA_JSON: options=[" << options << "]" << endl;
+    //if(LDEBUG) cerr << function_name << " options=[" << options << "]" << endl;
 
     int ISPIN=1, NIONS, NELECT, Nbands, NKPOINTS, KPOINTSGRID;
     double Efermi, ftmp, ftmpup, ftmpdn;
@@ -5515,7 +5532,7 @@ namespace estructure {
     stringstream ss_eigenval;
 
     //if(tokens.size()>=1) directory= tokens.at(0);
-    if(LDEBUG) cerr << XPID << "estructure::BANDSDATA_JSON: working in directory= " << directory << endl;
+    if(LDEBUG) cerr << function_name << " working in directory= " << directory << endl;
 
     ICSDName= KBIN::ExtractSystemName(directory); //Get SystemName
 
@@ -5550,7 +5567,7 @@ namespace estructure {
     //***********************************DEALING WITH BANDSDATA**************************************************************
 
     aflowlib::vaspfile2stringstream(directory, "EIGENVAL", ss_engenval);
-    //cout << ss_engenval.str() << endl;exit(0);
+    //cout << ss_engenval.str() << endl;throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Throw for debugging purposes.",_GENERIC_ERROR_);
 
     //Read FLAG of SPIN, if SPIN=1,Non-spin-polarized; IF SPIN=2, spin-polarized
     ss_engenval >> stmp >> stmp >> stmp >> ISPIN;   
@@ -5603,7 +5620,6 @@ namespace estructure {
     else {
       cerr << "Can not detect spin flag! Error, Aborting!" << endl;
       return FALSE;
-      //exit(0);
     }
     //READ KPOINTS  
     aflowlib::vaspfile2stringstream(directory, "KPOINTS", ss_kpoints);
@@ -5691,13 +5707,12 @@ namespace estructure {
     //Check number of kpoints
 
     if ((count/2)*KPOINTSGRID!=NKPOINTS) {
-      if(LDEBUG) cerr << XPID << "estructure::PLOT_BAND [16]" << endl;
-      cout << "ERROR: Please check your KPOINTS.bands file and EIGENVALE.bands. file! Their kpoints number are different!!!" << endl;
-      cout << "KPOINTSGRID=" << KPOINTSGRID << endl;
-      cout << "count=" << count << endl;
-      cout << "(count/2)*KPOINTSGRID=" << (count/2)*KPOINTSGRID << endl;
-      cout << "NKPOINTS=" << NKPOINTS << endl;
-      exit(0);
+      message << "Please check your KPOINTS.bands and EIGENVAL.bands. files! The number of kpoints are different!!!" << endl;
+      message << "KPOINTSGRID=" << KPOINTSGRID << endl;
+      message << "count=" << count << endl;
+      message << "(count/2)*KPOINTSGRID=" << (count/2)*KPOINTSGRID << endl;
+      message << "NKPOINTS=" << NKPOINTS << endl;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_VALUE_ERROR_);
     }
 
     //Calcuating klinedirect from the direct points

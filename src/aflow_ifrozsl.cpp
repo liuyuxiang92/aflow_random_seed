@@ -44,7 +44,7 @@ namespace KBIN {
 
     if(LDEBUG) cerr << vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING.size() << endl;
     string input_file=kflags.KBIN_PHONONS_CALCULATION_FROZSL_poscars;
-    aurostd::substring2strings(input_file,vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING,"[VASP_POSCAR_MODE_EXPLICIT]START.");
+    aurostd::substring2strings(input_file,vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING,_VASP_POSCAR_MODE_EXPLICIT_START_);  //CO20200624
     if(LDEBUG) cerr << vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING.size() << endl;
     // some verbose
     for(uint i=0;i<vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING.size();i++)
@@ -53,8 +53,8 @@ namespace KBIN {
     for(uint i=0;i<vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING.size();i++) {
       string START="[VASP_POSCAR_MODE_EXPLICIT]START";
       string STOP="[VASP_POSCAR_MODE_EXPLICIT]STOP";
-      START="[VASP_POSCAR_MODE_EXPLICIT]START."+vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING.at(i);
-      STOP="[VASP_POSCAR_MODE_EXPLICIT]STOP."+vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING.at(i);
+      START=_VASP_POSCAR_MODE_EXPLICIT_START_+vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING.at(i); //CO20200624
+      STOP=_VASP_POSCAR_MODE_EXPLICIT_STOP_+vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING.at(i); //CO20200624
       stringstream POSCAR;POSCAR.clear();POSCAR.str(std::string());
       if(aurostd::substring2bool(input_file,START) && aurostd::substring2bool(input_file,STOP))
         aurostd::ExtractToStringstreamEXPLICIT(input_file,POSCAR,START,STOP);
@@ -75,10 +75,9 @@ namespace KBIN {
     for(uint i=0;i<vtitel.size();i++) {
       aurostd::string2tokens(vtitel.at(i),tokens," ");
       if(tokens.size()!=4 && tokens.size()!=5) {
-        cerr << "EEEEE  POTCAR KBIN_VASP_RunPhonons_FROZSL " << endl;
-        for(uint j=0;j<vtitel.size();j++) 
-          cerr << vtitel.at(j) << endl;
-        exit(0);
+        string function = XPID + "KBIN::VASP_RunPhonons_FROZSL():";
+        string message = "POTCAR KBIN_VASP_RunPhonons_FROZSL " + aurostd::joinWDelimiter(vtitel, ", ");
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
       }
       species_pp.push_back(tokens.at(3));
       species.push_back(KBIN::VASP_PseudoPotential_CleanName(tokens.at(3)));
@@ -114,7 +113,7 @@ namespace KBIN {
       xvasp_aus.aopts.flag("FLAG::ALGO_SET",TRUE);
       xvasp_aus.AVASP_flag_TYPE=vflags.KBIN_VASP_FORCE_OPTION_TYPE;
       xvasp_aus.aopts.flag("FLAG::AVASP_SYMMETRY=OFF",TRUE);
-      xvasp_aus.aopts.flag("FLAG::AVASP_NEIGHBOURS=OFF",TRUE);
+      xvasp_aus.aopts.flag("FLAG::AVASP_NEIGHBORS=OFF",TRUE);
       xvasp_aus.aopts.flag("FLAG::AVASP_APL=OFF",TRUE);
       // xvasp_aus.aopts.flag("AVASP_flag_CONVERT_UNIT_CELL_STANDARD_PRIMITIVE",FALSE);
       // xvasp_aus.aopts.flag("AVASP_flag_CONVERT_UNIT_CELL_MINKOWSKI",FALSE);
@@ -126,7 +125,6 @@ namespace KBIN {
     for(uint i=0;i<vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING.size();i++) 
       AVASP_MakeSingleAFLOWIN(vaspRuns[i]);
 
-    //  exit(0);
   }
 }
 
@@ -269,6 +267,8 @@ namespace FROZSL {
 
 namespace FROZSL {
   bool WGET_OUTPUT(ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags) {
+    string function = XPID + "FROZSL::WGET_OUTPUT():";
+    string message = "";
     ostringstream aus;
     aus << "00000  MESSAGE FROZSL running WGET OUTPUT files " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -278,7 +278,10 @@ namespace FROZSL {
     if(!aurostd::FileExist(aflowin)) {FileMESSAGE << "ERROR" << ": file not found " << aflowin << endl;return FALSE;}
     string AflowIn;aurostd::file2string(aflowin,AflowIn);
 
-    if(XHOST.vext.size()!=XHOST.vcat.size()) { cerr << "ERROR - FROZSL::WGET_OUTPUT: XHOST.vext.size()!=XHOST.vcat.size(), aborting." << endl; exit(0); }
+    if(XHOST.vext.size()!=XHOST.vcat.size()) {
+      message = "XHOST.vext.size()!=XHOST.vcat.size().";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
+    }
 
     // CHECK FOR INSIDE STUFF
     if(FROZSL::Already_Calculated_Input(AflowIn)) {
@@ -292,7 +295,7 @@ namespace FROZSL {
 
       command="grep \"\\[VASP_POSCAR_MODE_EXPLICIT\\]START\\.\" "+aflags.Directory+"/"+_AFLOWIN_;
       aflow_frozsl_out=aurostd::execute2string(command);
-      aurostd::StringSubst(aflow_frozsl_out,"[VASP_POSCAR_MODE_EXPLICIT]START.","");
+      aurostd::StringSubst(aflow_frozsl_out,_VASP_POSCAR_MODE_EXPLICIT_START_,""); //CO20200624
       aurostd::string2vectorstring(aflow_frozsl_out,vdirectories);
 
       for(uint i=0;i<vdirectories.size();i++) {
@@ -309,10 +312,8 @@ namespace FROZSL {
           aus << "00000  MESSAGE FROZSL file OK: " << vfiles.at(i) << "" << endl;
           aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
         } else {
-          aus << "ERROR" << ": file not found " << vfiles.at(i) << endl;
-          aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-          exit(0);
-          return FALSE;
+          message = "file not found " + vfiles[i];
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_NOT_FOUND_);
         }
       }
       // ENERGIES
@@ -439,7 +440,7 @@ namespace FROZSL {
     // CHECK FOR INSIDE STUFF
     if(!FROZSL::Already_Calculated_Input(AflowIn)) {
       FROZSL::WGET_INPUT(FileMESSAGE,AflowIn,aflags,kflags);
-      exit(0);
+      return Krun;
     }
 
     aurostd::ExtractJustAfterToStringstreamEXPLICIT(AflowIn,input_file,"[AFLOW_FROZSL]STRUCTURES");
@@ -594,7 +595,6 @@ namespace FROZSL {
     //   Krun=Krun && FROZSL::input_TO_FROZSL_poscar(FileMESSAGE,input_file,aflags,kflags);
     //   //  aurostd::stringstream2file(input_file,string(aflags.Directory+"/"+DEFAULT_AFLOW_FROZSL_POSCAR_OUT));
     //   cerr << "Exit to make some scripts" << endl;
-    //  exit(0);
     return Krun;
   }
 }
@@ -766,6 +766,5 @@ namespace FROZSL {
 //   nohup aflow --DIRECTORY=./ &
 //   sleep 5
 //   mv LOCK LOCK.4
-
 
 

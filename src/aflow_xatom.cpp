@@ -189,7 +189,7 @@ ostream& operator<<(ostream& oss,const _atom& atom) {
       oss << "order_parameter_atom=" << atom.order_parameter_atom << endl;
       oss << "partial_occupation_value=" << atom.partial_occupation_value << endl;
       oss << "partial_occupation_flag=" << atom.partial_occupation_flag << endl;
-      oss << "nearest_neighbour_shell_num= " << atom.shell << endl;
+      oss << "nearest_neighbor_shell_num= " << atom.shell << endl;
     }
     if(atom.print_cartesian==TRUE) {
       if(atom.verbose) oss << "cartesian" << endl;
@@ -223,18 +223,39 @@ ostream& operator<<(ostream& oss,const _atom& atom) {
 
 
 void _atom::CleanName(void) {
-  // This function cleanup the name from VASP stuff
-  string name1,name2;
-  name1=name+" ";
-  name2=name+" ";
-  name1=name1.substr(0,1);
-  if(!((name1[0]>=65 && name1[0]<=90)||(name1[0]>=97 && name1[0]<=122))) name1="";
-  if((name1[0]>=97 && name1[0]<=122)) name1[0]-=-97+65;
-  name2=name2.substr(1,1);
-  if(!((name2[0]>=65 && name2[0]<=90)||(name2[0]>=97 && name2[0]<=122))) name2="";
-  if((name2[0]>=65 && name2[0]<=90)) name2[0]+=-97+65;
-  cleanname=name1+name2;
-  atomic_number=0;
+  //CO20200624 - cleaning up function
+  //the old function had a sign problem and was inefficient
+  cleanname=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(name);
+  aurostd::VASP_PseudoPotential_CleanName_InPlace(cleanname); //DX20200907 - changed from KBIN to aurostd (since this is now in xparser)
+  if(cleanname.size()>3){cleanname=cleanname.substr(0,3);}  //cannot be longer than 3 characters
+  for(uint i=cleanname.size()-1;i<cleanname.size();i--){  //go backwards and clean anything that isn't between A-Z and a-z 
+    //65-90 is A-Z
+    //97-122 is a-z
+    if(!((cleanname[i]>=65 && cleanname[i]<=90)||(cleanname[i]>=97 && cleanname[i]<=122))){
+      cleanname.erase(cleanname.begin()+i);
+    }
+  }
+  //the old function insists on correcting if we have aL instead of Al...
+  if(cleanname.size()>0 && cleanname[0]>=97 && cleanname[0]<=122){cleanname[0]-=('a'-'A');}
+  for(uint i=1;i<cleanname.size();i++){
+    if(cleanname[i]>=65 && cleanname[i]<=90){cleanname[i]+=('a'-'A');}
+  }
+
+  //[CO20200624 - OBSOLETE]// This function cleanup the name from VASP stuff
+  //[CO20200624 - OBSOLETE]string name1,name2;
+  //[CO20200624 - OBSOLETE]name1=name+" ";
+  //[CO20200624 - OBSOLETE]name2=name+" ";
+  //[CO20200624 - OBSOLETE]name1=name1.substr(0,1);  //grab first 2 characters
+  //[CO20200624 - OBSOLETE]//65-90 is A-Z
+  //[CO20200624 - OBSOLETE]//97-122 is a-z
+  //[CO20200624 - OBSOLETE]if(!((name1[0]>=65 && name1[0]<=90)||(name1[0]>=97 && name1[0]<=122))) name1="";
+  //[CO20200624 - OBSOLETE]if((name1[0]>=97 && name1[0]<=122)) name1[0]-=-97+65; //THE SIGN LOOKS WRONG!!! - if we have 97, then it would subtract -32: giving us 129
+  //[CO20200624 - OBSOLETE]name2=name2.substr(1,1);  //grab second and third character
+  //[CO20200624 - OBSOLETE]if(!((name2[0]>=65 && name2[0]<=90)||(name2[0]>=97 && name2[0]<=122))) name2="";
+  //[CO20200624 - OBSOLETE]if((name2[0]>=65 && name2[0]<=90)) name2[0]+=-97+65;  //THE SIGN LOOKS WRONG!!! - if we have 65, then it would add -32: giving us 33 
+  //[CO20200624 - OBSOLETE]cleanname=name1+name2;
+  //[CO20200624 - OBSOLETE]atomic_number=0;
+
   for(uint j=0;j< vatom_symbol.size();j++) if(cleanname==vatom_symbol.at(j)) atomic_number=j;
 }
 
@@ -451,13 +472,13 @@ void atoms_initialize(void) {
   //if(test!=valence_WSETYAWAN[j]) cerr << "   ****   ";
   //cerr << endl;
   //}
-  //exit(0);
+  //throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"atoms_initialize():","Throw for debugging purposes.",_GENERIC_ERROR_);
 
 
   //   for(int i=1;i<90;i++) {
   //     cerr << i << " " <<  vatom_symbol[i] << " " << vatom_pettifor_scale[i] << endl;
   //   }
-  // cerr << i << " " << vatom_symbol[i] << endl; exit(0);
+  // cerr << i << " " << vatom_symbol[i] << endl; throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"atoms_initialize","Throw for debugging purposes.",_GENERIC_ERROR_);
 
   // aconvasp stuff
   // All data collected from the NIST online tables:
@@ -938,7 +959,7 @@ double GetPearsonCoefficient(const string& symbol) {
     }
   }
   // If not found throw xerror
-  string function = "GetPearsonCoefficient";
+  string function = XPID + "GetPearsonCoefficient():";
   string message = symbol + " is not a valid element name or symbol.";
   throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _VALUE_ILLEGAL_);
 }
@@ -952,8 +973,6 @@ double GetPearsonCoefficient(const int& iat) {
 // **************************************************************************
 double GetCompoundAttenuationLength(const vector<string>& species,const vector<double>& composition,const double& density) { // density in g/cm^3, return in cm
   if(species.size()!=composition.size()) {
-    //[CO20190629 - no exit()]cerr << "ERROR - GetCompoundAttenuationLength: species.size()[" << species.size() << "]!=composition.size()[" << composition.size() << "]" << endl;
-    //[CO20190629 - no exit()]exit(0);
     stringstream message; //CO20190629
     message << "species.size()[" << species.size() << "]!=composition.size()[" << composition.size() << "]";  //CO20190629
     throw aurostd::xerror(_AFLOW_FILE_NAME_,"GetCompoundAttenuationLength():",message,_INDEX_MISMATCH_);  //CO20190629
@@ -982,28 +1001,29 @@ double GetCompoundAttenuationLength(const deque<string>& _species,const deque<in
 // **************************************************************************
 // Function XATOM_AlphabetizationSpecies & XATOM_AlphabetizationCompound
 // **************************************************************************
-string XATOM_AlphabetizationSpecies(string speciesA,string speciesB) {
-  string system;
+string XATOM_AlphabetizationSpecies(const string& speciesA,const string& speciesB) {
+  string system="";
   if(speciesA<=speciesB) system=speciesA+speciesB; else system=speciesB+speciesA;
   return system;
 }
 
-string XATOM_AlphabetizationSpecies(vector<string> vspecies_in) {
-  stringstream system;
-  vector<string> vspecies(vspecies_in);
-  aurostd::sort(vspecies);
-  for(uint i=0;i<vspecies.size();i++)
-    system << vspecies.at(i);
-  return system.str();
+string XATOM_AlphabetizationSpecies(const vector<string>& vspecies_in) {
+  string system="";
+  vector<string> vspecies(vspecies_in);std::sort(vspecies.begin(),vspecies.end());
+  return aurostd::joinWDelimiter(vspecies,"");
+  //[CO20200624 - OBSOLETE]aurostd::sort(vspecies);
+  //[CO20200624 - OBSOLETE]for(uint i=0;i<vspecies.size();i++)
+  //[CO20200624 - OBSOLETE]  system << vspecies.at(i);
+  //[CO20200624 - OBSOLETE]return system.str();
 }
 
-string XATOM_AlphabetizationSpecies(vector<string> vspecies_in,vector<double> vnumbers_in) {
+string XATOM_AlphabetizationSpecies(const vector<string>& vspecies_in,const vector<double>& vnumbers_in) {
   stringstream system;
   vector<string> vspecies(vspecies_in);
   vector<double> vnumbers(vnumbers_in);
   aurostd::sort(vspecies,vnumbers);
   for(uint i=0;i<vspecies.size();i++)
-    system << vspecies.at(i) << vnumbers.at(i);
+    system << vspecies[i] << vnumbers[i];
   return system.str();
 }
 
@@ -1047,86 +1067,86 @@ void XATOM_AlphabetizationCompound(string& system) {
 // **************************************************************************
 // Function XATOM_SplitAlloySpecies
 // **************************************************************************
-uint XATOM_SplitAlloySpecies(string alloy_in, vector<string> &speciesX) {
-  string alloy=alloy_in;
-  alloy=KBIN::VASP_PseudoPotential_CleanName(alloy); // always some cleaning is good
-  alloy=KBIN::VASP_PseudoPotential_CleanName(alloy); // always some cleaning is good
-  alloy=aurostd::RemoveNumbers(alloy);              // remove composition
-  speciesX.clear();
-  for(uint i=0;i<alloy.length();i++) {
-    if(alloy[i]>='A' && alloy[i]<='Z') speciesX.push_back("");
-    speciesX.at(speciesX.size()-1)+=alloy[i];
-  }
-  for(uint i=0;i<speciesX.size();i++)
-    speciesX.at(i)=aurostd::CleanStringASCII(speciesX.at(i));
+uint XATOM_SplitAlloySpecies(const string& alloy_in, vector<string> &speciesX) {
+  speciesX=aurostd::getElements(alloy_in); //CO20200624
+  //[CO20200624 - OBSOLETE]string alloy=alloy_in;
+  //[CO20200624 - OBSOLETE]alloy=KBIN::VASP_PseudoPotential_CleanName(alloy); // always some cleaning is good
+  //[CO20200624 - OBSOLETE]alloy=KBIN::VASP_PseudoPotential_CleanName(alloy); // always some cleaning is good
+  //[CO20200624 - OBSOLETE]alloy=aurostd::RemoveNumbers(alloy);              // remove composition
+  //[CO20200624 - OBSOLETE]speciesX.clear();
+  //[CO20200624 - OBSOLETE]for(uint i=0;i<alloy.length();i++) {
+  //[CO20200624 - OBSOLETE]  if(alloy[i]>='A' && alloy[i]<='Z') speciesX.push_back("");
+  //[CO20200624 - OBSOLETE]  speciesX.at(speciesX.size()-1)+=alloy[i];
+  //[CO20200624 - OBSOLETE]}
+  //[CO20200624 - OBSOLETE]for(uint i=0;i<speciesX.size();i++)
+  //[CO20200624 - OBSOLETE]  speciesX.at(i)=aurostd::CleanStringASCII(speciesX.at(i));
   return speciesX.size();
 }
 
+//[CO20200624 - OBSOLETE]uint new_XATOM_SplitAlloySpecies(string alloy_in, vector<string> &speciesX, vector<double> &natomsX) {
+//[CO20200624 - OBSOLETE]  string alloy=alloy_in,alloyn;
+//[CO20200624 - OBSOLETE]  string letters="QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm";
+//[CO20200624 - OBSOLETE]  string numbers="0123456789";
+//[CO20200624 - OBSOLETE]  cerr << alloy << endl;// throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"atoms_initialize","Throw for debugging purposes.",_GENERIC_ERROR_);
+//[CO20200624 - OBSOLETE]
+//[CO20200624 - OBSOLETE]  alloy=KBIN::VASP_PseudoPotential_CleanName(alloy); // always some cleaning is good
+//[CO20200624 - OBSOLETE]  cerr << alloy << endl;// throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"atoms_initialize","Throw for debugging purposes.",_GENERIC_ERROR_);
+//[CO20200624 - OBSOLETE]  alloy=KBIN::VASP_PseudoPotential_CleanName(alloy); // always some cleaning is good
+//[CO20200624 - OBSOLETE]  cerr << alloy << endl;// throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"atoms_initialize","Throw for debugging purposes.",_GENERIC_ERROR_);
+//[CO20200624 - OBSOLETE]  alloy=aurostd::CleanStringASCII(alloy);
+//[CO20200624 - OBSOLETE]  cerr << alloy << endl;// throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"atoms_initialize","Throw for debugging purposes.",_GENERIC_ERROR_);
+//[CO20200624 - OBSOLETE]  for(uint i=0;i<alloy.length();i++)
+//[CO20200624 - OBSOLETE]    for(uint j=0;j<letters.length();j++)
+//[CO20200624 - OBSOLETE]      if(alloy[i]==letters[j] && alloy[i]!=0) {cerr << alloy[i] << endl; alloy[i]='_';}
+//[CO20200624 - OBSOLETE]
+//[CO20200624 - OBSOLETE]  cerr << alloy << endl; throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"atoms_initialize","Throw for debugging purposes.",_GENERIC_ERROR_);
+//[CO20200624 - OBSOLETE]
+//[CO20200624 - OBSOLETE]  speciesX.clear();
+//[CO20200624 - OBSOLETE]  for(uint i=0;i<alloy.length();i++) {
+//[CO20200624 - OBSOLETE]    if(alloy[i]>='A' && alloy[i]<='Z') speciesX.push_back("");
+//[CO20200624 - OBSOLETE]    speciesX.at(speciesX.size()-1)+=alloy[i];
+//[CO20200624 - OBSOLETE]  }
+//[CO20200624 - OBSOLETE]  for(uint i=0;i<speciesX.size();i++)
+//[CO20200624 - OBSOLETE]    speciesX.at(i)=aurostd::CleanStringASCII(speciesX.at(i));   // clean it up so it does not have problems inside only letters_numbers
+//[CO20200624 - OBSOLETE]  // now the atoms
+//[CO20200624 - OBSOLETE]  natomsX.clear();
+//[CO20200624 - OBSOLETE]  for(uint i=0;i<speciesX.size();i++) {
+//[CO20200624 - OBSOLETE]    if(i<speciesX.size()-1)
+//[CO20200624 - OBSOLETE]      natomsX.push_back(aurostd::string2utype<double>(alloyn.substr(alloyn.find(speciesX.at(i))+speciesX.at(i).length(),alloyn.find(speciesX.at(i+1))-alloyn.find(speciesX.at(i))-speciesX.at(i).length())));
+//[CO20200624 - OBSOLETE]    else
+//[CO20200624 - OBSOLETE]      natomsX.push_back(aurostd::string2utype<double>(alloyn.substr(alloyn.find(speciesX.at(i))+speciesX.at(i).length())));
+//[CO20200624 - OBSOLETE]    if(abs(natomsX.at(natomsX.size()-1))<=0.00001) natomsX.at(natomsX.size()-1)=1.0;  // fix the no number = 1
+//[CO20200624 - OBSOLETE]  }
+//[CO20200624 - OBSOLETE]  //  for(uint i=0;i<natomsX.size();i++)
+//[CO20200624 - OBSOLETE]  //  cerr << natomsX.at(i) << endl;
+//[CO20200624 - OBSOLETE]  return speciesX.size();
+//[CO20200624 - OBSOLETE]}
 
-uint new_XATOM_SplitAlloySpecies(string alloy_in, vector<string> &speciesX, vector<double> &natomsX) {
-  string alloy=alloy_in,alloyn;
-  string letters="QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm";
-  string numbers="0123456789";
-  cerr << alloy << endl;// exit(0);
-
-  alloy=KBIN::VASP_PseudoPotential_CleanName(alloy); // always some cleaning is good
-  cerr << alloy << endl;// exit(0);
-  alloy=KBIN::VASP_PseudoPotential_CleanName(alloy); // always some cleaning is good
-  cerr << alloy << endl;// exit(0);
-  alloy=aurostd::CleanStringASCII(alloy);
-  cerr << alloy << endl;// exit(0);
-  for(uint i=0;i<alloy.length();i++)
-    for(uint j=0;j<letters.length();j++)
-      if(alloy[i]==letters[j] && alloy[i]!=0) {cerr << alloy[i] << endl; alloy[i]='_';}
-
-  cerr << alloy << endl; exit(0); //CO20190629 - need to clean this exit(), but this function looks unused...
-
-  speciesX.clear();
-  for(uint i=0;i<alloy.length();i++) {
-    if(alloy[i]>='A' && alloy[i]<='Z') speciesX.push_back("");
-    speciesX.at(speciesX.size()-1)+=alloy[i];
-  }
-  for(uint i=0;i<speciesX.size();i++)
-    speciesX.at(i)=aurostd::CleanStringASCII(speciesX.at(i));   // clean it up so it does not have problems inside only letters_numbers
-  // now the atoms
-  natomsX.clear();
-  for(uint i=0;i<speciesX.size();i++) {
-    if(i<speciesX.size()-1)
-      natomsX.push_back(aurostd::string2utype<double>(alloyn.substr(alloyn.find(speciesX.at(i))+speciesX.at(i).length(),alloyn.find(speciesX.at(i+1))-alloyn.find(speciesX.at(i))-speciesX.at(i).length())));
-    else
-      natomsX.push_back(aurostd::string2utype<double>(alloyn.substr(alloyn.find(speciesX.at(i))+speciesX.at(i).length())));
-    if(abs(natomsX.at(natomsX.size()-1))<=0.00001) natomsX.at(natomsX.size()-1)=1.0;  // fix the no number = 1
-  }
-  //  for(uint i=0;i<natomsX.size();i++)
-  //  cerr << natomsX.at(i) << endl;
-  return speciesX.size();
-}
-
-
-uint XATOM_SplitAlloySpecies(string alloy_in, vector<string> &speciesX, vector<double> &natomsX) {
-  string alloy=alloy_in,alloyn;
-  alloy=KBIN::VASP_PseudoPotential_CleanName(alloy); // always some cleaning is good
-  alloy=KBIN::VASP_PseudoPotential_CleanName(alloy); // always some cleaning is good
-  alloyn=aurostd::CleanStringASCII(alloy);
-  alloy=aurostd::RemoveNumbers(alloy);              // remove composition
-  speciesX.clear();
-  for(uint i=0;i<alloy.length();i++) {
-    if(alloy[i]>='A' && alloy[i]<='Z') speciesX.push_back("");
-    speciesX.at(speciesX.size()-1)+=alloy[i];
-  }
-  for(uint i=0;i<speciesX.size();i++)
-    speciesX.at(i)=aurostd::CleanStringASCII(speciesX.at(i));   // clean it up so it does not have problems inside only letters_numbers
-  // now the atoms
-  natomsX.clear();
-  for(uint i=0;i<speciesX.size();i++) {
-    if(i<speciesX.size()-1)
-      natomsX.push_back(aurostd::string2utype<double>(alloyn.substr(alloyn.find(speciesX.at(i))+speciesX.at(i).length(),alloyn.find(speciesX.at(i+1))-alloyn.find(speciesX.at(i))-speciesX.at(i).length())));
-    else
-      natomsX.push_back(aurostd::string2utype<double>(alloyn.substr(alloyn.find(speciesX.at(i))+speciesX.at(i).length())));
-    if(abs(natomsX.at(natomsX.size()-1))<=0.00001) natomsX.at(natomsX.size()-1)=1.0;  // fix the no number = 1
-  }
-  //  for(uint i=0;i<natomsX.size();i++)
-  //  cerr << natomsX.at(i) << endl;
+uint XATOM_SplitAlloySpecies(const string& alloy_in, vector<string> &speciesX, vector<double> &natomsX) {
+  speciesX=aurostd::getElements(alloy_in,natomsX);
+  //[CO20200624 - OBSOLETE]string alloy=alloy_in,alloyn;
+  //[CO20200624 - OBSOLETE]alloy=KBIN::VASP_PseudoPotential_CleanName(alloy); // always some cleaning is good
+  //[CO20200624 - OBSOLETE]alloy=KBIN::VASP_PseudoPotential_CleanName(alloy); // always some cleaning is good
+  //[CO20200624 - OBSOLETE]alloyn=aurostd::CleanStringASCII(alloy);
+  //[CO20200624 - OBSOLETE]alloy=aurostd::RemoveNumbers(alloy);              // remove composition
+  //[CO20200624 - OBSOLETE]speciesX.clear();
+  //[CO20200624 - OBSOLETE]for(uint i=0;i<alloy.length();i++) {
+  //[CO20200624 - OBSOLETE]  if(alloy[i]>='A' && alloy[i]<='Z') speciesX.push_back("");
+  //[CO20200624 - OBSOLETE]  speciesX.at(speciesX.size()-1)+=alloy[i];
+  //[CO20200624 - OBSOLETE]}
+  //[CO20200624 - OBSOLETE]for(uint i=0;i<speciesX.size();i++)
+  //[CO20200624 - OBSOLETE]  speciesX.at(i)=aurostd::CleanStringASCII(speciesX.at(i));   // clean it up so it does not have problems inside only letters_numbers
+  //[CO20200624 - OBSOLETE]// now the atoms
+  //[CO20200624 - OBSOLETE]natomsX.clear();
+  //[CO20200624 - OBSOLETE]for(uint i=0;i<speciesX.size();i++) {
+  //[CO20200624 - OBSOLETE]  if(i<speciesX.size()-1)
+  //[CO20200624 - OBSOLETE]    natomsX.push_back(aurostd::string2utype<double>(alloyn.substr(alloyn.find(speciesX.at(i))+speciesX.at(i).length(),alloyn.find(speciesX.at(i+1))-alloyn.find(speciesX.at(i))-speciesX.at(i).length())));
+  //[CO20200624 - OBSOLETE]  else
+  //[CO20200624 - OBSOLETE]    natomsX.push_back(aurostd::string2utype<double>(alloyn.substr(alloyn.find(speciesX.at(i))+speciesX.at(i).length())));
+  //[CO20200624 - OBSOLETE]  if(abs(natomsX.at(natomsX.size()-1))<=0.00001) natomsX.at(natomsX.size()-1)=1.0;  // fix the no number = 1
+  //[CO20200624 - OBSOLETE]}
+  //[CO20200624 - OBSOLETE]//  for(uint i=0;i<natomsX.size();i++)
+  //[CO20200624 - OBSOLETE]//  cerr << natomsX.at(i) << endl;
   return speciesX.size();
 }
 
@@ -1134,81 +1154,298 @@ uint XATOM_SplitAlloySpecies(string alloy_in, vector<string> &speciesX, vector<d
 // **************************************************************************
 // Function XATOM_SplitAlloyPseudoPotentials
 // **************************************************************************
-uint XATOM_SplitAlloyPseudoPotentials(string alloy_in, vector<string> &species_ppX) {
-  string alloy=alloy_in;
-  alloy=aurostd::RemoveNumbers(alloy);              // remove composition
-  species_ppX.clear();
-  for(uint i=0;i<alloy.length();i++) {
-    if(alloy[i]>='A' && alloy[i]<='Z') species_ppX.push_back("");
-    species_ppX.at(species_ppX.size()-1)+=alloy[i];
-  }
-  for(uint i=0;i<species_ppX.size();i++)
-    species_ppX.at(i)=aurostd::CleanStringASCII(species_ppX.at(i));
+uint XATOM_SplitAlloyPseudoPotentials(const string& alloy_in, vector<string> &species_ppX) {
+  species_ppX=aurostd::getElements(alloy_in,pp_string,false,false,true); //CO20200624 - no clean or sort, but do keep_pp
+  //[CO20200624 - OBSOLETE]string alloy=alloy_in;
+  //[CO20200624 - OBSOLETE]alloy=aurostd::RemoveNumbers(alloy);              // remove composition
+  //[CO20200624 - OBSOLETE]species_ppX.clear();
+  //[CO20200624 - OBSOLETE]for(uint i=0;i<alloy.length();i++) {
+  //[CO20200624 - OBSOLETE]  if(alloy[i]>='A' && alloy[i]<='Z') species_ppX.push_back("");
+  //[CO20200624 - OBSOLETE]  species_ppX.at(species_ppX.size()-1)+=alloy[i];
+  //[CO20200624 - OBSOLETE]}
+  //[CO20200624 - OBSOLETE]for(uint i=0;i<species_ppX.size();i++)
+  //[CO20200624 - OBSOLETE]  species_ppX.at(i)=aurostd::CleanStringASCII(species_ppX.at(i));
   return species_ppX.size();
 }
 
-uint XATOM_SplitAlloyPseudoPotentials(string alloy_in, vector<string> &species_ppX, vector<double> &natomsX) {
-  string alloy=alloy_in,alloyn;
-  alloyn=aurostd::CleanStringASCII(alloy);
-  alloy=aurostd::RemoveNumbers(alloy);              // remove composition
-  species_ppX.clear();
-  for(uint i=0;i<alloy.length();i++) {
-    if(alloy[i]>='A' && alloy[i]<='Z') species_ppX.push_back("");
-    species_ppX.at(species_ppX.size()-1)+=alloy[i];
-  }
-  for(uint i=0;i<species_ppX.size();i++)
-    species_ppX.at(i)=aurostd::CleanStringASCII(species_ppX.at(i));   // clean it up so it does not have problems inside only letters_numbers
-  // now the atoms
-  natomsX.clear();
-  for(uint i=0;i<species_ppX.size();i++) {
-    if(i<species_ppX.size()-1)
-      natomsX.push_back(aurostd::string2utype<double>(alloyn.substr(alloyn.find(species_ppX.at(i))+species_ppX.at(i).length(),alloyn.find(species_ppX.at(i+1))-alloyn.find(species_ppX.at(i))-species_ppX.at(i).length())));
-    else
-      natomsX.push_back(aurostd::string2utype<double>(alloyn.substr(alloyn.find(species_ppX.at(i))+species_ppX.at(i).length())));
-    if(abs(natomsX.at(natomsX.size()-1))<=0.00001) natomsX.at(natomsX.size()-1)=1.0;  // fix the no number = 1
-  }
-  //  for(uint i=0;i<natomsX.size();i++)
-  //  cerr << natomsX.at(i) << endl;
+uint XATOM_SplitAlloyPseudoPotentials(const string& alloy_in, vector<string> &species_ppX, vector<double> &natomsX) {
+  species_ppX=aurostd::getElements(alloy_in,natomsX,pp_string,false,false,true); //CO20200624 - no clean or sort, but do keep_pp - will return natomX to be all 1's
+  //[CO20200624 - OBSOLETE]string alloy=alloy_in,alloyn;
+  //[CO20200624 - OBSOLETE]alloyn=aurostd::CleanStringASCII(alloy);
+  //[CO20200624 - OBSOLETE]alloy=aurostd::RemoveNumbers(alloy);              // remove composition
+  //[CO20200624 - OBSOLETE]species_ppX.clear();
+  //[CO20200624 - OBSOLETE]for(uint i=0;i<alloy.length();i++) {
+  //[CO20200624 - OBSOLETE]  if(alloy[i]>='A' && alloy[i]<='Z') species_ppX.push_back("");
+  //[CO20200624 - OBSOLETE]  species_ppX.at(species_ppX.size()-1)+=alloy[i];
+  //[CO20200624 - OBSOLETE]}
+  //[CO20200624 - OBSOLETE]for(uint i=0;i<species_ppX.size();i++)
+  //[CO20200624 - OBSOLETE]  species_ppX.at(i)=aurostd::CleanStringASCII(species_ppX.at(i));   // clean it up so it does not have problems inside only letters_numbers
+  //[CO20200624 - OBSOLETE]// now the atoms
+  //[CO20200624 - OBSOLETE]natomsX.clear();
+  //[CO20200624 - OBSOLETE]for(uint i=0;i<species_ppX.size();i++) {
+  //[CO20200624 - OBSOLETE]  if(i<species_ppX.size()-1)
+  //[CO20200624 - OBSOLETE]    natomsX.push_back(aurostd::string2utype<double>(alloyn.substr(alloyn.find(species_ppX.at(i))+species_ppX.at(i).length(),alloyn.find(species_ppX.at(i+1))-alloyn.find(species_ppX.at(i))-species_ppX.at(i).length())));
+  //[CO20200624 - OBSOLETE]  else
+  //[CO20200624 - OBSOLETE]    natomsX.push_back(aurostd::string2utype<double>(alloyn.substr(alloyn.find(species_ppX.at(i))+species_ppX.at(i).length())));
+  //[CO20200624 - OBSOLETE]  if(abs(natomsX.at(natomsX.size()-1))<=0.00001) natomsX.at(natomsX.size()-1)=1.0;  // fix the no number = 1
+  //[CO20200624 - OBSOLETE]}
+  //[CO20200624 - OBSOLETE]//  for(uint i=0;i<natomsX.size();i++)
+  //[CO20200624 - OBSOLETE]//  cerr << natomsX.at(i) << endl;
   return species_ppX.size();
 }
 
-//DX composition2stoichiometry - 20181009 - START
-vector<uint> composition2stoichiometry(string& composition){
-  vector<uint> stoichiometry;
-  bool is_previous_alpha = false;
-  bool is_previous_digit = false;
-  string number_string = "";
-  for(uint i=0;i<composition.size();i++){
-    if(isalpha(composition[i])){
-      if(is_previous_alpha){
-        stoichiometry.push_back(1);
-      }
-      else if(is_previous_digit){
-        stoichiometry.push_back(aurostd::string2utype<uint>(number_string));
-      }
+//DX20200724 [OBSOLETE] //DX composition2stoichiometry - 20181009 - START
+//DX20200724 [OBSOLETE] vector<uint> composition2stoichiometry(string& composition){
+//DX20200724 [OBSOLETE]   vector<uint> stoichiometry;
+//DX20200724 [OBSOLETE]   bool is_previous_alpha = false;
+//DX20200724 [OBSOLETE]   bool is_previous_digit = false;
+//DX20200724 [OBSOLETE]   string number_string = "";
+//DX20200724 [OBSOLETE]   for(uint i=0;i<composition.size();i++){
+//DX20200724 [OBSOLETE]     if(isalpha(composition[i])){
+//DX20200724 [OBSOLETE]       if(is_previous_alpha){
+//DX20200724 [OBSOLETE]         stoichiometry.push_back(1);
+//DX20200724 [OBSOLETE]       }
+//DX20200724 [OBSOLETE]       else if(is_previous_digit){
+//DX20200724 [OBSOLETE]         stoichiometry.push_back(aurostd::string2utype<uint>(number_string));
+//DX20200724 [OBSOLETE]       }
+//DX20200724 [OBSOLETE]     }
+//DX20200724 [OBSOLETE]     else if(isdigit(composition[i])){
+//DX20200724 [OBSOLETE]       if(is_previous_digit){
+//DX20200724 [OBSOLETE]         stringstream tmp; tmp << number_string << composition[i];
+//DX20200724 [OBSOLETE]         number_string = tmp.str();
+//DX20200724 [OBSOLETE]       }
+//DX20200724 [OBSOLETE]       else {
+//DX20200724 [OBSOLETE]         stringstream tmp; tmp << composition[i];
+//DX20200724 [OBSOLETE]         number_string = tmp.str();
+//DX20200724 [OBSOLETE]       }
+//DX20200724 [OBSOLETE]     }
+//DX20200724 [OBSOLETE]     is_previous_alpha = isalpha(composition[i]);
+//DX20200724 [OBSOLETE]     is_previous_digit = isdigit(composition[i]);
+//DX20200724 [OBSOLETE]   }
+//DX20200724 [OBSOLETE]   if(is_previous_alpha){
+//DX20200724 [OBSOLETE]     stoichiometry.push_back(1);
+//DX20200724 [OBSOLETE]   }
+//DX20200724 [OBSOLETE]   else if(is_previous_digit){
+//DX20200724 [OBSOLETE]     stoichiometry.push_back(aurostd::string2utype<uint>(number_string));
+//DX20200724 [OBSOLETE]   }
+//DX20200724 [OBSOLETE]   return stoichiometry;
+//DX20200724 [OBSOLETE] }
+//DX20200724 [OBSOLETE] //DX composition2stoichiometry - 20181009 - END
+
+// ***************************************************************************
+// getLeastFrequentAtomTypes() //DX20201230 - moved from XtalFinder
+// ***************************************************************************
+vector<string> getLeastFrequentAtomTypes(const xstructure& xstr, bool clean) {
+
+  // The least frequent atom type is the species with the smallest
+  // concentration in the crystal. The atoms of this type are the minimal set
+  // of atoms that exhibit the crystal periodicity (useful for finding
+  // alternative lattices and translations).
+  // clean: cleans atom name (removes pseudopotential)
+  // Returns ALL LFA types (could be more than one)
+
+  vector<string> lfa_types; // lfa = least frequent atom
+
+  // find minimum type count
+  int type_count_min = aurostd::min(xstr.num_each_type);
+
+  // find the first species with this atom count
+  for(uint i=0;i<xstr.num_each_type.size();i++){
+    if(xstr.num_each_type[i] == type_count_min){
+      if(clean){ lfa_types.push_back(KBIN::VASP_PseudoPotential_CleanName(xstr.species[i])); }
+      else{ lfa_types.push_back(xstr.species[i]); }
     }
-    else if(isdigit(composition[i])){
-      if(is_previous_digit){
-        stringstream tmp; tmp << number_string << composition[i];
-        number_string = tmp.str();
-      }
-      else {
-        stringstream tmp; tmp << composition[i];
-        number_string = tmp.str();
-      }
-    }
-    is_previous_alpha = isalpha(composition[i]);
-    is_previous_digit = isdigit(composition[i]);
   }
-  if(is_previous_alpha){
-    stoichiometry.push_back(1);
+
+  if(lfa_types.size() == 0){
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,"getLeastFrequentAtomTypes():","Least frequent atom type not found. Bad xstructure.",_INPUT_ERROR_);
   }
-  else if(is_previous_digit){
-    stoichiometry.push_back(aurostd::string2utype<uint>(number_string));
-  }
-  return stoichiometry;
+
+  return lfa_types;
 }
-//DX composition2stoichiometry - 20181009 - END
+
+// **************************************************************************
+// Function xstructure::GetElements() //DX20200728
+// **************************************************************************
+vector<string> xstructure::GetElements(bool clean_name, bool fake_names){
+
+  // Returns the elements in the xstructure
+  // default: returns xstr.species
+  // If no species are given, it also checks atom.name and has the option to
+  // assign fake elements if none are given
+  // Note: GetElementsFromAtomNames() updates the xstructure
+
+  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  string function_name = XPID + "xstructure::GetElements():";
+
+  // ---------------------------------------------------------------------------
+  // 1) try xstructure.species
+  if(!species.size()){
+    if(clean_name){
+      vector<string> vspecies;
+      for(uint i=0;i<species.size();i++){
+        vspecies.push_back(KBIN::VASP_PseudoPotential_CleanName(species[i]));
+      }
+      return vspecies;
+    }
+    else{ return aurostd::deque2vector((*this).species); }
+  }
+  // ---------------------------------------------------------------------------
+  // 2) try element names (check if first atom name is given)
+  else if (!atoms[0].name.empty()){
+    return GetElementsFromAtomNames(clean_name);
+  }
+  // ---------------------------------------------------------------------------
+  // 3) if all are empty, decorate with fake elements (optional)
+  else if (atoms[0].name.empty() && fake_names){
+    if(LDEBUG) {cerr << function_name << " WARNING: Atoms are not labeled, assigning fake names." << endl;}
+    DecorateWithFakeElements();
+    return aurostd::deque2vector(species);
+  }
+
+  throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, "There are no element names in the structure.",_RUNTIME_ERROR_);
+}
+
+// **************************************************************************
+// Function xstructure::GetElements() //DX20200728
+// **************************************************************************
+vector<string> xstructure::GetElementsFromAtomNames(bool clean_name){
+
+  // Extracts the species from the atom names
+
+  string function_name = XPID + "xstructure::GetSpeciesFromAtomName():";
+
+  vector<string> species;
+  if(atoms.size()==0){ return species; }
+  if(!atoms[0].name_is_given) { return species; }
+
+  uint iat=0;
+  string species_tmp = "";
+  for(uint i=0;i<num_each_type.size();i++){
+    species_tmp = atoms[iat].name; //always the first in the species set
+    for(int j=0;j<num_each_type[i];j++){
+      // check all atoms of the same type have the same name
+      if(atoms[iat].name!=species_tmp){
+        stringstream message;
+        message << "The number of each type and atom names do not agree." << endl;
+        message << (*this) << endl;
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_VALUE_ERROR_);
+      }
+      iat++;
+    }
+    if(clean_name){ species.push_back(KBIN::VASP_PseudoPotential_CleanName(species_tmp)); }
+    else{ species.push_back(species_tmp); }
+  }
+  return species;
+}
+
+// **************************************************************************
+// Function xstructure::GetReducedComposition() //DX20200728
+// **************************************************************************
+vector<uint> xstructure::GetReducedComposition(bool numerical_sort){
+
+  string function_name = XPID + "xstructure::GetReducedComposition():";
+
+  vector<uint> composition;
+  for(uint i=0;i<num_each_type.size();i++){composition.push_back((uint)num_each_type[i]);}
+  vector<uint> reduced_composition;
+
+  // sort in numerical order (useful for prototypes)
+  if(numerical_sort){ std::stable_sort(composition.begin(),composition.end()); }
+
+  // reduce by GCD
+  aurostd::reduceByGCD(composition, reduced_composition);
+
+  return reduced_composition;
+}
+
+// ***************************************************************************
+// Function getCentroidOfStructure() //DX20200728
+// ***************************************************************************
+xvector<double> getCentroidOfStructure(const xstructure& xstr, bool use_cpos, bool use_atom_mass){
+  return getCentroidOfStructure(xstr.atoms,use_cpos,use_atom_mass);
+}
+
+// useful for molecules/non-periodic structures too
+xvector<double> getCentroidOfStructure(const deque<_atom>& atoms, bool use_cpos, bool use_atom_mass){
+
+  // Calculate centroid in a structure
+  // This overload is useful for non-periodic structures as well
+  // (e.g., needed for symmetry analysis of molecules)
+  // Uses aurostd::getCentroid()
+
+  // ---------------------------------------------------------------------------
+  // coordinate type
+  vector<xvector<double> > coordinates;
+  // cpos
+  if(use_cpos){
+    for(uint i=0;i<atoms.size();i++){ coordinates.push_back(atoms[i].cpos); }
+  }
+  // fpos
+  else{
+    for(uint i=0;i<atoms.size();i++){ coordinates.push_back(atoms[i].fpos); }
+  }
+
+  // ---------------------------------------------------------------------------
+  // coordinate weights
+  vector<double> weights;
+  // uses mass of atomic species
+  if(use_atom_mass){
+    for(uint i=0;i<atoms.size();i++){ weights.push_back(atoms[i].mass); }
+  }
+  // consider as geometric points
+  else{
+    for(uint i=0;i<atoms.size();i++){ weights.push_back(1.0); }
+  }
+
+  return getCentroid(coordinates,weights);
+}
+
+// ***************************************************************************
+// Function getCentroidOfStructurePBC() //DX20200728
+// ***************************************************************************
+xvector<double> getCentroidOfStructurePBC(const xstructure& xstr, bool use_cpos, bool use_atom_mass){
+  return getCentroidOfStructurePBC(xstr.atoms,xstr.lattice,use_cpos,use_atom_mass);
+}
+
+xvector<double> getCentroidOfStructurePBC(const deque<_atom>& atoms,
+    xmatrix<double> lattice,
+    bool use_cpos,
+    bool use_atom_mass){
+
+  // Calculate centroid in a structure with periodic boundary conditions
+  // Uses aurostd::getCentroidPBC()
+
+  xmatrix<double> cell;
+
+  // ---------------------------------------------------------------------------
+  // coordinate type
+  vector<xvector<double> > coordinates;
+  // cpos
+  if(use_cpos){
+    for(uint i=0;i<atoms.size();i++){ coordinates.push_back(atoms[i].cpos); }
+    cell = lattice; // use lattice
+  }
+  // fpos
+  else{
+    for(uint i=0;i<atoms.size();i++){ coordinates.push_back(atoms[i].fpos); }
+    cell = aurostd::eye<double>(3,3); // use unit cube
+  }
+
+  // ---------------------------------------------------------------------------
+  // coordinate weights
+  vector<double> weights;
+  // uses mass of atomic species
+  if(use_atom_mass){
+    for(uint i=0;i<atoms.size();i++){ weights.push_back(atoms[i].mass); }
+  }
+  // consider as geometric points
+  else{
+    for(uint i=0;i<atoms.size();i++){ weights.push_back(1.0); }
+  }
+
+  return getCentroidPBC(coordinates,weights,cell);
+}
 
 // ***************************************************************************
 // ***************************************************************************
@@ -1460,6 +1697,7 @@ void _kpoint::TransformKpoint(const xmatrix<double>& P){
 
 wyckoffsite_ITC::wyckoffsite_ITC() {
   coord.clear();
+  index=0; //DX20200427
   type="";
   wyckoffSymbol="";
   letter=""; //DX20180128 - add Wyckoff letter
@@ -1467,6 +1705,7 @@ wyckoffsite_ITC::wyckoffsite_ITC() {
   multiplicity=0; //DX20180128 - add Wyckoff multiplicity
   site_occupation=1.0; //DX20191010 - add site occupation (default: 1.0)
   equations.clear(); //DX20180128 - add Wyckoff multiplicity
+  parameter_index=0; //DX20200513
 }
 
 // destructor
@@ -1483,6 +1722,7 @@ const wyckoffsite_ITC& wyckoffsite_ITC::operator=(const wyckoffsite_ITC& b) {   
   if(this != &b) {
     free();
     coord=b.coord;
+    index=b.index; //DX20200501
     type=b.type;
     wyckoffSymbol=b.wyckoffSymbol;
     letter=b.letter; //DX20180128 - add Wyckoff letter
@@ -1490,6 +1730,7 @@ const wyckoffsite_ITC& wyckoffsite_ITC::operator=(const wyckoffsite_ITC& b) {   
     multiplicity=b.multiplicity; //DX20180128 - add Wyckoff multiplicity
     site_occupation=b.site_occupation; //DX20191010 - add site occupation
     equations=b.equations; //DX20180128 - add Wyckoff multiplicity
+    parameter_index=b.parameter_index; //DX20200513
   }
   return *this;
 }
@@ -1516,6 +1757,7 @@ bool wyckoffsite_ITC::operator<(const wyckoffsite_ITC& b) const {       // opera
 wyckoffsite_ITC::wyckoffsite_ITC(const wyckoffsite_ITC& b) {
   free();
   coord=b.coord;
+  index=b.index; //DX20200501
   type=b.type;
   wyckoffSymbol=b.wyckoffSymbol;
   letter=b.letter; //DX20180128 - add Wyckoff letter
@@ -1523,18 +1765,21 @@ wyckoffsite_ITC::wyckoffsite_ITC(const wyckoffsite_ITC& b) {
   multiplicity=b.multiplicity; //DX20180128 - add Wyckoff multiplicity
   site_occupation=b.site_occupation; //DX20191010 - add site occupation
   equations=b.equations; //DX20180128 - add Wyckoff multiplicity
+  parameter_index=b.parameter_index; //DX20200513
 }
 
 // operator <<
 ostream& operator<<(ostream& oss,const wyckoffsite_ITC& site) {
   //DX20171212 [OBSOLETE] oss << "wyckoffsite_ITC operator<< " << endl;
   oss << " coord: "<< site.coord << endl;
+  oss << " index: "<< site.index << endl; //DX20200501
   oss << " type: "<< site.type << endl;
   oss << " letter: "<< site.letter << endl;
   oss << " site_symmetry: "<< site.site_symmetry << endl;
   oss << " multiplicity: "<< site.multiplicity << endl;
   oss << " wyckoffSymbol: "<< site.wyckoffSymbol << endl;
   oss << " site_occupation: " << site.site_occupation << endl; //DX20191010 - add site occupation
+  oss << " parameter_index: " << site.parameter_index << endl; //DX20200513
   oss << " equations: " << endl; //DX20191010 - add site occupation
   for(uint i=0;i<site.equations.size();i++){
     oss << "  " << aurostd::joinWDelimiter(site.equations[i],",") << endl;
@@ -1770,6 +2015,9 @@ void resetLatticeDimensions(const xmatrix<double>& lattice,
   // stores dimension indices (a_index,b_index,c_index)
   // new dims explore order : zeroth cell to max dims = speed increase 
   // (can break early if match is found)
+  // Useful for finding the closest neihbors or minimum interatomic distances:
+  // once we find a neighbor, update/reduce how far we need to search to find
+  // a closer neighbor
   //DX create function date: 20190705
 
   // ---------------------------------------------------------------------------
@@ -2046,6 +2294,7 @@ void xstructure::free() { //DX20191220 - moved all initializations from constuct
   // ATOMS -----------------------------
   atoms.clear();
   // FLAGS -----------------------------
+  primitive_calculated=FALSE; //DX20201005
   Niggli_calculated=FALSE;
   Niggli_avoid=FALSE;
   Minkowski_calculated=FALSE;
@@ -2197,18 +2446,18 @@ void xstructure::free() { //DX20191220 - moved all initializations from constuct
   lijk_cpos.clear();
   lijk_fpos.clear();
   lijk_dims.clear();
-  // NEIGHBOURS ------------------------
-  neighbours_calculated=FALSE;
-  neighbours_radius=0.0;
-  neighbours_dradius=0.0;
-  for(uint i=0;i<neighbours_atoms_func_r_vs_nn.size();i++)
-    neighbours_atoms_func_r_vs_nn.at(i).clear();
-  neighbours_atoms_func_r_vs_nn.clear();
-  for(uint i=0;i<neighbours_atoms_func_num_vs_nn.size();i++)
-    neighbours_atoms_func_num_vs_nn.at(i).clear();
-  neighbours_atoms_func_num_vs_nn.clear();
-  neighbours_func_r_vs_nn.clear();                   // contains function distance vs neighbours (all atoms)
-  neighbours_func_num_vs_nn.clear();                    // contains function number vs neighbours (all atoms)
+  // NEIGHBOR ------------------------
+  //DX20210122 [OBSOLETE] neighbors_calculated=FALSE;
+  //DX20210122 [OBSOLETE] neighbors_radius=0.0;
+  //DX20210122 [OBSOLETE] neighbors_dradius=0.0;
+  //DX20210122 [OBSOLETE] for(uint i=0;i<neighbors_atoms_func_r_vs_nn.size();i++)
+  //DX20210122 [OBSOLETE]   neighbors_atoms_func_r_vs_nn.at(i).clear();
+  //DX20210122 [OBSOLETE] neighbors_atoms_func_r_vs_nn.clear();
+  //DX20210122 [OBSOLETE] for(uint i=0;i<neighbors_atoms_func_num_vs_nn.size();i++)
+  //DX20210122 [OBSOLETE]   neighbors_atoms_func_num_vs_nn.at(i).clear();
+  //DX20210122 [OBSOLETE] neighbors_atoms_func_num_vs_nn.clear();
+  //DX20210122 [OBSOLETE] neighbors_func_r_vs_nn.clear();                   // contains function distance vs neighbors (all atoms)
+  //DX20210122 [OBSOLETE] neighbors_func_num_vs_nn.clear();                    // contains function number vs neighbors (all atoms)
   // OUTPUT/ERROR ----------------------
   Niggli_has_failed=FALSE;
   Minkowski_has_failed=FALSE;
@@ -2230,22 +2479,25 @@ xstructure::xstructure(string structure_title) {
 
 // ifstream/istream
 xstructure::xstructure(istream& _input,int _iomode) {
-  free(); //DX20191220 - added free to initialize
-  (*this).iomode=_iomode;
-  _input >> (*this);
+  (*this).initialize(_input, _iomode);
+  //DX20210129 [OBSOLETE - done in initialize] free(); //DX20191220 - added free to initialize
+  //DX20210129 [OBSOLETE - done in initialize] (*this).iomode=_iomode;
+  //DX20210129 [OBSOLETE - done in initialize] _input >> (*this);
 }
 
 xstructure::xstructure(ifstream& _input,int _iomode) {
-  free(); //DX20191220 - added free to initialize
-  (*this).iomode=_iomode;
-  _input >> (*this);
+  (*this).initialize(_input, _iomode);
+  //DX20210129 [OBSOLETE - done in initialize] free(); //DX20191220 - added free to initialize
+  //DX20210129 [OBSOLETE - done in initialize] (*this).iomode=_iomode;
+  //DX20210129 [OBSOLETE - done in initialize] _input >> (*this);
 }
 
-xstructure::xstructure(stringstream& __input,int _iomode) {
-  free(); //DX20191220 - added free to initialize
-  (*this).iomode=_iomode;
-  stringstream _input(__input.str());
-  _input >> (*this);
+xstructure::xstructure(const stringstream& __input,int _iomode) { //DX20210129 - added const
+  (*this).initialize(__input, _iomode); //DX20210129
+  //DX20210129 [OBSOLETE - done in initialize] free(); //DX20191220 - added free to initialize
+  //DX20210129 [OBSOLETE - done in initialize] (*this).iomode=_iomode;
+  //DX20210129 [OBSOLETE - done in initialize] stringstream _input(__input.str());
+  //DX20210129 [OBSOLETE - done in initialize] _input >> (*this);
 }
 
 xstructure::xstructure(const string& _input,int _iomode) {
@@ -2337,6 +2589,7 @@ void xstructure::copy(const xstructure& bstr) {
   is_vasp4_poscar_format=bstr.is_vasp4_poscar_format;
   is_vasp5_poscar_format=bstr.is_vasp5_poscar_format;
   // FLAGS -----------------------------
+  primitive_calculated=bstr.primitive_calculated; //DX20201007
   Niggli_calculated=bstr.Niggli_calculated;
   Niggli_avoid=bstr.Niggli_avoid;
   Minkowski_calculated=bstr.Minkowski_calculated;
@@ -2532,26 +2785,26 @@ void xstructure::copy(const xstructure& bstr) {
     lijk_fpos.push_back(bstr.lijk_fpos.at(i));
   }
   lijk_dims=bstr.lijk_dims;
-  // NEIGHBOURS ------------------------
-  neighbours_calculated=bstr.neighbours_calculated;
-  neighbours_radius=bstr.neighbours_radius;
-  neighbours_dradius=bstr.neighbours_dradius;
-  //  for(uint i=0;i<neighbours_atoms_func_r_vs_nn.size();i++)
-  //   neighbours_atoms_func_r_vs_nn.at(i).clear();
-  neighbours_atoms_func_r_vs_nn.clear();
-  for(uint i=0;i<bstr.neighbours_atoms_func_r_vs_nn.size();i++)
-    neighbours_atoms_func_r_vs_nn.push_back(bstr.neighbours_atoms_func_r_vs_nn.at(i));
-  //  for(uint i=0;i<neighbours_atoms_func_num_vs_nn.size();i++)
-  //   neighbours_atoms_func_num_vs_nn.at(i).clear();
-  neighbours_atoms_func_num_vs_nn.clear();
-  for(uint i=0;i<bstr.neighbours_atoms_func_num_vs_nn.size();i++)
-    neighbours_atoms_func_num_vs_nn.push_back(bstr.neighbours_atoms_func_num_vs_nn.at(i));
-  neighbours_func_r_vs_nn.clear();
-  for(uint i=0;i<bstr.neighbours_func_r_vs_nn.size();i++)
-    neighbours_func_r_vs_nn.push_back(bstr.neighbours_func_r_vs_nn.at(i));
-  neighbours_func_num_vs_nn.clear();
-  for(uint i=0;i<bstr.neighbours_func_num_vs_nn.size();i++)
-    neighbours_func_num_vs_nn.push_back(bstr.neighbours_func_num_vs_nn.at(i));
+  // NEIGHBOR ------------------------
+  //DX20210122 [OBSOLETE] neighbors_calculated=bstr.neighbors_calculated;
+  //DX20210122 [OBSOLETE] neighbors_radius=bstr.neighbors_radius;
+  //DX20210122 [OBSOLETE] neighbors_dradius=bstr.neighbors_dradius;
+  //  for(uint i=0;i<neighbors_atoms_func_r_vs_nn.size();i++)
+  //   neighbors_atoms_func_r_vs_nn.at(i).clear();
+  //DX20210122 [OBSOLETE] neighbors_atoms_func_r_vs_nn.clear();
+  //DX20210122 [OBSOLETE] for(uint i=0;i<bstr.neighbors_atoms_func_r_vs_nn.size();i++)
+  //DX20210122 [OBSOLETE]   neighbors_atoms_func_r_vs_nn.push_back(bstr.neighbors_atoms_func_r_vs_nn.at(i));
+  //  for(uint i=0;i<neighbors_atoms_func_num_vs_nn.size();i++)
+  //   neighbors_atoms_func_num_vs_nn.at(i).clear();
+  //DX20210122 [OBSOLETE] neighbors_atoms_func_num_vs_nn.clear();
+  //DX20210122 [OBSOLETE] for(uint i=0;i<bstr.neighbors_atoms_func_num_vs_nn.size();i++)
+  //DX20210122 [OBSOLETE]   neighbors_atoms_func_num_vs_nn.push_back(bstr.neighbors_atoms_func_num_vs_nn.at(i));
+  //DX20210122 [OBSOLETE] neighbors_func_r_vs_nn.clear();
+  //DX20210122 [OBSOLETE] for(uint i=0;i<bstr.neighbors_func_r_vs_nn.size();i++)
+  //DX20210122 [OBSOLETE]   neighbors_func_r_vs_nn.push_back(bstr.neighbors_func_r_vs_nn.at(i));
+  //DX20210122 [OBSOLETE] neighbors_func_num_vs_nn.clear();
+  //DX20210122 [OBSOLETE] for(uint i=0;i<bstr.neighbors_func_num_vs_nn.size();i++)
+  //DX20210122 [OBSOLETE]   neighbors_func_num_vs_nn.push_back(bstr.neighbors_func_num_vs_nn.at(i));
   // OUTPUT/ERROR ----------------------
   Niggli_has_failed=bstr.Niggli_has_failed;
   Minkowski_has_failed=bstr.Minkowski_has_failed;
@@ -2628,6 +2881,25 @@ void xstructure::ClearSpecies() { //CO20180420 - helps with pocc, match with Add
   species_mass.clear();
 }
 
+void xstructure::initialize(istream& _input,int _iomode) { //DX20210129 - initialize structure; avoid copying of xstructure
+  free(); //DX20191220 - added free to initialize
+  (*this).iomode=_iomode;
+  _input >> (*this);
+}
+
+void xstructure::initialize(ifstream& _input,int _iomode) { //DX20210129 - initialize structure; avoid copying of xstructure
+  free(); //DX20191220 - added free to initialize
+  (*this).iomode=_iomode;
+  _input >> (*this);
+}
+
+void xstructure::initialize(const stringstream& __input,int _iomode) { //DX20210129 - initialize structure; avoid copying of xstructure
+  free(); //DX20191220 - added free to initialize
+  (*this).iomode=_iomode;
+  stringstream _input(__input.str());
+  _input >> (*this);
+}
+
 // **************************************************************************
 // Xstructure operator<< OUTPUT_XSTRUCTURE_OUTPUT 
 // **************************************************************************
@@ -2645,7 +2917,7 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
   // VASP OUTPUT
   if(a_iomode==IOVASP_AUTO || a_iomode==IOVASP_POSCAR || a_iomode==IOVASP_ABCCAR || a_iomode==IOVASP_WYCKCAR) { // VASP POSCAR
     oss.setf(std::ios::fixed,std::ios::floatfield);
-    uint _precision_=_AFLOW_XSTR_PRINT_PRECISION_; //14; //was 16 SC 10 DM //CO20180515
+    uint _precision_=_DOUBLE_WRITE_PRECISION_MAX_; //14; //was 16 SC 10 DM //CO20180515
     oss.precision(_precision_);
     //DX20180618 - Check for symbolic representaion only - START
     if(a.symbolic_math_representation_only){
@@ -2675,12 +2947,10 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
       oss.unsetf(ios_base::floatfield);
       oss << " "; //<< std::defaultfloat;
       if(a.neg_scale_second){oss << (-1)*a.partial_occupation_HNF;}
-      else {
-        oss << a.partial_occupation_site_tol;
-        if(1||a.scale_third.isentry){  //CO20170803 - stoich tol //always print
-          oss << " "; 
-          oss << a.partial_occupation_stoich_tol;
-        }
+      else{oss << a.partial_occupation_site_tol;}
+      if(1||a.scale_third.isentry){  //CO20170803 - stoich tol //always print
+        oss << " "; 
+        oss << a.partial_occupation_stoich_tol;
       }
       oss << std::fixed;
     }
@@ -2977,7 +3247,7 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
     //oss << aurostd::PaddedPOST(" ecutrho=_AFLOW_ECUTRHO_",depthQE," ") << " ! // fix these " << endl;   //CO20171010
     oss << " /" << endl;
     oss.setf(std::ios::fixed,std::ios::floatfield);
-    uint _precision_=_AFLOW_XSTR_PRINT_PRECISION_; //14; //was 16 SC 10 DM //CO20180515
+    uint _precision_=_DOUBLE_WRITE_PRECISION_MAX_; //14; //was 16 SC 10 DM //CO20180515
     oss.precision(_precision_);
     if(a.coord_flag==_COORDS_FRACTIONAL_) oss << "ATOMIC_POSITIONS (crystal)" << endl;
     if(a.coord_flag==_COORDS_CARTESIAN_)  oss << "ATOMIC_POSITIONS (angstrom)" << endl;
@@ -2986,7 +3256,6 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
       if(a.atoms.at(iat).name_is_given==TRUE) {
         oss << " " << aurostd::PaddedPOST(KBIN::VASP_PseudoPotential_CleanName(a.atoms.at(iat).name),5," ") << " ";
       } else {
-        //[CO20190629 - no exit()]cerr << "QE needs atoms species names" << endl; exit(0);
         message << "QE needs atoms species names";  //CO20190629
         throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_MISSING_); //CO20190629
       }
@@ -3039,7 +3308,7 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
   //  ABINIT OUTPUT
   if(a_iomode==IOABINIT_AUTO || a_iomode==IOABINIT_GEOM) { // VASP POSCAR
     oss << "# AFLOW::ABINIT BEGIN " << endl;
-    uint _precision_=_AFLOW_XSTR_PRINT_PRECISION_; //14; //was 16 SC 10 DM //CO20180515
+    uint _precision_=_DOUBLE_WRITE_PRECISION_MAX_; //14; //was 16 SC 10 DM //CO20180515
     oss.precision(_precision_);
     oss.setf(std::ios::fixed,std::ios::floatfield);
     if(a_iomode==IOABINIT_AUTO) oss << "# " << a.title <<endl;//<< " (AUTO)" << endl;
@@ -3115,7 +3384,7 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
   //  ELK OUTPUT //DX20200315
   if(a_iomode==IOELK_AUTO || a_iomode==IOELK_GEOM) { // ELK
     oss << "# AFLOW::ELK BEGIN " << endl;
-    uint _precision_=_AFLOW_XSTR_PRINT_PRECISION_; //14; //was 16 SC 10 DM //CO20180515
+    uint _precision_=_DOUBLE_WRITE_PRECISION_MAX_; //14; //was 16 SC 10 DM //CO20180515
     oss.precision(_precision_);
     oss.setf(std::ios::fixed,std::ios::floatfield);
     oss << "# " << a.title <<endl;
@@ -3177,7 +3446,7 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
   if(a_iomode==IOAIMS_AUTO || a_iomode==IOAIMS_GEOM) { // VASP POSCAR
     xstructure aa(a);
     aa.ReScale(1.0); //very important because there is NO scale factor in AIMS //CO20180420
-    uint _precision_=_AFLOW_XSTR_PRINT_PRECISION_; //14; //was 16 SC 10 DM //CO20180515
+    uint _precision_=_DOUBLE_WRITE_PRECISION_MAX_; //14; //was 16 SC 10 DM //CO20180515
     oss.precision(_precision_);
     oss.setf(std::ios::fixed,std::ios::floatfield);
     oss << "# " << aa.title <<endl;//<< " (AUTO)" << endl;
@@ -3428,7 +3697,7 @@ string xstructure::PrintUNCLE(void) {   // Print in uncle format
 // // **************************************************************************
 // string xstructure::PrintADO(string strin) {   // Print in ado format
 //   stringstream oss;
-//   uint _precision_=_AFLOW_XSTR_PRINT_PRECISION_; //14; //was 16 SC 10 DM //CO20180515
+//   uint _precision_=_DOUBLE_WRITE_PRECISION_MAX_; //14; //was 16 SC 10 DM //CO20180515
 //   oss.setf(std::ios::fixed,std::ios::floatfield);
 //   oss.precision(_precision_);
 //   // oss << "# Structure name number of atoms in the cell:" << endl;
@@ -3482,7 +3751,7 @@ bool sortAtomsTypes(const _atom& a1,const _atom& a2) {  //CO20180705
   //prettier (fpos standard)
   //if(a1.fpos.rows!=3 || a1.fpos.rows!=a2.fpos.rows){
   //  cerr << "XSTRUCTURE::sortAtomsNames:: bad cartesian coordinates" << endl;
-  //  exit(1);
+  //  throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"sortAtomsTypes():","Throw for debugging purposes.",_GENERIC_ERROR_);
   //}
   //for(uint i=1;i<=3;i++){
   //  if(a1.fpos[i]!=a2.fpos[i]){return a1.fpos[i]<a2.fpos[i];}
@@ -3506,7 +3775,7 @@ bool sortAtomsNames(const _atom& a1,const _atom& a2) {  //CO20180705
   //prettier (fpos standard)
   //if(a1.fpos.rows!=3 || a1.fpos.rows!=a2.fpos.rows){
   //  cerr << "XSTRUCTURE::sortAtomsNames:: bad cartesian coordinates" << endl;
-  //  exit(1);
+  //  throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"sortAtomsNames():","Throw for debugging purposes.",_GENERIC_ERROR_);
   //}
   //for(uint i=1;i<=3;i++){
   //  if(a1.fpos[i]!=a2.fpos[i]){return a1.fpos[i]<a2.fpos[i];}
@@ -3530,8 +3799,34 @@ bool sortAtomsDist(const _atom& a1,const _atom& a2) {
 bool sortAtomsEquiv(const _atom& a1,const _atom& a2){
   if(a1.type!=a2.type){return a1.type<a2.type;} //this is generally implied by equivalent, but not so for POCC, so keep
   if(a1.equivalent!=a2.equivalent){return a1.equivalent<a2.equivalent;}
-  return sortAtomsTypes(a1,a2); //CO20180705, pocc values!
-} //CO20190101
+  return sortAtomsTypes(a1,a2); //CO 180705, pocc values!
+} //CO190101
+
+// ---------------------------------------------------------------------------
+// Wyckoff sorting function (by Wyckoff letter) //DX20200515
+bool sortWyckoffByLetter(const wyckoffsite_ITC& a, const wyckoffsite_ITC& b) {
+  // compare letter
+  if(a.letter<b.letter){ return true; }
+  // if letters the same, sort by type
+  else if(a.letter==b.letter){
+    if(a.type<b.type){ return true; }
+    else { return false; }
+  }
+  return false;
+}
+
+// ---------------------------------------------------------------------------
+// Wyckoff sorting function (by atom type) //DX20200515
+bool sortWyckoffByType(const wyckoffsite_ITC& a, const wyckoffsite_ITC& b) {
+  // compare type
+  if(a.type<b.type){ return true; }
+  // if types the same, sort by letter
+  else if(a.type==b.type){
+    if(a.letter<b.letter){ return true; }
+    else { return false; }
+  }
+  return false;
+}
 
 // **************************************************************************
 // Xstructure operator>>  INPUT_XSTRUCTURE_INPUT
@@ -3566,7 +3861,6 @@ istream& operator>>(istream& cinput, xstructure& a) {
   string input_no_spaces=aurostd::joinWDelimiter(vinput,"");
   input_no_spaces=aurostd::RemoveWhiteSpaces(input_no_spaces);
   if(input_no_spaces.empty()){
-    //[CO20190629 - no exit()]cerr << soliloquy << " No input..." << endl; exit(0);
     throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No input",_INPUT_MISSING_);  //CO20190629
   }  //CO20180702
 
@@ -3589,11 +3883,10 @@ istream& operator>>(istream& cinput, xstructure& a) {
     DeStupidizer(vinput[i]);
   }
   if(vinput.size()==0) {
-    //[CO20190629 - no exit()]cerr << soliloquy << " No input..." << endl; exit(0);
     throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No input",_INPUT_MISSING_);  //CO20190629
   }  //CO20180420
 
-  //  for(uint i=0;i<vinput.size();i++) cerr << "[" << i << "] " <<  vinput[i] << " " << "[X]" << endl;   exit(0);
+  //  for(uint i=0;i<vinput.size();i++) cerr << "[" << i << "] " <<  vinput[i] << " " << "[X]" << endl;   throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"sortAtomsTypes():","Throw for debugging purposes.",_GENERIC_ERROR_);
   string sstring,stmp;
   bool IOMODE_found=FALSE;
   vector<double> poccaus; // partial occupation local host
@@ -3652,7 +3945,6 @@ istream& operator>>(istream& cinput, xstructure& a) {
       }
     }
     if(QE==5 && QE_ERROR) {
-      //[CO20190629 - no exit()]cerr << soliloquy << " QE input errors..." << endl; exit(0);
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"QE input errors",_INPUT_MISSING_); //CO20190629
     }
     if(QE==5 && !QE_ERROR) {
@@ -3787,11 +4079,6 @@ istream& operator>>(istream& cinput, xstructure& a) {
         }
         if(lat_found || atom_found){
           if(lat_found && tokens_line.size()<4){  //could be more, but not less
-            //[CO20190629 - no exit()]cerr << soliloquy << " AIMS input error, ";
-            //[CO20190629 - no exit()]cerr << "lattice_vector ";
-            //[CO20190629 - no exit()]cerr << "at line[" << i+1 << "] is ill-defined" << endl;
-            //[CO20190629 - no exit()]cerr << "line: " << vinput[i] << endl;
-            //[CO20190629 - no exit()]exit(1);
             message << " AIMS input error, ";  //CO20190629
             message << "lattice_vector "; //CO20190629
             message << "at line[" << i+1 << "] is ill-defined" << endl; //CO20190629
@@ -3799,13 +4086,6 @@ istream& operator>>(istream& cinput, xstructure& a) {
             throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
           }
           if(atom_found && tokens_line.size()<5){  //could be more, but not less (need name/type in last column)
-            //[CO20190629 - no exit()]cerr << soliloquy << " AIMS input error, ";
-            //[CO20190629 - no exit()]cerr << "atom position ";
-            //[CO20190629 - no exit()]cerr << "at line[" << i+1 << "] "; //CO20180627
-            //[CO20190629 - no exit()]if(tokens_line.size()==4){cerr << "is missing the atom name" << endl;} //CO20180627
-            //[CO20190629 - no exit()]else {cerr << "is ill-defined" << endl;} //CO20180627
-            //[CO20190629 - no exit()]cerr << "line: " << vinput[i] << endl;
-            //[CO20190629 - no exit()]exit(1);
             message << " AIMS input error, "; //CO20190629
             message << "atom position "; //CO20190629
             message << "at line[" << i+1 << "] "; //CO20190629
@@ -3817,8 +4097,6 @@ istream& operator>>(istream& cinput, xstructure& a) {
         }
       }
       if(!atom_found_anywhere){
-        //[CO20190629 - no exit()]cerr << soliloquy << " AIMS input error, no atoms found..." << endl;
-        //[CO20190629 - no exit()]exit(1);
         throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"AIMS input error, no atoms found",_INPUT_ERROR_); //CO20190629
       }
       a.coord_flag=_COORDS_CARTESIAN_;
@@ -3835,15 +4113,11 @@ istream& operator>>(istream& cinput, xstructure& a) {
             else if(lat_count==2){lat2_found=true;}
             else if(lat_count==3){lat3_found=true;}
             else {
-              //[CO20190629 - no exit()]oss << soliloquy << " AIMS input error, too many lattice vectors found" << endl;
-              //[CO20190629 - no exit()]exit(1);
               throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"AIMS input error, too many lattice vectors found",_INPUT_ERROR_);  //CO20190629
             }
           }
         }
         if(!lat1_found || !lat2_found || !lat3_found){
-          //[CO20190629 - no exit()]oss << soliloquy << " AIMS input error, incomplete lattice vector specification (needed if atom_frac found)" << endl;
-          //[CO20190629 - no exit()]exit(1);
           throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"AIMS input error, incomplete lattice vector specification (needed if atom_frac found)",_INPUT_ERROR_);  //CO20190629
         }
       }
@@ -3886,9 +4160,6 @@ istream& operator>>(istream& cinput, xstructure& a) {
     // -------------- TITLE
     // input.getline(stmp,MAX_TITLE_SIZE);title=stmp;
     if(vinput.size()-1<iline) {
-      //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
-      //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-      //[CO20190629 - no exit()]exit(0);
       message << "missing line[" << iline << "]" << endl; //CO20190629
       for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
@@ -3897,9 +4168,6 @@ istream& operator>>(istream& cinput, xstructure& a) {
     // -------------- SCALE
     //    input >> a.scale;
     if(vinput.size()-1<iline) {
-      //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
-      //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-      //[CO20190629 - no exit()]exit(0);
       message << "missing line[" << iline << "]" << endl; //CO20190629
       for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
@@ -3908,14 +4176,11 @@ istream& operator>>(istream& cinput, xstructure& a) {
     aurostd::StringSubst(stmp,"\t"," ");aurostd::StringSubst(stmp,"  "," ");aurostd::StringSubst(stmp,"  "," ");
     aurostd::string2tokens(stmp,tokens);
     if(tokens.size()==0) {
-      //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>> missing second line in poscar" << endl;
-      //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-      //[CO20190629 - no exit()]exit(0);
       message << "missing second line in poscar" << endl; //CO20190629
       for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
     }
-    // oss << tokens.size() <<  " = " << tokens.at(0) << endl;exit(0);
+    // oss << tokens.size() <<  " = " << tokens.at(0) << endl;throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Throw for debugging purposes.",_GENERIC_ERROR_);
     a.scale=0.0;
     if(tokens.size()>0) {a.scale=aurostd::string2utype<double>(tokens.at(0));}
     if(tokens.size()>1) {/*a.neg_scale_second=TRUE;*/a.scale_second=aurostd::string2utype<double>(tokens.at(1));a.neg_scale_second=std::signbit(a.scale_second);} //CO20180409
@@ -3926,9 +4191,6 @@ istream& operator>>(istream& cinput, xstructure& a) {
     // oss << sstring << endl;
     // -------------- UNIT CELL
     if(vinput.size()-1<iline) {
-      //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
-      //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-      //[CO20190629 - no exit()]exit(0);
       message << "missing line[" << iline << "]" << endl; //CO20190629
       for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
@@ -3949,9 +4211,6 @@ istream& operator>>(istream& cinput, xstructure& a) {
       a.lattice(1,3)=aurostd::string2utype<double>(tokens[2]);
       stringstream input_tmp;
       if(vinput.size()-1<iline) {
-        //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
-        //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-        //[CO20190629 - no exit()]exit(0);
         message << "missing line[" << iline << "]" << endl; //CO20190629
         for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
         throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
@@ -3959,9 +4218,6 @@ istream& operator>>(istream& cinput, xstructure& a) {
       input_tmp.clear();input_tmp.str(vinput.at(iline++));
       input_tmp >> a.lattice(2,1) >> a.lattice(2,2) >> a.lattice(2,3);
       if(vinput.size()-1<iline) {
-        //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
-        //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-        //[CO20190629 - no exit()]exit(0);
         message << "missing line[" << iline << "]" << endl; //CO20190629
         for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
         throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
@@ -4029,9 +4285,6 @@ istream& operator>>(istream& cinput, xstructure& a) {
     aurostd::StringSubst(stmp,"\t"," ");aurostd::StringSubst(stmp,"  "," ");aurostd::StringSubst(stmp,"  "," ");
     aurostd::string2tokens(stmp,tokens);
     if(tokens.size()==0) {
-      //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>> missing D/C/S line" << endl;
-      //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-      //[CO20190629 - no exit()]exit(0);
       //[CO20190629 - OBSOLETE]message << "missing D/C/S line" << endl;  //CO20190629
       message << "Missing \"Selective Dynamics\"/\"Direct\"/\"Cartesian\" line" << endl;  //CO20190629
       for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
@@ -4106,9 +4359,6 @@ istream& operator>>(istream& cinput, xstructure& a) {
     //last line was last lattice vector/geometry line
     if(a.is_vasp5_poscar_format) {
       if(vinput.size()-1<iline) {
-        //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
-        //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-        //[CO20190629 - no exit()]exit(0);
         message << "missing line[" << iline << "]" << endl; //CO20190629
         for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
         throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
@@ -4119,8 +4369,6 @@ istream& operator>>(istream& cinput, xstructure& a) {
     // -------------- ATOMS
     // Number of atoms of each type and total number of atoms.
     if(vinput.size()-1<iline) {
-      //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
-      //[CO20190629 - no exit()]exit(0);
       message << "missing line[" << iline << "]" << endl; //CO20190629
       for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
@@ -4134,9 +4382,6 @@ istream& operator>>(istream& cinput, xstructure& a) {
     tmpns=aurostd::RemoveWhiteSpaces(stmp);
     if(string(tmpns).size()==0) {
       if(vinput.size()-1<iline) {
-        //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
-        //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-        //[CO20190629 - no exit()]exit(0);
         message << "missing line[" << iline << "]" << endl; //CO20190629
         for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
         throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
@@ -4177,9 +4422,6 @@ istream& operator>>(istream& cinput, xstructure& a) {
           for(uint j=0;j<tokens_j.size();j++) {
             aurostd::string2tokens(tokens_j.at(j),tokens_k,"*");
             if(tokens_k.size()==0) {
-              //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>>: PARTIAL OCCUPATION error [1] tokens_k.size()==0, no *" << endl;
-              //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-              //[CO20190629 - no exit()]exit(0);
               message << "PARTIAL OCCUPATION error [1] tokens_k.size()==0, no *" << endl; //CO20190629
               for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
               throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
@@ -4194,9 +4436,6 @@ istream& operator>>(istream& cinput, xstructure& a) {
               if(tokens_k.size()==2) a.partial_occupation_sublattice.push_back(i); // put specie number
             }
             if(tokens_k.size()>=3) {
-              //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>>: PARTIAL OCCUPATION error [1] tokens_k.size()>=3, too many *" << endl;
-              //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-              //[CO20190629 - no exit()]exit(0);
               message << "PARTIAL OCCUPATION error [1] tokens_k.size()>=3, too many *" << endl; //CO20190629
               for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
               throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
@@ -4207,7 +4446,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
       }
       if(LDEBUG) {cerr << "P(" << poccaus.size()<< ") = ";for(uint j=0;j<poccaus.size();j++) cerr << poccaus.at(j) << " ";cerr << endl;}
     }
-    //  cerr << "num_atoms=" << num_atoms << endl; exit(0); // num_atoms is the SUM of the atoms in the numbers
+    //  cerr << "num_atoms=" << num_atoms << endl; throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Throw for debugging purposes.",_GENERIC_ERROR_); // num_atoms is the SUM of the atoms in the numbers
     // -------------- COORDINATE TYPES
     // Type of coordinates (Fractional or Cartesian) - only 1st character matters (D/d or C/c).
     // This line might also be the Selective Dynamics line so you must check for that (S/s).
@@ -4215,9 +4454,6 @@ istream& operator>>(istream& cinput, xstructure& a) {
     string stmp;
     if(LDEBUG) cerr << soliloquy << " DEBUG [1]" << endl;
     if(vinput.size()-1<iline) {
-      //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
-      //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-      //[CO20190629 - no exit()]exit(0);
       message << "missing line[" << iline << "]" << endl; //CO20190629
       for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
@@ -4228,9 +4464,6 @@ istream& operator>>(istream& cinput, xstructure& a) {
     aurostd::string2tokens(stmp,stmp_tokens);
     // Note that if there are spaces at the beginning of the line we have to remove them.
     if(stmp_tokens.size()==0) {
-      //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>>:  Found blank line on line 7. This line should give coordinate type or selective dynamics." << endl;
-      //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-      //[CO20190629 - no exit()]exit(0);
       message << "Found blank line on line 7. This line should give coordinate type or selective dynamics." << endl;  //CO20190629
       for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
@@ -4241,9 +4474,6 @@ istream& operator>>(istream& cinput, xstructure& a) {
       if(sstmp[0]=='S' || sstmp[0]=='s') {
         a.isd=TRUE;
         if(vinput.size()-1<iline){
-          //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
-          //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-          //[CO20190629 - no exit()]exit(0);
           message << "missing line[" << iline << "]" << endl; //CO20190629
           for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
           throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
@@ -4262,17 +4492,11 @@ istream& operator>>(istream& cinput, xstructure& a) {
           a.coord_type[0]=sstmp[0];
           a.coord_flag=_COORDS_CARTESIAN_;
           if(a.iomode==IOVASP_WYCKCAR) {
-            //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>> WYCKOFF mode requires FRACTIONAL coordinates (DIRECT)." << endl;
-            //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-            //[CO20190629 - no exit()]exit(0);
             message << "WYCKOFF mode requires FRACTIONAL coordinates (DIRECT)." << endl;  //CO20190629
             for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
             throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
           }
         } else {
-          //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>> Did not find coordinate type D/d or C/c." << endl;
-          //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-          //[CO20190629 - no exit()]exit(0);
           message << "Did not find coordinate type D/d or C/c." << endl;  //CO20190629
           for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
           throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
@@ -4328,9 +4552,6 @@ istream& operator>>(istream& cinput, xstructure& a) {
         stmp=vinput.at(iline++);
         if(LDEBUG) cerr << soliloquy << " " << iline << " " << vinput.size() << "," << iline-iline_ref << "," << num_atoms << "," << stmp << endl;
         if(iline==vinput.size() && (iline-iline_ref<(uint) num_atoms)) {
-          //[CO20190629 - no exit()]oss << "ERROR:  Unsufficient number of atom lines." << endl;
-          //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-          //[CO20190629 - no exit()]exit(0);
           message << "Insufficient number of atom lines." << endl;  //CO20190629
           for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
           throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
@@ -4342,9 +4563,6 @@ istream& operator>>(istream& cinput, xstructure& a) {
         aurostd::string2tokens(stmp,stmp_tokens);
         if(LDEBUG) cerr << soliloquy << " DEBUG [6b] stmp_tokens.size()=" << stmp_tokens.size() << endl;
         if(stmp_tokens.size()<3) {
-          //[CO20190629 - no exit()]oss << "ERROR:  Insufficient number of atom entries in atom=" << iline-iline_ref << "" << endl; //CO20180409
-          //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-          //[CO20190629 - no exit()]exit(0);
           message << "Insufficient number of atom entries in atom=" << iline-iline_ref << "" << endl; //CO20190629
           for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
           throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
@@ -4412,13 +4630,6 @@ istream& operator>>(istream& cinput, xstructure& a) {
         if(a.order_parameter_structure==TRUE) {
           if(stmp_tokens.size()!=5 && stmp_tokens.size()!=6) {
             if(a.order_parameter_structure==TRUE) {
-              //[CO20190629 - no exit()]cerr << "ERROR - xstructure::operator>>: with the order parameter you must specify " << endl;
-              //[CO20190629 - no exit()]cerr << "  x y z Name OrderParameter "                     << endl;
-              //[CO20190629 - no exit()]cerr << " where x,y,z are the coordinates " << endl;
-              //[CO20190629 - no exit()]cerr << " Name is the symbol of the atom  " << endl;
-              //[CO20190629 - no exit()]cerr << " Order parameter is -=none, *=consider, -1,0,1 (integer) values " << endl;
-              //[CO20190629 - no exit()]cerr << " good luck" << endl;
-              //[CO20190629 - no exit()]exit(0);
               message << "With the order parameter you must specify " << endl;  //CO20190629
               message << "  x y z Name OrderParameter "                     << endl;  //CO20190629
               message << " where x,y,z are the coordinates " << endl; //CO20190629
@@ -4707,9 +4918,6 @@ istream& operator>>(istream& cinput, xstructure& a) {
       aurostd::string2tokens(stmp,stmp_tokens);
       if(LDEBUG) cerr << soliloquy << " DEBUG [6b] stmp_tokens.size()=" << stmp_tokens.size() << endl;
       if(stmp_tokens.size()<4) {
-        //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>>: Insufficient number of atom entries in atom=" << i << "" << endl; //CO20180409
-        //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-        //[CO20190629 - no exit()]exit(0);
         message << "Insufficient number of atom entries in atom=" << i << "" << endl; //CO20190629
         for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
         throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
@@ -4762,11 +4970,13 @@ istream& operator>>(istream& cinput, xstructure& a) {
     // for(uint i=0;i<a.atoms.size();i++) cerr << "a.atoms.at(i).type=" << a.atoms.at(i).type << endl;
     a.SpeciesPutAlphabetic(); // fight analphabetization
     uint iat=0;
+    string _title=""; //CO20200731 - NO_TITLE_GIVEN clear
     for(uint itype=0;itype<a.num_each_type.size();itype++) 
       for(uint j=0;j<(uint) a.num_each_type.at(itype);j++) {
-        if(j==0) a.title+=a.atoms.at(iat).name+aurostd::utype2string(a.num_each_type.at(itype));
+        if(j==0) _title+=a.atoms.at(iat).name+aurostd::utype2string(a.num_each_type.at(itype));
         a.atoms.at(iat++).type=itype;
       }
+    if(!_title.empty()){a.title=_title;}  //CO20200731 - safer for empty titles
     // for(uint i=0;i<a.atoms.size();i++) cerr << "a.atoms.at(i).type=" << a.atoms.at(i).type << endl;
     a.partial_occupation_flag=FALSE;
     //    a.xstructure2vasp();
@@ -5438,7 +5648,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     if(LDEBUG) cerr << soliloquy << " CIF" << endl;
     a.scale=1.0; 
     a.neg_scale=FALSE; 
-    a.lattice=aurostd::eye<double>(); //CO20190520
+    a.lattice=aurostd::eye<double>(3,3); //CO20190520
 
     a.spacegroupnumber=0;
     a.spacegroupnumberoption=0;
@@ -5597,7 +5807,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
           //oss << "ERROR - xstructure::operator>>: Symmetry operations do not match between input operations and space group number/option." << endl; 
           //print(general_wyckoff_position);
           //print(spacegroup_symop_xyz);
-          //exit(0);
+          //throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Throw for debugging purposes.",_GENERIC_ERROR_);
           continue; //try a different setting
         }
         else {
@@ -5608,10 +5818,6 @@ istream& operator>>(istream& cinput, xstructure& a) {
         }
       }
       else {
-        //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>>: Number of symmetry operations do not match between input operations and space group number (aflow=" 
-        //[CO20190629 - no exit()]  << general_wyckoff_position.size() << " vs cif=" << spacegroup_symop_xyz.size() << ")." << endl; 
-        //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-        //[CO20190629 - no exit()]exit(0);
         message << "Number of symmetry operations do not match between input operations and space group number (aflow="   //CO20190629
           << general_wyckoff_position.size() << " vs cif=" << spacegroup_symop_xyz.size() << ")." << endl;  //CO20190629
         for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
@@ -5619,9 +5825,6 @@ istream& operator>>(istream& cinput, xstructure& a) {
       }
     }
     if(!found_setting){
-      //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>>: Symmetry operations do not match between input operations and space group number/option." << endl; 
-      //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-      //[CO20190629 - no exit()]exit(0);
       message << "Symmetry operations do not match between input operations and space group number/option." << endl;  //CO20190629
       for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
@@ -5714,9 +5917,6 @@ istream& operator>>(istream& cinput, xstructure& a) {
           a.AddAtom(atom_tmp);
           already_storing_atoms=TRUE; //DX20190718 - to handle format of Springer Materials cifs (adds extra fields at the end; do not read them)
         } else {
-          //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>>: Unexpected number of input fields based on _atom_site_[] information (tokens=" << tokens.size() << ", atom_sites_[]=" << atom_site_fields.size() << ")." <<  endl; 
-          //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-          //[CO20190629 - no exit()]exit(0);
           message << "Unexpected number of input fields based on _atom_site_[] information (tokens=" << tokens.size() << ", atom_sites_[]=" << atom_site_fields.size() << ")." <<  endl;  //CO20190629
           for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
           throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
@@ -5726,10 +5926,11 @@ istream& operator>>(istream& cinput, xstructure& a) {
     a=WyckoffPOSITIONS(a.spacegroupnumber,a.spacegroupnumberoption,a);
     a.isd=FALSE; // set Selective Dynamics to false
     //DX20191010 - moved loop that used to be here after re-alphabetizing
-    a.MakeBasis();
-    a.MakeTypes(); //DX20190508 - otherwise types are not created
     a.SpeciesPutAlphabetic(); //DX20190508 - put alphabetic, needed for many AFLOW functions to work properly
     std::stable_sort(a.atoms.begin(),a.atoms.end(),sortAtomsNames); //DX20200312
+    std::sort(a.wyckoff_sites_ITC.begin(), a.wyckoff_sites_ITC.end(), sortWyckoffByType); //DX20201014 - sort the Wyckoff positions too
+    a.MakeBasis(); //DX20200803 - must be after alphabetic sort
+    a.MakeTypes(); //DX20190508 - otherwise types are not created //DX20200803 - must be after alphabetic sort
     //DX20191010 - moved this loop - START
     for(uint i=0;i<a.atoms.size();i++){
       if(a.atoms[i].partial_occupation_flag==TRUE){
@@ -5757,7 +5958,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     // START FROM CELL
     a.scale=1.0; // standard
     a.neg_scale=FALSE; // standard
-    a.lattice=aurostd::eye<double>();//CO20190520
+    a.lattice=aurostd::eye<double>(3,3);//CO20190520
 
     uint lat_count=0;
     //get lattice first, if available (c2f,f2c)
@@ -5917,9 +6118,6 @@ istream& operator>>(istream& cinput, xstructure& a) {
   } else {
     // have partial
     if(poccaus.size()!=a.atoms.size()) {
-      //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>>: poccaus.size()=" << poccaus.size() << " a.atoms.size()=" << a.atoms.size() << " " << endl;
-      //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-      //[CO20190629 - no exit()]exit(0);
       message << "poccaus.size()=" << poccaus.size() << " a.atoms.size()=" << a.atoms.size() << " " << endl;  //CO20190629
       for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
@@ -5997,10 +6195,6 @@ istream& operator>>(istream& cinput, xstructure& a) {
     if(a.iomode==IOVASP_ABCCAR) aurostd::string2tokens((vinput[3]),tokens);
     if(a.iomode==IOVASP_WYCKCAR) aurostd::string2tokens((vinput[3]),tokens);
     if(a.num_each_type.size()!=tokens.size()) {
-      //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>> in aflow_xatom.cpp you need to specify the same number of species and atoms types" << endl;
-      //[CO20190629 - no exit()]oss << "      a.num_each_type.size()=" << a.num_each_type.size() << endl;
-      //[CO20190629 - no exit()]oss << "      tokens.size()=" << tokens.size() << endl;
-      //[CO20190629 - no exit()]exit(0);
       message << "You need to specify the same number of species and atoms types" << endl;  //CO20190629
       message << "      a.num_each_type.size()=" << a.num_each_type.size() << endl; //CO20190629
       message << "      tokens.size()=" << tokens.size() << endl; //CO20190629
@@ -6108,7 +6302,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
   a.sgroup_calculated=FALSE;
   a.grid_atoms_calculated=FALSE;
   a.lijk_calculated=FALSE;
-  a.neighbours_calculated=FALSE;
+  //DX20210122 [OBSOLETE] a.neighbors_calculated=FALSE;
   //DX20180712 START
   // ANRL SYMBOLIC MATH
   a.symbolic_math_representation_only=FALSE;
@@ -6128,31 +6322,22 @@ istream& operator>>(istream& cinput, xstructure& a) {
   a.write_DEBUG_flag=TRUE;
 #endif
   //RF20200310 BEGIN
-  for(int i=0;i<(int)a.atoms.size();i++) {
-    if (a.atoms.at(i).cleanname.empty()) a.atoms.at(i).cleanname=(KBIN::VASP_PseudoPotential_CleanName(a.atoms.at(i).name));
+  for(uint i=0;i<a.atoms.size();i++) {  //CO20200624
+    if (a.atoms.at(i).cleanname.empty()) a.atoms.at(i).CleanName(); //(KBIN::VASP_PseudoPotential_CleanName(a.atoms.at(i).name)); //CO20200624 - fixed CleanName()
   }
   //RF20200310 END
   // CHECKS
   if(a.atoms.size()!=a.qm_atoms.size())     {
-    //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>>: a.atoms.size()!=a.qm_atoms.size() " << endl;
-    //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-    //[CO20190629 - no exit()]exit(0);
     message << "a.atoms.size()!=a.qm_atoms.size() " << endl;  //CO20190629
     for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
     throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
   }
   if(a.atoms.size()!=a.qm_forces.size())    {
-    //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>>: a.atoms.size()!=a.qm_forces.size() " << endl;
-    //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-    //[CO20190629 - no exit()]exit(0);
     message << "a.atoms.size()!=a.qm_forces.size() " << endl; //CO20190629
     for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
     throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
   }
   if(a.atoms.size()!=a.qm_positions.size()) {
-    //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>>: a.atoms.size()!=a.qm_positions.size() " << endl;
-    //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-    //[CO20190629 - no exit()]exit(0);
     message << "a.atoms.size()!=a.qm_positions.size() " << endl;  //CO20190629
     for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
     throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
@@ -6451,14 +6636,15 @@ xstructure GetStructure(const int& iomode,const string& Directory) {
 // xstructure::SetCoordinates
 // **************************************************************************
 // change coordinates type
-void xstructure::SetCoordinates(const int& mode)  {
+void xstructure::SetCoordinates(int mode)  {
+  string function_name = XPID + "xstructure::SetCoordinates():";
   switch(mode) {
     case _UPDATE_LATTICE_VECTORS_TO_ABCANGLES_ : {
-                                                   cerr << "ERROR SetCoordinate [1] mode=" << mode << endl; exit(0);
+                                                   throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"[1] mode="+aurostd::utype2string(mode),_INPUT_ERROR_);
                                                    break;
                                                  }
     case _UPDATE_LATTICE_ABCANGLES_TO_VECTORS_ : {
-                                                   cerr << "ERROR SetCoordinate [2] mode=" << mode << endl; exit(0);
+                                                   throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"[2] mode="+aurostd::utype2string(mode),_INPUT_ERROR_);
                                                    break;
                                                  }
     case _COORDS_CARTESIAN_ : {
@@ -6472,7 +6658,7 @@ void xstructure::SetCoordinates(const int& mode)  {
                                  break;
                                }
     default: {
-               cerr << "SetCoordinates NOTHING TO DO  mode=" << mode << endl;
+               cerr << function_name << " NOTHING TO DO  mode=" << mode << endl;
              }
   }
 }
@@ -6498,9 +6684,14 @@ void xstructure::MakeTypes(void) {
   // need to update TYPES based on num_each_type
   // type is usually used as an index for species
   // if we take a subset of atoms from another structure (POCC), need to reset first iatom to 0
+  string function_name = XPID + "xstructure::MakeTypes():";
+  stringstream message;
   uint sum_atoms=0;
   for(uint itype=0;itype<num_each_type.size();itype++){sum_atoms+=num_each_type[itype];}
-  if(sum_atoms!=atoms.size()){cerr << "xstructure::MakeTypes: ERROR: num_each_type does not match atom count (sum_atoms=" << sum_atoms << " vs. atoms.size()=" << atoms.size() << ")" << endl;exit(0);}
+  if(sum_atoms!=atoms.size()){
+    message << "num_each_type does not match atom count (sum_atoms=" << sum_atoms << " vs. atoms.size()=" << atoms.size() << ").";
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_VALUE_ERROR_);
+  }
 
   uint iat=0;
   for(uint itype=0;itype<num_each_type.size();itype++){
@@ -6511,65 +6702,152 @@ void xstructure::MakeTypes(void) {
 }
 
 // **************************************************************************
+// xstructure::AddAtom() //DX20210202
+// **************************************************************************
+// This adds a deque<_atom> to the structure.
+// More efficient than adding one atom at a time (AddAtom): use more
+// efficient for-loop for atoms (upper-triangular) and update species/basis
+// info once at the end
+
+void xstructure::AddAtom(const deque<_atom>& atoms_in, bool check_present) { //DX20210129
+  //bool LDEBUG=(FALSE || XHOST.DEBUG);
+
+  uint natoms_xstr = atoms.size();
+  const deque<_atom>* ptr_atoms = &atoms_in;
+  deque<_atom> atoms_unique;
+
+  if(check_present){
+    // use sym_eps if available; if not, use tenth of an Angstrom
+    // (since this function adds atoms iteratively, we cannot use minimumDistance,
+    // because it would change as we add new atoms) //DX20210202
+    double tol=(*this).sym_eps;
+    if(tol>=AUROSTD_NAN || tol<_ZERO_TOL_){ tol = 0.1; } // tenth of Angstrom
+
+    // first check if the input atoms are unique
+    // it is more efficient to use a double for-loop (upper-triangular)
+    // as opposed to MapAtom(deque<_atom>, _atom); otherwise you check atoms
+    // end up checking twice //DX20210202
+    bool FOUND_POSITION=FALSE;
+    for(uint iat=0;iat<atoms_in.size();iat++){
+      FOUND_POSITION=FALSE;
+      for(uint jat=iat+1;jat<atoms_in.size()&&FOUND_POSITION==FALSE;jat++){
+        if(SYM::MapAtom(atoms_in[iat], atoms_in[jat], true, (*this).lattice, false, tol)){ FOUND_POSITION=TRUE; }
+      }
+      if(FOUND_POSITION){ continue; }
+      // now check if any atoms in the xstructure are duplicates with the input atoms
+      else if(natoms_xstr != 0){
+        if(!SYM::MapAtom(atoms, atoms_unique[iat], true, (*this).lattice, false, tol)){
+          atoms_unique.push_back(atoms_in[iat]);
+        }
+      }
+      // if no atoms in the xstructure, just add to the unique list
+      else{ atoms_unique.push_back(atoms_in[iat]); }
+    }
+    ptr_atoms=&atoms_unique;
+  }
+
+  //DX20210202 [OBSOLETE - use MapAtom] if(check_present){
+  //DX20210202 [OBSOLETE - use MapAtom]   // check that this atom is not already present
+  //DX20210202 [OBSOLETE - use MapAtom]   xvector<double> a1(3),a2(3),a3(3),aijk(3);
+  //DX20210202 [OBSOLETE - use MapAtom]   a1=lattice(1);a2=lattice(2);a3=lattice(3);
+  //DX20210202 [OBSOLETE - use MapAtom]   for(uint iat=0;iat<atoms_in.size();iat++){
+  //DX20210202 [OBSOLETE - use MapAtom]     bool FOUND_POSITION=FALSE;
+  //DX20210202 [OBSOLETE - use MapAtom]     for(uint jat=iat+1;jat<atoms_in.size()&&FOUND_POSITION==FALSE;jat++){
+  //DX20210202 [OBSOLETE - use MapAtom]       if(atoms_in[iat].type==atoms_in[jat].type && atoms_in[iat].name==atoms_in[jat].name){
+  //DX20210202 [OBSOLETE - use MapAtom]         for(int i=-1;i<=1&&FOUND_POSITION==FALSE;i++){
+  //DX20210202 [OBSOLETE - use MapAtom]           for(int j=-1;j<=1&&FOUND_POSITION==FALSE;j++){
+  //DX20210202 [OBSOLETE - use MapAtom]             for(int k=-1;k<=1&&FOUND_POSITION==FALSE;k++) {
+  //DX20210202 [OBSOLETE - use MapAtom]               aijk[1]=i;aijk[2]=j;aijk[3]=k;
+  //DX20210202 [OBSOLETE - use MapAtom]               //	if(aurostd::modulus(atoms_in[iat].cpos-(((double)i)*a1+((double)j)*a2+((double)k)*a3+atoms_in[jat].cpos))<0.1) FOUND_POSITION=TRUE;
+  //DX20210202 [OBSOLETE - use MapAtom]               //DX+CO START
+  //DX20210202 [OBSOLETE - use MapAtom]               //DX if(aurostd::modulus(atoms_in[iat].fpos-(aijk+atoms_in[jat].fpos))<0.01) FOUND_POSITION=TRUE;
+  //DX20210202 [OBSOLETE - use MapAtom]               if((*this).sym_eps!=AUROSTD_NAN && (*this).sym_eps<AUROSTD_NAN && (*this).sym_eps>1e-10){ //DX20171201 - Added (*this).sym_eps>1e-10 //DX20180215 - added (*this).sym_eps<AUROSTD_NAN (needed) 
+  //DX20210202 [OBSOLETE - use MapAtom]                 if(aurostd::modulus((*this).f2c*(atoms_in[iat].fpos-(aijk+atoms_in[jat].fpos)))<=(*this).sym_eps) FOUND_POSITION=TRUE; //DX
+  //DX20210202 [OBSOLETE - use MapAtom]               }
+  //DX20210202 [OBSOLETE - use MapAtom]               else {
+  //DX20210202 [OBSOLETE - use MapAtom]                 //if(aurostd::modulus(atoms[iat].fpos-(aijk+atom.fpos))<1e-10) FOUND_POSITION=TRUE; //DX
+  //DX20210202 [OBSOLETE - use MapAtom]                 if(aurostd::modulus(atoms_in[iat].cpos-(((double)i)*a1+((double)j)*a2+((double)k)*a3+atoms_in[jat].cpos))<0.1) FOUND_POSITION=TRUE; //DX20171201
+  //DX20210202 [OBSOLETE - use MapAtom]               }
+  //DX20210202 [OBSOLETE - use MapAtom]               //DX+CO END
+  //DX20210202 [OBSOLETE - use MapAtom]             }
+  //DX20210202 [OBSOLETE - use MapAtom]           }
+  //DX20210202 [OBSOLETE - use MapAtom]         }
+  //DX20210202 [OBSOLETE - use MapAtom]       }
+  //DX20210202 [OBSOLETE - use MapAtom]     }
+  //DX20210202 [OBSOLETE - use MapAtom]     if(FOUND_POSITION){ continue; } // found no need to add it further
+  //DX20210202 [OBSOLETE - use MapAtom]     else{ atoms.push_back(atoms_in[iat]); }
+  //DX20210202 [OBSOLETE - use MapAtom]   }
+  //DX20210202 [OBSOLETE - use MapAtom] }
+  //DX20210202 [OBSOLETE - use MapAtom] else{
+  //DX20210202 [OBSOLETE - use MapAtom]   atoms = atoms_in;
+  //DX20210202 [OBSOLETE - use MapAtom] }
+
+  // update the species: update num/comp each type or add new species
+  for(uint iat=0;iat<ptr_atoms->size();iat++){
+    UpdateSpecies(ptr_atoms->at(iat)); //DX20210202 - consolidated code below into function
+  }
+
+  // add atoms to xstructure
+  if(natoms_xstr == 0){ atoms = *ptr_atoms; } //if possible, do assignment instead of push_back (faster)
+  else{ 
+    for(uint iat=0;iat<ptr_atoms->size();iat++){
+      atoms.push_back(ptr_atoms->at(iat));
+    }
+  }
+
+  GetStoich();  //CO20170724
+  std::stable_sort(atoms.begin(), atoms.end(), sortAtomsTypes);
+  MakeBasis(); // need to update NUMBER and BASIS
+}
+
+// **************************************************************************
 // xstructure::AddAtom
 // **************************************************************************
 // This adds an atom to the structure.
 
-void xstructure::AddAtom(const _atom& atom) {
-  bool LDEBUG=(FALSE || XHOST.DEBUG); 
-  _atom btom;btom=atom;
+void xstructure::AddAtom(const _atom& atom, bool check_present) {
+  //bool LDEBUG=(FALSE || XHOST.DEBUG); 
+  //DX20210202 _atom btom;btom=atom;
+  _atom btom=atom; //DX20210202
 
-  // check that this atom is not already present
-  xvector<double> a1(3),a2(3),a3(3),aijk(3);
-  a1=lattice(1);a2=lattice(2);a3=lattice(3);
-
-  bool FOUND_POSITION=FALSE;
-  for(uint iat=0;iat<atoms.size()&&FOUND_POSITION==FALSE;iat++)
-    if(atoms.at(iat).type==atom.type && atoms.at(iat).name==atom.name)
-      for(int i=-1;i<=1&&FOUND_POSITION==FALSE;i++)
-        for(int j=-1;j<=1&&FOUND_POSITION==FALSE;j++)
-          for(int k=-1;k<=1&&FOUND_POSITION==FALSE;k++) {
-            aijk[1]=i;aijk[2]=j;aijk[3]=k;
-            //	if(aurostd::modulus(atoms.at(iat).cpos-(((double)i)*a1+((double)j)*a2+((double)k)*a3+atom.cpos))<0.1) FOUND_POSITION=TRUE;
-            //DX+CO START    
-            //DX if(aurostd::modulus(atoms.at(iat).fpos-(aijk+atom.fpos))<0.01) FOUND_POSITION=TRUE;
-            if((*this).sym_eps!=AUROSTD_NAN && (*this).sym_eps<AUROSTD_NAN && (*this).sym_eps>1e-10){ //DX20171201 - Added (*this).sym_eps>1e-10 //DX20180215 - added (*this).sym_eps<AUROSTD_NAN (needed) 
-              if(aurostd::modulus((*this).f2c*(atoms.at(iat).fpos-(aijk+atom.fpos)))<=(*this).sym_eps) FOUND_POSITION=TRUE; //DX
-            }
-            else { 
-              //if(aurostd::modulus(atoms.at(iat).fpos-(aijk+atom.fpos))<1e-10) FOUND_POSITION=TRUE; //DX
-              if(aurostd::modulus(atoms.at(iat).cpos-(((double)i)*a1+((double)j)*a2+((double)k)*a3+atom.cpos))<0.1) FOUND_POSITION=TRUE; //DX20171201
-            }
-            //DX+CO END
-          }
-  if(FOUND_POSITION==TRUE) return; // found no need to add it further
-
-  // now found that it does not exist check type
-  //  cerr << "AddAtom new atom" << endl;
-  bool FOUND_SPECIES=FALSE;
-  uint species_position=0;
-  for(uint isp=0;isp<species.size()&&FOUND_SPECIES==FALSE;isp++)
-    if(atom.name==species.at(isp)) {FOUND_SPECIES=TRUE;species_position=isp;}
-
-  if(FOUND_SPECIES==FALSE) {
-    if(LDEBUG) cerr << "AddAtom new_specie=" << atom.name << endl;
-    num_each_type.push_back(1);
-    comp_each_type.push_back(atom.partial_occupation_value);
-    species.push_back(atom.name); // cerr << "AddAtom=" << atom.name << endl;
-    species_pp.push_back(atom.name); // cerr << "AddAtom=" << atom.name << endl;
-    species_pp_type.push_back(""); // cerr << "AddAtom=" << atom.name << endl;
-    species_pp_version.push_back(""); // cerr << "AddAtom=" << atom.name << endl;
-    species_pp_ZVAL.push_back(0.0); // cerr << "AddAtom=" << atom.name << endl;
-    species_pp_vLDAU.push_back(deque<double>()); // cerr << "AddAtom=" << atom.name << endl;
-    species_volume.push_back(GetAtomVolume(atom.name)); // cerr << "AddAtom=" << atom.name << endl;
-    species_mass.push_back(GetAtomMass(atom.name)); // cerr << "AddAtom=" << atom.name << endl;
-  } else {
-    // cerr << num_each_type.size() << " " <<  btom.type << endl;
-    // cerr << comp_each_type.size() << " " <<  btom.type << endl;
-    if(LDEBUG) cerr << "AddAtom increasing species_position " << species_position << endl;
-    num_each_type.at(species_position)++;
-    comp_each_type.at(species_position)+=atom.partial_occupation_value;
+  if(check_present){ //CO20210116 - AddCorners() should NOT check
+    // use sym_eps if available; if not, use tenth of an Angstrom
+    // (since this function adds atoms iteratively, we cannot use minimumDistance,
+    // because it would change as we add new atoms) //DX20210202
+    double tol=(*this).sym_eps;
+    if(tol>=AUROSTD_NAN || tol<_ZERO_TOL_){ tol = 0.1; } // tenth of Angstrom
+    if(SYM::MapAtom((*this).atoms, atom, true, (*this).lattice, false, tol)){ return; }
   }
+
+  //DX20210202 [OBSOLETE - use MapAtom] if(check_present){ //CO20210116 - AddCorners() should NOT check
+  //DX20210202 [OBSOLETE - use MapAtom]   // check that this atom is not already present
+  //DX20210202 [OBSOLETE - use MapAtom]   xvector<double> a1(3),a2(3),a3(3),aijk(3);
+  //DX20210202 [OBSOLETE - use MapAtom]   a1=lattice(1);a2=lattice(2);a3=lattice(3);
+  //DX20210202 [OBSOLETE - use MapAtom]   bool FOUND_POSITION=FALSE;
+  //DX20210202 [OBSOLETE - use MapAtom]   for(uint iat=0;iat<atoms.size()&&FOUND_POSITION==FALSE;iat++)
+  //DX20210202 [OBSOLETE - use MapAtom]     if(atoms[iat].type==atom.type && atoms[iat].name==atom.name)
+  //DX20210202 [OBSOLETE - use MapAtom]       for(int i=-1;i<=1&&FOUND_POSITION==FALSE;i++)
+  //DX20210202 [OBSOLETE - use MapAtom]         for(int j=-1;j<=1&&FOUND_POSITION==FALSE;j++)
+  //DX20210202 [OBSOLETE - use MapAtom]           for(int k=-1;k<=1&&FOUND_POSITION==FALSE;k++) {
+  //DX20210202 [OBSOLETE - use MapAtom]             aijk[1]=i;aijk[2]=j;aijk[3]=k;
+  //DX20210202 [OBSOLETE - use MapAtom]             //	if(aurostd::modulus(atoms[iat].cpos-(((double)i)*a1+((double)j)*a2+((double)k)*a3+atom.cpos))<0.1) FOUND_POSITION=TRUE;
+  //DX20210202 [OBSOLETE - use MapAtom]             //DX+CO START
+  //DX20210202 [OBSOLETE - use MapAtom]             //DX if(aurostd::modulus(atoms[iat].fpos-(aijk+atom.fpos))<0.01) FOUND_POSITION=TRUE;
+  //DX20210202 [OBSOLETE - use MapAtom]             if((*this).sym_eps!=AUROSTD_NAN && (*this).sym_eps<AUROSTD_NAN && (*this).sym_eps>1e-10){ //DX20171201 - Added (*this).sym_eps>1e-10 //DX20180215 - added (*this).sym_eps<AUROSTD_NAN (needed) 
+  //DX20210202 [OBSOLETE - use MapAtom]               if(aurostd::modulus((*this).f2c*(atoms[iat].fpos-(aijk+atom.fpos)))<=(*this).sym_eps) FOUND_POSITION=TRUE; //DX
+  //DX20210202 [OBSOLETE - use MapAtom]             }
+  //DX20210202 [OBSOLETE - use MapAtom]             else {
+  //DX20210202 [OBSOLETE - use MapAtom]               //if(aurostd::modulus(atoms[iat].fpos-(aijk+atom.fpos))<1e-10) FOUND_POSITION=TRUE; //DX
+  //DX20210202 [OBSOLETE - use MapAtom]               if(aurostd::modulus(atoms[iat].cpos-(((double)i)*a1+((double)j)*a2+((double)k)*a3+atom.cpos))<0.1) FOUND_POSITION=TRUE; //DX20171201
+  //DX20210202 [OBSOLETE - use MapAtom]             }
+  //DX20210202 [OBSOLETE - use MapAtom]             //DX+CO END
+  //DX20210202 [OBSOLETE - use MapAtom]           }
+  //DX20210202 [OBSOLETE - use MapAtom]   if(FOUND_POSITION==TRUE) return; // found no need to add it further
+  //DX20210202 [OBSOLETE - use MapAtom] }
+
+  // update the species: update num/comp each type or add new species
+  UpdateSpecies(atom); //DX20210202 - consolidated code below into function
+
   if(btom.name_is_given) {
     btom.CleanName();
     //DX20170921 - Need to keep spin info  btom.CleanSpin();
@@ -6583,23 +6861,24 @@ void xstructure::AddAtom(const _atom& atom) {
   bool found=FALSE;
   if(0)  for(uint iat=0;iat<atoms.size()&&!found;iat++) {
     if(iat<atoms.size()-1) {
-      if(atoms.at(iat).type==btom.type && atoms.at(iat+1).type!=btom.type) {
+      if(atoms[iat].type==btom.type && atoms.at(iat+1).type!=btom.type) {
         //	if(LDEBUG)
-        cerr << "HERE1 iat=" << iat << "  atoms.at(iat).type=" << atoms.at(iat).type << "  btom.type=" << btom.type << endl;//" atoms.begin()=" <<  long(atoms.begin()) << endl;
+        cerr << "HERE1 iat=" << iat << "  atoms[iat].type=" << atoms[iat].type << "  btom.type=" << btom.type << endl;//" atoms.begin()=" <<  long(atoms.begin()) << endl;
         atoms.insert(iat+atoms.begin()+1,btom); // potential problem  with CAST
         found=TRUE;
       }
     }
   }
   if(1) {
+    // sort by types and partial occupation (highest occupation first)
     std::deque<_atom>::iterator it=atoms.begin();
     for(uint iat=0;iat<atoms.size()&&!found;iat++,it++) {
       if(iat<atoms.size()-1) {
-        //	cerr << "HERE0 iat=" << iat << "  atoms.at(iat).type=" << atoms.at(iat).type << "  btom.type=" << btom.type << endl;
-        if((atoms.at(iat).type==btom.type && atoms.at(iat+1).type!=btom.type) || 
-            (atoms.at(iat).type==btom.type && atoms.at(iat+1).partial_occupation_value<btom.partial_occupation_value)) {  //CO20180705 - for pocc sorting, larger pocc ahead of smaller pocc
+        //	cerr << "HERE0 iat=" << iat << "  atoms[iat].type=" << atoms[iat].type << "  btom.type=" << btom.type << endl;
+        if((atoms[iat].type==btom.type && atoms.at(iat+1).type!=btom.type) || 
+            (atoms[iat].type==btom.type && atoms.at(iat+1).partial_occupation_value<btom.partial_occupation_value)) {  //CO20180705 - for pocc sorting, larger pocc ahead of smaller pocc
           //	if(LDEBUG)
-          //	  cerr << "HERE1 iat=" << iat << "  atoms.at(iat).type=" << atoms.at(iat).type << "  btom.type=" << btom.type << endl;//" atoms.begin()=" <<  long(atoms.begin()) << endl;
+          //	  cerr << "HERE1 iat=" << iat << "  atoms[iat].type=" << atoms[iat].type << "  btom.type=" << btom.type << endl;//" atoms.begin()=" <<  long(atoms.begin()) << endl;
           atoms.insert(it+1,btom);  // it is iterator, fine for insert.
           found=TRUE;
         }
@@ -6670,6 +6949,7 @@ void xstructure::RemoveAtom(const uint& iatom) {
   MakeBasis(); // need to update NUMBER and BASIS
 }
 
+
 void xstructure::RemoveAtom(vector<uint>& v_atoms_to_remove) { //CO20181226
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   std::sort(v_atoms_to_remove.begin(),v_atoms_to_remove.end());v_atoms_to_remove.erase( std::unique( v_atoms_to_remove.begin(), v_atoms_to_remove.end() ), v_atoms_to_remove.end() ); //remove duplicates //CO20181226
@@ -6680,16 +6960,33 @@ void xstructure::RemoveAtom(vector<uint>& v_atoms_to_remove) { //CO20181226
   }
 }
 
-void xstructure::ReplaceAtoms(const deque<_atom>& new_atoms){ //CO20190520
+void xstructure::RemoveAtom(void) { //DX20210129
+  // Removes all atoms from an xstructure and clears the related
+  // atom/species variable; faster than removing one at a time
+
+  atoms.clear();
+  ClearSpecies(); //clears everything species related
+  order_parameter_atoms.clear();
+}
+
+void xstructure::ReplaceAtoms(const deque<_atom>& new_atoms, bool check_present){ //CO20190520 //DX20210129 - added check_present
   //this is the SAFEST/CLEANEST way to replace atoms in an xstructure
   //it takes care of num_each_type, species, etc.
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   string soliloquy = XPID + "xstructure::ReplaceAtoms():";
-  for(uint i=atoms.size()-1;i<atoms.size();i--){  //removing atoms
-    if(LDEBUG) cerr << soliloquy << " removing atom[" << i << "]" << endl;
-    RemoveAtom(i);
-  }
-  for(uint i=0;i<new_atoms.size();i++){AddAtom(new_atoms[i]);}  //adding atoms
+
+  //DX20210129 [OBSOLETE - remove all at once] for(uint i=atoms.size()-1;i<atoms.size();i--){  //removing atoms
+  //DX20210129 [OBSOLETE - remove all at once]   if(LDEBUG) cerr << soliloquy << " removing atom[" << i << "]" << endl;
+  //DX20210129 [OBSOLETE - remove all at once]   RemoveAtom(i);
+  //DX20210129 [OBSOLETE - remove all at once] }
+  if(LDEBUG) cerr << soliloquy << " removing all atoms" << endl;
+  RemoveAtom(); //DX20210129 - remove all atoms and clear species variables
+
+  if(LDEBUG) cerr << soliloquy << " adding new atoms" << endl;
+  //DX20210202 [OBSOLETE] for(uint i=0;i<new_atoms.size();i++){AddAtom(new_atoms[i]);}  //adding atoms
+  AddAtom(new_atoms, check_present);  //adding atoms
+
+  (*this).SpeciesPutAlphabetic(); //DX20210129
 }
 
 // **************************************************************************
@@ -6767,6 +7064,8 @@ void xstructure::RemoveCartesianCopies(double tol) {
 // xstructure::AddCorners
 // **************************************************************************
 void xstructure::AddCorners(void) {
+  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  string soliloquy=XPID+"xstructure::AddCorners()";
   xstructure str;
   BringInCell();str=*this;
   while(atoms.size()) RemoveAtom(0);   
@@ -6777,8 +7076,12 @@ void xstructure::AddCorners(void) {
           _atom atom=str.atoms.at(iat);
           atom.fpos[1]+=i;atom.fpos[2]+=j;atom.fpos[3]+=k;
           atom.cpos=F2C(lattice,atom.fpos);
-          if(atom.fpos[1]<=1.0 && atom.fpos[2]<=1.0 && atom.fpos[3]<=1.0) AddAtom(atom);
-          //	    if(aurostd::isequal(atom.fpos[1],1.0,0.02) && atom.fpos[2]<1.0 && atom.fpos[3]<1.0)   AddAtom(atom);	    //AddAtom(atom);
+          if(LDEBUG){cerr << soliloquy << " atom.fpos=" << atom.fpos;}
+          if(atom.fpos[1]<=1.0 && atom.fpos[2]<=1.0 && atom.fpos[3]<=1.0){
+            if(LDEBUG){cerr << " : adding atom";}
+            AddAtom(atom,false);  //CO20210116 - do NOT check if atom is already there
+          }
+          if(LDEBUG){cerr << endl;}
         }
       }
     }
@@ -6791,10 +7094,12 @@ void xstructure::AddCorners(void) {
 // **************************************************************************
 // // Shift the origin to atom(iat)
 void xstructure::ShiftOriginToAtom(const int& iat) {
+  string function_name = XPID + "xstructure::ShiftOriginToAtom():";
+  stringstream message;
   //DX+CO START
   if(iat<0 || iat>=(int)atoms.size()) {
-    cerr << "ERROR void xstructure::ShiftOriginToAtom(const int& iat),  iat=" << iat << " out of boundaries (0," << atoms.size()-1 << ")" << endl;
-    exit(0);
+    message << "iat=" << iat << " out of boundaries (0," << atoms.size()-1 << ").";
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ILLEGAL_);
   }
   xvector<double> frigin(3);
   origin=atoms[iat].cpos;
@@ -8975,9 +9280,9 @@ string GetSpaceGroupLabel(int spacegroupnumber) {
 xmatrix<double> MetricTensor(const xstructure& a) {return MetricTensor(a.lattice,a.scale);}
 
 xmatrix<double> MetricTensor(const xmatrix<double>& lattice,double scale) {
+  string function_name = XPID + "MetricTensor():";
   if(lattice.rows!=lattice.cols){
-    cerr << "metricTensor(): Dimension mismatch, should be square lattice matrix" << endl;
-    exit(1);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Dimension mismatch, should be square lattice matrix.",_VALUE_ILLEGAL_);
   }
   xmatrix<double> metric_tensor(lattice.rows,lattice.cols);
   for(int i=lattice.lrows;i<=lattice.urows;i++){ //CO20190520
@@ -9214,6 +9519,7 @@ string KPPRA_DELTA(xstructure& str,const double& DK) {
 // returns extimated version of NBANDS starting from
 // electrons, ions, spin and ispin
 int GetNBANDS(int electrons,int nions,int spineach,bool ispin) {
+  string function_name = XPID + "GetNBANDS():";
   double out;
   out=max(ceil((electrons+4.0)/1.75)+max(nions/1.75,6.0),ceil(0.80*electrons)); // from VASP
   if(ispin) out=out+(nions*spineach+1)/2;
@@ -9231,7 +9537,7 @@ int GetNBANDS(int electrons,int nions,int spineach,bool ispin) {
     out= out * std::pow((double) nions,(double) 0.06);  //ME20191028 - prior scaling factor not sufficient for supercells
   }
   //  cerr << "GetNBANDS=" << out << endl;
-  // exit(0);
+  // throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Throw for debugging purposes.",_GENERIC_ERROR_);
   return (int) ceil(out);
 }
 
@@ -9309,10 +9615,12 @@ double GetCellAtomZVAL(const string& directory,vector<double>& vZVAL,vector<doub
 // ***************************************************************************
 // Given the ZVAL of each species, it returns total ZVAL of cell
 double xstructure::GetZVAL(const vector<double>& vZVAL) {
+  string function_name = XPID + "xstructure::GetZVAL():";
+  stringstream message;
   if(num_each_type.size()!=vZVAL.size()) {
-    cerr << "ERROR GetZVAL num_each_type.size()=" << num_each_type.size() << endl;
-    cerr << "ERROR GetZVAL vZVAL.size()=" << vZVAL.size() << endl;
-    exit(0);
+    message << "num_each_type.size()=" << num_each_type.size() << endl;
+    message << "vZVAL.size()=" << vZVAL.size() << endl;
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ILLEGAL_);
   }
   double CellZVAL=0.0;
   for(uint i=0;i<vZVAL.size();i++)  
@@ -9395,10 +9703,12 @@ double GetCellAtomPOMASS(const string& directory,vector<double>& vPOMASS,vector<
 // ***************************************************************************
 // Given the POMASS of each species, it returns total POMASS of cell
 double xstructure::GetPOMASS(const vector<double>& vPOMASS) {
+  string function_name = XPID + "xstructure::GetPOMASS():";
+  stringstream message;
   if(num_each_type.size()!=vPOMASS.size()) {
-    cerr << "ERROR GetPOMASS num_each_type.size()=" << num_each_type.size() << endl;
-    cerr << "ERROR GetPOMASS vPOMASS.size()=" << vPOMASS.size() << endl;
-    exit(0);
+    message << "num_each_type.size()=" << num_each_type.size() << endl;
+    message << "vPOMASS.size()=" << vPOMASS.size() << endl;
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ILLEGAL_);
   }
   double CellPOMASS=0.0;
   for(uint i=0;i<vPOMASS.size();i++)  
@@ -9438,7 +9748,7 @@ double GetVol(const xvector<double>& v1,const xvector<double>& v2,const xvector<
 //#define _Getabc_angles Getabc_angles
 //#define _Getabc_angles __NO_USE_Sortabc_angles
 
-xvector<double> Getabc_angles(const xmatrix<double>& lat,const int& mode) {  // AFLOW_FUNCTION_IMPLEMENTATION
+xvector<double> Getabc_angles(const xmatrix<double>& lat,int mode) {  // AFLOW_FUNCTION_IMPLEMENTATION
   xvector<double> data(6);
   data(1)=aurostd::modulus(lat(1));
   data(2)=aurostd::modulus(lat(2));
@@ -9454,7 +9764,7 @@ xvector<double> Getabc_angles(const xmatrix<double>& lat,const int& mode) {  // 
   return data;
 }
 
-xvector<double> Getabc_angles(const xmatrix<double>& lat,const xvector<int>& permut,const int& mode) {        // AFLOW_FUNCTION_IMPLEMENTATION
+xvector<double> Getabc_angles(const xmatrix<double>& lat,const xvector<int>& permut,int mode) {        // AFLOW_FUNCTION_IMPLEMENTATION
   xvector<double> data(6);
   data(1)=aurostd::modulus(lat(1));
   data(2)=aurostd::modulus(lat(2));
@@ -9487,7 +9797,7 @@ xvector<double> Getabc_angles(const xmatrix<double>& lat,const xvector<int>& per
 xvector<double> Getabc_angles(const xvector<double>& r1,      // AFLOW_FUNCTION_IMPLEMENTATION
     const xvector<double>& r2,      // AFLOW_FUNCTION_IMPLEMENTATION
     const xvector<double>& r3,      // AFLOW_FUNCTION_IMPLEMENTATION
-    const int& mode) {              // AFLOW_FUNCTION_IMPLEMENTATION
+    int mode) {              // AFLOW_FUNCTION_IMPLEMENTATION
   xmatrix<double> lat(3,3);
   lat(1,1)=r1(1);lat(1,2)=r1(2);lat(1,3)=r1(3);
   lat(2,1)=r2(1);lat(2,2)=r2(2);lat(2,3)=r2(3);
@@ -9499,7 +9809,7 @@ xvector<double> Getabc_angles(const xvector<double>& r1,      // AFLOW_FUNCTION_
     const xvector<double>& r2,      // AFLOW_FUNCTION_IMPLEMENTATION
     const xvector<double>& r3,      // AFLOW_FUNCTION_IMPLEMENTATION
     const xvector<int>& permut,     // AFLOW_FUNCTION_IMPLEMENTATION
-    const int& mode) {              // AFLOW_FUNCTION_IMPLEMENTATION
+    int mode) {              // AFLOW_FUNCTION_IMPLEMENTATION
   xmatrix<double> lat(3,3);
   lat(1,1)=r1(1);lat(1,2)=r1(2);lat(1,3)=r1(3);
   lat(2,1)=r2(1);lat(2,2)=r2(2);lat(2,3)=r2(3);
@@ -9507,7 +9817,7 @@ xvector<double> Getabc_angles(const xvector<double>& r1,      // AFLOW_FUNCTION_
   return Getabc_angles(lat,permut,mode);
 }
 
-xvector<double> Sortabc_angles(const xmatrix<double>& lat,const int& mode) {        // AFLOW_FUNCTION_IMPLEMENTATION
+xvector<double> Sortabc_angles(const xmatrix<double>& lat,int mode) {        // AFLOW_FUNCTION_IMPLEMENTATION
   // with permutation - from AVDV
   int i,imin,imax,imid;
   double dmin,dmax;
@@ -9550,6 +9860,8 @@ xvector<double> Sortabc_angles(const xmatrix<double>& lat,const int& mode) {    
 // Dane Morgan, adjusted by SC
 
 xmatrix<double> GetClat(const xvector<double>& abc_angles) {   // AFLOW_FUNCTION_IMPLEMENTATION
+  string function_name = XPID + "GetClat():";
+  stringstream message;
   xmatrix<double> clattice(3,3);
   double a=abc_angles[1];
   double b=abc_angles[2];
@@ -9557,17 +9869,17 @@ xmatrix<double> GetClat(const xvector<double>& abc_angles) {   // AFLOW_FUNCTION
   double bc= abc_angles[4]*deg2rad; // angle from b to c (remove a)
   double ca= abc_angles[5]*deg2rad; // angle from c to a (remove b)
   double ab= abc_angles[6]*deg2rad; // angle from a to b (remove c)
-  //  if(abs(bc)>6.3||abs(ca)>6.3||abs(ab)>6.3) { cerr << _AUROSTD_XLIBS_ERROR_ << "GetClat: angles must be in RADIANT " << endl;exit(0);}
+  //  if(abs(bc)>6.3||abs(ca)>6.3||abs(ab)>6.3) { cerr << _AUROSTD_XLIBS_ERROR_ << "GetClat: angles must be in RADIANT " << endl;throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Throw for debugging purposes.",_GENERIC_ERROR_);}
   clattice(1,1)=a;
   clattice(2,1)=b*cos(ab);
   clattice(2,2)=b*sin(ab);
   clattice(3,1)=c*cos(ca);
   if(ab<0.00000001) {
-    cerr <<"ERROR: The angle gamma from a to b is too small" << endl;
-    cerr <<"ERROR: gamma = " << ab << endl;
-    cerr <<"ERROR: STOPPING "<< endl;
-    cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR: STOPPING " << endl;
-    exit(0);
+    message <<"The angle gamma from a to b is too small" << endl;
+    message <<"gamma = " << ab << endl;
+    message <<"STOPPING "<< endl;
+    message << _AUROSTD_XLIBS_ERROR_ << "ERROR: STOPPING " << endl;
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ILLEGAL_);
   }
   clattice(3,2)=c*(cos(bc)-cos(ab)*cos(ca))/sin(ab);
   clattice(3,3)=sqrt(abs(c*c-clattice(3,2)*clattice(3,2)-clattice(3,1)*clattice(3,1)));
@@ -9575,21 +9887,23 @@ xmatrix<double> GetClat(const xvector<double>& abc_angles) {   // AFLOW_FUNCTION
 }
 
 xmatrix<double> GetClat(const double &a,const double &b,const double &c,const double &alpha,const double &beta,const double &gamma) {
+  string function_name = XPID + "GetClat():";
+  stringstream message;
   xmatrix<double> clattice(3,3);
   double bc= alpha*deg2rad; // angle from b to c (remove a)
   double ca= beta*deg2rad; // angle from c to a (remove b)
   double ab= gamma*deg2rad; // angle from a to b (remove c)
-  //  if(abs(bc)>6.3||abs(ca)>6.3||abs(ab)>6.3) { cerr << _AUROSTD_XLIBS_ERROR_ << "GetClat: angles must be in RADIANT " << endl;exit(0);}
+  //  if(abs(bc)>6.3||abs(ca)>6.3||abs(ab)>6.3) { cerr << _AUROSTD_XLIBS_ERROR_ << "GetClat: angles must be in RADIANT " << endl;throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Throw for debugging purposes.",_GENERIC_ERROR_);}
   clattice(1,1)=a;
   clattice(2,1)=b*cos(ab);
   clattice(2,2)=b*sin(ab);
   clattice(3,1)=c*cos(ca);
   if(ab<0.00000001) {
-    cerr <<"ERROR: The angle gamma from a to b is too small" << endl;
-    cerr <<"ERROR: gamma = " << ab << endl;
-    cerr <<"ERROR: STOPPING "<< endl;
-    cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR: STOPPING " << endl;
-    exit(0);
+    message <<"The angle gamma from a to b is too small" << endl;
+    message <<"gamma = " << ab << endl;
+    message <<"STOPPING "<< endl;
+    message << _AUROSTD_XLIBS_ERROR_ << "ERROR: STOPPING " << endl;
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ILLEGAL_);
   }
   clattice(3,2)=c*(cos(bc)-cos(ab)*cos(ca))/sin(ab);
   clattice(3,3)=sqrt(abs(c*c-clattice(3,2)*clattice(3,2)-clattice(3,1)*clattice(3,1)));
@@ -9605,6 +9919,7 @@ xmatrix<double> GetClat(const double &a,const double &b,const double &c,const do
 // structures are all set to 1.
 
 xstructure GetIntpolStr(xstructure strA, xstructure strB, const double& f,const string& path_flag) {
+  string function_name = XPID + "GetIntpolStr():";
   strA=ReScale(strA,1.0);
   strB=ReScale(strB,1.0);
   // Get new lattice params.
@@ -9617,9 +9932,8 @@ xstructure GetIntpolStr(xstructure strA, xstructure strB, const double& f,const 
     for(int jc=1;jc<=3;jc++) lati(ic,jc)=latA(ic,jc)+dl(jc);
   }
   // Get new cart. coords.
-  if(strA.atoms.size()!=strB.atoms.size()) { 
-    cerr << _AUROSTD_XLIBS_ERROR_ << " GetIntpolStr(...) number of atoms must be the same in both structures !!" << endl;
-    exit(0);
+  if(strA.atoms.size()!=strB.atoms.size()) {
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,_AUROSTD_XLIBS_ERROR_+" number of atoms must be the same in both structures!!",_INPUT_ILLEGAL_);
   }
   int size=strA.atoms.size();
   vector<xvector<double> > cposi(size,3);
@@ -9711,7 +10025,7 @@ xvector<int> LatticeDimensionSphere(const xmatrix<double>& _lattice, double radi
   }
   if(LDEBUG) {
     for(uint i=1;i<(uint)normals.rows+1;i++){
-      cerr << "LatticeDimensionSphere: normals(" << i << ")=" << normals(i) << endl;
+      cerr << soliloquy << " normals(" << i << ")=" << normals(i) << endl;
     }
   }
   if(0) { // with eijk and estarijk
@@ -9745,12 +10059,11 @@ xvector<int> LatticeDimensionSphere(const xmatrix<double>& _lattice, double radi
   //the diagonals of frac_normal contain the dimensions of the lattice grid that
   //encompasses a sphere of radius = radius
   for(i=1;i<=3;i++){
-    if(LDEBUG) {cerr << "LatticeDimensionSphere: abs(frac_normals(i,i))=" << abs(frac_normals(i,i)) << endl;}
+    if(LDEBUG) {cerr << soliloquy << " abs(frac_normals(i,i))=" << abs(frac_normals(i,i)) << endl;}
     dim(i)=(int)ceil(abs(frac_normals(i,i)));
   }
   if(max(dim)==0) { 
-    cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR: LatticeDimensionSphere dim=0 !! " << endl;
-    exit(0);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,_AUROSTD_XLIBS_ERROR_+" dim=0!!",_INPUT_ILLEGAL_);
   }
   return dim;
 }
@@ -10294,14 +10607,16 @@ void xstructure::SpeciesSwap(const uint& specieA,const uint& specieB) {
 // ***************************************************************************
 // Tell if two species are alphabetic!  Stefano Curtarolo Nov 2008
 bool xstructure::SpeciesGetAlphabetic(void) {
+  string function_name = XPID + "xstructure::SpeciesGetAlphabetic():";
+  stringstream message;
   if(num_each_type.size()!=species.size()) {
-    cerr << "ERROR: SpeciesGetAlphabetic: num_each_type.size()!=species.size()   ("<<num_each_type.size()<<","<<species.size()<<")" << endl;
-    cerr << "ERROR: num_each_type.size()="<<num_each_type.size()<<": "; for(uint i=0;i<num_each_type.size();i++) cerr << num_each_type.at(i) << " "; cerr << endl;
-    cerr << "ERROR: species.size()="<<species.size()<< ": "; for(uint i=0;i<species.size();i++) cerr << species.at(i) << " "; cerr << endl;
-    cerr << "ERROR: species_pp.size()="<<species_pp.size()<< ": "; for(uint i=0;i<species_pp.size();i++) cerr << species_pp.at(i) << " "; cerr << endl;
-    cerr << "ERROR: species_volume.size()="<<species_volume.size()<< ": "; for(uint i=0;i<species_volume.size();i++) cerr << species_volume.at(i) << " "; cerr << endl;
-    cerr << "ERROR: species_mass.size()="<<species_mass.size()<< ": "; for(uint i=0;i<species_mass.size();i++) cerr << species_mass.at(i) << " "; cerr << endl;
-    exit(0);
+    message << "num_each_type.size()!=species.size()   ("<<num_each_type.size()<<","<<species.size()<<")" << endl;
+    message << "num_each_type.size()="<<num_each_type.size()<<": "; for(uint i=0;i<num_each_type.size();i++) message << num_each_type.at(i) << " "; message << endl;
+    message << "species.size()="<<species.size()<< ": "; for(uint i=0;i<species.size();i++) message << species.at(i) << " "; message << endl;
+    message << "species_pp.size()="<<species_pp.size()<< ": "; for(uint i=0;i<species_pp.size();i++) message << species_pp.at(i) << " "; message << endl;
+    message << "species_volume.size()="<<species_volume.size()<< ": "; for(uint i=0;i<species_volume.size();i++) message << species_volume.at(i) << " "; message << endl;
+    message << "species_mass.size()="<<species_mass.size()<< ": "; for(uint i=0;i<species_mass.size();i++) message << species_mass.at(i) << " "; message << endl;
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_VALUE_RANGE_);
   }
   // some useful checks
   if(species.size()==0) return TRUE; // empty structures are always alphabetic
@@ -10322,9 +10637,11 @@ bool xstructure::SpeciesGetAlphabetic(void) {
 // ***************************************************************************
 // Tell if two species are alphabetic!  Stefano Curtarolo Nov 2008
 bool xstructure::SpeciesPutAlphabetic(void) {
+  string function_name = XPID + "xstructure::SpeciesPutAlphabetic():";
+  stringstream message;
   if(num_each_type.size()!=species.size()) {
-    cerr << "ERROR: SpeciesPutAlphabetic: num_each_type.size()!=species.size()   ("<<num_each_type.size()<<","<<species.size()<<")" << endl;
-    exit(0);
+    message << "num_each_type.size()!=species.size()   ("<<num_each_type.size()<<","<<species.size()<<")";
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_VALUE_RANGE_);
   }
   // some useful checks
   if(species.size()==0) return TRUE; // empty structures are always alphabetic
@@ -10369,12 +10686,10 @@ uint xstructure::SetSpecies(const deque<string>& vspecies) {
   if(vspecies.size()!=species.size() ) {
     message << "vspecies.size()!=species.size()"; //CO20190317
     aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_RANGE_); //CO20190317
-    //[CO20190317]cerr << "ERROR - xstructure::SetSpecies:  vspecies.size()!=species.size()" << endl;exit(0);
   }
   if(vspecies.size()!=num_each_type.size() ) {
     message << "vspecies.size()!=num_each_type.size()"; //CO20190317
     aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_RANGE_); //CO20190317
-    //[CO20190317]cerr << "ERROR - xstructure::SetSpecies:  vspecies.size()!=num_each_type.size()" << endl;exit(0);
   }
   int iatom=0;
   for(uint itype=0;itype<num_each_type.size();itype++) {
@@ -10390,6 +10705,42 @@ uint xstructure::SetSpecies(const deque<string>& vspecies) {
     }
   }
   return vspecies.size();
+}
+
+// ***************************************************************************
+// Function UpdateSpecies() //DX20210202 [from AddAtom, consolidate to function]
+// ***************************************************************************
+void xstructure::UpdateSpecies(const _atom& atom){
+
+  // Update the species info based on the atom input
+  // If the species is already in xstructure, update the number of types
+  // and composition of each type, otherwise, add the new species info
+  // This code was copied from AddAtom
+
+  bool LDEBUG=(FALSE || XHOST.DEBUG); 
+
+  bool FOUND_SPECIES=FALSE;
+  uint species_position=0;
+  for(uint isp=0;isp<species.size()&&FOUND_SPECIES==FALSE;isp++)
+    if(atom.name==species[isp]) {FOUND_SPECIES=TRUE;species_position=isp;}
+
+  if(FOUND_SPECIES==FALSE) {
+    if(LDEBUG) cerr << "UpdateSpecies new_species=" << atom.name << endl;
+    num_each_type.push_back(1);
+    comp_each_type.push_back(atom.partial_occupation_value);
+    species.push_back(atom.name); // cerr << "UpdateSpecies=" << atom.name << endl;
+    species_pp.push_back(atom.name); // cerr << "UpdateSpecies=" << atom.name << endl;
+    species_pp_type.push_back(""); // cerr << "UpdateSpecies=" << atom.name << endl;
+    species_pp_version.push_back(""); // cerr << "UpdateSpecies=" << atom.name << endl;
+    species_pp_ZVAL.push_back(0.0); // cerr << "UpdateSpecies=" << atom.name << endl;
+    species_pp_vLDAU.push_back(deque<double>()); // cerr << "UpdateSpecies=" << atom.name << endl;
+    species_volume.push_back(GetAtomVolume(atom.name)); // cerr << "UpdateSpecies=" << atom.name << endl;
+    species_mass.push_back(GetAtomMass(atom.name)); // cerr << "UpdateSpecies=" << atom.name << endl;
+  } else {
+    if(LDEBUG) cerr << "UpdateSpecies increasing species_position " << species_position << endl;
+    num_each_type[species_position]++;
+    comp_each_type[species_position]+=atom.partial_occupation_value;
+  }
 }
 
 // ***************************************************************************
@@ -10718,7 +11069,7 @@ LoopHead:
     oss << outdat << endl;
     oss << "ERROR: a,b,c,alpha,beta,gamma from P matrix: ";
     oss << poutdat << endl;
-    oss << "ERROR: Exiting." << endl;
+    oss << "ERROR: Returning." << endl;
     // output
     cerr << oss.str();
     //  cout << oss.str();
@@ -10964,7 +11315,7 @@ LoopHead:
     oss << outdat << endl;
     oss << "ERROR: a,b,c,alpha,beta,gamma from P matrix: ";
     oss << poutdat << endl;
-    oss << "ERROR: Exiting." << endl;
+    oss << "ERROR: Returning." << endl;
     // output
     cerr << oss.str();
     //  cout << oss.str();
@@ -11058,12 +11409,31 @@ void xstructure::NiggliUnitCellForm(void) {
     FixLattices();
     Niggli_has_failed=FALSE;
   } else {
-    if(!XHOST.QUIET) cout << "00000  MESSAGE NIGGLI Form already Calculated: skipping" << endl;
+    if(!XHOST.QUIET) cout << XPID << "00000  MESSAGE NIGGLI Form already Calculated: skipping" << endl;
   }
 }
 
 xmatrix<double> NiggliUnitCellForm(const xmatrix<double>& lattice) {
   return GetNiggliStr(lattice);
+}
+
+// ***************************************************************************
+// Function GetNiggliStructures() //DX20201006
+// ***************************************************************************
+void GetNiggliStructures(vector<xstructure>& structures, uint start_index, uint end_index){
+
+  // Converts a set of xstructures to their Niggli representation
+  // Optional indices can be included; useful for pre-distributed
+  // threading schemes
+  // Default: run over entire range
+
+
+  // if end index is greater than structures.size(), then compute Niggli cell for all structures
+  if(end_index > structures.size()){ end_index=structures.size(); }
+
+  for(uint i=start_index;i<end_index;i++){
+    structures[i].NiggliUnitCellForm();
+  }
 }
 
 // **************************************************************************
@@ -11105,7 +11475,7 @@ void xstructure::MinkowskiBasisReduction(void) {
     Minkowski_calculated=TRUE;
     Minkowski_has_failed=FALSE;
   } else {
-    //    if(!QUIET) cout << "00000  MESSAGE MINKOWSKI Basis Reduction already Calculated: skipping" << endl;
+    //    if(!QUIET) cout << XPID << "00000  MESSAGE MINKOWSKI Basis Reduction already Calculated: skipping" << endl;
   }
 }
 
@@ -11116,6 +11486,24 @@ xmatrix<double> MinkowskiBasisReduction(const xmatrix<double>& lattice) {
   basis=aurostd::reduce_to_shortest_basis(basis);
   basis=trasp(basis);
   return basis;
+}
+
+// ***************************************************************************
+// Function GetMinkowskiStructures() //DX20201006
+// ***************************************************************************
+void GetMinkowskiStructures(vector<xstructure>& structures, uint start_index, uint end_index){
+
+  // Converts a set of xstructures to their Minkowski representation
+  // Optional indices can be included; useful for pre-distributed
+  // threading schemes
+  // Default: run over entire range
+
+  // if end index is greater than structures.size(), then compute Minkowski cell for all structures
+  if(end_index > structures.size()){ end_index=structures.size(); }
+
+  for(uint i=start_index;i<end_index;i++){
+    structures[i].MinkowskiBasisReduction();
+  }
 }
 
 // ***************************************************************************
@@ -11138,7 +11526,7 @@ void xstructure::LatticeReduction(void) {
     LatticeReduction_calculated=TRUE;
     LatticeReduction_has_failed=FALSE;
   } else {
-    //   if(!QUIET) cout << "00000  MESSAGE LATTICE Basis Reduction already Calculated: skipping" << endl;
+    //   if(!QUIET) cout << XPID << "00000  MESSAGE LATTICE Basis Reduction already Calculated: skipping" << endl;
   }
 }
 
@@ -11161,6 +11549,21 @@ xmatrix<double> LatticeReduction(const xmatrix<double>& lattice) {
 //DX20190214 [OBSOLETE]   return foldAtomsInCell(atoms, c2f_new, f2c_new, skew, tol);
 //DX20190214 [OBSOLETE]}
 
+// xstructure::foldAtomsInCell()
+// modify xstructure in-place
+void xstructure::foldAtomsInCell(const xmatrix<double>& lattice_new, bool skew, double tol, bool check_min_dists) { //DX20210104
+
+  deque<_atom> atoms_new = ::foldAtomsInCell((*this), lattice_new, skew, tol, check_min_dists); // fold atoms in //DX20210118 - specify global namespace
+
+  // update xstructure info
+  (*this).lattice=lattice_new;
+  // sort and update atom counts/order/types/basis/etc.
+  std::stable_sort(atoms_new.begin(),atoms_new.end(),sortAtomsNames); //DX20210129
+  (*this).ReplaceAtoms(atoms_new);
+  (*this).BringInCell();
+  (*this).FixLattices();
+}
+
 deque<_atom> foldAtomsInCell(const xstructure& a,const xmatrix<double>& lattice_new, bool skew, double tol, bool check_min_dists) { //CO20190520 - removed pointers for bools and doubles, added const where possible //DX20190619 = added check_min_dists bool
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   string soliloquy = XPID + "foldAtomsInCell():";
@@ -11171,8 +11574,9 @@ deque<_atom> foldAtomsInCell(const xstructure& a,const xmatrix<double>& lattice_
 
   deque<_atom> atoms_orig=a.atoms;  //need to make a copy for the pointer
   deque<_atom>* ptr_atoms=&atoms_orig;
-  xstructure atomic_grid; //stays empty if not needed
+  deque<_atom> atoms=*ptr_atoms; //DX20210129 - this need to be done before if-statement since we put atomic_grid inside if-statement
   if(!fold_in_only){
+    xstructure atomic_grid; //stays empty if not needed //DX+ME20210111 - added inside if-statement
     double radius=RadiusSphereLattice(lattice_new);
     xvector<int> dims=LatticeDimensionSphere(a.lattice,radius);//int dim=max(dims)+1; //dim=3;  //CO20190520
     if(LDEBUG){
@@ -11192,8 +11596,9 @@ deque<_atom> foldAtomsInCell(const xstructure& a,const xmatrix<double>& lattice_
     atomic_grid.GenerateGridAtoms(dims[1],dims[2],dims[3]); //much faster than supercell
     if(LDEBUG) {cerr << soliloquy << " atomic grid built" << endl;}
     ptr_atoms=&atomic_grid.grid_atoms;  //CO20190808 - GenerateGridAtoms() populates grid_atoms, not atoms
+    atoms=*ptr_atoms; //DX20210129 - set inside if-statement, otherwise, grid atoms goes out of scope
   }
-  const deque<_atom> atoms=*ptr_atoms;
+  //DX20210129 [OBOSLETE] const deque<_atom> atoms=*ptr_atoms;
 
   return foldAtomsInCell(atoms,a.lattice,lattice_new,skew,tol,check_min_dists); //DX20190619 = added check_min_dists bool
 }
@@ -11259,6 +11664,9 @@ deque<_atom> foldAtomsInCell(const deque<_atom>& atoms,const xmatrix<double>& la
     if(!aurostd::isequal(min_dist_orig,min_dist_new,0.1)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Minimum distance changed, check that atoms are not rotated",_RUNTIME_ERROR_);}
   }
 
+  // sort atoms //DX+CO20210119
+  std::stable_sort(atoms_in_cell.begin(),atoms_in_cell.end(),sortAtomsNames);
+
   return atoms_in_cell;
 }
 
@@ -11297,7 +11705,7 @@ xstructure GetPrimitiveVASP(const xstructure& a,double tol) {
     b.ReScale(1.0); b.ShiftOriginToAtom(0); b.BringInCell(); //fast clean for comparison
     cerr << "NEW STRUCTURE " << endl;
     cerr << b;
-    cerr << "STRUCTURES IDENTICAL = " << (compare::aflowCompareStructure(a,b,true) ? "TRUE" : "FALSE") << endl;
+    cerr << "STRUCTURES IDENTICAL = " << (compare::structuresMatch(a,b,true) ? "TRUE" : "FALSE") << endl;
     cerr << "-----------------------------------------------------------------------" << endl;
   }
   return b;
@@ -11663,7 +12071,7 @@ void xstructure::BringInCell(double tolerance, double upper_bound, double lower_
 // Function BringInCompact
 // ***************************************************************************
 // Make a structure where all the atoms are all the
-// atoms are mapped through the unit and neighbours cells
+// atoms are mapped through the unit and neighbors cells
 // to minimixe the shortest possible bond with an adjacent atom
 // This option is very useful if you run big and complicate
 // molecules where atoms exit of the unit cell and you have
@@ -11698,9 +12106,9 @@ xstructure _old_BringInCompact(const xstructure& a) {
         // scan over all the reference atoms
       }                                             // scan over all the reference atoms
 
-      for(int i1=-1;i1<=1;i1++)                     // roll over first neighbour cells
-        for(int j1=-1;j1<=1;j1++)                   // roll over first neighbour cells
-          for(int k1=-1;k1<=1;k1++) {               // roll over first neighbour cells
+      for(int i1=-1;i1<=1;i1++)                     // roll over first neighbor cells
+        for(int j1=-1;j1<=1;j1++)                   // roll over first neighbor cells
+          for(int k1=-1;k1<=1;k1++) {               // roll over first neighbor cells
             adtstpos(1)=sstr.atoms.at(i).fpos(1)+i1;
             adtstpos(2)=sstr.atoms.at(i).fpos(2)+j1;
             adtstpos(3)=sstr.atoms.at(i).fpos(3)+k1;      // test the atom
@@ -11752,9 +12160,9 @@ void xstructure::BringInCompact(void) {
         // scan over all the reference atoms
       }                                             // scan over all the reference atoms
 
-      for(int i1=-1;i1<=1;i1++)                     // roll over first neighbour cells
-        for(int j1=-1;j1<=1;j1++)                   // roll over first neighbour cells
-          for(int k1=-1;k1<=1;k1++) {               // roll over first neighbour cells
+      for(int i1=-1;i1<=1;i1++)                     // roll over first neighbor cells
+        for(int j1=-1;j1<=1;j1++)                   // roll over first neighbor cells
+          for(int k1=-1;k1<=1;k1++) {               // roll over first neighbor cells
             adtstpos(1)=atoms.at(i).fpos(1)+i1;
             adtstpos(2)=atoms.at(i).fpos(2)+j1;
             adtstpos(3)=atoms.at(i).fpos(3)+k1;      // test the atom
@@ -11855,7 +12263,12 @@ xstructure BringInWignerSeitz(const xstructure& a) {
 #define IsTranslationFVector IsTranslationFVectorORIGINAL_2011
 
 bool IsTranslationFVectorFAST(const xstructure& a, const xvector<double>& ftvec) {
-  if(a.equiv_fpos_epsilon<1.0e-12) { cerr << "ERROR:  Zero tolerance in aflow_xatom.cpp: IsTranslationFVectorFAST " << a.equiv_fpos_epsilon << endl; exit(0);}
+  string function_name = XPID + "IsTranslationFVectorFAST():";
+  stringstream message;
+  if(a.equiv_fpos_epsilon<1.0e-12) {
+    message << "Zero tolerance: " << a.equiv_fpos_epsilon;
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_VALUE_ILLEGAL_);
+  }
   double tolerance=a.equiv_fpos_epsilon;
   if(aurostd::modulus(ftvec)<=tolerance) return TRUE;
 
@@ -11888,7 +12301,12 @@ bool IsTranslationFVectorFAST(const xstructure& a, const xvector<double>& ftvec)
 }
 
 bool IsTranslationFVectorORIGINAL(const xstructure& a, const xvector<double>& ftvec) {
-  if(a.equiv_fpos_epsilon<1.0e-12) { cerr << "ERROR:  Zero tolerance in aflow_xatom.cpp: IsTranslationFVectorORIGINAL" << endl; exit(0);}
+  string function_name = XPID + "IsTranslationFVectorORIGINAL():";
+  stringstream message;
+  if(a.equiv_fpos_epsilon<1.0e-12) {
+    message << "Zero tolerance: " << a.equiv_fpos_epsilon;
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_VALUE_ILLEGAL_);
+  }
   double tolerance=a.equiv_fpos_epsilon;
   if(aurostd::modulus(ftvec)<=tolerance) return TRUE;
   uint CntGoodTrans=0;
@@ -11917,7 +12335,12 @@ bool IsTranslationFVectorORIGINAL(const xstructure& a, const xvector<double>& ft
 }
 
 bool IsTranslationFVectorFAST_2011(const xstructure& a, const xvector<double>& ftvec) {
-  if(a.equiv_fpos_epsilon<1.0e-12) { cerr << "ERROR:  Zero tolerance in aflow_xatom.cpp: IsTranslationFVectorFAST " << a.equiv_fpos_epsilon << endl; exit(0);}
+  string function_name = XPID + "IsTranslationFVectorFAST():";
+  stringstream message;
+  if(a.equiv_fpos_epsilon<1.0e-12) {
+    message << "Zero tolerance: " << a.equiv_fpos_epsilon;
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_VALUE_ILLEGAL_);
+  }
   double tolerance=a.equiv_fpos_epsilon;
   if(aurostd::modulus(ftvec)<=tolerance) return TRUE;
   uint CntGoodTrans=0;
@@ -11947,7 +12370,12 @@ bool IsTranslationFVectorFAST_2011(const xstructure& a, const xvector<double>& f
 }
 
 bool IsTranslationFVectorORIGINAL_2011(const xstructure& a, const xvector<double>& ftvec) {
-  if(a.equiv_fpos_epsilon<1.0e-12) { cerr << "ERROR:  Zero tolerance in aflow_xatom.cpp: IsTranslationFVectorORIGINAL" << endl; exit(0);}
+  string function_name = XPID + "IsTranslationFVectorORIGINAL():";
+  stringstream message;
+  if(a.equiv_fpos_epsilon<1.0e-12) {
+    message << "Zero tolerance: " << a.equiv_fpos_epsilon;
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_VALUE_ILLEGAL_);
+  }
   double tolerance=a.equiv_fpos_epsilon;
   if(aurostd::modulus(ftvec)<=tolerance) return TRUE;
 
@@ -11978,7 +12406,12 @@ bool IsTranslationFVectorORIGINAL_2011(const xstructure& a, const xvector<double
 
 
 bool IsTranslationCVector(const xstructure& a, const xvector<double>& ctvec) {
-  if(a.equiv_fpos_epsilon<1.0e-12) { cerr << "ERROR:  Zero tolerance in aflow_xatom.cpp: IsTranslationCVector" << endl; exit(0);}
+  string function_name = XPID + "IsTranslationCVector():";
+  stringstream message;
+  if(a.equiv_fpos_epsilon<1.0e-12) {
+    message << "Zero tolerance: " << a.equiv_fpos_epsilon;
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_VALUE_ILLEGAL_);
+  }
   /* Input translation vector is expectd to be in cartesian coordinates. */
   return IsTranslationFVector(a,C2F(a.lattice,ctvec));
 }
@@ -12027,7 +12460,7 @@ xstructure GetPrimitive(const xstructure& _a,double tolerance) {
     //    cerr << "GetPrimitiveSINGLE a.equiv_fpos_epsilon=" << a.equiv_fpos_epsilon << endl;
     b=GetPrimitiveSINGLE(a,tolerance);
   }
-  // restore and exit
+  // restore and return
   AFLOW_PTHREADS::FLAG=bool_backup;
   AFLOW_PTHREADS::MAX_PTHREADS=uint_backup;
   return b;
@@ -12318,28 +12751,30 @@ xstructure GetPrimitiveMULTITHREAD(const xstructure& _a,double tolerance) {  // 
   if(!aurostd::isinteger(fraction_atoms,0.01)) return _a;
 
   // nearest too close
-  if(NearestNeighbour(b)<5.0*tolerance)  return _a;
-  if(NearestNeighbour(b)<0.1)  return _a;
+  if(NearestNeighbor(b)<5.0*tolerance)  return _a;
+  if(NearestNeighbor(b)<0.1)  return _a;
 
   // no messed up volume
   double fraction=Volume(a)/Volume(b);
   if(abs(b.atoms.size()*fraction-a.atoms.size())>0.1) {
-    cerr << "ERROR   xstructure xstructure::GetPrimitive(void)" << endl;
-    cerr << "        supercell has the wrong number of atoms" << endl;
-    cerr << "        volume original    = " << Volume(a) << endl;
-    cerr << "        volume prim        = " << Volume(b) << endl;
-    cerr << "        a.scale            = " << a.scale << endl;
-    cerr << "        b.scale            = " << b.scale << endl;
-    cerr << "        a.atoms.size()     = " << a.atoms.size() << endl;
-    cerr << "        b.atoms.size()     = " << b.atoms.size() << endl;
-    cerr << "        fraction           = " << fraction << endl;
-    cerr << "        supercell atoms    = " << fraction*b.atoms.size() << endl;
-    cerr << b << endl;
-    exit(0);
+    stringstream message;
+    message << "ERROR   xstructure xstructure::GetPrimitive(void)" << endl;
+    message << "        supercell has the wrong number of atoms" << endl;
+    message << "        volume original    = " << Volume(a) << endl;
+    message << "        volume prim        = " << Volume(b) << endl;
+    message << "        a.scale            = " << a.scale << endl;
+    message << "        b.scale            = " << b.scale << endl;
+    message << "        a.atoms.size()     = " << a.atoms.size() << endl;
+    message << "        b.atoms.size()     = " << b.atoms.size() << endl;
+    message << "        fraction           = " << fraction << endl;
+    message << "        supercell atoms    = " << fraction*b.atoms.size() << endl;
+    message << b << endl;
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"xstructure::GetPrimitive(void)",message,_RUNTIME_ERROR_);
   }
   // everything ok
   if(LDEBUG) cerr << soliloquy << " END [ok]=" << fraction_atoms << endl;  //CO20200201
   b.ClearSymmetry();  //CO20181226 - new structure, symmetry not calculated
+  b.primitive_calculated = TRUE; //DX20201007
   return b;
 
 }
@@ -12438,27 +12873,34 @@ xstructure GetPrimitiveSINGLE(const xstructure& _a,double tolerance) {  // APRIL
   // check !
   double fraction=Volume(a)/Volume(b);
   if(abs(b.atoms.size()*fraction-a.atoms.size())>0.1) {
-    cerr << "ERROR   xstructure xstructure::GetPrimitive(void)" << endl;
-    cerr << "        supercell has the wrong number of atoms" << endl;
-    cerr << "        volume original    = " << Volume(a) << endl;
-    cerr << "        volume prim        = " << Volume(b) << endl;
-    cerr << "        a.scale            = " << a.scale << endl;
-    cerr << "        b.scale            = " << b.scale << endl;
-    cerr << "        a.atoms.size()     = " << a.atoms.size() << endl;
-    cerr << "        b.atoms.size()     = " << b.atoms.size() << endl;
-    cerr << "        fraction           = " << fraction << endl;
-    cerr << "        supercell atoms    = " << fraction*b.atoms.size() << endl;
-    cerr << b << endl;
-    exit(0);
+    stringstream message;
+    message << "ERROR   xstructure xstructure::GetPrimitive(void)" << endl;
+    message << "        supercell has the wrong number of atoms" << endl;
+    message << "        volume original    = " << Volume(a) << endl;
+    message << "        volume prim        = " << Volume(b) << endl;
+    message << "        a.scale            = " << a.scale << endl;
+    message << "        b.scale            = " << b.scale << endl;
+    message << "        a.atoms.size()     = " << a.atoms.size() << endl;
+    message << "        b.atoms.size()     = " << b.atoms.size() << endl;
+    message << "        fraction           = " << fraction << endl;
+    message << "        supercell atoms    = " << fraction*b.atoms.size() << endl;
+    message << b << endl;
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"xstructure::GetPrimitiveSINGLE()",message,_RUNTIME_ERROR_);
   }
   // everything ok
   b.ClearSymmetry();  //CO20181226 - new structure, symmetry not calculated
+  b.primitive_calculated = TRUE; //DX20201007
   return b;
 }
 
 
 xstructure GetPrimitive1(const xstructure& a) {  // MARCH 2009
-  if(a.equiv_fpos_epsilon<1.0e-12) { cerr << "ERROR:  Zero tolerance in aflow_xatom.cpp: GetPrimitive1" << endl; exit(0);}
+  string function_name = XPID + "GetPrimitive1():";
+  stringstream message;
+  if(a.equiv_fpos_epsilon<1.0e-12) {
+    message << "Zero tolerance: " << a.equiv_fpos_epsilon;
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_VALUE_ILLEGAL_);
+  }
   double tolerance=a.equiv_fpos_epsilon;
 
   cout.setf(std::ios::fixed,std::ios::floatfield);
@@ -12577,20 +13019,21 @@ xstructure GetPrimitive1(const xstructure& a) {  // MARCH 2009
   // check !
   double fraction=Volume(a)/Volume(b);
   if(abs(b.atoms.size()*fraction-a.atoms.size())>0.1) {
-    cerr << "ERROR   xstructure xstructure::GetPrimitive(void)" << endl;
-    cerr << "        supercell has the wrong number of atoms" << endl;
-    cerr << "        volume original    = " << Volume(a) << endl;
-    cerr << "        volume prim        = " << Volume(b) << endl;
-    cerr << "        a.scale            = " << a.scale << endl;
-    cerr << "        b.scale            = " << b.scale << endl;
-    cerr << "        a.atoms.size()     = " << a.atoms.size() << endl;
-    cerr << "        b.atoms.size()     = " << b.atoms.size() << endl;
-    cerr << "        fraction           = " << fraction << endl;
-    cerr << "        supercell atoms    = " << fraction*b.atoms.size() << endl;
-    cerr << b << endl;
-    exit(0);
+    message << "ERROR   xstructure xstructure::GetPrimitive(void)" << endl;
+    message << "        supercell has the wrong number of atoms" << endl;
+    message << "        volume original    = " << Volume(a) << endl;
+    message << "        volume prim        = " << Volume(b) << endl;
+    message << "        a.scale            = " << a.scale << endl;
+    message << "        b.scale            = " << b.scale << endl;
+    message << "        a.atoms.size()     = " << a.atoms.size() << endl;
+    message << "        b.atoms.size()     = " << b.atoms.size() << endl;
+    message << "        fraction           = " << fraction << endl;
+    message << "        supercell atoms    = " << fraction*b.atoms.size() << endl;
+    message << b << endl;
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
   }
   // everything ok
+  b.primitive_calculated = TRUE; //DX20201007
   return b;
 }
 
@@ -12598,7 +13041,12 @@ xstructure GetPrimitive1(const xstructure& a) {  // MARCH 2009
 
 // second try
 xstructure GetPrimitive2(const xstructure& a) {
-  if(a.equiv_fpos_epsilon<1.0e-12) { cerr << "ERROR:  Zero tolerance in aflow_xatom.cpp: GetPrimitive2" << endl; exit(0);}
+  string function_name = XPID + "GetPrimitive2():";
+  stringstream message;
+  if(a.equiv_fpos_epsilon<1.0e-12) {
+    message << "Zero tolerance: " << a.equiv_fpos_epsilon;
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_VALUE_ILLEGAL_);
+  }
   double tolerance=a.equiv_fpos_epsilon;
 
   cout.setf(std::ios::fixed,std::ios::floatfield);
@@ -12619,7 +13067,7 @@ xstructure GetPrimitive2(const xstructure& a) {
   //  cerr << sstr.scale << endl;
   sstr=BringInCell(sstr);
   // cerr << sstr.scale << endl;
-  // exit(0);
+  // throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Throw for debugging purposes.",_GENERIC_ERROR_);
   string title=sstr.title;
   int i;
   for(uint iat=0;iat<sstr.num_each_type.size();iat++) {
@@ -12758,7 +13206,7 @@ xstructure GetPrimitive2(const xstructure& a) {
     cerr << "        supercell atoms    = " << fraction*b.atoms.size() << endl;
     cerr << GetVol(b.lattice) << endl;
     cerr << GetVol(a.lattice) << endl;
-    //   exit(0);
+    //   throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"xstructure::GetPrimitive():","Throw for debugging purposes.",_GENERIC_ERROR_);
   }
   // rescale back to original scale.
   b=ReScale(b,a.scale);
@@ -12767,12 +13215,18 @@ xstructure GetPrimitive2(const xstructure& a) {
   // Put everything in new primitive cell.
   b=BringInCell(b);
   // everything ok
+  b.primitive_calculated = TRUE; //DX20201007
   return b;
 }
 
 // third try
 xstructure GetPrimitive3(const xstructure& a) {
-  if(a.equiv_fpos_epsilon<1.0e-12) { cerr << "ERROR:  Zero tolerance in aflow_xatom.cpp: GetPrimitive3" << endl; exit(0);}
+  string function_name = XPID + "GetPrimitive3():";
+  stringstream message;
+  if(a.equiv_fpos_epsilon<1.0e-12) {
+    message << "Zero tolerance: " << a.equiv_fpos_epsilon;
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_VALUE_ILLEGAL_);
+  }
   double tolerance=a.equiv_fpos_epsilon;
 
   cout.setf(std::ios::fixed,std::ios::floatfield);
@@ -12896,20 +13350,21 @@ xstructure GetPrimitive3(const xstructure& a) {
   // check !
   double fraction=Volume(a)/Volume(b);
   if(abs(b.atoms.size()*fraction-a.atoms.size())>0.1) {
-    cerr << "ERROR   xstructure xstructure::GetPrimitive(void)" << endl;
-    cerr << "        supercell has the wrong number of atoms" << endl;
-    cerr << "        volume original    = " << Volume(a) << endl;
-    cerr << "        volume prim        = " << Volume(b) << endl;
-    cerr << "        a.scale            = " << a.scale << endl;
-    cerr << "        b.scale            = " << b.scale << endl;
-    cerr << "        a.atoms.size()     = " << a.atoms.size() << endl;
-    cerr << "        b.atoms.size()     = " << b.atoms.size() << endl;
-    cerr << "        fraction           = " << fraction << endl;
-    cerr << "        supercell atoms    = " << fraction*b.atoms.size() << endl;
-    cerr << b << endl;
-    exit(0);
+    message << "ERROR   xstructure xstructure::GetPrimitive(void)" << endl;
+    message << "        supercell has the wrong number of atoms" << endl;
+    message << "        volume original    = " << Volume(a) << endl;
+    message << "        volume prim        = " << Volume(b) << endl;
+    message << "        a.scale            = " << a.scale << endl;
+    message << "        b.scale            = " << b.scale << endl;
+    message << "        a.atoms.size()     = " << a.atoms.size() << endl;
+    message << "        b.atoms.size()     = " << b.atoms.size() << endl;
+    message << "        fraction           = " << fraction << endl;
+    message << "        supercell atoms    = " << fraction*b.atoms.size() << endl;
+    message << b << endl;
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
   }
   // everything ok
+  b.primitive_calculated = TRUE; //DX20201007
   return b;
 }
 
@@ -12945,6 +13400,24 @@ void xstructure::GetPrimitive3(void) {
 }
 
 // ***************************************************************************
+// Function GetPrimitiveStructures() //DX20201006
+// ***************************************************************************
+void GetPrimitiveStructures(vector<xstructure>& structures, uint start_index, uint end_index){
+
+  // Converts a set of xstructures to their primitive representation
+  // Optional indices can be included; useful for pre-distributed
+  // threading schemes
+  // Default: run over entire range
+
+  // if end index is greater than structures.size(), then compute primitive cell for all structures
+  if(end_index > structures.size()){ end_index=structures.size(); }
+
+  for(uint i=start_index;i<end_index;i++){
+    structures[i].GetPrimitive();
+  }
+}
+
+// ***************************************************************************
 // Function MinDist
 // ***************************************************************************
 double xstructure::MinDist(void) {
@@ -12953,12 +13426,134 @@ double xstructure::MinDist(void) {
 }
 
 // ***************************************************************************
+// Function NearestNeighbor() // moved from aflow_xproto.cpp
+// ***************************************************************************
+double NearestNeighbor(const xstructure &str_in) {
+  return SYM::minimumDistance(str_in);
+  //[CO20171024 OBSOLETE]xstructure str(str_in);
+  //[CO20171024 OBSOLETE]// if(LDEBUG) { cerr << "NearestNeighbor 1" << endl; }
+  //[CO20171024 OBSOLETE]// if(LDEBUG) { cerr << str.scale << endl; }
+  //[CO20171024 OBSOLETE]str.ReScale(1.0);
+  //[CO20171024 OBSOLETE]xvector<int> ndims(3);
+  //[CO20171024 OBSOLETE]// str.neighbors_radius=RadiusSphereLattice(str.lattice);
+  //[CO20171024 OBSOLETE]// str.neighbors_radius=max(modulus(str.lattice(1)),modulus(str.lattice(2)),modulus(str.lattice(3)));
+  //[CO20171024 OBSOLETE]// ndims=LatticeDimensionSphere(str.lattice,str.neighbors_radius);
+  //[CO20171024 OBSOLETE]ndims[1]=ndims[2]=ndims[3]=1;
+  //[CO20171024 OBSOLETE]deque<_atom> vatoms;
+  //[CO20171024 OBSOLETE]_atom atom;
+  //[CO20171024 OBSOLETE]// if(LDEBUG) { cerr << "NearestNeighbor 2" << endl; }
+  //[CO20171024 OBSOLETE]for(int i=-ndims[1];i<=ndims[1];i++) {
+  //[CO20171024 OBSOLETE]  for(int j=-ndims[2];j<=ndims[2];j++) {
+  //[CO20171024 OBSOLETE]    for(int k=-ndims[3];k<=ndims[3];k++) {
+  //[CO20171024 OBSOLETE]for(uint iat=0;iat<str.atoms.size();iat++) {
+  //[CO20171024 OBSOLETE]  atom=str.atoms.at(iat);
+  //[CO20171024 OBSOLETE]  atom.cpos=atom.cpos+i*str.lattice(1)+j*str.lattice(2)+k*str.lattice(3);
+  //[CO20171024 OBSOLETE]  vatoms.push_back(atom);
+  //[CO20171024 OBSOLETE]}
+  //[CO20171024 OBSOLETE]    }
+  //[CO20171024 OBSOLETE]  }
+  //[CO20171024 OBSOLETE]}
+  //[CO20171024 OBSOLETE]double nndist=RadiusSphereLattice(str.lattice);
+  //[CO20171024 OBSOLETE]for(uint i=0;i<vatoms.size();i++) {
+  //[CO20171024 OBSOLETE]  for(uint j=0;j<vatoms.size();j++) {
+  //[CO20171024 OBSOLETE]    if(i!=j)
+  //[CO20171024 OBSOLETE]if(modulus(vatoms.at(i).cpos-vatoms.at(j).cpos) < nndist) nndist=modulus(vatoms.at(i).cpos-vatoms.at(j).cpos);
+  //[CO20171024 OBSOLETE]  }
+  //[CO20171024 OBSOLETE]}
+  //[CO20171024 OBSOLETE]return nndist;
+}
+
+// ***************************************************************************
+// Function NearestNeighbors() //DX20201230 - moved from XtalFinder 
+// ***************************************************************************
+vector<double> NearestNeighbors(const xstructure& xstr){
+
+  // Determine the nearest neighbor distances centered on each atom
+  // of the structure (needed for XtalFinder)
+
+  vector<double> all_nn_distances;
+  double nn = AUROSTD_MAX_DOUBLE;
+
+  for(uint i=0;i<xstr.atoms.size();i++){
+    nn = NearestNeighborToAtom(xstr,i);
+    all_nn_distances.push_back(nn);
+  }
+  return all_nn_distances;
+}
+
+// ***************************************************************************
+// Function NearestNeighborToAtom() //DX20201230 - moved from XtalFinder
+// ***************************************************************************
+double NearestNeighborToAtom(const xstructure& xstr, uint k) {
+
+  // Find the minimum interatomic distance in the structure to atom k
+  // Different than SYM::minimumDistance(): only considers one atom index
+  // in minimization routine, as opposed to global minimimum
+  // (considering one atom only affords speed ups)
+  // Use resetLatticeDimension() to update search radius for nearest
+  // neighbors: once we find a neighbor, update/reduce how far we
+  // need to search to find a closer neighbor
+
+  double min_dist=AUROSTD_MAX_DOUBLE;
+  double prev_min_dist=0; //DX20190716
+  xmatrix<double> lattice = xstr.lattice; //NEW
+
+  //DX speed increase
+  //perhaps can speed up even more, since the lattice doesn't change for the xstr...
+  vector<xvector<double> > l1, l2, l3;
+  vector<int> a_index, b_index, c_index;
+  xvector<int> dims(3); //DX20190710 - use robust method
+  dims[1]=dims[2]=dims[3]=0; //reset
+
+  xvector<double> tmp_coord, incell_dist, a_component, ab_component; //DX20200329
+  double incell_mod=AUROSTD_MAX_DOUBLE;
+
+  uint ii=0, m=0, n=0, p=0, m_size=0, n_size=0, p_size=0;
+
+  for(ii=0; ii<xstr.atoms.size(); ii++){
+    if(ii!=k){
+      if(min_dist<prev_min_dist){
+        if(!(dims[1]==1 && dims[2]==1 && dims[3]==1)){
+          // update the dimensions based on new search radius (min_dist)
+          resetLatticeDimensions(lattice,min_dist,dims,l1,l2,l3,a_index,b_index,c_index);
+          prev_min_dist=min_dist;
+          m_size = l1.size(); n_size = l2.size(); p_size = l3.size();
+        }
+      }
+      incell_dist = xstr.atoms[k].cpos-xstr.atoms[ii].cpos;
+      incell_mod = aurostd::modulus(incell_dist);
+      if(incell_mod<min_dist){
+        if(!(dims[1]==1 && dims[2]==1 && dims[3]==1)){
+          // update the dimensions based on new search radius (incell_mod)
+          resetLatticeDimensions(lattice,incell_mod,dims,l1,l2,l3,a_index,b_index,c_index);
+          m_size = l1.size(); n_size = l2.size(); p_size = l3.size();
+        }
+        prev_min_dist=incell_mod;
+      }
+      //DX20180423 - running vector in each loop saves computations; fewer duplicate operations
+      for(m=0;m<m_size;m++){
+        a_component = incell_dist + l1[m];    //DX : coord1-coord2+a*lattice(1)
+        for(n=0;n<n_size;n++){
+          ab_component = a_component + l2[n]; //DX : coord1-coord2+a*lattice(1) + (b*lattice(2))
+          for(p=0;p<p_size;p++){
+            tmp_coord = ab_component + l3[p]; //DX : coord1-coord2+a*lattice(1) + (b*lattice(2)) + (c*lattice(3))
+            min_dist=aurostd::min(min_dist,aurostd::modulus(tmp_coord));
+          }
+        }
+      }
+    }
+  }
+
+  return min_dist;
+}
+
+// ***************************************************************************
 // Function ReScale
 // ***************************************************************************
 xstructure ReScale(const xstructure& a, const double &in_scale) {
   // This resets scale and changes the cell parameters and coordinates
   // appropriately.  Keeps volume fixed.
-  if(in_scale==0.0) {cerr << "structure::ReScale in_scale must be non zero" << endl;exit(0);}
+  if(in_scale==0.0) {throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"ReScale()","in_scale must be non zero",_INPUT_ILLEGAL_);}
   xstructure b(a);
   if(aurostd::identical(b.scale,in_scale,_ZERO_TOL_)){return b;}  //try hard not to introduce precision errors, currently we print scale with precision 6
   b.lattice=b.lattice*b.scale/in_scale;
@@ -12988,7 +13583,7 @@ xstructure ReScale(const xstructure& a, const double &in_scale) {
 }
 
 void xstructure::ReScale(const double &in_scale) {
-  if(in_scale==0.0) {cerr << "structure::ReScale in_scale must be non zero" << endl;exit(0);}
+  if(in_scale==0.0) {throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"ReScale()","in_scale must be non zero",_INPUT_ILLEGAL_);}
   if(aurostd::identical(scale,in_scale,_ZERO_TOL_)){return;}  //try hard not to introduce precision errors, currently we print scale with precision 6
   lattice=lattice*scale/in_scale;
   origin=origin*scale/in_scale;
@@ -13018,14 +13613,14 @@ void xstructure::ReScale(const double &in_scale) {
 // Function SetScale
 // ***************************************************************************
 void xstructure::SetScale(const double &in_scale) {
-  if(in_scale==0.0) { cerr << _AUROSTD_XLIBS_ERROR_ << "structure::SetScale in_scale must be non zero" << endl;exit(0);}
+  if(in_scale==0.0) {throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"SetScale()","in_scale must be non zero",_INPUT_ILLEGAL_);}
   scale=in_scale;
   FixLattices();  // touched scale, then fix the lattices
 }
 
 xstructure SetScale(const xstructure& a,const double &in_scale) {
   // This resets scale.  Keeps volume fixed.
-  if(in_scale==0.0) { cerr << _AUROSTD_XLIBS_ERROR_ << "structure::SetScale in_scale must be non zero" << endl;exit(0);}
+  if(in_scale==0.0) {throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"SetScale()","in_scale must be non zero",_INPUT_ILLEGAL_);}
   xstructure b;b=a;
   b.scale=in_scale;
   b.FixLattices();  // touched scale, then fix the lattices
@@ -13046,7 +13641,6 @@ void xstructure::UpdateCartesianCoordinates()
 // Function SetVolume
 // ***************************************************************************
 void xstructure::SetVolume(const double &in_volume) {
-  //[CO20200201]if(in_volume==0.0) { cerr << _AUROSTD_XLIBS_ERROR_ << "structure::SetVolume in_scale must be non zero" << endl;exit(0);}
   if(in_volume==0.0){throw aurostd::xerror(_AFLOW_FILE_NAME_,"SetVolume()","in_scale must be non zero",_INPUT_ILLEGAL_);} //CO20200201
   if(det(lattice)<0.0){ //CO20200201
     stringstream message; //CO20200201
@@ -13061,7 +13655,6 @@ xstructure SetVolume(const xstructure& a,const double &in_volume) {
   xstructure b(a);
   b.SetVolume(in_volume);
   return b;
-  //[CO20200201 OBSOLETE]//[CO20200201]if(in_volume==0.0) { cerr << _AUROSTD_XLIBS_ERROR_ << "structure::SetVolume in_volume must be non zero" << endl;exit(0);}
   //[CO20200201 OBSOLETE]if(in_volume==0.0){throw aurostd::xerror(_AFLOW_FILE_NAME_,"SetVolume()","in_scale must be non zero",_INPUT_ILLEGAL_);} //CO20200201
   //[CO20200201 OBSOLETE]xstructure b;b=a;
   //[CO20200201 OBSOLETE]if(det(b.lattice)<0.0){ //CO20200201
@@ -13135,7 +13728,7 @@ void xstructure::SetAutoVolume(bool use_AFLOW_defaults_in) {  //CO20191010
 // Function InflateLattice
 // ***************************************************************************
 void xstructure::InflateLattice(const double &coefficient) {
-  if(coefficient==0.0) { cerr << _AUROSTD_XLIBS_ERROR_ << "structure::InflateLattice coefficient must be non zero" << endl;exit(0);}
+  if(coefficient==0.0) {throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"xstructure::InflateLattice()","coefficient must be non zero.",_INPUT_ILLEGAL_);}
   //  scale=coefficient*scale;
   lattice=coefficient*lattice;
   FixLattices();  // touched scale/lattice, then fix the lattices
@@ -13143,7 +13736,7 @@ void xstructure::InflateLattice(const double &coefficient) {
 
 xstructure InflateLattice(const xstructure& a,const double &coefficient) {
   // This resets scale.  Keeps volume fixed.
-  if(coefficient==0.0) { cerr << _AUROSTD_XLIBS_ERROR_ << "structure::InflateLattice coefficient must be non zero" << endl;exit(0);}
+  if(coefficient==0.0) {throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"xstructure::InflateLattice()","coefficient must be non zero.",_INPUT_ILLEGAL_);}
   xstructure b;b=a;
   //  b.scale=coefficient*b.scale;
   b.lattice=coefficient*b.lattice;
@@ -13155,7 +13748,7 @@ xstructure InflateLattice(const xstructure& a,const double &coefficient) {
 // Function InflateVolume
 // ***************************************************************************
 void xstructure::InflateVolume(const double &coefficient) {
-  if(coefficient==0.0) { cerr << _AUROSTD_XLIBS_ERROR_ << "structure::InflateVolume in_scale must be non zero" << endl;exit(0);}
+  if(coefficient==0.0) {throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"xstructure::InflateVolume()","coefficient must be non zero",_INPUT_ILLEGAL_);}
   // scale=std::pow((double) coefficient,(double) 1/3)*scale;
   lattice=std::pow((double) coefficient,(double) 1/3)*lattice;
   FixLattices();  // touched scale/lattice, then fix the lattices
@@ -13163,7 +13756,7 @@ void xstructure::InflateVolume(const double &coefficient) {
 }
 
 xstructure InflateVolume(const xstructure& a,const double &coefficient) {
-  if(coefficient==0.0) { cerr << _AUROSTD_XLIBS_ERROR_ << "structure::InflateVolume coefficient must be non zero" << endl;exit(0);}
+  if(coefficient==0.0) {throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"xstructure::InflateVolume()","coefficient must be non zero",_INPUT_ILLEGAL_);}
   xstructure b;b=a;
   //  b.scale=std::pow((double) coefficient,(double) 1/3)*b.scale;
   b.lattice=std::pow((double) coefficient,(double) 1/3)*b.lattice;
@@ -13245,33 +13838,30 @@ bool uniqueAtomInCell(_atom& atom, deque<_atom>& atoms){
 // ***************************************************************************
 // atomInCell() 
 // ***************************************************************************
-bool atomInCell(const _atom& atom, double tolerance){ 
+bool atomInCell(const _atom& atom, double tolerance, double upper_bound, double lower_bound) { //ME+DX20210203 - added bounds
 
   // check if the atom is in the unit cell based on fractional coordinates
   // if you use the non-default tolerance (i.e., _ZERO_TOL_), this alone is not robust 
-  // and should be used in tandem with SYM::MapAtom() to account for periodic boundary conditions
-  // filtering with this function with soft cutoffs before MapAtom() is faster, 
-  // especially if there are many atoms to check (e.g., 20,000)
   // Note: check over each component and returning false immediately (faster)
 
-  return inCell(atom.fpos, tolerance);
+  return inCell(atom.fpos, tolerance, upper_bound, lower_bound);
 
 }
 
 // ***************************************************************************
 // inCell() 
 // ***************************************************************************
-bool inCell(const xvector<double>& pos_vec, double tolerance){ 
+// ME20210128 - Added bounds
+bool inCell(const xvector<double>& pos_vec, double tolerance, double upper_bound, double lower_bound) {
 
   // check if the position is in the unit cell based on fractional coordinates
   // if you use the non-default tolerance (i.e., _ZERO_TOL_), this alone is not robust 
-  // and should be used in tandem with SYM::MapAtom() to account for periodic boundary conditions
-  // filtering with this function with soft cutoffs before MapAtom() is faster, 
-  // especially if there are many positions to check (e.g., 20,000)
   // Note: check over each component and returning false immediately (faster)
 
   for(uint f=1;f<4;f++){
-    if(pos_vec[f] > 1.0+tolerance || pos_vec[f] < -tolerance){ //allows tunable cutoff
+    // ME20210128: Used to be pos_vec[f] > 1.0 + tolerance.
+    // Adjusted to use the same cut-off criterion as bringInCell
+    if((pos_vec[f] - upper_bound) >= -tolerance || (pos_vec[f] - lower_bound) < -tolerance){ //allows tunable cutoff
       return false;
     }
   }
@@ -13325,7 +13915,7 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
   string soliloquy = XPID + "GetSuperCell():";
   stringstream message;
   double vol_supercell=det(supercell);
-  if(abs(vol_supercell)<0.001){message << "Singular supercell matrix";throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_);} //exit(0)
+  if(abs(vol_supercell)<0.001){message << "Singular supercell matrix";throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_);}
   xstructure a(aa); a.ReScale(1.0); //the nuclear option, the only way not to mess around with scale EVERYWHERE
   //DO NOT MODIFY STRUCTURE IN HERE, WE WANT TO PROPAGATE SYMMETRY FROM PRIMITIVE STRUCTURE!
   //a.BringInCell();
@@ -13645,7 +14235,6 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
     message << a.lattice << endl;
 
     throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_RUNTIME_ERROR_);
-    //exit(0);
   }
 
   bool pretend_uniform=false;//true;  //CO TEST, REMOVE ME
@@ -13786,7 +14375,7 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
                 //if(!SYM::getFullSymBasis(b.atoms,b.lattice,b.c2f,b.f2c,fSymOp,TRUE,skew,b.sym_eps,fSymOp.basis_atoms_map,fSymOp.basis_types_map)) {
                 //cerr << "Unable to find atom/types basis for fgroup" << endl;
                 //cerr << fSymOp << endl;
-                //exit(0);
+                //throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Throw for debugging purposes.",_GENERIC_ERROR_);
                 //KRUN = FALSE;
                 //}
                 fSymOp.basis_map_calculated=KRUN;
@@ -13899,7 +14488,7 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
               //if(!SYM::getFullSymBasis(b_atoms,b.lattice,b.c2f,b.f2c,aSymOp,TRUE,skew,b.sym_eps,aSymOp.basis_atoms_map,aSymOp.basis_types_map)) {
               //cerr << "Unable to find atom/types basis for agroup" << endl;
               //cerr << aSymOp << endl;
-              //exit(0);
+              //throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Throw for debugging purposes.",_GENERIC_ERROR_);
               //KRUN = FALSE;
               //}
               aSymOp.basis_map_calculated=KRUN;
@@ -13918,9 +14507,7 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
             }
           }
           //KRUN = FALSE;
-          //cerr << "Unable to propagate site symmetry to equivalent atoms." << endl;
-          //cerr << "Unable to propagate site symmetry to equivalent atoms. Exiting." << endl;
-          //exit(0);
+          //throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unable to propagate site symmetry to equivalent atoms.",_RUNTIME_ERROR_);
         } else {
           //can be faster than procedure above because there are MANY fgroups
           KRUN = KRUN && SYM::CalculateSitePointGroup(FileMESSAGE,b,1,aflags,_write_,osswrite,oss);  //we already know get_full_basis==FALSE, so don't waste time calculating for eatoms
@@ -13973,8 +14560,6 @@ xstructure GetSuperCell(const xstructure& a, const xvector<double>& supercell,ve
     _supercell(1,1)=supercell(1);_supercell(2,2)=supercell(2);_supercell(3,3)=supercell(3);
     return GetSuperCell(a,_supercell,sc2pcMap,pc2scMap,get_symmetry,get_full_basis,force_supercell_matrix,force_strict_pc2scMap); //DX20190319 - added force_supercell_matrix  //CO20190409 - added force_strict_pc2scMap
   }
-  //[CO20190520 -OBSOLETE]cerr << "GetSuperCell - vector must have 9 or 3 elements" << endl;
-  //[CO20190520 -OBSOLETE]exit(0);
   string soliloquy = XPID + "GetSuperCell():";
   stringstream message;
   message << "Matrix must have 9 or 3 elements";
@@ -13996,8 +14581,6 @@ xstructure GetSuperCell(const xstructure& a, const xvector<int>& supercell,vecto
     _supercell(1,1)=supercell(1);_supercell(2,2)=supercell(2);_supercell(3,3)=supercell(3);
     return GetSuperCell(a,_supercell,sc2pcMap,pc2scMap,get_symmetry,get_full_basis,force_supercell_matrix,force_strict_pc2scMap); //DX20190319 - added force_supercell_matrix  //CO20190409 - added force_strict_pc2scMap
   }
-  //[CO20190520 -OBSOLETE]cerr << "GetSuperCell - vector must have 9 or 3 elements" << endl;
-  //[CO20190520 -OBSOLETE]exit(0);
   string soliloquy = XPID + "GetSuperCell():";
   stringstream message;
   message << "Matrix must have 9 or 3 elements";
@@ -14492,6 +15075,36 @@ void CalculateSymmetryPointGroupKPatterson(xstructure& str) {
 }
 
 // ***************************************************************************
+// Function fixEmptyAtomNames()
+// ***************************************************************************
+void xstructure::fixEmptyAtomNames(bool force_fix){
+  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  string soliloquy=XPID+"xstructure::fixEmptyAtomNames():";
+  if(species.size()==species_pp.size()) { //CO20190218
+    for(uint itype=0;itype<species.size();itype++) {
+      if((force_fix || species.at(itype)=="") && species_pp.at(itype)!=""){
+        if(LDEBUG) {cerr << soliloquy << " species_pp.at(" << itype << ")=" << species_pp.at(itype) << endl;}
+        species.at(itype)=species_pp.at(itype); //KBIN::VASP_PseudoPotential_CleanName(species_pp.at(itype));  //CO20181226 KEEP PP INFO if available (auto aflow.in)
+      }
+    }
+  }  // cormac I`ll write a short pflow for this stuff
+  if(species.size()==num_each_type.size()){
+    int iatom=0;
+    for(uint itype=0;itype<num_each_type.size();itype++) {
+      string s=string(species.at(itype));
+      species.at(itype)=s;
+      for(int j=0;j<num_each_type.at(itype);j++) {
+        atoms.at(iatom).name=s;    // CONVASP_MODE
+        atoms.at(iatom).CleanName();
+        atoms.at(iatom).CleanSpin();
+        atoms.at(iatom).name_is_given=TRUE;
+        iatom++;
+      }
+    }
+  }
+}
+
+// ***************************************************************************
 // Function buildGenericTitle()
 // ***************************************************************************
 void xstructure::buildGenericTitle(bool vasp_input,bool force_fix){
@@ -14692,26 +15305,58 @@ string xstructure::platon2print(bool P_EQUAL,bool P_EXACT,double P_ang,double P_
   return oss.str();
 }
 
+// ***************************************************************************
+// Function DecorateWithElements()
+// ***************************************************************************
+void xstructure::DecorateWithElements(void) {
+
+  // Apply an element to each atom type.
+  // Elements are first alphabetized to follow the AFLOW convention
+
+  string function_name = XPID + "xstructure::DecorateWithElements():";
+
+  // elements need to be alphabetic for AFLOW
+  deque<string> elements;
+  for(uint i=0;i<velement.size();i++){ elements.push_back(velement[i].symbol); } // from xelement
+  std::stable_sort(elements.begin(), elements.end());
+
+  // update species and atom names;
+  SetSpecies(elements);
+
+  //DX20200727 [OBSOLETE] int iatom=0;
+  //DX20200727 [OBSOLETE] for(uint itype=0;itype<num_each_type.size();itype++)
+  //DX20200727 [OBSOLETE]   for(int j=0;j<num_each_type.at(itype);j++) {
+  //DX20200727 [OBSOLETE]     //    if(atoms.at(iatom).name_is_given==FALSE)
+  //DX20200727 [OBSOLETE]     {
+  //DX20200727 [OBSOLETE]       atoms.at(iatom).name=vatom_symbol[2+atoms.at(iatom).type];
+  //DX20200727 [OBSOLETE]       if(atoms.at(iatom).type==0) atoms.at(iatom).name="Ag"; // works....
+  //DX20200727 [OBSOLETE]       //	if(atoms.at(iatom).type==1) atoms.at(iatom).name="Au"; // works....
+  //DX20200727 [OBSOLETE]       atoms.at(iatom).CleanName();
+  //DX20200727 [OBSOLETE]       //DX20170921 - Need to keep spin info atoms.at(iatom).CleanSpin();
+  //DX20200727 [OBSOLETE]       atoms.at(iatom).name_is_given=TRUE;
+  //DX20200727 [OBSOLETE]     }
+  //DX20200727 [OBSOLETE]     iatom++;
+  //DX20200727 [OBSOLETE]   }
+}
 
 // ***************************************************************************
-// Function FakeNames
+// xstructure::DecorateWithFakeElements() //DX20200724
 // ***************************************************************************
-void xstructure::FakeNames(void) {
-  // fix names
-  int iatom=0;
-  for(uint itype=0;itype<num_each_type.size();itype++)
-    for(int j=0;j<num_each_type.at(itype);j++) {
-      //    if(atoms.at(iatom).name_is_given==FALSE)
-      {
-        atoms.at(iatom).name=vatom_symbol[2+atoms.at(iatom).type];
-        if(atoms.at(iatom).type==0) atoms.at(iatom).name="Ag"; // works....
-        //	if(atoms.at(iatom).type==1) atoms.at(iatom).name="Au"; // works....
-        atoms.at(iatom).CleanName();
-        //DX20170921 - Need to keep spin info atoms.at(iatom).CleanSpin();
-        atoms.at(iatom).name_is_given=TRUE;
-      }
-      iatom++;
-    }
+void xstructure::DecorateWithFakeElements(){
+
+  // Apply a fake letter to each atom type.
+  // Using letters (not elements) to avoid confusion with real materials
+  // i.e., prototype vs material
+  // In the case of compounds with more
+  // than 26 species it is necessary to add more characters to this string
+
+  string function_name = XPID + "xstructure::DecorateWithFakeElements():";
+
+  // get fake elements
+  vector<string> fake_elements = pflow::getFakeElements(num_each_type.size());
+
+  // update species atom names;
+  SetSpecies(aurostd::vector2deque(fake_elements));
 }
 
 // ***************************************************************************
@@ -14728,7 +15373,7 @@ string xstructure::platon2sg(bool P_EQUAL,bool P_EXACT,double P_ang,double P_d1,
   string output;
   vector<string> space_group;
   aurostd::DirectoryMake(directory);
-  str.FakeNames();
+  str.DecorateWithElements(); //DX20200727 - FakeNames() -> DecorateWithElements();
   aus << str.platon2print(P_EQUAL,P_EXACT,P_ang,P_d1,P_d2,P_d3);
   aurostd::stringstream2file(aus,file_spf);aus.clear();aus.str(std::string());
   aus << "cd " << directory << endl;
@@ -14854,40 +15499,135 @@ string xstructure::findsym2print(double tolerance) {
 // We can evalutate the R_0 terms by simply mulitplying by
 // a matrix.  Then we must add q to all the final cartesian
 // positions.
+
+// ---------------------------------------------------------------------------
+// returns new xstructure (makes a copy)
 xstructure Rotate(const xstructure&a, const xmatrix<double>& rm) {
+  xstructure xstr_rotated = a;
+  xstr_rotated.Rotate(rm);
+  return xstr_rotated;
+}
+
+// ---------------------------------------------------------------------------
+// modifies in-place (efficient)
+void xstructure::Rotate(const xmatrix<double>& rm) {
   bool LDEBUG=(FALSE || XHOST.DEBUG); //CO20190520
-  string soliloquy = XPID + "Rotate():"; //CO20190520
+  string soliloquy = XPID + "xstructure::Rotate():"; //CO20190520
   if(LDEBUG) { //CO20190520
-    cerr << soliloquy << " a=" << endl;cerr << a << endl; //CO20190520
-    cerr << soliloquy << " a.origin=" << a.origin << endl; //CO20190520
+    cerr << soliloquy << " (*this)=" << endl;cerr << (*this) << endl; //CO20190520
+    cerr << soliloquy << " (*this).origin=" << (*this).origin << endl; //CO20190520
     cerr << soliloquy << " rm=" << endl;cerr << rm << endl; //ME20200204
   }
-  if (aurostd::isidentity(rm)) return a;  //ME20200204 - no need to go through all the motions for identity matrix
+  if (aurostd::isidentity(rm)) return;  //ME20200204 - no need to go through all the motions for identity matrix
   // Get R_0(p) for all cartesian positions.
-  xstructure b(a);
   xmatrix<double> nlattice(3,3);
-  nlattice=trasp(a.lattice);
-  b.lattice=trasp(rm*nlattice);
-  b.FixLattices();  //CO20190409 - so we don't need to keep redefining f2c/c2f
-  const xmatrix<double>& f2c=b.f2c; //CO20190520
-  const xmatrix<double>& c2f=b.c2f; //CO20190520
-  for(int ia=0;ia<(int)b.atoms.size();ia++){b.atoms.at(ia).cpos=f2c*b.atoms.at(ia).fpos;}  //CO20190409 - so we don't need to keep redefining f2c/c2f
+  nlattice=trasp((*this).lattice);
+  (*this).lattice=trasp(rm*nlattice);
+  (*this).FixLattices();  //CO20190409 - so we don't need to keep redefining f2c/c2f
+  const xmatrix<double>& f2c=(*this).f2c; //CO20190520
+  const xmatrix<double>& c2f=(*this).c2f; //CO20190520
+  uint natoms = (*this).atoms.size(); //DX+ME20210111 - set variable to optimize for-loops
+  //DX+ME20210111 [OBSOLETE - consolidate into one for-loop, below] for(uint ia=0;ia<natoms;ia++){(*this).atoms[ia].cpos=f2c*(*this).atoms[ia].fpos;}  //CO20190409 - so we don't need to keep redefining f2c/c2f
   //[CO20190409 - OBSOLETE]for(int ia=0;ia<(int)b.atoms.size();ia++)
   //[CO20190409 - OBSOLETE]  b.atoms.at(ia).cpos=F2C(b.lattice,b.atoms.at(ia).fpos);
   //Get R_0(q)
   xvector<double> r_orig(3);
-  r_orig=rm*b.origin;
+  r_orig=rm*(*this).origin;
   // Assign new cartesian positions
-  for(int ia=0;ia<(int)b.atoms.size();ia++){b.atoms.at(ia).cpos+=(-r_orig+b.origin);}
-  //[CO20190409 - OBSOLETE]for(int ia=0;ia<(int)b.atoms.size();ia++)
-  //[CO20190409 - OBSOLETE]  b.atoms.at(ia).cpos=b.atoms.at(ia).cpos-r_orig+b.origin;
+  //DX+ME20210111 [OBSOLETE - consolidate into one for-loop, below] for(uint ia=0;ia<natoms;ia++){(*this).atoms[ia].cpos+=(-r_orig+(*this).origin);}
   // Get all the direct coords.
-  for(int ia=0;ia<(int)b.atoms.size();ia++){b.atoms.at(ia).fpos=c2f*b.atoms.at(ia).cpos;}  //CO20190409 - so we don't need to keep redefining f2c/c2f
+  //DX+ME20210111 [OBSOLETE - consolidate into one for-loop, below] for(uint ia=0;ia<natoms;ia++){(*this).atoms[ia].fpos=c2f*(*this).atoms[ia].cpos;}  //CO20190409 - so we don't need to keep redefining f2c/c2f
+  for(uint ia=0;ia<natoms;ia++){ //DX+ME20210111 consolidate into one for-loop
+    (*this).atoms[ia].cpos=f2c*(*this).atoms[ia].fpos;
+    (*this).atoms[ia].cpos+=(-r_orig+(*this).origin);
+    (*this).atoms[ia].fpos=c2f*(*this).atoms[ia].cpos;
+  }
   //[CO20190409 - OBSOLETE]for(int ia=0;ia<(int)b.atoms.size();ia++)
   //[CO20190409 - OBSOLETE]  b.atoms.at(ia).fpos=C2F(b.lattice,b.atoms.at(ia).cpos);
-  return b;
+  return;
 }
 
+// ***************************************************************************
+// GetRotationMatrix // moved from pflow
+// ***************************************************************************
+// This gets a rotation matrix from 3 angles assumed
+// to represent a rotation around x, then y, then z.
+// Angles are assumed to be in radians.
+aurostd::matrix<double> GetRotationMatrix(const vector<double>& angles) {  //CO20200404 pflow::matrix()->aurostd::matrix()
+  // Sin and cos.
+  vector<double> sn(3,0.0);
+  vector<double> cs(3,0.0);
+  for(int ic=0;ic<3;ic++) {
+    sn[ic]=sin(angles[ic]);
+    cs[ic]=cos(angles[ic]);
+  }
+  // Set rotation matrix (do x, then y, then z rotation).
+  aurostd::matrix<double> xm(3,3);pflow::VVset(xm,0.0);  //CO20200404 pflow::matrix()->aurostd::matrix()
+  aurostd::matrix<double> ym(3,3);pflow::VVset(ym,0.0);  //CO20200404 pflow::matrix()->aurostd::matrix()
+  aurostd::matrix<double> zm(3,3);pflow::VVset(zm,0.0);  //CO20200404 pflow::matrix()->aurostd::matrix()
+
+  xm[0][0]=1;
+  xm[1][1]=cs[0];
+  xm[1][2]=-sn[0];
+  xm[2][1]=sn[0];
+  xm[2][2]=cs[0];
+
+  ym[0][0]=cs[1];
+  ym[0][2]=sn[1];
+  ym[1][1]=1;
+  ym[2][0]=-sn[1];
+  ym[2][2]=cs[1];
+
+  zm[0][0]=cs[2];
+  zm[0][1]=-sn[2];
+  zm[1][0]=sn[2];
+  zm[1][1]=cs[2];
+  zm[2][2]=1;
+
+  aurostd::matrix<double> rm;  //CO20200404 pflow::matrix()->aurostd::matrix()
+  rm=pflow::MMmult(zm,pflow::MMmult(ym,xm));
+  return rm;
+}
+
+// ***************************************************************************
+// RotateStrVec // moved from pflow
+// ***************************************************************************
+// This rotates each structure in the vstr.
+// The rotation goes from an initial to a final set of angles
+// in steps of the primitive rotation.
+// The primitive rotation is the rotation around x, y, then z
+// by the amount of change given in rot divided by the number
+// of structures - 1.  All frames are initially rotated
+// according to the initial rotation angles.  The rotation is
+// then done as one primitive rotation per frame.
+void RotateStrVec(vector<xstructure>& vstr, const vector<double>& rot) {
+  // Get initial rotation matrix.
+  vector<double> angles(3);
+  for(int ic=0;ic<3;ic++) {
+    angles[ic]=rot[2*ic];
+    angles[ic]=angles[ic]*TWOPI/360.0;
+  }
+  aurostd::matrix<double> irm=GetRotationMatrix(angles); //CO20200404 pflow::matrix()->aurostd::matrix()
+
+  // get primitive rotation matrix.
+  int s=vstr.size()-1;
+  if(s<1) s=1;
+  for(int ic=0;ic<3;ic++) {
+    angles[ic]=(rot[2*ic+1]-rot[2*ic])/(s);
+    angles[ic]=angles[ic]*TWOPI/360.0;
+  }
+  aurostd::matrix<double> prm=GetRotationMatrix(angles); //CO20200404 pflow::matrix()->aurostd::matrix()
+  aurostd::matrix<double> rm=irm;  //CO20200404 pflow::matrix()->aurostd::matrix()
+  xmatrix<double> xprm(3,3); xprm=aurostd::matrix2xmatrix(prm);  //CO20200404 pflow::matrix()->aurostd::matrix()
+  xmatrix<double> xrm(3,3);  xrm=aurostd::matrix2xmatrix(rm);  //CO20200404 pflow::matrix()->aurostd::matrix()
+  for(int is=0;is<(int)vstr.size();is++) {
+    //    xrm=aurostd::matrix2xmatrix(rm); //CO20200404 pflow::matrix()->aurostd::matrix()
+    //   vstr[is]=Rotate(vstr[is],xrm);
+    //DX20210127 [OBSOLETE, avoid copying xstructure] vstr[is]=Rotate(vstr[is],aurostd::matrix2xmatrix(rm)); //CO20200404 pflow::matrix()->aurostd::matrix()
+    vstr[is].Rotate(aurostd::matrix2xmatrix(rm)); //CO20200404 pflow::matrix()->aurostd::matrix() //DX20210127 - do not make copy of xstructure
+    rm=pflow::MMmult(prm,rm);
+  }
+}
 
 // ***************************************************************************
 //  Function GetLTCell
@@ -14944,43 +15684,57 @@ xstructure GetLTFVCell(const xvector<double>& nvec, const double phi, const xstr
 //  Function ShiftPos ShiftCpos ShiftFpos
 // ***************************************************************************
 // This function shifts the position of the atoms !
-xstructure ShiftPos(const xstructure& a,const xvector<double>& shift, const int& flag) {
+// DX20201215 - added in-place methods
+
+// make a copy
+xstructure ShiftPos(const xstructure& a,const xvector<double>& shift, bool is_frac) { //DX20210113 - "int flag" to "bool is_frac"
   xstructure b(a);
-  if(flag==FALSE) { // Cartesian shift
-    b.coord_flag=TRUE;
-    for(uint ia=0;ia<b.atoms.size();ia++) {
-      b.atoms.at(ia).cpos=a.atoms.at(ia).cpos+shift;
-      b.atoms.at(ia).fpos=C2F(b.lattice,b.atoms.at(ia).cpos);
-    }
-  }
-  if(flag==TRUE) { // Direct coords shift
-    b.coord_flag=FALSE;
-    for(uint ia=0;ia<b.atoms.size();ia++) {
-      b.atoms.at(ia).fpos=a.atoms.at(ia).fpos+shift;
-      b.atoms.at(ia).cpos=F2C(b.lattice,b.atoms.at(ia).fpos);
-    }
-  }
+  b.ShiftPos(shift, is_frac);
   return b;
 }
 
+// modify in-place //DX2021215
+void xstructure::ShiftPos(const xvector<double>& shift, bool is_frac) {
+  // Cartesian shift
+  if(is_frac==FALSE) { (*this).ShiftCPos(shift); } //DX20210113 - use function, reduce code
+  // Direct coords shift
+  else { (*this).ShiftFPos(shift); } //DX20210113 - use function, reduce code
+}
+
+// make a copy
 xstructure ShiftCPos(const xstructure& a,const xvector<double>& shift) {
   xstructure b(a);
-  b.coord_flag=TRUE;
-  for(uint ia=0;ia<b.atoms.size();ia++) {
-    b.atoms.at(ia).cpos=b.atoms.at(ia).cpos+shift;
-    b.atoms.at(ia).fpos=C2F(b.lattice,b.atoms.at(ia).cpos);
-  }
+  b.ShiftCPos(shift);
   return b;
 }
 
+// modify in-place //DX2021215
+void xstructure::ShiftCPos(const xvector<double>& shift) {
+  uint natoms = (*this).atoms.size(); //DX20210111 - make variable to optimize for-loops
+  xmatrix<double> c2f=(*this).scale*inverse(trasp((*this).lattice)); //DX+ME20210111
+  (*this).coord_flag=TRUE;
+  for(uint ia=0;ia<natoms;ia++) {
+    (*this).atoms[ia].cpos=(*this).atoms[ia].cpos+shift;
+    (*this).atoms[ia].fpos=c2f*(*this).atoms[ia].cpos; //DX+ME20210111 - use pre-calculated c2f, optimize
+  }
+}
+
+// make a copy
 xstructure ShiftFPos(const xstructure& a,const xvector<double>& shift) {
   xstructure b(a);
-  b.coord_flag=FALSE;
-  for(uint ia=0;ia<b.atoms.size();ia++) {
-    b.atoms.at(ia).fpos=a.atoms.at(ia).fpos+shift;
-    b.atoms.at(ia).cpos=F2C(b.lattice,b.atoms.at(ia).fpos);
-  }
+  b.ShiftCPos(shift);
   return b;
+}
+
+// modify in-place //DX2021215
+void xstructure::ShiftFPos(const xvector<double>& shift) {
+  uint natoms = (*this).atoms.size(); //DX20210111 - make variable to optimize for-loops
+  xmatrix<double> f2c=(*this).scale*trasp((*this).lattice); //DX+ME20210111
+  (*this).coord_flag=FALSE;
+  for(uint ia=0;ia<natoms;ia++) {
+    (*this).atoms[ia].fpos=(*this).atoms[ia].fpos+shift;
+    (*this).atoms[ia].cpos=f2c*(*this).atoms[ia].fpos; //DX+ME20210111 - use pre-calculated f2c, optimize
+  }
 }
 
 // **************************************************************************
@@ -15089,16 +15843,17 @@ xmatrix<double> GetDistMatrix(const xstructure& aa){
       distsij(it1+1,it2+1)=distsij(it2+1,it1+1)=AUROSTD_MAX_DOUBLE;
     }
   }
-  uint atom1;
+  uint atom1=0,atom2=0;
+  uint it1=0,it2=0,ia1=0,ia2=0;
   double distij,min_dist;
-  for(uint it1=0;it1<atom_types.size();it1++){      //type 1 (must be in this order)
-    for(uint it2=it1;it2<atom_types.size();it2++){  //type 2 (must be in this order)
+  for(it1=0;it1<atom_types.size();it1++){      //type 1 (must be in this order)
+    for(it2=it1;it2<atom_types.size();it2++){  //type 2 (must be in this order)
       if(LDEBUG) {cerr << "GetDistMatrix: finding min dist between itype=" << it1 << " and itype=" << it2 << endl;}
       min_dist=AUROSTD_MAX_DOUBLE;                                      //reset min_dist
-      for(uint ia1=0;ia1<atom_types[it1].size();ia1++){                 //must go through all atoms of same type
+      for(ia1=0;ia1<atom_types[it1].size();ia1++){                 //must go through all atoms of same type
         atom1=xstr_cluster.grid_atoms_pc2scMap[atom_types[it1][ia1]];   //get respective index in cluster
-        for(uint ia2=0;ia2<atom_types[it2].size();ia2++){               //must go through all atoms of the same type
-          for(uint atom2=0;atom2<(uint)xstr_cluster.grid_atoms_number;atom2++){ //go through all atoms of the cluster
+        for(ia2=0;ia2<atom_types[it2].size();ia2++){               //must go through all atoms of the same type
+          for(atom2=0;atom2<(uint)xstr_cluster.grid_atoms_number;atom2++){ //go through all atoms of the cluster
             if(atom1!=atom2 && a.atoms[atom_types[it2][ia2]].type==xstr_cluster.grid_atoms[atom2].type){  //cannot be same index (dist=0), and must be the types we want
               distij=AtomDist(xstr_cluster.grid_atoms[atom1],xstr_cluster.grid_atoms[atom2]); //distance
               if(0&&LDEBUG){
@@ -15145,68 +15900,54 @@ vector<double> GetNBONDXX(const xstructure& a){
 // GenerateGridAtoms
 // **************************************************************************
 // make grid of atoms !
-int xstructure::GenerateGridAtoms(int i1,int i2,int j1,int j2,int k1,int k2) {
-  int GenerateGridAtoms(xstructure& str,int i1,int i2,int j1,int j2,int k1,int k2);
-  return GenerateGridAtoms(*this,i1,i2,j1,j2,k1,k2);
-}
-
-int xstructure::GenerateGridAtoms(int d1,int d2,int d3) {
-  int GenerateGridAtoms(xstructure& str,int i1,int i2,int j1,int j2,int k1,int k2);
-  return GenerateGridAtoms(*this,-d1,d1,-d2,d2,-d3,d3);
-}
-
-int xstructure::GenerateGridAtoms(int d) {
-  int GenerateGridAtoms(xstructure& str,int i1,int i2,int j1,int j2,int k1,int k2);
-  return GenerateGridAtoms(*this,-d,d,-d,d,-d,d);
-}
-
-int GenerateGridAtoms(xstructure& str,int i1,int i2,int j1,int j2,int k1,int k2) { //DX20191218
-  return GenerateGridAtoms_20191218(str,i1,i2,j1,j2,k1,k2);
-}
-
-int GenerateGridAtoms_20190520(xstructure& str,int i1,int i2,int j1,int j2,int k1,int k2) { //DX20191218 - added date [ORIG]
+int xstructure::GenerateGridAtoms(double radius) {return GenerateGridAtoms(LatticeDimensionSphere((*this),radius));} // radius is not normalized over the scale
+int xstructure::GenerateGridAtoms(int d) {return GenerateGridAtoms(-d,d,-d,d,-d,d);}
+int xstructure::GenerateGridAtoms(int d1,int d2,int d3) {return GenerateGridAtoms(-d1,d1,-d2,d2,-d3,d3);}
+int xstructure::GenerateGridAtoms(const xvector<int>& dims) {return GenerateGridAtoms(-dims(1),dims(1),-dims(2),dims(2),-dims(3),dims(3));} //CO20200912
+int xstructure::GenerateGridAtoms(int i1,int i2,int j1,int j2,int k1,int k2) {return GenerateGridAtoms_20191218(i1,i2,j1,j2,k1,k2);}
+int xstructure::GenerateGridAtoms_20190520(int i1,int i2,int j1,int j2,int k1,int k2) { //DX20191218 - added date [ORIG]
   bool LDEBUG=(FALSE || XHOST.DEBUG); //CO20190520
   string soliloquy = XPID + "GenerateGridAtoms():"; //CO20190520
   if(LDEBUG) { //CO20190520
-    cerr << soliloquy << " str=" << endl;cerr << str << endl; //CO20190520
+    cerr << soliloquy << " str=" << endl;cerr << (*this) << endl; //CO20190520
     cerr << soliloquy << " i=" << i1 << ":" << i2 << endl; //CO20190520
     cerr << soliloquy << " j=" << j1 << ":" << j2 << endl; //CO20190520
     cerr << soliloquy << " k=" << k1 << ":" << k2 << endl; //CO20190520
   } //CO20190520
   // same scale as before
-  str.grid_atoms.clear();
-  str.grid_atoms_sc2pcMap.clear(); str.grid_atoms_pc2scMap.clear();
+  grid_atoms.clear();
+  grid_atoms_sc2pcMap.clear(); grid_atoms_pc2scMap.clear();
   _atom atom;
-  str.BringInCell();  // are INCELL.
+  BringInCell();  // are INCELL.
   //xvector<double> a1(3),a2(3),a3(3);                     // a1,a2,a3 are the rows of the lattice matrix
-  //a1=str.lattice(1);a2=str.lattice(2);a3=str.lattice(3); // a1,a2,a3 are the rows of the lattice matrix
-  const xvector<double>& a1=str.lattice(1);  //CO20190520 - no need to make copies
-  const xvector<double>& a2=str.lattice(2);  //CO20190520 - no need to make copies
-  const xvector<double>& a3=str.lattice(3);  //CO20190520 - no need to make copies
+  //a1=lattice(1);a2=lattice(2);a3=lattice(3); // a1,a2,a3 are the rows of the lattice matrix
+  const xvector<double>& a1=lattice(1);  //CO20190520 - no need to make copies
+  const xvector<double>& a2=lattice(2);  //CO20190520 - no need to make copies
+  const xvector<double>& a3=lattice(3);  //CO20190520 - no need to make copies
 
-  for(uint iat=0;iat<str.atoms.size();iat++){
-    str.grid_atoms.push_back(str.atoms[iat]);  // put first the unit cell ! //DX20190709 - at to [] = speed increase
-    str.grid_atoms_pc2scMap.push_back(str.grid_atoms.size()-1); //CO20171025 
-    str.grid_atoms_sc2pcMap.push_back(iat); //CO20171025
+  for(uint iat=0;iat<atoms.size();iat++){
+    grid_atoms.push_back(atoms[iat]);  // put first the unit cell ! //DX20190709 - at to [] = speed increase
+    grid_atoms_pc2scMap.push_back(grid_atoms.size()-1); //CO20171025 
+    grid_atoms_sc2pcMap.push_back(iat); //CO20171025
   }
   for(int i=i1;i<=i2;i++) {
     for(int j=j1;j<=j2;j++) {
       for(int k=k1;k<=k2;k++) {
         if(i!=0 || j!=0 || k!=0) {
-          for(uint iat=0;iat<str.atoms.size();iat++) {
-            atom=str.atoms[iat]; //DX20190709 - at to [] = speed increase
+          for(uint iat=0;iat<atoms.size();iat++) {
+            atom=atoms[iat]; //DX20190709 - at to [] = speed increase
             atom.isincell=FALSE; // these are OUT OF CELL
-            atom.cpos=((double)i)*a1+((double)j)*a2+((double)k)*a3+str.atoms[iat].cpos; //DX20190709 - at to [] = speed increase
-            atom.fpos[1]=i+str.atoms[iat].fpos[1]; //DX20190709 - at to [] = speed increase
-            atom.fpos[2]=j+str.atoms[iat].fpos[2]; //DX20190709 - at to [] = speed increase
-            atom.fpos[3]=k+str.atoms[iat].fpos[3]; //DX20190709 - at to [] = speed increase
-            str.grid_atoms.push_back(atom);
-            str.grid_atoms_sc2pcMap.push_back(iat); //CO20171025
+            atom.cpos=((double)i)*a1+((double)j)*a2+((double)k)*a3+atoms[iat].cpos; //DX20190709 - at to [] = speed increase
+            atom.fpos[1]=i+atoms[iat].fpos[1]; //DX20190709 - at to [] = speed increase
+            atom.fpos[2]=j+atoms[iat].fpos[2]; //DX20190709 - at to [] = speed increase
+            atom.fpos[3]=k+atoms[iat].fpos[3]; //DX20190709 - at to [] = speed increase
+            grid_atoms.push_back(atom);
+            grid_atoms_sc2pcMap.push_back(iat); //CO20171025
             if(LDEBUG) { //CO20190520
-              cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].cpos=" << str.grid_atoms.back().cpos << endl; //CO20190520
-              cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].fpos=" << str.grid_atoms.back().fpos << endl; //CO20190520
-              cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "]=" << str.grid_atoms.back() << endl; //DX20191218
-              cerr << soliloquy << " grid_atoms_sc2pcMap[" << str.grid_atoms.size()-1 << "]=" << str.grid_atoms_sc2pcMap.back() << endl; //DX20191218
+              cerr << soliloquy << " grid_atoms[" << grid_atoms.size()-1 << "].cpos=" << grid_atoms.back().cpos << endl; //CO20190520
+              cerr << soliloquy << " grid_atoms[" << grid_atoms.size()-1 << "].fpos=" << grid_atoms.back().fpos << endl; //CO20190520
+              cerr << soliloquy << " grid_atoms[" << grid_atoms.size()-1 << "]=" << grid_atoms.back() << endl; //DX20191218
+              cerr << soliloquy << " grid_atoms_sc2pcMap[" << grid_atoms.size()-1 << "]=" << grid_atoms_sc2pcMap.back() << endl; //DX20191218
             } //CO20190520
           }
         }
@@ -15215,45 +15956,45 @@ int GenerateGridAtoms_20190520(xstructure& str,int i1,int i2,int j1,int j2,int k
   }
   if(0){  //CO20190808 - quick check of mindist
     double min_dist_local=AUROSTD_MAX_DOUBLE,min_dist=AUROSTD_MAX_DOUBLE;
-    for(uint i=0;i<str.grid_atoms.size()-1;i++){
-      for(uint j=i+1;j<str.grid_atoms.size();j++){
-        min_dist_local=aurostd::modulus(str.grid_atoms[i].cpos-str.grid_atoms[j].cpos);
+    for(uint i=0;i<grid_atoms.size()-1;i++){
+      for(uint j=i+1;j<grid_atoms.size();j++){
+        min_dist_local=aurostd::modulus(grid_atoms[i].cpos-grid_atoms[j].cpos);
         if(min_dist_local<min_dist){
           min_dist=min_dist_local;
         }
       }
     }
-    if(!aurostd::isequal(min_dist,SYM::minimumDistance(str),0.1)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Minimum distance changed, check that atoms are not rotated",_RUNTIME_ERROR_);}
+    if(!aurostd::isequal(min_dist,SYM::minimumDistance((*this)),0.1)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Minimum distance changed, check that atoms are not rotated",_RUNTIME_ERROR_);}
   }
-  str.grid_atoms_calculated=TRUE;
-  str.grid_atoms_dimsL[1]=i1;str.grid_atoms_dimsL[2]=j1;str.grid_atoms_dimsL[3]=k1;
-  str.grid_atoms_dimsH[1]=i2;str.grid_atoms_dimsH[2]=j2;str.grid_atoms_dimsH[3]=k2;
-  str.grid_atoms_number=str.grid_atoms.size();
-  //  for(uint i=0;i<str.grid_atoms.size();i++)
-  //   cerr << str.grid_atoms.at(i).cpos << endl;
-  // cerr << str.grid_atoms.size() << endl;
-  return str.grid_atoms.size();
+  grid_atoms_calculated=TRUE;
+  grid_atoms_dimsL[1]=i1;grid_atoms_dimsL[2]=j1;grid_atoms_dimsL[3]=k1;
+  grid_atoms_dimsH[1]=i2;grid_atoms_dimsH[2]=j2;grid_atoms_dimsH[3]=k2;
+  grid_atoms_number=grid_atoms.size();
+  //  for(uint i=0;i<grid_atoms.size();i++)
+  //   cerr << grid_atoms.at(i).cpos << endl;
+  // cerr << grid_atoms.size() << endl;
+  return grid_atoms.size();
 }
 
-int GenerateGridAtoms_20191218(xstructure& str,int i1,int i2,int j1,int j2,int k1,int k2) { //DX20191218 - [NEW]
+int xstructure::GenerateGridAtoms_20191218(int i1,int i2,int j1,int j2,int k1,int k2) { //DX20191218 - [NEW]
   bool LDEBUG=(FALSE || XHOST.DEBUG); //CO20190520
   string soliloquy = XPID + "GenerateGridAtoms():"; //CO20190520
   if(LDEBUG) { //CO20190520
-    cerr << soliloquy << " str=" << endl;cerr << str << endl; //CO20190520
+    cerr << soliloquy << " str=" << endl;cerr << (*this) << endl; //CO20190520
     cerr << soliloquy << " i=" << i1 << ":" << i2 << endl; //CO20190520
     cerr << soliloquy << " j=" << j1 << ":" << j2 << endl; //CO20190520
     cerr << soliloquy << " k=" << k1 << ":" << k2 << endl; //CO20190520
   } //CO20190520
   // same scale as before
-  str.grid_atoms.clear();
-  str.grid_atoms_sc2pcMap.clear(); str.grid_atoms_pc2scMap.clear();
+  grid_atoms.clear();
+  grid_atoms_sc2pcMap.clear(); grid_atoms_pc2scMap.clear();
   _atom atom;
-  str.BringInCell();  // are INCELL.
+  BringInCell();  // are INCELL.
   //xvector<double> a1(3),a2(3),a3(3);                     // a1,a2,a3 are the rows of the lattice matrix
-  //a1=str.lattice(1);a2=str.lattice(2);a3=str.lattice(3); // a1,a2,a3 are the rows of the lattice matrix
-  const xvector<double>& a1=str.lattice(1);  //CO20190520 - no need to make copies
-  const xvector<double>& a2=str.lattice(2);  //CO20190520 - no need to make copies
-  const xvector<double>& a3=str.lattice(3);  //CO20190520 - no need to make copies
+  //a1=lattice(1);a2=lattice(2);a3=lattice(3); // a1,a2,a3 are the rows of the lattice matrix
+  const xvector<double>& a1=lattice(1);  //CO20190520 - no need to make copies
+  const xvector<double>& a2=lattice(2);  //CO20190520 - no need to make copies
+  const xvector<double>& a3=lattice(3);  //CO20190520 - no need to make copies
   //DX20190709 - calculate and store once = speed - START
   vector<xvector<double> > l1, l2, l3;
   vector<int> a_index, b_index, c_index;
@@ -15263,38 +16004,38 @@ int GenerateGridAtoms_20191218(xstructure& str,int i1,int i2,int j1,int j2,int k
   //DX20191218 - calculate and store once = speed - END
 
   // resize vectors - DX20191122
-  uint num_grid_atoms = str.atoms.size()*l1.size()*l2.size()*l3.size();
-  str.grid_atoms.resize(num_grid_atoms);
-  str.grid_atoms_pc2scMap.resize(str.atoms.size()); //DX20191218 - should be the size of the the primitive cell, not grid
-  str.grid_atoms_sc2pcMap.resize(num_grid_atoms);
+  uint num_grid_atoms = atoms.size()*l1.size()*l2.size()*l3.size();
+  grid_atoms.resize(num_grid_atoms);
+  grid_atoms_pc2scMap.resize(atoms.size()); //DX20191218 - should be the size of the the primitive cell, not grid
+  grid_atoms_sc2pcMap.resize(num_grid_atoms);
 
   uint grid_atom_count = 0; // keep track of index - DX20191122
 
-  for(uint iat=0;iat<str.atoms.size();iat++){
-    //str.grid_atoms.push_back(str.atoms[iat]);  // put first the unit cell ! //DX20190709 - at to [] = speed increase
-    //str.grid_atoms_pc2scMap.push_back(str.grid_atoms.size()-1); //CO20171025 
-    //str.grid_atoms_sc2pcMap.push_back(iat); //CO20171025
-    str.grid_atoms[grid_atom_count] = str.atoms[iat];  // put first the unit cell ! //DX20190709 - at to [] = speed increase
-    str.grid_atoms_pc2scMap[grid_atom_count] = iat; //DX20191218 - use the index of the primitive cell not the running count of grid_atoms since it was resized
-    str.grid_atoms_sc2pcMap[grid_atom_count] = iat; //CO20171025
+  for(uint iat=0;iat<atoms.size();iat++){
+    //grid_atoms.push_back(atoms[iat]);  // put first the unit cell ! //DX20190709 - at to [] = speed increase
+    //grid_atoms_pc2scMap.push_back(grid_atoms.size()-1); //CO20171025 
+    //grid_atoms_sc2pcMap.push_back(iat); //CO20171025
+    grid_atoms[grid_atom_count] = atoms[iat];  // put first the unit cell ! //DX20190709 - at to [] = speed increase
+    grid_atoms_pc2scMap[grid_atom_count] = iat; //DX20191218 - use the index of the primitive cell not the running count of grid_atoms since it was resized
+    grid_atoms_sc2pcMap[grid_atom_count] = iat; //CO20171025
     grid_atom_count++; //DX20191122
   }
   //for(int i=i1;i<=i2;i++) {
   //for(int j=j1;j<=j2;j++) {
   //for(int k=k1;k<=k2;k++) {
   //if(i!=0 || j!=0 || k!=0) {
-  //for(uint iat=0;iat<str.atoms.size();iat++) {
-  //atom=str.atoms[iat]; //DX20190709 - at to [] = speed increase
+  //for(uint iat=0;iat<atoms.size();iat++) {
+  //atom=atoms[iat]; //DX20190709 - at to [] = speed increase
   //atom.isincell=FALSE; // these are OUT OF CELL
-  //atom.cpos=((double)i)*a1+((double)j)*a2+((double)k)*a3+str.atoms[iat].cpos; //DX20190709 - at to [] = speed increase
-  //atom.fpos[1]=i+str.atoms[iat].fpos[1]; //DX20190709 - at to [] = speed increase
-  //atom.fpos[2]=j+str.atoms[iat].fpos[2]; //DX20190709 - at to [] = speed increase
-  //atom.fpos[3]=k+str.atoms[iat].fpos[3]; //DX20190709 - at to [] = speed increase
-  //str.grid_atoms.push_back(atom);
-  //str.grid_atoms_sc2pcMap.push_back(iat); //CO20171025
+  //atom.cpos=((double)i)*a1+((double)j)*a2+((double)k)*a3+atoms[iat].cpos; //DX20190709 - at to [] = speed increase
+  //atom.fpos[1]=i+atoms[iat].fpos[1]; //DX20190709 - at to [] = speed increase
+  //atom.fpos[2]=j+atoms[iat].fpos[2]; //DX20190709 - at to [] = speed increase
+  //atom.fpos[3]=k+atoms[iat].fpos[3]; //DX20190709 - at to [] = speed increase
+  //grid_atoms.push_back(atom);
+  //grid_atoms_sc2pcMap.push_back(iat); //CO20171025
   //if(LDEBUG) { //CO20190520
-  //cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].cpos=" << str.grid_atoms.back().cpos << endl; //CO20190520
-  //cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].fpos=" << str.grid_atoms.back().fpos << endl; //CO20190520
+  //cerr << soliloquy << " grid_atoms[" << grid_atoms.size()-1 << "].cpos=" << grid_atoms.back().cpos << endl; //CO20190520
+  //cerr << soliloquy << " grid_atoms[" << grid_atoms.size()-1 << "].fpos=" << grid_atoms.back().fpos << endl; //CO20190520
   //} //CO20190520
   //}
   //}
@@ -15302,7 +16043,7 @@ int GenerateGridAtoms_20191218(xstructure& str,int i1,int i2,int j1,int j2,int k
   //}
   //}
   xvector<double> a_component(3), ab_component(3), abc_component(3); //DX+ME20191107 - define outside loop (speed increase)
-  uint natoms = str.atoms.size(); //DX20191107 - initialize natoms outside loop (speed increase)
+  uint natoms = atoms.size(); //DX20191107 - initialize natoms outside loop (speed increase)
   for(uint i=0;i<l1.size();i++) {
     a_component = l1[i];                           //DX : i*lattice(1)
     for(uint j=0;j<l2.size();j++) {
@@ -15312,28 +16053,28 @@ int GenerateGridAtoms_20191218(xstructure& str,int i1,int i2,int j1,int j2,int k
         if(a_index[i]!=0 || b_index[j]!=0 || c_index[k]!=0) //DX20191218
         { //CO20200106 - patching for auto-indenting
           abc_component = ab_component + l3[k];    //DX : i*lattice(1) + j*lattice(2) + k*lattice(3)
-          for(uint iat=0;iat<natoms;iat++) {       //DX20191107 - replace str.atoms.size() with natoms
-            atom=str.atoms[iat];                   //DX20190709 - at to [] = speed increase
+          for(uint iat=0;iat<natoms;iat++) {       //DX20191107 - replace atoms.size() with natoms
+            atom=atoms[iat];                   //DX20190709 - at to [] = speed increase
             atom.isincell=FALSE;                   // these are OUT OF CELL
-            //DX20191127 [OBOSLETE] atom.cpos=abc_component+str.atoms[iat].cpos; //DX20190709 - at to [] = speed increase
+            //DX20191127 [OBOSLETE] atom.cpos=abc_component+atoms[iat].cpos; //DX20190709 - at to [] = speed increase
             atom.cpos+=abc_component;              //DX20190709 - at to [] = speed increase //CO20191127 
-            //DX20191127 [OBOSLETE] atom.fpos[1]=a_index[i]+str.atoms[iat].fpos[1]; //DX20190709 - at to [] = speed increase
-            //DX20191127 [OBOSLETE] atom.fpos[2]=b_index[j]+str.atoms[iat].fpos[2]; //DX20190709 - at to [] = speed increase
-            //DX20191127 [OBOSLETE] atom.fpos[3]=c_index[k]+str.atoms[iat].fpos[3]; //DX20190709 - at to [] = speed increase
+            //DX20191127 [OBOSLETE] atom.fpos[1]=a_index[i]+atoms[iat].fpos[1]; //DX20190709 - at to [] = speed increase
+            //DX20191127 [OBOSLETE] atom.fpos[2]=b_index[j]+atoms[iat].fpos[2]; //DX20190709 - at to [] = speed increase
+            //DX20191127 [OBOSLETE] atom.fpos[3]=c_index[k]+atoms[iat].fpos[3]; //DX20190709 - at to [] = speed increase
             atom.fpos[1]+=a_index[i];              //DX20190709 - at to [] = speed increase //CO20191127
             atom.fpos[2]+=b_index[j];              //DX20190709 - at to [] = speed increase //CO20191127
             atom.fpos[3]+=c_index[k];              //DX20190709 - at to [] = speed increase //CO20191127
-            //DX20191122 [OBSOLETE-PUSH_BACK] str.grid_atoms.push_back(atom);
-            //DX20191122 [OBSOLETE-PUSH_BACK] str.grid_atoms_sc2pcMap.push_back(iat); //CO20171025
-            str.grid_atoms[grid_atom_count] = atom;
-            str.grid_atoms_sc2pcMap[grid_atom_count] = iat; //CO20171025
+            //DX20191122 [OBSOLETE-PUSH_BACK] grid_atoms.push_back(atom);
+            //DX20191122 [OBSOLETE-PUSH_BACK] grid_atoms_sc2pcMap.push_back(iat); //CO20171025
+            grid_atoms[grid_atom_count] = atom;
+            grid_atoms_sc2pcMap[grid_atom_count] = iat; //CO20171025
             //DX20200320 [OBSOLETE-moved outside of loop for speed] if(LDEBUG) { //CO20190520
-            //DX20200320 [OBSOLETE-moved outside of loop for speed]   //DX20191122 [OBSOLETE-PUSH_BACK] cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].cpos=" << str.grid_atoms.back().cpos << endl; //CO20190520
-            //DX20200320 [OBSOLETE-moved outside of loop for speed]   //DX20191122 [OBSOLETE-PUSH_BACK] cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].fpos=" << str.grid_atoms.back().fpos << endl; //CO20190520
-            //DX20200320 [OBSOLETE-moved outside of loop for speed]   cerr << soliloquy << " grid_atoms[" << grid_atom_count << "].cpos=" << str.grid_atoms[grid_atom_count].cpos << endl; //CO20190520
-            //DX20200320 [OBSOLETE-moved outside of loop for speed]   cerr << soliloquy << " grid_atoms[" << grid_atom_count << "].fpos=" << str.grid_atoms[grid_atom_count].fpos << endl; //CO20190520
-            //DX20200320 [OBSOLETE-moved outside of loop for speed]   cerr << soliloquy << " grid_atoms[" << grid_atom_count << "]=" << str.grid_atoms[grid_atom_count] << endl; //DX20191218
-            //DX20200320 [OBSOLETE-moved outside of loop for speed]   cerr << soliloquy << " grid_atoms_sc2pcMap[" << grid_atom_count << "]=" << str.grid_atoms_sc2pcMap[grid_atom_count] << endl; //DX20191218
+            //DX20200320 [OBSOLETE-moved outside of loop for speed]   //DX20191122 [OBSOLETE-PUSH_BACK] cerr << soliloquy << " grid_atoms[" << grid_atoms.size()-1 << "].cpos=" << grid_atoms.back().cpos << endl; //CO20190520
+            //DX20200320 [OBSOLETE-moved outside of loop for speed]   //DX20191122 [OBSOLETE-PUSH_BACK] cerr << soliloquy << " grid_atoms[" << grid_atoms.size()-1 << "].fpos=" << grid_atoms.back().fpos << endl; //CO20190520
+            //DX20200320 [OBSOLETE-moved outside of loop for speed]   cerr << soliloquy << " grid_atoms[" << grid_atom_count << "].cpos=" << grid_atoms[grid_atom_count].cpos << endl; //CO20190520
+            //DX20200320 [OBSOLETE-moved outside of loop for speed]   cerr << soliloquy << " grid_atoms[" << grid_atom_count << "].fpos=" << grid_atoms[grid_atom_count].fpos << endl; //CO20190520
+            //DX20200320 [OBSOLETE-moved outside of loop for speed]   cerr << soliloquy << " grid_atoms[" << grid_atom_count << "]=" << grid_atoms[grid_atom_count] << endl; //DX20191218
+            //DX20200320 [OBSOLETE-moved outside of loop for speed]   cerr << soliloquy << " grid_atoms_sc2pcMap[" << grid_atom_count << "]=" << grid_atoms_sc2pcMap[grid_atom_count] << endl; //DX20191218
             //DX20200320 [OBSOLETE-moved outside of loop for speed] } //CO20190520
             grid_atom_count++; //DX20191122
           }
@@ -15343,59 +16084,43 @@ int GenerateGridAtoms_20191218(xstructure& str,int i1,int i2,int j1,int j2,int k
   }
   //DX20200320 - moved outside of loop so that LDEBUG boolean is not checked every time (speed increase when grid atoms is large)
   if(LDEBUG) { //CO20190520
-    for(uint i=0;i<str.grid_atoms.size();i++){
-      //DX20191122 [OBSOLETE-PUSH_BACK] cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].cpos=" << str.grid_atoms.back().cpos << endl; //CO20190520
-      //DX20191122 [OBSOLETE-PUSH_BACK] cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].fpos=" << str.grid_atoms.back().fpos << endl; //CO20190520
-      cerr << soliloquy << " grid_atoms[" << i << "].cpos=" << str.grid_atoms[i].cpos << endl; //CO20190520
-      cerr << soliloquy << " grid_atoms[" << i << "].fpos=" << str.grid_atoms[i].fpos << endl; //CO20190520
-      cerr << soliloquy << " grid_atoms[" << i << "]=" << str.grid_atoms[i] << endl; //DX20191218
-      cerr << soliloquy << " grid_atoms_sc2pcMap[" << i << "]=" << str.grid_atoms_sc2pcMap[i] << endl; //DX20191218
+    for(uint i=0;i<grid_atoms.size();i++){
+      //DX20191122 [OBSOLETE-PUSH_BACK] cerr << soliloquy << " grid_atoms[" << grid_atoms.size()-1 << "].cpos=" << grid_atoms.back().cpos << endl; //CO20190520
+      //DX20191122 [OBSOLETE-PUSH_BACK] cerr << soliloquy << " grid_atoms[" << grid_atoms.size()-1 << "].fpos=" << grid_atoms.back().fpos << endl; //CO20190520
+      cerr << soliloquy << " grid_atoms[" << i << "].cpos=" << grid_atoms[i].cpos << endl; //CO20190520
+      cerr << soliloquy << " grid_atoms[" << i << "].fpos=" << grid_atoms[i].fpos << endl; //CO20190520
+      cerr << soliloquy << " grid_atoms[" << i << "]=" << grid_atoms[i] << endl; //DX20191218
+      cerr << soliloquy << " grid_atoms_sc2pcMap[" << i << "]=" << grid_atoms_sc2pcMap[i] << endl; //DX20191218
     } //CO20190520
   }
   if(0){  //CO20190808 - quick check of mindist
     double min_dist_local=AUROSTD_MAX_DOUBLE,min_dist=AUROSTD_MAX_DOUBLE;
-    for(uint i=0;i<str.grid_atoms.size()-1;i++){
-      for(uint j=i+1;j<str.grid_atoms.size();j++){
-        min_dist_local=aurostd::modulus(str.grid_atoms[i].cpos-str.grid_atoms[j].cpos);
+    for(uint i=0;i<grid_atoms.size()-1;i++){
+      for(uint j=i+1;j<grid_atoms.size();j++){
+        min_dist_local=aurostd::modulus(grid_atoms[i].cpos-grid_atoms[j].cpos);
         if(min_dist_local<min_dist){
           min_dist=min_dist_local;
         }
       }
     }
-    if(!aurostd::isequal(min_dist,SYM::minimumDistance(str),0.1)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Minimum distance changed, check that atoms are not rotated",_RUNTIME_ERROR_);}
+    if(!aurostd::isequal(min_dist,SYM::minimumDistance((*this)),0.1)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Minimum distance changed, check that atoms are not rotated",_RUNTIME_ERROR_);}
   }
-  str.grid_atoms_calculated=TRUE;
-  str.grid_atoms_dimsL[1]=i1;str.grid_atoms_dimsL[2]=j1;str.grid_atoms_dimsL[3]=k1;
-  str.grid_atoms_dimsH[1]=i2;str.grid_atoms_dimsH[2]=j2;str.grid_atoms_dimsH[3]=k2;
-  str.grid_atoms_number=str.grid_atoms.size();
-  //  for(uint i=0;i<str.grid_atoms.size();i++)
-  //   cerr << str.grid_atoms.at(i).cpos << endl;
-  // cerr << str.grid_atoms.size() << endl;
-  return str.grid_atoms.size();
+  grid_atoms_calculated=TRUE;
+  grid_atoms_dimsL[1]=i1;grid_atoms_dimsL[2]=j1;grid_atoms_dimsL[3]=k1;
+  grid_atoms_dimsH[1]=i2;grid_atoms_dimsH[2]=j2;grid_atoms_dimsH[3]=k2;
+  grid_atoms_number=grid_atoms.size();
+  //  for(uint i=0;i<grid_atoms.size();i++)
+  //   cerr << grid_atoms.at(i).cpos << endl;
+  // cerr << grid_atoms.size() << endl;
+  return grid_atoms.size();
 }
 
-int GenerateGridAtoms(xstructure& str,const double& radius) {
-  xvector<int> dims(3);
-  dims=LatticeDimensionSphere(str,radius);  // radius is not normalized over the scale
-  return GenerateGridAtoms(str,-dims(1),dims(1),-dims(2),dims(2),-dims(3),dims(3));
-}
-
-int GenerateGridAtoms(xstructure& str,int d1,int d2,int d3) {
-  return GenerateGridAtoms_20191218(str,-d1,d1,-d2,d2,-d3,d3);
-}
-
-int GenerateGridAtoms(xstructure& str,int d) {
-  return GenerateGridAtoms(str,-d,d,-d,d,-d,d);
-}
-
-int GenerateGridAtoms(xstructure& str,const xvector<int>& dims) {
-  return GenerateGridAtoms(str,-dims(1),dims(1),-dims(2),dims(2),-dims(3),dims(3));
-}
-
-int GenerateGridAtoms(xstructure& str) {
-  return GenerateGridAtoms(str,-1,1,-1,1,-1,1);
-}
-
+int GenerateGridAtoms(xstructure& str) {return str.GenerateGridAtoms(-1,1,-1,1,-1,1);}
+int GenerateGridAtoms(xstructure& str,double radius) {return str.GenerateGridAtoms(radius);}  //CO20200912 - double
+int GenerateGridAtoms(xstructure& str,int d) {return str.GenerateGridAtoms(d);}
+int GenerateGridAtoms(xstructure& str,int d1,int d2,int d3) {return str.GenerateGridAtoms(d1,d2,d3);}
+int GenerateGridAtoms(xstructure& str,int i1,int i2,int j1,int j2,int k1,int k2) {return str.GenerateGridAtoms(i1,i2,j1,j2,k1,k2);} //DX20191218
+int GenerateGridAtoms(xstructure& str,const xvector<int>& dims) {return str.GenerateGridAtoms(dims);} //CO20200912
 
 // **************************************************************************
 // GenerateLIJK table stuff
@@ -15473,14 +16198,14 @@ int xstructure::GenerateLIJK(double radius) {
 // LIJK table: L => IJK
 // **************************************************************************
 void l2ijk(const xstructure& str,const int &l,int &i,int &j,int &k) {
-  if(l<0) {cerr << "l2ijk error: l<0 " << endl; exit(0);}
-  if(l>(int) str.lijk_table.size()) {cerr << "l2ijk error: >str.lijk_table.size() " << endl; exit(0);}
+  if(l<0) {throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"l2ijk():","l2ijk error: l<0",_VALUE_RANGE_);}
+  if(l>(int) str.lijk_table.size()) {throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"l2ijk():","l>str.lijk_table.size()",_VALUE_RANGE_);}
   i=str.lijk_table[l][1];j=str.lijk_table[l][2];k=str.lijk_table[l][3];
 }
 
 void l2ijk(const xstructure& str,const int &l,xvector<int>& ijk) {
-  if(l<0) {cerr << "l2ijk error: l<0 " << endl; exit(0);}
-  if(l>(int) str.lijk_table.size()) {cerr << "l2ijk error: >str.lijk_table.size() " << endl; exit(0);}
+  if(l<0) {throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"l2ijk():","l2ijk error: l<0",_VALUE_RANGE_);}
+  if(l>(int) str.lijk_table.size()) {throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"l2ijk():","l>str.lijk_table.size()",_VALUE_RANGE_);}
   ijk[1]=str.lijk_table[l][1];ijk[2]=str.lijk_table[l][2];ijk[3]=str.lijk_table[l][3];
 }
 
@@ -15498,15 +16223,15 @@ xvector<int> l2ijk(const xstructure& str,const int &l) {
 // **************************************************************************
 void ijk2l(const xstructure& str,int &l,const int &i,const int &j,const int &k) {
   l=-1;
-  if(i<-str.lijk_dims(1) || i>str.lijk_dims(1)) {cerr << "ijk2l error; i out of boundary" << endl;exit(0);}
-  if(j<-str.lijk_dims(2) || j>str.lijk_dims(2)) {cerr << "ijk2l error; j out of boundary" << endl;exit(0);}
-  if(k<-str.lijk_dims(3) || k>str.lijk_dims(3)) {cerr << "ijk2l error; k out of boundary" << endl;exit(0);}
+  if(i<-str.lijk_dims(1) || i>str.lijk_dims(1)) {throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"ijk2l():","i out of boundary",_VALUE_RANGE_);}
+  if(j<-str.lijk_dims(2) || j>str.lijk_dims(2)) {throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"ijk2l():","j out of boundary",_VALUE_RANGE_);}
+  if(k<-str.lijk_dims(3) || k>str.lijk_dims(3)) {throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"ijk2l():","k out of boundary",_VALUE_RANGE_);}
   for(uint ll=0;ll<str.lijk_table.size();ll++) // start search
     if(str.lijk_table.at(ll)[1]==i)         // faster comparison one at a time
       if(str.lijk_table.at(ll)[2]==j)       // faster comparison one at a time
         if(str.lijk_table.at(ll)[3]==k)     // faster comparison one at a time
           l=ll;
-  if(l<0) {cerr << "ijk2l error: l not found" << endl; exit(0);}
+  if(l<0) {throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"ijk2l():","l not found",_VALUE_RANGE_);}
 }
 
 void ijk2l(const xstructure& str,int &l,const xvector<int>& ijk) {
@@ -15550,10 +16275,11 @@ xstructure input2QExstr(istream& input) {
   return a;
 }
 
-xstructure input2VASPxstr(istream& input) {
+xstructure input2VASPxstr(istream& input,bool vasp5) {  //CO20210119 - added vasp5
   xstructure a(input,IOAFLOW_AUTO);
   //  if(a.iomode==IOQE_AUTO || a.iomode==IOQE_GEOM)
   a.xstructure2vasp();
+  if(vasp5){a.is_vasp4_poscar_format=false;a.is_vasp5_poscar_format=true;}  //CO20210119
   //  cerr << a.title << endl;
   return a;
 }
@@ -15666,6 +16392,312 @@ class compare_GetNeighData {
       // }
     }
 };
+
+//RF20200831 - checkStructure - START
+// **************************************************************************
+// checkStructure
+// **************************************************************************
+// rescale structure to 1 and check whether e.g. species and atoms are present
+void xstructure::checkStructure(){
+  bool LDEBUG = (FALSE || XHOST.DEBUG);
+  string soliloquy=XPID+"xstructure::checkStructure():";
+  stringstream message;
+  (*this).ReScale(1.0); // rescales scaling factor in second line of POSCAR to 1, needed for correct distances
+  //throw some general information such as input structure
+  if(LDEBUG){
+    cerr << soliloquy << endl << "INPUT STRUCTURE:" << endl;
+    cerr << soliloquy << (*this) << endl;
+  }
+  // check whether the species vector is populated, otherwise throw error
+  if ((*this).species.size() == 0){
+    message << " BAD NEWS: It seems there are no species in the structure. Please adjust the structure and rerun.";
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
+  }
+  // check whether there are any atoms in the structure
+  if ((*this).atoms.size() == 0){
+    message << " BAD NEWS: It seems there are no atoms in the structure. Please adjust the structure and rerun.";
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
+  }
+  // if species of atoms are not known like in VASP4 format, throw error
+  for(uint k=0,ksize=(*this).atoms.size();k<ksize;k++){
+    if ((*this).atoms[k].cleanname == ""){
+      message << " BAD NEWS: It seems you are providing a structure without complete species information as input. This implementation requires a structure with the species information included. For a VASP4 POSCAR, the species must be written on the right side next to the coordinates for each atom. Please adjust the structure and rerun.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
+    }
+  }
+}
+//RF20200831 - checkStructure - END
+
+
+// **************************************************************************
+// Function GetNeighbors
+// **************************************************************************
+// rewrite of GetNeighData()
+// atoms_cell is the atoms for which neighbors are found (could be iatoms), hence it determines the sizes of i_neighbors and distances
+// i_neighbors are indices to gird_atoms
+// CO20200912
+void xstructure::GetNeighbors(deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,double rmin,bool prim,bool unique_only){
+  deque<_atom> atoms_cell;
+  return GetNeighbors(atoms_cell,i_neighbors,distances,rmin,prim,unique_only);
+}
+void xstructure::GetNeighbors(deque<_atom>& atoms_cell,deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,double rmin,bool prim,bool unique_only){
+  double rmax=RadiusSphereLattice((*this).scale*(*this).lattice);
+  return GetNeighbors(atoms_cell,i_neighbors,distances,rmax,rmin,prim,unique_only);
+}
+void xstructure::GetNeighbors(deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,double rmax,double rmin,bool prim,bool unique_only){
+  deque<_atom> atoms_cell;
+  return GetNeighbors(atoms_cell,i_neighbors,distances,rmax,rmin,prim,unique_only);
+}
+void xstructure::GetNeighbors(deque<_atom>& atoms_cell,deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,double rmax,double rmin,bool prim,bool unique_only){
+  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  string soliloquy=XPID+"xstructure::GetNeighbors():";
+
+  uint i=0,k=0;
+
+  if(prim){GetPrimitive();}
+  ReScale(1.0);
+  //get atoms_cell
+  atoms_cell.clear(); //clear
+  for(i=0;i<i_neighbors.size();i++){i_neighbors[i].clear();} i_neighbors.clear(); //clear
+  for(i=0;i<distances.size();i++){distances[i].clear();} distances.clear(); //clear
+  vector<uint> atomscell2atoms_mapping;
+  if(unique_only){
+    if(iatoms_calculated==false){CalculateSymmetry();}
+    for(i=0;i<iatoms.size();i++){
+      atoms_cell.push_back(atoms[iatoms[i][0]]);
+      atomscell2atoms_mapping.push_back(iatoms[i][0]);
+      i_neighbors.push_back(deque<uint>(0));
+      distances.push_back(deque<double>(0));
+    }
+  }else{
+    for(uint i=0;i<atoms.size();i++){
+      atoms_cell.push_back(atoms[i]);
+      atomscell2atoms_mapping.push_back(i);
+      i_neighbors.push_back(deque<uint>(0));
+      distances.push_back(deque<double>(0));
+    }
+  }
+
+  if(LDEBUG){
+    cerr << soliloquy << " atoms_cell.size()=" << atoms_cell.size() << endl;
+    cerr << soliloquy << " atomscell2atoms_mapping=" << aurostd::joinWDelimiter(atomscell2atoms_mapping,",") << endl;
+  }
+
+  if(LDEBUG){cerr << soliloquy << " GenerateGridAtoms(): starting" << endl;}
+  GenerateGridAtoms(rmax);
+  if(LDEBUG){cerr << soliloquy << " GenerateGridAtoms(): done" << endl;}
+  if(LDEBUG){cerr << soliloquy << " grid_atoms_number=" << grid_atoms_number << endl;}
+
+  if(LDEBUG){cerr << soliloquy << " generating neighbors" << endl;}
+  //[STILL SLOWER THAN AUROSTD::SORT()]//[SHAVES 1 SECOND]vector<double> v_mindist;
+  double dist=0.0;
+  uint atom1=0,atom2=0;
+  for(i=0;i<atoms_cell.size();i++){
+    //[STILL SLOWER THAN AUROSTD::SORT()]//[SHAVES 1 SECOND]v_mindist.push_back(AUROSTD_MAX_DOUBLE);
+    atom1=grid_atoms_pc2scMap[atomscell2atoms_mapping[i]];
+    for(atom2=0;atom2<(uint)grid_atoms_number;atom2++){
+      if(atom1==atom2){continue;} //skip self
+      dist=AtomDist(grid_atoms[atom1],grid_atoms[atom2]); //distance
+      if(dist>rmin && dist<=rmax){
+        i_neighbors[i].push_back(atom2);
+        distances[i].push_back(dist);
+        //[STILL SLOWER THAN AUROSTD::SORT()]//[SHAVES 1 SECOND]if(dist<v_mindist.back()){v_mindist.back()=dist;}
+      }
+    }
+  }
+
+  if(0){
+    //an attempt to shave off more runtime: only shaves off a second AT BEST for "make check_cce"
+    //the slowest part of the algorithm WAS sorting (using insertion sort), so reducing vector size would help
+    //now using quicksort, reducing the vector size does not help much (very efficient)
+    //to fully realize the 1 second shave off, replace min(distances[k]) with v_mindist (see above)
+    vector<uint> i2remove;
+    double cutoff=0.0;
+    for(k=0;k<distances.size();k++){
+      if(LDEBUG){cerr << soliloquy << " START distances[k=" << k << "].size()=" << distances[k].size() << endl;}
+      i2remove.clear();
+      cutoff=1.25*min(distances[k]); //v_mindist[k];  //focus on first shell: does not require an input tol
+      for(i=0;i<distances[k].size();i++){
+        if(distances[k][i]>cutoff){i2remove.push_back(i);}
+      }
+      for(i=i2remove.size()-1;i<i2remove.size();i--){
+        i_neighbors[k].erase(i_neighbors[k].begin()+i2remove[i]);
+        distances[k].erase(distances[k].begin()+i2remove[i]);
+      }
+      if(LDEBUG){cerr << soliloquy << " STOP  distances[k=" << k << "].size()=" << distances[k].size() << endl;}
+    }
+  }
+
+  //now sort
+  if(LDEBUG){cerr << soliloquy << " sorting" << endl;}
+  //[TOO SLOW FOR LARGE VECTORS]uint uint_tmp=0;
+  //[TOO SLOW FOR LARGE VECTORS]double double_tmp=0;
+  //[TOO SLOW FOR LARGE VECTORS]for(k=0;k<i_neighbors.size();k++){
+  //[TOO SLOW FOR LARGE VECTORS]  for(i=0;i<i_neighbors[k].size();i++){
+  //[TOO SLOW FOR LARGE VECTORS]    for(j=i+1;j<i_neighbors[k].size();j++){
+  //[TOO SLOW FOR LARGE VECTORS]      if(distances[k][j]<distances[k][i]){
+  //[TOO SLOW FOR LARGE VECTORS]        //std::swap(i_neighbors[k][i],i_neighbors[k][j]);
+  //[TOO SLOW FOR LARGE VECTORS]        uint_tmp=i_neighbors[k][i];
+  //[TOO SLOW FOR LARGE VECTORS]        i_neighbors[k][i]=i_neighbors[k][j];
+  //[TOO SLOW FOR LARGE VECTORS]        i_neighbors[k][j]=uint_tmp;
+  //[TOO SLOW FOR LARGE VECTORS]        //std::swap(distances[k][i],distances[k][j]);
+  //[TOO SLOW FOR LARGE VECTORS]        double_tmp=distances[k][i];
+  //[TOO SLOW FOR LARGE VECTORS]        distances[k][i]=distances[k][j];
+  //[TOO SLOW FOR LARGE VECTORS]        distances[k][j]=double_tmp;
+  //[TOO SLOW FOR LARGE VECTORS]      }
+  //[TOO SLOW FOR LARGE VECTORS]    }
+  //[TOO SLOW FOR LARGE VECTORS]  }
+  //[TOO SLOW FOR LARGE VECTORS]}
+  //[STILL SLOWER THAN AUROSTD::SORT()]vector<uint> i_sorting;
+  //[STILL SLOWER THAN AUROSTD::SORT()]deque<uint> i_neighborsk; //copy
+  //[STILL SLOWER THAN AUROSTD::SORT()]deque<double> distancesk; //copy
+  //[STILL SLOWER THAN AUROSTD::SORT()]for(k=0;k<i_neighbors.size();k++){
+  //[STILL SLOWER THAN AUROSTD::SORT()]  i_neighborsk=i_neighbors[k];  //copy
+  //[STILL SLOWER THAN AUROSTD::SORT()]  distancesk=distances[k];  //copy
+  //[STILL SLOWER THAN AUROSTD::SORT()]  i_sorting.clear();for(i=0;i<i_neighbors[k].size();i++){i_sorting.push_back(i);}
+  //[STILL SLOWER THAN AUROSTD::SORT()]  std::sort(i_sorting.begin(),i_sorting.end(),[&](uint a, uint b) {return distances[k][a]<distances[k][b];});
+  //[STILL SLOWER THAN AUROSTD::SORT()]  //reorder
+  //[STILL SLOWER THAN AUROSTD::SORT()]  //https://stackoverflow.com/questions/838384/reorder-vector-using-a-vector-of-indices
+  //[STILL SLOWER THAN AUROSTD::SORT()]  //do NOT use a reordering algorithm, it takes a LONG time
+  //[STILL SLOWER THAN AUROSTD::SORT()]  //instead make a copy, memory is not a problem here, as the order of the memory used does not change (2N vs. 4N)
+  //[STILL SLOWER THAN AUROSTD::SORT()]  for(i=0;i<i_sorting.size();i++){
+  //[STILL SLOWER THAN AUROSTD::SORT()]    i_neighbors[k][i]=i_neighborsk[i_sorting[i]];
+  //[STILL SLOWER THAN AUROSTD::SORT()]    distances[k][i]=distancesk[i_sorting[i]];
+  //[STILL SLOWER THAN AUROSTD::SORT()]  }
+  //[STILL SLOWER THAN AUROSTD::SORT()]}
+  for(k=0;k<i_neighbors.size();k++){aurostd::sort(distances[k],i_neighbors[k]);}
+
+  if(LDEBUG){
+    for(k=0;k<i_neighbors.size();k++){
+      cerr << soliloquy << " ATOMS_CELL[k=" << k << "]: " << atoms_cell[k].name << endl;
+      for(i=0;i<i_neighbors[k].size();i++){
+        cerr << "  neighbor[i=" << i << "]: " << grid_atoms[i_neighbors[k][i]].name << " dist=" << distances[k][i] << endl;
+      }
+    }
+  }
+
+}
+
+
+void GetNeighbors(const xstructure& xstr_in,deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,double rmin,bool prim,bool unique_only){
+  xstructure xstr(xstr_in);
+  return xstr.GetNeighbors(i_neighbors,distances,rmin,prim,unique_only);
+}
+void GetNeighbors(const xstructure& xstr_in,deque<_atom>& atoms_cell,deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,double rmin,bool prim,bool unique_only){
+  xstructure xstr(xstr_in);
+  return xstr.GetNeighbors(atoms_cell,i_neighbors,distances,rmin,prim,unique_only);
+}
+void GetNeighbors(const xstructure& xstr_in,deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,double rmax,double rmin,bool prim,bool unique_only){
+  xstructure xstr(xstr_in);
+  return xstr.GetNeighbors(i_neighbors,distances,rmax,rmin,prim,unique_only);
+}
+void GetNeighbors(const xstructure& xstr_in,deque<_atom>& atoms_cell,deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,double rmax,double rmin,bool prim,bool unique_only){
+  xstructure xstr(xstr_in);
+  return xstr.GetNeighbors(atoms_cell,i_neighbors,distances,rmax,rmin,prim,unique_only);
+}
+
+
+// **************************************************************************
+// Function GetCoordinations
+// **************************************************************************
+// CO20200912
+void xstructure::GetCoordinations(deque<deque<uint> >& coordinations,double rmin,double tol,bool prim,bool unique_only){
+  deque<deque<uint> > i_neighbors;
+  deque<deque<double> > distances;
+  return GetCoordinations(i_neighbors,distances,coordinations,tol,rmin,prim,unique_only);
+}
+void xstructure::GetCoordinations(deque<_atom>& atoms_cell,deque<deque<uint> >& coordinations,double rmin,double tol,bool prim,bool unique_only){
+  deque<deque<uint> > i_neighbors;
+  deque<deque<double> > distances;
+  return GetCoordinations(atoms_cell,i_neighbors,distances,coordinations,tol,rmin,prim,unique_only);
+}
+void xstructure::GetCoordinations(deque<deque<uint> >& coordinations,double rmax,double rmin,double tol,bool prim,bool unique_only){
+  deque<deque<uint> > i_neighbors;
+  deque<deque<double> > distances;
+  return GetCoordinations(i_neighbors,distances,coordinations,rmax,rmin,tol,prim,unique_only);
+}
+void xstructure::GetCoordinations(deque<_atom>& atoms_cell,deque<deque<uint> >& coordinations,double rmax,double rmin,double tol,bool prim,bool unique_only){
+  deque<deque<uint> > i_neighbors;
+  deque<deque<double> > distances;
+  return GetCoordinations(atoms_cell,i_neighbors,distances,coordinations,rmax,rmin,tol,prim,unique_only);
+}
+void xstructure::GetCoordinations(deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,deque<deque<uint> >& coordinations,double rmin,double tol,bool prim,bool unique_only){
+  deque<_atom> atoms_cell;
+  return GetCoordinations(atoms_cell,i_neighbors,distances,coordinations,tol,rmin,prim,unique_only);
+}
+void xstructure::GetCoordinations(deque<_atom>& atoms_cell,deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,deque<deque<uint> >& coordinations,double rmin,double tol,bool prim,bool unique_only){
+  double rmax=RadiusSphereLattice((*this).scale*(*this).lattice);
+  return GetCoordinations(atoms_cell,i_neighbors,distances,coordinations,rmax,rmin,tol,prim,unique_only);
+}
+void xstructure::GetCoordinations(deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,deque<deque<uint> >& coordinations,double rmax,double rmin,double tol,bool prim,bool unique_only){
+  deque<_atom> atoms_cell;
+  return GetCoordinations(atoms_cell,i_neighbors,distances,coordinations,rmax,rmin,tol,prim,unique_only);
+}
+void xstructure::GetCoordinations(deque<_atom>& atoms_cell,deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,deque<deque<uint> >& coordinations,double rmax,double rmin,double tol,bool prim,bool unique_only){
+  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  string soliloquy=XPID+"xstructure::GetCoordinations():";
+
+  GetNeighbors(atoms_cell,i_neighbors,distances,rmax,rmin,prim,unique_only);
+
+  uint i=0,j=0,k=0;
+  for(i=0;i<coordinations.size();i++){coordinations[i].clear();} coordinations.clear(); //clear
+
+  for(k=0;k<i_neighbors.size();k++){
+    coordinations.push_back(deque<uint>(0));
+    j=0;  //index to start at
+    coordinations.back().push_back(0);
+    for(i=0;i<i_neighbors[k].size();i++){
+      if(aurostd::isequal(distances[k][j],distances[k][i],tol)){coordinations.back().back()+=1;}
+      else{
+        j=i;
+        coordinations.back().push_back(1);
+      }
+    }
+  }
+
+  if(LDEBUG){
+    for(k=0;k<i_neighbors.size();k++){
+      cerr << soliloquy << " ATOMS_CELL[k=" << k << "]: " << atoms_cell[k].name << endl;
+      for(i=0;i<coordinations[k].size();i++){
+        cerr << "  coordination[i=" << i << "]: " << coordinations[k][i] << endl;
+      }
+    }
+  }
+
+}
+
+void GetCoordinations(const xstructure& xstr_in,deque<deque<uint> >& coordinations,double rmin,double tol,bool prim,bool unique_only){
+  xstructure xstr(xstr_in);
+  return xstr.GetCoordinations(coordinations,tol,rmin,prim,unique_only);
+}
+void GetCoordinations(const xstructure& xstr_in,deque<_atom>& atoms_cell,deque<deque<uint> >& coordinations,double rmin,double tol,bool prim,bool unique_only){
+  xstructure xstr(xstr_in);
+  return xstr.GetCoordinations(atoms_cell,coordinations,tol,rmin,prim,unique_only);
+}
+void GetCoordinations(const xstructure& xstr_in,deque<deque<uint> >& coordinations,double rmax,double rmin,double tol,bool prim,bool unique_only){
+  xstructure xstr(xstr_in);
+  return xstr.GetCoordinations(coordinations,rmax,rmin,tol,prim,unique_only);
+}
+void GetCoordinations(const xstructure& xstr_in,deque<_atom>& atoms_cell,deque<deque<uint> >& coordinations,double rmax,double rmin,double tol,bool prim,bool unique_only){
+  xstructure xstr(xstr_in);
+  return xstr.GetCoordinations(atoms_cell,coordinations,rmax,rmin,tol,prim,unique_only);
+}
+void GetCoordinations(const xstructure& xstr_in,deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,deque<deque<uint> >& coordinations,double rmin,double tol,bool prim,bool unique_only){
+  xstructure xstr(xstr_in);
+  return xstr.GetCoordinations(i_neighbors,distances,coordinations,tol,rmin,prim,unique_only);
+}
+void GetCoordinations(const xstructure& xstr_in,deque<_atom>& atoms_cell,deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,deque<deque<uint> >& coordinations,double rmin,double tol,bool prim,bool unique_only){
+  xstructure xstr(xstr_in);
+  return xstr.GetCoordinations(atoms_cell,i_neighbors,distances,coordinations,rmin,tol,prim,unique_only);
+}
+void GetCoordinations(const xstructure& xstr_in,deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,deque<deque<uint> >& coordinations,double rmax,double rmin,double tol,bool prim,bool unique_only){
+  xstructure xstr(xstr_in);
+  return xstr.GetCoordinations(i_neighbors,distances,coordinations,rmax,rmin,tol,prim,unique_only);
+}
+void GetCoordinations(const xstructure& xstr_in,deque<_atom>& atoms_cell,deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,deque<deque<uint> >& coordinations,double rmax,double rmin,double tol,bool prim,bool unique_only){
+  xstructure xstr(xstr_in);
+  return xstr.GetCoordinations(atoms_cell,i_neighbors,distances,coordinations,rmax,rmin,tol,prim,unique_only);
+}
 
 // **************************************************************************
 // Function GetNeighData
@@ -15805,7 +16837,7 @@ void xstructure::GetNeighData(const deque<_atom>& in_atom_vec,
 // **************************************************************************
 // This function collects all the neighbor data out to some
 // cutoff and stores it for each atom in the structure.
-void xstructure::GetStrNeighData(const double cutoff,deque<deque<_atom> >& neigh_mat) {
+void xstructure::GetStrNeighData(const double cutoff,deque<deque<_atom> >& neigh_mat) const { //RF+CO20200513
   deque<_atom> atom_vec;
   neigh_mat.clear();
   // Get data from str.
@@ -15828,6 +16860,336 @@ void xstructure::GetStrNeighData(const double cutoff,deque<deque<_atom> >& neigh
   double rmin=1e-6;
   // [OBSOLETE] GetNeighData(atom_vec,sstr,rmin,cutoff,neigh_mat);
   sstr.GetNeighData(atom_vec,rmin,cutoff,neigh_mat);
+}
+
+// **************************************************************************
+// Function GetBasisTransformation //DX20201015
+// **************************************************************************
+xmatrix<double> GetBasisTransformation(const xmatrix<double>& lattice_original, const xmatrix<double>& lattice_new) {
+  return lattice_new*inverse(lattice_original);
+}
+
+// **************************************************************************
+// Function GetBasisTransformationInternalTranslations //DX20201124
+// **************************************************************************
+vector<xvector<double> > GetBasisTransformationInternalTranslations(const xmatrix<double>& basis_transformation) {
+
+  // Given a basis transformation matrix, determine any internal lattice
+  // translation(s). This is necessary if the basis transformation increases
+  // the volume of the cell, otherwise, there are no internal translations
+  // (return immediately).
+  // Another way to think of this: if you expand your lattice/cell, this
+  // function finds all the lattice points in the new cell
+
+  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  string function_name = XPID + "GetBasisTransformationInternalTranslations():";
+  stringstream message;
+
+  vector<xvector<double> > translations;
+
+  double cell_volume_change = aurostd::abs(aurostd::det(basis_transformation));
+
+  if(LDEBUG){ cerr << function_name << " changed in cell volume from basis transformation: " << cell_volume_change << endl; }
+
+  // ---------------------------------------------------------------------------
+  // check if the basis transformation makes the cell larger and find
+  // corresponding internal translations
+  if(cell_volume_change-1.0>_AUROSTD_XSCALAR_TOLERANCE_INTEGER_){
+
+    if(LDEBUG){ cerr << function_name << " cell size increases. Finding internal translations." << endl; }
+
+    // ---------------------------------------------------------------------------
+    // get inverse matrix (Q)
+    xmatrix<double> inverse_transform = aurostd::inverse(basis_transformation);
+
+    // ---------------------------------------------------------------------------
+    // to get translations take the "larger cell" in fractional coordinates
+    // and perform the inverse operation (Q) to see how small it gets,
+    // then these are the internal translations
+    xmatrix<double> lattice_frac = aurostd::eye<double>(3,3);
+    xmatrix<double> lattice_shrink = inverse_transform*lattice_frac;
+
+    if(LDEBUG){ cerr << function_name << " shrunken lattice: " << lattice_shrink << endl; }
+
+    // ---------------------------------------------------------------------------
+    // Now that we have the shortest internal translations from lattice shrink
+    // (forms a basis), we need to find all the internal translations inside this
+    // cell via linear combinations of this basis.
+    // To determine how many combinations we need (i.e. how far to expand), we can
+    // use LatticeDimensionSphere(). Since lattice_shrink is in fractional
+    // coordinates, we need to find the necessary dimensions in each direction
+    // to fill the cell (i.e., the unit box). //DX20210111
+    xvector<int> dims=LatticeDimensionSphere(lattice_shrink,1.0);
+    if(LDEBUG){ cerr << function_name << " number of times to apply each internal translation: " << dims[1] << "," << dims[2] << "," << dims[3] << endl; }
+
+    // ---------------------------------------------------------------------------
+    // create all linear combinations of translations, filter out duplicates later
+    xvector<double> a_vec=lattice_shrink(1);
+    xvector<double> b_vec=lattice_shrink(2);
+    xvector<double> c_vec=lattice_shrink(3);
+    xvector<double> a_vec_scaled, b_vec_scaled, c_vec_scaled;
+    for(int a=0;a<dims[1];a++){
+      a_vec_scaled = (double)a*a_vec;
+      translations.push_back(a_vec_scaled);
+      for(int b=0;b<dims[2];b++){
+        b_vec_scaled = (double)b*b_vec;
+        translations.push_back(b_vec_scaled);
+        translations.push_back(a_vec_scaled+b_vec_scaled);
+        for(int c=0;c<dims[3];c++){
+          c_vec_scaled = (double)c*c_vec;
+          translations.push_back(c_vec_scaled);
+          translations.push_back(a_vec_scaled+c_vec_scaled);
+          translations.push_back(b_vec_scaled+c_vec_scaled);
+          translations.push_back(a_vec_scaled+b_vec_scaled+c_vec_scaled);
+        }
+      }
+    }
+
+    if(LDEBUG){
+      cerr << function_name << " # translations:" << translations.size() << endl;
+      for(uint t=0;t<translations.size();t++){
+        cerr << function_name << " translations:" << translations[t] << endl;
+      }
+    }
+
+    // ---------------------------------------------------------------------------
+    // filter out unique translations 
+    vector<xvector<double> > unique_translations;
+    bool unique = true;
+    for(uint t=0;t<translations.size();t++){
+      xvector<double> translation_incell = BringInCell(translations[t]);
+      unique = true;
+      for(uint u=0;u<unique_translations.size() && unique ;u++){
+        unique = !(aurostd::isequal(translation_incell,unique_translations[u]));
+      }
+      if(unique){ unique_translations.push_back(translation_incell); }
+    }
+
+    if(LDEBUG){
+      cerr << function_name << " # unique_translations:" << unique_translations.size() << endl;
+      for(uint t=0;t<unique_translations.size();t++){
+        cerr << function_name << " unique_translations:" << unique_translations[t] << endl;
+      }
+    }
+    translations = unique_translations;
+  }
+  // ---------------------------------------------------------------------------
+  // if the cell size remains the same or shrinks, no internal translations
+  else{
+    // use null vector
+    if(LDEBUG){ cerr << function_name << " cell size remains the same or reduced. No internal translations." << endl; }
+    xvector<double> zero_xvector;
+    translations.push_back(zero_xvector);
+  }
+  return translations;
+}
+
+// **************************************************************************
+// Function GetRotation //DX20201015
+// **************************************************************************
+xmatrix<double> GetRotation(const xmatrix<double>& lattice_original, const xmatrix<double>& lattice_new) {
+  return aurostd::inverse(lattice_original)*lattice_new; 
+}
+
+// **************************************************************************
+// Function ChangeBasis() //DX20201015
+// **************************************************************************
+// Convert a structure (lattice and atom positions) into a new representation
+// based on the input transformation matrix.
+// The transformation matrix is generally NOT a unitary transformation -
+// it can change the volume of the cell - otherwise it would be a rotation
+// (use Rotate() instead).
+// The procedure is generalized for transformations that enlarge (supercell)
+// or reduce (primitivize) the structure.
+// Enlarging the cell: search for unique internal translations based on 
+// transformation matrix.
+// Reducing the cell: remove duplicate atom positions.
+// Example transformation matrix (4x1x1 supercell expansion):
+//   -4.0000e+00  0.0000e+00  0.0000e+00
+//   -1.0000e+00  0.0000e+00  1.0000e+00
+//   -1.0000e+00  1.0000e+00  0.0000e+00
+
+// ---------------------------------------------------------------------------
+// returns new xstructure (makes a copy)
+xstructure ChangeBasis(const xstructure& xstr, const xmatrix<double>& transformation_matrix) {
+  xstructure xstr_transformed = xstr;
+  xstr_transformed.ChangeBasis(transformation_matrix);
+  return xstr_transformed;
+}
+
+// ---------------------------------------------------------------------------
+// modifies in-place (efficient)
+void xstructure::ChangeBasis(const xmatrix<double>& transformation_matrix) {
+
+  // if the transformation matrix is the identity, don't do anything
+  if(aurostd::isidentity(transformation_matrix)){ return; }
+
+  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  string function_name = XPID + "xstructure::ChangeBasis():";
+  stringstream message;
+
+  if(LDEBUG){
+    cerr << function_name << " structure BEFORE basis transformation:" << endl;
+    cerr << (*this) << endl;
+  }
+
+  uint natoms_orig = (*this).atoms.size();
+  uint natoms_transformed = 0;
+  bool is_integer_multiple_transformation = true;
+
+  // ---------------------------------------------------------------------------
+  // transform the lattice 
+  xmatrix<double> lattice_orig = (*this).lattice;
+  (*this).lattice = transformation_matrix*(*this).lattice;
+  (*this).FixLattices();
+
+  // ---------------------------------------------------------------------------
+  // get internal translations from basis transformation (i.e. transforming
+  // to larger cells)
+  vector<xvector<double> > translations = GetBasisTransformationInternalTranslations(transformation_matrix);
+
+  // ---------------------------------------------------------------------------
+  // transform the atom positions
+  deque<_atom> atom_basis;
+  _atom atom_tmp;
+  xmatrix<double> forig2fnew=inverse(trasp(transformation_matrix)); // Q*pos , but need to transpose Q for AFLOW xmatrix convention
+  xmatrix<double> f2c=trasp((*this).lattice); // Q*pos , but need to transpose Q for AFLOW xmatrix convention
+  for(uint i=0;i<(*this).atoms.size();i++){
+    for(uint t=0;t<translations.size();t++){
+      atom_tmp = (*this).atoms[i];
+      atom_tmp.fpos=forig2fnew*((*this).atoms[i].fpos);
+      atom_tmp.fpos=::BringInCell(atom_tmp.fpos+translations[t]);
+      atom_tmp.cpos=f2c*atom_tmp.fpos;
+      atom_basis.push_back(atom_tmp);
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // calculate change in basis transformation determinant
+  // (shift to 1 to easily see if reduces or expands)
+  double basis_transformation_det_change = aurostd::abs(aurostd::det(transformation_matrix))-1.0;
+
+  // ---------------------------------------------------------------------------
+  // reduce the cell: remove any duplicate atoms
+  // use _AUROSTD_XSCALAR_TOLERANCE_IDENTITY_ to be consistent with AUROSTD's
+  // isinteger tolerance
+  if(basis_transformation_det_change < -_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_){
+    if(LDEBUG){ cerr << function_name << " removing duplicate atoms (cell has been reduced)." << endl; }
+
+    bool skew = false;
+    double tol=0.01;
+    deque<_atom> new_basis = ::foldAtomsInCell(atom_basis, lattice_orig, (*this).lattice, skew, tol, false); //false: don't check atom mappings (slow) //DX20210118 - add global namespace
+    atom_basis = new_basis;
+
+    // check atom count
+    natoms_transformed = atom_basis.size();
+    is_integer_multiple_transformation = (natoms_orig%natoms_transformed==0);
+  }
+  // ---------------------------------------------------------------------------
+  // enlarge the cell: update the atom count information
+  else if(basis_transformation_det_change > _AUROSTD_XSCALAR_TOLERANCE_INTEGER_){
+    if(LDEBUG){ cerr << function_name << " cell size has increased." << endl; }
+    // check atom count
+    natoms_transformed = atom_basis.size();
+    is_integer_multiple_transformation = (natoms_transformed%natoms_orig==0);
+  }
+
+  // ---------------------------------------------------------------------------
+  // is integer multiple transformation (reduce or enlarge)
+  if(!is_integer_multiple_transformation){
+    message << "Number of atoms is no longer an integer multiple with respect to the input structure"
+      << " original: " << natoms_orig
+      << " transformed: " << natoms_transformed
+      << "; check the transformation matrix or same-atom tolerance.";
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
+  }
+
+  // ---------------------------------------------------------------------------
+  // if the number of atoms changed (i.e., change in determinant is zero),
+  // update the atom counts/order/types/etc.
+  if(!aurostd::isequal(aurostd::abs(basis_transformation_det_change), _ZERO_TOL_, _AUROSTD_XSCALAR_TOLERANCE_INTEGER_)){
+    if(LDEBUG){ cerr << function_name << " updating atom count information." << endl; }
+    std::stable_sort(atom_basis.begin(),atom_basis.end(),sortAtomsNames); //DX20210129
+    (*this).ReplaceAtoms(atom_basis, false); //false: check_atom_overlap
+  }
+  // ---------------------------------------------------------------------------
+  // if the transformation preserves the volume, one-to-one mappings
+  // no need to update species/types/etc. (i.e., ReplaceAtoms() is not needed)
+  else{
+    if(LDEBUG){ cerr << function_name << " cell size remains the same (updating atom positions)." << endl; }
+    (*this).atoms = atom_basis;
+  }
+
+  if(LDEBUG){
+    cerr << function_name << " structure AFTER basis transformation:" << endl;
+    cerr << (*this) << endl;
+  }
+}
+
+// **************************************************************************
+// Function TransformStructure() //DX20201125
+// **************************************************************************
+// ---------------------------------------------------------------------------
+// returns new xstructure (makes a copy)
+xstructure TransformStructure(const xstructure& xstr,
+    const xmatrix<double>& transformation_matrix,
+    const xmatrix<double>& rotation) {
+
+  xvector<double> origin_shift;
+  return TransformStructure(xstr, transformation_matrix, rotation, origin_shift);
+}
+
+xstructure TransformStructure(const xstructure& xstr,
+    const xmatrix<double>& transformation_matrix,
+    const xmatrix<double>& rotation,
+    const xvector<double>& origin_shift,
+    bool is_shift_frac){
+  xstructure xstr_transformed = xstr;
+  xstr_transformed.TransformStructure(transformation_matrix, rotation, origin_shift, is_shift_frac);
+  return xstr_transformed;
+}
+
+// ---------------------------------------------------------------------------
+// modifies in-place (efficient)
+void xstructure::TransformStructure(
+    const xmatrix<double>& transformation_matrix,
+    const xmatrix<double>& rotation) {
+
+  xvector<double> origin_shift;
+  (*this).TransformStructure(transformation_matrix, rotation, origin_shift);
+}
+
+void xstructure::TransformStructure(
+    const xmatrix<double>& transformation_matrix,
+    const xmatrix<double>& rotation,
+    const xvector<double>& origin_shift,
+    bool is_shift_frac) {
+
+  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  string function_name = XPID + "xstructure::TransformStructure():";
+
+  if(LDEBUG){
+    cerr << function_name << " basis transformation: " << transformation_matrix << endl;
+    cerr << function_name << " rotation (R): " << rotation << endl;
+  }
+
+  // ---------------------------------------------------------------------------
+  // changed basis
+  (*this).ChangeBasis(transformation_matrix);
+  if(LDEBUG){ cerr << function_name << " structure after CHANGING BASIS: " << (*this) << endl; }
+
+  // ---------------------------------------------------------------------------
+  // rotate
+  (*this).Rotate(rotation);
+  if(LDEBUG){ cerr << function_name << " structure after ROTATING: " << (*this) << endl; }
+
+  // ---------------------------------------------------------------------------
+  // rotate
+  bool coordinate_flag = (*this).coord_flag; // store original coordinate-type
+  (*this).ShiftPos(origin_shift,is_shift_frac);
+  (*this).coord_flag=coordinate_flag; // set back to original coordinate-type
+  (*this).BringInCell(); //DX20210116
+  if(LDEBUG){ cerr << function_name << " structure after shifting origin: " << (*this) << endl; }
 }
 
 // **************************************************************************
@@ -15859,16 +17221,16 @@ void xstructure::qm_clear(void) {
   qm_E_cell=0.0;qm_dE_cell=0.0;qm_H_cell=0.0;qm_PV_cell=0.0;qm_mag_cell=0.0;qm_P=0.0;
   qm_E_atom=0.0;qm_dE_atom=0.0;qm_H_atom=0.0;qm_PV_atom=0.0;qm_mag_atom=0.0; 
 
-  if(atoms.size()!=qm_atoms.size())     {cerr << "ERROR qm_clear [1] atoms.size()!=qm_atoms.size()"<<endl;exit(0);}
-  if(atoms.size()!=qm_forces.size())    {cerr << "ERROR qm_clear [2] atoms.size()!=qm_forces.size()"<<endl;exit(0);}
-  if(atoms.size()!=qm_positions.size()) {cerr << "ERROR qm_clear [3] atoms.size()!=qm_positions.size()"<<endl;exit(0);}
+  if(atoms.size()!=qm_atoms.size())     {throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"xstructure::qm_clear():","[1] atoms.size()!=qm_atoms.size().",_VALUE_ERROR_);}
+  if(atoms.size()!=qm_forces.size())    {throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"xstructure::qm_clear():","[2] atoms.size()!=qm_forces.size().",_VALUE_ERROR_);}
+  if(atoms.size()!=qm_positions.size()) {throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"xstructure::qm_clear():","[3] atoms.size()!=qm_positions.size().",_VALUE_ERROR_);}
 
 }
 
 void xstructure::qm_recycle(void) {
-  if(atoms.size()!=qm_atoms.size())     {cerr << "ERROR qm_load [1] atoms.size()!=qm_atoms.size()"<<endl;exit(0);}
-  if(atoms.size()!=qm_forces.size())    {cerr << "ERROR qm_load [2] atoms.size()!=qm_forces.size()"<<endl;exit(0);}
-  if(atoms.size()!=qm_positions.size()) {cerr << "ERROR qm_load [3] atoms.size()!=qm_positions.size()"<<endl;exit(0);}
+  if(atoms.size()!=qm_atoms.size())     {throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"xstructure::qm_recycle():","[1] atoms.size()!=qm_atoms.size().",_VALUE_ERROR_);}
+  if(atoms.size()!=qm_forces.size())    {throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"xstructure::qm_recycle():","[2] atoms.size()!=qm_forces.size().",_VALUE_ERROR_);}
+  if(atoms.size()!=qm_positions.size()) {throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"xstructure::qm_recycle():","[3] atoms.size()!=qm_positions.size().",_VALUE_ERROR_);}
   scale=qm_scale;
   lattice=qm_lattice;
   klattice=qm_klattice;
@@ -15885,37 +17247,37 @@ void xstructure::qm_recycle(void) {
 
 void xstructure::qm_load(string Directory,string suffix,int iomode) {
   double data_natoms=double(atoms.size());
-  if(iomode!=IOVASP_POSCAR) {cerr << "ERROR xtructure::qm_load, only IOVASP_POSCAR is supported" << endl;exit(0);};
+  if(iomode!=IOVASP_POSCAR) {throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"xstructure::qm_load():","Only IOVASP_POSCAR is supported.",_FILE_WRONG_FORMAT_);};
   if(iomode==IOVASP_POSCAR) {
     xOUTCAR outcar;
-    //if(aurostd::FileEmpty(Directory+"/OUTCAR"))   {cerr << "ERROR xtructure::qm_load: Empty OUTCAR" << endl;exit(0);}
-    if(aurostd::FileEmpty(Directory+"/OUTCAR"+suffix))   {cerr << "ERROR xtructure::qm_load: Empty OUTCAR" << endl;exit(0);}  //PN+JJPR FIXED BUG
+    if(aurostd::FileEmpty(Directory+"/OUTCAR"+suffix))   {throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"xstructure::qm_load():","Empty OUTCAR.",_FILE_CORRUPT_);}  //PN+JJPR FIXED BUG
 
     outcar.GetPropertiesFile(Directory+"/OUTCAR"+suffix,data_natoms,TRUE);
 
-    if(abs(data_natoms-(double) outcar.natoms)>0.1) { 
-      cerr << "ERROR void xstructure::qm_load: data_natoms(" << data_natoms << ")!= (int) outcar.natoms(" << outcar.natoms << ") ..." << endl;
-      cerr << "      Directory=" << Directory << endl;
-      cerr << "      suffix=" << suffix << endl;
-      cerr << "      iomode=" << iomode << endl;
-      exit(0);}
+    if(abs(data_natoms-(double) outcar.natoms)>0.1) {
+      stringstream message;
+      message << "ERROR void xstructure::qm_load: data_natoms(" << data_natoms << ")!= (int) outcar.natoms(" << outcar.natoms << ") ..." << endl;
+      message << "      Directory=" << Directory << endl;
+      message << "      suffix=" << suffix << endl;
+      message << "      iomode=" << iomode << endl;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"xstructure::qm_load():",message,_FILE_WRONG_FORMAT_);;
+    }
 
     //    cerr << atoms.size() << endl;
     qm_clear();
-    if(atoms.size()!=qm_atoms.size())     {cerr << "ERROR xtructure::qm_load [1] atoms.size()!=qm_atoms.size()" << endl;exit(0);}
-    if(atoms.size()!=qm_forces.size())    {cerr << "ERROR xtructure::qm_load [2] atoms.size()!=qm_forces.size()" << endl;exit(0);}
-    if(atoms.size()!=qm_positions.size()) {cerr << "ERROR xtructure::qm_load [3] atoms.size()!=qm_positions.size()" << endl;exit(0);}
+    if(atoms.size()!=qm_atoms.size())     {throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"xstructure::qm_load():","[1] atoms.size()!=qm_atoms.size().",_VALUE_ERROR_);}
+    if(atoms.size()!=qm_forces.size())    {throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"xstructure::qm_load():","[2] atoms.size()!=qm_forces.size().",_VALUE_ERROR_);}
+    if(atoms.size()!=qm_positions.size()) {throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"xstructure::qm_load():","[3] atoms.size()!=qm_positions.size().",_VALUE_ERROR_);}
 
     // NEW WITH xOUTCAR
     qm_forces.clear(); for(uint i=0;i<outcar.vforces.size();i++)  qm_forces.push_back(outcar.vforces.at(i)); 
     qm_positions.clear(); for(uint i=0;i<outcar.vpositions_cartesian.size();i++)  qm_positions.push_back(outcar.vpositions_cartesian.at(i)); 
-    if(atoms.size()!=qm_forces.size())    {cerr << "ERROR xtructure::qm_load [4] atoms.size()!=qm_forces.size()" << endl;exit(0);}
-    if(atoms.size()!=qm_positions.size()) {cerr << "ERROR xtructure::qm_load [5] atoms.size()!=qm_positions.size()" << endl;exit(0);}
+    if(atoms.size()!=qm_forces.size())    {throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"xstructure::qm_load():","[4] atoms.size()!=qm_forces.size().",_VALUE_ERROR_);}
+    if(atoms.size()!=qm_positions.size()) {throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"xstructure::qm_load():","[5] atoms.size()!=qm_positions.size().",_VALUE_ERROR_);}
 
     // NEW WITH xVASPRUNXML
     xVASPRUNXML vasprunxml;
-    //if(aurostd::FileEmpty(Directory+"/vasprun.xml"))   {cerr << "ERROR xtructure::qm_load: Empty vasprun.xml" << endl;exit(0);}
-    if(aurostd::FileEmpty(Directory+"/vasprun.xml"+suffix))   {cerr << "ERROR xtructure::qm_load: Empty vasprun.xml" << endl;exit(0);} //PN+JJPR FIXED BUG
+    if(aurostd::FileEmpty(Directory+"/vasprun.xml"+suffix))   {throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"xstructure::qm_load():","Empty vasprun.xml.",_FILE_CORRUPT_);} //PN+JJPR FIXED BUG
     //vasprunxml.GetPropertiesFile(Directory+"/vasprun.xml");
     vasprunxml.GetPropertiesFile(Directory+"/vasprun.xml"+suffix); //PN+JJPR FIXED BUG
     qm_forces.clear(); for(uint i=0;i<vasprunxml.vforces.size();i++)  qm_forces.push_back(vasprunxml.vforces.at(i)); 
@@ -16011,7 +17373,7 @@ bool PAULING_WyckoffDetector(vector<string> &vinput) {
     }
   }
 
-  exit(0);
+  throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"PAULING_WyckoffDetector():","Throw for debugging purposes.",_GENERIC_ERROR_);
 }
 
 //DX20170831 - xstructure2json - START
@@ -16044,7 +17406,7 @@ string xstructure2json(xstructure& xstr) {
 
   // LATTICE
   if(xstr.lattice.rows){
-    sscontent_json << "\"lattice\":[" << aurostd::xmatDouble2String(xstr.lattice,_AFLOW_XSTR_PRINT_PRECISION_,roff) << "]" << eendl; //CO20180515
+    sscontent_json << "\"lattice\":[" << aurostd::xmatDouble2String(xstr.lattice,_DOUBLE_WRITE_PRECISION_MAX_,roff) << "]" << eendl; //CO20180515
   } else {
     if(PRINT_NULL){ sscontent_json << "\"lattice\":null" << eendl;}
   }
@@ -16116,9 +17478,9 @@ string atom2json(_atom& atom, int coord_flag, int poccupation) {
 
   // POSITION
   if(coord_flag==_COORDS_FRACTIONAL_){
-    sscontent_json << "\"position\":[" << aurostd::joinWDelimiter(xvecDouble2vecString(atom.fpos,_AFLOW_XSTR_PRINT_PRECISION_,roff),",") << "]" << eendl; //CO20180515
+    sscontent_json << "\"position\":[" << aurostd::joinWDelimiter(xvecDouble2vecString(atom.fpos,_DOUBLE_WRITE_PRECISION_MAX_,roff),",") << "]" << eendl; //CO20180515
   } else if(coord_flag==_COORDS_CARTESIAN_){
-    sscontent_json << "\"position\":[" << aurostd::joinWDelimiter(xvecDouble2vecString(atom.cpos,_AFLOW_XSTR_PRINT_PRECISION_,roff),",") << "]" << eendl; //CO20180515
+    sscontent_json << "\"position\":[" << aurostd::joinWDelimiter(xvecDouble2vecString(atom.cpos,_DOUBLE_WRITE_PRECISION_MAX_,roff),",") << "]" << eendl; //CO20180515
   } else {
     if(PRINT_NULL){ sscontent_json << "\"position\":null" << eendl;}
   }

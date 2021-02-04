@@ -27,16 +27,17 @@ int _sign(const int& x) {return (int) (x<0? -1:1);};
 
 namespace surface {
   double PointInTriangleContribution(const xvector<double>& _point,const xvector<double>& v1,const xvector<double>& v2,const xvector<double>& v3) {
+    string soliloquy=XPID+"surface::PointInTriangleContribution():";
     double eps=1.1*_eps_; // relax a little bit
     // xvector<double> point(_point);
     xvector<double> point(3);
-    //  if(surface::PlaneDistance(_point,v1,v2,v3)>eps)  {cerr << "too far point = " << surface::PlaneDistance(_point,v1,v2,v3) << endl;exit(0);}
+    //  if(surface::PlaneDistance(_point,v1,v2,v3)>eps)  {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"point too far = "+aurostd::utype2string(surface::PlaneDistance(_point,v1,v2,v3)),_INPUT_ILLEGAL_);}  //CO20200624
     point=surface::PlaneGetProjection(_point,v1,v2,v3);
-    if(distance(point,_point)>eps) {cerr << "too far point = " << distance(point,_point) << endl;exit(0);}
+    if(distance(point,_point)>eps) {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"point too far = "+aurostd::utype2string(distance(point,_point)),_INPUT_ILLEGAL_);}  //CO20200624
     // if(modulus(point-_point)>1e-8)  cout << 1e8*modulus(point-_point) << endl;  // DEBUG OK
-    if(distance(v1,v2)<eps) { cerr << "ERROR - surface::PointInTriangleContribution: v1-v2" << endl;exit(0);}
-    if(distance(v2,v3)<eps) { cerr << "ERROR - surface::PointInTriangleContribution: v2-v3" << endl;exit(0);}
-    if(distance(v3,v1)<eps) { cerr << "ERROR - surface::PointInTriangleContribution: v3-v1" << endl;exit(0);}
+    if(distance(v1,v2)<eps) {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"v1-v2",_INPUT_ILLEGAL_);}  //CO20200624
+    if(distance(v2,v3)<eps) {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"v2-v3",_INPUT_ILLEGAL_);}  //CO20200624
+    if(distance(v3,v1)<eps) {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"v3-v1",_INPUT_ILLEGAL_);}  //CO20200624
     // is in vertices ?
     if(distance(point,v1)<eps) return angle(v1,v2,v3);
     if(distance(point,v2)<eps) return angle(v2,v3,v1);
@@ -146,6 +147,7 @@ namespace surface {
       xvector<double>& v1,xvector<double>& v2,xvector<double>& v3,xvector<double>& v4,
       const xvector<double>& a1,const xvector<double>& a2,const xvector<double>& a3) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy=XPID+"PlaneGetVVV():";
     bool isrhombus=TRUE;
     double h=hkl(1),k=hkl(2),l=hkl(3);
     double eps=_eps_;
@@ -164,43 +166,42 @@ namespace surface {
       if(LDEBUG) cerr << "X axis INFINITE - 0kl" << endl;
       v1=a2*(1.0/k);v2=a3*(1.0/l);
       v3=v1+a1;v4=v2+a1;
-      if(hkl!=surface::PlaneGetHKL(v1,v2,v3,a1,a2,a3)) {cerr << "ERROR - surface::PlaneGetHKL: GetPLANE: hkl problem in \"[X] axis INFINITE\"" << endl;exit(0);}
-      isrhombus=TRUE;area=2.0*surface::TriangleArea(v1,v2,v3);
-    }
-    if(abs(h)>eps && abs(k)<eps && abs(l)>eps) {   // Y axis INFINITE
-      if(LDEBUG) cerr << "Y axis INFINITE - h0l" << endl;
-      v1=a1*(1.0/h);v2=a3*(1.0/l);
-      v3=v1+a2;v4=v2+a2;  
-      if(hkl!=surface::PlaneGetHKL(v1,v2,v3,a1,a2,a3)) {cerr << "ERROR - surface::PlaneGetHKL: GetPLANE: hkl problem in \"[Y] axis INFINITE\"" << endl;exit(0);}
-      isrhombus=TRUE;area=2.0*surface::TriangleArea(v1,v2,v3);
-    }
-    if(abs(h)>eps && abs(k)>eps && abs(l)<eps) {   // Z axis INFINITE
-      if(LDEBUG) cerr << "Z axis INFINITE - hk0" << endl;
-      v1=a1*(1.0/h);v2=a2*(1.0/k);
-      v3=v1+a3;v4=v2+a3;
-      if(hkl!=surface::PlaneGetHKL(v1,v2,v3,a1,a2,a3)) {cerr << "ERROR - surface::PlaneGetHKL: GetPLANE: hkl problem in \"[Z] axis INFINITE\"" << endl;exit(0);}
-      isrhombus=TRUE;area=2.0*surface::TriangleArea(v1,v2,v3);
-    }
-    if(abs(h)>eps && abs(k)<eps && abs(l)<eps) {   // YZ axis INFINITE
-      if(LDEBUG) cerr << "YZ axis INFINITE - h00" << endl;
-      v1=a1*(1.0/h);v2=v1+a2;v3=v1+a3;v4=v1+a2+a3;
-      isrhombus=TRUE;area=2.0*surface::TriangleArea(v1,v2,v3);
-    }
-    if(abs(h)<eps && abs(k)>eps && abs(l)<eps) {   // XZ axis INFINITE
-      if(LDEBUG) cerr << "XZ axis INFINITE - 0k0" << endl;
-      //v1=a2*(1.0/k);v2=v1+a1;v3=v1+a3;v4=v1+a1+a3;
-      v2=a2*(1.0/k);v1=v2+a1;v3=v2+a3;v4=v2+a1+a3;
-      isrhombus=TRUE;area=2.0*surface::TriangleArea(v1,v2,v3);
-    }
-    if(abs(h)<eps && abs(k)<eps && abs(l)>eps) {   // XY axis INFINITE
-      if(LDEBUG) cerr << "XY axis INFINITE - 00l" << endl;
-      //v1=a3*(1.0/l);v2=v1+a1;v3=v1+a2;v4=v1+a1+a2;
-      v3=a3*(1.0/l);v1=v3+a1;v2=v3+a2;v4=v3+a1+a2;
-      isrhombus=TRUE;area=2.0*surface::TriangleArea(v1,v2,v3);
-    }
-    if(abs(h)<eps && abs(k)<eps && abs(l)<eps) {   // XYZ axis INFINITE
-      cerr << "ERROR - surface::PlaneGetHKL: aflow_xsurface: h,k,l cannot be 0 0 0" << endl;
-      exit(0);
+      if(hkl!=surface::PlaneGetHKL(v1,v2,v3,a1,a2,a3)) {
+        isrhombus=TRUE;area=2.0*surface::TriangleArea(v1,v2,v3);
+      }
+      if(abs(h)>eps && abs(k)<eps && abs(l)>eps) {   // Y axis INFINITE
+        if(LDEBUG) cerr << "Y axis INFINITE - h0l" << endl;
+        v1=a1*(1.0/h);v2=a3*(1.0/l);
+        v3=v1+a2;v4=v2+a2;  
+        if(hkl!=surface::PlaneGetHKL(v1,v2,v3,a1,a2,a3)) {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"hkl problem in \"[Y] axis INFINITE\"",_INPUT_ILLEGAL_);}  //CO20200624
+        isrhombus=TRUE;area=2.0*surface::TriangleArea(v1,v2,v3);
+      }
+      if(abs(h)>eps && abs(k)>eps && abs(l)<eps) {   // Z axis INFINITE
+        if(LDEBUG) cerr << "Z axis INFINITE - hk0" << endl;
+        v1=a1*(1.0/h);v2=a2*(1.0/k);
+        v3=v1+a3;v4=v2+a3;
+        if(hkl!=surface::PlaneGetHKL(v1,v2,v3,a1,a2,a3)) {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"hkl problem in \"[Z] axis INFINITE\"",_INPUT_ILLEGAL_);}  //CO20200624
+        isrhombus=TRUE;area=2.0*surface::TriangleArea(v1,v2,v3);
+      }
+      if(abs(h)>eps && abs(k)<eps && abs(l)<eps) {   // YZ axis INFINITE
+        if(LDEBUG) cerr << "YZ axis INFINITE - h00" << endl;
+        v1=a1*(1.0/h);v2=v1+a2;v3=v1+a3;v4=v1+a2+a3;
+        isrhombus=TRUE;area=2.0*surface::TriangleArea(v1,v2,v3);
+      }
+      if(abs(h)<eps && abs(k)>eps && abs(l)<eps) {   // XZ axis INFINITE
+        if(LDEBUG) cerr << "XZ axis INFINITE - 0k0" << endl;
+        //v1=a2*(1.0/k);v2=v1+a1;v3=v1+a3;v4=v1+a1+a3;
+        v2=a2*(1.0/k);v1=v2+a1;v3=v2+a3;v4=v2+a1+a3;
+        isrhombus=TRUE;area=2.0*surface::TriangleArea(v1,v2,v3);
+      }
+      if(abs(h)<eps && abs(k)<eps && abs(l)>eps) {   // XY axis INFINITE
+        if(LDEBUG) cerr << "XY axis INFINITE - 00l" << endl;
+        //v1=a3*(1.0/l);v2=v1+a1;v3=v1+a2;v4=v1+a1+a2;
+        v3=a3*(1.0/l);v1=v3+a1;v2=v3+a2;v4=v3+a1+a2;
+        isrhombus=TRUE;area=2.0*surface::TriangleArea(v1,v2,v3);
+      }
+      if(abs(h)<eps && abs(k)<eps && abs(l)<eps) {   // XYZ axis INFINITE
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"h,k,l cannot be 0 0 0",_INPUT_ILLEGAL_);}  //CO20200624
     }
     for(int i=1;i<=3;i++) {
       if(abs(v1[i])<eps) v1[i]=0.0;
@@ -285,6 +286,7 @@ namespace surface {
 
   namespace surface {
     double GetPlaneDensityBBonds(const xstructure& _str,const xvector<double>& hkl,const double& roughness,const double& bbdistance,const int& type_at1,const int& type_at2) {
+      string soliloquy=XPID+"surface::GetPlaneDensityBBonds():";
       xmatrix<double> lattice(3,3);
       lattice=(_str.lattice);
       xvector<double> a1(3),a2(3),a3(3);                    // lattice vectors
@@ -356,7 +358,7 @@ namespace surface {
               // P = P1 + u (P2 - P1)    rrr = rrr1 + u (rrr2 - rrr1)    
               num=a*rrr1(1)+b*rrr1[2]+c*rrr1[3]+d;
               den=a*(rrr1(1)-rrr2(1))+b*(rrr1[2]-rrr2[2])+c*(rrr1[3]-rrr2[3]);
-              // if(aurostd::abs(den)<eps/10.0 && aurostd::abs(num)>eps/10.0) {cerr << num << " " << den << endl;exit(0);}
+              // if(aurostd::abs(den)<eps/10.0 && aurostd::abs(num)>eps/10.0) {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,aurostd::utype2string(num)+" "+aurostd::utype2string(den),_INPUT_ILLEGAL_);}  //CO20200624
               // if(aurostd::abs(den)<eps/10.0 && aurostd::abs(num)<=aurostd::abs(den)) {num=0.0;den=1.0;}
               if(aurostd::abs(den)>eps/10.0) // to avoid rrr1,rrr2,rrr coplanar with the plane
               { // found
@@ -364,7 +366,7 @@ namespace surface {
                 if(u<-2*eps || u>1.0+2*eps) cerr << "u=" << u << " num=" << num << " den=" << den << endl;
                 // if(u<0.0 && u>=-eps) u=0.0;
                 // if(u>1.0 && u<=1.0+eps) u=1.0;
-                // if(u<-eps || u>1+eps) {cerr << "u=" << u << endl; exit(0);}
+                // if(u<-eps || u>1+eps) {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"u="aurostd::utype2string(u),_INPUT_ILLEGAL_);}  //CO20200624
                 if(u<0.0) u=0.0;
                 if(u>1.0) u=1.0;
                 rrr=rrr1+u*(rrr2-rrr1);
@@ -398,7 +400,7 @@ namespace surface {
   } // namespace surface
 
   namespace surface {
-    double GetNNeighbours(const xstructure& _str,const int& type_at1,const int& type_at2) {
+    double GetNNeighbors(const xstructure& _str,const int& type_at1,const int& type_at2) {
       xstructure str(_str);
       str=ReScale(BringInCell(_str),1.0);
       xvector<double> a1(3),a2(3),a3(3),rrr1(3),rrr2(3);                // lattice vectors and vectors
@@ -431,8 +433,8 @@ namespace surface {
   } // namespace surface
 
   namespace surface {
-    double GetNNeighbours(const xstructure& _str) {
-      return surface::GetNNeighbours(_str,-1,-1);
+    double GetNNeighbors(const xstructure& _str) {
+      return surface::GetNNeighbors(_str,-1,-1);
     }
   } // namespace surface
 
@@ -646,6 +648,7 @@ namespace surface {
     bool GetSurfaceHKL(const xstructure& _str,_aflags& aflags,const xvector<double>& iparams,
         vector<vector<double> >& planesreducible,vector<vector<double> >& planesirreducible,
         ostream& oss) {
+      string soliloquy=XPID+"surface::GetSurfaceHKL():";
       bool Krun=TRUE;
       xvector<double> hkl(3);
       int num_types=_str.num_each_type.size(),num_types_combinations=num_types*(num_types+1)/2;
@@ -670,15 +673,15 @@ namespace surface {
       oss.setf(std::ios::fixed,std::ios::floatfield);
       oss.precision(_oss_short_precision_aflow_surface_);
 
-      double nndist=surface::GetNNeighbours(str);
+      double nndist=surface::GetNNeighbors(str);
       xmatrix<double> nndists(num_types-1,num_types-1,0,0),bbdistances(num_types-1,num_types-1,0,0);
       for(int it1=0;it1<num_types;it1++)
         for(int it2=it1;it2<num_types;it2++)
-          nndists(it1,it2)=surface::GetNNeighbours(str,it1,it2);
+          nndists(it1,it2)=surface::GetNNeighbors(str,it1,it2);
 
 
       //  if(mode==3 || mode==4) { // all three are given
-      if(mode!=3 && mode!=4) {cerr << "only mode 3 and 4 are defined" << endl;exit(0);}
+      if(mode!=3 && mode!=4) {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"only mode 3 and 4 are defined",_INPUT_ILLEGAL_);}  //CO20200624
       if(mode==3 || mode==4) {
         if(mode==3) bbfrac=_BBFRAC_;
         if(mode==4) bbfrac=iparams(4);
@@ -729,9 +732,10 @@ namespace surface {
           vector<vector<double> >& planesreducible,vector<vector<double> >& planesirreducible,vector<vector<uint> >& planesirreducible_images,
           ostream& oss,const string& smode) {
         bool LDEBUG=(FALSE || XHOST.DEBUG);
+        string soliloquy=XPID+"surface::GetSurfaceHKLSearch():";
         bool search_trivial=FALSE,search_simple=FALSE,search_complete=FALSE;
 
-        if(smode!="HKL_SEARCH_TRIVIAL" && smode!="HKL_SEARCH_SIMPLE" && smode!="HKL_SEARCH_COMPLETE") {cerr << "Error: surface::GetSurfaceHKLSearch [1]" << endl; exit(0);}
+        if(smode!="HKL_SEARCH_TRIVIAL" && smode!="HKL_SEARCH_SIMPLE" && smode!="HKL_SEARCH_COMPLETE") {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"unknown mode",_INPUT_ILLEGAL_);}  //CO20200624
         if(smode=="HKL_SEARCH_TRIVIAL")  {search_trivial=TRUE;search_simple=FALSE;search_complete=FALSE;};
         if(smode=="HKL_SEARCH_SIMPLE" )  {search_trivial=FALSE;search_simple=TRUE;search_complete=FALSE;};
         if(smode=="HKL_SEARCH_COMPLETE") {search_trivial=FALSE;search_simple=FALSE;search_complete=TRUE;};
@@ -799,11 +803,11 @@ namespace surface {
         FFF.setf(std::ios::fixed,std::ios::floatfield);
         FFF.precision(_oss_short_precision_aflow_surface_);
 
-        double nndist=surface::GetNNeighbours(str);
+        double nndist=surface::GetNNeighbors(str);
         xmatrix<double> nndists(num_types-1,num_types-1,0,0),bbdistances(num_types-1,num_types-1,0,0);
         for(int it1=0;it1<num_types;it1++)
           for(int it2=it1;it2<num_types;it2++)
-            nndists(it1,it2)=surface::GetNNeighbours(str,it1,it2);
+            nndists(it1,it2)=surface::GetNNeighbors(str,it1,it2);
 
         if(LDEBUG) cerr << "surface::GetSurfaceHKLSearch: [2] " <<   endl;
 
@@ -838,7 +842,7 @@ namespace surface {
             //   oss << banner << endl; // ----------------------------------------------------------------
             oss << surface::PrintNNdists(num_types,num_types_combinations,bbfrac,nndist,nndists);
             oss << "hklmax=" << hklmax << endl;
-            oss << "bbdistance=" << bbdistance/nndist << "  surface::GetNNeighbours=" << surface::GetNNeighbours(str) << " real_bbdistance=" << bbdistance << endl;
+            oss << "bbdistance=" << bbdistance/nndist << "  surface::GetNNeighbors=" << surface::GetNNeighbors(str) << " real_bbdistance=" << bbdistance << endl;
             oss << "step=" << step << endl;
             oss << "SCANNING TRIVIAL PLANES" << endl;
             oss << surface::PrintHKLSigmaBB(num_types,num_types_combinations,bbfrac,bbdistance,bbdistances);
@@ -852,7 +856,7 @@ namespace surface {
             if(search_complete) FFF << "COMPLETE SEARCH" << endl;
             FFF << surface::PrintNNdists(num_types,num_types_combinations,bbfrac,nndist,nndists);
             FFF << "hklmax=" << hklmax << endl;
-            FFF << "bbdistance=" << bbdistance/nndist << "  surface::GetNNeighbours=" << surface::GetNNeighbours(str) << " real_bbdistance=" << bbdistance << endl;
+            FFF << "bbdistance=" << bbdistance/nndist << "  surface::GetNNeighbors=" << surface::GetNNeighbors(str) << " real_bbdistance=" << bbdistance << endl;
             FFF << "step=" << step << endl;
             FFF << "SCANNING TRIVIAL PLANES" << endl;
             FFF << surface::PrintHKLSigmaBB(num_types,num_types_combinations,bbfrac,bbdistance,bbdistances);
@@ -1210,12 +1214,11 @@ namespace slab {
   xstructure MAKE_SLAB(string options,xstructure& _str_in) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy = XPID + "slab::MAKE_SLAB():";
-    if(LDEBUG) cerr << "slab::MAKE_SLAB: BEGIN" << endl;
+    if(LDEBUG) cerr << soliloquy << " BEGIN" << endl;
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()<3 || tokens.size()>5) {
-      init::ErrorOption(cout,options,"slab::MAKE_SLAB","aflow --slab=h,k,l[,#filled_layers[,#vacuum layers]] < POSCAR");
-      exit(0);
+      init::ErrorOption(options,soliloquy,"aflow --slab=h,k,l[,#filled_layers[,#vacuum layers]] < POSCAR");
     }
     int i=0,j=0,k=0;
     //  options[0-2]="h" "k" "l" options[3-4]="NumFilledLayers" "NumEmptyLayers"
@@ -1472,7 +1475,7 @@ namespace slab {
       LayerBasis[1]++;
     }
     if(BasisFound==false || 180.0/PI*acos(Layer0BasisCosAngle)<10.0) {
-      cerr << "slab::MAKE_SLAB: Basis in plane was not found" << endl; //return 1;
+      cerr << soliloquy << " Basis in plane was not found" << endl; //return 1;
     }
     for(i=1;i<=2;i++) {
       AbsValueSlab_Basis[i]=slab::VectorAbsValue(0,Layer0Basis[i],UnitCellVector,LayerSitesDirCoords);
@@ -2005,20 +2008,17 @@ namespace slab {
     //[OBSOLETE CO20180727]  for(i=NumSites[j];i<NumSites[j+1]+NumSites[j];i++) {
     //[OBSOLETE CO20180727]    //CO20180202 - added safety
     //[OBSOLETE CO20180727]    if(i>(int)str_out.atoms.size()-1){
-    //[OBSOLETE CO20180727]      cerr << XPID << "pflow::MAKE_SLAB: ERROR - not as many atoms were created as cxpected (likely a problem with AddAtom())" << endl;
-    //[OBSOLETE CO20180727]      cerr << "Exiting!" << endl;
-    //[OBSOLETE CO20180727]      exit(1);
+    //[OBSOLETE CO20180727]      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"not as many atoms were created as should have been (likely a problem with AddAtom())",_RUNTIME_ERROR_);}  //CO20200624
     //[OBSOLETE CO20180727]    }
     //[OBSOLETE CO20180727]str_out.atoms.at(i).name=str_in.SpeciesLabel(j);
     //[OBSOLETE CO20180727]  }
-    //[OBSOLETE CO20180727]}
     //CO+DU20180705 STOP
     ////////////////////////////////////////////////////////////
 
     //for(i=0;i<NumberElements;i++)
     //str_out.num_each_type[i]=(NumSites[i+1]);
 
-    if(LDEBUG) cerr << "slab::MAKE_SLAB: END" << endl;
+    if(LDEBUG) cerr << soliloquy << " END" << endl;
     return str_out;
 
   }
@@ -2410,7 +2410,6 @@ namespace slab {
         cerr << soliloquy << " plane[i=" << i << "]: n=" << v_n_cpos[i] << ", p=" << (i<3?p_origin:p_top) << endl;
       }
     }
-    //exit(0);
 
     //find what atom fpos_starting corresponds to
     xvector<double> fpos_starting=BringInCell(c2f*cpos_starting);
@@ -3704,7 +3703,8 @@ namespace slab {
 
     if(LDEBUG) {cerr << soliloquy << " starting" << endl;}
 
-    int xy_dims=1;          //dimensions of supercell in x-y dimensions
+    int xy_dims=1;                //dimensions of supercell in x-y dimensions
+    xvector<double> zero_xvector; //zero xvector //DX20201124
 
     xstructure xstr_bulk(xstr_in);xstr_bulk.ReScale(1.0); //do NOT modify further
     double min_dist=xstr_bulk.dist_nn_min;
@@ -3842,7 +3842,8 @@ namespace slab {
 
     //clean up structure
     xstr_slab_origbasis.ReScale(1.0);
-    xstr_slab_origbasis.ShiftOriginToAtom(0);xstr_slab_origbasis.origin=0.0; //reset origin
+    //DX20201124 [OBSOLETE - origin is an xvector not double] xstr_slab_origbasis.ShiftOriginToAtom(0);xstr_slab_origbasis.origin=0.0; //reset origin
+    xstr_slab_origbasis.ShiftOriginToAtom(0); xstr_slab_origbasis.origin=zero_xvector; //reset origin //DX20201124
     xstr_slab_origbasis.BringInCell();
     xstr_slab_origbasis.clean(); //DX20191220 - uppercase to lowercase clean
 
@@ -3862,7 +3863,8 @@ namespace slab {
 
     //clean up structure
     xstr_slab_newbasis.ReScale(1.0);
-    xstr_slab_newbasis.ShiftOriginToAtom(0);xstr_slab_newbasis.origin=0.0; //reset origin
+    //DX20201124 [OBSOLETE - origin is an xvector not double] xstr_slab_newbasis.ShiftOriginToAtom(0);xstr_slab_newbasis.origin=0.0; //reset origin
+    xstr_slab_newbasis.ShiftOriginToAtom(0); xstr_slab_newbasis.origin=zero_xvector; //reset origin
     xstr_slab_newbasis.BringInCell();
     xstr_slab_newbasis.clean(); //DX20191220 - uppercase to lowercase clean
 
@@ -3929,7 +3931,8 @@ namespace slab {
 
     //clean up structure
     xstr_slab.ReScale(1.0);
-    xstr_slab.ShiftOriginToAtom(0);xstr_slab.origin=0.0; //reset origin
+    //DX20201124 [OBSOLETE - origin is an xvector not double] xstr_slab.ShiftOriginToAtom(0);xstr_slab.origin=0.0; //reset origin
+    xstr_slab.ShiftOriginToAtom(0); xstr_slab.origin=zero_xvector; //reset origin //DX20201124
     xstr_slab.BringInCell();
     //xstr_slab.clean();  //clear origin! //do not clear ijk! origin is okay here, only a problem for Rotate() //DX20191220 - uppercase to lowercase clean
 
@@ -4094,7 +4097,7 @@ namespace slab {
     }
     if(!aurostd::isequal(min_dist,min_dist_orig)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Minimum distance changed (test)",_INPUT_ERROR_);}
 
-    bool structures_match=compare::aflowCompareStructure(xstr_slab_correct,xstr_slab_test,true,false,false);
+    bool structures_match=compare::structuresMatch(xstr_slab_correct,xstr_slab_test,true,false,false);
     if(LDEBUG){cerr << soliloquy << " structures_match=" << structures_match << endl;}
     if(!structures_match){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Structures do not match",_RUNTIME_ERROR_);}
     message << "Slab test successful";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_COMPLETE_);

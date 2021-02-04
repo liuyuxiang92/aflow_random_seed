@@ -28,6 +28,10 @@ Note: This implementation of the geometric prototypes allows for the creation of
 structure prototypes depending on the parameters chosen. Therefore, these prototypes are quite 
 general and powerful.
 
+[New feature as of V3.2.5]
+Any possible prototype can be created with the new symbolic prototype generator as long as it follows
+the label and internal degrees of freedom scheme.
+Prototypes no longer need to be tabulated (hard-coded) in the AFLOW software, and are now created on-the-fly.
 
 The general format for the command is as follows (optional arguments are enclosed in square brackets "[]"):
 
@@ -61,6 +65,9 @@ for more "realistic" volumes when decorating with different atomic species.
 To force the ANRL defined lattice parameter, add the following flag to the 
 command: --use_anrl_lattice_parameter.
 
+By default, AFLOW will check if the input parameters match with any of the predefined aliases/enumerations.
+If there is a match, then the label is appended with the appropriate enumeration suffix and will
+be printed in the aflow.in and/or geometry file title.
 
 A description of each input is described below:
 

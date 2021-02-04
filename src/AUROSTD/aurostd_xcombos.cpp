@@ -45,12 +45,28 @@ namespace aurostd {
   // 
   //--------------------------------------------------------------------------------
 
+  //--------------------------------------------------------------------------------
+  // Permutation algorithms
+  // Depending on which algorithm is used, the swapping order for permutations can
+  // be different, see http://combos.org/perm
+  //
+  // Two algorithms are currently supported:
+  //  1) Shen - lexicographical order (default)
+  //            reference: doi:10.1007/BF01940170
+  //            first swap: 1234 -> 1243
+  //            example use case(s): POSCARs and POCC algorithm
+  //  2) Heap - swap left-most first (fastest, minimum number of swaps)
+  //            reference: https://en.wikipedia.org/wiki/Heap%27s_algorithm
+  //            first swap: 1234 -> 2134
+  //            example use case(s): finding representative atom decorations/permutations for prototypes
+  //
+  // If new algorithms are added, update the algorithms_xcombos enum.
 
   //------------------------------------------------------------------------------
   // constructor
   //------------------------------------------------------------------------------
   xcombos::xcombos() {free();}
-  xcombos::xcombos(const std::vector<int>& vec, bool sort, char mode) {reset(vec, sort, mode);}
+  xcombos::xcombos(const std::vector<int>& vec, bool sort, char mode, algorithm_xcombos algorithm) {reset(vec, sort, mode, algorithm);} //DX20201222 - added algorithm
   xcombos::xcombos(int choice_count,int choose_count, char mode, bool rpt) {reset(choice_count, choose_count, mode, rpt);}
   xcombos::xcombos(const std::vector<int>& vec, char mode) {reset(vec, mode);}
   xcombos::xcombos(const xcombos& b) {copy(b);} // copy PUBLIC
@@ -62,6 +78,7 @@ namespace aurostd {
     n_choices=0;
     m_choose=0;
     m_mode = '\0'; //ME20180529
+    m_algorithm = shen_alg_xcombos; //DX20201222 - use Shen algorithm by default
     m_sets.clear(); //ME20180529
     m_sort=FALSE;
     m_started=FALSE;
@@ -81,6 +98,7 @@ namespace aurostd {
     m_choose=b.m_choose;
     m_indices = b.m_indices; //ME20180620
     m_mode = b.m_mode; //ME20180529
+    m_algorithm = b.m_algorithm; //DX20201222
     m_sets = b.m_sets;
     m_sort=b.m_sort;
     m_started=b.m_started;
@@ -125,10 +143,11 @@ namespace aurostd {
     }
   }
 
-  void xcombos::reset(std::vector<int> vec,bool sort, char mode) { //do NOT make input vec a const &, this will screw up reset()
+  void xcombos::reset(std::vector<int> vec,bool sort, char mode, algorithm_xcombos algorithm) { //do NOT make input vec a const &, this will screw up reset()
     free();
     m_input=vec;
     m_mode=mode;
+    m_algorithm=algorithm; //DX20201222
     if (m_mode == 'p') {m_mode = 'P';}
     if (m_mode != 'P') {
       m_exhausted = TRUE;
@@ -207,6 +226,11 @@ namespace aurostd {
       for (uint i = 0; i < m_indices.size(); i++) {
         m_indices[i] = i;
       }
+      // for Heap's algorithm //DX20201222
+      m_p.clear();
+      m_p.resize(m_input.size(),0);
+      n_choices = (int)m_input.size(); //DX+ME20210111
+      m_choose = (int)m_input.size(); //DX+ME20210111
     } else {
       if(LDEBUG) {
         string soliloquy="xcombos::initialize():";  //CO20200404
@@ -287,17 +311,51 @@ namespace aurostd {
   void xcombos::incrementPermutation() {
     bool LDEBUG=(FALSE || XHOST.DEBUG||_DEBUG_XCOMBOS_);
     if(m_exhausted) {return;}
-    //Shen, MK. BIT (1962) 2(228). doi:10.1007/BF01940170
-    //note this will generate next permutation in lexicographical order (left to right)
-    int _i=-1;
-    int _j=-1;
-    for(int i=1;i<(int)m_current.size();i++) {if(m_current[i-1]<m_current[i]&&(i>_i)){_i=i;}}
-    if(_i==-1) {m_exhausted=TRUE; return;} //stop condition
-    for(int j=0;j<(int)m_current.size();j++) {if(m_current[_i-1]<m_current[j]&&(j>_j)){_j=j;}}
-    if(LDEBUG) {cerr << "xcombos::incrementPermutation(): i=" << _i << "  j=" << _j << " " << endl;}
-    std::swap(m_current[_i-1],m_current[_j]);
-    std::swap(m_indices[_i-1], m_indices[_j]); //ME20180620
-    for(int i=0;i<((int)m_current.size()-_i+1)/2;i++) {std::swap(m_current[_i+i],m_current[m_current.size()-i-1]);}
+    if(m_algorithm==shen_alg_xcombos){
+      //Shen, MK. BIT (1962) 2(228). doi:10.1007/BF01940170
+      //note this will generate next permutation in lexicographical order (left to right), e.g., first swap 1234 -> 1243
+      int _i=-1;
+      int _j=-1;
+      for(int i=1;i<m_choose;i++) {if(m_current[i-1]<m_current[i]&&(i>_i)){_i=i;}}
+      if(_i==-1) {m_exhausted=TRUE; return;} //stop condition
+      for(int j=0;j<m_choose;j++) {if(m_current[_i-1]<m_current[j]&&(j>_j)){_j=j;}}
+      if(LDEBUG) {cerr << "xcombos::incrementPermutation(): i=" << _i << "  j=" << _j << " " << endl;}
+      std::swap(m_current[_i-1],m_current[_j]);
+      std::swap(m_indices[_i-1], m_indices[_j]); //ME20180620
+      for(int i=0;i<(m_choose-_i+1)/2;i++) {std::swap(m_current[_i+i],m_current[m_current.size()-i-1]);}
+    }
+    else if (m_algorithm==heap_alg_xcombos){ //DX20201222 - added this algorithm
+      //Heap, B.R. (1963): https://en.wikipedia.org/wiki/Heap%27s_algorithm
+      //note this will generate permutation by swapping lowest position index (left-most position), e.g., first swap 1234 -> 2134
+      bool found_permutation=false;
+      uint count=0, safety = m_choose; //DX20210111 - smarter saftey; each increment should swap no more than m_choose times
+      while(!found_permutation&&count<=safety){
+        count++;
+        if(m_x>=m_choose){ m_exhausted=TRUE; return; } //stop condition
+        if(m_p[m_x] < m_x){
+          if(m_x%2==0){
+            std::swap(m_current[0],m_current[m_x]);
+          }
+          else{
+            std::swap(m_current[m_p[m_x]],m_current[m_x]);
+          }
+          m_p[m_x]+=1;
+          m_x=0;
+          found_permutation = true;
+          if(LDEBUG) {cerr << "xcombos::incrementPermutation(): [HEAP] m_current: " << aurostd::joinWDelimiter(m_current, ",") << endl;}
+        }
+        else{
+          m_p[m_x]=0;
+          m_x+=1;
+        }
+      }
+      if(count>safety){
+        throw xerror(_AFLOW_FILE_NAME_,"xcombos::incrementPermutation()", "[HEAP] Uncontrolled while loop. Algorithm is not working as expected.",  _RUNTIME_ERROR_);
+      }
+    }
+    else{ //DX2020111
+      throw xerror(_AFLOW_FILE_NAME_,"xcombos::incrementPermutation()", "Invalide algorithm type, only Shen (shen_alg_xcombos) and Heap's (heap_alg_xcombos) algorithms are available.",  _INPUT_ERROR_);
+    }
   }
 
   //ME20180509 - Implemented combinations with repetitions
@@ -404,7 +462,6 @@ namespace aurostd {
             cerr << endl;
             cerr << "x=" << m_x << "(1)" << endl;
             cerr << "y=" << m_y << "(0)" << endl;
-            //exit(0);
           }
         }
       }

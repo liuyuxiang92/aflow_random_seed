@@ -53,6 +53,8 @@
 #define AMU2KILOGRAM            1.66054E-27
 #define KILOGRAM2AMU            6.022137E+26
 #define E_ELECTRON              1.60217662E-19                  // C
+#define eV2J                    E_ELECTRON                      // 1eV=E_ELECTRON J //CO20201111
+#define J2eV                    (1.0/E_ELECTRON)                //CO20201111
 #define PLANCKSCONSTANT_h       6.62607E-34                     // J*s
 #define PLANCKSCONSTANT_hbar    1.0545718E-34                   // J*s
 #define PLANCKSCONSTANTEV_h     (PLANCKSCONSTANT_h/E_ELECTRON)  // eV*s
@@ -61,9 +63,11 @@
 #define KBOLTZEV                (KBOLTZ/E_ELECTRON)             // eV/K //8.617343E-5
 #define eV2K                    (11604.505)                     // 1eV=11604.505 K
 #define meV2K                   (11.604505)                     // 1meV=11.604505 K
-#define atom2mol                6.0221408E23                    //CO20180329
-#define meVatom2kJmol           (E_ELECTRON*atom2mol/1.0e6)     //CO20180329
-#define hartree2eV              27.2113862459                   //ME20200206
+#define mol2atom                6.0221408E23                    // 1mol=6.022e23 atoms    //CO20180329
+#define atom2mol                (1.0/6.0221408E23)              //CO20201111
+#define eVatom2kJmol            (E_ELECTRON*mol2atom/1.0e3)     // 1eV/atom=96.5kJ/mol    //CO20180329
+#define meVatom2kJmol           (eVatom2kJmol/1.0e3)            // 1meV/atom=0.0965kJ/mol //CO20180329
+#define hartree2eV              27.2113862459                   // 1hartree=27.211eV      //ME20200206
 
 //ME20200107 - (A)APL conversion factors
 #define THz2Hz                        1E12
@@ -82,6 +86,11 @@
 
 //AS20200427 - QHA-related conversion factors
 #define eV2GPa (E_ELECTRON*1e21)    // [eV/A^3] --> [GPa]
+#define atm2Pa 101325
+
+//DX20210111 - GFA factors
+#define TEMPERATURE_ROOM 300.0               // K
+#define kBT_ROOM (KBOLTZEV*TEMPERATURE_ROOM) // 0.025
 
 // ----------------------------------------------------------------------------
 // ------------------------------------------------------------------ constants
@@ -106,6 +115,8 @@
 #define _AUROSTD_XSCALAR_TOLERANCE_IDENTITY_ 1.0e-6
 #define _AUROSTD_XSCALAR_TOLERANCE_ROUNDOFF_ 1.0e-6
 
+#define _AUROSTD_XSCALAR_TOLERANCE_INTEGER_ 1.0e-2 //DX20201217
+
 // ----------------------------------------------------------------------------
 // ------------------------- primitives for template<class utype> xscalar<utype>
 
@@ -125,6 +136,7 @@
 namespace aurostd {
   // namespace aurostd
   //[CO20180729 OBSOLETE]template<class utype> bool _isfloat(utype) __xprototype;
+  bool _ishex(const string&) __xprototype;
   template<class utype> bool _isodd(utype) __xprototype;
   template<class utype> bool _iseven(utype) __xprototype;
   template<class utype> bool _isreal(utype) __xprototype;
@@ -157,18 +169,18 @@ namespace aurostd {
   void GCD(long double a,long double b,long double& gcd,long double tolerance=0.01);  //CO20191201
   int LCM(int a,int b); //CO20190520
 
-  template<class utype> bool _isinteger(utype,utype=(utype)0.01) __xprototype;  //CO20191201
-  //bool isinteger(bool x,bool tolerance=(bool)0.01); //CO20191201
-  //bool isinteger(char x,char tolerance=(char)0.01); //CO20191201
-  bool isinteger(uint x,uint tolerance=(uint)0.01); //CO20191201  //CO20191201 - obvious but define for boot
-  bool isinteger(int x,int tolerance=(int)0.01);  //CO20191201  //CO20191201 - obvious but define for boot
-  bool isinteger(long int x,long int tolerance=(long)0.01); //CO20191201  //CO20191201 - obvious but define for boot
-  bool isinteger(unsigned long int x,unsigned long int tolerance=(unsigned long)0.01); //CO20191201  //CO20191201 - obvious but define for boot
-  bool isinteger(long long int x,long long int tolerance=(long long int)0.01);  //CO20191201  //CO20191201 - obvious but define for boot
-  bool isinteger(unsigned long long int x,unsigned long long int tolerance=(unsigned long long int)0.01); //CO20191201  //CO20191201 - obvious but define for boot
-  bool isinteger(float x,float tolerance=(float)0.01);  //CO20191201
-  bool isinteger(double x,double tolerance=(double)0.01); //CO20191201
-  bool isinteger(long double x,long double tolerance=(long double)0.01);  //CO20191201
+  template<class utype> bool _isinteger(utype,utype=(utype)_AUROSTD_XSCALAR_TOLERANCE_INTEGER_) __xprototype;  //CO20191201
+  //bool isinteger(bool x,bool tolerance=(bool)_AUROSTD_XSCALAR_TOLERANCE_INTEGER_); //CO20191201
+  //bool isinteger(char x,char tolerance=(char)_AUROSTD_XSCALAR_TOLERANCE_INTEGER_); //CO20191201
+  bool isinteger(uint x,uint tolerance=(uint)_AUROSTD_XSCALAR_TOLERANCE_INTEGER_); //CO20191201  //CO20191201 - obvious but define for boot
+  bool isinteger(int x,int tolerance=(int)_AUROSTD_XSCALAR_TOLERANCE_INTEGER_);  //CO20191201  //CO20191201 - obvious but define for boot
+  bool isinteger(long int x,long int tolerance=(long)_AUROSTD_XSCALAR_TOLERANCE_INTEGER_); //CO20191201  //CO20191201 - obvious but define for boot
+  bool isinteger(unsigned long int x,unsigned long int tolerance=(unsigned long)_AUROSTD_XSCALAR_TOLERANCE_INTEGER_); //CO20191201  //CO20191201 - obvious but define for boot
+  bool isinteger(long long int x,long long int tolerance=(long long int)_AUROSTD_XSCALAR_TOLERANCE_INTEGER_);  //CO20191201  //CO20191201 - obvious but define for boot
+  bool isinteger(unsigned long long int x,unsigned long long int tolerance=(unsigned long long int)_AUROSTD_XSCALAR_TOLERANCE_INTEGER_); //CO20191201  //CO20191201 - obvious but define for boot
+  bool isinteger(float x,float tolerance=(float)_AUROSTD_XSCALAR_TOLERANCE_INTEGER_);  //CO20191201
+  bool isinteger(double x,double tolerance=(double)_AUROSTD_XSCALAR_TOLERANCE_INTEGER_); //CO20191201
+  bool isinteger(long double x,long double tolerance=(long double)_AUROSTD_XSCALAR_TOLERANCE_INTEGER_);  //CO20191201
 
   template<class utype> bool _iszero(utype a,utype tol=(utype)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_);  //CO20191201
   //bool iszero(bool x,bool tolerance); //CO20191201
@@ -547,6 +559,18 @@ namespace aurostd{
   double FermiDirac(double E, double mu, double T);
 }
 //AS20200513 END
+
+//CO20201111 BEGIN
+namespace aurostd{
+  template<class utype> utype nCk(utype n,utype k);
+}
+//CO20201111 END
+
+//CO20201111 - BEGIN
+namespace aurostd {
+  bool isNaN(double d);
+}
+//CO20201111 - END
 
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------

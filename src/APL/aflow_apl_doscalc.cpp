@@ -1,7 +1,8 @@
-// [OBSOLETE] #include <iostream>
-// [OBSOLETE] #include <sstream>
-// [OBSOLETE] #include <string>
-// [OBSOLETE] #include <limits>
+// ***************************************************************************
+// *                                                                         *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *                                                                         *
+// ***************************************************************************
 
 #include "aflow_apl.h"
 
@@ -17,9 +18,7 @@
 #endif
 //CO END
 
-#define MIN_FREQ_TRESHOLD -0.1
-
-using namespace std;
+static const double MIN_FREQ_THRESHOLD = -0.1;
 
 namespace apl {
 
@@ -28,27 +27,26 @@ namespace apl {
     free();
   }
 
-  DOSCalculator::DOSCalculator(PhononCalculator& pc, const string& method, const vector<xvector<double> >& projections) {
+  DOSCalculator::DOSCalculator(PhononCalculator& pc, const xoption &aplopts) {
     free();
     _pc = &pc;
     _pc_set = true;
-    initialize(projections, method);
+    initialize(aplopts);
   }
 
   DOSCalculator::DOSCalculator(const DOSCalculator& that) {
-    free();
+    if (this != &that) free();
     copy(that);
   }
 
   DOSCalculator& DOSCalculator::operator=(const DOSCalculator& that) {
-    if (this != &that) {
-      free();
-      copy(that);
-    }
+    if (this != &that) free();
+    copy(that);
     return *this;
   }
 
   void DOSCalculator::copy(const DOSCalculator& that) {
+    if (this == &that) return;
     _pc = that._pc;
     _pc_set = that._pc_set;
     _bzmethod = that._bzmethod;
@@ -101,16 +99,45 @@ namespace apl {
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  void DOSCalculator::initialize(const vector<xvector<double> >& projections, const string& method) {
+  void DOSCalculator::initialize(const xoption &aplopts){
     string function = "apl::DOSCalculator::initialize():";
     string message = "";
     if (!_pc_set) {
       message = "PhononCalculator pointer not set.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
     }
-    _bzmethod = method;
-    _projections = projections;
-    _system = _pc->getSystemName();
+    //AS20200312 BEGIN: now initialization parameters are passed using xoption
+    _bzmethod = aplopts.getattachedscheme("DOSMETHOD");
+
+    // projections
+    if (aplopts.flag("DOS_PROJECT")) {
+      if (aplopts.flag("DOS_CART") || aplopts.flag("DOS_FRAC")) {
+        string projscheme = "";
+        if (aplopts.flag("DOS_CART")){
+          projscheme = aplopts.getattachedscheme("DOSPROJECTIONS_CART");
+        } else {
+          projscheme = aplopts.getattachedscheme("DOSPROJECTIONS_FRAC");
+        }
+        vector<string> tokens;
+        aurostd::string2tokens(projscheme, tokens, "; ");
+        vector<double> proj;
+        for (uint i = 0; i < tokens.size(); i++) {
+          aurostd::string2tokens(tokens[i], proj, ", ");
+          _projections.push_back(aurostd::vector2xvector<double>(proj));
+        }
+      } else {
+        xvector<double> proj(3);
+        _projections.push_back(proj);
+      }
+    }
+
+    if ((_projections.size() > 0) && aplopts.flag("DOS_FRAC")) {
+      for (uint p = 0; p < _projections.size(); p++) {
+        _projections[p] = _pc->getInputCellStructure().f2c * _projections[p];
+      }
+    }
+    //AS20200312 END
+    _system = _pc->_system;
 
     if (!_pc->getSupercell().isConstructed()) {
       message = "The supercell structure has not been initialized yet.";
@@ -203,10 +230,10 @@ namespace apl {
 #endif
     //CO END
 
-    //if freq > MIN_FREQ_TRESHOLD considerd as +ve freq [PN]
+    //if freq > MIN_FREQ_THRESHOLD considerd as +ve freq [PN]
     for (uint i = 0; i < _freqs.size(); i++) {
       for (int j = _freqs[i].lrows; j <= _freqs[i].urows; j++) {
-        if ((_freqs[i][j] < 0.00) && (_freqs[i][j] > MIN_FREQ_TRESHOLD)) _freqs[i][j] = 0.00;
+        if ((_freqs[i][j] < 0.00) && (_freqs[i][j] > MIN_FREQ_THRESHOLD)) _freqs[i][j] = 0.00;
       }
     }
     //PN END
@@ -221,7 +248,7 @@ namespace apl {
       }
     }
     _maxFreq += 1.0;
-    if (_minFreq < MIN_FREQ_TRESHOLD) _minFreq -= 1.0;
+    if (_minFreq < MIN_FREQ_THRESHOLD) _minFreq -= 1.0;
     else _minFreq = 0.0;
   }
 
@@ -301,7 +328,7 @@ namespace apl {
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
     }
     // Check parameters
-    if (aurostd::isequal(fmax, fmin, _AFLOW_APL_EPS_)) {
+    if (aurostd::isequal(fmax, fmin, _FLOAT_TOL_)) {
       message = "Frequency range of phonon DOS is nearly zero.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
     } else if (fmin > fmax) {
@@ -683,7 +710,7 @@ namespace apl {
   }
 
   bool DOSCalculator::hasNegativeFrequencies() const {
-    return (_minFreq < MIN_FREQ_TRESHOLD ? true : false);
+    return (_minFreq < MIN_FREQ_THRESHOLD ? true : false);
   }
 
   // ///////////////////////////////////////////////////////////////////////////
@@ -732,3 +759,9 @@ namespace apl {
   // ///////////////////////////////////////////////////////////////////////////
 
 }  // namespace apl
+
+// ***************************************************************************
+// *                                                                         *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *                                                                         *
+// ***************************************************************************

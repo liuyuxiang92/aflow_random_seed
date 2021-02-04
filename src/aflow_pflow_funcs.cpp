@@ -39,18 +39,21 @@ double DebyeWallerFactor(double theta,
 // getGenericTitleXStructure()
 // ***************************************************************************
 string getGenericTitleXStructure(const xstructure& xstr,bool latex){ //CO20190520
-  string title;
+  //CO20200624 - used to be num_each_type, now it's comp_each_type (works for both pocc and non-pocc)
+  //use pocc default for precision
+  string title="";
   uint iat=0;
-  //if any names missing from atoms, lets use generic names
+  int comp_prec=(int)ceil(log10(1.0/xstr.partial_occupation_stoich_tol));  //ceil ensures we round up above 1 //CO20181226
   bool atom_names=true;
-  for(uint i=0;i<xstr.atoms.size()&&atom_names;i++){if(xstr.atoms[i].name.empty()){atom_names=false;}} //CO20180316 - use pp names
+
+  for(uint i=0;i<xstr.atoms.size()&&atom_names;i++){if(xstr.atoms[i].cleanname.empty()){atom_names=false;}}
   for(uint itype=0;itype<xstr.num_each_type.size();itype++){
-    for(uint j=0;j<(uint)xstr.num_each_type.at(itype);j++) {
+    for(uint j=0;j<(uint)xstr.num_each_type[itype];j++) {
       if(j==0){
-        if(atom_names){title+=xstr.atoms.at(iat).name;} //CO20180316 - use pp names
+        if(atom_names){title+=xstr.atoms[iat].cleanname;} //CO20200624 - never use pp names, never mix pp with composition
         else {title+=char('A'+itype);}
-        if(latex){title+="$_{"+aurostd::utype2string(xstr.num_each_type.at(itype))+"}$";}
-        else {title+=aurostd::utype2string(xstr.num_each_type.at(itype));}
+        if(latex){title+="$_{"+aurostd::utype2string(xstr.comp_each_type[itype],comp_prec)+"}$";}
+        else {title+=aurostd::utype2string(xstr.comp_each_type[itype],comp_prec);}
       }
       iat++;
     }
@@ -133,7 +136,6 @@ xvector<double> balanceChemicalEquation(const xmatrix<double>& composition_matri
   if(composition_matrix.rows<=composition_matrix.cols){
     message << "Composition matrix (m<=n) will NOT yield a viable null space for this analysis";
     throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_); //CO20190226
-    //exit(1);  //CO20190226
   }
   //[CO20191110 - OBSOLETE]xmatrix<double> composition_matrix=_composition_matrix;
   //[CO20191110 - OBSOLETE]xmatrix<double> Q=aurostd::generalHouseHolderQRDecomposition(composition_matrix);
@@ -157,7 +159,6 @@ xvector<double> balanceChemicalEquation(const xmatrix<double>& composition_matri
     if(coef[i]<-_ZERO_TOL_){
       message << "Found negative coef[" << i << "], invalid chemical equation (run with --debug to see): coef=" << coef;
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_RANGE_); //CO20190226
-      //exit(1);  //CO20190226
     }
   }
   if(LDEBUG) {cerr << soliloquy << " checking: all scalar products should yield 0" << endl;}
@@ -170,7 +171,6 @@ xvector<double> balanceChemicalEquation(const xmatrix<double>& composition_matri
     if(abs(sum)>_ZERO_TOL_){
       message << "Chemical equation was not balanced (run with --debug to see): coef=" << coef;
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_RANGE_); //CO20190226
-      //exit(1);  //CO20190226
     }
   }
   return coef;
@@ -376,7 +376,6 @@ namespace pflow {
     //cerr << rotation << endl << endl;
     //rotation=inverse(xstr_bulk.lattice)*xstr_slab_newbasis.lattice;
     //cerr << rotation << endl << endl;
-    //exit(0);
 
     //xmatrix<double> rotation=xstr_slab_newbasis.c2f*xstr_bulk.f2c;  //VERY POWERFUL
     //xmatrix<double> rotation=trasp(trasp(xstr_slab_newbasis.lattice)*inverse(trasp(xstr_bulk.lattice)));
@@ -1250,7 +1249,6 @@ namespace pflow {
 
     message.precision(prec_original); //set back
     message.flags(ff_original); //set back
-    //exit(0);
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // STOP - read flags
@@ -2230,7 +2228,7 @@ namespace pflow {
     deque<deque<_atom> > nmat;
     // [OBSOLETE]    pflow::GetStrNeighData(str,rmax,nmat);
     str.GetStrNeighData(rmax,nmat);   // once GetRD goes in xstructure I can remove the copy
-    // for(int i=0;i<nmat[0].size();i++) cout << AtomDist(nmat[0][0],nmat[0][i]) << " "; cout << endl; exit(0);
+    // for(int i=0;i<nmat[0].size();i++) cout << AtomDist(nmat[0][0],nmat[0][i]) << " "; cout << endl;
     for(int I1=0;I1<(int)nmat.size();I1++) { // Each atom for which we find RDF.
       int I2=1;
       double dist=0;
@@ -2416,16 +2414,13 @@ namespace pflow {
       const aurostd::matrix<double>& rdfsh_all_B,
       const int nsh, vector<int>& best_match,
       aurostd::matrix<double>& rms_mat) {  //CO20200404 pflow::matrix()->aurostd::matrix()
+    string soliloquy=XPID+"pflow::CmpRDFShells():";
     double TOL=1e-15;
     std::deque<int> netype_A=str_A.num_each_type;
     std::deque<int> netype_B=str_B.num_each_type;
     // Exit if A and B have different numbers of any types of atoms.
     if(!pflow::VVequal(netype_A,netype_B) || netype_A.size()!=netype_B.size()) {
-      cerr << "ERROR: in CmpRDFShell" << endl;
-      cerr << "ERROR: structures A and B do not have the same "<< endl;
-      cerr << "ERROR: number of each type of atom. "<< endl;
-      cerr << "ERROR: Exiting" << endl;
-      exit(1);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"structures A and B do not have the same number of each type of atom",_INPUT_ILLEGAL_); //CO20200624
     }
     int nat=str_A.atoms.size();
     int nt=netype_A.size();
@@ -2889,7 +2884,8 @@ namespace pflow {
       vector<string> names(nat,"H");
       vector<int> names_were_given(nat,FALSE);
       str=pflow::SetLat(str,lat_vec[is]);
-      str=pflow::SetNumEachType(str,num_each_type);
+      //DX20210118 [OBSOLETE] str=pflow::SetNumEachType(str,num_each_type);
+      str.num_each_type = num_each_type; //DX20210202 - replace SetNumEachType
       str=pflow::AddAllAtomPos(str,fpos_vec[is],0);
       str=pflow::SetAllAtomNames(str,names);
       str=pflow::SetNamesWereGiven(str,names_were_given);
@@ -2925,6 +2921,7 @@ namespace pflow {
 // follows a "#".
 namespace pflow {
   void ReadInRTParams(ifstream& rtinfile, pflow::rtparams& rtp) {
+    string soliloquy=XPID+"pflow::ReadInRTParams():";
 
     // Read in all the tokens.
     string s,s_ns;
@@ -2938,9 +2935,7 @@ namespace pflow {
           string token,sval;
           int id=s.find('=');
           if(id>=(int)s.length()) {
-            cout << "ERROR: The following token is incorrectly formatted: " << s << endl;
-            cout << "ERROR: Exiting" << endl;
-            exit(1);
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"the following token is incorrectly formatted: "+s,_INPUT_ILLEGAL_); //CO20200624
           }
           token=s.substr(0,id);
           token=aurostd::RemoveSpaces(token);
@@ -3210,9 +3205,7 @@ namespace pflow {
       }// PLANECOLOR
 
       if(!found_token) {
-        cerr << "ERROR: You have input a token " << tok <<endl;
-        cerr << "ERROR: This token is not recognized. Exiting! " << endl;
-        exit(1);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"token is not recognized: "+tok,_INPUT_ILLEGAL_); //CO20200624
       }
 
     } // for i
@@ -3289,9 +3282,9 @@ namespace pflow {
       aurostd::matrix<double> lat1=pflow::GetLat(str1);  //CO20200404 pflow::matrix()->aurostd::matrix()
       xmatrix<double> xlat1(3,3);xlat1=str1.lattice;
       aurostd::matrix<double> cpos2=pflow::GetCpos(str2);  //CO20200404 pflow::matrix()->aurostd::matrix()
-      deque<int> num_each_type_1=pflow::GetNumEachType(str1);
+      deque<int> num_each_type_1=str1.num_each_type; //DX20210119 pflow::GetNumEachType() -> xstructure.num_each_type
       int num_types_1=num_each_type_1.size();
-      deque<int> num_each_type_2=pflow::GetNumEachType(str2);
+      deque<int> num_each_type_2=str2.num_each_type; //DX20210119 pflow::GetNumEachType() -> xstructure.num_each_type
       int num_types_2=num_each_type_2.size();
       // Loop over str2 atoms, assign them a type and c/d positions in an atom.
       int cnt=0;
@@ -3400,7 +3393,7 @@ namespace pflow {
     // we must only do this the first time this set function is
     // called.  This is controlled by the first_set parameter.
     if(rtp.first_set) {
-      int ntypes = pflow::GetNumEachType(str).size();
+      int ntypes = str.num_each_type.size(); //DX20210119 pflow::GetNumEachType() -> xstructure.num_each_type
       aurostd::matrix<double> tmp; //CO20200404 pflow::matrix()->aurostd::matrix()
       int size;
       // Set sphtex_tex
@@ -3566,7 +3559,7 @@ namespace pflow {
     // Do atoms
     str=ReScale(str,1.0);
     aurostd::matrix<double> cpos=pflow::GetCpos(str);  //CO20200404 pflow::matrix()->aurostd::matrix()
-    deque<int> num_each_type=pflow::GetNumEachType(str);
+    deque<int> num_each_type=str.num_each_type; //DX20210119 pflow::GetNumEachType() -> xstructure.num_each_type
     //int nat=(int)cpos.size();
     int ntype=(int)num_each_type.size();
     int cnt=0;
@@ -3715,22 +3708,19 @@ namespace pflow {
 // ***************************************************************************
 namespace pflow {
   void RayTraceManager(vector<string> argv) {
+    string soliloquy=XPID+"pflow::RayTraceManager():";
     ifstream rtinfile(argv.at(2).c_str()); // File where RT params are input.
-    aurostd::InFileExistCheck("RayTraceFuncs.cc/RayTraceManager",argv.at(2),rtinfile,cerr);
+    aurostd::InFileExistCheck("RayTraceFuncs.cc/RayTraceManager",argv.at(2),rtinfile);
     pflow::rtparams rtp; // Object that stores RT params.
     ReadInRTParams(rtinfile,rtp); // Sets RT params object from input.
     switch (rtp.calc_type) {
       case 0:{ // A single file of structures.
                // Read in structure list.
                if(rtp.input_files.size()<1) {
-                 cerr << "ERROR: RayTraceManager" << endl;
-                 cerr << "ERROR: You must specify a structure list file to open with the token INFILE." << endl;
-                 cerr << "ERROR: For example:  INFILE = STRLIST ." << endl;
-                 cerr << "ERROR: Exiting." << endl;
-                 exit(1);
+                 throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"must specify a structure list file to open with the token INFILE (e.g., INFILE = STRLIST)",_FILE_CORRUPT_); //CO20200624
                }
                ifstream strlist_inf(rtp.input_files[0].c_str());
-               aurostd::InFileExistCheck("RayTraceFuncs.cc/RayTraceManager",rtp.input_files[0].c_str(),strlist_inf,cerr);
+               aurostd::InFileExistCheck("RayTraceFuncs.cc/RayTraceManager",rtp.input_files[0].c_str(),strlist_inf);
                vector<xstructure> vstr;
                cout << endl;
                cout << "Reading in structure list." << endl;
@@ -3803,102 +3793,19 @@ namespace pflow {
                break;
              }
       default:{
-                cout << endl;
-                cerr << "ERROR: RTManager" <<endl;
-                cerr << "ERROR: You have set CALCTYPE= " << rtp.calc_type << endl;
-                cerr << "ERROR: This does not correspond to any function. "<< endl;
-                cerr << "ERROR: exiting" << endl;
-                cout << endl;
-                exit(1);
+                throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"invalid CALCTYPE = "+aurostd::utype2string(rtp.calc_type),_INPUT_ILLEGAL_); //CO20200624
               }
     }//switch
   }
 }
 
 // ***************************************************************************
-// GetRotationMatrix
+// GetRotationMatrix [OBSOLETE - moved to xatom]
 // ***************************************************************************
-// This gets a rotation matrix from 3 angles assumed
-// to represent a rotation around x, then y, then z.
-// Angles are assumed to be in radians.
-namespace pflow {
-  aurostd::matrix<double> GetRotationMatrix(const vector<double>& angles) {  //CO20200404 pflow::matrix()->aurostd::matrix()
-    // Sin and cos.
-    vector<double> sn(3,0.0);
-    vector<double> cs(3,0.0);
-    for(int ic=0;ic<3;ic++) {
-      sn[ic]=sin(angles[ic]);
-      cs[ic]=cos(angles[ic]);
-    }
-    // Set rotation matrix (do x, then y, then z rotation).
-    aurostd::matrix<double> xm(3,3);pflow::VVset(xm,0.0);  //CO20200404 pflow::matrix()->aurostd::matrix()
-    aurostd::matrix<double> ym(3,3);pflow::VVset(ym,0.0);  //CO20200404 pflow::matrix()->aurostd::matrix()
-    aurostd::matrix<double> zm(3,3);pflow::VVset(zm,0.0);  //CO20200404 pflow::matrix()->aurostd::matrix()
-
-    xm[0][0]=1;
-    xm[1][1]=cs[0];
-    xm[1][2]=-sn[0];
-    xm[2][1]=sn[0];
-    xm[2][2]=cs[0];
-
-    ym[0][0]=cs[1];
-    ym[0][2]=sn[1];
-    ym[1][1]=1;
-    ym[2][0]=-sn[1];
-    ym[2][2]=cs[1];
-
-    zm[0][0]=cs[2];
-    zm[0][1]=-sn[2];
-    zm[1][0]=sn[2];
-    zm[1][1]=cs[2];
-    zm[2][2]=1;
-
-    aurostd::matrix<double> rm;  //CO20200404 pflow::matrix()->aurostd::matrix()
-    rm=pflow::MMmult(zm,pflow::MMmult(ym,xm));
-    return rm;
-  }
-}
 
 // ***************************************************************************
-// RotateStrVec
+// RotateStrVec //DX20210127 [OBSOLETE - moved to xatom]
 // ***************************************************************************
-// This rotates each structure in the vstr.
-// The rotation goes from an initial to a final set of angles
-// in steps of the primitive rotation.
-// The primitive rotation is the rotation around x, y, then z
-// by the amount of change given in rot divided by the number
-// of structures - 1.  All frames are initially rotated
-// according to the initial rotation angles.  The rotation is
-// then done as one primitive rotation per frame.
-namespace pflow {
-  void RotateStrVec(vector<xstructure>& vstr, const vector<double>& rot) {
-    // Get initial rotation matrix.
-    vector<double> angles(3);
-    for(int ic=0;ic<3;ic++) {
-      angles[ic]=rot[2*ic];
-      angles[ic]=angles[ic]*TWOPI/360.0;
-    }
-    aurostd::matrix<double> irm=GetRotationMatrix(angles); //CO20200404 pflow::matrix()->aurostd::matrix()
-
-    // get primitive rotation matrix.
-    int s=vstr.size()-1;
-    if(s<1) s=1;
-    for(int ic=0;ic<3;ic++) {
-      angles[ic]=(rot[2*ic+1]-rot[2*ic])/(s);
-      angles[ic]=angles[ic]*TWOPI/360.0;
-    }
-    aurostd::matrix<double> prm=GetRotationMatrix(angles); //CO20200404 pflow::matrix()->aurostd::matrix()
-    aurostd::matrix<double> rm=irm;  //CO20200404 pflow::matrix()->aurostd::matrix()
-    xmatrix<double> xprm(3,3); xprm=aurostd::matrix2xmatrix(prm);  //CO20200404 pflow::matrix()->aurostd::matrix()
-    xmatrix<double> xrm(3,3);  xrm=aurostd::matrix2xmatrix(rm);  //CO20200404 pflow::matrix()->aurostd::matrix()
-    for(int is=0;is<(int)vstr.size();is++) {
-      //    xrm=aurostd::matrix2xmatrix(rm); //CO20200404 pflow::matrix()->aurostd::matrix()
-      //   vstr[is]=Rotate(vstr[is],xrm);
-      vstr[is]=Rotate(vstr[is],aurostd::matrix2xmatrix(rm)); //CO20200404 pflow::matrix()->aurostd::matrix()
-      rm=pflow::MMmult(prm,rm);
-    }
-  }
-}
 
 // ***************************************************************************
 // PROJDATA PROJDATA PROJDATA PROJDATA PROJDATA PROJDATA PROJDATA PROJDATA PRO
@@ -4599,7 +4506,7 @@ namespace pflow {
     string s;
     char c;
     ifstream infile(pd.PROOUTinfile.c_str());
-    aurostd::InFileExistCheck("ReadInProj",pd.PROOUTinfile.c_str(),infile,cerr);
+    aurostd::InFileExistCheck("ReadInProj",pd.PROOUTinfile.c_str(),infile);
     string sdum;
     // Initial data
     infile >> sdum; // Title
@@ -5078,9 +4985,11 @@ namespace pflow {
 //   will be calculated.
 namespace pflow {
   void ReadInPDOSData(const pflow::projdata& prd, pflow::pdosdata& pdd) {
+    string soliloquy=XPID+"pflow::ReadInPDOSData():";
+    stringstream message;
 
     ifstream infile(pdd.PDOSinfile.c_str());
-    aurostd::InFileExistCheck("ReadInPDOSData",pdd.PDOSinfile.c_str(),infile,cerr);
+    aurostd::InFileExistCheck("ReadInPDOSData",pdd.PDOSinfile.c_str(),infile);
 
     // Defaults (emin,emax,nbins,smooth_sigma,print_params)
     double emn=prd.ener_k_b_u[0][0];
@@ -5116,9 +5025,7 @@ namespace pflow {
           string sval;
           int id=s.find('=');
           if(id>=(int)s.length()) {
-            cout << "ERROR: The following token is incorrectly formatted: " << s << endl;
-            cout << "ERROR: Exiting" << endl;
-            exit(1);
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"the following token is incorrectly formatted: "+s,_INPUT_ILLEGAL_); //CO20200624
           }
           token=s.substr(0,id);
           token=aurostd::RemoveSpaces(token);
@@ -5233,9 +5140,7 @@ namespace pflow {
       }// PRINT_PARAMS
 
       if(!found_token) {
-        cerr << "ERROR: You have input a token " << tok <<endl;
-        cerr << "ERROR: This token is not recognized. Exiting! " << endl;
-        exit(1);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"token is not recognized: "+tok,_INPUT_ILLEGAL_); //CO20200624
       }
 
     } // for i
@@ -5265,45 +5170,37 @@ namespace pflow {
       for(int ia=0;ia<(int)pdd.pdos_at[i].size();ia++) {
         int atp=pdd.pdos_at[i][ia];
         if(atp<1 || atp>prd.nions) {
-          cerr << "ERROR: ProjFuncs/ReadPDOSdat" << endl;
-          cerr << "ERROR: Error in case: " << i+1 << endl;
-          cerr << "ERROR: You have entered too low or high an atom number in entry: " << ia+1 << endl;
-          cerr << "ERROR: Bad value is: " << atp << endl;
-          cerr << "ERROR: Exiting." << endl;
-          exit(1);
+          message << "Error in case: " << i+1 << endl;
+          message << "too low or high an atom number has been entered in entry: " << ia+1 << endl;
+          message << "Bad value is: " << atp << endl;
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_); //CO20200624
         }
       }
       for(int ik=0;ik<(int)pdd.pdos_k[i].size();ik++) {
         int kp=pdd.pdos_k[i][ik];
         if(kp<1 || kp>prd.nkpts) {
-          cerr << "ERROR: ProjFuncs/ReadPDOSdat" << endl;
-          cerr << "ERROR: Error in case: " << i+1 << endl;
-          cerr << "ERROR: You have entered too low or high a kpt number in entry: " << ik+1 << endl;
-          cerr << "ERROR: Bad value is: " << kp << endl;
-          cerr << "ERROR: Exiting." << endl;
-          exit(1);
+          message << "Error in case: " << i+1 << endl;
+          message << "too low or high a kpt number has been entered in entry: " << ik+1 << endl;
+          message << "Bad value is: " << kp << endl;
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_); //CO20200624
         }
       }
       for(int ib=0;ib<(int)pdd.pdos_b[i].size();ib++) {
         int bp=pdd.pdos_b[i][ib];
         if(bp<1 || bp>prd.nbands) {
-          cerr << "ERROR: ProjFuncs/ReadPDOSdat" << endl;
-          cerr << "ERROR: Error in case: " << i+1 << endl;
-          cerr << "ERROR: You have entered too low or high a bnd number in entry: " << ib+1 << endl;
-          cerr << "ERROR: Bad value is: " << bp << endl;
-          cerr << "ERROR: Exiting." << endl;
-          exit(1);
+          message << "Error in case: " << i+1 << endl;
+          message << "too low or high a bnd number has been entered in entry: " << ib+1 << endl;
+          message << "Bad value is: " << bp << endl;
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_); //CO20200624
         }
       }
       for(int ilm=0;ilm<(int)pdd.pdos_lm[i].size();ilm++) {
         int lmp=pdd.pdos_lm[i][ilm];
         if(lmp<1 || lmp>prd.nlmtot) {
-          cerr << "ERROR: ProjFuncs/ReadPDOSdat" << endl;
-          cerr << "ERROR: Error in case: " << i+1 << endl;
-          cerr << "ERROR: You have entered too low or high an lm number in entry: " << ilm+1 << endl;
-          cerr << "ERROR: Bad value is: " << lmp << endl;
-          cerr << "ERROR: Exiting." << endl;
-          exit(1);
+          message << "Error in case: " << i+1 << endl;
+          message << "too low or high an lm number has been entered in entry: " << ilm+1 << endl;
+          message << "Bad value is: " << lmp << endl;
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_); //CO20200624
         }
       }
     }
@@ -5446,13 +5343,13 @@ namespace pflow {
 // Smooths the total PDOS based on Gaussian smoothing.
 namespace pflow {
   void AtomCntError(const string& tok, const int tokcnt, const int atom_cnt) {
-    cerr << "ERROR: in AtomCntError " <<endl;
-    cerr << "ERROR: The token " << tok << " has been defined (possibly by default) this many times: " << tokcnt << endl;
-    cerr << "ERROR: You have used the token ATOMS this many times: " << atom_cnt << endl;
-    cerr << "ERROR: These must be equal and >0 - the token ATOMS must precede each case and must occurr at least once. "<< endl;
-    cerr << "ERROR: This error is probably due to your having forgot to use the ATOMS token. Please type ATOMS=*** as the first line for each case."<< endl;
-    cerr << "ERROR: Exiting!" << endl;
-    exit(1);
+    stringstream message;
+    message << "in AtomCntError " <<endl;
+    message << "The token " << tok << " has been defined (possibly by default) this many times: " << tokcnt << endl;
+    message << "You have used the token ATOMS this many times: " << atom_cnt << endl;
+    message << "These must be equal and >0 - the token ATOMS must precede each case and must occurr at least once. "<< endl;
+    message << "This error is probably due to your having forgot to use the ATOMS token. Please type ATOMS=*** as the first line for each case."<< endl;
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,"pflow::AtomCntError():",message,_INPUT_ILLEGAL_); //CO20200624
   }
 }
 
@@ -5472,6 +5369,8 @@ namespace pflow {
 namespace pflow {
   void ReadSumDOSParams(ifstream& infile, pflow::pdosdata& pdd) {
     // Defaults (emin,emax,nbins,smooth_sigma,print_params,efermi)
+    string soliloquy=XPID+"pflow::ReadSumDOSParams():";
+    stringstream message;
     pdd.emin=0.0;
     pdd.emax=0.0;
     pdd.nbins=301;
@@ -5494,9 +5393,7 @@ namespace pflow {
           string sval;
           int id=s.find('=');
           if(id>=(int)s.length()) {
-            cout << "ERROR: The following token is incorrectly formatted: " << s << endl;
-            cout << "ERROR: Exiting" << endl;
-            exit(1);
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"the following token is incorrectly formatted: "+s,_INPUT_ILLEGAL_); //CO20200624
           }
           token=s.substr(0,id);
           token=aurostd::RemoveSpaces(token);
@@ -5578,9 +5475,7 @@ namespace pflow {
         found_token=1;
       }// NLM
       if(!found_token) {
-        cerr << "ERROR: You have input a token " << tok <<endl;
-        cerr << "ERROR: This token is not recognized. Exiting! " << endl;
-        exit(1);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"token is not recognized: "+tok,_INPUT_ILLEGAL_); //CO20200624
       }
     } // for i over tokens
 
@@ -5589,12 +5484,10 @@ namespace pflow {
       for(int ilm=0;ilm<(int)pdd.pdos_lm[i].size();ilm++) {
         int lmp=pdd.pdos_lm[i][ilm];
         if(lmp<1 || lmp>pdd.nlm) {
-          cerr << "ERROR: SumPDOSFuncs/ReadSumDOSParams" << endl;
-          cerr << "ERROR: Error in case: " << i+1 << endl;
-          cerr << "ERROR: You have entered too low or high an lm number in entry: " << ilm+1 << endl;
-          cerr << "ERROR: Bad value is: " << lmp << endl;
-          cerr << "ERROR: Exiting." << endl;
-          exit(1);
+          message << "Error in case: " << i+1 << endl;
+          message << "You have entered too low or high an lm number in entry: " << ilm+1 << endl;
+          message << "Bad value is: " << lmp << endl;
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_); //CO20200624
         }
       }
     }
@@ -5672,6 +5565,8 @@ namespace pflow {
 // Sums the PDOS accoring to the parameters specified.
 namespace pflow {
   void SumPDOS(const aurostd::matrix<aurostd::matrix<double> >& allpdos, pflow::pdosdata& pdd) { //CO20200404 pflow::matrix()->aurostd::matrix()
+    string soliloquy=XPID+"pflow::SumPDOS():";
+    stringstream message;
     if(pdd.spin==1) {
       pdd.pdos = aurostd::matrix<double> (pdd.nbins,3);  //CO20200404 pflow::matrix()->aurostd::matrix()
     }
@@ -5688,26 +5583,22 @@ namespace pflow {
         int ia=pdd.pdos_at[ic][ida]-1;
         // Error check
         if(ia<0 || ia>=pdd.natoms) {
-          cerr << "ERROR: SumPDOSFuncs/SumPDOS" << endl;
-          cerr << "ERROR: Error in case: " << ic+1 << endl;
-          cerr << "ERROR: You have entered too low or high an atom number in entry: " << ida+1 << endl;
-          cerr << "ERROR: Min/Max allowed values are: " << "1 / " << pdd.natoms << endl;
-          cerr << "ERROR: Bad value is: " << ia+1 << endl;
-          cerr << "ERROR: Exiting." << endl;
-          exit(1);
+          message << "Error in case: " << ic+1 << endl;
+          message << "You have entered too low or high an atom number in entry: " << ida+1 << endl;
+          message << "Min/Max allowed values are: " << "1 / " << pdd.natoms << endl;
+          message << "Bad value is: " << ia+1 << endl;
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_); //CO20200624
         }
         // Loop over each lm
         for(int idlm=0;idlm<(int)pdd.pdos_lm[ic].size();idlm++) {
           int ilm=pdd.pdos_lm[ic][idlm];
           // Error check
           if(ilm<1 || ilm>pdd.nlm) {
-            cerr << "ERROR: SumPDOSFuncs/SumPDOS" << endl;
-            cerr << "ERROR: Error in case: " << ic+1 << endl;
-            cerr << "ERROR: You have entered too low or high an lm number in entry: " << idlm+1 << endl;
-            cerr << "ERROR: Min/Max allowed values are: " << "1 / " << pdd.nlm << endl;
-            cerr << "ERROR: Bad value is: " << ilm << endl;
-            cerr << "ERROR: Exiting." << endl;
-            exit(1);
+            message << "Error in case: " << ic+1 << endl;
+            message << "You have entered too low or high an lm number in entry: " << idlm+1 << endl;
+            message << "Min/Max allowed values are: " << "1 / " << pdd.nlm << endl;
+            message << "Bad value is: " << ilm << endl;
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_); //CO20200624
           }
           // Loop over each bin
           for(int ib=0;ib<pdd.nbins;ib++) {
@@ -5725,13 +5616,11 @@ namespace pflow {
                        break;
                      }
               default:
-                     cerr << "ERROR: SumPDOSFuncs/SumPDOS" << endl;
-                     cerr << "ERROR: Error in case: " << ic+1 << endl;
-                     cerr << "ERROR: You have entered too low or high an spin number" << endl;
-                     cerr << "ERROR: Min/Max allowed values are: " << "1 / 2" << endl;
-                     cerr << "ERROR: Bad value is: " << pdd.spin << endl;
-                     cerr << "ERROR: Exiting." << endl;
-                     exit(1);
+                     message << "ERROR: Error in case: " << ic+1 << endl;
+                     message << "ERROR: You have entered too low or high an spin number" << endl;
+                     message << "ERROR: Min/Max allowed values are: " << "1 / 2" << endl;
+                     message << "ERROR: Bad value is: " << pdd.spin << endl;
+                     throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_); //CO20200624
             } // switch spin
           } // bin
         } // lm
@@ -6671,6 +6560,7 @@ namespace pflow {
 namespace pflow {
 
   void ReadPlaneDensParams(const xstructure& str, pd_params& pdp, istream& infile) {
+    string soliloquy=XPID+"pflow::ReadPlaneDensParams():";
     // Note that this converts everything to direct coordinates.
     string s;
     double TOL=1e-7;
@@ -6704,10 +6594,7 @@ namespace pflow {
       pdp.dpts[2]=pflow::CompAperpB(pdp.dpts[2],pdp.dpts[1]);
       double norm_new=norm(pdp.dpts[2]);
       if(norm_new<TOL) {
-        cout << "ERROR: ChgFuncs/ReadPlaneDensParams" << endl;
-        cout << "Your two axis are parallel and no plane can be determined." << endl;
-        cout << "Exiting." << endl;
-        exit(1);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"two axis are parallel and no plane can be determined",_INPUT_ILLEGAL_); //CO20200624
       }
       pdp.dpts[2]=SVprod(norm_orig/norm_new,pdp.dpts[2]);
     }
@@ -7335,13 +7222,25 @@ namespace pflow {
 
   string prettyPrintCompound(const string& compound, vector_reduction_type vred, bool exclude1, filetype ftype) {  //char mode  //CO20190629
     vector<double> vcomposition;
-    vector<string> vspecies =  stringElements2VectorElements(compound, vcomposition);
+    vector<string> vspecies =  aurostd::getElements(compound, vcomposition);
     return prettyPrintCompound(vspecies, vcomposition, vred, exclude1, ftype);  //mode  //CO20190629
+  }
+
+  string prettyPrintCompound(const vector<string>& vspecies,const vector<uint>& vcomposition,vector_reduction_type vred,bool exclude1,filetype ftype) {  // overload //char mode //DX20200727
+    vector<double> vcomposition_dbl;
+    for(uint i=0;i<vcomposition.size();i++){vcomposition_dbl.push_back((double)vcomposition[i]);}
+    return prettyPrintCompound(vspecies,aurostd::vector2xvector<double>(vcomposition_dbl),vred,exclude1,ftype); //mode //CO20190629
   }
 
   // Moved here from the ConvexHull class
   string prettyPrintCompound(const vector<string>& vspecies,const vector<double>& vcomposition,vector_reduction_type vred,bool exclude1,filetype ftype) {  // overload //char mode //CO20190629
     return prettyPrintCompound(vspecies,aurostd::vector2xvector<double>(vcomposition),vred,exclude1,ftype); //mode //CO20190629
+  }
+
+  string prettyPrintCompound(const vector<string>& vspecies,const xvector<uint>& vcomposition,vector_reduction_type vred,bool exclude1,filetype ftype) {  // overload //char mode //DX20200727
+    xvector<double> vcomposition_dbl(vcomposition.rows);
+    for(int i=1;i<=vcomposition.rows;i++){vcomposition_dbl(i)=(double)vcomposition[i];}
+    return prettyPrintCompound(vspecies,vcomposition_dbl,vred,exclude1,ftype); //mode //CO20190629
   }
 
   string prettyPrintCompound(const vector<string>& vspecies,const xvector<double>& vcomposition,vector_reduction_type vred,bool exclude1,filetype ftype) {  // main function //char mode //CO20190629
@@ -8244,6 +8143,140 @@ namespace pflow {
     aqueue.getQueue();
     //[only test on qrats]cerr << aqueue.getPercentage("aflow","batch",JOB_RUNNING) << endl;
     return "";
+  }
+}
+
+// ***************************************************************************
+// pflow::getFakeElements()
+// ***************************************************************************
+namespace pflow{
+  vector<string> getFakeElements(uint nspecies){
+
+    // Return vector of fake elements
+    // Useful for determining "elements" for prototypes
+
+    string function_name = XPID + "pflow::getFakeElements():";
+
+    if(nspecies>26){
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"There are more than 26 species, this function must be modified to include more fake elements.",_RUNTIME_ERROR_);
+    }
+
+    vector<string> elements;
+    for(uint i=0;i<nspecies;i++){
+      stringstream ss_letter; ss_letter << char('A'+i); // cannot type cast char to string directly //DX20200907 - use ASCII
+      elements.push_back(ss_letter.str());
+    }
+
+    return elements;
+  }
+}
+
+// ***************************************************************************
+// pflow::hasRealElements()
+// ***************************************************************************
+namespace pflow{
+  bool hasRealElements(const xstructure& xstr){
+
+    // Determine if elements in the xstructure are real/physical.
+    // Uses xelement
+
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string function_name = XPID + "pflow::hasRealElements():";
+    stringstream message;
+
+    if(xstr.species.size() > 0){
+      xelement::xelement element;
+      uint nspecies = xstr.species.size();
+      for(uint i=0;i<nspecies;i++){
+        try{
+          element = xelement::xelement(KBIN::VASP_PseudoPotential_CleanName(xstr.species[i]));
+        }
+        catch(aurostd::xerror& re){
+          if(LDEBUG){ cerr << function_name << xstr.species[i] << " is not a real element." << endl; }
+          return false;
+        }
+      }
+    }
+    else{
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"The species are empty.",_INPUT_NUMBER_);
+    }
+
+    return true;
+  }
+}
+
+// ***************************************************************************
+// pflow::getSymmetryTolerance() //DX20200820
+// ***************************************************************************
+namespace pflow{
+  double getSymmetryTolerance(const xstructure& xstr, const string& tolerance_string){
+
+    // Return the symmetry tolerance
+    // options:
+    //  1) tight = min_nn_dist/100
+    //  2) loose = min_nn_dist/10
+    //  3) number = user defined (Angstroms)
+
+    string function_name = XPID + "pflow::getSymmetryTolerance():";
+    stringstream message;
+
+    double default_tolerance=SYM::defaultTolerance(xstr);
+    double tolerance = AUROSTD_NAN;
+    if(!tolerance_string.empty()){
+      if(aurostd::toupper(tolerance_string[0]) == 'T'){ //Tight
+        tolerance=default_tolerance;
+      }
+      else if(aurostd::toupper(tolerance_string[0]) == 'L'){ //Loose
+        tolerance=default_tolerance*10.0;
+      }
+      else {
+        tolerance=aurostd::string2utype<double>(tolerance_string);
+      }
+    }
+    else {
+      tolerance = default_tolerance;
+    }
+    if(tolerance < 1e-10){
+      message << "Tolerance cannot be zero (i.e. less than 1e-10): tol=" << tolerance << ".";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_VALUE_RANGE_);
+    }
+
+    return tolerance;
+  }
+}
+
+// ***************************************************************************
+// pflow::getSymmetryToleranceSpectrum() //DX20200820
+// ***************************************************************************
+namespace pflow{
+  vector<double> getSymmetryToleranceSpectrum(const string& tolerance_range_string){
+
+    // Return the symmetry tolerance spectrum
+    // Expected input: "start:end:step"
+
+    string function_name = XPID + "pflow::getSymmetryToleranceSpectrum():";
+    stringstream message;
+
+    vector<double> tolerance_spectrum;
+
+    vector<string> tokens;
+    if(aurostd::string2tokens(tolerance_range_string,tokens,":") == 3){
+      double start = aurostd::string2utype<double>(tokens[0]);
+      double end = aurostd::string2utype<double>(tokens[1]);
+      uint nsteps = aurostd::string2utype<uint>(tokens[2])-1;
+      if(end<start){
+        message << "End of the range cannot be less than the beginning of the range: start=" << start << ", end=" << end;
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ILLEGAL_);
+      }
+      double interval = (end-start)/(double)nsteps;
+      for(uint i=0;i<=nsteps;i++){ tolerance_spectrum.push_back(start+((double)i*interval)); }
+    }
+    else{
+      message << "Expected three inputs: first=range_start, second=range_end, third=nsteps.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ILLEGAL_);
+    }
+
+    return tolerance_spectrum;
   }
 }
 

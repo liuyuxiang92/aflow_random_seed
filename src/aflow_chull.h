@@ -103,6 +103,8 @@ namespace chull {
   double H_f_atom(const aflowlib::_aflowlib_entry& entry, char units=_std_);
   double T_S(const ChullPoint& point);
   double T_S(const aflowlib::_aflowlib_entry& entry);
+  double EFA(const ChullPoint& point, char units=_std_);
+  double EFA(const aflowlib::_aflowlib_entry& entry, char units=_std_);
   double isoMaxLatentHeat(const ChullPoint& point, double x, char units=_std_);
   double isoMaxLatentHeat(const aflowlib::_aflowlib_entry& entry, double x, char units=_std_);
   ////////////////////////////////////////////////////////////////////////////////
@@ -116,6 +118,8 @@ namespace chull {
   bool nonZeroWithinTol(double val,double tol=ZERO_TOL);
   bool subspaceBelongs(const xvector<int>& space,const xvector<int>& subspace);
   bool correctSignVerticalDistance(double dist_2_hull,bool should_be_positive);
+  xvector<double> getTruncatedCoords(const xvector<double>& coords,const xvector<int>& elements_present); //truncated arbitrary coords
+  vector<uint> getRelevantIndices(const xvector<int>& elements_present);
 } // namespace chull
 
 //CO20180420 - moved to xStream (aflow.h)
@@ -155,7 +159,42 @@ namespace chull {
 //} // namespace chull
 
 namespace chull {
-  class ChullPoint : public xStream {
+  class ChullPointLight : virtual public xStream {
+    public:
+      //NECESSARY PUBLIC CLASS METHODS - START
+      //constructors - START
+      ChullPointLight(ostream& oss=cout);
+      ChullPointLight(ofstream& FileMESSAGE,ostream& oss=cout);
+      ChullPointLight(const ChullPointLight& b);  //upcasting is allowed, works for ChullPointLight and ChullPoint
+      //constructors - STOP
+      ~ChullPointLight();
+      const ChullPointLight& operator=(const ChullPointLight& other); //upcasting is allowed, works for ChullPointLight and ChullPoint
+      bool operator<(const ChullPointLight& other) const;
+      void clear();
+      //NECESSARY PUBLIC CLASS METHODS - STOP
+
+      //general attributes
+      bool m_initialized;
+      xvector<double> m_coords;           //most general hull coordinates
+      bool m_has_stoich_coords;
+      bool m_formation_energy_coord;
+      bool m_is_artificial;
+      bool m_has_entry;
+      uint m_i_nary;    //stoich_coords only
+      uint m_i_alloy;   //stoich_coords_only
+
+      //temporary variables that come with every new calculate() command
+      xvector<double> h_coords;  //dummy coord that changes per convex hull iteration, mere projection
+
+      //getters
+      double getLastCoord() const;
+    protected:
+      //NECESSARY private CLASS METHODS - START
+      void free();
+      void copy(const ChullPointLight& b);  //upcasting is allowed, works for ChullPointLight and ChullPoint
+      //NECESSARY END CLASS METHODS - END
+  };
+  class ChullPoint : public ChullPointLight {
     public:
       //NECESSARY PUBLIC CLASS METHODS - START
       //constructors - START
@@ -169,23 +208,13 @@ namespace chull {
       //constructors - STOP
       ~ChullPoint();
       const ChullPoint& operator=(const ChullPoint& other);
-      void HullCopy(const ChullPoint& b);  //copies b without entry
-      bool operator<(const ChullPoint& other) const;
       void clear();
       //NECESSARY PUBLIC CLASS METHODS - STOP
 
       //general attributes
-      bool m_initialized;
-      xvector<double> m_coords;           //most general hull coordinates
-      bool m_has_stoich_coords;
       aflowlib::_aflowlib_entry m_entry;
-      bool m_has_entry;
-      bool m_formation_energy_coord;
-      bool m_is_artificial;
 
       //for organization of points
-      uint m_i_nary;    //stoich_coords only
-      uint m_i_alloy;   //stoich_coords_only
       uint m_i_coord_group;
 
       //stoich_coords only!
@@ -201,11 +230,7 @@ namespace chull {
       double m_dist_2_hull; //warning, this is not TRUE dist to hull (facet), this is vertical distance
       //[OBSOLETE - reduce by frac_vrt always! so use coord_group values]xvector<double> m_decomp_coefs; //un-reduced coefficients here, reduced exist at the m_coord_groups level
       double m_stability_criterion;
-      double m_n_plus_1_energy_gain;
-
-      //flags - MOVED TO xStream
-      //aurostd::xoption m_cflags;
-      //_aflags m_aflags;                  //used PURELY for the logger (path), so no need to pass into constructor, pull from m_cflags
+      double m_n_plus_1_enthalpy_gain;
 
       //initialization methods
       bool initialize(ostream& oss,bool has_stoich_coords=false,bool formation_energy_coord=false,bool is_artificial=false);
@@ -223,28 +248,29 @@ namespace chull {
       bool isGState() const;
       xvector<double> getStoichiometricCoords() const; //get stoichiometric coordinates (sans energetic coordinate)
       xvector<double> getTruncatedReducedCoords(const xvector<int>& elements_present,vector_reduction_type vred=frac_vrt) const;
-      xvector<double> getTruncatedCoords(const xvector<double>& coords,const xvector<int>& elements_present) const; //truncated arbitrary coords
       xvector<double> getTruncatedSCoords(const xvector<int>& elements_present) const; //truncate stoichiometry
       xvector<double> getTruncatedCCoords(const xvector<int>& elements_present,bool reduce=true) const; //similar to truncated stoichiometry, but in integer form (if not POCC)
       xvector<double> getReducedCCoords() const;  //reduce by gcd()
       uint loadXstructures(bool relaxed_only);
       bool getMostRelaxedXstructure(xstructure& xstr) const;
-      double getLastCoord() const;
       uint getDim() const;
       bool isUnary() const;
       double getFormationEnthalpy() const;
       double getEntropicTemperature() const;
+      double getEntropyFormingAbility() const;
       const vector<string>& getVSG() const;
       const string& getSG() const;
       double getDist2Hull(char units=_std_) const;
       double getStabilityCriterion(char units=_std_) const;
       double getRelativeStabilityCriterion() const;
-      double getNPlus1EnergyGain(char units=_std_) const;
+      double getNPlus1EnthalpyGain(char units=_std_) const;
+      double getEntropyStabilizationCoefficient(char units=_std_) const;
 
       //setters
       void setHullCoords();
       void setHullCoords(const xvector<double>& coords);
       void setHullCoords(const xvector<int>& elements_present);
+      void reduceCoords(const xvector<int>& elements_present);
 
       //general methods
       bool entryIdentical(const aflowlib::_aflowlib_entry& other) const;
@@ -256,18 +282,6 @@ namespace chull {
       void free();
       void copy(const ChullPoint& b);
       //NECESSARY END CLASS METHODS - END
-
-      //logger variables - MOVED TO xStream
-      //ostream* m_p_oss;
-      //ofstream* m_p_FileMESSAGE;
-      //bool m_new_ofstream;  //for deletion later
-
-      //general setters - MOVED TO xStream
-      //void setOFStream(ofstream& FileMESSAGE);
-      //void setOSS(ostream& oss);
-
-      //temporary variables that come with every new calculate() command
-      xvector<double> h_coords;  //dummy coord that changes per convex hull iteration, mere projection
 
       //initialization methods
       void initializeCoords(const xvector<double>& coord,bool formation_energy_coord=false);
@@ -294,7 +308,7 @@ namespace chull {
       //NECESSARY PUBLIC CLASS METHODS - START
       //constructors - START
       FacetPoint();
-      FacetPoint(const ChullPoint& point,uint index,bool full_copy=true);
+      FacetPoint(const ChullPointLight& point,uint index);
       FacetPoint(const FacetPoint& b);
       //constructors - STOP
       ~FacetPoint();
@@ -306,10 +320,10 @@ namespace chull {
       //attributes
       bool m_initialized;
       uint ch_index;       //belongs to chull
-      ChullPoint ch_point; //take only what you need from chullpoint, don't copy the whole thing (has entry which is large)
+      ChullPointLight ch_point; //take only what you need from chullpoint, don't copy the whole thing (has entry which is large)
 
       //initializer
-      void initialize(const ChullPoint& point,uint index,bool full_copy=true);
+      void initialize(const ChullPointLight& point,uint index);
     private:
       //NECESSARY private CLASS METHODS - START
       void free();
@@ -326,7 +340,7 @@ namespace chull {
     bool m_sort_stoich_ascending; //good for sorting points in facets (lower vs. upper hemisphere), if facet in lower hemisphere, then sort ascending order (CLOCKWISE, graphing)
     bool m_sort_energy_ascending; //good for sorting points in facets (lower vs. upper hulls), if lower hull, then sort ascending (ground state is always first)
     bool operator() (const FacetPoint& fpi,const FacetPoint& fpj) const;
-    bool operator() (const ChullPoint& ci,const ChullPoint& cj) const;
+    bool operator() (const ChullPointLight& ci,const ChullPointLight& cj) const;  //upcasting is allowed, works for ChullPointLight and ChullPoint
   };
 } // namespace chull
 
@@ -371,7 +385,7 @@ namespace chull {
       vector<uint> getCHIndices() const;
 
       //setters
-      void addVertex(const ChullPoint& point,uint index=AUROSTD_MAX_UINT);
+      void addVertex(const ChullPointLight& point,uint index=AUROSTD_MAX_UINT);
       void addVertex(const FacetPoint& fp);
       void initialize(const xvector<double>& hull_centroid,uint hull_dim,bool check_validity=true); //needs some hull data (context) to align correctly
 
@@ -380,12 +394,12 @@ namespace chull {
       bool isPointOnFacet(const FacetPoint& fp) const;
       bool isPointOnFacet(uint i_point) const;
       bool isPointOutside(const FacetPoint& fp) const;
-      bool isPointOutside(const ChullPoint& point) const;
-      double getSignedPointPlaneDistance(const ChullPoint& point) const;
+      bool isPointOutside(const ChullPointLight& point) const;
+      double getSignedPointPlaneDistance(const ChullPointLight& point) const;
       double getSignedPointPlaneDistance(const xvector<double>& point) const;
-      double getSignedVerticalDistanceToZero(const ChullPoint& point) const;
+      double getSignedVerticalDistanceToZero(const ChullPointLight& point) const;
       double getSignedVerticalDistanceToZero(const xvector<double>& point) const;
-      double getSignedVerticalDistance(const ChullPoint& point) const;
+      double getSignedVerticalDistance(const ChullPointLight& point) const;
       double getSignedVerticalDistance(const xvector<double>& point) const;
 
       friend class ConvexHull;  //ConvexHull defines everything!
@@ -490,7 +504,7 @@ namespace chull {
       vector<uint> m_equivalent_g_states; //structure comparison
       vector<uint> m_sym_equivalent_g_states; //structure comparison
       double m_stability_criterion; //g-states only
-      double m_n_plus_1_energy_gain;     //g-states only
+      double m_n_plus_1_enthalpy_gain;     //g-states only
       bool m_icsd_g_state;          //whether icsd exists among equivalent states
       uint m_i_canonical_icsd;      //canonical icsd entry (lowest number)
 
@@ -523,7 +537,7 @@ namespace chull {
 
       //initializer
       void initialize(const xvector<int>& elements_present);
-      bool belongs2Hull(const xvector<int>& hull_elements_present) const;  //checks if alloy is a member of the hull (via hull_elements_present)
+      bool belongs2Hull(const xvector<int>& elements_present_hull) const;  //checks if alloy is a member of the hull (via elements_present_hull)
 
       //attributes
       bool m_initialized;
@@ -733,10 +747,18 @@ namespace chull {
       double getStabilityCriterion(const string& cauid) const;
       double getStabilityCriterion(uint cpoint) const;
       vector<double> getStabilityCriterion(const vector<string>& vcauid) const;
-      vector<double> getStabilityCriterion(const vector<uint>& vcpoint) const;
-      void getFakeHull(const vector<uint>& vcpoint,ConvexHull& fake_hull) const;
-      double getNPlus1EnergyGain(const string& cauid) const;
-      double getNPlus1EnergyGain(uint cpoint) const;
+      vector<double> getStabilityCriterion(const vector<uint>& vcpoints) const;
+      void getFakeHull(const vector<uint>& vcpoints,ConvexHull& fake_hull) const;
+      void getFakeHull(const vector<uint>& vcpoints,const xvector<int>& elements_present,ConvexHull& fake_hull) const;
+      void getFakeHull(const vector<uint>& vcpoints,const xvector<int>& elements_present_hull,const xvector<int>& elements_present_points,ConvexHull& fake_hull) const;
+      double getNPlus1EnthalpyGain(const string& cauid) const;
+      double getNPlus1EnthalpyGain(const string& cauid,ConvexHull& fake_hull,bool hull_set) const;
+      vector<double> getNPlus1EnthalpyGain(const vector<string>& vcauid) const;
+      vector<double> getNPlus1EnthalpyGain(const vector<string>& vcauid,ConvexHull& fake_hull,bool hull_set) const;
+      double getNPlus1EnthalpyGain(uint cpoint) const;
+      double getNPlus1EnthalpyGain(uint cpoint,ConvexHull& fake_hull,bool hull_set) const;
+      vector<double> getNPlus1EnthalpyGain(const vector<uint>& vcpoints) const;
+      vector<double> getNPlus1EnthalpyGain(const vector<uint>& vcpoint,ConvexHull& fake_hull,bool hull_set) const;
 
       //writer
       bool write(filetype ftype=latex_ft) const;
@@ -827,6 +849,8 @@ namespace chull {
       void removeDuplicateHullPoints();
       void calculateFacets();
       const xvector<int>& getElementsPresent(uint i_nary,uint i_alloy) const;
+      const xvector<int>& getElementsPresent(uint ipoint) const;
+      xvector<int> getElementsPresent(const vector<uint>& vcpoints) const;
       void setElementsPresent(uint i_nary,uint i_alloy);
       void addRelevantUnariesToHullCalculation(uint i_nary,uint i_alloy);
       void addRelevantUnariesToHullCalculation(xvector<int>& elements_present);
@@ -862,7 +886,9 @@ namespace chull {
       void thermodynamicsPostProcessing();
       void calculate();
       void setStabilityCriterion();
-      void setNPlus1EnergyGain();
+      void setNPlus1EnthalpyGain(uint i_point);
+      void setNPlus1EnthalpyGain(uint i_point,ConvexHull& fake_hull,bool hull_set);
+      void setNPlus1EnthalpyGain();
       void cleanHull(); //clean state of hull
 
       //writer functions

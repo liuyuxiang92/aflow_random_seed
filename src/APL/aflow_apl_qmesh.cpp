@@ -51,19 +51,18 @@ namespace apl {
 
   // Copy constructors
   QMesh::QMesh(const QMesh& that) : xStream(*that.getOFStream(),*that.getOSS()) {
-    free();
+    if (this != &that) free();
     copy(that);
   }
 
   QMesh& QMesh::operator=(const QMesh& that) {
-    if (this != &that) {
-      free();
-      copy(that);
-    }
+    if (this != &that) free();
+    copy(that);
     return *this;
   }
 
   void QMesh::copy(const QMesh& that) {
+    if (this == &that) return;
     xStream::copy(that);
     _ibzqpts = that._ibzqpts;
     _initialized = that._initialized;
@@ -136,25 +135,6 @@ namespace apl {
 
 //////////////////////////////////////////////////////////////////////////////
 //                                                                          //
-//                              INTERFACE                                   //
-//                                                                          //
-//////////////////////////////////////////////////////////////////////////////
-
-// For the logger
-namespace apl {
-
-  void QMesh::setDirectory(const string& dir) {
-    _directory = dir;
-  }
-
-  const string& QMesh::getDirectory() const {
-    return _directory;
-  }
-
-}
-
-//////////////////////////////////////////////////////////////////////////////
-//                                                                          //
 //                          Q-POINT FUNCTIONS                               //
 //                                                                          //
 //////////////////////////////////////////////////////////////////////////////
@@ -163,9 +143,21 @@ namespace apl {
 
   //initialize////////////////////////////////////////////////////////////////
   // Initializes the q-point grid
+  void QMesh::initialize(const vector<int>& vgrid, const xstructure& xs, ofstream& mf,
+      bool include_inversions, bool gamma_centered, ostream& oss) {
+    xStream::initialize(mf, oss);
+    initialize(vgrid, xs, include_inversions, gamma_centered);
+  }
+
   void QMesh::initialize(const vector<int>& vgrid, const xstructure& xs,
       bool include_inversions, bool gamma_centered) {
     initialize(aurostd::vector2xvector(vgrid), xs, include_inversions, gamma_centered);
+  }
+
+  void QMesh::initialize(const xvector<int>& grid, const xstructure& xs, ofstream& mf,
+      bool include_inversions, bool gamma_centered, ostream& oss) {
+    xStream::initialize(mf, oss);
+    initialize(grid, xs, include_inversions, gamma_centered);
   }
 
   void QMesh::initialize(const xvector<int>& grid, const xstructure& xs,
@@ -213,7 +205,7 @@ namespace apl {
       min_distances[i] = aurostd::modulus(_recCell.lattice(i))/((double) _qptGrid[i]);
     }
     double min_dist = aurostd::min(min_distances);
-    double tol = _AFLOW_APL_EPS_;
+    double tol = _FLOAT_TOL_;
     _recCell.skewed = SYM::isLatticeSkewed(_recCell.lattice, min_dist, tol);
 
     // Calculate the crystallographic point group of the reciprocal cell.

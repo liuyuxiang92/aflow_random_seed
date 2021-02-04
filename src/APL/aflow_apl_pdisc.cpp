@@ -37,23 +37,22 @@ namespace apl {
     free();
     _pc = &pc;
     _pc_set = true;
-    _system = _pc->getSystemName();  //ME20190614
+    _system = _pc->_system;  //ME20190614
   }
 
   PhononDispersionCalculator::PhononDispersionCalculator(const PhononDispersionCalculator& that) {
-    free();
+    if (this != &that) free();
     copy(that);
   }
 
   PhononDispersionCalculator& PhononDispersionCalculator::operator=(const PhononDispersionCalculator& that) {
-    if (this != &that) {
-      free();
-      copy(that);
-    }
+    if (this != &that) free();
+    copy(that);
     return *this;
   }
 
   void PhononDispersionCalculator::copy(const PhononDispersionCalculator& that) {
+    if (this == &that) return;
     _frequencyFormat = that._frequencyFormat;
     _freqs = that._freqs;
     _pc = that._pc;
@@ -355,7 +354,7 @@ namespace apl {
           string name = "-";
           std::map<double, string>::iterator iter = labelMap.begin();
           for (; iter != labelMap.end(); iter++)
-            if (aurostd::abs(iter->first - x) < _AFLOW_APL_EPS_) break;
+            if (aurostd::abs(iter->first - x) < _FLOAT_TOL_) break;
           if (iter != labelMap.end())
             name = iter->second;
           outfile << "# <exact>     " << x << " "
@@ -441,15 +440,15 @@ namespace apl {
     xcomplex<double> iONE(0.0, 1.0);
 
     bool isExact = false;
-    for (_AFLOW_APL_REGISTER_ int i = 1; i <= 1; i++) {
-      for (_AFLOW_APL_REGISTER_ int j = 1; j <= 1; j++) {
-        for (_AFLOW_APL_REGISTER_ int k = 1; k <= 1; k++) {
+    for (int i = 1; i <= 1; i++) {
+      for (int j = 1; j <= 1; j++) {
+        for (int k = 1; k <= 1; k++) {
           xvector<double> L = (((double)i) * lattice(1) +
               ((double)j) * lattice(2) +
               ((double)k) * lattice(3));
           xcomplex<double> p = exp(iONE * scalar_product(qpoint, L));
-          if ((aurostd::abs(p.imag()) < _AFLOW_APL_EPS_) &&
-              (aurostd::abs(p.real() - 1.0) < _AFLOW_APL_EPS_)) {
+          if ((aurostd::abs(p.imag()) < _FLOAT_TOL_) &&
+              (aurostd::abs(p.real() - 1.0) < _FLOAT_TOL_)) {
             isExact = true;
             break;
           }
@@ -521,7 +520,7 @@ namespace apl {
     xeigen.POTIM = 0.5E-15;
     xeigen.temperature = _temperature;
     xeigen.carstring = "PHON";
-    xeigen.title = _pc->getSystemName();
+    xeigen.title = _pc->_system;
     xeigen.number_electrons = 0;
     for (uint at = 0; at < xeigen.number_atoms; at++) {
       xeigen.number_electrons += _pc->getInputCellStructure().species_pp_ZVAL[at];
@@ -575,6 +574,14 @@ namespace apl {
   // ///////////////////////////////////////////////////////////////////////////
   //ME20190614 END
 
+  //AS20201110 BEGIN
+  /// Return q-path (as xKPOINTS) used to calculate phonon dispersion relations.
+  xKPOINTS PhononDispersionCalculator::getPHKPOINTS()
+  {
+    return _pb.createKPOINTS(_pc->getSupercell());
+  }
+  //AS20201110 END
+
 }  // namespace apl
 
 
@@ -602,19 +609,18 @@ namespace apl {
   }
 
   PathBuilder::PathBuilder(const PathBuilder& that) {
-    free();
+    if (this != &that) free();
     copy(that);
   }
 
   PathBuilder& PathBuilder::operator=(const PathBuilder& that) {
-    if (this != &that) {
-      free();
-      copy(that);
-    }
+    if (this != &that) free();
+    copy(that);
     return *this;
   }
 
   void PathBuilder::copy(const PathBuilder& that) {
+    if (this == &that) return;
     _mode = that._mode;
     _store = that._store;
     _path = that._path;
@@ -776,7 +782,7 @@ namespace apl {
       endPoint = _points[0];
       for(uint i = 0; i < _points.size(); i+=2) {
         startPoint = _points[i];
-        //if( aurostd::modulus( startPoint - endPoint ) > _AFLOW_APL_EPS_ )
+        //if( aurostd::modulus( startPoint - endPoint ) > _FLOAT_TOL_ )
         //    _path.push_back(endPoint);
         _path.push_back(startPoint);
         endPoint = _points[i+1];
@@ -991,7 +997,7 @@ namespace apl {
     vector<string> tokens;
 
     // Generate users path by points
-    tokenize(userPath,tokens,"|-");
+    aurostd::string2tokens(userPath,tokens,"|-");
     for(uint i = 0; i < tokens.size(); i++) {
       uint j = 0;
       for( ; j < _labels.size(); j++) {
@@ -1056,30 +1062,6 @@ namespace apl {
       if(LDEBUG){cerr << soliloquy << " OUT: " << _labels[i] << ": " << _points[i] << std::endl;}
     }
   }
-
-  // ///////////////////////////////////////////////////////////////////////////
-
-  //ME20190219 - OBSOLETE duplicate
-  //void PathBuilder::tokenize(const string& str,vector<string>& tokens, string del) {
-  //  string delimiters = del;
-
-  // Skip delimiters at beginning.
-  //  string::size_type lastPos = str.find_first_not_of(delimiters, 0);
-
-  // Find first "non-delimiter".
-  //  string::size_type pos = str.find_first_of(delimiters, lastPos);
-
-  //  while (string::npos != pos || string::npos != lastPos) {
-  // Found a token, add it to the vector.
-  //    tokens.push_back(str.substr(lastPos, pos - lastPos));
-
-  // Skip delimiters. Note the "not_of"
-  //    lastPos = str.find_first_not_of(delimiters, pos);
-
-  // Find next "non-delimiter"
-  //    pos = str.find_first_of(delimiters, lastPos);
-  //  }
-  //}
 
   // ///////////////////////////////////////////////////////////////////////////
 
@@ -1203,7 +1185,7 @@ namespace apl {
       if( line.empty() ) continue;
       if( line.size() == 1 ) continue;
       //cout << line << std::endl;
-      tokenize(line,tokens,string(" !"));
+      aurostd::string2tokens(line,tokens,string(" !"));
       addPoint(tokens[3],3,atof(tokens[0].c_str()),atof(tokens[1].c_str()),atof(tokens[2].c_str()));
       tokens.clear();
       line.clear();
