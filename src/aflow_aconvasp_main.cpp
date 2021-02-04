@@ -405,7 +405,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.flag("COMPARE_PERMUTATION",aurostd::args2attachedflag(argv,cmds,"--compare_atom_decoration|--compare_atom_decorations|--unique_atom_decoration|--unique_atom_decorations|--compare_permutation|--compare_permutations|--unique_permutation|--unique_permutations"));
   vpflow.flag("COMPARE2DATABASE",aurostd::args2attachedflag(argv,cmds,"--compare2database"));
   vpflow.flag("COMPARE2PROTOTYPES",aurostd::args2attachedflag(argv,cmds,"--compare2protos|--compare2prototypes"));
-  
+
   // COMPARISON: GENERAL OPTIONS
   if(vpflow.flag("COMPARE_DATABASE_ENTRIES") ||
       vpflow.flag("COMPARE_MATERIAL") ||
@@ -1362,7 +1362,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
 
   //  vpflow.flag("XXX",aurostd::args2flag(argv,cmds,"--xxx"));
   vpflow.flag("XFIXX",(aurostd::args2flag(argv,cmds,"--xfixX|--xfixx") && argv.size()==4));
-  
+
   vpflow.flag("XTALFINDER_PYTHON",aurostd::args2attachedflag(argv,cmds,"--aflow_xtalfinder_python|--xtalfinder_python")); //DX20201228
 
   vpflow.flag("XXX",(aurostd::args2flag(argv,cmds,"--xxx")));
@@ -6467,7 +6467,7 @@ namespace pflow {
             aurostd::liststring2string("aflow --aflow-sym|--AFLOW-SYM|--AFLOWSYM|--aflowSYM|--aflowsym|--full_symmetry|--full_sym|--fullsym[=tolerance|=tight|=loose] [--no_scan] [--print=txt|--print=json] [--screen_only] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR  default: tolerance=(minimum_interatomic_distance)/100.0, print=txt")); //DX20200724 - removed return
         return false; //CO20200624 - there has been NO calculation of symmetry
       }
-		}
+    }
 
     //DX20201228 - print Python script
     if(XHOST.vflag_control.flag("PRINT_MODE::PYTHON")){
@@ -8345,7 +8345,7 @@ namespace pflow {
     //------------------------------------------------- 
     // need to add enumeration suffixes to ANRL prototypes  //DX20201013
     vector<string> all_prototype_designations;
-  
+
     for(uint i=0;i<prototype_labels.size();i++){
       // check for ANRL
       vector<string> tokens;
@@ -10256,7 +10256,7 @@ namespace pflow {
     if(message_parts.size()==0){return;}
 
     string soliloquy=function_name; // aurostd::RemoveWhiteSpaces(function_name);
-    
+
     string tag_code="00000";
     string tag_message="MESSAGE";
     if (type == _LOGGER_ERROR_) {

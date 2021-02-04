@@ -2586,7 +2586,7 @@ namespace aurostd {
 
     bool verbose=(!XHOST.QUIET && !quiet && osswrite);verbose=true; //ALWAYS!
     bool fancy_print=(!XHOST.vflag_control.flag("WWW")&&!XHOST.vflag_control.flag("NO_FANCY_PRINT"));  //CO20200404 - new web flag
-    
+
     FILE* fstr=stderr;
 
     FileMESSAGE << ErrorBarString << endl;
@@ -2662,7 +2662,7 @@ namespace aurostd {
 
     bool verbose=(!XHOST.QUIET && !quiet && osswrite);verbose=true; //ALWAYS!
     bool fancy_print=(!XHOST.vflag_control.flag("WWW")&&!XHOST.vflag_control.flag("NO_FANCY_PRINT"));  //CO20200404 - new web flag
-    
+
     FILE* fstr=stderr;
 
     FileMESSAGE << WarningBarString << endl;

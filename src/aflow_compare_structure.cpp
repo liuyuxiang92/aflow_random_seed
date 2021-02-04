@@ -156,7 +156,7 @@ vector<string> XtalFinderCalculator::getUniquePermutations(
   xtal_finder_permutations.misfit_match = misfit_match; //copy misfit_match
   xtal_finder_permutations.misfit_family = misfit_family; //copy misfit_family
   xtal_finder_permutations.num_proc = num_proc; //copy num_proc
-  
+
   string misfit_results = "";
   //vector<StructurePrototype> final_permutations = xtal_finder_permutations.compareAtomDecorations(structure,num_proc,comparison_options);
   xtal_finder_permutations.compareAtomDecorations(structure,misfit_results,num_proc,comparison_options);
@@ -760,7 +760,7 @@ vector<StructurePrototype> XtalFinderCalculator::compare2prototypes(
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
     vlabel = aflowlib::GetPrototypesBySymmetry(stoichiometry, space_group_num, grouped_Wyckoff_positions, prototype_space_groups, SG_SETTING_ANRL, catalog);
   }
-  
+
   if(vlabel.size()>0){
     message << "Potential compatible prototypes: " << vlabel.size() << " (" << aurostd::joinWDelimiter(vlabel,",") << ").";
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
@@ -1043,14 +1043,14 @@ vector<StructurePrototype> XtalFinderCalculator::compare2database(
   bool ignore_symmetry = comparison_options.flag("COMPARISON_OPTIONS::IGNORE_SYMMETRY");
   if(!ignore_symmetry){
     if(!isSymmetryCalculated(structure_containers[0])){ calculateSymmetries(1); }  //1: one structure -> one processor
-    
+
     if(LDEBUG) {
       cerr << function_name << " Wyckoff positions of input structure:" << endl;
       for(uint i=0;i<structure_containers[0].grouped_Wyckoff_positions.size();i++){
         cerr << structure_containers[0].grouped_Wyckoff_positions[i] << endl;
       }
     }
-    
+
     // add space group query to AFLUX matchbook: get entries with compatible space groups, i.e., same or enantiomorph
     vmatchbook.push_back(aflowlib::getSpaceGroupAFLUXSummons(structure_containers[0].space_group,relaxation_step));
   }
@@ -1121,7 +1121,7 @@ vector<StructurePrototype> XtalFinderCalculator::compare2database(
   // ---------------------------------------------------------------------------
   // load and store entries from the database
   for(uint i=0; i<auids.size(); i++){
-  
+
     // ---------------------------------------------------------------------------
     // first, get stoichiometry from entry
     vector<double> vcomposition;
@@ -1137,7 +1137,7 @@ vector<StructurePrototype> XtalFinderCalculator::compare2database(
     }
     vector<uint> tmp_reduced_stoich; aurostd::reduceByGCD(tmp_stoich, tmp_reduced_stoich); //DX20191125
     if(!same_species){ std::sort(tmp_reduced_stoich.begin(),tmp_reduced_stoich.end()); }
-    
+
     // ---------------------------------------------------------------------------
     // second, check if stoichiometries are compatible
     // note: do not include in AFLUX matchbook, we would need to specify a range of compatible stoichs (could be expensive)
@@ -1260,7 +1260,7 @@ namespace compare {
     // DEBUG oss << ss_out.str();
     message << "Number of structures in database matching with the input structure: " << prototypes_final[0].structures_duplicate.size() << "." << endl;
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
-    
+
     // ---------------------------------------------------------------------------
     // print results
     string results_txt = xtal_finder_database.printResults(prototypes_final, same_species, txt_ft);
@@ -1383,7 +1383,7 @@ namespace compare {
 
       vmatchbook.insert(vmatchbook.end(), property_list.begin(), property_list.end());
     }
-  
+
     // ---------------------------------------------------------------------------
     // get schema from xoptions, i.e., metadata (for the units and types)
     // DX20201230 - added type
@@ -1543,7 +1543,7 @@ namespace compare {
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     message << "Loading structures ..." << auids.size();
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
-  
+
     // ---------------------------------------------------------------------------
     // load and store entries from the database
     for(uint i=0; i<auids.size(); i++){

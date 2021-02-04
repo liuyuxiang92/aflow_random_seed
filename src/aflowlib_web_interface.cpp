@@ -3951,7 +3951,7 @@ namespace aflowlib {
     tokens.erase(tokens.begin());
     string path=aurostd::joinWDelimiter(tokens,":");
     if(LDEBUG){cerr << soliloquy << " path=" << path << endl;}
-    
+
     //split by /
     aurostd::string2tokens(path,tokens,"/");
     if(tokens.size()<4){
@@ -3971,7 +3971,7 @@ namespace aflowlib {
       string::size_type loc;loc=species_string.find(":");
       species_string=species_string.substr(0,loc);
     }
-    
+
     vspecies=aurostd::getElements(species_string);
     if(LDEBUG){cerr << soliloquy << " vspecies=" << aurostd::joinWDelimiter(vspecies,",") << endl;}
     return vspecies;

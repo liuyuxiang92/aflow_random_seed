@@ -1384,7 +1384,7 @@ namespace pocc {
     else{tokens.push_back(temp_string);}
 
     if(tokens.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown temp_string format",_INPUT_ILLEGAL_);}
-   
+
     //check that they are all doubles
     vector<double> dtokens;
     for(uint i=0;i<tokens.size();i++){
@@ -1395,7 +1395,7 @@ namespace pocc {
 
     //simple comma-separated list
     if(dtokens.size()==1 || temp_string.find(",")!=string::npos){return dtokens;}
-    
+
     //treat ':' and '-' as delimiter for ranges
     if(tokens.size()<1 || tokens.size()>3){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown temp_string format",_INPUT_ILLEGAL_);}
 

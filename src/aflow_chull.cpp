@@ -483,7 +483,7 @@ namespace chull {
         vpflow.flag("CHULL::SKIP_THERMO_PROPERTIES_EXTRACTION",true);
         message << "Skipping thermodynamic properties extraction";pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
       }
-      
+
       //skip calculating all of the lower dimensional hulls
       //this works if you are finding the hull_energy somewhere in the middle of the hull
       //the edges are problematic (lower dimensional hulls)
@@ -1427,7 +1427,7 @@ namespace chull {
     m_i_alloy=b.m_i_alloy;
     h_coords=b.h_coords;
   }
-  
+
   double ChullPointLight::getLastCoord() const {return m_coords[m_coords.urows];}
 
   //--------------------------------------------------------------------------------
@@ -5675,7 +5675,7 @@ namespace chull {
     if(!m_naries[i_nary].m_alloys[i_alloy].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized alloy");}
     if(i_coord_group>m_coord_groups.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within coordgroups");}
     if(m_coord_groups[i_coord_group].m_nearest_facet>m_facets.size()-1){setNearestFacet(i_nary,i_alloy,i_coord_group);}
-    
+
     if(m_coord_groups[i_coord_group].m_is_on_hull){
       if(!isViablePoint(m_coord_groups[i_coord_group].m_hull_member)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No hull member set for m_coord_group["+aurostd::utype2string(i_coord_group)+"]",_RUNTIME_ERROR_);}
       vector<uint> dcomp_phases;dcomp_phases.push_back(m_coord_groups[i_coord_group].m_hull_member);
@@ -5759,7 +5759,7 @@ namespace chull {
     if(!m_naries[i_nary].m_alloys[i_alloy].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized alloy");}
     if(i_coord_group>m_coord_groups.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within coordgroups");}
     if(m_coord_groups[i_coord_group].m_decomp_phases.size()==0){setDecompositionPhases(i_nary,i_alloy,i_coord_group);}
-    
+
     if(m_coord_groups[i_coord_group].m_is_on_hull){
       xvector<double> dcomp_coefs(2);
       dcomp_coefs[dcomp_coefs.lrows]=dcomp_coefs[dcomp_coefs.lrows+1]=1.0;

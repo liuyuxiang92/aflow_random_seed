@@ -318,7 +318,7 @@ namespace xelement {
     HHIR=NNN;                           
     xray_scatt=NNN;   
     // [AFLOW]STOP=CONSTRUCTOR
-    
+
     //UNITS
     units_Z="";
     units_symbol="";
@@ -514,7 +514,7 @@ namespace xelement {
     HHIR=b.HHIR;                           
     xray_scatt=b.xray_scatt;    
     // [AFLOW]STOP=ASSIGNMENT
-    
+
     //UNITS
     units_Z=b.units_Z;
     units_symbol=b.units_symbol;
@@ -612,7 +612,7 @@ namespace xelement {
   void xelement::clear(){
     xelement a;(*this)=a;
   }
-  
+
   void xelement::loadDefaultUnits(){  //CO20201111
     units_Z="";
     units_symbol="";
@@ -1474,7 +1474,7 @@ namespace xelement {
       if(vproperties[i]==aurostd::toupper("HHIP")) continue;
       if(vproperties[i]==aurostd::toupper("HHIR")) continue;
       if(vproperties[i]==aurostd::toupper("xray_scatt")) {dptr=&xray_scatt;sptr=&units_xray_scatt;}
-      
+
       if(dptr==NULL && dvptr==NULL && dxvptr==NULL){
         throw aurostd::xerror(_AFLOW_FILE_NAME_,"xelement::convertUnits():","Property not found: "+property,_INPUT_ILLEGAL_);  //CO20200520
       }
@@ -1634,7 +1634,7 @@ namespace xelement {
           throw aurostd::xerror(_AFLOW_FILE_NAME_,"xelement::convertUnits():","Unknown units(_old) scheme: "+units_old,_RUNTIME_ERROR_);  //CO20200520
         }
       }
-      
+
       if(LDEBUG){cerr << soliloquy << " units_new=(" << (*sptr) << ")" << endl;}
 
       if(!converted){
@@ -1642,7 +1642,7 @@ namespace xelement {
       }
     }
   }
-  
+
 
   // ********************************************************************************************************************************************************
   // populate by name or symbol

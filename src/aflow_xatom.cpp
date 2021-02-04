@@ -1236,7 +1236,7 @@ uint XATOM_SplitAlloyPseudoPotentials(const string& alloy_in, vector<string> &sp
 // getLeastFrequentAtomTypes() //DX20201230 - moved from XtalFinder
 // ***************************************************************************
 vector<string> getLeastFrequentAtomTypes(const xstructure& xstr, bool clean) {
-  
+
   // The least frequent atom type is the species with the smallest
   // concentration in the crystal. The atoms of this type are the minimal set
   // of atoms that exhibit the crystal periodicity (useful for finding
@@ -1316,8 +1316,8 @@ vector<string> xstructure::GetElementsFromAtomNames(bool clean_name){
   string function_name = XPID + "xstructure::GetSpeciesFromAtomName():";
 
   vector<string> species;
-	if(atoms.size()==0){ return species; }
-	if(!atoms[0].name_is_given) { return species; }
+  if(atoms.size()==0){ return species; }
+  if(!atoms[0].name_is_given) { return species; }
 
   uint iat=0;
   string species_tmp = "";
@@ -6974,18 +6974,18 @@ void xstructure::ReplaceAtoms(const deque<_atom>& new_atoms, bool check_present)
   //it takes care of num_each_type, species, etc.
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   string soliloquy = XPID + "xstructure::ReplaceAtoms():";
-  
+
   //DX20210129 [OBSOLETE - remove all at once] for(uint i=atoms.size()-1;i<atoms.size();i--){  //removing atoms
   //DX20210129 [OBSOLETE - remove all at once]   if(LDEBUG) cerr << soliloquy << " removing atom[" << i << "]" << endl;
   //DX20210129 [OBSOLETE - remove all at once]   RemoveAtom(i);
   //DX20210129 [OBSOLETE - remove all at once] }
   if(LDEBUG) cerr << soliloquy << " removing all atoms" << endl;
   RemoveAtom(); //DX20210129 - remove all atoms and clear species variables
-  
+
   if(LDEBUG) cerr << soliloquy << " adding new atoms" << endl;
   //DX20210202 [OBSOLETE] for(uint i=0;i<new_atoms.size();i++){AddAtom(new_atoms[i]);}  //adding atoms
   AddAtom(new_atoms, check_present);  //adding atoms
-    
+
   (*this).SpeciesPutAlphabetic(); //DX20210129
 }
 
@@ -10711,7 +10711,7 @@ uint xstructure::SetSpecies(const deque<string>& vspecies) {
 // Function UpdateSpecies() //DX20210202 [from AddAtom, consolidate to function]
 // ***************************************************************************
 void xstructure::UpdateSpecies(const _atom& atom){
-   
+
   // Update the species info based on the atom input
   // If the species is already in xstructure, update the number of types
   // and composition of each type, otherwise, add the new species info
@@ -11492,7 +11492,7 @@ xmatrix<double> MinkowskiBasisReduction(const xmatrix<double>& lattice) {
 // Function GetMinkowskiStructures() //DX20201006
 // ***************************************************************************
 void GetMinkowskiStructures(vector<xstructure>& structures, uint start_index, uint end_index){
-  
+
   // Converts a set of xstructures to their Minkowski representation
   // Optional indices can be included; useful for pre-distributed
   // threading schemes
@@ -13403,7 +13403,7 @@ void xstructure::GetPrimitive3(void) {
 // Function GetPrimitiveStructures() //DX20201006
 // ***************************************************************************
 void GetPrimitiveStructures(vector<xstructure>& structures, uint start_index, uint end_index){
-  
+
   // Converts a set of xstructures to their primitive representation
   // Optional indices can be included; useful for pre-distributed
   // threading schemes
@@ -16895,7 +16895,7 @@ vector<xvector<double> > GetBasisTransformationInternalTranslations(const xmatri
   // check if the basis transformation makes the cell larger and find
   // corresponding internal translations
   if(cell_volume_change-1.0>_AUROSTD_XSCALAR_TOLERANCE_INTEGER_){
-  
+
     if(LDEBUG){ cerr << function_name << " cell size increases. Finding internal translations." << endl; }
 
     // ---------------------------------------------------------------------------
@@ -16908,7 +16908,7 @@ vector<xvector<double> > GetBasisTransformationInternalTranslations(const xmatri
     // then these are the internal translations
     xmatrix<double> lattice_frac = aurostd::eye<double>(3,3);
     xmatrix<double> lattice_shrink = inverse_transform*lattice_frac;
-   
+
     if(LDEBUG){ cerr << function_name << " shrunken lattice: " << lattice_shrink << endl; }
 
     // ---------------------------------------------------------------------------
@@ -16944,14 +16944,14 @@ vector<xvector<double> > GetBasisTransformationInternalTranslations(const xmatri
         }
       }
     }
-    
+
     if(LDEBUG){
       cerr << function_name << " # translations:" << translations.size() << endl;
       for(uint t=0;t<translations.size();t++){
         cerr << function_name << " translations:" << translations[t] << endl;
       }
     }
-    
+
     // ---------------------------------------------------------------------------
     // filter out unique translations 
     vector<xvector<double> > unique_translations;
@@ -16964,7 +16964,7 @@ vector<xvector<double> > GetBasisTransformationInternalTranslations(const xmatri
       }
       if(unique){ unique_translations.push_back(translation_incell); }
     }
-    
+
     if(LDEBUG){
       cerr << function_name << " # unique_translations:" << unique_translations.size() << endl;
       for(uint t=0;t<unique_translations.size();t++){
@@ -17042,12 +17042,12 @@ void xstructure::ChangeBasis(const xmatrix<double>& transformation_matrix) {
   xmatrix<double> lattice_orig = (*this).lattice;
   (*this).lattice = transformation_matrix*(*this).lattice;
   (*this).FixLattices();
- 
+
   // ---------------------------------------------------------------------------
   // get internal translations from basis transformation (i.e. transforming
   // to larger cells)
   vector<xvector<double> > translations = GetBasisTransformationInternalTranslations(transformation_matrix);
-  
+
   // ---------------------------------------------------------------------------
   // transform the atom positions
   deque<_atom> atom_basis;
@@ -17080,7 +17080,7 @@ void xstructure::ChangeBasis(const xmatrix<double>& transformation_matrix) {
     double tol=0.01;
     deque<_atom> new_basis = ::foldAtomsInCell(atom_basis, lattice_orig, (*this).lattice, skew, tol, false); //false: don't check atom mappings (slow) //DX20210118 - add global namespace
     atom_basis = new_basis;
-      
+
     // check atom count
     natoms_transformed = atom_basis.size();
     is_integer_multiple_transformation = (natoms_orig%natoms_transformed==0);
@@ -17182,7 +17182,7 @@ void xstructure::TransformStructure(
   // rotate
   (*this).Rotate(rotation);
   if(LDEBUG){ cerr << function_name << " structure after ROTATING: " << (*this) << endl; }
-  
+
   // ---------------------------------------------------------------------------
   // rotate
   bool coordinate_flag = (*this).coord_flag; // store original coordinate-type

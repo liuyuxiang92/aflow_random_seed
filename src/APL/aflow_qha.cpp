@@ -401,7 +401,7 @@ namespace apl
       }
       else{
         subdirectories_apl_gp.push_back(ARUN_DIRECTORY_PREFIX + QHA_ARUN_MODE + '_' +
-          arun_runnames_apl_gp.back());
+            arun_runnames_apl_gp.back());
       }
 
       coefGPVolumes.push_back(gprange[j]);
@@ -715,22 +715,22 @@ namespace apl
             if (qha_options.flag("EOS_MODEL:BM2")){
               runSCQHA(EOS_BIRCH_MURNAGHAN2, true, currentDirectory);
               writeTphononDispersions(EOS_BIRCH_MURNAGHAN2, SCQHA_CALC,
-                    currentDirectory);
+                  currentDirectory);
             }
             if (qha_options.flag("EOS_MODEL:BM3")){
               runSCQHA(EOS_BIRCH_MURNAGHAN3, true, currentDirectory);
               writeTphononDispersions(EOS_BIRCH_MURNAGHAN3, SCQHA_CALC,
-                    currentDirectory);
+                  currentDirectory);
             }
             if (qha_options.flag("EOS_MODEL:BM4")){
               runSCQHA(EOS_BIRCH_MURNAGHAN4, true, currentDirectory);
               writeTphononDispersions(EOS_BIRCH_MURNAGHAN4, SCQHA_CALC,
-                    currentDirectory);
+                  currentDirectory);
             }
             if (qha_options.flag("EOS_MODEL:M")){
               runSCQHA(EOS_MURNAGHAN, true, currentDirectory);
               writeTphononDispersions(EOS_MURNAGHAN, SCQHA_CALC,
-                    currentDirectory);
+                  currentDirectory);
             }
           }
         }
@@ -1176,7 +1176,7 @@ namespace apl
         }
         msg = "Hibernation file was read successfully.";
         pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
-              *p_oss, _LOGGER_MESSAGE_);
+            *p_oss, _LOGGER_MESSAGE_);
       }
 
       // calculate all phonon-related data: DOS, frequencies along the q-mesh and

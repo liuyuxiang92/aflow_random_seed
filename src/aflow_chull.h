@@ -185,7 +185,7 @@ namespace chull {
 
       //temporary variables that come with every new calculate() command
       xvector<double> h_coords;  //dummy coord that changes per convex hull iteration, mere projection
-      
+
       //getters
       double getLastCoord() const;
     protected:

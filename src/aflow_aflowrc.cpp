@@ -1646,7 +1646,7 @@ namespace aflowrc {
     aflowrc::load_default("MPI_OPTIONS_DUKE_QFLOW_OPENMPI",AFLOWRC_MPI_OPTIONS_DUKE_QFLOW_OPENMPI); 
     aflowrc::load_default("MPI_COMMAND_DUKE_QFLOW_OPENMPI",AFLOWRC_MPI_COMMAND_DUKE_QFLOW_OPENMPI); 
     aflowrc::load_default("MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI",AFLOWRC_MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI); 
-    
+
     //CO20201220 X START
     aflowrc::load_default("MPI_OPTIONS_DUKE_X",AFLOWRC_MPI_OPTIONS_DUKE_X); 
     aflowrc::load_default("MPI_COMMAND_DUKE_X",AFLOWRC_MPI_COMMAND_DUKE_X); 
@@ -2208,7 +2208,7 @@ namespace aflowrc {
     aflowrc << "AFLOW_CORE_TEMPERATURE_BEEP=" << AFLOWRC_AFLOW_CORE_TEMPERATURE_BEEP << " // Celsius" << endl;
     aflowrc << "AFLOW_CORE_TEMPERATURE_HALT=" << AFLOWRC_AFLOW_CORE_TEMPERATURE_HALT << " // Celsius" << endl;
     aflowrc << "AFLOW_CORE_TEMPERATURE_REFRESH=" << AFLOWRC_AFLOW_CORE_TEMPERATURE_REFRESH << " // seconds"   << endl;
-    
+
     aflowrc << "VASP_CHECK_SLEEP=" << AFLOWRC_VASP_CHECK_SLEEP << " // seconds"   << endl;  //CO20201111
 
     aflowrc << " " << endl;
@@ -2240,7 +2240,7 @@ namespace aflowrc {
     aflowrc << "MPI_OPTIONS_DUKE_QFLOW_OPENMPI=\"" << AFLOWRC_MPI_OPTIONS_DUKE_QFLOW_OPENMPI << "\"" << "  // DUKE_QFLOW_OPENMPI" << endl;
     aflowrc << "MPI_COMMAND_DUKE_QFLOW_OPENMPI=\"" << AFLOWRC_MPI_COMMAND_DUKE_QFLOW_OPENMPI << "\"" << "  // DUKE_QFLOW_OPENMPI" << endl;
     aflowrc << "MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI=\"" << AFLOWRC_MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI << "\"" << "  // DUKE_QFLOW_OPENMPI" << endl; 
-    
+
     //CO20201220 X START
     aflowrc << "MPI_OPTIONS_DUKE_X=\"" << AFLOWRC_MPI_OPTIONS_DUKE_X << "\"" << "  // DUKE_X" << endl;
     aflowrc << "MPI_COMMAND_DUKE_X=\"" << AFLOWRC_MPI_COMMAND_DUKE_X << "\"" << "  // DUKE_X" << endl;
@@ -2768,7 +2768,7 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<double>(\"AFLOW_CORE_TEMPERATURE_BEEP\")=" << AFLOW_CORE_TEMPERATURE_BEEP << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<double>(\"AFLOW_CORE_TEMPERATURE_HALT\")=" << AFLOW_CORE_TEMPERATURE_HALT << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<double>(\"AFLOW_CORE_TEMPERATURE_REFRESH\")=" << AFLOW_CORE_TEMPERATURE_REFRESH << endl;
-    
+
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<double>(\"VASP_CHECK_SLEEP\")=" << VASP_CHECK_SLEEP << endl; //CO20201111
 
     if(LDEBUG) oss << "// DEFAULT MACHINE DEPENDENT MPI" << endl;
@@ -2799,7 +2799,7 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_OPTIONS_DUKE_QFLOW_OPENMPI\")=\"" << MPI_OPTIONS_DUKE_QFLOW_OPENMPI << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_COMMAND_DUKE_QFLOW_OPENMPI\")=\"" << MPI_COMMAND_DUKE_QFLOW_OPENMPI << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI\")=\"" << MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI << "\"" << endl;
-    
+
     //CO20201220 X START
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_OPTIONS_DUKE_X\")=\"" << MPI_OPTIONS_DUKE_X << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_COMMAND_DUKE_X\")=\"" << MPI_COMMAND_DUKE_X << "\"" << endl;

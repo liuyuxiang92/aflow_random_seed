@@ -960,13 +960,13 @@ namespace aflowMachL {
         vheaders.reserve(vheaders_size);vfeatures.reserve(vheaders_size);
       }
     }
-    
+
     vector<string> vlattice_constants_variants;aurostd::string2tokens("a,b,c",vlattice_constants_variants,",");
     vector<string> vlattice_angles_variants;aurostd::string2tokens("alpha,beta,gamma",vlattice_angles_variants,",");
     vector<string> vions;aurostd::string2tokens("cation,anion",vions,",");
     vector<string> venvs;aurostd::string2tokens("crystal,atomenv",venvs,",");
     vector<string> vstats;aurostd::string2tokens("min,max,range,sum,mean,std,mode",vstats,",");
-    
+
     uint index_cation=0,index_anion=0;
     if(!vheaders_only){
       if(entry.vspecies.size()!=2){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"non-binary found",_FILE_CORRUPT_);}
@@ -1001,7 +1001,7 @@ namespace aflowMachL {
     vsizes.push_back((int)vions.size());
     vsizes.push_back(3);  //normal, divide by M-X_bonds, multiply by natoms and dvided by M-X_bonds
     vsizes.push_back((int)vstats.size());
-    
+
     xc.reset(vsizes,'E');
     count=0;
     divide_by_adjacency=false;
@@ -1096,7 +1096,7 @@ namespace aflowMachL {
       }
     }
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    
+
     int index_property2=0;
     int index_vec2=0;
     int index_operation=0;
@@ -1124,7 +1124,7 @@ namespace aflowMachL {
     vsizes.push_back(2);  //multiplication/division
     vsizes.push_back(3);  //normal, divide by M-X_bonds, multiply by natoms and dvided by M-X_bonds
     vsizes.push_back((int)vstats.size());
-    
+
     xc.reset(vsizes,'E');
     count=0;
     divide_by_adjacency=false;
@@ -1298,10 +1298,10 @@ namespace aflowMachL {
     stringstream message;
 
     if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
-    
+
     message << "creating one-hot features for " << features_categories;
     pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,cout,_LOGGER_MESSAGE_);
-    
+
     uint i=0,j=0,k=0;
 
     if(LDEBUG){
@@ -1328,7 +1328,7 @@ namespace aflowMachL {
       }
     }
     if(vfeatures_categories.size()!=vicol.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"vfeatures_categories.size()!=vicol.size()",_RUNTIME_ERROR_);}
-    
+
     //sort and reverse, so we can erase/insert
     std::sort(vicol.rbegin(),vicol.rend());
 
@@ -1407,9 +1407,9 @@ namespace aflowMachL {
   void reduceFeatures(vector<vector<string> >& table,const string& yheader,const vector<string>& vheaders2skip,double var_threshold,double ycorr_threshold,double selfcorr_threshold) {
     bool LDEBUG=(FALSE || _DEBUG_ML_ || XHOST.DEBUG);
     string soliloquy=XPID+"aflowMachL::reduceFeatures():";
-    
+
     if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
-    
+
     uint i=0,j=0;
 
     //table[0] are headers
@@ -1438,7 +1438,7 @@ namespace aflowMachL {
     stringstream message;
 
     if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
-    
+
     uint i=0,j=0,ncols=0,ncols_orig=0;
 
     if(LDEBUG){
@@ -1447,11 +1447,11 @@ namespace aflowMachL {
     }
 
     if(table.size()<2){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"table.size()<2",_RUNTIME_ERROR_);}
-    
+
     ncols=ncols_orig=table[0].size();
     message << "ncols_orig=" << ncols;
     pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,cout,_LOGGER_MESSAGE_);
-    
+
     message << "converting string table to xvector table";
     pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,cout,_LOGGER_MESSAGE_);
 
@@ -1485,10 +1485,10 @@ namespace aflowMachL {
     if(vmeans.size()!=ncols){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"vmeans.size()!=ncols",_RUNTIME_ERROR_);}
     if(vstddevs.size()!=ncols){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"vstddevs.size()!=ncols",_RUNTIME_ERROR_);}
     if(yiheader==AUROSTD_MAX_UINT){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"yiheader==AUROSTD_MAX_UINT",_INPUT_MISSING_);}
-    
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////
     //variance
-    
+
     message << "identifying and removing null / low-variance features";
     pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,cout,_LOGGER_MESSAGE_);
 
@@ -1543,10 +1543,10 @@ namespace aflowMachL {
     //[ERASE IS TOO SLOW]    delColumn(table,vicol2remove[i]);
     //[ERASE IS TOO SLOW]  }
     //[ERASE IS TOO SLOW]}
-    
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////
     //correlated with y
-    
+
     message << "identifying and removing low-correlated features";
     pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,cout,_LOGGER_MESSAGE_);
 
@@ -1572,7 +1572,7 @@ namespace aflowMachL {
       }
       const xvector<double>& xvec=xvtable[index]; //no need to remove NNN, correlation would be the same with 0 or NNN
       if(LDEBUG){cerr << soliloquy << " xvec[" << header << "]=" << xvec << endl;}
-      
+
       corr=std::pow(aurostd::correlation_Pearson_fast(xvec,vmeans[index],vstddevs[index],yvec,ymean,ystddev),2.0);
       if(LDEBUG){cerr << soliloquy << " corr(xvec,yvec)^2=" << corr << endl;}
       if(corr<ycorr_threshold){
@@ -1589,7 +1589,7 @@ namespace aflowMachL {
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////
     //self-correlated
-    
+
     message << "identifying and removing self-correlated features";
     pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,cout,_LOGGER_MESSAGE_);
 
@@ -1608,7 +1608,7 @@ namespace aflowMachL {
       }
       const xvector<double>& xvec=xvtable[index]; //no need to remove NNN, correlation would be the same with 0 or NNN
       if(LDEBUG){cerr << soliloquy << " xvec[" << header << "]=" << xvec << endl;}
-      
+
       for(j=i+1;j<xvindices.size();j++){
         index2=xvindices[j];
         if(LDEBUG){cerr << soliloquy << " index2=" << index2 << endl;}
@@ -1643,7 +1643,7 @@ namespace aflowMachL {
     //  }
     //  cerr << vinputs.size() << endl;
     //}
-    
+
     //std::sort(vicol2remove.begin(),vicol2remove.end());vicol2remove.erase( std::unique( vicol2remove.begin(), vicol2remove.end() ), vicol2remove.end() );  //get unique values
     //message << "removing " << vicol2remove.size() << " null / low-variance / low-correlated / self-correlated columns";
     message << "removing " << aurostd::sum(xvicol2remove) << " null / low-variance / low-correlated / self-correlated columns";
@@ -1658,11 +1658,11 @@ namespace aflowMachL {
     //[ERASE IS TOO SLOW]    delColumn(table,vicol2remove[i]);
     //[ERASE IS TOO SLOW]  }
     //[ERASE IS TOO SLOW]}
-    
+
     //two options
     //flip row and column
     //get list of columns to keep
-    
+
     //vector<uint> vicol2keep;
     //for(i=0;i<ncols;i++){
     //  if(aurostd::WithinList(vicol2remove,i,true)){continue;}
@@ -1708,15 +1708,15 @@ namespace aflowMachL {
         throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"table[i="+aurostd::utype2string(i)+"].size()!=ncols",_RUNTIME_ERROR_);
       }
     }
-    
+
     message << "ncols_new=" << ncols;
     pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,cout,_LOGGER_MESSAGE_);
-    
+
     if(1||LDEBUG){
       cerr << soliloquy << " table_new=" << endl;
       for(i=0;i<table.size();i++){cerr << aurostd::joinWDelimiter(table[i],",") << endl;}
     }
-    
+
   }
 
   string reduceEProperties(double var_threshold,double selfcorr_threshold) {
@@ -1739,7 +1739,7 @@ namespace aflowMachL {
     }
 
     if(LDEBUG){cerr << soliloquy << " vproperties_elements_numbers=" << aurostd::joinWDelimiter(vproperties_elements_numbers,",") << endl;}
-    
+
     if(!_TM_ONLY_){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"going beyond transition metals requires rewriting this function",_FILE_CORRUPT_);}
 
     vector<vector<string> > vvtable;
@@ -1806,7 +1806,7 @@ namespace aflowMachL {
         continue;
       }
     }
-    
+
     std::sort(vicol2remove.begin(),vicol2remove.end());vicol2remove.erase( std::unique( vicol2remove.begin(), vicol2remove.end() ), vicol2remove.end() );  //get unique values
     message << "found " << vicol2remove.size() << " null / low-variance columns";
     pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,cout,_LOGGER_MESSAGE_);
@@ -1822,7 +1822,7 @@ namespace aflowMachL {
       }
       const xvector<double>& xvec=vcols[index]; //no need to remove NNN, correlation would be the same with 0 or NNN
       if(LDEBUG){cerr << soliloquy << " xvec[" << header << "]=" << xvec << endl;}
-      
+
       for(j=i+1;j<vcols.size();j++){
         index2=j;
         if(LDEBUG){cerr << soliloquy << " index2=" << index2 << endl;}
@@ -1842,7 +1842,7 @@ namespace aflowMachL {
         }
       }
     }
-    
+
     std::sort(vicol2remove.begin(),vicol2remove.end());vicol2remove.erase( std::unique( vicol2remove.begin(), vicol2remove.end() ), vicol2remove.end() );  //get unique values
     message << "found " << vicol2remove.size() << " null / low-variance / self-correlated columns";
     pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,cout,_LOGGER_MESSAGE_);
@@ -1855,7 +1855,7 @@ namespace aflowMachL {
       if(aurostd::WithinList(vcol2remove,vproperties_elements_full[i])){continue;}
       vproperties_elements_full_new.push_back(vproperties_elements_full[i]);
     }
-    
+
     if(LDEBUG){
       cerr << soliloquy << " reduced " << vproperties_elements_full.size() << " elemental properties down to " << vproperties_elements_full_new.size() << " (reduced by " << (vproperties_elements_full.size()-vproperties_elements_full_new.size()) << ")" << endl;
       cerr << soliloquy << " vproperties_elements_full_new=" << aurostd::joinWDelimiter(vproperties_elements_full_new,",") << endl;
@@ -1878,7 +1878,7 @@ namespace aflowMachL {
     vvlines.resize(2); //N,O
 
     string eproperties_full=reduceEProperties();
-    
+
     vector<string> vheaders,vheaders_additional;
     vector<double> vfeatures;
     vector<string> vions;aurostd::string2tokens("cation,anion",vions,",");
@@ -2009,7 +2009,7 @@ namespace aflowMachL {
     }
 
     for(i=0;i<vvlines.size();i++){vvlines[i].push_back(vheaders);}
-    
+
     string species_pp="";
     bool found_pp=false;
     string structure_path="";
@@ -2164,7 +2164,7 @@ namespace aflowMachL {
         }
       }
     }
-    
+
     for(i=0;i<vvlines.size();i++){
       oneHotFeatures(vvlines[i],"Bravais_lattice_crystal,spacegroup_crystal,spacegroup_number_cation,spacegroup_number_anion");
       reduceFeatures(vvlines[i],"PBE_0K","PBE_298.15K,PBE_0K,LDA_298.15K,LDA_0K,SCAN_298.15K,SCAN_0K,PBE+U_298.15K,PBE+U_0K,exp_298.15K"); //skip y

@@ -1492,7 +1492,7 @@ namespace aflowlib {
           if (files[i].find("qha")!=string::npos &&
               files[i].find(".png")!=string::npos){
             aurostd::LinkFile(directory_RAW+"/"+files[i],directory_WEB);
-           }
+          }
         }
       }
     }
@@ -7222,7 +7222,7 @@ namespace aflowlib {
       if(vproperties_full[i]=="oxidation_states"){continue;} //skip this
       if(xel.getType(vproperties_full[i])=="number"||xel.getType(vproperties_full[i])=="numbers"){
         vproperties.push_back(vproperties_full[i]);
-        
+
         if(xel.getType(vproperties.back())=="number"){
           if(LDEBUG){cerr << soliloquy << " " << vproperties.back() << " is a number" << endl;}
           for(j=0;j<vstats.size();j++){vheaders.push_back(vproperties.back()+"_stoich_"+vstats[j]);}
@@ -7285,14 +7285,14 @@ namespace aflowlib {
 
     if(vheaders_only) return;
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //features
-    
+
     uint nspecies=vspecies.size();
     if(nspecies==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"nspecies==0",_RUNTIME_ERROR_);}
     xvector<double> nspecies_xv(nspecies);
-    
+
     //L^p norms
     xvector<double> stoich_xv(nspecies);
     for(j=0;j<nspecies;j++){stoich_xv[stoich_xv.lrows+j]=vcomposition[j]/natoms;}
@@ -7304,7 +7304,7 @@ namespace aflowlib {
       if(LDEBUG){cerr << soliloquy << " nspecies_xv[\"stoich_norm_p_"+aurostd::utype2string(vp[i])+"\"]=" << nspecies_xv << endl;}
       vfeatures.push_back( std::pow(sum(nspecies_xv),(vp[i]==0?1.0:1.0/vp[i])) );
     }
-    
+
     //element-property-based
     //load up vxel
     int index=0,index_min=0,index_max=0;
@@ -7347,7 +7347,7 @@ namespace aflowlib {
         else{throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown numbers property: "+vproperties[i],_RUNTIME_ERROR_);}
       }
     }
-    
+
     //valence (un)occupation
     for(j=0;j<nspecies;j++){nspecies_xv[nspecies_xv.lrows+j]=vxel[j].getPropertyDouble("valence_std");}
     double denom=aurostd::scalar_product(stoich_xv,nspecies_xv); //same for all quantities
@@ -7359,7 +7359,7 @@ namespace aflowlib {
       for(j=0;j<nspecies;j++){nspecies_xv[nspecies_xv.lrows+j]=vval_total[i]-nspecies_xv[nspecies_xv.lrows+j];} //has occupied inside already
       vfeatures.push_back( aurostd::scalar_product(stoich_xv,nspecies_xv)/denom );  //unoccupied
     }
-    
+
     //ionic character
     //ionic formability
     bool formability_ionic=false;

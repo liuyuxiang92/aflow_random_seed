@@ -435,7 +435,7 @@ namespace aflowlib {
 #define HTRESOURCE_MODE_PHP_AUTHOR   4
 #define HTRESOURCE_MODE_PHP_THRUST   5
 #define HTRESOURCE_MODE_PHP_ALLOY    6
- 
+
 // ***************************************************************************
 // _OUTREACH CLASS
 class _outreach {

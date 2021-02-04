@@ -1928,7 +1928,7 @@ void GetCoordinations(const xstructure& xstr_in,deque<deque<uint> >& i_neighbors
 void GetCoordinations(const xstructure& xstr_in,deque<_atom>& atoms_cell,deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,deque<deque<uint> >& coordinations,double rmax,double rmin,double tol,bool prim,bool unique_only); //CO2020914
 
 void LightCopy(const xstructure&, xstructure&);  //ME20200220
-    
+
 // LATTICE/BASIS TRANSFORMATIONS
 xmatrix<double> GetBasisTransformation(const xmatrix<double>& lattice_original, const xmatrix<double>& lattice_new); //DX20201015
 vector<xvector<double> > GetBasisTransformationInternalTranslations(const xmatrix<double>& basis_transformation); //DX20201124
@@ -4261,7 +4261,7 @@ namespace SYM {
   bool CalculateInequivalentAtoms_20160801(ofstream &FileMESSAGE,xstructure &a,bool rely_on_basis,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,double _eps_,string format="txt"); // EQUIVALENT ATOMS _IATOMS_ //DX  
   bool CalculateInequivalentAtoms_20160101(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss); // EQUIVALENT ATOMS _IATOMS_ //DX
   //DX+CO END
-  
+
   void writePythonScript(ostream& oss); //DX20201228
 }
 string AgroupSymmetryToJson(vector<vector<_sym_op> >& group, char& mode); //DX20170803 - For Python wrapper
@@ -4743,10 +4743,10 @@ namespace xelement {
       string getType(const string& property) const; //CO20201111
       string getUnits(const string& property) const; //CO20201111
       void convertUnits(const string& property="ALL",const string& units_new="SI");  //CO20201111
-      
+
       // content                                             // content
       bool verbose;
-      
+
       // [AFLOW]START=DECLARATION
       uint Z;                                 // Z
       string symbol;                          // http://periodictable.com      //DU20190517   // DONE SC20190524
@@ -4859,7 +4859,7 @@ namespace xelement {
       // All data are f1 values for Cu-alpha (wavelength=1.5418A, E=8.0416keV].
 
       // [AFLOW]STOP=DECLARATION
-      
+
       //UNITS
       string units_Z;
       string units_symbol;

@@ -873,7 +873,7 @@ namespace anrl {
     vproto.push_back("A3BC_hP10_194_h_a_c;3;10;194;5;3;hP10;a,c/a,x3;-;Ba3N1Na1;Ba3N1Na1 (ICSD #67497)");
     vproto.push_back("AB3C4_hP16_194_c_ae_2f;3;16;194;5;5;hP16;a,c/a,z3,z4,z5;-/-/-;Al1N3V4/Al1C3Ta4/Al1C3Ta4;Al1N3V4 (ICSD #181351)/Al1C3Ta4 (ICSD #157843)/Al1C3Ta4 (ICSD #159456)"); //DX20210121 - added two metal-carbides
     vproto.push_back("AB2C_cF32_227_b_c_a;3;8;227;5;1;cF32;a;-;Cs1N2Nb1;Cs1N2Nb1 (ICSD #72546)");
-    
+
     // -------------------------------------------------------------------------
     // metal prototypes (from DX) //DX20201028
     // -------------------------------------------------------------------------
@@ -1034,7 +1034,7 @@ namespace anrl {
     vproto.push_back("AB4C_cF24_216_a_e_c;3;6;216;5;2;cF24;a,x3;-;In1Ni4Zr1;In1Ni4Zr1 (ICSD #59462)");
     vproto.push_back("A3B4C4_cI22_217_b_c_c;3;11;217;5;3;cI22;a,x2,x3;-;Ca3Ga4Ni4;Ca3Ga4Ni4 (ICSD #58899)");
     vproto.push_back("A3BC_cP15_221_ag_c_d;3;15;221;5;2;cP15;a,x4;-;Ga3Os1Tb1;Ga3Os1Tb1 (ICSD #412144)");
-    
+
     // -------------------------------------------------------------------------
     // metal-boride prototypes (from DX) //DX20210104
     // -------------------------------------------------------------------------
@@ -5726,7 +5726,7 @@ namespace anrl {
       if(anrl_label=="A3BC_cP15_221_ag_c_d"){
         vparameters.push_back("6.408,0.29015");  // 001, metallic ternary prototype (ICSD #412144)
       }
-      
+
       // -------------------------------------------------------------------------
       // metal-boride prototypes (from DX) //DX20210104
       // ---------------------------------------------------------------------------
@@ -6038,7 +6038,7 @@ namespace anrl {
       if(anrl_label=="A2B7C_cF40_225_c_bd_a"){
         vparameters.push_back("8.23");  // ternary metal-boride prototype (ICSD #260147)
       }
-      
+
       // -------------------------------------------------------------------------
       // metal-oxide prototypes (from DX) //DX20210106
       // ---------------------------------------------------------------------------

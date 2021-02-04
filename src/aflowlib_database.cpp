@@ -1411,10 +1411,10 @@ namespace aflowlib {
         str_formatted = str_formatted.substr(1, str_formatted.size() - 2);
         str_formatted = aurostd::StringSubst(str_formatted, "\"", "\\\"");
         str_formatted = "\"" + str_formatted + "\"";
-      // ME20201024 - Breaks arrays of strings. Need to find a way to account for quotes
-      // in strings for arrays of strings. This corner case has not occurred yet though.
-      //} else {
-      //  str_formatted = aurostd::StringSubst(str_formatted, "\"", "\\\"");
+        // ME20201024 - Breaks arrays of strings. Need to find a way to account for quotes
+        // in strings for arrays of strings. This corner case has not occurred yet though.
+        // else 
+        //  str_formatted = aurostd::StringSubst(str_formatted, "\"", "\\\"");
       }
       json << indent << tab << tab << tab << "\"min\": "
         << (db_stats.min[c].empty()?"null":str_formatted) << "," << std::endl;
@@ -1423,10 +1423,10 @@ namespace aflowlib {
         str_formatted = str_formatted.substr(1, str_formatted.size() - 2);
         str_formatted = aurostd::StringSubst(str_formatted, "\"", "\\\"");
         str_formatted = "\"" + str_formatted + "\"";
-      // ME20201024 - Breaks arrays of strings. Need to find a way to account for quotes
-      // in strings for arrays of strings. This corner case has not occurred yet though.
-      //} else {
-      //  str_formatted = aurostd::StringSubst(str_formatted, "\"", "\\\"");
+        // ME20201024 - Breaks arrays of strings. Need to find a way to account for quotes
+        // in strings for arrays of strings. This corner case has not occurred yet though.
+        // else 
+        //  str_formatted = aurostd::StringSubst(str_formatted, "\"", "\\\"");
       }
       json << indent << tab << tab << tab << "\"max\": "
         << (db_stats.max[c].empty()?"null":str_formatted) << "," << std::endl;
@@ -1446,10 +1446,10 @@ namespace aflowlib {
             str_formatted = str_formatted.substr(1, str_formatted.size() - 2);
             str_formatted = aurostd::StringSubst(str_formatted, "\"", "\\\"");
             str_formatted = "\"" + str_formatted + "\"";
-          // ME20201024 - Breaks arrays of strings. Need to find a way to account for quotes
-          // in strings for arrays of strings. This corner case has not occurred yet though.
-          //} else {
-          //  str_formatted = aurostd::StringSubst(str_formatted, "\"", "\\\"");
+            // ME20201024 - Breaks arrays of strings. Need to find a way to account for quotes
+            // in strings for arrays of strings. This corner case has not occurred yet though.
+            // else 
+            //  str_formatted = aurostd::StringSubst(str_formatted, "\"", "\\\"");
           }
           json << indent << tab << tab << tab << tab << str_formatted;
           if (s < nset - 1) json << ",";
