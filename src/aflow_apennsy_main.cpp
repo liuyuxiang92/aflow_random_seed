@@ -897,13 +897,13 @@ string APENNSY_Parameters::APENNSY_EnergyList(bool _verbose,_aflags &aflags) {
       oss << "\\author[1]{Ohad Levy} %LATEX %SNAPSHOT" << endl;
       oss << "\\author[2]{Gus L.W. Hart} %LATEX %SNAPSHOT" << endl;
       oss << "\\author[3,4]{Stefano Curtarolo} %LATEX %SNAPSHOT" << endl;
-      oss << "\\affil[1]{\\small \\it Department of Mechanical Engineering and Materials Science, Duke University, Durham, NC 27708, USA} %LATEX %SNAPSHOT" << endl;
-      oss << "\\affil[2]{\\small \\it Department of Physics and Astronomy, Brigham Young University, Provo UT 84602, USA} %LATEX %SNAPSHOT" << endl;
-      oss << "\\affil[3]{\\small \\it Materials Science, Electrical Engineering, Chemistry and Physics, Duke University, Durham, NC 27708, USA} %LATEX %SNAPSHOT" << endl;
-      oss << "\\affil[4]{\\small \\it email: stefano@duke.edu} %LATEX %SNAPSHOT" << endl;
+      oss << "\\affil[1]{\\small \\textit{Department of Mechanical Engineering and Materials Science, Duke University, Durham, NC 27708, USA}} %LATEX %SNAPSHOT" << endl;
+      oss << "\\affil[2]{\\small \\textit{Department of Physics and Astronomy, Brigham Young University, Provo UT 84602, USA}} %LATEX %SNAPSHOT" << endl;
+      oss << "\\affil[3]{\\small \\textit{Materials Science, Electrical Engineering, Chemistry and Physics, Duke University, Durham, NC 27708, USA}} %LATEX %SNAPSHOT" << endl;
+      oss << "\\affil[4]{\\small \\textit{email: stefano@duke.edu}} %LATEX %SNAPSHOT" << endl;
       oss << "\\maketitle %LATEX %SNAPSHOT" << endl;
       oss << "\\begin{abstract} %LATEX %SNAPSHOT" << endl;
-      oss << "The document includes thermodynamic information for 3d-4d-5d binary intermetallics from the {\\sf aflow.org} repository %LATEX %SNAPSHOT" << endl;
+      oss << "The document includes thermodynamic information for 3d-4d-5d binary intermetallics from the \textsf{aflow.org} repository %LATEX %SNAPSHOT" << endl;
       oss << "(data retrieved on " << TODAY << " and comprising " << calculations_total << " quantum mechanical entries). %LATEX %SNAPSHOT" << endl;
       oss << "The following binary intermetallics are included:";
       for(uint k=0;k<alloys.size();k++)
@@ -922,7 +922,7 @@ string APENNSY_Parameters::APENNSY_EnergyList(bool _verbose,_aflags &aflags) {
       //  oss << "\\pagestyle{plain} %LATEX %CITE" << endl;
       oss << "\\pagestyle{fancy} %LATEX %CITE" << endl;
       oss << "\\lhead{} \\chead{} \\rhead{} %LATEX %CITE" << endl;
-      oss << "\\lfoot{{\\tiny \\sf \\hyperref[referencetoc]{\\underline{Contents}}}} \\rfoot{{\\tiny \\sf \\href{http://www.aflow.org}{www.aflow.org}}} \\cfoot{\\thepage} %LATEX %CITE" << endl;
+      oss << "\\lfoot{{\\tiny \\textsf{\\hyperref[referencetoc]{\\underline{Contents}}}}} \\rfoot{{\\tiny \\textsf{\\href{http://www.aflow.org}{www.aflow.org}}}} \\cfoot{\\thepage} %LATEX %CITE" << endl;
       oss << "\\footskip 14pt %LATEX %CITE" << endl;
       oss << "\\label{referencetoc} %LATEX %CITE" << endl;
       oss << "\\renewcommand{\\baselinestretch}{0.50} %LATEX" << endl;
@@ -1289,13 +1289,13 @@ string APENNSY_Parameters::APENNSY_EnergyList(bool _verbose,_aflags &aflags) {
     // oss << "     \\textsc{Annotation:}\\ #2\\end{quotation}}  %LATEX" << endl;
     oss << "\\bibitem{curtarolo:art75} %LATEX" << endl;
     oss << " S. Curtarolo, W. Setyawan, S. Wang, J. Xue, K. Yang, R. H. Taylor, L. J. Nelson, G. L. W. Hart, S. Sanvito, M. Buongiorno Nardelli, N. Mingo, and O. Levy, % ART75 - aflow 30767 %LATEX" << endl;
-    oss << " {\\it AFLOW.ORG: a distributed materials properties repository from high-throughput {\\it ab initio} calculations}, % ART75 - aflow 30767 %LATEX" << endl;
-    oss << " Comp. Mat. Sci. {\\bf 58}, 227-235 (2012).  % ART75 - aflow 30767 %LATEX" << endl;
+    oss << " \\textit{AFLOW.ORG: a distributed materials properties repository from high-throughput \\textit{ab initio} calculations}, % ART75 - aflow 30767 %LATEX" << endl;
+    oss << " Comp. Mat. Sci. \\textbf{58}, 227-235 (2012).  % ART75 - aflow 30767 %LATEX" << endl;
     oss << " %LATEX" << endl;
     oss << "\\bibitem{curtarolo:art65} %LATEX" << endl;
     oss << " S. Curtarolo, W. Setyawan, G. L. W. Hart, M. Jahnatek, R. V. Chepulskii, R. H. Taylor, S. Wang, J. Xue, K. Yang, O. Levy, M. Mehl, H. T. Stokes, D. O. Demchenko, and D. Morgan, % ART65 - aflow 30767 %LATEX" << endl;
-    oss << " {\\it AFLOW: an automatic framework for high-throughput materials discovery},  % ART65 - aflow 30767 %LATEX" << endl;
-    oss << " Comp. Mat. Sci. {\\bf 58}, 218-226 (2012).  % ART65 - aflow 30767 %LATEX" << endl;
+    oss << " \\textit{AFLOW: an automatic framework for high-throughput materials discovery},  % ART65 - aflow 30767 %LATEX" << endl;
+    oss << " Comp. Mat. Sci. \\textbf{58}, 218-226 (2012).  % ART65 - aflow 30767 %LATEX" << endl;
     oss << " %LATEX" << endl;
     for(uint iart=0;iart<vwnumber_global.size();iart++) {
       oss << "\\bibitem{curtarolo:art" << vwnumber_global.at(iart) << "}" << endl;

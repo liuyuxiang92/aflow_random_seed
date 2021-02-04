@@ -511,8 +511,8 @@ class _XHOST {
 #define XHOST_AFLOW_PSEUDOPOTENTIALS_TXT               XHOST.vGlobal_string.at(87)
 #define XHOST_AFLOW_PSEUDOPOTENTIALS_LIST_TXT          XHOST.vGlobal_string.at(88)
 #define XHOST_f144468a7ccc2d3a72ba44000715efdb         XHOST.vGlobal_string.at(90)
-#define XHOST_d0f1b0e47f178ae627a388d3bf65d2d2         XHOST.vGlobal_string.at(91)
-#define XHOST_decf00ca3ad2fe494eea8e543e929068         XHOST.vGlobal_string.at(92)
+// [OBSOLETE] #define XHOST_d0f1b0e47f178ae627a388d3bf65d2d2         XHOST.vGlobal_string.at(91)
+// [OBSOLETE] #define XHOST_decf00ca3ad2fe494eea8e543e929068         XHOST.vGlobal_string.at(92)
 // [OBSOLETE] #define XHOST_AFLOW_BinaryRead           XHOST.vGlobal_string.at(93)
 // [OBSOLETE] #define XHOST_AFLOW_Binary_Angle_Read    XHOST.vGlobal_string.at(94)
 
