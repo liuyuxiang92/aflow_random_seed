@@ -3360,7 +3360,7 @@ namespace aurostd {
     // Procedure:
     // 1) T^2 = trasp(T)*T=trasp(R*U)*(R*U)=trasp(U)*trasp(R)*R*U=trasp(U)*U
     //    (since trasp(R)*R=I, i.e. orthogonal matrix)
-    // 2) U = sqrt(trap(U)*U), using diagonalization technique:
+    // 2) U = sqrt(trasp(U)*U), using diagonalization technique:
     //    http://en.wikipedia.org/wiki/Square_root_of_a_matrix#By_diagonalization
     // 3) R = T*inverse(U)
     // Following ref: http://www.continuummechanics.org/polardecomposition.html
@@ -3371,7 +3371,7 @@ namespace aurostd {
     stringstream message;
 
     // ---------------------------------------------------------------------------
-    // analysis is only works for a square matrix
+    // analysis only works for a square matrix
     if(!transformation_matrix.issquare){
       message << "The transformation matrix must be a square matrix.";
       throw xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_ERROR_);
@@ -3437,13 +3437,13 @@ namespace aurostd {
       xmatrix<utype> identity_matrix = rotation*trasp(rotation);
       if(LDEBUG){
         // R^T==R^-1
-        cerr << function_name << " transpose(R): " << aurostd::trasp(rotation) << endl;
-        cerr << function_name << " inverse(R): " << aurostd::inverse(rotation) << endl;
+        cerr << function_name << " transpose(R):" << endl << aurostd::trasp(rotation) << endl;
+        cerr << function_name << " inverse(R):" << endl << aurostd::inverse(rotation) << endl;
         // R*R^T=I
-        cerr << function_name << " identity? (R*R^T=I): " << identity_matrix << endl;
+        cerr << function_name << " identity? (R*R^T=I):" << endl << identity_matrix << endl;
       }
       if(!aurostd::isidentity(identity_matrix)){
-        message << "Extracted rotation should be an orthgonal matrix (R*R^T==I): " << identity_matrix << endl;
+        message << "Extracted rotation should be an orthogonal matrix (R*R^T==I):" << endl << identity_matrix;
         throw xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
       }
     }

@@ -211,7 +211,7 @@ namespace apl {
 
   void PhononCalculator::setHarmonicForceConstants(const ForceConstantCalculator& fc) {
     setHarmonicForceConstants(fc.getForceConstants(), fc.getBornEffectiveChargeTensor(),
-       fc.getDielectricTensor(), fc.isPolarMaterial());//AS20201208
+        fc.getDielectricTensor(), fc.isPolarMaterial());//AS20201208
   }
 
   // AS20201204 BEGIN
@@ -278,10 +278,10 @@ namespace apl {
       }
 
       if ((dielectricTensor.rows != 3) || (dielectricTensor.cols != 3)){
-            message = "The supplied dielectricTensor has the wrong size: ";
-            message += aurostd::utype2string(dielectricTensor.rows)+"x"+aurostd::utype2string(dielectricTensor.cols);
-            message += " instead of 3x3";
-            throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _INDEX_MISMATCH_);
+        message = "The supplied dielectricTensor has the wrong size: ";
+        message += aurostd::utype2string(dielectricTensor.rows)+"x"+aurostd::utype2string(dielectricTensor.cols);
+        message += " instead of 3x3";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _INDEX_MISMATCH_);
       }
 
       _bornEffectiveChargeTensor = bornEffectiveChargeTensor;
@@ -293,11 +293,11 @@ namespace apl {
 
   void PhononCalculator::setHarmonicForceConstants(const vector<vector<xmatrix<double> > > &IFC)
   {
-      vector<xmatrix<double> > bornEffectiveChargeTensor;//dummy object, material is not polar
-      xmatrix<double> dielectricTensor;//dummy object, material is not polar
+    vector<xmatrix<double> > bornEffectiveChargeTensor;//dummy object, material is not polar
+    xmatrix<double> dielectricTensor;//dummy object, material is not polar
 
-      // set only IFC, material is not polar
-      setHarmonicForceConstants(IFC, bornEffectiveChargeTensor, dielectricTensor, false);
+    // set only IFC, material is not polar
+    setHarmonicForceConstants(IFC, bornEffectiveChargeTensor, dielectricTensor, false);
   }
   // AS20201204 END
 

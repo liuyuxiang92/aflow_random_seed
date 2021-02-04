@@ -57,6 +57,7 @@ namespace aurostd {
         void reset(void);
         void clear(void);
         void null(void);  //CO20200731 - to create null vector
+        void resize(int=3,int nl=1); //CO20201111
       private:
         utype *corpus;
         // bool isfloat,iscomplex;
@@ -297,6 +298,8 @@ namespace aurostd {
 
   template<class utype> xvector<utype>
     vector2xvector(const vector<utype>&,int lrows=1) __xprototype; //CO20180409
+  template<class utype> xvector<utype>
+    vector2xvector(const vector<string>&,int lrows=1) __xprototype; //CO20180409
 
   xvector<double> xvectorint2double(const xvector<int>&); //CO20180515
   xvector<int> xvectordouble2int(const xvector<double>&,bool check_int=true); //CO20180515
@@ -599,7 +602,12 @@ namespace aurostd { //CO20190419
   template<class utype> utype mean(const xvector<utype>& a); //CO20190520
   template<class utype> utype meanWeighted(const xvector<utype>& a,const xvector<utype>& weights); //CO20190520
   template<class utype> utype meanWeighted(const xvector<utype>& a,const xvector<utype>& weights,utype& sum_weights); //CO20190520
-  template<class utype> utype stddev(const xvector<utype>& a); //CO20190520
+  template<class utype> utype var(const xvector<utype>& a,int ddof=1); //CO20190520
+  template<class utype> utype stddev(const xvector<utype>& a,int ddof=1); //CO20190520
+  template<class utype> utype mode(const xvector<utype>& a); //CO20190520
+  template<class utype> utype correlation_Pearson_fast(const xvector<utype>& a,const xvector<utype>& b,int ddof=1); //CO20190520
+  template<class utype> utype correlation_Pearson_fast(const xvector<utype>& a,utype mean_a,utype stddev_a, const xvector<utype>& b,utype mean_b,utype stddev_b,int ddof=1); //CO20190520
+  template<class utype> utype correlation_Pearson_slow(const xvector<utype>& a,const xvector<utype>& b); //CO20190520
   template<class utype> void getQuartiles(const xvector<utype>& _a,utype& q1,utype& q2,utype& q3);  //CO20171202
   template<class utype> utype getMAD(const xvector<utype>& _a,utype median=(utype)AUROSTD_NAN);   //CO20171202, absolute deviation around the median (MAD)
   template<class utype> xvector<utype> convolution(const xvector<utype>& signal_input,const xvector<utype>& response_input,int SHAPE=CONV_SHAPE_FULL); //CO20190419

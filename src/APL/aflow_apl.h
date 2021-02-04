@@ -528,7 +528,7 @@ namespace apl {
       void setHarmonicForceConstants(const ForceConstantCalculator&);
       void setHarmonicForceConstants(const vector<vector<xmatrix<double> > > &);//AS20201204
       void setHarmonicForceConstants(const vector<vector<xmatrix<double> > > &,
-            const vector<xmatrix<double> >&, const xmatrix<double> &, bool isPolar=true);//AS20201204
+          const vector<xmatrix<double> >&, const xmatrix<double> &, bool isPolar=true);//AS20201204
       void awake();
       void setAnharmonicForceConstants(const AnharmonicIFCs&);
       void readAnharmonicIFCs(string);

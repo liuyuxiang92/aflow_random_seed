@@ -48,8 +48,7 @@ namespace aflowlib {
       const _aflowlib_entry& operator=(const _aflowlib_entry &b); // copy
       // CONTROL
       string entry;vector<string> ventry;                       // ventry split by "|"
-      string auid;                                              // AFLOW UNIQUE IDENTIFIER
-      deque<string> vauid;                                      // AFLOW UNIQUE IDENTIFIER SPLIT
+      string auid;deque<string> vauid;                          // AFLOW UNIQUE IDENTIFIER // AFLOW UNIQUE IDENTIFIER SPLIT
       string aurl;deque<string> vaurl;                          // AFLOW RESEARCH LOCATOR and TOKENS
       string system_name;                                       //ME20190125 - system_name of the calculation
       string keywords;deque<string> vkeywords;                  // keywords inside
@@ -120,7 +119,7 @@ namespace aflowlib {
       double PV_cell,PV_atom;
       double scintillation_attenuation_length;
       string sg,sg2;vector<string> vsg,vsg2; //CO20180101
-      string spacegroup_orig,spacegroup_relax;
+      uint spacegroup_orig,spacegroup_relax;
       string species;vector<string> vspecies;
       string species_pp;vector<string> vspecies_pp;
       string species_pp_version;vector<string> vspecies_pp_version;
@@ -262,13 +261,13 @@ namespace aflowlib {
       vector<uint> vNsgroup;                            // vNsgroups
       vector<string> vsgroup;                           // vsgroups
       vector<xstructure> vstr;                          // vstructures
+      // functions
       bool FixDescription(void);                        // fix description names
       void GetSGROUP(string aflowlibentry);             // disassemble SG
-      // functions
       void clear();                                              // free space
       uint Load(const stringstream& stream,ostream& oss);        // load from stringstream it std is cout
       uint Load(const string& entry,ostream& oss);               // load from string it std is cout
-      uint file2aflowlib(const string& file,ostream& oss);       // load from file
+      uint file2aflowlib(const string& file,ostream& oss=std::cout);       // load from file
       uint url2aflowlib(const string& url,ostream& oss,bool=TRUE); // load from the web (VERBOSE)
       string aflowlib2string(string="out");                      //
       string aflowlib2file(string file,string="out");            //
@@ -282,6 +281,11 @@ namespace aflowlib {
       bool ignoreBadDatabase(string& reason) const;                                         //CO20171202 - apennsy fixes
       string getPathAURL(ostream& oss=cout, bool load_from_common=false);                   // converts entry.aurl to url/path (common)
       string getPathAURL(ofstream& FileMESSAGE, ostream& oss, bool load_from_common=false); // converts entry.aurl to url/path (common)
+      vector<string> getSpeciesAURL(ostream& oss);                                          //CO20210201 - extracts species from aurl
+      vector<string> getSpeciesAURL(ofstream& FileMESSAGE,ostream& oss);                    //CO20210201 - extracts species from aurl
+      //ML stoich features
+      void getStoichFeatures(vector<string>& vheaders,const string& e_props=_AFLOW_XELEMENT_PROPERTIES_ALL_);
+      void getStoichFeatures(vector<string>& vheaders,vector<double>& vfeatures,bool vheaders_only=false,const string& e_props=_AFLOW_XELEMENT_PROPERTIES_ALL_);
     private:                                                     //
       void free();                                               // free space
       void copy(const _aflowlib_entry& b);                       //
@@ -292,6 +296,7 @@ namespace aflowlib {
   string VASPdirectory2auid(const string& directory,const string& aurl);   //CO20200624 - moving from inside _aflowlib_entry
   uint auid2vauid(const string auid, deque<string>& vauid);                // splits the auid into vauid
   string auid2directory(const string auid);                                // gives AUID directory from existence of vauid
+  void insertStoichStats(const vector<string> vstats,const xvector<double>& nspecies_xv,const xvector<double>& stoich_xv,vector<double>& vfeatures);  //CO20201111
 }
 
 // ***************************************************************************
@@ -347,7 +352,7 @@ namespace aflowlib {
   string AFLUXCall(const vector<string>& matchbook); //DX20190206 - add AFLUX functionality //CO20200520
   string AFLUXCall(const string& summons); //DX20190206 - add AFLUX functionality   //CO20200520
   vector<vector<std::pair<string,string> > > getPropertiesFromAFLUXResponse(const string& response); //DX20190206 - get properties from AFLUX response  //CO20200520
-  string getSpaceGroupAFLUXSummons(vector<uint>& space_groups, uint relaxation_step); //DX20200929
+  string getSpaceGroupAFLUXSummons(const vector<uint>& space_groups, uint relaxation_step); //DX20200929
   string getSpaceGroupAFLUXSummons(uint space_group_number, uint relaxation_step, bool only_one_sg=true); //DX20200929
   // [OBSOLETE] uint WEB_Aflowlib_Entry_PHP(string options,ostream& oss); //SC20200327
   uint WEB_Aflowlib_Entry(string options,ostream& oss); 
@@ -454,7 +459,7 @@ namespace aflowlib {
 #define HTRESOURCE_MODE_PHP_AUTHOR   4
 #define HTRESOURCE_MODE_PHP_THRUST   5
 #define HTRESOURCE_MODE_PHP_ALLOY    6
- 
+
 // ***************************************************************************
 // _OUTREACH CLASS
 class _outreach {

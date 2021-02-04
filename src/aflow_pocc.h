@@ -303,6 +303,7 @@ namespace pocc {
       //NECESSARY PUBLIC CLASS METHODS - START
       //constructors - START
       POccCalculatorTemplate();
+      POccCalculatorTemplate(const POccCalculatorTemplate& b);
       //constructors - STOP
       ~POccCalculatorTemplate();
       //NECESSARY PUBLIC CLASS METHODS - END
@@ -657,6 +658,7 @@ namespace pocc {
       bool QMVASPsFound() const;
       void setDFTEnergies();
       void setEFA();
+      void calculateRELAXProperties(double temperature=300);
       void calculateSTATICProperties(double temperature=300);
       void setPOccStructureProbabilities(double temperature=300); //room temperature
       string getTemperatureString(double temperature) const;

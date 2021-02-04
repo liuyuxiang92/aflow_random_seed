@@ -368,10 +368,10 @@ namespace apennsy_std {
         lines[j++] << "Space Group    ";lines[j++] << "Pearson Symbol ";
         lines[j++] << "Lattice type   ";lines[j++] << "$(a,b,c)$ (\\AA)";lines[j++] << "$(\\alpha,\\beta,\\gamma)$ degrees";
         lines[j++] << "Superlattice   ";
-        lines[j++]<<"Primitive vectors";lines[j++]<<"{\\bf a$_1$}/a";lines[j++]<<"{\\bf a$_2$}/a";lines[j++]<<"{\\bf a$_3$}/a";lines[j++]<<"(cartesian)";
+        lines[j++]<<"Primitive vectors";lines[j++]<<"\\textbf{a$_1$}/a";lines[j++]<<"\\textbf{a$_2$}/a";lines[j++]<<"\\textbf{a$_3$}/a";lines[j++]<<"(cartesian)";
         lines[j++]<<"Atomic positions";
-        for(i=1;i<=APENNSY_AAmax;i++) lines[j++] <<"{\\bf A$"<<i<<"$}     ";
-        for(i=1;i<=APENNSY_BBmax;i++) lines[j++] <<"{\\bf B$"<<i<<"$}     ";
+        for(i=1;i<=APENNSY_AAmax;i++) lines[j++] <<"\\textbf{A$"<<i<<"$}     ";
+        for(i=1;i<=APENNSY_BBmax;i++) lines[j++] <<"\\textbf{B$"<<i<<"$}     ";
         lines[j++] << "(fractional)   ";
         read_VASPIN(lines,2,"1,2 ","A1"                 ,"FCC","                ","Cu      ",VERB);
         read_VASPIN(lines,3,"3   ","L1$_0$ "            ,"FCC","AB along [001]  ","AuCu    ",VERB);
@@ -401,10 +401,10 @@ namespace apennsy_std {
         lines[j++] << "Space Group    ";lines[j++] << "Pearson Symbol ";
         lines[j++] << "Lattice type   ";lines[j++] << "$(a,b,c)$ (\\AA)";lines[j++] << "$(\\alpha,\\beta,\\gamma)$ degrees";
         lines[j++] << "Superlattice   ";
-        lines[j++]<<"Primitive vectors";lines[j++]<<"{\\bf a$_1$}/a";lines[j++]<<"{\\bf a$_2$}/a";lines[j++]<<"{\\bf a$_3$}/a";lines[j++]<<"(cartesian)";
+        lines[j++]<<"Primitive vectors";lines[j++]<<"\\textbf{a$_1$}/a";lines[j++]<<"\\textbf{a$_2$}/a";lines[j++]<<"\\textbf{a$_3$}/a";lines[j++]<<"(cartesian)";
         lines[j++]<<"Atomic positions";
-        for(i=1;i<=APENNSY_AAmax;i++) lines[j++] <<"{\\bf A$"<<i<<"$}     ";
-        for(i=1;i<=APENNSY_BBmax;i++) lines[j++] <<"{\\bf B$"<<i<<"$}     ";
+        for(i=1;i<=APENNSY_AAmax;i++) lines[j++] <<"\\textbf{A$"<<i<<"$}     ";
+        for(i=1;i<=APENNSY_BBmax;i++) lines[j++] <<"\\textbf{B$"<<i<<"$}     ";
         lines[j++] << "(fractional)   ";
         read_VASPIN(lines,7,"7,8 "," - "                ,"FCC","AB2 along [011] ","MoPt$_2$",VERB);
         read_VASPIN(lines,9,"9,10","$\\alpha1/\\alpha2$-FCC$_{AB2}^{[111]}$","FCC","AB2 along [111] ","        ",VERB);
@@ -437,10 +437,10 @@ namespace apennsy_std {
         lines[j++] << "Space Group    ";lines[j++] << "Pearson Symbol ";
         lines[j++] << "Lattice type   ";lines[j++] << "$(a,b,c)$ (\\AA)";lines[j++] << "$(\\alpha,\\beta,\\gamma)$ degrees";
         lines[j++] << "Superlattice   ";
-        lines[j++]<<"Primitive vectors";lines[j++]<<"{\\bf a$_1$}/a";lines[j++]<<"{\\bf a$_2$}/a";lines[j++]<<"{\\bf a$_3$}/a";lines[j++]<<"(cartesian)";
+        lines[j++]<<"Primitive vectors";lines[j++]<<"\\textbf{a$_1$}/a";lines[j++]<<"\\textbf{a$_2$}/a";lines[j++]<<"\\textbf{a$_3$}/a";lines[j++]<<"(cartesian)";
         lines[j++]<<"Atomic positions";
-        for(i=1;i<=APENNSY_AAmax;i++) lines[j++] <<"{\\bf A$"<<i<<"$}     ";
-        for(i=1;i<=APENNSY_BBmax;i++) lines[j++] <<"{\\bf B$"<<i<<"$}     ";
+        for(i=1;i<=APENNSY_AAmax;i++) lines[j++] <<"\\textbf{A$"<<i<<"$}     ";
+        for(i=1;i<=APENNSY_BBmax;i++) lines[j++] <<"\\textbf{B$"<<i<<"$}     ";
         lines[j++] << "(fractional)   ";
         read_VASPIN(lines,14,"14"   ,"Z2-FCC$_{A2B2}^{[001]}$","FCC","A2B2 along [001]"," ",VERB);
         read_VASPIN(lines,16,"16,18","     ","FCC","        ","         ",VERB);
@@ -470,10 +470,10 @@ namespace apennsy_std {
         lines[j++] << "Space Group    ";lines[j++] << "Pearson Symbol ";
         lines[j++] << "Lattice type   ";lines[j++] << "$(a,b,c)$ (\\AA)";lines[j++] << "$(\\alpha,\\beta,\\gamma)$ degrees";
         lines[j++] << "Superlattice   ";
-        lines[j++]<<"Primitive vectors";lines[j++]<<"{\\bf a$_1$}/a";lines[j++]<<"{\\bf a$_2$}/a";lines[j++]<<"{\\bf a$_3$}/a";lines[j++]<<"(cartesian)";
+        lines[j++]<<"Primitive vectors";lines[j++]<<"\\textbf{a$_1$}/a";lines[j++]<<"\\textbf{a$_2$}/a";lines[j++]<<"\\textbf{a$_3$}/a";lines[j++]<<"(cartesian)";
         lines[j++]<<"Atomic positions";
-        for(i=1;i<=APENNSY_AAmax;i++) lines[j++] <<"{\\bf A$"<<i<<"$}     ";
-        for(i=1;i<=APENNSY_BBmax;i++) lines[j++] <<"{\\bf B$"<<i<<"$}     ";
+        for(i=1;i<=APENNSY_AAmax;i++) lines[j++] <<"\\textbf{A$"<<i<<"$}     ";
+        for(i=1;i<=APENNSY_BBmax;i++) lines[j++] <<"\\textbf{B$"<<i<<"$}     ";
         lines[j++] << "(fractional)   ";
         read_VASPIN(lines,20,"20   ","Y2-FCC$_{A2B2}^{[011]}$","FCC","A2B2 along [011]","        ",VERB);// 20    oP? Pmmm     Y2      A2B2   #47  A2B2 along [011]
         read_VASPIN(lines,22,"22,24","D0$_{22}$   ","FCC","AB4  along [201]","Al$_3$Ti",VERB);// 22,24 tI8 I4/mmm   D0_22   Al3Ti  #139 AB4  along [201]
@@ -506,10 +506,10 @@ namespace apennsy_std {
         lines[j++] << "Space Group    ";lines[j++] << "Pearson Symbol ";
         lines[j++] << "Lattice type   ";lines[j++] << "$(a,b,c)$ (\\AA)";lines[j++] << "$(\\alpha,\\beta,\\gamma)$ degrees";
         lines[j++] << "Superlattice   ";
-        lines[j++]<<"Primitive vectors";lines[j++]<<"{\\bf a$_1$}/a";lines[j++]<<"{\\bf a$_2$}/a";lines[j++]<<"{\\bf a$_3$}/a";lines[j++]<<"(cartesian)";
+        lines[j++]<<"Primitive vectors";lines[j++]<<"\\textbf{a$_1$}/a";lines[j++]<<"\\textbf{a$_2$}/a";lines[j++]<<"\\textbf{a$_3$}/a";lines[j++]<<"(cartesian)";
         lines[j++]<<"Atomic positions";
-        for(i=1;i<=APENNSY_AAmax;i++) lines[j++] <<"{\\bf A$"<<i<<"$}     ";
-        for(i=1;i<=APENNSY_BBmax;i++) lines[j++] <<"{\\bf B$"<<i<<"$}     ";
+        for(i=1;i<=APENNSY_AAmax;i++) lines[j++] <<"\\textbf{A$"<<i<<"$}     ";
+        for(i=1;i<=APENNSY_BBmax;i++) lines[j++] <<"\\textbf{B$"<<i<<"$}     ";
         lines[j++] << "(fractional)   ";
         read_VASPIN(lines,27,"27,29","V1/V3-FCC$_{AB3}^{[111]}$","FCC","AB3  along [111]"," ",VERB);// 27,29 hR? R-3m  V1/3 AB3    #166 AB3  along [111]
         read_VASPIN(lines,28,"28   ","V2-FCC$_{A2B2}^{[111]}$","FCC","A2B2 along [111]","  ",VERB);// 28  hR? R-3m    V2    A2B2   #166 A2B2 along [111]
@@ -549,10 +549,10 @@ namespace apennsy_std {
         lines[j++] << "Space Group    ";lines[j++] << "Pearson Symbol ";
         lines[j++] << "Lattice type   ";lines[j++] << "$(a,b,c)$ (\\AA)";lines[j++] << "$(\\alpha,\\beta,\\gamma)$ degrees";
         lines[j++] << "Superlattice   ";
-        lines[j++]<<"Primitive vectors";lines[j++]<<"{\\bf a$_1$}/a";lines[j++]<<"{\\bf a$_2$}/a";lines[j++]<<"{\\bf a$_3$}/a";lines[j++]<<"(cartesian)";
+        lines[j++]<<"Primitive vectors";lines[j++]<<"\\textbf{a$_1$}/a";lines[j++]<<"\\textbf{a$_2$}/a";lines[j++]<<"\\textbf{a$_3$}/a";lines[j++]<<"(cartesian)";
         lines[j++]<<"Atomic positions";
-        for(i=1;i<=APENNSY_AAmax;i++) lines[j++] <<"{\\bf A$"<<i<<"$}     ";
-        for(i=1;i<=APENNSY_BBmax;i++) lines[j++] <<"{\\bf B$"<<i<<"$}     ";
+        for(i=1;i<=APENNSY_AAmax;i++) lines[j++] <<"\\textbf{A$"<<i<<"$}     ";
+        for(i=1;i<=APENNSY_BBmax;i++) lines[j++] <<"\\textbf{B$"<<i<<"$}     ";
         lines[j++] << "(fractional)   ";
         read_VASPIN(lines,58,"58,59","A2       ","BCC","                ","W      ",VERB);   // 58,59  bcc/cI2 Im-3m  A2    W       #229  
         read_VASPIN(lines,60,"60","","BCC","AB along [101]","$\\gamma$-IrV",VERB);// 60   oC8   Cmmm   gamma-IrV #65 AB along [101]
@@ -582,10 +582,10 @@ namespace apennsy_std {
         lines[j++] << "Space Group    ";lines[j++] << "Pearson Symbol ";
         lines[j++] << "Lattice type   ";lines[j++] << "$(a,b,c)$ (\\AA)";lines[j++] << "$(\\alpha,\\beta,\\gamma)$ degrees";
         lines[j++] << "Superlattice   ";
-        lines[j++]<<"Primitive vectors";lines[j++]<<"{\\bf a$_1$}/a";lines[j++]<<"{\\bf a$_2$}/a";lines[j++]<<"{\\bf a$_3$}/a";lines[j++]<<"(cartesian)";
+        lines[j++]<<"Primitive vectors";lines[j++]<<"\\textbf{a$_1$}/a";lines[j++]<<"\\textbf{a$_2$}/a";lines[j++]<<"\\textbf{a$_3$}/a";lines[j++]<<"(cartesian)";
         lines[j++]<<"Atomic positions";
-        for(i=1;i<=APENNSY_AAmax;i++) lines[j++] <<"{\\bf A$"<<i<<"$}     ";
-        for(i=1;i<=APENNSY_BBmax;i++) lines[j++] <<"{\\bf B$"<<i<<"$}     ";
+        for(i=1;i<=APENNSY_AAmax;i++) lines[j++] <<"\\textbf{A$"<<i<<"$}     ";
+        for(i=1;i<=APENNSY_BBmax;i++) lines[j++] <<"\\textbf{B$"<<i<<"$}     ";
         lines[j++] << "(fractional)   ";
         read_VASPIN(lines,64,"64,65","   ","BCC"," AB2 along [011]","  ",VERB);              // 64,65  oF?   Fmmm     ?     AB2     #69   AB2 along [011]
         read_VASPIN(lines,66,"66,67","C11$_b$ ","BCC"," ","MoSi$_2$",VERB);// 66,67  tI6   I4/mmm   C11_b MoSi2   #139  
@@ -618,10 +618,10 @@ namespace apennsy_std {
         lines[j++] << "Space Group    ";lines[j++] << "Pearson Symbol ";
         lines[j++] << "Lattice type   ";lines[j++] << "$(a,b,c)$ (\\AA)";lines[j++] << "$(\\alpha,\\beta,\\gamma)$ degrees";
         lines[j++] << "Superlattice   ";
-        lines[j++]<<"Primitive vectors";lines[j++]<<"{\\bf a$_1$}/a";lines[j++]<<"{\\bf a$_2$}/a";lines[j++]<<"{\\bf a$_3$}/a";lines[j++]<<"(cartesian)";
+        lines[j++]<<"Primitive vectors";lines[j++]<<"\\textbf{a$_1$}/a";lines[j++]<<"\\textbf{a$_2$}/a";lines[j++]<<"\\textbf{a$_3$}/a";lines[j++]<<"(cartesian)";
         lines[j++]<<"Atomic positions";
-        for(i=1;i<=APENNSY_AAmax;i++) lines[j++] <<"{\\bf A$"<<i<<"$}     ";
-        for(i=1;i<=APENNSY_BBmax;i++) lines[j++] <<"{\\bf B$"<<i<<"$}     ";
+        for(i=1;i<=APENNSY_AAmax;i++) lines[j++] <<"\\textbf{A$"<<i<<"$}     ";
+        for(i=1;i<=APENNSY_BBmax;i++) lines[j++] <<"\\textbf{B$"<<i<<"$}     ";
         lines[j++] << "(fractional)   ";
         read_VASPIN(lines,71,"71   ","B2      ","BCC"," "," ",VERB);// 71      oC?       Cmma     ?   A2B2      #67    UNDEF          
         read_VASPIN(lines,73,"73,75","        ","BCC"," "," ",VERB);// 73,75   mP?       P2/m     ?   AB3       #10    UNDEF  
@@ -651,10 +651,10 @@ namespace apennsy_std {
         lines[j++] << "Space Group    ";lines[j++] << "Pearson Symbol ";
         lines[j++] << "Lattice type   ";lines[j++] << "$(a,b,c)$ (\\AA)";lines[j++] << "$(\\alpha,\\beta,\\gamma)$ degrees";
         lines[j++] << "Superlattice   ";
-        lines[j++]<<"Primitive vectors";lines[j++]<<"{\\bf a$_1$}/a";lines[j++]<<"{\\bf a$_2$}/a";lines[j++]<<"{\\bf a$_3$}/a";lines[j++]<<"(cartesian)";
+        lines[j++]<<"Primitive vectors";lines[j++]<<"\\textbf{a$_1$}/a";lines[j++]<<"\\textbf{a$_2$}/a";lines[j++]<<"\\textbf{a$_3$}/a";lines[j++]<<"(cartesian)";
         lines[j++]<<"Atomic positions";
-        for(i=1;i<=APENNSY_AAmax;i++) lines[j++] <<"{\\bf A$"<<i<<"$}     ";
-        for(i=1;i<=APENNSY_BBmax;i++) lines[j++] <<"{\\bf B$"<<i<<"$}     ";
+        for(i=1;i<=APENNSY_AAmax;i++) lines[j++] <<"\\textbf{A$"<<i<<"$}     ";
+        for(i=1;i<=APENNSY_BBmax;i++) lines[j++] <<"\\textbf{B$"<<i<<"$}     ";
         lines[j++] << "(fractional)   ";
         read_VASPIN(lines,77,"77   ","B11 ","BCC"," ","$\\gamma$-CuTi",VERB); // 77  tP4   P4/nmm  B11 gamma-CuTi #129   UNDEF  
         read_VASPIN(lines,79,"79,81","          ","BCC"," "," ",VERB);// 79,81   oI?       Immm    ?    AB3       #71    UNDEF
@@ -687,10 +687,10 @@ namespace apennsy_std {
         lines[j++] << "Space Group    ";lines[j++] << "Pearson Symbol ";
         lines[j++] << "Lattice type   ";lines[j++] << "$(a,b,c)$ (\\AA)";lines[j++] << "$(\\alpha,\\beta,\\gamma)$ degrees";
         lines[j++] << "Superlattice   ";
-        lines[j++]<<"Primitive vectors";lines[j++]<<"{\\bf a$_1$}/a";lines[j++]<<"{\\bf a$_2$}/a";lines[j++]<<"{\\bf a$_3$}/a";lines[j++]<<"(cartesian)";
+        lines[j++]<<"Primitive vectors";lines[j++]<<"\\textbf{a$_1$}/a";lines[j++]<<"\\textbf{a$_2$}/a";lines[j++]<<"\\textbf{a$_3$}/a";lines[j++]<<"(cartesian)";
         lines[j++]<<"Atomic positions";
-        for(i=1;i<=APENNSY_AAmax;i++) lines[j++] <<"{\\bf A$"<<i<<"$}     ";
-        for(i=1;i<=APENNSY_BBmax;i++) lines[j++] <<"{\\bf B$"<<i<<"$}     ";
+        for(i=1;i<=APENNSY_AAmax;i++) lines[j++] <<"\\textbf{A$"<<i<<"$}     ";
+        for(i=1;i<=APENNSY_BBmax;i++) lines[j++] <<"\\textbf{B$"<<i<<"$}     ";
         lines[j++] << "(fractional)   ";
         read_VASPIN(lines,84,"84,86","D0$_3$    ","BCC"," ","AlFe$_3$",VERB); // 84,86   cF16   Fm-3m      D0_3    AlFe3     #225
         read_VASPIN(lines,85,"85   ","B32       ","BCC"," ","NaTl    ",VERB); // 85      cF16   Fd-3m      B32     NaTl      #227  
@@ -730,10 +730,10 @@ namespace apennsy_std {
         lines[j++] << "Space Group    ";lines[j++] << "Pearson Symbol ";
         lines[j++] << "Lattice type   ";lines[j++] << "$(a,b,c)$ (\\AA)";lines[j++] << "$(\\alpha,\\beta,\\gamma)$ degrees";
         lines[j++] << "Superlattice   ";
-        lines[j++]<<"Primitive vectors";lines[j++]<<"{\\bf a$_1$}/a";lines[j++]<<"{\\bf a$_2$}/a";lines[j++]<<"{\\bf a$_3$}/a";lines[j++]<<"(cartesian)";
+        lines[j++]<<"Primitive vectors";lines[j++]<<"\\textbf{a$_1$}/a";lines[j++]<<"\\textbf{a$_2$}/a";lines[j++]<<"\\textbf{a$_3$}/a";lines[j++]<<"(cartesian)";
         lines[j++]<<"Atomic positions";
-        for(i=1;i<=APENNSY_AAmax;i++) lines[j++] <<"{\\bf A$"<<i<<"$}     ";
-        for(i=1;i<=APENNSY_BBmax;i++) lines[j++] <<"{\\bf B$"<<i<<"$}     ";
+        for(i=1;i<=APENNSY_AAmax;i++) lines[j++] <<"\\textbf{A$"<<i<<"$}     ";
+        for(i=1;i<=APENNSY_BBmax;i++) lines[j++] <<"\\textbf{B$"<<i<<"$}     ";
         lines[j++] << "(fractional)   ";
         read_VASPIN(lines,115,"115,117","A3        ","HCP"," ","Mg  ",VERB);// 115,117 hcp/hcp2  P6_3/mmc      A3      Mg        #194
         read_VASPIN(lines,116,"116    ","B$_h$     ","HCP"," ","WC  ",VERB);// 116     hP2       P_6m2         B_h     WC        #187          
@@ -763,10 +763,10 @@ namespace apennsy_std {
         lines[j++] << "Space Group    ";lines[j++] << "Pearson Symbol ";
         lines[j++] << "Lattice type   ";lines[j++] << "$(a,b,c)$ (\\AA)";lines[j++] << "$(\\alpha,\\beta,\\gamma)$ degrees";
         lines[j++] << "Superlattice   ";
-        lines[j++]<<"Primitive vectors";lines[j++]<<"{\\bf a$_1$}/a";lines[j++]<<"{\\bf a$_2$}/a";lines[j++]<<"{\\bf a$_3$}/a";lines[j++]<<"(cartesian)";
+        lines[j++]<<"Primitive vectors";lines[j++]<<"\\textbf{a$_1$}/a";lines[j++]<<"\\textbf{a$_2$}/a";lines[j++]<<"\\textbf{a$_3$}/a";lines[j++]<<"(cartesian)";
         lines[j++]<<"Atomic positions";
-        for(i=1;i<=APENNSY_AAmax;i++) lines[j++] <<"{\\bf A$"<<i<<"$}     ";
-        for(i=1;i<=APENNSY_BBmax;i++) lines[j++] <<"{\\bf B$"<<i<<"$}     ";
+        for(i=1;i<=APENNSY_AAmax;i++) lines[j++] <<"\\textbf{A$"<<i<<"$}     ";
+        for(i=1;i<=APENNSY_BBmax;i++) lines[j++] <<"\\textbf{B$"<<i<<"$}     ";
         lines[j++] << "(fractional)   ";
         read_VASPIN(lines,120,"120    ","B19  ","HCP"," ","AuCd",VERB);// 120     oP4       Pmma          B19     AuCd      #51
         read_VASPIN(lines,122,"122,124","     ","HCP"," ","    ",VERB);// 122,124 oI?       Imm2          ?       AB3       #44    UNDEF  
@@ -798,10 +798,10 @@ namespace apennsy_std {
         lines[j++] << "Space Group    ";lines[j++] << "Pearson Symbol ";
         lines[j++] << "Lattice type   ";lines[j++] << "$(a,b,c)$ (\\AA)";lines[j++] << "$(\\alpha,\\beta,\\gamma)$ degrees";
         lines[j++] << "Superlattice   ";
-        lines[j++]<<"Primitive vectors";lines[j++]<<"{\\bf a$_1$}/a";lines[j++]<<"{\\bf a$_2$}/a";lines[j++]<<"{\\bf a$_3$}/a";lines[j++]<<"(cartesian)";
+        lines[j++]<<"Primitive vectors";lines[j++]<<"\\textbf{a$_1$}/a";lines[j++]<<"\\textbf{a$_2$}/a";lines[j++]<<"\\textbf{a$_3$}/a";lines[j++]<<"(cartesian)";
         lines[j++]<<"Atomic positions";
-        for(i=1;i<=APENNSY_AAmax;i++) lines[j++] <<"{\\bf A$"<<i<<"$}     ";
-        for(i=1;i<=APENNSY_BBmax;i++) lines[j++] <<"{\\bf B$"<<i<<"$}     ";
+        for(i=1;i<=APENNSY_AAmax;i++) lines[j++] <<"\\textbf{A$"<<i<<"$}     ";
+        for(i=1;i<=APENNSY_BBmax;i++) lines[j++] <<"\\textbf{B$"<<i<<"$}     ";
         lines[j++] << "(fractional)   ";
         read_VASPIN(lines,126,"126    "," ","HCP"," "," ",VERB); // 126     hP?       P-3m1         ?       A2B2      #164   UNDEF
         read_VASPIN(lines,128,"128,132"," ","HCP"," "," ",VERB); // 128,132 mC?       Cm            ?       AB5       #8     UNDEF  
@@ -831,10 +831,10 @@ namespace apennsy_std {
         lines[j++] << "Space Group    ";lines[j++] << "Pearson Symbol ";
         lines[j++] << "Lattice type   ";lines[j++] << "$(a,b,c)$ (\\AA)";lines[j++] << "$(\\alpha,\\beta,\\gamma)$ degrees";
         lines[j++] << "Superlattice   ";
-        lines[j++]<<"Primitive vectors";lines[j++]<<"{\\bf a$_1$}/a";lines[j++]<<"{\\bf a$_2$}/a";lines[j++]<<"{\\bf a$_3$}/a";lines[j++]<<"(cartesian)";
+        lines[j++]<<"Primitive vectors";lines[j++]<<"\\textbf{a$_1$}/a";lines[j++]<<"\\textbf{a$_2$}/a";lines[j++]<<"\\textbf{a$_3$}/a";lines[j++]<<"(cartesian)";
         lines[j++]<<"Atomic positions";
-        for(i=1;i<=APENNSY_AAmax;i++) lines[j++] <<"{\\bf A$"<<i<<"$}     ";
-        for(i=1;i<=APENNSY_BBmax;i++) lines[j++] <<"{\\bf B$"<<i<<"$}     ";
+        for(i=1;i<=APENNSY_AAmax;i++) lines[j++] <<"\\textbf{A$"<<i<<"$}     ";
+        for(i=1;i<=APENNSY_BBmax;i++) lines[j++] <<"\\textbf{B$"<<i<<"$}     ";
         lines[j++] << "(fractional)   ";
         read_VASPIN(lines,135,"131,135"," ","HCP"," "," ",VERB); // 131,135 mC?       C2/m          ?       A4B2      #12
         read_VASPIN(lines,133,"133,140"," ","HCP"," "," ",VERB); // 133,140 mC?       Cm            ?       A2B4      #8     UNDEF  
@@ -866,10 +866,10 @@ namespace apennsy_std {
         lines[j++] << "Space Group    ";lines[j++] << "Pearson Symbol ";
         lines[j++] << "Lattice type   ";lines[j++] << "$(a,b,c)$ (\\AA)";lines[j++] << "$(\\alpha,\\beta,\\gamma)$ degrees";
         lines[j++] << "Superlattice   ";
-        lines[j++]<<"Primitive vectors";lines[j++]<<"{\\bf a$_1$}/a";lines[j++]<<"{\\bf a$_2$}/a";lines[j++]<<"{\\bf a$_3$}/a";lines[j++]<<"(cartesian)";
+        lines[j++]<<"Primitive vectors";lines[j++]<<"\\textbf{a$_1$}/a";lines[j++]<<"\\textbf{a$_2$}/a";lines[j++]<<"\\textbf{a$_3$}/a";lines[j++]<<"(cartesian)";
         lines[j++]<<"Atomic positions";
-        for(i=1;i<=APENNSY_AAmax;i++) lines[j++] <<"{\\bf A$"<<i<<"$}     ";
-        for(i=1;i<=APENNSY_BBmax;i++) lines[j++] <<"{\\bf B$"<<i<<"$}     ";
+        for(i=1;i<=APENNSY_AAmax;i++) lines[j++] <<"\\textbf{A$"<<i<<"$}     ";
+        for(i=1;i<=APENNSY_BBmax;i++) lines[j++] <<"\\textbf{B$"<<i<<"$}     ";
         lines[j++] << "(fractional)   ";
         read_VASPIN(lines,141,"141,145"," ","HCP"," "," ",VERB); // 141,145 oA?  Amm2  ?   AB5       #38
         read_VASPIN(lines,147,"142,147"," ","HCP"," "," ",VERB); // 142,147 oC?  Cmcm  ?   A4B2      #63
@@ -909,10 +909,10 @@ namespace apennsy_std {
         lines[j++] << "Space Group    ";lines[j++] << "Pearson Symbol ";
         lines[j++] << "Lattice type   ";lines[j++] << "$(a,b,c)$ (\\AA)";lines[j++] << "$(\\alpha,\\beta,\\gamma)$ degrees";
         lines[j++] << "Superlattice   ";
-        lines[j++]<<"Primitive vectors";lines[j++]<<"{\\bf a$_1$}/a";lines[j++]<<"{\\bf a$_2$}/a";lines[j++]<<"{\\bf a$_3$}/a";lines[j++]<<"(cartesian)";
+        lines[j++]<<"Primitive vectors";lines[j++]<<"\\textbf{a$_1$}/a";lines[j++]<<"\\textbf{a$_2$}/a";lines[j++]<<"\\textbf{a$_3$}/a";lines[j++]<<"(cartesian)";
         lines[j++]<<"Atomic positions";
-        for(i=1;i<=APENNSY_AAmax;i++) lines[j++] <<"{\\bf A$"<<i<<"$}     ";
-        for(i=1;i<=APENNSY_BBmax;i++) lines[j++] <<"{\\bf B$"<<i<<"$}     ";
+        for(i=1;i<=APENNSY_AAmax;i++) lines[j++] <<"\\textbf{A$"<<i<<"$}     ";
+        for(i=1;i<=APENNSY_BBmax;i++) lines[j++] <<"\\textbf{B$"<<i<<"$}     ";
         lines[j++] << "(fractional)   ";
         read_VASPIN(lines,178,"178,179","C14       "," "," ","MgZn$_2$   ",VERB);// 178,179  hP12   P6_3/mm   C14    MgZn2 #194 A4B8Hex Laves
         read_VASPIN(lines,180,"180,181","D0$_{11}$ "," "," ","Fe$_3$C    ",VERB);// 180,181  oP16   Pnma      D0_11  Fe3C
@@ -943,10 +943,10 @@ namespace apennsy_std {
         lines[j++] << "Space Group    ";lines[j++] << "Pearson Symbol ";
         lines[j++] << "Lattice type   ";lines[j++] << "$(a,b,c)$ (\\AA)";lines[j++] << "$(\\alpha,\\beta,\\gamma)$ degrees";
         lines[j++] << "Superlattice   ";
-        lines[j++]<<"Primitive vectors";lines[j++]<<"{\\bf a$_1$}/a";lines[j++]<<"{\\bf a$_2$}/a";lines[j++]<<"{\\bf a$_3$}/a";lines[j++]<<"(cartesian)";
+        lines[j++]<<"Primitive vectors";lines[j++]<<"\\textbf{a$_1$}/a";lines[j++]<<"\\textbf{a$_2$}/a";lines[j++]<<"\\textbf{a$_3$}/a";lines[j++]<<"(cartesian)";
         lines[j++]<<"Atomic positions";
-        for(i=1;i<=APENNSY_AAmax;i++) lines[j++] <<"{\\bf A$"<<i<<"$}     ";
-        for(i=1;i<=APENNSY_BBmax;i++) lines[j++] <<"{\\bf B$"<<i<<"$}     ";
+        for(i=1;i<=APENNSY_AAmax;i++) lines[j++] <<"\\textbf{A$"<<i<<"$}     ";
+        for(i=1;i<=APENNSY_BBmax;i++) lines[j++] <<"\\textbf{B$"<<i<<"$}     ";
         lines[j++] << "(fractional)   ";
         read_VASPIN(lines,186,"186,187","D0$_{19}$ "," "," ","Ni$_3$Sn        ",VERB);// 186,187  hP8    P6_3/mmc  D0_19  Ni3Sn #194
         read_VASPIN(lines,188,"188,189","C49       "," "," ","ZrSi$_2$        ",VERB);// 188,189  hP6    Cmcm      C49    ZrSi2
@@ -980,10 +980,10 @@ namespace apennsy_std {
         lines[j++] << "Space Group    ";lines[j++] << "Pearson Symbol ";
         lines[j++] << "Lattice type   ";lines[j++] << "$(a,b,c)$ (\\AA)";lines[j++] << "$(\\alpha,\\beta,\\gamma)$ degrees";
         lines[j++] << "Superlattice   ";
-        lines[j++]<<"Primitive vectors";lines[j++]<<"{\\bf a$_1$}/a";lines[j++]<<"{\\bf a$_2$}/a";lines[j++]<<"{\\bf a$_3$}/a";lines[j++]<<"(cartesian)";
+        lines[j++]<<"Primitive vectors";lines[j++]<<"\\textbf{a$_1$}/a";lines[j++]<<"\\textbf{a$_2$}/a";lines[j++]<<"\\textbf{a$_3$}/a";lines[j++]<<"(cartesian)";
         lines[j++]<<"Atomic positions";
-        for(i=1;i<=APENNSY_AAmax;i++) lines[j++] <<"{\\bf A$"<<i<<"$}     ";
-        for(i=1;i<=APENNSY_BBmax;i++) lines[j++] <<"{\\bf B$"<<i<<"$}     ";
+        for(i=1;i<=APENNSY_AAmax;i++) lines[j++] <<"\\textbf{A$"<<i<<"$}     ";
+        for(i=1;i<=APENNSY_BBmax;i++) lines[j++] <<"\\textbf{B$"<<i<<"$}     ";
         lines[j++] << "(fractional)   ";
         read_VASPIN(lines,201,"201    ","B1     "," "," ","NaCl         ",VERB);// 201      cF8    Fm-3m     B1     NaCl    #225
         read_VASPIN(lines,202,"202,203","D1$_3$ "," "," ","BaAl$_4$     ",VERB);// 202,203  tI10   I4/mmm    D1_3   BaAl4   #139  NEW
@@ -1015,10 +1015,10 @@ namespace apennsy_std {
         lines[j++] << "Space Group    ";lines[j++] << "Pearson Symbol ";
         lines[j++] << "Lattice type   ";lines[j++] << "$(a,b,c)$ (\\AA)";lines[j++] << "$(\\alpha,\\beta,\\gamma)$ degrees";
         lines[j++] << "Superlattice   ";
-        lines[j++]<<"Primitive vectors";lines[j++]<<"{\\bf a$_1$}/a";lines[j++]<<"{\\bf a$_2$}/a";lines[j++]<<"{\\bf a$_3$}/a";lines[j++]<<"(cartesian)";
+        lines[j++]<<"Primitive vectors";lines[j++]<<"\\textbf{a$_1$}/a";lines[j++]<<"\\textbf{a$_2$}/a";lines[j++]<<"\\textbf{a$_3$}/a";lines[j++]<<"(cartesian)";
         lines[j++]<<"Atomic positions";
-        for(i=1;i<=APENNSY_AAmax;i++) lines[j++] <<"{\\bf A$"<<i<<"$}     ";
-        for(i=1;i<=APENNSY_BBmax;i++) lines[j++] <<"{\\bf B$"<<i<<"$}     ";
+        for(i=1;i<=APENNSY_AAmax;i++) lines[j++] <<"\\textbf{A$"<<i<<"$}     ";
+        for(i=1;i<=APENNSY_BBmax;i++) lines[j++] <<"\\textbf{B$"<<i<<"$}     ";
         lines[j++] << "(fractional)   ";
         //  read_VASPIN(lines,208,"208,209","C22      "," "," ","Fe$_2$P       ",VERB);// 208,209  hP9    P-62m     C22    Fe2P    #189      
         read_VASPIN(lines,211,"210,211","C37      "," "," ","Co$_2$Si      ",VERB);// 210,211  oP12   Pnma      C37    Co2Si   #62  AL1851.cif    
@@ -1054,10 +1054,10 @@ namespace apennsy_std {
         lines[j++] << "Space Group    ";lines[j++] << "Pearson Symbol ";
         lines[j++] << "Lattice type   ";lines[j++] << "$(a,b,c)$ (\\AA)";lines[j++] << "$(\\alpha,\\beta,\\gamma)$ degrees";
         lines[j++] << "Superlattice   ";
-        lines[j++]<<"Primitive vectors";lines[j++]<<"{\\bf a$_1$}/a";lines[j++]<<"{\\bf a$_2$}/a";lines[j++]<<"{\\bf a$_3$}/a";lines[j++]<<"(cartesian)";
+        lines[j++]<<"Primitive vectors";lines[j++]<<"\\textbf{a$_1$}/a";lines[j++]<<"\\textbf{a$_2$}/a";lines[j++]<<"\\textbf{a$_3$}/a";lines[j++]<<"(cartesian)";
         lines[j++]<<"Atomic positions";
-        for(i=1;i<=APENNSY_AAmax;i++) lines[j++] <<"{\\bf A$"<<i<<"$}     ";
-        for(i=1;i<=APENNSY_BBmax;i++) lines[j++] <<"{\\bf B$"<<i<<"$}     ";
+        for(i=1;i<=APENNSY_AAmax;i++) lines[j++] <<"\\textbf{A$"<<i<<"$}     ";
+        for(i=1;i<=APENNSY_BBmax;i++) lines[j++] <<"\\textbf{B$"<<i<<"$}     ";
         lines[j++] << "(fractional)   ";
         read_VASPIN(lines,220,"220,221","B8$_1$   "," "," ","NiAs             ",VERB);// 220,221  hP4    P63/mmc   B8_1   NiAs    #194
         read_VASPIN(lines,223,"222,223","D8$_8$   "," "," ","Mn$_5$Si$_3$     ",VERB);// 222,223  hP16   P63/mcm   D8_8   Mn5Si3  #193      
@@ -1089,10 +1089,10 @@ namespace apennsy_std {
         lines[j++] << "Space Group    ";lines[j++] << "Pearson Symbol ";
         lines[j++] << "Lattice type   ";lines[j++] << "$(a,b,c)$ (\\AA)";lines[j++] << "$(\\alpha,\\beta,\\gamma)$ degrees";
         lines[j++] << "Superlattice   ";
-        lines[j++]<<"Primitive vectors";lines[j++]<<"{\\bf a$_1$}/a";lines[j++]<<"{\\bf a$_2$}/a";lines[j++]<<"{\\bf a$_3$}/a";lines[j++]<<"(cartesian)";
+        lines[j++]<<"Primitive vectors";lines[j++]<<"\\textbf{a$_1$}/a";lines[j++]<<"\\textbf{a$_2$}/a";lines[j++]<<"\\textbf{a$_3$}/a";lines[j++]<<"(cartesian)";
         lines[j++]<<"Atomic positions";
-        for(i=1;i<=APENNSY_AAmax;i++) lines[j++] <<"{\\bf A$"<<i<<"$}     ";
-        for(i=1;i<=APENNSY_BBmax;i++) lines[j++] <<"{\\bf B$"<<i<<"$}     ";
+        for(i=1;i<=APENNSY_AAmax;i++) lines[j++] <<"\\textbf{A$"<<i<<"$}     ";
+        for(i=1;i<=APENNSY_BBmax;i++) lines[j++] <<"\\textbf{B$"<<i<<"$}     ";
         lines[j++] << "(fractional)   ";
         read_VASPIN(lines,231,"230,231","        "," "," ","CuAl$_2$ ",VERB);// 230,231  tI12                  CuAl2   #140      
         read_VASPIN(lines,232,"232,233","C11$_b$ "," "," ","MoSi$_2$ ",VERB);// 232,233  tI6    I4/mmm  C11_b  MoSi2   #139  
@@ -1126,10 +1126,10 @@ namespace apennsy_std {
         lines[j++] << "Space Group    ";lines[j++] << "Pearson Symbol ";
         lines[j++] << "Lattice type   ";lines[j++] << "$(a,b,c)$ (\\AA)";lines[j++] << "$(\\alpha,\\beta,\\gamma)$ degrees";
         lines[j++] << "Superlattice   ";
-        lines[j++]<<"Primitive vectors";lines[j++]<<"{\\bf a$_1$}/a";lines[j++]<<"{\\bf a$_2$}/a";lines[j++]<<"{\\bf a$_3$}/a";lines[j++]<<"(cartesian)";
+        lines[j++]<<"Primitive vectors";lines[j++]<<"\\textbf{a$_1$}/a";lines[j++]<<"\\textbf{a$_2$}/a";lines[j++]<<"\\textbf{a$_3$}/a";lines[j++]<<"(cartesian)";
         lines[j++]<<"Atomic positions";
-        for(i=1;i<=APENNSY_AAmax;i++) lines[j++] <<"{\\bf A$"<<i<<"$}     ";
-        for(i=1;i<=APENNSY_BBmax;i++) lines[j++] <<"{\\bf B$"<<i<<"$}     ";
+        for(i=1;i<=APENNSY_AAmax;i++) lines[j++] <<"\\textbf{A$"<<i<<"$}     ";
+        for(i=1;i<=APENNSY_BBmax;i++) lines[j++] <<"\\textbf{B$"<<i<<"$}     ";
         lines[j++] << "(fractional)   ";
         read_VASPIN(lines,238,"238,239","        "," "," ","Co$_3$V  ",VERB);// 238,239  hp24   P-6m2          Co3V    #187 130340.cif
         read_VASPIN(lines,242,"242,243","            "," "," ","NbPd$_3$         ",VERB);// 242,243  oP24   PmnmO2           NbPd3   #59  130379.cif
@@ -1161,10 +1161,10 @@ namespace apennsy_std {
         lines[j++] << "Space Group    ";lines[j++] << "Pearson Symbol ";
         lines[j++] << "Lattice type   ";lines[j++] << "$(a,b,c)$ (\\AA)";lines[j++] << "$(\\alpha,\\beta,\\gamma)$ degrees";
         lines[j++] << "Superlattice   ";
-        lines[j++]<<"Primitive vectors";lines[j++]<<"{\\bf a$_1$}/a";lines[j++]<<"{\\bf a$_2$}/a";lines[j++]<<"{\\bf a$_3$}/a";lines[j++]<<"(cartesian)";
+        lines[j++]<<"Primitive vectors";lines[j++]<<"\\textbf{a$_1$}/a";lines[j++]<<"\\textbf{a$_2$}/a";lines[j++]<<"\\textbf{a$_3$}/a";lines[j++]<<"(cartesian)";
         lines[j++]<<"Atomic positions";
-        for(i=1;i<=APENNSY_AAmax;i++) lines[j++] <<"{\\bf A$"<<i<<"$}     ";
-        for(i=1;i<=APENNSY_BBmax;i++) lines[j++] <<"{\\bf B$"<<i<<"$}     ";
+        for(i=1;i<=APENNSY_AAmax;i++) lines[j++] <<"\\textbf{A$"<<i<<"$}     ";
+        for(i=1;i<=APENNSY_BBmax;i++) lines[j++] <<"\\textbf{B$"<<i<<"$}     ";
         lines[j++] << "(fractional)   ";
         read_VASPIN(lines,249,"248,249","C$_c$       "," "," ","ThSi$_2$         ",VERB);// 248,249  tI12   I41/amd   C_c    ThSi2   #141 AL2272.cif
         read_VASPIN(lines,260,"259,260","C33         "," "," ","Bi$_2$Te$_3$     ",VERB);// 259,260  hR5    R-3m      C33    Bi2Te3  #166 120146.cif  
@@ -1198,10 +1198,10 @@ namespace apennsy_std {
         lines[j++] << "Space Group    ";lines[j++] << "Pearson Symbol ";
         lines[j++] << "Lattice type   ";lines[j++] << "$(a,b,c)$ (\\AA)";lines[j++] << "$(\\alpha,\\beta,\\gamma)$ degrees";
         lines[j++] << "Superlattice   ";
-        lines[j++]<<"Primitive vectors";lines[j++]<<"{\\bf a$_1$}/a";lines[j++]<<"{\\bf a$_2$}/a";lines[j++]<<"{\\bf a$_3$}/a";lines[j++]<<"(cartesian)";
+        lines[j++]<<"Primitive vectors";lines[j++]<<"\\textbf{a$_1$}/a";lines[j++]<<"\\textbf{a$_2$}/a";lines[j++]<<"\\textbf{a$_3$}/a";lines[j++]<<"(cartesian)";
         lines[j++]<<"Atomic positions";
-        for(i=1;i<=APENNSY_AAmax;i++) lines[j++] <<"{\\bf A$"<<i<<"$}     ";
-        for(i=1;i<=APENNSY_BBmax;i++) lines[j++] <<"{\\bf B$"<<i<<"$}     ";
+        for(i=1;i<=APENNSY_AAmax;i++) lines[j++] <<"\\textbf{A$"<<i<<"$}     ";
+        for(i=1;i<=APENNSY_BBmax;i++) lines[j++] <<"\\textbf{B$"<<i<<"$}     ";
         lines[j++] << "(fractional)   ";
         read_VASPIN(lines,252,"252,253","C15$_b$     "," "," ","AuBe$_5$         ",VERB);// 252,253  cF24   F-43m     C15_b  AuBe5   #216 AL3669.cif  
         // read_VASPIN(lines,261,"261,262","            "," "," ","Ti$_2$Ni         ",VERB);// 261,262  cF96   Fd-3m            Ti2Ni   #227 IMPOSSIBLE
@@ -1234,10 +1234,10 @@ namespace apennsy_std {
         lines[j++] << "Space Group    ";lines[j++] << "Pearson Symbol ";
         lines[j++] << "Lattice type   ";lines[j++] << "$(a,b,c)$ (\\AA)";lines[j++] << "$(\\alpha,\\beta,\\gamma)$ degrees";
         lines[j++] << "Superlattice   ";
-        lines[j++]<<"Primitive vectors";lines[j++]<<"{\\bf a$_1$}/a";lines[j++]<<"{\\bf a$_2$}/a";lines[j++]<<"{\\bf a$_3$}/a";lines[j++]<<"(cartesian)";
+        lines[j++]<<"Primitive vectors";lines[j++]<<"\\textbf{a$_1$}/a";lines[j++]<<"\\textbf{a$_2$}/a";lines[j++]<<"\\textbf{a$_3$}/a";lines[j++]<<"(cartesian)";
         lines[j++]<<"Atomic positions";
-        for(i=1;i<=APENNSY_AAmax;i++) lines[j++] <<"{\\bf A$"<<i<<"$}     ";
-        for(i=1;i<=APENNSY_BBmax;i++) lines[j++] <<"{\\bf B$"<<i<<"$}     ";
+        for(i=1;i<=APENNSY_AAmax;i++) lines[j++] <<"\\textbf{A$"<<i<<"$}     ";
+        for(i=1;i<=APENNSY_BBmax;i++) lines[j++] <<"\\textbf{B$"<<i<<"$}     ";
         lines[j++] << "(fractional)   ";
         read_VASPIN(lines,271,"271,272","            "," "," ","YCd$_3$          ",VERB);// 271,272  oC16   Cmcm             YCd3    #63  18260.cif
         read_VASPIN(lines,274,"273,274","B8$_2$      "," "," ","Ni$_2$In         ",VERB);// 273,274  hP6    P63/mmc   B8_2   Ni2In   #194 28249.cif
@@ -1271,10 +1271,10 @@ namespace apennsy_std {
         lines[j++] << "Space Group    ";lines[j++] << "Pearson Symbol ";
         lines[j++] << "Lattice type   ";lines[j++] << "$(a,b,c)$ (\\AA)";lines[j++] << "$(\\alpha,\\beta,\\gamma)$ degrees";
         lines[j++] << "Superlattice   ";
-        lines[j++]<<"Primitive vectors";lines[j++]<<"{\\bf a$_1$}/a";lines[j++]<<"{\\bf a$_2$}/a";lines[j++]<<"{\\bf a$_3$}/a";lines[j++]<<"(cartesian)";
+        lines[j++]<<"Primitive vectors";lines[j++]<<"\\textbf{a$_1$}/a";lines[j++]<<"\\textbf{a$_2$}/a";lines[j++]<<"\\textbf{a$_3$}/a";lines[j++]<<"(cartesian)";
         lines[j++]<<"Atomic positions";
-        for(i=1;i<=APENNSY_AAmax;i++) lines[j++] <<"{\\bf A$"<<i<<"$}     ";
-        for(i=1;i<=APENNSY_BBmax;i++) lines[j++] <<"{\\bf B$"<<i<<"$}     ";
+        for(i=1;i<=APENNSY_AAmax;i++) lines[j++] <<"\\textbf{A$"<<i<<"$}     ";
+        for(i=1;i<=APENNSY_BBmax;i++) lines[j++] <<"\\textbf{B$"<<i<<"$}     ";
         lines[j++] << "(fractional)   ";
         read_VASPIN(lines,280,"279,280","D0$_{23}$"," "," ","AL$_3$Zr",VERB);// 279,280 tI16  I4/mmm	D0_23	Al3Zr	  #139	NAVY DATABASE
         for(i=1;i<j;i++) lines[i] << "\t \\\\ ";
@@ -1301,10 +1301,10 @@ namespace apennsy_std {
         //   lines[j++] << "Space Group    ";lines[j++] << "Pearson Symbol ";
         //   lines[j++] << "Lattice type   ";lines[j++] << "$(a,b,c)$ (\\AA)";lines[j++] << "$(\\alpha,\\beta,\\gamma)$ degrees";
         //   lines[j++] << "Superlattice   ";
-        //   lines[j++]<<"Primitive vectors";lines[j++]<<"{\\bf a$_1$}/a";lines[j++]<<"{\\bf a$_2$}/a";lines[j++]<<"{\\bf a$_3$}/a";lines[j++]<<"(cartesian)";
+        //   lines[j++]<<"Primitive vectors";lines[j++]<<"\\textbf{a$_1$}/a";lines[j++]<<"\\textbf{a$_2$}/a";lines[j++]<<"\\textbf{a$_3$}/a";lines[j++]<<"(cartesian)";
         //   lines[j++]<<"Atomic positions";
-        //   for(i=1;i<=APENNSY_AAmax;i++) lines[j++] <<"{\\bf A$"<<i<<"$}     ";
-        //   for(i=1;i<=APENNSY_BBmax;i++) lines[j++] <<"{\\bf B$"<<i<<"$}     ";
+        //   for(i=1;i<=APENNSY_AAmax;i++) lines[j++] <<"\\textbf{A$"<<i<<"$}     ";
+        //   for(i=1;i<=APENNSY_BBmax;i++) lines[j++] <<"\\textbf{B$"<<i<<"$}     ";
         //   lines[j++] << "(fractional)   ";
         //   for(i=1;i<j;i++) lines[i] << "\t \\\\ ";
         //   for(i=1;i<j;i++) {
@@ -1344,7 +1344,7 @@ namespace apennsy_std {
     cout << "    \\item{}DIR=stacking direction                                             " << endl;
     cout << "    \\end{itemize}                                                             " << endl;
     cout << "    \\begin{tabular}{|c|c|c|}\\hline                                           " << endl;
-    cout << "      {\\it unusual} name   & plain formalism (s)         & label \\\\ \\hline " << endl;
+    cout << "     \\textit{unusual} name   & plain formalism (s)         & label \\\\ \\hline " << endl;
     cout << "      $\\beta1/\\beta2$      & FCC$_{AB2}^{[100]}$         & 5,6 \\\\ \\hline  " << endl;
     cout << "      $\\alpha1/\\alpha2$    & FCC$_{AB2}^{[111]}$         & 9,10 \\\\ \\hline " << endl;
     cout << "      Z1/Z3                & FCC$_{AB3}^{[001]}$         & 13,15 \\\\ \\hline  " << endl;

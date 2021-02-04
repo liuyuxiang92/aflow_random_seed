@@ -935,10 +935,10 @@ namespace pflow {
                   El_ref=El_ref+VStoichE.at(indices[l][i]).back()*psc_temp[indices[l][i]+1];
                 }
               }
+              double gfa_tmp = exp(-abs(El_ref-Egs[X])/kBT_ROOM)*weight*(1.0-dotProduct); //DX20210122 - create variable
+              if(LDEBUG){ cerr << soliloquy << " exp(-abs(El_ref-Egs[X])/kBT)*weight*(1.0-dotProduct): " << gfa_tmp << endl; }
 
-              if(LDEBUG){ cerr << soliloquy << " exp(-abs(El_ref-Egs[X])/kBT)*weight*(1.0-dotProduct): " << exp(-abs(El_ref-Egs[X])/kBT_ROOM)*weight*(1.0-dotProduct) << endl; }
-
-              gfa[X]=gfa[X]+exp(-abs(El_ref-Egs[X])/kBT_ROOM)*weight*(1.0-dotProduct);
+              gfa[X]+=gfa_tmp;
               if(LDEBUG){ cerr << soliloquy << " gfa[X]: " << gfa[X] << endl; }
               sampling[X]=sampling[X]+weight;
 

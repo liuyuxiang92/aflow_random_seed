@@ -21,7 +21,7 @@ int Sign(const double& x) {return (int) aurostd::sign(x);}
 // Function PutInCompact
 // ***************************************************************************
 // Make a structure where all the atoms are all the
-// atoms are mapped through the unit and neighbours cells
+// atoms are mapped through the unit and neighbors cells
 // to minimixe the shortest possible bond with an adjacent atom. (SC 6 Aug 04)
 xstructure PutInCompact(const xstructure& a) {
   xstructure sstr=a;

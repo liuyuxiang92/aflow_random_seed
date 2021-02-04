@@ -176,7 +176,7 @@
 #define         DEFAULT_AIMS_BIN                        XHOST.adefault.getattachedscheme("DEFAULT_AIMS_BIN")
 
 // POTCARS // DONE
-#define AFLOWRC_DEFAULT_VASP_POTCAR_DIRECTORIES               string("/common/VASP,/common/AFLOW/VASP,/home/aflow/common/AFLOW/VASP,/fslhome/fslcollab8/group/VASP,/fslhome/glh43/src/,/share/home/00470/tg457283/common/AFLOW/VASP/,/share/home/00457/tg457357/common/AFLOW/VASP/,/home/mehl/bin/AFLOW/VASP/,~/common/VASP/,~/common/AFLOW/VASP/,/nics/a/proj/aflow/common/AFLOW/VASP/,/home/users/aflow/common/VASP,/share/apps/AFLOW3/VASP,/projects/kyang-group/common/VASP,/home/Tools/src/vasp/,/somewhere/")  // first is default, tokenized with "," //DX20190107 - added CMU path
+#define AFLOWRC_DEFAULT_VASP_POTCAR_DIRECTORIES               string("/common/VASP,/common/AFLOW/VASP,/home/aflow/common/AFLOW/VASP,/fslhome/fslcollab8/group/VASP,/fslhome/glh43/src/,/share/home/00470/tg457283/common/AFLOW/VASP/,/share/home/00457/tg457357/common/AFLOW/VASP/,/home/mehl/bin/AFLOW/VASP/,~/common/VASP/,~/common/AFLOW/VASP/,/home/aflow/common/VASP/,/nics/a/proj/aflow/common/AFLOW/VASP/,/home/users/aflow/common/VASP,/share/apps/AFLOW3/VASP,/projects/kyang-group/common/VASP,/home/Tools/src/vasp/,/somewhere/")  // first is default, tokenized with "," //DX20190107 - added CMU path
 #define         DEFAULT_VASP_POTCAR_DIRECTORIES               XHOST.adefault.getattachedscheme("DEFAULT_VASP_POTCAR_DIRECTORIES")
 #define AFLOWRC_DEFAULT_VASP_POTCAR_DATE                      string("current")
 #define         DEFAULT_VASP_POTCAR_DATE                      XHOST.adefault.getattachedscheme("DEFAULT_VASP_POTCAR_DATE")
@@ -364,7 +364,7 @@
 #define         DEFAULT_CHULL_COUNT_THRESHOLD_BINARIES                    XHOST.adefault.getattachedutype<int>("DEFAULT_CHULL_COUNT_THRESHOLD_BINARIES")
 #define AFLOWRC_DEFAULT_CHULL_PERFORM_OUTLIER_ANALYSIS                    TRUE
 #define         DEFAULT_CHULL_PERFORM_OUTLIER_ANALYSIS                    XHOST.adefault.getattachedutype<bool>("DEFAULT_CHULL_PERFORM_OUTLIER_ANALYSIS")
-#define AFLOWRC_DEFAULT_CHULL_OUTLIER_ANALYSIS_COUNT_THRESHOLD_BINARIES   50
+#define AFLOWRC_DEFAULT_CHULL_OUTLIER_ANALYSIS_COUNT_THRESHOLD_BINARIES   75
 #define         DEFAULT_CHULL_OUTLIER_ANALYSIS_COUNT_THRESHOLD_BINARIES   XHOST.adefault.getattachedutype<int>("DEFAULT_CHULL_OUTLIER_ANALYSIS_COUNT_THRESHOLD_BINARIES")
 #define AFLOWRC_DEFAULT_CHULL_OUTLIER_MULTIPLIER                          3.25
 #define         DEFAULT_CHULL_OUTLIER_MULTIPLIER                          XHOST.adefault.getattachedutype<double>("DEFAULT_CHULL_OUTLIER_MULTIPLIER")
@@ -462,6 +462,8 @@
 #define         POCC_ALL_SITE_CONFIGURATIONS_FILE                 XHOST.adefault.getattachedscheme("POCC_ALL_SITE_CONFIGURATIONS_FILE")
 #define AFLOWRC_POCC_DOSCAR_FILE                                  string("DOSCAR.pocc")
 #define         POCC_DOSCAR_FILE                                  XHOST.adefault.getattachedscheme("POCC_DOSCAR_FILE")
+#define AFLOWRC_POCC_ANIONS_LIST                                  string("B,C,N,O")
+#define         POCC_ANIONS_LIST                                  XHOST.adefault.getattachedscheme("POCC_ANIONS_LIST")
 
 // DEFAULT APL
 //// DEFAULT APL SUPERCELL
@@ -912,6 +914,15 @@
 #define         MPI_COMMAND_DUKE_QFLOW_OPENMPI                XHOST.adefault.getattachedscheme("MPI_COMMAND_DUKE_QFLOW_OPENMPI")
 #define AFLOWRC_MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI             string("/home/bin/") // DUKE_QFLOW_MPICH
 #define         MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI             XHOST.adefault.getattachedscheme("MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI")
+
+//CO20201220 X START
+#define AFLOWRC_MPI_OPTIONS_DUKE_X                            string("ulimit -s unlimited ") // DUKE_X_MPICH
+#define         MPI_OPTIONS_DUKE_X                            XHOST.adefault.getattachedscheme("MPI_OPTIONS_DUKE_X")
+#define AFLOWRC_MPI_COMMAND_DUKE_X                            string("mpirun -n") // DUKE_X_MPICH
+#define         MPI_COMMAND_DUKE_X                            XHOST.adefault.getattachedscheme("MPI_COMMAND_DUKE_X")
+#define AFLOWRC_MPI_BINARY_DIR_DUKE_X                         string("/home/bin/") // DUKE_X_MPICH
+#define         MPI_BINARY_DIR_DUKE_X                         XHOST.adefault.getattachedscheme("MPI_BINARY_DIR_DUKE_X")
+//CO20201220 X STOP
 
 //DX20190509 - MACHINE001 - START
 #define AFLOWRC_MPI_OPTIONS_MACHINE001                        string("") // MACHINE001
@@ -1392,6 +1403,7 @@ namespace aflowrc {
     aflowrc::load_default("POCC_ALL_HNF_MATRICES_FILE",AFLOWRC_POCC_ALL_HNF_MATRICES_FILE);
     aflowrc::load_default("POCC_ALL_SITE_CONFIGURATIONS_FILE",AFLOWRC_POCC_ALL_SITE_CONFIGURATIONS_FILE);
     aflowrc::load_default("POCC_DOSCAR_FILE",AFLOWRC_POCC_DOSCAR_FILE);
+    aflowrc::load_default("POCC_ANIONS_LIST",AFLOWRC_POCC_ANIONS_LIST);
 
     // DEFAULT APL
     //// DEFAULT APL SUPERCELL
@@ -1638,6 +1650,12 @@ namespace aflowrc {
     aflowrc::load_default("MPI_OPTIONS_DUKE_QFLOW_OPENMPI",AFLOWRC_MPI_OPTIONS_DUKE_QFLOW_OPENMPI); 
     aflowrc::load_default("MPI_COMMAND_DUKE_QFLOW_OPENMPI",AFLOWRC_MPI_COMMAND_DUKE_QFLOW_OPENMPI); 
     aflowrc::load_default("MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI",AFLOWRC_MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI); 
+
+    //CO20201220 X START
+    aflowrc::load_default("MPI_OPTIONS_DUKE_X",AFLOWRC_MPI_OPTIONS_DUKE_X); 
+    aflowrc::load_default("MPI_COMMAND_DUKE_X",AFLOWRC_MPI_COMMAND_DUKE_X); 
+    aflowrc::load_default("MPI_BINARY_DIR_DUKE_X",AFLOWRC_MPI_BINARY_DIR_DUKE_X); 
+    //CO20201220 X STOP
 
     //DX20190509 - MACHINE001 - START
     aflowrc::load_default("MPI_OPTIONS_MACHINE001",AFLOWRC_MPI_OPTIONS_MACHINE001); 
@@ -1990,6 +2008,7 @@ namespace aflowrc {
     aflowrc << "POCC_ALL_HNF_MATRICES_FILE=\"" << AFLOWRC_POCC_ALL_HNF_MATRICES_FILE << "\"" << endl;
     aflowrc << "POCC_ALL_SITE_CONFIGURATIONS_FILE=\"" << AFLOWRC_POCC_ALL_SITE_CONFIGURATIONS_FILE << "\"" << endl;
     aflowrc << "POCC_DOSCAR_FILE=\"" << AFLOWRC_POCC_DOSCAR_FILE << "\"" << endl;
+    aflowrc << "POCC_ANIONS_LIST=\"" << AFLOWRC_POCC_ANIONS_LIST << "\"" << endl;
 
     aflowrc << " " << endl;
     aflowrc << "// DEFAULTS APL" << endl;
@@ -2194,7 +2213,7 @@ namespace aflowrc {
     aflowrc << "AFLOW_CORE_TEMPERATURE_BEEP=" << AFLOWRC_AFLOW_CORE_TEMPERATURE_BEEP << " // Celsius" << endl;
     aflowrc << "AFLOW_CORE_TEMPERATURE_HALT=" << AFLOWRC_AFLOW_CORE_TEMPERATURE_HALT << " // Celsius" << endl;
     aflowrc << "AFLOW_CORE_TEMPERATURE_REFRESH=" << AFLOWRC_AFLOW_CORE_TEMPERATURE_REFRESH << " // seconds"   << endl;
-    
+
     aflowrc << "VASP_CHECK_SLEEP=" << AFLOWRC_VASP_CHECK_SLEEP << " // seconds"   << endl;  //CO20201111
 
     aflowrc << " " << endl;
@@ -2226,6 +2245,12 @@ namespace aflowrc {
     aflowrc << "MPI_OPTIONS_DUKE_QFLOW_OPENMPI=\"" << AFLOWRC_MPI_OPTIONS_DUKE_QFLOW_OPENMPI << "\"" << "  // DUKE_QFLOW_OPENMPI" << endl;
     aflowrc << "MPI_COMMAND_DUKE_QFLOW_OPENMPI=\"" << AFLOWRC_MPI_COMMAND_DUKE_QFLOW_OPENMPI << "\"" << "  // DUKE_QFLOW_OPENMPI" << endl;
     aflowrc << "MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI=\"" << AFLOWRC_MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI << "\"" << "  // DUKE_QFLOW_OPENMPI" << endl; 
+
+    //CO20201220 X START
+    aflowrc << "MPI_OPTIONS_DUKE_X=\"" << AFLOWRC_MPI_OPTIONS_DUKE_X << "\"" << "  // DUKE_X" << endl;
+    aflowrc << "MPI_COMMAND_DUKE_X=\"" << AFLOWRC_MPI_COMMAND_DUKE_X << "\"" << "  // DUKE_X" << endl;
+    aflowrc << "MPI_BINARY_DIR_DUKE_X=\"" << AFLOWRC_MPI_BINARY_DIR_DUKE_X << "\"" << "  // DUKE_X" << endl; 
+    //CO20201220 X STOP
 
     //DX20190509 - MACHINE001 - START
     aflowrc << "MPI_OPTIONS_MACHINE001=\"" << AFLOWRC_MPI_OPTIONS_MACHINE001 << "\"" << "// MACHINE001" << endl;
@@ -2552,6 +2577,7 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"POCC_ALL_HNF_MATRICES_FILE\")=\"" << POCC_ALL_HNF_MATRICES_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"POCC_ALL_SITE_CONFIGURATIONS_FILE\")=\"" << POCC_ALL_SITE_CONFIGURATIONS_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"POCC_DOSCAR_FILE\")=\"" << POCC_DOSCAR_FILE << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"POCC_ANIONS_LIST\")=\"" << POCC_ANIONS_LIST << "\"" << endl;
 
     if(LDEBUG) oss << "// DEFAULTS APL" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_PREC\")=\"" << DEFAULT_APL_PREC << "\"" << endl;
@@ -2748,7 +2774,7 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<double>(\"AFLOW_CORE_TEMPERATURE_BEEP\")=" << AFLOW_CORE_TEMPERATURE_BEEP << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<double>(\"AFLOW_CORE_TEMPERATURE_HALT\")=" << AFLOW_CORE_TEMPERATURE_HALT << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<double>(\"AFLOW_CORE_TEMPERATURE_REFRESH\")=" << AFLOW_CORE_TEMPERATURE_REFRESH << endl;
-    
+
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<double>(\"VASP_CHECK_SLEEP\")=" << VASP_CHECK_SLEEP << endl; //CO20201111
 
     if(LDEBUG) oss << "// DEFAULT MACHINE DEPENDENT MPI" << endl;
@@ -2779,6 +2805,12 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_OPTIONS_DUKE_QFLOW_OPENMPI\")=\"" << MPI_OPTIONS_DUKE_QFLOW_OPENMPI << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_COMMAND_DUKE_QFLOW_OPENMPI\")=\"" << MPI_COMMAND_DUKE_QFLOW_OPENMPI << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI\")=\"" << MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI << "\"" << endl;
+
+    //CO20201220 X START
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_OPTIONS_DUKE_X\")=\"" << MPI_OPTIONS_DUKE_X << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_COMMAND_DUKE_X\")=\"" << MPI_COMMAND_DUKE_X << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_BINARY_DIR_DUKE_X\")=\"" << MPI_BINARY_DIR_DUKE_X << "\"" << endl;
+    //CO20201220 X STOP
 
     //DX20190509 - MACHINE001 - START
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_OPTIONS_MACHINE001\")=\"" << MPI_OPTIONS_MACHINE001 << "\"" << endl;

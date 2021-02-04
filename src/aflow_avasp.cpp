@@ -990,7 +990,7 @@ bool AVASP_populateXVASP(const _aflags& aflags,const _kflags& kflags,const _vfla
   if(LDEBUG) {cerr << soliloquy << " xvasp.aopts.flag(\"FLAG::AVASP_AAPL=OFF\")=" << xvasp.aopts.flag("FLAG::WRITE_AAPL") << endl;}
   if(LDEBUG) {cerr << soliloquy << " xvasp.aopts.flag(\"FLAG::AVASP_APL=OFF\")=" << xvasp.aopts.flag("FLAG::WRITE_APL") << endl;}
   if(LDEBUG) {cerr << soliloquy << " xvasp.aopts.flag(\"FLAG::AVASP_QHA=OFF\")=" << xvasp.aopts.flag("FLAG::WRITE_QHA") << endl;}
-  if(LDEBUG) {cerr << soliloquy << " xvasp.aopts.flag(\"FLAG::AVASP_NEIGHBOURS=OFF\")=" << xvasp.aopts.flag("FLAG::AVASP_NEIGHBOURS=OFF") << endl;}
+  //DX20210122 [OBSOLETE] if(LDEBUG) {cerr << soliloquy << " xvasp.aopts.flag(\"FLAG::AVASP_NEIGHBORS=OFF\")=" << xvasp.aopts.flag("FLAG::AVASP_NEIGHBOURS=OFF") << endl;}
   if(LDEBUG) {cerr << soliloquy << " xvasp.aopts.flag(\"FLAG::AVASP_SYMMETRY=OFF\")=" << xvasp.aopts.flag("FLAG::AVASP_SYMMETRY=OFF") << endl;}
   if(LDEBUG) {cerr << soliloquy << " xvasp.str=" << endl << xvasp.str << endl;}
   if(LDEBUG) {cerr << soliloquy << " xvasp.str.bravais_lattice_type=" << xvasp.str.bravais_lattice_type << endl;}
@@ -1761,6 +1761,11 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
           pflow::FIX_POCC_PARAMS(xvasp.str,xvasp.AVASP_pocc_parameters);
           pflow::convertXStr2POCC(xvasp.str,xvasp.AVASP_pocc_parameters,species_pp_orig,species_volume_orig);
           pflow::setPOCCTOL(xvasp.str,xvasp.AVASP_pocc_tol);
+          if(!pflow::checkAnionSublattice(xvasp.str)){  //CO20210201
+            if(!XHOST.vflag_control.flag("FORCE_POCC")){
+              throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Found non-anion in anion sublattice. Please check (and run with --force_pocc).",_VALUE_ILLEGAL_);
+            }
+          }
           if(LDEBUG) {cerr << soliloquy << "POCC structure" << endl << xvasp.str << endl;}
         } else {
           xvasp.str=aflowlib::PrototypeLibraries(oaus,xvasp.AVASP_label,xvasp.AVASP_parameters,xvasp.str.species_pp,xvasp.str.species_volume,xvasp.AVASP_volume_in,xvasp_in.AVASP_prototype_mode); 
@@ -2051,16 +2056,16 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
     //aflowin << "#[AFLOW_SYMMETRY]SGROUP_RADIUS=7.77 " << endl;
     aflowin << AFLOWIN_SEPARATION_LINE << endl; // [AFLOW] **************************************************
   }
-  // NEIGHBOURS WRITE
-  if(!xvasp.aopts.flag("FLAG::AVASP_NEIGHBOURS=OFF")) {
-    aflowin << aurostd::PaddedPOST("#[AFLOW_NEIGHBOURS]CALC ",_aflowinpad_) << "// README_AFLOW.TXT" << endl; //CO20180214
-    aflowin << aurostd::PaddedPOST("[AFLOW_NEIGHBOURS]RADIUS=7.7 ",_aflowinpad_) << "// README_AFLOW.TXT" << endl; //CO20180214
-    aflowin << aurostd::PaddedPOST("[AFLOW_NEIGHBOURS]DRADIUS=0.1 ",_aflowinpad_) << "// README_AFLOW.TXT" << endl; //CO20180214
-    //aflowin << "#[AFLOW_NEIGHBOURS]CALC " << endl;
-    //aflowin << "[AFLOW_NEIGHBOURS]RADIUS=7.7 " << endl;
-    //aflowin << "[AFLOW_NEIGHBOURS]DRADIUS=0.1 " << endl;
-    aflowin << AFLOWIN_SEPARATION_LINE << endl; // [AFLOW] **************************************************
-  }
+  // NEIGHBORS WRITE
+  //DX20210122 [OBSOLETE] if(!xvasp.aopts.flag("FLAG::AVASP_NEIGHBORS=OFF")) {
+  //DX20210122 [OBSOLETE]   aflowin << aurostd::PaddedPOST("#[AFLOW_NEIGHBOURS]CALC ",_aflowinpad_) << "// README_AFLOW.TXT" << endl; //CO20180214
+  //DX20210122 [OBSOLETE]   aflowin << aurostd::PaddedPOST("[AFLOW_NEIGHBOURS]RADIUS=7.7 ",_aflowinpad_) << "// README_AFLOW.TXT" << endl; //CO20180214
+  //DX20210122 [OBSOLETE]   aflowin << aurostd::PaddedPOST("[AFLOW_NEIGHBOURS]DRADIUS=0.1 ",_aflowinpad_) << "// README_AFLOW.TXT" << endl; //CO20180214
+  //DX20210122 [OBSOLETE]   //aflowin << "#[AFLOW_NEIGHBOURS]CALC " << endl;
+  //DX20210122 [OBSOLETE]   //aflowin << "[AFLOW_NEIGHBOURS]RADIUS=7.7 " << endl;
+  //DX20210122 [OBSOLETE]   //aflowin << "[AFLOW_NEIGHBOURS]DRADIUS=0.1 " << endl;
+  //DX20210122 [OBSOLETE]   aflowin << AFLOWIN_SEPARATION_LINE << endl; // [AFLOW] **************************************************
+  //DX20210122 [OBSOLETE] }
   string MODULE = aurostd::toupper(xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::MODULE"));
   // OBSOLETE - ME20191206
   // This would set CONVERT_UNIT_CELL=PRES for aflow_proto.
@@ -3923,16 +3928,16 @@ bool AVASP_MakeSingleAFLOWIN_20180101(_xvasp& xvasp_in,stringstream &_aflowin,bo
     //aflowin << "#[AFLOW_SYMMETRY]SGROUP_RADIUS=7.77 " << endl;
     aflowin << AFLOWIN_SEPARATION_LINE << endl; // [AFLOW] **************************************************
   }
-  // NEIGHBOURS WRITE
-  if(!xvasp.aopts.flag("FLAGS::AVASP_NEIGHBOURS=OFF")) {
-    aflowin << aurostd::PaddedPOST("#[AFLOW_NEIGHBOURS]CALC ",_aflowinpad_) << "// README_AFLOW.TXT" << endl; //CO20180214
-    aflowin << aurostd::PaddedPOST("[AFLOW_NEIGHBOURS]RADIUS=7.7 ",_aflowinpad_) << "// README_AFLOW.TXT" << endl; //CO20180214
-    aflowin << aurostd::PaddedPOST("[AFLOW_NEIGHBOURS]DRADIUS=0.1 ",_aflowinpad_) << "// README_AFLOW.TXT" << endl; //CO20180214
-    //aflowin << "#[AFLOW_NEIGHBOURS]CALC " << endl;
-    //aflowin << "[AFLOW_NEIGHBOURS]RADIUS=7.7 " << endl;
-    //aflowin << "[AFLOW_NEIGHBOURS]DRADIUS=0.1 " << endl;
-    aflowin << AFLOWIN_SEPARATION_LINE << endl; // [AFLOW] **************************************************
-  }
+  // NEIGHBORS WRITE
+  //DX20210122 [OBSOLETE] if(!xvasp.aopts.flag("FLAGS::AVASP_NEIGHBORS=OFF")) {
+  //DX20210122 [OBSOLETE]   aflowin << aurostd::PaddedPOST("#[AFLOW_NEIGHBOURS]CALC ",_aflowinpad_) << "// README_AFLOW.TXT" << endl; //CO20180214
+  //DX20210122 [OBSOLETE]   aflowin << aurostd::PaddedPOST("[AFLOW_NEIGHBOURS]RADIUS=7.7 ",_aflowinpad_) << "// README_AFLOW.TXT" << endl; //CO20180214
+  //DX20210122 [OBSOLETE]   aflowin << aurostd::PaddedPOST("[AFLOW_NEIGHBOURS]DRADIUS=0.1 ",_aflowinpad_) << "// README_AFLOW.TXT" << endl; //CO20180214
+  //DX20210122 [OBSOLETE]   //aflowin << "#[AFLOW_NEIGHBOURS]CALC " << endl;
+  //DX20210122 [OBSOLETE]   //aflowin << "[AFLOW_NEIGHBOURS]RADIUS=7.7 " << endl;
+  //DX20210122 [OBSOLETE]   //aflowin << "[AFLOW_NEIGHBOURS]DRADIUS=0.1 " << endl;
+  //DX20210122 [OBSOLETE]   aflowin << AFLOWIN_SEPARATION_LINE << endl; // [AFLOW] **************************************************
+  //DX20210122 [OBSOLETE] }
   string MODULE = aurostd::toupper(xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::MODULE"));
   // APL WRITING
   if(!xvasp.aopts.flag("FLAGS::AVASP_APL=OFF")) { //CO20180214 - I interpret this flag to refer to WRITING APL options, not if they are on

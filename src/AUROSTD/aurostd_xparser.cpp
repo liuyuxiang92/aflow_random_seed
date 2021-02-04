@@ -477,7 +477,7 @@ namespace aurostd {
     vector<string> matrix;
     for (uint i=0; i<value.size(); i++){
       matrix.push_back("[" + aurostd::joinWDelimiter(
-          aurostd::vecDouble2vecString(value[i], precision, roundoff, tol), ",") + "]");
+            aurostd::vecDouble2vecString(value[i], precision, roundoff, tol), ",") + "]");
     }
     content.back() += aurostd::joinWDelimiter(matrix, ",");
     content.back() += "]";
@@ -490,7 +490,7 @@ namespace aurostd {
     vector<string> matrix;
     for (uint i=0; i<value.size(); i++){
       matrix.push_back("[" + aurostd::joinWDelimiter(
-          aurostd::vecDouble2vecString(value[i], precision, roundoff, tol), ",") + "]");
+            aurostd::vecDouble2vecString(value[i], precision, roundoff, tol), ",") + "]");
     }
     content.back() += aurostd::joinWDelimiter(matrix, ",");
     content.back() += "]";

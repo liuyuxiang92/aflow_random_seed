@@ -1597,11 +1597,11 @@ namespace anrl {
 // *************************************************************************** 
 namespace anrl {
   double specialCaseSymmetryTolerances(const string& label_input){
-    
+
     // symmetry tolerances for specific prototypes
     // some parameter values can be "close" to higher symmetry points,
     // causing structures to fall into higher symmetries when analyzed with
-    // certain tolerance; occurs for certain AFLOW Prototype Encyclopedia
+    // certain tolerances; occurs for certain AFLOW Prototype Encyclopedia
     // structures 
 
     // ---------------------------------------------------------------------------
@@ -2089,7 +2089,7 @@ namespace anrl {
     // partition in parameter values
     vector<string> vparameters_temp;
     aurostd::string2tokens(parameters,vparameters_temp,",");
-    if(aurostd::string2utype<double>(vparameters_temp[0])<=0.0){ //DX20201104 - was missing
+    if(aurostd::string2utype<double>(vparameters_temp[0]) < _ZERO_TOL_){ //DX20201104 - was missing
       scale_volume_by_species=true;
       vparameters_temp[0]="1.0"; //fix
       parameters=aurostd::joinWDelimiter(vparameters_temp,",");
@@ -2146,7 +2146,7 @@ namespace anrl {
     // ---------------------------------------------------------------------------
     // generate atoms based Wyckoff equations and Wyckoff parameter values
     deque<_atom> atoms_conventional_cell = getAtomsFromWyckoff(ordered_Wyckoff_sites_ITC,lattice_conventional);
-    
+
     // ---------------------------------------------------------------------------
     // get interatomic distance to find a good "fold-in" tolerance //DX20201021
     xstructure str_conv;

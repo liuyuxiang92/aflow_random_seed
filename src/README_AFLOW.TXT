@@ -81,7 +81,7 @@ aflow
                 launched to perform the task in a multitasking fashion.
 
    --npmax      With this option, aflow starts a number of concurrent runs
-                equal to the maximun numbers of processors.
+                equal to the maximum numbers of processors.
 
    --multish    Very useful option for scripting.
                 if you have a "file" containing a gazillion of instructions,
@@ -193,8 +193,9 @@ aflow
    --machine=MACHINE
              MACHINE=duke_beta | beta
                      duke_beta_openmpi | beta_openmpi
-                     duke_qrats  | qrat
+                     duke_qrats  | qrats
                      duke_qflow  | qflow
+                     duke_x  | x
                      duke_materials  | materials
                      duke_aflowlib  | aflowlib 
                      duke_habana  | habana
@@ -286,7 +287,7 @@ similar aflow.in's and you want to add/remove options in a very short time.
 HOST: fix default things for the HOST
 
  [AFLOW_HOST]MACHINE
-  MACHINE=DUKE_BETA | DUKE_BETA_OPENMPI | DUKE_QRATS | DUKE_QFLOW | DUKE_MATERIALS | 
+  MACHINE=DUKE_BETA | DUKE_BETA_OPENMPI | DUKE_QRATS | DUKE_QFLOW | DUKE_X | DUKE_MATERIALS | 
                       DUKE_AFLOWLIB  | DUKE_HABANA | DOD_CONRAD | DOD_ONYX | DOD_GORDON | DOD_COPPER | 
                       DOD_GAFFNEY | DOD_KOEHR | DOD_MUSTANG | DOD_EULER |
                       MPCDF_EOS  | MPCDF_DRACO  | MPCDF_COBRA  | MPCDF_HYDRA  |
@@ -514,15 +515,6 @@ by hand. You can put everything inside aflow.in
   Specifies the tolerance for all symmetry routines. 
   (In Angstroms).
  //DX and CO - END
-
-******************************************************
-[AFLOW_NEIGHBOURS]KEYWORD    OPTIONAL
- Keyword to specify parameters. After [AFLOW_NEIGHBOURS]
- you can put
- CALCULATION         OPTIONAL
- WRITE               OPTIONAL
- RADIUS=XXX          OPTIONAL, default XXX=5.0
- DRADIUS=XXX         OPTIONAL, default XXX=0.1
 
 ******************************************************
 
@@ -1380,10 +1372,6 @@ EXAMPLE
 [AFLOW_SYMMETRY]CALC 
 #[AFLOW_SYMMETRY]SGROUP_WRITE 
 #[AFLOW_SYMMETRY]SGROUP_RADIUS=7.77 
-[AFLOW] ************************************************************************************************************************** 
-#[AFLOW_NEIGHBOURS]CALC 
-[AFLOW_NEIGHBOURS]RADIUS=7.7 
-[AFLOW_NEIGHBOURS]DRADIUS=0.1 
 [AFLOW] ************************************************************************************************************************** 
 #[AFLOW_APL]CALC                                      // README_AFLOW_APL.TXT
 [AFLOW_APL]ENGINE=DM                                  // README_AFLOW_APL.TXT

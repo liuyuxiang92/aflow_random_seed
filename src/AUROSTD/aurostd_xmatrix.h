@@ -627,9 +627,9 @@ namespace aurostd {
   //DX20210111 - added polarDecomposition() function
   template<class utype> void
     polarDecomposition(const xmatrix<utype>& transformation_matrix,
-    xmatrix<utype>& rotation,
-    xmatrix<utype>& deformation,
-    bool check_orthogonal_rotation=true); __xprototype;
+        xmatrix<utype>& rotation,
+        xmatrix<utype>& deformation,
+        bool check_orthogonal_rotation=true); __xprototype;
 }
 
 namespace aurostd {

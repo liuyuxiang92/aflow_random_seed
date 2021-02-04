@@ -52,7 +52,7 @@ Particular ranges of the misfit are adopted from Burzlaff and Malinovsky's work,
 By default:
   epsilon_match = 0.1 and
   epsilon_family = 0.2
-In general, structures that match within 0.1 will have enthalpies within 5meV/atom.
+In general, structures that match within 0.1 will have enthalpies within 5 meV/atom.
 Structures that match beyond 0.2 have poor structure-property correlation.
 See XtalFinder article for details.
 
@@ -116,7 +116,7 @@ NOTE ON STRUCTURE SIZE VS SPEED
 
 The number of atoms in the system generally increases the computational expense
 of the comparisons.  Namely, it is dependent on the least frequently occurring
-atom (LFA) in the crystal. If LFA>20 or there are many LFA-types, then the comparison
+atom (LFA) in the crystal. If LFA>20 or there are many LFA types, then the comparison
 time will increase. By default, the algorithm terminates as soon as a match is found
 (unless you request the optimal match via the --optimize_match option).
 However, this does not improve the speed of the comparison when a match cannot be found,
@@ -124,8 +124,8 @@ since we must explore the entire search space.
 
 METHODS FOR ENHANCING COMPUTATION SPEED:
   1) Increase the number of processors (--np=xx)
-  2) Convert structures to a primitive or more orthogonal lattice representation
-     via the following options:
+  2) Convert structures to a primitive and/or more orthogonal lattice representations
+     via the following options (conversions can be combined):
        --primitivize : convert the crystal to a primitive representation
        --minkowski   : convert the crystal to the Minkowski representation
        --niggli      : convert the crystal to the Niggli representation
@@ -211,7 +211,7 @@ General options - applicable to all commands - is listed at the bottom of this s
                                                                Allows numeric or string input (e.g., 0->original, 1->relax1, 2->most_relaxed).
             [--space_group=225,186,227,...]                  : Specify the space group(s) of the structures to extract and compare.
                                                                More than one space group can be specified.
-            [--stoichiometry=1:2:3:...]                      : Specify the stoichiometric ratio of the structures to extract and compare.
+            [--stoichiometry=1,2,3,...]                      : Specify the stoichiometric ratio of the structures to extract and compare.
 
 
     aflow --compare2prototypes [GENERAL_COMPARISON_OPTIONS] [COMPARE2PROTOTYPES_OPTIONS] < file
@@ -286,7 +286,7 @@ General options - applicable to all commands - is listed at the bottom of this s
     [GENERAL_COMPARISON_OPTIONS] : Generic options for all commands (unless indicated otherwise):
 
         [--misfit_match=0.1]                    : Specify the misfit threshold for matching structures (default: 0.1).
-        [--misfit_match=0.2]                    : Specify the misfit threshold for structures within the same family (default: 0.2).
+        [--misfit_family=0.2]                   : Specify the misfit threshold for structures within the same family (default: 0.2).
         [--np=16|--num_proc=16]                 : Allocate the number of processors/threads for the task.
         [--optimize_match]                      : Explore all lattice and origin choices to find the best matching representation, i.e., minimizes misfit value.
         [--no_scale_volume]                     : Suppresses volume rescaling during structure matching; identifies differences due to volume expansion or compression of a structure.

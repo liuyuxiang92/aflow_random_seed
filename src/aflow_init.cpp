@@ -429,6 +429,11 @@ namespace init {
       oss << "MPI_OPTIONS_DUKE_QFLOW_OPENMPI=" << MPI_OPTIONS_DUKE_QFLOW_OPENMPI << "\"" << endl;
       oss << "MPI_COMMAND_DUKE_QFLOW_OPENMPI=" << MPI_COMMAND_DUKE_QFLOW_OPENMPI << "\"" << endl;
       oss << "MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI=" << MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI << "\"" << endl;
+      //CO20201220 X START
+      oss << "MPI_OPTIONS_DUKE_X=" << MPI_OPTIONS_DUKE_X << "\"" << endl;
+      oss << "MPI_COMMAND_DUKE_X=" << MPI_COMMAND_DUKE_X << "\"" << endl;
+      oss << "MPI_BINARY_DIR_DUKE_X=" << MPI_BINARY_DIR_DUKE_X << "\"" << endl;
+      //CO20201220 X STOP
       oss << "MPI_OPTIONS_MPCDF_EOS=" << MPI_OPTIONS_MPCDF_EOS << "\"" << endl;
       oss << "MPI_COMMAND_MPCDF_EOS=" << MPI_COMMAND_MPCDF_EOS << "\"" << endl;
       oss << "MPI_NCPUS_MPCDF_EOS=" << MPI_NCPUS_MPCDF_EOS << "\"" << endl;
@@ -828,6 +833,10 @@ namespace init {
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"ARUNS2SKIP\")=" << XHOST.vflag_control.flag("ARUNS2SKIP") << endl;  //CO20200624
     if(XHOST.vflag_control.flag("ARUNS2SKIP")) XHOST.vflag_control.push_attached("ARUNS2SKIP",aurostd::args2attachedstring(argv,"--aruns2skip=|--arun2skip=","")); //CO20200624
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.getattachedscheme(\"ARUNS2SKIP\")=" << XHOST.vflag_control.getattachedscheme("ARUNS2SKIP") << endl;  //CO20200624
+    XHOST.vflag_control.flag("NEGLECT_CCE",aurostd::args2attachedflag(argv,"--neglect_cce|--no_cce|--neglectcce|--nocce")); //CO20210115
+    if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"NEGLECT_CCE\")=" << XHOST.vflag_control.flag("NEGLECT_CCE") << endl;  //CO20210115
+    XHOST.vflag_control.flag("FORCE_POCC",aurostd::args2attachedflag(argv,"--force_pocc")); //CO20210115
+    if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"FORCE_POCC\")=" << XHOST.vflag_control.flag("FORCE_POCC") << endl;  //CO20210115
 
     // [CT20200320] run full AEL post-processing for POCC
     XHOST.vflag_control.flag("AEL_RUN_POSTPROCESSING",aurostd::args2flag(XHOST.argv,cmds,"--ael_run_postprocessing"));  //CT20200320
@@ -989,6 +998,10 @@ namespace init {
 
     // LOADING ANRL WEB
     XHOST.vflag_control.flag("WWW",aurostd::args2flag(argv,cmds,"--www|--web|--web_mode|--php|--html|-www|-web|-web_mode|-php|-html"));  //CO20200404
+    if(XHOST.user=="www-data"){XHOST.vflag_control.flag("WWW",true);} //CO20201215
+
+    //FANCY_PRINT
+    XHOST.vflag_control.flag("NO_FANCY_PRINT",aurostd::args2flag(argv,cmds,"--no_fancy_print|--nofancyprint"));  //CO20200404
 
     // DEFAULT options
     if(INIT_VERBOSE) oss << "--- DEFAULTSs --- " << endl;
@@ -1077,23 +1090,23 @@ namespace init {
       if(LDEBUG) cerr << soliloquy << " XHOST.hostname=" << XHOST.hostname << endl;
       if(LDEBUG) cerr << soliloquy << " XHOST.user=" << XHOST.user << endl;
       if(LDEBUG) cerr << soliloquy << " XHOST.home=" << XHOST.home << endl;
- 
+
       if(XHOST.hostname=="nietzsche.mems.duke.edu"&&XHOST.user=="auro"&&aurostd::FileExist(XHOST.home+"/work/AFLOW3/aflow_data")) {  //CO, special SC
-	if(LDEBUG) cerr << soliloquy << " FOUND " << XHOST.home << "/work/AFLOW3/aflow_data" << endl;
-	//	if(LDEBUG) cerr << soliloquy << " out.length()=" << out.length() << endl;
- 	out=aurostd::execute2string(XHOST.home+"/work/AFLOW3/aflow_data"+" "+str2load);
-	if(LDEBUG) cerr << soliloquy << " out.length()=" << out.length() << endl;
-	// 	vector<string> vout;aurostd::string2vectorstring(out,vout);
-	// 	if(LDEBUG) cerr << soliloquy << " vout.size()=" << vout.size() << endl;
-	// 	for(uint i=0;i<vout.size();i+=3) {
-	// 	  if(aurostd::substring2bool(vout.at(i),"LIB6") || aurostd::substring2bool(vout.at(i+1),"LIB6") || aurostd::substring2bool(vout.at(i+2),"LIB6")) 
-	// 	    cout << vout.at(i) << "    " << vout.at(i+1) << "    " << vout.at(i+2) << endl;
-	// 	}
-	// 	//       if(LDEBUG) cerr << soliloquy << " out=" << out << endl; 
-	// if(LDEBUG) cerr << soliloquy << " str2load=" << str2load << endl;
+        if(LDEBUG) cerr << soliloquy << " FOUND " << XHOST.home << "/work/AFLOW3/aflow_data" << endl;
+        //	if(LDEBUG) cerr << soliloquy << " out.length()=" << out.length() << endl;
+        out=aurostd::execute2string(XHOST.home+"/work/AFLOW3/aflow_data"+" "+str2load);
+        if(LDEBUG) cerr << soliloquy << " out.length()=" << out.length() << endl;
+        // 	vector<string> vout;aurostd::string2vectorstring(out,vout);
+        // 	if(LDEBUG) cerr << soliloquy << " vout.size()=" << vout.size() << endl;
+        // 	for(uint i=0;i<vout.size();i+=3) {
+        // 	  if(aurostd::substring2bool(vout.at(i),"LIB6") || aurostd::substring2bool(vout.at(i+1),"LIB6") || aurostd::substring2bool(vout.at(i+2),"LIB6")) 
+        // 	    cout << vout.at(i) << "    " << vout.at(i+1) << "    " << vout.at(i+2) << endl;
+        // 	}
+        // 	//       if(LDEBUG) cerr << soliloquy << " out=" << out << endl; 
+        // if(LDEBUG) cerr << soliloquy << " str2load=" << str2load << endl;
       } else {
-	//	cerr <<  soliloquy << " [2] " << endl;
-	if(LDEBUG) {cerr << soliloquy << " issuing command: " << XHOST.command("aflow_data") << " " << str2load << endl;}
+        //	cerr <<  soliloquy << " [2] " << endl;
+        if(LDEBUG) {cerr << soliloquy << " issuing command: " << XHOST.command("aflow_data") << " " << str2load << endl;}
         out=aurostd::execute2string(XHOST.command("aflow_data")+" "+str2load);
       }
     } else { // cerr << string(aflow_data_path+"/"+XHOST.command("aflow_data")) << endl;
@@ -1104,7 +1117,7 @@ namespace init {
     if(LDEBUG) cerr.flush();
     if(LDEBUG) cerr << soliloquy << " XHOST_vLIBS.size()=" << XHOST_vLIBS.size() << endl;
 
-    if((str2load=="vLIBS" || str2load=="XHOST_vLIBS")) { // && XHOST_vLIBS.size()!=3) {
+    if((str2load=="vLIBS" || str2load=="XHOST_vLIBS")) { // && XHOST_vLIBS.size()!=3)
       if(XHOST_vLIBS.size()) for(uint i=0;i<XHOST_vLIBS.size();i++) XHOST_vLIBS.at(i).clear();
       XHOST_vLIBS.clear();
       XHOST_vLIBS.push_back(vector<string>()); // AURL
@@ -1117,7 +1130,7 @@ namespace init {
       aurostd::string2vectorstring(out,vout);
       if(LDEBUG) cerr << soliloquy << " vout.size()=" << vout.size() << endl;
       // make some checks if it  is divisible by three
-      
+
       for(uint i=0;i<vout.size();) {
         aurl=vout.at(i++);XHOST_vLIBS.at(0).push_back(aurl); // AURL
         auid=vout.at(i++);XHOST_vLIBS.at(1).push_back(auid); // AUID
@@ -1354,8 +1367,8 @@ namespace init {
     if(str=="AFLOW_PSEUDOPOTENTIALS_TXT") { if(XHOST_AFLOW_PSEUDOPOTENTIALS_TXT.empty()) { return XHOST_AFLOW_PSEUDOPOTENTIALS_TXT=init::InitLoadString(str,LVERBOSE);} else { return XHOST_AFLOW_PSEUDOPOTENTIALS_TXT;}} // LOADED TXTS
     if(str=="AFLOW_PSEUDOPOTENTIALS_LIST_TXT") { if(XHOST_AFLOW_PSEUDOPOTENTIALS_LIST_TXT.empty()) { return XHOST_AFLOW_PSEUDOPOTENTIALS_LIST_TXT=init::InitLoadString(str,LVERBOSE);} else { return XHOST_AFLOW_PSEUDOPOTENTIALS_LIST_TXT;}} // LOADED TXTS
     if(str=="f144468a7ccc2d3a72ba44000715efdb") { if(XHOST_f144468a7ccc2d3a72ba44000715efdb.empty()) { return XHOST_f144468a7ccc2d3a72ba44000715efdb=init::InitLoadString(str,LVERBOSE);} else { return XHOST_f144468a7ccc2d3a72ba44000715efdb;}} // LOADED TXTS
-    if(str=="d0f1b0e47f178ae627a388d3bf65d2d2") { if(XHOST_d0f1b0e47f178ae627a388d3bf65d2d2.empty()) { return XHOST_d0f1b0e47f178ae627a388d3bf65d2d2=init::InitLoadString(str,LVERBOSE);} else { return XHOST_d0f1b0e47f178ae627a388d3bf65d2d2;}} // LOADED TXTS
-    if(str=="decf00ca3ad2fe494eea8e543e929068") { if(XHOST_decf00ca3ad2fe494eea8e543e929068.empty()) { return XHOST_decf00ca3ad2fe494eea8e543e929068=init::InitLoadString(str,LVERBOSE);} else { return XHOST_decf00ca3ad2fe494eea8e543e929068;}} // LOADED TXTS
+    // [OBSOLETE] if(str=="d0f1b0e47f178ae627a388d3bf65d2d2") { if(XHOST_d0f1b0e47f178ae627a388d3bf65d2d2.empty()) { return XHOST_d0f1b0e47f178ae627a388d3bf65d2d2=init::InitLoadString(str,LVERBOSE);} else { return XHOST_d0f1b0e47f178ae627a388d3bf65d2d2;}} // LOADED TXTS
+    // [OBSOLETE] if(str=="decf00ca3ad2fe494eea8e543e929068") { if(XHOST_decf00ca3ad2fe494eea8e543e929068.empty()) { return XHOST_decf00ca3ad2fe494eea8e543e929068=init::InitLoadString(str,LVERBOSE);} else { return XHOST_decf00ca3ad2fe494eea8e543e929068;}} // LOADED TXTS
 
     // SEARCH IN AFLOW_DATA AND IF NOT FROM LIBRARIES
     // pure and auro are inside aflow_data
@@ -2730,7 +2743,7 @@ namespace init {
     XHOST.vschema.push_attached("SCHEMA::TYPE:MODULUS_BULK_QHA_300K","number");
     nschema++;
     //AS20200915 END
-    
+
     //AS20201008 BEGIN
     // schema is CAPITAL, content is not necessarily
     XHOST.vschema.push_attached("SCHEMA::NAME:MODULUS_BULK_DERIVATIVE_PRESSURE_QHA_300K","modulus_bulk_derivative_pressure_qha_300K");

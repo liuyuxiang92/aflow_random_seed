@@ -23,6 +23,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: make
+      if: github.event_name == 'push'
       run: make -C src
     - name: make check_full
       if: github.event_name == 'push'
@@ -32,6 +33,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: make
+      if: github.event_name == 'push'
       run: make -C src
     - name: make check_full
       if: github.event_name == 'push'
@@ -41,6 +43,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: make
+      if: github.event_name == 'push'
       run: make -C src
     - name: make check_full
       if: github.event_name == 'push'

@@ -2932,8 +2932,8 @@ namespace pflow {
       vector<string> names(nat,"H");
       vector<int> names_were_given(nat,FALSE);
       str=pflow::SetLat(str,lat_vec[is]);
-      //DX20210118 [Use xstructure method, perhaps others can be changed in the future] str=pflow::SetNumEachType(str,num_each_type);
-      str.SetNumEachType(num_each_type);
+      //DX20210118 [OBSOLETE] str=pflow::SetNumEachType(str,num_each_type);
+      str.num_each_type = num_each_type; //DX20210202 - replace SetNumEachType
       str=pflow::AddAllAtomPos(str,fpos_vec[is],0);
       str=pflow::SetAllAtomNames(str,names);
       str=pflow::SetNamesWereGiven(str,names_were_given);
@@ -3848,89 +3848,12 @@ namespace pflow {
 }
 
 // ***************************************************************************
-// GetRotationMatrix
+// GetRotationMatrix [OBSOLETE - moved to xatom]
 // ***************************************************************************
-// This gets a rotation matrix from 3 angles assumed
-// to represent a rotation around x, then y, then z.
-// Angles are assumed to be in radians.
-namespace pflow {
-  aurostd::matrix<double> GetRotationMatrix(const vector<double>& angles) {  //CO20200404 pflow::matrix()->aurostd::matrix()
-    // Sin and cos.
-    vector<double> sn(3,0.0);
-    vector<double> cs(3,0.0);
-    for(int ic=0;ic<3;ic++) {
-      sn[ic]=sin(angles[ic]);
-      cs[ic]=cos(angles[ic]);
-    }
-    // Set rotation matrix (do x, then y, then z rotation).
-    aurostd::matrix<double> xm(3,3);pflow::VVset(xm,0.0);  //CO20200404 pflow::matrix()->aurostd::matrix()
-    aurostd::matrix<double> ym(3,3);pflow::VVset(ym,0.0);  //CO20200404 pflow::matrix()->aurostd::matrix()
-    aurostd::matrix<double> zm(3,3);pflow::VVset(zm,0.0);  //CO20200404 pflow::matrix()->aurostd::matrix()
-
-    xm[0][0]=1;
-    xm[1][1]=cs[0];
-    xm[1][2]=-sn[0];
-    xm[2][1]=sn[0];
-    xm[2][2]=cs[0];
-
-    ym[0][0]=cs[1];
-    ym[0][2]=sn[1];
-    ym[1][1]=1;
-    ym[2][0]=-sn[1];
-    ym[2][2]=cs[1];
-
-    zm[0][0]=cs[2];
-    zm[0][1]=-sn[2];
-    zm[1][0]=sn[2];
-    zm[1][1]=cs[2];
-    zm[2][2]=1;
-
-    aurostd::matrix<double> rm;  //CO20200404 pflow::matrix()->aurostd::matrix()
-    rm=pflow::MMmult(zm,pflow::MMmult(ym,xm));
-    return rm;
-  }
-}
 
 // ***************************************************************************
-// RotateStrVec
+// RotateStrVec //DX20210127 [OBSOLETE - moved to xatom]
 // ***************************************************************************
-// This rotates each structure in the vstr.
-// The rotation goes from an initial to a final set of angles
-// in steps of the primitive rotation.
-// The primitive rotation is the rotation around x, y, then z
-// by the amount of change given in rot divided by the number
-// of structures - 1.  All frames are initially rotated
-// according to the initial rotation angles.  The rotation is
-// then done as one primitive rotation per frame.
-namespace pflow {
-  void RotateStrVec(vector<xstructure>& vstr, const vector<double>& rot) {
-    // Get initial rotation matrix.
-    vector<double> angles(3);
-    for(int ic=0;ic<3;ic++) {
-      angles[ic]=rot[2*ic];
-      angles[ic]=angles[ic]*TWOPI/360.0;
-    }
-    aurostd::matrix<double> irm=GetRotationMatrix(angles); //CO20200404 pflow::matrix()->aurostd::matrix()
-
-    // get primitive rotation matrix.
-    int s=vstr.size()-1;
-    if(s<1) s=1;
-    for(int ic=0;ic<3;ic++) {
-      angles[ic]=(rot[2*ic+1]-rot[2*ic])/(s);
-      angles[ic]=angles[ic]*TWOPI/360.0;
-    }
-    aurostd::matrix<double> prm=GetRotationMatrix(angles); //CO20200404 pflow::matrix()->aurostd::matrix()
-    aurostd::matrix<double> rm=irm;  //CO20200404 pflow::matrix()->aurostd::matrix()
-    xmatrix<double> xprm(3,3); xprm=aurostd::matrix2xmatrix(prm);  //CO20200404 pflow::matrix()->aurostd::matrix()
-    xmatrix<double> xrm(3,3);  xrm=aurostd::matrix2xmatrix(rm);  //CO20200404 pflow::matrix()->aurostd::matrix()
-    for(int is=0;is<(int)vstr.size();is++) {
-      //    xrm=aurostd::matrix2xmatrix(rm); //CO20200404 pflow::matrix()->aurostd::matrix()
-      //   vstr[is]=Rotate(vstr[is],xrm);
-      vstr[is]=Rotate(vstr[is],aurostd::matrix2xmatrix(rm)); //CO20200404 pflow::matrix()->aurostd::matrix()
-      rm=pflow::MMmult(prm,rm);
-    }
-  }
-}
 
 // ***************************************************************************
 // PROJDATA PROJDATA PROJDATA PROJDATA PROJDATA PROJDATA PROJDATA PROJDATA PRO
@@ -7428,16 +7351,16 @@ namespace pflow{
 }
 
 // ***************************************************************************
-// pflow::realElements()
+// pflow::hasRealElements()
 // ***************************************************************************
 namespace pflow{
-  bool realElements(const xstructure& xstr){
+  bool hasRealElements(const xstructure& xstr){
 
     // Determine if elements in the xstructure are real/physical.
     // Uses xelement
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string function_name = XPID + "pflow::realElements():";
+    string function_name = XPID + "pflow::hasRealElements():";
     stringstream message;
 
     if(xstr.species.size() > 0){

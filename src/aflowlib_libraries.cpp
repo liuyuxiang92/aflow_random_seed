@@ -1492,7 +1492,7 @@ namespace aflowlib {
           if (files[i].find("qha")!=string::npos &&
               files[i].find(".png")!=string::npos){
             aurostd::LinkFile(directory_RAW+"/"+files[i],directory_WEB);
-           }
+          }
         }
       }
     }
@@ -4067,8 +4067,8 @@ namespace aflowlib {
             data.reciprocal_lattice_variation_type_orig=vpflow_edata_orig.getattachedscheme("EDATA::RECIPROCAL_LATTICE_VARIATION_TYPE"); 
           }
           //DX20190131 - use self-consistent space group orig - START
-          if(data.spacegroup_orig.empty()) {
-            data.spacegroup_orig=vpflow_edata_orig.getattachedscheme("SGDATA::SPACE_GROUP_NUMBER");
+          if(data.spacegroup_orig==AUROSTD_NAN) { //CO20201111
+            data.spacegroup_orig=vpflow_edata_orig.getattachedutype<uint>("SGDATA::SPACE_GROUP_NUMBER");  //CO20201111
             if(AFLOWLIB_VERBOSE) cout << MESSAGE << " SPACEGROUP_ORIG = " << data.spacegroup_orig << endl;
           } 
           //DX20190131 - use self-consistent space group orig - END
@@ -4383,8 +4383,8 @@ namespace aflowlib {
             data.reciprocal_lattice_variation_type=vpflow_edata_relax.getattachedscheme("EDATA::RECIPROCAL_LATTICE_VARIATION_TYPE"); 
           }
           //DX20190131 - use self-consistent space group relax - START
-          if(data.spacegroup_relax.empty()) {
-            data.spacegroup_relax=vpflow_edata_relax.getattachedscheme("SGDATA::SPACE_GROUP_NUMBER");
+          if(data.spacegroup_relax==AUROSTD_NAN) {  //CO20201111
+            data.spacegroup_relax=vpflow_edata_relax.getattachedutype<uint>("SGDATA::SPACE_GROUP_NUMBER");  //CO20201111
             if(AFLOWLIB_VERBOSE) cout << MESSAGE << " SPACEGROUP_RELAX = " << data.spacegroup_relax << endl;
           } 
           //DX20190131 - use self-consistent space group orig - END
@@ -4626,8 +4626,8 @@ namespace aflowlib {
             data.reciprocal_lattice_variation_type=vpflow_edata_bands.getattachedscheme("EDATA::RECIPROCAL_LATTICE_VARIATION_TYPE"); 
           }
           //DX20190131 - use self-consistent space group relax - START
-          if(data.spacegroup_relax.empty()) {
-            data.spacegroup_relax=vpflow_edata_bands.getattachedscheme("SGDATA::SPACE_GROUP_NUMBER");
+          if(data.spacegroup_relax==AUROSTD_NAN) {  //CO20201111
+            data.spacegroup_relax=vpflow_edata_bands.getattachedutype<uint>("SGDATA::SPACE_GROUP_NUMBER");  //CO20201111
             if(AFLOWLIB_VERBOSE) cout << MESSAGE << " SPACEGROUP_RELAX = " << data.spacegroup_relax << endl;
           } 
           //DX20190131 - use self-consistent space group orig - END
@@ -6349,9 +6349,11 @@ namespace aflowlib {
     for(uint iremdirname=0;iremdirname<vremdirname.size();iremdirname++) {
       for(uint irelax=0;irelax<vrelax.size();irelax++) {
         for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed
-          dir=aurostd::RemoveSubString(dir,"/"+vremdirname.at(iremdirname)+vrelax.at(irelax)+XHOST.vext.at(iext));
+          dir=aurostd::RemoveSubString(dir,"/"+vremdirname[iremdirname]+vrelax[irelax]+XHOST.vext[iext]);
+
         }
-        dir=aurostd::RemoveSubString(dir,"/"+vremdirname.at(iremdirname)+vrelax.at(irelax));
+        dir=aurostd::RemoveSubString(dir,"/"+vremdirname[iremdirname]+vrelax[irelax]);
+
       }
       dir=aurostd::RemoveSubString(dir,"/"+vremdirname.at(iremdirname));
     }
@@ -6392,9 +6394,9 @@ namespace aflowlib {
     if(ok) { obb << ".";if(aurostd::FileExist(dir+"/OSZICAR")) { ok=FALSE;obb << " yes=OSZICAR"; }}
     if(ok) { obb << ".";if(aurostd::FileExist(dir+"/POTCAR")) { ok=FALSE;obb << " yes=POTCAR"; }}
     for(uint irelax=0;irelax<vrelax.size();irelax++) {
-      if(ok) { obb << ".";if(aurostd::FileExist(dir+"/OUTCAR"+vrelax.at(irelax))) { ok=FALSE;obb << " yes=OUTCAR"+vrelax.at(irelax); }}
-      if(ok) { obb << ".";if(aurostd::FileExist(dir+"/OSZICAR"+vrelax.at(irelax))) { ok=FALSE;obb << " yes=OSZICAR"+vrelax.at(irelax); }}
-      if(ok) { obb << ".";if(aurostd::FileExist(dir+"/POTCAR"+vrelax.at(irelax))) { ok=FALSE;obb << " yes=POTCAR"+vrelax.at(irelax); }}
+      if(ok) { obb << ".";if(aurostd::FileExist(dir+"/OUTCAR"+vrelax[irelax])) { ok=FALSE;obb << " yes=OUTCAR"+vrelax[irelax]; }}
+      if(ok) { obb << ".";if(aurostd::FileExist(dir+"/OSZICAR"+vrelax[irelax])) { ok=FALSE;obb << " yes=OSZICAR"+vrelax[irelax]; }}
+      if(ok) { obb << ".";if(aurostd::FileExist(dir+"/POTCAR"+vrelax[irelax])) { ok=FALSE;obb << " yes=POTCAR"+vrelax[irelax]; }}
     }
     // TEST COMPRESS
     if(ok) { obb << "z";  // check all the outputs
@@ -6403,58 +6405,87 @@ namespace aflowlib {
       if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/aflow.iatoms.out")) { ok=FALSE;obb << " no=aflow.iatoms.out" << ".EXT"; }}
       if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/aflow.pgroup.out")) { ok=FALSE;obb << " no=aflow.pgroup.out" << ".EXT"; }}
       if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/aflow.pgroup_xtal.out")) { ok=FALSE;obb << " no=aflow.pgroup_xtal.out" << ".EXT"; }}
-      if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/aflow.pseudopotential_auid.out")) { ok=FALSE;obb << " no=aflow.pseudopotential_auid.out" << ".EXT"; }}
+      //[CO20210126 - LIB2RAW_Loop_PATCH() fixes this]if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/aflow.pseudopotential_auid.out")) { ok=FALSE;obb << " no=aflow.pseudopotential_auid.out" << ".EXT"; }}
       if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/aflow.qmvasp.out")) { ok=FALSE;obb << " no=aflow.qmvasp.out" << ".EXT"; }}
       if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/INCAR.orig")) { ok=FALSE;obb << " no=INCAR.orig" << ".EXT"; }}
       //[CO20201111 - not needed]if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/POSCAR.orig")) { ok=FALSE;obb << " no=POSCAR.orig" << ".EXT"; }}
     }
     // TEST RELAX1 RELAX2 RELAX3
     for(uint irelax=0;irelax<vrelax.size();irelax++) {
-      if(ok && aurostd::EFileExist(dir+"/OUTCAR"+vrelax.at(irelax))) { // relax1 relax2 relax3
-        if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/OUTCAR"+vrelax.at(irelax))) { ok=FALSE;print=FALSE;obb << " no=OUTCAR"+vrelax.at(irelax)+".EXT"; }}
-        if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/OSZICAR"+vrelax.at(irelax))) { ok=FALSE;obb << " no=OSZICAR"+vrelax.at(irelax)+".EXT"; }}
-        if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/vasp.out"+vrelax.at(irelax))) { ok=FALSE;obb << " no=vasp.out"+vrelax.at(irelax)+".EXT"; }}
-        if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/INCAR"+vrelax.at(irelax))) { ok=FALSE;obb << " no=INCAR"+vrelax.at(irelax)+".EXT"; }}
-        //      if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/EIGENVAL"+vrelax.at(irelax))) { ok=FALSE;obb << " no=EIGENVAL"+vrelax.at(irelax)+".EXT"; }}
-        if(vrelax.at(irelax)==".static")
-          if(ok) { obb << "d"; if(!aurostd::EFileExist(dir+"/DOSCAR"+vrelax.at(irelax))) { ok=FALSE;obb << " no=DOSCAR"+vrelax.at(irelax)+".EXT"; }}
-        // "OUTCAR"+vrelax.at(irelax)+".EXT"  //CO20200106 - patching for auto-indenting (quotes)
+      if(ok && aurostd::EFileExist(dir+"/OUTCAR"+vrelax[irelax])) { // relax1 relax2 relax3
+        if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/OUTCAR"+vrelax[irelax])) { ok=FALSE;print=FALSE;obb << " no=OUTCAR"+vrelax[irelax]+".EXT"; }}
+        if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/OSZICAR"+vrelax[irelax])) { ok=FALSE;obb << " no=OSZICAR"+vrelax[irelax]+".EXT"; }}
+        if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/vasp.out"+vrelax[irelax])) { ok=FALSE;obb << " no=vasp.out"+vrelax[irelax]+".EXT"; }}
+        if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/INCAR"+vrelax[irelax])) { ok=FALSE;obb << " no=INCAR"+vrelax[irelax]+".EXT"; }}
+        //      if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/EIGENVAL"+vrelax[irelax])) { ok=FALSE;obb << " no=EIGENVAL"+vrelax[irelax]+".EXT"; }}
+        if(vrelax[irelax]==".static")
+          if(ok) { obb << "d"; if(!aurostd::EFileExist(dir+"/DOSCAR"+vrelax[irelax])) { ok=FALSE;obb << " no=DOSCAR"+vrelax[irelax]+".EXT"; }}
+        // "OUTCAR"+vrelax[irelax]+".EXT"  //CO20200106 - patching for auto-indenting (quotes)
         obb << ".";
         if(ok) { obb << "o";  // check Answer 4 or 5 in OUTCAR.RELAX.EXT
           for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed
-            if(aurostd::FileExist(dir+"/OUTCAR"+vrelax.at(irelax)+XHOST.vext.at(iext))) {
-              answer=aurostd::execute2utype<int>(XHOST.vcat.at(iext)+" \""+dir+"/OUTCAR"+vrelax.at(irelax)+XHOST.vext.at(iext)+"\" | grep -c \"(sec)\" ");
-              if(answer==0){answer=aurostd::execute2utype<int>(XHOST.vcat.at(iext)+" \""+dir+"/OUTCAR"+vrelax.at(irelax)+XHOST.vext.at(iext)+"\" | grep -c \"(sec)\" ");} //CO20200501 - soft patch, this could STILL break if xcat does NOT load anything
-              if(answer!=4 && answer!=5) { ok=FALSE;obb << ". error(" << answer << ")=OUTCAR"+vrelax.at(irelax)+".EXT"; }}
+            if(aurostd::FileExist(dir+"/OUTCAR"+vrelax[irelax]+XHOST.vext[iext])) {
+              answer=aurostd::execute2utype<int>(XHOST.vcat[iext]+" \""+dir+"/OUTCAR"+vrelax[irelax]+XHOST.vext[iext]+"\" | grep -c \"(sec)\" ");
+              if(answer==0){answer=aurostd::execute2utype<int>(XHOST.vcat[iext]+" \""+dir+"/OUTCAR"+vrelax[irelax]+XHOST.vext[iext]+"\" | grep -c \"(sec)\" ");} //CO20200501 - soft patch, this could STILL break if xcat does NOT load anything
+              if(answer!=4 && answer!=5) { ok=FALSE;obb << ". error(" << answer << ")=OUTCAR"+vrelax[irelax]+".EXT"; }}
           }
         }
         obb << ".";
         if(ok) { obb << "v"; // TEST VASP.OUT
           for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed
-            if(aurostd::FileExist(dir+"/vasp.out"+vrelax.at(irelax)+XHOST.vext.at(iext))) {
-              answer=aurostd::execute2utype<int>(XHOST.vcat.at(iext)+" \""+dir+"/vasp.out"+vrelax.at(irelax)+XHOST.vext.at(iext)+"\" | grep -c \"The distance between some ions is very small\" ");
-              if(answer!=0) { ok=FALSE;obb << ". ions=vasp.out"+vrelax.at(irelax)+".EXT"; }}
+            if(aurostd::FileExist(dir+"/vasp.out"+vrelax[irelax]+XHOST.vext[iext])) {
+              answer=aurostd::execute2utype<int>(XHOST.vcat[iext]+" \""+dir+"/vasp.out"+vrelax[irelax]+XHOST.vext[iext]+"\" | grep -c \"The distance between some ions is very small\" ");
+              if(answer!=0) { ok=FALSE;obb << ". ions=vasp.out"+vrelax[irelax]+".EXT"; }}
           }
         }
         obb << ".";
       }
       if(ok) {// obb << "b"; // TEST "+vbroken.at(ibroken)+"
         for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed
-          if(aurostd::FileExist(dir+"/OUTCAR"+vrelax.at(irelax)+XHOST.vext.at(iext))) {
-            //	    cerr << soliloquy << " " << string("ls "+dir+"/*"+vrelax.at(irelax)+XHOST.vext.at(iext)) << endl;
-            aurostd::string2dequestring(aurostd::execute2string("ls "+dir+"/*"+vrelax.at(irelax)+XHOST.vext.at(iext)),vbroken);
+          if(aurostd::FileExist(dir+"/OUTCAR"+vrelax[irelax]+XHOST.vext[iext])) {
+            //	    cerr << soliloquy << " " << string("ls "+dir+"/*"+vrelax[irelax]+XHOST.vext[iext]) << endl;
+            aurostd::string2dequestring(aurostd::execute2string("ls "+dir+"/*"+vrelax[irelax]+XHOST.vext[iext]),vbroken);
             for(uint ibroken=0;ibroken<vbroken.size();ibroken++) {
               //      cerr << soliloquy << " " << "[" << vbroken.at(ibroken) << "]" << endl;
               if(ok && aurostd::FileExist(vbroken.at(ibroken))) {
                 obb << "b";
-                //		answer=aurostd::execute2utype<int>(XHOST.vcat.at(iext)+" \""+dir+"/"+vbroken.at(ibroken)+"\" 2>&1 | grep -c \"Unexpected end of input\" ");
-                answer=aurostd::execute2utype<int>(XHOST.vcat.at(iext)+" \""+vbroken.at(ibroken)+"\" 2>&1 | grep -c \"Unexpected end of input\" ");
+                //		answer=aurostd::execute2utype<int>(XHOST.vcat[iext]+" \""+dir+"/"+vbroken.at(ibroken)+"\" 2>&1 | grep -c \"Unexpected end of input\" ");
+                answer=aurostd::execute2utype<int>(XHOST.vcat[iext]+" \""+vbroken.at(ibroken)+"\" 2>&1 | grep -c \"Unexpected end of input\" ");
                 if(answer!=0) { ok=FALSE;obb << ". Broken_file="+vbroken.at(ibroken)+".EXT"; }}
             }
           }
         } 
       }
     }
+    //CO20201220 START - look for stress tensor
+    bool check_stensor=true;
+    if(dir.find("ARUN.AEL")!=string::npos||dir.find("ARUN.AGL")!=string::npos){check_stensor=false;}  //do not check stensor for AEL_AGL calculations
+    if(ok && check_stensor) {
+      bool found=false;
+      deque<string> vtokens;
+      deque<double> stensor;
+      for(uint irelax=vrelax.size()-1;irelax<vrelax.size()&&!found;irelax--) {  //go backwards
+        if(vrelax[irelax].find("relax")==string::npos){continue;}
+        for(uint iext=1;iext<XHOST.vext.size()&&!found;iext++) { // SKIP uncompressed
+          if(aurostd::FileExist(dir+"/OUTCAR"+vrelax[irelax]+XHOST.vext[iext])) {
+            found=true;
+            if(LDEBUG){cerr << soliloquy << " looking at most relaxed OUTCAR=" << "OUTCAR"+vrelax[irelax]+XHOST.vext[iext] << endl;}
+            aurostd::string2tokens(aurostd::execute2string(XHOST.vcat[iext]+" \""+dir+"/OUTCAR"+vrelax[irelax]+XHOST.vext[iext]+"\" | grep 'in kB' | tail -1"),vtokens," ");
+            if(vtokens.size()==0){ ok=FALSE;obb << ". error(no stress tensor found)=OUTCAR"+vrelax[irelax]+".EXT";continue; }
+            for(uint i=0;i<vtokens.size();i++){
+              if(aurostd::isfloat(vtokens[i])){stensor.push_back(aurostd::string2utype<double>(vtokens[i]));}
+            }
+            if(LDEBUG){cerr << soliloquy << " stensor=" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(stensor,6),",") << endl;}
+            if(stensor.size()!=6){ ok=FALSE;obb << ". error(stress_tensor.size()==" << stensor.size() << ")=OUTCAR"+vrelax[irelax]+".EXT";continue; }
+            for(uint i=0;i<stensor.size();i++){
+              if(abs(stensor[i])>10){ ok=FALSE;obb << ". error(abs(stress_tensor[i=" << i << "])==" << abs(stensor[i]) << ">10kB)=OUTCAR"+vrelax[irelax]+".EXT";continue; }
+            }
+          }
+        }
+      }
+    }
+    //CO20201220 STOP - look for stress tensor
+
     // DONE
     if(ok==TRUE) obb << " good";
     if(ok==FALSE) obb << " bad";
@@ -6470,12 +6501,15 @@ namespace aflowlib {
     vector<string> dir_tokens;
     aurostd::string2tokens(dir,dir_tokens,"/");
     string run_directory = dir_tokens[dir_tokens.size()-1];
-    string sub_directory = dir+"/"+run_directory;
-    if(aurostd::FileExist(sub_directory)) {
-      obb << "This directory contains an identical subdirectory (subdir=" << sub_directory << "). Removing subdirectory." << endl;
-      oss << obb.str();
-      oss.flush();
-      aurostd::RemoveDirectory(sub_directory);
+    string sub_directory = aurostd::CleanFileName(dir+"/"+run_directory); //CO20201220
+    aurostd::StringSubst(sub_directory,"./","");  //CO20201220
+    if(!sub_directory.empty()&&sub_directory!="."){ //CO20201220
+      if(aurostd::FileExist(sub_directory)) {
+        obb << "This directory contains an identical subdirectory (subdir=" << sub_directory << "). Removing subdirectory." << endl;
+        oss << obb.str();
+        oss.flush();
+        aurostd::RemoveDirectory(sub_directory);
+      }
     }
     //DX+CO20191030 - check for identical subdirectories - END
 
@@ -7099,6 +7133,295 @@ namespace aflowlib {
     return TRUE;
   }
 }
+
+//////////////////////////////////////////////////////////////////////////////////////
+//CO20201111
+#define _DEBUG_STOICH_FEATURES_ false
+namespace aflowlib {
+  void insertStoichStats(const vector<string> vstats,const xvector<double>& nspecies_xv,const xvector<double>& stoich_xv,vector<double>& vfeatures){
+    bool LDEBUG=(FALSE || _DEBUG_STOICH_FEATURES_ || XHOST.DEBUG);
+    string soliloquy=XPID+"aflowlib::insertStoichStats():";
+
+    uint k=0,l=0;
+    int index=0;
+    double d_tmp;
+    vector<uint> vi_tmp;
+
+    //check for NNN or AUROSTD_NAN
+    bool has_NaN=false;
+    for(index=nspecies_xv.lrows;index<=nspecies_xv.urows&&!has_NaN;index++){
+      if(aurostd::isNaN(nspecies_xv[index])){has_NaN=true;}
+    }
+
+    if(LDEBUG){cerr << soliloquy << " nspecies_xv=" << nspecies_xv << endl;}
+    for(k=0;k<vstats.size();k++){
+      if(vstats[k]=="min"){if(has_NaN){vfeatures.push_back(NNN);continue;} vfeatures.push_back( aurostd::min(nspecies_xv) );}
+      else if(vstats[k]=="max"){if(has_NaN){vfeatures.push_back(NNN);continue;} vfeatures.push_back( aurostd::max(nspecies_xv) );}
+      else if(vstats[k]=="range"){if(has_NaN){vfeatures.push_back(NNN);continue;} vfeatures.push_back( aurostd::max(nspecies_xv) - aurostd::min(nspecies_xv) );}
+      else if(vstats[k]=="mean"){if(has_NaN){vfeatures.push_back(NNN);continue;} vfeatures.push_back( aurostd::scalar_product(stoich_xv,nspecies_xv) );}
+      else if(vstats[k]=="dev"){
+        if(has_NaN){vfeatures.push_back(NNN);continue;}
+        d_tmp=aurostd::scalar_product(stoich_xv,nspecies_xv);  //mean
+        vfeatures.push_back( aurostd::scalar_product(stoich_xv,aurostd::abs(nspecies_xv-d_tmp)) );
+      }
+      else if(vstats[k]=="mode"){ //property of most promiment species
+        if(has_NaN){vfeatures.push_back(NNN);continue;}
+        d_tmp=aurostd::max(stoich_xv);  //stoich_max
+        vi_tmp.clear();
+        for(index=stoich_xv.lrows;index<=stoich_xv.urows;index++){
+          if(aurostd::isequal(stoich_xv[index],d_tmp)){vi_tmp.push_back(index);}
+        }
+        if(vi_tmp.size()==1){vfeatures.push_back( nspecies_xv[vi_tmp[0]] );}  //easy case
+        else{
+          //take average
+          d_tmp=0;
+          for(l=0;l<vi_tmp.size();l++){d_tmp+=nspecies_xv[vi_tmp[l]];}
+          d_tmp/=(double)vi_tmp.size();
+          vfeatures.push_back( d_tmp );
+        }
+      }
+      else{throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown statistic type: "+vstats[k],_RUNTIME_ERROR_);}
+    }
+  }
+
+  void _aflowlib_entry::getStoichFeatures(vector<string>& vheaders,const string& e_props){
+    vector<double> vfeatures; //dummy
+    return getStoichFeatures(vheaders,vfeatures,true,e_props);
+  }
+  void _aflowlib_entry::getStoichFeatures(vector<string>& vheaders,vector<double>& vfeatures,bool vheaders_only,const string& e_props){
+    //follows supplementary of 10.1038/npjcompumats.2016.28
+    bool LDEBUG=(FALSE || _DEBUG_STOICH_FEATURES_ || XHOST.DEBUG);
+    string soliloquy=XPID+"_aflowlib_entry::getStoichFeatures():";
+    vheaders.clear();vfeatures.clear();
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //headers
+    stringstream tmp_ss;
+    xelement::xelement xel;
+    vector<xelement::xelement> vxel;
+    uint i=0,j=0,k=0;
+
+    //L^p norms
+    vector<uint> vp;
+    aurostd::string2tokens("0,2,3,4,5,6,7,8,9,10",vp,",");
+    for(i=0;i<vp.size();i++){
+      aurostd::StringstreamClean(tmp_ss);
+      tmp_ss << "stoich_norm_p_" << std::setfill('0') << std::setw(2) << vp[i];
+      vheaders.push_back(tmp_ss.str());
+    }
+
+    //element-property-based
+    //get which properties to average
+    xel.populate(1);  //dummy to get properties
+    vector<string> vproperties_full,vproperties;
+    vector<string> vstats;
+    aurostd::string2tokens(e_props,vproperties_full,",");
+    aurostd::string2tokens("min,max,range,mean,dev,mode",vstats,",");
+    //load up vheaders
+    for(i=0;i<vproperties_full.size();i++){
+      if(vproperties_full[i]=="oxidation_states"){continue;} //skip this
+      if(xel.getType(vproperties_full[i])=="number"||xel.getType(vproperties_full[i])=="numbers"){
+        vproperties.push_back(vproperties_full[i]);
+
+        if(xel.getType(vproperties.back())=="number"){
+          if(LDEBUG){cerr << soliloquy << " " << vproperties.back() << " is a number" << endl;}
+          for(j=0;j<vstats.size();j++){vheaders.push_back(vproperties.back()+"_stoich_"+vstats[j]);}
+        }
+        else if(xel.getType(vproperties.back())=="numbers"){
+          if(LDEBUG){cerr << soliloquy << " " << vproperties.back() << " are numbers" << endl;}
+          if(vproperties.back()=="lattice_constants"){
+            for(j=0;j<vstats.size();j++){vheaders.push_back(vproperties.back()+"_a_stoich_"+vstats[j]);}
+            for(j=0;j<vstats.size();j++){vheaders.push_back(vproperties.back()+"_b_stoich_"+vstats[j]);}
+            for(j=0;j<vstats.size();j++){vheaders.push_back(vproperties.back()+"_c_stoich_"+vstats[j]);}
+          }
+          else if(vproperties.back()=="lattice_angles"){
+            for(j=0;j<vstats.size();j++){vheaders.push_back(vproperties.back()+"_alpha_stoich_"+vstats[j]);}
+            for(j=0;j<vstats.size();j++){vheaders.push_back(vproperties.back()+"_beta_stoich_"+vstats[j]);}
+            for(j=0;j<vstats.size();j++){vheaders.push_back(vproperties.back()+"_gamma_stoich_"+vstats[j]);}
+          }
+          else if(vproperties.back()=="oxidation_states_preferred"){
+            for(j=0;j<vstats.size();j++){
+              vheaders.push_back(vproperties.back()+"_stoich_"+vstats[j]);  //only use 0th oxidation_state_preferred
+            }
+          }
+          else if(vproperties.back()=="energies_ionization"){
+            for(k=0;k<_ENERGIES_IONIZATION_MAX_AFLOWMACHL_;k++){
+              for(j=0;j<vstats.size();j++){vheaders.push_back(vproperties.back()+"_"+aurostd::utype2string(k+1)+"_stoich_"+vstats[j]);}
+            }
+            //for(j=0;j<vstats.size();j++){vheaders.push_back(vproperties.back()+"_2_stoich_"+vstats[j]);}
+            //for(j=0;j<vstats.size();j++){vheaders.push_back(vproperties.back()+"_3_stoich_"+vstats[j]);}
+            //for(j=0;j<vstats.size();j++){vheaders.push_back(vproperties.back()+"_4_stoich_"+vstats[j]);}
+            //for(j=0;j<vstats.size();j++){vheaders.push_back(vproperties.back()+"_5_stoich_"+vstats[j]);}
+          }
+          else{throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown numbers type: "+vproperties.back(),_RUNTIME_ERROR_);}
+        }
+      }
+    }
+
+    //valence (un)occupation
+    vector<string> vorbitals;
+    aurostd::string2tokens("s,p,d,f",vorbitals,",");
+    for(i=0;i<vorbitals.size();i++){
+      vheaders.push_back("valence_fraction_occupied_"+vorbitals[i]);
+      vheaders.push_back("valence_fraction_unoccupied_"+vorbitals[i]);
+    }
+
+    //ionic character
+    vheaders.push_back("formability_ionic");
+    vector<string> vEN;
+    for(i=0;i<vproperties.size();i++){
+      if(vproperties[i].find("electronegativity")!=string::npos && xel.getUnits(vproperties[i]).empty()){ //must have NO units (goes in exp)
+        vEN.push_back(vproperties[i]);
+      }
+    }
+    for(i=0;i<vEN.size();i++){
+      vheaders.push_back("character_ionic_"+vEN[i]+"_max");
+      vheaders.push_back("character_ionic_"+vEN[i]+"_mean");
+    }
+
+    if(LDEBUG){
+      for(i=0;i<vheaders.size();i++){cerr << soliloquy << " vheaders[i=" << i << "]=\"" << vheaders[i] << "\"" << endl;}
+    }
+
+    if(vheaders_only) return;
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //features
+
+    uint nspecies=vspecies.size();
+    if(nspecies==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"nspecies==0",_RUNTIME_ERROR_);}
+    xvector<double> nspecies_xv(nspecies);
+
+    //L^p norms
+    xvector<double> stoich_xv(nspecies);
+    for(j=0;j<nspecies;j++){stoich_xv[stoich_xv.lrows+j]=vcomposition[j]/natoms;}
+    if(LDEBUG){cerr << soliloquy << " stoich_xv=" << stoich_xv << endl;}
+    for(i=0;i<vp.size();i++){
+      for(j=0;j<nspecies;j++){
+        nspecies_xv[nspecies_xv.lrows+j]=std::pow(stoich_xv[stoich_xv.lrows+j],(double)vp[i]);
+      }
+      if(LDEBUG){cerr << soliloquy << " nspecies_xv[\"stoich_norm_p_"+aurostd::utype2string(vp[i])+"\"]=" << nspecies_xv << endl;}
+      vfeatures.push_back( std::pow(sum(nspecies_xv),(vp[i]==0?1.0:1.0/vp[i])) );
+    }
+
+    //element-property-based
+    //load up vxel
+    int index=0,index_min=0,index_max=0;
+    for(j=0;j<nspecies;j++){
+      vxel.push_back(xelement::xelement(vspecies[j]));
+    }
+    for(i=0;i<vproperties.size();i++){
+      if(xel.getType(vproperties[i])=="number"){
+        for(j=0;j<nspecies;j++){
+          nspecies_xv[nspecies_xv.lrows+j]=vxel[j].getPropertyDouble(vproperties[i]);
+        }
+        if(LDEBUG){cerr << soliloquy << " nspecies_xv[\""+vproperties[i]+"\"]=" << nspecies_xv << endl;}
+        insertStoichStats(vstats,nspecies_xv,stoich_xv,vfeatures);
+      }
+      if(xel.getType(vproperties[i])=="numbers"){
+        if(vproperties[i]=="lattice_constants"||vproperties[i]=="lattice_angles"){
+          index_min=1;index_max=3;
+          for(index=index_min;index<=index_max;index++){
+            for(j=0;j<nspecies;j++){
+              const xvector<double>& xvec=vxel[j].getPropertyXVectorDouble(vproperties[i]);
+              nspecies_xv[nspecies_xv.lrows+j]=xvec[index];
+            }
+            if(LDEBUG){cerr << soliloquy << " nspecies_xv[\""+vproperties[i]+"_index_"+aurostd::utype2string(index)+"\"]=" << nspecies_xv << endl;}
+            insertStoichStats(vstats,nspecies_xv,stoich_xv,vfeatures);
+          }
+        }
+        else if(vproperties[i]=="oxidation_states_preferred"||vproperties[i]=="energies_ionization"){
+          if(vproperties[i]=="oxidation_states_preferred"){index_min=0;index_max=0;}
+          else if(vproperties[i]=="energies_ionization"){index_min=0;index_max=_ENERGIES_IONIZATION_MAX_AFLOWMACHL_-1;}
+          else{throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown numbers property (vector): "+vproperties[i],_RUNTIME_ERROR_);}
+          for(index=index_min;index<=index_max;index++){
+            for(j=0;j<nspecies;j++){
+              const vector<double>& vec=vxel[j].getPropertyVectorDouble(vproperties[i]);
+              nspecies_xv[nspecies_xv.lrows+j]=(index<(int)vec.size()?vec[index]:NNN);
+            }
+            if(LDEBUG){cerr << soliloquy << " nspecies_xv[\""+vproperties[i]+"_index="+aurostd::utype2string(index)+"\"]=" << nspecies_xv << endl;}
+            insertStoichStats(vstats,nspecies_xv,stoich_xv,vfeatures);
+          }
+        }
+        else{throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown numbers property: "+vproperties[i],_RUNTIME_ERROR_);}
+      }
+    }
+
+    //valence (un)occupation
+    for(j=0;j<nspecies;j++){nspecies_xv[nspecies_xv.lrows+j]=vxel[j].getPropertyDouble("valence_std");}
+    double denom=aurostd::scalar_product(stoich_xv,nspecies_xv); //same for all quantities
+    vector<double> vval_total;
+    aurostd::string2tokens("2,6,10,14",vval_total,",");
+    for(i=0;i<vorbitals.size();i++){
+      for(j=0;j<nspecies;j++){nspecies_xv[nspecies_xv.lrows+j]=vxel[j].getPropertyDouble("valence_"+vorbitals[i]);}  //populate with orbital occupation
+      vfeatures.push_back( aurostd::scalar_product(stoich_xv,nspecies_xv)/denom );  //occupied
+      for(j=0;j<nspecies;j++){nspecies_xv[nspecies_xv.lrows+j]=vval_total[i]-nspecies_xv[nspecies_xv.lrows+j];} //has occupied inside already
+      vfeatures.push_back( aurostd::scalar_product(stoich_xv,nspecies_xv)/denom );  //unoccupied
+    }
+
+    //ionic character
+    //ionic formability
+    bool formability_ionic=false;
+    bool has_NaN=false;
+    vector<int> nspecies_v;
+    aurostd::xcombos xc;
+    for(j=0;j<nspecies&&!has_NaN;j++){
+      const vector<double>& oxidation_states=vxel[j].getPropertyVectorDouble("oxidation_states");
+      if(oxidation_states.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No oxidation states found for element: "+vxel[j].symbol,_RUNTIME_ERROR_);}  //should have NNN
+      if(oxidation_states.size()==1 && aurostd::isNaN(oxidation_states[0])){has_NaN=true;}
+      nspecies_v.push_back((int)oxidation_states.size());
+    }
+    if(has_NaN){cerr << soliloquy << " has NaN" << endl;}
+    if(!has_NaN){
+      xvector<double> natoms_xv(natoms);
+      if(LDEBUG){cerr << soliloquy << " oxidation_states_count=" << aurostd::joinWDelimiter(nspecies_v,",") << endl;}
+      xc.reset(nspecies_v,'E');
+      while(xc.increment()&&!formability_ionic){
+        const vector<int>& indices=xc.getCombo();
+        if(LDEBUG){cerr << soliloquy << " indices=" << aurostd::joinWDelimiter(indices,",") << endl;}
+        i=0;
+        for(j=0;j<nspecies&&!has_NaN;j++){
+          const vector<double>& oxidation_states=vxel[j].getPropertyVectorDouble("oxidation_states");
+          for(k=0;k<vcomposition[j];k++){
+            if(aurostd::isNaN(oxidation_states[indices[j]])){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Found NaN among populated oxidation_states",_RUNTIME_ERROR_);}
+            natoms_xv[natoms_xv.lrows+(i++)]=oxidation_states[indices[j]];
+          }
+        }
+        if(LDEBUG){cerr << soliloquy << " natoms_xv[\"oxidation_states\"]=" << natoms_xv << endl;}
+        if(aurostd::isequal(aurostd::sum(natoms_xv),0.0)){formability_ionic=true;}
+      }
+    }
+    vfeatures.push_back( (!has_NaN&&formability_ionic?1:0) );
+    //character_ionic_max and _mean
+    xvector<double> pairs_xv(aurostd::nCk((int)nspecies,2));  //electronegativities
+    xvector<double> pairs2_xv(aurostd::nCk((int)nspecies,2)); //stoich
+    for(i=0;i<vEN.size();i++){
+      if(LDEBUG){cerr << soliloquy << " EN=" << vEN[i] << endl;}
+      xc.reset(nspecies,2);
+      k=0;
+      while(xc.increment()){
+        const vector<int>& indices=xc.getIndices();
+        if(LDEBUG){cerr << soliloquy << " indices=" << aurostd::joinWDelimiter(indices,",") << endl;}
+        pairs_xv[pairs_xv.lrows+k]=1.0-std::exp(-0.25*(std::pow(vxel[indices[0]].getPropertyDouble(vEN[i])-vxel[indices[1]].getPropertyDouble(vEN[i]),2.0)));
+        pairs2_xv[pairs2_xv.lrows+k]=stoich_xv[stoich_xv.lrows+indices[0]]*stoich_xv[stoich_xv.lrows+indices[1]];
+        k++;
+      }
+      if(LDEBUG){cerr << soliloquy << " pairs_xv[\""+vEN[i]+"\"]=" << pairs_xv << endl;}
+      vfeatures.push_back( aurostd::max(pairs_xv) );
+      vfeatures.push_back( aurostd::scalar_product(pairs_xv,pairs2_xv) );
+    }
+
+    if(vheaders.size()!=vfeatures.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"vheaders.size()!=vfeatures.size()",_RUNTIME_ERROR_);}
+
+    if(LDEBUG){
+      for(i=0;i<vheaders.size();i++){cerr << soliloquy << " " << vheaders[i] << "=" << vfeatures[i] << endl;}
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  }
+} // namespace aflowlib
 
 #endif //  _AFLOWLIB_LIBRARIES_CPP_
 // ***************************************************************************
