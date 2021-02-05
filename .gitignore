@@ -48,6 +48,7 @@ src/aflowlib_webapp_bands.cpp
 src/aflow_chull_jupyter.cpp
 src/aflow_chull_jupyter_plotter.cpp
 src/aflow_chull_python.cpp
+src/aflow_cce_python.cpp
 src/aflow_chull_jupyter_requirements.cpp
 src/aflow_mix_nomix_table.cpp
 src/aflow_nomix.*.cpp
@@ -58,6 +59,8 @@ src/aflow_data_aflow_potcars.cpp
 src/aflow_data_latex.cpp
 src/aflow_data_readme.cpp
 src/aflow_data_extra.cpp
+src/aflow_sym_python.cpp
+src/aflow_xtalfinder_python.cpp
 
 # OS-specific
 *.swp
