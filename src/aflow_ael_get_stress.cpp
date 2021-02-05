@@ -306,6 +306,7 @@ namespace AEL_functions {
     string FileNameAFLOWIN = "", FileNameAFLOWINcheck = "", AflowInCheck = "";
     string FileNameMessage = "";
     string aflowinname = "";
+    string stmp="";
     uint aelerror = 0, filelength = 0;
     vector<string> vAflowInCheck;
     ael_aflowin_found = false;
@@ -318,6 +319,7 @@ namespace AEL_functions {
     vaflowins.push_back("agl_aflow.in");
     for(uint iaf=0;iaf<vaflowins.size()&&!ael_aflowin_found;iaf++){
       aflowinname = vaflowins.at(iaf);
+      if(aurostd::EFileExist(directory_LIB+"/"+aflowinname,stmp)&&aurostd::IsCompressed(stmp)){aurostd::UncompressFile(stmp);}  //CO20210204 - fix aflow.in.xz
       if((!ael_aflowin_found) && (aurostd::FileExist(directory_LIB+"/"+aflowinname))) {
         FileNameAFLOWINcheck = directory_LIB+"/"+aflowinname;
         // [OBSOLETE] FileAFLOWINcheck.open(FileNameAFLOWINcheck.c_str(),std::ios::in);
