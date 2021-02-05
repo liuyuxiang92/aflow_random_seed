@@ -82,6 +82,8 @@
         -- patched bug with LIB1 DOS plotter (CO)
         (AFLOW: aconvasp.cpp, aconvasp_main.cpp, aflow.cpp, aflow.h, aflowlib_database.cpp, aflowlib.h, aflowlib_libraries.cpp, aflowlib_web_interface.cpp, aflowrc.cpp, avasp.cpp, cce.cpp, cce.h, cce_python.py, chull.cpp, chull.h, compare_structure.cpp, compare_structure_function.cpp, compare_structure.h, contrib_shidong_cluster_expansion.cpp, contrib_shidong_cluster_expansion.h, contrib_shidong.cpp, contrib_shidong_main.cpp, gfa.cpp, ifrozsl.cpp, init.cpp, ivasp.cpp, kaims.cpp, kbin.cpp, kvasp.cpp, Makefile, Makefile.aflow, modules.cpp, neighbours.cpp, pflow_funcs.cpp, pflow.h, plotter.cpp, pocc.cpp, pocc.h, README_AFLOW_ACONVASP.TXT, README_AFLOW_AFLOWRC.TXT, README_AFLOW_CCE.TXT, README_AFLOW_CHULL.TXT, README_AFLOW_COMPARE.TXT, README_AFLOW.TXT, README_PROTO.TXT, surface.cpp, symbolic.cpp, symmetry.cpp, symmetry_spacegroup.cpp, symmetry_spacegroup.h, symmetry_spacegroup_ITC_library.cpp, sym_python.py, test.cpp, xatom.cpp, xclasses.cpp, xelement.cpp, xelement.h, xproto.cpp, xtalfinder_python.py)
         (ANRL: aflow_anrl.cpp, aflow_anrl.h, list.cpp, README_AFLOW_ANRL.TXT)
+        (AEL: ael_get_stress.cpp)
+        (AGL: agl_get_ev.cpp)
         (APL: aapl_tcond.cpp, apl_doscalc.cpp, apl.h, apl_kphonons.cpp, apl_pdisc.cpp, apl_phoncalc.cpp, qha.cpp)
         (AUROSTD: aurostd.h, boot.cpp, main.cpp, xcombos.cpp, xcombos.h, xfit.cpp, xmatrix.cpp, xmatrix.h, xparser.cpp, xparser.h, xscalar.cpp, xscalar.h, xvector.cpp, xvector.h)
 3.2.6 - 2020/12/30
