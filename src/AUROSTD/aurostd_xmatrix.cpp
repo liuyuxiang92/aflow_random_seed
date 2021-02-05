@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
 // *                                                                         *
 // ***************************************************************************
 // Written by Stefano Curtarolo 1994-2018
@@ -3348,6 +3348,109 @@ namespace aurostd {  // namespace aurostd
 } // namespace aurostd
 
 // ----------------------------------------------------------------------------
+// DX20201125
+namespace aurostd {
+  template<class utype> void polarDecomposition(const xmatrix<utype>& transformation_matrix,
+      xmatrix<utype>& rotation,
+      xmatrix<utype>& deformation,
+      bool check_orthogonal_rotation) {
+
+    // Decompose a transformation into its rotation and deformation
+    // matrices: T=R*U (where T=original matrix, R=rotation, U=deformation).
+    // Procedure:
+    // 1) T^2 = trasp(T)*T=trasp(R*U)*(R*U)=trasp(U)*trasp(R)*R*U=trasp(U)*U
+    //    (since trasp(R)*R=I, i.e. orthogonal matrix)
+    // 2) U = sqrt(trasp(U)*U), using diagonalization technique:
+    //    http://en.wikipedia.org/wiki/Square_root_of_a_matrix#By_diagonalization
+    // 3) R = T*inverse(U)
+    // Following ref: http://www.continuummechanics.org/polardecomposition.html
+    // Generalized for an nxn matrix.
+
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string function_name = XPID + "aurostd::polarDecomposition():";
+    stringstream message;
+
+    // ---------------------------------------------------------------------------
+    // analysis only works for a square matrix
+    if(!transformation_matrix.issquare){
+      message << "The transformation matrix must be a square matrix.";
+      throw xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_ERROR_);
+    }
+
+    // ---------------------------------------------------------------------------
+    // save matrix dimension
+    uint dimension = transformation_matrix.rows;
+
+    // ---------------------------------------------------------------------------
+    // square the matrix
+    xmatrix<utype> T_squared = trasp(transformation_matrix)*transformation_matrix;
+
+    if(LDEBUG){ cerr << function_name << " T^2: " << T_squared << endl; }
+
+    // ---------------------------------------------------------------------------
+    // if T^2 is the identity, then this is a unitary transformation, no deformation
+    // (not sure how sensitive the deformation is, we may not be able to do this)
+    if(aurostd::isidentity(T_squared)){
+      rotation = transformation_matrix;
+      deformation = aurostd::eye<utype>(dimension,dimension); //DX+ME20210111
+      return;
+    }
+
+    // ---------------------------------------------------------------------------
+    // find square root of matrix via diagonalization method
+    xvector<utype> diag(dimension); //diag: vector of diagonal components
+    xmatrix<utype> eigen_vec(dimension,dimension); //eigen_vec: matrix with eigen vectors as columns
+
+    // ---------------------------------------------------------------------------
+    // Jacobi
+    jacobi(T_squared, diag, eigen_vec);
+
+    if(LDEBUG){
+      cerr << function_name << " diag: " << diag << endl;
+      cerr << function_name << " eigen_vec: " << eigen_vec << endl;
+    }
+
+    // ---------------------------------------------------------------------------
+    // build diagonal matrix
+    xmatrix<utype> diag_matrix = aurostd::eye<utype>(dimension,dimension);
+    for(uint i=1;i<=dimension;i++){
+      diag_matrix[i][i] = aurostd::sqrt(diag(i));
+    }
+
+    if(LDEBUG){ cerr << function_name << " diag_matrix: " << diag_matrix << endl; }
+
+    // ---------------------------------------------------------------------------
+    // find deformation (U) via U=v*D*inverse(v);
+    deformation = eigen_vec*diag_matrix*aurostd::inverse(eigen_vec);
+
+    if(LDEBUG){ cerr << function_name << " deformation matrix (U): " << deformation << endl; }
+
+    // ---------------------------------------------------------------------------
+    // find rotation (R) via R=T*inverse(U)
+    rotation = transformation_matrix*aurostd::inverse(deformation);
+
+    if(LDEBUG){ cerr << function_name << " rotation matrix (R): " << rotation << endl; }
+
+    // ---------------------------------------------------------------------------
+    // verify conditions of an orthogonal matrix for rotation
+    if(check_orthogonal_rotation){
+      xmatrix<utype> identity_matrix = rotation*trasp(rotation);
+      if(LDEBUG){
+        // R^T==R^-1
+        cerr << function_name << " transpose(R):" << endl << aurostd::trasp(rotation) << endl;
+        cerr << function_name << " inverse(R):" << endl << aurostd::inverse(rotation) << endl;
+        // R*R^T=I
+        cerr << function_name << " identity? (R*R^T=I):" << endl << identity_matrix << endl;
+      }
+      if(!aurostd::isidentity(identity_matrix)){
+        message << "Extracted rotation should be an orthogonal matrix (R*R^T==I):" << endl << identity_matrix;
+        throw xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
+      }
+    }
+  }
+}
+
+// ----------------------------------------------------------------------------
 
 namespace aurostd {  // namespace aurostd
   template<class utype>                                      //  std::cout operator <<
@@ -5993,6 +6096,6 @@ namespace aurostd {
 #endif
 // **************************************************************************
 // *                                                                        *
-// *             STEFANO CURTAROLO - Duke University 2003-2020              *
+// *             STEFANO CURTAROLO - Duke University 2003-2021              *
 // *                                                                        *
 // **************************************************************************

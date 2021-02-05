@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
 // *                                                                         *
 // ***************************************************************************
 // Stefano Curtarolo
@@ -19,6 +19,7 @@
 using aurostd::nint;
 using aurostd::fact;
 using aurostd::factorial;
+using aurostd::nCk; //CO20201111
 using aurostd::sign;
 using aurostd::_isodd;
 using aurostd::_iseven;
@@ -91,7 +92,7 @@ using aurostd::getElements; //CO20200624
 template<class utype> bool initialize_scalar(utype d) {
   string s="";
   utype u=0;
-  u+=aurostd::string2utype<utype>(aurostd::utype2string<utype>(utype())+aurostd::utype2string<utype>(utype(),int()));
+  u+=aurostd::string2utype<utype>(aurostd::utype2string<utype>(utype())+aurostd::utype2string<utype>(utype(),int())+aurostd::utype2string<utype>(utype(),int(),DEFAULT_STREAM)); //DX20201028 - added third variant containing format
   u+=aurostd::substring2utype<utype>(s,s,1)+aurostd::substring2utype<utype>(s,s,s,1);
   u+=aurostd::substring2utype<utype>(s,s)+aurostd::substring2utype<utype>(s,s,s);
   double o=0;
@@ -130,6 +131,9 @@ template<class utype> bool initialize_scalar(utype d) {
   opt.getattachedutype<utype>("");
   opt.args2addattachedscheme<utype>(vs,vs,"","",u);
   opt.args2addattachedscheme<utype>(vs,"","",u);
+
+  aurostd::JSONwriter jw; jw.addNumber("", d);//AS20201217
+  jw.addNumber("", s); //DX20201230 - enables a string to be written as a number
   return (o<0);
 }
 
@@ -237,7 +241,7 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   aurostd::quicksort2((uint) 0,ixv,dxv);aurostd::quicksort2((uint) 0,dxv,ixv);
 
   // initialize scalars
-  o+=nint(x)+factorial(x)+fact(x)+isequal(x,x)+isequal(x,x,(utype) 0)+isequal(x,x,x)+isdifferent(x,x)+isdifferent(x,x,x);
+  o+=nint(x)+factorial(x)+nCk(x,x)+fact(x)+isequal(x,x)+isequal(x,x,(utype) 0)+isequal(x,x,x)+isdifferent(x,x)+isdifferent(x,x,x);
   o+=max(x,x);o+=max(x,x,x);o+=max(x,x,x,x);o+=max(x,x,x,x,x);o+=max(x,x,x,x,x,x);o+=sign(x);
   o+=min(x,x);o+=min(x,x,x);o+=min(x,x,x,x);o+=min(x,x,x,x,x);o+=min(x,x,x,x,x,x);o+=sign(x);
   o+=_isinteger(x,x)+_iszero(x,x)+uniform(x)+uniform(x,x)+gaussian(x)+gaussian(x,x)+expdev(x)+laplacedev(x)+laplacedev(x,x);
@@ -248,7 +252,7 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   aurostd::xvector<utype> v(2),w(2),vv,vvvv(1,2);		//CO20190329 - clang doesn't like x=x, changing to x=y
   std::vector<aurostd::xvector<utype> > vxv;
   v(1);v[1];o+=sum(v);sort(shellsort(heapsort(v+v)));o+=modulus(v);o+=modulus2(v);v=x*v*x/x;v=+w;v=-w;v+=w;v-=w;v+=x;v-=x;v*=x;v/=x;		//CO20190329 - clang doesn't like x=x, changing to x=y
-  v=v*i;v=nint(v);v=sign(v);v=i*v;v=v*d;v=d*v;v=d*v*d/d;o+=min(v);o+=max(v);o+=mini(v);o+=maxi(v);v=v+v;v=v-v;v=-v+v;
+  v=v*i;v=nint(v);v=sign(v);v=i*v;v=v*d;v=d*v;v=d*v*d/d;o+=min(v);o+=max(v);o+=mini(v);o+=maxi(v);v=v+v;v=v-v;v=v-x;v=-v+v;
   cout<<v<<endl;o+=scalar_product(v,v);o+=cos(v,v);o+=sin(v,v);o+=angle(v,v);v=vector_product(v,v);
   trasp(v);
   //  sin(v);sinh(v);cos(v);cosh(v);exp(v);
@@ -260,7 +264,7 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
 
   o=+(v==v);o=+(v!=v);o+=identical(v,v);o+=identical(v,v,x);o+=identical(v,v,(utype&) x);o+=identical(v,v,(const utype&) x);o+=isdifferent(v,v);
   o+=isdifferent(v,v,x);v=-v;o+=max(v);v=abs(v);roundoff(v);roundoff(v,x);reduceByGCD(v,v,x);v+=normalizeSumToOne(v,x);clear(v);floor(v);ceil(v); //DX20191125 - changed input format for reduceByGCD()
-  o+=getcos(v,v);v.clear();v.set(x);v.reset();clear(v);reset(v);set(v,x);v=abs(v);v=vabs(v);v=sign(v);
+  o+=getcos(v,v);v.clear();v.set(x);v.reset();v.resize(1,1);clear(v);reset(v);set(v,x);v=abs(v);v=vabs(v);v=sign(v);
   o+=angle(v,v,v);o+=getangle(v,v,v);isCollinear(v,v,x);v=getCentroid(vxv);v=getCentroid(vxv,vutype);o+=distance(v,v); //DX20200729 - added getCentroid() with weights
   aurostd::xmatrix<utype> xmatpbc;dxv=getCentroidPBC(vxv,xmatpbc);dxv=getCentroidPBC(vxv,vutype,xmatpbc); //DX20200728 - added getCentroidPBC()
   getGeneralAngles(v,x);getGeneralAngle(v,0,x);
@@ -274,7 +278,7 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   //  sort2((unsigned long)1,v,v);sort2((unsigned long)1,xvd,xvi);sort2((unsigned long)1,xvi,xvd);
   o+=isequal(v,v)+isequal(v,v,(utype) 0)+isequal(v,v,x)+isdifferent(v,v)+isdifferent(v,v,x)+isinteger(v,x);swap(v,1,1);shiftlrows(v,1);
   getQuartiles(v,x,x,x);
-  o+=aurostd::mean(v);aurostd::meanWeighted(v,v);aurostd::meanWeighted(v,v,x);o+=aurostd::stddev(v); //CO20190520
+  o+=aurostd::mean(v);aurostd::meanWeighted(v,v);aurostd::meanWeighted(v,v,x);o+=aurostd::var(v,1);o+=aurostd::stddev(v,1);o+=aurostd::mode(v);o+=aurostd::correlation_Pearson_fast(v,v);o+=aurostd::correlation_Pearson_slow(v,v);o+=aurostd::correlation_Pearson_fast(v,x,x,v,x,x); //CO20190520
   v=aurostd::box_filter_xv<utype>(1);v=aurostd::box_filter_xv<utype>(1,1); //CO20190520
   v=aurostd::gaussian_filter_xv<utype>(x);v=aurostd::gaussian_filter_xv<utype>(x,1);v=aurostd::gaussian_filter_xv<utype>(x,1,1); //CO20190520
   vector<uint> vii; //CO20190622
@@ -298,7 +302,7 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
 
   // initialize matrices
   utype* mstar;mstar=NULL;
-  aurostd::xmatrix<utype> m(2),n(2),mm,mmm(2,3),mmmmm(1,2,3,4),m5(1,2,mstar),mkron;		//CO20190329 - clang doesn't like x=x, changing to x=y
+  aurostd::xmatrix<utype> m(2),n(2),mm,mmm(2,3),m3(3,3),mmmmm(1,2,3,4),m5(1,2,mstar),mkron;		//CO20190329 - clang doesn't like x=x, changing to x=y
   xdouble(m);xint(m);m=+m;m=-m;o+=m(1)[1];o+=m(1,1);o+=m[1][1];m=identity(m);m=identity(x,1,1);m=identity(x,1);
   vv=m.getcol(1);vv=m.getdiag(0,1);m.setrow(v);m.setcol(v);m.setmat(n);m.setmat(v);m=n;m=m+n;m=m-n;m=m*n;adjointInPlace(m,n);n=adjoint(m);m=inverseByAdjoint(m);m=inverse(m);isNonInvertible(m);m=reduce_to_shortest_basis(m);		//CO20190329 - clang doesn't like x=x, changing to x=y  //CO20191110  //CO20191201
   m*=(utype)5;m/=(utype)6;  //CO20190911
@@ -310,6 +314,7 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   m.clear();m.set(x);m.reset();m.reset();clear(m);reset(m);clear(m);set(m,x);abs(m);mabs(m);
   o+=det(m);o+=determinant(m);m=submatrix(m,1,1);submatrixInPlace(m,m,1,1);o+=minordet(m,1,1);o+=minordeterminant(m,1,1);v*m;m*v;
   vector<utype> vvv=xvector2vector(v);vector2xvector(vvv,1);
+  vector<string> vs;vxu=vector2xvector<utype>(vs,1); //CO20201111
   vector<vector<utype> > mvv=xmatrix2vectorvector(m);vectorvector2xmatrix(mvv);
   if(det(m)==0 || sum(m)==0) return FALSE;
   reshape(v);reshape(v,v);reshape(v,v,v);reshape(v,v,v,v);reshape(v,v,v,v,v);reshape(v,v,v,v,v,v);
@@ -324,6 +329,7 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   //ME20190718 - norms
   aurostd::l1_norm(m);aurostd::frobenius_norm(m);aurostd::l2_norm(m);aurostd::linf_norm(m);
   // aurostd::trunc(m);aurostd::round(m);
+  polarDecomposition(m3,m3,m3); //DX20210111
 
   //[ME20180627 START]
   std::vector<int> stdv(3, 3),stdv2(2, 3),vind(3, 1),vind2(2),stdv0(3, 0); std::vector<utype> vut(3);
@@ -517,6 +523,10 @@ bool initialize_templates_never_call_this_procedure(bool flag) {
     mxdouble=xmatrixutype2double(mxint);  //CO20191201
     mxint=xmatrixdouble2utype<int>(mxdouble);   //CO20191201
     vector<int> vi;getElements("MnPd",vi);getElements("MnPd",vi,pp_string);getElements("MnPd",vi,pp_string,FileMESSAGE); //CO20200624
+    aurostd::JSONwriter jwi; jwi.addVector("",vi);//AS20201217
+    deque<int> di; jwi.addVector("",di);//AS20201217
+    vector<vector<int> > vvi; jwi.addMatrix("",vvi);//AS20201217
+    deque<deque<int> > ddi; jwi.addMatrix("",ddi);
 #endif
 #ifdef AUROSTD_INITIALIZE_UINT
     o+=aurostd::string2utype<uint>(aurostd::utype2string<uint>(uint())+aurostd::utype2string<uint>(uint(),int()));
@@ -529,6 +539,10 @@ bool initialize_templates_never_call_this_procedure(bool flag) {
     mxdouble=xmatrixutype2double(mxuint);  //CO20191201
     mxuint=xmatrixdouble2utype<uint>(mxdouble);   //CO20191201
     vector<uint> vui;getElements("MnPd",vui);getElements("MnPd",vui,pp_string);getElements("MnPd",vui,pp_string,FileMESSAGE); //CO20200624
+    aurostd::JSONwriter jwui; jwui.addVector("",vui);//AS20201217
+    deque<uint> dui; jwui.addVector("",dui);//AS20201217
+    vector<vector<uint> > vvui; jwui.addMatrix("",vvui);//AS20201217
+    deque<deque<uint> > ddui; jwui.addMatrix("",ddui);//AS20201217
 #endif
 #ifdef AUROSTD_INITIALIZE_FLOAT
     if(1) { // AUROSTD_INITIALIZE_FLOAT
@@ -656,7 +670,7 @@ bool initialize_templates_never_call_this_procedure(bool flag) {
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
 // *                                                                         *
 // ***************************************************************************
 

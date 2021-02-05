@@ -1,9 +1,9 @@
 // ***************************************************************************
 // *                                                                         *
 // *         aflow - Automatic FLOW for materials discovery project          *
-// *             Stefano Curtarolo - Duke University - 2003-2020             *
+// *             Stefano Curtarolo - Duke University - 2003-2021             *
 // *                 Kesong Yang - Duke University 2010-2011                 *
-// *                  Corey Oses - Duke University 2013-2020                 *
+// *                  Corey Oses - Duke University 2013-2021                 *
 // *                                                                         *
 // ***************************************************************************
 // aflow_pocc.h and aflow_pocc*.cpp*
@@ -303,6 +303,7 @@ namespace pocc {
       //NECESSARY PUBLIC CLASS METHODS - START
       //constructors - START
       POccCalculatorTemplate();
+      POccCalculatorTemplate(const POccCalculatorTemplate& b);
       //constructors - STOP
       ~POccCalculatorTemplate();
       //NECESSARY PUBLIC CLASS METHODS - END
@@ -650,6 +651,7 @@ namespace pocc {
       bool QMVASPsFound() const;
       void setDFTEnergies();
       void setEFA();
+      void calculateRELAXProperties(double temperature=300);
       void calculateSTATICProperties(double temperature=300);
       void setPOccStructureProbabilities(double temperature=300); //room temperature
       string getTemperatureString(double temperature) const;
@@ -809,8 +811,8 @@ namespace pocc {
 // ***************************************************************************
 // *                                                                         *
 // *         aflow - Automatic FLOW for materials discovery project          *
-// *             Stefano Curtarolo - Duke University - 2003-2020             *
+// *             Stefano Curtarolo - Duke University - 2003-2021             *
 // *                 Kesong Yang - Duke University 2010-2011                 *
-// *                  Corey Oses - Duke University 2013-2020                 *
+// *                  Corey Oses - Duke University 2013-2021                 *
 // *                                                                         *
 // ***************************************************************************

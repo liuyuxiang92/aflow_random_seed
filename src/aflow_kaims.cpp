@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
 // *                                                                         *
 // ***************************************************************************
 // this file contains the routines to run AIMS in KBIN
@@ -331,7 +331,7 @@ namespace KBIN{
           //    return FALSE;
         }
         // ***************************************************************************
-        // DO THE SYMMETRY NEIGHBOURS CALCULATION
+        // DO THE SYMMETRY NEIGHBORS CALCULATION
         //if(!kflags.KBIN_PHONONS_CALCULATION_FROZSL)
         //DX
         if(!(kflags.KBIN_PHONONS_CALCULATION_FROZSL || 
@@ -341,7 +341,7 @@ namespace KBIN{
             aflags.KBIN_GEN_SYMMETRY_OF_AFLOWIN ) {  //CO, do internally
           //DX
           if(Krun) Krun=KBIN_StepSymmetryPerform(xaims.str,AflowIn,FileMESSAGE,aflags,kflags,TRUE,cout); // DO THE SYMMETRY CALCULATION
-          if(Krun) Krun=StepNeighboursPerform(xaims.str,AflowIn,FileMESSAGE,aflags,kflags); // DO THE NEIGHBOURS CALCULATION
+          //DX20210122 [OBSOLETE - function doesn't calculate anything, removed] if(Krun) Krun=StepNeighborsPerform(xaims.str,AflowIn,FileMESSAGE,aflags,kflags); // DO THE NEIGHBORS CALCULATION
           //DX
           //cerr << "KBIN GEN SYMMETRY OF AFLOWIN: " << aflags.KBIN_GEN_SYMMETRY_OF_AFLOWIN << endl;
           if(aflags.KBIN_GEN_SYMMETRY_OF_AFLOWIN){
@@ -466,6 +466,6 @@ namespace KBIN{
 #endif
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
 // *                                                                         *
 // ***************************************************************************

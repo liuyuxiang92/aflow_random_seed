@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *              Aflow COREY OSES - Duke University 2003-2020               *
+// *              Aflow COREY OSES - Duke University 2003-2021               *
 // *                                                                         *
 // ***************************************************************************
 // Written by Corey Oses 2020
@@ -387,10 +387,164 @@ namespace aurostd {
   }
 } // namespace aurostd
 
+//AS20201214 BEGIN JSONwriter
+namespace aurostd {
+  //***************************************************************************
+  void JSONwriter::free() { content.clear(); }
+  void JSONwriter::clear() { free(); }
+  void JSONwriter::copy(const JSONwriter &jw){
+    content = jw.content;
+  }
+
+  JSONwriter::JSONwriter() { free(); }
+  JSONwriter::JSONwriter(const JSONwriter &jw)
+  {
+    free();
+    copy(jw);
+  }
+  JSONwriter::~JSONwriter() { free(); }
+
+  const JSONwriter& JSONwriter::operator=(const JSONwriter &jw){
+    copy(jw);
+    return *this;
+  }
+  //***************************************************************************
+  //  addNumber block
+  template <typename utype> void JSONwriter::addNumber(const string &key,
+      const utype value)
+  {
+    content.push_back("\"" + key + "\":" + aurostd::utype2string(value));
+  }
+
+  //***************************************************************************
+  //  addVector block
+  template <typename utype> void JSONwriter::addVector(const string &key,
+      const utype &value)
+  {
+    content.push_back("\"" + key + "\":[" + aurostd::joinWDelimiter(value, ",") + "]");
+  }
+
+  void JSONwriter::addVector(const string &key, const vector<double> &value,
+      int precision, bool roundoff, double tol)
+  {
+    content.push_back("\"" + key + "\":[");
+    content.back() += aurostd::joinWDelimiter(
+        aurostd::vecDouble2vecString(value, precision, roundoff, tol),",");
+    content.back() += "]";
+  }
+
+  void JSONwriter::addVector(const string &key, const deque<double> &value, int precision,
+      bool roundoff, double tol)
+  {
+    content.push_back("\"" + key + "\":[");
+    content.back() += aurostd::joinWDelimiter(
+        aurostd::vecDouble2vecString(value, precision, roundoff, tol),",");
+    content.back() += "]";
+  }
+
+  void JSONwriter::addVector(const string &key, const vector<string> &value)
+  {
+    content.push_back("\"" + key + "\":[");
+    content.back() += aurostd::joinWDelimiter(aurostd::wrapVecEntries(value, "\""), ",");
+    content.back() += "]";
+  }
+
+  void JSONwriter::addVector(const string &key, const deque<string> &value)
+  {
+    content.push_back("\"" + key + "\":[");
+    content.back() += aurostd::joinWDelimiter(aurostd::wrapVecEntries(value, "\""), ",");
+    content.back() += "]";
+  }
+
+  //***************************************************************************
+  //  addMatrix block
+  template <typename utype> void JSONwriter::addMatrix(const string &key,
+      const utype &value)
+  {
+    content.push_back("\"" + key + "\":[");
+    vector<string> matrix;
+    for (uint i=0; i<value.size(); i++){
+      matrix.push_back("[" + aurostd::joinWDelimiter(value[i], ",") + "]");
+    }
+    content.back() += aurostd::joinWDelimiter(matrix, ",");
+    content.back() += "]";
+  }
+
+  void JSONwriter::addMatrix(const string &key, const vector<vector<double> > &value,
+      int precision, bool roundoff, double tol)
+  {
+    content.push_back("\"" + key + "\":[");
+    vector<string> matrix;
+    for (uint i=0; i<value.size(); i++){
+      matrix.push_back("[" + aurostd::joinWDelimiter(
+            aurostd::vecDouble2vecString(value[i], precision, roundoff, tol), ",") + "]");
+    }
+    content.back() += aurostd::joinWDelimiter(matrix, ",");
+    content.back() += "]";
+  }
+
+  void JSONwriter::addMatrix(const string &key, const deque<deque<double> > &value,
+      int precision, bool roundoff, double tol)
+  {
+    content.push_back("\"" + key + "\":[");
+    vector<string> matrix;
+    for (uint i=0; i<value.size(); i++){
+      matrix.push_back("[" + aurostd::joinWDelimiter(
+            aurostd::vecDouble2vecString(value[i], precision, roundoff, tol), ",") + "]");
+    }
+    content.back() += aurostd::joinWDelimiter(matrix, ",");
+    content.back() += "]";
+  }
+
+  //***************************************************************************
+  void JSONwriter::addString(const string &key, const string &value)
+  {
+    content.push_back("\"" + key + "\":" + "\"" + value + "\"");
+  }
+
+  //***************************************************************************
+  void JSONwriter::addBool(const string &key, bool value)
+  {
+    content.push_back("\"" + key + "\":" + (value ? "true" : "false"));
+  }
+
+  //***************************************************************************
+  void JSONwriter::addRaw(const string &value)
+  {
+    content.push_back(value);
+  }
+
+  //***************************************************************************
+  /// Adds JSON object as a new value (i.e. with curly braces)
+  void JSONwriter::addJSON(const string &key, JSONwriter &value)
+  {
+    content.push_back("\"" + key + "\":" + value.toString(true));
+  }
+
+  //***************************************************************************
+  /// Merges/inserts a given JSON object (i.e. with no curly braces)
+  void JSONwriter::mergeJSON(JSONwriter &value)
+  {
+    content.push_back(value.toString(false));
+  }
+
+  //***************************************************************************
+  string JSONwriter::toString(bool wrap)
+  {
+    if (wrap){
+      return "{" + aurostd::joinWDelimiter(content, ",") + "}";
+    }
+    else{
+      return aurostd::joinWDelimiter(content, ",");
+    }
+  }
+}
+//AS20201214 END
+
 #endif // _AUROSTD_XPARSER_CPP_
 
 // **************************************************************************
 // *                                                                        *
-// *              Aflow COREY OSES - Duke University 2003-2020              *
+// *              Aflow COREY OSES - Duke University 2003-2021              *
 // *                                                                        *
 // **************************************************************************

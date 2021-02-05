@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
 // *                                                                         *
 // ***************************************************************************
 // Written by Stefano Curtarolo 1994-2011
@@ -623,6 +623,13 @@ namespace aurostd {
       return minM;
     }
   //AS20200512 END
+
+  //DX20210111 - added polarDecomposition() function
+  template<class utype> void
+    polarDecomposition(const xmatrix<utype>& transformation_matrix,
+        xmatrix<utype>& rotation,
+        xmatrix<utype>& deformation,
+        bool check_orthogonal_rotation=true); __xprototype;
 }
 
 namespace aurostd {
@@ -841,7 +848,7 @@ namespace aurostd {
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
 // *                                                                         *
 // ***************************************************************************
 

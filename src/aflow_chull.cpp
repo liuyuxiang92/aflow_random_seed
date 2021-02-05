@@ -1,7 +1,7 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
-// *           Aflow COREY OSES - Duke University 2013-2020                  *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
+// *           Aflow COREY OSES - Duke University 2013-2021                  *
 // *                                                                         *
 // ***************************************************************************
 // Written by Corey Oses
@@ -37,6 +37,7 @@ const std::string LATEX_COLORS_TO_AVOID = "black,white,yellow,darkgray,gray,ligh
 //[CO20180819 - MOVED TO AFLOWRC]const bool IGNORE_BAD_DATABASE = true;        //skip bad entries
 const bool CORRECT_BAD_DATABASE = true;                                        //make minor corrections, carried over from apennsy (SC)
 const bool PRINT_DIST2HULL_COL_TEX = false;                                    //print Dist2hull column in tex, there's no need because it's not used for anything in the image
+const bool GET_DECOMPOSITION_POLYMORPHS = true;                                //print decomposition information for polymorphs
 
 // LATEX PRINTING MODES
 const char ADDPLOT_MODE_HULL_POINTS = 'P';
@@ -135,9 +136,9 @@ namespace chull {
     usage_options.push_back("--include_skewed_hulls|--include_skewed|--ish");
     usage_options.push_back("--include_unreliable_hulls|--include_unreliable|--iuh");
     usage_options.push_back("--include_outliers|--io");
+    usage_options.push_back("--strict_outlier_analysis|--soa");
     usage_options.push_back("--include_ill_converged|--iic");
     usage_options.push_back("--force");
-    usage_options.push_back("--force_outliers");
     usage_options.push_back(" ");
     usage_options.push_back("LATEX/PDF/PNG OPTIONS:");
     usage_options.push_back("--image_only|--imageonly|--image");
@@ -316,6 +317,29 @@ namespace chull {
     //////////////////////////////////////////////////////////////////////////////
 
     //////////////////////////////////////////////////////////////////////////////
+    // START Adding --sc=XX to CHULL::NEGLECT if --output=web
+    //////////////////////////////////////////////////////////////////////////////
+    if(vpflow.flag("CHULL::STABILITY_CRITERION")&&vpflow.flag("CHULL::WEB_DOC")){
+      string sc_input=vpflow.getattachedscheme("CHULL::STABILITY_CRITERION");
+      if(vpflow.flag("CHULL::NEGLECT")){
+        string neglect=vpflow.getattachedscheme("CHULL::NEGLECT");
+        if(!neglect.empty()){neglect+=",";}
+        neglect+=sc_input;
+        vpflow.pop_attached("CHULL::NEGLECT");
+        vpflow.push_attached("CHULL::NEGLECT",neglect);
+        vpflow.flag("CHULL::NEGLECT",true); //repetita iuvant
+      }else{
+        vpflow.flag("CHULL::NEGLECT",true);
+        vpflow.push_attached("CHULL::NEGLECT",sc_input);
+      }
+      if(LDEBUG){cerr << soliloquy << " vpflow.getattachedscheme(\"CHULL::NEGLECT\")=" << vpflow.getattachedscheme("CHULL::NEGLECT") << endl;}
+    }
+    //////////////////////////////////////////////////////////////////////////////
+    // END Adding --sc=XX to CHULL::NEGLECT if --output=web
+    //////////////////////////////////////////////////////////////////////////////
+
+
+    //////////////////////////////////////////////////////////////////////////////
     // START Looping over hull inputs and creating desired output
     //////////////////////////////////////////////////////////////////////////////
     bool Krun=true;
@@ -333,6 +357,11 @@ namespace chull {
       }
       if(velements.size()<2){
         message << "Trivial input (" << vinputs[i] << "), enter binaries or higher";
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+        Krun=false;continue;/*return FALSE;*/
+      }
+      if(XHOST.vflag_control.flag("WWW")&&velements.size()>6){ //CO20200404 - new web flag
+        message << velements.size() << "-dimensional hulls cannot be calculated through the web portal (max=6D), please download the AFLOW binary";
         pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
         Krun=false;continue;/*return FALSE;*/
       }
@@ -452,6 +481,38 @@ namespace chull {
       //speed ups for command line options
       if(vpflow.flag("CHULL::DIST2HULL") || vpflow.flag("CHULL::STABILITY_CRITERION") || vpflow.flag("CHULL::N+1_ENTHALPY_GAIN") || vpflow.flag("CHULL::HULL_FORMATION_ENTHALPY")) {
         vpflow.flag("CHULL::SKIP_THERMO_PROPERTIES_EXTRACTION",true);
+        message << "Skipping thermodynamic properties extraction";pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+      }
+
+      //skip calculating all of the lower dimensional hulls
+      //this works if you are finding the hull_energy somewhere in the middle of the hull
+      //the edges are problematic (lower dimensional hulls)
+      //so only skip calculating these hulls if you are calculating hull_energy of the ND hull
+      if(0){  //not actually faster, lower dimensional hulls reduce number of points in ND hull, tested 7D-hull: 45 mins vs. 1 hr
+        if(vpflow.flag("CHULL::HULL_FORMATION_ENTHALPY")){
+          vector<double> _coords;
+          aurostd::string2tokens<double>(vpflow.getattachedscheme("CHULL::HULL_FORMATION_ENTHALPY"), _coords, ",");
+          if(_coords.size()==velements.size()-1||_coords.size()==velements.size()){
+            bool at_edge=false;
+            double sum=0.0;
+            for(uint ia=0;ia<(velements.size()-1)&&ia<_coords.size();ia++){
+              if(abs(_coords[ia])<ZERO_COEF_TOL||abs(1.0-_coords[ia])<ZERO_COEF_TOL){at_edge=true;}
+              sum+=_coords[ia];
+            }
+            double coord_last=1.0-sum;
+            at_edge=(at_edge || (abs(coord_last)<ZERO_COEF_TOL||abs(1.0-coord_last)<ZERO_COEF_TOL));
+            if(LDEBUG){
+              cerr << soliloquy << " coords=" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(_coords,4),",") << endl;
+              cerr << soliloquy << " sum=" << sum << endl;
+              cerr << soliloquy << " coord_last=" << coord_last << endl;
+              cerr << soliloquy << " at_edge=" << at_edge << endl;
+            }
+            if(at_edge==false){
+              vpflow.flag("CHULL::CALCULATE_HIGHEST_DIMENSION_ONLY",true);
+              message << "Calculating the highest dimensional hull ONLY";pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+            }
+          }
+        }
       }
 
       ////////////////////////////////////////////////////////////////////////////
@@ -561,7 +622,7 @@ namespace chull {
       ////////////////////////////////////////////////////////////////////////////
       // START Stability criterion calculation
       ////////////////////////////////////////////////////////////////////////////
-      if(vpflow.flag("CHULL::STABILITY_CRITERION")) {
+      if(vpflow.flag("CHULL::STABILITY_CRITERION")&&(!vpflow.flag("CHULL::WEB_DOC"))) { //CO20210201 - chull-web SS plotter
         message << "Starting stable criterion calculation of " << vpflow.getattachedscheme("CHULL::STABILITY_CRITERION");
         message << " on " << vinputs[i] << " hull";
         pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
@@ -698,7 +759,7 @@ namespace chull {
         aurostd::string2tokens<double>(vpflow.getattachedscheme("CHULL::HULL_FORMATION_ENTHALPY"), _coords, ",");
         for(uint j=0,fl_size_j=_coords.size();j<fl_size_j&&j<dimension;j++){coords[j+coords.lrows]=_coords[j];}
         if(LDEBUG) {cerr << soliloquy << " coords=" << coords << endl;}
-        double dist2hull;
+        double dist2hull=0.0;
         //NB: to anyone who is using the convex hull object
         //outside of declaration/initialization, all functions should be wrapped
         //in try/catch's to avoid hard exits
@@ -985,14 +1046,17 @@ namespace chull {
     if(vpflow.flag("CHULL::INCLUDE_OUTLIERS")) {
       pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::INCLUDE_OUTLIERS set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
     }
+    if(vpflow.flag("CHULL::STRICT_OUTLIER_ANALYSIS")) {
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::STRICT_OUTLIER_ANALYSIS set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
+    }
     if(vpflow.flag("CHULL::INCLUDE_ILL_CONVERGED")) {
       pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::INCLUDE_ILL_CONVERGED set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
     }
+    if(vpflow.flag("CHULL::CALCULATE_HIGHEST_DIMENSION_ONLY")) {
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::CALCULATE_HIGHEST_DIMENSION_ONLY set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
+    }
     if(vpflow.flag("FORCE")) {
       pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::FORCE set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
-    }
-    if(vpflow.flag("CHULL::FORCE_OUTLIERS")) {
-      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::FORCE_OUTLIERS set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
     }
   }
 } // namespace chull
@@ -1199,16 +1263,38 @@ namespace chull {
     throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No formation energy available for ChullPoint",_INPUT_ILLEGAL_);
     return AUROSTD_NAN;
   }
-  double H_f_atom(const aflowlib::_aflowlib_entry& entry, char units){return convertUnits(entry.enthalpyFormationAtom(0),units);}  //entry.enthalpy_formation_atom - ADDING CCE @ 0K
-  double T_S(const ChullPoint& point){
-    if(point.m_has_entry){return T_S(point.m_entry);}
-    return AUROSTD_NAN;
+  double H_f_atom(const aflowlib::_aflowlib_entry& entry, char units){
+    double d_tmp=entry.enthalpyFormationAtom(0);  //entry.enthalpy_formation_atom - ADDING CCE @ 0K
+    if(d_tmp==AUROSTD_NAN){return AUROSTD_NAN;}
+    return convertUnits(d_tmp,units);
   }
-  double T_S(const aflowlib::_aflowlib_entry& entry){return entry.entropic_temperature;}
-  double isoMaxLatentHeat(const ChullPoint& point, double x, char units){return isoMaxLatentHeat(point.m_entry,x,units);}
+  double T_S(const ChullPoint& point){
+    if(!point.m_has_entry){return AUROSTD_NAN;}
+    return T_S(point.m_entry);
+  }
+  double T_S(const aflowlib::_aflowlib_entry& entry){
+    double d_tmp=entry.entropic_temperature;
+    if(d_tmp==AUROSTD_NAN){return AUROSTD_NAN;}
+    return d_tmp;
+  }
+  double EFA(const ChullPoint& point, char units){
+    if(!point.m_has_entry){return AUROSTD_NAN;}
+    return EFA(point.m_entry,units);
+  }
+  double EFA(const aflowlib::_aflowlib_entry& entry, char units){
+    double d_tmp=entry.entropy_forming_ability;
+    if(d_tmp==AUROSTD_NAN){return AUROSTD_NAN;}
+    return convertUnits(d_tmp,units);
+  }
+  double isoMaxLatentHeat(const ChullPoint& point, double x, char units){
+    if(!point.m_has_entry){return AUROSTD_NAN;}
+    return isoMaxLatentHeat(point.m_entry,x,units);
+  }
   double isoMaxLatentHeat(const aflowlib::_aflowlib_entry& entry, double x, char units){
-    double iso_max=((double)KBOLTZEV)*T_S(entry)*(x*log(x)+(1.0-x)*log(1.0-x));
-    return convertUnits(iso_max,units);
+    if(T_S(entry)==AUROSTD_NAN){return AUROSTD_NAN;}
+    if(x<=0||x>=1.0){return AUROSTD_NAN;} //protect log()
+    double d_tmp=((double)KBOLTZEV)*T_S(entry)*(x*log(x)+(1.0-x)*log(1.0-x));
+    return convertUnits(d_tmp,units);
   }
 
   int roundDouble(double doub, int multiple, bool up) {
@@ -1291,18 +1377,72 @@ namespace chull {
 
 namespace chull {
   //--------------------------------------------------------------------------------
+  // class ChullPointLight
+  //--------------------------------------------------------------------------------
+  //--------------------------------------------------------------------------------
+  // constructor
+  //--------------------------------------------------------------------------------
+  ChullPointLight::ChullPointLight(ostream& oss) : xStream(oss),m_initialized(false) {;}
+  ChullPointLight::ChullPointLight(ofstream& FileMESSAGE,ostream& oss) : xStream(FileMESSAGE,oss),m_initialized(false) {;}
+  ChullPointLight::ChullPointLight(const ChullPointLight& b) : xStream(*b.getOFStream(),*b.getOSS()) {copy(b);} // copy PUBLIC  //upcasting is allowed, works for ChullPointLight and ChullPoint
+
+  ChullPointLight::~ChullPointLight() {xStream::free();free();}
+
+  const ChullPointLight& ChullPointLight::operator=(const ChullPointLight& other) { //upcasting is allowed, works for ChullPointLight and ChullPoint
+    if(this!=&other) {copy(other);}
+    return *this;
+  }
+  bool ChullPointLight::operator<(const ChullPointLight& other) const {
+    //NB: this is ALWAYS sorted in descending order of stoich, no need to make options for ascending order
+    //but, sorts in ascending order for energy
+    string soliloquy=XPID+"ChullPointLight::operator<():";
+    if(m_coords.lrows!=other.m_coords.lrows){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_coords.lrows!=other.m_coords.lrows");}
+    if(m_coords.rows!=other.m_coords.rows){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_coords.rows!=other.m_coords.rows");}
+    for(int i=m_coords.lrows;i<=m_coords.urows;i++){if(m_coords[i]!=other.m_coords[i]){return (m_coords[i]<other.m_coords[i]);}}
+    return false;
+  }
+
+  void ChullPointLight::clear() {free();}  //clear PUBLIC
+  void ChullPointLight::free() {
+    m_initialized=false;
+    m_coords.clear();
+    m_has_stoich_coords=false;
+    m_formation_energy_coord=false;
+    m_is_artificial=false;
+    m_has_entry=false;
+    m_i_nary=AUROSTD_MAX_UINT;
+    m_i_alloy=AUROSTD_MAX_UINT;
+    h_coords.clear();
+  }
+
+  void ChullPointLight::copy(const ChullPointLight& b) {  //copy PRIVATE  //upcasting is allowed, works for ChullPointLight and ChullPoint
+    xStream::copy(b);
+    m_initialized=b.m_initialized;
+    m_coords=b.m_coords;
+    m_has_stoich_coords=b.m_has_stoich_coords;
+    m_formation_energy_coord=b.m_formation_energy_coord;
+    m_is_artificial=b.m_is_artificial;
+    m_has_entry=b.m_has_entry;
+    m_i_nary=b.m_i_nary;
+    m_i_alloy=b.m_i_alloy;
+    h_coords=b.h_coords;
+  }
+
+  double ChullPointLight::getLastCoord() const {return m_coords[m_coords.urows];}
+
+  //--------------------------------------------------------------------------------
   // class ChullPoint
   //--------------------------------------------------------------------------------
   //--------------------------------------------------------------------------------
   // constructor
   //--------------------------------------------------------------------------------
-  ChullPoint::ChullPoint(ostream& oss,bool has_stoich_coords,bool formation_energy_coord,bool is_artificial) : xStream(oss),m_initialized(false) {initialize(has_stoich_coords,formation_energy_coord,is_artificial);}
-  ChullPoint::ChullPoint(const xvector<double>& coord,ostream& oss,bool has_stoich_coords,bool formation_energy_coord,bool is_artificial) : xStream(oss),m_initialized(false) {initialize(coord,has_stoich_coords,formation_energy_coord,is_artificial);}
-  ChullPoint::ChullPoint(const vector<string>& velements,const aflowlib::_aflowlib_entry& entry,ostream& oss,bool formation_energy_coord) : xStream(oss),m_initialized(false) {initialize(velements,entry,formation_energy_coord);}
-  ChullPoint::ChullPoint(ofstream& FileMESSAGE,ostream& oss,bool has_stoich_coords,bool formation_energy_coord,bool is_artificial) : xStream(FileMESSAGE,oss),m_initialized(false) {initialize(has_stoich_coords,formation_energy_coord,is_artificial);}
-  ChullPoint::ChullPoint(const xvector<double>& coord,ofstream& FileMESSAGE,ostream& oss,bool has_stoich_coords,bool formation_energy_coord,bool is_artificial) : xStream(FileMESSAGE,oss),m_initialized(false) {initialize(coord,has_stoich_coords,formation_energy_coord,is_artificial);}
-  ChullPoint::ChullPoint(const vector<string>& velements,const aflowlib::_aflowlib_entry& entry,ofstream& FileMESSAGE,ostream& oss,bool formation_energy_coord) : xStream(FileMESSAGE,oss),m_initialized(false) {initialize(velements,entry,formation_energy_coord);}
-  ChullPoint::ChullPoint(const ChullPoint& b) : xStream(*b.getOFStream(),*b.getOSS()) {copy(b);} // copy PUBLIC
+  ChullPoint::ChullPoint(ostream& oss,bool has_stoich_coords,bool formation_energy_coord,bool is_artificial) : ChullPointLight(oss) {initialize(has_stoich_coords,formation_energy_coord,is_artificial);}
+  ChullPoint::ChullPoint(const xvector<double>& coord,ostream& oss,bool has_stoich_coords,bool formation_energy_coord,bool is_artificial) : ChullPointLight(oss) {initialize(coord,has_stoich_coords,formation_energy_coord,is_artificial);}
+  ChullPoint::ChullPoint(const vector<string>& velements,const aflowlib::_aflowlib_entry& entry,ostream& oss,bool formation_energy_coord) : ChullPointLight(oss) {initialize(velements,entry,formation_energy_coord);}
+  ChullPoint::ChullPoint(ofstream& FileMESSAGE,ostream& oss,bool has_stoich_coords,bool formation_energy_coord,bool is_artificial) : ChullPointLight(FileMESSAGE,oss) {initialize(has_stoich_coords,formation_energy_coord,is_artificial);}
+  ChullPoint::ChullPoint(const xvector<double>& coord,ofstream& FileMESSAGE,ostream& oss,bool has_stoich_coords,bool formation_energy_coord,bool is_artificial) : ChullPointLight(FileMESSAGE,oss) {initialize(coord,has_stoich_coords,formation_energy_coord,is_artificial);}
+  ChullPoint::ChullPoint(const vector<string>& velements,const aflowlib::_aflowlib_entry& entry,ofstream& FileMESSAGE,ostream& oss,bool formation_energy_coord) : ChullPointLight(FileMESSAGE,oss) {initialize(velements,entry,formation_energy_coord);}
+  ChullPoint::ChullPoint(const ChullPoint& b) : xStream(*b.getOFStream(),*b.getOSS()),ChullPointLight(b) {copy(b);} // copy PUBLIC
 
   ChullPoint::~ChullPoint() {xStream::free();free();}
 
@@ -1311,16 +1451,20 @@ namespace chull {
     return *this;
   }
 
-  void ChullPoint::HullCopy(const ChullPoint& b){ //copies ALL chull stuff, no entry data
-    xStream::copy(b);
-    m_initialized=b.m_initialized;
-    m_coords=b.m_coords;
-    m_has_stoich_coords=b.m_has_stoich_coords;
-    m_has_entry=b.m_has_entry;
-    m_formation_energy_coord=b.m_formation_energy_coord;
-    m_is_artificial=b.m_is_artificial;
-    m_i_nary=b.m_i_nary;
-    m_i_alloy=b.m_i_alloy;
+  void ChullPoint::clear() {free();}  //clear PUBLIC
+  void ChullPoint::free() {
+    ChullPointLight::free();
+    m_entry.clear(); if(m_entry.vsg.size()==0){m_entry.vsg.push_back(NOSG);} if(m_entry.vsg2.size()==0){m_entry.vsg2.push_back(NOSG);}  //hack so it doesn't break with front(),back(),[0]
+    s_coords.clear();
+    c_coords.clear();
+    m_elements_present.clear();
+    cleanPointForHullTransfer();
+  }
+
+  void ChullPoint::copy(const ChullPoint& b) {  //copy PRIVATE
+    //xStream::copy(b); //done inside ChullPointLight::copy()
+    ChullPointLight::copy(b);
+    m_entry=b.m_entry; if(m_entry.vsg.size()==0){m_entry.vsg.push_back(NOSG);} if(m_entry.vsg2.size()==0){m_entry.vsg2.push_back(NOSG);}  //hack so it doesn't break with front(),back(),[0]
     m_i_coord_group=b.m_i_coord_group;
     s_coords=b.s_coords;
     c_coords=b.c_coords;
@@ -1333,48 +1477,7 @@ namespace chull {
     //[OBSOLETE - reduce by frac_vrt always! so use coord_group values]m_decomp_coefs=b.m_decomp_coefs;
     m_stability_criterion=b.m_stability_criterion;
     m_n_plus_1_enthalpy_gain=b.m_n_plus_1_enthalpy_gain;
-    h_coords=b.h_coords;
   }
-
-  bool ChullPoint::operator<(const ChullPoint& other) const {
-    //NB: this is ALWAYS sorted in descending order of stoich, no need to make options for ascending order
-    //but, sorts in ascending order for energy
-    string soliloquy=XPID+"ChullPoint::operator<():";
-    if(m_coords.lrows!=other.m_coords.lrows){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_coords.lrows!=other.m_coords.lrows");}
-    if(m_coords.rows!=other.m_coords.rows){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_coords.rows!=other.m_coords.rows");}
-    for(int i=m_coords.lrows;i<=m_coords.urows;i++){if(m_coords[i]!=other.m_coords[i]){return (m_coords[i]<other.m_coords[i]);}}
-    return false;
-  }
-
-  void ChullPoint::clear() {ChullPoint a;copy(a);}  //clear PUBLIC
-  void ChullPoint::free() {
-    m_initialized=false;
-    m_coords.clear();
-    m_has_stoich_coords=false;
-    m_entry.clear(); if(m_entry.vsg.size()==0){m_entry.vsg.push_back(NOSG);} if(m_entry.vsg2.size()==0){m_entry.vsg2.push_back(NOSG);}  //hack so it doesn't break with front(),back(),[0]
-    m_has_entry=false;
-    m_formation_energy_coord=false;
-    m_is_artificial=false;
-    m_i_nary=AUROSTD_MAX_UINT;
-    s_coords.clear();
-    c_coords.clear();
-    m_elements_present.clear();
-    //see xStream::free()
-    //p_oss=NULL;
-    //p_FileMESSAGE=NULL;
-    //f_new_ofstream=false;
-    cleanPointForHullTransfer();
-  }
-
-  void ChullPoint::copy(const ChullPoint& b) {  //copy PRIVATE
-    HullCopy(b);  //copies ALL chull stuff, no entry data
-    m_entry=b.m_entry; if(m_entry.vsg.size()==0){m_entry.vsg.push_back(NOSG);} if(m_entry.vsg2.size()==0){m_entry.vsg2.push_back(NOSG);}  //hack so it doesn't break with front(),back(),[0]
-  }
-
-  //MOVED TO xStream
-  //void ChullPoint::setOFStream(ofstream& FileMESSAGE){p_FileMESSAGE=&FileMESSAGE;}
-  //void ChullPoint::setOSS(ostream& oss) {p_oss=&oss;}
-
 
   bool ChullPoint::initialize(ostream& oss,bool has_stoich_coords,bool formation_energy_coord,bool is_artificial) {
     xStream::initialize(oss);
@@ -1520,11 +1623,13 @@ namespace chull {
   }
 
   uint ChullPoint::loadXstructures(bool relaxed_only) {  //load relaxed only
+    if(m_entry.prototype.find("POCC")!=string::npos){return false;} //POCC entries have no composition
     if(!pflow::loadXstructures(m_entry,*p_FileMESSAGE,*p_oss,relaxed_only)){return false;}
     return m_entry.vstr.size();
   }
 
   bool ChullPoint::getMostRelaxedXstructure(xstructure& xstr) const { //this is const!
+    if(m_entry.prototype.find("POCC")!=string::npos){return false;} //POCC entries have no composition
     aflowlib::_aflowlib_entry entry; entry.auid=m_entry.auid; entry.aurl=m_entry.aurl;  //fast copy
     if(!pflow::loadXstructures(entry,*p_FileMESSAGE,*p_oss,true)){return false;}
     if(entry.vstr.size()==1){xstr=entry.vstr[0]; return true;}
@@ -1532,18 +1637,20 @@ namespace chull {
   }
 
   //small get()'s of fundamental types get copies, otherwise const&
-  double ChullPoint::getLastCoord() const {return m_coords[m_coords.urows];}
   uint ChullPoint::getDim() const {return m_coords.rows;}
   bool ChullPoint::isUnary() const {return m_i_nary==0;}
   double ChullPoint::getFormationEnthalpy() const {return H_f_atom(*this,_std_);} //m_entry.enthalpy_formation_atom;
   double ChullPoint::getEntropicTemperature() const {return T_S(*this);} //m_entry.entropic_temperature;
+  double ChullPoint::getEntropyFormingAbility() const {return EFA(*this,_std_);} //m_entry.entropic_temperature;
   const vector<string>& ChullPoint::getVSG() const {return m_entry.vsg2;}
   const string& ChullPoint::getSG() const {return getVSG().back();}  //tight tolerance fine!  //vsg === LOOSE //vsg2 === TIGHT // doesn't make sense
   double ChullPoint::getDist2Hull(char units) const {
+    if(m_dist_2_hull==AUROSTD_MAX_DOUBLE){return AUROSTD_MAX_DOUBLE;}
     if(m_formation_energy_coord){return convertUnits(m_dist_2_hull,units);}
     else {return m_dist_2_hull;}  //no unit conversions coded yet here
   }
   double ChullPoint::getStabilityCriterion(char units) const {
+    if(m_stability_criterion==AUROSTD_MAX_DOUBLE){return AUROSTD_MAX_DOUBLE;}
     if(m_formation_energy_coord){return convertUnits(m_stability_criterion,units);}
     else {return m_stability_criterion;}  //no unit conversions coded yet here
   }
@@ -1559,8 +1666,21 @@ namespace chull {
     return abs(m_stability_criterion/getLastCoord()); //abs() because they are generally opposite signs //delivers as decimal, show as percentage
   }
   double ChullPoint::getNPlus1EnthalpyGain(char units) const {
+    if(m_n_plus_1_enthalpy_gain==AUROSTD_MAX_DOUBLE){return AUROSTD_MAX_DOUBLE;}
     if(m_formation_energy_coord){return convertUnits(m_n_plus_1_enthalpy_gain,units);}
     else {return m_n_plus_1_enthalpy_gain;}  //no unit conversions coded yet here
+  }
+  double ChullPoint::getEntropyStabilizationCoefficient(char units) const {
+    bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
+    string soliloquy=XPID+"ChullPoint::getEntropyStabilizationCoefficient():";
+    if(getDist2Hull()==AUROSTD_MAX_DOUBLE){return AUROSTD_MAX_DOUBLE;}
+    if(getEntropyFormingAbility()==AUROSTD_NAN){return AUROSTD_MAX_DOUBLE;}
+    if(zeroWithinTol(getEntropyFormingAbility())){return 0.0;} //protect from division by zero
+    if(LDEBUG) {
+      cerr << soliloquy << " dist2hull=" << getDist2Hull() << endl;
+      cerr << soliloquy << " EFA=" << getEntropyFormingAbility() << endl;
+    }
+    return convertUnits(sqrt(getDist2Hull() / getEntropyFormingAbility()),units);
   }
 
   //since we don't check ALL attributes of entry, then we weed out MORE
@@ -1600,17 +1720,33 @@ namespace chull {
 
   void ChullPoint::setGenCoords(const vector<string>& velements,const aflowlib::_aflowlib_entry& entry,bool formation_energy_coord) {
     string soliloquy=XPID+"ChullPoint::setGenCoords():";
+    if(entry.vcomposition.size()==0&&entry.vstoichiometry.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No vcomposition or vstoichiometry found for entry.auid="+entry.auid,_RUNTIME_ERROR_);}
     xvector<double> coord(velements.size());
-    double c_sum=0.0;
     bool found=false;
-    for(uint i=0,fl_size_i=entry.vcomposition.size();i<fl_size_i;i++){c_sum+=entry.vcomposition[i];}  //derive stoich exactly!
-    for(uint i=0,fl_size_i=velements.size();i<fl_size_i-1;i++){
-      found=false;
-      for(uint j=0,fl_size_j=entry.vspecies.size();j<fl_size_j && !found;j++){
-        if(velements[i]==entry.vspecies[j]){
-          coord[i+coord.lrows]=entry.vcomposition[j]/c_sum;
-          found=true;
+    if(entry.vcomposition.size()>0){
+      double c_sum=0.0;
+      for(uint i=0,fl_size_i=entry.vcomposition.size();i<fl_size_i;i++){c_sum+=entry.vcomposition[i];}  //derive stoich exactly!
+      if(c_sum==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"c_sum==0 (entry.auid="+entry.auid+",entry.aurl="+entry.aurl+")",_RUNTIME_ERROR_);}
+      for(uint i=0,fl_size_i=velements.size();i<fl_size_i-1;i++){
+        found=false;
+        for(uint j=0,fl_size_j=entry.vspecies.size();j<fl_size_j && !found;j++){
+          if(velements[i]==entry.vspecies[j]){
+            coord[i+coord.lrows]=entry.vcomposition[j]/c_sum;
+            found=true;
+          }
         }
+        //[might be from lower hull]if(!found){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"element not found: "+velements[i],_RUNTIME_ERROR_);}
+      }
+    }else{  //pocc structures have no vcomposition, only vstoichiometry
+      for(uint i=0,fl_size_i=velements.size();i<fl_size_i-1;i++){
+        found=false;
+        for(uint j=0,fl_size_j=entry.vspecies.size();j<fl_size_j && !found;j++){
+          if(velements[i]==entry.vspecies[j]){
+            coord[i+coord.lrows]=entry.vstoichiometry[j];
+            found=true;
+          }
+        }
+        //[might be from lower hull]if(!found){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"element not found: "+velements[i],_RUNTIME_ERROR_);}
       }
     }
     if(formation_energy_coord){coord[coord.urows]=H_f_atom(entry);} //entry.enthalpy_formation_atom
@@ -1731,7 +1867,7 @@ namespace chull {
   // constructor
   //--------------------------------------------------------------------------------
   FacetPoint::FacetPoint() {free();}
-  FacetPoint::FacetPoint(const ChullPoint& point,uint index,bool full_copy){initialize(point,index,full_copy);}  //need BOTH point and index, otherwise, just use point/index independently
+  FacetPoint::FacetPoint(const ChullPointLight& point,uint index){initialize(point,index);}  //need BOTH point and index, otherwise, just use point/index independently
   FacetPoint::FacetPoint(const FacetPoint& b) {copy(b);}  // copy PUBLIC
   FacetPoint::~FacetPoint() {free();}
 
@@ -1755,9 +1891,8 @@ namespace chull {
     ch_point=b.ch_point;
   }
 
-  void FacetPoint::initialize(const ChullPoint& point,uint index,bool full_copy) {
-    if(full_copy){ch_point=point;}
-    else {ch_point.HullCopy(point);} //fast copy of just hull relevant data, not extra entry data, for this, use index in ConvexHull
+  void FacetPoint::initialize(const ChullPointLight& point,uint index) {
+    ch_point=point;
     ch_index=index;
     m_initialized=true;
   }
@@ -1767,12 +1902,12 @@ namespace chull {
 namespace chull {
   bool sortThermoPoints::operator() (const FacetPoint& fpi,const FacetPoint& fpj) const{
     string soliloquy=XPID+"chull::sortThermoPoints::operator():";
-    const ChullPoint& ci=fpi.ch_point;
-    const ChullPoint& cj=fpj.ch_point;
+    const ChullPointLight& ci=fpi.ch_point;
+    const ChullPointLight& cj=fpj.ch_point;
     return (*this).operator()(ci,cj);
   }
 
-  bool sortThermoPoints::operator() (const ChullPoint& ci,const ChullPoint& cj) const{
+  bool sortThermoPoints::operator() (const ChullPointLight& ci,const ChullPointLight& cj) const{  //upcasting is allowed, works for ChullPointLight and ChullPoint
     string soliloquy=XPID+"chull::sortThermoPoints::operator():";
     if(!(ci.m_initialized && cj.m_initialized)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Points not initialized");}
     //do not first sort binaries from ternaries, screws up facet sorting
@@ -1922,7 +2057,7 @@ namespace chull {
     return isPointOutside(f_point.ch_point);
   }
 
-  bool ChullFacet::isPointOutside(const ChullPoint& point) const {
+  bool ChullFacet::isPointOutside(const ChullPointLight& point) const {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
     string soliloquy=XPID+"ChullFacet::isPointOutside():";
     if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Facet not initialized");}
@@ -1960,7 +2095,7 @@ namespace chull {
   }
 
   //sign depends on normal, if normal vector and point are in the same half-space, point-plane distance is positive, negative otherwise
-  double ChullFacet::getSignedPointPlaneDistance(const ChullPoint& point) const {return getSignedPointPlaneDistance(point.h_coords);}
+  double ChullFacet::getSignedPointPlaneDistance(const ChullPointLight& point) const {return getSignedPointPlaneDistance(point.h_coords);}
   double ChullFacet::getSignedPointPlaneDistance(const xvector<double>& point) const {
     string soliloquy=XPID+"ChullFacet::getSignedPointPlaneDistance():";
     if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Facet not initialized");}
@@ -1969,7 +2104,7 @@ namespace chull {
     return scalar_product(m_normal,diff);
   }
 
-  double ChullFacet::getSignedVerticalDistanceToZero(const ChullPoint& point) const {
+  double ChullFacet::getSignedVerticalDistanceToZero(const ChullPointLight& point) const {
     //get energy of facet at stoichiometry of input (point)
     string soliloquy=XPID+"ChullFacet::getSignedVerticalDistanceToZero():";
     return getSignedVerticalDistanceToZero(point.h_coords);
@@ -1999,7 +2134,7 @@ namespace chull {
     return dist;
   }
 
-  double ChullFacet::getSignedVerticalDistance(const ChullPoint& point) const {
+  double ChullFacet::getSignedVerticalDistance(const ChullPointLight& point) const {
     string soliloquy=XPID+"ChullFacet::getSignedVerticalDistance():";
     if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized facet");}
     if(!point.m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized point");}
@@ -2048,13 +2183,13 @@ namespace chull {
   //void ChullFacet::setOFStream(ofstream& FileMESSAGE){p_FileMESSAGE=&FileMESSAGE;}
   //void ChullFacet::setOSS(ostream& oss) {p_oss=&oss;}
 
-  void ChullFacet::addVertex(const ChullPoint& point,uint index) {FacetPoint fp(point,index,false);return addVertex(fp);} //no need for full copy
+  void ChullFacet::addVertex(const ChullPointLight& point,uint index) {FacetPoint fp(point,index);return addVertex(fp);} //no need for full copy
   void ChullFacet::addVertex(const FacetPoint& fp){
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
     stringstream message;
     string soliloquy=XPID+"ChullFacet::addVertex():";
     if(!fp.m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized facetpoint");}
-    const ChullPoint& point=fp.ch_point;
+    const ChullPointLight& point=fp.ch_point;
     if(m_vertices.size()==0){
       m_has_stoich_coords=point.m_has_stoich_coords;
       m_formation_energy_coord=point.m_formation_energy_coord;
@@ -2432,6 +2567,7 @@ namespace chull {
     m_equilibrium_phases.clear();
     m_calculated_equivalent_g_states=false;
     m_equivalent_g_states.clear();
+    m_sym_equivalent_g_states.clear();
     m_stability_criterion=AUROSTD_MAX_DOUBLE;
     m_n_plus_1_enthalpy_gain=AUROSTD_MAX_DOUBLE;
     m_icsd_g_state=false;
@@ -2457,6 +2593,7 @@ namespace chull {
     for(uint i=0,fl_size_i=m_equilibrium_phases.size();i<fl_size_i;i++){m_equilibrium_phases.clear();} m_equilibrium_phases.clear(); for(uint i=0;i<b.m_equilibrium_phases.size();i++){m_equilibrium_phases.push_back(b.m_equilibrium_phases[i]);}
     m_calculated_equivalent_g_states=b.m_calculated_equivalent_g_states;
     m_equivalent_g_states.clear(); for(uint i=0,fl_size_i=b.m_equivalent_g_states.size();i<fl_size_i;i++){m_equivalent_g_states.push_back(b.m_equivalent_g_states[i]);}
+    m_sym_equivalent_g_states.clear(); for(uint i=0,fl_size_i=b.m_sym_equivalent_g_states.size();i<fl_size_i;i++){m_sym_equivalent_g_states.push_back(b.m_sym_equivalent_g_states[i]);}
     m_stability_criterion=b.m_stability_criterion;
     m_n_plus_1_enthalpy_gain=b.m_n_plus_1_enthalpy_gain;
     m_icsd_g_state=b.m_icsd_g_state;
@@ -2626,7 +2763,11 @@ namespace chull {
   ConvexHull::ConvexHull(const aurostd::xoption& vpflow,const vector<ChullPoint>& vpoints,const vector<string>& velements,ofstream& FileMESSAGE,ostream& oss,bool formation_energy_hull,bool add_artificial_unaries) : xStream(FileMESSAGE,oss),m_initialized(false) {initialize(vpflow,vpoints,velements,formation_energy_hull,add_artificial_unaries);}
   ConvexHull::ConvexHull(const ConvexHull& b) : xStream(*b.getOFStream(),*b.getOSS()) {copy(b);}
 
-  ConvexHull::~ConvexHull() {xStream::free();free();}
+  ConvexHull::~ConvexHull() {
+    xStream::free();
+    free();
+    m_allowed_dft_types.clear();
+  }
 
   const ConvexHull& ConvexHull::operator=(const ConvexHull& other) {
     if(this!=&other) {copy(other);}
@@ -3452,11 +3593,13 @@ namespace chull {
     LOGGER_TYPE=_LOGGER_OPTION_;
     //tests of stupidity
     if(entry.vspecies.size()!=entry.vcomposition.size()){
-      //throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Bad entry ("+entry.auid+") - vspecies.size!=vcomposition.size()"); //let's not break the code for one bad entry
-      reason="Entry (auid="+entry.auid+") is ill-defined: vspecies.size()!=vcomposition.size()";
-      reason+=" (please report on AFLOW Forum: aflow.org/forum)";
-      LOGGER_TYPE=_LOGGER_WARNING_;
-      return false;
+      if(entry.prototype.find("POCC")==string::npos){ //POCC entries have no composition
+        //throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Bad entry ("+entry.auid+") - vspecies.size!=vcomposition.size()"); //let's not break the code for one bad entry
+        reason="Entry (auid="+entry.auid+") is ill-defined: vspecies.size()!=vcomposition.size()";
+        reason+=" (please report on AFLOW Forum: aflow.org/forum)";
+        LOGGER_TYPE=_LOGGER_WARNING_;
+        return false;
+      }
     }
     bool found=false;
     for(uint j=0,fl_size_j=entry.vspecies.size();j<fl_size_j;j++){
@@ -3699,16 +3842,15 @@ namespace chull {
     //nice solution here! but only works for odd counts
     //http://en.cppreference.com/w/cpp/algorithm/nth_element
     bool iqr_method=true; //unfortunately, MAD is normal distribution dependent, NOT our case here
-    //[CHECK COUNT ELSEWHERE]bool force_outlier_test=false;  //override binary alloy statistics check
 
     uint iqr_count_threshold=4; //3 results in degenerate quartile indices
     if((uint)energies.rows<iqr_count_threshold){ //ALWAYS not enough points to do statistics (need 3 quartiles)
       message << "Not enough degrees of freedom for outlier detection analysis per interquartile-range (count=" << energies.rows << " < " << iqr_count_threshold << ")";
       if(m_cflags.flag("FAKE_HULL")){aurostd::StringstreamClean(message);}  //don't want to see these errors, they are expected
-      else if(m_cflags.flag("FORCE")||m_cflags.flag("CHULL::FORCE_OUTLIERS")){
-        message << ", skipping outlier analysis";pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+      else if(m_cflags.flag("CHULL::STRICT_OUTLIER_ANALYSIS")&&(!m_cflags.flag("FORCE"))){
+        message << " (results may not be reliable). Terminating hull analysis.";throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_RANGE_);
       } else {
-        message << ". Override with --force_outliers (results may not be reliable).";throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);
+        message << ", skipping outlier analysis.";pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
       }
       return;
     }
@@ -3871,10 +4013,10 @@ namespace chull {
       if(points_to_consider.size()<binaries_half_hull_threshold){
         message << "Not enough degrees of freedom for outlier detection analysis per user defined threshold (count=" << points_to_consider.size() << " < " << binaries_half_hull_threshold << ")";
         if(m_cflags.flag("FAKE_HULL")){aurostd::StringstreamClean(message);}  //don't want to see these errors, they are expected
-        else if(m_cflags.flag("FORCE")||m_cflags.flag("CHULL::FORCE_OUTLIERS")){
-          message << ", skipping outlier analysis";pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+        else if(m_cflags.flag("CHULL::STRICT_OUTLIER_ANALYSIS")&&(!m_cflags.flag("FORCE"))){
+          message << " (results may not be reliable). Terminating hull analysis.";throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_RANGE_);
         } else {
-          message << ". Override with --force_outliers (results may not be reliable).";throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);
+          message << ", skipping outlier analysis.";pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
         }
         vector<uint> outliers;
         return outliers;
@@ -4221,7 +4363,7 @@ namespace chull {
       outliers.clear();
     }
 
-    bool found_outlier;
+    bool found_outlier=false;
     vector<uint> points_to_remove;
     uint valid_count=0;
     for(uint i_coord_group=0,fl_size_i_coord_group=m_coord_groups.size();i_coord_group<fl_size_i_coord_group;i_coord_group++){
@@ -5532,8 +5674,14 @@ namespace chull {
     if(!m_naries[i_nary].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized nary");}
     if(!m_naries[i_nary].m_alloys[i_alloy].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized alloy");}
     if(i_coord_group>m_coord_groups.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within coordgroups");}
-    if(m_coord_groups[i_coord_group].m_is_on_hull){return;}
     if(m_coord_groups[i_coord_group].m_nearest_facet>m_facets.size()-1){setNearestFacet(i_nary,i_alloy,i_coord_group);}
+
+    if(m_coord_groups[i_coord_group].m_is_on_hull){
+      if(!isViablePoint(m_coord_groups[i_coord_group].m_hull_member)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No hull member set for m_coord_group["+aurostd::utype2string(i_coord_group)+"]",_RUNTIME_ERROR_);}
+      vector<uint> dcomp_phases;dcomp_phases.push_back(m_coord_groups[i_coord_group].m_hull_member);
+      m_coord_groups[i_coord_group].m_decomp_phases=dcomp_phases;
+      return;
+    }
 
     uint i_facet=m_coord_groups[i_coord_group].m_nearest_facet;
     ChullFacet& facet=m_facets[i_facet];
@@ -5549,7 +5697,7 @@ namespace chull {
   xvector<double> ConvexHull::getDecompositionCoefficients(const ChullPoint& point,vector_reduction_type vred) const{
     string soliloquy=XPID+"ConvexHull::getDecompositionCoefficients():";
     if(!point.m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized point");}
-    if(point.m_is_on_hull){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No decomposition coefficients for hull members");}
+    //[returns self]if(point.m_is_on_hull){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No decomposition coefficients for hull members");}
     uint i_coord_group=AUROSTD_MAX_UINT;
     bool found_coord_group=getCoordGroupIndex(point,i_coord_group);
     if(found_coord_group){  //composition has already been considered by hull, might be g-state
@@ -5610,8 +5758,14 @@ namespace chull {
     if(!m_naries[i_nary].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized nary");}
     if(!m_naries[i_nary].m_alloys[i_alloy].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized alloy");}
     if(i_coord_group>m_coord_groups.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within coordgroups");}
-    if(m_coord_groups[i_coord_group].m_is_on_hull){return;}
     if(m_coord_groups[i_coord_group].m_decomp_phases.size()==0){setDecompositionPhases(i_nary,i_alloy,i_coord_group);}
+
+    if(m_coord_groups[i_coord_group].m_is_on_hull){
+      xvector<double> dcomp_coefs(2);
+      dcomp_coefs[dcomp_coefs.lrows]=dcomp_coefs[dcomp_coefs.lrows+1]=1.0;
+      m_coord_groups[i_coord_group].m_decomp_coefs=dcomp_coefs;
+      return;
+    }
 
     //we get different coefficients between stoich and composition
     //ALWAYS use composition (even POCC, simply won't reduce), and do NOT mix stoich + composition
@@ -5817,7 +5971,7 @@ namespace chull {
       cerr << soliloquy << " structure 2" << endl;
       cerr << b;
     }
-    bool are_equivalent=compare::aflowCompareStructure(a,b,true,false,false); //match species and use fast match, but not scale volume, two structures with different volumes (pressures) are different! //DX20180123 - added fast_match = true //DX20190318 - not fast_match but optimized_match=false
+    bool are_equivalent=compare::structuresMatch(a,b,true,false,false); //match species and use fast match, but not scale volume, two structures with different volumes (pressures) are different! //DX20180123 - added fast_match = true //DX20190318 - not fast_match but optimized_match=false
     if(LDEBUG) {cerr << soliloquy << " structures are " << (are_equivalent?"":"NOT ") << "equivalent" << endl;}
     return are_equivalent;
   }
@@ -6032,6 +6186,8 @@ namespace chull {
       //very important that you do not simply go through all facet points and find equilibrium points
       //this will overwrite binary information with ternary information
       //proceed safely with i_coord_group's
+      setDecompositionPhases(i_nary,i_alloy,i_coord_group);
+      setDecompositionCoefficients(i_nary,i_alloy,i_coord_group);
       setEquilibriumPhases(i_nary,i_alloy,i_coord_group);
       setSymEquivalentGStates(i_nary,i_alloy,i_coord_group);
       setEquivalentGStates(i_nary,i_alloy,i_coord_group);
@@ -6155,10 +6311,18 @@ namespace chull {
     if(LDEBUG) {cerr << soliloquy << " starting" << endl;}
     //we first run through alloy hulls IF stoich_coords, grabbing hull_members
     if(m_has_stoich_coords){
-      message << "Calculating the hull(s) in increasing dimensionality (stoichiometric coordinates)";
-      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
       if(!m_naries.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Points have yet to be structured");}
-      for(uint i_nary=1,fl_size_i_nary=m_naries.size();i_nary<fl_size_i_nary;i_nary++){ //start at binaries
+      bool calc_highest_hull_only=m_cflags.flag("CHULL::CALCULATE_HIGHEST_DIMENSION_ONLY");
+      uint i_nary_start=1;  //start at binaries
+      if(calc_highest_hull_only){
+        i_nary_start=m_naries.size()-1;
+        message << "Calculating the highest dimensional hull ONLY (stoichiometric coordinates)";
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+      }else{
+        message << "Calculating the hull(s) in increasing dimensionality (stoichiometric coordinates)";
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+      }
+      for(uint i_nary=i_nary_start,fl_size_i_nary=m_naries.size();i_nary<fl_size_i_nary;i_nary++){
         for(uint i_alloy=0,fl_size_i_alloy=m_naries[i_nary].m_alloys.size();i_alloy<fl_size_i_alloy;i_alloy++){
           message << "Calculating " << pflow::arity_string(i_nary+1,false,false) << " hull for";
           if(m_velements.size()){message << " " << aurostd::joinWDelimiter(alloyToElements(i_nary,i_alloy),"-");}
@@ -6166,7 +6330,11 @@ namespace chull {
           pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
           cleanHull();
           setElementsPresent(i_nary,i_alloy); //m_has_stoich_coords only
-          preparePointsForHullCalculation(i_nary,i_alloy);  //will have unary duplicates, but don't worry, we remove in calculateFacets()
+          if(calc_highest_hull_only){
+            preparePointsForHullCalculation();  //inject all points
+          }else{
+            preparePointsForHullCalculation(i_nary,i_alloy);  //will have unary duplicates, but don't worry, we remove in calculateFacets()
+          }
           calculateFacets();
           message << pflow::arity_string(i_nary+1,true,false) << " hull calculated for";
           if(m_velements.size()){message << " " << aurostd::joinWDelimiter(alloyToElements(i_nary,i_alloy),"-");}
@@ -6799,12 +6967,16 @@ namespace chull {
 
   string ConvexHull::prettyPrintCompound(const aflowlib::_aflowlib_entry& entry,vector_reduction_type vred,bool exclude1,filetype ftype) const {  // overload
     if(entry.vspecies.size()!=entry.vcomposition.size()) {
-      string soliloquy=XPID+"ConvexHull::prettyPrintCompound():";
-      stringstream message;
-      message << "Entry (auid=" << entry.auid << ") is ill-defined: vspecies.size()!=vcomposition.size()";
-      message << " (please report on AFLOW Forum: aflow.org/forum)";
-      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
-      return entry.compound;
+      if(entry.prototype.find("POCC")!=string::npos){ //POCC entries have no composition
+        return pflow::prettyPrintCompound(entry.vspecies,entry.vstoichiometry,no_vrt,exclude1,ftype);  //pass in stoichiometry and do not reduce
+      }else{
+        string soliloquy=XPID+"ConvexHull::prettyPrintCompound():";
+        stringstream message;
+        message << "Entry (auid=" << entry.auid << ") is ill-defined: vspecies.size()!=vcomposition.size()";
+        message << " (please report on AFLOW Forum: aflow.org/forum)";
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+        return entry.compound;
+      }
     }
     return pflow::prettyPrintCompound(entry.vspecies,entry.vcomposition,vred,exclude1,ftype);  //ME20190628
   }
@@ -9491,8 +9663,8 @@ namespace chull {
             ////////////////////////////////////////////////////////////////////
 
             if(meta_labels) {
-              uint tmp_precision=0;
-              double tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);
+              uint precision_tmp=0;
+              double tmp_roundoff_tol=5.0*pow(10,-((int)precision_tmp)-1);
               // no node option
 
               // get node position
@@ -9516,14 +9688,14 @@ namespace chull {
               // enthalpy of formation, row 4
               // no need for precision for next few columns, leave it same way
               // as received from AFLOW
-              node_content_ss << "$H_{\\mathrm{f}}$=" << aurostd::utype2string(chull::H_f_atom(point,_m_),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM) << " meV/atom";
+              node_content_ss << "$H_{\\mathrm{f}}$=" << aurostd::utype2string(chull::H_f_atom(point,_m_),precision_tmp,true,tmp_roundoff_tol,FIXED_STREAM) << " meV/atom";
               //num_ss << chull::H_f_atom(point,_m_);
               //node_content_ss << "$H_{\\mathrm{f}}$=" << num_ss.str() << " meV/atom";
               //num_ss.str("");
               // shortstack newline
               node_content_ss << "\\\\";
               // entropic temperature, row 5
-              node_content_ss << "$T_{\\mathrm{S}}$=" << aurostd::utype2string(chull::T_S(point),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM) << " K";
+              node_content_ss << "$T_{\\mathrm{S}}$=" << aurostd::utype2string(chull::T_S(point),precision_tmp,true,tmp_roundoff_tol,FIXED_STREAM) << " K";
               //num_ss << chull::T_S(point);
               //node_content_ss << "$T_{\\mathrm{S}}$=" << num_ss.str() << " K";
               //num_ss.str("");
@@ -9532,9 +9704,9 @@ namespace chull {
                 // shortstack newline
                 node_content_ss << "\\\\";
                 if(m_formation_energy_hull) {
-                  node_content_ss << "$" << getDelta(helvetica_font) << " H_{\\mathrm{f}}$=" << aurostd::utype2string(point.getDist2Hull(_m_),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM) << " meV/atom";  //CHULL_PRECISION
+                  node_content_ss << "$" << getDelta(helvetica_font) << " H_{\\mathrm{f}}$=" << aurostd::utype2string(point.getDist2Hull(_m_),precision_tmp,true,tmp_roundoff_tol,FIXED_STREAM) << " meV/atom";  //CHULL_PRECISION
                 } else {
-                  node_content_ss << "$" << getDelta(helvetica_font) << " T_{\\mathrm{S}}$=" << aurostd::utype2string(point.getDist2Hull(_std_),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM) << " K"; //CHULL_PRECISION
+                  node_content_ss << "$" << getDelta(helvetica_font) << " T_{\\mathrm{S}}$=" << aurostd::utype2string(point.getDist2Hull(_std_),precision_tmp,true,tmp_roundoff_tol,FIXED_STREAM) << " K"; //CHULL_PRECISION
                 }
               }
               node_content_ss << "}";
@@ -10187,7 +10359,7 @@ namespace chull {
       stringstream scriterion_data_ss,np1_data_ss;
       //uint num_cols_scriterion=2;
       //uint num_cols_np1=3;
-      uint tmp_precision;
+      uint precision_tmp=0;
       double tmp_roundoff_tol;
       if(compounds_column_report){pdftable_font_sizes="\\fontsize{4}{6}\\selectfont";}
       else {pdftable_font_sizes="\\fontsize{5}{7}\\selectfont";}
@@ -10396,17 +10568,17 @@ namespace chull {
                 _report_data_ss << " " << "(ground-state)"; // if ground-state
                 if(m_coord_groups[i_coord_group].m_stability_criterion<AUROSTD_NAN){
                   print_scriterion=true;
-                  tmp_precision=0;
-                  tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);
+                  precision_tmp=0;
+                  tmp_roundoff_tol=5.0*pow(10,-((int)precision_tmp)-1);
                   //scriterion_data_ss << "$\\mathit{\\Delta}_{\\mathrm{sc}}="; //this delta is okay, should be italicized
                   scriterion_data_ss << "$\\delta_{\\mathrm{sc}}="; //this delta is okay, should be italicized
-                  scriterion_data_ss << aurostd::utype2string(convertUnits(m_coord_groups[i_coord_group].m_stability_criterion,(m_formation_energy_hull?_m_:_std_)),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM);
+                  scriterion_data_ss << aurostd::utype2string(convertUnits(m_coord_groups[i_coord_group].m_stability_criterion,(m_formation_energy_hull?_m_:_std_)),precision_tmp,true,tmp_roundoff_tol,FIXED_STREAM);
                   scriterion_data_ss << "$~" << (m_formation_energy_hull?string("meV/atom"):string("K"));
                 }
                 if(m_coord_groups[i_coord_group].m_i_nary>=1 && m_coord_groups[i_coord_group].m_n_plus_1_enthalpy_gain<AUROSTD_NAN){ //print binaries anyway... //print only for ternaries and up, binaries is trivial formation enthalpy (save space)
                   print_np1=true;
-                  tmp_precision=0;
-                  tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);
+                  precision_tmp=0;
+                  tmp_roundoff_tol=5.0*pow(10,-((int)precision_tmp)-1);
                   //np1_data_ss << "$\\mathit{\\Delta}_{\\mathrm{sc}}="; //this delta is okay, should be italicized
                   if(0){
                     np1_data_ss << "$\\Delta H[N|\\{1,\\cdots,N-1\\}]="; //this delta is okay, should be italicized
@@ -10419,7 +10591,7 @@ namespace chull {
                     else if(m_coord_groups[i_coord_group].m_i_nary>3){np1_data_ss << "\\{1,\\cdots," << m_coord_groups[i_coord_group].m_i_nary << "\\}";}
                     np1_data_ss << "]=";
                   }
-                  np1_data_ss << aurostd::utype2string(convertUnits(m_coord_groups[i_coord_group].m_n_plus_1_enthalpy_gain,(m_formation_energy_hull?_m_:_std_)),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM);
+                  np1_data_ss << aurostd::utype2string(convertUnits(m_coord_groups[i_coord_group].m_n_plus_1_enthalpy_gain,(m_formation_energy_hull?_m_:_std_)),precision_tmp,true,tmp_roundoff_tol,FIXED_STREAM);
                   np1_data_ss << "$~" << (m_formation_energy_hull?string("meV/atom"):string("K"));
                 }
               } else {
@@ -10790,9 +10962,9 @@ namespace chull {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
     string soliloquy=XPID+"ConvexHull::grabCHPointProperty():";
     if(LDEBUG) {cerr << soliloquy << " start" << endl;}
-    uint precision,tmp_precision;
-    precision=tmp_precision=COEF_PRECISION;
+    uint precision=COEF_PRECISION,precision_tmp=COEF_PRECISION;
     double tmp_roundoff_tol=5.0*pow(10,-((int)precision)-1);
+    double d_tmp=0.0;
     string value="";
     string equilibrium_phases_delimiter="-";
     string string_wrapper="";
@@ -10862,19 +11034,22 @@ namespace chull {
       value=aurostd::wrapString(value,string_wrapper);
     }
     else if(property=="spin_atom"){
-      tmp_precision=precision;
-      if(ftype==latex_ft){tmp_precision=2;tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);}
-      value=aurostd::utype2string(point.m_entry.spin_atom,tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM);
+      d_tmp=point.m_entry.spin_atom;
+      if(d_tmp!=AUROSTD_NAN){
+        precision_tmp=precision;
+        if(ftype==latex_ft){precision_tmp=2;tmp_roundoff_tol=5.0*pow(10,-((int)precision_tmp)-1);}
+        value=aurostd::utype2string(d_tmp,precision_tmp,true,tmp_roundoff_tol,FIXED_STREAM);
+      }
     }
     else if(property=="enthalpy_formation_atom"){
-      tmp_precision=precision;
-      if(ftype==latex_ft){tmp_precision=0;tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);}
-      value=aurostd::utype2string(H_f_atom(point,_m_),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM);
+      precision_tmp=precision;
+      if(ftype==latex_ft){precision_tmp=0;tmp_roundoff_tol=5.0*pow(10,-((int)precision_tmp)-1);}
+      value=aurostd::utype2string(H_f_atom(point,_m_),precision_tmp,true,tmp_roundoff_tol,FIXED_STREAM);
     }
     else if(property=="entropic_temperature"){
-      tmp_precision=precision;
-      if(ftype==latex_ft){tmp_precision=0;tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);}
-      value=aurostd::utype2string(point.m_entry.entropic_temperature,tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM);
+      precision_tmp=precision;
+      if(ftype==latex_ft){precision_tmp=0;tmp_roundoff_tol=5.0*pow(10,-((int)precision_tmp)-1);}
+      value=aurostd::utype2string(point.m_entry.entropic_temperature,precision_tmp,true,tmp_roundoff_tol,FIXED_STREAM);
     }
     else if(property=="ground_state"){value=(point.isGState()?"true":"false");}
     else if(property=="equivalent_structures_auid"){
@@ -10931,7 +11106,9 @@ namespace chull {
         //need to grab from coord_group
         uint i_coord_group=AUROSTD_MAX_UINT;
         if(!getCoordGroupIndex(point,i_coord_group)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coordgroup index not set");}
-        if(m_coord_groups[i_coord_group].m_equilibrium_phases.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Equilibrium phases not set");}
+        if(!m_cflags.flag("CHULL::CALCULATE_HIGHEST_DIMENSION_ONLY")){
+          if(m_coord_groups[i_coord_group].m_equilibrium_phases.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Equilibrium phases not set");}
+        }
         vector<string> compounds,_compounds;
         uint i_point=AUROSTD_MAX_UINT;
         const vector<vector<uint> >& equilibrium_phases=m_coord_groups[i_coord_group].m_equilibrium_phases;
@@ -10957,7 +11134,9 @@ namespace chull {
         //need to grab from coord_group
         uint i_coord_group=AUROSTD_MAX_UINT;
         if(!getCoordGroupIndex(point,i_coord_group)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coordgroup index not set");}
-        if(m_coord_groups[i_coord_group].m_equilibrium_phases.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Equilibrium phases not set");}
+        if(!m_cflags.flag("CHULL::CALCULATE_HIGHEST_DIMENSION_ONLY")){
+          if(m_coord_groups[i_coord_group].m_equilibrium_phases.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Equilibrium phases not set");}
+        }
         vector<string> auids,_auids;
         uint i_point=AUROSTD_MAX_UINT;
         const vector<vector<uint> >& equilibrium_phases=m_coord_groups[i_coord_group].m_equilibrium_phases;
@@ -10979,11 +11158,11 @@ namespace chull {
     }
     else if(property=="phases_decomposition_compound"){
       if(!(ftype==txt_ft || ftype==json_ft)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No latex rule defined for "+property);}
-      if(!point.isGState()){
+      if(GET_DECOMPOSITION_POLYMORPHS||!point.isGState()){
         //need to grab from coord_group
         uint i_coord_group=AUROSTD_MAX_UINT;
         if(!getCoordGroupIndex(point,i_coord_group)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coordgroup index not set");}
-        if(!m_coord_groups[i_coord_group].m_is_on_hull){
+        if(GET_DECOMPOSITION_POLYMORPHS||!m_coord_groups[i_coord_group].m_is_on_hull){
           if(m_coord_groups[i_coord_group].m_decomp_phases.size()){
             vector<string> compounds;
             uint i_point=AUROSTD_MAX_UINT;
@@ -11004,11 +11183,11 @@ namespace chull {
     }
     else if(property=="phases_decomposition_auid"){
       if(!(ftype==txt_ft || ftype==json_ft)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No latex rule defined for "+property);}
-      if(!point.isGState()){
+      if(GET_DECOMPOSITION_POLYMORPHS||!point.isGState()){
         //need to grab from coord_group
         uint i_coord_group=AUROSTD_MAX_UINT;
         if(!getCoordGroupIndex(point,i_coord_group)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coordgroup index not set");}
-        if(!m_coord_groups[i_coord_group].m_is_on_hull){
+        if(GET_DECOMPOSITION_POLYMORPHS||!m_coord_groups[i_coord_group].m_is_on_hull){
           if(m_coord_groups[i_coord_group].m_decomp_phases.size()){
             vector<string> auids;
             uint i_point=AUROSTD_MAX_UINT;
@@ -11029,11 +11208,11 @@ namespace chull {
     }
     else if(property=="phases_decomposition_coefficient"){
       if(!(ftype==txt_ft || ftype==json_ft)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No latex rule defined for "+property);}
-      if(!point.isGState()){
+      if(GET_DECOMPOSITION_POLYMORPHS||!point.isGState()){
         //need to grab from coord_group
         uint i_coord_group=AUROSTD_MAX_UINT;
         if(!getCoordGroupIndex(point,i_coord_group)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coordgroup index not set");}
-        if(!m_coord_groups[i_coord_group].m_is_on_hull){
+        if(GET_DECOMPOSITION_POLYMORPHS||!m_coord_groups[i_coord_group].m_is_on_hull){
           if(m_coord_groups[i_coord_group].m_decomp_phases.size()){
             vector<double> nonzero_coefs;
             //[OBSOLETE - reduce by frac_vrt always! so use coord_group values]for(int i=point.m_decomp_coefs.lrows;i<=point.m_decomp_coefs.urows;i++){
@@ -11042,9 +11221,9 @@ namespace chull {
             for(int i=m_coord_groups[i_coord_group].m_decomp_coefs.lrows;i<=m_coord_groups[i_coord_group].m_decomp_coefs.urows;i++){
               if(nonZeroWithinTol(m_coord_groups[i_coord_group].m_decomp_coefs[i])){nonzero_coefs.push_back(m_coord_groups[i_coord_group].m_decomp_coefs[i]);}
             }
-            tmp_precision=precision;
-            tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);
-            value=aurostd::wrapString(aurostd::joinWDelimiter(aurostd::vecDouble2vecString(nonzero_coefs,tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM),","),list_prefix,list_suffix);
+            precision_tmp=precision;
+            tmp_roundoff_tol=5.0*pow(10,-((int)precision_tmp)-1);
+            value=aurostd::wrapString(aurostd::joinWDelimiter(aurostd::vecDouble2vecString(nonzero_coefs,precision_tmp,true,tmp_roundoff_tol,FIXED_STREAM),","),list_prefix,list_suffix);
           }
         }
       }
@@ -11059,22 +11238,31 @@ namespace chull {
       value=aurostd::utype2string(i_nary);  //no precision needed here, simple uint
     }
     else if(property=="enthalpy_formation_atom_difference"){
-      tmp_precision=precision;
-      if(ftype==latex_ft){tmp_precision=0;tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);}
-      value=aurostd::utype2string(point.getDist2Hull(_m_),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM);
+      d_tmp=point.getDist2Hull(_m_);
+      if(d_tmp!=AUROSTD_MAX_DOUBLE){
+        precision_tmp=precision;
+        if(ftype==latex_ft){precision_tmp=0;tmp_roundoff_tol=5.0*pow(10,-((int)precision_tmp)-1);}
+        value=aurostd::utype2string(d_tmp,precision_tmp,true,tmp_roundoff_tol,FIXED_STREAM);
+      }
     }
     else if(property=="entropic_temperature_difference"){
-      tmp_precision=precision;
-      if(ftype==latex_ft){tmp_precision=0;tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);}
-      value=aurostd::utype2string(point.getDist2Hull(_std_),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM); //will never be _m_ units
+      d_tmp=point.getDist2Hull(_std_);
+      if(d_tmp!=AUROSTD_MAX_DOUBLE){
+        precision_tmp=precision;
+        if(ftype==latex_ft){precision_tmp=0;tmp_roundoff_tol=5.0*pow(10,-((int)precision_tmp)-1);}
+        value=aurostd::utype2string(d_tmp,precision_tmp,true,tmp_roundoff_tol,FIXED_STREAM); //will never be _m_ units
+      }
     }
     else if(property=="stability_criterion"){
       if(m_cflags.flag("CHULL::SKIP_STABILITY_CRITERION_ANALYSIS")||point.getStabilityCriterion(_m_)>=AUROSTD_NAN){value=null_value;}
       else {
         if(point.isGState()){
-          tmp_precision=precision;
-          if(ftype==latex_ft){tmp_precision=0;tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);}
-          value=aurostd::utype2string(point.getStabilityCriterion(_m_),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM); //can be _m_ units, but smart enough to switch if T_S
+          d_tmp=point.getStabilityCriterion(_m_);
+          if(d_tmp!=AUROSTD_MAX_DOUBLE){
+            precision_tmp=precision;
+            if(ftype==latex_ft){precision_tmp=0;tmp_roundoff_tol=5.0*pow(10,-((int)precision_tmp)-1);}
+            value=aurostd::utype2string(d_tmp,precision_tmp,true,tmp_roundoff_tol,FIXED_STREAM); //can be _m_ units, but smart enough to switch if T_S
+          }
         }
       }
     }
@@ -11082,9 +11270,12 @@ namespace chull {
       if(m_cflags.flag("CHULL::SKIP_STABILITY_CRITERION_ANALYSIS")||point.getRelativeStabilityCriterion()>=AUROSTD_NAN){value=null_value;}
       else {
         if(point.isGState()){
-          tmp_precision=precision;
-          if(ftype==latex_ft){tmp_precision=0;tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);}
-          value=aurostd::utype2string(point.getRelativeStabilityCriterion(),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM); //delivers as decimal, show as percentage  //CO20180409 - not showing as fraction anymore, not necessarily out of 100%
+          d_tmp=point.getRelativeStabilityCriterion();
+          if(d_tmp!=AUROSTD_MAX_DOUBLE){
+            precision_tmp=precision;
+            if(ftype==latex_ft){precision_tmp=0;tmp_roundoff_tol=5.0*pow(10,-((int)precision_tmp)-1);}
+            value=aurostd::utype2string(d_tmp,precision_tmp,true,tmp_roundoff_tol,FIXED_STREAM); //delivers as decimal, show as percentage  //CO20180409 - not showing as fraction anymore, not necessarily out of 100%
+          }
         }
       }
     }
@@ -11092,18 +11283,21 @@ namespace chull {
       if(m_cflags.flag("CHULL::SKIP_N+1_ENTHALPY_GAIN_ANALYSIS")||point.getNPlus1EnthalpyGain(_m_)>=AUROSTD_NAN){value=null_value;}
       else {
         if(point.isGState()){
-          tmp_precision=precision;
-          if(ftype==latex_ft){tmp_precision=0;tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);}
-          value=aurostd::utype2string(point.getNPlus1EnthalpyGain(_m_),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM); //delivers as decimal, show as percentage  //CO20180409 - not showing as fraction anymore, not necessarily out of 100%
+          d_tmp=point.getNPlus1EnthalpyGain(_m_);
+          if(d_tmp!=AUROSTD_MAX_DOUBLE){
+            precision_tmp=precision;
+            if(ftype==latex_ft){precision_tmp=0;tmp_roundoff_tol=5.0*pow(10,-((int)precision_tmp)-1);}
+            value=aurostd::utype2string(d_tmp,precision_tmp,true,tmp_roundoff_tol,FIXED_STREAM); //delivers as decimal, show as percentage  //CO20180409 - not showing as fraction anymore, not necessarily out of 100%
+          }
         }
       }
     }
     else if(property=="entropy_stabilization_coefficient"){
-      //check that H_f and EFA are set and EFA!=0 (division by 0)
-      if(H_f_atom(point)!=AUROSTD_NAN && point.m_entry.entropy_forming_ability!=AUROSTD_NAN && nonZeroWithinTol(point.m_entry.entropy_forming_ability)){
-        tmp_precision=precision;
-        if(ftype==latex_ft){tmp_precision=0;tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);}
-        value=aurostd::utype2string( sqrt(H_f_atom(point) / point.m_entry.entropy_forming_ability) ,tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM);
+      d_tmp=point.getEntropyStabilizationCoefficient();
+      if(d_tmp!=AUROSTD_MAX_DOUBLE){
+        precision_tmp=precision;
+        if(ftype==latex_ft){precision_tmp=0;tmp_roundoff_tol=5.0*pow(10,-((int)precision_tmp)-1);}
+        value=aurostd::utype2string(d_tmp,precision_tmp,true,tmp_roundoff_tol,FIXED_STREAM);
       }
     }
     else {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown property");}
@@ -11277,7 +11471,9 @@ namespace chull {
       ventries.push_back(vector<vector<vector<string> > >(0));
       for(uint i_alloy=0,fl_size_i_alloy=m_naries[i_nary].m_alloys.size();i_alloy<fl_size_i_alloy;i_alloy++){
         if(!m_naries[i_nary].m_alloys[i_alloy].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized nary[i_nary="+aurostd::utype2string(i_nary)+",i_alloy="+aurostd::utype2string(i_alloy)+"]");}
-        if(m_naries[i_nary].m_alloys[i_alloy].m_facets.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No facets found in nary[i_nary="+aurostd::utype2string(i_nary)+",i_alloy="+aurostd::utype2string(i_alloy)+"]");}
+        if(!m_cflags.flag("CHULL::CALCULATE_HIGHEST_DIMENSION_ONLY")){
+          if(m_naries[i_nary].m_alloys[i_alloy].m_facets.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No facets found in nary[i_nary="+aurostd::utype2string(i_nary)+",i_alloy="+aurostd::utype2string(i_alloy)+"]");}
+        }
         if(LDEBUG) {cerr << soliloquy << " looking at i_nary=" << i_nary << ",i_alloy=" << i_alloy << endl;}
         ventries.back().push_back(vector<vector<string> >(0));
         for(uint i=0,fl_size_i=m_naries[i_nary].m_alloys[i_alloy].m_facets.size();i<fl_size_i;i++){
@@ -11535,17 +11731,18 @@ namespace chull {
     main_JSON_file="aflow_"+input; //SK20200406
     //[SK20200325 - OBSOLETE]main_JSON_file="aflow_"+input+"_hull_web.json"; //WSCHMITT20190620
     //SK20200331 START
-    bool sc_requested=m_cflags.flag("CHULL::NEGLECT");  //only neglect feature via web
+    bool sc_requested=m_cflags.flag("CHULL::STABILITY_CRITERION");  //only neglect feature via web
     bool n1eg_requested=m_cflags.flag("CHULL::CALCULATE_FAKE_HULL_N+1_ENTHALPY_GAIN");
     vector<string> sc_point;
     string delimiter="";
     // naming stability criterion files
     if(sc_requested) {
-      aurostd::string2tokens(m_cflags.getattachedscheme("CHULL::NEGLECT"),sc_point,",");
+      aurostd::string2tokens(m_cflags.getattachedscheme("CHULL::STABILITY_CRITERION"),sc_point,",");
       std::sort(sc_point.begin(),sc_point.end()); //CO20200404 - this sort is NOT necessary, as web only removes 1 point a time, but this is SAFE
       delimiter = "_sc_";
       // limiting to the characters after "aflow:" because ":" is a reserved character for php query calls, also shortening queries
       main_JSON_file=main_JSON_file + delimiter + sc_point[0].substr(6); // restricting to single auid to limit file name growth, the substr(6) removes 'aflow:' from string which would cause issues for the filename/web
+      if(LDEBUG){cerr << soliloquy << " main_JSON_file=" << main_JSON_file << endl;}
     }
     // naming n+1 enthalpy gain files
     if (n1eg_requested) {
@@ -12097,7 +12294,7 @@ namespace chull {
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
-// *           Aflow COREY OSES - Duke University 2013-2020                  *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
+// *           Aflow COREY OSES - Duke University 2013-2021                  *
 // *                                                                         *
 // ***************************************************************************

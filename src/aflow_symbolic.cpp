@@ -1,7 +1,7 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
-// *           Aflow DAVID HICKS - Duke University 2014-2020                 *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
+// *           Aflow DAVID HICKS - Duke University 2014-2021                 *
 // *                                                                         *
 // ***************************************************************************
 // Written by David Hicks (DX) - 2020
@@ -329,8 +329,8 @@ namespace anrl {
     // ---------------------------------------------------------------------------
     // base-centered monoclinic (mC)
     if(lattice_and_centering == "mC"){
-      lattice = ((1/2*a, -(1.0/2.0)*b, _SYMBOLIC_ZERO_),
-          (1.0/2.0*a, (1.0/2.0)*b, _SYMBOLIC_ZERO_),
+      lattice = ((0.5*a, -0.5*b, _SYMBOLIC_ZERO_), //DX20210106 - need parentheses and floats
+          (0.5*a, 0.5*b, _SYMBOLIC_ZERO_),
           (c*cos(beta), _SYMBOLIC_ZERO_ , c*sin(beta)));
     }
 
@@ -347,12 +347,12 @@ namespace anrl {
     if(lattice_and_centering == "oC"){
       if(space_group_letter == 'A'){
         lattice = ((a, _SYMBOLIC_ZERO_, _SYMBOLIC_ZERO_),
-            (_SYMBOLIC_ZERO_, (1.0/2.0)*b, -(1.0/2.0)*c),
-            (_SYMBOLIC_ZERO_, (1.0/2.0)*b, (1.0/2.0)*c));
+            (_SYMBOLIC_ZERO_, 0.5*b, -0.5*c),
+            (_SYMBOLIC_ZERO_, 0.5*b, 0.5*c));
       }
       if(space_group_letter == 'C'){
-        lattice = (((1.0/2.0)*a, -(1.0/2.0)*b, _SYMBOLIC_ZERO_),
-            ((1.0/2.0)*a, (1.0/2.0)*b, _SYMBOLIC_ZERO_),
+        lattice = ((0.5*a, -0.5*b, _SYMBOLIC_ZERO_),
+            (0.5*a, 0.5*b, _SYMBOLIC_ZERO_),
             (_SYMBOLIC_ZERO_, _SYMBOLIC_ZERO_, c));
       }
     }
@@ -360,17 +360,17 @@ namespace anrl {
     // ---------------------------------------------------------------------------
     // body-centered orthorhombic (oI)
     if(lattice_and_centering == "oI"){
-      lattice = ((-(1.0/2.0)*a, (1.0/2.0)*b, (1.0/2.0)*c),
-          ((1.0/2.0)*a, -(1.0/2.0)*b, (1.0/2.0)*c),
-          ((1.0/2.0)*a, (1.0/2.0)*b, -(1.0/2.0)*c));
+      lattice = ((-0.5*a, 0.5*b, 0.5*c),
+          (0.5*a, -0.5*b, 0.5*c),
+          (0.5*a, 0.5*b, -0.5*c));
     }
 
     // ---------------------------------------------------------------------------
     // face-centered orthorhombic (oF)
     if(lattice_and_centering == "oF"){
-      lattice = ((_SYMBOLIC_ZERO_, (1.0/2.0)*b, (1.0/2.0)*c),
-          ((1.0/2.0)*a, _SYMBOLIC_ZERO_, (1.0/2.0)*c),
-          ((1.0/2.0)*a, (1.0/2.0)*b, _SYMBOLIC_ZERO_));
+      lattice = ((_SYMBOLIC_ZERO_, 0.5*b, 0.5*c),
+          (0.5*a, _SYMBOLIC_ZERO_, 0.5*c),
+          (0.5*a, 0.5*b, _SYMBOLIC_ZERO_));
     }
 
     // ---------------------------------------------------------------------------
@@ -384,25 +384,25 @@ namespace anrl {
     // ---------------------------------------------------------------------------
     // body-centered tetragonal (tI)
     if(lattice_and_centering == "tI"){
-      lattice = ((-(1.0/2.0)*a, (1.0/2.0)*a, (1.0/2.0)*c),
-          ((1.0/2.0)*a, -(1.0/2.0)*a, (1.0/2.0)*c),
-          ((1.0/2.0)*a, (1.0/2.0)*a, -(1.0/2.0)*c));
+      lattice = ((-0.5*a, 0.5*a, 0.5*c),
+          (0.5*a, -0.5*a, 0.5*c),
+          (0.5*a, 0.5*a, -0.5*c));
     }
 
     // ---------------------------------------------------------------------------
     // hexagonal/trigonal (hP)
     if(lattice_and_centering == "hP"){
-      lattice = (((1.0/2.0)*a, -(sqrt(3.0)/2.0)*a, _SYMBOLIC_ZERO_),
-          ((1.0/2.0)*a, (sqrt(3.0)/2.0)*a, _SYMBOLIC_ZERO_),
+      lattice = ((0.5*a, -(sqrt(3.0)/2.0)*a, _SYMBOLIC_ZERO_),
+          (0.5*a, (sqrt(3.0)/2.0)*a, _SYMBOLIC_ZERO_),
           (_SYMBOLIC_ZERO_, _SYMBOLIC_ZERO_, c));
     }
 
     // ---------------------------------------------------------------------------
     // rhombohedral (hR)
     if(lattice_and_centering == "hR"){
-      lattice = (((1.0/2.0)*a, -(1.0/(2.0*sqrt(3.0)))*a, (1.0/3.0)*c),
+      lattice = ((0.5*a, -(1.0/(2.0*sqrt(3.0)))*a, (1.0/3.0)*c),
           (_SYMBOLIC_ZERO_, (1.0/sqrt(3.0))*a, (1.0/3.0)*c),
-          (-(1.0/2.0)*a, -(1.0/(2.0*sqrt(3.0)))*a, (1.0/3.0)*c));
+          (-0.5*a, -(1.0/(2.0*sqrt(3.0)))*a, (1.0/3.0)*c));
     }
 
     // ---------------------------------------------------------------------------
@@ -416,17 +416,17 @@ namespace anrl {
     // ---------------------------------------------------------------------------
     // body-centered cubic (cI)
     if(lattice_and_centering == "cI"){
-      lattice = ((-(1.0/2.0)*a, (1.0/2.0)*a, (1.0/2.0)*a),
-          ((1.0/2.0)*a, -(1.0/2.0)*a, (1.0/2.0)*a),
-          ((1.0/2.0)*a, (1.0/2.0)*a, -(1.0/2.0)*a));
+      lattice = ((-0.5*a, 0.5*a, 0.5*a),
+          (0.5*a, -0.5*a, 0.5*a),
+          (0.5*a, 0.5*a, -0.5*a));
     }
 
     // ---------------------------------------------------------------------------
     // face-centered cubic (cF)
     if(lattice_and_centering == "cF"){
-      lattice = ((_SYMBOLIC_ZERO_, (1.0/2.0)*a, (1.0/2.0)*a),
-          ((1.0/2.0)*a, _SYMBOLIC_ZERO_, (1.0/2.0)*a),
-          ((1.0/2.0)*a, (1.0/2.0)*a, _SYMBOLIC_ZERO_));
+      lattice = ((_SYMBOLIC_ZERO_, 0.5*a, 0.5*a),
+          (0.5*a, _SYMBOLIC_ZERO_, 0.5*a),
+          (0.5*a, 0.5*a, _SYMBOLIC_ZERO_));
     }
 
     if(LDEBUG){

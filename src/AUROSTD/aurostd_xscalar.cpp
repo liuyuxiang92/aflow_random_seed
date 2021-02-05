@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
 // *                                                                         *
 // ***************************************************************************
 // Written by Stefano Curtarolo 1994-2011
@@ -975,13 +975,27 @@ namespace aurostd{
 }
 //AS20200513 END
 
+//CO20201111 - binomial coefficient
+namespace aurostd {
+  template<class utype>
+    utype nCk(utype n,utype k) {
+      return factorial(n)/( factorial(k)*factorial(n-k) );
+    }
+}
+
+//CO20201111 - BEGIN
+namespace aurostd {
+  bool isNaN(double d){return aurostd::isequal(d,(double)NNN)||aurostd::isequal(d,(double)AUROSTD_NAN)||aurostd::isequal(d,(double)AUROSTD_MAX_DOUBLE);}
+}
+//CO20201111 - END
+
 #endif // _AUROSTD_XSCALAR_CPP_
 
 
 
 // **************************************************************************
 // *                                                                        *
-// *             STEFANO CURTAROLO - Duke University 2003-2020              *
+// *             STEFANO CURTAROLO - Duke University 2003-2021              *
 // *                                                                        *
 // **************************************************************************
 

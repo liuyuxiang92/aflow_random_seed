@@ -1,7 +1,7 @@
 // ***************************************************************************
 // *                                                                         *
-// *              AFlow STEFANO CURTAROLO  Duke University 2003-2020         *
-// *              AFlow COREY OSES  Duke University 2013-2020                *
+// *              AFlow STEFANO CURTAROLO  Duke University 2003-2021         *
+// *              AFlow COREY OSES  Duke University 2013-2021                *
 // *                                                                         *
 // ***************************************************************************
 // aflow_pocc.cpp
@@ -883,6 +883,8 @@ namespace pocc {
     unsigned long long int isupercell=0;
     for(std::list<POccSuperCellSet>::iterator it=l_supercell_sets.begin();it!=l_supercell_sets.end();++it){
       isupercell=std::distance(l_supercell_sets.begin(),it);
+      if(LDEBUG){cerr << soliloquy << " degeneracy[isupercell=" << isupercell << "]=" << (*it).getDegeneracy() << endl;}
+      if(LDEBUG){cerr << soliloquy << " m_energy_dft[isupercell=" << isupercell << "]=" << (*it).m_energy_dft << endl;}
       (*it).m_probability=(*it).getDegeneracy()*exp( -( (*it).m_energy_dft-m_energy_dft_ground ) / (KBOLTZEV*temperature) ) / denom;
       prob_total+=(*it).m_probability;
       if(LDEBUG){cerr << soliloquy << " prob[isupercell=" << isupercell << "]=" << (*it).m_probability << endl;}
@@ -943,7 +945,7 @@ namespace pocc {
     if(m_ARUN_directories.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_ARUN_directories.size()==0",_RUNTIME_ERROR_);}
     if(m_ARUN_directories.size()!=l_supercell_sets.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_ARUN_directories.size()!=l_supercell_sets.size()",_RUNTIME_ERROR_);}
 
-    setPOccStructureProbabilities(temperature);
+    setPOccStructureProbabilities(temperature); //done in calculateRELAXProperties() - repetita iuvant
 
     xDOSCAR xdoscar;
     string DOSCAR_file="";
@@ -1105,6 +1107,35 @@ namespace pocc {
     if(LDEBUG){cerr << soliloquy << " END" << endl;}
   }
 
+  void POccCalculator::calculateRELAXProperties(double temperature){
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
+    string soliloquy=XPID+"POccCalculator::calculateRELAXProperties():";
+
+    if(m_ARUN_directories.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_ARUN_directories.size()==0",_RUNTIME_ERROR_);}
+
+    //get most relaxed outcar
+    uint i=0,max=10,max_found=0;
+    for(i=1;i<=max;i++){  //i=max;i<=max;i--
+      if(aurostd::EFileExist(m_aflags.Directory+"/"+m_ARUN_directories[0]+"/OUTCAR.relax"+aurostd::utype2string(i))){max_found=i;}
+      else{break;}
+    }
+    if(max_found==0){return;} //no runs completed
+
+    string OUTCAR_relax="OUTCAR.relax"+aurostd::utype2string(max_found);
+    if(LDEBUG){cerr << soliloquy << " OUTCAR_relax=" << OUTCAR_relax << endl;}
+
+    bool found_all_OUTCARs=true;
+    for(unsigned long long int isupercell=0;isupercell<m_ARUN_directories.size()&&found_all_OUTCARs;isupercell++){
+      if(!aurostd::EFileExist(m_aflags.Directory+"/"+m_ARUN_directories[isupercell]+"/"+OUTCAR_relax)){
+        if(LDEBUG){cerr << soliloquy << " " << OUTCAR_relax << " not found in "+m_ARUN_directories[isupercell] << endl;}
+        found_all_OUTCARs=false;
+      }
+    }
+    if(!found_all_OUTCARs){return;}
+
+    setPOccStructureProbabilities(temperature);
+  }
+
   void POccCalculator::calculateSTATICProperties(double temperature){
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     string soliloquy=XPID+"POccCalculator::calculateSTATICProperties():";
@@ -1114,7 +1145,6 @@ namespace pocc {
     bool found_all_OUTCARs=true;
     for(unsigned long long int isupercell=0;isupercell<m_ARUN_directories.size()&&found_all_OUTCARs==true;isupercell++){
       if(!aurostd::EFileExist(m_aflags.Directory+"/"+m_ARUN_directories[isupercell]+"/OUTCAR.static")){
-        cerr << m_aflags.Directory+"/"+m_ARUN_directories[isupercell]+"/OUTCAR.static" << endl;
         if(LDEBUG){cerr << soliloquy << " OUTCAR.static not found in "+m_ARUN_directories[isupercell] << endl;}
         found_all_OUTCARs=false;
       }
@@ -1354,7 +1384,7 @@ namespace pocc {
     else{tokens.push_back(temp_string);}
 
     if(tokens.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown temp_string format",_INPUT_ILLEGAL_);}
-   
+
     //check that they are all doubles
     vector<double> dtokens;
     for(uint i=0;i<tokens.size();i++){
@@ -1365,7 +1395,7 @@ namespace pocc {
 
     //simple comma-separated list
     if(dtokens.size()==1 || temp_string.find(",")!=string::npos){return dtokens;}
-    
+
     //treat ':' and '-' as delimiter for ranges
     if(tokens.size()<1 || tokens.size()>3){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown temp_string format",_INPUT_ILLEGAL_);}
 
@@ -1512,18 +1542,19 @@ namespace pocc {
       aurostd::RemoveFile(m_aflags.Directory+"/"+POCC_FILE_PREFIX+POCC_OUT_FILE); //clear file
       writeResults(); //write temperature-independent properties first
       for(uint itemp=0;itemp<v_temperatures.size();itemp++){
+        calculateRELAXProperties(v_temperatures[itemp]);
         calculateSTATICProperties(v_temperatures[itemp]);
         writeResults(v_temperatures[itemp]);  //write temperature-dependent properties next
       }
     }
-    if (m_kflags.KBIN_PHONONS_CALCULATION_AEL) {
+    if (m_kflags.KBIN_PHONONS_CALCULATION_AEL) { //CT20200319
       if(LDEBUG){cerr << soliloquy << "Running AEL postprocessing" << endl;}
       calculateElasticProperties(v_temperatures);
-    } //CT20200319
-    if (m_kflags.KBIN_PHONONS_CALCULATION_AGL) {
+    }
+    if (m_kflags.KBIN_PHONONS_CALCULATION_AGL) { //CT20200323
       if(LDEBUG){cerr << "Running AGL postprocessing" << endl;}
       calculateDebyeThermalProperties(v_temperatures);
-    } //CT20200323
+    }
 
     //END: TEMPERATURE DEPENDENT PROPERTIES
 
@@ -1889,7 +1920,7 @@ namespace pocc {
   POccCalculator::POccCalculator(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,const _kflags& kflags,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(FileMESSAGE,oss),m_initialized(false) {initialize(xstr_pocc,pocc_flags,aflags,kflags);}
   POccCalculator::POccCalculator(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(FileMESSAGE,oss),m_initialized(false) {initialize(xstr_pocc,pocc_flags,aflags,vflags);}
   POccCalculator::POccCalculator(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(FileMESSAGE,oss),m_initialized(false) {initialize(xstr_pocc,pocc_flags,aflags,kflags,vflags);}
-  POccCalculator::POccCalculator(const POccCalculator& b) : xStream(*b.getOFStream(),*b.getOSS()) {copy(b);} // copy PUBLIC
+  POccCalculator::POccCalculator(const POccCalculator& b) : POccCalculatorTemplate(),xStream(*b.getOFStream(),*b.getOSS()) {copy(b);} // copy PUBLIC
 
   POccCalculator::~POccCalculator() {xStream::free();free();}
 
@@ -3557,7 +3588,7 @@ namespace pocc {
     }
     //cerr << aa << endl;
     //cerr << bb << endl;
-    bool are_equivalent=compare::aflowCompareStructure(a,b,true,false,false); //match species and use fast match, but not scale volume, two structures with different volumes (pressures) are different! //DX20180123 - added fast_match = true //DX20190318 - not fast_match but optimized_match=false
+    bool are_equivalent=compare::structuresMatch(a,b,true,false,false); //match species and use fast match, but not scale volume, two structures with different volumes (pressures) are different! //DX20180123 - added fast_match = true //DX20190318 - not fast_match but optimized_match=false
     //cerr << are_equivalent << endl;
     if(LDEBUG) {cerr << soliloquy << " structures are " << (are_equivalent?"":"NOT ") << "equivalent" << endl;}
     return are_equivalent;
@@ -4699,6 +4730,7 @@ namespace pocc {
   // constructor
   //--------------------------------------------------------------------------------
   POccCalculatorTemplate::POccCalculatorTemplate() {;}
+  POccCalculatorTemplate::POccCalculatorTemplate(const POccCalculatorTemplate& b) {copy(b);} // copy PUBLIC
   POccCalculatorTemplate::~POccCalculatorTemplate() {free();}
 
   void POccCalculatorTemplate::free() {
@@ -4725,7 +4757,13 @@ namespace pocc {
   void POccCalculatorTemplate::setAFlags(const _aflags& aflags) {m_aflags.clear();m_aflags=aflags;}
 
   void POccCalculatorTemplate::setPOccStructure(const xstructure& _xstr_pocc){
+    string soliloquy=XPID+"POccCalculatorTemplate::setPOccStructure():";
     xstr_pocc=_xstr_pocc;
+    if(!pflow::checkAnionSublattice(xstr_pocc)){  //CO20210201
+      if(!XHOST.vflag_control.flag("FORCE_POCC")){
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Found non-anion in anion sublattice. Please check (and run with --force_pocc).",_VALUE_ILLEGAL_);
+      }
+    }
     types2pc_map=getTypes2PCMap(xstr_pocc);     //get types2pc_map
     xvector<double> _stoich_each_type(xstr_pocc.stoich_each_type.size()-1,0);stoich_each_type=_stoich_each_type;
     for(uint i=0;i<xstr_pocc.stoich_each_type.size();i++){stoich_each_type[i]=xstr_pocc.stoich_each_type[i];}
@@ -5701,38 +5739,46 @@ namespace pocc {
       for(uint i=0;i<types2pc_map.size();i++){species.push_back(elements_std[i]);}
       if(LDEBUG) {cerr << soliloquy << " species_std         =" << aurostd::joinWDelimiter(species,",") << endl;}
 
-      //this section of the code is complicated, there are two layers of mapping occurring at once
-      //in resorting the elements_set
-      bool resort_standard_elements_set=false;  //the approach here is WRONG, we need structure comparison
+      //RENAMING SPECIES TO ELIMINATE CHEMISTRY-SPECIFIC UFF ENERGIES
+      //this code is NOT a general fix: true fix is structure comparison
+      //the biggest problem: the parent structure defines the volume for the cluster used to find the UFF energies
+      //the volume defines the bond distances and thus which pairs are bonded/non-bonded
+      //we need to make sure the parent structure is re-decorated as consistently as possible given different input decorations
+      //useful test:
+      // Ba_svHf_pvNb_svOSnTi_svZr_sv:PAW_PBE/AB3C_cP5_221_a_c_b.BAC:POCC_S0-1xD_P3-1xA_P4-0.2xB-0.2xC-0.2xE-0.2xF-0.2xG
+      // vs.
+      // Ba_svHf_pvOSnTi_svY_svZr_sv:PAW_PBE/AB3C_cP5_221_a_c_b.BAC:POCC_S0-1xC_P3-1xA_P4-0.2xB-0.2xD-0.2xE-0.2xF-0.2xG
+      bool resort_standard_elements_set=true;  //the approach here is WRONG, we need structure comparison
       if(resort_standard_elements_set==true){
+        uint site=0,itype=0,occ=0;
         vector<string> species_orig;  //keep orig species
         for(uint i=0;i<species.size();i++){species_orig.push_back(species[i]);}
-        vector<uint> occupant2species_map;  //maps occupants (m_pocc_sites) to species (types) in order of m_pocc_sites
+        vector<uint> occupant2species_map;  //maps occupants (m_pocc_sites) to species (types) in order of m_pocc_sites, NOT NEEDED
         species.clear();species.resize(species_orig.size());  //make room for species before you fill, need occupant2species_map to dictate where new species go
         vector<POccUnit> m_pocc_sites_resorted;   //make copy of m_pocc_sites for reshuffling
-        for(uint site=0;site<m_pocc_sites.size();site++){
-          for(uint occ=0;occ<m_pocc_sites[site].v_occupants.size();occ++){occupant2species_map.push_back(m_pocc_sites[site].v_types[occ]);}
+        for(site=0;site<m_pocc_sites.size();site++){
+          for(occ=0;occ<m_pocc_sites[site].v_occupants.size();occ++){occupant2species_map.push_back(m_pocc_sites[site].v_types[occ]);}
           m_pocc_sites_resorted.push_back(m_pocc_sites[site]);
         }
         if(LDEBUG) {
           cerr << soliloquy << " occupant2species_map=" << aurostd::joinWDelimiter(occupant2species_map,",") << endl;
           cerr << soliloquy << " original m_pocc_sites" << endl;
-          for(uint site=0;site<m_pocc_sites_resorted.size();site++){
+          for(site=0;site<m_pocc_sites_resorted.size();site++){
             cerr << soliloquy << " site=" << site << " occupants: ";
-            for(uint occ=0;occ<m_pocc_sites_resorted[site].v_occupants.size();occ++){
+            for(occ=0;occ<m_pocc_sites_resorted[site].v_occupants.size();occ++){
               cerr << xstr_pocc.atoms[m_pocc_sites_resorted[site].v_occupants[occ]].name << " ";
             }
             cerr << endl;
           }
         }
 
-        std::stable_sort(m_pocc_sites_resorted.begin(),m_pocc_sites_resorted.end(),sortPOccSites);
+        std::stable_sort(m_pocc_sites_resorted.rbegin(),m_pocc_sites_resorted.rend(),sortPOccSites);  //ascending order, fewer occupant-sites get populated first (sublattice anions)
 
         if(LDEBUG) {
           cerr << soliloquy << " sorted m_pocc_sites" << endl;
-          for(uint site=0;site<m_pocc_sites_resorted.size();site++){
+          for(site=0;site<m_pocc_sites_resorted.size();site++){
             cerr << soliloquy << " site=" << site << " occupants: ";
-            for(uint occ=0;occ<m_pocc_sites_resorted[site].v_occupants.size();occ++){
+            for(occ=0;occ<m_pocc_sites_resorted[site].v_occupants.size();occ++){
               cerr << xstr_pocc.atoms[m_pocc_sites_resorted[site].v_occupants[occ]].name << " ";
             }
             cerr << endl;
@@ -5742,13 +5788,55 @@ namespace pocc {
         uint iocc2spec=0;
         vector<uint> types_added;
         uint type=0;
-        for(uint site=0;site<m_pocc_sites_resorted.size();site++){
-          for(uint itype=0;itype<m_pocc_sites_resorted[site].v_types.size();itype++){
+
+        //0. prioritize anion sublattice, must find a sublattice full of anions
+        vector<string> vanions;
+        aurostd::string2tokens(POCC_ANIONS_LIST,vanions,",");
+        bool sublattice_found=false;
+        for(site=0;site<m_pocc_sites_resorted.size();site++){
+          if(m_pocc_sites_resorted[site].v_types.size()!=m_pocc_sites_resorted[site].v_occupants.size()){
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_pocc_sites_resorted[site].v_types.size()!=m_pocc_sites_resorted[site].v_occupants.size()",_RUNTIME_ERROR_);
+          }
+          sublattice_found=(m_pocc_sites_resorted[site].v_types.size()>0);  //set to true first
+          for(itype=0;itype<m_pocc_sites_resorted[site].v_types.size()&&sublattice_found;itype++){
             type=m_pocc_sites_resorted[site].v_types[itype];
-            if(LDEBUG) {cerr << soliloquy << " type=" << type << endl;}
+            const string& occupant=xstr_pocc.atoms[m_pocc_sites_resorted[site].v_occupants[itype]].name;
+            if(!aurostd::WithinList(vanions,occupant)){sublattice_found=false;}
+          }
+          if(sublattice_found){
+            itype=0;  //prioritize first species of sublattice for parent structure
+            type=m_pocc_sites_resorted[site].v_types[itype];
             if(!aurostd::WithinList(types_added,type)){
+              const string& occupant=xstr_pocc.atoms[m_pocc_sites_resorted[site].v_occupants[itype]].name;
+              if(LDEBUG){cerr << soliloquy << " mapping " << occupant << " to " << species_orig[iocc2spec] << " [sublattice]" << endl;}
+              species[type]=species_orig[iocc2spec++];
+              types_added.push_back(type);
+            }
+          }
+        }
+
+        //1. prioritize the first occupant of every site, these occupants will define the parent lattice volume (and thus bond lengths)
+        for(site=0;site<m_pocc_sites_resorted.size();site++){
+          itype=0;
+          type=m_pocc_sites_resorted[site].v_types[itype];
+          if(!aurostd::WithinList(types_added,type)){
+            const string& occupant=xstr_pocc.atoms[m_pocc_sites_resorted[site].v_occupants[itype]].name;
+            if(LDEBUG){cerr << soliloquy << " mapping " << occupant << " to " << species_orig[iocc2spec] << " [first-occupant]" << endl;}
+            species[type]=species_orig[iocc2spec++];
+            types_added.push_back(type);
+          }
+        }
+
+        //LAST. get remaining species
+        for(site=0;site<m_pocc_sites_resorted.size();site++){
+          for(itype=0;itype<m_pocc_sites_resorted[site].v_types.size();itype++){
+            type=m_pocc_sites_resorted[site].v_types[itype];
+            if(!aurostd::WithinList(types_added,type)){
+              const string& occupant=xstr_pocc.atoms[m_pocc_sites_resorted[site].v_occupants[itype]].name;
+              if(LDEBUG){cerr << soliloquy << " mapping " << occupant << " to " << species_orig[iocc2spec] << " [remaining]" << endl;}
               //species[occupant2species_map[iocc2spec++]]=species_orig[type];
-              species[type]=species_orig[occupant2species_map[iocc2spec++]];
+              //species[type]=species_orig[occupant2species_map[iocc2spec++]];
+              species[type]=species_orig[iocc2spec++];
               types_added.push_back(type);
             }
           }
@@ -6163,7 +6251,7 @@ namespace pocc {
   POccUFFEnergyAnalyzer::POccUFFEnergyAnalyzer(const xstructure& xstr_pocc,const xstructure& xstr_nopocc,const vector<string>& species_redecoration,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(FileMESSAGE,oss),m_initialized(false) {initialize(xstr_pocc,xstr_nopocc,species_redecoration,aflags);}
   POccUFFEnergyAnalyzer::POccUFFEnergyAnalyzer(const xstructure& xstr_pocc,const xstructure& xstr_nopocc,const vector<string>& species_redecoration,const aurostd::xoption& pocc_flags,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss) : POccCalculatorTemplate(),xStream(FileMESSAGE,oss),m_initialized(false) {initialize(xstr_pocc,xstr_nopocc,species_redecoration,pocc_flags,aflags);}
 
-  POccUFFEnergyAnalyzer::POccUFFEnergyAnalyzer(const POccUFFEnergyAnalyzer& b) : xStream(*b.getOFStream(),*b.getOSS()) {copy(b);} // copy PUBLIC
+  POccUFFEnergyAnalyzer::POccUFFEnergyAnalyzer(const POccUFFEnergyAnalyzer& b) : POccCalculatorTemplate(),xStream(*b.getOFStream(),*b.getOSS()) {copy(b);} // copy PUBLIC
 
   POccUFFEnergyAnalyzer::~POccUFFEnergyAnalyzer() {free();}
 
@@ -7284,7 +7372,7 @@ ostream& operator<<(ostream& oss, const pocc::POccStructuresFile& psf) {
 
 // ***************************************************************************
 // *                                                                         *
-// *              AFlow STEFANO CURTAROLO  Duke University 2003-2020         *
-// *              AFlow COREY OSES  Duke University 2013-2020                *
+// *              AFlow STEFANO CURTAROLO  Duke University 2003-2021         *
+// *              AFlow COREY OSES  Duke University 2013-2021                *
 // *                                                                         *
 // ***************************************************************************

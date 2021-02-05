@@ -1,7 +1,7 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
-// *           Aflow DAVID HICKS - Duke University 2014-2020                 *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
+// *           Aflow DAVID HICKS - Duke University 2014-2021                 *
 // *                                                                         *
 // ***************************************************************************
 // Written by David Hicks (DX) - 2020
@@ -45,7 +45,11 @@ namespace anrl{
 
   // ---------------------------------------------------------------------------
   // checking functions
-  bool structureAndLabelConsistent(const xstructure& _xstr, const string& label_input, string& label_and_params_calculated);
+  double specialCaseSymmetryTolerances(const string& label_input);
+  bool structureAndLabelConsistent(const xstructure& _xstr,
+      const string& label_input,
+      string& label_and_params_calculated,
+      double tolerance_sym_input=AUROSTD_MAX_DOUBLE); //DX20201105 - added tolerance input
 }
 
 // Symbolic functions are defined in aflow_symbolic.cpp

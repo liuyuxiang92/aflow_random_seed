@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
 // *                                                                         *
 // ***************************************************************************
 
@@ -14,7 +14,7 @@
 
 // #define  _AFLOW_TEMP_PRESERVE_  // to preseve /tmp files for debug
 
-#define NNN   -123456
+//[CO20200502 - moved to aurostd.h]#define NNN   -123456
 //[CO20200502 - moved to aurostd.h]#define GCC_VERSION (__GNUC__ * 10000  + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
 #define _ANRL_NOWEB_ //DX
 // hard-coded prototype generator (ANRL/ subdirectory required) //DX20200623
@@ -133,6 +133,10 @@ static const string POCC_ARUN_TITLE_TAG=ARUN_TITLE_TAG+"POCC_";
 //[OBSOLETE]};
 //[OBSOLETE]//CO20180419 - global exception handling - STOP
 
+//XELEMENT_PROPERTIES_ALL (define early)
+#define _AFLOW_XELEMENT_PROPERTIES_ALL_ "name,symbol,Z,period,group,series,block,mass,volume_molar,volume,area_molar_Miedema,valence_std,valence_iupac,valence_PT,valence_s,valence_p,valence_d,valence_f,density_PT,crystal,crystal_structure_PT,spacegroup,spacegroup_number,variance_parameter_mass,lattice_constants,lattice_angles,phase,radius_Saxena,radius_PT,radius_covalent_PT,radius_covalent,radius_VanDerWaals_PT,radii_Ghosh08,radii_Slatter,radii_Pyykko,conductivity_electrical,electronegativity_Pauling,hardness_chemical_Ghosh,electronegativity_Pearson,electronegativity_Ghosh,electronegativity_Allen,oxidation_states,oxidation_states_preferred,electron_affinity_PT,energies_ionization,work_function_Miedema,density_line_electron_WS_Miedema,energy_surface_0K_Miedema,chemical_scale_Pettifor,Mendeleev_number,temperature_boiling,temperature_melting,enthalpy_fusion,enthalpy_vaporization,enthalpy_atomization_WE,energy_cohesive,specific_heat_PT,critical_pressure,critical_temperature_PT,thermal_expansion,conductivity_thermal,hardness_mechanical_Brinell,hardness_mechanical_Mohs,hardness_mechanical_Vickers,hardness_chemical_Pearson,hardness_chemical_Putz,hardness_chemical_RB,modulus_shear,modulus_Young,modulus_bulk,Poisson_ratio_PT,modulus_bulk_x_volume_molar_Miedema,magnetic_type_PT,susceptibility_magnetic_mass,susceptibility_magnetic_volume,susceptibility_magnetic_molar,temperature_Curie,refractive_index,color_PT,HHIP,HHIR,xray_scatt" //CO20201111
+#define _ENERGIES_IONIZATION_MAX_AFLOWMACHL_ 5
+
 // --------------------------------------------------------------------------
 // definitions for MULTHREADS
 //#define MAX_ALLOCATABLE_PTHREADS     1024
@@ -175,9 +179,9 @@ extern string _AFLOWLOCK_;
 
 #define KBIN_SUBDIRECTORIES           string("ARUN.")
 
-#define KBIN_NEIGHBOURS_MAX_NUMBER      30000
-#define KBIN_NEIGHBOURS_RADIUS_DEFAULT 3.0
-#define KBIN_NEIGHBOURS_DRADIUS_DEFAULT 0.1
+//DX20210122 [OBSOLETE] #define KBIN_NEIGHBORS_MAX_NUMBER      30000
+//DX20210122 [OBSOLETE] #define KBIN_NEIGHBORS_RADIUS_DEFAULT 3.0
+//DX20210122 [OBSOLETE] #define KBIN_NEIGHBORS_DRADIUS_DEFAULT 0.1
 
 #define ALIEN_INPUT_FILE_NAME_DEFAULT  "./input"
 #define ALIEN_EXTERNAL_INPUT_DEFAULT   "../input_external"
@@ -778,11 +782,11 @@ class _kflags {
     bool  KBIN_SYMMETRY_AGROUP_WRITE;      // taken TRUE by default
     bool  KBIN_SYMMETRY_IATOMS_WRITE;      // taken TRUE by default
     double KBIN_SYMMETRY_SGROUP_RADIUS;
-    // neighbours operation lists
-    bool  KBIN_NEIGHBOURS_CALCULATION;
-    bool  KBIN_NEIGHBOURS_WRITE;
-    double KBIN_NEIGHBOURS_RADIUS;
-    double KBIN_NEIGHBOURS_DRADIUS;
+    //DX20210122 [OBSOLETE] // neighbors operation lists
+    //DX20210122 [OBSOLETE] bool  KBIN_NEIGHBORS_CALCULATION;
+    //DX20210122 [OBSOLETE] bool  KBIN_NEIGHBORS_WRITE;
+    //DX20210122 [OBSOLETE] double KBIN_NEIGHBORS_RADIUS;
+    //DX20210122 [OBSOLETE] double KBIN_NEIGHBORS_DRADIUS;
     // pocc operation lists
     bool   KBIN_POCC;
     bool   KBIN_POCC_CALCULATION;
@@ -1152,7 +1156,7 @@ class _atom { // simple class.. nothing fancy
     // for partial occupation                              // partial occupation
     double partial_occupation_value;                       // partial occupation
     bool   partial_occupation_flag;                        // partial occupation
-    int shell;                                             // neighbour shell number
+    int shell;                                             // neighbor shell number
     // printing
     bool   verbose;                                        // verbose in printing
     bool   print_RHT;                                      // a printer for coord and name (general position)   //RHT
@@ -1185,11 +1189,11 @@ extern std::vector<double> vatom_mass;               // store starting from ONE
 extern std::vector<double> vatom_volume;             // store starting from ONE
 extern std::vector<int> vatom_valence_iupac;         // store starting from ONE http://en.wikipedia.org/wiki/Valence_(chemistry)
 extern std::vector<int> vatom_valence_std;           // store starting from ONE http://en.wikipedia.org/wiki/Valence_(chemistry)
-extern std::vector<double> vatom_miedema_phi_star;       // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
-extern std::vector<double> vatom_miedema_nws;            // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
-extern std::vector<double> vatom_miedema_Vm;             // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
-extern std::vector<double> vatom_miedema_gamma_s;        // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
-extern std::vector<double> vatom_miedema_BVm;            // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
+extern std::vector<double> vatom_miedema_phi_star;       // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28 10.1016/0378-4363(80)90054-6
+extern std::vector<double> vatom_miedema_nws;            // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28 10.1016/0378-4363(80)90054-6
+extern std::vector<double> vatom_miedema_Vm;             // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28 10.1016/0378-4363(80)90054-6
+extern std::vector<double> vatom_miedema_gamma_s;        // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28 10.1016/0378-4363(80)90054-6
+extern std::vector<double> vatom_miedema_BVm;            // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28 10.1016/0378-4363(80)90054-6
 extern std::vector<double> vatom_radius;             // store starting from ONE - Saxena
 extern std::vector<double> vatom_radius_covalent;    // store starting from ONE - Codero, Covalent radii revisited, DOI: 10.1039/b801115j //DX+CO20170904
 extern std::vector<double> vatom_electronegativity;  // store starting from ONE - Saxena
@@ -1259,11 +1263,13 @@ uint XATOM_SplitAlloySpecies(const string& alloy_in, vector<string> &speciesX, v
 uint XATOM_SplitAlloyPseudoPotentials(const string& alloy_in, vector<string> &species_ppX);
 uint XATOM_SplitAlloyPseudoPotentials(const string& alloy_in, vector<string> &species_ppX, vector<double> &natomsX);
 //DX20200724 [OBSOLETE] vector<uint> composition2stoichiometry(string& composition); //DX20181009
-// neighbour things
+// neighbor things
 void GetUnitCellRep(const xvector<double>& ppos,xvector<double>& p_cell0,xvector<int>& ijk,const xmatrix<double>& lattice,const bool coord_flag);
 
 string xstructure2json(xstructure& xstr); //DX20170831 - xstructure2json
 string atom2json(_atom& atom, int coord_flag, int poccupation); //DX20170831 - atom2json
+
+vector<string> getLeastFrequentAtomTypes(const xstructure& xstr, bool clean=true); //DX20201230 - moved from XtalFinder
 
 // --------------------------------------------------------------------------
 class _sym_op {
@@ -1467,22 +1473,28 @@ class xstructure {
     xstructure(const xstructure& b);                              // constructor copy
     xstructure(istream& input,int=IOVASP_POSCAR);                 // constructor from istream
     xstructure(ifstream& input,int=IOVASP_POSCAR);                // constructor from ifstream
-    xstructure(stringstream& input,int=IOVASP_POSCAR);            // constructor from stringstream
+    xstructure(const stringstream& input,int=IOVASP_POSCAR);      // constructor from stringstream //DX20210129 - added const
     xstructure(const string& input,int);                          // constructor from file
     xstructure(const string& url,const string& file,int=IOVASP_POSCAR); // constructor from URL
     ~xstructure();                                                // destructor
     // I/O, mutators                                              // --------------------------------------
+    void initialize(istream& input,int=IOVASP_POSCAR);            // initialize xstructure based on input (avoids copying xstructure); //DX20210129
+    void initialize(ifstream& input,int=IOVASP_POSCAR);           // initialize xstructure based on input (avoids copying xstructure); //DX20210129
+    void initialize(const stringstream& input,int=IOVASP_POSCAR); // initialize xstructure based on input (avoids copying xstructure); //DX20210129
     bool GetStoich(void);                                         // get stoich_each_type - CO20170724
     bool sortAtomsEquivalent(void);                               // sort by equivalent atoms - CO20190116
     bool FixLattices(void);                                       // Reciprocal/f2c/c2f
     void SetCoordinates(int mode);                                // change coordinates
     void MakeBasis(void);                                         // make basis for atoms (basis and number)
     void MakeTypes(void);                                         // refresh types based on num_each_type  //CO20180420
-    void AddAtom(const _atom& atom);                              // adding an atom
+    void AddAtom(const _atom& atom,bool check_present=true);      // adding an atom
+    void AddAtom(const deque<_atom>& atom,bool check_present=true);// adding a deque<_atom> //CO20210129 //DX20210201
     void AddAtom_POCC(const _atom& atom);                         // adding an atom FOR POCC ONLY
     void RemoveAtom(const uint& iat);                             // deleting an atom (index)
     void RemoveAtom(vector<uint>& v_atoms_to_remove);             // deleting many atoms (indices)
-    void ReplaceAtoms(const deque<_atom>& new_atoms);             // replace all atoms SAFELY/CLEANLY
+    void RemoveAtom(void);                                        // removes all atoms //DX20210129
+    void ReplaceAtoms(const deque<_atom>& new_atoms,
+        bool check_atom_overlap=true);                            // replace all atoms SAFELY/CLEANLY //DX20210129 - added option to check atom overlap
     void RemoveCopies(double=1.0e-3);                             // deleting atoms too close F/C
     void RemoveFractionalCopies(double=1.0e-3);                   // deleting atoms too close F
     void RemoveCartesianCopies(double=1.0e-3);                    // deleting atoms too close C
@@ -1499,6 +1511,7 @@ class xstructure {
     bool SpeciesPutAlphabetic(void);                              // Put Species in alphabetic
     string SpeciesString(void);                                   // Gives a string with the list of all the species
     uint SetSpecies(const std::deque<string>& vspecies);          // Set the species
+    void UpdateSpecies(const _atom& atom);                        // Update species from atom (consolidated from AddAtom) //DX20210202
     void GetLatticeType(xstructure& sp,xstructure& sc);           // Get all lattices
     void GetLatticeType(void);                                    // Get all lattices
     void Standard_Primitive_UnitCellForm(void);                   // Reduce the Unit Cell to Standard Primitive Form
@@ -1506,7 +1519,13 @@ class xstructure {
     void Standard_Conventional_UnitCellForm(void);                // Reduce the Unit Cell to Standard Conventional Form
     void GetStandardConventional(void);                           // stub for void Standard_Conventional_UnitCellForm(void);
     void NiggliUnitCellForm(void);                                // Reduce the Unit Cell to Niggli Form
+    void GetNiggliStructures(vector<xstructure>& structures,
+        uint start_index=0,
+        uint end_index=AUROSTD_MAX_UINT); //DX20201006
     void MinkowskiBasisReduction(void);                           // Reduce the Basis to the max orthogonality (Minkowski)
+    void GetMinkowskiStructures(vector<xstructure>& structures,
+        uint start_index=0,
+        uint end_index=AUROSTD_MAX_UINT); //DX20201006
     void LatticeReduction(void);                                  // Lattice Reduction to Max Orthogonality (MINK) and then Niggly Form
     //DX20190905 [OBSOLETE] void BringInCell(void);                                       // Bring all the atoms in the origin
     //DX20190905 [OBSOLETE] void BringInCell(double);                                     // Bring all the atoms in the origin
@@ -1518,21 +1537,36 @@ class xstructure {
     void GetPrimitive1(void);                                     // Make it primitive, if possible
     void GetPrimitive2(void);                                     // Make it primitive, if possible
     void GetPrimitive3(void);                                     // Make it primitive, if possible
+    void GetPrimitiveStructures(vector<xstructure>& structures,
+        uint start_index=0,
+        uint end_index=AUROSTD_MAX_UINT); //DX20201006
     uint GetPrimitiveCell(void);                                  // Make it primitive, if possible. Returns 1 if routine fails (RHT)   //RHT
     double MinDist(void);                                         // get minimum interatomic distance -- CO20171024
     void ReScale(const double &in_scale);                         // Change scale but keep volume fixed
     void SetScale(const double &in_scale);                        // Change scale
     void UpdateCartesianCoordinates();                            //AS20200514
+    void ChangeBasis(const xmatrix<double>& transformation_matrix);//DX20201215
+    void Rotate(const xmatrix<double>& rm);                       // DX20201215 - added modify-in-place variant
+    void TransformStructure(const xmatrix<double>& transformation_matrix, const xmatrix<double>& rotation);
+    void TransformStructure(const xmatrix<double>& transformation_matrix, const xmatrix<double>& rotation, const xvector<double>& origin_shift, bool is_shift_frac=false);
+    void ShiftPos(const xvector<double>& shift, bool is_frac);    // Shift origin by vector (Cartesian/fractional boolean) //DX20201215 - added modify-in-place variant
+    void ShiftCPos(const xvector<double>& shift);                 // Shift origin by Cartesian vector //DX20201215 - added modify-in-place variant
+    void ShiftFPos(const xvector<double>& shift);                 // Shift origin by fractional vector //DX20201215 - added modify-in-place variant
     void SetVolume(const double &in_volume);                      // Change volume
     void SetAutoVolume(bool use_AFLOW_defaults_in=false);         // Change volume to sum of atoms  //CO20191010
     void InflateLattice(const double &coefficient);               // Inflate lattice
     void InflateVolume(const double &coefficient);                // Inflate volume
+    void foldAtomsInCell(                        // fold atoms into new cell representation //DX20210113
+        const xmatrix<double>& lattice_new,
+        bool skew,
+        double tol,
+        bool check_min_dists=true);
     string platon2print(bool,bool,double,double,double,double);   // Create Platon input file >=51108
     void DecorateWithElements(void);                              // Decorate with elements (alphabetic order) - useful for platon
     void DecorateWithFakeElements(void);                          // Decorate with fake elements - useful for prototypes //DX20200727
     vector<string> GetElements(bool clean_name=false,
         bool fake_names=false);                                   //DX20200724
-    vector<string> GetElementsFromAtomNames(bool clean_name);     //Dx20200724
+    vector<string> GetElementsFromAtomNames(bool clean_name=true);//DX20200724
     vector<uint> GetReducedComposition(bool numerical_sort=false);//DX20200724
     string platon2sg(bool P_EQUAL=DEFAULT_PLATON_P_EQUAL,
         bool P_EXACT=DEFAULT_PLATON_P_EXACT,
@@ -1631,6 +1665,7 @@ class xstructure {
     //  ----------------------------------------------------------------------------------------
     bool is_vasp4_poscar_format;                                  // flags for VASP4*
     bool is_vasp5_poscar_format;                                  // flags for VASP5*
+    bool primitive_calculated;                                    // flags for calculation //DX20201007
     bool Niggli_calculated;                                       // flags for calculation
     bool Niggli_avoid;                                            // flags for avoiding the calculation
     bool Minkowski_calculated;                                    // flags for calculation
@@ -1822,16 +1857,16 @@ class xstructure {
     vector<int> grid_atoms_sc2pcMap;                              //CO20170804 - mapping between grid_atoms (sc) and atoms (pc)
     vector<int> grid_atoms_pc2scMap;                              //CO20170804 - mapping between grid_atoms (sc) and atoms (pc)
     // ----------------------------------------------------------------------------------------
-    // NEIGHBOURS OBEJCTS EXPERIMENTAL/UNFINISHED                 // NEIGHBOURS OBEJCTS   WORKING EXPERIMENTAL
-    void neighbours_clear(void);                                  // NN create/clean all the vectors
-    void neighbours_calculate(void);                              // NN shift data from QM to GEOM
-    bool neighbours_calculated;                                   // NN calculation
-    double neighbours_radius;                                     // radius of application
-    double neighbours_dradius;                                    // delta radius of shell (bins)
-    vector<vector<double> > neighbours_atoms_func_r_vs_nn;        // contains function distance vs neighbours (each atom)
-    vector<vector<int> > neighbours_atoms_func_num_vs_nn;         // contains function distance vs neighbours (each atom)
-    vector<double> neighbours_func_r_vs_nn;                       // contains function distance vs neighbours (all atoms)
-    vector<int> neighbours_func_num_vs_nn;                        // contains function number vs neighbours (all atoms)
+    // NEIGHBORS OBEJCTS EXPERIMENTAL/UNFINISHED                 // NEIGHBORS OBEJCTS   WORKING EXPERIMENTAL
+    //DX20210122 [OBSOLETE] void neighbors_clear(void);                                  // NN create/clean all the vectors
+    //DX20210122 [OBSOLETE] void neighbors_calculate(void);                              // NN shift data from QM to GEOM
+    //DX20210122 [OBSOLETE] bool neighbors_calculated;                                   // NN calculation
+    //DX20210122 [OBSOLETE] double neighbors_radius;                                     // radius of application
+    //DX20210122 [OBSOLETE] double neighbors_dradius;                                    // delta radius of shell (bins)
+    //DX20210122 [OBSOLETE] vector<vector<double> > neighbors_atoms_func_r_vs_nn;        // contains function distance vs neighbors (each atom)
+    //DX20210122 [OBSOLETE] vector<vector<int> > neighbors_atoms_func_num_vs_nn;         // contains function distance vs neighbors (each atom)
+    //DX20210122 [OBSOLETE] vector<double> neighbors_func_r_vs_nn;                       // contains function distance vs neighbors (all atoms)
+    //DX20210122 [OBSOLETE] vector<int> neighbors_func_num_vs_nn;                        // contains function number vs neighbors (all atoms)
     // xvector<int> ndims;                                        // dimension of the radius (in +- integers)
     // std::deque<_atom> ashell;                                 // all the atoms in the shell
     // std::deque<deque<_atom> > natoms;                        // vector of vectors
@@ -1855,11 +1890,12 @@ class xstructure {
     void GetCoordinations(deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,deque<deque<uint> >& coordinations,double rmax,double rmin=0.0,double tol=0.5,bool prim=true,bool unique_only=true);  //CO20200912
     void GetCoordinations(deque<_atom>& atoms_cell,deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,deque<deque<uint> >& coordinations,double rmax,double rmin=0.0,double tol=0.5,bool prim=true,bool unique_only=true);  //CO20200912
     //
-    // NEIGHBOURS OBEJCTS OLD-ACONVASP BUT WORKS                  // NEIGHBOURS OBEJCTS 
+    // NEIGHBORS OBEJCTS OLD-ACONVASP BUT WORKS                  // NEIGHBORS OBEJCTS 
     // GetNeighData collects all the neighbor data between rmin and rmax and stores it for each atom in a vector of atom objects in order of increasing distance.  
     void GetNeighData(const deque<_atom>& in_atom_vec,const double& rmin, const double& rmax,deque<deque<_atom> >& neigh_mat);
     // GetStrNeighData collects all the neighbor data out to some cutoff and stores it for each atom in the structure.
     void GetStrNeighData(const double cutoff,deque<deque<_atom> >& neigh_mat) const; //RF+CO20200513
+
     // ----------------------------------------------------------------------------------------
     // OUTPUT/ERROR FLAGS                                         // --------------------------------------
     bool Niggli_has_failed;                                       // Niggli has failed ?
@@ -1892,6 +1928,22 @@ void GetCoordinations(const xstructure& xstr_in,deque<deque<uint> >& i_neighbors
 void GetCoordinations(const xstructure& xstr_in,deque<_atom>& atoms_cell,deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,deque<deque<uint> >& coordinations,double rmax,double rmin,double tol,bool prim,bool unique_only); //CO2020914
 
 void LightCopy(const xstructure&, xstructure&);  //ME20200220
+
+// LATTICE/BASIS TRANSFORMATIONS
+xmatrix<double> GetBasisTransformation(const xmatrix<double>& lattice_original, const xmatrix<double>& lattice_new); //DX20201015
+vector<xvector<double> > GetBasisTransformationInternalTranslations(const xmatrix<double>& basis_transformation); //DX20201124
+xmatrix<double> GetRotation(const xmatrix<double>& lattice_original, const xmatrix<double>& lattice_new); //DX20201015
+xstructure ChangeBasis(const xstructure& xstr, const xmatrix<double>& transformation_matrix); //DX20201015
+xstructure TransformStructure(const xstructure& xstr,
+    const xmatrix<double>& transformation_matrix,
+    const xmatrix<double>& rotation); //DX20201125
+xstructure TransformStructure(const xstructure& xstr,
+    const xmatrix<double>& transformation_matrix,
+    const xmatrix<double>& rotation,
+    const xvector<double>& origin_shift,
+    bool is_shift_frac=false); //DX20201125
+aurostd::matrix<double> GetRotationMatrix(const vector<double>& angles); //CO20200404 pflow::matrix()->aurostd::matrix()  //DX20210127 - moved from pflow
+void RotateStrVec(vector<xstructure>& str_vec, const vector<double>& rot);  //DX20210127 - moved from pflow
 
 //CO20180420
 //for stream management with objects
@@ -2408,8 +2460,8 @@ bool uniqueAtomInCell(_atom& atom, deque<_atom>& atoms);
 bool alreadyInCell(_atom& atom, deque<_atom> atoms);
 //DX20180726 END
 //DX+CO START
-bool atomInCell(const _atom& atom, double tolerance=_ZERO_TOL_); //DX20191125
-bool inCell(const xvector<double>& pos_vec, double tolerance=_ZERO_TOL_); //DX20191125 - added tolerance
+bool atomInCell(const _atom& atom, double tolerance=_ZERO_TOL_, double upper_bound=1.0, double lower_bound=0.0); //DX20191125 //ME+DX20210203 - added bounds
+bool inCell(const xvector<double>& pos_vec, double tolerance=_ZERO_TOL_, double upper_bound=1.0, double lower_bound=0.0); //DX20191125 - added tolerance  // ME20210128 - added bounds
 //DX+CO END
 xstructure GetSuperCell(const xstructure& a,const xmatrix<double>& sc);
 xstructure GetSuperCell(const xstructure& a,const xvector<double>& sc);
@@ -2457,7 +2509,7 @@ void CalculateSymmetryPointGroupKPatterson(xstructure& str);  //ME20200129
 xstructure Rotate(const xstructure& a,const xmatrix<double>& rm);
 xstructure GetLTCell(const xmatrix<double>& lt,const xstructure& str);
 xstructure GetLTFVCell(const xvector<double>& nvec,const double phi,const xstructure& str);
-xstructure ShiftPos(const xstructure& a,const xvector<double>& shift,const int& flag);
+xstructure ShiftPos(const xstructure& a,const xvector<double>& shift, bool is_frac); //DX20210111
 xstructure ShiftCPos(const xstructure& a,const xvector<double>& shift);
 xstructure ShiftFPos(const xstructure& a,const xvector<double>& shift);
 double MaxStructureLattice(const xstructure& str);
@@ -2488,7 +2540,7 @@ xvector<double> r_lattice(const xstructure& str,const xvector<int>& ijk);
 xstructure input2AIMSxstr(istream& input);
 xstructure input2ABINITxstr(istream& input);
 xstructure input2QExstr(istream& input);
-xstructure input2VASPxstr(istream& input);
+xstructure input2VASPxstr(istream& input,bool vasp5=false);
 xstructure input2ELKxstr(istream& input); //DX20200313
 
 // ----------------------------------------------------------------------------
@@ -2527,6 +2579,10 @@ bool smithTest(ostream& oss=cout);
 bool smithTest(ofstream& FileMESSAGE,ostream& oss=cout);
 bool coordinationTest(ostream& oss=cout);
 bool coordinationTest(ofstream& FileMESSAGE,ostream& oss=cout);
+bool PrototypeGeneratorTest(ostream& oss=cout, bool check_symmetry=false); //DX20200928
+bool PrototypeGeneratorTest(ofstream& FileMESSAGE,ostream& oss=cout, bool check_symmetry=false); //DX20200928
+bool FoldAtomsInCellTest(ostream& oss=cout); //DX20210129
+bool FoldAtomsInCellTest(ofstream& FileMESSAGE,ostream& oss=cout); //DX20210129
 
 // ----------------------------------------------------------------------------
 // Structure Prototypes
@@ -2541,7 +2597,9 @@ bool coordinationTest(ofstream& FileMESSAGE,ostream& oss=cout);
 namespace aflowlib {
   string PrototypeCleanLatticeString(const string& latticeIN);
 }
-double NearestNeighbour(const xstructure &str_in);
+double NearestNeighbor(const xstructure &str_in);
+vector<double> NearestNeighbors(const xstructure& xstr); //DX20201230 - moved from XtalFinder
+double NearestNeighborToAtom(const xstructure& xstr, uint k); //DX20201230 - moved from XtalFinder
 
 // for HTQC
 #define STRUCTURE_MODE_NONE             0
@@ -2908,7 +2966,7 @@ namespace KBIN {
   bool VASP_Run(_xvasp &xvasp,_aflags &aflags,_kflags &kflags,_vflags &vflags,string relaxA,string relaxB,bool qmwrite,ofstream &FileMESSAGE);
   bool VASP_Run(_xvasp &xvasp,_aflags &aflags,_kflags &kflags,_vflags &vflags,string relaxA,bool qmwrite,ofstream &FileMESSAGE);
   bool VASP_RunFinished(_xvasp &xvasp,_aflags &aflags,ofstream &FileMESSAGE,bool=FALSE);
-  void WaitFinished(_xvasp &xvasp,_aflags &aflags,ofstream &FileMESSAGE,bool=FALSE);
+  void WaitFinished(_xvasp &xvasp,_aflags &aflags,ofstream &FileMESSAGE,uint max_count=AUROSTD_MAX_UINT,bool=FALSE);  //CO20201220 - added max_count
   void VASP_Error(_xvasp &xvasp,string="",string="",string="");
   void VASP_Error(_xvasp &xvasp,ofstream &FileMESSAGE,string="",string="",string="");
   string VASP_Analyze(_xvasp &xvasp,bool qmwrite);
@@ -3707,6 +3765,10 @@ bool comparison_kEn_str_band_type_dn(const kEn_st& k1, const kEn_st& k2);
 bool is_equal_position_kEn_str      (const kEn_st& k1, const kEn_st& k2);
 bool near_to                        (const xvector<double> & k1, const xvector<double> & k2, const vector<double> & max_distance);
 // [OBSOLETE] bool GetEffectiveMass(xOUTCAR& outcar,xDOSCAR& doscar,xEIGENVAL& eigenval,xstructure xstr,ostream& oss,const bool& osswrite);
+namespace aurostd {
+  class JSONwriter; // forward-declaration of JSONwriter class: later in plotter
+  // namespace JSONwriter class defined in aurostd.h is not visible; dependencies race?
+}
 //-------------------------------------------------------------------------------------------------
 //ME20190614 - plotter functions
 namespace plotter {
@@ -3770,6 +3832,13 @@ namespace plotter {
   string getLatticeFromKpointsTitle(const string&);
   void shiftEfermiToZero(xEIGENVAL&, double);
   void setEMinMax(aurostd::xoption&, double, double);
+  aurostd::JSONwriter DOS2JSON(xoption &xopt, const xDOSCAR &xdos, ofstream& FileMESSAGE,
+      ostream &oss);//AS20201102
+  aurostd::JSONwriter bands2JSON(const xEIGENVAL &xeigen, const xKPOINTS &xkpts,
+      const vector<double> &distances, const vector<double> &segment_points,
+      const xoption& plotoptions);//AS2021102
+  aurostd::JSONwriter bandsDOS2JSON(const xDOSCAR &xdos, const xEIGENVAL &xeigen,
+      const xKPOINTS &xkpts, xoption &xopt, ofstream &FileMESSAGE, ostream &oss);//AS20201102
 
   // DOS
   void generateDosPlot(stringstream&, const xDOSCAR&, const aurostd::xoption&,ostream& oss=cout);  //CO20200404
@@ -3815,6 +3884,12 @@ namespace plotter {
   void PLOT_TCOND(aurostd::xoption&,ofstream& FileMESSAGE,ostream& oss=cout); //CO20200404
   void PLOT_TCOND(aurostd::xoption&, stringstream&,ostream& oss=cout);  //CO20200404
   void PLOT_TCOND(aurostd::xoption&, stringstream&,ofstream& FileMESSAGE,ostream& oss=cout);  //CO20200404
+
+  // QHA properties plotter -------------------------------------------------
+  void PLOT_THERMO_QHA(aurostd::xoption&,ostream& oss=cout);  //AS20200909
+  void PLOT_THERMO_QHA(aurostd::xoption&,ofstream& FileMESSAGE,ostream& oss=cout); //AS20200909
+  void PLOT_THERMO_QHA(aurostd::xoption&, stringstream&,ostream& oss=cout); //AS2020909
+  void PLOT_THERMO_QHA(aurostd::xoption&, stringstream&,ofstream& FileMESSAGE,ostream& oss=cout); //AS20200909
 
   // General plots -----------------------------------------------------------
   void plotSingleFromSet(xoption&, stringstream&, const vector<vector<double> >&, int,ostream& oss=cout); //CO20200404
@@ -4186,6 +4261,8 @@ namespace SYM {
   bool CalculateInequivalentAtoms_20160801(ofstream &FileMESSAGE,xstructure &a,bool rely_on_basis,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,double _eps_,string format="txt"); // EQUIVALENT ATOMS _IATOMS_ //DX  
   bool CalculateInequivalentAtoms_20160101(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss); // EQUIVALENT ATOMS _IATOMS_ //DX
   //DX+CO END
+
+  void writePythonScript(ostream& oss); //DX20201228
 }
 string AgroupSymmetryToJson(vector<vector<_sym_op> >& group, char& mode); //DX20170803 - For Python wrapper
 string EquivalentAtomsToJson(vector<vector<int> >& iatoms); //DX20170803 - For Python wrapper
@@ -4300,9 +4377,9 @@ namespace LATTICE {
 }
 
 // ----------------------------------------------------------------------------
-// neighbours prototypes
-// aflow_neighbours.cpp
-bool StepNeighboursPerform(xstructure& a,string AflowIn,ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags);
+// neighbors prototypes
+// aflow_neighbors.cpp
+bool StepNeighborsPerform(xstructure& a,string AflowIn,ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags);
 
 // ----------------------------------------------------------------------------
 // surface prototypes
@@ -4322,8 +4399,8 @@ namespace surface {
   double GetPlaneDensityAtoms(const xstructure& _str,const xvector<double>& hkl,const double& roughness);
   double GetPlaneDensityBBonds(const xstructure& _str,const xvector<double>& hkl,const double& roughness,const double& bbdistance,const int& type_at1,const int& type_at2);
   double GetPlaneDensityBBonds(const xstructure& _str,const xvector<double>& hkl,const double& roughness,const double& bbdistance);
-  double GetNNeighbours(const xstructure& _str,const int& type_at1,const int& type_at2);
-  double GetNNeighbours(const xstructure& _str);
+  double GetNNeighbors(const xstructure& _str,const int& type_at1,const int& type_at2);
+  double GetNNeighbors(const xstructure& _str);
   string PrintHKLSigma(int num_types,int num_types_combinations);
   string PrintHKLSigmaBB(int num_types,int num_types_combinations,const double& bbfrac,const double& bbdistance,const xmatrix<double>& bbdistances);
   bool GetSurfaceHKL(const xstructure& _str,_aflags& aflags,const xvector<double>& _hkl,vector<vector<double> >& planesreducible,vector<vector<double> >& planesirreducible,ostream& oss);
@@ -4552,8 +4629,8 @@ namespace pflow {
   // [RF20200415 - duplicate from xatom]vector<double> GetSpins(const xstructure& a);
   aurostd::matrix<double> GetFpos(const xstructure& str);  //CO20200404 pflow::matrix()->aurostd::matrix()
   aurostd::matrix<double> GetCpos(const xstructure& str);  //CO20200404 pflow::matrix()->aurostd::matrix()
-  xstructure SetNumEachType(const xstructure& a,const deque<int>& in_num_each_type);
-  deque<int> GetNumEachType(const xstructure& a);
+  //DX20210118 [OBSOLETE - use what AddAtom gives] xstructure SetNumEachType(const xstructure& a,const deque<int>& in_num_each_type);
+  //DX20210118 [OBSOLETE - use what AddAtom gives] deque<int> GetNumEachType(const xstructure& a);
   xstructure SetLat(const xstructure& a,const aurostd::matrix<double>& in_lat);  //CO20200404 pflow::matrix()->aurostd::matrix()
   aurostd::matrix<double> GetLat(const xstructure& a); //CO20200404 pflow::matrix()->aurostd::matrix()
   double GetScale(const xstructure& a);
@@ -4647,57 +4724,73 @@ namespace makefile {
 namespace xelement {
   class xelement { // simple class.. nothing fancy
     public:
-      // constructor destructor                              // constructor/destructor
-      xelement();                                            // default, just allocate
-      xelement(uint);                                        // look at it by Z
-      xelement(const string&);                               // look at it by symbol or name  //CO20200520
-      ~xelement();                                           // kill everything
-      const xelement& operator=(const xelement &b);          // copy
+      // constructor destructor                                       // constructor/destructor
+      xelement();                                                     // default, just allocate
+      xelement(uint Z,int oxidation_state=AUROSTD_MAX_INT);           // look at it by Z
+      xelement(const string&,int oxidation_state=AUROSTD_MAX_INT);    // look at it by symbol or name  //CO20200520
+      xelement(const xelement& b);                                    //CO20210201 copy
+      ~xelement();                                                    // kill everything
+      const xelement& operator=(const xelement &b);                   // copy
       void clear();
-      void populate(const string& element); //CO20200520
-      void populate(uint ZZ); //CO20200520
+      void loadDefaultUnits();  //CO20201111
+      void populate(const string& element,int oxidation_state=AUROSTD_MAX_INT); //CO20200520
+      void populate(uint ZZ,int oxidation_state=AUROSTD_MAX_INT); //CO20200520
+      string getPropertyStringVector(const string& property,const string& delim=",",uint ncols=AUROSTD_MAX_UINT) const; //CO20201111
+      string getPropertyString(const string& property,const string& delim=",",uint ncols=AUROSTD_MAX_UINT) const; //CO20201111
+      double getPropertyDouble(const string& property,int index=AUROSTD_MAX_INT) const;
+      const xvector<double>& getPropertyXVectorDouble(const string& property) const;
+      const vector<double>& getPropertyVectorDouble(const string& property) const;
+      string getType(const string& property) const; //CO20201111
+      string getUnits(const string& property) const; //CO20201111
+      void convertUnits(const string& property="ALL",const string& units_new="SI");  //CO20201111
+
       // content                                             // content
       bool verbose;
+
       // [AFLOW]START=DECLARATION
-      int Z;                                  // Z
+      uint Z;                                 // Z
       string symbol;                          // http://periodictable.com      //DU20190517   // DONE SC20190524
       string name;                            // http://periodictable.com      //DU20190517   // DONE SC20190524
-      double Period;                          // http://periodictable.com      //DU20190517
-      double Group;                           // http://periodictable.com      //DU20190517
-      string Series;                          // http://periodictable.com For Nh,Fl,Mc,Lv,Ts Value is a guess based on periodic table trend.      //DU20190517 
-      string Block;                           // http://periodictable.com      //DU20190517
+      uint period;                            // http://periodictable.com      //DU20190517
+      uint group;                             // http://periodictable.com      //DU20190517
+      string series;                          // http://periodictable.com For Nh,Fl,Mc,Lv,Ts Value is a guess based on periodic table trend.      //DU20190517 
+      string block;                           // http://periodictable.com      //DU20190517
       //                                          
       double mass;                            // (kg)     // DONE SC20190524
-      double MolarVolume;                     // (m^3/mol) http://periodictable.com      //DU20190517
+      double volume_molar;                    // (m^3/mol) http://periodictable.com      //DU20190517
       double volume;                          // atomic volume in A^3 from the FCC vasp table and/or successive calculations // DONE SC20190524
-      double Miedema_Vm;                      // (V_m^{2/3} in (cm^2)) Miedema Rule Table 1a Physica 100B (1980) 1-28
+      double area_molar_Miedema;              // (V_m^{2/3} in (cm^2)) (molar volume)^{2/3} surface area Miedema Rule Table 1a Physica 100B (1980) 1-28 10.1016/0378-4363(80)90054-6
       // for lanthines from J.A. Alonso and N.H. March. Electrons in Metals and Alloys, Academic Press, London (1989) (except La)
       double valence_std;                     // http://en.wikipedia.org/wiki/Valence_(chemistry) standard: number electrons minus closed shell at leff (noble gas)
       double valence_iupac;                   // http://en.wikipedia.org/wiki/Valence_(chemistry) IUPAC Maximum number of univalent atoms that may combine with an atom of the element under consideration, or with a fragment, or for which an atom of this element can be substituted.
       double valence_PT;                      //           http://periodictable.com      //DU20190517
-      double Density_PT;                      // (g/cm^3)  http://periodictable.com      //DU20190517
+      double valence_s;                       // number of valence s electrons (http://periodictable.com) //CO20201111
+      double valence_p;                       // number of valence p electrons (http://periodictable.com) //CO20201111
+      double valence_d;                       // number of valence f electrons (http://periodictable.com) //CO20201111
+      double valence_f;                       // number of valence f electrons (http://periodictable.com) //CO20201111
+      double density_PT;                      // (g/cm^3)  http://periodictable.com      //DU20190517
       string crystal;                         // Ashcroft-Mermin                                                                                                                   
-      string CrystalStr_PT;                   // http://periodictable.com      //DU20190517
-      string space_group;                     // http://periodictable.com      //DU20190517
-      uint space_group_number;                // http://periodictable.com      //DU20190517
-      double Pearson_coefficient;             // Pearson mass deviation coefficient //ME20181020
-      xvector<double> lattice_constant;       // (pm) http://periodictable.com      //DU20190517
-      xvector<double> lattice_angle;          // (rad) http://periodictable.com      //DU20190517
+      string crystal_structure_PT;            // http://periodictable.com      //DU20190517
+      string spacegroup;                      // http://periodictable.com      //DU20190517
+      uint spacegroup_number;                 // http://periodictable.com      //DU20190517
+      double variance_parameter_mass;         // Pearson mass deviation coefficient: the square deviation of the isotope masses (weighted by occurrence): 10.1103/PhysRevB.27.858 (isotope corrections), 10.1351/PAC-REP-10-06-02 (isotope distributions) //ME20181020
+      xvector<double> lattice_constants;      // (pm) http://periodictable.com      //DU20190517
+      xvector<double> lattice_angles;         // (rad) http://periodictable.com      //DU20190517
       string phase;                           //      http://periodictable.com      //DU20190517
-      double radius;                          // Saxena (nm)
+      double radius_Saxena;                   // Saxena (nm)
       double radius_PT;                       // (pm)       http://periodictable.com      //DU20190517
       double radius_covalent_PT;              // (pm)       http://periodictable.com      //DU20190517
       double radius_covalent;                 // (Angstrom) Dalton Trans. 2836, 2832-2838 (2008) //DX+CO20170904
       double radius_VanDerWaals_PT;           // (pm)       http://periodictable.com      //DU20190517
-      double radii_Ghosh08;                    // (Angstrom) Journal of Molecular Structure: THEOCHEM 865, 60–67 (2008)      //DU20190517
-      double radii_Slatter;                    // (Angstrom) J. of Chem. Phys. 41, 3199 (1964)      //DU20190517
-      double radii_Pyykko;                     // (pm) single bond covalent radii  Chem. Eur. J. 15, 186-197 (2009)      //DU20190517
+      double radii_Ghosh08;                   // (Angstrom) Journal of Molecular Structure: THEOCHEM 865, 60–67 (2008)      //DU20190517
+      double radii_Slatter;                   // (Angstrom) J. of Chem. Phys. 41, 3199 (1964)      //DU20190517
+      double radii_Pyykko;                    // (Angstrom) single bond covalent radii  Chem. Eur. J. 15, 186-197 (2009)      //DU20190517
       //                                          
-      double electrical_conductivity;          // (S/m)  http://periodictable.com  Value given for graphite. Diamond electrical conductivity is approximately 0.001.      //DU20190517
-      double electronegativity_vec;           // Saxena
-      double hardness_Ghosh;                   // (eV) Int. J. Quantum Chem 110, 1206-1213 (2010) Table III       //DU20190517
-      double electronegativity_Pearson;                  // (eV) Inorg. Chem., 27(4), 734–740 (1988)      //DU20190517
-      double electronegativity_Ghosh;                    // (eV) Journal of Theoretical and Computational Chemistry, 4, 21-33 (2005)      //DU20190517
+      double conductivity_electrical;         // (S/m)  http://periodictable.com  Value given for graphite. Diamond electrical conductivity is approximately 0.001.      //DU20190517
+      double electronegativity_Pauling;       // Saxena
+      double hardness_chemical_Ghosh;         // (eV) Int. J. Quantum Chem 110, 1206-1213 (2010) Table III       //DU20190517
+      double electronegativity_Pearson;       // (eV) Inorg. Chem., 27(4), 734–740 (1988)      //DU20190517
+      double electronegativity_Ghosh;         // (eV) Journal of Theoretical and Computational Chemistry, 4, 21-33 (2005)      //DU20190517
 
       //RF+SK20200410 START
       // Allen electronegativities were chosen for CCE since the IUPAC definition of oxidation states seems to use Allen electronegativities and since they also gave the best results
@@ -4711,45 +4804,50 @@ namespace xelement {
       vector<double> oxidation_states;
       //RF+SK20200410 END
 
-      double electron_affinity_PT;             // (kJ/mol)  http://periodictable.com       //DU20190517
-      double Miedema_phi_star;                // (V)        (phi^\star   Miedema Rule Table 1a Physica 100B 1-28 (1980)
-      double Miedema_nws;                     // (d.u.)^1/3 n_{ws}^{1/3} Miedema Rule Table 1a Physica 100B 1-28 (1980)
-      double Miedema_gamma_s;                 // (mJ/m^2)   \gamma_s^0   Miedema Rule Table 1a Physica 100B 1-28 (1980)
-      double Pettifor_scale;                  // Chemical Scale Pettifor Solid State Communications 51 31-34 (1984)
+      double electron_affinity_PT;              // (kJ/mol)  http://periodictable.com       //DU20190517
+      vector<double> energies_ionization;       // (kJ/mol) http://periodictable.com //CO20201111
+      double work_function_Miedema;             // (V)        (phi^{\star} empirically-adjusted work function   Miedema Rule Table 1a Physica 100B 1-28 (1980) 10.1016/0378-4363(80)90054-6
+      double density_line_electron_WS_Miedema;  // (d.u.)^1/3 n_{ws}^{1/3} (averaged electron density at the boundary of the Wigner-Seitz cell)^{1/3}  Miedema Rule Table 1a Physica 100B 1-28 (1980) 10.1016/0378-4363(80)90054-6
+      double energy_surface_0K_Miedema;         // (mJ/m^2)   \gamma_s^0 surface energy at T=0   Miedema Rule Table 1a Physica 100B 1-28 (1980) 10.1016/0378-4363(80)90054-6
+      double chemical_scale_Pettifor;           // Chemical Scale Pettifor Solid State Communications 51 31-34 (1984) //updated with D.G. Pettifor 1986 J. Phys. C: Solid State Phys. 19 285  10.1088/0022-3719/19/3/002 //CO20201111
+      uint Mendeleev_number;                    // D.G. Pettifor 1986 J. Phys. C: Solid State Phys. 19 285  10.1088/0022-3719/19/3/002 //CO20201111
       //                                          
-      double boiling_point;                   // (Celsius), http://periodictable.com C:diamond, P:"YELLOW" Phosphorus, As:sublimates at this T.      //DU20190517
-      double melting_point;                   // (Celsius), http://periodictable.com He does not solidify at standard pressure,C: Value given for diamond form, P : Value given for "YELLOW" phosphorus form, S : Value given for monoclinic, beta form, Se: Value given for hexagonal, gray form, Bk: Value given for alpha form.           //DU20190517
-      double vaporization_heat_PT;             // (kJ/mol)   http://periodictable.com      //DU20190517
-      double specific_heat_PT;                 // (J/(kg.K)) http://periodictable.com Gas_Phase:H(H2),He,N(N2),O(O2),F(F2),Ne,Cl(Cl2),Ar,Kr,Tc,Xe,Rn,Ra,Pa -- Liquid_Phase:Br,Hg -- Solid Phase: B(rhombic),C(graphite),S(rhombic),P(phase of P.4),As(alpha),Se(hexagonal),Cd(gamma),Sn(gray),Li,In,Be,Na,Mg,Al,Si,K,Ca,Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Ga,Ge,Rb,Sr,Y,Zr,Nb,Mo,Ru,Rh,Pd,Ag,Sb,Te,I,Cs,Ba,La,Ce,Pr,Nd,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Hf,Ta,W,Re,Os,Ir,Pt,Au,Tl,Pb,Bi,Ac,Th,U.      //DU20190517 
-      double critical_Pressure;                // (Atm)      http://periodictable.com Li,Na,K,Rb: Value estimated based on extrapolation.      //DU20190517
-      double critical_Temperature_PT;          // (K)        http://periodictable.com Li,Na,K,Rb: Value estimated based on extrapolation.      //DU20190517
+      double temperature_boiling;             // (Celsius), http://periodictable.com C:diamond, P:"YELLOW" Phosphorus, As:sublimates at this T.      //DU20190517
+      double temperature_melting;             // (Celsius), http://periodictable.com He does not solidify at standard pressure,C: Value given for diamond form, P : Value given for "YELLOW" phosphorus form, S : Value given for monoclinic, beta form, Se: Value given for hexagonal, gray form, Bk: Value given for alpha form.           //DU20190517
+      double enthalpy_fusion;                 // (kJ/mol)   http://periodictable.com primarily, also https://www.webelements.com/     //CO20201111
+      double enthalpy_vaporization;           // (kJ/mol)   http://periodictable.com primarily, also https://www.webelements.com/     //DU20190517  //CO20201111
+      double enthalpy_atomization_WE;         // (kJ/mol)   https://www.webelements.com   //CO20201111
+      double energy_cohesive;                 // (kJ/mol)   http://www.knowledgedoor.com/2/elements_handbook/cohesive_energy.html pulled mostly from Kittel pg 50  //CO20201111
+      double specific_heat_PT;                // (J/(kg K)) http://periodictable.com Gas_Phase:H(H2),He,N(N2),O(O2),F(F2),Ne,Cl(Cl2),Ar,Kr,Tc,Xe,Rn,Ra,Pa -- Liquid_Phase:Br,Hg -- Solid Phase: B(rhombic),C(graphite),S(rhombic),P(phase of P.4),As(alpha),Se(hexagonal),Cd(gamma),Sn(gray),Li,In,Be,Na,Mg,Al,Si,K,Ca,Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Ga,Ge,Rb,Sr,Y,Zr,Nb,Mo,Ru,Rh,Pd,Ag,Sb,Te,I,Cs,Ba,La,Ce,Pr,Nd,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Hf,Ta,W,Re,Os,Ir,Pt,Au,Tl,Pb,Bi,Ac,Th,U.      //DU20190517 
+      double critical_pressure;               // (Atm)      http://periodictable.com Li,Na,K,Rb: Value estimated based on extrapolation.      //DU20190517
+      double critical_temperature_PT;         // (K)        http://periodictable.com Li,Na,K,Rb: Value estimated based on extrapolation.      //DU20190517
       double thermal_expansion;               // (K^{-1})   http://periodictable.com C:graphite      //DU20190517
-      double thermal_conductivity;            // (W/(mK))   http://periodictable.com      //DU20190517
+      double conductivity_thermal;            // (W/(m K))   http://periodictable.com      //DU20190517
       //                                         
-      double Brinelll_hardness;               // (MPa)  http://periodictable.com For Ge value is converted from Mohs scale      //DU20190517
-      double Mohs_hardness;                   //        http://periodictable.com For C, value given for graphite. Diamond value is 10.0; For Pr, Nd, Sm, Eu, Gd, Tb, Dy, Ho, Er, Tm, Lu converted from Vickers scale.      //DU20190517
-      double Vickers_hardness;                // (MPa)  http://periodictable.com For Si,Ge,As,Ru,Os converted from Brinell scale.      //DU20190517
-      double Hardness_Pearson;                // (eV)   Inorg. Chem. 27(4) 734-740 (1988).      //DU20190517
-      double Hardness_Putz;                   // (eV/atom) International Journal of Quantum Chemistry, Vol 106, 361–389 (2006), TABLE-V.      //DU20190517
-      double Hardness_RB;                     // (eV)   Robles and Bartolotti, J. Am. Chem. Soc. 106, 3723-3727 (1984).      //DU20190517
-      double shear_modulus;                    // (GPa)  http://periodictable.com      //DU20190517
-      double Young_modulus;                    // (GPa)  http://periodictable.com      //DU20190517
-      double bulk_modulus;                     // (GPa)  http://periodictable.com      //DU20190517
-      double Poisson_ratio_PT;                 // (--)   http://periodictable.com      //DU20190517
-      double Miedema_BVm;                     // (kJ/mole) BV_m Miedema Rule Table 1a Physica 100B 1-28 (1980) 
+      double hardness_mechanical_Brinell;     // (MPa)  http://periodictable.com For Ge value is converted from Mohs scale      //DU20190517
+      double hardness_mechanical_Mohs;        //        http://periodictable.com For C, value given for graphite. Diamond value is 10.0; For Pr, Nd, Sm, Eu, Gd, Tb, Dy, Ho, Er, Tm, Lu converted from Vickers scale.      //DU20190517
+      double hardness_mechanical_Vickers;     // (MPa)  http://periodictable.com For Si,Ge,As,Ru,Os converted from Brinell scale.      //DU20190517
+      double hardness_chemical_Pearson;       // (eV)   Inorg. Chem. 27(4) 734-740 (1988).      //DU20190517
+      double hardness_chemical_Putz;          // (eV/atom) International Journal of Quantum Chemistry, Vol 106, 361–389 (2006), TABLE-V. 10.1002/qua.20787      //DU20190517
+      double hardness_chemical_RB;            // (eV)   Robles and Bartolotti, J. Am. Chem. Soc. 106, 3723-3727 (1984).  10.1021/ja00325a003 using Gunnarsson-Lundqvist (GL) for XC functional    //DU20190517
+      double modulus_shear;                   // (GPa)  http://periodictable.com      //DU20190517
+      double modulus_Young;                   // (GPa)  http://periodictable.com      //DU20190517
+      double modulus_bulk;                    // (GPa)  http://periodictable.com      //DU20190517
+      double Poisson_ratio_PT;                // (--)   http://periodictable.com      //DU20190517
+      double modulus_bulk_x_volume_molar_Miedema;   // (kJ/mol) B*V_m Miedema Rule Table 1a Physica 100B 1-28 (1980) 10.1016/0378-4363(80)90054-6
       //
-      string Magnetic_Type_PT;                 //           http://periodictable.com  //DU20190517
-      double Mass_Magnetic_Susceptibility;      // (m^3/K)   http://periodictable.com //DU20190517
-      double Volume_Magnetic_Susceptibility;    //           http://periodictable.com //DU20190517
-      double Molar_Magnetic_Susceptibility;     // (m^3/mol) http://periodictable.com //DU20190517
-      double Curie_point;                     // (K)       http://periodictable.com   //DU20190517
+      string magnetic_type_PT;                //           http://periodictable.com  //DU20190517
+      double susceptibility_magnetic_mass;    // (m^3/K)   http://periodictable.com //DU20190517
+      double susceptibility_magnetic_volume;  //           http://periodictable.com //DU20190517
+      double susceptibility_magnetic_molar;   // (m^3/mol) http://periodictable.com //DU20190517
+      double temperature_Curie;               // (K)       http://periodictable.com   //DU20190517
       //
-      double refractive_index;                 // http://periodictable.com C:diamond      //DU20190517
+      double refractive_index;                // http://periodictable.com C:diamond      //DU20190517
       string color_PT;                        // http://periodictable.com      //DU20190517
       //
       double HHIP;                            // Chem. Mater. 25(15), 2911–2920 (2013) Herfindahl–Hirschman Index (HHI), HHIP: for elemental production, Uncertinities in HHI_P: C,O,F,Cl,Sc,Ga,Rb,Ru,Rh,Cs,Hf,Os,Ir,Tl.      //DU20190517
       double HHIR;                            // Chem. Mater. 25(15), 2911–2920 (2013) Herfindahl–Hirschman Index (HHI), HHIR: for elemental reserves,   Uncertinities in HHI_R: Be,C,N,O,F,Na,Mg,Al,Si,S,Cl,Ca,Sc,Ga,Ge,As,Rb,Sr,Ru,Rh,Pd,In,Cs,Hf,Os,Ir,Pt,Tl.      //DU20190517
-      double xray_scatt;                      // shift+1 // All data collected from the NIST online tables: http://physics.nist.gov/PhysRefData/FFast/html/form.html//
+      double xray_scatt;                      // e-/atom //shift+1 // All data collected from the NIST online tables: http://physics.nist.gov/PhysRefData/FFast/html/form.html  //CO20201111 - another good source: https://henke.lbl.gov/optical_constants/asf.html
 
       // Xray_scatt_vector All data collected from the NIST online tables
       // http://physics.nist.gov/PhysRefData/FFast/html/form.html
@@ -4761,6 +4859,100 @@ namespace xelement {
       // All data are f1 values for Cu-alpha (wavelength=1.5418A, E=8.0416keV].
 
       // [AFLOW]STOP=DECLARATION
+
+      //UNITS
+      string units_Z;
+      string units_symbol;
+      string units_name;
+      string units_period;
+      string units_group; 
+      string units_series;
+      string units_block;      
+      //                                          
+      string units_mass;
+      string units_volume_molar;  
+      string units_volume;      
+      string units_area_molar_Miedema;      
+      //
+      string units_valence_std;  
+      string units_valence_iupac;
+      string units_valence_PT;       
+      string units_valence_s;       //CO20201111
+      string units_valence_p;       //CO20201111
+      string units_valence_d;       //CO20201111
+      string units_valence_f;       //CO20201111
+      string units_density_PT;       
+      string units_crystal;    
+      string units_crystal_structure_PT;
+      string units_spacegroup;
+      string units_spacegroup_number;    
+      string units_variance_parameter_mass;
+      string units_lattice_constants; 
+      string units_lattice_angles;   
+      string units_phase;
+      string units_radius_Saxena;         
+      string units_radius_PT;          
+      string units_radius_covalent_PT;   
+      string units_radius_covalent;  
+      string units_radius_VanDerWaals_PT;
+      string units_radii_Ghosh08;         
+      string units_radii_Slatter;         
+      string units_radii_Pyykko;          
+      //                                          
+      string units_conductivity_electrical;
+      string units_electronegativity_Pauling;    
+      string units_hardness_chemical_Ghosh;            
+      string units_electronegativity_Pearson;           
+      string units_electronegativity_Ghosh;             
+      string units_electronegativity_Allen;
+      string units_oxidation_states;
+      string units_oxidation_states_preferred;
+      string units_electron_affinity_PT;      
+      string units_energies_ionization;
+      string units_work_function_Miedema;         
+      string units_density_line_electron_WS_Miedema;              
+      string units_energy_surface_0K_Miedema;          
+      //
+      string units_chemical_scale_Pettifor;          
+      string units_Mendeleev_number;    //CO20201111
+      //
+      string units_temperature_boiling;         
+      string units_temperature_melting;         
+      string units_enthalpy_fusion;     //CO20201111
+      string units_enthalpy_vaporization;     
+      string units_enthalpy_atomization_WE; //CO20201111
+      string units_energy_cohesive; //CO20201111
+      string units_specific_heat_PT;         
+      string units_critical_pressure;     
+      string units_critical_temperature_PT;  
+      string units_thermal_expansion;     
+      string units_conductivity_thermal;  
+      //                                         
+      string units_hardness_mechanical_Brinell;
+      string units_hardness_mechanical_Mohs;    
+      string units_hardness_mechanical_Vickers; 
+      string units_hardness_chemical_Pearson;   
+      string units_hardness_chemical_Putz;      
+      string units_hardness_chemical_RB;        
+      string units_modulus_shear;    
+      string units_modulus_Young;    
+      string units_modulus_bulk;     
+      string units_Poisson_ratio_PT;    
+      string units_modulus_bulk_x_volume_molar_Miedema;        
+      //
+      string units_magnetic_type_PT;
+      string units_susceptibility_magnetic_mass;
+      string units_susceptibility_magnetic_volume;
+      string units_susceptibility_magnetic_molar; 
+      string units_temperature_Curie;                  
+      //
+      string units_refractive_index;             
+      string units_color_PT;         
+      //
+      string units_HHIP;                           
+      string units_HHIR;                           
+      string units_xray_scatt;
+
       // operators/functions                                    // operator/functions
       friend ostream& operator<<(ostream &,const xelement&);    // print
       xelement Initialize(uint Z);                              // function to clean up the name
@@ -4784,6 +4976,35 @@ namespace xelement {
 
 extern std::vector<xelement::xelement> velement;        // store starting from ONE
 
+// ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+//CO20201111 - START
+#define _VAR_THRESHOLD_STD_ 0.001
+#define _Y_CORR_THRESHOLD_STD_ 0.0
+#define _SELF_CORR_THRESHOLD_STD_ 0.95
+
+namespace aflowMachL {
+  void insertElementalProperties(const vector<string>& vproperties,const xelement::xelement& xel,vector<string>& vitems);
+  void insertElementalPropertiesCoordCE(const vector<string>& vproperties,const xelement::xelement& xel,double M_X_bonds,double natoms_per_fu,vector<string>& vitems);
+  void insertCrystalProperties(const string& structure_path,const string& anion,const vector<string>& vheaders,vector<string>& vitems,const string& e_props=_AFLOW_XELEMENT_PROPERTIES_ALL_);
+  double getStatistic(const xvector<double>& xvec,const string& stat);
+  void insertElementalCombinations(const vector<string>& vproperties,vector<string>& vheaders);
+  void insertElementalCombinations(const vector<string>& vproperties,const xelement::xelement& xel_cation,const xelement::xelement& xel_anion,const aflowlib::_aflowlib_entry& entry,double M_X_bonds,double natoms_per_fu_cation,double natoms_per_fu_anion,vector<string>& vheaders,vector<double>& vfeatures,bool vheaders_only=false,uint count_vcols=AUROSTD_MAX_UINT);
+  void getColumn(const vector<vector<string> >& table,uint icol,vector<string>& column,bool& isfloat,bool& isinteger,bool include_header=false);
+  void delColumn(vector<vector<string> >& table,uint icol);
+  void oneHotFeatures(vector<vector<string> >& table,const string& features_categories);
+  void removeNaN(const xvector<double>& xvec,xvector<double>& xvec_new);
+  void replaceNaN(xvector<double>& xvec,double val=0.0);
+  void MinMaxScale(xvector<double>& xvec);
+  void reduceFeatures(vector<vector<string> >& table,const string& yheader,double var_threshold=_VAR_THRESHOLD_STD_,double ycorr_threshold=_Y_CORR_THRESHOLD_STD_,double selfcorr_threshold=_SELF_CORR_THRESHOLD_STD_);
+  void reduceFeatures(vector<vector<string> >& table,const string& yheader,const string& header2skip,double var_threshold=_VAR_THRESHOLD_STD_,double ycorr_threshold=_Y_CORR_THRESHOLD_STD_,double selfcorr_threshold=_SELF_CORR_THRESHOLD_STD_);
+  void reduceFeatures(vector<vector<string> >& table,const string& yheader,const vector<string>& vheaders2skip,double var_threshold=_VAR_THRESHOLD_STD_,double ycorr_threshold=_Y_CORR_THRESHOLD_STD_,double selfcorr_threshold=_SELF_CORR_THRESHOLD_STD_);
+  void reduceFeatures(vector<vector<string> >& table,const string& yheader,uint icol2skip,double var_threshold=_VAR_THRESHOLD_STD_,double ycorr_threshold=_Y_CORR_THRESHOLD_STD_,double selfcorr_threshold=_SELF_CORR_THRESHOLD_STD_);
+  void reduceFeatures(vector<vector<string> >& table,const string& yheader,const vector<uint>& vicol2skip,double var_threshold=_VAR_THRESHOLD_STD_,double ycorr_threshold=_Y_CORR_THRESHOLD_STD_,double selfcorr_threshold=_SELF_CORR_THRESHOLD_STD_);
+  string reduceEProperties(double var_threshold=_VAR_THRESHOLD_STD_,double selfcorr_threshold=_SELF_CORR_THRESHOLD_STD_);
+  void writeCoordCECSV();
+} // namespace aflowMachL
+//CO20201111 - END
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
 // aflow_xprototype.h stuff by DAVID
@@ -4843,6 +5064,6 @@ namespace xprototype {
 #endif
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
 // *                                                                         *
 // ***************************************************************************

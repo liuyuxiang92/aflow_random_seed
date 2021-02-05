@@ -1,7 +1,7 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
-// *            Aflow MARCO ESTERS - Duke University 2018-2020               *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
+// *            Aflow MARCO ESTERS - Duke University 2018-2021               *
 // *                                                                         *
 // ***************************************************************************
 
@@ -525,6 +525,7 @@ namespace KBIN {
     opt.keyword="GP_FINITE_DIFF"; opt.option = DEFAULT_QHA_GP_FINITE_DIFF; opt.xscheme = (opt.option?"ON":"OFF"); qhaflags.push_back(opt); opt.clear();
     opt.keyword="IGNORE_IMAGINARY"; opt.option = DEFAULT_QHA_IGNORE_IMAGINARY; opt.xscheme = (opt.option?"ON":"OFF"); qhaflags.push_back(opt); opt.clear();
     //AS20200508 END
+    opt.keyword="RELAX_IONS_CELL"; opt.option = DEFAULT_QHA_RELAX_IONS_CELL; opt.xscheme = (opt.option?"ON":"OFF"); qhaflags.push_back(opt); opt.clear();//AS20201123
 
     if (LDEBUG) {
       for (uint i = 0; i < qhaflags.size(); i++) {
@@ -550,6 +551,7 @@ namespace KBIN {
     //AS20200508 BEGIN
     if(key=="GP_FINITE_DIFF"){return true;}
     if(key=="IGNORE_IMAGINARY"){return false;}
+    if(key=="RELAX_IONS_CELL"){return false;}
     //AS20200508 END
 
     return true;
@@ -588,7 +590,7 @@ namespace KBIN {
 
 //****************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
-// *            Aflow MARCO ESTERS - Duke University 2018-2020               *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
+// *            Aflow MARCO ESTERS - Duke University 2018-2021               *
 // *                                                                         *
 //****************************************************************************

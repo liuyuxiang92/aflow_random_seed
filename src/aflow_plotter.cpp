@@ -1,7 +1,7 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
-// *            Aflow MARCO ESTERS - Duke University 2019-2020               *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
+// *            Aflow MARCO ESTERS - Duke University 2019-2021               *
 // *                                                                         *
 // ***************************************************************************
 // 
@@ -876,10 +876,18 @@ static const string ESTRUCTURE_COLORS[ESTRUCTURE_NCOLORS] = {
 };
 static const string ISPIN_COLORS[2] = {"#000000", "#C44E52"};
 static const string ORBITALS[4] = {"s", "p", "d", "f"};
-static const string LM_ORBITALS[16] = {"s", "p_y", "p_z", "p_x",
+static const string LM_ORBITALS_LATEX[16] = {"s", "p_y", "p_z", "p_x",
   "d_{xy}", "d_{yz}", "d_{z^2}", "d_{xz}", "d_{x^2-y^2}",
   "f_{y(3x^2-y^2)}", "f_{xyz}", "f_{yz^2}", "f_{z^3}",
   "f_{xz^2}", "f_{z(x^2-y^2)}", "f_{x(x^2-3y^2)}"};
+//AS20201110 as used by E.G. in BANDSDATA_JSON procedure:
+static const string LM_ORBITALS[16] = {"s", "py", "pz", "px",
+  "dxy", "dyz", "dz2", "dxz", "dx2-y2",
+  "f1", "f2", "f3", "f4", "f5", "f6", "f7"};
+static const string SPIN_LABEL[2] = {"majority", "minority"};//AS20201102
+static const string LS_ORBITALS[16] = {"s_total", "sx", "sy", "sz",
+  "p_total", "px", "py", "pz", "d_total", "dx", "dy", "dz",
+  "f_total", "fx", "fy", "fz"};//AS20201105
 
 namespace plotter {
 
@@ -1311,6 +1319,409 @@ namespace plotter {
     }
   }
 
+#define BANDS_DOS_JSON_VERSION 1.0
+
+  /// Converts DOS data from xDOSCAR to the file in json format.
+  ///
+  /// @param xopts controls the following input options:
+  /// "DIRECTORY" -- the directory name
+  /// "NOSHIFT" -- if true energy is NOT shifted w.r.t Fermi energy
+  ///
+  /// @param standalone_json_object controls if the output json file is
+  /// a standalone object or a part of another json object (i.e. if opening
+  /// and closing curly brackets are present or not)
+  aurostd::JSONwriter DOS2JSON(xoption &xopt, const xDOSCAR &xdos, ofstream& FileMESSAGE,
+      ostream &oss)
+  {
+    string directory = ".";
+    xopt.push_attached("DIRECTORY", directory);
+    if (directory.empty()) directory = aurostd::getPWD();
+
+    xstructure xstr = getStructureWithNames(xopt,FileMESSAGE,xdos.carstring,oss);
+
+    string name = KBIN::ExtractSystemName(directory);
+    aurostd::JSONwriter dos_json;
+    // TDOS header begin
+    dos_json.addNumber("version", BANDS_DOS_JSON_VERSION);
+    dos_json.addString("name", name);
+    dos_json.addVector("species", xstr.species);
+    dos_json.addVector("composition", xstr.num_each_type);
+    dos_json.addNumber("Emin", xdos.energy_min);
+    dos_json.addNumber("Emax", xdos.energy_max);
+    dos_json.addNumber("Efermi", xdos.Efermi);
+    dos_json.addNumber("DOS_grid", xdos.number_energies);
+    // TDOS header end
+
+    aurostd::JSONwriter tdos_data;
+    tdos_data.addBool("energies_shifted", !xopt.flag("NOSHIFT"));
+    tdos_data.addVector("energy",xopt.flag("NOSHIFT") ? xdos.venergy : xdos.venergyEf);
+    if (aurostd::substring2bool(xdos.carstring, "CAR")){
+      tdos_data.addString("x_unit", "EV");
+      tdos_data.addString("y_unit", "");
+    }
+    else if (aurostd::substring2bool(xdos.carstring, "PHON")){
+      tdos_data.addString("x_unit", "MEV");
+      tdos_data.addString("y_unit", "");
+    }
+
+    if (xdos.spin){
+      tdos_data.addVector("spin_majority", xdos.vDOS[0][0][0]);
+      // negative for minority spin
+      deque<double> minority = xdos.vDOS[0][0][1];
+      for (uint i=0; i<minority.size(); i++) minority[i] *= -1;
+      tdos_data.addVector("spin_minority", minority);
+
+      tdos_data.addVector("sum_spin_majority", xdos.viDOS[0]);
+      // negative for minority spin
+      minority = xdos.viDOS[1];
+      for (uint i=0; i<minority.size(); i++) minority[i] *= -1;
+      tdos_data.addVector("sum_spin_minority", minority);
+    }
+    else{
+      tdos_data.addVector("tDOS", xdos.vDOS[0][0][0]);
+      tdos_data.addVector("sum", xdos.viDOS[0]);
+    }
+    dos_json.addJSON("tDOS_data", tdos_data);
+
+    // projected electronic DOS
+    if (xdos.partial && aurostd::substring2bool(xdos.carstring, "CAR")){
+      // Here we determine what orbital labels are used depending on the type of data
+      // present in DOSCAR.
+      // For the systems with LS coupling VASP will print at most 16 orbitals:
+      // i_total, i_x, i_y, i_z for i in {s,p,d,f}
+      // When there is no LS coupling, there are two possibilities:
+      // orbitals are classified by their l,m character and, since VASP prints up to
+      // f orbital, there would be 16 orbitals at most.
+      // Or orbitals are classified only by l character, giving at most 4 orbitals.
+      vector<string> orb_labels(xdos.isLSCOUPLING ? 16 : (xdos.lmResolved ? 16 : 4));
+      if (xdos.isLSCOUPLING){
+        for (uint i=0; i<16; i++) orb_labels[i] = LS_ORBITALS[i];
+      }
+      else if (xdos.lmResolved){
+        for (uint i=0; i<16; i++) orb_labels[i] = LM_ORBITALS[i];
+      }
+      else{
+        for (uint i=0; i<4; i++) orb_labels[i] = ORBITALS[i];
+      }
+
+      // for the "orbitals" key, we want to print a list of orbitals up to the
+      // highest present in any atom, not the entire list of known/possible orbitals
+      int highest_orbital = 0;
+      for (uint i=0; i<xdos.vDOS.size(); i++){
+        if (xdos.lmResolved){ // there are 1 s, 3 p, 5 d and so on orbitals
+          int orbs_total_num = 1, l = 0;
+          while (((int)xdos.vDOS[i].size()-1) - orbs_total_num){// 0's index of vDOS stands for total: it should not be counted
+            l++;
+            orbs_total_num += 2*l+1;
+          }
+          highest_orbital = std::max(highest_orbital, l+1);
+        }
+        else{
+          highest_orbital = std::max(highest_orbital, (int)xdos.vDOS[i].size()-1);
+        }
+      }
+
+      // make an array of orbitals labels from s to whichever is highest
+      vector<string> orb_labels_out(highest_orbital);
+      for (uint i=0; i<orb_labels_out.size(); i++){
+        orb_labels_out[i] = ORBITALS[i];
+      }
+
+      // header of partial DOS
+      aurostd::JSONwriter pdos_data;
+      pdos_data.addVector("orbitals", orb_labels_out);
+      pdos_data.addBool("spin_polarized", xdos.spin);
+      pdos_data.addBool("energies_shifted", !xopt.flag("NOSHIFT"));
+      pdos_data.addVector("energy",xopt.flag("NOSHIFT") ? xdos.venergy : xdos.venergyEf);
+      pdos_data.addString("x_unit", "EV");
+      pdos_data.addString("y_unit", "");
+
+      // create a mapping of species to the ID of the first representative of
+      // each group of the symmetry equivalent atoms, i.e. for SG #12 BaBiO3
+      // with Ba : {{0,1}}, Bi: {{2},{3}}, O: {{4,5,6,7}, {8,9}} make the
+      // following mapping: Ba -> {0}, Bi -> {2,3}, O -> {4,8}
+      pflow::PerformFullSymmetry(xstr);
+      vector<vector<int> > map_species_to_iatoms(xstr.species.size());
+      for (uint species_id=0; species_id<xstr.species.size(); species_id++){
+        for (uint iatom=0; iatom<xstr.iatoms.size(); iatom++){
+          if (xstr.atoms[xstr.iatoms[iatom][0]].type == (int)species_id)
+            map_species_to_iatoms[species_id].push_back(xstr.iatoms[iatom][0]);
+        }
+      }
+
+      // write atom-projected DOS for each unique atom
+      string label = "";
+      for (uint species_id=0; species_id<xstr.species.size(); species_id++){
+        aurostd::JSONwriter species_json;
+        for (uint iatom=0; iatom<map_species_to_iatoms[species_id].size(); iatom++){
+          int atom_id = map_species_to_iatoms[species_id][iatom];
+          aurostd::JSONwriter atom_json;
+          atom_id++; // in vDOS atoms are indexed starting from 1
+
+          if (xdos.isLSCOUPLING){
+            for (uint orb=1; orb<xdos.vDOS[atom_id].size(); orb++){
+              // there are 4 spin channels
+              for (uint spin=0; spin<xdos.vDOS[atom_id][orb].size(); spin++){
+                label = orb_labels[4*(orb-1) + spin];
+                atom_json.addVector(label, xdos.vDOS[atom_id][orb][spin]);
+              }
+            }
+
+            atom_json.addVector("total", xdos.vDOS[atom_id][0][0]);
+          }
+          else{
+            for (uint spin=0; spin<=xdos.spin; spin++){
+              if (xdos.vDOS[atom_id].size()){
+                label = "total" + (xdos.spin ? "_"+ SPIN_LABEL[spin] : "");
+                if (spin){
+                  // negative for minority spin
+                  deque<double> minority = xdos.vDOS[atom_id][0][spin];
+                  for (uint i=0; i<minority.size(); i++) minority[i] *= -1;
+                  atom_json.addVector(label, minority);
+                }
+                else{
+                  atom_json.addVector(label, xdos.vDOS[atom_id][0][spin]);
+                }
+              }
+
+              for (uint orb=1; orb<xdos.vDOS[atom_id].size(); orb++){
+                label = orb_labels[orb-1] + (xdos.spin ? "_"+ SPIN_LABEL[spin] : "");
+                if (spin){
+                  // negative for minority spin
+                  deque<double> minority = xdos.vDOS[atom_id][orb][spin];
+                  for (uint i=0; i<minority.size(); i++) minority[i] *= -1;
+                  atom_json.addVector(label, minority);
+                }
+                else{
+                  atom_json.addVector(label, xdos.vDOS[atom_id][orb][spin]);
+                }
+              }
+            }
+          }
+          species_json.addJSON(aurostd::utype2string<int>(atom_id-1), atom_json);
+        }
+        pdos_data.addJSON(xstr.species[species_id], species_json); 
+      }
+
+      // write the sum of DOS contributions for each orbital (s, p, d and f)
+      // for all atoms
+      if (xdos.lmResolved){
+        deque<deque<double> > orb_dos(xdos.spin+1, deque<double> (xdos.number_energies));
+        for (int l=0, norb=1; norb<=(int)xdos.vDOS[0].size()-1; l++, norb += (2*l+1)){
+          for (uint spin=0; spin<=xdos.spin; spin++){
+            for (uint en=0; en<orb_dos[spin].size(); en++) orb_dos[spin][en] = 0.0;
+          }
+
+          for (uint spin=0; spin<=xdos.spin; spin++){
+            // orbitals are grouped by 2*l+1 manifolds: loop to sum each group
+            for (int i=0; i<2*l+1; i++){
+              for (uint en=0; en<orb_dos[spin].size(); en++){
+                orb_dos[spin][en] += (xdos.spin ? -1 : 1)*xdos.vDOS[0][norb-i][spin][en]; // negative for minority spin
+              }
+            }
+            label = "sum_" + ORBITALS[l];
+            label += xdos.spin ? "_"+SPIN_LABEL[spin] : "";
+            pdos_data.addVector(label, orb_dos[spin]);
+          }
+        }
+      }
+      else{
+        for (uint orb=1; orb<xdos.vDOS[0].size(); orb++){
+          for (uint spin=0; spin<=xdos.spin; spin++){
+            if (xdos.isLSCOUPLING){
+              label = "sum_"+ORBITALS[orb-1];
+            }
+            else{
+              label = "sum_"+orb_labels[orb-1];
+              label += xdos.spin ? "_"+SPIN_LABEL[spin] : "";
+            }
+            if (spin){
+              // negative for minority spin
+              deque<double> minority = xdos.vDOS[0][orb][spin];
+              for (uint i=0; i<minority.size(); i++) minority[i] *= -1;
+              pdos_data.addVector(label, minority);
+            }
+            else{
+              pdos_data.addVector(label, xdos.vDOS[0][orb][spin]);
+            }
+          }
+        }
+      }
+      dos_json.addJSON("pDOS_data", pdos_data);
+    }
+
+    // projected phonon DOS
+    if (xdos.partial && aurostd::substring2bool(xdos.carstring, "PHON")){
+      // header of partial DOS
+      aurostd::JSONwriter pdos_data;
+      deque<string> projections;
+      if (xdos.vDOS.size()>=2){
+        for (uint j=1; j<xdos.vDOS[1].size(); j++){
+          projections.push_back("projection_" + aurostd::utype2string(j));
+        }
+      }
+      pdos_data.addVector("orbitals", projections);
+      pdos_data.addBool("spin_polarized", xdos.spin);
+      pdos_data.addBool("energies_shifted", !xopt.flag("NOSHIFT"));
+      pdos_data.addVector("energy", xopt.flag("NOSHIFT") ? xdos.venergy : xdos.venergyEf);
+      pdos_data.addString("x_unit", "MEV");
+      pdos_data.addString("y_unit", "");
+
+      // create a mapping of species to the id of the first representative of
+      // each group of the symmetry equivalent atoms, i.e. for SG #12 BaBiO3
+      // with Ba : {{0,1}}, Bi: {{2},{3}}, O: {{4,5,6,7}, {8,9}} make the
+      // following mapping: Ba -> {0}, Bi -> {2,3}, O -> {4,8}
+      pflow::PerformFullSymmetry(xstr);
+      vector<vector<int> > map_species_to_iatoms(xstr.species.size());
+      for (uint species_id=0; species_id<xstr.species.size(); species_id++){
+        for (uint iatom=0; iatom<xstr.iatoms.size(); iatom++){
+          if (xstr.atoms[xstr.iatoms[iatom][0]].type == (int)species_id)
+            map_species_to_iatoms[species_id].push_back(xstr.iatoms[iatom][0]);
+        }
+      }
+
+      // write atom-projected DOS for each unique atom
+      string label = "";
+      for (uint species_id=0; species_id<xstr.species.size(); species_id++){
+        aurostd::JSONwriter species_json;
+        for (uint iatom=0; iatom<map_species_to_iatoms[species_id].size(); iatom++){
+          int atom_id = map_species_to_iatoms[species_id][iatom];
+          aurostd::JSONwriter atom_json;
+          atom_id++; // in vDOS atoms are indexed starting from 1
+
+          for (uint p=1; p<xdos.vDOS[atom_id].size(); p++){
+            atom_json.addVector(projections[p-1], xdos.vDOS[atom_id][p][0]);
+          }
+          species_json.addJSON(aurostd::utype2string<int>(atom_id-1), atom_json);
+        }
+        pdos_data.addJSON(xstr.species[species_id], species_json);
+      }
+
+      dos_json.addJSON("pDOS_data", pdos_data);
+    }
+
+    return dos_json;
+  }
+
+  /// Converts band structure data from xEIGENVAL and xKPOINTS to the file in
+  /// json format.
+  ///
+  /// @plotoptions specifies the following options:
+  /// "DIRECTORY" -- the directory name
+  /// "NOSHIFT" -- if true energy is NOT shifted w.r.t Fermi energy
+  /// "EFERMI" -- the value of Fermi energy
+  aurostd::JSONwriter bands2JSON(const xEIGENVAL &xeigen, const xKPOINTS &xkpts,
+      const vector<double> &distances, const vector<double> &segment_points,
+      const xoption& plotoptions)
+  {
+    string directory = plotoptions.getattachedscheme("DIRECTORY");
+    if (directory.empty()) directory = aurostd::getPWD();
+    string name = KBIN::ExtractSystemName(directory);
+
+    // get lattice type as written in KPOINTS.bands file
+    vector<string> tokens;
+    aurostd::string2tokens(xkpts.title, tokens, " ");
+    string LattName = tokens[0];
+
+    // write header
+    aurostd::JSONwriter json;
+    json.addString("title", name+" ("+LattName+")");
+    json.addNumber("n_kpoints", xeigen.number_kpoints);
+    json.addNumber("n_bands", xeigen.number_bands);
+    if(aurostd::substring2bool(xeigen.carstring, "CAR")){
+      json.addString("x_unit", "");
+      json.addString("y_unit", "EV");
+    }
+    else if(aurostd::substring2bool(xeigen.carstring, "PHON")){
+      json.addString("x_unit", "");
+      json.addString("y_unit", "MEV");
+    }
+
+    static const int num = 4;
+    string tags[num] = {"kpoint_labels", "kpoint_labels_latex", "kpoint_labels_gnuplot", "kpoint_labels_html"};
+    string formats[num] = { "", "LATEX", "GNUPLOT", "HTML"};
+
+    // we need clean labels: to be consistent with E.G. format of the JSON file
+    // they will be converted into all possible formats
+    uint nsegments = xkpts.vpath.size()/2;
+    vector<string> labels_formated(nsegments+1);
+    for (uint f=0; f<num; f++){
+      labels_formated[0] = convertKPointLabel(xkpts.vpath[0], formats[f]);
+      for (uint i = 2; i < 2 * nsegments; i += 2) {
+        labels_formated[i/2] = convertKPointLabel(xkpts.vpath[i - 1], formats[f]);
+        if (xkpts.vpath[i-1] != xkpts.vpath[i]) {
+          labels_formated[i/2] += ("GNUPLOT" == formats[f] ? " |" : "|");
+          labels_formated[i/2] += convertKPointLabel(xkpts.vpath[i], formats[f]);
+        }
+      }
+      labels_formated.back() = convertKPointLabel(xkpts.vpath.back(), formats[f]);
+
+      // escape backslash symbols in all labels
+      for (uint j=0; j<labels_formated.size();j++){
+        labels_formated[j] = aurostd::StringSubst(labels_formated[j], "\\", "\\\\");
+      }
+
+      json.addVector(tags[f], labels_formated);
+    }
+
+    json.addVector("kpoint_positions", segment_points);
+    json.addBool("energies_shifted", !plotoptions.flag("NOSHIFT"));
+
+    // write bands data
+    string bandslabel = "";
+    double Efermi = aurostd::string2utype<double>(plotoptions.getattachedscheme("EFERMI"));
+    for (uint s=0; s<=xeigen.spin; s++){
+      bandslabel = "bands_data";
+      bandslabel += xeigen.spin ? (s ? "_minority" : "_majority") : "";
+
+      vector<vector<double> > bandsdata(distances.size(),
+          vector<double> (xeigen.number_bands + 1)); // +1 because the first element is the the distance, the others are energies for each band
+
+      for (uint i=0; i<distances.size(); i++){
+        bandsdata[i][0] = distances[i];
+        if (plotoptions.flag("NOSHIFT")){
+          for (uint band=0; band<xeigen.number_bands; band++){
+            bandsdata[i][band+1] = xeigen.venergy[i][band][s];
+          }
+        }
+        else{
+          for (uint band=0; band<xeigen.number_bands; band++){
+            bandsdata[i][band+1] = xeigen.venergy[i][band][s] - Efermi;
+          }
+        }
+      }
+
+      json.addMatrix(bandslabel, bandsdata);
+    }
+
+    return json;
+  }
+
+  /// Converts DOS and BANDS data from xDOSCAR, xEIGENVAL and xKPOINTS files
+  /// to JSON object
+  aurostd::JSONwriter bandsDOS2JSON(const xDOSCAR &xdos, const xEIGENVAL &xeigen,
+      const xKPOINTS &xkpts, xoption &xopt, ofstream &FileMESSAGE, ostream &oss)
+  {
+    // get DOS part of JSON
+    aurostd::JSONwriter json = DOS2JSON(xopt, xdos, FileMESSAGE, oss);
+
+    // get BANDS part of JSON
+    xstructure xstr = getStructureWithNames(xopt,FileMESSAGE,xdos.carstring,oss);
+    xopt.pop_attached("OUTPUT_FORMAT");
+    xopt.push_attached("OUTPUT_FORMAT","JSON");
+    xopt.pop_attached("EFERMI");
+    xopt.push_attached("EFERMI", aurostd::utype2string<double>(xdos.Efermi));
+    stringstream json_stream;
+    generateBandPlot(json_stream, xeigen, xkpts, xstr, xopt);
+    string bands = json_stream.str();
+    if (bands.size() > 2){
+      bands = bands.substr(1, bands.size() - 2); // remove wrapping curly brackets
+    }
+
+    json.addRaw(bands);
+    return json;
+  }
+
   // DOS ---------------------------------------------------------------------
 
   //generateDosPlot///////////////////////////////////////////////////////////
@@ -1375,7 +1786,7 @@ namespace plotter {
         throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_ERROR_);
       }
       for (uint i = 1; i < xdos.vDOS[pdos].size(); i++) {
-        labels.push_back("$" + LM_ORBITALS[i-1] + "$");
+        labels.push_back("$" + LM_ORBITALS_LATEX[i-1] + "$");
       }
       dos = xdos.vDOS[pdos];
     } else if (projection == "ATOMS") { //CO20191004 - "ATOMS" is really "IATOMS"
@@ -1420,8 +1831,10 @@ namespace plotter {
           }
         }
       } else { // In case someone uses pdos option and projection=atoms
-        labels.push_back(xstr.species[pdos-1]);
-        dos.push_back(vDOS_species[pdos][0]);
+        //labels.push_back(xstr.species[pdos-1]);
+        //dos.push_back(vDOS_species[pdos][0]);
+        labels.push_back(xstr.atoms[pdos-1].name);//AS20201028
+        dos.push_back(vDOS_species[xstr.atoms[pdos-1].type+1][0]);//AS20201028
       }
     } else if (projection == "NONE") {  // Total DOS only without projections
       dos.push_back(xdos.vDOS[0][0]);
@@ -1496,6 +1909,9 @@ namespace plotter {
     if (outformat == "GNUPLOT") {
       generateBandPlotGNUPLOT(out, xeigen, distances, segment_points, labels, plotoptions);
     }
+    else if (outformat == "JSON"){
+      out << bands2JSON(xeigen, xkpts, distances, segment_points, plotoptions).toString();
+    }
   }
 
   //convertKPointLabel////////////////////////////////////////////////////////
@@ -1513,6 +1929,14 @@ namespace plotter {
       } else if (format == "HTML") {
         formatted_label += "<sub>" + parts[1] + "</sub>";
       }
+      //AS20201103 BEGIN
+      else if (format == "GNUPLOT"){
+        formatted_label += "_{/"+DEFAULT_GNUPLOT_EPS_FONT+" "+parts[1]+"}";
+      }
+      else{// return the second part even if no format is specified
+        formatted_label += "_" + parts[1];
+      }
+      //AS20201103 END
     }
     return formatted_label;
   }
@@ -1532,6 +1956,19 @@ namespace plotter {
         letter += ";";
       }
     }
+    //AS20201103 BEGIN
+    else if (format == "GNUPLOT"){
+      if (aurostd::substring2bool(letter, "Gamma")){
+        letter = "{/Symbol G}";
+      }
+      else if (aurostd::substring2bool(letter, "Sigma")){
+        letter = "{/Symbol S}";
+      }
+      else{
+        letter = "{/"+DEFAULT_GNUPLOT_EPS_FONT_ITALICS+" "+letter+"}";
+      }
+    }
+    //AS20201103 END
     return letter;
   }
 
@@ -2130,6 +2567,63 @@ namespace plotter {
     }
   }
 
+  //AS20200909 BEGIN
+  //PLOT_THERMO_QHA///////////////////////////////////////////////////////////////
+  // Plots QHA thermal properties.
+  void PLOT_THERMO_QHA(xoption& plotoptions,ostream& oss) {ofstream FileMESSAGE; PLOT_THERMO_QHA(plotoptions,FileMESSAGE,oss);}  //CO20200404
+  void PLOT_THERMO_QHA(xoption& plotoptions,ofstream& FileMESSAGE,ostream& oss) {  //CO20200404
+    stringstream out;
+    plotoptions.push_attached("OUTPUT_FORMAT", "GNUPLOT");
+    plotoptions.push_attached("COLOR", "#000000");
+    plotoptions.push_attached("LINETYPES", "-1");
+    PLOT_THERMO_QHA(plotoptions, out,FileMESSAGE,oss); //CO20200404
+  }
+
+  void PLOT_THERMO_QHA(xoption& plotoptions, stringstream& out,ostream& oss) {ofstream FileMESSAGE; PLOT_THERMO_QHA(plotoptions,out,FileMESSAGE,oss);} //CO20200404
+  void PLOT_THERMO_QHA(xoption& plotoptions, stringstream& out,ofstream& FileMESSAGE,ostream& oss) 
+  {
+    // Set labels
+    static const int nprops = 7;
+    string ylabels[nprops] = {"V", "F", "B", "\\beta", "c_V", "c_P", "\\gamma"};
+    string extensions[nprops] = {"volume_equilibrium_qha", "energy_free_qha",
+      "modulus_bulk_qha", "thermal_expansion_qha", "cV_qha", "cP_qha",
+      "gruneisen_parameter_qha"};
+    string yunits[nprops] = {"\\AA$^{3}$/atom", "eV/atom", "GPa", "$10^{-5}K^{-1}$",
+      "$k_B$/atom", "$k_B$/atom", ""};
+    string ymin[nprops] = {"", "", "", "", "0", "0", ""};
+
+    // Get data
+    string directory = plotoptions.getattachedscheme("DIRECTORY");
+    string thermo_file = directory+"/"+DEFAULT_QHA_FILE_PREFIX+DEFAULT_QHA_THERMO_FILE;
+    //ME20200413 - Since multiple data files are plotted, the user file
+    // name functions as base file name.
+    string user_file_name = plotoptions.getattachedscheme("FILE_NAME_USER");
+    plotoptions.pop_attached("FILE_NAME_USER");
+    if (aurostd::EFileExist(thermo_file)) {
+      string outformat = plotoptions.getattachedscheme("OUTPUT_FORMAT");
+      plotoptions.push_attached("DATA_FILE", thermo_file);
+      plotoptions.push_attached("KEYWORD", "QHA_SJ_THERMO");
+      vector<vector<double> > data = readAflowDataFile(plotoptions);
+      if (!user_file_name.empty()) plotoptions.push_attached("DEFAULT_TITLE", user_file_name);  //ME20200413
+      for (int i = 0; i < nprops; i++) {
+        plotoptions.pop_attached("YMIN");
+        if (!ymin[i].empty()) plotoptions.push_attached("YMIN", ymin[i]);
+        plotoptions.push_attached("EXTENSION", extensions[i]);
+        setPlotLabels(plotoptions, "T", "K", ylabels[i], yunits[i]);
+        plotSingleFromSet(plotoptions, out, data, i + 1,FileMESSAGE,oss);  //CO20200404
+        if (outformat == "GNUPLOT") {
+          savePlotGNUPLOT(plotoptions, out);
+        }
+        out.str("");  //ME20200513 - reset stringstream
+      }
+    } else {
+      string function = "plotter::PLOT_THERMO_QHA():";
+      string message = "Could not find file " + thermo_file + ".";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_NOT_FOUND_);
+    }
+  }
+  //AS20200909 END
+
   //PLOT_TCOND////////////////////////////////////////////////////////////////
   // Plots AAPL thermal conductivity tensors
   void PLOT_TCOND(xoption& plotoptions,ostream& oss) {ofstream FileMESSAGE;return PLOT_TCOND(plotoptions,FileMESSAGE,oss);} //CO20200404
@@ -2416,7 +2910,7 @@ namespace plotter {
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
-// *            Aflow MARCO ESTERS - Duke University 2019-2020               *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
+// *            Aflow MARCO ESTERS - Duke University 2019-2021               *
 // *                                                                         *
 // ***************************************************************************

@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
 // *                                                                         *
 // ***************************************************************************
 // Stefano Curtarolo
@@ -1737,7 +1737,7 @@ namespace aurostd {
   // ***************************************************************************
   // Stefano Curtarolo
   // cleans file names from obvious things
-  string CleanFileName(string fileIN) {
+  string CleanFileName(const string& fileIN) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string fileOUT=fileIN;
     if(LDEBUG) cerr << "aurostd::CleanFileName: " << fileOUT << endl;
@@ -2036,6 +2036,14 @@ namespace aurostd {
         aurostd::execute("subst "+from_cmd+" "+to_cmd+" \""+dir+"/ael_aflow.in\"");
         aurostd::RemoveFile("\""+dir+"/\"*~");
       }
+    //AS20201023 BEGIN
+    if(aurostd::FileExist(dir+"/aflow_qha.in"))
+      if(aurostd::substring_present_file_FAST(dir+"/aflow_qha.in",from_cmd)) {
+        if(VERBOSE) { cout << message << "aurostd::ZIP2ZIP: " << from_ext << "->"+to_ext+" " << dir << "/aflow_qha.in" << " " << endl; cout.flush(); }
+        aurostd::execute("subst "+from_cmd+" "+to_cmd+" \""+dir+"/aflow_qha.in\"");
+        aurostd::RemoveFile("\""+dir+"/\"*~");
+      }
+    //AS20201023 END
     if(aurostd::FileExist(dir+"/LOCK"))
       if(aurostd::substring_present_file_FAST(dir+"/LOCK",from_cmd)) {
         if(VERBOSE) { cout << message << "aurostd::ZIP2ZIP: " << from_ext << "->"+to_ext+" " << dir << "/LOCK" << " " << endl; cout.flush(); }
@@ -2451,12 +2459,12 @@ namespace aurostd {
   //[CO20200624 - OBSOLETE]  aurostd::StringstreamClean(stream);
   //[CO20200624 - OBSOLETE]}
 
-  void PrintANSIEscapeSequence(const aurostd::xoption& color){
+  void PrintANSIEscapeSequence(const aurostd::xoption& color,FILE* fstr){
     if(color.option==FALSE){return;}
-    if(color.flag("COLOR==GREEN")){cursor_fore_green();return;}
-    if(color.flag("COLOR==CYAN")){cursor_fore_cyan();return;}
-    if(color.flag("COLOR==YELLOW")){cursor_fore_yellow();return;}
-    if(color.flag("COLOR==RED")){cursor_fore_red();return;}
+    if(color.flag("COLOR==GREEN")){cursor_fore_green(fstr);return;}
+    if(color.flag("COLOR==CYAN")){cursor_fore_cyan(fstr);return;}
+    if(color.flag("COLOR==YELLOW")){cursor_fore_yellow(fstr);return;}
+    if(color.flag("COLOR==RED")){cursor_fore_red(fstr);return;}
   }
 
   void PrintMessageStream(ostringstream &stream,bool quiet,std::ostream& oss) {ofstream FileMESSAGE;return PrintMessageStream(FileMESSAGE,stream,quiet,oss);} //CO20200624
@@ -2477,7 +2485,10 @@ namespace aurostd {
     if(message_parts.size()==0){return;}
 
     bool verbose=(!XHOST.QUIET && !quiet && osswrite);
-    bool fancy_print=(!XHOST.vflag_control.flag("WWW"));  //CO20200404 - new web flag
+    bool fancy_print=(!XHOST.vflag_control.flag("WWW")&&!XHOST.vflag_control.flag("NO_FANCY_PRINT"));  //CO20200404 - new web flag
+
+    FILE* fstr=stdout;
+    if(&oss==&std::cerr){fstr=stderr;}
 
     //COLOR CANNOT BE A STRING, this construction will cause errors for the compiler
     //string color="\033[32m";
@@ -2506,27 +2517,27 @@ namespace aurostd {
         //NOTICE - END
       }
 
-      //cursor_fore_green()
-      //cursor_fore_cyan()
+      //cursor_fore_green(fstr)
+      //cursor_fore_cyan(fstr)
 
       if(color.option==FALSE){fancy_print=false;}  //add others as needed
-      if(fancy_print) PrintANSIEscapeSequence(color);
+      if(fancy_print) PrintANSIEscapeSequence(color,fstr);
       for(uint i=0;i<message_parts.size();i++){
         loc=(!str2search.empty()?message_parts[i].find(str2search):string::npos);
         oss << message_parts[i].substr(0,loc);
         if(loc!=string::npos){
           //colors see here: https://en.m.wikipedia.org/wiki/ANSI_escape_code
-          if(fancy_print) cursor_attr_none();             // turn off all cursor attributes
-          if(fancy_print) PrintANSIEscapeSequence(color); // color
-          if(fancy_print) cursor_attr_blink();cursor_attr_bold(); // bold+blink
+          if(fancy_print) cursor_attr_none(fstr);             // turn off all cursor attributes
+          if(fancy_print) PrintANSIEscapeSequence(color,fstr); // color
+          if(fancy_print) {cursor_attr_blink(fstr);cursor_attr_bold(fstr);} // bold+blink
           oss << str2search;
-          if(fancy_print) cursor_attr_none();             // turn off all cursor attributes
-          if(fancy_print) PrintANSIEscapeSequence(color); // color
+          if(fancy_print) cursor_attr_none(fstr);             // turn off all cursor attributes
+          if(fancy_print) PrintANSIEscapeSequence(color,fstr); // color
           oss << message_parts[i].substr(loc+str2search.size(),string::npos);
         }
         oss << endl;  //flush included in endl
       }
-      if(fancy_print) cursor_attr_none();  // turn off all cursor attributes
+      if(fancy_print) cursor_attr_none(fstr);  // turn off all cursor attributes
     }
     aurostd::StringstreamClean(stream);
   }
@@ -2574,7 +2585,9 @@ namespace aurostd {
     if(message_parts.size()==0){return;}
 
     bool verbose=(!XHOST.QUIET && !quiet && osswrite);verbose=true; //ALWAYS!
-    bool fancy_print=(!XHOST.vflag_control.flag("WWW"));  //CO20200404 - new web flag
+    bool fancy_print=(!XHOST.vflag_control.flag("WWW")&&!XHOST.vflag_control.flag("NO_FANCY_PRINT"));  //CO20200404 - new web flag
+
+    FILE* fstr=stderr;
 
     FileMESSAGE << ErrorBarString << endl;
     for(uint i=0;i<message_parts.size();i++){FileMESSAGE << message_parts[i] << endl;}  //flush included in endl
@@ -2582,25 +2595,25 @@ namespace aurostd {
     if(verbose){
       string::size_type loc;
       string str2search="  ERROR ";  //replicate old behavior, look for ERROR coming from logger() which has two pre spaces
-      if(fancy_print) cursor_fore_red();  // red
       std::ostream& oss=std::cerr;
+      if(fancy_print) cursor_fore_red(fstr);  // red
       oss << ErrorBarString << endl;  //flush included in endl
       for(uint i=0;i<message_parts.size();i++){
         loc=message_parts[i].find(str2search);
         oss << message_parts[i].substr(0,loc);
         if(loc!=string::npos){
-          if(fancy_print) cursor_attr_none();     // turn off all cursor attributes
-          if(fancy_print) cursor_fore_red();      // red
-          if(fancy_print) cursor_attr_blink();cursor_attr_bold(); // bold+blink
+          if(fancy_print) cursor_attr_none(fstr);     // turn off all cursor attributes
+          if(fancy_print) cursor_fore_red(fstr);      // red
+          if(fancy_print) {cursor_attr_blink(fstr);cursor_attr_bold(fstr);} // bold+blink
           oss << str2search;
-          if(fancy_print) cursor_attr_none();     // turn off all cursor attributes
-          if(fancy_print) cursor_fore_red();      // red
+          if(fancy_print) cursor_attr_none(fstr);     // turn off all cursor attributes
+          if(fancy_print) cursor_fore_red(fstr);      // red
           oss << message_parts[i].substr(loc+str2search.size(),string::npos);
         }
         oss << endl;  //flush included in endl
       }
       oss << ErrorBarString << endl;  //flush included in endl
-      if(fancy_print) cursor_attr_none();  // turn off all cursor attributes
+      if(fancy_print) cursor_attr_none(fstr);  // turn off all cursor attributes
     }
     aurostd::StringstreamClean(stream);
   }
@@ -2648,7 +2661,9 @@ namespace aurostd {
     if(message_parts.size()==0){return;}
 
     bool verbose=(!XHOST.QUIET && !quiet && osswrite);verbose=true; //ALWAYS!
-    bool fancy_print=(!XHOST.vflag_control.flag("WWW"));  //CO20200404 - new web flag
+    bool fancy_print=(!XHOST.vflag_control.flag("WWW")&&!XHOST.vflag_control.flag("NO_FANCY_PRINT"));  //CO20200404 - new web flag
+
+    FILE* fstr=stderr;
 
     FileMESSAGE << WarningBarString << endl;
     for(uint i=0;i<message_parts.size();i++){FileMESSAGE << message_parts[i] << endl;}  //flush included in endl
@@ -2656,25 +2671,25 @@ namespace aurostd {
     if(verbose){
       string::size_type loc;
       string str2search="  WARNING ";  //replicate old behavior, look for WARNING coming from logger() which has two pre spaces
-      if(fancy_print) cursor_fore_yellow();   // yellow
       std::ostream& oss=std::cerr;
+      if(fancy_print) cursor_fore_yellow(fstr);   // yellow
       oss << WarningBarString << endl;  //flush included in endl
       for(uint i=0;i<message_parts.size();i++){
         loc=message_parts[i].find(str2search);
         oss << message_parts[i].substr(0,loc);
         if(loc!=string::npos){
-          if(fancy_print) cursor_attr_none();     // turn off all cursor attributes
-          if(fancy_print) cursor_fore_yellow();   // yellow
-          if(fancy_print) cursor_attr_blink();cursor_attr_bold(); // bold+blink
+          if(fancy_print) cursor_attr_none(fstr);     // turn off all cursor attributes
+          if(fancy_print) cursor_fore_yellow(fstr);   // yellow
+          if(fancy_print) {cursor_attr_blink(fstr);cursor_attr_bold(fstr);} // bold+blink
           oss << str2search;
-          if(fancy_print) cursor_attr_none();     // turn off all cursor attributes
-          if(fancy_print) cursor_fore_yellow();   // yellow
+          if(fancy_print) cursor_attr_none(fstr);     // turn off all cursor attributes
+          if(fancy_print) cursor_fore_yellow(fstr);   // yellow
           oss << message_parts[i].substr(loc+str2search.size(),string::npos);
         }
         oss << endl;  //flush included in endl
       }
       oss << WarningBarString << endl;  //flush included in endl
-      if(fancy_print) cursor_attr_none();  // turn off all cursor attributes
+      if(fancy_print) cursor_attr_none(fstr);  // turn off all cursor attributes
     }
     aurostd::StringstreamClean(stream);
   }
@@ -4593,12 +4608,12 @@ namespace aurostd {
   //   return (string) stream2stream<string>(from);
   // }
 
-  template<typename utype> string utype2string(const utype& from) {
-    return (string) stream2stream<string>(from);
-  }
-  template<typename utype> string utype2string(const utype& from,int precision) {
-    return (string) stream2stream<string>(from,precision);
-  }
+  //DX20210128 [OBSOLETE - use default arguments] template<typename utype> string utype2string(const utype& from) {
+  //DX20210128 [OBSOLETE - use default arguments]   return (string) stream2stream<string>(from);
+  //DX20210128 [OBSOLETE - use default arguments] }
+  //DX20210128 [OBSOLETE - use default arguments] template<typename utype> string utype2string(const utype& from,int precision) {
+  //DX20210128 [OBSOLETE - use default arguments]   return (string) stream2stream<string>(from,precision);
+  //DX20210128 [OBSOLETE - use default arguments]}
   template<typename utype> string utype2string(const utype& from,int precision,char FORMAT) { //see DEFAULT_STREAM, FIXED_STREAM, SCIENTIFIC_STREAM
     return (string) stream2stream<string>(from,precision,FORMAT);
   }
@@ -4935,28 +4950,29 @@ namespace aurostd {
     return (bool) substring_present_file_FAST(FileName,strsub1,FALSE);
   }
 
-  bool WithinList(const vector<string>& list,const string& input) { //CO20181010
+  bool WithinList(const vector<string>& list,const string& input,bool sorted) { //CO20181010
     //for(uint i=0;i<list.size();i++){if(list[i]==input){return true;}}  OBSOLETE ME20190905
     //return false;  OBSOLETE ME20190905
-    int index;
-    return WithinList(list, input, index);
+    int index=-1;
+    return WithinList(list, input, index, sorted);
   }
-  bool WithinList(const vector<int>& list,int input) {  //CO20181010
+  bool WithinList(const vector<int>& list,int input,bool sorted) {  //CO20181010
     //for(uint i=0;i<list.size();i++){if(list[i]==input){return true;}}  OBSOLETE ME20190905
     //return false;  OBSOLETE ME20190905
-    int index;
-    return WithinList(list, input, index);
+    int index=-1;
+    return WithinList(list, input, index, sorted);
   }
-  bool WithinList(const vector<uint>& list,uint input) {  //CO20181010
+  bool WithinList(const vector<uint>& list,uint input,bool sorted) {  //CO20181010
     //for(uint i=0;i<list.size();i++){if(list[i]==input){return true;}}  OBSOLETE ME20190905
     //return false;  OBSOLETE ME20190905
-    int index;
-    return WithinList(list, input, index);
+    int index=-1;
+    return WithinList(list, input, index, sorted);
   }
 
   //ME20190813 - added versions that also determine the index of the item in the list
-  bool WithinList(const vector<string>& list, const string& input, int& index) {
+  bool WithinList(const vector<string>& list, const string& input, int& index, bool sorted) {
     for (int i = 0, nlist = (int) list.size(); i < nlist; i++) {
+      if(sorted && list[i]>input){break;} //CO20201111
       if(list[i]==input) {
         index = i;
         return true;
@@ -4966,8 +4982,9 @@ namespace aurostd {
     return false;
   }
 
-  bool WithinList(const vector<int>& list, int input, int& index) {
+  bool WithinList(const vector<int>& list, int input, int& index, bool sorted) {
     for (int i = 0, nlist = (int) list.size(); i < nlist; i++) {
+      if(sorted && list[i]>input){break;} //CO20201111
       if(list[i]==input) {
         index = i;
         return true;
@@ -4977,8 +4994,9 @@ namespace aurostd {
     return false;
   }
 
-  bool WithinList(const vector<uint>& list, uint input, int& index) {
+  bool WithinList(const vector<uint>& list, uint input, int& index, bool sorted) {
     for (int i = 0, nlist = (int) list.size(); i < nlist; i++) {
+      if(sorted && list[i]>input){break;} //CO20201111
       if(list[i]==input) {
         index = i;
         return true;
@@ -7129,6 +7147,6 @@ namespace aurostd {
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
 // *                                                                         *
 // ***************************************************************************

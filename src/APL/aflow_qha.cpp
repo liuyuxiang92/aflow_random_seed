@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
 // *                                                                         *
 // ***************************************************************************
 // Written by Andriy Smolyanyuk (andriy.smolyanyuk@duke.edu)
@@ -47,6 +47,7 @@ enum PH_DATA_FILE {PH_DF_DIRECTORY, PH_DF_HARMIFC, PH_DF_PHPOSCAR};
 #define EOS_METHOD_FILE_BIRCH_MURNAGHAN4 "birch-murnaghan4."
 #define EOS_METHOD_FILE_MURNAGHAN "murnaghan."
 
+#define QHA_AFLOWIN_DEFAULT string("aflow_qha.in")
 
 //================================================================================
 //                    EOS related
@@ -107,7 +108,7 @@ bool isMinimumWithinBounds(const xvector<double> &y){
 }
 
 /// Calculates the bulk modulus for the Birch-Murnaghan EOS model.
-double BulkModulus_BM(double x_eq, const xvector<double> &dEdp)
+double calcBulkModulus_BM(double x_eq, const xvector<double> &dEdp)
 {
   double B = 4.0/9.0*std::pow(x_eq,5)*dEdp[3]+10.0/9.0*std::pow(x_eq,4)*dEdp[2];
   B *= eV2GPa*std::pow(x_eq,-3.0/2.0);
@@ -133,7 +134,7 @@ double Bprime_BM(double x, const xvector<double> &dEdp)
 /// Stabilized jellium model: https://doi.org/10.1103/PhysRevB.63.224115
 /// It is equaivalent to the model introduced in:
 /// https://doi.org/10.1103/PhysRevB.52.8064
-double BulkModulus_SJ(double x, const xvector<double> &dEdp)
+double calcBulkModulus_SJ(double x, const xvector<double> &dEdp)
 {
   double B = 1.0/9.0*std::pow(x,8)*dEdp[3]+4.0/9.0*std::pow(x,7)*dEdp[2];
   B *= eV2GPa*std::pow(x,-3);
@@ -186,7 +187,7 @@ namespace apl
     system_title = "";
     isEOS = false; isGP_FD = false;
     ignore_imaginary = false;
-    runQHA   = false; runQHA3P = false; runSCQHA = false; runQHANP = false;
+    isQHA   = false; isQHA3P = false; isSCQHA = false; isQHANP = false;
     isInitialized = false;
     includeElectronicContribution = false;
     doSommerfeldExpansion = false;
@@ -243,10 +244,10 @@ namespace apl
     isEOS             = qha.isEOS;
     isGP_FD           = qha.isGP_FD;
     ignore_imaginary  = qha.ignore_imaginary;
-    runQHA            = qha.runQHA;
-    runQHA3P          = qha.runQHA3P;
-    runSCQHA          = qha.runSCQHA;
-    runQHANP          = qha.runQHANP;
+    isQHA             = qha.isQHA;
+    isQHA3P           = qha.isQHA3P;
+    isSCQHA           = qha.isSCQHA;
+    isQHANP           = qha.isQHANP;
     isInitialized     = qha.isInitialized;
     includeElectronicContribution = qha.includeElectronicContribution;
     doSommerfeldExpansion = qha.doSommerfeldExpansion;
@@ -297,16 +298,16 @@ namespace apl
 
   ///////////////////////////////////////////////////////////////////////////////
 
-  QHA::QHA(_xinput &xinput, xoption &qha_options, xoption &apl_options,
-      ofstream &FileMESSAGE, ostream &oss)
+  QHA::QHA(const xstructure &in_structure, _xinput &xinput, xoption &qha_options,
+      xoption &apl_options, ofstream &FileMESSAGE, ostream &oss)
   {
-    initialize(xinput, qha_options, apl_options, FileMESSAGE, oss);
+    initialize(in_structure, xinput, qha_options, apl_options, FileMESSAGE, oss);
   }
 
   /// Initializes the QHA class with all the necessary data.
   ///
-  void QHA::initialize(_xinput &xinput, xoption &qha_options, xoption &apl_options,
-      ofstream &FileMESSAGE, ostream &oss)
+  void QHA::initialize(const xstructure &in_structure, _xinput &xinput,
+      xoption &qha_options, xoption &apl_options, ofstream &FileMESSAGE, ostream &oss)
   {
     static const int REQUIRED_MIN_NUM_OF_DATA_POINTS_FOR_EOS_FIT = 5;
     static const int precision_format = 4;
@@ -329,7 +330,7 @@ namespace apl
     currentDirectory = xinput.xvasp.Directory; // remember the current directory
 
     // initialization of the data that is derived from the structure
-    origStructure = xinput.xvasp.str;
+    origStructure = in_structure;
     origStructure.ReScale(1.0);
     NatomsOrigCell = origStructure.atoms.size();
     Nbranches = NatomsOrigCell * 3;
@@ -345,10 +346,10 @@ namespace apl
     isGP_FD = qha_options.flag("GP_FINITE_DIFF");
     ignore_imaginary = qha_options.flag("IGNORE_IMAGINARY");
     includeElectronicContribution = qha_options.flag("INCLUDE_ELEC_CONTRIB");
-    runQHA = qha_options.flag("MODE:QHA");
-    runQHA3P = qha_options.flag("MODE:QHA3P");
-    runQHANP = qha_options.flag("MODE:QHANP");
-    runSCQHA = qha_options.flag("MODE:SCQHA");
+    isQHA = qha_options.flag("MODE:QHA");
+    isQHA3P = qha_options.flag("MODE:QHA3P");
+    isQHANP = qha_options.flag("MODE:QHANP");
+    isSCQHA = qha_options.flag("MODE:SCQHA");
     aurostd::string2tokens(qha_options.getattachedscheme("PDIS_T"), ph_disp_temperatures, ",");
     doSommerfeldExpansion = qha_options.flag("SOMMERFELD_EXPANSION");
     TaylorExpansionOrder = aurostd::string2utype<int>(qha_options.getattachedscheme("TAYLOR_EXPANSION_ORDER"));
@@ -356,8 +357,8 @@ namespace apl
     // output with what parameters QHA will be run
     stringstream message;
     message << "QHA will run with the following parameters:" << std::endl;
-    message << "Methods:" << (runQHA ? " QHA" : "") << (runQHA3P ? " QHA3P" : "");
-    message << (runQHANP ? " QHANP" : "") << (runSCQHA ? " SCQHA" : "") << "." << std::endl;
+    message << "Methods:" << (isQHA ? " QHA" : "") << (isQHA3P ? " QHA3P" : "");
+    message << (isQHANP ? " QHANP" : "") << (isSCQHA ? " SCQHA" : "") << "." << std::endl;
 
     message << "Finite differences calculation of Grueneisen parameters will ";
     message << (isGP_FD ? "" : "NOT ") << "be run." << std::endl;
@@ -392,15 +393,23 @@ namespace apl
     for (int j=0; j<N_GPvolumes; j++){
       arun_runnames_apl_gp.push_back("PHONON_"
           + aurostd::utype2string(gprange[j],precision_format,false,FIXED_STREAM));
-      subdirectories_apl_gp.push_back(ARUN_DIRECTORY_PREFIX + QHA_ARUN_MODE + '_' +
-          arun_runnames_apl_gp.back());
+
+      // if APL state file for V=1.0 exists, reuse it and do not create PHONON_1.000 directory
+      if (aurostd::isequal(gprange[j], 1.0) &&
+          aurostd::EFileExist(DEFAULT_APL_FILE_PREFIX+DEFAULT_APL_STATE_FILE)){
+        subdirectories_apl_gp.push_back(".");
+      }
+      else{
+        subdirectories_apl_gp.push_back(ARUN_DIRECTORY_PREFIX + QHA_ARUN_MODE + '_' +
+            arun_runnames_apl_gp.back());
+      }
 
       coefGPVolumes.push_back(gprange[j]);
       GPvolumes.push_back(gprange[j]*Volume/NatomsOrigCell);
     }
 
     // determine the names for the directories used for the EOS calculation
-    if (isEOS || runQHA3P || runSCQHA || runQHANP){
+    if (isEOS || isQHA3P || isSCQHA || isQHANP){
       eosrange[0] = 1.0 + eosrange[0]/100.0;
       eosrange[1] = 1.0 + eosrange[1]/100.0;
       eosrange[2] = eosrange[2]/100.0;
@@ -426,8 +435,16 @@ namespace apl
       for (double i=eosrange[0]; i<=eosrange[1]; i+=eosrange[2]){
         arun_runnames_apl_eos.push_back( "PHONON_" +
             aurostd::utype2string(i,precision_format,false,FIXED_STREAM));
-        subdirectories_apl_eos.push_back(ARUN_DIRECTORY_PREFIX + QHA_ARUN_MODE + '_' +
-            arun_runnames_apl_eos.back());
+
+        // if APL state file for V=1.0 exists, reuse it and do not create PHONON_1.000 directory
+        if (aurostd::isequal(i, 1.0) &&
+            aurostd::EFileExist(DEFAULT_APL_FILE_PREFIX+DEFAULT_APL_STATE_FILE)){
+          subdirectories_apl_eos.push_back(".");
+        }
+        else{
+          subdirectories_apl_eos.push_back(ARUN_DIRECTORY_PREFIX + QHA_ARUN_MODE + '_' +
+              arun_runnames_apl_eos.back());
+        }
 
         arun_runnames_static.push_back("STATIC_" + 
             aurostd::utype2string(i, precision_format, false, FIXED_STREAM));
@@ -442,7 +459,7 @@ namespace apl
     }
 
     // determine the names for the directories used for the QHANP calculation
-    if (runQHANP){
+    if (isQHANP){
       N_QHANPvolumes = 2*TaylorExpansionOrder + 1;
 
       // get a set of volumes that would be used for the QHANP calculation
@@ -451,8 +468,16 @@ namespace apl
         coef = 1.0 + (-TaylorExpansionOrder + i)*gp_distortion; //dV = 2*gp_distortion
         arun_runnames_apl_qhanp.push_back("PHONON_"+
             aurostd::utype2string(coef,precision_format,false,FIXED_STREAM));
-        subdirectories_apl_qhanp.push_back(ARUN_DIRECTORY_PREFIX + QHA_ARUN_MODE + '_' +
-            arun_runnames_apl_qhanp.back());
+
+        // if APL state file for V=1.0 exists, reuse it and do not create PHONON_1.000 directory
+        if (aurostd::isequal(coef, 1.0) &&
+            aurostd::EFileExist(DEFAULT_APL_FILE_PREFIX+DEFAULT_APL_STATE_FILE)){
+          subdirectories_apl_qhanp.push_back(".");
+        }
+        else{
+          subdirectories_apl_qhanp.push_back(ARUN_DIRECTORY_PREFIX + QHA_ARUN_MODE + '_' +
+              arun_runnames_apl_qhanp.back());
+        }
 
         coefQHANPVolumes.push_back(coef);
         QHANPvolumes.push_back(coef*Volume/NatomsOrigCell);
@@ -536,7 +561,7 @@ namespace apl
       // QHA3P, QHANP and SCQHA require a set of static EOS calculations.
       // But for a QHA calculation, the EOS flag is used to toggle these types of 
       // calculations.
-      if ((runQHA && isEOS) || runQHA3P || runSCQHA || runQHANP){
+      if ((isQHA && isEOS) || isQHA3P || isSCQHA || isQHANP){
         msg = "Checking if all required files from static DFT calculations exist.";
         pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
             *p_oss, _LOGGER_MESSAGE_);
@@ -564,65 +589,73 @@ namespace apl
         }
       }
 
+      // we need to clean THERMO file from previous calculations, since calculated data from
+      // each QHA/EOS model is appended to the THERMO file and we do not want to mix
+      // results of calculations with potentially different parameters
+      if (eos_static_data_available){
+        aurostd::RemoveFile(currentDirectory+'/'+DEFAULT_QHA_FILE_PREFIX+DEFAULT_QHA_THERMO_FILE);
+      }
+
       // In a QHA calculation, the EOS flag performs APL calculations for a set of volumes.
       // This flag is used when one is interested in T-dependent properties.
-      if (isEOS && runQHA){
+      if (isEOS && isQHA){
         eos_apl_data_available = runAPL(xflags, aflags, kflags, QHA_EOS);
 
         if (eos_apl_data_available && eos_static_data_available){
-          if (includeElectronicContribution && doSommerfeldExpansion) DOSatEf();
+          if (includeElectronicContribution && doSommerfeldExpansion) calcDOSatEf();
           if (LDEBUG) writeFrequencies();
-          writeFVT();
+          writeFVT(currentDirectory);
 
           if (qha_options.flag("EOS_MODEL:SJ")){
-            writeThermalProperties(EOS_SJ, QHA_CALC);
-            writeTphononDispersions(EOS_SJ, QHA_CALC);
+            writeQHAresults(currentDirectory);
+            writeThermalProperties(EOS_SJ, QHA_CALC, currentDirectory);
+            writeTphononDispersions(EOS_SJ, QHA_CALC, currentDirectory);
           }
 
           if (qha_options.flag("EOS_MODEL:BM2")){
-            writeThermalProperties(EOS_BIRCH_MURNAGHAN2, QHA_CALC);
-            writeTphononDispersions(EOS_BIRCH_MURNAGHAN2, QHA_CALC);
+            writeThermalProperties(EOS_BIRCH_MURNAGHAN2, QHA_CALC, currentDirectory);
+            writeTphononDispersions(EOS_BIRCH_MURNAGHAN2, QHA_CALC, currentDirectory);
           }
 
           if (qha_options.flag("EOS_MODEL:BM3")){
-            writeThermalProperties(EOS_BIRCH_MURNAGHAN3, QHA_CALC);
-            writeTphononDispersions(EOS_BIRCH_MURNAGHAN3, QHA_CALC);
+            writeThermalProperties(EOS_BIRCH_MURNAGHAN3, QHA_CALC, currentDirectory);
+            writeTphononDispersions(EOS_BIRCH_MURNAGHAN3, QHA_CALC, currentDirectory);
           }
 
           if (qha_options.flag("EOS_MODEL:BM4")){
-            writeThermalProperties(EOS_BIRCH_MURNAGHAN4, QHA_CALC);
-            writeTphononDispersions(EOS_BIRCH_MURNAGHAN4, QHA_CALC);
+            writeThermalProperties(EOS_BIRCH_MURNAGHAN4, QHA_CALC, currentDirectory);
+            writeTphononDispersions(EOS_BIRCH_MURNAGHAN4, QHA_CALC, currentDirectory);
           }
 
           if (qha_options.flag("EOS_MODEL:M")){
-            writeThermalProperties(EOS_MURNAGHAN, QHA_CALC);
-            writeTphononDispersions(EOS_MURNAGHAN, QHA_CALC);
+            writeThermalProperties(EOS_MURNAGHAN, QHA_CALC, currentDirectory);
+            writeTphononDispersions(EOS_MURNAGHAN, QHA_CALC, currentDirectory);
           }
         }
       }
 
       bool qhanp_data_available = false;
-      if (runQHANP){
+      if (isQHANP){
         qhanp_data_available = runAPL(xflags, aflags, kflags, QHA_TE);
         if (qhanp_data_available){
           if (qha_options.flag("EOS_MODEL:SJ")){
-            writeThermalProperties(EOS_SJ, QHANP_CALC);
+            writeThermalProperties(EOS_SJ, QHANP_CALC, currentDirectory);
           }
 
           if (qha_options.flag("EOS_MODEL:BM2")){
-            writeThermalProperties(EOS_BIRCH_MURNAGHAN2, QHANP_CALC);
+            writeThermalProperties(EOS_BIRCH_MURNAGHAN2, QHANP_CALC, currentDirectory);
           }
 
           if (qha_options.flag("EOS_MODEL:BM3")){
-            writeThermalProperties(EOS_BIRCH_MURNAGHAN3, QHANP_CALC);
+            writeThermalProperties(EOS_BIRCH_MURNAGHAN3, QHANP_CALC, currentDirectory);
           }
 
           if (qha_options.flag("EOS_MODEL:BM4")){
-            writeThermalProperties(EOS_BIRCH_MURNAGHAN4, QHANP_CALC);
+            writeThermalProperties(EOS_BIRCH_MURNAGHAN4, QHANP_CALC, currentDirectory);
           }
 
           if (qha_options.flag("EOS_MODEL:M")){
-            writeThermalProperties(EOS_MURNAGHAN, QHANP_CALC);
+            writeThermalProperties(EOS_MURNAGHAN, QHANP_CALC, currentDirectory);
           }
         }
       }
@@ -630,64 +663,74 @@ namespace apl
       // QHA3P and SCQHA require that mode-dependent Grueneisen parameters are
       // calculated via a finite difference numerical derivative.
       // For a QHA calculation, use the GP_FD flag to turn on this type of calculation.
-      if (isGP_FD || runQHA3P || runSCQHA){
+      if (isGP_FD || isQHA3P || isSCQHA){
         gp_data_available = runAPL(xflags, aflags, kflags, QHA_FD);
 
         if (gp_data_available){
-          if (runQHA || runQHA3P){
+          if (isQHA || isQHA3P){
             double V0 = origStructure.GetVolume()/NatomsOrigCell;
-            writeGPpath(V0);
-            writeGPmeshFD();
-            writeAverageGPfiniteDifferences();
+            writeGPpath(V0, currentDirectory);
+            writeGPmeshFD(currentDirectory);
+            writeAverageGPfiniteDifferences(currentDirectory);
 
-            if (runQHA3P && eos_static_data_available){
+            if (isQHA3P && eos_static_data_available){
               if (qha_options.flag("EOS_MODEL:SJ")){
-                writeThermalProperties(EOS_SJ, QHA3P_CALC);
-                writeTphononDispersions(EOS_SJ, QHA3P_CALC);
+                writeThermalProperties(EOS_SJ, QHA3P_CALC, currentDirectory);
+                writeTphononDispersions(EOS_SJ, QHA3P_CALC, currentDirectory);
               }
 
               if (qha_options.flag("EOS_MODEL:BM2")){
-                writeThermalProperties(EOS_BIRCH_MURNAGHAN2, QHA3P_CALC);
-                writeTphononDispersions(EOS_BIRCH_MURNAGHAN2, QHA3P_CALC);
+                writeThermalProperties(EOS_BIRCH_MURNAGHAN2, QHA3P_CALC,
+                    currentDirectory);
+                writeTphononDispersions(EOS_BIRCH_MURNAGHAN2, QHA3P_CALC,
+                    currentDirectory);
               }
 
               if (qha_options.flag("EOS_MODEL:BM3")){
-                writeThermalProperties(EOS_BIRCH_MURNAGHAN3, QHA3P_CALC);
-                writeTphononDispersions(EOS_BIRCH_MURNAGHAN3, QHA3P_CALC);
+                writeThermalProperties(EOS_BIRCH_MURNAGHAN3, QHA3P_CALC,
+                    currentDirectory);
+                writeTphononDispersions(EOS_BIRCH_MURNAGHAN3, QHA3P_CALC,
+                    currentDirectory);
               }
 
               if (qha_options.flag("EOS_MODEL:BM4")){
-                writeThermalProperties(EOS_BIRCH_MURNAGHAN4, QHA3P_CALC);
-                writeTphononDispersions(EOS_BIRCH_MURNAGHAN4, QHA3P_CALC);
+                writeThermalProperties(EOS_BIRCH_MURNAGHAN4, QHA3P_CALC,
+                    currentDirectory);
+                writeTphononDispersions(EOS_BIRCH_MURNAGHAN4, QHA3P_CALC,
+                    currentDirectory);
               }
 
               if (qha_options.flag("EOS_MODEL:M")){
-                writeThermalProperties(EOS_MURNAGHAN, QHA3P_CALC);
-                writeTphononDispersions(EOS_MURNAGHAN, QHA3P_CALC);
+                writeThermalProperties(EOS_MURNAGHAN, QHA3P_CALC, currentDirectory);
+                writeTphononDispersions(EOS_MURNAGHAN, QHA3P_CALC, currentDirectory);
               }
             }
           }
 
-          if (runSCQHA && eos_static_data_available){
+          if (isSCQHA && eos_static_data_available){
             if (qha_options.flag("EOS_MODEL:SJ")){
-              RunSCQHA(EOS_SJ, true);
-              writeTphononDispersions(EOS_SJ, SCQHA_CALC);
+              runSCQHA(EOS_SJ, true, currentDirectory);
+              writeTphononDispersions(EOS_SJ, SCQHA_CALC, currentDirectory);
             }
             if (qha_options.flag("EOS_MODEL:BM2")){
-              RunSCQHA(EOS_BIRCH_MURNAGHAN2, true);
-              writeTphononDispersions(EOS_BIRCH_MURNAGHAN2, SCQHA_CALC);
+              runSCQHA(EOS_BIRCH_MURNAGHAN2, true, currentDirectory);
+              writeTphononDispersions(EOS_BIRCH_MURNAGHAN2, SCQHA_CALC,
+                  currentDirectory);
             }
             if (qha_options.flag("EOS_MODEL:BM3")){
-              RunSCQHA(EOS_BIRCH_MURNAGHAN3, true);
-              writeTphononDispersions(EOS_BIRCH_MURNAGHAN3, SCQHA_CALC);
+              runSCQHA(EOS_BIRCH_MURNAGHAN3, true, currentDirectory);
+              writeTphononDispersions(EOS_BIRCH_MURNAGHAN3, SCQHA_CALC,
+                  currentDirectory);
             }
             if (qha_options.flag("EOS_MODEL:BM4")){
-              RunSCQHA(EOS_BIRCH_MURNAGHAN4, true);
-              writeTphononDispersions(EOS_BIRCH_MURNAGHAN4, SCQHA_CALC);
+              runSCQHA(EOS_BIRCH_MURNAGHAN4, true, currentDirectory);
+              writeTphononDispersions(EOS_BIRCH_MURNAGHAN4, SCQHA_CALC,
+                  currentDirectory);
             }
             if (qha_options.flag("EOS_MODEL:M")){
-              RunSCQHA(EOS_MURNAGHAN, true);
-              writeTphononDispersions(EOS_MURNAGHAN, SCQHA_CALC);
+              runSCQHA(EOS_MURNAGHAN, true, currentDirectory);
+              writeTphononDispersions(EOS_MURNAGHAN, SCQHA_CALC,
+                  currentDirectory);
             }
           }
         }
@@ -707,9 +750,15 @@ namespace apl
   {
     string function = XPID + "QHA:createSubdirectoriesStaticRun():", msg = "";
     // use static_bands calculations to get a reasonable electronic DOS
-    xinput.xvasp.AVASP_flag_RUN_STATIC_BANDS       = true;
+    if (qha_options.flag("RELAX_IONS_CELL")){ 
+      xinput.xvasp.AVASP_flag_RUN_STATIC_BANDS       = false;
+      xinput.xvasp.AVASP_flag_RUN_RELAX_STATIC_BANDS = true;
+    }
+    else {
+      xinput.xvasp.AVASP_flag_RUN_STATIC_BANDS       = true;
+      xinput.xvasp.AVASP_flag_RUN_RELAX_STATIC_BANDS = false;
+    }
     xinput.xvasp.AVASP_flag_RUN_STATIC             = false;
-    xinput.xvasp.AVASP_flag_RUN_RELAX_STATIC_BANDS = false;
     xinput.xvasp.AVASP_flag_RUN_RELAX_STATIC       = false;
     xinput.xvasp.AVASP_flag_RUN_RELAX              = false;
     xinput.xvasp.AVASP_flag_GENERATE               = false;
@@ -729,7 +778,8 @@ namespace apl
       }
       else if (file_is_present[i][ST_DF_OUTCAR]) continue;
 
-      if (aurostd::FileExist(subdirectories_static[i]+'/'+_AFLOWIN_)) continue;
+      if (aurostd::FileExist(currentDirectory+'/'+subdirectories_static[i]+'/'
+            +_AFLOWIN_)) continue;
 
       msg = "Generate aflow.in file in " + subdirectories_static[i] + " directory.";
       pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
@@ -737,6 +787,7 @@ namespace apl
 
       xinput.xvasp.str = origStructure;
       xinput.xvasp.str.InflateVolume(coefEOSVolumes[i]);
+      xinput.xvasp.str.is_vasp5_poscar_format = true;
 
       xinput.setDirectory(currentDirectory);
       xinput.xvasp.AVASP_arun_mode = QHA_ARUN_MODE;
@@ -751,6 +802,16 @@ namespace apl
       }
       if (!xinput.xvasp.AVASP_value_BANDS_GRID)
         xinput.xvasp.AVASP_value_BANDS_GRID=DEFAULT_BANDS_GRID;
+
+      // set CONVERT_UNIT_CELL to PRES
+      xinput.xvasp.aopts.flag("AFLOWIN_FLAG::CONVERT_UNIT_CELL",true);
+      xinput.xvasp.aopts.pop_attached("AFLOWIN_FLAG::CONVERT_UNIT_CELL");
+      xinput.xvasp.aopts.push_attached("AFLOWIN_FLAG::CONVERT_UNIT_CELL", "PRES");
+      if (qha_options.flag("RELAX_IONS_CELL")){
+        xinput.xvasp.aopts.pop_attached("AFLOWIN_FLAG::RELAX_TYPE");
+        xinput.xvasp.aopts.push_attached("AFLOWIN_FLAG::RELAX_TYPE","IONS_CELL_SHAPE");
+      }
+
       AVASP_MakeSingleAFLOWIN(xinput.xvasp, aflow, true);
 
       xinput.xvasp.AVASP_INCAR_EXPLICIT_START_STOP.str(std::string());
@@ -774,25 +835,26 @@ namespace apl
     }
 
     int count = 0;
-    string outcarfile = "", eigenvfile = "", ibzkptfile = "";
+    string outcarfile = "", eigenvfile = "", ibzkptfile = "", directory = "";
     bool all_files_are_present = true;
     for (uint i=0; i<subdirectories_static.size(); i++){
       all_files_are_present = true;
 
-      if (aurostd::IsDirectory(subdirectories_static[i]))
+      directory = currentDirectory + '/' + subdirectories_static[i];
+      if (aurostd::IsDirectory(directory))
         file_is_present[i][ST_DF_DIRECTORY] = true;
       else
         all_files_are_present = false;
 
-      outcarfile = subdirectories_static[i]+"/OUTCAR.static";
+      outcarfile = directory+"/OUTCAR.static";
       if (aurostd::EFileExist(outcarfile))
         file_is_present[i][ST_DF_OUTCAR] = true;
       else
         all_files_are_present = false;
 
       if (includeElectronicContribution){
-        eigenvfile = subdirectories_static[i]+"/EIGENVAL.static";
-        ibzkptfile = subdirectories_static[i]+"/IBZKPT.static";
+        eigenvfile = directory+"/EIGENVAL.static";
+        ibzkptfile = directory+"/IBZKPT.static";
 
         if (aurostd::EFileExist(eigenvfile))
           file_is_present[i][ST_DF_EIGENVAL] = true;
@@ -866,7 +928,12 @@ namespace apl
 
     xinput.xvasp.aopts.opattachedscheme("AFLOWIN_FLAG::MODULE","APL",true);
     xinput.xvasp.aopts.flag("FLAG::VOLUME_PRESERVED",true);
-    xinput.xvasp.aplopts.opattachedscheme("AFLOWIN_FLAG::APL_RELAX","OFF",true);
+    if (qha_options.flag("RELAX_IONS_CELL")){
+      xinput.xvasp.aplopts.opattachedscheme("AFLOWIN_FLAG::APL_RELAX","ON",true);
+    }
+    else{
+      xinput.xvasp.aplopts.opattachedscheme("AFLOWIN_FLAG::APL_RELAX","OFF",true);
+    }
     xinput.xvasp.aplopts.opattachedscheme("AFLOWIN_FLAG::APL_HIBERNATE","ON",true);
 
     stringstream aflow;
@@ -884,7 +951,8 @@ namespace apl
     for (uint i=0; i<subdirectories.size(); i++){
       if (file_is_present[i][PH_DF_HARMIFC]) continue;
 
-      if (aurostd::FileExist(subdirectories[i]+'/'+_AFLOWIN_)) continue;
+      if (aurostd::FileExist(currentDirectory+'/'+subdirectories[i]+'/'+_AFLOWIN_)) 
+        continue;
 
       msg = "Generating aflow.in file in " + subdirectories[i] + " directory.";
       pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
@@ -892,6 +960,7 @@ namespace apl
 
       xinput.xvasp.str = origStructure;
       xinput.xvasp.str.InflateVolume(coefVolumes[i]);
+      xinput.xvasp.str.is_vasp5_poscar_format = true;
 
       xinput.setDirectory(currentDirectory);
       xinput.xvasp.AVASP_arun_mode = QHA_ARUN_MODE;
@@ -906,6 +975,16 @@ namespace apl
       }
       if (!xinput.xvasp.AVASP_value_BANDS_GRID)
         xinput.xvasp.AVASP_value_BANDS_GRID=DEFAULT_BANDS_GRID;
+
+      // set CONVERT_UNIT_CELL to PRES
+      xinput.xvasp.aopts.flag("AFLOWIN_FLAG::CONVERT_UNIT_CELL",true);
+      xinput.xvasp.aopts.pop_attached("AFLOWIN_FLAG::CONVERT_UNIT_CELL");
+      xinput.xvasp.aopts.push_attached("AFLOWIN_FLAG::CONVERT_UNIT_CELL", "PRES");
+      if (qha_options.flag("RELAX_IONS_CELL")){
+        xinput.xvasp.aopts.pop_attached("AFLOWIN_FLAG::RELAX_TYPE");
+        xinput.xvasp.aopts.push_attached("AFLOWIN_FLAG::RELAX_TYPE","IONS_CELL_SHAPE");
+      }
+
       AVASP_MakeSingleAFLOWIN(xinput.xvasp, aflow, true);
 
       xinput.xvasp.AVASP_INCAR_EXPLICIT_START_STOP.str(std::string());
@@ -932,23 +1011,24 @@ namespace apl
       (QHA_EOS==qhatype) ? subdirectories_apl_eos : subdirectories_apl_qhanp;
 
     int count = 0;
-    string harmifcfile = "", phposcarfile = "";
+    string harmifcfile = "", phposcarfile = "", directory = "";
     bool all_files_are_present = true;
     for (uint i=0; i<subdirectories.size(); i++){
       all_files_are_present = true;
 
-      if (aurostd::IsDirectory(subdirectories[i]))
+      directory = currentDirectory + '/' + subdirectories[i];
+      if (aurostd::IsDirectory(directory))
         file_is_present[i][PH_DF_DIRECTORY] = true;
       else
         all_files_are_present = false;
 
-      harmifcfile=subdirectories[i]+'/'+DEFAULT_APL_FILE_PREFIX+DEFAULT_APL_HARMIFC_FILE;
+      harmifcfile=directory+'/'+DEFAULT_APL_FILE_PREFIX+DEFAULT_APL_HARMIFC_FILE;
       if (aurostd::EFileExist(harmifcfile))
         file_is_present[i][PH_DF_HARMIFC] = true;
       else
         all_files_are_present = false;
 
-      phposcarfile=subdirectories[i]+'/'+DEFAULT_APL_PHPOSCAR_FILE;
+      phposcarfile=directory+'/'+DEFAULT_APL_PHPOSCAR_FILE;
       if (aurostd::EFileExist(phposcarfile))
         file_is_present[i][PH_DF_PHPOSCAR] = true;
       else
@@ -1066,18 +1146,19 @@ namespace apl
     int Nqpoints = 0;
     bool apl_data_read_successfully = true;
 
-    string phposcarfile = "";
+    string phposcarfile = "", directory = "";
     for (uint i=0; i<subdirectories.size(); i++){
-      phposcarfile = subdirectories[i]+'/'+DEFAULT_APL_PHPOSCAR_FILE;
+      directory = currentDirectory + '/' + subdirectories[i];
+      phposcarfile = directory + '/' + DEFAULT_APL_PHPOSCAR_FILE;
 
       apl::PhononCalculator phcalc(*p_FileMESSAGE, *p_oss);
-      phcalc.initialize_supercell(xstructure(phposcarfile, IOVASP_POSCAR));
+      phcalc.initialize_supercell(xstructure(phposcarfile, IOVASP_POSCAR), false);// verbose=false: do not write files related to symmetry-analysis
       phcalc.getSupercell().build(apl_options);  // ME20200518
-      phcalc.setDirectory(subdirectories[i]);
+      phcalc.setDirectory(directory);
       phcalc.setNCPUs(kflags);
       phcalc._system = system_title;
 
-      string hibernation_file = subdirectories[i]+'/'+DEFAULT_APL_FILE_PREFIX + 
+      string hibernation_file = directory+'/'+DEFAULT_APL_FILE_PREFIX + 
         DEFAULT_APL_HARMIFC_FILE;
       if (aurostd::EFileExist(hibernation_file)){
         msg = "Reading hibernation file...";
@@ -1089,11 +1170,13 @@ namespace apl
           pflow::logger(QHA_ARUN_MODE, function, e.error_message, currentDirectory,
               *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
           msg = "Reading data from the hibernation file failed.";
-          msg += " Force constants and the relevant data will be recalculated.";
           pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
-              *p_oss, _LOGGER_WARNING_);
+              *p_oss, _LOGGER_ERROR_);
           return false;
         }
+        msg = "Hibernation file was read successfully.";
+        pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
+            *p_oss, _LOGGER_MESSAGE_);
       }
 
       // calculate all phonon-related data: DOS, frequencies along the q-mesh and
@@ -1112,8 +1195,8 @@ namespace apl
 
       phcalc.initialize_qmesh(dos_mesh);
 
-      apl::DOSCalculator dosc(phcalc, apl_options.getattachedscheme("DOSMETHOD"),
-          dummy_dos_projections);
+      apl_options.flag("DOS_PROJECT", false);// do not need to calculated DOS projections for QHA
+      apl::DOSCalculator dosc(phcalc, apl_options);
       dosc.calc(aurostd::string2utype<double>(apl_options.getattachedscheme("DOSPOINTS")),
           aurostd::string2utype<double>(apl_options.getattachedscheme("DOSSMEAR")));
       // AS20200824 we do not want to overwrite the PHDOSCAR created by the independent APL
@@ -1185,6 +1268,14 @@ namespace apl
         qpWeights = phcalc.getQMesh().getWeights();
         qPoints   = phcalc.getQMesh().getIrredQPointsFPOS();
         Nqpoints  = qPoints.size();
+        stringstream qpath_stream;
+        qpath_stream <<  pdisc.getPHKPOINTS();
+        string filename = currentDirectory+"/";
+        filename += DEFAULT_QHA_FILE_PREFIX + DEFAULT_QHA_KPOINTS_FILE;
+        if (!aurostd::stringstream2file(qpath_stream, filename)){
+          msg = "Error writing to " + filename + "file.";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,function,msg,_FILE_ERROR_);
+        }
       }
       else{
         if (qpWeights.size() != phcalc.getQMesh().getWeights().size()){
@@ -1277,14 +1368,15 @@ namespace apl
     bool data_read_success = true;
 
     xOUTCAR outcar;
-    string outcarfile = "";
+    string outcarfile = "", directory = "";
     for (uint i=0; i<subdirectories_static.size(); i++){
       msg = "Reading data from the static DFT calculation in the ";
       msg += subdirectories_static[i] + " directory.";
       pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE, 
           *p_oss, _LOGGER_MESSAGE_);
 
-      outcarfile = subdirectories_static[i]+'/'+"OUTCAR.static";
+      directory = currentDirectory + '/' + subdirectories_static[i];
+      outcarfile = directory+'/'+"OUTCAR.static";
       if (!outcar.GetPropertiesFile(outcarfile)){
         msg = "Could not read the " + outcarfile + " file";
         pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE, 
@@ -1297,8 +1389,8 @@ namespace apl
 
       Nelectrons = outcar.nelectrons;
 
-      static_eigvals.push_back(xEIGENVAL(subdirectories_static[i]+"/EIGENVAL.static"));
-      static_ibzkpts.push_back(xIBZKPT(subdirectories_static[i]+"/IBZKPT.static"));
+      static_eigvals.push_back(xEIGENVAL(directory+"/EIGENVAL.static"));
+      static_ibzkpts.push_back(xIBZKPT(directory+"/IBZKPT.static"));
 
       if (!static_eigvals.back().m_initialized){
         msg = "Could not read the " + subdirectories_static[i]+"/EIGENVAL.static file.";
@@ -1405,6 +1497,12 @@ namespace apl
     return gamma;
   }
 
+  double QHA::calcGrueneisen(double V, xvector<double> &xomega)
+  {
+    double w = 0.0;
+    return calcGrueneisen(V, xomega, w);
+  }
+
   /// Calculates the Grueneisen parameter of an individual vibrational mode using
   /// the central finite difference method.
   /// 
@@ -1435,10 +1533,10 @@ namespace apl
   /// The volume dependency is obtained via a fit to the model equation of state.
   /// @param qha_method defines what kind of QHA calculation is performed.
   ///
-  double QHA::FreeEnergyFit(double T, double V, EOSmethod eos_method,
+  double QHA::calcFreeEnergyFit(double T, double V, EOSmethod eos_method,
       QHAmethod qha_method)
   {
-    string function = XPID + "QHA::FreeEnergyFit():", msg = "";
+    string function = XPID + "QHA::calcFreeEnergyFit():", msg = "";
     if (T<_ZERO_TOL_) return 0;
 
     xvector<double> E(N_EOSvolumes);
@@ -1447,12 +1545,12 @@ namespace apl
       case (QHA3P_CALC):
       case (QHANP_CALC):
         for (int i=E.lrows; i<=E.urows; i++){
-          E[i] = FreeEnergyTaylorExpansion(T, i-1, qha_method);
+          E[i] = calcFreeEnergyTaylorExpansion(T, i-1, qha_method);
         }
         break;
       case(QHA_CALC):
         for (int i=E.lrows; i<=E.urows; i++){
-          E[i] = FreeEnergy(T, i-1);
+          E[i] = calcFreeEnergy(T, i-1);
         }
         break;
       default:
@@ -1461,9 +1559,9 @@ namespace apl
         break;
     }
     if (includeElectronicContribution){
-      if (doSommerfeldExpansion) E += electronicFreeEnergySommerfeld(T);
+      if (doSommerfeldExpansion) E += calcElectronicFreeEnergySommerfeld(T);
       else{
-        for (int id=0; id<N_EOSvolumes; id++) E[id+1]+=electronicFreeEnergy(T, id);
+        for (int id=0; id<N_EOSvolumes; id++) E[id+1]+=calcElectronicFreeEnergy(T, id);
       }
     }
 
@@ -1472,7 +1570,7 @@ namespace apl
   }
 
   /// Calculates the bulk modulus for a given EOS model.
-  double QHA::BulkModulus(double V, const xvector<double> &parameters, EOSmethod method)
+  double QHA::calcBulkModulus(double V, const xvector<double> &parameters, EOSmethod method)
   {
     double B = 0.0;
     switch(method){
@@ -1480,7 +1578,7 @@ namespace apl
         {
           double x = std::pow(V, -1.0/3.0);
           xvector<double> dEdp = aurostd::evalPolynomialDeriv(x, parameters, 2);
-          B = BulkModulus_SJ(x, dEdp);
+          B = calcBulkModulus_SJ(x, dEdp);
         }
         break;
       case(EOS_BIRCH_MURNAGHAN2):
@@ -1489,7 +1587,7 @@ namespace apl
         {
           double x = std::pow(V, -2.0/3.0);
           xvector<double> dEdp = aurostd::evalPolynomialDeriv(x, parameters, 2);
-          B = BulkModulus_BM(x, dEdp);
+          B = calcBulkModulus_BM(x, dEdp);
         }
         break;
       case(EOS_MURNAGHAN):
@@ -1502,7 +1600,7 @@ namespace apl
   }
 
   /// Calculates the pressure derivative of the bulk modulus for a given EOS model.
-  double QHA::Bprime(double V, const xvector<double> &parameters, EOSmethod method)
+  double QHA::calcBprime(double V, const xvector<double> &parameters, EOSmethod method)
   {
     double Bp = 0.0;
     switch(method){
@@ -1531,7 +1629,7 @@ namespace apl
 
   /// For a given E(V) relations calculates a pressure the corresponds to a given
   /// volume V.
-  double QHA::EOS2Pressure(double V, const xvector<double> &parameters, EOSmethod method)
+  double QHA::calcEOS2Pressure(double V, const xvector<double> &parameters, EOSmethod method)
   {
     double P = 0.0;
     switch(method){
@@ -1559,7 +1657,7 @@ namespace apl
   }
 
   /// Calculates an equilibrium volume for a given EOS model.
-  double QHA::EquilibriumVolume(const xvector<double> &parameters, EOSmethod method)
+  double QHA::calcEquilibriumVolume(const xvector<double> &parameters, EOSmethod method)
   {
     double Veq = 0.0;
     switch(method){
@@ -1589,7 +1687,7 @@ namespace apl
 
   /// Calculates the internal energy as a function of volume and temperature.
   ///
-  double QHA::InternalEnergyFit(double T, double V, EOSmethod method)
+  double QHA::calcInternalEnergyFit(double T, double V, EOSmethod method)
   {
     static xvector<double> U(N_EOSvolumes);
     static xvector<double> xvolumes = aurostd::vector2xvector(EOSvolumes);
@@ -1607,7 +1705,7 @@ namespace apl
   /// Calculates the free energy (without electronic contribution) for a calculation at
   /// a specific volume (given by its id in the EOSvolumes array).
   ///
-  double QHA::FreeEnergy(double T, int id)
+  double QHA::calcFreeEnergy(double T, int id)
   {
     return eos_vib_thermal_properties[id].getVibrationalFreeEnergy(T, apl::eV)
       /NatomsOrigCell + E0_V[id];
@@ -1640,7 +1738,7 @@ namespace apl
           // index 1 - value, 2 - 1st derivative, 3 - 2nd derivative and so on
           xvector<double> dEdp = aurostd::evalPolynomialDeriv(x_eq, fit_params, 3);
           EOS_energy_at_equilibrium = dEdp[1];
-          EOS_bulk_modulus_at_equilibrium = BulkModulus_SJ(x_eq, dEdp);
+          EOS_bulk_modulus_at_equilibrium = calcBulkModulus_SJ(x_eq, dEdp);
           EOS_Bprime_at_equilibrium  = Bprime_SJ(x_eq, dEdp);
         }
         break;
@@ -1657,7 +1755,7 @@ namespace apl
           // index 1 - value, 2 - 1st derivative, 3 - 2nd derivative and so on
           xvector<double> dEdp = aurostd::evalPolynomialDeriv(x_eq, fit_params, 3);
           EOS_energy_at_equilibrium = dEdp[1];
-          EOS_bulk_modulus_at_equilibrium = BulkModulus_BM(x_eq, dEdp);
+          EOS_bulk_modulus_at_equilibrium = calcBulkModulus_BM(x_eq, dEdp);
           EOS_Bprime_at_equilibrium  = Bprime_BM(x_eq, dEdp);
         }
         break;
@@ -1674,7 +1772,7 @@ namespace apl
           // index 1 - value, 2 - 1st derivative, 3 - 2nd derivative and so on
           xvector<double> dEdp = aurostd::evalPolynomialDeriv(x_eq, fit_params, 3);
           EOS_energy_at_equilibrium = dEdp[1];
-          EOS_bulk_modulus_at_equilibrium = BulkModulus_BM(x_eq, dEdp);
+          EOS_bulk_modulus_at_equilibrium = calcBulkModulus_BM(x_eq, dEdp);
           EOS_Bprime_at_equilibrium  = Bprime_BM(x_eq, dEdp);
         }
         break;
@@ -1691,7 +1789,7 @@ namespace apl
           // index 1 - value, 2 - 1st derivative, 3 - 2nd derivative and so on
           xvector<double> dEdp = aurostd::evalPolynomialDeriv(x_eq, fit_params, 3);
           EOS_energy_at_equilibrium = dEdp[1];
-          EOS_bulk_modulus_at_equilibrium = BulkModulus_BM(x_eq, dEdp);
+          EOS_bulk_modulus_at_equilibrium = calcBulkModulus_BM(x_eq, dEdp);
           EOS_Bprime_at_equilibrium  = Bprime_BM(x_eq, dEdp);
         }
         break;
@@ -1762,12 +1860,12 @@ namespace apl
       case (QHA3P_CALC):
       case (QHANP_CALC):
         for (int i=E.lrows; i<=E.urows; i++){
-          E[i] = FreeEnergyTaylorExpansion(T, i-1, qha_method);
+          E[i] = calcFreeEnergyTaylorExpansion(T, i-1, qha_method);
         }
         break;
       case(QHA_CALC):
         for (int i=E.lrows; i<=E.urows; i++){
-          E[i] = FreeEnergy(T, i-1);
+          E[i] = calcFreeEnergy(T, i-1);
         }
         break;
       default:
@@ -1777,9 +1875,9 @@ namespace apl
     }
 
     if (includeElectronicContribution){
-      if (doSommerfeldExpansion) E += electronicFreeEnergySommerfeld(T);
+      if (doSommerfeldExpansion) E += calcElectronicFreeEnergySommerfeld(T);
       else{
-        for (int id=0; id<N_EOSvolumes; id++) E[id+1]+=electronicFreeEnergy(T, id);
+        for (int id=0; id<N_EOSvolumes; id++) E[id+1]+=calcElectronicFreeEnergy(T, id);
       }
     }
 
@@ -1875,6 +1973,33 @@ namespace apl
     CV *= pow(beta,2);
   }
 
+  /// Calculates average Grueneisen parameter at infinite temperature.
+  /// It corresponds to an unweighted average over mode-dependent Grueneisen parameters.
+  double QHA::calcGPinfFit(double V)
+  {
+    xvector<double> xomega;
+
+    uint NIrQpoints = omegaV_mesh_EOS.size();
+    int NQpoints = 0; // the total number of q-points
+    double w    = 0;  // frequency for a given volume
+    double gamma = 0;
+    double GP = 0;
+
+    for (uint q=0; q<NIrQpoints; q++){
+      for (int branch=0; branch<Nbranches; branch++){
+        xomega = aurostd::vector2xvector(omegaV_mesh_EOS[q][branch]);
+
+        gamma = calcGrueneisen(V, xomega, w);
+        w *= THz2Hz*PLANCKSCONSTANTEV_h; // [THz] -> [eV]
+        if (w > AUROSTD_ROUNDOFF_TOL) GP += gamma * qpWeights[q];
+      }
+      NQpoints += qpWeights[q];
+    }
+
+    GP /= NQpoints; GP/= Nbranches;
+    return GP;
+  }
+
   /// Calculates the volumetric thermal expansion coefficient (beta).
   /// 
   /// Central finite differences are used to calculate beta = 1/V dV/dT.
@@ -1887,7 +2012,7 @@ namespace apl
   /// @param eos_method defines which model is used for the EOS fit
   /// @return volumetric thermal expansion coefficient.
   /// 
-  double QHA::ThermalExpansion(double T, EOSmethod eos_method, QHAmethod qha_method)
+  double QHA::calcThermalExpansion(double T, EOSmethod eos_method, QHAmethod qha_method)
   {
     if (!(T>0)) return 0;
 
@@ -1902,15 +2027,15 @@ namespace apl
   /// 
   /// @param eos_method defines which model is used for the EOS fit
   /// 
-  double QHA::IsochoricSpecificHeat(double T, double V, EOSmethod eos_method,
+  double QHA::calcIsochoricSpecificHeat(double T, double V, EOSmethod eos_method,
       QHAmethod qha_method)
   {
     double dT = DCOEFF*T;
     double CV = 0;
     if (T>0){
-      CV = -(FreeEnergyFit(T+dT, V, eos_method, qha_method)
-          -2*FreeEnergyFit(T, V, eos_method, qha_method)
-          +FreeEnergyFit(T-dT ,V, eos_method, qha_method));
+      CV = -(calcFreeEnergyFit(T+dT, V, eos_method, qha_method)
+          -2*calcFreeEnergyFit(T, V, eos_method, qha_method)
+          +calcFreeEnergyFit(T-dT ,V, eos_method, qha_method));
       CV *= T/pow(dT,2);
     }
 
@@ -1922,17 +2047,17 @@ namespace apl
   /// 
   /// @param eos_method defines which model is used for EOS fit
   /// 
-  double QHA::Entropy(double T, double V, EOSmethod eos_method, QHAmethod qha_method)
+  double QHA::calcEntropy(double T, double V, EOSmethod eos_method, QHAmethod qha_method)
   {
     double dT = DCOEFF*T;
-    return -0.5*(FreeEnergyFit(T+dT,V,eos_method,qha_method)
-        -FreeEnergyFit(T-dT,V,eos_method,qha_method))/dT;
+    return -0.5*(calcFreeEnergyFit(T+dT,V,eos_method,qha_method)
+        -calcFreeEnergyFit(T-dT,V,eos_method,qha_method))/dT;
   }
 
   /// Calculates the DOS value at the Fermi level using the linear tetrahedron method. 
   /// For the details check: https://doi.org/10.1103/PhysRevB.49.16223
   ///
-  xvector<double> QHA::DOSatEf()
+  xvector<double> QHA::calcDOSatEf()
   {
     xvector<double> energy_tetrahedron(4);//energy eigenvalues at the corners of the tetrahedron
     double weighted_volume = 0; // weighted volume of tetrahedron
@@ -1991,7 +2116,7 @@ namespace apl
   }
 
   /// Calculates integrated DOS as a function of energy and temperature.
-  double QHA::IDOS(double e, double T, xEIGENVAL &eig)
+  double QHA::calcIDOS(double e, double T, xEIGENVAL &eig)
   {
     double res = 0.0;
     double weight = 0.0;
@@ -2014,18 +2139,18 @@ namespace apl
   /// The equation is solved using the bisection method and the bracketing interval is
   /// automatically determined starting with the Fermi energy at the one end of the
   /// interval.
-  double QHA::ChemicalPotential(double T, int Vid)
+  double QHA::calcChemicalPotential(double T, int Vid)
   {
     // step taken to determine the bracketing interval
     static const double dE = max(0.01, KBOLTZEV*T);
-    static const string function = XPID + "QHA::ChemicalPotential():";
+    static const string function = XPID + "QHA::calcChemicalPotential():";
 
     bool LDEBUG = (FALSE || DEBUG_QHA || XHOST.DEBUG);
     if (LDEBUG) cerr << function << "begin" << std::endl;
 
     // Fermi energy is used as a starting guess for the value of chemical potential
     double guess = Efermi_V[Vid];
-    double f = IDOS(guess, T, static_eigvals[Vid]) - Nelectrons;
+    double f = calcIDOS(guess, T, static_eigvals[Vid]) - Nelectrons;
     if (std::abs(f) < AUROSTD_ROUNDOFF_TOL) return guess;
 
     double left_end = 0.0, middle = 0.0, right_end = 0.0;
@@ -2042,19 +2167,19 @@ namespace apl
       f_at_right_end = f;
       do {
         left_end -= dE;
-        f_at_left_end = IDOS(left_end, T, static_eigvals[Vid]) - Nelectrons;
+        f_at_left_end = calcIDOS(left_end, T, static_eigvals[Vid]) - Nelectrons;
       } while (sign(f_at_left_end) == sign(f_at_right_end));
     }
     else{
       f_at_left_end = f;
       do {
         right_end += dE;
-        f_at_right_end = IDOS(right_end, T, static_eigvals[Vid]) - Nelectrons;
+        f_at_right_end = calcIDOS(right_end, T, static_eigvals[Vid]) - Nelectrons;
       } while (sign(f_at_left_end) == sign(f_at_right_end));
     }
 
     middle = (left_end + right_end)/2;
-    f_at_middle = IDOS(middle, T, static_eigvals[Vid]) - Nelectrons;
+    f_at_middle = calcIDOS(middle, T, static_eigvals[Vid]) - Nelectrons;
 
     if (LDEBUG){
       cerr << function << "Bracketing interval was determined." << std::endl;
@@ -2085,7 +2210,7 @@ namespace apl
       }
 
       middle = 0.5*(left_end + right_end);
-      f_at_middle = IDOS(middle, T, static_eigvals[Vid]) - Nelectrons;
+      f_at_middle = calcIDOS(middle, T, static_eigvals[Vid]) - Nelectrons;
 
       if (LDEBUG){
         cerr << function << "left_end= "  << left_end  << "middle= ";
@@ -2110,14 +2235,14 @@ namespace apl
   /// A.S. encountered a situation when the small differences in the values of
   /// eigenvalues for spin up and down down lead to wrong electronic free energies for 
   /// spin down while the calculation was correct for spin up.
-  double QHA::electronicFreeEnergy(double T, int Vid)
+  double QHA::calcElectronicFreeEnergy(double T, int Vid)
   {
     static const double Tmin = 0.1;
     if (T < Tmin) return 0.0;
     double U = 0.0, S = 0.0;
     xEIGENVAL eig = static_eigvals[Vid];
-    double mu  = ChemicalPotential(T, Vid);
-    double mu0 = ChemicalPotential(Tmin, Vid);
+    double mu  = calcChemicalPotential(T, Vid);
+    double mu0 = calcChemicalPotential(Tmin, Vid);
     double E = 0.0;
     double f = 0.0, f0 = 0.0;
     double weight = 0.0;
@@ -2139,7 +2264,7 @@ namespace apl
   }
 
   /// Calculates the electronic free energy using the Sommerfeld expansion.
-  xvector<double> QHA::electronicFreeEnergySommerfeld(double T)
+  xvector<double> QHA::calcElectronicFreeEnergySommerfeld(double T)
   {
     xvector<double> F_Som = DOS_Ef;
     for (int i=F_Som.lrows; i<=F_Som.urows; i++){
@@ -2275,7 +2400,7 @@ namespace apl
   /// using a Taylor expansion of the frequencies.
   /// This function is used in the QHA3P and SCQHA methods.
   /// 
-  double QHA::FreeEnergyTaylorExpansion(double T, int Vid, QHAmethod qha_method)
+  double QHA::calcFreeEnergyTaylorExpansion(double T, int Vid, QHAmethod qha_method)
   {
     double w = 0.0; // extrapolated frequency at V_id volume
     double F = 0.0; // Free energy
@@ -2311,7 +2436,7 @@ namespace apl
   /// Calculates the vibrational internal energy obtained using a Taylor expansion of
   /// the frequencies.
   /// This function is used in the QHA3P and SCQHA methods.
-  double QHA::InternalEnergyTaylorExpansion(double T, double V, QHAmethod qha_method)
+  double QHA::calcInternalEnergyTaylorExpansion(double T, double V, QHAmethod qha_method)
   {
     if (T<_ZERO_TOL_) return 0.0;
 
@@ -2352,9 +2477,9 @@ namespace apl
   /// Check http://dx.doi.org/10.1103/PhysRevMaterials.3.073801
   /// for more details
   /// 
-  double QHA::VPgamma(double T, double V)
+  double QHA::calcVPgamma(double T, double V)
   {
-    double VPgamma = 0.0, ui = 0.0,  w = 0.0; 
+    double calcVPgamma = 0.0, ui = 0.0,  w = 0.0; 
     double beta = 1.0/KBOLTZEV/T;
     int NQpoints = 0;
     xvector<double> xomega;
@@ -2368,15 +2493,15 @@ namespace apl
         if (w>_mm_epsilon && T>_mm_epsilon) ui += w/(exp(w*beta)-1.0);
 
         ui *= qpWeights[q];
-        VPgamma += ui * extrapolateGrueneisen(V, xomega, SCQHA_CALC);
+        calcVPgamma += ui * extrapolateGrueneisen(V, xomega, SCQHA_CALC);
       }
       NQpoints += qpWeights[q];
     }
 
-    VPgamma /= NQpoints;
-    VPgamma /= NatomsOrigCell;
+    calcVPgamma /= NQpoints;
+    calcVPgamma /= NatomsOrigCell;
 
-    return VPgamma;
+    return calcVPgamma;
   }
 
   /// Calculates the equilibrium volume for a given temperatures using SCQHA self-consistent
@@ -2384,9 +2509,9 @@ namespace apl
   /// Check for details:
   /// http://dx.doi.org/10.1103/PhysRevMaterials.3.073801
   /// and https://doi.org/10.1016/j.commatsci.2016.04.012
-  double QHA::SCQHAgetEquilibriumVolume(double T, double Vguess, xvector<double> &fit_params, EOSmethod method)
+  double QHA::calcSCQHAequilibriumVolume(double T, double Vguess, xvector<double> &fit_params, EOSmethod method)
   {
-    string function = XPID + "QHA::SCQHAgetEquilibriumVolume():";
+    string function = XPID + "QHA::calcSCQHAequilibriumVolume():";
     const static int max_scqha_iteration = 10000;
     const static double Vtol = 1e-5;
     const static double dV = 1e-3;
@@ -2395,8 +2520,8 @@ namespace apl
     double Vnew = 0.0, V = Vguess;
     int iter = 0;
     while (iter++ < max_scqha_iteration){
-      Pe   = EOS2Pressure(V, fit_params, method);
-      VPg  = VPgamma(T, V);
+      Pe   = calcEOS2Pressure(V, fit_params, method);
+      VPg  = calcVPgamma(T, V);
       Vnew = -VPg/Pe; // be careful: note that sign in this expression depends on 
       // whether the pressure or the volume derivative of energy is used (dE/dV = -Pe)
       if (std::abs(V - Vnew)/V > Vtol) V += (Vnew - V) * dV; else break;
@@ -2412,13 +2537,13 @@ namespace apl
     return V;
   }
 
-  double QHA::SCQHAgetEquilibriumVolume(double T, EOSmethod method)
+  double QHA::calcSCQHAequilibriumVolume(double T, EOSmethod method)
   {
     xvector<double> E = aurostd::vector2xvector<double>(E0_V);
     xvector<double> fit_params = fitToEOSmodel(E, method);
-    double Vguess = SCQHA_INITIAL_VOLUME_FACTOR * EquilibriumVolume(fit_params, method);
+    double Vguess = SCQHA_INITIAL_VOLUME_FACTOR * calcEquilibriumVolume(fit_params, method);
 
-    return SCQHAgetEquilibriumVolume(T, Vguess, fit_params, method);
+    return calcSCQHAequilibriumVolume(T, Vguess, fit_params, method);
   }
 
   /// Performs SCQHA calculations.
@@ -2431,9 +2556,10 @@ namespace apl
   /// 1) corresponds to the original implementation as described by the following papers:
   /// http://dx.doi.org/10.1103/PhysRevMaterials.3.073801
   /// and https://doi.org/10.1016/j.commatsci.2016.04.012
-  void QHA::RunSCQHA(EOSmethod method, bool all_iterations_self_consistent)
+  void QHA::runSCQHA(EOSmethod method, bool all_iterations_self_consistent,
+      const string &directory)
   {
-    string function = XPID + "QHA::RunSCQHA():", msg = "Running SCQHA ";
+    string function = XPID + "QHA::runSCQHA():", msg = "Running SCQHA ";
     if (all_iterations_self_consistent)
       msg += "with all temperature steps computed self-consistenly.";
     else
@@ -2450,47 +2576,48 @@ namespace apl
     // self-consistent loop to determine equilibrium volume at T=0K
     // to avoid division by zero in the self-consistent loop,
     // the initial volume is taken to be 10% bigger
-    double V0K = SCQHAgetEquilibriumVolume(0,SCQHA_INITIAL_VOLUME_FACTOR *
+    double V0K = calcSCQHAequilibriumVolume(0,SCQHA_INITIAL_VOLUME_FACTOR *
         EOS_volume_at_equilibrium, fit_params, method);
 
     // the name of the output file depends on the EOS fit method
     stringstream file;
-    string filename = DEFAULT_SCQHA_FILE_PREFIX;
-    string sc = all_iterations_self_consistent ? "sc." : "";
+    string filename = directory+'/'+DEFAULT_QHA_FILE_PREFIX+DEFAULT_QHA_THERMO_FILE;
+    string sc = all_iterations_self_consistent ? "SC_" : "";
+    string blockname = "[SCQHA_" + sc;
     switch(method){
       case(EOS_SJ):
-        filename += sc+EOS_METHOD_FILE_SJ;
+        blockname += "SJ_THERMO]";
         break;
       case(EOS_BIRCH_MURNAGHAN2):
-        filename += sc+EOS_METHOD_FILE_BIRCH_MURNAGHAN2;
+        blockname += "BM2_THERMO]";
         break;
       case(EOS_BIRCH_MURNAGHAN3):
-        filename += sc+EOS_METHOD_FILE_BIRCH_MURNAGHAN3;
+        blockname += "BM3_THERMO]";
         break;
       case(EOS_BIRCH_MURNAGHAN4):
-        filename += sc+EOS_METHOD_FILE_BIRCH_MURNAGHAN4;
+        blockname += "BM4_THERMO]";
         break;
       case(EOS_MURNAGHAN):
-        filename += sc+EOS_METHOD_FILE_MURNAGHAN;
+        blockname += "M_THERMO]";
         break;
       default:
         msg = "Nonexistent EOS method was passed to " + function;
         throw aurostd::xerror(_AFLOW_FILE_NAME_, QHA_ARUN_MODE, msg, _INPUT_UNKNOWN_);
         break;
     }
-    filename += DEFAULT_QHA_THERMO_FILE;
 
     file.precision(10);
 
     file << AFLOWIN_SEPARATION_LINE << std::endl;
-    file << "[SCQHA_THERMAL_PROPERTIES]START" << std::endl;
+    file << blockname + "SYSTEM=" << system_title << std::endl;
+    file << blockname + "START" << std::endl;
 
     // print header
     file << setw(5)  << "# T[K]"               << setw(SW) << ' ' <<
       setw(TW) << "Veq[ev/atom]"         << setw(SW) << ' ' <<
       setw(TW) << "F(Veq)[eV/atom]"      << setw(SW) << ' ' <<
       setw(TW) << "B[GPa]"               << setw(SW) << ' ' <<
-      setw(TW) << "beta[10^-6/K]"        << setw(SW) << ' ' <<
+      setw(TW) << "beta[10^-5/K]"        << setw(SW) << ' ' <<
       setw(TW) << "Cv[kB/atom]"         << setw(SW) << ' ' <<
       setw(TW) << "Cp[kB/atom]"         << setw(SW) << ' ' <<
       setw(TW) << "gamma"                << setw(SW) << ' ' <<
@@ -2500,7 +2627,7 @@ namespace apl
 
     // to avoid division by zero in the self-consistent loop,
     // the initial volume is taken to be 10% bigger
-    double V = SCQHAgetEquilibriumVolume(T, SCQHA_INITIAL_VOLUME_FACTOR * 
+    double V = calcSCQHAequilibriumVolume(T, SCQHA_INITIAL_VOLUME_FACTOR * 
         EOS_volume_at_equilibrium, fit_params, method);
 
     double dT = (Temperatures[Ntemperatures-1]-Temperatures[0])/(Ntemperatures-1);
@@ -2536,7 +2663,7 @@ namespace apl
       // calculate the next equilibrium volume using a self-consistent loop if beta=0 or
       // if the user wants so
       if (all_iterations_self_consistent || !(std::abs(beta)>0)){
-        V = SCQHAgetEquilibriumVolume(T, V, fit_params, method);
+        V = calcSCQHAequilibriumVolume(T, V, fit_params, method);
       }
       else{
         V *= (1 + beta*dT);
@@ -2599,7 +2726,7 @@ namespace apl
       Feq /= NatomsOrigCell;
       Feq += evalEOSmodel(V, fit_params, method);
 
-      Belec  = BulkModulus(V, fit_params, method);
+      Belec  = calcBulkModulus(V, fit_params, method);
       Bphononic *= eV2GPa/(NQpoints*NatomsOrigCell*V);
 
       B = Belec + Bphononic;
@@ -2617,16 +2744,16 @@ namespace apl
         setw(TW) << V                   << setw(SW) << ' ' <<
         setw(TW) << Feq                 << setw(SW) << ' ' <<
         setw(TW) << B                   << setw(SW) << ' ' <<
-        setw(TW) << beta * 1e6          << setw(SW) << ' ' << //[10^-6/K]
+        setw(TW) << beta * 1e5          << setw(SW) << ' ' << //[10^-5/K]
         setw(TW) << CV                  << setw(SW) << ' ' <<
         setw(TW) << CP                  << setw(SW) << ' ' <<
         setw(TW) << GP                  << setw(SW) << ' ' <<
         std::endl;
     }
-    file << "[SCQHA_THERMAL_PROPERTIES]STOP" << std::endl;
+    file << blockname + "STOP" << std::endl;
     file << AFLOWIN_SEPARATION_LINE << std::endl;
 
-    if (!aurostd::stringstream2file(file, filename)){
+    if (!aurostd::stringstream2file(file, filename, "APPEND")){
       msg = "Error writing to " + filename + "file.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function,msg,_FILE_ERROR_);
     }
@@ -2643,22 +2770,23 @@ namespace apl
   /// Grueneisen parameters and average Grueneisen calculated from the thermal
   /// expansion coefficient.
   ///
-  void QHA::writeThermalProperties(EOSmethod eos_method, QHAmethod qha_method)
+  void QHA::writeThermalProperties(EOSmethod eos_method, QHAmethod qha_method,
+      const string &directory)
   {
     string function = XPID + "QHA::writeThermalProperties():";
     string msg = "";
 
     // type of qha calculation
-    string filename = "";
+    string blockname = "[";
     switch(qha_method){
       case (QHANP_CALC):
-        filename = DEFAULT_QHANP_FILE_PREFIX;
+        blockname += "QHANP_";
         break;
       case (QHA3P_CALC):
-        filename = DEFAULT_QHA3P_FILE_PREFIX;
+        blockname += "QHA3P_";
         break;
       case(QHA_CALC):
-        filename = DEFAULT_QHA_FILE_PREFIX;
+        blockname += "QHA_";
         break;
       default:
         msg = "Nonexistent QHA method was passed to " + function;
@@ -2670,27 +2798,27 @@ namespace apl
     // QHA calculation
     switch(eos_method){
       case(EOS_SJ):
-        filename += EOS_METHOD_FILE_SJ;
+        blockname += "SJ_THERMO]";
         break;
       case(EOS_BIRCH_MURNAGHAN2):
-        filename += EOS_METHOD_FILE_BIRCH_MURNAGHAN2;
+        blockname += "BM2_THERMO]";
         break;
       case(EOS_BIRCH_MURNAGHAN3):
-        filename += EOS_METHOD_FILE_BIRCH_MURNAGHAN3;
+        blockname += "BM3_THERMO]";
         break;
       case(EOS_BIRCH_MURNAGHAN4):
-        filename += EOS_METHOD_FILE_BIRCH_MURNAGHAN4;
+        blockname += "BM4_THERMO]";
         break;
       case(EOS_MURNAGHAN):
-        filename += EOS_METHOD_FILE_MURNAGHAN;
+        blockname += "M_THERMO]";
         break;
       default:
         msg = "Nonexistent EOS method was passed to " + function;
         throw aurostd::xerror(_AFLOW_FILE_NAME_, QHA_ARUN_MODE, msg, _INPUT_UNKNOWN_);
         break;
     }
-    filename += DEFAULT_QHA_THERMO_FILE;
 
+    string filename = directory+'/'+DEFAULT_QHA_FILE_PREFIX+DEFAULT_QHA_THERMO_FILE;
     msg = "Writing T-dependent properties to "+filename;
     pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE, *p_oss,
         _LOGGER_MESSAGE_);
@@ -2699,24 +2827,29 @@ namespace apl
     file.precision(10);
 
     file << AFLOWIN_SEPARATION_LINE << std::endl;
-    file << "[QHA_THERMAL_PROPERTIES]START" << std::endl;
+    file << blockname + "SYSTEM=" << system_title << std::endl;
+    file << blockname + "START" << std::endl;
     // write header
-    file << setw(5)  << "# T[K]"               << setw(SW) << ' ' <<
-      setw(TW) << "Veq[ev/atom]"         << setw(SW) << ' ' <<
-      setw(TW) << "F(V0)[eV/atom]"       << setw(SW) << ' ' <<
+    file << setw(5)  << "#T[K]"          << setw(SW) << ' ' <<
+      setw(TW) << "V[A^3/atom]"          << setw(SW) << ' ' <<
+      setw(TW) << "F(V)[eV/atom]"        << setw(SW) << ' ' <<
       setw(TW) << "B[GPa]"               << setw(SW) << ' ' <<
-      setw(TW) << "beta[10^-6/K]"        << setw(SW) << ' ' <<
-      setw(TW) << "Cv[kB/atom]"         << setw(SW) << ' ' <<
-      setw(TW) << "Cp[kB/atom]"         << setw(SW) << ' ' <<
-      setw(TW) << "gamma(beta,B,Cv)"     << setw(SW) << ' ' <<
+      setw(TW) << "beta[10^-5/K]"        << setw(SW) << ' ' <<
+      setw(TW) << "Cv(V)[kB/atom]"       << setw(SW) << ' ' <<
+      setw(TW) << "Cp(V)[kB/atom]"       << setw(SW) << ' ' <<
+      setw(TW) << "gamma(beta,B,Cv(V))"  << setw(SW) << ' ' <<
       setw(TW) << "Bprime";
     // the following properties are calculated only with a regular QHA calculation
     if (qha_method==QHA_CALC){
       file  << setw(SW) << ' ' <<
-        setw(TW) << "beta_mesh[10^-6/K]"   << setw(SW) << ' ' <<
-        setw(TW) << "Cv_mesh[kB/atom]"    << setw(SW) << ' ' <<
-        setw(TW) << "Cp_mesh[kB/atom]"    << setw(SW) << ' ' <<
-        setw(TW) << "gamma_mesh";
+        setw(TW) << "gamma(V,mesh)"                          << setw(SW) << ' ' <<
+        setw(TW) << "beta(gamma(V,mesh),B,Cv(V))[10^-5/K]"   << setw(SW) << ' ' <<
+        setw(TW) << "Cv(V,mesh)[kB/atom]"                    << setw(SW) << ' ' <<
+        setw(TW) << "Cp(V,mesh)[kB/atom]"                    << setw(SW) << ' ' <<
+        setw(TW) << "gamma(V0,mesh)"                         << setw(SW) << ' ' <<
+        setw(TW) << "beta(gamma(V0,mesh),B,Cv(V0))[10^-5/K]" << setw(SW) << ' ' <<
+        setw(TW) << "Cv(V0,mesh)[kB/atom]"                   << setw(SW) << ' ' <<
+        setw(TW) << "Cp(V0,mesh)[kB/atom]";
     }
     file << std::endl;
 
@@ -2728,10 +2861,10 @@ namespace apl
       case(QHA3P_CALC):
       case(QHANP_CALC):
         for (int Vid=0; Vid<N_EOSvolumes; Vid++)
-          F[Vid+1] = FreeEnergyTaylorExpansion(0, Vid, qha_method);
+          F[Vid+1] = calcFreeEnergyTaylorExpansion(0, Vid, qha_method);
         break;
       case(QHA_CALC):
-        for (int Vid=0; Vid<N_EOSvolumes; Vid++) F[Vid+1] = FreeEnergy(0, Vid);
+        for (int Vid=0; Vid<N_EOSvolumes; Vid++) F[Vid+1] = calcFreeEnergy(0, Vid);
         break;
       default:
         msg = "Nonexistent QHA method was passed to " + function;
@@ -2743,8 +2876,10 @@ namespace apl
     double V0K = EOS_volume_at_equilibrium; // equilibrium volume at 0K
 
     double T = 0.0, Veq = 0.0, Feq = 0.0, B = 0.0, Bp = 0.0, beta = 0.0, CV = 0.0, CP = 0.0, GP = 0.0;
-    double CV_mesh = 0.0, GP_mesh = 0.0, CP_mesh = 0.0, beta_mesh = 0.0; // these properties are calculated 
-    // by weighted sum over q-points mesh
+    // the following properties are calculated by weighted sum over q-points mesh
+    double CV_mesh_V0 = 0.0, GP_mesh_V0 = 0.0, CP_mesh_V0 = 0.0, beta_mesh_V0 = 0.0;
+    double CV_mesh_V  = 0.0, GP_mesh_V  = 0.0, CP_mesh_V  = 0.0, beta_mesh_V  = 0.0;
+
     for (int Tid=0; Tid<Ntemperatures; Tid++){
       T = Temperatures[Tid];
 
@@ -2753,10 +2888,10 @@ namespace apl
         case(QHA3P_CALC):
         case(QHANP_CALC):
           for (int Vid=0; Vid<N_EOSvolumes; Vid++) 
-            F[Vid+1] = FreeEnergyTaylorExpansion(T, Vid, qha_method);
+            F[Vid+1] = calcFreeEnergyTaylorExpansion(T, Vid, qha_method);
           break;
         case(QHA_CALC):
-          for (int Vid=0; Vid<N_EOSvolumes; Vid++) F[Vid+1] = FreeEnergy(T, Vid);
+          for (int Vid=0; Vid<N_EOSvolumes; Vid++) F[Vid+1] = calcFreeEnergy(T, Vid);
           break;
         default:
           msg = "Nonexistent QHA method was passed to " + function;
@@ -2765,9 +2900,9 @@ namespace apl
       }
 
       if (includeElectronicContribution){
-        if (doSommerfeldExpansion) F += electronicFreeEnergySommerfeld(T);
+        if (doSommerfeldExpansion) F += calcElectronicFreeEnergySommerfeld(T);
         else{
-          for (int id=0; id<N_EOSvolumes; id++) F[id+1]+=electronicFreeEnergy(T, id);
+          for (int id=0; id<N_EOSvolumes; id++) F[id+1]+=calcElectronicFreeEnergy(T, id);
         }
       }
 
@@ -2781,57 +2916,73 @@ namespace apl
       }
 
       fitToEOSmodel(F, eos_method);
-      // note that the state of the EOS fit is changed by the ThermalExpansion and/or
-      // IsochoricSpecificHeat functions, so save Veq, Feq and B for future use
+      // note that the state of the EOS fit is changed by the calcThermalExpansion and/or
+      // calcIsochoricSpecificHeat functions, so save Veq, Feq and B for future use
       Veq = EOS_volume_at_equilibrium;
       Feq = EOS_energy_at_equilibrium;
       B   = EOS_bulk_modulus_at_equilibrium;  // [GPa]
       Bp  = EOS_Bprime_at_equilibrium;
-      beta = ThermalExpansion(T, eos_method, qha_method); // [K^-1]
-      CV   = IsochoricSpecificHeat(T, V0K, eos_method, qha_method)/KBOLTZEV; // [kB/atom]
+      beta = calcThermalExpansion(T, eos_method, qha_method); // [K^-1]
+      CV   = calcIsochoricSpecificHeat(T, Veq, eos_method, qha_method)/KBOLTZEV; // [kB/atom]
       CP   = CV + Veq*T*B*pow(beta,2)/eV2GPa/KBOLTZEV; // [kB/atom]
       GP   = (beta/CV)*B*Veq/eV2GPa/KBOLTZEV;
 
       // the following properties are calculated only with a regular QHA calculation
       if (qha_method==QHA_CALC){
-        calcCVandGPfit(T, Veq, CV_mesh, GP_mesh);
-        beta_mesh = KBOLTZEV*CV_mesh*GP_mesh/Veq/(B/eV2GPa); // [K^-1]
-        CP_mesh   = CV_mesh + Veq*T*B*pow(beta_mesh,2)/eV2GPa/KBOLTZEV; // [kB/atom]
+        calcCVandGPfit(T, V0K, CV_mesh_V0, GP_mesh_V0);
+        beta_mesh_V0 = KBOLTZEV*CV_mesh_V0*GP_mesh_V0/V0K/(B/eV2GPa); // [K^-1]
+        CP_mesh_V0 = CV_mesh_V0 + V0K*T*B*pow(beta_mesh_V0,2)/eV2GPa/KBOLTZEV;//[kB/atom]
+
+        calcCVandGPfit(T, Veq, CV_mesh_V,  GP_mesh_V);
+        beta_mesh_V = KBOLTZEV*CV_mesh_V*GP_mesh_V/Veq/(B/eV2GPa); // [K^-1]
+        CP_mesh_V   = CV_mesh_V + Veq*T*B*pow(beta_mesh_V,2)/eV2GPa/KBOLTZEV; //[kB/atom]
       }
 
       // write values to file
       file << setw(5)  << T                   << setw(SW) << ' ' <<
         setw(TW) << Veq                 << setw(SW) << ' ' <<
-        setw(TW) << Feq                 << setw(SW) << ' ' <<
+        setw(TW) << Feq                 << setw(SW) << ' ' << //[eV/atom]
         setw(TW) << B                   << setw(SW) << ' ' <<
-        setw(TW) << beta * 1e6          << setw(SW) << ' ' << //[10^-6/K]
-        setw(TW) << CV                  << setw(SW) << ' ' <<
-        setw(TW) << CP                  << setw(SW) << ' ' <<
+        setw(TW) << beta * 1e5          << setw(SW) << ' ' << //[10^-5/K]
+        setw(TW) << CV                  << setw(SW) << ' ' << //[kB/atom]
+        setw(TW) << CP                  << setw(SW) << ' ' << //[kB/atom]
         setw(TW) << GP                  << setw(SW) << ' ' <<
         setw(TW) << Bp;
       // the following properties are calculated only with a regular QHA calculation
       if (qha_method==QHA_CALC){
         file << setw(SW) << ' ' <<
-          setw(TW) << beta_mesh * 1e6     << setw(SW) << ' ' << //[10^-6/K]
-          setw(TW) << CV_mesh             << setw(SW) << ' ' <<
-          setw(TW) << CP_mesh             << setw(SW) << ' ' <<
-          setw(TW) << GP_mesh             << setw(SW);
+          setw(TW) << GP_mesh_V              << setw(SW) << ' ' <<
+          setw(TW) << beta_mesh_V * 1e5      << setw(SW) << ' ' << //[10^-5/K]
+          setw(TW) << CV_mesh_V              << setw(SW) << ' ' << //[kB/atom]
+          setw(TW) << CP_mesh_V              << setw(SW) << ' ' << //[kB/atom]
+          setw(TW) << GP_mesh_V0             << setw(SW) << ' ' <<
+          setw(TW) << beta_mesh_V0 * 1e5     << setw(SW) << ' ' << //[10^-5/K]
+          setw(TW) << CV_mesh_V0             << setw(SW) << ' ' << //[kB/atom]
+          setw(TW) << CP_mesh_V0             << setw(SW); //[kB/atom]
       }
       file << std::endl;
     }
 
-    file << "[QHA_THERMAL_PROPERTIES]STOP" << std::endl;
+    file << blockname + "STOP" << std::endl;
     file << AFLOWIN_SEPARATION_LINE << std::endl;
 
-    if (!aurostd::stringstream2file(file, filename)){
-      msg = "Error writing to " + filename + "file.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function,msg,_FILE_ERROR_);
+    if (aurostd::FileExist(filename)){
+      if (!aurostd::stringstream2file(file, filename, "APPEND")){
+        msg = "Error writing to " + filename + " file.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function,msg,_FILE_ERROR_);
+      }
+    }
+    else{
+      if (!aurostd::stringstream2file(file, filename)){
+        msg = "Error writing to " + filename + " file.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function,msg,_FILE_ERROR_);
+      }
     }
   }
 
   /// Writes the F(V,T) data to aflow.qha.FVT.out file
   ///
-  void QHA::writeFVT()
+  void QHA::writeFVT(const string &directory)
   {
     string function = XPID + "QHA::writeFVT():";
     string msg = "Writing F(V,T) relations to file.";
@@ -2839,7 +2990,7 @@ namespace apl
         _LOGGER_MESSAGE_);
 
     stringstream file;
-    string filename = DEFAULT_QHA_FILE_PREFIX + DEFAULT_QHA_FVT_FILE;
+    string filename = directory+'/'+DEFAULT_QHA_FILE_PREFIX+DEFAULT_QHA_FVT_FILE;
     file.precision(10);
 
     file << AFLOWIN_SEPARATION_LINE << std::endl;
@@ -2852,15 +3003,15 @@ namespace apl
       T = Temperatures[Tid];
       file << "# T = " << T << " K" << std::endl;
       if (includeElectronicContribution && doSommerfeldExpansion){
-        Felec = electronicFreeEnergySommerfeld(T);
+        Felec = calcElectronicFreeEnergySommerfeld(T);
       }
       for (int Vid = 0; Vid < N_EOSvolumes; Vid++){
         if (includeElectronicContribution && !doSommerfeldExpansion){
-          Felec[Vid+1]=electronicFreeEnergy(T,Vid);
+          Felec[Vid+1]=calcElectronicFreeEnergy(T,Vid);
         }
 
         file << setw(TW) << EOSvolumes[Vid]    << setw(SW) << ' '
-          << setw(TW) << FreeEnergy(T, Vid) << setw(SW) << ' '
+          << setw(TW) << calcFreeEnergy(T, Vid) << setw(SW) << ' '
           << setw(TW) << Felec[Vid+1]       << setw(SW) << ' '
           << setw(TW) << E0_V[Vid] <<
           std::endl;
@@ -2928,7 +3079,7 @@ namespace apl
   /// difference method and isochoric specific heat.
   /// Output file: "aflow.qha.gp.avg.out"
   ///
-  void QHA::writeAverageGPfiniteDifferences()
+  void QHA::writeAverageGPfiniteDifferences(const string &directory)
   {
     string function = XPID + "QHA::writeAverageGPfiniteDifferences(): ";
     string msg = "Writing T-dependence of the average Grueneisen parameter.";
@@ -2936,7 +3087,7 @@ namespace apl
         _LOGGER_MESSAGE_);
 
     stringstream file;
-    string filename = DEFAULT_QHA_FILE_PREFIX + DEFAULT_QHA_GP_AVG_FILE;
+    string filename = directory+'/'+DEFAULT_QHA_FILE_PREFIX+DEFAULT_QHA_GP_AVG_FILE;
     file.precision(10);
 
     file << AFLOWIN_SEPARATION_LINE << std::endl;
@@ -2970,7 +3121,7 @@ namespace apl
 
   /// Writes the mode-dependent Grueneisen parameters calculated at each q-point in the IBZ.
   ///
-  void QHA::writeGPmeshFD()
+  void QHA::writeGPmeshFD(const string &directory)
   {
     string function = XPID + "QHA::writeGPmeshFD():";
     string msg = "Writing Grueneisen parameters calculated on the mesh of q-points.";
@@ -2978,7 +3129,7 @@ namespace apl
         _LOGGER_MESSAGE_);
 
     stringstream file;
-    string filename = DEFAULT_QHA_FILE_PREFIX + DEFAULT_QHA_GP_MESH_FILE;
+    string filename = directory+'/'+DEFAULT_QHA_FILE_PREFIX+DEFAULT_QHA_GP_MESH_FILE;
     file.precision(6);
 
     xvector<double> xomega;
@@ -3027,11 +3178,11 @@ namespace apl
   /// Writes the volume-dependent phonon frequencies obtained from the series of EOS APL
   /// calculations.
   ///
-  void QHA::writeFrequencies()
+  void QHA::writeFrequencies(const string &directory)
   {
     string function = XPID + "QHA::writeFrequencies():", msg = "";
     stringstream file;
-    string filename = DEFAULT_QHA_FILE_PREFIX + DEFAULT_QHA_FREQS_FILE;
+    string filename = directory+'/'+DEFAULT_QHA_FILE_PREFIX + DEFAULT_QHA_FREQS_FILE;
 
     file << AFLOWIN_SEPARATION_LINE << std::endl;
     file << "[QHA_FREQUENCIES]START" << std::endl;
@@ -3052,7 +3203,8 @@ namespace apl
     }
   }
 
-  void QHA::writeTphononDispersions(EOSmethod eos_method, QHAmethod qha_method)
+  void QHA::writeTphononDispersions(EOSmethod eos_method, QHAmethod qha_method,
+      const string &directory)
   {
     string function = XPID + "QHA::writeTphononDispersions():", msg = "";
     double V = 0.0; int T = 0;
@@ -3073,7 +3225,7 @@ namespace apl
           break;
         case (SCQHA_CALC):
           xomega = xvector<double>(N_GPvolumes);
-          V = SCQHAgetEquilibriumVolume(T, eos_method);
+          V = calcSCQHAequilibriumVolume(T, eos_method);
           break;
         case (QHANP_CALC):
           msg = "T-dependent phonon dispersion calculation is not supported for QHANP method";
@@ -3143,27 +3295,153 @@ namespace apl
       stringstream eig_stream;
       eig_stream << eig;
 
-      string filename = "";
+      string filename = directory + '/';
       switch (qha_method){
         case (QHA_CALC):
-          filename = DEFAULT_QHA_FILE_PREFIX;
+          filename += DEFAULT_QHA_FILE_PREFIX;
           break;
         case (QHA3P_CALC):
-          filename = DEFAULT_QHA3P_FILE_PREFIX;
+          filename += DEFAULT_QHA3P_FILE_PREFIX;
           break;
         case (SCQHA_CALC):
-          filename = DEFAULT_SCQHA_FILE_PREFIX;
+          filename += DEFAULT_SCQHA_FILE_PREFIX;
           break;
         case (QHANP_CALC):
           // not supported, this case is handled in an earlier switch statement
           break;
       }
-      filename += aurostd::PaddedNumString(T, ndigits)+'.'+DEFAULT_APL_PDIS_FILE;
-      aurostd::stringstream2file(eig_stream, filename);
-      if (!aurostd::FileExist(filename)){
-        msg = "Cannot open "+filename+" file.";
+      filename += DEFAULT_QHA_PDIS_FILE;
+      filename += ".T"+aurostd::PaddedNumString(T, ndigits)+"K.out";
+      if (!aurostd::stringstream2file(eig_stream, filename)){
+        msg = "An error occured when attempted to write "+filename+" file.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_,function,msg,_FILE_ERROR_);
       }
     }
   }
+
+  void QHA::writeQHAresults(const string &directory)
+  {
+    string function = XPID + "QHA::writeQHAresults:";
+    string msg = "Writing properties calculated by QHA into aflow.qha.out file.";
+    pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
+        *p_oss, _LOGGER_MESSAGE_);
+
+    xvector<double> xvolumes = aurostd::vector2xvector(EOSvolumes);
+    xvector<double> F(N_EOSvolumes); // free energy
+    for (int Vid=0; Vid<N_EOSvolumes; Vid++) F[Vid+1] = calcFreeEnergy(0, Vid);
+
+    fitToEOSmodel(F, EOS_SJ);
+    double V0K = EOS_volume_at_equilibrium; // equilibrium volume at 0K
+
+    double T = 300.0;
+    for (int Vid=0; Vid<N_EOSvolumes; Vid++) F[Vid+1] = calcFreeEnergy(T, Vid);
+    fitToEOSmodel(F, EOS_SJ);
+
+    double volume = EOS_volume_at_equilibrium;
+    double free_energy = EOS_energy_at_equilibrium;
+    double bulk_modulus = EOS_bulk_modulus_at_equilibrium;
+    double bprime = EOS_Bprime_at_equilibrium;
+    double thermal_expansion = calcThermalExpansion(T, EOS_SJ, QHA_CALC);
+
+    double CV = 0.0, grueneisen_300K = 0.0;
+    calcCVandGPfit(T, V0K, CV, grueneisen_300K);
+    double grueneisen = calcGPinfFit(V0K);
+
+    CV = calcIsochoricSpecificHeat(T, volume, EOS_SJ, QHA_CALC)/KBOLTZEV; // [kB/atom]
+    double CP = CV + volume*T*bulk_modulus*pow(thermal_expansion,2)/eV2GPa/KBOLTZEV; // [kB/atom]
+
+    stringstream aflow_qha_out;
+    aflow_qha_out << AFLOWIN_SEPARATION_LINE << endl;
+    aflow_qha_out << "[QHA_RESULTS]START" << endl;
+    aflow_qha_out << "gruneisen_qha = " << grueneisen << endl;
+    aflow_qha_out << "gruneisen_qha_300K = " << grueneisen_300K << endl;
+    aflow_qha_out << "thermal_expansion_qha_300K = " << thermal_expansion;
+    aflow_qha_out << " (1/K)" << endl;
+    aflow_qha_out << "modulus_bulk_qha_300K = " << bulk_modulus;
+    aflow_qha_out << " (GPa)" << endl;
+    aflow_qha_out << "modulus_bulk_derivative_pressure_qha_300K = " << bprime << endl;
+    aflow_qha_out << "heat_capacity_Cv_atom_qha_300K = " << CV;
+    aflow_qha_out << " (kB/atom)" << endl;
+    aflow_qha_out << "heat_capacity_Cv_cell_qha_300K = " << CV * NatomsOrigCell;
+    aflow_qha_out << " (kB/cell)" << endl;
+    aflow_qha_out << "heat_capacity_Cp_atom_qha_300K = " << CP;
+    aflow_qha_out << " (kB/atom)" << endl;
+    aflow_qha_out << "heat_capacity_Cp_cell_qha_300K = " << CP * NatomsOrigCell;
+    aflow_qha_out << " (kB/cell)" << endl;
+    aflow_qha_out << "volume_atom_qha_300K = " << volume;
+    aflow_qha_out << " (A^3/atom)" << endl;
+    aflow_qha_out << "energy_free_atom_qha_300K = " << free_energy;
+    aflow_qha_out << " (eV/atom)" << endl;
+    aflow_qha_out << "energy_free_cell_qha_300K = " << free_energy * NatomsOrigCell;
+    aflow_qha_out << " (eV/cell)" << endl;
+    aflow_qha_out << "[QHA_RESULTS]STOP" << endl;
+    aflow_qha_out << AFLOWIN_SEPARATION_LINE << endl;
+
+    string filename = directory + '/' + DEFAULT_QHA_FILE_PREFIX + "out";
+    if (!aurostd::stringstream2file(aflow_qha_out, filename)){
+      msg = "Error writing to " + filename + " file.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function,msg,_FILE_ERROR_);
+    }
+  }
+}
+
+//=============================================================================
+//                         Auxiliary functions
+namespace apl{
+  /// Checks if there is an aflow.in-type file in directory_LIB with a directive to
+  /// run QHA and returns its name in AflowInName parameter.
+  /// The following variables/filenames are used for the check: AflowInName, _AFLOWIN_
+  /// and aflow_qha.in.
+  /// If there are a few suitable files, the topmost in the list is returned.
+  bool QHA_Get_AflowInName(string &AflowInName, const string &directory_LIB)
+  {
+    bool qha_aflowin_is_found = false;
+    vector<string> vaflowins;
+    if (!AflowInName.empty()) vaflowins.push_back(AflowInName);
+    if (!_AFLOWIN_.empty()) vaflowins.push_back(_AFLOWIN_);
+    vaflowins.push_back(QHA_AFLOWIN_DEFAULT);
+
+    string aflowin_name = "", aflowin = "", fullpath_aflowin_name = "";
+    for (uint i=0; i<vaflowins.size(); i++){
+      aflowin_name = vaflowins[i];
+      fullpath_aflowin_name = directory_LIB + '/' + aflowin_name;
+      if (aurostd::FileExist(fullpath_aflowin_name)){
+        aflowin = aurostd::file2string(fullpath_aflowin_name);
+        if (aflowin.empty()) continue;
+      }
+
+      aflowin = aurostd::RemoveComments(aflowin);
+      if (aurostd::substring2bool(aflowin,"[AFLOW_QHA]CALC",TRUE) ||
+          aurostd::substring2bool(aflowin,"[VASP_QHA]CALC",TRUE)){
+        AflowInName = aflowin_name;
+        qha_aflowin_is_found = true;
+        break;
+      }
+    }
+
+    return qha_aflowin_is_found;
+  }
+
+  // AS20201211 OBSOLETE, but still there is a little chance it might be usefull
+  /// Links existing APL calculation at the input volume to a corresponding QHA directory
+  /// (ARUN.QHA_PHONONS_1.0000).
+  /// It is assumed that linking should be performed before the first QHA run.
+  // void linkAPLtoQHA()
+  // {
+  //    string qha_directory_default = ARUN_DIRECTORY_PREFIX+QHA_ARUN_MODE+"_PHONON_1.0000";
+  //    string currentDirectory = aurostd::getPWD();
+  //    string qha_directory = currentDirectory + '/' + qha_directory_default;
+  //    if (!aurostd::IsDirectory(qha_directory)) aurostd::DirectoryMake(qha_directory);
+
+  //    vector<string> vfiles;
+  //    aurostd::DirectoryLS(currentDirectory, vfiles);
+  //    string dirname = "";
+  //    for (uint i=0; i<vfiles.size(); i++){
+  //      if (aurostd::substring2bool(vfiles[i], ARUN_DIRECTORY_PREFIX+"APL")){
+  //        dirname = currentDirectory+'/'+vfiles[i];
+  //        cout << "Linking "+dirname+" to "+qha_directory << endl;
+  //        aurostd::LinkFile(dirname, qha_directory);
+  //      }
+  //    }
+  // }
 }

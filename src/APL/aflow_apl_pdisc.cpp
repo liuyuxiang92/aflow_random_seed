@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
 // *                                                                         *
 // ***************************************************************************
 // This file contains the classes PhononDispersionCalculator and PathBuilder
@@ -573,6 +573,14 @@ namespace apl {
 
   // ///////////////////////////////////////////////////////////////////////////
   //ME20190614 END
+
+  //AS20201110 BEGIN
+  /// Return q-path (as xKPOINTS) used to calculate phonon dispersion relations.
+  xKPOINTS PhononDispersionCalculator::getPHKPOINTS()
+  {
+    return _pb.createKPOINTS(_pc->getSupercell());
+  }
+  //AS20201110 END
 
 }  // namespace apl
 
@@ -1249,6 +1257,6 @@ namespace apl {
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
 // *                                                                         *
 // ***************************************************************************

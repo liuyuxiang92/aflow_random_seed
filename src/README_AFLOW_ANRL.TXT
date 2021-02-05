@@ -1,6 +1,6 @@
 ****************************************************************************************************
 *                                                                                                  *
-*                        aflow - STEFANO CURTAROLO Duke University 2003-2020                       *
+*                        aflow - STEFANO CURTAROLO Duke University 2003-2021                       *
 *                            High-Throughput ab-initio Computing Project                           *
 *                                                                                                  *
 ****************************************************************************************************
@@ -28,6 +28,10 @@ Note: This implementation of the geometric prototypes allows for the creation of
 structure prototypes depending on the parameters chosen. Therefore, these prototypes are quite 
 general and powerful.
 
+[New feature as of V3.2.5]
+Any possible prototype can be created with the new symbolic prototype generator as long as it follows
+the label and internal degrees of freedom scheme.
+Prototypes no longer need to be tabulated (hard-coded) in the AFLOW software, and are now created on-the-fly.
 
 The general format for the command is as follows (optional arguments are enclosed in square brackets "[]"):
 

@@ -1,6 +1,6 @@
 ****************************************************************************************************
 *                                                                                                  *
-*                        aflow - STEFANO CURTAROLO Duke University 2003-2020                       *
+*                        aflow - STEFANO CURTAROLO Duke University 2003-2021                       *
 *                            High-Throughput ab-initio Computing Project                           *
 *                                                                                                  *
 ****************************************************************************************************
@@ -88,7 +88,7 @@ LATEST VERSION OF THE FILE:                              materials.duke.edu/AFLO
  	       --module=[APL | QHA | AAPL]
          --apl_supercell=NxNxN
          --potim=XXX (default: DEFAULT_VASP_PREC_POTIM in .aflow.rc)  (VASP) 
-         --relax_type=[ALL | IONS | CELL_SHAPE | CELL_VOLUME | IONS_CELL_VOLUME] (overrides relax_mode) (VASP)
+         --relax_type=[ALL | IONS | CELL_SHAPE | CELL_VOLUME | IONS_CELL_VOLUME | IONS_CELL_SHAPE] (overrides relax_mode) (VASP)
          --relax_mode=[ENERGY | FORCES | ENERGY_FORCES | FORCES_ENERGY] (default: DEFAULT_VASP_FORCE_OPTION_RELAX_MODE_SCHEME in .aflow.rc) (VASP)
          --relax_count=XX (default: DEFAULT_VASP_FORCE_OPTION_RELAX_COUNT in .aflow.rc) (VASP)
          --run_relax_static
@@ -226,7 +226,7 @@ LATEST VERSION OF THE FILE:                              materials.duke.edu/AFLO
 
       RELAX_TYPE
         One of the RELAX_TYPEs specified in the AFLOW manual (VASP only).
-        [ALL | IONS | CELL_SHAPE | CELL_VOLUME | IONS_CELL_VOLUME] (overrides RELAX_MODE)
+        [ALL | IONS | CELL_SHAPE | CELL_VOLUME | IONS_CELL_VOLUME | IONS_CELL_SHAPE] (overrides RELAX_MODE)
 
       RELAX_MODE
         One of the RELAX_MODEs specified in the AFLOW manual (VASP only).
@@ -380,7 +380,7 @@ LATEST VERSION OF THE FILE:                              materials.duke.edu/AFLO
         Outputs to standard out the angles for each atom triplet
         made up of neighors within a distance cutoff of each other.  
         Actually, since this can be huge, only the first MAX_NUM_ANGLE-1
-        neighbours within d are used.  MAX_NUM_ANGLE=21 at present and
+        neighbors within d are used.  MAX_NUM_ANGLE=21 at present and
         can be set in aflow_pflow_print.cpp
 
   aflow --bader -D DIRECTORY
@@ -738,10 +738,11 @@ LATTICES = (the ones with "")
             [ --oxidation_numbers=ox_num_1,ox_num_2,...]
             [ --print=json|out] (default is out)
 
-        Determines the CCE corrections for the structure in file STRUCT_FILE. It can be in any structure
-        format that AFLOW supports, e.g. VASP POSCAR, QE, AIMS, ABINIT, ELK, and CIF. For VASP, a VASP5
-        POSCAR is required or, if a VASP4 POSCAR is used, the species must be written on the right side
-        next to the coordinates for each atom.
+        Prints the results of the full CCE anaysis, i.e. cation coordination numbers, oxidation numbers,
+        and CCE corrections and formation enthalpies, for the given structure file. It can be in any
+        structure format that AFLOW supports, e.g. VASP POSCAR, QE, AIMS, ABINIT, ELK, and CIF. For VASP,
+        a VASP5 POSCAR is required or, if a VASP4 POSCAR is used, the species must be written on the right
+        side next to the coordinates for each atom.
         Precalculated DFT formation enthalpies can be provided as a comma separated list using the option
         --enthalpies_formation_dft= in eV/cell.
         Functionals for which corrections should be returned can be provided as a comma separated list 
@@ -851,8 +852,8 @@ LATTICES = (the ones with "")
         This compares the characteristics of two POSCAR files and is  
         useful for determining if the files are the same.  Characteristics
         compared include number of atoms, number of types, total volume,  
-        volume per atom, lattice parameters, number of neighbours of each
-        pair type out to rcut, differences in bond lengths for neighbours
+        volume per atom, lattice parameters, number of neighbors of each
+        pair type out to rcut, differences in bond lengths for neighbors
         of each pair type out to cutoff, and space groups.  For rcut<0 the
         cutoff is set to 4*(Wigner-Seitz radius of each atom) (this is the  
         radius such that num atom spheres occupies the whole volume).
@@ -1707,7 +1708,7 @@ LATTICES = (the ones with "")
   aflow --incompact < POSCAR
         Similar to --incell
         Outputs to standard out a POSCAR file where all the
-        atoms are mapped through the unit and neighbours cells
+        atoms are mapped through the unit and neighbors cells
         to minimixe the shortest possible bond with an adjacent atom
         This option is very useful if you run big and complicate
         molecules where atoms exit of the unit cell and you have
@@ -2794,13 +2795,13 @@ LATTICES = (the ones with "")
           (default: anrl).
   
 
-  aflow --prototype_labels|--proto_labels [--library=htqc|anrl|all] [--arity=|--number_of_species=|--species_count=<number>] [--stoichiometry=|--stoich=<number>:<number>:...] [--space_group_number=|--space_group=|--sg=<number>] 
+  aflow --prototype_labels|--proto_labels [--library=htqc|anrl|all] [--arity=|--number_of_species=|--species_count=<number>] [--stoichiometry=|--stoich=<number>,<number>,...] [--space_group_number=|--space_group=|--sg=<number>] 
         Returns a list of the AFLOW prototype labels.
         The labels can be filtered by arity, stoichiometry, and space group.
         options:
           [--library] : specify library/catalog, i.e., htqc, anrl, or all (default=all)
           [--arity=<number>] : specify 1=unary, 2=binary, 3=ternary, etc.
-          [--stoichiometry=<number>:<number>:...] : specify the stoichiometry
+          [--stoichiometry=<number>,<number>,...] : specify the stoichiometry
           [--space_group_number=<number>] : specify the space group number
 
   aflow --prototypermult | --PROTOTYPERMULT <POSCAR
@@ -3683,7 +3684,7 @@ AFLOWLIB MODE
 	
 ****************************************************************************************************
 *                                                                                                  *
-*                        aflow - STEFANO CURTAROLO Duke University 2003-2020                       *
+*                        aflow - STEFANO CURTAROLO Duke University 2003-2021                       *
 *                            High-Throughput ab-initio Computing Project                           *
 *                                                                                                  *
 ****************************************************************************************************

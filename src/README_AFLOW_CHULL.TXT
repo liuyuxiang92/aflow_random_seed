@@ -1,6 +1,6 @@
 ****************************************************************************************************
 *                                                                                                  *
-*                        aflow - STEFANO CURTAROLO Duke University 2003-2020                       *
+*                        aflow - STEFANO CURTAROLO Duke University 2003-2021                       *
 *                            High-Throughput ab-initio Computing Project                           *
 *                                                                                                  *
 ****************************************************************************************************
@@ -103,8 +103,8 @@ LIST OF AFLOW-CHULL COMMANDS:
       [--include_skewed_hulls|--include_skewed|--ish] : process hull despite skewed endpoints (abs(ground state endpoint energy) < 15 meV).
       [--include_unreliable_hulls|--include_unreliable|--iuh] : process hull despite poor statistics (binary hull count < 200).
       [--include_outliers|--io] : include any detected outliers (output/warning is still shown).
+      [--strict_outlier_analysis|--soa] : terminate hull analysis if binary hull statistics not satisfied.
       [--force] : force output despite warnings.
-      [--force_outliers|--fo] : force output despite outlier warnings.
 
       PDF/LATEX OPTIONS:
       [--image_only|--imageonly|--image] : Latex/PDF output mode only. Similar to --document_only, 
@@ -133,7 +133,7 @@ For additional information contact: Corey Oses (corey.oses@duke.edu)
 
 ****************************************************************************************************
 *                                                                                                  *
-*                        aflow - STEFANO CURTAROLO Duke University 2003-2020                       *
+*                        aflow - STEFANO CURTAROLO Duke University 2003-2021                       *
 *                            High-Throughput ab-initio Computing Project                           *
 *                                                                                                  *
 ****************************************************************************************************

@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
 // *                                                                         *
 // ***************************************************************************
 // Written by Stefano Curtarolo 1994-2011
@@ -33,22 +33,7 @@
 namespace aurostd {  // namespace aurostd
   template<class utype>                                    // default constructor
     xvector<utype>::xvector(int nh,int nl) : vsize(0) {        
-      // allocate a xvector with subscript range [nl..nh]
-      lrows=std::min(nl,nh);// if(!nh)lrows=0; this messes up convasp
-      urows=std::max(nl,nh);// if(!nh)urows=0; this messes up convasp
-      refresh(); //CO20191110
-#ifdef _AUROSTD_XVECTOR_DEBUG_CONSTRUCTORS
-      cerr << "xxvector -> default constructor: lrows=" << lrows << ", urows=" << urows << ", rows=" << rows << endl;
-#endif
-      if(vsize>0) {
-        corpus=new utype[rows+XXEND];
-        if(!corpus) {throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::xvector<utype>::xvector():","allocation failure in default constructor",_ALLOC_ERROR_);}
-        corpus+= -lrows+XXEND;
-        reset(); //CO20191110
-      }
-#ifdef _AUROSTD_XVECTOR_DEBUG_CONSTRUCTORS
-      cerr << " isfloat=" << isfloat << ", iscomplex=" << iscomplex << ", sizeof=" << size << ", vsize=" << vsize << endl;
-#endif
+      resize(nh,nl);  //CO20201111
     }
 }
 
@@ -136,6 +121,26 @@ namespace aurostd {  // namespace aurostd
       iscomplex=aurostd::_iscomplex((utype) 0);
       size=(char) (sizeof(utype));
       vsize=(long int) size*rows;
+    }
+  template<class utype>
+    void xvector<utype>::resize(int nh,int nl) {  //CO20201111
+      int lrows_old=lrows,urows_old=urows;long int vsize_old=vsize; //to check whether we need to make a new corpus
+      // allocate a xvector with subscript range [nl..nh]
+      lrows=std::min(nl,nh);// if(!nh)lrows=0; this messes up convasp
+      urows=std::max(nl,nh);// if(!nh)urows=0; this messes up convasp
+      refresh(); //CO20191110
+#ifdef _AUROSTD_XVECTOR_DEBUG_CONSTRUCTORS
+      cerr << "xxvector -> default constructor: lrows=" << lrows << ", urows=" << urows << ", rows=" << rows << endl;
+#endif
+      if(lrows!=lrows_old||urows!=urows_old||vsize!=vsize_old) { //vsize>0
+        corpus=new utype[rows+XXEND];
+        if(!corpus) {throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::xvector<utype>::xvector():","allocation failure in default constructor",_ALLOC_ERROR_);}
+        corpus+= -lrows+XXEND;
+        reset(); //CO20191110
+      }
+#ifdef _AUROSTD_XVECTOR_DEBUG_CONSTRUCTORS
+      cerr << " isfloat=" << isfloat << ", iscomplex=" << iscomplex << ", sizeof=" << size << ", vsize=" << vsize << endl;
+#endif
     }
 }
 
@@ -1196,11 +1201,19 @@ namespace aurostd {                   // conversion to vector<utype>
 
 namespace aurostd {                   // conversion to xvector<utype>
   template<class utype> xvector<utype>
-    vector2xvector(const vector<utype> & vec,int lrows) { //CO20180409
+    vector2xvector(const vector<utype>& vec,int lrows) { //CO20180409
       int isize=vec.size();
       xvector<utype> xvec(isize+lrows-1,lrows); //CO20180409
       for(int i=lrows;i<=isize+lrows-1;i++) //CO20180409
-        xvec(i)=vec.at(i-lrows); //CO20180409
+        xvec[i]=vec[i-lrows]; //CO20180409
+      return xvec;
+    }
+  template<class utype> xvector<utype>
+    vector2xvector(const vector<string>& vec,int lrows) { //CO20180409
+      int isize=vec.size();
+      xvector<utype> xvec(isize+lrows-1,lrows); //CO20180409
+      for(int i=lrows;i<=isize+lrows-1;i++) //CO20180409
+        xvec[i]=aurostd::string2utype<utype>(vec[i-lrows]); //CO20180409
       return xvec;
     }
 }
@@ -2785,24 +2798,93 @@ namespace aurostd {  // namespace aurostd
 // ----------------------------------------- STATS stuff
 
 namespace aurostd {
-  template<class utype> utype mean(const xvector<utype>& a){return sum(a)/a.rows;} //CO20190520
+  template<class utype> utype mean(const xvector<utype>& a){if(a.rows==0){return (utype)0;} return sum(a)/a.rows;} //CO20190520
   template<class utype> utype meanWeighted(const xvector<utype>& a,const xvector<utype>& weights){utype sum_weights;return meanWeighted(a,weights,sum_weights);} //CO20190520
   template<class utype> utype meanWeighted(const xvector<utype>& a,const xvector<utype>& weights,utype& sum_weights){ //CO20190520
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy=XPID+"aurostd::meanWeighted():";
     sum_weights=aurostd::sum(weights);
+    if(sum_weights==(utype)0){return (utype)0;}
     if(LDEBUG){cerr << soliloquy << " sum_weights=" << sum_weights << endl;}
     double avg=aurostd::scalar_product(a,weights)/sum_weights;
     if(LDEBUG){cerr << soliloquy << " avg=" << avg << endl;}
     return avg;
   }
-  template<class utype> utype stddev(const xvector<utype>& a){ //CO20190520
+  template<class utype> utype var(const xvector<utype>& a,int ddof){ //CO20190520
+    //ddof is degrees of freedom
+    //ddof==0 is population variance
+    //ddof==1 is sample variance (default)
+    if(a.rows==0||(a.rows-ddof)==0){return (utype)0;}
     utype avg=mean(a);
-    utype sd=(utype)0,diff=(utype)0;
-    for(int i=a.lrows;i<=a.urows;i++){diff=(a[i]-avg);sd+=diff*diff;}
-    sd/=a.rows-1;
-    sd=sqrt(sd);
+    utype var=(utype)0,diff=(utype)0;
+    for(int i=a.lrows;i<=a.urows;i++){diff=(a[i]-avg);var+=diff*diff;}
+    var/=(a.rows-ddof);
+    return var;
+  }
+  template<class utype> utype stddev(const xvector<utype>& a,int ddof){ //CO20190520
+    utype sd=sqrt(var(a,ddof));
     return sd;
+  }
+  template<class utype> utype mode(const xvector<utype>& a){ //CO20190520
+    vector<int> counts(a.rows,1);
+    int i=0,j=0;
+    for(i=a.lrows;i<=a.urows-1;i++){
+      for(j=i+1;j<=a.urows;j++){  //go through unique comparisons, so counts is only accurate for each unique number
+        if(a[i]==a[j]){counts[i-a.lrows]++;}
+      }
+    }
+    int count_max=0;
+    vector<int> indices_max;
+    for(i=0;i<(int)counts.size();i++){
+      if(counts[i]>count_max){indices_max.clear();indices_max.push_back(i);count_max=counts[i];}
+      else if(counts[i]==count_max){indices_max.push_back(i);}
+    }
+    if(indices_max.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::mode()","no indices_max found",_RUNTIME_ERROR_);}
+    if(indices_max.size()==1){return a[a.lrows+indices_max[0]];}
+    //take average
+    utype d=(utype)0.0;
+    for(i=0;i<(int)indices_max.size();i++){d+=a[a.lrows+indices_max[i]];}
+    d/=indices_max.size();
+    return d;
+  }
+  template<class utype> utype correlation_Pearson_fast(const xvector<utype>& a,const xvector<utype>& b,int ddof){  //CO20190520
+    utype mean_a=mean(a);
+    utype mean_b=mean(b);
+    utype stddev_a=stddev(a,ddof);
+    utype stddev_b=stddev(b,ddof);
+    return correlation_Pearson_fast(a,mean_a,stddev_a,b,mean_b,stddev_b,ddof);
+  }
+  template<class utype> utype correlation_Pearson_fast(const xvector<utype>& a,utype mean_a,utype stddev_a,
+      const xvector<utype>& b,utype mean_b,utype stddev_b,int ddof){  //CO20190520
+    //https://github.com/BiermanM/HackerRank/blob/master/10%20Days%20of%20Statistics/Day%207:%20Pearson%20Correlation%20Coefficient%20I.cpp
+    if(a.rows==0||(a.rows-ddof)==0){return (utype)0;}
+    if(a.lrows!=b.lrows){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::correlation_Pearson()","a.lrows!=b.lrows",_RUNTIME_ERROR_);}
+    if(a.rows!=b.rows){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::correlation_Pearson()","a.rows!=b.rows",_RUNTIME_ERROR_);}
+    utype denom=((a.rows-ddof) * stddev_a * stddev_b);  //faster than checking stddevs individually
+    if(denom==(utype)0){return (utype)0;}
+    utype sum=(utype)0;
+    for(int i=a.lrows;i<=a.urows;i++){sum+=(a[i]-mean_a)*(b[i]-mean_b);}
+    return sum/denom;
+  }
+  template<class utype> utype correlation_Pearson_slow(const xvector<utype>& a,const xvector<utype>& b){  //CO20190520
+    //Equation 3 from https://en.wikipedia.org/wiki/Pearson_correlation_coefficient
+    if(a.rows!=b.rows){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::correlation_Pearson()","a.rows!=b.rows",_RUNTIME_ERROR_);}
+    utype mean_a=mean(a);
+    utype mean_b=mean(b);
+    int i=0,j=0;
+    //denom_a
+    utype denom_a=0;
+    for(i=a.lrows;i<=a.urows;i++){denom_a+=std::pow((a[i]-mean_a),2.0);}
+    denom_a=sqrt(denom_a);
+    //denom_b
+    utype denom_b=0;
+    for(i=b.lrows;i<=b.urows;i++){denom_b+=std::pow((b[i]-mean_b),2.0);}
+    denom_b=sqrt(denom_b);
+    if(denom_a==(utype)0||denom_b==(utype)0||(denom_a*denom_b)==(utype)0){return (utype)0;}
+    //numerator
+    utype numerator=0;
+    for(i=a.lrows,j=b.lrows;i<=a.urows&&j<=b.urows;i++,j++){numerator+=((a[i]-mean_a)*(b[j]-mean_b));}
+    return numerator/(denom_a*denom_b);
   }
 }
 
@@ -3030,6 +3112,6 @@ namespace aurostd {
 
 // **************************************************************************
 // *                                                                        *
-// *             STEFANO CURTAROLO - Duke University 2003-2020              *
+// *             STEFANO CURTAROLO - Duke University 2003-2021              *
 // *                                                                        *
 // **************************************************************************
