@@ -1,7 +1,7 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
-// *           Aflow COREY OSES - Duke University 2013-2020                  *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
+// *           Aflow COREY OSES - Duke University 2013-2021                  *
 // *                                                                         *
 // ***************************************************************************
 
@@ -515,7 +515,7 @@ namespace aurostd {
 #endif  // _AUROSTD_XCOMBOS_CPP_
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
-// *           Aflow COREY OSES - Duke University 2013-2020                  *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
+// *           Aflow COREY OSES - Duke University 2013-2021                  *
 // *                                                                         *
 // ***************************************************************************

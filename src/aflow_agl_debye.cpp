@@ -1,7 +1,7 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
-// *                Aflow CORMAC TOHER - Duke University 2013-2020           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
+// *                Aflow CORMAC TOHER - Duke University 2013-2021           *
 // *                                                                         *
 // ***************************************************************************
 // Written by Cormac Toher
@@ -13,7 +13,7 @@
 #include "aflow_ael_elasticity.h"
 
 // ###############################################################################
-//                  AFLOW Automatic GIBBS Library (AGL) (2013-2020)
+//                  AFLOW Automatic GIBBS Library (AGL) (2013-2021)
 // ###############################################################################
 //
 // Uses quasi-harmonic Debye model to obtain thermodynamic properties of materials
@@ -4981,7 +4981,7 @@ namespace AGL_functions {
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
-// *                Aflow CORMAC TOHER - Duke University 2013-2020           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
+// *                Aflow CORMAC TOHER - Duke University 2013-2021           *
 // *                                                                         *
 // ***************************************************************************

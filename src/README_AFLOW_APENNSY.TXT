@@ -1,6 +1,6 @@
 ****************************************************************************************************
 *                                                                                                  *
-*                        aflow - STEFANO CURTAROLO Duke University 2003-2020                       *
+*                        aflow - STEFANO CURTAROLO Duke University 2003-2021                       *
 *                            High-Throughput ab-initio Computing Project                           *
 *                                                                                                  *
 ****************************************************************************************************
@@ -105,7 +105,7 @@ aflow --alloy AgCd --hull --energy
 
 ****************************************************************************************************
 *                                                                                                  *
-*                        aflow - STEFANO CURTAROLO Duke University 2003-2020                       *
+*                        aflow - STEFANO CURTAROLO Duke University 2003-2021                       *
 *                            High-Throughput ab-initio Computing Project                           *
 *                                                                                                  *
 ****************************************************************************************************

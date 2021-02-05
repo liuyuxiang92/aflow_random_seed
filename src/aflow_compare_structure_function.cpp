@@ -1,7 +1,7 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
-// *           Aflow DAVID HICKS - Duke University 2014-2020                 *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
+// *           Aflow DAVID HICKS - Duke University 2014-2021                 *
 // *                                                                         *
 // ***************************************************************************
 // AFLOW-XtalFinder (identify prototypes and compare crystal structures)
@@ -7968,7 +7968,7 @@ namespace compare {
 // Contributors: Carlo De Santo
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
-// *           Aflow DAVID HICKS - Duke University 2014-2020                 *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
+// *           Aflow DAVID HICKS - Duke University 2014-2021                 *
 // *                                                                         *
 // ***************************************************************************
