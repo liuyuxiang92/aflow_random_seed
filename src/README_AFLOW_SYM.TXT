@@ -1,6 +1,6 @@
 ****************************************************************************************************
 *                                                                                                  *
-*                        aflow - STEFANO CURTAROLO Duke University 2003-2020                       *
+*                        aflow - STEFANO CURTAROLO Duke University 2003-2021                       *
 *                            High-Throughput ab-initio Computing Project                           *
 *                                                                                                  *
 ****************************************************************************************************
@@ -656,7 +656,7 @@ For additional information contact: David Hicks (d.hicks@duke.edu)
 
 ****************************************************************************************************
 *                                                                                                  *
-*                        aflow - STEFANO CURTAROLO Duke University 2003-2020                       *
+*                        aflow - STEFANO CURTAROLO Duke University 2003-2021                       *
 *                            High-Throughput ab-initio Computing Project                           *
 *                                                                                                  *
 ****************************************************************************************************
