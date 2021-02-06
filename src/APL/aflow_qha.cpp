@@ -1244,7 +1244,7 @@ namespace apl
         msg = "Could not map the AFLOW standard primitive cell to the supercell. ";
         msg += "Phonon dispersions will be calculated using the original structure instead.";
         pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
-            *p_oss, _LOGGER_ERROR_);
+            *p_oss, _LOGGER_WARNING_);
       }
       Nbranches = phcalc.getNumberOfBranches();
 
