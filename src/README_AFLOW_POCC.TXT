@@ -1,6 +1,6 @@
 ****************************************************************************************************
 *                                                                                                  *
-*                        aflow - STEFANO CURTAROLO Duke University 2003-2020                       *
+*                        aflow - STEFANO CURTAROLO Duke University 2003-2021                       *
 *                            High-Throughput ab-initio Computing Project                           *
 *                                                                                                  *
 ****************************************************************************************************
@@ -171,7 +171,7 @@ July. 18th, 2013
 
 ****************************************************************************************************
 *                                                                                                  *
-*                        aflow - STEFANO CURTAROLO Duke University 2003-2020                       *
+*                        aflow - STEFANO CURTAROLO Duke University 2003-2021                       *
 *                            High-Throughput ab-initio Computing Project                           *
 *                                                                                                  *
 ****************************************************************************************************

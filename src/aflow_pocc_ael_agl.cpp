@@ -1,10 +1,10 @@
 //****************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
-// *                Aflow Cormac Toher - Duke University 2013-2020           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
+// *                Aflow Cormac Toher - Duke University 2013-2021           *
 // *                                                                         *
 //****************************************************************************
-// Written by Cormac Toher, 2019-2020.
+// Written by Cormac Toher, 2019-2021.
 //
 // This file provides a framework to calculate thermo-mechanical properties for
 // disordered materials modeled using the POCC algorithm.
@@ -1302,7 +1302,7 @@ namespace pocc {
 
 //****************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
-// *                Aflow Cormac Toher - Duke University 2013-2020           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
+// *                Aflow Cormac Toher - Duke University 2013-2021           *
 // *                                                                         *
 //****************************************************************************

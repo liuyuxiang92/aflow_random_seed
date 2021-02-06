@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
 // *                                                                         *
 // ***************************************************************************
 // Written by Stefano Curtarolo - 2008-2015
@@ -2627,7 +2627,7 @@ namespace aflowlib {
 #endif // _AFLOW_XPROTO_CPP
 // **************************************************************************
 // *                                                                        *
-// *             STEFANO CURTAROLO - Duke University 2003-2020              *
+// *             STEFANO CURTAROLO - Duke University 2003-2021              *
 // *                                                                        *
 // **************************************************************************
 

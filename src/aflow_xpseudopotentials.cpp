@@ -1,9 +1,9 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
 // *                                                                         *
 // ***************************************************************************
-// Written by Stefano Curtarolo - 2007-2020
+// Written by Stefano Curtarolo - 2007-2021
 #ifndef _AFLOW_XPSEUDOPOTENTIAL_CPP
 #define _AFLOW_XPSEUDOPOTENTIAL_CPP
 #include "aflow.h"
@@ -1349,6 +1349,6 @@ bool xPOTCAR_EnthalpyReference_AUID(string AUID,string METAGGA,string& groundsta
 
 // **************************************************************************
 // *                                                                        *
-// *             STEFANO CURTAROLO - Duke University 2003-2020              *
+// *             STEFANO CURTAROLO - Duke University 2003-2021              *
 // *                                                                        *
 // **************************************************************************

@@ -1,7 +1,7 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
-// *            Aflow MARCO ESTERS - Duke University 2017-2020               *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
+// *            Aflow MARCO ESTERS - Duke University 2017-2021               *
 // *                                                                         *
 // ***************************************************************************
 // Written by Marco Esters, 2018. Based on work by Jose J. Plata (AFLOW AAPL,
@@ -1124,7 +1124,7 @@ namespace apl {
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
-// *                Aflow MARCO ESTERS - Duke University 2018-2020           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
+// *                Aflow MARCO ESTERS - Duke University 2018-2021           *
 // *                                                                         *
 // ***************************************************************************

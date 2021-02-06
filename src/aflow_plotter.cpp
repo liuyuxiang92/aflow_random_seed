@@ -1,7 +1,7 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
-// *            Aflow MARCO ESTERS - Duke University 2019-2020               *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
+// *            Aflow MARCO ESTERS - Duke University 2019-2021               *
 // *                                                                         *
 // ***************************************************************************
 // 
@@ -410,7 +410,7 @@ namespace plotter {
     if(LDEBUG) { cerr << soliloquy << " default_title=" << default_title << endl;}
     if (default_title.empty()) return default_title;
     string title="";
-    if (aurostd::substring2bool(default_title, "_ICSD_")) {  // Check if AFLOW ICSD format
+    if (default_title.find("_ICSD_")!=string::npos) {  // Check if AFLOW ICSD format
       vector<string> tokens;
       aurostd::string2tokens(default_title, tokens, "_");
       if (tokens.size() == 3) {
@@ -435,6 +435,9 @@ namespace plotter {
           tokens.erase(tokens.begin() + 3, tokens.end());
         }
       }
+      string comp_str=tokens[0];
+      string::size_type loc=comp_str.find(":"); //remove LIB1 pp junk
+      comp_str=comp_str.substr(0,loc);
       if ((tokens.size() == 2) || (tokens.size() == 3)) {
         string proto = tokens[1];
         if(LDEBUG){cerr << soliloquy << " proto=" << proto << endl;}
@@ -443,7 +446,7 @@ namespace plotter {
         if (aurostd::WithinList(protos, proto)) {
           if(LDEBUG){cerr << soliloquy << " found proto in ANRL" << endl;}
           if (tokens.size() == 3) proto += "." + tokens[2];
-          vector<string> elements = aurostd::getElements(tokens[0]);
+          vector<string> elements = aurostd::getElements(comp_str);
           vector<double> composition = getCompositionFromANRLPrototype(proto);
           if(LDEBUG){
             cerr << soliloquy << " elements=" << aurostd::joinWDelimiter(elements,",") << endl;
@@ -459,7 +462,7 @@ namespace plotter {
           int index;
           if (aurostd::WithinList(protos, proto, index)) {
             proto = aurostd::fixStringLatex(proto, false, false); // Prevent LaTeX errors
-            vector<string> elements = aurostd::getElements(tokens[0]);
+            vector<string> elements = aurostd::getElements(comp_str);
             vector<double> composition = getCompositionFromHTQCPrototype(proto, comp[index]);
             if(LDEBUG){
               cerr << soliloquy << " elements=" << aurostd::joinWDelimiter(elements,",") << endl;
@@ -2910,7 +2913,7 @@ namespace plotter {
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
-// *            Aflow MARCO ESTERS - Duke University 2019-2020               *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
+// *            Aflow MARCO ESTERS - Duke University 2019-2021               *
 // *                                                                         *
 // ***************************************************************************

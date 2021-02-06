@@ -1,6 +1,6 @@
 # ***************************************************************************
 # *                                                                         *
-# *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+# *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
 # *                                                                         *
 # ***************************************************************************
 #
@@ -302,7 +302,7 @@ aflow_library_icsd.dat.xz: $(ICSD_LIB)/README_LIBRARY_ICSD1.TXT $(ICSD_LIB)/READ
 	echo "[README_LIBRARY_ICSD9.TXT]STOP " >> aflow_library_icsd.dat
 	cat aflow_library_icsd.dat |sed "s/WYCK_ICSD/WYC_ICSD/g" |sed "s/  / /g"|sed "s/  / /g"|sed "s/  / /g"|sed "s/  / /g"|sed "s/  / /g" | grep -v "//" > aflow_library_icsd.dat2
 	mv aflow_library_icsd.dat2 aflow_library_icsd.dat
-	xz -9vf aflow_library_icsd.dat
+	xz -9fv -T8 aflow_library_icsd.dat
 	cp -f aflow_library_icsd.dat.xz ../AFLOW3_NONFREE/LIBS
 	cp -f aflow_library_icsd.dat.xz /common/AFLOW/LIBS
 	rm -f aflow_data_*
@@ -310,7 +310,7 @@ aflow_library_icsd.dat.xz: $(ICSD_LIB)/README_LIBRARY_ICSD1.TXT $(ICSD_LIB)/READ
 #	rm -f $(EXTRA_FREE)/NIST/ICSD_List_2014.txt*
 	./aflow --protos_icsd > $(EXTRA_FREE)/NIST/ICSD_List_2014.txt
 	rm -f $(EXTRA_FREE)/NIST/ICSD_List_2014.txt.xz
-	xz -9vf $(EXTRA_FREE)/NIST/ICSD_List_2014.txt
+	xz -9fv -T8 $(EXTRA_FREE)/NIST/ICSD_List_2014.txt
 $(ICSD_LIB)/README_LIBRARY_ICSD1.TXT: Makefile
 	rm -rf $@
 	echo "// ***************************************************************************">>$@
@@ -898,11 +898,11 @@ niet:
 	$(MAKE) backup
 	$(MAKE) icsdclean
 	$(MAKE) -j 32
-	rm -fv aflow_data_calculated.cpp* && $(MAKE) aflow_data_calculated.cpp && cp -f aflow_data_calculated.cpp /www/AFLOW/AFLOW3_FREE/ && xz -9fv /www/AFLOW/AFLOW3_FREE/aflow_data_calculated.cpp
-	rm -fv aflow_data_stokes.cpp* && $(MAKE) aflow_data_stokes.cpp && cp -f aflow_data_stokes.cpp /www/AFLOW/AFLOW3_FREE/ && xz -9fv /www/AFLOW/AFLOW3_FREE/aflow_data_stokes.cpp
-	rm -fv aflow_data_nist.cpp* && $(MAKE) aflow_data_nist.cpp && cp -f aflow_data_nist.cpp /www/AFLOW/AFLOW3_FREE/ && xz -9fv /www/AFLOW/AFLOW3_FREE/aflow_data_nist.cpp
-	rm -fv aflow_matlab_funcs.cpp* && $(MAKE) aflow_matlab_funcs.cpp && cp -f aflow_matlab_funcs.cpp /www/AFLOW/AFLOW3_FREE/ && xz -9fv /www/AFLOW/AFLOW3_FREE/aflow_matlab_funcs.cpp
-	rm -fv aflow_gnuplot_funcs.cpp* && $(MAKE) aflow_gnuplot_funcs.cpp && cp -f aflow_gnuplot_funcs.cpp /www/AFLOW/AFLOW3_FREE/ && xz -9fv /www/AFLOW/AFLOW3_FREE/aflow_gnuplot_funcs.cpp
+	rm -fv aflow_data_calculated.cpp* && $(MAKE) aflow_data_calculated.cpp && cp -f aflow_data_calculated.cpp /www/AFLOW/AFLOW3_FREE/ && xz -9fv -T8 /www/AFLOW/AFLOW3_FREE/aflow_data_calculated.cpp
+	rm -fv aflow_data_stokes.cpp* && $(MAKE) aflow_data_stokes.cpp && cp -f aflow_data_stokes.cpp /www/AFLOW/AFLOW3_FREE/ && xz -9fv -T8 /www/AFLOW/AFLOW3_FREE/aflow_data_stokes.cpp
+	rm -fv aflow_data_nist.cpp* && $(MAKE) aflow_data_nist.cpp && cp -f aflow_data_nist.cpp /www/AFLOW/AFLOW3_FREE/ && xz -9fv -T8 /www/AFLOW/AFLOW3_FREE/aflow_data_nist.cpp
+	rm -fv aflow_matlab_funcs.cpp* && $(MAKE) aflow_matlab_funcs.cpp && cp -f aflow_matlab_funcs.cpp /www/AFLOW/AFLOW3_FREE/ && xz -9fv -T8 /www/AFLOW/AFLOW3_FREE/aflow_matlab_funcs.cpp
+	rm -fv aflow_gnuplot_funcs.cpp* && $(MAKE) aflow_gnuplot_funcs.cpp && cp -f aflow_gnuplot_funcs.cpp /www/AFLOW/AFLOW3_FREE/ && xz -9fv -T8 /www/AFLOW/AFLOW3_FREE/aflow_gnuplot_funcs.cpp
 	dropbox start
 .PHONY: backup
 backup: realclean clean icsdclean 

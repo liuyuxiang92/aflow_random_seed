@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
 // *                                                                         *
 // ***************************************************************************
 // Stefano Curtarolo
@@ -7294,9 +7294,15 @@ namespace pflow {
   string prettyPrintCompound(const vector<string>& vspecies,const xvector<double>& vcomposition,vector_reduction_type vred,bool exclude1,filetype ftype) {  // main function //char mode //CO20190629
     // 2-D, we usually want vred=gcd_vrt true for convex points, and no_vrt elsewhere
     string soliloquy = XPID + "pflow::prettyPrintCompound():";
+    stringstream message;
     uint precision=COEF_PRECISION;
     stringstream output;output.precision(precision);
-    if(vspecies.size()!=(uint)vcomposition.rows) {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"vspecies.size() != vcomposition.rows", _INDEX_MISMATCH_);}
+    if(vspecies.size()!=(uint)vcomposition.rows) {
+      message << "vspecies.size() != vcomposition.rows" << endl;
+      message << "vspecies=" << aurostd::joinWDelimiter(vspecies,",") << endl;
+      message << "vcomposition=" << aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(vcomposition),",") << endl;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message, _INDEX_MISMATCH_);
+    }
     // special case, unary
     if(vspecies.size() == 1) {
       output << vspecies[0];
@@ -7461,7 +7467,7 @@ namespace pflow{
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
 // *                                                                         *
 // ***************************************************************************
 #endif

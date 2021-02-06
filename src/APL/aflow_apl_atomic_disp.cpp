@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
 // *                Aflow PINKU NATH - Duke University 2014-2016             *
 // *                 Aflow MARCO ESTERS - Duke University 2020               *
 // *                                                                         *
@@ -769,7 +769,7 @@ namespace apl {
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
 // *                Aflow PINKU NATH - Duke University 2014-2016             *
 // *            Aflow MARCO ESTERS - Duke University 2020                    *
 // *                                                                         *

@@ -1,7 +1,7 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
-// *                Aflow CORMAC TOHER - Duke University 2013-2020           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
+// *                Aflow CORMAC TOHER - Duke University 2013-2021           *
 // *                                                                         *
 // ***************************************************************************
 // Written by Cormac Toher
@@ -12,7 +12,7 @@
 #include "aflow_ael_elasticity.h"
 
 // ###############################################################################
-//                  AFLOW Automatic Elasticity Library (AEL) (2014-2020)
+//                  AFLOW Automatic Elasticity Library (AEL) (2014-2021)
 // ###############################################################################
 //
 // Uses strain-stress calculations to obtain elastic constants of materials
@@ -306,6 +306,7 @@ namespace AEL_functions {
     string FileNameAFLOWIN = "", FileNameAFLOWINcheck = "", AflowInCheck = "";
     string FileNameMessage = "";
     string aflowinname = "";
+    string stmp="";
     uint aelerror = 0, filelength = 0;
     vector<string> vAflowInCheck;
     ael_aflowin_found = false;
@@ -318,6 +319,7 @@ namespace AEL_functions {
     vaflowins.push_back("agl_aflow.in");
     for(uint iaf=0;iaf<vaflowins.size()&&!ael_aflowin_found;iaf++){
       aflowinname = vaflowins.at(iaf);
+      if(aurostd::EFileExist(directory_LIB+"/"+aflowinname,stmp)&&aurostd::IsCompressed(stmp)){aurostd::UncompressFile(stmp);}  //CO20210204 - fix aflow.in.xz
       if((!ael_aflowin_found) && (aurostd::FileExist(directory_LIB+"/"+aflowinname))) {
         FileNameAFLOWINcheck = directory_LIB+"/"+aflowinname;
         // [OBSOLETE] FileAFLOWINcheck.open(FileNameAFLOWINcheck.c_str(),std::ios::in);
@@ -1377,7 +1379,7 @@ namespace AEL_functions {
 #endif  // _AFLOW_AEL_GET_STRESS_CPP
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
-// *                Aflow CORMAC TOHER - Duke University 2013-2020           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
+// *                Aflow CORMAC TOHER - Duke University 2013-2021           *
 // *                                                                         *
 // ***************************************************************************

@@ -1,7 +1,7 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
-// *                Aflow CORMAC TOHER - Duke University 2013-2020           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
+// *                Aflow CORMAC TOHER - Duke University 2013-2021           *
 // *                                                                         *
 // ***************************************************************************
 // Written by Cormac Toher
@@ -16,7 +16,7 @@
 // [OBSOLETE] #define LIB2RAW_FIX_THIS_LATER FALSE // Not needed anymore due to "--quiet" option in lib2lib
 
 // ###############################################################################
-//                  AFLOW Automatic Elasticity Library (AEL) (2014-2020)
+//                  AFLOW Automatic Elasticity Library (AEL) (2014-2021)
 // ###############################################################################
 //
 // Uses strain-stress calculations to obtain elastic constants of materials
@@ -2971,7 +2971,7 @@ namespace AEL_functions {
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
-// *                Aflow CORMAC TOHER - Duke University 2013-2020           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
+// *                Aflow CORMAC TOHER - Duke University 2013-2021           *
 // *                                                                         *
 // ***************************************************************************

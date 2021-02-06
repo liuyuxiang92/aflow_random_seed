@@ -1,11 +1,11 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
-// *           Aflow DAVID HICKS - Duke University 2014-2020                 *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
+// *           Aflow DAVID HICKS - Duke University 2014-2021                 *
 // *                                                                         *
 // ***************************************************************************
 // Written by Stefano Curtarolo - 2016
-// Written by David Hicks (DX) - 2016-2020 (generic prototype generator)
+// Written by David Hicks (DX) - 2016-2021 (generic prototype generator)
 
 #ifndef _AFLOW_ANRL_CPP
 #define _AFLOW_ANRL_CPP
@@ -6937,7 +6937,7 @@ namespace anrl {
 // Written by David Hicks (DX) - 2016/2020 (generic prototype generator)
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
-// *           Aflow DAVID HICKS - Duke University 2014-2020                 *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
+// *           Aflow DAVID HICKS - Duke University 2014-2021                 *
 // *                                                                         *
 // ***************************************************************************

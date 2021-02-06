@@ -1,7 +1,7 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
-// *                Aflow CORMAC TOHER - Duke University 2013-2020           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
+// *                Aflow CORMAC TOHER - Duke University 2013-2021           *
 // *                                                                         *
 // ***************************************************************************
 // Written by Cormac Toher
@@ -13,7 +13,7 @@
 
 
 // ###############################################################################
-//                  AFLOW Automatic GIBBS Library (AGL) (2013-2020)
+//                  AFLOW Automatic GIBBS Library (AGL) (2013-2021)
 // ###############################################################################
 //
 // Uses quasi-harmonic Debye model to obtain thermodynamic properties of materials
@@ -258,6 +258,7 @@ namespace AGL_functions {
     string FileNameAFLOWIN = "", FileNameAFLOWINcheck = "", AflowInCheck = "";
     string FileNameMessage = "";
     string aflowinname = "";
+    string stmp="";
     uint aglerror = 0, filelength = 0;
     vector<string> vAflowInCheck;
     agl_aflowin_found = false;
@@ -267,6 +268,7 @@ namespace AGL_functions {
     vaflowins.push_back("agl_aflow.in");  // Otherwise, check for other commonly used names for AGL aflow.in file
     for(uint iaf=0;iaf<vaflowins.size()&&!agl_aflowin_found;iaf++){
       aflowinname = vaflowins.at(iaf);
+      if(aurostd::EFileExist(directory_LIB+"/"+aflowinname,stmp)&&aurostd::IsCompressed(stmp)){aurostd::UncompressFile(stmp);}  //CO20210204 - fix aflow.in.xz
       if((!agl_aflowin_found) && (aurostd::FileExist(directory_LIB+"/"+aflowinname))) {
         FileNameAFLOWINcheck = directory_LIB+"/"+aflowinname;
         // [OBSOLETE] FileAFLOWINcheck.open(FileNameAFLOWINcheck.c_str(),std::ios::in);
@@ -1087,7 +1089,7 @@ namespace AGL_functions {
 #endif  // _AFLOW_AGL_GET_EV_CPP
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
-// *                Aflow CORMAC TOHER - Duke University 2013-2020           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
+// *                Aflow CORMAC TOHER - Duke University 2013-2021           *
 // *                                                                         *
 // ***************************************************************************
