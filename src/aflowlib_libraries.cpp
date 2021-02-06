@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
 // *                                                                         *
 // ***************************************************************************
 // Stefano Curtarolo
@@ -1217,6 +1217,8 @@ namespace aflowlib {
     // override for the web
     //    if(PROJECT_LIBRARY==init::AFLOW_Projects_Directories("ICSD")) directory_WEB=aurostd::CleanFileName(PROJECT_AFLOWLIB_WEB);
 
+    string stmp="";
+    if(aurostd::EFileExist(directory_LIB+"/"+_AFLOWIN_,stmp)&&aurostd::IsCompressed(stmp)){aurostd::UncompressFile(stmp);}  //CO20210204 - fix aflow.in.xz
     if(!aurostd::FileExist(directory_LIB+"/"+_AFLOWIN_)) {
       cout << soliloquy << " FOUND Project= " << XHOST.hostname << ": " << PROJECT_LIBRARY << endl;
       cout << soliloquy << " directory does not exist: " << directory_LIB << endl;
@@ -6954,6 +6956,7 @@ namespace aflowlib {
     bool qha_aflowin_found = false; //AS20200901
     string AflowInName = _AFLOWIN_;
     string FileLockName = _AFLOWLOCK_;
+    string stmp="";
     vector<string> vAflowInName, vFileLockName;
 
     //[CO20200624 - OBSOLETE]if(pocc::structuresGenerated(directory_LIB)){KBIN::VASP_RunPOCC(directory_LIB);}  //CO20200624
@@ -6966,11 +6969,15 @@ namespace aflowlib {
         else if(aurostd::FileExist(directory_LIB+"/"+_AFLOWLOCK_+".OLD")){aurostd::file2file(directory_LIB+"/"+_AFLOWLOCK_+".OLD",directory_LIB+"/"+_AFLOWLOCK_+".pocc.preprocessing");}
         else if(aurostd::FileExist(directory_LIB+"/"+_AFLOWLOCK_)){aurostd::file2file(directory_LIB+"/"+_AFLOWLOCK_,directory_LIB+"/"+_AFLOWLOCK_+".pocc.preprocessing");}
       }
+      AflowInName = _AFLOWIN_;
+      if(aurostd::EFileExist(directory_LIB+"/"+AflowInName,stmp)&&aurostd::IsCompressed(stmp)){aurostd::UncompressFile(stmp);}  //CO20210204 - fix aflow.in.xz
       vAflowInName.push_back(AflowInName); //AS20200915
+      FileLockName = _AFLOWLOCK_;
+      if(aurostd::EFileExist(directory_LIB+"/"+FileLockName,stmp)&&aurostd::IsCompressed(stmp)){aurostd::UncompressFile(stmp);} //CO20210204 - fix LOCK.xz
       vFileLockName.push_back(FileLockName); //AS20200915
     } else {
       // [OBSOLETE] else if(aurostd::FileExist(directory_LIB+"/agl_aflow.in"))
-      AGL_functions::AGL_Get_AflowInName(AflowInName, directory_LIB, agl_aflowin_found); //CT20200713 Call function to find correct aflow.in file name
+      AGL_functions::AGL_Get_AflowInName(AflowInName, directory_LIB, agl_aflowin_found); //CT20200713 Call function to find correct aflow.in file name  //CO20210204 - fix aflow.in.xz inside
       if (agl_aflowin_found) {
         run_directory=true;
         for(uint iext=0;iext<XHOST.vext.size();iext++) {
@@ -6993,12 +7000,14 @@ namespace aflowlib {
           aurostd::RemoveFile(directory_LIB+"/AEL_energy_structures.json"+XHOST.vext.at(iext));
         }
         // CORMAC FIX BELOW I NEED TO COMMENT TO RUN THE agl_aflow.in containing only statics.
-        if(aurostd::FileExist(directory_LIB+"/agl.LOCK")) {
-          // [OBSOLETE] aurostd::file2file(directory_LIB+"/agl.LOCK",directory_LIB+"/agl.LOCK.run");   // LINK
-          // [OBSOLETE] aurostd::CopyFile(directory_LIB+"/agl.LOCK",directory_LIB+"/agl.LOCK.run");   // LINK
-          // [OBSOLETE] aurostd::RemoveFile(directory_LIB+"/agl.LOCK");   //ME20191105 - otherwise aflow will not run
-          FileLockName = "agl.LOCK";
-        }
+        FileLockName = "agl.LOCK";  //CO20210204 - reset from before
+        if(aurostd::EFileExist(directory_LIB+"/"+FileLockName,stmp)&&aurostd::IsCompressed(stmp)){aurostd::UncompressFile(stmp);} //CO20210204 - fix LOCK.xz
+        //[CO20210204 - OBSOLETE, force it to be agl.LOCK]if(aurostd::FileExist(directory_LIB+"/agl.LOCK")) {
+        //[CO20210204 - OBSOLETE, force it to be agl.LOCK]  // [OBSOLETE] aurostd::file2file(directory_LIB+"/agl.LOCK",directory_LIB+"/agl.LOCK.run");   // LINK
+        //[CO20210204 - OBSOLETE, force it to be agl.LOCK]  // [OBSOLETE] aurostd::CopyFile(directory_LIB+"/agl.LOCK",directory_LIB+"/agl.LOCK.run");   // LINK
+        //[CO20210204 - OBSOLETE, force it to be agl.LOCK]  // [OBSOLETE] aurostd::RemoveFile(directory_LIB+"/agl.LOCK");   //ME20191105 - otherwise aflow will not run
+        //[CO20210204 - OBSOLETE, force it to be agl.LOCK]  FileLockName = "agl.LOCK";
+        //[CO20210204 - OBSOLETE, force it to be agl.LOCK]}
         // [OBSOLETE] if(aurostd::FileExist(directory_LIB+"/agl_aflow.in")) {
         // [OBSOLETE]  AflowInName="agl_aflow.in";
         // [OBSOLETE] }
@@ -7010,7 +7019,7 @@ namespace aflowlib {
         vFileLockName.push_back(FileLockName); //AS20200904
       } else {
         // Check for AEL input file
-        AEL_functions::AEL_Get_AflowInName(AflowInName, directory_LIB, ael_aflowin_found); //CT20200715 Call function to find correct aflow.in file name
+        AEL_functions::AEL_Get_AflowInName(AflowInName, directory_LIB, ael_aflowin_found); //CT20200715 Call function to find correct aflow.in file name  //CO20210204 - fix aflow.in.xz inside
         if (ael_aflowin_found) {
           run_directory=true;
           for(uint iext=0;iext<XHOST.vext.size();iext++) {
@@ -7021,11 +7030,13 @@ namespace aflowlib {
             aurostd::RemoveFile(directory_LIB+"/AEL_energy_structures.json"+XHOST.vext.at(iext));
           }
           // if(_AFLOWIN_=="aflow.in")
-          if(aurostd::FileExist(directory_LIB+"/ael.LOCK")) {
-            //[CO20200624 - do later]aurostd::CopyFile(directory_LIB+"/ael.LOCK",directory_LIB+"/ael.LOCK.run");   // LINK
-            //[CO20200624 - do later]aurostd::RemoveFile(directory_LIB+"/ael.LOCK");   //ME20191105 - otherwise aflow will not run
-            FileLockName = "ael.LOCK";
-          }
+          FileLockName = "ael.LOCK";  //CO20210204 - reset from before
+          if(aurostd::EFileExist(directory_LIB+"/"+FileLockName,stmp)&&aurostd::IsCompressed(stmp)){aurostd::UncompressFile(stmp);} //CO20210204 - fix LOCK.xz
+          //[CO20210204 - OBSOLETE, force it to be ael.LOCK]if(aurostd::FileExist(directory_LIB+"/ael.LOCK")) {
+          //[CO20210204 - OBSOLETE, force it to be ael.LOCK]  //[CO20200624 - do later]aurostd::CopyFile(directory_LIB+"/ael.LOCK",directory_LIB+"/ael.LOCK.run");   // LINK
+          //[CO20210204 - OBSOLETE, force it to be ael.LOCK]  //[CO20200624 - do later]aurostd::RemoveFile(directory_LIB+"/ael.LOCK");   //ME20191105 - otherwise aflow will not run
+          //[CO20210204 - OBSOLETE, force it to be ael.LOCK]  FileLockName = "ael.LOCK";
+          //[CO20210204 - OBSOLETE, force it to be ael.LOCK]}
           // [OBSOLETE] if(aurostd::FileExist(directory_LIB+"/ael_aflow.in")) {
           // [OBSOLETE]  AflowInName="ael_aflow.in";
           // [OBSOLETE] }
@@ -7051,9 +7062,9 @@ namespace aflowlib {
         aurostd::RemoveFile(directory_LIB+"/"+DEFAULT_SCQHA_FILE_PREFIX+"*");
         aurostd::RemoveFile(directory_LIB+"/*qha*png*");
 
-        if(aurostd::FileExist(directory_LIB+"/LOCK.qha")) {
-          FileLockName = "LOCK.qha";
-        }
+        FileLockName = "LOCK.qha";  //CO20210204 - reset from before
+        if(aurostd::EFileExist(directory_LIB+"/"+FileLockName,stmp)&&aurostd::IsCompressed(stmp)){aurostd::UncompressFile(stmp);} //CO20210204 - fix LOCK.xz
+        //[CO20210204 - OBSOLETE, force it to be LOCK.qha]if(aurostd::FileExist(directory_LIB+"/LOCK.qha")) {FileLockName = "LOCK.qha";}
 
         // AS20200904
         // save for later since we will need to loop among all possible submodules, 

@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
 // *                                                                         *
 // ***************************************************************************
 // Stefano Curtarolo
@@ -2050,6 +2050,6 @@ void xStream::initialize(ofstream& ofs,ostream& oss) {
 
 // **************************************************************************
 // *                                                                        *
-// *             STEFANO CURTAROLO - Duke University 2003-2020              *
+// *             STEFANO CURTAROLO - Duke University 2003-2021              *
 // *                                                                        *
 // **************************************************************************

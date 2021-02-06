@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
 // *                                                                         *
 // ***************************************************************************
 // Written by Andriy Smolyanyuk (andriy.smolyanyuk@duke.edu)
@@ -3397,6 +3397,7 @@ namespace apl{
   {
     bool qha_aflowin_is_found = false;
     vector<string> vaflowins;
+    string stmp="";
     if (!AflowInName.empty()) vaflowins.push_back(AflowInName);
     if (!_AFLOWIN_.empty()) vaflowins.push_back(_AFLOWIN_);
     vaflowins.push_back(QHA_AFLOWIN_DEFAULT);
@@ -3405,6 +3406,7 @@ namespace apl{
     for (uint i=0; i<vaflowins.size(); i++){
       aflowin_name = vaflowins[i];
       fullpath_aflowin_name = directory_LIB + '/' + aflowin_name;
+      if(aurostd::EFileExist(fullpath_aflowin_name,stmp)&&aurostd::IsCompressed(stmp)){aurostd::UncompressFile(stmp);}  //CO20210204 - fix aflow.in.xz
       if (aurostd::FileExist(fullpath_aflowin_name)){
         aflowin = aurostd::file2string(fullpath_aflowin_name);
         if (aflowin.empty()) continue;

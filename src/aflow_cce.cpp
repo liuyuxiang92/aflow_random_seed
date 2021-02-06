@@ -1,7 +1,7 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
-// *           Aflow RICO FRIEDRICH - Duke University 2018-2020              *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
+// *           Aflow RICO FRIEDRICH - Duke University 2018-2021              *
 // *                                                                         *
 // ***************************************************************************
 // Written by Rico Friedrich, Corey Oses, and Marco Esters
@@ -3236,7 +3236,7 @@ namespace cce {
   string print_usage() {
     stringstream oss;
     oss << endl;
-    oss << "Written by Rico Friedrich, Corey Oses, and Marco Esters, 2018-2020" << endl;
+    oss << "Written by Rico Friedrich, Corey Oses, and Marco Esters, 2018-2021" << endl;
     oss << endl;
     oss << "USER INSTRUCTIONS:" << endl;
     oss << endl;
@@ -3602,7 +3602,7 @@ namespace cce {
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
-// *           Aflow RICO FRIEDRICH - Duke University 2018-2020              *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
+// *           Aflow RICO FRIEDRICH - Duke University 2018-2021              *
 // *                                                                         *
 // ***************************************************************************

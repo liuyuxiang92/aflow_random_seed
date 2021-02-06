@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
 // *                                                                         *
 // ***************************************************************************
 // Stefano Curtarolo
@@ -389,6 +389,6 @@ bool KBIN_MATLAB_Directory(ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags
 
 // **************************************************************************
 // *                                                                        *
-// *             STEFANO CURTAROLO - Duke University 2003-2020              *
+// *             STEFANO CURTAROLO - Duke University 2003-2021              *
 // *                                                                        *
 // **************************************************************************

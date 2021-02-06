@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
 // *                                                                         *
 // ***************************************************************************
 // Stefano Curtarolo
@@ -1886,10 +1886,10 @@ namespace aurostd {
     //Will determine zipped extension
     string extension="";
     if(!IsCompressed(CompressedFileName)) {return extension;}
-    if(substring2bool(CompressedFileName,".xz"))  {return ".xz";}
-    if(substring2bool(CompressedFileName,".bz2")) {return ".bz2";}
-    if(substring2bool(CompressedFileName,".gz"))  {return ".gz";}
-    if(substring2bool(CompressedFileName,".zip")) {return ".zip";}
+    if(CompressedFileName.find(".xz")!=string::npos)  {return ".xz";}
+    if(CompressedFileName.find(".bz2")!=string::npos) {return ".bz2";}
+    if(CompressedFileName.find(".gz")!=string::npos)  {return ".gz";}
+    if(CompressedFileName.find(".zip")!=string::npos) {return ".zip";}
     return extension;
   }
   //CO END
@@ -1904,35 +1904,35 @@ namespace aurostd {
       if(!aurostd::IsCommandAvailable("bzip2")) {
         cerr << "ERROR - aurostd::UncompressFile: command \"bzip2\" is necessary !" << endl;
         return FALSE; }   
-      if(aurostd::substring2bool(file,".bz2")) aurostd::execute("bzip2 -dqf \""+file+"\"");
+      if(file.find(".bz2")!=string::npos) aurostd::execute("bzip2 -dqf \""+file+"\"");
     }
     if(command=="xunzip" || command=="xz" || command==".xz") {
       if(!aurostd::IsCommandAvailable("xz")) {
         cerr << "ERROR - aurostd::UncompressFile: command \"xz\" is necessary !" << endl;
         return FALSE; }   
-      if(aurostd::substring2bool(file,".xz")) aurostd::execute("xz -dqf \""+file+"\"");
+      if(file.find(".xz")!=string::npos) aurostd::execute("xz -dqf \""+file+"\"");
     }
     if(command=="gunzip" || command=="gzip" || command=="gz"  || command==".gz") {
       if(!aurostd::IsCommandAvailable("gzip")) {
         cerr << "ERROR - aurostd::UncompressFile: command \"gzip\" is necessary !" << endl;
         return FALSE; }   
-      if(aurostd::substring2bool(file,".gz")) aurostd::execute("gzip -dqf \""+file+"\"");
+      if(file.find(".gz")!=string::npos) aurostd::execute("gzip -dqf \""+file+"\"");
     }
     if(command=="unzip" || command=="zip" || command==".zip") {
       if(!aurostd::IsCommandAvailable("unzip")) {
         cerr << "ERROR - aurostd::UnzipFile: command \"unzip\" is necessary !" << endl;
         return FALSE;
       }
-      if(aurostd::substring2bool(file,".zip")) aurostd::execute("unzip -qo \""+file+"\"");
+      if(file.find(".zip")!=string::npos) aurostd::execute("unzip -qo \""+file+"\"");
     }
     return TRUE;
   }
   bool UncompressFile(const string& _file) {  // "" compliant SC20190401
     string file(CleanFileName(_file));
-    if(substring2bool(file,".xz"))  {return UncompressFile(file,"xz");}
-    if(substring2bool(file,".bz2")) {return UncompressFile(file,"bzip2");}
-    if(substring2bool(file,".gz"))  {return UncompressFile(file,"gzip");}
-    if(substring2bool(file,".zip")) {return UncompressFile(file,"zip");}
+    if(file.find(".xz")!=string::npos)  {return UncompressFile(file,"xz");}
+    if(file.find(".bz2")!=string::npos) {return UncompressFile(file,"bzip2");}
+    if(file.find(".gz")!=string::npos)  {return UncompressFile(file,"gzip");}
+    if(file.find(".zip")!=string::npos) {return UncompressFile(file,"zip");}
     return FALSE;
   }
 
@@ -1945,7 +1945,7 @@ namespace aurostd {
         return FALSE;
       }   
       // [OBSOLETE]     if(FileExist(file+".bz2")) {aurostd::execute("rm -f \""+file+".bz2\"");}
-      if(!aurostd::substring2bool(file,".bz2")) aurostd::execute("bzip2 -9qf \""+file+"\"");
+      if(file.find(".bz2")==string::npos) aurostd::execute("bzip2 -9qf \""+file+"\"");
       return TRUE;
     }
     if(aurostd::substring2bool(command,"xz") || aurostd::substring2bool(command,"xzip") || aurostd::substring2bool(command,".xz")) {
@@ -1955,7 +1955,7 @@ namespace aurostd {
       }   
       // [OBSOLETE]     if(FileExist(file+".xz")) {aurostd::execute("rm -f \""+file+".xz\"");}
       //    cerr << "aurostd::CompressFile XZ  FileName=[" << FileName << "]  command=[" << command << "]" << endl;
-      if(!aurostd::substring2bool(file,".xz")) aurostd::execute("xz -9qf -q \""+file+"\""); // twice -q to avoid any verbosity
+      if(file.find(".xz")==string::npos) aurostd::execute("xz -9qf -q \""+file+"\""); // twice -q to avoid any verbosity
       return TRUE;
     }
     if(aurostd::substring2bool(command,"gzip") || aurostd::substring2bool(command,"gz") || aurostd::substring2bool(command,".gz")) {
@@ -1964,7 +1964,7 @@ namespace aurostd {
         return FALSE;
       }   
       // [OBSOLETE]     if(FileExist(file+".gz")) {aurostd::execute("rm -f \""+file+".gz\"");}
-      if(!aurostd::substring2bool(file,".gz")) aurostd::execute("gzip -9qf \""+file+"\"");
+      if(file.find(".gz")==string::npos) aurostd::execute("gzip -9qf \""+file+"\"");
       return TRUE;
     }
     if(aurostd::substring2bool(command,"zip") || aurostd::substring2bool(command,".zip")) {
@@ -1974,7 +1974,7 @@ namespace aurostd {
       }
       // [OBSOLETE]     if(FileExist(file+".zip")) {cerr << file << ".zip" << endl;}
       if(FileExist(file+".zip")) {aurostd::execute("rm -f \""+file+".zip\"");}
-      if(!aurostd::substring2bool(file,".zip")) aurostd::execute("zip -9qm \""+file+".zip\" \""+file+"\"");
+      if(file.find(".zip")==string::npos) aurostd::execute("zip -9qm \""+file+".zip\" \""+file+"\"");
       return TRUE;
     }
     return FALSE;
@@ -7148,6 +7148,6 @@ namespace aurostd {
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
 // *                                                                         *
 // ***************************************************************************
