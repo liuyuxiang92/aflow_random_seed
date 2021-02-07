@@ -258,6 +258,7 @@ namespace AGL_functions {
     string FileNameAFLOWIN = "", FileNameAFLOWINcheck = "", AflowInCheck = "";
     string FileNameMessage = "";
     string aflowinname = "";
+    string stmp="";
     uint aglerror = 0, filelength = 0;
     vector<string> vAflowInCheck;
     agl_aflowin_found = false;
@@ -267,6 +268,7 @@ namespace AGL_functions {
     vaflowins.push_back("agl_aflow.in");  // Otherwise, check for other commonly used names for AGL aflow.in file
     for(uint iaf=0;iaf<vaflowins.size()&&!agl_aflowin_found;iaf++){
       aflowinname = vaflowins.at(iaf);
+      if(aurostd::EFileExist(directory_LIB+"/"+aflowinname,stmp)&&aurostd::IsCompressed(stmp)){aurostd::UncompressFile(stmp);}  //CO20210204 - fix aflow.in.xz
       if((!agl_aflowin_found) && (aurostd::FileExist(directory_LIB+"/"+aflowinname))) {
         FileNameAFLOWINcheck = directory_LIB+"/"+aflowinname;
         // [OBSOLETE] FileAFLOWINcheck.open(FileNameAFLOWINcheck.c_str(),std::ios::in);

@@ -1,8 +1,8 @@
 ********************************************************************************
-*                                                                              *
-*             Aflow STEFANO CURTAROLO - Duke University 2003-2021              *
-*                High-Throughput ab-initio Materials Discovery                 *
-*                                                                              *
+*                                                                                                                     *
+*             Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
+*                High-Throughput ab-initio Materials Discovery                          *
+*                                                                                                                     *
 ********************************************************************************
 LATEST VERSION OF THE FILE:        materials.duke.edu/AFLOW/README_AFLOW_AGL.TXT
 ********************************************************************************
