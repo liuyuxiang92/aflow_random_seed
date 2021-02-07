@@ -413,11 +413,7 @@ namespace compare {
       prototypes_final = xtal_finder.compareStructuresFromDirectory(directory, magmoms_for_systems, xtal_finder.num_proc, same_species, comparison_options); //DX20200103 - condensed booleans to xoptions
     }
     else if(structures_source=="string") {  // ME20210205
-      // Convert to stringstream to avoid ambiguous overloading and to use
-      // common load functions with file
-      stringstream structures;
-      structures << structures_string;
-      prototypes_final = xtal_finder.compareStructuresFromStringstream(structures, magmoms_for_systems, xtal_finder.num_proc, same_species, comparison_options);
+      prototypes_final = xtal_finder.compareStructuresFromString(structures_string, magmoms_for_systems, xtal_finder.num_proc, same_species, comparison_options);
     }
     if(structures_source=="file") {
       prototypes_final = xtal_finder.compareStructuresFromFile(filename, magmoms_for_systems, xtal_finder.num_proc, same_species, comparison_options); //DX20200103 - condensed booleans to xoptions
@@ -1741,8 +1737,8 @@ vector<StructurePrototype> XtalFinderCalculator::compareStructuresFromFile(
 // ***************************************************************************
 // XtalFinderCalculator::compareStructuresFromString() //ME20201206
 // ***************************************************************************
-vector<StructurePrototype> XtalFinderCalculator::compareStructuresFromStringstream(
-    stringstream& structures,
+vector<StructurePrototype> XtalFinderCalculator::compareStructuresFromString(
+    const string& structures_string,
     vector<string>& magmoms_for_systems,
     uint num_proc,
     bool same_species,
@@ -1754,6 +1750,8 @@ vector<StructurePrototype> XtalFinderCalculator::compareStructuresFromStringstre
 
   // ---------------------------------------------------------------------------
   // load structures in string
+  stringstream structures;
+  structures << structures_string;
   loadStructuresFromStringstream(structures,
       magmoms_for_systems,
       same_species);
