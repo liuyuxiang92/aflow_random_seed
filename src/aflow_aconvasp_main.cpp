@@ -64,6 +64,11 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     //DX20170921 - MAGNETIC SYMMETRY - START
     vpflow.args2addattachedscheme(argv,cmds,"SYMMETRY::MAGNETIC","--mag=|--magnetic=|--magmom=",""); //DX20170803
     //DX20170921 - MAGNETIC SYMMETRY - END
+    // ME20210206 - web mode
+    if (XHOST.vflag_control.flag("WWW")) {
+      vpflow.flag("SYMMETRY::SCREEN_ONLY", true);
+      XHOST.QUIET = true;
+    }
   }
   //DX20170818 - Added tolerance and no_scan options to Xgroups - END
   vpflow.flag("AGROUP2",aurostd::args2flag(argv,cmds,"--sitepointgroup2|--agroup2"));
@@ -436,6 +441,11 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     vpflow.flag("COMPARE::SCREEN_ONLY",aurostd::args2flag(argv,cmds,"--screen_only")); //DX20170803
     vpflow.flag("COMPARE::ICSD_COMPARISON",aurostd::args2flag(argv,cmds,"--ICSD")); //DX20190201
     vpflow.flag("COMPARE::DO_NOT_CALCULATE_UNIQUE_PERMUTATIONS",aurostd::args2flag(argv,cmds,"--ignore_atom_decoration_comparison|--ignore_decoration_comparison|--ignore_decorations")); //DX20190424
+    // ME20210206 - web mode
+    if (XHOST.vflag_control.flag("WWW")) {
+      vpflow.flag("COMPARE::SCREEN_ONLY", true);
+      XHOST.QUIET = true;
+    }
   }
 
   if(vpflow.flag("COMPARE_DATABASE_ENTRIES")) {
@@ -558,6 +568,11 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     //DX20170921 - MAGNETIC SYMMETRY - START
     vpflow.args2addattachedscheme(argv,cmds,"SYMMETRY::MAGNETIC","--mag=|--magnetic=|--magmom=",""); //DX20170803
     //DX20170921 - MAGNETIC SYMMETRY - END
+    // ME20210206 - web mode
+    if (XHOST.vflag_control.flag("WWW")) {
+      vpflow.flag("SYMMETRY::SCREEN_ONLY", true);
+      XHOST.QUIET = true;
+    }
   }
   //DX20170818 - Added tolerance and no_scan options to Xgroups - END
 
@@ -786,6 +801,11 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
       vpflow.args2addattachedscheme(argv,cmds,"SYMMETRY::TOLERANCE","--pointgroup=|--pgroup=",""); //DX20200907 - default is system specific, leaving empty
     }
     vpflow.flag("SYMMETRY::SCREEN_ONLY",aurostd::args2flag(argv,cmds,"--screen_only")); //DX20170803
+    // ME20210206 - web mode
+    if (XHOST.vflag_control.flag("WWW")) {
+      vpflow.flag("SYMMETRY::SCREEN_ONLY", true);
+      XHOST.QUIET = true;
+    }
   }
   //DX20170818 - Added tolerance and no_scan options to Xgroups - END
   //DX20170818 [OBSOLETE] vpflow.flag("PGROUPX",aurostd::args2flag(argv,cmds,"--pointgroup_crystal|--pgroup_crystal|--pgroup_xtal|--pgroupx|--pgroupX"));
@@ -800,6 +820,11 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     //DX20170921 - MAGNETIC SYMMETRY - START
     vpflow.args2addattachedscheme(argv,cmds,"SYMMETRY::MAGNETIC","--mag=|--magnetic=|--magmom=",""); //DX20170803
     //DX20170921 - MAGNETIC SYMMETRY - END
+    // ME20210206 - web mode
+    if (XHOST.vflag_control.flag("WWW")) {
+      vpflow.flag("SYMMETRY::SCREEN_ONLY", true);
+      XHOST.QUIET = true;
+    }
   }
   //DX20170818 - Added tolerance and no_scan options to Xgroups - END
   //DX20170818 [OBSOLETE] vpflow.flag("PGROUPK",aurostd::args2flag(argv,cmds,"--pointgroupklattice|--pgroupk"));
@@ -811,6 +836,11 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
       vpflow.args2addattachedscheme(argv,cmds,"SYMMETRY::TOLERANCE","--pointgroupklattice=|--pgroupk=",""); //DX20200907 - default is system specific, leaving empty
     }
     vpflow.flag("SYMMETRY::SCREEN_ONLY",aurostd::args2flag(argv,cmds,"--screen_only")); //DX20170803
+    // ME20210206 - web mode
+    if (XHOST.vflag_control.flag("WWW")) {
+      vpflow.flag("SYMMETRY::SCREEN_ONLY", true);
+      XHOST.QUIET = true;
+    }
   }
   //DX20170818 - Added tolerance and no_scan options to Xgroups - END
   //DX20200206 - add Patterson symmetry - START 
@@ -821,6 +851,11 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
       vpflow.args2addattachedscheme(argv,cmds,"SYMMETRY::TOLERANCE","--pointgroupk_Patterson=|--pgroupk_Patterson=",""); //DX20200907 - default is system specific, leaving empty
     }
     vpflow.flag("SYMMETRY::SCREEN_ONLY",aurostd::args2flag(argv,cmds,"--screen_only")); //DX20170803
+    // ME20210206 - web mode
+    if (XHOST.vflag_control.flag("WWW")) {
+      vpflow.flag("SYMMETRY::SCREEN_ONLY", true);
+      XHOST.QUIET = true;
+    }
   }
   //DX20200206 - add Patterson symmetry - END 
   //DX20171205 - Added pgroupk_xtal - START
@@ -831,6 +866,11 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
       vpflow.args2addattachedscheme(argv,cmds,"SYMMETRY::TOLERANCE","--pointgroupkcrystal=|--pgroupk_xtal=",""); //DX20200907 - default is system specific, leaving empty
     }
     vpflow.flag("SYMMETRY::SCREEN_ONLY",aurostd::args2flag(argv,cmds,"--screen_only")); //DX20170803
+    // ME20210206 - web mode
+    if (XHOST.vflag_control.flag("WWW")) {
+      vpflow.flag("SYMMETRY::SCREEN_ONLY", true);
+      XHOST.QUIET = true;
+    }
   }
   //DX20171205 - Added pgroupk_xtal - END
   vpflow.flag("PLANEDENS",aurostd::args2flag(argv,cmds,"--planedens") && argv.at(1)=="--planedens");
@@ -1567,7 +1607,14 @@ namespace pflow {
       if(vpflow.flag("CLEAVAGE_ENERGY")) {pflow::CleavageEnergyCalculation(vpflow,cin); _PROGRAMRUN=true;} //CO20190520
       //DX20190425 START
       if(vpflow.flag("COMPARE_DATABASE_ENTRIES")) {cout << compare::compareDatabaseEntries(vpflow); _PROGRAMRUN=true;}
-      if(vpflow.flag("COMPARE_MATERIAL") || vpflow.flag("COMPARE_STRUCTURE")){ cout << compare::compareInputStructures(vpflow); _PROGRAMRUN=true;}
+      if(vpflow.flag("COMPARE_MATERIAL") || vpflow.flag("COMPARE_STRUCTURE")){
+        // ME20210206 - Web mode: read files list from stdin
+        if (XHOST.vflag_control.flag("WWW")) {
+          cout << compare::compareInputStructures(vpflow, cin); _PROGRAMRUN=true;
+        } else {
+          cout << compare::compareInputStructures(vpflow); _PROGRAMRUN=true;
+        }
+      }
       //DX20190425 END
       if(vpflow.flag("COMPARE_PERMUTATION")) {cout << compare::compareAtomDecorations(cin,vpflow); _PROGRAMRUN=true;} //DX20190201
       if(vpflow.flag("GFA::INIT")){pflow::GLASS_FORMING_ABILITY(vpflow); _PROGRAMRUN=true;} //DF20190329 - GFA

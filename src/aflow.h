@@ -1469,7 +1469,7 @@ bool sortWyckoffByType(const wyckoffsite_ITC& a, const wyckoffsite_ITC& b); // s
 class xstructure {
   public:
     // constructors/destructors                                   // --------------------------------------
-    xstructure(string="");                                        // constructor default
+    xstructure(const string& title="");                           // constructor default
     xstructure(const xstructure& b);                              // constructor copy
     xstructure(istream& input,int=IOVASP_POSCAR);                 // constructor from istream
     xstructure(ifstream& input,int=IOVASP_POSCAR);                // constructor from ifstream

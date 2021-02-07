@@ -2472,7 +2472,7 @@ void xstructure::free() { //DX20191220 - moved all initializations from constuct
 }
 
 // Constructors
-xstructure::xstructure(string structure_title) {
+xstructure::xstructure(const string& structure_title) {
   free(); //DX20191220 - moved contents below into free()
   title=structure_title;
 }
