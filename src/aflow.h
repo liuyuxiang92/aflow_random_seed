@@ -568,6 +568,7 @@ extern _XHOST XHOST; // this will be global
 // Structures for flags and properties to share FAST !
 // STRUCTURES
 #define AFLOWIN_SEPARATION_LINE  string("[AFLOW] ************************************************************************************************************************** ")
+#define AFLOWIN_SEPARATION_LINE_SHORT  string("[AFLOW] ********************************************************************************************")  // ME20210208 - Same length as banner
 
 // --------------------------------------------------------------------------
 // general flags to run aflow

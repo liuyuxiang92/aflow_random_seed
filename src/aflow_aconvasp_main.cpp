@@ -7636,6 +7636,8 @@ namespace pflow {
   bool POCC_COMMAND_LINE(aurostd::xoption& vpflow,istream& input,ostream& oss) {  //CO20181226
     string soliloquy = XPID + "pflow::POCC_COMMAND_LINE():";
     stringstream message;
+    // ME20210208 - suppress logger output
+    if (XHOST.vflag_control.flag("WWW")) XHOST.QUIET = true;
     oss << aflow::Banner("BANNER_NORMAL");
     xstructure xstr(input,IOAFLOW_AUTO);
     if(vpflow.flag("POCC_TOL")){setPOCCTOL(xstr,vpflow.getattachedscheme("POCC_TOL"));}
@@ -7647,14 +7649,16 @@ namespace pflow {
     if(vpflow.flag("POCC_COUNT_TOTAL")){return pcalc.m_initialized;}
     pcalc.calculate();
     if(vpflow.flag("POCC_COUNT_UNIQUE")){return pcalc.m_initialized;}
+    oss << (XHOST.vflag_control.flag("WWW")?AFLOWIN_SEPARATION_LINE_SHORT:AFLOWIN_SEPARATION_LINE) << endl;  // ME20210208
     oss << "Creating list of unique derivative supercells." << endl;  //CO20190116
     for(unsigned long long int i=0;i<pcalc.getUniqueSuperCellsCount();i++) {
       //populate POCC_UNIQUE_DERIVATIVE_STRUCTURES_FILE
-      oss << AFLOWIN_SEPARATION_LINE << endl;
+      // ME202010208 - Web mode: print line that's aligned with the banner
+      oss << (XHOST.vflag_control.flag("WWW")?AFLOWIN_SEPARATION_LINE_SHORT:AFLOWIN_SEPARATION_LINE) << endl;
       oss << "[VASP_POSCAR_MODE_EXPLICIT]START" << endl; // ." << ss_pocc_count.str() << endl;
       oss << pcalc.getUniqueSuperCell(i);
       oss << "[VASP_POSCAR_MODE_EXPLICIT]STOP" << endl; // ." << ss_pocc_count.str() << endl;
-      oss << AFLOWIN_SEPARATION_LINE << endl;
+      oss << (XHOST.vflag_control.flag("WWW")?AFLOWIN_SEPARATION_LINE_SHORT:AFLOWIN_SEPARATION_LINE) << endl;
     }
     return pcalc.m_initialized;
   }
@@ -8126,11 +8130,12 @@ namespace pflow {
       //   cout << str_sp.lattice << endl;
       cout << "</pre>" << endl;
       cout << "<img height=600 src=http://" << XHOST.AFLOW_MATERIALS_SERVER << "/SCIENCE/images/brillouin/" << lattice_type << ".PNG><br>" << endl;
-      cout << "<br> [ ";
-      cout << "<a href=http://" << XHOST.AFLOW_MATERIALS_SERVER << "/SCIENCE/images/brillouin/" << lattice_type << ".PNG>png</a>";
-      cout << " | ";
-      cout << "<a href=http://" << XHOST.AFLOW_MATERIALS_SERVER << "/SCIENCE/images/brillouin/" << lattice_type << ".EPS>eps</a>";
-      cout << " ] ";
+      // OBSOLETE ME20210208 - There are no eps files on the server, so serving the image is enough
+      //cout << "<br> [ ";
+      //cout << "<a href=http://" << XHOST.AFLOW_MATERIALS_SERVER << "/SCIENCE/images/brillouin/" << lattice_type << ".PNG>png</a>";
+      //cout << " | ";
+      //cout << "<a href=http://" << XHOST.AFLOW_MATERIALS_SERVER << "/SCIENCE/images/brillouin/" << lattice_type << ".EPS>eps</a>";
+      //cout << " ] ";
       cout << "<pre>" << endl;
     }
     cout << "// END ************************************************************************************" << endl;
