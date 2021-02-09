@@ -527,11 +527,28 @@ namespace compare {
     // (calculates symmetry of input structure and grabs symmetrically similar prototypes)
     vector<string> isopointal_prototypes = compare::getIsopointalPrototypes(xstr, catalog);
 
-    if(isopointal_prototypes.size()==0){
-      return "no isopointal prototypes in AFLOW";
+    // ---------------------------------------------------------------------------
+    // print format //DX20210208
+    bool write_txt = false;
+    bool write_json = false;
+    if(XHOST.vflag_control.flag("PRINT_MODE::TXT")){ write_txt = true; }
+    if(XHOST.vflag_control.flag("PRINT_MODE::JSON")){ write_json = true; }
+    // if not specified, write text by default
+    if(!write_txt && !write_json){ write_txt = true; }
+
+    stringstream ss_output;
+    if(write_txt){
+      if(isopointal_prototypes.size()==0){ ss_output << "no isopointal prototypes in AFLOW"; }
+      else{ ss_output << aurostd::joinWDelimiter(isopointal_prototypes,","); }
+    }
+    if(write_json){
+      if(!ss_output.str().empty()){ ss_output << endl; } // if printing both text and json, add a newline
+      ss_output << "{\"prototypes_isopointal\":";
+      ss_output << "[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(isopointal_prototypes,"\""),",") << "]";
+      ss_output << "}";
     }
 
-    return aurostd::joinWDelimiter(isopointal_prototypes,",");
+    return ss_output.str();
   }
 }
 
