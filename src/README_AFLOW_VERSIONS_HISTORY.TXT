@@ -3,6 +3,7 @@
         -- Set output of symmetry groups to --quiet and --screen_only when in web mode. (ME)
         -- Made POCC web output more compact. (ME)
         -- Structure comparison takes from std::cin now in web mode. (ME)
+        -- Fixed bug for --aflowlib that did not print original structure for different symmetries. (ME)
         -- Fixed line breaks in stream2string method for istream. (ME)
 3.2.7 - 2021/02/04
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.7.tar.xz
