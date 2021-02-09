@@ -1,3 +1,6 @@
+3.2.8 - 2021/XX/XX
+        Location: http://materials.duke.edu/AFLOW/aflow.3.2.8.tar.xz
+        -- patched XVASP_KPOINTS_OPERATION() so a change is ensured for Xeven/Xodd etc. (CO)
 3.2.7 - 2021/02/04
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.7.tar.xz
         -- Added additional AEL and AGL properties to the AFLOW schema. (ME)
