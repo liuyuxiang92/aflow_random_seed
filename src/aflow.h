@@ -1515,6 +1515,12 @@ class xstructure {
     void UpdateSpecies(const _atom& atom);                        // Update species from atom (consolidated from AddAtom) //DX20210202
     void GetLatticeType(xstructure& sp,xstructure& sc);           // Get all lattices
     void GetLatticeType(void);                                    // Get all lattices
+    void GetReciprocalLatticeType(xstructure& sp,xstructure& sc,
+        double sym_eps=AUROSTD_MAX_DOUBLE);                       // Get reciprocal lattice type //DX20210209
+    void GetReciprocalLatticeType(double sym_eps=AUROSTD_MAX_DOUBLE);// Get reciprocal lattice type //DX20210209
+    void GetSuperlatticeType(xstructure& sp,xstructure& sc,
+        double sym_eps=AUROSTD_MAX_DOUBLE);                       // Get superlattice type //DX20210209
+    void GetSuperlatticeType(double sym_eps=AUROSTD_MAX_DOUBLE);  // Get superlattice type //DX20210209
     void Standard_Primitive_UnitCellForm(void);                   // Reduce the Unit Cell to Standard Primitive Form
     void GetStandardPrimitive(void);                              // stub for void Standard_Primitive_UnitCellForm(void);
     void Standard_Conventional_UnitCellForm(void);                // Reduce the Unit Cell to Standard Conventional Form
@@ -1694,6 +1700,7 @@ class xstructure {
     string reciprocal_lattice_type;                               // reciprocal lattice type as a string
     string reciprocal_lattice_variation_type;                     // reciprocal lattice type as a string WSETYAWAN mod
     //string reciprocal_conventional_lattice_type;                // reciprocal lattice type as a string
+    xmatrix<double> bravais_superlattice_lattice;                 // superlattice lattice (identical atoms) //DX20210209
     string bravais_superlattice_type;                             // super lattice type as a string (identical atoms)
     string bravais_superlattice_variation_type;                   // super lattice type as a string (identical atoms) WSETYAWAN mod
     string bravais_superlattice_system;                           // lattice system http://en.wikipedia.org/wiki/Bravais_lattice (7)
