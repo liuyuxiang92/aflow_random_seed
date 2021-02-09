@@ -492,6 +492,7 @@ namespace pflow {
   void PrintData1(const xstructure& str1,const double& rcut,ostream& oss);
   string PrintData1(const xstructure& str1,const double& rcut);
   void PrintData2(const xstructure&,ostream& oss=cout);
+  string PrintSuperlatticeData(const xstructure& xstr, filetype ftype=txt_ft, bool already_calculated=false, bool standalone=true); //DX20210209
   void PrintDisplacements(xstructure str,const double cutoff,ostream& oss=cout);
   void PrintDistances(xstructure str,const double cutoff,ostream& oss=cout);
   void PrintEwald(const xstructure& in_str,double& epoint,double& ereal,double& erecip,double& eewald,double& eta,const double& SUMTOL,ostream& oss=cout);

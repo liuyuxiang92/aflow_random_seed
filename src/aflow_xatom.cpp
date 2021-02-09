@@ -2322,6 +2322,7 @@ void xstructure::free() { //DX20191220 - moved all initializations from constuct
   rotate_lattice_original2new.clear(); //DX20181024
   rotate_lattice_new2original.clear(); //DX20181024
   //reciprocal_conventional_lattice_type="";
+  bravais_superlattice_lattice.clear(); //DX20210209
   bravais_superlattice_type="";
   bravais_superlattice_variation_type="";
   bravais_superlattice_system="";
@@ -2611,6 +2612,7 @@ void xstructure::copy(const xstructure& bstr) {
   pearson_symbol=bstr.pearson_symbol;
   reciprocal_lattice_type=bstr.reciprocal_lattice_type;
   reciprocal_lattice_variation_type=bstr.reciprocal_lattice_variation_type;
+  bravais_superlattice_lattice=bstr.bravais_superlattice_lattice; //DX20210209
   bravais_superlattice_type=bstr.bravais_superlattice_type;
   bravais_superlattice_variation_type=bstr.bravais_superlattice_variation_type;
   bravais_superlattice_system=bstr.bravais_superlattice_system;
@@ -10396,6 +10398,7 @@ void xstructure::GetLatticeType(xstructure& str_sp,xstructure& str_sc) {
     }
     //DX END
     if(VERBOSE) cerr << "xstructure::GetLatticeType: [12]" << endl;
+    this->bravais_superlattice_lattice=str_superlattice_sp.lattice; //DX20210209
     this->bravais_superlattice_type=str_superlattice_sp.bravais_lattice_type;
     this->bravais_superlattice_variation_type=str_superlattice_sp.bravais_lattice_variation_type;
     this->bravais_superlattice_system=str_superlattice_sp.bravais_lattice_system;
@@ -10405,6 +10408,66 @@ void xstructure::GetLatticeType(xstructure& str_sp,xstructure& str_sc) {
       break;
     }
   } //DX while loop
+}
+
+// ***************************************************************************
+// Function GetSuperlatticeType
+// ***************************************************************************
+void xstructure::GetSuperlatticeType(double sym_eps) {
+  xstructure str_sp,str_sc;
+  GetSuperlatticeType(str_sp,str_sc,sym_eps);
+}
+
+void xstructure::GetSuperlatticeType(xstructure& str_sp,xstructure& str_sc, double sym_eps) {
+
+  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  string function_name = XPID + "xstructure::GetSuperlatticeType():";
+
+  xstructure str_in;
+  // start
+  str_in=*this;
+  str_in.ClearSymmetry();  //DX20170814 - It wasn't cleared, so nothing was being calculated
+  str_in.title="NO_RECURSION";
+  if(LDEBUG){
+    cerr << str_in << endl;
+    cerr << function_name << " [1]" << endl;
+  }
+  // decorate with single atom type
+  str_in.IdenticalAtoms();  // make superlattice
+  if(LDEBUG){
+    cerr << function_name << " [2]" << endl;
+    cerr << str_in << endl;
+  }
+  // primitivize
+  str_in.GetPrimitive(0.005);
+  if(LDEBUG){
+    cerr << str_in << endl;
+    cerr << function_name << " [3]" << endl;
+  }
+  // Minkowski
+  str_in.Minkowski_calculated=FALSE;
+  if(LDEBUG){ cerr << function_name << " [4]" << endl; }
+  str_in.MinkowskiBasisReduction();
+  if(LDEBUG){
+    cerr << function_name << " [5]" << endl;
+    cerr << str_in << endl;
+  }
+  // set symmetry tolerance
+  double tolerance = sym_eps;
+  if(sym_eps!=AUROSTD_MAX_DOUBLE){ tolerance=sym_eps; }
+  else { tolerance=SYM::defaultTolerance(str_in); }
+  str_in.sym_eps=str_sp.sym_eps=str_sc.sym_eps=str_sp.sym_eps=tolerance; //DX
+  str_in.sym_eps_calculated=str_sp.sym_eps_calculated=str_sc.sym_eps_calculated=str_sp.sym_eps_calculated; //DX
+  str_in.sym_eps_change_count=str_sp.sym_eps_change_count=str_sc.sym_eps_change_count=str_sp.sym_eps_change_count; //DX20180222 - added sym_eps change count
+  // main lattice function
+  LATTICE::Standard_Lattice_StructureDefault(str_in,str_sp,str_sc,false); //DX //DX20180226 - do not need to do full sym for superlattice
+  this->bravais_superlattice_lattice=str_sp.lattice;
+  this->bravais_superlattice_type=str_sp.bravais_lattice_type;
+  this->bravais_superlattice_variation_type=str_sp.bravais_lattice_variation_type;
+  this->bravais_superlattice_system=str_sp.bravais_lattice_system;
+  this->pearson_symbol_superlattice=str_sp.pearson_symbol;
+
+  if(LDEBUG){ cerr << function_name << " [6] DONE" << endl; }
 }
 
 string GetLatticeType(xmatrix<double> lattice) {

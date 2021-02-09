@@ -506,6 +506,15 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
       vpflow.args2addattachedscheme(argv,cmds,"DATA::SETTING","--setting=","1");
     }
   } //DX20170901 - SGDATA + JSON
+
+  vpflow.args2addattachedscheme(argv,cmds,"DATA_SUPERLATTICE","--superlattice_data=|--data_superlattice=",""); //DX20210209
+  if(vpflow.flag("DATA_SUPERLATTICE")){ //DX20170901 - SGDATA + JSON
+    vpflow.flag("DATA::NO_SCAN",aurostd::args2flag(argv,cmds,"--no_scan"));
+    if(aurostd::args2attachedflag(argv,"--superlattice_data=|--data_superlattice=")){ //DX20170901 - SGDATA + JSON
+      vpflow.args2addattachedscheme(argv,cmds,"DATA::TOLERANCE","--superlattice_data=|--data_superlattice","");
+    }
+  }
+
   // [OBSOLETE] vpflow.flag("DATA1",aurostd::args2flag(argv,cmds,"--data1") && argv.at(1)=="--data1");
   vpflow.args2addattachedscheme(argv,cmds,"DATA1","--data1=","");
   vpflow.flag("DATA2",aurostd::args2flag(argv,cmds,"--data2"));
@@ -1723,6 +1732,7 @@ namespace pflow {
       // D
       //DX20170901 [OBSOLETE] if(vpflow.flag("DATA")) {pflow::DATA(cin,"DATA"); _PROGRAMRUN=true;}
       if(vpflow.flag("DATA")) {pflow::DATA(cin,vpflow,"DATA",cout); _PROGRAMRUN=true;}
+      if(vpflow.flag("DATA_SUPERLATTICE")) {pflow::DATA(cin,vpflow,"SUPERLATTICE",cout); _PROGRAMRUN=true;} //DX20210209
       if(vpflow.flag("DATA1")) {pflow::DATA1(vpflow.getattachedscheme("DATA1"),cin); _PROGRAMRUN=true;}
       if(vpflow.flag("DATA2")) {pflow::DATA2(cin); _PROGRAMRUN=true;}
       if(vpflow.flag("DEBYE")) {pflow::DEBYE(vpflow.getattachedscheme("DEBYE")); _PROGRAMRUN=true;}
@@ -5487,7 +5497,14 @@ namespace pflow {
       cout << aflow::Banner("BANNER_TINY") << endl;
     }
     // pflow::PrintData(a,cerr,smode);
-    pflow::PrintData(a,oss,tolerance,smode,no_scan,setting,format); //DX cout to oss
+    if(smode == "EDATA" || smode == "DATA"){
+      pflow::PrintData(a,oss,tolerance,smode,no_scan,setting,format); //DX cout to oss
+    }
+    else if(smode=="SUPERLATTICE"){
+      filetype ftype = txt_ft;
+      if(format == "json"){ ftype = json_ft; }
+      oss << PrintSuperlatticeData(a, ftype , false, true) << endl;
+    }
     return true;
   }
 } // namespace pflow

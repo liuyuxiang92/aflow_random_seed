@@ -1514,6 +1514,86 @@ namespace pflow {
   }
 } // namespace pflow
 
+namespace pflow {
+  string PrintSuperlatticeData(const xstructure& xstr, filetype ftype, bool already_calculated, bool standalone){
+
+    string function_name = XPID + "pflow::PrintSuperlatticeData():";
+
+    // ---------------------------------------------------------------------------
+    // calculate the superlattice symmetry if not already calculated
+    xstructure str_aus(xstr);
+    if(!already_calculated){ 
+      str_aus.GetSuperlatticeType();
+    }
+
+    stringstream ss_output;
+    // ---------------------------------------------------------------------------
+    // text output
+    if(ftype == txt_ft){
+      ss_output << "SUPERLATTICE (equally decorated)" << endl;
+      ss_output << " Superlattice lattice:" << endl;
+      ss_output << "  " << aurostd::roundoff(str_aus.bravais_superlattice_lattice(1),AUROSTD_ROUNDOFF_TOL) << endl;
+      ss_output << "  " << aurostd::roundoff(str_aus.bravais_superlattice_lattice(2),AUROSTD_ROUNDOFF_TOL) << endl;
+      ss_output << "  " << aurostd::roundoff(str_aus.bravais_superlattice_lattice(3),AUROSTD_ROUNDOFF_TOL) << endl;
+      ss_output << " Real space: Bravais Superlattice Primitive   = " << str_aus.bravais_superlattice_type << endl;
+      ss_output << " Real space: Superlattice Variation           = " << str_aus.bravais_superlattice_variation_type << endl;
+      ss_output << " Real space: Superlattice System              = " << str_aus.bravais_superlattice_system << endl; //DX - fixed mistake in line above
+      ss_output << " Real space: Pearson Symbol Superlattice      = " << str_aus.pearson_symbol_superlattice << endl;
+    }
+    // ---------------------------------------------------------------------------
+    // json output
+    else if(ftype == json_ft){
+
+      aurostd::JSONwriter json;
+      bool roff = true;
+      string null_string = "null";
+
+      // Real space: bravais superlattice lattice
+      if(str_aus.bravais_superlattice_type.size() != 0){
+        json.addNumber("Bravais_superlattice_lattice", "["+aurostd::xmatDouble2String(str_aus.bravais_superlattice_lattice,5,roff)+"]"); //hack
+      } else {
+        json.addNumber("Bravais_superlattice_lattice", null_string); //hack
+      }
+
+      // Real space: bravais superlattice type
+      if(str_aus.bravais_superlattice_type.size() != 0){
+        json.addString("Bravais_superlattice_type", str_aus.bravais_superlattice_type);
+      } else {
+        json.addNumber("Bravais_superlattice_type", null_string);
+      }
+
+      // Real space: bravais superlattice variation type
+      if(str_aus.bravais_superlattice_type.size() != 0){
+        json.addString("Bravais_superlattice_variation_type", str_aus.bravais_superlattice_variation_type);
+      } else {
+        json.addNumber("Bravais_superlattice_variation_type", null_string);
+      }
+
+      // Real space: bravais superlattice system
+      if(str_aus.bravais_superlattice_type.size() != 0){
+        json.addString("Bravais_superlattice_system", str_aus.bravais_superlattice_system);
+      } else {
+        json.addNumber("Bravais_superlattice_system", null_string);
+      }
+
+      // Real space: bravais superlattice type
+      if(str_aus.bravais_superlattice_type.size() != 0){
+        json.addString("Pearson_symbol_superlattice", str_aus.pearson_symbol_superlattice);
+      } else {
+        json.addNumber("Pearson_symbol_superlattice", null_string);
+      }
+      ss_output << json.toString(standalone); //standalone: determines if we enclose in brackets
+    }
+    else{
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Format type is not supported.",_INPUT_ILLEGAL_);
+    }
+
+    return ss_output.str();
+  }
+}
+
+
+
 // ***************************************************************************
 // pflow::PrintData1
 // ***************************************************************************
