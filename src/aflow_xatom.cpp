@@ -10411,6 +10411,54 @@ void xstructure::GetLatticeType(xstructure& str_sp,xstructure& str_sc) {
 }
 
 // ***************************************************************************
+// Function GetReciprocalLatticeType //DX20210209
+// ***************************************************************************
+void xstructure::GetReciprocalLatticeType(double sym_eps) {
+  xstructure str_sp,str_sc;
+  GetReciprocalLatticeType(str_sp,str_sc,sym_eps);
+}
+
+void xstructure::GetReciprocalLatticeType(xstructure& str_sp,xstructure& str_sc, double sym_eps) {
+
+  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  string function_name = XPID + "xstructure::GetReciprocalLatticeType():";
+
+  // RECIPROCAL
+  xstructure str_in;
+  // start
+  str_in.title="NO_RECURSION";
+  str_in.lattice=this->klattice;str_in.FixLattices();
+  _atom atom;str_in.AddAtom(atom);
+  // set symmetry tolerance
+  double tolerance = sym_eps;
+  if(sym_eps!=AUROSTD_MAX_DOUBLE){ tolerance=sym_eps; }
+  else { tolerance=SYM::defaultTolerance(str_in); }
+  str_in.sym_eps=str_sp.sym_eps=str_sc.sym_eps=str_sp.sym_eps=tolerance; //DX
+  str_in.sym_eps_calculated=str_sp.sym_eps_calculated=str_sc.sym_eps_calculated=str_sp.sym_eps_calculated; //DX
+  str_in.sym_eps_change_count=str_sp.sym_eps_change_count=str_sc.sym_eps_change_count=str_sp.sym_eps_change_count; //DX20180222 - added sym_eps change count
+
+  if(LDEBUG){ cerr << function_name << " [1]" << endl; }
+  //DX int ss=0; //JX
+  //DX LATTICE::Standard_Lattice_Structure(str_reciprocal_in,str_reciprocal_sp,str_reciprocal_sc,eps,epsang,ss,_EPS_); //JX
+  //DX20170814 START - Use real pgroup to calculate pgroupk and then set pgroupk from str_sp to the pgroup and pgroup_xtal of str_reciprocal_in
+  //DX20170814 The pgroup and pgroup_xtal are the same for the str_reciprocal structure because there is only one atom at the origin
+  //DX20170814 (i.e. lattice and crystal symmetry are the same for the reciprocal space crystal)
+  //DX20170829 [OBSOLETE] -since performing full symmetry analysis by default - str_sp.CalculateSymmetryPointGroupKLattice(FALSE);
+  //DX20180426 - possible that lattice exhibits lower symmetry than crystal (i.e., from str_sp); would need to pass lattice symmetry from Standard_Lattice, but that information is not stored out of scope, commenting out 5 lines below 
+  //DX20180426 [OBSOLETE] - possible that lattice exhibits lower symmetry than crystal (i.e., from str_sp) - str_reciprocal_in.pgroup=str_reciprocal_sp.pgroup=str_reciprocal_sc.pgroup=str_sp.pgroupk;
+  //DX20180426 [OBSOLETE] - possible that lattice exhibits lower symmetry than crystal (i.e., from str_sp) - str_reciprocal_in.pgroup_calculated=str_reciprocal_sp.pgroup_calculated=str_reciprocal_sc.pgroup_calculated=str_sp.pgroupk_calculated;
+  //DX20180426 [OBSOLETE] - possible that lattice exhibits lower symmetry than crystal (i.e., from str_sp) - str_reciprocal_in.pgroup_xtal=str_reciprocal_sp.pgroup_xtal=str_reciprocal_sc.pgroup_xtal=str_sp.pgroupk;
+  //DX20180426 [OBSOLETE] - possible that lattice exhibits lower symmetry than crystal (i.e., from str_sp) - str_reciprocal_in.pgroup_xtal_calculated=str_reciprocal_sp.pgroup_xtal_calculated=str_reciprocal_sc.pgroup_xtal_calculated=str_sp.pgroup_calculated;
+  //DX20180426 [OBSOLETE] - possible that lattice exhibits lower symmetry than crystal (i.e., from str_sp) - str_reciprocal_in.pgroup_xtal_calculated=str_reciprocal_sp.pgroup_xtal_calculated=str_reciprocal_sc.pgroup_xtal_calculated=str_sp.pgroup_calculated;
+  //DX20170814 END
+  LATTICE::Standard_Lattice_StructureDefault(str_in,str_sp,str_sc,false); //DX //DX20180226 - do not need to do full sym for recip
+
+  this->reciprocal_lattice_type=str_sp.bravais_lattice_type;
+  this->reciprocal_lattice_variation_type=str_sp.bravais_lattice_variation_type;
+  if(LDEBUG){ cerr << function_name << " [2]" << endl; }
+}
+
+// ***************************************************************************
 // Function GetSuperlatticeType
 // ***************************************************************************
 void xstructure::GetSuperlatticeType(double sym_eps) {

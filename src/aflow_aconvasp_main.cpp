@@ -507,6 +507,13 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     }
   } //DX20170901 - SGDATA + JSON
 
+  vpflow.args2addattachedscheme(argv,cmds,"DATA_RECIPROCAL_LATTICE","--reciprocal_lattice_data=|--reciprocallattice_data=|--klattice_data=|--data_reciprocal_lattice=",""); //DX20210209
+  if(vpflow.flag("DATA_RECIPROCAL_LATTICE")){ //DX20170901 - SGDATA + JSON
+    vpflow.flag("DATA::NO_SCAN",aurostd::args2flag(argv,cmds,"--no_scan"));
+    if(aurostd::args2attachedflag(argv,"--reciprocal_lattice_data=|--reciprocallattice_data=|--klattice_data=|--data_reciprocal_lattice=")){ //DX20170901 - SGDATA + JSON
+      vpflow.args2addattachedscheme(argv,cmds,"DATA::TOLERANCE","--reciprocal_lattice_data=|--reciprocallattice_data=|--klattice_data=|--data_reciprocal_lattice=","");
+    }
+  }
   vpflow.args2addattachedscheme(argv,cmds,"DATA_SUPERLATTICE","--superlattice_data=|--data_superlattice=",""); //DX20210209
   if(vpflow.flag("DATA_SUPERLATTICE")){ //DX20170901 - SGDATA + JSON
     vpflow.flag("DATA::NO_SCAN",aurostd::args2flag(argv,cmds,"--no_scan"));
@@ -1732,6 +1739,7 @@ namespace pflow {
       // D
       //DX20170901 [OBSOLETE] if(vpflow.flag("DATA")) {pflow::DATA(cin,"DATA"); _PROGRAMRUN=true;}
       if(vpflow.flag("DATA")) {pflow::DATA(cin,vpflow,"DATA",cout); _PROGRAMRUN=true;}
+      if(vpflow.flag("DATA_RECIPROCAL_LATTICE")) {pflow::DATA(cin,vpflow,"RECIPROCAL_LATTICE",cout); _PROGRAMRUN=true;} //DX20210209
       if(vpflow.flag("DATA_SUPERLATTICE")) {pflow::DATA(cin,vpflow,"SUPERLATTICE",cout); _PROGRAMRUN=true;} //DX20210209
       if(vpflow.flag("DATA1")) {pflow::DATA1(vpflow.getattachedscheme("DATA1"),cin); _PROGRAMRUN=true;}
       if(vpflow.flag("DATA2")) {pflow::DATA2(cin); _PROGRAMRUN=true;}
@@ -5503,7 +5511,12 @@ namespace pflow {
     else if(smode=="SUPERLATTICE"){
       filetype ftype = txt_ft;
       if(format == "json"){ ftype = json_ft; }
-      oss << PrintSuperlatticeData(a, ftype , false, true) << endl;
+      oss << PrintSuperlatticeData(a, tolerance, ftype , false, true) << endl;
+    }
+    else if(smode=="RECIPROCAL_LATTICE"){
+      filetype ftype = txt_ft;
+      if(format == "json"){ ftype = json_ft; }
+      oss << PrintReciprocalLatticeData(a, tolerance, ftype , false, true) << endl;
     }
     return true;
   }

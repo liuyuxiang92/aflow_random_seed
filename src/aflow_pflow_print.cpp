@@ -1514,8 +1514,94 @@ namespace pflow {
   }
 } // namespace pflow
 
+// ***************************************************************************
+// pflow::PrintReciprocalLatticeData //DX20210209
+// ***************************************************************************
 namespace pflow {
-  string PrintSuperlatticeData(const xstructure& xstr, filetype ftype, bool already_calculated, bool standalone){
+  string PrintReciprocalLatticeData(const xstructure& xstr, double sym_eps, filetype ftype, bool already_calculated, bool standalone){
+
+    string function_name = XPID + "pflow::PrintReciprocalLatticeData():";
+
+    // ---------------------------------------------------------------------------
+    // calculate the reciprocal lattice symmetry if not already calculated
+    xstructure str_aus(xstr);
+    if(!already_calculated){
+      str_aus.GetReciprocalLatticeType(sym_eps);
+    }
+
+    xvector<double> data=Getabc_angles(str_aus.klattice,DEGREES);
+    double kvol=GetVol(str_aus.klattice);
+
+    stringstream ss_output;
+    // ---------------------------------------------------------------------------
+    // text output
+    if(ftype == txt_ft){
+        ss_output << "RECIPROCAL LATTICE" << endl;
+        ss_output << " Reciprocal space lattice:" << endl;
+        ss_output << "  " << aurostd::roundoff(str_aus.klattice(1),AUROSTD_ROUNDOFF_TOL) << endl;
+        ss_output << "  " << aurostd::roundoff(str_aus.klattice(2),AUROSTD_ROUNDOFF_TOL) << endl;
+        ss_output << "  " << aurostd::roundoff(str_aus.klattice(3),AUROSTD_ROUNDOFF_TOL) << endl;
+        ss_output << " Reciprocal space a b c alpha beta gamma: ";
+        ss_output.precision(10);ss_output << data(1) << " " << data(2) << " " << data(3) << " ";
+        ss_output.precision(3); ss_output << data(4) << " " << data(5) << " " << data(6) << endl;
+        ss_output.precision(4);
+        ss_output << " Reciprocal space Volume: " << kvol << endl;
+        ss_output << " Reciprocal lattice primitive            = " << str_aus.reciprocal_lattice_type << endl;
+        ss_output << " Reciprocal lattice variation            = " << str_aus.reciprocal_lattice_variation_type << endl; //WSETYAWAN mod
+    }
+    // ---------------------------------------------------------------------------
+    // json output
+    else if(ftype == json_ft){
+
+      aurostd::JSONwriter json;
+      bool roff = true;
+      string null_string = "null";
+
+      // Reciprocal space lattice
+      if(str_aus.klattice.rows != 0){
+        json.addNumber("reciprocal_lattice_vectors", "["+aurostd::xmatDouble2String(str_aus.klattice,_AFLOWLIB_DATA_GEOMETRY_PREC_,roff)+"]"); //hack
+      } else {
+        json.addNumber("reciprocal_lattice_vectors", null_string); //hack
+      }
+
+      // Reciprocal lattice parameters
+      if(data.rows != 0){
+        json.addNumber("reciprocal_lattice_parameters", "["+aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(data,_AFLOWLIB_DATA_GEOMETRY_PREC_,roff),",")+"]"); //hack
+      } else {
+        json.addNumber("reciprocal_lattice_parameters", null_string); //hack
+      }
+
+      // Reciprocal space volume
+      json.addNumber("reciprocal_volume", kvol);
+
+      // Reciprocal space: reciprocal lattice type
+      if(str_aus.reciprocal_lattice_type.size() != 0){
+        json.addString("reciprocal_lattice_type", str_aus.reciprocal_lattice_type);
+      } else {
+        json.addNumber("reciprocal_lattice_type", null_string); //hack
+      }
+
+      // Reciprocal space: reciprocal lattice variation type
+      if(str_aus.reciprocal_lattice_variation_type.size() !=0){
+        json.addString("reciprocal_lattice_variation_type", str_aus.reciprocal_lattice_variation_type);
+      } else {
+        json.addNumber("reciprocal_lattice_variation_type", null_string); //hack
+      }
+      ss_output << json.toString(standalone); //standalone: determines if we enclose in brackets
+    }
+    else{
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Format type is not supported.",_INPUT_ILLEGAL_);
+    }
+
+    return ss_output.str();
+  }
+}
+
+// ***************************************************************************
+// pflow::PrintSuperlatticeData //DX20210209
+// ***************************************************************************
+namespace pflow {
+  string PrintSuperlatticeData(const xstructure& xstr, double sym_eps, filetype ftype, bool already_calculated, bool standalone){
 
     string function_name = XPID + "pflow::PrintSuperlatticeData():";
 
@@ -1523,7 +1609,7 @@ namespace pflow {
     // calculate the superlattice symmetry if not already calculated
     xstructure str_aus(xstr);
     if(!already_calculated){ 
-      str_aus.GetSuperlatticeType();
+      str_aus.GetSuperlatticeType(sym_eps);
     }
 
     stringstream ss_output;
@@ -1550,7 +1636,7 @@ namespace pflow {
 
       // Real space: bravais superlattice lattice
       if(str_aus.bravais_superlattice_type.size() != 0){
-        json.addNumber("Bravais_superlattice_lattice", "["+aurostd::xmatDouble2String(str_aus.bravais_superlattice_lattice,5,roff)+"]"); //hack
+        json.addNumber("Bravais_superlattice_lattice", "["+aurostd::xmatDouble2String(str_aus.bravais_superlattice_lattice,_AFLOWLIB_DATA_GEOMETRY_PREC_,roff)+"]"); //hack
       } else {
         json.addNumber("Bravais_superlattice_lattice", null_string); //hack
       }

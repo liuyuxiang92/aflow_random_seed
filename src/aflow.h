@@ -1515,9 +1515,12 @@ class xstructure {
     void UpdateSpecies(const _atom& atom);                        // Update species from atom (consolidated from AddAtom) //DX20210202
     void GetLatticeType(xstructure& sp,xstructure& sc);           // Get all lattices
     void GetLatticeType(void);                                    // Get all lattices
+    void GetReciprocalLatticeType(xstructure& sp,xstructure& sc,
+        double sym_eps=AUROSTD_MAX_DOUBLE);                       // Get reciprocal lattice type //DX20210209
+    void GetReciprocalLatticeType(double sym_eps=AUROSTD_MAX_DOUBLE);// Get reciprocal lattice type //DX20210209
     void GetSuperlatticeType(xstructure& sp,xstructure& sc,
-        double sym_eps=AUROSTD_MAX_DOUBLE);                       // Get superlattice type
-    void GetSuperlatticeType(double sym_eps=AUROSTD_MAX_DOUBLE);  // Get superlattice type
+        double sym_eps=AUROSTD_MAX_DOUBLE);                       // Get superlattice type //DX20210209
+    void GetSuperlatticeType(double sym_eps=AUROSTD_MAX_DOUBLE);  // Get superlattice type //DX20210209
     void Standard_Primitive_UnitCellForm(void);                   // Reduce the Unit Cell to Standard Primitive Form
     void GetStandardPrimitive(void);                              // stub for void Standard_Primitive_UnitCellForm(void);
     void Standard_Conventional_UnitCellForm(void);                // Reduce the Unit Cell to Standard Conventional Form
