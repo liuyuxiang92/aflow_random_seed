@@ -5047,6 +5047,11 @@ namespace aflowlib {
         if(aentry.vfiles_WEB.size()==0) aentry.vfiles_WEB=aentry.vfiles;
       }
 
+      // ME20210209 - Show original structure when symmetry changed
+      if (vflags.flag("FLAG::FOUND")) {
+        vflags.flag("FLAG::EDATA_ORIG", (aentry.spacegroup_orig != aentry.spacegroup_relax));
+      }
+
       if(vflags.flag("FLAG::FOUND")) {
         // check AGL/AEL
         vflags.flag("FLAG::ELECTRONIC",aurostd::substring2bool(aentry.vloop,"bands"));
