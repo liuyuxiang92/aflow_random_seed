@@ -1515,6 +1515,240 @@ namespace pflow {
 } // namespace pflow
 
 // ***************************************************************************
+// pflow::PrintRealLatticeData //DX20210209
+// ***************************************************************************
+namespace pflow {
+  string PrintRealLatticeData(const xstructure& xstr, double sym_eps, filetype ftype, bool already_calculated, bool standalone){
+
+    string function_name = XPID + "pflow::PrintRealLatticeData():";
+
+    // ---------------------------------------------------------------------------
+    // calculate the real lattice symmetry if not already calculated
+    xstructure str_aus(xstr);
+    if(!already_calculated){
+      str_aus.GetRealLatticeType(sym_eps);
+    }
+
+    // get lattice and angles
+    xvector<double> data(6);
+    data=Getabc_angles(xstr.lattice,DEGREES);data(1)*=xstr.scale;data(2)*=xstr.scale;data(3)*=xstr.scale;
+    double c_over_a = data(3)/data(1);
+
+    // get lattice and angles (Bohr)
+    xvector<double> data_Bohr(6);
+    data_Bohr(1) =  data(1)*angstrom2bohr;
+    data_Bohr(2) =  data(2)*angstrom2bohr;
+    data_Bohr(3) =  data(3)*angstrom2bohr;
+    data_Bohr(4) =  data(4);
+    data_Bohr(5) =  data(5);
+    data_Bohr(6) =  data(6);
+
+    // get volume
+    double vol = GetVol(xstr.lattice)*xstr.scale*xstr.scale*xstr.scale;
+
+    stringstream ss_output;
+    // ---------------------------------------------------------------------------
+    // text output
+    if(ftype == txt_ft){
+      ss_output << "REAL LATTICE" << endl;
+      ss_output << " Real space a b c alpha beta gamma: ";
+      ss_output.precision(10);ss_output << data(1) << " " << data(2) << " " << data(3) << " ";
+      ss_output.precision(3); ss_output << data(4) << " " << data(5) << " " << data(6) << endl;
+      ss_output.precision(4);
+      ss_output << " Real space a b c alpha beta gamma: ";
+      ss_output.precision(10);ss_output << data_Bohr(1) << " " << data_Bohr(2) << " " << data_Bohr(3) << " ";
+      ss_output.precision(3); ss_output << data(4) << " " << data(5) << " " << data(6) << "   Bohrs/Degs " << endl;
+      ss_output.precision(4);
+      ss_output << " Real space Volume: " << vol << endl;
+      ss_output << " Real space c/a = " << c_over_a << endl;
+      ss_output << "BRAVAIS LATTICE OF THE CRYSTAL (pgroup_xtal)" << endl;
+      ss_output << " Real space: Bravais Lattice Primitive        = " << str_aus.bravais_lattice_type << endl;// " " << str.title << endl;
+      ss_output << " Real space: Lattice Variation                = " << str_aus.bravais_lattice_variation_type << endl;//WSETYAWAN mod
+      ss_output << " Real space: Lattice System                   = " << str_aus.bravais_lattice_system << endl;
+      ss_output << " Real space: Pearson Symbol                   = " << str_aus.pearson_symbol << endl;
+    }
+    // ---------------------------------------------------------------------------
+    // json output
+    else if(ftype == json_ft){
+
+      aurostd::JSONwriter json;
+      bool roff = true;
+      bool PRINT_NULL=FALSE;
+      string null_string = "null";
+
+      // Real lattice parameters
+      if(data.rows != 0){
+        json.addNumber("lattice_parameters","["+aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(data,_AFLOWLIB_DATA_GEOMETRY_PREC_,roff),",")+"]"); //hack
+      } else if (PRINT_NULL){
+        json.addNumber("lattice_parameters", null_string); //hack
+      }
+
+      // Real lattice parameters (Bohr/Deg)
+      if(data_Bohr.rows != 0){
+        json.addNumber("lattice_parameters_Bohr_deg","["+aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(data_Bohr,_AFLOWLIB_DATA_GEOMETRY_PREC_,roff),",")+"]"); //hack
+      } else if (PRINT_NULL){
+        json.addNumber("lattice_parameters_Bohr_deg", null_string); //hack
+      }
+
+      // Real space volume
+      json.addNumber("volume", vol);
+
+      // Real space c/a
+      json.addNumber("c_over_a", c_over_a);
+
+      // Real space: bravais lattice primitive
+      if(str_aus.bravais_lattice_type.size() != 0){
+        json.addString("Bravais_lattice_type", str_aus.bravais_lattice_type);
+      } else if (PRINT_NULL){
+        json.addNumber("Bravais_lattice_type", null_string); //hack
+      }
+
+      // Real space: bravais lattice variation
+      if(str_aus.bravais_lattice_variation_type.size() != 0){
+        json.addString("Bravais_lattice_variation_type", str_aus.bravais_lattice_variation_type);
+      } else if (PRINT_NULL){
+        json.addNumber("Bravais_lattice_variation_type", null_string); //hack
+      }
+
+      // Real space: lattice system
+      if(str_aus.bravais_lattice_system.size()){
+        json.addString("Bravais_lattice_system", str_aus.bravais_lattice_system);
+      } else if (PRINT_NULL){
+        json.addNumber("Bravais_lattice_system", null_string); //hack
+      }
+
+      // Real space: Pearson symbol
+      if(str_aus.pearson_symbol.size()){
+        json.addString("Pearson_symbol", str_aus.pearson_symbol);
+      } else if (PRINT_NULL){
+        json.addNumber("Pearson_symbol", null_string); //hack
+      }
+
+      ss_output << json.toString(standalone); //standalone: determines if we enclose in brackets
+
+    }
+    else{
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Format type is not supported.",_INPUT_ILLEGAL_);
+    }
+
+    return ss_output.str();
+  }
+}
+
+// ***************************************************************************
+// pflow::PrintCrystalPointGroupData //DX20210209
+// ***************************************************************************
+namespace pflow {
+  string PrintCrystalPointGroupData(const xstructure& xstr, double sym_eps, filetype ftype, bool already_calculated, bool standalone){
+
+    string function_name = XPID + "pflow::PrintCrystalPointGroupData():";
+
+    // ---------------------------------------------------------------------------
+    // calculate the real lattice symmetry (contains point group information)
+    // if not already calculated
+    xstructure str_aus(xstr);
+    if(!already_calculated){
+      str_aus.GetRealLatticeType(sym_eps);
+    }
+
+    stringstream ss_output;
+    // ---------------------------------------------------------------------------
+    // text output
+    if(ftype == txt_ft){
+      ss_output << "POINT GROUP CRYSTAL" << endl;
+      ss_output << " Real space: Crystal Family                   = " << str_aus.crystal_family << endl;
+      ss_output << " Real space: Crystal System                   = " << str_aus.crystal_system << endl;
+      ss_output << " Real space: Crystal Class                    = " << str_aus.point_group_crystal_class << endl;
+      ss_output << " Real space: Point Group (Hermann Mauguin)    = " << str_aus.point_group_Hermann_Mauguin << endl; // "      PGXTAL" << endl;
+      ss_output << " Real space: Point Group (Schoenflies)        = " << str_aus.point_group_Shoenflies << endl;
+      ss_output << " Real space: Point Group Orbifold             = " << str_aus.point_group_orbifold << endl;
+      ss_output << " Real space: Point Group Type                 = " << str_aus.point_group_type << endl;
+      ss_output << " Real space: Point Group Order                = " << str_aus.point_group_order << endl;
+      ss_output << " Real space: Point Group Structure            = " << str_aus.point_group_structure << endl;
+    }
+    // ---------------------------------------------------------------------------
+    // json output
+    else if(ftype == json_ft){
+
+      aurostd::JSONwriter json;
+      bool PRINT_NULL=FALSE;
+      string null_string = "null";
+
+      // Real space: crystal family
+      if(str_aus.crystal_family.size() != 0){
+        json.addString("crystal_family", str_aus.crystal_family);
+      } else if (PRINT_NULL){
+        json.addNumber("crystal_family", null_string); //hack
+      }
+
+      // Real space: crystal system
+      if(str_aus.crystal_system.size() != 0){
+        json.addString("crystal_system", str_aus.crystal_system);
+      } else if (PRINT_NULL){
+        json.addNumber("crystal_system", null_string); //hack
+      }
+
+      // Real space: point group crystal class
+      if(str_aus.point_group_crystal_class.size() != 0){
+        json.addString("point_group_crystal_class", str_aus.point_group_crystal_class);
+      } else if (PRINT_NULL){
+        json.addNumber("point_group_crystal_class", null_string); //hack
+      }
+
+      // Real space: point group Hermann Mauguin
+      if(str_aus.point_group_Hermann_Mauguin.size() != 0){
+        json.addString("point_group_Hermann_Mauguin", str_aus.point_group_Hermann_Mauguin);
+      } else if (PRINT_NULL){
+        json.addNumber("point_group_Hermann_Mauguin", null_string); //hack
+      }
+
+      // Real space: point group Schoenflies
+      if(str_aus.point_group_Shoenflies.size() != 0){
+        json.addString("point_group_Schoenflies", str_aus.point_group_Shoenflies);
+      } else if (PRINT_NULL){
+        json.addNumber("point_group_Schoenflies", null_string); //hack
+      }
+
+      // Real space: point group orbifold
+      if(str_aus.point_group_orbifold.size() != 0){
+        json.addString("point_group_orbifold", str_aus.point_group_orbifold);
+      } else if (PRINT_NULL){
+        json.addNumber("point_group_orbifold", null_string); //hack
+      }
+
+      // Real space: point group type
+      if(str_aus.point_group_type.size() != 0){
+        json.addString("point_group_type", str_aus.point_group_type);
+      } else if (PRINT_NULL){
+        json.addNumber("point_group_type", null_string); //hack
+      }
+
+      // Real space: point group order
+      if(str_aus.point_group_order.size() != 0){
+        json.addNumber("point_group_order", str_aus.point_group_order);
+      } else if (PRINT_NULL){
+        json.addNumber("point_group_order", null_string); //hack
+      }
+
+      // Real space: point group structure
+      if(str_aus.point_group_structure.size() != 0){
+        json.addString("point_group_structure", str_aus.point_group_structure);
+      } else if (PRINT_NULL){
+        json.addNumber("point_group_structure", null_string); //hack
+      }
+
+      ss_output << json.toString(standalone); //standalone: determines if we enclose in brackets
+
+    }
+    else{
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Format type is not supported.",_INPUT_ILLEGAL_);
+    }
+
+    return ss_output.str();
+  }
+}
+
+// ***************************************************************************
 // pflow::PrintReciprocalLatticeData //DX20210209
 // ***************************************************************************
 namespace pflow {

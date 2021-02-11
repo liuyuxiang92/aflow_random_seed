@@ -1515,6 +1515,9 @@ class xstructure {
     void UpdateSpecies(const _atom& atom);                        // Update species from atom (consolidated from AddAtom) //DX20210202
     void GetLatticeType(xstructure& sp,xstructure& sc);           // Get all lattices
     void GetLatticeType(void);                                    // Get all lattices
+    void GetRealLatticeType(xstructure& sp,xstructure& sc,
+        double sym_eps=AUROSTD_MAX_DOUBLE);                       // Get real lattice type //DX2021011
+    void GetRealLatticeType(double sym_eps=AUROSTD_MAX_DOUBLE);  // Get real lattice type //DX20210211
     void GetReciprocalLatticeType(xstructure& sp,xstructure& sc,
         double sym_eps=AUROSTD_MAX_DOUBLE);                       // Get reciprocal lattice type //DX20210209
     void GetReciprocalLatticeType(double sym_eps=AUROSTD_MAX_DOUBLE);// Get reciprocal lattice type //DX20210209

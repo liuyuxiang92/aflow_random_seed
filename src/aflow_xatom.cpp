@@ -10411,6 +10411,67 @@ void xstructure::GetLatticeType(xstructure& str_sp,xstructure& str_sc) {
 }
 
 // ***************************************************************************
+// Function GetRealLatticeType //DX20210209
+// ***************************************************************************
+void xstructure::GetRealLatticeType(double sym_eps) {
+  xstructure str_sp,str_sc;
+  GetRealLatticeType(str_sp,str_sc,sym_eps);
+}
+
+void xstructure::GetRealLatticeType(xstructure& str_sp,xstructure& str_sc, double sym_eps) {
+
+  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  string function_name = XPID + "xstructure::GetRealLatticeType():";
+
+  xstructure str_in=*this;
+  // start
+  str_in.title="NO_RECURSION";
+
+  // set symmetry tolerance
+  if(LDEBUG){ cerr << function_name << " [1]" << endl; }
+  double tolerance = sym_eps;
+  if(sym_eps!=AUROSTD_MAX_DOUBLE){ tolerance=sym_eps; }
+  else { tolerance=SYM::defaultTolerance(str_in); }
+  str_in.sym_eps=str_sp.sym_eps=str_sc.sym_eps=tolerance; //DX
+  str_in.sym_eps_calculated=str_sp.sym_eps_calculated=str_sc.sym_eps_calculated=str_sp.sym_eps_calculated; //DX
+  str_in.sym_eps_change_count=str_sp.sym_eps_change_count=str_sc.sym_eps_change_count=str_sp.sym_eps_change_count; //DX20180222 - added sym_eps change count
+
+  // calculate
+  if(LDEBUG){ cerr << function_name << " [2]" << endl; }
+  LATTICE::Bravais_Lattice_StructureDefault(str_in,str_sp,str_sc); // STD tolerance  // ONLY BRAVAIS_CRYSTAL
+
+  // set properties
+  if(LDEBUG){ cerr << function_name << " [3]" << endl; }
+  if(str_sp.pgroup_calculated==FALSE) str_sp.CalculateSymmetryPointGroup(FALSE);// cerr << "POINT GROUP" << endl;
+  if(str_sp.fgroup_calculated==FALSE) str_sp.CalculateSymmetryFactorGroup(FALSE); //cerr << "FACTOR GROUP" << endl;
+  if(str_sp.pgroup_xtal_calculated==FALSE) str_sp.CalculateSymmetryPointGroupCrystal(FALSE); //cerr << "POINT GROUP XTAL" << endl;
+  //  *this=str_sp; // more obvious but will mess up the structures.... we only want to take the properties
+  this->bravais_lattice_type=str_sp.bravais_lattice_type;
+  this->bravais_lattice_variation_type=str_sp.bravais_lattice_variation_type;
+  this->bravais_lattice_system=str_sp.bravais_lattice_system;
+  this->bravais_lattice_lattice_type=str_sp.bravais_lattice_lattice_type;
+  this->bravais_lattice_lattice_variation_type=str_sp.bravais_lattice_lattice_variation_type;
+  this->bravais_lattice_lattice_system=str_sp.bravais_lattice_lattice_system;
+  this->volume_changed_original2new=str_sp.volume_changed_original2new; //DX20181024
+  this->transform_coordinates_original2new=str_sp.transform_coordinates_original2new; //DX20181024
+  this->transform_coordinates_new2original=str_sp.transform_coordinates_new2original; //DX20181024
+  this->rotate_lattice_original2new=str_sp.rotate_lattice_original2new; //DX20181024
+  this->rotate_lattice_new2original=str_sp.rotate_lattice_new2original; //DX20181024
+  this->pearson_symbol=str_sp.pearson_symbol;
+  this->crystal_family=str_sp.crystal_family;
+  this->crystal_system=str_sp.crystal_system;
+  this->point_group_crystal_class=str_sp.point_group_crystal_class;
+  this->point_group_Shoenflies=str_sp.point_group_Shoenflies;
+  this->point_group_Hermann_Mauguin=str_sp.point_group_Hermann_Mauguin;
+  this->point_group_orbifold=str_sp.point_group_orbifold;
+  this->point_group_type=str_sp.point_group_type;
+  this->point_group_order=str_sp.point_group_order;
+  this->point_group_structure=str_sp.point_group_structure;
+  if(LDEBUG){ cerr << function_name << " [3] DONE" << endl; }
+
+}
+
+// ***************************************************************************
 // Function GetReciprocalLatticeType //DX20210209
 // ***************************************************************************
 void xstructure::GetReciprocalLatticeType(double sym_eps) {
@@ -10433,7 +10494,7 @@ void xstructure::GetReciprocalLatticeType(xstructure& str_sp,xstructure& str_sc,
   double tolerance = sym_eps;
   if(sym_eps!=AUROSTD_MAX_DOUBLE){ tolerance=sym_eps; }
   else { tolerance=SYM::defaultTolerance(str_in); }
-  str_in.sym_eps=str_sp.sym_eps=str_sc.sym_eps=str_sp.sym_eps=tolerance; //DX
+  str_in.sym_eps=str_sp.sym_eps=str_sc.sym_eps=tolerance; //DX
   str_in.sym_eps_calculated=str_sp.sym_eps_calculated=str_sc.sym_eps_calculated=str_sp.sym_eps_calculated; //DX
   str_in.sym_eps_change_count=str_sp.sym_eps_change_count=str_sc.sym_eps_change_count=str_sp.sym_eps_change_count; //DX20180222 - added sym_eps change count
 
@@ -10504,7 +10565,7 @@ void xstructure::GetSuperlatticeType(xstructure& str_sp,xstructure& str_sc, doub
   double tolerance = sym_eps;
   if(sym_eps!=AUROSTD_MAX_DOUBLE){ tolerance=sym_eps; }
   else { tolerance=SYM::defaultTolerance(str_in); }
-  str_in.sym_eps=str_sp.sym_eps=str_sc.sym_eps=str_sp.sym_eps=tolerance; //DX
+  str_in.sym_eps=str_sp.sym_eps=str_sc.sym_eps=tolerance; //DX
   str_in.sym_eps_calculated=str_sp.sym_eps_calculated=str_sc.sym_eps_calculated=str_sp.sym_eps_calculated; //DX
   str_in.sym_eps_change_count=str_sp.sym_eps_change_count=str_sc.sym_eps_change_count=str_sp.sym_eps_change_count; //DX20180222 - added sym_eps change count
   // main lattice function

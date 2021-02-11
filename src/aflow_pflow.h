@@ -492,6 +492,8 @@ namespace pflow {
   void PrintData1(const xstructure& str1,const double& rcut,ostream& oss);
   string PrintData1(const xstructure& str1,const double& rcut);
   void PrintData2(const xstructure&,ostream& oss=cout);
+  string PrintRealLatticeData(const xstructure& xstr, double sym_eps=AUROSTD_MAX_DOUBLE, filetype ftype=txt_ft, bool already_calculated=false, bool standalone=true); //DX20210211
+  string PrintCrystalPointGroupData(const xstructure& xstr, double sym_eps=AUROSTD_MAX_DOUBLE, filetype ftype=txt_ft, bool already_calculated=false, bool standalone=true); //DX20210211
   string PrintReciprocalLatticeData(const xstructure& xstr, double sym_eps=AUROSTD_MAX_DOUBLE, filetype ftype=txt_ft, bool already_calculated=false, bool standalone=true); //DX20210209
   string PrintSuperlatticeData(const xstructure& xstr, double sym_eps=AUROSTD_MAX_DOUBLE, filetype ftype=txt_ft, bool already_calculated=false, bool standalone=true); //DX20210209
   void PrintDisplacements(xstructure str,const double cutoff,ostream& oss=cout);

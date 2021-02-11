@@ -507,6 +507,20 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     }
   } //DX20170901 - SGDATA + JSON
 
+  vpflow.args2addattachedscheme(argv,cmds,"DATA_REAL_LATTICE","--lattice_data=|--data_lattice=",""); //DX20210209
+  if(vpflow.flag("DATA_REAL_LATTICE")){ //DX20170901 - SGDATA + JSON
+    vpflow.flag("DATA::NO_SCAN",aurostd::args2flag(argv,cmds,"--no_scan"));
+    if(aurostd::args2attachedflag(argv,"--lattice_data=|--data_lattice=")){ //DX20170901 - SGDATA + JSON
+      vpflow.args2addattachedscheme(argv,cmds,"DATA::TOLERANCE","--lattice_data=|--data_lattice=","");
+    }
+  }
+  vpflow.args2addattachedscheme(argv,cmds,"DATA_CRYSTAL_POINT_GROUP","--point_group_crystal_data=|--pgroupxtal_data=|--pgroup_xtal_data=",""); //DX20210209
+  if(vpflow.flag("DATA_CRYSTAL_POINT_GROUP")){ //DX20170901 - SGDATA + JSON
+    vpflow.flag("DATA::NO_SCAN",aurostd::args2flag(argv,cmds,"--no_scan"));
+    if(aurostd::args2attachedflag(argv,"--point_group_crystal_data=|--pgroupxtal_data=|--pgroup_xtal_data=")){ //DX20170901 - SGDATA + JSON
+      vpflow.args2addattachedscheme(argv,cmds,"DATA::TOLERANCE","--point_group_crystal_data=|--pgroupxtal_data=|--pgroup_xtal_data=","");
+    }
+  }
   vpflow.args2addattachedscheme(argv,cmds,"DATA_RECIPROCAL_LATTICE","--reciprocal_lattice_data=|--reciprocallattice_data=|--klattice_data=|--data_reciprocal_lattice=",""); //DX20210209
   if(vpflow.flag("DATA_RECIPROCAL_LATTICE")){ //DX20170901 - SGDATA + JSON
     vpflow.flag("DATA::NO_SCAN",aurostd::args2flag(argv,cmds,"--no_scan"));
@@ -1739,6 +1753,8 @@ namespace pflow {
       // D
       //DX20170901 [OBSOLETE] if(vpflow.flag("DATA")) {pflow::DATA(cin,"DATA"); _PROGRAMRUN=true;}
       if(vpflow.flag("DATA")) {pflow::DATA(cin,vpflow,"DATA",cout); _PROGRAMRUN=true;}
+      if(vpflow.flag("DATA_CRYSTAL_POINT_GROUP")) {pflow::DATA(cin,vpflow,"CRYSTAL_POINT_GROUP",cout); _PROGRAMRUN=true;} //DX20210209
+      if(vpflow.flag("DATA_REAL_LATTICE")) {pflow::DATA(cin,vpflow,"REAL_LATTICE",cout); _PROGRAMRUN=true;} //DX20210209
       if(vpflow.flag("DATA_RECIPROCAL_LATTICE")) {pflow::DATA(cin,vpflow,"RECIPROCAL_LATTICE",cout); _PROGRAMRUN=true;} //DX20210209
       if(vpflow.flag("DATA_SUPERLATTICE")) {pflow::DATA(cin,vpflow,"SUPERLATTICE",cout); _PROGRAMRUN=true;} //DX20210209
       if(vpflow.flag("DATA1")) {pflow::DATA1(vpflow.getattachedscheme("DATA1"),cin); _PROGRAMRUN=true;}
@@ -5507,6 +5523,16 @@ namespace pflow {
     // pflow::PrintData(a,cerr,smode);
     if(smode == "EDATA" || smode == "DATA"){
       pflow::PrintData(a,oss,tolerance,smode,no_scan,setting,format); //DX cout to oss
+    }
+    else if(smode=="REAL_LATTICE"){
+      filetype ftype = txt_ft;
+      if(format == "json"){ ftype = json_ft; }
+      oss << PrintRealLatticeData(a, tolerance, ftype , false, true) << endl;
+    }
+    else if(smode=="CRYSTAL_POINT_GROUP"){
+      filetype ftype = txt_ft;
+      if(format == "json"){ ftype = json_ft; }
+      oss << PrintCrystalPointGroupData(a, tolerance, ftype , false, true) << endl;
     }
     else if(smode=="SUPERLATTICE"){
       filetype ftype = txt_ft;
