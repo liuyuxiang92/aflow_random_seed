@@ -3209,7 +3209,7 @@ namespace pflow {
       oss << " Space group label (Schoenflies)              = " << GetSpaceGroupSchoenflies(str_sg.space_group_ITC, str_sg.directory) << endl; //DX20180526 - add directory
       oss << " Laue class                                   = " << GetLaueLabel(str_sg.point_group_ITC) << endl;
       oss << " Crystal class                                = " << str_sg.point_group_ITC << endl;
-      oss << "ITC REPRESENTATION OF CRYSTAL" << endl;
+      oss << "ITC REPRESENTATION OF THE CRYSTAL" << endl;
       oss << " Setting                                      = " << str_sg.setting_ITC << endl;
       oss << " Origin                                       = " << roundoff(str_sg.origin_ITC,1e-8) << endl;
       oss << " General Wyckoff position" << endl;
@@ -3506,12 +3506,12 @@ namespace pflow {
       ss_output << " Space group label (Schoenflies)              = " << space_group_Schoenflies << endl;
       ss_output << " Laue class                                   = " << class_Laue << endl;
       ss_output << " Crystal class                                = " << str_sg.point_group_ITC << endl;
-      ss_output << "ITC REPRESENTATION OF CRYSTAL" << endl;
+      ss_output << "ITC REPRESENTATION OF THE CRYSTAL" << endl;
       ss_output << " Setting                                      = " << str_sg.setting_ITC << endl;
+      ss_output << " Origin                                       = " << roundoff(str_sg.origin_ITC,1e-8) << endl;
 
       // if not part of EDATA, skip
       if(!standalone){
-        ss_output << " Origin                                       = " << roundoff(str_sg.origin_ITC,1e-8) << endl;
         ss_output << " General Wyckoff position" << endl;
         for(uint i=0;i<str_sg.general_position_ITC.size();i++){
           ss_output << "  " << i+1 << " " << str_sg.general_position_ITC[i] << endl;
@@ -3592,14 +3592,14 @@ namespace pflow {
         json.addNumber("setting_ITC", null_string); //hack
       }
 
-      if(!standalone){
-        // ITC origin
-        if(str_sg.origin_ITC.rows != 0){
-          json.addNumber("origin_ITC","["+aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(str_sg.origin_ITC,_AFLOWLIB_DATA_GEOMETRY_PREC_,roff),",")+"]"); //hack
-        } else if (PRINT_NULL){
-          json.addNumber("origin_ITC", null_string); //hack
-        }
+      // ITC origin
+      if(str_sg.origin_ITC.rows != 0){
+        json.addNumber("origin_ITC","["+aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(str_sg.origin_ITC,_AFLOWLIB_DATA_GEOMETRY_PREC_,roff),",")+"]"); //hack
+      } else if (PRINT_NULL){
+        json.addNumber("origin_ITC", null_string); //hack
+      }
 
+      if(!standalone){
         // general Wyckoff position
         if(str_sg.general_position_ITC.size() != 0){
           vector<vector<string> > positions;
