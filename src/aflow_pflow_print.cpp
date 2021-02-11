@@ -957,6 +957,7 @@ namespace pflow {
     uint sym_eps_change_count = 0; //DX20180226 - added sym eps change count
 
     xstructure str_aus(str);//,str_sp,str_sc; //CO20171027
+    str_aus.ReScale(1.0); //DX20210211
     while(symmetry_commensurate == false){
       if(smode!="EDATA" || no_scan){
         symmetry_commensurate=true;
@@ -1525,6 +1526,7 @@ namespace pflow {
     // ---------------------------------------------------------------------------
     // calculate the real lattice symmetry if not already calculated
     xstructure str_aus(xstr);
+    str_aus.ReScale(1.0);
     if(!already_calculated){
       str_aus.GetRealLatticeType(sym_eps);
     }
@@ -1550,22 +1552,30 @@ namespace pflow {
     // ---------------------------------------------------------------------------
     // text output
     if(ftype == txt_ft){
+
+      string info_prefix = "";
+      if(!standalone){ info_prefix = "Real space "; }
+
       ss_output << "REAL LATTICE" << endl;
-      ss_output << " Real space a b c alpha beta gamma: ";
+      ss_output << " Real space lattice:" << endl;
+      ss_output << "  " << aurostd::roundoff(str_aus.lattice(1),AUROSTD_ROUNDOFF_TOL) << endl;
+      ss_output << "  " << aurostd::roundoff(str_aus.lattice(2),AUROSTD_ROUNDOFF_TOL) << endl;
+      ss_output << "  " << aurostd::roundoff(str_aus.lattice(3),AUROSTD_ROUNDOFF_TOL) << endl;
+      ss_output << " " << info_prefix << "a b c alpha beta gamma: ";
       ss_output.precision(10);ss_output << data(1) << " " << data(2) << " " << data(3) << " ";
       ss_output.precision(3); ss_output << data(4) << " " << data(5) << " " << data(6) << endl;
       ss_output.precision(4);
-      ss_output << " Real space a b c alpha beta gamma: ";
+      ss_output << " " << info_prefix << "a b c alpha beta gamma: ";
       ss_output.precision(10);ss_output << data_Bohr(1) << " " << data_Bohr(2) << " " << data_Bohr(3) << " ";
       ss_output.precision(3); ss_output << data(4) << " " << data(5) << " " << data(6) << "   Bohrs/Degs " << endl;
       ss_output.precision(4);
-      ss_output << " Real space Volume: " << vol << endl;
-      ss_output << " Real space c/a = " << c_over_a << endl;
+      ss_output << " " << info_prefix << "Volume: " << vol << endl;
+      ss_output << " " << info_prefix << "c/a = " << c_over_a << endl;
       ss_output << "BRAVAIS LATTICE OF THE CRYSTAL (pgroup_xtal)" << endl;
-      ss_output << " Real space: Bravais Lattice Primitive        = " << str_aus.bravais_lattice_type << endl;// " " << str.title << endl;
-      ss_output << " Real space: Lattice Variation                = " << str_aus.bravais_lattice_variation_type << endl;//WSETYAWAN mod
-      ss_output << " Real space: Lattice System                   = " << str_aus.bravais_lattice_system << endl;
-      ss_output << " Real space: Pearson Symbol                   = " << str_aus.pearson_symbol << endl;
+      ss_output << " " << info_prefix << "Bravais Lattice Primitive        = " << str_aus.bravais_lattice_type << endl;// " " << str.title << endl;
+      ss_output << " " << info_prefix << "Lattice Variation                = " << str_aus.bravais_lattice_variation_type << endl;//WSETYAWAN mod
+      ss_output << " " << info_prefix << "Lattice System                   = " << str_aus.bravais_lattice_system << endl;
+      ss_output << " " << info_prefix << "Pearson Symbol                   = " << str_aus.pearson_symbol << endl;
     }
     // ---------------------------------------------------------------------------
     // json output
@@ -1575,6 +1585,13 @@ namespace pflow {
       bool roff = true;
       bool PRINT_NULL=FALSE;
       string null_string = "null";
+
+      // Real space lattice
+      if(str_aus.lattice.rows != 0){
+        json.addNumber("lattice_vectors", "["+aurostd::xmatDouble2String(str_aus.lattice,_AFLOWLIB_DATA_GEOMETRY_PREC_,roff)+"]"); //hack
+      } else {
+        json.addNumber("lattice_vectors", null_string); //hack
+      }
 
       // Real lattice parameters
       if(data.rows != 0){
@@ -1647,6 +1664,7 @@ namespace pflow {
     // calculate the real lattice symmetry (contains point group information)
     // if not already calculated
     xstructure str_aus(xstr);
+    str_aus.ReScale(1.0);
     if(!already_calculated){
       str_aus.GetRealLatticeType(sym_eps);
     }
@@ -1655,16 +1673,20 @@ namespace pflow {
     // ---------------------------------------------------------------------------
     // text output
     if(ftype == txt_ft){
+
+      string info_prefix = "";
+      if(!standalone){ info_prefix = "Real space "; }
+
       ss_output << "POINT GROUP CRYSTAL" << endl;
-      ss_output << " Real space: Crystal Family                   = " << str_aus.crystal_family << endl;
-      ss_output << " Real space: Crystal System                   = " << str_aus.crystal_system << endl;
-      ss_output << " Real space: Crystal Class                    = " << str_aus.point_group_crystal_class << endl;
-      ss_output << " Real space: Point Group (Hermann Mauguin)    = " << str_aus.point_group_Hermann_Mauguin << endl; // "      PGXTAL" << endl;
-      ss_output << " Real space: Point Group (Schoenflies)        = " << str_aus.point_group_Shoenflies << endl;
-      ss_output << " Real space: Point Group Orbifold             = " << str_aus.point_group_orbifold << endl;
-      ss_output << " Real space: Point Group Type                 = " << str_aus.point_group_type << endl;
-      ss_output << " Real space: Point Group Order                = " << str_aus.point_group_order << endl;
-      ss_output << " Real space: Point Group Structure            = " << str_aus.point_group_structure << endl;
+      ss_output << " " << info_prefix << "Crystal Family                   = " << str_aus.crystal_family << endl;
+      ss_output << " " << info_prefix << "Crystal System                   = " << str_aus.crystal_system << endl;
+      ss_output << " " << info_prefix << "Crystal Class                    = " << str_aus.point_group_crystal_class << endl;
+      ss_output << " " << info_prefix << "Point Group (Hermann Mauguin)    = " << str_aus.point_group_Hermann_Mauguin << endl; // "      PGXTAL" << endl;
+      ss_output << " " << info_prefix << "Point Group (Schoenflies)        = " << str_aus.point_group_Shoenflies << endl;
+      ss_output << " " << info_prefix << "Point Group Orbifold             = " << str_aus.point_group_orbifold << endl;
+      ss_output << " " << info_prefix << "Point Group Type                 = " << str_aus.point_group_type << endl;
+      ss_output << " " << info_prefix << "Point Group Order                = " << str_aus.point_group_order << endl;
+      ss_output << " " << info_prefix << "Point Group Structure            = " << str_aus.point_group_structure << endl;
     }
     // ---------------------------------------------------------------------------
     // json output
@@ -1759,6 +1781,7 @@ namespace pflow {
     // ---------------------------------------------------------------------------
     // calculate the reciprocal lattice symmetry if not already calculated
     xstructure str_aus(xstr);
+    str_aus.ReScale(1.0);
     if(!already_calculated){
       str_aus.GetReciprocalLatticeType(sym_eps);
     }
@@ -1770,18 +1793,22 @@ namespace pflow {
     // ---------------------------------------------------------------------------
     // text output
     if(ftype == txt_ft){
-        ss_output << "RECIPROCAL LATTICE" << endl;
-        ss_output << " Reciprocal space lattice:" << endl;
-        ss_output << "  " << aurostd::roundoff(str_aus.klattice(1),AUROSTD_ROUNDOFF_TOL) << endl;
-        ss_output << "  " << aurostd::roundoff(str_aus.klattice(2),AUROSTD_ROUNDOFF_TOL) << endl;
-        ss_output << "  " << aurostd::roundoff(str_aus.klattice(3),AUROSTD_ROUNDOFF_TOL) << endl;
-        ss_output << " Reciprocal space a b c alpha beta gamma: ";
-        ss_output.precision(10);ss_output << data(1) << " " << data(2) << " " << data(3) << " ";
-        ss_output.precision(3); ss_output << data(4) << " " << data(5) << " " << data(6) << endl;
-        ss_output.precision(4);
-        ss_output << " Reciprocal space Volume: " << kvol << endl;
-        ss_output << " Reciprocal lattice primitive            = " << str_aus.reciprocal_lattice_type << endl;
-        ss_output << " Reciprocal lattice variation            = " << str_aus.reciprocal_lattice_variation_type << endl; //WSETYAWAN mod
+
+      string info_prefix = "";
+      if(!standalone){ info_prefix = "Reciprocal space "; }
+
+      ss_output << "RECIPROCAL LATTICE" << endl;
+      ss_output << " Reciprocal space lattice:" << endl;
+      ss_output << "  " << aurostd::roundoff(str_aus.klattice(1),AUROSTD_ROUNDOFF_TOL) << endl;
+      ss_output << "  " << aurostd::roundoff(str_aus.klattice(2),AUROSTD_ROUNDOFF_TOL) << endl;
+      ss_output << "  " << aurostd::roundoff(str_aus.klattice(3),AUROSTD_ROUNDOFF_TOL) << endl;
+      ss_output << " " << info_prefix << "a b c alpha beta gamma: ";
+      ss_output.precision(10);ss_output << data(1) << " " << data(2) << " " << data(3) << " ";
+      ss_output.precision(3); ss_output << data(4) << " " << data(5) << " " << data(6) << endl;
+      ss_output.precision(4);
+      ss_output << " " << info_prefix << "Volume: " << kvol << endl;
+      ss_output << " Reciprocal lattice primitive            = " << str_aus.reciprocal_lattice_type << endl;
+      ss_output << " Reciprocal lattice variation            = " << str_aus.reciprocal_lattice_variation_type << endl; //WSETYAWAN mod
     }
     // ---------------------------------------------------------------------------
     // json output
@@ -1842,23 +1869,55 @@ namespace pflow {
     // ---------------------------------------------------------------------------
     // calculate the superlattice symmetry if not already calculated
     xstructure str_aus(xstr);
+    str_aus.ReScale(1.0);
     if(!already_calculated){ 
       str_aus.GetSuperlatticeType(sym_eps);
     }
+
+    // get lattice and angles
+    xvector<double> data(6);
+    data=Getabc_angles(str_aus.bravais_superlattice_lattice,DEGREES);//DX20210201 - scaling factor from data(1)*=str_aus.scale;data(2)*=str_aus.scale;data(3)*=str_aus.scale;
+    double c_over_a = data(3)/data(1);
+
+    // get lattice and angles (Bohr)
+    xvector<double> data_Bohr(6);
+    data_Bohr(1) =  data(1)*angstrom2bohr;
+    data_Bohr(2) =  data(2)*angstrom2bohr;
+    data_Bohr(3) =  data(3)*angstrom2bohr;
+    data_Bohr(4) =  data(4);
+    data_Bohr(5) =  data(5);
+    data_Bohr(6) =  data(6);
+
+    // get volume
+    double vol = GetVol(str_aus.bravais_superlattice_lattice)*str_aus.scale*str_aus.scale*str_aus.scale;
 
     stringstream ss_output;
     // ---------------------------------------------------------------------------
     // text output
     if(ftype == txt_ft){
+
+      string info_prefix = "";
+      if(!standalone){ info_prefix = "Real space "; }
+
       ss_output << "SUPERLATTICE (equally decorated)" << endl;
       ss_output << " Superlattice lattice:" << endl;
       ss_output << "  " << aurostd::roundoff(str_aus.bravais_superlattice_lattice(1),AUROSTD_ROUNDOFF_TOL) << endl;
       ss_output << "  " << aurostd::roundoff(str_aus.bravais_superlattice_lattice(2),AUROSTD_ROUNDOFF_TOL) << endl;
       ss_output << "  " << aurostd::roundoff(str_aus.bravais_superlattice_lattice(3),AUROSTD_ROUNDOFF_TOL) << endl;
-      ss_output << " Real space: Bravais Superlattice Primitive   = " << str_aus.bravais_superlattice_type << endl;
-      ss_output << " Real space: Superlattice Variation           = " << str_aus.bravais_superlattice_variation_type << endl;
-      ss_output << " Real space: Superlattice System              = " << str_aus.bravais_superlattice_system << endl; //DX - fixed mistake in line above
-      ss_output << " Real space: Pearson Symbol Superlattice      = " << str_aus.pearson_symbol_superlattice << endl;
+      ss_output << " " << info_prefix << "a b c alpha beta gamma: ";
+      ss_output.precision(10);ss_output << data(1) << " " << data(2) << " " << data(3) << " ";
+      ss_output.precision(3); ss_output << data(4) << " " << data(5) << " " << data(6) << endl;
+      ss_output.precision(4);
+      ss_output << " " << info_prefix << "a b c alpha beta gamma: ";
+      ss_output.precision(10);ss_output << data_Bohr(1) << " " << data_Bohr(2) << " " << data_Bohr(3) << " ";
+      ss_output.precision(3); ss_output << data(4) << " " << data(5) << " " << data(6) << "   Bohrs/Degs " << endl;
+      ss_output.precision(4);
+      ss_output << " " << info_prefix << "Volume: " << vol << endl;
+      ss_output << " " << info_prefix << "c/a = " << c_over_a << endl;
+      ss_output << " " << info_prefix << "Bravais Superlattice Primitive   = " << str_aus.bravais_superlattice_type << endl;
+      ss_output << " " << info_prefix << "Superlattice Variation           = " << str_aus.bravais_superlattice_variation_type << endl;
+      ss_output << " " << info_prefix << "Superlattice System              = " << str_aus.bravais_superlattice_system << endl; //DX - fixed mistake in line above
+      ss_output << " " << info_prefix << "Pearson Symbol Superlattice      = " << str_aus.pearson_symbol_superlattice << endl;
     }
     // ---------------------------------------------------------------------------
     // json output
@@ -1866,40 +1925,61 @@ namespace pflow {
 
       aurostd::JSONwriter json;
       bool roff = true;
+      bool PRINT_NULL=false;
       string null_string = "null";
 
       // Real space: bravais superlattice lattice
       if(str_aus.bravais_superlattice_type.size() != 0){
         json.addNumber("Bravais_superlattice_lattice", "["+aurostd::xmatDouble2String(str_aus.bravais_superlattice_lattice,_AFLOWLIB_DATA_GEOMETRY_PREC_,roff)+"]"); //hack
-      } else {
+      } else if(PRINT_NULL){
         json.addNumber("Bravais_superlattice_lattice", null_string); //hack
       }
+
+      // Real lattice parameters
+      if(data.rows != 0){
+        json.addNumber("lattice_parameters_superlattice","["+aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(data,_AFLOWLIB_DATA_GEOMETRY_PREC_,roff),",")+"]"); //hack
+      } else if (PRINT_NULL){
+        json.addNumber("lattice_parameters_superlattice", null_string); //hack
+      }
+
+      // Real lattice parameters (Bohr/Deg)
+      if(data_Bohr.rows != 0){
+        json.addNumber("lattice_parameters_superlattice_Bohr_deg","["+aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(data_Bohr,_AFLOWLIB_DATA_GEOMETRY_PREC_,roff),",")+"]"); //hack
+      } else if (PRINT_NULL){
+        json.addNumber("lattice_parameters_superlattice_Bohr_deg", null_string); //hack
+      }
+
+      // Real space volume
+      json.addNumber("volume_superlattice", vol);
+
+      // Real space c/a
+      json.addNumber("c_over_a_superlattice", c_over_a);
 
       // Real space: bravais superlattice type
       if(str_aus.bravais_superlattice_type.size() != 0){
         json.addString("Bravais_superlattice_type", str_aus.bravais_superlattice_type);
-      } else {
+      } else if(PRINT_NULL){
         json.addNumber("Bravais_superlattice_type", null_string);
       }
 
       // Real space: bravais superlattice variation type
       if(str_aus.bravais_superlattice_type.size() != 0){
         json.addString("Bravais_superlattice_variation_type", str_aus.bravais_superlattice_variation_type);
-      } else {
+      } else if(PRINT_NULL){
         json.addNumber("Bravais_superlattice_variation_type", null_string);
       }
 
       // Real space: bravais superlattice system
       if(str_aus.bravais_superlattice_type.size() != 0){
         json.addString("Bravais_superlattice_system", str_aus.bravais_superlattice_system);
-      } else {
+      } else if(PRINT_NULL){
         json.addNumber("Bravais_superlattice_system", null_string);
       }
 
       // Real space: bravais superlattice type
       if(str_aus.bravais_superlattice_type.size() != 0){
         json.addString("Pearson_symbol_superlattice", str_aus.pearson_symbol_superlattice);
-      } else {
+      } else if(PRINT_NULL){
         json.addNumber("Pearson_symbol_superlattice", null_string);
       }
       ss_output << json.toString(standalone); //standalone: determines if we enclose in brackets
@@ -3383,6 +3463,263 @@ namespace pflow {
     return true;
   }
 }      
+//DX20170830 - SGDATA
+
+namespace pflow {
+  string PrintSGDataNEW(const xstructure& xstr, double sym_eps, bool no_scan, int setting, filetype ftype, bool already_calculated, bool standalone) { //DX20180226 - added & to tolerance
+    aurostd::xoption vpflow;
+    return PrintSGDataNEW(xstr, vpflow, sym_eps, no_scan, setting, ftype, already_calculated, standalone);
+  }
+}
+
+namespace pflow {
+  //DX20210211 [OBSOLETE] bool PrintSGData(xstructure& str_sg, double& tolerance, ostream& oss_final, aurostd::xoption& vpflow, bool no_scan, int setting, bool standalone, const string& format,bool already_calculated) { //DX20180226 - added & to tolerance
+  string PrintSGDataNEW(const xstructure& xstr, aurostd::xoption& vpflow, double sym_eps, bool no_scan, int setting, filetype ftype, bool already_calculated, bool standalone) { //DX20180226 - added & to tolerance
+
+    string function_name = XPID + "pflow::PrintSGData():";
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+
+    if(LDEBUG) cerr << function_name << " BEGIN" << endl;
+
+    // ---------------------------------------------------------------------------
+    // calculate the space group symmetry if not already calculated
+    xstructure str_sg(xstr);
+    if(!already_calculated){
+      str_sg.SpaceGroup_ITC(sym_eps, -1, setting, no_scan);
+    }
+
+    // get symmetry labels
+    string space_group_HM = GetSpaceGroupName(str_sg.space_group_ITC, str_sg.directory);
+    string space_group_Hall = GetSpaceGroupHall(str_sg.space_group_ITC, setting, str_sg.directory);
+    string space_group_Schoenflies = GetSpaceGroupSchoenflies(str_sg.space_group_ITC, str_sg.directory);
+    string class_Laue = GetLaueLabel(str_sg.point_group_ITC);
+
+    stringstream ss_output;
+    ss_output.setf(std::ios::fixed,std::ios::floatfield);
+    // ---------------------------------------------------------------------------
+    // text output
+    if(ftype == txt_ft){
+      ss_output << "SPACE GROUP OF THE CRYSTAL" << endl;
+      ss_output << " Space group number                           = " << str_sg.space_group_ITC << endl;
+      ss_output << " Space group label (Hermann Mauguin)          = " << space_group_HM << endl;
+      ss_output << " Space group label (Hall)                     = " << space_group_Hall << endl;
+      ss_output << " Space group label (Schoenflies)              = " << space_group_Schoenflies << endl;
+      ss_output << " Laue class                                   = " << class_Laue << endl;
+      ss_output << " Crystal class                                = " << str_sg.point_group_ITC << endl;
+      ss_output << "ITC REPRESENTATION OF CRYSTAL" << endl;
+      ss_output << " Setting                                      = " << str_sg.setting_ITC << endl;
+
+      // if not part of EDATA, skip
+      if(!standalone){
+        ss_output << " Origin                                       = " << roundoff(str_sg.origin_ITC,1e-8) << endl;
+        ss_output << " General Wyckoff position" << endl;
+        for(uint i=0;i<str_sg.general_position_ITC.size();i++){
+          ss_output << "  " << i+1 << " " << str_sg.general_position_ITC[i] << endl;
+        }
+        ss_output << " Representative Wyckoff positions" << endl;
+        for(uint i=0;i<str_sg.wyccar_ITC.size();i++){
+          if(i>4 && i!=str_sg.wyccar_ITC.size()-1){ //Skip title, scale, lattice parameters, number of atoms, and coordinate type, and last newline
+            ss_output << str_sg.wyccar_ITC[i] << endl;
+          }
+        }
+        ss_output << "WYCCAR" << endl;
+        // convert vector<string> of WYCCAR to xstructure
+        stringstream wss;
+        for(uint i=0;i<str_sg.wyccar_ITC.size();i++){
+          wss << str_sg.wyccar_ITC[i] << endl;
+        }
+        if(str_sg.wyccar_ITC.size()!=0){ //DX20180526 - skip if fails
+          xstructure xstr_wyccar(wss,IOVASP_WYCKCAR);
+          ss_output << xstr_wyccar << endl;
+        }
+      }
+    }
+    // ---------------------------------------------------------------------------
+    // json output
+    else if(ftype == json_ft){
+
+      aurostd::JSONwriter json;
+      bool roff = true;
+      bool PRINT_NULL=FALSE;
+      string null_string = "null";
+
+      // space group number
+      if(str_sg.space_group_ITC > 0 && str_sg.space_group_ITC < 231){
+        json.addNumber("space_group_number", str_sg.space_group_ITC);
+      } else if (PRINT_NULL){
+        json.addNumber("space_group_number", null_string); //hack
+      }
+
+      // space group label (HM)
+      if(space_group_HM.size() != 0){
+        json.addString("space_group_Hermann_Mauguin", space_group_HM);
+      } else if (PRINT_NULL){
+        json.addNumber("space_group_Hermann_Mauguin", null_string); //hack
+      }
+
+      // space group label (Hall)
+      if(space_group_Hall.size() != 0){
+        json.addString("space_group_Hall", space_group_Hall);
+      } else if (PRINT_NULL){
+        json.addNumber("space_group_Hall", null_string); //hack
+      }
+
+      // space group label (Schoenflies)
+      if(space_group_Schoenflies.size() != 0){
+        json.addString("space_group_Schoenflies", space_group_Schoenflies);
+      } else if (PRINT_NULL){
+        json.addNumber("space_group_Schoenflies", null_string); //hack
+      }
+
+      // Laue
+      if(class_Laue.size() != 0){
+        json.addString("Laue", class_Laue);
+      } else if (PRINT_NULL){
+        json.addNumber("Laue", null_string); //hack
+      }
+
+      // crystal class
+      if(str_sg.point_group_ITC.size() != 0){
+        json.addString("crystal_class", str_sg.point_group_ITC);
+      } else if (PRINT_NULL){
+        json.addNumber("crystal_class", null_string); //hack
+      }
+
+      // ITC setting
+      if(str_sg.setting_ITC == 1 || str_sg.setting_ITC == 2){
+        json.addNumber("setting_ITC", str_sg.setting_ITC);
+      } else if (PRINT_NULL){
+        json.addNumber("setting_ITC", null_string); //hack
+      }
+
+      if(!standalone){
+        // ITC origin
+        if(str_sg.origin_ITC.rows != 0){
+          json.addNumber("origin_ITC","["+aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(str_sg.origin_ITC,_AFLOWLIB_DATA_GEOMETRY_PREC_,roff),",")+"]"); //hack
+        } else if (PRINT_NULL){
+          json.addNumber("origin_ITC", null_string); //hack
+        }
+
+        // general Wyckoff position
+        if(str_sg.general_position_ITC.size() != 0){
+          vector<vector<string> > positions;
+          vector<string> tokens_positions;
+          for(uint i=0;i<str_sg.general_position_ITC.size();i++){
+            tokens_positions.clear();
+            aurostd::string2tokens(str_sg.general_position_ITC[i],tokens_positions,",");
+            positions.push_back(tokens_positions);
+          }
+          json.addMatrix("general_position_ITC",positions);
+        } else if (PRINT_NULL){
+          json.addNumber("general_position_ITC", null_string); //hack
+        }
+
+        // representative Wyckoff positions
+        if(str_sg.wyccar_ITC.size()){
+
+          aurostd::JSONwriter json_Wyckoff;
+
+          vector<string> wyckoff_set;
+          xvector<double> position;
+          for(uint i=0;i<str_sg.wyccar_ITC.size();i++){
+            if(i>4 && i!=str_sg.wyccar_ITC.size()-1){ //Skip title, scale, lattice parameters, number of atoms, and coordinate type, and last newline
+              json_Wyckoff.clear();
+              position.clear();
+
+              vector<string> tokens;
+              aurostd::string2tokens(str_sg.wyccar_ITC[i],tokens," ");
+              if(tokens.size() == 7){
+                position(1) = aurostd::string2utype<double>(tokens[0]);
+                position(2) = aurostd::string2utype<double>(tokens[1]);
+                position(3) = aurostd::string2utype<double>(tokens[2]);
+                json_Wyckoff.addNumber("position","["+aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(position,_AFLOWLIB_DATA_GEOMETRY_PREC_,roff),",")+"]"); //hack
+                json_Wyckoff.addString("name", tokens[3]);
+                json_Wyckoff.addNumber("mulitiplicity", tokens[4]);
+                json_Wyckoff.addString("Wyckoff_letter", tokens[5]);
+                json_Wyckoff.addString("site_symmetry", tokens[6]);
+              }
+              wyckoff_set.push_back(json_Wyckoff.toString(true));
+            }
+          }
+
+          json.addVector("Wyckoff_positions", wyckoff_set);
+        } else if (PRINT_NULL){
+          json.addNumber("Wyckoff_positions", null_string); //hack
+        }
+
+        // WYCCAR
+        if(str_sg.wyccar_ITC.size() != 0){
+          // convert vector<string> of WYCCAR to xstructure
+          stringstream wss;
+          for(uint i=0;i<str_sg.wyccar_ITC.size();i++){
+            wss << str_sg.wyccar_ITC[i] << endl;
+          }
+          xstructure xstr_wyccar(wss,IOVASP_WYCKCAR);
+          json.addNumber("wyccar", xstructure2json(xstr_wyccar)); // hack
+        } else if (PRINT_NULL){
+          json.addNumber("wyccar", null_string); //hack
+        }
+      }
+      ss_output << json.toString(standalone);
+    }
+
+    //DX20180822 - put attributes into vpflow - START
+    if(vpflow.flag("SGDATA::CALCULATED")){ //DX20180823 - if calculated, remove
+      vpflow.pop_attached("SGDATA::SPACE_GROUP_NUMBER");
+      vpflow.pop_attached("SGDATA::SPACE_GROUP_HERMANN_MAUGUIN");
+      vpflow.pop_attached("SGDATA::SPACE_GROUP_HALL");
+      vpflow.pop_attached("SGDATA::SPACE_GROUP_SCHOENFLIES");
+      vpflow.pop_attached("SGDATA::LAUE");
+      vpflow.pop_attached("SGDATA::CRYSTAL_CLASS");
+      vpflow.pop_attached("SGDATA::SETTING_ITC");
+      vpflow.pop_attached("SGDATA::ORIGIN_ITC");
+      vpflow.pop_attached("SGDATA::GENERAL_POSITION_ITC");
+      vpflow.pop_attached("SGDATA::WYCKOFF_LETTERS");
+      vpflow.pop_attached("SGDATA::WYCKOFF_MULTIPLICITIES");
+      vpflow.pop_attached("SGDATA::WYCKOFF_SITE_SYMMETRIES");
+      vpflow.pop_attached("SGDATA::WYCKOFF_POSITIONS");
+      vpflow.pop_attached("SGDATA::WYCCAR");
+    }
+    //DX20180823 - now populate xoption
+    vpflow.flag("SGDATA::CALCULATED");
+    vpflow.push_attached("SGDATA::SPACE_GROUP_NUMBER",aurostd::utype2string<uint>(str_sg.space_group_ITC));
+    vpflow.push_attached("SGDATA::SPACE_GROUP_HERMANN_MAUGUIN",GetSpaceGroupName(str_sg.space_group_ITC, str_sg.directory));
+    vpflow.push_attached("SGDATA::SPACE_GROUP_HALL",GetSpaceGroupHall(str_sg.space_group_ITC, setting, str_sg.directory));
+    vpflow.push_attached("SGDATA::SPACE_GROUP_SCHOENFLIES",GetSpaceGroupSchoenflies(str_sg.space_group_ITC, str_sg.directory));
+    vpflow.push_attached("SGDATA::LAUE",GetLaueLabel(str_sg.point_group_ITC));
+    vpflow.push_attached("SGDATA::CRYSTAL_CLASS",str_sg.point_group_ITC);
+    vpflow.push_attached("SGDATA::SETTING_ITC",aurostd::utype2string<uint>(str_sg.setting_ITC));
+    vpflow.push_attached("SGDATA::ORIGIN_ITC",aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(str_sg.origin_ITC,5,true),","));
+    // turn vector of strings into single string
+    stringstream general_position;
+    general_position << "[";
+    for(uint i=0;i<str_sg.general_position_ITC.size();i++){
+      vector<string> tokens;
+      aurostd::string2tokens(str_sg.general_position_ITC[i],tokens,",");
+      general_position << "[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(tokens,"\""),",") << "]";
+      if(i != str_sg.general_position_ITC.size()-1){
+        general_position << ",";
+      }
+    }
+    general_position << "]";
+    vpflow.push_attached("SGDATA::GENERAL_POSITION_ITC",general_position.str());
+    stringstream wyccar;
+    stringstream Wyckoff_positions;
+    for(uint i=0;i<str_sg.wyccar_ITC.size();i++){
+      if(i>4 && i!=str_sg.wyccar_ITC.size()-1){ //Skip title, scale, lattice parameters, number of atoms, and coordinate type, and last newline
+        Wyckoff_positions << str_sg.wyccar_ITC[i] << endl;
+      }
+      wyccar << str_sg.wyccar_ITC[i] << endl;
+    }
+    vpflow.push_attached("SGDATA::WYCKOFF_LETTERS",SYM::ExtractWyckoffLettersString(str_sg.wyccar_ITC));
+    vpflow.push_attached("SGDATA::WYCKOFF_MULTIPLICITIES",SYM::ExtractWyckoffMultiplicitiesString(str_sg.wyccar_ITC));
+    vpflow.push_attached("SGDATA::WYCKOFF_SITE_SYMMETRIES",SYM::ExtractWyckoffSiteSymmetriesString(str_sg.wyccar_ITC));
+    vpflow.push_attached("SGDATA::WYCKOFF_POSITIONS",Wyckoff_positions.str());
+    vpflow.push_attached("SGDATA::WYCCAR",wyccar.str());
+    //DX20180822 - put attributes into vpflow - END
+    return ss_output.str();
+  }
+}
 //DX20170830 - SGDATA
 
 // **************************************************************************

@@ -503,6 +503,8 @@ namespace pflow {
   bool PrintSGData(xstructure& str_sg,ostream& oss,bool standalone=true,const string& format="txt",bool already_calculated=false); //DX20170830 - SGDATA
   bool PrintSGData(xstructure& str_sg,double& tolerance,ostream& oss,bool no_scan=false,int setting=1,bool standalone=true,const string& format="txt",bool already_calculated=false); //DX20180226 - added & to tolerance
   bool PrintSGData(xstructure& str_sg,double& tolerance,ostream& oss_final,aurostd::xoption& vpflow,bool no_scan=false,int sg_setting=1,bool standalone=true,const string& format="txt",bool already_calculated=false); //DX20180822
+  string PrintSGDataNEW(const xstructure& xstr, double sym_eps=AUROSTD_MAX_DOUBLE, bool no_scan=false, int setting=1, filetype ftype=txt_ft, bool already_calculated=false, bool standalone=true); //DX20210211
+  string PrintSGDataNEW(const xstructure& xstr, aurostd::xoption& vpflow, double sym_eps=AUROSTD_MAX_DOUBLE, bool no_scan=false, int setting=1, filetype ftype=txt_ft, bool already_calculated=false, bool standalone=true); //DX20210211
 }
 void PrintKmesh(const xmatrix<double>& kmesh,ostream& oss=cout);    // HERE
 void PrintImages(xstructure strA,xstructure strB,const int& ni,const string& path_flag);

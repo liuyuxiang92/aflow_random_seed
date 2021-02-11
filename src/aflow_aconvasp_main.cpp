@@ -507,11 +507,11 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     }
   } //DX20170901 - SGDATA + JSON
 
-  vpflow.args2addattachedscheme(argv,cmds,"DATA_REAL_LATTICE","--lattice_data=|--data_lattice=",""); //DX20210209
+  vpflow.args2addattachedscheme(argv,cmds,"DATA_REAL_LATTICE","--lattice_data=|--data_lattice=|--real_lattice_data=|--data_real_lattice=",""); //DX20210209
   if(vpflow.flag("DATA_REAL_LATTICE")){ //DX20170901 - SGDATA + JSON
     vpflow.flag("DATA::NO_SCAN",aurostd::args2flag(argv,cmds,"--no_scan"));
-    if(aurostd::args2attachedflag(argv,"--lattice_data=|--data_lattice=")){ //DX20170901 - SGDATA + JSON
-      vpflow.args2addattachedscheme(argv,cmds,"DATA::TOLERANCE","--lattice_data=|--data_lattice=","");
+    if(aurostd::args2attachedflag(argv,"--lattice_data=|--data_lattice=|--real_lattice_data=|--data_real_lattice=")){ //DX20170901 - SGDATA + JSON
+      vpflow.args2addattachedscheme(argv,cmds,"DATA::TOLERANCE","--lattice_data=|--data_lattice=|--real_lattice_data=|--data_real_lattice=","");
     }
   }
   vpflow.args2addattachedscheme(argv,cmds,"DATA_CRYSTAL_POINT_GROUP","--point_group_crystal_data=|--pgroupxtal_data=|--pgroup_xtal_data=",""); //DX20210209
@@ -1328,6 +1328,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.args2addattachedscheme(argv,cmds,"SGDATA","--sgdata=|--space_group_data=","");
   if(vpflow.flag("SGDATA")){
     vpflow.flag("SGDATA::NO_SCAN",aurostd::args2flag(argv,cmds,"--no_scan")); //DX20170901 - SGDATA + JSON
+    vpflow.flag("SGDATA::SUPPRESS_WYCKOFF_PRINTING",aurostd::args2flag(argv,cmds,"--suppress_Wyckoff|--suppress_Wyckoff_printing")); //DX20210211
     if(aurostd::args2attachedflag(argv,"--sgdata=|--space_group_data=")){
       vpflow.args2addattachedscheme(argv,cmds,"SGDATA::TOLERANCE","--sgdata=|--space_group_data=",""); //DX20200907 - default is system specific, leaving empty
     }
@@ -14050,11 +14051,22 @@ namespace pflow {
     if(vpflow.flag("SGDATA::NO_SCAN")){
       no_scan = true;
     }
+    bool suppress_Wyckoff = false;
+    if(vpflow.flag("SGDATA::SUPPRESS_WYCKOFF_PRINTING")){
+      suppress_Wyckoff = true;
+    }
     if(format=="txt"){
       cout << aflow::Banner("BANNER_TINY") << endl;
     }
     // pflow::PrintData(a,cerr,smode);
-    pflow::PrintSGData(a,tolerance,oss,no_scan,setting,true,format,false); //CO20171027 //DX20180806 - added setting
+    if(!suppress_Wyckoff){
+      pflow::PrintSGData(a,tolerance,oss,no_scan,setting,true,format,false); //CO20171027 //DX20180806 - added setting
+    }
+    else{
+      filetype ftype = txt_ft;
+      if(format == "json"){ ftype = json_ft; }
+      cout << pflow::PrintSGDataNEW(a,tolerance,no_scan,setting,ftype,false,true) << endl;
+    }
     return true;
   }
 } // namespace pflow

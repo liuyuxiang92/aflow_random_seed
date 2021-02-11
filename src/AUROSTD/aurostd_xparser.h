@@ -75,6 +75,8 @@ namespace aurostd {
       void addMatrix(const string &key, const deque<deque<double> > &value,
           int precision = AUROSTD_DEFAULT_PRECISION, bool roundoff = false,
           double tol = AUROSTD_ROUNDOFF_TOL);
+      void addMatrix(const string &key, const vector<vector<string> > &value); //DX20210211
+      void addMatrix(const string &key, const deque<deque<string> > &value); //DX20210211
       void addString(const string &key, const string &value);
       void addBool(const string &key, bool value);
       void addRaw(const string &value);

@@ -10546,6 +10546,7 @@ void xstructure::GetSuperlatticeType(xstructure& str_sp,xstructure& str_sc, doub
   str_in.sym_eps_change_count=str_sp.sym_eps_change_count=str_sc.sym_eps_change_count=str_sp.sym_eps_change_count; //DX20180222 - added sym_eps change count
   // main lattice function
   LATTICE::Standard_Lattice_StructureDefault(str_in,str_sp,str_sc,false); //DX //DX20180226 - do not need to do full sym for superlattice
+  str_sp.ReScale(1.0); //DX20210211 - need to rescale to 1 since we aren't propagating the superlattice scaling factor
   this->bravais_superlattice_lattice=str_sp.lattice;
   this->bravais_superlattice_type=str_sp.bravais_lattice_type;
   this->bravais_superlattice_variation_type=str_sp.bravais_lattice_variation_type;

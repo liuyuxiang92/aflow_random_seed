@@ -496,6 +496,30 @@ namespace aurostd {
     content.back() += "]";
   }
 
+  void JSONwriter::addMatrix(const string &key, const vector<vector<string> > &value) //DX20210211
+  {
+    content.push_back("\"" + key + "\":[");
+    vector<string> matrix;
+    for (uint i=0; i<value.size(); i++){
+      matrix.push_back("[" + aurostd::joinWDelimiter(
+            aurostd::wrapVecEntries(value[i],"\""), ",") + "]");
+    }
+    content.back() += aurostd::joinWDelimiter(matrix, ",");
+    content.back() += "]";
+  }
+
+  void JSONwriter::addMatrix(const string &key, const deque<deque<string> > &value) //DX20210211
+  {
+    content.push_back("\"" + key + "\":[");
+    vector<string> matrix;
+    for (uint i=0; i<value.size(); i++){
+      matrix.push_back("[" + aurostd::joinWDelimiter(
+            aurostd::wrapVecEntries(value[i],"\""), ",") + "]");
+    }
+    content.back() += aurostd::joinWDelimiter(matrix, ",");
+    content.back() += "]";
+  }
+
   //***************************************************************************
   void JSONwriter::addString(const string &key, const string &value)
   {
