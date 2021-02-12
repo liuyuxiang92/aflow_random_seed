@@ -2522,6 +2522,13 @@ namespace aflowlib {
 
 namespace aflowlib {
   bool LIB2RAW_Calculate_FormationEnthalpy(aflowlib::_aflowlib_entry& data,const xstructure& xstr,const string& MESSAGE){ //CO20200731
+    /* 
+       make 2 flags
+       formation_calc_cce which allows or not calculaiton of cce having the right functional-cce
+       formation_calc_U which allows or not calculation of Href based on the fact that we have - or not - U
+       then a combination of AND/OR will do the if(combination) so that  lines XXX1 and XXX2 are always printed
+    */
+
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy=XPID+"aflowlib::LIB2RAW_Calculate_FormationEnthalpy():";
     // reference
@@ -2531,51 +2538,54 @@ namespace aflowlib {
     if(LDEBUG){cerr << soliloquy << " isLDAUcalc=" << isLDAUcalc << endl;}
 
     //CO20200624 START - CCE
-    string functional="";
+    string functional_cce="";
     if(xstr.species_pp_version.size()>0){
       //CO20200624 - don't use else if's, we might prefer that which comes later
-      if(xstr.species_pp_version[0].find("PBE")!=string::npos){functional="PBE";}
-      if(xstr.species_pp_version[0].find("LDA")!=string::npos){functional="LDA";}
-      if(xstr.species_pp_version[0].find("SCAN")!=string::npos){functional="SCAN";}
+      if(xstr.species_pp_version[0].find("PBE")!=string::npos){functional_cce="PBE";}
+      if(xstr.species_pp_version[0].find("LDA")!=string::npos){functional_cce="LDA";}
+      if(xstr.species_pp_version[0].find("SCAN")!=string::npos){functional_cce="SCAN";}
       //double check all of the pp match
-      for(uint i=0;i<xstr.species_pp_version.size()&&!functional.empty();i++){
-        if(functional=="PBE" && xstr.species_pp_version[i].find("PBE")==string::npos){
-          pflow::logger(_AFLOW_FILE_NAME_,soliloquy,"Mismatch in species_pp_version found ("+functional+"), not calculating CCE correction",_LOGGER_WARNING_);
-          functional="";
+      for(uint i=0;i<xstr.species_pp_version.size()&&!functional_cce.empty();i++){
+        if(functional_cce=="PBE" && xstr.species_pp_version[i].find("PBE")==string::npos){
+          pflow::logger(_AFLOW_FILE_NAME_,soliloquy,"Mismatch in species_pp_version found ("+functional_cce+"), not calculating CCE correction",_LOGGER_WARNING_);
+          functional_cce="";
         }
-        if(functional=="LDA" && xstr.species_pp_version[i].find("LDA")!=string::npos){
-          pflow::logger(_AFLOW_FILE_NAME_,soliloquy,"Mismatch in species_pp_version found ("+functional+"), not calculating CCE correction",_LOGGER_WARNING_);
-          functional="";
+        if(functional_cce=="LDA" && xstr.species_pp_version[i].find("LDA")!=string::npos){
+          pflow::logger(_AFLOW_FILE_NAME_,soliloquy,"Mismatch in species_pp_version found ("+functional_cce+"), not calculating CCE correction",_LOGGER_WARNING_);
+          functional_cce="";
         }
-        if(functional=="SCAN" && xstr.species_pp_version[i].find("SCAN")!=string::npos){
-          pflow::logger(_AFLOW_FILE_NAME_,soliloquy,"Mismatch in species_pp_version found ("+functional+"), not calculating CCE correction",_LOGGER_WARNING_);
-          functional="";
+        if(functional_cce=="SCAN" && xstr.species_pp_version[i].find("SCAN")!=string::npos){
+          pflow::logger(_AFLOW_FILE_NAME_,soliloquy,"Mismatch in species_pp_version found ("+functional_cce+"), not calculating CCE correction",_LOGGER_WARNING_);
+          functional_cce="";
         }
       }
-      if(data.catalog=="ICSD" && isLDAUcalc==TRUE && functional=="PBE"){functional="PBE+U:ICSD";}
+      if(data.catalog=="ICSD" && isLDAUcalc==TRUE && functional_cce=="PBE"){functional_cce="PBE+U:ICSD";}
     }
-    if(AFLOWLIB_VERBOSE) cout << MESSAGE << " FUNCTIONAL=" << functional << endl;
+    if(AFLOWLIB_VERBOSE) cout << MESSAGE << " FUNCTIONAL_CCE=" << functional_cce << endl;
     //CO20200624 STOP - CCE
 
     // LDAU ?
     if(FORMATION_CALC) { //CO20200624 - we can correct PBE now with CCE
       //[CO20200624 - we can correct PBE now with CCE]if(isLDAUcalc) FORMATION_CALC=FALSE; // no formation for LDAU
-      if(functional.empty()) FORMATION_CALC=FALSE;  //CO20200624
+      //      if(functional_cce.empty()) FORMATION_CALC=FALSE;  //CO20200624
     }
 
     // PP AVAILABLE ?
+    // line XXX1
     if(FORMATION_CALC) {
       for(uint i=0;i<(uint) data.nspecies;i++) {
         if(!xPOTCAR_EnthalpyReference_AUID(data.vspecies_pp_AUID.at(i),data.METAGGA)) { 
           FORMATION_CALC=FALSE; // WORKS WITH SCANN TOO
           if(AFLOWLIB_VERBOSE) cout << MESSAGE << " REFERENCE NOT AVAILABLE species_pp=" << xstr.species_pp_version.at(i) << "  species_pp_AUID=" << data.vspecies_pp_AUID.at(i)
-            << (data.METAGGA.empty()?string(""):string("  METAGGA=["+data.METAGGA+"]")) << "   Href=nothing" << endl;
+				    << (data.METAGGA.empty()?string(""):string("  METAGGA=["+data.METAGGA+"]")) << "   Href=nothing" << endl;
         }
-
       }
     }
 
     // OPERATE FORMATION
+    //     cerr << "FORMATION_CALC=" << FORMATION_CALC << endl; exit(0);
+	
+    // line XXX2					   
     if(FORMATION_CALC) { // no LDAU yet
       if(LDEBUG) cerr << soliloquy << " [FCALC=1]" << endl;
       vector<double> venthalpy_atom_ref;
@@ -2612,13 +2622,159 @@ namespace aflowlib {
       data.enthalpy_formation_atom=data.enthalpy_formation_cell/data_natoms;
 
       //CO20200624 START - adding cce variants
-      if(!functional.empty()){
+      if(!functional_cce.empty()){
         bool found_correctable=false;
         if(aurostd::WithinList(data.vspecies,"O")) found_correctable=true;
         if(aurostd::WithinList(data.vspecies,"N")) found_correctable=true;
         if(found_correctable){
           vector<double> enthalpy_formation_cell_corrections_cce;
-          try{enthalpy_formation_cell_corrections_cce=cce::calculate_corrections(xstr,functional);}
+          try{enthalpy_formation_cell_corrections_cce=cce::calculate_corrections(xstr,functional_cce);}
+          catch (aurostd::xerror& excpt) {
+            pflow::logger(excpt.whereFileName(), excpt.whereFunction(), excpt.error_message, cout, _LOGGER_ERROR_);
+            found_correctable=false;
+          }
+          if(found_correctable && enthalpy_formation_cell_corrections_cce.size()==2){  //the first is at 300K, the second at 0K
+            data.enthalpy_formation_cce_300K_cell=data.enthalpy_formation_cce_0K_cell=data.enthalpy_formation_cell;
+            data.enthalpy_formation_cce_300K_cell-=enthalpy_formation_cell_corrections_cce[0];
+            data.enthalpy_formation_cce_0K_cell-=enthalpy_formation_cell_corrections_cce[1];
+            data.enthalpy_formation_cce_300K_atom=data.enthalpy_formation_cce_300K_cell/data_natoms;
+            data.enthalpy_formation_cce_0K_atom=data.enthalpy_formation_cce_0K_cell/data_natoms;
+          }
+        }
+      }
+      if(LDEBUG){
+        cerr << soliloquy << " data.enthalpy_formation_cce_300K_cell=" << data.enthalpy_formation_cce_300K_cell << endl;
+        cerr << soliloquy << " data.enthalpy_formation_cce_0K_cell=" << data.enthalpy_formation_cce_0K_cell << endl;
+        cerr << soliloquy << " data.enthalpy_formation_cce_300K_atom=" << data.enthalpy_formation_cce_300K_atom << endl;
+        cerr << soliloquy << " data.enthalpy_formation_cce_0K_atom=" << data.enthalpy_formation_cce_0K_atom << endl;
+      }
+      //CO20200624 STOP - adding cce variants
+
+      if(LDEBUG) cerr << soliloquy << " [FCALC=3]" << endl;
+
+      data.entropic_temperature=0;
+      if(data.vstoichiometry.size()>1) {
+        for(i=0;i<(uint) data.vstoichiometry.size();i++)
+          if(data.vstoichiometry.at(i)>_EPSILON_COMPOSITION_ && data.vstoichiometry.at(i)<1-_EPSILON_COMPOSITION_)
+            data.entropic_temperature+=data.vstoichiometry.at(i)*logl(data.vstoichiometry.at(i));
+        data.entropic_temperature=data.enthalpy_formation_atom/(data.entropic_temperature*KBOLTZEV);
+      }
+      // cerr << XPID << data.enthalpy_formation_cell << endl << data.enthalpy_formation_cell/data_natoms << endl << data.enthalpy_formation_atom << endl;
+      if(LDEBUG) cerr << soliloquy << " [FCALC=4]" << endl;
+    }
+    return FORMATION_CALC;
+  }
+} // namespace aflowlib
+
+namespace aflowlib {
+  bool OLD_LIB2RAW_Calculate_FormationEnthalpy(aflowlib::_aflowlib_entry& data,const xstructure& xstr,const string& MESSAGE){ //CO20200731
+    /* 
+       make 2 flags
+       formation_calc_cce which allows or not calculaiton of cce having the right functional-cce
+       formation_calc_U which allows or not calculation of Href based on the fact that we have - or not - U
+       then a combination of AND/OR will do the if(combination) so that  lines XXX1 and XXX2 are always printed
+    */
+
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy=XPID+"aflowlib::LIB2RAW_Calculate_FormationEnthalpy():";
+    // reference
+    bool FORMATION_CALC=TRUE;    
+    bool isLDAUcalc=FALSE;
+    if(xstr.species_pp_vLDAU.at(0).size()>0) isLDAUcalc=TRUE;
+    if(LDEBUG){cerr << soliloquy << " isLDAUcalc=" << isLDAUcalc << endl;}
+
+    //CO20200624 START - CCE
+    string functional_cce="";
+    if(xstr.species_pp_version.size()>0){
+      //CO20200624 - don't use else if's, we might prefer that which comes later
+      if(xstr.species_pp_version[0].find("PBE")!=string::npos){functional_cce="PBE";}
+      if(xstr.species_pp_version[0].find("LDA")!=string::npos){functional_cce="LDA";}
+      if(xstr.species_pp_version[0].find("SCAN")!=string::npos){functional_cce="SCAN";}
+      //double check all of the pp match
+      for(uint i=0;i<xstr.species_pp_version.size()&&!functional_cce.empty();i++){
+        if(functional_cce=="PBE" && xstr.species_pp_version[i].find("PBE")==string::npos){
+          pflow::logger(_AFLOW_FILE_NAME_,soliloquy,"Mismatch in species_pp_version found ("+functional_cce+"), not calculating CCE correction",_LOGGER_WARNING_);
+          functional_cce="";
+        }
+        if(functional_cce=="LDA" && xstr.species_pp_version[i].find("LDA")!=string::npos){
+          pflow::logger(_AFLOW_FILE_NAME_,soliloquy,"Mismatch in species_pp_version found ("+functional_cce+"), not calculating CCE correction",_LOGGER_WARNING_);
+          functional_cce="";
+        }
+        if(functional_cce=="SCAN" && xstr.species_pp_version[i].find("SCAN")!=string::npos){
+          pflow::logger(_AFLOW_FILE_NAME_,soliloquy,"Mismatch in species_pp_version found ("+functional_cce+"), not calculating CCE correction",_LOGGER_WARNING_);
+          functional_cce="";
+        }
+      }
+      if(data.catalog=="ICSD" && isLDAUcalc==TRUE && functional_cce=="PBE"){functional_cce="PBE+U:ICSD";}
+    }
+    if(AFLOWLIB_VERBOSE) cout << MESSAGE << " FUNCTIONAL_CCE=" << functional_cce << endl;
+    //CO20200624 STOP - CCE
+
+    // LDAU ?
+    if(FORMATION_CALC) { //CO20200624 - we can correct PBE now with CCE
+      //[CO20200624 - we can correct PBE now with CCE]if(isLDAUcalc) FORMATION_CALC=FALSE; // no formation for LDAU
+      //      if(functional_cce.empty()) FORMATION_CALC=FALSE;  //CO20200624
+    }
+
+    // PP AVAILABLE ?
+    // line XXX1
+    if(FORMATION_CALC) {
+      for(uint i=0;i<(uint) data.nspecies;i++) {
+        if(!xPOTCAR_EnthalpyReference_AUID(data.vspecies_pp_AUID.at(i),data.METAGGA)) { 
+          FORMATION_CALC=FALSE; // WORKS WITH SCANN TOO
+          if(AFLOWLIB_VERBOSE) cout << MESSAGE << " REFERENCE NOT AVAILABLE species_pp=" << xstr.species_pp_version.at(i) << "  species_pp_AUID=" << data.vspecies_pp_AUID.at(i)
+				    << (data.METAGGA.empty()?string(""):string("  METAGGA=["+data.METAGGA+"]")) << "   Href=nothing" << endl;
+        }
+      }
+    }
+
+    // OPERATE FORMATION
+    //     cerr << "FORMATION_CALC=" << FORMATION_CALC << endl; exit(0);
+	
+    // line XXX2					   
+    if(FORMATION_CALC) { // no LDAU yet
+      if(LDEBUG) cerr << soliloquy << " [FCALC=1]" << endl;
+      vector<double> venthalpy_atom_ref;
+      double enthalpy_atom_ref=data.enthalpy_atom; // if there is 1 then there is only one
+      string aus_gs_structure="";
+      double aus_gs_atom=0.0,aus_volume_atom=0.0,aus_spin_atom=0.0;
+      for(uint i=0;i<(uint) data.nspecies;i++) {
+        //      string pseudopotential,string type,vector<double> LDAU
+        enthalpy_atom_ref=data.enthalpy_atom; // if there is 1 then there is only one
+        aus_gs_structure="";
+        // NEW STYLE
+        xPOTCAR_EnthalpyReference_AUID(data.vspecies_pp_AUID.at(i),data.METAGGA,aus_gs_structure,aus_gs_atom,aus_volume_atom,aus_spin_atom);
+        enthalpy_atom_ref=aus_gs_atom;
+        if(AFLOWLIB_VERBOSE) cout << MESSAGE << " REFERENCE species=" << xstr.species.at(i) << " species_pp_AUID=" << data.vspecies_pp_AUID.at(i) << (data.METAGGA.empty()?string(""):string("  METAGGA=["+data.METAGGA+"]")) << "   Href=" << enthalpy_atom_ref << endl;
+        venthalpy_atom_ref.push_back(enthalpy_atom_ref);
+      }
+
+      if(LDEBUG) cerr << soliloquy << " [FCALC=2]" << endl;
+      if(LDEBUG) cerr << soliloquy << " [FCALC=2] data.nspecies=" << data.nspecies << endl;
+      if(LDEBUG) cerr << soliloquy << " [FCALC=2] venthalpy_atom_ref.size()=" << venthalpy_atom_ref.size() << endl;
+
+      // calculation of REF
+      //     cerr << XPID << data.enthalpy << endl;
+      data.enthalpy_formation_cell=data.enthalpy_cell;
+      data.enthalpy_formation_atom=data.enthalpy_atom;
+
+      double data_natoms=0.0; //needs to be double for pocc
+      uint i=0;
+      for(i=0;i<xstr.comp_each_type.size();i++){data_natoms+=xstr.comp_each_type[i];}
+      if(LDEBUG){cerr << soliloquy << " data_natoms=" << data_natoms << endl;}
+
+      for(i=0;i<(uint) data.nspecies;i++) data.enthalpy_formation_cell=data.enthalpy_formation_cell-(double(venthalpy_atom_ref.at(i)*xstr.comp_each_type.at(i)));  //xstr.num_each_type.at(i)
+      //   for(i=0;i<(uint) data.nspecies;i++) data.enthalpy_formation_atom=data.enthalpy_formation_atom-venthalpy_atom_ref.at(i)*double(xstr.comp_each_type.at(i))/data_natoms; //xstr.num_each_type.at(i)
+      data.enthalpy_formation_atom=data.enthalpy_formation_cell/data_natoms;
+
+      //CO20200624 START - adding cce variants
+      if(!functional_cce.empty()){
+        bool found_correctable=false;
+        if(aurostd::WithinList(data.vspecies,"O")) found_correctable=true;
+        if(aurostd::WithinList(data.vspecies,"N")) found_correctable=true;
+        if(found_correctable){
+          vector<double> enthalpy_formation_cell_corrections_cce;
+          try{enthalpy_formation_cell_corrections_cce=cce::calculate_corrections(xstr,functional_cce);}
           catch (aurostd::xerror& excpt) {
             pflow::logger(excpt.whereFileName(), excpt.whereFunction(), excpt.error_message, cout, _LOGGER_ERROR_);
             found_correctable=false;
@@ -4146,7 +4302,7 @@ namespace aflowlib {
         // cerr << str_relax.species.at(0) << endl;
 
         // A1
-        if(data.aflow_prototype_label_orig=="A_cF4_225_a" && (s=="Ac" || s=="Ag" || s=="Al" || s=="Au" || s=="Ca" || s=="Cu" || s=="Ir" || s=="La" || s=="Ni" || s=="Pb" || s=="Pd" || s=="Pt" || s=="Rh" || s=="Sr" || s=="Yb" || s=="Ar" || s=="Ne" || s=="Xe" || s=="Kr")) { // A1
+        if(data.aflow_prototype_label_orig=="A_cF4_225_a" && (s=="Ac" || s=="Ag" || s=="Al" || s=="Au" || s=="Ca" || s=="Ce" || s=="Cu" || s=="Ir" || s=="La" || s=="Ni" || s=="Pb" || s=="Pd" || s=="Pt" || s=="Rh" || s=="Sr" || s=="Yb" || s=="Ar" || s=="Ne" || s=="Xe" || s=="Kr")) { // A1
           cout << TXT1 << "A1" << TXT2 << endl;}
         // A2
         if(data.aflow_prototype_label_orig=="A_cI2_229_a" && (s=="Ba" || s=="Cr" || s=="Fe" || s=="K" || s=="Li" || s=="Mo" || s=="Na" || s=="Nb" || s=="Ta" || s=="V" || s=="W" || s=="Cs" || s=="Eu")) { // A2
