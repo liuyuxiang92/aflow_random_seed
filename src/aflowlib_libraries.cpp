@@ -1330,6 +1330,7 @@ namespace aflowlib {
         aurostd::StringSubst(aflowlib_data.aurl,XHOST.home+"/WORK/common","common"); //CO20200731 DEBUGGING ONLY
         aurostd::StringSubst(aflowlib_data.aurl,XHOST.home+"/archive/common","common"); //CO20200731 DEBUGGING ONLY
         aurostd::StringSubst(aflowlib_data.aurl,XHOST.home+"/ARCHIVE/common","common"); //CO20200731 DEBUGGING ONLY
+        aurostd::StringSubst(aflowlib_data.aurl,XHOST.home+"/home/"+XHOST.user+"/common","common"); //CO20200731 - dev
       }
 
       if(LDEBUG){cerr << soliloquy << " aurl(PRE )=" << aflowlib_data.aurl << endl;}
@@ -2545,8 +2546,10 @@ namespace aflowlib {
       //CCE cannot correct 'GGA'
       if(data.dft_type.find("PBE")!=string::npos){functional_cce="PBE";}
       if(data.dft_type.find("LDA")!=string::npos){functional_cce="LDA";}
-      if(data.dft_type.find("SCAN")!=string::npos){functional_cce="SCAN";}
-      if(data.catalog=="ICSD" && formation_calc_U==TRUE && functional_cce=="PBE"){functional_cce="PBE+U:ICSD";}
+      if(functional_cce=="PBE"){
+        if(data.dft_type.find("SCAN")!=string::npos){functional_cce="SCAN";} //PAW_PBE_KIN:SCAN
+        if(data.catalog=="ICSD" && formation_calc_U==TRUE){functional_cce="PBE+U:ICSD";}
+      }
     }
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " FUNCTIONAL_CCE=" << functional_cce << endl;
     if(formation_calc_cce && functional_cce.empty()){formation_calc_cce=false;}
@@ -6261,7 +6264,7 @@ namespace aflowlib {
     //  aflowlib_out << _AFLOWLIB_ENTRY_SEPARATOR_ << "loop=LOCK";
     data.vloop.push_back("lock");
 
-    vector<string> vlock,tokens;
+    vector<string> vlock,vtokens;
     string tmp="";
     string::size_type loc;
     aflowlib::LIB2RAW_FileNeeded(directory_LIB,_AFLOWLOCK_,directory_RAW,_AFLOWLOCK_,vfile,MESSAGE);  // OUTCAR.static
@@ -6269,7 +6272,7 @@ namespace aflowlib {
     _XHOST aus_XHOST;
     // ---------------------------------------------------------------
     data.vaflowlib_date.clear(); //clear here, 
-    for(uint iline=0;iline<vlock.size();iline++) //CO20200624 - adding lock date to vaflowlib_date  //grab both FIRST and LAST dates - data.vaflowlib_date.empty()
+    for(uint iline=0;iline<vlock.size();iline++){ //CO20200624 - adding lock date to vaflowlib_date  //grab both FIRST and LAST dates - data.vaflowlib_date.empty()
       if(aurostd::substring2bool(vlock[iline],"date=") && aurostd::substring2bool(vlock[iline],"[") && aurostd::substring2bool(vlock[iline],"]")) {
         loc=vlock[iline].find("date=");
         tmp=vlock[iline].substr(loc,string::npos);
@@ -6288,46 +6291,78 @@ namespace aflowlib {
           }
         }
       }
+    }
+    if(data.vaflowlib_date.size()==0){  //CO20210213
+      //try looking for old style, should be the last item in lines containing -
+      //look that very last item in line is between 2000 and current year
+      double dtmp=0.0;
+      for(uint iline=0;iline<vlock.size();iline++){ //CO20200624 - adding lock date to vaflowlib_date  //grab both FIRST and LAST dates - data.vaflowlib_date.empty()
+        aurostd::string2tokens(vlock[iline],vtokens," ");
+        if(vtokens.size()>0 && aurostd::isfloat(vtokens.back())){
+          dtmp=aurostd::string2utype<double>(vtokens.back());
+          if(LDEBUG){cerr << soliloquy << " dtmp=" << dtmp << endl;}
+          if(aurostd::isinteger(dtmp) && (dtmp>2000 && dtmp<(double)aurostd::get_year())){
+            aurostd::string2tokens(vlock[iline],vtokens,"-");
+            if(vtokens.size()>0){
+              //START taken from above
+              tmp=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(vtokens.back());
+              aurostd::StringSubst(tmp,"[","");aurostd::StringSubst(tmp,"]","");  //just in case
+              aurostd::StringSubst(tmp,"date=",""); //just in case
+              if(LDEBUG) cerr << soliloquy << " FOUND LOCK date = " << tmp << endl;
+              tmp=aflow_convert_time_ctime2aurostd(tmp);
+              if(!tmp.empty()){
+                if(data.vaflowlib_date.empty()){data.vaflowlib_date.push_back(tmp+"_GMT-5");} //get first date
+                else{ //get last date
+                  if(data.vaflowlib_date.size()>1){data.vaflowlib_date.pop_back();}
+                  data.vaflowlib_date.push_back(tmp+"_GMT-5");
+                }
+              }
+              //STOP taken from above
+            }
+          }
+        }
+      }
+    }
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " lock_date (START) = " << ((data.vaflowlib_date.size()>0)?data.vaflowlib_date[0]:"unavailable") << endl;
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " lock_date (END) = " << ((data.vaflowlib_date.size()>1)?data.vaflowlib_date[1]:"unavailable") << endl;
     // ---------------------------------------------------------------
     for(uint iline=0;iline<vlock.size()&&data.aflow_version.empty();iline++)
       if(aurostd::substring2bool(vlock[iline],"NFS") && aurostd::substring2bool(vlock[iline],"(") && aurostd::substring2bool(vlock[iline],")")) {
-        aurostd::string2tokens(vlock[iline],tokens);
-        data.aflow_version=aurostd::RemoveWhiteSpaces(tokens.at(tokens.size()-1));
+        aurostd::string2tokens(vlock[iline],vtokens);
+        data.aflow_version=aurostd::RemoveWhiteSpaces(vtokens.at(vtokens.size()-1));
         aurostd::StringSubst(data.aflow_version,"(","");aurostd::StringSubst(data.aflow_version,")","");
       }
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " aflow_version = " << ((data.aflow_version.size())?data.aflow_version:"unavailable") << endl;
     // XHOST.CPU_Model ---------------------------------------------------------------
     for(uint iline=0;iline<vlock.size()&&aus_XHOST.CPU_Model.empty();iline++)
       if(aurostd::substring2bool(vlock[iline],"XHOST.CPU_Model") && aurostd::substring2bool(vlock[iline],":")) {
-        aurostd::string2tokens(vlock[iline],tokens,":");
-        aus_XHOST.CPU_Model=aurostd::RemoveWhiteSpaces(tokens.at(tokens.size()-1));
+        aurostd::string2tokens(vlock[iline],vtokens,":");
+        aus_XHOST.CPU_Model=aurostd::RemoveWhiteSpaces(vtokens.at(vtokens.size()-1));
         data.node_CPU_Model=aus_XHOST.CPU_Model;
       }
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " XHOST.CPU_Model = " << ((aus_XHOST.CPU_Model.size())?aus_XHOST.CPU_Model:"unavailable") << endl;
     // XHOST.CPU_Cores ---------------------------------------------------------------
     for(uint iline=0;iline<vlock.size()&&aus_XHOST.CPU_Cores==0;iline++)
       if(aurostd::substring2bool(vlock[iline],"XHOST.CPU_Cores") && aurostd::substring2bool(vlock[iline],":")) {
-        aurostd::string2tokens(vlock[iline],tokens,":");
-        aus_XHOST.CPU_Cores=aurostd::string2utype<int>(aurostd::RemoveWhiteSpaces(tokens.at(tokens.size()-1)));
-        aus_XHOST.CPU_Cores=aurostd::string2utype<int>(aurostd::RemoveWhiteSpaces(tokens.at(tokens.size()-1)));
+        aurostd::string2tokens(vlock[iline],vtokens,":");
+        aus_XHOST.CPU_Cores=aurostd::string2utype<int>(aurostd::RemoveWhiteSpaces(vtokens.at(vtokens.size()-1)));
+        aus_XHOST.CPU_Cores=aurostd::string2utype<int>(aurostd::RemoveWhiteSpaces(vtokens.at(vtokens.size()-1)));
         data.node_CPU_Cores=aus_XHOST.CPU_Cores;
       }
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " XHOST.CPU_Cores = " << ((aus_XHOST.CPU_Cores)?aurostd::utype2string<int>(aus_XHOST.CPU_Cores):"unavailable") << endl;
     // XHOST.CPU_MHz ---------------------------------------------------------------
     for(uint iline=0;iline<vlock.size()&&aus_XHOST.CPU_MHz.empty();iline++)
       if(aurostd::substring2bool(vlock[iline],"XHOST.CPU_MHz") && aurostd::substring2bool(vlock[iline],":")) {
-        aurostd::string2tokens(vlock[iline],tokens,":");
-        aus_XHOST.CPU_MHz=aurostd::RemoveWhiteSpaces(tokens.at(tokens.size()-1));
+        aurostd::string2tokens(vlock[iline],vtokens,":");
+        aus_XHOST.CPU_MHz=aurostd::RemoveWhiteSpaces(vtokens.at(vtokens.size()-1));
         data.node_CPU_MHz=ceil(aurostd::string2utype<double>(aus_XHOST.CPU_MHz));
       }
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " XHOST.CPU_MHz = " << ((aus_XHOST.CPU_MHz.size())?aus_XHOST.CPU_MHz:"unavailable") << endl;
     // XHOST.RAM_GB ---------------------------------------------------------------
     for(uint iline=0;iline<vlock.size()&&aus_XHOST.RAM_GB<0.001;iline++)
       if(aurostd::substring2bool(vlock[iline],"XHOST.RAM_GB") && aurostd::substring2bool(vlock[iline],":")) {
-        aurostd::string2tokens(vlock[iline],tokens,":");
-        aus_XHOST.RAM_GB=ceil(aurostd::string2utype<double>(aurostd::RemoveWhiteSpaces(tokens.at(tokens.size()-1))));
+        aurostd::string2tokens(vlock[iline],vtokens,":");
+        aus_XHOST.RAM_GB=ceil(aurostd::string2utype<double>(aurostd::RemoveWhiteSpaces(vtokens.at(vtokens.size()-1))));
         data.node_RAM_GB=aus_XHOST.RAM_GB;
       }
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " XHOST.RAM_GB = " << ((aus_XHOST.RAM_GB)?aurostd::utype2string<double>(aus_XHOST.RAM_GB):"unavailable") << endl;
