@@ -498,7 +498,7 @@ namespace KBIN {
     message << "The supercell will be built using ";
     if (aplopts.flag("SUPERCELL")) {
       message << "the dimensions " << aplopts.getattachedscheme("SUPERCELL::VALUE") << "." << std::endl;
-    } else if (aplopts.flag("MINATOMS") || aplopts.flag("MINATOMS_RESTRICTED")) {
+    } else if (aplopts.flag("MINATOMS") || aplopts.flag("MINATOMS_UNIFORM")) {
       message << "at least " << aplopts.getattachedscheme("SUPERCELL::VALUE") << " atoms." << std::endl;
     } else if (aplopts.flag("MINSHELLS")) {
       message << "at least " << aplopts.getattachedscheme("SUPERCELL:VALUE") << " shells." << std::endl;
@@ -1123,12 +1123,12 @@ namespace apl {
       aplopts.push_attached("SUPERCELL::METHOD", "SUPERCELL");
       aplopts.push_attached("SUPERCELL::VALUE", supercell_scheme);
       aplopts.flag("MINATOMS", false);
-      aplopts.flag("MINATOMS_RESTRICTED", false);
+      aplopts.flag("MINATOMS_UNIFORM", false);
       aplopts.flag("MINSHELL", false);
-    } else if (aplopts.flag("MINATOMS") || aplopts.flag("MINATOMS_RESTRICTED")) {
-      if (aplopts.flag("MINATOMS_RESTRICTED")) {
-        aplopts.push_attached("SUPERCELL::METHOD", "MINATOMS_RESTRICTED");
-        aplopts.push_attached("SUPERCELL::VALUE", aplopts.getattachedscheme("MINATOMS_RESTRICTED"));
+    } else if (aplopts.flag("MINATOMS") || aplopts.flag("MINATOMS_UNIFORM")) {
+      if (aplopts.flag("MINATOMS_UNIFORM")) {
+        aplopts.push_attached("SUPERCELL::METHOD", "MINATOMS_UNIFORM");
+        aplopts.push_attached("SUPERCELL::VALUE", aplopts.getattachedscheme("MINATOMS_UNIFORM"));
         aplopts.flag("MINATOMS", false);
       } else {
         aplopts.push_attached("SUPERCELL::METHOD", "MINATOMS");
@@ -1140,13 +1140,13 @@ namespace apl {
       aplopts.push_attached("SUPERCELL::METHOD", "SHELLS");
       aplopts.push_attached("SUPERCELL::VALUE", aplopts.getattachedscheme("MINSHELL"));
       aplopts.flag("SUPERCELL", false);
-      aplopts.flag("MINATOMS_RESTRICTED", false);
+      aplopts.flag("MINATOMS_UNIFORM", false);
       aplopts.flag("MINATOMS", false);
     } else { // Default: MINATOMS
       aplopts.push_attached("SUPERCELL::METHOD", "MINATOMS");
       aplopts.push_attached("SUPERCELL::VALUE", aplopts.getattachedscheme("MINATOMS"));
       aplopts.flag("SUPERCELL", false);
-      aplopts.flag("MINATOMS_RESTRICTED", false);
+      aplopts.flag("MINATOMS_UNIFORM", false);
       aplopts.flag("MINSHELL", false);
     }
   }
