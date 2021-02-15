@@ -5392,14 +5392,15 @@ istream& operator>>(istream& cinput, xstructure& a) {
     std::stable_sort(a.atoms.begin(),a.atoms.end(),sortAtomsNames);
     a.MakeBasis();
     a.MakeTypes(); //DX20190508 - otherwise types are not created
-    uint iat=0;
     // add system name to title
-    a.title += " "; // add space between existing title
-    for(uint itype=0;itype<a.num_each_type.size();itype++) 
-      for(uint j=0;j<(uint) a.num_each_type.at(itype);j++) {
-        if(j==0) a.title+=a.atoms.at(iat).name+aurostd::utype2string(a.num_each_type.at(itype));
-        a.atoms.at(iat++).type=itype;
-      }
+    a.buildGenericTitle(); //DX20210211
+    //DX20210211 [OBSOLETE] uint iat=0;
+    //DX20210211 [OBSOLETE - abinit does not generally have a title line] a.title += " "; // add space between existing title
+    //DX20210211 [OBSOLETE] for(uint itype=0;itype<a.num_each_type.size();itype++)
+    //DX20210211 [OBSOLETE]   for(uint j=0;j<(uint) a.num_each_type.at(itype);j++) {
+    //DX20210211 [OBSOLETE]     if(j==0) a.title+=a.atoms.at(iat).name+aurostd::utype2string(a.num_each_type.at(itype));
+    //DX20210211 [OBSOLETE]     a.atoms.at(iat++).type=itype;
+    //DX20210211 [OBSOLETE]   }
     a.partial_occupation_flag=FALSE;
     a.is_vasp4_poscar_format=FALSE;
     a.is_vasp5_poscar_format=FALSE;
@@ -5628,14 +5629,15 @@ istream& operator>>(istream& cinput, xstructure& a) {
     std::stable_sort(a.atoms.begin(),a.atoms.end(),sortAtomsNames);
     a.MakeBasis();
     a.MakeTypes();
-    uint iat=0;
     // add system name to title
-    a.title += " "; // add space between existing title
-    for(uint itype=0;itype<a.num_each_type.size();itype++)
-      for(uint j=0;j<(uint) a.num_each_type.at(itype);j++) {
-        if(j==0) a.title+=a.atoms.at(iat).name+aurostd::utype2string(a.num_each_type.at(itype));
-        a.atoms.at(iat++).type=itype;
-      }
+    a.buildGenericTitle(); //DX20210211
+    //DX20210211 [OBSOLETE] uint iat=0;
+    //DX20210211 [OBSOLETE - Elk does not generally have a title line] a.title += " "; // add space between existing title
+    //DX20210211 [OBSOLETE] for(uint itype=0;itype<a.num_each_type.size();itype++)
+    //DX20210211 [OBSOLETE]   for(uint j=0;j<(uint) a.num_each_type.at(itype);j++) {
+    //DX20210211 [OBSOLETE]     if(j==0) a.title+=a.atoms.at(iat).name+aurostd::utype2string(a.num_each_type.at(itype));
+    //DX20210211 [OBSOLETE]    a.atoms.at(iat++).type=itype;
+    //DX20210211 [OBSOLETE]  }
     // NO PARTIAL OCCUPATION
     a.partial_occupation_flag=FALSE;
     a.is_vasp4_poscar_format=FALSE;
@@ -5947,6 +5949,9 @@ istream& operator>>(istream& cinput, xstructure& a) {
     //DX20191010 - moved this loop - END
     a.is_vasp4_poscar_format=FALSE; //DX20190308 - needed or SPECIES section breaks
     a.is_vasp5_poscar_format=FALSE; //DX20190308 - needed or SPECIES section breaks
+
+    // add title, CIFs do not generally have a canonical "title" line, so make one
+    a.buildGenericTitle(); //DX20210211
   } // CIF INPUT
 
   // ----------------------------------------------------------------------
