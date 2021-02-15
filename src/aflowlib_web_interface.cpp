@@ -4839,6 +4839,23 @@ namespace aflowlib {
             for(uint ilat=0;ilat<14;ilat++)
               aurostd::StringSubst(label,lattices[ilat]+"/","");
             aurostd::StringSubst(label,"/",".");
+            //ME20210215 - Label may need pseudopotential information
+            if (!aurostd::FileExist(directory_AUID_RAW + "/" + label + ".cif")) {
+              string pp_types_str = "PAW_PBE,PAW_LDA,PAW_GGA,PAW_PBE_KIN,PAW_LDA_KIN,PBE,LDA,GGA";
+              vector<string> pp_types;
+              aurostd::string2tokens(pp_types_str, pp_types, ",");
+              size_t t = label.find(".");
+              string label_new = label;
+              for (uint i = 0; i < pp_types.size(); i++) {
+                label_new.insert(t, ":" + pp_types[i]);
+                if (aurostd::FileExist(directory_AUID_RAW + "/" + label_new + ".cif")) {
+                  label = label_new;
+                  break;
+                } else {
+                  label_new = label; // reset
+                }
+              }
+            }
           }
         }
       }
