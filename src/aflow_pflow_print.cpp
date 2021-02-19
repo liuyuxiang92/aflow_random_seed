@@ -1515,6 +1515,24 @@ namespace pflow {
   }
 } // namespace pflow
 
+/*
+namespace pflow {
+  string PrintDataNEW(const xstructure& xstr, double sym_eps, bool no_scan, int setting, filetype ftype, bool already_calculated, bool standalone) { //DX20180226 - added & to tolerance
+    aurostd::xoption vpflow;
+    return PrintDataNEW(xstr, vpflow, sym_eps, no_scan, setting, ftype, already_calculated, standalone);
+  }
+}
+
+namespace pflow {
+  //DX20210211 [OBSOLETE] bool PrintSGData(xstructure& str_sg, double& tolerance, ostream& oss_final, aurostd::xoption& vpflow, bool no_scan, int setting, bool standalone, const string& format,bool already_calculated) { //DX20180226 - added & to tolerance
+  string PrintDataNEW(const xstructure& xstr, aurostd::xoption& vpflow, double sym_eps, bool no_scan, int setting, filetype ftype, bool already_calculated, bool standalone) { //DX20180226 - added & to tolerance
+
+    string function_name = XPID + "pflow::PrintData():";
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+
+    if(LDEBUG) cerr << function_name << " BEGIN" << endl;
+*/
+
 // ***************************************************************************
 // pflow::PrintRealLatticeData //DX20210209
 // ***************************************************************************

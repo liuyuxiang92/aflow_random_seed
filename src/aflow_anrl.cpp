@@ -2244,10 +2244,15 @@ namespace anrl {
       symbolic::Symbolic lattice_symbolic = SymbolicANRLPrimitiveLattices(lattice_and_centering_from_Pearson, space_group_letter);
 
       // ---------------------------------------------------------------------------
+      // order alphabetically by species //DX20210217
+      vector<wyckoffsite_ITC> Wyckoff_sites_alphabetic = ordered_Wyckoff_sites_ITC;
+      std::sort(Wyckoff_sites_alphabetic.begin(), Wyckoff_sites_alphabetic.end(), sortWyckoffByType);
+
+      // ---------------------------------------------------------------------------
       // convert Wyckoff site into symbolic notation
       vector<SymbolicWyckoffSite> Wyckoff_sites_symbolic;
       for(uint i=0;i<ordered_Wyckoff_sites_ITC.size();i++){
-        Wyckoff_sites_symbolic.push_back(initializeSymbolicWyckoffSite(ordered_Wyckoff_sites_ITC[i]));
+        Wyckoff_sites_symbolic.push_back(initializeSymbolicWyckoffSite(Wyckoff_sites_alphabetic[i]));
       }
 
       // ---------------------------------------------------------------------------

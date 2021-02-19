@@ -10390,7 +10390,75 @@ void xstructure::GetLatticeType(xstructure& str_sp,xstructure& str_sc) {
     }
   } //DX while loop
 }
+/*
+// ***************************************************************************
+// Function GetLatticeType
+// ***************************************************************************
+void xstructure::GetLatticeTypeNEW(double sym_eps) {
+  xstructure str_sp,str_sc;
+  GetLatticeTypeNEW(str_sp,str_sc);
+}
 
+void xstructure::GetLatticeTypeNEW(xstructure& str_sp,xstructure& str_sc, double sym_eps) {
+  bool VERBOSE=FALSE;
+  
+  // DIRECT
+  xstructure str_in;//,str_sp,str_sc;
+  // start
+  str_in=*this;
+  str_in.title="NO_RECURSION";
+  
+  //DX START
+  bool same_eps = false;
+  uint count = 0;
+  
+  // set symmetry tolerance
+  if(LDEBUG){ cerr << function_name << " [1]" << endl; }
+  double tolerance = sym_eps;
+  if(sym_eps!=AUROSTD_MAX_DOUBLE){ tolerance=sym_eps; }
+  else { tolerance=SYM::defaultTolerance(str_in); }
+  str_in.sym_eps=str_sp.sym_eps=str_sc.sym_eps=tolerance; //DX
+  str_in.sym_eps_calculated=str_sp.sym_eps_calculated=str_sc.sym_eps_calculated=str_sp.sym_eps_calculated=true; //DX
+  str_in.sym_eps_change_count=str_sp.sym_eps_change_count=str_sc.sym_eps_change_count=str_sp.sym_eps_change_count=count; //DX20180222 - added sym_eps change count
+  
+  while(same_eps == false && count++ < 100){
+   
+    // REAL
+    str_in.GetRealLatticeType(str_sp, str_sc, tolerance);
+ 
+    // RECIPROCAL
+    str_in.GetReciprocalLatticeType(xstr_in.sym_eps);
+    
+    //DX START
+    if(str_sp.sym_eps == str_reciprocal_sp.sym_eps){
+      same_eps = true;
+    }
+    else {
+      str_in.sym_eps = str_sp.sym_eps = str_sc.sym_eps = str_reciprocal_sp.sym_eps;
+      str_in.sym_eps_change_count = str_sp.sym_eps_change_count = str_sc.sym_eps_change_count = str_reciprocal_sp.sym_eps_change_count; //DX20180222 - added sym_eps change count
+    }
+    //DX END
+    
+    // SUPERLATTICE
+    str_in.GetSuperlatticeType(xstr_in.sym_eps);
+    xstructure str_superlattice_in,str_superlattice_sp,str_superlattice_sc;
+    
+    //DX START
+    if(str_sp.sym_eps == str_superlattice_sp.sym_eps){
+      same_eps = true;
+    }
+    else {
+      str_sp.sym_eps = str_superlattice_sp.sym_eps;
+      str_sp.sym_eps_change_count = str_superlattice_sp.sym_eps_change_count; //DX20180222 - added sym_eps change count
+    }
+    
+    if(count==100){
+      cerr << "ERROR in Bravais_Lattice_StructureDefault(): Unable to find reliable sym_eps." << endl;
+      break;
+    }
+  } //DX while loop
+}
+*/
 // ***************************************************************************
 // Function GetRealLatticeType //DX20210209
 // ***************************************************************************
@@ -10414,8 +10482,8 @@ void xstructure::GetRealLatticeType(xstructure& str_sp,xstructure& str_sc, doubl
   if(sym_eps!=AUROSTD_MAX_DOUBLE){ tolerance=sym_eps; }
   else { tolerance=SYM::defaultTolerance(str_in); }
   str_in.sym_eps=str_sp.sym_eps=str_sc.sym_eps=tolerance; //DX
-  str_in.sym_eps_calculated=str_sp.sym_eps_calculated=str_sc.sym_eps_calculated=str_sp.sym_eps_calculated; //DX
-  str_in.sym_eps_change_count=str_sp.sym_eps_change_count=str_sc.sym_eps_change_count=str_sp.sym_eps_change_count; //DX20180222 - added sym_eps change count
+  str_in.sym_eps_calculated=str_sc.sym_eps_calculated=str_sp.sym_eps_calculated; //DX
+  str_in.sym_eps_change_count=str_sc.sym_eps_change_count=str_sp.sym_eps_change_count; //DX20180222 - added sym_eps change count
 
   // calculate
   if(LDEBUG){ cerr << function_name << " [2]" << endl; }
@@ -10449,6 +10517,11 @@ void xstructure::GetRealLatticeType(xstructure& str_sp,xstructure& str_sc, doubl
   this->point_group_order=str_sp.point_group_order;
   this->point_group_structure=str_sp.point_group_structure;
   if(LDEBUG){ cerr << function_name << " [3] DONE" << endl; }
+  
+  // update sym_eps
+  this->sym_eps=str_in.sym_eps=str_sc.sym_eps=str_sp.sym_eps; //DX
+  this->sym_eps_calculated=str_in.sym_eps_calculated=str_sc.sym_eps_calculated=str_sp.sym_eps_calculated; //DX
+  this->sym_eps_change_count=str_in.sym_eps_change_count=str_sc.sym_eps_change_count=str_sp.sym_eps_change_count; //DX20180222 - added sym_eps change count
 
 }
 
@@ -10498,6 +10571,11 @@ void xstructure::GetReciprocalLatticeType(xstructure& str_sp,xstructure& str_sc,
   this->reciprocal_lattice_type=str_sp.bravais_lattice_type;
   this->reciprocal_lattice_variation_type=str_sp.bravais_lattice_variation_type;
   if(LDEBUG){ cerr << function_name << " [2]" << endl; }
+  
+  // update sym_eps
+  this->sym_eps=str_in.sym_eps=str_sc.sym_eps=str_sp.sym_eps; //DX
+  this->sym_eps_calculated=str_in.sym_eps_calculated=str_sc.sym_eps_calculated=str_sp.sym_eps_calculated; //DX
+  this->sym_eps_change_count=str_in.sym_eps_change_count=str_sc.sym_eps_change_count=str_sp.sym_eps_change_count; //DX20180222 - added sym_eps change count
 }
 
 // ***************************************************************************
@@ -10559,6 +10637,11 @@ void xstructure::GetSuperlatticeType(xstructure& str_sp,xstructure& str_sc, doub
   this->pearson_symbol_superlattice=str_sp.pearson_symbol;
 
   if(LDEBUG){ cerr << function_name << " [6] DONE" << endl; }
+  
+  // update sym_eps
+  this->sym_eps=str_in.sym_eps=str_sc.sym_eps=str_sp.sym_eps; //DX
+  this->sym_eps_calculated=str_in.sym_eps_calculated=str_sc.sym_eps_calculated=str_sp.sym_eps_calculated; //DX
+  this->sym_eps_change_count=str_in.sym_eps_change_count=str_sc.sym_eps_change_count=str_sp.sym_eps_change_count; //DX20180222 - added sym_eps change count
 }
 
 string GetLatticeType(xmatrix<double> lattice) {
