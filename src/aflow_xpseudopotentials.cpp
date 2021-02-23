@@ -492,6 +492,18 @@ bool xPOTCAR_EnthalpyReference_AUID(string AUID,string METAGGA,string& groundsta
   if(AUID=="74bf44fed86520ba" && nKIN) {found=TRUE;groundstate_structure="A3";groundstate_energy=-1.523063;volume_atom=19.13637;spin_atom=0.0;} // Cd_sv_GW:PAW_LDA_KIN:16Apr2014
   if(AUID=="43daba3719e5e3b4" && nKIN) {found=TRUE;groundstate_structure="A3";groundstate_energy=-0.7795479;volume_atom=21.42407;spin_atom=0.0;} // Cd_sv_GW:PAW_PBE_KIN:16Apr2014
 
+  // Ce
+  if(AUID=="510a8ebc02942ebd" && nKIN) {found=TRUE;groundstate_structure="A1";groundstate_energy=-5.256439;volume_atom=27.3549;spin_atom=0.0;} // Ce_s:PAW_GGA:11May2000
+  if(AUID=="27449258606dd200" && nKIN) {found=TRUE;groundstate_structure="A1";groundstate_energy=-6.645601;volume_atom=25.52952;spin_atom=0.0;} // Ce_s:PAW_LDA:17Apr2000
+  if(AUID=="6e846dc10a52b11b" && nKIN) {found=TRUE;groundstate_structure="A1";groundstate_energy=-5.930997;volume_atom=26.05794;spin_atom=0.0;} // Ce:PAW_PBE:28Sep2000
+  if(AUID=="43bef7da77f3563c" && nKIN) {found=TRUE;groundstate_structure="A1";groundstate_energy=-6.899931;volume_atom=22.79678;spin_atom=0.0;} // Ce:PAW_LDA:28Sep2000
+  if(AUID=="af507d55827ec15c" && nKIN) {found=TRUE;groundstate_structure="A1";groundstate_energy=-5.964473;volume_atom=26.03088;spin_atom=0.0;} // Ce:PAW_GGA:29Sep2000
+  if(AUID=="abfa73bca84b87e0" && nKIN) {found=TRUE;groundstate_structure="A1";groundstate_energy=-4.77123;volume_atom=37.644;spin_atom=0.0;} // Ce_3:PAW_PBE:06Sep2000
+  if(AUID=="c30b547637edabc3" && nKIN) {found=TRUE;groundstate_structure="A1";groundstate_energy=-4.74004;volume_atom=37.32093;spin_atom=0.0;} // Ce_3:PAW_GGA:11May2000
+  if(AUID=="24ba1850e358faff" && SCAN) {found=TRUE;groundstate_structure="A1";groundstate_energy=-44.56046;volume_atom=24.57593;spin_atom=0.0;} // Ce_h:PAW_PBE_KIN:SCAN:03Mar2005
+  if(AUID=="a896fb0aac886619" && SCAN) {found=TRUE;groundstate_structure="A1";groundstate_energy=-43.13392;volume_atom=37.35713;spin_atom=0.0;} // Ce_3:PAW_PBE_KIN:SCAN:06Sep2000
+  if(AUID=="bc711278cc7e92ff" && SCAN) {found=TRUE;groundstate_structure="A1";groundstate_energy=-44.61209;volume_atom=24.63577;spin_atom=0.0;} // Ce:PAW_PBE_KIN:SCAN:23Dec2003
+
   // Cl
   if(AUID=="6bf17162620b7ce3" && nKIN) {found=TRUE;groundstate_structure="diatom";groundstate_energy=-1.787206;volume_atom=500;spin_atom=0.0;} // Cl:PAW_PBE:17Jan2003
   if(AUID=="6dca7e86aecb68cc" && nKIN) {found=TRUE;groundstate_structure="diatom";groundstate_energy=-1.776937;volume_atom=500;spin_atom=0.0;} // Cl_h:PAW_PBE:08Apr2002
