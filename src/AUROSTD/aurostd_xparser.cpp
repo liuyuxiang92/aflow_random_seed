@@ -442,17 +442,19 @@ namespace aurostd {
     content.back() += "]";
   }
 
-  void JSONwriter::addVector(const string &key, const vector<string> &value)
+  void JSONwriter::addVector(const string &key, const vector<string> &value, bool wrap) //DX20210301 - added wrap
   {
     content.push_back("\"" + key + "\":[");
-    content.back() += aurostd::joinWDelimiter(aurostd::wrapVecEntries(value, "\""), ",");
+    if(wrap){content.back() += aurostd::joinWDelimiter(aurostd::wrapVecEntries(value, "\""), ","); }
+    else{ content.back() += aurostd::joinWDelimiter(value, ","); }
     content.back() += "]";
   }
 
-  void JSONwriter::addVector(const string &key, const deque<string> &value)
+  void JSONwriter::addVector(const string &key, const deque<string> &value, bool wrap) //DX20210301 - added wrap
   {
     content.push_back("\"" + key + "\":[");
-    content.back() += aurostd::joinWDelimiter(aurostd::wrapVecEntries(value, "\""), ",");
+    if(wrap){content.back() += aurostd::joinWDelimiter(aurostd::wrapVecEntries(value, "\""), ","); }
+    else{ content.back() += aurostd::joinWDelimiter(value, ","); }
     content.back() += "]";
   }
 
@@ -536,6 +538,21 @@ namespace aurostd {
   void JSONwriter::addRaw(const string &value)
   {
     content.push_back(value);
+  }
+
+  //***************************************************************************
+  /// Add null value to a key //DX20210301
+  void JSONwriter::addNull(const string &key)
+  {
+    content.push_back("\"" + key + "\":null");
+  }
+
+  //***************************************************************************
+  /// Add "raw" value for a particular key //DX20210301
+  /// Enables JSONs to be passed in as strings, e.g., xstructure2json()
+  void JSONwriter::addRaw(const string &key, const string& value)
+  {
+    content.push_back("\"" + key + "\":" + value);
   }
 
   //***************************************************************************

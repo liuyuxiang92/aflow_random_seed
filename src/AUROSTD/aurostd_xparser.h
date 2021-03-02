@@ -66,8 +66,8 @@ namespace aurostd {
       void addVector(const string &key, const deque<double> &value,
           int precision = AUROSTD_DEFAULT_PRECISION, bool roundoff = false,
           double tol = AUROSTD_ROUNDOFF_TOL);
-      void addVector(const string &key, const vector<string> &value);
-      void addVector(const string &key, const deque<string> &value);
+      void addVector(const string &key, const vector<string> &value, bool wrap=true); //DX20210301 - added wrap
+      void addVector(const string &key, const deque<string> &value, bool wrap=true); //DX20210301 - added wrap
       template <typename utype> void addMatrix(const string &key, const utype &value);
       void addMatrix(const string &key, const vector<vector<double> > &value,
           int precision = AUROSTD_DEFAULT_PRECISION, bool roundoff = false,
@@ -80,6 +80,8 @@ namespace aurostd {
       void addString(const string &key, const string &value);
       void addBool(const string &key, bool value);
       void addRaw(const string &value);
+      void addRaw(const string &key, const string& value); //DX20210301
+      void addNull(const string &key); //DX20210301
       void addJSON(const string &key, JSONwriter &value);
       void mergeJSON(JSONwriter &value);
       string toString(bool wrap=true);

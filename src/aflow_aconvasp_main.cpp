@@ -495,45 +495,32 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.flag("AFLOWMACHL::CoordCE_CSV",aurostd::args2flag(argv,cmds,"--coordce_csv"));  //CO20200930
   vpflow.flag("CORNERS",aurostd::args2flag(argv,cmds,"--corner|--corners"));
 
-  //DX20170901 [OBSOLETE] vpflow.flag("DATA",aurostd::args2flag(argv,cmds,"--data"));
-  vpflow.args2addattachedscheme(argv,cmds,"DATA","--data=",""); //DX20170901 - SGDATA + JSON
-  if(vpflow.flag("DATA")){ //DX20170901 - SGDATA + JSON
-    vpflow.flag("DATA::NO_SCAN",aurostd::args2flag(argv,cmds,"--no_scan")); //DX20170901 - SGDATA + JSON
-    if(aurostd::args2attachedflag(argv,"--data=")){ //DX20170901 - SGDATA + JSON
-      vpflow.args2addattachedscheme(argv,cmds,"DATA::TOLERANCE","--data=",""); //DX20170901 - SGDATA + JSON //DX20200907 - default is system specific, leaving empty
-    } //DX20170901 - SGDATA + JSON
-    if(aurostd::args2attachedflag(argv,"--setting=")){ 
-      vpflow.args2addattachedscheme(argv,cmds,"DATA::SETTING","--setting=","1");
-    }
-  } //DX20170901 - SGDATA + JSON
+  //DX20210301 - consolidated all DATA functions
+  vpflow.flag("DATA",aurostd::args2attachedflag(argv,cmds,"--data"));
+  vpflow.flag("DATA_CRYSTAL_POINT_GROUP",aurostd::args2attachedflag(argv,cmds,"--point_group_crystal_data|--pgroupxtal_data|--pgroup_xtal_data")); //DX20210209
+  vpflow.flag("DATA_EDATA",aurostd::args2attachedflag(argv,cmds,"--edata"));
+  vpflow.flag("DATA_REAL_LATTICE",aurostd::args2attachedflag(argv,cmds,"--lattice_data|--data_lattice|--real_lattice_data|--data_real_lattice")); //DX20210209
+  vpflow.flag("DATA_RECIPROCAL_LATTICE",aurostd::args2attachedflag(argv,cmds,"--reciprocal_lattice_data|--reciprocallattice_data|--klattice_data|--data_reciprocal_lattice")); //DX20210209
+  vpflow.flag("DATA_SGDATA",aurostd::args2attachedflag(argv,cmds,"--sgdata|--space_group_data"));
+  vpflow.flag("DATA_SUPERLATTICE",aurostd::args2attachedflag(argv,cmds,"--superlattice_data|--data_superlattice")); //DX20210209
 
-  vpflow.args2addattachedscheme(argv,cmds,"DATA_REAL_LATTICE","--lattice_data=|--data_lattice=|--real_lattice_data=|--data_real_lattice=",""); //DX20210209
-  if(vpflow.flag("DATA_REAL_LATTICE")){ //DX20170901 - SGDATA + JSON
+  // EDATA/SGDATA/LATTICE DATA: GENERAL OPTIONS
+  if(vpflow.flag("DATA") ||
+      vpflow.flag("DATA_CRYSTAL_POINT_GROUP") ||
+      vpflow.flag("DATA_EDATA") ||
+      vpflow.flag("DATA_REAL_LATTICE") ||
+      vpflow.flag("DATA_RECIPROCAL_LATTICE") ||
+      vpflow.flag("DATA_SGDATA") ||
+      vpflow.flag("DATA_SUPERLATTICE")){
+
     vpflow.flag("DATA::NO_SCAN",aurostd::args2flag(argv,cmds,"--no_scan"));
-    if(aurostd::args2attachedflag(argv,"--lattice_data=|--data_lattice=|--real_lattice_data=|--data_real_lattice=")){ //DX20170901 - SGDATA + JSON
-      vpflow.args2addattachedscheme(argv,cmds,"DATA::TOLERANCE","--lattice_data=|--data_lattice=|--real_lattice_data=|--data_real_lattice=","");
+    vpflow.flag("DATA::SUPPRESS_WYCKOFF_PRINTING",aurostd::args2flag(argv,cmds,"--suppress_Wyckoff|--suppress_Wyckoff_printing|--suppress_wyckoff|--suppress_wyckoff_printing")); //DX20210211
+    vpflow.args2addattachedscheme(argv,cmds,"DATA::SETTING","--setting=","1");
+    vpflow.args2addattachedscheme(argv,cmds,"DATA::MAGNETIC","--mag=|--magnetic=|--magmom=","");
+    if(aurostd::args2attachedflag(argv,"--data=|--lattice_data=|--data_lattice=|--real_lattice_data=|--data_real_lattice=|--point_group_crystal_data=|--pgroupxtal_data=|--pgroup_xtal_data=|--reciprocal_lattice_data=|--reciprocallattice_data=|--klattice_data=|--data_reciprocal_lattice=|--superlattice_data=|--data_superlattice=|--edata=|--sgdata=|--space_group_data=")){
+      vpflow.args2addattachedscheme(argv,cmds,"DATA::TOLERANCE","--data=|--lattice_data=|--data_lattice=|--real_lattice_data=|--data_real_lattice=|--point_group_crystal_data=|--pgroupxtal_data=|--pgroup_xtal_data=|--reciprocal_lattice_data=|--reciprocallattice_data=|--klattice_data=|--data_reciprocal_lattice=|--superlattice_data=|--data_superlattice=|--edata=|--sgdata=|--space_group_data=","");
     }
-  }
-  vpflow.args2addattachedscheme(argv,cmds,"DATA_CRYSTAL_POINT_GROUP","--point_group_crystal_data=|--pgroupxtal_data=|--pgroup_xtal_data=",""); //DX20210209
-  if(vpflow.flag("DATA_CRYSTAL_POINT_GROUP")){ //DX20170901 - SGDATA + JSON
-    vpflow.flag("DATA::NO_SCAN",aurostd::args2flag(argv,cmds,"--no_scan"));
-    if(aurostd::args2attachedflag(argv,"--point_group_crystal_data=|--pgroupxtal_data=|--pgroup_xtal_data=")){ //DX20170901 - SGDATA + JSON
-      vpflow.args2addattachedscheme(argv,cmds,"DATA::TOLERANCE","--point_group_crystal_data=|--pgroupxtal_data=|--pgroup_xtal_data=","");
-    }
-  }
-  vpflow.args2addattachedscheme(argv,cmds,"DATA_RECIPROCAL_LATTICE","--reciprocal_lattice_data=|--reciprocallattice_data=|--klattice_data=|--data_reciprocal_lattice=",""); //DX20210209
-  if(vpflow.flag("DATA_RECIPROCAL_LATTICE")){ //DX20170901 - SGDATA + JSON
-    vpflow.flag("DATA::NO_SCAN",aurostd::args2flag(argv,cmds,"--no_scan"));
-    if(aurostd::args2attachedflag(argv,"--reciprocal_lattice_data=|--reciprocallattice_data=|--klattice_data=|--data_reciprocal_lattice=")){ //DX20170901 - SGDATA + JSON
-      vpflow.args2addattachedscheme(argv,cmds,"DATA::TOLERANCE","--reciprocal_lattice_data=|--reciprocallattice_data=|--klattice_data=|--data_reciprocal_lattice=","");
-    }
-  }
-  vpflow.args2addattachedscheme(argv,cmds,"DATA_SUPERLATTICE","--superlattice_data=|--data_superlattice=",""); //DX20210209
-  if(vpflow.flag("DATA_SUPERLATTICE")){ //DX20170901 - SGDATA + JSON
-    vpflow.flag("DATA::NO_SCAN",aurostd::args2flag(argv,cmds,"--no_scan"));
-    if(aurostd::args2attachedflag(argv,"--superlattice_data=|--data_superlattice=")){ //DX20170901 - SGDATA + JSON
-      vpflow.args2addattachedscheme(argv,cmds,"DATA::TOLERANCE","--superlattice_data=|--data_superlattice","");
-    }
+    vpflow.flag("DATA::USAGE",aurostd::args2flag(argv,cmds,"--usage"));
   }
 
   // [OBSOLETE] vpflow.flag("DATA1",aurostd::args2flag(argv,cmds,"--data1") && argv.at(1)=="--data1");
@@ -549,20 +536,8 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   // [OBSOLETE] vpflow.flag("DIST",aurostd::args2flag(argv,cmds,"--dist"));
   vpflow.args2addattachedscheme(argv,cmds,"DIST","--dist=","");
 
-  //DX20170901 [OBSOLETE] vpflow.flag("EDATA",aurostd::args2flag(argv,cmds,"--edata"));
-  vpflow.args2addattachedscheme(argv,cmds,"EDATA","--edata=",""); //DX20170901 - SGDATA + JSON
-  if(vpflow.flag("EDATA")){ //DX20170901 - SGDATA + JSON
-    vpflow.flag("DATA::NO_SCAN",aurostd::args2flag(argv,cmds,"--no_scan")); //DX20170901 - SGDATA + JSON
-    if(aurostd::args2attachedflag(argv,"--edata=")){ //DX20170901 - SGDATA + JSON
-      vpflow.args2addattachedscheme(argv,cmds,"DATA::TOLERANCE","--edata=",""); //DX20170901 - SGDATA + JSON //DX20200907 - default is system specific, leaving empty
-    } //DX20170901 - SGDATA + JSON
-    if(aurostd::args2attachedflag(argv,"--setting=")){ 
-      vpflow.args2addattachedscheme(argv,cmds,"DATA::SETTING","--setting=","1");
-    }
-    //DX20171128 - MAGNETIC SYMMETRY - START
-    vpflow.args2addattachedscheme(argv,cmds,"DATA::MAGNETIC","--mag=|--magnetic=|--magmom=",""); //DX20171128
-    //DX20171128 - MAGNETIC SYMMETRY - END
-  } //DX20170901 - SGDATA + JSON
+  //DX20210301 - consolidated EDATA into general DATA functions
+
   vpflow.flag("EDOS",aurostd::args2flag(argv,cmds,"--edos"));
   vpflow.flag("EFFMASS",aurostd::args2flag(argv,cmds,"--em")) ; // CAMILO
   // [OBSOLETE] vpflow.flag("EWALD",aurostd::args2flag(argv,cmds,"--ewald") && argv.at(1)=="--ewald");
@@ -1324,21 +1299,8 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   }
   //DX20170926 - Create flags for SG functions - END
 
+  //DX20210301 - consolidated SGDATA into general DATA functions
 
-  vpflow.args2addattachedscheme(argv,cmds,"SGDATA","--sgdata=|--space_group_data=","");
-  if(vpflow.flag("SGDATA")){
-    vpflow.flag("SGDATA::NO_SCAN",aurostd::args2flag(argv,cmds,"--no_scan")); //DX20170901 - SGDATA + JSON
-    vpflow.flag("SGDATA::SUPPRESS_WYCKOFF_PRINTING",aurostd::args2flag(argv,cmds,"--suppress_Wyckoff|--suppress_Wyckoff_printing|--suppress_wyckoff|--suppress_wyckoff_printing")); //DX20210211
-    if(aurostd::args2attachedflag(argv,"--sgdata=|--space_group_data=")){
-      vpflow.args2addattachedscheme(argv,cmds,"SGDATA::TOLERANCE","--sgdata=|--space_group_data=",""); //DX20200907 - default is system specific, leaving empty
-    }
-    if(aurostd::args2attachedflag(argv,"--setting=")){ 
-      vpflow.args2addattachedscheme(argv,cmds,"SGDATA::SETTING","--setting=","1");
-    }
-    //DX20170921 - MAGNETIC SYMMETRY - START
-    vpflow.args2addattachedscheme(argv,cmds,"SGDATA::MAGNETIC","--mag=|--magnetic=|--magmom=",""); //DX20170803
-    //DX20170921 - MAGNETIC SYMMETRY - END
-  }
   // [OBSOLETE] vpflow.flag("SLAB",aurostd::args2flag(argv,cmds,"--slab|--SLAB"));
   vpflow.args2addattachedscheme(argv,cmds,"SLAB","--slab=","");
 
@@ -1755,8 +1717,10 @@ namespace pflow {
       //DX20170901 [OBSOLETE] if(vpflow.flag("DATA")) {pflow::DATA(cin,"DATA"); _PROGRAMRUN=true;}
       if(vpflow.flag("DATA")) {pflow::DATA(cin,vpflow,"DATA",cout); _PROGRAMRUN=true;}
       if(vpflow.flag("DATA_CRYSTAL_POINT_GROUP")) {pflow::DATA(cin,vpflow,"CRYSTAL_POINT_GROUP",cout); _PROGRAMRUN=true;} //DX20210209
+      if(vpflow.flag("DATA_EDATA")) {pflow::DATA(cin,vpflow,"EDATA",cout); _PROGRAMRUN=true;}
       if(vpflow.flag("DATA_REAL_LATTICE")) {pflow::DATA(cin,vpflow,"REAL_LATTICE",cout); _PROGRAMRUN=true;} //DX20210209
       if(vpflow.flag("DATA_RECIPROCAL_LATTICE")) {pflow::DATA(cin,vpflow,"RECIPROCAL_LATTICE",cout); _PROGRAMRUN=true;} //DX20210209
+      if(vpflow.flag("DATA_SGDATA")) {pflow::DATA(cin,vpflow,"SGDATA",cout); _PROGRAMRUN=true;} //DX20170818 //DX20210301 - consolidated into pflow::DATA()
       if(vpflow.flag("DATA_SUPERLATTICE")) {pflow::DATA(cin,vpflow,"SUPERLATTICE",cout); _PROGRAMRUN=true;} //DX20210209
       if(vpflow.flag("DATA1")) {pflow::DATA1(vpflow.getattachedscheme("DATA1"),cin); _PROGRAMRUN=true;}
       if(vpflow.flag("DATA2")) {pflow::DATA2(cin); _PROGRAMRUN=true;}
@@ -1767,7 +1731,6 @@ namespace pflow {
       //if(DYNADIEL) {pflow::DYNADIEL(argv) ; _PROGRAMRUN=true ;} // CAMILO
       // E
       //DX20170901 [OBSOLETE] if(vpflow.flag("EDATA")) {pflow::DATA(cin,"EDATA"); _PROGRAMRUN=true;}
-      if(vpflow.flag("EDATA")) {pflow::DATA(cin,vpflow,"EDATA",cout); _PROGRAMRUN=true;}
       if(vpflow.flag("EDOS")) {pflow::EDOS(argv); _PROGRAMRUN=true;}
       if(vpflow.flag("EFFMASS")) { pflow::EFFMASS(argv, cout) ; _PROGRAMRUN=true ; } // CAMILO
       //  if(vpflow.flag("EFFECTIVEMASS")) {pflow::EffectiveMass(argv,aurostd::args2string(argv,"--em","./"),cout); _PROGRAMRUN=true;}
@@ -2031,7 +1994,6 @@ namespace pflow {
       if(vpflow.flag("SUPERCELLSTRLIST")) {pflow::SUPERCELLSTRLIST(vpflow.getattachedscheme("SUPERCELLSTRLIST")); _PROGRAMRUN=true;}
       if(vpflow.flag("SD") && argv.size()>=2) {cout << pflow::SD(argv,cin); _PROGRAMRUN=true;}
       if(vpflow.flag("SG")) {pflow::SG(cin); _PROGRAMRUN=true;}
-      if(vpflow.flag("SGDATA")) {pflow::SGDATA(cin,vpflow,cout); _PROGRAMRUN=true;} //DX20170818
       //DX20170818 [OBSOLETE] if(vpflow.flag("SGROUP")) {pflow::SGROUP(aflags,cin,KBIN_SYMMETRY_SGROUP_RADIUS_DEFAULT); _PROGRAMRUN=true;}
       if(vpflow.flag("SGROUP")) {pflow::SYMMETRY_GROUPS(aflags,cin,vpflow,cout); _PROGRAMRUN=true;} //DX20170818
       if(vpflow.flag("SPECIES")) {cout << pflow::SPECIES(cin); _PROGRAMRUN=true;}
@@ -5448,103 +5410,123 @@ namespace pflow {
 } // namespace pflow
 
 // ***************************************************************************
-// pflow::DATA
+// pflow::DATA()
 // ***************************************************************************
+// Determines the crystallographic data (lattice data or extended)
+// Stefano Curtarolo
+// Updated by David Hicks (DX) //DX20210302
+// Added separated real, reciprocal, and superlattice analyses
+// Moved SGDATA() inside
 namespace pflow {
-  //void DATA(string smode,istream& input)
-  bool DATA(istream& input,aurostd::xoption& vpflow,const string& smode,ostream& oss) {
+  bool DATA(istream& input, const aurostd::xoption& vpflow, const string& smode, ostream& oss) {
+
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy = XPID + "pflow::DATA()";
-    if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
-    string aliases = "";
-    string options = "";
-    if(smode == "EDATA"){
-      aliases = "--edata";
-      options = vpflow.getattachedscheme("EDATA");
-    }
-    else if(smode == "DATA"){
-      aliases = "--data";
-      options = vpflow.getattachedscheme("DATA");
-    }
-    vector<string> tokens;
-    aurostd::string2tokens(options,tokens,",");
-    if(tokens.size()==1) {
-      if(tokens.at(0)=="usage" || tokens.at(0)=="USAGE") {
-        init::MessageOption(options,soliloquy,
-            aurostd::liststring2string("aflow "+aliases+"[=tolerance|=tight|=loose] [--no_scan] [--print=txt|--print=json] < POSCAR  default: tolerance=(minimum_interatomic_distance)/100.0, print=txt")); //DX20200724 - removed return
-        return true;  //CO20200624 - the option was expressed successfully
+    string soliloquy = XPID + "pflow::DATA():";
+    stringstream message;
+
+    if(LDEBUG){cerr << soliloquy << " BEGIN: smode=" << smode << endl;}
+
+    // ---------------------------------------------------------------------------
+    // usage
+    if(vpflow.flag("DATA::USAGE")) {
+      // main command
+      string usage = "";
+      if(smode == "DATA"){ usage = "aflow --data"; }
+      else if(smode == "CRYSTAL_POINT_GROUP"){ usage = "aflow --point_group_crystal_data|--pgroupxtal_data|--pgroup_xtal_data[=tolerance|tight|loose]"; }
+      else if(smode == "EDATA"){ usage = "aflow --edata[=tolerance|tight|loose]"; }
+      else if(smode == "REAL_LATTICE"){ usage = "aflow --lattice_data|--data_lattice|--real_lattice_data|--data_real_lattice[=tolerance|tight|loose]"; }
+      else if(smode == "RECIPROCAL_LATTICE"){ usage = "aflow --reciprocal_lattice_data|--reciprocallattice_data|--klattice_data|--data_reciprocal_lattice[=tolerance|tight|loose]"; }
+      else if(smode == "SGDATA"){ usage = "aflow --sgdata|--space_group_data[=tolerance|tight|loose]"; }
+      else if(smode == "SUPERLATTICE"){ usage = "aflow --superlattice_data|--data_superlattice[=tolerance|tight|loose]"; }
+
+      // options
+      string options = "options: [--no_scan] [--print=txt|json]";
+      if(smode == "EDATA" || smode == "SGDATA"){
+        options += " [--setting=1|2] [--suppress_Wyckoff|--suppress_Wyckoff_printing|--suppress_wyckoff|--suppress_wyckoff_printing] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]]";
       }
+      vector<string> voptions;
+      aurostd::string2tokens(options,voptions," ");
+      voptions.insert(voptions.begin(), usage);
+
+      init::MessageOption("--usage","pflow::DATA()",voptions);
+      return true; //CO20200624 - the option was expressed successfully
     }
-    xstructure _a(input,IOAFLOW_AUTO);
-    xstructure a(_a);
+
+    // ---------------------------------------------------------------------------
+    // load structure
+    xstructure a(input,IOAFLOW_AUTO);
     a.ReScale(1.0);
-    //DX20180426 - use pwd - START
-    if(a.directory == ""){
-      a.directory = aurostd::getPWD(); //[CO20191112 - OBSOLETE]aurostd::execute2string("pwd");
-    }
-    //DX20180426 - use pwd - END
-    string print_directory = " [dir=" + a.directory + "]";
-    //DX20171128 - MAGNETIC SYMMETRY - START
+
+    // ---------------------------------------------------------------------------
+    // get directory info
+    if(a.directory == ""){ a.directory = aurostd::getPWD(); }
+
+    // ---------------------------------------------------------------------------
+    // get magnetic moment information
     if(vpflow.flag("DATA::MAGNETIC")){
       string magmom_info = vpflow.getattachedscheme("DATA::MAGNETIC");
       ProcessAndAddSpinToXstructure(a, magmom_info); //DX20191108 - condensed into a single function
     }
-    //DX20171128 - MAGNETIC SYMMETRY - END
-    // get tolerance  
+
+    // ---------------------------------------------------------------------------
+    // get tolerance
     double tolerance = pflow::getSymmetryTolerance(a,vpflow.getattachedscheme("DATA::TOLERANCE")); //DX20200820 - consolidated setting tolerance into a function
-    //DX20180806 - added setting - START
+
+    // ---------------------------------------------------------------------------
+    // get space group setting
     int setting = 0;
     if(vpflow.flag("DATA::SETTING")){
       int user_setting=aurostd::string2utype<int>(vpflow.getattachedscheme("DATA::SETTING"));
       if(user_setting!=1 && user_setting!=2){
-        cerr << XPID << "pflow::DATA::ERROR: Setting must be 1 or 2 (for rhombohedral systems: 1=rhl setting and 2=hex setting; for monoclinic systems: 1=unique axis-b and 2=unique axis-c)" << print_directory << "." << endl;
-        return 0;
+        message << "Setting must be 1 or 2 (for rhombohedral systems: 1=rhl setting and 2=hex setting; for monoclinic systems: 1=unique axis-b and 2=unique axis-c)";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
       }
       setting = user_setting;
     }
-    //DX20180806 - added setting - END
-    //DX20170803 - Add format flag - START
-    string format = "txt";
-    if(XHOST.vflag_control.flag("PRINT_MODE::TXT")){
-      format = "txt";
-    }
-    else if(XHOST.vflag_control.flag("PRINT_MODE::JSON")){
-      format = "json";
-    }
-    else { //default is txt
-      format = "txt";
-    }   
+
+    // ---------------------------------------------------------------------------
+    // file type //DX20210226 - string to filetype
+    filetype ftype = txt_ft;
+    if(XHOST.vflag_control.flag("PRINT_MODE::TXT")){ ftype = txt_ft; }
+    else if(XHOST.vflag_control.flag("PRINT_MODE::JSON")){ ftype = json_ft; }
+
+    // ---------------------------------------------------------------------------
+    // self-consistent tolerance scan
     bool no_scan = false;
-    if(vpflow.flag("DATA::NO_SCAN")){
-      no_scan = true;
-    }
-    if(format=="txt"){
-      cout << aflow::Banner("BANNER_TINY") << endl;
-    }
-    // pflow::PrintData(a,cerr,smode);
+    if(vpflow.flag("DATA::NO_SCAN")){ no_scan = true; }
+
+    // ---------------------------------------------------------------------------
+    // SGDATA: do not print all Wyckoff data (useful for web) //DX20210301
+    bool suppress_Wyckoff = false;
+    if(vpflow.flag("DATA::SUPPRESS_WYCKOFF_PRINTING")){ suppress_Wyckoff = true; }
+
+    // ---------------------------------------------------------------------------
+    // add banner
+    if(ftype==txt_ft){ cout << aflow::Banner("BANNER_TINY") << endl; }
+
+    // ---------------------------------------------------------------------------
+    // perform relevant analysis
+    bool already_calculated = false;
+    bool standalone = true;
     if(smode == "EDATA" || smode == "DATA"){
-      pflow::PrintData(a,oss,tolerance,smode,no_scan,setting,format); //DX cout to oss
+      oss << PrintData(a, smode, ftype, already_calculated, tolerance, no_scan, setting);
     }
     else if(smode=="REAL_LATTICE"){
-      filetype ftype = txt_ft;
-      if(format == "json"){ ftype = json_ft; }
-      oss << PrintRealLatticeData(a, tolerance, ftype , false, true) << endl;
+      oss << PrintRealLatticeData(a, "EDATA", ftype, standalone, already_calculated, tolerance) << endl;
     }
     else if(smode=="CRYSTAL_POINT_GROUP"){
-      filetype ftype = txt_ft;
-      if(format == "json"){ ftype = json_ft; }
-      oss << PrintCrystalPointGroupData(a, tolerance, ftype , false, true) << endl;
+      oss << PrintCrystalPointGroupData(a, ftype, standalone, already_calculated, tolerance) << endl;
     }
     else if(smode=="SUPERLATTICE"){
-      filetype ftype = txt_ft;
-      if(format == "json"){ ftype = json_ft; }
-      oss << PrintSuperlatticeData(a, tolerance, ftype , false, true) << endl;
+      oss << PrintSuperlatticeData(a, ftype, standalone, already_calculated, tolerance) << endl;
     }
     else if(smode=="RECIPROCAL_LATTICE"){
-      filetype ftype = txt_ft;
-      if(format == "json"){ ftype = json_ft; }
-      oss << PrintReciprocalLatticeData(a, tolerance, ftype , false, true) << endl;
+      oss << PrintReciprocalLatticeData(a, ftype, standalone, already_calculated, tolerance) << endl;
     }
+    else if(smode=="SGDATA"){
+      oss << pflow::PrintSGData(a, ftype, standalone, already_calculated, tolerance, no_scan, setting, suppress_Wyckoff) << endl;
+    }
+
     return true;
   }
 } // namespace pflow
@@ -13989,87 +13971,8 @@ namespace pflow {
 } // namespace pflow
 
 // ***************************************************************************
-// pflow::SGDATA
+// pflow::SGDATA() //DX20210301 [OBSOLETE - moved into pflow::DATA()]
 // ***************************************************************************
-namespace pflow {
-  bool SGDATA(istream& input, aurostd::xoption& vpflow, ostream& oss) {
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy = XPID + "pflow::SGDATA()";
-    if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
-    string options = vpflow.getattachedscheme("SGDATA");
-    vector<string> tokens;
-    aurostd::string2tokens(options,tokens,",");
-    if(tokens.size()==1) {
-      if(tokens.at(0)=="usage" || tokens.at(0)=="USAGE") {
-        init::MessageOption(options,soliloquy,
-            aurostd::liststring2string("aflow --sgdata|--space_group_data[=tolerance|=tight|=loose] [--no_scan] [--print=txt|--print=json] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR  default: tolerance=(minimum_interatomic_distance)/100.0, print=txt, non-magnetic")); //DX20200724 - removed return
-        return true;  //CO20200624 - the option was expressed successfully
-      }
-    }
-    xstructure _a(input,IOAFLOW_AUTO);
-    xstructure a(_a);
-    a.ReScale(1.0);
-    //DX20180221 - use pwd - START
-    if(a.directory == ""){
-      a.directory = aurostd::getPWD(); //[CO20191112 - OBSOLETE]aurostd::execute2string("pwd");
-    }
-    string print_directory = " [dir=" + a.directory + "]";
-    //DX20180221 - use pwd - END
-    //DX20170921 - MAGNETIC SYMMETRY - START
-    if(vpflow.flag("SGDATA::MAGNETIC")){
-      string magmom_info = vpflow.getattachedscheme("SGDATA::MAGNETIC");
-      ProcessAndAddSpinToXstructure(a, magmom_info); //DX20191108 - condensed into a single function
-    } 
-    //DX20170921 - MAGNETIC SYMMETRY - END
-
-    // get tolerance
-    double tolerance = pflow::getSymmetryTolerance(a,vpflow.getattachedscheme("SGDATA::TOLERANCE")); //DX20200820 - consolidated setting tolerance into a function
-
-    //DX20180806 - added setting - START
-    int setting = 0;
-    if(vpflow.flag("SGDATA::SETTING")){
-      int user_setting=aurostd::string2utype<int>(vpflow.getattachedscheme("SGDATA::SETTING"));
-      if(user_setting!=1 && user_setting!=2){
-        cerr << XPID << "pflow::SGDATA::ERROR: Setting must be 1 or 2 (for rhombohedral systems: 1=rhl setting and 2=hex setting; for monoclinic systems: 1=unique axis-b and 2=unique axis-c)" << print_directory << "." << endl;
-        return 0;
-      }
-      setting = user_setting;
-    }
-    //DX20180806 - added setting - END
-    //DX20170803 - Add format flag - START
-    string format = "txt";
-    if(XHOST.vflag_control.flag("PRINT_MODE::TXT")){
-      format = "txt";
-    }
-    else if(XHOST.vflag_control.flag("PRINT_MODE::JSON")){
-      format = "json";
-    }
-    else { //default is txt
-      format = "txt";
-    }   
-    bool no_scan = false;
-    if(vpflow.flag("SGDATA::NO_SCAN")){
-      no_scan = true;
-    }
-    bool suppress_Wyckoff = false;
-    if(vpflow.flag("SGDATA::SUPPRESS_WYCKOFF_PRINTING")){
-      suppress_Wyckoff = true;
-    }
-    if(format=="txt"){
-      cout << aflow::Banner("BANNER_TINY") << endl;
-    }
-    // pflow::PrintData(a,cerr,smode);
-    if(!suppress_Wyckoff){
-      pflow::PrintSGData(a,tolerance,oss,no_scan,setting,true,format,false); //CO20171027 //DX20180806 - added setting
-    }
-    else{
-      filetype ftype = txt_ft;
-      if(format == "json"){ ftype = json_ft; }
-      cout << pflow::PrintSGDataNEW(a,tolerance,no_scan,setting,ftype,false,true) << endl;
-    }
-    return true;
-  }
-} // namespace pflow
 
 // ***************************************************************************
 // pflow::SGROUP
