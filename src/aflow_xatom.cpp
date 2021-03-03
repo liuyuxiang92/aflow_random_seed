@@ -10240,248 +10240,19 @@ xstructure SwapCoordinates(const xstructure& str,const uint& ii,const uint& jj) 
 }
 
 // ***************************************************************************
-// Function GetLatticeType
-// ***************************************************************************
-void xstructure::GetLatticeType(void) {
-  xstructure str_sp,str_sc;
-  GetLatticeType(str_sp,str_sc);
-}
-
-void xstructure::GetLatticeType(xstructure& str_sp,xstructure& str_sc) {
-  //  bool VERBOSE=TRUE;
-  bool VERBOSE=FALSE;
-  //DX double eps=0.002,epsang=0.02;
-  // double eps=0.02,epsang=0.02;  //JX
-  // DIRECT
-  xstructure str_in;//,str_sp,str_sc;
-  // start
-  str_in=*this;
-  str_in.title="NO_RECURSION";
-  // str_in.GetPrimitive();
-  // str_in.MinkowskiBasisReduction();
-  // cerr << str_in << endl;
-  // str_in.CalculateSymmetryPointGroup(TRUE);
-  // str_in.CalculateSymmetryFactorGroup(TRUE);
-  // str_in.CalculateSymmetryPointGroupCrystal(TRUE);
-  //DX START
-  bool same_eps = false;
-  uint count = 0;
-  while(same_eps == false && count++ < 100){
-    //DX END
-    if(0) {
-      LATTICE::Standard_Lattice_StructureDefault(str_in,str_sp,str_sc); // STD tolerance  // ONLY BRAVAIS_CRYSTAL
-      // LATTICE::Standard_Lattice_Structure(str_in,str_sp,str_sc,0.0001,0.001);
-    }
-    if(1) {
-      //    cerr << XPID << "LATTICE::Bravais_Lattice_StructureDefault IN" << endl;
-      LATTICE::Bravais_Lattice_StructureDefault(str_in,str_sp,str_sc); // STD tolerance  // ONLY BRAVAIS_CRYSTAL
-      //  cerr << XPID << "LATTICE::Bravais_Lattice_StructureDefault OUT" << endl;
-    }
-    if(VERBOSE) cerr << "xstructure::GetLatticeType: [4]" << endl;
-    if(str_sp.pgroup_calculated==FALSE) str_sp.CalculateSymmetryPointGroup(FALSE);// cerr << "POINT GROUP" << endl;
-    if(str_sp.fgroup_calculated==FALSE) str_sp.CalculateSymmetryFactorGroup(FALSE); //cerr << "FACTOR GROUP" << endl;
-    if(str_sp.pgroup_xtal_calculated==FALSE) str_sp.CalculateSymmetryPointGroupCrystal(FALSE); //cerr << "POINT GROUP XTAL" << endl;
-    //  *this=str_sp; // more obvious but will mess up the structures.... we only want to take the properties
-    this->bravais_lattice_type=str_sp.bravais_lattice_type;
-    this->bravais_lattice_variation_type=str_sp.bravais_lattice_variation_type;
-    this->bravais_lattice_system=str_sp.bravais_lattice_system;
-    this->bravais_lattice_lattice_type=str_sp.bravais_lattice_lattice_type;
-    this->bravais_lattice_lattice_variation_type=str_sp.bravais_lattice_lattice_variation_type;
-    this->bravais_lattice_lattice_system=str_sp.bravais_lattice_lattice_system;
-    this->volume_changed_original2new=str_sp.volume_changed_original2new; //DX20181024
-    this->transform_coordinates_original2new=str_sp.transform_coordinates_original2new; //DX20181024
-    this->transform_coordinates_new2original=str_sp.transform_coordinates_new2original; //DX20181024
-    this->rotate_lattice_original2new=str_sp.rotate_lattice_original2new; //DX20181024
-    this->rotate_lattice_new2original=str_sp.rotate_lattice_new2original; //DX20181024
-    this->pearson_symbol=str_sp.pearson_symbol;
-    this->crystal_family=str_sp.crystal_family;
-    this->crystal_system=str_sp.crystal_system;
-    this->point_group_crystal_class=str_sp.point_group_crystal_class;
-    this->point_group_Shoenflies=str_sp.point_group_Shoenflies;
-    this->point_group_Hermann_Mauguin=str_sp.point_group_Hermann_Mauguin;
-    this->point_group_orbifold=str_sp.point_group_orbifold;
-    this->point_group_type=str_sp.point_group_type;
-    this->point_group_order=str_sp.point_group_order;
-    this->point_group_structure=str_sp.point_group_structure;
-    // RECIPROCAL
-    xstructure str_reciprocal_in,str_reciprocal_sp,str_reciprocal_sc;
-    str_reciprocal_in.lattice=this->klattice;str_reciprocal_in.FixLattices();
-    str_reciprocal_in.title="NO_RECURSION";
-    //DX+CO START
-    this->sym_eps=str_reciprocal_in.sym_eps=str_reciprocal_sp.sym_eps=str_reciprocal_sc.sym_eps=str_sp.sym_eps; //DX
-    this->sym_eps_calculated=str_reciprocal_in.sym_eps_calculated=str_reciprocal_sp.sym_eps_calculated=str_reciprocal_sc.sym_eps_calculated=str_sp.sym_eps_calculated; //DX
-    this->sym_eps_change_count=str_reciprocal_in.sym_eps_change_count=str_reciprocal_sp.sym_eps_change_count=str_reciprocal_sc.sym_eps_change_count=str_sp.sym_eps_change_count; //DX20180222 - added sym_eps change count
-    //DX+CO END
-    _atom atom;str_reciprocal_in.AddAtom(atom);
-    //LATTICE::Standard_Lattice_Structure(str_reciprocal_in,str_reciprocal_sp,str_reciprocal_sc,eps,epsang); //SC OLD VERSION
-    if(VERBOSE) cerr << "xstructure::GetLatticeType: [5]" << endl;
-    //DX int ss=0; //JX
-    //DX LATTICE::Standard_Lattice_Structure(str_reciprocal_in,str_reciprocal_sp,str_reciprocal_sc,eps,epsang,ss,_EPS_); //JX
-    //DX20170814 START - Use real pgroup to calculate pgroupk and then set pgroupk from str_sp to the pgroup and pgroup_xtal of str_reciprocal_in
-    //DX20170814 The pgroup and pgroup_xtal are the same for the str_reciprocal structure because there is only one atom at the origin
-    //DX20170814 (i.e. lattice and crystal symmetry are the same for the reciprocal space crystal)
-    //DX20170829 [OBSOLETE] -since performing full symmetry analysis by default - str_sp.CalculateSymmetryPointGroupKLattice(FALSE);
-    //DX20180426 - possible that lattice exhibits lower symmetry than crystal (i.e., from str_sp); would need to pass lattice symmetry from Standard_Lattice, but that information is not stored out of scope, commenting out 5 lines below 
-    //DX20180426 [OBSOLETE] - possible that lattice exhibits lower symmetry than crystal (i.e., from str_sp) - str_reciprocal_in.pgroup=str_reciprocal_sp.pgroup=str_reciprocal_sc.pgroup=str_sp.pgroupk;
-    //DX20180426 [OBSOLETE] - possible that lattice exhibits lower symmetry than crystal (i.e., from str_sp) - str_reciprocal_in.pgroup_calculated=str_reciprocal_sp.pgroup_calculated=str_reciprocal_sc.pgroup_calculated=str_sp.pgroupk_calculated;
-    //DX20180426 [OBSOLETE] - possible that lattice exhibits lower symmetry than crystal (i.e., from str_sp) - str_reciprocal_in.pgroup_xtal=str_reciprocal_sp.pgroup_xtal=str_reciprocal_sc.pgroup_xtal=str_sp.pgroupk;
-    //DX20180426 [OBSOLETE] - possible that lattice exhibits lower symmetry than crystal (i.e., from str_sp) - str_reciprocal_in.pgroup_xtal_calculated=str_reciprocal_sp.pgroup_xtal_calculated=str_reciprocal_sc.pgroup_xtal_calculated=str_sp.pgroup_calculated;
-    //DX20180426 [OBSOLETE] - possible that lattice exhibits lower symmetry than crystal (i.e., from str_sp) - str_reciprocal_in.pgroup_xtal_calculated=str_reciprocal_sp.pgroup_xtal_calculated=str_reciprocal_sc.pgroup_xtal_calculated=str_sp.pgroup_calculated;
-    //DX20170814 END
-    LATTICE::Standard_Lattice_StructureDefault(str_reciprocal_in,str_reciprocal_sp,str_reciprocal_sc,false); //DX //DX20180226 - do not need to do full sym for recip
-    //DX START
-    if(str_sp.sym_eps == str_reciprocal_sp.sym_eps){
-      same_eps = true;
-    }
-    else {
-      str_in.sym_eps = str_sp.sym_eps = str_sc.sym_eps = str_reciprocal_sp.sym_eps;
-      str_in.sym_eps_change_count = str_sp.sym_eps_change_count = str_sc.sym_eps_change_count = str_reciprocal_sp.sym_eps_change_count; //DX20180222 - added sym_eps change count
-    }
-    //DX END
-    this->reciprocal_lattice_type=str_reciprocal_sp.bravais_lattice_type;
-    this->reciprocal_lattice_variation_type=str_reciprocal_sp.bravais_lattice_variation_type;
-    if(VERBOSE) cerr << "xstructure::GetLatticeType: [6]" << endl;
-    // SUPERLATTICE
-    xstructure str_superlattice_in,str_superlattice_sp,str_superlattice_sc;
-    str_superlattice_in=*this;
-    str_superlattice_in.ClearSymmetry();  //DX20170814 - It wasn't cleared, so nothing was being calculated
-    str_superlattice_in.title="NO_RECURSION";
-    //str_superlattice_in.GetPrimitive(0.01);
-    if(VERBOSE) cerr << str_superlattice_in << endl;
-    if(VERBOSE) cerr << "xstructure::GetLatticeType: [7]" << endl;
-    str_superlattice_in.IdenticalAtoms();  // make superlattice
-    if(VERBOSE) cerr << "xstructure::GetLatticeType: [8]" << endl;
-    if(VERBOSE) cerr << str_superlattice_in << endl;
-    str_superlattice_in.GetPrimitive(0.005);
-    if(VERBOSE) cerr << str_superlattice_in << endl;
-    if(VERBOSE) cerr << "xstructure::GetLatticeType: [9]" << endl;
-    str_superlattice_in.Minkowski_calculated=FALSE;
-    if(VERBOSE) cerr << "xstructure::GetLatticeType: [10]" << endl;
-    str_superlattice_in.MinkowskiBasisReduction();
-    if(VERBOSE) cerr << "xstructure::GetLatticeType: [11]" << endl;
-    if(VERBOSE) cerr << str_superlattice_in << endl;
-    //  LATTICE::Standard_Lattice_Structure(str_superlattice_in,str_superlattice_sp,str_superlattice_sc); //SC OLD VERSION
-    //DX ss=0; //JX
-    //DX+CO START
-    str_superlattice_in.sym_eps=str_superlattice_sp.sym_eps=str_superlattice_sc.sym_eps=str_sp.sym_eps; //DX
-    str_superlattice_in.sym_eps_calculated=str_superlattice_sp.sym_eps_calculated=str_superlattice_sc.sym_eps_calculated=str_sp.sym_eps_calculated; //DX
-    str_superlattice_in.sym_eps_change_count=str_superlattice_sp.sym_eps_change_count=str_superlattice_sc.sym_eps_change_count=str_sp.sym_eps_change_count; //DX20180222 - added sym_eps change count
-    //DX+CO END
-    //DX LATTICE::Standard_Lattice_Structure(str_superlattice_in,str_superlattice_sp,str_superlattice_sc,eps,epsang,ss,_EPS_); //JX
-    LATTICE::Standard_Lattice_StructureDefault(str_superlattice_in,str_superlattice_sp,str_superlattice_sc,false); //DX //DX20180226 - do not need to do full sym for superlattice
-    //DX START
-    if(str_sp.sym_eps == str_superlattice_sp.sym_eps){
-      same_eps = true;
-    }
-    else {
-      str_sp.sym_eps = str_superlattice_sp.sym_eps;
-      str_sp.sym_eps_change_count = str_superlattice_sp.sym_eps_change_count; //DX20180222 - added sym_eps change count
-    }
-    //DX END
-    if(VERBOSE) cerr << "xstructure::GetLatticeType: [12]" << endl;
-    this->bravais_superlattice_lattice=str_superlattice_sp.lattice; //DX20210209
-    this->bravais_superlattice_type=str_superlattice_sp.bravais_lattice_type;
-    this->bravais_superlattice_variation_type=str_superlattice_sp.bravais_lattice_variation_type;
-    this->bravais_superlattice_system=str_superlattice_sp.bravais_lattice_system;
-    this->pearson_symbol_superlattice=str_superlattice_sp.pearson_symbol;
-    if(count==100){
-      cerr << "ERROR in Bravais_Lattice_StructureDefault(): Unable to find reliable sym_eps." << endl;
-      break;
-    }
-  } //DX while loop
-}
-
-// ***************************************************************************
-// Function GetExtendedCrystallographicData() //DX20210302
-// ***************************************************************************
-// Determine the real, reciprocal, superlattice, and space group symmetries
-// Includes self-consistency loop to ensure descriptions are commensurate
-void xstructure::GetExtendedCrystallographicData(double sym_eps,
-    bool no_scan,
-    int setting) {
-  xstructure str_sp,str_sc;
-  GetExtendedCrystallographicData(str_sp,str_sc,sym_eps,no_scan,setting);
-}
-
-void xstructure::GetExtendedCrystallographicData(xstructure& str_sp,
-    xstructure& str_sc,
-    double sym_eps,
-    bool no_scan,
-    int setting) {
-
-  bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string function_name = XPID + "xstructure::GetExtendedCrystallographicData():";
-
-  // ---------------------------------------------------------------------------
-  // set symmetry tolerance based on the following sequence
-  // 1) use input, 2) use sym_eps in xstructure, 3) calculate default
-  double tolerance = sym_eps;
-  if(tolerance==AUROSTD_MAX_DOUBLE){
-    if((*this).sym_eps_calculated){ tolerance = (*this).sym_eps; }
-    else{ tolerance=SYM::defaultTolerance((*this)); }
-  }
-  if(LDEBUG){ cerr << function_name << " [1] Set symmetry tolerance (starting sym_eps=" << tolerance << ")" << endl; }
-
-  // keep track of self-consistent tolerance
-  bool same_eps = false;
-  uint count = 0;
-  uint count_max = 100; // safety for while loop, don't calculate forever
-
-  // update tolerance info in *this
-  (*this).sym_eps=tolerance;
-  (*this).sym_eps_calculated=true;
-  (*this).sym_eps_change_count=count;
-
-  // ---------------------------------------------------------------------------
-  // loop over the real, reciprocal, and superlattice analysis until all
-  // symmetries are commensurate with a common tolerance value
-  while(!same_eps && count++ < count_max){
-
-    // ---------------------------------------------------------------------------
-    // update the tolerance, it may have change during loop
-    tolerance = (*this).sym_eps;
-    count = (*this).sym_eps_change_count;
-
-    // ---------------------------------------------------------------------------
-    // check if consistency checks failed (maxed while loop iteration)
-    // turn off scan
-    if(count==count_max){
-      no_scan=true;
-      tolerance = sym_eps; // set to original eps
-      cerr << function_name << " Unable to calculate consistent symmetry. Calculating at original tolerance (sym_eps=" << sym_eps << ") and ignoring consistency checks." << endl;
-    }
-
-    // ---------------------------------------------------------------------------
-    // REAL, RECIPROCAL, and SUPERLATTICE data
-    if(LDEBUG){ cerr << function_name << " [2] Calculate real, reciprocal, and superlattice information (sym_eps=" << tolerance << ", sym_eps_change_count=" << count << ")" << endl; }
-    (*this).GetLatticeTypeNEW(str_sp, str_sc, tolerance);
-
-    // ---------------------------------------------------------------------------
-    // space group data
-    if(LDEBUG){ cerr << function_name << " [3] Calculate the space group symmetry information (sym_eps=" << tolerance << ", sym_eps_change_count=" << count << ")" << endl; }
-    (*this).SpaceGroup_ITC(tolerance, -1, setting, no_scan);
-    if(!no_scan && (*this).sym_eps != tolerance){ continue; } // if tolerance changed, recalc
-
-    // made it to the end with same sym_eps
-    same_eps = true;
-  }
-
-  if(LDEBUG){ cerr << function_name << " [5] Extended crystallographic data calculation finished! (sym_eps=" << tolerance << ", sym_eps_change_count=" << count << ")" << endl; }
-
-}
-
-// ***************************************************************************
 // Function GetLatticeType()
 // ***************************************************************************
 // Determine the real, reciprocal, and superlattice symmetry information
+// Stefano Curtarolo
+// Modified by David Hicks (DX)
 // Includes self-consistency loop to ensure descriptions are commensurate
 // DX20210225 - cleaned/consolidated function
-void xstructure::GetLatticeTypeNEW(double sym_eps, bool no_scan) {
+void xstructure::GetLatticeType(double sym_eps, bool no_scan) {
   xstructure str_sp,str_sc;
-  GetLatticeTypeNEW(str_sp,str_sc,sym_eps,no_scan);
+  GetLatticeType(str_sp,str_sc,sym_eps,no_scan);
 }
 
-void xstructure::GetLatticeTypeNEW(xstructure& str_sp,xstructure& str_sc, double sym_eps, bool no_scan) {
+void xstructure::GetLatticeType(xstructure& str_sp,xstructure& str_sc, double sym_eps, bool no_scan) {
 
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   string function_name = XPID + "xstructure::GetLatticeType():";
@@ -10547,6 +10318,237 @@ void xstructure::GetLatticeTypeNEW(xstructure& str_sp,xstructure& str_sc, double
   }
 
   if(LDEBUG){ cerr << function_name << " [5] Lattice types calculation finished! (sym_eps=" << tolerance << ", sym_eps_change_count=" << count << ")" << endl; }
+
+}
+
+//DX20210302 [OBSOLETE] // ***************************************************************************
+//DX20210302 [OBSOLETE] // Function GetLatticeType
+//DX20210302 [OBSOLETE] // ***************************************************************************
+//DX20210302 [OBSOLETE] void xstructure::GetLatticeType(void) {
+//DX20210302 [OBSOLETE]   xstructure str_sp,str_sc;
+//DX20210302 [OBSOLETE]   GetLatticeType(str_sp,str_sc);
+//DX20210302 [OBSOLETE] }
+//DX20210302 [OBSOLETE] 
+//DX20210302 [OBSOLETE] void xstructure::GetLatticeType(xstructure& str_sp,xstructure& str_sc) {
+//DX20210302 [OBSOLETE]   //  bool VERBOSE=TRUE;
+//DX20210302 [OBSOLETE]   bool VERBOSE=FALSE;
+//DX20210302 [OBSOLETE]   //DX double eps=0.002,epsang=0.02;
+//DX20210302 [OBSOLETE]   // double eps=0.02,epsang=0.02;  //JX
+//DX20210302 [OBSOLETE]   // DIRECT
+//DX20210302 [OBSOLETE]   xstructure str_in;//,str_sp,str_sc;
+//DX20210302 [OBSOLETE]   // start
+//DX20210302 [OBSOLETE]   str_in=*this;
+//DX20210302 [OBSOLETE]   str_in.title="NO_RECURSION";
+//DX20210302 [OBSOLETE]   // str_in.GetPrimitive();
+//DX20210302 [OBSOLETE]   // str_in.MinkowskiBasisReduction();
+//DX20210302 [OBSOLETE]   // cerr << str_in << endl;
+//DX20210302 [OBSOLETE]   // str_in.CalculateSymmetryPointGroup(TRUE);
+//DX20210302 [OBSOLETE]   // str_in.CalculateSymmetryFactorGroup(TRUE);
+//DX20210302 [OBSOLETE]   // str_in.CalculateSymmetryPointGroupCrystal(TRUE);
+//DX20210302 [OBSOLETE]   //DX START
+//DX20210302 [OBSOLETE]   bool same_eps = false;
+//DX20210302 [OBSOLETE]   uint count = 0;
+//DX20210302 [OBSOLETE]   while(same_eps == false && count++ < 100){
+//DX20210302 [OBSOLETE]     //DX END
+//DX20210302 [OBSOLETE]     if(0) {
+//DX20210302 [OBSOLETE]       LATTICE::Standard_Lattice_StructureDefault(str_in,str_sp,str_sc); // STD tolerance  // ONLY BRAVAIS_CRYSTAL
+//DX20210302 [OBSOLETE]       // LATTICE::Standard_Lattice_Structure(str_in,str_sp,str_sc,0.0001,0.001);
+//DX20210302 [OBSOLETE]     }
+//DX20210302 [OBSOLETE]     if(1) {
+//DX20210302 [OBSOLETE]       //    cerr << XPID << "LATTICE::Bravais_Lattice_StructureDefault IN" << endl;
+//DX20210302 [OBSOLETE]       LATTICE::Bravais_Lattice_StructureDefault(str_in,str_sp,str_sc); // STD tolerance  // ONLY BRAVAIS_CRYSTAL
+//DX20210302 [OBSOLETE]       //  cerr << XPID << "LATTICE::Bravais_Lattice_StructureDefault OUT" << endl;
+//DX20210302 [OBSOLETE]     }
+//DX20210302 [OBSOLETE]     if(VERBOSE) cerr << "xstructure::GetLatticeType: [4]" << endl;
+//DX20210302 [OBSOLETE]     if(str_sp.pgroup_calculated==FALSE) str_sp.CalculateSymmetryPointGroup(FALSE);// cerr << "POINT GROUP" << endl;
+//DX20210302 [OBSOLETE]     if(str_sp.fgroup_calculated==FALSE) str_sp.CalculateSymmetryFactorGroup(FALSE); //cerr << "FACTOR GROUP" << endl;
+//DX20210302 [OBSOLETE]     if(str_sp.pgroup_xtal_calculated==FALSE) str_sp.CalculateSymmetryPointGroupCrystal(FALSE); //cerr << "POINT GROUP XTAL" << endl;
+//DX20210302 [OBSOLETE]     //  *this=str_sp; // more obvious but will mess up the structures.... we only want to take the properties
+//DX20210302 [OBSOLETE]     this->bravais_lattice_type=str_sp.bravais_lattice_type;
+//DX20210302 [OBSOLETE]     this->bravais_lattice_variation_type=str_sp.bravais_lattice_variation_type;
+//DX20210302 [OBSOLETE]     this->bravais_lattice_system=str_sp.bravais_lattice_system;
+//DX20210302 [OBSOLETE]     this->bravais_lattice_lattice_type=str_sp.bravais_lattice_lattice_type;
+//DX20210302 [OBSOLETE]     this->bravais_lattice_lattice_variation_type=str_sp.bravais_lattice_lattice_variation_type;
+//DX20210302 [OBSOLETE]     this->bravais_lattice_lattice_system=str_sp.bravais_lattice_lattice_system;
+//DX20210302 [OBSOLETE]     this->volume_changed_original2new=str_sp.volume_changed_original2new; //DX20181024
+//DX20210302 [OBSOLETE]     this->transform_coordinates_original2new=str_sp.transform_coordinates_original2new; //DX20181024
+//DX20210302 [OBSOLETE]     this->transform_coordinates_new2original=str_sp.transform_coordinates_new2original; //DX20181024
+//DX20210302 [OBSOLETE]     this->rotate_lattice_original2new=str_sp.rotate_lattice_original2new; //DX20181024
+//DX20210302 [OBSOLETE]     this->rotate_lattice_new2original=str_sp.rotate_lattice_new2original; //DX20181024
+//DX20210302 [OBSOLETE]     this->pearson_symbol=str_sp.pearson_symbol;
+//DX20210302 [OBSOLETE]     this->crystal_family=str_sp.crystal_family;
+//DX20210302 [OBSOLETE]     this->crystal_system=str_sp.crystal_system;
+//DX20210302 [OBSOLETE]     this->point_group_crystal_class=str_sp.point_group_crystal_class;
+//DX20210302 [OBSOLETE]     this->point_group_Shoenflies=str_sp.point_group_Shoenflies;
+//DX20210302 [OBSOLETE]     this->point_group_Hermann_Mauguin=str_sp.point_group_Hermann_Mauguin;
+//DX20210302 [OBSOLETE]     this->point_group_orbifold=str_sp.point_group_orbifold;
+//DX20210302 [OBSOLETE]     this->point_group_type=str_sp.point_group_type;
+//DX20210302 [OBSOLETE]     this->point_group_order=str_sp.point_group_order;
+//DX20210302 [OBSOLETE]     this->point_group_structure=str_sp.point_group_structure;
+//DX20210302 [OBSOLETE]     // RECIPROCAL
+//DX20210302 [OBSOLETE]     xstructure str_reciprocal_in,str_reciprocal_sp,str_reciprocal_sc;
+//DX20210302 [OBSOLETE]     str_reciprocal_in.lattice=this->klattice;str_reciprocal_in.FixLattices();
+//DX20210302 [OBSOLETE]     str_reciprocal_in.title="NO_RECURSION";
+//DX20210302 [OBSOLETE]     //DX+CO START
+//DX20210302 [OBSOLETE]     this->sym_eps=str_reciprocal_in.sym_eps=str_reciprocal_sp.sym_eps=str_reciprocal_sc.sym_eps=str_sp.sym_eps; //DX
+//DX20210302 [OBSOLETE]     this->sym_eps_calculated=str_reciprocal_in.sym_eps_calculated=str_reciprocal_sp.sym_eps_calculated=str_reciprocal_sc.sym_eps_calculated=str_sp.sym_eps_calculated; //DX
+//DX20210302 [OBSOLETE]     this->sym_eps_change_count=str_reciprocal_in.sym_eps_change_count=str_reciprocal_sp.sym_eps_change_count=str_reciprocal_sc.sym_eps_change_count=str_sp.sym_eps_change_count; //DX20180222 - added sym_eps change count
+//DX20210302 [OBSOLETE]     //DX+CO END
+//DX20210302 [OBSOLETE]     _atom atom;str_reciprocal_in.AddAtom(atom);
+//DX20210302 [OBSOLETE]     //LATTICE::Standard_Lattice_Structure(str_reciprocal_in,str_reciprocal_sp,str_reciprocal_sc,eps,epsang); //SC OLD VERSION
+//DX20210302 [OBSOLETE]     if(VERBOSE) cerr << "xstructure::GetLatticeType: [5]" << endl;
+//DX20210302 [OBSOLETE]     //DX int ss=0; //JX
+//DX20210302 [OBSOLETE]     //DX LATTICE::Standard_Lattice_Structure(str_reciprocal_in,str_reciprocal_sp,str_reciprocal_sc,eps,epsang,ss,_EPS_); //JX
+//DX20210302 [OBSOLETE]     //DX20170814 START - Use real pgroup to calculate pgroupk and then set pgroupk from str_sp to the pgroup and pgroup_xtal of str_reciprocal_in
+//DX20210302 [OBSOLETE]     //DX20170814 The pgroup and pgroup_xtal are the same for the str_reciprocal structure because there is only one atom at the origin
+//DX20210302 [OBSOLETE]     //DX20170814 (i.e. lattice and crystal symmetry are the same for the reciprocal space crystal)
+//DX20210302 [OBSOLETE]     //DX20170829 [OBSOLETE] -since performing full symmetry analysis by default - str_sp.CalculateSymmetryPointGroupKLattice(FALSE);
+//DX20210302 [OBSOLETE]     //DX20180426 - possible that lattice exhibits lower symmetry than crystal (i.e., from str_sp); would need to pass lattice symmetry from Standard_Lattice, but that information is not stored out of scope, commenting out 5 lines below 
+//DX20210302 [OBSOLETE]     //DX20180426 [OBSOLETE] - possible that lattice exhibits lower symmetry than crystal (i.e., from str_sp) - str_reciprocal_in.pgroup=str_reciprocal_sp.pgroup=str_reciprocal_sc.pgroup=str_sp.pgroupk;
+//DX20210302 [OBSOLETE]     //DX20180426 [OBSOLETE] - possible that lattice exhibits lower symmetry than crystal (i.e., from str_sp) - str_reciprocal_in.pgroup_calculated=str_reciprocal_sp.pgroup_calculated=str_reciprocal_sc.pgroup_calculated=str_sp.pgroupk_calculated;
+//DX20210302 [OBSOLETE]     //DX20180426 [OBSOLETE] - possible that lattice exhibits lower symmetry than crystal (i.e., from str_sp) - str_reciprocal_in.pgroup_xtal=str_reciprocal_sp.pgroup_xtal=str_reciprocal_sc.pgroup_xtal=str_sp.pgroupk;
+//DX20210302 [OBSOLETE]     //DX20180426 [OBSOLETE] - possible that lattice exhibits lower symmetry than crystal (i.e., from str_sp) - str_reciprocal_in.pgroup_xtal_calculated=str_reciprocal_sp.pgroup_xtal_calculated=str_reciprocal_sc.pgroup_xtal_calculated=str_sp.pgroup_calculated;
+//DX20210302 [OBSOLETE]     //DX20180426 [OBSOLETE] - possible that lattice exhibits lower symmetry than crystal (i.e., from str_sp) - str_reciprocal_in.pgroup_xtal_calculated=str_reciprocal_sp.pgroup_xtal_calculated=str_reciprocal_sc.pgroup_xtal_calculated=str_sp.pgroup_calculated;
+//DX20210302 [OBSOLETE]     //DX20170814 END
+//DX20210302 [OBSOLETE]     LATTICE::Standard_Lattice_StructureDefault(str_reciprocal_in,str_reciprocal_sp,str_reciprocal_sc,false); //DX //DX20180226 - do not need to do full sym for recip
+//DX20210302 [OBSOLETE]     //DX START
+//DX20210302 [OBSOLETE]     if(str_sp.sym_eps == str_reciprocal_sp.sym_eps){
+//DX20210302 [OBSOLETE]       same_eps = true;
+//DX20210302 [OBSOLETE]     }
+//DX20210302 [OBSOLETE]     else {
+//DX20210302 [OBSOLETE]       str_in.sym_eps = str_sp.sym_eps = str_sc.sym_eps = str_reciprocal_sp.sym_eps;
+//DX20210302 [OBSOLETE]       str_in.sym_eps_change_count = str_sp.sym_eps_change_count = str_sc.sym_eps_change_count = str_reciprocal_sp.sym_eps_change_count; //DX20180222 - added sym_eps change count
+//DX20210302 [OBSOLETE]     }
+//DX20210302 [OBSOLETE]     //DX END
+//DX20210302 [OBSOLETE]     this->reciprocal_lattice_type=str_reciprocal_sp.bravais_lattice_type;
+//DX20210302 [OBSOLETE]     this->reciprocal_lattice_variation_type=str_reciprocal_sp.bravais_lattice_variation_type;
+//DX20210302 [OBSOLETE]     if(VERBOSE) cerr << "xstructure::GetLatticeType: [6]" << endl;
+//DX20210302 [OBSOLETE]     // SUPERLATTICE
+//DX20210302 [OBSOLETE]     xstructure str_superlattice_in,str_superlattice_sp,str_superlattice_sc;
+//DX20210302 [OBSOLETE]     str_superlattice_in=*this;
+//DX20210302 [OBSOLETE]     str_superlattice_in.ClearSymmetry();  //DX20170814 - It wasn't cleared, so nothing was being calculated
+//DX20210302 [OBSOLETE]     str_superlattice_in.title="NO_RECURSION";
+//DX20210302 [OBSOLETE]     //str_superlattice_in.GetPrimitive(0.01);
+//DX20210302 [OBSOLETE]     if(VERBOSE) cerr << str_superlattice_in << endl;
+//DX20210302 [OBSOLETE]     if(VERBOSE) cerr << "xstructure::GetLatticeType: [7]" << endl;
+//DX20210302 [OBSOLETE]     str_superlattice_in.IdenticalAtoms();  // make superlattice
+//DX20210302 [OBSOLETE]     if(VERBOSE) cerr << "xstructure::GetLatticeType: [8]" << endl;
+//DX20210302 [OBSOLETE]     if(VERBOSE) cerr << str_superlattice_in << endl;
+//DX20210302 [OBSOLETE]     str_superlattice_in.GetPrimitive(0.005);
+//DX20210302 [OBSOLETE]     if(VERBOSE) cerr << str_superlattice_in << endl;
+//DX20210302 [OBSOLETE]     if(VERBOSE) cerr << "xstructure::GetLatticeType: [9]" << endl;
+//DX20210302 [OBSOLETE]     str_superlattice_in.Minkowski_calculated=FALSE;
+//DX20210302 [OBSOLETE]     if(VERBOSE) cerr << "xstructure::GetLatticeType: [10]" << endl;
+//DX20210302 [OBSOLETE]     str_superlattice_in.MinkowskiBasisReduction();
+//DX20210302 [OBSOLETE]     if(VERBOSE) cerr << "xstructure::GetLatticeType: [11]" << endl;
+//DX20210302 [OBSOLETE]     if(VERBOSE) cerr << str_superlattice_in << endl;
+//DX20210302 [OBSOLETE]     //  LATTICE::Standard_Lattice_Structure(str_superlattice_in,str_superlattice_sp,str_superlattice_sc); //SC OLD VERSION
+//DX20210302 [OBSOLETE]     //DX ss=0; //JX
+//DX20210302 [OBSOLETE]     //DX+CO START
+//DX20210302 [OBSOLETE]     str_superlattice_in.sym_eps=str_superlattice_sp.sym_eps=str_superlattice_sc.sym_eps=str_sp.sym_eps; //DX
+//DX20210302 [OBSOLETE]     str_superlattice_in.sym_eps_calculated=str_superlattice_sp.sym_eps_calculated=str_superlattice_sc.sym_eps_calculated=str_sp.sym_eps_calculated; //DX
+//DX20210302 [OBSOLETE]     str_superlattice_in.sym_eps_change_count=str_superlattice_sp.sym_eps_change_count=str_superlattice_sc.sym_eps_change_count=str_sp.sym_eps_change_count; //DX20180222 - added sym_eps change count
+//DX20210302 [OBSOLETE]     //DX+CO END
+//DX20210302 [OBSOLETE]     //DX LATTICE::Standard_Lattice_Structure(str_superlattice_in,str_superlattice_sp,str_superlattice_sc,eps,epsang,ss,_EPS_); //JX
+//DX20210302 [OBSOLETE]     LATTICE::Standard_Lattice_StructureDefault(str_superlattice_in,str_superlattice_sp,str_superlattice_sc,false); //DX //DX20180226 - do not need to do full sym for superlattice
+//DX20210302 [OBSOLETE]     //DX START
+//DX20210302 [OBSOLETE]     if(str_sp.sym_eps == str_superlattice_sp.sym_eps){
+//DX20210302 [OBSOLETE]       same_eps = true;
+//DX20210302 [OBSOLETE]     }
+//DX20210302 [OBSOLETE]     else {
+//DX20210302 [OBSOLETE]       str_sp.sym_eps = str_superlattice_sp.sym_eps;
+//DX20210302 [OBSOLETE]       str_sp.sym_eps_change_count = str_superlattice_sp.sym_eps_change_count; //DX20180222 - added sym_eps change count
+//DX20210302 [OBSOLETE]     }
+//DX20210302 [OBSOLETE]     //DX END
+//DX20210302 [OBSOLETE]     if(VERBOSE) cerr << "xstructure::GetLatticeType: [12]" << endl;
+//DX20210302 [OBSOLETE]     this->bravais_superlattice_lattice=str_superlattice_sp.lattice; //DX20210209
+//DX20210302 [OBSOLETE]     this->bravais_superlattice_type=str_superlattice_sp.bravais_lattice_type;
+//DX20210302 [OBSOLETE]     this->bravais_superlattice_variation_type=str_superlattice_sp.bravais_lattice_variation_type;
+//DX20210302 [OBSOLETE]     this->bravais_superlattice_system=str_superlattice_sp.bravais_lattice_system;
+//DX20210302 [OBSOLETE]     this->pearson_symbol_superlattice=str_superlattice_sp.pearson_symbol;
+//DX20210302 [OBSOLETE]     if(count==100){
+//DX20210302 [OBSOLETE]       cerr << "ERROR in Bravais_Lattice_StructureDefault(): Unable to find reliable sym_eps." << endl;
+//DX20210302 [OBSOLETE]       break;
+//DX20210302 [OBSOLETE]     }
+//DX20210302 [OBSOLETE]   } //DX while loop
+//DX20210302 [OBSOLETE] }
+
+// ***************************************************************************
+// Function GetExtendedCrystallographicData() //DX20210302
+// ***************************************************************************
+// Determine the real, reciprocal, superlattice, and space group symmetries
+// Includes self-consistency loop to ensure descriptions are commensurate
+void xstructure::GetExtendedCrystallographicData(double sym_eps,
+    bool no_scan,
+    int setting) {
+  xstructure str_sp,str_sc;
+  GetExtendedCrystallographicData(str_sp,str_sc,sym_eps,no_scan,setting);
+}
+
+void xstructure::GetExtendedCrystallographicData(xstructure& str_sp,
+    xstructure& str_sc,
+    double sym_eps,
+    bool no_scan,
+    int setting) {
+
+  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  string function_name = XPID + "xstructure::GetExtendedCrystallographicData():";
+
+  // ---------------------------------------------------------------------------
+  // set symmetry tolerance based on the following sequence
+  // 1) use input, 2) use sym_eps in xstructure, 3) calculate default
+  double tolerance = sym_eps;
+  if(tolerance==AUROSTD_MAX_DOUBLE){
+    if((*this).sym_eps_calculated){ tolerance = (*this).sym_eps; }
+    else{ tolerance=SYM::defaultTolerance((*this)); }
+  }
+  if(LDEBUG){ cerr << function_name << " [1] Set symmetry tolerance (starting sym_eps=" << tolerance << ")" << endl; }
+
+  // keep track of self-consistent tolerance
+  bool same_eps = false;
+  uint count = 0;
+  uint count_max = 100; // safety for while loop, don't calculate forever
+
+  // update tolerance info in *this
+  (*this).sym_eps=tolerance;
+  (*this).sym_eps_calculated=true;
+  (*this).sym_eps_change_count=count;
+
+  // ---------------------------------------------------------------------------
+  // loop over the real, reciprocal, and superlattice analysis until all
+  // symmetries are commensurate with a common tolerance value
+  while(!same_eps && count++ < count_max){
+
+    // ---------------------------------------------------------------------------
+    // update the tolerance, it may have change during loop
+    tolerance = (*this).sym_eps;
+    count = (*this).sym_eps_change_count;
+
+    // ---------------------------------------------------------------------------
+    // check if consistency checks failed (maxed while loop iteration)
+    // turn off scan
+    if(count==count_max){
+      no_scan=true;
+      tolerance = sym_eps; // set to original eps
+      cerr << function_name << " Unable to calculate consistent symmetry. Calculating at original tolerance (sym_eps=" << sym_eps << ") and ignoring consistency checks." << endl;
+    }
+
+    // ---------------------------------------------------------------------------
+    // REAL, RECIPROCAL, and SUPERLATTICE data
+    if(LDEBUG){ cerr << function_name << " [2] Calculate real, reciprocal, and superlattice information (sym_eps=" << tolerance << ", sym_eps_change_count=" << count << ")" << endl; }
+    (*this).GetLatticeType(str_sp, str_sc, tolerance);
+
+    // ---------------------------------------------------------------------------
+    // space group data
+    if(LDEBUG){ cerr << function_name << " [3] Calculate the space group symmetry information (sym_eps=" << tolerance << ", sym_eps_change_count=" << count << ")" << endl; }
+    (*this).SpaceGroup_ITC(tolerance, -1, setting, no_scan);
+    if(!no_scan && (*this).sym_eps != tolerance){ continue; } // if tolerance changed, recalc
+
+    // made it to the end with same sym_eps
+    same_eps = true;
+  }
+
+  if(LDEBUG){ cerr << function_name << " [5] Extended crystallographic data calculation finished! (sym_eps=" << tolerance << ", sym_eps_change_count=" << count << ")" << endl; }
 
 }
 

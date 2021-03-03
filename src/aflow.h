@@ -1513,8 +1513,14 @@ class xstructure {
     string SpeciesString(void);                                   // Gives a string with the list of all the species
     uint SetSpecies(const std::deque<string>& vspecies);          // Set the species
     void UpdateSpecies(const _atom& atom);                        // Update species from atom (consolidated from AddAtom) //DX20210202
-    void GetLatticeType(xstructure& sp,xstructure& sc);           // Get all lattices
-    void GetLatticeType(void);                                    // Get all lattices
+    //DX20210302 [OBSOLETE] void GetLatticeType(xstructure& sp,xstructure& sc);           // Get all lattices
+    //DX20210302 [OBSOLETE] void GetLatticeType(void);                                    // Get all lattices
+    void GetLatticeType(
+        double sym_eps=AUROSTD_MAX_DOUBLE,
+        bool no_scan=false);                                      // Get all lattices
+    void GetLatticeType(xstructure& sp,xstructure& sc,
+        double sym_eps=AUROSTD_MAX_DOUBLE,
+        bool no_scan=false);                                      // Get all lattices
     void GetExtendedCrystallographicData(
         double sym_eps=AUROSTD_MAX_DOUBLE,
         bool no_scan=false, int setting=1);
@@ -1522,12 +1528,6 @@ class xstructure {
         xstructure& sc,
         double sym_eps=AUROSTD_MAX_DOUBLE,
         bool no_scan=false, int setting=1);
-    void GetLatticeTypeNEW(
-        double sym_eps=AUROSTD_MAX_DOUBLE,
-        bool no_scan=false);                                      // Get all lattices
-    void GetLatticeTypeNEW(xstructure& sp,xstructure& sc,
-        double sym_eps=AUROSTD_MAX_DOUBLE,
-        bool no_scane=false);                                     // Get all lattices
     void GetRealLatticeType(xstructure& sp,xstructure& sc,
         double sym_eps=AUROSTD_MAX_DOUBLE);                       // Get real lattice type //DX2021011
     void GetRealLatticeType(double sym_eps=AUROSTD_MAX_DOUBLE);   // Get real lattice type //DX20210211
