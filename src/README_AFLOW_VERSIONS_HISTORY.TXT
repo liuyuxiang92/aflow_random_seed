@@ -1,3 +1,6 @@
+3.2.8 - 2021/xx/xx
+        Location: http://materials.duke.edu/AFLOW/aflow.3.2.8.tar.xz
+        -- Fixed bug with APL overwriting *.orig files. (AS)
 3.2.7 - 2021/02/04
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.7.tar.xz
         -- Added additional AEL and AGL properties to the AFLOW schema. (ME)
