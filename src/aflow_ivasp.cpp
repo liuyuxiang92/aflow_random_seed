@@ -116,7 +116,7 @@ namespace KBIN {
 }
 
 namespace KBIN {
-  bool VASP_Write_INPUT(_xvasp& xvasp,_vflags &vflags, string ext) {        // AFLOW_FUNCTION_IMPLEMENTATION
+  bool VASP_Write_INPUT(_xvasp& xvasp,_vflags &vflags,const string& ext) {        // AFLOW_FUNCTION_IMPLEMENTATION
     string soliloquy=XPID+"KBIN::VASP_Write_INPUT():";
     ifstream DirectoryStream;
     DirectoryStream.open(xvasp.Directory.c_str(),std::ios::in);
