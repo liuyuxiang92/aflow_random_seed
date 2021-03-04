@@ -4894,9 +4894,9 @@ namespace KBIN {
       if(operation.find("Zeven")) {i++;xvasp.str.kpoints_k3+=2;xvasp.str.kpoints_s3=0.0;change_made=true;if(LDEBUG) cout << "Zeven k3=" << xvasp.str.kpoints_k3 << endl;}
     }
     change_made=false;  //reset for Xeven/Xodd/etc.
-    if(operation.find("Xodd")) {i++;if(_iseven(xvasp.str.kpoints_k1)) {xvasp.str.kpoints_k1++;xvasp.str.kpoints_s1=0.0;change_made=true;if(LDEBUG) cout << "Xeven k1=" << xvasp.str.kpoints_k1 << endl;}}
-    if(operation.find("Yodd")) {i++;if(_iseven(xvasp.str.kpoints_k2)) {xvasp.str.kpoints_k2++;xvasp.str.kpoints_s2=0.0;change_made=true;if(LDEBUG) cout << "Yeven k2=" << xvasp.str.kpoints_k2 << endl;}}
-    if(operation.find("Zodd")) {i++;if(_iseven(xvasp.str.kpoints_k3)) {xvasp.str.kpoints_k3++;xvasp.str.kpoints_s3=0.0;change_made=true;if(LDEBUG) cout << "Zeven k3=" << xvasp.str.kpoints_k3 << endl;}}
+    if(operation.find("Xodd")) {i++;if(_iseven(xvasp.str.kpoints_k1)) {xvasp.str.kpoints_k1++;xvasp.str.kpoints_s1=0.0;change_made=true;if(LDEBUG) cout << "Xodd k1=" << xvasp.str.kpoints_k1 << endl;}}
+    if(operation.find("Yodd")) {i++;if(_iseven(xvasp.str.kpoints_k2)) {xvasp.str.kpoints_k2++;xvasp.str.kpoints_s2=0.0;change_made=true;if(LDEBUG) cout << "Yodd k2=" << xvasp.str.kpoints_k2 << endl;}}
+    if(operation.find("Zodd")) {i++;if(_iseven(xvasp.str.kpoints_k3)) {xvasp.str.kpoints_k3++;xvasp.str.kpoints_s3=0.0;change_made=true;if(LDEBUG) cout << "Zodd k3=" << xvasp.str.kpoints_k3 << endl;}}
     if(!change_made&&(operation.find("Xodd")||operation.find("Yodd")||operation.find("Zodd"))){  //CO20210201 - was already odd before, increment by 2
       if(operation.find("Xodd")) {i++;xvasp.str.kpoints_k1+=2;xvasp.str.kpoints_s1=0.0;change_made=true;if(LDEBUG) cout << "Xodd k1=" << xvasp.str.kpoints_k1 << endl;}
       if(operation.find("Yodd")) {i++;xvasp.str.kpoints_k2+=2;xvasp.str.kpoints_s2=0.0;change_made=true;if(LDEBUG) cout << "Yodd k2=" << xvasp.str.kpoints_k2 << endl;}
