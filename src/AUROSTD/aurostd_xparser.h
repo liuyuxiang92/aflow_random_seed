@@ -79,7 +79,7 @@ namespace aurostd {
       void addMatrix(const string &key, const deque<deque<string> > &value); //DX20210211
       void addString(const string &key, const string &value);
       void addBool(const string &key, bool value);
-      void addRaw(const string &value);
+      void addBlock(const string &value); //DX20210304 - changed from addRaw to addBlock
       void addRaw(const string &key, const string& value); //DX20210301
       void addNull(const string &key); //DX20210301
       void addJSON(const string &key, JSONwriter &value);

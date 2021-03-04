@@ -535,7 +535,7 @@ namespace aurostd {
   }
 
   //***************************************************************************
-  void JSONwriter::addRaw(const string &value)
+  void JSONwriter::addBlock(const string &value) //DX20210304 - changed name from addRaw to addBlock
   {
     content.push_back(value);
   }

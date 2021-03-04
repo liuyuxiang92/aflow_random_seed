@@ -1299,8 +1299,6 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   }
   //DX20170926 - Create flags for SG functions - END
 
-  //DX20210301 - consolidated SGDATA into general DATA functions
-
   // [OBSOLETE] vpflow.flag("SLAB",aurostd::args2flag(argv,cmds,"--slab|--SLAB"));
   vpflow.args2addattachedscheme(argv,cmds,"SLAB","--slab=","");
 
@@ -13969,10 +13967,6 @@ namespace pflow {
     //  spacegroup::SpaceGroupNumberStructure(a);
   }
 } // namespace pflow
-
-// ***************************************************************************
-// pflow::SGDATA() //DX20210301 [OBSOLETE - moved into pflow::DATA()]
-// ***************************************************************************
 
 // ***************************************************************************
 // pflow::SGROUP

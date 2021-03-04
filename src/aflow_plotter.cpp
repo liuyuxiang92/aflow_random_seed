@@ -1721,7 +1721,7 @@ namespace plotter {
       bands = bands.substr(1, bands.size() - 2); // remove wrapping curly brackets
     }
 
-    json.addRaw(bands);
+    json.addBlock(bands); //DX20210304 - addRaw -> addBlock
     return json;
   }
 

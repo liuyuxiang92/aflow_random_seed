@@ -1102,7 +1102,7 @@ uint ApennsyARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vfl
 #define _PGROUPK_ 6            // for point group klattice
 #define _PGROUP_XTAL_ 7        // for point group crystal
 #define _PGROUPK_XTAL_ 8       // for point group kcrystal
-#define _PGROUPK_PATTERSON_ 9   // for point group Patterson //DX20200129
+#define _PGROUPK_PATTERSON_ 9  // for point group Patterson //DX20200129
 #define _FGROUP_ 2             // for factor group
 #define _SGROUP_ 3             // for space group
 #define _AGROUP_ 4             // for site positions point group
