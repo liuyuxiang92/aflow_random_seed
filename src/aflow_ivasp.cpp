@@ -4878,6 +4878,14 @@ namespace KBIN {
     if(LDEBUG) cout << XPID << "KBIN::XVASP_KPOINTS_OPERATION  xvasp.str.kpoints_kscheme=*=(" << xvasp.str.kpoints_kscheme << ")" << endl;
     uint i=0;
     bool change_made=false; //CO20210201
+    //CO20210304 - some notes about change_made
+    //this function tries to make modifications to VASP files based on an input (e.g., make Xeven).
+    //it never checks whether the change was actually made (what if X was already even?).
+    //change_made is a local variable to facilitate what to do in such cases.
+    //it's a bit complicated because you could request Xeven,Yeven,Zeven and you could have one of them change, some of them change, or none of them change.
+    //if there is any change at all, the function is considered successful.
+    //if there is no change, then the function tries to change the whole set (X,Y,Z).
+    //the goal is to prevent aflow from spinning its wheels on an identical input.
     if(operation.find("X--")) {i++;xvasp.str.kpoints_k1--;change_made=true;if(LDEBUG) cout << "X-- k1=" << xvasp.str.kpoints_k1 << endl;}
     if(operation.find("Y--")) {i++;xvasp.str.kpoints_k2--;change_made=true;if(LDEBUG) cout << "Y-- k2=" << xvasp.str.kpoints_k2 << endl;}
     if(operation.find("Z--")) {i++;xvasp.str.kpoints_k3--;change_made=true;if(LDEBUG) cout << "Z-- k3=" << xvasp.str.kpoints_k3 << endl;}
