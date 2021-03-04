@@ -1185,10 +1185,6 @@ namespace apl
   //void linkAPLtoQHA();//AS20201216 OBSOLETE
 
   /// Calculates QHA-related properties
-  ///
-  /// This class will substitute old QHA class.
-  /// The old QHA class will be kept until the new one is finished.
-  ///
   class QHA : public xStream {
     public:
       QHA(ostream& oss=std::cout);

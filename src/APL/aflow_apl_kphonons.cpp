@@ -1407,7 +1407,7 @@ namespace apl {
     vector<double> dtokens;
     string option = "";
 
-    pflow::logger(_AFLOW_FILE_NAME_, function, "Validating QHA paramters.", aflags,
+    pflow::logger(_AFLOW_FILE_NAME_, function, "Validating QHA parameters.", aflags,
         FileMESSAGE, oss, _LOGGER_MESSAGE_);
 
     // EOS_DISTORTION_RANGE
