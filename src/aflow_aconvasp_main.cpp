@@ -536,8 +536,6 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   // [OBSOLETE] vpflow.flag("DIST",aurostd::args2flag(argv,cmds,"--dist"));
   vpflow.args2addattachedscheme(argv,cmds,"DIST","--dist=","");
 
-  //DX20210301 - consolidated EDATA into general DATA functions
-
   vpflow.flag("EDOS",aurostd::args2flag(argv,cmds,"--edos"));
   vpflow.flag("EFFMASS",aurostd::args2flag(argv,cmds,"--em")) ; // CAMILO
   // [OBSOLETE] vpflow.flag("EWALD",aurostd::args2flag(argv,cmds,"--ewald") && argv.at(1)=="--ewald");
