@@ -988,6 +988,7 @@ namespace pflow {
     // ---------------------------------------------------------------------------
     // if just lattice data (DATA, i.e., no symmetry), perform and return
     if(smode=="DATA"){
+      standalone = true; // if smode==DATA, then it is standalone
       oss << PrintRealLatticeData(xstr, smode, ftype, standalone, already_calculated, sym_eps) << endl;
       return oss.str();
     }
@@ -1027,9 +1028,9 @@ namespace pflow {
     if(ftype == txt_ft){
       oss << aurostd::joinWDelimiter(content,"");
       oss << "SPRIM" << endl;
-      oss << str_sp << endl;
+      oss << str_sp;
       oss << "SCONV" << endl;
-      oss << str_sc << endl;
+      oss << str_sc;
     }
     else if(ftype == json_ft){
       aurostd::JSONwriter json;
@@ -1808,6 +1809,7 @@ namespace pflow {
       }
 
       ss_output << json.toString(standalone); //standalone: determines if we enclose in brackets
+      if(standalone) { ss_output << endl; }
 
     }
     else{
@@ -1908,6 +1910,7 @@ namespace pflow {
       }
 
       ss_output << json.toString(standalone); //standalone: determines if we enclose in brackets
+      if(standalone) { ss_output << endl; }
 
     }
     else{
@@ -2047,6 +2050,7 @@ namespace pflow {
       }
 
       ss_output << json.toString(standalone); //standalone: determines if we enclose in brackets
+      if(standalone) { ss_output << endl; }
 
     }
     else{
@@ -2169,6 +2173,7 @@ namespace pflow {
         json.addNull("reciprocal_lattice_variation_type");
       }
       ss_output << json.toString(standalone); //standalone: determines if we enclose in brackets
+      if(standalone) { ss_output << endl; }
     }
     else{
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Format type is not supported.",_INPUT_ILLEGAL_);
@@ -2326,6 +2331,7 @@ namespace pflow {
         json.addNull("Pearson_symbol_superlattice");
       }
       ss_output << json.toString(standalone); //standalone: determines if we enclose in brackets
+      if(standalone) { ss_output << endl; }
     }
     else{
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Format type is not supported.",_INPUT_ILLEGAL_);
@@ -3608,7 +3614,7 @@ namespace pflow {
         }
         if(str_sg.wyccar_ITC.size()!=0){ //DX20180526 - skip if fails
           xstructure xstr_wyccar(wss,IOVASP_WYCKCAR);
-          ss_output << xstr_wyccar << endl;
+          ss_output << xstr_wyccar;
         }
       }
     }
@@ -3738,6 +3744,7 @@ namespace pflow {
         }
       }
       ss_output << json.toString(standalone);
+      if(standalone) { ss_output << endl; }
     }
 
     //DX20180822 - put attributes into vpflow - START

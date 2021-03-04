@@ -1393,6 +1393,13 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
         << species_pp_groundstate_energy.at(species_pp_groundstate_energy.size()-1) <<  ", "
         << species_pp_groundstate_structure.at(species_pp_groundstate_structure.size()-1) << "]" << endl;
   }
+  //CO20210213 - check types are all the same, if not issue warning/error (mixing is not advisable)
+  for(uint i=0;i<species_pp_type.size();i++){
+    if(species_pp_type[i]!=pp_type){
+      pflow::logger(_AFLOW_FILE_NAME_,soliloquy,"Mismatch in species_pp_types ("+species_pp_type[i]+" vs. "+pp_type+")",_LOGGER_WARNING_);
+    }
+  }
+
 
   if(LDEBUG) cerr << soliloquy << " PSEUDOPOTENTIAL type = " << pp_type << endl;
   if(LDEBUG) cerr << soliloquy << " species.size()=" << species.size() << endl;

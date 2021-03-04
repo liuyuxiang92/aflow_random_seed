@@ -1,10 +1,19 @@
-3.2.8 - 2021/02/04
+3.2.8 - 2021/xx/xx
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.8.tar.xz
+        -- Fixed bug with APL overwriting *.orig files. (AS)
         -- Set output of symmetry groups to --quiet and --screen_only when in web mode. (ME)
         -- Made POCC web output more compact. (ME)
         -- Structure comparison takes from std::cin now in web mode. (ME)
         -- Fixed bug for --aflowlib that did not print original structure for different symmetries. (ME)
         -- Fixed line breaks in stream2string method for istream. (ME)
+        -- added printing JSON/TXT options for --isopointal_prototypes in XtalFinder (DX)
+        -- added --superlattice_data, --reciprocal_lattice_data, --pgroup_xtal_data, and --real_lattice_data functions, options: tolerance and format type (DX)
+        -- fixed default titles for QE, AIMS, ELK, and CIF (DX)
+        -- added methods to JSONwriter: addVector (with wrap option), addNull, addRaw (key-value variant) (DX)
+        -- consolidated pflow::DATA(), moved SGDATA() into DATA() (DX)
+        -- updated usage for lattice data (DX)
+        -- added separate lattice functions for GetRealLatticeType(), GetCrystalPointGroupData(), GetSuperLatticeType() (DX)
+        -- added rescale to sconv/sprim (DX+ME)
 3.2.7 - 2021/02/04
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.7.tar.xz
         -- Added additional AEL and AGL properties to the AFLOW schema. (ME)

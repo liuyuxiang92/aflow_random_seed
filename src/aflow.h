@@ -3019,7 +3019,7 @@ namespace KBIN {
   bool VASP_Write_ppAUID_FILE(const string& directory,const deque<string>& vppAUIDs,const deque<string>& species);
   bool VASP_Write_ppAUID_AFLOWIN(const string& directory,const vector<string>& vppAUIDs,const vector<string>& species);
   bool VASP_Write_ppAUID_AFLOWIN(const string& directory,const deque<string>& vppAUIDs,const deque<string>& species);
-  bool VASP_Write_INPUT(_xvasp& xvasp,_vflags &vflags);
+  bool VASP_Write_INPUT(_xvasp& xvasp,_vflags &vflags,const string& ext_module="");//AS20210302
   bool VASP_Produce_INCAR(_xvasp& xvasp,const string& AflowIn,ofstream& FileERROR,_aflags& aflags,_kflags& kflags,_vflags& vflags);
   bool VASP_Modify_INCAR(_xvasp& xvasp,ofstream& FileERROR,_aflags& aflags,_kflags& kflags,_vflags& vflags);
   bool VASP_Reread_INCAR(_xvasp& xvasp,ofstream &FileMESSAGE,_aflags &aflags);

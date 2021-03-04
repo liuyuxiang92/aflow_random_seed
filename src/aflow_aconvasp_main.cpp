@@ -5512,19 +5512,19 @@ namespace pflow {
       oss << PrintData(a, smode, ftype, already_calculated, tolerance, no_scan, setting);
     }
     else if(smode=="REAL_LATTICE"){
-      oss << PrintRealLatticeData(a, "EDATA", ftype, standalone, already_calculated, tolerance) << endl;
+      oss << PrintRealLatticeData(a, "EDATA", ftype, standalone, already_calculated, tolerance);
     }
     else if(smode=="CRYSTAL_POINT_GROUP"){
-      oss << PrintCrystalPointGroupData(a, ftype, standalone, already_calculated, tolerance) << endl;
+      oss << PrintCrystalPointGroupData(a, ftype, standalone, already_calculated, tolerance);
     }
     else if(smode=="SUPERLATTICE"){
-      oss << PrintSuperlatticeData(a, ftype, standalone, already_calculated, tolerance) << endl;
+      oss << PrintSuperlatticeData(a, ftype, standalone, already_calculated, tolerance);
     }
     else if(smode=="RECIPROCAL_LATTICE"){
-      oss << PrintReciprocalLatticeData(a, ftype, standalone, already_calculated, tolerance) << endl;
+      oss << PrintReciprocalLatticeData(a, ftype, standalone, already_calculated, tolerance);
     }
     else if(smode=="SGDATA"){
-      oss << pflow::PrintSGData(a, ftype, standalone, already_calculated, tolerance, no_scan, setting, suppress_Wyckoff) << endl;
+      oss << pflow::PrintSGData(a, ftype, standalone, already_calculated, tolerance, no_scan, setting, suppress_Wyckoff);
     }
 
     return true;
