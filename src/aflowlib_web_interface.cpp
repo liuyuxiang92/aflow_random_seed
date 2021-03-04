@@ -5066,12 +5066,9 @@ namespace aflowlib {
 
       // ME20210209 - Show original structure when symmetry changed
       if (vflags.flag("FLAG::FOUND")) {
-        bool same_symmetry = (aentry.spacegroup_orig == aentry.spacegroup_relax);
-        uint nwyckoff = aentry.Wyckoff_multiplicities.size();
-        for (uint i = 0; i < nwyckoff && same_symmetry; i++) {
-          same_symmetry = ((aentry.Wyckoff_multiplicities[i] == aentry.Wyckoff_multiplicities_orig[i])
-                           && (aentry.Wyckoff_site_symmetries[i] == aentry.Wyckoff_site_symmetries_orig[i]));
-        }
+        bool same_symmetry = ((aentry.spacegroup_orig == aentry.spacegroup_relax)
+                           && (aentry.Wyckoff_multiplicities_orig == aentry.Wyckoff_multiplicities)
+                           && (aentry.Wyckoff_site_symmetries_orig == aentry.Wyckoff_site_symmetries_orig));
         vflags.flag("FLAG::EDATA_ORIG", !same_symmetry);
       }
 
