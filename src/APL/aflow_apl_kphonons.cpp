@@ -17,6 +17,7 @@
 static const string _ANHARMONIC_IFCS_FILE_[2] = {"anharmonicIFCs_3rd.xml", "anharmonicIFCs_4th.xml"};
 static const int _NUM_RELAX_ = 2; //ME20181226
 static const string _APL_RELAX_PREFIX_ = "relax_apl"; //ME20181226  //ME20190125
+static const string _APL_ORIG_PREFIX_  = "_apl"; //AS20210302
 
 namespace KBIN {
   //ME20181107 - Relax structure with PREC=PHONONS before running APL
@@ -170,7 +171,7 @@ namespace KBIN {
     ostringstream aus;
 
     bool Krun = VASP_Produce_and_Modify_INPUT(xvasp, AflowIn, fileMessage, aflags, kflags, vflags);
-    Krun = (Krun && VASP_Write_INPUT(xvasp, vflags));
+    Krun = (Krun && VASP_Write_INPUT(xvasp, vflags, _APL_ORIG_PREFIX_));
 
     //ME20200115 - set for SPIN_REMOVE_RELAX
     xvasp.NRELAX = _NUM_RELAX_;

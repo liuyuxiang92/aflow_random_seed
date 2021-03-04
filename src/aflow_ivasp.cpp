@@ -116,7 +116,7 @@ namespace KBIN {
 }
 
 namespace KBIN {
-  bool VASP_Write_INPUT(_xvasp& xvasp,_vflags &vflags) {        // AFLOW_FUNCTION_IMPLEMENTATION
+  bool VASP_Write_INPUT(_xvasp& xvasp,_vflags &vflags,const string& ext_module) {        // AFLOW_FUNCTION_IMPLEMENTATION
     string soliloquy=XPID+"KBIN::VASP_Write_INPUT():";
     ifstream DirectoryStream;
     DirectoryStream.open(xvasp.Directory.c_str(),std::ios::in);
@@ -142,10 +142,11 @@ namespace KBIN {
     if(Krun) Krun=(Krun && VASP_Write_ppAUID_AFLOWIN(xvasp.Directory,xvasp.POTCAR_AUID,xvasp.str.species));
 
     // VASP BACKUP VASP WRITE
-    if(Krun && xvasp.aopts.flag("FLAG::XVASP_POSCAR_changed"))  Krun=(Krun && aurostd::stringstream2file(xvasp.POSCAR_orig,string(xvasp.Directory+"/POSCAR.orig")));
-    if(Krun && xvasp.aopts.flag("FLAG::XVASP_INCAR_changed"))   Krun=(Krun && aurostd::stringstream2file(xvasp.INCAR_orig,string(xvasp.Directory+"/INCAR.orig")));
-    if(Krun && xvasp.aopts.flag("FLAG::XVASP_KPOINTS_changed")) Krun=(Krun && aurostd::stringstream2file(xvasp.KPOINTS_orig,string(xvasp.Directory+"/KPOINTS.orig")));
-    if(Krun && xvasp.aopts.flag("FLAG::XVASP_POTCAR_changed"))  Krun=(Krun && aurostd::stringstream2file(xvasp.POTCAR_orig,string(xvasp.Directory+"/POTCAR.orig")));
+    if(Krun && xvasp.aopts.flag("FLAG::XVASP_POSCAR_changed"))  Krun=(Krun && aurostd::stringstream2file(xvasp.POSCAR_orig,string(xvasp.Directory+"/POSCAR.orig"+ext_module)));
+    if(Krun && xvasp.aopts.flag("FLAG::XVASP_INCAR_changed"))   Krun=(Krun && aurostd::stringstream2file(xvasp.INCAR_orig,string(xvasp.Directory+"/INCAR.orig"+ext_module)));
+    if(Krun && xvasp.aopts.flag("FLAG::XVASP_KPOINTS_changed")) Krun=(Krun && aurostd::stringstream2file(xvasp.KPOINTS_orig,string(xvasp.Directory+"/KPOINTS.orig"+ext_module)));
+    if(Krun && xvasp.aopts.flag("FLAG::XVASP_POTCAR_changed"))  Krun=(Krun && aurostd::stringstream2file(xvasp.POTCAR_orig,string(xvasp.Directory+"/POTCAR.orig"+ext_module)));
+    // AS20210302 adding ext_module to be able to distinguish between different orig files (for example, we do not want APL to overwrite an existing POSCAR.orig file)
 
     if(vflags.KBIN_VASP_INCAR_VERBOSE) {;} // DUMMY
 
