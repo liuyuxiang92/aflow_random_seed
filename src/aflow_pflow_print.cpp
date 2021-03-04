@@ -3767,10 +3767,10 @@ namespace pflow {
     //DX20180823 - now populate xoption
     vpflow.flag("SGDATA::CALCULATED");
     vpflow.push_attached("SGDATA::SPACE_GROUP_NUMBER",aurostd::utype2string<uint>(str_sg.space_group_ITC));
-    vpflow.push_attached("SGDATA::SPACE_GROUP_HERMANN_MAUGUIN",GetSpaceGroupName(str_sg.space_group_ITC, str_sg.directory));
-    vpflow.push_attached("SGDATA::SPACE_GROUP_HALL",GetSpaceGroupHall(str_sg.space_group_ITC, setting, str_sg.directory));
-    vpflow.push_attached("SGDATA::SPACE_GROUP_SCHOENFLIES",GetSpaceGroupSchoenflies(str_sg.space_group_ITC, str_sg.directory));
-    vpflow.push_attached("SGDATA::LAUE",GetLaueLabel(str_sg.point_group_ITC));
+    vpflow.push_attached("SGDATA::SPACE_GROUP_HERMANN_MAUGUIN",space_group_HM);
+    vpflow.push_attached("SGDATA::SPACE_GROUP_HALL",space_group_Hall);
+    vpflow.push_attached("SGDATA::SPACE_GROUP_SCHOENFLIES",space_group_Schoenflies);
+    vpflow.push_attached("SGDATA::LAUE",class_Laue);
     vpflow.push_attached("SGDATA::CRYSTAL_CLASS",str_sg.point_group_ITC);
     vpflow.push_attached("SGDATA::SETTING_ITC",aurostd::utype2string<uint>(str_sg.setting_ITC));
     vpflow.push_attached("SGDATA::ORIGIN_ITC",aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(str_sg.origin_ITC,5,true),","));
