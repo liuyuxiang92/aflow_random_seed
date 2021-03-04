@@ -5498,7 +5498,7 @@ namespace pflow {
     // ---------------------------------------------------------------------------
     // SGDATA: do not print all Wyckoff data (useful for web) //DX20210301
     bool suppress_Wyckoff = false;
-    if(vpflow.flag("DATA::SUPPRESS_WYCKOFF_PRINTING")){ suppress_Wyckoff = true; }
+    if(vpflow.flag("DATA::SUPPRESS_WYCKOFF_PRINTING") || XHOST.vflag_control.flag("WWW")){ suppress_Wyckoff = true; }
 
     // ---------------------------------------------------------------------------
     // add banner
