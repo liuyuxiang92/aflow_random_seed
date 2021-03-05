@@ -154,7 +154,7 @@ uint bibtex2file(string bibtex,string _authors,string _title,string journal,stri
   // FIX THE AUTHORS
   string authors=_authors;
   vector<string> vfix;
-  aurostd::string2tokens("Buongiorno Nardelli,van Roekeghem,Aspuru-Guzik,Hattrick-Simpers,DeCost,de Coss,De Santo,De Gennaro,Al Rahal Al Orabi,de Jong,D'Amico,van der Zwaag,van de Walle",vfix,",");
+  aurostd::string2tokens("Buongiorno Nardelli,van Roekeghem,Aspuru-Guzik,Hattrick-Simpers,DeCost,de Coss,De Santo,De Gennaro,Al Rahal Al Orabi,de Jong,D'Amico,van der Zwaag,van de Walle,Di Stefano",vfix,",");
   for(uint i=0;i<vfix.size();i++) aurostd::StringSubst(authors,vfix.at(i),string("{"+vfix.at(i)+"}")); // FIX 
   aurostd::StringSubst(authors,".",".~"); 
   aurostd::StringSubst(authors,"~ "," "); 
