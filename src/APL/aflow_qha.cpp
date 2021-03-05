@@ -2022,8 +2022,8 @@ namespace apl
       dT/getEqVolumeT(T,eos_method,qha_method);
   }
 
-  /// Calculates the isochoric specific heat as a temperature derivative of the free
-  /// energy using the central finite differences method.
+  /// Calculates the isochoric specific heat as a second temperature derivative
+  /// of the free energy using the central finite differences method.
   /// 
   /// @param eos_method defines which model is used for the EOS fit
   /// 
