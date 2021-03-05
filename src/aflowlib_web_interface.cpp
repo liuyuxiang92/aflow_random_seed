@@ -4576,7 +4576,7 @@ namespace aflowlib {
 namespace aflowlib {
   string AFLUXCall(const string& _summons){
     // Performs AFLUX call based on summons input
-    bool LDEBUG=(TRUE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     string function_name = XPID + "AFLUXCall():";
 
     // percent encoding (otherwise it will not work)
