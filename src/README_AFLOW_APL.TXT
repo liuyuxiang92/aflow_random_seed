@@ -158,7 +158,7 @@ The most important setting is the supercell dimensions (a supercell is required 
 The supercell can be set by the following commands (in order of precedence):
 
     [AFLOW_APL]SUPERCELL=numberXnumberXnumber
-    [AFLOW_APL]MINATOMS_UNIF=number
+    [AFLOW_APL]MINATOMS_UNIFORM=number
     [AFLOW_APL]MINATOMS=number
     [AFLOW_APL]MINSHELL=number
 
@@ -176,11 +176,11 @@ Examples:
       SUPERCELL(i,j,k) containing at least the number of atoms specified.
 
       If it is desired that the supercell is expanded equally in all directions, i.e. to use
-      SUPERCELL(i,i,i), use the flag MINATOMS_UNIF as in:
+      SUPERCELL(i,i,i), use the flag MINATOMS_UNIFORM as in:
 
-        [AFLOW_APL]MINATOMS_UNIF=100
+        [AFLOW_APL]MINATOMS_UNIFORM=100
 
-       MINATOMS_UNIF takes precedence over MINATOMS.
+       MINATOMS_UNIFORM takes precedence over MINATOMS.
 
      * Specifying the minimal number of nearest neighbor shells, e.g.:
 
