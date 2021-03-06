@@ -222,7 +222,7 @@ namespace aflowlib {
 
     if(m_input_processed==false){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Input cannot be processed",_INPUT_ILLEGAL_);}
   }
-  void EntryLoader::sanitizeAFLUXSummons(){
+  void EntryLoader::sanitizeAFLUXSummons(){ //n from AFLUX paper
     bool LDEBUG=(FALSE || _DEBUG_ENTRY_LOADER_ || XHOST.DEBUG);
     string soliloquy=XPID+"EntryLoader::sanitizeAFLUXSummons():";
     stringstream message;
@@ -232,15 +232,32 @@ namespace aflowlib {
     string summons=m_elflags.getattachedscheme("AFLUX::SUMMONS");
     if(summons.empty()){return;}
 
+    uint i=0;
     vector<string> vtokens,vtokens_new;
     aurostd::string2tokens(summons,vtokens,",");
+    //patch paging(n,k)
+    for(i=0;i<vtokens.size();i++){
+      if(vtokens[i].find("paging(")!=string::npos){
+        if(vtokens[i].find(")")==string::npos){
+          if(i>=vtokens.size()-1){
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"paging directive incomplete [1]",_INPUT_ILLEGAL_);
+          }
+          string paging=vtokens[i]+","+vtokens[i+1];
+          if(paging.find(")")==string::npos){
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"paging directive incomplete [2]",_INPUT_ILLEGAL_);
+          }
+          vtokens[i]=paging;
+          vtokens.erase(vtokens.begin()+i+1); //erase second piece
+        }
+      }
+    }
 
-    uint i=0;
 
     bool found_format=false,found_paging=false,found_all=false;
     for(i=0;i<vtokens.size();i++){
       //format
       if(vtokens[i].find("format(")!=string::npos){
+        found_format=true;
         if(vtokens[i]!="format(aflow)"){
           vtokens_new.push_back("format(aflow)");
           message << "Converting \""+vtokens[i]+"\" to \"format(aflow)\"";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_NOTICE_);
@@ -249,7 +266,8 @@ namespace aflowlib {
       }
       //paging
       if(vtokens[i].find("paging(")!=string::npos){
-        if(vtokens[i]!="paging(0)"){
+        found_paging=true;
+        if(vtokens[i]!="paging(0)"){  //paging(0) //"paging("+aurostd::utype2string(n)+",1000)"
           vtokens_new.push_back("paging(0)");
           message << "Converting \""+vtokens[i]+"\" to \"paging(0)\"";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_NOTICE_);
           continue;  //skip
@@ -280,7 +298,7 @@ namespace aflowlib {
     m_elflags.pop_attached("AFLUX::SUMMONS");
     m_elflags.push_attached("AFLUX::SUMMONS",summons_new);
   }
-  void EntryLoader::AFLUXSummons2Entries(){
+  uint EntryLoader::AFLUXSummons2Entries(){
     bool LDEBUG=(FALSE || _DEBUG_ENTRY_LOADER_ || XHOST.DEBUG);
     string soliloquy=XPID+"EntryLoader::AFLUXSummons2Entries():";
     stringstream message;
@@ -288,7 +306,7 @@ namespace aflowlib {
     if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
 
     string summons=m_elflags.getattachedscheme("AFLUX::SUMMONS");
-    if(summons.empty()){return;}
+    if(summons.empty()){return 0;}
     if(LDEBUG){cerr << soliloquy << " summons=\"" << summons << "\"" << endl;}
     string soutput=aflowlib::AFLUXCall(m_elflags.getattachedscheme("AFLUX::SUMMONS"));
     if(LDEBUG){
@@ -312,6 +330,8 @@ namespace aflowlib {
     message << "Loaded " << ventries.size() << " entries";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_NOTICE_);
 
     if(!aflowlib::mergeEntries(ventries,m_ventries)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"mergeEntries() failed",_RUNTIME_ERROR_);}
+
+    return ventries.size(); //count of new entries
   }
   void EntryLoader::setAFLUXSummons4ElementsString(){
     bool LDEBUG=(FALSE || _DEBUG_ENTRY_LOADER_ || XHOST.DEBUG);
@@ -367,6 +387,12 @@ namespace aflowlib {
     for(i=0;i<m_ventries.size();i++){for(j=0;j<m_ventries[i].size();j++){m_ventries[i][j].clear();}m_ventries[i].clear();}m_ventries.clear(); //clear
     
     if(m_elflags.flag("ENTRY_LOADER::IS_SUMMONS")){
+      //uint n=1; //n from AFLUX paper
+      //uint nentries=0;
+      //while(true)
+      //sanitizeAFLUXSummons((n++));
+      //nentries=AFLUXSummons2Entries();
+      //if(nentries==0){break;}
       sanitizeAFLUXSummons();
       AFLUXSummons2Entries();
       return;
@@ -376,6 +402,13 @@ namespace aflowlib {
       setAFLUXSummons4ElementsString();
       sanitizeAFLUXSummons();
       AFLUXSummons2Entries();
+      //uint n=1; //n from AFLUX paper
+      //uint nentries=0;
+      //while(true){
+      //  sanitizeAFLUXSummons((n++));
+      //  nentries=AFLUXSummons2Entries();
+      //  if(nentries==0){break;}
+      //}
     }
     else{throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown input format",_INPUT_ILLEGAL_);}
   }

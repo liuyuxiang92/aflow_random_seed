@@ -70,8 +70,8 @@ namespace aflowlib {
       //NECESSARY END CLASS METHODS - END
 
       void processInput();
-      void sanitizeAFLUXSummons();
-      void AFLUXSummons2Entries();
+      void sanitizeAFLUXSummons();  //uint n=1; return first page, n from AFLUX paper
+      uint AFLUXSummons2Entries();
       void setAFLUXSummons4ElementsString();
       void loadEntries();
   };

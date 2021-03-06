@@ -86,7 +86,9 @@ bool EntryLoaderTest(ofstream& FileMESSAGE,ostream& oss){  //CO20200520
   }
 
 
-  sinput="MnPdPt";
+  //sinput="MnPdPt";
+  //el.initialize(sinput,elflags,FileMESSAGE,oss);
+  sinput="CMoTaTiW";  //CMoTaTiWZr
   el.initialize(sinput,elflags,FileMESSAGE,oss);
   //el.retrieveOutput(soutput);
   //if(soutput.empty()){

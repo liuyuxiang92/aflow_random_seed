@@ -302,7 +302,8 @@ namespace aflowlib {
 // ***************************************************************************
 // AFLUX STUFF
 //#define _AFLUX_API_PATH_ "/~frose/dev/aflux/src/?" //[CO20201220 - OBSOLETE]"/search/API/?"
-#define _AFLUX_API_PATH_ "/API/aflux/v1.0/?" //[CO20201220 - OBSOLETE]"/search/API/?"
+#define _AFLUX_API_PATH_ "/~esters/API/aflux/v1.0/?" //[CO20201220 - OBSOLETE]"/search/API/?"
+//#define _AFLUX_API_PATH_ "/API/aflux/v1.0/?" //[CO20201220 - OBSOLETE]"/search/API/?"
 namespace aflowlib {
   class APIget {
     private:
