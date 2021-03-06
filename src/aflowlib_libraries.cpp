@@ -2570,13 +2570,13 @@ namespace aflowlib {
         if(!xPOTCAR_EnthalpyReference_AUID(data.vspecies_pp_AUID.at(i),data.METAGGA)) { 
           FORMATION_CALC=FALSE; // WORKS WITH SCANN TOO
           if(AFLOWLIB_VERBOSE) cout << MESSAGE << " REFERENCE NOT AVAILABLE species_pp=" << xstr.species_pp_version.at(i) << "  species_pp_AUID=" << data.vspecies_pp_AUID.at(i)
-				    << (data.METAGGA.empty()?string(""):string("  METAGGA=["+data.METAGGA+"]")) << "   Href=nothing" << endl;
+            << (data.METAGGA.empty()?string(""):string("  METAGGA=["+data.METAGGA+"]")) << "   Href=nothing" << endl;
         }
       }
     }
 
     // OPERATE FORMATION
-    //     cerr << "FORMATION_CALC=" << FORMATION_CALC << endl; exit(0);
+    //     cerr << "FORMATION_CALC=" << FORMATION_CALC << endl;
 	
     // line XXX2					   
     if(FORMATION_CALC) { // no LDAU yet
@@ -2709,13 +2709,13 @@ namespace aflowlib {
         if(!xPOTCAR_EnthalpyReference_AUID(data.vspecies_pp_AUID.at(i),data.METAGGA)) { 
           FORMATION_CALC=FALSE; // WORKS WITH SCANN TOO
           if(AFLOWLIB_VERBOSE) cout << MESSAGE << " REFERENCE NOT AVAILABLE species_pp=" << xstr.species_pp_version.at(i) << "  species_pp_AUID=" << data.vspecies_pp_AUID.at(i)
-				    << (data.METAGGA.empty()?string(""):string("  METAGGA=["+data.METAGGA+"]")) << "   Href=nothing" << endl;
+            << (data.METAGGA.empty()?string(""):string("  METAGGA=["+data.METAGGA+"]")) << "   Href=nothing" << endl;
         }
       }
     }
 
     // OPERATE FORMATION
-    //     cerr << "FORMATION_CALC=" << FORMATION_CALC << endl; exit(0);
+    //     cerr << "FORMATION_CALC=" << FORMATION_CALC << endl;
 	
     // line XXX2					   
     if(FORMATION_CALC) { // no LDAU yet

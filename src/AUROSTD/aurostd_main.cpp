@@ -5315,6 +5315,10 @@ namespace aurostd {
     aurostd::StringSubst(out,"&icedil;","\\c{i}");aurostd::StringSubst(out,"&Icedil;","\\c{I}");
     aurostd::StringSubst(out,"&ocedil;","\\c{o}");aurostd::StringSubst(out,"&Ocedil;","\\c{O}");
     aurostd::StringSubst(out,"&ucedil;","\\c{u}");aurostd::StringSubst(out,"&Ucedil;","\\c{U}");
+    // caron
+    aurostd::StringSubst(out,"&zcaron;","{\\v{z}}");aurostd::StringSubst(out,"&Zcaron;","{\\v{Z}}");
+    // slash
+    aurostd::StringSubst(out,"&oslash;","{\\o}");aurostd::StringSubst(out,"&Oslash;","{\\O}");
     // math
     aurostd::StringSubst(out,"&Alpha;","$\\Alpha$");aurostd::StringSubst(out,"&alpha;","$\\alpha$");
     aurostd::StringSubst(out,"&Beta;","$\\Βeta$");aurostd::StringSubst(out,"&beta;","$\\beta$");
@@ -5449,6 +5453,12 @@ namespace aurostd {
     aurostd::StringSubst(out,"\\~i","&itilde;");aurostd::StringSubst(out,"\\~I","&Itilde;");
     aurostd::StringSubst(out,"\\~o","&otilde;");aurostd::StringSubst(out,"\\~O","&Otilde;");
     aurostd::StringSubst(out,"\\~u","&utilde;");aurostd::StringSubst(out,"\\~U","&Utilde;");
+
+    // caron
+    aurostd::StringSubst(out,"\\v{z}","&zcaron;"); aurostd::StringSubst(out,"\\v{Z}","&Zcaron;");
+    // slash
+    aurostd::StringSubst(out,"\\o","&oslash;"); aurostd::StringSubst(out,"\\O","&Oslash;");
+
     return out;
   }
 

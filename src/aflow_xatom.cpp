@@ -2146,6 +2146,7 @@ void minimumCoordinationShellLatticeOnly(const xmatrix<double>& lattice,
               resetLatticeDimensions(lattice,min_dist,dims,l1,l2,l3,a_index,b_index,c_index);
               m=n=p=0;
               frequency=0; //reset
+              coordinates.clear(); //DX20210222
             }
           }
           //DX - FIXED TOL (bad for undecorated prototypes) - else if(aurostd::isequal(tmp_mod,min_dist,0.5)){ frequency+=1; } // within half an Angstrom
