@@ -908,7 +908,7 @@
 
 #define AFLOWRC_MPI_OPTIONS_DUKE_QFLOW_OPENMPI                string("ulimit -s unlimited ") // DUKE_QFLOW_MPICH
 #define         MPI_OPTIONS_DUKE_QFLOW_OPENMPI                XHOST.adefault.getattachedscheme("MPI_OPTIONS_DUKE_QFLOW_OPENMPI")
-#define AFLOWRC_MPI_COMMAND_DUKE_QFLOW_OPENMPI                string("/usr/bin/mpirun -n") // DUKE_QFLOW_MPICH
+#define AFLOWRC_MPI_COMMAND_DUKE_QFLOW_OPENMPI                string("/home/bin/local/bin/mpirun -n") // DUKE_QFLOW_MPICH
 #define         MPI_COMMAND_DUKE_QFLOW_OPENMPI                XHOST.adefault.getattachedscheme("MPI_COMMAND_DUKE_QFLOW_OPENMPI")
 #define AFLOWRC_MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI             string("/home/bin/") // DUKE_QFLOW_MPICH
 #define         MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI             XHOST.adefault.getattachedscheme("MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI")

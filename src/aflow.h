@@ -1102,7 +1102,7 @@ uint ApennsyARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vfl
 #define _PGROUPK_ 6            // for point group klattice
 #define _PGROUP_XTAL_ 7        // for point group crystal
 #define _PGROUPK_XTAL_ 8       // for point group kcrystal
-#define _PGROUPK_PATTERSON_ 9   // for point group Patterson //DX20200129
+#define _PGROUPK_PATTERSON_ 9  // for point group Patterson //DX20200129
 #define _FGROUP_ 2             // for factor group
 #define _SGROUP_ 3             // for space group
 #define _AGROUP_ 4             // for site positions point group
@@ -1513,11 +1513,24 @@ class xstructure {
     string SpeciesString(void);                                   // Gives a string with the list of all the species
     uint SetSpecies(const std::deque<string>& vspecies);          // Set the species
     void UpdateSpecies(const _atom& atom);                        // Update species from atom (consolidated from AddAtom) //DX20210202
-    void GetLatticeType(xstructure& sp,xstructure& sc);           // Get all lattices
-    void GetLatticeType(void);                                    // Get all lattices
+    //DX20210302 [OBSOLETE] void GetLatticeType(xstructure& sp,xstructure& sc);           // Get all lattices
+    //DX20210302 [OBSOLETE] void GetLatticeType(void);                                    // Get all lattices
+    void GetLatticeType(
+        double sym_eps=AUROSTD_MAX_DOUBLE,
+        bool no_scan=false);                                      // Get all lattices
+    void GetLatticeType(xstructure& sp,xstructure& sc,
+        double sym_eps=AUROSTD_MAX_DOUBLE,
+        bool no_scan=false);                                      // Get all lattices
+    void GetExtendedCrystallographicData(
+        double sym_eps=AUROSTD_MAX_DOUBLE,
+        bool no_scan=false, int setting=1);
+    void GetExtendedCrystallographicData(xstructure& sp,
+        xstructure& sc,
+        double sym_eps=AUROSTD_MAX_DOUBLE,
+        bool no_scan=false, int setting=1);
     void GetRealLatticeType(xstructure& sp,xstructure& sc,
         double sym_eps=AUROSTD_MAX_DOUBLE);                       // Get real lattice type //DX2021011
-    void GetRealLatticeType(double sym_eps=AUROSTD_MAX_DOUBLE);  // Get real lattice type //DX20210211
+    void GetRealLatticeType(double sym_eps=AUROSTD_MAX_DOUBLE);   // Get real lattice type //DX20210211
     void GetReciprocalLatticeType(xstructure& sp,xstructure& sc,
         double sym_eps=AUROSTD_MAX_DOUBLE);                       // Get reciprocal lattice type //DX20210209
     void GetReciprocalLatticeType(double sym_eps=AUROSTD_MAX_DOUBLE);// Get reciprocal lattice type //DX20210209
@@ -3006,7 +3019,7 @@ namespace KBIN {
   bool VASP_Write_ppAUID_FILE(const string& directory,const deque<string>& vppAUIDs,const deque<string>& species);
   bool VASP_Write_ppAUID_AFLOWIN(const string& directory,const vector<string>& vppAUIDs,const vector<string>& species);
   bool VASP_Write_ppAUID_AFLOWIN(const string& directory,const deque<string>& vppAUIDs,const deque<string>& species);
-  bool VASP_Write_INPUT(_xvasp& xvasp,_vflags &vflags);
+  bool VASP_Write_INPUT(_xvasp& xvasp,_vflags &vflags,const string& ext_module="");//AS20210302
   bool VASP_Produce_INCAR(_xvasp& xvasp,const string& AflowIn,ofstream& FileERROR,_aflags& aflags,_kflags& kflags,_vflags& vflags);
   bool VASP_Modify_INCAR(_xvasp& xvasp,ofstream& FileERROR,_aflags& aflags,_kflags& kflags,_vflags& vflags);
   bool VASP_Reread_INCAR(_xvasp& xvasp,ofstream &FileMESSAGE,_aflags &aflags);
