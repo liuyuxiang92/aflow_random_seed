@@ -771,16 +771,13 @@ string StructurePrototype::printStructureTransformationInformation(
 
   bool roff = true;
   // basis transformation
-  // TODO - need xmatrix version - json.addMatrix("basis_transformation", misfit_info.basis_transformation);
-  json.addNumber("basis_transformation", "["+aurostd::xmatDouble2String(misfit_info.basis_transformation,5,roff)+"]"); //hack
+  json.addMatrix("basis_transformation", misfit_info.basis_transformation, 5, roff);
 
   // rotation
-  // TODO - need xmatrix version - json.addMatrix("rotation", misfit_info.rotation);
-  json.addNumber("rotation", "["+aurostd::xmatDouble2String(misfit_info.rotation,5,roff)+"]"); //hack
+  json.addMatrix("rotation", misfit_info.rotation, 5, roff);
 
   // origin_shift
-  // TODO - need xvector version - json.addVector("origin_shift", misfit_info.origin_shift);
-  json.addNumber("origin_shift", "["+aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(misfit_info.origin_shift,5,roff),",")+"]"); //hack
+  json.addVector("origin_shift", misfit_info.origin_shift, 5, roff);
 
   // atom map
   json.addVector("atom_map", misfit_info.atom_map);

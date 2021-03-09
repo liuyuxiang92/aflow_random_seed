@@ -442,6 +442,15 @@ namespace aurostd {
     content.back() += "]";
   }
 
+  void JSONwriter::addVector(const string &key, const xvector<double> &value, int precision,
+      bool roundoff, double tol) //DX20210308 - added xvector variant
+  {
+    content.push_back("\"" + key + "\":[");
+    content.back() += aurostd::joinWDelimiter(
+        aurostd::xvecDouble2vecString(value, precision, roundoff, tol),",");
+    content.back() += "]";
+  }
+
   void JSONwriter::addVector(const string &key, const vector<string> &value, bool wrap) //DX20210301 - added wrap
   {
     content.push_back("\"" + key + "\":[");
@@ -495,6 +504,14 @@ namespace aurostd {
             aurostd::vecDouble2vecString(value[i], precision, roundoff, tol), ",") + "]");
     }
     content.back() += aurostd::joinWDelimiter(matrix, ",");
+    content.back() += "]";
+  }
+
+  void JSONwriter::addMatrix(const string &key, const xmatrix<double> &value,
+      int precision, bool roundoff, double tol) //DX20210308 - added xmatrix variant
+  {
+    content.push_back("\"" + key + "\":[");
+    content.back() += xmatDouble2String(value, precision, roundoff, tol);
     content.back() += "]";
   }
 

@@ -1751,14 +1751,14 @@ namespace pflow {
 
       // Real space lattice
       if(str_aus.lattice.rows != 0){
-        json.addNumber("lattice_vectors", "["+aurostd::xmatDouble2String(str_aus.lattice,_AFLOWLIB_DATA_GEOMETRY_PREC_,roff)+"]"); //hack
+        json.addMatrix("lattice_vectors",str_aus.lattice,_AFLOWLIB_DATA_GEOMETRY_PREC_,roff);
       } else {
         json.addNull("lattice_vectors");
       }
 
       // Real lattice parameters
       if(data.rows != 0){
-        json.addNumber("lattice_parameters","["+aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(data,_AFLOWLIB_DATA_GEOMETRY_PREC_,roff),",")+"]"); //hack
+        json.addVector("lattice_parameters",data,_AFLOWLIB_DATA_GEOMETRY_PREC_,roff);
       } else if (PRINT_NULL){
         json.addNull("lattice_parameters");
       }
@@ -1766,7 +1766,7 @@ namespace pflow {
       if(smode == "EDATA"){
         // Real lattice parameters (Bohr/Deg)
         if(data_Bohr.rows != 0){
-          json.addNumber("lattice_parameters_Bohr_deg","["+aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(data_Bohr,_AFLOWLIB_DATA_GEOMETRY_PREC_,roff),",")+"]"); //hack
+          json.addVector("lattice_parameters_Bohr_deg",data_Bohr,_AFLOWLIB_DATA_GEOMETRY_PREC_,roff);
         } else if (PRINT_NULL){
           json.addNull("lattice_parameters_Bohr_deg");
         }
@@ -2144,14 +2144,14 @@ namespace pflow {
 
       // Reciprocal space lattice
       if(str_aus.klattice.rows != 0){
-        json.addNumber("reciprocal_lattice_vectors", "["+aurostd::xmatDouble2String(str_aus.klattice,_AFLOWLIB_DATA_GEOMETRY_PREC_,roff)+"]"); //hack
+        json.addMatrix("reciprocal_lattice_vectors", str_aus.klattice, _AFLOWLIB_DATA_GEOMETRY_PREC_, roff);
       } else {
         json.addNull("reciprocal_lattice_vectors");
       }
 
       // Reciprocal lattice parameters
       if(data.rows != 0){
-        json.addNumber("reciprocal_lattice_parameters", "["+aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(data,_AFLOWLIB_DATA_GEOMETRY_PREC_,roff),",")+"]"); //hack
+        json.addVector("reciprocal_lattice_parameters", data, _AFLOWLIB_DATA_GEOMETRY_PREC_, roff);
       } else {
         json.addNull("reciprocal_lattice_parameters");
       }
@@ -2278,21 +2278,21 @@ namespace pflow {
 
       // Real space: bravais superlattice lattice
       if(!str_aus.bravais_superlattice_type.empty()){
-        json.addNumber("Bravais_superlattice_lattice", "["+aurostd::xmatDouble2String(str_aus.bravais_superlattice_lattice,_AFLOWLIB_DATA_GEOMETRY_PREC_,roff)+"]"); //hack
+        json.addMatrix("Bravais_superlattice_lattice", str_aus.bravais_superlattice_lattice, _AFLOWLIB_DATA_GEOMETRY_PREC_, roff);
       } else if(PRINT_NULL){
         json.addNull("Bravais_superlattice_lattice");
       }
 
       // Real lattice parameters
       if(data.rows != 0){
-        json.addNumber("lattice_parameters_superlattice","["+aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(data,_AFLOWLIB_DATA_GEOMETRY_PREC_,roff),",")+"]"); //hack
+        json.addVector("lattice_parameters_superlattice", data, _AFLOWLIB_DATA_GEOMETRY_PREC_, roff);
       } else if (PRINT_NULL){
         json.addNull("lattice_parameters_superlattice");
       }
 
       // Real lattice parameters (Bohr/Deg)
       if(data_Bohr.rows != 0){
-        json.addNumber("lattice_parameters_superlattice_Bohr_deg","["+aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(data_Bohr,_AFLOWLIB_DATA_GEOMETRY_PREC_,roff),",")+"]"); //hack
+        json.addVector("lattice_parameters_superlattice_Bohr_deg", data_Bohr, _AFLOWLIB_DATA_GEOMETRY_PREC_, roff);
       } else if (PRINT_NULL){
         json.addNull("lattice_parameters_superlattice_Bohr_deg");
       }
@@ -3677,7 +3677,7 @@ namespace pflow {
 
       // ITC origin
       if(str_sg.origin_ITC.rows != 0){
-        json.addNumber("origin_ITC","["+aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(str_sg.origin_ITC,_AFLOWLIB_DATA_GEOMETRY_PREC_,roff),",")+"]"); //hack
+        json.addVector("origin_ITC", str_sg.origin_ITC, _AFLOWLIB_DATA_GEOMETRY_PREC_, roff);
       } else if (PRINT_NULL){
         json.addNull("origin_ITC");
       }
@@ -3715,7 +3715,7 @@ namespace pflow {
                 position(1) = aurostd::string2utype<double>(tokens[0]);
                 position(2) = aurostd::string2utype<double>(tokens[1]);
                 position(3) = aurostd::string2utype<double>(tokens[2]);
-                json_Wyckoff.addNumber("position","["+aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(position,_AFLOWLIB_DATA_GEOMETRY_PREC_,roff),",")+"]"); //hack
+                json_Wyckoff.addVector("position", position, _AFLOWLIB_DATA_GEOMETRY_PREC_, roff);
                 json_Wyckoff.addString("name", tokens[3]);
                 json_Wyckoff.addNumber("mulitiplicity", tokens[4]);
                 json_Wyckoff.addString("Wyckoff_letter", tokens[5]);
@@ -3738,7 +3738,7 @@ namespace pflow {
             wss << str_sg.wyccar_ITC[i] << endl;
           }
           xstructure xstr_wyccar(wss,IOVASP_WYCKCAR);
-          json.addRaw("wyccar", xstructure2json(xstr_wyccar));
+          json.addRawJSON("wyccar", xstructure2json(xstr_wyccar));
         } else if (PRINT_NULL){
           json.addNull("wyccar");
         }
