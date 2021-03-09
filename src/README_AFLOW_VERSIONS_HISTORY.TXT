@@ -9,7 +9,7 @@
         -- added printing JSON/TXT options for --isopointal_prototypes in XtalFinder (DX)
         -- added --superlattice_data, --reciprocal_lattice_data, --pgroup_xtal_data, and --real_lattice_data functions, options: tolerance and format type (DX)
         -- fixed default titles for QE, AIMS, ELK, and CIF (DX)
-        -- added methods to JSONwriter: addVector (with wrap option), addNull, addRawJSON (key-value variant) (DX)
+        -- added methods to JSONwriter: addVector (with wrap option), addNull, addRawJSON (key-value variant), addVector (xvector variant), addMatrix (xmatrix variant) (DX)
         -- consolidated pflow::DATA(), moved SGDATA() into DATA() (DX)
         -- updated usage for lattice data (DX)
         -- added separate lattice functions for GetRealLatticeType(), GetCrystalPointGroupData(), GetSuperLatticeType() (DX)
