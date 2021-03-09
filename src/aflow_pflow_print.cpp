@@ -1034,9 +1034,9 @@ namespace pflow {
     }
     else if(ftype == json_ft){
       aurostd::JSONwriter json;
-      json.addBlock(aurostd::joinWDelimiter(content,","));
-      json.addRaw("standard_primitive_structure", xstructure2json(str_sp)); // add sprim
-      json.addRaw("standard_conventional_structure", xstructure2json(str_sc)); // add sconv
+      json.mergeRawJSON(aurostd::joinWDelimiter(content,","));
+      json.addRawJSON("standard_primitive_structure", xstructure2json(str_sp)); // add sprim
+      json.addRawJSON("standard_conventional_structure", xstructure2json(str_sc)); // add sconv
       oss << json.toString(true) << endl;
     }
 
@@ -4727,4 +4727,3 @@ void PrintXray(const xstructure& str, double lambda, ostream& oss) {
 // *             STEFANO CURTAROLO - Duke University 2003-2021              *
 // *                                                                        *
 // **************************************************************************
-
