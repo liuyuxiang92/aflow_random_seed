@@ -550,7 +550,7 @@ namespace aurostd {
   //***************************************************************************
   /// Add "raw" value for a particular key //DX20210301
   /// Enables JSONs to be passed in as strings, e.g., xstructure2json()
-  void JSONwriter::addRaw(const string &key, const string& value)
+  void JSONwriter::addRawJSON(const string &key, const string& value)
   {
     content.push_back("\"" + key + "\":" + value);
   }
