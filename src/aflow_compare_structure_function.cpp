@@ -5074,7 +5074,7 @@ string XtalFinderCalculator::printStructureMappingResults(
           misfit_info.basis_transformation,
           misfit_info.rotation,
           misfit_info.origin_shift,
-          xstr_mapped.coord_flag);
+          (xstr_mapped.coord_flag==_COORDS_FRACTIONAL_)); //DX20210222
 
       // mapping information
       output << "-------------------------------------------------------------------------"<<endl;
