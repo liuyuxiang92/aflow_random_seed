@@ -80,7 +80,7 @@ namespace aurostd {
       void addString(const string &key, const string &value);
       void addBool(const string &key, bool value);
       void addBlock(const string &value); //DX20210304 - changed from addRaw to addBlock
-      void addRaw(const string &key, const string& value); //DX20210301
+      void addRawJSON(const string &key, const string& value); //DX20210301
       void addNull(const string &key); //DX20210301
       void addJSON(const string &key, JSONwriter &value);
       void mergeJSON(JSONwriter &value);
