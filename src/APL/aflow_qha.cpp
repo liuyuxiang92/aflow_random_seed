@@ -2874,6 +2874,7 @@ namespace apl
 
     fitToEOSmodel(F, eos_method);
     double V0K = EOS_volume_at_equilibrium; // equilibrium volume at 0K
+    double B0K = EOS_bulk_modulus_at_equilibrium; // bulk modulus at 0K
 
     double T = 0.0, Veq = 0.0, Feq = 0.0, B = 0.0, Bp = 0.0, beta = 0.0, CV = 0.0, CP = 0.0, GP = 0.0;
     // the following properties are calculated by weighted sum over q-points mesh
@@ -2930,8 +2931,8 @@ namespace apl
       // the following properties are calculated only with a regular QHA calculation
       if (qha_method==QHA_CALC){
         calcCVandGPfit(T, V0K, CV_mesh_V0, GP_mesh_V0);
-        beta_mesh_V0 = KBOLTZEV*CV_mesh_V0*GP_mesh_V0/V0K/(B/eV2GPa); // [K^-1]
-        CP_mesh_V0 = CV_mesh_V0 + V0K*T*B*pow(beta_mesh_V0,2)/eV2GPa/KBOLTZEV;//[kB/atom]
+        beta_mesh_V0 = KBOLTZEV*CV_mesh_V0*GP_mesh_V0/V0K/(B0K/eV2GPa); // [K^-1]
+        CP_mesh_V0 = CV_mesh_V0 + V0K*T*B0K*pow(beta_mesh_V0,2)/eV2GPa/KBOLTZEV;//[kB/atom]
 
         calcCVandGPfit(T, Veq, CV_mesh_V,  GP_mesh_V);
         beta_mesh_V = KBOLTZEV*CV_mesh_V*GP_mesh_V/Veq/(B/eV2GPa); // [K^-1]
