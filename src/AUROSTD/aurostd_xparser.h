@@ -71,6 +71,7 @@ namespace aurostd {
           double tol = AUROSTD_ROUNDOFF_TOL); //DX20210308 - added xvector variant
       void addVector(const string &key, const vector<string> &value, bool wrap=true); //DX20210301 - added wrap
       void addVector(const string &key, const deque<string> &value, bool wrap=true); //DX20210301 - added wrap
+      void addVector(const string &key, vector<JSONwriter> &value); //AS20210309
       template <typename utype> void addMatrix(const string &key, const utype &value);
       void addMatrix(const string &key, const vector<vector<double> > &value,
           int precision = AUROSTD_DEFAULT_PRECISION, bool roundoff = false,

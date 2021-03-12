@@ -3700,13 +3700,13 @@ namespace pflow {
         // representative Wyckoff positions
         if(str_sg.wyccar_ITC.size()){
 
-          aurostd::JSONwriter json_Wyckoff;
+          aurostd::JSONwriter Wyckoff_json;
+          vector<aurostd::JSONwriter> vset_json;
 
-          vector<string> wyckoff_set;
           xvector<double> position;
           for(uint i=0;i<str_sg.wyccar_ITC.size();i++){
             if(i>4 && i!=str_sg.wyccar_ITC.size()-1){ //Skip title, scale, lattice parameters, number of atoms, and coordinate type, and last newline
-              json_Wyckoff.clear();
+              Wyckoff_json.clear();
               position.clear();
 
               vector<string> tokens;
@@ -3715,17 +3715,17 @@ namespace pflow {
                 position(1) = aurostd::string2utype<double>(tokens[0]);
                 position(2) = aurostd::string2utype<double>(tokens[1]);
                 position(3) = aurostd::string2utype<double>(tokens[2]);
-                json_Wyckoff.addVector("position", position, _AFLOWLIB_DATA_GEOMETRY_PREC_, roff);
-                json_Wyckoff.addString("name", tokens[3]);
-                json_Wyckoff.addNumber("mulitiplicity", tokens[4]);
-                json_Wyckoff.addString("Wyckoff_letter", tokens[5]);
-                json_Wyckoff.addString("site_symmetry", tokens[6]);
+                Wyckoff_json.addVector("position", position, _AFLOWLIB_DATA_GEOMETRY_PREC_, roff);
+                Wyckoff_json.addString("name", tokens[3]);
+                Wyckoff_json.addNumber("mulitiplicity", tokens[4]);
+                Wyckoff_json.addString("Wyckoff_letter", tokens[5]);
+                Wyckoff_json.addString("site_symmetry", tokens[6]);
+                vset_json.push_back(Wyckoff_json);
               }
-              wyckoff_set.push_back(json_Wyckoff.toString(true));
             }
           }
 
-          json.addVector("Wyckoff_positions", wyckoff_set, false);
+          json.addVector("Wyckoff_positions", vset_json);
         } else if (PRINT_NULL){
           json.addNull("Wyckoff_positions");
         }

@@ -467,6 +467,19 @@ namespace aurostd {
     content.back() += "]";
   }
 
+  void JSONwriter::addVector(const string &key, vector<JSONwriter> &value) //AS20210309
+  {
+    content.push_back("\"" + key + "\":[");
+    uint size = value.size();
+    if (size){
+      for (uint i=0; i<size-1; i++){
+        content.back() += value[i].toString() + ",";
+      }
+      content.back() += value[size-1].toString();
+    }
+    content.back() += "]";
+  }
+
   //***************************************************************************
   //  addMatrix block
   template <typename utype> void JSONwriter::addMatrix(const string &key,
