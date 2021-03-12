@@ -2848,7 +2848,8 @@ namespace aurostd {
     
     //CO20200624 START - some command cleanup
     string command=aurostd::CleanCommand4Execute(_command);
-    if(command.find("; ")!=string::npos){command="( "+command+" )";}  //put to subshell for IO redirection
+    //if(command.find("; ")!=string::npos){command="( "+command+" )";}  //put to subshell for IO redirection; https://www.gnu.org/software/bash/manual/html_node/Command-Grouping.html#Command-Grouping
+    command="( "+command+" )";  //ALWAYS put to subshell for IO redirection; https://www.gnu.org/software/bash/manual/html_node/Command-Grouping.html#Command-Grouping
     //CO20200624 END - some command cleanup
     
     stringstream strstream,cmdstream;
