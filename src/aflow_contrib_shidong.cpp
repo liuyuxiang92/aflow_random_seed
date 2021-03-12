@@ -30,9 +30,7 @@ bool ACEGetStructureType(const string& structure_type_in) {
   if( structure_type == "fcc" || structure_type == "bcc" || structure_type == "hcp") {
     ACEFlag = true;
   } else {
-    string errmsg = "The structure given must be one of fcc[FCC]/bcc[BCC]/hcp[HCP]!";
-    ACEFlag = false;
-    ErrorMessage(errmsg, _EXIT_WRONGTYPE);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,"ACEGetStructureType():","The structure given must be one of fcc[FCC]/bcc[BCC]/hcp[HCP]",_INPUT_ILLEGAL_); //CO20200624
   }
 
   return ACEFlag;
@@ -114,9 +112,7 @@ vector<cestructure>  ReadInFitStructure(istream & ins, string & structure_type) 
 
 
   if( str_out_list.size() == 0) {
-    string errmsg = "aconvasp: No " + structure_type
-      + " structure is found. Check your input file!";
-    ErrorMessage(errmsg, _EXIT_NOSTRUCTURE);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,"ReadInFitStructure():","No "+structure_type+" structure is found. Check your input file",_FILE_CORRUPT_); //CO20200624
   }
 
   return str_out_list;
@@ -2641,10 +2637,10 @@ void GenerateAflowInputFile(string structure_type,
   input_file << "#[AFLOW_SYMMETRY]SGROUP_WRITE " << endl;
   input_file << "#[AFLOW_SYMMETRY]SGROUP_RADIUS=7.77 " << endl;
   input_file << AFLOWIN_SEPARATION_LINE << endl;
-  input_file << "#[AFLOW_NEIGHBOURS]CALC " << endl;
-  input_file << "[AFLOW_NEIGHBOURS]RADIUS=7.7 " << endl;
-  input_file << "[AFLOW_NEIGHBOURS]DRADIUS=0.1 " << endl;
-  input_file << AFLOWIN_SEPARATION_LINE << endl;
+  //DX20210122 [OBSOLETE] input_file << "#[AFLOW_NEIGHBOURS]CALC " << endl;
+  //DX20210122 [OBSOLETE] input_file << "[AFLOW_NEIGHBOURS]RADIUS=7.7 " << endl;
+  //DX20210122 [OBSOLETE] input_file << "[AFLOW_NEIGHBOURS]DRADIUS=0.1 " << endl;
+  //DX20210122 [OBSOLETE] input_file << AFLOWIN_SEPARATION_LINE << endl;
   input_file << "[AFLOW] # Phonons calculations are not implemented yet. They will be included in aflow4." << endl;
   input_file << "#[AFLOW_PHONONS]CALC " << endl;
   input_file << AFLOWIN_SEPARATION_LINE << endl;
@@ -2732,6 +2728,7 @@ void GenerateAflowInputFile(string structure_type,
 // ***************************************************************************
 
 void CheckAllInputFileExistence(string structure_type) {
+  string soliloquy=XPID+"CheckAllInputFileExistence():";
   // if no cluster data exists, ask user to
   // obtain it first
   string filename;
@@ -2745,7 +2742,7 @@ void CheckAllInputFileExistence(string structure_type) {
 
     cerr << "The cluster data file is missing\n"
       << "Please use the command\n"
-      << "    aflow --cluster structure_type minimun_site_num maximun_site_num minimum_nearest_neighbour maximun_nearest_neighbour \n"
+      << "    aflow --cluster structure_type minimun_site_num maximum_site_num minimum_nearest_neighbor maximum_nearest_neighbor \n"
       << "to generate it\n";
 
     myfile.close();
@@ -2785,12 +2782,12 @@ void CheckAllInputFileExistence(string structure_type) {
   if( flag_SL_cal ) {
     cerr << "One or more input files for superlattice calculations are missing.\n"
       << "Please run the command \n"
-      << "    aflow --sl structure_type mininum_atom_in_unit_cell maximun_atom_in_unit_cell \n"
+      << "    aflow --sl structure_type mininum_atom_in_unit_cell maximum_atom_in_unit_cell \n"
       << "to obtained them\n";
   }
 
   if( flag_cluster_cal || flag_SL_cal ) {
-    exit(_EXIT_NO_INPUTFILE);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"no input",_INPUT_MISSING_); //CO20200624
   } else {
     cerr << "All input files are found. Calculation begins.\n"
       << endl;

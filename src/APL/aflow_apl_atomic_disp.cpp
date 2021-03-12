@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
 // *                Aflow PINKU NATH - Duke University 2014-2016             *
 // *                 Aflow MARCO ESTERS - Duke University 2020               *
 // *                                                                         *
@@ -41,15 +41,13 @@ namespace apl {
   }
 
   AtomicDisplacements::AtomicDisplacements(const AtomicDisplacements& that) {
-    free();
+    if (this != &that) free();
     copy(that);
   }
 
   AtomicDisplacements& AtomicDisplacements::operator=(const AtomicDisplacements& that) {
-    if (this != &that) {
-      free();
-      copy(that);
-    }
+    if (this != &that) free();
+    copy(that);
     return *this;
   }
 
@@ -58,6 +56,7 @@ namespace apl {
   }
 
   void AtomicDisplacements::copy(const AtomicDisplacements& that) {
+    if (this == &that) return;
     _eigenvectors = that._eigenvectors;
     _frequencies = that._frequencies;
     _displacement_matrices = that._displacement_matrices;
@@ -209,7 +208,7 @@ namespace apl {
     double prefactor = (PLANCKSCONSTANT_hbar * Hz2THz * std::pow(1e10, 2)/(2 * PI * (double) _qpoints.size()));
     for (uint q = 0; q < nq; q++) {
       for (uint br = 0; br < nbranches; br++) {
-        if (_frequencies[q][br] > _AFLOW_APL_EPS_) {
+        if (_frequencies[q][br] > _FLOAT_TOL_) {
           for (uint at = 0; at < natoms; at++) {
             outer[at] = aurostd::outer_product(_eigenvectors[q][br][at], conj(_eigenvectors[q][br][at]));
           }
@@ -285,7 +284,7 @@ namespace apl {
   // Calculates the phonon numbers for a specific frequency and temperature
   // using Bose-Einstein statistics.
   double AtomicDisplacements::getOccupationNumber(double T, double f) {
-    if (T < _AFLOW_APL_EPS_) return 0.0;
+    if (T < _FLOAT_TOL_) return 0.0;
     else return (1.0/(exp(BEfactor_h_THz * f/T) - 1));
   }
 
@@ -356,7 +355,7 @@ namespace apl {
     string tag = "[APL_DISPLACEMENTS]";
 
     output << AFLOWIN_SEPARATION_LINE << std::endl;
-    output << tag << "SYSTEM=" << _pc->getSystemName() << std::endl;
+    output << tag << "SYSTEM=" << _pc->_system << std::endl;
     output << tag << "START" << std::endl;
     output << "#" << std::setw(9) << "T (K)" << setw(15) << "Species"
       << std::setw(15) << "x (A^2)" << std::setw(15) << "y (A^2)" << std::setw(15) << "z (A^2)" << std::endl;
@@ -520,7 +519,7 @@ namespace apl {
     double amplitude = 0.0;
     if (amplitude_str.empty()) amplitude = DEFAULT_APL_ADISP_AMPLITUDE;
     else amplitude = aurostd::string2utype<double>(amplitude_str);
-    if (amplitude < _AFLOW_APL_EPS_) {
+    if (amplitude < _FLOAT_TOL_) {
       message = "Amplitude must be positive.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ILLEGAL_);
     }
@@ -770,7 +769,7 @@ namespace apl {
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
 // *                Aflow PINKU NATH - Duke University 2014-2016             *
 // *            Aflow MARCO ESTERS - Duke University 2020                    *
 // *                                                                         *

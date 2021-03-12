@@ -1,6 +1,6 @@
 ****************************************************************************************************
 *                                                                                                  *
-*                        aflow - STEFANO CURTAROLO Duke University 2003-2020                       *
+*                        aflow - STEFANO CURTAROLO Duke University 2003-2021                       *
 *                            High-Throughput ab-initio Computing Project                           *
 *                                                                                                  *
 ****************************************************************************************************
@@ -88,7 +88,7 @@ LATEST VERSION OF THE FILE:                              materials.duke.edu/AFLO
  	       --module=[APL | QHA | AAPL]
          --apl_supercell=NxNxN
          --potim=XXX (default: DEFAULT_VASP_PREC_POTIM in .aflow.rc)  (VASP) 
-         --relax_type=[ALL | IONS | CELL_SHAPE | CELL_VOLUME | IONS_CELL_VOLUME] (overrides relax_mode) (VASP)
+         --relax_type=[ALL | IONS | CELL_SHAPE | CELL_VOLUME | IONS_CELL_VOLUME | IONS_CELL_SHAPE] (overrides relax_mode) (VASP)
          --relax_mode=[ENERGY | FORCES | ENERGY_FORCES | FORCES_ENERGY] (default: DEFAULT_VASP_FORCE_OPTION_RELAX_MODE_SCHEME in .aflow.rc) (VASP)
          --relax_count=XX (default: DEFAULT_VASP_FORCE_OPTION_RELAX_COUNT in .aflow.rc) (VASP)
          --run_relax_static
@@ -226,7 +226,7 @@ LATEST VERSION OF THE FILE:                              materials.duke.edu/AFLO
 
       RELAX_TYPE
         One of the RELAX_TYPEs specified in the AFLOW manual (VASP only).
-        [ALL | IONS | CELL_SHAPE | CELL_VOLUME | IONS_CELL_VOLUME] (overrides RELAX_MODE)
+        [ALL | IONS | CELL_SHAPE | CELL_VOLUME | IONS_CELL_VOLUME | IONS_CELL_SHAPE] (overrides RELAX_MODE)
 
       RELAX_MODE
         One of the RELAX_MODEs specified in the AFLOW manual (VASP only).
@@ -327,7 +327,7 @@ LATEST VERSION OF THE FILE:                              materials.duke.edu/AFLO
         STDOUT option available.
 
 	  
-  aflow --aflowSG[_label,_number][=tolerance | =tight | =loose] [--no_scan] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR
+  aflow --aflowSG[_label,_number][=tolerance | =tight | =loose] [--no_scan] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] [--tolerance_spectrum=start:stop:step] < POSCAR
         Calculates the space group of the crystal in the ITC convention.
         No assumptions are made on the input POSCAR-- may be supercell, primitive, etc.
         Gives the Bravais lattice, crystal system, point group, space group number and wyckoff set.
@@ -357,6 +357,7 @@ LATEST VERSION OF THE FILE:                              materials.duke.edu/AFLO
         Options:
           [--no_scan] : Will not perform tolerance scan.
           [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]]: Perform symmetry analysis of spin system, where spin degree of freedom breaks symmetry 
+          [--tolerance_spectrum=start:stop:step] : Perform symmetry analysis for a range of tolerance values
         Check aflow --readme=symmetry
  
   aflow --alphabetic < POSCAR
@@ -379,7 +380,7 @@ LATEST VERSION OF THE FILE:                              materials.duke.edu/AFLO
         Outputs to standard out the angles for each atom triplet
         made up of neighors within a distance cutoff of each other.  
         Actually, since this can be huge, only the first MAX_NUM_ANGLE-1
-        neighbours within d are used.  MAX_NUM_ANGLE=21 at present and
+        neighbors within d are used.  MAX_NUM_ANGLE=21 at present and
         can be set in aflow_pflow_print.cpp
 
   aflow --bader -D DIRECTORY
@@ -729,21 +730,24 @@ LATTICES = (the ones with "")
 
   aflow --cce[=STRUCT_FILE --usage]
         Prints user instructions for CCE.
-  aflow --cce=STRUCT_FILE
+  aflow --cce|--cce_correction=STRUCT_FILE
         options:
             [ --usage ]
             [ --functionals=PBE|LDA|SCAN]
-            [ --dft_formation_energies=form_energy_1,form_energy_2,...]
+            [ --enthalpies_formation_dft|dft_formation_enthalpies=form_enthalpy_1,form_enthalpy_2,...]
             [ --oxidation_numbers=ox_num_1,ox_num_2,...]
             [ --print=json|out] (default is out)
 
-        Determines the CCE corrections for the structure in file STRUCT_FILE. It can be in any structure 
-        format that AFLOW supports, e.g. VASP POSCAR, QE, aims, ... For VASP, a VASP5 POSCAR is required.
-        Precalculated DFT formation energies can be provided as a comma separated list using the option
-        --dft_formation_energies= in eV/cell.
+        Prints the results of the full CCE anaysis, i.e. cation coordination numbers, oxidation numbers,
+        and CCE corrections and formation enthalpies, for the given structure file. It can be in any
+        structure format that AFLOW supports, e.g. VASP POSCAR, QE, AIMS, ABINIT, ELK, and CIF. For VASP,
+        a VASP5 POSCAR is required or, if a VASP4 POSCAR is used, the species must be written on the right
+        side next to the coordinates for each atom.
+        Precalculated DFT formation enthalpies can be provided as a comma separated list using the option
+        --enthalpies_formation_dft= in eV/cell.
         Functionals for which corrections should be returned can be provided as a comma separated list 
-        using the option --functionals=. If used together with --dft_formation energies, the functionals
-        must be in the same sequence as the DFT formation energies they correspond to. 
+        using the option --functionals=. If used together with --dft_formation enthalpies, the functionals
+        must be in the same sequence as the DFT formation enthalpies they correspond to. 
         Oxidation numbers can be provided as a comma separated list using the option --oxidation_numbers=
         It is assumed that: (i) one is provided for each atom of the structure and (ii) they are in the 
         same sequence as the corresponding atoms in the provided structure file.
@@ -848,8 +852,8 @@ LATTICES = (the ones with "")
         This compares the characteristics of two POSCAR files and is  
         useful for determining if the files are the same.  Characteristics
         compared include number of atoms, number of types, total volume,  
-        volume per atom, lattice parameters, number of neighbours of each
-        pair type out to rcut, differences in bond lengths for neighbours
+        volume per atom, lattice parameters, number of neighbors of each
+        pair type out to rcut, differences in bond lengths for neighbors
         of each pair type out to cutoff, and space groups.  For rcut<0 the
         cutoff is set to 4*(Wigner-Seitz radius of each atom) (this is the  
         radius such that num atom spheres occupies the whole volume).
@@ -1050,6 +1054,11 @@ LATTICES = (the ones with "")
               a warning if structure is not a ground state one. It removes the point from the 
               hull, calculates the new hull, and calculates the distance of this point from
               below/above (Hf/Ts) hull.
+        [--n+1_enthalpy_gain=|--n+1_energy_gain=|--n+1enthalpygain=|--n+1energygain=|--n+1egain=|--n1egain=|--n+1_enthalpygain=|--n+1+energygain=|--n+1_egain=aflow:bb0d45ab555bc208,aflow:fb9eaa58604ce774] :
+              Calculates the N+1 enthalpy gain of the ground state structure. Will return
+              a warning if structure is not a ground state one. It removes all points having the 
+              same dimensionality from the hull, calculates the new hull, and calculates the 
+              distance of this point from below/above (Hf/Ts) hull.
         [--hull_formation_enthalpy=|--hull_energy=0.25,0.25] : Returns the value of the convex hull surface at the specified coordinate/concentration.
               For stoichiometric hulls, provide the reduced composition form, i.e., for the compound Mn2PdPt, use
               --hull_formation_enthalpy=0.5,0.25, where the composition of the last component is implicitly 1-sum(0.5+0.25).
@@ -1059,10 +1068,13 @@ LATTICES = (the ones with "")
               equivalent ground state structures is skipped (can be time consuming).
         [--skip_stability_criterion_analysis|--skipstabilitycriterionanalysis|--skipscriterion|--sscriterion] : analysis
               of stability criterion for ground state structures is skipped (can be time consuming).
+        [--skip_n_plus_1_enthalpy_gain_analysis|--skip_n_plus_1_energy_gain_analysis|--skipnplus1enthalpygainanalysis|--skipnplus1energygainanalysis|--skipnplus1|--snp1|--snpo] : analysis
+              of N+1 enthalpy gain for ground state structures is skipped (can be time consuming).
         [--include_skewed_hulls|--include_skewed|--ish] : process hull despite skewed endpoints (abs(ground state endpoint energy) < 15 meV).
         [--include_unreliable_hulls|--include_unreliable|--iuh] : process hull despite poor statistics (binary hull count < 200).
         [--include_outliers|--io] : include any detected outliers (output/warning is still shown).
         [--force] : force output despite warnings.
+        [--force_outliers|--fo] : force output despite outlier warnings.
 
         PDF/LATEX OPTIONS:
         [--image_only|--imageonly|--image] : Latex/PDF output mode only. Similar to --document_only, 
@@ -1361,6 +1373,18 @@ LATTICES = (the ones with "")
   aflow --frac [-f,-d,--fract,--fractional,--direct] < POSCAR
         Outputs to standard out a new POSCAR file with
         atom positions in direct (fractional) coordinates.
+
+  aflow --get_cation_coordination_numbers|--get_cation_coord_nums|--poscar2cation_coord_nums < STRUC_FILE
+        Determines the number of anion neighbors for each cation for the structure in file STRUC_FILE.
+        It can be in any structure format that AFLOW supports, e.g. VASP POSCAR, QE, AIMS, ABINIT, ELK, and CIF.
+        For VASP, a VASP5 POSCAR is required or, if a VASP4 POSCAR is used, the species must be written
+        on the right side next to the coordinates for each atom. (RF20200820)
+
+  aflow --get_oxidation_numbers|--get_ox_nums|--poscar2ox_nums < STRUC_FILE
+        Determines the oxidation numbers for the structure in file STRUC_FILE. It can be in any structure
+        format that AFLOW supports, e.g. VASP POSCAR, QE, AIMS, ABINIT, ELK, and CIF. For VASP, a VASP5 POSCAR
+        is required or, if a VASP4 POSCAR is used, the species must be written on the right side next to
+        the coordinates for each atom.
 
   aflow --getTEMP[s] [--runstat | --runbar | --refresh=X | --warning_beep=T | --warning_halt=T ]
         If available, the command outputs the hostname and temperatures of the machine. Useful to find hardware issues:
@@ -1684,7 +1708,7 @@ LATTICES = (the ones with "")
   aflow --incompact < POSCAR
         Similar to --incell
         Outputs to standard out a POSCAR file where all the
-        atoms are mapped through the unit and neighbours cells
+        atoms are mapped through the unit and neighbors cells
         to minimixe the shortest possible bond with an adjacent atom
         This option is very useful if you run big and complicate
         molecules where atoms exit of the unit cell and you have
@@ -1793,13 +1817,27 @@ LATTICES = (the ones with "")
         It also helps in the primitive cell serach, as it has been
         included by default inside. (SC0902).
   
-  aflow --lattice_type | --lattice | --lattice_crystal < POSCAR
+  aflow --lattice_type | --lattice | --lattice_crystal[=tolerance| =tight| =loose] < POSCAR
         Returns the lattice type and the conventional lattice type of the CRYSTAL following the tables
         of Setyawayn-Curtarolo [http://dx.doi.org/10.1016/j.commatsci.2010.05.010].
+        Tolerance:
+           The tolerance is given in Angstroms.  There are two preset tolerances:
+             tight: minimum_interatomic_distance/100.0
+             loose: minimum_interatomic_distance/10.0
+           The default tolerance is the "tight" tolerance value.
+           A value can also be specified. (Note, it must be below the minimum
+           interatomic distance, otherwise an error will be thrown.)
         Check aflow --readme=symmetry
-  aflow --lattice_lattice_type | --lattice_lattice < POSCAR
+  aflow --lattice_lattice_type | --lattice_lattice[=tolerance| =tight| =loose] < POSCAR
         Returns the lattice type and the conventional lattice type of the LATTICE following the tables
         of Setyawayn-Curtarolo [http://dx.doi.org/10.1016/j.commatsci.2010.05.010].
+        Tolerance:
+           The tolerance is given in Angstroms.  There are two preset tolerances:
+             tight: minimum_interatomic_distance/100.0
+             loose: minimum_interatomic_distance/10.0
+           The default tolerance is the "tight" tolerance value.
+           A value can also be specified. (Note, it must be below the minimum
+           interatomic distance, otherwise an error will be thrown.)
         Check aflow --readme=symmetry
   aflow --latticehistogram < POSCAR
         Outputs the lattice calculated respect to tolerance of histogram of symmetry.
@@ -1976,6 +2014,12 @@ LATTICES = (the ones with "")
         lattice vector magnitudes to the volume of the parallelpiped defined 
         by the lattice vectors. So, for three orthogonal vectors, this ratio 
         would be unity. (R. Taylor).
+
+  aflow --patch_database --patchfiles=file1,file2,...
+        Patches entries of the database file. The patch files have to be in
+        jsonl format. Each json in the jsonl must contain an AUID. If an AUID
+        is not found in the database, it will be skipped. Properties not in
+        the schema will be ignored.
 
   aflow --pdb < POSCAR
         Outputs to standard out a protein database (PDB) format file
@@ -2642,20 +2686,22 @@ LATTICES = (the ones with "")
         Makes an "almost standard" aflow.in starting from the poscar.
         Useful for scripting (SC100630).
 
-  aflow --poscar2cce < STRUCT_FILE
+  aflow --poscar2cce|--get_cce_correction|--get_cce_cor < STRUCT_FILE
         options:
             [ --functionals=PBE|LDA|SCAN]
-            [ --dft_formation_energies=form_energy_1,form_energy_2,...]
+            [ --enthalpies_formation_dft|dft_formation_enthalpies=form_enthalpy_1,form_enthalpy_2,...]
             [ --oxidation_numbers=ox_num_1,ox_num_2,...]
             [ --print=json|out] (default is out)
 
-        Determines the CCE corrections for the structure in file STRUCT_FILE. It can be in any structure 
-        format that AFLOW supports, e.g. VASP POSCAR, QE, aims, ... For VASP, a VASP5 POSCAR is required.
-        Precalculated DFT formation energies can be provided as a comma separated list using the option
-        --dft_formation_energies= in eV/cell.
+        Determines the CCE corrections for the structure in file STRUCT_FILE. It can be in any structure
+        format that AFLOW supports, e.g. VASP POSCAR, QE, AIMS, ABINIT, ELK, and CIF. For VASP, a VASP5
+        POSCAR is required or, if a VASP4 POSCAR is used, the species must be written on the right side
+        next to the coordinates for each atom.
+        Precalculated DFT formation enthalpies can be provided as a comma separated list using the option
+        --enthalpies_formation_dft= in eV/cell.
         Functionals for which corrections should be returned can be provided as a comma separated list 
-        using the option --functionals=. If used together with --dft_formation energies, the functionals
-        must be in the same sequence as the DFT formation energies they correspond to. 
+        using the option --functionals=. If used together with --dft_formation enthalpies, the functionals
+        must be in the same sequence as the DFT formation enthalpies they correspond to. 
         Oxidation numbers can be provided as a comma separated list using the option --oxidation_numbers=
         It is assumed that: (i) one is provided for each atom of the structure and (ii) they are in the 
         same sequence as the corresponding atoms in the provided structure file.
@@ -2749,13 +2795,13 @@ LATTICES = (the ones with "")
           (default: anrl).
   
 
-  aflow --prototype_labels|--proto_labels [--library=htqc|anrl|all] [--arity=|--number_of_species=|--species_count=<number>] [--stoichiometry=|--stoich=<number>:<number>:...] [--space_group_number=|--space_group=|--sg=<number>] 
+  aflow --prototype_labels|--proto_labels [--library=htqc|anrl|all] [--arity=|--number_of_species=|--species_count=<number>] [--stoichiometry=|--stoich=<number>,<number>,...] [--space_group_number=|--space_group=|--sg=<number>] 
         Returns a list of the AFLOW prototype labels.
         The labels can be filtered by arity, stoichiometry, and space group.
         options:
           [--library] : specify library/catalog, i.e., htqc, anrl, or all (default=all)
           [--arity=<number>] : specify 1=unary, 2=binary, 3=ternary, etc.
-          [--stoichiometry=<number>:<number>:...] : specify the stoichiometry
+          [--stoichiometry=<number>,<number>,...] : specify the stoichiometry
           [--space_group_number=<number>] : specify the space group number
 
   aflow --prototypermult | --PROTOTYPERMULT <POSCAR
@@ -2999,8 +3045,9 @@ LATTICES = (the ones with "")
         each type you can create supercell (see --supercell) to make this
         function usable.
 
-  aflow --rebuild_database
+  aflow --rebuild_database [--patchfiles=file1,file2,...]
         Fetches new entries and rebuilds the AFLOW database file.
+        --patchfiles can be used to patch the AFLOW database using jsonl files (see --patch_database).
 
   aflow --revsg [#] [n] [l] [m]
         Constructs a POSCAR of a specified space group and with specified wyckoff positions
@@ -3373,8 +3420,9 @@ LATTICES = (the ones with "")
   aflow --uffenergy | --ue <  POSCAR
         Output the energy of the structure using the simplified Universal Force Filed (UFF) method [JACS, 114, 10024 (1992)].
 
-  aflow --update_database
+  aflow --update_database [--patchfiles=file1,file2,...]
         Fetches new entries and rebuilds the AFLOW database file if new entries are available.
+        --patchfiles can be used to patch the AFLOW database using jsonl files (see --patch_database).
 
   aflow --vasp                                                                     
         Transforms the GEOMETRICAL (or whicever is the input file format) to a        
@@ -3420,7 +3468,7 @@ LATTICES = (the ones with "")
   aflow --volume+= x < POSCAR
         Outputs POSCAR with volume changes as *=, += actor (like in c,c++).
 
-  aflow --wyccar[=tolerance | =tight | =loose] [--no_scan] [--setting=1| =2] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR
+  aflow --wyccar[=tolerance | =tight | =loose] [--no_scan] [--setting=1| =2] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] [--letters_only] [--multiplicities_only] [--site_symmetries_only] < POSCAR
         Prints the wyccar file (the poscar file with wyckoff positions) for the input POSCAR
         The wyccar format presents the lattice in standard conventional form and the wyckoff 
         positions with their associated labels and site symmetry. If variability in the 
@@ -3448,6 +3496,9 @@ LATTICES = (the ones with "")
         Options:
           [--no_scan] : Will not perform tolerance scan.
           [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]]: Perform symmetry analysis of spin system, where spin degree of freedom breaks symmetry
+          [--letters_only]: Return the Wyckoff letters only
+          [--multiplicities_only]: Return the Wyckoff multiplicities only
+          [--site_symmetries_only]: Return the Wyckoff site symmetries only
         Check aflow --readme=symmetry
 
   aflow --xray=lambda < POSCAR
@@ -3633,7 +3684,7 @@ AFLOWLIB MODE
 	
 ****************************************************************************************************
 *                                                                                                  *
-*                        aflow - STEFANO CURTAROLO Duke University 2003-2020                       *
+*                        aflow - STEFANO CURTAROLO Duke University 2003-2021                       *
 *                            High-Throughput ab-initio Computing Project                           *
 *                                                                                                  *
 ****************************************************************************************************

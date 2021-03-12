@@ -1,9 +1,9 @@
 // ***************************************************************************
 // *                                                                         *
 // *         aflow - Automatic FLOW for materials discovery project          *
-// *             Stefano Curtarolo - Duke University - 2003-2020             *
+// *             Stefano Curtarolo - Duke University - 2003-2021             *
 // *                 Kesong Yang - Duke University 2010-2011                 *
-// *                  Corey Oses - Duke University 2013-2020                 *
+// *                  Corey Oses - Duke University 2013-2021                 *
 // *                                                                         *
 // ***************************************************************************
 // aflow_pocc.h and aflow_pocc*.cpp*
@@ -37,6 +37,8 @@ const string AFLOW_POCC_TAG="[AFLOW_POCC]";
 const string STD_ELEMENTS_LIST="Sc Ti V Cr Mn Fe Co Ni Cu Zn "
 "Y Zr Nb Mo Tc Ru Rh Pd Ag Cd "
 "La Hf Ta W Re Os Ir Pt Au Hg ";
+
+const int TEMPERATURE_PRECISION=2;  //not really going to explore more than 2000-3000K, looks weird if decimal is larger than non-decimal part of number //4;  //this is std::fixed
 
 namespace pocc {
   class POccCalculator; //forward declaration
@@ -88,9 +90,15 @@ namespace pocc {
   string getARUNString(const std::list<POccSuperCellSet>& l_supercell_sets,unsigned long long int i);
   string getARUNString(unsigned long long int index_structure_group,unsigned long long int vstructure_groups_size,unsigned long long int index_structure,unsigned long long int vstructures_size,unsigned long long int index_hnf,unsigned long long int index_site_config,bool include_strgrp=false);
 
-  double getHmix(const xvector<double>& v_dg,const xvector<double>& v_energies);
-  double getHmix(const xvector<double>& v_dg,const xvector<double>& v_energies,double& dg_total);
-  double getEFA(const xvector<double>& v_dg,const xvector<double>& v_energies);
+  double getHmix(const xvector<double>& xv_energies,const xvector<double>& xv_dgs);
+  double getHmix(const xvector<double>& xv_energies,const xvector<double>& xv_dgs,double& dg_total);
+  double getEFA(const xvector<double>& xv_energies,const xvector<double>& xv_dgs);
+
+  void poccOld2New(ostream& oss=cout);
+  void poccOld2New(ofstream& FileMESSAGE,ostream& oss=cout);
+
+  string addDefaultPOCCTOL2string(const string& input);
+  string getTemperatureString(double temperature,int precision=TEMPERATURE_PRECISION,bool temperatures_int=true,int zero_padding_temperature=TEMPERATURE_PRECISION+1);
 } // namespace pocc
 
 namespace pocc {
@@ -295,6 +303,7 @@ namespace pocc {
       //NECESSARY PUBLIC CLASS METHODS - START
       //constructors - START
       POccCalculatorTemplate();
+      POccCalculatorTemplate(const POccCalculatorTemplate& b);
       //constructors - STOP
       ~POccCalculatorTemplate();
       //NECESSARY PUBLIC CLASS METHODS - END
@@ -518,8 +527,8 @@ namespace pocc {
       double m_energy_dft_ground;
       uint m_ARUN_directory_ground;
       xDOSCAR m_xdoscar;
-      vector<double> m_Egap;
-      double m_Egap_net;
+      vector<double> m_Egap_DOS,m_Egap;
+      double m_Egap_DOS_net,m_Egap_net;
 
       //initializers
       bool initialize(ostream& oss);
@@ -602,11 +611,13 @@ namespace pocc {
       bool initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags);
 
       //external methods
-      void setPOccFlags(const aurostd::xoption& pocc_flags);  //input flags, e.g., vpflow
-      void loadPOccStructureFromAFlags(const _aflags& aflags);
+      void setPOccFlags(const aurostd::xoption& pocc_flags);                    //input flags, e.g., vpflow
+      void loadFromAFlags();                                                    //grabs from m_aflags
+      void loadFromAFlags(const aurostd::xoption& loader);                      //grabs from m_aflags
       void setPOccStructure(const xstructure& xstr_pocc);
-      void setKFlags(const _kflags& Kflags);                      //standard _kflags
-      void setVFlags(const _vflags& Vflags);                      //standard _vflags
+      void setAFlags(const _aflags& Aflags);                                    //standard _aflags
+      void setKFlags(const _kflags& Kflags);                                    //standard _kflags
+      void setVFlags(const _vflags& Vflags);                                    //standard _vflags
 
       void writePARTCAR() const;
       void generateStructures(const _xvasp& xvasp);
@@ -630,17 +641,24 @@ namespace pocc {
       void resetHNFMatrices();
       void resetSiteConfigurations();
 
+      void CleanPostProcessing();
+      void loadDataIntoCalculator();
+      void setTemperatureStringParameters();
+      void setTemperatureStringParameters(vector<double>& v_temperatures);
       void postProcessing();
       void StructuresAllFile2SupercellSets();
       void StructuresUniqueFile2SupercellSets();
       bool QMVASPsFound() const;
       void setDFTEnergies();
       void setEFA();
+      void calculateRELAXProperties(double temperature=300);
       void calculateSTATICProperties(double temperature=300);
       void setPOccStructureProbabilities(double temperature=300); //room temperature
       string getTemperatureString(double temperature) const;
       void setAvgDOSCAR(double temperature=300);  //depends on probabilities
-      void plotAvgDOSCAR(double temperature=300);
+      void plotAvgDOSCAR(double temperature) const; //no default temperature, needs to be set inside setAvgDOSCAR()
+      void plotAvgDOSCAR(const string& doscar_path,const string& directory=".") const;
+      void plotAvgDOSCAR(const xDOSCAR& xdos,double temperature,const string& directory=".") const;
       void writeResults() const;
       void writeResults(double temperature) const;
 
@@ -722,8 +740,10 @@ namespace pocc {
 
       //CT20200323 - POCC+AGL functions
       void calculateDebyeThermalProperties(const vector<double>& v_temperatures);
-      void setAGLOptions(bool& agl_run_postprocess, bool& agl_write_full_results, uint& ntemperature, double& stemperature, uint& npressure, double& spressure);
-      void generateDebyeThermalProperties(uint ntemperature, double stemperature, uint npressure, double spressure, vector<double>& Debye_temperature, vector<double>& Debye_acoustic, vector<double>& Gruneisen, vector<double>& Cv300K, vector<double>& Cp300K, vector<double>& Fvib300K_atom, vector<double>& Fvib300K_cell, vector<double>& Svib300K_atom, vector<double>& Svib300K_cell, vector<double>& kappa300K, vector<vector<double> >& agl_temperatures, vector<vector<double> >& agl_gibbs_energies_atom, vector<vector<double> >& agl_vibrational_energies_atom);
+      // [OBSOLETE] void setAGLOptions(bool& agl_run_postprocess, bool& agl_write_full_results, uint& ntemperature, double& stemperature, uint& npressure, double& spressure);
+      void setAGLOptions(bool& agl_run_postprocess, bool& agl_write_full_results); //CT20200722
+      // [OBSOLETE] void generateDebyeThermalProperties(uint ntemperature, double stemperature, uint npressure, double spressure, vector<double>& Debye_temperature, vector<double>& Debye_acoustic, vector<double>& Gruneisen, vector<double>& Cv300K, vector<double>& Cp300K, vector<double>& Fvib300K_atom, vector<double>& Fvib300K_cell, vector<double>& Svib300K_atom, vector<double>& Svib300K_cell, vector<double>& kappa300K, vector<vector<double> >& agl_temperatures, vector<vector<double> >& agl_gibbs_energies_atom, vector<vector<double> >& agl_vibrational_energies_atom);
+      void generateDebyeThermalProperties(vector<double>& Debye_temperature, vector<double>& Debye_acoustic, vector<double>& Gruneisen, vector<double>& Cv300K, vector<double>& Cp300K, vector<double>& Fvib300K_atom, vector<double>& Fvib300K_cell, vector<double>& Svib300K_atom, vector<double>& Svib300K_cell, vector<double>& kappa300K, vector<vector<double> >& agl_temperatures, vector<vector<double> >& agl_gibbs_energies_atom, vector<vector<double> >& agl_vibrational_energies_atom); //CT20200722
       void getDebyeThermalProperties(vector<double>& Debye_temperature, vector<double>& Debye_acoustic, vector<double>& Gruneisen, vector<double>& Cv300K, vector<double>& Cp300K, vector<double>& Fvib300K_atom, vector<double>& Fvib300K_cell, vector<double>& Svib300K_atom, vector<double>& Svib300K_cell, vector<double>& kappa300K, vector<vector<double> >& agl_temperatures, vector<vector<double> >& agl_gibbs_energies_atom, vector<vector<double> >& agl_vibrational_energies_atom);
       void getAverageDebyeThermalProperties(const vector<double>& v_temperatures, bool agl_write_full_results, vector<double>& Debye_temperature, vector<double>& Debye_acoustic, vector<double>& Gruneisen, vector<double>& Cv300K, vector<double>& Cp300K, vector<double>& Fvib300K_atom, vector<double>& Fvib300K_cell, vector<double>& Svib300K_atom, vector<double>& Svib300K_cell, vector<double>& kappa300K, vector<vector<double> >& agl_temperatures, vector<vector<double> >& agl_gibbs_energies_atom, vector<vector<double> >& agl_vibrational_energies_atom);
   };
@@ -791,8 +811,8 @@ namespace pocc {
 // ***************************************************************************
 // *                                                                         *
 // *         aflow - Automatic FLOW for materials discovery project          *
-// *             Stefano Curtarolo - Duke University - 2003-2020             *
+// *             Stefano Curtarolo - Duke University - 2003-2021             *
 // *                 Kesong Yang - Duke University 2010-2011                 *
-// *                  Corey Oses - Duke University 2013-2020                 *
+// *                  Corey Oses - Duke University 2013-2021                 *
 // *                                                                         *
 // ***************************************************************************

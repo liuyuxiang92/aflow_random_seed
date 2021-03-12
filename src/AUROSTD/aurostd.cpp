@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
 // *                                                                         *
 // ***************************************************************************
 // Stefano Curtarolo
@@ -17,6 +17,9 @@
 #ifndef _AUROSTD_ARGV_CPP_
 #include "aurostd_argv.cpp"
 #endif
+#ifndef _AUROSTD_XPARSER_CPP_  //CO20200624
+#include "aurostd_xparser.cpp" //CO20200624
+#endif                         //CO20200624
 #ifndef _AUROSTD_XOPTION_CPP_
 #include "aurostd_xoption.cpp"
 #endif
@@ -50,12 +53,15 @@
 #ifndef _AUROSTD_XERROR_CPP_  //ME20180627
 #include "aurostd_xerror.cpp" //ME20180627
 #endif                        //ME20180627
+#ifndef _AUROSTD_XFIT_CPP_  //AS20200824
+#include "aurostd_xfit.cpp" //AS20200824
+#endif
 
 #endif  // _AURO_IMPLEMENTATIONS_
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
 // *                                                                         *
 // ***************************************************************************
 

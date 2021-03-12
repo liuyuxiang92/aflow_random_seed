@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
 // *                                                                         *
 // ***************************************************************************
 //
@@ -63,15 +63,13 @@ namespace apl {
 
   // Copy constructors
   ThermalPropertiesCalculator::ThermalPropertiesCalculator(const ThermalPropertiesCalculator& that) : xStream(*that.getOFStream(),*that.getOSS()) {
-    free();
+    if (this != &that) free();
     copy(that);
   }
 
   ThermalPropertiesCalculator& ThermalPropertiesCalculator::operator=(const ThermalPropertiesCalculator& that) {
-    if (this != &that) {
-      free();
-      copy(that);
-    }
+    if (this != &that) free();
+    copy(that);
     return *this;
   }
 
@@ -82,6 +80,7 @@ namespace apl {
   }
 
   void ThermalPropertiesCalculator::copy(const ThermalPropertiesCalculator& that) {
+    if (this == &that) return;
     xStream::copy(that);
     _freqs_0K = that._freqs_0K;
     _dos_0K = that._dos_0K;
@@ -113,14 +112,6 @@ namespace apl {
     free();
   }
 
-  void ThermalPropertiesCalculator::setDirectory(const string& directory) {
-    _directory = directory;
-  }
-
-  string ThermalPropertiesCalculator::getDirectory() const {
-    return _directory;
-  }
-
 }  // namespace apl
 
 //////////////////////////////////////////////////////////////////////////////
@@ -134,8 +125,13 @@ namespace apl {
   //initialize////////////////////////////////////////////////////////////////
   // Initializes the thermal properties calculator with a 0 K solution.
   void ThermalPropertiesCalculator::initialize(const vector<double>& freqs,
-      const vector<double>& dos,
-      string _system) {
+      const vector<double>& dos, ofstream& mf, const string& _system, ostream& oss) {
+    xStream::initialize(mf, oss);
+    initialize(freqs, dos, _system);
+  }
+
+  void ThermalPropertiesCalculator::initialize(const vector<double>& freqs,
+      const vector<double>& dos, const string& _system) {
     _freqs_0K = freqs;
     _dos_0K = dos;
     system = _system;
@@ -206,7 +202,7 @@ namespace apl {
     double zpe = 0.0;
     double stepDOS = getStepDOS(_freqs_0K);
     for (uint i = 0; i < _freqs_0K.size(); i++) {
-      if (_freqs_0K[i] < _AFLOW_APL_EPS_) continue;
+      if (_freqs_0K[i] < _FLOAT_TOL_) continue;
       zpe += _freqs_0K[i] * THz2Hz * _dos_0K[i];
     }
     zpe *= 0.5 * 1000 * PLANCKSCONSTANTEV_h * stepDOS;  // Convert to meV
@@ -224,14 +220,14 @@ namespace apl {
       const vector<double>& freq,
       const vector<double>& dos,
       ThermalPropertiesUnits unit) {
-    if (T < _AFLOW_APL_EPS_) return getScalingFactor(unit) * U0; //AS20200508
+    if (T < _FLOAT_TOL_) return getScalingFactor(unit) * U0; //AS20200508
 
     double stepDOS = getStepDOS(freq);
     double beta = 1.0/(KBOLTZEV * T);  // beta = 1/kBT (in 1/eV)
 
     double E = 0.0, hni = 0;
     for (uint i = 0; i < freq.size(); i++) {
-      if (freq[i] < _AFLOW_APL_EPS_) continue;
+      if (freq[i] < _FLOAT_TOL_) continue;
       hni = PLANCKSCONSTANTEV_h * freq[i] * THz2Hz;  // h * freq in eV
       E += dos[i] * hni / (exp(beta * hni) - 1.0);
     }
@@ -252,14 +248,14 @@ namespace apl {
       const vector<double>& freq,
       const vector<double>& dos,
       ThermalPropertiesUnits unit) {
-    if (T < _AFLOW_APL_EPS_) return getScalingFactor(unit) * U0; //AS20200508
+    if (T < _FLOAT_TOL_) return getScalingFactor(unit) * U0; //AS20200508
 
     double stepDOS = getStepDOS(freq);
     double beta = 1.0/(KBOLTZEV * T);  // beta = 1/kBT (in 1/eV)
 
     double F = 0.0, hni = 0.0;
     for (uint i = 0; i < freq.size(); i++) {
-      if (freq[i] < _AFLOW_APL_EPS_) continue;
+      if (freq[i] < _FLOAT_TOL_) continue;
       hni = PLANCKSCONSTANTEV_h * freq[i] * THz2Hz;  // h * freq in eV
       F += dos[i] * aurostd::ln(1.0 - exp(-beta * hni)) / beta;
     }
@@ -281,7 +277,7 @@ namespace apl {
       const vector<double>& freq,
       const vector<double>& dos,
       ThermalPropertiesUnits unit) {
-    if (T < _AFLOW_APL_EPS_) return 0.0;
+    if (T < _FLOAT_TOL_) return 0.0;
 
     double E = getInternalEnergy(T, freq, dos);
     double F = getVibrationalFreeEnergy(T, freq, dos);
@@ -291,7 +287,7 @@ namespace apl {
 
   double ThermalPropertiesCalculator::getVibrationalEntropy(double T, double E,
       double F, ThermalPropertiesUnits unit) {
-    if (T < _AFLOW_APL_EPS_) return 0.0;
+    if (T < _FLOAT_TOL_) return 0.0;
 
     double S = (E - F)/T;
     return getScalingFactor(unit) * S;
@@ -308,14 +304,14 @@ namespace apl {
       const vector<double>& freq,
       const vector<double>& dos,
       ThermalPropertiesUnits unit) {
-    if (T < _AFLOW_APL_EPS_) return 0.0;
+    if (T < _FLOAT_TOL_) return 0.0;
 
     double stepDOS = getStepDOS(freq);
     double beta = 1.0/(KBOLTZEV * T);  // beta = 1/kBT (in 1/eV)
 
     double cv = 0.0, bhni = 0.0, ebhni = 0.0;
     for (uint i = 0; i < freq.size(); i++) {
-      if (freq[i] < _AFLOW_APL_EPS_) continue;
+      if (freq[i] < _FLOAT_TOL_) continue;
       bhni = beta * PLANCKSCONSTANTEV_h * freq[i] * THz2Hz;  // h * freq/(kB * T)
       ebhni = exp(bhni);
       cv += dos[i] * (KBOLTZEV * bhni * bhni / ((1.0 - 1.0 / ebhni) * (ebhni - 1.0)));
@@ -419,6 +415,6 @@ namespace apl {
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
 // *                                                                         *
 // ***************************************************************************

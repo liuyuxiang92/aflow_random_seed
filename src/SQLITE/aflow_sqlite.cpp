@@ -1,7 +1,7 @@
 //****************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
-// *            Aflow MARCO ESTERS - Duke University 2019-2020               *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
+// *            Aflow MARCO ESTERS - Duke University 2019-2021               *
 // *                                                                         *
 //****************************************************************************
 
@@ -26,8 +26,7 @@ namespace sql {
   // types should be handled outside these functions.
 
   void SQLexecuteCommand(sqlite3* cursor, const string& command) {
-    bool LDEBUG = ((FALSE || XHOST.DEBUG || _AFLOW_SQL_DEBUG_) && _SQL_COMMAND_DEBUG_);
-    if (LDEBUG) std::cerr << "sql::SQLexecuteCommand(): command = " << command << std::endl;
+    if (_SQL_COMMAND_DEBUG_) std::cerr << XPID << "sql::SQLexecuteCommand(): command = " << command << std::endl;
     char* sqlErrMsg = 0;
     int sql_code = sqlite3_exec(cursor, command.c_str(), SQLcallback, 0, &sqlErrMsg);
     if (sql_code != SQLITE_OK) {
@@ -38,13 +37,12 @@ namespace sql {
   }
 
   string SQLexecuteCommandSCALAR(sqlite3* cursor, const string& command) {
-    bool LDEBUG = ((FALSE || XHOST.DEBUG || _AFLOW_SQL_DEBUG_) && _SQL_COMMAND_DEBUG_);
-    if (LDEBUG) std::cerr << "sql::SQLexecuteCommandSCALAR(): command = " << command << std::endl;
+    if (_SQL_COMMAND_DEBUG_) std::cerr << XPID << "sql::SQLexecuteCommandSCALAR(): command = " << command << std::endl;
     char* sqlErrMsg = 0;
     string returnstring = "";
     int sql_code = sqlite3_exec(cursor, command.c_str(), SQLcallbackSCALAR, &returnstring, &sqlErrMsg);
     if (sql_code != SQLITE_OK) {
-      string function = "sql::SQLexecuteCommandSCALAR():";
+      string function = XPID + "sql::SQLexecuteCommandSCALAR():";
       string message = string(sqlErrMsg) + " in command " + command;
       message += " (SQL code " + aurostd::utype2string<int>(sql_code) + ").";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_SQL_);
@@ -54,13 +52,12 @@ namespace sql {
   }
 
   vector<string> SQLexecuteCommandVECTOR(sqlite3* cursor, const string& command) {
-    bool LDEBUG = ((FALSE || XHOST.DEBUG) && _SQL_COMMAND_DEBUG_);
-    if (LDEBUG) std::cerr << "sql::SQLexecuteCommandVECTOR(): command = " << command << std::endl;
+    if (_SQL_COMMAND_DEBUG_) std::cerr << XPID << "sql::SQLexecuteCommandVECTOR(): command = " << command << std::endl;
     char *sqlErrMsg = 0;
     vector<string> returnvector;
     int sql_code = sqlite3_exec(cursor, command.c_str(), SQLcallbackVECTOR, &returnvector, &sqlErrMsg);
     if (sql_code != SQLITE_OK) {
-      string function = "sql::SQLexecuteCommandVECTOR():";
+      string function = XPID + "sql::SQLexecuteCommandVECTOR():";
       string message = string(sqlErrMsg) + " in command " + command;
       message += " (SQL code " + aurostd::utype2string<int>(sql_code) + ").";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_SQL_);
@@ -70,13 +67,12 @@ namespace sql {
   }
 
   vector<vector<string> > SQLexecuteCommand2DVECTOR(sqlite3* cursor, const string& command) {
-    bool LDEBUG = ((FALSE || XHOST.DEBUG || _AFLOW_SQL_DEBUG_) && _SQL_COMMAND_DEBUG_);
-    if (LDEBUG) std::cerr << "sql::SQLexecuteCommand2DVECTOR(): command = " << command << std::endl;
+    if (_SQL_COMMAND_DEBUG_) std::cerr << XPID << "sql::SQLexecuteCommand2DVECTOR(): command = " << command << std::endl;
     char *sqlErrMsg = 0;
     vector<vector<string> > returnvector;
     int sql_code = sqlite3_exec(cursor, command.c_str(), SQLcallback2DVECTOR, &returnvector, &sqlErrMsg);
     if (sql_code != SQLITE_OK) {
-      string function = "sql::SQLexecuteCommand2DVECTOR():";
+      string function = XPID + "sql::SQLexecuteCommand2DVECTOR():";
       string message = string(sqlErrMsg) + " in command " + command;
       message += " (SQL code " + aurostd::utype2string<int>(sql_code) + ").";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_SQL_);
@@ -91,11 +87,10 @@ namespace sql {
   // function.
 
   int SQLcallback(void* data, int argc, char** argv, char** col) {
-    bool LDEBUG = ((FALSE || XHOST.DEBUG || _AFLOW_SQL_DEBUG_) && _SQL_CALLBACK_DEBUG_);
     (void) data;  // To suppress compiler warnings
-    if (LDEBUG) {
+    if (_SQL_CALLBACK_DEBUG_) {
       for (int i = 0; i < argc; i++) {
-        std::cerr << "sql::SQLcallback()[" << i << "]: " << col[i] << " = " << (argv[i]?argv[i]:"NULL") << std::endl;
+        std::cerr << XPID << "sql::SQLcallback()[" << i << "]: " << col[i] << " = " << (argv[i]?argv[i]:"NULL") << std::endl;
       }
       std::cerr << std::endl;
     }
@@ -103,10 +98,9 @@ namespace sql {
   }
 
   int SQLcallbackSCALAR(void* data, int argc, char** argv, char** col) {
-    bool LDEBUG = ((FALSE || XHOST.DEBUG || _AFLOW_SQL_DEBUG_) && _SQL_CALLBACK_DEBUG_);
-    if (LDEBUG) {
+    if (_SQL_CALLBACK_DEBUG_) {
       for (int i = 0; i < argc; i++) {
-        std::cerr << "sql::SQLcallbackSCALAR()[" << i << "]: " << col[i] << " = " << (argv[i]?argv[i]:"NULL") << std::endl;
+        std::cerr << XPID << "sql::SQLcallbackSCALAR()[" << i << "]: " << col[i] << " = " << (argv[i]?argv[i]:"NULL") << std::endl;
       }
       std::cerr << std::endl;
     }
@@ -124,10 +118,9 @@ namespace sql {
   }
 
   int SQLcallbackVECTOR(void* data, int argc, char** argv, char** col) {
-    bool LDEBUG = ((FALSE || XHOST.DEBUG || _AFLOW_SQL_DEBUG_) && _SQL_CALLBACK_DEBUG_);
-    if (LDEBUG) {
+    if (_SQL_CALLBACK_DEBUG_) {
       for (int i = 0; i < argc; i++) {
-        std::cerr << "sql::SQLcallbackVECTOR()[" << i << "]: " << col[i] << " = " << (argv[i]?argv[i]:"NULL") << std::endl;
+        std::cerr << XPID << "sql::SQLcallbackVECTOR()[" << i << "]: " << col[i] << " = " << (argv[i]?argv[i]:"NULL") << std::endl;
       }
       std::cerr << std::endl;
     }
@@ -142,10 +135,9 @@ namespace sql {
   }
 
   int SQLcallback2DVECTOR(void* data, int argc, char** argv, char** col) {
-    bool LDEBUG = ((FALSE || XHOST.DEBUG || _AFLOW_SQL_DEBUG_) && _SQL_CALLBACK_DEBUG_);
-    if (LDEBUG) {
+    if (_SQL_CALLBACK_DEBUG_) {
       for (int i = 0; i < argc; i++) {
-        std::cerr << "sql::SQLcallback2DVECTOR()[" << i << "]: " << col[i] << " = " << (argv[i]?argv[i]:"NULL") << std::endl;
+        std::cerr << XPID << "sql::SQLcallback2DVECTOR()[" << i << "]: " << col[i] << " = " << (argv[i]?argv[i]:"NULL") << std::endl;
       }
       std::cerr << std::endl;
     }
@@ -163,7 +155,7 @@ namespace sql {
 
 //****************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
-// *            Aflow MARCO ESTERS - Duke University 2019-2020               *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
+// *            Aflow MARCO ESTERS - Duke University 2019-2021               *
 // *                                                                         *
 //****************************************************************************

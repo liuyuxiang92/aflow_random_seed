@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
 // *           Aflow ERIC PERIM MARTINS - Duke University 2014-2016          *
 // *           Aflow DENISE FORD - Duke University 2016-2019                 *
 // *                                                                         *  
@@ -17,10 +17,12 @@
 #include "aflow_chull.h"
 #include "aflow_compare_structure.h"
 
+#define _DEBUG_GFA_ false //DX20201005
+
 /********DEFINITIONS**********/
 
 //atomic environments
-#define _DOUBLE_TOL_ 0.001 //Tolerance for double comparison
+//[CO20200731 - OBSOLETE]#define _DOUBLE_TOL_ 0.001 //Tolerance for double comparison
 #define _MIN_NUM_ATM_ 500.0 //Number of atoms used to define the supercell
 #define _MIN_SAMPLING_ 40 //Minimum number of neighbors for acceptable sampling
 #define _CON_TOL_ 1.3 //Tolerance when calculating connectivity (multiplying constant < sqrt(2))
@@ -28,8 +30,8 @@
 //gfa
 // [OBSOLETE] #define _ZTOL_ 0.05 //Tolerance for positive formation enthalpies - was originally 0.05
 //[CO20190628]#define KbT 0.025 // setting for room temperature - 0.025, could also be human body temperature - 0.0267
-#define TEMPERATURE 300 //Kelvin //CO20190628
-#define KbT KBOLTZEV*TEMPERATURE // setting for room temperature - 0.025, could also be human body temperature - 0.0267 //CO20190628
+//DX20210111 [OBSOLETE - moved to xscalar] #define TEMPERATURE 300.0 //Kelvin //CO20190628 //DX20201005 - needs to be a float/double (not integer)
+//DX20210111 [OBSOLETE - moved to xscalar] #define KbT (KBOLTZEV*TEMPERATURE) // setting for room temperature - 0.025, could also be human body temperature - 0.0267 //CO20190628 //DX20201006 - need parentheses around macro multiplication
 
 /********DEFINITIONS**********/
 
@@ -109,7 +111,7 @@ void FindGap(xvector<double>& maxGaps, xvector<double>& gapPositions, xmatrix<do
       if((maxGaps(i)-new_tol) <= (individualDistances(j)-individualDistances(j-1))){
         if((individualDistances(j-1)<gapPositions(i) ||
               maxGaps(i)<(individualDistances(j)-individualDistances(j-1)-new_tol)) && 
-            individualDistances(j-1)>_DOUBLE_TOL_) { //Excludes first gap and negative distances (atoms outside cutoff)
+            individualDistances(j-1)>_ZERO_TOL_LOOSE_) { //Excludes first gap and negative distances (atoms outside cutoff)
           gapPositions(i)=individualDistances(j-1);
           maxGaps(i)=individualDistances(j)-individualDistances(j-1);
         } 
@@ -117,7 +119,7 @@ void FindGap(xvector<double>& maxGaps, xvector<double>& gapPositions, xmatrix<do
 
     }
 
-    if(maxGaps(i)<_DOUBLE_TOL_) //Just a check
+    if(maxGaps(i)<_ZERO_TOL_LOOSE_) //Just a check
       cout << "WARNING!!! Failed to find gap!" << endl << endl;
   } 
 }
@@ -144,7 +146,7 @@ void FindNewGap(uint i, xvector<double>& maxGaps, xvector<double>& gapPositions,
       if((maxGaps(i)-new_tol) <= (individualDistances(j)-individualDistances(j-1))){
         if((individualDistances(j-1)<gapPositions(i) || 
               maxGaps(i)<(individualDistances(j)-individualDistances(j-1)-new_tol)) && 
-            individualDistances(j-1)>_DOUBLE_TOL_) { //Excludes first gap and negative distances (atoms outside cutoff)
+            individualDistances(j-1)>_ZERO_TOL_LOOSE_) { //Excludes first gap and negative distances (atoms outside cutoff)
           gapPositions(i)=individualDistances(j-1);
           maxGaps(i)=individualDistances(j)-individualDistances(j-1);
         } 
@@ -152,7 +154,7 @@ void FindNewGap(uint i, xvector<double>& maxGaps, xvector<double>& gapPositions,
 
   }
 
-  if(maxGaps(i)<_DOUBLE_TOL_){ //Gap rule failure
+  if(maxGaps(i)<_ZERO_TOL_LOOSE_){ //Gap rule failure
     for(uint j=2;j<=superStr.atoms.size();j++){ 
       if(individualDistances(j-1)<cutoff){
         maxGaps(i)=individualDistances(j)-individualDistances(j-1);
@@ -175,7 +177,7 @@ void BuildAE(deque<deque<int> > &environment, xvector<double> gapPositions, xstr
   for(uint i=1;i<=str.atoms.size();i++){
     for(uint j=1;j<=superStr.atoms.size();j++){
       d = superStr.atoms[p*(k*k+k+1)+(i-1)*k*k*k].cpos - superStr.atoms[j-1].cpos;
-      if((gapPositions(i)+new_tol) >= modulus(d) && modulus(d)>_DOUBLE_TOL_){
+      if((gapPositions(i)+new_tol) >= modulus(d) && modulus(d)>_ZERO_TOL_LOOSE_){
         environment[i-1].push_back(j);
       }
     }
@@ -194,7 +196,7 @@ void BuildNewAE(int i, deque<deque<int> > &environment, xvector<double> gapPosit
 
   for(uint j=1;j<=superStr.atoms.size();j++){
     d = superStr.atoms[p*(k*k+k+1)+(i-1)*k*k*k].cpos - superStr.atoms[j-1].cpos;
-    if((gapPositions(i)+new_tol) >= modulus(d) && modulus(d)>_DOUBLE_TOL_){
+    if((gapPositions(i)+new_tol) >= modulus(d) && modulus(d)>_ZERO_TOL_LOOSE_){
       environment[i-1].push_back(j);
     }
   }
@@ -289,7 +291,7 @@ namespace pflow {
 
     //Determines the size of the supercell
     int cellNumber = (int) pow((_MIN_NUM_ATM_/str.atoms.size()),1.0/3.0);
-    if((pow((_MIN_NUM_ATM_/str.atoms.size()),1.0/3.0)-(double)cellNumber)>_DOUBLE_TOL_)
+    if((pow((_MIN_NUM_ATM_/str.atoms.size()),1.0/3.0)-(double)cellNumber)>_ZERO_TOL_LOOSE_)
       cellNumber++;
     if(cellNumber<3)
       cellNumber=3;
@@ -414,7 +416,7 @@ namespace pflow {
                 else {//third connection
                   v3 = superStr.atoms[environment[i-1][j-1]-1].cpos - superStr.atoms[environment[i-1][l-1]-1].cpos;
                   vp = vector_product(vector_product(v1,v2),vector_product(v2,v3));
-                  if(modulus(vp)<_DOUBLE_TOL_) //v1,v2 and v2,v3 define the same plane
+                  if(modulus(vp)<_ZERO_TOL_LOOSE_) //v1,v2 and v2,v3 define the same plane
                     recalcAE[i]=1; //Flag for recalculating AE
                 }
               }
@@ -716,7 +718,7 @@ namespace pflow {
       vector<uint> distinctAE_size, vector<chull::ChullPoint> vcpt, vector<vector<double> > VStoichE,
       vector<string> species){
 
-    bool LDEBUG=(FALSE || XHOST.DEBUG); //CO20190424
+    bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_GFA_); //CO20190424
     string soliloquy = XPID + "pflow::ComputeGFA():";  //CO20190424
     if(LDEBUG) { //CO20190424
       for(uint i=0;i<Egs.size();i++){cerr << soliloquy << " Egs[i=" << i << "]=" << Egs[i] << endl;} //CO20190424
@@ -933,12 +935,16 @@ namespace pflow {
                   El_ref=El_ref+VStoichE.at(indices[l][i]).back()*psc_temp[indices[l][i]+1];
                 }
               }
-              gfa[X]=gfa[X]+exp(-abs(El_ref-Egs[X])/KbT)*weight*(1.0-dotProduct);
+              double gfa_tmp = exp(-abs(El_ref-Egs[X])/kBT_ROOM)*weight*(1.0-dotProduct); //DX20210122 - create variable
+              if(LDEBUG){ cerr << soliloquy << " exp(-abs(El_ref-Egs[X])/kBT)*weight*(1.0-dotProduct): " << gfa_tmp << endl; }
+
+              gfa[X]+=gfa_tmp;
+              if(LDEBUG){ cerr << soliloquy << " gfa[X]: " << gfa[X] << endl; }
               sampling[X]=sampling[X]+weight;
 
               weight_avgDP.push_back(weight);
               if(weight_avgDP.back()<-0.0000001){cout << "ERROR: weight_avgDP.back() = " << weight_avgDP.back() << ", weight = " << weight << endl;}
-              VEavg.push_back(El_ref/KbT);
+              VEavg.push_back(El_ref/kBT_ROOM);
 
             }	  
           }
@@ -1040,7 +1046,7 @@ namespace pflow {
   //************** Function for computing GFA (end)
 
   void CalculateGFA(aurostd::xoption& vpflow, const string& alloy, const string& AE_file_read, double fe_cut){
-    bool LDEBUG=(FALSE || XHOST.DEBUG); //CO20190424
+    bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_GFA_); //CO20190424
     string soliloquy = XPID + "pflow::CalculateGFA():";  //CO20190424
 
     uint entries_size=0;
@@ -1056,7 +1062,7 @@ namespace pflow {
     chull::ConvexHull the_hull;
     vector<chull::ChullPoint> Vpoint, vcpt;
     ostream& oss=cout;
-    vector<string> species=stringElements2VectorElements(alloy,true,true,pp_string,false,oss);  //clean and sort, do not keep_pp //[CO20190712 - OBSOLETE]getAlphabeticVectorString(alloy);
+    vector<string> species=aurostd::getElements(alloy,pp_string,true,true,false,oss);  //clean and sort, do not keep_pp //[CO20190712 - OBSOLETE]getAlphabeticVectorString(alloy);
     string input=aurostd::joinWDelimiter(species,""); //getAlphabeticString(alloy); //CO20190712
     vector<chull::CoordGroup> VCoordGroup;
 
@@ -1101,7 +1107,7 @@ namespace pflow {
             equal_E=true;
           }
           else if (tEForm[j]<tEForm[i]){
-            if(compare::aflowCompareStructure(tVStructure[i].back(),tVStructure[j].back(),true,false,true)==true){
+            if(compare::structuresMatch(tVStructure[i].back(),tVStructure[j].back(),true,false,true)==true){
               break;
             }
           }

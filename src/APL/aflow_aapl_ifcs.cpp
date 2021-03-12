@@ -1,7 +1,7 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
-// *            Aflow MARCO ESTERS - Duke University 2017-2020               *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
+// *            Aflow MARCO ESTERS - Duke University 2017-2021               *
 // *                                                                         *
 // ***************************************************************************
 // Written by Marco Esters, 2018. Based on work by Jose J. Plata (AFLOW AAPL,
@@ -62,20 +62,19 @@ namespace apl {
 
   //Copy constructors
   AnharmonicIFCs::AnharmonicIFCs(const AnharmonicIFCs& that) : xStream(*that.getOFStream(),*that.getOSS()) {
-    free();
+    if (this != &that) free();
     copy(that);
   }
 
   const AnharmonicIFCs& AnharmonicIFCs::operator=(const AnharmonicIFCs& that) {
-    if (this != &that) {
-      free();
-      copy(that);
-    }
+    if (this != &that) free();
+    copy(that);
     return *this;
   }
 
   //copy//////////////////////////////////////////////////////////////////////
   void AnharmonicIFCs::copy(const AnharmonicIFCs& that) {
+    if (this == &that) return;
     xStream::copy(that);
     cart_indices = that.cart_indices;
     clst = that.clst;
@@ -136,13 +135,41 @@ namespace apl {
 
   void AnharmonicIFCs::setDirectory(const string& dir) {
     directory = dir;
-    clst.setDirectory(dir);
+    clst.directory = dir;
   }
 
   //initialize////////////////////////////////////////////////////////////////
   // Initializes the anharmonic IFC calculator by building the ClusterSet.
-  void AnharmonicIFCs::initialize(const Supercell& scell, int _order, int cut_shell, double cut_rad) {
+  void AnharmonicIFCs::initialize(const Supercell& scell, int _order, const aurostd::xoption& opts, ofstream& mf, ostream& oss) {
+    xStream::initialize(mf, oss);
+    initialize(scell, _order, opts);
+  }
+
+  void AnharmonicIFCs::initialize(const Supercell& scell, int _order, const aurostd::xoption& opts) {
+    string function = "apl::AnharmonicIFCs::initialize()";
+    string message = "";
+    // Initialize IFC parameters
     order = _order;
+    distortion_magnitude = aurostd::string2utype<double>(opts.getattachedscheme("DMAG"));
+    max_iter = aurostd::string2utype<int>(opts.getattachedscheme("SUMRULE_MAX_ITER"));
+    mixing_coefficient = aurostd::string2utype<double>(opts.getattachedscheme("MIXING_COEFFICIENT"));
+    sumrule_threshold = aurostd::string2utype<double>(opts.getattachedscheme("SUMRULE"));
+    _useZeroStateForces = opts.flag("ZEROSTATE");
+
+    // Initialize cluster
+    vector<string> tokens;
+    aurostd::string2tokens(opts.getattachedscheme("CUT_RAD"), tokens, ",");
+    if (tokens.size() < (uint) order - 2) {
+      message = "Not enough parameters for CUT_RAD";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
+    }
+    double cut_rad = aurostd::string2utype<double>(tokens[order - 3]);
+    aurostd::string2tokens(opts.getattachedscheme("CUT_SHELL"), tokens, ",");
+    if (tokens.size() < (uint) order - 2) {
+      message = "Not enough parameters for CUT_SHELL";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
+    }
+    int cut_shell = aurostd::string2utype<int>(tokens[order - 3]);
     clst.initialize(scell, _order, cut_shell, cut_rad);
     string clust_hib_file = directory + "/" + DEFAULT_AAPL_FILE_PREFIX + _CLUSTER_SET_FILE_[_order-3];
     bool awakeClusterSet = aurostd::EFileExist(clust_hib_file);
@@ -316,9 +343,8 @@ namespace apl {
       }
       dist_cart *= distortion_magnitude;
       //ME20190109 - Add to title
-      xstr.title += " atom=" + stringify(atoms[at]);
-      //xstr.title += " distortion=[" + aurostd::RemoveWhiteSpacesFromTheFrontAndBack(stringify(dist_cart)) + "]"; OBSOLETE ME20190112
-      std::stringstream distortion; //ME20190112 - need stringstream for nicer formatting
+      xstr.title += " atom=" + aurostd::utype2string<int>(atoms[at]);
+      std::stringstream distortion; // ME20190112 - need stringstream for nicer formatting
       distortion << " distortion=["
         << std::setprecision(3) << dist_cart[1] << ","
         << std::setprecision(3) << dist_cart[2] << ","
@@ -1098,7 +1124,7 @@ namespace apl {
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
-// *                Aflow MARCO ESTERS - Duke University 2018-2020           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
+// *                Aflow MARCO ESTERS - Duke University 2018-2021           *
 // *                                                                         *
 // ***************************************************************************

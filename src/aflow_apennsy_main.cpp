@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
 // *                                                                         *
 // ***************************************************************************
 
@@ -117,6 +117,8 @@ uint ApennsyARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vfl
 
 // ---------------------------------------------------------------------------
 int Apennsymain(vector<string> &argv,vector<string> &cmds) {
+  string soliloquy=XPID+"Apennsymain():";
+  stringstream message;
   //  bool LDEBUG=(FALSE || XHOST.DEBUG);
   if(cmds.size()) {;} //dummy load
   // std::vector<string> cmds;
@@ -131,19 +133,35 @@ int Apennsymain(vector<string> &argv,vector<string> &cmds) {
   // Introduction
   cerr << aflow::Banner("BANNER_BIG");
   // *****************************************************************************
-  if(!XHOST.is_command("gnuplot")) {cerr << "AFLOW V" << string(AFLOW_VERSION) << " - apennsy. ERROR gnuplot is necessary." << endl;exit(0);}; 
-  if(!XHOST.is_command("latex")) {cerr << "AFLOW V" << string(AFLOW_VERSION) << " - apennsy. ERROR latex is necessary." << endl;exit(0);}; 
-  if(!XHOST.is_command("pdflatex")) {cerr << "AFLOW V" << string(AFLOW_VERSION) << " - apennsy. ERROR pdflatex is necessary." << endl;exit(0);}; 
-  if(!XHOST.is_command("dvips")) {cerr << "AFLOW V" << string(AFLOW_VERSION) << " - apennsy. ERROR dvips is necessary." << endl;exit(0);}; 
-  if(!XHOST.is_command("dvipdf")) {cerr << "AFLOW V" << string(AFLOW_VERSION) << " - apennsy. ERROR dvipdf is necessary." << endl;exit(0);}; 
-  if(!XHOST.is_command("ps2pdf")) {cerr << "AFLOW V" << string(AFLOW_VERSION) << " - apennsy. ERROR ps2pdf is necessary." << endl;exit(0);}; 
+  if(!XHOST.is_command("gnuplot")) {
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"gnuplot is missing",_RUNTIME_INIT_); //CO20200624
+  } 
+  if(!XHOST.is_command("latex")) {
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"latex is missing",_RUNTIME_INIT_); //CO20200624
+  }
+  if(!XHOST.is_command("pdflatex")) {
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"pdflatex is missing",_RUNTIME_INIT_); //CO20200624
+  }
+  if(!XHOST.is_command("dvips")) {
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"dvips is missing",_RUNTIME_INIT_); //CO20200624
+  }
+  if(!XHOST.is_command("dvipdf")) {
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"dvipdf is missing",_RUNTIME_INIT_); //CO20200624
+  }
+  if(!XHOST.is_command("ps2pdf")) {
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"ps2pdf is missing",_RUNTIME_INIT_); //CO20200624
+  }
 
   // [OBSOLETE] XHOST.vflag_apennsy.clear();                                 // inside init::Init::InitMachine
   // [OBSOLETE] ApennsyARGs(argv,cmds,XHOST.vflag_apennsy);         // inside init::Init::InitMachine
   aflags.vflag=XHOST.vflag_apennsy; 
 
-  if(aflags.vflag.flag("APENNSY::HELP")) {cout << init::InitGlobalObject("README_AFLOW_APENNSY_TXT");cout << aflow::Banner("BANNER_BIG");exit(1);}
-  if(aflags.vflag.vxscheme.size()==0 || argv.size()==1) {cout << init::InitGlobalObject("README_AFLOW_APENNSY_TXT");cout << aflow::Banner("BANNER_BIG");exit(1);}
+  if(aflags.vflag.flag("APENNSY::HELP")) {
+    cout << init::InitGlobalObject("README_AFLOW_APENNSY_TXT");cout << aflow::Banner("BANNER_BIG");return 1;  //expressed correctly
+  }
+  if(aflags.vflag.vxscheme.size()==0 || argv.size()==1) {
+    cout << init::InitGlobalObject("README_AFLOW_APENNSY_TXT");cout << aflow::Banner("BANNER_BIG");return 0;  //error
+  }
 
   aflowlib::_aflowlib_entry aflowlib_server;
   vector<string> aflowlib_server_content;
@@ -161,7 +179,6 @@ int Apennsymain(vector<string> &argv,vector<string> &cmds) {
   //       }    
   //     }
   //   }
-  // exit(0);
 
   params.Load_ALL=TRUE;
   params.PseudopotentialNoclean=aflags.vflag.flag("APENNSY::NOCLEAN");
@@ -300,19 +317,21 @@ int Apennsymain(vector<string> &argv,vector<string> &cmds) {
     if(aflags.vflag.flag("APENNSY::LOAD_LIB2U"))  params.LibLoadAlloysLIB2U(aflags);  // Load LIB2
     if(aflags.vflag.flag("APENNSY::LOAD_LIB2PGM"))  params.LibLoadAlloysLIB2PGM(aflags);  // Load LIB2
     if(aflags.vflag.flag("APENNSY::LOAD_ALLOY"))     params.LibLoadAlloysALLOY(systemS,aflags); // Load ALLOY*
-    if(params.alloys.size()==0) {cerr << "APENNSY: No alloys to load" << endl;exit(0);}
+    if(params.alloys.size()==0) {
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No alloys to load",_INPUT_MISSING_); //CO20200624
+    }
     // Loaded now start
     cerr << params.alloysmesg.str();            // Done some verbose
     // params.LibLoadAlloys();                  // Make the alloys name vector
     params.SplitAlloySpecies();                 // Divide the species
-    // for(int k=0;k<params.alloys.size();k++) cerr << "params.speciesAB.at(k)=" << params.speciesAB.at(k) <<  endl;exit(0);
+    // for(int k=0;k<params.alloys.size();k++) cerr << "params.speciesAB.at(k)=" << params.speciesAB.at(k) <<  endl;
     params.SplitAlloyPseudoPotentials();        // Divide the pseudopotentials
     params.LoadDynamicMemory(TRUE);             // Load Dynamic Memory
     params.LoadLibrary(aflags);                 // Load the whole Library
     params.MakeRankLib();                       // bottom
     params.CheckAlloyRelaxationStructures();    // Check Relaxation of Structures in Alloys
-    // for(i=1;i<=Nconcentrations[2];i++) cerr << params.C.at(i) << " " <<  NumberConcentrations[2].at(i) << endl;exit(0);
-    // for(int k=0;k<params.alloys.size();k++) cerr << params.alloys.at(k) << " A=" << params.speciesA.at(k) << " B=" << params.speciesB.at(k) << " pA=" << pseudosA.at(k) << " pB=" << pseudosB.at(k) << endl;exit(0);
+    // for(i=1;i<=Nconcentrations[2];i++) cerr << params.C.at(i) << " " <<  NumberConcentrations[2].at(i) << endl;
+    // for(int k=0;k<params.alloys.size();k++) cerr << params.alloys.at(k) << " A=" << params.speciesA.at(k) << " B=" << params.speciesB.at(k) << " pA=" << pseudosA.at(k) << " pB=" << pseudosB.at(k) << endl;
 
     if(0)    if(XHOST.vflag_control.flag("OSS::COUT") && aflags.vflag.flag("APENNSY::SMALL_CONVEX_HULL_MATLAB")) {
       params.FixGndStatesNamesConcentrations(TRUE);
@@ -397,7 +416,7 @@ int Apennsymain(vector<string> &argv,vector<string> &cmds) {
     }
 
     if(!XHOST.vflag_control.flag("OSS::COUT") && aflags.vflag.flag("APENNSY::CONVEX_HULL") && aflags.vflag.flag("APENNSY::GNUPLOT")) {
-      // for(int k=0;k<params.alloys.size();k++) cerr << "params.speciesAB.at(k)=" << params.speciesAB.at(k) <<  endl;exit(0);
+      // for(int k=0;k<params.alloys.size();k++) cerr << "params.speciesAB.at(k)=" << params.speciesAB.at(k) <<  endl;
       // check for GNUPLOT
       // aurostd::CommandRequired("gnuplot"); // GNUPLOT MUST BE AVAILABLE
       stringstream aus;aus.clear();aus.str(std::string());
@@ -411,7 +430,6 @@ int Apennsymain(vector<string> &argv,vector<string> &cmds) {
       aus << "export DISPLAY=:0.0" << endl << XHOST.command("gnuplot") << " " << " " << FileGNUPLOT_title << endl;
       // [OBSOLETE] aus << "rm -f str_info.dat* hull.dat*" << endl;
       // [OBSOLETE] aus << "rm -f " << FileGNUPLOT_title  << endl;
-      // exit(0);
       aurostd::execute(aus);
       if(!XHOST.vflag_control.flag("KEEP::GPL")) aurostd::RemoveFile(FileGNUPLOT_title);
     }
@@ -501,7 +519,6 @@ int Apennsymain(vector<string> &argv,vector<string> &cmds) {
       // [OBSOLETE] aus << "rm -f " << FileGNUPLOT_title  << endl;
       aurostd::execute(aus);
       if(!XHOST.vflag_control.flag("KEEP::GPL")) aurostd::RemoveFile(FileGNUPLOT_title);
-      // exit(0);
     }
 
     if(aflags.vflag.flag("APENNSY::MATLAB")) {
@@ -539,7 +556,9 @@ int Apennsymain(vector<string> &argv,vector<string> &cmds) {
       if(vparams.at(k).PseudopotentialNoclean==FALSE) vparams.at(k).LibLoadAlloysALLOY(KBIN::VASP_PseudoPotential_CleanName(params.alloys.at(k)),aflags);  // load the particular alloy
       if(vparams.at(k).PseudopotentialNoclean==TRUE) vparams.at(k).LibLoadAlloysALLOY(params.alloys.at(k),aflags);  // load the particular alloy
 
-      if(vparams.at(k).alloys.size()==0) {cerr << "APENNSY: No alloys to load" << endl;exit(0);}
+      if(vparams.at(k).alloys.size()==0) {
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No alloys to load",_INPUT_MISSING_); //CO20200624
+      }
       // Loaded now start
       cerr << vparams.at(k).alloysmesg.str();            // Done some verbose
       vparams.at(k).SplitAlloySpecies();                 // Divide the species
@@ -878,13 +897,13 @@ string APENNSY_Parameters::APENNSY_EnergyList(bool _verbose,_aflags &aflags) {
       oss << "\\author[1]{Ohad Levy} %LATEX %SNAPSHOT" << endl;
       oss << "\\author[2]{Gus L.W. Hart} %LATEX %SNAPSHOT" << endl;
       oss << "\\author[3,4]{Stefano Curtarolo} %LATEX %SNAPSHOT" << endl;
-      oss << "\\affil[1]{\\small \\it Department of Mechanical Engineering and Materials Science, Duke University, Durham, NC 27708, USA} %LATEX %SNAPSHOT" << endl;
-      oss << "\\affil[2]{\\small \\it Department of Physics and Astronomy, Brigham Young University, Provo UT 84602, USA} %LATEX %SNAPSHOT" << endl;
-      oss << "\\affil[3]{\\small \\it Materials Science, Electrical Engineering, Chemistry and Physics, Duke University, Durham, NC 27708, USA} %LATEX %SNAPSHOT" << endl;
-      oss << "\\affil[4]{\\small \\it email: stefano@duke.edu} %LATEX %SNAPSHOT" << endl;
+      oss << "\\affil[1]{\\small \\textit{Department of Mechanical Engineering and Materials Science, Duke University, Durham, NC 27708, USA}} %LATEX %SNAPSHOT" << endl;
+      oss << "\\affil[2]{\\small \\textit{Department of Physics and Astronomy, Brigham Young University, Provo UT 84602, USA}} %LATEX %SNAPSHOT" << endl;
+      oss << "\\affil[3]{\\small \\textit{Materials Science, Electrical Engineering, Chemistry and Physics, Duke University, Durham, NC 27708, USA}} %LATEX %SNAPSHOT" << endl;
+      oss << "\\affil[4]{\\small \\textit{email: stefano@duke.edu}} %LATEX %SNAPSHOT" << endl;
       oss << "\\maketitle %LATEX %SNAPSHOT" << endl;
       oss << "\\begin{abstract} %LATEX %SNAPSHOT" << endl;
-      oss << "The document includes thermodynamic information for 3d-4d-5d binary intermetallics from the {\\sf aflow.org} repository %LATEX %SNAPSHOT" << endl;
+      oss << "The document includes thermodynamic information for 3d-4d-5d binary intermetallics from the \textsf{aflow.org} repository %LATEX %SNAPSHOT" << endl;
       oss << "(data retrieved on " << TODAY << " and comprising " << calculations_total << " quantum mechanical entries). %LATEX %SNAPSHOT" << endl;
       oss << "The following binary intermetallics are included:";
       for(uint k=0;k<alloys.size();k++)
@@ -903,7 +922,7 @@ string APENNSY_Parameters::APENNSY_EnergyList(bool _verbose,_aflags &aflags) {
       //  oss << "\\pagestyle{plain} %LATEX %CITE" << endl;
       oss << "\\pagestyle{fancy} %LATEX %CITE" << endl;
       oss << "\\lhead{} \\chead{} \\rhead{} %LATEX %CITE" << endl;
-      oss << "\\lfoot{{\\tiny \\sf \\hyperref[referencetoc]{\\underline{Contents}}}} \\rfoot{{\\tiny \\sf \\href{http://www.aflow.org}{www.aflow.org}}} \\cfoot{\\thepage} %LATEX %CITE" << endl;
+      oss << "\\lfoot{{\\tiny \\textsf{\\hyperref[referencetoc]{\\underline{Contents}}}}} \\rfoot{{\\tiny \\textsf{\\href{http://www.aflow.org}{www.aflow.org}}}} \\cfoot{\\thepage} %LATEX %CITE" << endl;
       oss << "\\footskip 14pt %LATEX %CITE" << endl;
       oss << "\\label{referencetoc} %LATEX %CITE" << endl;
       oss << "\\renewcommand{\\baselinestretch}{0.50} %LATEX" << endl;
@@ -1270,13 +1289,13 @@ string APENNSY_Parameters::APENNSY_EnergyList(bool _verbose,_aflags &aflags) {
     // oss << "     \\textsc{Annotation:}\\ #2\\end{quotation}}  %LATEX" << endl;
     oss << "\\bibitem{curtarolo:art75} %LATEX" << endl;
     oss << " S. Curtarolo, W. Setyawan, S. Wang, J. Xue, K. Yang, R. H. Taylor, L. J. Nelson, G. L. W. Hart, S. Sanvito, M. Buongiorno Nardelli, N. Mingo, and O. Levy, % ART75 - aflow 30767 %LATEX" << endl;
-    oss << " {\\it AFLOW.ORG: a distributed materials properties repository from high-throughput {\\it ab initio} calculations}, % ART75 - aflow 30767 %LATEX" << endl;
-    oss << " Comp. Mat. Sci. {\\bf 58}, 227-235 (2012).  % ART75 - aflow 30767 %LATEX" << endl;
+    oss << " \\textit{AFLOW.ORG: a distributed materials properties repository from high-throughput \\textit{ab initio} calculations}, % ART75 - aflow 30767 %LATEX" << endl;
+    oss << " Comp. Mat. Sci. \\textbf{58}, 227-235 (2012).  % ART75 - aflow 30767 %LATEX" << endl;
     oss << " %LATEX" << endl;
     oss << "\\bibitem{curtarolo:art65} %LATEX" << endl;
     oss << " S. Curtarolo, W. Setyawan, G. L. W. Hart, M. Jahnatek, R. V. Chepulskii, R. H. Taylor, S. Wang, J. Xue, K. Yang, O. Levy, M. Mehl, H. T. Stokes, D. O. Demchenko, and D. Morgan, % ART65 - aflow 30767 %LATEX" << endl;
-    oss << " {\\it AFLOW: an automatic framework for high-throughput materials discovery},  % ART65 - aflow 30767 %LATEX" << endl;
-    oss << " Comp. Mat. Sci. {\\bf 58}, 218-226 (2012).  % ART65 - aflow 30767 %LATEX" << endl;
+    oss << " \\textit{AFLOW: an automatic framework for high-throughput materials discovery},  % ART65 - aflow 30767 %LATEX" << endl;
+    oss << " Comp. Mat. Sci. \\textbf{58}, 218-226 (2012).  % ART65 - aflow 30767 %LATEX" << endl;
     oss << " %LATEX" << endl;
     for(uint iart=0;iart<vwnumber_global.size();iart++) {
       oss << "\\bibitem{curtarolo:art" << vwnumber_global.at(iart) << "}" << endl;
@@ -2086,7 +2105,7 @@ string APENNSY_Parameters::APENNSY_ConvexHull(bool _verbose,_aflags &aflags,uint
         oss << "set output '" << speciesAB.at(k) << ".pdf'" << endl;//make name automatic  // drop MATLAB
       }
       string title=aurostd::string2latex(speciesAB.at(k));
-      // cerr << title << endl;//exit(0);
+      // cerr << title << endl;
       oss << "set title '[" << title << "]" << "   opar=" << alloy_order.at(k)
         << "   calcs=" << ZLibrary.at(k).size()
         << "   date: " << TODAY
@@ -2219,7 +2238,6 @@ string APENNSY_Parameters::APENNSY_ConvexHull(bool _verbose,_aflags &aflags,uint
 // [OBSOLETE]   // [OBSOLETE] aus << "rm -f " << FileGNUPLOT_title  << endl;
 // [OBSOLETE]   aurostd::execute(aus);
 // [OBSOLETE]   if(!XHOST.vflag_control.flag("KEEP::GPL")) aurostd::RemoveFile(FileGNUPLOT_title);
-// [OBSOLETE]   // exit(0);
 // [OBSOLETE] 
 // [OBSOLETE]   return oss.str();
 // [OBSOLETE] }
@@ -2228,6 +2246,7 @@ string APENNSY_Parameters::APENNSY_ConvexHull(bool _verbose,_aflags &aflags,uint
 // APENNSY_Parameters::APENNSY_PS_EnergyList
 // **********************************************************************************************
 string APENNSY_Parameters::APENNSY_PS_EnergyList(_aflags &aflags) {
+  string soliloquy=XPID+"APENNSY_Parameters::APENNSY_PS_EnergyList():";
   stringstream oss;
   double dHf,dHfd;
   // ************************************************************************
@@ -2258,8 +2277,7 @@ string APENNSY_Parameters::APENNSY_PS_EnergyList(_aflags &aflags) {
     for(uint k=0;k<alloys.size();k++) {
       xvector<double> FindMinimun(ZConcentrations.at(k).size()-1);
       if(Alloy2MiscibilityHT.at(k)==MISCIBILITY_SYSTEM_MISCIBLE) {
-        cerr << "ERROR - PENNSY_Parameters::APENNSY_PS_EnergyList: Compound forming alloy " << alloys.at(k) << endl;
-        exit(0);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Compound forming alloy "+alloys.at(k),_VALUE_ILLEGAL_); //CO20200624
       }
       { //find mimumum distance
         for(uint j=1;j<=ZConcentrations.at(k).size()-1;j++) {
@@ -2883,7 +2901,6 @@ string APENNSY_Parameters::APENNSY_Order(_aflags &aflags) {
     SortAtomsPettiforScale(elements,vorder,vvalue);
     for(uint i=0;i<elements.size();i++)
       cerr << i << " " << elements.at(i) << " " << GetAtomPettiforScale(elements.at(i)) << endl;
-    exit(0);
   }
 
   string systemAB,systemBA;
@@ -3075,7 +3092,7 @@ string APENNSY_Parameters::APENNSY_Miscibility(_aflags &aflags) {
   // ************************************************************************
   oss << "// ***************************************************************************" << endl;
   oss << "// *                                                                         *" << endl;
-  oss << "// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *" << endl;
+  oss << "// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *" << endl;
   oss << "// *                                                                         *" << endl;
   oss << "// ***************************************************************************" << endl;
   oss << "// Stefano Curtarolo - 2009 Duke" << endl;
@@ -3137,7 +3154,7 @@ string APENNSY_Parameters::APENNSY_Miscibility(_aflags &aflags) {
   oss << " " << endl;
   oss << "// ***************************************************************************" << endl;
   oss << "// *                                                                         *" << endl;
-  oss << "// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *" << endl;
+  oss << "// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *" << endl;
   oss << "// *                                                                         *" << endl;
   oss << "// ***************************************************************************" << endl;
   // done
@@ -3154,7 +3171,7 @@ string APENNSY_Parameters::APENNSY_Miscibility_Experiments(_aflags &aflags) {
   // ************************************************************************
   oss << "// ***************************************************************************" << endl;
   oss << "// *                                                                         *" << endl;
-  oss << "// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *" << endl;
+  oss << "// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *" << endl;
   oss << "// *                                                                         *" << endl;
   oss << "// ***************************************************************************" << endl;
   oss << "// Ohad Levy - 2009 Duke" << endl;
@@ -3198,7 +3215,7 @@ string APENNSY_Parameters::APENNSY_Miscibility_Experiments(_aflags &aflags) {
   oss << " " << endl;
   oss << "// ***************************************************************************" << endl;
   oss << "// *                                                                         *" << endl;
-  oss << "// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *" << endl;
+  oss << "// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *" << endl;
   oss << "// *                                                                         *" << endl;
   oss << "// ***************************************************************************" << endl;
   // done
@@ -3215,7 +3232,7 @@ string APENNSY_Parameters::APENNSY_Miscibility_Miedema(_aflags &aflags) {
   // ************************************************************************
   oss << "// ***************************************************************************" << endl;
   oss << "// *                                                                         *" << endl;
-  oss << "// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *" << endl;
+  oss << "// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *" << endl;
   oss << "// *                                                                         *" << endl;
   oss << "// ***************************************************************************" << endl;
   // HERE
@@ -3242,7 +3259,7 @@ string APENNSY_Parameters::APENNSY_Miscibility_HumeRothery(_aflags &aflags) {
   // ************************************************************************
   oss << "// ***************************************************************************" << endl;
   oss << "// *                                                                         *" << endl;
-  oss << "// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *" << endl;
+  oss << "// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *" << endl;
   oss << "// *                                                                         *" << endl;
   oss << "// ***************************************************************************" << endl;
   for(uint k=0;k<alloys.size();k++) {
@@ -3267,7 +3284,7 @@ string APENNSY_Parameters::APENNSY_Miscibility_Table(_aflags &aflags) {
   // ************************************************************************
   oss << "%% ***************************************************************************" << endl;
   oss << "%% *                                                                         *" << endl;
-  oss << "%% *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *" << endl;
+  oss << "%% *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *" << endl;
   oss << "%% *                                                                         *" << endl;
   oss << "%% ***************************************************************************" << endl;
   oss << "\\begin{table}[htb]" << endl;
@@ -3298,7 +3315,7 @@ string APENNSY_Parameters::APENNSY_Miscibility_Table(_aflags &aflags) {
   oss << "\\end{table} " << endl;
   oss << "%% ***************************************************************************" << endl;
   oss << "%% *                                                                         *" << endl;
-  oss << "%% *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *" << endl;
+  oss << "%% *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *" << endl;
   oss << "%% *                                                                         *" << endl;
   oss << "%% ***************************************************************************" << endl;
   // done
@@ -3317,7 +3334,7 @@ string APENNSY_Parameters::APENNSY_Miscibility_Statistics(_aflags &aflags) {
   // ************************************************************************
   // oss << "%% ***************************************************************************" << endl;
   // oss << "%% *                                                                         *" << endl;
-  // oss << "%% *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *" << endl;
+  // oss << "%% *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *" << endl;
   // oss << "%% *                                                                         *" << endl;
   // oss << "%% ***************************************************************************" << endl;
   //#define MISCIBILITY_SYSTEM_NOT_STUDIED
@@ -3639,6 +3656,6 @@ string APENNSY_Parameters::APENNSY_Miscibility_Statistics(_aflags &aflags) {
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
 // *                                                                         *
 // ***************************************************************************

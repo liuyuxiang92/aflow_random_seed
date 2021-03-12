@@ -1,7 +1,7 @@
 //****************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
-// *            Aflow MARCO ESTERS - Duke University 2018-2020               *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
+// *            Aflow MARCO ESTERS - Duke University 2018-2021               *
 // *                                                                         *
 //****************************************************************************
 // Class to handle AFLOW exceptions.
@@ -34,7 +34,7 @@ namespace aurostd {
     {"file not found", "wrong format", "file corrupt", "", "", "", "", "", ""},
     {"illegal value", "out of range", "", "", "", "", "", "", ""},
     {"illegal value", "out of bounds", "mismatch", "", "", "", "", "", ""},
-    {"not initialized", "SQL error", "", "", "", "", "", "", ""},
+    {"not initialized", "SQL error", "busy", "", "", "", "", "", ""},
     {"could not allocate", "insufficient memory", "", "", "", "", "", "", ""}};
 
   //Constructors////////////////////////////////////////////////////////////////
@@ -97,6 +97,9 @@ namespace aurostd {
       msgstr << "Supplied error message: ";
     }
     msgstr << what();  // detailed error message
+    if(XHOST.vflag_control.flag("DIRECTORY_CLEAN")){  //CO20200624
+      msgstr << " [dir=" << XHOST.vflag_control.getattachedscheme("DIRECTORY_CLEAN") << "]";
+    }
     return msgstr.str();
   }
 
@@ -133,7 +136,7 @@ namespace aurostd {
 
 //****************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
-// *            Aflow MARCO ESTERS - Duke University 2018-2020               *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
+// *            Aflow MARCO ESTERS - Duke University 2018-2021               *
 // *                                                                         *
 //****************************************************************************

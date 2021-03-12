@@ -1,7 +1,7 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
-// *           Aflow COREY OSES - Duke University 2013-2020                  *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
+// *           Aflow COREY OSES - Duke University 2013-2021                  *
 // *                                                                         *
 // ***************************************************************************
 // Written by Corey Oses
@@ -37,6 +37,7 @@ const std::string LATEX_COLORS_TO_AVOID = "black,white,yellow,darkgray,gray,ligh
 //[CO20180819 - MOVED TO AFLOWRC]const bool IGNORE_BAD_DATABASE = true;        //skip bad entries
 const bool CORRECT_BAD_DATABASE = true;                                        //make minor corrections, carried over from apennsy (SC)
 const bool PRINT_DIST2HULL_COL_TEX = false;                                    //print Dist2hull column in tex, there's no need because it's not used for anything in the image
+const bool GET_DECOMPOSITION_POLYMORPHS = true;                                //print decomposition information for polymorphs
 
 // LATEX PRINTING MODES
 const char ADDPLOT_MODE_HULL_POINTS = 'P';
@@ -84,7 +85,7 @@ namespace chull {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
     ostream& oss = cout;
     ofstream FileMESSAGE;
-    string soliloquy = XPID + "chull::convexHull():";
+    string soliloquy=XPID+"chull::convexHull():";
     stringstream message;
     aurostd::xoption vpflow(_vpflow);
     string directory=getPath(vpflow,FileMESSAGE,oss);
@@ -127,13 +128,15 @@ namespace chull {
     usage_options.push_back("ANALYSIS OPTIONS:");
     usage_options.push_back("--distance_to_hull=|--distancetohull=|--distance2hull=|--dist2hull=|--d2h=aflow:bb0d45ab555bc208,aflow:fb9eaa58604ce774");
     usage_options.push_back("--stability_criterion=|--stabilitycriterion=|--stable_criterion=|--scriterion=|--sc=aflow:bb0d45ab555bc208,aflow:fb9eaa58604ce774");
+    usage_options.push_back("--n+1_enthalpy_gain=|--=|--n+1enthalpygain=|--n+1energygain=|--n+1egain=|--n1egain=|--n+1_enthalpygain=|--n+1+energygain=|--n+1_egain=aflow:bb0d45ab555bc208,aflow:fb9eaa58604ce774");
     usage_options.push_back("--hull_formation_enthalpy=|--hull_energy=0.25,0.25");
     usage_options.push_back("--skip_structure_comparison|--skipstructruecomparison|--skipstructcomp|--ssc");
     usage_options.push_back("--skip_stability_criterion_analysis|--skipstabilitycriterionanalysis|--skipscriterion|--sscriterion");
-    usage_options.push_back("--skip_n_plus_1_energy_gain_analysis|--skipnplus1energygainanalysis|--skipnplus1|--snp1|--snpo");
+    usage_options.push_back("--skip_n_plus_1_enthalpy_gain_analysis|--skip_n_plus_1_energy_gain_analysis|--skipnplus1enthalpygainanalysis|--skipnplus1energygainanalysis|--skipnplus1|--snp1|--snpo");
     usage_options.push_back("--include_skewed_hulls|--include_skewed|--ish");
     usage_options.push_back("--include_unreliable_hulls|--include_unreliable|--iuh");
     usage_options.push_back("--include_outliers|--io");
+    usage_options.push_back("--strict_outlier_analysis|--soa");
     usage_options.push_back("--include_ill_converged|--iic");
     usage_options.push_back("--force");
     usage_options.push_back(" ");
@@ -151,7 +154,7 @@ namespace chull {
     usage_options.push_back(" ");
     // output usage
     if(vpflow.flag("CHULL::USAGE")) {
-      if(!vpflow.flag("CHULL::SCREEN_ONLY")){init::ErrorOption(cout, "--usage", "CHULL()", usage_options);}
+      if(!vpflow.flag("CHULL::SCREEN_ONLY")){init::MessageOption( "--usage", "CHULL()", usage_options);}
       if(vpflow.flag("CHULL::SCREEN_ONLY")&&vpflow.flag("CHULL::JSON_DOC")){oss << "{}";} //so JSON-reader doesn't bomb
       return TRUE;
     }
@@ -235,7 +238,7 @@ namespace chull {
       message << "No input given for elements";
       pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
       //really drive the point home
-      if(!vpflow.flag("CHULL::SCREEN_ONLY")){init::ErrorOption(cout, "--alloy=" + vpflow.getattachedscheme("PFLOW::ALLOY"), "PFLOW()", usage_options);}
+      if(!vpflow.flag("CHULL::SCREEN_ONLY")){init::ErrorOption( "--alloy=" + vpflow.getattachedscheme("PFLOW::ALLOY"), "PFLOW()", usage_options);}
       if(vpflow.flag("CHULL::SCREEN_ONLY")&&vpflow.flag("CHULL::JSON_DOC")){oss << "{}";} //so JSON-reader doesn't bomb
       return FALSE;
     }
@@ -261,7 +264,7 @@ namespace chull {
       aurostd::xcombos xc(vsizes,'E');
       while(xc.increment()){
         velements=xc.applyCombo(vcomponents);
-        if(verbose_elimination){velements=pflow::stringElements2VectorElements(aurostd::joinWDelimiter(velements,""),FileMESSAGE,true,true,pp_string,false,oss);}  //fast way to eliminate pseudopotential information  //clean and sort, do not keep_pp  //CO20190712
+        if(verbose_elimination){velements=aurostd::getElements(aurostd::joinWDelimiter(velements,""),pp_string,FileMESSAGE,true,true,false,oss);}  //fast way to eliminate pseudopotential information  //clean and sort, do not keep_pp  //CO20190712
         //[CO20190712 - OBSOLETE]if(verbose_elimination){velements=pflow::getAlphabeticVectorString(aurostd::joinWDelimiter(velements,""),FileMESSAGE,oss);}  //fast way to eliminate pseudopotential information
         std::sort(velements.begin(),velements.end());
         original_input=aurostd::joinWDelimiter(velements,"");
@@ -277,7 +280,7 @@ namespace chull {
     } else {  //simple list mode
       aurostd::string2tokens(inputs, tokens_comma, ",");
       for(uint i=0,fl_size_i=tokens_comma.size();i<fl_size_i;i++){
-        velements=pflow::stringElements2VectorElements(tokens_comma[i],FileMESSAGE,true,true,pp_string,false,oss);  //clean and sort, do not keep_pp  //CO20190712
+        velements=aurostd::getElements(tokens_comma[i],pp_string,FileMESSAGE,true,true,false,oss);  //clean and sort, do not keep_pp  //CO20190712
         //[CO20190712 - OBSOLETE]velements=pflow::getAlphabeticVectorString(tokens_comma[i], FileMESSAGE,oss);
         nary=velements.size();
         original_input=aurostd::joinWDelimiter(velements,"");
@@ -314,6 +317,29 @@ namespace chull {
     //////////////////////////////////////////////////////////////////////////////
 
     //////////////////////////////////////////////////////////////////////////////
+    // START Adding --sc=XX to CHULL::NEGLECT if --output=web
+    //////////////////////////////////////////////////////////////////////////////
+    if(vpflow.flag("CHULL::STABILITY_CRITERION")&&vpflow.flag("CHULL::WEB_DOC")){
+      string sc_input=vpflow.getattachedscheme("CHULL::STABILITY_CRITERION");
+      if(vpflow.flag("CHULL::NEGLECT")){
+        string neglect=vpflow.getattachedscheme("CHULL::NEGLECT");
+        if(!neglect.empty()){neglect+=",";}
+        neglect+=sc_input;
+        vpflow.pop_attached("CHULL::NEGLECT");
+        vpflow.push_attached("CHULL::NEGLECT",neglect);
+        vpflow.flag("CHULL::NEGLECT",true); //repetita iuvant
+      }else{
+        vpflow.flag("CHULL::NEGLECT",true);
+        vpflow.push_attached("CHULL::NEGLECT",sc_input);
+      }
+      if(LDEBUG){cerr << soliloquy << " vpflow.getattachedscheme(\"CHULL::NEGLECT\")=" << vpflow.getattachedscheme("CHULL::NEGLECT") << endl;}
+    }
+    //////////////////////////////////////////////////////////////////////////////
+    // END Adding --sc=XX to CHULL::NEGLECT if --output=web
+    //////////////////////////////////////////////////////////////////////////////
+
+
+    //////////////////////////////////////////////////////////////////////////////
     // START Looping over hull inputs and creating desired output
     //////////////////////////////////////////////////////////////////////////////
     bool Krun=true;
@@ -322,7 +348,7 @@ namespace chull {
     for(uint i=0,fl_size_i=vinputs.size();i<fl_size_i;i++) {
       // go through each request
       // create log specific to that request
-      velements = pflow::stringElements2VectorElements(vinputs[i],FileMESSAGE,true,true,pp_string,false,oss); //clean and sort, do not keep_pp  //CO20190712
+      velements = aurostd::getElements(vinputs[i],pp_string,FileMESSAGE,true,true,false,oss); //clean and sort, do not keep_pp  //CO20190712
       //[CO20190712 - OBSOLETE]velements = pflow::getAlphabeticVectorString(vinputs[i], FileMESSAGE,oss);
       if(!velements.size()){
         message << "Invalid input (" << vinputs[i] << "), please capitalize element symbols";
@@ -331,6 +357,11 @@ namespace chull {
       }
       if(velements.size()<2){
         message << "Trivial input (" << vinputs[i] << "), enter binaries or higher";
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+        Krun=false;continue;/*return FALSE;*/
+      }
+      if(XHOST.vflag_control.flag("WWW")&&velements.size()>6){ //CO20200404 - new web flag
+        message << velements.size() << "-dimensional hulls cannot be calculated through the web portal (max=6D), please download the AFLOW binary";
         pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
         Krun=false;continue;/*return FALSE;*/
       }
@@ -448,8 +479,40 @@ namespace chull {
       ////////////////////////////////////////////////////////////////////////////
 
       //speed ups for command line options
-      if(vpflow.flag("CHULL::DIST2HULL") || vpflow.flag("CHULL::STABILITY_CRITERION") || vpflow.flag("CHULL::HULL_FORMATION_ENTHALPY")) {
+      if(vpflow.flag("CHULL::DIST2HULL") || vpflow.flag("CHULL::STABILITY_CRITERION") || vpflow.flag("CHULL::N+1_ENTHALPY_GAIN") || vpflow.flag("CHULL::HULL_FORMATION_ENTHALPY")) {
         vpflow.flag("CHULL::SKIP_THERMO_PROPERTIES_EXTRACTION",true);
+        message << "Skipping thermodynamic properties extraction";pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+      }
+
+      //skip calculating all of the lower dimensional hulls
+      //this works if you are finding the hull_energy somewhere in the middle of the hull
+      //the edges are problematic (lower dimensional hulls)
+      //so only skip calculating these hulls if you are calculating hull_energy of the ND hull
+      if(0){  //not actually faster, lower dimensional hulls reduce number of points in ND hull, tested 7D-hull: 45 mins vs. 1 hr
+        if(vpflow.flag("CHULL::HULL_FORMATION_ENTHALPY")){
+          vector<double> _coords;
+          aurostd::string2tokens<double>(vpflow.getattachedscheme("CHULL::HULL_FORMATION_ENTHALPY"), _coords, ",");
+          if(_coords.size()==velements.size()-1||_coords.size()==velements.size()){
+            bool at_edge=false;
+            double sum=0.0;
+            for(uint ia=0;ia<(velements.size()-1)&&ia<_coords.size();ia++){
+              if(abs(_coords[ia])<ZERO_COEF_TOL||abs(1.0-_coords[ia])<ZERO_COEF_TOL){at_edge=true;}
+              sum+=_coords[ia];
+            }
+            double coord_last=1.0-sum;
+            at_edge=(at_edge || (abs(coord_last)<ZERO_COEF_TOL||abs(1.0-coord_last)<ZERO_COEF_TOL));
+            if(LDEBUG){
+              cerr << soliloquy << " coords=" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(_coords,4),",") << endl;
+              cerr << soliloquy << " sum=" << sum << endl;
+              cerr << soliloquy << " coord_last=" << coord_last << endl;
+              cerr << soliloquy << " at_edge=" << at_edge << endl;
+            }
+            if(at_edge==false){
+              vpflow.flag("CHULL::CALCULATE_HIGHEST_DIMENSION_ONLY",true);
+              message << "Calculating the highest dimensional hull ONLY";pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+            }
+          }
+        }
       }
 
       ////////////////////////////////////////////////////////////////////////////
@@ -559,7 +622,7 @@ namespace chull {
       ////////////////////////////////////////////////////////////////////////////
       // START Stability criterion calculation
       ////////////////////////////////////////////////////////////////////////////
-      if(vpflow.flag("CHULL::STABILITY_CRITERION")) {
+      if(vpflow.flag("CHULL::STABILITY_CRITERION")&&(!vpflow.flag("CHULL::WEB_DOC"))) { //CO20210201 - chull-web SS plotter
         message << "Starting stable criterion calculation of " << vpflow.getattachedscheme("CHULL::STABILITY_CRITERION");
         message << " on " << vinputs[i] << " hull";
         pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
@@ -621,6 +684,70 @@ namespace chull {
       ////////////////////////////////////////////////////////////////////////////
 
       ////////////////////////////////////////////////////////////////////////////
+      // START N+1 enthalpy gain calculation
+      ////////////////////////////////////////////////////////////////////////////
+      if(vpflow.flag("CHULL::N+1_ENTHALPY_GAIN")) {
+        message << "Starting N+1 enthalpy gain calculation of " << vpflow.getattachedscheme("CHULL::N+1_ENTHALPY_GAIN");
+        message << " on " << vinputs[i] << " hull";
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+        vector<string> vauid;
+        aurostd::string2tokens(vpflow.getattachedscheme("CHULL::N+1_ENTHALPY_GAIN"), vauid, ",");
+        vector<double> vn1egain;
+        //NB: to anyone who is using the convex hull object
+        //outside of declaration/initialization, all functions should be wrapped
+        //in try/catch's to avoid hard exits
+        //proceed otherwise at your own risk
+        try{vn1egain=hull.getNPlus1EnthalpyGain(vauid);}
+        catch(aurostd::xerror& err){
+          pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+          if(vpflow.flag("CHULL::LOG")) {FileMESSAGE.close();}
+          if(vpflow.flag("CHULL::SCREEN_ONLY")&&vpflow.flag("CHULL::JSON_DOC")){oss << "{}";} //so JSON-reader doesn't bomb
+          return false;
+        }
+
+        ////set correct sign convention
+        ////since this SHOULD be a negative distance (outside hull), we will negate for formation_energy_hull
+        //for (uint ia = 0; ia < vauid.size(); ia++) {
+        //  if(!vpflow.flag("CHULL::ENTROPIC_TEMPERATURE")) {vn1egain[ia]=-vn1egain[ia];}
+        //}
+
+        for(uint ia=0,fl_size_ia=vauid.size();ia<fl_size_ia;ia++) {
+          if(!vpflow.flag("CHULL::ENTROPIC_TEMPERATURE")) {message << vauid[ia] << " n+1_enthalpy_gain = " << chull::convertUnits(vn1egain[ia], _m_) << " (meV/atom)";}
+          else {message << vauid[ia] << " n+1_enthalpy_gain = " << vn1egain[ia] << " (K)";}
+          if(std::signbit(vn1egain[ia])) {
+            message << ", may NOT be on the hull (negative value)";
+            pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
+          } else {pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_COMPLETE_);}
+        }
+
+        if(vpflow.flag("CHULL::SCREEN_ONLY")){
+          if(vpflow.flag("CHULL::TEXT_DOC")){
+            for(uint ia=0,fl_size_ia=vauid.size();ia<fl_size_ia;ia++) {
+              message << vauid[ia] << ": " << chull::convertUnits(vn1egain[ia], (!vpflow.flag("CHULL::ENTROPIC_TEMPERATURE")?_m_:_std_)) << endl;
+            }
+            oss << message.str();
+          } else if(vpflow.flag("CHULL::JSON_DOC")){
+            vector<string> vmes;
+            stringstream dummy;
+            for(uint ia=0,fl_size_ia=vauid.size();ia<fl_size_ia;ia++) {
+              dummy << "\"" <<vauid[ia] << "\":" << chull::convertUnits(vn1egain[ia], (!vpflow.flag("CHULL::ENTROPIC_TEMPERATURE")?_m_:_std_));
+              vmes.push_back(dummy.str()); dummy.str("");
+            }
+            oss << aurostd::wrapString(aurostd::joinWDelimiter(vmes,","),"{","}");
+          } else { //.log only, but obsolete now anyway since it defaults to json
+            message << "Unknown print option, only --print=text or --print=json available";
+            pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+            if(vpflow.flag("CHULL::LOG")) {FileMESSAGE.close();}
+            Krun=false;continue;/*return FALSE;*/
+          }
+        }
+        continue;
+      }
+      ////////////////////////////////////////////////////////////////////////////
+      // END N+1 enthalpy gain calculation
+      ////////////////////////////////////////////////////////////////////////////
+
+      ////////////////////////////////////////////////////////////////////////////
       // START Hull formation enthalpy calculation
       ////////////////////////////////////////////////////////////////////////////
       if(vpflow.flag("CHULL::HULL_FORMATION_ENTHALPY")) {
@@ -632,7 +759,7 @@ namespace chull {
         aurostd::string2tokens<double>(vpflow.getattachedscheme("CHULL::HULL_FORMATION_ENTHALPY"), _coords, ",");
         for(uint j=0,fl_size_j=_coords.size();j<fl_size_j&&j<dimension;j++){coords[j+coords.lrows]=_coords[j];}
         if(LDEBUG) {cerr << soliloquy << " coords=" << coords << endl;}
-        double dist2hull;
+        double dist2hull=0.0;
         //NB: to anyone who is using the convex hull object
         //outside of declaration/initialization, all functions should be wrapped
         //in try/catch's to avoid hard exits
@@ -720,7 +847,7 @@ namespace chull {
     return getPath(vpflow, FileMESSAGE, oss, silent);
   }
   string getPath(const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& oss, bool silent) {  // main function
-    string soliloquy = XPID + "chull::getPath():";
+    string soliloquy=XPID+"chull::getPath():";
     stringstream message;
     if(!vpflow.flag("CHULL::PATH")) {
       string pwd = getPath();
@@ -742,7 +869,7 @@ namespace chull {
     return getPath(_path, FileMESSAGE, oss, silent);
   }
   string getPath(string _path, ofstream& FileMESSAGE, ostream& oss, bool silent) {  // main function
-    string soliloquy = XPID + "chull::getPath():";
+    string soliloquy=XPID+"chull::getPath():";
     stringstream message;
     string pwd = getPath(false);
     string home = XHOST.home; //aurostd::execute2string(XHOST.command("echo") + " $HOME");
@@ -800,7 +927,7 @@ namespace chull {
     flagCheck(vpflow, velements, FileMESSAGE, oss, silent);
   }
   void flagCheck(aurostd::xoption& vpflow, const vector<string>& velements, ofstream& FileMESSAGE, ostream& oss, bool silent) {  // main function
-    string soliloquy = XPID + "chull::flagCheck():";
+    string soliloquy=XPID+"chull::flagCheck():";
     stringstream message;
     string directory=getPath(vpflow,FileMESSAGE,oss);
     _aflags aflags; aflags.Directory=directory;
@@ -880,8 +1007,8 @@ namespace chull {
     if(vpflow.flag("CHULL::SEE_NEGLECT")) {
       pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::SEE_NEGLECT set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
     }
-    if(vpflow.flag("CHULL::NPLUS1_ENTHALPY_GAIN")) { //SK20200327
-      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::NPLUS1_ENTHALPY_GAIN set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent); 
+    if(vpflow.flag("CHULL::CALCULATE_FAKE_HULL_N+1_ENTHALPY_GAIN")) { //SK20200327
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::CALCULATE_FAKE_HULL_N+1_ENTHALPY_GAIN set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent); 
     }
     if(vpflow.flag("CHULL::REMOVE_EXTREMA")) {
       pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::REMOVE_EXTREMA set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
@@ -907,8 +1034,8 @@ namespace chull {
     if(vpflow.flag("CHULL::SKIP_STABILITY_CRITERION_ANALYSIS")) {
       pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::SKIP_STABILITY_CRITERION_ANALYSIS set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
     }
-    if(vpflow.flag("CHULL::SKIP_N_PLUS_1_ENERGY_GAIN_ANALYSIS")) {
-      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::SKIP_N_PLUS_1_ENERGY_GAIN_ANALYSIS set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
+    if(vpflow.flag("CHULL::SKIP_N+1_ENTHALPY_GAIN_ANALYSIS")) {
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::SKIP_N+1_ENTHALPY_GAIN_ANALYSIS set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
     }
     if(vpflow.flag("CHULL::INCLUDE_SKEWED_HULLS")) {
       pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::INCLUDE_SKEWED_HULLS set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
@@ -919,8 +1046,14 @@ namespace chull {
     if(vpflow.flag("CHULL::INCLUDE_OUTLIERS")) {
       pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::INCLUDE_OUTLIERS set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
     }
+    if(vpflow.flag("CHULL::STRICT_OUTLIER_ANALYSIS")) {
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::STRICT_OUTLIER_ANALYSIS set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
+    }
     if(vpflow.flag("CHULL::INCLUDE_ILL_CONVERGED")) {
       pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::INCLUDE_ILL_CONVERGED set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
+    }
+    if(vpflow.flag("CHULL::CALCULATE_HIGHEST_DIMENSION_ONLY")) {
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::CALCULATE_HIGHEST_DIMENSION_ONLY set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
     }
     if(vpflow.flag("FORCE")) {
       pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::FORCE set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
@@ -955,7 +1088,7 @@ namespace chull {
 //    return calculateStabilityCriterion(vpflow,velements,scriterion,FileMESSAGE,oss);
 //  }
 //  bool calculateStabilityCriterion(const aurostd::xoption& vpflow,const vector<string>& velements,double& scriterion,ofstream& FileMESSAGE,ostream& oss){
-//    string soliloquy = XPID + "chull::calculateStabilityCriterion():";
+//    string soliloquy=XPID+"chull::calculateStabilityCriterion():";
 //    stringstream message;
 //    if(!vpflow.flag("CHULL::NEGLECT")) {
 //      pflow::logger(_AFLOW_FILE_NAME_,soliloquy,"CHULL::NEGLECT not set",FileMESSAGE,oss,_LOGGER_ERROR_);
@@ -987,7 +1120,7 @@ namespace chull {
 //    return calculateStabilityCriterion(vpflow,velements,vscriterion,FileMESSAGE,oss);
 //  }
 //  bool calculateStabilityCriterion(const aurostd::xoption& vpflow,const vector<string>& velements,vector<double>& vscriterion,ofstream& FileMESSAGE,ostream& oss){
-//    string soliloquy = XPID + "chull::calculateStabilityCriterion():";
+//    string soliloquy=XPID+"chull::calculateStabilityCriterion():";
 //    stringstream message;
 //    if(!vpflow.flag("CHULL::NEGLECT")) {
 //      pflow::logger(_AFLOW_FILE_NAME_,soliloquy,"CHULL::NEGLECT not set",FileMESSAGE,oss,_LOGGER_ERROR_);
@@ -1003,7 +1136,7 @@ namespace chull {
 //  }
 //  bool calculateStabilityCriterion(const aurostd::xoption& vpflow,const vector<string>& velements,const vector<string>& vauid,vector<double>& vscriterion,ofstream& FileMESSAGE,ostream& oss) {
 //    bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-//    string soliloquy = XPID + "chull::calculateStabilityCriterion():";
+//    string soliloquy=XPID+"chull::calculateStabilityCriterion():";
 //    stringstream message;
 //    
 //    //don't only remove vauid, but also equivalent gstates
@@ -1126,20 +1259,42 @@ namespace chull {
   double H_f_atom(const ChullPoint& point, char units) {
     if(point.m_has_entry){return H_f_atom(point.m_entry,units);}
     if(point.m_formation_energy_coord){return convertUnits(point.getLastCoord(),units);}
-    string soliloquy = XPID + "chull::H_f_atom():";
+    string soliloquy=XPID+"chull::H_f_atom():";
     throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No formation energy available for ChullPoint",_INPUT_ILLEGAL_);
     return AUROSTD_NAN;
   }
-  double H_f_atom(const aflowlib::_aflowlib_entry& entry, char units){return convertUnits(entry.enthalpy_formation_atom,units);}
-  double T_S(const ChullPoint& point){
-    if(point.m_has_entry){return T_S(point.m_entry);}
-    return AUROSTD_NAN;
+  double H_f_atom(const aflowlib::_aflowlib_entry& entry, char units){
+    double d_tmp=entry.enthalpyFormationAtom(0);  //entry.enthalpy_formation_atom - ADDING CCE @ 0K
+    if(d_tmp==AUROSTD_NAN){return AUROSTD_NAN;}
+    return convertUnits(d_tmp,units);
   }
-  double T_S(const aflowlib::_aflowlib_entry& entry){return entry.entropic_temperature;}
-  double isoMaxLatentHeat(const ChullPoint& point, double x, char units){return isoMaxLatentHeat(point.m_entry,x,units);}
+  double T_S(const ChullPoint& point){
+    if(!point.m_has_entry){return AUROSTD_NAN;}
+    return T_S(point.m_entry);
+  }
+  double T_S(const aflowlib::_aflowlib_entry& entry){
+    double d_tmp=entry.entropic_temperature;
+    if(d_tmp==AUROSTD_NAN){return AUROSTD_NAN;}
+    return d_tmp;
+  }
+  double EFA(const ChullPoint& point, char units){
+    if(!point.m_has_entry){return AUROSTD_NAN;}
+    return EFA(point.m_entry,units);
+  }
+  double EFA(const aflowlib::_aflowlib_entry& entry, char units){
+    double d_tmp=entry.entropy_forming_ability;
+    if(d_tmp==AUROSTD_NAN){return AUROSTD_NAN;}
+    return convertUnits(d_tmp,units);
+  }
+  double isoMaxLatentHeat(const ChullPoint& point, double x, char units){
+    if(!point.m_has_entry){return AUROSTD_NAN;}
+    return isoMaxLatentHeat(point.m_entry,x,units);
+  }
   double isoMaxLatentHeat(const aflowlib::_aflowlib_entry& entry, double x, char units){
-    double iso_max=((double)KBOLTZEV)*T_S(entry)*(x*log(x)+(1.0-x)*log(1.0-x));
-    return convertUnits(iso_max,units);
+    if(T_S(entry)==AUROSTD_NAN){return AUROSTD_NAN;}
+    if(x<=0||x>=1.0){return AUROSTD_NAN;} //protect log()
+    double d_tmp=((double)KBOLTZEV)*T_S(entry)*(x*log(x)+(1.0-x)*log(1.0-x));
+    return convertUnits(d_tmp,units);
   }
 
   int roundDouble(double doub, int multiple, bool up) {
@@ -1176,7 +1331,7 @@ namespace chull {
 
   bool subspaceBelongs(const xvector<int>& space,const xvector<int>& subspace){
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "chull::subspaceBelongs():";
+    string soliloquy=XPID+"chull::subspaceBelongs():";
     if(LDEBUG) {
       cerr << soliloquy << " space=" << space << endl;
       cerr << soliloquy << " subspace=" << subspace << endl;
@@ -1222,18 +1377,72 @@ namespace chull {
 
 namespace chull {
   //--------------------------------------------------------------------------------
+  // class ChullPointLight
+  //--------------------------------------------------------------------------------
+  //--------------------------------------------------------------------------------
+  // constructor
+  //--------------------------------------------------------------------------------
+  ChullPointLight::ChullPointLight(ostream& oss) : xStream(oss),m_initialized(false) {;}
+  ChullPointLight::ChullPointLight(ofstream& FileMESSAGE,ostream& oss) : xStream(FileMESSAGE,oss),m_initialized(false) {;}
+  ChullPointLight::ChullPointLight(const ChullPointLight& b) : xStream(*b.getOFStream(),*b.getOSS()) {copy(b);} // copy PUBLIC  //upcasting is allowed, works for ChullPointLight and ChullPoint
+
+  ChullPointLight::~ChullPointLight() {xStream::free();free();}
+
+  const ChullPointLight& ChullPointLight::operator=(const ChullPointLight& other) { //upcasting is allowed, works for ChullPointLight and ChullPoint
+    if(this!=&other) {copy(other);}
+    return *this;
+  }
+  bool ChullPointLight::operator<(const ChullPointLight& other) const {
+    //NB: this is ALWAYS sorted in descending order of stoich, no need to make options for ascending order
+    //but, sorts in ascending order for energy
+    string soliloquy=XPID+"ChullPointLight::operator<():";
+    if(m_coords.lrows!=other.m_coords.lrows){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_coords.lrows!=other.m_coords.lrows");}
+    if(m_coords.rows!=other.m_coords.rows){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_coords.rows!=other.m_coords.rows");}
+    for(int i=m_coords.lrows;i<=m_coords.urows;i++){if(m_coords[i]!=other.m_coords[i]){return (m_coords[i]<other.m_coords[i]);}}
+    return false;
+  }
+
+  void ChullPointLight::clear() {free();}  //clear PUBLIC
+  void ChullPointLight::free() {
+    m_initialized=false;
+    m_coords.clear();
+    m_has_stoich_coords=false;
+    m_formation_energy_coord=false;
+    m_is_artificial=false;
+    m_has_entry=false;
+    m_i_nary=AUROSTD_MAX_UINT;
+    m_i_alloy=AUROSTD_MAX_UINT;
+    h_coords.clear();
+  }
+
+  void ChullPointLight::copy(const ChullPointLight& b) {  //copy PRIVATE  //upcasting is allowed, works for ChullPointLight and ChullPoint
+    xStream::copy(b);
+    m_initialized=b.m_initialized;
+    m_coords=b.m_coords;
+    m_has_stoich_coords=b.m_has_stoich_coords;
+    m_formation_energy_coord=b.m_formation_energy_coord;
+    m_is_artificial=b.m_is_artificial;
+    m_has_entry=b.m_has_entry;
+    m_i_nary=b.m_i_nary;
+    m_i_alloy=b.m_i_alloy;
+    h_coords=b.h_coords;
+  }
+
+  double ChullPointLight::getLastCoord() const {return m_coords[m_coords.urows];}
+
+  //--------------------------------------------------------------------------------
   // class ChullPoint
   //--------------------------------------------------------------------------------
   //--------------------------------------------------------------------------------
   // constructor
   //--------------------------------------------------------------------------------
-  ChullPoint::ChullPoint(ostream& oss,bool has_stoich_coords,bool formation_energy_coord,bool is_artificial) : xStream(oss),m_initialized(false) {initialize(has_stoich_coords,formation_energy_coord,is_artificial);}
-  ChullPoint::ChullPoint(const xvector<double>& coord,ostream& oss,bool has_stoich_coords,bool formation_energy_coord,bool is_artificial) : xStream(oss),m_initialized(false) {initialize(coord,has_stoich_coords,formation_energy_coord,is_artificial);}
-  ChullPoint::ChullPoint(const vector<string>& velements,const aflowlib::_aflowlib_entry& entry,ostream& oss,bool formation_energy_coord) : xStream(oss),m_initialized(false) {initialize(velements,entry,formation_energy_coord);}
-  ChullPoint::ChullPoint(ofstream& FileMESSAGE,ostream& oss,bool has_stoich_coords,bool formation_energy_coord,bool is_artificial) : xStream(FileMESSAGE,oss),m_initialized(false) {initialize(has_stoich_coords,formation_energy_coord,is_artificial);}
-  ChullPoint::ChullPoint(const xvector<double>& coord,ofstream& FileMESSAGE,ostream& oss,bool has_stoich_coords,bool formation_energy_coord,bool is_artificial) : xStream(FileMESSAGE,oss),m_initialized(false) {initialize(coord,has_stoich_coords,formation_energy_coord,is_artificial);}
-  ChullPoint::ChullPoint(const vector<string>& velements,const aflowlib::_aflowlib_entry& entry,ofstream& FileMESSAGE,ostream& oss,bool formation_energy_coord) : xStream(FileMESSAGE,oss),m_initialized(false) {initialize(velements,entry,formation_energy_coord);}
-  ChullPoint::ChullPoint(const ChullPoint& b) : xStream(*b.getOFStream(),*b.getOSS()) {copy(b);} // copy PUBLIC
+  ChullPoint::ChullPoint(ostream& oss,bool has_stoich_coords,bool formation_energy_coord,bool is_artificial) : ChullPointLight(oss) {initialize(has_stoich_coords,formation_energy_coord,is_artificial);}
+  ChullPoint::ChullPoint(const xvector<double>& coord,ostream& oss,bool has_stoich_coords,bool formation_energy_coord,bool is_artificial) : ChullPointLight(oss) {initialize(coord,has_stoich_coords,formation_energy_coord,is_artificial);}
+  ChullPoint::ChullPoint(const vector<string>& velements,const aflowlib::_aflowlib_entry& entry,ostream& oss,bool formation_energy_coord) : ChullPointLight(oss) {initialize(velements,entry,formation_energy_coord);}
+  ChullPoint::ChullPoint(ofstream& FileMESSAGE,ostream& oss,bool has_stoich_coords,bool formation_energy_coord,bool is_artificial) : ChullPointLight(FileMESSAGE,oss) {initialize(has_stoich_coords,formation_energy_coord,is_artificial);}
+  ChullPoint::ChullPoint(const xvector<double>& coord,ofstream& FileMESSAGE,ostream& oss,bool has_stoich_coords,bool formation_energy_coord,bool is_artificial) : ChullPointLight(FileMESSAGE,oss) {initialize(coord,has_stoich_coords,formation_energy_coord,is_artificial);}
+  ChullPoint::ChullPoint(const vector<string>& velements,const aflowlib::_aflowlib_entry& entry,ofstream& FileMESSAGE,ostream& oss,bool formation_energy_coord) : ChullPointLight(FileMESSAGE,oss) {initialize(velements,entry,formation_energy_coord);}
+  ChullPoint::ChullPoint(const ChullPoint& b) : xStream(*b.getOFStream(),*b.getOSS()),ChullPointLight(b) {copy(b);} // copy PUBLIC
 
   ChullPoint::~ChullPoint() {xStream::free();free();}
 
@@ -1242,16 +1451,20 @@ namespace chull {
     return *this;
   }
 
-  void ChullPoint::HullCopy(const ChullPoint& b){ //copies ALL chull stuff, no entry data
-    xStream::copy(b);
-    m_initialized=b.m_initialized;
-    m_coords=b.m_coords;
-    m_has_stoich_coords=b.m_has_stoich_coords;
-    m_has_entry=b.m_has_entry;
-    m_formation_energy_coord=b.m_formation_energy_coord;
-    m_is_artificial=b.m_is_artificial;
-    m_i_nary=b.m_i_nary;
-    m_i_alloy=b.m_i_alloy;
+  void ChullPoint::clear() {free();}  //clear PUBLIC
+  void ChullPoint::free() {
+    ChullPointLight::free();
+    m_entry.clear(); if(m_entry.vsg.size()==0){m_entry.vsg.push_back(NOSG);} if(m_entry.vsg2.size()==0){m_entry.vsg2.push_back(NOSG);}  //hack so it doesn't break with front(),back(),[0]
+    s_coords.clear();
+    c_coords.clear();
+    m_elements_present.clear();
+    cleanPointForHullTransfer();
+  }
+
+  void ChullPoint::copy(const ChullPoint& b) {  //copy PRIVATE
+    //xStream::copy(b); //done inside ChullPointLight::copy()
+    ChullPointLight::copy(b);
+    m_entry=b.m_entry; if(m_entry.vsg.size()==0){m_entry.vsg.push_back(NOSG);} if(m_entry.vsg2.size()==0){m_entry.vsg2.push_back(NOSG);}  //hack so it doesn't break with front(),back(),[0]
     m_i_coord_group=b.m_i_coord_group;
     s_coords=b.s_coords;
     c_coords=b.c_coords;
@@ -1263,49 +1476,8 @@ namespace chull {
     m_dist_2_hull=b.m_dist_2_hull;
     //[OBSOLETE - reduce by frac_vrt always! so use coord_group values]m_decomp_coefs=b.m_decomp_coefs;
     m_stability_criterion=b.m_stability_criterion;
-    m_n_plus_1_energy_gain=b.m_n_plus_1_energy_gain;
-    h_coords=b.h_coords;
+    m_n_plus_1_enthalpy_gain=b.m_n_plus_1_enthalpy_gain;
   }
-
-  bool ChullPoint::operator<(const ChullPoint& other) const {
-    //NB: this is ALWAYS sorted in descending order of stoich, no need to make options for ascending order
-    //but, sorts in ascending order for energy
-    string soliloquy = XPID + "ChullPoint::operator<():";
-    if(m_coords.lrows!=other.m_coords.lrows){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_coords.lrows!=other.m_coords.lrows");}
-    if(m_coords.rows!=other.m_coords.rows){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_coords.rows!=other.m_coords.rows");}
-    for(int i=m_coords.lrows;i<=m_coords.urows;i++){if(m_coords[i]!=other.m_coords[i]){return (m_coords[i]<other.m_coords[i]);}}
-    return false;
-  }
-
-  void ChullPoint::clear() {ChullPoint a;copy(a);}  //clear PUBLIC
-  void ChullPoint::free() {
-    m_initialized=false;
-    m_coords.clear();
-    m_has_stoich_coords=false;
-    m_entry.clear(); if(m_entry.vsg.size()==0){m_entry.vsg.push_back(NOSG);} if(m_entry.vsg2.size()==0){m_entry.vsg2.push_back(NOSG);}  //hack so it doesn't break with front(),back(),[0]
-    m_has_entry=false;
-    m_formation_energy_coord=false;
-    m_is_artificial=false;
-    m_i_nary=AUROSTD_MAX_UINT;
-    s_coords.clear();
-    c_coords.clear();
-    m_elements_present.clear();
-    //see xStream::free()
-    //p_oss=NULL;
-    //p_FileMESSAGE=NULL;
-    //f_new_ofstream=false;
-    cleanPointForHullTransfer();
-  }
-
-  void ChullPoint::copy(const ChullPoint& b) {  //copy PRIVATE
-    HullCopy(b);  //copies ALL chull stuff, no entry data
-    m_entry=b.m_entry; if(m_entry.vsg.size()==0){m_entry.vsg.push_back(NOSG);} if(m_entry.vsg2.size()==0){m_entry.vsg2.push_back(NOSG);}  //hack so it doesn't break with front(),back(),[0]
-  }
-
-  //MOVED TO xStream
-  //void ChullPoint::setOFStream(ofstream& FileMESSAGE){p_FileMESSAGE=&FileMESSAGE;}
-  //void ChullPoint::setOSS(ostream& oss) {p_oss=&oss;}
-
 
   bool ChullPoint::initialize(ostream& oss,bool has_stoich_coords,bool formation_energy_coord,bool is_artificial) {
     xStream::initialize(oss);
@@ -1377,31 +1549,42 @@ namespace chull {
   //use hard cutoff here
   bool ChullPoint::isWithinHalfHull(bool lower_hull) const {return (lower_hull ? lessEqualZero(getLastCoord()) : greaterEqualZero(getLastCoord()) );}
 
-  bool ChullPoint::isGState() const{
-    string soliloquy = XPID + "ChullPoint::isGState():";
+  bool ChullPoint::isGState() const {
+    string soliloquy=XPID+"ChullPoint::isGState():";
     if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized point");}
     return m_is_on_hull || m_is_g_state || m_is_equivalent_g_state;
   }
 
-  xvector<double> ChullPoint::getStoichiometricCoords() const{
-    xvector<double> r_coords(m_coords.rows-1);
+  xvector<double> ChullPoint::getStoichiometricCoords() const {
+    bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
+    string soliloquy=XPID+"ChullPoint::getStoichiometricCoords():";
+    if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
+    if(m_coords.rows==1){ //trivial unary hull
+      if(LDEBUG){cerr << soliloquy << " m_coords.rows==1: generating null xvector" << endl;}
+      if(!isUnary()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Found non-unary point on unary hull",_INPUT_UNKNOWN_);}
+      xvector<double> r_coords=aurostd::null_xv<double>(); //get null vector //(m_coords.lrows,m_coords.lrows);  //just return vector length 1 with 0 inside
+      if(LDEBUG){cerr << soliloquy << " r_coords=" << r_coords << endl;}
+      return r_coords;
+    }
+    xvector<double> r_coords(m_coords.lrows,m_coords.urows-1);
     for(int i=m_coords.lrows;i<=m_coords.urows-1;i++){r_coords[i]=m_coords[i];}
+    if(LDEBUG){cerr << soliloquy << " r_coords=" << r_coords << endl;}
     return r_coords;
   }
 
-  xvector<double> ChullPoint::getTruncatedReducedCoords(const xvector<int>& elements_present,vector_reduction_type vred) const{
-    string soliloquy = XPID + "ChullPoint::getTruncatedCoords():";
+  xvector<double> ChullPoint::getTruncatedReducedCoords(const xvector<int>& elements_present,vector_reduction_type vred) const {
+    string soliloquy=XPID+"ChullPoint::getTruncatedReducedCoords():";
     if(vred==frac_vrt || vred==no_vrt){return getTruncatedSCoords(elements_present);}
     else if(vred==gcd_vrt){return getTruncatedCCoords(elements_present,true);}
     else {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown reduce mode",_INPUT_UNKNOWN_);}
     xvector<double> out;return out;
   }
 
-  xvector<double> ChullPoint::getTruncatedCoords(const xvector<double>& coords,const xvector<int>& elements_present) const{
-    string soliloquy = XPID + "ChullPoint::getTruncatedCoords():";
+  xvector<double> getTruncatedCoords(const xvector<double>& coords,const xvector<int>& elements_present) {
+    string soliloquy=XPID+"chull::getTruncatedCoords():";
     if(coords.rows!=elements_present.rows){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Reduction invalid, coords mismatch");}
     uint h_dim=sum(elements_present);
-    xvector<double> red_coords(h_dim);
+    xvector<double> red_coords(coords.lrows,coords.lrows+h_dim-1);
     vector<uint> relevant_indices=getRelevantIndices(elements_present);
     for(uint i=0,fl_size_i=relevant_indices.size();i<fl_size_i;i++){red_coords[i+red_coords.lrows]=coords[relevant_indices[i]];}
     return red_coords;
@@ -1409,7 +1592,7 @@ namespace chull {
 
   xvector<double> ChullPoint::getTruncatedSCoords(const xvector<int>& elements_present) const {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ChullPoint::getTruncatedSCoords():";
+    string soliloquy=XPID+"ChullPoint::getTruncatedSCoords():";
     if(!m_has_stoich_coords){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Non-stoich coordinates");}
     xvector<double> coords=getTruncatedCoords(s_coords,elements_present);
     if(LDEBUG) {cerr << soliloquy << " truncated stoich for " << s_coords << " is " << coords << " (elements_present=" << elements_present << ")" << endl;}
@@ -1418,7 +1601,7 @@ namespace chull {
 
   xvector<double> ChullPoint::getTruncatedCCoords(const xvector<int>& elements_present,bool reduce) const {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ChullPoint::getTruncatedCCoords():";
+    string soliloquy=XPID+"ChullPoint::getTruncatedCCoords():";
     if(!m_has_stoich_coords){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Non-stoich coordinates");}
     xvector<double> coords=getTruncatedCoords(c_coords,elements_present);
     //DX20191125 [OBSOLETE] if(reduce){coords=aurostd::reduceByGCD(coords);}
@@ -1432,7 +1615,7 @@ namespace chull {
 
   xvector<double> ChullPoint::getReducedCCoords() const {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ChullPoint::getReducedCCoords():";
+    string soliloquy=XPID+"ChullPoint::getReducedCCoords():";
     if(!m_has_stoich_coords){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Non-stoich coordinates");}
     xvector<double> coords; aurostd::reduceByGCD(c_coords,coords,ZERO_TOL); //DX20191125 - new form of function
     if(LDEBUG) {cerr << soliloquy << " reduced comp for " << c_coords << " is " << coords << endl;}
@@ -1440,11 +1623,13 @@ namespace chull {
   }
 
   uint ChullPoint::loadXstructures(bool relaxed_only) {  //load relaxed only
+    if(m_entry.prototype.find("POCC")!=string::npos){return false;} //POCC entries have no composition
     if(!pflow::loadXstructures(m_entry,*p_FileMESSAGE,*p_oss,relaxed_only)){return false;}
     return m_entry.vstr.size();
   }
 
   bool ChullPoint::getMostRelaxedXstructure(xstructure& xstr) const { //this is const!
+    if(m_entry.prototype.find("POCC")!=string::npos){return false;} //POCC entries have no composition
     aflowlib::_aflowlib_entry entry; entry.auid=m_entry.auid; entry.aurl=m_entry.aurl;  //fast copy
     if(!pflow::loadXstructures(entry,*p_FileMESSAGE,*p_oss,true)){return false;}
     if(entry.vstr.size()==1){xstr=entry.vstr[0]; return true;}
@@ -1452,24 +1637,26 @@ namespace chull {
   }
 
   //small get()'s of fundamental types get copies, otherwise const&
-  double ChullPoint::getLastCoord() const {return m_coords[m_coords.urows];}
   uint ChullPoint::getDim() const {return m_coords.rows;}
   bool ChullPoint::isUnary() const {return m_i_nary==0;}
   double ChullPoint::getFormationEnthalpy() const {return H_f_atom(*this,_std_);} //m_entry.enthalpy_formation_atom;
   double ChullPoint::getEntropicTemperature() const {return T_S(*this);} //m_entry.entropic_temperature;
+  double ChullPoint::getEntropyFormingAbility() const {return EFA(*this,_std_);} //m_entry.entropic_temperature;
   const vector<string>& ChullPoint::getVSG() const {return m_entry.vsg2;}
   const string& ChullPoint::getSG() const {return getVSG().back();}  //tight tolerance fine!  //vsg === LOOSE //vsg2 === TIGHT // doesn't make sense
   double ChullPoint::getDist2Hull(char units) const {
+    if(m_dist_2_hull==AUROSTD_MAX_DOUBLE){return AUROSTD_MAX_DOUBLE;}
     if(m_formation_energy_coord){return convertUnits(m_dist_2_hull,units);}
     else {return m_dist_2_hull;}  //no unit conversions coded yet here
   }
   double ChullPoint::getStabilityCriterion(char units) const {
+    if(m_stability_criterion==AUROSTD_MAX_DOUBLE){return AUROSTD_MAX_DOUBLE;}
     if(m_formation_energy_coord){return convertUnits(m_stability_criterion,units);}
     else {return m_stability_criterion;}  //no unit conversions coded yet here
   }
   double ChullPoint::getRelativeStabilityCriterion() const {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ChullPoint::getRelativeStabilityCriterion():";
+    string soliloquy=XPID+"ChullPoint::getRelativeStabilityCriterion():";
     if(m_stability_criterion==AUROSTD_MAX_DOUBLE){return AUROSTD_MAX_DOUBLE;}
     if(aurostd::identical(getLastCoord(),0.0,ZERO_TOL)){return 0.0;}
     if(LDEBUG) {
@@ -1478,9 +1665,22 @@ namespace chull {
     }
     return abs(m_stability_criterion/getLastCoord()); //abs() because they are generally opposite signs //delivers as decimal, show as percentage
   }
-  double ChullPoint::getNPlus1EnergyGain(char units) const {
-    if(m_formation_energy_coord){return convertUnits(m_n_plus_1_energy_gain,units);}
-    else {return m_n_plus_1_energy_gain;}  //no unit conversions coded yet here
+  double ChullPoint::getNPlus1EnthalpyGain(char units) const {
+    if(m_n_plus_1_enthalpy_gain==AUROSTD_MAX_DOUBLE){return AUROSTD_MAX_DOUBLE;}
+    if(m_formation_energy_coord){return convertUnits(m_n_plus_1_enthalpy_gain,units);}
+    else {return m_n_plus_1_enthalpy_gain;}  //no unit conversions coded yet here
+  }
+  double ChullPoint::getEntropyStabilizationCoefficient(char units) const {
+    bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
+    string soliloquy=XPID+"ChullPoint::getEntropyStabilizationCoefficient():";
+    if(getDist2Hull()==AUROSTD_MAX_DOUBLE){return AUROSTD_MAX_DOUBLE;}
+    if(getEntropyFormingAbility()==AUROSTD_NAN){return AUROSTD_MAX_DOUBLE;}
+    if(zeroWithinTol(getEntropyFormingAbility())){return 0.0;} //protect from division by zero
+    if(LDEBUG) {
+      cerr << soliloquy << " dist2hull=" << getDist2Hull() << endl;
+      cerr << soliloquy << " EFA=" << getEntropyFormingAbility() << endl;
+    }
+    return convertUnits(sqrt(getDist2Hull() / getEntropyFormingAbility()),units);
   }
 
   //since we don't check ALL attributes of entry, then we weed out MORE
@@ -1512,45 +1712,53 @@ namespace chull {
 
   void ChullPoint::setGenCoords(const xvector<double>& coord,bool formation_energy_coord) {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ChullPoint::setGenCoords():";
+    string soliloquy=XPID+"ChullPoint::setGenCoords():";
     m_coords=coord;//aurostd::shiftlrows(m_coords,0);
     m_formation_energy_coord=formation_energy_coord;
     if(LDEBUG) {cerr << soliloquy << " m_within_half_hull=" << isWithinHalfHull(m_formation_energy_coord) << endl;}  //m_formation_energy_coord===lower_hull
   }
 
   void ChullPoint::setGenCoords(const vector<string>& velements,const aflowlib::_aflowlib_entry& entry,bool formation_energy_coord) {
-    string soliloquy = XPID + "ChullPoint::setGenCoords():";
+    string soliloquy=XPID+"ChullPoint::setGenCoords():";
+    if(entry.vcomposition.size()==0&&entry.vstoichiometry.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No vcomposition or vstoichiometry found for entry.auid="+entry.auid,_RUNTIME_ERROR_);}
     xvector<double> coord(velements.size());
-    double c_sum=0.0;
     bool found=false;
-    for(uint i=0,fl_size_i=entry.vcomposition.size();i<fl_size_i;i++){c_sum+=entry.vcomposition[i];}  //derive stoich exactly!
-    for(uint i=0,fl_size_i=velements.size();i<fl_size_i-1;i++){
-      found=false;
-      for(uint j=0,fl_size_j=entry.vspecies.size();j<fl_size_j && !found;j++){
-        if(velements[i]==entry.vspecies[j]){
-          coord[i+coord.lrows]=entry.vcomposition[j]/c_sum;
-          found=true;
+    if(entry.vcomposition.size()>0){
+      double c_sum=0.0;
+      for(uint i=0,fl_size_i=entry.vcomposition.size();i<fl_size_i;i++){c_sum+=entry.vcomposition[i];}  //derive stoich exactly!
+      if(c_sum==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"c_sum==0 (entry.auid="+entry.auid+",entry.aurl="+entry.aurl+")",_RUNTIME_ERROR_);}
+      for(uint i=0,fl_size_i=velements.size();i<fl_size_i-1;i++){
+        found=false;
+        for(uint j=0,fl_size_j=entry.vspecies.size();j<fl_size_j && !found;j++){
+          if(velements[i]==entry.vspecies[j]){
+            coord[i+coord.lrows]=entry.vcomposition[j]/c_sum;
+            found=true;
+          }
         }
+        //[might be from lower hull]if(!found){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"element not found: "+velements[i],_RUNTIME_ERROR_);}
+      }
+    }else{  //pocc structures have no vcomposition, only vstoichiometry
+      for(uint i=0,fl_size_i=velements.size();i<fl_size_i-1;i++){
+        found=false;
+        for(uint j=0,fl_size_j=entry.vspecies.size();j<fl_size_j && !found;j++){
+          if(velements[i]==entry.vspecies[j]){
+            coord[i+coord.lrows]=entry.vstoichiometry[j];
+            found=true;
+          }
+        }
+        //[might be from lower hull]if(!found){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"element not found: "+velements[i],_RUNTIME_ERROR_);}
       }
     }
-    if(formation_energy_coord){coord[coord.urows]=entry.enthalpy_formation_atom;}
+    if(formation_energy_coord){coord[coord.urows]=H_f_atom(entry);} //entry.enthalpy_formation_atom
     else {coord[coord.urows]=entry.entropic_temperature;}  //entropic temperature is positive for stable compounds (we want upper half convex-hull)
     setGenCoords(coord,formation_energy_coord);
   }
 
-  vector<uint> ChullPoint::getRelevantIndices(const xvector<int>& elements_present) const {
+  vector<uint> getRelevantIndices(const xvector<int>& elements_present) {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ChullPoint::getRelevantIndices():";
-    stringstream message;
-    if(!m_has_stoich_coords){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Non-stoich coordinates");}
-    if(elements_present.rows!=s_coords.rows){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Dimension mismatch between point and elements_present");}
+    string soliloquy=XPID+"chull::getRelevantIndices():";
     vector<uint> relevant_indices;
     for(int i=elements_present.lrows;i<=elements_present.urows;i++){
-      if(elements_present[i]==0 && nonZeroWithinTol(s_coords[i])){
-        message << "Attempting to reduce non-zero coord (i=" << i << ",s_coords=" << s_coords << "), ";
-        message << "elements_present=" << elements_present;
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);
-      }
       if(elements_present[i]==1){relevant_indices.push_back(i);}
     }
     if(LDEBUG) {
@@ -1561,9 +1769,26 @@ namespace chull {
     return relevant_indices;
   }
 
+  vector<uint> ChullPoint::getRelevantIndices(const xvector<int>& elements_present) const {
+    bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
+    string soliloquy=XPID+"ChullPoint::getRelevantIndices():";
+    if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
+    if(!m_has_stoich_coords){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Non-stoich coordinates");}
+    if(elements_present.rows!=s_coords.rows){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Dimension mismatch between point and elements_present");}
+    for(int i=elements_present.lrows;i<=elements_present.urows;i++){
+      if(elements_present[i]==0 && nonZeroWithinTol(s_coords[i])){
+        stringstream message;
+        message << "Attempting to reduce non-zero coord (i=" << i << ",s_coords=" << s_coords << "), ";
+        message << "elements_present=" << elements_present;
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);
+      }
+    }
+    return chull::getRelevantIndices(elements_present);
+  }
+
   void ChullPoint::setStoichCoords() {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ChullPoint::setStoichCoords():";
+    string soliloquy=XPID+"ChullPoint::setStoichCoords():";
     if(!m_has_stoich_coords){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Non-stoich coordinates");}
     double c_sum=0.0; //concentration sum
     xvector<double> stoich(m_coords.urows,m_coords.lrows);
@@ -1594,19 +1819,31 @@ namespace chull {
   void ChullPoint::setHullCoords(const xvector<double>& coords) {h_coords=coords;}
   void ChullPoint::setHullCoords(const xvector<int>& elements_present) {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ChullPoint::setHullCoords():";
-    uint h_dim=sum(elements_present);
-    xvector<double> coords(h_dim);
+    string soliloquy=XPID+"ChullPoint::setHullCoords():";
     if(LDEBUG) {
       cerr << soliloquy << " elements_present=" << elements_present << endl;
       cerr << soliloquy << " s_coords=" << s_coords << endl;
       cerr << soliloquy << " c_coords=" << c_coords << endl;
     }
-    vector<uint> relevant_indices=getRelevantIndices(elements_present);
-    for(uint i=0,fl_size_i=relevant_indices.size();i<fl_size_i;i++){coords[i+coords.lrows]=m_coords[relevant_indices[i]];}
+    xvector<double> coords=chull::getTruncatedCoords(m_coords,elements_present);
+    //vector<uint> relevant_indices=getRelevantIndices(elements_present);
+    //for(uint i=0,fl_size_i=relevant_indices.size();i<fl_size_i;i++){coords[i+coords.lrows]=m_coords[relevant_indices[i]];}
     coords[coords.urows]=getLastCoord(); //overwrite last coord appropriately
     if(LDEBUG) {cerr << soliloquy << " setting h_coords=" << coords << endl;}
     setHullCoords(coords);
+  }
+
+  void ChullPoint::reduceCoords(const xvector<int>& elements_present) {
+    bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
+    string soliloquy=XPID+"ChullPoint::reduceCoords():";
+
+    //redoing a bit of ChullPoint::initialize()
+    if(LDEBUG){cerr << soliloquy << " m_coords(pre )=" << m_coords << endl;}
+    xvector<double> coords=chull::getTruncatedCoords(m_coords,elements_present);
+    coords[coords.urows]=getLastCoord(); //overwrite last coord appropriately
+    initializeCoords(coords,m_formation_energy_coord);
+    if(LDEBUG){cerr << soliloquy << " m_coords(post)=" << m_coords << endl;}
+    if(m_has_stoich_coords){setStoichCoords();}
   }
 
   void ChullPoint::cleanPointForHullCalc() {h_coords.clear();}
@@ -1620,7 +1857,7 @@ namespace chull {
     m_dist_2_hull=AUROSTD_MAX_DOUBLE;
     //[OBSOLETE - reduce by frac_vrt always! so use coord_group values]m_decomp_coefs.clear();
     m_stability_criterion=AUROSTD_MAX_DOUBLE;
-    m_n_plus_1_energy_gain=AUROSTD_MAX_DOUBLE;
+    m_n_plus_1_enthalpy_gain=AUROSTD_MAX_DOUBLE;
     cleanPointForHullCalc();
   }
 } // namespace chull
@@ -1630,7 +1867,7 @@ namespace chull {
   // constructor
   //--------------------------------------------------------------------------------
   FacetPoint::FacetPoint() {free();}
-  FacetPoint::FacetPoint(const ChullPoint& point,uint index,bool full_copy){initialize(point,index,full_copy);}  //need BOTH point and index, otherwise, just use point/index independently
+  FacetPoint::FacetPoint(const ChullPointLight& point,uint index){initialize(point,index);}  //need BOTH point and index, otherwise, just use point/index independently
   FacetPoint::FacetPoint(const FacetPoint& b) {copy(b);}  // copy PUBLIC
   FacetPoint::~FacetPoint() {free();}
 
@@ -1654,9 +1891,8 @@ namespace chull {
     ch_point=b.ch_point;
   }
 
-  void FacetPoint::initialize(const ChullPoint& point,uint index,bool full_copy) {
-    if(full_copy){ch_point=point;}
-    else {ch_point.HullCopy(point);} //fast copy of just hull relevant data, not extra entry data, for this, use index in ConvexHull
+  void FacetPoint::initialize(const ChullPointLight& point,uint index) {
+    ch_point=point;
     ch_index=index;
     m_initialized=true;
   }
@@ -1665,14 +1901,14 @@ namespace chull {
 //nice sorters for points we know sit on a thermo hull (stoich coords + energy dimension)
 namespace chull {
   bool sortThermoPoints::operator() (const FacetPoint& fpi,const FacetPoint& fpj) const{
-    string soliloquy = XPID + "chull::sortThermoPoints::operator():";
-    const ChullPoint& ci=fpi.ch_point;
-    const ChullPoint& cj=fpj.ch_point;
+    string soliloquy=XPID+"chull::sortThermoPoints::operator():";
+    const ChullPointLight& ci=fpi.ch_point;
+    const ChullPointLight& cj=fpj.ch_point;
     return (*this).operator()(ci,cj);
   }
 
-  bool sortThermoPoints::operator() (const ChullPoint& ci,const ChullPoint& cj) const{
-    string soliloquy = XPID + "chull::sortThermoPoints::operator():";
+  bool sortThermoPoints::operator() (const ChullPointLight& ci,const ChullPointLight& cj) const{  //upcasting is allowed, works for ChullPointLight and ChullPoint
+    string soliloquy=XPID+"chull::sortThermoPoints::operator():";
     if(!(ci.m_initialized && cj.m_initialized)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Points not initialized");}
     //do not first sort binaries from ternaries, screws up facet sorting
     //keep sorting based on concentration of elements in relative order
@@ -1712,7 +1948,7 @@ namespace chull {
   }
 
   bool ChullFacet::operator<(const ChullFacet& other) const {
-    string soliloquy = XPID + "ChullFacet::operator<():";
+    string soliloquy=XPID+"ChullFacet::operator<():";
     if(m_vertices.size()!=other.m_vertices.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Dimension mismatch between facet points");}
 
     //simply sort by m_point (indices)
@@ -1774,7 +2010,7 @@ namespace chull {
 
   bool ChullFacet::shareRidge(const ChullFacet& other) const{
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ChullFacet::shareRidge():";
+    string soliloquy=XPID+"ChullFacet::shareRidge():";
     bool match;
     for(uint i=0,fl_size_i=m_ridges.size();i<fl_size_i;i++){
       const vector<uint>& ridge_indices1=m_ridges[i].getCHIndices();
@@ -1795,14 +2031,14 @@ namespace chull {
   }
 
   bool ChullFacet::isPointOnFacet(const FacetPoint& fp) const {
-    string soliloquy = XPID + "ChullFacet::isPointOnFacet():";
+    string soliloquy=XPID+"ChullFacet::isPointOnFacet():";
     if(!fp.m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized facetpoint");}
     return isPointOnFacet(fp.ch_index);
   }
 
   bool ChullFacet::isPointOnFacet(uint i_point) const {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ChullFacet::isPointOnFacet():";
+    string soliloquy=XPID+"ChullFacet::isPointOnFacet():";
     if(m_vertices.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Facet has no vertices");}
     //if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized facet");}
     if(LDEBUG) {cerr << soliloquy << " checking if point[" << i_point << "] is on this facet" << endl;}
@@ -1815,15 +2051,15 @@ namespace chull {
   }
 
   bool ChullFacet::isPointOutside(const FacetPoint& f_point) const {
-    string soliloquy = XPID + "ChullFacet::isPointOutside():";
+    string soliloquy=XPID+"ChullFacet::isPointOutside():";
     if(!f_point.m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized facetpoint");}
     if(isPointOnFacet(f_point)){return false;}
     return isPointOutside(f_point.ch_point);
   }
 
-  bool ChullFacet::isPointOutside(const ChullPoint& point) const {
+  bool ChullFacet::isPointOutside(const ChullPointLight& point) const {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ChullFacet::isPointOutside():";
+    string soliloquy=XPID+"ChullFacet::isPointOutside():";
     if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Facet not initialized");}
     double dist_point=getSignedPointPlaneDistance(point);
     bool is_outside=false;
@@ -1859,18 +2095,18 @@ namespace chull {
   }
 
   //sign depends on normal, if normal vector and point are in the same half-space, point-plane distance is positive, negative otherwise
-  double ChullFacet::getSignedPointPlaneDistance(const ChullPoint& point) const {return getSignedPointPlaneDistance(point.h_coords);}
+  double ChullFacet::getSignedPointPlaneDistance(const ChullPointLight& point) const {return getSignedPointPlaneDistance(point.h_coords);}
   double ChullFacet::getSignedPointPlaneDistance(const xvector<double>& point) const {
-    string soliloquy = XPID + "ChullFacet::getSignedPointPlaneDistance():";
+    string soliloquy=XPID+"ChullFacet::getSignedPointPlaneDistance():";
     if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Facet not initialized");}
     if(point.rows!=m_vertices[0].ch_point.h_coords.rows){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Dimension mismatch between point and facet");}
     xvector<double> diff=point-m_vertices[0].ch_point.h_coords;
     return scalar_product(m_normal,diff);
   }
 
-  double ChullFacet::getSignedVerticalDistanceToZero(const ChullPoint& point) const {
+  double ChullFacet::getSignedVerticalDistanceToZero(const ChullPointLight& point) const {
     //get energy of facet at stoichiometry of input (point)
-    string soliloquy = XPID + "ChullFacet::getSignedVerticalDistanceToZero():";
+    string soliloquy=XPID+"ChullFacet::getSignedVerticalDistanceToZero():";
     return getSignedVerticalDistanceToZero(point.h_coords);
   }
 
@@ -1879,7 +2115,7 @@ namespace chull {
     //distance from 0 to point on facet (vertical projection)
     //negative for projections BELOW 0, positive for projections ABOVE 0
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ChullFacet::getSignedVerticalDistanceToZero():";
+    string soliloquy=XPID+"ChullFacet::getSignedVerticalDistanceToZero():";
     if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized facet");}
     if(m_normal.rows!=point.rows){
       if(LDEBUG) {
@@ -1898,8 +2134,8 @@ namespace chull {
     return dist;
   }
 
-  double ChullFacet::getSignedVerticalDistance(const ChullPoint& point) const {
-    string soliloquy = XPID + "ChullFacet::getSignedVerticalDistance():";
+  double ChullFacet::getSignedVerticalDistance(const ChullPointLight& point) const {
+    string soliloquy=XPID+"ChullFacet::getSignedVerticalDistance():";
     if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized facet");}
     if(!point.m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized point");}
     return getSignedVerticalDistance(point.h_coords);
@@ -1912,7 +2148,7 @@ namespace chull {
     //https://www.mathworks.com/matlabcentral/answers/107595-how-can-i-find-the-minimum-distance-from-convex-boundary
     //https://stackoverflow.com/questions/18230259/computing-distance-from-a-point-to-a-triangulation-in-3d-with-matlab
     //this is H_hull - H_f, which is negative for points on top of the hull (lower hull)
-    string soliloquy = XPID + "ChullFacet::getSignedVerticalDistance():";
+    string soliloquy=XPID+"ChullFacet::getSignedVerticalDistance():";
     if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized facet");}
     double dist=getSignedVerticalDistanceToZero(point);
     //[OBSOLETE CO20180828]if(zero_point_projection_only){return dist;}
@@ -1923,7 +2159,7 @@ namespace chull {
   }
 
   vector<uint> ChullFacet::getCHIndices() const {
-    string soliloquy = XPID + "ChullFacet::getCHIndices():";
+    string soliloquy=XPID+"ChullFacet::getCHIndices():";
     if(!m_vertices.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No vertices found");}
     vector<uint> vi;
     for(uint i=0,fl_size_i=m_vertices.size();i<fl_size_i;i++){vi.push_back(m_vertices[i].ch_index);}
@@ -1947,13 +2183,13 @@ namespace chull {
   //void ChullFacet::setOFStream(ofstream& FileMESSAGE){p_FileMESSAGE=&FileMESSAGE;}
   //void ChullFacet::setOSS(ostream& oss) {p_oss=&oss;}
 
-  void ChullFacet::addVertex(const ChullPoint& point,uint index) {FacetPoint fp(point,index,false);return addVertex(fp);} //no need for full copy
+  void ChullFacet::addVertex(const ChullPointLight& point,uint index) {FacetPoint fp(point,index);return addVertex(fp);} //no need for full copy
   void ChullFacet::addVertex(const FacetPoint& fp){
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
     stringstream message;
-    string soliloquy = XPID + "ChullFacet::addVertex():";
+    string soliloquy=XPID+"ChullFacet::addVertex():";
     if(!fp.m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized facetpoint");}
-    const ChullPoint& point=fp.ch_point;
+    const ChullPointLight& point=fp.ch_point;
     if(m_vertices.size()==0){
       m_has_stoich_coords=point.m_has_stoich_coords;
       m_formation_energy_coord=point.m_formation_energy_coord;
@@ -1999,7 +2235,7 @@ namespace chull {
 
   void ChullFacet::initialize(const xvector<double>& ref,uint h_dim,bool check_validity){
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ChullFacet::initialize():";
+    string soliloquy=XPID+"ChullFacet::initialize():";
     if(LDEBUG) {
       cerr << soliloquy << " initialize facet with points: " << endl;
       for(uint i=0,fl_size_i=m_vertices.size();i<fl_size_i;i++){cerr << "    " << m_vertices[i].ch_point.h_coords << endl;}
@@ -2020,7 +2256,7 @@ namespace chull {
 
   bool ChullFacet::hasValidPoints(string& error){
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ChullFacet::hasValidPoints():";
+    string soliloquy=XPID+"ChullFacet::hasValidPoints():";
     error.clear();
     if(!m_vertices.size()){error="Facet has no defining points";return false;}
     for(uint i=0,fl_size_i=m_vertices.size();i<fl_size_i;i++){if(!m_vertices[i].m_initialized){error="Uninitialized facetpoint";}}
@@ -2049,7 +2285,7 @@ namespace chull {
 
   void ChullFacet::setContent(){
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ChullFacet::setContent():";
+    string soliloquy=XPID+"ChullFacet::setContent():";
     m_content=AUROSTD_MAX_DOUBLE;
     m_hypercollinear=true;
     string error; if(!hasValidPoints(error)){return;}
@@ -2093,7 +2329,7 @@ namespace chull {
   }
 
   void ChullFacet::setDirectiveVectors(bool check_validity){  //perhaps we already checked...
-    string soliloquy = XPID + "ChullFacet::setDirectiveVectors():";
+    string soliloquy=XPID+"ChullFacet::setDirectiveVectors():";
     m_directive_vectors.clear();
     string error;
     if(check_validity && !hasValidPoints(error)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,error);}
@@ -2123,7 +2359,7 @@ namespace chull {
   }
 
   bool ChullFacet::hasCollinearVectors(bool check_validity){  //perhaps we already checked...
-    string soliloquy = XPID + "ChullFacet::hasCollinearVectors():";
+    string soliloquy=XPID+"ChullFacet::hasCollinearVectors():";
     string error;
     if(check_validity && !pointsMatchDirectiveVectors(error)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,error);}
     if(check_validity && !hasValidDirectiveVectors(error)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,error);}
@@ -2142,7 +2378,7 @@ namespace chull {
     //but by removing these facets, we screw up the neighboring determination, and hence create gaps in the hull
     //so keep them
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ChullFacet::isValid():";
+    string soliloquy=XPID+"ChullFacet::isValid():";
     error.clear();
     if(!hasValidPoints(error)){return false;}
     setContent(); //we need to preserve neighbors, so do not kill these pseudo-facets
@@ -2158,7 +2394,7 @@ namespace chull {
 
   void ChullFacet::setNormal(bool check_validity){
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ChullFacet::setNormal():";
+    string soliloquy=XPID+"ChullFacet::setNormal():";
     m_normal.clear();
     string error;
     if(check_validity && !isValid(error)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,error);}
@@ -2174,7 +2410,7 @@ namespace chull {
   }
 
   void ChullFacet::setOffset(){
-    string soliloquy = XPID + "ChullFacet::setOffset():";
+    string soliloquy=XPID+"ChullFacet::setOffset():";
     if(!m_vertices.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Facet has not been defined");}
     const xvector<double>& plane_point=m_vertices[0].ch_point.h_coords;
     if(m_normal.rows!=plane_point.rows){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Dimension mismatch between normal and point");}
@@ -2183,7 +2419,7 @@ namespace chull {
 
   void ChullFacet::setCentroid() {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ChullFacet::setCentroid():";
+    string soliloquy=XPID+"ChullFacet::setCentroid():";
     vector<xvector<double> > points;
     for(uint i=0,fl_size_i=m_vertices.size();i<fl_size_i;i++){points.push_back(m_vertices[i].ch_point.h_coords);}
     m_facet_centroid=aurostd::getCentroid(points);
@@ -2193,21 +2429,21 @@ namespace chull {
   //_AFLOW_CHULL_VERTICAL_PLANE_TOLERANCE_ = 1e-4 for H_f_atom, else 1e-9 for T_S
   void ChullFacet::setVertical(){
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ChullFacet::setVertical():";
+    string soliloquy=XPID+"ChullFacet::setVertical():";
     if(LDEBUG) {cerr << soliloquy << " looking if vertical hull: normal=" << m_normal << endl;}
     double tol=(m_has_stoich_coords&&m_formation_energy_coord ? ZERO_COEF_TOL : ZERO_TOL);  //1e-4 if stoich coords
     m_is_vertical=zeroWithinTol(m_normal[m_normal.urows],tol); //simple
   }
 
   void ChullFacet::setArtificial(){  //in half hulls, this finds the facet of all artificial points
-    string soliloquy = XPID + "ChullFacet::setArtificial():";
+    string soliloquy=XPID+"ChullFacet::setArtificial():";
     for(uint i=0,fl_size_i=m_vertices.size();i<fl_size_i;i++){if(!m_vertices[i].ch_point.m_is_artificial){m_is_artificial=false;return;}}
     m_is_artificial=true;return;
   }
 
   void ChullFacet::alignNormalInward() { 
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ChullFacet::alignNormalInward():";
+    string soliloquy=XPID+"ChullFacet::alignNormalInward():";
     //we want normal pointing inward
     double dist=scalar_product(m_normal,m_hull_reference)+m_offset;  //point-plane distance formula without normalization
     if(LDEBUG) {
@@ -2225,14 +2461,14 @@ namespace chull {
   }
 
   void ChullFacet::setHemisphere() {
-    string soliloquy = XPID + "ChullFacet::alignNormalInward():";
+    string soliloquy=XPID+"ChullFacet::alignNormalInward():";
     //vertical facets are NOT considered lower_hemisphere
     m_in_lower_hemisphere=(!m_is_vertical && !std::signbit(m_normal[m_normal.urows])); //not flat and upward pointed normal
   }
 
   void ChullFacet::setFurthestPoint(){
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ChullFacet::setFurthestPoint():";
+    string soliloquy=XPID+"ChullFacet::setFurthestPoint():";
     f_furthest_point.clear();
     if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Facet not initialized");}
     if(!f_outside_set.size()){return;}
@@ -2255,7 +2491,7 @@ namespace chull {
 
   void ChullFacet::setRidges(){
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ChullFacet::setRidges():";
+    string soliloquy=XPID+"ChullFacet::setRidges():";
     m_ridges.clear();
     if(!m_vertices.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Facet has no vertices");}
     for(uint fl_size_i=m_vertices.size(),i=(fl_size_i-1);i<fl_size_i;i--){  //wrap around to HUGE number
@@ -2303,7 +2539,7 @@ namespace chull {
 
   bool CoordGroup::operator<(const CoordGroup& other) const {
     // safety, so it doesn't break, but it's outside scope of function
-    string soliloquy = XPID + "CoordGroup::operator<():";
+    string soliloquy=XPID+"CoordGroup::operator<():";
     if(m_coords.rows!=other.m_coords.rows){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Dimension mismatch between stoichiometries");} //return (m_coords.rows<other.m_coords.rows);
     for(int i=m_coords.lrows;i<=m_coords.urows;i++) {
       if(m_coords(i)!=other.m_coords(i)) {return (m_coords(i)<other.m_coords(i));}
@@ -2331,8 +2567,9 @@ namespace chull {
     m_equilibrium_phases.clear();
     m_calculated_equivalent_g_states=false;
     m_equivalent_g_states.clear();
+    m_sym_equivalent_g_states.clear();
     m_stability_criterion=AUROSTD_MAX_DOUBLE;
-    m_n_plus_1_energy_gain=AUROSTD_MAX_DOUBLE;
+    m_n_plus_1_enthalpy_gain=AUROSTD_MAX_DOUBLE;
     m_icsd_g_state=false;
     m_i_canonical_icsd=AUROSTD_MAX_UINT;
   }
@@ -2356,8 +2593,9 @@ namespace chull {
     for(uint i=0,fl_size_i=m_equilibrium_phases.size();i<fl_size_i;i++){m_equilibrium_phases.clear();} m_equilibrium_phases.clear(); for(uint i=0;i<b.m_equilibrium_phases.size();i++){m_equilibrium_phases.push_back(b.m_equilibrium_phases[i]);}
     m_calculated_equivalent_g_states=b.m_calculated_equivalent_g_states;
     m_equivalent_g_states.clear(); for(uint i=0,fl_size_i=b.m_equivalent_g_states.size();i<fl_size_i;i++){m_equivalent_g_states.push_back(b.m_equivalent_g_states[i]);}
+    m_sym_equivalent_g_states.clear(); for(uint i=0,fl_size_i=b.m_sym_equivalent_g_states.size();i<fl_size_i;i++){m_sym_equivalent_g_states.push_back(b.m_sym_equivalent_g_states[i]);}
     m_stability_criterion=b.m_stability_criterion;
-    m_n_plus_1_energy_gain=b.m_n_plus_1_energy_gain;
+    m_n_plus_1_enthalpy_gain=b.m_n_plus_1_enthalpy_gain;
     m_icsd_g_state=b.m_icsd_g_state;
     m_i_canonical_icsd=b.m_i_canonical_icsd;
   }
@@ -2372,9 +2610,10 @@ namespace chull {
 
   xvector<int> CoordGroup::getElementsPresent() const {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    //quick checks
-    string soliloquy = XPID + "CoordGroup::getElementsPresent():";
+    string soliloquy=XPID+"CoordGroup::getElementsPresent():";
+    if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
     if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized coordgroup");}
+    if(LDEBUG){cerr << soliloquy << " m_coords=" << m_coords << endl;}
     for(int i=m_coords.lrows;i<=m_coords.urows;i++){
       if(std::signbit(m_coords[i]) || m_coords[i]>1.0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coord("+aurostd::utype2string(i)+") is outside of [0,1] range of a generalized stoichiometry coordinate");}
     }
@@ -2392,7 +2631,7 @@ namespace chull {
 
   uint CoordGroup::getDim() const {
     if(!m_initialized){
-      string soliloquy = XPID + "CoordGroup::getDim():";
+      string soliloquy=XPID+"CoordGroup::getDim():";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized coordgroup");
     }
     return sum(getElementsPresent());
@@ -2416,7 +2655,7 @@ namespace chull {
 
   bool Alloy::operator<(const Alloy& other) const {
     // safety, so it doesn't break, but it's outside scope of function
-    string soliloquy = XPID + "Alloy::operator<():";
+    string soliloquy=XPID+"Alloy::operator<():";
     if(m_elements_present.rows!=other.m_elements_present.rows){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Dimension mismatch between alloys");} //return (m_elements_present.rows<other.m_elements_present.rows);
     for(int i=m_elements_present.lrows;i<=m_elements_present.urows;i++) {
       if(m_elements_present[i]!=other.m_elements_present[i]) {return (m_elements_present[i]<other.m_elements_present[i]);}
@@ -2448,7 +2687,7 @@ namespace chull {
     m_initialized=true;
   }
 
-  bool Alloy::belongs2Hull(const xvector<int>& hull_elements_present) const{return subspaceBelongs(hull_elements_present,m_elements_present);}
+  bool Alloy::belongs2Hull(const xvector<int>& elements_present_hull) const {return subspaceBelongs(elements_present_hull,m_elements_present);}
 } // namespace chull
 
 namespace chull {
@@ -2524,7 +2763,11 @@ namespace chull {
   ConvexHull::ConvexHull(const aurostd::xoption& vpflow,const vector<ChullPoint>& vpoints,const vector<string>& velements,ofstream& FileMESSAGE,ostream& oss,bool formation_energy_hull,bool add_artificial_unaries) : xStream(FileMESSAGE,oss),m_initialized(false) {initialize(vpflow,vpoints,velements,formation_energy_hull,add_artificial_unaries);}
   ConvexHull::ConvexHull(const ConvexHull& b) : xStream(*b.getOFStream(),*b.getOSS()) {copy(b);}
 
-  ConvexHull::~ConvexHull() {xStream::free();free();}
+  ConvexHull::~ConvexHull() {
+    xStream::free();
+    free();
+    m_allowed_dft_types.clear();
+  }
 
   const ConvexHull& ConvexHull::operator=(const ConvexHull& other) {
     if(this!=&other) {copy(other);}
@@ -2913,7 +3156,7 @@ namespace chull {
 
   uint ConvexHull::getDim() const {return m_dim;}
   uint ConvexHull::getEntriesCount(bool only_within_half_hull) const {
-    string soliloquy = XPID + "ConvexHull::getEntriesCount():";
+    string soliloquy=XPID+"ConvexHull::getEntriesCount():";
     uint i_point=AUROSTD_MAX_UINT,count=0;
     for(uint i_coord_group=0,fl_size_i_coord_group=m_coord_groups.size();i_coord_group<fl_size_i_coord_group;i_coord_group++){
       if(!m_coord_groups[i_coord_group].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coordgroup["+aurostd::utype2string(i_coord_group)+"] is not initialized");}
@@ -2930,7 +3173,7 @@ namespace chull {
   }
 
   uint ConvexHull::getEntriesCount(uint i_nary,bool only_within_half_hull) const {
-    string soliloquy = XPID + "ConvexHull::getEntriesCount():";
+    string soliloquy=XPID+"ConvexHull::getEntriesCount():";
     if(!m_has_stoich_coords){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Non-stoich coordinates");}
     uint count=0;
     if(i_nary>m_naries.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within m_naries");}
@@ -2940,7 +3183,7 @@ namespace chull {
   }
 
   uint ConvexHull::getEntriesCount(uint i_nary,uint i_alloy,bool only_within_half_hull) const {
-    string soliloquy = XPID + "ConvexHull::getEntriesCount():";
+    string soliloquy=XPID+"ConvexHull::getEntriesCount():";
     if(!m_has_stoich_coords){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Non-stoich coordinates");}
     if(i_nary>m_naries.size()-1 || i_alloy>m_naries[i_nary].m_alloys.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within m_naries");}
     if(!m_naries[i_nary].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized nary");}
@@ -2972,11 +3215,11 @@ namespace chull {
     for(uint i_nary1=0,fl_size_i_nary1=m_naries.size();i_nary1<fl_size_i_nary1;i_nary1++){
       for(uint i_alloy1=0,fl_size_i_alloy1=m_naries[i_nary1].m_alloys.size();i_alloy1<fl_size_i_alloy1;i_alloy1++){
         //m_naries[i_nary1].m_alloys[i_alloy1].m_elements_present is relevant hull dimensions
-        const xvector<int>& hull_elements_present=m_naries[i_nary1].m_alloys[i_alloy1].m_elements_present;
+        const xvector<int>& elements_present_hull=m_naries[i_nary1].m_alloys[i_alloy1].m_elements_present;
         for(uint i_nary2=0;i_nary2<=i_nary1;i_nary2++){ //up to i_nary1
           for(uint i_alloy2=0,fl_size_i_alloy2=m_naries[i_nary2].m_alloys.size();i_alloy2<fl_size_i_alloy2;i_alloy2++){
             //space==m_naries[i_nary1].m_alloys[i_alloy1].m_elements_present, subspace==m_naries[i_nary2].m_alloys[i_alloy2].m_elements_present
-            if(subspaceBelongs(hull_elements_present,m_naries[i_nary2].m_alloys[i_alloy2].m_elements_present)){
+            if(subspaceBelongs(elements_present_hull,m_naries[i_nary2].m_alloys[i_alloy2].m_elements_present)){
               counts[i_nary1][i_alloy1]+=getEntriesCount(i_nary2,i_alloy2,only_within_half_hull);
             }
           }
@@ -2987,7 +3230,7 @@ namespace chull {
   }
 
   uint ConvexHull::getGStateCount() const {
-    string soliloquy = XPID + "ConvexHull::getGStateCount():";
+    string soliloquy=XPID+"ConvexHull::getGStateCount():";
     uint i_point=AUROSTD_MAX_UINT,count=0;
     for(uint i_coord_group=0,fl_size_i_coord_group=m_coord_groups.size();i_coord_group<fl_size_i_coord_group;i_coord_group++){
       for(uint i=0,fl_size_i=m_coord_groups[i_coord_group].m_points.size();i<fl_size_i;i++){
@@ -3000,7 +3243,7 @@ namespace chull {
   }
 
   uint ConvexHull::getGStateCount(uint i_nary) const {
-    string soliloquy = XPID + "ConvexHull::getGStateCount():";
+    string soliloquy=XPID+"ConvexHull::getGStateCount():";
     if(!m_has_stoich_coords){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Non-stoich coordinates");}
     uint i_point=AUROSTD_MAX_UINT,i_coord_group=AUROSTD_MAX_UINT,count=0;
     for(uint i_alloy=0,fl_size_i_alloy=m_naries[i_nary].m_alloys.size();i_alloy<fl_size_i_alloy;i_alloy++){
@@ -3018,7 +3261,7 @@ namespace chull {
   }
 
   vector<uint> ConvexHull::getHullPoints(bool sort_stoich_ascending) const { //pure hull-members, not equivalent ones too
-    string soliloquy = XPID + "ConvexHull::getHullPoints():";
+    string soliloquy=XPID+"ConvexHull::getHullPoints():";
     vector<uint> hull_points;
     uint i_point=AUROSTD_MAX_UINT;
     for(uint i_coord_group=0,fl_size_i_coord_group=m_coord_groups.size();i_coord_group<fl_size_i_coord_group;i_coord_group++){
@@ -3034,7 +3277,7 @@ namespace chull {
   }
 
   vector<uint> ConvexHull::getGStates(bool include_unaries,bool sort_stoich_ascending) const { //pure g_states, not equivalent ones too
-    string soliloquy = XPID + "ConvexHull::getGStates():";
+    string soliloquy=XPID+"ConvexHull::getGStates():";
     vector<uint> g_states;
     uint i_point=AUROSTD_MAX_UINT;
     for(uint i_coord_group=0,fl_size_i_coord_group=m_coord_groups.size();i_coord_group<fl_size_i_coord_group;i_coord_group++){
@@ -3053,7 +3296,7 @@ namespace chull {
   }
 
   uint ConvexHull::getUnaryGState(uint i_alloy) const {
-    string soliloquy = XPID + "ConvexHull::getUnaryGState():";
+    string soliloquy=XPID+"ConvexHull::getUnaryGState():";
     uint i_nary=0;
     if(i_alloy>m_naries[i_nary].m_alloys.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within alloys");}
     uint g_state=AUROSTD_MAX_UINT;
@@ -3100,25 +3343,25 @@ namespace chull {
   }
 
   bool ConvexHull::getNariesIndex(uint i_point,uint& i_nary,uint& i_alloy,uint& i_coord_group,bool redo) const{
-    string soliloquy = XPID + "ConvexHull::getNariesIndex():";
+    string soliloquy=XPID+"ConvexHull::getNariesIndex():";
     if(i_point>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
     return getNariesIndex(m_points[i_point],i_nary,i_alloy,i_coord_group,redo);
   }
 
   bool ConvexHull::getNariesIndex(const ChullPoint& point,uint& i_nary,uint& i_alloy,uint& i_coord_group,bool redo) const{
-    string soliloquy = XPID + "ConvexHull::getNariesIndex():";
+    string soliloquy=XPID+"ConvexHull::getNariesIndex():";
     if(!point.m_has_stoich_coords){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Point does not have stoich coordinates");}
     return (getAlloyIndex(point,i_nary,i_alloy,redo) && getCoordGroupIndex(point,i_coord_group,redo));
   }
 
   bool ConvexHull::getCoordGroupIndex(uint i_point,uint& i_coord_group,bool redo) const {
-    string soliloquy = XPID + "ConvexHull::getCoordGroupIndex():";
+    string soliloquy=XPID+"ConvexHull::getCoordGroupIndex():";
     if(i_point>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
     return getCoordGroupIndex(m_points[i_point],i_coord_group,redo);
   }
 
   bool ConvexHull::getCoordGroupIndex(const ChullPoint& point,uint& i_coord_group,bool redo) const {
-    string soliloquy = XPID + "ConvexHull::getCoordGroupIndex():";
+    string soliloquy=XPID+"ConvexHull::getCoordGroupIndex():";
     if(!point.m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized chullpoint");}
     if(!redo){
       i_coord_group=point.m_i_coord_group;
@@ -3128,19 +3371,29 @@ namespace chull {
   }
 
   bool ConvexHull::getCoordGroupIndex(const xvector<double>& r_coords,uint& i_coord_group) const {
-    string soliloquy = XPID + "ConvexHull::getCoordGroupIndex():";
+    bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
+    string soliloquy=XPID+"ConvexHull::getCoordGroupIndex():";
+    if(LDEBUG){
+      cerr << soliloquy << " r_coords=" << r_coords << endl;
+      cerr << soliloquy << " m_coord_groups.size()=" << m_coord_groups.size() << endl;
+      for(uint i=0,fl_size_i=m_coord_groups.size();i<fl_size_i;i++){
+        cerr << soliloquy << " m_coord_groups[i=" << i << "].m_coords=" << m_coord_groups[i].m_coords << endl;
+      }
+    }
     for(uint i=0,fl_size_i=m_coord_groups.size();i<fl_size_i;i++){
       if(!m_coord_groups[i].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized coordgroup");}
       if(identical(m_coord_groups[i].m_coords,r_coords,ZERO_TOL)){
         i_coord_group=i;
         return true;
       }
+      if(LDEBUG){cerr << soliloquy << " m_coord_groups[i=" << i << "].m_coords=" << m_coord_groups[i].m_coords << " != " << "r_coords=" << r_coords << endl;}
     }
+    if(LDEBUG){cerr << soliloquy << " no coord_group index found for r_coords=" << r_coords << endl;}
     return false;
   }
 
   bool ConvexHull::getAlloyIndex(const ChullPoint& point,uint& i_nary,uint& i_alloy,bool redo) const {
-    string soliloquy = XPID + "ConvexHull::getAlloyIndex():";
+    string soliloquy=XPID+"ConvexHull::getAlloyIndex():";
     if(!point.m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized chullpoint");}
     if(!point.m_has_stoich_coords){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Point does not have stoich coordinates");}
     if(!redo){
@@ -3152,7 +3405,7 @@ namespace chull {
   }
 
   bool ConvexHull::getAlloyIndex(const CoordGroup& cg,uint& i_nary,uint& i_alloy,bool redo) const {
-    string soliloquy = XPID + "ConvexHull::getAlloyIndex():";
+    string soliloquy=XPID+"ConvexHull::getAlloyIndex():";
     if(!cg.m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized coordgroup");}
     if(!cg.m_has_stoich_coords){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coordgroup does not have stoich coordinates");}
     if(!cg.m_points.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coordgroup has no points");}
@@ -3166,13 +3419,15 @@ namespace chull {
 
   bool ConvexHull::getAlloyIndex(const xvector<int>& elements_present,uint& i_nary,uint& i_alloy) const {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ConvexHull::getAlloyIndex():";
+    string soliloquy=XPID+"ConvexHull::getAlloyIndex():";
+    if(LDEBUG) {cerr << soliloquy << " BEGIN" << endl;}
     i_nary=sum(elements_present)-1;
     if(i_nary>m_naries.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within m_naries");}
     if(!m_naries[i_nary].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized nary");}
     if(LDEBUG) {cerr << soliloquy << " elements_present=" << elements_present << endl;}
     for(uint i=0,fl_size_i=m_naries[i_nary].m_alloys.size();i<fl_size_i;i++){
       if(!m_naries[i_nary].m_alloys[i].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized alloy");}
+      if(LDEBUG){cerr << soliloquy << " m_naries[i_nary=" << i_nary << "].m_alloys[i=" << i << "].m_elements_present=" << m_naries[i_nary].m_alloys[i].m_elements_present << endl;}
       if(m_naries[i_nary].m_alloys[i].m_elements_present==elements_present){
         i_alloy=i;
         return true;
@@ -3182,7 +3437,7 @@ namespace chull {
   }
 
   uint ConvexHull::artificialMap(uint i_point) const{
-    string soliloquy = XPID + "ConvexHull::artificialMap():";
+    string soliloquy=XPID+"ConvexHull::artificialMap():";
     if(i_point>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within m_points");}
     if(!m_points[i_point].m_is_artificial){return i_point;}
     //we found an artificial point, but was it supposed to be here?
@@ -3333,16 +3588,18 @@ namespace chull {
   }
 
   bool ConvexHull::entryValid(const aflowlib::_aflowlib_entry& entry,string& reason,char& LOGGER_TYPE,bool ignore_bad_database) const {
-    string soliloquy = XPID + "ConvexHull::entryValid():";
+    string soliloquy=XPID+"ConvexHull::entryValid():";
     reason="";
     LOGGER_TYPE=_LOGGER_OPTION_;
     //tests of stupidity
     if(entry.vspecies.size()!=entry.vcomposition.size()){
-      //throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Bad entry ("+entry.auid+") - vspecies.size!=vcomposition.size()"); //let's not break the code for one bad entry
-      reason="Entry (auid="+entry.auid+") is ill-defined: vspecies.size()!=vcomposition.size()";
-      reason+=" (please report on AFLOW Forum: aflow.org/forum)";
-      LOGGER_TYPE=_LOGGER_WARNING_;
-      return false;
+      if(entry.prototype.find("POCC")==string::npos){ //POCC entries have no composition
+        //throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Bad entry ("+entry.auid+") - vspecies.size!=vcomposition.size()"); //let's not break the code for one bad entry
+        reason="Entry (auid="+entry.auid+") is ill-defined: vspecies.size()!=vcomposition.size()";
+        reason+=" (please report on AFLOW Forum: aflow.org/forum)";
+        LOGGER_TYPE=_LOGGER_WARNING_;
+        return false;
+      }
     }
     bool found=false;
     for(uint j=0,fl_size_j=entry.vspecies.size();j<fl_size_j;j++){
@@ -3381,7 +3638,7 @@ namespace chull {
       reason="calculated with manual NUPDOWN, thus E-fermi is NOT adjusted for spin-up"; //as explained in ovasp
       return false;
     }
-    if(entry.enthalpy_formation_atom==AUROSTD_NAN || entry.entropic_temperature==AUROSTD_NAN){
+    if(H_f_atom(entry)==AUROSTD_NAN || entry.entropic_temperature==AUROSTD_NAN){  //entry.enthalpy_formation_atom
       reason="enthalpy_formation_atom/entropic_temperature not calculated";
       return false;
     }
@@ -3395,7 +3652,7 @@ namespace chull {
     //really, dim specifies within s_coords unless dim == s_coords.size()
     //then it's the last coord
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ConvexHull::addArtificialUnaries():";
+    string soliloquy=XPID+"ConvexHull::addArtificialUnaries():";
     if(!m_has_stoich_coords){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Non-stoich coordinates");}
     if(dim>m_dim-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid dimension requested");}
     xvector<double> dummy(m_dim);
@@ -3411,7 +3668,7 @@ namespace chull {
     //hack, go backwards, as the way entries are ordered, duplicates occur near each other
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
     canonical_auid="";
-    string soliloquy = XPID + "ConvexHull::entryUnique():";
+    string soliloquy=XPID+"ConvexHull::entryUnique():";
     for(uint fl_size_i=unique_entries.size(),i=fl_size_i-1;i<fl_size_i;i--){
       const ChullPoint& point=m_points[unique_entries[i]];
       if(point.entryIdentical(entry)){
@@ -3428,16 +3685,16 @@ namespace chull {
 
   void ConvexHull::loadPoints(const string& alloy) {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ConvexHull::loadPoints():";
+    string soliloquy=XPID+"ConvexHull::loadPoints():";
     if(LDEBUG) {cerr << soliloquy << " initializing alloy, compound=" << alloy << endl;}
-    vector<string> velements = pflow::stringElements2VectorElements(alloy, *p_FileMESSAGE, true, true, pp_string, false, *p_oss); //clean and sort, do not keep_pp  //CO20190712
+    vector<string> velements = aurostd::getElements(alloy, pp_string, *p_FileMESSAGE, true, true, false, *p_oss); //clean and sort, do not keep_pp  //CO20190712
     //[CO20190712 - OBSOLETE]vector<string> velements = pflow::getAlphabeticVectorString(alloy, *p_FileMESSAGE, *p_oss);
     return loadPoints(velements);
   }
 
   void ConvexHull::loadPoints(const vector<string>& _velements) {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ConvexHull::loadPoints():";
+    string soliloquy=XPID+"ConvexHull::loadPoints():";
 
     vector<string> velements; 
     for(uint i=0,fl_size_i=_velements.size();i<fl_size_i;i++){velements.push_back(_velements[i]);}
@@ -3452,7 +3709,7 @@ namespace chull {
 
   void ConvexHull::loadPoints(const vector<string>& _velements,const vector<vector<vector<aflowlib::_aflowlib_entry> > >& entries) {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ConvexHull::loadPoints():";
+    string soliloquy=XPID+"ConvexHull::loadPoints():";
     stringstream message;
 
     vector<string> velements;
@@ -3491,7 +3748,7 @@ namespace chull {
 
   void ConvexHull::loadPoints(const vector<xvector<double> >& vcoords,bool has_stoich_coords,bool formation_energy_hull,bool add_artificial_unaries) {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ConvexHull::loadPoints():";
+    string soliloquy=XPID+"ConvexHull::loadPoints():";
     vector<ChullPoint> points;
     if(LDEBUG) {cerr << soliloquy << " initializing vcoords (has_stoich_coords==" << has_stoich_coords << "), count=" << vcoords.size() << endl;}
     ChullPoint cp;
@@ -3509,7 +3766,7 @@ namespace chull {
 
   void ConvexHull::loadPoints(const vector<ChullPoint>& vpoints,const vector<string>& velements,bool formation_energy_hull,bool add_artificial_unaries) {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ConvexHull::loadPoints():";
+    string soliloquy=XPID+"ConvexHull::loadPoints():";
     stringstream message;
 
     if(velements.size()){
@@ -3531,7 +3788,7 @@ namespace chull {
     //detect for coord types mixture!
     m_has_stoich_coords=( m_points[0].m_has_stoich_coords || m_has_stoich_coords );
     m_dim=m_points[0].m_coords.rows;
-    if(m_dim<2){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"1D hulls are trivial");}
+    if(m_dim<2){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"1D hulls are trivial");} //this MUST be true: chull cannot find facets for 1D hulls
     //test of stupidity
     for(uint i=0,fl_size_i=m_points.size();i<fl_size_i;i++){
       if(!m_points[i].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized point");}
@@ -3576,7 +3833,7 @@ namespace chull {
 
   void ConvexHull::calculateOutlierThreshold(const xvector<double>& energies,double& upper_threshold,double& lower_threshold) {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ConvexHull::calculateOutlierThreshold():";
+    string soliloquy=XPID+"ConvexHull::calculateOutlierThreshold():";
     stringstream message;
 
     upper_threshold=AUROSTD_MAX_DOUBLE;   //effectively NOT a threshold
@@ -3585,19 +3842,17 @@ namespace chull {
     //nice solution here! but only works for odd counts
     //http://en.cppreference.com/w/cpp/algorithm/nth_element
     bool iqr_method=true; //unfortunately, MAD is normal distribution dependent, NOT our case here
-    //[CHECK COUNT ELSEWHERE]bool force_outlier_test=false;  //override binary alloy statistics check
 
     uint iqr_count_threshold=4; //3 results in degenerate quartile indices
     if((uint)energies.rows<iqr_count_threshold){ //ALWAYS not enough points to do statistics (need 3 quartiles)
       message << "Not enough degrees of freedom for outlier detection analysis per interquartile-range (count=" << energies.rows << " < " << iqr_count_threshold << ")";
-      if(m_cflags.flag("FORCE")){
-        message << ", skipping outlier analysis";
-        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
-        return;
+      if(m_cflags.flag("FAKE_HULL")){aurostd::StringstreamClean(message);}  //don't want to see these errors, they are expected
+      else if(m_cflags.flag("CHULL::STRICT_OUTLIER_ANALYSIS")&&(!m_cflags.flag("FORCE"))){
+        message << " (results may not be reliable). Terminating hull analysis.";throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_RANGE_);
       } else {
-        message << ". Override with --force (results may not be reliable).";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);
+        message << ", skipping outlier analysis.";pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
       }
+      return;
     }
     if(LDEBUG) {cerr << "lastCoords(): " << sort(energies) << endl;}
     double q1,q2,q3;
@@ -3632,7 +3887,7 @@ namespace chull {
     //very sensitive to outliers
     //instead, use median
     //see discussion here:  doi=10.1016/j.jesp.2013.03.013
-    string soliloquy = XPID + "ConvexHull::calculateOutliers():";
+    string soliloquy=XPID+"ConvexHull::calculateOutliers():";
     vector<uint> outliers;
 
     //bool keep_outliers=m_cflags.flag("CHULL::INCLUDE_OUTLIERS");
@@ -3699,7 +3954,7 @@ namespace chull {
   }
 
   vector<uint> ConvexHull::getOutliers() {
-    string soliloquy = XPID + "ConvexHull::getOutliers():";
+    string soliloquy=XPID+"ConvexHull::getOutliers():";
     vector<uint> points_to_consider;
     uint i_point=AUROSTD_MAX_UINT;
     for(uint i_coord_group=0,fl_size_i_coord_group=m_coord_groups.size();i_coord_group<fl_size_i_coord_group;i_coord_group++){
@@ -3714,7 +3969,7 @@ namespace chull {
   }
 
   vector<uint> ConvexHull::getOutliers(const xvector<int>& elements_present) {
-    string soliloquy = XPID + "ConvexHull::getOutliers():";
+    string soliloquy=XPID+"ConvexHull::getOutliers():";
     stringstream message;
     vector<uint> points_to_consider;
     uint i_point=AUROSTD_MAX_UINT;
@@ -3757,16 +4012,14 @@ namespace chull {
       uint binaries_half_hull_threshold=DEFAULT_CHULL_OUTLIER_ANALYSIS_COUNT_THRESHOLD_BINARIES;
       if(points_to_consider.size()<binaries_half_hull_threshold){
         message << "Not enough degrees of freedom for outlier detection analysis per user defined threshold (count=" << points_to_consider.size() << " < " << binaries_half_hull_threshold << ")";
-        if(m_cflags.flag("FORCE")){
-          message << ", skipping outlier analysis";
-          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
-          vector<uint> outliers;
-          return outliers;
+        if(m_cflags.flag("FAKE_HULL")){aurostd::StringstreamClean(message);}  //don't want to see these errors, they are expected
+        else if(m_cflags.flag("CHULL::STRICT_OUTLIER_ANALYSIS")&&(!m_cflags.flag("FORCE"))){
+          message << " (results may not be reliable). Terminating hull analysis.";throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_RANGE_);
+        } else {
+          message << ", skipping outlier analysis.";pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
         }
-        else {
-          message << ". Override with --force (results may not be reliable).";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);
-        }
+        vector<uint> outliers;
+        return outliers;
       }
     }
 
@@ -3774,7 +4027,7 @@ namespace chull {
   }
 
   vector<uint> ConvexHull::findArtificialPoints(uint i_coord_group){
-    string soliloquy = XPID + "ConvexHull::findArtificialPoints():";
+    string soliloquy=XPID+"ConvexHull::findArtificialPoints():";
     if(i_coord_group>m_coord_groups.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within coordgroups");}
     if(!m_coord_groups[i_coord_group].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized coordgroup");}
 
@@ -3790,7 +4043,7 @@ namespace chull {
   }
 
   uint ConvexHull::findArtificialUnary(uint i_coord_group){
-    string soliloquy = XPID + "ConvexHull::findArtificialUnary():";
+    string soliloquy=XPID+"ConvexHull::findArtificialUnary():";
     if(!m_has_stoich_coords){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No unaries to be found (coordinates are not stoichiometric)");}
     if(i_coord_group>m_coord_groups.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within coordgroups");}
     if(!m_coord_groups[i_coord_group].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized coordgroup");}
@@ -3806,7 +4059,7 @@ namespace chull {
 
   void ConvexHull::organizeHullPoints(uint i_coord_group) {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ConvexHull::organizeHullPoints():";
+    string soliloquy=XPID+"ConvexHull::organizeHullPoints():";
     if(i_coord_group>m_coord_groups.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within coordgroups");}
     if(!m_coord_groups[i_coord_group].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized coordgroup");}
 
@@ -3874,7 +4127,7 @@ namespace chull {
 
   void ConvexHull::organizeHullPoints() {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ConvexHull::organizeHullPoints():";
+    string soliloquy=XPID+"ConvexHull::organizeHullPoints():";
     if(!m_coord_groups.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Points have not been structured correctly");}
     if(LDEBUG) {
       cerr << soliloquy << " filtering points definitely NOT on the hull by energy" << endl;
@@ -3885,7 +4138,7 @@ namespace chull {
 
   void ConvexHull::initializeNaries() {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ConvexHull::initializeNaries():";
+    string soliloquy=XPID+"ConvexHull::initializeNaries():";
     stringstream message;
     //clear
     for(uint i_nary=0,fl_size_i_nary=m_naries.size();i_nary<fl_size_i_nary;i_nary++){
@@ -3911,7 +4164,7 @@ namespace chull {
         m_naries[i_nary].m_alloys.push_back(alloy);
       }
     }
-    if(m_naries.size()<2){message << "m_naries.size()=0, xcombos may be broken";throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);}
+    if(m_naries.size()==0){message << "m_naries.size()=0, xcombos may be broken";throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);}
     if(!m_naries[0].m_alloys.size()){message << "m_naries[0].m_alloys.size()==0, xcombos may be broken";throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);}
     //SORT NOW! do not sort later as we populate m_points with i_nary and i_alloy
     for(uint i_nary=0,fl_size_i_nary=m_naries.size();i_nary<fl_size_i_nary;i_nary++){
@@ -3923,7 +4176,7 @@ namespace chull {
 
   void ConvexHull::structurePoints() {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ConvexHull::structurePoints():";
+    string soliloquy=XPID+"ConvexHull::structurePoints():";
     stringstream message;
     m_coord_groups.clear();
     m_naries.clear();
@@ -3939,7 +4192,8 @@ namespace chull {
 
     bool remove_requested=m_cflags.flag("CHULL::NEGLECT");
     bool see_neglect=m_cflags.flag("CHULL::SEE_NEGLECT");
-    bool n1eg_requested=m_cflags.flag("CHULL::NPLUS1_ENTHALPY_GAIN"); //SK20200327
+    bool remove_submodular=true;  //remove AEL-AGL, APL, etc.
+    bool n1eg_requested=m_cflags.flag("CHULL::CALCULATE_FAKE_HULL_N+1_ENTHALPY_GAIN"); //SK20200327
     bool remove_invalid=true;
     bool remove_duplicate_entries=true;        //we remove duplicate entries from the database, but in general, keep input of user constant
     bool remove_extreme=m_cflags.flag("CHULL::REMOVE_EXTREMA");
@@ -3992,8 +4246,8 @@ namespace chull {
     if(LDEBUG) {cerr << soliloquy << " organizing into coordgroups" << endl;}
     vector<uint> unique_entries;
     string invalid_reason,canonical_auid;
-    char LOGGER_TYPE;
-    bool silent;
+    char LOGGER_TYPE=_LOGGER_OPTION_;
+    bool silent=false;
     uint i_coord_group_sort;  //so it doesn't conflict with i_coord_group in for-loops
     CoordGroup cg;
     xvector<double> r_coords;
@@ -4002,14 +4256,26 @@ namespace chull {
       const aflowlib::_aflowlib_entry& entry=m_points[i].m_entry;
       if(!point.m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized point");}
       // start remove points
-      if(remove_invalid && m_points[i].m_has_entry){
-        if(!entryValid(entry,invalid_reason,LOGGER_TYPE,ignore_bad_database)){
+      if(m_points[i].m_has_entry){
+        if(remove_invalid && !entryValid(entry,invalid_reason,LOGGER_TYPE,ignore_bad_database)){
           if(!invalid_reason.empty()){
             silent=(!see_neglect && LOGGER_TYPE==_LOGGER_OPTION_);
             message << "Neglecting [auid=" << entry.auid << ",aurl=" << entry.aurl << "]: " << invalid_reason;
             pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, LOGGER_TYPE, silent);
           }
           continue;
+        }
+        if(remove_submodular){
+          if(entry.aurl.find("ARUN.AEL_")!=string::npos ||
+              entry.aurl.find("ARUN.AGL_")!=string::npos ||
+              entry.aurl.find("ARUN.APL_")!=string::npos ||
+              entry.aurl.find("ARUN.QHA_")!=string::npos ||
+              FALSE){
+            silent=true;  //no need to see
+            message << "Neglecting [auid=" << entry.auid << ",aurl=" << entry.aurl << "]: sub-module load";
+            pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, LOGGER_TYPE, silent);
+            continue;
+          }
         }
         if(remove_duplicate_entries && !entryUnique(unique_entries,entry,canonical_auid)){
           silent=(!see_neglect);
@@ -4028,6 +4294,8 @@ namespace chull {
           // point.getDim() is dimension of hull
           //SK20200330
           if (point.getDim() == point.m_i_nary + 1) {
+            message << "Neglecting [auid=" << entry.auid << ",aurl=" << entry.aurl << "] to calculate N+1 enthalpy gain";
+            pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_OPTION_);
             continue;
           }
         }
@@ -4055,7 +4323,7 @@ namespace chull {
       //comparison of stoichiometry is more general, but less reliable than composition (to within tol)
       //nevermind, vcomposition is a double anyway (in anticipation for POCC), so floating point comparisons are inevitable
       r_coords=point.getStoichiometricCoords();
-      if(LDEBUG) {cerr << soliloquy << " point[" << i << "]: m_coords=" << point.m_coords << ", r_coords=" << r_coords << ", compound= " << point.m_entry.compound << ", dim=" << point.m_i_nary+1 << endl;}
+      if(LDEBUG) {cerr << soliloquy << " point[" << i << "]: m_coords=" << point.m_coords << ", r_coords=" << r_coords << ", compound=\"" << point.m_entry.compound << "\", dim=" << point.m_i_nary+1 << endl;}
       if(!getCoordGroupIndex(r_coords,i_coord_group_sort)){
         cg.initialize(r_coords,point.m_has_stoich_coords);
         m_coord_groups.push_back(cg);
@@ -4089,13 +4357,13 @@ namespace chull {
       } else {outliers=getOutliers();}
     }
 
-    if(!remove_outliers){
+    if(keep_outliers){
       message << "NOT removing outliers";
       pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_OPTION_);
       outliers.clear();
     }
 
-    bool found_outlier;
+    bool found_outlier=false;
     vector<uint> points_to_remove;
     uint valid_count=0;
     for(uint i_coord_group=0,fl_size_i_coord_group=m_coord_groups.size();i_coord_group<fl_size_i_coord_group;i_coord_group++){
@@ -4177,8 +4445,11 @@ namespace chull {
 
       initializeNaries(); //create empty bins first, we can do this combinatorially
 
+      if(LDEBUG){cerr << soliloquy << " m_coord_groups.size()=" << m_coord_groups.size() << endl;}
+
       uint i_nary,i_alloy;
       for(uint i_coord_group=0,fl_size_i_coord_group=m_coord_groups.size();i_coord_group<fl_size_i_coord_group;i_coord_group++){
+        if(LDEBUG){cerr << soliloquy << " m_coord_groups[i_coord_group=" << i_coord_group << "].m_points.size()=" << m_coord_groups[i_coord_group].m_points.size() << endl;}
         if(!m_coord_groups[i_coord_group].m_points.size()){continue;}
         //we already filled bins, if we cannot find alloy system, then it's a bust
         if(!getAlloyIndex(m_coord_groups[i_coord_group],i_nary,i_alloy,true)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Cannot get alloys index");}  //redo as we never done before
@@ -4237,7 +4508,9 @@ namespace chull {
 
   vector<string> ConvexHull::alloyToElements(const ChullPoint& point) const {return alloyToElements(point.m_i_nary,point.m_i_alloy);}
   vector<string> ConvexHull::alloyToElements(uint i_nary,uint i_alloy) const {
-    string soliloquy = XPID + "ConvexHull::alloyToElements():";
+    bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
+    string soliloquy=XPID+"ConvexHull::alloyToElements():";
+    if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
     const xvector<int>& elements_present=getElementsPresent(i_nary,i_alloy);
     if((uint)elements_present.rows!=m_velements.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Dimension mismatch between elements present and composition");}
     vector<string> vout;
@@ -4249,12 +4522,12 @@ namespace chull {
 
   void ConvexHull::checkStructurePoints() {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ConvexHull::checkStructurePoints():";
+    string soliloquy=XPID+"ConvexHull::checkStructurePoints():";
     stringstream message;
 
     if(LDEBUG) {cerr << soliloquy << " starting" << endl;}
 
-    bool binary_statistics_check=true;
+    bool binary_statistics_check=m_naries.size()>1; //unary hull //true;
 
     if(m_has_stoich_coords){
       //UNARIES - START
@@ -4294,7 +4567,8 @@ namespace chull {
               message << " (auid=" << m_points[i_point_real].m_entry.auid << ")";
               message << ": abs(" << m_points[i_point_real].getLastCoord() << ")>=" << ENERGY_TOL << " [eV]";
               message << " (please report on AFLOW Forum: aflow.org/forum)";
-              if(m_cflags.flag("FORCE")||m_cflags.flag("CHULL::INCLUDE_SKEWED_HULLS")){pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);}
+              if(m_cflags.flag("FAKE_HULL")){aurostd::StringstreamClean(message);}  //don't want to see these errors, they are expected
+              else if(m_cflags.flag("FORCE")||m_cflags.flag("CHULL::INCLUDE_SKEWED_HULLS")){pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);}
               else {
                 message << ". Override with --force (results may not be reliable).";
                 throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);
@@ -4302,10 +4576,12 @@ namespace chull {
             }
           }
         } else {
-          message << "No ground-state available for";
-          if(i_alloy<m_velements.size()){message << " " << m_velements[i_alloy];}
-          message << " [i_nary=" << i_nary <<",i_alloy=" << i_alloy << "]";
-          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+          if(!m_cflags.flag("FAKE_HULL")){
+            message << "No ground-state available for";
+            if(i_alloy<m_velements.size()){message << " " << m_velements[i_alloy];}
+            message << " [i_nary=" << i_nary <<",i_alloy=" << i_alloy << "]";
+            pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+          }
         }
       }
       //UNARIES - STOP
@@ -4323,7 +4599,8 @@ namespace chull {
             if(m_velements.size()){hull << aurostd::joinWDelimiter(alloyToElements(i_nary,i_alloy),"-") << " ";}
             hull << "[i_nary=" << i_nary <<",i_alloy=" << i_alloy << "]";
             message << pflow::arity_string(i_nary+1,true,false) <<  " hull " << hull.str() << " is unreliable (total_entry_count=" << count << " < " << count_threshold_binaries_total << ")";
-            if(m_cflags.flag("FORCE")||m_cflags.flag("CHULL::INCLUDE_UNRELIABLE_HULLS")){pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);}
+            if(m_cflags.flag("FAKE_HULL")){aurostd::StringstreamClean(message);}  //don't want to see these errors, they are expected
+            else if(m_cflags.flag("FORCE")||m_cflags.flag("CHULL::INCLUDE_UNRELIABLE_HULLS")){pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);}
             else {
               message << ". Override with --force (results may not be reliable).";
               throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);
@@ -4338,7 +4615,7 @@ namespace chull {
 
   void ConvexHull::addPointToFacet(ChullFacet& facet,uint i_point) {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ConvexHull::addPointToFacet():";
+    string soliloquy=XPID+"ConvexHull::addPointToFacet():";
     if(i_point>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
     facet.addVertex(m_points[i_point],i_point);
     if(LDEBUG) {
@@ -4358,7 +4635,7 @@ namespace chull {
 
   uint ConvexHull::getExtremePoint(uint dim,const vector<FacetPoint>& points_to_avoid) {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ConvexHull::getExtremePoint():";
+    string soliloquy=XPID+"ConvexHull::getExtremePoint():";
     stringstream message;
     if(!h_points.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No starting points provided");}
     uint i_point=AUROSTD_MAX_UINT;
@@ -4397,7 +4674,7 @@ namespace chull {
 
   void ConvexHull::setCentroid() {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ConvexHull::setCentroid():";
+    string soliloquy=XPID+"ConvexHull::setCentroid():";
     vector<xvector<double> > points;
     for(uint i=0,fl_size_i=h_points.size();i<fl_size_i;i++){points.push_back(m_points[h_points[i]].h_coords);}
     h_centroid=h_reference=aurostd::getCentroid(points);  //fix h_reference later
@@ -4411,7 +4688,7 @@ namespace chull {
 
   vector<FacetPoint> ConvexHull::getInitialExtremePoints() {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ConvexHull::getInitialExtremePoints():";
+    string soliloquy=XPID+"ConvexHull::getInitialExtremePoints():";
     if(LDEBUG) {cerr << soliloquy << " start" << endl;}
     ChullFacet facet(*p_FileMESSAGE,*p_oss);  //CO20180305
     string error;
@@ -4444,7 +4721,7 @@ namespace chull {
 
   void ConvexHull::setNeighbors() {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ConvexHull::setNeighbors():";
+    string soliloquy=XPID+"ConvexHull::setNeighbors():";
 
     //print ridges so far
     if(LDEBUG) {
@@ -4482,7 +4759,7 @@ namespace chull {
           cerr << soliloquy << " is_vertical=" << h_facets[i].m_is_vertical << endl;
         }
         message << "Neighbor count (" << h_facets[i].f_neighbors.size() << ") and facet dimension (" << h_dim << ") mismatch";
-        if(m_cflags.flag("FORCE")){pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);}  //h_facets[i].m_is_vertical
+        if(0&&m_cflags.flag("FORCE")){pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);}  //h_facets[i].m_is_vertical
         else {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);}
       }
     }
@@ -4503,7 +4780,7 @@ namespace chull {
 
   void ConvexHull::createInitializeSimplex() {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ConvexHull::createInitializeSimplex():";
+    string soliloquy=XPID+"ConvexHull::createInitializeSimplex():";
     //clear
     h_facets.clear();
     setCentroid();
@@ -4584,7 +4861,7 @@ namespace chull {
 
   void ConvexHull::setVisibleFacets(uint i_facet){
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ConvexHull::setVisibleFacets():";
+    string soliloquy=XPID+"ConvexHull::setVisibleFacets():";
     if(i_facet>h_facets.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index with h_facets");}
     //clean
     for(uint i=0,fl_size_i=h_facets.size();i<fl_size_i;i++){h_facets[i].f_visited=false;}
@@ -4619,7 +4896,7 @@ namespace chull {
 
   void ConvexHull::setHorizonRidges(){
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ConvexHull::setHorizonRidges():";
+    string soliloquy=XPID+"ConvexHull::setHorizonRidges():";
     if(!h_visible_facets.size()){return;}
     h_horizon_ridges.clear();
     bool match;
@@ -4652,7 +4929,7 @@ namespace chull {
 
   uint ConvexHull::createNewFacets(FacetPoint furthest_point){
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ConvexHull::createNewFacets():";
+    string soliloquy=XPID+"ConvexHull::createNewFacets():";
     if(furthest_point.ch_index>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index with furthest_point");}
     uint old_facet_count=h_facets.size();
     string error; //dummy so we don't recreate every time
@@ -4683,7 +4960,7 @@ namespace chull {
 
   void ConvexHull::updateOutsideSet(uint new_facet_count){  //they are at the end of the list
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ConvexHull::updateOutsideSet():";
+    string soliloquy=XPID+"ConvexHull::updateOutsideSet():";
     //we're deleting visible planes soon, so we need to reassess/reassign outside points
     uint i_visible;
     bool associated;
@@ -4717,7 +4994,7 @@ namespace chull {
 
   void ConvexHull::removeDuplicateHullPoints() {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ConvexHull::removeDuplicateHullPoints():";
+    string soliloquy=XPID+"ConvexHull::removeDuplicateHullPoints():";
     std::sort(h_points.begin(),h_points.end());h_points.erase( std::unique( h_points.begin(), h_points.end() ), h_points.end() );  //first remove duplicate indices
 
     if(LDEBUG) {cerr << soliloquy << " starting" << endl;}
@@ -4742,7 +5019,7 @@ namespace chull {
   void ConvexHull::calculateFacets() {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
     //only copy those possibly on the hull (does not include endpoints)
-    string soliloquy = XPID + "ConvexHull::calculateFacets():";
+    string soliloquy=XPID+"ConvexHull::calculateFacets():";
 
     h_facets.clear();
     removeDuplicateHullPoints();
@@ -4803,17 +5080,34 @@ namespace chull {
   }
 
   const xvector<int>& ConvexHull::getElementsPresent(uint i_nary,uint i_alloy) const {
-    string soliloquy = XPID + "ConvexHull::setElementsPresent():";
+    string soliloquy=XPID+"ConvexHull::setElementsPresent():";
     if(i_nary>m_naries.size()-1 || i_alloy>m_naries[i_nary].m_alloys.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within m_naries");}
     if(!m_naries[i_nary].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized nary");}
     if(!m_naries[i_nary].m_alloys[i_alloy].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized alloy");}
     return m_naries[i_nary].m_alloys[i_alloy].m_elements_present;
   }
+  const xvector<int>& ConvexHull::getElementsPresent(uint i_point) const {
+    if(i_point>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,"ConvexHull::getElementsPresent():","Invalid index within points");}
+    return m_points[i_point].m_elements_present;
+  }
+  xvector<int> ConvexHull::getElementsPresent(const vector<uint>& vcpoints) const {
+    //get union of elements_present, just the sum
+    string soliloquy=XPID+"ConvexHull::getElementsPresent():";
+    if(vcpoints.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No points provided");}
+    xvector<int> elements_present=getElementsPresent(vcpoints[0]);
+    if(vcpoints.size()==1){return elements_present;}
+    for(uint i=1,fl_size_i=vcpoints.size();i<fl_size_i;i++) {
+      uint i_point=vcpoints[i];
+      const xvector<int>& _elements_present=getElementsPresent(i_point);
+      elements_present+=_elements_present;
+    }
+    return elements_present;
+  }
 
   void ConvexHull::setElementsPresent(uint i_nary,uint i_alloy){m_elements_present=getElementsPresent(i_nary,i_alloy);}
 
   void ConvexHull::addRelevantUnariesToHullCalculation(uint i_nary,uint i_alloy) {
-    string soliloquy = XPID + "ConvexHull::addRelevantUnariesToHullCalculation():";
+    string soliloquy=XPID+"ConvexHull::addRelevantUnariesToHullCalculation():";
     if(i_nary>m_naries.size()-1 || i_alloy>m_naries[i_nary].m_alloys.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within m_naries");}
     if(!m_naries[i_nary].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized nary");}
     if(!m_naries[i_nary].m_alloys[i_alloy].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized alloy");}
@@ -4821,7 +5115,7 @@ namespace chull {
   }
 
   void ConvexHull::addRelevantUnariesToHullCalculation(xvector<int>& elements_present) {
-    string soliloquy = XPID + "ConvexHull::addRelevantUnariesToHullCalculation():";
+    string soliloquy=XPID+"ConvexHull::addRelevantUnariesToHullCalculation():";
     uint i_nary=0;
     if((uint)elements_present.rows!=m_naries[i_nary].m_alloys.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unary alloy is missing from m_naries");}
     uint i_coord_group,i_point;
@@ -4841,7 +5135,7 @@ namespace chull {
 
   void ConvexHull::addLowerDimensionPointsToHullCalculation(uint i_nary_max){
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ConvexHull::addLowerDimensionPointsToHullCalculation():";
+    string soliloquy=XPID+"ConvexHull::addLowerDimensionPointsToHullCalculation():";
     if(i_nary_max>m_naries.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within m_naries");}
     if(LDEBUG) {cerr << soliloquy << " starting" << endl;}
     //grab from m_naries[i_nary].m_alloys[i_alloy].m_facets
@@ -4869,14 +5163,14 @@ namespace chull {
   }
 
   void ConvexHull::addPointToHullCalculation(uint i_point){
-    string soliloquy = XPID + "ConvexHull::addPointToHullCalculation():";
+    string soliloquy=XPID+"ConvexHull::addPointToHullCalculation():";
     if(i_point>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
     h_points.push_back(i_point);
     m_points[i_point].setHullCoords();
   }
 
   void ConvexHull::addPointToHullCalculation(uint i_point,xvector<int>& elements_present){
-    string soliloquy = XPID + "ConvexHull::addPointToHullCalculation():";
+    string soliloquy=XPID+"ConvexHull::addPointToHullCalculation():";
     if(i_point>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
     h_points.push_back(i_point);
     m_points[i_point].setHullCoords(elements_present);
@@ -4884,7 +5178,7 @@ namespace chull {
 
   void ConvexHull::preparePointsForHullCalculation(uint i_nary,uint i_alloy) {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ConvexHull::preparePointsForHullCalculation():";
+    string soliloquy=XPID+"ConvexHull::preparePointsForHullCalculation():";
     if(i_nary>m_naries.size()-1 || i_alloy>m_naries[i_nary].m_alloys.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within m_naries");}
     if(!m_naries[i_nary].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized nary");}
     if(!m_naries[i_nary].m_alloys[i_alloy].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized alloy");}
@@ -4906,7 +5200,7 @@ namespace chull {
   }
 
   void ConvexHull::preparePointsForHullCalculation() {
-    string soliloquy = XPID + "ConvexHull::preparePointsForHullCalculation():";
+    string soliloquy=XPID+"ConvexHull::preparePointsForHullCalculation():";
     h_points.clear();
     //we already checked extremes in last (energy) direction, just add these to the hull
     //don't include those points in between
@@ -4923,7 +5217,7 @@ namespace chull {
 
   uint ConvexHull::getNearestFacetVertically(const vector<uint>& i_facets,const ChullPoint& point) const{
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ConvexHull::getNearestFacetVertically():";
+    string soliloquy=XPID+"ConvexHull::getNearestFacetVertically():";
     if(!point.m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized point");}
     if(LDEBUG) {cerr << soliloquy << " m_coords=" << point.m_coords << ", h_coords=" << point.h_coords << endl;}
     return getNearestFacetVertically(i_facets,point.h_coords);
@@ -4932,7 +5226,7 @@ namespace chull {
   uint ConvexHull::getNearestFacetVertically(const vector<uint>& i_facets,const xvector<double>& point) const{
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
     //determines nearness by vertical distance
-    string soliloquy = XPID + "ConvexHull::getNearestFacetVertically():";
+    string soliloquy=XPID+"ConvexHull::getNearestFacetVertically():";
     uint i_facet = 0, i_facet_min = 0;
     uint i_facet_artificial=-1; //really large uint
     double vdist,dist=AUROSTD_MAX_DOUBLE;
@@ -4963,7 +5257,7 @@ namespace chull {
   }
 
   const vector<uint>& ConvexHull::getRelevantFacets(uint i_nary,uint i_alloy) const {
-    string soliloquy = XPID + "ConvexHull::getRelevantFacets():";
+    string soliloquy=XPID+"ConvexHull::getRelevantFacets():";
     if(i_nary>m_naries.size()-1 || i_alloy>m_naries[i_nary].m_alloys.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within m_naries");}
     if(!m_naries[i_nary].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized nary");}
     if(!m_naries[i_nary].m_alloys[i_alloy].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized alloy");}
@@ -4984,7 +5278,7 @@ namespace chull {
 
   void ConvexHull::setHullMembers() {return setHullMembers(m_i_facets);}
   void ConvexHull::setHullMembers(uint i_nary,uint i_alloy) {
-    string soliloquy = XPID + "ConvexHull::setHullMembers():";
+    string soliloquy=XPID+"ConvexHull::setHullMembers():";
     if(i_nary>m_naries.size()-1 || i_alloy>m_naries[i_nary].m_alloys.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within m_naries");}
     if(!m_naries[i_nary].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized nary");}
     if(!m_naries[i_nary].m_alloys[i_alloy].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized alloy");}
@@ -4993,7 +5287,7 @@ namespace chull {
   }
 
   void ConvexHull::setHullMembers(const vector<uint>& i_facets) {
-    string soliloquy = XPID + "ConvexHull::setHullMembers():";
+    string soliloquy=XPID+"ConvexHull::setHullMembers():";
     if(!i_facets.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Hull has yet to be calculated");}
     uint i_point=AUROSTD_MAX_UINT,g_state=AUROSTD_MAX_UINT,i_coord_group=AUROSTD_MAX_UINT,i_facet=AUROSTD_MAX_UINT;
     for(uint i=0,fl_size_i=i_facets.size();i<fl_size_i;i++){
@@ -5015,7 +5309,7 @@ namespace chull {
 
   void ConvexHull::setNearestFacet(uint i_nary,uint i_alloy,uint i_coord_group){
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ConvexHull::setNearestFacet():";
+    string soliloquy=XPID+"ConvexHull::setNearestFacet():";
     if(i_nary>m_naries.size()-1 || i_alloy>m_naries[i_nary].m_alloys.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within m_naries");}
     if(!m_naries[i_nary].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized nary");}
     if(!m_naries[i_nary].m_alloys[i_alloy].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized alloy");}
@@ -5041,14 +5335,14 @@ namespace chull {
   }
 
   double ConvexHull::getSignedVerticalDistanceWithinCoordGroup(uint i_coord_group,uint i_point) const {
-    string soliloquy = XPID + "ConvexHull::getSignedVerticalDistanceWithinCoordGroup():";
+    string soliloquy=XPID+"ConvexHull::getSignedVerticalDistanceWithinCoordGroup():";
     if(i_point>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
     return getSignedVerticalDistanceWithinCoordGroup(i_coord_group,m_points[i_point]);
   }
 
   double ConvexHull::getSignedVerticalDistanceWithinCoordGroup(uint i_coord_group,const ChullPoint& point) const {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ConvexHull::getSignedVerticalDistanceWithinCoordGroup():";
+    string soliloquy=XPID+"ConvexHull::getSignedVerticalDistanceWithinCoordGroup():";
     if(!m_coord_groups[i_coord_group].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized coordgroup");}
     if(m_coord_groups[i_coord_group].m_points.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coordgroup["+aurostd::utype2string(i_coord_group)+"] has no points");}
     if(!point.m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized point");}
@@ -5093,14 +5387,14 @@ namespace chull {
   }
 
   double ConvexHull::getDistanceToHull(uint i_point,bool redo,bool get_signed_distance) const{
-    string soliloquy = XPID + "ConvexHull::getDistanceToHull():";
+    string soliloquy=XPID+"ConvexHull::getDistanceToHull():";
     if(i_point>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
     return getDistanceToHull(m_points[i_point],redo,get_signed_distance);
   }
 
   double ConvexHull::getDistanceToHull(const ChullPoint& point,bool redo,bool get_signed_distance) const{
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ConvexHull::getDistanceToHull():";
+    string soliloquy=XPID+"ConvexHull::getDistanceToHull():";
     if(!point.m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized point");}
     //const vector<uint>& i_facets=m_i_facets;
     double dist;
@@ -5161,7 +5455,9 @@ namespace chull {
         return dist;
       }
       i_facets=getRelevantFacets(i_nary,i_alloy);
-    } else {if(LDEBUG) {cerr << soliloquy << " searching through ALL facets for closet vertical distance" << endl;}}
+    } else {
+      if(LDEBUG) {cerr << soliloquy << " searching through ALL facets for closest vertical distance" << endl;}
+    }
     //otherwise, all facets are relevant (same dimension)
     uint i_facet=getNearestFacetVertically(i_facets,point);
     dist=m_facets[i_facet].getSignedVerticalDistance(point);
@@ -5172,7 +5468,7 @@ namespace chull {
 
   vector<double> ConvexHull::getDistancesToHull(const vector<string>& vauid,bool redo) const{
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ConvexHull::getDistancesToHull():";
+    string soliloquy=XPID+"ConvexHull::getDistancesToHull():";
     stringstream message;
     vector<double> vdist2hull;
     uint i_point=AUROSTD_MAX_UINT;
@@ -5227,7 +5523,7 @@ namespace chull {
 
   void ConvexHull::setDistancesToHull(uint i_nary,uint i_alloy) {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ConvexHull::setDistancesToHull():";
+    string soliloquy=XPID+"ConvexHull::setDistancesToHull():";
     stringstream message;
     if(!m_has_stoich_coords){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Non-stoich coordinates");}
     if(i_nary>m_naries.size()-1 || i_alloy>m_naries[i_nary].m_alloys.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within m_naries");}
@@ -5260,7 +5556,7 @@ namespace chull {
 
   void ConvexHull::setDistancesToHull(uint i_nary,uint i_alloy,uint i_coord_group) {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ConvexHull::setDistancesToHull():";
+    string soliloquy=XPID+"ConvexHull::setDistancesToHull():";
     if(!m_has_stoich_coords){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Non-stoich coordinates");}
     if(i_nary>m_naries.size()-1 || i_alloy>m_naries[i_nary].m_alloys.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within m_naries");}
     if(!m_naries[i_nary].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized nary");}
@@ -5326,7 +5622,7 @@ namespace chull {
   }
 
   vector<uint> ConvexHull::extractDecompositionPhases(const ChullFacet& facet) const{
-    string soliloquy = XPID + "ConvexHull::extractDecompositionPhases():";
+    string soliloquy=XPID+"ConvexHull::extractDecompositionPhases():";
     uint i_point=AUROSTD_MAX_UINT;
     vector<uint> decomp_phases;
     for(uint i=0,fl_size_i=facet.m_vertices.size();i<fl_size_i;i++){
@@ -5341,13 +5637,13 @@ namespace chull {
   }
 
   vector<uint> ConvexHull::getDecompositionPhases(uint i_point) const{
-    string soliloquy = XPID + "ConvexHull::getDecompositionPhases():";
+    string soliloquy=XPID+"ConvexHull::getDecompositionPhases():";
     if(i_point>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
     return getDecompositionPhases(m_points[i_point]);
   }
 
   vector<uint> ConvexHull::getDecompositionPhases(const ChullPoint& point) const{
-    string soliloquy = XPID + "ConvexHull::getDecompositionPhases():";
+    string soliloquy=XPID+"ConvexHull::getDecompositionPhases():";
     if(!point.m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized point");}
     if(point.m_is_on_hull){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No decomposition coefficients for hull members");}
     uint i_facet=AUROSTD_MAX_UINT;
@@ -5373,13 +5669,19 @@ namespace chull {
   }
 
   void ConvexHull::setDecompositionPhases(uint i_nary,uint i_alloy,uint i_coord_group){
-    string soliloquy = XPID + "ConvexHull::setDecompositionPhases():";
+    string soliloquy=XPID+"ConvexHull::setDecompositionPhases():";
     if(i_nary>m_naries.size()-1 || i_alloy>m_naries[i_nary].m_alloys.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within m_naries");}
     if(!m_naries[i_nary].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized nary");}
     if(!m_naries[i_nary].m_alloys[i_alloy].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized alloy");}
     if(i_coord_group>m_coord_groups.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within coordgroups");}
-    if(m_coord_groups[i_coord_group].m_is_on_hull){return;}
     if(m_coord_groups[i_coord_group].m_nearest_facet>m_facets.size()-1){setNearestFacet(i_nary,i_alloy,i_coord_group);}
+
+    if(m_coord_groups[i_coord_group].m_is_on_hull){
+      if(!isViablePoint(m_coord_groups[i_coord_group].m_hull_member)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No hull member set for m_coord_group["+aurostd::utype2string(i_coord_group)+"]",_RUNTIME_ERROR_);}
+      vector<uint> dcomp_phases;dcomp_phases.push_back(m_coord_groups[i_coord_group].m_hull_member);
+      m_coord_groups[i_coord_group].m_decomp_phases=dcomp_phases;
+      return;
+    }
 
     uint i_facet=m_coord_groups[i_coord_group].m_nearest_facet;
     ChullFacet& facet=m_facets[i_facet];
@@ -5387,15 +5689,15 @@ namespace chull {
   }
 
   xvector<double> ConvexHull::getDecompositionCoefficients(uint i_point,vector_reduction_type vred) const{
-    string soliloquy = XPID + "ConvexHull::getDecompositionCoefficients():";
+    string soliloquy=XPID+"ConvexHull::getDecompositionCoefficients():";
     if(i_point>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
     return getDecompositionCoefficients(m_points[i_point],vred);
   }
 
   xvector<double> ConvexHull::getDecompositionCoefficients(const ChullPoint& point,vector_reduction_type vred) const{
-    string soliloquy = XPID + "ConvexHull::getDecompositionCoefficients():";
+    string soliloquy=XPID+"ConvexHull::getDecompositionCoefficients():";
     if(!point.m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized point");}
-    if(point.m_is_on_hull){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No decomposition coefficients for hull members");}
+    //[returns self]if(point.m_is_on_hull){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No decomposition coefficients for hull members");}
     uint i_coord_group=AUROSTD_MAX_UINT;
     bool found_coord_group=getCoordGroupIndex(point,i_coord_group);
     if(found_coord_group){  //composition has already been considered by hull, might be g-state
@@ -5412,13 +5714,13 @@ namespace chull {
   }
 
   xvector<double> ConvexHull::getDecompositionCoefficients(uint i_point,const vector<uint>& decomp_phases,vector_reduction_type vred) const{
-    string soliloquy = XPID + "ConvexHull::getDecompositionCoefficients():";
+    string soliloquy=XPID+"ConvexHull::getDecompositionCoefficients():";
     if(i_point>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
     return getDecompositionCoefficients(m_points[i_point],decomp_phases,vred);
   }
 
   xvector<double> ConvexHull::getDecompositionCoefficients(const ChullPoint& point,const vector<uint>& decomp_phases,vector_reduction_type vred) const{
-    string soliloquy = XPID + "ConvexHull::getDecompositionCoefficients():";
+    string soliloquy=XPID+"ConvexHull::getDecompositionCoefficients():";
     //do m_coords_group first (REDUCED)
     if(!point.m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized point");}
     if(!decomp_phases.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No decomposition phases found");}
@@ -5451,13 +5753,19 @@ namespace chull {
   }
 
   void ConvexHull::setDecompositionCoefficients(uint i_nary,uint i_alloy,uint i_coord_group){
-    string soliloquy = XPID + "ConvexHull::setDecompositionCoefficients():";
+    string soliloquy=XPID+"ConvexHull::setDecompositionCoefficients():";
     if(i_nary>m_naries.size()-1 || i_alloy>m_naries[i_nary].m_alloys.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within m_naries");}
     if(!m_naries[i_nary].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized nary");}
     if(!m_naries[i_nary].m_alloys[i_alloy].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized alloy");}
     if(i_coord_group>m_coord_groups.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within coordgroups");}
-    if(m_coord_groups[i_coord_group].m_is_on_hull){return;}
     if(m_coord_groups[i_coord_group].m_decomp_phases.size()==0){setDecompositionPhases(i_nary,i_alloy,i_coord_group);}
+
+    if(m_coord_groups[i_coord_group].m_is_on_hull){
+      xvector<double> dcomp_coefs(2);
+      dcomp_coefs[dcomp_coefs.lrows]=dcomp_coefs[dcomp_coefs.lrows+1]=1.0;
+      m_coord_groups[i_coord_group].m_decomp_coefs=dcomp_coefs;
+      return;
+    }
 
     //we get different coefficients between stoich and composition
     //ALWAYS use composition (even POCC, simply won't reduce), and do NOT mix stoich + composition
@@ -5476,7 +5784,7 @@ namespace chull {
 
   void ConvexHull::setOffHullProperties(uint i_nary,uint i_alloy){
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ConvexHull::setOffHullProperties():";
+    string soliloquy=XPID+"ConvexHull::setOffHullProperties():";
     stringstream message;
     if(!m_has_stoich_coords){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Non-stoich coordinates");}
     if(i_nary>m_naries.size()-1 || i_alloy>m_naries[i_nary].m_alloys.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within m_naries");}
@@ -5504,7 +5812,7 @@ namespace chull {
 
   vector<uint> ConvexHull::getAdjacentFacets(uint hull_member,bool ignore_hypercollinear,bool ignore_vertical,bool ignore_artificial) const {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ConvexHull::getAdjacentFacets():";
+    string soliloquy=XPID+"ConvexHull::getAdjacentFacets():";
     if(hull_member>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No hull member has been identified");}
     vector<uint> adjacent_i_facets;
     if(!m_points[hull_member].m_is_on_hull){return adjacent_i_facets;}
@@ -5533,7 +5841,7 @@ namespace chull {
 
   vector<vector<uint> > ConvexHull::getEquilibriumPhases(uint hull_member) const {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ConvexHull::getEquilibriumPhases():";
+    string soliloquy=XPID+"ConvexHull::getEquilibriumPhases():";
     if(hull_member>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
     const ChullPoint& point=m_points[hull_member];
     if(!point.m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized point");}
@@ -5569,7 +5877,7 @@ namespace chull {
 
   void ConvexHull::setEquilibriumPhases(uint i_nary,uint i_alloy,uint i_coord_group){
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ConvexHull::setEquilibriumPhases():";
+    string soliloquy=XPID+"ConvexHull::setEquilibriumPhases():";
     if(i_nary>m_naries.size()-1 || i_alloy>m_naries[i_nary].m_alloys.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within m_naries");}
     if(!m_naries[i_nary].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized nary");}
     if(!m_naries[i_nary].m_alloys[i_alloy].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized alloy");}
@@ -5596,7 +5904,7 @@ namespace chull {
   //continue on to more strict determination later
   bool ConvexHull::energiesDiffer(uint i_point1,uint i_point2,bool strict) const{
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ConvexHull::energiesDiffer():";
+    string soliloquy=XPID+"ConvexHull::energiesDiffer():";
     if(i_point1>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
     if(i_point2>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
 
@@ -5619,7 +5927,7 @@ namespace chull {
   //continue on to more strict determination later
   bool ConvexHull::spacegroupsDiffer(uint i_point1,uint i_point2,bool strict) const{
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ConvexHull::spacegroupsDiffer():";
+    string soliloquy=XPID+"ConvexHull::spacegroupsDiffer():";
     if(i_point1>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
     if(i_point2>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
 
@@ -5639,7 +5947,7 @@ namespace chull {
 
   bool ConvexHull::structuresEquivalent(uint i_point1,uint i_point2) const{
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ConvexHull::structuresEquivalent():";
+    string soliloquy=XPID+"ConvexHull::structuresEquivalent():";
     if(i_point1>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
     if(i_point2>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
 
@@ -5663,14 +5971,14 @@ namespace chull {
       cerr << soliloquy << " structure 2" << endl;
       cerr << b;
     }
-    bool are_equivalent=compare::aflowCompareStructure(a,b,true,false,false); //match species and use fast match, but not scale volume, two structures with different volumes (pressures) are different! //DX20180123 - added fast_match = true //DX20190318 - not fast_match but optimized_match=false
+    bool are_equivalent=compare::structuresMatch(a,b,true,false,false); //match species and use fast match, but not scale volume, two structures with different volumes (pressures) are different! //DX20180123 - added fast_match = true //DX20190318 - not fast_match but optimized_match=false
     if(LDEBUG) {cerr << soliloquy << " structures are " << (are_equivalent?"":"NOT ") << "equivalent" << endl;}
     return are_equivalent;
   }
 
   vector<uint> ConvexHull::getEquivalentGStates(uint g_state) const{
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ConvexHull::getEquivalentGStates():";
+    string soliloquy=XPID+"ConvexHull::getEquivalentGStates():";
     if(g_state>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
     const ChullPoint& point=m_points[g_state];
     if(!point.m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized point");}
@@ -5709,7 +6017,7 @@ namespace chull {
 
   bool ConvexHull::isICSD(uint i_point) const {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ConvexHull::isICSD():";
+    string soliloquy=XPID+"ConvexHull::isICSD():";
     if(i_point>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
     string point_icsd_number=getICSDNumber(i_point,true);
     if(LDEBUG) {cerr << soliloquy << " looking for icsd_number=" << point_icsd_number << endl;}
@@ -5736,7 +6044,7 @@ namespace chull {
 
   void ConvexHull::setEquivalentGStates(uint i_nary,uint i_alloy,uint i_coord_group){
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ConvexHull::setEquivalentGStates():";
+    string soliloquy=XPID+"ConvexHull::setEquivalentGStates():";
     m_coord_groups[i_coord_group].m_equivalent_g_states.clear();
     m_coord_groups[i_coord_group].m_calculated_equivalent_g_states=false;
     if(i_nary>m_naries.size()-1 || i_alloy>m_naries[i_nary].m_alloys.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within m_naries");}
@@ -5797,7 +6105,7 @@ namespace chull {
 
   vector<uint> ConvexHull::getSymEquivalentGStates(uint g_state) const{
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ConvexHull::getSymEquivalentGStates():";
+    string soliloquy=XPID+"ConvexHull::getSymEquivalentGStates():";
     if(g_state>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
     const ChullPoint& point=m_points[g_state];
     if(!point.m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized point");}
@@ -5826,7 +6134,7 @@ namespace chull {
 
   void ConvexHull::setSymEquivalentGStates(uint i_nary,uint i_alloy,uint i_coord_group){
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ConvexHull::setSymEquivalentGStates():";
+    string soliloquy=XPID+"ConvexHull::setSymEquivalentGStates():";
     m_coord_groups[i_coord_group].m_sym_equivalent_g_states.clear();
     if(i_nary>m_naries.size()-1 || i_alloy>m_naries[i_nary].m_alloys.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within m_naries");}
     if(!m_naries[i_nary].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized nary");}
@@ -5854,7 +6162,7 @@ namespace chull {
 
   void ConvexHull::setOnHullProperties(uint i_nary,uint i_alloy){
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ConvexHull::setOnHullProperties():";
+    string soliloquy=XPID+"ConvexHull::setOnHullProperties():";
     stringstream message;
     if(!m_has_stoich_coords){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Non-stoich coordinates");}
     if(i_nary>m_naries.size()-1 || i_alloy>m_naries[i_nary].m_alloys.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within m_naries");}
@@ -5878,6 +6186,8 @@ namespace chull {
       //very important that you do not simply go through all facet points and find equilibrium points
       //this will overwrite binary information with ternary information
       //proceed safely with i_coord_group's
+      setDecompositionPhases(i_nary,i_alloy,i_coord_group);
+      setDecompositionCoefficients(i_nary,i_alloy,i_coord_group);
       setEquilibriumPhases(i_nary,i_alloy,i_coord_group);
       setSymEquivalentGStates(i_nary,i_alloy,i_coord_group);
       setEquivalentGStates(i_nary,i_alloy,i_coord_group);
@@ -5886,7 +6196,7 @@ namespace chull {
 
   void ConvexHull::storeHullData(uint i_nary,uint i_alloy){
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ConvexHull::storeHullData():";
+    string soliloquy=XPID+"ConvexHull::storeHullData():";
     stringstream message;
     if(!h_facets.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Hull has yet to be calculated");}
     if(i_nary>m_naries.size()-1 || i_alloy>m_naries[i_nary].m_alloys.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within m_naries");}
@@ -5922,7 +6232,7 @@ namespace chull {
   }
 
   void ConvexHull::extractThermodynamicProperties(uint i_nary,uint i_alloy){
-    string soliloquy = XPID + "ConvexHull::extractThermodynamicProperties():";
+    string soliloquy=XPID+"ConvexHull::extractThermodynamicProperties():";
     stringstream message;
     if(!h_facets.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Hull has yet to be calculated");}
     if(!m_has_stoich_coords){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Non-stoich coordinates");}
@@ -5958,7 +6268,7 @@ namespace chull {
 
   void ConvexHull::thermodynamicsPostProcessing(){
     //hull must be initialized for these analyses
-    string soliloquy = XPID + "ConvexHull::thermodynamicsPostProcessing():";
+    string soliloquy=XPID+"ConvexHull::thermodynamicsPostProcessing():";
     stringstream message;
     if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Hull not initialized");}
     if(!m_thermo_hull){return;}
@@ -5979,8 +6289,8 @@ namespace chull {
     bool perform_stability_criterion=(1&&(!m_cflags.flag("CHULL::SKIP_STABILITY_CRITERION_ANALYSIS"))); //(1&&!(m_cflags.flag("CHULL::SKIP_STABILITY_CRITERION_ANALYSIS")||(!m_cflags.flag("CHULL::MULTI_OUTPUT")&&m_cflags.flag("CHULL::LATEX_DOC")&&m_cflags.flag("CHULL::IMAGE_ONLY"))));
     if(perform_stability_criterion){setStabilityCriterion();}
 
-    bool perform_n_plus_1_energy_gain=(1&&(!m_cflags.flag("CHULL::SKIP_N_PLUS_1_ENERGY_GAIN_ANALYSIS"))); //(1&&!(m_cflags.flag("CHULL::SKIP_N_PLUS_1_ENERGY_GAIN_ANALYSIS")||(!m_cflags.flag("CHULL::MULTI_OUTPUT")&&m_cflags.flag("CHULL::LATEX_DOC")&&m_cflags.flag("CHULL::IMAGE_ONLY"))));
-    if(perform_n_plus_1_energy_gain){setNPlus1EnergyGain();}
+    bool perform_n_plus_1_enthalpy_gain=(1&&(!m_cflags.flag("CHULL::SKIP_N+1_ENTHALPY_GAIN_ANALYSIS"))); //(1&&!(m_cflags.flag("CHULL::SKIP_N+1_ENTHALPY_GAIN_ANALYSIS")||(!m_cflags.flag("CHULL::MULTI_OUTPUT")&&m_cflags.flag("CHULL::LATEX_DOC")&&m_cflags.flag("CHULL::IMAGE_ONLY"))));
+    if(perform_n_plus_1_enthalpy_gain){setNPlus1EnthalpyGain();}
 
     return;
   }
@@ -5988,7 +6298,7 @@ namespace chull {
   void ConvexHull::calculate(){
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
     stringstream message;
-    string soliloquy = XPID + "ConvexHull::calculate():";
+    string soliloquy=XPID+"ConvexHull::calculate():";
 
     for(uint i_coord_group=0,fl_size_i_coord_group=m_coord_groups.size();i_coord_group<fl_size_i_coord_group;i_coord_group++){
       if(!m_coord_groups[i_coord_group].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized coordgroup");}
@@ -6001,10 +6311,18 @@ namespace chull {
     if(LDEBUG) {cerr << soliloquy << " starting" << endl;}
     //we first run through alloy hulls IF stoich_coords, grabbing hull_members
     if(m_has_stoich_coords){
-      message << "Calculating the hull(s) in increasing dimensionality (stoichiometric coordinates)";
-      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
       if(!m_naries.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Points have yet to be structured");}
-      for(uint i_nary=1,fl_size_i_nary=m_naries.size();i_nary<fl_size_i_nary;i_nary++){ //start at binaries
+      bool calc_highest_hull_only=m_cflags.flag("CHULL::CALCULATE_HIGHEST_DIMENSION_ONLY");
+      uint i_nary_start=1;  //start at binaries
+      if(calc_highest_hull_only){
+        i_nary_start=m_naries.size()-1;
+        message << "Calculating the highest dimensional hull ONLY (stoichiometric coordinates)";
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+      }else{
+        message << "Calculating the hull(s) in increasing dimensionality (stoichiometric coordinates)";
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+      }
+      for(uint i_nary=i_nary_start,fl_size_i_nary=m_naries.size();i_nary<fl_size_i_nary;i_nary++){
         for(uint i_alloy=0,fl_size_i_alloy=m_naries[i_nary].m_alloys.size();i_alloy<fl_size_i_alloy;i_alloy++){
           message << "Calculating " << pflow::arity_string(i_nary+1,false,false) << " hull for";
           if(m_velements.size()){message << " " << aurostd::joinWDelimiter(alloyToElements(i_nary,i_alloy),"-");}
@@ -6012,7 +6330,11 @@ namespace chull {
           pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
           cleanHull();
           setElementsPresent(i_nary,i_alloy); //m_has_stoich_coords only
-          preparePointsForHullCalculation(i_nary,i_alloy);  //will have unary duplicates, but don't worry, we remove in calculateFacets()
+          if(calc_highest_hull_only){
+            preparePointsForHullCalculation();  //inject all points
+          }else{
+            preparePointsForHullCalculation(i_nary,i_alloy);  //will have unary duplicates, but don't worry, we remove in calculateFacets()
+          }
           calculateFacets();
           message << pflow::arity_string(i_nary+1,true,false) << " hull calculated for";
           if(m_velements.size()){message << " " << aurostd::joinWDelimiter(alloyToElements(i_nary,i_alloy),"-");}
@@ -6072,7 +6394,7 @@ namespace chull {
   }
 
   double ConvexHull::getStabilityCriterion(const string& cauid) const {
-    string soliloquy = XPID + "ConvexHull::getStabilityCriterion():";
+    string soliloquy=XPID+"ConvexHull::getStabilityCriterion():";
     if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Hull not initialized");}
     vector<string> vcauid; vcauid.push_back(cauid);
     vector<double> vsc=getStabilityCriterion(vcauid);
@@ -6080,63 +6402,74 @@ namespace chull {
   }
 
   double ConvexHull::getStabilityCriterion(uint cpoint) const {
-    string soliloquy = XPID + "ConvexHull::getStabilityCriterion():";
+    string soliloquy=XPID+"ConvexHull::getStabilityCriterion():";
     if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Hull not initialized");}
     if(cpoint>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
-    vector<uint> vcpoint; vcpoint.push_back(cpoint);
-    vector<double> vsc=getStabilityCriterion(vcpoint);
+    vector<uint> vcpoints; vcpoints.push_back(cpoint);
+    vector<double> vsc=getStabilityCriterion(vcpoints);
     return vsc[0];
   }
 
   vector<double> ConvexHull::getStabilityCriterion(const vector<string>& vcauid) const {
-    string soliloquy = XPID + "ConvexHull::getStabilityCriterion():";
+    string soliloquy=XPID+"ConvexHull::getStabilityCriterion():";
     if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Hull not initialized");}
     stringstream message;
 
     uint i_point=AUROSTD_MAX_UINT;
-    vector<uint> vcpoint; //follows vcauid
+    vector<uint> vcpoints; //follows vcauid
     for(uint i=0,fl_size_i=vcauid.size();i<fl_size_i;i++){
       const string& auid=vcauid[i];
       if(auid.empty()){message << "Empty auid found";throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);}
       if(!findPoint(auid,i_point)){message << "Specified auid not found on hull (auid=" << auid << ")";throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);}
-      vcpoint.push_back(i_point);
+      vcpoints.push_back(i_point);
     }
-    return getStabilityCriterion(vcpoint);
+    return getStabilityCriterion(vcpoints);
   }
 
-  vector<double> ConvexHull::getStabilityCriterion(const vector<uint>& vcpoint) const {
+  vector<double> ConvexHull::getStabilityCriterion(const vector<uint>& vcpoints) const {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ConvexHull::getStabilityCriterion():";
+    string soliloquy=XPID+"ConvexHull::getStabilityCriterion():";
     if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Hull not initialized");}
     stringstream message;
 
-    //get full set of points to neglect
-    uint i_point=AUROSTD_MAX_UINT;
+    //set fake_hull
+    xvector<int> elements_present_points=getElementsPresent(vcpoints);
+    xvector<int> elements_present_hull=elements_present_points;
+    if(sum(elements_present_hull)==1){
+      //pick ANY other index to be 1 as well
+      if(elements_present_hull[elements_present_hull.lrows]==0){elements_present_hull[elements_present_hull.lrows]=1;}
+      else{
+        if(elements_present_hull.rows<2){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"elements_present.rows<2",_INPUT_ILLEGAL_);} //we cannot have unary hulls as input (facets issue)
+        if(elements_present_hull[elements_present_hull.lrows+1]==1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"elements_present mismatch for unary hull",_INDEX_MISMATCH_);}
+        elements_present_hull[elements_present_hull.lrows+1]=1;
+      }
+    }
+    if(sum(elements_present_hull)==1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Could not fix sum(elements_present_hull)==1",_RUNTIME_ERROR_);}
     ConvexHull fake_hull;
-    getFakeHull(vcpoint,fake_hull);
+    getFakeHull(vcpoints,elements_present_hull,elements_present_points,fake_hull);
 
     //since i_nary and i_alloy don't change, the getDistanceToHull function should work fine (getRelevantFacets())
-    uint i_nary=AUROSTD_MAX_UINT,i_alloy=AUROSTD_MAX_UINT;
     vector<double> vscriterion;
     ChullPoint point;
-    for(uint i=0,fl_size_i=vcpoint.size();i<fl_size_i;i++) {
-      i_point=vcpoint[i];
+    uint i_point=AUROSTD_MAX_UINT;
+    for(uint i=0,fl_size_i=vcpoints.size();i<fl_size_i;i++) {
+      i_point=vcpoints[i];
       //already checked validity of these points
       point=m_points[i_point];
+      point.cleanPointForHullTransfer();  //clean now
+      point.reduceCoords(elements_present_hull);  //reduce to minimum hull necessary to calculate scriterion (for unaries this will be a binary)
+      point.setHullCoords(); //set to most general coords (m_coords), this reflects relevantFacets()
       //we need to clean this point of any properties relevant to REAL hull (not to be confused with fake hull)
       //clean first, then set h_coords
       //in the case that it is not a unary, leverage i_alloy of REAL hull first, then clean
-      if(point.isUnary()){
-        point.cleanPointForHullTransfer();  //clean now
-        point.setHullCoords(); //set to most general coords (m_coords), this reflects relevantFacets()
-      }
-      else {
-        if(!getAlloyIndex(point,i_nary,i_alloy)){message << "Alloy index not set (auid=" << point.m_entry.auid << ")";throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);}
-        xvector<int> elements_present=m_naries[i_nary].m_alloys[i_alloy].m_elements_present;
-        if(LDEBUG) {cerr << soliloquy << " elements_present=" << elements_present << endl;}
-        point.cleanPointForHullTransfer();      //clean now
-        point.setHullCoords(elements_present);  //just to be sure
-      }
+      //if(point.isUnary()){
+      //  point.setHullCoords(); //set to most general coords (m_coords), this reflects relevantFacets()
+      //} else {
+      //  if(!getAlloyIndex(point,i_nary,i_alloy)){message << "Alloy index not set (auid=" << point.m_entry.auid << ")";throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);}
+      //  xvector<int> elements_present=m_naries[i_nary].m_alloys[i_alloy].m_elements_present;
+      //  if(LDEBUG) {cerr << soliloquy << " elements_present=" << elements_present << endl;}
+      //  point.setHullCoords(elements_present);  //just to be sure
+      //}
       if(LDEBUG) {cerr << soliloquy << " m.coords=" << point.m_coords << endl;}
       if(LDEBUG) {cerr << soliloquy << " h.coords=" << point.h_coords << endl;}
       vscriterion.push_back(fake_hull.getDistanceToHull(point,false));
@@ -6144,22 +6477,31 @@ namespace chull {
     return vscriterion;
   }
 
-  void ConvexHull::getFakeHull(const vector<uint>& vcpoint,ConvexHull& fake_hull) const {
+  void ConvexHull::getFakeHull(const vector<uint>& vcpoints,ConvexHull& fake_hull) const {
+    string soliloquy=XPID+"ConvexHull::getFakeHull():";
+    if(!m_points.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No points loaded, no way to determine dimensionality of hull");}
+    xvector<int> elements_present=aurostd::ones_xv<int>(m_points[0].m_coords.lrows,m_points[0].m_coords.lrows+(int)getDim()-1);
+    return getFakeHull(vcpoints,elements_present,elements_present,fake_hull);
+  }
+  void ConvexHull::getFakeHull(const vector<uint>& vcpoints,const xvector<int>& elements_present,ConvexHull& fake_hull) const {
+    return getFakeHull(vcpoints,elements_present,elements_present,fake_hull);
+  }
+  void ConvexHull::getFakeHull(const vector<uint>& vcpoints,const xvector<int>& elements_present_hull,const xvector<int>& elements_present_points,ConvexHull& fake_hull) const {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ConvexHull::getFakeHull():";
+    string soliloquy=XPID+"ConvexHull::getFakeHull():";
     if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Hull not initialized");}
     stringstream message;
 
     //get full set of points to neglect
     uint i_point=AUROSTD_MAX_UINT,i_coord_group=AUROSTD_MAX_UINT,g_state=AUROSTD_MAX_UINT;
 
-    if(LDEBUG) {cerr << soliloquy << " initial points_to_neglect.size()=" << vcpoint.size() << endl;}
+    if(LDEBUG) {cerr << soliloquy << " initial points_to_neglect.size()=" << vcpoints.size() << endl;}
 
     //vector<ChullPoint> points_to_neglect; //not sure why it needs to be vector of chullpoints, simply hold indices
     vector<uint> points_to_neglect;
     vector<uint> eq_gstates;
-    for(uint i=0,fl_size_i=vcpoint.size();i<fl_size_i;i++){
-      i_point=vcpoint[i];
+    for(uint i=0,fl_size_i=vcpoints.size();i<fl_size_i;i++){
+      i_point=vcpoints[i];
       if(i_point>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
       const ChullPoint& point=m_points[i_point];  //this point may not be on the hull, it may be an equivalent structure, but coordgroup is
       if(!point.m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized chullpoint");}
@@ -6189,11 +6531,22 @@ namespace chull {
       cerr << endl;
     }
 
+    if(LDEBUG){
+      cerr << soliloquy << " elements_present_hull=" << elements_present_hull << endl;
+      cerr << soliloquy << " elements_present_points=" << elements_present_points << endl;
+    }
+    if(sum(elements_present_points)>sum(elements_present_hull)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"elements_present_hull must belong to bigger subspace than elements_present_points",_INPUT_ILLEGAL_);}
+
     //create new set of points
     //bool found=false;
     vector<ChullPoint> new_points;
     //do NOT go through m_points, this may include some duplicates we previously excluded (now not duplicates since we are removing points: AlFe hull)
     for(uint i_coord_group=0,fl_size_i_coord_group=m_coord_groups.size();i_coord_group<fl_size_i_coord_group;i_coord_group++){
+      if(LDEBUG){cerr << soliloquy << " m_coord_groups[i_coord_group=" << i_coord_group << "].getElementsPresent()=" << m_coord_groups[i_coord_group].getElementsPresent() << endl;}
+      if(!subspaceBelongs(elements_present_points,m_coord_groups[i_coord_group].getElementsPresent())){
+        if(LDEBUG) {cerr << soliloquy << " Ignoring irrelevant subspace of m_coord_groups[i_coord_group=" << i_coord_group << "] (m_coord_groups[i_coord_group=" << i_coord_group << "].getElementsPresent()=" << m_coord_groups[i_coord_group].getElementsPresent() << ")" << endl;}
+        continue;
+      }
       for(uint i=0,fl_size_i=m_coord_groups[i_coord_group].m_points.size();i<fl_size_i;i++){
         i_point=m_coord_groups[i_coord_group].m_points[i];
         if(aurostd::WithinList(points_to_neglect,i_point)){
@@ -6210,44 +6563,83 @@ namespace chull {
         //  }
         //}
         //if(found){continue;}
-        if(LDEBUG) {cerr << soliloquy << " including point[" << i_point << "].compound=" << point.m_entry.compound << endl;}
+        if(LDEBUG) {cerr << soliloquy << " including point[i_point=" << i_point << ",auid=" << m_points[i_point].m_entry.auid << "].compound=" << point.m_entry.compound << endl;}
         new_points.push_back(point);
+        new_points.back().reduceCoords(elements_present_hull);
+        if(LDEBUG) {cerr << soliloquy << " point[" << i_point << "].m_coords=" << new_points.back().m_coords << endl;}
         new_points.back().cleanPointForHullTransfer();
       }
     }
     if(!new_points.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No points found for pseudo convex hull");}
 
+    //patch m_velements to match reduceCoords(elements_present_hull)
+    vector<string> velements;
+    if(m_velements.size()>0){
+      vector<uint> relevant_indices=getRelevantIndices(elements_present_hull);
+      if(LDEBUG){cerr << soliloquy << " relevant_indices=" << aurostd::joinWDelimiter(relevant_indices,",") << endl;}
+      for(uint i=0,fl_size_i=relevant_indices.size();i<fl_size_i;i++){velements.push_back(m_velements[relevant_indices[i]-1]);} //-1 because xvector->vecto
+      if(LDEBUG){cerr << soliloquy << " velements=" << aurostd::joinWDelimiter(velements,",") << endl;}
+    }
+
     if(LDEBUG) {cerr << soliloquy << " Creating new (pseudo) hull without relevant g-states" << endl;}
-    pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
     aurostd::xoption cflags=m_cflags;
     //[do NOT do, we need hull distance calculation]cflags.flag("CHULL::SKIP_HULL_DISTANCE_CALCULATION",true);  //no need to get the distances for ALL points, we will do for the one after hull creation
     cflags.flag("CHULL::SKIP_THERMO_PROPERTIES_EXTRACTION",true); //thermo properties NOT needed, just need hull
     //[killed off by SKIP_THERMO_PROPERTIES_EXTRACTION]cflags.flag("CHULL::SKIP_STRUCTURE_COMPARISON",true);       //structure comparison is not needed for 1 hull point distance calculation
     //[killed off by SKIP_THERMO_PROPERTIES_EXTRACTION]cflags.flag("CHULL::SKIP_STABILITY_CRITERION_ANALYSIS",true); //this would be circular
-    //[killed off by SKIP_THERMO_PROPERTIES_EXTRACTION]cflags.flag("CHULL::SKIP_N_PLUS_1_ENERGY_GAIN_ANALYSIS",true); //this would be circular
-    cflags.flag("FORCE",true); //need to avoid "Very skewed ground-state..." and "Unreliable hull" issues, we're removing points, so these may (and likely will) come up
+    //[killed off by SKIP_THERMO_PROPERTIES_EXTRACTION]cflags.flag("CHULL::SKIP_N+1_ENTHALPY_GAIN_ANALYSIS",true); //this would be circular
+    cflags.flag("FAKE_HULL",true); //need to avoid "Very skewed ground-state..." and "Unreliable hull" issues, we're removing points, so these may (and likely will) come up
+    cflags.flag("FORCE",true); //need to avoid outlier issues, we're removing points, so these may (and likely will) come up
     //let's skip all this extra output
     bool see_sub_output=false;//true;
     ostream& oss_empty=cout;if(!see_sub_output){oss_empty.setstate(std::ios_base::badbit);}  //like NULL
     ofstream devnull("/dev/null");  //NULL
-    fake_hull.initialize(cflags,new_points,m_velements,devnull,oss_empty,m_half_hull,m_add_artificial_unaries);
+    fake_hull.initialize(cflags,new_points,velements,devnull,oss_empty,m_half_hull,m_add_artificial_unaries);
     oss_empty.clear();  //clear badbit, as cout is GLOBAL
     if(!fake_hull.m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Could not create pseudo convex hull");}
+    if(LDEBUG) {cerr << soliloquy << " New (pseudo) hull created" << endl;}
   }
 
-  double ConvexHull::getNPlus1EnergyGain(const string& auid) const {
-    string soliloquy = XPID + "ConvexHull::getNPlus1EnergyGain):";
-    stringstream message;
+  double ConvexHull::getNPlus1EnthalpyGain(const string& cauid) const {
+    string soliloquy=XPID+"ConvexHull::getNPlus1EnthalpyGain():";
     if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Hull not initialized");}
-    uint i_point=AUROSTD_MAX_UINT;
-    if(auid.empty()){message << "Empty auid found";throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);}
-    if(!findPoint(auid,i_point)){message << "Specified auid not found on hull (auid=" << auid << ")";throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);}
-    return getNPlus1EnergyGain(i_point);
+    vector<string> vcauid; vcauid.push_back(cauid);
+    vector<double> vnp1eg=getNPlus1EnthalpyGain(vcauid);
+    return vnp1eg[0];
   }
+  double ConvexHull::getNPlus1EnthalpyGain(const string& cauid,ConvexHull& fake_hull,bool hull_set) const {
+    string soliloquy=XPID+"ConvexHull::getNPlus1EnthalpyGain():";
+    if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Hull not initialized");}
+    vector<string> vcauid; vcauid.push_back(cauid);
+    vector<double> vnp1eg=getNPlus1EnthalpyGain(vcauid,fake_hull,hull_set);
+    return vnp1eg[0];
+  }
+  vector<double> ConvexHull::getNPlus1EnthalpyGain(const vector<string>& vcauid) const {ConvexHull fake_hull;return getNPlus1EnthalpyGain(vcauid,fake_hull,false);}
+  vector<double> ConvexHull::getNPlus1EnthalpyGain(const vector<string>& vcauid,ConvexHull& fake_hull,bool hull_set) const {
+    string soliloquy=XPID+"ConvexHull::getNPlus1EnthalpyGain():";
+    if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Hull not initialized");}
+    stringstream message;
 
-  double ConvexHull::getNPlus1EnergyGain(uint i_point) const {
+    uint i_point=AUROSTD_MAX_UINT;
+    vector<uint> vcpoints; //follows vcauid
+    for(uint i=0,fl_size_i=vcauid.size();i<fl_size_i;i++){
+      const string& auid=vcauid[i];
+      if(auid.empty()){message << "Empty auid found";throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);}
+      if(!findPoint(auid,i_point)){message << "Specified auid not found on hull (auid=" << auid << ")";throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);}
+      vcpoints.push_back(i_point);
+    }
+    return getNPlus1EnthalpyGain(vcpoints,fake_hull,hull_set);
+  }
+  vector<double> ConvexHull::getNPlus1EnthalpyGain(const vector<uint>& vcpoints) const {ConvexHull fake_hull;return getNPlus1EnthalpyGain(vcpoints,fake_hull,false);}
+  vector<double> ConvexHull::getNPlus1EnthalpyGain(const vector<uint>& vcpoints,ConvexHull& fake_hull,bool hull_set) const {
+    vector<double> vnp1eg;
+    for(uint i=0,fl_size_i=vcpoints.size();i<fl_size_i;i++){vnp1eg.push_back(getNPlus1EnthalpyGain(vcpoints[i],fake_hull,hull_set));}
+    return vnp1eg;
+  }
+  double ConvexHull::getNPlus1EnthalpyGain(uint i_point) const {ConvexHull fake_hull;return getNPlus1EnthalpyGain(i_point,fake_hull,false);}
+  double ConvexHull::getNPlus1EnthalpyGain(uint i_point,ConvexHull& fake_hull,bool hull_set) const {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ConvexHull::getNPlus1EnergyGain):";
+    string soliloquy=XPID+"ConvexHull::getNPlus1EnthalpyGain():";
     stringstream message;
 
     if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Hull not initialized");}
@@ -6256,55 +6648,71 @@ namespace chull {
     if(point.m_i_nary==0){return AUROSTD_MAX_DOUBLE;} //N+1(unary)=formation_enthalpy (distance from 0 point) - TECHNICALLY TRUE (allowed in polytope theory), but our definition for N+1 enthalpy gain really starts for binaries (Delta H[{N|1,...,N-1}]), can NOT have 1|0
     bool force_calc_binaries=false; //set TRUE for debugging
     if(point.m_i_nary==0 || (point.m_i_nary==1 && force_calc_binaries==false) ){ //N+1(unary)=formation_enthalpy (distance from 0 point), N+1(binary)=formation_enthalpy (distance from 0 tieline)
-      if(LDEBUG){cerr << soliloquy << " found " << (point.m_i_nary==0 ? "unary" : "binary") << ", returning abs(enthalpy_formation_atom)" << endl;}
-      if(point.m_has_entry&&point.m_entry.enthalpy_formation_atom!=AUROSTD_NAN){return abs(point.m_entry.enthalpy_formation_atom);}
+      if(LDEBUG){cerr << soliloquy << " found " << (point.m_i_nary==0 ? "unary" : "binary") << ", returning abs(H_f_atom)" << endl;} //enthalpy_formation_atom
+      if(point.m_has_entry&&H_f_atom(point.m_entry)!=AUROSTD_NAN){return abs(H_f_atom(point.m_entry));} //point.m_entry.enthalpy_formation_atom
       return AUROSTD_MAX_DOUBLE; //0; //return null
     }
 
-    //since j_nary and j_alloy don't change, the getDistanceToHull function should work fine (getRelevantFacets())
-    uint j_nary=AUROSTD_MAX_UINT,j_alloy=AUROSTD_MAX_UINT;
-    if(!getAlloyIndex(point,j_nary,j_alloy)){message << "Alloy index not set (auid=" << point.m_entry.auid << ")";throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);}
-    xvector<int> elements_present=m_naries[j_nary].m_alloys[j_alloy].m_elements_present;
-    if(LDEBUG) {cerr << soliloquy << " elements_present=" << elements_present << endl;}
-    point.cleanPointForHullTransfer();      //clean now
-    point.setHullCoords(elements_present);  //just to be sure
-
-    if(LDEBUG) {cerr << soliloquy << " m.coords=" << point.m_coords << endl;}
-    if(LDEBUG) {cerr << soliloquy << " h.coords=" << point.h_coords << endl;}
+    //set fake_hull
+    xvector<int> elements_present_points=point.m_elements_present;
+    xvector<int> elements_present_hull=elements_present_points;
+    if(sum(elements_present_hull)==1){
+      //pick ANY other index to be 1 as well
+      if(elements_present_hull[elements_present_hull.lrows]==0){elements_present_hull[elements_present_hull.lrows]=1;}
+      else{
+        if(elements_present_hull.rows<2){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"elements_present.rows<2",_INPUT_ILLEGAL_);} //we cannot have unary hulls as input (facets issue)
+        if(elements_present_hull[elements_present_hull.lrows+1]==1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"elements_present mismatch for unary hull",_INDEX_MISMATCH_);}
+        elements_present_hull[elements_present_hull.lrows+1]=1;
+      }
+    }
+    if(sum(elements_present_hull)==1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Could not fix sum(elements_present_hull)==1",_RUNTIME_ERROR_);}
 
     //get full set of points to neglect
     //neglect ALL points with equal or higher dimensionality
-    uint i_coord_group=AUROSTD_MAX_UINT;
-    vector<uint> vcpoint;
-    for(uint fl_size_i_nary=m_naries.size(),i_nary=(fl_size_i_nary-1);i_nary<fl_size_i_nary&&i_nary>=j_nary;i_nary--){ //go backwards!
-      if(LDEBUG) {cerr << soliloquy << " removing i_nary=" << i_nary << endl;}
-      for(uint i_alloy=0,fl_size_i_alloy=m_naries[i_nary].m_alloys.size();i_alloy<fl_size_i_alloy;i_alloy++){
-        for(uint i=0,fl_size_i=m_naries[i_nary].m_alloys[i_alloy].m_coord_groups.size();i<fl_size_i;i++){
-          i_coord_group=m_naries[i_nary].m_alloys[i_alloy].m_coord_groups[i];
-          for(uint j=0,fl_size_j=m_coord_groups[i_coord_group].m_points.size();j<fl_size_j;j++){
-            vcpoint.push_back(m_coord_groups[i_coord_group].m_points[j]);
+    if(hull_set==false){
+      uint j_nary=AUROSTD_MAX_UINT,j_alloy=AUROSTD_MAX_UINT;
+      if(!getAlloyIndex(point,j_nary,j_alloy)){message << "Alloy index not set (auid=" << point.m_entry.auid << ")";throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);}
+      uint i_coord_group=AUROSTD_MAX_UINT;
+      vector<uint> vcpoints;
+      for(uint fl_size_i_nary=m_naries.size(),i_nary=(fl_size_i_nary-1);i_nary<fl_size_i_nary&&i_nary>=j_nary;i_nary--){ //go backwards!
+        if(LDEBUG) {cerr << soliloquy << " removing i_nary=" << i_nary << endl;}
+        for(uint i_alloy=0,fl_size_i_alloy=m_naries[i_nary].m_alloys.size();i_alloy<fl_size_i_alloy;i_alloy++){
+          for(uint i=0,fl_size_i=m_naries[i_nary].m_alloys[i_alloy].m_coord_groups.size();i<fl_size_i;i++){
+            i_coord_group=m_naries[i_nary].m_alloys[i_alloy].m_coord_groups[i];
+            for(uint j=0,fl_size_j=m_coord_groups[i_coord_group].m_points.size();j<fl_size_j;j++){
+              vcpoints.push_back(m_coord_groups[i_coord_group].m_points[j]);
+            }
           }
         }
       }
+
+      if(LDEBUG) {
+        cerr << soliloquy << " points_to_neglect.size()=" << vcpoints.size() << endl;
+        std::sort(vcpoints.begin(),vcpoints.end());
+        cerr << soliloquy << " points_to_neglect: ";
+        for(uint i=0,fl_size_i=vcpoints.size();i<fl_size_i;i++){cerr << vcpoints[i] << " ";} 
+        cerr << endl;
+      }
+
+      getFakeHull(vcpoints,elements_present_hull,elements_present_points,fake_hull);
     }
 
-    if(LDEBUG) {
-      cerr << soliloquy << " points_to_neglect.size()=" << vcpoint.size() << endl;
-      std::sort(vcpoint.begin(),vcpoint.end());
-      cerr << soliloquy << " points_to_neglect: ";
-      for(uint i=0,fl_size_i=vcpoint.size();i<fl_size_i;i++){cerr << vcpoint[i] << " ";} 
-      cerr << endl;
-    }
-
-    ConvexHull fake_hull;
-    getFakeHull(vcpoint,fake_hull);
+    //since j_nary and j_alloy don't change, the getDistanceToHull function should work fine (getRelevantFacets())
+    //xvector<int> elements_present=m_naries[j_nary].m_alloys[j_alloy].m_elements_present;
+    //if(LDEBUG) {cerr << soliloquy << " elements_present=" << elements_present << endl;}
+    //point.setHullCoords(elements_present);  //just to be sure
+    point.cleanPointForHullTransfer();      //clean now
+    point.reduceCoords(elements_present_hull);  //reduce to minimum hull necessary to calculate scriterion (for unaries this will be a binary)
+    point.setHullCoords(); //set to most general coords (m_coords), this reflects relevantFacets()
+    if(LDEBUG) {cerr << soliloquy << " m.coords=" << point.m_coords << endl;}
+    if(LDEBUG) {cerr << soliloquy << " h.coords=" << point.h_coords << endl;}
 
     return fake_hull.getDistanceToHull(point,false);
   }
 
   void ConvexHull::setStabilityCriterion() {
     bool LDEBUG = (FALSE || XHOST.DEBUG);
-    string soliloquy = XPID + "ConvexHull::setStabilityCriterion():";
+    string soliloquy=XPID+"ConvexHull::setStabilityCriterion():";
     if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Hull not initialized");}
     stringstream message;
 
@@ -6385,103 +6793,155 @@ namespace chull {
     }
   }
 
-  void ConvexHull::setNPlus1EnergyGain() {
+  void ConvexHull::setNPlus1EnthalpyGain(uint i_point) {ConvexHull fake_hull;return setNPlus1EnthalpyGain(i_point,fake_hull,false);}
+  void ConvexHull::setNPlus1EnthalpyGain(uint i_point,ConvexHull& fake_hull,bool hull_set) {
     bool LDEBUG = (FALSE || XHOST.DEBUG);
-    string soliloquy = XPID + "ConvexHull::setNPlus1EnergyGain():";
+    string soliloquy=XPID+"ConvexHull::setNPlus1EnthalpyGain():";
     if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Hull not initialized");}
     stringstream message;
 
-    message << "Determining N+1 energy gain for ground-state structures, please be patient";
+    if(i_point>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
+    if(!m_points[i_point].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
+    //[CO20200404 - not useful, we still want values for binaries, this would skip over value assignment]if(test_binary_np1==false&&m_points[i_point].m_i_nary<2){continue;} //unaries would be trivial, and binaries is simply H_f
+    if(LDEBUG) {cerr << soliloquy << " looking at point[i_point=" << i_point << "].m_coords=" << m_points[i_point].m_coords << ", compound=" << m_points[i_point].m_entry.compound << endl;}
+    double np1egain=getNPlus1EnthalpyGain(i_point,fake_hull,hull_set);
+    //CONSISTENCY CHECKS?
+    //yes - for unaries/binaries N+1 == formation enthalpy
+    //[MATHEMATICALLY ALLOWED but our definition of N+1 energy does not allow for unaries, so don't check]if(m_points[i_point].m_i_nary==0 || m_points[i_point].m_i_nary==1)
+    if(m_points[i_point].m_i_nary==1) {
+      if(m_points[i_point].m_has_entry&&H_f_atom(m_points[i_point].m_entry)!=AUROSTD_NAN){  //m_points[i_point].m_entry.enthalpy_formation_atom
+        if(!aurostd::identical(abs(np1egain),abs(H_f_atom(m_points[i_point].m_entry)),ZERO_MEV_TOL)){ //m_points[i_point].m_entry.enthalpy_formation_atom
+          message << "abs(np1egain) != abs(H_f_atom(m_points[i_point].m_entry)) [ " << abs(np1egain) << " != " << abs(H_f_atom(m_points[i_point].m_entry)) << " ], please check"; //m_points[i_point].m_entry.enthalpy_formation_atom
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_RUNTIME_ERROR_); //throw an error because we are not in debug mode (see force_calc_binaries)
+          //pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+        }
+      }
+    }
+    //[OBSOLETE - this is a DISTANCE so it is always positive]if(m_points[i_point].m_i_nary>0){ //skip unaries for this check
+    //[OBSOLETE - this is a DISTANCE so it is always positive]  if(m_half_hull){
+    //[OBSOLETE - this is a DISTANCE so it is always positive]    //do not use signbit, add tol to zero
+    //[OBSOLETE - this is a DISTANCE so it is always positive]    //sign of distance:
+    //[OBSOLETE - this is a DISTANCE so it is always positive]    //independent of lower/upper hull:  above hull is negative, below hull is positive
+    //[OBSOLETE - this is a DISTANCE so it is always positive]    if(m_lower_hull){
+    //[OBSOLETE - this is a DISTANCE so it is always positive]      if(notPositive(np1egain,true)) //std::signbit(np1egain))
+    //[OBSOLETE - this is a DISTANCE so it is always positive]      { //CO20200106 - patching for auto-indenting
+    //[OBSOLETE - this is a DISTANCE so it is always positive]        message << "(lower half hull) found ground-state structure INSIDE hull, suggesting it was not really a ground-state";
+    //[OBSOLETE - this is a DISTANCE so it is always positive]        message << " (i_point=" << i_point;
+    //[OBSOLETE - this is a DISTANCE so it is always positive]        message << (m_points[i_point].m_entry.auid.empty()?"":",auid="+m_points[i_point].m_entry.auid);
+    //[OBSOLETE - this is a DISTANCE so it is always positive]        message << ",np1egain=" << np1egain << ")";
+    //[OBSOLETE - this is a DISTANCE so it is always positive]        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);
+    //[OBSOLETE - this is a DISTANCE so it is always positive]      }
+    //[OBSOLETE - this is a DISTANCE so it is always positive]    } else {
+    //[OBSOLETE - this is a DISTANCE so it is always positive]      if(notNegative(np1egain,true)) //!std::signbit(np1egain))
+    //[OBSOLETE - this is a DISTANCE so it is always positive]      { //CO20200106 - patching for auto-indenting
+    //[OBSOLETE - this is a DISTANCE so it is always positive]        message << "(upper half hull) found ground-state structure INSIDE hull, suggesting it was not really a ground-state";
+    //[OBSOLETE - this is a DISTANCE so it is always positive]        message << " (i_point=" << i_point;
+    //[OBSOLETE - this is a DISTANCE so it is always positive]        message << (m_points[i_point].m_entry.auid.empty()?"":",auid="+m_points[i_point].m_entry.auid);
+    //[OBSOLETE - this is a DISTANCE so it is always positive]        message << ",np1egain=" << np1egain << ")";
+    //[OBSOLETE - this is a DISTANCE so it is always positive]        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);
+    //[OBSOLETE - this is a DISTANCE so it is always positive]      }
+    //[OBSOLETE - this is a DISTANCE so it is always positive]    }
+    //[OBSOLETE - this is a DISTANCE so it is always positive]  }
+    //[OBSOLETE - this is a DISTANCE so it is always positive]i}
+    //KEEP THE SIGN CONVENTION AS IS, it is correct without manipulation
+    //set sign convention, negative for outside hull
+    //np1egain=abs(np1egain);
+    if(m_points[i_point].m_i_nary>0){ //don't print for unaries
+      message << "Ground-state ";
+      message << (!m_points[i_point].m_entry.compound.empty()?m_points[i_point].m_entry.compound:"")+" ";
+      message << "(i_point=" << i_point;
+      message << (m_points[i_point].m_entry.auid.empty()?"":",auid="+m_points[i_point].m_entry.auid);
+      message << ") shows N+1 enthalpy gain = ";
+      message << chull::convertUnits(np1egain,(m_formation_energy_hull?_m_:_std_)) << " ";
+      message << (m_formation_energy_hull?"meV/atom":"K");
+    }
+    //this check should STILL work for unaries, as it's the difference of distances, and
+    //the actual hull points should ALWAYS be lower than pseudo hull points, hence a positive np1egain
+    //by convention, enthalpy gains are NEGATIVE as they are outside the hull
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+    m_points[i_point].m_n_plus_1_enthalpy_gain=np1egain;
+    //set equivalent ones
+    uint i_coord_group=AUROSTD_MAX_UINT;
+    if(!getCoordGroupIndex(i_point,i_coord_group)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coordgroup index not set");}
+    if(!m_coord_groups[i_coord_group].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized coordgroup");}
+    if(!m_coord_groups[i_coord_group].m_is_on_hull){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coordgroup is not on the hull");}
+    m_coord_groups[i_coord_group].m_n_plus_1_enthalpy_gain=m_points[i_point].m_n_plus_1_enthalpy_gain;
+    vector<uint> eq_gstates;
+    //const vector<uint>& eq_gstates=m_coord_groups[i_coord_group].m_equivalent_g_states;
+    if(m_coord_groups[i_coord_group].m_calculated_equivalent_g_states){eq_gstates=m_coord_groups[i_coord_group].m_equivalent_g_states;}
+    else {eq_gstates=getEquivalentGStates(i_point);}
+    if(!eq_gstates.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No equivalent states found (not even self)");}
+    for(uint j=0,fl_size_j=eq_gstates.size();j<fl_size_j;j++){
+      if(eq_gstates[j]>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
+      if(!m_points[eq_gstates[j]].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Point["+aurostd::utype2string(eq_gstates[j])+"] is not initialized");}
+      np1egain=m_points[i_point].m_n_plus_1_enthalpy_gain;
+      np1egain+=(m_points[i_point].getLastCoord()-m_points[eq_gstates[j]].getLastCoord());
+      //if(m_formation_energy_hull){np1egain+=abs(H_f_atom(m_points[i_point])-H_f_atom(m_points[eq_gstates[j]]));}
+      //else {np1egain+=abs(T_S(m_points[i_point])-T_S(m_points[eq_gstates[j]]));}
+      //unaries could be really close to 0
+      //don't set if it becomes positive
+      if(std::signbit(m_points[i_point].m_n_plus_1_enthalpy_gain)!=std::signbit(np1egain)){np1egain=0;}  //define these to be 0, AlFe hull look at Fe
+      m_points[eq_gstates[j]].m_n_plus_1_enthalpy_gain=np1egain;
+    }
+  }
+  void ConvexHull::setNPlus1EnthalpyGain() {
+    bool LDEBUG = (FALSE || XHOST.DEBUG);
+    string soliloquy=XPID+"ConvexHull::setNPlus1EnthalpyGain():";
+    if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Hull not initialized");}
+    stringstream message;
+
+    message << "Determining N+1 enthalpy gain for ground-state structures, please be patient";
     pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
 
     vector<uint> g_states=getGStates(true);
-    uint i_point=AUROSTD_MAX_UINT,i_coord_group=AUROSTD_MAX_UINT;
-    double np1egain;
-    vector<uint> eq_gstates;
-    //[CO20200404 - not useful, we still want values for binaries, this would skip over value assignment]bool test_binary_np1=true;  //turn me off when you're sure np1 is working
-    for(uint i=0,fl_size_i=g_states.size();i<fl_size_i;i++){
+
+    //CO20200804 - group g_states by elements_present, they will all need the same fake_hull
+    vector<xvector<int> > v_elements_present;
+    vector<vector<uint> > v_g_states;
+
+    uint i=0,j=0,fl_size_i=0,fl_size_j=0;
+    uint i_point=AUROSTD_MAX_UINT;
+    bool found=false;
+    for(i=0,fl_size_i=g_states.size();i<fl_size_i;i++){
       i_point=g_states[i];
       if(i_point>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
       if(!m_points[i_point].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
       //[CO20200404 - not useful, we still want values for binaries, this would skip over value assignment]if(test_binary_np1==false&&m_points[i_point].m_i_nary<2){continue;} //unaries would be trivial, and binaries is simply H_f
       if(LDEBUG) {cerr << soliloquy << " looking at point[i_point=" << i_point << "].m_coords=" << m_points[i_point].m_coords << ", compound=" << m_points[i_point].m_entry.compound << endl;}
-      np1egain=getNPlus1EnergyGain(i_point);
-      //CONSISTENCY CHECKS?
-      //yes - for unaries/binaries N+1 == formation enthalpy
-      //[MATHEMATICALLY ALLOWED but our definition of N+1 energy does not allow for unaries, so don't check]if(m_points[i_point].m_i_nary==0 || m_points[i_point].m_i_nary==1)
-      if(m_points[i_point].m_i_nary==1)
-      {
-        if(m_points[i_point].m_has_entry&&m_points[i_point].m_entry.enthalpy_formation_atom!=AUROSTD_NAN){
-          if(!aurostd::identical(abs(np1egain),abs(m_points[i_point].m_entry.enthalpy_formation_atom),ZERO_MEV_TOL)){
-            message << "abs(np1egain) != abs(m_points[i_point].m_entry.enthalpy_formation_atom) [ " << abs(np1egain) << " != " << abs(m_points[i_point].m_entry.enthalpy_formation_atom) << " ], please check";
-            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_RUNTIME_ERROR_); //throw an error because we are not in debug mode (see force_calc_binaries)
-            //pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+
+      found=false;
+      for(j=0,fl_size_j=v_elements_present.size();j<fl_size_j&&found==false;j++){
+        if(m_points[i_point].m_elements_present==v_elements_present[j]){
+          if(LDEBUG){
+            cerr << soliloquy << " adding point[i_point=" << i_point << ",auid=" << m_points[i_point].m_entry.auid << "].compound=\"" << m_points[i_point].m_entry.compound << "\" ";
+            cerr << "with elements_present=" << m_points[i_point].m_elements_present << " to v_elements_present[j=" << j << "]=" << v_elements_present[j] << endl;
           }
+          v_g_states[j].push_back(g_states[i]);
+          found=true;
         }
       }
-      //[OBSOLETE - this is a DISTANCE so it is always positive]if(m_points[i_point].m_i_nary>0){ //skip unaries for this check
-      //[OBSOLETE - this is a DISTANCE so it is always positive]  if(m_half_hull){
-      //[OBSOLETE - this is a DISTANCE so it is always positive]    //do not use signbit, add tol to zero
-      //[OBSOLETE - this is a DISTANCE so it is always positive]    //sign of distance:
-      //[OBSOLETE - this is a DISTANCE so it is always positive]    //independent of lower/upper hull:  above hull is negative, below hull is positive
-      //[OBSOLETE - this is a DISTANCE so it is always positive]    if(m_lower_hull){
-      //[OBSOLETE - this is a DISTANCE so it is always positive]      if(notPositive(np1egain,true)) //std::signbit(np1egain))
-      //[OBSOLETE - this is a DISTANCE so it is always positive]      { //CO20200106 - patching for auto-indenting
-      //[OBSOLETE - this is a DISTANCE so it is always positive]        message << "(lower half hull) found ground-state structure INSIDE hull, suggesting it was not really a ground-state";
-      //[OBSOLETE - this is a DISTANCE so it is always positive]        message << " (i_point=" << i_point;
-      //[OBSOLETE - this is a DISTANCE so it is always positive]        message << (m_points[i_point].m_entry.auid.empty()?"":",auid="+m_points[i_point].m_entry.auid);
-      //[OBSOLETE - this is a DISTANCE so it is always positive]        message << ",np1egain=" << np1egain << ")";
-      //[OBSOLETE - this is a DISTANCE so it is always positive]        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);
-      //[OBSOLETE - this is a DISTANCE so it is always positive]      }
-      //[OBSOLETE - this is a DISTANCE so it is always positive]    } else {
-      //[OBSOLETE - this is a DISTANCE so it is always positive]      if(notNegative(np1egain,true)) //!std::signbit(np1egain))
-      //[OBSOLETE - this is a DISTANCE so it is always positive]      { //CO20200106 - patching for auto-indenting
-      //[OBSOLETE - this is a DISTANCE so it is always positive]        message << "(upper half hull) found ground-state structure INSIDE hull, suggesting it was not really a ground-state";
-      //[OBSOLETE - this is a DISTANCE so it is always positive]        message << " (i_point=" << i_point;
-      //[OBSOLETE - this is a DISTANCE so it is always positive]        message << (m_points[i_point].m_entry.auid.empty()?"":",auid="+m_points[i_point].m_entry.auid);
-      //[OBSOLETE - this is a DISTANCE so it is always positive]        message << ",np1egain=" << np1egain << ")";
-      //[OBSOLETE - this is a DISTANCE so it is always positive]        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);
-      //[OBSOLETE - this is a DISTANCE so it is always positive]      }
-      //[OBSOLETE - this is a DISTANCE so it is always positive]    }
-      //[OBSOLETE - this is a DISTANCE so it is always positive]  }
-      //[OBSOLETE - this is a DISTANCE so it is always positive]i}
-      //KEEP THE SIGN CONVENTION AS IS, it is correct without manipulation
-      //set sign convention, negative for outside hull
-      //np1egain=abs(np1egain);
-      if(m_points[i_point].m_i_nary>0){ //don't print for unaries
-        message << "Ground-state ";
-        message << (!m_points[i_point].m_entry.compound.empty()?m_points[i_point].m_entry.compound:"")+" ";
-        message << "(i_point=" << i_point;
-        message << (m_points[i_point].m_entry.auid.empty()?"":",auid="+m_points[i_point].m_entry.auid);
-        message << ") shows N+1 energy gain = ";
-        message << chull::convertUnits(np1egain,(m_formation_energy_hull?_m_:_std_)) << " ";
-        message << (m_formation_energy_hull?"meV/atom":"K");
+      if(!found){
+        if(LDEBUG){
+          cerr << soliloquy << " adding point[i_point=" << i_point << ",auid=" << m_points[i_point].m_entry.auid << "].compound=\"" << m_points[i_point].m_entry.compound << "\" ";
+          cerr << "with elements_present=" << m_points[i_point].m_elements_present << " to set" << endl;
+        }
+        v_elements_present.push_back(m_points[i_point].m_elements_present);
+        v_g_states.push_back(vector<uint>(0));
+        v_g_states.back().push_back(g_states[i]);
       }
-      //this check should STILL work for unaries, as it's the difference of distances, and
-      //the actual hull points should ALWAYS be lower than pseudo hull points, hence a positive np1egain
-      //by convention, energy gains are NEGATIVE as they are outside the hull
-      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
-      m_points[i_point].m_n_plus_1_energy_gain=np1egain;
-      //set equivalent ones
-      if(!getCoordGroupIndex(i_point,i_coord_group)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coordgroup index not set");}
-      if(!m_coord_groups[i_coord_group].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized coordgroup");}
-      if(!m_coord_groups[i_coord_group].m_is_on_hull){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coordgroup is not on the hull");}
-      m_coord_groups[i_coord_group].m_n_plus_1_energy_gain=m_points[i_point].m_n_plus_1_energy_gain;
-      //const vector<uint>& eq_gstates=m_coord_groups[i_coord_group].m_equivalent_g_states;
-      if(m_coord_groups[i_coord_group].m_calculated_equivalent_g_states){eq_gstates=m_coord_groups[i_coord_group].m_equivalent_g_states;}
-      else {eq_gstates=getEquivalentGStates(i_point);}
-      if(!eq_gstates.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No equivalent states found (not even self)");}
-      for(uint j=0,fl_size_j=eq_gstates.size();j<fl_size_j;j++){
-        if(eq_gstates[j]>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
-        if(!m_points[eq_gstates[j]].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Point["+aurostd::utype2string(eq_gstates[j])+"] is not initialized");}
-        np1egain=m_points[i_point].m_n_plus_1_energy_gain;
-        np1egain+=(m_points[i_point].getLastCoord()-m_points[eq_gstates[j]].getLastCoord());
-        //if(m_formation_energy_hull){np1egain+=abs(H_f_atom(m_points[i_point])-H_f_atom(m_points[eq_gstates[j]]));}
-        //else {np1egain+=abs(T_S(m_points[i_point])-T_S(m_points[eq_gstates[j]]));}
-        //unaries could be really close to 0
-        //don't set if it becomes positive
-        if(std::signbit(m_points[i_point].m_n_plus_1_energy_gain)!=std::signbit(np1egain)){np1egain=0;}  //define these to be 0, AlFe hull look at Fe
-        m_points[eq_gstates[j]].m_n_plus_1_energy_gain=np1egain;
+    }
+    if(v_elements_present.size()!=v_g_states.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"v_elements_present.size()!=v_g_states.size()",_INDEX_MISMATCH_);}
+
+    ConvexHull fake_hull;
+    //[CO20200404 - not useful, we still want values for binaries, this would skip over value assignment]bool test_binary_np1=true;  //turn me off when you're sure np1 is working
+    for(i=0,fl_size_i=v_g_states.size();i<fl_size_i;i++){
+      /////////////////////////////////////////////////////////////
+      if(v_g_states[i].empty()){continue;}
+      i_point=v_g_states[i][0]; //g_states[i];
+      setNPlus1EnthalpyGain(i_point,fake_hull,false);
+      for(j=1,fl_size_j=v_g_states[i].size();j<fl_size_j;j++){
+        i_point=v_g_states[i][j]; //g_states[i];
+        setNPlus1EnthalpyGain(i_point,fake_hull,true);
       }
     }
   }
@@ -6499,7 +6959,7 @@ namespace chull {
 
   string ConvexHull::prettyPrintCompound(const ChullPoint& point,vector_reduction_type vred,bool exclude1,filetype ftype) const {  // overload
     if(!point.m_has_entry){
-      string soliloquy = XPID + "ConvexHull::prettyPrintCompound():";
+      string soliloquy=XPID+"ConvexHull::prettyPrintCompound():";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No entry found");
     }
     return prettyPrintCompound(point.m_entry,vred,exclude1,ftype);
@@ -6507,12 +6967,16 @@ namespace chull {
 
   string ConvexHull::prettyPrintCompound(const aflowlib::_aflowlib_entry& entry,vector_reduction_type vred,bool exclude1,filetype ftype) const {  // overload
     if(entry.vspecies.size()!=entry.vcomposition.size()) {
-      string soliloquy = XPID + "ConvexHull::prettyPrintCompound():";
-      stringstream message;
-      message << "Entry (auid=" << entry.auid << ") is ill-defined: vspecies.size()!=vcomposition.size()";
-      message << " (please report on AFLOW Forum: aflow.org/forum)";
-      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
-      return entry.compound;
+      if(entry.prototype.find("POCC")!=string::npos){ //POCC entries have no composition
+        return pflow::prettyPrintCompound(entry.vspecies,entry.vstoichiometry,no_vrt,exclude1,ftype);  //pass in stoichiometry and do not reduce
+      }else{
+        string soliloquy=XPID+"ConvexHull::prettyPrintCompound():";
+        stringstream message;
+        message << "Entry (auid=" << entry.auid << ") is ill-defined: vspecies.size()!=vcomposition.size()";
+        message << " (please report on AFLOW Forum: aflow.org/forum)";
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+        return entry.compound;
+      }
     }
     return pflow::prettyPrintCompound(entry.vspecies,entry.vcomposition,vred,exclude1,ftype);  //ME20190628
   }
@@ -6524,7 +6988,7 @@ namespace chull {
   //[ME20190628 - moved to pflow_funcs.cpp] string ConvexHull::prettyPrintCompound(const vector<string>& vspecies,const xvector<double>& vcomposition,vector_reduction_type vred,bool exclude1,filetype ftype) const {  // main function
   //[ME20190628 - moved to pflow_funcs.cpp]   // creates compound_label for LaTeX and text docs, like adding $_{}$
   //[ME20190628 - moved to pflow_funcs.cpp]   // 2-D, we usually want vred=gcd_vrt true for convex points, and no_vrt elsewhere
-  //[ME20190628 - moved to pflow_funcs.cpp]   string soliloquy = XPID + "ConvexHull::prettyPrintCompound():";
+  //[ME20190628 - moved to pflow_funcs.cpp]   string soliloquy=XPID+"ConvexHull::prettyPrintCompound():";
   //[ME20190628 - moved to pflow_funcs.cpp]   uint precision=COEF_PRECISION;
   //[ME20190628 - moved to pflow_funcs.cpp]   stringstream output;output.precision(precision);
   //[ME20190628 - moved to pflow_funcs.cpp]   if(vspecies.size()!=(uint)vcomposition.rows) {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"vspecies.size() != vcomposition.rows");}
@@ -6554,20 +7018,20 @@ namespace chull {
   //[ME20190628 - moved to pflow_funcs.cpp] }
 
   string ConvexHull::getICSDNumber(uint i_point,bool remove_suffix) const{
-    string soliloquy = XPID + "ConvexHull::getICSDNumber():";
+    string soliloquy=XPID+"ConvexHull::getICSDNumber():";
     if(i_point>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
     return getICSDNumber(m_points[i_point],remove_suffix);
   }
 
   string ConvexHull::getICSDNumber(const ChullPoint& point,bool remove_suffix) const{
-    string soliloquy = XPID + "ConvexHull::getICSDNumber():";
+    string soliloquy=XPID+"ConvexHull::getICSDNumber():";
     if(!point.m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized point");}
     if(!point.m_has_entry){return "";}
     return getICSDNumber(point.m_entry,remove_suffix);
 
   }
   string ConvexHull::getICSDNumber(const aflowlib::_aflowlib_entry& entry,bool remove_suffix) const{
-    string soliloquy = XPID + "ConvexHull::getICSDNumber():";
+    string soliloquy=XPID+"ConvexHull::getICSDNumber():";
     const string& proto=entry.prototype;
     if(!aurostd::substring2bool(proto,"ICSD_")){return "";}
     vector<string> tokens;
@@ -6585,7 +7049,7 @@ namespace chull {
 
   string ConvexHull::prettyPrintPrototype(const ChullPoint& point, bool double_back_slash,bool icsd_label_skim) const {  // overload
     if(!point.m_has_entry){
-      string soliloquy = XPID + "ConvexHull::prettyPrintPrototype():";
+      string soliloquy=XPID+"ConvexHull::prettyPrintPrototype():";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No entry found");
     }
     return prettyPrintPrototype(point.m_entry,double_back_slash,icsd_label_skim);
@@ -6595,7 +7059,7 @@ namespace chull {
     // creates prototype_label for LaTeX ONLY, no use for this function otherwise
     // escapes funny characters
     if(entry.prototype.empty()) {
-      string soliloquy = XPID + "ConvexHull::prettyPrintPrototype():";
+      string soliloquy=XPID+"ConvexHull::prettyPrintPrototype():";
       stringstream message;
       message << "Entry (auid=" << entry.auid << ") is ill-defined: empty prototype";
       message << " (please report on AFLOW Forum: aflow.org/forum)";
@@ -6623,7 +7087,7 @@ namespace chull {
   //[CO20190419 - moved to aurostd_main.cpp]  // see http://tex.stackexchange.com/questions/34580/escape-character-in-latex
   //[CO20190419 - moved to aurostd_main.cpp]  // double_back_slash was needed SOMETIMES for gnuplot output, as one backslash
   //[CO20190419 - moved to aurostd_main.cpp]  // went away when writing to file, and  -- OBSOLETE NOW
-  //[CO20190419 - moved to aurostd_main.cpp]  string soliloquy = XPID + "ConvexHull::fixStringLatex():";
+  //[CO20190419 - moved to aurostd_main.cpp]  string soliloquy=XPID+"ConvexHull::fixStringLatex():";
   //[CO20190419 - moved to aurostd_main.cpp]  string output;
   //[CO20190419 - moved to aurostd_main.cpp]  vector<char> problem_characters;
   //[CO20190419 - moved to aurostd_main.cpp]  problem_characters.push_back('&');
@@ -6722,7 +7186,7 @@ namespace chull {
 
   string ConvexHull::getPlotHeaderPDF(char function_mode,const string& column_header,bool display_color_gradient) const {
     // produces addplot latex string
-    string soliloquy = XPID + "ConvexHull::getPlotHeaderPDF():";
+    string soliloquy=XPID+"ConvexHull::getPlotHeaderPDF():";
     stringstream message;
     stringstream addplot_output_ss;addplot_output_ss.str("");
 
@@ -6854,7 +7318,7 @@ namespace chull {
 
   string ConvexHull::getPlotPointContentPDF(const ChullPoint& point,bool zero_end_point,bool zero_dist_2_hull) const {  //true,false
     bool LDEBUG = (FALSE || XHOST.DEBUG);
-    string soliloquy = XPID + "ConvexHull::getPlotPointContentPDF():";
+    string soliloquy=XPID+"ConvexHull::getPlotPointContentPDF():";
     if(LDEBUG) {cerr << soliloquy << " starting" << endl;}
 
     // initializations
@@ -6902,7 +7366,7 @@ namespace chull {
 
   string ConvexHull::getNodeCoordPosition(const ChullPoint& point) const {
     if(!point.m_has_entry){
-      string soliloquy = XPID + "ConvexHull::getNodeCoordPosition():";
+      string soliloquy=XPID+"ConvexHull::getNodeCoordPosition():";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No entry found");
     }
     return getNodeCoordPosition(point.m_entry,point.m_coords);
@@ -6911,7 +7375,7 @@ namespace chull {
   string ConvexHull::getNodeCoordPosition(const aflowlib::_aflowlib_entry& entry,const xvector<double>& coord) const {
     bool LDEBUG = (FALSE || XHOST.DEBUG);
     // produces node latex output
-    string soliloquy = XPID + "ConvexHull::getNodeCoordPosition():";
+    string soliloquy=XPID+"ConvexHull::getNodeCoordPosition():";
     stringstream message;
     if(LDEBUG) {cerr << soliloquy << " starting" << endl;}
 
@@ -6989,7 +7453,7 @@ namespace chull {
     // checks if the facet created by this combination of chullPoints is necessary
     // for 3D hull
     bool LDEBUG = (FALSE || XHOST.DEBUG);
-    string soliloquy = XPID + "ConvexHull::unwantedFacetLine():";
+    string soliloquy=XPID+"ConvexHull::unwantedFacetLine():";
     if(LDEBUG) {cerr << soliloquy << " starting" << endl;}
     if(vi>m_points.size()-1 || vj>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
     if(check_border) {
@@ -7094,7 +7558,8 @@ namespace chull {
     else {headers+=(!headers.empty()?string(","):string(""))+"entropic_temperature_difference";}
     if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"stability_criterion";}
     if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"relative_stability_criterion";}
-    if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"N+1_energy_gain";}
+    if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"N+1_enthalpy_gain";}
+    if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"entropy_stabilization_coefficient";}
 
     return headers;
   }
@@ -7103,7 +7568,7 @@ namespace chull {
 
   string ConvexHull::getSnapshotTableHeader(string headers,bool designate_HEADER) const {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ConvexHull::getSnapshotTableHeader():";
+    string soliloquy=XPID+"ConvexHull::getSnapshotTableHeader():";
     vector<string> vheaders,vlabels;
     vector<uint> vpaddings;
     aurostd::string2tokens(headers,vheaders,",");
@@ -7199,7 +7664,7 @@ namespace chull {
 
   double ConvexHull::getYTickDistance(double y_range,int approx_num_ticks,double round_to_value) const {
     bool LDEBUG = (FALSE || XHOST.DEBUG);
-    string soliloquy = XPID + "ConvexHull::getYTickDistance():";
+    string soliloquy=XPID+"ConvexHull::getYTickDistance():";
     if(LDEBUG) {
       cerr << soliloquy << " y_range=" << y_range << endl;
       cerr << soliloquy << " approx_num_ticks=" << approx_num_ticks << endl;
@@ -7252,7 +7717,7 @@ namespace chull {
   }
 
   aurostd::xoption ConvexHull::resolvePlotLabelSettings() const {
-    string soliloquy = XPID + "ConvexHull::resolvePlotLabelSettings():";
+    string soliloquy=XPID+"ConvexHull::resolvePlotLabelSettings():";
     stringstream message;
 
     bool labels_off_hull=DEFAULT_CHULL_LATEX_LABELS_OFF_HULL;
@@ -7318,7 +7783,7 @@ namespace chull {
 
   void ConvexHull::writeLatex() const {
     bool LDEBUG = (FALSE || XHOST.DEBUG);
-    string soliloquy = XPID + "ConvexHull::writeLatex():";
+    string soliloquy=XPID+"ConvexHull::writeLatex():";
     stringstream message;
     if(!aurostd::IsCommandAvailable("pdflatex")) {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"\"pdflatex\" needs to be in your path");}
     if(m_cflags.flag("CHULL::PNG_IMAGE")){
@@ -9198,8 +9663,8 @@ namespace chull {
             ////////////////////////////////////////////////////////////////////
 
             if(meta_labels) {
-              uint tmp_precision=0;
-              double tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);
+              uint precision_tmp=0;
+              double tmp_roundoff_tol=5.0*pow(10,-((int)precision_tmp)-1);
               // no node option
 
               // get node position
@@ -9223,14 +9688,14 @@ namespace chull {
               // enthalpy of formation, row 4
               // no need for precision for next few columns, leave it same way
               // as received from AFLOW
-              node_content_ss << "$H_{\\mathrm{f}}$=" << aurostd::utype2string(chull::H_f_atom(point,_m_),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM) << " meV/atom";
+              node_content_ss << "$H_{\\mathrm{f}}$=" << aurostd::utype2string(chull::H_f_atom(point,_m_),precision_tmp,true,tmp_roundoff_tol,FIXED_STREAM) << " meV/atom";
               //num_ss << chull::H_f_atom(point,_m_);
               //node_content_ss << "$H_{\\mathrm{f}}$=" << num_ss.str() << " meV/atom";
               //num_ss.str("");
               // shortstack newline
               node_content_ss << "\\\\";
               // entropic temperature, row 5
-              node_content_ss << "$T_{\\mathrm{S}}$=" << aurostd::utype2string(chull::T_S(point),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM) << " K";
+              node_content_ss << "$T_{\\mathrm{S}}$=" << aurostd::utype2string(chull::T_S(point),precision_tmp,true,tmp_roundoff_tol,FIXED_STREAM) << " K";
               //num_ss << chull::T_S(point);
               //node_content_ss << "$T_{\\mathrm{S}}$=" << num_ss.str() << " K";
               //num_ss.str("");
@@ -9239,9 +9704,9 @@ namespace chull {
                 // shortstack newline
                 node_content_ss << "\\\\";
                 if(m_formation_energy_hull) {
-                  node_content_ss << "$" << getDelta(helvetica_font) << " H_{\\mathrm{f}}$=" << aurostd::utype2string(point.getDist2Hull(_m_),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM) << " meV/atom";  //CHULL_PRECISION
+                  node_content_ss << "$" << getDelta(helvetica_font) << " H_{\\mathrm{f}}$=" << aurostd::utype2string(point.getDist2Hull(_m_),precision_tmp,true,tmp_roundoff_tol,FIXED_STREAM) << " meV/atom";  //CHULL_PRECISION
                 } else {
-                  node_content_ss << "$" << getDelta(helvetica_font) << " T_{\\mathrm{S}}$=" << aurostd::utype2string(point.getDist2Hull(_std_),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM) << " K"; //CHULL_PRECISION
+                  node_content_ss << "$" << getDelta(helvetica_font) << " T_{\\mathrm{S}}$=" << aurostd::utype2string(point.getDist2Hull(_std_),precision_tmp,true,tmp_roundoff_tol,FIXED_STREAM) << " K"; //CHULL_PRECISION
                 }
               }
               node_content_ss << "}";
@@ -9894,7 +10359,7 @@ namespace chull {
       stringstream scriterion_data_ss,np1_data_ss;
       //uint num_cols_scriterion=2;
       //uint num_cols_np1=3;
-      uint tmp_precision;
+      uint precision_tmp=0;
       double tmp_roundoff_tol;
       if(compounds_column_report){pdftable_font_sizes="\\fontsize{4}{6}\\selectfont";}
       else {pdftable_font_sizes="\\fontsize{5}{7}\\selectfont";}
@@ -10103,17 +10568,17 @@ namespace chull {
                 _report_data_ss << " " << "(ground-state)"; // if ground-state
                 if(m_coord_groups[i_coord_group].m_stability_criterion<AUROSTD_NAN){
                   print_scriterion=true;
-                  tmp_precision=0;
-                  tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);
+                  precision_tmp=0;
+                  tmp_roundoff_tol=5.0*pow(10,-((int)precision_tmp)-1);
                   //scriterion_data_ss << "$\\mathit{\\Delta}_{\\mathrm{sc}}="; //this delta is okay, should be italicized
                   scriterion_data_ss << "$\\delta_{\\mathrm{sc}}="; //this delta is okay, should be italicized
-                  scriterion_data_ss << aurostd::utype2string(convertUnits(m_coord_groups[i_coord_group].m_stability_criterion,(m_formation_energy_hull?_m_:_std_)),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM);
+                  scriterion_data_ss << aurostd::utype2string(convertUnits(m_coord_groups[i_coord_group].m_stability_criterion,(m_formation_energy_hull?_m_:_std_)),precision_tmp,true,tmp_roundoff_tol,FIXED_STREAM);
                   scriterion_data_ss << "$~" << (m_formation_energy_hull?string("meV/atom"):string("K"));
                 }
-                if(m_coord_groups[i_coord_group].m_i_nary>=1 && m_coord_groups[i_coord_group].m_n_plus_1_energy_gain<AUROSTD_NAN){ //print binaries anyway... //print only for ternaries and up, binaries is trivial formation enthalpy (save space)
+                if(m_coord_groups[i_coord_group].m_i_nary>=1 && m_coord_groups[i_coord_group].m_n_plus_1_enthalpy_gain<AUROSTD_NAN){ //print binaries anyway... //print only for ternaries and up, binaries is trivial formation enthalpy (save space)
                   print_np1=true;
-                  tmp_precision=0;
-                  tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);
+                  precision_tmp=0;
+                  tmp_roundoff_tol=5.0*pow(10,-((int)precision_tmp)-1);
                   //np1_data_ss << "$\\mathit{\\Delta}_{\\mathrm{sc}}="; //this delta is okay, should be italicized
                   if(0){
                     np1_data_ss << "$\\Delta H[N|\\{1,\\cdots,N-1\\}]="; //this delta is okay, should be italicized
@@ -10126,7 +10591,7 @@ namespace chull {
                     else if(m_coord_groups[i_coord_group].m_i_nary>3){np1_data_ss << "\\{1,\\cdots," << m_coord_groups[i_coord_group].m_i_nary << "\\}";}
                     np1_data_ss << "]=";
                   }
-                  np1_data_ss << aurostd::utype2string(convertUnits(m_coord_groups[i_coord_group].m_n_plus_1_energy_gain,(m_formation_energy_hull?_m_:_std_)),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM);
+                  np1_data_ss << aurostd::utype2string(convertUnits(m_coord_groups[i_coord_group].m_n_plus_1_enthalpy_gain,(m_formation_energy_hull?_m_:_std_)),precision_tmp,true,tmp_roundoff_tol,FIXED_STREAM);
                   np1_data_ss << "$~" << (m_formation_energy_hull?string("meV/atom"):string("K"));
                 }
               } else {
@@ -10495,11 +10960,11 @@ namespace chull {
 
   string ConvexHull::grabCHPointProperty(const ChullPoint& point,const string& property,filetype ftype) const {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ConvexHull::grabCHPointProperty():";
+    string soliloquy=XPID+"ConvexHull::grabCHPointProperty():";
     if(LDEBUG) {cerr << soliloquy << " start" << endl;}
-    uint precision,tmp_precision;
-    precision=tmp_precision=COEF_PRECISION;
+    uint precision=COEF_PRECISION,precision_tmp=COEF_PRECISION;
     double tmp_roundoff_tol=5.0*pow(10,-((int)precision)-1);
+    double d_tmp=0.0;
     string value="";
     string equilibrium_phases_delimiter="-";
     string string_wrapper="";
@@ -10569,19 +11034,22 @@ namespace chull {
       value=aurostd::wrapString(value,string_wrapper);
     }
     else if(property=="spin_atom"){
-      tmp_precision=precision;
-      if(ftype==latex_ft){tmp_precision=2;tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);}
-      value=aurostd::utype2string(point.m_entry.spin_atom,tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM);
+      d_tmp=point.m_entry.spin_atom;
+      if(d_tmp!=AUROSTD_NAN){
+        precision_tmp=precision;
+        if(ftype==latex_ft){precision_tmp=2;tmp_roundoff_tol=5.0*pow(10,-((int)precision_tmp)-1);}
+        value=aurostd::utype2string(d_tmp,precision_tmp,true,tmp_roundoff_tol,FIXED_STREAM);
+      }
     }
     else if(property=="enthalpy_formation_atom"){
-      tmp_precision=precision;
-      if(ftype==latex_ft){tmp_precision=0;tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);}
-      value=aurostd::utype2string(H_f_atom(point,_m_),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM);
+      precision_tmp=precision;
+      if(ftype==latex_ft){precision_tmp=0;tmp_roundoff_tol=5.0*pow(10,-((int)precision_tmp)-1);}
+      value=aurostd::utype2string(H_f_atom(point,_m_),precision_tmp,true,tmp_roundoff_tol,FIXED_STREAM);
     }
     else if(property=="entropic_temperature"){
-      tmp_precision=precision;
-      if(ftype==latex_ft){tmp_precision=0;tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);}
-      value=aurostd::utype2string(point.m_entry.entropic_temperature,tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM);
+      precision_tmp=precision;
+      if(ftype==latex_ft){precision_tmp=0;tmp_roundoff_tol=5.0*pow(10,-((int)precision_tmp)-1);}
+      value=aurostd::utype2string(point.m_entry.entropic_temperature,precision_tmp,true,tmp_roundoff_tol,FIXED_STREAM);
     }
     else if(property=="ground_state"){value=(point.isGState()?"true":"false");}
     else if(property=="equivalent_structures_auid"){
@@ -10638,7 +11106,9 @@ namespace chull {
         //need to grab from coord_group
         uint i_coord_group=AUROSTD_MAX_UINT;
         if(!getCoordGroupIndex(point,i_coord_group)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coordgroup index not set");}
-        if(m_coord_groups[i_coord_group].m_equilibrium_phases.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Equilibrium phases not set");}
+        if(!m_cflags.flag("CHULL::CALCULATE_HIGHEST_DIMENSION_ONLY")){
+          if(m_coord_groups[i_coord_group].m_equilibrium_phases.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Equilibrium phases not set");}
+        }
         vector<string> compounds,_compounds;
         uint i_point=AUROSTD_MAX_UINT;
         const vector<vector<uint> >& equilibrium_phases=m_coord_groups[i_coord_group].m_equilibrium_phases;
@@ -10664,7 +11134,9 @@ namespace chull {
         //need to grab from coord_group
         uint i_coord_group=AUROSTD_MAX_UINT;
         if(!getCoordGroupIndex(point,i_coord_group)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coordgroup index not set");}
-        if(m_coord_groups[i_coord_group].m_equilibrium_phases.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Equilibrium phases not set");}
+        if(!m_cflags.flag("CHULL::CALCULATE_HIGHEST_DIMENSION_ONLY")){
+          if(m_coord_groups[i_coord_group].m_equilibrium_phases.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Equilibrium phases not set");}
+        }
         vector<string> auids,_auids;
         uint i_point=AUROSTD_MAX_UINT;
         const vector<vector<uint> >& equilibrium_phases=m_coord_groups[i_coord_group].m_equilibrium_phases;
@@ -10686,11 +11158,11 @@ namespace chull {
     }
     else if(property=="phases_decomposition_compound"){
       if(!(ftype==txt_ft || ftype==json_ft)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No latex rule defined for "+property);}
-      if(!point.isGState()){
+      if(GET_DECOMPOSITION_POLYMORPHS||!point.isGState()){
         //need to grab from coord_group
         uint i_coord_group=AUROSTD_MAX_UINT;
         if(!getCoordGroupIndex(point,i_coord_group)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coordgroup index not set");}
-        if(!m_coord_groups[i_coord_group].m_is_on_hull){
+        if(GET_DECOMPOSITION_POLYMORPHS||!m_coord_groups[i_coord_group].m_is_on_hull){
           if(m_coord_groups[i_coord_group].m_decomp_phases.size()){
             vector<string> compounds;
             uint i_point=AUROSTD_MAX_UINT;
@@ -10711,11 +11183,11 @@ namespace chull {
     }
     else if(property=="phases_decomposition_auid"){
       if(!(ftype==txt_ft || ftype==json_ft)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No latex rule defined for "+property);}
-      if(!point.isGState()){
+      if(GET_DECOMPOSITION_POLYMORPHS||!point.isGState()){
         //need to grab from coord_group
         uint i_coord_group=AUROSTD_MAX_UINT;
         if(!getCoordGroupIndex(point,i_coord_group)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coordgroup index not set");}
-        if(!m_coord_groups[i_coord_group].m_is_on_hull){
+        if(GET_DECOMPOSITION_POLYMORPHS||!m_coord_groups[i_coord_group].m_is_on_hull){
           if(m_coord_groups[i_coord_group].m_decomp_phases.size()){
             vector<string> auids;
             uint i_point=AUROSTD_MAX_UINT;
@@ -10736,11 +11208,11 @@ namespace chull {
     }
     else if(property=="phases_decomposition_coefficient"){
       if(!(ftype==txt_ft || ftype==json_ft)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No latex rule defined for "+property);}
-      if(!point.isGState()){
+      if(GET_DECOMPOSITION_POLYMORPHS||!point.isGState()){
         //need to grab from coord_group
         uint i_coord_group=AUROSTD_MAX_UINT;
         if(!getCoordGroupIndex(point,i_coord_group)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coordgroup index not set");}
-        if(!m_coord_groups[i_coord_group].m_is_on_hull){
+        if(GET_DECOMPOSITION_POLYMORPHS||!m_coord_groups[i_coord_group].m_is_on_hull){
           if(m_coord_groups[i_coord_group].m_decomp_phases.size()){
             vector<double> nonzero_coefs;
             //[OBSOLETE - reduce by frac_vrt always! so use coord_group values]for(int i=point.m_decomp_coefs.lrows;i<=point.m_decomp_coefs.urows;i++){
@@ -10749,9 +11221,9 @@ namespace chull {
             for(int i=m_coord_groups[i_coord_group].m_decomp_coefs.lrows;i<=m_coord_groups[i_coord_group].m_decomp_coefs.urows;i++){
               if(nonZeroWithinTol(m_coord_groups[i_coord_group].m_decomp_coefs[i])){nonzero_coefs.push_back(m_coord_groups[i_coord_group].m_decomp_coefs[i]);}
             }
-            tmp_precision=precision;
-            tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);
-            value=aurostd::wrapString(aurostd::joinWDelimiter(aurostd::vecDouble2vecString(nonzero_coefs,tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM),","),list_prefix,list_suffix);
+            precision_tmp=precision;
+            tmp_roundoff_tol=5.0*pow(10,-((int)precision_tmp)-1);
+            value=aurostd::wrapString(aurostd::joinWDelimiter(aurostd::vecDouble2vecString(nonzero_coefs,precision_tmp,true,tmp_roundoff_tol,FIXED_STREAM),","),list_prefix,list_suffix);
           }
         }
       }
@@ -10766,22 +11238,31 @@ namespace chull {
       value=aurostd::utype2string(i_nary);  //no precision needed here, simple uint
     }
     else if(property=="enthalpy_formation_atom_difference"){
-      tmp_precision=precision;
-      if(ftype==latex_ft){tmp_precision=0;tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);}
-      value=aurostd::utype2string(point.getDist2Hull(_m_),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM);
+      d_tmp=point.getDist2Hull(_m_);
+      if(d_tmp!=AUROSTD_MAX_DOUBLE){
+        precision_tmp=precision;
+        if(ftype==latex_ft){precision_tmp=0;tmp_roundoff_tol=5.0*pow(10,-((int)precision_tmp)-1);}
+        value=aurostd::utype2string(d_tmp,precision_tmp,true,tmp_roundoff_tol,FIXED_STREAM);
+      }
     }
     else if(property=="entropic_temperature_difference"){
-      tmp_precision=precision;
-      if(ftype==latex_ft){tmp_precision=0;tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);}
-      value=aurostd::utype2string(point.getDist2Hull(_std_),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM); //will never be _m_ units
+      d_tmp=point.getDist2Hull(_std_);
+      if(d_tmp!=AUROSTD_MAX_DOUBLE){
+        precision_tmp=precision;
+        if(ftype==latex_ft){precision_tmp=0;tmp_roundoff_tol=5.0*pow(10,-((int)precision_tmp)-1);}
+        value=aurostd::utype2string(d_tmp,precision_tmp,true,tmp_roundoff_tol,FIXED_STREAM); //will never be _m_ units
+      }
     }
     else if(property=="stability_criterion"){
       if(m_cflags.flag("CHULL::SKIP_STABILITY_CRITERION_ANALYSIS")||point.getStabilityCriterion(_m_)>=AUROSTD_NAN){value=null_value;}
       else {
         if(point.isGState()){
-          tmp_precision=precision;
-          if(ftype==latex_ft){tmp_precision=0;tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);}
-          value=aurostd::utype2string(point.getStabilityCriterion(_m_),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM); //can be _m_ units, but smart enough to switch if T_S
+          d_tmp=point.getStabilityCriterion(_m_);
+          if(d_tmp!=AUROSTD_MAX_DOUBLE){
+            precision_tmp=precision;
+            if(ftype==latex_ft){precision_tmp=0;tmp_roundoff_tol=5.0*pow(10,-((int)precision_tmp)-1);}
+            value=aurostd::utype2string(d_tmp,precision_tmp,true,tmp_roundoff_tol,FIXED_STREAM); //can be _m_ units, but smart enough to switch if T_S
+          }
         }
       }
     }
@@ -10789,20 +11270,34 @@ namespace chull {
       if(m_cflags.flag("CHULL::SKIP_STABILITY_CRITERION_ANALYSIS")||point.getRelativeStabilityCriterion()>=AUROSTD_NAN){value=null_value;}
       else {
         if(point.isGState()){
-          tmp_precision=precision;
-          if(ftype==latex_ft){tmp_precision=0;tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);}
-          value=aurostd::utype2string(point.getRelativeStabilityCriterion(),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM); //delivers as decimal, show as percentage  //CO20180409 - not showing as fraction anymore, not necessarily out of 100%
+          d_tmp=point.getRelativeStabilityCriterion();
+          if(d_tmp!=AUROSTD_MAX_DOUBLE){
+            precision_tmp=precision;
+            if(ftype==latex_ft){precision_tmp=0;tmp_roundoff_tol=5.0*pow(10,-((int)precision_tmp)-1);}
+            value=aurostd::utype2string(d_tmp,precision_tmp,true,tmp_roundoff_tol,FIXED_STREAM); //delivers as decimal, show as percentage  //CO20180409 - not showing as fraction anymore, not necessarily out of 100%
+          }
         }
       }
     }
-    else if(property=="N+1_energy_gain"){
-      if(m_cflags.flag("CHULL::SKIP_N_PLUS_1_ENERGY_GAIN_ANALYSIS")||point.getNPlus1EnergyGain(_m_)>=AUROSTD_NAN){value=null_value;}
+    else if(property=="N+1_enthalpy_gain"){
+      if(m_cflags.flag("CHULL::SKIP_N+1_ENTHALPY_GAIN_ANALYSIS")||point.getNPlus1EnthalpyGain(_m_)>=AUROSTD_NAN){value=null_value;}
       else {
         if(point.isGState()){
-          tmp_precision=precision;
-          if(ftype==latex_ft){tmp_precision=0;tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);}
-          value=aurostd::utype2string(point.getNPlus1EnergyGain(_m_),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM); //delivers as decimal, show as percentage  //CO20180409 - not showing as fraction anymore, not necessarily out of 100%
+          d_tmp=point.getNPlus1EnthalpyGain(_m_);
+          if(d_tmp!=AUROSTD_MAX_DOUBLE){
+            precision_tmp=precision;
+            if(ftype==latex_ft){precision_tmp=0;tmp_roundoff_tol=5.0*pow(10,-((int)precision_tmp)-1);}
+            value=aurostd::utype2string(d_tmp,precision_tmp,true,tmp_roundoff_tol,FIXED_STREAM); //delivers as decimal, show as percentage  //CO20180409 - not showing as fraction anymore, not necessarily out of 100%
+          }
         }
+      }
+    }
+    else if(property=="entropy_stabilization_coefficient"){
+      d_tmp=point.getEntropyStabilizationCoefficient();
+      if(d_tmp!=AUROSTD_MAX_DOUBLE){
+        precision_tmp=precision;
+        if(ftype==latex_ft){precision_tmp=0;tmp_roundoff_tol=5.0*pow(10,-((int)precision_tmp)-1);}
+        value=aurostd::utype2string(d_tmp,precision_tmp,true,tmp_roundoff_tol,FIXED_STREAM);
       }
     }
     else {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown property");}
@@ -10819,7 +11314,7 @@ namespace chull {
 
   string ConvexHull::grabCHFacetProperty(const ChullFacet& facet,const string& property,filetype ftype) const {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ConvexHull::grabCHFacetProperty():";
+    string soliloquy=XPID+"ConvexHull::grabCHFacetProperty():";
     uint precision=COEF_PRECISION;
     double roundoff_tol=5.0*pow(10,-((int)precision)-1);
     string value="";
@@ -10890,7 +11385,7 @@ namespace chull {
   }
 
   vector<vector<string> > ConvexHull::getPointsData(const string& properties_str,vector<string>& headers,filetype ftype) const {
-    string soliloquy = XPID + "ConvexHull::getPointsData():";
+    string soliloquy=XPID+"ConvexHull::getPointsData():";
     stringstream message;
 
     vector<string> vproperties;
@@ -10958,7 +11453,7 @@ namespace chull {
 
   vector<vector<vector<vector<string> > > > ConvexHull::getFacetsData(const string& facet_properties_str,vector<string>& headers,filetype ftype) const {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ConvexHull::getFacetsData():";
+    string soliloquy=XPID+"ConvexHull::getFacetsData():";
     stringstream message;
 
     if(m_naries.size()<2){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No naries (larger than 1) found");}
@@ -10976,7 +11471,9 @@ namespace chull {
       ventries.push_back(vector<vector<vector<string> > >(0));
       for(uint i_alloy=0,fl_size_i_alloy=m_naries[i_nary].m_alloys.size();i_alloy<fl_size_i_alloy;i_alloy++){
         if(!m_naries[i_nary].m_alloys[i_alloy].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized nary[i_nary="+aurostd::utype2string(i_nary)+",i_alloy="+aurostd::utype2string(i_alloy)+"]");}
-        if(m_naries[i_nary].m_alloys[i_alloy].m_facets.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No facets found in nary[i_nary="+aurostd::utype2string(i_nary)+",i_alloy="+aurostd::utype2string(i_alloy)+"]");}
+        if(!m_cflags.flag("CHULL::CALCULATE_HIGHEST_DIMENSION_ONLY")){
+          if(m_naries[i_nary].m_alloys[i_alloy].m_facets.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No facets found in nary[i_nary="+aurostd::utype2string(i_nary)+",i_alloy="+aurostd::utype2string(i_alloy)+"]");}
+        }
         if(LDEBUG) {cerr << soliloquy << " looking at i_nary=" << i_nary << ",i_alloy=" << i_alloy << endl;}
         ventries.back().push_back(vector<vector<string> >(0));
         for(uint i=0,fl_size_i=m_naries[i_nary].m_alloys[i_alloy].m_facets.size();i<fl_size_i;i++){
@@ -11018,7 +11515,7 @@ namespace chull {
   }
 
   void ConvexHull::getPlainTextColumnSizes(const vector<string>& headers,const vector<vector<string> >& ventries,vector<uint>& sizes) const {
-    string soliloquy = XPID + "ConvexHull::getPlainTextColumnSizes():";
+    string soliloquy=XPID+"ConvexHull::getPlainTextColumnSizes():";
     for(uint i=0,fl_size_i=ventries.size();i<fl_size_i;i++){
       if(headers.size()!=ventries[i].size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Dimension mismatch between headers and ventries");}
     }
@@ -11038,7 +11535,7 @@ namespace chull {
 
   void ConvexHull::getPlainTextColumnSizesPoints(const vector<string>& headers,const vector<vector<string> >& ventries,vector<uint>& sizes) const {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ConvexHull::getPlainTextColumnSizesPoints():";
+    string soliloquy=XPID+"ConvexHull::getPlainTextColumnSizesPoints():";
     stringstream message;
     sizes.clear();
     getPlainTextColumnSizes(headers,ventries,sizes);
@@ -11048,7 +11545,7 @@ namespace chull {
 
   void ConvexHull::getPlainTextColumnSizesFacets(const vector<string>& headers,const vector<vector<vector<vector<string> > > >& ventries,vector<uint>& sizes) const {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ConvexHull::getPlainTextColumnSizesFacets():";
+    string soliloquy=XPID+"ConvexHull::getPlainTextColumnSizesFacets():";
     stringstream message;
     sizes.clear();
     for(uint i=0,fl_size_i=ventries.size();i<fl_size_i;i++){
@@ -11089,7 +11586,7 @@ namespace chull {
 
   void ConvexHull::writeText(filetype ftype) const {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ConvexHull::writeText():";
+    string soliloquy=XPID+"ConvexHull::writeText():";
     stringstream message;
 
     if(!(ftype==txt_ft || ftype==json_ft)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown mode");}
@@ -11198,7 +11695,7 @@ namespace chull {
 
   void ConvexHull::writeWebApp() const {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy = XPID + "ConvexHull::writeWebApp():";
+    string soliloquy=XPID+"ConvexHull::writeWebApp():";
     stringstream message;
     pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "Starting web-specific JSONifier", m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
 
@@ -11234,17 +11731,18 @@ namespace chull {
     main_JSON_file="aflow_"+input; //SK20200406
     //[SK20200325 - OBSOLETE]main_JSON_file="aflow_"+input+"_hull_web.json"; //WSCHMITT20190620
     //SK20200331 START
-    bool sc_requested=m_cflags.flag("CHULL::NEGLECT");  //only neglect feature via web
-    bool n1eg_requested=m_cflags.flag("CHULL::NPLUS1_ENTHALPY_GAIN");
+    bool sc_requested=m_cflags.flag("CHULL::STABILITY_CRITERION");  //only neglect feature via web
+    bool n1eg_requested=m_cflags.flag("CHULL::CALCULATE_FAKE_HULL_N+1_ENTHALPY_GAIN");
     vector<string> sc_point;
     string delimiter="";
     // naming stability criterion files
     if(sc_requested) {
-      aurostd::string2tokens(m_cflags.getattachedscheme("CHULL::NEGLECT"),sc_point,",");
+      aurostd::string2tokens(m_cflags.getattachedscheme("CHULL::STABILITY_CRITERION"),sc_point,",");
       std::sort(sc_point.begin(),sc_point.end()); //CO20200404 - this sort is NOT necessary, as web only removes 1 point a time, but this is SAFE
       delimiter = "_sc_";
       // limiting to the characters after "aflow:" because ":" is a reserved character for php query calls, also shortening queries
       main_JSON_file=main_JSON_file + delimiter + sc_point[0].substr(6); // restricting to single auid to limit file name growth, the substr(6) removes 'aflow:' from string which would cause issues for the filename/web
+      if(LDEBUG){cerr << soliloquy << " main_JSON_file=" << main_JSON_file << endl;}
     }
     // naming n+1 enthalpy gain files
     if (n1eg_requested) {
@@ -11423,12 +11921,12 @@ namespace chull {
             distances_data_JSON_ss << ",";
             // entropic temperature, row 5
             distances_data_JSON_ss << "\"entropicTemperature\":" << aurostd::utype2string(0.0,CHULL_PRECISION);
-            //wws16 06.20.2019 - adding in np1 and stab criterion to webApp - START
+            //WSCHMITT20190620 - adding in np1 and stab criterion to webApp - START
             distances_data_JSON_ss << ",";
             distances_data_JSON_ss << "\"nPlus1EnthalpyGain\":" << aurostd::utype2string(0.0, CHULL_PRECISION);
             distances_data_JSON_ss << ",";
             distances_data_JSON_ss << "\"stabilityCriterion\":" << aurostd::utype2string(0.0, CHULL_PRECISION);
-            //wws16 06.20.2019 - adding in np1 and stab criterion to webApp - STOP
+            //WSCHMITT20190620 - adding in np1 and stab criterion to webApp - STOP
           } else {
             // enthalpy of formation, row 4
             // no need for precision for next few columns, leave it same way as
@@ -11442,10 +11940,10 @@ namespace chull {
             distances_data_JSON_ss << "\"entropicTemperature\":" << num_ss.str();
             num_ss.str("");
 
-            //wws16 06.20.2019 - adding in np1 and stab criterion to webApp, "N/A" for non ground-states - START
+            //WSCHMITT20190620 - adding in np1 and stab criterion to webApp, "N/A" for non ground-states - START
             distances_data_JSON_ss << ",";
 
-            num_ss << ConvexHull::grabCHPointProperty(point,"N+1_energy_gain",json_ft);
+            num_ss << ConvexHull::grabCHPointProperty(point,"N+1_enthalpy_gain",json_ft);
             distances_data_JSON_ss << "\"nPlus1EnthalpyGain\":" << num_ss.str();
             distances_data_JSON_ss << ",";
             num_ss.str("");
@@ -11453,7 +11951,17 @@ namespace chull {
             num_ss << ConvexHull::grabCHPointProperty(point,"stability_criterion",json_ft);
             distances_data_JSON_ss << "\"stabilityCriterion\":" << num_ss.str();
             num_ss.str("");
-            //wws16 06.20.2019 - adding in np1 and stab criterion to webApp, "N/A" for non ground-states - STOP
+            //WSCHMITT20190620 - adding in np1 and stab criterion to webApp, "N/A" for non ground-states - STOP
+
+            //SK20200825 start
+            //adding decompositionAuids for webapp
+            distances_data_JSON_ss << ",";
+            num_ss.str("");
+
+            num_ss << ConvexHull::grabCHPointProperty(point,"phases_decomposition_auid",json_ft);
+            distances_data_JSON_ss << "\"decompositionAuids\":" << num_ss.str();
+            num_ss.str("");
+            //SK20200825 end
           }
           distances_data_JSON_ss << "}";
           distances_data_JSON_vs.push_back(distances_data_JSON_ss.str());
@@ -11485,12 +11993,12 @@ namespace chull {
             hull_points_data_JSON_ss << ",";
             // entropic temperature, row 5
             hull_points_data_JSON_ss << "\"entropicTemperature\":" << aurostd::utype2string(0.0,CHULL_PRECISION);
-            //wws16 06.20.2019 - adding in np1 and stab criterion to webApp - START
+            //WSCHMITT20190620 - adding in np1 and stab criterion to webApp - START
             hull_points_data_JSON_ss << ",";
             hull_points_data_JSON_ss << "\"nPlus1EnthalpyGain\":" << aurostd::utype2string(0.0, CHULL_PRECISION);
             hull_points_data_JSON_ss << ",";
             hull_points_data_JSON_ss << "\"stabilityCriterion\":" << aurostd::utype2string(0.0, CHULL_PRECISION);
-            //wws16 06.20.2019 - adding in np1 and stab criterion to webApp - STOP
+            //WSCHMITT20190620 - adding in np1 and stab criterion to webApp - STOP
           } else {
             // enthalpy of formation, row 4
             // no need for precision for next few columns, leave it same way as
@@ -11504,10 +12012,10 @@ namespace chull {
             hull_points_data_JSON_ss << "\"entropicTemperature\":" << num_ss.str();
             num_ss.str("");
 
-            //wws16 06.20.2019 - adding in np1 and stab criterion to webApp - START
+            //WSCHMITT20190620 - adding in np1 and stab criterion to webApp - START
             hull_points_data_JSON_ss << ",";
 
-            num_ss << ConvexHull::grabCHPointProperty(point,"N+1_energy_gain",json_ft);
+            num_ss << ConvexHull::grabCHPointProperty(point,"N+1_enthalpy_gain",json_ft);
             hull_points_data_JSON_ss << "\"nPlus1EnthalpyGain\":" << num_ss.str();
             hull_points_data_JSON_ss << ",";
             num_ss.str("");
@@ -11515,7 +12023,7 @@ namespace chull {
             num_ss << ConvexHull::grabCHPointProperty(point,"stability_criterion",json_ft);
             hull_points_data_JSON_ss << "\"stabilityCriterion\":" << num_ss.str();
             num_ss.str("");
-            //wws16 06.20.2019 - adding in np1 and stab criterion to webApp - STOP
+            //WSCHMITT20190620 - adding in np1 and stab criterion to webApp - STOP
           }
           hull_points_data_JSON_ss << "}";
           hull_points_data_JSON_vs.push_back(hull_points_data_JSON_ss.str());
@@ -11617,12 +12125,12 @@ namespace chull {
         vertices_data_JSON_ss << ",";
         // entropic temperature, row 5
         vertices_data_JSON_ss << "\"entropicTemperature\":" << aurostd::utype2string(0.0,CHULL_PRECISION);
-        //wws16 06.20.2019 - adding in np1 and stab criterion to webApp - START
+        //WSCHMITT20190620 - adding in np1 and stab criterion to webApp - START
         vertices_data_JSON_ss << ",";
         vertices_data_JSON_ss << "\"nPlus1EnthalpyGain\":" << aurostd::utype2string(0.0, CHULL_PRECISION);
         vertices_data_JSON_ss << ",";
         vertices_data_JSON_ss << "\"stabilityCriterion\":" << aurostd::utype2string(0.0, CHULL_PRECISION);
-        //wws16 06.20.2019 - adding in np1 and stab criterion to webApp - STOP
+        //WSCHMITT20190620 - adding in np1 and stab criterion to webApp - STOP
       } else {
         // enthalpy of formation, row 4
         // no need for precision for next few columns, leave it same way as
@@ -11636,10 +12144,10 @@ namespace chull {
         vertices_data_JSON_ss << "\"entropicTemperature\":" << num_ss.str();
         num_ss.str("");
 
-        //wws16 06.20.2019 - adding in np1 and stab criterion to webApp, "N/A" for non ground-states - START
+        //WSCHMITT20190620 - adding in np1 and stab criterion to webApp, "N/A" for non ground-states - START
         vertices_data_JSON_ss << ",";
 
-        num_ss << ConvexHull::grabCHPointProperty(point,"N+1_energy_gain",json_ft);
+        num_ss << ConvexHull::grabCHPointProperty(point,"N+1_enthalpy_gain",json_ft);
         vertices_data_JSON_ss << "\"nPlus1EnthalpyGain\":" << num_ss.str();
         vertices_data_JSON_ss << ",";
         num_ss.str("");
@@ -11647,7 +12155,7 @@ namespace chull {
         num_ss << ConvexHull::grabCHPointProperty(point,"stability_criterion",json_ft);
         vertices_data_JSON_ss << "\"stabilityCriterion\":" << num_ss.str();
         num_ss.str("");
-        //wws16 06.20.2019 - adding in np1 and stab criterion to webApp, "N/A" for non ground-states - STOP
+        //WSCHMITT20190620 - adding in np1 and stab criterion to webApp, "N/A" for non ground-states - STOP
       }
       vertices_data_JSON_ss << "}";
       vertices_data_JSON_vs.push_back(vertices_data_JSON_ss.str());
@@ -11722,7 +12230,7 @@ namespace chull {
 
   bool ConvexHull::sortWithinCoordGroup::operator() (uint i,uint j) {
     //ascending order
-    string soliloquy = XPID + "ConvexHull::sortWithinCoordGroup::operator():";
+    string soliloquy=XPID+"ConvexHull::sortWithinCoordGroup::operator():";
     if( (i>m_points.size()-1) || (j>m_points.size()-1) ) {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within CoordGroup");}  //safety
     const ChullPoint& ci=m_points[i];
     const ChullPoint& cj=m_points[j];
@@ -11745,7 +12253,7 @@ namespace chull {
   }
 
   bool ConvexHull::sortCHullPoints::operator() (uint i,uint j) const{
-    string soliloquy = XPID + "ConvexHull::sortCHullPoints::operator():";
+    string soliloquy=XPID+"ConvexHull::sortCHullPoints::operator():";
     if(i>m_points.size()-1 || j>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index for m_points");}
     const ChullPoint& ci=m_points[i];
     const ChullPoint& cj=m_points[j];
@@ -11754,7 +12262,7 @@ namespace chull {
   }
 
   bool ConvexHull::sortFacetsByPoints::operator() (const ChullFacet& fi,const ChullFacet& fj) const {
-    string soliloquy = XPID + "ConvexHull::sortFacetsByPoints::operator():";
+    string soliloquy=XPID+"ConvexHull::sortFacetsByPoints::operator():";
     if(fi.m_vertices.size()!=fj.m_vertices.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Dimension mismatch among facets");} //return m_ascending_order ? fi.m_vertices.size()<rj.m_vertices.size() : fi.m_vertices.size()>rj.m_vertices.size();
     if(fi.m_normal.rows!=fj.m_normal.rows){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Dimension mismatch between facet normals");}
     if(!(fi.m_initialized&&fj.m_initialized)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized facet");}       //ensure we have inward pointing normal and angle
@@ -11786,7 +12294,7 @@ namespace chull {
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
-// *           Aflow COREY OSES - Duke University 2013-2020                  *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
+// *           Aflow COREY OSES - Duke University 2013-2021                  *
 // *                                                                         *
 // ***************************************************************************

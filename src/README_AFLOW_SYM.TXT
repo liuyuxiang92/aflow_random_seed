@@ -1,6 +1,6 @@
 ****************************************************************************************************
 *                                                                                                  *
-*                        aflow - STEFANO CURTAROLO Duke University 2003-2020                       *
+*                        aflow - STEFANO CURTAROLO Duke University 2003-2021                       *
 *                            High-Throughput ab-initio Computing Project                           *
 *                                                                                                  *
 ****************************************************************************************************
@@ -230,7 +230,7 @@ AFLOW COMMANDS USAGE:
              tight: minimum_interatomic_distance/100.0
              loose: minimum_interatomic_distance/10.0
            The default tolerance is the "tight" tolerance value.
-           A value can also be specified. (Note, it must not be below the minimum 
+           A value can also be specified. (Note, it must not be below the minimum
            interatomic distance, otherwise an error will be thrown.)
         Magnetic analysis:
           The magnetic tag specifies the magnetic moment on each of the atoms.  The
@@ -246,7 +246,7 @@ AFLOW COMMANDS USAGE:
           [--screen_only] : Prints symmetry elements to string and does not write to a file.
           [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]]: Perform symmetry analysis of spin system, where spin degree of freedom breaks symmetry 
 
-  aflow --aflowSG[_label,_number][=tolerance | =tight | =loose] [--no_scan] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR
+  aflow --aflowSG[_label,_number][=tolerance | =tight | =loose] [--no_scan] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] [--tolerance_spectrum=start:stop:step] < POSCAR
         Calculates the space group of the crystal in the ITC convention.
         No assumptions are made on the input POSCAR-- may be supercell, primitive, etc.
         Gives the Bravais lattice, crystal system, point group, space group number and wyckoff set.
@@ -259,7 +259,7 @@ AFLOW COMMANDS USAGE:
              tight: minimum_interatomic_distance/100.0
              loose: minimum_interatomic_distance/10.0
            The default tolerance is the "tight" tolerance value.
-           A value can also be specified. (Note, it must be below the minimum 
+           A value can also be specified. (Note, it must be below the minimum
            interatomic distance, otherwise an error will be thrown.)
         Can be called inside aflow via:
               xstructure.SpaceGroup_ITC()        (default tolerance)
@@ -276,6 +276,7 @@ AFLOW COMMANDS USAGE:
         Options:
           [--no_scan] : Will not perform tolerance scan.
           [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]]: Perform symmetry analysis of spin system, where spin degree of freedom breaks symmetry 
+          [--tolerance_spectrum=start:stop:step] : Perform symmetry analysis for a range of tolerance values
   
   aflow --cif[=tolerance | =tight | =loose] [--setting=1| =2] [--no_symmetry] < POSCAR
         Outputs to standard out a Crystallographic Information File
@@ -380,13 +381,27 @@ AFLOW COMMANDS USAGE:
           [--screen_only] : Prints symmetry elements to string and does not write to a file.
           [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]]: Perform symmetry analysis of spin system, where spin degree of freedom breaks symmetry 
   
-  aflow --lattice_type | --lattice | --lattice_crystal < POSCAR
+  aflow --lattice_type | --lattice | --lattice_crystal[=tolerance| =tight| =loose] < POSCAR
         Returns the lattice type and the conventional lattice type of the CRYSTAL following the tables
         of Setyawayn-Curtarolo [http://dx.doi.org/10.1016/j.commatsci.2010.05.010].
+        Tolerance:
+           The tolerance is given in Angstroms.  There are two preset tolerances:
+             tight: minimum_interatomic_distance/100.0
+             loose: minimum_interatomic_distance/10.0
+           The default tolerance is the "tight" tolerance value.
+           A value can also be specified. (Note, it must be below the minimum
+           interatomic distance, otherwise an error will be thrown.)
 
-  aflow --lattice_lattice_type | --lattice_lattice < POSCAR
+  aflow --lattice_lattice_type | --lattice_lattice[=tolerance| =tight| =loose] < POSCAR
         Returns the lattice type and the conventional lattice type of the LATTICE following the tables
         of Setyawayn-Curtarolo [http://dx.doi.org/10.1016/j.commatsci.2010.05.010].
+        Tolerance:
+           The tolerance is given in Angstroms.  There are two preset tolerances:
+             tight: minimum_interatomic_distance/100.0
+             loose: minimum_interatomic_distance/10.0
+           The default tolerance is the "tight" tolerance value.
+           A value can also be specified. (Note, it must be below the minimum
+           interatomic distance, otherwise an error will be thrown.)
   
   aflow --pearson_symbol | --pearson < POSCAR
         Returns the Pearson symbol of the structure.
@@ -603,7 +618,7 @@ AFLOW COMMANDS USAGE:
           [--screen_only] : Prints symmetry elements to string and does not write to a file.
           [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]]: Perform symmetry analysis of spin system, where spin degree of freedom breaks symmetry 
 
-  aflow --wyccar[=tolerance | =tight | =loose] [--no_scan] [--setting=1| =2] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR
+  aflow --wyccar[=tolerance | =tight | =loose] [--no_scan] [--setting=1| =2] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] [--letters_only] [--multiplicities_only] [--site_symmetries_only] < POSCAR
         Prints the wyccar file (the poscar file with wyckoff positions) for the input POSCAR
         The wyccar format presents the lattice in standard conventional form and the wyckoff
         positions with their associated labels and site symmetry. If variability in the
@@ -631,6 +646,9 @@ AFLOW COMMANDS USAGE:
         Options:
           [--no_scan] : Will not perform tolerance scan.
           [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]]: Perform symmetry analysis of spin system, where spin degree of freedom breaks symmetry
+          [--letters_only]: Return the Wyckoff letters only
+          [--multiplicities_only]: Return the Wyckoff multiplicities only
+          [--site_symmetries_only]: Return the Wyckoff site symmetries only
         Check aflow --readme=symmetry
 
 
@@ -638,7 +656,7 @@ For additional information contact: David Hicks (d.hicks@duke.edu)
 
 ****************************************************************************************************
 *                                                                                                  *
-*                        aflow - STEFANO CURTAROLO Duke University 2003-2020                       *
+*                        aflow - STEFANO CURTAROLO Duke University 2003-2021                       *
 *                            High-Throughput ab-initio Computing Project                           *
 *                                                                                                  *
 ****************************************************************************************************

@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
 // *                                                                         *
 // ***************************************************************************
 
@@ -26,6 +26,8 @@ extern vector<string> vLibrary_ALL;
 // **************************************************************************
 bool APENNSY_Parameters::LoadLibrary(_aflags &aflags) {
   bool LDEBUG=(FALSE || XHOST.DEBUG);
+  string soliloquy=XPID+"APENNSY_Parameters::LoadLibrary():";
+  stringstream message;
   // START_NEW_STYLE 
   // LOAD LIBRARY
   if(XHOST.APENNSY_USE_LIBRARY) aflowlib::LOAD_Library_ALL(TRUE);
@@ -44,8 +46,7 @@ bool APENNSY_Parameters::LoadLibrary(_aflags &aflags) {
   char string_line_TMELTING[1024],alloy_TMELTING[1024],*string_TMELTING_ptr;
   in_file_pointer_TMELTING=fopen(TMELTING_FILE,"r");
   if(in_file_pointer_TMELTING==NULL) {
-    cerr << "ERROR: file not found [M] " << MELTING_FILE << endl;
-    exit(0);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"file not found [M]: "+MELTING_FILE,_FILE_CORRUPT_); //CO20200624
   }
   fgets(string_line_TMELTING,1024,in_file_pointer_TMELTING);
   cerr << string_line_TMELTING << endl;
@@ -57,8 +58,7 @@ bool APENNSY_Parameters::LoadLibrary(_aflags &aflags) {
 #ifdef TMELTING
     fgets(string_line_TMELTING,1024,in_file_pointer_TMELTING);
     if(!strstr(string_line_TMELTING,alloys.at(nalloy))) {
-      cerr << "string " << alloys.at(nalloy) << " not found in " << string_line_TMELTING << endl;
-      exit(0);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"string "+alloys.at(nalloy)+" not found in "+string_line_TMELTING,_FILE_CORRUPT_); //CO20200624
     }
     for(uint i=1;i<=Ntemperatures;i++) {
       if(i==1) Tmelting(i,nalloy)=strtod(string_line_TMELTING+10,&string_TMELTING_ptr);
@@ -137,7 +137,7 @@ bool APENNSY_Parameters::LoadLibrary(_aflags &aflags) {
       if(LDEBUG) cerr << " XHOST.APENNSY_USE_LIBRARY" << endl;
       // aflowlib::GREP_Species_ALL(vspecies,vspecies_pp,vList,vList_tokens,vList_species,vList_Hmin,vList_Pmin,vList_Imin,vList_concs,vList_Ef);
       aflowlib::GREP_Species_ALL(vspecies,vspecies_pp,vList);
-      if(LDEBUG) cerr << " LIBS entries= " << vList.at(0).size()+vList.at(1).size() << endl;//   exit(0);
+      if(LDEBUG) cerr << " LIBS entries= " << vList.at(0).size()+vList.at(1).size() << endl;
       for(uint ilist=0;ilist<vList.at(0).size();ilist++) {_aflowlib_tmp.Load(vList.at(0).at(ilist),cout);vaflowlib_aus.push_back(_aflowlib_tmp);};
       for(uint ilist=0;ilist<vList.at(1).size();ilist++) {_aflowlib_tmp.Load(vList.at(1).at(ilist),cout);vaflowlib_aus.push_back(_aflowlib_tmp);};
     } 
@@ -181,7 +181,6 @@ bool APENNSY_Parameters::LoadLibrary(_aflags &aflags) {
     if(LDEBUG) cerr << "vaflowlib.size()=" << vaflowlib.size() << endl;
     if(LDEBUG) cerr << "vaflowlibentry_url_aus.size()=" << vaflowlibentry_url_aus.size() << endl;
     if(LDEBUG) cerr << "vaflowlibentry_url.size()=" << vaflowlibentry_url.size() << endl;
-    //    exit(0);
 
     // PREPARE CONCENTRATIONS
     for(uint ilist=0;ilist<vaflowlib.size();ilist++) {
@@ -326,7 +325,7 @@ bool APENNSY_Parameters::LoadLibrary(_aflags &aflags) {
         plug.vstr.clear();
         //	if(struct_proprts.vstr.size()!=0 && struct_proprts.vstr.size()!=3) {
         //	  cerr << "ERROR: struct_proprts.vstr.size()=" << struct_proprts.vstr.size() << endl;
-        // exit;
+        //    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"struct_proprts.vstr.size()="+aurostd::utype2string(struct_proprts.vstr.size()),_INDEX_MISMATCH_); //CO20200624
         //	}
         xstructure xstr;
         if(XHOST.APENNSY_USE_SERVER) {
@@ -341,31 +340,34 @@ bool APENNSY_Parameters::LoadLibrary(_aflags &aflags) {
           aurl=aurostd::StringSubst(aurl,"AFLOWDATA/LIB2_RAW/","/common/LIB2/RAW/");
           // PRE
           if(!aurostd::FileExist(aurl+"/POSCAR.relax1") && !aurostd::FileExist(aurl+"/POSCAR.orig")) {
-            cerr << "ERROR aurl=\"" << aurl << "\" needed POSCAR.orig/POSCAR.relax1" << endl;exit(0);}
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"aurl=\""+aurl+"\" needed POSCAR.orig/POSCAR.relax1",_FILE_CORRUPT_); //CO20200624
+          }
           if(!xstr.atoms.size() && aurostd::FileExist(aurl+"/POSCAR.orig")) {xstr=xstructure(aurl+"/POSCAR.orig",IOVASP_AUTO);}
           if(!xstr.atoms.size() && aurostd::FileExist(aurl+"/POSCAR.relax1")) {xstr=xstructure(aurl+"/POSCAR.relax1",IOVASP_AUTO);}
           plug.vstr.push_back(xstr);xstr.clear(); //DX20191220 - uppercase to lowercase clear
           // MID
           if(!aurostd::FileExist(aurl+"/CONTCAR.relax1") && !aurostd::FileExist(aurl+"/POSCAR.relax2")) {
-            cerr << "ERROR aurl=\"" << aurl << "\" needed POSCAR.relax2/CONTCAR.relax1" << endl;exit(0);}
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"aurl=\""+aurl+"\" needed POSCAR.relax2/CONTCAR.relax1",_FILE_CORRUPT_); //CO20200624
+          }
           if(!xstr.atoms.size() && aurostd::FileExist(aurl+"/POSCAR.relax2")) {xstr=xstructure(aurl+"/POSCAR.relax2",IOVASP_AUTO);}
           if(!xstr.atoms.size() && aurostd::FileExist(aurl+"/CONTCAR.relax1")) {xstr=xstructure(aurl+"/CONTCAR.relax1",IOVASP_AUTO);}
           plug.vstr.push_back(xstr);xstr.clear(); //DX20191220 - uppercase to lowercase clear
           // POST
           if(!aurostd::FileExist(aurl+"/CONTCAR.relax") && !aurostd::FileExist(aurl+"/CONTCAR.relax2")) {
-            cerr << "ERROR aurl=\"" << aurl << "\" needed CONTCAR.relax/CONTCAR.relax2" << endl;exit(0);}
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"aurl=\""+aurl+"\" needed CONTCAR.relax/CONTCAR.relax2",_FILE_CORRUPT_); //CO20200624
+          }
           if(!xstr.atoms.size() && aurostd::FileExist(aurl+"/CONTCAR.relax")) {xstr=xstructure(aurl+"/CONTCAR.relax",IOVASP_AUTO);}
           if(!xstr.atoms.size() && aurostd::FileExist(aurl+"/CONTCAR.relax2")) {xstr=xstructure(aurl+"/CONTCAR.relax2",IOVASP_AUTO);}
           plug.vstr.push_back(xstr);xstr.clear(); //DX20191220 - uppercase to lowercase clear
           //	plug.vstr.clear(); for(uint ii=0;ii<struct_proprts.vstr.size();ii++) plug.vstr.push_back(struct_proprts.vstr.at(ii));
           //	plug.nrelaxations=struct_proprts.nrelaxations;
-          //	exit(0);
         }
 
         if(XHOST.APENNSY_SERVER_AFLOWLIB_ORG) { 	  // load files
           // PRE
           if(!aurostd::substring2bool(vaflowlib.at(i).vfiles,"POSCAR.relax1") && !aurostd::substring2bool(vaflowlib.at(i).vfiles,"POSCAR.orig")) {
-            cerr << "ERROR vaflowlibentry_url.at(i)=\"" << vaflowlibentry_url.at(i) << "\" needed POSCAR.orig/POSCAR.relax1" << endl;exit(0);}
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"vaflowlibentry_url.at(i)=\""+vaflowlibentry_url.at(i)+"\" needed POSCAR.orig/POSCAR.relax1",_FILE_CORRUPT_); //CO20200624
+          }
           if(!xstr.atoms.size() && aurostd::substring2bool(vaflowlib.at(i).vfiles,"POSCAR.orig")) {
             stringstream aus(aurostd::url2string(vaflowlibentry_url.at(i)+"/POSCAR.orig"));xstr=xstructure(aus,IOVASP_AUTO);}
           if(!xstr.atoms.size() && aurostd::substring2bool(vaflowlib.at(i).vfiles,"POSCAR.relax1")) {
@@ -373,7 +375,8 @@ bool APENNSY_Parameters::LoadLibrary(_aflags &aflags) {
           plug.vstr.push_back(xstr);xstr.clear(); //DX20191220 - uppercase to lowercase clear
           // MID
           if(!aurostd::substring2bool(vaflowlib.at(i).vfiles,"CONTCAR.relax1") && !aurostd::substring2bool(vaflowlib.at(i).vfiles,"POSCAR.relax2")) {
-            cerr << "ERROR vaflowlibentry_url.at(i)=\"" << vaflowlibentry_url.at(i) << "\" needed POSCAR.relax2/CONTCAR.relax1" << endl;exit(0);}
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"vaflowlibentry_url.at(i)=\""+vaflowlibentry_url.at(i)+"\" needed POSCAR.relax2/CONTCAR.relax1",_FILE_CORRUPT_); //CO20200624
+          }
           if(!xstr.atoms.size() && aurostd::substring2bool(vaflowlib.at(i).vfiles,"CONTCAR.relax1")) {
             stringstream aus(aurostd::url2string(vaflowlibentry_url.at(i)+"/CONTCAR.relax1"));xstr=xstructure(aus,IOVASP_AUTO);}
           if(!xstr.atoms.size() && aurostd::substring2bool(vaflowlib.at(i).vfiles,"POSCAR.relax2")) {
@@ -381,7 +384,8 @@ bool APENNSY_Parameters::LoadLibrary(_aflags &aflags) {
           plug.vstr.push_back(xstr);xstr.clear(); //DX20191220 - uppercase to lowercase clear
           // POST
           if(!aurostd::substring2bool(vaflowlib.at(i).vfiles,"CONTCAR.relax") && !aurostd::substring2bool(vaflowlib.at(i).vfiles,"CONTCAR.relax2")) {
-            cerr << "ERROR vaflowlibentry_url.at(i)=\"" << vaflowlibentry_url.at(i) << "\" needed CONTCAR.relax/CONTCAR.relax2" << endl;exit(0);}
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"vaflowlibentry_url.at(i)=\""+vaflowlibentry_url.at(i)+"\" needed CONTCAR.relax/CONTCAR.relax2",_FILE_CORRUPT_); //CO20200624
+          }
           if(!xstr.atoms.size() && aurostd::substring2bool(vaflowlib.at(i).vfiles,"CONTCAR.relax")) {
             stringstream aus(aurostd::url2string(vaflowlibentry_url.at(i)+"/CONTCAR.relax"));xstr=xstructure(aus,IOVASP_AUTO);}
           if(!xstr.atoms.size() && aurostd::substring2bool(vaflowlib.at(i).vfiles,"CONTCAR.relax2")) {
@@ -454,7 +458,10 @@ bool APENNSY_Parameters::LoadLibrary(_aflags &aflags) {
 
         // aurostd::string2tokens(plug.geometry,tokens,",");
         // //	cerr << "tokens.size()=" << tokens.size() << endl;
-        // if(tokens.size()!=6) {cerr << "ERROR: (get_dimensions_properties) abc-tokens " << endl;cerr << plug.entry << endl;exit(0);}
+        // if(tokens.size()!=6) {
+        //  message << "(get_dimensions_properties) abc-tokens " << endl;message << plug.entry << endl;
+        //  throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_NUMBER_); //CO20200624
+        // }
 
         // plug.unit_cell_a=(double) aurostd::string2utype<double>(tokens.at(0));         // UCELLD unit cell: a (max)
         // plug.unit_cell_b=(double) aurostd::string2utype<double>(tokens.at(1));         // UCELLD unit cell: b
@@ -471,7 +478,10 @@ bool APENNSY_Parameters::LoadLibrary(_aflags &aflags) {
         //	cerr << "tokens.size()=" << tokens.size() << endl;
         if(tokens.size()==1) {plug.bond_aa=aurostd::string2utype<double>(tokens.at(0));plug.bond_ab=0.0;plug.bond_bb=0.0;}
         if(tokens.size()==3) {plug.bond_aa=aurostd::string2utype<double>(tokens.at(0));plug.bond_ab=aurostd::string2utype<double>(tokens.at(1));plug.bond_bb=aurostd::string2utype<double>(tokens.at(2));}
-        if(tokens.size()==0) {cerr << "ERROR: (get_dimensions_properties) nbondxx not enough tokens " << endl;cerr << plug.entry << endl;exit(0);}
+        if(tokens.size()==0) {
+          message << "(get_dimensions_properties) nbondxx not enough tokens " << endl;message << plug.entry << endl;
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_NUMBER_); //CO20200624
+        }
         // done
 
         if(!ishole && aflags.vflag.flag("APENNSY::NEGLECT_STRUCTURES")) 
@@ -641,7 +651,6 @@ xvector<int> xconvexhull(int nalloy,const APENNSY_Parameters &params) {
   double c1,c2,c3,alpha,beta,energy;
   //  for(uint i=0;i<params.ZConcentrations.at(nalloy).size();i++) 
   //  cerr << "i=" << i << " params.ZConcentrations.at(nalloy).at(i)=" << params.ZConcentrations.at(nalloy).at(i) << endl;
-  //  exit(0);
 
   for(uint i=1;i<params.ZConcentrations.at(nalloy).size();i++) {
     gndEFlibrary(i)=APENNSY_INF;
@@ -1101,7 +1110,7 @@ bool APENNSY_Parameters::LibLoadAlloysALLOY(string alloy_name,_aflags &aflags) {
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
 // *                                                                         *
 // ***************************************************************************
 

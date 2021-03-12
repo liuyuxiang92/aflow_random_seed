@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
 // *                                                                         *
 // ***************************************************************************
 // Stefano Curtarolo and Dane Morgan
@@ -21,7 +21,7 @@ int Sign(const double& x) {return (int) aurostd::sign(x);}
 // Function PutInCompact
 // ***************************************************************************
 // Make a structure where all the atoms are all the
-// atoms are mapped through the unit and neighbours cells
+// atoms are mapped through the unit and neighbors cells
 // to minimixe the shortest possible bond with an adjacent atom. (SC 6 Aug 04)
 xstructure PutInCompact(const xstructure& a) {
   xstructure sstr=a;
@@ -697,29 +697,29 @@ namespace pflow {
 }
 
 // ***************************************************************************
-// Function SetNumEachType
+// DX20210118 [OBSOLETE - no need to make a copy, improved in xatom] Function SetNumEachType
 // ***************************************************************************
-namespace pflow {
-  xstructure SetNumEachType(const xstructure& a, const deque<int>& in_num_each_type) {
-    xstructure b(a);
-    b.num_each_type.clear();
-    b.comp_each_type.clear();
-    for(uint i=0;i<in_num_each_type.size();i++) {
-      b.num_each_type.push_back(in_num_each_type.at(i));
-      b.comp_each_type.push_back(in_num_each_type.at(i));
-    }
-    return b;
-  }
-}
+//DX20210118 [OBSOLETE] namespace pflow {
+//DX20210118 [OBSOLETE]  xstructure SetNumEachType(const xstructure& a, const deque<int>& in_num_each_type) {
+//DX20210118 [OBSOLETE]    xstructure b(a);
+//DX20210118 [OBSOLETE]    b.num_each_type.clear();
+//DX20210118 [OBSOLETE]    b.comp_each_type.clear();
+//DX20210118 [OBSOLETE]    for(uint i=0;i<in_num_each_type.size();i++) {
+//DX20210118 [OBSOLETE]      b.num_each_type.push_back(in_num_each_type.at(i));
+//DX20210118 [OBSOLETE]      b.comp_each_type.push_back(in_num_each_type.at(i));
+//DX20210118 [OBSOLETE]    }
+//DX20210118 [OBSOLETE]    return b;
+//DX20210118 [OBSOLETE]  }
+//DX20210118 [OBSOLETE]}
 
 // ***************************************************************************
-// Function GetNumEachType
+// //DX20210118 [OBSOLETE - just use xstructure attribute] Function GetNumEachType
 // ***************************************************************************
-namespace pflow {
-  deque<int> GetNumEachType(const xstructure& a) {
-    return a.num_each_type;
-  }
-}
+//DX20210118 [OBSOLETE] namespace pflow {
+//DX20210118 [OBSOLETE]   deque<int> GetNumEachType(const xstructure& a) {
+//DX20210118 [OBSOLETE]     return a.num_each_type;
+//DX20210118 [OBSOLETE]   }
+//DX20210118 [OBSOLETE] }
 
 // ***************************************************************************
 // Function AddAllAtomPos
@@ -788,10 +788,10 @@ namespace pflow {
 // ***************************************************************************
 namespace pflow {
   xstructure SetAllAtomNames(const xstructure& a, const vector<string>& in) {
+    string soliloquy=XPID+"pflow::SetAllAtomNames():";
     xstructure b(a);
     if(in.size()==a.num_each_type.size()) {
-      cerr << "SetAllAtomNames: this routine must be fixed... it does not work here" << endl;
-      exit(0);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"this routine must be fixed, it does not work here",_RUNTIME_ERROR_);
 
       for(uint iat=0;iat<b.num_each_type.size();iat++) {
         b.atoms.at(iat).name=in.at(b.atoms.at(iat).type);       // CONVASP_MODE
@@ -812,10 +812,11 @@ namespace pflow {
       }
       return b;
     }
-    cerr << "Must specity as many names as types/numbers: in.size()=" << (int) in.size()
-      << "   =a.num_each_type.size()=" << (int) a.num_each_type.size()
-      << "   =a.atoms.size()=" << (int) a.atoms.size() << endl;
-    exit(0);
+    stringstream message;
+    message << "Must specify as many names as types/numbers: in.size()=" << (int) in.size();
+    message << "   =a.num_each_type.size()=" << (int) a.num_each_type.size();
+    message << "   =a.atoms.size()=" << (int) a.atoms.size();
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_NUMBER_);
   }
 }
 
@@ -824,10 +825,10 @@ namespace pflow {
 // ***************************************************************************
 namespace pflow {
   xstructure SetNamesWereGiven(const xstructure& a, const vector<int>& in) {
+    string soliloquy=XPID+"pflow::SetNamesWereGiven():";
     xstructure b(a);
     if(in.size()==a.num_each_type.size()) {
-      cerr << "ERROR - SetNamesWereGiven: this routine must be fixed... it does not work here" << endl;
-      exit(0);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"this routine must be fixed... it does not work here",_RUNTIME_ERROR_);
       for(uint iat=0;iat<b.num_each_type.size();iat++)
         b.atoms.at(iat).name_is_given=in.at(b.atoms.at(iat).type);      // CONVASP_MODE
       return b;
@@ -838,10 +839,11 @@ namespace pflow {
       }
       return b;
     }
-    cerr << "Must specity as many names as types/numbers: in.size()=" << (uint) in.size()
-      << "   =a.num_each_type.size()=" << (uint) a.num_each_type.size()
-      << "   =a.atoms.size()=" << (uint) a.atoms.size() << endl;
-    exit(0);
+    stringstream message;
+    message << "Must specify as many names as types/numbers: in.size()=" << (int) in.size();
+    message << "   =a.num_each_type.size()=" << (int) a.num_each_type.size();
+    message << "   =a.atoms.size()=" << (int) a.atoms.size();
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_NUMBER_);
   }
 }
 
@@ -1409,8 +1411,8 @@ namespace pflow {
     }
     h=xa[khi]-xa[klo];
     if(h == 0.0) {
-      cerr << "ERROR - pflow::GetSplineInt Bad xa input to routine splint" << endl;
-      exit(0);
+      string soliloquy=XPID+"pflow::GetSplineInt():";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Bad xa input to routine splint",_INPUT_ERROR_);
     }
     a=(xa[khi]-x)/h;
     b=(x-xa[klo])/h;
@@ -1483,6 +1485,6 @@ bool never_call_this_function(void) {
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
 // *                                                                         *
 // ***************************************************************************

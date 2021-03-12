@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
 // *                                                                         *
 // ***************************************************************************
 // Written by Stefano Curtarolo 1994-2011
@@ -14,20 +14,15 @@
 // all vector./matrix must be loaded before
 
 void SpaceGroupOptionRequired(uint &spacegroup, uint &option) {
-  cerr << "AFLOW WARNING: Wyckoff Spacegroup " << spacegroup << " requires option 1 or 2 (" << option << ")" << endl;
-  // cout << "AFLOW WARNING: Wyckoff Spacegroup " << spacegroup << " requires option 1 or 2 (" << option << ")" << endl;
-  //  cerr << "AFLOW WARNING: check it out and double-check concentrations and space-group" << endl;
-  // cerr << "EXITING..." << endl;
-  //  exit(0);SpaceGroupOptionRequired(spacegroup,option);
+  string function_name = XPID + "SpaceGroupOptionRequired():";
+  cerr << function_name << " Wyckoff Spacegroup " << spacegroup << " requires option 1 or 2 (" << option << ")" << endl;
   if(option==0 || option>3) {
     option=1;
-    cerr << "AFLOW WARNING: Wyckoff Spacegroup " << spacegroup << " taking option=" << option << " (let`s hope it is the right one, check the concentrations and space-group)" << endl;
-    //   cout << "AFLOW WARNING: Taking option=" << option << " (let`s hope it is the right one, check the concentrations and space-group)" << endl;
+    cerr << function_name << " Wyckoff Spacegroup " << spacegroup << " taking option=" << option << " (let`s hope it is the right one, check the concentrations and space-group)" << endl;
   }
   if(option==3) {
     option=2;
-    cerr << "AFLOW WARNING: Wyckoff Spacegroup " << spacegroup << " taking option=" << option << " (let`s hope it is the right one, check the concentrations and space-group)" << endl;
-    //  cout << "AFLOW WARNING: Taking option=" << option << " (let`s hope it is the right one, check the concentrations and space-group)" << endl;
+    cerr << function_name << " Wyckoff Spacegroup " << spacegroup << " taking option=" << option << " (let`s hope it is the right one, check the concentrations and space-group)" << endl;
   }
 }
 
@@ -6699,7 +6694,7 @@ xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
 // *                                                                         *
 // ***************************************************************************
 

@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
 // *                                                                         *
 // ***************************************************************************
 
@@ -248,22 +248,21 @@ bool APENNSY_Parameters::SplitAlloyPseudoPotentials(void) {
 // Is_alphabetic - tells if an alloy is alphabetic or not
 // ***************************************************************************
 bool _NEW_is_alphabetic(string alloy_dir) {
+  string soliloquy=XPID+"_NEW_is_alphabetic():";
   string in_file_name_aflowlib_entry=alloy_dir+string("/3/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT);
   vector<string> vaflowlib_entry,tokens;
   if(XHOST.APENNSY_USE_SERVER) { // FINDING ALPHABETIC FROM aflowlib.out - local
     if(aurostd::FileExist(in_file_name_aflowlib_entry)) {
       aurostd::string2tokens(aurostd::file2string(in_file_name_aflowlib_entry),vaflowlib_entry,"|");
     } else {
-      cerr << "ERROR: file not found [1] " << in_file_name_aflowlib_entry << endl; 
-      exit(0);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"file not found [1]: "+in_file_name_aflowlib_entry,_FILE_CORRUPT_); //CO20200624
     }
   }
   if(XHOST.APENNSY_SERVER_AFLOWLIB_ORG) { // FINDING ALPHABETIC FROM aflowlib.out - web
     aurostd::url2tokens(in_file_name_aflowlib_entry,vaflowlib_entry,"|"); 
     // [OBSOLETE]  aurostd::string2tokens(aurostd::url2string(in_file_name_aflowlib_entry),vaflowlib_entry,"|");
     if(!vaflowlib_entry.size()) {
-      cerr << "ERROR: file not found [2] " << in_file_name_aflowlib_entry << endl; 
-      exit(0);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"file not found [2]: "+in_file_name_aflowlib_entry,_FILE_CORRUPT_); //CO20200624
     }
   }
   vector<string> vspeciesD,vspeciesP;
@@ -276,7 +275,9 @@ bool _NEW_is_alphabetic(string alloy_dir) {
       if(vspeciesD.size()==2) {
         //	cout << "[5] " << "[" << vspeciesD.at(0) << "," << vspeciesD.at(1) << "]" << endl;
       }
-      if(vspeciesD.size()>=3) {cerr << "ERROR: unsupported number of species (vspecies) in " << in_file_name_aflowlib_entry << endl; exit(0);}
+      if(vspeciesD.size()>=3) {
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"unsupported number of species (vspecies) in "+in_file_name_aflowlib_entry,_INPUT_ILLEGAL_); //CO20200624
+      }
     }
     if(aurostd::substring2bool(vaflowlib_entry.at(i),"species=") && !aurostd::substring2bool(vaflowlib_entry.at(i),"nspecies=")) {
       aurostd::string2tokens(aurostd::substring2string(vaflowlib_entry.at(i),"species=",TRUE),vspeciesP,",");
@@ -285,7 +286,9 @@ bool _NEW_is_alphabetic(string alloy_dir) {
       if(vspeciesP.size()==2) {
         //	cout << "[5] " << "[" << vspeciesP.at(0) << "," << vspeciesP.at(1) << "]" << endl;
       }
-      if(vspeciesP.size()>=3) {cerr << "ERROR: unsupported number of species (vspeciesP) in " << in_file_name_aflowlib_entry << endl; exit(0);}
+      if(vspeciesP.size()>=3) {
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"unsupported number of species (vspeciesP) in "+in_file_name_aflowlib_entry,_INPUT_ILLEGAL_); //CO20200624
+      }
     }
   }
   if(vspeciesD.size()==0 && vspeciesP.size()==0) return TRUE;
@@ -294,13 +297,15 @@ bool _NEW_is_alphabetic(string alloy_dir) {
   if(vspeciesD.at(0) <vspeciesD.at(1) && vspeciesP.at(0) <vspeciesP.at(1) && vspeciesD.at(0)==vspeciesP.at(0) && vspeciesD.at(1)==vspeciesP.at(1)) return TRUE;
   if(vspeciesD.at(0) >vspeciesD.at(1) && vspeciesP.at(0) <vspeciesP.at(1) && vspeciesD.at(0)==vspeciesP.at(1) && vspeciesD.at(1)==vspeciesP.at(0)) return FALSE;
 
-  cerr << "_NEW_is_alphabetic: ERROR: " << vspeciesD.size() << " " << vspeciesP.size() << endl;
-  cerr << "_NEW_is_alphabetic: ERROR: " << vspeciesD.at(0) << " " << vspeciesD.at(1) << " " << vspeciesP.at(0) << " " << vspeciesP.at(1) << endl;
-  exit(0);
+  stringstream message;
+  message << vspeciesD.size() << " " << vspeciesP.size() << endl;
+  message << vspeciesD.at(0) << " " << vspeciesD.at(1) << " " << vspeciesP.at(0) << " " << vspeciesP.at(1) << endl;
+  throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_); //CO20200624
   return FALSE;
 }
 
 bool _OLD_is_alphabetic(string alloy_dir) {
+  string soliloquy=XPID+"_OLD_is_alphabetic():";
   FILE *in_file_pointer;
   string in_file_name;
   static char string_line[1024],*strptr;
@@ -312,15 +317,16 @@ bool _OLD_is_alphabetic(string alloy_dir) {
   in_file_name=alloy_dir+string("/3/POSCAR.relax1"); // OBSOLETE
   in_file_pointer=fopen(in_file_name.c_str(),"r");
   if(in_file_pointer==NULL) {
-    cerr << "ERROR: file not found " << in_file_name << endl;
-    exit(0);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"file not found: "+in_file_name,_FILE_CORRUPT_); //CO20200624
   }
 
   while(fgets(string_line,1024,in_file_pointer)) {
     i++;
     if(i==1) {
       A1=string_line[0];A2=string_line[1];
-      if(A1<65 || A1>90) { cerr << "APENNSY Error alphabetic (1)" << endl;exit(0);}
+      if(A1<65 || A1>90) {
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Error alphabetic (1)",_INPUT_ILLEGAL_); //CO20200624
+      }
       A1=A1-65;
       if(A2<97 || A2>122)  A2=0; else A2=A2-97;
     }
@@ -330,7 +336,9 @@ bool _OLD_is_alphabetic(string alloy_dir) {
       strtod(strptr,&strptr);
       while(strptr[0]==32) strptr++;
       B1=strptr[0];B2=strptr[1];
-      if(B1<65 || B1>90) { cerr << "APENNSY Error alphabetic (2)" << endl;exit(0);}
+      if(B1<65 || B1>90) {
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Error alphabetic (2)",_INPUT_ILLEGAL_); //CO20200624
+      }
       B1=B1-65;
       if(B2<97 || B2>122)  B2=0; else B2=B2-97;
       //  cerr << strptr << endl;
@@ -354,6 +362,6 @@ bool _is_alphabetic(string alloy_dir) {
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
 // *                                                                         *
 // ***************************************************************************

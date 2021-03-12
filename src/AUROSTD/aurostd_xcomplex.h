@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
 // *                                                                         *
 // ***************************************************************************
 // Written by Stefano Curtarolo 1994-2011
@@ -14,8 +14,8 @@
 // -------------------------------------------------------------- class xcomplex
 namespace aurostd {
 
-  class istream;
-  class ostream;
+  //[CO20200624 - OBSOLETE]class istream;
+  //[CO20200624 - OBSOLETE]class ostream;
 
   template <class utype> class xcomplex;
 
@@ -428,6 +428,6 @@ namespace aurostd {
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
 // *                                                                         *
 // ***************************************************************************

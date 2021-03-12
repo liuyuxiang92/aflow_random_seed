@@ -1,7 +1,7 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
-// *                Aflow CORMAC TOHER - Duke University 2013-2020           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
+// *                Aflow CORMAC TOHER - Duke University 2013-2021           *
 // *                                                                         *
 // ***************************************************************************
 // aflow_agl_debye.h
@@ -262,7 +262,8 @@ class _AGL_data {
 namespace AGL_functions {
   // Functions to actually run AGL, either directly or from another part of AFLOW
   uint RunDebye_AGL(_xvasp& xvasp, const string& AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, _AGL_data& AGL_data, ofstream& FileMESSAGE);
-  uint AGL_xvasp_flags_populate(_xvasp& xvasp, string& AflowIn, const string& AflowInName, const string& FileLockName, const string& directory_LIB, _aflags& aflags, _kflags& kflags, _vflags& vflags, ofstream& FileMESSAGE);
+  uint AGL_xvasp_flags_populate(_xvasp& xvasp, string& AflowIn, string& AflowInName, string& FileLockName, const string& directory_LIB, _aflags& aflags, _kflags& kflags, _vflags& vflags, ofstream& FileMESSAGE);
+  uint AGL_Get_AflowInName(string& AflowInName, const string& directory_LIB, bool& agl_aflowin_found); //CT20200713 Find aflow.in filename
   uint Get_ThermalProperties_AGL_postprocess(const string& directory, uint ntemperature, double stemperature, uint npressure, double spressure, vector<double>& agl_temperature, vector<double>& agl_gibbs_energy_atom, vector<double>& agl_vibrational_energy_atom);
   uint Get_EquilibriumVolumeTemperature(_xvasp& xvasp, const string& AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, vector<double>& Temperature, vector<double>& EquilibriumVolume, ofstream& FileMESSAGE);
   uint Get_EquilibriumVolumeAngstromTemperature(_xvasp&  xvasp, const string& AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, vector<double>& Temperature, vector<double>& EquilibriumVolume, ofstream& FileMESSAGE);
@@ -338,8 +339,8 @@ namespace AGL_functions {
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
-// *              AFlow CORMAC TOHER - Duke University 2013-2020             *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
+// *              AFlow CORMAC TOHER - Duke University 2013-2021             *
 // *                                                                         *
 // ***************************************************************************
 

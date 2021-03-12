@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
 // *                                                                         *
 // ***************************************************************************
 // Written by Stefano Curtarolo 2013-2014
@@ -42,7 +42,6 @@ namespace aurostd {
       vector<string> vxscheme;   // tokenized "," content
       vector<string> vxsghost;   // tokenized "," content
       bool preserved;            // the output
-      bool LDEBUG;               // to print or not to print
       // LOAD BOOLS FUNCTIONS
       void options2entry(string,string,int=aurostd_xoptionONOFF,string="");
       void scheme2scheme(char,string);
@@ -64,8 +63,8 @@ namespace aurostd {
       // [OBSOLETE] uint purgeattachedscheme(string check);            // remove attached_scheme, then returns vghost.size() - same as pop_attached
       uint push_attached(string scheme,string attached);               // add attached_scheme, then returns vghost.size() - like addattachedscheme with flag=TRUE
       uint pop_attached(string check);                                 // remove attached_scheme, then returns vghost.size()
-      string getattachedscheme(string scheme) const; //CO20180101
-      template<class utype> utype getattachedutype(string scheme);
+      string getattachedscheme(const string& scheme) const; //CO20180101
+      template<class utype> utype getattachedutype(const string& scheme) const;  //CO20200731
       bool args2addattachedscheme(vector<string> &argv,const string scheme,const string& _s_search,string string_default); 
       bool args2addattachedscheme(vector<string> &argv,vector<string> &cmds,const string scheme,const string& _s_search,string string_default);
       bool args2addattachedscheme(vector<string> &argv,const string scheme,const string& _s_search,char const* string_default); 
@@ -86,7 +85,7 @@ namespace aurostd {
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
 // *                                                                         *
 // ***************************************************************************
 

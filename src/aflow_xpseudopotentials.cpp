@@ -1,9 +1,9 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
 // *                                                                         *
 // ***************************************************************************
-// Written by Stefano Curtarolo - 2007-2020
+// Written by Stefano Curtarolo - 2007-2021
 #ifndef _AFLOW_XPSEUDOPOTENTIAL_CPP
 #define _AFLOW_XPSEUDOPOTENTIAL_CPP
 #include "aflow.h"
@@ -12,21 +12,21 @@
 // ---------------------------------------------------------------------------
 // _XPSEUDOPOTENTIAL_PROTOTYPES_
 /*
-  ./aflow --scrub=POTCAR --FILE /common/VASP/potpaw_PBE/current/Mo_pv/POTCAR
-  ./aflow --scrub=OUTCAR --FILE /common/LIB3/LIB/AgCdCo/TFCC001.ABC/OUTCAR.relax2.xz
-  ./aflow --pseudopotentials_check=/tmp/POTCAR1
-  ./aflow --pseudopotentials_check=/tmp/POTCAR2
-  ./aflow --pseudopotentials_check=/tmp/OUTCAR.relax2
-  ./aflow --pseudopotentials_check=/common/LIB3/LIB/AgCdCo/TFCC001.ABC/OUTCAR.relax2.xz
+   ./aflow --scrub=POTCAR --FILE /common/VASP/potpaw_PBE/current/Mo_pv/POTCAR
+   ./aflow --scrub=OUTCAR --FILE /common/LIB3/LIB/AgCdCo/TFCC001.ABC/OUTCAR.relax2.xz
+   ./aflow --pseudopotentials_check=/tmp/POTCAR1
+   ./aflow --pseudopotentials_check=/tmp/POTCAR2
+   ./aflow --pseudopotentials_check=/tmp/OUTCAR.relax2
+   ./aflow --pseudopotentials_check=/common/LIB3/LIB/AgCdCo/TFCC001.ABC/OUTCAR.relax2.xz
 
-  ./aflow --use_aflow.in=aflow.in --beep --force --showPID --lib2raw="/common/LIB3/LIB/TeW_pvY_sv/TFCC001.ABC"
+   ./aflow --use_aflow.in=aflow.in --beep --force --showPID --lib2raw="/common/LIB3/LIB/TeW_pvY_sv/TFCC001.ABC"
 
-  #!/bin/sh
-  #echo "$1"
-  #echo "$2"
-  STR1=`cat "/common/LIB1/LIB/$1/A1/aflow.in" | grep AUID | head -1 | sed "s/\[VASP_POTCAR_AUID\]/if(AUID==\""/g`
-  STR2="\") {"$2"}   //   "$1
-  echo $STR1$STR2
+#!/bin/sh
+#echo "$1"
+#echo "$2"
+STR1=`cat "/common/LIB1/LIB/$1/A1/aflow.in" | grep AUID | head -1 | sed "s/\[VASP_POTCAR_AUID\]/if(AUID==\""/g`
+STR2="\") {"$2"}   //   "$1
+echo $STR1$STR2
 
 */
 
@@ -70,12 +70,12 @@ xPOTCAR xPOTCAR_Finder(vector<string>& species_pp_AUID,vector<string>& species_p
       (aurostd::abs(RMAX-vxpseudopotential.at(ipp).vRMAX.at(0))<0.0001);
     if(test && found) {
       if(!aurostd::substring2bool(vxpseudopotential.at(ipp).filename,"pot_GGA/potcar.Apr00/Xe") &&
-	 !aurostd::substring2bool(vxpseudopotential.at(ipp).filename,"pot_GGA/potcar.Apr00/Kr") &&
-	 !aurostd::substring2bool(vxpseudopotential.at(ipp).filename,"pot_GGA/potcar.Apr00/Li_pv") &&
-	 !aurostd::substring2bool(vxpseudopotential.at(ipp).filename,"pot_LDA/potcar.Apr00/Li_pv")) {
-	//if(LVERBOSE)
-	cerr << XPID << "xPOTCAR::xPOTCAR_Finder: COLLISION: POTCAR " << vxpseudopotential.at(ipp).filename << " " << xPOT.filename << endl;
-	species_pp_AUID_collisions.push_back(vxpseudopotential.at(ipp).AUID);
+          !aurostd::substring2bool(vxpseudopotential.at(ipp).filename,"pot_GGA/potcar.Apr00/Kr") &&
+          !aurostd::substring2bool(vxpseudopotential.at(ipp).filename,"pot_GGA/potcar.Apr00/Li_pv") &&
+          !aurostd::substring2bool(vxpseudopotential.at(ipp).filename,"pot_LDA/potcar.Apr00/Li_pv")) {
+        //if(LVERBOSE)
+        cerr << XPID << "xPOTCAR::xPOTCAR_Finder: COLLISION: POTCAR " << vxpseudopotential.at(ipp).filename << " " << xPOT.filename << endl;
+        species_pp_AUID_collisions.push_back(vxpseudopotential.at(ipp).AUID);
       }
     }
     if(test && !found) {
@@ -90,7 +90,7 @@ xPOTCAR xPOTCAR_Finder(vector<string>& species_pp_AUID,vector<string>& species_p
       // if(LVERBOSE)
       cerr << XPID << "xPOTCAR::xPOTCAR_Finder: NOT FOUND: TITEL=" << TITEL << " LEXCH=" <<  LEXCH << " EATOM=" <<  EATOM << " RMAX =" <<  RMAX << endl;
       //    cout << XPID << "xPOTCAR::xPOTCAR_Finder: NOT FOUND: TITEL=" << TITEL << " LEXCH=" <<  LEXCH << " EATOM=" <<  EATOM << " RMAX =" <<  RMAX << endl;
-      // exit(0);
+      // throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"xPOTCAR::xPOTCAR_Finder():","Throw for debugging purposes.",_GENERIC_ERROR_);
     }
     species_pp_AUID.push_back("N/A");
   }
@@ -106,11 +106,11 @@ xPOTCAR xPOTCAR_Finder(const string& AUID,bool LVERBOSE) {
     bool test= (AUID==vxpseudopotential.at(ipp).AUID);
     if(test && found) {
       if(!aurostd::substring2bool(vxpseudopotential.at(ipp).filename,"pot_GGA/potcar.Apr00/Xe") &&
-	 !aurostd::substring2bool(vxpseudopotential.at(ipp).filename,"pot_GGA/potcar.Apr00/Kr") &&
-	 !aurostd::substring2bool(vxpseudopotential.at(ipp).filename,"pot_GGA/potcar.Apr00/Li_pv") &&
-	 !aurostd::substring2bool(vxpseudopotential.at(ipp).filename,"pot_LDA/potcar.Apr00/Li_pv")) {
-	//if(LVERBOSE)
-	cerr << XPID << "xPOTCAR::xPOTCAR_Finder: COLLISION: POTCAR " << vxpseudopotential.at(ipp).filename << " " << xPOT.filename << endl;
+          !aurostd::substring2bool(vxpseudopotential.at(ipp).filename,"pot_GGA/potcar.Apr00/Kr") &&
+          !aurostd::substring2bool(vxpseudopotential.at(ipp).filename,"pot_GGA/potcar.Apr00/Li_pv") &&
+          !aurostd::substring2bool(vxpseudopotential.at(ipp).filename,"pot_LDA/potcar.Apr00/Li_pv")) {
+        //if(LVERBOSE)
+        cerr << XPID << "xPOTCAR::xPOTCAR_Finder: COLLISION: POTCAR " << vxpseudopotential.at(ipp).filename << " " << xPOT.filename << endl;
       }
     }
     if(test && !found) {
@@ -124,7 +124,7 @@ xPOTCAR xPOTCAR_Finder(const string& AUID,bool LVERBOSE) {
       // if(LVERBOSE)
       cerr << XPID << "xPOTCAR::xPOTCAR_Finder: NOT FOUND: AUID=" << AUID << endl;
       //   cout << XPID << "xPOTCAR::xPOTCAR_Finder: NOT FOUND: AUID=" << AUID << endl;
-      //    exit(0);
+      //   throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"xPOTCAR::xPOTCAR_Finder():","Throw for debugging purposes.",_GENERIC_ERROR_);
     }
   }
 
@@ -265,22 +265,22 @@ uint xPOTCAR_Initialize(void) {
   for(uint i=0;i<vxpseudopotential.size();i++) {
     for(uint j=i+1;j<vxpseudopotential.size();j++) {
       if(vxpseudopotential.at(i).AUID!=vxpseudopotential.at(j).AUID) {
-	if(vxpseudopotential.at(i).vTITEL.at(0)==vxpseudopotential.at(j).vTITEL.at(0)) {
-	  if(vxpseudopotential.at(i).vLEXCH.at(0)==vxpseudopotential.at(j).vLEXCH.at(0)) {
-	    if(abs(vxpseudopotential.at(i).vEATOM.at(0)-vxpseudopotential.at(j).vEATOM.at(0))<0.00001) {
-	      if(abs(vxpseudopotential.at(i).vRMAX.at(0)-vxpseudopotential.at(j).vRMAX.at(0))<0.0001) {
-		cerr << "COLLISION" << " "
-		     << "FILENAME " << vxpseudopotential.at(i).filename << " " << vxpseudopotential.at(j).filename << " "
-		     << "TITEL " << vxpseudopotential.at(i).vTITEL.at(0) << " "
-		     << "LEXCH " << vxpseudopotential.at(i).vLEXCH.at(0) << " "
-		     << "EATOM " << vxpseudopotential.at(i).vEATOM.at(0) << " "
-		     << "RMAX " << vxpseudopotential.at(i).vRMAX.at(0) << " "
-		     << endl;
-		COLLISIONS++;
-	      }
-	    }
-	  }
-	}
+        if(vxpseudopotential.at(i).vTITEL.at(0)==vxpseudopotential.at(j).vTITEL.at(0)) {
+          if(vxpseudopotential.at(i).vLEXCH.at(0)==vxpseudopotential.at(j).vLEXCH.at(0)) {
+            if(abs(vxpseudopotential.at(i).vEATOM.at(0)-vxpseudopotential.at(j).vEATOM.at(0))<0.00001) {
+              if(abs(vxpseudopotential.at(i).vRMAX.at(0)-vxpseudopotential.at(j).vRMAX.at(0))<0.0001) {
+                cerr << "COLLISION" << " "
+                  << "FILENAME " << vxpseudopotential.at(i).filename << " " << vxpseudopotential.at(j).filename << " "
+                  << "TITEL " << vxpseudopotential.at(i).vTITEL.at(0) << " "
+                  << "LEXCH " << vxpseudopotential.at(i).vLEXCH.at(0) << " "
+                  << "EATOM " << vxpseudopotential.at(i).vEATOM.at(0) << " "
+                  << "RMAX " << vxpseudopotential.at(i).vRMAX.at(0) << " "
+                  << endl;
+                COLLISIONS++;
+              }
+            }
+          }
+        }
       }
     }
   }
@@ -299,15 +299,15 @@ bool xPOTCAR_EnthalpyReference_AUID(string AUID,string METAGGA,string& groundsta
   bool VERBOSE=0;//TRUE;
   if(LDEBUG) cerr << XPID << "xPOTCAR_EnthalpyReference_AUID: [BEGIN]" << endl;
   bool found=FALSE;
-  if(LDEBUG) cout <<"ERROR (xPOTCAR_EnthalpyReference_AUID): AUID=[" << AUID << "]" << endl; // exit(0);
-  if(LDEBUG) cout <<"ERROR (xPOTCAR_EnthalpyReference_AUID): METAGGA=[" << METAGGA << "]" << endl; // exit(0);
+  if(LDEBUG) cout <<"ERROR (xPOTCAR_EnthalpyReference_AUID): AUID=[" << AUID << "]" << endl; // throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"xPOTCAR_EnthalpyReference_AUID():","Throw for debugging purposes.",_GENERIC_ERROR_);
+  if(LDEBUG) cout <<"ERROR (xPOTCAR_EnthalpyReference_AUID): METAGGA=[" << METAGGA << "]" << endl; // throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"xPOTCAR_EnthalpyReference_AUID():","Throw for debugging purposes.",_GENERIC_ERROR_);
 
   bool nKIN=FALSE,SCAN=FALSE;
   if(METAGGA.empty() || METAGGA=="none" || METAGGA=="NONE") {nKIN=TRUE;SCAN=FALSE;}
   if(METAGGA=="SCAN" || METAGGA=="scan") {nKIN=FALSE;SCAN=TRUE;}
 
   if(!XHOST.PSEUDOPOTENTIAL_GENERATOR) if(VERBOSE) cout <<"xPOTCAR_EnthalpyReference_AUID: AUID=[" << AUID << "]  METAGGA=[" << METAGGA << "]" << endl;
- 
+
   // Ac
   // find /common/LIB1/LIB/Ac* -name "A1" | sed "s/\/common/aflow --force --lib2raw=&/g" > /tmp/xpot && aflow --multi=8 --file=/tmp/xpot | grep XXX | sort | uniq
   if(AUID=="06e8eff4a6b826a0" && nKIN) {found=TRUE;groundstate_structure="A1";groundstate_energy=-4.031959;volume_atom=44.76122;spin_atom=0.0;} // Ac_s:PAW_PBE:06Sep2000
@@ -394,7 +394,7 @@ bool xPOTCAR_EnthalpyReference_AUID(string AUID,string METAGGA,string& groundsta
   if(AUID=="76781ebe8489383f" && nKIN) {found=TRUE;groundstate_structure="ICSD_56992";groundstate_energy=-6.693257;volume_atom=7.241668;spin_atom=0.0;} // B_h:PAW_PBE:07Sep2000
   if(AUID=="70110ee6c6cbaf90" && nKIN) {found=TRUE;groundstate_structure="ICSD_56992";groundstate_energy=-7.469139;volume_atom=6.998381;spin_atom=0.0;} // B_h:PAW_LDA:17Apr2000
   if(AUID=="a7226ec232e2ee27" && nKIN) {found=TRUE;groundstate_structure="ICSD_56992";groundstate_energy=-6.69039;volume_atom=7.248991;spin_atom=0.0;} // B_s:PAW_PBE:22Jan2003
-  
+
   // Ba
   if(AUID=="062068333d4e7e80" && nKIN) {found=TRUE;groundstate_structure="A2";groundstate_energy=-1.92400;volume_atom=63.1759;spin_atom=0.0;} // Ba_sv:PAW_PBE:06Sep2000
   if(AUID=="0ea886f29a8f18e6" && nKIN) {found=TRUE;groundstate_structure="A2";groundstate_energy=-1.92401;volume_atom=62.1307;spin_atom=0.0;} // Ba_sv:PAW_GGA:14Apr2000
@@ -492,6 +492,18 @@ bool xPOTCAR_EnthalpyReference_AUID(string AUID,string METAGGA,string& groundsta
   if(AUID=="74bf44fed86520ba" && nKIN) {found=TRUE;groundstate_structure="A3";groundstate_energy=-1.523063;volume_atom=19.13637;spin_atom=0.0;} // Cd_sv_GW:PAW_LDA_KIN:16Apr2014
   if(AUID=="43daba3719e5e3b4" && nKIN) {found=TRUE;groundstate_structure="A3";groundstate_energy=-0.7795479;volume_atom=21.42407;spin_atom=0.0;} // Cd_sv_GW:PAW_PBE_KIN:16Apr2014
 
+  // Ce
+  if(AUID=="510a8ebc02942ebd" && nKIN) {found=TRUE;groundstate_structure="A1";groundstate_energy=-5.256439;volume_atom=27.3549;spin_atom=0.0;} // Ce_s:PAW_GGA:11May2000
+  if(AUID=="27449258606dd200" && nKIN) {found=TRUE;groundstate_structure="A1";groundstate_energy=-6.645601;volume_atom=25.52952;spin_atom=0.0;} // Ce_s:PAW_LDA:17Apr2000
+  if(AUID=="6e846dc10a52b11b" && nKIN) {found=TRUE;groundstate_structure="A1";groundstate_energy=-5.930997;volume_atom=26.05794;spin_atom=0.0;} // Ce:PAW_PBE:28Sep2000
+  if(AUID=="43bef7da77f3563c" && nKIN) {found=TRUE;groundstate_structure="A1";groundstate_energy=-6.899931;volume_atom=22.79678;spin_atom=0.0;} // Ce:PAW_LDA:28Sep2000
+  if(AUID=="af507d55827ec15c" && nKIN) {found=TRUE;groundstate_structure="A1";groundstate_energy=-5.964473;volume_atom=26.03088;spin_atom=0.0;} // Ce:PAW_GGA:29Sep2000
+  if(AUID=="abfa73bca84b87e0" && nKIN) {found=TRUE;groundstate_structure="A1";groundstate_energy=-4.77123;volume_atom=37.644;spin_atom=0.0;} // Ce_3:PAW_PBE:06Sep2000
+  if(AUID=="c30b547637edabc3" && nKIN) {found=TRUE;groundstate_structure="A1";groundstate_energy=-4.74004;volume_atom=37.32093;spin_atom=0.0;} // Ce_3:PAW_GGA:11May2000
+  if(AUID=="24ba1850e358faff" && SCAN) {found=TRUE;groundstate_structure="A1";groundstate_energy=-44.56046;volume_atom=24.57593;spin_atom=0.0;} // Ce_h:PAW_PBE_KIN:SCAN:03Mar2005
+  if(AUID=="a896fb0aac886619" && SCAN) {found=TRUE;groundstate_structure="A1";groundstate_energy=-43.13392;volume_atom=37.35713;spin_atom=0.0;} // Ce_3:PAW_PBE_KIN:SCAN:06Sep2000
+  if(AUID=="bc711278cc7e92ff" && SCAN) {found=TRUE;groundstate_structure="A1";groundstate_energy=-44.61209;volume_atom=24.63577;spin_atom=0.0;} // Ce:PAW_PBE_KIN:SCAN:23Dec2003
+
   // Cl
   if(AUID=="6bf17162620b7ce3" && nKIN) {found=TRUE;groundstate_structure="diatom";groundstate_energy=-1.787206;volume_atom=500;spin_atom=0.0;} // Cl:PAW_PBE:17Jan2003
   if(AUID=="6dca7e86aecb68cc" && nKIN) {found=TRUE;groundstate_structure="diatom";groundstate_energy=-1.776937;volume_atom=500;spin_atom=0.0;} // Cl_h:PAW_PBE:08Apr2002
@@ -577,7 +589,8 @@ bool xPOTCAR_EnthalpyReference_AUID(string AUID,string METAGGA,string& groundsta
 
   // Eu
   if(AUID=="9b801fd8fd52e116" && nKIN) {found=TRUE;groundstate_structure="A2";groundstate_energy=-10.23775;volume_atom=43.37685;spin_atom=7.26175;} // Eu:PAW_PBE:08Apr2002
-  
+  if(AUID=="2453fc28e3c2ebe1" && nKIN) {found=TRUE;groundstate_structure="A2";groundstate_energy=-10.28213;volume_atom=42.56765;spin_atom=7.243493;} // Eu:PAW_PBE_KIN:23Dec2003
+
   // F
   if(AUID=="3defbdd6f1dad3f2" && nKIN) {found=TRUE;groundstate_structure="diatom";groundstate_energy=-1.790868;volume_atom=500;spin_atom=0.0;} // F_s:PAW_PBE:06Sep2000
   if(AUID=="4c13232a0a03cdc4" && nKIN) {found=TRUE;groundstate_structure="diatom";groundstate_energy=-1.780263;volume_atom=500;spin_atom=0.0;} // F:PAW_PBE_KIN:08Apr2002
@@ -761,7 +774,7 @@ bool xPOTCAR_EnthalpyReference_AUID(string AUID,string METAGGA,string& groundsta
   if(AUID=="15ba50edd26f214b" && nKIN) {found=TRUE;groundstate_structure="A2";groundstate_energy=-3.689587;volume_atom=20.20269;spin_atom=0.0;} // Li_sv_GW:PAW_PBE:25Mar2010
   if(AUID=="2d76bbafaaad041b" && nKIN) {found=TRUE;groundstate_structure="A2";groundstate_energy=-2.044447;volume_atom=18.75312;spin_atom=0.0;} // Li_sv:PAW_LDA:10Sep2004
   if(AUID=="faf632cf08a133d7" && nKIN) {found=TRUE;groundstate_structure="A2";groundstate_energy=-2.04007;volume_atom=19.03729;spin_atom=0.0;} // Li:PAW_LDA_KIN:15Mar2012
-  
+
   // Mg
   if(AUID=="285c78eec2b06a80" && nKIN) {found=TRUE;groundstate_structure="A3";groundstate_energy=-1.51618;volume_atom=22.8934;spin_atom=0.0;} // Mg:GGA:01Apr2000
   if(AUID=="d8bb30571ef22203" && nKIN) {found=TRUE;groundstate_structure="A3";groundstate_energy=-1.52082;volume_atom=22.7555;spin_atom=0.0;} // Mg:GGA:01Apr2000
@@ -1269,6 +1282,9 @@ bool xPOTCAR_EnthalpyReference_AUID(string AUID,string METAGGA,string& groundsta
   if(AUID=="61a24681ec6520ee" && nKIN) {found=TRUE;groundstate_structure="A2";groundstate_energy=-16.171;volume_atom=15.38559;spin_atom=0.0;} // W_sv_GW:PAW_LDA_KIN:23Mar2010
   if(AUID=="c5c6cbb458696867" && nKIN) {found=TRUE;groundstate_structure="A2";groundstate_energy=-14.10342;volume_atom=15.46532;spin_atom=0.0;} // W_sv:PAW_LDA_KIN:04Sep2015
 
+  // Xe
+  if(AUID=="cde8ed26c95905b5" && nKIN) {found=TRUE;groundstate_structure="isolated";groundstate_energy=-0.008491;volume_atom=3375;spin_atom=0.0;} // Xe:PAW_PBE:07Sep2000
+
   // Y
   if(AUID=="377b8f487d291e0e" && nKIN) {found=TRUE;groundstate_structure="A3";groundstate_energy=-6.33584;volume_atom=32.5652;spin_atom=0.0;} // Y:GGA:01Apr2000
   if(AUID=="a0835c00b2263c8b" && nKIN) {found=TRUE;groundstate_structure="A3";groundstate_energy=-6.40419;volume_atom=31.9468;spin_atom=0.0;} // Y:GGA:01Apr2000
@@ -1323,18 +1339,18 @@ bool xPOTCAR_EnthalpyReference_AUID(string AUID,string METAGGA,string& groundsta
   if(AUID=="1d3446a7830fa99e" && nKIN) {found=TRUE;groundstate_structure="A3";groundstate_energy=-11.06212;volume_atom=21.62537;spin_atom=0.0;} // Zr_sv_GW:PAW_LDA_KIN:05Dec2013
   if(AUID=="d9f9fc183b6567ac" && nKIN) {found=TRUE;groundstate_structure="A3";groundstate_energy=-9.283964;volume_atom=21.62691;spin_atom=0.0;} // Zr_sv:PAW_LDA_KIN:04Jan2005
 
- 
+
   // ./xgo Sm_3:PAW_GGA:11May2000 "found=TRUE;groundstate_structure=\"ICSD_246657\";groundstate_energy=-4.621400;volume_atom=33.447633;spin_atom=0.0;"// FIX
   // ./xgo Sm_3:PAW_GGA:11May2000 && 0 "found=TRUE;groundstate_structure=\"ICSD_652637\";groundstate_energy=-4.64136;volume_atom=33.5075;spin_atom=0.0;"// IT HAS LDAU
   // ./xgo Sm_3:PAW_PBE:07Sep2000 && 0 "found=TRUE;groundstate_structure=\"A1\";groundstate_energy=-4.7062;volume_atom=33.8339;spin_atom=0.0;"// IT HAS LDAU
   // ./xgo Ce "found=TRUE;groundstate_structure=\"A1\";groundstate_energy=-5.92998;volume_atom=26.0579;spin_atom=0.0;"
   // ./xgo Ce "found=TRUE;groundstate_structure=\"ICSD_2284-mS4\";groundstate_energy=-5.93013;volume_atom=26.0697;spin_atom=0.0;"
   // ./xgo Cl_h:PAW_PBE:08Apr2002 "found=TRUE;groundstate_structure=\"A11\";groundstate_energy=-1.8156;volume_atom=37.3299;spin_atom=0.0;"WAITING
- 
+
   if(!found) { volume_atom=999999,spin_atom=999999;} // some defaults
-  //  if(!found) cerr <<"ERROR (xPOTCAR_EnthalpyReference_AUID): NOT FOUND: AUID=" << AUID << endl;// exit(0);
-  if(LDEBUG && !found) cout <<"ERROR (xPOTCAR_EnthalpyReference_AUID): NOT FOUND: AUID=" << AUID << endl;// exit(0);
-  if(LDEBUG &&  found) cout <<"ERROR (xPOTCAR_EnthalpyReference_AUID): FOUND: AUID=" << AUID << endl;// exit(0);
+  //  if(!found) cerr <<"ERROR (xPOTCAR_EnthalpyReference_AUID): NOT FOUND: AUID=" << AUID << endl;// throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"xPOTCAR_EnthalpyReference_AUID():","Throw for debugging purposes.",_GENERIC_ERROR_);
+  if(LDEBUG && !found) cout <<"ERROR (xPOTCAR_EnthalpyReference_AUID): NOT FOUND: AUID=" << AUID << endl;// throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"xPOTCAR_EnthalpyReference_AUID():","Throw for debugging purposes.",_GENERIC_ERROR_);
+  if(LDEBUG &&  found) cout <<"ERROR (xPOTCAR_EnthalpyReference_AUID): FOUND: AUID=" << AUID << endl;// throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"xPOTCAR_EnthalpyReference_AUID():","Throw for debugging purposes.",_GENERIC_ERROR_);
   if(LDEBUG) cerr << XPID << "xPOTCAR_EnthalpyReference_AUID: [END]" << endl;
   return found;
 };
@@ -1345,6 +1361,6 @@ bool xPOTCAR_EnthalpyReference_AUID(string AUID,string METAGGA,string& groundsta
 
 // **************************************************************************
 // *                                                                        *
-// *             STEFANO CURTAROLO - Duke University 2003-2020              *
+// *             STEFANO CURTAROLO - Duke University 2003-2021              *
 // *                                                                        *
 // **************************************************************************

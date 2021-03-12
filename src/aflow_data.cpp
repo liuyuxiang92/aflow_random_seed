@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
 // *                                                                         *
 // ***************************************************************************
 
@@ -101,8 +101,8 @@ extern std::string README_AFLOW_AFLOWRC_TXT;
 
 // LINKED #include "aflow_data_latex.cpp"  // created automatically
 extern std::string f144468a7ccc2d3a72ba44000715efdb;
-extern std::string d0f1b0e47f178ae627a388d3bf65d2d2;
-extern std::string decf00ca3ad2fe494eea8e543e929068;
+// [OBSOLETE] extern std::string d0f1b0e47f178ae627a388d3bf65d2d2;
+// [OBSOLETE] extern std::string decf00ca3ad2fe494eea8e543e929068;
 
 // LINKED #include "aflow_data_aflow_potcars.cpp"  // created automatically
 extern bool AFLOW_PSEUDOPOTENTIALS;
@@ -181,18 +181,17 @@ namespace aflow {
       oss << "*                          aflow - Automatic-FLOW for materials discovery                          *" << endl;
       oss << "*                aflow.org consortium - High-Throughput ab-initio Computing Project                *" << endl;
       //      oss << "*                     VERSION "<<aurostd::PaddedPOST(string(AFLOW_VERSION),5) <<" - BUILT ["<<TODAY<<"] - Copyright " << XHOST.Copyright_Years << "                     *" << endl;
-      oss << "*" << aurostd::PaddedCENTER(string("version "+string(AFLOW_VERSION)+" - g++/gcc "+aurostd::utype2string(__GNUC__)+"."+aurostd::utype2string(__GNUC_MINOR__)+"."+aurostd::utype2string(__GNUC_PATCHLEVEL__)+" - built ["+string(TODAY)+"] - (C) " +string("2003-2019")),100) << "*" << endl;
+      oss << "*" << aurostd::PaddedCENTER(string("version "+string(AFLOW_VERSION)+" - g++/gcc "+aurostd::utype2string(__GNUC__)+"."+aurostd::utype2string(__GNUC_MINOR__)+"."+aurostd::utype2string(__GNUC_PATCHLEVEL__)+" - built ["+string(TODAY)+"] - (C) " +string("2003-2021")),100) << "*" << endl;
       oss << "*                                                                                                  *" << endl;
       oss << "****************************************************************************************************" << endl;
       return oss.str();
     }
     if(type=="BANNER_TINY") {
-      oss << "AFLOW VERSION "<<string(AFLOW_VERSION)<<":  [Stefano Curtarolo - 2003-2019] ";
+      oss << "AFLOW VERSION "<<string(AFLOW_VERSION)<<":  [Stefano Curtarolo - 2003-2021] ";
       return oss.str();
     }
     cerr << "aflow::Banner type=" << type << " not found..." << endl;
     oss << "aflow::Banner type=" << type << " not found..." << endl;
-    //  std::exit(0);
     return oss.str();
   }
 } // namespace aflow
@@ -211,7 +210,7 @@ int main(int _argc,char **_argv) {
   }
   for(int i=1;i<_argc;i++) {
     string argvi(_argv[i]);
-    
+
     //     if(_argc==1) {
     //       cout << aflow::Banner("BANNER_BIG");
     //       cout << " V=" << string(AFLOW_VERSION) << " -> " << argvi << endl;
@@ -283,8 +282,8 @@ int main(int _argc,char **_argv) {
       cout << aurostd::PaddedPOST("AFLOW_PSEUDOPOTENTIALS_TXT",40) << " size=" << aurostd::PaddedPOST(aurostd::utype2string(AFLOW_PSEUDOPOTENTIALS_TXT.size()),10) << "lines=" << aurostd::string2vectorstring(AFLOW_PSEUDOPOTENTIALS_TXT,vtemp) << "       BASE64" << endl;
       cout << aurostd::PaddedPOST("AFLOW_PSEUDOPOTENTIALS_LIST_TXT",40) << " size=" << aurostd::PaddedPOST(aurostd::utype2string(AFLOW_PSEUDOPOTENTIALS_LIST_TXT.size()),10) << "lines=" << aurostd::string2vectorstring(AFLOW_PSEUDOPOTENTIALS_LIST_TXT,vtemp) << endl;
       cout << aurostd::PaddedPOST("f144468a7ccc2d3a72ba44000715efdb",40) << " size=" << aurostd::PaddedPOST(aurostd::utype2string(f144468a7ccc2d3a72ba44000715efdb.size()),10) << "lines=" << aurostd::string2vectorstring(f144468a7ccc2d3a72ba44000715efdb,vtemp) << endl;
-      cout << aurostd::PaddedPOST("d0f1b0e47f178ae627a388d3bf65d2d2",40) << " size=" << aurostd::PaddedPOST(aurostd::utype2string(d0f1b0e47f178ae627a388d3bf65d2d2.size()),10) << "lines=" << aurostd::string2vectorstring(d0f1b0e47f178ae627a388d3bf65d2d2,vtemp) << endl;
-      cout << aurostd::PaddedPOST("decf00ca3ad2fe494eea8e543e929068",40) << " size=" << aurostd::PaddedPOST(aurostd::utype2string(decf00ca3ad2fe494eea8e543e929068.size()),10) << "lines=" << aurostd::string2vectorstring(decf00ca3ad2fe494eea8e543e929068,vtemp) << endl;
+// [OBSOLETE]       cout << aurostd::PaddedPOST("d0f1b0e47f178ae627a388d3bf65d2d2",40) << " size=" << aurostd::PaddedPOST(aurostd::utype2string(d0f1b0e47f178ae627a388d3bf65d2d2.size()),10) << "lines=" << aurostd::string2vectorstring(d0f1b0e47f178ae627a388d3bf65d2d2,vtemp) << endl;
+// [OBSOLETE]       cout << aurostd::PaddedPOST("decf00ca3ad2fe494eea8e543e929068",40) << " size=" << aurostd::PaddedPOST(aurostd::utype2string(decf00ca3ad2fe494eea8e543e929068.size()),10) << "lines=" << aurostd::string2vectorstring(decf00ca3ad2fe494eea8e543e929068,vtemp) << endl;
 
 #ifdef ICSD
       cout << aurostd::PaddedPOST("amir_natan_icsd_1_ary",40) << " size=" << aurostd::PaddedPOST(aurostd::utype2string(icsd_1_ary.size()),10) << "lines=" << aurostd::string2vectorstring(icsd_1_ary,vtemp) << endl;
@@ -300,7 +299,7 @@ int main(int _argc,char **_argv) {
 #endif
       cout << "********************************************************************************" << endl;
     }
-    
+
     string *pstr=NULL;
     bool found=FALSE;
     bool BASE64=TRUE;
@@ -381,7 +380,7 @@ int main(int _argc,char **_argv) {
       aurostd::string2vectorstring(AFLOW_PSEUDOPOTENTIALS_LIST_TXT,tokens);
       if(LDEBUG) {cerr << "AFLOW_DATA: AFLOW_PSEUDOPOTENTIALS_LIST_TXT: " << tokens.size() << endl;}
       for(uint i=0;i<tokens.size();i++) {
-	if(aurostd::substring2bool(tokens.at(i),query)) {conststring+=tokens.at(i);}
+        if(aurostd::substring2bool(tokens.at(i),query)) {conststring+=tokens.at(i);}
       }
       pstr=&conststring;
     }
@@ -396,9 +395,9 @@ int main(int _argc,char **_argv) {
       vector<string> vtemp;
       aurostd::string2vectorstring(vLIBS,vtemp);
       for(uint i=0;i<vtemp.size();) {
-	vAURL+=vtemp.at(i++)+"\n";
-	vAUID+=vtemp.at(i++)+"\n";
-	vLOOP+=vtemp.at(i++)+"\n";
+        vAURL+=vtemp.at(i++)+"\n";
+        vAUID+=vtemp.at(i++)+"\n";
+        vLOOP+=vtemp.at(i++)+"\n";
       }
       if(argvi=="vAURL") pstr=&vAURL;
       if(argvi=="vAUID") pstr=&vAUID;
@@ -409,71 +408,71 @@ int main(int _argc,char **_argv) {
     if(!BASE64) { //  no BASE64
       if(!found && argvi=="AFLOW_PSEUDOPOTENTIALS_TXT") {found=TRUE;pstr=&AFLOW_PSEUDOPOTENTIALS_TXT;} // << endl;
       if(!found && aurostd::substring2bool(argvi,"AFLOW_PSEUDOPOTENTIALS_TXT:")) {
-	if(LDEBUG) {cerr << "AFLOW_DATA: AFLOW_PSEUDOPOTENTIALS_TXT: " << endl;}
-	found=TRUE;
-	vector<string> tokens;
-	aurostd::string2tokens(argvi,tokens,":");
-	string query="";
-	if(tokens.size()>0) {query=tokens.at(1);}
-	if(LDEBUG) {cerr << "AFLOW_DATA: AFLOW_PSEUDOPOTENTIALS_TXT: " << tokens.at(0) << " & " << tokens.at(0) << endl;}
-	aurostd::string2vectorstring(AFLOW_PSEUDOPOTENTIALS_TXT,tokens);
-	if(LDEBUG) {cerr << "AFLOW_DATA: AFLOW_PSEUDOPOTENTIALS_TXT: " << tokens.size() << endl;}
-	uint istart=0,istop=0;
-	for(uint i=0;i<tokens.size();i++) {
-	  if(aurostd::substring2bool(tokens.at(i),"START."+query)) {istart=i;}
-	  if(aurostd::substring2bool(tokens.at(i),"STOP."+query)) {istop=i;}
-	}
-	for(uint i=istart+1;i<istop;i++) {
-	  for(uint j=0;j<tokens.at(i).size()-1;j++) {conststring+=tokens.at(i).at(j);}
-	  if(i<istop-1) {conststring+=string("\n");}
-	}
-	pstr=&conststring;
+        if(LDEBUG) {cerr << "AFLOW_DATA: AFLOW_PSEUDOPOTENTIALS_TXT: " << endl;}
+        found=TRUE;
+        vector<string> tokens;
+        aurostd::string2tokens(argvi,tokens,":");
+        string query="";
+        if(tokens.size()>0) {query=tokens.at(1);}
+        if(LDEBUG) {cerr << "AFLOW_DATA: AFLOW_PSEUDOPOTENTIALS_TXT: " << tokens.at(0) << " & " << tokens.at(0) << endl;}
+        aurostd::string2vectorstring(AFLOW_PSEUDOPOTENTIALS_TXT,tokens);
+        if(LDEBUG) {cerr << "AFLOW_DATA: AFLOW_PSEUDOPOTENTIALS_TXT: " << tokens.size() << endl;}
+        uint istart=0,istop=0;
+        for(uint i=0;i<tokens.size();i++) {
+          if(aurostd::substring2bool(tokens.at(i),"START."+query)) {istart=i;}
+          if(aurostd::substring2bool(tokens.at(i),"STOP."+query)) {istop=i;}
+        }
+        for(uint i=istart+1;i<istop;i++) {
+          for(uint j=0;j<tokens.at(i).size()-1;j++) {conststring+=tokens.at(i).at(j);}
+          if(i<istop-1) {conststring+=string("\n");}
+        }
+        pstr=&conststring;
       }
     }
     if(BASE64) { // with BASE64
       string tmpfile=aurostd::TmpFileCreate("aflow_data");
       if(!found && argvi=="AFLOW_PSEUDOPOTENTIALS_TXT") {  // [BASE64]
-	found=TRUE;  
-	aurostd::execute("rm -f "+tmpfile+"*");
-	aurostd::string2file(aurostd::base64Decoder(AFLOW_PSEUDOPOTENTIALS_TXT),tmpfile+".xz");
-	aurostd::execute("xz -d "+tmpfile+".xz");
-	aurostd::file2string(""+tmpfile+"",conststring);
-	aurostd::execute("rm -f "+tmpfile+"*");
-	pstr=&conststring;  
+        found=TRUE;  
+        aurostd::execute("rm -f "+tmpfile+"*");
+        aurostd::string2file(aurostd::base64Decoder(AFLOW_PSEUDOPOTENTIALS_TXT),tmpfile+".xz");
+        aurostd::execute("xz -d "+tmpfile+".xz");
+        aurostd::file2string(""+tmpfile+"",conststring);
+        aurostd::execute("rm -f "+tmpfile+"*");
+        pstr=&conststring;  
       }  // [BASE64]
       if(!found && aurostd::substring2bool(argvi,"AFLOW_PSEUDOPOTENTIALS_TXT:")) {  // [BASE64]
-	if(LDEBUG) {cerr << "AFLOW_DATA: AFLOW_PSEUDOPOTENTIALS_TXT: " << endl;}
-	found=TRUE;
-	vector<string> tokens;
-	aurostd::string2tokens(argvi,tokens,":");
-	string query="",strtmp="";
-	if(tokens.size()>0) {query=tokens.at(1);}
-	if(LDEBUG) {cerr << "AFLOW_DATA: AFLOW_PSEUDOPOTENTIALS_TXT: " << tokens.at(0) << " & " << tokens.at(0) << endl;}
-	aurostd::execute("rm -f "+tmpfile+"*");
-	aurostd::string2file(aurostd::base64Decoder(AFLOW_PSEUDOPOTENTIALS_TXT),tmpfile+".xz");
-	aurostd::execute("xz -d "+tmpfile+".xz");
-	aurostd::file2string(""+tmpfile+"",strtmp);
-	aurostd::execute("rm -f "+tmpfile+"*");
-	aurostd::string2vectorstring(strtmp,tokens);
-	if(LDEBUG) {cerr << "AFLOW_DATA: AFLOW_PSEUDOPOTENTIALS_TXT: " << tokens.size() << endl;}
-	uint istart=0,istop=0;
-	for(uint i=0;i<tokens.size();i++) {
-	  if(aurostd::substring2bool(tokens.at(i),"START."+query)) {istart=i;}
-	  if(aurostd::substring2bool(tokens.at(i),"STOP."+query)) {istop=i;}
-	}
-	for(uint i=istart+1;i<istop;i++) {
-	  for(uint j=0;j<tokens.at(i).size()-1;j++) {conststring+=tokens.at(i).at(j);}
-	  if(i<istop-1) {conststring+=string("\n");}
-	}
-	pstr=&conststring;
+        if(LDEBUG) {cerr << "AFLOW_DATA: AFLOW_PSEUDOPOTENTIALS_TXT: " << endl;}
+        found=TRUE;
+        vector<string> tokens;
+        aurostd::string2tokens(argvi,tokens,":");
+        string query="",strtmp="";
+        if(tokens.size()>0) {query=tokens.at(1);}
+        if(LDEBUG) {cerr << "AFLOW_DATA: AFLOW_PSEUDOPOTENTIALS_TXT: " << tokens.at(0) << " & " << tokens.at(0) << endl;}
+        aurostd::execute("rm -f "+tmpfile+"*");
+        aurostd::string2file(aurostd::base64Decoder(AFLOW_PSEUDOPOTENTIALS_TXT),tmpfile+".xz");
+        aurostd::execute("xz -d "+tmpfile+".xz");
+        aurostd::file2string(""+tmpfile+"",strtmp);
+        aurostd::execute("rm -f "+tmpfile+"*");
+        aurostd::string2vectorstring(strtmp,tokens);
+        if(LDEBUG) {cerr << "AFLOW_DATA: AFLOW_PSEUDOPOTENTIALS_TXT: " << tokens.size() << endl;}
+        uint istart=0,istop=0;
+        for(uint i=0;i<tokens.size();i++) {
+          if(aurostd::substring2bool(tokens.at(i),"START."+query)) {istart=i;}
+          if(aurostd::substring2bool(tokens.at(i),"STOP."+query)) {istop=i;}
+        }
+        for(uint i=istart+1;i<istop;i++) {
+          for(uint j=0;j<tokens.at(i).size()-1;j++) {conststring+=tokens.at(i).at(j);}
+          if(i<istop-1) {conststring+=string("\n");}
+        }
+        pstr=&conststring;
       }  // [BASE64]
     }
 
     //      std::string base64Decoder(std::string const& encoded_string);
 
     if(!found && argvi=="f144468a7ccc2d3a72ba44000715efdb") {found=TRUE;pstr=&f144468a7ccc2d3a72ba44000715efdb;} // << endl;
-    if(!found && argvi=="d0f1b0e47f178ae627a388d3bf65d2d2") {found=TRUE;pstr=&d0f1b0e47f178ae627a388d3bf65d2d2;} // << endl;
-    if(!found && argvi=="decf00ca3ad2fe494eea8e543e929068") {found=TRUE;pstr=&decf00ca3ad2fe494eea8e543e929068;} // << endl;
+// [OBSOLETE]     if(!found && argvi=="d0f1b0e47f178ae627a388d3bf65d2d2") {found=TRUE;pstr=&d0f1b0e47f178ae627a388d3bf65d2d2;} // << endl;
+// [OBSOLETE]     if(!found && argvi=="decf00ca3ad2fe494eea8e543e929068") {found=TRUE;pstr=&decf00ca3ad2fe494eea8e543e929068;} // << endl;
 #ifdef ICSD
     if(!found && argvi=="amir_natan_icsd_1_ary") {found=TRUE;pstr=&icsd_1_ary;} // << endl;
     if(!found && argvi=="amir_natan_icsd_2_ary") {found=TRUE;pstr=&icsd_2_ary;} // << endl;
@@ -489,47 +488,47 @@ int main(int _argc,char **_argv) {
 
     if(0) {
       if((found && (*pstr).length()==0) || pstr==NULL) {
-	if(argvi=="Library_ICSD" || argvi=="aflowlib_lib0" || argvi=="aflowlib_lib1" || argvi=="aflowlib_lib2" || argvi=="aflowlib_lib3" || argvi=="aflowlib_lib4" || argvi=="aflowlib_lib5" || argvi=="aflowlib_lib6" || argvi=="aflowlib_lib7" || argvi=="aflowlib_lib8" || argvi=="aflowlib_lib9" || argvi=="aflowlib_icsd" ) { string FileLibrary;
-	  string *pstr;
-	  if(argvi=="Library_ICSD")  {pstr=&Library_ICSD;}
-	  if(argvi=="aflowlib_icsd") {pstr=&aflowlib_icsd;}
-	  if(argvi=="aflowlib_lib0") {pstr=&aflowlib_lib0;}
-	  if(argvi=="aflowlib_lib1") {pstr=&aflowlib_lib1;}
-	  if(argvi=="aflowlib_lib2") {pstr=&aflowlib_lib2;}
-	  if(argvi=="aflowlib_lib3") {pstr=&aflowlib_lib3;}
-	  if(argvi=="aflowlib_lib4") {pstr=&aflowlib_lib4;}
-	  if(argvi=="aflowlib_lib5") {pstr=&aflowlib_lib5;}
-	  if(argvi=="aflowlib_lib6") {pstr=&aflowlib_lib6;}
-	  if(argvi=="aflowlib_lib7") {pstr=&aflowlib_lib7;}
-	  if(argvi=="aflowlib_lib8") {pstr=&aflowlib_lib8;}
-	  if(argvi=="aflowlib_lib9") {pstr=&aflowlib_lib9;}
-   
-	  // check if available
-	  if((*pstr).empty()) { // find and LOAD
-	    string str2search=argvi;
-	    aurostd::StringSubst(str2search,"Library_ICSD","aflow_library_icsd");
-	    (*pstr)="";
-	    for(uint j=0;j<vAFLOW_LIBRARY_DIRECTORIES.size() && (*pstr).empty();j++) { // cycle through possible directories
-	      FileLibrary=aurostd::CleanFileName(vAFLOW_LIBRARY_DIRECTORIES.at(j)+"/"+str2search+".dat");
-	      if(LDEBUG) {cerr << "00000  AFLOW LIBRARY  (" << j << ")  FileLibrary=" << FileLibrary << endl;}
-	      if(aurostd::FileExist(FileLibrary) && !aurostd::FileEmpty(FileLibrary)) {
-		if(LDEBUG) {cerr << "00000  AFLOW LIBRARY  (" << j << ")  found=" <<  FileLibrary << endl;}
-		if(LDEBUG) {cerr << "loading... ";}
-		if(LDEBUG) {cerr.flush();}
-		//       if(grep=="") {
-		aurostd::file2string(FileLibrary,(*pstr));
-		//   } else {(*pstr)=aurostd::execute2string("cat "+FileLibrary+" | grep -E '"+grep+"'");}
-		if(LDEBUG) {cerr << "length=" << (*pstr).size();} // << " " << endl;
-		if(LDEBUG) {cerr.flush();}
-	      }
-	    } // cycle through possible directories
-	    if((*pstr).empty()) { if(LDEBUG) {cerr << "WARNING - init::InitGlobalObject: " << argvi << " not found! " << endl;}// exit(0);
-	      found=FALSE;
-	    }
-	    cout << (*pstr) << endl;
-	    return 1;
-	  }
-	}
+        if(argvi=="Library_ICSD" || argvi=="aflowlib_lib0" || argvi=="aflowlib_lib1" || argvi=="aflowlib_lib2" || argvi=="aflowlib_lib3" || argvi=="aflowlib_lib4" || argvi=="aflowlib_lib5" || argvi=="aflowlib_lib6" || argvi=="aflowlib_lib7" || argvi=="aflowlib_lib8" || argvi=="aflowlib_lib9" || argvi=="aflowlib_icsd" ) { string FileLibrary;
+          string *pstr;
+          if(argvi=="Library_ICSD")  {pstr=&Library_ICSD;}
+          if(argvi=="aflowlib_icsd") {pstr=&aflowlib_icsd;}
+          if(argvi=="aflowlib_lib0") {pstr=&aflowlib_lib0;}
+          if(argvi=="aflowlib_lib1") {pstr=&aflowlib_lib1;}
+          if(argvi=="aflowlib_lib2") {pstr=&aflowlib_lib2;}
+          if(argvi=="aflowlib_lib3") {pstr=&aflowlib_lib3;}
+          if(argvi=="aflowlib_lib4") {pstr=&aflowlib_lib4;}
+          if(argvi=="aflowlib_lib5") {pstr=&aflowlib_lib5;}
+          if(argvi=="aflowlib_lib6") {pstr=&aflowlib_lib6;}
+          if(argvi=="aflowlib_lib7") {pstr=&aflowlib_lib7;}
+          if(argvi=="aflowlib_lib8") {pstr=&aflowlib_lib8;}
+          if(argvi=="aflowlib_lib9") {pstr=&aflowlib_lib9;}
+
+          // check if available
+          if((*pstr).empty()) { // find and LOAD
+            string str2search=argvi;
+            aurostd::StringSubst(str2search,"Library_ICSD","aflow_library_icsd");
+            (*pstr)="";
+            for(uint j=0;j<vAFLOW_LIBRARY_DIRECTORIES.size() && (*pstr).empty();j++) { // cycle through possible directories
+              FileLibrary=aurostd::CleanFileName(vAFLOW_LIBRARY_DIRECTORIES.at(j)+"/"+str2search+".dat");
+              if(LDEBUG) {cerr << "00000  AFLOW LIBRARY  (" << j << ")  FileLibrary=" << FileLibrary << endl;}
+              if(aurostd::FileExist(FileLibrary) && !aurostd::FileEmpty(FileLibrary)) {
+                if(LDEBUG) {cerr << "00000  AFLOW LIBRARY  (" << j << ")  found=" <<  FileLibrary << endl;}
+                if(LDEBUG) {cerr << "loading... ";}
+                if(LDEBUG) {cerr.flush();}
+                //       if(grep=="") {
+                aurostd::file2string(FileLibrary,(*pstr));
+                //   } else {(*pstr)=aurostd::execute2string("cat "+FileLibrary+" | grep -E '"+grep+"'");}
+                if(LDEBUG) {cerr << "length=" << (*pstr).size();} // << " " << endl;
+                if(LDEBUG) {cerr.flush();}
+              }
+            } // cycle through possible directories
+            if((*pstr).empty()) { if(LDEBUG) {cerr << "WARNING - init::InitGlobalObject: " << argvi << " not found! " << endl;}
+              found=FALSE;
+            }
+            cout << (*pstr) << endl;
+            return 1;
+          }
+        }
       }
     }
 
@@ -549,7 +548,7 @@ int main(int _argc,char **_argv) {
 
 
 namespace aurostd {
-  
+
   // ***************************************************************************
   // Function StringSubst
   // ***************************************************************************
@@ -592,7 +591,7 @@ namespace aurostd {
   uint string2vectorstring(const string& stringIN,vector<string> &vstringout) {
     return aurostd::string2tokens(stringIN,vstringout,"\n");
   }
-  
+
   // ***************************************************************************
   // Function RemoveWhiteSpaces
   // ***************************************************************************
@@ -612,7 +611,7 @@ namespace aurostd {
     for (uint i=0;i<s.size();i++) {
       if(s[i]==toogle) { copy=!copy; }
       if(copy) {
-	if(s[i]!=' ' && s[i]!='\t') { ss+=s[i]; }
+        if(s[i]!=' ' && s[i]!='\t') { ss+=s[i]; }
       }
       if(!copy) { ss+=s[i]; }
     }
@@ -629,7 +628,7 @@ namespace aurostd {
     while(ss[ss.size()-1]==' ' || ss[ss.size()-1]=='\t') {
       ss.erase(ss.size()-1,1);
       if(ss.size()==0) {
-	return ss;
+        return ss;
       } // nothing to do
     }
     return ss;
@@ -651,10 +650,10 @@ namespace aurostd {
     for(uint i=0;i<tokens.size();i++) {
       _strline=tokens.at(i);
       if(_strline.find("#")!=string::npos  
-         && _strline.find("#1")==string::npos && _strline.find("#2")==string::npos && _strline.find("#3")==string::npos // avoid space groups
-         && _strline.find("#4")==string::npos && _strline.find("#5")==string::npos && _strline.find("#6")==string::npos // avoid space groups
-         && _strline.find("#7")==string::npos && _strline.find("#8")==string::npos && _strline.find("#9")==string::npos // avoid space groups
-         ) {_strline=_strline.substr(0,_strline.find("#"));} // avoid space groups
+          && _strline.find("#1")==string::npos && _strline.find("#2")==string::npos && _strline.find("#3")==string::npos // avoid space groups
+          && _strline.find("#4")==string::npos && _strline.find("#5")==string::npos && _strline.find("#6")==string::npos // avoid space groups
+          && _strline.find("#7")==string::npos && _strline.find("#8")==string::npos && _strline.find("#9")==string::npos // avoid space groups
+        ) {_strline=_strline.substr(0,_strline.find("#"));} // avoid space groups
       if(_strline.find(COMMENT_NEGLECT_2)!=string::npos) {_strline=_strline.substr(0,_strline.find(COMMENT_NEGLECT_2));}
       if(_strline.find(COMMENT_NEGLECT_3)!=string::npos) {_strline=_strline.substr(0,_strline.find(COMMENT_NEGLECT_3));}
       idxS1=_strline.find(_strsub1);
@@ -674,29 +673,29 @@ namespace aurostd {
   }
 
   template<class utype>
-  string _PaddedPOST(utype input,int depth,string ch) {
-    stringstream aus("");
-    aus << input;
-    string strout=aus.str();
-    for(int i=0;i<depth-(int) aus.str().length();i++) {strout+=ch;}
-    return strout;
-  }
-  
+    string _PaddedPOST(utype input,int depth,string ch) {
+      stringstream aus("");
+      aus << input;
+      string strout=aus.str();
+      for(int i=0;i<depth-(int) aus.str().length();i++) {strout+=ch;}
+      return strout;
+    }
+
   string PaddedPOST(string input,int depth) {
     return _PaddedPOST(input,depth," ");
   }
 
   // Add PRE AND POST characters to pad so that string is in the center
   template<class utype>
-  string _PaddedCENTER(utype input,int depth,string ch) {
-    stringstream aus("");
-    int pre=(depth-(int) input.length())/2;
-    int post=depth-pre-(int) input.length();
-    for(int i=1;i<pre;i++) {aus << ch;} 
-    aus << input;
-    for(int i=1;i<post;i++) {aus << ch;}
-    return aus.str();
-  }
+    string _PaddedCENTER(utype input,int depth,string ch) {
+      stringstream aus("");
+      int pre=(depth-(int) input.length())/2;
+      int post=depth-pre-(int) input.length();
+      for(int i=1;i<pre;i++) {aus << ch;} 
+      aus << input;
+      for(int i=1;i<post;i++) {aus << ch;}
+      return aus.str();
+    }
   string PaddedCENTER(string input,int depth) {
     return _PaddedCENTER(input,depth," ");
   }
@@ -710,7 +709,7 @@ namespace aurostd {
     return (typeTo) stream2stream<typeTo>(from,20);
   }
 
-  
+
   template<typename utype> string utype2string(const utype& from) {
     return (string) stream2stream<string>(from);
   }
@@ -732,7 +731,7 @@ namespace aurostd {
     if(LDEBUG) {cerr << "aurostd::CleanFileName: " << fileOUT << endl;}
     return fileOUT;
   }
-  
+
   // ***************************************************************************
   // Function FileExist
   // ***************************************************************************
@@ -773,9 +772,9 @@ namespace aurostd {
       // count no more that 16... it is not worth to count more
       FileStream.close();
       if(i>0) {
-	return FALSE;
+        return FALSE;
       } else {
-	return TRUE;
+        return TRUE;
       }
     }
     if(0) {
@@ -820,7 +819,7 @@ namespace aurostd {
     FileStream.close();
     return sizeout;
   }
-    // ***************************************************************************
+  // ***************************************************************************
   // aurostd::isBase64(unsigned char c)
   // ***************************************************************************
   // determines if char is base64
@@ -847,12 +846,12 @@ namespace aurostd {
     while (in_len-- && ( encoded_string[in_] != '=') && isBase64(encoded_string[in_])) {
       char_array_4[i++]=encoded_string[in_]; in_++;
       if (i==4) {
-	for (i=0; i <4; i++) { char_array_4[i]=base64_chars.find(char_array_4[i]); } 
-	char_array_3[0]=(char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4);
-	char_array_3[1]=((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2);
-	char_array_3[2]=((char_array_4[2] & 0x3) << 6) + char_array_4[3]; 
-	for (i=0; (i<3); i++) { ret += char_array_3[i]; }
-	i=0;
+        for (i=0; i <4; i++) { char_array_4[i]=base64_chars.find(char_array_4[i]); } 
+        char_array_3[0]=(char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4);
+        char_array_3[1]=((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2);
+        char_array_3[2]=((char_array_4[2] & 0x3) << 6) + char_array_4[3]; 
+        for (i=0; (i<3); i++) { ret += char_array_3[i]; }
+        i=0;
       }
     }
     if (i) {
@@ -863,7 +862,7 @@ namespace aurostd {
       char_array_3[2]=((char_array_4[2] & 0x3) << 6) + char_array_4[3];
       for (j=0; (j<i - 1); j++) { ret += char_array_3[j]; }
     }
-    
+
     return ret;
   }
 }
@@ -871,6 +870,6 @@ namespace aurostd {
 
 // **************************************************************************
 // *                                                                        *
-// *             STEFANO CURTAROLO - Duke University 2003-2020              *
+// *             STEFANO CURTAROLO - Duke University 2003-2021              *
 // *                                                                        *
 // **************************************************************************
