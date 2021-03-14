@@ -307,6 +307,9 @@ using aurostd::xcombos;
 #define _METALGAP_ -1.0*AUROSTD_NAN
 #define _METALEDGE_ -1.0
 
+//moved from avasp
+#define _AFLOWINPAD_ 60
+
 // --------------------------------------------------------------------------
 // this is a container of general global choices
 class _XHOST {
@@ -3057,8 +3060,8 @@ namespace KBIN {
   void XVASP_INCAR_Ivdw(_xvasp& xvasp,_vflags& vflags);
   void XVASP_INCAR_ABMIX(_xvasp& xvasp,_vflags& vflags);
   int XVASP_INCAR_GetNBANDS(_xvasp& xvasp,bool ispin);
-  bool XVASP_INCAR_PREPARE_GENERIC(string command,_xvasp& xvasp,_vflags& vflags,string svalue,int ivalue,double dvalue,bool bvalue);
-  //  bool XVASP_INCAR_PREPARE_GENERIC(string command,_xvasp& xvasp,_kflags &kflags,_vflags& vflags,string svalue,int ivalue,double dvalue,bool bvalue);
+  bool XVASP_INCAR_PREPARE_GENERIC(const string& command,_xvasp& xvasp,_vflags& vflags,string svalue,int ivalue,double dvalue,bool bvalue);
+  //  bool XVASP_INCAR_PREPARE_GENERIC(const string& command,_xvasp& xvasp,_kflags &kflags,_vflags& vflags,string svalue,int ivalue,double dvalue,bool bvalue);
   // ALGO, ENMAX_MULTIPLY, IMIX, IALGO, TYPE, PAW_CORRECTIONS, NBANDS, PSTRESS, EDIFFG, POTIM, SPIN, LS_COUPLING, AUTO_MAGMOM, NWS, SYM, WAVECAR, CHGCAR
   void XVASP_INCAR_ADJUST_ICHARG(_xvasp&, _vflags&, _aflags&, int, ofstream&);  //ME20191028
   void XVASP_INCAR_SPIN_REMOVE_RELAX(_xvasp& xvasp,_aflags &aflags,_vflags& vflags,int step,ofstream &FileMESSAGE);
@@ -3070,9 +3073,16 @@ namespace KBIN {
   void XVASP_INCAR_KPOINTS_Dielectric_SET(_xvasp& xvasp,_kflags &kflags,_vflags& vflags,string mode_dielectric);
   void XVASP_INCAR_REMOVE_ENTRY(_xvasp& xvasp,const string& ENTRY,const string& COMMENT,bool VERBOSE,bool preload_incar=true,bool rewrite_incar=true);  //CO20200624 - adding ENTRIES2IGNORE, preload_incar, and rewrite_incar, preload_incar/rewrite_incar=true ensures consistency between xvasp.INCAR and ./INCAR, preload_incar WILL overwrite xvasp.INCAR
   void XVASP_INCAR_REMOVE_ENTRY(_xvasp& xvasp,const vector<string>& ENTRIES,const string& COMMENT,bool VERBOSE,bool preload_incar=true,bool rewrite_incar=true);  //CO20200624 - adding ENTRIES2IGNORE, preload_incar, and rewrite_incar, preload_incar/rewrite_incar=true ensures consistency between xvasp.INCAR and ./INCAR, preload_incar WILL overwrite xvasp.INCAR
+  void XVASP_INCAR_REMOVE_ENTRY(_xvasp& xvasp,const string& ENTRY,const string& ENTRY2IGNORE,const string& COMMENT,bool VERBOSE,bool preload_incar=true,bool rewrite_incar=true);  //CO20200624 - adding ENTRIES2IGNORE, preload_incar, and rewrite_incar, preload_incar/rewrite_incar=true ensures consistency between xvasp.INCAR and ./INCAR, preload_incar WILL overwrite xvasp.INCAR
   void XVASP_INCAR_REMOVE_ENTRY(_xvasp& xvasp,const string& ENTRY,const vector<string>& ENTRIES2IGNORE,const string& COMMENT,bool VERBOSE,bool preload_incar=true,bool rewrite_incar=true);  //CO20200624 - adding ENTRIES2IGNORE, preload_incar, and rewrite_incar, preload_incar/rewrite_incar=true ensures consistency between xvasp.INCAR and ./INCAR, preload_incar WILL overwrite xvasp.INCAR
   void XVASP_INCAR_REMOVE_ENTRY(_xvasp& xvasp,const vector<string>& ENTRIES,const vector<string>& ENTRIES2IGNORE,const string& COMMENT,bool VERBOSE,bool preload_incar=true,bool rewrite_incar=true);  //CO20200624 - adding ENTRIES2IGNORE, preload_incar, and rewrite_incar, preload_incar/rewrite_incar=true ensures consistency between xvasp.INCAR and ./INCAR, preload_incar WILL overwrite xvasp.INCAR
   string XVASP_INCAR_GET_ENTRY(_xvasp& xvasp,const string& ENTRY,bool preload_incar=true); //CO20200624 - preload_incar ensures consistency between xvasp.INCAR and ./INCAR, preload_incar WILL overwrite xvasp.INCAR
+
+  bool AFLOWIN_REMOVE(const string& aflowin_file,const string& keyword,const string& comment); //CO20210314
+  bool AFLOWIN_REMOVE(const string& aflowin_file,const vector<string>& vkeywords,const string& comment); //CO20210314
+  bool AFLOWIN_REMOVE(const string& aflowin_file,const string& keyword,const string& keyword2avoid,const string& comment); //CO20210314
+  bool AFLOWIN_REMOVE(const string& aflowin_file,const vector<string>& vkeywords,const vector<string>& vkeywords2ignore,const string& comment); //CO20210314
+  void AFLOWIN_ADD(const string& aflowin_file,const string& item,const string& comment);
 
   bool XVASP_KPOINTS_KPOINTS(_xvasp &xvasp,ofstream &FileMESSAGE,bool VERBOSE);
   bool XVASP_KPOINTS_KPOINTS(_xvasp &xvasp);

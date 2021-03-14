@@ -19,6 +19,7 @@
         -- consolidated XVASP_KPOINTS_KPOINTS() overloads (CO)
         -- adding ISYM=-1 for magnetic systems (CO)
         -- extensive consolidation of XVASP_INCAR_PREPARE_GENERIC() (CO)
+        -- added AFLOWIN_REMOVE() and AFLOWIN_ADD() (CO)
         TODO:
         -- patch CSLOSHING/NELM
         -- patch/consolidate Afix_GENERIC() and ROTMAT()

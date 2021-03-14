@@ -625,11 +625,11 @@ namespace aurostd {
   uint zipfile2string(string _FileNameIN,string& StringIN); //CO
   uint efile2string(const string& FileNameIN,string& StringIN);  //CO20191110
   // file2vectorstring  
-  uint file2vectorstring(string FileNameIN,vector<string>& vline);
-  uint bz2file2vectorstring(string FileNameIN,vector<string>& vline);
-  uint gzfile2vectorstring(string FileNameIN,vector<string>& vline);
-  uint xzfile2vectorstring(string FileNameIN,vector<string>& vline);
-  uint efile2vectorstring(string FileNameIN,vector<string>& vline);
+  uint file2vectorstring(string FileNameIN,vector<string>& vline,bool consecutive=false,bool trim_edges=false); //CO20170613, defaults to usual string2tokens() behavior
+  uint bz2file2vectorstring(string FileNameIN,vector<string>& vline,bool consecutive=false,bool trim_edges=false);  //CO20170613, defaults to usual string2tokens() behavior
+  uint gzfile2vectorstring(string FileNameIN,vector<string>& vline,bool consecutive=false,bool trim_edges=false); //CO20170613, defaults to usual string2tokens() behavior
+  uint xzfile2vectorstring(string FileNameIN,vector<string>& vline,bool consecutive=false,bool trim_edges=false); //CO20170613, defaults to usual string2tokens() behavior
+  uint efile2vectorstring(string FileNameIN,vector<string>& vline,bool consecutive=false,bool trim_edges=false);  //CO20170613, defaults to usual string2tokens() behavior
   bool vectorstring2file(const vector<string>& vline,string FileNameOUT);
   // file2dequestring  
   uint file2dequestring(string FileNameIN,deque<string>& vline);

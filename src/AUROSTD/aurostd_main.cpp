@@ -3805,24 +3805,24 @@ namespace aurostd {
   // Function file2vectorstring bz2file2vectorstring gzfile2vectorstring xzfile2vectorstring efile2vectorstring 
   // ***************************************************************************
   // write file to vector string - Stefano Curtarolo
-  uint file2vectorstring(string FileNameIN,vector<string>& vline) {
-    return aurostd::string2vectorstring(file2string(aurostd::CleanFileName(FileNameIN)),vline);
+  uint file2vectorstring(string FileNameIN,vector<string>& vline,bool consecutive,bool trim_edges) {
+    return aurostd::string2vectorstring(file2string(aurostd::CleanFileName(FileNameIN)),vline,consecutive,trim_edges);
   }
 
-  uint bz2file2vectorstring(string FileNameIN,vector<string>& vline) {
-    return aurostd::string2vectorstring(bz2file2string(aurostd::CleanFileName(FileNameIN)),vline);
+  uint bz2file2vectorstring(string FileNameIN,vector<string>& vline,bool consecutive,bool trim_edges) {
+    return aurostd::string2vectorstring(bz2file2string(aurostd::CleanFileName(FileNameIN)),vline,consecutive,trim_edges);
   }
 
-  uint gzfile2vectorstring(string FileNameIN,vector<string>& vline) {
-    return aurostd::string2vectorstring(gzfile2string(aurostd::CleanFileName(FileNameIN)),vline);
+  uint gzfile2vectorstring(string FileNameIN,vector<string>& vline,bool consecutive,bool trim_edges) {
+    return aurostd::string2vectorstring(gzfile2string(aurostd::CleanFileName(FileNameIN)),vline,consecutive,trim_edges);
   }
 
-  uint xzfile2vectorstring(string FileNameIN,vector<string>& vline) {
-    return aurostd::string2vectorstring(xzfile2string(aurostd::CleanFileName(FileNameIN)),vline);
+  uint xzfile2vectorstring(string FileNameIN,vector<string>& vline,bool consecutive,bool trim_edges) {
+    return aurostd::string2vectorstring(xzfile2string(aurostd::CleanFileName(FileNameIN)),vline,consecutive,trim_edges);
   }
 
-  uint efile2vectorstring(string FileNameIN,vector<string>& vline) {
-    return aurostd::string2vectorstring(efile2string(aurostd::CleanFileName(FileNameIN)),vline);
+  uint efile2vectorstring(string FileNameIN,vector<string>& vline,bool consecutive,bool trim_edges) {
+    return aurostd::string2vectorstring(efile2string(aurostd::CleanFileName(FileNameIN)),vline,consecutive,trim_edges);
   }
 
   bool vectorstring2file(const vector<string>& vline,string FileNameOUT) {
@@ -4517,9 +4517,9 @@ namespace aurostd {
     tokens.clear(); // clear in the case there was something already in!
     string::size_type lastPos=(consecutive ? 0 : str.find_first_not_of(delimiters,0));   // Skip delimiters at beginning.
     string::size_type pos=str.find_first_of(delimiters,lastPos);     // Find first "non-delimiter".
-    while (string::npos!=pos || string::npos!=lastPos) {
+    while (pos!=string::npos || lastPos!=string::npos) {
       tokens.push_back(str.substr(lastPos,pos-lastPos));             // Found a token, add it to the vector.
-      if(consecutive){lastPos=(string::npos!=pos ? pos+1 : string::npos);}
+      if(consecutive){lastPos=(pos!=string::npos ? pos+1 : string::npos);}
       else{lastPos=str.find_first_not_of(delimiters,pos);}  // Skip delimiters.  Note the "not_of"
       pos=str.find_first_of(delimiters,lastPos);                     // Find next "non-delimiter"
     }
