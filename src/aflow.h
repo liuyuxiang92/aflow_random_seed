@@ -3060,9 +3060,7 @@ namespace KBIN {
   void XVASP_INCAR_Ivdw(_xvasp& xvasp,_vflags& vflags);
   void XVASP_INCAR_ABMIX(_xvasp& xvasp,_vflags& vflags);
   int XVASP_INCAR_GetNBANDS(_xvasp& xvasp,bool ispin);
-  bool XVASP_INCAR_PREPARE_GENERIC(const string& command,_xvasp& xvasp,_vflags& vflags,string svalue,int ivalue,double dvalue,bool bvalue);
-  //  bool XVASP_INCAR_PREPARE_GENERIC(const string& command,_xvasp& xvasp,_kflags &kflags,_vflags& vflags,string svalue,int ivalue,double dvalue,bool bvalue);
-  // ALGO, ENMAX_MULTIPLY, IMIX, IALGO, TYPE, PAW_CORRECTIONS, NBANDS, PSTRESS, EDIFFG, POTIM, SPIN, LS_COUPLING, AUTO_MAGMOM, NWS, SYM, WAVECAR, CHGCAR
+  bool XVASP_INCAR_PREPARE_GENERIC(const string& command,_xvasp& xvasp,_vflags& vflags,const string& svalue,int ivalue,double dvalue,bool bvalue);
   void XVASP_INCAR_ADJUST_ICHARG(_xvasp&, _vflags&, _aflags&, int, ofstream&);  //ME20191028
   void XVASP_INCAR_SPIN_REMOVE_RELAX(_xvasp& xvasp,_aflags &aflags,_vflags& vflags,int step,ofstream &FileMESSAGE);
   void XVASP_KPOINTS_IBZKPT_UPDATE(_xvasp& xvasp,_aflags &aflags,_vflags& vflags,int step,ofstream &FileMESSAGE);
@@ -3101,11 +3099,14 @@ namespace KBIN {
   void XVASP_Afix_Clean(const _xvasp& xvasp,const string& preserve_name);
   bool XVASP_Afix_ROTMAT(_xvasp& xvasp,int mode,_aflags &aflags,bool verbose,ofstream &FileMESSAGE);
   bool XVASP_Afix_ROTMAT(_xvasp& xvasp,int mode,_kflags kflags,_vflags vflags,_aflags &aflags,bool verbose,ofstream &FileMESSAGE);
-  void XVASP_Afix_NBANDS(_xvasp& xvasp,int& nbands,bool VERBOSE);
   //the following functions are all associated with XVASP_Afix_GENERIC()
+  void XVASP_Afix_GENERIC_NBANDS(_xvasp& xvasp,bool VERBOSE);  //CO20200624 - this is not a general Afix, this can only be used inside Afix_GENERIC
+  void XVASP_Afix_GENERIC_NBANDS(_xvasp& xvasp,int& nbands,bool VERBOSE);  //CO20200624 - this is not a general Afix, this can only be used inside Afix_GENERIC
+  bool XVASP_Afix_GENERIC_POTIM(_xvasp& xvasp,bool VERBOSE);  //CO20200624 - this is not a general Afix, this can only be used inside Afix_GENERIC
   bool XVASP_Afix_GENERIC_POTIM(_xvasp& xvasp,double& potim,bool VERBOSE);  //CO20200624 - this is not a general Afix, this can only be used inside Afix_GENERIC
+  bool XVASP_Afix_GENERIC_NELM(_xvasp& xvasp,bool VERBOSE); //CO20200624 - this is not a general Afix, this can only be used inside Afix_GENERIC
   bool XVASP_Afix_GENERIC_NELM(_xvasp& xvasp,int& potim,bool VERBOSE); //CO20200624 - this is not a general Afix, this can only be used inside Afix_GENERIC
-  bool XVASP_Afix_GENERIC_ISMEAR(_xvasp& xvasp,const string& mode,int scheme,bool VERBOSE); //CO20200624 - this is not a general Afix, this can only be used inside Afix_GENERIC
+  bool XVASP_Afix_GENERIC_ISMEAR(_xvasp& xvasp,int scheme,bool VERBOSE); //CO20200624 - this is not a general Afix, this can only be used inside Afix_GENERIC
   bool XVASP_Afix_GENERIC(const string& mode,_xvasp& xvasp,_kflags& kflags,_vflags& vflags); //CO20200624 - adding submode so we don't need to make a bunch of spin-off functions
   bool XVASP_Afix_GENERIC(const string& mode,_xvasp& xvasp,_kflags& kflags,_vflags& vflags,double& param_double); //CO20200624 - adding submode so we don't need to make a bunch of spin-off functions
   bool XVASP_Afix_GENERIC(const string& mode,_xvasp& xvasp,_kflags& kflags,_vflags& vflags,int& param_int); //CO20200624 - adding submode so we don't need to make a bunch of spin-off functions
@@ -3208,6 +3209,7 @@ class xOUTCAR : public xStream { //CO20200404 - xStream integration for logging
     int NIONS;
     double Efermi;
     bool isLSCOUPLING;
+    xvector<double> efield_pead;  //CO20210315
     int nelectrons; //AS20200528
     double natoms;                                                // for aflowlib_libraries.cpp
     double energy_cell,energy_atom;                               // for aflowlib_libraries.cpp

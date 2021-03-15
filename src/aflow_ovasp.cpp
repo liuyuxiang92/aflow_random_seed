@@ -48,6 +48,7 @@ void xOUTCAR::free() {
   NIONS=0;                      // for aflowlib_libraries.cpp
   Efermi=0.0;                   // for aflowlib_libraries.cpp
   isLSCOUPLING=FALSE;           // for aflowlib_libraries.cpp
+  efield_pead.clear();          // for ivasp
   nelectrons = 0;               // AS20200528
   natoms=0.0;                   // for aflowlib_libraries.cpp
   energy_cell=0.0;              // for aflowlib_libraries.cpp
@@ -220,6 +221,7 @@ void xOUTCAR::copy(const xOUTCAR& b) { // copy PRIVATE
   NIONS=b.NIONS;
   Efermi=b.Efermi;
   isLSCOUPLING=b.isLSCOUPLING;
+  efield_pead=b.efield_pead;  //CO20210315
   nelectrons=b.nelectrons; //AS20200528
   natoms=b.natoms;                              // for aflowlib_libraries.cpp
   energy_cell=b.energy_cell;                    // for aflowlib_libraries.cpp
@@ -678,7 +680,9 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   string anchor_word_NIONS="NIONS";
   string anchor_word_LSORBIT="LSORBIT =";
   string anchor_word_Efermi="E-fermi";
+  string anchor_word_EFIELD_PEAD="EFIELD_PEAD"; //CO20210315
   string tmp="";
+  efield_pead.resize(3);  //CO20210315
   while(getline(sss,line)) {
     if(line.find(anchor_word_NELM) !=string::npos) {  //CO20200624
       aurostd::string2tokens(line,tokens,";");
@@ -702,6 +706,16 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     if(line.find(anchor_word_Efermi) !=string::npos) {
       aurostd::string2tokens(line,tokens," ");
       Efermi=aurostd::string2utype<double>(tokens.at(2));
+    }
+    if(line.find(anchor_word_EFIELD_PEAD) !=string::npos) { //CO20210315 - moved from aflow_ivasp XVASP_INCAR_EFIELD_PEAD()
+      aurostd::string2tokens(line,tokens,"=");
+      if(tokens.size()<2){continue;}
+      tmp=tokens[1];
+      aurostd::string2tokens(tmp,tokens);
+      if(tokens.size()<3){continue;}
+      for(int i=0;i<3;i++){
+        efield_pead[i+1]=aurostd::string2utype<double>(tokens[i]);
+      }
     }
   }
   if(LDEBUG) cerr << soliloquy << " NELM=" << NELM << endl; //CO20200624

@@ -2869,7 +2869,6 @@ namespace KBIN {
     ostringstream aus_exec,aus;
     xoption xwarning,xfixed,xmessage;
     int nbands = 0,nelm = 0,counter_ZPOTRF=0; //CO20200624
-    double enmax = 0.0;
     bool vasp_start=TRUE;
     aurostd::StringstreamClean(aus_exec);
     aurostd::StringstreamClean(aus);
@@ -3603,7 +3602,7 @@ namespace KBIN {
         if(!vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("NBANDS") && !xfixed.flag("ALL")) { // check NBANDS
           if(xwarning.flag("NBANDS")) {
             KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  NBANDS problems ");
-            KBIN::XVASP_Afix_NBANDS(xvasp,nbands,!XHOST.QUIET);  // here it does the nbands_update
+            KBIN::XVASP_Afix_GENERIC("NBANDS",xvasp,kflags,vflags,nbands);  //CO20210315 // here it does the nbands_update
             xfixed.flag("NBANDS",TRUE);xfixed.flag("ALL",TRUE);
             aus << "WWWWW  FIX NBANDS = [" << nbands << "] - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
             aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -3999,8 +3998,7 @@ namespace KBIN {
             KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  PSMAXN problems ");
             aus << "WWWWW  FIX PSMAXN - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
             aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-            //[CO20200624 - OBSOLETE]enmax=KBIN::XVASP_Afix_GENERIC("PSMAXN",xvasp,kflags,vflags,enmax);
-            KBIN::XVASP_Afix_GENERIC("PSMAXN",xvasp,kflags,vflags,enmax);
+            KBIN::XVASP_Afix_GENERIC("PSMAXN",xvasp,kflags,vflags);
             xfixed.flag("PSMAXN",TRUE);xfixed.flag("ALL",TRUE);
           }
         }
@@ -4078,7 +4076,7 @@ namespace KBIN {
         if(!vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("NELM") && !xfixed.flag("ALL")) { // check NELM
           if(xwarning.flag("NELM") && nelm<MAX_VASP_NELM) {  //only increase nelm so many times
             KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  NELM problems ");
-            KBIN::XVASP_Afix_GENERIC_NELM(xvasp,nelm,!XHOST.QUIET);  // here it does the nelm_update
+            KBIN::XVASP_Afix_GENERIC("NELM",xvasp,kflags,vflags);
             xfixed.flag("NELM",TRUE);xfixed.flag("ALL",TRUE);
             aus << "WWWWW  FIX NELM = [" << nelm << "] - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
             aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
