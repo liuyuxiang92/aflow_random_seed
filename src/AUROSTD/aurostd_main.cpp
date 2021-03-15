@@ -1318,17 +1318,24 @@ namespace aurostd {
   vector<string> RemoveComments(const vector<string>& vstrin) {
     vector<string> vstrout;
     string::size_type loc;
-    string line;
+    string line="";
     for (uint i = 0; i < vstrin.size(); i++) {
       line = vstrin[i];
       // COMMENT_NEGLECT_1
       loc = line.find(COMMENT_NEGLECT_1);
-      line = line.substr(0, loc);
+      while (loc != string::npos) {
+        // Do not remove #[1-9] since it is not a comment (spacegroup)
+        if (!((loc > 0) && (loc < line.size()) && (isdigit(line[loc+1])))) {
+          line = line.substr(0, loc);
+          break;
+        }
+        loc = line.find(COMMENT_NEGLECT_1, loc + 1);
+      }
       // COMMENT_NEGLECT_2
       loc = line.find(COMMENT_NEGLECT_2);
       while (loc != string::npos) {
-        // Do not remove :// since it is not a comment
-        if (!((loc > 0) && (loc < line.size()) && (line[loc -1] == ':'))) {
+        // Do not remove :// since it is not a comment (web address)
+        if (!((loc > 0) && (loc < line.size()) && (line[loc-1] == ':'))) {
           line = line.substr(0, loc);
           break;
         }
@@ -1342,37 +1349,14 @@ namespace aurostd {
     return vstrout;
   }
   deque<string> RemoveComments(const deque<string>& vstrin) {
-    deque<string> vstrout;
-    string::size_type loc;
-    string line;
-    for (uint i = 0; i < vstrin.size(); i++) {
-      line = vstrin[i];
-      // COMMENT_NEGLECT_1
-      loc = line.find(COMMENT_NEGLECT_1);
-      line = line.substr(0, loc);
-      // COMMENT_NEGLECT_2
-      loc = line.find(COMMENT_NEGLECT_2);
-      while (loc != string::npos) {
-        // Do not remove :// since it is not a comment
-        if (!((loc > 0) && (loc < line.size()) && (line[loc -1] == ':'))) {
-          line = line.substr(0, loc);
-          break;
-        }
-        loc = line.find(COMMENT_NEGLECT_2, loc + 1);
-      }
-      // COMMENT_NEGLECT_3
-      loc = line.find(COMMENT_NEGLECT_3);
-      line = line.substr(0, loc);
-      if (!line.empty()) vstrout.push_back(line);
-    }
-    return vstrout;
+    return aurostd::vector2deque(RemoveComments(aurostd::deque2vector(vstrin)));
   }
 
   string RemoveComments(const string& strin) {
     vector<string> vlines;
     aurostd::string2vectorstring(strin, vlines);
     vlines = RemoveComments(vlines);
-    string strout;
+    string strout="";
     for (uint i = 0; i < vlines.size(); i++) strout += vlines[i] + '\n';
     return strout;
   }
