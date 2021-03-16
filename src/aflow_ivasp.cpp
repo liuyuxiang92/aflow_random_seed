@@ -4702,7 +4702,6 @@ namespace KBIN {
 
     KBIN::XVASP_INCAR_REMOVE_ENTRY(xvasp,"EFIELD","Patching EFIELD",VERBOSE,false,false);  //CO20200624 - do not preload or rewrite incar
     xvasp.INCAR << aurostd::PaddedPOST("EFIELD_PEAD="+aurostd::utype2string(E(1),6)+" "+aurostd::utype2string(E(2),6)+" "+aurostd::utype2string(E(3),6)+" ",_incarpad_) << " # " << function << endl;
-    aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR")); //CO20200624 - update immediately to ensure consistency between xvasp.INCAR and ./INCAR
     xvasp.aopts.flag("FLAG::XVASP_INCAR_changed",TRUE); //CO20200624
   }
 }
@@ -5398,18 +5397,11 @@ namespace KBIN {
 
     KBIN::XVASP_INCAR_REMOVE_ENTRY(xvasp,"NBANDS","Increasing NBANDS",VERBOSE,false,false); //CO20200624 - do not preload or rewrite incar
     xvasp.INCAR << aurostd::PaddedPOST("NBANDS="+aurostd::utype2string(nbands),_incarpad_) << " # Increasing NBANDS" << endl; //CO20200624
-    aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR")); //CO20200624 - update immediately to ensure consistency between xvasp.INCAR and ./INCAR
     xvasp.aopts.flag("FLAG::XVASP_INCAR_changed",TRUE); //CO20200624
     
     // fix aflow.in
     KBIN::AFLOWIN_REMOVE(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]NBANDS","Self Correction");
     KBIN::AFLOWIN_ADD(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]NBANDS="+aurostd::utype2string(nbands,_IVASP_DOUBLE2STRING_PRECISION_),"Self Correction");
-    
-    //[CO20200624 - OBSOLETE]// reload to restart ---------------------------------
-    //[CO20200624 - OBSOLETE]xvasp.INCAR_orig.str(std::string()); xvasp.INCAR_orig << xvasp.INCAR.str();
-    //[CO20200624 - OBSOLETE]xvasp.INCAR.str(std::string()); xvasp.INCAR << aurostd::file2string(xvasp.Directory+"/INCAR");
-    //[CO20200624 - OBSOLETE]// clean to restart ----------------------------------
-    //[CO20200624 - OBSOLETE]KBIN::XVASP_Afix_Clean(xvasp,"aflow.error.nbands");
   }
 }
 
@@ -5446,16 +5438,11 @@ namespace KBIN {
 
     KBIN::XVASP_INCAR_REMOVE_ENTRY(xvasp,"POTIM","Patching POTIM",VERBOSE,false,false); //CO20200624 - do not preload or rewrite incar
     xvasp.INCAR << aurostd::PaddedPOST("POTIM="+aurostd::utype2string(potim,_IVASP_DOUBLE2STRING_PRECISION_),_incarpad_) << " # Patching POTIM" << endl; //CO20200624
-    aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR")); //CO20200624 - update immediately to ensure consistency between xvasp.INCAR and ./INCAR
     xvasp.aopts.flag("FLAG::XVASP_INCAR_changed",TRUE); //CO20200624
     
     // fix aflow.in
     KBIN::AFLOWIN_REMOVE(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]POTIM","Self Correction");
     KBIN::AFLOWIN_ADD(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]POTIM="+aurostd::utype2string(potim,_IVASP_DOUBLE2STRING_PRECISION_),"Self Correction");
-    
-    //[CO20200624 - OBSOLETE]// reload to restart ---------------------------------
-    //[CO20200624 - OBSOLETE]xvasp.INCAR_orig.str(std::string()); xvasp.INCAR_orig << xvasp.INCAR.str();
-    //[CO20200624 - OBSOLETE]xvasp.INCAR.str(std::string()); xvasp.INCAR << aurostd::file2string(xvasp.Directory+"/INCAR");
     return true;
   }
 }
@@ -5493,14 +5480,9 @@ namespace KBIN {
 
     KBIN::XVASP_INCAR_REMOVE_ENTRY(xvasp,"NELM","Increasing NELM",VERBOSE,false,false); //CO20200624 - do not preload or rewrite incar
     xvasp.INCAR << aurostd::PaddedPOST("NELM="+aurostd::utype2string(nelm,_IVASP_DOUBLE2STRING_PRECISION_),_incarpad_) << " # Increasing NELM" << endl; //CO20200624
-    aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR")); //CO20200624 - update immediately to ensure consistency between xvasp.INCAR and ./INCAR
     xvasp.aopts.flag("FLAG::XVASP_INCAR_changed",TRUE); //CO20200624
     
     //[CO20200624 - do NOT fix aflow.in, keep patch LOCAL]// fix aflow.in
-    
-    //[CO20200624 - OBSOLETE]// reload to restart ---------------------------------
-    //[CO20200624 - OBSOLETE]xvasp.INCAR_orig.str(std::string()); xvasp.INCAR_orig << xvasp.INCAR.str();
-    //[CO20200624 - OBSOLETE]xvasp.INCAR.str(std::string()); xvasp.INCAR << aurostd::file2string(xvasp.Directory+"/INCAR");
     return true;
   }
 }
@@ -5524,7 +5506,6 @@ namespace KBIN {
     else if(scheme==-4){tmp+="tetrahedron";}
     else if(scheme==-5){tmp+="tetrahedron with Bloechl corrections";}
     xvasp.INCAR << tmp << endl;
-    aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR")); //CO20200624 - update immediately to ensure consistency between xvasp.INCAR and ./INCAR
     
     return true;
   }
