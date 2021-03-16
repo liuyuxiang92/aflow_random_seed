@@ -3016,6 +3016,7 @@ namespace KBIN {
   bool VASP_Produce_INCAR(_xvasp& xvasp,const string& AflowIn,ofstream& FileERROR,_aflags& aflags,_kflags& kflags,_vflags& vflags);
   bool VASP_Modify_INCAR(_xvasp& xvasp,ofstream& FileERROR,_aflags& aflags,_kflags& kflags,_vflags& vflags);
   void VASP_CleanUp_INCAR(_xvasp& xvasp);
+  bool VASP_Reread_INCAR(_xvasp& xvasp); //CO20210315
   bool VASP_Reread_INCAR(_xvasp& xvasp,ofstream &FileMESSAGE,_aflags &aflags);
   bool VASP_Produce_POSCAR(_xvasp& xvasp,const string& AflowIn,ofstream& FileERROR,_aflags& aflags,_kflags& kflags,_vflags& vflags);
   bool VASP_Produce_POSCAR(_xvasp& xvasp);
@@ -3060,7 +3061,7 @@ namespace KBIN {
   void XVASP_INCAR_Ivdw(_xvasp& xvasp,_vflags& vflags);
   void XVASP_INCAR_ABMIX(_xvasp& xvasp,_vflags& vflags);
   int XVASP_INCAR_GetNBANDS(_xvasp& xvasp,bool ispin);
-  bool XVASP_INCAR_PREPARE_GENERIC(const string& command,_xvasp& xvasp,_vflags& vflags,const string& svalue,int ivalue,double dvalue,bool bvalue);
+  void XVASP_INCAR_PREPARE_GENERIC(const string& command,_xvasp& xvasp,_vflags& vflags,const string& svalue,int ivalue,double dvalue,bool bvalue);
   void XVASP_INCAR_ADJUST_ICHARG(_xvasp&, _vflags&, _aflags&, int, ofstream&);  //ME20191028
   void XVASP_INCAR_SPIN_REMOVE_RELAX(_xvasp& xvasp,_aflags &aflags,_vflags& vflags,int step,ofstream &FileMESSAGE);
   void XVASP_KPOINTS_IBZKPT_UPDATE(_xvasp& xvasp,_aflags &aflags,_vflags& vflags,int step,ofstream &FileMESSAGE);
@@ -3069,7 +3070,6 @@ namespace KBIN {
   void XVASP_INCAR_LDAU_ADIABATIC(_xvasp& xvasp,int step);
   void XVASP_INCAR_LDAU_CUTOFF(_xvasp& xvasp,bool VERBOSE);
   void XVASP_INCAR_KPOINTS_Dielectric_SET(_xvasp& xvasp,_kflags &kflags,_vflags& vflags,string mode_dielectric);
-  void XVASP_INCAR_LOAD(_xvasp& xvasp); //CO20200314
   void XVASP_INCAR_REMOVE_ENTRY(_xvasp& xvasp,const string& ENTRY,const string& COMMENT,bool VERBOSE,bool preload_incar=true,bool rewrite_incar=true);  //CO20200624 - adding ENTRIES2IGNORE, preload_incar, and rewrite_incar, preload_incar/rewrite_incar=true ensures consistency between xvasp.INCAR and ./INCAR, preload_incar WILL overwrite xvasp.INCAR
   void XVASP_INCAR_REMOVE_ENTRY(_xvasp& xvasp,const vector<string>& ENTRIES,const string& COMMENT,bool VERBOSE,bool preload_incar=true,bool rewrite_incar=true);  //CO20200624 - adding ENTRIES2IGNORE, preload_incar, and rewrite_incar, preload_incar/rewrite_incar=true ensures consistency between xvasp.INCAR and ./INCAR, preload_incar WILL overwrite xvasp.INCAR
   void XVASP_INCAR_REMOVE_ENTRY(_xvasp& xvasp,const string& ENTRY,const string& ENTRY2IGNORE,const string& COMMENT,bool VERBOSE,bool preload_incar=true,bool rewrite_incar=true);  //CO20200624 - adding ENTRIES2IGNORE, preload_incar, and rewrite_incar, preload_incar/rewrite_incar=true ensures consistency between xvasp.INCAR and ./INCAR, preload_incar WILL overwrite xvasp.INCAR
@@ -3083,19 +3083,19 @@ namespace KBIN {
   bool AFLOWIN_REMOVE(const string& aflowin_file,const vector<string>& vkeywords,const vector<string>& vkeywords2ignore,const string& comment); //CO20210314
   void AFLOWIN_ADD(const string& aflowin_file,const string& item,const string& comment);
 
-  bool XVASP_KPOINTS_KPOINTS(_xvasp &xvasp,ofstream &FileMESSAGE,bool VERBOSE);
-  bool XVASP_KPOINTS_KPOINTS(_xvasp &xvasp);
+  void XVASP_KPOINTS_KPOINTS(_xvasp &xvasp,ofstream &FileMESSAGE,bool VERBOSE);
+  void XVASP_KPOINTS_KPOINTS(_xvasp &xvasp);
   // bool XVASP_KPOINTS_EVEN(_xvasp& xvasp); TO REMOVE
   // bool XVASP_KPOINTS_ODD(_xvasp& xvasp); TO REMOVE
   bool XVASP_KPOINTS_OPERATION(_xvasp& xvasp,string operation);
   // bool XVASP_KPOINTS_Kshift_Gamma_EVEN(_xvasp& xvasp); TO REMOVE
   // bool XVASP_KPOINTS_Kshift_Gamma_ODD(_xvasp& xvasp); TO REMOVE
   // bool XVASP_KPOINTS_Kscheme(_xvasp& xvasp,string kscheme);
-  bool XVASP_KPOINTS_Fix_KPPRA(_xvasp &xvasp,int NK,ofstream &FileMESSAGE,bool VERBOSE);
-  bool XVASP_KPOINTS_Fix_KSHIFT(_xvasp &xvasp,_xvasp &rxvasp,bool KAUTOSHIFT,bool VERBOSE);
-  bool XVASP_KPOINTS_Fix_KPOINTS(_xvasp &xvasp,int NK,ofstream &FileMESSAGE,bool VERBOSE);
-  void XVASP_string2numbers(_xvasp& xvasp);
-  void XVASP_numbers2string(_xvasp& xvasp);
+  //[CO20210315 - OBSOLETE]bool XVASP_KPOINTS_Fix_KPPRA(_xvasp &xvasp,int NK,ofstream &FileMESSAGE,bool VERBOSE);
+  //[CO20210315 - OBSOLETE]bool XVASP_KPOINTS_Fix_KSHIFT(_xvasp &xvasp,_xvasp &rxvasp,bool KAUTOSHIFT,bool VERBOSE);
+  //[CO20210315 - OBSOLETE]bool XVASP_KPOINTS_Fix_KPOINTS(_xvasp &xvasp,int NK,ofstream &FileMESSAGE,bool VERBOSE);
+  void XVASP_KPOINTS_string2numbers(_xvasp& xvasp);
+  void XVASP_KPOINTS_numbers2string(_xvasp& xvasp);
   void XVASP_Afix_Clean(const _xvasp& xvasp,const string& preserve_name);
   bool XVASP_Afix_ROTMAT(_xvasp& xvasp,int mode,_aflags &aflags,bool verbose,ofstream &FileMESSAGE);
   bool XVASP_Afix_ROTMAT(_xvasp& xvasp,int mode,_kflags kflags,_vflags vflags,_aflags &aflags,bool verbose,ofstream &FileMESSAGE);

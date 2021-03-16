@@ -2730,7 +2730,7 @@ namespace KBIN {
                 aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
                 xvasp.str.kpoints_k1=min(kk1,kbak_k1);xvasp.str.kpoints_k2=min(kk2,kbak_k2);xvasp.str.kpoints_k3=min(kk3,kbak_k3);
                 xvasp.str.kpoints_kmax=max(xvasp.str.kpoints_k1,xvasp.str.kpoints_k2,xvasp.str.kpoints_k3);
-                KBIN::XVASP_numbers2string(xvasp);
+                KBIN::XVASP_KPOINTS_numbers2string(xvasp);
                 aurostd::stringstream2file(xvasp.KPOINTS,string(xvasp.Directory+"/KPOINTS"));   // BACKUP KPOINTS
                 Krun=KBIN::VASP_Run(xvasp,aflags,kflags,vflags,relaxfile,relaxfile,FALSE,FileMESSAGE);
                 if(!Krun) {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error [KPOINTS 1]");return Krun;}
@@ -2743,7 +2743,7 @@ namespace KBIN {
                 aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
                 xvasp.str.kpoints_k1=min(kk1,kbak_k1);xvasp.str.kpoints_k2=min(kk2,kbak_k2);xvasp.str.kpoints_k3=min(kk3,kbak_k3);
                 xvasp.str.kpoints_kmax=max(xvasp.str.kpoints_k1,xvasp.str.kpoints_k2,xvasp.str.kpoints_k3);
-                KBIN::XVASP_numbers2string(xvasp);
+                KBIN::XVASP_KPOINTS_numbers2string(xvasp);
                 aurostd::stringstream2file(xvasp.KPOINTS,string(xvasp.Directory+"/KPOINTS"));   // BACKUP KPOINTS
                 Krun=KBIN::VASP_Run(xvasp,aflags,kflags,vflags,relaxfile,relaxfile,FALSE,FileMESSAGE);
                 if(!Krun) {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error [KPOINTS 2]");return Krun;}
@@ -2756,7 +2756,7 @@ namespace KBIN {
                 aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
                 xvasp.str.kpoints_k1=min(kk1,kbak_k1);xvasp.str.kpoints_k2=min(kk2,kbak_k2);xvasp.str.kpoints_k3=min(kk3,kbak_k3);
                 xvasp.str.kpoints_kmax=max(xvasp.str.kpoints_k1,xvasp.str.kpoints_k2,xvasp.str.kpoints_k3);
-                KBIN::XVASP_numbers2string(xvasp);
+                KBIN::XVASP_KPOINTS_numbers2string(xvasp);
                 aurostd::stringstream2file(xvasp.KPOINTS,string(xvasp.Directory+"/KPOINTS"));   // BACKUP KPOINTS
                 // ----------------------------------------------------------
                 // with PAWGGA2
