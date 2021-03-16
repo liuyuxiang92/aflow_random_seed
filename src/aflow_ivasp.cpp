@@ -5596,19 +5596,21 @@ namespace KBIN {
     }
     else if(mode=="IBZKPT") {
       file_error="aflow.error.ibzkpt";
-      reload_kpoints=TRUE;
-      rewrite_kpoints=TRUE;
       if(xvasp.aopts.flag("FLAG::KPOINTS_PRESERVED")) return false; // don't touch kpoints
+      //START - modify xvasp.str.kpoints* and write out new KPOINTS
+      xvasp.str.kpoints_s1=0.0;xvasp.str.kpoints_s2=0.0;xvasp.str.kpoints_s3=0.0; //should go before OPERATION() which writes out xvasp.KPOINTS
       KBIN::XVASP_KPOINTS_OPERATION(xvasp,"Xodd,Yodd,Zodd");  // KBIN::XVASP_KPOINTS_ODD(xvasp);  // this should put the origin in GAMMA ??
-      xvasp.str.kpoints_s1=0.0;xvasp.str.kpoints_s2=0.0;xvasp.str.kpoints_s3=0.0;
+      aurostd::stringstream2file(xvasp.KPOINTS,string(xvasp.Directory+"/KPOINTS"));
+      //END - modify xvasp.str.kpoints* and write out new KPOINTS
     }
     else if(mode=="GAMMA_SHIFT") {
       file_error="aflow.error.gamma_shift";
-      reload_kpoints=TRUE;
-      rewrite_kpoints=TRUE;
       if(xvasp.aopts.flag("FLAG::KPOINTS_PRESERVED")) return false; // don't touch kpoints
+      //START - modify xvasp.str.kpoints* and write out new KPOINTS
+      //    xvasp.str.kpoints_s1=0.0;xvasp.str.kpoints_s2=0.0;xvasp.str.kpoints_s3=0.0; //should go before OPERATION() which writes out xvasp.KPOINTS
       KBIN::XVASP_KPOINTS_OPERATION(xvasp,"Gamma");
-      //    xvasp.str.kpoints_s1=0.0;xvasp.str.kpoints_s2=0.0;xvasp.str.kpoints_s3=0.0;
+      aurostd::stringstream2file(xvasp.KPOINTS,string(xvasp.Directory+"/KPOINTS"));
+      //END - modify xvasp.str.kpoints* and write out new KPOINTS
     }
     else if(mode=="MPICH11") {
       file_error="aflow.error.mpich11";
@@ -5616,20 +5618,23 @@ namespace KBIN {
     }
     else if(mode=="MPICH139") {
       file_error="aflow.error.mpich139";
-      reload_kpoints=TRUE;
-      rewrite_kpoints=TRUE;
+      kflags.KBIN_MPI_OPTIONS=string("ulimit -s unlimited ");//+string("\n")+kflags.KBIN_MPI_OPTIONS; //can go BEFORE KPOINTS mods, since it does not affect KPOINTS
       if(xvasp.aopts.flag("FLAG::KPOINTS_PRESERVED")) return false; // don't touch kpoints
+      //START - modify xvasp.str.kpoints* and write out new KPOINTS
+      // xvasp.str.kpoints_s1=0.0;xvasp.str.kpoints_s2=0.0;xvasp.str.kpoints_s3=0.0;  //should go before OPERATION() which writes out xvasp.KPOINTS
       KBIN::XVASP_KPOINTS_OPERATION(xvasp,"X--,Y--,Z--");  // reduce KPOINTS withoug bugging the origin
       KBIN::XVASP_KPOINTS_OPERATION(xvasp,"X--,Y--,Z--");  // reduce KPOINTS withoug bugging the origin
-      // xvasp.str.kpoints_s1=0.0;xvasp.str.kpoints_s2=0.0;xvasp.str.kpoints_s3=0.0;
-      kflags.KBIN_MPI_OPTIONS=string("ulimit -s unlimited ");//+string("\n")+kflags.KBIN_MPI_OPTIONS;
+      aurostd::stringstream2file(xvasp.KPOINTS,string(xvasp.Directory+"/KPOINTS"));
+      //END - modify xvasp.str.kpoints* and write out new KPOINTS
     }
     else if(mode=="NKXYZ_IKPTD") {
       file_error="aflow.error.nkxyz_ikptd";
-      reload_kpoints=TRUE;
-      rewrite_kpoints=TRUE;
       // if(xvasp.aopts.flag("FLAG::KPOINTS_PRESERVED")) return false; // don't touch kpoints MUST FIX ANYWAY
+      //START - modify xvasp.str.kpoints* and write out new KPOINTS
       KBIN::XVASP_KPOINTS_OPERATION(xvasp,"X--,Y--,Z--");  // this should put the origin in GAMMA ??
+      aurostd::stringstream2file(xvasp.KPOINTS,string(xvasp.Directory+"/KPOINTS"));
+      //END - modify xvasp.str.kpoints* and write out new KPOINTS
+    }
     }
     else if(mode=="EDDRMM") {
       //https://www.vasp.at/forum/viewtopic.php?f=3&t=214&p=215
