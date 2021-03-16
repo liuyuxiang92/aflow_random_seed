@@ -5635,7 +5635,6 @@ namespace KBIN {
       aurostd::stringstream2file(xvasp.KPOINTS,string(xvasp.Directory+"/KPOINTS"));
       //END - modify xvasp.str.kpoints* and write out new KPOINTS
     }
-    }
     else if(mode=="EDDRMM") {
       //https://www.vasp.at/forum/viewtopic.php?f=3&t=214&p=215
       file_error="aflow.error.eddrmm";
