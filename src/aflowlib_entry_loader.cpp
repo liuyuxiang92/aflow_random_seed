@@ -353,7 +353,7 @@ namespace aflowlib {
     vector<string> vtokens_elements;  //to be joined with ':' inside species()
 
     //do unary separately
-    vtokens_naries.push_back( "species("+aurostd::joinWDelimiter(velements,":")+"),nspecies(1)" );
+    vtokens_naries.push_back( "nspecies(1),species("+aurostd::joinWDelimiter(velements,":")+")" );  //always put nspecies first, faster in sqlite
 
     uint i=0;
     aurostd::xcombos xc;
@@ -364,7 +364,7 @@ namespace aflowlib {
         vtokens_elements.push_back( aurostd::joinWDelimiter(xc.applyCombo(velements),",") );
       }
       if(vtokens_elements.size()>1){vtokens_elements=aurostd::wrapVecEntries(vtokens_elements,"(",")");}
-      vtokens_naries.push_back( "species("+aurostd::joinWDelimiter(vtokens_elements,":")+"),nspecies("+aurostd::utype2string(i+1)+")" );
+      vtokens_naries.push_back( "nspecies("+aurostd::utype2string(i+1)+"),species("+aurostd::joinWDelimiter(vtokens_elements,":")+")" );  //always put nspecies first, faster in sqlite
     }
     if(vtokens_naries.size()>1){vtokens_naries=aurostd::wrapVecEntries(vtokens_naries,"(",")");}
 
