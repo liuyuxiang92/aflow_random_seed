@@ -24,6 +24,7 @@
         -- extensive consolidation of XVASP_INCAR_PREPARE_GENERIC() (CO)
         -- added AFLOWIN_REMOVE() and AFLOWIN_ADD() (CO)
         -- cleanup aurostd::RemoveComments() and substring2bool() (CO)
+        -- added new formatting for EXCCOR vasp error (CO)
         TODO:
         -- patch CSLOSHING/NELM
         -- patch/consolidate Afix_GENERIC() and ROTMAT()
