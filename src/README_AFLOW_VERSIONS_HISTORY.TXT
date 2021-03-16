@@ -1,9 +1,20 @@
-3.2.8 - 2021/XX/XX
-        Location: http://materials.duke.edu/AFLOW/aflow.3.2.8.tar.xz
+3.2.9 - 2021/xx/xx
+        Location: http://materials.duke.edu/AFLOW/aflow.3.2.9.tar.xz
         -- Fixed bug with APL overwriting *.orig files. (AS)
         -- patched XVASP_KPOINTS_OPERATION() so a change is ensured for Xeven/Xodd etc. (CO)
         -- APL MINATOMS_RESTRICTED->MINATOMS_UNIFORM (CO)
         -- adding PAW_PBE_KIN to allowed DFT types in chull (CO)
+3.2.8 - 2021/02/22
+        Location: http://materials.duke.edu/AFLOW/aflow.3.2.8.tar.xz
+        -- lib2raw bug fixes (CO)
+        -- web aflowin bug fixes (SC)
+        -- fixed typo in Wyckoff position for space group 85, setting 2 (DX)
+        -- fixed compare2database species issue (DX)
+        -- fixed alphabetic ordering of symbolic equations (DX)
+        -- fixed origin shift coordinate-type in XtalFinder (DX)
+        -- fixed LFA environment cardinality (DX)
+        (AFLOW: aflowlib_web_interface.cpp, aflow_compare_structure.cpp, aflow_compare_structure_function.cpp, aflow_symmetry_spacegroup_ITC_library.cpp, aflow_xatom.cpp, Makefile)
+        (ANRL: aflow_anrl.cpp)
 3.2.7 - 2021/02/04
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.7.tar.xz
         -- Added additional AEL and AGL properties to the AFLOW schema. (ME)

@@ -929,17 +929,6 @@ vector<StructurePrototype> XtalFinderCalculator::compare2database(
   string directory = aurostd::getPWD();
 
   // ---------------------------------------------------------------------------
-  // add input structure to container
-  stringstream ss_input; ss_input << xstrIN;
-  addStructure2container(xstrIN, "input geometry", ss_input.str(), 0, false);
-
-  // check if structure is loaded;
-  if(structure_containers.size() != 1){
-    message << "Input structure was not loaded. Nothing to compare.";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_RUNTIME_ERROR_);
-  }
-
-  // ---------------------------------------------------------------------------
   // create xoptions to contain all comparison options
   aurostd::xoption comparison_options = compare::loadDefaultComparisonOptions(); //DX20200103
   // get options from vpflow/command line
@@ -967,6 +956,17 @@ vector<StructurePrototype> XtalFinderCalculator::compare2database(
     same_species = false;
     message << "OPTIONS: Structure-type comparison, i.e., ignore atomic species.";
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+  }
+
+  // ---------------------------------------------------------------------------
+  // add input structure to container //DX20210219 - put after same_species flag
+  stringstream ss_input; ss_input << xstrIN;
+  addStructure2container(xstrIN, "input geometry", ss_input.str(), 0, same_species); //DX20210219 - use same_species flag
+
+  // check if structure is loaded;
+  if(structure_containers.size() != 1){
+    message << "Input structure was not loaded. Nothing to compare.";
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_RUNTIME_ERROR_);
   }
 
   // ---------------------------------------------------------------------------
