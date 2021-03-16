@@ -374,7 +374,7 @@
 #define         DEFAULT_GNUPLOT_GREEK_FONT_BOLD_ITALICS       XHOST.adefault.getattachedscheme("DEFAULT_GNUPLOT_GREEK_FONT_BOLD_ITALICS")
 
 // DEFAULT CHULL
-#define AFLOWRC_DEFAULT_CHULL_ALLOWED_DFT_TYPES                           string("PAW_PBE")
+#define AFLOWRC_DEFAULT_CHULL_ALLOWED_DFT_TYPES                           string("PAW_PBE,PAW_PBE_KIN")
 #define         DEFAULT_CHULL_ALLOWED_DFT_TYPES                           XHOST.adefault.getattachedscheme("DEFAULT_CHULL_ALLOWED_DFT_TYPES")
 #define AFLOWRC_DEFAULT_CHULL_ALLOW_ALL_FORMATION_ENERGIES                FALSE
 #define         DEFAULT_CHULL_ALLOW_ALL_FORMATION_ENERGIES                XHOST.adefault.getattachedutype<bool>("DEFAULT_CHULL_ALLOW_ALL_FORMATION_ENERGIES")

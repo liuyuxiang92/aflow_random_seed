@@ -1,6 +1,9 @@
 3.2.9 - 2021/xx/xx
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.9.tar.xz
         -- Fixed bug with APL overwriting *.orig files. (AS)
+        -- patched XVASP_KPOINTS_OPERATION() so a change is ensured for Xeven/Xodd etc. (CO)
+        -- APL MINATOMS_RESTRICTED->MINATOMS_UNIFORM (CO)
+        -- adding PAW_PBE_KIN to allowed DFT types in chull (CO)
         -- changed newlines to semi-colons in aurostd::execute() and aurostd::execute2string() and added file system IO options to aurostd::execute2string() (CO)
         -- extended CleanStringASCII_InPlace() to include ALL ASCII characters (CO)
         -- added NELM and NELM_STATIC options to VASP_FORCE_OPTIONS and aflow.rc (CO)
