@@ -708,10 +708,9 @@ namespace aurostd {
   template<class utype> uint string2tokensAdd(const string& str,std::vector<utype>& tokens,const string& delimiters = " ") __xprototype;
   template<class utype> uint string2tokensAdd(const string& str,std::deque<utype>& tokens,const string& delimiters = " ") __xprototype;
 
-  template<typename typeTo, typename typeFrom> typeTo StringStreamConvert(typeFrom from) __xprototype;
-  //  template<typename typeFrom> string StringStreamConvert(typeFrom from) __xprototype;
-  template<typename typeFrom> string StringConvert(typeFrom from) __xprototype;
-  template<typename typeTo, typename typeFrom> typeTo NumberStreamConvert(typeFrom from) __xprototype;
+  //[CO20210315 - OBSOLETE use stream2stream()]template<typename typeTo, typename typeFrom> typeTo StringStreamConvert(const typeFrom& from);  //CO20210315 - cleaned up
+  //[CO20210315 - OBSOLETE use stream2stream()]template<typename typeFrom> string StringConvert(const typeFrom& from);  //CO20210315 - cleaned up
+  //[CO20210315 - not defined]template<typename typeTo, typename typeFrom> typeTo NumberStreamConvert(const typeFrom& from);  //CO20210315 - cleaned up
 
   // [OBSOLETE]  double string2double(const string& from) __xprototype;
   vector<double> vectorstring2vectordouble(const vector<string>& from); //CO20210315 - cleaned up

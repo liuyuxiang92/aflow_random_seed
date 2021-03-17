@@ -4566,36 +4566,36 @@ namespace aurostd {
     return tokens.size();
   }
 
-  // ***************************************************************************
-  // Function StringStreamConvert
-  // ***************************************************************************
-  // convert whatever into a string !
-  template<typename typeTo, typename typeFrom> typeTo StringStreamConvert(typeFrom from) {
-    std::stringstream temp;
-    temp << from;
-    typeTo to=typeTo();
-    temp >> to;
-    return to;
-  }
-
-  template<typename typeFrom> std::string StringConvert(typeFrom from) {
-    return StringStreamConvert<std::string>((typeFrom) from);
-  }
-  // to initialize the templates....
-  void _StringConvert(void) {
-    cerr << StringStreamConvert<std::string>((int) 1);
-    cerr << StringStreamConvert<std::string>((float) 1);
-    cerr << StringStreamConvert<std::string>((double) 1);
-    cerr << StringConvert<int>((int) 1);
-    cerr << StringConvert<float>((float) 1);
-    cerr << StringConvert<double>((double) 1);
-  }
+  //[CO20210315 - OBSOLETE use stream2stream()]// ***************************************************************************
+  //[CO20210315 - OBSOLETE use stream2stream()]// Function StringStreamConvert
+  //[CO20210315 - OBSOLETE use stream2stream()]// ***************************************************************************
+  //[CO20210315 - OBSOLETE use stream2stream()]// convert whatever into a string !
+  //[CO20210315 - OBSOLETE use stream2stream()]template<typename typeTo, typename typeFrom> typeTo StringStreamConvert(const typeFrom& from) {  //CO20210315 - cleaned up
+  //[CO20210315 - OBSOLETE use stream2stream()]  std::stringstream temp;
+  //[CO20210315 - OBSOLETE use stream2stream()]  temp << from;
+  //[CO20210315 - OBSOLETE use stream2stream()]  typeTo to=typeTo();
+  //[CO20210315 - OBSOLETE use stream2stream()]  temp >> to;
+  //[CO20210315 - OBSOLETE use stream2stream()]  return to;
+  //[CO20210315 - OBSOLETE use stream2stream()]}
+  //[CO20210315 - OBSOLETE use stream2stream()]
+  //[CO20210315 - OBSOLETE use stream2stream()]template<typename typeFrom> std::string StringConvert(const typeFrom& from) { //CO20210315 - cleaned up
+  //[CO20210315 - OBSOLETE use stream2stream()]  return StringStreamConvert<std::string>((typeFrom) from);
+  //[CO20210315 - OBSOLETE use stream2stream()]}
+  //[CO20210315 - OBSOLETE use stream2stream()]// to initialize the templates....
+  //[CO20210315 - OBSOLETE use stream2stream()]void _StringConvert(void) {
+  //[CO20210315 - OBSOLETE use stream2stream()]  cerr << StringStreamConvert<std::string>((int) 1);
+  //[CO20210315 - OBSOLETE use stream2stream()]  cerr << StringStreamConvert<std::string>((float) 1);
+  //[CO20210315 - OBSOLETE use stream2stream()]  cerr << StringStreamConvert<std::string>((double) 1);
+  //[CO20210315 - OBSOLETE use stream2stream()]  cerr << StringConvert<int>((int) 1);
+  //[CO20210315 - OBSOLETE use stream2stream()]  cerr << StringConvert<float>((float) 1);
+  //[CO20210315 - OBSOLETE use stream2stream()]  cerr << StringConvert<double>((double) 1);
+  //[CO20210315 - OBSOLETE use stream2stream()]}
 
   // ***************************************************************************
   // Function stream2stream
   // ***************************************************************************
   // convert whatever into a string !
-  template<typename typeTo, typename typeFrom> typeTo stream2stream(typeFrom from,int precision,char FORMAT) {
+  template<typename typeTo, typename typeFrom> typeTo stream2stream(const typeFrom& from,int precision,char FORMAT) { //CO20210315 - cleaned up
     std::stringstream temp;
     if(FORMAT==DEFAULT_STREAM){;} //default
     if(FORMAT==FIXED_STREAM){temp << std::fixed;}
@@ -4606,13 +4606,14 @@ namespace aurostd {
     temp >> to;
     return to;
   }
-  template<typename typeTo, typename typeFrom> typeTo stream2stream(typeFrom from,int precision) {
+  template<typename typeTo, typename typeFrom> typeTo stream2stream(const typeFrom& from,int precision) {  //CO20210315 - cleaned up
     return (typeTo) stream2stream<typeTo>(from,precision,DEFAULT_STREAM);
   }
-  template<typename typeTo, typename typeFrom> typeTo stream2stream(typeFrom from) {
+  template<typename typeTo, typename typeFrom> typeTo stream2stream(const typeFrom& from) { //CO20210315 - cleaned up
     return (typeTo) stream2stream<typeTo>(from,AUROSTD_DEFAULT_PRECISION,DEFAULT_STREAM);
   }
   template<typename utype> utype string2utype(const string& from) {
+    if(from.empty()){return (utype) 0;} //CO20210315 - stream2stream behavior is not defined for empty string input: https://stackoverflow.com/questions/4999650/c-how-do-i-check-if-the-cin-buffer-is-empty
     return (utype) stream2stream<utype>(from,AUROSTD_DEFAULT_PRECISION,DEFAULT_STREAM);
   }
 
@@ -4620,9 +4621,7 @@ namespace aurostd {
     vector<double> vout;for(uint i=0;i<from.size();i++) vout.push_back(aurostd::string2utype<double>(from[i]));return vout;
   }
 
-  string string2string(const string& from) {
-    return from;
-  }
+  string string2string(const string& from) {return from;}
 
   vector<int> vectorstring2vectorint(const vector<string>& from) {  //CO20210315 - cleaned up
     vector<int> vout;for(uint i=0;i<from.size();i++) vout.push_back(aurostd::string2utype<int>(from[i]));return vout;

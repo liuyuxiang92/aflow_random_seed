@@ -5371,8 +5371,9 @@ namespace KBIN {
     }
     if(nbands==0) {                                            // GET BANDS FROM INCAR
       if(LDEBUG) cerr << soliloquy << " GET NBANDS FROM INCAR" << endl;
-      string tmp=KBIN::XVASP_INCAR_GET_ENTRY(xvasp,"NBANDS",false); //do not preload_incar //CO20200624
-      if(!tmp.empty()&&aurostd::isfloat(tmp)){nbands=aurostd::string2utype<int>(tmp);}  //CO20200624
+      nbands=aurostd::substring2utype<int>(xvasp.INCAR.str(),"NBANDS=");
+      //string tmp=KBIN::XVASP_INCAR_GET_ENTRY(xvasp,"NBANDS",false); //do not preload_incar //CO20200624
+      //if(!tmp.empty()&&aurostd::isfloat(tmp)){nbands=aurostd::string2utype<int>(tmp);}  //CO20200624
       //no need to spit error, if it doesn't find NBANDS in INCAR, then use defaults (below)
     }
     if(LDEBUG) cerr << soliloquy << " nbands=" << nbands << endl;

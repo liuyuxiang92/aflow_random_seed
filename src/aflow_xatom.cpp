@@ -9269,7 +9269,7 @@ string GetLaueLabel(string& point_group) {
 // ***************************************************************************
 string GetSpaceGroupLabel(int spacegroupnumber) {
   string spacegrouplabel;
-  spacegrouplabel="#"+aurostd::StringConvert(spacegroupnumber);
+  spacegrouplabel="#"+aurostd::utype2string(spacegroupnumber);
   return spacegrouplabel;
 }
 
