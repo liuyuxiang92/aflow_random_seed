@@ -4614,6 +4614,7 @@ namespace aurostd {
   }
   template<typename utype> utype string2utype(const string& from) {
     if(from.empty()){return (utype) 0;} //CO20210315 - stream2stream behavior is not defined for empty string input: https://stackoverflow.com/questions/4999650/c-how-do-i-check-if-the-cin-buffer-is-empty
+    //[CO20210315 - doesn't work]if(!aurostd::isfloat(from)){return (utype) 0;} //CO20210315 - stream2stream undefined behavior
     return (utype) stream2stream<utype>(from,AUROSTD_DEFAULT_PRECISION,DEFAULT_STREAM);
   }
 
@@ -5101,6 +5102,10 @@ namespace aurostd {
     if(LDEBUG) cerr << XPID << "aurostd::substring2string(): END [substring=" << strsub1 << " NOT found] [CLEAN=" << CLEAN << "]" << endl;
     return "";
   }
+  
+  string substring2string(const stringstream& strstream, const string& strsub1, bool CLEAN) { //CO20210315 - cleaned up
+    return substring2string(strstream.str(),strsub1,CLEAN);
+  }
 
   //[CO20210315 - not used, not sure the purpose of strsub2]string substring2string(const string& strstream, const string& strsub1, const string& strsub2, bool CLEAN) {
   //[CO20210315 - not used, not sure the purpose of strsub2]  bool LDEBUG=(FALSE || XHOST.DEBUG);
@@ -5133,6 +5138,9 @@ namespace aurostd {
 
   template<typename utype> utype substring2utype(const string& strstream, const string& strsub1, bool CLEAN) {
     return string2utype<utype>(substring2string(strstream,strsub1,CLEAN));
+  }
+  template<typename utype> utype substring2utype(const stringstream& strstream, const string& strsub1, bool CLEAN) {
+    return substring2utype<utype>(strstream.str(),strsub1,CLEAN);
   }
   //[CO20210315 - not used, not sure the purpose of strsub2]template<typename utype> utype substring2utype(const string& strstream, const string& strsub1, const string& strsub2, bool CLEAN) {
   //[CO20210315 - not used, not sure the purpose of strsub2]  return string2utype<utype>(substring2string(strstream,strsub1,strsub2,CLEAN));
@@ -5196,12 +5204,15 @@ namespace aurostd {
   //[CO20210315 - not used, not sure the purpose of strsub2]  return vstringout.size();
   //[CO20210315 - not used, not sure the purpose of strsub2]}
 
-  template<typename utype> uint substring2utypes(const string& strstream, vector<int> &vintout, const string& strsub1, bool CLEAN) {
+  template<typename utype> uint substring2utypes(const string& strstream, vector<int> &vintout, const string& strsub1, bool CLEAN) {  //CO20210315 - cleaned up
     vintout.clear();
     vector<string> vstringout;
     aurostd::substring2strings(strstream,vstringout,strsub1,CLEAN);
     vintout=aurostd::vectorstring2vectorint(vstringout);
     return vintout.size();
+  }
+  template<typename utype> uint substring2utypes(const stringstream& strstream, vector<int> &vintout, const string& strsub1, bool CLEAN) {  //CO20210315 - cleaned up
+    return substring2utypes<utype>(strstream.str(),vintout,strsub1,CLEAN);
   }
   //[CO20210315 - not used, not sure the purpose of strsub2]template<typename utype> uint substring2utypes(const string& strstream, vector<int> &vintout, const string& strsub1, const string& strsub2, bool CLEAN) {
   //[CO20210315 - not used, not sure the purpose of strsub2]  string _strstream(strstream),_strsub1(strsub1),_strsub2(strsub2);

@@ -1221,7 +1221,7 @@ namespace KBIN {
       xvasp.aopts.flag("FLAG::XVASP_INCAR_changed",TRUE); //repetita iuvant
     } // KEVIN
     if(Krun && aurostd::substring2bool(xvasp.INCAR,"IBRION") && !aurostd::substring2bool(xvasp.INCAR,"#IBRION")) {  /*************** INCAR **************/
-      uint IBRION=aurostd::substring2utype<uint>(xvasp.INCAR.str(),"IBRION=");
+      uint IBRION=aurostd::substring2utype<uint>(xvasp.INCAR,"IBRION=");
       if(IBRION==8) {
         aus << "00000  MESSAGE REMOVE ENTRIES NPAR and NCORE because of IBRION=" << IBRION << "  - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;  //ME20191205
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -3751,6 +3751,18 @@ namespace KBIN {
 // ***************************************************************************
 // KBIN::XVASP_INCAR_PSTRESS
 namespace KBIN {
+  string INCAR_IALGO2ALGO(int ialgo){ //CO20210315
+    //https://www.vasp.at/wiki/index.php/ALGO
+    if(ialgo==38){return "Normal";}
+    else if(ialgo==48){return "Veryfast";}
+    else if(ialgo==58){return "All";}
+    else if(ialgo==53){return "Damped";}
+    else if(ialgo==90){return "Exact";}
+    else if(ialgo==4){return "Subrot";}
+    else if(ialgo==3){return "Eigenval";}
+    else if(ialgo==2){return "None";}
+    return "";
+  }
   void XVASP_INCAR_PREPARE_GENERIC(const string& command,_xvasp& xvasp,_vflags& vflags,const string& svalue,int ivalue,double dvalue,bool OPTION){
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string function="KBIN::XVASP_INCAR_PREPARE_GENERIC";
@@ -4044,8 +4056,8 @@ namespace KBIN {
       if(vflags.KBIN_VASP_FORCE_OPTION_AUTO_MAGMOM.isentry && vflags.KBIN_VASP_FORCE_OPTION_AUTO_MAGMOM.option){
         XVASP_INCAR_REMOVE_ENTRY(xvasp,"MAGMOM",operation_option,vflags.KBIN_VASP_INCAR_VERBOSE,false,false);  //CO20200624 - do not preload or rewrite incar
       }else{
-        string tmp=KBIN::XVASP_INCAR_GET_ENTRY(xvasp,"MAGMOM",false); //do not preload_incar //CO20200624
-        MAGMOM_ALREADY_SPECIFIED=(!tmp.empty());
+        string magmoms=aurostd::substring2string(xvasp.INCAR.str(),"MAGMOM=");  //CO20210315
+        MAGMOM_ALREADY_SPECIFIED=(!magmoms.empty());
       }
       //ADD LINES
       if(vflags.KBIN_VASP_INCAR_VERBOSE)  xvasp.INCAR << "# Performing " << operation_option << " [AFLOW] begin" << endl;
@@ -4869,30 +4881,6 @@ namespace KBIN {
 } // namespace KBIN
 
 // ***************************************************************************
-// KBIN::XVASP_INCAR_GET_ENTRY
-namespace KBIN {
-  string XVASP_INCAR_GET_ENTRY(_xvasp& xvasp,const string& ENTRY,bool preload_incar) {        // AFLOW_FUNCTION_IMPLEMENTATION  //CO20200624 - adding ENTRIES2IGNORE and preload_incar, preload_incar=false to keep behavior the same
-    if(preload_incar){
-      xvasp.INCAR_orig.str(std::string()); xvasp.INCAR_orig << xvasp.INCAR.str();
-      xvasp.INCAR.str(std::string()); xvasp.INCAR << aurostd::file2string(xvasp.Directory+"/INCAR");
-    }
-    vector<string> vlines,tokens;
-    aurostd::string2vectorstring(aurostd::RemoveComments(xvasp.INCAR.str()),vlines);  //remove all the garbage
-    for(uint iline=0;iline<vlines.size();iline++) {
-      const string& strline=vlines[iline];
-      if(aurostd::substring2bool(strline,ENTRY,TRUE)) {
-        aurostd::string2tokens(strline,tokens,"=");
-        if(tokens.size()<2){continue;}
-        if(aurostd::RemoveWhiteSpacesFromTheFrontAndBack(tokens[0])==ENTRY){  //found definite match: NELM vs NELMIN
-          return aurostd::RemoveWhiteSpacesFromTheFrontAndBack(tokens[1]);
-        }
-      }
-    }
-    return "";
-  }
-}
-
-// ***************************************************************************
 // KBIN::AFLOWIN_REMOVE and AFLOWIN_ADD
 namespace KBIN {
   bool AFLOWIN_REMOVE(const string& aflowin_file,const string& keyword,const string& comment){  //CO20210313
@@ -5369,11 +5357,9 @@ namespace KBIN {
       xOUTCAR OUTCAR_NBANDS(xvasp.Directory+"/OUTCAR",true); //quiet, there might be issues with halfway-written OUTCARs
       nbands=OUTCAR_NBANDS.NBANDS;
     }
-    if(nbands==0) {                                            // GET BANDS FROM INCAR
+    if(nbands==0 && aurostd::substring2bool(xvasp.INCAR,"NBANDS")) {  // GET BANDS FROM INCAR //CO20210315 - the substring2bool check makes sure we don't get nbands=0 for lack of input
       if(LDEBUG) cerr << soliloquy << " GET NBANDS FROM INCAR" << endl;
-      nbands=aurostd::substring2utype<int>(xvasp.INCAR.str(),"NBANDS=");
-      //string tmp=KBIN::XVASP_INCAR_GET_ENTRY(xvasp,"NBANDS",false); //do not preload_incar //CO20200624
-      //if(!tmp.empty()&&aurostd::isfloat(tmp)){nbands=aurostd::string2utype<int>(tmp);}  //CO20200624
+      nbands=aurostd::substring2utype<int>(xvasp.INCAR,"NBANDS=");  //CO20210315
       //no need to spit error, if it doesn't find NBANDS in INCAR, then use defaults (below)
     }
     if(LDEBUG) cerr << soliloquy << " nbands=" << nbands << endl;
@@ -5412,10 +5398,9 @@ namespace KBIN {
       xOUTCAR OUTCAR_POTIM(xvasp.Directory+"/OUTCAR",true);  //quiet, there might be issues with halfway-written OUTCARs
       potim=OUTCAR_POTIM.POTIM;
     }
-    if(potim==0) {                                            // GET BANDS FROM INCAR
+    if(potim==0 && aurostd::substring2bool(xvasp.INCAR,"POTIM=")) {  // GET BANDS FROM INCAR  //CO20210315 - the substring2bool check makes sure we don't get potim=0 for lack of input
       if(LDEBUG) cerr << soliloquy << " GET POTIM FROM INCAR" << endl;
-      string tmp=KBIN::XVASP_INCAR_GET_ENTRY(xvasp,"POTIM",false); //do not preload_incar //CO20200624
-      if(!tmp.empty()&&aurostd::isfloat(tmp)){potim=aurostd::string2utype<double>(tmp);}  //CO20200624
+      potim=aurostd::substring2utype<double>(xvasp.INCAR,"POTIM="); //CO20210315
       //no need to spit error, if it doesn't find POTIM in INCAR, then use 0.01 (below)
     }
     if(LDEBUG) cerr << soliloquy << " potim=" << potim << endl;
@@ -5455,10 +5440,9 @@ namespace KBIN {
       xOUTCAR OUTCAR_NELM(xvasp.Directory+"/OUTCAR",true); //quiet, there might be issues with halfway-written OUTCARs
       nelm=OUTCAR_NELM.NELM;
     }
-    if(nelm==0) {                                            // GET BANDS FROM INCAR
+    if(nelm==0 && aurostd::substring2bool(xvasp.INCAR,"NELM=")) {  // GET BANDS FROM INCAR  //CO20210315 - the substring2bool check makes sure we don't get nelm=0 for lack of input
       if(LDEBUG) cerr << soliloquy << " GET NELM FROM INCAR" << endl;
-      string tmp=KBIN::XVASP_INCAR_GET_ENTRY(xvasp,"NELM",false); //do not preload_incar //CO20200624
-      if(!tmp.empty()&&aurostd::isfloat(tmp)){nelm=aurostd::string2utype<int>(tmp);}  //CO20200624
+      nelm=aurostd::substring2utype<int>(xvasp.INCAR,"NELM=");  //CO20210315
     }
     if(LDEBUG) cerr << soliloquy << " nelm=" << nelm << endl;
     //[CO20200624 - no point in setting over and over again, just do in one shot]nelm=nelm*2.0;
@@ -5487,8 +5471,9 @@ namespace KBIN {
 
     if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
 
-    string ismear_current=KBIN::XVASP_INCAR_GET_ENTRY(xvasp,"ISMEAR",false);  //do not preload incar
-    if(aurostd::string2utype<int>(ismear_current)==scheme){return false;}
+    int ismear_current=AUROSTD_MAX_INT; //CO20210315
+    if(aurostd::substring2bool(xvasp.INCAR,"ISMEAR=")){ismear_current=aurostd::substring2utype<int>(xvasp.INCAR,"ISMEAR=");}  //CO20210315 - the substring2bool check makes sure we don't get ismear=0 for lack of input
+    if(ismear_current==scheme){return false;}
     
     KBIN::XVASP_INCAR_REMOVE_ENTRY(xvasp,"ISMEAR",function,VERBOSE,false,false); //CO20200624 - do not preload or rewrite incar
     string tmp=aurostd::PaddedPOST("ISMEAR="+aurostd::utype2string(scheme),_incarpad_)+" # "+function+" Performing ISMEAR scheme ";
@@ -5638,7 +5623,12 @@ namespace KBIN {
       if(submode==1){ //CO20200624 - try ALGO=NORMAL and ALGO=FAST (if not already tried)
         //START - load INCAR into xvasp, modify, then write out new INCAR
         VASP_Reread_INCAR(xvasp);  //preload incar
-        string algo_current=XVASP_INCAR_GET_ENTRY(xvasp,"ALGO",false);  //do not preload incar
+        string algo_current="NORMAL"; //vasp default: https://www.vasp.at/wiki/index.php/ALGO
+        if(aurostd::substring2bool(xvasp.INCAR,"ALGO=")){algo_current=aurostd::toupper(aurostd::substring2string(xvasp.INCAR,"ALGO="));}
+        else if(aurostd::substring2bool(xvasp.INCAR,"IALGO=")){ //aflow also prints IALGO sometimes, need to check
+          string algo_current_tmp=aurostd::toupper(KBIN::INCAR_IALGO2ALGO(aurostd::substring2utype<int>(xvasp.INCAR,"IALGO=")));
+          if(!algo_current_tmp.empty()){algo_current=algo_current_tmp;}
+        }
         if(algo_current!="NORMAL" && algo_current!="FAST"){submode++;}  //try ALGO=NORMAL then ALGO=FAST
         else{ //we only need to try ALGO=NORMAL or ALGO=FAST
           if(algo_current=="NORMAL"){vflags.KBIN_VASP_FORCE_OPTION_ALGO.xscheme="FAST";}
@@ -5811,9 +5801,9 @@ namespace KBIN {
       //START - load INCAR into xvasp, modify, then write out new INCAR
       VASP_Reread_INCAR(xvasp);  //preload incar
       double& enmax=param_double;
-      string tmp=KBIN::XVASP_INCAR_GET_ENTRY(xvasp,"ENMAX",false); //do not preload_incar //CO20200624
-      if(!tmp.empty()&&aurostd::isfloat(tmp)){enmax=aurostd::string2utype<int>(tmp);}  //CO20200624
-      else{enmax=500.0;}
+      enmax=AUROSTD_MAX_DOUBLE;
+      if(aurostd::substring2bool(xvasp.INCAR,"ENMAX=")){enmax=aurostd::substring2utype<int>(xvasp.INCAR,"ENMAX=");}  //CO20210315 - the substring2bool check makes sure we don't get enmax=0 for lack of input
+      else{enmax=500.0;}  //CO20210315
       // enmax*=0.99; // reduce 1%.... if enough
       enmax*=0.97; // reduce 3%.... if enough
       KBIN::XVASP_INCAR_REMOVE_ENTRY(xvasp,"ENMAX,LREAL",operation,vflags.KBIN_VASP_INCAR_VERBOSE,false,false); //CO20200624 - do not preload or rewrite incar

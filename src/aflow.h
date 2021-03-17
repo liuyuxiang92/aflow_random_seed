@@ -2997,6 +2997,7 @@ namespace KBIN {
   bool VASP_OSZICARUnconverged(const string& dir);
   void GetStatDiel(string& outcar, xvector<double>& eigr, xvector<double>& eigi); // CAMILO
   void GetDynaDiel(string& outcar, xvector<double>& eigr, xvector<double>& eigi); // CAMILO
+  string OUTCAR2VASPVersionString(const string& outcar);  //CO20210315
   string getVASPVersionString(const string&);  //ME20190219
   string getVASPVersionNumber(const string&);  //CO20200610
   double getVASPVersion(const string&);  //CO20200610
@@ -3061,6 +3062,7 @@ namespace KBIN {
   void XVASP_INCAR_Ivdw(_xvasp& xvasp,_vflags& vflags);
   void XVASP_INCAR_ABMIX(_xvasp& xvasp,_vflags& vflags);
   int XVASP_INCAR_GetNBANDS(_xvasp& xvasp,bool ispin);
+  string INCAR_IALGO2ALGO(int ialgo); //CO20210315
   void XVASP_INCAR_PREPARE_GENERIC(const string& command,_xvasp& xvasp,_vflags& vflags,const string& svalue,int ivalue,double dvalue,bool bvalue);
   void XVASP_INCAR_ADJUST_ICHARG(_xvasp&, _vflags&, _aflags&, int, ofstream&);  //ME20191028
   void XVASP_INCAR_SPIN_REMOVE_RELAX(_xvasp& xvasp,_aflags &aflags,_vflags& vflags,int step,ofstream &FileMESSAGE);

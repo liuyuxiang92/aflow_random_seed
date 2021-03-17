@@ -798,14 +798,17 @@ namespace aurostd {
   bool EWithinList(const vector<string>& list, const string& input, string& output); //CO20200223
   // about present substrings and taking off the value
   string substring2string(const string& strstream, const string& strsub1, bool CLEAN=false);  //CO20210315 - cleaned up
+  string substring2string(const stringstream& strstream, const string& strsub1, bool CLEAN=false);  //CO20210315 - cleaned up
   //[CO20210315 - not used, not sure the purpose of strsub2]string substring2string(const string& strstream, const string& strsub1, const string& strsub2, bool CLEAN=false); //CO20210315 - cleaned up
 
   template<typename utype> utype substring2utype(const string& strstream, const string& strsub1, bool CLEAN=false); //CO20210315 - cleaned up
+  template<typename utype> utype substring2utype(const stringstream& strstream, const string& strsub1, bool CLEAN=false); //CO20210315 - cleaned up
   //[CO20210315 - not used, not sure the purpose of strsub2]template<typename utype> utype substring2utype(const string& strstream, const string& strsub1, const string& strsub2, bool CLEAN=false);  //CO20210315 - cleaned up
 
   uint substring2strings(const string& strstream, vector<string> &vstringout, const string& strsub1, bool CLEAN=false); //CO20210315 - cleaned up
   //[CO20210315 - not used, not sure the purpose of strsub2]uint substring2strings(const string& strstream, vector<string> &vstringout, const string& strsub1, const string& strsub2, bool CLEAN=false);  //CO20210315 - cleaned up
   template<typename utype> uint substring2utypes(const string& strstream, vector<string> &vstringout, const string& strsub1, bool CLEAN=false); //CO20210315 - cleaned up
+  template<typename utype> uint substring2utypes(const stringstream& strstream, vector<string> &vstringout, const string& strsub1, bool CLEAN=false); //CO20210315 - cleaned up
   //[CO20210315 - not used, not sure the purpose of strsub2]template<typename utype> uint substring2utypes(const string& strstream, vector<string> &vstringout, const string& strsub1, const string& strsub2, bool CLEAN=false);  //CO20210315 - cleaned up
 }
 
