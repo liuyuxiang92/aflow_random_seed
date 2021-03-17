@@ -3070,12 +3070,12 @@ namespace KBIN {
   void XVASP_INCAR_LDAU_ADIABATIC(_xvasp& xvasp,int step);
   void XVASP_INCAR_LDAU_CUTOFF(_xvasp& xvasp,bool VERBOSE);
   void XVASP_INCAR_KPOINTS_Dielectric_SET(_xvasp& xvasp,_kflags &kflags,_vflags& vflags,string mode_dielectric);
-  void XVASP_INCAR_REMOVE_ENTRY(_xvasp& xvasp,const string& ENTRY,const string& COMMENT,bool VERBOSE,bool preload_incar=true,bool rewrite_incar=true);  //CO20200624 - adding ENTRIES2IGNORE, preload_incar, and rewrite_incar, preload_incar/rewrite_incar=true ensures consistency between xvasp.INCAR and ./INCAR, preload_incar WILL overwrite xvasp.INCAR
-  void XVASP_INCAR_REMOVE_ENTRY(_xvasp& xvasp,const vector<string>& ENTRIES,const string& COMMENT,bool VERBOSE,bool preload_incar=true,bool rewrite_incar=true);  //CO20200624 - adding ENTRIES2IGNORE, preload_incar, and rewrite_incar, preload_incar/rewrite_incar=true ensures consistency between xvasp.INCAR and ./INCAR, preload_incar WILL overwrite xvasp.INCAR
-  void XVASP_INCAR_REMOVE_ENTRY(_xvasp& xvasp,const string& ENTRY,const string& ENTRY2IGNORE,const string& COMMENT,bool VERBOSE,bool preload_incar=true,bool rewrite_incar=true);  //CO20200624 - adding ENTRIES2IGNORE, preload_incar, and rewrite_incar, preload_incar/rewrite_incar=true ensures consistency between xvasp.INCAR and ./INCAR, preload_incar WILL overwrite xvasp.INCAR
-  void XVASP_INCAR_REMOVE_ENTRY(_xvasp& xvasp,const string& ENTRY,const vector<string>& ENTRIES2IGNORE,const string& COMMENT,bool VERBOSE,bool preload_incar=true,bool rewrite_incar=true);  //CO20200624 - adding ENTRIES2IGNORE, preload_incar, and rewrite_incar, preload_incar/rewrite_incar=true ensures consistency between xvasp.INCAR and ./INCAR, preload_incar WILL overwrite xvasp.INCAR
-  void XVASP_INCAR_REMOVE_ENTRY(_xvasp& xvasp,const vector<string>& ENTRIES,const vector<string>& ENTRIES2IGNORE,const string& COMMENT,bool VERBOSE,bool preload_incar=true,bool rewrite_incar=true);  //CO20200624 - adding ENTRIES2IGNORE, preload_incar, and rewrite_incar, preload_incar/rewrite_incar=true ensures consistency between xvasp.INCAR and ./INCAR, preload_incar WILL overwrite xvasp.INCAR
-  string XVASP_INCAR_GET_ENTRY(_xvasp& xvasp,const string& ENTRY,bool preload_incar=true); //CO20200624 - preload_incar ensures consistency between xvasp.INCAR and ./INCAR, preload_incar WILL overwrite xvasp.INCAR
+  void XVASP_INCAR_REMOVE_ENTRY(_xvasp& xvasp,const string& ENTRY,const string& COMMENT,bool VERBOSE,bool preload_incar=false,bool rewrite_incar=false);  //CO20200624 - adding ENTRIES2IGNORE, preload_incar, and rewrite_incar, preload_incar/rewrite_incar=true ensures consistency between xvasp.INCAR and ./INCAR, preload_incar WILL overwrite xvasp.INCAR
+  void XVASP_INCAR_REMOVE_ENTRY(_xvasp& xvasp,const vector<string>& ENTRIES,const string& COMMENT,bool VERBOSE,bool preload_incar=false,bool rewrite_incar=false);  //CO20200624 - adding ENTRIES2IGNORE, preload_incar, and rewrite_incar, preload_incar/rewrite_incar=true ensures consistency between xvasp.INCAR and ./INCAR, preload_incar WILL overwrite xvasp.INCAR
+  void XVASP_INCAR_REMOVE_ENTRY(_xvasp& xvasp,const string& ENTRY,const string& ENTRY2IGNORE,const string& COMMENT,bool VERBOSE,bool preload_incar=false,bool rewrite_incar=false);  //CO20200624 - adding ENTRIES2IGNORE, preload_incar, and rewrite_incar, preload_incar/rewrite_incar=true ensures consistency between xvasp.INCAR and ./INCAR, preload_incar WILL overwrite xvasp.INCAR
+  void XVASP_INCAR_REMOVE_ENTRY(_xvasp& xvasp,const string& ENTRY,const vector<string>& ENTRIES2IGNORE,const string& COMMENT,bool VERBOSE,bool preload_incar=false,bool rewrite_incar=false);  //CO20200624 - adding ENTRIES2IGNORE, preload_incar, and rewrite_incar, preload_incar/rewrite_incar=true ensures consistency between xvasp.INCAR and ./INCAR, preload_incar WILL overwrite xvasp.INCAR
+  void XVASP_INCAR_REMOVE_ENTRY(_xvasp& xvasp,const vector<string>& ENTRIES,const vector<string>& ENTRIES2IGNORE,const string& COMMENT,bool VERBOSE,bool preload_incar=false,bool rewrite_incar=false);  //CO20200624 - adding ENTRIES2IGNORE, preload_incar, and rewrite_incar, preload_incar/rewrite_incar=true ensures consistency between xvasp.INCAR and ./INCAR, preload_incar WILL overwrite xvasp.INCAR
+  string XVASP_INCAR_GET_ENTRY(_xvasp& xvasp,const string& ENTRY,bool preload_incar=false); //CO20200624 - preload_incar ensures consistency between xvasp.INCAR and ./INCAR, preload_incar WILL overwrite xvasp.INCAR
 
   bool AFLOWIN_REMOVE(const string& aflowin_file,const string& keyword,const string& comment); //CO20210314
   bool AFLOWIN_REMOVE(const string& aflowin_file,const vector<string>& vkeywords,const string& comment); //CO20210314
@@ -3087,7 +3087,7 @@ namespace KBIN {
   void XVASP_KPOINTS_KPOINTS(_xvasp &xvasp);
   // bool XVASP_KPOINTS_EVEN(_xvasp& xvasp); TO REMOVE
   // bool XVASP_KPOINTS_ODD(_xvasp& xvasp); TO REMOVE
-  bool XVASP_KPOINTS_OPERATION(_xvasp& xvasp,string operation);
+  bool XVASP_KPOINTS_OPERATION(_xvasp& xvasp,const string& operation);
   // bool XVASP_KPOINTS_Kshift_Gamma_EVEN(_xvasp& xvasp); TO REMOVE
   // bool XVASP_KPOINTS_Kshift_Gamma_ODD(_xvasp& xvasp); TO REMOVE
   // bool XVASP_KPOINTS_Kscheme(_xvasp& xvasp,string kscheme);

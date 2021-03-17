@@ -714,20 +714,20 @@ namespace aurostd {
   template<typename typeTo, typename typeFrom> typeTo NumberStreamConvert(typeFrom from) __xprototype;
 
   // [OBSOLETE]  double string2double(const string& from) __xprototype;
-  vector<double> vectorstring2vectordouble(vector<string> from) __xprototype;
+  vector<double> vectorstring2vectordouble(const vector<string>& from); //CO20210315 - cleaned up
   // [OBSOLETE]  long double string2longdouble(const string& from) __xprototype;
   // [OBSOLETE]  int string2int(const string& from) __xprototype;
   string string2string(const string& from) __xprototype;
-  template<typename utype> utype string2utype(const string& from) __xprototype;
-  vector<int> vectorstring2vectorint(vector<string> from) __xprototype;
+  template<typename utype> utype string2utype(const string& from);  //CO20210315 - cleaned up
+  vector<int> vectorstring2vectorint(const vector<string>& from); //CO20210315 - cleaned up
   // [OBSOLETE] uint string2uint(const string& from) __xprototype;
-  vector<uint> vectorstring2vectoruint(vector<string> from) __xprototype;
+  vector<uint> vectorstring2vectoruint(const vector<string>& from); //CO20210315 - cleaned up
   // [OBSOLETE] long int string2longint(const string& from) __xprototype;
   // [OBSOLETE] float string2float(const string& from) __xprototype;
 
-  vector<float> vectorstring2vectorfloat(vector<string> from) __xprototype;
-  string vectorstring2string(const vector<string>& vstrings) __xprototype;
-  string vectorstring2string(const deque<string>& vstrings) __xprototype;
+  vector<float> vectorstring2vectorfloat(const vector<string>& from);  //CO20210315 - cleaned up
+  string vectorstring2string(const vector<string>& vstrings);
+  string vectorstring2string(const deque<string>& vstrings);
 
   // [OBSOLETE] string double2string(double from) __xprototype;
   // [OBSOLETE] string double2string(double from,int precision) __xprototype;
@@ -783,16 +783,12 @@ namespace aurostd {
   string StringSubst(string &strstring, const char &charfind, const char &charreplace);
   void StringStreamSubst(stringstream &strstring, const string &strfind, const string &strreplace);  //ME20190128 - fixed type declaration
   // about present substrings
-  bool substring2bool(const string& strstream, const string& strsub1, bool CLEAN);
-  bool substring2bool(const vector<string>& vstrstream, const string& strsub1, bool CLEAN);
-  bool substring2bool(const deque<string>& vstrstream, const string& strsub1, bool CLEAN);
-  bool substring2bool(const stringstream& strstream, const string& strsub1, bool CLEAN);
-  bool substring_present_file(const string& FileName, const string& strsub1, bool CLEAN);
-  bool substring_present_file_FAST(const string& FileName, const string& strsub1, bool CLEAN);
-  bool substring2bool(const string& strstream, const string& strsub1);
-  bool substring2bool(const vector<string>& vstrstream, const string& strsub1);
-  bool substring2bool(const deque<string>& vstrstream, const string& strsub1);
-  bool substring2bool(const stringstream& strstream, const string& strsub1);
+  bool substring2bool(const string& strstream, const string& strsub1, bool CLEAN=false);  //CO20210315 - cleaned up
+  bool substring2bool(const vector<string>& vstrstream, const string& strsub1, bool CLEAN=false); //CO20210315 - cleaned up
+  bool substring2bool(const deque<string>& vstrstream, const string& strsub1, bool CLEAN=false);  //CO20210315 - cleaned up
+  bool substring2bool(const stringstream& strstream, const string& strsub1, bool CLEAN=false);  //CO20210315 - cleaned up
+  bool substring_present_file(const string& FileName, const string& strsub1, bool CLEAN=false); //CO20210315 - cleaned up
+  bool substring_present_file_FAST(const string& FileName, const string& strsub1, bool CLEAN=false);  //CO20210315 - cleaned up
   bool WithinList(const vector<string>& list,const string& input,bool sorted=false);  //CO20181010
   bool WithinList(const vector<int>& list,int input,bool sorted=false); //CO20181010
   bool WithinList(const vector<uint>& list,uint input,bool sorted=false); //CO20181010
@@ -801,53 +797,17 @@ namespace aurostd {
   bool WithinList(const vector<uint>&, uint, int&,bool sorted=false);  //ME20190905
   bool EWithinList(const vector<string>& list,const string& input); //CO20200223
   bool EWithinList(const vector<string>& list, const string& input, string& output); //CO20200223
-  bool substring_present_file(const string& FileName, const string& strsub1) ;
-  bool substring_present_file_FAST(const string& FileName, const string& strsub1) ;
   // about present substrings and taking off the value
-  string substring2string(const string& strstream, const string& strsub1) __xprototype;
-  string substring2string(const string& strstream, const string& strsub1, bool CLEAN) __xprototype;
-  string substring2string(const string& strstream, const string& strsub1, const string& strsub2) __xprototype;
-  string substring2string(const string& strstream, const string& strsub1, const string& strsub2, bool CLEAN) __xprototype;
+  string substring2string(const string& strstream, const string& strsub1, bool CLEAN=false);  //CO20210315 - cleaned up
+  //[CO20210315 - not used, not sure the purpose of strsub2]string substring2string(const string& strstream, const string& strsub1, const string& strsub2, bool CLEAN=false); //CO20210315 - cleaned up
 
-  template<typename utype> utype substring2utype(const string& strstream, const string& strsub1) __xprototype;
-  template<typename utype> utype substring2utype(const string& strstream, const string& strsub1, bool CLEAN) __xprototype;
-  template<typename utype> utype substring2utype(const string& strstream, const string& strsub1, const string& strsub2) __xprototype;
-  template<typename utype> utype substring2utype(const string& strstream, const string& strsub1, const string& strsub2, bool CLEAN) __xprototype;
-  // [OBSOLETE] int substring2integer(const string& strstream, const string& strsub1) __xprototype;
-  // [OBSOLETE] int substring2integer(const string& strstream, const string& strsub1, bool CLEAN) __xprototype;
-  // [OBSOLETE] int substring2integer(const string& strstream, const string& strsub1, const string& strsub2) __xprototype;
-  // [OBSOLETE] int substring2integer(const string& strstream, const string& strsub1, const string& strsub2, bool CLEAN) __xprototype;
-  // [OBSOLETE] int substring2int(const string& strstream, const string& strsub1) __xprototype;
-  // [OBSOLETE] int substring2int(const string& strstream, const string& strsub1, bool CLEAN) __xprototype;
-  // [OBSOLETE] int substring2int(const string& strstream, const string& strsub1, const string& strsub2) __xprototype;
-  // [OBSOLETE] int substring2int(const string& strstream, const string& strsub1, const string& strsub2, bool CLEAN) __xprototype;
-  // [OBSOLETE] double substring2double(const string& strstream, const string& strsub1) __xprototype;
-  // [OBSOLETE] double substring2double(const string& strstream, const string& strsub1, bool CLEAN) __xprototype;
-  // [OBSOLETE] double substring2double(const string& strstream, const string& strsub1, const string& strsub2) __xprototype;
-  // [OBSOLETE] double substring2double(const string& strstream, const string& strsub1, const string& strsub2, bool CLEAN) __xprototype;
-  // about present substrings and taking off the values in vectors
+  template<typename utype> utype substring2utype(const string& strstream, const string& strsub1, bool CLEAN=false); //CO20210315 - cleaned up
+  //[CO20210315 - not used, not sure the purpose of strsub2]template<typename utype> utype substring2utype(const string& strstream, const string& strsub1, const string& strsub2, bool CLEAN=false);  //CO20210315 - cleaned up
 
-  uint substring2strings(const string& strstream, vector<string> &vstringout, const string& strsub1) __xprototype;
-  uint substring2strings(const string& strstream, vector<string> &vstringout, const string& strsub1, bool CLEAN) __xprototype;
-  uint substring2strings(const string& strstream, vector<string> &vstringout, const string& strsub1, const string& strsub2) __xprototype;
-  uint substring2strings(const string& strstream, vector<string> &vstringout, const string& strsub1, const string& strsub2, bool CLEAN) __xprototype;
-  template<typename utype> uint substring2utypes(const string& strstream, vector<string> &vstringout, const string& strsub1) __xprototype;
-  template<typename utype> uint substring2utypes(const string& strstream, vector<string> &vstringout, const string& strsub1, bool CLEAN) __xprototype;
-  template<typename utype> uint substring2utypes(const string& strstream, vector<string> &vstringout, const string& strsub1, const string& strsub2, bool CLEAN) __xprototype;
-  template<typename utype> uint substring2utypes(const string& strstream, vector<string> &vstringout, const string& strsub1, const string& strsub2) __xprototype;
-  // [OBSOLETE] uint substring2integers(const string& strstream, vector<int> &vintout, const string& strsub1) __xprototype;
-  // [OBSOLETE] uint substring2integers(const string& strstream, vector<int> &vintout, const string& strsub1, bool CLEAN) __xprototype;
-  // [OBSOLETE] uint substring2integers(const string& strstream, vector<int> &vintout, const string& strsub1, const string& strsub2) __xprototype;
-  // [OBSOLETE] uint substring2integers(const string& strstream, vector<int> &vintout, const string& strsub1, const string& strsub2, bool CLEAN) __xprototype;
-  // [OBSOLETE] uint substring2ints(const string& strstream, vector<int> &vintout, const string& strsub1) __xprototype;
-  // [OBSOLETE] uint substring2ints(const string& strstream, vector<int> &vintout, const string& strsub1, bool CLEAN) __xprototype;
-  // [OBSOLETE] uint substring2ints(const string& strstream, vector<int> &vintout, const string& strsub1, const string& strsub2) __xprototype;
-  // [OBSOLETE] uint substring2ints(const string& strstream, vector<int> &vintout, const string& strsub1, const string& strsub2, bool CLEAN) __xprototype;
-  // [OBSOLETE] uint substring2doubles(const string& strstream, vector<double> &vdoubleout, const string& strsub1) __xprototype;
-  // [OBSOLETE] uint substring2doubles(const string& strstream, vector<double> &vdoubleout, const string& strsub1, bool CLEAN) __xprototype;
-  // [OBSOLETE] uint substring2doubles(const string& strstream, vector<double> &vdoubleout, const string& strsub1, const string& strsub2) __xprototype;
-  // [OBSOLETE] uint substring2doubles(const string& strstream, vector<double> &vdoubleout, const string& strsub1, const string& strsub2, bool CLEAN) __xprototype;
-
+  uint substring2strings(const string& strstream, vector<string> &vstringout, const string& strsub1, bool CLEAN=false); //CO20210315 - cleaned up
+  //[CO20210315 - not used, not sure the purpose of strsub2]uint substring2strings(const string& strstream, vector<string> &vstringout, const string& strsub1, const string& strsub2, bool CLEAN=false);  //CO20210315 - cleaned up
+  template<typename utype> uint substring2utypes(const string& strstream, vector<string> &vstringout, const string& strsub1, bool CLEAN=false); //CO20210315 - cleaned up
+  //[CO20210315 - not used, not sure the purpose of strsub2]template<typename utype> uint substring2utypes(const string& strstream, vector<string> &vstringout, const string& strsub1, const string& strsub2, bool CLEAN=false);  //CO20210315 - cleaned up
 }
 
 // ***************************************************************************

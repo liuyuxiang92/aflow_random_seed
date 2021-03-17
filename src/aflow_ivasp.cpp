@@ -1210,14 +1210,14 @@ namespace KBIN {
       //ME20191205 - also remove NCORE
       aus << "00000  MESSAGE REMOVE ENTRIES NPAR and NCORE because of LEPSILON - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;  //ME20191205
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-      KBIN::XVASP_INCAR_REMOVE_ENTRY(xvasp,"NPAR,NCORE","LEPSILON",vflags.KBIN_VASP_INCAR_VERBOSE);  //ME20191205 //CO20210313 - preload/rewrite==true
+      KBIN::XVASP_INCAR_REMOVE_ENTRY(xvasp,"NPAR,NCORE","LEPSILON",vflags.KBIN_VASP_INCAR_VERBOSE);  //ME20191205 //CO20210313 - preload/rewrite==false
       xvasp.aopts.flag("FLAG::XVASP_INCAR_changed",TRUE); //repetita iuvant
     }
     if(Krun && aurostd::substring2bool(xvasp.INCAR,"LCALCEPS") && !aurostd::substring2bool(xvasp.INCAR,"#LCALCEPS")) {  /*************** INCAR **************/
       //ME20191205 - also remove NCORE
       aus << "00000  MESSAGE REMOVE ENTRIES NPAR and NCORE because of LCALCEPS - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;  //ME20191205
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-      KBIN::XVASP_INCAR_REMOVE_ENTRY(xvasp,"NPAR,NCORE","LCALCEPS",vflags.KBIN_VASP_INCAR_VERBOSE);  //ME20191205 //CO20210313 - preload/rewrite==true
+      KBIN::XVASP_INCAR_REMOVE_ENTRY(xvasp,"NPAR,NCORE","LCALCEPS",vflags.KBIN_VASP_INCAR_VERBOSE);  //ME20191205 //CO20210313 - preload/rewrite==false
       xvasp.aopts.flag("FLAG::XVASP_INCAR_changed",TRUE); //repetita iuvant
     } // KEVIN
     if(Krun && aurostd::substring2bool(xvasp.INCAR,"IBRION") && !aurostd::substring2bool(xvasp.INCAR,"#IBRION")) {  /*************** INCAR **************/
@@ -1225,7 +1225,7 @@ namespace KBIN {
       if(IBRION==8) {
         aus << "00000  MESSAGE REMOVE ENTRIES NPAR and NCORE because of IBRION=" << IBRION << "  - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;  //ME20191205
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-        KBIN::XVASP_INCAR_REMOVE_ENTRY(xvasp,"NPAR,NCORE","IBRION=8",vflags.KBIN_VASP_INCAR_VERBOSE);  //ME20191205 //CO20210313 - preload/rewrite==true
+        KBIN::XVASP_INCAR_REMOVE_ENTRY(xvasp,"NPAR,NCORE","IBRION=8",vflags.KBIN_VASP_INCAR_VERBOSE);  //ME20191205 //CO20210313 - preload/rewrite==false
         xvasp.aopts.flag("FLAG::XVASP_INCAR_changed",TRUE); //repetita iuvant
       }
     }
@@ -3238,8 +3238,8 @@ namespace KBIN {
     // if(vflags.KBIN_VASP_FORCE_OPTION_BADER.option) xvasp.INCAR << aurostd::PaddedPOST("ADDGRID=.TRUE.",_incarpad_) << " # Performing STATIC  (Bader ON)" << endl;
     if(vflags.KBIN_VASP_FORCE_OPTION_ELF.isentry && vflags.KBIN_VASP_FORCE_OPTION_ELF.option) xvasp.INCAR << aurostd::PaddedPOST("LELF=.TRUE.",_incarpad_) << " # Performing STATIC  (Elf ON)" << endl;
     if(vflags.KBIN_VASP_FORCE_OPTION_ELF.isentry && !vflags.KBIN_VASP_FORCE_OPTION_ELF.option) xvasp.INCAR << aurostd::PaddedPOST("LELF=.FALSE.",_incarpad_) << " # Performing STATIC  (Elf OFF)" << endl;
-    if(vflags.KBIN_VASP_FORCE_OPTION_ALGO.preserved==FALSE) xvasp.INCAR << "ALGO=Normal      # Performing STATIC" << endl;
-    xvasp.INCAR << "LORBIT=10        # Performing STATIC" << endl; //CO20180130 get spinD
+    if(vflags.KBIN_VASP_FORCE_OPTION_ALGO.preserved==FALSE) xvasp.INCAR << aurostd::PaddedPOST("ALGO=Normal",_incarpad_) << " # Performing STATIC" << endl;
+    xvasp.INCAR << aurostd::PaddedPOST("LORBIT=10",_incarpad_) << " # Performing STATIC" << endl;  //CO20180130 get spinD
     xvasp.INCAR << aurostd::PaddedPOST("NELM="+aurostd::utype2string(vflags.KBIN_VASP_FORCE_OPTION_NELM_STATIC_EQUAL.content_int),_incarpad_) << " # Performing STATIC" << endl;  //CO20200624
     if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "#removing IBRION, NSW, ISIF" << endl;
   }
@@ -5055,7 +5055,7 @@ namespace KBIN {
 }
 
 namespace KBIN {
-  bool XVASP_KPOINTS_OPERATION(_xvasp& xvasp,string operation) {
+  bool XVASP_KPOINTS_OPERATION(_xvasp& xvasp,const string& operation) {
     bool LDEBUG=(FALSE || XHOST.DEBUG); // TRUE;
     if(LDEBUG) cout << XPID << "KBIN::XVASP_KPOINTS_OPERATION  operation=" << operation << endl;
     if(LDEBUG) cout << XPID << "KBIN::XVASP_KPOINTS_OPERATION  xvasp.str.kpoints_k*=(" << xvasp.str.kpoints_k1 << "," << xvasp.str.kpoints_k2 << "," << xvasp.str.kpoints_k3 << ")" << endl;

@@ -23,7 +23,7 @@
         -- adding ISYM=-1 for magnetic systems (CO)
         -- extensive consolidation of XVASP_INCAR_PREPARE_GENERIC() (CO)
         -- added AFLOWIN_REMOVE() and AFLOWIN_ADD() (CO)
-        -- cleanup aurostd::RemoveComments() and substring2bool() (CO)
+        -- cleanup aurostd::RemoveComments(), substring2bool(), substring2string(), substring2strings() (CO)
         -- added new formatting for EXCCOR vasp error (CO)
         TODO:
         -- patch CSLOSHING/NELM
