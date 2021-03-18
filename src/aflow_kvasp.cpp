@@ -4889,57 +4889,69 @@ namespace KBIN {
       //execute2string does not work well here...
       aurostd::execute(binfile + " > /dev/null 2>&1");  //ME20200610 - no output from vasp
       if(LDEBUG){cerr << soliloquy << " ls[2]=" << endl << aurostd::execute2string("ls") << endl;}
+      if(!aurostd::FileExist("OUTCAR")){
+        //first re-try, source intel
+        aurostd::execute("/bin/bash -c \"source /opt/intel/bin/compilervars.sh intel64; "+ binfile + " > /dev/null 2>&1\"");  //ME20200610 - no output from vasp
+        if(LDEBUG){cerr << soliloquy << " ls[3]=" << endl << aurostd::execute2string("ls") << endl;}
+      }
       string vasp_version_outcar=KBIN::OUTCAR2VASPVersionString("OUTCAR");
-      if(!vasp_version_outcar.empty()){
-        chdir(pwddir.c_str());
+      chdir(pwddir.c_str());
 #ifndef _AFLOW_TEMP_PRESERVE_
-        aurostd::RemoveDirectory(tmpdir);
+      aurostd::RemoveDirectory(tmpdir);
 #endif
+      if(!vasp_version_outcar.empty()){
         return vasp_version_outcar;
       }
     }
     //CO20200610 END - run a dumb vasp to get vasp.out and grab version
 
-    // Open the binary
-    ifstream infile(fullPathBinaryName.c_str(), std::ios::in | std::ios::binary);
-    if (!infile.is_open()) return "";
+    if(0){  //CO20210315 - this works well for vasp.4.6 or lower, does NOT work for vasp.5.4.4
+      // Open the binary
+      ifstream infile(fullPathBinaryName.c_str(), std::ios::in | std::ios::binary);
+      if (!infile.is_open()) return "";
 
-    // Read bytes...
-    int bufferSize = 1024;
-    char buffer[bufferSize];
-    string versionString = "";
-    while (true) {
-      if (!infile.read(buffer, bufferSize))
-        bufferSize = infile.gcount();
+      // Read bytes...
+      int bufferSize = 1024;
+      char buffer[bufferSize];
+      string versionString = "";
+      while (true) {
+        if (!infile.read(buffer, bufferSize))
+          bufferSize = infile.gcount();
 
-      for (int i = 0; i < bufferSize; i++) {
-        if ((buffer[i] == 'v') &&
-            (buffer[i + 1] == 'a') &&
-            (buffer[i + 2] == 's') &&
-            (buffer[i + 3] == 'p') &&
-            (buffer[i + 4] == '.')) {
-          //[CO20200610 - include vasp. in string]int j = i + 5;
-          int j=i;
-          while (buffer[j] != ' ')
-            versionString.push_back(buffer[j++]);
-          break;
+        for (int i = 0; i < bufferSize; i++) {
+          if ((buffer[i] == 'v') &&
+              (buffer[i + 1] == 'a') &&
+              (buffer[i + 2] == 's') &&
+              (buffer[i + 3] == 'p') &&
+              (buffer[i + 4] == '.') &&
+              (isdigit(buffer[i + 5])) &&
+              (isdigit(buffer[i + 6]) || buffer[i + 6] == '.') &&
+              TRUE) {
+            //[CO20200610 - include 'vasp.' in string]int j = i + 5;
+            int j=i;
+            while (buffer[j] != ' ')
+              versionString.push_back(buffer[j++]);
+            break;
+          }
         }
-      }
-      if (!versionString.empty()) break;
-      if (infile.eof()) break;
+        if (!versionString.empty()) break;
+        if (infile.eof()) break;
 
-      // Shift cursor to avoid the case where "vasp." is on the boundary of two buffers...
-      infile.seekg(-20, std::ios::cur);
+        // Shift cursor to avoid the case where "vasp." is on the boundary of two buffers...
+        infile.seekg(-20, std::ios::cur);
+      }
+
+      infile.close();
+      infile.clear();
+
+      if (!versionString.empty()) return versionString;
     }
 
-    infile.close();
-    infile.clear();
-
-    return versionString;
+    return "";
   }
   string getVASPVersionNumber(const string& binfile) {  //CO20200610
-    //vasp.4.6.35
-    //vasp.5.4.4.18Apr17-6-g9f103f2a35
+    //4.6.35
+    //5.4.4
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy= XPID + "KBIN::getVASPVersionNumber():";
     string version_str=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(getVASPVersionString(binfile));
@@ -4973,16 +4985,18 @@ namespace KBIN {
     return version_str_num;
   }
   double getVASPVersion(const string& binfile) {  //CO20200610
+    //4.635
+    //5.44
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy= XPID + "KBIN::getVASPVersion():";
     string version_str=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(getVASPVersionNumber(binfile));
     if(LDEBUG){cerr << soliloquy << " version_str=\"" << version_str << "\"" << endl;}
     //the best double representation is 4.6.35->4.635, so remove all but the first '.'
     string::size_type pos1=version_str.find("."); //get first
-    string::size_type pos2=version_str.find(".",pos1);
+    string::size_type pos2=version_str.find(".",pos1+1);
     while(pos2!=string::npos){
       version_str.erase(pos2,1);
-      pos2=version_str.find(".",pos1);
+      pos2=version_str.find(".",pos1+1);
     }
     if(LDEBUG){cerr << soliloquy << " version_str(double-able)=\"" << version_str << "\"" << endl;}
     return aurostd::string2utype<double>(version_str);
