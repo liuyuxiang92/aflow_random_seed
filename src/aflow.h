@@ -2997,10 +2997,14 @@ namespace KBIN {
   bool VASP_OSZICARUnconverged(const string& dir);
   void GetStatDiel(string& outcar, xvector<double>& eigr, xvector<double>& eigi); // CAMILO
   void GetDynaDiel(string& outcar, xvector<double>& eigr, xvector<double>& eigi); // CAMILO
-  string OUTCAR2VASPVersionString(const string& outcar);  //CO20210315
-  string getVASPVersionString(const string&);  //ME20190219
-  string getVASPVersionNumber(const string&);  //CO20200610
-  double getVASPVersion(const string&);  //CO20200610
+  string OUTCAR2VASPVersion(const string& outcar);  //CO20210315
+  string OUTCAR2VASPVersionNumber(const string& outcar);  //CO20210315
+  double OUTCAR2VASPVersionDouble(const string& outcar);  //CO20210315
+  string VASPVersionString2Number(const string& vasp_version);  //CO20210315
+  double VASPVersionString2Double(const string& vasp_version);  //CO20210315
+  string getVASPVersion(const string& binfile);  //ME20190219
+  string getVASPVersionNumber(const string& binfile);  //CO20200610
+  double getVASPVersionDouble(const string& binfile);  //CO20200610
 }
 
 // ----------------------------------------------------------------------------

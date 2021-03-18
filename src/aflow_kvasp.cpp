@@ -4831,9 +4831,9 @@ namespace KBIN {
 // ***************************************************************************
 
 namespace KBIN {
-  string OUTCAR2VASPVersionString(const string& outcar){  //CO20210315
-    //vasp.4.6.35
-    //vasp.5.4.4.18Apr17-6-g9f103f2a35
+  string OUTCAR2VASPVersion(const string& outcar){  //CO20210315
+    //outcar -> vasp.4.6.35
+    //outcar -> vasp.5.4.4.18Apr17-6-g9f103f2a35
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy=XPID+"KBIN::OUTCAR2VASPVersionString():";
     if(LDEBUG){cerr << soliloquy << " outcar=" << outcar << endl;}
@@ -4856,6 +4856,69 @@ namespace KBIN {
     }
     return "";
   }
+  string OUTCAR2VASPVersionNumber(const string& outcar){  //CO20210315
+    //outcar -> 4.6.35
+    //outcar -> 5.4.4
+    return VASPVersionString2Number(OUTCAR2VASPVersion(outcar));
+  }
+  double OUTCAR2VASPVersionDouble(const string& outcar){  //CO20210315
+    //outcar -> 4.635
+    //outcar -> 5.44
+    return VASPVersionString2Double(OUTCAR2VASPVersion(outcar));
+  }
+  string VASPVersionString2Number(const string& vasp_version){  //CO20210315
+    //vasp.4.6.35 -> 4.6.35
+    //vasp.5.4.4.18Apr17-6-g9f103f2a35 -> 5.4.4
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy=XPID+"KBIN::VASPVersionString2Number():";
+    string version_str=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(vasp_version);
+    if(LDEBUG){cerr << soliloquy << " version_str=\"" << version_str << "\"" << endl;}
+    if(version_str.empty()){return "";}
+    aurostd::StringSubst(version_str,"vasp.",""); //remove 'vasp.'
+    if(LDEBUG){cerr << soliloquy << " version_str=\"" << version_str << "\"" << endl;}
+    //isfloat() does not work here: "35 3Apr08" is considered float: 35
+    vector<string> vtokens;
+    aurostd::string2tokens(version_str,vtokens,".");  //split by '.', check if pieces are all digits
+    string version_str_num="";
+    uint i=0,j=0;
+    bool all_digits=true;
+    for(i=0;i<vtokens.size();i++){
+      all_digits=true;
+      for(j=0;j<vtokens[i].size()&&all_digits;j++){
+        if(!isdigit(vtokens[i][j])){all_digits=false;}
+      }
+      if(all_digits){
+        if(version_str_num.empty()){version_str_num+=vtokens[i];}
+        else{version_str_num+="."+vtokens[i];}
+      }else{break;} //stop at 18Apr17...
+    }
+    //[CO20210315 - not good, will catch 18 (date) in vasp.5.4.4.18Apr17-6-g9f103f2a35]for(uint i=0;i<version_str.size();i++){
+    //[CO20210315 - not good, will catch 18 (date) in vasp.5.4.4.18Apr17-6-g9f103f2a35]  if(isdigit(version_str[i]) || version_str[i]=='.'){
+    //[CO20210315 - not good, will catch 18 (date) in vasp.5.4.4.18Apr17-6-g9f103f2a35]    version_str_num+=version_str[i];
+    //[CO20210315 - not good, will catch 18 (date) in vasp.5.4.4.18Apr17-6-g9f103f2a35]  }else{break;}
+    //[CO20210315 - not good, will catch 18 (date) in vasp.5.4.4.18Apr17-6-g9f103f2a35]}
+    if(LDEBUG){cerr << soliloquy << " version_str_num=\"" << version_str_num << "\"" << endl;}
+    if(version_str_num.empty()){return "";}  //repetita iuvant
+    return version_str_num;
+  }
+  double VASPVersionString2Double(const string& vasp_version){  //CO20210315
+    //vasp.4.6.35 -> 4.635
+    //vasp.5.4.4.18Apr17-6-g9f103f2a35 -> 5.44
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy=XPID+"KBIN::VASPVersionString2Number():";
+    string version_str=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(vasp_version);
+    if(LDEBUG){cerr << soliloquy << " version_str=\"" << version_str << "\"" << endl;}
+    if(version_str.empty()){return 0.0;}
+    //the best double representation is 4.6.35->4.635, so remove all but the first '.'
+    string::size_type pos1=version_str.find("."); //get first
+    string::size_type pos2=version_str.find(".",pos1+1);
+    while(pos2!=string::npos){
+      version_str.erase(pos2,1);
+      pos2=version_str.find(".",pos1+1);
+    }
+    if(LDEBUG){cerr << soliloquy << " version_str(double-able)=\"" << version_str << "\"" << endl;}
+    return aurostd::string2utype<double>(version_str);
+  }
   //ME20190219 - getVASPVersionString
   // Retrives the VASP version of a binary file.
   // Taken from old APL/apl_hroutines
@@ -4864,9 +4927,9 @@ namespace KBIN {
   // when aflow.in files are moved between machines and the VASP binary files
   // have different names. This is not desirable when VASP does not need to be
   // run (e.g. for post-processing).
-  string getVASPVersionString(const string& binfile) {
-    //vasp.4.6.35
-    //vasp.5.4.4.18Apr17-6-g9f103f2a35
+  string getVASPVersion(const string& binfile) {  //CO20210315
+    // /home/bin/vasp_std -> vasp.4.6.35
+    // /home/bin/vasp_std -> vasp.5.4.4.18Apr17-6-g9f103f2a35
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy=XPID+"KBIN::getVASPVersionString():";
     if(LDEBUG){cerr << soliloquy << " binfile=" << binfile << endl;}
@@ -4894,7 +4957,7 @@ namespace KBIN {
         aurostd::execute("/bin/bash -c \"source /opt/intel/bin/compilervars.sh intel64; "+ binfile + " > /dev/null 2>&1\"");  //ME20200610 - no output from vasp
         if(LDEBUG){cerr << soliloquy << " ls[3]=" << endl << aurostd::execute2string("ls") << endl;}
       }
-      string vasp_version_outcar=KBIN::OUTCAR2VASPVersionString("OUTCAR");
+      string vasp_version_outcar=KBIN::OUTCAR2VASPVersion("OUTCAR");
       chdir(pwddir.c_str());
 #ifndef _AFLOW_TEMP_PRESERVE_
       aurostd::RemoveDirectory(tmpdir);
@@ -4950,56 +5013,14 @@ namespace KBIN {
     return "";
   }
   string getVASPVersionNumber(const string& binfile) {  //CO20200610
-    //4.6.35
-    //5.4.4
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy= XPID + "KBIN::getVASPVersionNumber():";
-    string version_str=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(getVASPVersionString(binfile));
-    if(LDEBUG){cerr << soliloquy << " version_str=\"" << version_str << "\"" << endl;}
-    if(version_str.empty()){return "";}
-    aurostd::StringSubst(version_str,"vasp.",""); //remove 'vasp.'
-    if(LDEBUG){cerr << soliloquy << " version_str=\"" << version_str << "\"" << endl;}
-    //isfloat() does not work here: "35 3Apr08" is considered float: 35
-    vector<string> vtokens;
-    aurostd::string2tokens(version_str,vtokens,".");  //split by '.', check if pieces are all digits
-    string version_str_num="";
-    uint i=0,j=0;
-    bool all_digits=true;
-    for(i=0;i<vtokens.size();i++){
-      all_digits=true;
-      for(j=0;j<vtokens[i].size()&&all_digits;j++){
-        if(!isdigit(vtokens[i][j])){all_digits=false;}
-      }
-      if(all_digits){
-        if(version_str_num.empty()){version_str_num+=vtokens[i];}
-        else{version_str_num+="."+vtokens[i];}
-      }else{break;} //stop at 18Apr17...
-    }
-    //[CO20210315 - not good, will catch 18 (date) in vasp.5.4.4.18Apr17-6-g9f103f2a35]for(uint i=0;i<version_str.size();i++){
-    //[CO20210315 - not good, will catch 18 (date) in vasp.5.4.4.18Apr17-6-g9f103f2a35]  if(isdigit(version_str[i]) || version_str[i]=='.'){
-    //[CO20210315 - not good, will catch 18 (date) in vasp.5.4.4.18Apr17-6-g9f103f2a35]    version_str_num+=version_str[i];
-    //[CO20210315 - not good, will catch 18 (date) in vasp.5.4.4.18Apr17-6-g9f103f2a35]  }else{break;}
-    //[CO20210315 - not good, will catch 18 (date) in vasp.5.4.4.18Apr17-6-g9f103f2a35]}
-    if(LDEBUG){cerr << soliloquy << " version_str_num=\"" << version_str_num << "\"" << endl;}
-    if(version_str_num.empty()){return "";}  //repetita iuvant
-    return version_str_num;
+    // /home/bin/vasp_std -> 4.6.35
+    // /home/bin/vasp_std -> 5.4.4
+    return VASPVersionString2Number(getVASPVersion(binfile));
   }
-  double getVASPVersion(const string& binfile) {  //CO20200610
-    //4.635
-    //5.44
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy= XPID + "KBIN::getVASPVersion():";
-    string version_str=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(getVASPVersionNumber(binfile));
-    if(LDEBUG){cerr << soliloquy << " version_str=\"" << version_str << "\"" << endl;}
-    //the best double representation is 4.6.35->4.635, so remove all but the first '.'
-    string::size_type pos1=version_str.find("."); //get first
-    string::size_type pos2=version_str.find(".",pos1+1);
-    while(pos2!=string::npos){
-      version_str.erase(pos2,1);
-      pos2=version_str.find(".",pos1+1);
-    }
-    if(LDEBUG){cerr << soliloquy << " version_str(double-able)=\"" << version_str << "\"" << endl;}
-    return aurostd::string2utype<double>(version_str);
+  double getVASPVersionDouble(const string& binfile) {  //CO20200610
+    // /home/bin/vasp_std -> 4.635
+    // /home/bin/vasp_std -> 5.44
+    return VASPVersionString2Double(getVASPVersion(binfile));
   }
 }  // namespace KBIN
 

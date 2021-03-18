@@ -726,9 +726,9 @@ int main(int _argc,char **_argv) {
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_FoldAtomsInCell|--FoldAtomsInCell_test")) {return (FoldAtomsInCellTest(cout)?0:1);}  //DX20210129
     if(!Arun && aurostd::args2flag(argv,cmds,"--test")) {
 
-      cerr << "string=" << KBIN::getVASPVersionString("/home/bin/vasp_std") << endl;
+      cerr << "string=" << KBIN::getVASPVersion("/home/bin/vasp_std") << endl;
       cerr << "number=" << KBIN::getVASPVersionNumber("/home/bin/vasp_std") << endl;
-      cerr << "double=" << KBIN::getVASPVersion("/home/bin/vasp_std") << endl;
+      cerr << "double=" << KBIN::getVASPVersionDouble("/home/bin/vasp_std") << endl;
       exit(0);
 
       if(XHOST.vext.size()!=XHOST.vcat.size()) {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"XHOST.vext.size()!=XHOST.vcat.size(), aborting.",_RUNTIME_ERROR_);}

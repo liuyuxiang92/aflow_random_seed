@@ -655,11 +655,15 @@ namespace KBIN {
         try {
           // Check the version of VASP binary
           message << "Checking VASP version for linear response calculations.";
-          string vaspVersion;
-          vaspVersion = getVASPVersionString( (kflags.KBIN_MPI ? kflags.KBIN_MPI_BIN : kflags.KBIN_BIN ) );
-          if (!vaspVersion.empty()) {
-            message << "[" << vaspVersion[0] << "].";
-            if ((vaspVersion[0] - '0') < 5) { //cool way of getting ascii value:  https://stackoverflow.com/questions/36310181/char-subtraction-in-c
+          //[CO20210315 - new style]string vaspVersion;
+          //[CO20210315 - new style]vaspVersion = getVASPVersionNumber( (kflags.KBIN_MPI ? kflags.KBIN_MPI_BIN : kflags.KBIN_BIN ) );
+          double vaspVersion=KBIN::getVASPVersionDouble( (kflags.KBIN_MPI ? kflags.KBIN_MPI_BIN : kflags.KBIN_BIN ) );  //CO20210315
+          //[CO20210315 - new style]if (!vaspVersion.empty())
+          if (vaspVersion!=0.0){  //CO20210315
+            //[CO20210315 - new style]message << "[" << vaspVersion[0] << "]."; //CO20210315
+            //[CO20210315 - new style]if ((vaspVersion[0] - '0') < 5) //cool way of getting ascii value:  https://stackoverflow.com/questions/36310181/char-subtraction-in-c
+            message << "[" << vaspVersion << "]."; //CO20210315
+            if (vaspVersion < 5) {  //CO20210315
               pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, FileMESSAGE, oss);
               //ME20190107 - fix both serial and MPI binaries
               kflags.KBIN_SERIAL_BIN = DEFAULT_VASP5_BIN;
