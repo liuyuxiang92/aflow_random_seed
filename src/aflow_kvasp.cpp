@@ -2452,11 +2452,11 @@ namespace KBIN {
                   // have static
                   if(vflags.KBIN_VASP_RUN.flag("DIELECTRIC_STATIC")) {  // check for DIELECTRIC STATIC
                     // check VASP version
-                    double dversion=0.0;
-                    string sversion=aurostd::execute2string("cat "+xvasp.Directory+"/OUTCAR.static | grep vasp | head -1 | sed \"s/ /\\n/g\" | grep vasp | sed \"s/vasp\\.//g\"");  //LOOK INTO USING getVASPVersionString()
-                    vector<string> tokens; aurostd::string2tokensAdd(sversion,tokens,".");
-                    if(tokens.size()>0) dversion+=aurostd::string2utype<double>(tokens.at(0));
-                    if(tokens.size()>1) dversion+=aurostd::string2utype<double>(tokens.at(1))/10.0;
+                    string sversion=KBIN::OUTCAR2VASPVersionNumber(xvasp.Directory+"/OUTCAR.static"); //CO20210315
+                    double dversion=KBIN::VASPVersionString2Double(sversion); //CO20210315
+                    //[CO20210315 - not needed]vector<string> tokens; aurostd::string2tokensAdd(sversion,tokens,".");
+                    //[CO20210315 - not needed]if(tokens.size()>0) dversion+=aurostd::string2utype<double>(tokens.at(0));
+                    //[CO20210315 - not needed]if(tokens.size()>1) dversion+=aurostd::string2utype<double>(tokens.at(1))/10.0;
                     aus << "00000  MESSAGE Found VASP version=" << sversion << "  " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
                     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
                     if(dversion<5.2) { // cant do it
@@ -3389,13 +3389,10 @@ namespace KBIN {
       if(LDEBUG) cerr << soliloquy << " " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << "  [3b]  maxrun=" << maxrun<< endl;
 
       // check VASP version
-      double DVERSION=0.0;
-      xwarning.push_attached("SVERSION",aurostd::execute2string("cat "+xvasp.Directory+"/OUTCAR | grep vasp | head -1 | sed \"s/ /\\n/g\" | grep vasp | sed \"s/vasp\\.//g\""));  //LOOK INTO USING getVASPVersionString()
-      vector<string> vtokens; aurostd::string2tokensAdd(xwarning.getattachedscheme("SVERSION"),vtokens,".");
-      if(vtokens.size()>0) DVERSION+=aurostd::string2utype<double>(vtokens.at(0));
-      if(vtokens.size()>1) DVERSION+=aurostd::string2utype<double>(vtokens.at(1))/10.0;
-      xwarning.push_attached("DVERSION",aurostd::utype2string((double) DVERSION));
-
+      string SVERSION=KBIN::OUTCAR2VASPVersionNumber(xvasp.Directory+"/OUTCAR"); //CO20210315
+      double DVERSION=KBIN::VASPVersionString2Double(SVERSION); //CO20210315
+      xwarning.push_attached("SVERSION",SVERSION);  //CO20210315
+      xwarning.push_attached("DVERSION",aurostd::utype2string(DVERSION)); //CO20210315
 
       if(nrun<maxrun) {
         if(LDEBUG) cerr << soliloquy << " " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << "  checking warnings" << endl;
