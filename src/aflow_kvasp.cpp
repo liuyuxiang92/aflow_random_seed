@@ -3476,45 +3476,23 @@ namespace KBIN {
               aurostd::substring_present_file_FAST(xvasp.Directory+"/INCAR","LEPSILON") ||
               aurostd::substring_present_file_FAST(xvasp.Directory+"/INCAR","LOPTICS"))) xwarning.flag("NPARN",FALSE);  // dont touch NPARN if LRPA or LEPSILON or LOPTICS necessary
         
-        //WARNINGS STOP
-
         if(LDEBUG) cerr << soliloquy << " " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << "  [4]" << endl;
 
-        int NBANDS_OUTCAR=0;
-        // [OBSOLETE] vector<string> nbands_tokens;
-        // [OBSOLETE] aurostd::string2tokensAdd(aurostd::execute2string("cat "+xvasp.Directory+"/OUTCAR | grep NBANDS="),nbands_tokens,"=");
-        // [OBSOLETE] for(uint i=0;i<nbands_tokens.size();i++) if(i<nbands_tokens.size()-1 && aurostd::substring2bool(nbands_tokens.at(i),"NBANDS")) NBANDS_OUTCAR=aurostd::string2utype<int>(nbands_tokens.at(i+1));
-        //	XHOST.DEBUG=TRUE;
-        xOUTCAR OUTCAR_NBANDS(xvasp.Directory+"/OUTCAR");
-        NBANDS_OUTCAR=OUTCAR_NBANDS.NBANDS;
+        xOUTCAR xout(xvasp.Directory+"/OUTCAR",true);  //quiet, there might be issues with halfway-written OUTCARs
+        int NBANDS=xout.NBANDS;
+        int NELM=xout.NELM;
+        
+        aus << "MMMMM  MESSAGE NBANDS=" << NBANDS << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);aus.str(std::string());aus.clear();
+        aus << "MMMMM  MESSAGE NELM=" << NELM << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);aus.str(std::string());aus.clear();
 
-        if(xwarning.flag("NBANDS") && NBANDS_OUTCAR>1000) xwarning.flag("NBANDS",FALSE); // for safety
-        if(xwarning.flag("NBANDS") && aurostd::substring_present_file_FAST(xvasp.Directory+"/INCAR","DIELECTRIC_STATIC") && NBANDS_OUTCAR>1000) xwarning.flag("NBANDS",FALSE); // for safety
-        if(xwarning.flag("NBANDS") && aurostd::substring_present_file_FAST(xvasp.Directory+"/INCAR","DIELECTRIC_DYNAMIC") && NBANDS_OUTCAR>1000) xwarning.flag("NBANDS",FALSE); // for safety
-        if(xwarning.flag("NBANDS") && aurostd::substring_present_file_FAST(xvasp.Directory+"/INCAR","DSCF") && NBANDS_OUTCAR>1000) xwarning.flag("NBANDS",FALSE); // for safety
+        //[CO20210315 - APL can go way above]if(xwarning.flag("NBANDS") && NBANDS>1000) xwarning.flag("NBANDS",FALSE); // for safety
+        if(xwarning.flag("NBANDS") && aurostd::substring_present_file_FAST(xvasp.Directory+"/INCAR","DIELECTRIC_STATIC") && NBANDS>1000) xwarning.flag("NBANDS",FALSE); // for safety
+        if(xwarning.flag("NBANDS") && aurostd::substring_present_file_FAST(xvasp.Directory+"/INCAR","DIELECTRIC_DYNAMIC") && NBANDS>1000) xwarning.flag("NBANDS",FALSE); // for safety
+        if(xwarning.flag("NBANDS") && aurostd::substring_present_file_FAST(xvasp.Directory+"/INCAR","DSCF") && NBANDS>1000) xwarning.flag("NBANDS",FALSE); // for safety
         
-        // code to get xwarning.flag("NELM")
-        //if(1) {
-        stringstream command,aus;
+        int NSTEPS=0;
+        stringstream command;
         string tmp="";
-        int NELM=0,NSTEPS=0;
-        
-        command.str(std::string());command.clear();
-        //[CO20200624 - OBSOLETE]command << "cat " << xvasp.Directory << "/OUTCAR | grep NELM | sed \"s/;/\\n/g\" | head -1 | sed \"s/ //g\" | sed \"s/NELM=//g\"" << endl;
-        command << "cat " << xvasp.Directory << "/OUTCAR | grep NELM | head -n 1 | cut -d ';' -f1 | cut -d '=' -f2 | awk '{print $1}'" << endl;
-        tmp=aurostd::execute2string(command);
-        
-        if(0){
-          aus.str(std::string());aus.clear();
-          aus << "MMMMM  MESSAGE NELM GREP RESPONSE=\"" << tmp << "\"" << endl;
-          aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);aus.str(std::string());aus.clear();
-        }
-        
-        if(!tmp.empty() && aurostd::isfloat(tmp)){NELM=aurostd::string2utype<int>(tmp);}
-        //[CO20200624 - OBSOLETE]aus >> NELM;
-        aus << "MMMMM  MESSAGE NELM=" << NELM << endl;
-        aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);aus.str(std::string());aus.clear();
-        
         command.str(std::string());command.clear();
         command << "cat " << xvasp.Directory << "/OSZICAR | grep ':' | tail -n 1 | cut -d ':' -f2 | awk '{print $1}'" << endl;
         tmp=aurostd::execute2string(command);
@@ -3534,6 +3512,7 @@ namespace KBIN {
         //[CO20200624 - OBSOLETE]cerr << "NELM=" << NELM << "  " << "NSTEPS=" << NSTEPS << "  " << "xwarning.flag(\"NELM\")=" << xwarning.flag("NELM") << endl;
         //}
 
+        //WARNINGS STOP
 
         if(1) {
           bool wdebug=FALSE;//TRUE;
@@ -3575,7 +3554,6 @@ namespace KBIN {
           if(wdebug || xwarning.flag("SGRCON")) aus << "MMMMM  MESSAGE xwarning.flag(\"SGRCON\")=" << xwarning.flag("SGRCON") << endl;
           if(wdebug || xwarning.flag("SYMPREC")) aus << "MMMMM  MESSAGE xwarning.flag(\"SYMPREC\")=" << xwarning.flag("SYMPREC") << endl;
           if(wdebug || xwarning.flag("ZPOTRF")) aus << "MMMMM  MESSAGE xwarning.flag(\"ZPOTRF\")=" << xwarning.flag("ZPOTRF") << endl;
-          if(wdebug) aus << "MMMMM  MESSAGE NBANDS_OUTCAR=" << NBANDS_OUTCAR << endl;
           aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
         }
 
@@ -4834,19 +4812,18 @@ namespace KBIN {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy=XPID+"KBIN::OUTCAR2VASPVersionString():";
     if(LDEBUG){cerr << soliloquy << " outcar=" << outcar << endl;}
-    if(aurostd::FileExist(outcar)){
-      vector<string> vlines;
-      aurostd::file2vectorstring(outcar,vlines);
-      for(uint iline=0;iline<vlines.size();iline++){
-        if(LDEBUG){cerr << soliloquy << " vlines[iline]=\"" << vlines[iline] << "\"" << endl;}
-        if(vlines[iline].find("vasp.")!=string::npos){
-          if(LDEBUG){cerr << soliloquy << " FOUND 'vasp.' line" << endl;}
-          vector<string> tokens;
-          aurostd::string2tokens(vlines[iline],tokens," ");
-          for(uint i=0;i<tokens.size();i++){
-            if(tokens[i].find("vasp.")!=string::npos){
-              return tokens[i];
-            }
+    if(!aurostd::FileExist(outcar)){return "";}
+    vector<string> vlines;
+    aurostd::file2vectorstring(outcar,vlines);
+    vector<string> tokens;
+    for(uint iline=0;iline<vlines.size();iline++){
+      if(LDEBUG){cerr << soliloquy << " vlines[iline]=\"" << vlines[iline] << "\"" << endl;}
+      if(vlines[iline].find("vasp.")!=string::npos){
+        if(LDEBUG){cerr << soliloquy << " FOUND 'vasp.' line" << endl;}
+        aurostd::string2tokens(vlines[iline],tokens," ");
+        for(uint i=0;i<tokens.size();i++){
+          if(tokens[i].find("vasp.")!=string::npos){
+            return tokens[i];
           }
         }
       }
@@ -4951,21 +4928,21 @@ namespace KBIN {
       if(LDEBUG){cerr << soliloquy << " ls[2]=" << endl << aurostd::execute2string("ls") << endl;}
       if(!aurostd::FileExist("OUTCAR")){
         //first re-try, source intel
-        aurostd::execute("/bin/bash -c \"source /opt/intel/bin/compilervars.sh intel64; "+ binfile + " > /dev/null 2>&1\"");  //ME20200610 - no output from vasp
-        if(LDEBUG){cerr << soliloquy << " ls[3]=" << endl << aurostd::execute2string("ls") << endl;}
+        if(aurostd::FileExist("/bin/bash") && aurostd::FileExist("/opt/intel/bin/compilervars.sh")){
+          aurostd::execute("/bin/bash -c \"source /opt/intel/bin/compilervars.sh intel64; "+ binfile + " > /dev/null 2>&1\"");  //ME20200610 - no output from vasp  //CO20210315 - source only works in bash
+          if(LDEBUG){cerr << soliloquy << " ls[3]=" << endl << aurostd::execute2string("ls") << endl;}
+        }
       }
       string vasp_version_outcar=KBIN::OUTCAR2VASPVersion("OUTCAR");
       chdir(pwddir.c_str());
 #ifndef _AFLOW_TEMP_PRESERVE_
       aurostd::RemoveDirectory(tmpdir);
 #endif
-      if(!vasp_version_outcar.empty()){
-        return vasp_version_outcar;
-      }
+      if(!vasp_version_outcar.empty()){return vasp_version_outcar;}
     }
     //CO20200610 END - run a dumb vasp to get vasp.out and grab version
 
-    if(0){  //CO20210315 - this works well for vasp.4.6 or lower, does NOT work for vasp.5.4.4
+    if(0){  //CO20210315 - this works well for vasp.4.6 or lower, does NOT work for vasp.5.4.4, true version info gets mixed up with notes about other versions
       // Open the binary
       ifstream infile(fullPathBinaryName.c_str(), std::ios::in | std::ios::binary);
       if (!infile.is_open()) return "";
