@@ -3440,7 +3440,7 @@ namespace KBIN {
         xwarning.flag("LRF_COMMUTATOR",aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","LRF_COMMUTATOR internal error: the vector")); // GET ALL TIMES
         xwarning.flag("EXCCOR",
             aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","ERROR FEXCF: supplied exchange-correlation table") || //CO20210315
-            aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","Error FEXCP: supplied Exchange-correletion table") || //CO20210315 - looks like the formatting changed a bit between versions
+            aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","ERROR FEXCP: supplied Exchange-correletion table") || //CO20210315 - looks like the formatting changed a bit between versions
             FALSE); // look for problem at the correlation  //CO20210315
         xwarning.flag("NATOMS",aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","The distance between some ions is very small")); // look for problem for distance
         xwarning.flag("MEMORY",aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","AFLOW ERROR: AFLOW_MEMORY=")); // look for problem for distance
