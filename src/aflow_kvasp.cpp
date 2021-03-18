@@ -4838,7 +4838,7 @@ namespace KBIN {
   double OUTCAR2VASPVersionDouble(const string& outcar){  //CO20210315
     //outcar -> 4.635
     //outcar -> 5.44
-    return VASPVersionString2Double(OUTCAR2VASPVersion(outcar));
+    return VASPVersionString2Double(OUTCAR2VASPVersionNumber(outcar));
   }
   string VASPVersionString2Number(const string& vasp_version){  //CO20210315
     //vasp.4.6.35 -> 4.6.35
@@ -4994,7 +4994,7 @@ namespace KBIN {
   double getVASPVersionDouble(const string& binfile) {  //CO20200610
     // /home/bin/vasp_std -> 4.635
     // /home/bin/vasp_std -> 5.44
-    return VASPVersionString2Double(getVASPVersion(binfile));
+    return VASPVersionString2Double(getVASPVersionNumber(binfile));
   }
 }  // namespace KBIN
 
