@@ -1568,6 +1568,18 @@ namespace aurostd {
   }
 
   // ***************************************************************************
+  // Function ProcessRunning
+  // ***************************************************************************
+  //CO20210315
+  bool ProcessRunning(const string& process){ //CO20210315
+    string output=aurostd::execute2string("pgrep "+process+" 2> /dev/null");
+    aurostd::StringSubst(output,"\n","");
+    output=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(output);
+    if(output.length()>0) return true;
+    return false;
+  }
+
+  // ***************************************************************************
   // Function DirectoryMake
   // ***************************************************************************
   // Stefano Curtarolo
@@ -2298,9 +2310,10 @@ namespace aurostd {
   // tells you if the command is available
   bool IsCommandAvailable(const string& command, string& position) {
     // position=aurostd::execute2string("which "+command+" 2>&1 2> /dev/null");
-    position=aurostd::execute2string("bash -c \"which "+command+" 2>&1 2> /dev/null\"");
+    position=aurostd::execute2string("bash -c \"which "+command+" 2> /dev/null\"");  //CO20210315 - put stderr to stdout and stderr to /dev/null ?? //2>&1
     // cerr << position.length() << endl;
     aurostd::StringSubst(position,"\n","");
+    position=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(position); //CO20210315 - remove white spaces
     if(position.length()>0) return TRUE;
     if(aurostd::FileExist("./"+command)) {position="./"+command;return TRUE;}
     if(aurostd::FileExist("/bin/"+command)) {position="/bin/"+command;return TRUE;}

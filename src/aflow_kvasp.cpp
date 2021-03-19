@@ -3407,10 +3407,20 @@ namespace KBIN {
         string content_incar=aurostd::RemoveComments(xvasp.INCAR.str());  //remove comments
         content_incar=aurostd::RemoveWhiteSpaces(content_incar);  //remove whitespaces
         content_incar=aurostd::toupper(content_incar);  //put toupper to eliminate case-sensitivity
+
+        //determine if vasp is still running
+        bool vasp_finished_running=false; //CO20210315 - look at wording, very careful, this bool implies vasp WAS running, and now is not
+        if(kflags.KBIN_QSUB==FALSE){
+          string& vasp_bin=kflags.KBIN_MPI_BIN;
+          if(kflags.KBIN_MPI==FALSE){vasp_bin=kflags.KBIN_BIN;}
+          vasp_finished_running=(aurostd::ProcessRunning(vasp_bin)==false);
+        }
+
         
         //WARNINGS START
         if(LDEBUG) cerr << soliloquy << " " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << "  checking warnings" << endl;
         xmessage.flag("REACHED_ACCURACY",(content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("reached required accuracy")))!=string::npos));
+        xwarning.flag("OUTCAR_INCOMPLETE",!KBIN::VASP_RunFinished(xvasp,aflags,FileMESSAGE,false));  //CO20201111
 
         //VASP's internal symmetry routines START
         //CO20200624 - these are all related to VASP's internal symmetry routines
@@ -3428,7 +3438,6 @@ namespace KBIN {
               (content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("NKZ>IKPTD")))!=string::npos) || 
               FALSE));
         //VASP's internal symmetry routines END
-        xwarning.flag("OUTCAR_INCOMPLETE",!KBIN::VASP_RunFinished(xvasp,aflags,FileMESSAGE,false));  //CO20201111
         xwarning.flag("BRMIX",(content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("BRMIX: very serious problems")))!=string::npos));
         xwarning.flag("DAV",(!xmessage.flag("REACHED_ACCURACY") &&
               (content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("WARNING: Sub-Space-Matrix is not hermitian in DAV")))!=string::npos)) );
@@ -4645,11 +4654,7 @@ namespace KBIN {
     if(!tmp.empty() && aurostd::isfloat(tmp)){NSTEPS=aurostd::string2utype<int>(tmp);}
     return NSTEPS;
   }
-  bool VASP_OSZICARUnconverged(const string& dir) {
-    //we only care about the last electronic SC steps
-    int NELM=KBIN::VASP_getNELM(dir);
-    int NSTEPS=KBIN::VASP_getNSTEPS(dir);
-    if(NELM!=0 && NSTEPS!=0 && NSTEPS>=NELM){return true;}
+  bool VASP_OSZICARUnconverging(const string& dir) {
     //[CO20200624 - OBSOLETE]uint ielectrons=0,issues=0,cutoff=3;
     //[CO20200624 - OBSOLETE]vector<string> vlines,vrelax,tokens;
     //[CO20200624 - OBSOLETE]aurostd::file2vectorstring(dir+"/OSZICAR",vlines);
@@ -4664,6 +4669,12 @@ namespace KBIN {
     //[CO20200624 - OBSOLETE]  if(ielectrons==60 || ielectrons==120) issues++;
     //[CO20200624 - OBSOLETE]}
     //[CO20200624 - OBSOLETE]if(issues==cutoff) return TRUE;
+  }
+  bool VASP_OSZICARUnconverged(const string& dir) {
+    //we only care about the last electronic SC steps
+    int NELM=KBIN::VASP_getNELM(dir);
+    int NSTEPS=KBIN::VASP_getNSTEPS(dir);
+    if(NELM!=0 && NSTEPS!=0 && NSTEPS>=NELM){return true;}
     return FALSE;
   }
 } // namespace KBIN

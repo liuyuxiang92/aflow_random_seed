@@ -726,6 +726,10 @@ int main(int _argc,char **_argv) {
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_FoldAtomsInCell|--FoldAtomsInCell_test")) {return (FoldAtomsInCellTest(cout)?0:1);}  //DX20210129
     if(!Arun && aurostd::args2flag(argv,cmds,"--test")) {
 
+      cerr << "process(aflow)=" << aurostd::ProcessRunning("aflow") << endl;
+      cerr << "process(vasp)=" << aurostd::ProcessRunning("vasp") << endl;
+      exit(0);
+
       cerr << "string=" << KBIN::getVASPVersion("/home/bin/vasp_std") << endl;
       cerr << "number=" << KBIN::getVASPVersionNumber("/home/bin/vasp_std") << endl;
       cerr << "double=" << KBIN::getVASPVersionDouble("/home/bin/vasp_std") << endl;

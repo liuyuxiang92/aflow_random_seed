@@ -1068,15 +1068,17 @@ namespace init {
   uint InitSchema(bool INIT_VERBOSE);
 } // namespace init
 
-uint AFLOW_getTEMP(vector<string> argv);
-uint AFLOW_monitor(vector<string> argv);
-double AFLOW_checkMEMORY(string="",double=102.0);
+uint AFLOW_getTEMP(const vector<string>& argv);
+uint AFLOW_monitor(const vector<string>& argv);
+double AFLOW_checkMEMORY(const string& progname="",double=102.0);
 bool CheckMaterialServer(const string& message);  //CO20200624
 bool CheckMaterialServer(void);
 string aflow_get_time_string(void);
 string aflow_convert_time_ctime2aurostd(const string& time_LOCK); //CO20200624
 string aflow_get_time_string_short(void);
 // [OBSOLETE] string strPID(void);
+
+void AFLOW_monitor_VASP(uint sleep_seconds=60);  //CO20210315
 
 string Message(const string& list2print="");  //CO20200713
 string Message(const string& list2print,const string& filename);  //CO20200713

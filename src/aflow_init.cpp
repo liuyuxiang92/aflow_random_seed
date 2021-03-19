@@ -603,6 +603,7 @@ namespace init {
     XHOST.vflag_control.flag("MULTI=GZ2XZ",aurostd::args2flag(argv,cmds,"--multi=gz2xz"));
     XHOST.vflag_control.flag("MULTI=ZIP",aurostd::args2flag(argv,cmds,"--multi=zip"));
     XHOST.vflag_control.flag("MONITOR",aurostd::args2flag(argv,cmds,"--monitor"));
+    XHOST.vflag_control.flag("KILL_ALL_VASP",aurostd::args2flag(argv,cmds,"--kill_all_vasp|--killallvasp"));  //CO20210315 - issue non-specific killall vasp command
     XHOST.vflag_control.flag("GETTEMP",aurostd::args2flag(argv,cmds,"--getTEMP|--getTEMPS|--getTEMPs|--gettemp|--gettemps"));
     XHOST.vflag_control.flag("SWITCH_AFLOW",
         aurostd::args2flag(argv,cmds,"--run|--clean|--xclean|--multi|--generate") ||
@@ -1597,7 +1598,7 @@ namespace init {
 // ***************************************************************************
 // AFLOW_getTEMP
 // ***************************************************************************
-uint AFLOW_getTEMP(vector<string> argv) {
+uint AFLOW_getTEMP(const vector<string>& argv) {
   bool LDEBUG=(TRUE || XHOST.DEBUG);
   bool RUNBAR=aurostd::args2flag(argv,"--runbar|--RUNBAR|--runBAR|--bar|--BAR");
   bool RUNSTAT=aurostd::args2flag(argv,"--runstat|--RUNSTAT|--runSTAT|--stat|--STAT");
@@ -1677,7 +1678,7 @@ uint AFLOW_getTEMP(vector<string> argv) {
 // ***************************************************************************
 // AFLOW_monitor
 // ***************************************************************************
-uint AFLOW_monitor(vector<string> argv) {
+uint AFLOW_monitor(const vector<string>& argv) {
   cout << "MMMMM  Aflow: starting AFLOW_monitor" << endl;
   cerr << "MMMMM  Aflow: starting AFLOW_monitor" << endl;
 
@@ -1816,7 +1817,7 @@ string aflow_get_time_string_short(void) {
 // ***************************************************************************
 // Messages
 // ***************************************************************************
-double AFLOW_checkMEMORY(string progname,double memory) {
+double AFLOW_checkMEMORY(const string& progname,double memory) {
   vector<string> vps,tokens;string command;
   double maxmem=0.0;
   if(progname.empty()) aurostd::string2vectorstring(aurostd::execute2string("ps aux | grep -v \" 0.0  0.0 \" | grep "+XHOST.user),vps);
@@ -1836,6 +1837,28 @@ double AFLOW_checkMEMORY(string progname,double memory) {
     }
   }
   return maxmem;
+}
+
+// ***************************************************************************
+// AFLOW_monitor_VASP
+// ***************************************************************************
+void AFLOW_monitor_VASP(uint sleep_seconds){
+  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  string soliloquy=XPID+"AFLOW_monitor_VASP():";
+  stringstream message;
+
+  if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
+
+  int nloop=1;
+
+  while(true){
+    message << "nloop=" << nloop;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,_LOGGER_MESSAGE_);
+
+    //check vasp.out here
+
+    message << "sleeping for " << sleep_seconds << " seconds";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,_LOGGER_MESSAGE_);
+    aurostd::Sleep(sleep_seconds);
+  }
 }
 
 // ***************************************************************************

@@ -26,6 +26,7 @@
         -- cleanup aurostd::RemoveComments(), substring2bool(), substring2string(), substring2strings() (CO)
         -- added KBIN::OUTCAR2VASPVersionString() and KBIN::INCAR_IALGO2ALGO() (CO)
         -- added new formatting for EXCCOR vasp error (CO)
+        -- added aurostd::ProcessRunning() (CO)
         TODO:
         -- patch CSLOSHING/NELM
         -- patch/consolidate Afix_GENERIC() and ROTMAT()
