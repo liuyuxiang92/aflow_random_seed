@@ -5530,25 +5530,15 @@ namespace KBIN {
     bool vflags_KBIN_VASP_INCAR_VERBOSE_orig=vflags.KBIN_VASP_INCAR_VERBOSE; //keep original
     vflags.KBIN_VASP_INCAR_VERBOSE=TRUE;  //VERBOSE
 
-    if(mode=="SYMPREC" || mode=="SGRCON" || mode=="INVGRP") {
+    //implement a strict return false if 1) the fix cannot be applied (flags) or 2) fix has already been applied
+    //that will enable kvasp to iterate through options faster
+    //come back soon
+
+    if(mode=="SGRCON" || mode=="INVGRP" || mode=="SYMPREC") {
       file_error="aflow.error.symprec";
       //START - load INCAR into xvasp, modify, then write out new INCAR
       VASP_Reread_INCAR(xvasp);  //preload incar
-      if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << " # Performing " << operation << " [AFLOW] start" << endl;
-      XVASP_INCAR_REMOVE_ENTRY(xvasp,"SYMPREC",operation,vflags.KBIN_VASP_INCAR_VERBOSE,false,false);  //CO20200624 - do not preload or rewrite incar
-      xvasp.INCAR << aurostd::PaddedPOST("SYMPREC=1e-7",_incarpad_)+" # " << operation << endl;  //CO20200604
-      if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << " # Performing " << operation << " [AFLOW] end" << endl;
-      aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR")); //write out incar
-      //END - load INCAR into xvasp, modify, then write out new INCAR
-    }
-    else if(mode=="READ_KPOINTS_RD_SYM") {
-      file_error="aflow.error.read_kpoints_rd_sym";
-      //START - load INCAR into xvasp, modify, then write out new INCAR
-      VASP_Reread_INCAR(xvasp);  //preload incar
-      if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << " # Performing " << operation << " [AFLOW] start" << endl;
-      XVASP_INCAR_REMOVE_ENTRY(xvasp,"ISYM",operation,vflags.KBIN_VASP_INCAR_VERBOSE,false,false);  //CO20200624 - do not preload or rewrite incar
-      xvasp.INCAR << aurostd::PaddedPOST("ISYM=0",_incarpad_)+" # " << operation << endl;  //CO20200604
-      if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << " # Performing " << operation << " [AFLOW] end" << endl;
+      KBIN::XVASP_INCAR_PREPARE_GENERIC("SYMPREC",xvasp,vflags,"",0,0.0,OFF);
       aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR")); //write out incar
       //END - load INCAR into xvasp, modify, then write out new INCAR
     }
@@ -5563,6 +5553,17 @@ namespace KBIN {
       KBIN::XVASP_KPOINTS_OPERATION(xvasp,"Xodd,Yodd,Zodd");  //CO20210315 - yes, odd with no shift is the same as Gamma-centered, see here: https://cms.mpi.univie.ac.at/vasp/vasp/Automatic_k_mesh_generation.html#sec:autok // this should put the origin in GAMMA ??
       aurostd::stringstream2file(xvasp.KPOINTS,string(xvasp.Directory+"/KPOINTS"));
       //END - modify xvasp.str.kpoints* and write out new KPOINTS
+    }
+    else if(mode=="READ_KPOINTS_RD_SYM") {
+      file_error="aflow.error.read_kpoints_rd_sym";
+      //START - load INCAR into xvasp, modify, then write out new INCAR
+      VASP_Reread_INCAR(xvasp);  //preload incar
+      if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << " # Performing " << operation << " [AFLOW] start" << endl;
+      XVASP_INCAR_REMOVE_ENTRY(xvasp,"ISYM",operation,vflags.KBIN_VASP_INCAR_VERBOSE,false,false);  //CO20200624 - do not preload or rewrite incar
+      xvasp.INCAR << aurostd::PaddedPOST("ISYM=0",_incarpad_)+" # " << operation << endl;  //CO20200604
+      if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << " # Performing " << operation << " [AFLOW] end" << endl;
+      aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR")); //write out incar
+      //END - load INCAR into xvasp, modify, then write out new INCAR
     }
     else if(mode=="GAMMA_SHIFT") {
       if(xvasp.aopts.flag("FLAG::KPOINTS_PRESERVED")){ // don't touch kpoints
@@ -5595,10 +5596,11 @@ namespace KBIN {
       //END - modify xvasp.str.kpoints* and write out new KPOINTS
     }
     else if(mode=="NKXYZ_IKPTD") {
-      //[MUST FIX ANYWAY]if(xvasp.aopts.flag("FLAG::KPOINTS_PRESERVED")){ // don't touch kpoints
-      //[MUST FIX ANYWAY]  vflags.KBIN_VASP_INCAR_VERBOSE=vflags_KBIN_VASP_INCAR_VERBOSE_orig; //restore
-      //[MUST FIX ANYWAY]  return false;
-      //[MUST FIX ANYWAY]}
+      //https://www.vasp.at/forum/viewtopic.php?t=1228
+      if(xvasp.aopts.flag("FLAG::KPOINTS_PRESERVED")){ // don't touch kpoints
+        vflags.KBIN_VASP_INCAR_VERBOSE=vflags_KBIN_VASP_INCAR_VERBOSE_orig; //restore
+        return false;
+      }
       file_error="aflow.error.nkxyz_ikptd";
       //START - modify xvasp.str.kpoints* and write out new KPOINTS
       KBIN::XVASP_KPOINTS_OPERATION(xvasp,"X--,Y--,Z--");  //CO20210315 - no this does not shift to Gamma necessarily // this should put the origin in GAMMA ??
