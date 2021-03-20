@@ -10,7 +10,7 @@
         -- added ISMEAR_SCHEME, ISMEAR_STATIC_SCHEME, and ISMEAR_STATIC_BANDS_SCHEME options to VASP_FORCE_OPTIONS and aflow.rc (CO)
         -- added SIGMA, SIGMA_STATIC, and SIGMA_STATIC_BANDS options to VASP_FORCE_OPTIONS and aflow.rc (CO)
         -- added MAX_VASP_NELM to aflow.rc and created a xwarning/xfixed scheme for NELM (CO)
-        -- patched VASP_OSZICARUnconverged() (CO)
+        -- patched VASP_OSZICARUnconverged(), adding VASP_OSZICARUnconverging() (CO)
         -- patched generation of INCAR, removed duplicate lines like SYSTEM=XXXX (CO)
         -- patched removal of NELM from INCAR vs. NELMIN (CO)
         -- added XVASP_Afix_NELM() and XVASP_Afix_ISMEAR() (CO)
