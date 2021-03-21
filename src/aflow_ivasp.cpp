@@ -5590,8 +5590,8 @@ namespace KBIN {
       }
       //START - modify xvasp.str.kpoints* and write out new KPOINTS
       // xvasp.str.kpoints_s1=0.0;xvasp.str.kpoints_s2=0.0;xvasp.str.kpoints_s3=0.0;  //should go before OPERATION() which writes out xvasp.KPOINTS
-      KBIN::XVASP_KPOINTS_OPERATION(xvasp,"X--,Y--,Z--");  // reduce KPOINTS withoug bugging the origin
-      KBIN::XVASP_KPOINTS_OPERATION(xvasp,"X--,Y--,Z--");  // reduce KPOINTS withoug bugging the origin
+      KBIN::XVASP_KPOINTS_OPERATION(xvasp,"X--,Y--,Z--");  // reduce KPOINTS without bugging the origin, keep even/odd parity
+      KBIN::XVASP_KPOINTS_OPERATION(xvasp,"X--,Y--,Z--");  // reduce KPOINTS without bugging the origin, keep even/odd parity
       aurostd::stringstream2file(xvasp.KPOINTS,string(xvasp.Directory+"/KPOINTS"));
       //END - modify xvasp.str.kpoints* and write out new KPOINTS
     }
@@ -5678,6 +5678,8 @@ namespace KBIN {
           //END - load INCAR into xvasp, modify, then write out new INCAR
         }
       }
+      if(submode>4){return false;}
+      submode++;  //increment
     }
     else if(mode=="LREAL") {
       file_error="aflow.error.lreal";
@@ -5797,6 +5799,16 @@ namespace KBIN {
       KBIN::VASP_Produce_POSCAR(xvasp); //creates xvasp.POSCAR
       aurostd::stringstream2file(xvasp.POSCAR,string(xvasp.Directory+"/POSCAR"));
       //END - modify xvasp.str and write out new POSCAR
+    }
+    else if(mode=="MEMORY") { //CO20210315
+      file_error="aflow.error.memory";
+      //START - one-off solution for memory
+      stringstream command("");
+      command << "cat " << xvasp.Directory << "/vasp.out | grep AFLOW > " << xvasp.Directory << "/" << DEFAULT_AFLOW_MEMORY_OUT << endl;
+      command << "cat " << xvasp.Directory << "/vasp.out | grep AFLOW > " << xvasp.Directory << "/SKIP" << endl;	
+      command << "cat " << xvasp.Directory << "/vasp.out | grep AFLOW >> " << xvasp.Directory << DEFAULT_AFLOW_ERVASP_OUT << endl;	
+      aurostd::execute(command);
+      //END - one-off solution for memory
     }
     else if(mode=="PSMAXN") {
       file_error="aflow.error.psmaxn";

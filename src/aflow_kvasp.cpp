@@ -2868,14 +2868,13 @@ namespace KBIN {
 
     ostringstream aus_exec,aus;
     xoption xwarning,xfixed,xmessage;
-    int nbands = 0,nelm = 0,counter_ZPOTRF=0; //CO20200624
+    int nbands = 0; //CO20200624
     bool vasp_start=TRUE;
     aurostd::StringstreamClean(aus_exec);
     aurostd::StringstreamClean(aus);
     int nrun=0,maxrun=15;
-    int submode=0;
     int fix_NIRMAT=0;
-    int fix_eddrmm=0;
+    int fix_EDDRMM=0;
     int kpoints_k1=xvasp.str.kpoints_k1; double kpoints_s1=xvasp.str.kpoints_s1;
     int kpoints_k2=xvasp.str.kpoints_k2; double kpoints_s2=xvasp.str.kpoints_s2;
     int kpoints_k3=xvasp.str.kpoints_k3; double kpoints_s3=xvasp.str.kpoints_s3;
@@ -2957,10 +2956,10 @@ namespace KBIN {
       // ********* RUN VASP                
       { // ERRORS
         bool error=FALSE;
-        if(aurostd::FileEmpty(xvasp.Directory+"/INCAR"))   {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  ERROR KBIN::VASP_Run: "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  Empty INCAR ");error=TRUE;return FALSE;}
-        if(aurostd::FileEmpty(xvasp.Directory+"/POSCAR"))  {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  ERROR KBIN::VASP_Run: "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  Empty POSCAR ");error=TRUE;return FALSE;}
-        if(aurostd::FileEmpty(xvasp.Directory+"/KPOINTS")) {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  ERROR KBIN::VASP_Run: "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  Empty KPOINTS ");error=TRUE;return FALSE;}
-        if(aurostd::FileEmpty(xvasp.Directory+"/POTCAR"))  {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  ERROR KBIN::VASP_Run: "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  Empty POTCAR ");error=TRUE;return FALSE;}
+        if(aurostd::FileEmpty(xvasp.Directory+"/INCAR"))   {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  ERROR "+soliloquy+" "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  Empty INCAR");error=TRUE;return FALSE;}
+        if(aurostd::FileEmpty(xvasp.Directory+"/POSCAR"))  {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  ERROR "+soliloquy+" "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  Empty POSCAR");error=TRUE;return FALSE;}
+        if(aurostd::FileEmpty(xvasp.Directory+"/KPOINTS")) {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  ERROR "+soliloquy+" "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  Empty KPOINTS");error=TRUE;return FALSE;}
+        if(aurostd::FileEmpty(xvasp.Directory+"/POTCAR"))  {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  ERROR "+soliloquy+" "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  Empty POTCAR");error=TRUE;return FALSE;}
         if(error) return FALSE;
 
         if(LDEBUG){cerr << soliloquy << " [1] " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
@@ -3375,8 +3374,8 @@ namespace KBIN {
       KBIN::WaitFinished(xvasp,aflags,FileMESSAGE,2,true);  //CO20201111 - try twice and verbose
       if(LDEBUG){cerr << soliloquy << " [2] " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
 
-      if(aurostd::FileEmpty(xvasp.Directory+"/vasp.out"))  {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  ERROR KBIN::VASP_Run: "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  Empty vasp.out");return FALSE;}
-      if(aurostd::FileEmpty(xvasp.Directory+"/OUTCAR"))  {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  ERROR KBIN::VASP_Run: "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  Empty OUTCAR");return FALSE;}
+      if(aurostd::FileEmpty(xvasp.Directory+"/vasp.out"))  {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  ERROR "+soliloquy+" "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  Empty vasp.out");return FALSE;}
+      if(aurostd::FileEmpty(xvasp.Directory+"/OUTCAR"))  {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  ERROR "+soliloquy+" "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  Empty OUTCAR");return FALSE;}
       // DONT CHECK CONTCAR it can be empty
       // DONT CHECK OSZICAR it can be empty
 
@@ -3577,8 +3576,6 @@ namespace KBIN {
         //[no must fix the LATTICE]if(xwarning.flag("EDDRMM")) xwarning.flag("ZPOTRF",FALSE);
 
         xfixed.flag("ALL",FALSE);
-        xfixed.flag("MPICH11",FALSE); // all the items that must be restarted until they work
-        xfixed.flag("MPICH139",FALSE); // all the items that must be restarted until they work
         vasp_start=FALSE;
 
         if(LDEBUG){cerr << soliloquy << " [6] " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
@@ -3593,23 +3590,21 @@ namespace KBIN {
         if(LDEBUG){cerr << soliloquy << " [CHECK NBANDS PROBLEMS] " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
         apply_patch=xwarning.flag("NBANDS");
         if(apply_patch && xfixed.flag("ALL")){
-          if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"ALL\")==TRUE:  skipping NBANDS patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"ALL\")==TRUE: skipping NBANDS patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
           apply_patch=false;
         }
         //[keep increasing NBANDS until it works]if(apply_patch && xfixed.flag("NBANDS")){
-        //[keep increasing NBANDS until it works]  if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"NBANDS\")==TRUE:  skipping NBANDS patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+        //[keep increasing NBANDS until it works]  if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"NBANDS\")==TRUE: skipping NBANDS patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
         //[keep increasing NBANDS until it works]  apply_patch=false;
         //[keep increasing NBANDS until it works]}
         if(apply_patch && vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("NBANDS")){
-          if(LDEBUG){cerr << soliloquy << " vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"NBANDS\")==TRUE:  skipping NBANDS patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          if(LDEBUG){cerr << soliloquy << " vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"NBANDS\")==TRUE: skipping NBANDS patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
           apply_patch=false;
         }
-        if(apply_patch){
-          KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  NBANDS problems ");
-          KBIN::XVASP_Afix_GENERIC("NBANDS",xvasp,kflags,vflags,nbands);  //CO20210315 // here it does the nbands_update
+        if(apply_patch && KBIN::XVASP_Afix_GENERIC("NBANDS",xvasp,kflags,vflags,nbands)){   //CO20210315 // here it does the nbands_update
+          KBIN::VASP_Error(xvasp,"WWWWW  ERROR "+soliloquy+" NBANDS problems "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_));
+          aus << "WWWWW  FIX NBANDS = [" << nbands << "] - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
           xfixed.flag("NBANDS",TRUE);xfixed.flag("ALL",TRUE);
-          aus << "WWWWW  FIX NBANDS = [" << nbands << "] - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-          aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
         }
         // ********* CHECK LRF_COMMUTATOR PROBLEMS ******************
         // https://www.vasp.at/forum/viewtopic.php?f=4&t=8230
@@ -3617,23 +3612,21 @@ namespace KBIN {
         if(LDEBUG){cerr << soliloquy << " [CHECK LRF_COMMUTATOR PROBLEMS] " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
         apply_patch=xwarning.flag("LRF_COMMUTATOR");
         if(apply_patch && xfixed.flag("ALL")){
-          if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"ALL\")==TRUE:  skipping LRF_COMMUTATOR patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"ALL\")==TRUE: skipping LRF_COMMUTATOR patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
           apply_patch=false;
         }
         if(apply_patch && xfixed.flag("LRF_COMMUTATOR")){
-          if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"LRF_COMMUTATOR\")==TRUE:  skipping LRF_COMMUTATOR patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"LRF_COMMUTATOR\")==TRUE: skipping LRF_COMMUTATOR patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
           apply_patch=false;
         }
         if(apply_patch && vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("LRF_COMMUTATOR")){
-          if(LDEBUG){cerr << soliloquy << " vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"LRF_COMMUTATOR\")==TRUE:  skipping LRF_COMMUTATOR patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          if(LDEBUG){cerr << soliloquy << " vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"LRF_COMMUTATOR\")==TRUE: skipping LRF_COMMUTATOR patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
           apply_patch=false;
         }
-        if(0 && apply_patch){ //CO20210315 - I guess this patch is obsolete?
-          KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  LRF_COMMUTATOR problems ");
-          //	  KBIN_XVASP_Afix_LRF_COMMUTATOR(xvasp,nbands);  // here it does the nbands_update
+        if(0 && apply_patch){ // && KBIN_XVASP_Afix_LRF_COMMUTATOR(xvasp,nbands) //CO20210315 - I guess this patch is obsolete?
+          KBIN::VASP_Error(xvasp,"WWWWW  ERROR "+soliloquy+" LRF_COMMUTATOR problems "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_));
+          aus << "WWWWW  FIX LRF_COMMUTATOR = [" << nbands << "] - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
           xfixed.flag("LRF_COMMUTATOR",TRUE);xfixed.flag("ALL",TRUE);
-          aus << "WWWWW  FIX LRF_COMMUTATOR = [" << nbands << "] - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-          aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
         }
         // ********* CHECK NKXYZ_IKPTD PROBLEMS ******************
         // NKXYZ_IKPTD should be addressed BEFORE symmetry issues
@@ -3641,22 +3634,20 @@ namespace KBIN {
         if(LDEBUG){cerr << soliloquy << " [CHECK NKXYZ_IKPTD PROBLEMS] " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
         apply_patch=xwarning.flag("NKXYZ_IKPTD");
         if(apply_patch && xfixed.flag("ALL")){
-          if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"ALL\")==TRUE:  skipping NKXYZ_IKPTD patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"ALL\")==TRUE: skipping NKXYZ_IKPTD patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
           apply_patch=false;
         }
         //[keep decreasing KPOINTS until it works]if(apply_patch && xfixed.flag("NKXYZ_IKPTD")){
-        //[keep decreasing KPOINTS until it works]  if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"NKXYZ_IKPTD\")==TRUE:  skipping NKXYZ_IKPTD patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+        //[keep decreasing KPOINTS until it works]  if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"NKXYZ_IKPTD\")==TRUE: skipping NKXYZ_IKPTD patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
         //[keep decreasing KPOINTS until it works]  apply_patch=false;
         //[keep decreasing KPOINTS until it works]}
         if(apply_patch && vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("NKXYZ_IKPTD")){
-          if(LDEBUG){cerr << soliloquy << " vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"NKXYZ_IKPTD\")==TRUE:  skipping NKXYZ_IKPTD patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          if(LDEBUG){cerr << soliloquy << " vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"NKXYZ_IKPTD\")==TRUE: skipping NKXYZ_IKPTD patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
           apply_patch=false;
         }
-        if(apply_patch){
-          KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  NKXYZ_IKPTD problems ");
-          aus << "WWWWW  FIX NKXYZ_IKPTD - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-          aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-          KBIN::XVASP_Afix_GENERIC("NKXYZ_IKPTD",xvasp,kflags,vflags);
+        if(apply_patch && KBIN::XVASP_Afix_GENERIC("NKXYZ_IKPTD",xvasp,kflags,vflags)){
+          KBIN::VASP_Error(xvasp,"WWWWW  ERROR "+soliloquy+" NKXYZ_IKPTD problems "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_));
+          aus << "WWWWW  FIX NKXYZ_IKPTD - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
           xfixed.flag("NKXYZ_IKPTD",TRUE);xfixed.flag("ALL",TRUE);
         }
         // ********* CHECK IBZKPT PROBLEMS ******************
@@ -3665,22 +3656,20 @@ namespace KBIN {
         if(LDEBUG){cerr << soliloquy << " [CHECK IBZKPT PROBLEMS] " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
         apply_patch=xwarning.flag("IBZKPT");
         if(apply_patch && xfixed.flag("ALL")){
-          if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"ALL\")==TRUE:  skipping IBZKPT patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"ALL\")==TRUE: skipping IBZKPT patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
           apply_patch=false;
         }
         if(apply_patch && xfixed.flag("IBZKPT")){
-          if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"IBZKPT\")==TRUE:  skipping IBZKPT patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"IBZKPT\")==TRUE: skipping IBZKPT patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
           apply_patch=false;
         }
         if(apply_patch && vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("IBZKPT")){
-          if(LDEBUG){cerr << soliloquy << " vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"IBZKPT\")==TRUE:  skipping IBZKPT patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          if(LDEBUG){cerr << soliloquy << " vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"IBZKPT\")==TRUE: skipping IBZKPT patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
           apply_patch=false;
         }
-        if(apply_patch){
-          KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  IBZKPT problems ");
-          aus << "WWWWW  FIX IBZKPT - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-          aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-          KBIN::XVASP_Afix_GENERIC("IBZKPT",xvasp,kflags,vflags);
+        if(apply_patch && KBIN::XVASP_Afix_GENERIC("IBZKPT",xvasp,kflags,vflags)){
+          KBIN::VASP_Error(xvasp,"WWWWW  ERROR "+soliloquy+" IBZKPT problems "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_));
+          aus << "WWWWW  FIX IBZKPT - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
           xfixed.flag("IBZKPT",TRUE);xfixed.flag("ALL",TRUE);
         }
         // ********* CHECK SGRCON PROBLEMS ******************
@@ -3688,24 +3677,22 @@ namespace KBIN {
         if(LDEBUG){cerr << soliloquy << " [CHECK SGRCON PROBLEMS] " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
         apply_patch=xwarning.flag("SGRCON");
         if(apply_patch && xfixed.flag("ALL")){
-          if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"ALL\")==TRUE:  skipping SGRCON patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"ALL\")==TRUE: skipping SGRCON patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
           apply_patch=false;
         }
         if(apply_patch && (xfixed.flag("SGRCON") || xfixed.flag("INVGRP") || xfixed.flag("SYMPREC"))){  //they are all the same patch
           if(xfixed.flag("SGRCON")){
-            if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"SGRCON\")==TRUE:  skipping SGRCON patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+            if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"SGRCON\")==TRUE: skipping SGRCON patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
           }
           apply_patch=false;
         }
         if(apply_patch && vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("SGRCON")){
-          if(LDEBUG){cerr << soliloquy << " vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"SGRCON\")==TRUE:  skipping SGRCON patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          if(LDEBUG){cerr << soliloquy << " vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"SGRCON\")==TRUE: skipping SGRCON patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
           apply_patch=false;
         }
-        if(apply_patch){
-          KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  SGRCON problems ");
-          aus << "WWWWW  FIX SGRCON - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-          aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-          KBIN::XVASP_Afix_GENERIC("SGRCON",xvasp,kflags,vflags);
+        if(apply_patch && KBIN::XVASP_Afix_GENERIC("SGRCON",xvasp,kflags,vflags)){
+          KBIN::VASP_Error(xvasp,"WWWWW  ERROR "+soliloquy+" SGRCON problems "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_));
+          aus << "WWWWW  FIX SGRCON - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
           xfixed.flag("SGRCON",TRUE);xfixed.flag("ALL",TRUE);
         }
         // ********* CHECK INVGRP PROBLEMS ******************
@@ -3713,24 +3700,22 @@ namespace KBIN {
         if(LDEBUG){cerr << soliloquy << " [CHECK INVGRP PROBLEMS] " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
         apply_patch=xwarning.flag("INVGRP");
         if(apply_patch && xfixed.flag("ALL")){
-          if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"ALL\")==TRUE:  skipping INVGRP patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"ALL\")==TRUE: skipping INVGRP patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
           apply_patch=false;
         }
         if(apply_patch && (xfixed.flag("SGRCON") || xfixed.flag("INVGRP") || xfixed.flag("SYMPREC"))){  //they are all the same patch
           if(xfixed.flag("INVGRP")){
-            if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"INVGRP\")==TRUE:  skipping INVGRP patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+            if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"INVGRP\")==TRUE: skipping INVGRP patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
           }
           apply_patch=false;
         }
         if(apply_patch && vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("INVGRP")){
-          if(LDEBUG){cerr << soliloquy << " vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"INVGRP\")==TRUE:  skipping INVGRP patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          if(LDEBUG){cerr << soliloquy << " vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"INVGRP\")==TRUE: skipping INVGRP patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
           apply_patch=false;
         }
-        if(apply_patch){
-          KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  INVGRP problems ");
-          aus << "WWWWW  FIX INVGRP - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-          aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-          KBIN::XVASP_Afix_GENERIC("INVGRP",xvasp,kflags,vflags);
+        if(apply_patch && KBIN::XVASP_Afix_GENERIC("INVGRP",xvasp,kflags,vflags)){
+          KBIN::VASP_Error(xvasp,"WWWWW  ERROR "+soliloquy+" INVGRP problems "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_));
+          aus << "WWWWW  FIX INVGRP - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
           xfixed.flag("INVGRP",TRUE);xfixed.flag("ALL",TRUE);
         }
         // ********* CHECK SYMPREC PROBLEMS ******************
@@ -3738,24 +3723,22 @@ namespace KBIN {
         if(LDEBUG){cerr << soliloquy << " [CHECK SYMPREC PROBLEMS] " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
         apply_patch=xwarning.flag("SYMPREC");
         if(apply_patch && xfixed.flag("ALL")){
-          if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"ALL\")==TRUE:  skipping SYMPREC patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"ALL\")==TRUE: skipping SYMPREC patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
           apply_patch=false;
         }
         if(apply_patch && (xfixed.flag("SGRCON") || xfixed.flag("INVGRP") || xfixed.flag("SYMPREC"))){  //they are all the same patch
           if(xfixed.flag("SYMPREC")){
-            if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"SYMPREC\")==TRUE:  skipping SYMPREC patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+            if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"SYMPREC\")==TRUE: skipping SYMPREC patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
           }
           apply_patch=false;
         }
         if(apply_patch && vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("SYMPREC")){
-          if(LDEBUG){cerr << soliloquy << " vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"SYMPREC\")==TRUE:  skipping SYMPREC patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          if(LDEBUG){cerr << soliloquy << " vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"SYMPREC\")==TRUE: skipping SYMPREC patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
           apply_patch=false;
         }
-        if(apply_patch){
-          KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  SYMPREC problems ");
-          aus << "WWWWW  FIX SYMPREC - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-          aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-          KBIN::XVASP_Afix_GENERIC("SYMPREC",xvasp,kflags,vflags);
+        if(apply_patch && KBIN::XVASP_Afix_GENERIC("SYMPREC",xvasp,kflags,vflags)){
+          KBIN::VASP_Error(xvasp,"WWWWW  ERROR "+soliloquy+" SYMPREC problems "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_));
+          aus << "WWWWW  FIX SYMPREC - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
           xfixed.flag("SYMPREC",TRUE);xfixed.flag("ALL",TRUE);
         }
         // ********* CHECK SYMMETRY PROBLEMS ******************
@@ -3785,7 +3768,7 @@ namespace KBIN {
             xvasp.str.kpoints_k1=kpoints_k1;xvasp.str.kpoints_s1=kpoints_s1;
             xvasp.str.kpoints_k2=kpoints_k2;xvasp.str.kpoints_s2=kpoints_s2;
             xvasp.str.kpoints_k3=kpoints_k3;xvasp.str.kpoints_s3=kpoints_s3;
-            KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  NIRMAT problems ");
+            KBIN::VASP_Error(xvasp,"WWWWW  ERROR "+soliloquy+" NIRMAT problems "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_));
             //[CO20200624 - OBSOLETE]if(fix_NIRMAT<=6) {
             aus << "WWWWW  FIX NIRMAT (" << fix_NIRMAT << ") - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
             aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -3814,14 +3797,14 @@ namespace KBIN {
             //4. ISYM=0
             //[CO20200624 - OBSOLETE]if (!vflags.KBIN_VASP_FORCE_OPTION_SYM.option) xfixed.flag("KKSYM", true);  //ME20200304 - Do not fix when SYM=OFF
             if(xfixed.flag("KKSYM")==false && xfixed.flag("KKSYM_G_SHIFT")==false && !xvasp.str.kpoints_kscheme.empty() && !(xvasp.str.kpoints_kscheme[0]=='G' || xvasp.str.kpoints_kscheme[0]=='g')){
-              KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  \"Reciprocal lattice and k-lattice belong to different class of lattices\" problem");
+              KBIN::VASP_Error(xvasp,"WWWWW  ERROR "+soliloquy+" \"Reciprocal lattice and k-lattice belong to different class of lattices\" problem "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_));
               aus << "WWWWW  FIX KKSYM (GAMMA_SHIFT) - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
               aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
               KBIN::XVASP_Afix_GENERIC("GAMMA_SHIFT",xvasp,kflags,vflags);  //use this over KBIN::XVASP_KPOINTS_OPERATION(xvasp,"Gamma") so we save error file
               xfixed.flag("KKSYM",TRUE);xfixed.flag("KKSYM_G_SHIFT",TRUE);xfixed.flag("ALL",TRUE);
             }
             if(xfixed.flag("KKSYM")==false && xfixed.flag("KKSYM_SYMPREC")==false){
-              KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  \"Reciprocal lattice and k-lattice belong to different class of lattices\" problem");
+              KBIN::VASP_Error(xvasp,"WWWWW  ERROR "+soliloquy+" \"Reciprocal lattice and k-lattice belong to different class of lattices\" problem "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_));
               aus << "WWWWW  FIX KKSYM (SYMPREC) - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
               aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
               KBIN::XVASP_Afix_GENERIC("SYMPREC",xvasp,kflags,vflags);
@@ -3829,7 +3812,7 @@ namespace KBIN {
             }
             //CO20181226 STOP - adding fix for "Reciprocal lattice and k-lattice belong to different class of lattices"
             if(xfixed.flag("KKSYM")==false && xfixed.flag("KKSYM_KMAX")==false){  //CO20181226 - no point running many times, max is max
-              KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  \"Reciprocal lattice and k-lattice belong to different class of lattices\" problem");
+              KBIN::VASP_Error(xvasp,"WWWWW  ERROR "+soliloquy+" \"Reciprocal lattice and k-lattice belong to different class of lattices\" problem "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_));
               aus << "WWWWW  FIX KKSYM (K1=K2=K3=KMAX) - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
               aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
               xvasp.str.kpoints_k1=kpoints_k1;xvasp.str.kpoints_s1=kpoints_s1;
@@ -3840,7 +3823,7 @@ namespace KBIN {
             }
             //CO20181226 START - adding fix for "Reciprocal lattice and k-lattice belong to different class of lattices"
             if(xfixed.flag("KKSYM")==false && xfixed.flag("KKSYM_ISYM")==false){
-              KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  \"Reciprocal lattice and k-lattice belong to different class of lattices\" problem");
+              KBIN::VASP_Error(xvasp,"WWWWW  ERROR "+soliloquy+" \"Reciprocal lattice and k-lattice belong to different class of lattices\" problem "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_));
               //THE NUCLEAR OPTION
               aus << "WWWWW  FIX KKSYM (ISYM=0) - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
               aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -3850,324 +3833,490 @@ namespace KBIN {
             //CO20181226 STOP - adding fix for "Reciprocal lattice and k-lattice belong to different class of lattices"
           }
         }
-        // ********* CHECK SGRCON PROBLEMS ******************
-        if(LDEBUG){cerr << soliloquy << " [CHECK SGRCON PROBLEMS] " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
-        if(!vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("SGRCON") && !xfixed.flag("ALL")) { // OPTIONS FOR SYMMETRY
-          if(xwarning.flag("SGRCON")){
-            if(!xfixed.flag("SGRCON")) {
-              KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  SGRCON problems ");
-              aus << "WWWWW  FIX SGRCON (SYMPREC) - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-              aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-              KBIN::XVASP_Afix_GENERIC("SGRCON",xvasp,kflags,vflags);
-              xfixed.flag("SGRCON",TRUE);xfixed.flag("ALL",TRUE);
-              // if(nrun<maxrun) vasp_start=TRUE;
-            }else{
-              //THE NUCLEAR OPTION
-              aus << "WWWWW  FIX SGRCON (ISYM=0) - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-              aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-              KBIN::XVASP_Afix_ROTMAT(xvasp,5,kflags,vflags,aflags,!XHOST.QUIET,FileMESSAGE);
-              xfixed.flag("SGRCON",TRUE);xfixed.flag("ALL",TRUE);
-            }
-          }
-        }
         // ********* CHECK GAMMA_SHIFT PROBLEMS ******************
         if(LDEBUG){cerr << soliloquy << " [CHECK GAMMA_SHIFT PROBLEMS] " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
-        if(!vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("GAMMA_SHIFT") && !xfixed.flag("ALL")) {
-          if(xwarning.flag("GAMMA_SHIFT") && !xfixed.flag("GAMMA_SHIFT")) {
-            KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  GAMMA_SHIFT problems ");
-            aus << "WWWWW  FIX GAMMA_SHIFT - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-            aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-            KBIN::XVASP_Afix_GENERIC("GAMMA_SHIFT",xvasp,kflags,vflags);
-            xfixed.flag("GAMMA_SHIFT",TRUE);xfixed.flag("ALL",TRUE);
-            // if(nrun<maxrun) vasp_start=TRUE;
-          }
+        apply_patch=xwarning.flag("GAMMA_SHIFT");
+        if(apply_patch && xfixed.flag("ALL")){
+          if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"ALL\")==TRUE: skipping GAMMA_SHIFT patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          apply_patch=false;
+        }
+        if(apply_patch && xfixed.flag("GAMMA_SHIFT")){
+          if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"GAMMA_SHIFT\")==TRUE: skipping GAMMA_SHIFT patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          apply_patch=false;
+        }
+        if(apply_patch && vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("GAMMA_SHIFT")){
+          if(LDEBUG){cerr << soliloquy << " vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"GAMMA_SHIFT\")==TRUE: skipping GAMMA_SHIFT patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          apply_patch=false;
+        }
+        if(apply_patch && KBIN::XVASP_Afix_GENERIC("GAMMA_SHIFT",xvasp,kflags,vflags)){
+          KBIN::VASP_Error(xvasp,"WWWWW  ERROR "+soliloquy+" GAMMA_SHIFT problems "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_));
+          aus << "WWWWW  FIX GAMMA_SHIFT - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+          xfixed.flag("GAMMA_SHIFT",TRUE);xfixed.flag("ALL",TRUE);
         }
         // ********* CHECK MPICH11 PROBLEMS ******************
         if(LDEBUG){cerr << soliloquy << " [CHECK MPICH11 PROBLEMS] " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
-        if(!vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("MPICH11") && !xfixed.flag("ALL")) {
-          if(xwarning.flag("MPICH11") && !xfixed.flag("MPICH11")) {
-            KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  MPICH11 problems ");
-            aus << "WWWWW  FIX MPICH11 - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-            aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-            KBIN::XVASP_Afix_GENERIC("MPICH11",xvasp,kflags,vflags);
-            xfixed.flag("MPICH11",TRUE);xfixed.flag("ALL",TRUE);
-            // if(nrun<maxrun) vasp_start=TRUE;
-          }
+        apply_patch=xwarning.flag("MPICH11");
+        if(apply_patch && xfixed.flag("ALL")){
+          if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"ALL\")==TRUE: skipping MPICH11 patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          apply_patch=false;
         }
+        if(apply_patch && xfixed.flag("MPICH11")){
+          if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"MPICH11\")==TRUE: skipping MPICH11 patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          apply_patch=false;
+        }
+        if(apply_patch && vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("MPICH11")){
+          if(LDEBUG){cerr << soliloquy << " vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"MPICH11\")==TRUE: skipping MPICH11 patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          apply_patch=false;
+        }
+        if(apply_patch && KBIN::XVASP_Afix_GENERIC("MPICH11",xvasp,kflags,vflags)){
+          KBIN::VASP_Error(xvasp,"WWWWW  ERROR "+soliloquy+" MPICH11 problems "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_));
+          aus << "WWWWW  FIX MPICH11 - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+          xfixed.flag("MPICH11",TRUE);xfixed.flag("ALL",TRUE);
+        }
+        // ********* CHECK MPICH139 PROBLEMS ******************
         if(LDEBUG){cerr << soliloquy << " [CHECK MPICH139 PROBLEMS] " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
-        if(!vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("MPICH139") && !xfixed.flag("ALL")) {
-          if(xwarning.flag("MPICH139") && !xfixed.flag("MPICH139")) {
-            KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  MPICH139 problems ");
-            aus << "WWWWW  FIX MPICH139 - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-            aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-            KBIN::XVASP_Afix_GENERIC("MPICH139",xvasp,kflags,vflags);
-            xfixed.flag("MPICH139",TRUE);xfixed.flag("ALL",TRUE);
-            // if(nrun<maxrun) vasp_start=TRUE;
-          }
+        apply_patch=xwarning.flag("MPICH139");
+        if(apply_patch && xfixed.flag("ALL")){
+          if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"ALL\")==TRUE: skipping MPICH139 patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          apply_patch=false;
+        }
+        //[keep decreasing KPOINTS until it works]if(apply_patch && xfixed.flag("MPICH139")){
+        //[keep decreasing KPOINTS until it works]  if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"MPICH139\")==TRUE: skipping MPICH139 patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+        //[keep decreasing KPOINTS until it works]  apply_patch=false;
+        //[keep decreasing KPOINTS until it works]}
+        if(apply_patch && vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("MPICH139")){
+          if(LDEBUG){cerr << soliloquy << " vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"MPICH139\")==TRUE: skipping MPICH139 patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          apply_patch=false;
+        }
+        if(apply_patch && KBIN::XVASP_Afix_GENERIC("MPICH139",xvasp,kflags,vflags)){
+          KBIN::VASP_Error(xvasp,"WWWWW  ERROR "+soliloquy+" MPICH139 problems "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_));
+          aus << "WWWWW  FIX MPICH139 - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+          xfixed.flag("MPICH139",TRUE);xfixed.flag("ALL",TRUE);
         }
         // ********* CHECK EDDRMM PROBLEMS ******************
         if(LDEBUG){cerr << soliloquy << " [CHECK EDDRMM PROBLEMS] " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
-        if(!vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("EDDRMM") && !xfixed.flag("ALL")) { // OPTIONS FOR EDDRMM
-          if(xwarning.flag("EDDRMM")) {
-            KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  EDDRMM problems ");
-            aus << "WWWWW  FIX EDDRMM - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-            aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-            KBIN::XVASP_Afix_GENERIC("EDDRMM",fix_eddrmm,xvasp,kflags,vflags);  //CO20200624 - adding fix_eddrmm
-            fix_eddrmm++;
-            xfixed.flag("EDDRMM",TRUE);xfixed.flag("ALL",TRUE);
-            // if(nrun<maxrun) vasp_start=TRUE;
-          }
+        apply_patch=xwarning.flag("EDDRMM");
+        if(apply_patch && xfixed.flag("ALL")){
+          if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"ALL\")==TRUE: skipping EDDRMM patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          apply_patch=false;
         }
-        // ********* CHECK REAL_OPTLAY_1 REAL_OPT PROBLEMS ******************
-        if(LDEBUG){cerr << soliloquy << " [CHECK REAL_OPTLAY_1 REAL_OPT PROBLEMS] " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
-        if(!vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("LREAL") && !xfixed.flag("ALL")) { // OPTIONS FOR REAL_OPTLAY_1 OPTLAY
-          if(xwarning.flag("REAL_OPTLAY_1") && !xfixed.flag("REAL_OPTLAY_1")) {
-            KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  REAL_OPTLAY_1 problems ");
-            aus << "WWWWW  FIX REAL_OPTLAY_1 - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-            aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-            KBIN::XVASP_Afix_GENERIC("LREAL",xvasp,kflags,vflags);
-            xfixed.flag("REAL_OPTLAY_1",TRUE);xfixed.flag("ALL",TRUE);
-            // if(nrun<maxrun) vasp_start=TRUE;
+        if(apply_patch && xfixed.flag("EDDRMM_"+aurostd::utype2string(fix_EDDRMM))){
+          if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"EDDRMM_" << aurostd::utype2string(fix_EDDRMM) << "\")==TRUE: skipping EDDRMM patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          apply_patch=false;
+        }
+        if(apply_patch && vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("EDDRMM")){
+          if(LDEBUG){cerr << soliloquy << " vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"EDDRMM\")==TRUE: skipping EDDRMM patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          apply_patch=false;
+        }
+        if(apply_patch && KBIN::XVASP_Afix_GENERIC("EDDRMM",fix_EDDRMM,xvasp,kflags,vflags)){  //CO20200624 - adding fix_EDDRMM
+          KBIN::VASP_Error(xvasp,"WWWWW  ERROR "+soliloquy+" EDDRMM problems "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_));
+          aus << "WWWWW  FIX EDDRMM (submode=" << fix_EDDRMM << ") - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+          xfixed.flag("EDDRMM_"+aurostd::utype2string(fix_EDDRMM),TRUE);xfixed.flag("ALL",TRUE);
+        }
+        // ********* CHECK REAL_OPTLAY_1 PROBLEMS ******************
+        if(LDEBUG){cerr << soliloquy << " [CHECK REAL_OPTLAY_1 PROBLEMS] " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+        apply_patch=xwarning.flag("REAL_OPTLAY_1");
+        if(apply_patch && xfixed.flag("ALL")){
+          if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"ALL\")==TRUE: skipping REAL_OPTLAY_1 patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          apply_patch=false;
+        }
+        if(apply_patch && (xfixed.flag("REAL_OPTLAY_1") || xfixed.flag("REAL_OPT"))){  //they are all the same patch
+          if(xfixed.flag("REAL_OPTLAY_1")){
+            if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"REAL_OPTLAY_1\")==TRUE: skipping REAL_OPTLAY_1 patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
           }
-          if(xwarning.flag("REAL_OPT") && !xfixed.flag("REAL_OPT")) {
-            KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  REAL_OPT problems ");
-            aus << "WWWWW  FIX REAL_OPT - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-            aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-            KBIN::XVASP_Afix_GENERIC("LREAL",xvasp,kflags,vflags);
-            xfixed.flag("REAL_OPT",TRUE);xfixed.flag("ALL",TRUE);
-            // if(nrun<maxrun) vasp_start=TRUE;
+          apply_patch=false;
+        }
+        if(apply_patch && vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("LREAL")){
+          if(LDEBUG){cerr << soliloquy << " vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"LREAL\")==TRUE: skipping LREAL patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          apply_patch=false;
+        }
+        if(apply_patch && KBIN::XVASP_Afix_GENERIC("LREAL",xvasp,kflags,vflags)){
+          KBIN::VASP_Error(xvasp,"WWWWW  ERROR "+soliloquy+" REAL_OPTLAY_1 problems "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_));
+          aus << "WWWWW  FIX REAL_OPTLAY_1 - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+          xfixed.flag("REAL_OPTLAY_1",TRUE);xfixed.flag("ALL",TRUE);
+        }
+        // ********* CHECK REAL_OPT PROBLEMS ******************
+        if(LDEBUG){cerr << soliloquy << " [CHECK REAL_OPT PROBLEMS] " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+        apply_patch=xwarning.flag("REAL_OPT");
+        if(apply_patch && xfixed.flag("ALL")){
+          if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"ALL\")==TRUE: skipping REAL_OPT patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          apply_patch=false;
+        }
+        if(apply_patch && (xfixed.flag("REAL_OPTLAY_1") || xfixed.flag("REAL_OPT"))){  //they are all the same patch
+          if(xfixed.flag("REAL_OPT")){
+            if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"REAL_OPT\")==TRUE: skipping REAL_OPT patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
           }
+          apply_patch=false;
+        }
+        if(apply_patch && vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("LREAL")){
+          if(LDEBUG){cerr << soliloquy << " vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"LREAL\")==TRUE: skipping LREAL patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          apply_patch=false;
+        }
+        if(apply_patch && KBIN::XVASP_Afix_GENERIC("LREAL",xvasp,kflags,vflags)){
+          KBIN::VASP_Error(xvasp,"WWWWW  ERROR "+soliloquy+" REAL_OPT problems "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_));
+          aus << "WWWWW  FIX REAL_OPT - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+          xfixed.flag("REAL_OPT",TRUE);xfixed.flag("ALL",TRUE);
         }
         // ********* CHECK BRMIX PROBLEMS ******************
         if(LDEBUG){cerr << soliloquy << " [CHECK BRMIX PROBLEMS] " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
-        if(!vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("BRMIX") && !xfixed.flag("ALL")) { // check BRMIX
-          if(xwarning.flag("BRMIX") && !xfixed.flag("BRMIX")) { // Apply only ONCE
-            KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  BRMIX problems ");
-            aus << "WWWWW  FIX BRMIX - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-            aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-
-            //if(aurostd::substring2bool(xvasp.INCAR,"IALGO=48",TRUE)) {
-            //KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  BRMIX problems not performed with IALGO=48 ");
-            //aus << "WWWWW  FIX BRMIX NOT PERFORMED with IALGO=48 - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-            //aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-            //xfixed.flag("BRMIX",TRUE);xfixed.flag("ALL",TRUE);
-            //} else {	//[CO20200106 - close bracket for indenting]}
-
-            KBIN::XVASP_Afix_GENERIC("BRMIX",xvasp,kflags,vflags);
-            xfixed.flag("BRMIX",TRUE);xfixed.flag("ALL",TRUE);
-          }
+        apply_patch=xwarning.flag("BRMIX");
+        if(apply_patch && xfixed.flag("ALL")){
+          if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"ALL\")==TRUE: skipping BRMIX patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          apply_patch=false;
+        }
+        if(apply_patch && xfixed.flag("BRMIX")){
+          if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"BRMIX\")==TRUE: skipping BRMIX patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          apply_patch=false;
+        }
+        if(apply_patch && vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("BRMIX")){
+          if(LDEBUG){cerr << soliloquy << " vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"BRMIX\")==TRUE: skipping BRMIX patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          apply_patch=false;
+        }
+        if(apply_patch && KBIN::XVASP_Afix_GENERIC("BRMIX",xvasp,kflags,vflags)){
+          KBIN::VASP_Error(xvasp,"WWWWW  ERROR "+soliloquy+" BRMIX problems "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_));
+          aus << "WWWWW  FIX BRMIX - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+          xfixed.flag("BRMIX",TRUE);xfixed.flag("ALL",TRUE);
         }
         // ********* CHECK DAV PROBLEMS ******************
         if(LDEBUG){cerr << soliloquy << " [CHECK DAV PROBLEMS] " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
-        if(!vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("DAV") && !xfixed.flag("ALL")) { // check DAV
-          if(xwarning.flag("DAV") && !xfixed.flag("DAV")) { // Apply only ONCE
-            KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  DAV problems ");
-            aus << "WWWWW  FIX DAV - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-            aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-            KBIN::XVASP_Afix_GENERIC("DAV",xvasp,kflags,vflags);
-            xfixed.flag("DAV",TRUE);xfixed.flag("ALL",TRUE);
-          }
+        apply_patch=xwarning.flag("DAV");
+        if(apply_patch && xfixed.flag("ALL")){
+          if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"ALL\")==TRUE: skipping DAV patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          apply_patch=false;
+        }
+        if(apply_patch && xfixed.flag("DAV")){
+          if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"DAV\")==TRUE: skipping DAV patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          apply_patch=false;
+        }
+        if(apply_patch && vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("DAV")){
+          if(LDEBUG){cerr << soliloquy << " vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"DAV\")==TRUE: skipping DAV patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          apply_patch=false;
+        }
+        if(apply_patch && KBIN::XVASP_Afix_GENERIC("DAV",xvasp,kflags,vflags)){
+          KBIN::VASP_Error(xvasp,"WWWWW  ERROR "+soliloquy+" DAV problems "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_));
+          aus << "WWWWW  FIX DAV - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+          xfixed.flag("DAV",TRUE);xfixed.flag("ALL",TRUE);
         }
         // ********* CHECK EDDDAV PROBLEMS ******************
         if(LDEBUG){cerr << soliloquy << " [CHECK EDDDAV PROBLEMS] " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
-        if(!vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("EDDDAV") && !xfixed.flag("ALL")) { // check EDDDAV
-          if(xwarning.flag("EDDDAV") && !xfixed.flag("EDDDAV")) { // Apply only ONCE
-            KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  EDDDAV problems ");
-            aus << "WWWWW  FIX EDDDAV - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-            aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-            KBIN::XVASP_Afix_GENERIC("EDDDAV",xvasp,kflags,vflags);
-            xfixed.flag("EDDDAV",TRUE);xfixed.flag("ALL",TRUE);
-          }
+        apply_patch=xwarning.flag("EDDDAV");
+        if(apply_patch && xfixed.flag("ALL")){
+          if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"ALL\")==TRUE: skipping EDDDAV patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          apply_patch=false;
+        }
+        if(apply_patch && xfixed.flag("EDDDAV")){
+          if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"EDDDAV\")==TRUE: skipping EDDDAV patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          apply_patch=false;
+        }
+        if(apply_patch && vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("EDDDAV")){
+          if(LDEBUG){cerr << soliloquy << " vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"EDDDAV\")==TRUE: skipping EDDDAV patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          apply_patch=false;
+        }
+        if(apply_patch && KBIN::XVASP_Afix_GENERIC("EDDDAV",xvasp,kflags,vflags)){
+          KBIN::VASP_Error(xvasp,"WWWWW  ERROR "+soliloquy+" EDDDAV problems "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_));
+          aus << "WWWWW  FIX EDDDAV - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+          xfixed.flag("EDDDAV",TRUE);xfixed.flag("ALL",TRUE);
         }
         // ********* CHECK EFIELD_PEAD PROBLEMS ******************
         if(LDEBUG){cerr << soliloquy << " [CHECK EFIELD_PEAD PROBLEMS] " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
-        if(!vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("EFIELD_PEAD") && !xfixed.flag("ALL")) { // check EFIELD_PEAD
-          if(xwarning.flag("EFIELD_PEAD")) // can be applied many times && !xfixed.flag("EFIELD_PEAD")) // Apply only ONCE
-          {  //CO20200106 - patching for auto-indenting
-            KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  EFIELD_PEAD problems ");
-            aus << "WWWWW  FIX EFIELD_PEAD - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-            aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-            KBIN::XVASP_Afix_GENERIC("EFIELD_PEAD",xvasp,kflags,vflags);
-            xfixed.flag("EFIELD_PEAD",TRUE);xfixed.flag("ALL",TRUE);
-          }
+        apply_patch=xwarning.flag("EFIELD_PEAD");
+        if(apply_patch && xfixed.flag("ALL")){
+          if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"ALL\")==TRUE: skipping EFIELD_PEAD patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          apply_patch=false;
+        }
+        //[keep decreasing EFIELD_PEAD until it works]if(apply_patch && xfixed.flag("EFIELD_PEAD")){
+        //[keep decreasing EFIELD_PEAD until it works]  if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"EFIELD_PEAD\")==TRUE: skipping EFIELD_PEAD patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+        //[keep decreasing EFIELD_PEAD until it works]  apply_patch=false;
+        //[keep decreasing EFIELD_PEAD until it works]}
+        if(apply_patch && vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("EFIELD_PEAD")){
+          if(LDEBUG){cerr << soliloquy << " vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"EFIELD_PEAD\")==TRUE: skipping EFIELD_PEAD patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          apply_patch=false;
+        }
+        if(apply_patch && KBIN::XVASP_Afix_GENERIC("EFIELD_PEAD",xvasp,kflags,vflags)){
+          KBIN::VASP_Error(xvasp,"WWWWW  ERROR "+soliloquy+" EFIELD_PEAD problems "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_));
+          aus << "WWWWW  FIX EFIELD_PEAD - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+          xfixed.flag("EFIELD_PEAD",TRUE);xfixed.flag("ALL",TRUE);
         }
         // ********* CHECK ZPOTRF PROBLEMS ******************
         if(LDEBUG){cerr << soliloquy << " [CHECK ZPOTRF PROBLEMS] " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
-        if(0) if(!vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ZPOTRF") && !xfixed.flag("ALL")) { // check ZPOTRF
-          if(xwarning.flag("ZPOTRF") && !xfixed.flag("ZPOTRF")) { // Apply only ONCE
-            counter_ZPOTRF++;
-            KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  ZPOTRF problems ");
-            aus << "WWWWW  FIX ZPOTRF - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-            aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-            aus << "00000  MESSAGE WARNING SWAPPING TO CONVENTIONAL STRUCTURE" << " - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+        apply_patch=xwarning.flag("ZPOTRF");
+        if(apply_patch && xfixed.flag("ALL")){
+          if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"ALL\")==TRUE: skipping ZPOTRF patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          apply_patch=false;
+        }
+        if(apply_patch && xfixed.flag("ZPOTRF")){
+          if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"ZPOTRF\")==TRUE: skipping ZPOTRF patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          apply_patch=false;
+        }
+        if(apply_patch && vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ZPOTRF")){
+          if(LDEBUG){cerr << soliloquy << " vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ZPOTRF\")==TRUE: skipping ZPOTRF patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          apply_patch=false;
+        }
+        if(0){
+          if(apply_patch){
+            aus << "00000  MESSAGE WARNING SWAPPING TO CONVENTIONAL STRUCTURE" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
             aus << "00000  MESSAGE BEFORE: a,b,c,alpha,beta,gamma " << xvasp.str.a << "," << xvasp.str.b << "," << xvasp.str.c << "," << xvasp.str.alpha << "," << xvasp.str.beta << "," << xvasp.str.gamma << endl;
             aus << "00000  MESSAGE BEFORE: structure: " << endl;
             aus << xvasp.str;
             aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-            KBIN::XVASP_Afix_GENERIC("ZPOTRF",xvasp,kflags,vflags);
+          }
+          if(apply_patch && KBIN::XVASP_Afix_GENERIC("ZPOTRF",xvasp,kflags,vflags)){
+            KBIN::VASP_Error(xvasp,"WWWWW  ERROR "+soliloquy+" ZPOTRF problems "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_));
+            aus << "WWWWW  FIX ZPOTRF - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
             aus << "00000  MESSAGE AFTER: a,b,c,alpha,beta,gamma " << xvasp.str.a << "," << xvasp.str.b << "," << xvasp.str.c << "," << xvasp.str.alpha << "," << xvasp.str.beta << "," << xvasp.str.gamma << endl;
             aus << "00000  MESSAGE AFTER: structure: " << endl;
             aus << xvasp.str;
             aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
             xfixed.flag("ZPOTRF",TRUE);xfixed.flag("ALL",TRUE);
           }
-        }
-        if(LDEBUG){cerr << soliloquy << " [CHECK ZPOTRF PROBLEMS] " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
-        if(!vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ZPOTRF") && !xfixed.flag("ALL")) { // check ZPOTRF
-          if(xwarning.flag("ZPOTRF") && !xfixed.flag("ZPOTRF")) { // Apply only ONCE
-            counter_ZPOTRF++;
-            KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  ZPOTRF problems ");
-            aus << "WWWWW  FIX ZPOTRF - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-            aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);	    
-            aus << "00000  MESSAGE WARNING CHANGING POTIM" << " - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-            aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-            KBIN::XVASP_Afix_GENERIC("ZPOTRF_POTIM",xvasp,kflags,vflags);
-            aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+        }else{
+          if(apply_patch && KBIN::XVASP_Afix_GENERIC("ZPOTRF_POTIM",xvasp,kflags,vflags)){
+            KBIN::VASP_Error(xvasp,"WWWWW  ERROR "+soliloquy+" ZPOTRF problems "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_));
+            aus << "WWWWW  FIX ZPOTRF - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+            aus << "00000  MESSAGE WARNING CHANGING POTIM" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
             xfixed.flag("ZPOTRF",TRUE);xfixed.flag("ALL",TRUE);
           }
         }
-
         // ********* CHECK EXCHANGE_CORRELATION PROBLEMS ******************
-        if(LDEBUG){cerr << soliloquy << " [CHECK EXCHANGE_CORRELATION PROBLEMS] " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
-        if(!vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("EXCCOR") && !xfixed.flag("ALL")) { // OPTIONS FOR EXCCOR
-          if(xwarning.flag("EXCCOR") && !xfixed.flag("EXCCOR")) {  // Apply only ONCE
-            KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  EXCHANGE-CORRELATION problems ");
-            aus << "WWWWW  FIX  EXCHANGE-CORRELATION - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-            aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-            KBIN::XVASP_Afix_GENERIC("EXCCOR",xvasp,kflags,vflags);
-            xfixed.flag("EXCCOR",TRUE);xfixed.flag("ALL",TRUE);
-          }
+        if(LDEBUG){cerr << soliloquy << " [CHECK EXCCOR PROBLEMS] " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+        apply_patch=xwarning.flag("EXCCOR");
+        if(apply_patch && xfixed.flag("ALL")){
+          if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"ALL\")==TRUE: skipping EXCCOR patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          apply_patch=false;
+        }
+        if(apply_patch && xfixed.flag("EXCCOR")){
+          if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"EXCCOR\")==TRUE: skipping EXCCOR patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          apply_patch=false;
+        }
+        if(apply_patch && vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("EXCCOR")){
+          if(LDEBUG){cerr << soliloquy << " vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"EXCCOR\")==TRUE: skipping EXCCOR patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          apply_patch=false;
+        }
+        if(apply_patch && KBIN::XVASP_Afix_GENERIC("EXCCOR",xvasp,kflags,vflags)){
+          KBIN::VASP_Error(xvasp,"WWWWW  ERROR "+soliloquy+" EXCCOR problems "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_));
+          aus << "WWWWW  FIX EXCCOR - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+          xfixed.flag("EXCCOR",TRUE);xfixed.flag("ALL",TRUE);
         }
         // ********* NEAREST NEIGHBOR ATOMS PROBLEMS ******************
-        if(LDEBUG){cerr << soliloquy << " [CHECK NEAREST NEIGHBOR ATOMS PROBLEMS] " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
-        if(!vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("NATOMS") && !xfixed.flag("ALL")) { // OPTIONS FOR NATOMS
-          if(xwarning.flag("NATOMS") && !xfixed.flag("NATOMS")) {  // Apply only ONCE
-            KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  NEAREST-NEIGHBORS ATOMS problems ");
-            aus << "WWWWW  FIX  NEAREST-NEIGHBORS ATOMS - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-            aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-            KBIN::XVASP_Afix_GENERIC("NATOMS",xvasp,kflags,vflags);
-            xfixed.flag("NATOMS",TRUE);xfixed.flag("ALL",TRUE);
-          }
+        if(LDEBUG){cerr << soliloquy << " [CHECK NATOMS PROBLEMS] " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+        apply_patch=xwarning.flag("NATOMS");
+        if(apply_patch && xfixed.flag("ALL")){
+          if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"ALL\")==TRUE: skipping NATOMS patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          apply_patch=false;
+        }
+        if(apply_patch && xfixed.flag("NATOMS")){
+          if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"NATOMS\")==TRUE: skipping NATOMS patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          apply_patch=false;
+        }
+        if(apply_patch && vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("NATOMS")){
+          if(LDEBUG){cerr << soliloquy << " vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"NATOMS\")==TRUE: skipping NATOMS patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          apply_patch=false;
+        }
+        if(apply_patch && KBIN::XVASP_Afix_GENERIC("NATOMS",xvasp,kflags,vflags)){
+          KBIN::VASP_Error(xvasp,"WWWWW  ERROR "+soliloquy+" NATOMS problems "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_));
+          aus << "WWWWW  FIX NATOMS - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+          xfixed.flag("NATOMS",TRUE);xfixed.flag("ALL",TRUE);
         }
         // ********* MEMORY PROBLEMS ******************
         if(LDEBUG){cerr << soliloquy << " [CHECK MEMORY PROBLEMS] " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
-        if(!vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("MEMORY") && !xfixed.flag("ALL")) { // OPTIONS FOR MEMORY
-          if(xwarning.flag("MEMORY") && !xfixed.flag("MEMORY")) {  // Apply only ONCE
-            KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  MEMORY problems ");
-            aus << "WWWWW  FIX  MEMORY - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-            aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-            stringstream command("");
-            command << "cat " << xvasp.Directory << "/vasp.out | grep AFLOW > " << xvasp.Directory << "/" << DEFAULT_AFLOW_MEMORY_OUT << endl;
-            command << "cat " << xvasp.Directory << "/vasp.out | grep AFLOW > " << xvasp.Directory << "/SKIP" << endl;	
-            command << "cat " << xvasp.Directory << "/vasp.out | grep AFLOW >> " << xvasp.Directory << DEFAULT_AFLOW_ERVASP_OUT << endl;	
-            aurostd::execute(command);
-            xfixed.flag("MEMORY",TRUE);xfixed.flag("ALL",TRUE);
-            KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  ERROR MEMORY PROBLEMS "); return FALSE;
-          }
+        apply_patch=xwarning.flag("MEMORY");
+        if(apply_patch && xfixed.flag("ALL")){
+          if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"ALL\")==TRUE: skipping MEMORY patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          apply_patch=false;
+        }
+        if(apply_patch && xfixed.flag("MEMORY")){
+          if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"MEMORY\")==TRUE: skipping MEMORY patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          apply_patch=false;
+        }
+        if(apply_patch && vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("MEMORY")){
+          if(LDEBUG){cerr << soliloquy << " vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"MEMORY\")==TRUE: skipping MEMORY patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          apply_patch=false;
+        }
+        if(apply_patch && KBIN::XVASP_Afix_GENERIC("MEMORY",xvasp,kflags,vflags)){
+          KBIN::VASP_Error(xvasp,"WWWWW  ERROR "+soliloquy+" MEMORY problems "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_));
+          aus << "WWWWW  FIX MEMORY - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+          xfixed.flag("MEMORY",TRUE);xfixed.flag("ALL",TRUE);
         }
         // ********* CHECK PSMAXN PROBLEMS ******************
         if(LDEBUG){cerr << soliloquy << " [CHECK PSMAXN PROBLEMS] " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
-        if(!vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("PSMAXN") && !xfixed.flag("ALL")) { // CHECK FOR PSMAXN
-          if(xwarning.flag("PSMAXN") && !xfixed.flag("PSMAXN")) {  // Apply only ONCE
-            KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  PSMAXN problems ");
-            aus << "WWWWW  FIX PSMAXN - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-            aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-            KBIN::XVASP_Afix_GENERIC("PSMAXN",xvasp,kflags,vflags);
-            xfixed.flag("PSMAXN",TRUE);xfixed.flag("ALL",TRUE);
-          }
+        apply_patch=xwarning.flag("PSMAXN");
+        if(apply_patch && xfixed.flag("ALL")){
+          if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"ALL\")==TRUE: skipping PSMAXN patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          apply_patch=false;
+        }
+        if(apply_patch && xfixed.flag("PSMAXN")){
+          if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"PSMAXN\")==TRUE: skipping PSMAXN patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          apply_patch=false;
+        }
+        if(apply_patch && vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("PSMAXN")){
+          if(LDEBUG){cerr << soliloquy << " vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"PSMAXN\")==TRUE: skipping PSMAXN patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          apply_patch=false;
+        }
+        if(apply_patch && KBIN::XVASP_Afix_GENERIC("PSMAXN",xvasp,kflags,vflags)){
+          KBIN::VASP_Error(xvasp,"WWWWW  ERROR "+soliloquy+" PSMAXN problems "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_));
+          aus << "WWWWW  FIX PSMAXN - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+          xfixed.flag("PSMAXN",TRUE);xfixed.flag("ALL",TRUE);
         }
         // ********* CHECK NPAR PROBLEMS ******************
         if(LDEBUG){cerr << soliloquy << " [CHECK NPAR PROBLEM] " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
-        if(!vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("NPAR") && !xfixed.flag("ALL")) { // CHECK FOR NPAR
-          if(xwarning.flag("NPAR") && !xfixed.flag("NPAR")) {  // Apply only ONCE
-            KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  NPAR problems ");
-            aus << "WWWWW  FIX NPAR - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-            aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-            KBIN::XVASP_Afix_GENERIC("NPAR",xvasp,kflags,vflags);
-            xfixed.flag("NPAR",TRUE);xfixed.flag("ALL",TRUE);
-          }
+        apply_patch=xwarning.flag("NPAR");
+        if(apply_patch && xfixed.flag("ALL")){
+          if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"ALL\")==TRUE: skipping NPAR patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          apply_patch=false;
+        }
+        if(apply_patch && xfixed.flag("NPAR")){
+          if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"NPAR\")==TRUE: skipping NPAR patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          apply_patch=false;
+        }
+        if(apply_patch && vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("NPAR")){
+          if(LDEBUG){cerr << soliloquy << " vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"NPAR\")==TRUE: skipping NPAR patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          apply_patch=false;
+        }
+        if(apply_patch && KBIN::XVASP_Afix_GENERIC("NPAR",xvasp,kflags,vflags)){
+          KBIN::VASP_Error(xvasp,"WWWWW  ERROR "+soliloquy+" NPAR problems "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_));
+          aus << "WWWWW  FIX NPAR - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+          xfixed.flag("NPAR",TRUE);xfixed.flag("ALL",TRUE);
         }
         // ********* CHECK NPARC PROBLEMS ******************
         if(LDEBUG){cerr << soliloquy << " [CHECK NPARC PROBLEMS] " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
-        if(!vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("NPARC") && !xfixed.flag("ALL")) { // CHECK FOR NPARC
-          if(xwarning.flag("NPARC") && !xfixed.flag("NPARC")) {  // Apply only ONCE
-            KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  NPARC problems ");
-            aus << "WWWWW  FIX NPARC - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-            aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-            KBIN::XVASP_Afix_GENERIC("NPARC",xvasp,kflags,vflags,kflags.KBIN_MPI_NCPUS);  // this will kill the system as NBANDS_MPI=NPAR*NBANDS_SERIAL
-            xfixed.flag("NPARC",TRUE);xfixed.flag("ALL",TRUE);
-          }
+        apply_patch=xwarning.flag("NPARC");
+        if(apply_patch && xfixed.flag("ALL")){
+          if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"ALL\")==TRUE: skipping NPARC patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          apply_patch=false;
+        }
+        if(apply_patch && xfixed.flag("NPARC")){
+          if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"NPARC\")==TRUE: skipping NPARC patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          apply_patch=false;
+        }
+        if(apply_patch && vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("NPARC")){
+          if(LDEBUG){cerr << soliloquy << " vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"NPARC\")==TRUE: skipping NPARC patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          apply_patch=false;
+        }
+        if(apply_patch && KBIN::XVASP_Afix_GENERIC("NPARC",xvasp,kflags,vflags)){
+          KBIN::VASP_Error(xvasp,"WWWWW  ERROR "+soliloquy+" NPARC problems "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_));
+          aus << "WWWWW  FIX NPARC - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+          xfixed.flag("NPARC",TRUE);xfixed.flag("ALL",TRUE);
         }
         // ********* CHECK NPARN PROBLEMS ******************
         if(LDEBUG){cerr << soliloquy << " [CHECK NPARN PROBLEMS] " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
-        if(!vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("NPARN") && !xfixed.flag("ALL")) { // CHECK FOR NPARN
-          if(xwarning.flag("NPARN") && !xfixed.flag("NPARN")) {  // Apply only ONCE
-            KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  NPARN problems ");
-            aus << "WWWWW  FIX NPARN - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-            aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-            KBIN::XVASP_Afix_GENERIC("NPARN",xvasp,kflags,vflags,kflags.KBIN_MPI_NCPUS);  // this will kill the system as NBANDS_MPI=NPAR*NBANDS_SERIAL
-            xfixed.flag("NPARN",TRUE);xfixed.flag("ALL",TRUE);
-          }
+        apply_patch=xwarning.flag("NPARN");
+        if(apply_patch && xfixed.flag("ALL")){
+          if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"ALL\")==TRUE: skipping NPARN patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          apply_patch=false;
+        }
+        if(apply_patch && xfixed.flag("NPARN")){
+          if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"NPARN\")==TRUE: skipping NPARN patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          apply_patch=false;
+        }
+        if(apply_patch && vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("NPARN")){
+          if(LDEBUG){cerr << soliloquy << " vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"NPARN\")==TRUE: skipping NPARN patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          apply_patch=false;
+        }
+        if(apply_patch && KBIN::XVASP_Afix_GENERIC("NPARN",xvasp,kflags,vflags)){
+          KBIN::VASP_Error(xvasp,"WWWWW  ERROR "+soliloquy+" NPARN problems "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_));
+          aus << "WWWWW  FIX NPARN - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+          xfixed.flag("NPARN",TRUE);xfixed.flag("ALL",TRUE);
         }
         // ********* CHECK NPAR_REMOVE PROBLEMS ******************
         if(LDEBUG){cerr << soliloquy << " [CHECK NPAR_REMOVE PROBLEMS] " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
-        if(!vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("NPAR_REMOVE") && !xfixed.flag("ALL")) { // CHECK FOR NPAR_REMOVE
-          if(xwarning.flag("NPAR_REMOVE") && !xfixed.flag("NPAR_REMOVE")) {  // Apply only ONCE
-            KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  NPAR_REMOVE problems ");
-            aus << "WWWWW  FIX NPAR_REMOVE - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-            aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-            KBIN::XVASP_Afix_GENERIC("NPAR_REMOVE",xvasp,kflags,vflags,kflags.KBIN_MPI_NCPUS);  // this will be asked when NPAR is needed
-            xfixed.flag("NPAR_REMOVE",TRUE);xfixed.flag("ALL",TRUE);
-          }
+        apply_patch=xwarning.flag("NPAR_REMOVE");
+        if(apply_patch && xfixed.flag("ALL")){
+          if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"ALL\")==TRUE: skipping NPAR_REMOVE patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          apply_patch=false;
+        }
+        if(apply_patch && xfixed.flag("NPAR_REMOVE")){
+          if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"NPAR_REMOVE\")==TRUE: skipping NPAR_REMOVE patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          apply_patch=false;
+        }
+        if(apply_patch && vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("NPAR_REMOVE")){
+          if(LDEBUG){cerr << soliloquy << " vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"NPAR_REMOVE\")==TRUE: skipping NPAR_REMOVE patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          apply_patch=false;
+        }
+        if(apply_patch && KBIN::XVASP_Afix_GENERIC("NPAR_REMOVE",xvasp,kflags,vflags)){
+          KBIN::VASP_Error(xvasp,"WWWWW  ERROR "+soliloquy+" NPAR_REMOVE problems "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_));
+          aus << "WWWWW  FIX NPAR_REMOVE - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+          xfixed.flag("NPAR_REMOVE",TRUE);xfixed.flag("ALL",TRUE);
         }
         // ********* CHECK CSLOSHING PROBLEMS ******************
         if(LDEBUG){cerr << soliloquy << " [CHECK CSLOSHING PROBLEMS] " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
-        //apply KBIN::XVASP_Afix_GENERIC("NELM") as a last resort
-        if(!vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("CSLOSHING") && !xfixed.flag("ALL")) { // check CSLOSHING
-          if(xwarning.flag("CSLOSHING") && !xfixed.flag("CSLOSHING")) { // Apply only ONCE
-            KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  CSLOSHING problems ");
-            aus << "WWWWW  FIX CSLOSHING - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-            aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-            KBIN::XVASP_Afix_GENERIC("CSLOSHING",xvasp,kflags,vflags);
-            //	  KBIN_XVASP_Afix_CSLOSHING(xvasp,kflags,vflags);
-            xfixed.flag("CSLOSHING",TRUE);xfixed.flag("ALL",TRUE);
-          }
+        apply_patch=xwarning.flag("CSLOSHING");
+        if(apply_patch && xfixed.flag("ALL")){
+          if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"ALL\")==TRUE: skipping CSLOSHING patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          apply_patch=false;
+        }
+        if(apply_patch && xfixed.flag("CSLOSHING")){
+          if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"CSLOSHING\")==TRUE: skipping CSLOSHING patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          apply_patch=false;
+        }
+        if(apply_patch && vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("CSLOSHING")){
+          if(LDEBUG){cerr << soliloquy << " vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"CSLOSHING\")==TRUE: skipping CSLOSHING patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          apply_patch=false;
+        }
+        if(apply_patch && KBIN::XVASP_Afix_GENERIC("CSLOSHING",xvasp,kflags,vflags)){
+          KBIN::VASP_Error(xvasp,"WWWWW  ERROR "+soliloquy+" CSLOSHING problems "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_));
+          aus << "WWWWW  FIX CSLOSHING - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+          xfixed.flag("CSLOSHING",TRUE);xfixed.flag("ALL",TRUE);
         }
         // ********* CHECK DENTET PROBLEMS ******************
         if(LDEBUG){cerr << soliloquy << " [CHECK DENTET PROBLEMS] " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
-        if(!vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("DENTET") && !xfixed.flag("ALL")) { // CHECK FOR DENTET
-          if(xwarning.flag("DENTET") && !xfixed.flag("DENTET")) {  // Apply only ONCE
-            KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  DENTET problems ");
-            aus << "WWWWW  FIX DENTET - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-            aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-            KBIN::XVASP_Afix_GENERIC("DENTET",xvasp,kflags,vflags);
-            xfixed.flag("DENTET",TRUE);xfixed.flag("ALL",TRUE);
-          }
+        apply_patch=xwarning.flag("DENTET");
+        if(apply_patch && xfixed.flag("ALL")){
+          if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"ALL\")==TRUE: skipping DENTET patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          apply_patch=false;
         }
-
+        if(apply_patch && xfixed.flag("DENTET")){
+          if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"DENTET\")==TRUE: skipping DENTET patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          apply_patch=false;
+        }
+        if(apply_patch && vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("DENTET")){
+          if(LDEBUG){cerr << soliloquy << " vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"DENTET\")==TRUE: skipping DENTET patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          apply_patch=false;
+        }
+        if(apply_patch && KBIN::XVASP_Afix_GENERIC("DENTET",xvasp,kflags,vflags)){
+          KBIN::VASP_Error(xvasp,"WWWWW  ERROR "+soliloquy+" DENTET problems "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_));
+          aus << "WWWWW  FIX DENTET - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+          xfixed.flag("DENTET",TRUE);xfixed.flag("ALL",TRUE);
+        }
         //CO20200624 - DO LAST
         // ********* CHECK NELM PROBLEMS ******************
         if(LDEBUG){cerr << soliloquy << " [CHECK NELM PROBLEMS] " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
-        if(!vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("NELM") && !xfixed.flag("ALL")) { // check NELM
-          if(xwarning.flag("NELM") && nelm<MAX_VASP_NELM) {  //only increase nelm so many times
-            KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  NELM problems ");
-            KBIN::XVASP_Afix_GENERIC("NELM",xvasp,kflags,vflags);
-            xfixed.flag("NELM",TRUE);xfixed.flag("ALL",TRUE);
-            aus << "WWWWW  FIX NELM = [" << nelm << "] - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-            aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-            // cerr << "nelm=" << nelm << endl;
-          }
+        apply_patch=xwarning.flag("NELM");
+        if(apply_patch && xfixed.flag("ALL")){
+          if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"ALL\")==TRUE: skipping NELM patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          apply_patch=false;
         }
-
-        //[CO20201220 - NO EVIDENCE THIS WORKS]// ********* CHECK OUTCAR PROBLEMS ****************** //CO20201111 - CHECK LAST! KIND OF A CATCH ALL
-        //[CO20201220 - NO EVIDENCE THIS WORKS]if(LDEBUG){cerr << soliloquy << " [CHECK OUTCAR PROBLEMS] " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}  //CO20201111
-        //[CO20201220 - NO EVIDENCE THIS WORKS]if(!xfixed.flag("ALL")) {
-        //[CO20201220 - NO EVIDENCE THIS WORKS]  if(xwarning.flag("OUTCAR_INCOMPLETE") && !xfixed.flag("OUTCAR_INCOMPLETE")) {
-        //[CO20201220 - NO EVIDENCE THIS WORKS]    KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  OUTCAR problems ");
-        //[CO20201220 - NO EVIDENCE THIS WORKS]    aus << "WWWWW  RERUNNING TO FIX OUTCAR - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-        //[CO20201220 - NO EVIDENCE THIS WORKS]    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-        //[CO20201220 - NO EVIDENCE THIS WORKS]    xfixed.flag("OUTCAR_INCOMPLETE",TRUE);xfixed.flag("ALL",TRUE);
-        //[CO20201220 - NO EVIDENCE THIS WORKS]  }
+        if(apply_patch && xfixed.flag("NELM")){
+          if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"NELM\")==TRUE: skipping NELM patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          apply_patch=false;
+        }
+        if(apply_patch && vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("NELM")){
+          if(LDEBUG){cerr << soliloquy << " vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"NELM\")==TRUE: skipping NELM patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+          apply_patch=false;
+        }
+        if(apply_patch && KBIN::XVASP_Afix_GENERIC("NELM",xvasp,kflags,vflags)){
+          KBIN::VASP_Error(xvasp,"WWWWW  ERROR "+soliloquy+" NELM problems "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_));
+          aus << "WWWWW  FIX NELM - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+          xfixed.flag("NELM",TRUE);xfixed.flag("ALL",TRUE);
+        }
+        //[CO20201220 - NO EVIDENCE THIS WORKS]// ********* CHECK OUTCAR_INCOMPLETE PROBLEMS ******************  //CO20201111 - CHECK LAST! KIND OF A CATCH ALL
+        //[CO20201220 - NO EVIDENCE THIS WORKS]if(LDEBUG){cerr << soliloquy << " [CHECK OUTCAR_INCOMPLETE PROBLEMS] " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+        //[CO20201220 - NO EVIDENCE THIS WORKS]apply_patch=xwarning.flag("OUTCAR_INCOMPLETE");
+        //[CO20201220 - NO EVIDENCE THIS WORKS]if(apply_patch && xfixed.flag("ALL")){
+        //[CO20201220 - NO EVIDENCE THIS WORKS]  if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"ALL\")==TRUE: skipping OUTCAR_INCOMPLETE patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+        //[CO20201220 - NO EVIDENCE THIS WORKS]  apply_patch=false;
+        //[CO20201220 - NO EVIDENCE THIS WORKS]}
+        //[CO20201220 - NO EVIDENCE THIS WORKS]if(apply_patch && xfixed.flag("OUTCAR_INCOMPLETE")){
+        //[CO20201220 - NO EVIDENCE THIS WORKS]  if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"OUTCAR_INCOMPLETE\")==TRUE: skipping OUTCAR_INCOMPLETE patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+        //[CO20201220 - NO EVIDENCE THIS WORKS]  apply_patch=false;
+        //[CO20201220 - NO EVIDENCE THIS WORKS]}
+        //[CO20201220 - NO EVIDENCE THIS WORKS]if(apply_patch && vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("OUTCAR_INCOMPLETE")){
+        //[CO20201220 - NO EVIDENCE THIS WORKS]  if(LDEBUG){cerr << soliloquy << " vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"OUTCAR_INCOMPLETE\")==TRUE: skipping OUTCAR_INCOMPLETE patch " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+        //[CO20201220 - NO EVIDENCE THIS WORKS]  apply_patch=false;
+        //[CO20201220 - NO EVIDENCE THIS WORKS]}
+        //[CO20201220 - NO EVIDENCE THIS WORKS]if(apply_patch){  //RERUNNING TO FIX OUTCAR
+        //[CO20201220 - NO EVIDENCE THIS WORKS]  KBIN::VASP_Error(xvasp,"WWWWW  ERROR "+soliloquy+" OUTCAR_INCOMPLETE problems "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_));
+        //[CO20201220 - NO EVIDENCE THIS WORKS]  aus << "WWWWW  FIX OUTCAR_INCOMPLETE - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+        //[CO20201220 - NO EVIDENCE THIS WORKS]  xfixed.flag("OUTCAR_INCOMPLETE",TRUE);xfixed.flag("ALL",TRUE);
         //[CO20201220 - NO EVIDENCE THIS WORKS]}
         
         // ********* VASP TO BE RESTARTED *********
@@ -4175,8 +4324,7 @@ namespace KBIN {
         if(xfixed.flag("ALL")) vasp_start=TRUE;
         if(vasp_start) {
           if(LDEBUG){cerr << soliloquy << " [VASP TO BE RESTARTED] " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
-          aus << "00000  RESTART VASP   - " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;
-          aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+          aus << "00000  RESTART VASP - " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
         }
       }
     }
@@ -4297,34 +4445,18 @@ namespace KBIN {
 } // namespace KBIN
 
 namespace KBIN {
-  void VASP_Error(_xvasp &xvasp,string message1,string message2,string message3) {
-    //  pthread_mutex_lock( &mutex_KVASP );
+  void VASP_Error(const _xvasp& xvasp,const string& message1,const string& message2,const string& message3) { //CO20210315 - cleaned up
     ofstream FileXVASP;
-    string FileNameXVASP;
-    FileNameXVASP=xvasp.Directory+"/"+DEFAULT_AFLOW_ERVASP_OUT;
-    if(1) {
-      FileXVASP.open(FileNameXVASP.c_str(),std::ios::out|std::ios::app);
-      // FileXVASP.open(FileNameXVASP.c_str(),std::ios::app);
-      FileXVASP << message1 << message2 << message3 << "  - " <<endl;
-      //   cerr << message1 << message2 << message3 << "  - " <<endl;
-      FileXVASP.flush(); FileXVASP.clear();
-      FileXVASP.close();
-    }
-    if(0) {
-      ostringstream aus;
-      aus << "echo \"" << message1 << message2 << message3 << " \" >> " << FileNameXVASP << endl;//endl;
-      aurostd::execute(aus);
-      //    cerr << aus.str();
-    }
-    //  pthread_mutex_unlock( &mutex_KVASP);
+    return VASP_Error(xvasp,FileXVASP,message1,message2,message3);
   }
 } // namespace KBIN
 
 namespace KBIN {
-  void VASP_Error(_xvasp &xvasp,ofstream &FileMESSAGE,string message1,string message2,string message3) {
-    KBIN::VASP_Error(xvasp,message1,message2,message3);
-    ostringstream aus; aus << message1 << message2 << message3;
-    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+  void VASP_Error(const _xvasp& xvasp,ofstream &FileMESSAGE,const string& message1,const string& message2,const string& message3) { //CO20210315 - cleaned up
+    string FileNameXVASP=xvasp.Directory+"/"+DEFAULT_AFLOW_ERVASP_OUT;
+    stringstream message;message << message1 << message2 << message3 << endl;
+    aurostd::stringstream2file(message,FileNameXVASP,"APPEND");
+    aurostd::PrintMessageStream(FileMESSAGE,message,XHOST.QUIET);
   }
 } // namespace KBIN
 

@@ -3527,7 +3527,7 @@ namespace aurostd {
   // Function string2file string2compressfile string2gzfile string2bz2file string2xzfile
   // ***************************************************************************
   // write string to file - Stefano Curtarolo
-  bool string2file(const string& StringOUTPUT,const string& FileNameOUTPUT,string mode) {
+  bool string2file(const string& StringOUTPUT,const string& FileNameOUTPUT,const string& mode) {
     if(mode=="POST" || mode=="APPEND") {
       stringstream FileINPUT;
       aurostd::file2stringstream(FileNameOUTPUT,FileINPUT);
@@ -3558,7 +3558,7 @@ namespace aurostd {
     return FALSE;
   }
 
-  bool string2compressfile(const string& command,const string& StringOUTPUT,const string& _file,string mode) {
+  bool string2compressfile(const string& command,const string& StringOUTPUT,const string& _file,const string& mode) {
     // "" compliant SC20190401
     string file=aurostd::CleanFileName(_file);
     bool out=string2file(StringOUTPUT,file,mode);
@@ -3566,15 +3566,15 @@ namespace aurostd {
     return out;
   }
 
-  bool string2gzfile(const string& StringOUTPUT,const string& file,string mode) {
+  bool string2gzfile(const string& StringOUTPUT,const string& file,const string& mode) {
     return string2compressfile("gzip",StringOUTPUT,file,mode);
   }
 
-  bool string2bz2file(const string& StringOUTPUT,const string& file,string mode) {
+  bool string2bz2file(const string& StringOUTPUT,const string& file,const string& mode) {
     return string2compressfile("bzip2",StringOUTPUT,file,mode);
   }
 
-  bool string2xzfile(const string& StringOUTPUT,const string& file,string mode) {
+  bool string2xzfile(const string& StringOUTPUT,const string& file,const string& mode) {
     return string2compressfile("xz",StringOUTPUT,file,mode);
   }
 
@@ -3583,7 +3583,7 @@ namespace aurostd {
   // Function stringstream2file stringstream2compressedfile stringstream2gzfile stringstream2bz2file stringstream2xzfile
   // ***************************************************************************
   // write string to file - Stefano Curtarolo
-  bool stringstream2file(const stringstream& StringstreamOUTPUT,const string& _file,string mode) {
+  bool stringstream2file(const stringstream& StringstreamOUTPUT,const string& _file,const string& mode) {
     string file=aurostd::CleanFileName(_file);
     bool writable=true;  //CO20190808 - captures whether we can open/write file
     if(mode=="POST" || mode=="APPEND") {
@@ -3623,22 +3623,22 @@ namespace aurostd {
   }
 
 
-  bool stringstream2compressfile(const string& command,const stringstream& StringstreamOUTPUT,const string& _file,string mode) {
+  bool stringstream2compressfile(const string& command,const stringstream& StringstreamOUTPUT,const string& _file,const string& mode) {
     string file=aurostd::CleanFileName(_file);
     bool out=stringstream2file(StringstreamOUTPUT,file,mode);
     aurostd::execute(command+" -9fq \""+file+"\"");
     return out;
   }
 
-  bool stringstream2gzfile(const stringstream& StringstreamOUTPUT,const string& file,string mode) {
+  bool stringstream2gzfile(const stringstream& StringstreamOUTPUT,const string& file,const string& mode) {
     return stringstream2compressfile("gzip",StringstreamOUTPUT,file,mode);
   }
 
-  bool stringstream2bz2file(const stringstream& StringstreamOUTPUT,const string& file,string mode) {
+  bool stringstream2bz2file(const stringstream& StringstreamOUTPUT,const string& file,const string& mode) {
     return stringstream2compressfile("bzip2",StringstreamOUTPUT,file,mode);
   }
 
-  bool stringstream2xzfile(const stringstream& StringstreamOUTPUT,const string& file,string mode) {
+  bool stringstream2xzfile(const stringstream& StringstreamOUTPUT,const string& file,const string& mode) {
     return stringstream2compressfile("xz",StringstreamOUTPUT,file,mode);
   }
 

@@ -608,16 +608,16 @@ namespace aurostd {
   deque<string> stream2dequestring(stringstream& stringstreamIN);
   deque<string> string2dequestring(const string& stringIN);
   // about writing files
-  bool string2file(const string& StringOUTPUT,const string& FileNameOUTPUT,string="");
-  bool string2compressfile(const string& commamnd,const string& StringOUTPUT,const string& FileNameOUTPUT,string="");
-  bool string2gzfile(const string& StringOUTPUT,const string& FileNameOUTPUT,string="");
-  bool string2bz2file(const string& StringOUTPUT,const string& FileNameOUTPUT,string="");
-  bool string2xzfile(const string& StringOUTPUT,const string& FileNameOUTPUT,string="");
-  bool stringstream2file(const stringstream& StringstreamOUTPUT,const string& FileNameOUTPUT,string="");
-  bool stringstream2compressfile(const string& commamnd,const stringstream& StringstreamOUTPUT,const string& FileNameOUTPUT,string="");
-  bool stringstream2gzfile(const stringstream& StringstreamOUTPUT,const string& FileNameOUTPUT,string="");
-  bool stringstream2bz2file(const stringstream& StringstreamOUTPUT,const string& FileNameOUTPUT,string="");
-  bool stringstream2xzfile(const stringstream& StringstreamOUTPUT,const string& FileNameOUTPUT,string="");
+  bool string2file(const string& StringOUTPUT,const string& FileNameOUTPUT,const string& mode="");
+  bool string2compressfile(const string& commamnd,const string& StringOUTPUT,const string& FileNameOUTPUT,const string& mode="");
+  bool string2gzfile(const string& StringOUTPUT,const string& FileNameOUTPUT,const string& mode="");
+  bool string2bz2file(const string& StringOUTPUT,const string& FileNameOUTPUT,const string& mode="");
+  bool string2xzfile(const string& StringOUTPUT,const string& FileNameOUTPUT,const string& mode="");
+  bool stringstream2file(const stringstream& StringstreamOUTPUT,const string& FileNameOUTPUT,const string& mode="");
+  bool stringstream2compressfile(const string& commamnd,const stringstream& StringstreamOUTPUT,const string& FileNameOUTPUT,const string& mode="");
+  bool stringstream2gzfile(const stringstream& StringstreamOUTPUT,const string& FileNameOUTPUT,const string& mode="");
+  bool stringstream2bz2file(const stringstream& StringstreamOUTPUT,const string& FileNameOUTPUT,const string& mode="");
+  bool stringstream2xzfile(const stringstream& StringstreamOUTPUT,const string& FileNameOUTPUT,const string& mode="");
   // file2string
   uint file2string(string FileNameIN,string& StringIN);
   uint bz2file2string(string FileNameIN,string& StringIN);
