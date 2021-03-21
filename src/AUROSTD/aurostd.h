@@ -771,9 +771,8 @@ namespace aurostd {
   int GetNLinesString(const string& strstream) __xprototype;
   int GetNLinesString(const stringstream& strstream) __xprototype;
   int GetNLinesFile(const string& file_name) __xprototype;
-  string GetLineString(const string& strstream, const int& line) __xprototype;
-  string GetLineString(const stringstream& strstream, const int& line) __xprototype;
-  stringstream GetLineStringstream(const stringstream& strstream, const int& line) __xprototype;
+  string GetLineString(const string& strstream,int line);
+  string GetLineString(const stringstream& strstream,int line);
   // substitute strings in strings and stringstreams
   bool StringsAlphabetic(const string& A,const string& B,bool allow_identical=true); //CO20180801
   bool StringsAlphabetic(const vector<string>& input,bool allow_identical=true);  //CO20180801

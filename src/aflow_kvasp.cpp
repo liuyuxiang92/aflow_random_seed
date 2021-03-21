@@ -3443,12 +3443,31 @@ namespace KBIN {
         xwarning.flag("SYMPREC",(content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("inverse of rotation matrix was not found (increase SYMPREC)")))!=string::npos));  //usually goes with INVGRP
         //VASP's internal symmetry routines END
         xwarning.flag("BRMIX",(content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("BRMIX: very serious problems")))!=string::npos));
+        xwarning.flag("CSLOSHING",vasp_still_running==true && KBIN::VASP_OSZICARUnconverging(xvasp.Directory)); // check from OSZICAR
         xwarning.flag("DAV",(!xmessage.flag("REACHED_ACCURACY") &&
               (content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("WARNING: Sub-Space-Matrix is not hermitian in DAV")))!=string::npos)) );
+        xwarning.flag("DENTET",(content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("WARNING: DENTET: can't reach specified precision")))!=string::npos)); // not only npar==1
         xwarning.flag("EDDDAV",(content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("Error EDDDAV: Call to ZHEGV failed. Returncode")))!=string::npos));
         xwarning.flag("EDDRMM",(!xmessage.flag("REACHED_ACCURACY") &&
               (content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("WARNING in EDDRMM: call to ZHEGV failed, returncode")))!=string::npos)) ); // && !xwarning.flag("ZPOTRF");
-        xwarning.flag("ZPOTRF",(content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("LAPACK: Routine ZPOTRF failed")))!=string::npos));
+        xwarning.flag("EFIELD_PEAD",
+            (content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("EFIELD_PEAD is too large")))!=string::npos) || //20190704
+            (content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("EFIELD_PEAD are too large for comfort")))!=string::npos) || //20190704 - new VASP
+            FALSE); // EFIELD_PEAD  //CO20190704
+        xwarning.flag("EXCCOR",
+            (content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("ERROR FEXCF: supplied exchange-correlation table")))!=string::npos) || //CO20210315
+            (content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("ERROR FEXCP: supplied Exchange-correletion table")))!=string::npos) || //CO20210315 - looks like the formatting changed a bit between versions
+            FALSE); // look for problem at the correlation  //CO20210315
+        xwarning.flag("GAMMA_SHIFT",
+            (content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("shift your grid to Gamma")))!=string::npos) || //CO20190704 - captures both old/new versions of VASP
+            FALSE); //CO20190704
+        xwarning.flag("LRF_COMMUTATOR",(content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("LRF_COMMUTATOR internal error: the vector")))!=string::npos)); // GET ALL TIMES
+        xwarning.flag("MEMORY",(content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("AFLOW ERROR: AFLOW_MEMORY=")))!=string::npos));
+        xwarning.flag("MPICH11",((content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("BAD TERMINATION OF ONE OF YOUR APPLICATION PROCESSES")))!=string::npos) &&
+              (content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("EXIT CODE: 11")))!=string::npos)) );
+        xwarning.flag("MPICH139",((content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("BAD TERMINATION OF ONE OF YOUR APPLICATION PROCESSES")))!=string::npos) &&
+              (content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("EXIT CODE: 139")))!=string::npos)) );
+        xwarning.flag("NATOMS",(content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("The distance between some ions is very small")))!=string::npos)); // look for problem for distance
         //ME20190620 - Avoid changing NBANDS in the aflow.in file just because VASP throws the warning that NBANDS is changed because of NPAR. However, if you have that warning AND the error that the number of bands is not sufficient, aflow needs to act.
         if (aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out", "NBANDS")) {
           // The NBANDS warning due to NPAR is not an error we want to fix, so set to
@@ -3459,40 +3478,20 @@ namespace KBIN {
           nbands_error = nbands_error || aurostd::substring_present_file_FAST(xvasp.Directory + "/vasp.out", "The number of bands is not sufficient to hold all electrons");
           xwarning.flag("NBANDS", nbands_error);
         }
-        xwarning.flag("LRF_COMMUTATOR",(content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("LRF_COMMUTATOR internal error: the vector")))!=string::npos)); // GET ALL TIMES
-        xwarning.flag("EXCCOR",
-            (content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("ERROR FEXCF: supplied exchange-correlation table")))!=string::npos) || //CO20210315
-            (content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("ERROR FEXCP: supplied Exchange-correletion table")))!=string::npos) || //CO20210315 - looks like the formatting changed a bit between versions
-            FALSE); // look for problem at the correlation  //CO20210315
-        xwarning.flag("NATOMS",(content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("The distance between some ions is very small")))!=string::npos)); // look for problem for distance
-        xwarning.flag("MEMORY",(content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("AFLOW ERROR: AFLOW_MEMORY=")))!=string::npos));
-        // xwarning.flag("PSMAXN",(content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("WARNING: PSMAXN for non-local potential too small")))!=string::npos));
-        xwarning.flag("PSMAXN",(content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("REAL_OPT: internal ERROR")))!=string::npos));
-        xwarning.flag("REAL_OPTLAY_1",(content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("REAL_OPTLAY: internal error (1)")))!=string::npos));
-        xwarning.flag("REAL_OPT",(content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("REAL_OPT: internal ERROR")))!=string::npos));
+        xwarning.flag("NELM",vasp_still_running==false && KBIN::VASP_OSZICARUnconverged(xvasp.Directory)); // check from OSZICAR
         xwarning.flag("NPAR",(content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("please rerun with NPAR=")))!=string::npos)); // not only npar==1
+        xwarning.flag("NPAR_REMOVE",(content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("Please remove the tag NPAR from the INCAR file and restart the")))!=string::npos));
         xwarning.flag("NPARC",((content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("NPAR = 4")))!=string::npos) &&
               (content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("NPAR=number of cores")))!=string::npos)) ); // fix with NPAR=cores in MPI
         xwarning.flag("NPARN",((content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("NPAR = 4")))!=string::npos) &&
               (content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("NPAR=number of nodes")))!=string::npos)) ); // fix with NPAR=nodes in MPI
-        xwarning.flag("NPAR_REMOVE",(content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("Please remove the tag NPAR from the INCAR file and restart the")))!=string::npos));
-        xwarning.flag("GAMMA_SHIFT",
-            (content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("shift your grid to Gamma")))!=string::npos) || //CO20190704
-            (content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("Shift your grid to Gamma")))!=string::npos) || //CO20190704 - new VASP
-            FALSE); //CO20190704
-        xwarning.flag("CSLOSHING",vasp_still_running==true && KBIN::VASP_OSZICARUnconverging(xvasp.Directory)); // check from OSZICAR
-        xwarning.flag("NELM",vasp_still_running==false && KBIN::VASP_OSZICARUnconverged(xvasp.Directory)); // check from OSZICAR
-        xwarning.flag("DENTET",(content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("WARNING: DENTET: can't reach specified precision")))!=string::npos)); // not only npar==1
-        xwarning.flag("EFIELD_PEAD",
-            (content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("EFIELD_PEAD is too large")))!=string::npos) || //20190704
-            (content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("EFIELD_PEAD are too large for comfort")))!=string::npos) || //20190704 - new VASP
-            FALSE); // EFIELD_PEAD  //CO20190704
+        // xwarning.flag("PSMAXN",(content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("WARNING: PSMAXN for non-local potential too small")))!=string::npos));
+        xwarning.flag("PSMAXN",(content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("REAL_OPT: internal ERROR")))!=string::npos));
         xwarning.flag("READ_KPOINTS_RD_SYM",((content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("ERROR in RE_READ_KPOINTS_RD")))!=string::npos) &&
               (content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("switch off symmetry")))!=string::npos)) );
-        xwarning.flag("MPICH11",((content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("BAD TERMINATION OF ONE OF YOUR APPLICATION PROCESSES")))!=string::npos) &&
-              (content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("EXIT CODE: 11")))!=string::npos)) );
-        xwarning.flag("MPICH139",((content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("BAD TERMINATION OF ONE OF YOUR APPLICATION PROCESSES")))!=string::npos) &&
-              (content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("EXIT CODE: 139")))!=string::npos)) );
+        xwarning.flag("REAL_OPTLAY_1",(content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("REAL_OPTLAY: internal error (1)")))!=string::npos));
+        xwarning.flag("REAL_OPT",(content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("REAL_OPT: internal ERROR")))!=string::npos));
+        xwarning.flag("ZPOTRF",(content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("LAPACK: Routine ZPOTRF failed")))!=string::npos));
 
         if(LDEBUG){cerr << soliloquy << " [4] " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
 

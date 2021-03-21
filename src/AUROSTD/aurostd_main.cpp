@@ -4911,7 +4911,7 @@ namespace aurostd {
     return GetNLinesString(streamFILE);
   }
 
-  string GetLineString(const string& strstream, const int& line) {
+  string GetLineString(const string& strstream,int line) {
     string _strstream(strstream),_strline;
     //  if(line>aurostd::GetNLinesString(_strstream)) return (string) "";   // TOO SLOW IF THE STRING IS LONG !
     for(int i=0;i<line;i++) {
@@ -4920,7 +4920,7 @@ namespace aurostd {
     }
     return _strline;
   }
-  string GetLineString(const stringstream& strstream, const int& line) {
+  string GetLineString(const stringstream& strstream,int line) {
     return aurostd::GetLineString(strstream.str(),line);
   }
 
