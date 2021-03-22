@@ -3480,17 +3480,17 @@ namespace KBIN {
         }
         xwarning.flag("NELM",vasp_still_running==false && KBIN::VASP_OSZICARUnconverged(xvasp.Directory)); // check from OSZICAR
         xwarning.flag("NPAR",(content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("please rerun with NPAR=")))!=string::npos)); // not only npar==1
-        xwarning.flag("NPAR_REMOVE",(content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("Please remove the tag NPAR from the INCAR file and restart the")))!=string::npos));
         xwarning.flag("NPARC",((content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("NPAR = 4")))!=string::npos) &&
               (content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("NPAR=number of cores")))!=string::npos)) ); // fix with NPAR=cores in MPI
         xwarning.flag("NPARN",((content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("NPAR = 4")))!=string::npos) &&
               (content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("NPAR=number of nodes")))!=string::npos)) ); // fix with NPAR=nodes in MPI
+        xwarning.flag("NPAR_REMOVE",(content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("Please remove the tag NPAR from the INCAR file and restart the")))!=string::npos));
         // xwarning.flag("PSMAXN",(content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("WARNING: PSMAXN for non-local potential too small")))!=string::npos));
         xwarning.flag("PSMAXN",(content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("REAL_OPT: internal ERROR")))!=string::npos));
         xwarning.flag("READ_KPOINTS_RD_SYM",((content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("ERROR in RE_READ_KPOINTS_RD")))!=string::npos) &&
               (content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("switch off symmetry")))!=string::npos)) );
-        xwarning.flag("REAL_OPTLAY_1",(content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("REAL_OPTLAY: internal error (1)")))!=string::npos));
         xwarning.flag("REAL_OPT",(content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("REAL_OPT: internal ERROR")))!=string::npos));
+        xwarning.flag("REAL_OPTLAY_1",(content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("REAL_OPTLAY: internal error (1)")))!=string::npos));
         xwarning.flag("ZPOTRF",(content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("LAPACK: Routine ZPOTRF failed")))!=string::npos));
 
         if(LDEBUG){cerr << soliloquy << " [4] " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
@@ -3583,7 +3583,7 @@ namespace KBIN {
         //iterate through options faster/more efficiently
         //come back soon
 
-        bool apply_patch=false; //CO20210315 - prevents us from having many many nested if()/else()
+        bool apply_patch=false; //CO20210315 - prevents us from having many many nested if/else
 
         // ********* CHECK NBANDS PROBLEMS ******************
         if(LDEBUG){cerr << soliloquy << " [CHECK NBANDS PROBLEMS] " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
@@ -4318,6 +4318,8 @@ namespace KBIN {
         //[CO20201220 - NO EVIDENCE THIS WORKS]  xfixed.flag("OUTCAR_INCOMPLETE",TRUE);xfixed.flag("ALL",TRUE);
         //[CO20201220 - NO EVIDENCE THIS WORKS]}
         
+        //come back - should we check if any xwarning() flag is still on?
+
         // ********* VASP TO BE RESTARTED *********
         if(LDEBUG){cerr << soliloquy << " [DONE WITH CHECKS] " << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
         if(xfixed.flag("ALL")) vasp_start=TRUE;
