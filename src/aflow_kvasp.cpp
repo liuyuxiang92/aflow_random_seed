@@ -3650,24 +3650,26 @@ namespace KBIN {
         KBIN::VASP_ApplyPatch("INVGRP",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
         KBIN::VASP_ApplyPatch("SYMPREC",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
         // ********* APPLY GENERIC SYMMETRY FIXES ******************
-        //need to get ISYM and ISPIN (ISPIND too)
-        //get ISYM
-        int isym_current=2; //CO20200624 - VASP default for non-USPP runs, add check later for USPP //https://www.vasp.at/wiki/index.php/ISYM
-        if(aurostd::substring2bool(xvasp.INCAR,"ISYM=")){isym_current=aurostd::substring2utype<int>(xvasp.INCAR,"ISYM=");}
-        //[CO20210315 - ISPIND not necessary]//get ISPIND
-        //[CO20210315 - ISPIND not necessary]//seems ISPIND is not read from the INCAR: https://www.vasp.at/forum/viewtopic.php?f=3&t=3037
-        //[CO20210315 - ISPIND not necessary]int ispind_current=1; //CO20200624 - VASP default //https://cms.mpi.univie.ac.at/vasp/guide/node87.html
-        //[CO20210315 - ISPIND not necessary]if(aurostd::substring2bool(xvasp.INCAR,"ISPIND=")){ispind_current=aurostd::substring2utype<int>(xvasp.INCAR,"ISPIND=");}
-        //get ISPIN
-        int ispin_current=1; //CO20200624 - VASP default  //https://www.vasp.at/wiki/index.php/ISPIN
-        if(aurostd::substring2bool(xvasp.INCAR,"ISPIN=")){ispin_current=aurostd::substring2utype<int>(xvasp.INCAR,"ISPIN=");}
-        //[CO20210315 - ISPIND not necessary]if(ispin_current==2 && ispind_current==1){ispind_current=2;}  //in case ISPIND is not written but spin is on
-        //
-        if( ( xwarning.flag("ROTMAT") ) && 
-            ((ispin_current==2 && isym_current==-1) || isym_current==0)){  //CO20200624 - needs to change if we do magnetic systems //ispind_current==2 &&
-          aus << "MMMMM  IGNORING SYM WARNINGS: ISYM==" << isym_current << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-          aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-          xwarning.flag("ROTMAT",FALSE);xwarning.flag("NIRMAT",FALSE);xwarning.flag("KKSYM",FALSE);xwarning.flag("SYMPREC",FALSE);
+        if(0){  //not sure this is needed, the errors should disappear on their own
+          //need to get ISYM and ISPIN (ISPIND too)
+          //get ISYM
+          int isym_current=2; //CO20200624 - VASP default for non-USPP runs, add check later for USPP //https://www.vasp.at/wiki/index.php/ISYM
+          if(aurostd::substring2bool(xvasp.INCAR,"ISYM=")){isym_current=aurostd::substring2utype<int>(xvasp.INCAR,"ISYM=");}
+          //[CO20210315 - ISPIND not necessary]//get ISPIND
+          //[CO20210315 - ISPIND not necessary]//seems ISPIND is not read from the INCAR: https://www.vasp.at/forum/viewtopic.php?f=3&t=3037
+          //[CO20210315 - ISPIND not necessary]int ispind_current=1; //CO20200624 - VASP default //https://cms.mpi.univie.ac.at/vasp/guide/node87.html
+          //[CO20210315 - ISPIND not necessary]if(aurostd::substring2bool(xvasp.INCAR,"ISPIND=")){ispind_current=aurostd::substring2utype<int>(xvasp.INCAR,"ISPIND=");}
+          //get ISPIN
+          int ispin_current=1; //CO20200624 - VASP default  //https://www.vasp.at/wiki/index.php/ISPIN
+          if(aurostd::substring2bool(xvasp.INCAR,"ISPIN=")){ispin_current=aurostd::substring2utype<int>(xvasp.INCAR,"ISPIN=");}
+          //[CO20210315 - ISPIND not necessary]if(ispin_current==2 && ispind_current==1){ispind_current=2;}  //in case ISPIND is not written but spin is on
+          //
+          if( ( xwarning.flag("ROTMAT") ) && 
+              ((ispin_current==2 && isym_current==-1) || isym_current==0)){  //CO20200624 - needs to change if we do magnetic systems //ispind_current==2 &&
+            aus << "MMMMM  IGNORING SYM WARNINGS: ISYM==" << isym_current << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+            aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+            xwarning.flag("ROTMAT",FALSE);xwarning.flag("NIRMAT",FALSE);xwarning.flag("KKSYM",FALSE);xwarning.flag("SYMPREC",FALSE);
+          }
         }
         KBIN::VASP_ApplyPatch("ROTMAT",fix_ROTMAT,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
         // ********* APPLY OTHER FIXES ******************
