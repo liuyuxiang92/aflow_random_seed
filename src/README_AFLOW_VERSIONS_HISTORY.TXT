@@ -1,6 +1,9 @@
 3.2.9 - 2021/xx/xx
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.9.tar.xz
         -- Fixed bug with APL overwriting *.orig files. (AS)
+        -- patched XVASP_KPOINTS_OPERATION() so a change is ensured for Xeven/Xodd etc. (CO)
+        -- APL MINATOMS_RESTRICTED->MINATOMS_UNIFORM (CO)
+        -- adding PAW_PBE_KIN to allowed DFT types in chull (CO)
 3.2.8 - 2021/02/22
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.8.tar.xz
         -- lib2raw bug fixes (CO)
