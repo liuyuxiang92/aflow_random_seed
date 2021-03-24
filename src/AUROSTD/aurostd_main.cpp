@@ -1177,9 +1177,9 @@ namespace aurostd {
     string ss;
     bool copy=TRUE;
     for (uint i=0;i<s.size();i++) {
-      if(s[i]==toggle) copy=!copy;  //CO20190710
-      if(copy) if(s[i]!=' ' && s[i]!='\t') ss+=s[i];
-      if(!copy) ss+=s[i];
+      if(s[i]==toggle){copy=!copy;}  //CO20190710
+      if(copy){if(s[i]!=' ' && s[i]!='\t'){ss+=s[i];}}
+      else{ss+=s[i];}
     }
     return ss;
   }
@@ -1239,9 +1239,9 @@ namespace aurostd {
     string ss;
     bool copy=TRUE;
     for (uint i=0;i<s.size();i++) {
-      if(s[i]==toggle) copy=!copy;  //CO20190710
-      if(copy) if(s[i]!=' ') ss+=s[i];
-      if(!copy) ss+=s[i];
+      if(s[i]==toggle){copy=!copy;}  //CO20190710
+      if(copy){if(s[i]!=' '){ss+=s[i];}}
+      else{ss+=s[i];}
     }
     return ss;
   }
@@ -1275,9 +1275,9 @@ namespace aurostd {
     string ss;
     bool copy=TRUE;
     for (uint i=0;i<s.size();i++) {
-      if(s[i]==toggle) copy=!copy;  //CO20190710
-      if(copy) if(s[i]!='\t') ss+=s[i];
-      if(!copy) ss+=s[i];
+      if(s[i]==toggle){copy=!copy;}  //CO20190710
+      if(copy){if(s[i]!='\t'){ss+=s[i];}}
+      else{ss+=s[i];}
     }
     return ss;
   }
@@ -1315,7 +1315,7 @@ namespace aurostd {
   //   }
 
   //ME20190614 - added vector<string> version of RemoveComments
-  vector<string> RemoveComments(const vector<string>& vstrin) {
+  vector<string> RemoveComments(const vector<string>& vstrin) { //CO20210315 - cleaned up
     vector<string> vstrout;
     string::size_type loc;
     string line="";
@@ -1352,7 +1352,7 @@ namespace aurostd {
     return aurostd::vector2deque(RemoveComments(aurostd::deque2vector(vstrin)));
   }
 
-  string RemoveComments(const string& strin) {
+  string RemoveComments(const string& strin) {  //CO20210315 - cleaned up
     vector<string> vlines;
     aurostd::string2vectorstring(strin, vlines);
     vlines = RemoveComments(vlines);
@@ -4626,7 +4626,10 @@ namespace aurostd {
     return (typeTo) stream2stream<typeTo>(from,AUROSTD_DEFAULT_PRECISION,DEFAULT_STREAM);
   }
   template<typename utype> utype string2utype(const string& from) {
-    if(from.empty()){return (utype) 0;} //CO20210315 - stream2stream behavior is not defined for empty string input: https://stackoverflow.com/questions/4999650/c-how-do-i-check-if-the-cin-buffer-is-empty
+    if(from.empty()){return (utype) stream2stream<utype>("0",AUROSTD_DEFAULT_PRECISION,DEFAULT_STREAM);;} //CO20210315 - stream2stream behavior is not defined for empty string input: https://stackoverflow.com/questions/4999650/c-how-do-i-check-if-the-cin-buffer-is-empty
+    string FROM=aurostd::toupper(from); //CO20210315
+    if(FROM=="TRUE"||FROM=="T"||FROM==".TRUE."){return (utype) stream2stream<utype>("1",AUROSTD_DEFAULT_PRECISION,DEFAULT_STREAM);;}  //CO20210315 - safe because inputs are generally digits
+    if(FROM=="FALSE"||FROM=="F"||FROM==".FALSE."){return (utype) stream2stream<utype>("0",AUROSTD_DEFAULT_PRECISION,DEFAULT_STREAM);;}  //CO20210315 - safe because inputs are generally digits
     //[CO20210315 - doesn't work]if(!aurostd::isfloat(from)){return (utype) 0;} //CO20210315 - stream2stream undefined behavior
     return (utype) stream2stream<utype>(from,AUROSTD_DEFAULT_PRECISION,DEFAULT_STREAM);
   }
@@ -4927,42 +4930,42 @@ namespace aurostd {
   // ***************************************************************************
   // Function SubStringsPresent
   // ***************************************************************************
-  bool substring2bool(const string& strstream, const string& strsub1, bool CLEAN) { //CO20210315 - cleaned up
+  bool substring2bool(const string& strstream,const string& strsub1,bool RemoveWS,bool RemoveComments) { //CO20210315 - cleaned up
     //an AFLOW-specific substring matcher: will remove comments before searching
     bool LDEBUG=FALSE;//TRUE;
-    if(LDEBUG) cerr << XPID << "aurostd::substring2bool(): BEGIN [substring=" << strsub1 << "] [CLEAN=" << CLEAN << "]" << endl;
+    if(LDEBUG) cerr << XPID << "aurostd::substring2bool(): BEGIN [substring=\"" << strsub1 << "\"] [RemoveWS=" << RemoveWS << "]" << endl;
     string _strstream(strstream);
-    if(CLEAN==TRUE) _strstream=aurostd::RemoveWhiteSpaces(_strstream,'"');
-    if(LDEBUG) cerr << XPID << "aurostd::substring2bool(): [input=" << strstream << "], [substring=" << strsub1 << "]" << endl;
+    if(RemoveWS==TRUE) _strstream=aurostd::RemoveWhiteSpaces(_strstream,'"');
+    if(LDEBUG) cerr << XPID << "aurostd::substring2bool(): [input=\"" << strstream << "\"], [substring=\"" << strsub1 << "\"]" << endl;
     if(_strstream.find(strsub1)==string::npos) return false;
     
     vector<string> tokens;
     aurostd::string2tokens(_strstream,tokens,"\n");
     string strline="";
     for(uint i=0;i<tokens.size();i++) {
-      strline=aurostd::RemoveComments(tokens[i]);  //CO20210315
+      if(RemoveComments){strline=aurostd::RemoveComments(tokens[i]);}  //CO20210315
       if(strline.find(strsub1)!=string::npos) {
-        if(LDEBUG) cerr << XPID << "aurostd::substring2bool(): END [substring=" << strsub1 << " found] [CLEAN=" << CLEAN << "]" << endl;
+        if(LDEBUG) cerr << XPID << "aurostd::substring2bool(): END [substring=\"" << strsub1 << "\" found] [RemoveWS=" << RemoveWS << "]" << endl;
         return true;
       }
     }
-    if(LDEBUG) cerr << XPID << "aurostd::substring2bool(): END [substring=" << strsub1 << " NOT found] [CLEAN=" << CLEAN << "]" << endl;
+    if(LDEBUG) cerr << XPID << "aurostd::substring2bool(): END [substring=" << strsub1 << " NOT found] [RemoveWS=" << RemoveWS << "]" << endl;
     return false;
   }
 
-  bool substring2bool(const vector<string>& vstrstream, const string& strsub1, bool CLEAN) {
+  bool substring2bool(const vector<string>& vstrstream,const string& strsub1,bool RemoveWS,bool RemoveComments) {
     for(uint i=0;i<vstrstream.size();i++)
-      if(aurostd::substring2bool(vstrstream[i],strsub1,CLEAN)) return TRUE;
+      if(aurostd::substring2bool(vstrstream[i],strsub1,RemoveWS,RemoveComments)) return TRUE;
     return FALSE;
   }
-  bool substring2bool(const deque<string>& vstrstream, const string& strsub1, bool CLEAN) {
+  bool substring2bool(const deque<string>& vstrstream,const string& strsub1,bool RemoveWS,bool RemoveComments) {
     for(uint i=0;i<vstrstream.size();i++)
-      if(aurostd::substring2bool(vstrstream[i],strsub1,CLEAN)) return TRUE;
+      if(aurostd::substring2bool(vstrstream[i],strsub1,RemoveWS,RemoveComments)) return TRUE;
     return FALSE;
   }
 
-  bool substring2bool(const stringstream& strstream, const string& strsub1, bool CLEAN) {
-    return aurostd::substring2bool(strstream.str(),strsub1,CLEAN);
+  bool substring2bool(const stringstream& strstream,const string& strsub1,bool RemoveWS,bool RemoveComments) {
+    return aurostd::substring2bool(strstream.str(),strsub1,RemoveWS,RemoveComments);
   }
 
   bool WithinList(const vector<string>& list,const string& input,bool sorted) { //CO20181010
@@ -5037,7 +5040,7 @@ namespace aurostd {
   }
 
   // ***************************************************************************
-  bool substring_present_file(const string& FileName, const string& strsub1, bool CLEAN) {
+  bool substring_present_file(const string& FileName,const string& strsub1,bool RemoveWS,bool RemoveComments) {
     string StringFile;
     ifstream FileFile;
     FileFile.open(FileName.c_str(),std::ios::in);
@@ -5048,10 +5051,10 @@ namespace aurostd {
     }
     StringFile="";char c; while (FileFile.get(c)) StringFile+=c;
     FileFile.close();
-    return aurostd::substring2bool(StringFile,strsub1,CLEAN);
+    return aurostd::substring2bool(StringFile,strsub1,RemoveWS,RemoveComments);
   }
 
-  bool substring_present_file_FAST(const string& FileName, const string& strsub1, bool CLEAN) {
+  bool substring_present_file_FAST(const string& FileName, const string& strsub1, bool RemoveWS) {
     // be careful, this does not filter-out # comments
     string function = XPID + "aurostd::substring_present_file_FAST():";
 
@@ -5062,8 +5065,8 @@ namespace aurostd {
     int found=0;
     aurostd::StringstreamClean(aus);
     aus << "rm -f " << temp_file  << endl;
-    if(CLEAN==FALSE) aus << "cat \"" << FileName << "\" | grep -c \"" << strsub1 << "\" > " << temp_file  << endl;
-    if(CLEAN==TRUE ) aus << "cat \"" << FileName << "\" | sed \"s/ //g\" | sed \"s/\t//g\"  | grep -c \"" << aurostd::RemoveWhiteSpaces(strsub1) << "\" > " << temp_file  << endl;
+    if(RemoveWS==FALSE) aus << "cat \"" << FileName << "\" | grep -c \"" << strsub1 << "\" > " << temp_file  << endl;
+    if(RemoveWS==TRUE ) aus << "cat \"" << FileName << "\" | sed \"s/ //g\" | sed \"s/\t//g\"  | grep -c \"" << aurostd::RemoveWhiteSpaces(strsub1) << "\" > " << temp_file  << endl;
     aus << "echo >> " << temp_file << endl; // to give EOL
     aurostd::execute(aus);
     if(!aurostd::FileExist(FileName)) {
@@ -5089,13 +5092,13 @@ namespace aurostd {
   // ***************************************************************************
   // Function SubStringsPresent and EXTRACT
   // ***************************************************************************
-  string substring2string(const string& strstream, const string& strsub1, bool CLEAN) { //CO20210315 - cleaned up
+  string substring2string(const string& strstream,const string& strsub1,bool RemoveWS,bool RemoveComments) { //CO20210315 - cleaned up
     //an AFLOW-specific substring matcher: will remove comments before searching
     bool LDEBUG=FALSE;//TRUE;
-    if(LDEBUG) cerr << XPID << "aurostd::substring2string(): BEGIN [substring=" << strsub1 << "] [CLEAN=" << CLEAN << "]" << endl;
+    if(LDEBUG) cerr << XPID << "aurostd::substring2string(): BEGIN [substring=\"" << strsub1 << "\"] [RemoveWS=" << RemoveWS << "]" << endl;
     string _strstream(strstream);
-    if(CLEAN==TRUE) _strstream=aurostd::RemoveWhiteSpaces(_strstream,'"');
-    if(LDEBUG) cerr << XPID << "aurostd::substring2string(): [input=" << strstream << "], [substring=" << strsub1 << "]" << endl;
+    if(RemoveWS==TRUE) _strstream=aurostd::RemoveWhiteSpaces(_strstream,'"');
+    if(LDEBUG) cerr << XPID << "aurostd::substring2string(): [input=\"" << strstream << "\"], [substring=\"" << strsub1 << "\"]" << endl;
     if(_strstream.find(strsub1)==string::npos) return "";
     
     vector<string> tokens;
@@ -5103,30 +5106,64 @@ namespace aurostd {
     string strline="";
     string::size_type idxS1;
     for(uint i=0;i<tokens.size();i++) {
-      strline=aurostd::RemoveComments(tokens[i]);  //CO20210315
+      if(RemoveComments){strline=aurostd::RemoveComments(tokens[i]);}  //CO20210315
       idxS1=strline.find(strsub1);
       if(idxS1!=string::npos) {
         strline=strline.substr(idxS1+strsub1.length());
         strline=aurostd::RemoveWhiteSpacesFromTheBack(strline);
-        if(LDEBUG) cerr << XPID << "aurostd::substring2string(): END [substring=" << strsub1 << " found] [output=" << strline << "] [CLEAN=" << CLEAN << "]" << endl;
+        if(LDEBUG) cerr << XPID << "aurostd::substring2string(): END [substring=\"" << strsub1 << "\" found] [output=\"" << strline << "\"] [RemoveWS=" << RemoveWS << "]" << endl;
         return strline;
       }
     }
-    if(LDEBUG) cerr << XPID << "aurostd::substring2string(): END [substring=" << strsub1 << " NOT found] [CLEAN=" << CLEAN << "]" << endl;
+    if(LDEBUG) cerr << XPID << "aurostd::substring2string(): END [substring=" << strsub1 << " NOT found] [RemoveWS=" << RemoveWS << "]" << endl;
     return "";
   }
   
-  string substring2string(const stringstream& strstream, const string& strsub1, bool CLEAN) { //CO20210315 - cleaned up
-    return substring2string(strstream.str(),strsub1,CLEAN);
+  string substring2string(const stringstream& strstream,const string& strsub1,bool RemoveWS,bool RemoveComments) { //CO20210315 - cleaned up
+    return substring2string(strstream.str(),strsub1,RemoveWS,RemoveComments);
+  }
+  
+  string kvpair2value(const string& strstream,const string& keyword,const string& delim,bool RemoveWS,bool RemoveComments) { //CO20210315
+    //an AFLOW-specific substring matcher: will remove comments before searching
+    bool LDEBUG=TRUE;//TRUE;
+    if(LDEBUG) cerr << XPID << "aurostd::kvpair2value(): BEGIN [keyword=\"" << keyword << "\"] [delimiter=\"" << delim << "\"] [RemoveWS=" << RemoveWS << "]" << endl;
+    string _strstream(strstream);
+    if(RemoveWS==TRUE) _strstream=aurostd::RemoveWhiteSpaces(_strstream,'"');
+    if(LDEBUG) cerr << XPID << "aurostd::kvpair2value(): [input=\"" << strstream << "\"], [keyword=\"" << keyword << "\"] [delimiter=\"" << delim << "\"]" << endl;
+    if(_strstream.find(keyword)==string::npos) return "";
+    
+    vector<string> tokens;
+    aurostd::string2tokens(_strstream,tokens,"\n");
+    string strline="",_keyword="",value="";
+    string::size_type idxS1;
+    for(uint i=0;i<tokens.size();i++) {
+      if(RemoveComments){strline=aurostd::RemoveComments(tokens[i]);}
+      idxS1=strline.find(delim);
+      if(idxS1!=string::npos){
+        _keyword=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(strline.substr(0,idxS1));
+        if(LDEBUG) cerr << XPID << "aurostd::kvpair2value(): _keyword=\"" << _keyword << "\"" << endl;
+        if(_keyword==keyword){
+          value=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(strline.substr(idxS1+1));
+          if(LDEBUG) cerr << XPID << "aurostd::kvpair2value(): END [keyword=\"" << keyword << "\" found] [output=\"" << value << "\"] [RemoveWS=" << RemoveWS << "]" << endl;
+          return value;
+        }
+      }
+    }
+    if(LDEBUG) cerr << XPID << "aurostd::kvpair2value(): END [keyword=" << keyword << " NOT found] [RemoveWS=" << RemoveWS << "]" << endl;
+    return "";
+  }
+  
+  string kvpair2value(const stringstream& strstream,const string& keyword,const string& delim,bool RemoveWS,bool RemoveComments) { //CO20210315 - cleaned up
+    return kvpair2value(strstream.str(),keyword,delim,RemoveWS,RemoveComments);
   }
 
-  //[CO20210315 - not used, not sure the purpose of strsub2]string substring2string(const string& strstream, const string& strsub1, const string& strsub2, bool CLEAN) {
+  //[CO20210315 - not used, not sure the purpose of strsub2]string substring2string(const string& strstream, const string& strsub1, const string& strsub2, bool RemoveWS) {
   //[CO20210315 - not used, not sure the purpose of strsub2]  bool LDEBUG=(FALSE || XHOST.DEBUG);
-  //[CO20210315 - not used, not sure the purpose of strsub2]  if(LDEBUG) cerr << "DEBUG substring2string5: (BEGIN) " << strsub1 << " " << CLEAN << endl;
+  //[CO20210315 - not used, not sure the purpose of strsub2]  if(LDEBUG) cerr << "DEBUG substring2string5: (BEGIN) " << strsub1 << " " << RemoveWS << endl;
   //[CO20210315 - not used, not sure the purpose of strsub2]  string _strstream(strstream),_strline,_strsub1(strsub1),_strsub2(strsub2);
   //[CO20210315 - not used, not sure the purpose of strsub2]  string strout="";
   //[CO20210315 - not used, not sure the purpose of strsub2]  string::size_type idxS1,idxS2;
-  //[CO20210315 - not used, not sure the purpose of strsub2]  if(CLEAN==TRUE) _strstream=aurostd::RemoveWhiteSpaces(_strstream,'"');
+  //[CO20210315 - not used, not sure the purpose of strsub2]  if(RemoveWS==TRUE) _strstream=aurostd::RemoveWhiteSpaces(_strstream,'"');
   //[CO20210315 - not used, not sure the purpose of strsub2]  if(_strstream.find(_strsub1)==string::npos) return (string) strout;
   //[CO20210315 - not used, not sure the purpose of strsub2]  if(_strstream.find(_strsub2)==string::npos) return (string) strout;
   //[CO20210315 - not used, not sure the purpose of strsub2]  //  transform(_strstream.begin(),_strstream.end(),_strstream.begin(),toupper); // pout everything UPPER
@@ -5142,34 +5179,41 @@ namespace aurostd {
   //[CO20210315 - not used, not sure the purpose of strsub2]    if(idxS1!=string::npos && idxS2!=string::npos && idxS1<=idxS2) {
   //[CO20210315 - not used, not sure the purpose of strsub2]      strout=_strline.substr(std::max(_strline.find(_strsub2)+_strsub2.length(),_strline.find(_strsub1)+_strsub1.length()));
   //[CO20210315 - not used, not sure the purpose of strsub2]      strout=aurostd::RemoveWhiteSpacesFromTheBack(strout);
-  //[CO20210315 - not used, not sure the purpose of strsub2]      if(LDEBUG) cerr << "DEBUG substring2string5: (END) " << strsub1 << " " << CLEAN << endl;
+  //[CO20210315 - not used, not sure the purpose of strsub2]      if(LDEBUG) cerr << "DEBUG substring2string5: (END) " << strsub1 << " " << RemoveWS << endl;
   //[CO20210315 - not used, not sure the purpose of strsub2]      return (string) strout;
   //[CO20210315 - not used, not sure the purpose of strsub2]    }
   //[CO20210315 - not used, not sure the purpose of strsub2]  }
   //[CO20210315 - not used, not sure the purpose of strsub2]  return (string) strout;
   //[CO20210315 - not used, not sure the purpose of strsub2]}
 
-  template<typename utype> utype substring2utype(const string& strstream, const string& strsub1, bool CLEAN) {
-    return string2utype<utype>(substring2string(strstream,strsub1,CLEAN));
+  template<typename utype> utype substring2utype(const string& strstream,const string& strsub1,bool RemoveWS,bool RemoveComments) {
+    return string2utype<utype>(substring2string(strstream,strsub1,RemoveWS,RemoveComments));
   }
-  template<typename utype> utype substring2utype(const stringstream& strstream, const string& strsub1, bool CLEAN) {
-    return substring2utype<utype>(strstream.str(),strsub1,CLEAN);
+  template<typename utype> utype substring2utype(const stringstream& strstream,const string& strsub1,bool RemoveWS,bool RemoveComments) {
+    return substring2utype<utype>(strstream.str(),strsub1,RemoveWS,RemoveComments);
   }
-  //[CO20210315 - not used, not sure the purpose of strsub2]template<typename utype> utype substring2utype(const string& strstream, const string& strsub1, const string& strsub2, bool CLEAN) {
-  //[CO20210315 - not used, not sure the purpose of strsub2]  return string2utype<utype>(substring2string(strstream,strsub1,strsub2,CLEAN));
+  
+  template<typename utype> utype kvpair2utype(const string& strstream,const string& keyword,const string& delim,bool RemoveWS,bool RemoveComments) {
+    return string2utype<utype>(kvpair2value(strstream,keyword,delim,RemoveWS,RemoveComments));
+  }
+  template<typename utype> utype kvpair2utype(const stringstream& strstream,const string& keyword,const string& delim,bool RemoveWS,bool RemoveComments) {
+    return kvpair2utype<utype>(strstream.str(),keyword,delim,RemoveWS,RemoveComments);
+  }
+  //[CO20210315 - not used, not sure the purpose of strsub2]template<typename utype> utype substring2utype(const string& strstream, const string& strsub1, const string& strsub2, bool RemoveWS) {
+  //[CO20210315 - not used, not sure the purpose of strsub2]  return string2utype<utype>(substring2string(strstream,strsub1,strsub2,RemoveWS));
   //[CO20210315 - not used, not sure the purpose of strsub2]}
 
   // ***************************************************************************
   // Function SubStringsPresentExtractString and other
   // ***************************************************************************
-  uint substring2strings(const string& strstream, vector<string> &vstringout, const string& strsub1, bool CLEAN) {
+  uint substring2strings(const string& strstream,vector<string> &vstringout,const string& strsub1,bool RemoveWS,bool RemoveComments) {
     //an AFLOW-specific substring matcher: will remove comments before searching
     bool LDEBUG=FALSE;//TRUE;
-    if(LDEBUG) cerr << XPID << "aurostd::substring2strings(): BEGIN [substring=" << strsub1 << "] [CLEAN=" << CLEAN << "]" << endl;
+    if(LDEBUG) cerr << XPID << "aurostd::substring2strings(): BEGIN [substring=\"" << strsub1 << "\"] [RemoveWS=" << RemoveWS << "]" << endl;
     vstringout.clear();
     string _strstream(strstream);
-    if(CLEAN==TRUE) _strstream=aurostd::RemoveWhiteSpaces(_strstream,'"');
-    if(LDEBUG) cerr << XPID << "aurostd::substring2strings(): [input=" << strstream << "], [substring=" << strsub1 << "]" << endl;
+    if(RemoveWS==TRUE) _strstream=aurostd::RemoveWhiteSpaces(_strstream,'"');
+    if(LDEBUG) cerr << XPID << "aurostd::substring2strings(): [input=\"" << strstream << "\"], [substring=\"" << strsub1 << "\"]" << endl;
     if(_strstream.find(strsub1)==string::npos) return 0;
     
     vector<string> tokens;
@@ -5177,26 +5221,26 @@ namespace aurostd {
     string strline="";
     string::size_type idxS1;
     for(uint i=0;i<tokens.size();i++) {
-      strline=aurostd::RemoveComments(tokens[i]);  //CO20210315
+      if(RemoveComments){strline=aurostd::RemoveComments(tokens[i]);}  //CO20210315
       idxS1=strline.find(strsub1);
       if(idxS1!=string::npos) {
         strline=strline.substr(idxS1+strsub1.length());
         strline=aurostd::RemoveWhiteSpacesFromTheBack(strline);
-        if(LDEBUG) cerr << XPID << "aurostd::substring2strings(): [substring=" << strsub1 << " found] [output=" << strline << "] [CLEAN=" << CLEAN << "]" << endl;
+        if(LDEBUG) cerr << XPID << "aurostd::substring2strings(): [substring=\"" << strsub1 << "\" found] [output=\"" << strline << "\"] [RemoveWS=" << RemoveWS << "]" << endl;
         vstringout.push_back(strline);
       }
     }
-    if(LDEBUG) cerr << XPID << "aurostd::substring2strings(): END [substring=" << strsub1 << "] [hits=" << vstringout.size() << "] [CLEAN=" << CLEAN << "]" << endl;
+    if(LDEBUG) cerr << XPID << "aurostd::substring2strings(): END [substring=\"" << strsub1 << "\"] [hits=" << vstringout.size() << "] [RemoveWS=" << RemoveWS << "]" << endl;
     return vstringout.size();
   }
 
-  //[CO20210315 - not used, not sure the purpose of strsub2]uint substring2strings(const string& strstream, vector<string> &vstringout, const string& strsub1, const string& strsub2, bool CLEAN) {
+  //[CO20210315 - not used, not sure the purpose of strsub2]uint substring2strings(const string& strstream, vector<string> &vstringout, const string& strsub1, const string& strsub2, bool RemoveWS) {
   //[CO20210315 - not used, not sure the purpose of strsub2]  bool LDEBUG=(FALSE || XHOST.DEBUG);
-  //[CO20210315 - not used, not sure the purpose of strsub2]  if(LDEBUG) cerr << "DEBUG substring2strings5: (BEGIN) " << strsub1 << " " << strsub2 << " " << CLEAN << endl;
+  //[CO20210315 - not used, not sure the purpose of strsub2]  if(LDEBUG) cerr << "DEBUG substring2strings5: (BEGIN) " << strsub1 << " " << strsub2 << " " << RemoveWS << endl;
   //[CO20210315 - not used, not sure the purpose of strsub2]  string _strstream(strstream),_strline,_strsub1(strsub1),_strsub2(strsub2);
   //[CO20210315 - not used, not sure the purpose of strsub2]  string::size_type idxS1,idxS2;
   //[CO20210315 - not used, not sure the purpose of strsub2]  vstringout.clear(); // clear so it is empty
-  //[CO20210315 - not used, not sure the purpose of strsub2]  if(CLEAN==TRUE) _strstream=aurostd::RemoveWhiteSpaces(_strstream,'"');
+  //[CO20210315 - not used, not sure the purpose of strsub2]  if(RemoveWS==TRUE) _strstream=aurostd::RemoveWhiteSpaces(_strstream,'"');
   //[CO20210315 - not used, not sure the purpose of strsub2]  if(_strstream.find(_strsub1)==string::npos) return 0; // there is not
   //[CO20210315 - not used, not sure the purpose of strsub2]  if(_strstream.find(_strsub2)==string::npos) return 0; // there is not
   //[CO20210315 - not used, not sure the purpose of strsub2]  //  transform(_strstream.begin(),_strstream.end(),_strstream.begin(),toupper); // pout everything UPPER
@@ -5213,25 +5257,25 @@ namespace aurostd {
   //[CO20210315 - not used, not sure the purpose of strsub2]      vstringout.push_back(aurostd::RemoveWhiteSpacesFromTheBack(_strline.substr(std::max(_strline.find(_strsub2)+_strsub2.length(),_strline.find(_strsub1)+_strsub1.length()))));
   //[CO20210315 - not used, not sure the purpose of strsub2]    }
   //[CO20210315 - not used, not sure the purpose of strsub2]  }
-  //[CO20210315 - not used, not sure the purpose of strsub2]  if(LDEBUG) cerr << "DEBUG substring2string5: (END) " << strsub1 << " " << strsub2 << " " << vstringout.size() << " " << CLEAN << endl;
+  //[CO20210315 - not used, not sure the purpose of strsub2]  if(LDEBUG) cerr << "DEBUG substring2string5: (END) " << strsub1 << " " << strsub2 << " " << vstringout.size() << " " << RemoveWS << endl;
   //[CO20210315 - not used, not sure the purpose of strsub2]  return vstringout.size();
   //[CO20210315 - not used, not sure the purpose of strsub2]}
 
-  template<typename utype> uint substring2utypes(const string& strstream, vector<int> &vintout, const string& strsub1, bool CLEAN) {  //CO20210315 - cleaned up
+  template<typename utype> uint substring2utypes(const string& strstream,vector<int> &vintout,const string& strsub1,bool RemoveWS,bool RemoveComments) {  //CO20210315 - cleaned up
     vintout.clear();
     vector<string> vstringout;
-    aurostd::substring2strings(strstream,vstringout,strsub1,CLEAN);
+    aurostd::substring2strings(strstream,vstringout,strsub1,RemoveWS,RemoveComments);
     vintout=aurostd::vectorstring2vectorint(vstringout);
     return vintout.size();
   }
-  template<typename utype> uint substring2utypes(const stringstream& strstream, vector<int> &vintout, const string& strsub1, bool CLEAN) {  //CO20210315 - cleaned up
-    return substring2utypes<utype>(strstream.str(),vintout,strsub1,CLEAN);
+  template<typename utype> uint substring2utypes(const stringstream& strstream,vector<int> &vintout,const string& strsub1,bool RemoveWS,bool RemoveComments) {  //CO20210315 - cleaned up
+    return substring2utypes<utype>(strstream.str(),vintout,strsub1,RemoveWS,RemoveComments);
   }
-  //[CO20210315 - not used, not sure the purpose of strsub2]template<typename utype> uint substring2utypes(const string& strstream, vector<int> &vintout, const string& strsub1, const string& strsub2, bool CLEAN) {
+  //[CO20210315 - not used, not sure the purpose of strsub2]template<typename utype> uint substring2utypes(const string& strstream, vector<int> &vintout, const string& strsub1, const string& strsub2, bool RemoveWS) {
   //[CO20210315 - not used, not sure the purpose of strsub2]  string _strstream(strstream),_strsub1(strsub1),_strsub2(strsub2);
   //[CO20210315 - not used, not sure the purpose of strsub2]  vintout.clear();
   //[CO20210315 - not used, not sure the purpose of strsub2]  vector<string> vstringout;
-  //[CO20210315 - not used, not sure the purpose of strsub2]  uint i=aurostd::substring2strings(_strstream,vstringout,_strsub1,_strsub2,CLEAN);
+  //[CO20210315 - not used, not sure the purpose of strsub2]  uint i=aurostd::substring2strings(_strstream,vstringout,_strsub1,_strsub2,RemoveWS);
   //[CO20210315 - not used, not sure the purpose of strsub2]  for(i=0;i<vstringout.size();i++) vintout.push_back(string2utype<utype>(vstringout[i]));
   //[CO20210315 - not used, not sure the purpose of strsub2]  return vintout.size();
   //[CO20210315 - not used, not sure the purpose of strsub2]}

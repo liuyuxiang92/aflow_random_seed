@@ -94,10 +94,14 @@ template<class utype> bool initialize_scalar(utype d) {
   stringstream ss;
   utype u=0;
   u+=aurostd::string2utype<utype>(aurostd::utype2string<utype>(utype())+aurostd::utype2string<utype>(utype(),int())+aurostd::utype2string<utype>(utype(),int(),DEFAULT_STREAM)); //DX20201028 - added third variant containing format
-  u+=aurostd::substring2utype<utype>(s,s,1); //[CO20210315 - not used, not sure the purpose of strsub2]+aurostd::substring2utype<utype>(s,s,s,1);
+  u+=aurostd::substring2utype<utype>(s,s,1,1); //[CO20210315 - not used, not sure the purpose of strsub2]+aurostd::substring2utype<utype>(s,s,s,1);
   u+=aurostd::substring2utype<utype>(s,s); //[CO20210315 - not used, not sure the purpose of strsub2]+aurostd::substring2utype<utype>(s,s,s);
-  u+=aurostd::substring2utype<utype>(ss,s,1); //CO20210315
+  u+=aurostd::substring2utype<utype>(ss,s,1,1); //CO20210315
   u+=aurostd::substring2utype<utype>(ss,s); //CO20210315
+  u+=aurostd::kvpair2utype<utype>(s,s,s,1,1);  //CO20210315
+  u+=aurostd::kvpair2utype<utype>(s,s,s);  //CO20210315
+  u+=aurostd::kvpair2utype<utype>(ss,s,s,1,1); //CO20210315
+  u+=aurostd::kvpair2utype<utype>(ss,s,s); //CO20210315
   double o=0;
   o+=_isfloat(d)+_iscomplex(d);//abs(d);
   o+=max(d,d);o+=max(d,d,d);o+=max(d,d,d,d);o+=max(d,d,d,d,d);o+=min(d,d);o+=min(d,d,d);o+=min(d,d,d,d);o+=min(d,d,d,d,d);o+=_real(d);

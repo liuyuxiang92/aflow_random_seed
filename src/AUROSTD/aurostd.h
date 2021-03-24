@@ -782,12 +782,12 @@ namespace aurostd {
   string StringSubst(string &strstring, const char &charfind, const char &charreplace);
   void StringStreamSubst(stringstream &strstring, const string &strfind, const string &strreplace);  //ME20190128 - fixed type declaration
   // about present substrings
-  bool substring2bool(const string& strstream, const string& strsub1, bool CLEAN=false);  //CO20210315 - cleaned up
-  bool substring2bool(const vector<string>& vstrstream, const string& strsub1, bool CLEAN=false); //CO20210315 - cleaned up
-  bool substring2bool(const deque<string>& vstrstream, const string& strsub1, bool CLEAN=false);  //CO20210315 - cleaned up
-  bool substring2bool(const stringstream& strstream, const string& strsub1, bool CLEAN=false);  //CO20210315 - cleaned up
-  bool substring_present_file(const string& FileName, const string& strsub1, bool CLEAN=false); //CO20210315 - cleaned up
-  bool substring_present_file_FAST(const string& FileName, const string& strsub1, bool CLEAN=false);  //CO20210315 - cleaned up
+  bool substring2bool(const string& strstream,const string& strsub1,bool RemoveWS=false,bool RemoveComments=true);  //CO20210315 - cleaned up
+  bool substring2bool(const vector<string>& vstrstream,const string& strsub1,bool RemoveWS=false,bool RemoveComments=true); //CO20210315 - cleaned up
+  bool substring2bool(const deque<string>& vstrstream,const string& strsub1,bool RemoveWS=false,bool RemoveComments=true);  //CO20210315 - cleaned up
+  bool substring2bool(const stringstream& strstream,const string& strsub1,bool RemoveWS=false,bool RemoveComments=true);  //CO20210315 - cleaned up
+  bool substring_present_file(const string& FileName,const string& strsub1,bool RemoveWS=false,bool RemoveComments=true); //CO20210315 - cleaned up
+  bool substring_present_file_FAST(const string& FileName, const string& strsub1, bool RemoveWS=false);  //CO20210315 - cleaned up
   bool WithinList(const vector<string>& list,const string& input,bool sorted=false);  //CO20181010
   bool WithinList(const vector<int>& list,int input,bool sorted=false); //CO20181010
   bool WithinList(const vector<uint>& list,uint input,bool sorted=false); //CO20181010
@@ -797,19 +797,24 @@ namespace aurostd {
   bool EWithinList(const vector<string>& list,const string& input); //CO20200223
   bool EWithinList(const vector<string>& list, const string& input, string& output); //CO20200223
   // about present substrings and taking off the value
-  string substring2string(const string& strstream, const string& strsub1, bool CLEAN=false);  //CO20210315 - cleaned up
-  string substring2string(const stringstream& strstream, const string& strsub1, bool CLEAN=false);  //CO20210315 - cleaned up
-  //[CO20210315 - not used, not sure the purpose of strsub2]string substring2string(const string& strstream, const string& strsub1, const string& strsub2, bool CLEAN=false); //CO20210315 - cleaned up
+  string substring2string(const string& strstream, const string& strsub1, bool RemoveWS=false,bool RemoveComments=true);  //CO20210315 - cleaned up
+  string substring2string(const stringstream& strstream, const string& strsub1, bool RemoveWS=false,bool RemoveComments=true);  //CO20210315 - cleaned up
+  string kvpair2value(const string& strstream,const string& keyword,const string& delim,bool RemoveWS=false,bool RemoveComments=true);  //CO20210315
+  string kvpair2value(const stringstream& strstream,const string& keyword,const string& delim,bool RemoveWS=false,bool RemoveComments=true);  //CO20210315
+  //[CO20210315 - not used, not sure the purpose of strsub2]string substring2string(const string& strstream, const string& strsub1, const string& strsub2, bool RemoveWS=false,bool RemoveComments=true); //CO20210315 - cleaned up
 
-  template<typename utype> utype substring2utype(const string& strstream, const string& strsub1, bool CLEAN=false); //CO20210315 - cleaned up
-  template<typename utype> utype substring2utype(const stringstream& strstream, const string& strsub1, bool CLEAN=false); //CO20210315 - cleaned up
-  //[CO20210315 - not used, not sure the purpose of strsub2]template<typename utype> utype substring2utype(const string& strstream, const string& strsub1, const string& strsub2, bool CLEAN=false);  //CO20210315 - cleaned up
+  template<typename utype> utype substring2utype(const string& strstream,const string& strsub1,bool RemoveWS=false,bool RemoveComments=true); //CO20210315 - cleaned up
+  template<typename utype> utype substring2utype(const stringstream& strstream,const string& strsub1,bool RemoveWS=false,bool RemoveComments=true); //CO20210315 - cleaned up
+  //[CO20210315 - not used, not sure the purpose of strsub2]template<typename utype> utype substring2utype(const string& strstream, const string& strsub1, const string& strsub2, bool RemoveWS=false,bool RemoveComments=true);  //CO20210315 - cleaned up
+  
+  template<typename utype> utype kvpair2utype(const string& strstream,const string& keyword,const string& delim,bool RemoveWS=false,bool RemoveComments=true); //CO20210315 - cleaned up
+  template<typename utype> utype kvpair2utype(const stringstream& strstream,const string& keyword,const string& delim,bool RemoveWS=false,bool RemoveComments=true); //CO20210315 - cleaned up
 
-  uint substring2strings(const string& strstream, vector<string> &vstringout, const string& strsub1, bool CLEAN=false); //CO20210315 - cleaned up
-  //[CO20210315 - not used, not sure the purpose of strsub2]uint substring2strings(const string& strstream, vector<string> &vstringout, const string& strsub1, const string& strsub2, bool CLEAN=false);  //CO20210315 - cleaned up
-  template<typename utype> uint substring2utypes(const string& strstream, vector<string> &vstringout, const string& strsub1, bool CLEAN=false); //CO20210315 - cleaned up
-  template<typename utype> uint substring2utypes(const stringstream& strstream, vector<string> &vstringout, const string& strsub1, bool CLEAN=false); //CO20210315 - cleaned up
-  //[CO20210315 - not used, not sure the purpose of strsub2]template<typename utype> uint substring2utypes(const string& strstream, vector<string> &vstringout, const string& strsub1, const string& strsub2, bool CLEAN=false);  //CO20210315 - cleaned up
+  uint substring2strings(const string& strstream, vector<string> &vstringout, const string& strsub1, bool RemoveWS=false,bool RemoveComments=true); //CO20210315 - cleaned up
+  //[CO20210315 - not used, not sure the purpose of strsub2]uint substring2strings(const string& strstream, vector<string> &vstringout, const string& strsub1, const string& strsub2, bool RemoveWS=false,bool RemoveComments=true);  //CO20210315 - cleaned up
+  template<typename utype> uint substring2utypes(const string& strstream, vector<string> &vstringout, const string& strsub1, bool RemoveWS=false,bool RemoveComments=true); //CO20210315 - cleaned up
+  template<typename utype> uint substring2utypes(const stringstream& strstream, vector<string> &vstringout, const string& strsub1, bool RemoveWS=false,bool RemoveComments=true); //CO20210315 - cleaned up
+  //[CO20210315 - not used, not sure the purpose of strsub2]template<typename utype> uint substring2utypes(const string& strstream, vector<string> &vstringout, const string& strsub1, const string& strsub2, bool RemoveWS=false,bool RemoveComments=true);  //CO20210315 - cleaned up
 }
 
 // ***************************************************************************
