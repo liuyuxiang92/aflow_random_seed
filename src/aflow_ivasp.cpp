@@ -5804,7 +5804,7 @@ namespace KBIN {
     else if(mode=="EDDRMM") {
       //https://www.vasp.at/forum/viewtopic.php?f=3&t=214&p=215
       file_error="aflow.error.eddrmm";
-      if(submode==0){ //try G-centered (odd scheme) //CO20200624 - try odd (G-centered) scheme
+      if(submode==0){ //try G-centered //CO20200624
         if(xvasp.aopts.flag("FLAG::KPOINTS_PRESERVED")){Krun=false;} // don't touch kpoints
         if(Krun && KBIN::XVASP_KPOINTS_IncludesGamma(xvasp)){Krun=false;} //already done
         //START - load KPOINTS into xvasp, modify xvasp.str.kpoints*, and write out new KPOINTS
@@ -5812,11 +5812,21 @@ namespace KBIN {
         Krun=(Krun && KBIN::XVASP_KPOINTS_OPERATION(xvasp,"Gamma_Shift"));  //CO20210315
         Krun=(Krun && aurostd::stringstream2file(xvasp.KPOINTS,string(xvasp.Directory+"/KPOINTS")));
         //END - load KPOINTS into xvasp, modify xvasp.str.kpoints*, and write out new KPOINTS
-        if(Krun){aus << "WWWWW  FIX GAMMA-CENTERED KPOINTS (ODD SCHEME)" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+        if(Krun){aus << "WWWWW  FIX GAMMA-CENTERED KPOINTS" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
       //else if(submode==1) //DO NOT USE else if, we may change submode inside
-      if(submode==1){ //CO20200624 - try ALGO=NORMAL and ALGO=FAST (if not already tried)
+      if(submode==1){ //Gamma-odd (might increase ki) //CO20200624
+        if(xvasp.aopts.flag("FLAG::KPOINTS_PRESERVED")){Krun=false;} // don't touch kpoints
+        //START - load KPOINTS into xvasp, modify xvasp.str.kpoints*, and write out new KPOINTS
+        Krun=(Krun && VASP_Reread_KPOINTS(xvasp) && XVASP_KPOINTS_string2numbers(xvasp)); //preload kpoints, load into xvasp.str
+        Krun=(Krun && KBIN::XVASP_KPOINTS_OPERATION(xvasp,"Gamma,Xodd,Yodd,Zodd"));  //CO20210315
+        Krun=(Krun && aurostd::stringstream2file(xvasp.KPOINTS,string(xvasp.Directory+"/KPOINTS")));
+        //END - load KPOINTS into xvasp, modify xvasp.str.kpoints*, and write out new KPOINTS
+        if(Krun){aus << "WWWWW  FIX GAMMA-CENTERED KPOINTS" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+        if(!Krun){Krun=true;submode++;} //reset and go to the next solution
+      }
+      if(submode==2){ //CO20200624 - try ALGO=NORMAL and ALGO=FAST (if not already tried)
         //START - load INCAR into xvasp, modify, then write out new INCAR
         Krun=(Krun && VASP_Reread_INCAR(xvasp));  //preload incar
         //get algo_current - START
@@ -5840,7 +5850,7 @@ namespace KBIN {
         if(Krun){submode_increment=2;}  //skip beyond combined tries
         else{Krun=true;submode++;}  //reset and go to the next solution
       }
-      if(submode==2){ //CO20200624 - try ALGO=NORMAL
+      if(submode==3){ //CO20200624 - try ALGO=NORMAL
         //START - load INCAR into xvasp, modify, then write out new INCAR
         Krun=(Krun && VASP_Reread_INCAR(xvasp));  //preload incar
         Krun=(Krun && KBIN::XVASP_INCAR_PREPARE_GENERIC("ALGO",xvasp,vflags,"NORMAL",0,0.0,FALSE));
@@ -5849,7 +5859,7 @@ namespace KBIN {
         if(Krun){aus << "WWWWW  FIX ALGO=" << vflags.KBIN_VASP_FORCE_OPTION_ALGO.xscheme << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
-      if(submode==3){ //CO20200624 - try ALGO=FAST
+      if(submode==4){ //CO20200624 - try ALGO=FAST
         //START - load INCAR into xvasp, modify, then write out new INCAR
         Krun=(Krun && VASP_Reread_INCAR(xvasp));  //preload incar
         Krun=(Krun && KBIN::XVASP_INCAR_PREPARE_GENERIC("ALGO",xvasp,vflags,"FAST",0,0.0,FALSE));
@@ -5858,7 +5868,7 @@ namespace KBIN {
         if(Krun){aus << "WWWWW  FIX ALGO=" << vflags.KBIN_VASP_FORCE_OPTION_ALGO.xscheme << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
-      if(submode==4){ //CO20200624 - try RELAX=FORCES
+      if(submode==5){ //CO20200624 - try RELAX=FORCES
         //START - load INCAR into xvasp, modify, then write out new INCAR
         Krun=(Krun && VASP_Reread_INCAR(xvasp));  //preload incar
         if(Krun){
@@ -5885,7 +5895,7 @@ namespace KBIN {
         if(Krun){aus << "WWWWW  FIX RELAX=FORCES" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
-      if(submode==5){ //CO20200624 - try patching POTIM if we are relaxing, otherwise change ISMEAR
+      if(submode==6){ //CO20200624 - try patching POTIM if we are relaxing, otherwise change ISMEAR
         if(xvasp.NRELAXING<=xvasp.NRELAX){  //happens during relax
           //START - load INCAR into xvasp, modify, then write out new INCAR
           Krun=(Krun && VASP_Reread_INCAR(xvasp));  //preload incar
@@ -5905,7 +5915,7 @@ namespace KBIN {
           if(!Krun){Krun=true;submode++;} //reset and go to the next solution
         }
       }
-      if(submode>=6){Krun=false;}
+      if(submode>=7){Krun=false;}
       submode+=submode_increment;submode_increment=1;  //increment and reset
     }
     else if(mode=="EFIELD_PEAD") {
