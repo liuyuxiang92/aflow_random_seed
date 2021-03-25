@@ -1721,6 +1721,13 @@ namespace apl
   xvector<double> QHA::fitToEOSmodel(xvector<double> &E, EOSmethod method)
   {
     string function = XPID + "QHA::fitToEOSmodel():", msg = "";
+
+    if (!isMinimumWithinBounds(E)){
+      msg = "Calculation is stopped since there is no free energy minimum";
+      msg += " within a given volume range.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function,msg,_VALUE_RANGE_);
+    }
+
     xvector<double> V = aurostd::vector2xvector(EOSvolumes);
     xvector<double> fit_params;
     xvector<double> guess(4);
@@ -2881,87 +2888,101 @@ namespace apl
     double CV_mesh_V0 = 0.0, GP_mesh_V0 = 0.0, CP_mesh_V0 = 0.0, beta_mesh_V0 = 0.0;
     double CV_mesh_V  = 0.0, GP_mesh_V  = 0.0, CP_mesh_V  = 0.0, beta_mesh_V  = 0.0;
 
-    for (int Tid=0; Tid<Ntemperatures; Tid++){
-      T = Temperatures[Tid];
+    try{
+      for (int Tid=0; Tid<Ntemperatures; Tid++){
+        T = Temperatures[Tid];
 
-      switch(qha_method){
-        // here QHA3P and QHANP share the same code
-        case(QHA3P_CALC):
-        case(QHANP_CALC):
-          for (int Vid=0; Vid<N_EOSvolumes; Vid++) 
-            F[Vid+1] = calcFreeEnergyTaylorExpansion(T, Vid, qha_method);
-          break;
-        case(QHA_CALC):
-          for (int Vid=0; Vid<N_EOSvolumes; Vid++) F[Vid+1] = calcFreeEnergy(T, Vid);
-          break;
-        default:
-          msg = "Nonexistent QHA method was passed to " + function;
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, QHA_ARUN_MODE, msg, _INPUT_UNKNOWN_);
-          break;
-      }
-
-      if (includeElectronicContribution){
-        if (doSommerfeldExpansion) F += calcElectronicFreeEnergySommerfeld(T);
-        else{
-          for (int id=0; id<N_EOSvolumes; id++) F[id+1]+=calcElectronicFreeEnergy(T, id);
+        switch(qha_method){
+          // here QHA3P and QHANP share the same code
+          case(QHA3P_CALC):
+          case(QHANP_CALC):
+            for (int Vid=0; Vid<N_EOSvolumes; Vid++)
+              F[Vid+1] = calcFreeEnergyTaylorExpansion(T, Vid, qha_method);
+            break;
+          case(QHA_CALC):
+            for (int Vid=0; Vid<N_EOSvolumes; Vid++) F[Vid+1] = calcFreeEnergy(T, Vid);
+            break;
+          default:
+            msg = "Nonexistent QHA method was passed to " + function;
+            throw aurostd::xerror(_AFLOW_FILE_NAME_, QHA_ARUN_MODE, msg, _INPUT_UNKNOWN_);
+            break;
         }
+
+        if (includeElectronicContribution){
+          if (doSommerfeldExpansion) F += calcElectronicFreeEnergySommerfeld(T);
+          else{
+            for (int id=0; id<N_EOSvolumes; id++) F[id+1]+=calcElectronicFreeEnergy(T, id);
+          }
+        }
+
+        // stop if energy minimum is no longer within a given set of volumes
+        if (!isMinimumWithinBounds(F)){
+          msg = "Calculation is stopped at T=" + aurostd::utype2string<double>(T) + " [K]";
+          msg+= " since there is no free energy minimum within a given volume range.";
+          pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
+              *p_oss, _LOGGER_WARNING_);
+          break;
+        }
+
+        fitToEOSmodel(F, eos_method);
+        // note that the state of the EOS fit is changed by the calcThermalExpansion and/or
+        // calcIsochoricSpecificHeat functions, so save Veq, Feq and B for future use
+        Veq = EOS_volume_at_equilibrium;
+        Feq = EOS_energy_at_equilibrium;
+        B   = EOS_bulk_modulus_at_equilibrium;  // [GPa]
+        Bp  = EOS_Bprime_at_equilibrium;
+        beta = calcThermalExpansion(T, eos_method, qha_method); // [K^-1]
+        CV   = calcIsochoricSpecificHeat(T, Veq, eos_method, qha_method)/KBOLTZEV; // [kB/atom]
+        CP   = CV + Veq*T*B*pow(beta,2)/eV2GPa/KBOLTZEV; // [kB/atom]
+        GP   = (beta/CV)*B*Veq/eV2GPa/KBOLTZEV;
+
+        // the following properties are calculated only with a regular QHA calculation
+        if (qha_method==QHA_CALC){
+          calcCVandGPfit(T, V0K, CV_mesh_V0, GP_mesh_V0);
+          beta_mesh_V0 = KBOLTZEV*CV_mesh_V0*GP_mesh_V0/V0K/(B0K/eV2GPa); // [K^-1]
+          CP_mesh_V0 = CV_mesh_V0 + V0K*T*B0K*pow(beta_mesh_V0,2)/eV2GPa/KBOLTZEV;//[kB/atom]
+
+          calcCVandGPfit(T, Veq, CV_mesh_V,  GP_mesh_V);
+          beta_mesh_V = KBOLTZEV*CV_mesh_V*GP_mesh_V/Veq/(B/eV2GPa); // [K^-1]
+          CP_mesh_V   = CV_mesh_V + Veq*T*B*pow(beta_mesh_V,2)/eV2GPa/KBOLTZEV; //[kB/atom]
+        }
+
+        // write values to file
+        file << setw(5)  << T                   << setw(SW) << ' ' <<
+          setw(TW) << Veq                 << setw(SW) << ' ' <<
+          setw(TW) << Feq                 << setw(SW) << ' ' << //[eV/atom]
+          setw(TW) << B                   << setw(SW) << ' ' <<
+          setw(TW) << beta * 1e5          << setw(SW) << ' ' << //[10^-5/K]
+          setw(TW) << CV                  << setw(SW) << ' ' << //[kB/atom]
+          setw(TW) << CP                  << setw(SW) << ' ' << //[kB/atom]
+          setw(TW) << GP                  << setw(SW) << ' ' <<
+          setw(TW) << Bp;
+        // the following properties are calculated only with a regular QHA calculation
+        if (qha_method==QHA_CALC){
+          file << setw(SW) << ' ' <<
+            setw(TW) << GP_mesh_V              << setw(SW) << ' ' <<
+            setw(TW) << beta_mesh_V * 1e5      << setw(SW) << ' ' << //[10^-5/K]
+            setw(TW) << CV_mesh_V              << setw(SW) << ' ' << //[kB/atom]
+            setw(TW) << CP_mesh_V              << setw(SW) << ' ' << //[kB/atom]
+            setw(TW) << GP_mesh_V0             << setw(SW) << ' ' <<
+            setw(TW) << beta_mesh_V0 * 1e5     << setw(SW) << ' ' << //[10^-5/K]
+            setw(TW) << CV_mesh_V0             << setw(SW) << ' ' << //[kB/atom]
+            setw(TW) << CP_mesh_V0             << setw(SW); //[kB/atom]
+        }
+        file << std::endl;
       }
-
-      // stop if energy minimum is no longer within a given set of volumes
-      if (!isMinimumWithinBounds(F)){
-        msg = "Calculation is stopped at T=" + aurostd::utype2string<double>(T) + " [K]";
-        msg+= " since there is no free energy minimum within a given volume range.";
-        pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
-            *p_oss, _LOGGER_WARNING_);
-        break;
+    } catch (aurostd::xerror e){
+      // QHA throws _VALUE_RANGE_ exception only when there is no minimum in
+      // the energy-volume relation: at this point the calculation of 
+      // thermodynamic properties should be stooped printing a warning and all
+      // calculated data should be saved to the file
+      if (e.error_code == _VALUE_RANGE_){
+        pflow::logger(e.whereFileName(), e.whereFunction(), e.error_message, 
+            currentDirectory, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
       }
-
-      fitToEOSmodel(F, eos_method);
-      // note that the state of the EOS fit is changed by the calcThermalExpansion and/or
-      // calcIsochoricSpecificHeat functions, so save Veq, Feq and B for future use
-      Veq = EOS_volume_at_equilibrium;
-      Feq = EOS_energy_at_equilibrium;
-      B   = EOS_bulk_modulus_at_equilibrium;  // [GPa]
-      Bp  = EOS_Bprime_at_equilibrium;
-      beta = calcThermalExpansion(T, eos_method, qha_method); // [K^-1]
-      CV   = calcIsochoricSpecificHeat(T, Veq, eos_method, qha_method)/KBOLTZEV; // [kB/atom]
-      CP   = CV + Veq*T*B*pow(beta,2)/eV2GPa/KBOLTZEV; // [kB/atom]
-      GP   = (beta/CV)*B*Veq/eV2GPa/KBOLTZEV;
-
-      // the following properties are calculated only with a regular QHA calculation
-      if (qha_method==QHA_CALC){
-        calcCVandGPfit(T, V0K, CV_mesh_V0, GP_mesh_V0);
-        beta_mesh_V0 = KBOLTZEV*CV_mesh_V0*GP_mesh_V0/V0K/(B0K/eV2GPa); // [K^-1]
-        CP_mesh_V0 = CV_mesh_V0 + V0K*T*B0K*pow(beta_mesh_V0,2)/eV2GPa/KBOLTZEV;//[kB/atom]
-
-        calcCVandGPfit(T, Veq, CV_mesh_V,  GP_mesh_V);
-        beta_mesh_V = KBOLTZEV*CV_mesh_V*GP_mesh_V/Veq/(B/eV2GPa); // [K^-1]
-        CP_mesh_V   = CV_mesh_V + Veq*T*B*pow(beta_mesh_V,2)/eV2GPa/KBOLTZEV; //[kB/atom]
+      else{
+        throw;
       }
-
-      // write values to file
-      file << setw(5)  << T                   << setw(SW) << ' ' <<
-        setw(TW) << Veq                 << setw(SW) << ' ' <<
-        setw(TW) << Feq                 << setw(SW) << ' ' << //[eV/atom]
-        setw(TW) << B                   << setw(SW) << ' ' <<
-        setw(TW) << beta * 1e5          << setw(SW) << ' ' << //[10^-5/K]
-        setw(TW) << CV                  << setw(SW) << ' ' << //[kB/atom]
-        setw(TW) << CP                  << setw(SW) << ' ' << //[kB/atom]
-        setw(TW) << GP                  << setw(SW) << ' ' <<
-        setw(TW) << Bp;
-      // the following properties are calculated only with a regular QHA calculation
-      if (qha_method==QHA_CALC){
-        file << setw(SW) << ' ' <<
-          setw(TW) << GP_mesh_V              << setw(SW) << ' ' <<
-          setw(TW) << beta_mesh_V * 1e5      << setw(SW) << ' ' << //[10^-5/K]
-          setw(TW) << CV_mesh_V              << setw(SW) << ' ' << //[kB/atom]
-          setw(TW) << CP_mesh_V              << setw(SW) << ' ' << //[kB/atom]
-          setw(TW) << GP_mesh_V0             << setw(SW) << ' ' <<
-          setw(TW) << beta_mesh_V0 * 1e5     << setw(SW) << ' ' << //[10^-5/K]
-          setw(TW) << CV_mesh_V0             << setw(SW) << ' ' << //[kB/atom]
-          setw(TW) << CP_mesh_V0             << setw(SW); //[kB/atom]
-      }
-      file << std::endl;
     }
 
     file << blockname + "STOP" << std::endl;
