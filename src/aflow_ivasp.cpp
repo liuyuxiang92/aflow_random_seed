@@ -2338,16 +2338,16 @@ namespace KBIN {
       KBIN::XVASP_KPOINTS_OPERATION(xvasp,"Xodd,Yodd,Zodd");  // KBIN::XVASP_KPOINTS_ODD(xvasp);
       xvasp.aopts.flag("FLAG::XVASP_KPOINTS_changed",TRUE);
     }
-    if(Krun && vflags.KBIN_VASP_FORCE_OPTION_NOTUNE.isentry==FALSE && vflags.KBIN_VASP_FORCE_OPTION_KPOINTS.flag("KSHIFT_GAMMA_EVEN")) {           /*************** KPOINTS **************/
+    if(Krun && vflags.KBIN_VASP_FORCE_OPTION_NOTUNE.isentry==FALSE && vflags.KBIN_VASP_FORCE_OPTION_KPOINTS.flag("KSHIFT_GAMMA_EVEN")) {           /*************** KPOINTS **************/ //CO20210315 - the 'GAMMA' here is not appropriate unless 'Gamma' is set below, shifting the even by 0.5 puts it on the same 'grid' as Gamma, see https://www.vasp.at/wiki/index.php/KPOINTS#Monkhorst-Pack, not changing for legacy
       aus << "00000  MESSAGE-OPTION  [VASP_FORCE_OPTION]KPOINTS=KSHIFT_GAMMA_EVEN - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-      KBIN::XVASP_KPOINTS_OPERATION(xvasp,"Xevenshift,Yevenshift,Zevenshift");   // KBIN::XVASP_KPOINTS_Kshift_Gamma_EVEN(_xvasp& xvasp);
+      KBIN::XVASP_KPOINTS_OPERATION(xvasp,"Xevenshift,Yevenshift,Zevenshift");   // KBIN::XVASP_KPOINTS_Kshift_Gamma_EVEN(_xvasp& xvasp); //CO20210315 - 'Gamma' should be set here, see https://www.vasp.at/wiki/index.php/KPOINTS#Monkhorst-Pack, not changing for legacy
       xvasp.aopts.flag("FLAG::XVASP_KPOINTS_changed",TRUE);
     }
-    if(Krun && vflags.KBIN_VASP_FORCE_OPTION_NOTUNE.isentry==FALSE && vflags.KBIN_VASP_FORCE_OPTION_KPOINTS.flag("KSHIFT_GAMMA_ODD")) {            /*************** KPOINTS **************/
+    if(Krun && vflags.KBIN_VASP_FORCE_OPTION_NOTUNE.isentry==FALSE && vflags.KBIN_VASP_FORCE_OPTION_KPOINTS.flag("KSHIFT_GAMMA_ODD")) {            /*************** KPOINTS **************/ //CO20210315 - the 'GAMMA' here is not appropriate unless 'Gamma' is set below, shifting the odd by 0.5 offsets it from the Gamma 'grid', see https://www.vasp.at/wiki/index.php/KPOINTS#Monkhorst-Pack, not changing for legacy
       aus << "00000  MESSAGE-OPTION  [VASP_FORCE_OPTION]KPOINTS=KSHIFT_GAMMA_ODD - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-      KBIN::XVASP_KPOINTS_OPERATION(xvasp,"Xoddshift,Yoddshift,Zoddshift");   // KBIN::XVASP_KPOINTS_Kshift_Gamma_ODD(xvasp);
+      KBIN::XVASP_KPOINTS_OPERATION(xvasp,"Xoddshift,Yoddshift,Zoddshift");   // KBIN::XVASP_KPOINTS_Kshift_Gamma_ODD(xvasp); //CO20210315 - 'Gamma' should be set here, see https://www.vasp.at/wiki/index.php/KPOINTS#Monkhorst-Pack, not changing for legacy
       xvasp.aopts.flag("FLAG::XVASP_KPOINTS_changed",TRUE);
     }
     if(Krun && vflags.KBIN_VASP_FORCE_OPTION_NOTUNE.isentry==FALSE && vflags.KBIN_VASP_FORCE_OPTION_KPOINTS.flag("KSCHEME_MONKHORST_PACK")) {      /*************** KPOINTS **************/
@@ -5044,6 +5044,23 @@ namespace KBIN {
 }
 
 namespace KBIN {
+  bool XVASP_KPOINTS_IncludesGamma(const _xvasp& xvasp){  //CO20210315
+    //https://www.vasp.at/wiki/index.php/KPOINTS#Monkhorst-Pack
+    if((!xvasp.str.kpoints_kscheme.empty() && aurostd::toupper(xvasp.str.kpoints_kscheme[0])=='G') &&
+        (aurostd::isequal(xvasp.str.kpoints_s1,0.0) && aurostd::isequal(xvasp.str.kpoints_s2,0.0) && aurostd::isequal(xvasp.str.kpoints_s3,0.0))){
+      return true; //Gamma with no shift ensures Gamma
+    }
+    //otherwise, check that we have an odd scheme with no shift, this is also Gamma-centered
+    if(!xvasp.str.kpoints_kscheme.empty() && (aurostd::toupper(xvasp.str.kpoints_kscheme[0])=='G' || aurostd::toupper(xvasp.str.kpoints_kscheme[0])=='M') &&
+        (_isodd(xvasp.str.kpoints_k1) && _isodd(xvasp.str.kpoints_k2) && _isodd(xvasp.str.kpoints_k3)) &&
+       (aurostd::isequal(xvasp.str.kpoints_s1,0.0) && aurostd::isequal(xvasp.str.kpoints_s2,0.0) && aurostd::isequal(xvasp.str.kpoints_s3,0.0))){
+      return true;
+    }
+    return false;
+  }
+}
+
+namespace KBIN {
   bool XVASP_KPOINTS_OPERATION(_xvasp& xvasp,const string& _operation) {
     //CO20210315 - extensive rewrite
     //the schemes below check if the modification needs to be made (has it already been made?)
@@ -5059,6 +5076,7 @@ namespace KBIN {
     if(_operation.empty()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"empty operation",_INPUT_ILLEGAL_);}  //CO20210315
     string operation=aurostd::toupper(_operation);
     aurostd::StringSubst(operation,"KMAX","XMAX,YMAX,ZMAX");  //expand
+    aurostd::StringSubst(operation,"GAMMA_SHIFT","GAMMA,XZEROSHIFT,YZEROSHIFT,ZZEROSHIFT");  //expand  //repetita iuvant  //can also do XODD,YODD,ZODD
     uint nchanges_made=0;
     //CO20210304 - some notes about change_made
     //this function tries to make modifications to VASP files based on an input (e.g., make Xeven).
@@ -5068,55 +5086,115 @@ namespace KBIN {
     //if there is any change at all, the function is considered successful.
     //if there is no change, then the function tries to change the whole set (X,Y,Z).
     //the goal is to prevent aflow from spinning its wheels on an identical input.
-    //
+    //i--: decrease ki by 1 (if possible)
     if(operation.find("X--")){if(xvasp.str.kpoints_k1>=2){xvasp.str.kpoints_k1--;nchanges_made++;if(LDEBUG) cerr << "X-- k1=" << xvasp.str.kpoints_k1 << endl;}}
     if(operation.find("Y--")){if(xvasp.str.kpoints_k2>=2){xvasp.str.kpoints_k2--;nchanges_made++;if(LDEBUG) cerr << "Y-- k2=" << xvasp.str.kpoints_k2 << endl;}}
     if(operation.find("Z--")){if(xvasp.str.kpoints_k3>=2){xvasp.str.kpoints_k3--;nchanges_made++;if(LDEBUG) cerr << "Z-- k3=" << xvasp.str.kpoints_k3 << endl;}}
-    //
+    //i++: increase ki by 1 (always possible)
     if(operation.find("X++")){xvasp.str.kpoints_k1++;nchanges_made++;if(LDEBUG) cerr << "X++ k1=" << xvasp.str.kpoints_k1 << endl;}
     if(operation.find("Y++")){xvasp.str.kpoints_k2++;nchanges_made++;if(LDEBUG) cerr << "Y++ k2=" << xvasp.str.kpoints_k2 << endl;}
     if(operation.find("Z++")){xvasp.str.kpoints_k3++;nchanges_made++;if(LDEBUG) cerr << "Z++ k3=" << xvasp.str.kpoints_k3 << endl;}
-    //
+    //i2-: decrease ki by 2 (if possible)
     //CO20210315 - 2- and 2+ is important if we want to keep even/odd parity
     //if k1==2, running X-- twice will stop at 1, changing parity
     //these routines fix this
     if(operation.find("X2-")){if(xvasp.str.kpoints_k1>=3){xvasp.str.kpoints_k1-=2;nchanges_made++;if(LDEBUG) cerr << "X2- k1=" << xvasp.str.kpoints_k1 << endl;}} //CO20210315
     if(operation.find("Y2-")){if(xvasp.str.kpoints_k2>=3){xvasp.str.kpoints_k2-=2;nchanges_made++;if(LDEBUG) cerr << "Y2- k2=" << xvasp.str.kpoints_k2 << endl;}} //CO20210315
     if(operation.find("Z2-")){if(xvasp.str.kpoints_k3>=3){xvasp.str.kpoints_k3-=2;nchanges_made++;if(LDEBUG) cerr << "Z2- k3=" << xvasp.str.kpoints_k3 << endl;}} //CO20210315
-    //
+    //i2+: increase ki by 2 (always possible)
     if(operation.find("X2+")){xvasp.str.kpoints_k1+=2;nchanges_made++;if(LDEBUG) cerr << "X2+ k1=" << xvasp.str.kpoints_k1 << endl;}  //CO20210315
     if(operation.find("Y2+")){xvasp.str.kpoints_k2+=2;nchanges_made++;if(LDEBUG) cerr << "Y2+ k2=" << xvasp.str.kpoints_k2 << endl;}  //CO20210315
     if(operation.find("Z2+")){xvasp.str.kpoints_k3+=2;nchanges_made++;if(LDEBUG) cerr << "Z2+ k3=" << xvasp.str.kpoints_k3 << endl;}  //CO20210315
-    //
-    if(operation.find("XEVEN")){if(_isodd(xvasp.str.kpoints_k1)){xvasp.str.kpoints_k1++;xvasp.str.kpoints_s1=0.0;nchanges_made++;if(LDEBUG) cerr << "Xeven k1=" << xvasp.str.kpoints_k1 << endl;}}
-    if(operation.find("YEVEN")){if(_isodd(xvasp.str.kpoints_k2)){xvasp.str.kpoints_k2++;xvasp.str.kpoints_s2=0.0;nchanges_made++;if(LDEBUG) cerr << "Yeven k2=" << xvasp.str.kpoints_k2 << endl;}}
-    if(operation.find("ZEVEN")){if(_isodd(xvasp.str.kpoints_k3)){xvasp.str.kpoints_k3++;xvasp.str.kpoints_s3=0.0;nchanges_made++;if(LDEBUG) cerr << "Zeven k3=" << xvasp.str.kpoints_k3 << endl;}}
-    //
-    if(operation.find("XODD")){if(_iseven(xvasp.str.kpoints_k1)){xvasp.str.kpoints_k1++;xvasp.str.kpoints_s1=0.0;nchanges_made++;if(LDEBUG) cerr << "Xodd k1=" << xvasp.str.kpoints_k1 << endl;}}
-    if(operation.find("YODD")){if(_iseven(xvasp.str.kpoints_k2)){xvasp.str.kpoints_k2++;xvasp.str.kpoints_s2=0.0;nchanges_made++;if(LDEBUG) cerr << "Yodd k2=" << xvasp.str.kpoints_k2 << endl;}}
-    if(operation.find("ZODD")){if(_iseven(xvasp.str.kpoints_k3)){xvasp.str.kpoints_k3++;xvasp.str.kpoints_s3=0.0;nchanges_made++;if(LDEBUG) cerr << "Zodd k3=" << xvasp.str.kpoints_k3 << endl;}}
+    //ieven: make ki even (if not already) AND si=0 (if not already)
+    if(operation.find("XEVEN")){
+      if(_isodd(xvasp.str.kpoints_k1)){xvasp.str.kpoints_k1++;nchanges_made++;if(LDEBUG) cerr << "Xeven k1=" << xvasp.str.kpoints_k1 << endl;}
+      if(!aurostd::isequal(xvasp.str.kpoints_s1,0.0)){xvasp.str.kpoints_s1=0.0;nchanges_made++;if(LDEBUG) cerr << "Xeven s1=" << xvasp.str.kpoints_s1 << endl;}
+    }
+    if(operation.find("YEVEN")){
+      if(_isodd(xvasp.str.kpoints_k2)){xvasp.str.kpoints_k2++;nchanges_made++;if(LDEBUG) cerr << "Yeven k2=" << xvasp.str.kpoints_k2 << endl;}
+      if(!aurostd::isequal(xvasp.str.kpoints_s2,0.0)){xvasp.str.kpoints_s2=0.0;nchanges_made++;if(LDEBUG) cerr << "Yeven s2=" << xvasp.str.kpoints_s2 << endl;}
+    }
+    if(operation.find("ZEVEN")){
+      if(_isodd(xvasp.str.kpoints_k3)){xvasp.str.kpoints_k3++;nchanges_made++;if(LDEBUG) cerr << "Zeven k3=" << xvasp.str.kpoints_k3 << endl;}
+      if(!aurostd::isequal(xvasp.str.kpoints_s3,0.0)){xvasp.str.kpoints_s3=0.0;nchanges_made++;if(LDEBUG) cerr << "Zeven s3=" << xvasp.str.kpoints_s3 << endl;}
+    }
+    //iodd: make ki odd (if not already) AND si=0 (if not already)
+    if(operation.find("XODD")){
+      if(_iseven(xvasp.str.kpoints_k1)){xvasp.str.kpoints_k1++;nchanges_made++;if(LDEBUG) cerr << "Xodd k1=" << xvasp.str.kpoints_k1 << endl;}
+      if(!aurostd::isequal(xvasp.str.kpoints_s1,0.0)){xvasp.str.kpoints_s1=0.0;nchanges_made++;if(LDEBUG) cerr << "Xodd s1=" << xvasp.str.kpoints_s1 << endl;}
+    }
+    if(operation.find("YODD")){
+      if(_iseven(xvasp.str.kpoints_k2)){xvasp.str.kpoints_k2++;nchanges_made++;if(LDEBUG) cerr << "Yodd k2=" << xvasp.str.kpoints_k2 << endl;}
+      if(!aurostd::isequal(xvasp.str.kpoints_s2,0.0)){xvasp.str.kpoints_s2=0.0;nchanges_made++;if(LDEBUG) cerr << "Yodd s2=" << xvasp.str.kpoints_s2 << endl;}
+    }
+    if(operation.find("ZODD")){
+      if(_iseven(xvasp.str.kpoints_k3)){xvasp.str.kpoints_k3++;nchanges_made++;if(LDEBUG) cerr << "Zodd k3=" << xvasp.str.kpoints_k3 << endl;}
+      if(!aurostd::isequal(xvasp.str.kpoints_s3,0.0)){xvasp.str.kpoints_s3=0.0;nchanges_made++;if(LDEBUG) cerr << "Zodd s3=" << xvasp.str.kpoints_s3 << endl;}
+    }
     //
     //CO20210315 - below here, do not change _k* (only for MAX)
     xvasp.str.kpoints_kmax=max(xvasp.str.kpoints_k1,xvasp.str.kpoints_k2,xvasp.str.kpoints_k3);
-    //
+    //imax: set ki to kmax (if not already)
     if(operation.find("XMAX")){if(xvasp.str.kpoints_k1!=xvasp.str.kpoints_kmax){xvasp.str.kpoints_k1=xvasp.str.kpoints_kmax;nchanges_made++;if(LDEBUG) cerr << "Xmax k1=" << xvasp.str.kpoints_k1 << endl;}}
     if(operation.find("YMAX")){if(xvasp.str.kpoints_k2!=xvasp.str.kpoints_kmax){xvasp.str.kpoints_k2=xvasp.str.kpoints_kmax;nchanges_made++;if(LDEBUG) cerr << "Ymax k2=" << xvasp.str.kpoints_k2 << endl;}}
     if(operation.find("ZMAX")){if(xvasp.str.kpoints_k3!=xvasp.str.kpoints_kmax){xvasp.str.kpoints_k3=xvasp.str.kpoints_kmax;nchanges_made++;if(LDEBUG) cerr << "Zmax k3=" << xvasp.str.kpoints_k3 << endl;}}
-    //
-    if(operation.find("XEVENSHIFT")){if(_iseven(xvasp.str.kpoints_k1)) xvasp.str.kpoints_s1=0.5; else xvasp.str.kpoints_s1=0.0;nchanges_made++;if(LDEBUG) cerr << "Xevenshift s1=" << xvasp.str.kpoints_s1 << endl;}
-    if(operation.find("YEVENSHIFT")){if(_iseven(xvasp.str.kpoints_k2)) xvasp.str.kpoints_s2=0.5; else xvasp.str.kpoints_s2=0.0;nchanges_made++;if(LDEBUG) cerr << "Yevenshift s2=" << xvasp.str.kpoints_s2 << endl;}
-    if(operation.find("ZEVENSHIFT")){if(_iseven(xvasp.str.kpoints_k3)) xvasp.str.kpoints_s3=0.5; else xvasp.str.kpoints_s3=0.0;nchanges_made++;if(LDEBUG) cerr << "Zevenshift s3=" << xvasp.str.kpoints_s3 << endl;}
-    //
-    if(operation.find("XODDSHIFT")){if(_isodd(xvasp.str.kpoints_k1)) xvasp.str.kpoints_s1=0.5; else xvasp.str.kpoints_s1=0.0;nchanges_made++;if(LDEBUG) cerr << "Xoddshift s1=" << xvasp.str.kpoints_s1 << endl;}
-    if(operation.find("YODDSHIFT")){if(_isodd(xvasp.str.kpoints_k2)) xvasp.str.kpoints_s2=0.5; else xvasp.str.kpoints_s2=0.0;nchanges_made++;if(LDEBUG) cerr << "Yoddshift s2=" << xvasp.str.kpoints_s2 << endl;}
-    if(operation.find("ZODDSHIFT")){if(_isodd(xvasp.str.kpoints_k3)) xvasp.str.kpoints_s3=0.5; else xvasp.str.kpoints_s3=0.0;nchanges_made++;if(LDEBUG) cerr << "Zoddshift s3=" << xvasp.str.kpoints_s3 << endl;}
-    //
+    //ievenshift: even ki get si=0.5 and odd k1 si=0 (if not already)
+    if(operation.find("XEVENSHIFT")){
+      if(_iseven(xvasp.str.kpoints_k1)){
+        if(!aurostd::isequal(xvasp.str.kpoints_s1,0.5)){xvasp.str.kpoints_s1=0.5;nchanges_made++;if(LDEBUG) cerr << "Xevenshift s1=" << xvasp.str.kpoints_s1 << endl;}
+      } 
+      else{ //_isodd()
+        if(!aurostd::isequal(xvasp.str.kpoints_s1,0.0)){xvasp.str.kpoints_s1=0.0;nchanges_made++;if(LDEBUG) cerr << "Xevenshift s1=" << xvasp.str.kpoints_s1 << endl;}
+      }
+    }
+    if(operation.find("YEVENSHIFT")){
+      if(_iseven(xvasp.str.kpoints_k2)){
+        if(!aurostd::isequal(xvasp.str.kpoints_s2,0.5)){xvasp.str.kpoints_s2=0.5;nchanges_made++;if(LDEBUG) cerr << "Xevenshift s2=" << xvasp.str.kpoints_s2 << endl;}
+      }
+      else{ //_isodd()
+        if(!aurostd::isequal(xvasp.str.kpoints_s2,0.0)){xvasp.str.kpoints_s2=0.0;nchanges_made++;if(LDEBUG) cerr << "Yevenshift s2=" << xvasp.str.kpoints_s2 << endl;}
+      }
+    }
+    if(operation.find("ZEVENSHIFT")){
+      if(_iseven(xvasp.str.kpoints_k3)){
+        if(!aurostd::isequal(xvasp.str.kpoints_s3,0.5)){xvasp.str.kpoints_s3=0.5;nchanges_made++;if(LDEBUG) cerr << "Xevenshift s3=" << xvasp.str.kpoints_s3 << endl;}
+      } 
+      else{ //_isodd()
+        if(!aurostd::isequal(xvasp.str.kpoints_s3,0.0)){xvasp.str.kpoints_s3=0.0;nchanges_made++;if(LDEBUG) cerr << "Zevenshift s3=" << xvasp.str.kpoints_s3 << endl;}
+      }
+    }
+    //ioddshift: odd ki get si=0.5 and even k1 si=0 (if not already)
+    if(operation.find("XODDSHIFT")){
+      if(_isodd(xvasp.str.kpoints_k1)){
+        if(!aurostd::isequal(xvasp.str.kpoints_s1,0.5)){xvasp.str.kpoints_s1=0.5;nchanges_made++;if(LDEBUG) cerr << "Xoddshift s1=" << xvasp.str.kpoints_s1 << endl;}
+      } 
+      else{ //_iseven()
+        if(!aurostd::isequal(xvasp.str.kpoints_s1,0.0)){xvasp.str.kpoints_s1=0.0;nchanges_made++;if(LDEBUG) cerr << "Xoddshift s1=" << xvasp.str.kpoints_s1 << endl;}
+      }
+    }
+    if(operation.find("YODDSHIFT")){
+      if(_isodd(xvasp.str.kpoints_k2)){
+        if(!aurostd::isequal(xvasp.str.kpoints_s2,0.5)){xvasp.str.kpoints_s2=0.5;nchanges_made++;if(LDEBUG) cerr << "Xoddshift s2=" << xvasp.str.kpoints_s2 << endl;}
+      }
+      else{ //_iseven()
+        if(!aurostd::isequal(xvasp.str.kpoints_s2,0.0)){xvasp.str.kpoints_s2=0.0;nchanges_made++;if(LDEBUG) cerr << "Yoddshift s2=" << xvasp.str.kpoints_s2 << endl;}
+      }
+    }
+    if(operation.find("ZODDSHIFT")){
+      if(_isodd(xvasp.str.kpoints_k3)){
+        if(!aurostd::isequal(xvasp.str.kpoints_s3,0.5)){xvasp.str.kpoints_s3=0.5;nchanges_made++;if(LDEBUG) cerr << "Xoddshift s3=" << xvasp.str.kpoints_s3 << endl;}
+      } 
+      else{ //_iseven()
+        if(!aurostd::isequal(xvasp.str.kpoints_s3,0.0)){xvasp.str.kpoints_s3=0.0;nchanges_made++;if(LDEBUG) cerr << "Zoddshift s3=" << xvasp.str.kpoints_s3 << endl;}
+      }
+    }
+    //izeroshift: si=0 (if not already)
     if(operation.find("XZEROSHIFT")){if(!aurostd::isequal(xvasp.str.kpoints_s1,0.0)){xvasp.str.kpoints_s1=0.0;nchanges_made++;if(LDEBUG) cerr << "Xzeroshift s1=" << xvasp.str.kpoints_s1 << endl;}}
     if(operation.find("YZEROSHIFT")){if(!aurostd::isequal(xvasp.str.kpoints_s2,0.0)){xvasp.str.kpoints_s2=0.0;nchanges_made++;if(LDEBUG) cerr << "Yzeroshift s2=" << xvasp.str.kpoints_s2 << endl;}}
     if(operation.find("ZZEROSHIFT")){if(!aurostd::isequal(xvasp.str.kpoints_s3,0.0)){xvasp.str.kpoints_s3=0.0;nchanges_made++;if(LDEBUG) cerr << "Zzeroshift s3=" << xvasp.str.kpoints_s3 << endl;}}
-    //
+    //M vs. G: set kscheme accordingly (if not already)
     if(operation.at(0)=='M' || operation.find("MONKHORST-PACK")){if(xvasp.str.kpoints_kscheme!="Monkhorst-Pack"){xvasp.str.kpoints_kscheme="Monkhorst-Pack";nchanges_made++;if(LDEBUG) cerr << "Monkhorst-Pack" << endl;}} // "Monkhorst-Pack";
-    if(operation.at(0)=='G' || operation.find("GAMMA")){if(xvasp.str.kpoints_kscheme!="Gamma"){xvasp.str.kpoints_kscheme="Gamma";nchanges_made++;if(LDEBUG) cerr << "Gamma" << endl;}} // "Gamma";  //CO20210315 - write a better function that checks if odd and no shift, this is also Gamma
+    if(operation.at(0)=='G' || operation.find("GAMMA")){if(xvasp.str.kpoints_kscheme!="Gamma"){xvasp.str.kpoints_kscheme="Gamma";nchanges_made++;if(LDEBUG) cerr << "Gamma" << endl;}} // "Gamma";  //CO20210315 - do not check if !KBIN::XVASP_KPOINTS_IncludesGamma(xvasp) here, changing to 'G' if 'G' is not set is an entirely new scheme: https://www.vasp.at/wiki/index.php/KPOINTS#Monkhorst-Pack
     //
     //[CO20210315 - better not to do something not requested, just return false]//CO20210315 - below here, we attempt to make a change if a change was not effected earlier
     //[CO20210315 - better not to do something not requested, just return false]if((nchanges_made==0)&&(operation.find("XEVEN")||operation.find("YEVEN")||operation.find("ZEVEN"))){  //CO20210201 - was already even before, increment by 2
@@ -5660,8 +5738,8 @@ namespace KBIN {
     //maintain this feedback system to ensure aflow doesn't keep spinning its wheels on the same patches
     string function="KBIN::XVASP_Afix_GENERIC";
     string soliloquy=XPID+function+"():";
-    string operation=function+" (fix="+mode+")";
-    string file_error="";
+    string operation=function+" (fix="+mode+(submode>=0?",submode="+aurostd::utype2string(submode):"")+")";
+    string file_error="",incar_input="";
     stringstream aus;
 
     _xvasp xvasp_orig(xvasp);     //keep original, restore later if necessary
@@ -5728,9 +5806,10 @@ namespace KBIN {
       file_error="aflow.error.eddrmm";
       if(submode==0){ //try G-centered (odd scheme) //CO20200624 - try odd (G-centered) scheme
         if(xvasp.aopts.flag("FLAG::KPOINTS_PRESERVED")){Krun=false;} // don't touch kpoints
+        if(Krun && KBIN::XVASP_KPOINTS_IncludesGamma(xvasp)){Krun=false;} //already done
         //START - load KPOINTS into xvasp, modify xvasp.str.kpoints*, and write out new KPOINTS
         Krun=(Krun && VASP_Reread_KPOINTS(xvasp) && XVASP_KPOINTS_string2numbers(xvasp)); //preload kpoints, load into xvasp.str
-        Krun=(Krun && KBIN::XVASP_KPOINTS_OPERATION(xvasp,"Xodd,Yodd,Zodd,Xzeroshift,Yzeroshift,Zzeroshift"));  //CO20210315 - yes, odd with no shift is the same as Gamma-centered, see here: https://cms.mpi.univie.ac.at/vasp/vasp/Automatic_k_mesh_generation.html#sec:autok // this should put the origin in GAMMA ??
+        Krun=(Krun && KBIN::XVASP_KPOINTS_OPERATION(xvasp,"Gamma_Shift"));  //CO20210315
         Krun=(Krun && aurostd::stringstream2file(xvasp.KPOINTS,string(xvasp.Directory+"/KPOINTS")));
         //END - load KPOINTS into xvasp, modify xvasp.str.kpoints*, and write out new KPOINTS
         if(Krun){aus << "WWWWW  FIX GAMMA-CENTERED KPOINTS (ODD SCHEME)" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
@@ -5779,8 +5858,34 @@ namespace KBIN {
         if(Krun){aus << "WWWWW  FIX ALGO=" << vflags.KBIN_VASP_FORCE_OPTION_ALGO.xscheme << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
-      //ADD HERE: change RELAX=ENERGY to RELAX=FORCES
-      if(submode==4){ //CO20200624 - try patching POTIM if we are relaxing, otherwise change ISMEAR
+      if(submode==4){ //CO20200624 - try RELAX=FORCES
+        //START - load INCAR into xvasp, modify, then write out new INCAR
+        Krun=(Krun && VASP_Reread_INCAR(xvasp));  //preload incar
+        if(Krun){
+          //refer to vflags.KBIN_VASP_FORCE_OPTION_RELAX_MODE.xscheme=="FORCES" above
+          //we're probably coming from RELAX=ENERGY, so only change non-overlapping settings
+          //first do a check that we're not already doing RELAX=FORCES, IBRION is a good enough check
+          incar_input="IBRION=1";
+          if(aurostd::substring2bool(xvasp.INCAR,incar_input,true)){Krun=false;}  //remove whitespace
+        }
+        if(Krun){
+          //REMOVE LINES
+          KBIN::XVASP_INCAR_REMOVE_ENTRY(xvasp,"IBRION,NELMIN,ADDGRID,EDIFFG,NSW",operation,vflags.KBIN_VASP_INCAR_VERBOSE,false,false); //CO20200624 - do not preload or rewrite incar
+          //ADD LINES
+          if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << " # Performing " << operation << " [AFLOW] start" << endl;
+          xvasp.INCAR << aurostd::PaddedPOST(incar_input,_incarpad_) << " # " << operation << endl; //CO20200624
+          xvasp.INCAR << aurostd::PaddedPOST("NELMIN=4",_incarpad_) << " # " << operation << endl; //CO20200624
+          xvasp.INCAR << aurostd::PaddedPOST("ADDGRID=.TRUE.",_incarpad_) << " # " << operation << endl; //CO20200624
+          xvasp.INCAR << aurostd::PaddedPOST("EDIFFG="+aurostd::utype2string(DEFAULT_VASP_PREC_EDIFFG,12),_incarpad_) << " # " << operation << endl; //CO20200624
+          xvasp.INCAR << aurostd::PaddedPOST("NSW=100",_incarpad_) << " # " << operation << endl; //CO20200624
+          if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << " # Performing " << operation << " [AFLOW] end" << endl;
+        }
+        Krun=(Krun && aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR"))); //write out incar
+        //END - load INCAR into xvasp, modify, then write out new INCAR
+        if(Krun){aus << "WWWWW  FIX RELAX=FORCES" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+        if(!Krun){Krun=true;submode++;} //reset and go to the next solution
+      }
+      if(submode==5){ //CO20200624 - try patching POTIM if we are relaxing, otherwise change ISMEAR
         if(xvasp.NRELAXING<=xvasp.NRELAX){  //happens during relax
           //START - load INCAR into xvasp, modify, then write out new INCAR
           Krun=(Krun && VASP_Reread_INCAR(xvasp));  //preload incar
@@ -5800,7 +5905,7 @@ namespace KBIN {
           if(!Krun){Krun=true;submode++;} //reset and go to the next solution
         }
       }
-      if(submode>=5){Krun=false;}
+      if(submode>=6){Krun=false;}
       submode+=submode_increment;submode_increment=1;  //increment and reset
     }
     else if(mode=="EFIELD_PEAD") {
@@ -5826,9 +5931,10 @@ namespace KBIN {
     else if(mode=="GAMMA_SHIFT") {
       file_error="aflow.error.gamma_shift";
       if(xvasp.aopts.flag("FLAG::KPOINTS_PRESERVED")){Krun=false;} // don't touch kpoints
+      if(Krun && KBIN::XVASP_KPOINTS_IncludesGamma(xvasp)){Krun=false;} //already done
       //START - load KPOINTS into xvasp, modify xvasp.str.kpoints*, and write out new KPOINTS
       Krun=(Krun && VASP_Reread_KPOINTS(xvasp) && XVASP_KPOINTS_string2numbers(xvasp)); //preload kpoints, load into xvasp.str
-      Krun=(Krun && KBIN::XVASP_KPOINTS_OPERATION(xvasp,"Gamma,Xzeroshift,Yzeroshift,Zzeroshift"));
+      Krun=(Krun && KBIN::XVASP_KPOINTS_OPERATION(xvasp,"Gamma_Shift"));  //CO20210315
       Krun=(Krun && aurostd::stringstream2file(xvasp.KPOINTS,string(xvasp.Directory+"/KPOINTS")));
       //END - load KPOINTS into xvasp, modify xvasp.str.kpoints*, and write out new KPOINTS
       if(Krun){aus << "WWWWW  FIX GAMMA-CENTERED KPOINTS" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
@@ -5836,12 +5942,13 @@ namespace KBIN {
     else if(mode=="IBZKPT") {
       file_error="aflow.error.ibzkpt";
       if(xvasp.aopts.flag("FLAG::KPOINTS_PRESERVED")){Krun=false;} // don't touch kpoints
+      if(Krun && KBIN::XVASP_KPOINTS_IncludesGamma(xvasp)){Krun=false;} //already done
       //START - load KPOINTS into xvasp, modify xvasp.str.kpoints*, and write out new KPOINTS
       Krun=(Krun && VASP_Reread_KPOINTS(xvasp) && XVASP_KPOINTS_string2numbers(xvasp)); //preload kpoints, load into xvasp.str
-      Krun=(Krun && KBIN::XVASP_KPOINTS_OPERATION(xvasp,"Xodd,Yodd,Zodd,Xzeroshift,Yzeroshift,Zzeroshift"));  //CO20210315 - yes, odd with no shift is the same as Gamma-centered, see here: https://cms.mpi.univie.ac.at/vasp/vasp/Automatic_k_mesh_generation.html#sec:autok // this should put the origin in GAMMA ??
+      Krun=(Krun && KBIN::XVASP_KPOINTS_OPERATION(xvasp,"Gamma_Shift"));  //CO20210315
       Krun=(Krun && aurostd::stringstream2file(xvasp.KPOINTS,string(xvasp.Directory+"/KPOINTS")));
       //END - load KPOINTS into xvasp, modify xvasp.str.kpoints*, and write out new KPOINTS
-      if(Krun){aus << "WWWWW  FIX GAMMA-CENTERED KPOINTS (ODD SCHEME)" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+      if(Krun){aus << "WWWWW  FIX GAMMA-CENTERED KPOINTS" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
     }
     else if(mode=="INVGRP" || mode=="SGRCON" || mode=="SYMPREC") {
       file_error="aflow.error.symprec";
@@ -5974,17 +6081,22 @@ namespace KBIN {
       //START - load INCAR into xvasp, modify, then write out new INCAR
       Krun=(Krun && VASP_Reread_INCAR(xvasp));  //preload incar
       if(Krun){
-        //no need to check if new INCAR input is already present, we grab ENMAX and reduce from INCAR (if present)
         double& enmax=param_double;
         enmax=AUROSTD_MAX_DOUBLE;
         if(aurostd::substring2bool(xvasp.INCAR,"ENMAX=",true)){enmax=aurostd::kvpair2utype<int>(xvasp.INCAR,"ENMAX","=");}  //CO20210315 - the substring2bool check makes sure we don't get enmax=0 for lack of input, remove whitespaces
-        else{enmax=500.0;}  //CO20210315
-        // enmax*=0.99; // reduce 1%.... if enough
-        enmax*=0.97; // reduce 3%.... if enough
+        else{enmax=DEFAULT_VASP_PREC_ENMAX_ACCURATE*xvasp.POTCAR_ENMAX;}
+        if(enmax==AUROSTD_MAX_DOUBLE || aurostd::isequal(enmax,0.0)){enmax=500.0;}  //CO20210315
+        enmax*=0.97; // reduce 3%.... if enough // enmax*=0.99; // reduce 1%.... if enough
         KBIN::XVASP_INCAR_PREPARE_GENERIC("LREAL",xvasp,vflags,"",0,0.0,ON);  //no Krun here, if it's already there, we're set
+        incar_input="ENMAX="+aurostd::utype2string(enmax,_IVASP_DOUBLE2STRING_PRECISION_);
+        if(aurostd::substring2bool(xvasp.INCAR,incar_input,true)){Krun=false;}  //remove whitespace
+      }
+      if(Krun){
+        //REMOVE LINES
         KBIN::XVASP_INCAR_REMOVE_ENTRY(xvasp,"ENMAX",operation,vflags.KBIN_VASP_INCAR_VERBOSE,false,false); //CO20200624 - do not preload or rewrite incar
+        //ADD LINES
         if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << " # Performing " << operation << " [AFLOW] start" << endl;
-        xvasp.INCAR << aurostd::PaddedPOST("ENMAX="+aurostd::utype2string(enmax,_IVASP_DOUBLE2STRING_PRECISION_),_incarpad_) << " # " << operation << endl; //CO20200624
+        xvasp.INCAR << aurostd::PaddedPOST(incar_input,_incarpad_) << " # " << operation << endl; //CO20200624
         if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << " # Performing " << operation << " [AFLOW] end" << endl;
       }
       Krun=(Krun && aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR"))); //write out incar
@@ -6014,9 +6126,10 @@ namespace KBIN {
       //else if(submode==1) //DO NOT USE else if, we may change submode inside
       if(submode==1){ //Gamma
         if(xvasp.aopts.flag("FLAG::KPOINTS_PRESERVED")){Krun=false;} // don't touch kpoints
+        if(Krun && KBIN::XVASP_KPOINTS_IncludesGamma(xvasp)){Krun=false;} //already done
         //START - load KPOINTS into xvasp, modify xvasp.str.kpoints*, and write out new KPOINTS
         Krun=(Krun && VASP_Reread_KPOINTS(xvasp) && XVASP_KPOINTS_string2numbers(xvasp)); //preload kpoints, load into xvasp.str
-        Krun=(Krun && KBIN::XVASP_KPOINTS_OPERATION(xvasp,"Gamma,Xzeroshift,Yzeroshift,Zzeroshift"));
+        Krun=(Krun && KBIN::XVASP_KPOINTS_OPERATION(xvasp,"Gamma_Shift"));  //CO20210315
         Krun=(Krun && aurostd::stringstream2file(xvasp.KPOINTS,string(xvasp.Directory+"/KPOINTS")));
         //END - load KPOINTS into xvasp, modify xvasp.str.kpoints*, and write out new KPOINTS
         if(Krun){aus << "WWWWW  FIX GAMMA-CENTERED KPOINTS" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
@@ -6029,7 +6142,7 @@ namespace KBIN {
         Krun=(Krun && KBIN::XVASP_KPOINTS_OPERATION(xvasp,"Gamma,Xeven,Yeven,Zeven"));
         Krun=(Krun && aurostd::stringstream2file(xvasp.KPOINTS,string(xvasp.Directory+"/KPOINTS")));
         //END - load KPOINTS into xvasp, modify xvasp.str.kpoints*, and write out new KPOINTS
-        if(Krun){aus << "WWWWW  FIX KPOINTS EVEN" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+        if(Krun){aus << "WWWWW  FIX GAMMA-CENTERED KPOINTS EVEN" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
       if(submode==3){ //Gamma-odd
@@ -6039,7 +6152,7 @@ namespace KBIN {
         Krun=(Krun && KBIN::XVASP_KPOINTS_OPERATION(xvasp,"Gamma,Xodd,Yodd,Zodd"));
         Krun=(Krun && aurostd::stringstream2file(xvasp.KPOINTS,string(xvasp.Directory+"/KPOINTS")));
         //END - load KPOINTS into xvasp, modify xvasp.str.kpoints*, and write out new KPOINTS
-        if(Krun){aus << "WWWWW  FIX KPOINTS ODD" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+        if(Krun){aus << "WWWWW  FIX GAMMA-CENTERED KPOINTS ODD" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
       if(submode==4){ //Kmax

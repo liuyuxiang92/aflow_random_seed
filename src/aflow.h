@@ -3105,6 +3105,7 @@ namespace KBIN {
   void XVASP_KPOINTS_KPOINTS(_xvasp &xvasp);
   // bool XVASP_KPOINTS_EVEN(_xvasp& xvasp); TO REMOVE
   // bool XVASP_KPOINTS_ODD(_xvasp& xvasp); TO REMOVE
+  bool XVASP_KPOINTS_IncludesGamma(const _xvasp& xvasp);  //CO20210315
   bool XVASP_KPOINTS_OPERATION(_xvasp& xvasp,const string& operation);
   // bool XVASP_KPOINTS_Kshift_Gamma_EVEN(_xvasp& xvasp); TO REMOVE
   // bool XVASP_KPOINTS_Kshift_Gamma_ODD(_xvasp& xvasp); TO REMOVE

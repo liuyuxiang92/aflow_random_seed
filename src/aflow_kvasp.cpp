@@ -2905,7 +2905,7 @@ namespace KBIN {
       apply_patch=false;
     }
     if(apply_patch && !KBIN::XVASP_Afix_GENERIC(fix,submode,xvasp,kflags,vflags,aflags,FileMESSAGE)){   //CO20210315
-      if(LDEBUG){cerr << soliloquy << " KBIN::XVASP_Afix_GENERIC(\"" << fix << (submode>=0?",submode="+aurostd::utype2string(submode):"") << "\") failed" << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+      if(LDEBUG){cerr << soliloquy << " KBIN::XVASP_Afix_GENERIC(fix=\"" << fix << (submode>=0?",submode="+aurostd::utype2string(submode):"") << "\") failed" << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
       apply_patch=false;
     }
     if(apply_patch){
@@ -3638,9 +3638,11 @@ namespace KBIN {
 
         if(LDEBUG){cerr << soliloquy << " [6]" << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
 
-        //implement a check on whether Afix_Generic() returned false
-        //iterate through options faster/more efficiently
-        //come back soon
+        //a note about the fixes below
+        //they generally compound, which I believe is the right approach
+        //however, there might be some options which conflict
+        //add KBIN::XVASP_INCAR_REMOVE_ENTRY() as necessary
+        //check also submode patches
 
         // ********* APPLY PREFERRED SYMMETRY FIXES ******************
         // NKXYZ_IKPTD must come BEFORE IBZKPT
@@ -3678,7 +3680,7 @@ namespace KBIN {
         KBIN::VASP_ApplyPatch("DAV",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
         KBIN::VASP_ApplyPatch("DENTET",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
         KBIN::VASP_ApplyPatch("EDDDAV",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
-        KBIN::VASP_ApplyPatch("EDDRMM",fix_EDDRMM,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
+        KBIN::VASP_ApplyPatch("EDDRMM",fix_EDDRMM,false,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);  //apply_once==false: we have POTIM inside
         KBIN::VASP_ApplyPatch("EFIELD_PEAD",false,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);  //apply_once==false: keep decreasing EFIELD_PEAD until it works
         KBIN::VASP_ApplyPatch("EXCCOR",false,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE); //apply_once==false: keep increasing volume until it works
         KBIN::VASP_ApplyPatch("GAMMA_SHIFT",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);

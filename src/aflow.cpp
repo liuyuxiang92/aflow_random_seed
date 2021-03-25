@@ -726,14 +726,20 @@ int main(int _argc,char **_argv) {
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_FoldAtomsInCell|--FoldAtomsInCell_test")) {return (FoldAtomsInCellTest(cout)?0:1);}  //DX20210129
     if(!Arun && aurostd::args2flag(argv,cmds,"--test")) {
 
+      stringstream ss1;
+      ss1 << "MAGMOM = 1 -1 -1 1 # blah" << endl;
+      cerr << aurostd::kvpair2value(ss1.str(),"MAGMOM","=") << endl;
+
+      _xvasp xvasp;
+      aurostd::file2stringstream("KPOINTS",xvasp.KPOINTS);
+      KBIN::XVASP_KPOINTS_string2numbers(xvasp);
+
       cerr << "process(aflow)=" << aurostd::ProcessRunning("aflow") << endl;
       cerr << "process(vasp)=" << aurostd::ProcessRunning("vasp") << endl;
-      exit(0);
 
       cerr << "string=" << KBIN::getVASPVersion("/home/bin/vasp_std") << endl;
       cerr << "number=" << KBIN::getVASPVersionNumber("/home/bin/vasp_std") << endl;
       cerr << "double=" << KBIN::getVASPVersionDouble("/home/bin/vasp_std") << endl;
-      exit(0);
 
       if(XHOST.vext.size()!=XHOST.vcat.size()) {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"XHOST.vext.size()!=XHOST.vcat.size(), aborting.",_RUNTIME_ERROR_);}
 
