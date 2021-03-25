@@ -3549,7 +3549,7 @@ namespace KBIN {
         xwarning.flag("ZPOTRF",(content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("LAPACK: Routine ZPOTRF failed")))!=string::npos));
 
         //do last
-        xwarning.flag("ROTMAT",xwarning.flag("NIRMAT") || xwarning.flag("KKSYM") || xwarning.flag("SYMPREC"));  //CO20210315 - can probably add others to this list as well
+        xwarning.flag("ROTMAT",xwarning.flag("SGRCON") || xwarning.flag("NIRMAT") || xwarning.flag("IBZKPT") || xwarning.flag("KKSYM") || xwarning.flag("NKXYZ_IKPTD") || xwarning.flag("INVGRP") || xwarning.flag("SYMPREC"));  //CO20210315 - can probably add others to this list as well
 
         if(LDEBUG){cerr << soliloquy << " [4]" << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
 
@@ -3693,10 +3693,10 @@ namespace KBIN {
         KBIN::VASP_ApplyPatch("NPARC",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
         KBIN::VASP_ApplyPatch("NPARN",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
         KBIN::VASP_ApplyPatch("NPAR_REMOVE",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
-        KBIN::VASP_ApplyPatch("PSMAXN",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
+        KBIN::VASP_ApplyPatch("PSMAXN",false,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE); //apply_once==false: keep decreasing enmax until it works
         KBIN::VASP_ApplyPatch("REAL_OPTLAY_1","LREAL",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
         KBIN::VASP_ApplyPatch("REAL_OPT","LREAL",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
-        KBIN::VASP_ApplyPatch("ZPOTRF","ZPOTRF_POTIM",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
+        KBIN::VASP_ApplyPatch("ZPOTRF","ZPOTRF_POTIM",false,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);  //apply_once==false: keep decreasing POTIM until it works
         
         //come back - should we check if any xwarning() flag is still on?
 

@@ -29,17 +29,10 @@
         -- added KBIN::OUTCAR2VASPVersionString() and KBIN::INCAR_IALGO2ALGO() (CO)
         -- added new formatting for EXCCOR vasp error (CO)
         -- added aurostd::ProcessRunning() (CO)
+        -- extensive rewrite of KBIN::XVASP_INCAR_PREPARE_GENERIC(), KBIN::XVASP_KPOINTS_OPERATION(), and KBIN::XVASP_Afix_GENERIC() enabling a feedback loop of INCAR/KPOINTS updates (CO)
         TODO:
-        -- patch CSLOSHING/NELM
-        -- patch/consolidate Afix_GENERIC() and ROTMAT()
-        -- remove all "cat INCAR" ...
-        -- add SYMPREC to vflags so we can check if the patch has already been applied
-        -- create system of bools for whether a patch has been applied
-        -- change PREPARE_GENERIC so true/false corresponds to patch applied (do if/else then throw if no mode)
         -- check gamma vs. shift/odd, make sure we don't retry over and over
-        -- change when kmax gets applied
         -- add natoms cutoff for kmax to aflow.rc
-        -- remove NELM and NSTEPS from checks (CSLOSHING)
 3.2.8 - 2021/02/22
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.8.tar.xz
         -- lib2raw bug fixes (CO)

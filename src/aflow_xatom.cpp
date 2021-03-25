@@ -9520,22 +9520,22 @@ string KPPRA_DELTA(xstructure& str,const double& DK) {
 // returns extimated version of NBANDS starting from
 // electrons, ions, spin and ispin
 int GetNBANDS(int electrons,int nions,int spineach,bool ispin) {
-  string function_name = XPID + "GetNBANDS():";
-  double out;
+  string function_name=XPID+"GetNBANDS():";
+  double out=0.0;
   out=max(ceil((electrons+4.0)/1.75)+max(nions/1.75,6.0),ceil(0.80*electrons)); // from VASP
-  if(ispin) out=out+(nions*spineach+1)/2;
-  //  out=out*1.2;  // safety from vasp
-  out=out*1.3;      // safety more
-  out=out*1.1+5;    // Thu Jun 11 12:08:42 EDT 2009 // METAL PROJECT
-  out=out*1.075;    // Tue Oct 13 07:59:43 EDT 2009 // ICSD PROJECT
-  out=out+5;        // Sun Nov  1 10:41:20 EDT 2009 // ICSD PROJECT ORC
-  out=out*1.03;     // Tue Feb 26 15:15:36 EST 2013 // HELPS dielectric CALS
-  out=out*1.05;     // Mon Apr 23 13:40:02 EST 2018 // HELPS SCAN
+  if(ispin) out+=(nions*spineach+1)/2;
+  //  out*=1.2;  // safety from vasp
+  out*=1.3;      // safety more
+  out*=1.1+5;    // Thu Jun 11 12:08:42 EDT 2009 // METAL PROJECT
+  out*=1.075;    // Tue Oct 13 07:59:43 EDT 2009 // ICSD PROJECT
+  out+=5;        // Sun Nov  1 10:41:20 EDT 2009 // ICSD PROJECT ORC
+  out*=1.03;     // Tue Feb 26 15:15:36 EST 2013 // HELPS dielectric CALS
+  out*=1.05;     // Mon Apr 23 13:40:02 EST 2018 // HELPS SCAN
   // cerr << "GetNBANDS=" << out << endl;
   if (nions < 100) {
-    out=out*std::pow((double) nions,(double) 0.025);  // rescale so for big numbers of ions you get extra bands // Wed Jun 23 12:29:01 EDT 2010
+    out*=std::pow((double) nions,(double) 0.025);  // rescale so for big numbers of ions you get extra bands // Wed Jun 23 12:29:01 EDT 2010
   } else {
-    out= out * std::pow((double) nions,(double) 0.06);  //ME20191028 - prior scaling factor not sufficient for supercells
+    out*=std::pow((double) nions,(double) 0.06);  //ME20191028 - prior scaling factor not sufficient for supercells
   }
   //  cerr << "GetNBANDS=" << out << endl;
   // throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Throw for debugging purposes.",_GENERIC_ERROR_);
