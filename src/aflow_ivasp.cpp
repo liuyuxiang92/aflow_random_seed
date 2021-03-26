@@ -16,11 +16,13 @@
 #define DIELECTRIC_DK 0.1
 #define DEFAULT_EFIELD_PEAD 0.001
 
+#define _DEBUG_IVASP_ false  //CO20190116
+
 // ---------------------------------------------------------------------------------------------------------------------------------------------------------
 // INPUT
 namespace KBIN {
   bool VASP_Produce_INPUT(_xvasp& xvasp,const string& AflowIn,ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags,_vflags &vflags,bool load_POSCAR_from_xvasp) {
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || _DEBUG_IVASP_ || XHOST.DEBUG);
     if(AflowIn.length()==0) {throw aurostd::xerror(_AFLOW_FILE_NAME_,"KBIN::VASP_Produce_INPUT():","empty AflowIn",_FILE_CORRUPT_);} //CO20200624
     bool Krun=TRUE;
     if(load_POSCAR_from_xvasp){
@@ -49,7 +51,7 @@ namespace KBIN {
 
 namespace KBIN {
   bool VASP_Modify_INPUT(_xvasp& xvasp,ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags,_vflags &vflags) {
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || _DEBUG_IVASP_ || XHOST.DEBUG);
     bool Krun=TRUE;
     // if(Krun) Krun=(Krun && KBIN::VASP_Modify_POSCAR(xvasp,FileMESSAGE,aflags,vflags));  // moved up
     if(Krun) Krun=(Krun && KBIN::VASP_Modify_INCAR(xvasp,FileMESSAGE,aflags,kflags,vflags));
@@ -1288,7 +1290,7 @@ namespace KBIN {
 // POSCAR
 namespace KBIN {
   bool VASP_Produce_POSCAR(_xvasp& xvasp,const string& AflowIn,ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags,_vflags &vflags) {        // AFLOW_FUNCTION_IMPLEMENTATION
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || _DEBUG_IVASP_ || XHOST.DEBUG);
     if(AflowIn.length()==0) {throw aurostd::xerror(_AFLOW_FILE_NAME_,"KBIN::VASP_Produce_POSCAR():","empty AflowIn",_FILE_CORRUPT_);} //CO20200624
     if(!kflags.AFLOW_MODE_VASP) {cerr << XPID << "KBIN::VASP_Produce_POSCAR: should kflags.AFLOW_MODE_VASP be set ??" << endl;}
     ostringstream aus;
@@ -1580,7 +1582,7 @@ namespace KBIN {
 
 namespace KBIN {
   bool VASP_Modify_POSCAR(_xvasp& xvasp,const string& AflowIn,ofstream &FileMESSAGE,_aflags &aflags,_vflags &vflags) {        // AFLOW_FUNCTION_IMPLEMENTATION
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || _DEBUG_IVASP_ || XHOST.DEBUG);
     ostringstream aus;
     bool Krun=TRUE;
     if(xvasp.aopts.flag("FLAG::XVASP_POSCAR_generated")==FALSE) {
@@ -1775,7 +1777,7 @@ namespace KBIN {
 
   // CONVERT_UNIT_CELL STUFF
   bool VASP_Convert_Unit_Cell(_xvasp& xvasp, _vflags& vflags, _aflags& aflags, ofstream& FileMESSAGE, ostringstream& aus) {
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || _DEBUG_IVASP_ || XHOST.DEBUG);
     bool Krun = true;
 
     if(LDEBUG) aus << "00000  MESSAGE-OPTION  KBIN::VASP_Convert_Unit_Cell: BEGIN" << endl;  //SC20200410
@@ -2419,7 +2421,7 @@ namespace KBIN {
 // POTCAR
 namespace KBIN {
   bool VASP_Find_DATA_POTCAR(const string& species_pp,string &FilePotcar,string &DataPotcar,string &AUIDPotcar) {
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || _DEBUG_IVASP_ || XHOST.DEBUG);
     string pseudopotential="nothing";
     FilePotcar="";DataPotcar="";
     if(aurostd::substring2bool(species_pp,"pot_LDA") || aurostd::substring2bool(species_pp,DEFAULT_VASP_POTCAR_DIR_POT_LDA))
@@ -2464,7 +2466,7 @@ namespace KBIN {
 
 namespace KBIN {
   bool VASP_Find_FILE_POTCAR(const string& species_pp,string &FilePotcar,string &DataPotcar,string &AUIDPotcar) {
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || _DEBUG_IVASP_ || XHOST.DEBUG);
     string pseudopotential="nothing";
     FilePotcar="";DataPotcar="";
     if(aurostd::substring2bool(species_pp,"pot_LDA") || aurostd::substring2bool(species_pp,DEFAULT_VASP_POTCAR_DIR_POT_LDA))
@@ -2540,7 +2542,7 @@ namespace KBIN {
 
 namespace KBIN {
   bool VASP_Produce_POTCAR(_xvasp& xvasp,const string& AflowIn,ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags,_vflags &vflags) {        // AFLOW_FUNCTION_IMPLEMENTATION
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || _DEBUG_IVASP_ || XHOST.DEBUG);
     string soliloquy = XPID + "KBIN::VASP_Produce_POTCAR():";
     if(AflowIn.length()==0) {throw aurostd::xerror(_AFLOW_FILE_NAME_,"KBIN::VASP_Produce_POTCAR():","empty AflowIn",_FILE_CORRUPT_);} //CO20200624
     if(!kflags.AFLOW_MODE_VASP) {cerr << XPID << "KBIN::VASP_Produce_POTCAR: should kflags.AFLOW_MODE_VASP be set ??" << endl;}
@@ -3769,7 +3771,7 @@ namespace KBIN {
     //CO20210315 - extensive rewrite
     //the schemes below check if the modification needs to be made (has it already been made?)
     //maintain this feedback system to ensure aflow doesn't keep spinning its wheels on the same patches
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || _DEBUG_IVASP_ || XHOST.DEBUG);
     string function="KBIN::XVASP_INCAR_PREPARE_GENERIC";
     string soliloquy=XPID+function+"():";
     string operation=function+" ("+command+")";
@@ -4601,7 +4603,7 @@ namespace KBIN {
 // KBIN::XVASP_INCAR_LDAU_ADIABATIC
 namespace KBIN {
   void XVASP_INCAR_LDAU_ADIABATIC(_xvasp& xvasp,int step) {        // AFLOW_FUNCTION_IMPLEMENTATION
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || _DEBUG_IVASP_ || XHOST.DEBUG);
     string soliloquy=XPID+"KBIN::XVASP_INCAR_LDAU_ADIABATIC():";
     // reload incar
     xvasp.INCAR_orig.clear(); xvasp.INCAR_orig.str(xvasp.INCAR.str());
@@ -4698,7 +4700,7 @@ namespace KBIN {
 // KBIN::XVASP_INCAR_KPOINTS_Dielectric  DIELECTRIC
 namespace KBIN {
   void XVASP_INCAR_KPOINTS_Dielectric_SET(_xvasp& xvasp,_kflags &kflags,_vflags& vflags,string svalue) {        // AFLOW_FUNCTION_IMPLEMENTATION
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || _DEBUG_IVASP_ || XHOST.DEBUG);
     // STATIC
     if(svalue=="STATIC" || svalue=="static") {
       //.  Retain the following static run entries and their values: ALGO, LREAL, NSIM, ISYM, IBRION, NSW, NELM, NELMIN, ENMAX, ISPIN, ISMEAR, SIGMA, and everything LDA+U related.
@@ -4899,7 +4901,7 @@ namespace KBIN {
     return AFLOWIN_REMOVE(aflowin_file,vkeywords,vkeywords2ignore,comment);
   }
   bool AFLOWIN_REMOVE(const string& aflowin_file,const vector<string>& vkeywords,const vector<string>& vkeywords2ignore,const string& comment){  //CO20210313
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || _DEBUG_IVASP_ || XHOST.DEBUG);
     string soliloquy=XPID+"KBIN::AFLOWIN_REMOVE():";
 
     if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
@@ -4968,7 +4970,7 @@ namespace KBIN {
   void AFLOWIN_ADD(const string& aflowin_file,const string& item,const string& comment){  //CO20210313
     //always use this function to add data at the end of the _AFLOWIN_
     //echo "" >> _AFLOWIN_ does NOT work in general, might attach data to the end of the previous line (depends on whether there was a final endl)
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || _DEBUG_IVASP_ || XHOST.DEBUG);
     string soliloquy=XPID+"KBIN::AFLOWIN_ADD():";
 
     if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
@@ -5065,7 +5067,7 @@ namespace KBIN {
     //CO20210315 - extensive rewrite
     //the schemes below check if the modification needs to be made (has it already been made?)
     //maintain this feedback system to ensure aflow doesn't keep spinning its wheels on the same patches
-    bool LDEBUG=(FALSE || XHOST.DEBUG); // TRUE;
+    bool LDEBUG=(FALSE || _DEBUG_IVASP_ || XHOST.DEBUG); // TRUE;
     string soliloquy=XPID+"KBIN::XVASP_KPOINTS_OPERATION():";
     if(LDEBUG){
       cerr << soliloquy << " operation=" << _operation << endl;
@@ -5299,7 +5301,7 @@ namespace KBIN {
   bool XVASP_KPOINTS_string2numbers(_xvasp& xvasp) {  //CO20210315 - cleaned up
     //CO20210315 - can only read auto-meshes of MP or G
     //https://www.vasp.at/wiki/index.php/KPOINTS
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || _DEBUG_IVASP_ || XHOST.DEBUG);
     string soliloquy=XPID+"KBIN::XVASP_KPOINTS_string2numbers():";
 
     if(LDEBUG){cerr << soliloquy << " xvasp.KPOINTS=" << endl;cerr << xvasp.KPOINTS.str() << endl;}
@@ -5508,7 +5510,7 @@ namespace KBIN {
     //it will assume xvasp.INCAR has been pre-loaded and will NOT rewrite the INCAR
     //this is all done inside the main XVASP_Afix_GENERIC() function
     //BE CAREFUL not to overwrite xvasp.INCAR
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || _DEBUG_IVASP_ || XHOST.DEBUG);
     string function="KBIN::XVASP_Afix_GENERIC_NBANDS";
     string soliloquy=XPID+function+"():";
 
@@ -5554,7 +5556,7 @@ namespace KBIN {
     //it will assume xvasp.INCAR has been pre-loaded and will NOT rewrite the INCAR
     //this is all done inside the main XVASP_Afix_GENERIC() function
     //BE CAREFUL not to overwrite xvasp.INCAR
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || _DEBUG_IVASP_ || XHOST.DEBUG);
     string function="KBIN::XVASP_Afix_GENERIC_POTIM";
     string soliloquy=XPID+function+"():";  //CO20200624
 
@@ -5600,7 +5602,7 @@ namespace KBIN {
     //it will assume xvasp.INCAR has been pre-loaded and will NOT rewrite the INCAR
     //this is all done inside the main XVASP_Afix_GENERIC() function
     //BE CAREFUL not to overwrite xvasp.INCAR
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || _DEBUG_IVASP_ || XHOST.DEBUG);
     string function="KBIN::XVASP_Afix_GENERIC_NELM";
     string soliloquy=XPID+function+"():"; //CO20200624
 
@@ -5642,7 +5644,7 @@ namespace KBIN {
     //it will assume xvasp.INCAR has been pre-loaded and will NOT rewrite the INCAR
     //this is all done inside the main XVASP_Afix_GENERIC() function
     //BE CAREFUL not to overwrite xvasp.INCAR
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || _DEBUG_IVASP_ || XHOST.DEBUG);
     string function="KBIN::XVASP_Afix_GENERIC_EFIELD_PEAD";
     string soliloquy=XPID+function+"():";
 
@@ -6522,7 +6524,7 @@ namespace KBIN {
   }
 
   string ExtractSystemNameFromVASP(const string& _directory) {
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || _DEBUG_IVASP_ || XHOST.DEBUG);
     string soliloquy=XPID+"KBIN::ExtractSystemNameFromVASP():";
     string directory="", SystemName="", stmp="", DOSCARfile="";
     stringstream strline;

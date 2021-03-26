@@ -1849,16 +1849,50 @@ void AFLOW_monitor_VASP(uint sleep_seconds){
 
   if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
 
+  //aflags
+  _aflags aflags;
+  if(XHOST.vflag_control.flag("DIRECTORY_CLEAN")){aflags.Directory=XHOST.vflag_control.getattachedscheme("DIRECTORY_CLEAN");} //CO20190402
+  if(aflags.Directory.empty() || aflags.Directory=="./" || aflags.Directory=="."){aflags.Directory=aurostd::getPWD()+"/";} //".";  //CO20180220 //[CO20191112 - OBSOLETE]aurostd::execute2string(XHOST.command("pwd"))
+
+  //output objects
+  ofstream FileMESSAGE;
+  string FileNameLOCK=aflags.Directory+"/"+_AFLOWLOCK_+".monitor_vasp";
+  FileMESSAGE.open(FileNameLOCK.c_str(),std::ios::out);
+  ostream& oss=cout;if(true){oss.setstate(std::ios_base::badbit);}  //like NULL - cannot print to cout with two instances of aflow running
+
+  //aflow.in
+  string AflowIn_file="",AflowIn="";
+  try{KBIN::getAflowInFromAFlags(aflags,AflowIn_file,AflowIn,FileMESSAGE,oss);}
+  catch(aurostd::xerror& err){
+    pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+    return;
+  }
+
+  //other flags
+  _kflags kflags=KBIN::VASP_Get_Kflags_from_AflowIN(AflowIn,FileMESSAGE,aflags,oss);
+  _vflags vflags=KBIN::VASP_Get_Vflags_from_AflowIN(AflowIn,FileMESSAGE,aflags,kflags,oss);
+  
+  _xvasp xvasp;
+  xvasp.Directory=aflags.Directory; //arun_directory;
+  AVASP_populateXVASP(aflags,kflags,vflags,xvasp);
+
   int nloop=1;
+  aurostd::xoption xmessage,xwarning,xfixed;
+  bool VERBOSE=true;
 
   while(true){
-    message << "nloop=" << nloop;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,_LOGGER_MESSAGE_);
+    if(VERBOSE){message << "nloop=" << nloop;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);}
 
     //check vasp.out here
+    KBIN::VASP_ProcessWarnings(xvasp,aflags,kflags,xmessage,xwarning,xfixed,FileMESSAGE);
 
-    message << "sleeping for " << sleep_seconds << " seconds";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,_LOGGER_MESSAGE_);
+    if(aurostd::EFileExist(xvasp.Directory+"/"+DEFAULT_AFLOW_END_OUT)){break;}
+    if(aurostd::EFileExist(xvasp.Directory+"/STOPFLOW")){aurostd::RemoveFile(xvasp.Directory+"/STOPFLOW");break;}
+
+    if(VERBOSE){message << "sleeping for " << sleep_seconds << " seconds";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);}
     aurostd::Sleep(sleep_seconds);
   }
+  FileMESSAGE.flush();FileMESSAGE.clear();FileMESSAGE.close();
 }
 
 // ***************************************************************************
