@@ -4228,6 +4228,13 @@ bool xDOSCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   }
   // Done reading header
   //ME20190614 START
+  //ME20200305 - Check if DOSCAR is broken
+  uint number_lines = number_energies + 6;
+  if (partial) number_lines += number_atoms * (number_energies + 1);
+  if (vcontent.size() < number_lines) {
+    message << "Broken DOSCAR - not enough lines.";
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _FILE_CORRUPT_);
+  }
   uint norbitals = 0;
   int d = 0, e = 0;
   double dos = 0.0;
