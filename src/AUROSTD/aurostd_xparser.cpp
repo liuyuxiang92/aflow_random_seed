@@ -231,8 +231,13 @@ namespace aurostd {
         loc2=input.find(vspecies[i],loc2+1);
       }
       if(LDEBUG){cerr << soliloquy << " loc1=" << loc1 << ", loc2=" << loc2 << endl;}
-      velements.push_back(input.substr(loc1,loc2-loc1));  //loc2-loc1 because it is the distance
-      loc1=loc2;
+      if(loc2==string::npos){ //CO20210315
+        velements.push_back(input.substr(loc1));
+        break;
+      }else{
+        velements.push_back(input.substr(loc1,loc2-loc1));  //loc2-loc1 because it is the distance
+        loc1=loc2;
+      }
     }
 
     if(LDEBUG){cerr << soliloquy << " velements=" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(velements,"\""),",") << endl;}
