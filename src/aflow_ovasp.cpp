@@ -494,7 +494,8 @@ bool xOUTCAR::GetProperties(const string& stringIN,bool QUIET) {
 bool xOUTCAR::GetPropertiesFile(const string& fileIN,bool QUIET) {
   stringstream sss;
   aurostd::efile2stringstream(fileIN,sss);
-  if(filename=="") filename=fileIN;
+  //[CO20210315 - always set for GetPropertiesFile]if(filename=="") 
+  filename=fileIN;
   return xOUTCAR::GetProperties(sss,QUIET);
 }
 
@@ -510,11 +511,12 @@ bool xOUTCAR::GetPropertiesFile(const string& fileIN,uint natoms_check,bool QUIE
   return flag;
 }
 
-bool xOUTCAR::GetPropertiesUrlFile(const string& url,const string& file,bool VERBOSE) {
+bool xOUTCAR::GetPropertiesUrlFile(const string& url,const string& file,bool QUIET) {
   //[CO20200502 - OBSOLETE]string tmpfile=XHOST.tmpfs+"/_aflow_"+XHOST.user+".pid"+XHOST.ostrPID.str()+".a"+string(AFLOW_VERSION)+".rnd"+aurostd::utype2string(uint((double) std::floor((double)100000*aurostd::ran0())))+".u"+aurostd::utype2string(uint((double) aurostd::get_useconds()))+"_"+file;
   string tmpfile=aurostd::TmpFileCreate("xOUTCAR_GetProperties"); //CO20200502 - threadID
-  aurostd::url2file(url+"/"+file,tmpfile,VERBOSE);
-  bool out=GetPropertiesFile(tmpfile,VERBOSE); //CO20200404 - added VERBOSE
+  aurostd::url2file(url+"/"+file,tmpfile,!QUIET);
+  bool out=GetPropertiesFile(tmpfile,QUIET); //CO20200404 - added QUIET
+  filename="url="+url;  //CO20210315
   aurostd::RemoveFile(tmpfile);
   return out;
 }
@@ -1739,12 +1741,14 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   if(LDEBUG) cout << soliloquy << " calculation_cores=" << calculation_cores << endl;
   // CALCULATION_TIME
   calculation_time=0.0;
-  for(int iline=(int)vcontent.size()-1;iline>=0;iline--)  // NEW FROM THE BACK
-    if(aurostd::substring2bool(vcontent.at(iline),"time"))
+  for(int iline=(int)vcontent.size()-1;iline>=0;iline--){  // NEW FROM THE BACK
+    if(aurostd::substring2bool(vcontent.at(iline),"time")){
       if(aurostd::substring2bool(vcontent.at(iline),"Total")) {
         line=vcontent.at(iline);
         break;
       } 
+    }
+  }
   if(line.empty()) {
     //[CO20200404 - OBSOLETE]if(!QUIET) cerr << "WARNING - "<< soliloquy << " in OUTCAR (no calculation_time)" << "   filename=[" << filename << "]" << endl;
     message << "In OUTCAR (no calculation_time)" << "   filename=[" << filename << "]";
@@ -4151,16 +4155,18 @@ bool xDOSCAR::GetProperties(const string& stringIN,bool QUIET) {
 
 bool xDOSCAR::GetPropertiesFile(const string& fileIN,bool QUIET) {
   stringstream sss;
-  if(filename=="") filename=fileIN;
+  //[CO20210315 - always set for GetPropertiesFile]if(filename=="") 
+  filename=fileIN;
   aurostd::efile2stringstream(fileIN,sss);
   return xDOSCAR::GetProperties(sss,QUIET);
 }
 
-bool xDOSCAR::GetPropertiesUrlFile(const string& url,const string& file,bool VERBOSE) {
+bool xDOSCAR::GetPropertiesUrlFile(const string& url,const string& file,bool QUIET) {
   //[CO20200502 - OBSOLETE]string tmpfile=XHOST.tmpfs+"/_aflow_"+XHOST.user+".pid"+XHOST.ostrPID.str()+".a"+string(AFLOW_VERSION)+".rnd"+aurostd::utype2string(uint((double) std::floor((double)100000*aurostd::ran0())))+".u"+aurostd::utype2string(uint((double) aurostd::get_useconds()))+"_"+file;
   string tmpfile=aurostd::TmpFileCreate("xDOSCAR_GetProperties"); //CO20200502 - threadID
-  aurostd::url2file(url+"/"+file,tmpfile,VERBOSE);
-  bool out=GetPropertiesFile(tmpfile);
+  aurostd::url2file(url+"/"+file,tmpfile,!QUIET);
+  bool out=GetPropertiesFile(tmpfile,QUIET);
+  filename="url="+url;  //CO20210315
   aurostd::RemoveFile(tmpfile);
   return out;
 }
@@ -5051,11 +5057,12 @@ bool xEIGENVAL::GetPropertiesFile(const string& fileIN,bool QUIET) {
   return xEIGENVAL::GetProperties(sss,QUIET);
 }
 
-bool xEIGENVAL::GetPropertiesUrlFile(const string& url,const string& file,bool VERBOSE) {
+bool xEIGENVAL::GetPropertiesUrlFile(const string& url,const string& file,bool QUIET) {
   //[CO20200502 - OBSOLETE]string tmpfile=XHOST.tmpfs+"/_aflow_"+XHOST.user+".pid"+XHOST.ostrPID.str()+".a"+string(AFLOW_VERSION)+".rnd"+aurostd::utype2string(uint((double) std::floor((double)100000*aurostd::ran0())))+".u"+aurostd::utype2string(uint((double) aurostd::get_useconds()))+"_"+file;
   string tmpfile=aurostd::TmpFileCreate("xEIGENVAL_GetProperties"); //CO20200502 - threadID
-  aurostd::url2file(url+"/"+file,tmpfile,VERBOSE);
-  bool out=GetPropertiesFile(tmpfile);
+  aurostd::url2file(url+"/"+file,tmpfile,!QUIET);
+  bool out=GetPropertiesFile(tmpfile,QUIET);
+  filename="url="+url;  //CO20210315
   aurostd::RemoveFile(tmpfile);
   return out;
 }
@@ -7590,11 +7597,12 @@ bool xPOTCAR::GetPropertiesFile(const string& fileIN,bool QUIET) {
   return xPOTCAR::GetProperties(sss,QUIET);
 }
 
-bool xPOTCAR::GetPropertiesUrlFile(const string& url,const string& file,bool VERBOSE) {
+bool xPOTCAR::GetPropertiesUrlFile(const string& url,const string& file,bool QUIET) {
   //[CO20200502 - OBSOLETE]string tmpfile=XHOST.tmpfs+"/_aflow_"+XHOST.user+".pid"+XHOST.ostrPID.str()+".a"+string(AFLOW_VERSION)+".rnd"+aurostd::utype2string(uint((double) std::floor((double)100000*aurostd::ran0())))+".u"+aurostd::utype2string(uint((double) aurostd::get_useconds()))+"_"+file;
   string tmpfile=aurostd::TmpFileCreate("xPOTCAR_GetProperties"); //CO20200502 - threadID
-  aurostd::url2file(url+"/"+file,tmpfile,VERBOSE);
-  bool out=GetPropertiesFile(tmpfile);
+  aurostd::url2file(url+"/"+file,tmpfile,!QUIET);
+  bool out=GetPropertiesFile(tmpfile,QUIET);
+  filename="url="+url;  //CO20210315
   aurostd::RemoveFile(tmpfile);
   return out;
 }
@@ -7986,11 +7994,12 @@ bool xVASPRUNXML::GetPropertiesFile(const string& fileIN,bool QUIET) {
   return xVASPRUNXML::GetProperties(sss,QUIET);
 }
 
-bool xVASPRUNXML::GetPropertiesUrlFile(const string& url,const string& file,bool VERBOSE) {
+bool xVASPRUNXML::GetPropertiesUrlFile(const string& url,const string& file,bool QUIET) {
   //[CO20200502 - OBSOLETE]string tmpfile=XHOST.tmpfs+"/_aflow_"+XHOST.user+".pid"+XHOST.ostrPID.str()+".a"+string(AFLOW_VERSION)+".rnd"+aurostd::utype2string(uint((double) std::floor((double)100000*aurostd::ran0())))+".u"+aurostd::utype2string(uint((double) aurostd::get_useconds()))+"_"+file;
   string tmpfile=aurostd::TmpFileCreate("xVASPRUNXML_GetProperties"); //CO20200502 - threadID
-  aurostd::url2file(url+"/"+file,tmpfile,VERBOSE);
-  bool out=GetPropertiesFile(tmpfile);
+  aurostd::url2file(url+"/"+file,tmpfile,!QUIET);
+  bool out=GetPropertiesFile(tmpfile,QUIET);
+  filename="url="+url;  //CO20210315
   aurostd::RemoveFile(tmpfile);
   return out;
 }
@@ -8316,11 +8325,12 @@ bool xIBZKPT::GetPropertiesFile(const string& fileIN,bool QUIET) {
   return xIBZKPT::GetProperties(sss,QUIET);
 }
 
-bool xIBZKPT::GetPropertiesUrlFile(const string& url,const string& file,bool VERBOSE) {
+bool xIBZKPT::GetPropertiesUrlFile(const string& url,const string& file,bool QUIET) {
   //[CO20200502 - OBSOLETE]string tmpfile=XHOST.tmpfs+"/_aflow_"+XHOST.user+".pid"+XHOST.ostrPID.str()+".a"+string(AFLOW_VERSION)+".rnd"+aurostd::utype2string(uint((double) std::floor((double)100000*aurostd::ran0())))+".u"+aurostd::utype2string(uint((double) aurostd::get_useconds()))+"_"+file;
   string tmpfile=aurostd::TmpFileCreate("xIBZKPT_GetProperties"); //CO20200502 - threadID
-  aurostd::url2file(url+"/"+file,tmpfile,VERBOSE);
-  bool out=GetPropertiesFile(tmpfile);
+  aurostd::url2file(url+"/"+file,tmpfile,!QUIET);
+  bool out=GetPropertiesFile(tmpfile,QUIET);
+  filename="url="+url;  //CO20210315
   aurostd::RemoveFile(tmpfile);
   return out;
 }
@@ -8527,11 +8537,12 @@ bool xKPOINTS::GetPropertiesFile(const string& fileIN,bool QUIET) {
   return xKPOINTS::GetProperties(sss,QUIET);
 }
 
-bool xKPOINTS::GetPropertiesUrlFile(const string& url,const string& file,bool VERBOSE) {
+bool xKPOINTS::GetPropertiesUrlFile(const string& url,const string& file,bool QUIET) {
   //[CO20200502 - OBSOLETE]string tmpfile=XHOST.tmpfs+"/_aflow_"+XHOST.user+".pid"+XHOST.ostrPID.str()+".a"+string(AFLOW_VERSION)+".rnd"+aurostd::utype2string(uint((double) std::floor((double)100000*aurostd::ran0())))+".u"+aurostd::utype2string(uint((double) aurostd::get_useconds()))+"_"+file;
   string tmpfile=aurostd::TmpFileCreate("xKPOINTS_GetProperties"); //CO20200502 - threadID
-  aurostd::url2file(url+"/"+file,tmpfile,VERBOSE);
-  bool out=GetPropertiesFile(tmpfile);
+  aurostd::url2file(url+"/"+file,tmpfile,!QUIET);
+  bool out=GetPropertiesFile(tmpfile,QUIET);
+  filename="url="+url;  //CO20210315
   aurostd::RemoveFile(tmpfile);
   return out;
 }
@@ -8840,11 +8851,12 @@ bool xCHGCAR::GetPropertiesFile(const string& fileIN,bool QUIET) {
   return xCHGCAR::GetProperties(sss,QUIET);
 }
 
-bool xCHGCAR::GetPropertiesUrlFile(const string& url,const string& file,bool VERBOSE) {
+bool xCHGCAR::GetPropertiesUrlFile(const string& url,const string& file,bool QUIET) {
   //[CO20200502 - OBSOLETE]string tmpfile=XHOST.tmpfs+"/_aflow_"+XHOST.user+".pid"+XHOST.ostrPID.str()+".a"+string(AFLOW_VERSION)+".rnd"+aurostd::utype2string(uint((double) std::floor((double)100000*aurostd::ran0())))+".u"+aurostd::utype2string(uint((double) aurostd::get_useconds()))+"_"+file;
   string tmpfile=aurostd::TmpFileCreate("xCHGCAR_GetProperties"); //CO20200502 - threadID
-  aurostd::url2file(url+"/"+file,tmpfile,VERBOSE);
-  bool out=GetPropertiesFile(tmpfile);
+  aurostd::url2file(url+"/"+file,tmpfile,!QUIET);
+  bool out=GetPropertiesFile(tmpfile,QUIET);
+  filename="url="+url;  //CO20210315
   aurostd::RemoveFile(tmpfile);
   return out;
 }
@@ -9025,11 +9037,12 @@ bool xQMVASP::GetPropertiesFile(const string& fileIN,bool QUIET) { //CO20191110
   return xQMVASP::GetProperties(sss,QUIET);
 }
 
-bool xQMVASP::GetPropertiesUrlFile(const string& url,const string& file,bool VERBOSE) {  //CO20191110
+bool xQMVASP::GetPropertiesUrlFile(const string& url,const string& file,bool QUIET) {  //CO20191110
   //[CO20200502 - OBSOLETE]string tmpfile=XHOST.tmpfs+"/_aflow_"+XHOST.user+".pid"+XHOST.ostrPID.str()+".a"+string(AFLOW_VERSION)+".rnd"+aurostd::utype2string(uint((double) std::floor((double)100000*aurostd::ran0())))+".u"+aurostd::utype2string(uint((double) aurostd::get_useconds()))+"_"+file;
   string tmpfile=aurostd::TmpFileCreate("xQMVASP_GetProperties"); //CO20200502 - threadID
-  aurostd::url2file(url+"/"+file,tmpfile,VERBOSE);
-  bool out=GetPropertiesFile(tmpfile);
+  aurostd::url2file(url+"/"+file,tmpfile,!QUIET);
+  bool out=GetPropertiesFile(tmpfile,QUIET);
+  filename="url="+url;  //CO20210315
   aurostd::RemoveFile(tmpfile);
   return out;
 }
