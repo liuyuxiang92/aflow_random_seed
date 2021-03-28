@@ -995,6 +995,7 @@ int main(int _argc,char **_argv) {
     if(!Arun && XHOST.vflag_control.flag("MULTI=GZ2XZ")) {Arun=TRUE;AFLOW_PTHREADS::MULTI_gz2xz(argv);return 0;}  //CO20180419
     if(!Arun && XHOST.vflag_control.flag("MULTI=ZIP")) {Arun=TRUE;AFLOW_PTHREADS::MULTI_zip(argv);return 0;}  //CO20180419
     if(!Arun && XHOST.vflag_control.flag("MONITOR")) {Arun=TRUE;AFLOW_monitor(argv);return 0;} //CO20180419
+    if(!Arun && XHOST.vflag_control.flag("MONITOR_VASP")) {Arun=TRUE;AFLOW_monitor_VASP();return 0;} //CO20180419
     if(!Arun && XHOST.vflag_control.flag("GETTEMP")) {Arun=TRUE;AFLOW_getTEMP(argv);return 0;} //CO20180419
 
     // **************************************************************

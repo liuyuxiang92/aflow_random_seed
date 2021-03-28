@@ -603,6 +603,7 @@ namespace init {
     XHOST.vflag_control.flag("MULTI=GZ2XZ",aurostd::args2flag(argv,cmds,"--multi=gz2xz"));
     XHOST.vflag_control.flag("MULTI=ZIP",aurostd::args2flag(argv,cmds,"--multi=zip"));
     XHOST.vflag_control.flag("MONITOR",aurostd::args2flag(argv,cmds,"--monitor"));
+    XHOST.vflag_control.flag("MONITOR_VASP",aurostd::args2flag(argv,cmds,"--monitor_vasp"));
     XHOST.vflag_control.flag("KILL_VASP_ALL",aurostd::args2flag(argv,cmds,"--kill_vasp_all|--killvaspall"));  //CO20210315 - issue non-specific killall vasp command
     XHOST.vflag_control.flag("GETTEMP",aurostd::args2flag(argv,cmds,"--getTEMP|--getTEMPS|--getTEMPs|--gettemp|--gettemps"));
     XHOST.vflag_control.flag("SWITCH_AFLOW",
