@@ -32,9 +32,8 @@
         -- extensive rewrite of KBIN::XVASP_INCAR_PREPARE_GENERIC(), KBIN::XVASP_KPOINTS_OPERATION(), and KBIN::XVASP_Afix_GENERIC() enabling a feedback loop of INCAR/KPOINTS updates (CO)
         -- adding KBIN::XVASP_KPOINTS_IncludesGamma() to check if existing xvasp is includes Gamma in the grid (CO)
         -- added RELAX=FORCES patch to EDDRMM patches (CO)
-        TODO:
-        -- check gamma vs. shift/odd, make sure we don't retry over and over
-        -- add natoms cutoff for kmax to aflow.rc
+        -- added AFLOW_monitor_VASP() (CO)
+        -- added aurostd::ProcessKill() (CO)
 3.2.8 - 2021/02/22
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.8.tar.xz
         -- lib2raw bug fixes (CO)

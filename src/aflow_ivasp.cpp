@@ -5906,16 +5906,17 @@ namespace KBIN {
           //END - load INCAR into xvasp, modify, then write out new INCAR
           //aus already written in KBIN::XVASP_Afix_GENERIC_POTIM()
           if(!Krun){Krun=true;submode++;} //reset and go to the next solution
-        }else{  //happens during static/bands
-          //https://www.vasp.at/forum/viewtopic.php?f=4&t=11502
-          //START - load INCAR into xvasp, modify, then write out new INCAR
-          Krun=(Krun && VASP_Reread_INCAR(xvasp));  //preload incar
-          Krun=(Krun && KBIN::XVASP_INCAR_PREPARE_GENERIC("ISMEAR",xvasp,vflags,"",2,0.0,FALSE));
-          Krun=(Krun && aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR"))); //write out incar
-          //END - load INCAR into xvasp, modify, then write out new INCAR
-          if(Krun){aus << "WWWWW  FIX ISMEAR=" << vflags.KBIN_VASP_FORCE_OPTION_ISMEAR_EQUAL.content_int << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
-          if(!Krun){Krun=true;submode++;} //reset and go to the next solution
         }
+        //[CO20210315 - not a patch for EDDRMM]else{  //happens during static/bands
+        //[CO20210315 - not a patch for EDDRMM]  //https://www.vasp.at/forum/viewtopic.php?f=4&t=11502
+        //[CO20210315 - not a patch for EDDRMM]  //START - load INCAR into xvasp, modify, then write out new INCAR
+        //[CO20210315 - not a patch for EDDRMM]  Krun=(Krun && VASP_Reread_INCAR(xvasp));  //preload incar
+        //[CO20210315 - not a patch for EDDRMM]  Krun=(Krun && KBIN::XVASP_INCAR_PREPARE_GENERIC("ISMEAR",xvasp,vflags,"",2,0.0,FALSE));
+        //[CO20210315 - not a patch for EDDRMM]  Krun=(Krun && aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR"))); //write out incar
+        //[CO20210315 - not a patch for EDDRMM]  //END - load INCAR into xvasp, modify, then write out new INCAR
+        //[CO20210315 - not a patch for EDDRMM]  if(Krun){aus << "WWWWW  FIX ISMEAR=" << vflags.KBIN_VASP_FORCE_OPTION_ISMEAR_EQUAL.content_int << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+        //[CO20210315 - not a patch for EDDRMM]  if(!Krun){Krun=true;submode++;} //reset and go to the next solution
+        //[CO20210315 - not a patch for EDDRMM]}
       }
       if(submode>=7){Krun=false;}
       submode+=submode_increment;submode_increment=1;  //increment and reset

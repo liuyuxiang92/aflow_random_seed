@@ -2921,7 +2921,7 @@ namespace KBIN {
 } // namespace KBIN
 
 namespace KBIN {
-  void VASP_ProcessWarnings(_xvasp &xvasp,_aflags &aflags,_kflags &kflags,aurostd::xoption& xmessage,aurostd::xoption& xwarning,aurostd::xoption& xfixed,ofstream &FileMESSAGE) { //CO20210315
+  void VASP_ProcessWarnings(_xvasp &xvasp,_aflags &aflags,_kflags &kflags,aurostd::xoption& xmessage,aurostd::xoption& xwarning,ofstream &FileMESSAGE) { //CO20210315
     bool LDEBUG=(FALSE || _DEBUG_KVASP_ || XHOST.DEBUG);
     string soliloquy=XPID+"KBIN::VASP_ProcessWarnings():";
     stringstream aus;
@@ -3125,6 +3125,7 @@ namespace KBIN {
     if(LDEBUG){cerr << soliloquy << " [4]" << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
   }
 } // namespace KBIN
+
 namespace KBIN {
   bool VASP_Run(_xvasp &xvasp,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE) {        // AFLOW_FUNCTION_IMPLEMENTATION
     bool LDEBUG=(FALSE || _DEBUG_KVASP_ || XHOST.DEBUG);
@@ -3663,7 +3664,7 @@ namespace KBIN {
 
         if(LDEBUG){cerr << soliloquy << " [4]" << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
         
-        VASP_ProcessWarnings(xvasp,aflags,kflags,xmessage,xwarning,xfixed,FileMESSAGE);
+        VASP_ProcessWarnings(xvasp,aflags,kflags,xmessage,xwarning,FileMESSAGE);
 
         xfixed.flag("ALL",FALSE);
         vasp_start=FALSE;

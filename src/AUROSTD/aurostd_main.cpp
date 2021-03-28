@@ -1572,11 +1572,26 @@ namespace aurostd {
   // ***************************************************************************
   //CO20210315
   bool ProcessRunning(const string& process){ //CO20210315
+    if(!aurostd::IsCommandAvailable("pgrep")) {
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::ProcessRunning():","\"pgrep\" command not found",_INPUT_ILLEGAL_);
+    }
     string output=aurostd::execute2string("pgrep "+process+" 2> /dev/null");
     aurostd::StringSubst(output,"\n","");
     output=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(output);
     if(output.length()>0) return true;
     return false;
+  }
+  
+  // ***************************************************************************
+  // Function ProcessKill
+  // ***************************************************************************
+  //CO20210315
+  void ProcessKill(const string& process,bool sigkill){ //CO20210315
+    if(!aurostd::IsCommandAvailable("killall")) {
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::ProcessRunning():","\"killall\" command not found",_INPUT_ILLEGAL_);
+    }
+    aurostd::execute("killall "+(sigkill?string("-9"):string(""))+process);
+    //can add here checks if the process wasn't killed completely
   }
 
   // ***************************************************************************

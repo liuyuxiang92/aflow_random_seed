@@ -603,7 +603,7 @@ namespace init {
     XHOST.vflag_control.flag("MULTI=GZ2XZ",aurostd::args2flag(argv,cmds,"--multi=gz2xz"));
     XHOST.vflag_control.flag("MULTI=ZIP",aurostd::args2flag(argv,cmds,"--multi=zip"));
     XHOST.vflag_control.flag("MONITOR",aurostd::args2flag(argv,cmds,"--monitor"));
-    XHOST.vflag_control.flag("KILL_ALL_VASP",aurostd::args2flag(argv,cmds,"--kill_all_vasp|--killallvasp"));  //CO20210315 - issue non-specific killall vasp command
+    XHOST.vflag_control.flag("KILL_VASP_ALL",aurostd::args2flag(argv,cmds,"--kill_vasp_all|--killvaspall"));  //CO20210315 - issue non-specific killall vasp command
     XHOST.vflag_control.flag("GETTEMP",aurostd::args2flag(argv,cmds,"--getTEMP|--getTEMPS|--getTEMPs|--gettemp|--gettemps"));
     XHOST.vflag_control.flag("SWITCH_AFLOW",
         aurostd::args2flag(argv,cmds,"--run|--clean|--xclean|--multi|--generate") ||
@@ -1877,20 +1877,41 @@ void AFLOW_monitor_VASP(uint sleep_seconds){
   AVASP_populateXVASP(aflags,kflags,vflags,xvasp);
 
   int nloop=1;
-  aurostd::xoption xmessage,xwarning,xfixed;
+  aurostd::xoption xmessage,xwarning; //xfixed; //not needed (yet)
   bool VERBOSE=true;
 
   while(true){
     if(VERBOSE){message << "nloop=" << nloop;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);}
 
     //check vasp.out here
-    KBIN::VASP_ProcessWarnings(xvasp,aflags,kflags,xmessage,xwarning,xfixed,FileMESSAGE);
+    KBIN::VASP_ProcessWarnings(xvasp,aflags,kflags,xmessage,xwarning,FileMESSAGE);
+
+    bool kill_vasp=false;
+    if(xwarning.flag()){  //if any flag is on
+      kill_vasp=true;
+      //HERE: plug in exceptions from xfixed, etc. to turn OFF kill_vasp
+      //read LOCK to see what has been issued already
+    }
+
+    if(kill_vasp){
+      string& vasp_bin=kflags.KBIN_MPI_BIN;
+      if(kflags.KBIN_MPI==FALSE){vasp_bin=kflags.KBIN_BIN;}
+      if(XHOST.vflag_control.flag("KILL_VASP_ALL")){
+        message << "issuing \"killall\" command for: \""+vasp_bin+"\"";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+        aurostd::ProcessKill(vasp_bin);
+      }else{  //to be developed
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"a targeted kill command for VASP not available yet: try --kill_vasp_all",_INPUT_ILLEGAL_);
+      }
+    }
 
     if(aurostd::EFileExist(xvasp.Directory+"/"+DEFAULT_AFLOW_END_OUT)){break;}
     if(aurostd::EFileExist(xvasp.Directory+"/STOPFLOW")){aurostd::RemoveFile(xvasp.Directory+"/STOPFLOW");break;}
 
     if(VERBOSE){message << "sleeping for " << sleep_seconds << " seconds";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);}
     aurostd::Sleep(sleep_seconds);
+    
+    if(aurostd::EFileExist(xvasp.Directory+"/"+DEFAULT_AFLOW_END_OUT)){break;}
+    if(aurostd::EFileExist(xvasp.Directory+"/STOPFLOW")){aurostd::RemoveFile(xvasp.Directory+"/STOPFLOW");break;}
   }
   FileMESSAGE.flush();FileMESSAGE.clear();FileMESSAGE.close();
 }
