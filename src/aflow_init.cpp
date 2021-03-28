@@ -1878,11 +1878,18 @@ void AFLOW_monitor_VASP(uint sleep_seconds){
   AVASP_populateXVASP(aflags,kflags,vflags,xvasp);
 
   int nloop=1;
+  uint sleep_seconds_afterkill=60;
   aurostd::xoption xmessage,xwarning; //xfixed; //not needed (yet)
   bool VERBOSE=true;
+  
+  string& vasp_bin=kflags.KBIN_MPI_BIN;
+  if(kflags.KBIN_MPI==FALSE){vasp_bin=kflags.KBIN_BIN;}
 
   while(true){
-    if(VERBOSE){message << "nloop=" << nloop;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);}
+    if(VERBOSE){
+      message << "nloop=" << (nloop++);pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+      message << "program \"" << vasp_bin << "\" is " << (aurostd::ProcessRunning(vasp_bin)?"STILL ":"NOT ") << "running";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+    }
 
     //check vasp.out here
     KBIN::VASP_ProcessWarnings(xvasp,aflags,kflags,xmessage,xwarning,FileMESSAGE);
@@ -1895,11 +1902,11 @@ void AFLOW_monitor_VASP(uint sleep_seconds){
     }
 
     if(kill_vasp){
-      string& vasp_bin=kflags.KBIN_MPI_BIN;
-      if(kflags.KBIN_MPI==FALSE){vasp_bin=kflags.KBIN_BIN;}
       if(XHOST.vflag_control.flag("KILL_VASP_ALL")){
-        message << "issuing \"killall\" command for: \""+vasp_bin+"\"";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+        message << "issuing kill command for: \""+vasp_bin+"\"";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
         aurostd::ProcessKill(vasp_bin);
+        message << "sleeping for " << sleep_seconds_afterkill << " seconds after kill command";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+        aurostd::Sleep(sleep_seconds_afterkill); //sleep at least a minute to let aflow sleep since OUTCAR is incomplete
       }else{  //to be developed
         throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"a targeted kill command for VASP not available yet: try --kill_vasp_all",_INPUT_ILLEGAL_);
       }

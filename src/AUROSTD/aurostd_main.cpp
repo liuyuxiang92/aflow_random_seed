@@ -1587,11 +1587,17 @@ namespace aurostd {
   // ***************************************************************************
   //CO20210315
   void ProcessKill(const string& process,bool sigkill){ //CO20210315
-    if(!aurostd::IsCommandAvailable("killall")) {
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::ProcessRunning():","\"killall\" command not found",_INPUT_ILLEGAL_);
+    bool process_killed=false;
+    if(!process_killed){
+      if(aurostd::IsCommandAvailable("killall")) {aurostd::execute("killall "+(sigkill?string("-9"):string(""))+process+" 2>/dev/null");aurostd::Sleep(2);process_killed=aurostd::ProcessRunning(process);}
     }
-    aurostd::execute("killall "+(sigkill?string("-9"):string(""))+process);
+    if(!process_killed){
+      if(aurostd::IsCommandAvailable("pkill")) {aurostd::execute("pkill "+(sigkill?string("-9"):string(""))+process+" 2>/dev/null");aurostd::Sleep(2);process_killed=aurostd::ProcessRunning(process);}
+    }
     //can add here checks if the process wasn't killed completely
+    if(!process_killed){
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::ProcessRunning():","process could not be kill",_RUNTIME_ERROR_);
+    }
   }
 
   // ***************************************************************************
@@ -5140,7 +5146,7 @@ namespace aurostd {
   
   string kvpair2value(const string& strstream,const string& keyword,const string& delim,bool RemoveWS,bool RemoveComments) { //CO20210315
     //an AFLOW-specific substring matcher: will remove comments before searching
-    bool LDEBUG=TRUE;//TRUE;
+    bool LDEBUG=FALSE;//TRUE;
     if(LDEBUG) cerr << XPID << "aurostd::kvpair2value(): BEGIN [keyword=\"" << keyword << "\"] [delimiter=\"" << delim << "\"] [RemoveWS=" << RemoveWS << "]" << endl;
     string _strstream(strstream);
     if(RemoveWS==TRUE) _strstream=aurostd::RemoveWhiteSpaces(_strstream,'"');

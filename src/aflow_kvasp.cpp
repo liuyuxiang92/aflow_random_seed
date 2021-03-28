@@ -2957,7 +2957,7 @@ namespace KBIN {
     //WARNINGS START
     if(LDEBUG){cerr << soliloquy << " checking warnings" << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
     xmessage.flag("REACHED_ACCURACY",(content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("reached required accuracy")))!=string::npos));
-    xwarning.flag("OUTCAR_INCOMPLETE",!KBIN::VASP_RunFinished(xvasp,aflags,FileMESSAGE,false));  //CO20201111
+    xwarning.flag("OUTCAR_INCOMPLETE",vasp_still_running==false && !KBIN::VASP_RunFinished(xvasp,aflags,FileMESSAGE,false));  //CO20201111
 
     //VASP's internal symmetry routines START
     //CO20200624 - these are all related to VASP's internal symmetry routines

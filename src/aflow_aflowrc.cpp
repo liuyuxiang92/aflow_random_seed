@@ -878,7 +878,7 @@
 #define         AFLOW_CORE_TEMPERATURE_REFRESH                XHOST.adefault.getattachedutype<double>("AFLOW_CORE_TEMPERATURE_REFRESH") 
 
 // VASP MACHINE SETTINGS
-#define AFLOWRC_VASP_CHECK_SLEEP                              30    // seconds
+#define AFLOWRC_VASP_CHECK_SLEEP                              15    // seconds
 #define         VASP_CHECK_SLEEP                              XHOST.adefault.getattachedutype<double>("VASP_CHECK_SLEEP") 
 
 // MACHINE DEPENDENT MPI

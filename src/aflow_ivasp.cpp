@@ -3847,7 +3847,7 @@ namespace KBIN {
         //ADD LINES
         if(VERBOSE) xvasp.INCAR << "# Performing " << operation_option << " [AFLOW] begin" << endl;
         xvasp.INCAR << aurostd::PaddedPOST(incar_input,_incarpad_) << " # " << operation_option << endl;
-        if(VERBOSE) xvasp.INCAR << "# Performing " << operation_option << " [AFLOW] begin" << endl;
+        if(VERBOSE) xvasp.INCAR << "# Performing " << operation_option << " [AFLOW] end" << endl;
       }
     }
     // ***************************************************************************
