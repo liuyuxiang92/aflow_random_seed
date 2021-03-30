@@ -425,8 +425,9 @@ namespace aurostd {
   void RemoveSubStringFirstInPlace(string& str_orig, const string& str_rm) __xprototype;  //CO20190712
   string RemoveSubString(const string& str_orig, const string& str_rm) __xprototype;
   void RemoveSubStringInPlace(string& str_orig, const string& str_rm) __xprototype; //CO20190712
+  vector<string> ProcessPIDs(const string& process); //CO20210315
   bool ProcessRunning(const string& process); //CO20210315
-  void ProcessKill(const string& process,bool sigkill=false); //CO20210315
+  void ProcessKill(const string& process,bool sigkill=true); //CO20210315
   // about directories and file existing or not
   bool DirectoryMake(string Directory);
   bool SSH_DirectoryMake(string user, string machine,string Directory);

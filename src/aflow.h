@@ -3120,13 +3120,14 @@ namespace KBIN {
   //[CO20210315 - OBSOLETE]bool XVASP_Afix_ROTMAT(_xvasp& xvasp,int mode,_aflags& aflags,bool VERBOSE,ofstream &FileMESSAGE);
   //[CO20210315 - OBSOLETE]bool XVASP_Afix_ROTMAT(_xvasp& xvasp,int mode,_kflags kflags,_vflags vflags,_aflags& aflags,bool VERBOSE,ofstream &FileMESSAGE);
   //the following functions are all associated with XVASP_Afix_GENERIC()
-  bool XVASP_Afix_GENERIC_NBANDS(_xvasp& xvasp,_vflags& vflags,_aflags& aflags,ofstream &FileMESSAGE);  //CO20200624 - this is not a general Afix, this can only be used inside Afix_GENERIC
-  bool XVASP_Afix_GENERIC_NBANDS(_xvasp& xvasp,_vflags& vflags,int& nbands,_aflags& aflags,ofstream &FileMESSAGE);  //CO20200624 - this is not a general Afix, this can only be used inside Afix_GENERIC
-  bool XVASP_Afix_GENERIC_POTIM(_xvasp& xvasp,_vflags& vflags,_aflags& aflags,ofstream &FileMESSAGE);  //CO20200624 - this is not a general Afix, this can only be used inside Afix_GENERIC
-  bool XVASP_Afix_GENERIC_POTIM(_xvasp& xvasp,_vflags& vflags,double& potim,_aflags& aflags,ofstream &FileMESSAGE);  //CO20200624 - this is not a general Afix, this can only be used inside Afix_GENERIC
-  bool XVASP_Afix_GENERIC_NELM(_xvasp& xvasp,_vflags& vflags,_aflags& aflags,ofstream &FileMESSAGE); //CO20200624 - this is not a general Afix, this can only be used inside Afix_GENERIC
-  bool XVASP_Afix_GENERIC_NELM(_xvasp& xvasp,_vflags& vflags,int& nelm,_aflags& aflags,ofstream &FileMESSAGE); //CO20200624 - this is not a general Afix, this can only be used inside Afix_GENERIC
-  bool XVASP_Afix_GENERIC_EFIELD_PEAD(_xvasp& xvasp,double dvalue,_aflags& aflags,bool VERBOSE,ofstream &FileMESSAGE); //CO20200624 - this is not a general Afix, this can only be used inside Afix_GENERIC
+  bool XVASP_Afix_GENERIC_NBANDS(_xvasp& xvasp,_vflags& vflags);  //CO20200624 - this is not a general Afix, this can only be used inside Afix_GENERIC
+  bool XVASP_Afix_GENERIC_NBANDS(_xvasp& xvasp,_vflags& vflags,int& nbands);  //CO20200624 - this is not a general Afix, this can only be used inside Afix_GENERIC
+  bool XVASP_Afix_GENERIC_POTIM(_xvasp& xvasp,_vflags& vflags);  //CO20200624 - this is not a general Afix, this can only be used inside Afix_GENERIC
+  bool XVASP_Afix_GENERIC_POTIM(_xvasp& xvasp,_vflags& vflags,double& potim);  //CO20200624 - this is not a general Afix, this can only be used inside Afix_GENERIC
+  bool XVASP_Afix_GENERIC_NELM(_xvasp& xvasp,_vflags& vflags); //CO20200624 - this is not a general Afix, this can only be used inside Afix_GENERIC
+  bool XVASP_Afix_GENERIC_NELM(_xvasp& xvasp,_vflags& vflags,int& nelm); //CO20200624 - this is not a general Afix, this can only be used inside Afix_GENERIC
+  bool XVASP_Afix_GENERIC_EFIELD_PEAD(_xvasp& xvasp,_vflags& vflags); //CO20200624 - this is not a general Afix, this can only be used inside Afix_GENERIC
+  bool XVASP_Afix_GENERIC_EFIELD_PEAD(_xvasp& xvasp,_vflags& vflags,xvector<double>& E); //CO20200624 - this is not a general Afix, this can only be used inside Afix_GENERIC
   bool XVASP_Afix_GENERIC(const string& mode,_xvasp& xvasp,_kflags& kflags,_vflags& vflags,_aflags &aflags,ofstream& FileMESSAGE); //CO20200624 - adding submode so we don't need to make a bunch of spin-off functions
   bool XVASP_Afix_GENERIC(const string& mode,_xvasp& xvasp,_kflags& kflags,_vflags& vflags,double& param_double,_aflags &aflags,ofstream& FileMESSAGE); //CO20200624 - adding submode so we don't need to make a bunch of spin-off functions
   bool XVASP_Afix_GENERIC(const string& mode,_xvasp& xvasp,_kflags& kflags,_vflags& vflags,int& param_int,_aflags &aflags,ofstream& FileMESSAGE); //CO20200624 - adding submode so we don't need to make a bunch of spin-off functions

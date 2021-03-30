@@ -726,6 +726,9 @@ int main(int _argc,char **_argv) {
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_FoldAtomsInCell|--FoldAtomsInCell_test")) {return (FoldAtomsInCellTest(cout)?0:1);}  //DX20210129
     if(!Arun && aurostd::args2flag(argv,cmds,"--test")) {
 
+      cerr << aurostd::joinWDelimiter(aurostd::ProcessPIDs("migration")," ") << endl;
+      exit(0);
+
       stringstream ss1;
       ss1 << "MAGMOM = 1 -1 -1 1 # blah" << endl;
       cerr << aurostd::kvpair2value(ss1.str(),"MAGMOM","=") << endl;

@@ -2894,6 +2894,7 @@ namespace KBIN {
     if(LDEBUG){cerr << soliloquy << " [CHECK " << error << " PROBLEMS]" << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
     bool apply_patch=xwarning.flag(error);
     string fix_submode=fix+(submode>0?":"+aurostd::utype2string(submode):""); //use colon to differentiate REAL_OPTLAY_1
+    bool VERBOSE=true;
     if(apply_patch && xfixed.flag("ALL")){
       if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"ALL\")==TRUE: skipping " << error << " patch" << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
       apply_patch=false;
@@ -2906,14 +2907,19 @@ namespace KBIN {
       if(LDEBUG){cerr << soliloquy << " vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"" << error << "\")==TRUE: skipping " << error << " patch" << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
       apply_patch=false;
     }
+    //do not reference submode below KBIN::XVASP_Afix_GENERIC(), as it will have been incremented (perhaps by 2)
+    //if KBIN::XVASP_Afix_GENERIC() fails, submode will be restored to original, so it is okay to reference for the LDEBUG statement
+    stringstream aus;
+    if(apply_patch && VERBOSE){
+      aus << "WWWWW  ATTEMPTING FIX=" << fix << " FOR ERROR=" << error << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);  //CO20210315 - do not reference submode after KBIN::XVASP_Afix_GENERIC(), (submode>=0?" (SUBMODE="+aurostd::utype2string(submode)+")":"")
+    }
     if(apply_patch && !KBIN::XVASP_Afix_GENERIC(fix,submode,xvasp,kflags,vflags,aflags,FileMESSAGE)){   //CO20210315
-      if(LDEBUG){cerr << soliloquy << " KBIN::XVASP_Afix_GENERIC(fix=\"" << fix << (submode>=0?",submode="+aurostd::utype2string(submode):"") << "\") failed" << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+      if(LDEBUG){cerr << soliloquy << " KBIN::XVASP_Afix_GENERIC(fix=\"" << fix << (submode>=0?",submode="+aurostd::utype2string(submode):"") << "\") failed" << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}  //if KBIN::XVASP_Afix_GENERIC() fails, submode will be restored to original, so it is okay to reference for the LDEBUG statement
       apply_patch=false;
     }
-    if(apply_patch){
+    if(apply_patch && VERBOSE){
+      aus << "WWWWW  APPLIED FIX=" << fix << " FOR ERROR=" << error << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);  //CO20210315 - do not reference submode after KBIN::XVASP_Afix_GENERIC(), (submode>=0?" (SUBMODE="+aurostd::utype2string(submode)+")":"")
       KBIN::VASP_Error(xvasp,"WWWWW  ERROR "+soliloquy+" "+error+" problems"+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_));
-      stringstream aus;
-      aus << "WWWWW  APPLYING FIX=" << fix << (submode>=0?" (SUBMODE="+aurostd::utype2string(submode)+")":"") << " FOR ERROR=" << error << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       xfixed.flag(error,TRUE);xfixed.flag("ALL",TRUE);
     }
     return apply_patch;
@@ -2948,11 +2954,12 @@ namespace KBIN {
     bool vasp_still_running=false; //CO20210315 - look at wording, very careful, this bool implies vasp WAS running, and now is not
     string& vasp_bin=kflags.KBIN_MPI_BIN;
     if(kflags.KBIN_MPI==FALSE){vasp_bin=kflags.KBIN_BIN;}
-    if(XHOST.vflag_control.flag("KILL_ALL_VASP")){
-      //KILL_ALL_VASP allows us to check for ANY instance of vasp running (assumes exclusivity in node environment)
+    if(XHOST.vflag_control.flag("KILL_VASP_ALL")){
+      //KILL_VASP_ALL allows us to check for ANY instance of vasp running (assumes exclusivity in node environment)
       //we will develop more precise methods for tracking parent/child processes of aflow to target specific vasp instances in the future
       vasp_still_running=aurostd::ProcessRunning(vasp_bin);
     }
+    if(LDEBUG){cerr << soliloquy << " vasp_still_running=" << vasp_still_running << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
     
     //WARNINGS START
     if(LDEBUG){cerr << soliloquy << " checking warnings" << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}

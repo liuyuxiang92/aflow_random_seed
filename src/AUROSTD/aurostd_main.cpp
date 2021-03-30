@@ -1568,31 +1568,103 @@ namespace aurostd {
   }
 
   // ***************************************************************************
+  // Function ProcessPIDs
+  // ***************************************************************************
+  //CO20210315
+  vector<string> ProcessPIDs(const string& process){ //CO20210315
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="aurostd::ProcessRunning():";
+    vector<string> vpids;
+    
+    if(aurostd::IsCommandAvailable("pgrep")) {
+      string output=aurostd::execute2string("pgrep "+process+" 2> /dev/null");
+      if(LDEBUG){cerr << soliloquy << " pgrep output:" << endl << "\"" << output << "\"" << endl;}
+      aurostd::StringSubst(output,"\n"," ");
+      output=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(output);
+      if(output.empty()){return vpids;}
+      aurostd::string2tokens(output,vpids," ");
+      if(LDEBUG){
+        cerr << soliloquy << " vpids=" << aurostd::joinWDelimiter(vpids,",") << endl;
+        cerr << soliloquy << " vpids.empty()=" << vpids.empty() << endl;
+      }
+      return vpids;
+    }
+    if(aurostd::IsCommandAvailable("ps") && aurostd::IsCommandAvailable("grep")) {
+      //FR recommends ps aux vs. ps -e
+      //tested on linux and mac, PIDs are in second column, process is the last column
+      string command_grep="grep "+process;
+      string command="ps aux 2>/dev/null | "+command_grep+" 2> /dev/null";
+      string output=aurostd::execute2string(command);
+      if(LDEBUG){cerr << soliloquy << " ps/grep output:" << endl << output << endl;}
+      vector<string> vlines,vtokens,vpids;
+      aurostd::string2vectorstring(output,vlines);
+      uint i=0,j=0;
+      for(i=0;i<vlines.size();i++){
+        aurostd::string2tokens(vlines[i],vtokens," ");
+        if(vtokens.size()<11){continue;}
+        const string& pid=vtokens[1];
+        string proc=vtokens[10]; //since we split on " ", we need to join columns 11-onward
+        for(j=11;j<vtokens.size();j++){proc+=" "+vtokens[j];}
+        if(LDEBUG){cerr << soliloquy << " proc[i=" << i << "]=\"" << proc << "\"" << endl;}
+        if(proc.find(process)==string::npos){continue;}
+        if(proc.find(command)!=string::npos){continue;} //ps aux | grep ... always returns itself, neglect  //do a find() instead of == here
+        if(proc==command_grep){continue;} //ps aux | grep ... always returns itself, neglect  //do a == instead a find() here
+        vpids.push_back(pid);
+      }
+      if(LDEBUG){
+        cerr << soliloquy << " vpids=" << aurostd::joinWDelimiter(vpids,",") << endl;
+        cerr << soliloquy << " vpids.empty()=" << vpids.empty() << endl;
+      }
+      return vpids;
+    }
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"\"pgrep\"-type command not found",_INPUT_ILLEGAL_);
+    return vpids;
+  }
+
+  // ***************************************************************************
   // Function ProcessRunning
   // ***************************************************************************
   //CO20210315
-  bool ProcessRunning(const string& process){ //CO20210315
-    if(!aurostd::IsCommandAvailable("pgrep")) {
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::ProcessRunning():","\"pgrep\" command not found",_INPUT_ILLEGAL_);
-    }
-    string output=aurostd::execute2string("pgrep "+process+" 2> /dev/null");
-    aurostd::StringSubst(output,"\n","");
-    output=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(output);
-    if(output.length()>0) return true;
-    return false;
-  }
+  bool ProcessRunning(const string& process){return !aurostd::ProcessPIDs(process).empty();} //CO20210315
   
   // ***************************************************************************
   // Function ProcessKill
   // ***************************************************************************
   //CO20210315
   void ProcessKill(const string& process,bool sigkill){ //CO20210315
-    bool process_killed=false;
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="aurostd::ProcessRunning():";
+    string command="";
+
+    bool process_killed=(!aurostd::ProcessRunning(process));
+    uint sleep_seconds=5; //2 seconds is too few
     if(!process_killed){
-      if(aurostd::IsCommandAvailable("killall")) {aurostd::execute("killall "+(sigkill?string("-9"):string(""))+process+" 2>/dev/null");aurostd::Sleep(2);process_killed=aurostd::ProcessRunning(process);}
+      if(aurostd::IsCommandAvailable("killall")) {
+        command="killall "+(sigkill?string("-9 "):string(""))+process+" 2>/dev/null";
+        aurostd::execute(command);
+        if(LDEBUG){cerr << soliloquy << " issuing command: \"" << command << "\"" << endl;}
+        aurostd::Sleep(sleep_seconds);process_killed=aurostd::ProcessRunning(process);
+      }
     }
     if(!process_killed){
-      if(aurostd::IsCommandAvailable("pkill")) {aurostd::execute("pkill "+(sigkill?string("-9"):string(""))+process+" 2>/dev/null");aurostd::Sleep(2);process_killed=aurostd::ProcessRunning(process);}
+      if(aurostd::IsCommandAvailable("pkill")) {
+        command="pkill "+(sigkill?string("-9 "):string(""))+process+" 2>/dev/null";
+        if(LDEBUG){cerr << soliloquy << " issuing command: \"" << command << "\"" << endl;}
+        aurostd::execute(command);
+        aurostd::Sleep(sleep_seconds);process_killed=aurostd::ProcessRunning(process);
+      }
+    }
+    if(!process_killed){
+      if(aurostd::IsCommandAvailable("kill")) {
+        vector<string> vpids=aurostd::ProcessPIDs(process);
+        if(vpids.empty()){process_killed=true;}
+        else{
+          command="kill "+(sigkill?string("-9 "):string(""))+aurostd::joinWDelimiter(vpids," ")+" 2>/dev/null";
+          if(LDEBUG){cerr << soliloquy << " issuing command: \"" << command << "\"" << endl;}
+          aurostd::execute(command);
+          aurostd::Sleep(sleep_seconds);process_killed=aurostd::ProcessRunning(process);
+        }
+      }
     }
     //can add here checks if the process wasn't killed completely
     if(!process_killed){
@@ -1825,7 +1897,8 @@ namespace aurostd {
     if(!IsCompressed(CompressedFileName)&&!IsCompressed(FileNameOUT)) {return TRUE;}
     if(IsCompressed(FileNameOUT)) {
       if(GetCompressionExtension(CompressedFileName)==GetCompressionExtension(FileNameOUT)) {return TRUE;}
-      return FALSE;}
+      return FALSE;
+    }
     if(substring2bool(CompressedFileName,".xz")) {CompressFile(FileNameOUT,"xz");return TRUE;}
     if(substring2bool(CompressedFileName,".bz2")) {CompressFile(FileNameOUT,"bzip2");return TRUE;}
     if(substring2bool(CompressedFileName,".gz")) {CompressFile(FileNameOUT,"gzip");return TRUE;}
@@ -2499,7 +2572,8 @@ namespace aurostd {
 
     //CO20181226 - split by newlines and print separately
     vector<string> message_parts,_message_parts;
-    aurostd::string2vectorstring(stream.str(),_message_parts);
+    string stream_str=stream.str();aurostd::StringstreamClean(stream);
+    aurostd::string2vectorstring(stream_str,_message_parts);
     for(uint i=0;i<_message_parts.size();i++){
       if(!aurostd::RemoveWhiteSpacesFromTheBack(_message_parts[i]).empty()){
         message_parts.push_back(_message_parts[i]);
@@ -2525,7 +2599,7 @@ namespace aurostd {
       string str2search="";  //replicate old behavior, look for ERROR coming from logger() which has two pre spaces
       aurostd::xoption color;color.clear(); //use xoption: .option is global color flag (do we have color?), and .vxscheme tells me which color
       if(fancy_print){
-        string message=stream.str();
+        string message=stream_str;
         //COMPLETE - START
         if(color.option==FALSE){
           str2search="  COMPLETE ";  //replicate old behavior, look for ERROR coming from logger() which has two pre spaces
@@ -2562,7 +2636,6 @@ namespace aurostd {
       }
       if(fancy_print) cursor_attr_none(fstr);  // turn off all cursor attributes
     }
-    aurostd::StringstreamClean(stream);
   }
 
   //[CO20200624 - OBSOLETE]void PrintMessageStream(ostringstream &stream,bool quiet) {
@@ -2599,7 +2672,8 @@ namespace aurostd {
 
     //CO20181226 - split by newlines and print separately
     vector<string> message_parts,_message_parts;
-    aurostd::string2vectorstring(stream.str(),_message_parts);
+    string stream_str=stream.str();aurostd::StringstreamClean(stream);
+    aurostd::string2vectorstring(stream_str,_message_parts);
     for(uint i=0;i<_message_parts.size();i++){
       if(!aurostd::RemoveWhiteSpacesFromTheBack(_message_parts[i]).empty()){
         message_parts.push_back(_message_parts[i]);
@@ -2638,7 +2712,6 @@ namespace aurostd {
       oss << ErrorBarString << endl;  //flush included in endl
       if(fancy_print) cursor_attr_none(fstr);  // turn off all cursor attributes
     }
-    aurostd::StringstreamClean(stream);
   }
 
   //[CO20200624 - OBSOLETE]void PrintErrorStream(ostringstream &stream,bool quiet) {
@@ -2675,7 +2748,8 @@ namespace aurostd {
 
     //CO20181226 - split by newlines and print separately
     vector<string> message_parts,_message_parts;
-    aurostd::string2vectorstring(stream.str(),_message_parts);
+    string stream_str=stream.str();aurostd::StringstreamClean(stream);
+    aurostd::string2vectorstring(stream_str,_message_parts);
     for(uint i=0;i<_message_parts.size();i++){
       if(!aurostd::RemoveWhiteSpacesFromTheBack(_message_parts[i]).empty()){
         message_parts.push_back(_message_parts[i]);
@@ -2714,7 +2788,6 @@ namespace aurostd {
       oss << WarningBarString << endl;  //flush included in endl
       if(fancy_print) cursor_attr_none(fstr);  // turn off all cursor attributes
     }
-    aurostd::StringstreamClean(stream);
   }
 
   //[CO20200624 - OBSOLETE]void PrintWarningStream(ostringstream &stream,bool quiet) {
@@ -2741,7 +2814,7 @@ namespace aurostd {
 
   void PrintMessageStream(stringstream &stream,bool quiet,std::ostream& oss) {ofstream FileMESSAGE;return PrintMessageStream(FileMESSAGE,stream,quiet,oss);} //CO20200624
   void PrintMessageStream(ofstream &FileMESSAGE,stringstream &stream,bool quiet,std::ostream& oss) {bool osswrite=true;return PrintMessageStream(FileMESSAGE,stream,quiet,osswrite,oss);} //CO20200624
-  void PrintMessageStream(ofstream &FileMESSAGE,stringstream &stream,bool quiet,bool osswrite,std::ostream& oss) {ostringstream omess;omess << stream.str();return PrintMessageStream(FileMESSAGE,omess,quiet,osswrite,oss);}
+  void PrintMessageStream(ofstream &FileMESSAGE,stringstream &stream,bool quiet,bool osswrite,std::ostream& oss) {ostringstream omess;omess << stream.str();aurostd::StringstreamClean(stream);return PrintMessageStream(FileMESSAGE,omess,quiet,osswrite,oss);}
 
   //[CO20200624 - OBSOLETE]void PrintMessageStream(stringstream &stream,bool quiet) {
   //[CO20200624 - OBSOLETE]  if(!quiet) {cout << stream.str().c_str();cout.flush();}
@@ -2767,7 +2840,7 @@ namespace aurostd {
 
   void PrintErrorStream(stringstream &stream,bool quiet) {ofstream FileMESSAGE;return PrintErrorStream(FileMESSAGE,stream,quiet);} //CO20200624
   void PrintErrorStream(ofstream &FileMESSAGE,stringstream &stream,bool quiet) {bool osswrite=true;return PrintErrorStream(FileMESSAGE,stream,quiet,osswrite);} //CO20200624
-  void PrintErrorStream(ofstream &FileMESSAGE,stringstream &stream,bool quiet,bool osswrite) {ostringstream omess;omess << stream.str();return PrintErrorStream(FileMESSAGE,omess,quiet,osswrite);}
+  void PrintErrorStream(ofstream &FileMESSAGE,stringstream &stream,bool quiet,bool osswrite) {ostringstream omess;omess << stream.str();aurostd::StringstreamClean(stream);return PrintErrorStream(FileMESSAGE,omess,quiet,osswrite);}
 
   //[CO20200624 - OBSOLETE]void PrintErrorStream(stringstream &stream,bool quiet) {
   //[CO20200624 - OBSOLETE]  if(quiet) {;} // phony just to keep quiet busy
@@ -2794,7 +2867,7 @@ namespace aurostd {
 
   void PrintWarningStream(stringstream &stream,bool quiet) {ofstream FileMESSAGE;return PrintWarningStream(FileMESSAGE,stream,quiet);} //CO20200624
   void PrintWarningStream(ofstream &FileMESSAGE,stringstream &stream,bool quiet) {bool osswrite=true;return PrintWarningStream(FileMESSAGE,stream,quiet,osswrite);} //CO20200624
-  void PrintWarningStream(ofstream &FileMESSAGE,stringstream &stream,bool quiet,bool osswrite) {ostringstream omess;omess << stream.str();return PrintWarningStream(FileMESSAGE,omess,quiet,osswrite);}
+  void PrintWarningStream(ofstream &FileMESSAGE,stringstream &stream,bool quiet,bool osswrite) {ostringstream omess;omess << stream.str();aurostd::StringstreamClean(stream);return PrintWarningStream(FileMESSAGE,omess,quiet,osswrite);}
 
   //[CO20200624 - OBSOLETE]void PrintWarningStream(stringstream &stream,bool quiet) {
   //[CO20200624 - OBSOLETE]  if(quiet) {;} // phony just to keep quiet busy
@@ -3548,34 +3621,39 @@ namespace aurostd {
   // Function string2file string2compressfile string2gzfile string2bz2file string2xzfile
   // ***************************************************************************
   // write string to file - Stefano Curtarolo
-  bool string2file(const string& StringOUTPUT,const string& FileNameOUTPUT,const string& mode) {
+  bool string2file(const string& StringOUTPUT,const string& _FileNameOUTPUT,const string& mode) {
+    string FileNameOUTPUT=aurostd::CleanFileName(_FileNameOUTPUT);
+    bool writable=true;  //CO20190808 - captures whether we can open/write file
     if(mode=="POST" || mode=="APPEND") {
       stringstream FileINPUT;
-      aurostd::file2stringstream(FileNameOUTPUT,FileINPUT);
+      if(aurostd::FileExist(FileNameOUTPUT)){aurostd::file2stringstream(FileNameOUTPUT,FileINPUT);}
       ofstream FileOUTPUT;
       FileOUTPUT.open(FileNameOUTPUT.c_str(),std::ios::out);
+      writable=FileOUTPUT.is_open(); //CO20190808 - captures whether we can open/write file
       FileOUTPUT << FileINPUT.str();
-      FileOUTPUT << StringOUTPUT;    
+      FileOUTPUT << StringOUTPUT;
       FileOUTPUT.flush();FileOUTPUT.clear();FileOUTPUT.close();
-      return TRUE;  // return FALSE if something got messed up
+      return writable; //TRUE;  // return FALSE if something got messed up //CO20190808 - captures whether we can open/write file
     }
     if(mode=="PRE") {
       stringstream FileINPUT;
-      aurostd::file2stringstream(FileNameOUTPUT,FileINPUT);
+      if(aurostd::FileExist(FileNameOUTPUT)){aurostd::file2stringstream(FileNameOUTPUT,FileINPUT);}
       ofstream FileOUTPUT;
       FileOUTPUT.open(FileNameOUTPUT.c_str(),std::ios::out);
-      FileOUTPUT << StringOUTPUT;    
+      writable=FileOUTPUT.is_open(); //CO20190808 - captures whether we can open/write file
+      FileOUTPUT << StringOUTPUT;
       FileOUTPUT << FileINPUT.str();
       FileOUTPUT.flush();FileOUTPUT.clear();FileOUTPUT.close();
-      return TRUE;  // return FALSE if something got messed up
+      return writable; //TRUE;  // return FALSE if something got messed up //CO20190808 - captures whether we can open/write file
     }
     if(mode=="WRITE" || mode=="") {
       ofstream FileOUTPUT;
       FileOUTPUT.open(FileNameOUTPUT.c_str(),std::ios::out);
-      FileOUTPUT << StringOUTPUT;    
+      writable=FileOUTPUT.is_open(); //CO20190808 - captures whether we can open/write file
+      FileOUTPUT << StringOUTPUT;
       FileOUTPUT.flush();FileOUTPUT.clear();FileOUTPUT.close();
-      return TRUE;  // return FALSE if something got messed up
-    }   
+      return writable; //TRUE;  // return FALSE if something got messed up //CO20190808 - captures whether we can open/write file
+    }
     return FALSE;
   }
 
@@ -3604,45 +3682,7 @@ namespace aurostd {
   // Function stringstream2file stringstream2compressedfile stringstream2gzfile stringstream2bz2file stringstream2xzfile
   // ***************************************************************************
   // write string to file - Stefano Curtarolo
-  bool stringstream2file(const stringstream& StringstreamOUTPUT,const string& _file,const string& mode) {
-    string file=aurostd::CleanFileName(_file);
-    bool writable=true;  //CO20190808 - captures whether we can open/write file
-    if(mode=="POST" || mode=="APPEND") {
-      stringstream FileINPUT;
-      aurostd::file2stringstream(file,FileINPUT);
-      ofstream FileOUTPUT;
-      FileOUTPUT.open(file.c_str(),std::ios::out);
-      writable=FileOUTPUT.is_open(); //CO20190808 - captures whether we can open/write file
-      FileOUTPUT << FileINPUT.str();
-      FileOUTPUT << StringstreamOUTPUT.str();
-      // FileOUTPUT << StringstreamOUTPUT.rdbuf();
-      FileOUTPUT.flush();FileOUTPUT.clear();FileOUTPUT.close();
-      return writable; //TRUE;  // return FALSE if something got messed up //CO20190808 - captures whether we can open/write file
-    }
-    if(mode=="PRE") {
-      stringstream FileINPUT;
-      aurostd::file2stringstream(file,FileINPUT);
-      ofstream FileOUTPUT;
-      FileOUTPUT.open(file.c_str(),std::ios::out);
-      writable=FileOUTPUT.is_open(); //CO20190808 - captures whether we can open/write file
-      FileOUTPUT << StringstreamOUTPUT.str();
-      // FileOUTPUT << StringstreamOUTPUT.rdbuf();
-      FileOUTPUT << FileINPUT.str();
-      FileOUTPUT.flush();FileOUTPUT.clear();FileOUTPUT.close();
-      return writable; //TRUE;  // return FALSE if something got messed up //CO20190808 - captures whether we can open/write file
-    }
-    if(mode=="WRITE" || mode=="") {
-      ofstream FileOUTPUT;
-      FileOUTPUT.open(file.c_str(),std::ios::out);
-      writable=FileOUTPUT.is_open(); //CO20190808 - captures whether we can open/write file
-      FileOUTPUT << StringstreamOUTPUT.str();
-      // FileOUTPUT << StringstreamOUTPUT.rdbuf();
-      FileOUTPUT.flush();FileOUTPUT.clear();FileOUTPUT.close();
-      return writable; //TRUE;  // return FALSE if something got messed up //CO20190808 - captures whether we can open/write file
-    }   
-    return FALSE;
-  }
-
+  bool stringstream2file(const stringstream& StringstreamOUTPUT,const string& file,const string& mode) {return string2file(StringstreamOUTPUT.str(),file,mode);}  //CO20210315 - cleaned up
 
   bool stringstream2compressfile(const string& command,const stringstream& StringstreamOUTPUT,const string& _file,const string& mode) {
     string file=aurostd::CleanFileName(_file);
@@ -3935,7 +3975,8 @@ namespace aurostd {
     string FileNameIN=aurostd::CleanFileName(_FileNameIN);
     if(!FileExist(FileNameIN)) {
       cerr << "ERROR - aurostd::file2stringstream: file=" << FileNameIN << " not present !" << endl;
-      return FALSE;}   
+      return FALSE;
+    }
     ifstream FileIN;
     StringstreamIN.clear();StringstreamIN.str(std::string());
     FileIN.open(FileNameIN.c_str(),std::ios::in);
@@ -3947,10 +3988,12 @@ namespace aurostd {
     string FileNameIN=aurostd::CleanFileName(_FileNameIN);
     if(!FileExist(FileNameIN)) {
       cerr << "ERROR - aurostd::bz2file2stringstream: file=" << FileNameIN << " not present !" << endl;
-      return FALSE;}   
+      return FALSE;
+    }
     if(!aurostd::IsCommandAvailable("bzcat")) {
       cerr << "ERROR - aurostd::bz2file2stringstream: command \"bzcat\" is necessary !" << endl;
-      return FALSE;}   
+      return FALSE;
+    }
     StringstreamIN.clear();StringstreamIN.str(std::string());
     StringstreamIN << execute2string("bzcat \""+FileNameIN+"\"");
     return TRUE;  // return FALSE if something got messed up
@@ -3959,10 +4002,12 @@ namespace aurostd {
     string FileNameIN=aurostd::CleanFileName(_FileNameIN);
     if(!FileExist(FileNameIN)) {
       cerr << "ERROR - aurostd::gzfile2stringstream: file=" << FileNameIN << " not present !" << endl;
-      return FALSE;}   
+      return FALSE;
+    }
     if(!aurostd::IsCommandAvailable("zcat")) {
       cerr << "ERROR - aurostd::gzfile2stringstream: command \"zcat\" is necessary !" << endl;
-      return FALSE;}   
+      return FALSE;
+    }
     StringstreamIN.clear();StringstreamIN.str(std::string());
     StringstreamIN << execute2string("zcat \""+FileNameIN+"\"");
     return TRUE;  // return FALSE if something got messed up
@@ -3971,10 +4016,12 @@ namespace aurostd {
     string FileNameIN=aurostd::CleanFileName(_FileNameIN);
     if(!FileExist(FileNameIN)) {
       cerr << "ERROR - aurostd::xzfile2stringstream: file=" << FileNameIN << " not present !" << endl;
-      return FALSE;}   
+      return FALSE;
+    }
     if(!aurostd::IsCommandAvailable("xzcat")) {
       cerr << "ERROR - aurostd::xzfile2stringstream: command \"xzcat\" is necessary !" << endl;
-      return FALSE;}   
+      return FALSE;
+    }
     StringstreamIN.clear();StringstreamIN.str(std::string());
     StringstreamIN << execute2string("xzcat \""+FileNameIN+"\"");
     return TRUE;  // return FALSE if something got messed up
@@ -3985,10 +4032,12 @@ namespace aurostd {
     string FileNameIN=CleanFileName(_FileNameIN);
     if(!FileExist(FileNameIN)) {
       cerr << "ERROR - aurostd::zipfile2stringstream: file=" << FileNameIN << " not present !" << endl;
-      return FALSE;}
+      return FALSE;
+    }
     if(!aurostd::IsCommandAvailable("zcat")) {
       cerr << "ERROR - aurostd::zipfile2stringstream: command \"unzip\" is necessary !" << endl;
-      return FALSE;}
+      return FALSE;
+    }
     StringstreamIN.clear();StringstreamIN.str(std::string());
     StringstreamIN << execute2string("unzip -p \""+FileNameIN+"\"");
     return TRUE;  // return FALSE if something got messed up
@@ -3998,7 +4047,8 @@ namespace aurostd {
     string FileNameIN=aurostd::CleanFileName(_FileNameIN),FileNameOUT;  //CO
     if(!FileExist(FileNameIN,FileNameOUT) && !EFileExist(FileNameIN,FileNameOUT)) {
       cerr << "ERROR - aurostd::efile2stringstream: file=" << FileNameIN << " not present !" << endl;
-      return FALSE;}   
+      return FALSE;
+    }
     //ME20200922 - Do not use substring2bool - it may delete paths if not properly cleaned (e.g. if they contain //)
     if(FileNameOUT.find(".bz2") != string::npos) return aurostd::bz2file2stringstream(FileNameOUT,StringstreamIN);
     if(FileNameOUT.find(".gz") != string::npos)  return aurostd::gzfile2stringstream(FileNameOUT,StringstreamIN);
@@ -4047,7 +4097,8 @@ namespace aurostd {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     if(!aurostd::IsCommandAvailable("wget")) {
       cerr << "ERROR - aurostd::url2file(): command \"wget\" is necessary !" << endl;
-      return FALSE;}	
+      return FALSE;
+    }
     string _url=url;
     aurostd::StringSubst(_url,"http://","");
     aurostd::StringSubst(_url,"//","/");
@@ -4120,7 +4171,8 @@ namespace aurostd {
     stringIN="";
     if(!aurostd::IsCommandAvailable("wget")) {
       cerr << "ERROR - aurostd::url2string(): command \"wget\" is necessary !" << endl;
-      return FALSE;}	
+      return FALSE;
+    }
     string _url=url;
     aurostd::StringSubst(_url,"http://","");
     aurostd::StringSubst(_url,"//","/");

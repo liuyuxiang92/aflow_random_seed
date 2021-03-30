@@ -1888,7 +1888,7 @@ void AFLOW_monitor_VASP(uint sleep_seconds){
   while(true){
     if(VERBOSE){
       message << "nloop=" << (nloop++);pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-      message << "program \"" << vasp_bin << "\" is " << (aurostd::ProcessRunning(vasp_bin)?"STILL ":"NOT ") << "running";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+      message << "program \"" << vasp_bin << "\" is " << (aurostd::ProcessRunning(vasp_bin)?"":"NOT ") << "running";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
     }
 
     //check vasp.out here
