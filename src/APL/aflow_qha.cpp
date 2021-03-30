@@ -2257,7 +2257,7 @@ namespace apl
       weight = (2-eig.spin)*eig.vweight[k];// factor 2 if non-magnetic and 1 otherwise
       for (uint s=0; s<=eig.spin; s++){
         for (uint b=0; b<eig.number_bands; b++){
-          E = eig.venergy[k][b][0];
+          E = eig.venergy[k][b][s];
           f = aurostd::FermiDirac(E, mu, T); f0 = aurostd::FermiDirac(E, mu0, Tmin);
           U += E * weight*(f - f0);
 
@@ -2267,7 +2267,7 @@ namespace apl
     }
     S *= KBOLTZEV;
 
-    return U - T*S;
+    return (U - T*S)/NatomsOrigCell;
   }
 
   /// Calculates the electronic free energy using the Sommerfeld expansion.
@@ -2275,7 +2275,7 @@ namespace apl
   {
     xvector<double> F_Som = DOS_Ef;
     for (int i=F_Som.lrows; i<=F_Som.urows; i++){
-      F_Som[i] *= -pow(M_PI*KBOLTZEV*T,2)/6.0;
+      F_Som[i] *= -pow(M_PI*KBOLTZEV*T,2)/6.0/NatomsOrigCell;
     }
     return F_Som;
   }
