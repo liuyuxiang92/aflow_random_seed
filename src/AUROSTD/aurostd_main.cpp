@@ -1979,16 +1979,30 @@ namespace aurostd {
   string GetCompressionExtension(const string& CompressedFileName) {
     //Corey Oses
     //Will determine zipped extension
-    string extension="";
-    if(!IsCompressed(CompressedFileName)) {return extension;}
+    //[CO20210315 - more work]string extension="";
+    //[CO20210315 - more work]if(!IsCompressed(CompressedFileName)) {return extension;}
     if(CompressedFileName.find(".xz")!=string::npos)  {return ".xz";}
     if(CompressedFileName.find(".bz2")!=string::npos) {return ".bz2";}
     if(CompressedFileName.find(".gz")!=string::npos)  {return ".gz";}
     if(CompressedFileName.find(".zip")!=string::npos) {return ".zip";}
-    return extension;
+    return "";
   }
   //CO END
 
+  //***************************************************************************//
+  // aurostd::GetCatCommand
+  //***************************************************************************//
+  string GetCatCommand(const string& CompressedFileName) {  //CO20210315
+    //Corey Oses
+    //Will determine zipped extension
+    if(CompressedFileName.find(".xz")!=string::npos)  {return "xzcat";}
+    if(CompressedFileName.find(".bz2")!=string::npos) {return "bzcat";}
+    if(CompressedFileName.find(".gz")!=string::npos)  {return "zcat";}
+    if(CompressedFileName.find(".zip")!=string::npos) {return "unzip -p";}
+    return "cat";
+  }
+
+  //CO END
   // ***************************************************************************
   // Function aurostd::UncompressFile aurostd::Compress
   // ***************************************************************************

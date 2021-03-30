@@ -3022,7 +3022,7 @@ namespace KBIN {
       nbands_error = nbands_error || aurostd::substring_present_file_FAST(xvasp.Directory + "/vasp.out", "The number of bands is not sufficient to hold all electrons");
       xwarning.flag("NBANDS", nbands_error);
     }
-    xwarning.flag("NELM",vasp_still_running==false && KBIN::VASP_OSZICARUnconverged(xvasp.Directory)); // check from OSZICAR
+    xwarning.flag("NELM",vasp_still_running==false && KBIN::VASP_OSZICARUnconverged(xvasp.Directory+"/OSZICAR",xvasp.Directory+"/OUTCAR")); // check from OSZICAR
     xwarning.flag("NPAR",(content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("please rerun with NPAR=")))!=string::npos)); // not only npar==1
     xwarning.flag("NPARC",((content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("NPAR = 4")))!=string::npos) &&
           (content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("NPAR=number of cores")))!=string::npos)) ); // fix with NPAR=cores in MPI
@@ -3045,7 +3045,7 @@ namespace KBIN {
     //[CO20210315 - CSLOSHING already picks this up]xOUTCAR xout(xvasp.Directory+"/OUTCAR",true);  //quiet, there might be issues with halfway-written OUTCARs
     //[CO20210315 - CSLOSHING already picks this up]int NBANDS=xout.NBANDS;
     //[CO20210315 - CSLOSHING already picks this up]int NELM=xout.NELM;
-    //[CO20210315 - CSLOSHING already picks this up]int NSTEPS=KBIN::VASP_getNSTEPS(xvasp.Directory);
+    //[CO20210315 - CSLOSHING already picks this up]int NSTEPS=KBIN::VASP_getNSTEPS(xvasp.Directory+"/OSZICAR");
     //[CO20210315 - CSLOSHING already picks this up]aus << "MMMMM  MESSAGE NBANDS=" << NBANDS << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);aus.str(std::string());aus.clear();
     //[CO20210315 - CSLOSHING already picks this up]aus << "MMMMM  MESSAGE NELM=" << NELM << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);aus.str(std::string());aus.clear();
     //[CO20210315 - CSLOSHING already picks this up]aus << "MMMMM  MESSAGE NSTEPS=" << NSTEPS << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);aus.str(std::string());aus.clear();
@@ -4308,22 +4308,22 @@ namespace KBIN {
   //CO20210315 - reconsider rewriting these functions to eliminate subshell
   //NELM comes from xOUTCAR
   //NSTEPS comes from xOSZICAR (to be created)
-  uint VASP_getNELM(const string& dir){ //CO20200624
+  uint VASP_getNELM(const string& outcar){ //CO20200624
     bool LDEBUG=(FALSE || _DEBUG_KVASP_ || XHOST.DEBUG);
     string soliloquy=XPID+"KBIN::VASP_getNELM():";
-    stringstream command;command.str(std::string());command.clear();
-    command << "cat " << dir << "/OUTCAR | grep NELM | head -n 1 | cut -d ';' -f1 | cut -d '=' -f2 | awk '{print $1}'" << endl;
+    stringstream command;
+    command << aurostd::GetCatCommand(outcar) << " " << outcar << " | grep NELM | head -n 1 | cut -d ';' -f1 | cut -d '=' -f2 | awk '{print $1}'" << endl;
     string tmp=aurostd::execute2string(command);
     if(LDEBUG){cerr << soliloquy << " NELM grep response=\"" << tmp << "\"" << endl;}
     int NELM=60;  //VASP default
     if(!tmp.empty() && aurostd::isfloat(tmp)){NELM=aurostd::string2utype<int>(tmp);}
     return NELM;
   }
-  uint VASP_getNSTEPS(const string& dir){  //CO20200624
+  uint VASP_getNSTEPS(const string& oszicar){  //CO20200624
     bool LDEBUG=(FALSE || _DEBUG_KVASP_ || XHOST.DEBUG);
     string soliloquy=XPID+"KBIN::VASP_getNSTEPS():";
-    stringstream command;command.str(std::string());command.clear();
-    command << "cat " << dir << "/OSZICAR | grep ':' | tail -n 1 | cut -d ':' -f2 | awk '{print $1}'" << endl;
+    stringstream command;
+    command << aurostd::GetCatCommand(oszicar) << " " << oszicar << " | grep ':' | tail -n 1 | cut -d ':' -f2 | awk '{print $1}'" << endl;
     string tmp=aurostd::execute2string(command);
     if(LDEBUG){cerr << soliloquy << " NSTEPS grep response=\"" << tmp << "\"" << endl;}
     int NSTEPS=0;  //VASP default
@@ -4339,7 +4339,7 @@ namespace KBIN {
     }
     if(vrelax.size()<cutoff) return FALSE; // no problem
     // otherwise check for issues.
-    uint NELM=KBIN::VASP_getNELM(dir);
+    uint NELM=KBIN::VASP_getNELM(dir+"/OUTCAR");
     uint nsteps=0,nissues=0;
     for(i=0;i<vrelax.size()&&i<cutoff;i++) {
       aurostd::string2tokens(vrelax[i],tokens," ");
@@ -4351,10 +4351,10 @@ namespace KBIN {
     if(nissues==cutoff) return true;
     return false;
   }
-  bool VASP_OSZICARUnconverged(const string& dir) {
+  bool VASP_OSZICARUnconverged(const string& oszicar,const string& outcar) {
     //we only care about the last electronic SC steps
-    uint NELM=KBIN::VASP_getNELM(dir);
-    uint NSTEPS=KBIN::VASP_getNSTEPS(dir);
+    uint NELM=KBIN::VASP_getNELM(outcar);
+    uint NSTEPS=KBIN::VASP_getNSTEPS(oszicar);
     if(NELM!=0 && NSTEPS!=0 && NSTEPS>=NELM){return true;}
     return false;
   }

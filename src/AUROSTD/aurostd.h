@@ -454,6 +454,7 @@ namespace aurostd {
   bool IsCompressed(const string& FileNameIn,string& FileNameOut);
   bool IsCompressed(const string& FileNameIn);
   string GetCompressionExtension(const string& CompressedFileName);
+  string GetCatCommand(const string& CompressedFileName); //CO20210315
   //CO END
   bool UncompressFile(const string& FileName,const string& command);  bool UncompressFile(const string& FileName); // with guess  
   bool CompressFile(const string& FileName,const string& command=AUROSTD_ZIP_BIN); // with default

@@ -6668,6 +6668,18 @@ namespace aflowlib {
     }
     //CO20201220 STOP - look for stress tensor
 
+    //CO20210315 START - test for convergence
+    for(uint irelax=0;irelax<vrelax.size();irelax++) {
+      for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed
+        if(aurostd::FileExist(dir+"/OSZICAR"+vrelax[irelax]+XHOST.vext[iext]) && aurostd::FileExist(dir+"/OUTCAR"+vrelax[irelax]+XHOST.vext[iext])) {
+          if(!KBIN::VASP_OSZICARUnconverged(dir+"/OSZICAR"+vrelax[irelax]+XHOST.vext[iext],dir+"/OUTCAR"+vrelax[irelax]+XHOST.vext[iext])){
+            ok=FALSE;obb << ". error(unconverged)=OSZICAR"+vrelax[irelax]+".EXT";continue;
+          }
+        }
+      }
+    }
+    //CO20210315 STOP - test for convergence
+
     // DONE
     if(ok==TRUE) obb << " good";
     if(ok==FALSE) obb << " bad";

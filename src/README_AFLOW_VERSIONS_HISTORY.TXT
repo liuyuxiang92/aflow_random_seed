@@ -35,6 +35,8 @@
         -- added AFLOW_monitor_VASP() (CO)
         -- added aurostd::ProcessKill() (CO)
         -- added AFLOW_monitor_VASP() support for LOCK files vs. directory input (CO)
+        -- adding GetCatCommand() (CO)
+        -- adding convergence test for --xplug (CO)
 3.2.8 - 2021/02/22
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.8.tar.xz
         -- lib2raw bug fixes (CO)

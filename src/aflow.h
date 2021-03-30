@@ -3007,10 +3007,10 @@ namespace KBIN {
   void VASP_Recycle(_xvasp xvasp,int relax_number);
   void VASP_RecycleExtraFile(_xvasp xvasp,string xfile,string relax);
   void VASP_RecycleExtraFile(_xvasp xvasp,string xfile,int relax_number);
-  uint VASP_getNELM(const string& dir); //CO20200624
-  uint VASP_getNSTEPS(const string& dir);  //CO20200624
+  uint VASP_getNELM(const string& outcar); //CO20200624
+  uint VASP_getNSTEPS(const string& oszicar);  //CO20200624
   bool VASP_OSZICARUnconverging(const string& dir,uint cutoff=3);
-  bool VASP_OSZICARUnconverged(const string& dir);
+  bool VASP_OSZICARUnconverged(const string& oszicar,const string& outcar);
   void GetStatDiel(string& outcar, xvector<double>& eigr, xvector<double>& eigi); // CAMILO
   void GetDynaDiel(string& outcar, xvector<double>& eigr, xvector<double>& eigi); // CAMILO
   string OUTCAR2VASPVersion(const string& outcar);  //CO20210315
