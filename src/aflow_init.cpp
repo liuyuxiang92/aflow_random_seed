@@ -1927,11 +1927,16 @@ void AFLOW_monitor_VASP(const string& directory){
   xvasp.Directory=aflags.Directory; //arun_directory;
   AVASP_populateXVASP(aflags,kflags,vflags,xvasp);
 
+  //a note about xmonitor: it only controls the amount of output to the LOCK file, it does NOT affect performance
+
   int nloop=1;
+  uint i=0;
+  uint nexecuting=0,nexecuting_old=0;
   uint sleep_seconds=MONITOR_VASP_SLEEP;
   uint sleep_seconds_afterkill=sleep_seconds;
-  aurostd::xoption xmessage,xwarning; //xfixed; //not needed (yet)
-  bool VERBOSE=true;
+  aurostd::xoption xmessage,xwarning,xmonitor; //xfixed; //not needed (yet)
+  bool VERBOSE=false;
+  vector<string> vlines;
   
   string& vasp_bin=kflags.KBIN_MPI_BIN;
   if(kflags.KBIN_MPI==FALSE){vasp_bin=kflags.KBIN_BIN;}
@@ -1942,8 +1947,21 @@ void AFLOW_monitor_VASP(const string& directory){
       message << "program \"" << vasp_bin << "\" is " << (aurostd::ProcessRunning(vasp_bin)?"":"NOT ") << "running";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
     }
 
+    if(aurostd::FileExist(aflags.Directory+"/"+_AFLOWLOCK_)){ //determine whether we need to clear xmonitor with new vasp instance (relax1->relax2)
+      nexecuting=0;
+      aurostd::file2vectorstring(aflags.Directory+"/"+_AFLOWLOCK_,vlines);
+      for(i=0;i<vlines.size();i++){
+        if(vlines[i].find(EXECUTION_KEYWORD_VASP)==string::npos){continue;}
+        nexecuting++;
+      }
+      if(nexecuting!=nexecuting_old){
+        xmonitor.clear(); //new run, clear IGNORE_WARNINGS //we've transitioned from relax1->relax2, etc.
+        nexecuting_old=nexecuting;
+      }
+    }
+
     //check vasp.out here
-    KBIN::VASP_ProcessWarnings(xvasp,aflags,kflags,xmessage,xwarning,FileMESSAGE);
+    KBIN::VASP_ProcessWarnings(xvasp,aflags,kflags,xmessage,xwarning,xmonitor,FileMESSAGE);
 
     bool kill_vasp=false;
     if(xwarning.flag()){  //if any flag is on
@@ -1956,6 +1974,7 @@ void AFLOW_monitor_VASP(const string& directory){
       if(XHOST.vflag_control.flag("KILL_VASP_ALL")){
         message << "issuing kill command for: \""+vasp_bin+"\"";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
         aurostd::ProcessKill(vasp_bin);
+        xmonitor.clear(); //new run, clear IGNORE_WARNINGS
         message << "sleeping for " << sleep_seconds_afterkill << " seconds after kill command";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
         aurostd::Sleep(sleep_seconds_afterkill); //sleep at least a minute to let aflow sleep since OUTCAR is incomplete
       }else{  //to be developed

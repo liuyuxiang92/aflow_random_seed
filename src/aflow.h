@@ -154,6 +154,8 @@ namespace AFLOW_PTHREADS {
 extern string _AFLOWIN_; 
 extern string _AFLOWLOCK_; 
 
+const string EXECUTION_KEYWORD_VASP=" Executing: ";
+
 // --------------------------------------------------------------------------
 // definitions for aflow
 // aflow2 default definitions
@@ -2989,6 +2991,7 @@ namespace KBIN {
   bool VASP_ApplyPatch(const string& error,const string& fix,int& submode,_xvasp &xvasp,aurostd::xoption& xwarning,aurostd::xoption& xfixed,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE);  //CO20210315
   bool VASP_ApplyPatch(const string& error,const string& fix,int& submode,bool apply_once,_xvasp &xvasp,aurostd::xoption& xwarning,aurostd::xoption& xfixed,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE);  //CO20210315
   void VASP_ProcessWarnings(_xvasp &xvasp,_aflags &aflags,_kflags &kflags,aurostd::xoption& xmessage,aurostd::xoption& xwarning,ofstream &FileMESSAGE); //CO20210315
+  void VASP_ProcessWarnings(_xvasp &xvasp,_aflags &aflags,_kflags &kflags,aurostd::xoption& xmessage,aurostd::xoption& xwarning,aurostd::xoption& xmonitor,ofstream &FileMESSAGE); //CO20210315
   bool VASP_Run(_xvasp &xvasp,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE);
   bool VASP_Run(_xvasp &xvasp,_aflags &aflags,_kflags &kflags,_vflags &vflags,string relaxA,string relaxB,bool qmwrite,ofstream &FileMESSAGE);
   bool VASP_Run(_xvasp &xvasp,_aflags &aflags,_kflags &kflags,_vflags &vflags,string relaxA,bool qmwrite,ofstream &FileMESSAGE);
