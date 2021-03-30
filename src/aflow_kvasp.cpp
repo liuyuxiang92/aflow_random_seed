@@ -3645,7 +3645,7 @@ namespace KBIN {
           vasp_start=FALSE;
         }
       }
-      KBIN::WaitFinished(xvasp,aflags,FileMESSAGE,2,true);  //CO20201111 - try twice and verbose
+      KBIN::WaitFinished(xvasp,aflags,FileMESSAGE,2,false);  //CO20201111 - try twice and NO verbose, we verbose in bigger VASP_Run() loop
       if(LDEBUG){cerr << soliloquy << " [2]" << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
 
       if(aurostd::FileEmpty(xvasp.Directory+"/vasp.out"))  {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  ERROR "+soliloquy+" "+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_)+"  Empty vasp.out");return FALSE;}

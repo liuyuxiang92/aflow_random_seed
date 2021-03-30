@@ -1843,7 +1843,56 @@ double AFLOW_checkMEMORY(const string& progname,double memory) {
 // ***************************************************************************
 // AFLOW_monitor_VASP
 // ***************************************************************************
-void AFLOW_monitor_VASP(uint sleep_seconds){
+void AFLOW_monitor_VASP(){
+  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  string soliloquy=XPID+"AFLOW_monitor_VASP():";
+
+  if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
+
+  string directory="";
+
+  if(XHOST.vflag_control.flag("FILE")){
+    uint nfailures=0,nsuccesses=0;  //nfailures waits for file to be written, nsuccesses makes sure we didn't run out of directories
+    string file=XHOST.vflag_control.getattachedscheme("FILE");
+    vector<string> vlines,vtokens;
+    uint i=0,j=0;
+    bool found=false;
+    string search_str="[dir=";
+    string directory_old="";
+    while(nfailures<10 && nsuccesses<10){  //10 minutes, keeps us from wasting walltime
+      if(!aurostd::FileExist(file)){
+        nfailures++;  //increment, only wait 10 minutes for a file to be written
+        aurostd::Sleep(MONITOR_VASP_SLEEP);
+        continue;
+      }
+      nfailures=0;  //reset
+      aurostd::file2vectorstring(file,vlines);
+      found=false;
+      for(i=vlines.size()-1;i<vlines.size()&&!found;i--){ //go backwards
+        //looking for "... - [dir=.] - [user=aflow] ..."
+        if(vlines[i].find(search_str)==string::npos){continue;}
+        aurostd::string2tokens(vlines[i],vtokens," ");
+        for(j=0;j<vtokens.size()&&!found;j++){
+          if(vtokens[j].find(search_str)==string::npos){continue;}
+          directory=vtokens[j];
+          aurostd::StringSubst(directory,search_str,"");aurostd::StringSubst(directory,"]","");
+          if(directory!=directory_old){directory_old=directory;nsuccesses=0;}
+          else{nsuccesses++;} //increment, only wait 10 minutes for a new directory to be found
+          AFLOW_monitor_VASP(directory);
+          found=true;
+        }
+      }
+      aurostd::Sleep(MONITOR_VASP_SLEEP);
+    }
+  }
+  else if(XHOST.vflag_control.flag("DIRECTORY_CLEAN")){
+    directory=XHOST.vflag_control.getattachedscheme("DIRECTORY_CLEAN");
+    return AFLOW_monitor_VASP(directory);
+  }
+  else{throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"no directory input provided",_INPUT_ILLEGAL_);}
+}
+
+void AFLOW_monitor_VASP(const string& directory){
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   string soliloquy=XPID+"AFLOW_monitor_VASP():";
   stringstream message;
@@ -1852,8 +1901,9 @@ void AFLOW_monitor_VASP(uint sleep_seconds){
 
   //aflags
   _aflags aflags;
-  if(XHOST.vflag_control.flag("DIRECTORY_CLEAN")){aflags.Directory=XHOST.vflag_control.getattachedscheme("DIRECTORY_CLEAN");} //CO20190402
-  if(aflags.Directory.empty() || aflags.Directory=="./" || aflags.Directory=="."){aflags.Directory=aurostd::getPWD()+"/";} //".";  //CO20180220 //[CO20191112 - OBSOLETE]aurostd::execute2string(XHOST.command("pwd"))
+  aflags.Directory=directory;
+  if(directory.empty()){return;} //throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"directory input is empty",_INPUT_ILLEGAL_);
+  if(!aurostd::FileExist(aflags.Directory+"/"+_AFLOWIN_)){return;}
 
   //output objects
   ofstream FileMESSAGE;
@@ -1878,7 +1928,8 @@ void AFLOW_monitor_VASP(uint sleep_seconds){
   AVASP_populateXVASP(aflags,kflags,vflags,xvasp);
 
   int nloop=1;
-  uint sleep_seconds_afterkill=60;
+  uint sleep_seconds=MONITOR_VASP_SLEEP;
+  uint sleep_seconds_afterkill=sleep_seconds;
   aurostd::xoption xmessage,xwarning; //xfixed; //not needed (yet)
   bool VERBOSE=true;
   

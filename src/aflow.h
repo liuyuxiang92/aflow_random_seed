@@ -1078,7 +1078,8 @@ string aflow_convert_time_ctime2aurostd(const string& time_LOCK); //CO20200624
 string aflow_get_time_string_short(void);
 // [OBSOLETE] string strPID(void);
 
-void AFLOW_monitor_VASP(uint sleep_seconds=60);  //CO20210315
+void AFLOW_monitor_VASP();  //CO20210315
+void AFLOW_monitor_VASP(const string& directory);  //CO20210315
 
 string Message(const string& list2print="");  //CO20200713
 string Message(const string& list2print,const string& filename);  //CO20200713
