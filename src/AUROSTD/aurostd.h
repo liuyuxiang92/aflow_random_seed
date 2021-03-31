@@ -385,10 +385,10 @@ namespace aurostd {
   //about cleaning up strings
   bool RemoveControlCodeCharactersFromString(const string& in, string& out); //DX20190516  //CO20190620
   bool RemoveControlCodeCharactersFromStringstream(std::stringstream& ss_in, std::stringstream& ss_out); //DX20190516
-  bool RemoveControlCodeCharactersFromFile(string directory, string filename, bool keep_orig_file=true); //DX20190516
+  bool RemoveControlCodeCharactersFromFile(const string& directory,const string& filename, bool keep_orig_file=true); //DX20190516
   bool isNullByte(char c); //DX20190131
   string removeNullBytes(string in); //DX20190131
-  bool RemoveBinaryCharactersFromFile(string directory, string filename); //DX20190211
+  bool RemoveBinaryCharactersFromFile(const string& directory,const string& filename); //DX20190211 //CO20210315
   string CleanStringASCII(const string& s) __xprototype;
   string CleanStringASCII_20190712(const string& s) __xprototype; //CO20190712
   string CleanStringASCII_20190101(const string& s) __xprototype; //CO20190712
@@ -435,6 +435,8 @@ namespace aurostd {
   bool SubDirectoryLS(const string& _Directory,vector<string>& vsubd);  //CO20200731
   bool DirectoryLS(const string& Directory,vector<string> &vfiles);
   bool DirectoryLS(const string& Directory,deque<string> &vfiles);
+  string dirname(const string& _file);  //CO20210315
+  string basename(const string& _file); //CO20210315
   bool DirectoryLocked(string directory,string="LOCK");
   bool DirectorySkipped(string directory);
   bool DirectoryWritable(string directory);

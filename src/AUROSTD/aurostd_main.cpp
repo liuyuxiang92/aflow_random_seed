@@ -1047,7 +1047,7 @@ namespace aurostd {
   // ***************************************************************************
   // Function RemoveControlCodeCharactersFromFile
   // ***************************************************************************
-  bool RemoveControlCodeCharactersFromFile(string directory, string filename, bool keep_orig_file){
+  bool RemoveControlCodeCharactersFromFile(const string& directory,const string& filename, bool keep_orig_file){  //CO20210315
 
     // removes control code and backspace characters (e.g., NUL, DEL, etc.)
     // overwrites file if control characters are detected, otherwise the file is untouched (preserve original timestamp)
@@ -1111,7 +1111,7 @@ namespace aurostd {
   // Function RemoveBinaryCharactersFromFile()
   // ***************************************************************************
   // Remove all null bytes in file
-  bool RemoveBinaryCharactersFromFile(string directory, string filename){
+  bool RemoveBinaryCharactersFromFile(const string& directory,const string& filename){  //CO20210315
     stringstream aus_exec;
     deque<string> vext; aurostd::string2tokens(".bz2,.xz,.gz",vext,",");vext.push_front(""); // cheat for void string
     deque<string> vcmd; aurostd::string2tokens("cat,bzcat,xzcat,gzcat",vcmd,",");
@@ -1786,6 +1786,32 @@ namespace aurostd {
     bool run=DirectoryLS(_Directory,_vfiles);
     vfiles=aurostd::vector2deque(_vfiles);
     return run;
+  }
+  
+  // ***************************************************************************
+  // Function dirname
+  // ***************************************************************************
+  // CO20210315
+  // Returns the dirname of file
+  string dirname(const string& _file) {
+    string file=CleanFileName(file);
+    if(!aurostd::FileExist(file)){return "";}
+    if(file.find('/')==string::npos){return ".";}
+    string::size_type loc=file.find_last_of('/');
+    return file.substr(0,loc);
+  }
+  
+  // ***************************************************************************
+  // Function basename
+  // ***************************************************************************
+  // CO20210315
+  // Returns the dirname of file
+  string basename(const string& _file) {
+    string file=CleanFileName(file);
+    if(!aurostd::FileExist(file)){return "";}
+    if(file.find('/')==string::npos){return file;}
+    string::size_type loc=file.find_last_of('/');
+    return file.substr(loc);
   }
 
   // ***************************************************************************

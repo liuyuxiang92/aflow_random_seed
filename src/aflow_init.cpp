@@ -1939,7 +1939,7 @@ void AFLOW_monitor_VASP(const string& directory){
   vector<string> vlines;
   
   string& vasp_bin=kflags.KBIN_MPI_BIN;
-  if(kflags.KBIN_MPI==FALSE){vasp_bin=kflags.KBIN_BIN;}
+  if(!(kflags.KBIN_MPI==true||XHOST.MPI==true)){vasp_bin=kflags.KBIN_BIN;}
 
   while(true){
     if(VERBOSE){

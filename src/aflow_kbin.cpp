@@ -363,7 +363,7 @@ namespace KBIN {
     aflags.AFLOW_MODE_QSUB_MODE3 = aurostd::args2flag(argv,"--qsub3|-qsub3");
 
     // [OBSOLETE]  MPI=aurostd::args2flag(argv,"--MPI|--mpi");  // ABSOLUTELY otherwise the multithreads kicks
-    aflags.AFLOW_FORCE_MPI = aurostd::args2flag(argv,"--MPI|--mpi");
+    aflags.AFLOW_FORCE_MPI = XHOST.MPI; //[CO20210315]aurostd::args2flag(argv,"--MPI|--mpi");
     aflags.AFLOW_FORCE_SERIAL = aurostd::args2flag(argv,"--nompi|-nompi|--serial|-serial");
     // [OBSOLETE]  aflags.AFLOW_GLOBAL_NCPUS=aurostd::args2utype(argv,"--np",(int) 0);
     aflags.AFLOW_GLOBAL_NCPUS=aurostd::args2attachedutype<int>(argv,"--np=",(int) 0);

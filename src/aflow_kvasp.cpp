@@ -2957,7 +2957,7 @@ namespace KBIN {
     //CO20210315 - determine if vasp is still running
     bool vasp_still_running=false; //CO20210315 - look at wording, very careful, this bool implies vasp WAS running, and now is not
     string& vasp_bin=kflags.KBIN_MPI_BIN;
-    if(kflags.KBIN_MPI==FALSE){vasp_bin=kflags.KBIN_BIN;}
+    if(!(kflags.KBIN_MPI==true||XHOST.MPI==true)){vasp_bin=kflags.KBIN_BIN;}
     if(XHOST.vflag_control.flag("KILL_VASP_ALL")){
       //KILL_VASP_ALL allows us to check for ANY instance of vasp running (assumes exclusivity in node environment)
       //we will develop more precise methods for tracking parent/child processes of aflow to target specific vasp instances in the future
