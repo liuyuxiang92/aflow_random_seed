@@ -154,7 +154,7 @@ namespace AFLOW_PTHREADS {
 extern string _AFLOWIN_; 
 extern string _AFLOWLOCK_; 
 
-const string EXECUTION_KEYWORD_VASP=" Executing: ";
+const string VASP_KEYWORD_EXECUTION=" Executing: ";
 
 // --------------------------------------------------------------------------
 // definitions for aflow

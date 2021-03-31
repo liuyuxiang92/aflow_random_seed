@@ -4987,15 +4987,15 @@ namespace aflowlib {
         }
       }
       for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed
-        fileA_LIB=directory_LIB+"/aflow.qmvasp.out"+XHOST.vext.at(iext);
-        fileA_RAW=directory_RAW+"/aflow.qmvasp.out"+XHOST.vext.at(iext);
+        fileA_LIB=directory_LIB+"/"+DEFAULT_AFLOW_QMVASP_OUT+XHOST.vext.at(iext);
+        fileA_RAW=directory_RAW+"/"+DEFAULT_AFLOW_QMVASP_OUT+XHOST.vext.at(iext);
         if(aurostd::FileExist(fileA_LIB)) {
-          aflowlib::LIB2RAW_FileNeeded(directory_LIB,"aflow.qmvasp.out"+XHOST.vext.at(iext),directory_RAW,"aflow.qmvasp.out"+XHOST.vext.at(iext),vfile,MESSAGE);
+          aflowlib::LIB2RAW_FileNeeded(directory_LIB,DEFAULT_AFLOW_QMVASP_OUT+XHOST.vext.at(iext),directory_RAW,DEFAULT_AFLOW_QMVASP_OUT+XHOST.vext.at(iext),vfile,MESSAGE);
         }
       }
       //     for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed
-      // no vasp.out.relax1  fileA_LIB=directory_LIB+"/vasp.out.relax1"+XHOST.vext.at(iext);fileA_RAW=directory_RAW+"/vasp.out.relax1"+XHOST.vext.at(iext);if(aurostd::FileExist(fileA_LIB)) { aflowlib::LIB2RAW_FileNeeded(directory_LIB,"vasp.out.relax1"+XHOST.vext.at(iext),directory_RAW,"vasp.out.relax1"+XHOST.vext.at(iext),vfile,MESSAGE); }
-      // no vasp.out.relax2  fileA_LIB=directory_LIB+"/vasp.out.relax2"+XHOST.vext.at(iext);fileA_RAW=directory_RAW+"/vasp.out.relax2"+XHOST.vext.at(iext);if(aurostd::FileExist(fileA_LIB)) { aflowlib::LIB2RAW_FileNeeded(directory_LIB,"vasp.out.relax2"+XHOST.vext.at(iext),directory_RAW,"vasp.out.relax2"+XHOST.vext.at(iext),vfile,MESSAGE); }
+      // no DEFAULT_VASP_OUT.relax1  fileA_LIB=directory_LIB+"/"+DEFAULT_VASP_OUT+".relax1"+XHOST.vext.at(iext);fileA_RAW=directory_RAW+"/"+DEFAULT_VASP_OUT+".relax1"+XHOST.vext.at(iext);if(aurostd::FileExist(fileA_LIB)) { aflowlib::LIB2RAW_FileNeeded(directory_LIB,DEFAULT_VASP_OUT+".relax1"+XHOST.vext.at(iext),directory_RAW,DEFAULT_VASP_OUT+".relax1"+XHOST.vext.at(iext),vfile,MESSAGE); }
+      // no DEFAULT_VASP_OUT.relax2  fileA_LIB=directory_LIB+"/"+DEFAULT_VASP_OUT+".relax2"+XHOST.vext.at(iext);fileA_RAW=directory_RAW+"/"+DEFAULT_VASP_OUT+".relax2"+XHOST.vext.at(iext);if(aurostd::FileExist(fileA_LIB)) { aflowlib::LIB2RAW_FileNeeded(directory_LIB,DEFAULT_VASP_OUT+".relax2"+XHOST.vext.at(iext),directory_RAW,DEFAULT_VASP_OUT+".relax2"+XHOST.vext.at(iext),vfile,MESSAGE); }
       // }
       if(_APENNSY_STYLE_OLD_) {
         for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed
@@ -6565,8 +6565,8 @@ namespace aflowlib {
     // TEST INCOMPLETE
     if(ok) { obb << ".";if(!aurostd::FileExist(dir+"/"+_AFLOWLOCK_)) { ok=FALSE;obb << " no=LOCK"; }}
     if(ok) { obb << ".";if(aurostd::FileExist(dir+"/EIGENVAL")) { ok=FALSE;obb << " yes=EIGENVAL"; }}
-    if(ok) { obb << ".";if(aurostd::FileExist(dir+"/vasp.out")) { ok=FALSE;obb << " yes=vasp.out"; }}
-    if(ok) { obb << ".";if(aurostd::FileExist(dir+"/aflow.qmvasp.out")) { ok=FALSE;obb << " yes=aflow.qmvasp.out"; }}
+    if(ok) { obb << ".";if(aurostd::FileExist(dir+"/"+DEFAULT_VASP_OUT)) { ok=FALSE;obb << " yes="+DEFAULT_VASP_OUT; }}
+    if(ok) { obb << ".";if(aurostd::FileExist(dir+"/"+DEFAULT_AFLOW_QMVASP_OUT)) { ok=FALSE;obb << " yes="+DEFAULT_AFLOW_QMVASP_OUT; }}
     if(ok) { obb << ".";if(aurostd::FileExist(dir+"/AECCAR0")) { ok=FALSE;obb << " yes=AECCAR0"; }}
     if(ok) { obb << ".";if(aurostd::FileExist(dir+"/AECCAR1")) { ok=FALSE;obb << " yes=AECCAR1"; }}
     if(ok) { obb << ".";if(aurostd::FileExist(dir+"/AECCAR2")) { ok=FALSE;obb << " yes=AECCAR2"; }}
@@ -6588,7 +6588,7 @@ namespace aflowlib {
       if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/aflow.pgroup.out")) { ok=FALSE;obb << " no=aflow.pgroup.out" << ".EXT"; }}
       if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/aflow.pgroup_xtal.out")) { ok=FALSE;obb << " no=aflow.pgroup_xtal.out" << ".EXT"; }}
       //[CO20210126 - LIB2RAW_Loop_PATCH() fixes this]if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/aflow.pseudopotential_auid.out")) { ok=FALSE;obb << " no=aflow.pseudopotential_auid.out" << ".EXT"; }}
-      if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/aflow.qmvasp.out")) { ok=FALSE;obb << " no=aflow.qmvasp.out" << ".EXT"; }}
+      if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/"+DEFAULT_AFLOW_QMVASP_OUT)) { ok=FALSE;obb << " no="+DEFAULT_AFLOW_QMVASP_OUT << ".EXT"; }}
       if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/INCAR.orig")) { ok=FALSE;obb << " no=INCAR.orig" << ".EXT"; }}
       //[CO20201111 - not needed]if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/POSCAR.orig")) { ok=FALSE;obb << " no=POSCAR.orig" << ".EXT"; }}
     }
@@ -6597,7 +6597,7 @@ namespace aflowlib {
       if(ok && aurostd::EFileExist(dir+"/OUTCAR"+vrelax[irelax])) { // relax1 relax2 relax3
         if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/OUTCAR"+vrelax[irelax])) { ok=FALSE;print=FALSE;obb << " no=OUTCAR"+vrelax[irelax]+".EXT"; }}
         if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/OSZICAR"+vrelax[irelax])) { ok=FALSE;obb << " no=OSZICAR"+vrelax[irelax]+".EXT"; }}
-        if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/vasp.out"+vrelax[irelax])) { ok=FALSE;obb << " no=vasp.out"+vrelax[irelax]+".EXT"; }}
+        if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/"+DEFAULT_VASP_OUT+vrelax[irelax])) { ok=FALSE;obb << " no="+DEFAULT_VASP_OUT+vrelax[irelax]+".EXT"; }}
         if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/INCAR"+vrelax[irelax])) { ok=FALSE;obb << " no=INCAR"+vrelax[irelax]+".EXT"; }}
         //      if(ok) { obb << ".";if(!aurostd::EFileExist(dir+"/EIGENVAL"+vrelax[irelax])) { ok=FALSE;obb << " no=EIGENVAL"+vrelax[irelax]+".EXT"; }}
         if(vrelax[irelax]==".static")
@@ -6613,11 +6613,11 @@ namespace aflowlib {
           }
         }
         obb << ".";
-        if(ok) { obb << "v"; // TEST VASP.OUT
+        if(ok) { obb << "v"; // TEST DEFAULT_VASP_OUT
           for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed
-            if(aurostd::FileExist(dir+"/vasp.out"+vrelax[irelax]+XHOST.vext[iext])) {
-              answer=aurostd::execute2utype<int>(XHOST.vcat[iext]+" \""+dir+"/vasp.out"+vrelax[irelax]+XHOST.vext[iext]+"\" | grep -c \"The distance between some ions is very small\" ");
-              if(answer!=0) { ok=FALSE;obb << ". ions=vasp.out"+vrelax[irelax]+".EXT"; }}
+            if(aurostd::FileExist(dir+"/"+DEFAULT_VASP_OUT+vrelax[irelax]+XHOST.vext[iext])) {
+              answer=aurostd::execute2utype<int>(XHOST.vcat[iext]+" \""+dir+"/"+DEFAULT_VASP_OUT+vrelax[irelax]+XHOST.vext[iext]+"\" | grep -c \"The distance between some ions is very small\" ");
+              if(answer!=0) { ok=FALSE;obb << ". ions="+DEFAULT_VASP_OUT+vrelax[irelax]+".EXT"; }}
           }
         }
         obb << ".";

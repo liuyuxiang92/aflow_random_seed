@@ -1892,6 +1892,28 @@ void AFLOW_monitor_VASP(){
   else{throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"no directory input provided",_INPUT_ILLEGAL_);}
 }
 
+string GetVASPBinaryFromLOCK(const string& directory){
+  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  string soliloquy=XPID+"GetVASPBinaryFromLOCK():";
+
+  if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
+
+  if(!aurostd::FileExist(directory+"/"+_AFLOWLOCK_)){return "";}
+
+  vector<string> vlines,vtokens;
+  aurostd::file2vectorstring(directory+"/"+_AFLOWLOCK_,vlines);
+
+  uint i=0,j=0;
+  for(i=0;i<vlines.size();i++){
+    if(vlines[i].find(VASP_KEYWORD_EXECUTION)==string::npos){continue;} //look for 'Executing:' line
+    aurostd::string2tokens(vlines[i],vtokens," ");
+    for(j=0;j<vtokens.size();j++){
+      //if(vtokens[j].find('')
+    }
+  }
+
+}
+
 void AFLOW_monitor_VASP(const string& directory){
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   string soliloquy=XPID+"AFLOW_monitor_VASP():";
@@ -1938,6 +1960,9 @@ void AFLOW_monitor_VASP(const string& directory){
   bool VERBOSE=false;
   vector<string> vlines;
   
+  //there are issues getting the correct vasp binary since this is an entirely different aflow instance
+  //we might run the other aflow instance with --mpi or --machine flags that affect which vasp binary we use
+  //therefore, the most robust way to define the binary is to search the LOCK file
   string& vasp_bin=kflags.KBIN_MPI_BIN;
   if(!(kflags.KBIN_MPI==true||XHOST.MPI==true)){vasp_bin=kflags.KBIN_BIN;}
 
@@ -1951,7 +1976,7 @@ void AFLOW_monitor_VASP(const string& directory){
       nexecuting=0;
       aurostd::file2vectorstring(aflags.Directory+"/"+_AFLOWLOCK_,vlines);
       for(i=0;i<vlines.size();i++){
-        if(vlines[i].find(EXECUTION_KEYWORD_VASP)==string::npos){continue;}
+        if(vlines[i].find(VASP_KEYWORD_EXECUTION)==string::npos){continue;}
         nexecuting++;
       }
       if(nexecuting!=nexecuting_old){
@@ -1960,7 +1985,7 @@ void AFLOW_monitor_VASP(const string& directory){
       }
     }
 
-    //check vasp.out here
+    //check vasp output file here
     KBIN::VASP_ProcessWarnings(xvasp,aflags,kflags,xmessage,xwarning,xmonitor,FileMESSAGE);
 
     bool kill_vasp=false;

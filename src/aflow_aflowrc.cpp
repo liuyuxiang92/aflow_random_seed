@@ -254,6 +254,8 @@
 #define         DEFAULT_VASP_PREC_EDIFFG                      XHOST.adefault.getattachedutype<double>("DEFAULT_VASP_PREC_EDIFFG")
 
 // OPTIONS // DONE
+#define AFLOWRC_DEFAULT_VASP_OUT                                      string("vasp.out")
+#define         DEFAULT_VASP_OUT                                      XHOST.adefault.getattachedscheme("DEFAULT_VASP_OUT")
 #define AFLOWRC_DEFAULT_VASP_EXTERNAL_INCAR                           string("./INCAR")
 #define         DEFAULT_VASP_EXTERNAL_INCAR                           XHOST.adefault.getattachedscheme("DEFAULT_VASP_EXTERNAL_INCAR")
 #define AFLOWRC_DEFAULT_VASP_EXTERNAL_POSCAR                          string("./POSCAR")
@@ -1309,6 +1311,7 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_VASP_PREC_EDIFFG",AFLOWRC_DEFAULT_VASP_PREC_EDIFFG);
 
     // OPTIONS
+    aflowrc::load_default("DEFAULT_VASP_OUT",AFLOWRC_DEFAULT_VASP_OUT);
     aflowrc::load_default("DEFAULT_VASP_EXTERNAL_INCAR",AFLOWRC_DEFAULT_VASP_EXTERNAL_INCAR);
     aflowrc::load_default("DEFAULT_VASP_EXTERNAL_POSCAR",AFLOWRC_DEFAULT_VASP_EXTERNAL_POSCAR);
     aflowrc::load_default("DEFAULT_VASP_EXTERNAL_POTCAR",AFLOWRC_DEFAULT_VASP_EXTERNAL_POTCAR);
@@ -1916,6 +1919,7 @@ namespace aflowrc {
 
     aflowrc << " " << endl;
     aflowrc << "// DEFAULTS OPTIONS " << endl;
+    aflowrc << "DEFAULT_VASP_OUT=" << AFLOWRC_DEFAULT_VASP_OUT << endl;
     aflowrc << "DEFAULT_VASP_EXTERNAL_INCAR=" << AFLOWRC_DEFAULT_VASP_EXTERNAL_INCAR << endl;
     aflowrc << "DEFAULT_VASP_EXTERNAL_POSCAR=" << AFLOWRC_DEFAULT_VASP_EXTERNAL_POSCAR << endl;
     aflowrc << "DEFAULT_VASP_EXTERNAL_POTCAR=" << AFLOWRC_DEFAULT_VASP_EXTERNAL_POTCAR << endl;
@@ -2501,6 +2505,7 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<double>(\"DEFAULT_VASP_PREC_EDIFFG\")=" << DEFAULT_VASP_PREC_EDIFFG << endl;
 
     if(LDEBUG) oss << "// DEFAULTS OPTIONS " << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_VASP_OUT\")=\"" << DEFAULT_VASP_OUT << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_VASP_EXTERNAL_INCAR\")=\"" << DEFAULT_VASP_EXTERNAL_INCAR << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_VASP_EXTERNAL_POSCAR\")=\"" << DEFAULT_VASP_EXTERNAL_POSCAR << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_VASP_EXTERNAL_POTCAR\")=\"" << DEFAULT_VASP_EXTERNAL_POTCAR << "\"" << endl;

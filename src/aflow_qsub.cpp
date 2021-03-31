@@ -121,8 +121,8 @@ namespace KBIN {
           aus << "[AFLOW_QSUB_FILE]    exit 1 " << endl;
           aus << "[AFLOW_QSUB_FILE]fi " << endl;
           aus << "[AFLOW_QSUB_FILE]# run " << endl;
-          aus << "[AFLOW_QSUB_FILE]rm -f vasp.out " << endl;
-          aus << "[AFLOW_QSUB_FILE]$PROG >> vasp.out " << endl;
+          aus << "[AFLOW_QSUB_FILE]rm -f " << DEFAULT_VASP_OUT << " " << endl;
+          aus << "[AFLOW_QSUB_FILE]$PROG >> " << DEFAULT_VASP_OUT << " " << endl;
           aus << "[AFLOW_QSUB_FILE]rm -f WAVECAR core " << endl;
           aus << "[AFLOW_QSUB_FILE]mv * $WDIR/ " << endl;
           aus << "[AFLOW_QSUB_FILE]cd $WDIR  " << endl;
@@ -158,8 +158,8 @@ namespace KBIN {
           aus << "    exit 1 " << endl;
           aus << "fi " << endl;
           aus << "# run " << endl;
-          aus << "rm -f vasp.out " << endl;
-          aus << "$PROG >> vasp.out " << endl;
+          aus << "rm -f " << DEFAULT_VASP_OUT << " " << endl;
+          aus << "$PROG >> " << DEFAULT_VASP_OUT << " " << endl;
           aus << "rm -f WAVECAR core " << endl;
           aus << "mv * $WDIR/ " << endl;
           aus << "cd $WDIR  " << endl;
@@ -292,8 +292,8 @@ namespace KBIN {
     xqsub.QSUB << "    exit 1 " << endl;
     xqsub.QSUB << "fi " << endl;
     xqsub.QSUB << "# run " << endl;
-    xqsub.QSUB << "rm -f vasp.out " << endl;
-    xqsub.QSUB << "$PROG >> vasp.out " << endl;
+    xqsub.QSUB << "rm -f " << DEFAULT_VASP_OUT << " " << endl;
+    xqsub.QSUB << "$PROG >> " << DEFAULT_VASP_OUT << " " << endl;
     xqsub.QSUB << "rm -f WAVECAR core " << endl;
     xqsub.QSUB << "mv * $WDIR/ " << endl;
     xqsub.QSUB << "cd $WDIR  " << endl;
@@ -344,7 +344,7 @@ namespace KBIN {
     // xqsub.QSUB << "#PBS -m abe " << endl;
     xqsub.QSUB << "#PBS -V " << endl;
     xqsub.QSUB << "PROG=~/bin/vasp46s " << endl;
-    xqsub.QSUB << "$PROG > vasp.out " << endl;
+    xqsub.QSUB << "$PROG > " << DEFAULT_VASP_OUT << " " << endl;
     xqsub.QSUB << "echo \"DONE\" > aflow.qsub.done " << endl;
     xqsub.QSUB << "exit 0  " << endl;
     xqsub.QSUB << "# automatic qsub by AFLOW " << endl;

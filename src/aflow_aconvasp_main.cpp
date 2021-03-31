@@ -3656,7 +3656,7 @@ namespace pflow {
     //  Change the suffixes of VASP files. Easy conversion between AFLOW format and VASP format. (KY20131222)
     //	Mnemonic: from2to with from/to =[n=none;r1=relax1;r2=relax2;r3=relax3;s=static;b=bands] or without abbreviations.
     vector<string> vfile,tokens;
-    aurostd::string2tokens("AECCAR0,AECCAR1,AECCAR2,INCAR,POSCAR,POTCAR,KPOINTS,CONTCAR,OUTCAR,EIGENVAL,DOSCAR,IBZKPT,OSZICAR,PCDAT,XDATCAR,CHG,CHGCAR,PROCAR,ELFCAR,WAVECAR,LOCPOT,vasprun.xml,vasp.out",vfile,",");
+    aurostd::string2tokens("AECCAR0,AECCAR1,AECCAR2,INCAR,POSCAR,POTCAR,KPOINTS,CONTCAR,OUTCAR,EIGENVAL,DOSCAR,IBZKPT,OSZICAR,PCDAT,XDATCAR,CHG,CHGCAR,PROCAR,ELFCAR,WAVECAR,LOCPOT,vasprun.xml,"+DEFAULT_VASP_OUT,vfile,",");
     aurostd::string2tokens(_operation,tokens,",");
     string directory,operation;
     if(tokens.size()==0) {directory="";operation=_operation;}

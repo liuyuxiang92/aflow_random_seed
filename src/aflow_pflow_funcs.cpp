@@ -944,7 +944,7 @@ namespace pflow {
       xvasp.AVASP_arun_runname=arun_dirname.str();
       AVASP_populateXVASP(aflags,kflags,vflags,xvasp);
 
-      FileName=xvasp.Directory + "/" + string("aflow.qmvasp.out");
+      FileName=xvasp.Directory + "/" + DEFAULT_AFLOW_QMVASP_OUT;
       if(LDEBUG){cerr << soliloquy << " looking for: " << FileName << endl;}
       if(!aurostd::EFileExist(FileName)){all_vasp_done=false;break;}
       shear_fraction+=step_size;
@@ -1292,7 +1292,7 @@ namespace pflow {
     AVASP_populateXVASP(aflags,kflags,vflags,xvasp);
 
     all_vasp_done=true;
-    FileName=xvasp.Directory + "/" + string("aflow.qmvasp.out");
+    FileName=xvasp.Directory + "/" + DEFAULT_AFLOW_QMVASP_OUT;
     if(LDEBUG){cerr << soliloquy << " looking for: " << FileName << endl;}
     if(!aurostd::EFileExist(FileName)){all_vasp_done=false;}
 
@@ -1492,7 +1492,7 @@ namespace pflow {
     AVASP_populateXVASP(aflags,kflags,vflags,xvasp);
 
     all_vasp_done=true;
-    FileName=xvasp.Directory + "/" + string("aflow.qmvasp.out");
+    FileName=xvasp.Directory + "/" + DEFAULT_AFLOW_QMVASP_OUT;
     if(LDEBUG){cerr << soliloquy << " looking for: " << FileName << endl;}
     if(!aurostd::EFileExist(FileName)){all_vasp_done=false;}
 

@@ -5373,8 +5373,8 @@ namespace KBIN {
 
 namespace KBIN {
   void XVASP_Afix_Clean(const _xvasp& xvasp,const string& preserve_name) {
-    aurostd::file2file(xvasp.Directory+"/vasp.out",xvasp.Directory+"/"+preserve_name);
-    deque<string> vrem;aurostd::string2tokens("aflow.tmp,CHG,CONTCAR,DOSCAR,EIGENVAL,IBZKPT,OUTCAR,OSZICAR,PCDAT,WAVECAR,aflow.qsub*,XDATCAR,vasprun.xml,vasp.out,core*",vrem,",");
+    aurostd::file2file(xvasp.Directory+"/"+DEFAULT_VASP_OUT,xvasp.Directory+"/"+preserve_name);
+    deque<string> vrem;aurostd::string2tokens("aflow.tmp,CHG,CONTCAR,DOSCAR,EIGENVAL,IBZKPT,OUTCAR,OSZICAR,PCDAT,WAVECAR,aflow.qsub*,XDATCAR,vasprun.xml,"+DEFAULT_VASP_OUT+",core*",vrem,",");
     for (uint i=0;i<vrem.size();i++)
       aurostd::RemoveFile(xvasp.Directory+"/"+vrem.at(i));
     if(!xvasp.aopts.flag("FLAG::CHGCAR_PRESERVED")) aurostd::RemoveFile(xvasp.Directory+"/CHGCAR"); 
@@ -5491,8 +5491,8 @@ namespace KBIN {
 //[CO20210315 - OBSOLETE]    xvasp.INCAR.str(std::string()); xvasp.INCAR << aurostd::file2string(xvasp.Directory+"/INCAR");
 //[CO20210315 - OBSOLETE]    // clean to restart ----------------------------------    
 //[CO20210315 - OBSOLETE]    XVASP_Afix_Clean(xvasp,"aflow.error.rotmat"); //CO20200624
-//[CO20210315 - OBSOLETE]    //[CO20200624 - OBSOLETE]aurostd::execute("cat "+xvasp.Directory+"/vasp.out >> "+xvasp.Directory+"/aflow.error.rotmat");
-//[CO20210315 - OBSOLETE]    //[CO20200624 - OBSOLETE]deque<string> vrem;aurostd::string2tokens("aflow.tmp,CHG,CONTCAR,DOSCAR,EIGENVAL,IBZKPT,OUTCAR,OSZICAR,PCDAT,WAVECAR,aflow.qsub*,XDATCAR,vasprun.xml,vasp.out,core*",vrem,",");
+//[CO20210315 - OBSOLETE]    //[CO20200624 - OBSOLETE]aurostd::execute("cat "+xvasp.Directory+"/"+DEFAULT_VASP_OUT+" >> "+xvasp.Directory+"/aflow.error.rotmat");
+//[CO20210315 - OBSOLETE]    //[CO20200624 - OBSOLETE]deque<string> vrem;aurostd::string2tokens("aflow.tmp,CHG,CONTCAR,DOSCAR,EIGENVAL,IBZKPT,OUTCAR,OSZICAR,PCDAT,WAVECAR,aflow.qsub*,XDATCAR,vasprun.xml,"+DEFAULT_VASP_OUT+",core*",vrem,",");
 //[CO20210315 - OBSOLETE]    //[CO20200624 - OBSOLETE]for (uint i=0;i<vrem.size();i++)
 //[CO20210315 - OBSOLETE]    //[CO20200624 - OBSOLETE]  aurostd::RemoveFile(xvasp.Directory+"/"+vrem.at(i));
 //[CO20210315 - OBSOLETE]    //[CO20200624 - OBSOLETE]if(!xvasp.aopts.flag("FLAG::CHGCAR_PRESERVED")) aurostd::RemoveFile(xvasp.Directory+"/CHGCAR");
@@ -5657,9 +5657,9 @@ namespace KBIN {
     //[CO20210315 - OBSOLETE]E(2)=DEFAULT_EFIELD_PEAD;
     //[CO20210315 - OBSOLETE]E(3)=DEFAULT_EFIELD_PEAD;
     //[CO20210315 - OBSOLETE]vector<string> tokens;
-    //[CO20210315 - OBSOLETE]// from vasp.out
+    //[CO20210315 - OBSOLETE]// from vasp output file
     //[CO20210315 - OBSOLETE]if(0) for(uint i=1;i<=3;i++) {
-    //[CO20210315 - OBSOLETE]  aurostd::string2tokens(aurostd::execute2string("cat "+xvasp.Directory+"/vasp.out | grep E_g/N_"+aurostd::utype2string(i)),tokens,">");
+    //[CO20210315 - OBSOLETE]  aurostd::string2tokens(aurostd::execute2string("cat "+xvasp.Directory+"/"+DEFAULT_VASP_OUT+" | grep E_g/N_"+aurostd::utype2string(i)),tokens,">");
     //[CO20210315 - OBSOLETE]  if(tokens.size()>0) {
     //[CO20210315 - OBSOLETE]    aurostd::string2tokens(string(tokens.at(1)),tokens,"=");
     //[CO20210315 - OBSOLETE]    if(tokens.size()>0) E(i)=aurostd::string2utype<double>(tokens.at(1));
@@ -6001,9 +6001,9 @@ namespace KBIN {
       //START - one-off solution for memory
       if(Krun){
         stringstream command("");
-        command << "cat " << xvasp.Directory << "/vasp.out | grep AFLOW > " << xvasp.Directory << "/" << DEFAULT_AFLOW_MEMORY_OUT << endl;
-        command << "cat " << xvasp.Directory << "/vasp.out | grep AFLOW > " << xvasp.Directory << "/SKIP" << endl;	
-        command << "cat " << xvasp.Directory << "/vasp.out | grep AFLOW >> " << xvasp.Directory << DEFAULT_AFLOW_ERVASP_OUT << endl;	
+        command << "cat " << xvasp.Directory << "/" << DEFAULT_VASP_OUT << " | grep AFLOW > " << xvasp.Directory << "/" << DEFAULT_AFLOW_MEMORY_OUT << endl;
+        command << "cat " << xvasp.Directory << "/" << DEFAULT_VASP_OUT << " | grep AFLOW > " << xvasp.Directory << "/SKIP" << endl;	
+        command << "cat " << xvasp.Directory << "/" << DEFAULT_VASP_OUT << " | grep AFLOW >> " << xvasp.Directory << DEFAULT_AFLOW_ERVASP_OUT << endl;	
         aurostd::execute(command);
       }
       //END - one-off solution for memory

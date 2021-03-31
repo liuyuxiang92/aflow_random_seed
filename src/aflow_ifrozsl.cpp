@@ -301,9 +301,9 @@ namespace FROZSL {
       for(uint i=0;i<vdirectories.size();i++) {
         // cout << vdirectories.at(i) << "hihi" << endl;
         for(uint iext=0;iext<XHOST.vext.size();iext++) {
-          if(aurostd::FileExist(aflags.Directory+"/ARUN."+vdirectories.at(i)+"/aflow.qmvasp.out"+XHOST.vext.at(iext)+"")) {
-            vfiles.push_back("./ARUN."+vdirectories.at(i)+"/aflow.qmvasp.out"+XHOST.vext.at(iext)+"");
-            vcommands.push_back(XHOST.vcat.at(iext)+" "+aflags.Directory+"/ARUN."+vdirectories.at(i)+"/aflow.qmvasp.out"+XHOST.vext.at(iext)+""+" | grep \"H=\"");// >> aflow.frozsl.out");
+          if(aurostd::FileExist(aflags.Directory+"/ARUN."+vdirectories.at(i)+"/"+DEFAULT_AFLOW_QMVASP_OUT+XHOST.vext.at(iext)+"")) {
+            vfiles.push_back("./ARUN."+vdirectories.at(i)+"/"+DEFAULT_AFLOW_QMVASP_OUT+XHOST.vext.at(iext)+"");
+            vcommands.push_back(XHOST.vcat.at(iext)+" "+aflags.Directory+"/ARUN."+vdirectories.at(i)+"/"+DEFAULT_AFLOW_QMVASP_OUT+XHOST.vext.at(iext)+""+" | grep \"H=\"");// >> aflow.frozsl.out");
           }
         }
       }

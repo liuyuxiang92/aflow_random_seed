@@ -594,6 +594,11 @@ DEFAULT_VASP_PREC_EDIFFG
 ####################################################################################################
 DEFAULTS OPTIONS
 
+DEFAULT_VASP_OUT
+  description: Filename for vasp output.
+  type: string
+  default: vasp.out
+
 DEFAULT_VASP_EXTERNAL_INCAR
   description: File to load in as default VASP INCAR.
   type: string
