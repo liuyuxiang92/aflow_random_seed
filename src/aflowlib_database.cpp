@@ -98,6 +98,7 @@ namespace aflowlib {
     database_file = db_file;
     if (LDEBUG) std::cerr << "AflowDB: reading database" << std::endl;
     open(SQLITE_OPEN_READONLY);
+    initializeExtraSchema();
   }
 
   // Open the database for write access
@@ -110,9 +111,10 @@ namespace aflowlib {
     if (LDEBUG) {
       std::cerr << "AflowDB: Database file: " << database_file << std::endl;
       std::cerr << "AflowDB: Data path: " << data_path << std::endl;
-      std::cerr << "AflowDB:: Lock file: " << lock_file << std::endl;
+      std::cerr << "AflowDB: Lock file: " << lock_file << std::endl;
     }
     open();
+    initializeExtraSchema();
   }
 
   // Copy constructors
@@ -125,13 +127,13 @@ namespace aflowlib {
     return *this;
   }
 
-
   void AflowDB::copy(const AflowDB& that) {
     if (this == &that) return;
     xStream::copy(that);
     data_path = that.data_path;
     database_file = that.database_file;
     lock_file = that.lock_file;
+    vschema_extra = that.vschema_extra;
     // Two databases should never operate on a temporary
     // file or have write access at the same time.
     is_tmp = false;
@@ -148,6 +150,7 @@ namespace aflowlib {
     data_path = "";
     database_file = "";
     lock_file = "";
+    veschema_extra.clear();
     is_tmp = false;
   }
 
@@ -181,6 +184,12 @@ namespace aflowlib {
       message += " (SQL code " + aurostd::utype2string<int>(sql_code) + ").";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
+  }
+
+  void AFlowDB::initializeExtraSchema() {
+    vschema_extra.clear();
+    vschema_extra.push_attached("SCHEMA::NAME::ALLOY", "alloy");
+    vschema_extra.push_attached("SCHEMA::NAME::ALLOY", "string");
   }
 
 }  // namespace aflowlib
@@ -699,7 +708,10 @@ namespace aflowlib {
     vector<string> keys = getSchemaKeys();
     uint nkeys = keys.size();
     vector<string> columns(nkeys);
-    for (uint k = 0; k < nkeys; k++) columns[k] = XHOST.vschema.getattachedscheme("SCHEMA::NAME:" + keys[k]);
+    for (uint k = 0; k < nkeys; k++) {
+      columns[k] = XHOST.vschema.getattachedscheme("SCHEMA::NAME:" + keys[k]);
+      if (columns[k].empty()) columns[k] = vschema_extra.getattachedscheme("SCHEMA::NAME:" + keys[k]);
+    }
     vector<string> types = getDataTypes(columns, true);
 
     // Rebuild
@@ -772,7 +784,7 @@ namespace aflowlib {
 
     // Create indexes on important database properties
     vector<string> index_cols;
-    string indexes = "auid,aurl,catalog,compound,nspecies,Pearson_symbol_relax,spacegroup_relax";
+    string indexes = "alloy,auid,aurl,catalog,compound,nspecies,Pearson_symbol_relax,spacegroup_relax";
     aurostd::string2tokens(indexes, index_cols, ",");
     string index, index_expression;
     for (uint i = 0; i < index_cols.size(); i++) {
@@ -899,6 +911,13 @@ namespace aflowlib {
         keys.push_back(aurostd::tolower(key));
       }
     }
+    for (uint i = 0, n = vschema_extra.vxsghost.size(); i < n; i += 2) {
+      if(vschema_extra.vxsghost[i].find("::NAME:") != string::npos) {
+        key=aurostd::RemoveSubString(vschema_extra.vxsghost[i], "SCHEMA::NAME:");
+        // json keys are lower case
+        keys.push_back(aurostd::tolower(key));
+      }
+    }
     return keys;
   }
 
@@ -915,6 +934,7 @@ namespace aflowlib {
     for (uint k = 0; k < nkeys; k++) {
       // AUID has to be unique
       type = XHOST.vschema.getattachedscheme("SCHEMA::TYPE:" + aurostd::toupper(keys[k]));
+      if (type.empty()) type = vschema_extra.getattachedscheme("SCHEMA::TYPE:" + aurostd::toupper(keys[k]));
       if (unique && (keys[k] == "AUID")) {
         types[k] = "TEXT UNIQUE NOT NULL";
       } else if (type == "number") {
@@ -932,8 +952,21 @@ namespace aflowlib {
     string value = "", id = "";
     uint ncols = cols.size();
     vector<string> values(ncols, "NULL");
+    string species = "";  // For special key handling
     for (uint c = 0; c < ncols; c++) {
       value = extractJsonValueAflow(entry, cols[c]);
+
+      // Store for later
+      if (cols[c] == "species") species = value;
+
+      // If not found in the json, Check if column is part of the extra schema
+      // Only check if not found in case the json is part of a patch file
+      if (value.empty()) {
+        if ((cols[c] == "alloy") && (!species.empty())) {
+          for (uint i = 0; i < species.size(); i++) {
+            if (isalpha(species[i])) value += species[i];
+          }
+      }
       if (!value.empty() && (aurostd::toupper(value) != "NULL")) {
         if (types[c] != "REAL") values[c] = "'" + value + "'";
         else values[c] = value;
@@ -1066,9 +1099,8 @@ namespace aflowlib {
 
       // Add to totals
       total_stats.nentries += catalog_stats.nentries;
-      // Since we cannot determine which systems are in the ICSD but not
-      // in other catalogs, skip it for the system count. The error should
-      // be small though.
+      // Since we cannot determine which systems are in the ICSD but not in
+      // other catalogs, skip it for the system count. The error should be small.
       if (catalog_stats.catalog != "ICSD") total_stats.nsystems += catalog_stats.nsystems;
 
       // Columns
@@ -1129,7 +1161,7 @@ namespace aflowlib {
     std::sort(total_stats.species.begin(), total_stats.species.end());
 
     // Write everything now
-    ncatalogs = ncatalogs + 1; // Include totals now
+    ncatalogs = ncatalogs + 1; // Include totals
 
     string tab = "    ";
     std::stringstream json;
@@ -1476,6 +1508,107 @@ namespace aflowlib {
 
 }  // namespace aflowlib
 
+/******************************* GET ENTRIES ********************************/
+
+namespace aflowlib {
+
+  //getEntry//////////////////////////////////////////////////////////////////
+  // Returns all data for a specific AUID in the specified format
+  string AflowDB::getEntry(const string& auid, const filetype& ft) {
+    string entry = "";
+    if (auidInDatabase(auid)) {
+      string table = "auid_" + auid.substr(6,2);
+      string where = "auid='\"" + auid + "\"'";
+      vector<string> values = getRows(table, where)[0];
+      if (values.size() == 0) return "";  // Nothing found
+      vector<string> keys = getColumnNames(table);
+      uint nkeys = keys.size();
+      vector<string> keyval;
+      switch (ft) {
+        case json_ft:
+          for (uint i = 0; i < nkeys; i++) {
+            if (!values[i].empty()) {
+              keyval.push_back("\"" + keys[i] + "\":" + values[i]);
+            }
+          }
+          entry = "{" + aurostd::joinWDelimiter(keyval, ",") + "}";
+          break;
+        case aflow_ft:
+        default:
+          for (uint i = 0; i < nkeys; i++) {
+            if (!values[i].empty()) {
+              aurostd::StringSubst(values[i], "],[", ";");
+              aurostd::StringSubst(values[i], "[", "");
+              aurostd::StringSubst(values[i], "]", "");
+              aurostd::StringSubst(values[i], "\"", "");
+              keyval.push_back(keys[i] + "=" + values[i]);
+            }
+          }
+          entry = aurostd::joinWDelimiter(keyval, "|");
+      }
+    }
+    return entry;
+  }
+
+
+  //getEntryAentry////////////////////////////////////////////////////////////
+  // Returns the data of a specific auid as an _aflowlib_entry object
+  _aflowlib_entry AflowDB::getEntryAentry(const string& auid) {
+    _aflowlib_entry aentry;
+    string aflowout = getEntry(auid, aflow_ft);
+    if (!aflowout.empty()) aentry.Load(aflowout, *p_oss);
+    return aentry;
+  }
+
+  //getEntrySet///////////////////////////////////////////////////////////////
+  // Returns all data of a set of auid based on a search condition
+  vector<string > AflowDB::getEntrySet(const string& where, const filetype& ft) {
+    vector<vector<string> > data = getRowsMultiTables(where);
+    uint ndata = data.size();
+    vector<string> entries(ndata);
+    if (ndata > 0) {
+      vector<string> keys = getColumnNames("auid_00");
+      uint nkeys = keys.size();
+      vector<string> keyval;
+      for (uint i = 0; i < ndata; i++) {
+        keyval.clear();
+        switch (ft) {
+          case json_ft:
+            for (uint j = 0; j < nkeys; j++) {
+              if (!data[i][j].empty()) {
+                keyval.push_back("\"" + keys[j] + "\":" + data[i][j]);
+              }
+              entries[i] = "{" + aurostd::joinWDelimiter(keyval, ",") + "}";
+            }
+            break;
+          case aflow_ft:
+          default:
+            for (uint j = 0; j < nkeys; j++) {
+              if (!data[i][j].empty()) {
+                aurostd::StringSubst(data[i][j], "],[", ";");
+                aurostd::StringSubst(data[i][j], "[", "");
+                aurostd::StringSubst(data[i][j], "]", "");
+                aurostd::StringSubst(data[i][j], "\"", "");
+                keyval.push_back(keys[i] + "=" + data[i][j]);
+              }
+              entries[i] = aurostd::joinWDelimiter(keyval, "|");
+            }
+        }
+      }
+    }
+    return entries;
+  }
+
+  vector<_aflowlib_entry> AflowDB::getEntrySetAentry(const string& where) {
+    vector<_aflowlib_entry> aentries;
+    vector<string> aflowouts = getEntrySet(where, aflow_ft);
+    uint nentries = aflowouts.size();
+    for (uint i = 0; i < nentries; i++) aentries[i].Load(aflowouts[i], *p_oss);
+    return aentries;
+  }
+
+}
+
 /***************************** SQLite FUNCTIONS *****************************/
 
 // These functions are higher level SQLite functions that call functions of
@@ -1656,6 +1789,39 @@ namespace aflowlib {
     return columns;
   }
 
+  //getRows///////////////////////////////////////////////////////////////////
+  // Returns the rows for a specific where condition. If the where condition is
+  // ambiguous, the first row that fits the criteria will be returned.
+  vector<vector<string> > AflowDB::getRows(const string& table, const string& where) {
+    return getRows(db, table, where);
+  }
+
+  vector<vector<string> > AflowDB::getRows(sqlite3* cursor, const string& table, const string& where) {
+    string command = prepareSELECT(table, "", "*", where, 0, "");
+    return sql::SQLexecuteCommand2DVECTOR(cursor, command);
+  }
+
+  vector<vector<string> > AflowDB::getRowsMultiTables(const string& where) {
+    vector<string> tables = getTables();
+    return getRowsMultiTables(db, tables, where);
+  }
+
+  vector<vector<string> > AflowDB::getRowsMultiTables(sqlite3* cursor, const string& where) {
+    vector<string> tables = getTables();
+    return getRowsMultiTables(cursor, tables, where);
+  }
+
+  vector<vector<string> > AflowDB::getRowsMultiTables(const vector<string>& tables, const string& where) {
+    return getRowsMultiTables(db, tables, where);
+  }
+
+  vector<vector<string> > AflowDB::getRowsMultiTables(sqlite3* cursor, const vector<string>& tables, const string& where) {
+    uint ntables = tables.size();
+    vector<string> commands(ntables);
+    for (uint t = 0; t < ntables; t++) commands[t] = prepareSELECT(tables[t], "", "*", where);
+    return sql::SQLexecuteCommand2DVECTOR(cursor, aurostd::joinWDelimiter(commands, " UNION ALL "));
+  }
+
   //getValue//////////////////////////////////////////////////////////////////
   // Gets a value from a specific column. The row must be specified in the
   // where condition, or else it just takes the first value.
@@ -1667,6 +1833,7 @@ namespace aflowlib {
     string command = prepareSELECT(table, "", col, where, 0, "");
     return sql::SQLexecuteCommandSCALAR(cursor, command);
   }
+
 
   //getProperty///////////////////////////////////////////////////////////////
   // Gets a database property for a specific column.

@@ -119,19 +119,18 @@ namespace sql {
 
   int SQLcallbackVECTOR(void* data, int argc, char** argv, char** col) {
     if (_SQL_CALLBACK_DEBUG_) {
+      std::cout << "argc = " << argc << std::endl;
       for (int i = 0; i < argc; i++) {
         std::cerr << XPID << "sql::SQLcallbackVECTOR()[" << i << "]: " << col[i] << " = " << (argv[i]?argv[i]:"NULL") << std::endl;
       }
       std::cerr << std::endl;
     }
     vector<string>* vec = static_cast<vector<string>*>(data);
-    if (argc == 1) {
-      if (argv[0] != NULL) vec->push_back(string(argv[0]));
+    for (int i = 0; i < argc; i++) {
+      if (argv[i] != NULL) vec->push_back(string(argv[i]));
       else vec->push_back("");
-      return 0;
-    } else {
-      return 1;
     }
+    return 0;
   }
 
   int SQLcallback2DVECTOR(void* data, int argc, char** argv, char** col) {

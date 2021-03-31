@@ -560,10 +560,6 @@ namespace aflowlib {
       ~AflowDB();
       void clear();
 
-      string data_path;
-      string database_file;
-      string lock_file;
-
       bool isTMP();
 
       int rebuildDatabase(bool force_rebuild=false);
@@ -573,6 +569,13 @@ namespace aflowlib {
       int patchDatabase(const vector<string>&, bool check_timestamps=false);
       void analyzeDatabase(const string&);
 
+      string getEntry(const string&, const filetype&);
+      _aflowlib_entry getEntryAentry(const string&);
+      vector<string> getEntrySet(const string&, const filetype&);
+      vector<_aflowlib_entry> getEntrySetAentry(const string&);
+
+      vector<vector<string> > getEntrySetData(const string&);
+
       vector<string> getTables(const string& where="");
       vector<string> getTables(sqlite3*, const string& where="");
 
@@ -581,6 +584,12 @@ namespace aflowlib {
       vector<string> getColumnTypes(const string&);
       vector<string> getColumnTypes(sqlite3*, const string&);
 
+      vector<vector<string> > getRows(const string&, const string& where="");
+      vector<vector<string> > getRows(sqlite3*, const string&, const string& where="");
+      vector<vector<string> > getRowsMultiTables(const string& where="");
+      vector<vector<string> > getRowsMultiTables(sqlite3*, const string& where="");
+      vector<vector<string> > getRowsMultiTables(const vector<string>&, const string& where="");
+      vector<vector<string> > getRowsMultiTables(sqlite3*, const vector<string>&, const string& where="");
       string getValue(const string&, const string&, const string& where="");
       string getValue(sqlite3*, const string&, const string&, const string& where="");
       string getProperty(const string&, const string&, const string&, const string& where="");
@@ -602,6 +611,10 @@ namespace aflowlib {
 
       sqlite3* db;
       bool is_tmp;
+      aurostd::xoption vschema_extra;
+      string data_path;
+      string database_file;
+      string lock_file;
 
       void openTmpFile(int open_flags=SQLITE_OPEN_READWRITE|SQLITE_OPEN_CREATE|SQLITE_OPEN_FULLMUTEX, bool copy_original=false);
       bool closeTmpFile(bool force_copy=false, bool keep=false, bool nocopy=false);

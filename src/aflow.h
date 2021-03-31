@@ -56,6 +56,7 @@ enum filetype {   //CO20190629
   //GENERAL FILE TYPES
   txt_ft,         //general plain text
   json_ft,
+  aflow_ft,       //ME20210329 - aflowlib.out format
   csv_ft,
   latex_ft,
   gnuplot_ft,
