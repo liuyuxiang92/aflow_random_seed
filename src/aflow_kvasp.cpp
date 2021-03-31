@@ -4315,7 +4315,7 @@ namespace KBIN {
     stringstream command;
     command << aurostd::GetCatCommand(outcar) << " " << outcar << " | grep NELM | head -n 1 | cut -d ';' -f1 | cut -d '=' -f2 | awk '{print $1}'" << endl;
     string tmp=aurostd::execute2string(command);
-    if(LDEBUG){cerr << soliloquy << " NELM grep response=\"" << tmp << "\"" << endl;}
+    if(LDEBUG){cerr << soliloquy << " " << outcar << " NELM grep response=\"" << tmp << "\"" << endl;}
     int NELM=60;  //VASP default
     if(!tmp.empty() && aurostd::isfloat(tmp)){NELM=aurostd::string2utype<int>(tmp);}
     return NELM;
@@ -4326,7 +4326,7 @@ namespace KBIN {
     stringstream command;
     command << aurostd::GetCatCommand(oszicar) << " " << oszicar << " | grep ':' | tail -n 1 | cut -d ':' -f2 | awk '{print $1}'" << endl;
     string tmp=aurostd::execute2string(command);
-    if(LDEBUG){cerr << soliloquy << " NSTEPS grep response=\"" << tmp << "\"" << endl;}
+    if(LDEBUG){cerr << soliloquy << " " << oszicar << " NSTEPS grep response=\"" << tmp << "\"" << endl;}
     int NSTEPS=0;  //VASP default
     if(!tmp.empty() && aurostd::isfloat(tmp)){NSTEPS=aurostd::string2utype<int>(tmp);}
     return NSTEPS;

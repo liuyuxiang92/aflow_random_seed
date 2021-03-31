@@ -6672,7 +6672,7 @@ namespace aflowlib {
     for(uint irelax=0;irelax<vrelax.size();irelax++) {
       for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed
         if(aurostd::FileExist(dir+"/OSZICAR"+vrelax[irelax]+XHOST.vext[iext]) && aurostd::FileExist(dir+"/OUTCAR"+vrelax[irelax]+XHOST.vext[iext])) {
-          if(!KBIN::VASP_OSZICARUnconverged(dir+"/OSZICAR"+vrelax[irelax]+XHOST.vext[iext],dir+"/OUTCAR"+vrelax[irelax]+XHOST.vext[iext])){
+          if(KBIN::VASP_OSZICARUnconverged(dir+"/OSZICAR"+vrelax[irelax]+XHOST.vext[iext],dir+"/OUTCAR"+vrelax[irelax]+XHOST.vext[iext])){
             ok=FALSE;obb << ". error(unconverged)=OSZICAR"+vrelax[irelax]+".EXT";continue;
           }
         }
