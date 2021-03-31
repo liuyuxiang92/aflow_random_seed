@@ -1946,6 +1946,8 @@ void AFLOW_monitor_VASP(const string& directory){
   string FileNameLOCK=aflags.Directory+"/"+_AFLOWLOCK_+".monitor_vasp";
   FileMESSAGE.open(FileNameLOCK.c_str(),std::ios::out);
   ostream& oss=cout;if(true){oss.setstate(std::ios_base::badbit);}  //like NULL - cannot print to cout with two instances of aflow running
+      
+  message << aflow::Banner("BANNER_NORMAL");pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_RAW_);
 
   //aflow.in
   string AflowIn_file="",AflowIn="";
@@ -1985,7 +1987,7 @@ void AFLOW_monitor_VASP(const string& directory){
   string vasp_bin="";
   nloop=0;
   while((nloop++)<10 && vasp_bin.empty()){  //wait no more than 10 minutes for vasp bin to start up
-    vasp_bin=GetVASPBinaryFromLOCK(aflags.Directory+"/"+_AFLOWLOCK_);
+    vasp_bin=GetVASPBinaryFromLOCK(xvasp.Directory);
     if(vasp_bin.empty()){
       if(VERBOSE){message << "sleeping for " << sleep_seconds_afterkill << " seconds, waiting for \"" << vasp_bin << "\" to start running and " << _AFLOWLOCK_ << " to be written";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);}
       aurostd::Sleep(sleep_seconds_afterkill); //sleep at least a minute to let aflow startup
@@ -1993,12 +1995,13 @@ void AFLOW_monitor_VASP(const string& directory){
     }
     vasp_bin=aurostd::basename(vasp_bin); //remove director stuff
   }
+  if(vasp_bin.empty()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"no vasp binary found in "+xvasp.Directory+"/"+_AFLOWLOCK_,_RUNTIME_ERROR_);}
   message << "vasp_binary=" << vasp_bin;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
 
   nloop=0;
   n_not_running=0;
   while(n_not_running<10){  //wait no more than 10 minutes for vasp bin to start up (again)
-    if(!aurostd::FileExist(aflags.Directory+"/"+_AFLOWLOCK_)){break;} //we needed it above to get the vasp_bin
+    if(!aurostd::FileExist(xvasp.Directory+"/"+_AFLOWLOCK_)){break;} //we needed it above to get the vasp_bin
     
     vasp_running=aurostd::ProcessRunning(vasp_bin);
     if(VERBOSE){
@@ -2015,12 +2018,13 @@ void AFLOW_monitor_VASP(const string& directory){
     
     //determine whether we need to clear xmonitor with new vasp instance (relax1->relax2)
     nexecuting=0;
-    aurostd::file2vectorstring(aflags.Directory+"/"+_AFLOWLOCK_,vlines);  //we already checked above that it exists
+    aurostd::file2vectorstring(xvasp.Directory+"/"+_AFLOWLOCK_,vlines);  //we already checked above that it exists
     for(i=0;i<vlines.size();i++){
       if(vlines[i].find(VASP_KEYWORD_EXECUTION)==string::npos){continue;}
       nexecuting++;
     }
     if(nexecuting!=nexecuting_old){
+      message << "clearing xmonitor for new instance of \""+vasp_bin+"\"";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
       xmonitor.clear(); //new run, clear IGNORE_WARNINGS //we've transitioned from relax1->relax2, etc.
       nexecuting_old=nexecuting;
     }

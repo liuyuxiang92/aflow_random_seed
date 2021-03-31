@@ -2960,7 +2960,7 @@ namespace KBIN {
     //therefore, the most robust way to define the binary is to search the LOCK file
     //[CO20210315 - OBSOLETE]string& vasp_bin=kflags.KBIN_MPI_BIN;
     //[CO20210315 - OBSOLETE]if(!(kflags.KBIN_MPI==true||XHOST.MPI==true)){vasp_bin=kflags.KBIN_BIN;}
-    string vasp_bin=aurostd::basename(GetVASPBinaryFromLOCK(aflags.Directory+"/"+_AFLOWLOCK_));
+    string vasp_bin=aurostd::basename(GetVASPBinaryFromLOCK(xvasp.Directory));
     if(vasp_bin.empty()){ //rely on defaults here in case we're not running --monitor_vasp
       vasp_bin=kflags.KBIN_MPI_BIN;
       if(!(kflags.KBIN_MPI==true||XHOST.MPI==true)){vasp_bin=kflags.KBIN_BIN;}
@@ -3894,8 +3894,12 @@ namespace KBIN {
 namespace KBIN {
   void WaitFinished(_xvasp &xvasp,_aflags &aflags,ofstream &FileMESSAGE,uint max_count,bool verbose) {
     uint i=0;
+    uint sleep_seconds=VASP_CHECK_SLEEP;
+    if((max_count*sleep_seconds)>MONITOR_VASP_SLEEP){ //safety for --monitor_vasp
+      sleep_seconds=(uint)(max(3.0,((double)MONITOR_VASP_SLEEP/(double)max_count)-5.0)); //the max ensures we don't go below 0 (if MONITOR_VASP_SLEEP is too low)
+    }
     while((i++)<max_count && !KBIN::VASP_RunFinished(xvasp,aflags,FileMESSAGE,verbose)) {
-      aurostd::Sleep(VASP_CHECK_SLEEP); //CO20201111
+      aurostd::Sleep(sleep_seconds); //CO20201111
     }
   }
 } // namespace KBIN

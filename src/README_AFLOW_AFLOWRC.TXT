@@ -1743,7 +1743,7 @@ AFLOW_CORE_TEMPERATURE_REFRESH
   default: 5
 
 VASP_CHECK_SLEEP
-  description: Time (seconds) to wait for VASP to finish writing output files. Useful on clusters with NFS delays.
+  description: Time (seconds) to wait for VASP to finish writing output files. Useful on clusters with NFS delays. Twice this number should be less than MONITOR_VASP_SLEEP to run with --monitor_vasp.
   type: integer
   default: 15
 

@@ -726,6 +726,8 @@ int main(int _argc,char **_argv) {
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_FoldAtomsInCell|--FoldAtomsInCell_test")) {return (FoldAtomsInCellTest(cout)?0:1);}  //DX20210129
     if(!Arun && aurostd::args2flag(argv,cmds,"--test")) {
 
+      cerr << "bin=" << GetVASPBinaryFromLOCK("/home/aflow/work/jobs_submission/to_run/first_run/library/LIB2_WARNINGS/WARNINGS/SYMPREC/LIB2/LIB/CIr/303") << endl;
+
       cerr << "aurostd::dirname(\"PARK\")=" << aurostd::dirname("PARK") << endl;
       cerr << "aurostd::dirname(\"/home/corey/PARK\")=" << aurostd::dirname("/home/corey/PARK") << endl;
       cerr << "aurostd::dirname(\"/home/corey/PARK/\")=" << aurostd::dirname("/home/corey/PARK/") << endl;
