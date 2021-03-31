@@ -3195,6 +3195,7 @@ namespace KBIN {
     int nrun=0,maxrun=15;
     int fix_ROTMAT=0;
     int fix_EDDRMM=0;
+    int fix_NELM=0;
 
     // get CPUS from PBS/SLURM
     // string ausenv;
@@ -3752,7 +3753,7 @@ namespace KBIN {
         KBIN::VASP_ApplyPatch("MPICH139",false,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE); //apply_once==false: keep decreasing KPOINTS until it works
         KBIN::VASP_ApplyPatch("NATOMS",false,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE); //apply_once=false: keep increasing volume until it works
         KBIN::VASP_ApplyPatch("NBANDS",false,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE); //apply_once==false: keep increasing NBANDS until it works
-        KBIN::VASP_ApplyPatch("NELM",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
+        KBIN::VASP_ApplyPatch("NELM",fix_NELM,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
         KBIN::VASP_ApplyPatch("NPAR",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
         KBIN::VASP_ApplyPatch("NPARC",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
         KBIN::VASP_ApplyPatch("NPARN",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);

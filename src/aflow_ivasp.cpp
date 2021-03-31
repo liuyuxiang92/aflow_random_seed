@@ -6053,14 +6053,68 @@ namespace KBIN {
       if(Krun){aus << "MMMMM  MESSAGE applied fix NBANDS=" << param_int << " " << fix_str << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
     }
     else if(mode=="NELM") {
+      //VASP lectures on electronic convergence
       file_error="aflow.error.nelm";
-      if(Krun && VERBOSE){aus << "MMMMM  MESSAGE attempting fix NELM" << " " << fix_str << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
-      //START - load INCAR into xvasp, modify, then write out new INCAR
-      Krun=(Krun && VASP_Reread_INCAR(xvasp));  //preload incar
-      Krun=(Krun && KBIN::XVASP_Afix_GENERIC_NELM(xvasp,vflags,param_int));
-      Krun=(Krun && aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR"))); //write out incar
-      //END - load INCAR into xvasp, modify, then write out new INCAR
-      if(Krun && VERBOSE){aus << "MMMMM  MESSAGE attempting fix NELM=" << param_int << " " << fix_str << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+      if(submode==0){ //AMIX/BMIX fixes
+        if(Krun && VERBOSE){aus << "MMMMM  MESSAGE attempting fix AMIX/BMIX" << " " << fix_str << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+        //START - load INCAR into xvasp, modify, then write out new INCAR
+        Krun=(Krun && VASP_Reread_INCAR(xvasp));  //preload incar
+        if(Krun){
+          bool Krun1=true;if(aurostd::substring2bool(xvasp.INCAR,"AMIX=0.1",true)){Krun1=false;}  //remove whitespace
+          bool Krun2=true;if(aurostd::substring2bool(xvasp.INCAR,"BMIX=0.01",true)){Krun2=false;}  //remove whitespace
+          Krun=(Krun && (Krun1 || Krun2));
+        }
+        if(Krun){
+          //REMOVE LINES
+          KBIN::XVASP_INCAR_REMOVE_ENTRY(xvasp,"AMIX,BMIX",operation,vflags.KBIN_VASP_INCAR_VERBOSE,false,false); //CO20200624 - do not preload or rewrite incar
+          //ADD LINES
+          if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << " # Performing " << operation << " [AFLOW] start" << endl;
+          xvasp.INCAR << aurostd::PaddedPOST("AMIX=0.1",_incarpad_) << " # " << operation << endl; //CO20200624
+          xvasp.INCAR << aurostd::PaddedPOST("BMIX=0.01",_incarpad_) << " # " << operation << endl; //CO20200624
+          if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << " # Performing " << operation << " [AFLOW] end" << endl;
+        }
+        Krun=(Krun && aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR"))); //write out incar
+        //END - load INCAR into xvasp, modify, then write out new INCAR
+        if(Krun && VERBOSE){aus << "MMMMM  MESSAGE attempting fix AMIX=0.1 BMIX=0.01" << " " << fix_str << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+        if(!Krun){Krun=true;submode++;} //reset and go to the next solution
+      }
+      //else if(submode==1) //DO NOT USE else if, we may change submode inside
+      if(submode==1){ //BMIX/AMIN fixes
+        //CO20210315 - not sure if we need to remove previously applied AMIX (submode==0)
+        if(Krun && VERBOSE){aus << "MMMMM  MESSAGE attempting fix BMIX/AMIN" << " " << fix_str << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+        //START - load INCAR into xvasp, modify, then write out new INCAR
+        Krun=(Krun && VASP_Reread_INCAR(xvasp));  //preload incar
+        if(Krun){
+          bool Krun1=true;if(aurostd::substring2bool(xvasp.INCAR,"BMIX=3.0",true)){Krun1=false;}  //remove whitespace
+          bool Krun2=true;if(aurostd::substring2bool(xvasp.INCAR,"AMIN=0.01",true)){Krun2=false;}  //remove whitespace
+          Krun=(Krun && (Krun1 || Krun2));
+        }
+        if(Krun){
+          //REMOVE LINES
+          KBIN::XVASP_INCAR_REMOVE_ENTRY(xvasp,"BMIX,AMIN",operation,vflags.KBIN_VASP_INCAR_VERBOSE,false,false); //CO20200624 - do not preload or rewrite incar
+          //ADD LINES
+          if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << " # Performing " << operation << " [AFLOW] start" << endl;
+          xvasp.INCAR << aurostd::PaddedPOST("BMIX=3.0",_incarpad_) << " # " << operation << endl; //CO20200624
+          xvasp.INCAR << aurostd::PaddedPOST("AMIN=0.01",_incarpad_) << " # " << operation << endl; //CO20200624
+          if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << " # Performing " << operation << " [AFLOW] end" << endl;
+        }
+        Krun=(Krun && aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR"))); //write out incar
+        //END - load INCAR into xvasp, modify, then write out new INCAR
+        if(Krun && VERBOSE){aus << "MMMMM  MESSAGE attempting fix BMIX=3.0 AMIN=0.01" << " " << fix_str << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+        if(!Krun){Krun=true;submode++;} //reset and go to the next solution
+      }
+      if(submode==2){ //desperate attempt, increase NELM
+        if(Krun && VERBOSE){aus << "MMMMM  MESSAGE attempting fix NELM" << " " << fix_str << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+        //START - load INCAR into xvasp, modify, then write out new INCAR
+        Krun=(Krun && VASP_Reread_INCAR(xvasp));  //preload incar
+        Krun=(Krun && KBIN::XVASP_Afix_GENERIC_NELM(xvasp,vflags,param_int));
+        Krun=(Krun && aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR"))); //write out incar
+        //END - load INCAR into xvasp, modify, then write out new INCAR
+        if(Krun && VERBOSE){aus << "MMMMM  MESSAGE attempting fix NELM=" << param_int << " " << fix_str << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+        if(!Krun){Krun=true;submode++;} //reset and go to the next solution
+      }
+      if(submode>=3){Krun=false;}
+      submode+=submode_increment;submode_increment=1;  //increment and reset
     }
     else if(mode=="NKXYZ_IKPTD") {
       //https://www.vasp.at/forum/viewtopic.php?t=1228
