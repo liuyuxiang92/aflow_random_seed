@@ -150,7 +150,7 @@ namespace aflowlib {
     data_path = "";
     database_file = "";
     lock_file = "";
-    veschema_extra.clear();
+    vschema_extra.clear();
     is_tmp = false;
   }
 
@@ -186,7 +186,7 @@ namespace aflowlib {
     }
   }
 
-  void AFlowDB::initializeExtraSchema() {
+  void AflowDB::initializeExtraSchema() {
     vschema_extra.clear();
     vschema_extra.push_attached("SCHEMA::NAME::ALLOY", "alloy");
     vschema_extra.push_attached("SCHEMA::NAME::ALLOY", "string");
@@ -748,9 +748,19 @@ namespace aflowlib {
       createTable(table, columns, types);
 
       string jsonfile = aurostd::CleanFileName(data_path + "/aflow:" + t.str() + ".jsonl");
-      vector<string> data;
-      aurostd::efile2vectorstring(jsonfile, data);
-      uint ndata = data.size();
+      vector<string> data, data_raw;
+      aurostd::efile2vectorstring(jsonfile, data_raw);
+      // Filter non-POCC ARUNs
+      uint ndata = data_raw.size();
+      string aurl = "";
+      for (uint d = 0; d < ndata; d++) {
+        aurl = extractJsonValueAflow(data_raw[d], "aurl");
+        if ((aurl.find("ARUN") == string::npos)
+          || (aurl.find("ARUN.POCC") != string::npos)) {
+          data.push_back(data_raw[d]);
+        }
+      }
+      ndata = data.size();
       vector<vector<string> > values(ndata);
       for (uint d = 0; d < ndata; d++) {
         values[d] = getDataValues(data[d], columns, types);
@@ -966,6 +976,7 @@ namespace aflowlib {
           for (uint i = 0; i < species.size(); i++) {
             if (isalpha(species[i])) value += species[i];
           }
+        }
       }
       if (!value.empty() && (aurostd::toupper(value) != "NULL")) {
         if (types[c] != "REAL") values[c] = "'" + value + "'";

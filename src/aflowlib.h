@@ -608,6 +608,7 @@ namespace aflowlib {
       void open(int = SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_FULLMUTEX);
       void close();
       void copy(const AflowDB&);
+      void initializeExtraSchema();
 
       sqlite3* db;
       bool is_tmp;
