@@ -2938,6 +2938,7 @@ namespace KBIN {
     
     if(!aurostd::FileExist(xvasp.Directory+"/"+DEFAULT_VASP_OUT)){return;}
     if(!aurostd::FileExist(xvasp.Directory+"/INCAR")){return;}
+    if(!aurostd::FileExist(aflags.Directory+"/"+_AFLOWLOCK_)){return;} //we needed it above to get the vasp_bin
 
     //get vasp output file
     //CO20210315 - opening up subshells for grep (substring_present_file_FAST) is very expensive, especially many times
@@ -2954,10 +2955,16 @@ namespace KBIN {
     
     if(LDEBUG){cerr << soliloquy << " [1]" << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
 
+    //there are issues getting the correct vasp binary since this is an entirely different aflow instance
+    //we might run the other aflow instance with --mpi or --machine flags that affect which vasp binary we use
+    //therefore, the most robust way to define the binary is to search the LOCK file
+    //[CO20210315 - OBSOLETE]string& vasp_bin=kflags.KBIN_MPI_BIN;
+    //[CO20210315 - OBSOLETE]if(!(kflags.KBIN_MPI==true||XHOST.MPI==true)){vasp_bin=kflags.KBIN_BIN;}
+    string vasp_bin=aurostd::basename(GetVASPBinaryFromLOCK(aflags.Directory+"/"+_AFLOWLOCK_));
+    if(vasp_bin.empty()){return;}
+
     //CO20210315 - determine if vasp is still running
     bool vasp_still_running=false; //CO20210315 - look at wording, very careful, this bool implies vasp WAS running, and now is not
-    string& vasp_bin=kflags.KBIN_MPI_BIN;
-    if(!(kflags.KBIN_MPI==true||XHOST.MPI==true)){vasp_bin=kflags.KBIN_BIN;}
     if(XHOST.vflag_control.flag("KILL_VASP_ALL")){
       //KILL_VASP_ALL allows us to check for ANY instance of vasp running (assumes exclusivity in node environment)
       //we will develop more precise methods for tracking parent/child processes of aflow to target specific vasp instances in the future
