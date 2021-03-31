@@ -1870,6 +1870,7 @@ string GetVASPBinaryFromLOCK(const string& directory){  //CO20210315
 // ***************************************************************************
 // AFLOW_monitor_VASP
 // ***************************************************************************
+#define NCOUNTS_WAIT_MONITOR 10 //wait no more than 10*sleep_secounds (should be 10 minutes)
 void AFLOW_monitor_VASP(){
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   string soliloquy=XPID+"AFLOW_monitor_VASP():";
@@ -1887,7 +1888,7 @@ void AFLOW_monitor_VASP(){
     bool found=false;
     string search_str="[dir=";
     string directory_old="";
-    while(nfailures<10 && nsuccesses<10){  //10 minutes, keeps us from wasting walltime
+    while(nfailures<NCOUNTS_WAIT_MONITOR && nsuccesses<NCOUNTS_WAIT_MONITOR){  //10 minutes, keeps us from wasting walltime
       if(!aurostd::FileExist(file)){
         nfailures++;  //increment, only wait 10 minutes for a file to be written
         aurostd::Sleep(MONITOR_VASP_SLEEP);
@@ -1986,7 +1987,7 @@ void AFLOW_monitor_VASP(const string& directory){
   
   string vasp_bin="";
   nloop=0;
-  while((nloop++)<10 && vasp_bin.empty()){  //wait no more than 10 minutes for vasp bin to start up
+  while((nloop++)<NCOUNTS_WAIT_MONITOR && vasp_bin.empty()){  //wait no more than 10 minutes for vasp bin to start up
     vasp_bin=GetVASPBinaryFromLOCK(xvasp.Directory);
     if(vasp_bin.empty()){
       if(VERBOSE){message << "sleeping for " << sleep_seconds_afterkill << " seconds, waiting for \"" << vasp_bin << "\" to start running and " << _AFLOWLOCK_ << " to be written";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);}
@@ -2000,7 +2001,7 @@ void AFLOW_monitor_VASP(const string& directory){
 
   nloop=0;
   n_not_running=0;
-  while(n_not_running<10){  //wait no more than 10 minutes for vasp bin to start up (again)
+  while(n_not_running<NCOUNTS_WAIT_MONITOR){  //wait no more than 10 minutes for vasp bin to start up (again)
     if(!aurostd::FileExist(xvasp.Directory+"/"+_AFLOWLOCK_)){break;} //we needed it above to get the vasp_bin
     
     vasp_running=aurostd::ProcessRunning(vasp_bin);
