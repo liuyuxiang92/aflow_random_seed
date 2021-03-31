@@ -2961,7 +2961,10 @@ namespace KBIN {
     //[CO20210315 - OBSOLETE]string& vasp_bin=kflags.KBIN_MPI_BIN;
     //[CO20210315 - OBSOLETE]if(!(kflags.KBIN_MPI==true||XHOST.MPI==true)){vasp_bin=kflags.KBIN_BIN;}
     string vasp_bin=aurostd::basename(GetVASPBinaryFromLOCK(aflags.Directory+"/"+_AFLOWLOCK_));
-    if(vasp_bin.empty()){return;}
+    if(vasp_bin.empty()){ //rely on defaults here in case we're not running --monitor_vasp
+      vasp_bin=kflags.KBIN_MPI_BIN;
+      if(!(kflags.KBIN_MPI==true||XHOST.MPI==true)){vasp_bin=kflags.KBIN_BIN;}
+    }
 
     //CO20210315 - determine if vasp is still running
     bool vasp_still_running=false; //CO20210315 - look at wording, very careful, this bool implies vasp WAS running, and now is not
