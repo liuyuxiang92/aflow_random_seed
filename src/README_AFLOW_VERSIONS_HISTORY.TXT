@@ -38,6 +38,7 @@
         -- adding GetCatCommand() (CO)
         -- adding convergence test for --xplug (CO)
         -- adding aurostd::dirname() and aurostd::basename() (CO)
+        -- adding GetVASPBinaryFromLOCK() (CO)
 3.2.8 - 2021/02/22
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.8.tar.xz
         -- lib2raw bug fixes (CO)

@@ -726,6 +726,13 @@ int main(int _argc,char **_argv) {
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_FoldAtomsInCell|--FoldAtomsInCell_test")) {return (FoldAtomsInCellTest(cout)?0:1);}  //DX20210129
     if(!Arun && aurostd::args2flag(argv,cmds,"--test")) {
 
+      cerr << "aurostd::dirname(\"PARK\")=" << aurostd::dirname("PARK") << endl;
+      cerr << "aurostd::dirname(\"/home/corey/PARK\")=" << aurostd::dirname("/home/corey/PARK") << endl;
+      cerr << "aurostd::dirname(\"/home/corey/PARK/\")=" << aurostd::dirname("/home/corey/PARK/") << endl;
+      cerr << "aurostd::basename(\"PARK\")=" << aurostd::basename("PARK") << endl;
+      cerr << "aurostd::basename(\"/home/corey/PARK\")=" << aurostd::basename("/home/corey/PARK") << endl;
+      cerr << "aurostd::basename(\"/home/corey/PARK/\")=" << aurostd::basename("/home/corey/PARK/") << endl;
+
       cerr << aurostd::joinWDelimiter(aurostd::ProcessPIDs("migration")," ") << endl;
       exit(0);
 

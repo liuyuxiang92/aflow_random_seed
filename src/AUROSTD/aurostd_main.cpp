@@ -1794,8 +1794,10 @@ namespace aurostd {
   // CO20210315
   // Returns the dirname of file
   string dirname(const string& _file) {
-    string file=CleanFileName(file);
-    if(!aurostd::FileExist(file)){return "";}
+    string file=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(CleanFileName(_file));
+    if(file.empty()){return "";}
+    //[no need]if(!aurostd::FileExist(file)){return "";}
+    if(file[file.size()-1]=='/'){file=file.substr(0,file.size()-1);}  //remove last / for directories: matches functionality with bash dirname/basename
     if(file.find('/')==string::npos){return ".";}
     string::size_type loc=file.find_last_of('/');
     return file.substr(0,loc);
@@ -1806,12 +1808,14 @@ namespace aurostd {
   // ***************************************************************************
   // CO20210315
   // Returns the dirname of file
-  string basename(const string& _file) {
-    string file=CleanFileName(file);
-    if(!aurostd::FileExist(file)){return "";}
+  string basename(const string& _file) {  //CO20210315
+    string file=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(CleanFileName(_file));
+    if(file.empty()){return "";}
+    //[no need]if(!aurostd::FileExist(file)){return "";}
+    if(file[file.size()-1]=='/'){file=file.substr(0,file.size()-1);}  //remove last / for directories: matches functionality with bash dirname/basename
     if(file.find('/')==string::npos){return file;}
     string::size_type loc=file.find_last_of('/');
-    return file.substr(loc);
+    return file.substr(loc+1);
   }
 
   // ***************************************************************************
@@ -1859,6 +1863,7 @@ namespace aurostd {
   // cleans file names from obvious things
   string CleanFileName(const string& fileIN) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
+    if(fileIN.empty()){return fileIN;}
     string fileOUT=fileIN;
     if(LDEBUG) cerr << "aurostd::CleanFileName: " << fileOUT << endl;
     // [OBSOLETE] interferes with ~/.aflow.rc   if(aurostd::substring2bool(fileOUT,"~/")) aurostd::StringSubst(fileOUT,"~/","/home/"+XHOST.user+"/");
