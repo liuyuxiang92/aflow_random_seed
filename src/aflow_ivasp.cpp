@@ -2907,10 +2907,10 @@ namespace KBIN {
       }
     }
     // xvasp.INCAR << endl;
-    if(VERBOSE) xvasp.INCAR << "# Performing MPI-AUTOTUNE [AFLOW] - begin" << endl;
+    if(VERBOSE) xvasp.INCAR << "# Performing MPI-AUTOTUNE [AFLOW] begin" << endl;
     if(VERBOSE) xvasp.INCAR << "# MPI tuning for Linux cluster with CPUS=" << xvasp.NCPUS << endl;
     if(VERBOSE) xvasp.INCAR << "# look at the VASP manual" << endl;
-    if(VERBOSE) xvasp.INCAR << "# http://www.teragridforum.org/mediawiki/images/7/7e/Performance_on_Ranger_of_the_medium_size_problem.pdf" << endl;
+    //[CO20210315 - OBSOLETE link]if(VERBOSE) xvasp.INCAR << "# http://www.teragridforum.org/mediawiki/images/7/7e/Performance_on_Ranger_of_the_medium_size_problem.pdf" << endl;
     xvasp.INCAR << aurostd::PaddedPOST("IALGO=48",_incarpad_) << " # MPI algorithm" << endl;
     xvasp.INCAR << aurostd::PaddedPOST("LPLANE=.TRUE.",_incarpad_) << " # parallelization" << endl;
     // xvasp.INCAR << aurostd::PaddedPOST("NPAR="+aurostd::utype2string(xvasp.NCPUS),_incarpad_) << " # number of CPUs" << endl;
@@ -3053,7 +3053,7 @@ namespace KBIN {
     //  xvasp.INCAR << aurostd::PaddedPOST("NPAR=4",_incarpad_) << " # seems to give good results with all MPI" << endl;    // 6 times faster than NPAR=cpus..
     xvasp.INCAR << aurostd::PaddedPOST("NSIM=4",_incarpad_) << " # tune size vector/matrix product" << endl;
     xvasp.INCAR << aurostd::PaddedPOST("LSCALU=.FALSE.",_incarpad_) << " # neglect scalapack" << endl;
-    if(VERBOSE) xvasp.INCAR << "# Performing MPI-AUTOTUNE [AFLOW] - end" << endl;
+    if(VERBOSE) xvasp.INCAR << "# Performing MPI-AUTOTUNE [AFLOW] end" << endl;
   }
 }
 
@@ -4253,9 +4253,9 @@ namespace KBIN {
         }
         if(OPTION==ON && MAGMOM_ALREADY_SPECIFIED==FALSE && vflags.KBIN_VASP_FORCE_OPTION_LSCOUPLING.option==FALSE) { //CO
           if(vflags.KBIN_VASP_FORCE_OPTION_AUTO_MAGMOM.isentry && vflags.KBIN_VASP_FORCE_OPTION_AUTO_MAGMOM.option){  // with spin, make the mag mom +5
-            xvasp.INCAR << aurostd::PaddedPOST("MAGMOM= "+aurostd::utype2string(xvasp.str.atoms.size())+"*5",_incarpad_) << " # " << operation_option << " " << xvasp.str.atoms.size() << " atoms" << endl;
+            xvasp.INCAR << aurostd::PaddedPOST("MAGMOM= "+aurostd::utype2string(xvasp.str.atoms.size())+"*5",_incarpad_) << " # " << operation_option << " " << xvasp.str.atoms.size() << " atom" << (xvasp.str.atoms.size()>1?"s":"") << endl;
           }else{  // otherwise, make the mag mom +1
-            xvasp.INCAR << aurostd::PaddedPOST("MAGMOM= "+aurostd::utype2string(xvasp.str.atoms.size())+"*1",_incarpad_) << " # " << operation_option << " " << xvasp.str.atoms.size() << " atoms (default)" << endl;
+            xvasp.INCAR << aurostd::PaddedPOST("MAGMOM= "+aurostd::utype2string(xvasp.str.atoms.size())+"*1",_incarpad_) << " # " << operation_option << " " << xvasp.str.atoms.size() << " atom" << (xvasp.str.atoms.size()>1?"s":"") << " (default)" << endl;
           }
         }
         if(VERBOSE)  xvasp.INCAR << "# Performing " << operation_option << " [AFLOW] end" << endl;
