@@ -2278,8 +2278,8 @@ namespace apl
   }
 
   /// Calculates the electronic specific heat at a fixed volume using the
-  /// Sommerfeld expansion. Units are kB/atom.
-  xvector<double> QHA::calcElectronicSpecificHeat(double T)
+  /// Sommerfeld expansion. Units are eV/atom.
+  xvector<double> QHA::calcElectronicSpecificHeatSommerfeld(double T)
   {
     xvector<double> Cv_Som = DOS_Ef;
     for (int i=Cv_Som.lrows; i<=Cv_Som.urows; i++){
@@ -2919,7 +2919,7 @@ namespace apl
         if (qha_method==QHA_CALC){
           if (includeElectronicContribution){
             if (doSommerfeldExpansion){
-              xvector<double> Cv_elec = calcElectronicSpecificHeat(T);
+              xvector<double> Cv_elec = calcElectronicSpecificHeatSommerfeld(T);
               VM.LeastSquare(Cv_elec);
               CV_elec_V0K = aurostd::evalPolynomial(V0K, VM.GetFitVector())/KBOLTZEV; // [kB/atom]
               CV_elec_V   = aurostd::evalPolynomial(Veq, VM.GetFitVector())/KBOLTZEV; // [kB/atom]

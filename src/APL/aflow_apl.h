@@ -1213,7 +1213,7 @@ namespace apl
       double calcChemicalPotential(double T, int Vid);
       double calcIDOS(double e, double T, xEIGENVAL &eig);
       xvector<double> calcElectronicFreeEnergySommerfeld(double T);
-      xvector<double> calcElectronicSpecificHeat(double T);
+      xvector<double> calcElectronicSpecificHeatSommerfeld(double T);
       xvector<double> calcFreeEnergy(double T, QHAmethod qha_method, F_CONTRIB contrib);
       xvector<double> calcDOSatEf();
       double calcInternalEnergyFit(double T, double V, EOSmethod method);
