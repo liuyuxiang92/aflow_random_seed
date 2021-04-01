@@ -2880,12 +2880,12 @@ namespace apl
 
     double T = 0.0, Veq = 0.0, Feq = 0.0, B = 0.0, Bp = 0.0, beta = 0.0, CV = 0.0, CP = 0.0, GP = 0.0;
     // the following properties are calculated by weighted sum over q-points mesh
-    double CV_mesh_V0 = 0.0, GP_mesh_V0 = 0.0, CP_mesh_V0 = 0.0, beta_mesh_V0 = 0.0;
-    double CV_mesh_V  = 0.0, GP_mesh_V  = 0.0, CP_mesh_V  = 0.0, beta_mesh_V  = 0.0;
+    double CV_mesh_V0K = 0.0, GP_mesh_V0K = 0.0, CP_mesh_V0K = 0.0, beta_mesh_V0K = 0.0;
+    double CV_mesh_V   = 0.0, GP_mesh_V   = 0.0, CP_mesh_V   = 0.0, beta_mesh_V   = 0.0;
 
     // if electronic contributions are requested
-    double beta_elec_V0 = 0.0, beta_elec_V = 0.0;
-    double CV_elec_V0 = 0.0, CV_elec_V = 0.0;
+    double beta_elec_V0K = 0.0, beta_elec_V = 0.0;
+    double CV_elec_V0K   = 0.0, CV_elec_V   = 0.0;
 
     F_CONTRIB f_contrib = includeElectronicContribution ? F_ELEC_VIB : F_VIB;
 
@@ -2921,29 +2921,29 @@ namespace apl
             if (doSommerfeldExpansion){
               xvector<double> Cv_elec = calcElectronicSpecificHeat(T);
               VM.LeastSquare(Cv_elec);
-              CV_elec_V0 = aurostd::evalPolynomial(V0K, VM.GetFitVector())/KBOLTZEV; // [kB/atom]
-              CV_elec_V  = aurostd::evalPolynomial(Veq, VM.GetFitVector())/KBOLTZEV; // [kB/atom]
+              CV_elec_V0K = aurostd::evalPolynomial(V0K, VM.GetFitVector())/KBOLTZEV; // [kB/atom]
+              CV_elec_V   = aurostd::evalPolynomial(Veq, VM.GetFitVector())/KBOLTZEV; // [kB/atom]
 
-              beta_elec_V0 = 2.0*CV_elec_V0*KBOLTZEV*eV2GPa/(3.0*B0K*V0K);
-              beta_elec_V  = 2.0*CV_elec_V *KBOLTZEV*eV2GPa/(3.0*B*Veq);
+              beta_elec_V0K = 2.0*CV_elec_V0K*KBOLTZEV*eV2GPa/(3.0*B0K*V0K);
+              beta_elec_V   = 2.0*CV_elec_V *KBOLTZEV*eV2GPa/(3.0*B*Veq);
             }
             else{
-              CV_elec_V0 = calcIsochoricSpecificHeat(T, V0K, eos_method,
+              CV_elec_V0K = calcIsochoricSpecificHeat(T, V0K, eos_method,
                   qha_method, F_ELEC)/KBOLTZEV; // [kB/atom]
-              CV_elec_V  = calcIsochoricSpecificHeat(T, Veq, eos_method,
+              CV_elec_V   = calcIsochoricSpecificHeat(T, Veq, eos_method,
                   qha_method, F_ELEC)/KBOLTZEV; // [kB/atom]
-              beta_elec_V0 = calcThermalExpansion(T, eos_method, qha_method, F_ELEC);
-              beta_elec_V  = beta_elec_V0;
+              beta_elec_V   = calcThermalExpansion(T, eos_method, qha_method, F_ELEC);
+              beta_elec_V0K = beta_elec_V;
             }
           }
 
-          calcCVandGPfit(T, V0K, CV_mesh_V0, GP_mesh_V0);
-          CV_mesh_V0 += CV_elec_V0;
+          calcCVandGPfit(T, V0K, CV_mesh_V0K, GP_mesh_V0K);
+          CV_mesh_V0K += CV_elec_V0K;
 
-          beta_mesh_V0 = KBOLTZEV*CV_mesh_V0*GP_mesh_V0/V0K/(B0K/eV2GPa); // [K^-1]
-          beta_mesh_V0 += beta_elec_V0;
+          beta_mesh_V0K = KBOLTZEV*CV_mesh_V0K*GP_mesh_V0K/V0K/(B0K/eV2GPa); // [K^-1]
+          beta_mesh_V0K += beta_elec_V0K;
 
-          CP_mesh_V0 = CV_mesh_V0 + V0K*T*B0K*pow(beta_mesh_V0,2)/eV2GPa/KBOLTZEV;//[kB/atom]
+          CP_mesh_V0K = CV_mesh_V0K + V0K*T*B0K*pow(beta_mesh_V0K,2)/eV2GPa/KBOLTZEV;//[kB/atom]
 
           calcCVandGPfit(T, Veq, CV_mesh_V,  GP_mesh_V);
           CV_mesh_V += CV_elec_V;
@@ -2971,10 +2971,10 @@ namespace apl
             setw(TW) << beta_mesh_V * 1e5      << setw(SW) << ' ' << //[10^-5/K]
             setw(TW) << CV_mesh_V              << setw(SW) << ' ' << //[kB/atom]
             setw(TW) << CP_mesh_V              << setw(SW) << ' ' << //[kB/atom]
-            setw(TW) << GP_mesh_V0             << setw(SW) << ' ' <<
-            setw(TW) << beta_mesh_V0 * 1e5     << setw(SW) << ' ' << //[10^-5/K]
-            setw(TW) << CV_mesh_V0             << setw(SW) << ' ' << //[kB/atom]
-            setw(TW) << CP_mesh_V0             << setw(SW); //[kB/atom]
+            setw(TW) << GP_mesh_V0K            << setw(SW) << ' ' <<
+            setw(TW) << beta_mesh_V0K * 1e5    << setw(SW) << ' ' << //[10^-5/K]
+            setw(TW) << CV_mesh_V0K            << setw(SW) << ' ' << //[kB/atom]
+            setw(TW) << CP_mesh_V0K            << setw(SW); //[kB/atom]
         }
         file << std::endl;
       }
