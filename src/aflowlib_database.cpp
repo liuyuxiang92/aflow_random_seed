@@ -914,15 +914,15 @@ namespace aflowlib {
     for (uint i = 0, n = XHOST.vschema.vxsghost.size(); i < n; i += 2) {
       if(XHOST.vschema.vxsghost[i].find("::NAME:") != string::npos) {
         key=aurostd::RemoveSubString(XHOST.vschema.vxsghost[i], "SCHEMA::NAME:");
-        // json keys are lower case
-        keys.push_back(aurostd::tolower(key));
+        // schema keys are upper case
+        keys.push_back(aurostd::toupper(key));
       }
     }
     for (uint i = 0, n = vschema_extra.vxsghost.size(); i < n; i += 2) {
       if(vschema_extra.vxsghost[i].find("::NAME:") != string::npos) {
         key=aurostd::RemoveSubString(vschema_extra.vxsghost[i], "SCHEMA::NAME:");
-        // json keys are lower case
-        keys.push_back(aurostd::tolower(key));
+        // schema keys are upper case
+        keys.push_back(aurostd::toupper(key));
       }
     }
     return keys;
@@ -1088,7 +1088,6 @@ namespace aflowlib {
     // Get properties and tables for which statistics need to be collected
     // Since all tables have the same columns, only one table needs to be searched
     vector<string> tables = getTables();
-    vector<string> columns = getColumnNames(tables[0]);
 
     vector<string> catalogs = getSetMultiTables(tables, "catalog", true);
     uint ncatalogs = catalogs.size();
@@ -1099,11 +1098,11 @@ namespace aflowlib {
 
     vector<DBStats> db_stats(ncatalogs + 1);
     DBStats& total_stats = db_stats[0];  // Declare to make code more legible
-    total_stats = initDBStats("\"total\"", columns, loops);
+    total_stats = initDBStats("\"total\"", loops);
 
     for (uint c = 0; c < ncatalogs; c++) {
       DBStats& catalog_stats = db_stats[c+1];  // Declare to make code more legible
-      catalog_stats = getCatalogStats(catalogs[c], tables, columns, loops);
+      catalog_stats = getCatalogStats(catalogs[c], tables, loops);
 
       // Add to totals
       total_stats.nentries += catalog_stats.nentries;
@@ -1168,7 +1167,7 @@ namespace aflowlib {
     }
     std::sort(total_stats.species.begin(), total_stats.species.end());
 
-    // Write everything now
+    // Write output
     ncatalogs = ncatalogs + 1; // Include totals
 
     string tab = "    ";
@@ -1184,7 +1183,17 @@ namespace aflowlib {
     aurostd::stringstream2file(json, outfile);
   }
 
-  DBStats AflowDB::initDBStats(const string& catalog, const vector<string>& cols, const vector<string>& loops) {
+  DBStats AflowDB::initDBStats(const string& catalog, const vector<string>& loops) {
+    vector<string> keys = getSchemaKeys();
+    vector<string> excluded_properties, cols;
+    string exclude = "alloy";
+    aurostd::string2tokens(exclude, excluded_properties, ",");
+    string key = "";
+    for (uint i = 0, nkeys = keys.size(); i < nkeys; i++) {
+      key = XHOST.vschema.getattachedscheme("SCHEMA::NAME:" + keys[i]);
+      if (key.empty()) key = vschema_extra.getattachedscheme("SCHEMA::NAME:" + keys[i]);
+      if (!key.empty() && !aurostd::WithinList(excluded_properties, key)) cols.push_back(key);
+    }
     uint ncols = cols.size();
     uint nloops = loops.size();
 
@@ -1215,15 +1224,14 @@ namespace aflowlib {
 
   //getCatalogStats///////////////////////////////////////////////////////////
   // Gets the statistics for all properties in the catalog.
-  DBStats AflowDB::getCatalogStats(const string& catalog, const vector<string>& tables,
-      const vector<string>& cols, const vector<string>& loops) {
+  DBStats AflowDB::getCatalogStats(const string& catalog, const vector<string>& tables, const vector<string>& loops) {
     string function = XPID + _AFLOW_DB_ERR_PREFIX_ + "getCatalogStats():";
     stringstream message;
 
-    uint ncols = cols.size();
     uint nloops = loops.size();
 
-    DBStats stats = initDBStats(catalog, cols, loops);
+    DBStats stats = initDBStats(catalog, loops);
+    uint ncols = stats.columns.size();
     const vector<string>& types = stats.types;
 
     string where = "catalog='" + catalog + "'";
@@ -1252,7 +1260,7 @@ namespace aflowlib {
         threads.push_back(new std::thread(&AflowDB::getColStats, this,
               thread_dist[i][0], thread_dist[i][1],
               std::ref(catalog), std::ref(tables),
-              std::ref(cols), std::ref(types), std::ref(loops),
+              std::ref(stats.columns), std::ref(types), std::ref(loops),
               std::ref(counts), std::ref(loop_counts),
               std::ref(maxmin), std::ref(sets)));
       }
@@ -1261,7 +1269,7 @@ namespace aflowlib {
         delete threads[i];
       }
 #else
-      getColStats(0, _N_AUID_TABLES_, catalog, tables, cols, types,
+      getColStats(0, _N_AUID_TABLES_, catalog, tables, stats.columns, types,
           loops, counts, loop_counts, maxmin, sets);
 #endif
 
