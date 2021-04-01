@@ -640,7 +640,7 @@ namespace aflowlib {
           const vector<string>&, const vector<string>&, vector<vector<vector<int> > >&, vector<vector<int> >&,
           vector<vector<vector<string> > >&, vector<vector<vector<string> > >&);
       vector<string> getUniqueFromJsonArrays(const vector<string>&);
-      void writeStatsToJson(std::stringstream&, const DBStats&);
+      string stats2json(const DBStats&);
 
       void createIndex(const string&, const string&, const string&);
       void dropIndex(const string&);

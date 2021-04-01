@@ -7,6 +7,7 @@
         -- Added alloy property to database (ME)
         -- Added functionality to convert entries to json and aflowlib entry formats (ME)
         -- Improved vector callback function for SQLite (ME)
+        -- Minified database statistics file (ME)
 3.2.8 - 2021/02/22
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.8.tar.xz
         -- lib2raw bug fixes (CO)

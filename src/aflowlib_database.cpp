@@ -1170,16 +1170,13 @@ namespace aflowlib {
     // Write output
     ncatalogs = ncatalogs + 1; // Include totals
 
-    string tab = "    ";
     std::stringstream json;
-    json << "{" << std::endl << tab << "\"Aflow_DBs\": {" << std::endl;
+    json << "{\"Aflow_DBs\":{";
 
     for (uint c = 0; c < ncatalogs; c++) {
-      writeStatsToJson(json, db_stats[c]);
-      if (c < ncatalogs - 1) json << ",";
-      json << std::endl;
+      json << db_stats[c].catalog << ":" << stats2json(db_stats[c]) << ((c < ncatalogs - 1)?",":"");
     }
-    json << tab << "}" << std::endl << "}" << std::endl;
+    json << "}}" << std::endl;
     aurostd::stringstream2file(json, outfile);
   }
 
@@ -1430,96 +1427,45 @@ namespace aflowlib {
 
   //writeStatsToJson//////////////////////////////////////////////////////////
   // Writes the database statistics into a JSON-formatted string(stream).
-  void AflowDB::writeStatsToJson(std::stringstream& json, const DBStats& db_stats) {
-    string tab = "    ";
-    string indent = tab + tab;
-    json << indent << db_stats.catalog << ": {" << std::endl;
-    json << indent << tab << "\"count\": " << db_stats.nentries << "," << std::endl;
-    json << indent << tab << "\"systems\": " <<  db_stats.nsystems << "," << std::endl;
+  string AflowDB::stats2json(const DBStats& db_stats) {
+    stringstream json;
+    json << "{";
+    json << "\"count\":" << db_stats.nentries << ",";
+    json << "\"systems\":" <<  db_stats.nsystems << ",";
     for (uint l = 0; l < db_stats.loop_counts.size(); l++) {
-      json << indent << tab << "\"" << db_stats.loop_counts[l].first << "\": ";
-      json << db_stats.loop_counts[l].second << "," << std::endl;
+      json << "\"" << db_stats.loop_counts[l].first << "\":" << db_stats.loop_counts[l].second << ",";
     }
-    json << indent << tab << "\"columns\": {" << std::endl;
+    json << "\"columns\":{";
     uint ncols = db_stats.columns.size();
-    string str_formatted = "";
     for (uint c = 0; c < ncols; c++) {
-      json << indent << tab << tab << "\"" << db_stats.columns[c] << "\": {" << std::endl;
-      json << indent << tab << tab << tab << "\"count\": ";
+      json << "\"" << db_stats.columns[c] << "\":{";
+      json << "\"count\":";
       if (db_stats.types[c] == "bool") {
-        json << "{" << std::endl;
-        json << indent << tab << tab << tab << tab << "\"true\": " << db_stats.count[c][0] << "," << std::endl;
-        json << indent << tab << tab << tab << tab << "\"false\": " << db_stats.count[c][1] << std::endl;
-        json << indent << tab << tab << tab << "}," << std::endl;
+        json << "{\"true\":" << db_stats.count[c][0] << ",\"false\":" << db_stats.count[c][1] << "},";
       } else {
-        json << aurostd::utype2string<int>(db_stats.count[c][0]) << "," << std::endl;
+        json << aurostd::utype2string<int>(db_stats.count[c][0]) << ",";
       }
-      str_formatted = db_stats.min[c];
-      if ((str_formatted[0] == '\"') && (str_formatted[str_formatted.size()-1] == '\"')) {  // Don't escape enclosing strings //DX20200317 - back() doesn't work for old GCC versions
-        str_formatted = str_formatted.substr(1, str_formatted.size() - 2);
-        str_formatted = aurostd::StringSubst(str_formatted, "\"", "\\\"");
-        str_formatted = "\"" + str_formatted + "\"";
-        // ME20201024 - Breaks arrays of strings. Need to find a way to account for quotes
-        // in strings for arrays of strings. This corner case has not occurred yet though.
-        // else 
-        //  str_formatted = aurostd::StringSubst(str_formatted, "\"", "\\\"");
-      }
-      json << indent << tab << tab << tab << "\"min\": "
-        << (db_stats.min[c].empty()?"null":str_formatted) << "," << std::endl;
-      str_formatted = db_stats.max[c];
-      if ((str_formatted[0] == '\"') && (str_formatted[str_formatted.size()-1] == '\"')) {  // Don't escape enclosing strings //DX20200317 - back() doesn't work for old GCC versions
-        str_formatted = str_formatted.substr(1, str_formatted.size() - 2);
-        str_formatted = aurostd::StringSubst(str_formatted, "\"", "\\\"");
-        str_formatted = "\"" + str_formatted + "\"";
-        // ME20201024 - Breaks arrays of strings. Need to find a way to account for quotes
-        // in strings for arrays of strings. This corner case has not occurred yet though.
-        // else 
-        //  str_formatted = aurostd::StringSubst(str_formatted, "\"", "\\\"");
-      }
-      json << indent << tab << tab << tab << "\"max\": "
-        << (db_stats.max[c].empty()?"null":str_formatted) << "," << std::endl;
+      json << "\"min\":" << (db_stats.min[c].empty()?"null":db_stats.min[c])<< ",";
+      json << "\"max\":" << (db_stats.max[c].empty()?"null":db_stats.max[c]) << ",";
 
       // Write set
-      uint nset = db_stats.set[c].size();
-      json << indent << tab << tab << tab << "\"set\": ";
-      if (nset > _DEFAULT_SET_LIMIT_) {
-        json << "null" << std::endl;
-      } else if (nset == 0) {
-        json << "[]" << std::endl;
-      } else {
-        json << "[" << std::endl;
-        for (uint s = 0; s < nset; s++) {
-          str_formatted = db_stats.set[c][s];
-          if ((str_formatted[0] == '\"') && (str_formatted[str_formatted.size()-1] == '\"')) {  // Don't escape enclosing strings //DX20200317 - back() doesn't work for old GCC versions
-            str_formatted = str_formatted.substr(1, str_formatted.size() - 2);
-            str_formatted = aurostd::StringSubst(str_formatted, "\"", "\\\"");
-            str_formatted = "\"" + str_formatted + "\"";
-            // ME20201024 - Breaks arrays of strings. Need to find a way to account for quotes
-            // in strings for arrays of strings. This corner case has not occurred yet though.
-            // else 
-            //  str_formatted = aurostd::StringSubst(str_formatted, "\"", "\\\"");
-          }
-          json << indent << tab << tab << tab << tab << str_formatted;
-          if (s < nset - 1) json << ",";
-          json << std::endl;
-        }
-        json << indent << tab << tab << tab << "]" << std::endl;
-      }
+      json << "\"set\":";
+      if (db_stats.set[c].size() > _DEFAULT_SET_LIMIT_) json << "null";
+      else json << "[" << aurostd::joinWDelimiter(db_stats.set[c], ",") << "]";
 
-      json << indent << tab << tab << "}";
-      if (c < ncols - 1) json << ",";
-      json << std::endl;
+      json << "}" << ((c < ncols - 1)?",":"");
     }
-    json << indent << tab << "}," << std::endl;
-    uint nspecies = db_stats.species.size();
-    json << indent << tab << "\"species\": " << ((nspecies > 0)?"[":"null") << std::endl;
-    for (uint s = 0; s < db_stats.species.size(); s++) {
-      json << indent << tab << tab << "\"" << db_stats.species[s] << "\"";
-      if (s < nspecies - 1) json << ",";
-      json << std::endl;
+    json << "},";
+
+    json << "\"species\":";
+    if (db_stats.species.size() > 0) {
+      json << "[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(db_stats.species, "\"", "\""), ",") << "]";
+    } else {
+      json << "null";
     }
-    if (nspecies > 0) json << indent << tab << "]" << std::endl;
-    json << indent << "}";
+
+    json << "}";
+    return json.str();
   }
 
 }  // namespace aflowlib
