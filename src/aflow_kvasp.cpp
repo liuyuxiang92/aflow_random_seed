@@ -2899,11 +2899,12 @@ namespace KBIN {
       aus << "MMMMM  MESSAGE applied fix=" << fix << " for error=" << error << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);  //CO20210315 - do not reference submode after KBIN::XVASP_Afix(), (submode>=0?" (SUBMODE="+aurostd::utype2string(submode)+")":"")
       KBIN::VASP_Error(xvasp,"WWWWW  ERROR "+soliloquy+" "+error+" problems"+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_));
       //[CO20210315 - old style]xfixed.flag(error,TRUE);
-      xfixed.flag("ALL",TRUE);
-      //print out all xfixed
+      //print out all xfixed BEFORE adding "ALL"
+      std::sort(xfixed.vxscheme.begin(),xfixed.vxscheme.end()); //sort for printing
       for(uint i=0;i<xfixed.vxscheme.size();i++){
         aus << "MMMMM  MESSAGE xfixed.flag(\""+xfixed.vxscheme[i]+"\")=" << xfixed.flag(xfixed.vxscheme[i]) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       }
+      xfixed.flag("ALL",TRUE);
     }
     return apply_patch;
   }
