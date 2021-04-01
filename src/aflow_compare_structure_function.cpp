@@ -771,13 +771,16 @@ string StructurePrototype::printStructureTransformationInformation(
 
   bool roff = true;
   // basis transformation
-  json.addMatrix("basis_transformation", misfit_info.basis_transformation, 5, roff);
+  // TODO - need xmatrix version - json.addMatrix("basis_transformation", misfit_info.basis_transformation);
+  json.addNumber("basis_transformation", "["+aurostd::xmatDouble2String(misfit_info.basis_transformation,5,roff)+"]"); //hack
 
   // rotation
-  json.addMatrix("rotation", misfit_info.rotation, 5, roff);
+  // TODO - need xmatrix version - json.addMatrix("rotation", misfit_info.rotation);
+  json.addNumber("rotation", "["+aurostd::xmatDouble2String(misfit_info.rotation,5,roff)+"]"); //hack
 
   // origin_shift
-  json.addVector("origin_shift", misfit_info.origin_shift, 5, roff);
+  // TODO - need xvector version - json.addVector("origin_shift", misfit_info.origin_shift);
+  json.addNumber("origin_shift", "["+aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(misfit_info.origin_shift,5,roff),",")+"]"); //hack
 
   // atom map
   json.addVector("atom_map", misfit_info.atom_map);
@@ -1747,27 +1750,20 @@ void XtalFinderCalculator::loadStructuresFromFile(
   // XtalFinderCalculator.structure_containers.
   // Useful for reading in aflow.in relaxation steps or pocc structures
 
-  // ---------------------------------------------------------------------------
-  // file to stringstream
-  stringstream input_file;
-  aurostd::efile2stringstream(filename, input_file);
-  loadStructuresFromStringstream(input_file, magmoms_for_systems, same_species);
-}
+  string function_name = XPID + "XtalFinderCalculator::loadStructuresFromFile():";
 
-// ME20210206 - Added stringstream variant
-void XtalFinderCalculator::loadStructuresFromStringstream(
-    stringstream& input_stream,
-    const vector<string>& magmoms_for_systems,
-    bool same_species){
-
-  string function_name = XPID + "XtalFinderCalculator::loadStructuresFromStringstream():";
   bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_COMPARE_);
   stringstream message;
 
   // ---------------------------------------------------------------------------
+  // file to stringstream
+  stringstream input_file;
+  aurostd::efile2stringstream(filename, input_file);
+
+  // ---------------------------------------------------------------------------
   // tokenize stringstream by newline
   vector<string> lines;
-  aurostd::string2tokens(input_stream.str(),lines,"\n");
+  aurostd::string2tokens(input_file.str(),lines,"\n");
 
   // ---------------------------------------------------------------------------
   // structure delimiters
@@ -1777,7 +1773,7 @@ void XtalFinderCalculator::loadStructuresFromStringstream(
   // ---------------------------------------------------------------------------
   // used to find the total number of structures
   vector<string> start_string;
-  aurostd::substring2strings(input_stream.str(),start_string,START);
+  aurostd::substring2strings(input_file.str(),start_string,START);
 
   message << "Loading " << start_string.size() << " structures in file ... ";
   pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);

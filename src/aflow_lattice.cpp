@@ -2044,7 +2044,6 @@ namespace LATTICE {
       //str_sc.pearson_symbol_superlattice=str_superlattice_sp.pearson_symbol;
       //}
       str_sp.SetVolume(str_sp_volume);
-      str_sp.ReScale(1.0); //DX+ME20210303
       xmatrix<double> rlattice_metric_tensor = MetricTensor(rlattice);
       xmatrix<double> str_sp_metric_tensor = MetricTensor(str_sp.scale*str_sp.lattice);
       if(!aurostd::identical(str_sp_metric_tensor,rlattice_metric_tensor)){
@@ -2054,7 +2053,6 @@ namespace LATTICE {
         str_sp.rotate_lattice_original2new=str_sp.rotate_lattice_original2new*aurostd::inverse(rlattice)*str_sp.lattice*str_sp.scale;
       }
       str_sc.SetVolume(str_sp_volume*((double) str_sc.atoms.size()/str_sp.atoms.size()));
-      str_sc.ReScale(1.0); //DX+ME20210303
       str_sp.neg_scale=str_sp_neg_scale;  // reload from backup
       str_sc.neg_scale=str_sp_neg_scale;  // reload from backup
     }

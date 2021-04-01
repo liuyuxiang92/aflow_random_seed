@@ -442,41 +442,17 @@ namespace aurostd {
     content.back() += "]";
   }
 
-  void JSONwriter::addVector(const string &key, const xvector<double> &value, int precision,
-      bool roundoff, double tol) //DX20210308 - added xvector variant
+  void JSONwriter::addVector(const string &key, const vector<string> &value)
   {
     content.push_back("\"" + key + "\":[");
-    content.back() += aurostd::joinWDelimiter(
-        aurostd::xvecDouble2vecString(value, precision, roundoff, tol),",");
+    content.back() += aurostd::joinWDelimiter(aurostd::wrapVecEntries(value, "\""), ",");
     content.back() += "]";
   }
 
-  void JSONwriter::addVector(const string &key, const vector<string> &value, bool wrap) //DX20210301 - added wrap
+  void JSONwriter::addVector(const string &key, const deque<string> &value)
   {
     content.push_back("\"" + key + "\":[");
-    if(wrap){content.back() += aurostd::joinWDelimiter(aurostd::wrapVecEntries(value, "\""), ","); }
-    else{ content.back() += aurostd::joinWDelimiter(value, ","); }
-    content.back() += "]";
-  }
-
-  void JSONwriter::addVector(const string &key, const deque<string> &value, bool wrap) //DX20210301 - added wrap
-  {
-    content.push_back("\"" + key + "\":[");
-    if(wrap){content.back() += aurostd::joinWDelimiter(aurostd::wrapVecEntries(value, "\""), ","); }
-    else{ content.back() += aurostd::joinWDelimiter(value, ","); }
-    content.back() += "]";
-  }
-
-  void JSONwriter::addVector(const string &key, vector<JSONwriter> &value) //AS20210309
-  {
-    content.push_back("\"" + key + "\":[");
-    uint size = value.size();
-    if (size){
-      for (uint i=0; i<size-1; i++){
-        content.back() += value[i].toString() + ",";
-      }
-      content.back() += value[size-1].toString();
-    }
+    content.back() += aurostd::joinWDelimiter(aurostd::wrapVecEntries(value, "\""), ",");
     content.back() += "]";
   }
 
@@ -520,38 +496,6 @@ namespace aurostd {
     content.back() += "]";
   }
 
-  void JSONwriter::addMatrix(const string &key, const xmatrix<double> &value,
-      int precision, bool roundoff, double tol) //DX20210308 - added xmatrix variant
-  {
-    content.push_back("\"" + key + "\":[");
-    content.back() += xmatDouble2String(value, precision, roundoff, tol);
-    content.back() += "]";
-  }
-
-  void JSONwriter::addMatrix(const string &key, const vector<vector<string> > &value) //DX20210211
-  {
-    content.push_back("\"" + key + "\":[");
-    vector<string> matrix;
-    for (uint i=0; i<value.size(); i++){
-      matrix.push_back("[" + aurostd::joinWDelimiter(
-            aurostd::wrapVecEntries(value[i],"\""), ",") + "]");
-    }
-    content.back() += aurostd::joinWDelimiter(matrix, ",");
-    content.back() += "]";
-  }
-
-  void JSONwriter::addMatrix(const string &key, const deque<deque<string> > &value) //DX20210211
-  {
-    content.push_back("\"" + key + "\":[");
-    vector<string> matrix;
-    for (uint i=0; i<value.size(); i++){
-      matrix.push_back("[" + aurostd::joinWDelimiter(
-            aurostd::wrapVecEntries(value[i],"\""), ",") + "]");
-    }
-    content.back() += aurostd::joinWDelimiter(matrix, ",");
-    content.back() += "]";
-  }
-
   //***************************************************************************
   void JSONwriter::addString(const string &key, const string &value)
   {
@@ -565,24 +509,9 @@ namespace aurostd {
   }
 
   //***************************************************************************
-  void JSONwriter::mergeRawJSON(const string &value) //DX20210304 - changed name from addRaw to mergeRawJSON
+  void JSONwriter::addRaw(const string &value)
   {
     content.push_back(value);
-  }
-
-  //***************************************************************************
-  /// Add null value to a key //DX20210301
-  void JSONwriter::addNull(const string &key)
-  {
-    content.push_back("\"" + key + "\":null");
-  }
-
-  //***************************************************************************
-  /// Add "raw" value for a particular key //DX20210301
-  /// Enables JSONs to be passed in as strings, e.g., xstructure2json()
-  void JSONwriter::addRawJSON(const string &key, const string& value)
-  {
-    content.push_back("\"" + key + "\":" + value);
   }
 
   //***************************************************************************

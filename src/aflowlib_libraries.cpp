@@ -3958,7 +3958,7 @@ namespace aflowlib {
           if(VOLDISTEvolution_flag) if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [Volume Distance Bonds Analyzer: ORIGINAL]" << endl;
           ssfile << "Volume Distance Bonds Analyzer: ORIGINAL" << endl;
           stringstream sss;vector<string> vline;
-          sss << pflow::PrintData(xstructure(directory_RAW+"/POSCAR.orig",IOAFLOW_AUTO),"DATA"); // DATA //DX20210301 - void to string output
+          pflow::PrintData(xstructure(directory_RAW+"/POSCAR.orig",IOAFLOW_AUTO),sss,"DATA"); // DATA
           aurostd::string2vectorstring(sss.str(),vline);
           for(uint iline=0;iline<vline.size();iline++) if(aurostd::substring2bool(vline.at(iline),"real space volume")) ssfile << vline.at(iline) << endl;
           for(uint iline=0;iline<vline.size();iline++) if(aurostd::substring2bool(vline.at(iline),"Real space a b c alpha beta gamma")) ssfile << vline.at(iline) << endl;
@@ -3967,7 +3967,7 @@ namespace aflowlib {
           if(VOLDISTEvolution_flag) if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [Volume Distance Bonds Analyzer: RELAX1]" << endl;
           ssfile << "Volume Distance Bonds Analyzer: RELAX1" << endl;
           stringstream sss;vector<string> vline;
-          sss << pflow::PrintData(xstructure(directory_RAW+"/CONTCAR.relax1",IOAFLOW_AUTO),"DATA"); // DATA //DX20210301 - void to string output
+          pflow::PrintData(xstructure(directory_RAW+"/CONTCAR.relax1",IOAFLOW_AUTO),sss,"DATA"); // DATA
           aurostd::string2vectorstring(sss.str(),vline);
           for(uint iline=0;iline<vline.size();iline++) if(aurostd::substring2bool(vline.at(iline),"real space volume")) ssfile << vline.at(iline) << endl;
           for(uint iline=0;iline<vline.size();iline++) if(aurostd::substring2bool(vline.at(iline),"Real space a b c alpha beta gamma")) ssfile << vline.at(iline) << endl;
@@ -3976,7 +3976,7 @@ namespace aflowlib {
           if(VOLDISTEvolution_flag) if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [Volume Distance Bonds Analyzer: RELAX]" << endl;
           ssfile << "Volume Distance Bonds Analyzer: RELAX" << endl;
           stringstream sss;vector<string> vline;
-          sss << pflow::PrintData(xstructure(directory_RAW+"/CONTCAR.relax",IOAFLOW_AUTO),"DATA"); // DATA //DX20210301 - void to string output
+          pflow::PrintData(xstructure(directory_RAW+"/CONTCAR.relax",IOAFLOW_AUTO),sss,"DATA"); // DATA
           aurostd::string2vectorstring(sss.str(),vline);
           for(uint iline=0;iline<vline.size();iline++) if(aurostd::substring2bool(vline.at(iline),"real space volume")) ssfile << vline.at(iline) << endl;
           for(uint iline=0;iline<vline.size();iline++) if(aurostd::substring2bool(vline.at(iline),"Real space a b c alpha beta gamma")) ssfile << vline.at(iline) << endl;
@@ -4044,11 +4044,11 @@ namespace aflowlib {
         stringstream sss; sss << aflow::Banner("BANNER_TINY") << endl;
         xstructure str_sym=str; //CO20171027 //DX20180226 - set equal str
         aurostd::xoption vpflow_edata_orig; //DX20180823 - added xoption
-        sss << pflow::PrintData(str,str_sym,str_sp,str_sc,vpflow_edata_orig,"EDATA",txt_ft,false); // 1=EDATA //CO20171025 //CO20171027 //DX20210301 - void to string output, "txt" to txt_ft
+        pflow::PrintData(str,str_sym,str_sp,str_sc,sss,vpflow_edata_orig,"EDATA","txt",false); // 1=EDATA //CO20171025 //CO20171027
         aurostd::stringstream2file(sss,directory_RAW+"/"+DEFAULT_FILE_EDATA_ORIG_OUT);
         if(AFLOWLIB_VERBOSE) cout << MESSAGE << " EDATA doing orig (POSCAR.orig) json format: " << directory_RAW << endl;
         stringstream jjj; //CO20171025
-        jjj << pflow::PrintData(str_sym,str_sym,str_sp,str_sc,vpflow_edata_orig,"EDATA",json_ft,true); // 1=EDATA, already_calculated!  //CO20171025 //CO20171027  //DX20210301 - void to string output, "json" to json_ft
+        pflow::PrintData(str_sym,str_sym,str_sp,str_sc,jjj,vpflow_edata_orig,"EDATA","json",true); // 1=EDATA, already_calculated!  //CO20171025 //CO20171027
         aurostd::stringstream2file(jjj,directory_RAW+"/"+DEFAULT_FILE_EDATA_ORIG_JSON); //CO20171025
         vcif.clear();vcif.push_back(str);vcif.push_back(str_sp);vcif.push_back(str_sc);
         //CO+DX START 20170713 - adding symmetry output to RAW
@@ -4357,11 +4357,11 @@ namespace aflowlib {
         stringstream sss; sss << aflow::Banner("BANNER_TINY") << endl;
         xstructure str_sym=str; //CO20171027 //DX20180226 - set equal str
         aurostd::xoption vpflow_edata_relax; //DX20180823 - added xoption
-        sss << pflow::PrintData(str,str_sym,str_sp,str_sc,vpflow_edata_relax,"EDATA",txt_ft,false); // EDATA //CO20171025 //CO20171027 //DX20210301 - void to string output, "txt" to txt_ft
+        pflow::PrintData(str,str_sym,str_sp,str_sc,sss,vpflow_edata_relax,"EDATA","txt",false); // EDATA //CO20171025 //CO20171027
         aurostd::stringstream2file(sss,directory_RAW+"/"+DEFAULT_FILE_EDATA_RELAX_OUT);
         if(AFLOWLIB_VERBOSE) cout << MESSAGE << " EDATA doing relax (CONTCAR.relax) json format: " << directory_RAW << endl;
         stringstream jjj; //CO20171025
-        jjj << pflow::PrintData(str_sym,str_sym,str_sp,str_sc,vpflow_edata_relax,"EDATA",json_ft,true); // EDATA already_calculated! //CO20171025 //CO20171027 //DX20210301 - void to string output, "json" to json_ft
+        pflow::PrintData(str_sym,str_sym,str_sp,str_sc,jjj,vpflow_edata_relax,"EDATA","json",true); // EDATA already_calculated! //CO20171025 //CO20171027
         aurostd::stringstream2file(jjj,directory_RAW+"/"+DEFAULT_FILE_EDATA_RELAX_JSON); //CO20171025
         vcif.clear();vcif.push_back(str);vcif.push_back(str_sp);vcif.push_back(str_sc);
         //CO+DX START 20170713 - adding symmetry output to RAW
@@ -4600,11 +4600,11 @@ namespace aflowlib {
         stringstream sss; sss << aflow::Banner("BANNER_TINY") << endl;
         xstructure str_sym=str; //CO20171027 //DX20180226 - set equal str
         aurostd::xoption vpflow_edata_bands; //DX20180823 - added xoption
-        sss << pflow::PrintData(str,str_sym,str_sp,str_sc,vpflow_edata_bands,"EDATA",txt_ft,false); // EDATA //CO20171025 //CO20171027 //DX20210301 - void to string output, "txt" to txt_ft
+        pflow::PrintData(str,str_sym,str_sp,str_sc,sss,vpflow_edata_bands,"EDATA","txt",false); // EDATA //CO20171025 //CO20171027
         aurostd::stringstream2file(sss,directory_RAW+"/"+DEFAULT_FILE_EDATA_BANDS_OUT);
         if(AFLOWLIB_VERBOSE) cout << MESSAGE << " EDATA doing bands (POSCAR.bands) json format: " << directory_RAW << endl;
         stringstream jjj; //CO20171025
-        jjj << pflow::PrintData(str_sym,str_sym,str_sp,str_sc,vpflow_edata_bands,"EDATA",json_ft,true); // EDATA already_calculated! //CO20171025 //CO20171027 //DX20210301 - void to string output, "json" to json_ft
+        pflow::PrintData(str_sym,str_sym,str_sp,str_sc,jjj,vpflow_edata_bands,"EDATA","json",true); // EDATA already_calculated! //CO20171025 //CO20171027
         aurostd::stringstream2file(jjj,directory_RAW+"/"+DEFAULT_FILE_EDATA_BANDS_JSON); //CO20171025
         vcif.clear();vcif.push_back(str);vcif.push_back(str_sp);vcif.push_back(str_sc);
         //CO+DX START 20170713 - adding symmetry output to RAW
@@ -4843,11 +4843,11 @@ namespace aflowlib {
         str=xstructure(directory_RAW+"/POSCAR.orig",IOAFLOW_AUTO);str_sp.clear();str_sc.clear(); //DX20191220 - uppercase to lowercase clear
         stringstream sss; sss << aflow::Banner("BANNER_TINY") << endl;
         xstructure str_sym=str; //CO20171027 //DX20180226 - set equal str
-        sss << pflow::PrintData(str,str_sym,str_sp,str_sc,"DATA",txt_ft,false); // DATA //CO20171025 //CO20171027 //DX20210301 - void to string output, "txt" to txt_ft
+        pflow::PrintData(str,str_sym,str_sp,str_sc,sss,"DATA","txt",false); // DATA //CO20171025 //CO20171027
         aurostd::stringstream2file(sss,directory_RAW+"/"+DEFAULT_FILE_DATA_ORIG_OUT);
         if(AFLOWLIB_VERBOSE) cout << MESSAGE << " DATA doing orig (POSCAR.orig) json format: " << directory_RAW << endl;
         stringstream jjj; //CO20171025
-        jjj << pflow::PrintData(str_sym,str_sym,str_sp,str_sc,"DATA",json_ft,true); // DATA already_calculated! //CO20171025 //CO20171027 //DX20210301 - void to string output, "json" to json_ft
+        pflow::PrintData(str_sym,str_sym,str_sp,str_sc,jjj,"DATA","json",true); // DATA already_calculated! //CO20171025 //CO20171027
         aurostd::stringstream2file(jjj,directory_RAW+"/"+DEFAULT_FILE_DATA_ORIG_JSON); //CO20171025
       }
     }
@@ -4858,11 +4858,11 @@ namespace aflowlib {
         str=xstructure(directory_RAW+"/CONTCAR.relax",IOAFLOW_AUTO);str_sp.clear();str_sc.clear(); //DX20191220 - uppercase to lowercase clear
         stringstream sss; sss << aflow::Banner("BANNER_TINY") << endl;
         xstructure str_sym=str; //CO20171027 //DX20180226 - set equal str
-        sss << pflow::PrintData(str,str_sym,str_sp,str_sc,"DATA",txt_ft,false); // DATA //CO20171025 //CO20171027 //DX20210301 - void to string output, "txt" to txt_ft
+        pflow::PrintData(str,str_sym,str_sp,str_sc,sss,"DATA","txt",false); // DATA //CO20171025 //CO20171027
         aurostd::stringstream2file(sss,directory_RAW+"/"+DEFAULT_FILE_DATA_RELAX_OUT);
         if(AFLOWLIB_VERBOSE) cout << MESSAGE << " DATA doing relax (CONTCAR.relax) json format: " << directory_RAW << endl;
         stringstream jjj; //CO20171025
-        jjj << pflow::PrintData(str_sym,str_sym,str_sp,str_sc,"DATA",json_ft,true); // DATA already_calculated! //CO20171025 //CO20171027 //DX20210301 - void to string output, "json" to json_ft
+        pflow::PrintData(str_sym,str_sym,str_sp,str_sc,jjj,"DATA","json",true); // DATA already_calculated! //CO20171025 //CO20171027
         aurostd::stringstream2file(jjj,directory_RAW+"/"+DEFAULT_FILE_DATA_RELAX_JSON); //CO20171025
       }
     }
@@ -4873,11 +4873,11 @@ namespace aflowlib {
         str=xstructure(directory_RAW+"/POSCAR.bands",IOAFLOW_AUTO);str_sp.clear();str_sc.clear(); //DX20191220 - uppercase to lowercase clear
         stringstream sss; sss << aflow::Banner("BANNER_TINY") << endl;
         xstructure str_sym=str; //CO20171027 //DX20180226 - set equal str
-        sss << pflow::PrintData(str,str_sym,str_sp,str_sc,"DATA",txt_ft,false); // DATA //CO20171025 //CO20171027 //DX20210301 - void to string output, "txt" to txt_ft
+        pflow::PrintData(str,str_sym,str_sp,str_sc,sss,"DATA","txt",false); // DATA //CO20171025 //CO20171027
         aurostd::stringstream2file(sss,directory_RAW+"/"+DEFAULT_FILE_DATA_BANDS_OUT);
         if(AFLOWLIB_VERBOSE) cout << MESSAGE << " DATA doing relax (POSCAR.bands) json format: " << directory_RAW << endl;
         stringstream jjj; //CO20171025
-        jjj << pflow::PrintData(str_sym,str_sym,str_sp,str_sc,"DATA",json_ft,true); // DATA already_calculated! //CO20171025 //CO20171027 //DX20210301 - void to string output, "json" to json_ft
+        pflow::PrintData(str_sym,str_sym,str_sp,str_sc,jjj,"DATA","json",true); // DATA already_calculated! //CO20171025 //CO20171027
         aurostd::stringstream2file(jjj,directory_RAW+"/"+DEFAULT_FILE_DATA_BANDS_JSON); //CO20171025
       }
     }
@@ -6005,7 +6005,7 @@ namespace aflowlib {
     stringstream sss;
     aurostd::xoption vpflow_edata; //DX20180823 - added xoption
     if(LDEBUG){cerr << soliloquy << " starting EDATA analysis" << endl;}
-    sss << pflow::PrintData(xstr_pocc_parent,xstr_sp,xstr_sc,vpflow_edata,"EDATA"); // 1=EDATA //CO20171025 //CO20171027 //DX20210301 void to string output
+    pflow::PrintData(xstr_pocc_parent,xstr_sp,xstr_sc,sss,vpflow_edata,"EDATA"); // 1=EDATA //CO20171025 //CO20171027
     if(LDEBUG){cerr << soliloquy << " EDATA analysis finished" << endl;}
     xmatrix<double> klattice;
     //do NOT write out file, not all the properties are applicable

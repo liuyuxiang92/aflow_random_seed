@@ -426,8 +426,7 @@ namespace anrl {
 
     // space group setting
     if(vpflow.flag("STRUCTURE2ANRL::SETTING")){
-      if(aurostd::tolower(vpflow.getattachedscheme("STRUCTURE2ANRL::SETTING")) == "aflow" ||
-          aurostd::tolower(vpflow.getattachedscheme("STRUCTURE2ANRL::SETTING")) == "anrl"){
+      if(aurostd::tolower(vpflow.getattachedscheme("STRUCTURE2ANRL::SETTING")) == "anrl"){
         setting=SG_SETTING_ANRL;
       }
       else { //DX20190318 - added else
@@ -435,7 +434,7 @@ namespace anrl {
         if(user_setting==1){setting=SG_SETTING_1;}
         else if(user_setting==2){setting=SG_SETTING_2;}
         if(user_setting!=SG_SETTING_1 && user_setting!=SG_SETTING_2){  //DX20190318
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Setting must be 1, 2, or \"aflow\" (for rhombohedral systems: 1=rhl setting and 2=hex setting; for monoclinic systems: 1=unique axis-b and 2=unique axis-c).",_INPUT_ILLEGAL_); //DX20191030
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Setting must be 1, 2, or \"anrl\" (for rhombohedral systems: 1=rhl setting and 2=hex setting; for monoclinic systems: 1=unique axis-b and 2=unique axis-c).",_INPUT_ILLEGAL_); //DX20191030
           //DX20191030 [OBSOLETE] cerr << function_name << "::ERROR: Setting must be 1, 2, or \"anrl\" (for rhombohedral systems: 1=rhl setting and 2=hex setting; for monoclinic systems: 1=unique axis-b and 2=unique axis-c). " << endl; //DX20190318
           //DX20191030 [OBSOLETE] return "";
         } //DX20190318

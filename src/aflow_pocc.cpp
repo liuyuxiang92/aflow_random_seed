@@ -3617,8 +3617,7 @@ namespace pocc {
     bool test_iterator_insertion=false; //short circuit
     xstructure a,b;
     uint starting_index=1;
-    // ME20210208 - do not update when quiet
-    if (!XHOST.QUIET) pflow::updateProgressBar(0,vpsc.size()-starting_index,*p_oss);
+    pflow::updateProgressBar(0,vpsc.size()-starting_index,*p_oss);
     for(uint i=starting_index;i<vpsc.size();i++){
       const POccSuperCell& psc_b=vpsc[i];
       b=createXStructure(psc_b,n_hnf,hnf_count,types_config_permutations_count,true,false);  //PRIMITIVIZE==false, in general it is faster to find whether two structures are equivalent than it is to find primitive cell
@@ -3648,8 +3647,7 @@ namespace pocc {
         unique_structure_bins.push_back(vector<uint>(0));
         unique_structure_bins.back().push_back(i);
       }
-      // ME20210208 - do not update when quiet
-      if (!XHOST.QUIET) pflow::updateProgressBar(i,vpsc.size(),*p_oss);
+      pflow::updateProgressBar(i,vpsc.size(),*p_oss);
     }
 
     //test of stupidity
@@ -3794,8 +3792,7 @@ namespace pocc {
     //NEW
     POccSuperCell psc;
     resetHNFMatrices();
-    // ME20210208 - do not update when quiet
-    if (!XHOST.QUIET) pflow::updateProgressBar(current_iteration,total_permutations_count,*p_oss);
+    pflow::updateProgressBar(current_iteration,total_permutations_count,*p_oss);
     while(iterateHNFMatrix()){
       energy_analyzer.getCluster(hnf_mat);
       psc.m_hnf_index=hnf_index;
@@ -3808,8 +3805,7 @@ namespace pocc {
         psc.m_degeneracy=1; //degeneracy of 1
         add2DerivativeStructuresList(psc);
         site_config_index++;
-        // ME20210208 - do not update when quiet
-        if (!XHOST.QUIET) pflow::updateProgressBar(++current_iteration,total_permutations_count,*p_oss);
+        pflow::updateProgressBar(++current_iteration,total_permutations_count,*p_oss);
       }
       hnf_index++;
     }
@@ -4080,15 +4076,13 @@ namespace pocc {
     }
 
     unsigned long long int current_iteration=0;
-    // ME20210208 - do not update when quiet
-    if (!XHOST.QUIET) pflow::updateProgressBar(current_iteration,l_supercell_sets.size()-1,*p_oss);
+    pflow::updateProgressBar(current_iteration,l_supercell_sets.size()-1,*p_oss);
     POccSuperCell psc;
     for(std::list<POccSuperCellSet>::iterator it=l_supercell_sets.begin();it!=l_supercell_sets.end();++it){
       psc=(*it).getSuperCell();
       psc.m_degeneracy=(*it).getDegeneracy(); //BEWARE OF DEGENERACY of this special POccSuperCell, representative of all supercells in that set
       v_xstr.push_back(createXStructure(psc,n_hnf,hnf_count,types_config_permutations_count,true,PRIMITIVIZE));
-      // ME20210208 - do not update when quiet
-      if (!XHOST.QUIET) pflow::updateProgressBar(++current_iteration,l_supercell_sets.size()-1,*p_oss);
+      pflow::updateProgressBar(++current_iteration,l_supercell_sets.size()-1,*p_oss);
       //cout << AFLOWIN_SEPARATION_LINE << endl;
       //cout << createXStructure((*it),true);
       //cout << AFLOWIN_SEPARATION_LINE << endl;
@@ -6156,32 +6150,17 @@ namespace pocc {
     if(v_str_configs.size()>1){
       multiple_configs_ss.str("");
       multiple_configs_ss << "*** MULTIPLE CONFIGURATIONS POSSIBLE FOR HNF=" << i_hnf << " - START ***" << endl;
-      // ME20210208 - Output to p_oss directly for web (uses --quiet)
-      if (XHOST.vflag_control.flag("WWW")) {
-        *p_oss << aurostd::PaddedCENTER(multiple_configs_ss.str(), centering_padding + 2);
-      } else {
-        pflow::logger(_AFLOW_FILE_NAME_,soliloquy,aurostd::PaddedCENTER(multiple_configs_ss.str(),centering_padding+2),m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_RAW_);
-      }
+      pflow::logger(_AFLOW_FILE_NAME_,soliloquy,aurostd::PaddedCENTER(multiple_configs_ss.str(),centering_padding+2),m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_RAW_);
     }
 
     for(uint str_config=0;str_config<v_str_configs.size();str_config++){
-      // ME20210208 - Output to p_oss directly for web (uses --quiet)
-      if (XHOST.vflag_control.flag("WWW")) {
-        *p_oss << hnfTableLineOutput(i_hnf, str_config);
-      } else {
-        pflow::logger(_AFLOW_FILE_NAME_,soliloquy,hnfTableLineOutput(i_hnf,str_config),m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_RAW_);
-      }
+      pflow::logger(_AFLOW_FILE_NAME_,soliloquy,hnfTableLineOutput(i_hnf,str_config),m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_RAW_);
     }
 
     if(v_str_configs.size()>1){
       multiple_configs_ss.str("");
       multiple_configs_ss << "*** MULTIPLE CONFIGURATIONS POSSIBLE FOR HNF=" << i_hnf << " - END ***" << endl;
-      // ME20210208 - Output to p_oss directly for web (uses --quiet)
-      if (XHOST.vflag_control.flag("WWW")) {
-        *p_oss << aurostd::PaddedCENTER(multiple_configs_ss.str(), centering_padding + 2);
-      } else {
-        pflow::logger(_AFLOW_FILE_NAME_,soliloquy,aurostd::PaddedCENTER(multiple_configs_ss.str(),centering_padding+2),m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_RAW_);
-      }
+      pflow::logger(_AFLOW_FILE_NAME_,soliloquy,aurostd::PaddedCENTER(multiple_configs_ss.str(),centering_padding+2),m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_RAW_);
     }
   }
 
@@ -6229,34 +6208,20 @@ namespace pocc {
     }
 
     i_hnf=0;
-    // ME20210208 - Output to p_oss directly for web (uses --quiet)
-    if (XHOST.vflag_control.flag("WWW")) {
-      *p_oss << AFLOWIN_SEPARATION_LINE_SHORT  << std::endl;
-      *p_oss << hnfTableHeader();
-    } else {
-      message_raw << AFLOWIN_SEPARATION_LINE  << endl; pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message_raw,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_RAW_);pflow::logger(_AFLOW_FILE_NAME_, soliloquy,hnfTableHeader(),m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_RAW_);
-    }
+    message_raw << AFLOWIN_SEPARATION_LINE  << endl; pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message_raw,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_RAW_);pflow::logger(_AFLOW_FILE_NAME_, soliloquy,hnfTableHeader(),m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_RAW_);
     while( hnf_already_provided ? i_hnf<xstr_pocc.partial_occupation_HNF : stoich_error>stoich_tolerance || site_error>site_tolerance ){
       i_hnf++;
       getSiteCountConfigurations(i_hnf);
       writeHNFTableOutput(i_hnf,stoich_error,site_error);
     }
-    // ME20210208 - Output to p_oss directly for web (uses --quiet)
-    if (XHOST.vflag_control.flag("WWW")) {
-      *p_oss << AFLOWIN_SEPARATION_LINE_SHORT << endl;
-    } else {
-      message_raw << AFLOWIN_SEPARATION_LINE << endl;
-      pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message_raw,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_RAW_);
-    }
+    message_raw << AFLOWIN_SEPARATION_LINE << endl; pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message_raw,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_RAW_);
     n_hnf=i_hnf;
 
     if(hnf_already_provided==false) { //if HNF exists, no need to optimize pocc values
       message << "Optimized HNF value = " << n_hnf;
       char LOGGER_TYPE=_LOGGER_MESSAGE_;
       if(m_p_flags.flag("HNF")){LOGGER_TYPE=_LOGGER_COMPLETE_;}
-      // ME20210208 - Output to p_oss directly for web (uses --quiet)
-      if (XHOST.vflag_control.flag("WWW")) *p_oss << message.str() << std::endl;
-      else pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,LOGGER_TYPE);
+      pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,LOGGER_TYPE);
     }
   }
 
