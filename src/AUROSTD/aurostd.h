@@ -474,7 +474,7 @@ namespace aurostd {
   bool FileNotEmpty(const string& FileName);
   bool EFileEmpty(const string& FileName); //CO20190808
   bool EFileNotEmpty(const string& FileName); //CO20190808
-  long int SecondsSinceFileModified_Epoch(const string&);  //ME20180712
+  long int GetTimestampModified(const string&);  //ME20180712
   long int SecondsSinceFileModified(const string&);  //CO20210315
   unsigned int getFileCheckSum(const string&, const string&);  //ME20190219
   unsigned int getFletcher32(unsigned short*, size_t);  //ME20190219

@@ -2319,11 +2319,11 @@ namespace aurostd {
   }
 
   // ***************************************************************************
-  // Function SecondsSinceFileModified_Epoch
+  // Function GetTimestampModified
   // ***************************************************************************
   // ME20180712
   // gets modification time and returns SECONDS since epoch (as long int)
-  long int SecondsSinceFileModified_Epoch(const string& _FileName) {
+  long int GetTimestampModified(const string& _FileName) {
     string FileName(CleanFileName(_FileName));
     if(!FileExist(_FileName)){return 0;}
     time_t tm = 0;
@@ -2340,7 +2340,7 @@ namespace aurostd {
   long int SecondsSinceFileModified(const string& _FileName) {
     string FileName(CleanFileName(_FileName));
     if(!FileExist(_FileName)){return 0;}
-    long int tm_mod=SecondsSinceFileModified_Epoch(FileName);
+    long int tm_mod=GetTimestampModified(FileName);
     time_t t = std::time(NULL); //DX20200319 - nullptr -> NULL
     long int tm_curr = (long int) t;
     return tm_curr-tm_mod;

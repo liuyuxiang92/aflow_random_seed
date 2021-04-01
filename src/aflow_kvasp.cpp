@@ -2924,8 +2924,12 @@ namespace KBIN {
     if(!aurostd::FileExist(xvasp.Directory+"/INCAR")){return;}
     if(!aurostd::FileExist(aflags.Directory+"/"+_AFLOWLOCK_)){return;} //we needed it above to get the vasp_bin
 
-    long int tmod_vaspout=aurostd::SecondsSinceFileModified(xvasp.Directory+"/"+DEFAULT_VASP_OUT);
-    if(LDEBUG){aus << "MMMMM  MESSAGE time since " << DEFAULT_VASP_OUT << " last modified: " << tmod_vaspout << " seconds" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+    //[CO20210315 - not reliable, depends on possibly wrong times on nodes]long int tmod_vaspout=aurostd::SecondsSinceFileModified(xvasp.Directory+"/"+DEFAULT_VASP_OUT);
+    //solution inspired by ME
+    long int tmod_vaspout=aurostd::GetTimestampModified(xvasp.Directory+"/"+DEFAULT_VASP_OUT);
+    long int tmod_lock=aurostd::GetTimestampModified(xvasp.Directory+"/"+_AFLOWLOCK_);
+    long int tmod_vaspout_delta=max((long int)0,tmod_lock-tmod_vaspout);  //if, for some reason, vaspout>lock, then set it to 0
+    if(1||LDEBUG){aus << "MMMMM  MESSAGE time since " << DEFAULT_VASP_OUT << " last modified: " << tmod_vaspout_delta << " seconds" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
 
     //get vasp output file
     //CO20210315 - opening up subshells for grep (substring_present_file_FAST) is very expensive, especially many times
@@ -3010,7 +3014,7 @@ namespace KBIN {
     xwarning.flag("LRF_COMMUTATOR",(content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("LRF_COMMUTATOR internal error: the vector")))!=string::npos)); // GET ALL TIMES
     xwarning.flag("MEMORY",
         (content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("AFLOW ERROR: AFLOW_MEMORY=")))!=string::npos) ||
-        (vasp_still_running==true && (tmod_vaspout>0 && tmod_vaspout<(3600*12)) && tmod_vaspout>=STALE_VASP_OUT) || //CO20210315 - tmod_vaspout might be skewed based on node clocks, so make sure the values are reasonable (between 0 and 12 hours)
+        (vasp_still_running==true && (tmod_vaspout_delta>0 && tmod_vaspout_delta<(3600*12)) && tmod_vaspout_delta>=STALE_VASP_OUT) || //CO20210315 - tmod_vaspout_delta might be skewed based on node clocks, so make sure the values are reasonable (between 0 and 12 hours)
         FALSE);
     xwarning.flag("MPICH11",((content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("BAD TERMINATION OF ONE OF YOUR APPLICATION PROCESSES")))!=string::npos) &&
           (content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("EXIT CODE: 11")))!=string::npos)) );
@@ -3745,13 +3749,13 @@ namespace KBIN {
         //add KBIN::XVASP_INCAR_REMOVE_ENTRY() as necessary
         //check also submode patches
 
-        // ********* APPLY PREFERRED SYMMETRY FIXES ******************
-        KBIN::VASP_ApplyPatch("NKXYZ_IKPTD",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);  // NKXYZ_IKPTD must come BEFORE IBZKPT
+        // ********* APPLY PREFERRED SYMMETRY FIXES ******************  //all of these must come before ROTMAT
+        KBIN::VASP_ApplyPatch("NKXYZ_IKPTD",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);  //must come BEFORE IBZKPT
+        KBIN::VASP_ApplyPatch("KKSYM",fix_KKSYM,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);  //must come BEFORE IBZKPT
         KBIN::VASP_ApplyPatch("IBZKPT",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
+        KBIN::VASP_ApplyPatch("SYMPREC",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);  //must come before INVGRP
         KBIN::VASP_ApplyPatch("INVGRP",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
-        KBIN::VASP_ApplyPatch("KKSYM",fix_KKSYM,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
         KBIN::VASP_ApplyPatch("SGRCON",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
-        KBIN::VASP_ApplyPatch("SYMPREC",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
         // ********* APPLY GENERIC SYMMETRY FIXES ******************
         KBIN::VASP_ApplyPatch("ROTMAT",fix_ROTMAT,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
         // ********* APPLY OTHER FIXES ******************
