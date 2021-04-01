@@ -115,7 +115,7 @@ namespace pflow {
   //DX20200225 [OBSOLETE - moved to XtalFinder header] vector<StructurePrototype> compare2prototypes(const xstructure& xstrIN, const aurostd::xoption& vpflow, ostream& logstream=cout); //DX20190314 - overloaded 
   //DX20200225 [OBSOLETE - moved to XtalFinder header] vector<StructurePrototype> compare2prototypes(const xstructure& xstrIN, const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream=cout); //DX20190314 - overloaded 
   //DX20170901 [OBSOLETE] void DATA(const string& smode="DATA",istream& input);
-  bool DATA(istream& input,aurostd::xoption& vpflow,const string& smode="DATA",ostream& oss=cout); //DX20170901 - SGDATA + JSON
+  bool DATA(istream& input,const aurostd::xoption& vpflow,const string& smode="DATA",ostream& oss=cout); //DX20170901 - SGDATA + JSON //DX20210302 - added const to vpflow
   void DATA1(const string& options,istream& input);
   void DATA2(istream& input);
   void DEBYE(const string& options);
@@ -433,7 +433,7 @@ namespace pflow {
   xstructure SETORIGIN(istream& input,const int& natom);
   void SEWALD(vector<string>,istream& input);
   void SG(istream& input);
-  bool SGDATA(istream& input, aurostd::xoption& vpflow, ostream& oss=cout); //DX20170831 - SGDATA
+  //DX20210301 [OBSOLETE - moved into pflow::DATA()] bool SGDATA(istream& input, aurostd::xoption& vpflow, ostream& oss=cout); //DX20170831 - SGDATA
   void SGROUP(_aflags &aflags,istream& input,double radius);
   void SHELL(const string& options,istream& input);
   string SPECIES(istream& input);
@@ -481,14 +481,29 @@ namespace pflow {
   void PrintCIF(ostream& oss,const xstructure&,int=1,int=1); //DX20180806 - added setting default
   void PrintClat(const xvector<double>& data,ostream& oss=cout);
   void PrintCmpStr(const xstructure& str1,const xstructure& str2,const double& rcut,ostream& oss=cout);
-  void PrintData(const xstructure& str,xstructure& str_sym,xstructure& str_sp,xstructure& str_sc,ostream& oss,const string& smode="DATA",const string& format="txt",bool already_calculated=false); //CO20171027
-  void PrintData(const xstructure& str,xstructure& str_sym,xstructure& str_sp,xstructure& str_sc,ostream& oss,double tolerance,const string& smode="DATA",bool no_scan=false,int sg_setting=1,const string& format="txt",bool already_calculated=false); //CO20171027
-  void PrintData(const xstructure& str,xstructure& str_sym,xstructure& str_sp,xstructure& str_sc,ostream& oss,aurostd::xoption& vpflow,const string& smode="DATA",const string& format="txt",bool already_calculated=false); //DX20180823
-  void PrintData(const xstructure& str,xstructure& str_sym,xstructure& str_sp,xstructure& str_sc,ostream& oss_final,aurostd::xoption& vpflow,double tolerance,const string& smode="DATA",bool no_scan=false,int sg_setting=1,const string& format="txt",bool already_calculated=false); //DX20180822
-  void PrintData(const xstructure& str,ostream& oss,double tolerance,const string& smode="DATA",bool no_scan=false,int sg_setting=1,const string& format="txt");
-  void PrintData(const xstructure& str,ostream& oss,const string& smode="DATA",const string& format="txt");
-  void PrintData(const xstructure& str,ostream& oss,aurostd::xoption& vpflow,const string& smode="DATA",const string& format="txt");  //CO20200731
-  void PrintData(const xstructure& str,xstructure& str_sp,xstructure& str_sc,ostream& oss,aurostd::xoption& vpflow,const string& smode="DATA",const string& format="txt");  //CO20200731
+  string PrintData(const xstructure& xstr, const string& smode="DATA", filetype ftype=txt_ft, bool already_calculated=false, double sym_eps=AUROSTD_MAX_DOUBLE, bool no_scan=false, int setting=1); //DX20210301
+  string PrintData(const xstructure& xstr, aurostd::xoption& vpflow, const string& smode="DATA", filetype ftype=txt_ft, bool already_calculated=false, double sym_eps=AUROSTD_MAX_DOUBLE, bool no_scan=false, int setting=1); //DX20210301
+  string PrintData(const xstructure& xstr, xstructure& str_sp, xstructure& str_sc, aurostd::xoption& vpflow, const string& smode="DATA", filetype ftype=txt_ft, bool already_calculated=false, double sym_eps=AUROSTD_MAX_DOUBLE, bool no_scan=false, int setting=1); //DX20210301
+  string PrintData(const xstructure& xstr, xstructure& str_sym, xstructure& str_sp, xstructure& str_sc, const string& smode="DATA", filetype ftype=txt_ft, bool already_calculated=false, double sym_eps=AUROSTD_MAX_DOUBLE, bool no_scan=false, int setting=1); //DX20210301
+  string PrintData(const xstructure& xstr, xstructure& str_sym, xstructure& str_sp, xstructure& str_sc, aurostd::xoption& vpflow, const string& smode="DATA", filetype ftype=txt_ft, bool already_calculated=false, double sym_eps=AUROSTD_MAX_DOUBLE, bool no_scan=false, int setting=1); //DX20210301
+  //DX20210301 [OBSOLETE] void PrintData(const xstructure& str,xstructure& str_sym,xstructure& str_sp,xstructure& str_sc,ostream& oss,const string& smode="DATA",const string& format="txt",bool already_calculated=false); //CO20171027
+  //DX20210301 [OBSOLETE] void PrintData(const xstructure& str,xstructure& str_sym,xstructure& str_sp,xstructure& str_sc,ostream& oss,double tolerance,const string& smode="DATA",bool no_scan=false,int sg_setting=1,const string& format="txt",bool already_calculated=false); //CO20171027
+  //DX20210301 [OBSOLETE] void PrintData(const xstructure& str,xstructure& str_sym,xstructure& str_sp,xstructure& str_sc,ostream& oss,aurostd::xoption& vpflow,const string& smode="DATA",const string& format="txt",bool already_calculated=false); //DX20180823
+  //DX20210301 [OBSOLETE] void PrintData(const xstructure& str,xstructure& str_sym,xstructure& str_sp,xstructure& str_sc,ostream& oss_final,aurostd::xoption& vpflow,double tolerance,const string& smode="DATA",bool no_scan=false,int sg_setting=1,const string& format="txt",bool already_calculated=false); //DX20180822
+  //DX20210301 [OBSOLETE] void PrintData(const xstructure& str,ostream& oss,double tolerance,const string& smode="DATA",bool no_scan=false,int sg_setting=1,const string& format="txt");
+  //DX20210301 [OBSOLETE] void PrintData(const xstructure& str,ostream& oss,const string& smode="DATA",const string& format="txt");
+  //DX20210301 [OBSOLETE] void PrintData(const xstructure& str,ostream& oss,aurostd::xoption& vpflow,const string& smode="DATA",const string& format="txt");  //CO20200731
+  //DX20210301 [OBSOLETE] void PrintData(const xstructure& str,xstructure& str_sp,xstructure& str_sc,ostream& oss,aurostd::xoption& vpflow,const string& smode="DATA",const string& format="txt");  //CO20200731
+  string PrintRealLatticeData(const xstructure& xstr, const string& smode="DATA", filetype ftype=txt_ft, bool standalone=true, bool already_calculated=false, double sym_eps=AUROSTD_MAX_DOUBLE); //DX20210211
+  string PrintRealLatticeData(const xstructure& xstr, aurostd::xoption& vpflow, const string& smode="DATA", filetype ftype=txt_ft, bool standalone=true, bool already_calculated=false, double sym_eps=AUROSTD_MAX_DOUBLE); //DX20210211
+  string PrintLatticeLatticeData(const xstructure& xstr, filetype ftype=txt_ft, bool standalone=true, bool already_calculated=false, double sym_eps=AUROSTD_MAX_DOUBLE); //DX20210211
+  string PrintLatticeLatticeData(const xstructure& xstr, aurostd::xoption& vpflow, filetype ftype=txt_ft, bool standalone=true, bool already_calculated=false, double sym_eps=AUROSTD_MAX_DOUBLE); //DX20210211
+  string PrintCrystalPointGroupData(const xstructure& xstr, filetype ftype=txt_ft, bool standalone=true, bool already_calculated=false, double sym_eps=AUROSTD_MAX_DOUBLE); //DX20210211
+  string PrintCrystalPointGroupData(const xstructure& xstr, aurostd::xoption& vpflow, filetype ftype=txt_ft, bool standalone=true, bool already_calculated=false, double sym_eps=AUROSTD_MAX_DOUBLE); //DX20210211
+  string PrintReciprocalLatticeData(const xstructure& xstr, filetype ftype=txt_ft, bool standalone=true, bool already_calculated=false, double sym_eps=AUROSTD_MAX_DOUBLE); //DX20210209
+  string PrintReciprocalLatticeData(const xstructure& xstr, aurostd::xoption& vpflow, filetype ftype=txt_ft, bool standalone=true, bool already_calculated=false, double sym_eps=AUROSTD_MAX_DOUBLE); //DX20210209
+  string PrintSuperlatticeData(const xstructure& xstr, filetype ftype=txt_ft, bool standalone=true, bool already_calculated=false, double sym_eps=AUROSTD_MAX_DOUBLE); //DX20210209
+  string PrintSuperlatticeData(const xstructure& xstr, aurostd::xoption& vpflow, filetype ftype=txt_ft, bool standalone=true, bool already_calculated=false, double sym_eps=AUROSTD_MAX_DOUBLE); //DX20210209
   void PrintData1(const xstructure& str1,const double& rcut,ostream& oss);
   string PrintData1(const xstructure& str1,const double& rcut);
   void PrintData2(const xstructure&,ostream& oss=cout);
@@ -496,9 +511,11 @@ namespace pflow {
   void PrintDistances(xstructure str,const double cutoff,ostream& oss=cout);
   void PrintEwald(const xstructure& in_str,double& epoint,double& ereal,double& erecip,double& eewald,double& eta,const double& SUMTOL,ostream& oss=cout);
   void PrintGulp(const xstructure&,ostream& oss=cout);
-  bool PrintSGData(xstructure& str_sg,ostream& oss,bool standalone=true,const string& format="txt",bool already_calculated=false); //DX20170830 - SGDATA
-  bool PrintSGData(xstructure& str_sg,double& tolerance,ostream& oss,bool no_scan=false,int setting=1,bool standalone=true,const string& format="txt",bool already_calculated=false); //DX20180226 - added & to tolerance
-  bool PrintSGData(xstructure& str_sg,double& tolerance,ostream& oss_final,aurostd::xoption& vpflow,bool no_scan=false,int sg_setting=1,bool standalone=true,const string& format="txt",bool already_calculated=false); //DX20180822
+  string PrintSGData(xstructure& xstr, filetype ftype=txt_ft, bool standalone=true, bool already_calculated=false, double sym_eps=AUROSTD_MAX_DOUBLE, bool no_scan=false, int setting=1, bool supress_Wyckoff=false); //DX20210211
+  string PrintSGData(xstructure& xstr, aurostd::xoption& vpflow, filetype ftype=txt_ft, bool standalone=true, bool already_calculated=false, double sym_eps=AUROSTD_MAX_DOUBLE, bool no_scan=false, int setting=1, bool suppress_Wyckoff=false); //DX20210211
+  //DX20210301 [OBSOLETE] bool PrintSGData(xstructure& str_sg,ostream& oss,bool standalone=true,const string& format="txt",bool already_calculated=false); //DX20170830 - SGDATA
+  //DX20210301 [OBSOLETE] bool PrintSGData(xstructure& str_sg,double& tolerance,ostream& oss,bool no_scan=false,int setting=1,bool standalone=true,const string& format="txt",bool already_calculated=false); //DX20180226 - added & to tolerance
+  //DX20210301 [OBSOLETE] bool PrintSGData(xstructure& str_sg,double& tolerance,ostream& oss_final,aurostd::xoption& vpflow,bool no_scan=false,int sg_setting=1,bool standalone=true,const string& format="txt",bool already_calculated=false); //DX20180822
 }
 void PrintKmesh(const xmatrix<double>& kmesh,ostream& oss=cout);    // HERE
 void PrintImages(xstructure strA,xstructure strB,const int& ni,const string& path_flag);
