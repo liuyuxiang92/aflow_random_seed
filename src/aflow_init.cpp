@@ -1891,7 +1891,7 @@ void AFLOW_monitor_VASP(){
     while(nfailures<NCOUNTS_WAIT_MONITOR && nsuccesses<NCOUNTS_WAIT_MONITOR){  //10 minutes, keeps us from wasting walltime
       if(!aurostd::FileExist(file)){
         nfailures++;  //increment, only wait 10 minutes for a file to be written
-        aurostd::Sleep(MONITOR_VASP_SLEEP);
+        aurostd::Sleep(SLEEP_VASP_MONITOR);
         continue;
       }
       nfailures=0;  //reset
@@ -1915,7 +1915,7 @@ void AFLOW_monitor_VASP(){
       if(aurostd::EFileExist(file_dir+"/"+DEFAULT_AFLOW_END_OUT)){break;}
       if(aurostd::EFileExist(file_dir+"/STOPFLOW")){aurostd::RemoveFile(file_dir+"/STOPFLOW");break;}
       
-      aurostd::Sleep(MONITOR_VASP_SLEEP);
+      aurostd::Sleep(SLEEP_VASP_MONITOR);
       
       //if --FILE=LOCK, this will be useful
       if(aurostd::EFileExist(file_dir+"/"+DEFAULT_AFLOW_END_OUT)){break;}
@@ -1972,7 +1972,7 @@ void AFLOW_monitor_VASP(const string& directory){
   uint i=0;
   uint nexecuting=0,nexecuting_old=0;
   uint n_not_running=0;
-  uint sleep_seconds=MONITOR_VASP_SLEEP;
+  uint sleep_seconds=SLEEP_VASP_MONITOR;
   uint sleep_seconds_afterkill=sleep_seconds;
   aurostd::xoption xmessage,xwarning,xmonitor; //xfixed; //not needed (yet)
   bool VERBOSE=false;

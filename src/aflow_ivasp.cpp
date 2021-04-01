@@ -6117,6 +6117,8 @@ namespace KBIN {
       else if(param_string=="=GAMMA_ODD"){koperation="Gamma,Xodd,Yodd,Zodd";}
       else if(param_string=="=GAMMA_EVEN"){koperation="Gamma,Xeven,Yeven,Zeven";}
       else if(param_string=="=KMAX"){koperation="Kmax";}
+      else if(param_string=="+=1"){koperation="X++,Y++,Z++";}
+      else if(param_string=="+=2"){koperation="X2+,Y2+,Z2+";}
       else if(param_string=="-=1"){koperation="X--,Y--,Z--";}
       else if(param_string=="-=2"){koperation="X2-,Y2-,Z2-";}
       else{throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"KPOINTS unknown mode: \""+param_string+"\"",_INPUT_ILLEGAL_);}
@@ -6376,6 +6378,7 @@ namespace KBIN {
     }
     else if(mode=="EDDRMM") {
       //https://www.vasp.at/forum/viewtopic.php?f=3&t=214&p=215
+      if(submode<0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"no submode set: \""+mode+"\"",_INPUT_ILLEGAL_);}  //CO20210315
       if(submode==0){ //try G-centered //CO20200624
         patch="KPOINTS=GAMMA";
         if(Krun && xfixed.flag(patch)){Krun=false;}
@@ -6449,10 +6452,30 @@ namespace KBIN {
       if(Krun){xfixed.flag(patch,true);}
     }
     else if(mode=="KKSYM") {
-      patch="KPOINTS=KMAX";
-      if(Krun && xfixed.flag(patch)){Krun=false;}
-      Krun=(Krun && KBIN::XVASP_Afix_ApplyPatch(patch,xvasp,kflags,vflags,aflags,FileMESSAGE));
-      if(Krun){xfixed.flag(patch,true);}
+      if(submode<0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"no submode set: \""+mode+"\"",_INPUT_ILLEGAL_);}  //CO20210315
+      if(submode==0){ //try SYMPREC first (easy)
+        patch="SYMPREC";
+        if(Krun && xfixed.flag(patch)){Krun=false;}
+        Krun=(Krun && KBIN::XVASP_Afix_ApplyPatch(patch,xvasp,kflags,vflags,aflags,FileMESSAGE));
+        if(Krun){xfixed.flag(patch,true);}
+        if(!Krun){Krun=true;submode++;} //reset and go to the next solution
+      }
+      if(submode==1){ //try G-centered //CO20200624
+        patch="KPOINTS=GAMMA";
+        if(Krun && xfixed.flag(patch)){Krun=false;}
+        Krun=(Krun && KBIN::XVASP_Afix_ApplyPatch(patch,xvasp,kflags,vflags,aflags,FileMESSAGE));
+        if(Krun){xfixed.flag(patch,true);}
+        if(!Krun){Krun=true;submode++;} //reset and go to the next solution
+      }
+      if(submode==2){ //Kmax
+        patch="KPOINTS=KMAX";
+        if(Krun && xfixed.flag(patch)){Krun=false;}
+        Krun=(Krun && KBIN::XVASP_Afix_ApplyPatch(patch,xvasp,kflags,vflags,aflags,FileMESSAGE));
+        if(Krun){xfixed.flag(patch,true);}
+        if(!Krun){Krun=true;submode++;} //reset and go to the next solution
+      }
+      if(submode>=3){Krun=false;}
+      submode+=submode_increment;submode_increment=1;  //increment and reset
     }
     else if(mode=="LREAL") {
       patch="LREAL";
@@ -6461,10 +6484,25 @@ namespace KBIN {
       if(Krun){xfixed.flag(patch,true);}
     }
     else if(mode=="MEMORY") { //CO20210315
-      patch="SKIP_RUN";
-      if(Krun && xfixed.flag(patch)){Krun=false;}
-      Krun=(Krun && KBIN::XVASP_Afix_ApplyPatch(patch,xvasp,kflags,vflags,aflags,FileMESSAGE));
-      if(Krun){xfixed.flag(patch,true);}
+      if(submode<0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"no submode set: \""+mode+"\"",_INPUT_ILLEGAL_);}  //CO20210315
+      if(submode==0){ //lower k-points
+        patch="KPOINTS-=1";
+        //[keep applying until it returns false]if(Krun && xfixed.flag(patch)){Krun=false;}
+        if(Krun && (xfixed.flag("KPOINTS+=1") || xfixed.flag("KPOINTS+=2"))){Krun=false;} //avoid up and down
+        Krun=(Krun && KBIN::XVASP_Afix_ApplyPatch(patch,xvasp,kflags,vflags,aflags,FileMESSAGE));
+        if(Krun){xfixed.flag(patch,true);}
+        if(!Krun){Krun=true;submode++;} //reset and go to the next solution
+      }
+      //we might add lowering NBANDS here, as well as NGX, need to test...
+      if(submode==1){ //skip run
+        patch="SKIP_RUN";
+        if(Krun && xfixed.flag(patch)){Krun=false;}
+        Krun=(Krun && KBIN::XVASP_Afix_ApplyPatch(patch,xvasp,kflags,vflags,aflags,FileMESSAGE));
+        if(Krun){xfixed.flag(patch,true);}
+        if(!Krun){Krun=true;submode++;} //reset and go to the next solution
+      }
+      if(submode>=2){Krun=false;}
+      submode+=submode_increment;submode_increment=1;  //increment and reset
     }
     else if(mode=="MPICH11") {
       patch="ULIMIT";
@@ -6480,6 +6518,7 @@ namespace KBIN {
       
       bool Krun2=true;patch="KPOINTS-=2";
       //[keep applying until it returns false]if(Krun2 && xfixed.flag(patch)){Krun2=false;}
+      if(Krun && (xfixed.flag("KPOINTS+=1") || xfixed.flag("KPOINTS+=2"))){Krun=false;} //avoid up and down
       Krun2=(Krun2 && KBIN::XVASP_Afix_ApplyPatch(patch,xvasp,kflags,vflags,aflags,FileMESSAGE));
       if(Krun2){xfixed.flag(patch,true);}
 
@@ -6492,6 +6531,7 @@ namespace KBIN {
       if(Krun){xfixed.flag(patch,true);}
     }
     else if(mode=="NELM") {
+      if(submode<0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"no submode set: \""+mode+"\"",_INPUT_ILLEGAL_);}  //CO20210315
       if(submode==0){ //AMIX/BMIX fixes
         bool Krun1=true;patch="AMIX=0.1";
         if(Krun1 && xfixed.flag(patch)){Krun1=false;}
@@ -6535,6 +6575,7 @@ namespace KBIN {
       //https://www.vasp.at/forum/viewtopic.php?t=1228
       patch="KPOINTS-=1";
       //[keep applying until it returns false]if(Krun && xfixed.flag(patch)){Krun=false;}
+      if(Krun && (xfixed.flag("KPOINTS+=1") || xfixed.flag("KPOINTS+=2"))){Krun=false;} //avoid up and down
       Krun=(Krun && KBIN::XVASP_Afix_ApplyPatch(patch,xvasp,kflags,vflags,aflags,FileMESSAGE));
       if(Krun){xfixed.flag(patch,true);}
     }
@@ -6569,6 +6610,7 @@ namespace KBIN {
       if(Krun){xfixed.flag(patch,true);}
     }
     else if(mode=="ROTMAT") {
+      if(submode<0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"no submode set: \""+mode+"\"",_INPUT_ILLEGAL_);}  //CO20210315
       if(submode==0){ //try SYMPREC first (easy)
         patch="SYMPREC";
         if(Krun && xfixed.flag(patch)){Krun=false;}

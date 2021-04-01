@@ -14,7 +14,7 @@
 
 #define _KVASP_VASP_SLEEP_   2
 #define _KVASP_WAIT_SLEEP_   10
-//[CO20201111 created rc parameter VASP_CHECK_SLEEP]#define _KVASP_CHECK_SLEEP_  30 //CO20201111  //60   //10
+//[CO20201111 created rc parameter SLEEP_VASP_COMPLETION]#define _KVASP_CHECK_SLEEP_  30 //CO20201111  //60   //10
 #define KBIN_WRONG_ENTRY_STRING string("WRONG_ENTRY")
 #define KBIN_WRONG_ENTRY_NUMBER -123
 
@@ -2924,6 +2924,9 @@ namespace KBIN {
     if(!aurostd::FileExist(xvasp.Directory+"/INCAR")){return;}
     if(!aurostd::FileExist(aflags.Directory+"/"+_AFLOWLOCK_)){return;} //we needed it above to get the vasp_bin
 
+    long int tmod_vaspout=aurostd::SecondsSinceFileModified(xvasp.Directory+"/"+DEFAULT_VASP_OUT);
+    if(LDEBUG){cerr << soliloquy << " time since " << DEFAULT_VASP_OUT << " last modified: " << tmod_vaspout << " seconds" << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
+
     //get vasp output file
     //CO20210315 - opening up subshells for grep (substring_present_file_FAST) is very expensive, especially many times
     //better to read file in once
@@ -3005,7 +3008,10 @@ namespace KBIN {
         (content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("shift your grid to Gamma")))!=string::npos) || //CO20190704 - captures both old/new versions of VASP
         FALSE); //CO20190704
     xwarning.flag("LRF_COMMUTATOR",(content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("LRF_COMMUTATOR internal error: the vector")))!=string::npos)); // GET ALL TIMES
-    xwarning.flag("MEMORY",(content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("AFLOW ERROR: AFLOW_MEMORY=")))!=string::npos));
+    xwarning.flag("MEMORY",
+        (content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("AFLOW ERROR: AFLOW_MEMORY=")))!=string::npos) ||
+        (vasp_still_running==true && tmod_vaspout>=STALE_VASP_OUT) || //CO20210315
+        TRUE);
     xwarning.flag("MPICH11",((content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("BAD TERMINATION OF ONE OF YOUR APPLICATION PROCESSES")))!=string::npos) &&
           (content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("EXIT CODE: 11")))!=string::npos)) );
     xwarning.flag("MPICH139",((content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("BAD TERMINATION OF ONE OF YOUR APPLICATION PROCESSES")))!=string::npos) &&
@@ -3194,6 +3200,8 @@ namespace KBIN {
     int fix_ROTMAT=0;
     int fix_EDDRMM=0;
     int fix_NELM=0;
+    int fix_KKSYM=0;
+    int fix_MEMORY=0;
 
     // get CPUS from PBS/SLURM
     // string ausenv;
@@ -3738,11 +3746,11 @@ namespace KBIN {
         //check also submode patches
 
         // ********* APPLY PREFERRED SYMMETRY FIXES ******************
-        // NKXYZ_IKPTD must come BEFORE IBZKPT
-        KBIN::VASP_ApplyPatch("NKXYZ_IKPTD",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
+        KBIN::VASP_ApplyPatch("NKXYZ_IKPTD",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);  // NKXYZ_IKPTD must come BEFORE IBZKPT
         KBIN::VASP_ApplyPatch("IBZKPT",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
-        KBIN::VASP_ApplyPatch("SGRCON",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
         KBIN::VASP_ApplyPatch("INVGRP",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
+        KBIN::VASP_ApplyPatch("KKSYM",fix_KKSYM,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
+        KBIN::VASP_ApplyPatch("SGRCON",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
         KBIN::VASP_ApplyPatch("SYMPREC",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
         // ********* APPLY GENERIC SYMMETRY FIXES ******************
         KBIN::VASP_ApplyPatch("ROTMAT",fix_ROTMAT,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
@@ -3757,7 +3765,7 @@ namespace KBIN {
         KBIN::VASP_ApplyPatch("EXCCOR",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
         KBIN::VASP_ApplyPatch("GAMMA_SHIFT",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
         //[CO20210315 - patch previously removed]KBIN::VASP_ApplyPatch("LRF_COMMUTATOR",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
-        KBIN::VASP_ApplyPatch("MEMORY",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
+        KBIN::VASP_ApplyPatch("MEMORY",fix_MEMORY,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
         KBIN::VASP_ApplyPatch("MPICH11",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
         KBIN::VASP_ApplyPatch("MPICH139",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
         KBIN::VASP_ApplyPatch("NATOMS",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
@@ -3892,9 +3900,9 @@ namespace KBIN {
 namespace KBIN {
   void WaitFinished(_xvasp &xvasp,_aflags &aflags,ofstream &FileMESSAGE,uint max_count,bool verbose) {
     uint i=0;
-    uint sleep_seconds=VASP_CHECK_SLEEP;
-    if((max_count*sleep_seconds)>MONITOR_VASP_SLEEP){ //safety for --monitor_vasp
-      sleep_seconds=(uint)(max(3.0,((double)MONITOR_VASP_SLEEP/(double)max_count)-5.0)); //the max ensures we don't go below 0 (if MONITOR_VASP_SLEEP is too low)
+    uint sleep_seconds=SLEEP_VASP_COMPLETION;
+    if((max_count*sleep_seconds)>SLEEP_VASP_MONITOR){ //safety for --monitor_vasp
+      sleep_seconds=(uint)(max(3.0,((double)SLEEP_VASP_MONITOR/(double)max_count)-5.0)); //the max ensures we don't go below 0 (if SLEEP_VASP_MONITOR is too low)
     }
     while((i++)<max_count && !KBIN::VASP_RunFinished(xvasp,aflags,FileMESSAGE,verbose)) {
       aurostd::Sleep(sleep_seconds); //CO20201111

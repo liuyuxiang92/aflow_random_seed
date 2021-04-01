@@ -880,10 +880,12 @@
 #define         AFLOW_CORE_TEMPERATURE_REFRESH                XHOST.adefault.getattachedutype<double>("AFLOW_CORE_TEMPERATURE_REFRESH") 
 
 // VASP MACHINE SETTINGS
-#define AFLOWRC_VASP_CHECK_SLEEP                              15    // seconds
-#define         VASP_CHECK_SLEEP                              XHOST.adefault.getattachedutype<double>("VASP_CHECK_SLEEP") 
-#define AFLOWRC_MONITOR_VASP_SLEEP                            60    // seconds
-#define         MONITOR_VASP_SLEEP                            XHOST.adefault.getattachedutype<double>("MONITOR_VASP_SLEEP") 
+#define AFLOWRC_SLEEP_VASP_COMPLETION                         15    // seconds
+#define         SLEEP_VASP_COMPLETION                         XHOST.adefault.getattachedutype<double>("SLEEP_VASP_COMPLETION") 
+#define AFLOWRC_SLEEP_VASP_MONITOR                            60    // seconds
+#define         SLEEP_VASP_MONITOR                            XHOST.adefault.getattachedutype<double>("SLEEP_VASP_MONITOR") 
+#define AFLOWRC_STALE_VASP_OUT                                10800    // seconds
+#define         STALE_VASP_OUT                                XHOST.adefault.getattachedutype<double>("STALE_VASP_OUT") 
 
 // MACHINE DEPENDENT MPI
 #define AFLOWRC_MPI_OPTIONS_DUKE_BETA_MPICH                   string("ulimit -s unlimited ") // DUKE_BETA_MPICH
@@ -1648,8 +1650,9 @@ namespace aflowrc {
     aflowrc::load_default("AFLOW_CORE_TEMPERATURE_REFRESH",AFLOWRC_AFLOW_CORE_TEMPERATURE_REFRESH);
 
     // VASP MACHINE SETTINGS
-    aflowrc::load_default("VASP_CHECK_SLEEP",AFLOWRC_VASP_CHECK_SLEEP); //CO20201111
-    aflowrc::load_default("MONITOR_VASP_SLEEP",AFLOWRC_MONITOR_VASP_SLEEP); //CO20201111
+    aflowrc::load_default("SLEEP_VASP_COMPLETION",AFLOWRC_SLEEP_VASP_COMPLETION); //CO20201111
+    aflowrc::load_default("SLEEP_VASP_MONITOR",AFLOWRC_SLEEP_VASP_MONITOR); //CO20201111
+    aflowrc::load_default("STALE_VASP_OUT",AFLOWRC_STALE_VASP_OUT); //CO20201111
 
     // DEFAULT MACHINE DEPENDENT MPI
     aflowrc::load_default("MPI_OPTIONS_DUKE_BETA_MPICH",AFLOWRC_MPI_OPTIONS_DUKE_BETA_MPICH); 
@@ -2252,8 +2255,9 @@ namespace aflowrc {
     aflowrc << "AFLOW_CORE_TEMPERATURE_HALT=" << AFLOWRC_AFLOW_CORE_TEMPERATURE_HALT << " // Celsius" << endl;
     aflowrc << "AFLOW_CORE_TEMPERATURE_REFRESH=" << AFLOWRC_AFLOW_CORE_TEMPERATURE_REFRESH << " // seconds"   << endl;
 
-    aflowrc << "VASP_CHECK_SLEEP=" << AFLOWRC_VASP_CHECK_SLEEP << " // seconds"   << endl;  //CO20201111
-    aflowrc << "MONITOR_VASP_SLEEP=" << AFLOWRC_MONITOR_VASP_SLEEP << " // seconds"   << endl;  //CO20201111
+    aflowrc << "SLEEP_VASP_COMPLETION=" << AFLOWRC_SLEEP_VASP_COMPLETION << " // seconds"   << endl;  //CO20201111
+    aflowrc << "SLEEP_VASP_MONITOR=" << AFLOWRC_SLEEP_VASP_MONITOR << " // seconds"   << endl;  //CO20201111
+    aflowrc << "STALE_VASP_OUT=" << AFLOWRC_STALE_VASP_OUT << " // seconds"   << endl;  //CO20201111
 
     aflowrc << " " << endl;
     aflowrc << "// DEFAULTS MACHINE DEPENDENT MPI" << endl;
@@ -2823,8 +2827,9 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<double>(\"AFLOW_CORE_TEMPERATURE_HALT\")=" << AFLOW_CORE_TEMPERATURE_HALT << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<double>(\"AFLOW_CORE_TEMPERATURE_REFRESH\")=" << AFLOW_CORE_TEMPERATURE_REFRESH << endl;
 
-    if(LDEBUG) oss << "XHOST.adefault.getattachedutype<double>(\"VASP_CHECK_SLEEP\")=" << VASP_CHECK_SLEEP << endl; //CO20201111
-    if(LDEBUG) oss << "XHOST.adefault.getattachedutype<double>(\"MONITOR_VASP_SLEEP\")=" << MONITOR_VASP_SLEEP << endl; //CO20201111
+    if(LDEBUG) oss << "XHOST.adefault.getattachedutype<double>(\"SLEEP_VASP_COMPLETION\")=" << SLEEP_VASP_COMPLETION << endl; //CO20201111
+    if(LDEBUG) oss << "XHOST.adefault.getattachedutype<double>(\"SLEEP_VASP_MONITOR\")=" << SLEEP_VASP_MONITOR << endl; //CO20201111
+    if(LDEBUG) oss << "XHOST.adefault.getattachedutype<double>(\"STALE_VASP_OUT\")=" << STALE_VASP_OUT << endl; //CO20201111
 
     if(LDEBUG) oss << "// DEFAULT MACHINE DEPENDENT MPI" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_OPTIONS_DUKE_BETA_MPICH\")=\"" << MPI_OPTIONS_DUKE_BETA_MPICH << "\"" << endl;

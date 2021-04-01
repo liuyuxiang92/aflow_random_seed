@@ -2319,21 +2319,31 @@ namespace aurostd {
   }
 
   // ***************************************************************************
-  // Function FileModificationTime
+  // Function SecondsSinceFileModified_Epoch
   // ***************************************************************************
-  //ME20180712
-  // Checks the modification date of the file and returns it as an integer
-
-  long int FileModificationTime(const string& _FileName) {
+  // ME20180712
+  // gets modification time and returns SECONDS since epoch (as long int)
+  long int SecondsSinceFileModified_Epoch(const string& _FileName) {
     string FileName(CleanFileName(_FileName));
-    if (FileExist(_FileName)) {
-      time_t tm = 0;
-      struct stat file_stat;
-      if (stat(_FileName.c_str(), &file_stat) == 0) tm = file_stat.st_mtime;
-      return static_cast<long int>(tm);
-    } else {
-      return 0;
-    }
+    if(!FileExist(_FileName)){return 0;}
+    time_t tm = 0;
+    struct stat file_stat;
+    if (stat(_FileName.c_str(), &file_stat) == 0) tm = file_stat.st_mtime;
+    return static_cast<long int>(tm);
+  }
+
+  // ***************************************************************************
+  // Function SecondsSinceModified
+  // ***************************************************************************
+  // CO20210315
+  // gets modification time and returns SECONDS since now (as long int)
+  long int SecondsSinceFileModified(const string& _FileName) {
+    string FileName(CleanFileName(_FileName));
+    if(!FileExist(_FileName)){return 0;}
+    long int tm_mod=SecondsSinceFileModified_Epoch(FileName);
+    time_t t = std::time(NULL); //DX20200319 - nullptr -> NULL
+    long int tm_curr = (long int) t;
+    return tm_curr-tm_mod;
   }
 
   // ***************************************************************************

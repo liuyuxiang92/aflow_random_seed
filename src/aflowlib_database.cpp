@@ -217,7 +217,7 @@ namespace aflowlib {
     // If there is a temporary database file, a rebuild process is either in
     // progress or failed.
     if (aurostd::FileExist(tmp_file)) {
-      long int tm_tmp = aurostd::FileModificationTime(tmp_file);
+      long int tm_tmp = aurostd::SecondsSinceFileModified_Epoch(tmp_file);
       time_t t = std::time(NULL); //DX20200319 - nullptr -> NULL
       long int tm_curr = (long int) t;
       int pid = -1;
@@ -545,10 +545,10 @@ namespace aflowlib {
         }
       }
 
-      long int tm_db = aurostd::FileModificationTime(database_file);
+      long int tm_db = aurostd::SecondsSinceFileModified_Epoch(database_file);
       int i = 0;
       for (i = 0; i < _N_AUID_TABLES_; i++) {
-        if (aurostd::FileModificationTime(json_files[i]) > tm_db) break;
+        if (aurostd::SecondsSinceFileModified_Epoch(json_files[i]) > tm_db) break;
       }
       rebuild_db = (i != _N_AUID_TABLES_);
 
@@ -606,7 +606,7 @@ namespace aflowlib {
     if (npatch_input == 0) return 0;  // No files, so nothing to patch
 
     long int tm_db = 0;
-    if (check_timestamps) tm_db = aurostd::FileModificationTime(database_file);
+    if (check_timestamps) tm_db = aurostd::SecondsSinceFileModified_Epoch(database_file);
 
     // Check files that need to be patched
     for (uint i = 0; i < npatch_input; i++) {
@@ -625,7 +625,7 @@ namespace aflowlib {
         }
       }
 
-      if (!check_timestamps || (aurostd::FileModificationTime(filename) > tm_db)) {
+      if (!check_timestamps || (aurostd::SecondsSinceFileModified_Epoch(filename) > tm_db)) {
         patch_files.push_back(filename);
         message << "Adding file " << filename << " to patch list.";
       } else {
