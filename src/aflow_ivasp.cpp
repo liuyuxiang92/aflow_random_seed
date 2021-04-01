@@ -103,13 +103,16 @@ namespace KBIN {
     string date=std::ctime(&fileInfo.st_mtime);
     if (!date.empty() && date[date.length()-1] == '\n') date.erase(date.length()-1); // remove last newline
 
-    string WRITE="[VASP_POTCAR_AUID]";
-    for(uint i=0;i<vppAUIDs.size();i++) {
-      WRITE+=vppAUIDs.at(i);
-      if(i<vppAUIDs.size()-1) WRITE+=",";
+    string WRITE="[VASP_POTCAR_AUID]"+aurostd::joinWDelimiter(vppAUIDs,",");
+    if(!aurostd::substring2bool(aurostd::file2string(directory+"/"+_AFLOWIN_),WRITE)){  //CO20210315 - it write many times
+      KBIN::AFLOWIN_ADD(directory+"/"+_AFLOWIN_,WRITE,"");
+      //[CO20210315 - OBSOLETE]for(uint i=0;i<vppAUIDs.size();i++) {
+      //[CO20210315 - OBSOLETE]  WRITE+=vppAUIDs.at(i);
+      //[CO20210315 - OBSOLETE]  if(i<vppAUIDs.size()-1) WRITE+=",";
+      //[CO20210315 - OBSOLETE]}
+      //[CO20210315 - OBSOLETE]aurostd::execute("echo \""+WRITE+"\" >> "+directory+"/"+_AFLOWIN_);
+      aurostd::execute("touch -m --date=\""+date+"\" "+directory+"/"+_AFLOWIN_);
     }
-    aurostd::execute("echo \""+WRITE+"\" >> "+directory+"/"+_AFLOWIN_);
-    aurostd::execute("touch -m --date=\""+date+"\" "+directory+"/"+_AFLOWIN_);
     return TRUE;
   }
   bool VASP_Write_ppAUID_AFLOWIN(const string& directory,const deque<string>& vppAUIDs,const deque<string>& species) {
