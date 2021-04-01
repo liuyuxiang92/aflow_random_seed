@@ -2333,7 +2333,7 @@ namespace aurostd {
   }
 
   // ***************************************************************************
-  // Function SecondsSinceModified
+  // Function SecondsSinceFileModified
   // ***************************************************************************
   // CO20210315
   // gets modification time and returns SECONDS since now (as long int)
