@@ -5747,11 +5747,11 @@ namespace KBIN {
     //CO20210315 - extensive rewrite
     //the schemes below check if the modification needs to be made (has it already been made?)
     //maintain this feedback system to ensure aflow doesn't keep spinning its wheels on the same patches
-    string function="KBIN::XVASP_Afix";
+    string function="KBIN::XVASP_Afix_ApplyPatch";
     string soliloquy=XPID+function+"():";
     string patch=aurostd::toupper(_patch);
-    string fix_str="(patch="+patch+")";
-    string operation=function+" "+fix_str;
+    string fix_str="(patch=\""+patch+"\")";
+    string operation=function+fix_str;
     string incar_input="";
     stringstream aus;
 
@@ -5875,16 +5875,17 @@ namespace KBIN {
       if(Krun){aus << "MMMMM  MESSAGE applied fix " << patch << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
     }
     else if(patch.find("KPOINTS")!=string::npos) {
-      loc=patch.find("KPOINTS");
+      string tmp="KPOINTS";
+      loc=patch.find(tmp);
       if(loc==patch.size()-1||loc==string::npos){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"KPOINTS mode not found",_INPUT_ILLEGAL_);}
-      string mode=patch.substr(loc+1),koperation="";  //get everything after 'KPOINTS', including '='
+      string mode=patch.substr(loc+tmp.length()),koperation="";  //get everything after 'KPOINTS', including '='
       if(mode=="=GAMMA"){koperation="Gamma_Shift";}
       else if(mode=="=GAMMA_ODD"){koperation="Gamma,Xodd,Yodd,Zodd";}
       else if(mode=="=GAMMA_EVEN"){koperation="Gamma,Xeven,Yeven,Zeven";}
       else if(mode=="=KMAX"){koperation="Kmax";}
       else if(mode=="-=1"){koperation="X--,Y--,Z--";}
       else if(mode=="-=2"){koperation="X2-,Y2-,Z2-";}
-      else{throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"KPOINTS mode unknown",_INPUT_ILLEGAL_);}
+      else{throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"KPOINTS unknown mode: \""+mode+"\"",_INPUT_ILLEGAL_);}
 
       if(xvasp.aopts.flag("FLAG::KPOINTS_PRESERVED")){Krun=false;} // don't touch kpoints
       if(Krun && mode=="=GAMMA" && KBIN::XVASP_KPOINTS_IncludesGamma(xvasp)){Krun=false;} //already done
@@ -6074,7 +6075,7 @@ namespace KBIN {
       if(Krun){aus << "MMMMM  MESSAGE applied fix " << patch << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
     }
     else{
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown patch=="+patch,_INPUT_ILLEGAL_);  //CO20210315
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown patch: \""+patch+"\"",_INPUT_ILLEGAL_);  //CO20210315
     }
     
     if(Krun==false){
@@ -6148,15 +6149,16 @@ namespace KBIN {
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
       //else if(submode==1) //DO NOT USE else if, we may change submode inside
-      if(submode==1){ //Gamma-odd (might increase ki) //CO20200624
-        patch="KPOINTS=GAMMA_ODD";
+      if(submode==1){ //CO20200624 - try ALGO=FAST (fast is faster than normal, try first)
+        //https://www.vasp.at/wiki/index.php/IALGO#RMM-DIIS
+        patch="ALGO=FAST";
         if(Krun && xfixed.flag(patch)){Krun=false;}
         Krun=(Krun && KBIN::XVASP_Afix_ApplyPatch(patch,xvasp,kflags,vflags,aflags,FileMESSAGE));
         if(Krun){xfixed.flag(patch,true);}
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
-      if(submode==2){ //CO20200624 - try ALGO=FAST (fast is faster than normal, try first
-        patch="ALGO=FAST";
+      if(submode==2){ //Gamma-odd (might increase ki) //CO20200624
+        patch="KPOINTS=GAMMA_ODD";
         if(Krun && xfixed.flag(patch)){Krun=false;}
         Krun=(Krun && KBIN::XVASP_Afix_ApplyPatch(patch,xvasp,kflags,vflags,aflags,FileMESSAGE));
         if(Krun){xfixed.flag(patch,true);}
@@ -6297,7 +6299,7 @@ namespace KBIN {
     else if(mode=="NKXYZ_IKPTD") {
       //https://www.vasp.at/forum/viewtopic.php?t=1228
       patch="KPOINTS-=1";
-      if(Krun && xfixed.flag(patch)){Krun=false;}
+      //[keep applying until it returns false]if(Krun && xfixed.flag(patch)){Krun=false;}
       Krun=(Krun && KBIN::XVASP_Afix_ApplyPatch(patch,xvasp,kflags,vflags,aflags,FileMESSAGE));
       if(Krun){xfixed.flag(patch,true);}
     }
@@ -6391,7 +6393,7 @@ namespace KBIN {
       if(Krun){xfixed.flag(patch,true);}
     }
     else{
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"unknown mode=="+mode,_INPUT_ILLEGAL_);  //CO20210315
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"unknown mode: \""+mode+"\"",_INPUT_ILLEGAL_);  //CO20210315
     }
     
     if(Krun==false){

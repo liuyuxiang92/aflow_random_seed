@@ -2900,6 +2900,10 @@ namespace KBIN {
       KBIN::VASP_Error(xvasp,"WWWWW  ERROR "+soliloquy+" "+error+" problems"+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_));
       //[CO20210315 - old style]xfixed.flag(error,TRUE);
       xfixed.flag("ALL",TRUE);
+      //print out all xfixed
+      for(uint i=0;i<xfixed.vxscheme.size();i++){
+        aus << "MMMMM  MESSAGE xfixed.flag(\""+xfixed.vxscheme[i]+"\")=" << xfixed.flag(xfixed.vxscheme[i]) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+      }
     }
     return apply_patch;
   }
@@ -2982,7 +2986,11 @@ namespace KBIN {
     xwarning.flag("DENTET",(content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("WARNING: DENTET: can't reach specified precision")))!=string::npos)); // not only npar==1
     xwarning.flag("EDDDAV",(content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("Error EDDDAV: Call to ZHEGV failed. Returncode")))!=string::npos));
     xwarning.flag("EDDRMM",(!xmessage.flag("REACHED_ACCURACY") &&
-          (content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("WARNING in EDDRMM: call to ZHEGV failed, returncode")))!=string::npos)) ); // && !xwarning.flag("ZPOTRF");
+          ( 
+           (content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("WARNING in EDDRMM: call to ZHEGV failed, returncode")))!=string::npos) || 
+           (content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("num prob")))!=string::npos) || 
+          FALSE) 
+          && TRUE));  //CO20210315 - look here https://www.vasp.at/wiki/index.php/IALGO#RMM-DIIS // && !xwarning.flag("ZPOTRF");
     xwarning.flag("EFIELD_PEAD",
         (content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("EFIELD_PEAD is too large")))!=string::npos) || //20190704
         (content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("EFIELD_PEAD are too large for comfort")))!=string::npos) || //20190704 - new VASP
@@ -3700,6 +3708,17 @@ namespace KBIN {
       xwarning.push_attached("SVERSION",SVERSION);  //CO20210315
       xwarning.push_attached("DVERSION",aurostd::utype2string(DVERSION)); //CO20210315
 
+      //get algo_current - START
+      KBIN::VASP_Reread_INCAR(xvasp);
+      string algo_current="NORMAL"; //vasp default: https://www.vasp.at/wiki/index.php/ALGO
+      if(aurostd::substring2bool(xvasp.INCAR,"ALGO=",true)){algo_current=aurostd::toupper(aurostd::kvpair2value(xvasp.INCAR,"ALGO","="));}  //CO20210315 - remove whitespaces
+      else if(aurostd::substring2bool(xvasp.INCAR,"IALGO=",true)){ //aflow also prints IALGO sometimes, need to check, remove whitespaces
+        string algo_current_tmp=aurostd::toupper(KBIN::INCAR_IALGO2ALGO(aurostd::kvpair2utype<int>(xvasp.INCAR,"IALGO","=")));
+        if(!algo_current_tmp.empty()){algo_current=algo_current_tmp;}
+      }
+      if(!algo_current.empty()){xfixed.flag("ALGO="+algo_current,true);}  //so we don't retry later as a fix
+      //get algo_current - END
+
       if(nrun<maxrun) {
 
         if(LDEBUG){cerr << soliloquy << " [4]" << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
@@ -3708,17 +3727,6 @@ namespace KBIN {
 
         xfixed.flag("ALL",FALSE);
         vasp_start=FALSE;
-
-        //get algo_current - START
-        KBIN::VASP_Reread_INCAR(xvasp);
-        string algo_current="NORMAL"; //vasp default: https://www.vasp.at/wiki/index.php/ALGO
-        if(aurostd::substring2bool(xvasp.INCAR,"ALGO=",true)){algo_current=aurostd::toupper(aurostd::kvpair2value(xvasp.INCAR,"ALGO","="));}  //CO20210315 - remove whitespaces
-        else if(aurostd::substring2bool(xvasp.INCAR,"IALGO=",true)){ //aflow also prints IALGO sometimes, need to check, remove whitespaces
-          string algo_current_tmp=aurostd::toupper(KBIN::INCAR_IALGO2ALGO(aurostd::kvpair2utype<int>(xvasp.INCAR,"IALGO","=")));
-          if(!algo_current_tmp.empty()){algo_current=algo_current_tmp;}
-        }
-        if(!algo_current.empty()){xfixed.flag("ALGO="+algo_current,true);}  //so we don't retry later as a fix
-        //get algo_current - END
 
         if(LDEBUG){cerr << soliloquy << " [5]" << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
 
