@@ -141,10 +141,9 @@ namespace sql {
       std::cerr << std::endl;
     }
     vector<vector<string> >* vec2d = static_cast<vector<vector<string> >*>(data);
-    vector<string> vec;
+    vector<string> vec(argc, "");
     for (int i = 0; i < argc; i++) {
-      if (argv[i] != NULL) vec.push_back(string(argv[i]));
-      else vec.push_back("");
+      if (argv[i] != NULL) vec[i] = string(argv[i]);
     }
     vec2d->push_back(vec);
     return 0;
