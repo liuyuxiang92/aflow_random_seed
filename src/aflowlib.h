@@ -622,7 +622,7 @@ namespace aflowlib {
 
       void rebuildDB();
       void buildTables(int, int, const vector<string>&, const vector<string>&);
-      void populateTable(const string&, const vector<string>&, const vector<vector<string> >&);
+      void populateTable(const string&, const vector<string>&, const vector<string>&, const vector<vector<string> >&);
 
       uint applyPatchFromJsonl(const vector<string>&);
       bool auidInDatabase(const string&);

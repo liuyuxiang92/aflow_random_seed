@@ -189,7 +189,7 @@ namespace aflowlib {
   void AflowDB::initializeExtraSchema() {
     vschema_extra.clear();
     vschema_extra.push_attached("SCHEMA::NAME::ALLOY", "alloy");
-    vschema_extra.push_attached("SCHEMA::NAME::ALLOY", "string");
+    vschema_extra.push_attached("SCHEMA::TYPE::ALLOY", "string");
   }
 
 }  // namespace aflowlib
@@ -745,27 +745,23 @@ namespace aflowlib {
       stringstream t;
       t << std::setfill('0') << std::setw(2) << std::hex << i;
       string table = "auid_" + t.str();
-      createTable(table, columns, types);
 
       string jsonfile = aurostd::CleanFileName(data_path + "/aflow:" + t.str() + ".jsonl");
-      vector<string> data, data_raw;
-      aurostd::efile2vectorstring(jsonfile, data_raw);
-      // Filter non-POCC ARUNs
-      uint ndata = data_raw.size();
+      vector<string> data;
+      aurostd::efile2vectorstring(jsonfile, data);
+      vector<vector<string> > values;
+      uint ndata = data.size();
       string aurl = "";
       for (uint d = 0; d < ndata; d++) {
-        aurl = extractJsonValueAflow(data_raw[d], "aurl");
-        if ((aurl.find("ARUN") == string::npos)
-          || (aurl.find("ARUN.POCC") != string::npos)) {
-          data.push_back(data_raw[d]);
+        // Filter non-POCC ARUNs
+        aurl = extractJsonValueAflow(data[d], "aurl");
+        if ((aurl.find("ARUN") != string::npos)
+          && (aurl.find("ARUN.POCC") == string::npos)) {
+          continue;
         }
+        values.push_back(getDataValues(data[d], columns, types));
       }
-      ndata = data.size();
-      vector<vector<string> > values(ndata);
-      for (uint d = 0; d < ndata; d++) {
-        values[d] = getDataValues(data[d], columns, types);
-      }
-      populateTable(table, columns, values);
+      populateTable(table, columns, types, values);
     }
   }
 
@@ -775,12 +771,13 @@ namespace aflowlib {
   // concurrent writing anyway, multiple threads may open a transaction, which
   // causes the build to fail (hence the mutex). The mutex is also the reason
   // why this function should never do any processing.
-  void AflowDB::populateTable(const string& table, const vector<string>& columns, const vector<vector<string> >& values) {
+  void AflowDB::populateTable(const string& table, const vector<string>& columns, const vector<string>& types, const vector<vector<string> >& values) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || _AFLOW_DB_DEBUG_);
     string function = XPID + _AFLOW_DB_ERR_PREFIX_ + "populateTable():";
 #ifdef AFLOW_DB_MULTITHREADS_ENABLE
     std::unique_lock<std::mutex> lk(m);
 #endif
+    createTable(table, columns, types);
     int chunk_size = 1000, count = 0;
     transaction(true);
     for (uint v = 0, nvals = values.size(); v < nvals; v++) {
