@@ -1540,8 +1540,8 @@ namespace aflowlib {
               if (!data[i][j].empty()) {
                 keyval.push_back("\"" + keys[j] + "\":" + data[i][j]);
               }
-              entries[i] = "{" + aurostd::joinWDelimiter(keyval, ",") + "}";
             }
+            entries[i] = "{" + aurostd::joinWDelimiter(keyval, ",") + "}";
             break;
           case aflow_ft:
           default:
@@ -1551,10 +1551,10 @@ namespace aflowlib {
                 aurostd::StringSubst(data[i][j], "[", "");
                 aurostd::StringSubst(data[i][j], "]", "");
                 aurostd::StringSubst(data[i][j], "\"", "");
-                keyval.push_back(keys[i] + "=" + data[i][j]);
+                keyval.push_back(keys[j] + "=" + data[i][j]);
               }
-              entries[i] = aurostd::joinWDelimiter(keyval, "|");
             }
+            entries[i] = aurostd::joinWDelimiter(keyval, "|");
         }
       }
     }
@@ -1562,9 +1562,9 @@ namespace aflowlib {
   }
 
   vector<_aflowlib_entry> AflowDB::getEntrySetAentry(const string& where) {
-    vector<_aflowlib_entry> aentries;
     vector<string> aflowouts = getEntrySet(where, aflow_ft);
     uint nentries = aflowouts.size();
+    vector<_aflowlib_entry> aentries(nentries);
     for (uint i = 0; i < nentries; i++) aentries[i].Load(aflowouts[i], *p_oss);
     return aentries;
   }
