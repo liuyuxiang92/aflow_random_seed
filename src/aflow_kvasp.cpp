@@ -2859,68 +2859,47 @@ int CheckStringInFile(string FileIn,string str,int PID,int TID) { //CO20200502 -
 
 namespace KBIN {
   bool VASP_ApplyPatch(const string& error,_xvasp &xvasp,aurostd::xoption& xwarning,aurostd::xoption& xfixed,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE) { //CO20210315
-    bool apply_once=true;
     int submode=-1; //default
-    return VASP_ApplyPatch(error,error,submode,apply_once,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
-  }
-  bool VASP_ApplyPatch(const string& error,bool apply_once,_xvasp &xvasp,aurostd::xoption& xwarning,aurostd::xoption& xfixed,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE) { //CO20210315
-    int submode=-1; //default
-    return VASP_ApplyPatch(error,error,submode,apply_once,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
+    return VASP_ApplyPatch(error,error,submode,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
   }
   bool VASP_ApplyPatch(const string& error,const string& fix,_xvasp &xvasp,aurostd::xoption& xwarning,aurostd::xoption& xfixed,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE) {  //CO20210315
-    bool apply_once=true;
     int submode=-1; //default
-    return VASP_ApplyPatch(error,fix,submode,apply_once,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
-  }
-  bool VASP_ApplyPatch(const string& error,const string& fix,bool apply_once,_xvasp &xvasp,aurostd::xoption& xwarning,aurostd::xoption& xfixed,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE) {  //CO20210315
-    int submode=-1; //default
-    return VASP_ApplyPatch(error,fix,submode,apply_once,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
+    return VASP_ApplyPatch(error,fix,submode,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
   }
   bool VASP_ApplyPatch(const string& error,int& submode,_xvasp &xvasp,aurostd::xoption& xwarning,aurostd::xoption& xfixed,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE) { //CO20210315
-    bool apply_once=true;
-    return VASP_ApplyPatch(error,error,submode,apply_once,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
-  }
-  bool VASP_ApplyPatch(const string& error,int& submode,bool apply_once,_xvasp &xvasp,aurostd::xoption& xwarning,aurostd::xoption& xfixed,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE) { //CO20210315
-    return VASP_ApplyPatch(error,error,submode,apply_once,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
+    return VASP_ApplyPatch(error,error,submode,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
   }
   bool VASP_ApplyPatch(const string& error,const string& fix,int& submode,_xvasp &xvasp,aurostd::xoption& xwarning,aurostd::xoption& xfixed,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE) {  //CO20210315
-    bool apply_once=true;
-    return VASP_ApplyPatch(error,fix,submode,apply_once,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
-  }
-  bool VASP_ApplyPatch(const string& error,const string& fix,int& submode,bool apply_once,_xvasp &xvasp,aurostd::xoption& xwarning,aurostd::xoption& xfixed,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE) {  //CO20210315
     bool LDEBUG=(FALSE || _DEBUG_KVASP_ || XHOST.DEBUG);
     string soliloquy=XPID+"KBIN::VASP_ApplyPatch():";
 
     if(LDEBUG){cerr << soliloquy << " [CHECK " << error << " PROBLEMS]" << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
     bool apply_patch=xwarning.flag(error);
-    string fix_submode=fix+(submode>0?":"+aurostd::utype2string(submode):""); //use colon to differentiate REAL_OPTLAY_1
+    //string fix_submode=fix+(submode>0?":"+aurostd::utype2string(submode):""); //use colon to differentiate REAL_OPTLAY_1
     bool VERBOSE=true;
     if(apply_patch && xfixed.flag("ALL")){
       if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"ALL\")==TRUE: skipping " << error << " patch" << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
-      apply_patch=false;
-    }
-    if(apply_patch && apply_once && xfixed.flag(fix_submode)){
-      if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"" << fix_submode << "\")==TRUE: skipping " << error << " patch" << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
       apply_patch=false;
     }
     if(apply_patch && vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(error)){
       if(LDEBUG){cerr << soliloquy << " vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"" << error << "\")==TRUE: skipping " << error << " patch" << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
       apply_patch=false;
     }
-    //do not reference submode below KBIN::XVASP_Afix_GENERIC(), as it will have been incremented (perhaps by 2)
-    //if KBIN::XVASP_Afix_GENERIC() fails, submode will be restored to original, so it is okay to reference for the LDEBUG statement
     stringstream aus;
     if(apply_patch && VERBOSE){
-      aus << "MMMMM  MESSAGE attempting fix=" << fix << " for error=" << error << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);  //CO20210315 - do not reference submode after KBIN::XVASP_Afix_GENERIC(), (submode>=0?" (SUBMODE="+aurostd::utype2string(submode)+")":"")
+      aus << "MMMMM  MESSAGE attempting fix=" << fix << " for error=" << error << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);  //CO20210315 - do not reference submode after KBIN::XVASP_Afix(), (submode>=0?" (SUBMODE="+aurostd::utype2string(submode)+")":"")
     }
-    if(apply_patch && !KBIN::XVASP_Afix_GENERIC(fix,submode,xvasp,kflags,vflags,aflags,FileMESSAGE)){   //CO20210315
-      if(LDEBUG){cerr << soliloquy << " KBIN::XVASP_Afix_GENERIC(fix=\"" << fix << (submode>=0?",submode="+aurostd::utype2string(submode):"") << "\") failed" << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}  //if KBIN::XVASP_Afix_GENERIC() fails, submode will be restored to original, so it is okay to reference for the LDEBUG statement
+    //do not reference submode below KBIN::XVASP_Afix(), as it will have been incremented (perhaps by 2)
+    //if KBIN::XVASP_Afix() fails, submode will be restored to original, so it is okay to reference for the LDEBUG statement
+    if(apply_patch && !KBIN::XVASP_Afix(fix,submode,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE)){   //CO20210315
+      if(LDEBUG){cerr << soliloquy << " KBIN::XVASP_Afix(fix=\"" << fix << (submode>=0?",submode="+aurostd::utype2string(submode):"") << "\") failed" << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}  //if KBIN::XVASP_Afix() fails, submode will be restored to original, so it is okay to reference for the LDEBUG statement
       apply_patch=false;
     }
     if(apply_patch && VERBOSE){
-      aus << "MMMMM  MESSAGE applied fix=" << fix << " for error=" << error << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);  //CO20210315 - do not reference submode after KBIN::XVASP_Afix_GENERIC(), (submode>=0?" (SUBMODE="+aurostd::utype2string(submode)+")":"")
+      aus << "MMMMM  MESSAGE applied fix=" << fix << " for error=" << error << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);  //CO20210315 - do not reference submode after KBIN::XVASP_Afix(), (submode>=0?" (SUBMODE="+aurostd::utype2string(submode)+")":"")
       KBIN::VASP_Error(xvasp,"WWWWW  ERROR "+soliloquy+" "+error+" problems"+Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_));
-      xfixed.flag(error,TRUE);xfixed.flag("ALL",TRUE);
+      //[CO20210315 - old style]xfixed.flag(error,TRUE);
+      xfixed.flag("ALL",TRUE);
     }
     return apply_patch;
   }
@@ -3730,6 +3709,17 @@ namespace KBIN {
         xfixed.flag("ALL",FALSE);
         vasp_start=FALSE;
 
+        //get algo_current - START
+        KBIN::VASP_Reread_INCAR(xvasp);
+        string algo_current="NORMAL"; //vasp default: https://www.vasp.at/wiki/index.php/ALGO
+        if(aurostd::substring2bool(xvasp.INCAR,"ALGO=",true)){algo_current=aurostd::toupper(aurostd::kvpair2value(xvasp.INCAR,"ALGO","="));}  //CO20210315 - remove whitespaces
+        else if(aurostd::substring2bool(xvasp.INCAR,"IALGO=",true)){ //aflow also prints IALGO sometimes, need to check, remove whitespaces
+          string algo_current_tmp=aurostd::toupper(KBIN::INCAR_IALGO2ALGO(aurostd::kvpair2utype<int>(xvasp.INCAR,"IALGO","=")));
+          if(!algo_current_tmp.empty()){algo_current=algo_current_tmp;}
+        }
+        if(!algo_current.empty()){xfixed.flag("ALGO="+algo_current,true);}  //so we don't retry later as a fix
+        //get algo_current - END
+
         if(LDEBUG){cerr << soliloquy << " [5]" << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
 
         //a note about the fixes below
@@ -3740,7 +3730,7 @@ namespace KBIN {
 
         // ********* APPLY PREFERRED SYMMETRY FIXES ******************
         // NKXYZ_IKPTD must come BEFORE IBZKPT
-        KBIN::VASP_ApplyPatch("NKXYZ_IKPTD",false,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);  //apply_once==false: keep decreasing KPOINTS until it works
+        KBIN::VASP_ApplyPatch("NKXYZ_IKPTD",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
         KBIN::VASP_ApplyPatch("IBZKPT",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
         KBIN::VASP_ApplyPatch("SGRCON",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
         KBIN::VASP_ApplyPatch("INVGRP",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
@@ -3753,25 +3743,25 @@ namespace KBIN {
         KBIN::VASP_ApplyPatch("DAV",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
         KBIN::VASP_ApplyPatch("DENTET",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
         KBIN::VASP_ApplyPatch("EDDDAV",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
-        KBIN::VASP_ApplyPatch("EDDRMM",fix_EDDRMM,false,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);  //apply_once==false: we have POTIM inside
-        KBIN::VASP_ApplyPatch("EFIELD_PEAD",false,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);  //apply_once==false: keep decreasing EFIELD_PEAD until it works
-        KBIN::VASP_ApplyPatch("EXCCOR",false,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE); //apply_once==false: keep increasing volume until it works
+        KBIN::VASP_ApplyPatch("EDDRMM",fix_EDDRMM,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
+        KBIN::VASP_ApplyPatch("EFIELD_PEAD",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
+        KBIN::VASP_ApplyPatch("EXCCOR",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
         KBIN::VASP_ApplyPatch("GAMMA_SHIFT",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
         //[CO20210315 - patch previously removed]KBIN::VASP_ApplyPatch("LRF_COMMUTATOR",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
         KBIN::VASP_ApplyPatch("MEMORY",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
         KBIN::VASP_ApplyPatch("MPICH11",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
-        KBIN::VASP_ApplyPatch("MPICH139",false,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE); //apply_once==false: keep decreasing KPOINTS until it works
-        KBIN::VASP_ApplyPatch("NATOMS",false,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE); //apply_once=false: keep increasing volume until it works
-        KBIN::VASP_ApplyPatch("NBANDS",false,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE); //apply_once==false: keep increasing NBANDS until it works
+        KBIN::VASP_ApplyPatch("MPICH139",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
+        KBIN::VASP_ApplyPatch("NATOMS",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
+        KBIN::VASP_ApplyPatch("NBANDS",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
         KBIN::VASP_ApplyPatch("NELM",fix_NELM,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
         KBIN::VASP_ApplyPatch("NPAR",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
         KBIN::VASP_ApplyPatch("NPARC",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
         KBIN::VASP_ApplyPatch("NPARN",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
         KBIN::VASP_ApplyPatch("NPAR_REMOVE",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
-        KBIN::VASP_ApplyPatch("PSMAXN",false,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE); //apply_once==false: keep decreasing enmax until it works
+        KBIN::VASP_ApplyPatch("PSMAXN",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
         KBIN::VASP_ApplyPatch("REAL_OPTLAY_1","LREAL",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
         KBIN::VASP_ApplyPatch("REAL_OPT","LREAL",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
-        KBIN::VASP_ApplyPatch("ZPOTRF","ZPOTRF_POTIM",false,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);  //apply_once==false: keep decreasing POTIM until it works
+        KBIN::VASP_ApplyPatch("ZPOTRF","ZPOTRF_POTIM",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
         
         //come back - should we check if any xwarning() flag is still on?
 
