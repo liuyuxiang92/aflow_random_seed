@@ -1363,7 +1363,7 @@ namespace aflowlib {
     }
 
     uint ncols = cols.size();
-    string where = "", where_loop = "";
+    string where = "";
     for (int i = startIndex; i < endIndex; i++) {
       for (uint c = 0; c < ncols; c++) {
         if (types[c] == "bool") {
@@ -1385,8 +1385,8 @@ namespace aflowlib {
         }
       }
       for (uint l = 0, nloops = loops.size(); l < nloops; l++) {
-        where_loop = where + " AND loop LIKE '%" + loops[l] + "%'";
-        loop_counts[i][l] = aurostd::string2utype<int>(getProperty("COUNT", tables[i], "loop", where_loop));
+        where = "catalog='" + catalog + "' AND loop LIKE '%\"" + loops[l] + "\"%'";
+        loop_counts[i][l] = aurostd::string2utype<int>(getProperty("COUNT", tables[i], "loop", where));
       }
     }
 
