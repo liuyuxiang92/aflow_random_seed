@@ -3455,7 +3455,7 @@ namespace apl{
     return qha_aflowin_is_found;
   }
 
-  // AS20201211 OBSOLETE, but still there is a little chance it might be useful
+  // AS20201211 OBSOLETE, but might be useful
   /// Links existing APL calculation at the input volume to a corresponding QHA directory
   /// (ARUN.QHA_PHONONS_1.0000).
   /// It is assumed that linking should be performed before the first QHA run.
