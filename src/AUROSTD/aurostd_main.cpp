@@ -5241,40 +5241,6 @@ namespace aurostd {
     return substring2string(strstream.str(),strsub1,RemoveWS,RemoveComments);
   }
   
-  string kvpair2value(const string& strstream,const string& keyword,const string& delim,bool RemoveWS,bool RemoveComments) { //CO20210315
-    //an AFLOW-specific substring matcher: will remove comments before searching
-    bool LDEBUG=FALSE;//TRUE;
-    if(LDEBUG) cerr << XPID << "aurostd::kvpair2value(): BEGIN [keyword=\"" << keyword << "\"] [delimiter=\"" << delim << "\"] [RemoveWS=" << RemoveWS << "]" << endl;
-    string _strstream(strstream);
-    if(RemoveWS==TRUE) _strstream=aurostd::RemoveWhiteSpaces(_strstream,'"');
-    if(LDEBUG) cerr << XPID << "aurostd::kvpair2value(): [input=\"" << strstream << "\"], [keyword=\"" << keyword << "\"] [delimiter=\"" << delim << "\"]" << endl;
-    if(_strstream.find(keyword)==string::npos) return "";
-    
-    vector<string> tokens;
-    aurostd::string2tokens(_strstream,tokens,"\n");
-    string strline="",_keyword="",value="";
-    string::size_type idxS1;
-    for(uint i=0;i<tokens.size();i++) {
-      if(RemoveComments){strline=aurostd::RemoveComments(tokens[i]);}
-      idxS1=strline.find(delim);
-      if(idxS1!=string::npos){
-        _keyword=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(strline.substr(0,idxS1));
-        if(LDEBUG) cerr << XPID << "aurostd::kvpair2value(): _keyword=\"" << _keyword << "\"" << endl;
-        if(_keyword==keyword){
-          value=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(strline.substr(idxS1+1));
-          if(LDEBUG) cerr << XPID << "aurostd::kvpair2value(): END [keyword=\"" << keyword << "\" found] [output=\"" << value << "\"] [RemoveWS=" << RemoveWS << "]" << endl;
-          return value;
-        }
-      }
-    }
-    if(LDEBUG) cerr << XPID << "aurostd::kvpair2value(): END [keyword=" << keyword << " NOT found] [RemoveWS=" << RemoveWS << "]" << endl;
-    return "";
-  }
-  
-  string kvpair2value(const stringstream& strstream,const string& keyword,const string& delim,bool RemoveWS,bool RemoveComments) { //CO20210315 - cleaned up
-    return kvpair2value(strstream.str(),keyword,delim,RemoveWS,RemoveComments);
-  }
-
   //[CO20210315 - not used, not sure the purpose of strsub2]string substring2string(const string& strstream, const string& strsub1, const string& strsub2, bool RemoveWS) {
   //[CO20210315 - not used, not sure the purpose of strsub2]  bool LDEBUG=(FALSE || XHOST.DEBUG);
   //[CO20210315 - not used, not sure the purpose of strsub2]  if(LDEBUG) cerr << "DEBUG substring2string5: (BEGIN) " << strsub1 << " " << RemoveWS << endl;
@@ -5310,16 +5276,83 @@ namespace aurostd {
   template<typename utype> utype substring2utype(const stringstream& strstream,const string& strsub1,bool RemoveWS,bool RemoveComments) {
     return substring2utype<utype>(strstream.str(),strsub1,RemoveWS,RemoveComments);
   }
+  //[CO20210315 - not used, not sure the purpose of strsub2]template<typename utype> utype substring2utype(const string& strstream, const string& strsub1, const string& strsub2, bool RemoveWS) {
+  //[CO20210315 - not used, not sure the purpose of strsub2]  return string2utype<utype>(substring2string(strstream,strsub1,strsub2,RemoveWS));
+  //[CO20210315 - not used, not sure the purpose of strsub2]}
   
+  bool kvpairfound(const string& strstream,const string& keyword,const string& delim,bool RemoveWS,bool RemoveComments) { //CO20210315
+    //an AFLOW-specific substring matcher: will remove comments before searching
+    bool LDEBUG=FALSE;//TRUE;
+    if(LDEBUG) cerr << XPID << "aurostd::kvpair2value(): BEGIN [keyword=\"" << keyword << "\"] [delimiter=\"" << delim << "\"] [RemoveWS=" << RemoveWS << "]" << endl;
+    string _strstream(strstream);
+    if(RemoveWS==TRUE) _strstream=aurostd::RemoveWhiteSpaces(_strstream,'"');
+    if(LDEBUG) cerr << XPID << "aurostd::kvpair2value(): [input=\"" << strstream << "\"], [keyword=\"" << keyword << "\"] [delimiter=\"" << delim << "\"]" << endl;
+    if(_strstream.find(keyword)==string::npos) return false;
+    
+    vector<string> tokens;
+    aurostd::string2tokens(_strstream,tokens,"\n");
+    string strline="",_keyword="",value="";
+    string::size_type idxS1;
+    for(uint i=0;i<tokens.size();i++) {
+      if(RemoveComments){strline=aurostd::RemoveComments(tokens[i]);}
+      idxS1=strline.find(delim);
+      if(idxS1!=string::npos){
+        _keyword=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(strline.substr(0,idxS1));
+        if(LDEBUG) cerr << XPID << "aurostd::kvpair2value(): _keyword=\"" << _keyword << "\"" << endl;
+        if(_keyword==keyword){
+          if(LDEBUG) cerr << XPID << "aurostd::kvpair2value(): END [keyword=\"" << keyword << "\" found] [RemoveWS=" << RemoveWS << "]" << endl;
+          return true;
+        }
+      }
+    }
+    if(LDEBUG) cerr << XPID << "aurostd::kvpair2value(): END [keyword=" << keyword << " NOT found] [RemoveWS=" << RemoveWS << "]" << endl;
+    return false;
+  }
+  
+  bool kvpairfound(const stringstream& strstream,const string& keyword,const string& delim,bool RemoveWS,bool RemoveComments) { //CO20210315 - cleaned up
+    return kvpairfound(strstream.str(),keyword,delim,RemoveWS,RemoveComments);
+  }
+
+  string kvpair2value(const string& strstream,const string& keyword,const string& delim,bool RemoveWS,bool RemoveComments) { //CO20210315
+    //an AFLOW-specific substring matcher: will remove comments before searching
+    bool LDEBUG=FALSE;//TRUE;
+    if(LDEBUG) cerr << XPID << "aurostd::kvpair2value(): BEGIN [keyword=\"" << keyword << "\"] [delimiter=\"" << delim << "\"] [RemoveWS=" << RemoveWS << "]" << endl;
+    string _strstream(strstream);
+    if(RemoveWS==TRUE) _strstream=aurostd::RemoveWhiteSpaces(_strstream,'"');
+    if(LDEBUG) cerr << XPID << "aurostd::kvpair2value(): [input=\"" << strstream << "\"], [keyword=\"" << keyword << "\"] [delimiter=\"" << delim << "\"]" << endl;
+    if(_strstream.find(keyword)==string::npos) return "";
+    
+    vector<string> tokens;
+    aurostd::string2tokens(_strstream,tokens,"\n");
+    string strline="",_keyword="",value="";
+    string::size_type idxS1;
+    for(uint i=0;i<tokens.size();i++) {
+      if(RemoveComments){strline=aurostd::RemoveComments(tokens[i]);}
+      idxS1=strline.find(delim);
+      if(idxS1!=string::npos){
+        _keyword=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(strline.substr(0,idxS1));
+        if(LDEBUG) cerr << XPID << "aurostd::kvpair2value(): _keyword=\"" << _keyword << "\"" << endl;
+        if(_keyword==keyword){
+          value=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(strline.substr(idxS1+1));
+          if(LDEBUG) cerr << XPID << "aurostd::kvpair2value(): END [keyword=\"" << keyword << "\" found] [output=\"" << value << "\"] [RemoveWS=" << RemoveWS << "]" << endl;
+          return value;
+        }
+      }
+    }
+    if(LDEBUG) cerr << XPID << "aurostd::kvpair2value(): END [keyword=" << keyword << " NOT found] [RemoveWS=" << RemoveWS << "]" << endl;
+    return "";
+  }
+  
+  string kvpair2value(const stringstream& strstream,const string& keyword,const string& delim,bool RemoveWS,bool RemoveComments) { //CO20210315 - cleaned up
+    return kvpair2value(strstream.str(),keyword,delim,RemoveWS,RemoveComments);
+  }
+
   template<typename utype> utype kvpair2utype(const string& strstream,const string& keyword,const string& delim,bool RemoveWS,bool RemoveComments) {
     return string2utype<utype>(kvpair2value(strstream,keyword,delim,RemoveWS,RemoveComments));
   }
   template<typename utype> utype kvpair2utype(const stringstream& strstream,const string& keyword,const string& delim,bool RemoveWS,bool RemoveComments) {
     return kvpair2utype<utype>(strstream.str(),keyword,delim,RemoveWS,RemoveComments);
   }
-  //[CO20210315 - not used, not sure the purpose of strsub2]template<typename utype> utype substring2utype(const string& strstream, const string& strsub1, const string& strsub2, bool RemoveWS) {
-  //[CO20210315 - not used, not sure the purpose of strsub2]  return string2utype<utype>(substring2string(strstream,strsub1,strsub2,RemoveWS));
-  //[CO20210315 - not used, not sure the purpose of strsub2]}
 
   // ***************************************************************************
   // Function SubStringsPresentExtractString and other

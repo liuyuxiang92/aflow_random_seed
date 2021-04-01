@@ -2969,7 +2969,7 @@ namespace KBIN {
     //they would all benefit from similar fixes (except NKXYZ_IKPTD which requires KPOINTS to be reduced)
     xwarning.flag("SGRCON",(content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("VERY BAD NEWS! internal error in subroutine SGRCON")))!=string::npos));  //usually goes with NIRMAT
     xwarning.flag("NIRMAT",(content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("Found some non-integer element in rotation matrix")))!=string::npos)); //usually goes with SGRCON
-    xwarning.flag("IBZKPT",(!xmessage.flag("REACHED_ACCURACY") && //usually goes with KKSYM or NKXYZ_IKPTD
+    xwarning.flag("IBZKPT",(vasp_still_running==false && !xmessage.flag("REACHED_ACCURACY") && //usually goes with KKSYM or NKXYZ_IKPTD
           (content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("VERY BAD NEWS! internal error in subroutine IBZKPT")))!=string::npos)) );
     xwarning.flag("KKSYM",(content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("Reciprocal lattice and k-lattice belong to different class of lattices")))!=string::npos));
     xwarning.flag("NKXYZ_IKPTD",( //usually goes with IBZKPT
@@ -2980,13 +2980,14 @@ namespace KBIN {
     xwarning.flag("INVGRP",(content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("VERY BAD NEWS! internal error in subroutine INVGRP")))!=string::npos));  //usually goes with SYMPREC
     xwarning.flag("SYMPREC",(content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("inverse of rotation matrix was not found (increase SYMPREC)")))!=string::npos));  //usually goes with INVGRP
     //VASP's internal symmetry routines END
+    //CSLOSHING and NELM warnings are similar, CSLOSHING will apply a fix before VASP finishes running, while NELM only cares about the LAST iteration
     xwarning.flag("BRMIX",(content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("BRMIX: very serious problems")))!=string::npos));
     xwarning.flag("CSLOSHING",vasp_still_running==true && KBIN::VASP_OSZICARUnconverging(xvasp.Directory)); // check from OSZICAR
-    xwarning.flag("DAV",(!xmessage.flag("REACHED_ACCURACY") &&
+    xwarning.flag("DAV",(vasp_still_running==false && !xmessage.flag("REACHED_ACCURACY") &&
           (content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("WARNING: Sub-Space-Matrix is not hermitian in DAV")))!=string::npos)) );
     xwarning.flag("DENTET",(content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("WARNING: DENTET: can't reach specified precision")))!=string::npos)); // not only npar==1
     xwarning.flag("EDDDAV",(content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("Error EDDDAV: Call to ZHEGV failed. Returncode")))!=string::npos));
-    xwarning.flag("EDDRMM",(!xmessage.flag("REACHED_ACCURACY") &&
+    xwarning.flag("EDDRMM",(vasp_still_running==false && !xmessage.flag("REACHED_ACCURACY") &&
           ( 
            (content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("WARNING in EDDRMM: call to ZHEGV failed, returncode")))!=string::npos) || 
            (content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("num prob")))!=string::npos) || 
@@ -3157,14 +3158,13 @@ namespace KBIN {
       }
       xwarning.flag("NPARN",FALSE);
     }
-    //need to revisit this: --monitor_vasp will never allow errors with IBZKPT to reach the end of the run
-    if(xmessage.flag("REACHED_ACCURACY") && xwarning.flag("IBZKPT")){  //CO20210315 - I guess it's not an issue then?
-      if(!xmonitor.flag("IGNORING_WARNINGS:IBZKPT")){
-        aus << "MMMMM  MESSAGE ignoring xwarning.flag(\"IBZKPT\"): VASP calculation achieved required accuracy anyway" << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-        xmonitor.flag("IGNORING_WARNINGS:IBZKPT",TRUE); //so we don't clog output files
-      }
-      xwarning.flag("IBZKPT",FALSE);
-    }
+    //[CO20210315 - flag would not be turned on above]if(xmessage.flag("REACHED_ACCURACY") && xwarning.flag("IBZKPT")){  //CO20210315 - I guess it's not an issue then?
+    //[CO20210315 - flag would not be turned on above]  if(!xmonitor.flag("IGNORING_WARNINGS:IBZKPT")){
+    //[CO20210315 - flag would not be turned on above]    aus << "MMMMM  MESSAGE ignoring xwarning.flag(\"IBZKPT\"): VASP calculation achieved required accuracy anyway" << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+    //[CO20210315 - flag would not be turned on above]    xmonitor.flag("IGNORING_WARNINGS:IBZKPT",TRUE); //so we don't clog output files
+    //[CO20210315 - flag would not be turned on above]  }
+    //[CO20210315 - flag would not be turned on above]  xwarning.flag("IBZKPT",FALSE);
+    //[CO20210315 - flag would not be turned on above]}
 
     //[CO20210315 - OBSOLETE, we prioritize the order below]if(xwarning.flag("NKXYZ_IKPTD")){xwarning.flag("IBZKPT",FALSE);} // priority
     //[try NIRMAT first]if(xwarning.flag("NIRMAT") && xwarning.flag("SGRCON")) xwarning.flag("SGRCON",FALSE);
@@ -3785,8 +3785,7 @@ namespace KBIN {
     }
 
     if(LDEBUG){
-      aus << "MMMMM  MESSAGE tested all the errors" << endl;
-      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+      aus << "MMMMM  MESSAGE tested all the errors" << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     }
 
     bool Krun=TRUE;
@@ -4216,7 +4215,7 @@ namespace KBIN {
 } // namespace KBIN
 
 namespace KBIN {
-  void VASP_Backup(_xvasp& xvasp,bool qmwrite,string ext) {        // AFLOW_FUNCTION_IMPLEMENTATION
+  void VASP_Backup(_xvasp& xvasp,bool qmwrite,const string& ext) {        // AFLOW_FUNCTION_IMPLEMENTATION  //CO20210315
     xvasp.AnalyzeLabel=ext;
     KBIN::VASP_Analyze(xvasp,qmwrite);
     ostringstream aus;
@@ -4257,25 +4256,28 @@ namespace KBIN {
 } // namespace KBIN
 
 namespace KBIN {
-  void VASP_CONTCAR_Save(_xvasp xvasp,string ext) {        // AFLOW_FUNCTION_IMPLEMENTATION
-    if(aurostd::FileExist(xvasp.Directory+string("/CONTCAR")))
-      if(!aurostd::FileEmpty(xvasp.Directory+string("/CONTCAR"))) {
-        ostringstream aus;
-        aus << "cd " << xvasp.Directory << endl;
-        aus << "echo \"[AFLOW] SELF-MODIFICATION \" >> " << _AFLOWIN_ << " " << endl;
-        aus << "echo \"[AFLOW] Recycling CONTCAR of " << ext << " \" >> " << _AFLOWIN_ << " " << endl;
-        aus << "cat CONTCAR | aflow --aflowin  >> " << _AFLOWIN_ << " " << endl;
-        aurostd::execute(aus);
-        aus << "cd " << xvasp.Directory << endl;
-        aus << "cat " << _AFLOWIN_ << " | sed \"s/\\[VASP_FORCE_OPTION\\]VOLUME/#\\[VASP_FORCE_OPTION\\]VOLUME/g\" | sed \"s/##\\[/#\\[/g\" > aflow.tmp && mv aflow.tmp " << _AFLOWIN_ << "" << endl; // PRESERVE VOLUME
-        aurostd::execute(aus);
-        // cerr << aus.str();
-      }
+  void VASP_CONTCAR_Save(const _xvasp& xvasp,const string& ext) {        // AFLOW_FUNCTION_IMPLEMENTATION //CO20210315
+    string function="KBIN::VASP_CONTCAR_Save";
+    string operation=function+"("+ext+")";
+    string contcar=xvasp.Directory+string("/CONTCAR");
+    if(aurostd::FileExist(contcar) && !aurostd::FileEmpty(contcar)) {
+      xstructure xstr(contcar,IOAFLOW_AUTO);
+      ostringstream aus;
+      aus << "[AFLOW] SELF-MODIFICATION" << endl;
+      aus << "[AFLOW] Recycling CONTCAR of " << ext << endl;
+      aus << AFLOWIN_SEPARATION_LINE << endl;
+      aus << "[VASP_POSCAR_MODE_EXPLICIT]START" << endl;
+      aus << xstr;
+      aus << "[VASP_POSCAR_MODE_EXPLICIT]STOP" << endl;
+      aus << AFLOWIN_SEPARATION_LINE << endl;
+      KBIN::AFLOWIN_ADD(xvasp.Directory+"/"+_AFLOWIN_,aus,"");
+      KBIN::AFLOWIN_REMOVE(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]VOLUME","Self Correction "+operation); //CO20210315
+    }
   }
 } // namespace KBIN
 
 namespace KBIN {
-  void VASP_Recycle(_xvasp xvasp,string ext) {        // AFLOW_FUNCTION_IMPLEMENTATION
+  void VASP_Recycle(const _xvasp& xvasp,const string& ext) {        // AFLOW_FUNCTION_IMPLEMENTATION  //CO20210315
     aurostd::CopyFile(xvasp.Directory+"/CONTCAR."+ext,xvasp.Directory+"/POSCAR");
     aurostd::CopyFile(xvasp.Directory+"/INCAR."+ext,xvasp.Directory+"/INCAR");
     aurostd::CopyFile(xvasp.Directory+"/KPOINTS."+ext,xvasp.Directory+"/KPOINTS");
@@ -4284,7 +4286,7 @@ namespace KBIN {
 } // namespace KBIN
 
 namespace KBIN {
-  void VASP_Recycle(_xvasp xvasp,int relax_number) {        // AFLOW_FUNCTION_IMPLEMENTATION
+  void VASP_Recycle(const _xvasp& xvasp,int relax_number) {        // AFLOW_FUNCTION_IMPLEMENTATION //CO20210315
     for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed
       aurostd::execute(XHOST.vzip.at(iext)+" -dqf "+aurostd::CleanFileName(xvasp.Directory+"/*"+XHOST.vext.at(iext)));
     }
@@ -4296,13 +4298,13 @@ namespace KBIN {
 } // namespace KBIN
 
 namespace KBIN {
-  void VASP_RecycleExtraFile(_xvasp xvasp,string xfile,string relax) {        // AFLOW_FUNCTION_IMPLEMENTATION
+  void VASP_RecycleExtraFile(const _xvasp& xvasp,const string& xfile,const string& relax) {        // AFLOW_FUNCTION_IMPLEMENTATION //CO20210315
     aurostd::CopyFile(xvasp.Directory+"/"+xfile+"."+relax,xvasp.Directory+"/"+xfile);
   }
 } // namespace KBIN
 
 namespace KBIN {
-  void VASP_RecycleExtraFile(_xvasp xvasp,string xfile,int relax_number) {        // AFLOW_FUNCTION_IMPLEMENTATION
+  void VASP_RecycleExtraFile(const _xvasp& xvasp,const string& xfile,int relax_number) {        // AFLOW_FUNCTION_IMPLEMENTATION  //CO20210315
     for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed 
       aurostd::execute(XHOST.vzip.at(iext)+" -dqf "+aurostd::CleanFileName(xvasp.Directory+"/"+xfile+XHOST.vext.at(iext)));
     }

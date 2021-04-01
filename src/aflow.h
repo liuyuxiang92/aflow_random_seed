@@ -2997,13 +2997,13 @@ namespace KBIN {
   void VASP_Error(const _xvasp &xvasp,const string& message1="",const string& message2="",const string& message3="");
   void VASP_Error(const _xvasp &xvasp,ofstream &FileMESSAGE,const string& message1="",const string& message2="",const string& message3="");
   string VASP_Analyze(_xvasp &xvasp,bool qmwrite);
-  void VASP_CompressDirectory(_xvasp xvasp,_kflags &kflags);
-  void VASP_Backup(_xvasp& xvasp,bool qmwrite,string relax);
-  void VASP_CONTCAR_Save(_xvasp xvasp,string relax);
-  void VASP_Recycle(_xvasp xvasp,string relax);
-  void VASP_Recycle(_xvasp xvasp,int relax_number);
-  void VASP_RecycleExtraFile(_xvasp xvasp,string xfile,string relax);
-  void VASP_RecycleExtraFile(_xvasp xvasp,string xfile,int relax_number);
+  //[CO20210315 - OBSOLETE]void VASP_CompressDirectory(_xvasp xvasp,_kflags &kflags);
+  void VASP_Backup(_xvasp& xvasp,bool qmwrite,const string& relax); //CO20210315
+  void VASP_CONTCAR_Save(const _xvasp& xvasp,const string& relax);  //CO20210315
+  void VASP_Recycle(const _xvasp& xvasp,const string& relax); //CO20210315
+  void VASP_Recycle(const _xvasp& xvasp,int relax_number);  //CO20210315
+  void VASP_RecycleExtraFile(const _xvasp& xvasp,const string& xfile,const string& relax);  //CO20210315
+  void VASP_RecycleExtraFile(const _xvasp& xvasp,const string& xfile,int relax_number); //CO20210315
   uint VASP_getNELM(const string& outcar); //CO20200624
   uint VASP_getNSTEPS(const string& oszicar);  //CO20200624
   bool VASP_OSZICARUnconverging(const string& dir,uint cutoff=3);
@@ -3090,18 +3090,17 @@ namespace KBIN {
   void XVASP_INCAR_LDAU_ADIABATIC(_xvasp& xvasp,int step);
   void XVASP_INCAR_LDAU_CUTOFF(_xvasp& xvasp,bool VERBOSE);
   void XVASP_INCAR_KPOINTS_Dielectric_SET(_xvasp& xvasp,_kflags &kflags,_vflags& vflags,string mode_dielectric);
-  void XVASP_INCAR_REMOVE_ENTRY(_xvasp& xvasp,const string& ENTRY,const string& COMMENT,bool VERBOSE,bool preload_incar=false,bool rewrite_incar=false);  //CO20200624 - adding ENTRIES2IGNORE, preload_incar, and rewrite_incar, preload_incar/rewrite_incar=true ensures consistency between xvasp.INCAR and ./INCAR, preload_incar WILL overwrite xvasp.INCAR
-  void XVASP_INCAR_REMOVE_ENTRY(_xvasp& xvasp,const vector<string>& ENTRIES,const string& COMMENT,bool VERBOSE,bool preload_incar=false,bool rewrite_incar=false);  //CO20200624 - adding ENTRIES2IGNORE, preload_incar, and rewrite_incar, preload_incar/rewrite_incar=true ensures consistency between xvasp.INCAR and ./INCAR, preload_incar WILL overwrite xvasp.INCAR
-  void XVASP_INCAR_REMOVE_ENTRY(_xvasp& xvasp,const string& ENTRY,const string& ENTRY2IGNORE,const string& COMMENT,bool VERBOSE,bool preload_incar=false,bool rewrite_incar=false);  //CO20200624 - adding ENTRIES2IGNORE, preload_incar, and rewrite_incar, preload_incar/rewrite_incar=true ensures consistency between xvasp.INCAR and ./INCAR, preload_incar WILL overwrite xvasp.INCAR
-  void XVASP_INCAR_REMOVE_ENTRY(_xvasp& xvasp,const string& ENTRY,const vector<string>& ENTRIES2IGNORE,const string& COMMENT,bool VERBOSE,bool preload_incar=false,bool rewrite_incar=false);  //CO20200624 - adding ENTRIES2IGNORE, preload_incar, and rewrite_incar, preload_incar/rewrite_incar=true ensures consistency between xvasp.INCAR and ./INCAR, preload_incar WILL overwrite xvasp.INCAR
-  void XVASP_INCAR_REMOVE_ENTRY(_xvasp& xvasp,const vector<string>& ENTRIES,const vector<string>& ENTRIES2IGNORE,const string& COMMENT,bool VERBOSE,bool preload_incar=false,bool rewrite_incar=false);  //CO20200624 - adding ENTRIES2IGNORE, preload_incar, and rewrite_incar, preload_incar/rewrite_incar=true ensures consistency between xvasp.INCAR and ./INCAR, preload_incar WILL overwrite xvasp.INCAR
-  string XVASP_INCAR_GET_ENTRY(_xvasp& xvasp,const string& ENTRY,bool preload_incar=false); //CO20200624 - preload_incar ensures consistency between xvasp.INCAR and ./INCAR, preload_incar WILL overwrite xvasp.INCAR
+  void XVASP_INCAR_REMOVE_ENTRY(_xvasp& xvasp,const string& entry,const string& COMMENT,bool VERBOSE);  //CO20200624 - using aurostd::kvpairfound() now
+  void XVASP_INCAR_REMOVE_ENTRY(_xvasp& xvasp,const vector<string>& entries,const string& COMMENT,bool VERBOSE);  //CO20200624 - using aurostd::kvpairfound() now
 
   bool AFLOWIN_REMOVE(const string& aflowin_file,const string& keyword,const string& comment); //CO20210314
   bool AFLOWIN_REMOVE(const string& aflowin_file,const vector<string>& vkeywords,const string& comment); //CO20210314
   bool AFLOWIN_REMOVE(const string& aflowin_file,const string& keyword,const string& keyword2avoid,const string& comment); //CO20210314
   bool AFLOWIN_REMOVE(const string& aflowin_file,const vector<string>& vkeywords,const vector<string>& vkeywords2ignore,const string& comment); //CO20210314
-  void AFLOWIN_ADD(const string& aflowin_file,const string& item,const string& comment);
+  void AFLOWIN_ADD(const string& aflowin_file,const stringstream& streamin,const string& comment);  //CO20210315
+  void AFLOWIN_ADD(const string& aflowin_file,const ostringstream& streamin,const string& comment); //CO20210315
+  void AFLOWIN_ADD(const string& aflowin_file,const string& line,const string& comment);  //CO20210315
+  void AFLOWIN_ADD(const string& aflowin_file,const vector<string>& vlines2add,const string& comment);  //CO20210315
 
   void XVASP_KPOINTS_KPOINTS(_xvasp &xvasp,ofstream &FileMESSAGE,bool VERBOSE);
   void XVASP_KPOINTS_KPOINTS(_xvasp &xvasp);
