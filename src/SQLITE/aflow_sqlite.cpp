@@ -119,7 +119,6 @@ namespace sql {
 
   int SQLcallbackVECTOR(void* data, int argc, char** argv, char** col) {
     if (_SQL_CALLBACK_DEBUG_) {
-      std::cout << "argc = " << argc << std::endl;
       for (int i = 0; i < argc; i++) {
         std::cerr << XPID << "sql::SQLcallbackVECTOR()[" << i << "]: " << col[i] << " = " << (argv[i]?argv[i]:"NULL") << std::endl;
       }
