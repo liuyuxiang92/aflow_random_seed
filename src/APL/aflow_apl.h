@@ -1180,6 +1180,8 @@ namespace apl
     EOS_BIRCH_MURNAGHAN4};
   enum QHAmethod {QHA_CALC, QHA3P_CALC, SCQHA_CALC, QHANP_CALC};
   enum QHAtype   {QHA_FD, QHA_EOS, QHA_TE};
+  // specifies what contributions to the free energy are included
+  enum F_CONTRIB {F_ELEC, F_VIB, F_ELEC_VIB};
 
   bool QHA_Get_AflowInName(string &AflowInName, const string &directory_LIB);
   //void linkAPLtoQHA();//AS20201216 OBSOLETE
@@ -1204,12 +1206,15 @@ namespace apl
       void   calcCVandGP(double T, double &CV, double &GP);
       void   calcCVandGPfit(double T, double V, double &CV, double &GP);
       double calcGPinfFit(double V);
-      double calcFreeEnergy(double T, int id);
-      double calcFreeEnergyFit(double T, double V, EOSmethod eos_method, QHAmethod method);
+      double calcVibFreeEnergy(double T, int id);
+      double calcFreeEnergyFit(double T, double V, EOSmethod eos_method,
+          QHAmethod method, F_CONTRIB contrib);
       double calcElectronicFreeEnergy(double T, int id);
       double calcChemicalPotential(double T, int Vid);
       double calcIDOS(double e, double T, xEIGENVAL &eig);
       xvector<double> calcElectronicFreeEnergySommerfeld(double T);
+      xvector<double> calcElectronicSpecificHeat(double T);
+      xvector<double> calcFreeEnergy(double T, QHAmethod qha_method, F_CONTRIB contrib);
       xvector<double> calcDOSatEf();
       double calcInternalEnergyFit(double T, double V, EOSmethod method);
       xvector<double> fitToEOSmodel(xvector<double> &E, EOSmethod method);
@@ -1218,16 +1223,17 @@ namespace apl
       double calcBprime(double V, const xvector<double> &parameters, EOSmethod method);
       double calcEOS2Pressure(double V, const xvector<double> &parameters, EOSmethod method);
       double calcEquilibriumVolume(const xvector<double> &parameters, EOSmethod method);
-      double calcEntropy(double T, double V, EOSmethod eos_method, QHAmethod method);
-      double getEqVolumeT(double T, EOSmethod eos_method, QHAmethod method);
-      double calcThermalExpansion(double T, EOSmethod eos_method, QHAmethod method);
+      double calcEntropy(double T, double V, EOSmethod eos_method,
+          QHAmethod method, F_CONTRIB contrib);
+      double getEqVolumeT(double T, EOSmethod eos_method, QHAmethod method, F_CONTRIB contrib);
+      double calcThermalExpansion(double T, EOSmethod eos_method, QHAmethod method, F_CONTRIB contrib);
       double calcIsochoricSpecificHeat(double T, double V, EOSmethod eos_method, 
-          QHAmethod qha_method);
+          QHAmethod qha_method, F_CONTRIB contrib);
       // QHA3P and SCQHA and QHANP
       double extrapolateFrequency(double V, const xvector<double> &xomega, QHAmethod qha_method);
       double extrapolateGrueneisen(double V, const xvector<double> &xomega, QHAmethod qha_method);
       // QHA3P
-      double calcFreeEnergyTaylorExpansion(double T, int Vid, QHAmethod qha_method);
+      double calcVibFreeEnergyTaylorExpansion(double T, int Vid, QHAmethod qha_method);
       double calcInternalEnergyTaylorExpansion(double T, double V, QHAmethod qha_method);
       // SCQHA
       double calcVPgamma(double T, double V);
