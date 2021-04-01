@@ -4,6 +4,9 @@
         -- patched XVASP_KPOINTS_OPERATION() so a change is ensured for Xeven/Xodd etc. (CO)
         -- APL MINATOMS_RESTRICTED->MINATOMS_UNIFORM (CO)
         -- adding PAW_PBE_KIN to allowed DFT types in chull (CO)
+        -- Added alloy property to database (ME)
+        -- Added functionality to convert entries to json and aflowlib entry formats (ME)
+        -- Improved vector callback function for SQLite (ME)
 3.2.8 - 2021/02/22
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.8.tar.xz
         -- lib2raw bug fixes (CO)
