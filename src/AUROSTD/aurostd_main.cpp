@@ -133,18 +133,21 @@ namespace aurostd {
 // ***************************************************************************
 // FILES creation/destruction
 namespace aurostd {
-  string TmpFileCreate(string identifier) {
-    string str=XHOST.tmpfs+"/_aflow_"+identifier+"."+XHOST.user+".pid"+XHOST.ostrPID.str()+".tid"+XHOST.ostrTID.str()+".a"+AFLOW_VERSION+".rnd"+aurostd::utype2string(uint((double) std::floor((double)100000*aurostd::ran0())))+".u"+aurostd::utype2string(uint((double) aurostd::get_useconds()))+".tmp"; //CO20200502 - threadID
+  string TmpFileCreate(const string& identifier,const string& _tmpdir,bool hidden) {  //CO20210315
+    string tmpdir=_tmpdir;  //CO20210315
+    if(tmpdir.empty()){tmpdir=XHOST.tmpfs;} //CO20210315
+    string str=tmpdir+"/"+(hidden?".":"")+"_aflow_"+identifier+"."+XHOST.user+".pid"+XHOST.ostrPID.str()+".tid"+XHOST.ostrTID.str()+".a"+AFLOW_VERSION+".rnd"+aurostd::utype2string(uint((double) std::floor((double)100000*aurostd::ran0())))+".u"+aurostd::utype2string(uint((double) aurostd::get_useconds()))+".tmp"; //CO20200502 - threadID
     // cerr << str << endl;
     return str;
   }
   string TmpFileCreate(void) {return TmpFileCreate("");}
-  string TmpDirectoryCreate(string identifier) {
-    string dir=XHOST.tmpfs+"/_aflow_"+identifier+"_"+XHOST.user+"_pid"+XHOST.ostrPID.str()+"_tid"+XHOST.ostrTID.str()+"_a"+AFLOW_VERSION+"_rnd"+aurostd::utype2string(uint((double) std::floor((double) 100000*aurostd::ran0())))+"_u"+aurostd::utype2string(uint((double) aurostd::get_useconds()))+"_tmp";  //CO20200502 - threadID
+  string TmpDirectoryCreate(const string& identifier,const string& _tmpdir,bool hidden) { //CO20210315
+    string tmpdir=_tmpdir;  //CO20210315
+    if(tmpdir.empty()){tmpdir=XHOST.tmpfs;} //CO20210315
+    string dir=tmpdir+"/"+(hidden?".":"")+"_aflow_"+identifier+"_"+XHOST.user+"_pid"+XHOST.ostrPID.str()+"_tid"+XHOST.ostrTID.str()+"_a"+AFLOW_VERSION+"_rnd"+aurostd::utype2string(uint((double) std::floor((double) 100000*aurostd::ran0())))+"_u"+aurostd::utype2string(uint((double) aurostd::get_useconds()))+"_tmp";  //CO20200502 - threadID
     DirectoryMake(dir);
     return dir;}
-  string TmpDirectoryCreate(void) {
-    return TmpDirectoryCreate("");}
+  string TmpDirectoryCreate(void) {return TmpDirectoryCreate("");}
 }
 
 // ***************************************************************************
@@ -2325,10 +2328,10 @@ namespace aurostd {
   // gets modification time and returns SECONDS since epoch (as long int)
   long int GetTimestampModified(const string& _FileName) {
     string FileName(CleanFileName(_FileName));
-    if(!FileExist(_FileName)){return 0;}
+    if(!FileExist(FileName)){return 0;}
     time_t tm = 0;
     struct stat file_stat;
-    if (stat(_FileName.c_str(), &file_stat) == 0) tm = file_stat.st_mtime;
+    if (stat(FileName.c_str(), &file_stat) == 0) tm = file_stat.st_mtime;
     return static_cast<long int>(tm);
   }
 
@@ -2339,11 +2342,21 @@ namespace aurostd {
   // gets modification time and returns SECONDS since now (as long int)
   long int SecondsSinceFileModified(const string& _FileName) {
     string FileName(CleanFileName(_FileName));
-    if(!FileExist(_FileName)){return 0;}
-    long int tm_mod=GetTimestampModified(FileName);
-    time_t t = std::time(NULL); //DX20200319 - nullptr -> NULL
-    long int tm_curr = (long int) t;
-    return tm_curr-tm_mod;
+    if(!FileExist(FileName)){return 0;}
+    long int tmod_file=GetTimestampModified(FileName);
+    if(0){  //CO20210315 - this does NOT work, current time on the machine (node) vs. NFS will cause problems
+      time_t t = std::time(NULL); //DX20200319 - nullptr -> NULL
+      long int tmod_curr = (long int) t;
+      return max((long int)0,tmod_curr-tmod_file);  //max ensures that if something goes wrong, we return 0
+    }
+    //instead, write a new file and take the difference in the time stamps
+    //solution inspired by ME - create a temporary file IN THE CURRENT DIRECTORY (within NFS) and check time deltas
+    string dir=aurostd::dirname(FileName);
+    string tmpfile=aurostd::TmpFileCreate("timestamp",dir,true); //put in current directory, make it hidden
+    if(!aurostd::string2file("timestamp",tmpfile)){return 0;}  //write the file out, need a better fix here
+    long int tmod_tmp=aurostd::GetTimestampModified(tmpfile);
+    aurostd::RemoveFile(tmpfile);
+    return max((long int)0,tmod_tmp-tmod_file); //max ensures that if something goes wrong, we return 0
   }
 
   // ***************************************************************************

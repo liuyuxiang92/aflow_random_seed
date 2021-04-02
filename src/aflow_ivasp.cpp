@@ -6367,11 +6367,33 @@ namespace KBIN {
       if(Krun){xfixed.flag(patch,true);}
     }
     else if(mode=="DAV" || mode=="EDDDAV") {
+      //https://www.vasp.at/forum/viewtopic.php?f=2&t=10409&p=10434#:~:text=7%3A18%20am-,Re%3A%20on%20solving%20%22Error%20EDDDAV%3A%20Call%20to%20ZHEGV%20failed,Returncode%20%3D%20xx%22&text=This%20is%20an%20error%20of,of%20the%20very%20last%20one.
+      //solution: try flipping around different ALGOs
       //previously it was IALGO=48, better to use ALGO=VERYFAST (same thing: https://www.vasp.at/wiki/index.php/ALGO)
-      patch="ALGO=VERYFAST";
-      if(Krun && xfixed.flag(patch)){Krun=false;}
-      Krun=(Krun && KBIN::XVASP_Afix_ApplyPatch(patch,xvasp,kflags,vflags,aflags,FileMESSAGE));
-      if(Krun){xfixed.flag(patch,true);}
+      if(submode<0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"no submode set: \""+mode+"\"",_INPUT_ILLEGAL_);}  //CO20210315
+      if(submode==0){ //try ALGO=VERYFAST //CO20200624
+        patch="ALGO=VERYFAST";
+        if(Krun && xfixed.flag(patch)){Krun=false;}
+        Krun=(Krun && KBIN::XVASP_Afix_ApplyPatch(patch,xvasp,kflags,vflags,aflags,FileMESSAGE));
+        if(Krun){xfixed.flag(patch,true);}
+        if(!Krun){Krun=true;submode++;} //reset and go to the next solution
+      }
+      if(submode==1){ //try ALGO=FAST //CO20200624
+        patch="ALGO=FAST";
+        if(Krun && xfixed.flag(patch)){Krun=false;}
+        Krun=(Krun && KBIN::XVASP_Afix_ApplyPatch(patch,xvasp,kflags,vflags,aflags,FileMESSAGE));
+        if(Krun){xfixed.flag(patch,true);}
+        if(!Krun){Krun=true;submode++;} //reset and go to the next solution
+      }
+      if(submode==2){ //try ALGO=NORMAL //CO20200624
+        patch="ALGO=NORMAL";
+        if(Krun && xfixed.flag(patch)){Krun=false;}
+        Krun=(Krun && KBIN::XVASP_Afix_ApplyPatch(patch,xvasp,kflags,vflags,aflags,FileMESSAGE));
+        if(Krun){xfixed.flag(patch,true);}
+        if(!Krun){Krun=true;submode++;} //reset and go to the next solution
+      }
+      if(submode>=3){Krun=false;}
+      submode+=submode_increment;submode_increment=1;  //increment and reset
     }
     else if(mode=="DENTET") {
       patch="ISMEAR=2";

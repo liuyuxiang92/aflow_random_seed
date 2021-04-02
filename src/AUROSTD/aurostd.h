@@ -441,9 +441,9 @@ namespace aurostd {
   bool DirectorySkipped(string directory);
   bool DirectoryWritable(string directory);
   bool DirectoryUnwritable(string directory);
-  string TmpFileCreate(string prefix);
+  string TmpFileCreate(const string& prefix,const string& _tmpdir="",bool hidden=false);  //CO20210315 - empty means use XHOST.tmpfs
   string TmpFileCreate(void);
-  string TmpDirectoryCreate(string prefix);
+  string TmpDirectoryCreate(const string& prefix,const string& _tmpdir="",bool hidden=false);  //CO20210315 - empty means use XHOST.tmpfs
   string TmpDirectoryCreate(void);
   string CleanFileName(const string& fileIN);
   string ProperFileName(string fileIN);
