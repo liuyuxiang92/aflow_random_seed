@@ -827,8 +827,8 @@ DEFAULTS CHULL
 DEFAULT_CHULL_ALLOWED_DFT_TYPES
   description: Defines the allowed entries based on the DFT calculation type.
   type: string
-  choices: "US", "GGA", "PAW_LDA", "PAW_GGA", "PAW_PBE", "GW", "HSE06"
-  default: "PAW_PBE"
+  choices: "US", "GGA", "PAW_LDA", "PAW_GGA", "PAW_PBE", "PAW_PBE_KIN", "GW", "HSE06"
+  default: "PAW_PBE,PAW_PBE_KIN"
 
 DEFAULT_CHULL_ALLOW_ALL_FORMATION_ENERGIES
   description: Allows all entries independent of DFT calculation type.
