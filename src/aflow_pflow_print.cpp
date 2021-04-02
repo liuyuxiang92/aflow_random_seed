@@ -3582,7 +3582,8 @@ namespace pflow {
     ss_output.setf(std::ios::fixed,std::ios::floatfield);
     // ---------------------------------------------------------------------------
     // text output
-    if(ftype == txt_ft){
+    // ME20210402 - print both for web
+    if((ftype == txt_ft) || (XHOST.vflag_control.flag("WWW"))) {
       ss_output << "SPACE GROUP OF THE CRYSTAL" << endl;
       ss_output << " Space group number                           = " << str_sg.space_group_ITC << endl;
       ss_output << " Space group label (Hermann Mauguin)          = " << space_group_HM << endl;
@@ -3617,10 +3618,19 @@ namespace pflow {
           ss_output << xstr_wyccar;
         }
       }
+      // ME20210402 - Convert to array of strings for web
+      if (XHOST.vflag_control.flag("WWW")) {
+        vector<string> voutput;
+        aurostd::stream2vectorstring(ss_output, voutput);
+        ss_output.clear();
+        ss_output.str("");
+        ss_output << "{\"txt\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(voutput, "\"", "\""), ",") << "],";
+      }
     }
     // ---------------------------------------------------------------------------
     // json output
-    else if(ftype == json_ft){
+    // ME20210402 - print both for web
+    if((ftype == json_ft) || XHOST.vflag_control.flag("WWW")){
 
       aurostd::JSONwriter json;
       bool roff = true;
@@ -3743,7 +3753,9 @@ namespace pflow {
           json.addNull("wyccar");
         }
       }
-      ss_output << json.toString(standalone);
+      // ME20210402 - added web output
+      if (XHOST.vflag_control.flag("WWW")) ss_output << "\"json\":" << json.toString(standalone) << "}" << std::endl;
+      else ss_output << json.toString(standalone);
       if(standalone) { ss_output << endl; }
     }
 

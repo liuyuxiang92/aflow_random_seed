@@ -5503,8 +5503,8 @@ namespace pflow {
     if(vpflow.flag("DATA::SUPPRESS_WYCKOFF_PRINTING") || XHOST.vflag_control.flag("WWW")){ suppress_Wyckoff = true; }
 
     // ---------------------------------------------------------------------------
-    // add banner
-    if(ftype==txt_ft){ cout << aflow::Banner("BANNER_TINY") << endl; }
+    // add banner // ME20210402 - but not for web
+    if(ftype==txt_ft && !XHOST.vflag_control.flag("WWW")){ cout << aflow::Banner("BANNER_TINY") << endl; }
 
     // ---------------------------------------------------------------------------
     // perform relevant analysis
