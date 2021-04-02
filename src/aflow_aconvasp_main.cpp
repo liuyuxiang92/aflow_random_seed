@@ -1241,6 +1241,11 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     //DX20170921 - MAGNETIC SYMMETRY - START
     vpflow.args2addattachedscheme(argv,cmds,"SYMMETRY::MAGNETIC","--mag=|--magnetic=|--magmom=",""); //DX20170803
     //DX20170921 - MAGNETIC SYMMETRY - END
+    // ME20210206 - web mode
+    if (XHOST.vflag_control.flag("WWW")) {
+      vpflow.flag("SYMMETRY::SCREEN_ONLY", true);
+      XHOST.QUIET = true;
+    }
   }
   //DX20170818 - Added tolerance and no_scan options to Xgroups - END
   // vpflow.flag("SPLINE",aurostd::args2flag(argv,cmds,"--spline") && argv.at(1)=="--spline");
@@ -3245,7 +3250,8 @@ namespace pflow {
     }
     //DX20170803 - Print to symmetry operators to screen - START
     if(print==true) {
-      KBIN_SymmetryToScreen(a,format,oss,mode);
+      if (XHOST.vflag_control.flag("WWW")) KBIN_SymmetryToScreenWeb(a, oss, mode);
+      else KBIN_SymmetryToScreen(a,format,oss,mode);
     }
     //DX20170803 - Print to symmetry operators to screen - END
     // BZIP if necessary

@@ -8539,18 +8539,18 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
 // Function KBIN_SymmetryToScreen
 //
 // This function prints to screen all the symmetry elements for a given structure 
-bool KBIN_SymmetryToScreen(xstructure& a, string& format, ostream& oss, char mode){
+bool KBIN_SymmetryToScreen(xstructure& a, const string& format, ostream& oss, char mode){
   // OUT format
   if(aurostd::toupper(format)=="TXT" || aurostd::toupper(format)=="TEXT"){ //DX20200206
-    xvector<double> aux_rrr(9),aux_ijk(9);
+    //xvector<double> aux_rrr(9),aux_ijk(9);  //OBSOLETE ME20210402 - not used
     string _lines_="------------------------------------------------------------------------------------------------";
     if(mode == '\0' || mode == _PGROUP_){
       oss << "AFLOW point groups, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
       oss << a.pgroup.size() << "    point group operations " << endl;
+      oss << _lines_ << endl;
       for(uint k=0;k<a.pgroup.size();k++) {
-        for(int i=0;i<9;i++) aux_rrr(i+1)=a.pgroup[k].Uc(int(i/3)+1,mod(i,3)+1);                 // put in rows
-        for(int i=0;i<9;i++) aux_ijk(i+1)=a.pgroup[k].Uf(int(i/3)+1,mod(i,3)+1);                  // put in rows
-        if(k==0) oss << _lines_ << endl;
+        //for(int i=0;i<9;i++) aux_rrr(i+1)=a.pgroup[k].Uc(int(i/3)+1,mod(i,3)+1);                 // put in rows
+        //for(int i=0;i<9;i++) aux_ijk(i+1)=a.pgroup[k].Uf(int(i/3)+1,mod(i,3)+1);                  // put in rows
         oss << " Operation number = " << k+1 << " / " << a.pgroup.size() << endl;
         oss << a.pgroup[k]; // << endl;
         oss << _lines_ << endl;
@@ -8560,10 +8560,10 @@ bool KBIN_SymmetryToScreen(xstructure& a, string& format, ostream& oss, char mod
     if(mode == '\0' || mode == _PGROUPK_){
       oss << "AFLOW point groups klattice, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
       oss << a.pgroupk.size() << "    point group operations " << endl;
+      oss << _lines_ << endl;
       for(uint k=0;k<a.pgroupk.size();k++) {
-        for(int i=0;i<9;i++) aux_rrr(i+1)=a.pgroupk[k].Uc(int(i/3)+1,mod(i,3)+1);                 // put in rows
-        for(int i=0;i<9;i++) aux_ijk(i+1)=a.pgroupk[k].Uf(int(i/3)+1,mod(i,3)+1);                  // put in rows
-        if(k==0) oss << _lines_ << endl;
+        //for(int i=0;i<9;i++) aux_rrr(i+1)=a.pgroupk[k].Uc(int(i/3)+1,mod(i,3)+1);                 // put in rows
+        //for(int i=0;i<9;i++) aux_ijk(i+1)=a.pgroupk[k].Uf(int(i/3)+1,mod(i,3)+1);                  // put in rows
         oss << " Operation number = " << k+1 << " / " << a.pgroupk.size() << endl;
         oss << a.pgroupk[k]; // << endl;
         oss << _lines_ << endl;
@@ -8573,10 +8573,10 @@ bool KBIN_SymmetryToScreen(xstructure& a, string& format, ostream& oss, char mod
     if(mode == '\0' || mode == _FGROUP_){
       oss << "AFLOW factor groups, operations are as a=U*b+tau (cols vectors), (Uc,Uf,ctau,ftau for cartesian/fractional)" << endl;
       oss << a.fgroup.size() << "    factor group operations " << endl;
+      oss << _lines_ << endl;
       for(uint k=0;k<a.fgroup.size();k++) {
-        for(int i=0;i<9;i++) aux_rrr(i+1)=a.fgroup[k].Uc(int(i/3)+1,mod(i,3)+1);                       // put in rows
-        for(int i=0;i<9;i++) aux_ijk(i+1)=a.fgroup[k].Uf(int(i/3)+1,mod(i,3)+1);                    // put in rows
-        if(k==0) oss << _lines_ << endl;
+        //for(int i=0;i<9;i++) aux_rrr(i+1)=a.fgroup[k].Uc(int(i/3)+1,mod(i,3)+1);                       // put in rows
+        //for(int i=0;i<9;i++) aux_ijk(i+1)=a.fgroup[k].Uf(int(i/3)+1,mod(i,3)+1);                    // put in rows
         oss << " Operation number = " << k+1 << " / " << a.fgroup.size() << endl;
         oss << a.fgroup[k]; // << endl;
         oss << _lines_ << endl;
@@ -8585,10 +8585,10 @@ bool KBIN_SymmetryToScreen(xstructure& a, string& format, ostream& oss, char mod
     if(mode == '\0' || mode == _PGROUP_XTAL_){
       oss << "AFLOW crystal point groups, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
       oss << a.pgroup_xtal.size() << "    point group operations " << endl;
+      oss << _lines_ << endl;
       for(uint k=0;k<a.pgroup_xtal.size();k++) {
-        for(int i=0;i<9;i++) aux_rrr(i+1)=a.pgroup_xtal[k].Uc(int(i/3)+1,mod(i,3)+1);                 // put in rows
-        for(int i=0;i<9;i++) aux_ijk(i+1)=a.pgroup_xtal[k].Uf(int(i/3)+1,mod(i,3)+1);                  // put in rows
-        if(k==0) oss << _lines_ << endl;
+        //for(int i=0;i<9;i++) aux_rrr(i+1)=a.pgroup_xtal[k].Uc(int(i/3)+1,mod(i,3)+1);                 // put in rows
+        //for(int i=0;i<9;i++) aux_ijk(i+1)=a.pgroup_xtal[k].Uf(int(i/3)+1,mod(i,3)+1);                  // put in rows
         oss << " Operation number = " << k+1 << " / " << a.pgroup_xtal.size() << endl;
         oss << a.pgroup_xtal[k]; // << endl;
         oss << _lines_ << endl;
@@ -8599,10 +8599,10 @@ bool KBIN_SymmetryToScreen(xstructure& a, string& format, ostream& oss, char mod
     if(mode == '\0' || mode == _PGROUPK_XTAL_){
       oss << "AFLOW dual of crystal point groups, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
       oss << a.pgroupk_xtal.size() << "    dual of crystal point group operations " << endl;
+      oss << _lines_ << endl;
       for(uint k=0;k<a.pgroupk_xtal.size();k++) {
-        for(int i=0;i<9;i++) aux_rrr(i+1)=a.pgroupk_xtal[k].Uc(int(i/3)+1,mod(i,3)+1);                 // put in rows
-        for(int i=0;i<9;i++) aux_ijk(i+1)=a.pgroupk_xtal[k].Uf(int(i/3)+1,mod(i,3)+1);                  // put in rows
-        if(k==0) oss << _lines_ << endl;
+        //for(int i=0;i<9;i++) aux_rrr(i+1)=a.pgroupk_xtal[k].Uc(int(i/3)+1,mod(i,3)+1);                 // put in rows
+        //for(int i=0;i<9;i++) aux_ijk(i+1)=a.pgroupk_xtal[k].Uf(int(i/3)+1,mod(i,3)+1);                  // put in rows
         oss << " Operation number = " << k+1 << " / " << a.pgroupk_xtal.size() << endl;
         oss << a.pgroupk_xtal[k]; // << endl;
         oss << _lines_ << endl;
@@ -8614,10 +8614,10 @@ bool KBIN_SymmetryToScreen(xstructure& a, string& format, ostream& oss, char mod
     if(mode == '\0' || mode == _PGROUPK_PATTERSON_){
       oss << "AFLOW Patterson point groups, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
       oss << a.pgroupk_Patterson.size() << "    point group operations " << endl;
+      oss << _lines_ << endl;
       for(uint k=0;k<a.pgroupk_Patterson.size();k++) {
-        for(int i=0;i<9;i++) aux_rrr(i+1)=a.pgroupk_Patterson[k].Uc(int(i/3)+1,mod(i,3)+1);                 // put in rows
-        for(int i=0;i<9;i++) aux_ijk(i+1)=a.pgroupk_Patterson[k].Uf(int(i/3)+1,mod(i,3)+1);                  // put in rows
-        if(k==0) oss << _lines_ << endl;
+        //for(int i=0;i<9;i++) aux_rrr(i+1)=a.pgroupk_Patterson[k].Uc(int(i/3)+1,mod(i,3)+1);                 // put in rows
+        //for(int i=0;i<9;i++) aux_ijk(i+1)=a.pgroupk_Patterson[k].Uf(int(i/3)+1,mod(i,3)+1);                  // put in rows
         oss << " Operation number = " << k+1 << " / " << a.pgroupk_Patterson.size() << endl;
         oss << a.pgroupk_Patterson[k]; // << endl;
         oss << _lines_ << endl;
@@ -8630,10 +8630,10 @@ bool KBIN_SymmetryToScreen(xstructure& a, string& format, ostream& oss, char mod
       oss << a.sgroup.size() << "    space group operations " << endl;
       oss << a.sgroup_radius << "    radius of space group " << endl;
       oss << a.sgroup_radius_dims << "    dimension of radius of space group " << endl;
+      oss << _lines_ << endl;
       for(uint k=0;k<a.sgroup.size();k++) {
-        for(int i=0;i<9;i++) aux_rrr(i+1)=a.sgroup[k].Uc(int(i/3)+1,mod(i,3)+1);                       // put in rows
-        for(int i=0;i<9;i++) aux_ijk(i+1)=a.sgroup[k].Uf(int(i/3)+1,mod(i,3)+1);                    // put in rows
-        if(k==0) oss << _lines_ << endl;
+        //for(int i=0;i<9;i++) aux_rrr(i+1)=a.sgroup[k].Uc(int(i/3)+1,mod(i,3)+1);                       // put in rows
+        //for(int i=0;i<9;i++) aux_ijk(i+1)=a.sgroup[k].Uf(int(i/3)+1,mod(i,3)+1);                    // put in rows
         oss << " Operation number = " << k+1 << " / " << a.sgroup.size() << endl;
         oss << a.sgroup[k]; // << endl;
         oss << _lines_ << endl;
@@ -8645,10 +8645,10 @@ bool KBIN_SymmetryToScreen(xstructure& a, string& format, ostream& oss, char mod
       for(uint iat=0;iat<a.atoms.size();iat++) {
         oss << " Site="  << iat << endl;
         oss << a.agroup.at(iat).size() << "   site point group operations " << endl;
+        oss << _lines_ << endl;
         for(uint k=0;k<a.agroup.at(iat).size();k++) {
-          for(int i=0;i<9;i++) aux_rrr(i+1)=a.agroup.at(iat)[k].Uc(int(i/3)+1,mod(i,3)+1);                       // put in rows
-          for(int i=0;i<9;i++) aux_ijk(i+1)=a.agroup.at(iat)[k].Uf(int(i/3)+1,mod(i,3)+1);                    // put in rows
-          if(k==0) oss << _lines_ << endl;
+          //for(int i=0;i<9;i++) aux_rrr(i+1)=a.agroup.at(iat)[k].Uc(int(i/3)+1,mod(i,3)+1);                       // put in rows
+          //for(int i=0;i<9;i++) aux_ijk(i+1)=a.agroup.at(iat)[k].Uf(int(i/3)+1,mod(i,3)+1);                    // put in rows
           oss << " Site = " << iat << endl;
           oss << " Operation number = " << k+1 << " / " << a.agroup.at(iat).size() << endl;
           oss << a.agroup.at(iat)[k]; // << endl;
@@ -8730,7 +8730,112 @@ bool KBIN_SymmetryToScreen(xstructure& a, string& format, ostream& oss, char mod
   return FALSE;
 }
 //DX20170803 - Print symmetry to screen - END
-
+//ME20210402 - Special web output for symmetry
+bool KBIN_SymmetryToScreenWeb(xstructure& a, ostream& oss, char mode) {
+  stringstream sscontent_txt, sscontent_json;
+  vector<string> vcontent_txt;
+  string _lines_="------------------------------------------------------------------------------------------------";
+  switch(mode) {
+    case _PGROUP_:
+      sscontent_txt << "AFLOW point groups, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
+      sscontent_txt << a.pgroup.size() << "    point group operations " << endl;
+      sscontent_txt << _lines_ << endl;
+      for(uint k=0;k<a.pgroup.size();k++) {
+        sscontent_txt << " Operation number = " << k+1 << " / " << a.pgroup.size() << endl;
+        sscontent_txt << a.pgroup[k];
+        sscontent_txt << _lines_ << endl;
+      }
+      sscontent_json << SymmetryToJson(a.pgroup, mode);
+      break;
+    case _PGROUPK_:
+      sscontent_txt << "AFLOW point groups klattice, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
+      sscontent_txt << a.pgroupk.size() << "    point group operations " << endl;
+      sscontent_txt << _lines_ << endl;
+      for(uint k=0;k<a.pgroupk.size();k++) {
+        sscontent_txt << " Operation number = " << k+1 << " / " << a.pgroupk.size() << endl;
+        sscontent_txt << a.pgroupk[k];
+        sscontent_txt << _lines_ << endl;
+      }
+      sscontent_json << SymmetryToJson(a.pgroupk, mode);
+      break;
+    case _FGROUP_:
+      sscontent_txt << "AFLOW factor groups, operations are as a=U*b+tau (cols vectors), (Uc,Uf,ctau,ftau for cartesian/fractional)" << endl;
+      sscontent_txt << a.fgroup.size() << "    factor group operations " << endl;
+      sscontent_txt << _lines_ << endl;
+      for(uint k=0;k<a.fgroup.size();k++) {
+        sscontent_txt << " Operation number = " << k+1 << " / " << a.fgroup.size() << endl;
+        sscontent_txt << a.fgroup[k];
+        sscontent_txt << _lines_ << endl;
+      }
+      sscontent_json << SymmetryToJson(a.fgroup, mode);
+      break;
+    case _PGROUP_XTAL_:
+      sscontent_txt << "AFLOW crystal point groups, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
+      sscontent_txt << a.pgroup_xtal.size() << "    point group operations " << endl;
+      sscontent_txt << _lines_ << endl;
+      for(uint k=0;k<a.pgroup_xtal.size();k++) {
+        sscontent_txt << " Operation number = " << k+1 << " / " << a.pgroup_xtal.size() << endl;
+        sscontent_txt << a.pgroup_xtal[k];
+        sscontent_txt << _lines_ << endl;
+      }
+      sscontent_json << SymmetryToJson(a.pgroup_xtal, mode);
+      break;
+    case _PGROUPK_XTAL_:
+      sscontent_txt << "AFLOW dual of crystal point groups, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
+      sscontent_txt << a.pgroupk_xtal.size() << "    dual of crystal point group operations " << endl;
+      sscontent_txt << _lines_ << endl;
+      for(uint k=0;k<a.pgroupk_xtal.size();k++) {
+        sscontent_txt << " Operation number = " << k+1 << " / " << a.pgroupk_xtal.size() << endl;
+        sscontent_txt << a.pgroupk_xtal[k];
+        sscontent_txt << _lines_ << endl;
+      }
+      sscontent_json << SymmetryToJson(a.pgroupk_xtal, mode);
+      break;
+    case _PGROUPK_PATTERSON_:
+      sscontent_txt << "AFLOW Patterson point groups, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
+      sscontent_txt << a.pgroupk_Patterson.size() << "    point group operations " << endl;
+      sscontent_txt << _lines_ << endl;
+      for(uint k=0;k<a.pgroupk_Patterson.size();k++) {
+        sscontent_txt << " Operation number = " << k+1 << " / " << a.pgroupk_Patterson.size() << endl;
+        sscontent_txt << a.pgroupk_Patterson[k];
+        sscontent_txt << _lines_ << endl;
+      }
+      sscontent_json << SymmetryToJson(a.pgroupk_Patterson, mode);
+      break;
+    case _SGROUP_:
+      sscontent_txt << "AFLOW - space groups, operations are as a=U*b+tau+trasl (cols vectors), (Uc,Uf,ctau,ftau,ctrasl,ftrasl for cartesian/fractional)" << endl;
+      sscontent_txt << a.sgroup.size() << "    space group operations " << endl;
+      sscontent_txt << a.sgroup_radius << "    radius of space group " << endl;
+      sscontent_txt << a.sgroup_radius_dims << "    dimension of radius of space group " << endl;
+      for(uint k=0;k<a.sgroup.size();k++) {
+        sscontent_txt << " Operation number = " << k+1 << " / " << a.sgroup.size() << endl;
+        sscontent_txt << a.sgroup[k];
+        sscontent_txt << _lines_ << endl;
+      }
+      sscontent_json << SymmetryToJson(a.sgroup, mode);
+      break;
+    case _AGROUP_:
+      sscontent_txt << "AFLOW site point groups centered on the site, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
+      for(uint iat=0;iat<a.atoms.size();iat++) {
+        sscontent_txt << " Site="  << iat << endl;
+        sscontent_txt << a.agroup.at(iat).size() << "   site point group operations " << endl;
+        sscontent_txt << _lines_ << endl;
+        for(uint k=0;k<a.agroup[iat].size();k++) {
+          sscontent_txt << " Operation number = " << k+1 << " / " << a.agroup[iat].size() << endl;
+          sscontent_txt << a.agroup[iat][k];
+          sscontent_txt << _lines_ << endl;
+        }
+      }
+      sscontent_json << AgroupSymmetryToJson(a.agroup, mode);
+      break;
+    default:
+      return false;
+  }
+  aurostd::stream2vectorstring(sscontent_txt, vcontent_txt);
+  oss << "{\"txt\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(vcontent_txt, "\"", "\""), ",") << "],"
+      << "\"json\":" << sscontent_json.str() << "}" << std::endl;
+  return true;
+}
 
 // --------------------------------------------------------------------------
 // --------------------------------------------------------------------------

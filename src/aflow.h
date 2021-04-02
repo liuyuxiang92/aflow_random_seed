@@ -4293,7 +4293,8 @@ string EquivalentAtomsToJson(vector<vector<int> >& iatoms); //DX20170803 - For P
 string SymmetryToJson(vector<_sym_op>& group, char& mode); //DX20170803 - For Python wrapper
 bool KBIN_SymmetryWrite(ofstream& FileMESSAGE,xstructure& a,_aflags& aflags,char group,const bool& osswrite,ostream& oss,const string& format="txt");
 //bool KBIN_SymmetryToScreen(xstructure& a, string& format, ostream& oss); //DX20170803 - For Python wrapper
-bool KBIN_SymmetryToScreen(xstructure& a, string& format, ostream& oss, char mode='\0'); //DX20170822 - For Python wrapper
+bool KBIN_SymmetryToScreen(xstructure& a, const string& format, ostream& oss, char mode='\0'); //DX20170822 - For Python wrapper
+bool KBIN_SymmetryToScreenWeb(xstructure& a, ostream& oss, char mode); //ME20210402
 bool KBIN_StepSymmetryPerform(xstructure& a,string AflowIn,ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags,const bool& osswrite,ostream& oss);
 //DX+CO START
 bool KBIN_StepSymmetryPerform_20161205(xstructure& a,string AflowIn,ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags,const bool& osswrite,ostream& oss); //DX
