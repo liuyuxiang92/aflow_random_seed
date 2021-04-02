@@ -2925,7 +2925,7 @@ namespace KBIN {
     if(!aurostd::FileExist(aflags.Directory+"/"+_AFLOWLOCK_)){return;} //we needed it above to get the vasp_bin
 
     long int tmod_vaspout=aurostd::SecondsSinceFileModified(xvasp.Directory+"/"+DEFAULT_VASP_OUT);
-    if(1||LDEBUG){aus << "MMMMM  MESSAGE time since " << DEFAULT_VASP_OUT << " last modified: " << tmod_vaspout << " seconds" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+    if(LDEBUG){aus << soliloquy << " time since " << DEFAULT_VASP_OUT << " last modified: " << tmod_vaspout << " seconds" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
 
     //get vasp output file
     //CO20210315 - opening up subshells for grep (substring_present_file_FAST) is very expensive, especially many times
@@ -2940,7 +2940,7 @@ namespace KBIN {
     content_incar=aurostd::RemoveWhiteSpaces(content_incar);  //remove whitespaces
     content_incar=aurostd::toupper(content_incar);  //put toupper to eliminate case-sensitivity
     
-    if(LDEBUG){aus << soliloquy << " [1]" << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+    if(LDEBUG){aus << soliloquy << " [1]" << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
 
     //there are issues getting the correct vasp binary since this is an entirely different aflow instance
     //we might run the other aflow instance with --mpi or --machine flags that affect which vasp binary we use
@@ -2960,10 +2960,10 @@ namespace KBIN {
       //we will develop more precise methods for tracking parent/child processes of aflow to target specific vasp instances in the future
       vasp_still_running=aurostd::ProcessRunning(vasp_bin);
     }
-    if(LDEBUG){aus << soliloquy << " vasp_still_running=" << vasp_still_running << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+    if(LDEBUG){aus << soliloquy << " vasp_still_running=" << vasp_still_running << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
     
     //WARNINGS START
-    if(LDEBUG){aus << soliloquy << " checking warnings" << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+    if(LDEBUG){aus << soliloquy << " checking warnings" << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
     xmessage.flag("REACHED_ACCURACY",(content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("reached required accuracy")))!=string::npos));
     xwarning.flag("OUTCAR_INCOMPLETE",vasp_still_running==false && !KBIN::VASP_RunFinished(xvasp,aflags,FileMESSAGE,false));  //CO20201111
 
@@ -3045,7 +3045,7 @@ namespace KBIN {
     //do last
     xwarning.flag("ROTMAT",xwarning.flag("SGRCON") || xwarning.flag("NIRMAT") || xwarning.flag("IBZKPT") || xwarning.flag("KKSYM") || xwarning.flag("NKXYZ_IKPTD") || xwarning.flag("INVGRP") || xwarning.flag("SYMPREC"));  //CO20210315 - can probably add others to this list as well
 
-    if(LDEBUG){aus << soliloquy << " [2]" << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+    if(LDEBUG){aus << soliloquy << " [2]" << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
 
     //[CO20210315 - CSLOSHING already picks this up]xOUTCAR xout(xvasp.Directory+"/OUTCAR",true);  //quiet, there might be issues with halfway-written OUTCARs
     //[CO20210315 - CSLOSHING already picks this up]int NBANDS=xout.NBANDS;
@@ -3064,7 +3064,7 @@ namespace KBIN {
 
     if(1) {
       bool wdebug=FALSE;//TRUE;
-      if(LDEBUG){aus << soliloquy << " printing warnings" << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+      if(LDEBUG){aus << soliloquy << " printing warnings" << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
       if(LDEBUG){wdebug=TRUE;}
       if(wdebug || xmessage.flag("REACHED_ACCURACY")) aus << "MMMMM  MESSAGE xmessage.flag(\"REACHED_ACCURACY\")=" << xmessage.flag("REACHED_ACCURACY") << endl;
       if(wdebug) aus << "MMMMM  MESSAGE VASP_release=" << xwarning.getattachedscheme("SVERSION") << endl;
@@ -3105,10 +3105,11 @@ namespace KBIN {
       if(!xmonitor.flag("IGNORING_WARNINGS:SYMMETRY_VASP") && (wdebug || xwarning.flag("SGRCON"))) aus << "WWWWW  WARNING xwarning.flag(\"SGRCON\")=" << xwarning.flag("SGRCON") << endl;
       if(!xmonitor.flag("IGNORING_WARNINGS:SYMMETRY_VASP") && (wdebug || xwarning.flag("SYMPREC"))) aus << "WWWWW  WARNING xwarning.flag(\"SYMPREC\")=" << xwarning.flag("SYMPREC") << endl;
       if(wdebug || xwarning.flag("ZPOTRF")) aus << "WWWWW  WARNING xwarning.flag(\"ZPOTRF\")=" << xwarning.flag("ZPOTRF") << endl;
+      cerr << aus.str();
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     }
 
-    if(LDEBUG){aus << soliloquy << " [3]" << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+    if(LDEBUG){aus << soliloquy << " [3]" << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
 
     //decide which warnings to ignore
     //need to get ISYM and ISPIN (ISPIND too)
@@ -3176,7 +3177,7 @@ namespace KBIN {
     //[try NIRMAT first]if(xwarning.flag("NIRMAT") && xwarning.flag("SGRCON")) xwarning.flag("SGRCON",FALSE);
     //[no must fix the LATTICE]if(xwarning.flag("EDDRMM")) xwarning.flag("ZPOTRF",FALSE);
     
-    if(LDEBUG){aus << soliloquy << " [4]" << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+    if(LDEBUG){aus << soliloquy << " [4]" << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
   }
 } // namespace KBIN
 
@@ -3721,7 +3722,10 @@ namespace KBIN {
         string algo_current_tmp=aurostd::toupper(KBIN::INCAR_IALGO2ALGO(aurostd::kvpair2utype<int>(xvasp.INCAR,"IALGO","=")));
         if(!algo_current_tmp.empty()){algo_current=algo_current_tmp;}
       }
-      if(!algo_current.empty()){xfixed.flag("ALGO="+algo_current,true);}  //so we don't retry later as a fix
+      if(!algo_current.empty()){  //so we don't retry later as a fix
+        xfixed.flag("ALGO="+algo_current,true);
+        aus << "MMMMM  MESSAGE adding current \"ALGO=" << algo_current << "\" to xfixed" << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+      }
       //get algo_current - END
 
       if(nrun<maxrun) {

@@ -5137,17 +5137,18 @@ namespace KBIN {
     aurostd::StringstreamClean(xvasp.INCAR);
     uint iline=0,i=0;
     string patch="";
+    bool found=false;
     for(iline=0;iline<vlines.size();iline++) {
       const string& strline=vlines[iline];
-      for(i=0;i<vkeywords.size();i++){
-        if(aurostd::kvpairfound(strline,vkeywords[i],"=")) {
-          patch="#[AFLOW REMOVED ("+function+") "+comment+"] "; //CO20210315 - this new comment style avoids figuring out how much to pad previously-padded line
-          if(VERBOSE) xvasp.INCAR << patch << strline << endl;  //aurostd::PaddedPOST("# "+aurostd::RemoveWhiteSpacesFromTheFrontAndBack(strline),_incarpad_) << " # AFLOW REMOVED (" << function << ") " << comment << endl;
-        }
-        else{
-          if(!VERBOSE && strline.length()) xvasp.INCAR << strline << endl;
-          if(VERBOSE) xvasp.INCAR << strline << endl;
-        }
+      found=false;
+      for(i=0;i<vkeywords.size()&&!found;i++){
+        if(aurostd::kvpairfound(strline,vkeywords[i],"=")){found=true;}
+      }
+      if(found){
+        patch="#[AFLOW REMOVED ("+function+") "+comment+"] "; //CO20210315 - this new comment style avoids figuring out how much to pad previously-padded line
+        if(VERBOSE) xvasp.INCAR << patch << strline << endl;  //aurostd::PaddedPOST("# "+aurostd::RemoveWhiteSpacesFromTheFrontAndBack(strline),_incarpad_) << " # AFLOW REMOVED (" << function << ") " << comment << endl;
+      }else{
+        if(VERBOSE||strline.length()){xvasp.INCAR << strline << endl;}
       }
     }
     xvasp.aopts.flag("FLAG::XVASP_INCAR_changed",TRUE);
@@ -6128,13 +6129,19 @@ namespace KBIN {
 
       if(xvasp.aopts.flag("FLAG::KPOINTS_PRESERVED")){Krun=false;} // don't touch kpoints
       if(Krun && param_string=="=GAMMA" && KBIN::XVASP_KPOINTS_IncludesGamma(xvasp)){Krun=false;} //already done
-      if(Krun && VERBOSE){aus << "MMMMM  MESSAGE attempting fix " << patch << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+      if(Krun && VERBOSE){
+        aus << "MMMMM  MESSAGE attempting fix " << patch << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+        aus << "MMMMM  MESSAGE KPOINTS(pre )=[" << xvasp.str.kpoints_kscheme << ";" << xvasp.str.kpoints_k1 << "," << xvasp.str.kpoints_k2 << "," << xvasp.str.kpoints_k3 << ";" << xvasp.str.kpoints_s1 << "," << xvasp.str.kpoints_s2 << "," << xvasp.str.kpoints_s3 << "]" << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+      }
       //START - load KPOINTS into xvasp, modify xvasp.str.kpoints*, and write out new KPOINTS
       Krun=(Krun && VASP_Reread_KPOINTS(xvasp) && XVASP_KPOINTS_string2numbers(xvasp)); //preload kpoints, load into xvasp.str
       Krun=(Krun && KBIN::XVASP_KPOINTS_OPERATION(xvasp,koperation));  //CO20210315
       Krun=(Krun && aurostd::stringstream2file(xvasp.KPOINTS,string(xvasp.Directory+"/KPOINTS")));
       //END - load KPOINTS into xvasp, modify xvasp.str.kpoints*, and write out new KPOINTS
-      if(Krun){aus << "MMMMM  MESSAGE applied fix " << patch << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+      if(Krun){
+        aus << "MMMMM  MESSAGE applied fix " << patch << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+        aus << "MMMMM  MESSAGE KPOINTS(post)=[" << xvasp.str.kpoints_kscheme << ";" << xvasp.str.kpoints_k1 << "," << xvasp.str.kpoints_k2 << "," << xvasp.str.kpoints_k3 << ";" << xvasp.str.kpoints_s1 << "," << xvasp.str.kpoints_s2 << "," << xvasp.str.kpoints_s3 << "]" << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+      }
     }
     else if(patch=="LREAL") {
       if(Krun && VERBOSE){aus << "MMMMM  MESSAGE attempting fix " << patch << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
@@ -6329,6 +6336,27 @@ namespace KBIN {
     return true;  //CO20200624
   }
 }
+
+namespace KBIN {
+  void XVASP_Afix_xfixed(const string& patch,aurostd::xoption& xfixed,_aflags &aflags,ofstream& FileMESSAGE){ //CO20210315
+    xfixed.flag(patch,true);
+
+    if(patch.find("KPOINTS")!=string::npos){
+      //if you change the KPOINTS, reset xfixed for ALGO, some patches that did not work before might work now
+      bool VERBOSE=true;
+      stringstream aus;
+      uint i=0;
+      for(i=xfixed.vxscheme.size()-1;i<xfixed.vxscheme.size();i--){ //go backwards
+        const string& scheme=xfixed.vxscheme[i];
+        if(scheme.find("ALGO=")!=string::npos){
+          if(VERBOSE){aus << "MMMMM  MESSAGE clearing \"" << scheme << "\" from xfixed, KPOINTS modified" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+          xfixed.vxscheme.erase(xfixed.vxscheme.begin()+i); //erase is really inefficient, but it is okay here because xfixed.vxscheme is not large
+        }
+      }
+    }
+  }
+}
+
 namespace KBIN {
   bool XVASP_Afix(const string& mode,int& submode,aurostd::xoption& xfixed,_xvasp& xvasp,_kflags& kflags,_vflags& vflags,_aflags &aflags,ofstream& FileMESSAGE) {  //CO20200624 - adding submode
     //CO20210315 - extensive rewrite
@@ -6353,18 +6381,26 @@ namespace KBIN {
     string patch="";
     file_error="aflow.error."+aurostd::tolower(mode);
 
+    //some intuition about the schemes below
+    //changing KPOINTS will remove any 'ALGO' from xfixed, because they might work with a different set of KPOINTS
+    //therefore, the submodes are set up so ALGO changes go first and KPOINTS changes occur later
+    //an exception is KPOINTS=GAMMA, always try this first
+    //ending with KPOINTS+=1 is similar to resetting submode to 0
+    //try GAMMA_EVEN before GAMMA_ODD, as later solutions would benefit from and odd scheme
+    //both GAMMA_EVEN and GAMMA_ODD are expected to increase at least some of the KPOINTS
+
     if(mode=="BRMIX") {
       //https://www.vasp.at/forum/viewtopic.php?f=3&t=1417
       patch="ALGO=VERYFAST";
       if(Krun && xfixed.flag(patch)){Krun=false;}
       Krun=(Krun && KBIN::XVASP_Afix_ApplyPatch(patch,xvasp,kflags,vflags,aflags,FileMESSAGE));
-      if(Krun){xfixed.flag(patch,true);}
+      if(Krun){KBIN::XVASP_Afix_xfixed(patch,xfixed,aflags,FileMESSAGE);}
     }
     else if(mode=="CSLOSHING") {
       patch="ALGO=NORMAL";
       if(Krun && xfixed.flag(patch)){Krun=false;}
       Krun=(Krun && KBIN::XVASP_Afix_ApplyPatch(patch,xvasp,kflags,vflags,aflags,FileMESSAGE));
-      if(Krun){xfixed.flag(patch,true);}
+      if(Krun){KBIN::XVASP_Afix_xfixed(patch,xfixed,aflags,FileMESSAGE);}
     }
     else if(mode=="DAV" || mode=="EDDDAV") {
       //https://www.vasp.at/forum/viewtopic.php?f=2&t=10409&p=10434#:~:text=7%3A18%20am-,Re%3A%20on%20solving%20%22Error%20EDDDAV%3A%20Call%20to%20ZHEGV%20failed,Returncode%20%3D%20xx%22&text=This%20is%20an%20error%20of,of%20the%20very%20last%20one.
@@ -6375,31 +6411,46 @@ namespace KBIN {
         patch="ALGO=VERYFAST";
         if(Krun && xfixed.flag(patch)){Krun=false;}
         Krun=(Krun && KBIN::XVASP_Afix_ApplyPatch(patch,xvasp,kflags,vflags,aflags,FileMESSAGE));
-        if(Krun){xfixed.flag(patch,true);}
+        if(Krun){KBIN::XVASP_Afix_xfixed(patch,xfixed,aflags,FileMESSAGE);}
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
       if(submode==1){ //try ALGO=FAST //CO20200624
         patch="ALGO=FAST";
         if(Krun && xfixed.flag(patch)){Krun=false;}
         Krun=(Krun && KBIN::XVASP_Afix_ApplyPatch(patch,xvasp,kflags,vflags,aflags,FileMESSAGE));
-        if(Krun){xfixed.flag(patch,true);}
+        if(Krun){KBIN::XVASP_Afix_xfixed(patch,xfixed,aflags,FileMESSAGE);}
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
       if(submode==2){ //try ALGO=NORMAL //CO20200624
         patch="ALGO=NORMAL";
         if(Krun && xfixed.flag(patch)){Krun=false;}
         Krun=(Krun && KBIN::XVASP_Afix_ApplyPatch(patch,xvasp,kflags,vflags,aflags,FileMESSAGE));
-        if(Krun){xfixed.flag(patch,true);}
+        if(Krun){KBIN::XVASP_Afix_xfixed(patch,xfixed,aflags,FileMESSAGE);}
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
-      if(submode>=3){Krun=false;}
+      if(submode==3){ //Gamma-odd (might increase ki) //CO20200624
+        patch="KPOINTS=GAMMA_ODD";
+        if(Krun && xfixed.flag(patch)){Krun=false;}
+        Krun=(Krun && KBIN::XVASP_Afix_ApplyPatch(patch,xvasp,kflags,vflags,aflags,FileMESSAGE));
+        if(Krun){KBIN::XVASP_Afix_xfixed(patch,xfixed,aflags,FileMESSAGE);}
+        if(!Krun){Krun=true;submode++;} //reset and go to the next solution
+      }
+      if(submode==4){ //increase KPOINTS //CO20200624
+        patch="KPOINTS+=1";
+        //[keep applying until it returns false]if(Krun && xfixed.flag(patch)){Krun=false;}
+        if(Krun && (xfixed.flag("KPOINTS-=1") || xfixed.flag("KPOINTS-=2"))){Krun=false;} //avoid up and down
+        Krun=(Krun && KBIN::XVASP_Afix_ApplyPatch(patch,xvasp,kflags,vflags,aflags,FileMESSAGE));
+        if(Krun){KBIN::XVASP_Afix_xfixed(patch,xfixed,aflags,FileMESSAGE);}
+        if(!Krun){Krun=true;submode++;} //reset and go to the next solution
+      }
+      if(submode>=5){Krun=false;}
       submode+=submode_increment;submode_increment=1;  //increment and reset
     }
     else if(mode=="DENTET") {
       patch="ISMEAR=2";
       if(Krun && xfixed.flag(patch)){Krun=false;}
       Krun=(Krun && KBIN::XVASP_Afix_ApplyPatch(patch,xvasp,kflags,vflags,aflags,FileMESSAGE));
-      if(Krun){xfixed.flag(patch,true);}
+      if(Krun){KBIN::XVASP_Afix_xfixed(patch,xfixed,aflags,FileMESSAGE);}
     }
     else if(mode=="EDDRMM") {
       //https://www.vasp.at/forum/viewtopic.php?f=3&t=214&p=215
@@ -6408,7 +6459,7 @@ namespace KBIN {
         patch="KPOINTS=GAMMA";
         if(Krun && xfixed.flag(patch)){Krun=false;}
         Krun=(Krun && KBIN::XVASP_Afix_ApplyPatch(patch,xvasp,kflags,vflags,aflags,FileMESSAGE));
-        if(Krun){xfixed.flag(patch,true);}
+        if(Krun){KBIN::XVASP_Afix_xfixed(patch,xfixed,aflags,FileMESSAGE);}
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
       //else if(submode==1) //DO NOT USE else if, we may change submode inside
@@ -6417,36 +6468,44 @@ namespace KBIN {
         patch="ALGO=FAST";
         if(Krun && xfixed.flag(patch)){Krun=false;}
         Krun=(Krun && KBIN::XVASP_Afix_ApplyPatch(patch,xvasp,kflags,vflags,aflags,FileMESSAGE));
-        if(Krun){xfixed.flag(patch,true);}
+        if(Krun){KBIN::XVASP_Afix_xfixed(patch,xfixed,aflags,FileMESSAGE);}
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
-      if(submode==2){ //Gamma-odd (might increase ki) //CO20200624
-        patch="KPOINTS=GAMMA_ODD";
-        if(Krun && xfixed.flag(patch)){Krun=false;}
-        Krun=(Krun && KBIN::XVASP_Afix_ApplyPatch(patch,xvasp,kflags,vflags,aflags,FileMESSAGE));
-        if(Krun){xfixed.flag(patch,true);}
-        if(!Krun){Krun=true;submode++;} //reset and go to the next solution
-      }
-      if(submode==3){ //CO20200624 - try ALGO=NORMAL
+      if(submode==2){ //CO20200624 - try ALGO=NORMAL
         patch="ALGO=NORMAL";
         if(Krun && xfixed.flag(patch)){Krun=false;}
         Krun=(Krun && KBIN::XVASP_Afix_ApplyPatch(patch,xvasp,kflags,vflags,aflags,FileMESSAGE));
-        if(Krun){xfixed.flag(patch,true);}
+        if(Krun){KBIN::XVASP_Afix_xfixed(patch,xfixed,aflags,FileMESSAGE);}
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
-      if(submode==5){ //CO20200624 - try RELAX_MODE=FORCES
+      if(submode==3){ //CO20200624 - try RELAX_MODE=FORCES
         patch="RELAX_MODE=FORCES";
         if(Krun && xfixed.flag(patch)){Krun=false;}
         Krun=(Krun && KBIN::XVASP_Afix_ApplyPatch(patch,xvasp,kflags,vflags,aflags,FileMESSAGE));
-        if(Krun){xfixed.flag(patch,true);}
+        if(Krun){KBIN::XVASP_Afix_xfixed(patch,xfixed,aflags,FileMESSAGE);}
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
-      if(submode==6){ //CO20200624 - try patching POTIM if we are relaxing, otherwise change ISMEAR=2(?)
+      if(submode==4){ //CO20200624 - try patching POTIM if we are relaxing, otherwise change ISMEAR=2(?)
         //[CO20210315 - need to figure out better way to tell if run is relaxing vs. static]if(xvasp.NRELAXING<=xvasp.NRELAX)  //happens during relax
         patch="POTIM";
         //[keep applying until it returns false]if(Krun && xfixed.flag(patch)){Krun=false;}
         Krun=(Krun && KBIN::XVASP_Afix_ApplyPatch(patch,xvasp,kflags,vflags,aflags,FileMESSAGE));
-        if(Krun){xfixed.flag(patch,true);}
+        if(Krun){KBIN::XVASP_Afix_xfixed(patch,xfixed,aflags,FileMESSAGE);}
+        if(!Krun){Krun=true;submode++;} //reset and go to the next solution
+      }
+      if(submode==5){ //Gamma-odd (might increase ki) //CO20200624
+        patch="KPOINTS=GAMMA_ODD";
+        if(Krun && xfixed.flag(patch)){Krun=false;}
+        Krun=(Krun && KBIN::XVASP_Afix_ApplyPatch(patch,xvasp,kflags,vflags,aflags,FileMESSAGE));
+        if(Krun){KBIN::XVASP_Afix_xfixed(patch,xfixed,aflags,FileMESSAGE);}
+        if(!Krun){Krun=true;submode++;} //reset and go to the next solution
+      }
+      if(submode==6){ //increase KPOINTS //CO20200624
+        patch="KPOINTS+=1";
+        //[keep applying until it returns false]if(Krun && xfixed.flag(patch)){Krun=false;}
+        if(Krun && (xfixed.flag("KPOINTS-=1") || xfixed.flag("KPOINTS-=2"))){Krun=false;} //avoid up and down
+        Krun=(Krun && KBIN::XVASP_Afix_ApplyPatch(patch,xvasp,kflags,vflags,aflags,FileMESSAGE));
+        if(Krun){KBIN::XVASP_Afix_xfixed(patch,xfixed,aflags,FileMESSAGE);}
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
       if(submode>=7){Krun=false;}
@@ -6456,25 +6515,25 @@ namespace KBIN {
       patch="EFIELD_PEAD";
       //[keep applying until it returns false]if(Krun && xfixed.flag(patch)){Krun=false;}
       Krun=(Krun && KBIN::XVASP_Afix_ApplyPatch(patch,xvasp,kflags,vflags,aflags,FileMESSAGE));
-      if(Krun){xfixed.flag(patch,true);}
+      if(Krun){KBIN::XVASP_Afix_xfixed(patch,xfixed,aflags,FileMESSAGE);}
     }
     else if(mode=="EXCCOR") {
       patch="POSCAR=INCREASE_VOLUME";
       if(Krun && xfixed.flag(patch)){Krun=false;}
       Krun=(Krun && KBIN::XVASP_Afix_ApplyPatch(patch,xvasp,kflags,vflags,aflags,FileMESSAGE));
-      if(Krun){xfixed.flag(patch,true);}
+      if(Krun){KBIN::XVASP_Afix_xfixed(patch,xfixed,aflags,FileMESSAGE);}
     }
     else if(mode=="GAMMA_SHIFT" || mode=="IBZKPT") {
       patch="KPOINTS=GAMMA";
       if(Krun && xfixed.flag(patch)){Krun=false;}
       Krun=(Krun && KBIN::XVASP_Afix_ApplyPatch(patch,xvasp,kflags,vflags,aflags,FileMESSAGE));
-      if(Krun){xfixed.flag(patch,true);}
+      if(Krun){KBIN::XVASP_Afix_xfixed(patch,xfixed,aflags,FileMESSAGE);}
     }
     else if(mode=="INVGRP" || mode=="SGRCON" || mode=="SYMPREC") {
       patch="SYMPREC";
       if(Krun && xfixed.flag(patch)){Krun=false;}
       Krun=(Krun && KBIN::XVASP_Afix_ApplyPatch(patch,xvasp,kflags,vflags,aflags,FileMESSAGE));
-      if(Krun){xfixed.flag(patch,true);}
+      if(Krun){KBIN::XVASP_Afix_xfixed(patch,xfixed,aflags,FileMESSAGE);}
     }
     else if(mode=="KKSYM") {
       if(submode<0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"no submode set: \""+mode+"\"",_INPUT_ILLEGAL_);}  //CO20210315
@@ -6482,21 +6541,21 @@ namespace KBIN {
         patch="SYMPREC";
         if(Krun && xfixed.flag(patch)){Krun=false;}
         Krun=(Krun && KBIN::XVASP_Afix_ApplyPatch(patch,xvasp,kflags,vflags,aflags,FileMESSAGE));
-        if(Krun){xfixed.flag(patch,true);}
+        if(Krun){KBIN::XVASP_Afix_xfixed(patch,xfixed,aflags,FileMESSAGE);}
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
       if(submode==1){ //try G-centered //CO20200624
         patch="KPOINTS=GAMMA";
         if(Krun && xfixed.flag(patch)){Krun=false;}
         Krun=(Krun && KBIN::XVASP_Afix_ApplyPatch(patch,xvasp,kflags,vflags,aflags,FileMESSAGE));
-        if(Krun){xfixed.flag(patch,true);}
+        if(Krun){KBIN::XVASP_Afix_xfixed(patch,xfixed,aflags,FileMESSAGE);}
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
       if(submode==2){ //Kmax
         patch="KPOINTS=KMAX";
         if(Krun && xfixed.flag(patch)){Krun=false;}
         Krun=(Krun && KBIN::XVASP_Afix_ApplyPatch(patch,xvasp,kflags,vflags,aflags,FileMESSAGE));
-        if(Krun){xfixed.flag(patch,true);}
+        if(Krun){KBIN::XVASP_Afix_xfixed(patch,xfixed,aflags,FileMESSAGE);}
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
       if(submode>=3){Krun=false;}
@@ -6506,7 +6565,7 @@ namespace KBIN {
       patch="LREAL";
       if(Krun && xfixed.flag(patch)){Krun=false;}
       Krun=(Krun && KBIN::XVASP_Afix_ApplyPatch(patch,xvasp,kflags,vflags,aflags,FileMESSAGE));
-      if(Krun){xfixed.flag(patch,true);}
+      if(Krun){KBIN::XVASP_Afix_xfixed(patch,xfixed,aflags,FileMESSAGE);}
     }
     else if(mode=="MEMORY") { //CO20210315
       if(submode<0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"no submode set: \""+mode+"\"",_INPUT_ILLEGAL_);}  //CO20210315
@@ -6515,7 +6574,7 @@ namespace KBIN {
         //[keep applying until it returns false]if(Krun && xfixed.flag(patch)){Krun=false;}
         if(Krun && (xfixed.flag("KPOINTS+=1") || xfixed.flag("KPOINTS+=2"))){Krun=false;} //avoid up and down
         Krun=(Krun && KBIN::XVASP_Afix_ApplyPatch(patch,xvasp,kflags,vflags,aflags,FileMESSAGE));
-        if(Krun){xfixed.flag(patch,true);}
+        if(Krun){KBIN::XVASP_Afix_xfixed(patch,xfixed,aflags,FileMESSAGE);}
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
       //we might add lowering NBANDS here, as well as NGX, need to test...
@@ -6523,7 +6582,7 @@ namespace KBIN {
         patch="SKIP_RUN";
         if(Krun && xfixed.flag(patch)){Krun=false;}
         Krun=(Krun && KBIN::XVASP_Afix_ApplyPatch(patch,xvasp,kflags,vflags,aflags,FileMESSAGE));
-        if(Krun){xfixed.flag(patch,true);}
+        if(Krun){KBIN::XVASP_Afix_xfixed(patch,xfixed,aflags,FileMESSAGE);}
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
       if(submode>=2){Krun=false;}
@@ -6533,7 +6592,7 @@ namespace KBIN {
       patch="ULIMIT";
       if(Krun && xfixed.flag(patch)){Krun=false;}
       Krun=(Krun && KBIN::XVASP_Afix_ApplyPatch(patch,xvasp,kflags,vflags,aflags,FileMESSAGE));
-      if(Krun){xfixed.flag(patch,true);}
+      if(Krun){KBIN::XVASP_Afix_xfixed(patch,xfixed,aflags,FileMESSAGE);}
     }
     else if(mode=="MPICH139") {
       bool Krun1=true;patch="ULIMIT";
@@ -6553,7 +6612,7 @@ namespace KBIN {
       patch="NBANDS";
       //[keep applying until it returns false]if(Krun && xfixed.flag(patch)){Krun=false;}
       Krun=(Krun && KBIN::XVASP_Afix_ApplyPatch(patch,xvasp,kflags,vflags,aflags,FileMESSAGE));
-      if(Krun){xfixed.flag(patch,true);}
+      if(Krun){KBIN::XVASP_Afix_xfixed(patch,xfixed,aflags,FileMESSAGE);}
     }
     else if(mode=="NELM") {
       if(submode<0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"no submode set: \""+mode+"\"",_INPUT_ILLEGAL_);}  //CO20210315
@@ -6590,7 +6649,7 @@ namespace KBIN {
         patch="NELM";
         //[keep applying until it returns false]if(Krun && xfixed.flag(patch)){Krun=false;}
         Krun=(Krun && KBIN::XVASP_Afix_ApplyPatch(patch,xvasp,kflags,vflags,aflags,FileMESSAGE));
-        if(Krun){xfixed.flag(patch,true);}
+        if(Krun){KBIN::XVASP_Afix_xfixed(patch,xfixed,aflags,FileMESSAGE);}
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
       if(submode>=3){Krun=false;}
@@ -6602,37 +6661,37 @@ namespace KBIN {
       //[keep applying until it returns false]if(Krun && xfixed.flag(patch)){Krun=false;}
       if(Krun && (xfixed.flag("KPOINTS+=1") || xfixed.flag("KPOINTS+=2"))){Krun=false;} //avoid up and down
       Krun=(Krun && KBIN::XVASP_Afix_ApplyPatch(patch,xvasp,kflags,vflags,aflags,FileMESSAGE));
-      if(Krun){xfixed.flag(patch,true);}
+      if(Krun){KBIN::XVASP_Afix_xfixed(patch,xfixed,aflags,FileMESSAGE);}
     }
     else if(mode=="NPAR") {
       patch="NPAR=1";
       if(Krun && xfixed.flag(patch)){Krun=false;}
       Krun=(Krun && KBIN::XVASP_Afix_ApplyPatch(patch,xvasp,kflags,vflags,aflags,FileMESSAGE));
-      if(Krun){xfixed.flag(patch,true);}
+      if(Krun){KBIN::XVASP_Afix_xfixed(patch,xfixed,aflags,FileMESSAGE);}
     }
     else if(mode=="NPARC" || mode=="NPARN") {
       patch="NPAR=4";
       if(Krun && xfixed.flag(patch)){Krun=false;}
       Krun=(Krun && KBIN::XVASP_Afix_ApplyPatch(patch,xvasp,kflags,vflags,aflags,FileMESSAGE));
-      if(Krun){xfixed.flag(patch,true);}
+      if(Krun){KBIN::XVASP_Afix_xfixed(patch,xfixed,aflags,FileMESSAGE);}
     }
     else if(mode=="NPAR_REMOVE") {
       patch="NPAR_REMOVE";
       if(Krun && xfixed.flag(patch)){Krun=false;}
       Krun=(Krun && KBIN::XVASP_Afix_ApplyPatch(patch,xvasp,kflags,vflags,aflags,FileMESSAGE));
-      if(Krun){xfixed.flag(patch,true);}
+      if(Krun){KBIN::XVASP_Afix_xfixed(patch,xfixed,aflags,FileMESSAGE);}
     }
     else if(mode=="PSMAXN") {
       patch="ENMAX";
       //[keep applying until it returns false]if(Krun && xfixed.flag(patch)){Krun=false;}
       Krun=(Krun && KBIN::XVASP_Afix_ApplyPatch(patch,xvasp,kflags,vflags,aflags,FileMESSAGE));
-      if(Krun){xfixed.flag(patch,true);}
+      if(Krun){KBIN::XVASP_Afix_xfixed(patch,xfixed,aflags,FileMESSAGE);}
     }
     else if(mode=="READ_KPOINTS_RD_SYM") {
       patch="SYM=OFF";
       if(Krun && xfixed.flag(patch)){Krun=false;}
       Krun=(Krun && KBIN::XVASP_Afix_ApplyPatch(patch,xvasp,kflags,vflags,aflags,FileMESSAGE));
-      if(Krun){xfixed.flag(patch,true);}
+      if(Krun){KBIN::XVASP_Afix_xfixed(patch,xfixed,aflags,FileMESSAGE);}
     }
     else if(mode=="ROTMAT") {
       if(submode<0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"no submode set: \""+mode+"\"",_INPUT_ILLEGAL_);}  //CO20210315
@@ -6640,7 +6699,7 @@ namespace KBIN {
         patch="SYMPREC";
         if(Krun && xfixed.flag(patch)){Krun=false;}
         Krun=(Krun && KBIN::XVASP_Afix_ApplyPatch(patch,xvasp,kflags,vflags,aflags,FileMESSAGE));
-        if(Krun){xfixed.flag(patch,true);}
+        if(Krun){KBIN::XVASP_Afix_xfixed(patch,xfixed,aflags,FileMESSAGE);}
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
       //else if(submode==1) //DO NOT USE else if, we may change submode inside
@@ -6648,35 +6707,35 @@ namespace KBIN {
         patch="KPOINTS=GAMMA";
         if(Krun && xfixed.flag(patch)){Krun=false;}
         Krun=(Krun && KBIN::XVASP_Afix_ApplyPatch(patch,xvasp,kflags,vflags,aflags,FileMESSAGE));
-        if(Krun){xfixed.flag(patch,true);}
+        if(Krun){KBIN::XVASP_Afix_xfixed(patch,xfixed,aflags,FileMESSAGE);}
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
       if(submode==2){ //Gamma-even
         patch="KPOINTS=GAMMA_EVEN";
         if(Krun && xfixed.flag(patch)){Krun=false;}
         Krun=(Krun && KBIN::XVASP_Afix_ApplyPatch(patch,xvasp,kflags,vflags,aflags,FileMESSAGE));
-        if(Krun){xfixed.flag(patch,true);}
+        if(Krun){KBIN::XVASP_Afix_xfixed(patch,xfixed,aflags,FileMESSAGE);}
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
       if(submode==3){ //Gamma-odd
         patch="KPOINTS=GAMMA_ODD";
         if(Krun && xfixed.flag(patch)){Krun=false;}
         Krun=(Krun && KBIN::XVASP_Afix_ApplyPatch(patch,xvasp,kflags,vflags,aflags,FileMESSAGE));
-        if(Krun){xfixed.flag(patch,true);}
+        if(Krun){KBIN::XVASP_Afix_xfixed(patch,xfixed,aflags,FileMESSAGE);}
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
       if(submode==4){ //Kmax
         patch="KPOINTS=KMAX";
         if(Krun && xfixed.flag(patch)){Krun=false;}
         Krun=(Krun && KBIN::XVASP_Afix_ApplyPatch(patch,xvasp,kflags,vflags,aflags,FileMESSAGE));
-        if(Krun){xfixed.flag(patch,true);}
+        if(Krun){KBIN::XVASP_Afix_xfixed(patch,xfixed,aflags,FileMESSAGE);}
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
       if(submode==5){ //ISYM=0
         patch="SYM=OFF";
         if(Krun && xfixed.flag(patch)){Krun=false;}
         Krun=(Krun && KBIN::XVASP_Afix_ApplyPatch(patch,xvasp,kflags,vflags,aflags,FileMESSAGE));
-        if(Krun){xfixed.flag(patch,true);}
+        if(Krun){KBIN::XVASP_Afix_xfixed(patch,xfixed,aflags,FileMESSAGE);}
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
       if(submode>=6){Krun=false;}
@@ -6686,13 +6745,13 @@ namespace KBIN {
       patch="POSCAR=STANDARD_CONVENTIONAL";
       if(Krun && xfixed.flag(patch)){Krun=false;}
       Krun=(Krun && KBIN::XVASP_Afix_ApplyPatch(patch,xvasp,kflags,vflags,aflags,FileMESSAGE));
-      if(Krun){xfixed.flag(patch,true);}
+      if(Krun){KBIN::XVASP_Afix_xfixed(patch,xfixed,aflags,FileMESSAGE);}
     }
     else if(mode=="ZPOTRF_POTIM") {
       patch="POTIM";
       //[keep applying until it returns false]if(Krun && xfixed.flag(patch)){Krun=false;}
       Krun=(Krun && KBIN::XVASP_Afix_ApplyPatch(patch,xvasp,kflags,vflags,aflags,FileMESSAGE));
-      if(Krun){xfixed.flag(patch,true);}
+      if(Krun){KBIN::XVASP_Afix_xfixed(patch,xfixed,aflags,FileMESSAGE);}
     }
     else{
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"unknown mode: \""+mode+"\"",_INPUT_ILLEGAL_);  //CO20210315
