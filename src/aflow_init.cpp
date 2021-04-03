@@ -2025,7 +2025,7 @@ void AFLOW_monitor_VASP(const string& directory){
       nexecuting++;
     }
     if(nexecuting!=nexecuting_old){
-      message << "clearing xmonitor for new instance of \""+vasp_bin+"\"";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+      message << "found new instance of \""+vasp_bin+"\"";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
       xmonitor.clear(); //new run, clear IGNORE_WARNINGS //we've transitioned from relax1->relax2, etc.
       nexecuting_old=nexecuting;
     }

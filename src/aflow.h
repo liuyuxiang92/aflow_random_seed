@@ -2983,10 +2983,10 @@ namespace KBIN {
   bool VASP_Directory(ofstream& FileERROR,_aflags& aflags,_kflags& kflags);
   void VASP_BackupOriginal(_aflags aflags);
   // [OBSOLETE] G++6 not needed  void VASP_Wait(_xvasp& xvasp,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE);
-  bool VASP_ApplyPatch(const string& error,_xvasp &xvasp,aurostd::xoption& xwarning,aurostd::xoption& xfixed,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE);  //CO20210315
-  bool VASP_ApplyPatch(const string& error,const string& fix,_xvasp &xvasp,aurostd::xoption& xwarning,aurostd::xoption& xfixed,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE);  //CO20210315
-  bool VASP_ApplyPatch(const string& error,int& submode,_xvasp &xvasp,aurostd::xoption& xwarning,aurostd::xoption& xfixed,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE);  //CO20210315
-  bool VASP_ApplyPatch(const string& error,const string& fix,int& submode,_xvasp &xvasp,aurostd::xoption& xwarning,aurostd::xoption& xfixed,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE);  //CO20210315
+  bool VASP_Error2Fix(const string& error,_xvasp &xvasp,aurostd::xoption& xwarning,aurostd::xoption& xfixed,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE);  //CO20210315
+  bool VASP_Error2Fix(const string& error,const string& mode,_xvasp &xvasp,aurostd::xoption& xwarning,aurostd::xoption& xfixed,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE);  //CO20210315
+  bool VASP_Error2Fix(const string& error,int& submode,_xvasp &xvasp,aurostd::xoption& xwarning,aurostd::xoption& xfixed,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE);  //CO20210315
+  bool VASP_Error2Fix(const string& error,const string& mode,int& submode,_xvasp &xvasp,aurostd::xoption& xwarning,aurostd::xoption& xfixed,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE);  //CO20210315
   void VASP_ProcessWarnings(_xvasp &xvasp,_aflags &aflags,_kflags &kflags,aurostd::xoption& xmessage,aurostd::xoption& xwarning,ofstream &FileMESSAGE); //CO20210315
   void VASP_ProcessWarnings(_xvasp &xvasp,_aflags &aflags,_kflags &kflags,aurostd::xoption& xmessage,aurostd::xoption& xwarning,aurostd::xoption& xmonitor,ofstream &FileMESSAGE); //CO20210315
   bool VASP_Run(_xvasp &xvasp,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE);
@@ -3128,8 +3128,7 @@ namespace KBIN {
   bool XVASP_Afix_NELM(_xvasp& xvasp,_vflags& vflags,int& nelm); //CO20200624 - this is not a general Afix, this can only be used inside Afix_GENERIC
   bool XVASP_Afix_EFIELD_PEAD(_xvasp& xvasp,_vflags& vflags); //CO20200624 - this is not a general Afix, this can only be used inside Afix_GENERIC
   bool XVASP_Afix_EFIELD_PEAD(_xvasp& xvasp,_vflags& vflags,xvector<double>& E); //CO20200624 - this is not a general Afix, this can only be used inside Afix_GENERIC
-  bool XVASP_Afix_ApplyPatch(const string& patch,_xvasp& xvasp,_kflags& kflags,_vflags& vflags,_aflags &aflags,ofstream& FileMESSAGE); //CO20200624 - adding submode so we don't need to make a bunch of spin-off functions
-  void XVASP_Afix_xfixed(const string& patch,aurostd::xoption& xfixed,_aflags &aflags,ofstream& FileMESSAGE); //CO20210315
+  bool XVASP_Afix_ApplyFix(const string& fix,aurostd::xoption& xfixed,_xvasp& xvasp,_kflags& kflags,_vflags& vflags,_aflags &aflags,ofstream& FileMESSAGE); //CO20200624 - adding submode so we don't need to make a bunch of spin-off functions
   bool XVASP_Afix(const string& mode,int& submode,aurostd::xoption& xfixed,_xvasp& xvasp,_kflags& kflags,_vflags& vflags,_aflags &aflags,ofstream& FileMESSAGE); //CO20200624 - adding submode so we don't need to make a bunch of spin-off functions
 
   string ExtractSystemName(const string& directory);  //ME20200217

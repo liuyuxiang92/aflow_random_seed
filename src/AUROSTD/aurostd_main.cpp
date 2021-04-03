@@ -2353,7 +2353,7 @@ namespace aurostd {
     //solution inspired by ME - create a temporary file IN THE CURRENT DIRECTORY (within NFS) and check time deltas
     string dir=aurostd::dirname(FileName);
     string tmpfile=aurostd::TmpFileCreate("timestamp",dir,true); //put in current directory, make it hidden
-    if(!aurostd::string2file("timestamp",tmpfile)){return 0;}  //write the file out, need a better fix here
+    if(!aurostd::string2file("timestamp",tmpfile)){return 0;}  //write the file out, need a better fix here, perhaps write to /tmp?
     long int tmod_tmp=aurostd::GetTimestampModified(tmpfile);
     aurostd::RemoveFile(tmpfile);
     return max((long int)0,tmod_tmp-tmod_file); //max ensures that if something goes wrong, we return 0
