@@ -5369,17 +5369,11 @@ namespace KBIN {
     }
     if(_operation.empty()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"empty operation",_INPUT_ILLEGAL_);}  //CO20210315
     string operation=aurostd::toupper(_operation);
+    aurostd::StringSubst(operation,"+=1","++"); //backwards compatibility
+    aurostd::StringSubst(operation,"-=1","--"); //backwards compatibility
     aurostd::StringSubst(operation,"KMAX","XMAX,YMAX,ZMAX");  //expand
     aurostd::StringSubst(operation,"GAMMA_SHIFT","GAMMA,XZEROSHIFT,YZEROSHIFT,ZZEROSHIFT");  //expand  //repetita iuvant  //can also do XODD,YODD,ZODD
-    uint nchanges_made=0;
-    //CO20210304 - some notes about change_made
-    //this function tries to make modifications to VASP files based on an input (e.g., make Xeven).
-    //it never checks whether the change was actually made (what if X was already even?).
-    //change_made is a local variable to facilitate what to do in such cases.
-    //it's a bit complicated because you could request Xeven,Yeven,Zeven and you could have one of them change, some of them change, or none of them change.
-    //if there is any change at all, the function is considered successful.
-    //if there is no change, then the function tries to change the whole set (X,Y,Z).
-    //the goal is to prevent aflow from spinning its wheels on an identical input.
+    uint nchanges_made=0; //CO20210315 - prevent aflow from spinning its wheels on an identical input
     //i--: decrease ki by 1 (if possible)
     if(operation.find("X--")!=string::npos){if(xvasp.str.kpoints_k1>=2){xvasp.str.kpoints_k1--;nchanges_made++;if(LDEBUG) cerr << "X-- k1=" << xvasp.str.kpoints_k1 << endl;}}
     if(operation.find("Y--")!=string::npos){if(xvasp.str.kpoints_k2>=2){xvasp.str.kpoints_k2--;nchanges_made++;if(LDEBUG) cerr << "Y-- k2=" << xvasp.str.kpoints_k2 << endl;}}
@@ -5388,17 +5382,17 @@ namespace KBIN {
     if(operation.find("X++")!=string::npos){xvasp.str.kpoints_k1++;nchanges_made++;if(LDEBUG) cerr << "X++ k1=" << xvasp.str.kpoints_k1 << endl;}
     if(operation.find("Y++")!=string::npos){xvasp.str.kpoints_k2++;nchanges_made++;if(LDEBUG) cerr << "Y++ k2=" << xvasp.str.kpoints_k2 << endl;}
     if(operation.find("Z++")!=string::npos){xvasp.str.kpoints_k3++;nchanges_made++;if(LDEBUG) cerr << "Z++ k3=" << xvasp.str.kpoints_k3 << endl;}
-    //i2-: decrease ki by 2 (if possible)
-    //CO20210315 - 2- and 2+ is important if we want to keep even/odd parity
+    //i-=2: decrease ki by 2 (if possible)
+    //CO20210315 - -=2 and +=2 are important if we want to keep even/odd parity
     //if k1==2, running X-- twice will stop at 1, changing parity
     //these routines fix this
-    if(operation.find("X2-")!=string::npos){if(xvasp.str.kpoints_k1>=3){xvasp.str.kpoints_k1-=2;nchanges_made++;if(LDEBUG) cerr << "X2- k1=" << xvasp.str.kpoints_k1 << endl;}} //CO20210315
-    if(operation.find("Y2-")!=string::npos){if(xvasp.str.kpoints_k2>=3){xvasp.str.kpoints_k2-=2;nchanges_made++;if(LDEBUG) cerr << "Y2- k2=" << xvasp.str.kpoints_k2 << endl;}} //CO20210315
-    if(operation.find("Z2-")!=string::npos){if(xvasp.str.kpoints_k3>=3){xvasp.str.kpoints_k3-=2;nchanges_made++;if(LDEBUG) cerr << "Z2- k3=" << xvasp.str.kpoints_k3 << endl;}} //CO20210315
-    //i2+: increase ki by 2 (always possible)
-    if(operation.find("X2+")!=string::npos){xvasp.str.kpoints_k1+=2;nchanges_made++;if(LDEBUG) cerr << "X2+ k1=" << xvasp.str.kpoints_k1 << endl;}  //CO20210315
-    if(operation.find("Y2+")!=string::npos){xvasp.str.kpoints_k2+=2;nchanges_made++;if(LDEBUG) cerr << "Y2+ k2=" << xvasp.str.kpoints_k2 << endl;}  //CO20210315
-    if(operation.find("Z2+")!=string::npos){xvasp.str.kpoints_k3+=2;nchanges_made++;if(LDEBUG) cerr << "Z2+ k3=" << xvasp.str.kpoints_k3 << endl;}  //CO20210315
+    if(operation.find("X-=2")!=string::npos){if(xvasp.str.kpoints_k1>=3){xvasp.str.kpoints_k1-=2;nchanges_made++;if(LDEBUG) cerr << "X-=2 k1=" << xvasp.str.kpoints_k1 << endl;}} //CO20210315
+    if(operation.find("Y-=2")!=string::npos){if(xvasp.str.kpoints_k2>=3){xvasp.str.kpoints_k2-=2;nchanges_made++;if(LDEBUG) cerr << "Y-=2 k2=" << xvasp.str.kpoints_k2 << endl;}} //CO20210315
+    if(operation.find("Z-=2")!=string::npos){if(xvasp.str.kpoints_k3>=3){xvasp.str.kpoints_k3-=2;nchanges_made++;if(LDEBUG) cerr << "Z-=2 k3=" << xvasp.str.kpoints_k3 << endl;}} //CO20210315
+    //i+=2: increase ki by 2 (always possible)
+    if(operation.find("X+=2")!=string::npos){xvasp.str.kpoints_k1+=2;nchanges_made++;if(LDEBUG) cerr << "X+=2 k1=" << xvasp.str.kpoints_k1 << endl;}  //CO20210315
+    if(operation.find("Y+=2")!=string::npos){xvasp.str.kpoints_k2+=2;nchanges_made++;if(LDEBUG) cerr << "Y+=2 k2=" << xvasp.str.kpoints_k2 << endl;}  //CO20210315
+    if(operation.find("Z+=2")!=string::npos){xvasp.str.kpoints_k3+=2;nchanges_made++;if(LDEBUG) cerr << "Z+=2 k3=" << xvasp.str.kpoints_k3 << endl;}  //CO20210315
     //ieven: make ki even (if not already) AND si=0 (if not already)
     if(operation.find("XEVEN")!=string::npos){
       if(_isodd(xvasp.str.kpoints_k1)){xvasp.str.kpoints_k1++;nchanges_made++;if(LDEBUG) cerr << "Xeven k1=" << xvasp.str.kpoints_k1 << endl;}
@@ -6010,7 +6004,7 @@ namespace KBIN {
     bool apply_once=true;
     if(fix=="EFIELD_PEAD"){apply_once=false;}
     else if(fix=="ENMAX"){apply_once=false;}
-    else if(fix.find("KPOINTS+=")!=string::npos||fix.find("KPOINTS-=")!=string::npos){apply_once=false;}
+    else if(fix.find("KPOINTS+")!=string::npos||fix.find("KPOINTS-")!=string::npos){apply_once=false;}
     else if(fix=="NBANDS"){apply_once=false;}
     else if(fix=="NELM"){apply_once=false;}
     else if(fix=="POTIM"){apply_once=false;}
@@ -6037,10 +6031,10 @@ namespace KBIN {
     if(Krun==false){return false;}
 
     //check KPOINTS: avoid up and down
-    for(uint i=0;i<xfixed.vxscheme.size();i++){
+    for(uint i=0;i<xfixed.vxscheme.size()&&Krun;i++){
       const string& scheme=xfixed.vxscheme[i];
-      if(scheme.find("KPOINTS+=")!=string::npos && fix.find("KPOINTS-=")!=string::npos){Krun=false;}
-      if(scheme.find("KPOINTS-=")!=string::npos && fix.find("KPOINTS+=")!=string::npos){Krun=false;}
+      if(scheme.find("KPOINTS+")!=string::npos && fix.find("KPOINTS-")!=string::npos){Krun=false;}
+      if(scheme.find("KPOINTS-")!=string::npos && fix.find("KPOINTS+")!=string::npos){Krun=false;}
     }
     if(Krun==false){return false;}
     
@@ -6166,10 +6160,10 @@ namespace KBIN {
       else if(param_string=="=GAMMA_ODD"){koperation="Gamma,Xodd,Yodd,Zodd";}
       else if(param_string=="=GAMMA_EVEN"){koperation="Gamma,Xeven,Yeven,Zeven";}
       else if(param_string=="=KMAX"){koperation="Kmax";}
-      else if(param_string=="+=1"){koperation="X++,Y++,Z++";}
-      else if(param_string=="+=2"){koperation="X2+,Y2+,Z2+";}
-      else if(param_string=="-=1"){koperation="X--,Y--,Z--";}
-      else if(param_string=="-=2"){koperation="X2-,Y2-,Z2-";}
+      else if(param_string=="++"){koperation="X++,Y++,Z++";}
+      else if(param_string=="+=2"){koperation="X+=2,Y+=2,Z+=2";}
+      else if(param_string=="--"){koperation="X--,Y--,Z--";}
+      else if(param_string=="-=2"){koperation="X-=2,Y-=2,Z-=2";}
       else{throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"KPOINTS unknown mode: \""+param_string+"\"",_INPUT_ILLEGAL_);}
 
       if(xvasp.aopts.flag("FLAG::KPOINTS_PRESERVED")){Krun=false;} // don't touch kpoints
@@ -6430,7 +6424,7 @@ namespace KBIN {
     //changing KPOINTS will remove any 'ALGO' from xfixed, because they might work with a different set of KPOINTS
     //therefore, the submodes are set up so ALGO changes go first and KPOINTS changes occur later
     //an exception is KPOINTS=GAMMA, always try this first
-    //ending with KPOINTS+=1 is similar to resetting submode to 0
+    //ending with KPOINTS++ is similar to resetting submode to 0
     //try GAMMA_EVEN before GAMMA_ODD, as later solutions would benefit from and odd scheme
     //both GAMMA_EVEN and GAMMA_ODD are expected to increase at least some of the KPOINTS
 
@@ -6469,7 +6463,7 @@ namespace KBIN {
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
       if(submode==4){ //increase KPOINTS //CO20200624
-        fix="KPOINTS+=1";
+        fix="KPOINTS++";
         Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
@@ -6490,7 +6484,7 @@ namespace KBIN {
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
       if(submode==2){ //increase KPOINTS //CO20200624
-        fix="KPOINTS+=1";
+        fix="KPOINTS++";
         Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
@@ -6522,7 +6516,7 @@ namespace KBIN {
         Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
-      if(submode==4){ //CO20200624 - try fixing POTIM if we are relaxing, otherwise change ISMEAR=2(?)
+      if(submode==4){ //CO20200624 - try fixing POTIM
         fix="POTIM";
         Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
@@ -6533,7 +6527,7 @@ namespace KBIN {
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
       if(submode==6){ //increase KPOINTS //CO20200624
-        fix="KPOINTS+=1";
+        fix="KPOINTS++";
         Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
@@ -6557,24 +6551,10 @@ namespace KBIN {
       Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
     }
     else if(mode=="KKSYM") {
-      if(submode<0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"no submode set: \""+mode+"\"",_INPUT_ILLEGAL_);}  //CO20210315
-      if(submode==0){ //try SYMPREC first (easy)
-        fix="SYMPREC";
-        Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
-        if(!Krun){Krun=true;submode++;} //reset and go to the next solution
-      }
-      if(submode==1){ //try G-centered //CO20200624
-        fix="KPOINTS=GAMMA";
-        Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
-        if(!Krun){Krun=true;submode++;} //reset and go to the next solution
-      }
-      if(submode==2){ //Kmax
-        fix="KPOINTS=KMAX";
-        Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
-        if(!Krun){Krun=true;submode++;} //reset and go to the next solution
-      }
-      if(submode>=3){Krun=false;}
-      submode+=submode_increment;submode_increment=1;  //increment and reset
+      //CO20210315 - tried SYMPREC and KPOINTS=GAMMA first in several tests, they never worked. KPOINTS=KMAX works everytime
+      //ROTMAT is trigged for KKSYM, it will try these other procedures anyway in the off change KPOINTS=KMAX doesn't work
+      fix="KPOINTS=KMAX";
+      Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
     }
     else if(mode=="LREAL") {
       fix="LREAL";
@@ -6583,7 +6563,7 @@ namespace KBIN {
     else if(mode=="MEMORY") { //CO20210315
       if(submode<0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"no submode set: \""+mode+"\"",_INPUT_ILLEGAL_);}  //CO20210315
       if(submode==0){ //lower k-points
-        fix="KPOINTS-=1";
+        fix="KPOINTS--";
         Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
@@ -6646,7 +6626,7 @@ namespace KBIN {
     }
     else if(mode=="NKXYZ_IKPTD") {
       //https://www.vasp.at/forum/viewtopic.php?t=1228
-      fix="KPOINTS-=1";
+      fix="KPOINTS--";
       Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
     }
     else if(mode=="NPAR") {
