@@ -4653,7 +4653,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
                   atom.order_parameter_value=0;
                   atom.order_parameter_atom=TRUE;
                 } else {
-                  atom.order_parameter_value=atoi(stmp_tokens.at(id).c_str());
+                  atom.order_parameter_value=aurostd::string2utype<int>(stmp_tokens.at(id).c_str());
                   atom.order_parameter_atom=TRUE;
                   a.order_parameter_sum+=atom.order_parameter_value;
                 }

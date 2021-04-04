@@ -831,8 +831,8 @@ namespace KBIN {
           aus << "00000  MESSAGE-DEFAULT AUTO_MAGMOM=" << (DEFAULT_VASP_FORCE_OPTION_AUTO_MAGMOM?"ON":"OFF") << " - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
         }
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-        if(vflags.KBIN_VASP_FORCE_OPTION_AUTO_MAGMOM.isentry || DEFAULT_VASP_FORCE_OPTION_AUTO_MAGMOM) {
-          KBIN::XVASP_INCAR_PREPARE_GENERIC("AUTO_MAGMOM",xvasp,vflags,"",0,0.0,vflags.KBIN_VASP_FORCE_OPTION_AUTO_MAGMOM.option);
+        if((vflags.KBIN_VASP_FORCE_OPTION_AUTO_MAGMOM.isentry && vflags.KBIN_VASP_FORCE_OPTION_AUTO_MAGMOM.option) || DEFAULT_VASP_FORCE_OPTION_AUTO_MAGMOM) {
+          KBIN::XVASP_INCAR_PREPARE_GENERIC("AUTO_MAGMOM",xvasp,vflags,"",0,0.0,FALSE);
           xvasp.aopts.flag("FLAG::XVASP_INCAR_changed",TRUE);
         }
       }
@@ -3767,6 +3767,27 @@ namespace KBIN {
   }
 } // namespace KBIN
 
+namespace KBIN {
+  bool XVASP_INCAR_Read_MAGMOM(_xvasp& xvasp){  //CO20210315
+    if(!aurostd::kvpairfound(xvasp.INCAR,"MAGMOM","=")){return false;}
+    string value=aurostd::kvpair2value(xvasp.INCAR,"MAGMOM","=");
+    vector<string> vstr_order_parameters;
+    aurostd::string2tokens(value,vstr_order_parameters," ");
+    if(vstr_order_parameters.size()!=xvasp.str.atoms.size()){return false;} //check before you apply
+    bool Krun=true;
+    uint i=0;
+    for(i=0;i<vstr_order_parameters.size()&&Krun;i++){  //check before you apply
+      if(!aurostd::isfloat(vstr_order_parameters[i])){Krun=false;}
+    }
+    if(Krun==false){return false;}
+    for(i=0;i<vstr_order_parameters.size();i++){  //check before you apply
+      xvasp.str.atoms[i].order_parameter_atom=true;
+      xvasp.str.atoms[i].order_parameter_value=aurostd::string2utype<int>(vstr_order_parameters[i]);
+    }
+    return true;
+  }
+} // namespace KBIN
+
 // ***************************************************************************
 // KBIN::XVASP_INCAR_PREPARE_GENERIC
 namespace KBIN {
@@ -3898,11 +3919,11 @@ namespace KBIN {
 
       if(Krun){
         //REMOVE LINES
-        XVASP_INCAR_REMOVE_ENTRY(xvasp,keyword,operation_option,VERBOSE);  //CO20200624
+        XVASP_INCAR_REMOVE_ENTRY(xvasp,keyword,operation,VERBOSE);  //CO20200624
         //ADD LINES
-        if(VERBOSE) xvasp.INCAR << "# Performing " << operation_option << " [AFLOW] begin" << endl;
-        xvasp.INCAR << aurostd::PaddedPOST(incar_input,_incarpad_) << " # " << operation_option << " MAGMOM " << xvasp.str.atoms.size() << " atoms" << endl;
-        if(VERBOSE) xvasp.INCAR << "# Performing " << operation_option << " [AFLOW] end" << endl;
+        if(VERBOSE) xvasp.INCAR << "# Performing " << operation << " [AFLOW] begin" << endl;
+        xvasp.INCAR << aurostd::PaddedPOST(incar_input,_incarpad_) << " # " << operation << " MAGMOM " << xvasp.str.atoms.size() << " atoms" << endl;
+        if(VERBOSE) xvasp.INCAR << "# Performing " << operation << " [AFLOW] end" << endl;
       }
     }
     // ***************************************************************************
@@ -6150,30 +6171,33 @@ namespace KBIN {
       if(Krun){aus << "MMMMM  MESSAGE applied FIX=\"" << fix << "\"" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
     }
     else if(fix.find("KPOINTS")!=string::npos) {
-      string tmp="KPOINTS";
-      loc=fix.find(tmp);
-      if(loc==fix.size()-1||loc==string::npos){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"KPOINTS mode not found",_INPUT_ILLEGAL_);}
-      param_string=fix.substr(loc+tmp.length());  //get everything after 'KPOINTS', including '='
-      string koperation="";
-      if(param_string=="=GAMMA"){koperation="Gamma_Shift";}
-      else if(param_string=="=GAMMA_ODD"){koperation="Gamma,Xodd,Yodd,Zodd";}
-      else if(param_string=="=GAMMA_EVEN"){koperation="Gamma,Xeven,Yeven,Zeven";}
-      else if(param_string=="=KMAX"){koperation="Kmax";}
-      else if(param_string=="++"){koperation="X++,Y++,Z++";}
-      else if(param_string=="+=2"){koperation="X+=2,Y+=2,Z+=2";}
-      else if(param_string=="--"){koperation="X--,Y--,Z--";}
-      else if(param_string=="-=2"){koperation="X-=2,Y-=2,Z-=2";}
-      else{throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"KPOINTS unknown mode: \""+param_string+"\"",_INPUT_ILLEGAL_);}
-
       if(xvasp.aopts.flag("FLAG::KPOINTS_PRESERVED")){Krun=false;} // don't touch kpoints
-      if(Krun && param_string=="=GAMMA" && KBIN::XVASP_KPOINTS_IncludesGamma(xvasp)){Krun=false;} //already done
+      if(Krun){
+        string key="KPOINTS";
+        loc=fix.find(key);
+        if(loc==fix.size()-1||loc==string::npos){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"KPOINTS mode not found",_INPUT_ILLEGAL_);}
+        string value="";
+        value=fix.substr(loc+key.length());  //get everything after 'KPOINTS', including '='
+        if(value=="=GAMMA"){param_string="Gamma_Shift";}
+        else if(value=="=GAMMA_ODD"){param_string="Gamma,Xodd,Yodd,Zodd";}
+        else if(value=="=GAMMA_EVEN"){param_string="Gamma,Xeven,Yeven,Zeven";}
+        else if(value=="=KMAX"){param_string="Kmax";}
+        else if(value=="++"){param_string="X++,Y++,Z++";}
+        else if(value=="+=2"){param_string="X+=2,Y+=2,Z+=2";}
+        else if(value=="--"){param_string="X--,Y--,Z--";}
+        else if(value=="-=2"){param_string="X-=2,Y-=2,Z-=2";}
+        else{throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"KPOINTS unknown mode: \""+value+"\"",_INPUT_ILLEGAL_);}
+        
+        if(Krun && value=="=GAMMA" && KBIN::XVASP_KPOINTS_IncludesGamma(xvasp)){Krun=false;} //already done
+      }
+
       if(Krun && VERBOSE){
         aus << "MMMMM  MESSAGE attempting FIX=\"" << fix << "\"" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
         aus << "MMMMM  MESSAGE KPOINTS(pre )=[" << xvasp.str.kpoints_kscheme << ";" << xvasp.str.kpoints_k1 << "," << xvasp.str.kpoints_k2 << "," << xvasp.str.kpoints_k3 << ";" << xvasp.str.kpoints_s1 << "," << xvasp.str.kpoints_s2 << "," << xvasp.str.kpoints_s3 << "]" << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       }
       //START - load KPOINTS into xvasp, modify xvasp.str.kpoints*, and write out new KPOINTS
       Krun=(Krun && VASP_Reread_KPOINTS(xvasp) && XVASP_KPOINTS_string2numbers(xvasp)); //preload kpoints, load into xvasp.str
-      Krun=(Krun && KBIN::XVASP_KPOINTS_OPERATION(xvasp,koperation));  //CO20210315
+      Krun=(Krun && KBIN::XVASP_KPOINTS_OPERATION(xvasp,param_string));  //CO20210315
       Krun=(Krun && aurostd::stringstream2file(xvasp.KPOINTS,string(xvasp.Directory+"/KPOINTS")));
       //END - load KPOINTS into xvasp, modify xvasp.str.kpoints*, and write out new KPOINTS
       if(Krun){
@@ -6259,15 +6283,25 @@ namespace KBIN {
       //START - modify xvasp.str and write out new POSCAR
       Krun=(Krun && aurostd::stringstream2file(xvasp.POSCAR,string(xvasp.Directory+"/POSCAR.orig")));  //CO20210315 - POSCAR.orig here is NOT the original structure, but a saved state, come back later
       if(Krun){
+        //CO20210315 - need to make sure fix magmom too (if it's there)
+        //load into xvasp.str.atoms[i].order_parameter_atom/value, convert to sconv, then print out
+        VASP_Reread_INCAR(xvasp);  //preload incar - MAGMOM
+        bool remove_magmom=aurostd::kvpairfound(xvasp.INCAR,"MAGMOM","=");
+        bool write_magmom=XVASP_INCAR_Read_MAGMOM(xvasp);
         aus << "00000  MESSAGE WARNING SWAPPING TO CONVENTIONAL STRUCTURE" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
         aus << "00000  MESSAGE BEFORE: a,b,c,alpha,beta,gamma " << xvasp.str.a << "," << xvasp.str.b << "," << xvasp.str.c << "," << xvasp.str.alpha << "," << xvasp.str.beta << "," << xvasp.str.gamma << endl;
+        if(write_magmom){aus << "00000  MESSAGE BEFORE: MAGMOM=" << aurostd::kvpair2value(xvasp.INCAR,"MAGMOM","=") << endl;}
         aus << "00000  MESSAGE BEFORE: structure: " << endl;
         aus << xvasp.str;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
         //
         xvasp.str.Standard_Conventional_UnitCellForm(); //CO20210315 - previously missing before
+        if(remove_magmom){KBIN::XVASP_INCAR_REMOVE_ENTRY(xvasp,"MAGMOM",operation,vflags.KBIN_VASP_INCAR_VERBOSE);} //CO20200624
+        if(write_magmom){KBIN::XVASP_INCAR_PREPARE_GENERIC("AUTO_MAGMOM",xvasp,vflags,"",0,0.0,FALSE);}
+        if(remove_magmom || write_magmom){aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR"));}  //write out incar
         //
         aus << "00000  MESSAGE AFTER: a,b,c,alpha,beta,gamma " << xvasp.str.a << "," << xvasp.str.b << "," << xvasp.str.c << "," << xvasp.str.alpha << "," << xvasp.str.beta << "," << xvasp.str.gamma << endl;
+        if(write_magmom){aus << "00000  MESSAGE AFTER: MAGMOM=" << aurostd::kvpair2value(xvasp.INCAR,"MAGMOM","=") << endl;}
         aus << "00000  MESSAGE AFTER: structure: " << endl;
         aus << xvasp.str;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);

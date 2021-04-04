@@ -3081,6 +3081,7 @@ namespace KBIN {
   void XVASP_INCAR_ABMIX(_xvasp& xvasp,_vflags& vflags);
   int XVASP_INCAR_GetNBANDS(_xvasp& xvasp,bool ispin=true); //CO20210315 - spin==true is safer
   string INCAR_IALGO2ALGO(int ialgo); //CO20210315
+  bool XVASP_INCAR_Read_MAGMOM(_xvasp& xvasp);  //CO20210315
   bool XVASP_INCAR_PREPARE_GENERIC(const string& command,_xvasp& xvasp,_vflags& vflags,const string& svalue,int ivalue,double dvalue,bool bvalue);
   void XVASP_INCAR_ADJUST_ICHARG(_xvasp&, _vflags&, _aflags&, int, ofstream&);  //ME20191028
   void XVASP_INCAR_SPIN_REMOVE_RELAX(_xvasp& xvasp,_aflags &aflags,_vflags& vflags,int step,ofstream &FileMESSAGE);
