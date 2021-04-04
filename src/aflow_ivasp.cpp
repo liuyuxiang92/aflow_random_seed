@@ -6534,7 +6534,7 @@ namespace KBIN {
       fix="POSCAR=VOLUME";
       Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
     }
-    else if(mode=="GAMMA_SHIFT" || mode=="IBZKPT") {
+    else if(mode=="GAMMA_SHIFT" || mode=="IBZKPT") {  //CO20210315 - does a simple shift work for IBZKPT? come back
       fix="KPOINTS=GAMMA";
       Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
     }
@@ -6638,9 +6638,10 @@ namespace KBIN {
       Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
     }
     else if(mode=="RMM_DIIS") {
+      //problems with RMM-DIIS, avoid VERYFAST
       //https://www.vasp.at/forum/viewtopic.php?t=214 (EDDRMM)
       //https://www.vasp.at/forum/viewtopic.php?f=3&t=18028 (NUM_PROB)
-      //problems with RMM-DIIS, avoid VERYFAST
+      //https://www.vasp.at/wiki/index.php/IALGO#RMM-DIIS
       if(submode<0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"no submode set: \""+mode+"\"",_INPUT_ILLEGAL_);}  //CO20210315
       if(submode==0){ //CO20200624 - try ALGO=FAST (fast is faster than normal, try first)
         //https://www.vasp.at/wiki/index.php/IALGO#RMM-DIIS
@@ -6669,12 +6670,17 @@ namespace KBIN {
         Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
-      if(submode==5){ //increase KPOINTS //CO20200624
+      if(submode==5){ //CO20200624 - try Fermi smearing
+        fix="ISMEAR=-1";
+        Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
+        if(!Krun){Krun=true;submode++;} //reset and go to the next solution
+      }
+      if(submode==6){ //increase KPOINTS //CO20200624
         fix="KPOINTS++";
         Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
-      if(submode>=6){Krun=false;}
+      if(submode>=7){Krun=false;}
       submode+=submode_increment;submode_increment=1;  //increment and reset
     }
     else if(mode=="ROTMAT") {
@@ -6685,12 +6691,12 @@ namespace KBIN {
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
       //else if(submode==1) //DO NOT USE else if, we may change submode inside
-      if(submode==1){ //Gamma without increasing KPOINTS
+      if(submode==1){ //Gamma without increasing KPOINTS  //CO20210315 - does a simple shift fix ROTMAT? come back
         fix="KPOINTS=GAMMA";
         Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
-      if(submode==2){ //Gamma-even
+      if(submode==2){ //Gamma-even  //CO20210315 - does this ever work? or is it just increase KPOINTS helps? come back
         fix="KPOINTS=GAMMA_EVEN";
         Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution

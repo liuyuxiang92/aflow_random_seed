@@ -3044,7 +3044,7 @@ namespace KBIN {
 
     //do last
     xwarning.flag("RMM_DIIS",xwarning.flag("EDDRMM") || xwarning.flag("NUM_PROB") || xwarning.flag("ZBRENT"));  //CO20210315 - can probably add others to this list as well
-    xwarning.flag("ROTMAT",xwarning.flag("SGRCON") || xwarning.flag("NIRMAT") || xwarning.flag("IBZKPT") || xwarning.flag("KKSYM") || xwarning.flag("NKXYZ_IKPTD") || xwarning.flag("INVGRP") || xwarning.flag("SYMPREC"));  //CO20210315 - can probably add others to this list as well
+    xwarning.flag("ROTMAT",xwarning.flag("SGRCON") || xwarning.flag("NIRMAT") || xwarning.flag("IBZKPT") || xwarning.flag("KKSYM") || xwarning.flag("INVGRP") || xwarning.flag("SYMPREC"));  //CO20210315 - can probably add others to this list as well
 
     if(LDEBUG){aus << soliloquy << " [2]" << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
 
