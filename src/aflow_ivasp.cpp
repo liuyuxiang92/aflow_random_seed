@@ -3769,20 +3769,34 @@ namespace KBIN {
 
 namespace KBIN {
   bool XVASP_INCAR_Read_MAGMOM(_xvasp& xvasp){  //CO20210315
+    //needs support for LNONCOLLINEAR=.TRUE., add later
+    //order_parameter_value should probably become double, not necessary for now
+    if(aurostd::kvpairfound(xvasp.INCAR,"LNONCOLLINEAR","=") && aurostd::kvpair2value(xvasp.INCAR,"LNONCOLLINEAR","=")==".TRUE."){return false;}
     if(!aurostd::kvpairfound(xvasp.INCAR,"MAGMOM","=")){return false;}
     string value=aurostd::kvpair2value(xvasp.INCAR,"MAGMOM","=");
-    vector<string> vstr_order_parameters;
-    aurostd::string2tokens(value,vstr_order_parameters," ");
-    if(vstr_order_parameters.size()!=xvasp.str.atoms.size()){return false;} //check before you apply
-    bool Krun=true;
-    uint i=0;
-    for(i=0;i<vstr_order_parameters.size()&&Krun;i++){  //check before you apply
-      if(!aurostd::isfloat(vstr_order_parameters[i])){Krun=false;}
+    vector<string> vtokens,vtokens2;
+    vector<int> vmags;
+    aurostd::string2tokens(value,vtokens," ");
+    uint i=0,j=0;
+    int natoms=0;
+    for(i=0;i<vtokens.size();i++){
+      if(vtokens[i].find("*")==string::npos){
+        if(!aurostd::isfloat(vtokens[i])){return false;}
+        vmags.push_back(aurostd::string2utype<int>(vtokens[i]));
+      }else{
+        aurostd::string2tokens(vtokens[i],vtokens2,"*");
+        if(vtokens2.size()!=2){return false;}
+        if((!aurostd::isfloat(vtokens2[0]))||(!aurostd::isfloat(vtokens2[1]))){return false;}
+        //assume natoms is first, not last
+        natoms=aurostd::string2utype<int>(vtokens2[0]);
+        if(natoms<1){return false;}
+        for(j=0;j<(uint)natoms;j++){vmags.push_back(aurostd::string2utype<int>(vtokens2[1]));}
+      }
     }
-    if(Krun==false){return false;}
-    for(i=0;i<vstr_order_parameters.size();i++){  //check before you apply
+    if(vmags.size()!=xvasp.str.atoms.size()){return false;} //check before you apply
+    for(i=0;i<vmags.size();i++){
       xvasp.str.atoms[i].order_parameter_atom=true;
-      xvasp.str.atoms[i].order_parameter_value=aurostd::string2utype<int>(vstr_order_parameters[i]);
+      xvasp.str.atoms[i].order_parameter_value=vmags[i];
     }
     return true;
   }
