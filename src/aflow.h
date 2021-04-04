@@ -3121,8 +3121,8 @@ namespace KBIN {
   //[CO20210315 - OBSOLETE]bool XVASP_Afix_ROTMAT(_xvasp& xvasp,int mode,_aflags& aflags,bool VERBOSE,ofstream &FileMESSAGE);
   //[CO20210315 - OBSOLETE]bool XVASP_Afix_ROTMAT(_xvasp& xvasp,int mode,_kflags kflags,_vflags vflags,_aflags& aflags,bool VERBOSE,ofstream &FileMESSAGE);
   //the following functions are all associated with XVASP_Afix()
-  bool XVASP_Afix_NBANDS(_xvasp& xvasp,_vflags& vflags);  //CO20200624 - this is not a general Afix, this can only be used inside Afix_GENERIC
-  bool XVASP_Afix_NBANDS(_xvasp& xvasp,_vflags& vflags,int& nbands);  //CO20200624 - this is not a general Afix, this can only be used inside Afix_GENERIC
+  bool XVASP_Afix_NBANDS(_xvasp& xvasp,_vflags& vflags,bool increase=true);  //CO20200624 - this is not a general Afix, this can only be used inside Afix_GENERIC
+  bool XVASP_Afix_NBANDS(_xvasp& xvasp,_vflags& vflags,int& nbands,bool increase=true);  //CO20200624 - this is not a general Afix, this can only be used inside Afix_GENERIC
   bool XVASP_Afix_POTIM(_xvasp& xvasp,_vflags& vflags);  //CO20200624 - this is not a general Afix, this can only be used inside Afix_GENERIC
   bool XVASP_Afix_POTIM(_xvasp& xvasp,_vflags& vflags,double& potim);  //CO20200624 - this is not a general Afix, this can only be used inside Afix_GENERIC
   bool XVASP_Afix_NELM(_xvasp& xvasp,_vflags& vflags); //CO20200624 - this is not a general Afix, this can only be used inside Afix_GENERIC

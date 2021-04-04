@@ -5808,15 +5808,16 @@ namespace KBIN {
 //[CO20210315 - OBSOLETE]}
 
 namespace KBIN {
-  bool XVASP_Afix_NBANDS(_xvasp& xvasp,_vflags& vflags) {
+  bool XVASP_Afix_NBANDS(_xvasp& xvasp,_vflags& vflags,bool increase) {
     int nbands=0;
-    return XVASP_Afix_NBANDS(xvasp,vflags,nbands);
+    return XVASP_Afix_NBANDS(xvasp,vflags,nbands,increase);
   }
-  bool XVASP_Afix_NBANDS(_xvasp& xvasp,_vflags& vflags,int& nbands) {
+  bool XVASP_Afix_NBANDS(_xvasp& xvasp,_vflags& vflags,int& nbands,bool increase) {
     //note, this function is part of the XVASP_Afix_* series
     //it will assume xvasp.INCAR has been pre-loaded and will NOT rewrite the INCAR
     //this is all done inside the main XVASP_Afix() function
     //BE CAREFUL not to overwrite xvasp.INCAR
+    //for now the default is to increase NBANDS, we might decrease later as a fix to MEMORY
     bool LDEBUG=(FALSE || _DEBUG_IVASP_ || XHOST.DEBUG);
     string function="KBIN::XVASP_Afix_NBANDS";
     string soliloquy=XPID+function+"():";
@@ -5834,8 +5835,9 @@ namespace KBIN {
       //no need to spit error, if it doesn't find NBANDS in INCAR, then use defaults (below)
     }
     if(LDEBUG) cerr << soliloquy << " nbands=" << nbands << endl;
-    if(nbands<5) {nbands=KBIN::XVASP_INCAR_GetNBANDS(xvasp,TRUE);}
-    else {nbands=nbands+20+nbands/5;} // why did I remove it ?
+    if(nbands==0){nbands=KBIN::XVASP_INCAR_GetNBANDS(xvasp,TRUE);}
+    if(increase){nbands+=20+nbands/5;}
+    else{nbands=(int)((double)nbands*0.9);}  //CO20210315
     if(LDEBUG) cerr << soliloquy << " nbands=" << nbands << endl;
 
     if(!KBIN::XVASP_INCAR_PREPARE_GENERIC("NBANDS",xvasp,vflags,"",nbands,0.0,FALSE)){return false;}
@@ -5860,6 +5862,8 @@ namespace KBIN {
     //it will assume xvasp.INCAR has been pre-loaded and will NOT rewrite the INCAR
     //this is all done inside the main XVASP_Afix() function
     //BE CAREFUL not to overwrite xvasp.INCAR
+    //there is no need for increasing POTIM, as increasing POTIM simply speeds up the calculation
+    //you can ignore "BRIONS problems: POTIM should be increase", not a problem
     bool LDEBUG=(FALSE || _DEBUG_IVASP_ || XHOST.DEBUG);
     string function="KBIN::XVASP_Afix_POTIM";
     string soliloquy=XPID+function+"():";  //CO20200624
@@ -5903,6 +5907,7 @@ namespace KBIN {
     //it will assume xvasp.INCAR has been pre-loaded and will NOT rewrite the INCAR
     //this is all done inside the main XVASP_Afix() function
     //BE CAREFUL not to overwrite xvasp.INCAR
+    //there is no need to decrease NELM, as it will stop when converged no matter what
     bool LDEBUG=(FALSE || _DEBUG_IVASP_ || XHOST.DEBUG);
     string function="KBIN::XVASP_Afix_NELM";
     string soliloquy=XPID+function+"():"; //CO20200624
