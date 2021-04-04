@@ -6744,20 +6744,20 @@ namespace KBIN {
     }
     else if(mode=="ZPOTRF") {
       if(submode<0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"no submode set: \""+mode+"\"",_INPUT_ILLEGAL_);}  //CO20210315
-      //previously we tried "POSCAR=STANDARD_CONVENTIONAL", but it was turned off and has not been shown to work
-      //we keep here as a last-ditch effort
-      if(submode==0){  //CO20210315 - try converting to standard conventional (previously not applied)
-        fix="POSCAR=STANDARD_CONVENTIONAL";
-        Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
-        if(!Krun){Krun=true;submode++;} //reset and go to the next solution
-      }
-      if(submode==1){  //CO20210315 - POTIM usually works
+      if(submode==0){  //CO20210315 - POTIM usually works
         fix="POTIM";
         Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
-      if(submode==2){  //CO20210315 - increasing volume might get you out of rut
+      if(submode==1){  //CO20210315 - increasing volume might get you out of rut
         fix="POSCAR=VOLUME";
+        Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
+        if(!Krun){Krun=true;submode++;} //reset and go to the next solution
+      }
+      //previously we tried "POSCAR=STANDARD_CONVENTIONAL", but it was turned off and has not been shown to work
+      //we keep here as a last-ditch effort
+      if(submode==2){  //CO20210315 - try converting to standard conventional (previously not applied)
+        fix="POSCAR=STANDARD_CONVENTIONAL";
         Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
