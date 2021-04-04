@@ -2983,20 +2983,22 @@ namespace KBIN {
     xwarning.flag("INVGRP",(content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("VERY BAD NEWS! internal error in subroutine INVGRP")))!=string::npos));  //usually goes with SYMPREC
     xwarning.flag("SYMPREC",(content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("inverse of rotation matrix was not found (increase SYMPREC)")))!=string::npos));  //usually goes with INVGRP
     //VASP's internal symmetry routines END
+    //VASP issues with RMM-DIIS START
+    xwarning.flag("EDDRMM",(vasp_still_running==false && !xmessage.flag("REACHED_ACCURACY") &&
+          (content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("WARNING in EDDRMM: call to ZHEGV failed, returncode")))!=string::npos))); //CO20210315 - look here https://www.vasp.at/wiki/index.php/IALGO#RMM-DIIS // && !xwarning.flag("ZPOTRF");
+    xwarning.flag("NUM_PROB",(content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("num prob")))!=string::npos));  //CO20210315 - look here https://www.vasp.at/wiki/index.php/IALGO#RMM-DIIS  //CO20210315 - num prob can be a big problem for the DOS: https://www.vasp.at/forum/viewtopic.php?f=3&t=18028
+    xwarning.flag("ZBRENT",(vasp_still_running==false && !xmessage.flag("REACHED_ACCURACY") && 
+          content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("ZBRENT: can't locate minimum")))!=string::npos));  //CO20210315 - look here https://www.vasp.at/wiki/index.php/IALGO#RMM-DIIS
+    //VASP issues with RMM-DIIS END
     //CSLOSHING and NELM warnings are similar, CSLOSHING will apply a fix before VASP finishes running, while NELM only cares about the LAST iteration
     xwarning.flag("BRMIX",(content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("BRMIX: very serious problems")))!=string::npos));
     xwarning.flag("CSLOSHING",vasp_still_running==true && KBIN::VASP_OSZICARUnconverging(xvasp.Directory)); // check from OSZICAR
+    xwarning.flag("CALC_FROZEN",vasp_still_running==true && tmod_vaspout>=STALE_VASP_OUT); //CO20210315
     xwarning.flag("DAV",(vasp_still_running==false && !xmessage.flag("REACHED_ACCURACY") &&
           (content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("WARNING: Sub-Space-Matrix is not hermitian in DAV")))!=string::npos)) );
     xwarning.flag("DENTET",(vasp_still_running==false && !xmessage.flag("REACHED_ACCURACY") &&  //CO+AS20210315 - this is only a problem if we don't reach accuracy //https://www.vasp.at/forum/viewtopic.php?f=3&t=416
           content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("WARNING: DENTET: can't reach specified precision")))!=string::npos)); // not only npar==1
     xwarning.flag("EDDDAV",(content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("Error EDDDAV: Call to ZHEGV failed. Returncode")))!=string::npos));
-    xwarning.flag("EDDRMM",(vasp_still_running==false && !xmessage.flag("REACHED_ACCURACY") &&
-          ( 
-           (content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("WARNING in EDDRMM: call to ZHEGV failed, returncode")))!=string::npos) || 
-           //[CO20210315 - this by itself without warnings is ok](content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("num prob")))!=string::npos) || 
-          FALSE) 
-          && TRUE));  //CO20210315 - look here https://www.vasp.at/wiki/index.php/IALGO#RMM-DIIS // && !xwarning.flag("ZPOTRF");
     xwarning.flag("EFIELD_PEAD",
         (content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("EFIELD_PEAD is too large")))!=string::npos) || //20190704
         (content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("EFIELD_PEAD are too large for comfort")))!=string::npos) || //20190704 - new VASP
@@ -3009,10 +3011,7 @@ namespace KBIN {
         (content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("shift your grid to Gamma")))!=string::npos) || //CO20190704 - captures both old/new versions of VASP
         FALSE); //CO20190704
     xwarning.flag("LRF_COMMUTATOR",(content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("LRF_COMMUTATOR internal error: the vector")))!=string::npos)); // GET ALL TIMES
-    xwarning.flag("MEMORY",
-        (content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("AFLOW ERROR: AFLOW_MEMORY=")))!=string::npos) ||
-        (vasp_still_running==true && tmod_vaspout>=STALE_VASP_OUT) || //CO20210315
-        FALSE);
+    xwarning.flag("MEMORY",(content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("AFLOW ERROR: AFLOW_MEMORY=")))!=string::npos));
     xwarning.flag("MPICH11",((content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("BAD TERMINATION OF ONE OF YOUR APPLICATION PROCESSES")))!=string::npos) &&
           (content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("EXIT CODE: 11")))!=string::npos)) );
     xwarning.flag("MPICH139",((content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("BAD TERMINATION OF ONE OF YOUR APPLICATION PROCESSES")))!=string::npos) &&
@@ -3044,6 +3043,7 @@ namespace KBIN {
     xwarning.flag("ZPOTRF",(content_vasp_out.find(aurostd::toupper(aurostd::RemoveWhiteSpaces("LAPACK: Routine ZPOTRF failed")))!=string::npos));
 
     //do last
+    xwarning.flag("RMM_DIIS",xwarning.flag("EDDRMM") || xwarning.flag("NUM_PROB") || xwarning.flag("ZBRENT"));  //CO20210315 - can probably add others to this list as well
     xwarning.flag("ROTMAT",xwarning.flag("SGRCON") || xwarning.flag("NIRMAT") || xwarning.flag("IBZKPT") || xwarning.flag("KKSYM") || xwarning.flag("NKXYZ_IKPTD") || xwarning.flag("INVGRP") || xwarning.flag("SYMPREC"));  //CO20210315 - can probably add others to this list as well
 
     if(LDEBUG){aus << soliloquy << " [2]" << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
@@ -3075,6 +3075,7 @@ namespace KBIN {
       //
       if(wdebug || xwarning.flag("BRMIX")) aus << "WWWWW  WARNING xwarning.flag(\"BRMIX\")=" << xwarning.flag("BRMIX") << endl;
       if(wdebug || xwarning.flag("CSLOSHING")) aus << "WWWWW  WARNING xwarning.flag(\"CSLOSHING\")=" << xwarning.flag("CSLOSHING") << endl;
+      if(wdebug || xwarning.flag("CALC_FROZEN")) aus << "WWWWW  WARNING xwarning.flag(\"CALC_FROZEN\")=" << xwarning.flag("CALC_FROZEN") << endl; //CO20210135
       if(wdebug || xwarning.flag("DAV")) aus << "WWWWW  WARNING xwarning.flag(\"DAV\")=" << xwarning.flag("DAV") << endl;
       if(wdebug || xwarning.flag("DENTET")) aus << "WWWWW  WARNING xwarning.flag(\"DENTET\")=" << xwarning.flag("DENTET") << endl;
       if(wdebug || xwarning.flag("EDDDAV")) aus << "WWWWW  WARNING xwarning.flag(\"EDDDAV\")=" << xwarning.flag("EDDDAV") << endl;
@@ -3098,13 +3099,16 @@ namespace KBIN {
       if(!xmonitor.flag("IGNORING_WARNINGS:NPARC") && (wdebug || xwarning.flag("NPARC"))) aus << "WWWWW  WARNING xwarning.flag(\"NPARC\")=" << xwarning.flag("NPARC") << endl;
       if(!xmonitor.flag("IGNORING_WARNINGS:NPARN") && (wdebug || xwarning.flag("NPARN"))) aus << "WWWWW  WARNING xwarning.flag(\"NPARN\")=" << xwarning.flag("NPARN") << endl;
       if(wdebug || xwarning.flag("NPAR_REMOVE")) aus << "WWWWW  WARNING xwarning.flag(\"NPAR_REMOVE\")=" << xwarning.flag("NPAR_REMOVE") << endl;
+      if(wdebug || xwarning.flag("NUM_PROB")) aus << "WWWWW  WARNING xwarning.flag(\"NUM_PROB\")=" << xwarning.flag("NUM_PROB") << endl;  //CO20210315
       if(wdebug || xwarning.flag("PSMAXN")) aus << "WWWWW  WARNING xwarning.flag(\"PSMAXN\")=" << xwarning.flag("PSMAXN") << endl;
       if(wdebug || xwarning.flag("READ_KPOINTS_RD_SYM")) aus << "WWWWW  WARNING xwarning.flag(\"READ_KPOINTS_RD_SYM\")=" << xwarning.flag("READ_KPOINTS_RD_SYM") << endl;
       if(wdebug || xwarning.flag("REAL_OPT")) aus << "WWWWW  WARNING xwarning.flag(\"REAL_OPT\")=" << xwarning.flag("REAL_OPT") << endl;
       if(wdebug || xwarning.flag("REAL_OPTLAY_1")) aus << "WWWWW  WARNING xwarning.flag(\"REAL_OPTLAY_1\")=" << xwarning.flag("REAL_OPTLAY_1") << endl;
+      if(wdebug || xwarning.flag("RMM_DIIS")) aus << "WWWWW  WARNING xwarning.flag(\"RMM_DIIS\")=" << xwarning.flag("RMM_DIIS") << endl;  //CO20210315
       if(!xmonitor.flag("IGNORING_WARNINGS:SYMMETRY_VASP") && (wdebug || xwarning.flag("ROTMAT"))) aus << "WWWWW  WARNING xwarning.flag(\"ROTMAT\")=" << xwarning.flag("ROTMAT") << endl;
       if(!xmonitor.flag("IGNORING_WARNINGS:SYMMETRY_VASP") && (wdebug || xwarning.flag("SGRCON"))) aus << "WWWWW  WARNING xwarning.flag(\"SGRCON\")=" << xwarning.flag("SGRCON") << endl;
       if(!xmonitor.flag("IGNORING_WARNINGS:SYMMETRY_VASP") && (wdebug || xwarning.flag("SYMPREC"))) aus << "WWWWW  WARNING xwarning.flag(\"SYMPREC\")=" << xwarning.flag("SYMPREC") << endl;
+      if(wdebug || xwarning.flag("ZBRENT")) aus << "WWWWW  WARNING xwarning.flag(\"ZBRENT\")=" << xwarning.flag("ZBRENT") << endl;  //CO20210315
       if(wdebug || xwarning.flag("ZPOTRF")) aus << "WWWWW  WARNING xwarning.flag(\"ZPOTRF\")=" << xwarning.flag("ZPOTRF") << endl;
       cerr << aus.str();
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -3751,17 +3755,22 @@ namespace KBIN {
         KBIN::VASP_Error2Fix("KKSYM",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);  //must come BEFORE IBZKPT
         KBIN::VASP_Error2Fix("IBZKPT",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
         KBIN::VASP_Error2Fix("SYMPREC",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);  //must come before INVGRP
-        KBIN::VASP_Error2Fix("INVGRP",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
-        KBIN::VASP_Error2Fix("SGRCON",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
+        KBIN::VASP_Error2Fix("INVGRP","SYMPREC",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
+        KBIN::VASP_Error2Fix("SGRCON","SYMPREC",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
         // ********* APPLY GENERIC SYMMETRY FIXES ******************
         KBIN::VASP_Error2Fix("ROTMAT",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
+        
+        // ********* APPLY PREFERRED RMM-DIIS FIXES ******************  //all of these must come before RMM-DIIS
+        KBIN::VASP_Error2Fix("ZBRENT",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
+        // ********* APPLY GENERIC RMM-DIIS FIXES ******************
+        KBIN::VASP_Error2Fix("RMM_DIIS",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
+        
         // ********* APPLY OTHER FIXES ******************
         KBIN::VASP_Error2Fix("BRMIX",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
         KBIN::VASP_Error2Fix("CSLOSHING",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
         KBIN::VASP_Error2Fix("DAV",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
         KBIN::VASP_Error2Fix("DENTET",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
         KBIN::VASP_Error2Fix("EDDDAV",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
-        KBIN::VASP_Error2Fix("EDDRMM",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
         KBIN::VASP_Error2Fix("EFIELD_PEAD",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
         KBIN::VASP_Error2Fix("EXCCOR",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
         KBIN::VASP_Error2Fix("GAMMA_SHIFT",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
@@ -3780,6 +3789,9 @@ namespace KBIN {
         KBIN::VASP_Error2Fix("REAL_OPTLAY_1","LREAL",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
         KBIN::VASP_Error2Fix("REAL_OPT","LREAL",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
         KBIN::VASP_Error2Fix("ZPOTRF",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
+        
+        //CO20210315 - do last, fixes assume out-of-memory error
+        KBIN::VASP_Error2Fix("CALC_FROZEN","MEMORY",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
         
         //come back - should we check if any xwarning() flag is still on?
 
@@ -3803,7 +3815,7 @@ namespace KBIN {
     if(!aurostd::FileExist(xvasp.Directory+"/OUTCAR")) {Krun=FALSE;KBIN::VASP_Error(xvasp,"EEEEE  file does not exist=OUTCAR");}
     if(aurostd::FileEmpty(xvasp.Directory+"/OUTCAR")) {Krun=FALSE;KBIN::VASP_Error(xvasp,"EEEEE  file empty=OUTCAR");}
     if(!aurostd::FileExist(xvasp.Directory+"/CONTCAR")) {Krun=FALSE;KBIN::VASP_Error(xvasp,"EEEEE  file does not exist=CONTCAR");}
-    if(aurostd::FileEmpty(xvasp.Directory+"/CONTCAR")) {Krun=FALSE;KBIN::VASP_Error(xvasp,"EEEEE  file xsempty=CONTCAR");}
+    if(aurostd::FileEmpty(xvasp.Directory+"/CONTCAR")) {Krun=FALSE;KBIN::VASP_Error(xvasp,"EEEEE  file is empty=CONTCAR");}
 
     if(LDEBUG){cerr << soliloquy << " Krun=" << Krun << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;}
     if(LDEBUG) {

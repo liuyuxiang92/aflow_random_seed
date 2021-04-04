@@ -6006,7 +6006,6 @@ namespace KBIN {
     else if(fix=="ENMAX"){apply_once=false;}
     else if(fix.find("KPOINTS+")!=string::npos||fix.find("KPOINTS-")!=string::npos){apply_once=false;}
     else if(fix=="NBANDS"){apply_once=false;}
-    else if(fix=="NELM"){apply_once=false;}
     else if(fix=="POTIM"){apply_once=false;}
     //add others here
     if(apply_once==true && xfixed.flag(fix)){return false;}
@@ -6019,7 +6018,7 @@ namespace KBIN {
       if(fix.find("ISMEAR=")!=string::npos){Krun=false;}  //specific smearing selected is very important
       //[CO20210315 - better to look for IBRION and NSW (linear-response calcs)]else if(fix=="POTIM"){Krun=false;}  //only applies to MD or ionic relaxations
     }
-    if(Krun && fix=="POTIM"){ //check for IBRION/NSW
+    if(Krun && (fix.find("RELAX_MODE")!=string::npos || fix=="POTIM")){ //check for IBRION/NSW
       VASP_Reread_INCAR(xvasp);
       if(!aurostd::kvpairfound(xvasp.INCAR,"IBRION","=")){Krun=false;}
       else{ //STATIC also has IBRION, but NSW=0 so POTIM has no effect
@@ -6428,19 +6427,12 @@ namespace KBIN {
     //try GAMMA_EVEN before GAMMA_ODD, as later solutions would benefit from and odd scheme
     //both GAMMA_EVEN and GAMMA_ODD are expected to increase at least some of the KPOINTS
 
-    if(mode=="BRMIX") {
-      //https://www.vasp.at/forum/viewtopic.php?f=3&t=1417
-      fix="ALGO=VERYFAST";
-      Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
-    }
-    else if(mode=="CSLOSHING") {
-      fix="ALGO=NORMAL";
-      Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
-    }
-    else if(mode=="DAV" || mode=="EDDDAV") {
-      //https://www.vasp.at/forum/viewtopic.php?f=2&t=10409&p=10434#:~:text=7%3A18%20am-,Re%3A%20on%20solving%20%22Error%20EDDDAV%3A%20Call%20to%20ZHEGV%20failed,Returncode%20%3D%20xx%22&text=This%20is%20an%20error%20of,of%20the%20very%20last%20one.
-      //solution: try flipping around different ALGOs
-      //previously it was IALGO=48, better to use ALGO=VERYFAST (same thing: https://www.vasp.at/wiki/index.php/ALGO)
+    if(mode=="BRMIX" || mode=="DAV" || mode=="EDDDAV") {
+      //https://www.vasp.at/forum/viewtopic.php?f=3&t=1417 (BRMIX)
+      //https://www.vasp.at/forum/viewtopic.php?t=7949 (BRMIX)
+      //https://www.vasp.at/forum/viewtopic.php?f=2&t=10409&p=10434#:~:text=7%3A18%20am-,Re%3A%20on%20solving%20%22Error%20EDDDAV%3A%20Call%20to%20ZHEGV%20failed,Returncode%20%3D%20xx%22&text=This%20is%20an%20error%20of,of%20the%20very%20last%20one. (EDDDAV)
+      //solution: try flipping around different ALGOs (EDDDAV)
+      //previously it was IALGO=48, better to use ALGO=VERYFAST (same thing: https://www.vasp.at/wiki/index.php/ALGO) (EDDDAV)
       if(submode<0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"no submode set: \""+mode+"\"",_INPUT_ILLEGAL_);}  //CO20210315
       if(submode==0){ //try ALGO=VERYFAST //CO20200624
         fix="ALGO=VERYFAST";
@@ -6470,6 +6462,10 @@ namespace KBIN {
       if(submode>=5){Krun=false;}
       submode+=submode_increment;submode_increment=1;  //increment and reset
     }
+    else if(mode=="CSLOSHING") {
+      fix="ALGO=NORMAL";
+      Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
+    }
     else if(mode=="DENTET") {
       //https://www.vasp.at/forum/viewtopic.php?f=3&t=416
       if(submode<0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"no submode set: \""+mode+"\"",_INPUT_ILLEGAL_);}  //CO20210315
@@ -6491,54 +6487,11 @@ namespace KBIN {
       if(submode>=3){Krun=false;}
       submode+=submode_increment;submode_increment=1;  //increment and reset
     }
-    else if(mode=="EDDRMM") {
-      //https://www.vasp.at/forum/viewtopic.php?f=3&t=214&p=215
-      if(submode<0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"no submode set: \""+mode+"\"",_INPUT_ILLEGAL_);}  //CO20210315
-      if(submode==0){ //try G-centered //CO20200624
-        fix="KPOINTS=GAMMA";
-        Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
-        if(!Krun){Krun=true;submode++;} //reset and go to the next solution
-      }
-      //else if(submode==1) //DO NOT USE else if, we may change submode inside
-      if(submode==1){ //CO20200624 - try ALGO=FAST (fast is faster than normal, try first)
-        //https://www.vasp.at/wiki/index.php/IALGO#RMM-DIIS
-        fix="ALGO=FAST";
-        Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
-        if(!Krun){Krun=true;submode++;} //reset and go to the next solution
-      }
-      if(submode==2){ //CO20200624 - try ALGO=NORMAL
-        fix="ALGO=NORMAL";
-        Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
-        if(!Krun){Krun=true;submode++;} //reset and go to the next solution
-      }
-      if(submode==3){ //CO20200624 - try RELAX_MODE=FORCES
-        fix="RELAX_MODE=FORCES";
-        Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
-        if(!Krun){Krun=true;submode++;} //reset and go to the next solution
-      }
-      if(submode==4){ //CO20200624 - try fixing POTIM
-        fix="POTIM";
-        Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
-        if(!Krun){Krun=true;submode++;} //reset and go to the next solution
-      }
-      if(submode==5){ //Gamma-odd (might increase ki) //CO20200624
-        fix="KPOINTS=GAMMA_ODD";
-        Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
-        if(!Krun){Krun=true;submode++;} //reset and go to the next solution
-      }
-      if(submode==6){ //increase KPOINTS //CO20200624
-        fix="KPOINTS++";
-        Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
-        if(!Krun){Krun=true;submode++;} //reset and go to the next solution
-      }
-      if(submode>=7){Krun=false;}
-      submode+=submode_increment;submode_increment=1;  //increment and reset
-    }
     else if(mode=="EFIELD_PEAD") {
       fix="EFIELD_PEAD";
       Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
     }
-    else if(mode=="EXCCOR") {
+    else if(mode=="EXCCOR" || mode=="NATOMS") {
       fix="POSCAR=VOLUME";
       Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
     }
@@ -6546,12 +6499,8 @@ namespace KBIN {
       fix="KPOINTS=GAMMA";
       Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
     }
-    else if(mode=="INVGRP" || mode=="SGRCON" || mode=="SYMPREC") {
-      fix="SYMPREC";
-      Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
-    }
     else if(mode=="KKSYM") {
-      //CO20210315 - tried SYMPREC and KPOINTS=GAMMA first in several tests, they never worked. KPOINTS=KMAX works everytime
+      //CO20210315 - tried SYMPREC and KPOINTS=GAMMA first in several tests, they never worked. KPOINTS=KMAX works every time
       //ROTMAT is trigged for KKSYM, it will try these other procedures anyway in the off change KPOINTS=KMAX doesn't work
       fix="KPOINTS=KMAX";
       Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
@@ -6567,7 +6516,7 @@ namespace KBIN {
         Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
-      //we might add lowering NBANDS here, as well as NGX, need to test...
+      //we might add lowering NBANDS here (add NBANDS++ and NBANDS--), as well as NGX, need to test...
       if(submode==1){ //skip run
         fix="SKIP_RUN";
         Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
@@ -6649,6 +6598,46 @@ namespace KBIN {
       fix="SYM=OFF";
       Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
     }
+    else if(mode=="RMM_DIIS") {
+      //https://www.vasp.at/forum/viewtopic.php?t=214 (EDDRMM)
+      //https://www.vasp.at/forum/viewtopic.php?f=3&t=18028 (NUM_PROB)
+      //problems with RMM-DIIS, avoid VERYFAST
+      if(submode<0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"no submode set: \""+mode+"\"",_INPUT_ILLEGAL_);}  //CO20210315
+      if(submode==0){ //CO20200624 - try ALGO=FAST (fast is faster than normal, try first)
+        //https://www.vasp.at/wiki/index.php/IALGO#RMM-DIIS
+        fix="ALGO=FAST";
+        Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
+        if(!Krun){Krun=true;submode++;} //reset and go to the next solution
+      }
+      //else if(submode==1) //DO NOT USE else if, we may change submode inside
+      if(submode==1){ //CO20200624 - try ALGO=NORMAL
+        fix="ALGO=NORMAL";
+        Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
+        if(!Krun){Krun=true;submode++;} //reset and go to the next solution
+      }
+      if(submode==2){ //Gamma-odd (might increase ki) //CO20200624
+        fix="KPOINTS=GAMMA_ODD";
+        Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
+        if(!Krun){Krun=true;submode++;} //reset and go to the next solution
+      }
+      if(submode==3){ //CO20200624 - try RELAX_MODE=FORCES
+        fix="RELAX_MODE=FORCES";
+        Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
+        if(!Krun){Krun=true;submode++;} //reset and go to the next solution
+      }
+      if(submode==4){ //CO20200624 - try fixing POTIM
+        fix="POTIM";
+        Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
+        if(!Krun){Krun=true;submode++;} //reset and go to the next solution
+      }
+      if(submode==5){ //increase KPOINTS //CO20200624
+        fix="KPOINTS++";
+        Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
+        if(!Krun){Krun=true;submode++;} //reset and go to the next solution
+      }
+      if(submode>=6){Krun=false;}
+      submode+=submode_increment;submode_increment=1;  //increment and reset
+    }
     else if(mode=="ROTMAT") {
       if(submode<0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"no submode set: \""+mode+"\"",_INPUT_ILLEGAL_);}  //CO20210315
       if(submode==0){ //try SYMPREC first (easy)
@@ -6657,7 +6646,7 @@ namespace KBIN {
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
       //else if(submode==1) //DO NOT USE else if, we may change submode inside
-      if(submode==1){ //Gamma
+      if(submode==1){ //Gamma without increasing KPOINTS
         fix="KPOINTS=GAMMA";
         Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
@@ -6685,6 +6674,15 @@ namespace KBIN {
       if(submode>=6){Krun=false;}
       submode+=submode_increment;submode_increment=1;  //increment and reset
     }
+    else if(mode=="SYMPREC") {
+      fix="SYMPREC";
+      Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
+    }
+    else if(mode=="ZBRENT") { //other RMM-DIIS patches will follow
+      //https://www.vasp.at/forum/viewtopic.php?t=1856
+      fix="RELAX_MODE=FORCES";
+      Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
+    }
     else if(mode=="ZPOTRF") {
       if(submode<0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"no submode set: \""+mode+"\"",_INPUT_ILLEGAL_);}  //CO20210315
       if(submode==0){  //CO20210315 - POTIM usually works
@@ -6697,6 +6695,8 @@ namespace KBIN {
         Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
+      //previously we tried "POSCAR=STANDARD_CONVENTIONAL", but it was turned off and has not been shown to work
+      //we keep here as a last-ditch effort
       if(submode==2){  //CO20210315 - try converting to standard conventional (previously not applied)
         fix="POSCAR=STANDARD_CONVENTIONAL";
         Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
@@ -6708,6 +6708,23 @@ namespace KBIN {
     else{
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"unknown mode: \""+mode+"\"",_INPUT_ILLEGAL_);  //CO20210315
     }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    //last-ditch efforts
+    
+    if(Krun==false){
+      //last ditch effort, increase volume
+      fix="POSCAR=VOLUME";
+      Krun=(xfixed.flag(fix)==false); //only try if it has not already been tried before
+      Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
+    }
+    if(Krun==false){
+      //last ditch effort, increase KPOINTS
+      fix="KPOINTS++";
+      Krun=(xfixed.flag(fix)==false); //only try if it has not already been tried before
+      Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
+    }
+    ///////////////////////////////////////////////////////////////////////////////////////////////
     
     if(Krun==false){
       submode=submode_orig; //restore original
