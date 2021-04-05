@@ -2917,7 +2917,7 @@ namespace KBIN {
     return content.find(aurostd::toupper(aurostd::RemoveWhiteSpaces(substring)))!=string::npos;
   }
   bool ReachedAccuracy2bool(const string& scheme,const aurostd::xoption& xRequiresAccuracy,const aurostd::xoption& xmessage,bool vasp_still_running){
-    if(!xRequiresAccuracy.flag(scheme)){return true;}  //this scheme does not require xmessage.flag("REACHED_ACCURACY"), return true for '&&' logic
+    if(xRequiresAccuracy.flag(scheme)==false){return true;}  //this scheme does not require xmessage.flag("REACHED_ACCURACY"), return true for '&&' logic
     return (vasp_still_running==false && xmessage.flag("REACHED_ACCURACY")==false);
   }
   void VASP_ProcessWarnings(_xvasp &xvasp,_aflags &aflags,_kflags &kflags,aurostd::xoption& xmessage,aurostd::xoption& xwarning,ofstream &FileMESSAGE) { //CO20210315
