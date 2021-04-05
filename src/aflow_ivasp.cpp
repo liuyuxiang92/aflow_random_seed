@@ -3812,11 +3812,11 @@ namespace KBIN {
     bool LDEBUG=(FALSE || _DEBUG_IVASP_ || XHOST.DEBUG);
     string function="KBIN::XVASP_INCAR_PREPARE_GENERIC";
     string soliloquy=XPID+function+"():";
-    string operation=function+" ("+command+")";
-    string operation_svalue=function+" ("+command+"="+svalue+")";
-    string operation_ivalue=function+" ("+command+"="+aurostd::utype2string(ivalue)+")";
-    string operation_dvalue=function+" ("+command+"="+aurostd::utype2string(dvalue,_IVASP_DOUBLE2STRING_PRECISION_)+")";
-    string operation_option=function+" ("+command+"="+(OPTION==ON?string("ON"):string("OFF"))+")";
+    string operation=function+"("+command+")";
+    string operation_svalue=function+"("+command+"="+svalue+")";
+    string operation_ivalue=function+"("+command+"="+aurostd::utype2string(ivalue)+")";
+    string operation_dvalue=function+"("+command+"="+aurostd::utype2string(dvalue,_IVASP_DOUBLE2STRING_PRECISION_)+")";
+    string operation_option=function+"("+command+"="+(OPTION==ON?string("ON"):string("OFF"))+")";
     
     //this function only changes xvasp.INCAR
     //no pre-load of INCAR, i.e., assume current INCAR is inside xvasp.INCAR
@@ -5166,11 +5166,14 @@ namespace KBIN {
     
     if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
 
+    string patch="#[AFLOW REMOVED"; //("+function+") //CO20210315 - this new comment style avoids figuring out how much to pad previously-padded line
+    if(!comment.empty()){patch+="("+comment+")";}
+    patch+="] ";
+    
     vector<string> vlines;
     aurostd::string2vectorstring(xvasp.INCAR.str(),vlines);
     aurostd::StringstreamClean(xvasp.INCAR);
     uint iline=0,i=0;
-    string patch="";
     bool found=false;
     for(iline=0;iline<vlines.size();iline++) {
       const string& strline=vlines[iline];
@@ -5179,8 +5182,7 @@ namespace KBIN {
         if(aurostd::kvpairfound(strline,vkeywords[i],"=")){found=true;}
       }
       if(found){
-        patch="#[AFLOW REMOVED ("+function+") "+comment+"] "; //CO20210315 - this new comment style avoids figuring out how much to pad previously-padded line
-        if(VERBOSE) xvasp.INCAR << patch << strline << endl;  //aurostd::PaddedPOST("# "+aurostd::RemoveWhiteSpacesFromTheFrontAndBack(strline),_incarpad_) << " # AFLOW REMOVED (" << function << ") " << comment << endl;
+        if(VERBOSE){xvasp.INCAR << patch << strline << endl;}  //aurostd::PaddedPOST("# "+aurostd::RemoveWhiteSpacesFromTheFrontAndBack(strline),_incarpad_) << " # AFLOW REMOVED (" << function << ") " << comment << endl;
       }else{
         if(VERBOSE||strline.length()){xvasp.INCAR << strline << endl;}
       }
@@ -5231,14 +5233,16 @@ namespace KBIN {
         cerr << "[iline=" << iline << "]=\"" << vlines[iline] << "\"" << endl;
       }
     }
+        
+    string patch="#[AFLOW REMOVED"; //("+function+")
+    if(!comment.empty()){patch+=" ("+comment+")";}
+    patch+="] ";
 
-    //this code is very similar to that in XVASP_INCAR_REMOVE_ENTRY()
-    //do not combine/generalize since that function uses substring2bool()
-    //leave default behavior alone
+    //vkeywords2ignore avoids matching ALGO and IAGO, AFLOW has no particular delimiter (kvpairfound)
 
     bool mod_made=false;
     bool found=false,found_ignore=false;
-    string line="",patch="";
+    string line="";
     for(iline=0;iline<vlines.size();iline++) {
       line=aurostd::RemoveComments(vlines[iline]);
       found=false;
@@ -5254,8 +5258,6 @@ namespace KBIN {
       }
       if(found==false){vlines_new.push_back(vlines[iline]);}
       else{ //found==true
-        patch="#[AFLOW REMOVED ("+function+") "+comment+"] ";
-        //if(!comment.empty()){patch+="["+comment+"] ";}
         vlines_new.push_back( patch+vlines[iline] );
         mod_made=true;
       }
@@ -5316,7 +5318,7 @@ namespace KBIN {
 
     if(!comment.empty()){
       for(iline=0;iline<vlines2add.size();iline++) {
-        vlines.push_back( aurostd::PaddedPOST(vlines2add[iline],_AFLOWINPAD_)+" // "+comment );
+        vlines.push_back( aurostd::PaddedPOST(vlines2add[iline],_AFLOWINPAD_)+" // Self Correction ("+comment+")");
       }
     }
     else{vlines.insert(vlines.end(),vlines2add.begin(),vlines2add.end());}
@@ -5859,8 +5861,8 @@ namespace KBIN {
     //[CO20210315 - avoid writing orig]xvasp.aopts.flag("FLAG::XVASP_INCAR_changed",TRUE); //CO20200624
     
     // fix aflow.in
-    KBIN::AFLOWIN_REMOVE(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]NBANDS","Self Correction "+function);
-    KBIN::AFLOWIN_ADD(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]NBANDS="+aurostd::utype2string(nbands,_IVASP_DOUBLE2STRING_PRECISION_),"Self Correction "+function);
+    KBIN::AFLOWIN_REMOVE(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]NBANDS",function);
+    KBIN::AFLOWIN_ADD(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]NBANDS="+aurostd::utype2string(nbands,_IVASP_DOUBLE2STRING_PRECISION_),function);
 
     return true;
   }
@@ -5904,8 +5906,8 @@ namespace KBIN {
     //[CO20210315 - avoid writing orig]xvasp.aopts.flag("FLAG::XVASP_INCAR_changed",TRUE); //CO20200624
     
     // fix aflow.in
-    KBIN::AFLOWIN_REMOVE(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]POTIM","Self Correction "+function);
-    KBIN::AFLOWIN_ADD(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]POTIM="+aurostd::utype2string(potim,_IVASP_DOUBLE2STRING_PRECISION_),"Self Correction "+function);
+    KBIN::AFLOWIN_REMOVE(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]POTIM",function);
+    KBIN::AFLOWIN_ADD(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]POTIM="+aurostd::utype2string(potim,_IVASP_DOUBLE2STRING_PRECISION_),function);
 
     return true;
   }
@@ -6032,7 +6034,7 @@ namespace KBIN {
     string function="KBIN::XVASP_Afix_ApplyFix";
     string soliloquy=XPID+function+"():";
     string fix=aurostd::toupper(_fix);
-    string fix_str="(FIX=\""+fix+"\")";
+    string fix_str="("+fix+")";
     string operation=function+fix_str;
     string incar_input="";
     stringstream aus;
@@ -6106,8 +6108,8 @@ namespace KBIN {
       if(Krun){aus << "MMMMM  MESSAGE applied FIX=\"" << fix << "\"" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
       //START - add fix to _AFLOWIN_
       if(Krun){
-        KBIN::AFLOWIN_REMOVE(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]ALGO=","Self Correction "+operation);
-        KBIN::AFLOWIN_ADD(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]ALGO="+param_string,"Self Correction "+operation);
+        KBIN::AFLOWIN_REMOVE(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]ALGO=",operation);
+        KBIN::AFLOWIN_ADD(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]ALGO="+param_string,operation);
       }
       //END - add fix to _AFLOWIN_ 
     }
@@ -6331,8 +6333,8 @@ namespace KBIN {
       if(Krun){aus << "MMMMM  MESSAGE applied FIX=\"" << fix << "\"" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
       //START - add fix to _AFLOWIN_ 
       if(Krun){
-        KBIN::AFLOWIN_REMOVE(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]CONVERT_UNIT_CELL=","Self Correction "+operation);
-        KBIN::AFLOWIN_ADD(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]CONVERT_UNIT_CELL=SCONV","Self Correction "+operation);
+        KBIN::AFLOWIN_REMOVE(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]CONVERT_UNIT_CELL=",operation);
+        KBIN::AFLOWIN_ADD(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]CONVERT_UNIT_CELL=SCONV",operation);
       }
       //END - add fix to _AFLOWIN_ 
     }
@@ -6368,8 +6370,8 @@ namespace KBIN {
       if(Krun){aus << "MMMMM  MESSAGE applied FIX=\"" << fix << "\"" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
       //START - add fix to _AFLOWIN_
       if(Krun){
-        KBIN::AFLOWIN_REMOVE(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]RELAX_MODE=","Self Correction "+operation);
-        KBIN::AFLOWIN_ADD(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]RELAX_MODE=FORCES","Self Correction "+operation);
+        KBIN::AFLOWIN_REMOVE(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]RELAX_MODE=",operation);
+        KBIN::AFLOWIN_ADD(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]RELAX_MODE=FORCES",operation);
       }
       //END - add fix to _AFLOWIN_ 
     }
@@ -6405,8 +6407,8 @@ namespace KBIN {
       if(Krun){aus << "MMMMM  MESSAGE applied FIX=\"" << fix << "\"" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
       //START - add fix to _AFLOWIN_
       if(Krun){
-        KBIN::AFLOWIN_REMOVE(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]SYM=","Self Correction "+operation);
-        KBIN::AFLOWIN_ADD(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]SYM=OFF","Self Correction "+operation);
+        KBIN::AFLOWIN_REMOVE(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]SYM=",operation);
+        KBIN::AFLOWIN_ADD(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]SYM=OFF",operation);
       }
       //END - add fix to _AFLOWIN_ 
     }
@@ -6455,8 +6457,6 @@ namespace KBIN {
     //maintain this feedback system to ensure aflow doesn't keep spinning its wheels on the same fixes
     string function="KBIN::XVASP_Afix";
     string soliloquy=XPID+function+"():";
-    //string fix_str="(fix="+mode+(submode>=0?",submode="+aurostd::utype2string(submode):"")+")";
-    //string operation=function+" "+fix_str;
     string file_error="",incar_input="";
     stringstream aus;
 
@@ -6480,9 +6480,15 @@ namespace KBIN {
     //try GAMMA_EVEN before GAMMA_ODD, as later solutions would benefit from and odd scheme
     //both GAMMA_EVEN and GAMMA_ODD are expected to increase at least some of the KPOINTS
 
-    if(mode=="BRMIX" || mode=="DAV" || mode=="EDDDAV") {
+    if(mode=="BRMIX"){
       //https://www.vasp.at/forum/viewtopic.php?f=3&t=1417 (BRMIX)
       //https://www.vasp.at/forum/viewtopic.php?t=7949 (BRMIX)
+      //CO20210315 - from several tests, "ALGO=VERYFAST" is the only solution that has worked
+      //keep this as the only solution and then try last-ditch efforts
+      fix="ALGO=VERYFAST";
+      Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
+    }
+    else if(mode=="DAV" || mode=="EDDDAV") {
       //https://www.vasp.at/forum/viewtopic.php?f=2&t=10409&p=10434#:~:text=7%3A18%20am-,Re%3A%20on%20solving%20%22Error%20EDDDAV%3A%20Call%20to%20ZHEGV%20failed,Returncode%20%3D%20xx%22&text=This%20is%20an%20error%20of,of%20the%20very%20last%20one. (EDDDAV)
       //solution: try flipping around different ALGOs (EDDDAV)
       //previously it was IALGO=48, better to use ALGO=VERYFAST (same thing: https://www.vasp.at/wiki/index.php/ALGO) (EDDDAV)
@@ -6502,17 +6508,7 @@ namespace KBIN {
         Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
-      if(submode==3){ //Gamma-odd (might increase ki) //CO20200624
-        fix="KPOINTS=GAMMA_ODD";
-        Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
-        if(!Krun){Krun=true;submode++;} //reset and go to the next solution
-      }
-      if(submode==4){ //increase KPOINTS //CO20200624
-        fix="KPOINTS++";
-        Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
-        if(!Krun){Krun=true;submode++;} //reset and go to the next solution
-      }
-      if(submode>=5){Krun=false;}
+      if(submode>=3){Krun=false;}
       submode+=submode_increment;submode_increment=1;  //increment and reset
     }
     else if(mode=="CSLOSHING") {
@@ -6521,24 +6517,9 @@ namespace KBIN {
     }
     else if(mode=="DENTET") {
       //https://www.vasp.at/forum/viewtopic.php?f=3&t=416
-      if(submode<0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"no submode set: \""+mode+"\"",_INPUT_ILLEGAL_);}  //CO20210315
-      if(submode==0){ //change smearing
-        fix="ISMEAR=2";
-        Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
-        if(!Krun){Krun=true;submode++;} //reset and go to the next solution
-      }
-      if(submode==1){ //Gamma-odd (might increase ki) //CO20200624
-        fix="KPOINTS=GAMMA_ODD";
-        Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
-        if(!Krun){Krun=true;submode++;} //reset and go to the next solution
-      }
-      if(submode==2){ //increase KPOINTS //CO20200624
-        fix="KPOINTS++";
-        Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
-        if(!Krun){Krun=true;submode++;} //reset and go to the next solution
-      }
-      if(submode>=3){Krun=false;}
-      submode+=submode_increment;submode_increment=1;  //increment and reset
+      fix="ISMEAR=2";
+      Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
+      if(!Krun){Krun=true;submode++;} //reset and go to the next solution
     }
     else if(mode=="EFIELD_PEAD") {
       fix="EFIELD_PEAD";
@@ -6689,17 +6670,13 @@ namespace KBIN {
         Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
-      if(submode==6){ //increase KPOINTS //CO20200624
-        fix="KPOINTS++";
-        Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
-        if(!Krun){Krun=true;submode++;} //reset and go to the next solution
-      }
-      if(submode>=7){Krun=false;}
+      if(submode>=6){Krun=false;}
       submode+=submode_increment;submode_increment=1;  //increment and reset
     }
     else if(mode=="ROTMAT") {
       if(submode<0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"no submode set: \""+mode+"\"",_INPUT_ILLEGAL_);}  //CO20210315
       if(submode==0){ //try SYMPREC first (easy)
+        //SYMPREC has been shown to work: LIB2/LIB/CeO/AB_tI4_139_b_a-001.AB
         fix="SYMPREC";
         Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
@@ -6772,13 +6749,19 @@ namespace KBIN {
     //last-ditch efforts
     
     if(Krun==false){
-      //last ditch effort, increase volume
-      fix="POSCAR=VOLUME";
+      //last-ditch effort, increase volume
+      fix="POSCAR=VOLUME";  //this is a great "general" solution
       Krun=(xfixed.flag(fix)==false); //only try if it has not already been tried before
       Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
     }
     if(Krun==false){
-      //last ditch effort, increase KPOINTS
+      //last-ditch effort, increase KPOINTS
+      fix="KPOINTS=GAMMA_ODD";  //this is a great "general" solution
+      Krun=(xfixed.flag(fix)==false); //only try if it has not already been tried before
+      Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
+    }
+    if(Krun==false){
+      //last-ditch effort, increase KPOINTS
       fix="KPOINTS++";
       Krun=(xfixed.flag(fix)==false); //only try if it has not already been tried before
       Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));

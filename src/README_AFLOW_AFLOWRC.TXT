@@ -1745,17 +1745,17 @@ AFLOW_CORE_TEMPERATURE_REFRESH
 ####################################################################################################
 DEFAULTS VASP MACHINE
 
-SLEEP_VASP_COMPLETION
-  description: Time (seconds) to wait for VASP to finish writing output files. Useful on clusters with NFS delays. Twice this number should be less than SLEEP_VASP_MONITOR to run with --monitor_vasp.
+SECONDS_SLEEP_VASP_COMPLETION
+  description: Time (seconds) to wait for VASP to finish writing output files. Useful on clusters with NFS delays. Twice this number should be less than SECONDS_SLEEP_VASP_MONITOR to run with --monitor_vasp.
   type: integer
   default: 15
 
-SLEEP_VASP_MONITOR
+SECONDS_SLEEP_VASP_MONITOR
   description: Time (seconds) to wait between monitoring loops for --monitor_vasp.
   type: integer
   default: 60
 
-STALE_VASP_OUT
+SECONDS_STALE_VASP_OUT
   description: Time (seconds) at which the DEFAULT_VASP_OUT file is considered stale (since last modified).
   type: integer
   default: 10800 (3 hours)
