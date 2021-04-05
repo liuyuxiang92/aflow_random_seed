@@ -3245,13 +3245,13 @@ namespace KBIN {
         }
       }
     }
-    //ZBRENT is a soft error, fix anything else first
-    if(xwarning.flag("ZBRENT") && 
-        ((xwarning.flag("OUTCAR_INCOMPLETE")==false && xwarning.vxscheme.size()>1) || (xwarning.flag("OUTCAR_INCOMPLETE") && xwarning.vxscheme.size()>2))){
-      aus << "MMMMM  MESSAGE ignoring xwarning.flag(\"ZBRENT\"): prioritizing other warnings first" << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-      xwarning.flag("ZBRENT",FALSE);
-      //we don't need an xmonitor here, this is only for prioritizing errors
-    }
+    //[CO20210315 - OBSOLETE]//ZBRENT is a soft error, fix anything else first
+    //[CO20210315 - OBSOLETE]if(xwarning.flag("ZBRENT") && 
+    //[CO20210315 - OBSOLETE]    ((xwarning.flag("OUTCAR_INCOMPLETE")==false && xwarning.vxscheme.size()>1) || (xwarning.flag("OUTCAR_INCOMPLETE") && xwarning.vxscheme.size()>2))){
+    //[CO20210315 - OBSOLETE]  aus << "MMMMM  MESSAGE ignoring xwarning.flag(\"ZBRENT\"): prioritizing other warnings first" << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+    //[CO20210315 - OBSOLETE]  xwarning.flag("ZBRENT",FALSE);
+    //[CO20210315 - OBSOLETE]  //we don't need an xmonitor here, this is only for prioritizing errors
+    //[CO20210315 - OBSOLETE]}
 
     //do last
     xwarning.flag("RMM_DIIS",xwarning.flag("EDDRMM") || xwarning.flag("NUM_PROB") || xwarning.flag("ZBRENT"));  //CO20210315 - can probably add others to this list as well
