@@ -3238,7 +3238,7 @@ namespace KBIN {
       if((xwarning.flag("OUTCAR_INCOMPLETE")==false && xwarning.vxscheme.size()>n_require_accuracy) || (xwarning.flag("OUTCAR_INCOMPLETE") && xwarning.vxscheme.size()>(n_require_accuracy+1))){
         for(i=0;i<xwarning.vxscheme.size();i++){
           if(xRequiresAccuracy.flag(xwarning.vxscheme[i])){
-            aus << "MMMMM  MESSAGE ignoring xwarning.flag(\""+xwarning.vxscheme[i]+"\"): prioritizing other warnings first (requires_accuracy==false)" << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+            aus << "MMMMM  MESSAGE ignoring xwarning.flag(\""+xwarning.vxscheme[i]+"\"): prioritizing other warnings first (requires accuracy)" << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
             xwarning.flag(xwarning.vxscheme[i],FALSE);
             //we don't need an xmonitor here, this is only for prioritizing errors
           }
