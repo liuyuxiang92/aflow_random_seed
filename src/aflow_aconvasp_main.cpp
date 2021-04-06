@@ -3131,10 +3131,9 @@ namespace pflow {
       osswrite=FALSE;
     }  
     // Perform full scan
-    bool no_scan = false;
     bool force_perform = true; //if no_scan fails, still return true at default tolerance (even though it cannot be validated)
     if(vpflow.flag("SYMMETRY::NO_SCAN")) {
-      no_scan=true;
+      a.sym_eps_no_scan=true; //DX20210406
     }
 
     bool tocompress = TRUE;
@@ -3200,7 +3199,7 @@ namespace pflow {
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_IATOMS_JSON+XHOST.vext.at(iext)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_IATOMS_JSON)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_IATOMS_JSON+"*");}
       }
     }
-    if(!pflow::PerformFullSymmetry(a,tolerance,no_scan,force_perform,FileMESSAGE,aflags,kflags,osswrite,oss,format)){
+    if(!pflow::PerformFullSymmetry(a,tolerance,a.sym_eps_no_scan,force_perform,FileMESSAGE,aflags,kflags,osswrite,oss,format)){
       return FALSE;
     }
     //DX20170803 - Print to symmetry operators to screen - START
@@ -5432,15 +5431,14 @@ namespace pflow {
     else { //default is txt
       format = "txt";
     }   
-    bool no_scan = false;
     if(vpflow.flag("DATA::NO_SCAN")){
-      no_scan = true;
+      a.sym_eps_no_scan=true; //DX20210406
     }
     if(format=="txt"){
       cout << aflow::Banner("BANNER_TINY") << endl;
     }
     // pflow::PrintData(a,cerr,smode);
-    pflow::PrintData(a,oss,tolerance,smode,no_scan,setting,format); //DX cout to oss
+    pflow::PrintData(a,oss,tolerance,smode,a.sym_eps_no_scan,setting,format); //DX cout to oss
     return true;
   }
 } // namespace pflow
@@ -5802,13 +5800,12 @@ namespace pflow {
       format = "txt";
     }
     // Perform full scan
-    bool no_scan = false;
     bool force_perform = true; //if no_scan fails, still return true at default tolerance (even though it cannot be validated)
     if(vpflow.flag("SYMMETRY::NO_SCAN")) {
-      no_scan=true;
+      a.sym_eps_no_scan=true; //DX20210406
     }
 
-    if(!pflow::PerformFullSymmetry(a,tolerance,no_scan,force_perform,FileMESSAGE,aflags,kflags,PRINT_SCREEN,cout)){
+    if(!pflow::PerformFullSymmetry(a,tolerance,a.sym_eps_no_scan,force_perform,FileMESSAGE,aflags,kflags,PRINT_SCREEN,cout)){
       message << "Could not find commensurate symmetry at tolerance = " << tolerance << " " << print_directory;
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_RUNTIME_ERROR_); //CO20200624
     }
@@ -6036,6 +6033,9 @@ namespace pflow {
     double orig_tolerance = a.sym_eps;
     if(!aflags.QUIET) aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "Symmetry: starting tolerance " << a.sym_eps << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
+    
+    a.sym_eps_no_scan = no_scan; //DX20210406
+    if(LDEBUG) {cerr << XPID << "pflow::PerformFullSymmetry: no_scan=" << a.sym_eps_no_scan << endl;}
 
     while(symmetry_commensurate==FALSE){
       //[DX OBSOLETE] a.SpaceGroup_ITC(a.sym_eps,orig_tolerance,-1,change_sym_count,no_scan); //rescales to 1.0 internally, but doesn't affect a
@@ -6053,14 +6053,15 @@ namespace pflow {
       // Calculate Lattice Point Group 
       if(kflags.KBIN_SYMMETRY_CALCULATE_PGROUP){ //DX20170814
         if(!SYM::CalculatePointGroup(FileMESSAGE,a,aflags,kflags.KBIN_SYMMETRY_PGROUP_WRITE,osswrite,oss,format)){
-          if(!no_scan){
+          if(LDEBUG){ cerr << soliloquy << " WARNING: PGROUP calculation is inconsisent." << endl; }
+          if(!a.sym_eps_no_scan){
             a.ClearSymmetry();
-            //DX20170905 [OBSOLETE] if(!SYM::change_tolerance(a,a.sym_eps,orig_tolerance,change_sym_count,min_dist,no_scan))
-            if(!SYM::change_tolerance(a,a.sym_eps,min_dist,no_scan))
+            //DX20170905 [OBSOLETE] if(!SYM::change_tolerance(a,a.sym_eps,orig_tolerance,change_sym_count,min_dist,a.sym_eps_no_scan))
+            if(!SYM::change_tolerance(a,a.sym_eps,min_dist,a.sym_eps_no_scan))
             { //CO20200106 - patching for auto-indenting
               a=b;  //pretty printing, unmodified structure
               if(force_perform){
-                cerr << XPID << "pflow::PerformFullSymmetry: Scan failed [0]. Reverting back to original tolerance and recalculating as is (with aforementioned inconsistencies)." << print_directory << endl;
+                cerr << soliloquy << " Scan failed [0]. Reverting back to original tolerance and recalculating as is (with aforementioned inconsistencies)." << print_directory << endl;
                 PerformFullSymmetry(a,orig_tolerance,true,false,FileMESSAGE,aflags,kflags,osswrite,oss,format);
               } else {
                 return FALSE;
@@ -6074,14 +6075,15 @@ namespace pflow {
       } //DX20170814
       if(kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK){ //DX20170814
         if(!SYM::CalculatePointGroupKLattice(FileMESSAGE,a,aflags,kflags.KBIN_SYMMETRY_PGROUPK_WRITE,osswrite,oss,format)){
-          if(!no_scan){
+          if(LDEBUG){ cerr << soliloquy << " WARNING: PGROUPK calculation is inconsisent." << endl; }
+          if(!a.sym_eps_no_scan){
             a.ClearSymmetry();
-            //DX20170905 [OBSOLETE] if(!SYM::change_tolerance(a,a.sym_eps,orig_tolerance,change_sym_count,min_dist,no_scan))
-            if(!SYM::change_tolerance(a,a.sym_eps,min_dist,no_scan))
+            //DX20170905 [OBSOLETE] if(!SYM::change_tolerance(a,a.sym_eps,orig_tolerance,change_sym_count,min_dist,a.sym_eps_no_scan))
+            if(!SYM::change_tolerance(a,a.sym_eps,min_dist,a.sym_eps_no_scan))
             { //CO20200106 - patching for auto-indenting
               a=b;  //pretty printing, unmodified structure
               if(force_perform){
-                cerr << XPID << "pflow::PerformFullSymmetry: Scan failed [1]. Reverting back to original tolerance and recalculating as is (with aforementioned inconsistencies)." << print_directory << endl;
+                cerr << soliloquy << " Scan failed [1]. Reverting back to original tolerance and recalculating as is (with aforementioned inconsistencies)." << print_directory << endl;
                 PerformFullSymmetry(a,orig_tolerance,true,false,FileMESSAGE,aflags,kflags,osswrite,oss,format);
               } else {
                 return FALSE;
@@ -6095,17 +6097,15 @@ namespace pflow {
       } //DX20170814
       // Check for identity element
       if(kflags.KBIN_SYMMETRY_CALCULATE_PGROUP && SYM::CheckForIdentity(a) == FALSE){
-        if(LDEBUG) { 
-          cerr << XPID << "pflow::PerformFullSymmetry: WARNING: Point group does not contain the identity element (impossible for a crystal)." << print_directory << endl;
-        }
-        if(!no_scan){
+        if(LDEBUG) { cerr << soliloquy << " WARNING: Point group does not contain the identity element (impossible for a crystal)." << print_directory << endl; }
+        if(!a.sym_eps_no_scan){
           a.ClearSymmetry();
-          //DX20170905 [OBSOLETE] if(!SYM::change_tolerance(a,a.sym_eps,orig_tolerance,change_sym_count,min_dist,no_scan))
-          if(!SYM::change_tolerance(a,a.sym_eps,min_dist,no_scan))
+          //DX20170905 [OBSOLETE] if(!SYM::change_tolerance(a,a.sym_eps,orig_tolerance,change_sym_count,min_dist,a.sym_eps_no_scan))
+          if(!SYM::change_tolerance(a,a.sym_eps,min_dist,a.sym_eps_no_scan))
           { //CO20200106 - patching for auto-indenting
             a=b;  //pretty printing, unmodified structure
             if(force_perform){
-              cerr << XPID << "pflow::PerformFullSymmetry: Scan failed [2]. Reverting back to original tolerance and recalculating as is (with aforementioned inconsistencies)." << print_directory << endl;
+              cerr << soliloquy << " Scan failed [2]. Reverting back to original tolerance and recalculating as is (with aforementioned inconsistencies)." << print_directory << endl;
               PerformFullSymmetry(a,orig_tolerance,true,false,FileMESSAGE,aflags,kflags,osswrite,oss,format);
             } else {
               return FALSE;
@@ -6119,14 +6119,15 @@ namespace pflow {
       // Calculate Factor Group 
       if(kflags.KBIN_SYMMETRY_CALCULATE_FGROUP){ //DX20170814
         if(!SYM::CalculateFactorGroup(FileMESSAGE,a,aflags,kflags.KBIN_SYMMETRY_FGROUP_WRITE,osswrite,oss,format)){
-          if(!no_scan){
+          if(LDEBUG){ cerr << soliloquy << " WARNING: FGROUP calculation is inconsisent." << endl; }
+          if(!a.sym_eps_no_scan){
             a.ClearSymmetry();
-            //DX20170905 [OBSOLETE] if(!SYM::change_tolerance(a,a.sym_eps,orig_tolerance,change_sym_count,min_dist,no_scan))
-            if(!SYM::change_tolerance(a,a.sym_eps,min_dist,no_scan))
+            //DX20170905 [OBSOLETE] if(!SYM::change_tolerance(a,a.sym_eps,orig_tolerance,change_sym_count,min_dist,a.sym_eps_no_scan))
+            if(!SYM::change_tolerance(a,a.sym_eps,min_dist,a.sym_eps_no_scan))
             { //CO20200106 - patching for auto-indenting
               a=b;  //pretty printing, unmodified structure
               if(force_perform){
-                cerr << XPID << "pflow::PerformFullSymmetry: Scan failed [3]. Reverting back to original tolerance and recalculating as is (with aforementioned inconsistencies)." << print_directory << endl;
+                cerr << soliloquy << " Scan failed [3]. Reverting back to original tolerance and recalculating as is (with aforementioned inconsistencies)." << print_directory << endl;
                 PerformFullSymmetry(a,orig_tolerance,true,false,FileMESSAGE,aflags,kflags,osswrite,oss,format);
               } else {
                 return FALSE;
@@ -6141,10 +6142,11 @@ namespace pflow {
       // Calculate Crystallographic Point Group 
       if(kflags.KBIN_SYMMETRY_CALCULATE_PGROUP_XTAL){ //DX20170814
         if(!SYM::CalculatePointGroupCrystal(FileMESSAGE,a,aflags,kflags.KBIN_SYMMETRY_PGROUP_XTAL_WRITE,osswrite,oss,format)){
-          if(!no_scan){
+          if(LDEBUG){ cerr << soliloquy << " WARNING: PGROUP_XTAL calculation is inconsisent." << endl; }
+          if(!a.sym_eps_no_scan){
             a.ClearSymmetry();
-            //DX20170905 [OBSOLETE] if(!SYM::change_tolerance(a,a.sym_eps,orig_tolerance,change_sym_count,min_dist,no_scan))
-            if(!SYM::change_tolerance(a,a.sym_eps,min_dist,no_scan))
+            //DX20170905 [OBSOLETE] if(!SYM::change_tolerance(a,a.sym_eps,orig_tolerance,change_sym_count,min_dist,a.sym_eps_no_scan))
+            if(!SYM::change_tolerance(a,a.sym_eps,min_dist,a.sym_eps_no_scan))
             { //CO20200106 - patching for auto-indenting
               a=b;  //pretty printing, unmodified structure
               if(force_perform){
@@ -6163,16 +6165,16 @@ namespace pflow {
       // Check if a point group map was found; if not, change tolerance
       if(kflags.KBIN_SYMMETRY_CALCULATE_PGROUP_XTAL && a.point_group_Hermann_Mauguin.empty() == TRUE){ //DX20170814
         if(LDEBUG) { 
-          cerr << XPID << "pflow::PerformFullSymmetry: WARNING: Point group crystal operations did not match with any Hermann-Mauguin symbols. (i.e. The set of symmetry elements found are not allowed possible for a crystal.) " << print_directory << endl;;
+          cerr << soliloquy << " WARNING: Point group crystal operations did not match with any Hermann-Mauguin symbols. (i.e. The set of symmetry elements found are not allowed possible for a crystal.) " << print_directory << endl;;
         }
-        if(!no_scan){
+        if(!a.sym_eps_no_scan){
           a.ClearSymmetry();
-          //DX20170905 [OBSOLETE] if(!SYM::change_tolerance(a,a.sym_eps,orig_tolerance,change_sym_count,min_dist,no_scan))
-          if(!SYM::change_tolerance(a,a.sym_eps,min_dist,no_scan))
+          //DX20170905 [OBSOLETE] if(!SYM::change_tolerance(a,a.sym_eps,orig_tolerance,change_sym_count,min_dist,a.sym_eps_no_scan))
+          if(!SYM::change_tolerance(a,a.sym_eps,min_dist,a.sym_eps_no_scan))
           { //CO20200106 - patching for auto-indenting
             a=b;  //pretty printing, unmodified structure
             if(force_perform){
-              cerr << XPID << "pflow::PerformFullSymmetry: Scan failed [5]. Reverting back to original tolerance and recalculating as is (with aforementioned inconsistencies)." << print_directory << endl;
+              cerr << soliloquy << " Scan failed [5]. Reverting back to original tolerance and recalculating as is (with aforementioned inconsistencies)." << print_directory << endl;
               PerformFullSymmetry(a,orig_tolerance,true,false,FileMESSAGE,aflags,kflags,osswrite,oss,format);
             } else {
               return FALSE;
@@ -6189,16 +6191,16 @@ namespace pflow {
         multiplicity_of_primitive = a.fgroup.size()/a.pgroup_xtal.size();
         if(a.fgroup.size()%a.pgroup_xtal.size() != 0){ //DX20170814
           if(LDEBUG) { 
-            cerr << XPID << "pflow::PerformFullSymmetry: WARNING: Number of factor groups is not an integer multiple of the point group crystal (fgroup: " << a.fgroup.size() << " vs pgroup_xtal: " << a.pgroup_xtal.size() << ")." << print_directory << endl;
+            cerr << soliloquy << " WARNING: Number of factor groups is not an integer multiple of the point group crystal (fgroup: " << a.fgroup.size() << " vs pgroup_xtal: " << a.pgroup_xtal.size() << ")." << print_directory << endl;
           }
-          if(!no_scan){
+          if(!a.sym_eps_no_scan){
             a.ClearSymmetry();
-            //DX20170905 [OBSOLETE] if(!SYM::change_tolerance(a,a.sym_eps,orig_tolerance,change_sym_count,min_dist,no_scan))
-            if(!SYM::change_tolerance(a,a.sym_eps,min_dist,no_scan))
+            //DX20170905 [OBSOLETE] if(!SYM::change_tolerance(a,a.sym_eps,orig_tolerance,change_sym_count,min_dist,a.sym_eps_no_scan))
+            if(!SYM::change_tolerance(a,a.sym_eps,min_dist,a.sym_eps_no_scan))
             { //CO20200106 - patching for auto-indenting
               a=b;  //pretty printing, unmodified structure
               if(force_perform){
-                cerr << XPID << "pflow::PerformFullSymmetry: Scan failed [6]. Reverting back to original tolerance and recalculating as is (with aforementioned inconsistencies)." << print_directory << endl;
+                cerr << soliloquy << " Scan failed [6]. Reverting back to original tolerance and recalculating as is (with aforementioned inconsistencies)." << print_directory << endl;
                 PerformFullSymmetry(a,orig_tolerance,true,false,FileMESSAGE,aflags,kflags,osswrite,oss,format);
               } else {
                 return FALSE;
@@ -6212,14 +6214,15 @@ namespace pflow {
       } //DX20170814
       if(kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_XTAL){ //DX20171205 - Added pgroupk_xtal
         if(!SYM::CalculatePointGroupKCrystal(FileMESSAGE,a,aflags,kflags.KBIN_SYMMETRY_PGROUPK_XTAL_WRITE,osswrite,oss,format)){ //DX20180118 - PGROUPK_XTAL not PGROUPK
-          if(!no_scan){
+          if(LDEBUG){ cerr << soliloquy << " WARNING: PGROUPK_XTAL calculation is inconsisent." << endl; }
+          if(!a.sym_eps_no_scan){
             a.ClearSymmetry();
-            //DX20170905 [OBSOLETE] if(!SYM::change_tolerance(a,a.sym_eps,orig_tolerance,change_sym_count,min_dist,no_scan))
-            if(!SYM::change_tolerance(a,a.sym_eps,min_dist,no_scan))
+            //DX20170905 [OBSOLETE] if(!SYM::change_tolerance(a,a.sym_eps,orig_tolerance,change_sym_count,min_dist,a.sym_eps_no_scan))
+            if(!SYM::change_tolerance(a,a.sym_eps,min_dist,a.sym_eps_no_scan))
             { //CO20200106 - patching for auto-indenting
               a=b;  //pretty printing, unmodified structure
               if(force_perform){
-                cerr << XPID << "pflow::PerformFullSymmetry: Scan failed [7]. Reverting back to original tolerance and recalculating as is (with aforementioned inconsistencies)." << print_directory << endl;
+                cerr << soliloquy << " Scan failed [7]. Reverting back to original tolerance and recalculating as is (with aforementioned inconsistencies)." << print_directory << endl;
                 PerformFullSymmetry(a,orig_tolerance,true,false,FileMESSAGE,aflags,kflags,osswrite,oss,format);
               } else {
                 return FALSE;
@@ -6245,10 +6248,10 @@ namespace pflow {
       //[DX OBSOLETE]      cerr << " | Space Group: --" << endl; 
       //[DX OBSOLETE]    }
       //[DX OBSOLETE]  }
-      //[DX OBSOLETE]  if(!no_scan){
+      //[DX OBSOLETE]  if(!a.sym_eps_no_scan){
       //[DX OBSOLETE]    a.ClearSymmetry();
-      //[DX OBSOLETE]    //DX20170905 [OBSOLETE] if(!SYM::change_tolerance(a,a.sym_eps,orig_tolerance,change_sym_count,min_dist,no_scan))
-      //[DX OBSOLETE]    if(!SYM::change_tolerance(a,a.sym_eps,min_dist,no_scan))
+      //[DX OBSOLETE]    //DX20170905 [OBSOLETE] if(!SYM::change_tolerance(a,a.sym_eps,orig_tolerance,change_sym_count,min_dist,a.sym_eps_no_scan))
+      //[DX OBSOLETE]    if(!SYM::change_tolerance(a,a.sym_eps,min_dist,a.sym_eps_no_scan))
       //[DX OBSOLETE]    {  //CO20200106 - patching for auto-indenting
       //[DX OBSOLETE]	    a=b;  //pretty printing, unmodified structure
       //[DX OBSOLETE]      if(force_perform){
@@ -6270,14 +6273,15 @@ namespace pflow {
       // Calculate Patterson Point Group 
       if(kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_PATTERSON){ //DX20200129
         if(!SYM::CalculatePointGroupKPatterson(FileMESSAGE,a,aflags,kflags.KBIN_SYMMETRY_PGROUPK_PATTERSON_WRITE,osswrite,oss,format)){
-          if(!no_scan){
+          if(LDEBUG){ cerr << soliloquy << " WARNING: PGROUPK_PATTERSON calculation is inconsisent." << endl; }
+          if(!a.sym_eps_no_scan){
             a.ClearSymmetry();
-            //DX20170905 [OBSOLETE] if(!SYM::change_tolerance(a,a.sym_eps,orig_tolerance,change_sym_count,min_dist,no_scan))
-            if(!SYM::change_tolerance(a,a.sym_eps,min_dist,no_scan))
+            //DX20170905 [OBSOLETE] if(!SYM::change_tolerance(a,a.sym_eps,orig_tolerance,change_sym_count,min_dist,a.sym_eps_no_scan))
+            if(!SYM::change_tolerance(a,a.sym_eps,min_dist,a.sym_eps_no_scan))
             { //CO20200106 - patching for auto-indenting
               a=b;  //pretty printing, unmodified structure
               if(force_perform){
-                cerr << "pflow::PerformFullSymmetry: Scan failed [0]. Reverting back to original tolerance and recalculating as is (with aforementioned inconsistencies)." << print_directory << endl;
+                cerr << soliloquy << " Scan failed [0]. Reverting back to original tolerance and recalculating as is (with aforementioned inconsistencies)." << print_directory << endl;
                 PerformFullSymmetry(a,orig_tolerance,true,false,FileMESSAGE,aflags,kflags,osswrite,oss,format);
               } else {
                 return FALSE;
@@ -6301,10 +6305,11 @@ namespace pflow {
         a.sgroup_radius=kflags.KBIN_SYMMETRY_SGROUP_RADIUS;
         // Calculate Space Group
         if(!SYM::CalculateSpaceGroup(FileMESSAGE,a,aflags,kflags.KBIN_SYMMETRY_SGROUP_WRITE,osswrite,oss,format)){
-          if(!no_scan){
+          if(LDEBUG){ cerr << soliloquy << " WARNING: SGROUP calculation is inconsisent." << endl; }
+          if(!a.sym_eps_no_scan){
             a.ClearSymmetry();
-            //DX20170905 [OBSOLETE] if(!SYM::change_tolerance(a,a.sym_eps,orig_tolerance,change_sym_count,min_dist,no_scan))
-            if(!SYM::change_tolerance(a,a.sym_eps,min_dist,no_scan))
+            //DX20170905 [OBSOLETE] if(!SYM::change_tolerance(a,a.sym_eps,orig_tolerance,change_sym_count,min_dist,a.sym_eps_no_scan))
+            if(!SYM::change_tolerance(a,a.sym_eps,min_dist,a.sym_eps_no_scan))
             { //CO20200106 - patching for auto-indenting
               a=b;  //pretty printing, unmodified structure
               if(force_perform){
@@ -6323,14 +6328,15 @@ namespace pflow {
       // Calculate inequivalent atoms
       if(kflags.KBIN_SYMMETRY_CALCULATE_IATOMS){ //DX20170814
         if(!SYM::CalculateInequivalentAtoms(FileMESSAGE,a,aflags,kflags.KBIN_SYMMETRY_IATOMS_WRITE,osswrite,oss,format)){
-          if(!no_scan){
+          if(LDEBUG){ cerr << soliloquy << " WARNING: IATOMS calculation is inconsisent." << endl; }
+          if(!a.sym_eps_no_scan){
             a.ClearSymmetry();
-            //DX20170905 [OBSOLETE] if(!SYM::change_tolerance(a,a.sym_eps,orig_tolerance,change_sym_count,min_dist,no_scan))
-            if(!SYM::change_tolerance(a,a.sym_eps,min_dist,no_scan))
+            //DX20170905 [OBSOLETE] if(!SYM::change_tolerance(a,a.sym_eps,orig_tolerance,change_sym_count,min_dist,a.sym_eps_no_scan))
+            if(!SYM::change_tolerance(a,a.sym_eps,min_dist,a.sym_eps_no_scan))
             { //CO20200106 - patching for auto-indenting  
               a=b;  //pretty printing, unmodified structure
               if(force_perform){
-                cerr << XPID << "pflow::PerformFullSymmetry: Scan failed [9]. Reverting back to original tolerance and recalculating as is (with aforementioned inconsistencies)." << print_directory << endl;
+                cerr << soliloquy << " Scan failed [9]. Reverting back to original tolerance and recalculating as is (with aforementioned inconsistencies)." << print_directory << endl;
                 PerformFullSymmetry(a,orig_tolerance,true,false,FileMESSAGE,aflags,kflags,osswrite,oss,format);
               } else {
                 return FALSE;
@@ -6350,13 +6356,11 @@ namespace pflow {
           }
         }
         if(iatoms_commensurate == FALSE){
-          if(LDEBUG) { 
-            cerr << XPID << "pflow::PerformFullSymmetry: WARNING: Number of equivalent atoms is not an integer multiple of the number factor groups." << print_directory << endl;
-          }
-          if(!no_scan){
+          if(LDEBUG) { cerr << soliloquy << " WARNING: Number of equivalent atoms is not an integer multiple of the number factor groups." << print_directory << endl; }
+          if(!a.sym_eps_no_scan){
             a.ClearSymmetry();
-            //DX20170905 [OBSOLETE] if(!SYM::change_tolerance(a,a.sym_eps,orig_tolerance,change_sym_count,min_dist,no_scan))
-            if(!SYM::change_tolerance(a,a.sym_eps,min_dist,no_scan))
+            //DX20170905 [OBSOLETE] if(!SYM::change_tolerance(a,a.sym_eps,orig_tolerance,change_sym_count,min_dist,a.sym_eps_no_scan))
+            if(!SYM::change_tolerance(a,a.sym_eps,min_dist,a.sym_eps_no_scan))
             { //CO20200106 - patching for auto-indenting
               a=b;  //pretty printing, unmodified structure
               if(force_perform){
@@ -6375,14 +6379,15 @@ namespace pflow {
       // Calculate site point group
       if(kflags.KBIN_SYMMETRY_CALCULATE_AGROUP){ //DX20170814
         if(!SYM::CalculateSitePointGroup(FileMESSAGE,a,aflags,kflags.KBIN_SYMMETRY_AGROUP_WRITE,osswrite,oss,format)){
-          if(!no_scan){
+          if(LDEBUG){ cerr << soliloquy << " WARNING: AGROUP calculation is inconsisent." << endl; }
+          if(!a.sym_eps_no_scan){
             a.ClearSymmetry();
-            //DX20170905 [OBSOLETE] if(!SYM::change_tolerance(a,a.sym_eps,orig_tolerance,change_sym_count,min_dist,no_scan))
-            if(!SYM::change_tolerance(a,a.sym_eps,min_dist,no_scan))
+            //DX20170905 [OBSOLETE] if(!SYM::change_tolerance(a,a.sym_eps,orig_tolerance,change_sym_count,min_dist,a.sym_eps_no_scan))
+            if(!SYM::change_tolerance(a,a.sym_eps,min_dist,a.sym_eps_no_scan))
             { //CO20200106 - patching for auto-indenting
               a=b;  //pretty printing, unmodified structure
               if(force_perform){
-                cerr << XPID << "pflow::PerformFullSymmetry: Scan failed [11]. Reverting back to original tolerance and recalculating as is (with aforementioned inconsistencies)." << print_directory << endl;
+                cerr << soliloquy << " Scan failed [11]. Reverting back to original tolerance and recalculating as is (with aforementioned inconsistencies)." << print_directory << endl;
                 PerformFullSymmetry(a,orig_tolerance,true,false,FileMESSAGE,aflags,kflags,osswrite,oss,format);
               } else {
                 return FALSE;
@@ -6398,6 +6403,18 @@ namespace pflow {
     }
     a.ReScale(b.scale);                   //the nuclear option, only way to fix all of the issues with f2c/c2f/ctau/ctrasl/etc.
     a.lattice=b.lattice;a.scale=b.scale;  //perfect printing, we should also fix cpos of all atoms, but not really worried since we usually print fpos
+
+    if(LDEBUG){
+      cerr << soliloquy << " SYMMETRY CALCULATION IS COMPLETE." << endl;
+      cerr << soliloquy << " # pgroup: " << a.pgroup.size() << endl;
+      cerr << soliloquy << " # pgroupk: " << a.pgroupk.size() << endl;
+      cerr << soliloquy << " # fgroup: " << a.fgroup.size() << endl;
+      cerr << soliloquy << " # pgroup_xtal: " << a.pgroup_xtal.size() << endl;
+      cerr << soliloquy << " # pgroupk_xtal: " << a.pgroupk_xtal.size() << endl;
+      cerr << soliloquy << " # pgroupk_Patterson: " << a.pgroupk_Patterson.size() << endl;
+      cerr << soliloquy << " # sgroup: " << a.sgroup.size() << endl;
+      cerr << soliloquy << " # agroup: " << a.agroup.size() << endl;
+    }
     return symmetry_commensurate;
   }
 }
@@ -6531,9 +6548,8 @@ namespace pflow {
     //    }
     //DX
     // Perform full scan
-    bool no_scan = false;
     if(vpflow.flag("FULLSYMMETRY::NO_SCAN")) {
-      no_scan=true;
+      a.sym_eps_no_scan = true; //DX20210406
     }
 
     bool tocompress = TRUE;
@@ -6603,7 +6619,7 @@ namespace pflow {
       }
     }	
 
-    if(!pflow::PerformFullSymmetry(a,tolerance,no_scan,true,FileMESSAGE,aflags,kflags,osswrite,oss,format)){
+    if(!pflow::PerformFullSymmetry(a,tolerance,a.sym_eps_no_scan,true,FileMESSAGE,aflags,kflags,osswrite,oss,format)){
       return FALSE;
     }
 
@@ -11184,7 +11200,8 @@ namespace pflow {
 namespace pflow {
   xstructure PRIM(istream& input,uint mode) {
     xstructure a(input,IOAFLOW_AUTO);
-    if(mode==0) return GetPrimitive(a,0.005);
+    //DX20210406 [OBSOLETE] if(mode==0) return GetPrimitive(a,0.005);
+    if(mode==0) return GetPrimitive(a); //DX20210406
     if(mode==1) return GetPrimitive1(a);
     if(mode==2) return GetPrimitive2(a);
     if(mode==3) return GetPrimitive3(a);
@@ -13691,19 +13708,18 @@ namespace pflow {
       }
       //DX20200817 - SPACEGROUP SPECTRUM - END
       //DX20170926 - NO SCAN - START
-      bool no_scan = false;
       if(vpflow.flag("SG::NO_SCAN")){
-        no_scan = true;
+	a.sym_eps_no_scan = true; //DX20210406
       }
       //DX20170926 - NO SCAN - END
       if(!tolerance_spectrum_analysis){
-        uint sgroup=a.SpaceGroup_ITC(tolerance,no_scan);
+        uint sgroup=a.SpaceGroup_ITC(tolerance,a.sym_eps_no_scan);
         a.spacegroup=GetSpaceGroupName(sgroup,a.directory)+" #"+aurostd::utype2string(sgroup); //DX20190319 - put directory name
       }
       else{
         // perform space group analysis through a range of tolerances //DX20200820
         for(uint i=0;i<tolerance_spectrum.size();i++){
-          uint sgroup=a.SpaceGroup_ITC(tolerance_spectrum[i],no_scan);
+          uint sgroup=a.SpaceGroup_ITC(tolerance_spectrum[i],a.sym_eps_no_scan);
           try{
             GetSpaceGroupName(sgroup,a.directory);
             cout << "tol=" << tolerance_spectrum[i] << ": " << GetSpaceGroupName(sgroup,a.directory) << " #" << aurostd::utype2string(sgroup) << endl;
@@ -13938,15 +13954,14 @@ namespace pflow {
     else { //default is txt
       format = "txt";
     }   
-    bool no_scan = false;
     if(vpflow.flag("SGDATA::NO_SCAN")){
-      no_scan = true;
+      a.sym_eps_no_scan = true; //DX20210406
     }
     if(format=="txt"){
       cout << aflow::Banner("BANNER_TINY") << endl;
     }
     // pflow::PrintData(a,cerr,smode);
-    pflow::PrintSGData(a,tolerance,oss,no_scan,setting,true,format,false); //CO20171027 //DX20180806 - added setting
+    pflow::PrintSGData(a,tolerance,oss,a.sym_eps_no_scan,setting,true,format,false); //CO20171027 //DX20180806 - added setting
     return true;
   }
 } // namespace pflow
@@ -14269,12 +14284,11 @@ namespace pflow {
     }
 
     // tolerance scan 
-    bool no_scan = false;
     if(vpflow.flag("WYCCAR::NO_SCAN")) {
-      no_scan=true;
+      str.sym_eps_no_scan = true; //DX20210406
     }
     //DX20190201 START
-    uint space_group_number = str.SpaceGroup_ITC(tolerance,-1,setting,no_scan);
+    uint space_group_number = str.SpaceGroup_ITC(tolerance,-1,setting,str.sym_eps_no_scan);
 
     if(letters_only){
       string letters = SYM::ExtractWyckoffLettersString(str.wyccar_ITC);

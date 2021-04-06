@@ -23,6 +23,8 @@
 
 #define _EPS_ 0.02
 
+#define DEBUG_LATTICE_DIMENSIONS false //DX20210401
+
 //#define _pocc_precision_ 5  //CO20170630 - we should really be fixing default vs. fixed
 // tested right
 // ./aflow --zval=/common/LIB3/LIB/AgCdZn/TFCC013.ABC
@@ -1233,28 +1235,71 @@ uint XATOM_SplitAlloyPseudoPotentials(const string& alloy_in, vector<string> &sp
 //DX20200724 [OBSOLETE] //DX composition2stoichiometry - 20181009 - END
 
 // ***************************************************************************
-// getLeastFrequentAtomTypes() //DX20201230 - moved from XtalFinder
+// getAtomsByType() //DX20210322
 // ***************************************************************************
-vector<string> getLeastFrequentAtomTypes(const xstructure& xstr, bool clean) {
+deque<_atom> getAtomsByType(const xstructure& xstr, int type) {
 
-  // The least frequent atom type is the species with the smallest
+  string function_name = XPID + "getAtomsByType():";
+  stringstream message;
+  
+  uint natoms = xstr.atoms.size();
+
+  deque<_atom> atoms_subset;
+  for(uint i=0; i<natoms; i++) {
+    if(xstr.atoms[i].type == type){ atoms_subset.push_back(xstr.atoms[i]); }
+  }
+
+  if(atoms_subset.size() == 0){
+    message << "No atoms found with type = " << type << ". Check structure.";
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
+  }
+
+  return atoms_subset;
+}
+
+// ***************************************************************************
+// getAtomsByName() //DX20210322
+// ***************************************************************************
+deque<_atom> getAtomsByName(const xstructure& xstr, const string& name) {
+
+  string function_name = XPID + "getAtomsByName():";
+  stringstream message;
+
+  uint natoms = xstr.atoms.size();
+
+  deque<_atom> atoms_subset;
+  for(uint i=0; i<natoms; i++) {
+    if(xstr.atoms[i].name == name){ atoms_subset.push_back(xstr.atoms[i]); }
+  }
+
+  if(atoms_subset.size() == 0){
+    message << "No atoms found with name = " << name << ". Check structure.";
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
+  }
+
+  return atoms_subset;
+}
+
+
+// ***************************************************************************
+// getLeastFrequentAtomTypes() //DX20210322
+// ***************************************************************************
+vector<uint> getLeastFrequentAtomTypes(const xstructure& xstr) {
+
+  // The least frequent atom type is the atom type with the smallest
   // concentration in the crystal. The atoms of this type are the minimal set
-  // of atoms that exhibit the crystal periodicity (useful for finding
+  // that exhibit the crystal periodicity (useful for finding
   // alternative lattices and translations).
-  // clean: cleans atom name (removes pseudopotential)
   // Returns ALL LFA types (could be more than one)
 
-  vector<string> lfa_types; // lfa = least frequent atom
+  vector<uint> lfa_types; // lfa = least frequent atom
 
   // find minimum type count
   int type_count_min = aurostd::min(xstr.num_each_type);
 
   // find the first species with this atom count
   for(uint i=0;i<xstr.num_each_type.size();i++){
-    if(xstr.num_each_type[i] == type_count_min){
-      if(clean){ lfa_types.push_back(KBIN::VASP_PseudoPotential_CleanName(xstr.species[i])); }
-      else{ lfa_types.push_back(xstr.species[i]); }
-    }
+    if(xstr.num_each_type[i] == type_count_min){ lfa_types.push_back(i); }
   }
 
   if(lfa_types.size() == 0){
@@ -1262,6 +1307,38 @@ vector<string> getLeastFrequentAtomTypes(const xstructure& xstr, bool clean) {
   }
 
   return lfa_types;
+}
+
+// ***************************************************************************
+// getLeastFrequentAtomSpecies() //DX20201230 - moved from XtalFinder
+// ***************************************************************************
+vector<string> getLeastFrequentAtomSpecies(const xstructure& xstr, bool clean) {
+
+  // The least frequent atom species is the species with the smallest
+  // concentration in the crystal. These atoms are the minimal set
+  // that exhibit the crystal periodicity (useful for finding
+  // alternative lattices and translations).
+  // clean: cleans atom name (removes pseudopotential)
+  // Returns ALL LFA species (could be more than one)
+
+  vector<string> lfa_species; // lfa = least frequent atom
+
+  // find minimum type count
+  int type_count_min = aurostd::min(xstr.num_each_type);
+
+  // find the first species with this atom count
+  for(uint i=0;i<xstr.num_each_type.size();i++){
+    if(xstr.num_each_type[i] == type_count_min){
+      if(clean){ lfa_species.push_back(KBIN::VASP_PseudoPotential_CleanName(xstr.species[i])); }
+      else{ lfa_species.push_back(xstr.species[i]); }
+    }
+  }
+
+  if(lfa_species.size() == 0){
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,"getLeastFrequentAtomTypes():","Least frequent atom species not found. Bad xstructure.",_INPUT_ERROR_);
+  }
+
+  return lfa_species;
 }
 
 // **************************************************************************
@@ -2370,6 +2447,7 @@ void xstructure::free() { //DX20191220 - moved all initializations from constuct
   sym_eps=AUROSTD_NAN; //DX
   sym_eps_calculated=false; //DX, this means that it was calculated and set by the symmetry routines
   sym_eps_change_count=0; //DX20180222 - added tolerance count specific to structure
+  sym_eps_no_scan=false; //DX20210331 - added no scan specific to structure
   //DX+CO END
   // PGROUP ----------------------------
   pgroup.clear();            // just initialize
@@ -2677,6 +2755,7 @@ void xstructure::copy(const xstructure& bstr) {
   sym_eps=bstr.sym_eps; //DX
   sym_eps_calculated=bstr.sym_eps_calculated; //DX
   sym_eps_change_count=bstr.sym_eps_change_count; //DX20180222 - added tolerance count specific to structure
+  sym_eps_no_scan=bstr.sym_eps_no_scan; //DX20210331 - added no scan specific to structure
   //DX+CO END
   // PGROUP ----------------------------
   pgroup.clear();
@@ -6292,6 +6371,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
   a.sym_eps=AUROSTD_NAN; //DX
   a.sym_eps_calculated=FALSE; //DX
   a.sym_eps_change_count=0; //DX20180222 - added tolerance count specific to structure
+  a.sym_eps_no_scan=false; //DX20210331 - added no scan specific to structure
   //DX+CO END
   a.iatoms_calculated=FALSE;
   a.pgroup_calculated=FALSE;
@@ -9995,7 +10075,9 @@ double RadiusSphereLattice(const xmatrix<double>& lattice,double scale) {
 
 xvector<int> LatticeDimensionSphere(const xmatrix<double>& _lattice, double radius,double scale) {
   // Adapted from AVDV routine
+#if DEBUG_LATTICE_DIMENSIONS
   bool LDEBUG=(FALSE || XHOST.DEBUG);
+#endif
   string soliloquy = XPID + "LatticeDimensionSphere():"; //CO20190520
   xmatrix<double> lattice; lattice=scale*_lattice;
   int i,j,k;
@@ -10024,11 +10106,13 @@ xvector<int> LatticeDimensionSphere(const xmatrix<double>& _lattice, double radi
           normals(3,l)+=aurostd::eijk(l,m,n)*lattice(1,m)*lattice(2,n);
         }
   }
+#if DEBUG_LATTICE_DIMENSIONS
   if(LDEBUG) {
     for(uint i=1;i<(uint)normals.rows+1;i++){
       cerr << soliloquy << " normals(" << i << ")=" << normals(i) << endl;
     }
   }
+#endif
   if(0) { // with eijk and estarijk
     for(int m=1;m<=3;m++)
       for(int n=1;n<=3;n++)
@@ -10044,11 +10128,13 @@ xvector<int> LatticeDimensionSphere(const xmatrix<double>& _lattice, double radi
   }
   //get the normals in the coordinates system of the lattice vectors
   invlattice=aurostd::inverse(lattice);
+#if DEBUG_LATTICE_DIMENSIONS
   if(LDEBUG) { //CO20190520
     cerr << soliloquy << " normals="<< endl;cerr << normals << endl; //CO20190520
     cerr << soliloquy << " lattice="<< endl;cerr << lattice << endl; //CO20190520
     cerr << soliloquy << " inverse(lattice)="<< endl;cerr << invlattice << endl; //CO20190520
   } //CO20190520
+#endif
 
   for(i=1;i<=3;i++) {
     for(j=1;j<=3;j++) {
@@ -10060,7 +10146,9 @@ xvector<int> LatticeDimensionSphere(const xmatrix<double>& _lattice, double radi
   //the diagonals of frac_normal contain the dimensions of the lattice grid that
   //encompasses a sphere of radius = radius
   for(i=1;i<=3;i++){
+#if DEBUG_LATTICE_DIMENSIONS
     if(LDEBUG) {cerr << soliloquy << " abs(frac_normals(i,i))=" << abs(frac_normals(i,i)) << endl;}
+#endif
     dim(i)=(int)ceil(abs(frac_normals(i,i)));
   }
   if(max(dim)==0) { 
@@ -10329,6 +10417,7 @@ void xstructure::GetLatticeType(xstructure& str_sp,xstructure& str_sc) {
     this->sym_eps=str_reciprocal_in.sym_eps=str_reciprocal_sp.sym_eps=str_reciprocal_sc.sym_eps=str_sp.sym_eps; //DX
     this->sym_eps_calculated=str_reciprocal_in.sym_eps_calculated=str_reciprocal_sp.sym_eps_calculated=str_reciprocal_sc.sym_eps_calculated=str_sp.sym_eps_calculated; //DX
     this->sym_eps_change_count=str_reciprocal_in.sym_eps_change_count=str_reciprocal_sp.sym_eps_change_count=str_reciprocal_sc.sym_eps_change_count=str_sp.sym_eps_change_count; //DX20180222 - added sym_eps change count
+    this->sym_eps_no_scan=str_reciprocal_in.sym_eps_no_scan=str_reciprocal_sp.sym_eps_no_scan=str_reciprocal_sc.sym_eps_no_scan=str_sp.sym_eps_no_scan; //DX20210331 - added sym_eps no scan
     //DX+CO END
     _atom atom;str_reciprocal_in.AddAtom(atom);
     //LATTICE::Standard_Lattice_Structure(str_reciprocal_in,str_reciprocal_sp,str_reciprocal_sc,eps,epsang); //SC OLD VERSION
@@ -10354,6 +10443,7 @@ void xstructure::GetLatticeType(xstructure& str_sp,xstructure& str_sc) {
     else {
       str_in.sym_eps = str_sp.sym_eps = str_sc.sym_eps = str_reciprocal_sp.sym_eps;
       str_in.sym_eps_change_count = str_sp.sym_eps_change_count = str_sc.sym_eps_change_count = str_reciprocal_sp.sym_eps_change_count; //DX20180222 - added sym_eps change count
+      str_in.sym_eps_no_scan = str_sp.sym_eps_no_scan = str_sc.sym_eps_no_scan = str_reciprocal_sp.sym_eps_no_scan; //DX20210331
     }
     //DX END
     this->reciprocal_lattice_type=str_reciprocal_sp.bravais_lattice_type;
@@ -10384,6 +10474,7 @@ void xstructure::GetLatticeType(xstructure& str_sp,xstructure& str_sc) {
     str_superlattice_in.sym_eps=str_superlattice_sp.sym_eps=str_superlattice_sc.sym_eps=str_sp.sym_eps; //DX
     str_superlattice_in.sym_eps_calculated=str_superlattice_sp.sym_eps_calculated=str_superlattice_sc.sym_eps_calculated=str_sp.sym_eps_calculated; //DX
     str_superlattice_in.sym_eps_change_count=str_superlattice_sp.sym_eps_change_count=str_superlattice_sc.sym_eps_change_count=str_sp.sym_eps_change_count; //DX20180222 - added sym_eps change count
+    str_superlattice_in.sym_eps_no_scan=str_superlattice_sp.sym_eps_no_scan=str_superlattice_sc.sym_eps_no_scan=str_sp.sym_eps_no_scan; //DX20210331 - added sym_eps no scan
     //DX+CO END
     //DX LATTICE::Standard_Lattice_Structure(str_superlattice_in,str_superlattice_sp,str_superlattice_sc,eps,epsang,ss,_EPS_); //JX
     LATTICE::Standard_Lattice_StructureDefault(str_superlattice_in,str_superlattice_sp,str_superlattice_sc,false); //DX //DX20180226 - do not need to do full sym for superlattice
@@ -10394,6 +10485,7 @@ void xstructure::GetLatticeType(xstructure& str_sp,xstructure& str_sc) {
     else {
       str_sp.sym_eps = str_superlattice_sp.sym_eps;
       str_sp.sym_eps_change_count = str_superlattice_sp.sym_eps_change_count; //DX20180222 - added sym_eps change count
+      str_sp.sym_eps_no_scan = str_superlattice_sp.sym_eps_no_scan; //DX20210331
     }
     //DX END
     if(VERBOSE) cerr << "xstructure::GetLatticeType: [12]" << endl;
@@ -10722,8 +10814,15 @@ void xstructure::UpdateSpecies(const _atom& atom){
 
   bool FOUND_SPECIES=FALSE;
   uint species_position=0;
-  for(uint isp=0;isp<species.size()&&FOUND_SPECIES==FALSE;isp++)
-    if(atom.name==species[isp]) {FOUND_SPECIES=TRUE;species_position=isp;}
+
+  if(!atom.name.empty()){ //DX20210324 - check if name is empty
+    for(uint isp=0;isp<species.size()&&FOUND_SPECIES==FALSE;isp++)
+      if(atom.name==species[isp]) {FOUND_SPECIES=TRUE;species_position=isp;}
+  }
+  else{ //DX20210324 - if name is empty, then use types
+    for(uint isp=0;isp<species.size()&&FOUND_SPECIES==FALSE;isp++)
+      if(atom.type==(int)isp) {FOUND_SPECIES=TRUE;species_position=isp;}
+  }
 
   if(FOUND_SPECIES==FALSE) {
     if(LDEBUG) cerr << "UpdateSpecies new_species=" << atom.name << endl;
@@ -12485,35 +12584,52 @@ xstructure GetPrimitive(const xstructure& a);
 
 xstructure GetPrimitive(const xstructure& _a,double tolerance) {
   // return GetPrimitiveMULTITHREAD(a);
-  bool LDEBUG=(FALSE || XHOST.DEBUG);
-  if(LDEBUG) cerr << "GetPrimitive(const xstructure& _a,double tolerance): BEGIN" << endl;
 
-  bool bool_backup=AFLOW_PTHREADS::FLAG;
-  uint uint_backup=AFLOW_PTHREADS::MAX_PTHREADS;
-  xstructure a(_a);
-  if(tolerance<=0.0) a.equiv_fpos_epsilon=_EQUIV_FPOS_EPS_; else a.equiv_fpos_epsilon=tolerance;
-
-  if(AFLOW_PTHREADS::RUNNING==0 && !AFLOW_PTHREADS::FLAG) { // force to save time
-    AFLOW_PTHREADS::FLAG=TRUE;   // put multithread by default in
-    AFLOW_PTHREADS::MAX_PTHREADS=XHOST.CPU_Cores;
-  }
-  // calc
   xstructure b;
-  if(AFLOW_PTHREADS::FLAG==TRUE) {
-    //    cerr << "GetPrimitiveMULTITHREAD a.equiv_fpos_epsilon=" << a.equiv_fpos_epsilon << endl;
-    b=GetPrimitiveMULTITHREAD(a,tolerance);
-  } else {
-    //    cerr << "GetPrimitiveSINGLE a.equiv_fpos_epsilon=" << a.equiv_fpos_epsilon << endl;
-    b=GetPrimitiveSINGLE(a,tolerance);
-  }
-  // restore and return
-  AFLOW_PTHREADS::FLAG=bool_backup;
-  AFLOW_PTHREADS::MAX_PTHREADS=uint_backup;
+  b=GetPrimitive_20210322(_a, tolerance); //DX20210406 - new/fast variant
+
+  //[DX TESTING] xstructure c;
+  //[DX TESTING] c=GetPrimitiveMULTITHREAD(a,tolerance);
+  //[DX TESTING] cerr << "STRUCTURES MATCH (ORIG vs OLD): " << compare::structuresMatch(a,b,false) << " (ORIG vs NEW): " << compare::structuresMatch(a,c,false) << endl;
+  //[DX TESTING] cerr << "VOLUMES: " << b.atoms.size()/c.atoms.size() << " (mod=" << b.atoms.size()%c.atoms.size() << ")" << endl;
+
+  // OLD VERSION - the version above is fast and does not need to be multithreaded
+  //DX20210406 [OBSOLETE] bool LDEBUG=(FALSE || XHOST.DEBUG);
+  //DX20210406 [OBSOLETE] if(LDEBUG) cerr << "GetPrimitive(const xstructure& _a,double tolerance): BEGIN" << endl;
+
+  //DX20210406 [OBSOLETE] bool bool_backup=AFLOW_PTHREADS::FLAG;
+  //DX20210406 [OBSOLETE] uint uint_backup=AFLOW_PTHREADS::MAX_PTHREADS;
+  //DX20210406 [OBSOLETE] xstructure a(_a);
+  //DX20210406 [OBSOLETE] if(tolerance<=0.0) a.equiv_fpos_epsilon=_EQUIV_FPOS_EPS_; else a.equiv_fpos_epsilon=tolerance;
+
+  //DX20210406 [OBSOLETE] if(AFLOW_PTHREADS::RUNNING==0 && !AFLOW_PTHREADS::FLAG) { // force to save time
+  //DX20210406 [OBSOLETE]   AFLOW_PTHREADS::FLAG=TRUE;   // put multithread by default in
+  //DX20210406 [OBSOLETE]   AFLOW_PTHREADS::MAX_PTHREADS=XHOST.CPU_Cores;
+  //DX20210406 [OBSOLETE] }
+  //DX20210406 [OBSOLETE] // calc
+  //DX20210406 [OBSOLETE] xstructure b;
+  //DX20210406 [OBSOLETE] b=GetPrimitiveMULTITHREAD(a,tolerance);
+
+  //DX20210406 [OBSOLETE] //if(AFLOW_PTHREADS::FLAG==TRUE) {
+  //DX20210406 [OBSOLETE] //  //    cerr << "GetPrimitiveMULTITHREAD a.equiv_fpos_epsilon=" << a.equiv_fpos_epsilon << endl;
+  //DX20210406 [OBSOLETE] //  b=GetPrimitiveMULTITHREAD(a,tolerance);
+  //DX20210406 [OBSOLETE] //} else {
+  //DX20210406 [OBSOLETE] //  //    cerr << "GetPrimitiveSINGLE a.equiv_fpos_epsilon=" << a.equiv_fpos_epsilon << endl;
+  //DX20210406 [OBSOLETE] //  b=GetPrimitiveSINGLE(a,tolerance);
+  //DX20210406 [OBSOLETE] //}
+  //DX20210406 [OBSOLETE] // restore and return
+  //DX20210406 [OBSOLETE] AFLOW_PTHREADS::FLAG=bool_backup;
+  //DX20210406 [OBSOLETE] AFLOW_PTHREADS::MAX_PTHREADS=uint_backup;
+
   return b;
 }
 
 xstructure GetPrimitive(const xstructure& a) {
-  return GetPrimitive(a,_EQUIV_FPOS_EPS_);
+  //DX20210401 [OBSOLETE] return GetPrimitive(a,_EQUIV_FPOS_EPS_);
+  double tolerance=AUROSTD_MAX_DOUBLE;
+  if(a.sym_eps!=AUROSTD_NAN){ tolerance = a.sym_eps; }
+  else{ tolerance = SYM::defaultTolerance(a); }
+  return GetPrimitive(a,tolerance);
 }
 
 pthread_mutex_t mutex_XATOM=PTHREAD_MUTEX_INITIALIZER;
@@ -12602,6 +12718,193 @@ void *_threaded_GetTvectors(void *ptr) {
   AFLOW_PTHREADS::RUNNING--;
   aurostd::Sleep(_PTHREAD_FLUSH_TIME_);
   return NULL;
+}
+
+// **************************************************************************
+// GetPrimitive() //DX20210406
+// **************************************************************************
+// This version is faster than the previous AFLOW variants
+// Speed ups:
+//   - returns immediately if the number of atoms/types indicate the cell
+//     cannot be reduced (i.e., only one atom or one atom of a given type)
+//   - optimized lattice vector search (search over only the least-frequent
+//     atom type)
+//   - optimized lattice search (volume checks, mulitplicity checks, etc.)
+//   - uses transfomation method to convert between original and primitive
+//     cell (as opposed to removing atoms)
+// It also uses sym_eps to reduce the cell (previous methods did not)
+xstructure GetPrimitive_20210322(const xstructure& a,double eps) {  //DX20210406
+  xstructure xstr = a;
+  xstr.GetPrimitive_20210322(eps);
+  return xstr;
+}
+
+void xstructure::GetPrimitive_20210322(double eps) { //DX20210406
+
+  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  string function_name = XPID + "GetPrimitive():";
+
+  if(LDEBUG){ cerr << function_name << " BEGIN " << endl; }
+
+  uint natoms_orig = (*this).atoms.size();
+  // ---------------------------------------------------------------------------
+  // if only one atom or atom type in the unit cell, the structure is already
+  // primitivized
+  if(natoms_orig == 1 || aurostd::min((*this).num_each_type) == 1) { return; }
+
+  (*this).ReScale(1.0);
+
+  // ---------------------------------------------------------------------------
+  // set tolerance
+  double tolerance = eps;
+  if((*this).dist_nn_min==AUROSTD_NAN){ (*this).MinDist(); }
+
+  if(tolerance==AUROSTD_MAX_DOUBLE){
+    if((*this).sym_eps!=AUROSTD_NAN){ tolerance = (*this).sym_eps; }
+    else{ tolerance = SYM::defaultTolerance((*this)); }
+  }
+  if(LDEBUG){ cerr << function_name << " [1] Tolerance = " << tolerance << endl; }
+
+  double volume_orig=(*this).Volume();
+
+  // ---------------------------------------------------------------------------
+  // get least frequent atom type and the corresponding set of atoms
+  // to search for possible lattice vectors (minimal set of atoms perserving
+  // periodicity)
+  uint atom_type_min = getLeastFrequentAtomTypes((*this))[0]; // normally a vector, grabbing only first one (there will always be one)
+  deque<_atom> vatoms_min = getAtomsByType((*this),atom_type_min);
+  uint natoms_min = vatoms_min.size();
+
+  if(LDEBUG){ cerr << function_name << " [2] Subset of atoms to find lattice vectors: " << natoms_min << endl; }
+
+  // generate list of vectors
+  vector<xvector<double> > candidate_lattice_vector;
+  candidate_lattice_vector.push_back((*this).lattice(1));  // lattice is made of good vectors
+  candidate_lattice_vector.push_back((*this).lattice(2));  // lattice is made of good vectors
+  candidate_lattice_vector.push_back((*this).lattice(3));  // lattice is made of good vectors
+
+  // ---------------------------------------------------------------------------
+  // get all lattice vectors
+  // only need to check difference between 0th and ith atom coordinates
+  vector<xvector<double> > diff_vectors;
+  for(uint i=1; i<natoms_min; i++) {
+    diff_vectors.push_back(::BringInCell(vatoms_min[i].fpos - vatoms_min[0].fpos)); //need to get BringInCell from outside xstructure scope
+  }
+  //Translate by difference vectors and check if equivalent
+  bool is_frac = true;
+  for(uint d=0; d < diff_vectors.size(); d++){
+    if(isTranslationVector((*this), diff_vectors[d], tolerance, is_frac)){
+      candidate_lattice_vector.push_back((*this).f2c*diff_vectors[d]);
+    }
+  }
+
+  double nlattice_vectors = candidate_lattice_vector.size();
+  if(LDEBUG){ cerr << function_name << " [3] number of lattice vectors=" << nlattice_vectors << endl; }
+
+  if(LDEBUG){
+    for(uint i=0;i<nlattice_vectors;i++){
+      cerr << function_name << i << ": mod=" << aurostd::modulus(candidate_lattice_vector[i]) << " vec=" << candidate_lattice_vector[i] << endl;
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // if only the three original lattice vectors were found, then the cell
+  // is already primitivized
+  if(nlattice_vectors == 3){ return; }
+
+  xmatrix<double> lattice_tmp(3,3), plattice(3,3), olattice(3,3);
+  olattice=(*this).lattice;                           // the lattice is always a good lattice
+  double volume_min = aurostd::det((*this).lattice);
+  double volume_tmp = AUROSTD_MAX_DOUBLE;
+  double amin = (*this).dist_nn_min;
+  double tol_vol = tolerance * amin * amin * amin;    // scale tolerance for volume
+  double atom_number_ratio = 1;                       // track atom ratio during reduction
+  double integer_tol = 0.05;                          // use somewhat large tol to find lattices
+
+  // ---------------------------------------------------------------------------
+  // check possible lattices, upper triangular for-loop only
+  // criteria for volume of new lattice:
+  //  1) must not be zero
+  //  2) must be smaller than original lattice volume
+  //  3) must be an integer multiple of original lattice
+  //  4) must reduce atom count consistent with integer multiple
+  //  5) must not remove entire atom types
+  // Minkowski/Niggli will fix left-handed (negative determinants)
+  for(uint iu=0;iu<nlattice_vectors;iu++) { for(uint i=1;i<=3;i++) lattice_tmp[1][i]=candidate_lattice_vector.at(iu)[i];
+    for(uint iv=iu+1;iv<nlattice_vectors;iv++) { for(uint i=1;i<=3;i++) lattice_tmp[2][i]=candidate_lattice_vector.at(iv)[i];
+      for(uint iw=iv+1;iw<nlattice_vectors;iw++) { for(uint i=1;i<=3;i++) lattice_tmp[3][i]=candidate_lattice_vector.at(iw)[i];
+        volume_tmp = abs(lattice_tmp[1][1]*lattice_tmp[2][2]*lattice_tmp[3][3]+lattice_tmp[1][2]*lattice_tmp[2][3]*lattice_tmp[3][1]+ // FAST
+            lattice_tmp[1][3]*lattice_tmp[2][1]*lattice_tmp[3][2]-lattice_tmp[1][3]*lattice_tmp[2][2]*lattice_tmp[3][1]-              // FAST
+            lattice_tmp[1][2]*lattice_tmp[2][1]*lattice_tmp[3][3]-lattice_tmp[1][1]*lattice_tmp[2][3]*lattice_tmp[3][2]);             // FAST
+        if(aurostd::abs(volume_tmp) > tol_vol){
+            plattice=::MinkowskiBasisReduction(lattice_tmp);    // Minkowski first, "::" is needed to access outside xstructure scope
+            plattice=::NiggliUnitCellForm(plattice);            // Niggli Second, "::" is needed to access outside xstructure scope
+            volume_tmp= aurostd::det(plattice);
+            atom_number_ratio = (double)natoms_min/aurostd::nint(volume_orig/volume_tmp);
+        if(volume_tmp > tol_vol &&                                                 // 1) tol > 0
+	    volume_tmp < volume_orig &&                                            // 2) new_tol < orig_tol
+	    aurostd::isinteger(volume_orig / volume_tmp, integer_tol) &&           // 3) new and orig volumes related by integer multiple
+	    aurostd::isinteger(atom_number_ratio, 0.05) &&                         // 4) number of atoms is consistent with integer multiple
+	    (atom_number_ratio-1.0)>-_ZERO_TOL_) {                                 // 5) didn't lose any atoms
+            if(isdifferent(plattice,olattice,0.001)) {
+              olattice=plattice;
+              volume_min = (olattice[1][1]*olattice[2][2]*olattice[3][3]+olattice[1][2]*olattice[2][3]*olattice[3][1]+ // FAST
+                olattice[1][3]*olattice[2][1]*olattice[3][2]-olattice[1][3]*olattice[2][2]*olattice[3][1]-             // FAST
+                olattice[1][2]*olattice[2][1]*olattice[3][3]-olattice[1][1]*olattice[2][3]*olattice[3][2]);            // FAST
+            }
+          }
+        }
+      }
+    }
+  }
+  plattice=olattice;
+
+  if(LDEBUG){ cerr << function_name << " reduced lattice=" << plattice << endl; }
+
+  // ---------------------------------------------------------------------------
+  // if the lattice remains the same, do not change or update the atoms
+  if(aurostd::isequal(volume_min, volume_orig) || aurostd::isequal(plattice,(*this).lattice)){ return; }
+
+  // ---------------------------------------------------------------------------
+  //DX20210316 - used transformation method (more efficient)
+  // ---------------------------------------------------------------------------
+  // update xstructure
+  xstructure prim = (*this);
+  //prim.FixLattices();
+  xmatrix<double> transformation_matrix = GetBasisTransformation((*this).lattice, plattice);
+  xmatrix<double> rotation_matrix = aurostd::eye<double>(3,3);
+  // try to primitivize, it may fail, so return original structure
+  try{
+    // this checks volumes, number of atoms, etc. internally
+    prim.TransformStructure(transformation_matrix, rotation_matrix);
+  }
+  catch(aurostd::xerror& re){
+    return;
+  }
+
+  // no messed up volume
+  // this is checked in TransformStructure, but kept as a safety
+  double fraction=aurostd::det(prim.lattice)/aurostd::det((*this).lattice);
+  if(abs(natoms_orig*fraction-prim.atoms.size())>0.1) {
+    stringstream message;
+    message << "ERROR   " << function_name << endl;
+    message << "        supercell has the wrong number of atoms" << endl;
+    message << "        volume original    = " << (*this).Volume() << endl;
+    message << "        volume prim        = " << prim.Volume() << endl;
+    message << "        a.scale            = " << (*this).scale << endl;
+    message << "        b.scale            = " << prim.scale << endl;
+    message << "        a.atoms.size()     = " << (*this).atoms.size() << endl;
+    message << "        b.atoms.size()     = " << prim.atoms.size() << endl;
+    message << "        fraction           = " << fraction << endl;
+    message << "        supercell atoms    = " << fraction*prim.atoms.size() << endl;
+    message << prim << endl;
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"xstructure::GetPrimitive(void)",message,_RUNTIME_ERROR_);
+  }
+  // everything ok
+  if(LDEBUG){ cerr << function_name << " END [ok]=" << fraction << endl; }
+
+  // set primitive representation
+  (*this) = prim;
 }
 
 xstructure GetPrimitiveMULTITHREAD(const xstructure& _a,double tolerance) {  // APRIL 2009 JUNE 2012 added tolerance
@@ -14714,6 +15017,9 @@ xstructure GetSuperCell(const xstructure& a, const int& sc1,const int& sc2,const
 // Function ClearSymmetry
 // ***************************************************************************
 void xstructure::ClearSymmetry(void) {
+
+  bool LDEBUG = (FALSE || XHOST.DEBUG); //DX20210406
+
   // PGROUP ----------------------------
   pgroup.clear();            // just initialize
   pgroup_calculated=FALSE;
@@ -14751,6 +15057,9 @@ void xstructure::ClearSymmetry(void) {
     iatoms.at(i).clear();
   iatoms.clear();
   for(uint i=0;i<atoms.size();i++){atoms[i].ClearSymmetry();} //CO20190219
+
+  if(LDEBUG){ cerr << XPID << "xstructure::ClearSymmetry(): All symmetry attributes have been cleared." << endl; } //DX20210406
+
 }
 
 //DX - Consider using pflow::CalculateFullSymmetry in aflow_aconvasp_main.cpp.

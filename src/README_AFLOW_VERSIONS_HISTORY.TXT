@@ -1,3 +1,11 @@
+3.2.9 - 2021/XX/XX
+        Location: http://materials.duke.edu/AFLOW/aflow.3.2.9.tar.xz
+        -- added faster and more robust GetPrimitive() function (DX)
+        -- added new function to find translation/lattice vectors (DX)
+        -- fixed bug for empty/cleared symmetry groups to prevent core files (DX)
+        -- added sym_eps_no_scan to xstructure to pass around no tolerance scan information to different functions (DX)
+        -- added more debugging to pflow::PerformFullSymmetry() (DX)
+        -- suppressed/reduced output for minimumDistance() and LatticeDimensionSphere() (DX)
 3.2.8 - 2021/02/22
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.8.tar.xz
         -- improved efficiency/speed of minimizeDistanceCartesianMethod() (DX)

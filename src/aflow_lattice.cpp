@@ -978,7 +978,8 @@ namespace LATTICE {
 
     if(LDEBUG) cerr << XPID << "LATTICE::Standard_Lattice_Structure: [1]" << endl;
     if(LDEBUG){ cerr << XPID << "LATTICE::Standard_Lattice_Structure: structure BEFORE primitivization:" << str_sp << endl; }
-    str_sp.GetPrimitive(0.005);
+    //DX20210406 [OBSOLETE] str_sp.GetPrimitive(0.005);
+    str_sp.GetPrimitive(); //DX20210406 - new/fast get primitive function
     if(LDEBUG) cerr << XPID << "LATTICE::Standard_Lattice_Structure: [2]" << endl;
     if(LDEBUG){ cerr << XPID << "LATTICE::Standard_Lattice_Structure: structure AFTER primitivization:" << str_sp << endl; }
     str_sp.FixLattices();
@@ -1035,14 +1036,7 @@ namespace LATTICE {
       ofstream FileDevNull("/dev/null");
       _aflags aflags;
       _kflags kflags;
-      kflags.KBIN_SYMMETRY_PGROUP_WRITE=FALSE;
-      kflags.KBIN_SYMMETRY_FGROUP_WRITE=FALSE;
-      kflags.KBIN_SYMMETRY_PGROUP_XTAL_WRITE=FALSE;
-      kflags.KBIN_SYMMETRY_PGROUPK_WRITE=FALSE; //DX20171207 - was mising before
-      kflags.KBIN_SYMMETRY_PGROUPK_XTAL_WRITE=FALSE; //DX20171207 - added pgroupk_xtal
-      kflags.KBIN_SYMMETRY_SGROUP_WRITE=FALSE;
-      kflags.KBIN_SYMMETRY_IATOMS_WRITE=FALSE;
-      kflags.KBIN_SYMMETRY_AGROUP_WRITE=FALSE;
+      pflow::defaultKFlags4SymWrite(kflags,false); //DX20210327 - used consolidated version
       aflags.Directory="./";aflags.QUIET=FALSE;
       str_sp.LatticeReduction_avoid=TRUE;
       if(LDEBUG) { cerr << XPID << "LATTICE::Standard_Lattice_Structure: [4b]" << endl;}
@@ -1053,31 +1047,23 @@ namespace LATTICE {
       }
       else if(str_sp.pgroup_xtal_calculated==FALSE) {
         //DX Calculate up to pgroup_xtal only
-        if(full_sym){
-          kflags.KBIN_SYMMETRY_CALCULATE_PGROUP=TRUE;
-          kflags.KBIN_SYMMETRY_CALCULATE_FGROUP=TRUE;
-          kflags.KBIN_SYMMETRY_CALCULATE_PGROUP_XTAL=TRUE;
-          kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK=TRUE;
-          kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_XTAL=TRUE; //DX20171207 - added pgroupk_xtal
-          kflags.KBIN_SYMMETRY_CALCULATE_IATOMS=TRUE;
-          kflags.KBIN_SYMMETRY_CALCULATE_AGROUP=TRUE;
-          kflags.KBIN_SYMMETRY_CALCULATE_SGROUP=TRUE;
-        }
+        if(full_sym){ pflow::defaultKFlags4SymCalc(kflags,true); } //DX20210327 - use consolidated version
         else {
           kflags.KBIN_SYMMETRY_CALCULATE_PGROUP=TRUE;
           kflags.KBIN_SYMMETRY_CALCULATE_FGROUP=TRUE;
           kflags.KBIN_SYMMETRY_CALCULATE_PGROUP_XTAL=TRUE;
           kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK=FALSE;
           kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_XTAL=FALSE; //DX20171207 - added pgroupk_xtal //DX20171218 - missing the "K" in "PGROUPK_XTAL"
+          kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_PATTERSON=FALSE; //DX20210327
           kflags.KBIN_SYMMETRY_CALCULATE_IATOMS=FALSE;
           kflags.KBIN_SYMMETRY_CALCULATE_AGROUP=FALSE;
           kflags.KBIN_SYMMETRY_CALCULATE_SGROUP=FALSE;
         }
-        pflow::PerformFullSymmetry(str_sp,FileDevNull,aflags,kflags,SYS_VERBOSE,cout);
+        //DX20210401 - pflow::PerformFullSymmetry(str_sp,FileDevNull,aflags,kflags,SYS_VERBOSE,cout);
+        pflow::PerformFullSymmetry(str_sp,eps,str_sp.sym_eps_no_scan,true,FileDevNull,aflags,kflags,SYS_VERBOSE,cout,format); //DX20210401
       }
     }
     crystal_system=str_sp.crystal_system;
-
     eps = str_sp.sym_eps;
     sym_change_count = str_sp.sym_eps_change_count; //DX20200525
 
@@ -1486,13 +1472,11 @@ namespace LATTICE {
           rlattice=vrlattice1_aaa.at(i);                           // FASTER with _aaa
           rdata=Getabc_angles(rlattice,DEGREES);
           a=rdata[1];b=rdata[2];c=rdata[3];alpha=rdata[4];beta=rdata[5];gamma=rdata[6];
-          //  cerr << a << " " << b << " " << c << " " << alpha << " " << beta << " " << gamma << " " << eps << endl;
           if(choice==0) { // only pristine
             if(aurostd::isequal(a,b,eps) && aurostd::isequal(b,c,eps)) {  // aaa
-              //  cerr << a << " " << b << " " << c << " " << alpha << " " << beta << " " << gamma << " " << eps << " " << epsang << endl;
-              //DX if(aurostd::isequal(alpha,beta,epsang) && aurostd::isequal(beta,gamma,epsang))  // alpha alpha alpha
               if(SYM::checkAngle(b,c,alpha,beta,is_deg,eps) && SYM::checkAngle(a,c,beta,gamma,is_deg,eps)) //DX
               { //CO20200106 - patching for auto-indenting
+              //DX if(aurostd::isequal(alpha,beta,epsang) && aurostd::isequal(beta,gamma,epsang))  // alpha alpha alpha
                 //  cerr << a << " " << b << " " << c << " " << alpha << " " << beta << " " << gamma << " " << eps << " " << epsang << endl;
                 //DX if(aurostd::isdifferent(alpha,90.0,epsang/rhl_ratio) && // no cubic
                 //DX    aurostd::isdifferent(alpha,60.0,epsang/rhl_ratio) && aurostd::isdifferent(alpha,180.0-60.0,epsang/rhl_ratio) && // no fcc (60 and 120)
@@ -2174,12 +2158,14 @@ namespace LATTICE {
       str_sp.Standard_Lattice_calculated=TRUE;str_sp.Standard_Lattice_avoid=FALSE;
       str_sp.Standard_Lattice_primitive=FALSE;str_sp.Standard_Lattice_conventional=FALSE;
       str_sp.Standard_Lattice_has_failed=TRUE;
-      str_sp=str_in;
-      str_sp.GetPrimitive();
-      str_sp.MinkowskiBasisReduction(); // shorten the vectors as much as possible and as perpendicular as possible
-      str_sc=str_in; // copy it
-      str_sc.MinkowskiBasisReduction(); // shorten the vectors as much as possible and as perpendicular as possible
-
+      // DX20210406 - only clear/reset xstructure IF we are doing a not doing a tolerance scan
+      if(!str_sp.sym_eps_no_scan){
+	str_sp=str_in;
+	str_sp.GetPrimitive();
+	str_sp.MinkowskiBasisReduction(); // shorten the vectors as much as possible and as perpendicular as possible
+	str_sc=str_in; // copy it
+	str_sc.MinkowskiBasisReduction(); // shorten the vectors as much as possible and as perpendicular as possible
+      }
       // copy eps information despite failure (for tolerance scan)
       str_sp.sym_eps = str_sc.sym_eps = eps; //DX20200217
       str_sp.sym_eps_change_count = str_sc.sym_eps_change_count = sym_change_count; //DX20200525
@@ -3493,22 +3479,23 @@ namespace LATTICE {
     bool LDEBUG=(FALSE || XHOST.DEBUG); //DX20180426 - added LDEBUG
     string directory=aurostd::getPWD(); //[CO20191112 - OBSOLETE]aurostd::execute2string("pwd"); //DX20180426 - added current working directory 
     bool same_eps = false;
-    bool no_scan = false;
+    //DX20210406 [OBSOLETE] bool no_scan = false;
     bool ignore_checks = false;
     uint count=0;
     while(same_eps == false && count++ < 100){
       if(ignore_checks==true){
         same_eps = true; //force single while loop, no check
       }
-      if(!LATTICE::Standard_Lattice_StructureDefault(str_in,str_sp,str_sc,full_sym)){
+      if(!LATTICE::Standard_Lattice_StructureDefault(str_in,str_sp,str_sc,full_sym) && !str_in.sym_eps_no_scan){
         if(LDEBUG) {cerr << XPID << "LATTICE::WARNING: Could not find crystal lattice type." << " [dir=" << directory << "]" << endl;} //DX20180426 - added directory info and put in LDEBUG
-        if(!SYM::change_tolerance(str_sp,str_sp.sym_eps,str_sp.dist_nn_min,no_scan)){
+        if(!SYM::change_tolerance(str_sp,str_sp.sym_eps,str_sp.dist_nn_min,str_sp.sym_eps_no_scan)){ //DX20210331 - used xstr no scan
           cerr << XPID << "LATTICE::WARNING: [1] Scan failed. Reverting back to original tolerance and recalculating as is (with aforementioned inconsistencies)." << " [dir=" << directory << "]" << endl;
           ignore_checks = true;
         }
         str_in.sym_eps = str_sp.sym_eps = str_sc.sym_eps = str_sp.sym_eps;
         str_in.sym_eps_change_count = str_sp.sym_eps_change_count = str_sc.sym_eps_change_count = str_sp.sym_eps_change_count; //DX20180222 - added sym_eps change count
-        continue;
+        str_in.sym_eps_no_scan = str_sc.sym_eps_no_scan = str_sp.sym_eps_no_scan; //DX20210331
+        if(!str_in.sym_eps_no_scan){continue;} //DX20210331 - add if-statement, don't keep going through loop
       }
       str_in.bravais_lattice_type=str_sp.bravais_lattice_type;
       str_in.bravais_lattice_variation_type=str_sp.bravais_lattice_variation_type;
@@ -3521,6 +3508,7 @@ namespace LATTICE {
       _str_in.sym_eps=_str_sp.sym_eps=_str_sc.sym_eps=str_sp.sym_eps; //DX
       _str_in.sym_eps_calculated=_str_sp.sym_eps_calculated=_str_sc.sym_eps_calculated=str_sp.sym_eps_calculated; //DX
       _str_in.sym_eps_change_count=_str_sp.sym_eps_change_count=_str_sc.sym_eps_change_count=str_sp.sym_eps_change_count; //DX20180222 - added sym_eps change count
+      _str_in.sym_eps_no_scan=_str_sp.sym_eps_no_scan=_str_sc.sym_eps_no_scan=str_sp.sym_eps_no_scan; //DX20180222 - added sym_eps change count
       _atom atom; atom.cpos.clear();atom.fpos.clear();atom.type=0; _str_in.AddAtom(atom);
       //DX20170814 START - Use real pgroup to calculate pgroupk and then set pgrouk from str_sp to the pgroup and pgroup_xtal of str_reciprocal_in
       //DX20170814 The pgroup and pgroup_xtal are the same for the str_reciprocal structure because there is only one atom at the origin
@@ -3531,15 +3519,16 @@ namespace LATTICE {
       //DX20180426 [OBSOLETE] - this is not a reciprocal lattice structure - _str_in.pgroup_xtal_calculated = _str_sp.pgroup_xtal_calculated = _str_sc.pgroup_xtal_calculated = str_sp.pgroup_xtal_calculated;
       //DX20170814 END
       //DX20180226 [OBSOLETE] if(!LATTICE::Standard_Lattice_StructureDefault(_str_in,_str_sp,_str_sc,full_sym))
-      if(!LATTICE::Standard_Lattice_StructureDefault(_str_in,_str_sp,_str_sc,false)) //DX20180226 - do not need to do full sym on lattice
+      if(!LATTICE::Standard_Lattice_StructureDefault(_str_in,_str_sp,_str_sc,false) && !_str_in.sym_eps_no_scan) //DX20180226 - do not need to do full sym on lattice
       { //CO20200106 - patching for auto-indenting
         if(LDEBUG) {cerr << XPID << "LATTICE::WARNING: Could not find lattice lattice type." << " [dir=" << directory << "]" << endl;} //DX20180426 - added directory info and put in LDEBUG
-        if(!SYM::change_tolerance(str_sp,str_sp.sym_eps,str_sp.dist_nn_min,no_scan)){
+        if(!SYM::change_tolerance(str_sp,str_sp.sym_eps,str_sp.dist_nn_min,str_sp.sym_eps_no_scan)){ //DX20210331 - used xstr scan
           cerr << XPID << "LATTICE::WARNING: [2] Scan failed. Reverting back to original tolerance and recalculating as is (with aforementioned inconsistencies)." << " [dir=" << directory << "]" << endl;
         }
         str_in.sym_eps = str_sp.sym_eps = str_sc.sym_eps = str_sp.sym_eps;
         str_in.sym_eps_change_count = str_sp.sym_eps_change_count = str_sc.sym_eps_change_count = str_sp.sym_eps_change_count; //DX20180222 - added sym_eps change count
-        continue;
+        str_in.sym_eps_no_scan = str_sc.sym_eps_no_scan = str_sp.sym_eps_no_scan; //DX20210331
+        if(!str_in.sym_eps_no_scan){continue;} //DX20210331 - add if-statement, don't keep going through loop
       }
       str_in.bravais_lattice_lattice_type=_str_sp.bravais_lattice_type;
       str_in.bravais_lattice_lattice_variation_type=_str_sp.bravais_lattice_variation_type;
@@ -3553,6 +3542,7 @@ namespace LATTICE {
       else { 
         str_in.sym_eps = str_sp.sym_eps = str_sc.sym_eps = _str_sp.sym_eps;
         str_in.sym_eps_change_count = str_sp.sym_eps_change_count = str_sc.sym_eps_change_count = _str_sp.sym_eps_change_count; //DX20180222 - added sym_eps change count
+        str_in.sym_eps_no_scan = str_sc.sym_eps_no_scan = str_sp.sym_eps_no_scan; //DX20210331
       }
     }
     if(count==100){
