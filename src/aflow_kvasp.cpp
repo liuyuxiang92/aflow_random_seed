@@ -3915,8 +3915,13 @@ namespace KBIN {
         //however, there might be some options which conflict
         //add KBIN::XVASP_INCAR_REMOVE_ENTRY() as necessary
         //check also submode fixes
+        
+        //check NBANDS/LRF_COMMUTATOR problems immediately
+        KBIN::VASP_Error2Fix("NBANDS",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
+        //[CO20210315 - fix previously removed]KBIN::VASP_Error2Fix("LRF_COMMUTATOR",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
 
-        //fix symmetry issues immediately
+        //fix symmetry issues next
+        KBIN::VASP_Error2Fix("GAMMA_SHIFT",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
         // ********* APPLY PREFERRED SYMMETRY FIXES ******************  //all of these must come before ROTMAT
         KBIN::VASP_Error2Fix("NKXYZ_IKPTD",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);  //must come before IBZKPT
         KBIN::VASP_Error2Fix("KKSYM",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);  //must come before IBZKPT
@@ -3927,6 +3932,14 @@ namespace KBIN {
         // ********* APPLY GENERIC SYMMETRY FIXES ******************
         KBIN::VASP_Error2Fix("ROTMAT",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
         
+        //fix MPI/NPAR problems next
+        KBIN::VASP_Error2Fix("MPICH11",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
+        KBIN::VASP_Error2Fix("MPICH139",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
+        KBIN::VASP_Error2Fix("NPAR",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
+        KBIN::VASP_Error2Fix("NPARC",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
+        KBIN::VASP_Error2Fix("NPARN",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
+        KBIN::VASP_Error2Fix("NPAR_REMOVE",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
+
         //all other fixes, no priority here (alphabetic order)
         // ********* APPLY OTHER FIXES ******************
         KBIN::VASP_Error2Fix("BRMIX",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
@@ -3937,18 +3950,9 @@ namespace KBIN {
         KBIN::VASP_Error2Fix("EDDRMM","RMM_DIIS",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
         KBIN::VASP_Error2Fix("EFIELD_PEAD",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
         KBIN::VASP_Error2Fix("EXCCOR",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
-        KBIN::VASP_Error2Fix("GAMMA_SHIFT",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
-        //[CO20210315 - fix previously removed]KBIN::VASP_Error2Fix("LRF_COMMUTATOR",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
         KBIN::VASP_Error2Fix("MEMORY",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
-        KBIN::VASP_Error2Fix("MPICH11",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
-        KBIN::VASP_Error2Fix("MPICH139",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
         KBIN::VASP_Error2Fix("NATOMS",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
-        KBIN::VASP_Error2Fix("NBANDS",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
         KBIN::VASP_Error2Fix("NELM",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
-        KBIN::VASP_Error2Fix("NPAR",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
-        KBIN::VASP_Error2Fix("NPARC",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
-        KBIN::VASP_Error2Fix("NPARN",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
-        KBIN::VASP_Error2Fix("NPAR_REMOVE",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
         KBIN::VASP_Error2Fix("PSMAXN",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
         KBIN::VASP_Error2Fix("REAL_OPTLAY_1","LREAL",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
         KBIN::VASP_Error2Fix("REAL_OPT","LREAL",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
