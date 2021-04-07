@@ -138,6 +138,7 @@ namespace aurostd {
     if(tmpdir.empty()){tmpdir=XHOST.tmpfs;} //CO20210315
     string str=tmpdir+"/"+(hidden?".":"")+"_aflow_"+identifier+"."+XHOST.user+".pid"+XHOST.ostrPID.str()+".tid"+XHOST.ostrTID.str()+".a"+AFLOW_VERSION+".rnd"+aurostd::utype2string(uint((double) std::floor((double)100000*aurostd::ran0())))+".u"+aurostd::utype2string(uint((double) aurostd::get_useconds()))+".tmp"; //CO20200502 - threadID
     // cerr << str << endl;
+    str=aurostd::CleanFileName(str);
     return str;
   }
   string TmpFileCreate(void) {return TmpFileCreate("");}
@@ -145,8 +146,10 @@ namespace aurostd {
     string tmpdir=_tmpdir;  //CO20210315
     if(tmpdir.empty()){tmpdir=XHOST.tmpfs;} //CO20210315
     string dir=tmpdir+"/"+(hidden?".":"")+"_aflow_"+identifier+"_"+XHOST.user+"_pid"+XHOST.ostrPID.str()+"_tid"+XHOST.ostrTID.str()+"_a"+AFLOW_VERSION+"_rnd"+aurostd::utype2string(uint((double) std::floor((double) 100000*aurostd::ran0())))+"_u"+aurostd::utype2string(uint((double) aurostd::get_useconds()))+"_tmp";  //CO20200502 - threadID
+    dir=aurostd::CleanFileName(dir);
     DirectoryMake(dir);
-    return dir;}
+    return dir;
+  }
   string TmpDirectoryCreate(void) {return TmpDirectoryCreate("");}
 }
 
@@ -5195,28 +5198,45 @@ namespace aurostd {
     return aurostd::substring2bool(StringFile,strsub1,RemoveWS,RemoveComments);
   }
 
-  bool substring_present_file_FAST(const string& FileName, const string& strsub1, bool RemoveWS) {
+  bool substring_present_file_FAST(const string& FileName, const string& _strsub1, bool RemoveWS, bool case_insensitive) {
     // be careful, this does not filter-out # comments
-    string function = XPID + "aurostd::substring_present_file_FAST():";
-
+    //CO20210315 - this function is not only fast, but it enables grepping through VERY large files,
+    //whereas reading the whole file into memory can lead to out-of-memory issues for aflow
+    //leverages regex power of grep (better than reading in cpp line by line and processing the string)
+    //CO20210315 - adding case_insensitive
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy = XPID + "aurostd::substring_present_file_FAST():";
     string message = "";
+    
+    if(!aurostd::FileExist(FileName)) {
+      message = "file input not found =" + FileName;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _FILE_NOT_FOUND_);
+    }
+
     string temp_file=aurostd::TmpFileCreate("substring");
     ostringstream aus;
     ifstream FileFile;
     int found=0;
     aurostd::StringstreamClean(aus);
     aus << "rm -f " << temp_file  << endl;
-    if(RemoveWS==FALSE) aus << "cat \"" << FileName << "\" | grep -c \"" << strsub1 << "\" > " << temp_file  << endl;
-    if(RemoveWS==TRUE ) aus << "cat \"" << FileName << "\" | sed \"s/ //g\" | sed \"s/\t//g\"  | grep -c \"" << aurostd::RemoveWhiteSpaces(strsub1) << "\" > " << temp_file  << endl;
-    aus << "echo >> " << temp_file << endl; // to give EOL
-    aurostd::execute(aus);
-    if(!aurostd::FileExist(FileName)) {
-      message = "file input not found =" + FileName;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_NOT_FOUND_);
+    aus << "cat \"" << FileName << "\"";
+    string strsub1=_strsub1;
+    if(RemoveWS==TRUE){
+      aus << " | sed \"s/ //g\" | sed \"s/\\t//g\"";
+      strsub1=aurostd::RemoveWhiteSpaces(strsub1);
     }
+    string flags_grep="-c";
+    if(case_insensitive==true){
+      flags_grep="-ic";
+      strsub1=aurostd::tolower(strsub1);
+    }
+    aus << " | grep " << flags_grep << " \"" << strsub1 << "\" > " << temp_file  << endl;
+    aus << "echo >> " << temp_file << endl; // to give EOL
+    if(LDEBUG){cerr << soliloquy << " command=\"" << aus.str() << "\"" << endl;}
+    aurostd::execute(aus);
     if(!aurostd::FileExist(temp_file)) {
       message = "file output not found =" + FileName;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_NOT_FOUND_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _FILE_NOT_FOUND_);
     }
     FileFile.open(temp_file.c_str(),std::ios::in);
     FileFile.clear();FileFile.seekg(0);
