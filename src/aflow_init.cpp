@@ -2040,6 +2040,20 @@ void AFLOW_monitor_VASP(const string& directory){
       //read LOCK to see what has been issued already
     }
 
+    //it's possible KBIN::VASP_ProcessWarnings() takes a long time (big vasp.out)
+    //double check that there isn't a new instance of vasp running
+    nexecuting=0;
+    aurostd::file2vectorstring(xvasp.Directory+"/"+_AFLOWLOCK_,vlines);  //we already checked above that it exists
+    for(i=0;i<vlines.size();i++){
+      if(vlines[i].find(VASP_KEYWORD_EXECUTION)==string::npos){continue;}
+      nexecuting++;
+    }
+    if(nexecuting!=nexecuting_old){
+      message << "found new instance of \""+vasp_bin+"\"";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+      kill_vasp=false;
+      nexecuting_old=nexecuting;
+    }
+
     if(kill_vasp){
       if(XHOST.vflag_control.flag("KILL_VASP_ALL")){
         message << "issuing kill command for: \""+vasp_bin+"\"";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);

@@ -2930,7 +2930,11 @@ namespace KBIN {
     bool vasp_monitor_running=aurostd::FileExist(aflags.Directory+"/"+_AFLOWLOCK_+"."+FILE_VASP_MONITOR);
 
     long int tmod_vaspout=aurostd::SecondsSinceFileModified(xvasp.Directory+"/"+DEFAULT_VASP_OUT);
-    if(LDEBUG){aus << soliloquy << " time since " << DEFAULT_VASP_OUT << " last modified: " << tmod_vaspout << " seconds" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+    unsigned long long int fsize_vaspout=aurostd::FileSize(xvasp.Directory+"/"+DEFAULT_VASP_OUT);
+    if(LDEBUG){
+      aus << soliloquy << " time since " << DEFAULT_VASP_OUT << " last modified: " << tmod_vaspout << " seconds" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+      aus << soliloquy << " size of " << DEFAULT_VASP_OUT << ": " << fsize_vaspout << " bytes" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+    }
 
     //CO20210315 - reading the full vasp.out does not work
     //vasp can spit out so many warnings that the file can be >50GB, killing aflow's memory
@@ -2986,7 +2990,6 @@ namespace KBIN {
     //VASP's internal symmetry routines START
     //CO20200624 - these are all related to VASP's internal symmetry routines
     //they would all benefit from similar fixes (except NKXYZ_IKPTD which requires KPOINTS to be reduced)
-    //
     scheme="SGRCON";  //usually goes with NIRMAT
     found_warning=ReachedAccuracy2bool(scheme,xRequiresAccuracy,xmessage,vasp_still_running);
     found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"VERY BAD NEWS! internal error in subroutine SGRCON",true,true));
@@ -3022,11 +3025,11 @@ namespace KBIN {
     found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"inverse of rotation matrix was not found (increase SYMPREC)",true,true));
     xwarning.flag(scheme,found_warning);
     //VASP's internal symmetry routines END
+    
     //VASP issues with RMM-DIIS START
-    //
     scheme="EDDRMM"; //CO20210315 - look here https://www.vasp.at/wiki/index.php/IALGO#RMM-DIIS
     found_warning=ReachedAccuracy2bool(scheme,xRequiresAccuracy,xmessage,vasp_still_running);
-    found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"WARNING in EDDRMM: call to ZHEGV failed, returncode",true,true));
+    found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"WARNING in EDDRMM: call to ZHEGV failed",true,true));
     xwarning.flag(scheme,found_warning);
     //
     scheme="NUM_PROB";  //CO20210315 - look here https://www.vasp.at/wiki/index.php/IALGO#RMM-DIIS  //CO20210315 - num prob can be a big problem for the DOS: https://www.vasp.at/forum/viewtopic.php?f=3&t=18028
@@ -3039,15 +3042,22 @@ namespace KBIN {
     found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"ZBRENT: can't locate minimum",true,true));
     xwarning.flag(scheme,found_warning);
     //VASP issues with RMM-DIIS END
+    
+    //CSLOSHING and NELM START
     //CSLOSHING and NELM warnings are similar, CSLOSHING will apply a fix before VASP finishes running, while NELM only cares about the LAST iteration
+    scheme="CSLOSHING";
+    found_warning=(vasp_still_running==true && KBIN::VASP_OSZICARUnconverging(xvasp.Directory)); // check from OSZICAR
+    xwarning.flag(scheme,found_warning);
     //
+    scheme="NELM";
+    found_warning=(vasp_still_running==false && KBIN::VASP_OSZICARUnconverged(xvasp.Directory+"/OSZICAR",xvasp.Directory+"/OUTCAR"));  // check from OSZICAR
+    xwarning.flag(scheme,found_warning);
+    //CSLOSHING and NELM END
+    
+    //ALL OTHERS (in alphabetic order) START
     scheme="BRMIX";
     found_warning=ReachedAccuracy2bool(scheme,xRequiresAccuracy,xmessage,vasp_still_running);
     found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"BRMIX: very serious problems",true,true));
-    xwarning.flag(scheme,found_warning);
-    //
-    scheme="CSLOSHING";
-    found_warning=(vasp_still_running==true && KBIN::VASP_OSZICARUnconverging(xvasp.Directory)); // check from OSZICAR
     xwarning.flag(scheme,found_warning);
     //
     scheme="CALC_FROZEN"; //CO20210315
@@ -3066,7 +3076,7 @@ namespace KBIN {
     //
     scheme="EDDDAV";
     found_warning=ReachedAccuracy2bool(scheme,xRequiresAccuracy,xmessage,vasp_still_running);
-    found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"Error EDDDAV: Call to ZHEGV failed. Returncode",true,true));
+    found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"Error EDDDAV: Call to ZHEGV failed",true,true));
     xwarning.flag(scheme,found_warning);
     //
     scheme="EFIELD_PEAD";
@@ -3119,10 +3129,6 @@ namespace KBIN {
     found_warning=(found_warning && vasp_corrected==false);
     xwarning.flag(scheme,found_warning);
     //
-    scheme="NELM";
-    found_warning=(vasp_still_running==false && KBIN::VASP_OSZICARUnconverged(xvasp.Directory+"/OSZICAR",xvasp.Directory+"/OUTCAR"));  // check from OSZICAR
-    xwarning.flag(scheme,found_warning);
-    //
     scheme="NPAR";
     found_warning=ReachedAccuracy2bool(scheme,xRequiresAccuracy,xmessage,vasp_still_running);
     found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"please rerun with NPAR=",true,true)); //not only npar==1
@@ -3168,8 +3174,17 @@ namespace KBIN {
     found_warning=ReachedAccuracy2bool(scheme,xRequiresAccuracy,xmessage,vasp_still_running);
     found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"LAPACK: Routine ZPOTRF failed",true,true));
     xwarning.flag(scheme,found_warning);
-    //
+    //ALL OTHERS (in alphabetic order) END
     
+    //check at the end (only if other warnings are found and can be corrected)
+    //this is actually a critical check, what appeared to be vasp stuck was actually aflow stuck reading (cat/sed/grep) a VERY long vasp.out full of warnings
+    //a single check for errors could take hours
+    //files this large will put a lot of stress on cat/grep for warnings
+    //vasp.out should NEVER get this large, means its filled with warnings/errors
+    scheme="OUTPUT_LARGE";
+    found_warning=(vasp_still_running==true && fsize_vaspout>=BYTES_MAX_VASP_OUT);  //1GB, make aflowrc parameter
+    xwarning.flag(scheme,found_warning);
+
     if(LDEBUG){aus << soliloquy << " [2]" << Message(aflags,_AFLOW_FILE_NAME_,_AFLOW_FILE_NAME_) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
 
     bool wdebug=FALSE;//TRUE;
@@ -3209,6 +3224,7 @@ namespace KBIN {
       if(!xmonitor.flag("IGNORING_WARNINGS:NPARN") && (wdebug || xwarning.flag("NPARN"))) aus << "WWWWW  WARNING xwarning.flag(\"NPARN\")=" << xwarning.flag("NPARN") << endl;
       if(wdebug || xwarning.flag("NPAR_REMOVE")) aus << "WWWWW  WARNING xwarning.flag(\"NPAR_REMOVE\")=" << xwarning.flag("NPAR_REMOVE") << endl;
       if(wdebug || xwarning.flag("NUM_PROB")) aus << "WWWWW  WARNING xwarning.flag(\"NUM_PROB\")=" << xwarning.flag("NUM_PROB") << endl;  //CO20210315
+      if(wdebug || xwarning.flag("OUTPUT_LARGE")) aus << "WWWWW  WARNING xwarning.flag(\"OUTPUT_LARGE\")=" << xwarning.flag("OUTPUT_LARGE") << endl;
       if(wdebug || xwarning.flag("PSMAXN")) aus << "WWWWW  WARNING xwarning.flag(\"PSMAXN\")=" << xwarning.flag("PSMAXN") << endl;
       if(wdebug || xwarning.flag("READ_KPOINTS_RD_SYM")) aus << "WWWWW  WARNING xwarning.flag(\"READ_KPOINTS_RD_SYM\")=" << xwarning.flag("READ_KPOINTS_RD_SYM") << endl;
       if(wdebug || xwarning.flag("REAL_OPT")) aus << "WWWWW  WARNING xwarning.flag(\"REAL_OPT\")=" << xwarning.flag("REAL_OPT") << endl;
@@ -3230,10 +3246,16 @@ namespace KBIN {
       for(i=0;i<xwarning.vxscheme.size();i++){
         if(xRequiresAccuracy.flag(xwarning.vxscheme[i])){n_require_accuracy++;}
       }
-      if((xwarning.flag("OUTCAR_INCOMPLETE")==false && xwarning.vxscheme.size()>n_require_accuracy) || (xwarning.flag("OUTCAR_INCOMPLETE") && xwarning.vxscheme.size()>(n_require_accuracy+1))){
+      uint n_derivative=0;
+      vector<string> vwarnings_derivative; //these warnings are derivative: e.g., an incomplete outcar could be the result of many errors, including those requiring xmessage.flag("REACHED_ACCURACY")
+      aurostd::string2tokens("OUTCAR_INCOMPLETE,CALC_FROZEN,OUTPUT_LARGE",vwarnings_derivative,",");
+      for(i=0;i<vwarnings_derivative.size();i++){
+        if(xwarning.flag(vwarnings_derivative[i])){n_derivative++;}
+      }
+      if(xwarning.vxscheme.size()>(n_require_accuracy+n_derivative)){ //this means we have some real errors inside
         for(i=0;i<xwarning.vxscheme.size();i++){
           if(xRequiresAccuracy.flag(xwarning.vxscheme[i])){
-            aus << "MMMMM  MESSAGE ignoring xwarning.flag(\""+xwarning.vxscheme[i]+"\"): prioritizing other warnings first (requires accuracy)" << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+            aus << "MMMMM  MESSAGE ignoring xwarning.flag(\""+xwarning.vxscheme[i]+"\"): prioritizing other warnings first (requires xmessage.flag(\"REACHED_ACCURACY\"); possible false positive)" << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
             xwarning.flag(xwarning.vxscheme[i],FALSE);
             //we don't need an xmonitor here, this is only for prioritizing errors
           }

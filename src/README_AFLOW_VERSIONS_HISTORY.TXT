@@ -42,6 +42,8 @@
         -- adding check for vasp.out's modification time and categorizing it as an OOM error (CO)
         -- fixing repetitious writing of '[VASP_POTCAR_AUID]' in aflow.in (CO)
         -- adding XVASP_INCAR_Read_MAGMOM to load up MAGMOM into xvasp.str (CO)
+        -- added a faster aurostd::FileSize() approach (CO)
+        -- added check for vasp.out's size to avoid hours delay grepping for warnings (CO)
 3.2.8 - 2021/02/22
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.8.tar.xz
         -- lib2raw bug fixes (CO)

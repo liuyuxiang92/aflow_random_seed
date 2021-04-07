@@ -2271,16 +2271,27 @@ namespace aurostd {
   //ME20191001 - Changed to unsigned long long int to accommodate large files
   unsigned long long int FileSize(const string& _FileName) {
     string FileName(CleanFileName(_FileName));
-    ifstream FileStream;
-    long int sizeout = 0;
-    FileStream.open(FileName.c_str(),std::ios::in);
-    if(!FileStream.good()) {
-      sizeout=0;
-    } else {
-      string FileString; FileString="";char c; while (FileStream.get(c)) FileString+=c;
-      sizeout=FileString.length();
+    if(0){
+      ifstream FileStream;
+      FileStream.open(FileName.c_str(),std::ios::in);
+      if(!FileStream.good()){return 0;}
+      unsigned long long int sizeout = 0;
+      //[CO20210315 - no need to store BIG file in memory]string FileString="";
+      char c; 
+      while (FileStream.get(c)){
+        //[CO20210315 - no need to store BIG file in memory]FileString+=c;
+        sizeout+=1; //[CO20210315 - no need to store BIG file in memory]=FileString.length();
+      }
+      FileStream.close();
+      return sizeout;
     }
-    FileStream.close();
+    //CO20210315 - much faster approach
+    //https://www.codespeedy.com/cpp-program-to-get-the-size-of-a-file/
+    FILE* fp=fopen(FileName.c_str(),"r");
+    if (fp==NULL){return 0;}
+    fseek(fp,0L,SEEK_END);
+    unsigned long long int sizeout=ftell(fp);
+    fclose(fp);
     return sizeout;
   }
 

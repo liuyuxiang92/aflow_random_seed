@@ -629,7 +629,7 @@ bool initialize_templates_never_call_this_procedure(bool flag) {
 #endif
 #ifdef AUROSTD_INITIALIZE_UNSIGNED_LONG_INT
     o+=aurostd::string2utype<unsigned long int>(aurostd::utype2string<unsigned long int>((unsigned long int)(1))+aurostd::utype2string<unsigned long int>((unsigned long int)(1),int()));
-    // o+=initialize_scalar(((unsigned long int))(1));
+    o+=initialize_scalar((unsigned long int)(1));
     // o+=initialize_xscalar_xvector_xmatrix_xtensor(((unsigned long int))(1));
     // o+=initialize_xcomplex(((unsigned long int))(1));
     // xmatrix<(long int)> m(1,1);GaussJordan(m,m);
@@ -656,7 +656,7 @@ bool initialize_templates_never_call_this_procedure(bool flag) {
 #endif
 #ifdef AUROSTD_INITIALIZE_UNSIGNED_LONG_LONG_INT
     o+=aurostd::string2utype<unsigned long long int>(aurostd::utype2string<unsigned long long int>((unsigned long long int)(1))+aurostd::utype2string<unsigned long long int>((unsigned long long int)(1),int()));
-    // o+=initialize_scalar((unsigned long long int)(1));
+    o+=initialize_scalar((unsigned long long int)(1));
     // o+=initialize_xscalar_xvector_xmatrix_xtensor((unsigned long long int)(1));
     // o+=initialize_xcomplex((unsigned long long int)(1));
     // xmatrix<(long long int)> m(1,1);GaussJordan(m,m);

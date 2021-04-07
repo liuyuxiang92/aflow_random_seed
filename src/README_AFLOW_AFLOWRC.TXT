@@ -1760,6 +1760,16 @@ SECONDS_STALE_VASP_OUT
   type: integer
   default: 10800 (3 hours)
 
+BYTES_MAX_VASP_OUT
+  description: Maximum size of the DEFAULT_VASP_OUT file. The large the size, the longer the delays in applying patches.
+  type: integer
+  default: 1000000000 (1GB)
+
+FILE_VASP_MONITOR
+  description: File name for the aflow vasp monitor (--monitor_vasp). In the default case, the name would be LOCK.monitor_vasp.
+  type: string
+  default: "monitor_vasp"
+
 ####################################################################################################
 DEFAULTS MACHINE DEPENDENT MPI
 

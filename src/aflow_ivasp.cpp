@@ -5978,8 +5978,8 @@ namespace KBIN {
       E=OUTCAR_EP.efield_pead;
     }
     if(E.lrows!=1||E.urows!=3){E.clear();E.resize(3);}  //safety
-    E*=0.2;  //dvalue used to be an input, not used right now, maybe make an aflowrc value in the future
     for(int i=E.lrows;i<=E.urows;i++){if(E[i]<=1.0E-6){E[i]=DEFAULT_EFIELD_PEAD;}}
+    E*=0.2;  //dvalue used to be an input, not used right now, maybe make an aflowrc value in the future
 
     //[CO20210315 - OBSOLETE]E(1)=DEFAULT_EFIELD_PEAD;
     //[CO20210315 - OBSOLETE]E(2)=DEFAULT_EFIELD_PEAD;
@@ -6489,7 +6489,9 @@ namespace KBIN {
       Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
     }
     else if(mode=="DAV" || mode=="EDDDAV") {
+      //https://www.vasp.at/forum/viewtopic.php?t=1192&p=2321 (DAV)
       //https://www.vasp.at/forum/viewtopic.php?f=2&t=10409&p=10434#:~:text=7%3A18%20am-,Re%3A%20on%20solving%20%22Error%20EDDDAV%3A%20Call%20to%20ZHEGV%20failed,Returncode%20%3D%20xx%22&text=This%20is%20an%20error%20of,of%20the%20very%20last%20one. (EDDDAV)
+      //problems with DAV, avoid NORMAL
       //solution: try flipping around different ALGOs (EDDDAV)
       //previously it was IALGO=48, better to use ALGO=VERYFAST (same thing: https://www.vasp.at/wiki/index.php/ALGO) (EDDDAV)
       if(submode<0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"no submode set: \""+mode+"\"",_INPUT_ILLEGAL_);}  //CO20210315
@@ -6503,12 +6505,7 @@ namespace KBIN {
         Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
-      if(submode==2){ //try ALGO=NORMAL //CO20200624
-        fix="ALGO=NORMAL";
-        Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
-        if(!Krun){Krun=true;submode++;} //reset and go to the next solution
-      }
-      if(submode>=3){Krun=false;}
+      if(submode>=2){Krun=false;}
       submode+=submode_increment;submode_increment=1;  //increment and reset
     }
     else if(mode=="CSLOSHING") {
