@@ -2570,6 +2570,8 @@ void minimumCoordinationShell(const xstructure& xstr, uint center_index,
     double& min_dist, uint& frequency, vector<xvector<double> >& coordinates, const string& type); //DX20191122
 
 //makefile tests
+bool SchemaTest(ostream& oss=std::cout);  //ME20210408
+bool SchemaTest(ofstream& FileMESSAGE,ostream& oss=std::cout);  //ME20210408
 bool CeramGenTest(ostream& oss=cout);
 bool CeramGenTest(ofstream& FileMESSAGE,ostream& oss=cout);
 bool EgapTest(ostream& oss=cout);

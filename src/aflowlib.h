@@ -269,7 +269,7 @@ namespace aflowlib {
       uint Load(const string& entry,ostream& oss);               // load from string it std is cout
       uint file2aflowlib(const string& file,ostream& oss=std::cout);       // load from file
       uint url2aflowlib(const string& url,ostream& oss,bool=TRUE); // load from the web (VERBOSE)
-      string aflowlib2string(string="out");                      //
+      string aflowlib2string(string="out", bool=false);          //ME20210408 - added PRINT_NULL
       string aflowlib2file(string file,string="out");            //
       string POCCdirectory2MetadataAUIDjsonfile(const string& directory,uint salt=0);           //CO20200624 - get contents of auid_metadata.json 
       bool directory2auid(const string& directory);                                         // from directory and AURL gives AUID and VAUID
@@ -631,8 +631,6 @@ namespace aflowlib {
       vector<string> getSchemaKeys();
       vector<string> getDataTypes(const vector<string>&, bool);
       vector<string> getDataValues(const string&, const vector<string>&, const vector<string>&);
-      vector<string> extractJsonKeysAflow(const string&);
-      string extractJsonValueAflow(const string&, string);
 
       DBStats initDBStats(const string&, const vector<string>&);
       DBStats getCatalogStats(const string&, const vector<string>&, const vector<string>&);

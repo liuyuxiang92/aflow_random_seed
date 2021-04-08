@@ -1192,7 +1192,7 @@ namespace aflowlib {
   }
 
   // aflowlib2string 
-  string _aflowlib_entry::aflowlib2string(string mode) {
+  string _aflowlib_entry::aflowlib2string(string mode, bool PRINT_NULL) {
     string soliloquy=XPID+"aflowlib::_aflowlib_entry::aflowlib2string():";
     stringstream sss("");
     //  string eendl="\n";
@@ -1468,7 +1468,6 @@ namespace aflowlib {
     // this is the aflowlib.json mode
     if(mode=="json" || mode=="JSON") {  //CO OPERATE HERE ALL THE STRINGS AS BEFORE
       string eendl=",";
-      bool PRINT_NULL=FALSE;
       stringstream sscontent_json;
       vector<string> vcontent_json;
       vector<string> sg_tokens;

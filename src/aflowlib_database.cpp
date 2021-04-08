@@ -754,7 +754,7 @@ namespace aflowlib {
       string aurl = "";
       for (uint d = 0; d < ndata; d++) {
         // Filter non-POCC ARUNs
-        aurl = extractJsonValueAflow(data[d], "aurl");
+        aurl = aurostd::extractJsonValueAflow(data[d], "aurl");
         if ((aurl.find("ARUN") != string::npos)
           && (aurl.find("ARUN.POCC") == string::npos)) {
           continue;
@@ -831,13 +831,13 @@ namespace aflowlib {
     transaction(true);
     for (uint l = 0; l < nlines; l++) {
       cols.clear();
-      keys = extractJsonKeysAflow(data[l]);
+      keys = aurostd::extractJsonKeysAflow(data[l]);
       nkeys = keys.size();
 
       // Check
       for (uint k = 0; k < nkeys; k++) {
         if (keys[k] == "auid") {
-          auid = extractJsonValueAflow(data[l], keys[k]);
+          auid = aurostd::extractJsonValueAflow(data[l], keys[k]);
           auid = auid.substr(1, auid.size() - 2);  // Remove quotes
         } else if (aurostd::WithinList(schema_keys, keys[k])) {
           cols.push_back(keys[k]);
@@ -961,10 +961,31 @@ namespace aflowlib {
     vector<string> values(ncols, "NULL");
     string species = "";  // For special key handling
     for (uint c = 0; c < ncols; c++) {
-      value = extractJsonValueAflow(entry, cols[c]);
+      value = aurostd::extractJsonValueAflow(entry, cols[c]);
 
       // Store for later
       if (cols[c] == "species") species = value;
+
+      // Check for synonyms for changed parameter names
+      if (value.empty()) {
+       if (cols[c] == "aflow_prototype_label_relax") {
+         value = aurostd::extractJsonValueAflow(entry, "anrl_label_relax");
+       } else if (cols[c] == "aflow_prototype_label_orig") {
+         value = aurostd::extractJsonValueAflow(entry, "anrl_label_orig");
+       } else if (cols[c] == "aflow_prototype_parameter_list_relax") {
+          value = aurostd::extractJsonValueAflow(entry, "anrl_parameter_list_relax");
+         if (value.empty()) value = aurostd::extractJsonValueAflow(entry, "aflow_prototype_params_list_relax");
+       } else if (cols[c] == "aflow_prototype_parameter_list_orig") {
+          value = aurostd::extractJsonValueAflow(entry, "anrl_parameter_list_orig");
+         if (value.empty()) value = aurostd::extractJsonValueAflow(entry, "aflow_prototype_params_list_orig");
+       } else if (cols[c] == "aflow_prototype_parameter_values_relax") {
+          value = aurostd::extractJsonValueAflow(entry, "anrl_parameter_values_relax");
+         if (value.empty()) value = aurostd::extractJsonValueAflow(entry, "aflow_prototype_params_values_relax");
+       } else if (cols[c] == "aflow_prototype_parameter_values_orig") {
+          value = aurostd::extractJsonValueAflow(entry, "anrl_parameter_values_orig");
+         if (value.empty()) value = aurostd::extractJsonValueAflow(entry, "aflow_prototype_params_values_orig");
+       }
+     }
 
       // If not found in the json, Check if column is part of the extra schema
       // Only check if not found in case the json is part of a patch file
@@ -981,92 +1002,6 @@ namespace aflowlib {
       }
     }
     return values;
-  }
-
-  //extractJsonKeysAflow//////////////////////////////////////////////////////
-  // This function extracts keys from an aflowlib.json file. It is much
-  // faster than using SQLite's JSON extension, but has was designed to only
-  // work for the aflowlib.json. It cannot handle nested JSONs!
-  vector<string> AflowDB::extractJsonKeysAflow(const string& json) {
-    vector<string> keys;
-    string substring = "";
-    string::size_type pos = 0, lastPos = 0, dpos = 0, quote1  = 0, quote2 = 0, colon = 0;
-
-    // Find the first comma - this is either the end of the key-value pair
-    // or part of an array. Either way, the key is inside.
-    pos = json.find(",");
-    lastPos = 1;  // First character is a curly brace, so skip
-    dpos = pos - lastPos;
-    while ((pos != string::npos) || (lastPos != string::npos)) {
-      // A comma could be separating a key-value pair an array
-      // or numbers or strings
-      substring = json.substr(lastPos, dpos);
-
-      // Find the colon - if there is no colon, it cannot be a key-value pair
-      colon = substring.find(":");
-      if (colon != string::npos) {
-        // A key is enclosed in quotes, so there must be at least two of them
-        quote1 = substring.find("\"");
-        if (quote1 != string::npos) {
-          quote2 = substring.find("\"", quote1 + 1);
-          // Most non-keys are filtered out by now. There could still be array
-          // elements left. In that case, however, the colon is between the quotes,
-          // so make sure that the first two quotes appear before the colon and
-          // take everything in-between as the key. This breaks if quotes, colons,
-          // and commas are inside a string in the right sequence, but should not
-          // be the case in AFLOW's JSON files.
-          if ((quote2 != string::npos) && (quote1 < colon) && (quote2 < colon)) {
-            substring = substring.substr(quote1 + 1, quote2 - quote1 - 1);
-            if (!substring.empty()) keys.push_back(substring);
-          }
-        }
-      }
-      // Move on to the next comma
-      lastPos = json.find_first_not_of(",", pos);
-      pos = json.find(",", lastPos);
-      dpos = pos - lastPos;
-    }
-    return keys;
-  }
-
-  //extractJsonValueAflow/////////////////////////////////////////////////////
-  // This function extracts values from an aflowlib.json file. It is much
-  // faster than using SQLite's JSON extension, but has was designed to only
-  // work for the aflowlib.json. It cannot handle nested JSONs!
-  string AflowDB::extractJsonValueAflow(const string& json, string key) {
-    string value = "";
-    key = "\"" + key + "\":";
-    string::size_type start = 0, end = 0;
-    start = json.find(key);
-    if (start != string::npos) {
-      start += key.length();
-      end = json.find("\":", start);
-      if (end != string::npos) {
-        // In case there is any white space between key and value
-        value = aurostd::RemoveWhiteSpacesFromTheFront(json.substr(start, end - start));
-        // If we have a nested object, "value" should only be '{' + white space by now.
-        if (value[0] == '{') {
-          string function = XPID + _AFLOW_DB_ERR_PREFIX_ + "extractJsonValueAflow():";
-          string message = "JSON parser cannot read nested objects.";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
-        }
-        end = value.find_last_of(",");
-        value = value.substr(0, end);
-      } else {
-        end = json.find("}", start);
-        // In case there is any white space between key and value
-        value = aurostd::RemoveWhiteSpacesFromTheFront(json.substr(start, end - start));
-        // If we have a nested object, it should start with '{'
-        if (value[0] == '{') {
-          string function = XPID + _AFLOW_DB_ERR_PREFIX_ + "extractJsonValueAflow():";
-          string message = "JSON parser cannot read nested objects.";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
-        }
-      }
-    } else {
-      value = "";
-    }
-    return value;
   }
 
 }  // namespace aflowlib
