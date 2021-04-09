@@ -12753,6 +12753,7 @@ void xstructure::GetPrimitive_20210322(double eps) { //DX20210406
   if(natoms_orig == 1 || aurostd::min((*this).num_each_type) == 1) { return; }
 
   (*this).ReScale(1.0);
+  (*this).FixLattices(); //DX20210407 - since we use c2f/f2c, update for safety
 
   // ---------------------------------------------------------------------------
   // set tolerance
@@ -12820,6 +12821,7 @@ void xstructure::GetPrimitive_20210322(double eps) { //DX20210406
   double tol_vol = tolerance * amin * amin * amin;    // scale tolerance for volume
   double atom_number_ratio = 1;                       // track atom ratio during reduction
   double integer_tol = 0.05;                          // use somewhat large tol to find lattices
+  double moduli_sum=AUROSTD_MAX_DOUBLE, moduli_sum_tmp=AUROSTD_MAX_DOUBLE; // ensures shortest sum of lattice vectors (chooses minimum Minkowski lattice, some noise can get introduced)
 
   // ---------------------------------------------------------------------------
   // check possible lattices, upper triangular for-loop only
@@ -12829,6 +12831,7 @@ void xstructure::GetPrimitive_20210322(double eps) { //DX20210406
   //  3) must be an integer multiple of original lattice
   //  4) must reduce atom count consistent with integer multiple
   //  5) must not remove entire atom types
+  //  6) must form shortest vectors
   // Minkowski/Niggli will fix left-handed (negative determinants)
   for(uint iu=0;iu<nlattice_vectors;iu++) { for(uint i=1;i<=3;i++) lattice_tmp[1][i]=candidate_lattice_vector.at(iu)[i];
     for(uint iv=iu+1;iv<nlattice_vectors;iv++) { for(uint i=1;i<=3;i++) lattice_tmp[2][i]=candidate_lattice_vector.at(iv)[i];
@@ -12837,21 +12840,22 @@ void xstructure::GetPrimitive_20210322(double eps) { //DX20210406
             lattice_tmp[1][3]*lattice_tmp[2][1]*lattice_tmp[3][2]-lattice_tmp[1][3]*lattice_tmp[2][2]*lattice_tmp[3][1]-              // FAST
             lattice_tmp[1][2]*lattice_tmp[2][1]*lattice_tmp[3][3]-lattice_tmp[1][1]*lattice_tmp[2][3]*lattice_tmp[3][2]);             // FAST
         if(aurostd::abs(volume_tmp) > tol_vol){
-            plattice=::MinkowskiBasisReduction(lattice_tmp);    // Minkowski first, "::" is needed to access outside xstructure scope
-            plattice=::NiggliUnitCellForm(plattice);            // Niggli Second, "::" is needed to access outside xstructure scope
-            volume_tmp= aurostd::det(plattice);
-            atom_number_ratio = (double)natoms_min/aurostd::nint(volume_orig/volume_tmp);
-        if(volume_tmp > tol_vol &&                                                 // 1) tol > 0
-	    volume_tmp < volume_orig &&                                            // 2) new_tol < orig_tol
-	    aurostd::isinteger(volume_orig / volume_tmp, integer_tol) &&           // 3) new and orig volumes related by integer multiple
-	    aurostd::isinteger(atom_number_ratio, 0.05) &&                         // 4) number of atoms is consistent with integer multiple
-	    (atom_number_ratio-1.0)>-_ZERO_TOL_) {                                 // 5) didn't lose any atoms
-            if(isdifferent(plattice,olattice,0.001)) {
-              olattice=plattice;
-              volume_min = (olattice[1][1]*olattice[2][2]*olattice[3][3]+olattice[1][2]*olattice[2][3]*olattice[3][1]+ // FAST
+          plattice=::MinkowskiBasisReduction(lattice_tmp);    // Minkowski first, "::" is needed to access outside xstructure scope
+          plattice=::NiggliUnitCellForm(plattice);            // Niggli Second, "::" is needed to access outside xstructure scope
+          volume_tmp= aurostd::det(plattice);
+          atom_number_ratio = (double)natoms_min/aurostd::nint(volume_orig/volume_tmp);
+          moduli_sum_tmp = aurostd::modulus(plattice(1)) + aurostd::modulus(plattice(2)) + aurostd::modulus(plattice(3));
+          if(volume_tmp > tol_vol &&                                                 // 1) tol > 0
+              volume_tmp < volume_orig &&                                            // 2) new_tol < orig_tol
+              aurostd::isinteger(volume_orig / volume_tmp, integer_tol) &&           // 3) new and orig volumes related by integer multiple
+              aurostd::isinteger(atom_number_ratio, 0.05) &&                         // 4) number of atoms is consistent with integer multiple
+              (atom_number_ratio-1.0)>-_ZERO_TOL_ &&                                 // 5) didn't lose any atoms
+              moduli_sum_tmp < moduli_sum){                                          // 6) ensure shortest sum of vectors (Minkowski should ensure this, but noise can be introduced)
+            moduli_sum = moduli_sum_tmp;
+            olattice=plattice;
+            volume_min = (olattice[1][1]*olattice[2][2]*olattice[3][3]+olattice[1][2]*olattice[2][3]*olattice[3][1]+ // FAST
                 olattice[1][3]*olattice[2][1]*olattice[3][2]-olattice[1][3]*olattice[2][2]*olattice[3][1]-             // FAST
                 olattice[1][2]*olattice[2][1]*olattice[3][3]-olattice[1][1]*olattice[2][3]*olattice[3][2]);            // FAST
-            }
           }
         }
       }
@@ -17391,7 +17395,7 @@ void xstructure::ChangeBasis(const xmatrix<double>& transformation_matrix) {
   uint natoms_orig = (*this).atoms.size();
   uint natoms_transformed = 0;
   bool is_integer_multiple_transformation = true;
-  double tol=(*this).dist_nn_min-0.1; //DX20210316 - 0.1 is not robust, used slightly less than min dist
+  double tol=0.9*(*this).dist_nn_min; //DX20210316 - 0.1 is not robust, used fraction of min_dist
 
   // ---------------------------------------------------------------------------
   // transform the lattice 
