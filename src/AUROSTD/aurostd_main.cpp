@@ -5222,7 +5222,7 @@ namespace aurostd {
     //use cat/tac if you know it comes at the end of the file
     //adding size_max: if the file is bigger than size_max, then do not search and return FALSE
     //files that are too big will freeze-up the grep command
-    bool LDEBUG=(true || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy = XPID + "aurostd::substring_present_file_FAST():";
     string message = "";
     

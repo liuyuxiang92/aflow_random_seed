@@ -726,27 +726,23 @@ int main(int _argc,char **_argv) {
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_FoldAtomsInCell|--FoldAtomsInCell_test")) {return (FoldAtomsInCellTest(cout)?0:1);}  //DX20210129
     if(!Arun && aurostd::args2flag(argv,cmds,"--test")) {
 
-      cerr << KBIN::VASP_OSZICARUnconverging("/home/aflow/work/jobs_submission/to_run/first_run/library/LIB2_WARNINGS/WARNINGS/OUTCAR_INCOMPLETE/LIB2/LIB/CeO/AB_oP2_47_a_e-001.AB") << endl;
-      exit(0);
+      //cerr << KBIN::VASP_OSZICARUnconverging("/home/aflow/work/jobs_submission/to_run/first_run/library/LIB2_WARNINGS/WARNINGS/OUTCAR_INCOMPLETE/LIB2/LIB/CeO/AB_oP2_47_a_e-001.AB") << endl;
 
       //bool spff=aurostd::substring_present_file_FAST("test"," EDD DAV ",true,true,true);
       //cerr << spff << endl;
-      //exit(0);
 
-      cerr << "size=" << aurostd::FileSize("/mnt/work/aflow/jobs_submission/to_run/first_run/library/LIB2_WARNINGS/WARNINGS/SYMPREC/LIB2/LIB/CIr/b2/test/vasp.out") << " bytes" << endl;
-      exit(0);
+      //cerr << "size=" << aurostd::FileSize("/mnt/work/aflow/jobs_submission/to_run/first_run/library/LIB2_WARNINGS/WARNINGS/SYMPREC/LIB2/LIB/CIr/b2/test/vasp.out") << " bytes" << endl;
 
-      cerr << "bin=" << GetVASPBinaryFromLOCK("/home/aflow/work/jobs_submission/to_run/first_run/library/LIB2_WARNINGS/WARNINGS/SYMPREC/LIB2/LIB/CIr/303") << endl;
+      //cerr << "bin=" << GetVASPBinaryFromLOCK("/home/aflow/work/jobs_submission/to_run/first_run/library/LIB2_WARNINGS/WARNINGS/SYMPREC/LIB2/LIB/CIr/303") << endl;
 
-      cerr << "aurostd::dirname(\"PARK\")=" << aurostd::dirname("PARK") << endl;
-      cerr << "aurostd::dirname(\"/home/corey/PARK\")=" << aurostd::dirname("/home/corey/PARK") << endl;
-      cerr << "aurostd::dirname(\"/home/corey/PARK/\")=" << aurostd::dirname("/home/corey/PARK/") << endl;
-      cerr << "aurostd::basename(\"PARK\")=" << aurostd::basename("PARK") << endl;
-      cerr << "aurostd::basename(\"/home/corey/PARK\")=" << aurostd::basename("/home/corey/PARK") << endl;
-      cerr << "aurostd::basename(\"/home/corey/PARK/\")=" << aurostd::basename("/home/corey/PARK/") << endl;
+      //cerr << "aurostd::dirname(\"PARK\")=" << aurostd::dirname("PARK") << endl;
+      //cerr << "aurostd::dirname(\"/home/corey/PARK\")=" << aurostd::dirname("/home/corey/PARK") << endl;
+      //cerr << "aurostd::dirname(\"/home/corey/PARK/\")=" << aurostd::dirname("/home/corey/PARK/") << endl;
+      //cerr << "aurostd::basename(\"PARK\")=" << aurostd::basename("PARK") << endl;
+      //cerr << "aurostd::basename(\"/home/corey/PARK\")=" << aurostd::basename("/home/corey/PARK") << endl;
+      //cerr << "aurostd::basename(\"/home/corey/PARK/\")=" << aurostd::basename("/home/corey/PARK/") << endl;
 
       cerr << aurostd::joinWDelimiter(aurostd::ProcessPIDs("migration")," ") << endl;
-      exit(0);
 
       stringstream ss1;
       ss1 << "MAGMOM = 1 -1 -1 1 # blah" << endl;
@@ -759,9 +755,9 @@ int main(int _argc,char **_argv) {
       cerr << "process(aflow)=" << aurostd::ProcessRunning("aflow") << endl;
       cerr << "process(vasp)=" << aurostd::ProcessRunning("vasp") << endl;
 
-      cerr << "string=" << KBIN::getVASPVersion("/home/bin/vasp_std") << endl;
-      cerr << "number=" << KBIN::getVASPVersionNumber("/home/bin/vasp_std") << endl;
-      cerr << "double=" << KBIN::getVASPVersionDouble("/home/bin/vasp_std") << endl;
+      //cerr << "string=" << KBIN::getVASPVersion("/home/bin/vasp_std") << endl;
+      //cerr << "number=" << KBIN::getVASPVersionNumber("/home/bin/vasp_std") << endl;
+      //cerr << "double=" << KBIN::getVASPVersionDouble("/home/bin/vasp_std") << endl;
 
       if(XHOST.vext.size()!=XHOST.vcat.size()) {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"XHOST.vext.size()!=XHOST.vcat.size(), aborting.",_RUNTIME_ERROR_);}
 
