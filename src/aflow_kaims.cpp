@@ -197,7 +197,7 @@ namespace KBIN{
     FileAFLOWIN.clear();FileAFLOWIN.seekg(0);
     AflowIn=aurostd::RemoveComments(AflowIn); // NOW Clean AFLOWIN
     if(!FileAFLOWIN) {                                                                                      // ******* _AFLOWIN_ does not exist
-      aus << "EEEEE  " << _AFLOWIN_ << " ABSENT   = " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+      aus << "EEEEE  " << _AFLOWIN_ << " ABSENT   = " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
       aurostd::PrintMessageStream(aus,XHOST.QUIET);
       return FALSE;
     }
@@ -214,24 +214,24 @@ namespace KBIN{
     // ***************************************************************************
     // Get the KBIN_BIN name
     aurostd::StringstreamClean(aus);
-    aus << "00000  MESSAGE KBIN::AIMS_Directory Running KBIN_BIN=\"" << kflags.KBIN_BIN << "\" " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aus << "00000  MESSAGE KBIN::AIMS_Directory Running KBIN_BIN=\"" << kflags.KBIN_BIN << "\" " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     // ***************************************************************************
     // Some verbose
-    if(kflags.KBIN_PHONONS_CALCULATION_APL) aus << "00000  MESSAGE KBIN::AIMS_Directory Running PHONONS_CALCULATION_APL" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-    if(kflags.KBIN_PHONONS_CALCULATION_QHA) aus << "00000  MESSAGE KBIN::AIMS_Directory Running PHONONS_CALCULATION_QHA" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;   //CO20170601
-    if(kflags.KBIN_PHONONS_CALCULATION_AAPL) aus << "00000  MESSAGE KBIN::AIMS_Directory Running PHONONS_CALCULATION_AAPL" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl; //CO20170601
-    if(kflags.KBIN_PHONONS_CALCULATION_AGL) aus << "00000  MESSAGE KBIN::AIMS_Directory Running PHONONS_CALCULATION_AGL (Debye Model)" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-    if(kflags.KBIN_PHONONS_CALCULATION_AEL) aus << "00000  MESSAGE KBIN::AIMS_Directory Running PHONONS_CALCULATION_AEL (Elastic constants)" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-    if(kflags.KBIN_PHONONS_CALCULATION_FROZSL) aus << "00000  MESSAGE KBIN::AIMS_Directory Running PHONONS_CALCULATION_FROZSL" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-    if(aimsflags.KBIN_AIMS_RUN.flag("GENERATE")) aus << "00000  MESSAGE KBIN::AIMS_Directory Running RUN_GENERATE" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    if(kflags.KBIN_PHONONS_CALCULATION_APL) aus << "00000  MESSAGE KBIN::AIMS_Directory Running PHONONS_CALCULATION_APL" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+    if(kflags.KBIN_PHONONS_CALCULATION_QHA) aus << "00000  MESSAGE KBIN::AIMS_Directory Running PHONONS_CALCULATION_QHA" << Message(_AFLOW_FILE_NAME_,aflags) << endl;   //CO20170601
+    if(kflags.KBIN_PHONONS_CALCULATION_AAPL) aus << "00000  MESSAGE KBIN::AIMS_Directory Running PHONONS_CALCULATION_AAPL" << Message(_AFLOW_FILE_NAME_,aflags) << endl; //CO20170601
+    if(kflags.KBIN_PHONONS_CALCULATION_AGL) aus << "00000  MESSAGE KBIN::AIMS_Directory Running PHONONS_CALCULATION_AGL (Debye Model)" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+    if(kflags.KBIN_PHONONS_CALCULATION_AEL) aus << "00000  MESSAGE KBIN::AIMS_Directory Running PHONONS_CALCULATION_AEL (Elastic constants)" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+    if(kflags.KBIN_PHONONS_CALCULATION_FROZSL) aus << "00000  MESSAGE KBIN::AIMS_Directory Running PHONONS_CALCULATION_FROZSL" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+    if(aimsflags.KBIN_AIMS_RUN.flag("GENERATE")) aus << "00000  MESSAGE KBIN::AIMS_Directory Running RUN_GENERATE" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     // ***************************************************************************
     uint ntasks=0;
     ntasks=1; // default
     if(aimsflags.KBIN_AIMS_GEOM_MODE.flag("EXPLICIT_START_STOP_POINT")) {
       ntasks=aimsflags.KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRING.size();
-      aus << "00000  MESSAGE Loaded ntasks = " << ntasks << " - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+      aus << "00000  MESSAGE Loaded ntasks = " << ntasks << " - " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       for(uint i=0;i<aimsflags.KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRING.size();i++) {
         aus << "00000  MESSAGE task " << i << "/" << ntasks << " in subdirectory " << aimsflags.KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRING.at(i) << endl;
@@ -251,7 +251,7 @@ namespace KBIN{
       aflags=aflags_backup;kflags=kflags_backup; // load it up
       // some verbose
       if(aimsflags.KBIN_AIMS_GEOM_MODE.flag("EXPLICIT_START_STOP_POINT")) {
-        aus << "00000  MESSAGE START loop " << xaims.GEOM_index << "/" << aimsflags.KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRING.size() << " - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+        aus << "00000  MESSAGE START loop " << xaims.GEOM_index << "/" << aimsflags.KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRING.size() << " - " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       }
       if(LDEBUG) cerr << XPID << "KBIN::AIMS_Directory: [1]" << xaims.str << endl; 
@@ -261,14 +261,14 @@ namespace KBIN{
       xaims.Directory=aflags.Directory;
       if(aimsflags.KBIN_AIMS_GEOM_MODE.flag("EXPLICIT_START_STOP_POINT")) {
         xaims.Directory=aflags.Directory+"/"+KBIN_SUBDIRECTORIES+aimsflags.KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRING.at(xaims.GEOM_index);
-        aus << "00000  MESSAGE Taking loop directory = " << xaims.Directory << " - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+        aus << "00000  MESSAGE Taking loop directory = " << xaims.Directory << " - " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       }
       // check for directory KY CHECK THIS (if Krun=FALSE, everything stops).
       if(Krun && aimsflags.KBIN_AIMS_GEOM_MODE.flag("EXPLICIT_START_STOP_POINT")) {
         if(aurostd::FileExist(xaims.Directory)) {
           Krun=FALSE; // avoid rerunning
-          aus << "00000  MESSAGE Skipping loop directory = " << xaims.Directory << " - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+          aus << "00000  MESSAGE Skipping loop directory = " << xaims.Directory << " - " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
           aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
         } else {
           // before making it, check it again... NFS problem... check LOCK again
@@ -278,7 +278,7 @@ namespace KBIN{
           if(Krun && aurostd::EFileExist(xaims.Directory+"/LLOCK")) Krun=FALSE;     // to fight against NFS cache
           if(Krun) {
             aurostd::DirectoryMake(xaims.Directory);
-            aus << "00000  MESSAGE Creating loop directory = " << xaims.Directory << " - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+            aus << "00000  MESSAGE Creating loop directory = " << xaims.Directory << " - " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
             aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
             aurostd::execute("echo \"NNNNN  KBIN LLOCK ASAP for NFS concurrent jobs (aflow"+string(AFLOW_VERSION)+")\" >> "+xaims.Directory+"/LLOCK");
           }
@@ -288,7 +288,7 @@ namespace KBIN{
 
       if(Krun) {
         aflags.Directory=xaims.Directory; // so we are set ! since there are plenty of routines with aflags.Directory inside
-        aus << "00000  MESSAGE Performing loop directory = " << xaims.Directory << " - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+        aus << "00000  MESSAGE Performing loop directory = " << xaims.Directory << " - " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       }
       // ------------------------------------------
@@ -318,15 +318,15 @@ namespace KBIN{
         ifstream DirectoryStream;
         DirectoryStream.open(xaims.Directory.c_str(),std::ios::in);
         if(!DirectoryStream) {
-          //   aus << "EEEEE  DIRECTORY_NOT_FOUND = " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-          aus << "XXXXX  MAKING DIRECTORY = " << xaims.Directory << "  " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+          //   aus << "EEEEE  DIRECTORY_NOT_FOUND = " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+          aus << "XXXXX  MAKING DIRECTORY = " << xaims.Directory << "  " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
           aurostd::PrintMessageStream(aus,XHOST.QUIET); // return FALSE;
           string str="mkdir "+xaims.Directory;
           system(str.c_str());
         }
         // some check
         if(!FileAFLOWIN) {                                                                                      // ******* _AFLOWIN_ does not exist
-          //    aus << "EEEEE  " << _AFLOWIN_ << " ABSENT   = " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+          //    aus << "EEEEE  " << _AFLOWIN_ << " ABSENT   = " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
           //    aurostd::PrintMessageStream(aus,XHOST.QUIET);
           //    return FALSE;
         }
@@ -364,35 +364,35 @@ namespace KBIN{
         // GENERATE ONLY -------------------------------------------------------------
         if(aimsflags.KBIN_AIMS_RUN.flag("GENERATE")) {
           KBIN::AIMS_Write_INPUT(xaims,aimsflags); // AIMS AIMS WRITE
-          aus << "00000  MESSAGE AIMS generation files ONLY " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+          aus << "00000  MESSAGE AIMS generation files ONLY " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
           aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
           Krun=FALSE;
         } else {
           // RUN SOMETHING
           if(kflags.KBIN_PHONONS_CALCULATION_APL) {  // RUN PHONONS APL ------------------------
-            aus << "00000  MESSAGE PERFORMING PHONONS_CALCULATION_APL " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+            aus << "00000  MESSAGE PERFORMING PHONONS_CALCULATION_APL " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
             aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
           }
           //CO START 20170601
           if(kflags.KBIN_PHONONS_CALCULATION_QHA) {  // RUN PHONONS QHA ------------------------
-            aus << "00000  MESSAGE PERFORMING PHONONS_CALCULATION_QHA " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+            aus << "00000  MESSAGE PERFORMING PHONONS_CALCULATION_QHA " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
             aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
           }
           if(kflags.KBIN_PHONONS_CALCULATION_AAPL) {  // RUN PHONONS AAPL ------------------------
-            aus << "00000  MESSAGE PERFORMING PHONONS_CALCULATION_AAPL " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+            aus << "00000  MESSAGE PERFORMING PHONONS_CALCULATION_AAPL " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
             aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
           }
           //CO END 20170601
           if(kflags.KBIN_PHONONS_CALCULATION_AGL) {  // RUN PHONONS AGL ------------------------
-            aus << "00000  MESSAGE PERFORMING PHONONS_CALCULATION_AGL (Debye Model) " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+            aus << "00000  MESSAGE PERFORMING PHONONS_CALCULATION_AGL (Debye Model) " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
             aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
           }
           if(kflags.KBIN_PHONONS_CALCULATION_AEL) {  // RUN PHONONS AEL ------------------------
-            aus << "00000  MESSAGE PERFORMING PHONONS_CALCULATION_AEL (Elastic constants) " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+            aus << "00000  MESSAGE PERFORMING PHONONS_CALCULATION_AEL (Elastic constants) " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
             aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
           }
           if(kflags.KBIN_PHONONS_CALCULATION_FROZSL) {  // RUN PHONONS FROZSL ------------------------
-            aus << "00000  MESSAGE PERFORMING PHONONS_CALCULATION_FROZSL " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+            aus << "00000  MESSAGE PERFORMING PHONONS_CALCULATION_FROZSL " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
             aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
           }
 
@@ -443,8 +443,8 @@ namespace KBIN{
       // some verbose
       if(aimsflags.KBIN_AIMS_GEOM_MODE.flag("EXPLICIT_START_STOP_POINT")) {
         aus << "00000  MESSAGE END loop " << xaims.GEOM_index << "/" << aimsflags.KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRING.size()
-          << " - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-        aus << "00000  MESSAGE END loop in directory =" << xaims.Directory << " - " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+          << " - " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+        aus << "00000  MESSAGE END loop in directory =" << xaims.Directory << " - " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
         // compress the subdirectories
         if(Krun && kflags.KZIP_COMPRESS) KBIN::CompressDirectory(aflags,kflags);

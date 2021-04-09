@@ -1841,7 +1841,7 @@ double AFLOW_checkMEMORY(const string& progname,double memory) {
 }
 
 // ***************************************************************************
-// AFLOW_monitor_VASP
+// GetVASPBinaryFromLOCK
 // ***************************************************************************
 string GetVASPBinaryFromLOCK(const string& directory){  //CO20210315
   bool LDEBUG=(FALSE || XHOST.DEBUG);
@@ -2082,7 +2082,7 @@ void AFLOW_monitor_VASP(const string& directory){
 // Messages
 // ***************************************************************************
 pthread_mutex_t mutex_INIT_Message=PTHREAD_MUTEX_INITIALIZER;
-string Message(const string& list2print) {
+string Message(const string& filename,const string& list2print){
   pthread_mutex_lock(&mutex_INIT_Message);
   // pthread_mutex_unlock(&mutex_INIT_Message);
   stringstream strout;
@@ -2102,23 +2102,14 @@ string Message(const string& list2print) {
   //if(XHOST.maxmem>0.0 && XHOST.maxmem<100.0) AFLOW_checkMEMORY("vasp",XHOST.maxmem);  //CO20170628 - this is already run above, very slow
   // if(XHOST.maxmem>0.0 && XHOST.maxmem<100.0) AFLOW_checkMEMORY("aflow",XHOST.maxmem);
   // if(XHOST.maxmem>0.0 && XHOST.maxmem<100.0) AFLOW_checkMEMORY("clamd",XHOST.maxmem);
+  if(!filename.empty()) strout << " - ["  <<  filename << "]";  //CO20200713
   return strout.str();
 }
-
-//[CO20200713 - OBSOLETE]string Message(const string& str1,const string& list2print) {return string(" - "+str1+Message(list2print));}
-string Message(const string& list2print,const string& filename) { //CO20200713
-  stringstream strout;  //CO20200713
-  strout << Message(list2print);  //CO20200624 - do not check for empty - print ERROR_TEMPERATURE
-  if(!filename.empty()) strout << " - ["  <<  filename << "]";  //CO20200713
-  return strout.str();  //CO20200713
-}
-//string Message(const _aflags& aflags) {return string(" - "+aflags.Directory + "\n");}
-string Message(const _aflags& aflags) {return Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_);}
-string Message(const _aflags& aflags,const string& list2print,const string& filename) { //CO20200713
+string Message(const string& filename,const _aflags& aflags,const string& list2print){ //CO20200713
   stringstream strout;  //CO20200713
   if(!list2print.empty()) strout << " - [dir=" << aflags.Directory << "]";  //CO20200713
   if(AFLOW_PTHREADS::FLAG) strout << " - [thread=" << aurostd::utype2string(aflags.AFLOW_PTHREADS_NUMBER) << "/" << aurostd::utype2string(AFLOW_PTHREADS::MAX_PTHREADS) << "]"; //CO20200713
-  strout << Message(list2print,filename); //CO20200713
+  strout << Message(filename,list2print); //CO20200713
   return strout.str();  //CO20200713
 }
 

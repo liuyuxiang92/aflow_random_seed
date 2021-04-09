@@ -1231,7 +1231,7 @@ namespace aflowlib {
         aurostd::ZIP2ZIP(directory_LIB,"bz2","xz",FALSE,XHOST.sPID); // PATCH FOR REFRESH (to be removed)
         aurostd::ZIP2ZIP(directory_LIB,"gz","xz",FALSE,XHOST.sPID); // PATCH FOR REFRESH (to be removed)
 
-        cout << soliloquy << " ALREADY CALCULATED = " << directory_RAW << "   END_DATE - [v=" << string(AFLOW_VERSION) << "] -" << Message(aflags,"time",_AFLOW_FILE_NAME_) << endl;
+        cout << soliloquy << " ALREADY CALCULATED = " << directory_RAW << "   END_DATE - [v=" << string(AFLOW_VERSION) << "] -" << Message(_AFLOW_FILE_NAME_,aflags,"time") << endl;
         return FALSE;
       }
       if(perform_BANDS) {
@@ -1278,7 +1278,7 @@ namespace aflowlib {
 
     //[CO20200624 - OBSOLETE]if((perform_THERMODYNAMICS || perform_BANDS ||  perform_STATIC))
     _aflags aflags;
-    cout << soliloquy << " dir=" << directory_LIB << " BEGIN_DATE = " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    cout << soliloquy << " dir=" << directory_LIB << " BEGIN_DATE = " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
     aurostd::ZIP2ZIP(directory_LIB,"bz2","xz",TRUE,XHOST.sPID); 
     aurostd::ZIP2ZIP(directory_LIB,"gz","xz",TRUE,XHOST.sPID);
 
@@ -1879,8 +1879,8 @@ namespace aflowlib {
 
       // for(uint i=0;i<aflowlib_data.vauid.size();i++) { cout << soliloquy << " DEBUG  aflowlib_data.vauid.at(" << i << ")=" << aflowlib_data.vauid.at(i) << endl; }
       // DONE
-      //      cout << soliloquy << " dir=" << directory_LIB << "   END_DATE - [v=" << string(AFLOW_VERSION) << "] -" << " [time=" << aurostd::utype2string(aurostd::get_seconds(seconds_begin),2) << "] " << Message(aflags,"time",_AFLOW_FILE_NAME_) << endl;
-      cout << soliloquy << " dir=" << directory_LIB << "   END_DATE - [v=" << string(AFLOW_VERSION) << "] -" << Message(aflags,"time",_AFLOW_FILE_NAME_) << " [time=" << aurostd::utype2string(aurostd::get_seconds(seconds_begin),2,FIXED_STREAM) << "] " << endl; //CO20200624 - added FIXED_STREAM
+      //      cout << soliloquy << " dir=" << directory_LIB << "   END_DATE - [v=" << string(AFLOW_VERSION) << "] -" << " [time=" << aurostd::utype2string(aurostd::get_seconds(seconds_begin),2) << "] " << Message(_AFLOW_FILE_NAME_,aflags,"time") << endl;
+      cout << soliloquy << " dir=" << directory_LIB << "   END_DATE - [v=" << string(AFLOW_VERSION) << "] -" << Message(_AFLOW_FILE_NAME_,aflags,"time") << " [time=" << aurostd::utype2string(aurostd::get_seconds(seconds_begin),2,FIXED_STREAM) << "] " << endl; //CO20200624 - added FIXED_STREAM
       if(XHOST.vflag_control.flag("BEEP")) aurostd::beep(aurostd::min(6000,aurostd::abs(int(1*aflowlib_data.aflowlib2string().length()-2000))),50);
     }
 

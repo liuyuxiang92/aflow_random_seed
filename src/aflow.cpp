@@ -726,6 +726,16 @@ int main(int _argc,char **_argv) {
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_FoldAtomsInCell|--FoldAtomsInCell_test")) {return (FoldAtomsInCellTest(cout)?0:1);}  //DX20210129
     if(!Arun && aurostd::args2flag(argv,cmds,"--test")) {
 
+      cerr << KBIN::VASP_OSZICARUnconverging("/home/aflow/work/jobs_submission/to_run/first_run/library/LIB2_WARNINGS/WARNINGS/OUTCAR_INCOMPLETE/LIB2/LIB/CeO/AB_oP2_47_a_e-001.AB") << endl;
+      exit(0);
+
+      //bool spff=aurostd::substring_present_file_FAST("test"," EDD DAV ",true,true,true);
+      //cerr << spff << endl;
+      //exit(0);
+
+      cerr << "size=" << aurostd::FileSize("/mnt/work/aflow/jobs_submission/to_run/first_run/library/LIB2_WARNINGS/WARNINGS/SYMPREC/LIB2/LIB/CIr/b2/test/vasp.out") << " bytes" << endl;
+      exit(0);
+
       cerr << "bin=" << GetVASPBinaryFromLOCK("/home/aflow/work/jobs_submission/to_run/first_run/library/LIB2_WARNINGS/WARNINGS/SYMPREC/LIB2/LIB/CIr/303") << endl;
 
       cerr << "aurostd::dirname(\"PARK\")=" << aurostd::dirname("PARK") << endl;

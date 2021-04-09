@@ -5209,19 +5209,69 @@ namespace aurostd {
     return aurostd::substring2bool(StringFile,strsub1,RemoveWS,RemoveComments);
   }
 
-  bool substring_present_file_FAST(const string& FileName, const string& _strsub1, bool RemoveWS, bool case_insensitive) {
-    // be careful, this does not filter-out # comments
+  bool substring_present_file_FAST(const string& FileName, const string& _strsub1, bool RemoveWS, bool case_insensitive,bool expect_near_end,unsigned long long int size_max) {
+    //be careful, this does not filter-out # comments
     //CO20210315 - this function is not only fast, but it enables grepping through VERY large files,
     //whereas reading the whole file into memory can lead to out-of-memory issues for aflow
     //leverages regex power of grep (better than reading in cpp line by line and processing the string)
     //CO20210315 - adding case_insensitive
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    //https://stackoverflow.com/questions/13913014/grepping-a-huge-file-80gb-any-way-to-speed-it-up
+    //use LC_ALL=C to speed up grep
+    //use fgrep if possible
+    //use -m 1 to stop at the first match
+    //use cat/tac if you know it comes at the end of the file
+    //adding size_max: if the file is bigger than size_max, then do not search and return FALSE
+    //files that are too big will freeze-up the grep command
+    bool LDEBUG=(true || XHOST.DEBUG);
     string soliloquy = XPID + "aurostd::substring_present_file_FAST():";
     string message = "";
     
     if(!aurostd::FileExist(FileName)) {
       message = "file input not found =" + FileName;
       throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _FILE_NOT_FOUND_);
+    }
+    if(size_max!=AUROSTD_MAX_ULLINT){
+      unsigned long long int fsize=aurostd::FileSize(FileName);
+      if(fsize>=size_max){return false;}
+    }
+    
+    bool use_regex=true;
+    string strsub1=_strsub1;
+
+    string grep_command="grep";
+    if(( (RemoveWS==false && case_insensitive==false) ||
+        (!(use_regex==true && (RemoveWS==true||case_insensitive==true))) ) && 
+        aurostd::IsCommandAvailable("fgrep")){grep_command="fgrep";}  //fixed string search
+    if(LDEBUG){cerr << soliloquy << " grep_command=\"" << grep_command << "\"" << endl;}
+    
+    string grep_flags="-c";
+    if(case_insensitive==true){
+      grep_flags="-ic";
+      strsub1=aurostd::tolower(strsub1);
+    }
+    if(use_regex){
+      grep_flags="-E "+grep_flags;
+    }
+    if(LDEBUG){cerr << soliloquy << " grep_flags=\"" << grep_flags << "\"" << endl;}
+
+    string cat_command="cat";
+    if(expect_near_end && aurostd::IsCommandAvailable("tac")){cat_command="tac";}
+    if(LDEBUG){cerr << soliloquy << " cat_command=\"" << cat_command << "\"" << endl;}
+
+    if(RemoveWS){
+      if(use_regex){  //use regex
+        aurostd::StringSubst(strsub1,"\t"," ");
+        string strsub1_keep=strsub1;
+        vector<string> vtokens;
+        aurostd::string2tokens(strsub1,vtokens," ");
+        strsub1=aurostd::joinWDelimiter(vtokens,"\\s*");
+        if(!strsub1_keep.empty() && strsub1_keep[0]==' '){strsub1="\\s*"+strsub1;}  //insert at the front
+        if(!strsub1_keep.empty() && strsub1_keep[strsub1_keep.size()-1]==' '){strsub1+="\\s*";} //append at the back
+        if(LDEBUG){cerr << soliloquy << " strsub1(regex)=\"" << strsub1 << "\"" << endl;}
+      }else{
+        strsub1=aurostd::RemoveWhiteSpaces(strsub1);
+        if(LDEBUG){cerr << soliloquy << " strsub1(!regex)=\"" << strsub1 << "\"" << endl;}
+      }
     }
 
     string temp_file=aurostd::TmpFileCreate("substring");
@@ -5230,18 +5280,13 @@ namespace aurostd {
     int found=0;
     aurostd::StringstreamClean(aus);
     aus << "rm -f " << temp_file  << endl;
-    aus << "cat \"" << FileName << "\"";
-    string strsub1=_strsub1;
-    if(RemoveWS==TRUE){
+    if(1){aus << "LC_ALL=C ";}  //speed up grep
+    aus << cat_command << " \"" << FileName << "\"";
+    if(use_regex==false && RemoveWS==TRUE){
       aus << " | sed \"s/ //g\" | sed \"s/\\t//g\"";
-      strsub1=aurostd::RemoveWhiteSpaces(strsub1);
     }
-    string flags_grep="-c";
-    if(case_insensitive==true){
-      flags_grep="-ic";
-      strsub1=aurostd::tolower(strsub1);
-    }
-    aus << " | grep " << flags_grep << " \"" << strsub1 << "\" > " << temp_file  << endl;
+
+    aus << " | " << grep_command << " " << grep_flags << " -m 1 \"" << strsub1 << "\" > " << temp_file  << endl;  //-m 1: stop when you find a match
     aus << "echo >> " << temp_file << endl; // to give EOL
     if(LDEBUG){cerr << soliloquy << " command=\"" << aus.str() << "\"" << endl;}
     aurostd::execute(aus);
