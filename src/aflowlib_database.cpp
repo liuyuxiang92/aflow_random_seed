@@ -530,6 +530,7 @@ namespace aflowlib {
         uint k = 0;
         for (k = 0; k < nkeys; k++) {
           key = XHOST.vschema.getattachedscheme("SCHEMA::NAME:" + keys_schema[k]);
+          if (key.empty()) key = vschema_extra.getattachedscheme("SCHEMA::NAME:" + keys_schema[k]);
           if (!aurostd::WithinList(columns, key, index)) break;
           if (types_db[index] != types_schema[k]) break;
         }
