@@ -24,13 +24,13 @@
 
 //ME20191001 START
 // DEFAULTS AFLOW DATABASE
-#define AFLOWRC_DEFAULT_AFLOW_DB_FILE                   string("/common/AFLOWCACHE/aflowlib.db")
+#define AFLOWRC_DEFAULT_AFLOW_DB_FILE                   string("/common/AFLOWCACHE/AFLOWDB/aflowlib.db")
 #define         DEFAULT_AFLOW_DB_FILE                   XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_DB_FILE")
-#define AFLOWRC_DEFAULT_AFLOW_DB_STATS_FILE             string("/common/AFLOWCACHE/aflowlib.json")
+#define AFLOWRC_DEFAULT_AFLOW_DB_STATS_FILE             string("/common/AFLOWCACHE/AFLOWDB/aflowlib.json")
 #define         DEFAULT_AFLOW_DB_STATS_FILE             XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_DB_STATS_FILE")
 #define AFLOWRC_DEFAULT_AFLOW_DB_DATA_PATH              string("/common/AFLOW/LIBS/")
 #define         DEFAULT_AFLOW_DB_DATA_PATH              XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_DB_DATA_PATH")
-#define AFLOWRC_DEFAULT_AFLOW_DB_LOCK_FILE              string("/common/AFLOWCACHE/ADB_Idle.lock")
+#define AFLOWRC_DEFAULT_AFLOW_DB_LOCK_FILE              string("/common/AFLOWCACHE/AFLOWDB/ADB_Idle.lock")
 #define         DEFAULT_AFLOW_DB_LOCK_FILE              XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_DB_LOCK_FILE")
 #define AFLOWRC_DEFAULT_AFLOW_DB_STALE_THRESHOLD        3*3600
 #define         DEFAULT_AFLOW_DB_STALE_THRESHOLD        XHOST.adefault.getattachedutype<long int>("DEFAULT_AFLOW_DB_STALE_THRESHOLD")
