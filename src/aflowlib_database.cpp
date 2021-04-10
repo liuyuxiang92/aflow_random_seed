@@ -973,18 +973,18 @@ namespace aflowlib {
          value = aurostd::extractJsonValueAflow(entry, "anrl_label_relax");
        } else if (cols[c] == "aflow_prototype_label_orig") {
          value = aurostd::extractJsonValueAflow(entry, "anrl_label_orig");
-       } else if (cols[c] == "aflow_prototype_parameter_list_relax") {
+       } else if (cols[c] == "aflow_prototype_params_list_relax") {
           value = aurostd::extractJsonValueAflow(entry, "anrl_parameter_list_relax");
-         if (value.empty()) value = aurostd::extractJsonValueAflow(entry, "aflow_prototype_params_list_relax");
-       } else if (cols[c] == "aflow_prototype_parameter_list_orig") {
+         if (value.empty()) value = aurostd::extractJsonValueAflow(entry, "aflow_prototype_parameter_list_relax");
+       } else if (cols[c] == "aflow_prototype_params_list_orig") {
           value = aurostd::extractJsonValueAflow(entry, "anrl_parameter_list_orig");
-         if (value.empty()) value = aurostd::extractJsonValueAflow(entry, "aflow_prototype_params_list_orig");
-       } else if (cols[c] == "aflow_prototype_parameter_values_relax") {
+         if (value.empty()) value = aurostd::extractJsonValueAflow(entry, "aflow_prototype_parameter_list_orig");
+       } else if (cols[c] == "aflow_prototype_params_values_relax") {
           value = aurostd::extractJsonValueAflow(entry, "anrl_parameter_values_relax");
-         if (value.empty()) value = aurostd::extractJsonValueAflow(entry, "aflow_prototype_params_values_relax");
-       } else if (cols[c] == "aflow_prototype_parameter_values_orig") {
+         if (value.empty()) value = aurostd::extractJsonValueAflow(entry, "aflow_prototype_parameter_values_relax");
+       } else if (cols[c] == "aflow_prototype_params_values_orig") {
           value = aurostd::extractJsonValueAflow(entry, "anrl_parameter_values_orig");
-         if (value.empty()) value = aurostd::extractJsonValueAflow(entry, "aflow_prototype_params_values_orig");
+         if (value.empty()) value = aurostd::extractJsonValueAflow(entry, "aflow_prototype_parameter_values_orig");
        }
      }
 
