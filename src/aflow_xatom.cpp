@@ -3486,7 +3486,7 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
     oss << "atoms" << endl;
     oss << " " << setw(49) << std::left << a.species.size();
     oss << ": nspecies" << endl;
-    xvector<double> magnetic_field; // not currently supported; zero vector for now
+    //DX20210409 [OBSOLETE] xvector<double> magnetic_field; // not currently supported; zero vector for now
     for(uint i=0;i<a.num_each_type.size();i++){
       oss << setw(50) << std::left << "\'" + a.species[i] + ".in\'";
       oss << ": spfname" << endl;
@@ -3507,11 +3507,11 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
               oss << a.atoms.at(iat).fpos(j) << " ";
             }
           }
-          // magnetic field
+          // magnetic field //DX20210409 - updated with non-collinear spin
           for(uint j=1;j<=3;j++) {
-            if(abs(magnetic_field(j))<10.0) oss << " ";
-            if(!std::signbit(magnetic_field(j))) oss << " ";
-            oss << magnetic_field(j) << " ";
+            if(abs(a.atoms[iat].noncoll_spin(j))<10.0) oss << " ";
+            if(!std::signbit(a.atoms[iat].noncoll_spin(j))) oss << " ";
+            oss << a.atoms[iat].noncoll_spin(j) << " ";
           }
           oss << endl;
         }
@@ -5619,7 +5619,8 @@ istream& operator>>(istream& cinput, xstructure& a) {
         // ----------------------------------------------------------------------
         // get element
         aurostd::string2tokens(vinput[i],tokens,".");
-        string element_symbol = aurostd::RemoveCharacterFromTheFrontAndBack(tokens[0],'\''); //clean
+        string element_symbol = aurostd::RemoveWhiteSpacesFromTheFrontAndBack(tokens[0]); //clean //DX20210409 - remove whitespace before as well
+        element_symbol = aurostd::RemoveCharacterFromTheFrontAndBack(element_symbol,'\''); //clean
         element_symbol = aurostd::RemoveWhiteSpacesFromTheFrontAndBack(element_symbol); //clean
         tokens.clear();
         if(LDEBUG){ cerr << soliloquy << " ELK READER element extracted = " << element_symbol << endl; }
@@ -5654,7 +5655,9 @@ istream& operator>>(istream& cinput, xstructure& a) {
               magnetic_field(1) = aurostd::string2utype<double>(tokens[3]);
               magnetic_field(2) = aurostd::string2utype<double>(tokens[4]);
               magnetic_field(3) = aurostd::string2utype<double>(tokens[5]);
-              if(LDEBUG){ cerr << soliloquy << " ELK READER magnetic field found : " << magnetic_field << " [CURRENTLY NOT USED]" << endl; }
+              atom.noncoll_spin_is_given = TRUE; //DX20210409
+              atom.noncoll_spin = magnetic_field; //DX20210409
+              if(LDEBUG){ cerr << soliloquy << " ELK READER magnetic field/spin found : " << atom.noncoll_spin << endl; }
             }
           }
           // F2C
@@ -5662,7 +5665,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
 
           atom.name=element_symbol;
           atom.CleanName();
-          atom.CleanSpin();
+          //DX20210409 [OBSOLETE] atom.CleanSpin();
           atom.name_is_given=TRUE;
 
           atom.number=a.atoms.size();    // reference position for convasp
@@ -5670,8 +5673,8 @@ istream& operator>>(istream& cinput, xstructure& a) {
           atom.ijk(1)=0;atom.ijk(2)=0;atom.ijk(3)=0; // inside the zero cell...
           atom.corigin(1)=0.0;atom.corigin(2)=0.0;atom.corigin(3)=0.0; // inside the zero cell
           atom.coord(1)=0.0;atom.coord(2)=0.0;atom.coord(3)=0.0; // inside the zero cell
-          atom.spin=0.0;
-          atom.noncoll_spin.clear();
+          //DX20210409 [OBSOLETE] atom.spin=0.0;
+          //DX20210409 [OBSOLETE] atom.noncoll_spin.clear();
           atom.order_parameter_value=0;
           atom.order_parameter_atom=FALSE;
           atom.partial_occupation_value=1.0;
