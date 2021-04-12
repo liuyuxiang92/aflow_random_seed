@@ -6234,7 +6234,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
   if(a.iomode==IOVASP_WYCKCAR) {
     // cerr << "[" << a.atoms.size() << "]" << endl;
     a=WyckoffPOSITIONS(a.spacegroupnumber,a.spacegroupnumberoption,a);
-    a.title=a.title+" (WICKOFF "+a.spacegroup+" "+a.spacegrouplabel+")";
+    a.title=a.title+" (WYCKOFF "+a.spacegroup+" "+a.spacegrouplabel+")";
     // cerr << "[" << a.atoms.size() << "]" << endl;
   }
 
