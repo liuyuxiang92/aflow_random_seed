@@ -49,6 +49,10 @@ enum PH_DATA_FILE {PH_DF_DIRECTORY, PH_DF_HARMIFC, PH_DF_PHPOSCAR};
 
 #define QHA_AFLOWIN_DEFAULT string("aflow_qha.in")
 
+// labels to specify what contributions to the free energy are included
+#define F_ELEC 1
+#define F_VIB  2
+
 //================================================================================
 //                    EOS related
 
@@ -1533,7 +1537,7 @@ namespace apl
   /// @param qha_method defines what kind of QHA calculation is performed.
   ///
   double QHA::calcFreeEnergyFit(double T, double V, EOSmethod eos_method,
-      QHAmethod qha_method, F_CONTRIB contrib)
+      QHAmethod qha_method, uint contrib)
   {
     string function = XPID + "QHA::calcFreeEnergyFit():", msg = "";
     if (T<_ZERO_TOL_) T = 0.0;
@@ -1545,7 +1549,7 @@ namespace apl
 
   /// Calculates the free energy as a function of temperature.
   xvector<double> QHA::calcFreeEnergy(double T, QHAmethod qha_method,
-      F_CONTRIB contrib)
+      uint contrib)
   {
     string function = XPID + "QHA::calcFreeEnergy():", msg = "";
 
@@ -1553,7 +1557,7 @@ namespace apl
     if (T<_ZERO_TOL_) T = 0.0;
 
     // include electronic contribution to the free energy
-    if ((contrib==F_ELEC) || (contrib==F_ELEC_VIB)){
+    if (contrib & F_ELEC){
       if (doSommerfeldExpansion) F += calcElectronicFreeEnergySommerfeld(T);
       else{
         for (int id=0; id<N_EOSvolumes; id++){
@@ -1563,7 +1567,7 @@ namespace apl
     }
 
     // include vibrational contribution to the free energy
-    if ((contrib==F_VIB) || (contrib==F_ELEC_VIB)){
+    if (contrib & F_VIB){
       switch(qha_method){
         // here QHA3P and QHANP share the same code
         case (QHA3P_CALC):
@@ -1878,7 +1882,7 @@ namespace apl
   /// @param qha_method defines what kind of QHA calculation is performed.
   /// 
   double QHA::getEqVolumeT(double T, EOSmethod eos_method, QHAmethod qha_method,
-      F_CONTRIB contrib)
+      uint contrib)
   {
     string function = XPID + "QHA::getEqVolumeT():", msg = "";
     xvector<double> F = calcFreeEnergy(T, qha_method, contrib);
@@ -2014,7 +2018,7 @@ namespace apl
   /// @return volumetric thermal expansion coefficient.
   /// 
   double QHA::calcThermalExpansion(double T, EOSmethod eos_method,
-      QHAmethod qha_method, F_CONTRIB contrib)
+      QHAmethod qha_method, uint contrib)
   {
     if (!(T>0)) return 0;
 
@@ -2030,7 +2034,7 @@ namespace apl
   /// @param eos_method defines which model is used for the EOS fit
   /// 
   double QHA::calcIsochoricSpecificHeat(double T, double V, EOSmethod eos_method,
-      QHAmethod qha_method, F_CONTRIB contrib)
+      QHAmethod qha_method, uint contrib)
   {
     double dT = DCOEFF*T;
     double CV = 0;
@@ -2050,7 +2054,7 @@ namespace apl
   /// @param eos_method defines which model is used for EOS fit
   /// 
   double QHA::calcEntropy(double T, double V, EOSmethod eos_method, 
-      QHAmethod qha_method, F_CONTRIB contrib)
+      QHAmethod qha_method, uint contrib)
   {
     double dT = DCOEFF*T;
     return -0.5*(calcFreeEnergyFit(T+dT,V,eos_method,qha_method,contrib)
@@ -2887,7 +2891,7 @@ namespace apl
     double beta_elec_V0K = 0.0, beta_elec_V = 0.0;
     double CV_elec_V0K   = 0.0, CV_elec_V   = 0.0;
 
-    F_CONTRIB f_contrib = includeElectronicContribution ? F_ELEC_VIB : F_VIB;
+    uint f_contrib = includeElectronicContribution ? F_ELEC | F_VIB : F_VIB;
 
     try{
       for (int Tid=0; Tid<Ntemperatures; Tid++){
@@ -3240,7 +3244,7 @@ namespace apl
     xvector<double> xomega;
 
     int ndigits = aurostd::getZeroPadding(max(ph_disp_temperatures));
-    F_CONTRIB f_contrib = includeElectronicContribution ? F_ELEC_VIB : F_VIB;
+    uint f_contrib = includeElectronicContribution ? F_ELEC | F_VIB : F_VIB;
 
     for (uint i=0; i<ph_disp_temperatures.size(); i++){
       T = ph_disp_temperatures[i];
@@ -3358,7 +3362,7 @@ namespace apl
 
     xvector<double> xvolumes = aurostd::vector2xvector(EOSvolumes);
 
-    F_CONTRIB f_contrib = includeElectronicContribution ? F_ELEC_VIB : F_VIB;
+    uint f_contrib = includeElectronicContribution ? F_ELEC | F_VIB : F_VIB;
     xvector<double> F = calcFreeEnergy(0, QHA_CALC, f_contrib);
 
     fitToEOSmodel(F, EOS_SJ);
