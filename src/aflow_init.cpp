@@ -1964,6 +1964,7 @@ void AFLOW_monitor_VASP(const string& directory){
   
   _xvasp xvasp;
   xvasp.Directory=aflags.Directory; //arun_directory;
+  message << "START        - " << xvasp.Directory;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_); //include directory so noticeable space remains
   AVASP_populateXVASP(aflags,kflags,vflags,xvasp);
 
   //a note about xmonitor: it only controls the amount of output to the LOCK file, it does NOT affect performance
@@ -1985,9 +1986,11 @@ void AFLOW_monitor_VASP(const string& directory){
   //[CO20210315 - OBSOLETE]string& vasp_bin=kflags.KBIN_MPI_BIN;
   //[CO20210315 - OBSOLETE]if(!(kflags.KBIN_MPI==true||XHOST.MPI==true)){vasp_bin=kflags.KBIN_BIN;}
   
+  //CO20210315 - when we generalize this code to run for targeted instances of vasp, we also need to target the right instances of aflow
+
   string vasp_bin="";
   nloop=0;
-  while((nloop++)<NCOUNTS_WAIT_MONITOR && vasp_bin.empty()){  //wait no more than 10 minutes for vasp bin to start up
+  while((aurostd::ProcessPIDs("aflow").size()>1 || (nloop++)<NCOUNTS_WAIT_MONITOR) && vasp_bin.empty()){  //wait no more than 10 minutes for vasp bin to start up
     vasp_bin=GetVASPBinaryFromLOCK(xvasp.Directory);
     if(vasp_bin.empty()){
       if(VERBOSE){message << "sleeping for " << sleep_seconds_afterkill << " seconds, waiting for \"" << vasp_bin << "\" to start running and " << _AFLOWLOCK_ << " to be written";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);}
@@ -2001,7 +2004,7 @@ void AFLOW_monitor_VASP(const string& directory){
 
   nloop=0;
   n_not_running=0;
-  while(n_not_running<NCOUNTS_WAIT_MONITOR){  //wait no more than 10 minutes for vasp bin to start up (again)
+  while(aurostd::ProcessPIDs("aflow").size()>1 || n_not_running<NCOUNTS_WAIT_MONITOR){  //wait no more than 10 minutes for vasp bin to start up (again)
     if(!aurostd::FileExist(xvasp.Directory+"/"+_AFLOWLOCK_)){break;} //we needed it above to get the vasp_bin
     
     vasp_running=aurostd::ProcessRunning(vasp_bin);
@@ -2075,6 +2078,7 @@ void AFLOW_monitor_VASP(const string& directory){
     if(aurostd::EFileExist(xvasp.Directory+"/"+DEFAULT_AFLOW_END_OUT)){break;}
     if(aurostd::EFileExist(xvasp.Directory+"/STOPFLOW")){aurostd::RemoveFile(xvasp.Directory+"/STOPFLOW");break;}
   }
+  message << "END        - " << xvasp.Directory;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_); //include directory so noticeable space remains
   FileMESSAGE.flush();FileMESSAGE.clear();FileMESSAGE.close();
 }
 

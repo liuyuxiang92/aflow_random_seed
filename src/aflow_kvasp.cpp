@@ -2977,6 +2977,8 @@ namespace KBIN {
     unsigned long long int grep_stop_condition=AUROSTD_MAX_ULLINT;
     if(vasp_monitor_running && vasp_still_running){grep_stop_condition=BYTES_MAX_VASP_OUT;} //no stop condition when vasp is not running, we must process the errors
     
+    //CO20210315 - might consider "renice 20 -p VASP_PIDs" to give greps below priority
+    
     uint i=0;
     vector<string> vtokens;
     
@@ -3969,7 +3971,7 @@ namespace KBIN {
         //all other fixes, no priority here (alphabetic order)
         // ********* APPLY OTHER FIXES ******************
         KBIN::VASP_Error2Fix("BRMIX",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
-        KBIN::VASP_Error2Fix("CSLOSHING",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
+        KBIN::VASP_Error2Fix("CSLOSHING",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE); //must come before NELM
         KBIN::VASP_Error2Fix("DAV",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
         KBIN::VASP_Error2Fix("DENTET",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
         KBIN::VASP_Error2Fix("EDDDAV",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
@@ -3978,11 +3980,13 @@ namespace KBIN {
         KBIN::VASP_Error2Fix("EXCCOR",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
         KBIN::VASP_Error2Fix("MEMORY",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
         KBIN::VASP_Error2Fix("NATOMS",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
-        KBIN::VASP_Error2Fix("NELM",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
         KBIN::VASP_Error2Fix("PSMAXN",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
         KBIN::VASP_Error2Fix("REAL_OPTLAY_1","LREAL",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
         KBIN::VASP_Error2Fix("REAL_OPT","LREAL",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
         KBIN::VASP_Error2Fix("ZPOTRF",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
+        
+        //patch only if above warnings are not patched first
+        KBIN::VASP_Error2Fix("NELM",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
         
         //apply these last if no other fixes worked
         // ********* APPLY PREFERRED RMM-DIIS FIXES ******************  //all of these must come before RMM-DIIS

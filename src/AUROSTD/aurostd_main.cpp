@@ -1679,6 +1679,17 @@ namespace aurostd {
   }
 
   // ***************************************************************************
+  // Function ProcessRenice
+  // ***************************************************************************
+  //CO20210315
+  void ProcessRenice(const string& process,int nvalue){ //CO20210315
+    vector<string> vpids=ProcessPIDs(process);
+    if(vpids.empty()){return;}
+    string command="renice "+aurostd::utype2string(nvalue)+" "+aurostd::joinWDelimiter(vpids," ");
+    aurostd::execute(command);
+  }
+
+  // ***************************************************************************
   // Function DirectoryMake
   // ***************************************************************************
   // Stefano Curtarolo
@@ -5232,7 +5243,7 @@ namespace aurostd {
     }
     if(size_max!=AUROSTD_MAX_ULLINT){
       unsigned long long int fsize=aurostd::FileSize(FileName);
-      if(fsize>=size_max){return false;}
+      if(fsize>=size_max){return false;}  //CO20210315 - in the future, consider throwing instead, and create a special function for vasp.out greps in kvasp
     }
     
     bool use_regex=true;

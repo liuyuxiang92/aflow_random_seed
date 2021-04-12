@@ -6511,8 +6511,19 @@ namespace KBIN {
       submode+=submode_increment;submode_increment=1;  //increment and reset
     }
     else if(mode=="CSLOSHING") {
-      fix="ALGO=NORMAL";
-      Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
+      if(submode<0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"no submode set: \""+mode+"\"",_INPUT_ILLEGAL_);}  //CO20210315
+      if(submode==0){ //try ALGO=NORMAL //CO20200624
+        fix="ALGO=NORMAL";
+        Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
+        if(!Krun){Krun=true;submode++;} //reset and go to the next solution
+      }
+      if(submode==1){ //try ALGO=FAST //CO20200624
+        fix="ALGO=FAST";
+        Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
+        if(!Krun){Krun=true;submode++;} //reset and go to the next solution
+      }
+      if(submode>=2){Krun=false;}
+      submode+=submode_increment;submode_increment=1;  //increment and reset
     }
     else if(mode=="DENTET") {
       //https://www.vasp.at/forum/viewtopic.php?f=3&t=416
