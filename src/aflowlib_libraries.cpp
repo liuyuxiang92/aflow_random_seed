@@ -943,50 +943,52 @@ namespace aflowlib {
       throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _INDEX_MISMATCH_);
     }
 
-    if(LDEBUG) cerr << soliloquy << " [1]" << endl;
+    if(LDEBUG) cerr << soliloquy << " vspecies.size()=" << vspecies.size() << " [1]" << endl;
     for(uint iext=0;iext<XHOST.vext.size();iext++) { // check _AFLOWIN_.EXT
       if(!vspecies.size() && aurostd::FileExist(directory+"/" + _AFLOWIN_ + XHOST.vext.at(iext))) {
         aurostd::string2vectorstring(aurostd::execute2string(XHOST.vcat.at(iext)+" \""+directory+"/" + _AFLOWIN_ + XHOST.vext.at(iext)+"\""+" | grep VASP_POTCAR_FILE"),vspecies);
-        for(uint i=0;i<vspecies.size();i++) aurostd::StringSubst(vspecies.at(i),"[VASP_POTCAR_FILE]","");
-        for(uint i=0;i<vspecies.size();i++) KBIN::VASP_PseudoPotential_CleanName(vspecies.at(i));
+        for(uint i=0;i<vspecies.size();i++) aurostd::StringSubst(vspecies[i],"[VASP_POTCAR_FILE]","");
+        if(LDEBUG) cerr << soliloquy << " vspecies=" << aurostd::joinWDelimiter(vspecies,",") << endl;  //CO20210315
+        for(uint i=0;i<vspecies.size();i++) vspecies[i]=KBIN::VASP_PseudoPotential_CleanName(vspecies[i]); //CO20210315
+        if(LDEBUG) cerr << soliloquy << " vspecies=" << aurostd::joinWDelimiter(vspecies,",") << endl;  //CO20210315
       }
     }
-    if(LDEBUG) cerr << soliloquy << " [2]" << endl;
+    if(LDEBUG) cerr << soliloquy << " vspecies.size()=" << vspecies.size() << " [2]" << endl;
     for(uint iext=0;iext<XHOST.vext.size();iext++) { // check POSCAR.orig.EXT
       if(!vspecies.size() && aurostd::FileExist(directory+"/POSCAR.orig"+XHOST.vext.at(iext))) {
         oss.str(aurostd::execute2string(XHOST.vcat.at(iext)+" \""+directory+"/POSCAR.orig"+XHOST.vext.at(iext)+"\""));
         xstructure xstr(oss,IOVASP_POSCAR);
-        if(xstr.species.size()>0) if(xstr.species.at(0)!="") for(uint i=0;i<xstr.species.size();i++) vspecies.push_back(xstr.species.at(i)); // dont change order
+        if(xstr.species.size()>0) if(xstr.species.at(0)!="") for(uint i=0;i<xstr.species.size();i++) vspecies.push_back(xstr.species[i]); // dont change order
       }
     }
-    if(LDEBUG) cerr << soliloquy << " [3]" << endl;
+    if(LDEBUG) cerr << soliloquy << " vspecies.size()=" << vspecies.size() << " [3]" << endl;
     for(uint iext=0;iext<XHOST.vext.size();iext++) {  // check POSCAR.relax1.EXT
       if(!vspecies.size() && aurostd::FileExist(directory+"/POSCAR.relax1"+XHOST.vext.at(iext))) {
         oss.str(aurostd::execute2string(XHOST.vcat.at(iext)+" \""+directory+"/POSCAR.relax1"+XHOST.vext.at(iext)+"\""));
         xstructure xstr(oss,IOVASP_POSCAR);
-        if(xstr.species.size()>0) if(xstr.species.at(0)!="") for(uint i=0;i<xstr.species.size();i++) vspecies.push_back(xstr.species.at(i)); // dont change order
+        if(xstr.species.size()>0) if(xstr.species.at(0)!="") for(uint i=0;i<xstr.species.size();i++) vspecies.push_back(xstr.species[i]); // dont change order
       }
     }
-    if(LDEBUG) cerr << soliloquy << " [4]" << endl;
+    if(LDEBUG) cerr << soliloquy << " vspecies.size()=" << vspecies.size() << " [4]" << endl;
     for(uint iext=0;iext<XHOST.vext.size();iext++) { // check POSCAR.bands.EXT
       if(!vspecies.size() && aurostd::FileExist(directory+"/POSCAR.bands"+XHOST.vext.at(iext))) {
         oss.str(aurostd::execute2string(XHOST.vcat.at(iext)+" \""+directory+"/POSCAR.bands"+XHOST.vext.at(iext)+"\""));
         xstructure xstr(oss,IOVASP_POSCAR);
-        if(xstr.species.size()>0) if(xstr.species.at(0)!="") for(uint i=0;i<xstr.species.size();i++) vspecies.push_back(xstr.species.at(i)); // dont change order
+        if(xstr.species.size()>0) if(xstr.species.at(0)!="") for(uint i=0;i<xstr.species.size();i++) vspecies.push_back(xstr.species[i]); // dont change order
       }
     }
-    if(LDEBUG) cerr << soliloquy << " [5]" << endl;
+    if(LDEBUG) cerr << soliloquy << " vspecies.size()=" << vspecies.size() << " [5]" << endl;
     for(uint iext=0;iext<XHOST.vext.size();iext++) { // check OUTCAR.relax1.EXT
       if(!vspecies.size() && aurostd::FileExist(directory+"/OUTCAR.relax1"+XHOST.vext.at(iext))) {
         aurostd::string2vectorstring(aurostd::execute2string(XHOST.vcat.at(iext)+" \""+directory+"/OUTCAR.relax1"+XHOST.vext.at(iext)+"\""+" | grep TITEL"),vs);
-        for(uint i=0;i<vs.size();i++) { aurostd::string2tokens(vs.at(i),tokens," ");vspecies.push_back(KBIN::VASP_PseudoPotential_CleanName(tokens.at(3))); }
+        for(uint i=0;i<vs.size();i++) { aurostd::string2tokens(vs[i],tokens," ");vspecies.push_back(KBIN::VASP_PseudoPotential_CleanName(tokens.at(3))); }
       }
     }
-    if(LDEBUG) cerr << soliloquy << " [6]" << endl;
+    if(LDEBUG) cerr << soliloquy << " vspecies.size()=" << vspecies.size() << " [6]" << endl;
     for(uint iext=0;iext<XHOST.vext.size();iext++) { // check OUTCAR.static.EXT
       if(!vspecies.size() && aurostd::FileExist(directory+"/OUTCAR.static"+XHOST.vext.at(iext))) {
         aurostd::string2vectorstring(aurostd::execute2string(XHOST.vcat.at(iext)+" \""+directory+"/OUTCAR.static"+XHOST.vext.at(iext)+"\""+" | grep TITEL"),vs);
-        for(uint i=0;i<vs.size();i++) { aurostd::string2tokens(vs.at(i),tokens," ");vspecies.push_back(KBIN::VASP_PseudoPotential_CleanName(tokens.at(3))); }
+        for(uint i=0;i<vs.size();i++) { aurostd::string2tokens(vs[i],tokens," ");vspecies.push_back(KBIN::VASP_PseudoPotential_CleanName(tokens.at(3))); }
       }
     }
     if(LDEBUG) cerr << soliloquy << " END" << endl;
@@ -1296,6 +1298,9 @@ namespace aflowlib {
     GetSpeciesDirectory(directory_LIB,aflowlib_data.vspecies);
     aflowlib_data.species=aurostd::joinWDelimiter(aflowlib_data.vspecies,",");
     aflowlib_data.nspecies=aflowlib_data.vspecies.size();
+    
+    cout << soliloquy << " nspecies=" << aflowlib_data.nspecies << endl;
+    cout << soliloquy << " species=" << aflowlib_data.species << endl;
 
     if(LDEBUG) cerr << soliloquy << " [2]" << endl;
 
