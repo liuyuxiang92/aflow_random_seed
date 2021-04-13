@@ -313,7 +313,6 @@ namespace apl
   void QHA::initialize(const xstructure &in_structure, _xinput &xinput,
       xoption &qha_options, xoption &apl_options, ofstream &FileMESSAGE, ostream &oss)
   {
-    static const int REQUIRED_MIN_NUM_OF_DATA_POINTS_FOR_EOS_FIT = 5;
     static const int precision_format = 4;
 
     isInitialized = false;
@@ -357,6 +356,23 @@ namespace apl
     aurostd::string2tokens(qha_options.getattachedscheme("PDIS_T"), ph_disp_temperatures, ",");
     doSommerfeldExpansion = qha_options.flag("SOMMERFELD_EXPANSION");
     TaylorExpansionOrder = aurostd::string2utype<int>(qha_options.getattachedscheme("TAYLOR_EXPANSION_ORDER"));
+
+    // retrieve the minimum number of parameters for the EOS calculation with a
+    // given set of requested EOS models
+    int REQUIRED_MIN_NUM_OF_DATA_POINTS_FOR_EOS_FIT = 5;
+    if (qha_options.flag("EOS_MODEL:BM2")){
+      REQUIRED_MIN_NUM_OF_DATA_POINTS_FOR_EOS_FIT = 3;
+    }
+
+    if (qha_options.flag("EOS_MODEL:BM3") ||
+        qha_options.flag("EOS_MODEL:SJ")  ||
+        qha_options.flag("EOS_MODEL:M")){
+      REQUIRED_MIN_NUM_OF_DATA_POINTS_FOR_EOS_FIT = 4;
+    }
+
+    if (qha_options.flag("EOS_MODEL:BM4")){
+      REQUIRED_MIN_NUM_OF_DATA_POINTS_FOR_EOS_FIT = 5;
+    }
 
     // output with what parameters QHA will be run
     stringstream message;
@@ -418,25 +434,9 @@ namespace apl
       eosrange[1] = 1.0 + eosrange[1]/100.0;
       eosrange[2] = eosrange[2]/100.0;
 
-      N_EOSvolumes = round((eosrange[1]-eosrange[0])/eosrange[2]+1);
-      if (N_EOSvolumes < REQUIRED_MIN_NUM_OF_DATA_POINTS_FOR_EOS_FIT){
-        isEOS = false;
-
-        stringstream msg;
-        msg << "QHA EOS calculation requires at least ";
-        msg << aurostd::utype2string<int>(REQUIRED_MIN_NUM_OF_DATA_POINTS_FOR_EOS_FIT);
-        msg << " APL calculations." << std::endl;
-        msg << "The current choice of volume range and increment produces ";
-        msg << aurostd::utype2string<int>(N_EOSvolumes);
-        msg << " APL calculations." << std::endl;
-        msg << "QHA EOS calculation will be skipped!";
-        pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
-            *p_oss, _LOGGER_ERROR_);
-      }
-
       // get a set of volumes that would be used for the QHA-EOS calculation
       string dirname = "";
-      for (double i=eosrange[0]; i<=eosrange[1]; i+=eosrange[2]){
+      for (double i=eosrange[0]; i<=(eosrange[1]+AUROSTD_ROUNDOFF_TOL); i+=eosrange[2]){
         arun_runnames_apl_eos.push_back( "PHONON_" +
             aurostd::utype2string(i,precision_format,false,FIXED_STREAM));
 
@@ -460,6 +460,23 @@ namespace apl
         EOSvolumes.push_back(i*Volume/NatomsOrigCell);
       }
       N_EOSvolumes = EOSvolumes.size();
+
+      // check that we have enough datapoints to do the requested set of EOS
+      // models. If not print an error and swith the EOS calculation off
+      if (N_EOSvolumes < REQUIRED_MIN_NUM_OF_DATA_POINTS_FOR_EOS_FIT){
+        isEOS = false;
+
+        stringstream msg;
+        msg << "QHA EOS calculation requires at least ";
+        msg << aurostd::utype2string<int>(REQUIRED_MIN_NUM_OF_DATA_POINTS_FOR_EOS_FIT);
+        msg << " APL calculations for the requested set of EOS models." << std::endl;
+        msg << "The current choice of volume range and increment produces ";
+        msg << aurostd::utype2string<int>(N_EOSvolumes);
+        msg << " APL calculations." << std::endl;
+        msg << "QHA EOS calculation will be skipped!";
+        pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
+            *p_oss, _LOGGER_ERROR_);
+      }
     }
 
     // determine the names for the directories used for the QHANP calculation

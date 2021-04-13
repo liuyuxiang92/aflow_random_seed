@@ -3,6 +3,7 @@
         -- Fixed bug with APL overwriting *.orig files. (AS)
         -- Fixed bugs in the electronic free energy calculation. (AS)
         -- Fixed bug in the fixed volume QHA method. (AS)
+        -- Fixed determination of the required number of parameters for the EOS model. (AS)
         -- Extended the fixed volume QHA to include electronic contributions. (AS)
         -- patched XVASP_KPOINTS_OPERATION() so a change is ensured for Xeven/Xodd etc. (CO)
         -- APL MINATOMS_RESTRICTED->MINATOMS_UNIFORM (CO)
