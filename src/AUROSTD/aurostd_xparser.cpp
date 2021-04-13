@@ -26,6 +26,26 @@ namespace aurostd {
     }
 
     if(capital_letters_only==false){
+      //from AFLOW.org database //CO20210315 - must come before .5 (removed below)
+      aurostd::RemoveSubStringInPlace(species,"pot_LDA/");
+      aurostd::RemoveSubStringInPlace(species,"pot_GGA/");
+      aurostd::RemoveSubStringInPlace(species,"pot_PBE/");
+      aurostd::RemoveSubStringInPlace(species,"potpaw_LDA/");
+      aurostd::RemoveSubStringInPlace(species,"potpaw_GGA/");
+      aurostd::RemoveSubStringInPlace(species,"potpaw_PBE/");
+      aurostd::RemoveSubStringInPlace(species,"potpaw_LDA.54/");
+      aurostd::RemoveSubStringInPlace(species,"potpaw_PBE.54/");
+
+      //general database  //CO20210315 - must come before .5 (removed below)
+      aurostd::RemoveSubStringInPlace(species,DEFAULT_VASP_POTCAR_DIR_POT_LDA+"/");
+      aurostd::RemoveSubStringInPlace(species,DEFAULT_VASP_POTCAR_DIR_POT_GGA+"/");
+      aurostd::RemoveSubStringInPlace(species,DEFAULT_VASP_POTCAR_DIR_POT_PBE+"/");
+      aurostd::RemoveSubStringInPlace(species,DEFAULT_VASP_POTCAR_DIR_POTPAW_LDA+"/");
+      aurostd::RemoveSubStringInPlace(species,DEFAULT_VASP_POTCAR_DIR_POTPAW_GGA+"/");
+      aurostd::RemoveSubStringInPlace(species,DEFAULT_VASP_POTCAR_DIR_POTPAW_PBE+"/");
+      aurostd::RemoveSubStringInPlace(species,DEFAULT_VASP_POTCAR_DIR_POTPAW_LDA_KIN+"/");
+      aurostd::RemoveSubStringInPlace(species,DEFAULT_VASP_POTCAR_DIR_POTPAW_PBE_KIN+"/");
+
       aurostd::RemoveSubStringInPlace(species,"_old");  //CO20190712 - potpaw_PBE/potpaw_PBE.20100506/Si_h_old
       aurostd::RemoveSubStringInPlace(species,".old");  //CO20190712 - potpaw_PBE/potpaw_PBE.20100506/Mg_pv.old
       aurostd::RemoveSubStringInPlace(species,"_vnew");  //CO20190712 - potpaw_PBE/potpaw_PBE.20100506/Pd_vnew
@@ -82,26 +102,6 @@ namespace aurostd {
       aurostd::RemoveSubStringInPlace(species,"-3");
       aurostd::RemoveSubStringInPlace(species,"-5");
       aurostd::RemoveSubStringInPlace(species,"-7");
-
-      //from AFLOW.org database
-      aurostd::RemoveSubStringInPlace(species,"pot_LDA/");
-      aurostd::RemoveSubStringInPlace(species,"pot_GGA/");
-      aurostd::RemoveSubStringInPlace(species,"pot_PBE/");
-      aurostd::RemoveSubStringInPlace(species,"potpaw_LDA/");
-      aurostd::RemoveSubStringInPlace(species,"potpaw_GGA/");
-      aurostd::RemoveSubStringInPlace(species,"potpaw_PBE/");
-      aurostd::RemoveSubStringInPlace(species,"potpaw_LDA.54/");
-      aurostd::RemoveSubStringInPlace(species,"potpaw_PBE.54/");
-
-      //general database
-      aurostd::RemoveSubStringInPlace(species,DEFAULT_VASP_POTCAR_DIR_POT_LDA+"/");
-      aurostd::RemoveSubStringInPlace(species,DEFAULT_VASP_POTCAR_DIR_POT_GGA+"/");
-      aurostd::RemoveSubStringInPlace(species,DEFAULT_VASP_POTCAR_DIR_POT_PBE+"/");
-      aurostd::RemoveSubStringInPlace(species,DEFAULT_VASP_POTCAR_DIR_POTPAW_LDA+"/");
-      aurostd::RemoveSubStringInPlace(species,DEFAULT_VASP_POTCAR_DIR_POTPAW_GGA+"/");
-      aurostd::RemoveSubStringInPlace(species,DEFAULT_VASP_POTCAR_DIR_POTPAW_PBE+"/");
-      aurostd::RemoveSubStringInPlace(species,DEFAULT_VASP_POTCAR_DIR_POTPAW_LDA_KIN+"/");
-      aurostd::RemoveSubStringInPlace(species,DEFAULT_VASP_POTCAR_DIR_POTPAW_PBE_KIN+"/");
 
       aurostd::RemoveSubStringInPlace(species,"__"); //CO20190712 - BEFORE _ - potpaw_LDA/potpaw_LDA.05May2010/Si_sv_GW__
       aurostd::RemoveSubStringInPlace(species,"_");  //CO20190712  //potpaw_LDA/potpaw_LDA.05May2010/Si_sv_GW_
