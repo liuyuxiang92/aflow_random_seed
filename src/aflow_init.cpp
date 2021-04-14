@@ -1895,7 +1895,11 @@ void processFlagsFromLOCK(_xvasp& xvasp,aurostd::xoption& xfixed){  //CO20210315
   uint i=0,nexecuting=0;
   for(i=vlines.size()-1;i<vlines.size();i--){ //go backwards
     const string& line=vlines[i];
-    if(line.find(VASP_KEYWORD_EXECUTION)==string::npos){nexecuting++;} //look for 'Executing:' line
+    if(line.find(VASP_KEYWORD_EXECUTION)!=string::npos){nexecuting++;} //look for 'Executing:' line
+    if(LDEBUG){
+      cerr << soliloquy << " vlines[i=" << i << "]=" << line << endl;
+      cerr << soliloquy << " nexecuting=" << nexecuting << endl;
+    }
     if(nexecuting>1){break;}
 
     loc_start=line.find(str_xvasp_aopts_start);
@@ -1908,12 +1912,12 @@ void processFlagsFromLOCK(_xvasp& xvasp,aurostd::xoption& xfixed){  //CO20210315
     loc_start=line.find(str_xfixed_start);
     loc_end=line.find(str_flag_end);
     if(loc_start!=string::npos && loc_end!=string::npos){
-      scheme=line.substr(loc_start+str_xvasp_aopts_start.length(),loc_end-(loc_start+str_xvasp_aopts_start.length()));
+      scheme=line.substr(loc_start+str_xfixed_start.length(),loc_end-(loc_start+str_xfixed_start.length()));
       xfixed.flag(scheme,true);
     }
   }
 
-  if(1||LDEBUG){
+  if(LDEBUG){
     cerr << soliloquy << " printing xvasp.aopts" << endl;
     for(uint i=0;i<xvasp.aopts.vxscheme.size();i++){cerr << soliloquy << " xvasp.aopts.flag(\"" << xvasp.aopts.vxscheme[i] << "\")=" << xvasp.aopts.flag(xvasp.aopts.vxscheme[i]) << endl;}
     cerr << soliloquy << " printing xfixed" << endl;

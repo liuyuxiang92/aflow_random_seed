@@ -726,6 +726,10 @@ int main(int _argc,char **_argv) {
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_FoldAtomsInCell|--FoldAtomsInCell_test")) {return (FoldAtomsInCellTest(cout)?0:1);}  //DX20210129
     if(!Arun && aurostd::args2flag(argv,cmds,"--test")) {
 
+      //_xvasp xvasp1;aurostd::xoption xfixed;
+      //xvasp1.Directory="/home/aflow/work/jobs_submission/to_run/first_run/library/LIB2_WARNINGS/WARNINGS/NELM/LIB2/LIB/CCu_pv/A7.B/test";
+      //processFlagsFromLOCK(xvasp1,xfixed);
+
       //cerr << KBIN::VASP_OSZICARUnconverging("/home/aflow/work/jobs_submission/to_run/first_run/library/LIB2_WARNINGS/WARNINGS/OUTCAR_INCOMPLETE/LIB2/LIB/CeO/AB_oP2_47_a_e-001.AB") << endl;
 
       //bool spff=aurostd::substring_present_file_FAST("test"," EDD DAV ",true,true,true);
