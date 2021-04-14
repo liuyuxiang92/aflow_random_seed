@@ -2859,58 +2859,6 @@ int CheckStringInFile(string FileIn,string str,int PID,int TID) { //CO20200502 -
 // FLAG Class for KBIN_VASP_Run
 
 namespace KBIN {
-  bool VASP_Error2Fix(const string& error,_xvasp &xvasp,aurostd::xoption& xwarning,aurostd::xoption& xfixed,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE) { //CO20210315
-    int submode=0; //default
-    return VASP_Error2Fix(error,error,submode,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
-  }
-  bool VASP_Error2Fix(const string& error,const string& mode,_xvasp &xvasp,aurostd::xoption& xwarning,aurostd::xoption& xfixed,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE) {  //CO20210315
-    int submode=0; //default
-    return VASP_Error2Fix(error,mode,submode,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
-  }
-  bool VASP_Error2Fix(const string& error,int& submode,_xvasp &xvasp,aurostd::xoption& xwarning,aurostd::xoption& xfixed,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE) { //CO20210315
-    return VASP_Error2Fix(error,error,submode,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
-  }
-  bool VASP_Error2Fix(const string& error,const string& mode,int& submode,_xvasp &xvasp,aurostd::xoption& xwarning,aurostd::xoption& xfixed,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE) {  //CO20210315
-    bool LDEBUG=(FALSE || _DEBUG_KVASP_ || XHOST.DEBUG);
-    string soliloquy=XPID+"KBIN::VASP_Error2Fix():";
-
-    if(LDEBUG){cerr << soliloquy << " [CHECK " << error << " PROBLEMS]" << Message(_AFLOW_FILE_NAME_,aflags) << endl;}
-    bool apply_fix=xwarning.flag(error);
-    bool VERBOSE=true;
-    if(apply_fix && xfixed.flag("ALL")){
-      if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"ALL\")==TRUE: skipping " << error << " fix" << Message(_AFLOW_FILE_NAME_,aflags) << endl;}
-      apply_fix=false;
-    }
-    if(apply_fix && vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(error)){
-      if(LDEBUG){cerr << soliloquy << " vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"" << error << "\")==TRUE: skipping " << error << " fix" << Message(_AFLOW_FILE_NAME_,aflags) << endl;}
-      apply_fix=false;
-    }
-    stringstream aus;
-    if(apply_fix && VERBOSE){
-      aus << "MMMMM  MESSAGE attempting to fix ERROR=\"" << error << "\" (mode=" << mode << ")" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);  //CO20210315 - do not reference submode after KBIN::XVASP_Afix(), (submode>=0?" (SUBMODE="+aurostd::utype2string(submode)+")":"")
-    }
-    //do not reference submode below KBIN::XVASP_Afix(), as it will have been incremented (perhaps by 2)
-    //if KBIN::XVASP_Afix() fails, submode will be restored to original, so it is okay to reference for the LDEBUG statement
-    if(apply_fix && !KBIN::XVASP_Afix(mode,submode,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE)){   //CO20210315
-      if(LDEBUG){cerr << soliloquy << " KBIN::XVASP_Afix(mode=" << mode << (submode>=0?",submode="+aurostd::utype2string(submode):"") << ") failed" << Message(_AFLOW_FILE_NAME_,aflags) << endl;}  //if KBIN::XVASP_Afix() fails, submode will be restored to original, so it is okay to reference for the LDEBUG statement
-      apply_fix=false;
-    }
-    if(apply_fix && VERBOSE){
-      aus << "MMMMM  MESSAGE fix applied for ERROR=\"" << error << "\" (mode=" << mode << ")" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);  //CO20210315 - do not reference submode after KBIN::XVASP_Afix(), (submode>=0?" (SUBMODE="+aurostd::utype2string(submode)+")":"")
-      KBIN::VASP_Error(xvasp,"WWWWW  ERROR "+soliloquy+" \""+error+"\" problems"+Message(_AFLOW_FILE_NAME_,aflags));
-      //[CO20210315 - old style]xfixed.flag(error,TRUE);
-      //print out all xfixed BEFORE adding "ALL"
-      std::sort(xfixed.vxscheme.begin(),xfixed.vxscheme.end()); //sort for printing
-      for(uint i=0;i<xfixed.vxscheme.size();i++){
-        aus << "MMMMM  MESSAGE xfixed.flag(\""+xfixed.vxscheme[i]+"\")=" << xfixed.flag(xfixed.vxscheme[i]) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-      }
-      xfixed.flag("ALL",TRUE);
-    }
-    return apply_fix;
-  }
-} // namespace KBIN
-
-namespace KBIN {
   bool ReachedAccuracy2bool(const string& scheme,const aurostd::xoption& xRequiresAccuracy,const aurostd::xoption& xmessage,bool vasp_still_running){
     if(xRequiresAccuracy.flag(scheme)==false){return true;}  //this scheme does not require xmessage.flag("REACHED_ACCURACY"), return true for '&&' logic
     return (vasp_still_running==false && xmessage.flag("REACHED_ACCURACY")==false);
@@ -2979,6 +2927,9 @@ namespace KBIN {
     
     //CO20210315 - might consider "renice 20 -p VASP_PIDs" to give greps below priority
     
+    bool renice=false;
+    if(vasp_still_running && fsize_vaspout>=10000000){aurostd::ProcessRenice(vasp_bin,15);renice=true;} //renice vasp if vasp.out>=10Mb so grep can work faster
+
     uint i=0;
     vector<string> vtokens;
     
@@ -3197,6 +3148,8 @@ namespace KBIN {
     xwarning.flag(scheme,found_warning);
 
     if(LDEBUG){aus << soliloquy << " [2]" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+    
+    if(renice){aurostd::ProcessRenice(vasp_bin,0);} //renice vasp back to normal after grep
 
     bool wdebug=FALSE;//TRUE;
     if(LDEBUG){wdebug=TRUE;}
@@ -3381,6 +3334,132 @@ namespace KBIN {
 } // namespace KBIN
 
 namespace KBIN {
+  bool VASP_Error2Fix(const string& error,_xvasp &xvasp,aurostd::xoption& xwarning,aurostd::xoption& xfixed,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE) { //CO20210315
+    int submode=0; //default
+    return VASP_Error2Fix(error,error,submode,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
+  }
+  bool VASP_Error2Fix(const string& error,const string& mode,_xvasp &xvasp,aurostd::xoption& xwarning,aurostd::xoption& xfixed,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE) {  //CO20210315
+    int submode=0; //default
+    return VASP_Error2Fix(error,mode,submode,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
+  }
+  bool VASP_Error2Fix(const string& error,int& submode,_xvasp &xvasp,aurostd::xoption& xwarning,aurostd::xoption& xfixed,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE) { //CO20210315
+    return VASP_Error2Fix(error,error,submode,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
+  }
+  bool VASP_Error2Fix(const string& error,const string& mode,int& submode,_xvasp &xvasp,aurostd::xoption& xwarning,aurostd::xoption& xfixed,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE) {  //CO20210315
+    bool LDEBUG=(FALSE || _DEBUG_KVASP_ || XHOST.DEBUG);
+    string soliloquy=XPID+"KBIN::VASP_Error2Fix():";
+
+    if(LDEBUG){cerr << soliloquy << " [CHECK " << error << " PROBLEMS]" << Message(_AFLOW_FILE_NAME_,aflags) << endl;}
+    bool apply_fix=xwarning.flag(error);
+    bool VERBOSE=true;
+    if(apply_fix && xfixed.flag("ALL")){
+      if(LDEBUG){cerr << soliloquy << " xfixed.flag(\"ALL\")==TRUE: skipping " << error << " fix" << Message(_AFLOW_FILE_NAME_,aflags) << endl;}
+      apply_fix=false;
+    }
+    if(apply_fix && vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(error)){
+      if(LDEBUG){cerr << soliloquy << " vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"" << error << "\")==TRUE: skipping " << error << " fix" << Message(_AFLOW_FILE_NAME_,aflags) << endl;}
+      apply_fix=false;
+    }
+    stringstream aus;
+    if(apply_fix && VERBOSE){
+      aus << "MMMMM  MESSAGE attempting to fix ERROR=\"" << error << "\" (mode=" << mode << ")" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);  //CO20210315 - do not reference submode after KBIN::XVASP_Afix(), (submode>=0?" (SUBMODE="+aurostd::utype2string(submode)+")":"")
+    }
+    //do not reference submode below KBIN::XVASP_Afix(), as it will have been incremented (perhaps by 2)
+    //if KBIN::XVASP_Afix() fails, submode will be restored to original, so it is okay to reference for the LDEBUG statement
+    if(apply_fix && !KBIN::XVASP_Afix(mode,submode,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE)){   //CO20210315
+      if(LDEBUG){cerr << soliloquy << " KBIN::XVASP_Afix(mode=" << mode << (submode>=0?",submode="+aurostd::utype2string(submode):"") << ") failed" << Message(_AFLOW_FILE_NAME_,aflags) << endl;}  //if KBIN::XVASP_Afix() fails, submode will be restored to original, so it is okay to reference for the LDEBUG statement
+      apply_fix=false;
+    }
+    if(apply_fix && VERBOSE){
+      aus << "MMMMM  MESSAGE fix applied for ERROR=\"" << error << "\" (mode=" << mode << ")" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);  //CO20210315 - do not reference submode after KBIN::XVASP_Afix(), (submode>=0?" (SUBMODE="+aurostd::utype2string(submode)+")":"")
+    }
+    if(apply_fix){
+      KBIN::VASP_Error(xvasp,"WWWWW  ERROR "+soliloquy+" \""+error+"\" problems"+Message(_AFLOW_FILE_NAME_,aflags));
+      //[CO20210315 - old style]xfixed.flag(error,TRUE);
+      xfixed.flag("ALL",TRUE);
+    }
+    return apply_fix;
+  }
+} // namespace KBIN
+
+namespace KBIN {
+  bool VASP_FixErrors(_xvasp &xvasp,aurostd::xoption& xwarning,aurostd::xoption& xfixed,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE){
+    //a note about the fixes below
+    //they generally compound, which I believe is the right approach
+    //however, there might be some options which conflict
+    //add KBIN::XVASP_INCAR_REMOVE_ENTRY() as necessary
+    //check also submode fixes
+   
+    bool fixed_applied=false;
+
+    //check NBANDS/LRF_COMMUTATOR problems immediately
+    fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("NBANDS",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+    //[CO20210315 - fix previously removed]KBIN::VASP_Error2Fix("LRF_COMMUTATOR",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
+
+    //fix symmetry issues next
+    fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("GAMMA_SHIFT",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+    // ********* APPLY PREFERRED SYMMETRY FIXES ******************  //all of these must come before ROTMAT
+    fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("NKXYZ_IKPTD",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));  //must come before IBZKPT
+    fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("KKSYM",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));  //must come before IBZKPT
+    fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("IBZKPT",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+    fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("SYMPREC",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));  //must come before INVGRP
+    fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("INVGRP","SYMPREC",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+    fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("SGRCON","SYMPREC",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+    // ********* APPLY GENERIC SYMMETRY FIXES ******************
+    fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("ROTMAT",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+    
+    //fix MPI/NPAR problems next
+    fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("MPICH11",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+    fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("MPICH139",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+    fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("NPAR",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+    fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("NPARC",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+    fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("NPARN",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+    fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("NPAR_REMOVE",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+
+    //all other fixes, no priority here (alphabetic order)
+    // ********* APPLY OTHER FIXES ******************
+    fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("BRMIX",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+    fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("CSLOSHING",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE)); //must come before NELM
+    fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("DAV",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+    fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("DENTET",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+    fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("EDDDAV",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+    fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("EDDRMM","RMM_DIIS",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+    fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("EFIELD_PEAD",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+    fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("EXCCOR",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+    fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("MEMORY",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+    fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("NATOMS",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+    fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("PSMAXN",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+    fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("REAL_OPTLAY_1","LREAL",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+    fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("REAL_OPT","LREAL",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+    fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("ZPOTRF",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+    
+    //patch only if above warnings are not patched first
+    fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("NELM",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+    
+    //apply these last if no other fixes worked
+    // ********* APPLY PREFERRED RMM-DIIS FIXES ******************  //all of these must come before RMM-DIIS
+    fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("ZBRENT",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+    // ********* APPLY GENERIC RMM-DIIS FIXES ******************
+    fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("RMM_DIIS",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+    
+    //CO20210315 - do last, fixes assume out-of-memory error
+    fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("CALC_FROZEN","MEMORY",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+    
+    //print out all xfixed BEFORE adding "ALL"
+    std::sort(xfixed.vxscheme.begin(),xfixed.vxscheme.end()); //sort for printing
+    //print ALL first
+    stringstream aus;
+    if(xfixed.flag("ALL")){aus << "MMMMM  MESSAGE xfixed.flag(\"ALL\")=" << xfixed.flag("ALL") << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+    for(uint i=0;i<xfixed.vxscheme.size();i++){
+      if(xfixed.vxscheme[i]=="ALL"){continue;}  //already done above
+      aus << "MMMMM  MESSAGE xfixed.flag(\""+xfixed.vxscheme[i]+"\")=" << xfixed.flag(xfixed.vxscheme[i]) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+    }
+
+    return fixed_applied;
+  }
+}
+
+namespace KBIN {
   bool VASP_Run(_xvasp &xvasp,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE) {        // AFLOW_FUNCTION_IMPLEMENTATION
     bool LDEBUG=(FALSE || _DEBUG_KVASP_ || XHOST.DEBUG);
     string function="KBIN::VASP_Run";
@@ -3497,6 +3576,15 @@ namespace KBIN {
           vflags.KBIN_VASP_FORCE_OPTION_RELAX_TYPE.push("IONS_CELL_VOLUME");
           KBIN::XVASP_INCAR_Relax_ON(xvasp,vflags,xvasp.NRELAXING);
         }
+
+        //CO20210315
+        //print out these schemes so they can picked up by the vasp monitor
+        string aopts_scheme="";
+        aopts_scheme="FLAG::KPOINTS_PRESERVED";
+        if(xvasp.aopts.flag(aopts_scheme)){aus << "MMMMM  MESSAGE xvasp.aopts.flag(\"" << aopts_scheme << "\")=" << xvasp.aopts.flag(aopts_scheme) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+        aopts_scheme="FLAG::POSCAR_PRESERVED";
+        if(xvasp.aopts.flag(aopts_scheme)){aus << "MMMMM  MESSAGE xvasp.aopts.flag(\"" << aopts_scheme << "\")=" << xvasp.aopts.flag(aopts_scheme) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+
         // RUN VASP NON QUEUE ------------------------------------------------------------------------
         if(kflags.KBIN_QSUB==FALSE) {
           nrun++;
@@ -3938,66 +4026,10 @@ namespace KBIN {
 
         if(LDEBUG){cerr << soliloquy << " [5]" << Message(_AFLOW_FILE_NAME_,aflags) << endl;}
 
-        //a note about the fixes below
-        //they generally compound, which I believe is the right approach
-        //however, there might be some options which conflict
-        //add KBIN::XVASP_INCAR_REMOVE_ENTRY() as necessary
-        //check also submode fixes
-        
-        //check NBANDS/LRF_COMMUTATOR problems immediately
-        KBIN::VASP_Error2Fix("NBANDS",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
-        //[CO20210315 - fix previously removed]KBIN::VASP_Error2Fix("LRF_COMMUTATOR",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
+        KBIN::VASP_FixErrors(xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
 
-        //fix symmetry issues next
-        KBIN::VASP_Error2Fix("GAMMA_SHIFT",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
-        // ********* APPLY PREFERRED SYMMETRY FIXES ******************  //all of these must come before ROTMAT
-        KBIN::VASP_Error2Fix("NKXYZ_IKPTD",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);  //must come before IBZKPT
-        KBIN::VASP_Error2Fix("KKSYM",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);  //must come before IBZKPT
-        KBIN::VASP_Error2Fix("IBZKPT",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
-        KBIN::VASP_Error2Fix("SYMPREC",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);  //must come before INVGRP
-        KBIN::VASP_Error2Fix("INVGRP","SYMPREC",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
-        KBIN::VASP_Error2Fix("SGRCON","SYMPREC",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
-        // ********* APPLY GENERIC SYMMETRY FIXES ******************
-        KBIN::VASP_Error2Fix("ROTMAT",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
-        
-        //fix MPI/NPAR problems next
-        KBIN::VASP_Error2Fix("MPICH11",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
-        KBIN::VASP_Error2Fix("MPICH139",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
-        KBIN::VASP_Error2Fix("NPAR",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
-        KBIN::VASP_Error2Fix("NPARC",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
-        KBIN::VASP_Error2Fix("NPARN",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
-        KBIN::VASP_Error2Fix("NPAR_REMOVE",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
-
-        //all other fixes, no priority here (alphabetic order)
-        // ********* APPLY OTHER FIXES ******************
-        KBIN::VASP_Error2Fix("BRMIX",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
-        KBIN::VASP_Error2Fix("CSLOSHING",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE); //must come before NELM
-        KBIN::VASP_Error2Fix("DAV",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
-        KBIN::VASP_Error2Fix("DENTET",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
-        KBIN::VASP_Error2Fix("EDDDAV",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
-        KBIN::VASP_Error2Fix("EDDRMM","RMM_DIIS",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
-        KBIN::VASP_Error2Fix("EFIELD_PEAD",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
-        KBIN::VASP_Error2Fix("EXCCOR",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
-        KBIN::VASP_Error2Fix("MEMORY",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
-        KBIN::VASP_Error2Fix("NATOMS",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
-        KBIN::VASP_Error2Fix("PSMAXN",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
-        KBIN::VASP_Error2Fix("REAL_OPTLAY_1","LREAL",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
-        KBIN::VASP_Error2Fix("REAL_OPT","LREAL",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
-        KBIN::VASP_Error2Fix("ZPOTRF",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
-        
-        //patch only if above warnings are not patched first
-        KBIN::VASP_Error2Fix("NELM",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
-        
-        //apply these last if no other fixes worked
-        // ********* APPLY PREFERRED RMM-DIIS FIXES ******************  //all of these must come before RMM-DIIS
-        KBIN::VASP_Error2Fix("ZBRENT",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
-        // ********* APPLY GENERIC RMM-DIIS FIXES ******************
-        KBIN::VASP_Error2Fix("RMM_DIIS",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
-        
-        //CO20210315 - do last, fixes assume out-of-memory error
-        KBIN::VASP_Error2Fix("CALC_FROZEN","MEMORY",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
-        
         //come back - should we check if any xwarning() flag is still on?
+        //CO20210315 - NO, aflow patches if possible, otherwise let it run. we'll catch BIG bugs with --xplug
 
         // ********* VASP TO BE RESTARTED *********
         if(LDEBUG){cerr << soliloquy << " [DONE WITH CHECKS]" << Message(_AFLOW_FILE_NAME_,aflags) << endl;}

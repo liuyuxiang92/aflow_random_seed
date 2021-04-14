@@ -5160,6 +5160,7 @@ namespace KBIN {
   void XVASP_INCAR_REMOVE_ENTRY(_xvasp& xvasp,const vector<string>& vkeywords,const string& comment,bool VERBOSE) {        // AFLOW_FUNCTION_IMPLEMENTATION 
     //CO20210315 - INCAR always uses keyword=value: https://www.vasp.at/wiki/index.php/INCAR
     //CO20210315 - modifying this function, not using substring2bool() which might match IALGO with ALGO or NELM with NELMIN, keyword is specific key to remove
+    //do NOT preload/rewrite the INCAR file, only modify xvasp.INCAR
     bool LDEBUG=(FALSE || _DEBUG_IVASP_ || XHOST.DEBUG);
     string function="KBIN::AFLOWIN_REMOVE";
     string soliloquy=XPID+function+"():";
@@ -5621,8 +5622,27 @@ namespace KBIN {
 //[CO20210315 - OBSOLETE]}
 
 namespace KBIN {
+  bool XVASP_KPOINTS_isAutoMesh(const _xvasp& xvasp){ //CO20210315
+    //returns if KPOINTS is automatic generation scheme: https://www.vasp.at/wiki/index.php/KPOINTS
+    bool LDEBUG=(FALSE || _DEBUG_IVASP_ || XHOST.DEBUG);
+    string soliloquy=XPID+"KBIN::XVASP_KPOINTS_string2numbers():";
+    
+    if(LDEBUG){cerr << soliloquy << " xvasp.KPOINTS=" << endl;cerr << xvasp.KPOINTS.str() << endl;}
+
+    vector<string> vlines;
+    aurostd::string2vectorstring(aurostd::RemoveComments(xvasp.KPOINTS.str()),vlines);
+    if(vlines.size()<2){return false;}
+    string nkpoints=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(vlines[1]);
+    if(aurostd::isfloat(nkpoints) && aurostd::string2utype<uint>(nkpoints)==0){return true;} //is an auto-mesh
+    
+    return false;
+  }
+} // namespace KBIN
+
+namespace KBIN {
   bool XVASP_KPOINTS_string2numbers(_xvasp& xvasp) {  //CO20210315 - cleaned up
     //CO20210315 - can only read auto-meshes of MP or G
+    //do not patch for generic KPOINTS files, this will break Afix which might change KPOINTS when it needs to keep it fixed for BANDS runs
     //https://www.vasp.at/wiki/index.php/KPOINTS
     bool LDEBUG=(FALSE || _DEBUG_IVASP_ || XHOST.DEBUG);
     string soliloquy=XPID+"KBIN::XVASP_KPOINTS_string2numbers():";
@@ -5632,6 +5652,8 @@ namespace KBIN {
     vector<string> vlines;
     aurostd::string2vectorstring(aurostd::RemoveComments(xvasp.KPOINTS.str()),vlines);
     if(vlines.size()<3){return false;}
+    string nkpoints=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(vlines[1]);
+    if(!(aurostd::isfloat(nkpoints) && aurostd::string2utype<uint>(nkpoints)==0)){return false;} //not an auto-mesh
     string scheme=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(vlines[2]);
     if(scheme.empty()||(aurostd::toupper(scheme[0])!='M' && aurostd::toupper(scheme[0])!='G')){return false;}
 
@@ -5861,8 +5883,10 @@ namespace KBIN {
     //[CO20210315 - avoid writing orig]xvasp.aopts.flag("FLAG::XVASP_INCAR_changed",TRUE); //CO20200624
     
     // fix aflow.in
-    KBIN::AFLOWIN_REMOVE(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]NBANDS",function);
-    KBIN::AFLOWIN_ADD(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]NBANDS="+aurostd::utype2string(nbands,_IVASP_DOUBLE2STRING_PRECISION_),function);
+    if(xvasp.aopts.flag("FLAG::AFIX_DRYRUN")==false){
+      KBIN::AFLOWIN_REMOVE(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]NBANDS",function);
+      KBIN::AFLOWIN_ADD(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]NBANDS="+aurostd::utype2string(nbands,_IVASP_DOUBLE2STRING_PRECISION_),function);
+    }
 
     return true;
   }
@@ -5906,8 +5930,10 @@ namespace KBIN {
     //[CO20210315 - avoid writing orig]xvasp.aopts.flag("FLAG::XVASP_INCAR_changed",TRUE); //CO20200624
     
     // fix aflow.in
-    KBIN::AFLOWIN_REMOVE(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]POTIM",function);
-    KBIN::AFLOWIN_ADD(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]POTIM="+aurostd::utype2string(potim,_IVASP_DOUBLE2STRING_PRECISION_),function);
+    if(xvasp.aopts.flag("FLAG::AFIX_DRYRUN")==false){
+      KBIN::AFLOWIN_REMOVE(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]POTIM",function);
+      KBIN::AFLOWIN_ADD(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]POTIM="+aurostd::utype2string(potim,_IVASP_DOUBLE2STRING_PRECISION_),function);
+    }
 
     return true;
   }
@@ -6052,23 +6078,43 @@ namespace KBIN {
     //add others here
     if(apply_once==true && xfixed.flag(fix)){return false;}
 
-    //come back: would be good to reduce dependence on xvasp properties
-    //xvasp.NRELAXING, xvasp.NRELAX, xvasp.xvasp.aopts.flag(), will be difficult to track from a monitoring perspective
     //check whether fix can be applied given current state
     bool Krun=true;
-    if(xvasp.NRELAXING<=xvasp.NRELAX){  //RELAX
-      //add here any fixes that would not apply for relaxations
-    }else{ //STATIC, BANDS, etc.
-      if(fix.find("ISMEAR=")!=string::npos){Krun=false;}  //specific smearing selected is very important
-      //[CO20210315 - better to look for IBRION and NSW (linear-response calcs)]else if(fix=="POTIM"){Krun=false;}  //only applies to MD or ionic relaxations
+    //[CO20210315 - OBSOLETE]if(xvasp.NRELAXING<=xvasp.NRELAX){  //RELAX
+    //[CO20210315 - OBSOLETE]  //add here any fixes that would not apply for relaxations
+    //[CO20210315 - OBSOLETE]}else{ //STATIC, BANDS, etc.
+    //[CO20210315 - OBSOLETE]  if(fix.find("ISMEAR=")!=string::npos){Krun=false;}  //specific smearing selected is very important
+    //[CO20210315 - OBSOLETE]  //[CO20210315 - better to look for IBRION and NSW (linear-response calcs)]else if(fix=="POTIM"){Krun=false;}  //only applies to MD or ionic relaxations
+    //[CO20210315 - OBSOLETE]}
+    //[CO20210315 - OBSOLETE]if(Krun && (fix.find("RELAX_MODE")!=string::npos || fix=="POTIM")){ //check for IBRION/NSW
+    //[CO20210315 - OBSOLETE]  VASP_Reread_INCAR(xvasp);
+    //[CO20210315 - OBSOLETE]  if(!aurostd::kvpairfound(xvasp.INCAR,"IBRION","=")){Krun=false;}
+    //[CO20210315 - OBSOLETE]  else{ //STATIC also has IBRION, but NSW=0 so POTIM has no effect
+    //[CO20210315 - OBSOLETE]    if(!aurostd::kvpairfound(xvasp.INCAR,"NSW","=")){Krun=false;} //NSW=0 by default
+    //[CO20210315 - OBSOLETE]    if(aurostd::kvpairfound(xvasp.INCAR,"NSW","=") && aurostd::kvpair2utype<int>(xvasp.INCAR,"NSW","=")==0){Krun=false;}
+    //[CO20210315 - OBSOLETE]  }
+    //[CO20210315 - OBSOLETE]}
+    //do not rely on xvasp.NRELAXING, etc., access to this information is limited for vasp monitor
+    //instead, read INCAR and look for IBRION
+    //for linear-response calcs, you also have IBRION, we must also look for NSW and make sure it is bigger than 0
+    bool relaxing=false;
+    VASP_Reread_INCAR(xvasp);
+    if(aurostd::kvpairfound(xvasp.INCAR,"IBRION","=")){
+      if(aurostd::kvpairfound(xvasp.INCAR,"NSW","=") && aurostd::kvpair2utype<int>(xvasp.INCAR,"NSW","=")>0){relaxing=true;}
     }
-    if(Krun && (fix.find("RELAX_MODE")!=string::npos || fix=="POTIM")){ //check for IBRION/NSW
-      VASP_Reread_INCAR(xvasp);
-      if(!aurostd::kvpairfound(xvasp.INCAR,"IBRION","=")){Krun=false;}
-      else{ //STATIC also has IBRION, but NSW=0 so POTIM has no effect
-        if(!aurostd::kvpairfound(xvasp.INCAR,"NSW","=")){Krun=false;} //NSW=0 by default
-        if(aurostd::kvpairfound(xvasp.INCAR,"NSW","=") && aurostd::kvpair2utype<int>(xvasp.INCAR,"NSW","=")==0){Krun=false;}
-      }
+    if(relaxing){
+      //add here any fixes that would not apply for relaxations
+    }else{  //static, bands, etc.
+      if(fix.find("RELAX_MODE")!=string::npos){Krun=false;} //does not apply
+      else if(fix=="POTIM"){Krun=false;}  //has no effect for these runs
+      else if(fix.find("POSCAR")!=string::npos){Krun=false;}  //do not change the POSCAR
+    }
+    //ismear=-5 is very important for static calcs
+    bool not_relaxing_or_bands=false; //looking for static-type calc, might improve this in the future
+    VASP_Reread_KPOINTS(xvasp);
+    if(relaxing==false && XVASP_KPOINTS_isAutoMesh(xvasp)){not_relaxing_or_bands=true;}  //bands is NOT auto-mesh
+    if(not_relaxing_or_bands){
+      if(fix.find("ISMEAR=")!=string::npos){Krun=false;} //specific smearing selected is very important for static
     }
     //add others here
     if(Krun==false){return false;}
@@ -6096,6 +6142,10 @@ namespace KBIN {
     int param_int=0;
     xvector<double> param_xvd(3);
 
+    //NB: xvasp.aopts.flag("FLAG::AFIX_DRYRUN") is very important
+    //make sure that any changes made to files (INCAR, KPOINTS, aflow.in) are only done if xvasp.aopts.flag("FLAG::AFIX_DRYRUN")==false
+    //otherwise, the monitor might make changes before they are needed
+
     if(fix.find("ALGO=")!=string::npos && fix.find("IALGO=")==string::npos) {
       loc=fix.find('=');
       if(loc==fix.size()-1||loc==string::npos){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"ALGO mode not found",_INPUT_ILLEGAL_);}
@@ -6105,13 +6155,17 @@ namespace KBIN {
       //START - load INCAR into xvasp, modify, then write out new INCAR
       Krun=(Krun && VASP_Reread_INCAR(xvasp));  //preload incar
       Krun=(Krun && KBIN::XVASP_INCAR_PREPARE_GENERIC("ALGO",xvasp,vflags,param_string,0,0.0,FALSE));
-      Krun=(Krun && aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR"))); //write out incar
+      if(xvasp.aopts.flag("FLAG::AFIX_DRYRUN")==false){
+        Krun=(Krun && aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR"))); //write out incar
+      }
       //END - load INCAR into xvasp, modify, then write out new INCAR
       if(Krun){aus << "MMMMM  MESSAGE applied FIX=\"" << fix << "\"" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
       //START - add fix to _AFLOWIN_
-      if(Krun){
-        KBIN::AFLOWIN_REMOVE(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]ALGO=",operation);
-        KBIN::AFLOWIN_ADD(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]ALGO="+param_string,operation);
+      if(xvasp.aopts.flag("FLAG::AFIX_DRYRUN")==false){
+        if(Krun){
+          KBIN::AFLOWIN_REMOVE(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]ALGO=",operation);
+          KBIN::AFLOWIN_ADD(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]ALGO="+param_string,operation);
+        }
       }
       //END - add fix to _AFLOWIN_ 
     }
@@ -6124,7 +6178,9 @@ namespace KBIN {
       //START - load INCAR into xvasp, modify, then write out new INCAR
       Krun=(Krun && VASP_Reread_INCAR(xvasp));  //preload incar
       Krun=(Krun && KBIN::XVASP_INCAR_PREPARE_GENERIC("AMIN",xvasp,vflags,"",0,param_double,ON));
-      Krun=(Krun && aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR"))); //write out incar
+      if(xvasp.aopts.flag("FLAG::AFIX_DRYRUN")==false){
+        Krun=(Krun && aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR"))); //write out incar
+      }
       //END - load INCAR into xvasp, modify, then write out new INCAR
       if(Krun){aus << "MMMMM  MESSAGE applied FIX=\"" << fix << "\"" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
     }
@@ -6137,7 +6193,9 @@ namespace KBIN {
       //START - load INCAR into xvasp, modify, then write out new INCAR
       Krun=(Krun && VASP_Reread_INCAR(xvasp));  //preload incar
       Krun=(Krun && KBIN::XVASP_INCAR_PREPARE_GENERIC("AMIX",xvasp,vflags,"",0,param_double,ON));
-      Krun=(Krun && aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR"))); //write out incar
+      if(xvasp.aopts.flag("FLAG::AFIX_DRYRUN")==false){
+        Krun=(Krun && aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR"))); //write out incar
+      }
       //END - load INCAR into xvasp, modify, then write out new INCAR
       if(Krun){aus << "MMMMM  MESSAGE applied FIX=\"" << fix << "\"" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
     }
@@ -6150,7 +6208,9 @@ namespace KBIN {
       //START - load INCAR into xvasp, modify, then write out new INCAR
       Krun=(Krun && VASP_Reread_INCAR(xvasp));  //preload incar
       Krun=(Krun && KBIN::XVASP_INCAR_PREPARE_GENERIC("BMIX",xvasp,vflags,"",0,param_double,ON));
-      Krun=(Krun && aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR"))); //write out incar
+      if(xvasp.aopts.flag("FLAG::AFIX_DRYRUN")==false){
+        Krun=(Krun && aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR"))); //write out incar
+      }
       //END - load INCAR into xvasp, modify, then write out new INCAR
       if(Krun){aus << "MMMMM  MESSAGE applied FIX=\"" << fix << "\"" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
     }
@@ -6159,7 +6219,9 @@ namespace KBIN {
       //START - load INCAR into xvasp, modify, then write out new INCAR
       Krun=(Krun && VASP_Reread_INCAR(xvasp));  //preload incar
       Krun=(Krun && KBIN::XVASP_Afix_EFIELD_PEAD(xvasp,vflags,param_xvd));
-      Krun=(Krun && aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR"))); //write out incar
+      if(xvasp.aopts.flag("FLAG::AFIX_DRYRUN")==false){
+        Krun=(Krun && aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR"))); //write out incar
+      }
       //END - load INCAR into xvasp, modify, then write out new INCAR
       if(Krun){aus << "MMMMM  MESSAGE applied FIX=" << fix << "=[" << aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(param_xvd,6)," ") << "]" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
     }
@@ -6176,7 +6238,9 @@ namespace KBIN {
         KBIN::XVASP_INCAR_PREPARE_GENERIC("LREAL",xvasp,vflags,"",0,0.0,ON);  //no Krun here, if it's already there, we're set
       }
       Krun=(Krun && KBIN::XVASP_INCAR_PREPARE_GENERIC("ENMAX",xvasp,vflags,"",0,param_double,FALSE));
-      Krun=(Krun && aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR"))); //write out incar
+      if(xvasp.aopts.flag("FLAG::AFIX_DRYRUN")==false){
+        Krun=(Krun && aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR"))); //write out incar
+      }
       //END - load INCAR into xvasp, modify, then write out new INCAR
       if(Krun){aus << "MMMMM  MESSAGE applied FIX=" << fix << "=" << param_double << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
     }
@@ -6189,7 +6253,9 @@ namespace KBIN {
       //START - load INCAR into xvasp, modify, then write out new INCAR
       Krun=(Krun && VASP_Reread_INCAR(xvasp));  //preload incar
       Krun=(Krun && KBIN::XVASP_INCAR_PREPARE_GENERIC("ISMEAR",xvasp,vflags,"",param_int,0.0,FALSE));
-      Krun=(Krun && aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR"))); //write out incar
+      if(xvasp.aopts.flag("FLAG::AFIX_DRYRUN")==false){
+        Krun=(Krun && aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR"))); //write out incar
+      }
       //END - load INCAR into xvasp, modify, then write out new INCAR
       if(Krun){aus << "MMMMM  MESSAGE applied FIX=\"" << fix << "\"" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
     }
@@ -6221,7 +6287,9 @@ namespace KBIN {
       //START - load KPOINTS into xvasp, modify xvasp.str.kpoints*, and write out new KPOINTS
       Krun=(Krun && VASP_Reread_KPOINTS(xvasp) && XVASP_KPOINTS_string2numbers(xvasp)); //preload kpoints, load into xvasp.str
       Krun=(Krun && KBIN::XVASP_KPOINTS_OPERATION(xvasp,param_string));  //CO20210315
-      Krun=(Krun && aurostd::stringstream2file(xvasp.KPOINTS,string(xvasp.Directory+"/KPOINTS")));
+      if(xvasp.aopts.flag("FLAG::AFIX_DRYRUN")==false){
+        Krun=(Krun && aurostd::stringstream2file(xvasp.KPOINTS,string(xvasp.Directory+"/KPOINTS")));
+      }
       //END - load KPOINTS into xvasp, modify xvasp.str.kpoints*, and write out new KPOINTS
       if(Krun){
         aus << "MMMMM  MESSAGE applied FIX=\"" << fix << "\"" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -6233,7 +6301,9 @@ namespace KBIN {
       //START - load INCAR into xvasp, modify, then write out new INCAR
       Krun=(Krun && VASP_Reread_INCAR(xvasp));  //preload incar
       Krun=(Krun && KBIN::XVASP_INCAR_PREPARE_GENERIC("LREAL",xvasp,vflags,"",0,0.0,ON));
-      Krun=(Krun && aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR"))); //write out incar
+      if(xvasp.aopts.flag("FLAG::AFIX_DRYRUN")==false){
+        Krun=(Krun && aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR"))); //write out incar
+      }
       //END - load INCAR into xvasp, modify, then write out new INCAR
       if(Krun){aus << "MMMMM  MESSAGE applied FIX=\"" << fix << "\"" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
     }
@@ -6242,7 +6312,9 @@ namespace KBIN {
       //START - load INCAR into xvasp, modify, then write out new INCAR
       Krun=(Krun && VASP_Reread_INCAR(xvasp));  //preload incar
       Krun=(Krun && KBIN::XVASP_Afix_NBANDS(xvasp,vflags,param_int));
-      Krun=(Krun && aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR"))); //write out incar
+      if(xvasp.aopts.flag("FLAG::AFIX_DRYRUN")==false){
+        Krun=(Krun && aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR"))); //write out incar
+      }
       //END - load INCAR into xvasp, modify, then write out new INCAR
       if(Krun){aus << "MMMMM  MESSAGE applied FIX=" << fix << "=" << param_int << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
     }
@@ -6251,7 +6323,9 @@ namespace KBIN {
       //START - load INCAR into xvasp, modify, then write out new INCAR
       Krun=(Krun && VASP_Reread_INCAR(xvasp));  //preload incar
       Krun=(Krun && KBIN::XVASP_Afix_NELM(xvasp,vflags,param_int));
-      Krun=(Krun && aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR"))); //write out incar
+      if(xvasp.aopts.flag("FLAG::AFIX_DRYRUN")==false){
+        Krun=(Krun && aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR"))); //write out incar
+      }
       //END - load INCAR into xvasp, modify, then write out new INCAR
       if(Krun && VERBOSE){aus << "MMMMM  MESSAGE attempting FIX=" << fix << "=" << param_int << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
     }
@@ -6262,7 +6336,9 @@ namespace KBIN {
       if(Krun){
         KBIN::XVASP_INCAR_REMOVE_ENTRY(xvasp,"NPAR",operation,vflags.KBIN_VASP_INCAR_VERBOSE); //CO20200624
       }
-      Krun=(Krun && aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR"))); //write out incar
+      if(xvasp.aopts.flag("FLAG::AFIX_DRYRUN")==false){
+        Krun=(Krun && aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR"))); //write out incar
+      }
       //END - load INCAR into xvasp, modify, then write out new INCAR
       if(Krun){aus << "MMMMM  MESSAGE applied FIX=\"" << fix << "\"" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
     }
@@ -6275,7 +6351,9 @@ namespace KBIN {
       //START - load INCAR into xvasp, modify, then write out new INCAR
       Krun=(Krun && VASP_Reread_INCAR(xvasp));  //preload incar
       Krun=(Krun && KBIN::XVASP_INCAR_PREPARE_GENERIC("NPAR",xvasp,vflags,"",param_int,0.0,FALSE));
-      Krun=(Krun && aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR"))); //write out incar
+      if(xvasp.aopts.flag("FLAG::AFIX_DRYRUN")==false){
+        Krun=(Krun && aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR"))); //write out incar
+      }
       //END - load INCAR into xvasp, modify, then write out new INCAR
       if(Krun){aus << "MMMMM  MESSAGE applied FIX=\"" << fix << "\"" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
     }
@@ -6284,7 +6362,9 @@ namespace KBIN {
       //START - load INCAR into xvasp, modify, then write out new INCAR
       Krun=(Krun && VASP_Reread_INCAR(xvasp));  //preload incar
       Krun=(Krun && KBIN::XVASP_Afix_POTIM(xvasp,vflags,param_double));
-      Krun=(Krun && aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR"))); //write out incar
+      if(xvasp.aopts.flag("FLAG::AFIX_DRYRUN")==false){
+        Krun=(Krun && aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR"))); //write out incar
+      }
       //END - load INCAR into xvasp, modify, then write out new INCAR
       if(Krun){aus << "MMMMM  MESSAGE applied FIX=" << fix << "=" << param_double << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
     }
@@ -6292,10 +6372,14 @@ namespace KBIN {
       if(xvasp.aopts.flag("FLAG::POSCAR_PRESERVED")){Krun=false;} // don't touch poscar
       if(Krun && VERBOSE){aus << "MMMMM  MESSAGE attempting FIX=\"" << fix << "\"" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
       //START - modify xvasp.str and write out new POSCAR
-      Krun=(Krun && aurostd::stringstream2file(xvasp.POSCAR,string(xvasp.Directory+"/POSCAR.orig")));  //CO20210315 - POSCAR.orig here is NOT the original structure, but a saved state, come back later
+      if(xvasp.aopts.flag("FLAG::AFIX_DRYRUN")==false){
+        Krun=(Krun && aurostd::stringstream2file(xvasp.POSCAR,string(xvasp.Directory+"/POSCAR.orig")));  //CO20210315 - POSCAR.orig here is NOT the original structure, but a saved state, come back later
+      }
       if(Krun){xvasp.str.scale*=pow(2.0,1.0/3.0);}   // *=1.25
       Krun=(Krun && KBIN::VASP_Produce_POSCAR(xvasp)); //creates xvasp.POSCAR
-      Krun=(Krun && aurostd::stringstream2file(xvasp.POSCAR,string(xvasp.Directory+"/POSCAR")));
+      if(xvasp.aopts.flag("FLAG::AFIX_DRYRUN")==false){
+        Krun=(Krun && aurostd::stringstream2file(xvasp.POSCAR,string(xvasp.Directory+"/POSCAR")));
+      }
       //END - modify xvasp.str and write out new POSCAR
       if(Krun){aus << "MMMMM  MESSAGE applied FIX=" << fix << "=" << xvasp.str.GetVolume() << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
     }
@@ -6304,7 +6388,9 @@ namespace KBIN {
       if(Krun && xvasp.str.Standard_Lattice_conventional){Krun=false;}  //DX is this right?
       if(Krun && VERBOSE){aus << "MMMMM  MESSAGE attempting FIX=\"" << fix << "\"" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
       //START - modify xvasp.str and write out new POSCAR
-      Krun=(Krun && aurostd::stringstream2file(xvasp.POSCAR,string(xvasp.Directory+"/POSCAR.orig")));  //CO20210315 - POSCAR.orig here is NOT the original structure, but a saved state, come back later
+      if(xvasp.aopts.flag("FLAG::AFIX_DRYRUN")==false){
+        Krun=(Krun && aurostd::stringstream2file(xvasp.POSCAR,string(xvasp.Directory+"/POSCAR.orig")));  //CO20210315 - POSCAR.orig here is NOT the original structure, but a saved state, come back later
+      }
       if(Krun){
         //CO20210315 - need to make sure fix magmom too (if it's there)
         //load into xvasp.str.atoms[i].order_parameter_atom/value, convert to sconv, then print out
@@ -6321,7 +6407,9 @@ namespace KBIN {
         xvasp.str.Standard_Conventional_UnitCellForm(); //CO20210315 - previously missing before
         if(remove_magmom){KBIN::XVASP_INCAR_REMOVE_ENTRY(xvasp,"MAGMOM",operation,vflags.KBIN_VASP_INCAR_VERBOSE);} //CO20200624
         if(write_magmom){KBIN::XVASP_INCAR_PREPARE_GENERIC("AUTO_MAGMOM",xvasp,vflags,"",0,0.0,FALSE);}
-        if(remove_magmom || write_magmom){aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR"));}  //write out incar
+        if(xvasp.aopts.flag("FLAG::AFIX_DRYRUN")==false){
+          if(remove_magmom || write_magmom){aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR"));}  //write out incar
+        }
         //
         aus << "00000  MESSAGE AFTER: a,b,c,alpha,beta,gamma " << xvasp.str.a << "," << xvasp.str.b << "," << xvasp.str.c << "," << xvasp.str.alpha << "," << xvasp.str.beta << "," << xvasp.str.gamma << endl;
         if(write_magmom){aus << "00000  MESSAGE AFTER: MAGMOM=" << aurostd::kvpair2value(xvasp.INCAR,"MAGMOM","=") << endl;}
@@ -6330,13 +6418,17 @@ namespace KBIN {
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       }
       Krun=(Krun && KBIN::VASP_Produce_POSCAR(xvasp)); //CO20210315 - previously missing before  //creates xvasp.POSCAR
-      Krun=(Krun && aurostd::stringstream2file(xvasp.POSCAR,string(xvasp.Directory+"/POSCAR")));
+      if(xvasp.aopts.flag("FLAG::AFIX_DRYRUN")==false){
+        Krun=(Krun && aurostd::stringstream2file(xvasp.POSCAR,string(xvasp.Directory+"/POSCAR")));
+      }
       //END - modify xvasp.str and write out new POSCAR
       if(Krun){aus << "MMMMM  MESSAGE applied FIX=\"" << fix << "\"" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
       //START - add fix to _AFLOWIN_ 
-      if(Krun){
-        KBIN::AFLOWIN_REMOVE(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]CONVERT_UNIT_CELL=",operation);
-        KBIN::AFLOWIN_ADD(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]CONVERT_UNIT_CELL=SCONV",operation);
+      if(xvasp.aopts.flag("FLAG::AFIX_DRYRUN")==false){
+        if(Krun){
+          KBIN::AFLOWIN_REMOVE(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]CONVERT_UNIT_CELL=",operation);
+          KBIN::AFLOWIN_ADD(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]CONVERT_UNIT_CELL=SCONV",operation);
+        }
       }
       //END - add fix to _AFLOWIN_ 
     }
@@ -6367,25 +6459,31 @@ namespace KBIN {
         xvasp.INCAR << aurostd::PaddedPOST("NSW=100",_incarpad_) << " # " << operation << endl; //CO20200624
         if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << " # Performing " << operation << " [AFLOW] end" << endl;
       }
-      Krun=(Krun && aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR"))); //write out incar
+      if(xvasp.aopts.flag("FLAG::AFIX_DRYRUN")==false){
+        Krun=(Krun && aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR"))); //write out incar
+      }
       //END - load INCAR into xvasp, modify, then write out new INCAR
       if(Krun){aus << "MMMMM  MESSAGE applied FIX=\"" << fix << "\"" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
       //START - add fix to _AFLOWIN_
-      if(Krun){
-        KBIN::AFLOWIN_REMOVE(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]RELAX_MODE=",operation);
-        KBIN::AFLOWIN_ADD(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]RELAX_MODE=FORCES",operation);
+      if(xvasp.aopts.flag("FLAG::AFIX_DRYRUN")==false){
+        if(Krun){
+          KBIN::AFLOWIN_REMOVE(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]RELAX_MODE=",operation);
+          KBIN::AFLOWIN_ADD(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]RELAX_MODE=FORCES",operation);
+        }
       }
       //END - add fix to _AFLOWIN_ 
     }
     else if(fix=="SKIP_RUN") { //CO20210315
       if(Krun && VERBOSE){aus << "MMMMM  MESSAGE attempting FIX=\"" << fix << "\"" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
       //START - one-off solution for memory
-      if(Krun){
-        stringstream command("");
-        command << "cat " << xvasp.Directory << "/" << DEFAULT_VASP_OUT << " | grep AFLOW > " << xvasp.Directory << "/" << DEFAULT_AFLOW_MEMORY_OUT << endl;
-        command << "cat " << xvasp.Directory << "/" << DEFAULT_VASP_OUT << " | grep AFLOW > " << xvasp.Directory << "/SKIP" << endl;	
-        command << "cat " << xvasp.Directory << "/" << DEFAULT_VASP_OUT << " | grep AFLOW >> " << xvasp.Directory << DEFAULT_AFLOW_ERVASP_OUT << endl;	
-        aurostd::execute(command);
+      if(xvasp.aopts.flag("FLAG::AFIX_DRYRUN")==false){
+        if(Krun){
+          stringstream command("");
+          command << "cat " << xvasp.Directory << "/" << DEFAULT_VASP_OUT << " | grep AFLOW > " << xvasp.Directory << "/" << DEFAULT_AFLOW_MEMORY_OUT << endl;
+          command << "cat " << xvasp.Directory << "/" << DEFAULT_VASP_OUT << " | grep AFLOW > " << xvasp.Directory << "/SKIP" << endl;	
+          command << "cat " << xvasp.Directory << "/" << DEFAULT_VASP_OUT << " | grep AFLOW >> " << xvasp.Directory << DEFAULT_AFLOW_ERVASP_OUT << endl;	
+          aurostd::execute(command);
+        }
       }
       //END - one-off solution for memory
       if(Krun){aus << "MMMMM  MESSAGE applied FIX=\"" << fix << "\"" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
@@ -6395,7 +6493,9 @@ namespace KBIN {
       //START - load INCAR into xvasp, modify, then write out new INCAR
       Krun=(Krun && VASP_Reread_INCAR(xvasp));  //preload incar
       Krun=(Krun && KBIN::XVASP_INCAR_PREPARE_GENERIC("SYMPREC",xvasp,vflags,"",0,0.0,OFF));
-      Krun=(Krun && aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR"))); //write out incar
+      if(xvasp.aopts.flag("FLAG::AFIX_DRYRUN")==false){
+        Krun=(Krun && aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR"))); //write out incar
+      }
       //END - load INCAR into xvasp, modify, then write out new INCAR
       if(Krun){aus << "MMMMM  MESSAGE applied FIX=\"" << fix << "\"" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
     }
@@ -6404,13 +6504,17 @@ namespace KBIN {
       //START - load INCAR into xvasp, modify, then write out new INCAR
       Krun=(Krun && VASP_Reread_INCAR(xvasp));  //preload incar
       Krun=(Krun && KBIN::XVASP_INCAR_PREPARE_GENERIC("SYM",xvasp,vflags,"",0,0.0,OFF));
-      Krun=(Krun && aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR"))); //write out incar
+      if(xvasp.aopts.flag("FLAG::AFIX_DRYRUN")==false){
+        Krun=(Krun && aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR"))); //write out incar
+      }
       //END - load INCAR into xvasp, modify, then write out new INCAR
       if(Krun){aus << "MMMMM  MESSAGE applied FIX=\"" << fix << "\"" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
       //START - add fix to _AFLOWIN_
-      if(Krun){
-        KBIN::AFLOWIN_REMOVE(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]SYM=",operation);
-        KBIN::AFLOWIN_ADD(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]SYM=OFF",operation);
+      if(xvasp.aopts.flag("FLAG::AFIX_DRYRUN")==false){
+        if(Krun){
+          KBIN::AFLOWIN_REMOVE(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]SYM=",operation);
+          KBIN::AFLOWIN_ADD(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]SYM=OFF",operation);
+        }
       }
       //END - add fix to _AFLOWIN_ 
     }

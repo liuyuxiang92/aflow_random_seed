@@ -1868,6 +1868,60 @@ string GetVASPBinaryFromLOCK(const string& directory){  //CO20210315
 }
 
 // ***************************************************************************
+// processFlagsFromLOCK
+// ***************************************************************************
+void processFlagsFromLOCK(_xvasp& xvasp,aurostd::xoption& xfixed){  //CO20210315
+  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  string soliloquy=XPID+"GetVASPBinaryFromLOCK():";
+
+  if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
+
+  if(!aurostd::FileExist(xvasp.Directory+"/"+_AFLOWLOCK_)){return;}
+
+  //clear out past options
+  xvasp.aopts.clear();
+  xfixed.clear();
+
+  vector<string> vlines,vtokens;
+  aurostd::file2vectorstring(xvasp.Directory+"/"+_AFLOWLOCK_,vlines);
+
+  string str_xvasp_aopts_start="xvasp.aopts.flag(\"";
+  string str_xfixed_start="xfixed.flag(\"";
+  string str_flag_end="\")=1";
+  string scheme="";
+
+  string::size_type loc_start=0,loc_end=0;
+
+  uint i=0,nexecuting=0;
+  for(i=vlines.size()-1;i<vlines.size();i--){ //go backwards
+    const string& line=vlines[i];
+    if(line.find(VASP_KEYWORD_EXECUTION)==string::npos){nexecuting++;} //look for 'Executing:' line
+    if(nexecuting>1){break;}
+
+    loc_start=line.find(str_xvasp_aopts_start);
+    loc_end=line.find(str_flag_end);
+    if(loc_start!=string::npos && loc_end!=string::npos){
+      scheme=line.substr(loc_start+str_xvasp_aopts_start.length(),loc_end-(loc_start+str_xvasp_aopts_start.length()));
+      xvasp.aopts.flag(scheme,true);
+    }
+
+    loc_start=line.find(str_xfixed_start);
+    loc_end=line.find(str_flag_end);
+    if(loc_start!=string::npos && loc_end!=string::npos){
+      scheme=line.substr(loc_start+str_xvasp_aopts_start.length(),loc_end-(loc_start+str_xvasp_aopts_start.length()));
+      xfixed.flag(scheme,true);
+    }
+  }
+
+  if(1||LDEBUG){
+    cerr << soliloquy << " printing xvasp.aopts" << endl;
+    for(uint i=0;i<xvasp.aopts.vxscheme.size();i++){cerr << soliloquy << " xvasp.aopts.flag(\"" << xvasp.aopts.vxscheme[i] << "\")=" << xvasp.aopts.flag(xvasp.aopts.vxscheme[i]) << endl;}
+    cerr << soliloquy << " printing xfixed" << endl;
+    for(uint i=0;i<xfixed.vxscheme.size();i++){cerr << soliloquy << " xfixed.flag(\"" << xfixed.vxscheme[i] << "\")=" << xfixed.flag(xfixed.vxscheme[i]) << endl;}
+  }
+}
+
+// ***************************************************************************
 // AFLOW_monitor_VASP
 // ***************************************************************************
 #define NCOUNTS_WAIT_MONITOR 10 //wait no more than 10*sleep_secounds (should be 10 minutes)
@@ -1943,7 +1997,7 @@ void AFLOW_monitor_VASP(const string& directory){
   if(!aurostd::FileExist(aflags.Directory+"/"+_AFLOWIN_)){return;}
 
   //output objects
-  ofstream FileMESSAGE;
+  ofstream FileMESSAGE,FileMESSAGE_devnull;
   string FileNameLOCK=aflags.Directory+"/"+_AFLOWLOCK_+"."+FILE_VASP_MONITOR;
   FileMESSAGE.open(FileNameLOCK.c_str(),std::ios::out);
   ostream& oss=cout;if(true){oss.setstate(std::ios_base::badbit);}  //like NULL - cannot print to cout with two instances of aflow running
@@ -1966,6 +2020,7 @@ void AFLOW_monitor_VASP(const string& directory){
   xvasp.Directory=aflags.Directory; //arun_directory;
   message << "START        - " << xvasp.Directory;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_); //include directory so noticeable space remains
   AVASP_populateXVASP(aflags,kflags,vflags,xvasp);
+  xvasp.aopts.flag("FLAG::AFIX_DRYRUN",true); //VERY IMPORTANT
 
   //a note about xmonitor: it only controls the amount of output to the LOCK file, it does NOT affect performance
 
@@ -1975,10 +2030,10 @@ void AFLOW_monitor_VASP(const string& directory){
   uint n_not_running=0;
   uint sleep_seconds=SECONDS_SLEEP_VASP_MONITOR;
   uint sleep_seconds_afterkill=sleep_seconds;
-  aurostd::xoption xmessage,xwarning,xmonitor; //xfixed; //not needed (yet)
+  aurostd::xoption xmessage,xwarning,xmonitor,xfixed;
   bool VERBOSE=false;
   bool vasp_running=false;
-  vector<string> vlines;
+  vector<string> vlines_lock;
   
   //there are issues getting the correct vasp binary since this is an entirely different aflow instance
   //we might run the other aflow instance with --mpi or --machine flags that affect which vasp binary we use
@@ -2022,9 +2077,9 @@ void AFLOW_monitor_VASP(const string& directory){
     
     //determine whether we need to clear xmonitor with new vasp instance (relax1->relax2)
     nexecuting=0;
-    aurostd::file2vectorstring(xvasp.Directory+"/"+_AFLOWLOCK_,vlines);  //we already checked above that it exists
-    for(i=0;i<vlines.size();i++){
-      if(vlines[i].find(VASP_KEYWORD_EXECUTION)==string::npos){continue;}
+    aurostd::file2vectorstring(xvasp.Directory+"/"+_AFLOWLOCK_,vlines_lock);  //we already checked above that it exists
+    for(i=0;i<vlines_lock.size();i++){
+      if(vlines_lock[i].find(VASP_KEYWORD_EXECUTION)==string::npos){continue;}
       nexecuting++;
     }
     if(nexecuting!=nexecuting_old){
@@ -2041,14 +2096,16 @@ void AFLOW_monitor_VASP(const string& directory){
       kill_vasp=true;
       //HERE: plug in exceptions from xfixed, etc. to turn OFF kill_vasp
       //read LOCK to see what has been issued already
+      processFlagsFromLOCK(xvasp,xfixed);
+      if(!KBIN::VASP_FixErrors(xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE_devnull)){kill_vasp=false;}
     }
 
     //it's possible KBIN::VASP_ProcessWarnings() takes a long time (big vasp.out)
     //double check that there isn't a new instance of vasp running
     nexecuting=0;
-    aurostd::file2vectorstring(xvasp.Directory+"/"+_AFLOWLOCK_,vlines);  //we already checked above that it exists
-    for(i=0;i<vlines.size();i++){
-      if(vlines[i].find(VASP_KEYWORD_EXECUTION)==string::npos){continue;}
+    aurostd::file2vectorstring(xvasp.Directory+"/"+_AFLOWLOCK_,vlines_lock);  //we already checked above that it exists
+    for(i=0;i<vlines_lock.size();i++){
+      if(vlines_lock[i].find(VASP_KEYWORD_EXECUTION)==string::npos){continue;}
       nexecuting++;
     }
     if(nexecuting!=nexecuting_old){
