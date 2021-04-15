@@ -104,7 +104,7 @@ namespace KBIN {
     if (!date.empty() && date[date.length()-1] == '\n') date.erase(date.length()-1); // remove last newline
 
     string WRITE="[VASP_POTCAR_AUID]"+aurostd::joinWDelimiter(vppAUIDs,",");
-    if(!aurostd::substring2bool(aurostd::file2string(directory+"/"+_AFLOWIN_),WRITE)){  //CO20210315 - it write many times
+    if(1||!aurostd::substring2bool(aurostd::file2string(directory+"/"+_AFLOWIN_),WRITE)){  //CO20210315 - better to write many times in case the file is run on another computer //CO20210315 - it write many times
       KBIN::AFLOWIN_ADD(directory+"/"+_AFLOWIN_,WRITE,"");
       //[CO20210315 - OBSOLETE]for(uint i=0;i<vppAUIDs.size();i++) {
       //[CO20210315 - OBSOLETE]  WRITE+=vppAUIDs.at(i);
@@ -6561,6 +6561,7 @@ namespace KBIN {
     //CO20210315 - extensive rewrite
     //the schemes below check if the modification needs to be made (has it already been made?)
     //maintain this feedback system to ensure aflow doesn't keep spinning its wheels on the same fixes
+    bool LDEBUG=(true || _DEBUG_IVASP_ || XHOST.DEBUG);
     string function="KBIN::XVASP_Afix";
     string soliloquy=XPID+function+"():";
     string file_error="",incar_input="";
@@ -6861,6 +6862,8 @@ namespace KBIN {
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
     //last-ditch efforts
+          
+    if(LDEBUG){aus << soliloquy << " Krun=" << Krun << " [1]" << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
     
     if(Krun==false){
       //last-ditch effort, increase volume
@@ -6868,18 +6871,27 @@ namespace KBIN {
       Krun=(xfixed.flag(fix)==false); //only try if it has not already been tried before
       Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
     }
+    
+    if(LDEBUG){aus << soliloquy << " Krun=" << Krun << " [2]" << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+    
     if(Krun==false){
       //last-ditch effort, increase KPOINTS
       fix="KPOINTS=GAMMA_ODD";  //this is a great "general" solution
       Krun=(xfixed.flag(fix)==false); //only try if it has not already been tried before
       Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
     }
+    
+    if(LDEBUG){aus << soliloquy << " Krun=" << Krun << " [3]" << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+    
     if(Krun==false){
       //last-ditch effort, increase KPOINTS
       fix="KPOINTS++";
       Krun=(xfixed.flag(fix)==false); //only try if it has not already been tried before
       Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
     }
+    
+    if(LDEBUG){aus << soliloquy << " Krun=" << Krun << " [4]" << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+    
     ///////////////////////////////////////////////////////////////////////////////////////////////
     
     if(Krun==false){
@@ -6893,7 +6905,9 @@ namespace KBIN {
     vflags.KBIN_VASP_INCAR_VERBOSE=vflags_orig.KBIN_VASP_INCAR_VERBOSE; //restore original
     
     if(file_error.empty()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No file_error specified",_INPUT_ILLEGAL_);} //CO20200624
-    KBIN::XVASP_Afix_Clean(xvasp,file_error);
+    if(xvasp.aopts.flag("FLAG::AFIX_DRYRUN")==false){
+      KBIN::XVASP_Afix_Clean(xvasp,file_error);
+    }
     return true;  //CO20200624
   }
 }

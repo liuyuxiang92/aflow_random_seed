@@ -1871,7 +1871,7 @@ string GetVASPBinaryFromLOCK(const string& directory){  //CO20210315
 // processFlagsFromLOCK
 // ***************************************************************************
 void processFlagsFromLOCK(_xvasp& xvasp,aurostd::xoption& xfixed){  //CO20210315
-  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  bool LDEBUG=(true || XHOST.DEBUG);
   string soliloquy=XPID+"GetVASPBinaryFromLOCK():";
 
   if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
@@ -1879,7 +1879,9 @@ void processFlagsFromLOCK(_xvasp& xvasp,aurostd::xoption& xfixed){  //CO20210315
   if(!aurostd::FileExist(xvasp.Directory+"/"+_AFLOWLOCK_)){return;}
 
   //clear out past options
-  xvasp.aopts.clear();
+  //[needs to be targeted, keep FLAG::AFIX_DRYRUN]xvasp.aopts.clear();
+  xvasp.aopts.flag("FLAG::KPOINTS_PRESERVED",false);
+  xvasp.aopts.flag("FLAG::POSCAR_PRESERVED",false);
   xfixed.clear();
 
   vector<string> vlines,vtokens;
@@ -1988,11 +1990,8 @@ void AFLOW_monitor_VASP(){
 }
 
 void AFLOW_monitor_VASP(const string& directory){
-  bool LDEBUG=(FALSE || XHOST.DEBUG);
   string soliloquy=XPID+"AFLOW_monitor_VASP():";
   stringstream message;
-
-  if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
 
   //aflags
   _aflags aflags;
@@ -2101,7 +2100,13 @@ void AFLOW_monitor_VASP(const string& directory){
       //HERE: plug in exceptions from xfixed, etc. to turn OFF kill_vasp
       //read LOCK to see what has been issued already
       processFlagsFromLOCK(xvasp,xfixed);
-      if(!KBIN::VASP_FixErrors(xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE_devnull)){kill_vasp=false;}
+      xfixed.flag("ALL",false); //otherwise new attempts cannot be tried
+      if(VERBOSE){message << "ls (pre)" << endl << aurostd::execute2string("ls -l") << endl;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);}
+      if(!KBIN::VASP_FixErrors(xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE)){
+        kill_vasp=false;
+        if(VERBOSE){message << "kill_vasp=" << kill_vasp << ": all fixes exhausted" << endl;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);}
+      }
+      if(VERBOSE){message << "ls (post)" << endl << aurostd::execute2string("ls -l") << endl;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);}
     }
 
     //it's possible KBIN::VASP_ProcessWarnings() takes a long time (big vasp.out)
