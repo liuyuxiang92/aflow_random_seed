@@ -1234,6 +1234,9 @@ IVDW=number_for_VASP_see_manual_for_IVDW
   patches are ignored with the "ERROR:" prefix.
   Some errors below are only triggered when "reached required accuracy" is not found in the vasp.out,
   and these include: ERROR:DAV, ERROR:DENTET, ERROR:EDDRMM, ERROR:IBZKPT, ERROR:NUM_PROB, ERROR:ZBRENT.
+  In addition to the patches described below, AFLOW will attempt some "last-ditch" patches should errors occur again, including
+  increasing the volume of the structure by a factor of 1.05, changing to an odd Gamma-centered KPOINTS scheme, and
+  increasing the KPOINTS mesh in all directions by 1.
 
   These inputs are optional and should only be considered when the run fails.
 
@@ -1272,8 +1275,8 @@ IVDW=number_for_VASP_see_manual_for_IVDW
 
   ERROR:EFIELD_PEAD
     The EFIELD_PEAD error is triggered when the following text is found in the vasp.out: "EFIELD_PEAD is too large" or "EFIELD_PEAD are too large for comfort".
-    AFLOW will read in the EFIELD_PEAD vector from the OUTCAR, reduce it by 20%, and apply it as an input in the INCAR.
-    Should the error occur again, AFLOW will continue to reduce the EFIELD_PEAD vector by 20%.
+    AFLOW will read in the EFIELD_PEAD vector from the OUTCAR, reduce it by 80%, and apply it as an input in the INCAR.
+    Should the error occur again, AFLOW will continue to reduce the EFIELD_PEAD vector by 80%.
 
   ERROR:EXCCOR
     The EXCCOR error is triggered when the following text is found in the vasp.out: "ERROR FEXCF: supplied exchange-correlation table" or "ERROR FEXCP: supplied Exchange-correletion table".
@@ -1303,7 +1306,7 @@ IVDW=number_for_VASP_see_manual_for_IVDW
 
   ERROR:MEMORY
     The MEMORY error is triggered when an out-of-memory error is detected in the vasp.out (depends on the cluster).
-    AFLOW will reduce the number of KPOINTS in each direction.
+    AFLOW will reduce the KPOINTS mesh in all direction by 1.
     Should the error occur again, AFLOW will skip the run.
 
   ERROR:MPICH11
@@ -1312,7 +1315,7 @@ IVDW=number_for_VASP_see_manual_for_IVDW
 
   ERROR:MPICH139
     The MPICH139 error is triggered when the following text is found in the vasp.out: "BAD TERMINATION OF ONE OF YOUR APPLICATION PROCESSES" and "EXIT CODE: 139".
-    AFLOW will reduce the KPOINTS in every direction by two to maintain parity and 
+    AFLOW will reduce the KPOINTS mesh in all directions by 2 to maintain parity and 
     allocate all possible resources to VASP by executing the following command before executing VASP again: ulimit -s unlimited.
 
   ERROR:NATOMS
@@ -1337,7 +1340,7 @@ IVDW=number_for_VASP_see_manual_for_IVDW
 
   ERROR:NKXYZ_IKPTD
     The NKXYZ_IKPTD error is triggered when the following text is found in the vasp.out: "NKX>IKPTD" or "NKY>IKPTD" or "NKZ>IKPTD".
-    AFLOW will lower the KPOINTS dimensions in each direction until the error is resolved.
+    AFLOW will reduce the KPOINTS mesh in all directions by 1 until the error is resolved.
 
   ERROR:NPAR
     The NPAR error is triggered when the following text is found in the vasp.out: "please rerun with NPAR=".
@@ -1385,7 +1388,7 @@ IVDW=number_for_VASP_see_manual_for_IVDW
     The RMM_DIIS error is triggered when the following errors are triggered: ERROR:EDDRMM, ERROR:NUM_PROB, ERROR:ZBRENT.
     AFLOW will apply the following change to the INCAR: ALGO=FAST.
     Should the error occur again, AFLOW will apply the following change to the INCAR: ALGO=NORMAL.
-    Should the error occur again, AFLOW will switch to a Gamma-centered odd KPOINTS scheme.
+    Should the error occur again, AFLOW will switch to an odd Gamma-centered KPOINTS scheme.
     Should the error occur again, AFLOW will switch to a RELAX_MODE=FORCES scheme.
     Should the error occur again, AFLOW will halve the default POTIM parameter (0.5) and apply it as an input in the INCAR.
     Should the error occur again, AFLOW will continue to halve POTIM until 
@@ -1396,8 +1399,8 @@ IVDW=number_for_VASP_see_manual_for_IVDW
     The ROTMAT error is triggered when the following errors are triggered: ERROR:SGRCON, ERROR:NIRMAT, ERROR:IBZKPT, ERROR:KKSYM, ERROR:INVGRP, ERROR:SYMPREC.
     AFLOW will apply the following change to the INCAR: SYMPREC=1E-7.
     Should the error occur again, AFLOW will switch to a Gamma-centered KPOINTS scheme.
-    Should the error occur again, AFLOW will switch to a Gamma-centered even KPOINTS scheme.
-    Should the error occur again, AFLOW will switch to a Gamma-centered odd KPOINTS scheme.
+    Should the error occur again, AFLOW will switch to an even Gamma-centered KPOINTS scheme.
+    Should the error occur again, AFLOW will switch to an odd Gamma-centered KPOINTS scheme.
     Should the error occur again, AFLOW will create an equi-dimensional KPOINTS mesh with n=max(nx,ny,nz).
     Should the error occur again, AFLOW will turn off symmetry (ISYM=0 or ISYM=-1).
 
@@ -1425,151 +1428,133 @@ IVDW=number_for_VASP_see_manual_for_IVDW
     Should the error occur again, AFLOW will convert the structure to the standard conventional cell.
   
   FIX:AMIN
+    This input will avoid any AMIN fixes. Relevant errors: ERROR:NELM.
+
   FIX:AMIN=0.01
+    This input will avoid the AMIN=0.01 fix. Relevant errors: ERROR:NELM.
+
   FIX:AMIX
+    This input will avoid any AMIX fixes. Relevant errors: ERROR:NELM.
+
   FIX:AMIX=0.1
+    This input will avoid the AMIX=0.1 fix. Relevant errors: ERROR:NELM.
+
   FIX:BMIX
+    This input will avoid any BMIX fixes. Relevant errors: ERROR:NELM.
+
   FIX:BMIX=0.01
+    This input will avoid the BMIX=0.01 fix. Relevant errors: ERROR:NELM.
+
   FIX:BMIX=3
+    This input will avoid the BMIX=3 fix. Relevant errors: ERROR:NELM.
+  
   FIX:ALGO
+    This input will avoid any ALGO fixes. Relevant errors: ERROR:BRMIX, ERROR:CSLOSHING, ERROR:DAV, ERROR:RMM_DIIS, .
+
   FIX:ALGO=FAST
+    This input will avoid the ALGO=FAST fix. Relevant errors: ERROR:CSLOSHING, ERROR:DAV, ERROR:RMM_DIIS.
+
   FIX:ALGO=NORMAL
+    This input will avoid the ALGO=NORMAL fix. Relevant errors: ERROR:CSLOSHING, ERROR:RMM_DIIS.
+
   FIX:ALGO=VERYFAST
+    This input will avoid the ALGO=VERYFAST fix. Relevant errors: ERROR:BRMIX, ERROR:DAV.
+
   FIX:EFIELD_PEAD
+    This input will avoid the EFIELD_PEAD fix. Relevant errors: ERROR:EFIELD_PEAD.
+
   FIX:ENMAX
+    This input will avoid the ENMAX fix. Relevant errors: ERROR:PSMAXN.
+
   FIX:ISMEAR
+    This input will avoid any ISMEAR fixes. Relevant errors: ERROR:DENTET, ERROR:RMM_DIIS.
+
   FIX:ISMEAR=2
+    This input will avoid the ISMEAR=2 fix. Relevant errors: ERROR:DENTET.
+
   FIX:ISMEAR=-1
+    This input will avoid the ISMEAR=-1 fix. Relevant errors: ERROR:RMM_DIIS.
+
   FIX:KPOINTS
+    This input will avoid any KPOINTS fixes. Relevant errors: ERROR:GAMMA_SHIFT, ERROR:IBZKPT, ERROR:KKSYM, ERROR:MEMORY, ERROR:MPICH139, ERROR:NKXYZ_IKPTD, ERROR:READ_KPOINTS_RD_SYM, ERROR:RMM_DIIS, ERROR:ROTMAT.
+
   FIX:KPOINTS=GAMMA
+    This input will avoid the KPOINTS=GAMMA fix. Relevant errors: ERROR:GAMMA_SHIFT, ERROR:IBZKPT, ERROR:ROTMAT.
+
   FIX:KPOINTS=GAMMA_EVEN
+    This input will avoid the KPOINTS=GAMMA_EVEN fix. Relevant errors: ERROR:ROTMAT.
+
   FIX:KPOINTS=GAMMA_ODD
+    This input will avoid the KPOINTS=GAMMA_ODD fix. Relevant errors: ERROR:RMM_DIIS, ERROR:ROTMAT.
+
   FIX:KPOINTS=KMAX
+    This input will avoid the KPOINTS=KMAX fix. Relevant errors: ERROR:KKSYM, ERROR:ROTMAT.
+
   FIX:KPOINTS--
+    This input will avoid the KPOINTS-- fix. Relevant errors: ERROR:MEMORY, ERROR:NKXYZ_IKPTD.
+
   FIX:KPOINTS-=2
+    This input will avoid the KPOINTS-=2 fix. Relevant errors: ERROR:MPICH139.
+
   FIX:LREAL
+    This input will avoid the LREAL fix. Relevant errors: ERROR:REAL_OPT, ERROR:REAL_OPTLAY_1.
+  
   FIX:NBANDS
+    This input will avoid the NBANDS fix. Relevant errors: ERROR:NBANDS.
+
   FIX:NPAR
+    This input will avoid any NPAR fixes. Relevant errors: ERROR:NPAR, ERROR:NPARC, ERROR:NPARN, ERROR:NPAR_REMOVE.
+
   FIX:NPAR=1
+    This input will avoid the NPAR=1 fix. Relevant errors: ERROR:NPAR.
+
   FIX:NPAR=4
+    This input will avoid the NPAR=4 fix. Relevant errors: ERROR:NPARC, ERROR:NPARN.
+
   FIX:NPAR_REMOVE
+    This input will avoid the NPAR_REMOVE fix. Relevant errors: ERROR:NPAR_REMOVE.
+
   FIX:POSCAR
-  FIX:POSCAR=VOLUME
+    This input will avoid any POSCAR fixes. Relevant errors: ERROR:EXCCOR, ERROR:NATOMS, ERROR:ZPOTRF.
+
+  FIX:POSCAR_VOLUME
+    This input will avoid any POSCAR volume fixes. Relevant errors: ERROR:EXCCOR, ERROR:NATOMS, ERROR:ZPOTRF.
+
+  FIX:POSCAR_VOLUME*=1.05
+    This input will avoid the POSCAR_VOLUME*=1.05 fix. Relevant errors: ERROR:ZPOTRF.
+
+  FIX:POSCAR_VOLUME*=1.2
+    This input will avoid the POSCAR_VOLUME*=1.2 fix. Relevant errors: ERROR:EXCCOR.
+
+  FIX:POSCAR_VOLUME*=1.25
+    This input will avoid the POSCAR_VOLUME*=1.25 fix. Relevant errors: ERROR:NATOMS.
+
   FIX:POSCAR=STANDARD_CONVENTIONAL
+    This input will avoid the POSCAR=STANDARD_CONVENTIONAL fix. Relevant errors: ERROR:ZPOTRF.
+  
   FIX:POTIM
+    This input will avoid the POTIM fix. Relevant errors: ERROR:RMM_DIIS, ERROR:ZPOTRF.
+
   FIX:RELAX_MODE
+    This input will avoid any RELAX_MODE fixes. Relevant errors: ERROR:RMM_DIIS, ERROR:ZBRENT.
+
   FIX:RELAX_MODE=FORCES
+    This input will avoid the RELAX_MODE=FORCES fix. Relevant errors: ERROR:RMM_DIIS, ERROR:ZBRENT.
+
   FIX:SKIP_RUN
+    This input will avoid the SKIP_RUN fix. Relevant errors: ERROR:MEMORY.
+
   FIX:SYM
+    This input will avoid any SYM fixes. Relevant errors: ERROR:READ_KPOINTS_RD_SYM, ERROR:ROTMAT.
+  
   FIX:SYM=OFF
+    This input will avoid the SYM=OFF fix. Relevant errors: ERROR:READ_KPOINTS_RD_SYM, ERROR:ROTMAT.
+
   FIX:SYMPREC
+    This input will avoid the SYMPREC fix. Relevant errors: ERROR:INVGRP, ERROR:ROTMAT, ERROR:SGRCON, ERROR:SYMPREC.
+  
   FIX:ULIMIT
-
-
- ROTMAT
-  "VERY BAD NEWS! Found some non-integer element in the rotation matrix" error. To address this issue,
-  AFLOW removes symmetry (ISYM=0) and make K-points ODD (look at VASP tutorial about k-points).
-
- SGRCON
-  SGRCON relaxation errors. By default aflow tries to go around SGRCON errors by enhancing  SYMPREC=1e-6
-  in the INCAR.
-
- IBZKPT
-  IBZKPT relaxation errors. By default aflow tries to go around IBZKPT errors by changing the KPOINTS
-  to have origin in Gamma.
-
- NKXYX_IKPTD
-  NK[X,Y,Z]>IKPTD kpoints errors. By default aflow tries to go around NK[X,Y,Z]>IKPTD errors by reducing the KPOINTS.
-
- SYMPREC
-  SYMPREC relaxation errors. By default aflow tries to go around SYMPREC errors by incresing precision
-  with SYMPREC.
-
- INVGRP
-  INVGRP relaxation errors. By default aflow tries to go around INVGRP errors by incresing precision
-  with SYMPREC.
-
- EDDRMM
-  EDDRMM relaxation errors. By default aflow tries to go around EDDRMM errors by changing the KPOINTS
-  to have origin in Gamma.
-
- LREAL
-  REAL_OPTLAY (1) errors. By default aflow tries to go around LREAL errors by changing the INCAR.
-
- BRMIX
-  BRMIX errors. By default aflow tries to go around the BRMIX error problem by changing INCAR schemes.
-
- DAV
-  DAV relaxation errors. By default aflow tries to go around DAV relaxation errors by changing INCAR schemes.
-
- EFIELD_PEAD
-  EFIELD_PEAD errors. By default aflow tries to go around EFIELD_PEAD errors by dividing by 5 the EFIELD_PEAD.
-
- EDDDAV
-  EDDDAV errors. By default aflow tries to go around EDDDAV errors by changing INCAR schemes.
-
- ZPOTRF
-  ZPOTRF errors. By default aflow tries to go around ZPOTRF errors by changing INCAR schemes and potentially POSCARs. Check for atoms moving around.
-
- EXCCOR
-  ECHANGE-CORRELATIONS errors. By default aflow tries to go around "supplied exchange-correlation table is too small"
-  errors by changing the POSCAR volume (inflating it).
-
- NATOMS
-  NEAR NEAREST ATOMS errors. By default aflow tries to go around "The distance between some ions is very small"
-  errors by changing the POSCAR volume (inflating it)
-
- NBANDS
-  NBANDS errors. By default aflow  tries to go around insufficient NBANDS by restarting VASP with increasingly
-  higher NBANDS until everything is set. This can be done by tuning the INCAR schemes.
-
- MEMORY
-  MEMORY errors. By default aflow tries to go around insufficient MEMORY by skipping the calculation and
-  writing a SKIP file with some information inside.
-
- PSMAXN
-  PSMAXN errors. By default aflow tries to go around PSMAXN warnings by restarting VASP with reducingly
-  lower ENMAX until everything is set. This can be done by tuning the INCAR schemes.
-
- NPAR
-  NPAR errors. By default aflow tries to go around NPAR warnings by restarting VASP with reducingly
-  lower NPAR. This can be done by tuning the INCAR schemes.
-
- NPARC
-  NPAR=number of cores. By default aflow tries to go around NPAR warnings by putting NPAR=4 (default).
-
- NPARN
-  NPAR=number of nodes errors. By default aflow tries to go around NPAR warnings by putting NPAR=4 (default).
-
- NPAR_REMOVE
-  NPAR=number of nodes errors, when VASP wants to change NPAR. By default aflow tries to go around NPAR warnings by removing NPAR (default)
-
- CSLOSHING
-  CSLOSHING electronic charge-sloshing problems. By default aflow tries to go around unconverged electronic loops,
-  due to charge sloshing, by restarting VASP with with different relax algorithm (aflow choses Algo=Normal which
-  contains default parameters better suited to address this issue).
-
- DENTET
-  DENTET warnings. By default aflow tries to go around DENTET warnings by restarting VASP with different
-  smearing algorithm. This can be done by tuning the INCAR schemes.
-
- LRF_COMMUTATOR
-  LRF_COMMUTATOR warnings. By default aflow tries to go around LRF_COMMUTATOR warnings by restarting VASP with different
-  options. This can be done by tuning the INCAR schemes.
-
- GAMMA_SHIFT
-  GAMMA_SHIFT warnings. By default aflow tries to go around GAMMA_SHIFT warnings by restarting VASP with
-  moving the KPOINTS origin to Gamma. This can be done by tuning KPOINTS.
-
- MPICH11
-  MPICH11 errors. By default aflow tries to go around MPICH11 errors by restarting VASP without NPAR in INCAR, and fixing ulimit.
-
- MPICH139
-  MPICH139 errors. By default aflow tries to go around MPICH139 errors by restarting VASP reducing KPOINTS and fixing ulimit.
-
- READ_KPOINTS_RD_SYM
-  READ_KPOINTS_RD_SYM warnings. By default aflow tries to go around READ_KPOINTS_RD_SYM warnings by restarting VASP with different
-  options. This can be done by tuning the INCAR schemes.
+    This input will avoid the ULIMIT fix. Relevant errors: ERROR:MPICH11, ERROR:MPICH139.
 
 <----------------cut here------------------------------------>
 EXAMPLE

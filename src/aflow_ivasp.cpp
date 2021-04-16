@@ -6600,6 +6600,17 @@ namespace KBIN {
       if(LDEBUG){cerr << soliloquy << " vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:"+fix+"\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:"+fix) << endl;}
       return true;
     }
+
+    //nparc and nparn
+    aurostd::StringSubst(fix,"NPARC","NPAR");
+    aurostd::StringSubst(fix,"NPARN","NPAR");
+    
+    if(LDEBUG){cerr << soliloquy << " generic_fix_string[3]=" << fix << endl;}
+    
+    if(vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:"+fix)){
+      if(LDEBUG){cerr << soliloquy << " vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:"+fix+"\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:"+fix) << endl;}
+      return true;
+    }
     
     return false;
   }
