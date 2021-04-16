@@ -1262,6 +1262,10 @@ IVDW=number_for_VASP_see_manual_for_IVDW
   In addition to the patches described below, AFLOW will attempt some "last-ditch" patches should errors occur again, including
   increasing the volume of the structure by a factor of 1.05, changing to an odd Gamma-centered KPOINTS scheme, and
   increasing the KPOINTS mesh in all directions by 1.
+  Certain patches are avoided depending on the run, e.g., 
+  POTIM is only applied as a patch to relaxation runs, 
+  ISMEAR is not changed for static runs,
+  KPOINTS are not patched for bands runs.
 
   These inputs are optional and should only be considered when the run fails.
 
