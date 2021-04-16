@@ -1277,7 +1277,7 @@ IVDW=number_for_VASP_see_manual_for_IVDW
 
   ERROR:EXCCOR
     The EXCCOR error is triggered when the following text is found in the vasp.out: "ERROR FEXCF: supplied exchange-correlation table" or "ERROR FEXCP: supplied Exchange-correletion table".
-    AFLOW will increase the volume of the structure by a factor of 2^{1/3}.
+    AFLOW will increase the volume of the structure by a factor of 1.2.
 
   ERROR:GAMMA_SHIFT
     The GAMMA_SHIFT error is triggered when the following text is found in the vasp.out: "shift your grid to Gamma".
@@ -1298,80 +1298,131 @@ IVDW=number_for_VASP_see_manual_for_IVDW
   ERROR:KKSYM
     The KKSYM error is triggered when the following text is found in the vasp.out: "Reciprocal lattice and k-lattice belong to different class of lattices".
     This error also triggers ERROR:ROTMAT.
-    AFLOW will create an equi-dimensional KPOINTS mesh 
-
-  ERROR:LRF_COMMUTATOR
-    The  error is triggered when the following text is found in the vasp.out: "".
+    AFLOW will create an equi-dimensional KPOINTS mesh with n=max(nx,ny,nz).
+    Should the error occur again, AFLOW will apply the patches for ERROR:ROTMAT.
 
   ERROR:MEMORY
-    The  error is triggered when the following text is found in the vasp.out: "".
+    The MEMORY error is triggered when an out-of-memory error is detected in the vasp.out (depends on the cluster).
+    AFLOW will reduce the number of KPOINTS in each direction.
+    Should the error occur again, AFLOW will skip the run.
 
   ERROR:MPICH11
-    The  error is triggered when the following text is found in the vasp.out: "".
+    The MPICH11 error is triggered when the following text is found in the vasp.out: "BAD TERMINATION OF ONE OF YOUR APPLICATION PROCESSES" and "EXIT CODE: 11".
+    AFLOW will allocate all possible resources to VASP by executing the following command before executing VASP again: ulimit -s unlimited.
 
   ERROR:MPICH139
-    The  error is triggered when the following text is found in the vasp.out: "".
+    The MPICH139 error is triggered when the following text is found in the vasp.out: "BAD TERMINATION OF ONE OF YOUR APPLICATION PROCESSES" and "EXIT CODE: 139".
+    AFLOW will reduce the KPOINTS in every direction by two to maintain parity and 
+    allocate all possible resources to VASP by executing the following command before executing VASP again: ulimit -s unlimited.
 
   ERROR:NATOMS
-    The  error is triggered when the following text is found in the vasp.out: "".
+    The NATOMS error is triggered when the following text is found in the vasp.out: "distance between some ions is very small".
+    AFLOW will increase the volume of the structure by a factor of 1.25.
 
   ERROR:NBANDS
-    The  error is triggered when the following text is found in the vasp.out: "".
+    The NBANDS error is triggered when the following text is found in the vasp.out: "NBANDS".
+    In some cases, VASP can self-correct (in which case there is no error) as dictated by the following text in the vasp.out: "number of bands has been changed from the values supplied" or "now  NBANDS  =".
+    AFLOW will increase the NBANDS until the error disappears.
 
   ERROR:NELM
-    The  error is triggered when the following text is found in the vasp.out: "".
-
+    The NELM error is triggered when the electronic density is not converged in the last ionic relaxations step.
+    AFLOW will change the mixing parameters in the INCAR: AMIX=0.1 and BMIX=0.01.
+    Should the error occur again, AFLOW will change the mixing parameters in the INCAR: BMIX=3 and AMIN=0.01.
+    Should the error occur again, AFLOW will set NELM to MAX_VASP_NELM (see README_AFLOW_AFLOWRC.TXT).
+    
   ERROR:NIRMAT
-    The  error is triggered when the following text is found in the vasp.out: "".
+    The NIRMAT error is triggered when the following text is found in the vasp.out: "Found some non-integer element in rotation matrix".
+    This error also triggers ERROR:ROTMAT.
+    AFLOW will apply the patches for ERROR:ROTMAT.
 
   ERROR:NKXYZ_IKPTD
-    The  error is triggered when the following text is found in the vasp.out: "".
+    The NKXYZ_IKPTD error is triggered when the following text is found in the vasp.out: "NKX>IKPTD" or "NKY>IKPTD" or "NKZ>IKPTD".
+    AFLOW will lower the KPOINTS dimensions in each direction until the error is resolved.
 
   ERROR:NPAR
-    The  error is triggered when the following text is found in the vasp.out: "".
+    The NPAR error is triggered when the following text is found in the vasp.out: "please rerun with NPAR=".
+    AFLOW will apply the following change to the INCAR: NPAR=1.
 
   ERROR:NPARC
-    The  error is triggered when the following text is found in the vasp.out: "".
+    The NPARC error is triggered when the following text is found in the vasp.out: "NPAR = 4" and "NPAR=number of cores".
+    AFLOW will apply the following change to the INCAR: NPAR=4.
 
   ERROR:NPARN
-    The  error is triggered when the following text is found in the vasp.out: "".
+    The NPARN error is triggered when the following text is found in the vasp.out: "NPAR = 4" and "NPAR=number of nodes".
+    AFLOW will apply the following change to the INCAR: NPAR=4.
 
   ERROR:NPAR_REMOVE
-    The  error is triggered when the following text is found in the vasp.out: "".
+    The NPAR_REMOVE error is triggered when the following text is found in the vasp.out: "Please remove the tag NPAR from the INCAR file and restart the".
+    AFLOW will remove the NPAR tag from the INCAR.
 
   ERROR:NUM_PROB
-    The  error is triggered when the required accuracy is not reached and the following text is found in the vasp.out: "".
+    The NUM_PROB error is triggered when the required accuracy is not reached and the following text is found in the vasp.out: "num prob".
+    This error also triggers ERROR:RMM-DIIS.
+    AFLOW will apply the patches for ERROR:RMM-DIIS.
   
   ERROR:OUTPUT_LARGE
+    THE OUTPUT_LARGE error is triggered when the vasp.out grows beyond BYTES_MAX_VASP_OUT bytes (see README_AFLOW_AFLOWRC.TXT).
+    This indicates that the file is full of warnings to correct.
+
   ERROR:PSMAXN
-    The  error is triggered when the following text is found in the vasp.out: "".
+    The PSMAXN error is triggered when the following text is found in the vasp.out: "REAL_OPT: internal ERROR".
+    AFLOW will read the ENMAX from the OUTCAR, reduce it by 3%, and apply it as an input in the INCAR.
+    Should the error occur again, AFLOW will continue to reduce ENMAX vector by 3%.
 
   ERROR:READ_KPOINTS_RD_SYM
-    The  error is triggered when the following text is found in the vasp.out: "".
+    The READ_KPOINTS_RD_SYM error is triggered when the following text is found in the vasp.out: "ERROR in RE_READ_KPOINTS_RD".
+    AFLOW will turn off symmetry (ISYM=0 or ISYM=-1).
 
   ERROR:REAL_OPT
-    The  error is triggered when the following text is found in the vasp.out: "".
+    The REAL_OPT error is triggered when the following text is found in the vasp.out: "REAL_OPT: internal ERROR".
+    AFLOW will apply the following change to the INCAR: LREAL=.TRUE. .
 
   ERROR:REAL_OPTLAY_1
-    The  error is triggered when the following text is found in the vasp.out: "".
+    The REAL_OPTLAY_1 error is triggered when the following text is found in the vasp.out: "REAL_OPTLAY: internal error (1)".
+    AFLOW will apply the following change to the INCAR: LREAL=.TRUE. .
 
   ERROR:RMM_DIIS
-    The  error is triggered when the following text is found in the vasp.out: "".
+    The RMM_DIIS error is triggered when the following errors are triggered: ERROR:EDDRMM, ERROR:NUM_PROB, ERROR:ZBRENT.
+    AFLOW will apply the following change to the INCAR: ALGO=FAST.
+    Should the error occur again, AFLOW will apply the following change to the INCAR: ALGO=NORMAL.
+    Should the error occur again, AFLOW will switch to a Gamma-centered odd KPOINTS scheme.
+    Should the error occur again, AFLOW will switch to a RELAX_MODE=FORCES scheme.
+    Should the error occur again, AFLOW will halve the default POTIM parameter (0.5) and apply it as an input in the INCAR.
+    Should the error occur again, AFLOW will continue to halve POTIM until 
+    Should the error occur again, AFLOW will half POTIM until it falls below 0.01.
+    Should the error occur again, AFLOW will apply the following change to the INCAR: ISMEAR=-1.
 
   ERROR:ROTMAT
-    The  error is triggered when the following text is found in the vasp.out: "".
+    The ROTMAT error is triggered when the following errors are triggered: ERROR:SGRCON, ERROR:NIRMAT, ERROR:IBZKPT, ERROR:KKSYM, ERROR:INVGRP, ERROR:SYMPREC.
+    AFLOW will apply the following change to the INCAR: SYMPREC=1E-7.
+    Should the error occur again, AFLOW will switch to a Gamma-centered KPOINTS scheme.
+    Should the error occur again, AFLOW will switch to a Gamma-centered even KPOINTS scheme.
+    Should the error occur again, AFLOW will switch to a Gamma-centered odd KPOINTS scheme.
+    Should the error occur again, AFLOW will create an equi-dimensional KPOINTS mesh with n=max(nx,ny,nz).
+    Should the error occur again, AFLOW will turn off symmetry (ISYM=0 or ISYM=-1).
 
   ERROR:SGRCON
-    The  error is triggered when the following text is found in the vasp.out: "".
+    The SGRCON error is triggered when the following text is found in the vasp.out: "VERY BAD NEWS! internal error in subroutine SGRCON".
+    AFLOW will apply the following change to the INCAR: SYMPREC=1E-7.
 
   ERROR:SYMPREC
-    The  error is triggered when the following text is found in the vasp.out: "".
+    The SYMPREC error is triggered when the following text is found in the vasp.out: "inverse of rotation matrix was not found (increase SYMPREC)".
+    AFLOW will apply the following change to the INCAR: SYMPREC=1E-7.
 
   ERROR:ZBRENT
-    The  error is triggered when the required accuracy is not reached and the following text is found in the vasp.out: "".
-  
+    The ZBRENT error is triggered when the required accuracy is not reached and the following text is found in the vasp.out: "ZBRENT: can't locate minimum".
+    This error also triggers ERROR:RMM-DIIS.
+    AFLOW will switch to a RELAX_MODE=FORCES scheme.
+    Should the error occur again, AFLOW will apply the patches for ERROR:RMM-DIIS.
+
   ERROR:ZPOTRF
-    The  error is triggered when the following text is found in the vasp.out: "".
+    The ZPOTRF error is triggered when the following text is found in the vasp.out: "LAPACK: Routine ZPOTRF failed".
+    AFLOW will halve the default POTIM parameter (0.5) and apply it as an input in the INCAR.
+    Should the error occur again, AFLOW will continue to halve POTIM until 
+    Should the error occur again, AFLOW will half POTIM until it falls below 0.01.
+    Should the error occur again, AFLOW will half POTIM until it falls below 0.01.
+    Should the error occur again, AFLOW will increase the volume of the structure by a factor of 1.05.
+    Should the error occur again, AFLOW will convert the structure to the standard conventional cell.
   
   FIX:AMIN
   FIX:AMIN=0.01
