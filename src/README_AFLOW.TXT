@@ -31,6 +31,31 @@ aflow
                                     and run the first N available aflow.in without LOCK.
                                     The old option --runone is mapped into --run=1.
 
+   --monitor_vasp                   Activates an AFLOW daemon process that monitors a VASP run (--DIRECTORY=. or --FILE=LOCK),
+                                    analyzing the files (primarily the vasp.out) for errors/warnings.
+                                    See IGNORE_AFIX below for what/how errors are detected.
+                                    If there is a patch available, a kill command is issued for VASP, allowing
+                                    the primary instance of aflow (running VASP) to correct the errors and rerun.
+                                    This command is still under development, and should only be run with jobs that occupy the
+                                    full compute node (see --kill_vasp_all).
+                                    Use the --DIRECTORY=. command to specify the directory where VASP is running, or the
+                                    --FILE=LOCK to point to the AFLOW LOCK file for the run of interest.
+
+                                    Example use case in qsub file:
+                                    aflow --monitor_vasp --kill_vasp_all --FILE=$RUN_PATH/LOCK &
+                                    MONITOR_PID=$!
+                                    aflow --run --mpi --np=64 --force --use_aflow.in=aflow.in --use_LOCK=LOCK -D $RUN_PATH >> $LOG_PATH
+
+                                    sleep 65;
+                                    [ -n "`ps -p $MONITOR_PID | grep $MONITOR_PID`" ] && touch $RUN_PATH/STOPFLOW && sleep 65;
+                                    [ -n "`ps -p $MONITOR_PID | grep $MONITOR_PID`" ] && kill -9 $MONITOR_PID
+
+                                    The STOPFLOW file will trigger the monitor to exit gracefully.
+                                    Otherwise, a kill command for the monitor is issued.
+   
+   --kill_vasp_all                  A flag for the AFLOW --monitor_vasp daemon indicating that the kill command
+                                    should target all instances of VASP running on the node.
+
    --loop                           When finish, wait for more run
    --sort | -sort                   Sorts the aflow.in in the list
    --reverse | -rsort               Reverse the aflow.in in the list
