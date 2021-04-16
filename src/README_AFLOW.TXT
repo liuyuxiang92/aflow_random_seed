@@ -1226,14 +1226,194 @@ IVDW=number_for_VASP_see_manual_for_IVDW
 
 
 --- IGNORE OPTIONS ---------------------------------------
-[VASP_FORCE_OPTION]IGNORE_AFIX=STRINGS
-  Activates/deactivates some parameters in aflow for VASP calculation,
-  that are possible solutions to usual problems.
-  Suggestion: do not specify these options unless you are willing to look into
-  OUTCAR and vasp.out to check for troubles.
-  They are all OPTIONALS. Possible keywords are:
+[VASP_FORCE_OPTION]IGNORE_AFIX=STRING1,STRING2,... etc.
+  Avoid automatic patches for VASP errors, which are detected by analyzing the vasp.out.
+  Each type of error may come with a series of patches that are applied sequentially should 
+  the error occur repeatedly.
+  Specific patches can be avoided with the "FIX:" prefix, whereas the error and the full series of
+  patches are ignored with the "ERROR:" prefix.
+  Some errors below are only triggered when "reached required accuracy" is not found in the vasp.out,
+  and these include: ERROR:DAV, ERROR:DENTET, ERROR:EDDRMM, ERROR:IBZKPT, ERROR:NUM_PROB, ERROR:ZBRENT.
 
- IGNORE_AFIX=STRING1,STRING2,... etc where STRINGS can be
+  These inputs are optional and should only be considered when the run fails.
+
+  Input options include:
+
+  ERROR:BRMIX
+    The BRMIX error is triggered when the following text is found in the vasp.out: "BRMIX: very serious problems".
+    AFLOW will apply the following change to the INCAR: ALGO=VERYFAST.
+
+  ERROR:CSLOSHING
+    The CSLOSHING error is triggered when three ionic relaxation steps fail to converge the electronic density.
+    AFLOW will apply the following change to the INCAR: ALGO=NORMAL.
+    Should the error occur again, AFLOW will apply the following change to the INCAR: ALGO=FAST.
+  
+  ERROR:CALC_FROZEN
+    The CALC_FROZEN error is triggered when the vasp.out is not modified for SECONDS_STALE_VASP_OUT seconds (see README_AFLOW_AFLOWRC.TXT).
+    If no other errors occur, AFLOW assumes the calculation is frozen because the node experienced an out-of-memory error, and
+    apply patches for "ERROR:MEMORY".
+
+  ERROR:DAV
+    The DAV error is triggered when the required accuracy is not reached and the following text is found in the vasp.out: "WARNING: Sub-Space-Matrix is not hermitian in DAV".
+    AFLOW will apply the following change to the INCAR: ALGO=VERYFAST.
+    Should the error occur again, AFLOW will apply the following change to the INCAR: ALGO=FAST.
+      
+  ERROR:DENTET
+    The DENTET error is triggered when the required accuracy is not reached and the following text is found in the vasp.out: "WARNING: DENTET: can't reach specified precision".
+    AFLOW will apply the following change to the INCAR: ISMEAR=2.
+
+  ERROR:EDDDAV
+    The EDDDAV error is triggered when the following text is found in the vasp.out: "Error EDDDAV: Call to ZHEGV failed".
+    AFLOW will apply the same patches as for ERROR:DAV.
+  
+  ERROR:EDDRMM
+    The EDDRMM error is triggered when the required accuracy is not reached and the following text is found in the vasp.out: "WARNING in EDDRMM: call to ZHEGV failed".
+    This error also triggers ERROR:RMM_DIIS and applies those patches.
+
+  ERROR:EFIELD_PEAD
+    The EFIELD_PEAD error is triggered when the following text is found in the vasp.out: "EFIELD_PEAD is too large" or "EFIELD_PEAD are too large for comfort".
+    AFLOW will read in the EFIELD_PEAD vector from the OUTCAR, reduce it by 20%, and apply it as an input in the INCAR.
+    Should the error occur again, AFLOW will continue to reduce the EFIELD_PEAD vector by 20%.
+
+  ERROR:EXCCOR
+    The EXCCOR error is triggered when the following text is found in the vasp.out: "ERROR FEXCF: supplied exchange-correlation table" or "ERROR FEXCP: supplied Exchange-correletion table".
+    AFLOW will increase the volume of the structure by a factor of 2^{1/3}.
+
+  ERROR:GAMMA_SHIFT
+    The GAMMA_SHIFT error is triggered when the following text is found in the vasp.out: "shift your grid to Gamma".
+    AFLOW will switch to a Gamma-centered KPOINTS scheme.
+
+  ERROR:IBZKPT
+    The IBZKPT error is triggered when the required accuracy is not reached and the following text is found in the vasp.out: "VERY BAD NEWS! internal error in subroutine IBZKPT".
+    This error also triggers ERROR:ROTMAT.
+    AFLOW will switch to a Gamma-centered KPOINTS scheme.
+    Should the error occur again, AFLOW will apply the patches for ERROR:ROTMAT.
+  
+  ERROR:INVGRP
+    The INVGRP error is triggered when the following text is found in the vasp.out: "VERY BAD NEWS! internal error in subroutine INVGRP".
+    This error also triggers ERROR:ROTMAT.
+    AFLOW will apply the following change to the INCAR: SYMPREC=1E-7.
+    Should the error occur again, AFLOW will apply the patches for ERROR:ROTMAT.
+
+  ERROR:KKSYM
+    The KKSYM error is triggered when the following text is found in the vasp.out: "Reciprocal lattice and k-lattice belong to different class of lattices".
+    This error also triggers ERROR:ROTMAT.
+    AFLOW will create an equi-dimensional KPOINTS mesh 
+
+  ERROR:LRF_COMMUTATOR
+    The  error is triggered when the following text is found in the vasp.out: "".
+
+  ERROR:MEMORY
+    The  error is triggered when the following text is found in the vasp.out: "".
+
+  ERROR:MPICH11
+    The  error is triggered when the following text is found in the vasp.out: "".
+
+  ERROR:MPICH139
+    The  error is triggered when the following text is found in the vasp.out: "".
+
+  ERROR:NATOMS
+    The  error is triggered when the following text is found in the vasp.out: "".
+
+  ERROR:NBANDS
+    The  error is triggered when the following text is found in the vasp.out: "".
+
+  ERROR:NELM
+    The  error is triggered when the following text is found in the vasp.out: "".
+
+  ERROR:NIRMAT
+    The  error is triggered when the following text is found in the vasp.out: "".
+
+  ERROR:NKXYZ_IKPTD
+    The  error is triggered when the following text is found in the vasp.out: "".
+
+  ERROR:NPAR
+    The  error is triggered when the following text is found in the vasp.out: "".
+
+  ERROR:NPARC
+    The  error is triggered when the following text is found in the vasp.out: "".
+
+  ERROR:NPARN
+    The  error is triggered when the following text is found in the vasp.out: "".
+
+  ERROR:NPAR_REMOVE
+    The  error is triggered when the following text is found in the vasp.out: "".
+
+  ERROR:NUM_PROB
+    The  error is triggered when the required accuracy is not reached and the following text is found in the vasp.out: "".
+  
+  ERROR:OUTPUT_LARGE
+  ERROR:PSMAXN
+    The  error is triggered when the following text is found in the vasp.out: "".
+
+  ERROR:READ_KPOINTS_RD_SYM
+    The  error is triggered when the following text is found in the vasp.out: "".
+
+  ERROR:REAL_OPT
+    The  error is triggered when the following text is found in the vasp.out: "".
+
+  ERROR:REAL_OPTLAY_1
+    The  error is triggered when the following text is found in the vasp.out: "".
+
+  ERROR:RMM_DIIS
+    The  error is triggered when the following text is found in the vasp.out: "".
+
+  ERROR:ROTMAT
+    The  error is triggered when the following text is found in the vasp.out: "".
+
+  ERROR:SGRCON
+    The  error is triggered when the following text is found in the vasp.out: "".
+
+  ERROR:SYMPREC
+    The  error is triggered when the following text is found in the vasp.out: "".
+
+  ERROR:ZBRENT
+    The  error is triggered when the required accuracy is not reached and the following text is found in the vasp.out: "".
+  
+  ERROR:ZPOTRF
+    The  error is triggered when the following text is found in the vasp.out: "".
+  
+  FIX:AMIN
+  FIX:AMIN=0.01
+  FIX:AMIX
+  FIX:AMIX=0.1
+  FIX:BMIX
+  FIX:BMIX=0.01
+  FIX:BMIX=3
+  FIX:ALGO
+  FIX:ALGO=FAST
+  FIX:ALGO=NORMAL
+  FIX:ALGO=VERYFAST
+  FIX:EFIELD_PEAD
+  FIX:ENMAX
+  FIX:ISMEAR
+  FIX:ISMEAR=2
+  FIX:ISMEAR=-1
+  FIX:KPOINTS
+  FIX:KPOINTS=GAMMA
+  FIX:KPOINTS=GAMMA_EVEN
+  FIX:KPOINTS=GAMMA_ODD
+  FIX:KPOINTS=KMAX
+  FIX:KPOINTS--
+  FIX:KPOINTS-=2
+  FIX:LREAL
+  FIX:NBANDS
+  FIX:NPAR
+  FIX:NPAR=1
+  FIX:NPAR=4
+  FIX:NPAR_REMOVE
+  FIX:POSCAR
+  FIX:POSCAR=VOLUME
+  FIX:POSCAR=STANDARD_CONVENTIONAL
+  FIX:POTIM
+  FIX:RELAX_MODE
+  FIX:RELAX_MODE=FORCES
+  FIX:SKIP_RUN
+  FIX:SYM
+  FIX:SYM=OFF
+  FIX:SYMPREC
+  FIX:ULIMIT
+
 
  ROTMAT
   "VERY BAD NEWS! Found some non-integer element in the rotation matrix" error. To address this issue,

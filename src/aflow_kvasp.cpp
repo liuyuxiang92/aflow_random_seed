@@ -1156,35 +1156,86 @@ namespace KBIN {
     BflowIn=AflowIn;aurostd::StringSubst(BflowIn,"=","_");aurostd::StringSubst(BflowIn,"IGNORE_AFIX_","IGNORE_AFIX="); // bypass for getting all "_"
     vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.options2entry(BflowIn,string(_STROPT_+"IGNORE_AFIX="),aurostd_xoptionMULTI,""); // stack them all
     if(0) {
-      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"BRMIX\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("BRMIX") << endl;
-      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"CSLOSHING\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("CSLOSHING") << endl;
-      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"DAV\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("DAV") << endl;
-      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"DENTET\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("DENTET") << endl;
-      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"EDDDAV\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("EDDDAV") << endl;
-      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"EDDRMM\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("EDDRMM") << endl;
-      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"EXCCOR\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("EXCCOR") << endl;
-      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"GAMMA_SHIFT\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("GAMMA_SHIFT") << endl;
-      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"IBZKPT\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("IBZKPT") << endl;
-      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"INVGRP\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("INVGRP") << endl;
-      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"LREAL\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("LREAL") << endl;
-      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"LRF_COMMUTATOR\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("LRF_COMMUTATOR") << endl;
-      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"MEMORY\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("MEMORY") << endl;
-      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"MPICH11\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("MPICH11") << endl;
-      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"MPICH139\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("MPICH139") << endl;
-      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"NATOMS\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("NATOMS") << endl;
-      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"NBANDS\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("NBANDS") << endl;
-      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"NKXYZ_IKPTD\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("NKXYZ_IKPTD") << endl;
-      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"NONE\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("NONE") << endl;
-      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"NPAR\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("NPAR") << endl;
-      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"NPARC\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("NPARC") << endl;
-      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"NPARN\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("NPARN") << endl;
-      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"NPAR_REMOVE\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("NPAR_REMOVE") << endl;
-      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"PSMAXN\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("PSMAXN") << endl;
-      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"READ_KPOINTS_RD_SYM\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("READ_KPOINTS_RD_SYM") << endl;
-      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ROTMAT\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ROTMAT") << endl;
-      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"SGRCON\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("SGRCON") << endl;
-      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"SYMPREC\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("SYMPREC") << endl;
-      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ZPOTRF\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ZPOTRF") << endl;
+      //ERRORS
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:BRMIX\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ERROR:BRMIX") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:CSLOSHING\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ERROR:CSLOSHING") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:CALC_FROZEN\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ERROR:CALC_FROZEN") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:DAV\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ERROR:DAV") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:DENTET\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ERROR:DENTET") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:EDDDAV\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ERROR:EDDDAV") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:EDDRMM\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ERROR:EDDRMM") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:EFIELD_PEAD\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ERROR:EFIELD_PEAD") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:EXCCOR\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ERROR:EXCCOR") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:GAMMA_SHIFT\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ERROR:GAMMA_SHIFT") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:IBZKPT\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ERROR:IBZKPT") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:INVGRP\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ERROR:INVGRP") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:KKSYM\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ERROR:KKSYM") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:LRF_COMMUTATOR\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ERROR:LRF_COMMUTATOR") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:MEMORY\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ERROR:MEMORY") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:MPICH11\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ERROR:MPICH11") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:MPICH139\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ERROR:MPICH139") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:NATOMS\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ERROR:NATOMS") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:NBANDS\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ERROR:NBANDS") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:NELM\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ERROR:NELM") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:NIRMAT\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ERROR:NIRMAT") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:NKXYZ_IKPTD\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ERROR:NKXYZ_IKPTD") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:NPAR\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ERROR:NPAR") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:NPARC\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ERROR:NPARC") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:NPARN\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ERROR:NPARN") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:NPAR_REMOVE\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ERROR:NPAR_REMOVE") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:NUM_PROB\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ERROR:NUM_PROB") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:OUTPUT_LARGE\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ERROR:OUTPUT_LARGE") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:PSMAXN\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ERROR:PSMAXN") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:READ_KPOINTS_RD_SYM\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ERROR:READ_KPOINTS_RD_SYM") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:REAL_OPT\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ERROR:REAL_OPT") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:REAL_OPTLAY_1\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ERROR:REAL_OPTLAY_1") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:RMM_DIIS\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ERROR:RMM_DIIS") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:ROTMAT\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ERROR:ROTMAT") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:SGRCON\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ERROR:SGRCON") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:SYMPREC\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ERROR:SYMPREC") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:ZBRENT\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ERROR:ZBRENT") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:ZPOTRF\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ERROR:ZPOTRF") << endl;
+      //FIXES
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:AMIN\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:AMIN") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:AMIN=0.01\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:AMIN=0.01") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:AMIX\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:AMIX") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:AMIX=0.1\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:AMIX=0.1") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:BMIX\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:BMIX") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:BMIX=0.01\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:BMIX=0.01") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:BMIX=3\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:BMIX=3") << endl;  //CO20210315 - what to do about 3 vs. 3.0?
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:ALGO\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:ALGO") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:ALGO=FAST\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:ALGO=FAST") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:ALGO=NORMAL\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:ALGO=NORMAL") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:ALGO=VERYFAST\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:ALGO=VERYFAST") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:EFIELD_PEAD\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:EFIELD_PEAD") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:ENMAX\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:ENMAX") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:ISMEAR\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:ISMEAR") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:ISMEAR=2\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:ISMEAR=2") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:ISMEAR=-1\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:ISMEAR=-1") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:KPOINTS\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:KPOINTS") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:KPOINTS=GAMMA\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:KPOINTS=GAMMA") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:KPOINTS=GAMMA_EVEN\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:KPOINTS=GAMMA_EVEN") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:KPOINTS=GAMMA_ODD\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:KPOINTS=GAMMA_ODD") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:KPOINTS=KMAX\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:KPOINTS=KMAX") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:KPOINTS--\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:KPOINTS--") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:KPOINTS-=2\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:KPOINTS-=2") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:LREAL\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:LREAL") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:NBANDS\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:NBANDS") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:NPAR\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:NPAR") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:NPAR=1\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:NPAR=1") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:NPAR=4\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:NPAR=4") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:NPAR_REMOVE\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:NPAR_REMOVE") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:POSCAR\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:POSCAR") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:POSCAR=VOLUME\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:POSCAR=VOLUME") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:POSCAR=STANDARD_CONVENTIONAL\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:POSCAR=STANDARD_CONVENTIONAL") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:POTIM\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:POTIM") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:RELAX_MODE\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:RELAX_MODE") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:RELAX_MODE=FORCES\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:RELAX_MODE=FORCES") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:SKIP_RUN\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:SKIP_RUN") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:SYM\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:SYM") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:SYM=OFF\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:SYM=OFF") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:SYMPREC\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:SYMPREC") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:ULIMIT\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:ULIMIT") << endl;
     }
 
     // INPUT FILES
@@ -2431,9 +2482,10 @@ namespace KBIN {
                   xvasp.NRELAXING++;
                   aus << 11111*xvasp.NRELAXING << "  BANDS (" << STRING_TO_SHOW << ") - " <<  xvasp.Directory << " - K=[" << vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE.content_string << "," << vflags.KBIN_VASP_KPOINTS_BANDS_GRID_VALUE << "]" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
                   aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-                  vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.push("ROTMAT");	// dont mess up KPOINTS in bands
-                  vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.push("IBZKPT");    // dont mess up KPOINTS in bands
-                  vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.push("EDDRMM");	// dont mess up KPOINTS in bands
+                  //[CO20210315 - OBSOLETE]vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.push("ROTMAT");	// dont mess up KPOINTS in bands
+                  //[CO20210315 - OBSOLETE]vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.push("IBZKPT");    // dont mess up KPOINTS in bands
+                  //[CO20210315 - OBSOLETE]vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.push("EDDRMM");	// dont mess up KPOINTS in bands
+                  vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.push("FIX:KPOINTS");	//CO20210315 - this should also be obsolete, Afix knows not to fix a non-automesh, also covered by xvasp.aopts.flag("FLAG::CHGCAR_PRESERVED",TRUE) above // dont mess up KPOINTS in bands
                   Krun=KBIN::VASP_Run(xvasp,aflags,kflags,vflags,FileMESSAGE);
                   if(!Krun) {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error [RELAX_STATIC_BANDS BANDS]");return Krun;}
                   //  if(_VASP_CONTCAR_SAVE_) KBIN::VASP_CONTCAR_Save(xvasp,string("bands"));
@@ -3357,8 +3409,8 @@ namespace KBIN {
       if(LDEBUG){aus << soliloquy << " xfixed.flag(\"ALL\")==TRUE: skipping " << error << " fix" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
       apply_fix=false;
     }
-    if(apply_fix && vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(error)){
-      if(LDEBUG){aus << soliloquy << " vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"" << error << "\")==TRUE: skipping " << error << " fix" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+    if(apply_fix && vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ERROR:"+error)){
+      if(LDEBUG){aus << soliloquy << " vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:" << error << "\")==TRUE: skipping " << error << " fix" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
       apply_fix=false;
     }
     if(apply_fix && VERBOSE){

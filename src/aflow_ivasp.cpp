@@ -6557,6 +6557,34 @@ namespace KBIN {
 }
 
 namespace KBIN {
+  bool XVASP_Afix_IgnoreFix(const string& _fix,const _vflags& vflags){
+    bool LDEBUG=(true || _DEBUG_IVASP_ || XHOST.DEBUG);
+    string soliloquy=XPID+"KBIN::XVASP_Afix_IgnoreFix():";
+    
+    if(vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:"+_fix)){
+      if(LDEBUG){cerr << soliloquy << " vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:"+_fix+"\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:"+_fix) << endl;}
+      return true;
+    }
+    
+    string fix=_fix;
+    string::size_type loc=0;
+    loc=fix.find("=");
+    if(loc!=string::npos){fix=fix.substr(0,loc);}
+    aurostd::StringSubst(fix,"-","");
+    aurostd::StringSubst(fix,"+","");
+
+    if(LDEBUG){cerr << soliloquy << " generic_fix_string=" << fix << endl;}
+    
+    if(vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:"+fix)){
+      if(LDEBUG){cerr << soliloquy << " vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:"+fix+"\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:"+fix) << endl;}
+      return true;
+    }
+    
+    return false;
+  }
+} // namespace KBIN
+
+namespace KBIN {
   bool XVASP_Afix(const string& mode,int& submode,aurostd::xoption& xfixed,_xvasp& xvasp,_kflags& kflags,_vflags& vflags,_aflags &aflags,ofstream& FileMESSAGE) {  //CO20200624 - adding submode
     //CO20210315 - extensive rewrite
     //the schemes below check if the modification needs to be made (has it already been made?)
@@ -6593,7 +6621,25 @@ namespace KBIN {
       //CO20210315 - from several tests, "ALGO=VERYFAST" is the only solution that has worked
       //keep this as the only solution and then try last-ditch efforts
       fix="ALGO=VERYFAST";
+      if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
       Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
+    }
+    else if(mode=="CSLOSHING") {
+      if(submode<0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"no submode set: \""+mode+"\"",_INPUT_ILLEGAL_);}  //CO20210315
+      if(submode==0){ //try ALGO=NORMAL //CO20200624
+        fix="ALGO=NORMAL";
+        if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
+        Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
+        if(!Krun){Krun=true;submode++;} //reset and go to the next solution
+      }
+      if(submode==1){ //try ALGO=FAST //CO20200624
+        fix="ALGO=FAST";
+        if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
+        Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
+        if(!Krun){Krun=true;submode++;} //reset and go to the next solution
+      }
+      if(submode>=2){Krun=false;}
+      submode+=submode_increment;submode_increment=1;  //increment and reset
     }
     else if(mode=="DAV" || mode=="EDDDAV") {
       //https://www.vasp.at/forum/viewtopic.php?t=1192&p=2321 (DAV)
@@ -6604,26 +6650,13 @@ namespace KBIN {
       if(submode<0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"no submode set: \""+mode+"\"",_INPUT_ILLEGAL_);}  //CO20210315
       if(submode==0){ //try ALGO=VERYFAST //CO20200624
         fix="ALGO=VERYFAST";
+        if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
         Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
       if(submode==1){ //try ALGO=FAST //CO20200624
         fix="ALGO=FAST";
-        Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
-        if(!Krun){Krun=true;submode++;} //reset and go to the next solution
-      }
-      if(submode>=2){Krun=false;}
-      submode+=submode_increment;submode_increment=1;  //increment and reset
-    }
-    else if(mode=="CSLOSHING") {
-      if(submode<0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"no submode set: \""+mode+"\"",_INPUT_ILLEGAL_);}  //CO20210315
-      if(submode==0){ //try ALGO=NORMAL //CO20200624
-        fix="ALGO=NORMAL";
-        Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
-        if(!Krun){Krun=true;submode++;} //reset and go to the next solution
-      }
-      if(submode==1){ //try ALGO=FAST //CO20200624
-        fix="ALGO=FAST";
+        if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
         Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
@@ -6633,41 +6666,49 @@ namespace KBIN {
     else if(mode=="DENTET") {
       //https://www.vasp.at/forum/viewtopic.php?f=3&t=416
       fix="ISMEAR=2";
+      if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
       Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
       if(!Krun){Krun=true;submode++;} //reset and go to the next solution
     }
     else if(mode=="EFIELD_PEAD") {
       fix="EFIELD_PEAD";
+      if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
       Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
     }
     else if(mode=="EXCCOR" || mode=="NATOMS") {
       fix="POSCAR=VOLUME";
+      if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
       Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
     }
     else if(mode=="GAMMA_SHIFT" || mode=="IBZKPT") {  //CO20210315 - does a simple shift work for IBZKPT? come back
       fix="KPOINTS=GAMMA";
+      if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
       Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
     }
     else if(mode=="KKSYM") {
       //CO20210315 - tried SYMPREC and KPOINTS=GAMMA first in several tests, they never worked. KPOINTS=KMAX works every time
       //ROTMAT is trigged for KKSYM, it will try these other procedures anyway in the off change KPOINTS=KMAX doesn't work
       fix="KPOINTS=KMAX";
+      if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
       Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
     }
     else if(mode=="LREAL") {
       fix="LREAL";
+      if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
       Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
     }
     else if(mode=="MEMORY") { //CO20210315
       if(submode<0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"no submode set: \""+mode+"\"",_INPUT_ILLEGAL_);}  //CO20210315
       if(submode==0){ //lower k-points
         fix="KPOINTS--";
+        if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
         Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
       //we might add lowering NBANDS here (add NBANDS++ and NBANDS--), as well as NGX, need to test...
       if(submode==1){ //skip run
         fix="SKIP_RUN";
+        if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
         Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
@@ -6676,28 +6717,34 @@ namespace KBIN {
     }
     else if(mode=="MPICH11") {
       fix="ULIMIT";
+      if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
       Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
     }
     else if(mode=="MPICH139") {
       bool Krun1=true;fix="ULIMIT";
+      if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun1=false;}
       Krun1=(Krun1 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
       
       bool Krun2=true;fix="KPOINTS-=2";
+      if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun2=false;}
       Krun2=(Krun2 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
 
       Krun=(Krun1||Krun2);
     }
     else if(mode=="NBANDS") {
       fix="NBANDS";
+      if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
       Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
     }
     else if(mode=="NELM") {
       if(submode<0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"no submode set: \""+mode+"\"",_INPUT_ILLEGAL_);}  //CO20210315
       if(submode==0){ //AMIX/BMIX fixes
         bool Krun1=true;fix="AMIX=0.1";
+        if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun1=false;}
         Krun1=(Krun1 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
 
         bool Krun2=true;fix="BMIX=0.01";
+        if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun2=false;}
         Krun2=(Krun2 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
 
         Krun=(Krun1||Krun2);
@@ -6705,10 +6752,12 @@ namespace KBIN {
       }
       //else if(submode==1) //DO NOT USE else if, we may change submode inside
       if(submode==1){ //BMIX/AMIN fixes
-        bool Krun1=true;fix="BMIX=3.0";
+        bool Krun1=true;fix="BMIX=3"; //3.0
+        if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun1=false;}
         Krun1=(Krun1 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
 
         bool Krun2=true;fix="AMIN=0.01";
+        if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun2=false;}
         Krun2=(Krun2 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
 
         Krun=(Krun1||Krun2);
@@ -6716,6 +6765,7 @@ namespace KBIN {
       }
       if(submode==2){ //desperate attempt, increase NELM
         fix="NELM";
+        if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
         Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
@@ -6725,26 +6775,32 @@ namespace KBIN {
     else if(mode=="NKXYZ_IKPTD") {
       //https://www.vasp.at/forum/viewtopic.php?t=1228
       fix="KPOINTS--";
+      if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
       Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
     }
     else if(mode=="NPAR") {
       fix="NPAR=1";
+      if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
       Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
     }
     else if(mode=="NPARC" || mode=="NPARN") {
       fix="NPAR=4";
+      if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
       Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
     }
     else if(mode=="NPAR_REMOVE") {
       fix="NPAR_REMOVE";
+      if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
       Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
     }
     else if(mode=="PSMAXN") {
       fix="ENMAX";
+      if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
       Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
     }
     else if(mode=="READ_KPOINTS_RD_SYM") {
       fix="SYM=OFF";
+      if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
       Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
     }
     else if(mode=="RMM_DIIS") {
@@ -6756,32 +6812,38 @@ namespace KBIN {
       if(submode==0){ //CO20200624 - try ALGO=FAST (fast is faster than normal, try first)
         //https://www.vasp.at/wiki/index.php/IALGO#RMM-DIIS
         fix="ALGO=FAST";
+        if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
         Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
       //else if(submode==1) //DO NOT USE else if, we may change submode inside
       if(submode==1){ //CO20200624 - try ALGO=NORMAL
         fix="ALGO=NORMAL";
+        if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
         Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
       if(submode==2){ //Gamma-odd (might increase ki) //CO20200624
         fix="KPOINTS=GAMMA_ODD";
+        if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
         Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
       if(submode==3){ //CO20200624 - try RELAX_MODE=FORCES
         fix="RELAX_MODE=FORCES";
+        if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
         Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
       if(submode==4){ //CO20200624 - try fixing POTIM
         fix="POTIM";
+        if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
         Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
       if(submode==5){ //CO20200624 - try Fermi smearing
         fix="ISMEAR=-1";
+        if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
         Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
@@ -6793,32 +6855,38 @@ namespace KBIN {
       if(submode==0){ //try SYMPREC first (easy)
         //SYMPREC has been shown to work: LIB2/LIB/CeO/AB_tI4_139_b_a-001.AB
         fix="SYMPREC";
+        if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
         Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
       //else if(submode==1) //DO NOT USE else if, we may change submode inside
       if(submode==1){ //Gamma without increasing KPOINTS  //CO20210315 - does a simple shift fix ROTMAT? come back
         fix="KPOINTS=GAMMA";
+        if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
         Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
       if(submode==2){ //Gamma-even  //CO20210315 - does this ever work? or is it just increase KPOINTS helps? come back
         fix="KPOINTS=GAMMA_EVEN";
+        if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
         Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
       if(submode==3){ //Gamma-odd
         fix="KPOINTS=GAMMA_ODD";
+        if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
         Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
       if(submode==4){ //Kmax
         fix="KPOINTS=KMAX";
+        if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
         Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
       if(submode==5){ //ISYM=0
         fix="SYM=OFF";
+        if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
         Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
@@ -6827,22 +6895,26 @@ namespace KBIN {
     }
     else if(mode=="SYMPREC") {
       fix="SYMPREC";
+      if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
       Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
     }
     else if(mode=="ZBRENT") { //other RMM-DIIS patches will follow
       //https://www.vasp.at/forum/viewtopic.php?t=1856
       fix="RELAX_MODE=FORCES";
+      if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
       Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
     }
     else if(mode=="ZPOTRF") {
       if(submode<0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"no submode set: \""+mode+"\"",_INPUT_ILLEGAL_);}  //CO20210315
       if(submode==0){  //CO20210315 - POTIM usually works
         fix="POTIM";
+        if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
         Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
       if(submode==1){  //CO20210315 - increasing volume might get you out of rut
         fix="POSCAR=VOLUME";
+        if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
         Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
@@ -6850,6 +6922,7 @@ namespace KBIN {
       //we keep here as a last-ditch effort
       if(submode==2){  //CO20210315 - try converting to standard conventional (previously not applied)
         fix="POSCAR=STANDARD_CONVENTIONAL";
+        if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
         Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }

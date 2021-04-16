@@ -726,6 +726,12 @@ int main(int _argc,char **_argv) {
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_FoldAtomsInCell|--FoldAtomsInCell_test")) {return (FoldAtomsInCellTest(cout)?0:1);}  //DX20210129
     if(!Arun && aurostd::args2flag(argv,cmds,"--test")) {
 
+      //_vflags vflags1;
+      //KBIN::XVASP_Afix_IgnoreFix("BMIX=0.2",vflags1);
+      //KBIN::XVASP_Afix_IgnoreFix("KPOINTS++",vflags1);
+      //KBIN::XVASP_Afix_IgnoreFix("KPOINTS--",vflags1);
+      //KBIN::XVASP_Afix_IgnoreFix("KPOINTS+=2",vflags1);
+
       //_xvasp xvasp1;aurostd::xoption xfixed;
       //xvasp1.Directory="/home/aflow/work/jobs_submission/to_run/first_run/library/LIB2_WARNINGS/WARNINGS/NELM/LIB2/LIB/CCu_pv/A7.B/test";
       //processFlagsFromLOCK(xvasp1,xfixed);
