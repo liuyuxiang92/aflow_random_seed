@@ -1546,17 +1546,20 @@ IVDW=number_for_VASP_see_manual_for_IVDW
   FIX:POSCAR
     This input will avoid any POSCAR fixes. Relevant errors: ERROR:EXCCOR, ERROR:NATOMS, ERROR:ZPOTRF.
 
+  FIX:POSCAR_SCALE
+    This input will avoid any POSCAR scale fixes. Relevant errors: ERROR:EXCCOR.
+
+  FIX:POSCAR_SCALE*=1.2
+    This input will avoid the POSCAR_SCALE*=1.2 fix. Relevant errors: ERROR:EXCCOR.
+
   FIX:POSCAR_VOLUME
-    This input will avoid any POSCAR volume fixes. Relevant errors: ERROR:EXCCOR, ERROR:NATOMS, ERROR:ZPOTRF.
+    This input will avoid any POSCAR volume fixes. Relevant errors: ERROR:NATOMS, ERROR:ZPOTRF.
 
   FIX:POSCAR_VOLUME*=1.05
     This input will avoid the POSCAR_VOLUME*=1.05 fix. Relevant errors: ERROR:ZPOTRF.
 
-  FIX:POSCAR_VOLUME*=1.2
-    This input will avoid the POSCAR_VOLUME*=1.2 fix. Relevant errors: ERROR:EXCCOR.
-
-  FIX:POSCAR_VOLUME*=1.25
-    This input will avoid the POSCAR_VOLUME*=1.25 fix. Relevant errors: ERROR:NATOMS.
+  FIX:POSCAR_VOLUME*=2
+    This input will avoid the POSCAR_VOLUME*=2 fix. Relevant errors: ERROR:NATOMS.
 
   FIX:POSCAR=STANDARD_CONVENTIONAL
     This input will avoid the POSCAR=STANDARD_CONVENTIONAL fix. Relevant errors: ERROR:ZPOTRF.

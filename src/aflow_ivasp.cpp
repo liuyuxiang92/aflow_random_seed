@@ -6368,16 +6368,16 @@ namespace KBIN {
       //END - load INCAR into xvasp, modify, then write out new INCAR
       if(Krun){aus << "MMMMM  MESSAGE applied FIX=\"" << fix << "\"=" << param_double << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
     }
-    else if(fix.find("POSCAR_VOLUME")!=string::npos) {
+    else if(fix.find("POSCAR_SCALE")!=string::npos) {
       if(xvasp.aopts.flag("FLAG::POSCAR_PRESERVED")){Krun=false;} // don't touch poscar
       if(Krun){
-        string key="POSCAR_VOLUME";
+        string key="POSCAR_SCALE";
         loc=fix.find(key);
-        if(loc==fix.size()-1||loc==string::npos){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"KPOINTS mode not found",_INPUT_ILLEGAL_);}
+        if(loc==fix.size()-1||loc==string::npos){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"POSCAR_SCALE mode not found",_INPUT_ILLEGAL_);}
         string value="";
-        value=fix.substr(loc+key.length());  //get everything after 'KPOINTS', including '='
+        value=fix.substr(loc+key.length());  //get everything after 'POSCAR_SCALE', including '='
         if(value.find("*=")!=string::npos){param_string=value;aurostd::StringSubst(param_string,"*=","");param_double=aurostd::string2utype<double>(param_string);}
-        else{throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"KPOINTS unknown mode: \""+value+"\"",_INPUT_ILLEGAL_);}
+        else{throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"POSCAR_SCALE unknown mode: \""+value+"\"",_INPUT_ILLEGAL_);}
       }
       if(Krun && VERBOSE){aus << "MMMMM  MESSAGE attempting FIX=\"" << fix << "\" volume(pre)=" << xvasp.str.GetVolume() << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
       //START - modify xvasp.str and write out new POSCAR
@@ -6385,6 +6385,30 @@ namespace KBIN {
         Krun=(Krun && aurostd::stringstream2file(xvasp.POSCAR,string(xvasp.Directory+"/POSCAR.orig")));  //CO20210315 - POSCAR.orig here is NOT the original structure, but a saved state, come back later
       }
       if(Krun){xvasp.str.scale*=param_double;}
+      Krun=(Krun && KBIN::VASP_Produce_POSCAR(xvasp)); //creates xvasp.POSCAR
+      if(xvasp.aopts.flag("FLAG::AFIX_DRYRUN")==false){
+        Krun=(Krun && aurostd::stringstream2file(xvasp.POSCAR,string(xvasp.Directory+"/POSCAR")));
+      }
+      //END - modify xvasp.str and write out new POSCAR
+      if(Krun){aus << "MMMMM  MESSAGE applied FIX=\"" << fix << "\" volume(post)=" << xvasp.str.GetVolume() << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+    }
+    else if(fix.find("POSCAR_VOLUME")!=string::npos) {
+      if(xvasp.aopts.flag("FLAG::POSCAR_PRESERVED")){Krun=false;} // don't touch poscar
+      if(Krun){
+        string key="POSCAR_VOLUME";
+        loc=fix.find(key);
+        if(loc==fix.size()-1||loc==string::npos){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"POSCAR_VOLUME mode not found",_INPUT_ILLEGAL_);}
+        string value="";
+        value=fix.substr(loc+key.length());  //get everything after 'POSCAR_VOLUME', including '='
+        if(value.find("*=")!=string::npos){param_string=value;aurostd::StringSubst(param_string,"*=","");param_double=aurostd::string2utype<double>(param_string);}
+        else{throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"POSCAR_VOLUME unknown mode: \""+value+"\"",_INPUT_ILLEGAL_);}
+      }
+      if(Krun && VERBOSE){aus << "MMMMM  MESSAGE attempting FIX=\"" << fix << "\" volume(pre)=" << xvasp.str.GetVolume() << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+      //START - modify xvasp.str and write out new POSCAR
+      if(xvasp.aopts.flag("FLAG::AFIX_DRYRUN")==false){
+        Krun=(Krun && aurostd::stringstream2file(xvasp.POSCAR,string(xvasp.Directory+"/POSCAR.orig")));  //CO20210315 - POSCAR.orig here is NOT the original structure, but a saved state, come back later
+      }
+      if(Krun){xvasp.str.scale*=std::pow(param_double,(1.0/3.0));}
       Krun=(Krun && KBIN::VASP_Produce_POSCAR(xvasp)); //creates xvasp.POSCAR
       if(xvasp.aopts.flag("FLAG::AFIX_DRYRUN")==false){
         Krun=(Krun && aurostd::stringstream2file(xvasp.POSCAR,string(xvasp.Directory+"/POSCAR")));
@@ -6546,6 +6570,7 @@ namespace KBIN {
     //if the following fixes were applied, reset xfixed for ALGO, some fixes that did not work previously might work now
     bool reset_xfixes=false;
     if(fix.find("KPOINTS")!=string::npos){reset_xfixes=true;}
+    else if(fix.find("POSCAR_SCALE")!=string::npos){reset_xfixes=true;}
     else if(fix.find("POSCAR_VOLUME")!=string::npos){reset_xfixes=true;}
     //add others here
     if(reset_xfixes){
@@ -6708,7 +6733,7 @@ namespace KBIN {
       Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
     }
     else if(mode=="EXCCOR") {
-      fix="POSCAR_VOLUME*=1.2"; //just need a small bump in volume, not as big as for mode==NATOMS
+      fix="POSCAR_SCALE*=1.2"; //volume*=1.2^3
       if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
       Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
     }
@@ -6764,7 +6789,7 @@ namespace KBIN {
       Krun=(Krun1||Krun2);
     }
     else if(mode=="NATOMS") {
-      fix="POSCAR_VOLUME*=1.25";  //need a bigger bump in volume than for mode==EXCCOR
+      fix="POSCAR_VOLUME*=2";
       if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
       Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
     }
