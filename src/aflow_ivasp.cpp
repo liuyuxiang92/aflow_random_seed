@@ -6997,10 +6997,14 @@ namespace KBIN {
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
     //last-ditch efforts
-          
+    
+    bool try_last_ditch_effort=true;
+
     if(LDEBUG){aus << soliloquy << " Krun=" << Krun << " [1]" << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
     
-    if(Krun==false){
+    try_last_ditch_effort=true;
+
+    if(Krun==false && try_last_ditch_effort){
       //last-ditch effort, increase volume
       fix="POSCAR_VOLUME*=1.05";  //this is a great "general" solution
       Krun=(xfixed.flag(fix)==false); //only try if it has not already been tried before
@@ -7009,7 +7013,11 @@ namespace KBIN {
     
     if(LDEBUG){aus << soliloquy << " Krun=" << Krun << " [2]" << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
     
-    if(Krun==false){
+    try_last_ditch_effort=true;
+    if(mode=="EXCCOR") {try_last_ditch_effort=false;} //changing KPOINTS doesn't help
+    else if(mode=="NATOMS") {try_last_ditch_effort=false;} //changing KPOINTS doesn't help
+    
+    if(Krun==false && try_last_ditch_effort){
       //last-ditch effort, increase KPOINTS
       fix="KPOINTS=GAMMA_ODD";  //this is a great "general" solution
       Krun=(xfixed.flag(fix)==false); //only try if it has not already been tried before
@@ -7018,7 +7026,11 @@ namespace KBIN {
     
     if(LDEBUG){aus << soliloquy << " Krun=" << Krun << " [3]" << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
     
-    if(Krun==false){
+    try_last_ditch_effort=true;
+    if(mode=="EXCCOR") {try_last_ditch_effort=false;} //changing KPOINTS doesn't help
+    else if(mode=="NATOMS") {try_last_ditch_effort=false;} //changing KPOINTS doesn't help
+    
+    if(Krun==false && try_last_ditch_effort){
       //last-ditch effort, increase KPOINTS
       fix="KPOINTS++";
       Krun=(xfixed.flag(fix)==false); //only try if it has not already been tried before
