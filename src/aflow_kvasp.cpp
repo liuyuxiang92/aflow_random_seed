@@ -2931,10 +2931,10 @@ namespace KBIN {
     if(!aurostd::FileExist(aflags.Directory+"/"+_AFLOWLOCK_)){return;} //we needed it above to get the vasp_bin
     bool vasp_monitor_running=aurostd::FileExist(aflags.Directory+"/"+_AFLOWLOCK_+"."+FILE_VASP_MONITOR);
 
-    long int tmod_vaspout=aurostd::SecondsSinceFileModified(xvasp.Directory+"/"+DEFAULT_VASP_OUT);
+    long int tmod_outcar=aurostd::SecondsSinceFileModified(xvasp.Directory+"/"+"OUTCAR"); //better to look at OUTCAR than vasp.out, when vasp is killed you get errors in vasp.out, resetting the time
     unsigned long long int fsize_vaspout=aurostd::FileSize(xvasp.Directory+"/"+DEFAULT_VASP_OUT);
     if(1||LDEBUG){
-      aus << soliloquy << " time since " << DEFAULT_VASP_OUT << " last modified: " << tmod_vaspout << " seconds (max=" << SECONDS_STALE_VASP_OUT << " seconds)" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+      aus << soliloquy << " time since " << "OUTCAR" << " last modified: " << tmod_outcar << " seconds (max=" << SECONDS_STALE_OUTCAR << " seconds)" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       aus << soliloquy << " size of " << DEFAULT_VASP_OUT << ": " << fsize_vaspout << " bytes (max=" << BYTES_MAX_VASP_OUT << " bytes)" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     }
 
@@ -3075,7 +3075,7 @@ namespace KBIN {
     xwarning.flag(scheme,found_warning);
     //
     scheme="CALC_FROZEN"; //CO20210315
-    found_warning=(tmod_vaspout>=SECONDS_STALE_VASP_OUT);
+    found_warning=(tmod_outcar>=SECONDS_STALE_OUTCAR);
     xwarning.flag(scheme,found_warning);
     //
     scheme="DAV";
@@ -3533,7 +3533,7 @@ namespace KBIN {
     bool vasp_start=TRUE;
     aurostd::StringstreamClean(aus_exec);
     aurostd::StringstreamClean(aus);
-    int nrun=0,maxrun=15;
+    int nrun=0,maxrun=20; //CO20210315 - increase from 15 to 20
 
     // get CPUS from PBS/SLURM
     // string ausenv;

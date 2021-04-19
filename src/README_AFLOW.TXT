@@ -1281,7 +1281,7 @@ IVDW=number_for_VASP_see_manual_for_IVDW
     Should the error occur again, AFLOW will apply the following change to the INCAR: ALGO=FAST.
   
   ERROR:CALC_FROZEN
-    The CALC_FROZEN error is triggered when the vasp.out is not modified for SECONDS_STALE_VASP_OUT seconds (see README_AFLOW_AFLOWRC.TXT).
+    The CALC_FROZEN error is triggered when the OUTCAR has not modified for SECONDS_STALE_OUTCAR seconds (see README_AFLOW_AFLOWRC.TXT).
     If no other errors occur, AFLOW assumes the calculation is frozen because the node experienced an out-of-memory error, and
     apply patches for "ERROR:MEMORY".
 

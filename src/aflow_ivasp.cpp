@@ -6064,6 +6064,7 @@ namespace KBIN {
     string operation=function+fix_str;
     string incar_input="";
     stringstream aus;
+    bool VERBOSE=true;
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
     //checks and quick return false here
@@ -6076,7 +6077,10 @@ namespace KBIN {
     else if(fix=="NBANDS"){apply_once=false;}
     else if(fix=="POTIM"){apply_once=false;}
     //add others here
-    if(apply_once==true && xfixed.flag(fix)){return false;}
+    if(apply_once==true && xfixed.flag(fix)){
+      if(VERBOSE){aus << "MMMMM  MESSAGE ignoring FIX=\"" << fix << "\"" << ": already applied" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+      return false;
+    }
 
     //check whether fix can be applied given current state
     bool Krun=true;
@@ -6105,16 +6109,28 @@ namespace KBIN {
     if(relaxing){
       //add here any fixes that would not apply for relaxations
     }else{  //static, bands, etc.
-      if(fix.find("RELAX_MODE")!=string::npos){Krun=false;} //does not apply
-      else if(fix=="POTIM"){Krun=false;}  //has no effect for these runs
-      else if(fix.find("POSCAR")!=string::npos){Krun=false;}  //do not change the POSCAR
+      if(fix.find("RELAX_MODE")!=string::npos){ //does not apply
+        if(VERBOSE){aus << "MMMMM  MESSAGE ignoring FIX=\"" << fix << "\"" << ": does not apply for static/bands calculations" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+        Krun=false;
+      }
+      else if(fix=="POTIM"){  //has no effect for these runs
+        if(VERBOSE){aus << "MMMMM  MESSAGE ignoring FIX=\"" << fix << "\"" << ": does not apply for static/bands calculations" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+        Krun=false;
+      }
+      else if(fix.find("POSCAR")!=string::npos){  //do not change the POSCAR
+        if(VERBOSE){aus << "MMMMM  MESSAGE ignoring FIX=\"" << fix << "\"" << ": does not apply for static/bands calculations" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+        Krun=false;
+      }
     }
     //ismear=-5 is very important for static calcs
     bool not_relaxing_or_bands=false; //looking for static-type calc, might improve this in the future
     VASP_Reread_KPOINTS(xvasp);
     if(relaxing==false && XVASP_KPOINTS_isAutoMesh(xvasp)){not_relaxing_or_bands=true;}  //bands is NOT auto-mesh
     if(not_relaxing_or_bands){
-      if(fix.find("ISMEAR=")!=string::npos){Krun=false;} //specific smearing selected is very important for static
+      if(fix.find("ISMEAR=")!=string::npos){ //specific smearing selected is very important for static
+        if(VERBOSE){aus << "MMMMM  MESSAGE ignoring FIX=\"" << fix << "\"" << ": does not apply for static calculations" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+        Krun=false;
+      }
     }
     //add others here
     if(Krun==false){return false;}
@@ -6125,7 +6141,10 @@ namespace KBIN {
       if(scheme.find("KPOINTS+")!=string::npos && fix.find("KPOINTS-")!=string::npos){Krun=false;}
       if(scheme.find("KPOINTS-")!=string::npos && fix.find("KPOINTS+")!=string::npos){Krun=false;}
     }
-    if(Krun==false){return false;}
+    if(Krun==false){
+      if(VERBOSE){aus << "MMMMM  MESSAGE ignoring FIX=\"" << fix << "\"" << ": avoiding KPOINTS++ and KPOINTS--" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+      return false;
+    }
     
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -6134,7 +6153,6 @@ namespace KBIN {
     _vflags vflags_orig(vflags);  //keep original, restore later if necessary
 
     vflags.KBIN_VASP_INCAR_VERBOSE=TRUE;  //VERBOSE, will restore original later
-    bool VERBOSE=true;
     string::size_type loc=0;
 
     string param_string="";
@@ -6800,7 +6818,19 @@ namespace KBIN {
     }
     else if(mode=="NELM") {
       if(submode<0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"no submode set: \""+mode+"\"",_INPUT_ILLEGAL_);}  //CO20210315
-      if(submode==0){ //AMIX/BMIX fixes
+      if(submode==0){ //try ALGO=NORMAL //CO20200624
+        fix="ALGO=NORMAL";
+        if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
+        Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
+        if(!Krun){Krun=true;submode++;} //reset and go to the next solution
+      }
+      if(submode==1){ //try ALGO=FAST //CO20200624
+        fix="ALGO=FAST";
+        if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
+        Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
+        if(!Krun){Krun=true;submode++;} //reset and go to the next solution
+      }
+      if(submode==2){ //AMIX/BMIX fixes
         bool Krun1=true;fix="AMIX=0.1";
         if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun1=false;}
         Krun1=(Krun1 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
@@ -6812,8 +6842,7 @@ namespace KBIN {
         Krun=(Krun1||Krun2);
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
-      //else if(submode==1) //DO NOT USE else if, we may change submode inside
-      if(submode==1){ //BMIX/AMIN fixes
+      if(submode==3){ //BMIX/AMIN fixes
         bool Krun1=true;fix="BMIX=3"; //3.0
         if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun1=false;}
         Krun1=(Krun1 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
@@ -6825,13 +6854,13 @@ namespace KBIN {
         Krun=(Krun1||Krun2);
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
-      if(submode==2){ //desperate attempt, increase NELM
+      if(submode==4){ //desperate attempt, increase NELM
         fix="NELM";
         if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
         Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
-      if(submode>=3){Krun=false;}
+      if(submode>=5){Krun=false;}
       submode+=submode_increment;submode_increment=1;  //increment and reset
     }
     else if(mode=="NKXYZ_IKPTD") {
