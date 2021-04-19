@@ -73,7 +73,7 @@ namespace pocc {
     bool LDEBUG = false || _DEBUG_POCC_QHA_ || XHOST.DEBUG;
 
     msg = "Performing POCC+QHA post-processing step.";
-    pflow::logger(_AFLOW_FILE_NAME_, function, msg, m_aflags.Directory, 
+    pflow::logger(_AFLOW_FILE_NAME_, function, msg, m_aflags.Directory,
       *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
 
     vector<vector<vector<double> > > pocc_qha_thermo_properties;
@@ -90,7 +90,7 @@ namespace pocc {
       if (LDEBUG) cerr << function << " file: " << filename << endl;
 
       if (aurostd::EFileExist(filename)){
-         aurostd::ExtractToStringEXPLICIT(aurostd::efile2string(filename), data, 
+         aurostd::ExtractToStringEXPLICIT(aurostd::efile2string(filename), data,
           "[QHA_SJ_THERMO]START", "[QHA_SJ_THERMO]STOP");
 
         vector<string> lines = aurostd::string2vectorstring(data);
@@ -129,7 +129,7 @@ namespace pocc {
           msg += "that the structure is dynamically unstable and QHA refused ";
           msg += "to proceed with the calculation. ";
           msg += "Please check if that's the case";
-          pflow::logger(_AFLOW_FILE_NAME_, function, msg, m_aflags.Directory, 
+          pflow::logger(_AFLOW_FILE_NAME_, function, msg, m_aflags.Directory,
             *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
         }
       }
@@ -140,7 +140,7 @@ namespace pocc {
         msg += "that the structure is dynamically unstable and QHA refused ";
         msg += "to proceed with the calculation. ";
         msg += "Please check if that's the case";
-        pflow::logger(_AFLOW_FILE_NAME_, function, msg, m_aflags.Directory, 
+        pflow::logger(_AFLOW_FILE_NAME_, function, msg, m_aflags.Directory,
             *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
       }
     }
@@ -158,13 +158,13 @@ namespace pocc {
 
     msg = "The data from the following ARUN directories will be used:\n";
     for (uint i=0; i<aruns.size(); i++) msg += aruns[i] + '\n';
-    pflow::logger(_AFLOW_FILE_NAME_, function, msg, m_aflags.Directory, 
+    pflow::logger(_AFLOW_FILE_NAME_, function, msg, m_aflags.Directory,
         *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
 
     uint n = pocc_qha_thermo_properties.size();
     uint minsize = pocc_qha_thermo_properties[0].size();
     for (uint i=1; i<n; i++){
-      if (pocc_qha_thermo_properties[i].size() < minsize) 
+      if (pocc_qha_thermo_properties[i].size() < minsize)
         minsize = pocc_qha_thermo_properties[i].size();
 
       if (minsize == 0) minsize = pocc_qha_thermo_properties[i].size();
@@ -184,8 +184,8 @@ namespace pocc {
     vector<int> degeneracies;
     int n_total = 0;
     unsigned long long int isupercell=0;
-    for (std::list<POccSuperCellSet>::iterator it = l_supercell_sets.begin(); 
-         it != l_supercell_sets.end(); ++it) 
+    for (std::list<POccSuperCellSet>::iterator it = l_supercell_sets.begin();
+         it != l_supercell_sets.end(); ++it)
     {
       isupercell=std::distance(l_supercell_sets.begin(),it);
       if (arun_contains_data[isupercell]){
@@ -208,14 +208,14 @@ namespace pocc {
     stringstream file;
     writeQHAdatablock(file, averaged_data, "POCC_QHA_SJ_THERMO_T=INFTY");
 
-    // average for finite T, where T is a sintering temperature
+    // average for const Tpocc, where Tpocc is a given (sintering) temperature
     double T = 0;
     for (uint i=0; i<v_temperatures.size(); i++){
       T = v_temperatures[i];
       setPOccStructureProbabilities(T);
 
       vector<double> probabilities;
-      for (std::list<POccSuperCellSet>::iterator it = l_supercell_sets.begin(); 
+      for (std::list<POccSuperCellSet>::iterator it = l_supercell_sets.begin();
            it != l_supercell_sets.end(); ++it)
       {
         isupercell=std::distance(l_supercell_sets.begin(),it);
@@ -228,6 +228,8 @@ namespace pocc {
       for (uint j=0; j<probabilities.size(); j++) total_prob += probabilities[j];
       for (uint j=0; j<probabilities.size(); j++) probabilities[j]/=total_prob;
 
+      cout << ": " << T << aurostd::vector2xvector(probabilities) << endl;
+
       vector<vector<double> > averaged_qha_data(minsize, vector<double> (ncols));
       for (uint i=0; i<n; i++){
         for (uint row=0; row<minsize; row++){
@@ -238,13 +240,47 @@ namespace pocc {
         }
       }
 
-      writeQHAdatablock(file, averaged_qha_data, "POCC_QHA_SJ_THERMO_T=" + 
+      writeQHAdatablock(file, averaged_qha_data, "POCC_QHA_SJ_THERMO_T=" +
           aurostd::utype2string(T));
     }
+    //TODO check that temperatures are the same for all data blocks
+
+    // average for Tpocc = T
+    vector<vector<double> > averaged_qha_data_T(minsize, vector<double> (ncols));
+    for (uint row=0; row<minsize; row++){
+      T = pocc_qha_thermo_properties[0][row][0];
+      setPOccStructureProbabilities(T);
+
+      vector<double> probabilities;
+
+      for (std::list<POccSuperCellSet>::iterator it = l_supercell_sets.begin();
+           it != l_supercell_sets.end(); ++it)
+      {
+        isupercell=std::distance(l_supercell_sets.begin(),it);
+        if (arun_contains_data[isupercell]){
+          probabilities.push_back((*it).m_probability);
+        }
+      }
+
+      double total_prob = 0;
+      for (uint j=0; j<probabilities.size(); j++) total_prob += probabilities[j];
+      for (uint j=0; j<probabilities.size(); j++) probabilities[j]/=total_prob;
+
+      cout << ":: " << T << aurostd::vector2xvector(probabilities) << endl;
+
+      for (uint i=0; i<n; i++){
+        for (uint col=0; col<ncols; col++){
+          averaged_qha_data_T[row][col] += probabilities[i]*
+                  pocc_qha_thermo_properties[i][row][col];
+        }
+      }
+    }
+
+    writeQHAdatablock(file, averaged_qha_data_T, "POCC_QHA_SJ_THERMO_T=T");
 
     string output_file = "aflow.pocc.qha.thermo.out";
     msg = "Writing the averaged POCC+QHA data to " + output_file+" file.";
-    pflow::logger(_AFLOW_FILE_NAME_, function, msg, m_aflags.Directory, 
+    pflow::logger(_AFLOW_FILE_NAME_, function, msg, m_aflags.Directory,
         *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
     output_file = m_aflags.Directory + "/" + output_file;
 
