@@ -6117,7 +6117,11 @@ namespace KBIN {
         if(VERBOSE){aus << "MMMMM  MESSAGE ignoring FIX=\"" << fix << "\"" << ": does not apply for static/bands calculations" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
         Krun=false;
       }
-      else if(fix.find("POSCAR")!=string::npos){  //do not change the POSCAR
+      else if(fix.find("POSCAR")!=string::npos){  //do not change the POSCAR, only during relaxation
+        if(VERBOSE){aus << "MMMMM  MESSAGE ignoring FIX=\"" << fix << "\"" << ": does not apply for static/bands calculations" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+        Krun=false;
+      }
+      else if(fix.find("KPOINTS")!=string::npos){  //do not change the KPOINTS, only during relaxation
         if(VERBOSE){aus << "MMMMM  MESSAGE ignoring FIX=\"" << fix << "\"" << ": does not apply for static/bands calculations" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
         Krun=false;
       }
