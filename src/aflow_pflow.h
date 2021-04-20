@@ -943,6 +943,7 @@ namespace pflow {
   bool hasRealElements(const xstructure& xstr); //DX20210113
   double getSymmetryTolerance(const xstructure& xstr, const string& tolerance_string);
   vector<double> getSymmetryToleranceSpectrum(const string& tolerance_range_string);
+  uint getSpaceGroupSetting(const string& setting_string, uint mode_default=0); //DX20210420 - mode_default=0: unspecified, AFLOW will determine
 }
 
 #endif

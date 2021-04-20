@@ -8679,7 +8679,8 @@ string GetSpaceGroupHall(int spacegroupnumber, int setting, string directory) {
     throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_); //DX20190708 - for xerror
   }
   // OK
-  if(setting==0){ //signals default //DX20180807
+  if(setting==SG_SETTING_ANRL){ setting = anrl::getANRLSettingChoice(spacegroupnumber); } //DX20210420
+  else if (setting==0){ //signals default //DX20180807
     // if RHL, AFLOW prefers hexagonal setting (i.e., setting=2)
     if(spacegroupnumber==146 || spacegroupnumber==148 || spacegroupnumber==155 || spacegroupnumber==160 || 
         spacegroupnumber==161 || spacegroupnumber==166 || spacegroupnumber==167){

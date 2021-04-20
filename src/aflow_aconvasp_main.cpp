@@ -5248,16 +5248,7 @@ namespace pflow {
     else {
       //put tolerance flag check in loop to save time if we aren't calculating, defaultTolerance can be expensive
       double tolerance = pflow::getSymmetryTolerance(a,vpflow.getattachedscheme("CIF::TOLERANCE")); //DX20200820 - consolidated setting tolerance into a function
-      // get setting
-      int setting = 0;
-      if(vpflow.flag("CIF::SETTING")){
-        int user_setting=aurostd::string2utype<int>(vpflow.getattachedscheme("CIF::SETTING"));
-        if(user_setting!=1 && user_setting!=2){
-          cerr << XPID << "pflow::CIF ERROR: Setting must be 1 or 2 (for rhombohedral systems: 1=rhl setting and 2=hex setting; for monoclinic systems: 1=unique axis-b and 2=unique axis-c). " << endl;
-          return;
-        }
-        setting = user_setting;
-      }
+      uint setting = pflow::getSpaceGroupSetting(vpflow.getattachedscheme("CIF::SETTING")); //DX20210421 - consolidated space group setting into function
       a.spacegroupnumber = a.SpaceGroup_ITC(tolerance,setting);
       a.lattice = a.standard_lattice_ITC; //DX20180904 - need to update the lattice; may have rotated
       pflow::PrintCIF(cout,a,a.spacegroupnumber,setting); //DX20180803 - add space group information
@@ -5476,15 +5467,7 @@ namespace pflow {
 
     // ---------------------------------------------------------------------------
     // get space group setting
-    int setting = 0;
-    if(vpflow.flag("DATA::SETTING")){
-      int user_setting=aurostd::string2utype<int>(vpflow.getattachedscheme("DATA::SETTING"));
-      if(user_setting!=1 && user_setting!=2){
-        message << "Setting must be 1 or 2 (for rhombohedral systems: 1=rhl setting and 2=hex setting; for monoclinic systems: 1=unique axis-b and 2=unique axis-c)";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
-      }
-      setting = user_setting;
-    }
+    uint setting = pflow::getSpaceGroupSetting(vpflow.getattachedscheme("DATA::SETTING")); //DX20210421 - consolidated space group setting into function
 
     // ---------------------------------------------------------------------------
     // file type //DX20210226 - string to filetype
@@ -8403,11 +8386,10 @@ namespace pflow {
       }
     }
 
-    // ----- space group number ----- //
-    uint setting = 1; //default: 1; other options: 2.
-    if(vpflow.flag("LIST_PROTOTYPE_LABELS::SETTING")){
-      setting = aurostd::string2utype<uint>(vpflow.getattachedscheme("LIST_PROTOTYPE_LABELS::SETTING"));
-    }
+    // ---------------------------------------------------------------------------
+    // get space group setting
+    uint setting_default = 1;
+    uint setting = pflow::getSpaceGroupSetting(vpflow.getattachedscheme("LIST_PROTOTYPE_LABELS::SETTING"), setting_default); //DX20210421 - consolidated space group setting into function
 
     //------------------------------------------------- 
     // get prototype labels
@@ -14272,16 +14254,9 @@ namespace pflow {
     // get tolerance
     double tolerance = pflow::getSymmetryTolerance(str,vpflow.getattachedscheme("WYCCAR::TOLERANCE")); //DX20200820 - consolidated setting tolerance into a function
 
-    // get setting
-    int setting = 0;
-    if(vpflow.flag("WYCCAR::SETTING")){
-      int user_setting=aurostd::string2utype<int>(vpflow.getattachedscheme("WYCCAR::SETTING"));
-      if(user_setting!=1 && user_setting!=2){
-        cerr << XPID << "pflow::WYCCAR ERROR: Setting must be 1 or 2 (for rhombohedral systems: 1=rhl setting and 2=hex setting; for monoclinic systems: 1=unique axis-b and 2=unique axis-c)." << endl;
-        return 0;
-      }
-      setting = user_setting;
-    }
+    // ---------------------------------------------------------------------------
+    // get space group setting
+    uint setting = pflow::getSpaceGroupSetting(vpflow.getattachedscheme("WYCCAR::SETTING")); //DX20210421 - consolidated space group setting into function
 
     // get magnetic moment
     if(vpflow.flag("WYCCAR::MAGNETIC")){

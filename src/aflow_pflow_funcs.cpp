@@ -7418,6 +7418,43 @@ namespace pflow{
 }
 
 // ***************************************************************************
+// pflow::getSpaceGroupSetting() //DX20210420
+// ***************************************************************************
+namespace pflow{
+   uint getSpaceGroupSetting(const string& setting_string, uint mode_default){
+
+    // Return the space group setting
+    // options:
+    //  1) 1 (SG_SETTING_1)    = rhombohedral: rhl setting, monoclinic: unique-axis b, centrosymmetric: origin on high-symmetry site
+    //  2) 2 (SG_SETTING_2)    = rhombohedral: hex setting, monoclinic: unique-axis c, centrosymmetric: origin on inversion site
+    //  3) 3 (SG_SETTING_ANRL) = rhomobhedral: rhl setting, monoclinic: unique-axis b, centrosymmetric: origin on inversion site 
+    // The mode_default variable is an optional input: --prototype comman defaults to the AFLOW setting, while everything else defaults to SG_SETTING_1
+
+    string function_name = XPID + "pflow::getSpaceGroupSetting():";
+    stringstream message;
+
+    uint setting = mode_default; //default
+
+    // space group setting
+    if(!setting_string.empty()){
+      if(aurostd::tolower(setting_string) == "aflow" || aurostd::tolower(setting_string) == "anrl"){
+        setting=SG_SETTING_ANRL;
+      }
+      else {
+        int setting_num=aurostd::string2utype<int>(setting_string);
+        if(setting_num==1){setting=SG_SETTING_1;}
+        else if(setting_num==2){setting=SG_SETTING_2;}
+        if(setting_num!=SG_SETTING_1 && setting_num!=SG_SETTING_2){
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Setting must be 1, 2, or \"aflow\" (for rhombohedral systems: 1=rhl setting and 2=hex setting; for monoclinic systems: 1=unique axis-b and 2=unique axis-c).",_INPUT_ILLEGAL_);
+        }
+      }
+    }
+
+    return setting;
+  }
+}
+
+// ***************************************************************************
 // *                                                                         *
 // *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
 // *                                                                         *
