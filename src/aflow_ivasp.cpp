@@ -3119,7 +3119,17 @@ namespace KBIN {
     xvasp.aopts.flag("FLAG::XVASP_INCAR_changed",TRUE);
     imax=aurostd::GetNLinesString(FileContent);
 
-    bool nelm_patch=(vflags.KBIN_VASP_FORCE_OPTION_NELM_EQUAL.content_int!=AFLOWRC_DEFAULT_VASP_FORCE_OPTION_NELM); //CO20200624 - default for VASP is 60, don't add the line if unnecessary
+    //CO20210315 - nelm is a special case
+    //it was not previously written to INCAR for relaxations, allowing WSETYAWAN to write it in [VASP_INCAR_MODE_EXPLICIT] section of aflow.in for ICSD runs (aflow_avasp.cpp), see xvasp.AVASP_EXTRA_INCAR
+    //however, now we write it in as it is an aflowrc parameter, as well as a VASP_FORCE_OPTION
+    //only for this relaxation function (applies for AUTOTUNE), check if NELM is specified in the INCAR already
+    //if so, do not override
+    //the VASP_FORCE_OPTION will overwrite later, so don't worry about here
+    //this hack is required to be backwards-compatible with all ICSD aflow.in's in database
+    //this is the ONLY exception for not overwriting a property, use the VASP_FORCE_OPTIONs otherwise
+    //the only properties that should go in the [VASP_INCAR_MODE_EXPLICIT] section are those NOT overwritten by AUTOTUNE
+    bool nelm_patch=(aurostd::kvpairfound(FileContent,"NELM","=")==false);
+    //[CO20210315 - always patch, you might NELM in INCAR section of aflow.in](vflags.KBIN_VASP_FORCE_OPTION_NELM_EQUAL.content_int!=AFLOWRC_DEFAULT_VASP_FORCE_OPTION_NELM); //CO20200624 - default for VASP is 60, don't add the line if unnecessary
 
     // RELAX_MODE=ENERGY mode
     if(vflags.KBIN_VASP_FORCE_OPTION_RELAX_MODE.xscheme=="ENERGY") {
@@ -3143,7 +3153,9 @@ namespace KBIN {
       xvasp.INCAR << aurostd::PaddedPOST("NSW=51",_incarpad_) << " # relax for long" << endl;
       xvasp.INCAR << aurostd::PaddedPOST("ISIF="+aurostd::utype2string(isif),_incarpad_) << " # relax appropriately" << endl;
       xvasp.INCAR << aurostd::PaddedPOST("LORBIT=10",_incarpad_) << " # get spin decomposition" << endl; //CO20180130 get spinD
-      xvasp.INCAR << aurostd::PaddedPOST("NELM="+aurostd::utype2string(vflags.KBIN_VASP_FORCE_OPTION_NELM_EQUAL.content_int),_incarpad_) << " # set max SC electronic steps" << endl;  //CO20200624
+      if(nelm_patch){ //avoid writing NELM twice
+        xvasp.INCAR << aurostd::PaddedPOST("NELM="+aurostd::utype2string(vflags.KBIN_VASP_FORCE_OPTION_NELM_EQUAL.content_int),_incarpad_) << " # set max SC electronic steps" << endl;  //CO20200624
+      }
       if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# Performing RELAX=ENERGY [AFLOW] end" << endl;
     }
     // RELAX=MODE=FORCES mode
@@ -3176,7 +3188,9 @@ namespace KBIN {
       // xvasp.INCAR << "ISIF=3         # relax everything" << endl;
       xvasp.INCAR << aurostd::PaddedPOST("ISIF="+aurostd::utype2string(isif),_incarpad_)     << " # relax appropriately" << endl;
       xvasp.INCAR << aurostd::PaddedPOST("LORBIT=10",_incarpad_) << " # get spin decomposition" << endl; //CO20180130 get spinD
-      xvasp.INCAR << aurostd::PaddedPOST("NELM="+aurostd::utype2string(vflags.KBIN_VASP_FORCE_OPTION_NELM_EQUAL.content_int),_incarpad_) << " # set max SC electronic steps" << endl;  //CO20200624
+      if(nelm_patch){ //avoid writing NELM twice
+        xvasp.INCAR << aurostd::PaddedPOST("NELM="+aurostd::utype2string(vflags.KBIN_VASP_FORCE_OPTION_NELM_EQUAL.content_int),_incarpad_) << " # set max SC electronic steps" << endl;  //CO20200624
+      }
       if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# Performing RELAX_MODE=FORCES [AFLOW] end" << endl;
     }
     // done now write if necessary
@@ -3524,13 +3538,18 @@ namespace KBIN {
       }
       //BEGIN JJPR
       if(vflags.KBIN_VASP_FORCE_OPTION_PREC.xscheme=="PHONONS") {
-        if(((aurostd::substring2bool(strline,"PREC",TRUE) && !aurostd::substring2bool(strline,"SYMPREC",TRUE)) || aurostd::substring2bool(strline,"#PREC",TRUE) ||  //CO20171003 - don't confuse PREC and SYMPREC
+        if((aurostd::substring2bool(strline,"PREC",TRUE) && !aurostd::substring2bool(strline,"SYMPREC",TRUE)) || aurostd::substring2bool(strline,"#PREC",TRUE) ||  //CO20171003 - don't confuse PREC and SYMPREC
               aurostd::substring2bool(strline,"ENMAX",TRUE) || aurostd::substring2bool(strline,"#ENMAX",TRUE) ||
               aurostd::substring2bool(strline,"LREAL",TRUE) || aurostd::substring2bool(strline,"#LREAL",TRUE) ||
               aurostd::substring2bool(strline,"EDIFF",TRUE) || aurostd::substring2bool(strline,"#EDIFF",TRUE) ||
-              aurostd::substring2bool(strline,"ALGO",TRUE) || aurostd::substring2bool(strline,"#ALGO",TRUE)) &&
-            (!aurostd::substring2bool(strline,"IALGO",TRUE)  && !aurostd::substring2bool(strline,"#IALGO",TRUE)) &&
-            (!aurostd::substring2bool(strline,"EDIFFG",TRUE)  && !aurostd::substring2bool(strline,"#EDIFFG",TRUE))) {
+              aurostd::substring2bool(strline,"EDIFFG",TRUE) || aurostd::substring2bool(strline,"#EDIFFG",TRUE) ||  //CO20210315
+              ((aurostd::substring2bool(strline,"NELM",TRUE) || aurostd::substring2bool(strline,"#NELM",TRUE)) && (!( aurostd::substring2bool(strline,"NELMIN",TRUE) || aurostd::substring2bool(strline,"#NELMIN",TRUE) || aurostd::substring2bool(strline,"NELMDL",TRUE) || aurostd::substring2bool(strline,"#NELMDL",TRUE) )) ) ||  //CO20200624
+              aurostd::substring2bool(strline,"NELMIN",TRUE) || aurostd::substring2bool(strline,"#NELMIN",TRUE) ||  //CO20210315
+              aurostd::substring2bool(strline,"ADDGRID",TRUE) || aurostd::substring2bool(strline,"#ADDGRID",TRUE) ||  //CO20210315
+            //[CO20210315 - no ALGO replaced below]  aurostd::substring2bool(strline,"ALGO",TRUE) || aurostd::substring2bool(strline,"#ALGO",TRUE)) &&
+            //[CO20210315 - no ALGO replaced below](!aurostd::substring2bool(strline,"IALGO",TRUE)  && !aurostd::substring2bool(strline,"#IALGO",TRUE)) &&
+            //[CO20210315 - specified below](!aurostd::substring2bool(strline,"EDIFFG",TRUE)  && !aurostd::substring2bool(strline,"#EDIFFG",TRUE))) {
+          FALSE) {
           if(vflags.KBIN_VASP_INCAR_VERBOSE) {
             if(vflags.KBIN_VASP_FORCE_OPTION_PREC.xscheme=="PHONONS") xvasp.INCAR << "# " << strline << " # AFLOW REMOVED (KBIN::XVASP_INCAR PREC=PHONONS)" << endl;
           }
@@ -4291,7 +4310,7 @@ namespace KBIN {
       keyword="NELM";
       
       if(Krun){
-        bool nelm_fix=(ivalue!=AFLOWRC_DEFAULT_VASP_FORCE_OPTION_NELM); //CO20200624 - default for VASP is 60, don't add the line if unnecessary
+        bool nelm_fix=true; //[CO20210315 - always patch, you might NELM in INCAR section of aflow.in](ivalue!=AFLOWRC_DEFAULT_VASP_FORCE_OPTION_NELM); //CO20200624 - default for VASP is 60, don't add the line if unnecessary
         if(nelm_fix==false){Krun=false;}
       }
       

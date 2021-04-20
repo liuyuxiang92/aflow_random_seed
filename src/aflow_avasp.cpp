@@ -6885,7 +6885,7 @@ bool AVASP_MakePrototypeICSD_AFLOWIN(_AVASP_PROTO *PARAMS,bool flag_AFLOW_IN_ONL
   // extra INCAR
   xvasp.aopts.flag("FLAG::EXTRA_INCAR",TRUE);                               
   xvasp.AVASP_EXTRA_INCAR.clear();                                          
-  xvasp.AVASP_EXTRA_INCAR << "NELM = 120" << endl;                           //WSETYAWAN DEFAULT
+  xvasp.AVASP_EXTRA_INCAR << "NELM=120" << endl;                             //WSETYAWAN DEFAULT
   xvasp.AVASP_EXTRA_INCAR << "NELMIN=2"  << endl;                            //WSETYAWAN DEFAULT
   xvasp.AVASP_EXTRA_INCAR << "LPLANE=.TRUE." << endl;                        //WSETYAWAN DEFAULT
   if(xvasp.str.atoms.size()<=10)                     // cutoff for LREAL     //WSETYAWAN DEFAULT
