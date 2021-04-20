@@ -1083,7 +1083,7 @@ string aflow_get_time_string_short(void);
 class _xvasp; //forward declaration
 
 string GetVASPBinaryFromLOCK(const string& directory);  //CO20210315
-void processFlagsFromLOCK(_xvasp& xvasp,aurostd::xoption& xfixed);  //CO20210315
+void processFlagsFromLOCK(_xvasp& xvasp,_vflags& vflags,aurostd::xoption& xfixed);  //CO20210315
 void AFLOW_monitor_VASP();  //CO20210315
 void AFLOW_monitor_VASP(const string& directory);  //CO20210315
 

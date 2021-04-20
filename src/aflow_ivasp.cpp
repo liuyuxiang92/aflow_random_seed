@@ -6140,21 +6140,30 @@ namespace KBIN {
         if(VERBOSE){aus << "MMMMM  MESSAGE ignoring FIX=\"" << fix << "\"" << ": does not apply for static/bands calculations" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
         Krun=false;
       }
-      else if(fix.find("KPOINTS")!=string::npos){  //do not change the KPOINTS, only during relaxation
+      //[CO20210315 - can change KPOINTS for static]else if(fix.find("KPOINTS")!=string::npos){  //do not change the KPOINTS, only during relaxation
+      //[CO20210315 - can change KPOINTS for static]  if(VERBOSE){aus << "MMMMM  MESSAGE ignoring FIX=\"" << fix << "\"" << ": does not apply for static/bands calculations" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+      //[CO20210315 - can change KPOINTS for static]  Krun=false;
+      //[CO20210315 - can change KPOINTS for static]}
+      else if(fix.find("ISMEAR=")!=string::npos){ //specific smearing selected is very important for static/bands
         if(VERBOSE){aus << "MMMMM  MESSAGE ignoring FIX=\"" << fix << "\"" << ": does not apply for static/bands calculations" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
         Krun=false;
       }
     }
-    //ismear=-5 is very important for static calcs
-    bool not_relaxing_or_bands=false; //looking for static-type calc, might improve this in the future
-    VASP_Reread_KPOINTS(xvasp);
-    if(relaxing==false && XVASP_KPOINTS_isAutoMesh(xvasp)){not_relaxing_or_bands=true;}  //bands is NOT auto-mesh
-    if(not_relaxing_or_bands){
-      if(fix.find("ISMEAR=")!=string::npos){ //specific smearing selected is very important for static
-        if(VERBOSE){aus << "MMMMM  MESSAGE ignoring FIX=\"" << fix << "\"" << ": does not apply for static calculations" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
-        Krun=false;
-      }
+    //some safety
+    if(fix.find("KPOINTS")!=string::npos && XVASP_KPOINTS_isAutoMesh(xvasp)==false){  //cannot change non-auto-mesh (bands)
+      if(VERBOSE){aus << "MMMMM  MESSAGE ignoring FIX=\"" << fix << "\"" << ": cannot change KPOINTS for non-auto-mesh" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+      Krun=false;
     }
+    //[CO20210315 - OBSOLETE]//ismear=-5 is very important for static calcs
+    //[CO20210315 - OBSOLETE]bool not_relaxing_or_bands=false; //looking for static-type calc, might improve this in the future
+    //[CO20210315 - OBSOLETE]VASP_Reread_KPOINTS(xvasp);
+    //[CO20210315 - OBSOLETE]if(relaxing==false && XVASP_KPOINTS_isAutoMesh(xvasp)){not_relaxing_or_bands=true;}  //bands is NOT auto-mesh
+    //[CO20210315 - OBSOLETE]if(not_relaxing_or_bands){
+    //[CO20210315 - OBSOLETE]  if(fix.find("ISMEAR=")!=string::npos){ //specific smearing selected is very important for static
+    //[CO20210315 - OBSOLETE]    if(VERBOSE){aus << "MMMMM  MESSAGE ignoring FIX=\"" << fix << "\"" << ": does not apply for static calculations" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+    //[CO20210315 - OBSOLETE]    Krun=false;
+    //[CO20210315 - OBSOLETE]  }
+    //[CO20210315 - OBSOLETE]}
     //add others here
     if(Krun==false){return false;}
 
@@ -6188,9 +6197,12 @@ namespace KBIN {
     //otherwise, the monitor might make changes before they are needed
 
     if(fix.find("ALGO=")!=string::npos && fix.find("IALGO=")==string::npos) {
-      loc=fix.find('=');
-      if(loc==fix.size()-1||loc==string::npos){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"ALGO mode not found",_INPUT_ILLEGAL_);}
-      param_string=fix.substr(loc+1);  //get everything after the '='
+      if(vflags.KBIN_VASP_FORCE_OPTION_ALGO.preserved){Krun=false;} // don't touch kpoints
+      if(Krun){
+        loc=fix.find('=');
+        if(loc==fix.size()-1||loc==string::npos){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"ALGO mode not found",_INPUT_ILLEGAL_);}
+        param_string=fix.substr(loc+1);  //get everything after the '='
+      }
 
       if(Krun && VERBOSE){aus << "MMMMM  MESSAGE attempting FIX=\"" << fix << "\"" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
       //START - load INCAR into xvasp, modify, then write out new INCAR

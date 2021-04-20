@@ -1870,7 +1870,7 @@ string GetVASPBinaryFromLOCK(const string& directory){  //CO20210315
 // ***************************************************************************
 // processFlagsFromLOCK
 // ***************************************************************************
-void processFlagsFromLOCK(_xvasp& xvasp,aurostd::xoption& xfixed){  //CO20210315
+void processFlagsFromLOCK(_xvasp& xvasp,_vflags& vflags,aurostd::xoption& xfixed){  //CO20210315
   bool LDEBUG=(true || XHOST.DEBUG);
   string soliloquy=XPID+"GetVASPBinaryFromLOCK():";
 
@@ -1878,23 +1878,32 @@ void processFlagsFromLOCK(_xvasp& xvasp,aurostd::xoption& xfixed){  //CO20210315
 
   if(!aurostd::FileExist(xvasp.Directory+"/"+_AFLOWLOCK_)){return;}
 
+  uint i=0;
+
   //clear out past options
   //[needs to be targeted, keep FLAG::AFIX_DRYRUN]xvasp.aopts.clear();
-  xvasp.aopts.flag("FLAG::KPOINTS_PRESERVED",false);
-  xvasp.aopts.flag("FLAG::POSCAR_PRESERVED",false);
+  vector<string> flags;
+  flags=xvasp.aopts.vxscheme;
+  for(i=0;i<flags.size();i++){ //capture all _PRESERVED flags (KPOINTS, POSCAR, etc.)
+    const string& flag=flags[i];
+    if(flag.find("FLAG::")!=string::npos && flag.find("_PRESERVED")!=string::npos){xvasp.aopts.flag(flag,false);}
+  }
+  vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.clear();
+  vflags.KBIN_VASP_FORCE_OPTION_ALGO.preserved=false;
   xfixed.clear();
 
   vector<string> vlines,vtokens;
   aurostd::file2vectorstring(xvasp.Directory+"/"+_AFLOWLOCK_,vlines);
 
   string str_xvasp_aopts_start="xvasp.aopts.flag(\"";
+  string str_vflags_ignore_afix_start="vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"";
   string str_xfixed_start="xfixed.flag(\"";
   string str_flag_end="\")=1";
   string scheme="";
 
   string::size_type loc_start=0,loc_end=0;
 
-  uint i=0,nexecuting=0;
+  uint nexecuting=0;
   for(i=vlines.size()-1;i<vlines.size();i--){ //go backwards
     const string& line=vlines[i];
     if(line.find(VASP_KEYWORD_EXECUTION)!=string::npos){nexecuting++;} //look for 'Executing:' line
@@ -1910,6 +1919,15 @@ void processFlagsFromLOCK(_xvasp& xvasp,aurostd::xoption& xfixed){  //CO20210315
       scheme=line.substr(loc_start+str_xvasp_aopts_start.length(),loc_end-(loc_start+str_xvasp_aopts_start.length()));
       xvasp.aopts.flag(scheme,true);
     }
+    
+    loc_start=line.find(str_vflags_ignore_afix_start);
+    loc_end=line.find(str_flag_end);
+    if(loc_start!=string::npos && loc_end!=string::npos){
+      scheme=line.substr(loc_start+str_vflags_ignore_afix_start.length(),loc_end-(loc_start+str_vflags_ignore_afix_start.length()));
+      vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(scheme,true);
+    }
+    
+    if(line.find("vflags.KBIN_VASP_FORCE_OPTION_ALGO.preserved=1")!=string::npos){vflags.KBIN_VASP_FORCE_OPTION_ALGO.preserved=true;}
 
     loc_start=line.find(str_xfixed_start);
     loc_end=line.find(str_flag_end);
@@ -1917,6 +1935,7 @@ void processFlagsFromLOCK(_xvasp& xvasp,aurostd::xoption& xfixed){  //CO20210315
       scheme=line.substr(loc_start+str_xfixed_start.length(),loc_end-(loc_start+str_xfixed_start.length()));
       xfixed.flag(scheme,true);
     }
+
   }
 
   if(LDEBUG){
@@ -2099,7 +2118,7 @@ void AFLOW_monitor_VASP(const string& directory){
       kill_vasp=true;
       //HERE: plug in exceptions from xfixed, etc. to turn OFF kill_vasp
       //read LOCK to see what has been issued already
-      processFlagsFromLOCK(xvasp,xfixed);
+      processFlagsFromLOCK(xvasp,vflags,xfixed);
       xfixed.flag("ALL",false); //otherwise new attempts cannot be tried
       if(VERBOSE){message << "ls (pre)" << endl << aurostd::execute2string("ls -l") << endl;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);}
       if(!KBIN::VASP_FixErrors(xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE)){

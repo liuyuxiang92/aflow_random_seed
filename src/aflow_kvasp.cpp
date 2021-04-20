@@ -1001,6 +1001,22 @@ namespace KBIN {
     // cerr << "SIGMA" << endl;
     vflags.KBIN_VASP_FORCE_OPTION_SIGMA_EQUAL.options2entry(AflowIn,_STROPT_+"SIGMA=",FALSE,vflags.KBIN_VASP_FORCE_OPTION_SIGMA_EQUAL.xscheme); // scheme already loaded in aflow_xclasses.cpp is "0.1" - default  //CO20181128
 
+    // ISMEAR_STATIC  //CO20210315
+    // cerr << "ISMEAR_STATIC" << endl;
+    vflags.KBIN_VASP_FORCE_OPTION_ISMEAR_STATIC_EQUAL.options2entry(AflowIn,_STROPT_+"ISMEAR_STATIC=",FALSE,vflags.KBIN_VASP_FORCE_OPTION_ISMEAR_STATIC_EQUAL.xscheme); // scheme already loaded in aflow_xclasses.cpp is "1" - default  //CO20181128
+
+    // SIGMA_STATIC //CO20210315
+    // cerr << "SIGMA_STATIC" << endl;
+    vflags.KBIN_VASP_FORCE_OPTION_SIGMA_STATIC_EQUAL.options2entry(AflowIn,_STROPT_+"SIGMA_STATIC=",FALSE,vflags.KBIN_VASP_FORCE_OPTION_SIGMA_STATIC_EQUAL.xscheme); // scheme already loaded in aflow_xclasses.cpp is "0.1" - default  //CO20181128
+
+    // ISMEAR_STATIC_BANDS  //CO20210315
+    // cerr << "ISMEAR_STATIC_BANDS" << endl;
+    vflags.KBIN_VASP_FORCE_OPTION_ISMEAR_STATIC_BANDS_EQUAL.options2entry(AflowIn,_STROPT_+"ISMEAR_STATIC_BANDS=",FALSE,vflags.KBIN_VASP_FORCE_OPTION_ISMEAR_STATIC_BANDS_EQUAL.xscheme); // scheme already loaded in aflow_xclasses.cpp is "1" - default  //CO20181128
+
+    // SIGMA_STATIC_BANDS //CO20210315
+    // cerr << "SIGMA_STATIC_BANDS" << endl;
+    vflags.KBIN_VASP_FORCE_OPTION_SIGMA_STATIC_BANDS_EQUAL.options2entry(AflowIn,_STROPT_+"SIGMA_STATIC_BANDS=",FALSE,vflags.KBIN_VASP_FORCE_OPTION_SIGMA_STATIC_BANDS_EQUAL.xscheme); // scheme already loaded in aflow_xclasses.cpp is "0.1" - default  //CO20181128
+
     // NBANDS and/or NBANDS=
     //  cerr << "NBANDS_AUTO" << endl;
     vflags.KBIN_VASP_FORCE_OPTION_NBANDS_AUTO_isentry = aurostd::substring2bool(AflowIn,_STROPT_+"NBANDS",TRUE);
@@ -2068,7 +2084,7 @@ namespace KBIN {
               // --------------------------------------------------------------------------------------------------------------------
               // STATIC STATIC STATIC
               if(vflags.KBIN_VASP_RUN.flag("STATIC")) {    // xvasp.RELAX=-1
-                xvasp.aopts.flag("FLAG::POSCAR_PRESERVED",TRUE); // in case of errors it is not lost bur recycled
+                xvasp.aopts.flag("FLAG::POSCAR_PRESERVED",TRUE); // in case of errors it is not lost but recycled
                 KBIN::VASP_Write_INPUT(xvasp,vflags); // VASP VASP WRITE
                 aus << 11111 << "  STATIC - " <<  xvasp.Directory << " - K=[" << xvasp.str.kpoints_k1 << " " << xvasp.str.kpoints_k2 << " " << xvasp.str.kpoints_k3 << "]" << " - " << kflags.KBIN_BIN << Message(_AFLOW_FILE_NAME_,aflags) << endl;
                 aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -2173,8 +2189,8 @@ namespace KBIN {
                 aus << "00000  MESSAGE MODE= (" << STRING_TO_SHOW << ") - " << xvasp.Directory << Message(_AFLOW_FILE_NAME_,aflags) << endl;
                 aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
 
-                xvasp.aopts.flag("FLAG::POSCAR_PRESERVED",TRUE); // in case of errors it is not lost bur recycled
-                xvasp.aopts.flag("FLAG::CHGCAR_PRESERVED",TRUE); // in case of errors it is not lost bur recycled
+                //[CO20210315 - wrong placement, change this with relaxations]xvasp.aopts.flag("FLAG::POSCAR_PRESERVED",TRUE); // in case of errors it is not lost but recycled
+                //[CO20210315 - wrong placement, change this with relaxations]xvasp.aopts.flag("FLAG::CHGCAR_PRESERVED",TRUE); // in case of errors it is not lost but recycled
 
                 if(vflags.KBIN_VASP_RUN.flag("RELAX_STATIC_BANDS") || vflags.KBIN_VASP_RUN.flag("STATIC_BANDS") || vflags.KBIN_VASP_RUN.flag("RELAX_STATIC") || vflags.KBIN_VASP_RUN.flag("STATIC")) {
                   // DO THE RELAX PART (IF ANY)
@@ -2400,6 +2416,7 @@ namespace KBIN {
                   // done with the fixing
                   xvasp.str.FixLattices();
                   rlattice=xvasp.str.lattice; // in rlattice I`ve always the final structure
+                  xvasp.aopts.flag("FLAG::POSCAR_PRESERVED",TRUE); //CO20210315 - correct placement // in case of errors it is not lost but recycled
                   // NOW DO THE STATIC PATCHING KPOINTS
                   aus << "00000  MESSAGE Patching KPOINTS " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
                   aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -2446,7 +2463,8 @@ namespace KBIN {
                   bool foundBZ;
                   KBIN::VASP_Recycle(xvasp,"static");  // bring back the stuff
                   KBIN::VASP_RecycleExtraFile(xvasp,"CHGCAR","static");  // bring back the stuff
-                  xvasp.aopts.flag("FLAG::CHGCAR_PRESERVED",TRUE); // in case of errors it is not lost bur recycled
+                  xvasp.aopts.flag("FLAG::POSCAR_PRESERVED",TRUE); //CO20210315 - correct placement // in case of errors it is not lost but recycled
+                  xvasp.aopts.flag("FLAG::CHGCAR_PRESERVED",TRUE); // in case of errors it is not lost but recycled
                   aus << "00000  MESSAGE Patching KPOINTS with BANDS LATTICE = \"" << vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE.content_string << "\"" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
                   aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
                   // KBIN::VASP_Produce_KPOINTS(xvasp,AflowIn,FileAFLOWIN,FileMESSAGE,aflags,kflags,vflags);
@@ -2459,7 +2477,7 @@ namespace KBIN {
                   // removed stuff BELOW
                   xvasp.KPOINTS << stringBZ;
                   aurostd::stringstream2file(xvasp.KPOINTS,string(xvasp.Directory+"/KPOINTS"));
-                  xvasp.aopts.flag("FLAG::KPOINTS_PRESERVED",TRUE); // don`t touch kpoints if there are flaws
+                  xvasp.aopts.flag("FLAG::KPOINTS_PRESERVED",TRUE); // don't touch kpoints if there are flaws
                   // NOW DO THE BANDS PATCHING INCAR
                   aus << "00000  MESSAGE [" << STRING_TO_SHOW << "] Patching INCAR (bands_patching)" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
                   aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
@@ -2487,7 +2505,7 @@ namespace KBIN {
                   //[CO20210315 - OBSOLETE]vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.push("ROTMAT");	// dont mess up KPOINTS in bands
                   //[CO20210315 - OBSOLETE]vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.push("IBZKPT");    // dont mess up KPOINTS in bands
                   //[CO20210315 - OBSOLETE]vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.push("EDDRMM");	// dont mess up KPOINTS in bands
-                  vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.push("FIX:KPOINTS");	//CO20210315 - this should also be obsolete, Afix knows not to fix a non-automesh, also covered by xvasp.aopts.flag("FLAG::CHGCAR_PRESERVED",TRUE) above // dont mess up KPOINTS in bands
+                  //[CO20210315 - OBSOLETE as above: xvasp.aopts.flag("FLAG::KPOINTS_PRESERVED",TRUE)]vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.push("FIX:KPOINTS");	//CO20210315 - this should also be obsolete, Afix knows not to fix a non-automesh, also covered by xvasp.aopts.flag("FLAG::KPOINTS_PRESERVED",TRUE) above // dont mess up KPOINTS in bands
                   Krun=KBIN::VASP_Run(xvasp,aflags,kflags,vflags,FileMESSAGE);
                   if(!Krun) {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error [RELAX_STATIC_BANDS BANDS]");return Krun;}
                   //  if(_VASP_CONTCAR_SAVE_) KBIN::VASP_CONTCAR_Save(xvasp,string("bands"));
@@ -3638,11 +3656,17 @@ namespace KBIN {
 
         //CO20210315
         //print out these schemes so they can picked up by the vasp monitor
-        string aopts_scheme="";
-        aopts_scheme="FLAG::KPOINTS_PRESERVED";
-        if(xvasp.aopts.flag(aopts_scheme)){aus << "MMMMM  MESSAGE xvasp.aopts.flag(\"" << aopts_scheme << "\")=" << xvasp.aopts.flag(aopts_scheme) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
-        aopts_scheme="FLAG::POSCAR_PRESERVED";
-        if(xvasp.aopts.flag(aopts_scheme)){aus << "MMMMM  MESSAGE xvasp.aopts.flag(\"" << aopts_scheme << "\")=" << xvasp.aopts.flag(aopts_scheme) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+        for(uint i=0;i<xvasp.aopts.vxscheme.size();i++){
+          const string& flag=xvasp.aopts.vxscheme[i];
+          if(flag.find("FLAG::")!=string::npos && flag.find("_PRESERVED")!=string::npos){
+            if(xvasp.aopts.flag(flag)){aus << "MMMMM  MESSAGE xvasp.aopts.flag(\"" << flag << "\")=" << xvasp.aopts.flag(flag) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+          }
+        }
+        for(uint i=0;i<vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.vxscheme.size();i++){
+          const string& flag=vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.vxscheme[i];
+          if(vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(flag)){aus << "MMMMM  MESSAGE vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"" << flag << "\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(flag) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+        }
+        if(vflags.KBIN_VASP_FORCE_OPTION_ALGO.preserved){aus << "MMMMM  MESSAGE vflags.KBIN_VASP_FORCE_OPTION_ALGO.preserved=" << vflags.KBIN_VASP_FORCE_OPTION_ALGO.preserved << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
 
         // RUN VASP NON QUEUE ------------------------------------------------------------------------
         if(kflags.KBIN_QSUB==FALSE) {
