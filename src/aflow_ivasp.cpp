@@ -6820,21 +6820,9 @@ namespace KBIN {
       if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
       Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
     }
-    else if(mode=="NELM") {
+    else if(mode=="NELM") { //CSLOSHING solutions should be tried first
       if(submode<0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"no submode set: \""+mode+"\"",_INPUT_ILLEGAL_);}  //CO20210315
-      if(submode==0){ //try ALGO=NORMAL //CO20200624
-        fix="ALGO=NORMAL";
-        if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
-        Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
-        if(!Krun){Krun=true;submode++;} //reset and go to the next solution
-      }
-      if(submode==1){ //try ALGO=FAST //CO20200624
-        fix="ALGO=FAST";
-        if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
-        Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
-        if(!Krun){Krun=true;submode++;} //reset and go to the next solution
-      }
-      if(submode==2){ //AMIX/BMIX fixes
+      if(submode==0){ //AMIX/BMIX fixes
         bool Krun1=true;fix="AMIX=0.1";
         if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun1=false;}
         Krun1=(Krun1 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
@@ -6846,7 +6834,7 @@ namespace KBIN {
         Krun=(Krun1||Krun2);
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
-      if(submode==3){ //BMIX/AMIN fixes
+      if(submode==1){ //BMIX/AMIN fixes
         bool Krun1=true;fix="BMIX=3"; //3.0
         if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun1=false;}
         Krun1=(Krun1 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
@@ -6858,13 +6846,13 @@ namespace KBIN {
         Krun=(Krun1||Krun2);
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
-      if(submode==4){ //desperate attempt, increase NELM
+      if(submode==2){ //desperate attempt, increase NELM
         fix="NELM";
         if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
         Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
-      if(submode>=5){Krun=false;}
+      if(submode>=3){Krun=false;}
       submode+=submode_increment;submode_increment=1;  //increment and reset
     }
     else if(mode=="NKXYZ_IKPTD") {

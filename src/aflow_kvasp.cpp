@@ -3059,12 +3059,13 @@ namespace KBIN {
     //CSLOSHING and NELM START
     //CSLOSHING and NELM warnings are similar, CSLOSHING will apply a fix before VASP finishes running, while NELM only cares about the LAST iteration
     //if there is a patch to be applied for the error (CSLOSHING does), then check both when vasp running and when it's not running
-    scheme="CSLOSHING";
-    found_warning=(KBIN::VASP_OSZICARUnconverging(xvasp.Directory)); // check from OSZICAR
-    xwarning.flag(scheme,found_warning);
-    //
+    //check NELM first, and set CSLOSHING on if NELM, that way CSLOSHING patches are applied first (work for both errors)
     scheme="NELM";
     found_warning=(vasp_still_running==false && KBIN::VASP_OSZICARUnconverged(xvasp.Directory+"/OSZICAR",xvasp.Directory+"/OUTCAR"));  // check from OSZICAR
+    xwarning.flag(scheme,found_warning);
+    //
+    scheme="CSLOSHING";
+    found_warning=(xwarning.flag("NELM") || KBIN::VASP_OSZICARUnconverging(xvasp.Directory)); // check from OSZICAR
     xwarning.flag(scheme,found_warning);
     //CSLOSHING and NELM END
     
@@ -3271,10 +3272,11 @@ namespace KBIN {
         if(xwarning.flag(vwarnings_derivative[i])){n_derivative++;}
       }
       if(xwarning.vxscheme.size()>(n_require_accuracy+n_derivative)){ //this means we have some real errors inside
-        for(i=0;i<xwarning.vxscheme.size();i++){
-          if(xRequiresAccuracy.flag(xwarning.vxscheme[i])){
-            aus << "MMMMM  MESSAGE ignoring xwarning.flag(\""+xwarning.vxscheme[i]+"\"): prioritizing other warnings first (requires xmessage.flag(\"REACHED_ACCURACY\"); possible false positive)" << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-            xwarning.flag(xwarning.vxscheme[i],FALSE);
+        vector<string> xwarning_vxscheme=xwarning.vxscheme; //make a copy since we're deleting entries of the vector
+        for(i=xwarning_vxscheme.size()-1;i<xwarning_vxscheme.size();i--){  //go backwards since we're removing entries
+          if(xRequiresAccuracy.flag(xwarning_vxscheme[i])){
+            aus << "MMMMM  MESSAGE ignoring xwarning.flag(\""+xwarning_vxscheme[i]+"\"): prioritizing other warnings first (requires xmessage.flag(\"REACHED_ACCURACY\"); possible false positive)" << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+            xwarning.flag(xwarning_vxscheme[i],FALSE);
             //we don't need an xmonitor here, this is only for prioritizing errors
           }
         }
