@@ -13710,7 +13710,7 @@ namespace pflow {
       //DX20200817 - SPACEGROUP SPECTRUM - END
       //DX20170926 - NO SCAN - START
       if(vpflow.flag("SG::NO_SCAN")){
-	a.sym_eps_no_scan = true; //DX20210406
+        a.sym_eps_no_scan = true; //DX20210406
       }
       //DX20170926 - NO SCAN - END
       if(!tolerance_spectrum_analysis){

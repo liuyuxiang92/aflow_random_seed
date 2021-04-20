@@ -1030,9 +1030,11 @@ namespace pflow {
           //DX20170901 - Add consistency check for input symmetry method and ITC method - START
           int multiplicity_of_primitive=str_sp.fgroup.size()/str_sp.pgroup_xtal.size();
           bool derivative_structure=false;
-          string lattice_and_centering_from_Pearson = str_aus.pearson_symbol.substr(0,2); //DX20210412 - check centering
+          string lattice_and_centering = LATTICE::Lattice2TypeAndCentering(str_aus.bravais_lattice_type); //DX20210412 - check centering
           string lattice_and_centering_from_sg = SYM::spacegroup2latticeAndCentering(str_aus.space_group_ITC); //DX20210412 - check centering
-          if((lattice_and_centering_from_Pearson == lattice_and_centering_from_sg && SYM::ComparePointGroupAndSpaceGroupString(str_aus,multiplicity_of_primitive,derivative_structure)) || str_aus.sym_eps_no_scan || already_calculated){ //DX20210327 - added already calculated  //DX20210412 - check centering
+          cerr << "centering from Pearson: " << lattice_and_centering << endl;
+          cerr << "centering from SG: " << lattice_and_centering_from_sg << endl;
+          if((lattice_and_centering == lattice_and_centering_from_sg && SYM::ComparePointGroupAndSpaceGroupString(str_aus,multiplicity_of_primitive,derivative_structure)) || str_aus.sym_eps_no_scan || already_calculated){ //DX20210327 - added already calculated  //DX20210412 - check centering
             symmetry_commensurate=true;
           }
           else {

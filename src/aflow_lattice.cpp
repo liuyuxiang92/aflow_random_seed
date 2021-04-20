@@ -2152,6 +2152,7 @@ namespace LATTICE {
     if(VERBOSE_PROGRESS) cerr << XPID << "LATTICE::Standard_Lattice_Structure: X1 found=" << found << endl;
 
     if(found==FALSE) {
+      if(LDEBUG) { cerr << XPID << "LATTICE::Standard_Lattice_Structure: Did not find consistent lattice description." << endl; }
       str_sc.Standard_Lattice_calculated=TRUE;str_sc.Standard_Lattice_avoid=FALSE;
       str_sc.Standard_Lattice_primitive=FALSE;str_sc.Standard_Lattice_conventional=FALSE;
       str_sc.Standard_Lattice_has_failed=TRUE;
@@ -2160,11 +2161,11 @@ namespace LATTICE {
       str_sp.Standard_Lattice_has_failed=TRUE;
       // DX20210406 - only clear/reset xstructure IF we are doing a not doing a tolerance scan
       if(!str_sp.sym_eps_no_scan){
-	str_sp=str_in;
-	str_sp.GetPrimitive();
-	str_sp.MinkowskiBasisReduction(); // shorten the vectors as much as possible and as perpendicular as possible
-	str_sc=str_in; // copy it
-	str_sc.MinkowskiBasisReduction(); // shorten the vectors as much as possible and as perpendicular as possible
+        str_sp=str_in;
+        str_sp.GetPrimitive();
+        str_sp.MinkowskiBasisReduction(); // shorten the vectors as much as possible and as perpendicular as possible
+        str_sc=str_in; // copy it
+        str_sc.MinkowskiBasisReduction(); // shorten the vectors as much as possible and as perpendicular as possible
       }
       // copy eps information despite failure (for tolerance scan)
       str_sp.sym_eps = str_sc.sym_eps = eps; //DX20200217

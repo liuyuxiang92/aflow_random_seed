@@ -3387,12 +3387,14 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
   // ----------------------------------------------------------------------
   //  ABINIT OUTPUT
   if(a_iomode==IOABINIT_AUTO || a_iomode==IOABINIT_GEOM) { // VASP POSCAR
+    xstructure aa(a); //DX20210415 - need to make a copy to rescale
+    aa.ReScale(1.0); //DX20210415
     oss << "# AFLOW::ABINIT BEGIN " << endl;
     uint _precision_=_DOUBLE_WRITE_PRECISION_MAX_; //14; //was 16 SC 10 DM //CO20180515
     oss.precision(_precision_);
     oss.setf(std::ios::fixed,std::ios::floatfield);
-    if(a_iomode==IOABINIT_AUTO) oss << "# " << a.title <<endl;//<< " (AUTO)" << endl;
-    if(a_iomode==IOABINIT_GEOM) oss << "# " << a.title <<endl;//<< " (GEOM)" << endl;
+    if(a_iomode==IOABINIT_AUTO) oss << "# " << aa.title <<endl;//<< " (AUTO)" << endl;
+    if(a_iomode==IOABINIT_GEOM) oss << "# " << aa.title <<endl;//<< " (GEOM)" << endl;
     oss << "acell   " << double(1) << "   " << double(1) << "   " << double(1) << "  ANGSTR" << endl; // scaling of the primitive vectors, in Bohr.
     for(uint j=1;j<=3;j++) { //CO20190908 - manual is misleading, it's row-based// each COLUMN of this array is one primitive translation
       if(j==1) oss << "rprim";
@@ -3400,18 +3402,18 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
       if(j==3) oss << "     ";
       for(uint i=1;i<=3;i++) {
         oss << " ";
-        if(abs(a.lattice(j,i))<10.0) oss << " ";  //CO20190908 - manual is misleading, it's row-based
-        if(!std::signbit(a.lattice(j,i))) oss << " "; //CO20190908 - manual is misleading, it's row-based
-        oss << a.lattice(j,i) << "";  //CO20190908 - manual is misleading, it's row-based
+        if(abs(aa.lattice(j,i))<10.0) oss << " ";  //CO20190908 - manual is misleading, it's row-based
+        if(!std::signbit(aa.lattice(j,i))) oss << " "; //CO20190908 - manual is misleading, it's row-based
+        oss << aa.lattice(j,i) << "";  //CO20190908 - manual is misleading, it's row-based
       }
       oss << endl;
     }
-    oss << "natom " << a.atoms.size() << endl;
+    oss << "natom " << aa.atoms.size() << endl;
     //DX20200313 - add atom type info via znucl - START
     oss << "znucl ";
-    for(uint i=0;i<a.species.size();i++){
+    for(uint i=0;i<aa.species.size();i++){
       for(uint e=0;e<velement.size();e++){ //external variable (see aflow_xelement.h)
-        if(velement[e].symbol == KBIN::VASP_PseudoPotential_CleanName(a.species[i])){
+        if(velement[e].symbol == KBIN::VASP_PseudoPotential_CleanName(aa.species[i])){
           oss << e << " "; // index corresponds to Z value 
           break;
         }
@@ -3420,38 +3422,38 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
     oss << endl;
     //DX20200313 - add atom type info via znucl - END
     oss << "typat ";
-    //   for(uint i=0;i<a.num_each_type.size();i++) oss << a.num_each_type.at(i) << " ";  oss << endl;
-    for(uint i=0;i<a.atoms.size();i++)
-      oss << a.atoms.at(i).type+1 << " ";
+    //   for(uint i=0;i<aa.num_each_type.size();i++) oss << a.num_each_type.at(i) << " ";  oss << endl;
+    for(uint i=0;i<aa.atoms.size();i++)
+      oss << aa.atoms.at(i).type+1 << " ";
     oss << endl;
-    if(a.coord_flag==_COORDS_FRACTIONAL_) oss << "xred " << endl;
-    if(a.coord_flag==_COORDS_CARTESIAN_) oss << "xangst " << endl;
-    for(uint iat=0;iat<a.atoms.size();iat++) {
+    if(aa.coord_flag==_COORDS_FRACTIONAL_) oss << "xred " << endl;
+    if(aa.coord_flag==_COORDS_CARTESIAN_) oss << "xangst " << endl;
+    for(uint iat=0;iat<aa.atoms.size();iat++) {
       oss << "      ";
       for(uint j=1;j<=3;j++) {
-        if(a.coord_flag==_COORDS_FRACTIONAL_) {
-          if(abs(a.atoms.at(iat).fpos(j))<10.0) oss << " ";
-          if(!std::signbit(a.atoms.at(iat).fpos(j))) oss << " ";
-          oss << a.atoms.at(iat).fpos(j) << " ";
+        if(aa.coord_flag==_COORDS_FRACTIONAL_) {
+          if(abs(aa.atoms.at(iat).fpos(j))<10.0) oss << " ";
+          if(!std::signbit(aa.atoms.at(iat).fpos(j))) oss << " ";
+          oss << aa.atoms.at(iat).fpos(j) << " ";
         }
-        if(a.coord_flag==_COORDS_CARTESIAN_) {
-          if(abs(a.atoms.at(iat).cpos(j))<10.0) oss << " ";
-          if(!std::signbit(a.atoms.at(iat).cpos(j))) oss << " ";
-          oss << a.atoms.at(iat).cpos(j) << " ";
+        if(aa.coord_flag==_COORDS_CARTESIAN_) {
+          if(abs(aa.atoms.at(iat).cpos(j))<10.0) oss << " ";
+          if(!std::signbit(aa.atoms.at(iat).cpos(j))) oss << " ";
+          oss << aa.atoms.at(iat).cpos(j) << " ";
         }
       }
-      oss << " # " << a.atoms.at(iat).cleanname << " ";
-      if(a.write_inequivalent_flag==TRUE) {
+      oss << " # " << aa.atoms.at(iat).cleanname << " ";
+      if(aa.write_inequivalent_flag==TRUE) {
         oss << " ";
         //	if(i<10) oss << "0";
         oss << iat << "[";
-        if(a.atoms.at(iat).equivalent<10) oss << "0";
-        oss << a.atoms.at(iat).equivalent << "]";
-        if(a.atoms.at(iat).is_inequivalent) {
+        if(aa.atoms.at(iat).equivalent<10) oss << "0";
+        oss << aa.atoms.at(iat).equivalent << "]";
+        if(aa.atoms.at(iat).is_inequivalent) {
           oss <<"*";
-          oss << "_(" << a.atoms.at(iat).num_equivalents << ") "; //<< "  index=" << a.atoms.at(iat).index_iatoms << "  ";
-          //  " v" << a.iatoms.size() << "   burp ";
-          // for(uint jat=0;jat<a.iatoms.size();jat++)  oss << a.iatoms.at(jat).size() << " ";
+          oss << "_(" << aa.atoms.at(iat).num_equivalents << ") "; //<< "  index=" << a.atoms.at(iat).index_iatoms << "  ";
+          //  " v" << aa.iatoms.size() << "   burp ";
+          // for(uint jat=0;jat<aa.iatoms.size();jat++)  oss << a.iatoms.at(jat).size() << " ";
         }
       }
       oss << endl;
@@ -3463,55 +3465,57 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
   // ----------------------------------------------------------------------
   //  ELK OUTPUT //DX20200315
   if(a_iomode==IOELK_AUTO || a_iomode==IOELK_GEOM) { // ELK
+    xstructure aa(a); //DX20210415 - need to make a copy to rescale
+    aa.ReScale(1.0); //DX20210415
     oss << "# AFLOW::ELK BEGIN " << endl;
     uint _precision_=_DOUBLE_WRITE_PRECISION_MAX_; //14; //was 16 SC 10 DM //CO20180515
     oss.precision(_precision_);
     oss.setf(std::ios::fixed,std::ios::floatfield);
-    oss << "# " << a.title <<endl;
+    oss << "# " << aa.title <<endl;
     oss << endl;
     //scaling factors
-    oss << "scale" << endl << " " << a.scale << endl << endl;
+    oss << "scale" << endl << " " << aa.scale << endl << endl;
     oss << "scale1" << endl << " 1.0" << endl << endl; // returns unscaled (for now)
     oss << "scale2" << endl << " 1.0" << endl << endl; // returns unscaled (for now) 
     oss << "scale3" << endl << " 1.0" << endl << endl; // returns unscaled (for now)
 
     //lattice, note: convert to atomic units (Bohr)
     oss << "avec" << endl;
-    oss << " " << a.lattice(1)*angstrom2bohr << endl;
-    oss << " " << a.lattice(2)*angstrom2bohr << endl;
-    oss << " " << a.lattice(3)*angstrom2bohr << endl;
+    oss << " " << aa.lattice(1)*angstrom2bohr << endl;
+    oss << " " << aa.lattice(2)*angstrom2bohr << endl;
+    oss << " " << aa.lattice(3)*angstrom2bohr << endl;
     oss << endl;
 
     // atom info
     oss << "atoms" << endl;
-    oss << " " << setw(49) << std::left << a.species.size();
+    oss << " " << setw(49) << std::left << aa.species.size();
     oss << ": nspecies" << endl;
     //DX20210409 [OBSOLETE] xvector<double> magnetic_field; // not currently supported; zero vector for now
-    for(uint i=0;i<a.num_each_type.size();i++){
-      oss << setw(50) << std::left << "\'" + a.species[i] + ".in\'";
+    for(uint i=0;i<aa.num_each_type.size();i++){
+      oss << setw(50) << std::left << "\'" + aa.species[i] + ".in\'";
       oss << ": spfname" << endl;
-      oss << " " << setw(49) << std::left << a.num_each_type[i];
+      oss << " " << setw(49) << std::left << aa.num_each_type[i];
       oss << ": natoms; atpos, bfcmt below" << endl;
-      for(uint iat=0;iat<a.atoms.size();iat++){
-        if(a.atoms[iat].name == a.species[i]){
+      for(uint iat=0;iat<aa.atoms.size();iat++){
+        if(aa.atoms[iat].name == aa.species[i]){
           // atom coordinates
           for(uint j=1;j<=3;j++) {
-            if(a.coord_flag==_COORDS_CARTESIAN_) {
-              if(abs(a.atoms.at(iat).fpos(j))<10.0) oss << " ";
-              if(!std::signbit(a.atoms.at(iat).fpos(j))) oss << " ";
-              oss << a.atoms.at(iat).fpos(j) << " ";
+            if(aa.coord_flag==_COORDS_CARTESIAN_) {
+              if(abs(aa.atoms.at(iat).fpos(j))<10.0) oss << " ";
+              if(!std::signbit(aa.atoms.at(iat).fpos(j))) oss << " ";
+              oss << aa.atoms.at(iat).fpos(j) << " ";
             }
-            if(a.coord_flag==_COORDS_FRACTIONAL_) {
-              if(abs(a.atoms.at(iat).fpos(j))<10.0) oss << " ";
-              if(!std::signbit(a.atoms.at(iat).fpos(j))) oss << " ";
-              oss << a.atoms.at(iat).fpos(j) << " ";
+            if(aa.coord_flag==_COORDS_FRACTIONAL_) {
+              if(abs(aa.atoms.at(iat).fpos(j))<10.0) oss << " ";
+              if(!std::signbit(aa.atoms.at(iat).fpos(j))) oss << " ";
+              oss << aa.atoms.at(iat).fpos(j) << " ";
             }
           }
           // magnetic field //DX20210409 - updated with non-collinear spin
           for(uint j=1;j<=3;j++) {
-            if(abs(a.atoms[iat].noncoll_spin(j))<10.0) oss << " ";
-            if(!std::signbit(a.atoms[iat].noncoll_spin(j))) oss << " ";
-            oss << a.atoms[iat].noncoll_spin(j) << " ";
+            if(abs(aa.atoms[iat].noncoll_spin(j))<10.0) oss << " ";
+            if(!std::signbit(aa.atoms[iat].noncoll_spin(j))) oss << " ";
+            oss << aa.atoms[iat].noncoll_spin(j) << " ";
           }
           oss << endl;
         }
