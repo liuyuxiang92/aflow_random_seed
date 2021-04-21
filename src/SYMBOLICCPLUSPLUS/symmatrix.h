@@ -52,8 +52,8 @@ namespace symbolic{ //DX20200625
             SymbolicMatrix(int,int);
             ~SymbolicMatrix();
 
-            void copy(const SymbolicMatrix&);
-            SymbolicMatrix &operator=(const SymbolicMatrix&);
+            void copy(const SymbolicMatrix&); //DX20210420 - to fix warnings for gcc>10, need explicit declaration
+            SymbolicMatrix &operator=(const SymbolicMatrix&); //DX20210420 - to fix warnings for gcc>10, need explicit declaration
 
             void print(ostream&) const;
             Symbolic subst(const Symbolic&,const Symbolic&,int &n) const;
