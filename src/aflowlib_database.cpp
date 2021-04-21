@@ -1412,7 +1412,7 @@ namespace aflowlib {
 
   //getEntry//////////////////////////////////////////////////////////////////
   // Returns all data for a specific AUID in the specified format
-  string AflowDB::getEntry(const string& auid, const filetype& ft) {
+  string AflowDB::getEntry(const string& auid, filetype ft) {
     string entry = "";
     if (auidInDatabase(auid)) {
       string table = "auid_" + auid.substr(6,2);
@@ -1460,7 +1460,7 @@ namespace aflowlib {
 
   //getEntrySet///////////////////////////////////////////////////////////////
   // Returns all data of a set of auid based on a search condition
-  vector<string > AflowDB::getEntrySet(const string& where, const filetype& ft) {
+  vector<string > AflowDB::getEntrySet(const string& where, filetype ft) {
     vector<vector<string> > data = getRowsMultiTables(where);
     uint ndata = data.size();
     vector<string> entries(ndata);

@@ -569,9 +569,9 @@ namespace aflowlib {
       int patchDatabase(const vector<string>&, bool check_timestamps=false);
       void analyzeDatabase(const string&);
 
-      string getEntry(const string&, const filetype&);
+      string getEntry(const string&, filetype);
       _aflowlib_entry getEntryAentry(const string&);
-      vector<string> getEntrySet(const string&, const filetype&);
+      vector<string> getEntrySet(const string&, filetype);
       vector<_aflowlib_entry> getEntrySetAentry(const string&);
 
       vector<vector<string> > getEntrySetData(const string&);
