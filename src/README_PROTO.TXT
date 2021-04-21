@@ -2701,6 +2701,62 @@ A3B3C_hP14_194_cf_df_a-001.{ABC}                 hP14      P6_{3}/mmc          -
 AB3C4_hP16_194_c_ae_2f-002.{ABC}                 hP16      P6_{3}/mmc          -         Al1C3Ta4            #194      metal-carbide; Al1C3Ta4, ICSD #157843
 AB3C4_hP16_194_c_ae_2f-003.{ABC}                 hP16      P6_{3}/mmc          -         Al1C3Ta4            #194      metal-carbide; Al1C3Ta4, ICSD #159456
 
+*****************************************************************************************************************************************************
+ANRL - carbo-nitrides - BINARIES
+
+ANRL Label                                       Pearson   SG symbol           Struk     Prototype           SG #      notes
+----------------------------------------------------------------------------------------------------------------------------------------------------
+A11B4_oP15_16_acgqtu_u-001.{AB}                  oP15      P222                -         C11N4               #16       carbo-nitride; C11N4, ICSD #184897
+AB2_oC12_36_a_2a-001.{AB}                        oC12      Cmc2_{1}            -         C1N2                #36       carbo-nitride; C1N2, ICSD #247680
+AB_oP16_61_c_c-002.{AB}                          oP16      Pbca                -         C2N2                #61       carbo-nitride; C2N2, ICSD #15870
+A11B4_tP15_111_abcmn_n-001.{AB}                  tP15      P-42m               -         C11N4               #111      carbo-nitride; C11N4, ICSD #184896
+AB2_tP6_113_a_e-001.{AB}                         tP6       P-42_{1}m           -         C1N2                #113      carbo-nitride; C1N2, ICSD #247676
+AB2_tI6_119_a_f-001.{AB}                         tI6       I-4m2               -         C1N2                #119      carbo-nitride; C1N2, ICSD #247678
+AB2_tI24_122_d_e-001.{AB}                        tI24      I-42d               -         C1N2                #122      carbo-nitride; C1N2, ICSD #247677
+A3B4_hR7_160_b_ab-001.{AB}                       hR7       R3m                 -         C3N4                #160      carbo-nitride; C3N4, ICSD #41952
+AB2_hP6_164_c_2d-001.{AB}                        hP6       P-3m1               -         C1N2                #164      carbo-nitride; C1N2, ICSD #247679
+A3B4_hP14_176_h_ch-001.{AB}                      hP14      P6_{3}/m            -         C3N4                #176      carbo-nitride; C3N4, ICSD #41950
+A3B4_hP14_187_jk_adjk-001.{AB}                   hP14      P-6m2               -         C3N4                #187      carbo-nitride; C3N4, ICSD #83265
+A3B4_cP7_215_c_e-001.{AB}                        cP7       P-43m               -         C3N4                #215      carbo-nitride; C3N4, ICSD #41951 equivalent to 707.AB,707.BA,1255.AB,1255.BA [HTQC]
+A3B4_cI28_220_b_c-001.{AB}                       cI28      I-43d               -         C3N4                #220      carbo-nitride; C3N4, ICSD #83263
+
+*****************************************************************************************************************************************************
+ANRL - metal carbo-nitrides - TERNARIES
+
+ANRL Label                                       Pearson   SG symbol           Struk     Prototype           SG #      notes
+----------------------------------------------------------------------------------------------------------------------------------------------------
+AB2C2_aP15_2_ai_3i_3i-001.{ABC}                  aP15      P-1                 -         C1N2Tl2             #2        metal carbo-nitride; C1N2Tl2, ICSD #417297
+A4B3C_aP16_2_4i_3i_i-001.{ABC}                   aP16      P-1                 -         C4N3Na1             #2        metal carbo-nitride; C4N3Na1, ICSD #31926
+A4BC3_aP16_2_4i_i_3i-002.{ABC}                   aP16      P-1                 -         C4K1N3              #2        metal carbo-nitride; C4K1N3, ICSD #77046
+ABC_mC6_8_a_a_a-001.ABC/CAB/BCA                  mC6       Cm                  -         C1K1N1              #8        metal carbo-nitride; C1K1N1, ICSD #27350
+ABC_mC12_9_a_a_a-001.{ABC}                       mC12      Cc                  -         C1K1N1              #9        metal carbo-nitride; C1K1N1, ICSD #173942
+AB2C2_mC10_12_a_i_i-002.{ABC}                    mC10      C2/m                -         C1K2N2              #12       metal carbo-nitride; C1K2N2, ICSD #411094
+AB2C2_mC10_12_a_i_i-003.{ABC}                    mC10      C2/m                -         C1N2Na2             #12       metal carbo-nitride; C1N2Na2, ICSD #411341
+ABC2_mP16_14_e_e_2e-002.{ABC}                    mP16      P2_{1}/c            -         C1Hg1N2             #14       metal carbo-nitride; C1Hg1N2, ICSD #412278
+AB2C_oP16_33_a_2a_a-001.{ABC}                    oP16      Pna2_{1}            -         C1N2Pb1             #33       metal carbo-nitride; C1N2Pb1, ICSD #16600
+AB4C3_oI32_46_b_2bc_bc-001.{ABC}                 oI32      Ima2                -         Ag1C4N3             #46       metal carbo-nitride; Ag1C4N3, ICSD #43823
+ABC_oP6_59_a_a_b-001.ABC/CAB/BCA                 oP6       Pmmn                -         C1N1Na1             #59       metal carbo-nitride; C1N1Na1, ICSD #77172
+ABC_oP12_62_c_c_c-016.{ABC}                      oP12      Pnma                -         C1Li1N1             #62       metal carbo-nitride; C1Li1N1, ICSD #77321
+AB2C_oP16_62_c_2c_c-002.{ABC}                    oP16      Pnma                -         C1N2Sr1             #62       metal carbo-nitride; C1N2Sr1, ICSD #75040
+AB2C_oP16_62_c_2c_c-003.{ABC}                    oP16      Pnma                -         C1N2Pb1             #62       metal carbo-nitride; C1N2Pb1, ICSD #410915
+ABC2_oC16_63_c_a_f-001.{ABC}                     oC16      Cmcm                -         C1Cu1N2             #63       metal carbo-nitride; C1Cu1N2, ICSD #161460
+ABC2_tI16_122_a_b_d-002.{ABC}                    tI16      I-42d               -         C1Mg1N2             #122      metal carbo-nitride; C1Mg1N2, ICSD #44110
+AB2C_tI32_122_d_e_d-001.{ABC}                    tI32      I-42d               -         C1N2Zn1             #122      metal carbo-nitride; C1N2Zn1, ICSD #280523
+AB2C2_tI10_139_a_d_e-002.{ABC}                   tI10      I4/mmm              -         C1Li2N2             #139      metal carbo-nitride; C1Li2N2, ICSD #200369
+A3B2C6_hR11_155_d_c_f-001.{ABC}                  hR11      R32                 -         C3Lu2N6             #155      metal carbo-nitride; C3Lu2N6, ICSD #240311
+ABC_hR3_160_a_a_a-002.ABC/BAC/CAB                hR3       R3m                 -         Ag1C1N1             #160      metal carbo-nitride; Ag1C1N1, ICSD #85783
+ABC2_hR4_160_a_a_2a-001.{ABC}                    hR4       R3m                 -         C1Cd1N2             #160      metal carbo-nitride; C1Cd1N2, ICSD #95265
+A6B3C2_hR11_160_6a_3a_2a-001.{ABC}               hR11      R3m                 -         Al6C3N2             #160      metal carbo-nitride; Al6C3N2, ICSD #14399
+A8B3C4_hR15_160_8a_3a_4a-001.{ABC}               hR15      R3m                 -         Al8C3N4             #160      metal carbo-nitride; Al8C3N4, ICSD #14401
+ABC2_hR4_166_b_a_c-003.{ABC}                     hR4       R-3m                -         C1Ca1N2             #166      metal carbo-nitride; C1Ca1N2, ICSD #25763
+ABC2_hR4_166_b_a_c-004.{ABC}                     hR4       R-3m                -         C1Ca1N2             #166      metal carbo-nitride; C1Ca1N2, ICSD #31100
+ABC2_hR4_166_b_a_c-005.{ABC}                     hR4       R-3m                -         C1Mg1N2             #166      metal carbo-nitride; C1Mg1N2, ICSD #75039
+A6B3C2_hR11_166_3c_ac_c-001.{ABC}                hR11      R-3m                -         Al6C3N2             #166      metal carbo-nitride; Al6C3N2, ICSD #41260
+AB2C_hR4_166_a_c_b-004.{ABC}                     hR4       R-3m                -         C1N2Sr1             #166      metal carbo-nitride; C1N2Sr1, ICSD #59860
+A8B3C4_hR15_166_4c_ac_2c-001.{ABC}               hR15      R-3m                -         Al8C3N4             #166      metal carbo-nitride; Al8C3N4, ICSD #41261
+AB2C_hP8_194_c_f_a-003.{ABC}                     hP8       P6_{3}/mmc          -         C1N2Ni1             #194      metal carbo-nitride; C1N2Ni1, ICSD #249388
+A2BC2_cP10_215_e_ab_e-001.ABC/CAB/BCA            cP10      P-43m               -         C2Cd1N2             #215      metal carbo-nitride; C2Cd1N2, ICSD #20748
+
 ****************************************************************************************************
 ****************************************************************************************************
 ****************************************************************************************************

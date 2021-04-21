@@ -1008,7 +1008,7 @@ vector<StructurePrototype> XtalFinderCalculator::compare2database(
     if(relaxation_step == _COMPARE_DATABASE_GEOMETRY_ORIGINAL_){ relaxation_name = "original"; }
     else if(relaxation_step == _COMPARE_DATABASE_GEOMETRY_RELAX1_){ relaxation_name = "relax1"; }
     else { throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, "Unexpected relaxation step input: "+aurostd::utype2string<uint>(relaxation_step)+".", _INPUT_ERROR_); }
-    message << "The " << relaxation_name << " structures will be extracted; the properties will not correspond to these structures. Proceed with caution.";
+    message << "The " << relaxation_name << " structures will be extracted; the properties may not correspond to these structures. Proceed with caution.";
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
   }
 
