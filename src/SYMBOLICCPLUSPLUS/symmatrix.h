@@ -52,6 +52,9 @@ namespace symbolic{ //DX20200625
             SymbolicMatrix(int,int);
             ~SymbolicMatrix();
 
+            void copy(const SymbolicMatrix&);
+            SymbolicMatrix &operator=(const SymbolicMatrix&);
+
             void print(ostream&) const;
             Symbolic subst(const Symbolic&,const Symbolic&,int &n) const;
             Simplified simplify() const;
