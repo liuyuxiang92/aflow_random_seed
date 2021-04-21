@@ -59,7 +59,7 @@
 
 bool SchemaTest(ostream& oss){ofstream FileMESSAGE;return SchemaTest(FileMESSAGE,oss);}
 bool SchemaTest(ofstream& FileMESSAGE,ostream& oss) {
-  string function = "SchemaTest()";
+  string function = XPID+"SchemaTest()";
   _aflags aflags; aflags.Directory = ".";
   stringstream message;
   bool all_passed = true, check_passed = true;
