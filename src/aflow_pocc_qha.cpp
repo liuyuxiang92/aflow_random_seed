@@ -128,7 +128,7 @@ namespace pocc {
           msg = "The file " + filename + " is empty. The possible reason is ";
           msg += "that the structure is dynamically unstable and QHA refused ";
           msg += "to proceed with the calculation. ";
-          msg += "Please check if that's the case";
+          msg += "Please check if that's the case.";
           pflow::logger(_AFLOW_FILE_NAME_, function, msg, m_aflags.Directory,
             *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
         }
@@ -139,7 +139,7 @@ namespace pocc {
         msg = "The file " + filename + " is missing. The possible reason is ";
         msg += "that the structure is dynamically unstable and QHA refused ";
         msg += "to proceed with the calculation. ";
-        msg += "Please check if that's the case";
+        msg += "Please check if that's the case.";
         pflow::logger(_AFLOW_FILE_NAME_, function, msg, m_aflags.Directory,
             *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
       }
@@ -177,6 +177,19 @@ namespace pocc {
       else{
         pocc_qha_thermo_properties[i] = vector<vector<double> >(minsize,
           vector<double> (ncols));
+      }
+    }
+
+    // check that temperatures are the same for all data blocks
+    for (uint i=0; i<n-1; i++){
+      for (uint row=0; row<minsize; row++){
+        if (!aurostd::isequal(pocc_qha_thermo_properties[i][row][0],
+                              pocc_qha_thermo_properties[i+1][row][0])){
+          msg="Inconsistent list of temperatures among different";
+          msg+="POCC-QHA calculations.";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg,
+              _VALUE_ILLEGAL_);
+        }
       }
     }
 
@@ -243,7 +256,6 @@ namespace pocc {
       writeQHAdatablock(file, averaged_qha_data, "POCC_QHA_SJ_THERMO_T=" +
           aurostd::utype2string(T));
     }
-    //TODO check that temperatures are the same for all data blocks
 
     // average for Tpocc = T
     vector<vector<double> > averaged_qha_data_T(minsize, vector<double> (ncols));
