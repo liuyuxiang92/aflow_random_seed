@@ -510,8 +510,8 @@ namespace SYM {
       double tol = 0.0001;
       double orient = 1;
       xvector<double> x_0 = G.plane_point;
-      double d1 = distance_between_points(x_0, P);
-      double d2 = distance_between_points(x_0 + tol * G.a, P);
+      double d1 = aurostd::distance(x_0, P); //DX20210422 - use aurostd
+      double d2 = aurostd::distance(x_0 + tol * G.a, P); //DX20210422 - use aurostd
       if(d2 == d1) {
         message << "THERE IS A PROBLEM in operator* Glide(DIRECT=true): " << endl;
         message << "d1,d2: " << d1 << " " << d2 << endl;
@@ -545,8 +545,8 @@ namespace SYM {
       double tol = 0.0001;
       double orient = 1;
       xvector<double> x_0 = get_random_point_in_plane(G.planestring);
-      double d1 = distance_between_points(x_0, P);
-      double d2 = distance_between_points(x_0 + tol * G.a, P);
+      double d1 = aurostd::distance(x_0, P); //DX20210422 - use aurostd
+      double d2 = aurostd::distance(x_0 + tol * G.a, P); //DX20210422 - use aurostd
       if(d2 == d1) { cerr << "THERE IS A PROBLEM: " << endl; }
       if(d2 < d1) {  //Normal not oriented properly, switch sign. (G.a -> -G.a) et.c
         orient = -1;
@@ -567,8 +567,8 @@ namespace SYM {
     double tol = 0.0001;
     double orient = 1;
     xvector<double> x_0 = get_random_point_in_plane(G.planestring);
-    double d1 = distance_between_points(x_0, P);
-    double d2 = distance_between_points(x_0 + tol * G.a, P);
+    double d1 = aurostd::distance(x_0, P); //DX20210422 - used aurostd
+    double d2 = aurostd::distance(x_0 + tol * G.a, P); //DX20210422 - use aurostd
     if(d2 == d1) { cerr << "THERE IS A PROBLEM: " << endl; }
     if(d2 < d1) {  //Normal not oriented properly, switch sign. (G.a -> -G.a) et.c
       orient = -1;
@@ -620,10 +620,15 @@ namespace SYM {
     vector<string> parametric_plane = splitstring(plane);
     vector<char> params;
     char c;
+    bool found_params=false; //DX20210422
     for (uint i = 0; i < parametric_plane.size(); i++) {
       c = whichchar(parametric_plane[i]);
       if(c != '\0') {
-        if(!invec<char>(params, c)) {
+        found_params=false; //DX20210422
+        for(uint j=0;j<params.size()&&!found_params;j++){ //DX20210422
+          if(c == params[j]){ found_params = true; }
+        }
+        if(!found_params){
           params.push_back(c);
         }
       }

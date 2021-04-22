@@ -116,6 +116,7 @@
 #define _AUROSTD_XSCALAR_TOLERANCE_ROUNDOFF_ 1.0e-6
 
 #define _AUROSTD_XSCALAR_TOLERANCE_INTEGER_ 1.0e-2 //DX20201217
+#define _AUROSTD_XSCALAR_ZERO_TOL_ 1.0e-10 //DX20210422
 
 // ----------------------------------------------------------------------------
 // ------------------------- primitives for template<class utype> xscalar<utype>

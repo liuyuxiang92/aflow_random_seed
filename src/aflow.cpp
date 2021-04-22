@@ -427,7 +427,7 @@ bool PrototypeGeneratorTest(ofstream& FileMESSAGE,ostream& oss,bool check_symmet
   message << "Number of prototype labels = " << num_protos << " (each may have multiple parameter sets)";
   pflow::logger(_AFLOW_FILE_NAME_,function_name,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
 
-  bool check_duplicates = true;
+  bool check_duplicates = false;//true;
   string catalog="anrl";
 
   for(uint i=0;i<num_protos;i++){
