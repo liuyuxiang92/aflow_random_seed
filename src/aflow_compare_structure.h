@@ -606,6 +606,8 @@ namespace compare{
   vector<StructurePrototype> compare2prototypes(istream& input, const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream=cout); //DX20181004 //DX20190314 - changed return value
   string printMatchingPrototypes(istream& cin, const aurostd::xoption& vpflow); //DX20190314
   vector<string> getMatchingPrototypes(xstructure& xstr, const string& catalog); //DX20190314
+  vector<string> getMatchingPrototypes(xstructure& xstr, const string& catalog); //DX20190314
+  vector<string> getMatchingPrototypes(xstructure& xstr, const aurostd::xoption& vpflow, const string& catalog); //DX20210421
 
   // ---------------------------------------------------------------------------
   // permutaion comparisons

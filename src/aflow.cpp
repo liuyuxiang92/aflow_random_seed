@@ -427,6 +427,9 @@ bool PrototypeGeneratorTest(ofstream& FileMESSAGE,ostream& oss,bool check_symmet
   message << "Number of prototype labels = " << num_protos << " (each may have multiple parameter sets)";
   pflow::logger(_AFLOW_FILE_NAME_,function_name,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
 
+  bool check_duplicates = true;
+  string catalog="anrl";
+
   for(uint i=0;i<num_protos;i++){
     // get parameters
     vector<string> parameter_sets = anrl::getANRLParameters(prototype_labels[i],"all");
@@ -463,6 +466,36 @@ bool PrototypeGeneratorTest(ofstream& FileMESSAGE,ostream& oss,bool check_symmet
           message << "Please feed this label and set of parameters into the prototype generator.";
           pflow::logger(_AFLOW_FILE_NAME_,function_name,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
           return false;
+        }
+      }
+      // check duplicates
+      if(check_duplicates){
+        aurostd::xoption vpflow;
+        stringstream label_input_ss; label_input_ss << prototype_labels[i] << "-" << std::setw(3) << std::setfill('0') << j+1;
+        string label_input = label_input_ss.str();
+        // use special symmetry tolerance if necessary (otherwise, we won't check the prototypes with the correct symmetry)
+        double sym_eps = anrl::specialCaseSymmetryTolerances(label_input);
+        if(sym_eps!=AUROSTD_MAX_DOUBLE){;
+          xstr.sym_eps = sym_eps;
+          xstr.sym_eps_calculated = true;
+        }
+        // check if the prototype matches to more than one prototype
+        // (i.e., a prototype should match with itself, but no others)
+        vector<string> protos_matching = compare::getMatchingPrototypes(xstr, vpflow, catalog);
+        // if it matches to more than one
+        if(protos_matching.size()>1 && !anrl::isSpecialCaseEquivalentPrototypes(protos_matching)){
+          message << "ERROR: " << prototype_labels[i] << " given parameters=" << parameter_sets[j] << " matches to more than one prototype (and not a documented special case): ";
+          message << aurostd::joinWDelimiter(protos_matching,",") << ". ";
+          message << "If the prototype was newly added, ONLY include it in the encyclopedia for a valid reason (e.g., historical, special designation, etc.)";
+          message << " and document this in anrl::isSpecialCaseEquivalentPrototypes().";
+          pflow::logger(_AFLOW_FILE_NAME_,function_name,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
+          return false;
+        }
+        // if it doesn't matche with ITSELF
+        if(protos_matching.size()==0){
+          message << "ERROR: " << prototype_labels[i] << " given parameters=" << parameter_sets[j] << " does NOT match to any prototypes ";
+          message << "(either this system requires a special symmetry tolerance or there is a bug with XtalFinder)." << endl;
+          pflow::logger(_AFLOW_FILE_NAME_,function_name,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
         }
       }
     }
@@ -1282,10 +1315,10 @@ namespace aflow {
     strstream << tab << xspaces << " " << tab << "Returns the HELP information for the \"aflow-gibbs-library (AFLOW-AGL)\"." << endl;
     strstream << tab << x << " --readme=ael|--readme_ael" << endl;
     strstream << tab << xspaces << " " << tab << "Returns the HELP information for the \"aflow-elastic-library (AFLOW-AEL)\"." << endl;
-    strstream << tab << x << " --readme=anrl|--readme_anrl" << endl;
+    strstream << tab << x << " --readme=prototypes|--readme_prototypes|--readme=anrl|--readme_anrl" << endl;
     strstream << tab << xspaces << " " << tab << "Returns the HELP information for the \"aflow library of prototypes\"." << endl;
-    strstream << tab << x << " --readme=compare|--readme_compare" << endl;
-    strstream << tab << xspaces << " " << tab << "Returns the HELP information for the \"structure geometry comparison code\"." << endl;
+    strstream << tab << x << " --readme=xtalfinder|--readme_xtalfinder|--readme=compare|--readme_compare" << endl;
+    strstream << tab << xspaces << " " << tab << "Returns the HELP information for the \"aflow-crystal-finder (AFLOW-XtalFinder) code\"." << endl;
     strstream << tab << x << " --readme=gfa|--readme_gfa" << endl;
     strstream << tab << xspaces << " " << tab << "Returns the HELP information for the \"glass-forming-ability code\"." << endl;
     strstream << tab << x << " --readme=symmetry|--readme_symmetry" << endl;

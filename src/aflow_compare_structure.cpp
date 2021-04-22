@@ -543,10 +543,16 @@ namespace compare {
 // ***************************************************************************
 namespace compare {
   vector<string> getMatchingPrototypes(xstructure& xstr, const string& catalog){
+    aurostd::xoption vpflow_input;
+    return getMatchingPrototypes(xstr,vpflow_input,catalog);
+  }
+}
+namespace compare {
+  vector<string> getMatchingPrototypes(xstructure& xstr, const aurostd::xoption& vpflow_input, const string& catalog){ //DX20210421 - added vpflow variant
 
     // Returns the matching prototype label, if any exists
 
-    aurostd::xoption vpflow;
+    aurostd::xoption vpflow = vpflow_input; //DX20210421 - transfer input options to vpflow
     vpflow.flag("COMPARE2PROTOTYPES",TRUE);
 
     // ---------------------------------------------------------------------------
@@ -573,6 +579,8 @@ namespace compare {
     XHOST.QUIET=original_quiet;
 
     vector<string> matching_prototypes;
+    if(prototypes.size()==0){ return matching_prototypes; } //DX20210421 - protect against no matching entries
+
     for(uint i=0;i<prototypes[0].structures_duplicate.size();i++){
       matching_prototypes.push_back(prototypes[0].structures_duplicate[i]->name);
     }

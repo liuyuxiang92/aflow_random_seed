@@ -683,8 +683,8 @@ namespace init {
     XHOST.vflag_control.flag("README_AAPL",aurostd::args2flag(argv,cmds,"--readme=aapl|--readme_aapl"));
     XHOST.vflag_control.flag("README_AGL",aurostd::args2flag(argv,cmds,"--readme=agl|--readme_agl"));
     XHOST.vflag_control.flag("README_AEL",aurostd::args2flag(argv,cmds,"--readme=ael|--readme_ael"));
-    XHOST.vflag_control.flag("README_ANRL",aurostd::args2flag(argv,cmds,"--readme=anrl|--readme_anrl"));
-    XHOST.vflag_control.flag("README_COMPARE",aurostd::args2flag(argv,cmds,"--readme=compare|--readme_compare"));
+    XHOST.vflag_control.flag("README_ANRL",aurostd::args2flag(argv,cmds,"--readme=prototypes|--readme_prototypes|--readme=anrl|--readme_anrl")); //DX20210422 - added prototypes variants
+    XHOST.vflag_control.flag("README_COMPARE",aurostd::args2flag(argv,cmds,"--readme=xtalfinder|--readme_xtalfinder|--readme=compare|--readme_compare")); //DX20210422 - added xtalfinder variants
     XHOST.vflag_control.flag("README_GFA",aurostd::args2flag(argv,cmds,"--readme=gfa|--readme_gfa")); //CO20190401
     XHOST.vflag_control.flag("README_SYMMETRY",aurostd::args2flag(argv,cmds,"--readme=symmetry|--readme_symmetry"));
     XHOST.vflag_control.flag("README_CCE",aurostd::args2flag(argv,cmds,"--readme=cce|--readme_cce")); //CO20190620
