@@ -8599,8 +8599,8 @@ bool KBIN_SymmetryToScreen(xstructure& a, string& format, ostream& oss, char mod
     string _lines_="------------------------------------------------------------------------------------------------";
     if(mode == '\0' || mode == _PGROUP_){
       if(a.pgroup.empty()){ //DX20210327 - check if empty
-	message << "No PGROUP (lattice point group) operations! Symmetry calculation failed (bug).";
-	throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
+        message << "No PGROUP (lattice point group) operations! Symmetry calculation failed (bug).";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
       }
       oss << "AFLOW point groups, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
       oss << a.pgroup.size() << "    point group operations " << endl;
@@ -8616,8 +8616,8 @@ bool KBIN_SymmetryToScreen(xstructure& a, string& format, ostream& oss, char mod
     }
     if(mode == '\0' || mode == _PGROUPK_){
       if(a.pgroupk.empty()){ //DX20210327 - check if empty
-	message << "No PGROUPK (dual of lattice point group) operations! Symmetry calculation failed (bug).";
-	throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
+        message << "No PGROUPK (dual of lattice point group) operations! Symmetry calculation failed (bug).";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
       }
       oss << "AFLOW point groups klattice, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
       oss << a.pgroupk.size() << "    point group operations " << endl;
@@ -8633,8 +8633,8 @@ bool KBIN_SymmetryToScreen(xstructure& a, string& format, ostream& oss, char mod
     }
     if(mode == '\0' || mode == _FGROUP_){
       if(a.fgroup.empty()){ //DX20210327 - check if empty
-	message << "No FGROUP (factor group representative, unit cell symmetry) operations! Symmetry calculation failed (bug).";
-	throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
+        message << "No FGROUP (factor group representative, unit cell symmetry) operations! Symmetry calculation failed (bug).";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
       }
       oss << "AFLOW factor groups, operations are as a=U*b+tau (cols vectors), (Uc,Uf,ctau,ftau for cartesian/fractional)" << endl;
       oss << a.fgroup.size() << "    factor group operations " << endl;
@@ -8649,8 +8649,8 @@ bool KBIN_SymmetryToScreen(xstructure& a, string& format, ostream& oss, char mod
     }
     if(mode == '\0' || mode == _PGROUP_XTAL_){
       if(a.pgroup_xtal.empty()){ //DX20210327 - check if empty
-	message << "No PGROUP_XTAL (crystal point group) operations! Symmetry calculation failed (bug).";
-	throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
+        message << "No PGROUP_XTAL (crystal point group) operations! Symmetry calculation failed (bug).";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
       }
       oss << "AFLOW crystal point groups, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
       oss << a.pgroup_xtal.size() << "    point group operations " << endl;
@@ -8667,8 +8667,8 @@ bool KBIN_SymmetryToScreen(xstructure& a, string& format, ostream& oss, char mod
     //DX20171205 - Added pgroupk_xtal - START
     if(mode == '\0' || mode == _PGROUPK_XTAL_){
       if(a.pgroupk_xtal.empty()){ //DX20210327 - check if empty
-	message << "No PGROUPK_XTAL (dual of crystal point group) operations! Symmetry calculation failed (bug).";
-	throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
+        message << "No PGROUPK_XTAL (dual of crystal point group) operations! Symmetry calculation failed (bug).";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
       }
       oss << "AFLOW dual of crystal point groups, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
       oss << a.pgroupk_xtal.size() << "    dual of crystal point group operations " << endl;
@@ -8686,8 +8686,8 @@ bool KBIN_SymmetryToScreen(xstructure& a, string& format, ostream& oss, char mod
     //DX20200129 - Patterson symmetry - START
     if(mode == '\0' || mode == _PGROUPK_PATTERSON_){
       if(a.pgroupk_Patterson.empty()){ //DX20210327 - check if empty
-	message << "No PGROUPK_PATTERSON (Patterson point group) operations! Symmetry calculation failed (bug).";
-	throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
+        message << "No PGROUPK_PATTERSON (Patterson point group) operations! Symmetry calculation failed (bug).";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
       }
       oss << "AFLOW Patterson point groups, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
       oss << a.pgroupk_Patterson.size() << "    point group operations " << endl;
@@ -8704,8 +8704,8 @@ bool KBIN_SymmetryToScreen(xstructure& a, string& format, ostream& oss, char mod
     //DX20200129 - Patterson symmetry - END
     if(mode == '\0' || mode == _SGROUP_){
       if(a.sgroup.empty()){ //DX20210327 - check if empty
-	message << "No SGROUP (space group) operations! Symmetry calculation failed (bug).";
-	throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
+        message << "No SGROUP (space group) operations! Symmetry calculation failed (bug).";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
       }
       oss << "AFLOW - space groups, operations are as a=U*b+tau+trasl (cols vectors), (Uc,Uf,ctau,ftau,ctrasl,ftrasl for cartesian/fractional)" << endl;
       oss << a.sgroup.size() << "    space group operations " << endl;
@@ -8723,8 +8723,8 @@ bool KBIN_SymmetryToScreen(xstructure& a, string& format, ostream& oss, char mod
     }
     if(mode == '\0' || mode == _AGROUP_){
       if(a.agroup.empty()){ //DX20210327 - check if empty
-	message << "No AGROUP (site point group) operations! Symmetry calculation failed (bug).";
-	throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
+        message << "No AGROUP (site point group) operations! Symmetry calculation failed (bug).";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
       }
       oss << "AFLOW site point groups centered on the site, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
       for(uint iat=0;iat<a.atoms.size();iat++) {
@@ -8743,8 +8743,8 @@ bool KBIN_SymmetryToScreen(xstructure& a, string& format, ostream& oss, char mod
     }   
     if(mode == '\0' || mode == _IATOMS_){
       if(a.iatoms.empty()){ //DX20210327 - check if empty
-	message << "No IATOMS (inequivalent atoms)! Symmetry calculation failed (bug).";
-	throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
+        message << "No IATOMS (inequivalent atoms)! Symmetry calculation failed (bug).";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
       }
       oss << "Equivalent atoms" << endl;
       oss << _lines_ << endl;
