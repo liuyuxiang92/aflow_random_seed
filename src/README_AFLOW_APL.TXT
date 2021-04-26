@@ -135,7 +135,7 @@ The precision for the phonon calculations can be set using the flag:
 This parameter is similar [VASP_FORCE_OPTION]PREC and guides the precision of the relaxation
 calculation when [AFLOW_APL]RELAX is set to ON as well as all APL and AAPL calculations. The
 default is PHONONS. The setting of [VASP_FORCE_OPTION]PREC has no influence on the APL and AAPL
-alculation.
+calculation.
 
 APL also introduces the new option "PHONONS" for the PREC parameter, which can be used for both
 the [AFLOW_APL]PREC and the [VASP_FORCE_OPTION]PREC flag. It adds the following lines in the
@@ -158,7 +158,7 @@ The most important setting is the supercell dimensions (a supercell is required 
 The supercell can be set by the following commands (in order of precedence):
 
     [AFLOW_APL]SUPERCELL=numberXnumberXnumber
-    [AFLOW_APL]MINATOMS_RESTRICTED=number
+    [AFLOW_APL]MINATOMS_UNIFORM=number
     [AFLOW_APL]MINATOMS=number
     [AFLOW_APL]MINSHELL=number
 
@@ -176,11 +176,11 @@ Examples:
       SUPERCELL(i,j,k) containing at least the number of atoms specified.
 
       If it is desired that the supercell is expanded equally in all directions, i.e. to use
-      SUPERCELL(i,i,i), use the flag MINATOMS_RESTRICTED as in:
+      SUPERCELL(i,i,i), use the flag MINATOMS_UNIFORM as in:
 
-        [AFLOW_APL]MINATOMS_RESTRICTED=100
+        [AFLOW_APL]MINATOMS_UNIFORM=100
 
-       MINATOMS_RESTRICTED takes precedence over MINATOMS.
+       MINATOMS_UNIFORM takes precedence over MINATOMS.
 
      * Specifying the minimal number of nearest neighbor shells, e.g.:
 
