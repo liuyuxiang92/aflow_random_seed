@@ -10,7 +10,7 @@
         -- Minified database statistics file (ME)
         -- Updated AFLOW schema (ME)
         -- Added consistency checks for schema (ME)
-3.2.8 - 2021/02/22
+        -- fixed SymbolicC++ compilation warnings with gcc 10 and later (DX)3.2.8 - 2021/02/22
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.8.tar.xz
         -- lib2raw bug fixes (CO)
         -- web aflowin bug fixes (SC)
