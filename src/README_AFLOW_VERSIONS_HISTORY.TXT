@@ -1,6 +1,7 @@
 3.2.9 - 2021/xx/xx
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.9.tar.xz
         -- Fixed bug with APL overwriting *.orig files. (AS)
+        -- fixed SymbolicC++ compilation warnings with gcc 10 and later (DX)
         -- APL MINATOMS_RESTRICTED->MINATOMS_UNIFORM (CO)
         -- adding PAW_PBE_KIN to allowed DFT types in chull (CO)
         -- changed newlines to semi-colons in aurostd::execute() and aurostd::execute2string() and added file system IO options to aurostd::execute2string() (CO)
