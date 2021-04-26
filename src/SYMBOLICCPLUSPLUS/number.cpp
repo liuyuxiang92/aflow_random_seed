@@ -421,6 +421,9 @@ namespace symbolic{ //DX20200625
     Number<void>::match(const Number<void> &n1,const Number<void> &n2)
     { return Numeric::match(*n1,*n2); }
 
+  void Number<void>::copy(const Numeric &n) //DX20210420 - to fix warnings for gcc>10, need explicit declaration
+  { CastPtr<Numeric>::operator=(n); } //DX20210420 - to fix warnings for gcc>10, need explicit declaration
+
   Number<void> Number<void>::operator+(const Numeric &n) const
   {
     std::pair<Number<void>,Number<void> > p = Number<void>::match(*this,n);
@@ -450,6 +453,9 @@ namespace symbolic{ //DX20200625
     std::pair<Number<void>,Number<void> > p = Number<void>::match(*this,n);
     return p.first->mod(*(p.second));
   }
+
+  Number<void> &Number<void>::operator=(const Numeric &n) //DX20210420 - to fix warnings for gcc>10, need explicit declaration
+  { copy(n); return *this; } //DX20210420 - to fix warnings for gcc>10, need explicit declaration
 
   Number<void> &Number<void>::operator+=(const Numeric &n)
   { return *this = *this + n; }
@@ -484,6 +490,9 @@ namespace symbolic{ //DX20200625
   int Number<void>::operator>=(const Numeric &n) const
   { return !(*this < n); }
 
+  void Number<void>::copy(const Number<void> &n) //DX20210420 - to fix warnings for gcc>10, need explicit declaration
+  { CastPtr<Numeric>::operator=(n); } //DX20210420 - to fix warnings for gcc>10, need explicit declaration
+
   Number<void> Number<void>::operator+(const Number<void> &n) const
   { return operator+(*n); }
 
@@ -498,6 +507,9 @@ namespace symbolic{ //DX20200625
 
   Number<void> Number<void>::operator%(const Number<void> &n) const
   { return operator%(*n); }
+
+  Number<void> &Number<void>::operator=(const Number<void> &n) //DX20210420 - to fix warnings for gcc>10, need explicit declaration
+  { copy(n); return *this; } //DX20210420 - to fix warnings for gcc>10, need explicit declaration
 
   Number<void> &Number<void>::operator+=(const Number<void> &n)
   { return *this = *this + n; }

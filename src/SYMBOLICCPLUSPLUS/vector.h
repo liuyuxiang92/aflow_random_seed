@@ -53,6 +53,8 @@ namespace symbolic{ //DX20200625
       Vector<T> operator + () const;
       Vector<T> operator - () const;
 
+      void copy(const Vector<T>&); //DX20210420 - to fix warnings for gcc>10, need explicit declaration
+      Vector<T> &operator = (const Vector<T>&); //DX20210420 - to fix warnings for gcc>10, need explicit declaration
       Vector<T> operator += (const Vector<T>&);
       Vector<T> operator -= (const Vector<T>&);
       Vector<T> operator *= (const Vector<T>&);
