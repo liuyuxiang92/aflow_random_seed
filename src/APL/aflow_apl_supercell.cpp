@@ -363,7 +363,7 @@ namespace apl {
           << " natoms=" << natoms;
         pflow::logger(_AFLOW_FILE_NAME_, _APL_SUPERCELL_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
       }
-    } else if (method == "MINATOMS_RESTRICTED") {
+    } else if (method == "MINATOMS_UNIFORM") {
       int minatoms = aurostd::string2utype<int>(value);
       int natoms = (int) _inStructure.atoms.size();
       int Ni = 0;

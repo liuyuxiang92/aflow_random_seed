@@ -63,6 +63,17 @@ namespace symbolic { //DX20200825
   template <class T> Vector<T> Vector<T>::operator - () const
   { return *this * T(-1); }
 
+  template <class T> void Vector<T>::copy(const Vector<T> &v) //DX20210420 - to fix warnings for gcc>10, need explicit declaration - START
+  {
+    int length = v.size();
+    vector<T>::clear();
+    vector<T>::resize(length);
+    for(int i=0;i<length;i++) vector<T>::at(i) = v[i];
+  } //DX20210420 - to fix warnings for gcc>10, need explicit declaration - STOP
+
+  template <class T> Vector<T> &Vector<T>::operator = (const Vector<T> &v) //DX20210420 - to fix warnings for gcc>10, need explicit declaration
+  { copy(v); return *this; } //DX20210420 - to fix warnings for gcc>10, need explicit declaration
+
   template <class T> Vector<T> Vector<T>::operator += (const Vector<T> &v)
   {
     int length = vector<T>::size();
