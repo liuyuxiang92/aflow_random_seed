@@ -8,6 +8,7 @@
         -- patched XVASP_KPOINTS_OPERATION() so a change is ensured for Xeven/Xodd etc. (CO)
         -- APL MINATOMS_RESTRICTED->MINATOMS_UNIFORM (CO)
         -- adding PAW_PBE_KIN to allowed DFT types in chull (CO)
+        -- fixed SymbolicC++ compilation warnings with gcc 10 and later (DX)
 3.2.8 - 2021/02/22
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.8.tar.xz
         -- lib2raw bug fixes (CO)
