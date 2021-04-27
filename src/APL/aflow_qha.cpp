@@ -436,7 +436,7 @@ namespace apl
 
       // get a set of volumes that would be used for the QHA-EOS calculation
       string dirname = "";
-      for (double i=eosrange[0]; i<=(eosrange[1]+AUROSTD_ROUNDOFF_TOL); i+=eosrange[2]){
+      for (double i=eosrange[0]; i<=(eosrange[1]+AUROSTD_IDENTITY_TOL); i+=eosrange[2]){
         arun_runnames_apl_eos.push_back( "PHONON_" +
             aurostd::utype2string(i,precision_format,false,FIXED_STREAM));
 
@@ -1471,7 +1471,7 @@ namespace apl
       / the actual value depends on the path used to approach w->0. */
     bool freqs_are_nonzero = true;
     for (int i=xomega.lrows; i<=xomega.urows; i++){
-      if (!(xomega[i] > AUROSTD_ROUNDOFF_TOL)){
+      if (!(xomega[i] > AUROSTD_IDENTITY_TOL)){
         freqs_are_nonzero = false;
         break;
       }
@@ -1978,7 +1978,7 @@ namespace apl
 
         gamma = calcGrueneisen(V, xomega, w);
         w *= THz2Hz*PLANCKSCONSTANTEV_h; // [THz] -> [eV]
-        if (w > AUROSTD_ROUNDOFF_TOL){
+        if (w > AUROSTD_IDENTITY_TOL){
           expx = exp(w*beta);
 
           Cvi = pow(w,2)*expx/pow(expx-1.0,2) * qpWeights[q];
@@ -2013,7 +2013,7 @@ namespace apl
 
         gamma = calcGrueneisen(V, xomega, w);
         w *= THz2Hz*PLANCKSCONSTANTEV_h; // [THz] -> [eV]
-        if (w > AUROSTD_ROUNDOFF_TOL) GP += gamma * qpWeights[q];
+        if (w > AUROSTD_IDENTITY_TOL) GP += gamma * qpWeights[q];
       }
       NQpoints += qpWeights[q];
     }
@@ -2176,7 +2176,7 @@ namespace apl
     // Fermi energy is used as a starting guess for the value of chemical potential
     double guess = Efermi_V[Vid];
     double f = calcIDOS(guess, T, static_eigvals[Vid]) - Nelectrons;
-    if (std::abs(f) < AUROSTD_ROUNDOFF_TOL) return guess;
+    if (std::abs(f) < AUROSTD_IDENTITY_TOL) return guess;
 
     double left_end = 0.0, middle = 0.0, right_end = 0.0;
     double f_at_left_end = 0.0, f_at_middle = 0.0, f_at_right_end = 0.0;
@@ -2455,7 +2455,7 @@ namespace apl
           PLANCKSCONSTANTEV_h;
         fi = 0.5*w;
 
-        if (w> AUROSTD_ROUNDOFF_TOL && T>_ZERO_TOL_) fi += KBOLTZEV*T*log(1-exp(-w*beta));
+        if (w> AUROSTD_IDENTITY_TOL && T>_ZERO_TOL_) fi += KBOLTZEV*T*log(1-exp(-w*beta));
 
         fi *= qpWeights[q];
         F += fi;
