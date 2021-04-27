@@ -2304,7 +2304,8 @@ namespace LATTICE {
     // preparation
     str_sp=str_in; // copy it
     if(LDEBUG) cerr << XPID << "LATTICE::Standard_Lattice_Structure: [1]" << endl;
-    str_sp.GetPrimitive(0.005);
+    //DX20210427 - [OBSOLETE - use default sym_eps] str_sp.GetPrimitive(0.005);
+    str_sp.GetPrimitive(); //DX20210427 - use default sym_eps
     if(LDEBUG) cerr << XPID << "LATTICE::Standard_Lattice_Structure: [2]" << endl;
     str_sp.FixLattices();
 

@@ -10471,7 +10471,8 @@ void xstructure::GetLatticeType(xstructure& str_sp,xstructure& str_sc) {
     str_superlattice_in.IdenticalAtoms();  // make superlattice
     if(VERBOSE) cerr << "xstructure::GetLatticeType: [8]" << endl;
     if(VERBOSE) cerr << str_superlattice_in << endl;
-    str_superlattice_in.GetPrimitive(0.005);
+    //DX20210427 - [OBSOLETE - use default sym_eps] str_superlattice_in.GetPrimitive(0.005);
+    str_superlattice_in.GetPrimitive(); //DX20210427 - use default sym_eps
     if(VERBOSE) cerr << str_superlattice_in << endl;
     if(VERBOSE) cerr << "xstructure::GetLatticeType: [9]" << endl;
     str_superlattice_in.Minkowski_calculated=FALSE;
