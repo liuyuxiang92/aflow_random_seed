@@ -1269,8 +1269,8 @@ void GetUnitCellRep(const xvector<double>& ppos,xvector<double>& p_cell0,xvector
 string xstructure2json(xstructure& xstr); //DX20170831 - xstructure2json
 string atom2json(_atom& atom, int coord_flag, int poccupation); //DX20170831 - atom2json
 
-deque<_atom> getAtomsByType(const xstructure& xstr, int type); //DX20210322
-deque<_atom> getAtomsByName(const xstructure& xstr, const string& name); //DX20210322
+vector<uint> getAtomIndicesByType(const xstructure& xstr, int type); //DX20210322
+vector<uint> getAtomIndicesByName(const xstructure& xstr, const string& name); //DX20210322
 vector<uint> getLeastFrequentAtomTypes(const xstructure& xstr); //DX20210322
 vector<string> getLeastFrequentAtomSpecies(const xstructure& xstr, bool clean=true); //DX20201230 - moved from XtalFinder
 

@@ -1235,49 +1235,53 @@ uint XATOM_SplitAlloyPseudoPotentials(const string& alloy_in, vector<string> &sp
 //DX20200724 [OBSOLETE] //DX composition2stoichiometry - 20181009 - END
 
 // ***************************************************************************
-// getAtomsByType() //DX20210322
+// getAtomIndicesByType() //DX20210322
 // ***************************************************************************
-deque<_atom> getAtomsByType(const xstructure& xstr, int type) {
+vector<uint> getAtomIndicesByType(const xstructure& xstr, int type) {
 
-  string function_name = XPID + "getAtomsByType():";
+  // Get the atom indices of a given type from an xstructure
+
+  string function_name = XPID + "getAtomIndicesByType():";
   stringstream message;
   
   uint natoms = xstr.atoms.size();
 
-  deque<_atom> atoms_subset;
+  vector<uint> indices_atoms_subset;
   for(uint i=0; i<natoms; i++) {
-    if(xstr.atoms[i].type == type){ atoms_subset.push_back(xstr.atoms[i]); }
+    if(xstr.atoms[i].type == type){ indices_atoms_subset.push_back(i); }
   }
 
-  if(atoms_subset.size() == 0){
+  if(indices_atoms_subset.size() == 0){
     message << "No atoms found with type = " << type << ". Check structure.";
     throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
   }
 
-  return atoms_subset;
+  return indices_atoms_subset;
 }
 
 // ***************************************************************************
-// getAtomsByName() //DX20210322
+// getAtomIndicesByName() //DX20210322
 // ***************************************************************************
-deque<_atom> getAtomsByName(const xstructure& xstr, const string& name) {
+vector<uint> getAtomIndicesByName(const xstructure& xstr, const string& name) {
 
-  string function_name = XPID + "getAtomsByName():";
+  // Get the atom indices of a given name/species from an xstructure
+
+  string function_name = XPID + "getAtomIndicesByName():";
   stringstream message;
 
   uint natoms = xstr.atoms.size();
 
-  deque<_atom> atoms_subset;
+  vector<uint> indices_atoms_subset;
   for(uint i=0; i<natoms; i++) {
-    if(xstr.atoms[i].name == name){ atoms_subset.push_back(xstr.atoms[i]); }
+    if(xstr.atoms[i].name == name){ indices_atoms_subset.push_back(i); }
   }
 
-  if(atoms_subset.size() == 0){
+  if(indices_atoms_subset.size() == 0){
     message << "No atoms found with name = " << name << ". Check structure.";
     throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
   }
 
-  return atoms_subset;
+  return indices_atoms_subset;
 }
 
 
@@ -12780,8 +12784,8 @@ void xstructure::GetPrimitive_20210322(double eps) { //DX20210406
   // to search for possible lattice vectors (minimal set of atoms perserving
   // periodicity)
   uint atom_type_min = getLeastFrequentAtomTypes((*this))[0]; // normally a vector, grabbing only first one (there will always be one)
-  deque<_atom> vatoms_min = getAtomsByType((*this),atom_type_min);
-  uint natoms_min = vatoms_min.size();
+  vector<uint> vindices_atoms_min = getAtomIndicesByType((*this),atom_type_min);
+  uint natoms_min = vindices_atoms_min.size();
 
   if(LDEBUG){ cerr << function_name << " [2] Subset of atoms to find lattice vectors: " << natoms_min << endl; }
 
@@ -12793,10 +12797,11 @@ void xstructure::GetPrimitive_20210322(double eps) { //DX20210406
 
   // ---------------------------------------------------------------------------
   // get all lattice vectors
-  // only need to check difference between 0th and ith atom coordinates
+  // only need to check difference between 0th and ith atom coordinates for the
+  // subset of atom indices
   vector<xvector<double> > diff_vectors;
   for(uint i=1; i<natoms_min; i++) {
-    diff_vectors.push_back(::BringInCell(vatoms_min[i].fpos - vatoms_min[0].fpos)); //need to get BringInCell from outside xstructure scope
+    diff_vectors.push_back(::BringInCell((*this).atoms[vindices_atoms_min[i]].fpos - (*this).atoms[vindices_atoms_min[0]].fpos)); //need to get BringInCell from outside xstructure scope
   }
   //Translate by difference vectors and check if equivalent
   bool is_frac = true;
