@@ -7578,7 +7578,7 @@ namespace pflow {
           throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"RUNNING job="+aurostd::utype2string(_job.m_id)+" has not been assigned to a node",_RUNTIME_ERROR_);
         }
         if(_job.m_vinodes.size()>0){  //node information is available for mapping to a node
-          //to add a job, it's record should have been taken from one node (at a time)
+          //to add a job, its record should have been taken from one node (at a time)
           if(_job.m_vinodes.size()!=1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"_job.m_vinodes.size()!=1",_RUNTIME_ERROR_);}
           if(_job.m_vncpus.size()!=1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"_job.m_vncpus.size()!=1",_RUNTIME_ERROR_);}
           if(_job.m_vinodes.size()!=_job.m_vncpus.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"_job.m_vinodes.size()!=_job.m_vncpus.size()",_RUNTIME_ERROR_);}
