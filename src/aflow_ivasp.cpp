@@ -5875,27 +5875,55 @@ namespace KBIN {
     //this is all done inside the main XVASP_Afix() function
     //BE CAREFUL not to overwrite xvasp.INCAR
     //for now the default is to increase NBANDS, we might decrease later as a fix to MEMORY
-    bool LDEBUG=(FALSE || _DEBUG_IVASP_ || XHOST.DEBUG);
+    bool LDEBUG=(true || _DEBUG_IVASP_ || XHOST.DEBUG);
     string function="KBIN::XVASP_Afix_NBANDS";
     string soliloquy=XPID+function+"():";
 
     // get NBANDS from OUTCAR
     aurostd::RemoveFile(xvasp.Directory+"/aflow.tmp");
     nbands=0;
+    int nelectrons=0;
     if(aurostd::FileExist(xvasp.Directory+"/OUTCAR")&&aurostd::FileNotEmpty(xvasp.Directory+"/OUTCAR")){
       xOUTCAR OUTCAR_NBANDS(xvasp.Directory+"/OUTCAR",true); //quiet, there might be issues with halfway-written OUTCARs
       nbands=OUTCAR_NBANDS.NBANDS;
+      nelectrons=OUTCAR_NBANDS.nelectrons;
     }
     if(nbands==0 && aurostd::kvpairfound(xvasp.INCAR,"NBANDS","=")) {  // GET BANDS FROM INCAR //CO20210315 - the kvpairfound() is more robust than substring2bool
       if(LDEBUG) cerr << soliloquy << " GET NBANDS FROM INCAR" << endl;
       nbands=aurostd::kvpair2utype<int>(xvasp.INCAR,"NBANDS","=");  //CO20210315
       //no need to spit error, if it doesn't find NBANDS in INCAR, then use defaults (below)
     }
-    if(LDEBUG) cerr << soliloquy << " nbands=" << nbands << endl;
+    //CO20210315 - get NPAR, as NBANDS will be set internally to something divisible by NPAR
+    int npar=1;  //default in vasp in ncore, which is 1
+    if(aurostd::kvpairfound(xvasp.INCAR,"NPAR","=")) {
+      if(LDEBUG) cerr << soliloquy << " GET NPAR FROM INCAR" << endl;
+      npar=aurostd::kvpair2utype<int>(xvasp.INCAR,"NPAR","=");  //CO20210315
+    }
+    else if(aurostd::kvpairfound(xvasp.INCAR,"NCORE","=")) {  //default is npar=ncore
+      if(LDEBUG) cerr << soliloquy << " GET NCORE FROM INCAR" << endl;
+      npar=aurostd::kvpair2utype<int>(xvasp.INCAR,"NCORE","=");  //CO20210315
+    }
+
+    if(LDEBUG){
+      cerr << soliloquy << " nbands=" << nbands << endl;
+      cerr << soliloquy << " nelectrons=" << nelectrons << endl;
+      cerr << soliloquy << " npar=" << npar << endl;
+    }
     if(nbands==0){nbands=KBIN::XVASP_INCAR_GetNBANDS(xvasp,TRUE);}
-    if(increase){nbands+=20+nbands/5;}
-    else{nbands=(int)((double)nbands*0.9);}  //CO20210315
+    else{
+      if(increase){nbands+=(int)(20+(double)nbands*0.2);}
+      else{nbands=(int)((double)nbands*0.9);}  //CO20210315
+    }
+    //make sure nbands is divisible by npar (default =1)
+    int increment=(increase?+1:-1);
+    while((nbands%npar)!=0){nbands+=increment;}
+    
     if(LDEBUG) cerr << soliloquy << " nbands=" << nbands << endl;
+
+    if(nelectrons!=0 && nbands<(nelectrons+1)/2){
+      if(LDEBUG){cerr << soliloquy << " nbands < " << (nelectrons+1)/2 << " = (nelectrons+1)/2 (too small)" << endl;}
+      return false;
+    }
 
     if(!KBIN::XVASP_INCAR_PREPARE_GENERIC("NBANDS",xvasp,vflags,"",nbands,0.0,FALSE)){return false;}
     
@@ -6093,6 +6121,7 @@ namespace KBIN {
     if(fix=="EFIELD_PEAD"){apply_once=false;}
     else if(fix=="ENMAX"){apply_once=false;}
     else if(fix.find("KPOINTS+")!=string::npos||fix.find("KPOINTS-")!=string::npos){apply_once=false;}
+    else if(fix.find("NBANDS+")!=string::npos||fix.find("NBANDS-")!=string::npos){apply_once=false;}
     else if(fix=="NBANDS"){apply_once=false;}
     else if(fix=="POTIM"){apply_once=false;}
     //add others here
@@ -6167,14 +6196,43 @@ namespace KBIN {
     //add others here
     if(Krun==false){return false;}
 
-    //check KPOINTS: avoid up and down
+    bool found_up_down=false;
+    
+    //check KPOINTS: avoid up and down (more than once)
+    found_up_down=false; //if true, adds "KPOINTS_EXHAUSTED" to xfixed. we want to allow one up and down which might fix two different errors
     for(uint i=0;i<xfixed.vxscheme.size()&&Krun;i++){
       const string& scheme=xfixed.vxscheme[i];
-      if(scheme.find("KPOINTS+")!=string::npos && fix.find("KPOINTS-")!=string::npos){Krun=false;}
-      if(scheme.find("KPOINTS-")!=string::npos && fix.find("KPOINTS+")!=string::npos){Krun=false;}
+      if(scheme.find("KPOINTS+")!=string::npos && fix.find("KPOINTS-")!=string::npos){
+        if(xfixed.flag("KPOINTS_EXHAUSTED")){Krun=false;}
+        else{found_up_down=true;}
+      }
+      if(scheme.find("KPOINTS-")!=string::npos && fix.find("KPOINTS+")!=string::npos){
+        if(xfixed.flag("KPOINTS_EXHAUSTED")){Krun=false;}
+        else{found_up_down=true;}
+      }
     }
+    if(found_up_down){xfixed.flag("KPOINTS_EXHAUSTED",true);}
     if(Krun==false){
       if(VERBOSE){aus << "MMMMM  MESSAGE ignoring FIX=\"" << fix << "\"" << ": avoiding KPOINTS++ and KPOINTS--" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+      return false;
+    }
+    
+    //check NBANDS: avoid up and down (more than once)
+    found_up_down=false; //if true, adds "NBANDS_EXHAUSTED" to xfixed. we want to allow one up and down which might fix two different errors
+    for(uint i=0;i<xfixed.vxscheme.size()&&Krun;i++){
+      const string& scheme=xfixed.vxscheme[i];
+      if(scheme.find("NBANDS+")!=string::npos && fix.find("NBANDS-")!=string::npos){
+        if(xfixed.flag("NBANDS_EXHAUSTED")){Krun=false;}
+        else{found_up_down=true;}
+      }
+      if(scheme.find("NBANDS-")!=string::npos && fix.find("NBANDS+")!=string::npos){
+        if(xfixed.flag("NBANDS_EXHAUSTED")){Krun=false;}
+        else{found_up_down=true;}
+      }
+    }
+    if(found_up_down){xfixed.flag("NBANDS_EXHAUSTED",true);}
+    if(Krun==false){
+      if(VERBOSE){aus << "MMMMM  MESSAGE ignoring FIX=\"" << fix << "\"" << ": avoiding NBANDS++ and NBANDS--" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
       return false;
     }
     
@@ -6215,7 +6273,7 @@ namespace KBIN {
       if(Krun){aus << "MMMMM  MESSAGE applied FIX=\"" << fix << "\"" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
       //START - add fix to _AFLOWIN_
       if(xvasp.aopts.flag("FLAG::AFIX_DRYRUN")==false){
-        if(Krun){
+        if(Krun && relaxing==true){ //the ALGO command in the aflow.in only affects relaxations
           KBIN::AFLOWIN_REMOVE(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]ALGO=",operation);
           KBIN::AFLOWIN_ADD(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]ALGO="+param_string,operation);
         }
@@ -6360,11 +6418,12 @@ namespace KBIN {
       //END - load INCAR into xvasp, modify, then write out new INCAR
       if(Krun){aus << "MMMMM  MESSAGE applied FIX=\"" << fix << "\"" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
     }
-    else if(fix=="NBANDS") {
+    else if(fix.find("NBANDS")!=string::npos) {
+      bool increase=(fix.find("--")==string::npos); //increase if "--" NOT found, so NBANDS or NBANDS++ works
       if(Krun && VERBOSE){aus << "MMMMM  MESSAGE attempting FIX=\"" << fix << "\"" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
       //START - load INCAR into xvasp, modify, then write out new INCAR
       Krun=(Krun && VASP_Reread_INCAR(xvasp));  //preload incar
-      Krun=(Krun && KBIN::XVASP_Afix_NBANDS(xvasp,vflags,param_int));
+      Krun=(Krun && KBIN::XVASP_Afix_NBANDS(xvasp,vflags,param_int,increase));
       if(xvasp.aopts.flag("FLAG::AFIX_DRYRUN")==false){
         Krun=(Krun && aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR"))); //write out incar
       }
@@ -6815,14 +6874,20 @@ namespace KBIN {
         Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
-      //we might add lowering NBANDS here (add NBANDS++ and NBANDS--), as well as NGX, need to test...
-      if(submode==1){ //skip run
+      if(submode==1){ //lower NBANDS
+        fix="NBANDS--";
+        if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
+        Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
+        if(!Krun){Krun=true;submode++;} //reset and go to the next solution
+      }
+      //we might add lowering NGX, need to test...
+      if(submode==2){ //skip run
         fix="SKIP_RUN";
         if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
         Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
-      if(submode>=2){Krun=false;}
+      if(submode>=3){Krun=false;}
       submode+=submode_increment;submode_increment=1;  //increment and reset
     }
     else if(mode=="MPICH11") {
@@ -6847,7 +6912,7 @@ namespace KBIN {
       Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
     }
     else if(mode=="NBANDS") {
-      fix="NBANDS";
+      fix="NBANDS++";
       if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
       Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
     }
@@ -7033,9 +7098,15 @@ namespace KBIN {
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
       //previously we tried "POSCAR=STANDARD_CONVENTIONAL", but it was turned off and has not been shown to work
-      //we keep here as a last-ditch effort
-      if(submode==2){  //CO20210315 - try converting to standard conventional (previously not applied)
-        fix="POSCAR=STANDARD_CONVENTIONAL";
+      //[CO20210315 - doesn't work]//we keep here as a last-ditch effort
+      //[CO20210315 - doesn't work]if(submode==2){  //CO20210315 - try converting to standard conventional (previously not applied)
+      //[CO20210315 - doesn't work]  fix="POSCAR=STANDARD_CONVENTIONAL";
+      //[CO20210315 - doesn't work]  if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
+      //[CO20210315 - doesn't work]  Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
+      //[CO20210315 - doesn't work]  if(!Krun){Krun=true;submode++;} //reset and go to the next solution
+      //[CO20210315 - doesn't work]}
+      if(submode==2){  //CO20210315 - try lowering NBANDS
+        fix="NBANDS--";
         if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
         Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution

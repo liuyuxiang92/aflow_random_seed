@@ -40,6 +40,8 @@
         -- added a faster aurostd::FileSize() approach (CO)
         -- added check for vasp.out's size to avoid hours delay grepping for warnings (CO)
         -- included beta support for --monitor_vasp (with --kill_vasp_all) (CO)
+        -- adding NBANDS-- for ZPOTRF errors (CO)
+        -- adding patch for EXIT CODE: 174 (MPICH174) (CO)
 3.2.8 - 2021/02/22
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.8.tar.xz
         -- lib2raw bug fixes (CO)

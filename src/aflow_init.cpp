@@ -2122,8 +2122,10 @@ void AFLOW_monitor_VASP(const string& directory){
       xfixed.flag("ALL",false); //otherwise new attempts cannot be tried
       if(VERBOSE){message << "ls (pre)" << endl << aurostd::execute2string("ls -l") << endl;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);}
       if(!KBIN::VASP_FixErrors(xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE)){
-        kill_vasp=false;
-        if(VERBOSE){message << "kill_vasp=" << kill_vasp << ": all fixes exhausted" << endl;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);}
+        if(xwarning.flag("CALC_FROZEN")==false){  //kill vasp if the calc is frozen (no solution)
+          kill_vasp=false;
+          if(VERBOSE){message << "kill_vasp=" << kill_vasp << ": all fixes exhausted" << endl;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);}
+        }
       }
       if(VERBOSE){message << "ls (post)" << endl << aurostd::execute2string("ls -l") << endl;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);}
     }

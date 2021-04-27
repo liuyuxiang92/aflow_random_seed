@@ -1190,6 +1190,7 @@ namespace KBIN {
       cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:MEMORY\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ERROR:MEMORY") << endl;
       cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:MPICH11\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ERROR:MPICH11") << endl;
       cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:MPICH139\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ERROR:MPICH139") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:MPICH174\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ERROR:MPICH174") << endl;
       cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:NATOMS\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ERROR:NATOMS") << endl;
       cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:NBANDS\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ERROR:NBANDS") << endl;
       cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:NELM\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ERROR:NELM") << endl;
@@ -2940,7 +2941,7 @@ namespace KBIN {
     return VASP_ProcessWarnings(xvasp,aflags,kflags,xmessage,xwarning,xmonitor,FileMESSAGE);
   }
   void VASP_ProcessWarnings(_xvasp &xvasp,_aflags &aflags,_kflags &kflags,aurostd::xoption& xmessage,aurostd::xoption& xwarning,aurostd::xoption& xmonitor,ofstream &FileMESSAGE) { //CO20210315
-    bool LDEBUG=(FALSE || _DEBUG_KVASP_ || XHOST.DEBUG);
+    bool LDEBUG=(true || _DEBUG_KVASP_ || XHOST.DEBUG);
     string soliloquy=XPID+"KBIN::VASP_ProcessWarnings():";
     stringstream aus;
 
@@ -2970,6 +2971,25 @@ namespace KBIN {
     VASP_Reread_INCAR(xvasp);  //preload incar
     
     if(LDEBUG){aus << soliloquy << " [1]" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+    
+    //get whether relaxing or not
+    bool relaxing=false;
+    if(aurostd::kvpairfound(xvasp.INCAR,"IBRION","=")){
+      if(aurostd::kvpairfound(xvasp.INCAR,"NSW","=") && aurostd::kvpair2utype<int>(xvasp.INCAR,"NSW","=")>0){relaxing=true;}
+    }
+    
+    //need to get ISYM and ISPIN (ISPIND too)
+    //get ISYM
+    int isym_current=2; //CO20200624 - VASP default for non-USPP runs, add check later for USPP //https://www.vasp.at/wiki/index.php/ISYM
+    if(aurostd::substring2bool(xvasp.INCAR,"ISYM=")){isym_current=aurostd::substring2utype<int>(xvasp.INCAR,"ISYM=");}
+    //[CO20210315 - ISPIND not necessary]//get ISPIND
+    //[CO20210315 - ISPIND not necessary]//seems ISPIND is not read from the INCAR: https://www.vasp.at/forum/viewtopic.php?f=3&t=3037
+    //[CO20210315 - ISPIND not necessary]int ispind_current=1; //CO20200624 - VASP default //https://cms.mpi.univie.ac.at/vasp/guide/node87.html
+    //[CO20210315 - ISPIND not necessary]if(aurostd::substring2bool(xvasp.INCAR,"ISPIND=")){ispind_current=aurostd::substring2utype<int>(xvasp.INCAR,"ISPIND=");}
+    //get ISPIN
+    int ispin_current=1; //CO20200624 - VASP default  //https://www.vasp.at/wiki/index.php/ISPIN
+    if(aurostd::substring2bool(xvasp.INCAR,"ISPIN=")){ispin_current=aurostd::substring2utype<int>(xvasp.INCAR,"ISPIN=");}
+    //[CO20210315 - ISPIND not necessary]if(ispin_current==2 && ispind_current==1){ispind_current=2;}  //in case ISPIND is not written but spin is on
 
     //there are issues getting the correct vasp binary since this is an entirely different aflow instance
     //we might run the other aflow instance with --mpi or --machine flags that affect which vasp binary we use
@@ -3011,16 +3031,29 @@ namespace KBIN {
     aurostd::string2tokens("DAV,DENTET,EDDRMM,IBZKPT,NUM_PROB,ZBRENT",vtokens,",");
     for(i=0;i<vtokens.size();i++){xRequiresAccuracy.flag(vtokens[i],true);}
 
+    xwarning.clear(); //CO20210315 - very important to clear!
+
+    bool vasp_oszicar_unconverged=KBIN::VASP_OSZICARUnconverged(xvasp.Directory+"/OSZICAR",xvasp.Directory+"/OUTCAR");
+
     //WARNINGS START
     if(LDEBUG){aus << soliloquy << " checking warnings" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
-    xmessage.flag("REACHED_ACCURACY",aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"reached required accuracy",true,true,true,grep_stop_condition));
     xwarning.flag("OUTCAR_INCOMPLETE",vasp_still_running==false && !KBIN::VASP_RunFinished(xvasp,aflags,FileMESSAGE,false));  //CO20201111
+    xmessage.flag("REACHED_ACCURACY",
+        ( relaxing==true  && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"reached required accuracy",true,true,true,grep_stop_condition) ) ||
+        ( relaxing==false && vasp_oszicar_unconverged==false && xwarning.flag("OUTCAR_INCOMPLETE")==false ) || //CO20210315 - "reached accuracy" for static/bands calculation is a converged electronic scf, need to also check OUTCAR_INCOMPLETE, as a converged OSZICAR might actually be a run that ended because of an error
+        FALSE);
 
     string scheme="";
     bool found_warning=false;
     //VASP's internal symmetry routines START
     //CO20200624 - these are all related to VASP's internal symmetry routines
     //they would all benefit from similar fixes (except NKXYZ_IKPTD which requires KPOINTS to be reduced)
+    //SGRCON+NIRMAT: https://dannyvanpoucke.be/vasp-errors-en/
+    //IBZKPT+KKSYM: http://www.error.wiki/VERY_BAD_NEWS!_internal_error_in_subroutine_IBZKPT
+    //IBZKPT+KKSYM: https://www.vasp.at/forum/viewtopic.php?f=3&t=7811
+    //INVGRP+SYMPREC: https://www.vasp.at/forum/viewtopic.php?t=486
+    //INVGRP+SYMPREC: https://www.vasp.at/forum/viewtopic.php?f=3&t=9435&p=9473
+    //
     scheme="SGRCON";  //usually goes with NIRMAT
     found_warning=ReachedAccuracy2bool(scheme,xRequiresAccuracy,xmessage,vasp_still_running);
     found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"VERY BAD NEWS! internal error in subroutine SGRCON",true,true,true,grep_stop_condition));
@@ -3076,14 +3109,15 @@ namespace KBIN {
     
     //CSLOSHING and NELM START
     //CSLOSHING and NELM warnings are similar, CSLOSHING will apply a fix before VASP finishes running, while NELM only cares about the LAST iteration
-    //if there is a patch to be applied for the error (CSLOSHING does), then check both when vasp running and when it's not running
-    //check NELM first, and set CSLOSHING on if NELM, that way CSLOSHING patches are applied first (work for both errors)
+    //do not check turn on CSLOSHING with NELM, caused collisions with EDDDAV. it bounces back and forth between ALGO=VERFAST and ALGO=NORMAL
+    //[CO20210315 - OBSOLETE]//if there is a patch to be applied for the error (CSLOSHING does), then check both when vasp running and when it's not running
+    //[CO20210315 - OBSOLETE]//check NELM first, and set CSLOSHING on if NELM, that way CSLOSHING patches are applied first (work for both errors)
     scheme="NELM";
-    found_warning=(vasp_still_running==false && KBIN::VASP_OSZICARUnconverged(xvasp.Directory+"/OSZICAR",xvasp.Directory+"/OUTCAR"));  // check from OSZICAR
+    found_warning=(vasp_still_running==false && vasp_oszicar_unconverged);  // check from OSZICAR
     xwarning.flag(scheme,found_warning);
     //
     scheme="CSLOSHING";
-    found_warning=(xwarning.flag("NELM") || KBIN::VASP_OSZICARUnconverging(xvasp.Directory)); // check from OSZICAR
+    found_warning=(KBIN::VASP_OSZICARUnconverging(xvasp.Directory)); // check from OSZICAR //xwarning.flag("NELM")
     xwarning.flag(scheme,found_warning);
     //CSLOSHING and NELM END
     
@@ -3147,6 +3181,11 @@ namespace KBIN {
     found_warning=(found_warning && (aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"BAD TERMINATION OF ONE OF YOUR APPLICATION PROCESSES",true,true,true,grep_stop_condition) && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"EXIT CODE: 139",true,true,true,grep_stop_condition) ));
     xwarning.flag(scheme,found_warning);
     //
+    scheme="MPICH174";
+    found_warning=ReachedAccuracy2bool(scheme,xRequiresAccuracy,xmessage,vasp_still_running);
+    found_warning=(found_warning && (aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"BAD TERMINATION OF ONE OF YOUR APPLICATION PROCESSES",true,true,true,grep_stop_condition) && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"EXIT CODE: 174",true,true,true,grep_stop_condition) ));
+    xwarning.flag(scheme,found_warning);
+    //
     scheme="NATOMS";  //look for problem for distance
     found_warning=ReachedAccuracy2bool(scheme,xRequiresAccuracy,xmessage,vasp_still_running);
     found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"distance between some ions is very small",true,true,true,grep_stop_condition));
@@ -3157,7 +3196,7 @@ namespace KBIN {
     //However, if you have that warning AND the error that the number of bands is not sufficient, aflow needs to act.
     scheme="NBANDS";
     found_warning=ReachedAccuracy2bool(scheme,xRequiresAccuracy,xmessage,vasp_still_running);
-    found_warning=(found_warning && (aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,scheme,true,true,true,grep_stop_condition) && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"number of bands is not sufficient to hold all electrons",true,true,true,grep_stop_condition) ));  // The NBANDS warning due to NPAR is not an error we want to fix, so set to false if found
+    found_warning=(found_warning && (aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,scheme,true,true,true,grep_stop_condition) && (aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"number of bands is not sufficient to hold all electrons",true,true,true,grep_stop_condition) || aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"Number of bands NBANDS too small to hold electrons",true,true,true,grep_stop_condition) || aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"Your highest band is occupied at some k-points",true,true,true,grep_stop_condition)) ));  // The NBANDS warning due to NPAR is not an error we want to fix, so set to false if found
     bool vasp_corrected=(aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"number of bands has been changed from the values supplied",true,true,true,grep_stop_condition) || aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"now  NBANDS  =",true,true,true,grep_stop_condition));  // Need explicit check or else the NPAR warning prevents this NBANDS error from being corrected
     found_warning=(found_warning && vasp_corrected==false);
     xwarning.flag(scheme,found_warning);
@@ -3224,8 +3263,14 @@ namespace KBIN {
     
     if(renice){aurostd::ProcessRenice(vasp_bin,0);} //renice vasp back to normal after grep
 
-    bool wdebug=FALSE;//TRUE;
-    if(LDEBUG){wdebug=TRUE;}
+    //CO20210315 - this bit must be done before wdebug
+    //CO20210315 - only ignore KKSYM if OUTCAR is not registered as incomplete
+    if( ( xwarning.flag("KKSYM") ) && ( xwarning.flag("OUTCAR_INCOMPLETE") ) &&
+        ((ispin_current==2 && isym_current==-1) || (ispin_current==1 && isym_current==0))){  //CO20200624 - needs to change if we do magnetic systems //ispind_current==2 &&
+      xmonitor.flag("IGNORING_WARNINGS:KKSYM",FALSE);
+    }
+
+    bool wdebug=(FALSE && LDEBUG);
     if(1) {
       if(LDEBUG){aus << soliloquy << " printing warnings" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
       if(wdebug || xmessage.flag("REACHED_ACCURACY")) aus << "MMMMM  MESSAGE xmessage.flag(\"REACHED_ACCURACY\")=" << xmessage.flag("REACHED_ACCURACY") << endl;
@@ -3244,17 +3289,18 @@ namespace KBIN {
       if(wdebug || xwarning.flag("EFIELD_PEAD")) aus << "WWWWW  WARNING xwarning.flag(\"EFIELD_PEAD\")=" << xwarning.flag("EFIELD_PEAD") << endl;
       if(wdebug || xwarning.flag("EXCCOR")) aus << "WWWWW  WARNING xwarning.flag(\"EXCCOR\")=" << xwarning.flag("EXCCOR") << endl;
       if(wdebug || xwarning.flag("GAMMA_SHIFT")) aus << "WWWWW  WARNING xwarning.flag(\"GAMMA_SHIFT\")=" << xwarning.flag("GAMMA_SHIFT") << endl;
-      if(!xmonitor.flag("IGNORING_WARNINGS:SYMMETRY_VASP") && !xmonitor.flag("IGNORING_WARNINGS:IBZKPT") && (wdebug || xwarning.flag("IBZKPT"))) aus << "WWWWW  WARNING xwarning.flag(\"IBZKPT\")=" << xwarning.flag("IBZKPT") << endl;
-      if(!xmonitor.flag("IGNORING_WARNINGS:SYMMETRY_VASP") && (wdebug || xwarning.flag("INVGRP"))) aus << "WWWWW  WARNING xwarning.flag(\"INVGRP\")=" << xwarning.flag("INVGRP") << endl;
-      if(!xmonitor.flag("IGNORING_WARNINGS:SYMMETRY_VASP") && (wdebug || xwarning.flag("KKSYM"))) aus << "WWWWW  WARNING xwarning.flag(\"KKSYM\")=" << xwarning.flag("KKSYM") << endl;
+      if(!xmonitor.flag("IGNORING_WARNINGS:KKSYM") && !xmonitor.flag("IGNORING_WARNINGS:IBZKPT") && (wdebug || xwarning.flag("IBZKPT"))) aus << "WWWWW  WARNING xwarning.flag(\"IBZKPT\")=" << xwarning.flag("IBZKPT") << endl;
+      if(wdebug || xwarning.flag("INVGRP")) aus << "WWWWW  WARNING xwarning.flag(\"INVGRP\")=" << xwarning.flag("INVGRP") << endl;
+      if(!xmonitor.flag("IGNORING_WARNINGS:KKSYM") && (wdebug || xwarning.flag("KKSYM"))) aus << "WWWWW  WARNING xwarning.flag(\"KKSYM\")=" << xwarning.flag("KKSYM") << endl;
       if(wdebug || xwarning.flag("LRF_COMMUTATOR")) aus << "WWWWW  WARNING xwarning.flag(\"LRF_COMMUTATOR\")=" << xwarning.flag("LRF_COMMUTATOR") << endl;
       if(wdebug || xwarning.flag("MEMORY")) aus << "WWWWW  WARNING xwarning.flag(\"MEMORY\")=" << xwarning.flag("MEMORY") << endl;
       if(wdebug || xwarning.flag("MPICH11")) aus << "WWWWW  WARNING xwarning.flag(\"MPICH11\")=" << xwarning.flag("MPICH11") << endl;
       if(wdebug || xwarning.flag("MPICH139")) aus << "WWWWW  WARNING xwarning.flag(\"MPICH139\")=" << xwarning.flag("MPICH139") << endl;
+      if(wdebug || xwarning.flag("MPICH174")) aus << "WWWWW  WARNING xwarning.flag(\"MPICH174\")=" << xwarning.flag("MPICH174") << endl;
       if(wdebug || xwarning.flag("NATOMS")) aus << "WWWWW  WARNING xwarning.flag(\"NATOMS\")=" << xwarning.flag("NATOMS") << endl;
       if(wdebug || xwarning.flag("NBANDS")) aus << "WWWWW  WARNING xwarning.flag(\"NBANDS\")=" << xwarning.flag("NBANDS") << endl;
       if(wdebug || xwarning.flag("NELM")) aus << "WWWWW  WARNING xwarning.flag(\"NELM\")=" << xwarning.flag("NELM") << endl;
-      if(!xmonitor.flag("IGNORING_WARNINGS:SYMMETRY_VASP") && (wdebug || xwarning.flag("NIRMAT"))) aus << "WWWWW  WARNING xwarning.flag(\"NIRMAT\")=" << xwarning.flag("NIRMAT") << endl;
+      if(wdebug || xwarning.flag("NIRMAT")) aus << "WWWWW  WARNING xwarning.flag(\"NIRMAT\")=" << xwarning.flag("NIRMAT") << endl;
       if(wdebug || xwarning.flag("NKXYZ_IKPTD")) aus << "WWWWW  WARNING xwarning.flag(\"NKXYZ_IKPTD\")=" << xwarning.flag("NKXYZ_IKPTD") << endl;
       if(wdebug || xwarning.flag("NPAR")) aus << "WWWWW  WARNING xwarning.flag(\"NPAR\")=" << xwarning.flag("NPAR") << endl;
       if(!xmonitor.flag("IGNORING_WARNINGS:NPARC") && (wdebug || xwarning.flag("NPARC"))) aus << "WWWWW  WARNING xwarning.flag(\"NPARC\")=" << xwarning.flag("NPARC") << endl;
@@ -3266,8 +3312,8 @@ namespace KBIN {
       if(wdebug || xwarning.flag("READ_KPOINTS_RD_SYM")) aus << "WWWWW  WARNING xwarning.flag(\"READ_KPOINTS_RD_SYM\")=" << xwarning.flag("READ_KPOINTS_RD_SYM") << endl;
       if(wdebug || xwarning.flag("REAL_OPT")) aus << "WWWWW  WARNING xwarning.flag(\"REAL_OPT\")=" << xwarning.flag("REAL_OPT") << endl;
       if(wdebug || xwarning.flag("REAL_OPTLAY_1")) aus << "WWWWW  WARNING xwarning.flag(\"REAL_OPTLAY_1\")=" << xwarning.flag("REAL_OPTLAY_1") << endl;
-      if(!xmonitor.flag("IGNORING_WARNINGS:SYMMETRY_VASP") && (wdebug || xwarning.flag("SGRCON"))) aus << "WWWWW  WARNING xwarning.flag(\"SGRCON\")=" << xwarning.flag("SGRCON") << endl;
-      if(!xmonitor.flag("IGNORING_WARNINGS:SYMMETRY_VASP") && (wdebug || xwarning.flag("SYMPREC"))) aus << "WWWWW  WARNING xwarning.flag(\"SYMPREC\")=" << xwarning.flag("SYMPREC") << endl;
+      if(wdebug || xwarning.flag("SGRCON")) aus << "WWWWW  WARNING xwarning.flag(\"SGRCON\")=" << xwarning.flag("SGRCON") << endl;
+      if(wdebug || xwarning.flag("SYMPREC")) aus << "WWWWW  WARNING xwarning.flag(\"SYMPREC\")=" << xwarning.flag("SYMPREC") << endl;
       if(wdebug || xwarning.flag("ZBRENT")) aus << "WWWWW  WARNING xwarning.flag(\"ZBRENT\")=" << xwarning.flag("ZBRENT") << endl;  //CO20210315
       if(wdebug || xwarning.flag("ZPOTRF")) aus << "WWWWW  WARNING xwarning.flag(\"ZPOTRF\")=" << xwarning.flag("ZPOTRF") << endl;
       if(LDEBUG){cerr << aus.str();}
@@ -3289,6 +3335,13 @@ namespace KBIN {
       for(i=0;i<vwarnings_derivative.size();i++){
         if(xwarning.flag(vwarnings_derivative[i])){n_derivative++;}
       }
+      if(LDEBUG){
+        aus << soliloquy << " xwarning.vxscheme=" << aurostd::joinWDelimiter(xwarning.vxscheme,",") << endl;
+        aus << soliloquy << " xwarning.vxscheme.size()=" << xwarning.vxscheme.size() << endl;
+        aus << soliloquy << " n_require_accuracy=" << n_require_accuracy << endl;
+        aus << soliloquy << " n_derivative=" << n_derivative << endl;
+        cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+      }
       if(xwarning.vxscheme.size()>(n_require_accuracy+n_derivative)){ //this means we have some real errors inside
         vector<string> xwarning_vxscheme=xwarning.vxscheme; //make a copy since we're deleting entries of the vector
         for(i=xwarning_vxscheme.size()-1;i<xwarning_vxscheme.size();i--){  //go backwards since we're removing entries
@@ -3308,6 +3361,17 @@ namespace KBIN {
     //[CO20210315 - OBSOLETE]  //we don't need an xmonitor here, this is only for prioritizing errors
     //[CO20210315 - OBSOLETE]}
 
+    //CO20210315 - only ignore KKSYM if OUTCAR is not registered as incomplete
+    if( ( xwarning.flag("KKSYM") ) && ( xwarning.flag("OUTCAR_INCOMPLETE")==false ) && 
+        ((ispin_current==2 && isym_current==-1) || (ispin_current==1 && isym_current==0))){  //CO20200624 - needs to change if we do magnetic systems //ispind_current==2 &&
+      if(!xmonitor.flag("IGNORING_WARNINGS:KKSYM")){
+        aus << "MMMMM  MESSAGE ignoring KKSYM warnings: ISYM=" << isym_current << " ISPIN=" << ispin_current << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+        xmonitor.flag("IGNORING_WARNINGS:KKSYM",TRUE);  //so we don't clog output files
+      }
+      xwarning.flag("KKSYM",FALSE);
+      xwarning.flag("IBZKPT",FALSE);  //goes with KKSYM
+    }
+
     //do last
     xwarning.flag("RMM_DIIS",xwarning.flag("EDDRMM") || xwarning.flag("NUM_PROB") || xwarning.flag("ZBRENT"));  //CO20210315 - can probably add others to this list as well
     xwarning.flag("ROTMAT",xwarning.flag("SGRCON") || xwarning.flag("NIRMAT") || xwarning.flag("IBZKPT") || xwarning.flag("KKSYM") || xwarning.flag("INVGRP") || xwarning.flag("SYMPREC"));  //CO20210315 - can probably add others to this list as well
@@ -3315,7 +3379,7 @@ namespace KBIN {
 
     if(1){
       if(wdebug || xwarning.flag("RMM_DIIS")) aus << "WWWWW  WARNING xwarning.flag(\"RMM_DIIS\")=" << xwarning.flag("RMM_DIIS") << endl;  //CO20210315
-      if(!xmonitor.flag("IGNORING_WARNINGS:SYMMETRY_VASP") && (wdebug || xwarning.flag("ROTMAT"))) aus << "WWWWW  WARNING xwarning.flag(\"ROTMAT\")=" << xwarning.flag("ROTMAT") << endl;
+      if(wdebug || xwarning.flag("ROTMAT")) aus << "WWWWW  WARNING xwarning.flag(\"ROTMAT\")=" << xwarning.flag("ROTMAT") << endl;
       if(LDEBUG){cerr << aus.str();}
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     }
@@ -3338,35 +3402,7 @@ namespace KBIN {
     if(LDEBUG){aus << soliloquy << " [3]" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
 
     //decide which warnings to ignore
-    //need to get ISYM and ISPIN (ISPIND too)
-    //get ISYM
-    int isym_current=2; //CO20200624 - VASP default for non-USPP runs, add check later for USPP //https://www.vasp.at/wiki/index.php/ISYM
-    if(aurostd::substring2bool(xvasp.INCAR,"ISYM=")){isym_current=aurostd::substring2utype<int>(xvasp.INCAR,"ISYM=");}
-    //[CO20210315 - ISPIND not necessary]//get ISPIND
-    //[CO20210315 - ISPIND not necessary]//seems ISPIND is not read from the INCAR: https://www.vasp.at/forum/viewtopic.php?f=3&t=3037
-    //[CO20210315 - ISPIND not necessary]int ispind_current=1; //CO20200624 - VASP default //https://cms.mpi.univie.ac.at/vasp/guide/node87.html
-    //[CO20210315 - ISPIND not necessary]if(aurostd::substring2bool(xvasp.INCAR,"ISPIND=")){ispind_current=aurostd::substring2utype<int>(xvasp.INCAR,"ISPIND=");}
-    //get ISPIN
-    int ispin_current=1; //CO20200624 - VASP default  //https://www.vasp.at/wiki/index.php/ISPIN
-    if(aurostd::substring2bool(xvasp.INCAR,"ISPIN=")){ispin_current=aurostd::substring2utype<int>(xvasp.INCAR,"ISPIN=");}
-    //[CO20210315 - ISPIND not necessary]if(ispin_current==2 && ispind_current==1){ispind_current=2;}  //in case ISPIND is not written but spin is on
-    //
-    //SGRCON+NIRMAT: https://dannyvanpoucke.be/vasp-errors-en/
-    //IBZKPT+KKSYM: http://www.error.wiki/VERY_BAD_NEWS!_internal_error_in_subroutine_IBZKPT
-    //IBZKPT+KKSYM: https://www.vasp.at/forum/viewtopic.php?f=3&t=7811
-    //INVGRP+SYMPREC: https://www.vasp.at/forum/viewtopic.php?t=486
-    //INVGRP+SYMPREC: https://www.vasp.at/forum/viewtopic.php?f=3&t=9435&p=9473
-    if( ( xwarning.flag("ROTMAT") || xwarning.flag("SGRCON") || xwarning.flag("NIRMAT") || xwarning.flag("IBZKPT") || xwarning.flag("KKSYM") || xwarning.flag("INVGRP") || xwarning.flag("SYMPREC") ) && 
-        ((ispin_current==2 && isym_current==-1) || (ispin_current==1 && isym_current==0))){  //CO20200624 - needs to change if we do magnetic systems //ispind_current==2 &&
-      if(!xmonitor.flag("IGNORING_WARNINGS:SYMMETRY_VASP")){
-        aus << "MMMMM  MESSAGE ignoring symmetry warnings: ISYM=" << isym_current << " ISPIN=" << ispin_current << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-        xmonitor.flag("IGNORING_WARNINGS:SYMMETRY_VASP",TRUE);  //so we don't clog output files
-      }
-      xwarning.flag("ROTMAT",FALSE);
-      xwarning.flag("SGRCON",FALSE);xwarning.flag("NIRMAT",FALSE);
-      xwarning.flag("IBZKPT",FALSE);xwarning.flag("KKSYM",FALSE);
-      xwarning.flag("INVGRP",FALSE);xwarning.flag("SYMPREC",FALSE);
-    }
+    
     if(xwarning.flag("MPICH11") && xwarning.flag("NBANDS")){ // fix MPICH11 first
       aus << "MMMMM  MESSAGE ignoring xwarning.flag(\"NBANDS\"): prioritizing xwarning.flag(\"MPICH11\")" << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       xwarning.flag("NBANDS",FALSE);
@@ -3487,6 +3523,7 @@ namespace KBIN {
     //fix MPI/NPAR problems next
     fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("MPICH11",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
     fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("MPICH139",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+    fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("MPICH174","MPICH11",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE)); //CO20210315 - testing, exit code 174 looks like an error on the node, basically try rerunning with more memory
     fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("NPAR",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
     fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("NPARC",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
     fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("NPARN",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
@@ -3518,8 +3555,8 @@ namespace KBIN {
     // ********* APPLY GENERIC RMM-DIIS FIXES ******************
     fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("RMM_DIIS",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
     
-    //CO20210315 - do last, fixes assume out-of-memory error
-    fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("CALC_FROZEN","MEMORY",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+    //[CO20210315 - do not apply patches for frozen calc]//CO20210315 - do last, fixes assume out-of-memory error
+    //[CO20210315 - do not apply patches for frozen calc]fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("CALC_FROZEN","MEMORY",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
     
     //print out all xfixed BEFORE adding "ALL"
     std::sort(xfixed.vxscheme.begin(),xfixed.vxscheme.end()); //sort for printing
@@ -3553,7 +3590,7 @@ namespace KBIN {
     bool vasp_start=TRUE;
     aurostd::StringstreamClean(aus_exec);
     aurostd::StringstreamClean(aus);
-    int nrun=0,maxrun=20; //CO20210315 - increase from 15 to 20
+    int nrun=0,maxrun=100; //CO20210315 - increase from 15 to 100 //NBANDS can take a lot of iterations to reach goal
 
     // get CPUS from PBS/SLURM
     // string ausenv;
@@ -4079,6 +4116,8 @@ namespace KBIN {
         aus << soliloquy << " [3b]  maxrun=" << maxrun << Message(_AFLOW_FILE_NAME_,aflags) << endl;
         cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       }
+
+      xmessage.clear(); //CO20210315
 
       // check VASP version
       string SVERSION=KBIN::OUTCAR2VASPVersionNumber(xvasp.Directory+"/OUTCAR"); //CO20210315

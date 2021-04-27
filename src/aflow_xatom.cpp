@@ -9517,7 +9517,7 @@ string KPPRA_DELTA(xstructure& str,const double& DK) {
 // **************************************************************************
 // Function GetNBAND
 // **************************************************************************
-// returns extimated version of NBANDS starting from
+// returns estimated version of NBANDS starting from
 // electrons, ions, spin and ispin
 int GetNBANDS(int electrons,int nions,int spineach,bool ispin) {
   string function_name=XPID+"GetNBANDS():";

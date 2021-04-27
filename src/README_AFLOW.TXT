@@ -49,6 +49,7 @@ aflow
                                     sleep 65;
                                     [ -n "`ps -p $MONITOR_PID | grep $MONITOR_PID`" ] && touch $RUN_PATH/STOPFLOW && sleep 65;
                                     [ -n "`ps -p $MONITOR_PID | grep $MONITOR_PID`" ] && kill -9 $MONITOR_PID
+                                    rm  -f $RUN_PATH/STOPFLOW
 
                                     The STOPFLOW file will trigger the monitor to exit gracefully.
                                     Otherwise, a kill command for the monitor is issued.
