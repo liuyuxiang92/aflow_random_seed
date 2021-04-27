@@ -8,6 +8,7 @@
         -- patched XVASP_KPOINTS_OPERATION() so a change is ensured for Xeven/Xodd etc. (CO)
         -- APL MINATOMS_RESTRICTED->MINATOMS_UNIFORM (CO)
         -- adding PAW_PBE_KIN to allowed DFT types in chull (CO)
+        -- added AQueue, APartition, ANode, and --queue_status to aflow for auto-queue submission on qrats/quser (CO)
         -- patched stability criterion online plotter (CO)
         -- patching Egap calculations for HEX/Br2Mn1_ICSD_60250 (CO)
         -- fixed SymbolicC++ compilation warnings with gcc 10 and later (DX)
