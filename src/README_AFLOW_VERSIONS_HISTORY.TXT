@@ -1,5 +1,16 @@
-3.2.9 - 2021/XX/XX
+3.2.9 - 2021/xx/xx
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.9.tar.xz
+        -- Fixed bug with APL overwriting *.orig files. (AS)
+        -- Fixed bugs in the electronic free energy calculation. (AS)
+        -- Fixed bug in the fixed volume QHA method. (AS)
+        -- Fixed determination of the required number of parameters for the EOS model. (AS)
+        -- Extended the fixed volume QHA to include electronic contributions. (AS)
+        -- patched XVASP_KPOINTS_OPERATION() so a change is ensured for Xeven/Xodd etc. (CO)
+        -- APL MINATOMS_RESTRICTED->MINATOMS_UNIFORM (CO)
+        -- adding PAW_PBE_KIN to allowed DFT types in chull (CO)
+        -- patched stability criterion online plotter (CO)
+        -- patching Egap calculations for HEX/Br2Mn1_ICSD_60250 (CO)
+        -- fixed SymbolicC++ compilation warnings with gcc 10 and later (DX)
         -- added faster and more robust GetPrimitive() function (DX)
         -- added new function to find translation/lattice vectors (DX)
         -- fixed bug for empty/cleared symmetry groups to prevent core files (DX)
@@ -7,8 +18,6 @@
         -- added more debugging to pflow::PerformFullSymmetry() (DX)
         -- suppressed/reduced output for minimumDistance() and LatticeDimensionSphere() (DX)
         -- fixed ELK reader to include magnetic/spin information (DX)
-        -- patched stability criterion online plotter (CO)
-        -- patching Egap calculations for HEX/Br2Mn1_ICSD_60250 (CO)
 3.2.8 - 2021/02/22
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.8.tar.xz
         -- improved efficiency/speed of minimizeDistanceCartesianMethod() (DX)

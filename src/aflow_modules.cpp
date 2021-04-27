@@ -89,7 +89,7 @@ namespace KBIN {
     opt.keyword="ENGINE"; opt.xscheme = DEFAULT_APL_ENGINE; aplflags.push_back(opt); opt.clear();
     opt.keyword="SUPERCELL"; opt.xscheme = ""; aplflags.push_back(opt); opt.clear();
     opt.keyword="MINATOMS"; opt.xscheme = utype2string<int>(DEFAULT_APL_MINATOMS); aplflags.push_back(opt); opt.clear();
-    opt.keyword="MINATOMS_RESTRICTED"; opt.xscheme = utype2string<int>(DEFAULT_APL_MINATOMS); aplflags.push_back(opt); opt.clear();
+    opt.keyword="MINATOMS_UNIFORM"; opt.xscheme = utype2string<int>(DEFAULT_APL_MINATOMS); aplflags.push_back(opt); opt.clear();
     opt.keyword="MINSHELL"; opt.xscheme = utype2string<int>(DEFAULT_APL_MINSHELL); aplflags.push_back(opt); opt.clear();
     opt.keyword="POLAR"; opt.option = DEFAULT_APL_POLAR; opt.xscheme = (opt.option?"ON":"OFF"); aplflags.push_back(opt); opt.clear();
     opt.keyword="DMAG"; opt.xscheme = utype2string<double>(DEFAULT_APL_DMAG, FLAG_PRECISION); aplflags.push_back(opt); opt.clear();
@@ -189,13 +189,21 @@ namespace KBIN {
         entry += "|" + _ASTROPT_APL_ + "TDISMAG"+ "=|" + _ASTROPT_APL_OLD_ + "TDISMAG" + "="; //CO20181226
         entry += "|" + _ASTROPT_AAPL_ + "TDISMAG" + "="; //CO20181226
       }
-      if (key == "DSYMMETRIZE") {  // for backwards compatibility
+      else if (key == "DSYMMETRIZE") {  // for backwards compatibility
         entry += "|" + _ASTROPT_APL_ + "SYMMETRIZE=";  //CO20181226
         entry += "|" + _ASTROPT_APL_ + "SYM=";  //CO20181226
       }
-      if (key == "DINEQUIV_ONLY") {  // for backwards compatibility
+      else if (key == "DINEQUIV_ONLY") {  // for backwards compatibility
         entry += "|" + _ASTROPT_APL_ + "INEQUIVONLY=";  //CO20181226
       }
+      else if (key == "MINATOMS_UNIFORM") {  // for backwards compatibility
+        entry += "|" + _ASTROPT_APL_ + "MINATOMS_UNIF=";        //CO20181226
+        entry += "|" + _ASTROPT_APL_ + "MINATOMS_UNF=";         //CO20181226
+        entry += "|" + _ASTROPT_APL_ + "MINATOMS_CUBE=";        //CO20181226
+        entry += "|" + _ASTROPT_APL_ + "MINATOMS_RESTRICTED=";  //CO20181226
+      }
+
+
       module_opts.aplflags[i].options2entry(AflowIn, entry, module_opts.aplflags[i].option, module_opts.aplflags[i].xscheme);
 
       // options2entry sets the keyword to _ASTROPT_ + key + "=", so reset
@@ -221,7 +229,7 @@ namespace KBIN {
         supercell_method[1] = true;
         continue;
       }
-      if ((key == "MINATOMS_RESTRICTED") && (module_opts.aplflags[i].isentry)) {
+      if ((key == "MINATOMS_UNIFORM") && (module_opts.aplflags[i].isentry)) {
         supercell_method[2] = true;
         continue;
       }
@@ -259,7 +267,7 @@ namespace KBIN {
       // Supercell
       xinput.xvasp.aplopts.flag("AFLOWIN_FLAG::APL_SUPERCELL", supercell_method[0]);
       xinput.xvasp.aplopts.flag("AFLOWIN_FLAG::APL_MINATOMS", supercell_method[1]);
-      xinput.xvasp.aplopts.flag("AFLOWIN_FLAG::APL_MINATOMS_RESTRICTED", supercell_method[2]);
+      xinput.xvasp.aplopts.flag("AFLOWIN_FLAG::APL_MINATOMS_UNIFORM", supercell_method[2]);
       xinput.xvasp.aplopts.flag("AFLOWIN_FLAG::APL_MINSHELL", supercell_method[3]);
 
       // Phonon dispersion

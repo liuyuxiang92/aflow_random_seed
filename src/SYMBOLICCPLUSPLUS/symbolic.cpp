@@ -51,6 +51,9 @@ namespace symbolic{ //DX20200625
       const CloningSymbolicInterface &s)
     : SymbolicInterface(s), Cloning(s) {}
 
+  CloningSymbolicInterface &CloningSymbolicInterface::operator=(const CloningSymbolicInterface &c) //DX20210420 - to fix warnings for gcc>10, need explicit declaration
+  { *this=c; return *this; } //DX20210420 - to fix warnings for gcc>10, need explicit declaration
+
   ///////////////////////////////////////////////////
   // Implementation for SymbolicProxy              //
   ///////////////////////////////////////////////////

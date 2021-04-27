@@ -2581,8 +2581,8 @@ namespace aflowlib {
     }
 
     // OPERATE FORMATION
-    //     cerr << "FORMATION_CALC=" << FORMATION_CALC << endl; exit(0);
-
+    //     cerr << "FORMATION_CALC=" << FORMATION_CALC << endl;
+	
     // line XXX2					   
     if(FORMATION_CALC) { // no LDAU yet
       if(LDEBUG) cerr << soliloquy << " [FCALC=1]" << endl;
@@ -2720,8 +2720,8 @@ namespace aflowlib {
     }
 
     // OPERATE FORMATION
-    //     cerr << "FORMATION_CALC=" << FORMATION_CALC << endl; exit(0);
-
+    //     cerr << "FORMATION_CALC=" << FORMATION_CALC << endl;
+	
     // line XXX2					   
     if(FORMATION_CALC) { // no LDAU yet
       if(LDEBUG) cerr << soliloquy << " [FCALC=1]" << endl;

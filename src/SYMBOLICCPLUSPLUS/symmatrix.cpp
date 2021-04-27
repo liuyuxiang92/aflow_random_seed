@@ -86,6 +86,12 @@ namespace symbolic{ //DX20200625
 
   SymbolicMatrix::~SymbolicMatrix() {}
 
+  void SymbolicMatrix::copy(const SymbolicMatrix &s) //DX20210420 - to fix warnings for gcc>10, need explicit declaration
+  { Matrix<Symbolic>::operator=(s); } //DX20210420 - to fix warnings for gcc>10, need explicit declaration
+
+  SymbolicMatrix &SymbolicMatrix::operator=(const SymbolicMatrix &s) //DX20210420 - to fix warnings for gcc>10, need explicit declaration
+  { copy(s); return *this; } //DX20210420 - to fix warnings for gcc>10, need explicit declaration
+
   void SymbolicMatrix::print(ostream &o) const
   { o << endl << *this; }
 
