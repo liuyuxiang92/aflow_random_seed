@@ -7965,10 +7965,15 @@ namespace pflow {
         value=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(tokens[1]);
         if(LDEBUG){cerr << soliloquy << " key=" << key << endl;}
         if(key=="state"){
+          //possible states: http://docs.adaptivecomputing.com/torque/4-0-2/Content/topics/commands/pbsnodes.htm
+          //"active", "all", "busy", "down", "free", "job-exclusive", "job-sharing", "offline", "reserve", "state-unknown", "time-shared", and "up"
           if(value.find("down")!=string::npos){_node.m_status=NODE_DOWN;} //down first so we can rectify
           else if(value.find("offline")!=string::npos){_node.m_status=NODE_OFFLINE;} //offline next
           else if(value.find("job-exclusive")!=string::npos){_node.m_status=NODE_OCCUPIED;}
           else if(value.find("free")!=string::npos){_node.m_status=NODE_FREE;}
+          else{
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"unknown state from pbsnodes: state=\""+value+"\"",_RUNTIME_ERROR_);  //more states to account for
+          }
         }
         else if(key=="np"){_node.m_ncpus=aurostd::string2utype<uint>(value);}
         else if(key=="properties"){_node.m_properties=value;}  //needed to match with queue
