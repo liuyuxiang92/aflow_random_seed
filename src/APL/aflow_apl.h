@@ -1185,10 +1185,6 @@ namespace apl
   //void linkAPLtoQHA();//AS20201216 OBSOLETE
 
   /// Calculates QHA-related properties
-  ///
-  /// This class will substitute old QHA class.
-  /// The old QHA class will be kept until the new one is finished.
-  ///
   class QHA : public xStream {
     public:
       QHA(ostream& oss=std::cout);
@@ -1208,12 +1204,15 @@ namespace apl
       void   calcCVandGP(double T, double &CV, double &GP);
       void   calcCVandGPfit(double T, double V, double &CV, double &GP);
       double calcGPinfFit(double V);
-      double calcFreeEnergy(double T, int id);
-      double calcFreeEnergyFit(double T, double V, EOSmethod eos_method, QHAmethod method);
+      double calcVibFreeEnergy(double T, int id);
+      double calcFreeEnergyFit(double T, double V, EOSmethod eos_method,
+          QHAmethod method, uint contrib);
       double calcElectronicFreeEnergy(double T, int id);
       double calcChemicalPotential(double T, int Vid);
       double calcIDOS(double e, double T, xEIGENVAL &eig);
       xvector<double> calcElectronicFreeEnergySommerfeld(double T);
+      xvector<double> calcElectronicSpecificHeatSommerfeld(double T);
+      xvector<double> calcFreeEnergy(double T, QHAmethod qha_method, uint contrib);
       xvector<double> calcDOSatEf();
       double calcInternalEnergyFit(double T, double V, EOSmethod method);
       xvector<double> fitToEOSmodel(xvector<double> &E, EOSmethod method);
@@ -1222,16 +1221,17 @@ namespace apl
       double calcBprime(double V, const xvector<double> &parameters, EOSmethod method);
       double calcEOS2Pressure(double V, const xvector<double> &parameters, EOSmethod method);
       double calcEquilibriumVolume(const xvector<double> &parameters, EOSmethod method);
-      double calcEntropy(double T, double V, EOSmethod eos_method, QHAmethod method);
-      double getEqVolumeT(double T, EOSmethod eos_method, QHAmethod method);
-      double calcThermalExpansion(double T, EOSmethod eos_method, QHAmethod method);
+      double calcEntropy(double T, double V, EOSmethod eos_method,
+          QHAmethod method, uint contrib);
+      double getEqVolumeT(double T, EOSmethod eos_method, QHAmethod method, uint contrib);
+      double calcThermalExpansion(double T, EOSmethod eos_method, QHAmethod method, uint contrib);
       double calcIsochoricSpecificHeat(double T, double V, EOSmethod eos_method, 
-          QHAmethod qha_method);
+          QHAmethod qha_method, uint contrib);
       // QHA3P and SCQHA and QHANP
       double extrapolateFrequency(double V, const xvector<double> &xomega, QHAmethod qha_method);
       double extrapolateGrueneisen(double V, const xvector<double> &xomega, QHAmethod qha_method);
       // QHA3P
-      double calcFreeEnergyTaylorExpansion(double T, int Vid, QHAmethod qha_method);
+      double calcVibFreeEnergyTaylorExpansion(double T, int Vid, QHAmethod qha_method);
       double calcInternalEnergyTaylorExpansion(double T, double V, QHAmethod qha_method);
       // SCQHA
       double calcVPgamma(double T, double V);
