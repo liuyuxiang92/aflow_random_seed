@@ -7349,7 +7349,7 @@ namespace pflow {
   }
   bool ANode::isStatus(const node_status& status) const {
     //[keep silent]bool LDEBUG=(FALSE || _AQUEUE_DEBUG_ || XHOST.DEBUG);
-    //[keep silent]string soliloquy="pflow::ANode::isStatus():";
+    //[keep silent]string soliloquy=XPID+"pflow::ANode::isStatus():";
     //[keep silent]if(LDEBUG){
     //[keep silent]  //status
     //[keep silent]  if(status==NODE_FREE){cerr << soliloquy << " status==NODE_FREE" << endl;}
@@ -7492,14 +7492,14 @@ namespace pflow {
     return ncpus;
   }
   uint AQueue::getNCPUS(const string& user,const string& partition,const job_status& status) const {
-    string soliloquy="pflow::AQueue::getNCPUS():";
+    string soliloquy=XPID+"pflow::AQueue::getNCPUS():";
     uint ipartition=partitionName2Index(partition);
     if(ipartition>m_partitions.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"ipartition>m_partitions.size()-1",_INDEX_BOUNDS_);}
     return getNCPUS(user,m_partitions[ipartition],status);
   }
   uint AQueue::getNCPUS(const string& user,const APartition& partition,const job_status& status) const {
     bool LDEBUG=(FALSE || _AQUEUE_DEBUG_ || XHOST.DEBUG);
-    string soliloquy="pflow::AQueue::getNCPUS():";
+    string soliloquy=XPID+"pflow::AQueue::getNCPUS():";
     uint ncpus=0;
     uint ijob=0;
     if(LDEBUG){cerr << soliloquy << " partition=" << partition.m_name << endl;}
@@ -7515,7 +7515,7 @@ namespace pflow {
     return ncpus;
   }
   double AQueue::getPercentage(const string& user,const string& partition,const job_status& status) const {
-    string soliloquy="pflow::AQueue::getPercentage():";
+    string soliloquy=XPID+"pflow::AQueue::getPercentage():";
     uint ipartition=partitionName2Index(partition);
     if(ipartition>m_partitions.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"ipartition>m_partitions.size()-1",_INDEX_BOUNDS_);}
     return getPercentage(user,m_partitions[ipartition],status);
@@ -7527,7 +7527,7 @@ namespace pflow {
   }
 
   uint AQueue::nodeName2Index(const string& name) const {
-    string soliloquy="pflow::AQueue::nodeName2Index():";
+    string soliloquy=XPID+"pflow::AQueue::nodeName2Index():";
     for(uint inode=0;inode<m_nodes.size();inode++){
       if(m_nodes[inode].m_name==name){
         return inode;
@@ -7536,7 +7536,7 @@ namespace pflow {
     throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No node found with name="+name,_INPUT_UNKNOWN_);
   }
   uint AQueue::partitionName2Index(const string& name) const {
-    string soliloquy="pflow::AQueue::partitionName2Index():";
+    string soliloquy=XPID+"pflow::AQueue::partitionName2Index():";
     for(uint ipartition=0;ipartition<m_partitions.size();ipartition++){
       if(m_partitions[ipartition].m_name==name){
         return ipartition;
@@ -7547,7 +7547,7 @@ namespace pflow {
 
   uint getTORQUEIDFromString(const string& torqueid_str) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy="pflow::getTORQUEIDFromString():";
+    string soliloquy=XPID+"pflow::getTORQUEIDFromString():";
     string tmp="";
     vector<string> tokens;
     aurostd::string2tokens(torqueid_str,tokens,".");
@@ -7564,7 +7564,7 @@ namespace pflow {
 
   bool AQueue::addJob(const AJob& _job){  //add job to m_jobs
     bool LDEBUG=(FALSE || _AQUEUE_DEBUG_ || XHOST.DEBUG);
-    string soliloquy="pflow::AQueue::addJob():";
+    string soliloquy=XPID+"pflow::AQueue::addJob():";
     bool job_added=false;
     bool found_job=false,found_node=false;
     uint i=0,j=0;
@@ -7612,7 +7612,7 @@ namespace pflow {
 
   bool AQueue::addPartition(const APartition& _partition){
     bool LDEBUG=(FALSE || _AQUEUE_DEBUG_ || XHOST.DEBUG);
-    string soliloquy="pflow::AQueue::addPartition():";
+    string soliloquy=XPID+"pflow::AQueue::addPartition():";
     uint i=0;
     for(i=0;i<m_partitions.size();i++){
       if(m_partitions[i].m_name==_partition.m_name){return false;}
@@ -7640,7 +7640,7 @@ namespace pflow {
 
   bool AQueue::addNode(const ANode& _node){
     bool LDEBUG=(FALSE || _AQUEUE_DEBUG_ || XHOST.DEBUG);
-    string soliloquy="pflow::AQueue::addNode():";
+    string soliloquy=XPID+"pflow::AQueue::addNode():";
     uint inode=0;
     for(inode=0;inode<m_nodes.size();inode++){
       if(m_nodes[inode].m_name==_node.m_name){
@@ -7683,7 +7683,7 @@ namespace pflow {
 
   void AQueue::nodePartitionMapping(ANode& node){
     bool LDEBUG=(FALSE || _AQUEUE_DEBUG_ || XHOST.DEBUG);
-    string soliloquy="pflow::AQueue::nodePartitionMapping():";
+    string soliloquy=XPID+"pflow::AQueue::nodePartitionMapping():";
     //get partition
     bool found=false;
     node.m_vipartitions.clear();
@@ -7718,7 +7718,7 @@ namespace pflow {
   
   void AQueue::jobMapping(AJob& job){
     bool LDEBUG=(FALSE || _AQUEUE_DEBUG_ || XHOST.DEBUG);
-    string soliloquy="pflow::AQueue::jobMapping():";
+    string soliloquy=XPID+"pflow::AQueue::jobMapping():";
     uint i=0,ipartition=0;
     //map job to partition
     //mapping MUST have happened upon adding the job, just checking and verbose
@@ -7762,7 +7762,7 @@ namespace pflow {
 #define ATTEMPTS_GETQUEUE_MAX 10
   void AQueue::getQueue() {
     bool LDEBUG=(TRUE || _AQUEUE_DEBUG_ || XHOST.DEBUG);
-    string soliloquy="pflow::AQueue::getQueue():";
+    string soliloquy=XPID+"pflow::AQueue::getQueue():";
 
     bool SUCCESS=false;
     uint attempts=0;
@@ -7786,7 +7786,7 @@ namespace pflow {
 
   void AQueue::readNodesPartitionsSLURM(){
     bool LDEBUG=(FALSE || _AQUEUE_DEBUG_ || XHOST.DEBUG);
-    string soliloquy="pflow::AQueue::readNodesPartitionsSLURM():";
+    string soliloquy=XPID+"pflow::AQueue::readNodesPartitionsSLURM():";
     
     vector<string> lines,tokens,tokens2;
     uint iline=0;
@@ -7843,7 +7843,7 @@ namespace pflow {
 
   void AQueue::readJobsSLURM(){
     bool LDEBUG=(FALSE || _AQUEUE_DEBUG_ || XHOST.DEBUG);
-    string soliloquy="pflow::AQueue::readJobsSLURM():";
+    string soliloquy=XPID+"pflow::AQueue::readJobsSLURM():";
     
     vector<string> lines,tokens,tokens2;
     uint iline=0,i=0;
@@ -7894,7 +7894,7 @@ namespace pflow {
 
   void AQueue::readPartitionsTORQUE(){
     bool LDEBUG=(FALSE || _AQUEUE_DEBUG_ || XHOST.DEBUG);
-    string soliloquy="pflow::AQueue::readPartitionsTORQUE():";
+    string soliloquy=XPID+"pflow::AQueue::readPartitionsTORQUE():";
     
     vector<string> lines,tokens,tokens2;
     uint iline=0;
@@ -7935,7 +7935,7 @@ namespace pflow {
 
   void AQueue::readNodesJobsTORQUE(){
     bool LDEBUG=(FALSE || _AQUEUE_DEBUG_ || XHOST.DEBUG);
-    string soliloquy="pflow::AQueue::readNodesJobsTORQUE():";
+    string soliloquy=XPID+"pflow::AQueue::readNodesJobsTORQUE():";
     
     vector<string> lines,tokens,tokens2;
     uint iline=0,i=0;
@@ -8000,7 +8000,7 @@ namespace pflow {
 
   void AQueue::readJobsTORQUE(){
     bool LDEBUG=(FALSE || _AQUEUE_DEBUG_ || XHOST.DEBUG);
-    string soliloquy="pflow::AQueue::readJobsTORQUE():";
+    string soliloquy=XPID+"pflow::AQueue::readJobsTORQUE():";
     
     vector<string> lines,tokens,tokens2;
     uint iline=0,i=0;
@@ -8061,7 +8061,7 @@ namespace pflow {
 
   void AQueue::processQueue() {
     bool LDEBUG=(FALSE || _AQUEUE_DEBUG_ || XHOST.DEBUG);
-    string soliloquy="pflow::AQueue::processQueue():";
+    string soliloquy=XPID+"pflow::AQueue::processQueue():";
 
     if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
 
