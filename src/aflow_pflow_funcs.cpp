@@ -7991,6 +7991,7 @@ namespace pflow {
             addJob(_job);
           }
         }
+        //no else, there are other keys that we don't process
       }
     }
     if(!_node.m_properties.empty()){addNode(_node);} //we have node information loaded up
