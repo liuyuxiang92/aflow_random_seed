@@ -8123,7 +8123,7 @@ namespace pflow {
       }
     }
     
-    if(1||LDEBUG){
+    if(LDEBUG){
       cerr << soliloquy << " " << XHOST.hostname << " has " << getNNodes() << " nodes (" << getNCPUS() << " cpus)" << endl;
       bool add_comma=false;
       for(uint i=0;i<m_partitions.size();i++){
