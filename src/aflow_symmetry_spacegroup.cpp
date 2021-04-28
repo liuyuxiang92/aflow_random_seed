@@ -811,7 +811,7 @@ uint xstructure::GetPrimitiveCell(void) {
 
   xmatrix<double> f2c = trasp(lattice_basis_xmat);
   xmatrix<double> c2f = inverse(trasp(lattice_basis_xmat));
-  //DX20210315 [OBSOLETE] bool skew = SYM::isLatticeSkewed(lattice_basis_xmat, (*this).dist_nn_min, (*this).sym_eps); //DX20190215 - _SYM_TOL to (*this).sym_eps
+  //DX20210315 [OBSOLETE - now using transformation method for cell conversion] bool skew = SYM::isLatticeSkewed(lattice_basis_xmat, (*this).dist_nn_min, (*this).sym_eps); //DX20190215 - _SYM_TOL to (*this).sym_eps
   vector<xvector<double> > diff_vectors;
 
   // Determine the Greatest Common Denominator between the atom types
@@ -879,7 +879,7 @@ uint xstructure::GetPrimitiveCell(void) {
   lattice_basis_xmat = SYM::xvec2xmat(lattice_basis[0], lattice_basis[1], lattice_basis[2]);
   f2c = trasp(lattice_basis_xmat);
   c2f = inverse(trasp(lattice_basis_xmat));
-  //DX20210315 [OBSOLETE] skew = SYM::isLatticeSkewed(lattice_basis_xmat, (*this).dist_nn_min, (*this).sym_eps); //DX20190215 - _SYM_TOL_ to (*this).sym_eps
+  //DX20210315 [OBSOLETE - now using transformation method for cell conversion] skew = SYM::isLatticeSkewed(lattice_basis_xmat, (*this).dist_nn_min, (*this).sym_eps); //DX20190215 - _SYM_TOL_ to (*this).sym_eps
   vector<_atom> full_basis;  //basis that has been reduced modulo 1
   vector<xvector<double> > lattice_vector_candidates;
 

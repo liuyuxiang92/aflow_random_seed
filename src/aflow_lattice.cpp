@@ -712,7 +712,7 @@ namespace LATTICE {
     double volume_orig=det(lattice_original); // volume
     double amin=min(aurostd::modulus(lattice_original(1)),aurostd::modulus(lattice_original(2)),aurostd::modulus(lattice_original(3)));
     double volume_eps = eps*amin*amin*amin;
-    double volume_tmp = AUROSTD_MAX_DOUBLE;
+    double volume_tmp = AUROSTD_MAX_DOUBLE, volume_tmp_abs = AUROSTD_MAX_DOUBLE;
     //DX20210316 [OTHER POSSIBILITY] double tol_vol=0.1;
     //DX20210316 [OTHER POSSIBILITY] double volume_eps=tol_vol*volume_orig;
 
@@ -740,9 +740,10 @@ namespace LATTICE {
             // check determinant
             // use absolute value to quickly filter, but then check for positive determinant
             // later for each lattice vector permutation
-            if(abs(volume_tmp) > volume_eps){
+            volume_tmp_abs = abs(volume_tmp);
+            if(volume_tmp_abs > volume_eps){
               // do absolute value determinant here
-              if(abs(abs(volume_tmp)-volume_orig) < volume_eps){
+              if(abs(volume_tmp_abs-volume_orig) < volume_eps){
                 tmp_lattice_orig = tmp_lattice; // save original lattice before swapping rows
                 // ---------------------------------------------------------------------------
                 // store positive determinant permutations

@@ -1270,14 +1270,15 @@ vector<uint> getAtomIndicesByName(const xstructure& xstr, const string& name) {
   stringstream message;
 
   uint natoms = xstr.atoms.size();
+  string name_clean = KBIN::VASP_PseudoPotential_CleanName(name);
 
   vector<uint> indices_atoms_subset;
   for(uint i=0; i<natoms; i++) {
-    if(xstr.atoms[i].name == name){ indices_atoms_subset.push_back(i); }
+    if(xstr.atoms[i].cleanname == name_clean){ indices_atoms_subset.push_back(i); }
   }
 
   if(indices_atoms_subset.size() == 0){
-    message << "No atoms found with name = " << name << ". Check structure.";
+    message << "No atoms found with name = " << name << " (note, using name_clean=" << name_clean << "). Check structure.";
     throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
   }
 
@@ -12392,10 +12393,10 @@ bool isTranslationVector(const xstructure& xstr, const xvector<double>& vec, dou
   xvector<double> cvec, fvec;
   if(is_frac){
     fvec = vec;
-    cvec = F2C(xstr.lattice,vec);
+    cvec = xstr.f2c*vec;
   }
   else{
-    fvec = C2F(xstr.lattice,vec);
+    fvec = xstr.c2f*vec;
     cvec = vec;
   }
 
