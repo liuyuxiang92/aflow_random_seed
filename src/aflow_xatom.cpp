@@ -1301,7 +1301,7 @@ vector<uint> getLeastFrequentAtomTypes(const xstructure& xstr) {
   // find minimum type count
   int type_count_min = aurostd::min(xstr.num_each_type);
 
-  // find the first species with this atom count
+  // find all species with this atom count
   for(uint i=0;i<xstr.num_each_type.size();i++){
     if(xstr.num_each_type[i] == type_count_min){ lfa_types.push_back(i); }
   }
