@@ -10216,7 +10216,7 @@ namespace pflow {
   // ME20200512 - Created by CO for POCC.
   const int BAR_WIDTH = 70;
   void updateProgressBar(unsigned long long int current, unsigned long long int end, ostream& oss){
-    if(XHOST.vflag_control.flag("WWW")){return;} //CO20190520 - no progress bar for web stuff  //CO20200404 - new web flag
+    if(XHOST.QUIET || XHOST.vflag_control.flag("WWW")){return;} //CO20190520 - no progress bar for web stuff  //CO20200404 - new web flag // ME20210428 - do not update when quiet either
     double progress = (double)current/(double)end;
     int pos = BAR_WIDTH * progress;
 

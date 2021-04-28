@@ -3617,8 +3617,7 @@ namespace pocc {
     bool test_iterator_insertion=false; //short circuit
     xstructure a,b;
     uint starting_index=1;
-    // ME20210208 - do not update when quiet
-    if (!XHOST.QUIET) pflow::updateProgressBar(0,vpsc.size()-starting_index,*p_oss);
+    pflow::updateProgressBar(0,vpsc.size()-starting_index,*p_oss);
     for(uint i=starting_index;i<vpsc.size();i++){
       const POccSuperCell& psc_b=vpsc[i];
       b=createXStructure(psc_b,n_hnf,hnf_count,types_config_permutations_count,true,false);  //PRIMITIVIZE==false, in general it is faster to find whether two structures are equivalent than it is to find primitive cell
@@ -3648,8 +3647,7 @@ namespace pocc {
         unique_structure_bins.push_back(vector<uint>(0));
         unique_structure_bins.back().push_back(i);
       }
-      // ME20210208 - do not update when quiet
-      if (!XHOST.QUIET) pflow::updateProgressBar(i,vpsc.size(),*p_oss);
+      pflow::updateProgressBar(i,vpsc.size(),*p_oss);
     }
 
     //test of stupidity
@@ -3794,8 +3792,7 @@ namespace pocc {
     //NEW
     POccSuperCell psc;
     resetHNFMatrices();
-    // ME20210208 - do not update when quiet
-    if (!XHOST.QUIET) pflow::updateProgressBar(current_iteration,total_permutations_count,*p_oss);
+    pflow::updateProgressBar(current_iteration,total_permutations_count,*p_oss);
     while(iterateHNFMatrix()){
       energy_analyzer.getCluster(hnf_mat);
       psc.m_hnf_index=hnf_index;
@@ -3808,8 +3805,7 @@ namespace pocc {
         psc.m_degeneracy=1; //degeneracy of 1
         add2DerivativeStructuresList(psc);
         site_config_index++;
-        // ME20210208 - do not update when quiet
-        if (!XHOST.QUIET) pflow::updateProgressBar(++current_iteration,total_permutations_count,*p_oss);
+        pflow::updateProgressBar(++current_iteration,total_permutations_count,*p_oss);
       }
       hnf_index++;
     }
@@ -4080,15 +4076,13 @@ namespace pocc {
     }
 
     unsigned long long int current_iteration=0;
-    // ME20210208 - do not update when quiet
-    if (!XHOST.QUIET) pflow::updateProgressBar(current_iteration,l_supercell_sets.size()-1,*p_oss);
+    pflow::updateProgressBar(current_iteration,l_supercell_sets.size()-1,*p_oss);
     POccSuperCell psc;
     for(std::list<POccSuperCellSet>::iterator it=l_supercell_sets.begin();it!=l_supercell_sets.end();++it){
       psc=(*it).getSuperCell();
       psc.m_degeneracy=(*it).getDegeneracy(); //BEWARE OF DEGENERACY of this special POccSuperCell, representative of all supercells in that set
       v_xstr.push_back(createXStructure(psc,n_hnf,hnf_count,types_config_permutations_count,true,PRIMITIVIZE));
-      // ME20210208 - do not update when quiet
-      if (!XHOST.QUIET) pflow::updateProgressBar(++current_iteration,l_supercell_sets.size()-1,*p_oss);
+      pflow::updateProgressBar(++current_iteration,l_supercell_sets.size()-1,*p_oss);
       //cout << AFLOWIN_SEPARATION_LINE << endl;
       //cout << createXStructure((*it),true);
       //cout << AFLOWIN_SEPARATION_LINE << endl;
