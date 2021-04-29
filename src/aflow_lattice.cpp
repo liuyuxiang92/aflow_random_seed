@@ -1185,7 +1185,7 @@ namespace LATTICE {
     // ------------------------------------------------------------------------------------
     // filter vectors - replaces obsolete code above //DX20210316
     findLattices(vvectors, str_sp.lattice, vrlattice1, vrlattice1_aaa, crystal_system, eps);
-    
+
     if(LDEBUG || 0) {
       cerr << "DEBUG dims=" << dims << endl;
       cerr << "DEBUG vvectors.size()=" << vvectors.size() << endl;
