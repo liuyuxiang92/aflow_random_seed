@@ -756,7 +756,6 @@ namespace compare{
   // ---------------------------------------------------------------------------
   // structure manipulation 
   xstructure GetLFASupercell(const xstructure& xstr, const xvector<int>& dims, const string& lfa_name); //DX20190530
-  bool vectorPeriodic(const xvector<double>& vec, const xstructure& lfa_supercell); //DX20201209
   void getLatticeTransformations(const xmatrix<double>& lattice_original, 
       const xmatrix<double>& lattice_ideal,
       const vector<xmatrix<double> >& candidate_lattices,

@@ -1,9 +1,5 @@
-3.2.9 - 2021/xx/xx
-        Location: http://materials.duke.edu/AFLOW/aflow.3.2.9.tar.xz
-        -- Fixed bug with APL overwriting *.orig files. (AS)
-        -- fixed SymbolicC++ compilation warnings with gcc 10 and later (DX)
-        -- APL MINATOMS_RESTRICTED->MINATOMS_UNIFORM (CO)
-        -- adding PAW_PBE_KIN to allowed DFT types in chull (CO)
+3.2.10 - 2021/xx/xx
+        Location: http://materials.duke.edu/AFLOW/aflow.3.2.10.tar.xz
         -- changed newlines to semi-colons in aurostd::execute() and aurostd::execute2string() and added file system IO options to aurostd::execute2string() (CO)
         -- extended CleanStringASCII_InPlace() to include ALL ASCII characters (CO)
         -- added NELM and NELM_STATIC options to VASP_FORCE_OPTIONS and aflow.rc (CO)
@@ -42,8 +38,25 @@
         -- included beta support for --monitor_vasp (with --kill_vasp_all) (CO)
         -- adding NBANDS-- for ZPOTRF errors (CO)
         -- adding patch for EXIT CODE: 174 (MPICH174) (CO)
+3.2.9 - 2021/xx/xx
+        Location: http://materials.duke.edu/AFLOW/aflow.3.2.9.tar.xz
+        -- Fixed bug with APL overwriting *.orig files. (AS)
+        -- Fixed bugs in the electronic free energy calculation. (AS)
+        -- Fixed bug in the fixed volume QHA method. (AS)
+        -- Fixed determination of the required number of parameters for the EOS model. (AS)
+        -- Extended the fixed volume QHA to include electronic contributions. (AS)
+        -- patched XVASP_KPOINTS_OPERATION() so a change is ensured for Xeven/Xodd etc. (CO)
+        -- APL MINATOMS_RESTRICTED->MINATOMS_UNIFORM (CO)
+        -- adding PAW_PBE_KIN to allowed DFT types in chull (CO)
+        -- added AQueue, APartition, ANode, and --queue_status to aflow for auto-queue submission on qrats/quser (CO)
+        -- fixed SymbolicC++ compilation warnings with gcc 10 and later (DX)
 3.2.8 - 2021/02/22
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.8.tar.xz
+        -- improved efficiency/speed of minimizeDistanceCartesianMethod() (DX)
+        -- improved structure conversions in space group routines (uses new transformation methods; TransformStructure()) (DX)
+        -- improved lattice-type calculator; search lattices more efficiently (DX)
+        -- fixed minor bugs for comparing unaries with different cell sizes in XtalFinder (DX)
+        -- fixed minor bug in reading element names from Xstructure (DX)
         -- lib2raw bug fixes (CO)
         -- web aflowin bug fixes (SC)
         -- fixed typo in Wyckoff position for space group 85, setting 2 (DX)

@@ -2889,7 +2889,10 @@ void XtalFinderCalculator::performStructureConversions(
   while (i < nstructures){
     // ---------------------------------------------------------------------------
     // primitivize
-    if(calculate_primitive_vec[i]){ structure_containers[i].structure.GetPrimitive(); }
+    if(calculate_primitive_vec[i]){
+      structure_containers[i].structure.GetPrimitive();
+      structure_containers[i].natoms = structure_containers[i].structure.atoms.size(); //DX20210316 - updated number of atoms
+    }
     // ---------------------------------------------------------------------------
     // Minkowski
     if(calculate_Minkowski_vec[i]){ structure_containers[i].structure.MinkowskiBasisReduction(); }
@@ -3749,11 +3752,11 @@ namespace compare{
       return false;
     }
     // check if number of atoms are integer multiples of one another (elements only; compounds verified with stoich) //DX20200421
-    if(structure1.ntypes == 1 && structure1.is_structure_generated && structure2.is_structure_generated){
-      if(structure1.natoms%structure2.natoms!=0 && structure2.natoms%structure1.natoms!=0){
-        return false;
-      }
-    }
+    //DX20210316 [TOO STRICT] if(structure1.ntypes == 1 && structure1.is_structure_generated && structure2.is_structure_generated){
+    //DX20210316 [TOO STRICT]   if(structure1.natoms%structure2.natoms!=0 && structure2.natoms%structure1.natoms!=0){
+    //DX20210316 [TOO STRICT]     return false;
+    //DX20210316 [TOO STRICT]   }
+    //DX20210316 [TOO STRICT] }
     // ---------------------------------------------------------------------------
     // check if LFA environments are compatible - DX20190711
     if(!ignore_environment && !compatibleEnvironmentSets(structure1.environments_LFA,structure2.environments_LFA,same_species,ignore_environment_angles,false)){ //DX20200320
@@ -6442,42 +6445,8 @@ string XtalFinderCalculator::printUnmatchedAtoms(
 // ***************************************************************************
 
 // ***************************************************************************
-// compare::vectorPeriodic()
+// compare::vectorPeriodic() -> isTranslationVector() in XATOM //DX20210316
 // ***************************************************************************
-namespace compare{
-  bool vectorPeriodic(const xvector<double>& vec, const xstructure& xstr){
-
-    // Once we have a possible quadruplet (lattice), we need to make sure that this
-    // choice of the primitive cell preserves the periodicity o the lattice.
-    // Therefore, we check that each of the quadruplet atoms maps onto another atom
-    // in the supercell. Helpful analogy: Lattice periodicty vs crystal periodicity.
-    // The quadruplets form the lattice and in this function we check for lattice
-    // periodicity. The misfit criteria checks the crystal periodicity.
-
-
-    double tolerance = 0.5; // half an Angstrom (Ex As1_ICSD_158474 == As1_ICSD_162840 with 0.1, but not 0.01)
-    //DX20200416 [ORIG] double tolerance = 0.01; // Hundredth of an Angstrom
-    uint natoms = xstr.atoms.size();
-    bool skew = false;
-
-    uint count=0;
-
-    xvector<double> fvec = C2F(xstr.lattice,vec); //DX20200329 - convert to C2F only once
-
-    // ===== Check if applying the symmetry element along with internal translation maps to another atom ===== //
-    for(uint d=0;d<natoms;d++){
-      _atom tmp_atom = xstr.atoms[d]; //copy names, types, etc. //DX20190702
-      tmp_atom.cpos = xstr.atoms[d].cpos+vec;
-      tmp_atom.fpos+=fvec; //DX20200329 - faster than doing C2F constantly
-      if(SYM::MapAtom(xstr.atoms,tmp_atom,true,xstr.lattice,xstr.f2c,skew,tolerance)){ //DX20190619 - removed c2f
-        count++;
-      }
-      // match not found, violates periodicity, return immediately
-      else { return false; }
-    }
-    return (count == natoms);
-  }
-}
 
 // ***************************************************************************
 // compare::GetLFASupercell()
@@ -7281,7 +7250,7 @@ void XtalFinderCalculator::findSimilarTranslationVectors(
     // Removing non-periodic lattice vectors
     vector<xvector<double> > lattice_vecs_periodic;
     for(uint i=0;i<lattice_vecs.size();i++){
-      if(compare::vectorPeriodic(lattice_vecs[i],xstr)){ //DX20190701 - xstr_LFA_supercell to xstr
+      if(isTranslationVector(xstr,lattice_vecs[i],0.5,false)){
         lattice_vecs_periodic.push_back(lattice_vecs[i]);
       }
     }

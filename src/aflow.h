@@ -2470,6 +2470,7 @@ xstructure GetPrimitive(const xstructure& a,double tol);
 xstructure GetPrimitive1(const xstructure& a);
 xstructure GetPrimitive2(const xstructure& a);
 xstructure GetPrimitive3(const xstructure& a);
+bool isTranslationVector(const xstructure& xstr, const xvector<double>& vec, double tolerance=0.5, bool is_frac=false); //DX20210316
 bool IsTranslationFVector(const xstructure& a,const xvector<double>& ftvec);
 bool IsTranslationCVector(const xstructure& a,const xvector<double>& ctvec);
 // other eggs
@@ -3913,6 +3914,7 @@ namespace plotter {
       const xKPOINTS &xkpts, xoption &xopt, ofstream &FileMESSAGE, ostream &oss);//AS20201102
 
   // DOS
+  bool dosDataAvailable(const deque<deque<deque<deque<double> > > >& vdos, int pdos); // ME20200305
   void generateDosPlot(stringstream&, const xDOSCAR&, const aurostd::xoption&,ostream& oss=cout);  //CO20200404
   void generateDosPlot(stringstream&, const xDOSCAR&, const aurostd::xoption&,ofstream& FileMESSAGE,ostream& oss=cout);  //CO20200404
 
@@ -4396,6 +4398,7 @@ namespace LATTICE {
   string ConventionalLattice_SpaceGroup(uint sg,double a,double b,double c);
   string ConventionalLattice_SpaceGroup(uint sg,const xstructure& str);
   xvector<double> Getabc_angles_Conventional(const xmatrix<double>& rlattice, string lattice,int mode);
+  void findLattices(const vector<xvector<double> >& translation_vectors,const xmatrix<double>& lattice_original,vector<xmatrix<double> >& lattices,vector<xmatrix<double> >& lattices_aaa,const string& crystal_system,double eps); //DX20210316
   bool fix_sts_sp(xstructure& str_sp,xmatrix<double> &rlattice,xmatrix<double> &plattice);
   bool Standard_Lattice_Structure(const xstructure& str_in,xstructure& str_sp,xstructure& str_sc,bool full_sym=true);
   bool Standard_Lattice_StructureDefault(const xstructure& str_in,xstructure& str_sp,xstructure& str_sc,bool full_sym=true);
