@@ -1280,7 +1280,7 @@ vector<string> xstructure::GetElements(bool clean_name, bool fake_names){
 
   // ---------------------------------------------------------------------------
   // 1) try xstructure.species
-  if(!species.size()){
+  if(species.size() != 0){ //DX20210315 
     if(clean_name){
       vector<string> vspecies;
       for(uint i=0;i<species.size();i++){
@@ -12618,6 +12618,51 @@ xstructure BringInWignerSeitz(const xstructure& a) {
 //#define IsTranslationFVector IsTranslationFVectorFAST_2011
 #define IsTranslationFVector IsTranslationFVectorORIGINAL_2011
 
+// isTranslationVector() //DX20210316 - moved from XtalFinder
+// faster than subsequent variants below and more robust
+bool isTranslationVector(const xstructure& xstr, const xvector<double>& vec, double tolerance, bool is_frac){
+
+  // Check if input vector is a translation vector (i.e. preserves periodicity)
+  // tolerance: default is half an Angstrom
+  // (tolerance example: need at least tol=0.1 for As1_ICSD_158474 == As1_ICSD_162840 via XtalFinder)
+
+  if(tolerance<_ZERO_TOL_) {
+    string function_name = XPID + "isTranslationVector():";
+    stringstream message;
+    message << "Zero tolerance: " << tolerance;
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_VALUE_ILLEGAL_);
+  }
+
+  xvector<double> cvec, fvec;
+  if(is_frac){
+    fvec = vec;
+    cvec = F2C(xstr.lattice,vec);
+  }
+  else{
+    fvec = C2F(xstr.lattice,vec);
+    cvec = vec;
+  }
+
+  uint natoms = xstr.atoms.size();
+  bool skew = false;
+  uint count=0;
+
+  // ---------------------------------------------------------------------------
+  // check if applying the translation maps to another atom
+  // use MapAtom to match type/name/spin/occupation/etc.
+  for(uint d=0;d<natoms;d++){
+    _atom tmp_atom = xstr.atoms[d];
+    tmp_atom.cpos+=cvec;
+    tmp_atom.fpos+=fvec;
+    if(SYM::MapAtom(xstr.atoms,tmp_atom,true,xstr.lattice,xstr.f2c,skew,tolerance)){
+      count++;
+    }
+    // match not found, violates periodicity, return immediately
+    else { return false; }
+  }
+  return (count == natoms);
+}
+
 bool IsTranslationFVectorFAST(const xstructure& a, const xvector<double>& ftvec) {
   string function_name = XPID + "IsTranslationFVectorFAST():";
   stringstream message;
@@ -17392,6 +17437,7 @@ void xstructure::ChangeBasis(const xmatrix<double>& transformation_matrix) {
   uint natoms_orig = (*this).atoms.size();
   uint natoms_transformed = 0;
   bool is_integer_multiple_transformation = true;
+  double tol=(*this).dist_nn_min-0.1; //DX20210316 - 0.1 is not robust, used slightly less than min dist
 
   // ---------------------------------------------------------------------------
   // transform the lattice 
@@ -17416,7 +17462,9 @@ void xstructure::ChangeBasis(const xmatrix<double>& transformation_matrix) {
       atom_tmp.fpos=forig2fnew*((*this).atoms[i].fpos);
       atom_tmp.fpos=::BringInCell(atom_tmp.fpos+translations[t]);
       atom_tmp.cpos=f2c*atom_tmp.fpos;
-      atom_basis.push_back(atom_tmp);
+      if(!SYM::MapAtom(atom_basis, atom_tmp, true, (*this).lattice, false, tol)){ //DX20210324 - to account for duplicate translations
+        atom_basis.push_back(atom_tmp);
+      }
     }
   }
 
@@ -17433,13 +17481,12 @@ void xstructure::ChangeBasis(const xmatrix<double>& transformation_matrix) {
     if(LDEBUG){ cerr << function_name << " removing duplicate atoms (cell has been reduced)." << endl; }
 
     bool skew = false;
-    double tol=0.01;
     deque<_atom> new_basis = ::foldAtomsInCell(atom_basis, lattice_orig, (*this).lattice, skew, tol, false); //false: don't check atom mappings (slow) //DX20210118 - add global namespace
     atom_basis = new_basis;
 
     // check atom count
     natoms_transformed = atom_basis.size();
-    is_integer_multiple_transformation = (natoms_orig%natoms_transformed==0);
+    is_integer_multiple_transformation = ((*this).num_each_type.size() == 1 || natoms_orig%natoms_transformed==0); //DX20210316 - integer multiple does not apply to unaries
   }
   // ---------------------------------------------------------------------------
   // enlarge the cell: update the atom count information
@@ -17447,7 +17494,7 @@ void xstructure::ChangeBasis(const xmatrix<double>& transformation_matrix) {
     if(LDEBUG){ cerr << function_name << " cell size has increased." << endl; }
     // check atom count
     natoms_transformed = atom_basis.size();
-    is_integer_multiple_transformation = (natoms_transformed%natoms_orig==0);
+    is_integer_multiple_transformation = ((*this).num_each_type.size() == 1 || natoms_transformed%natoms_orig==0); //DX20210316 - integer multiple does not apply to unaries
   }
 
   // ---------------------------------------------------------------------------
