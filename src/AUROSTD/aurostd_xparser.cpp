@@ -548,7 +548,7 @@ namespace aurostd {
 
   //extractJsonKeysAflow//////////////////////////////////////////////////////
   // This function extracts keys from an aflowlib.json file. It is much
-  // faster than using SQLite's JSON extension, but has was designed to only
+  // faster than using SQLite's JSON extension, but was designed to only
   // work for the aflowlib.json. It cannot handle nested JSONs!
   vector<string> extractJsonKeysAflow(const string& json) {
     vector<string> keys;
