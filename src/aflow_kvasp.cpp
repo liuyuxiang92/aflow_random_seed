@@ -739,9 +739,9 @@ namespace KBIN {
     // [OBSOLETE] vflags.KBIN_VASP_REPEAT_DELSOL       = aurostd::FileExist(aflags.Directory+string("/REPEAT_DELSOL")) || aurostd::substring2bool(AflowIn,"[VASP_RUN_REPEAT_DELSOL]") || aurostd::substring2bool(AflowIn,"[VASP_RUN]REPEAT_DELSOL]");
 
     vflags.KBIN_VASP_REPEAT.clear();
-    if(aurostd::FileExist(aflags.Directory+string("/REPEAT_BANDS")) || aurostd::substring2bool(AflowIn,"[VASP_RUN_REPEAT_BANDS]") || aurostd::substring2bool(AflowIn,"[VASP_RUN]REPEAT_BANDS]")) vflags.KBIN_VASP_REPEAT.push("REPEAT_BANDS");
-    if(aurostd::FileExist(aflags.Directory+string("/REPEAT_STATIC_BANDS")) || aurostd::substring2bool(AflowIn,"[VASP_RUN_REPEAT_STATIC_BANDS]") || aurostd::substring2bool(AflowIn,"[VASP_RUN]REPEAT_STATIC_BANDS]")) vflags.KBIN_VASP_REPEAT.push("REPEAT_STATIC_BANDS");
-    if(aurostd::FileExist(aflags.Directory+string("/REPEAT_DELSOL")) || aurostd::substring2bool(AflowIn,"[VASP_RUN_REPEAT_DELSOL]") || aurostd::substring2bool(AflowIn,"[VASP_RUN]REPEAT_DELSOL]")) vflags.KBIN_VASP_REPEAT.push("REPEAT_DELSOL");
+    if(aurostd::FileExist(aflags.Directory+string("/REPEAT_BANDS")) || aurostd::substring2bool(AflowIn,"[VASP_RUN_REPEAT_BANDS]") || aurostd::substring2bool(AflowIn,"[VASP_RUN]REPEAT_BANDS")) vflags.KBIN_VASP_REPEAT.push("REPEAT_BANDS"); //CO20210315 - fixing typo
+    if(aurostd::FileExist(aflags.Directory+string("/REPEAT_STATIC_BANDS")) || aurostd::substring2bool(AflowIn,"[VASP_RUN_REPEAT_STATIC_BANDS]") || aurostd::substring2bool(AflowIn,"[VASP_RUN]REPEAT_STATIC_BANDS")) vflags.KBIN_VASP_REPEAT.push("REPEAT_STATIC_BANDS"); //CO20210315 - fixing typo
+    if(aurostd::FileExist(aflags.Directory+string("/REPEAT_DELSOL")) || aurostd::substring2bool(AflowIn,"[VASP_RUN_REPEAT_DELSOL]") || aurostd::substring2bool(AflowIn,"[VASP_RUN]REPEAT_DELSOL")) vflags.KBIN_VASP_REPEAT.push("REPEAT_DELSOL"); //CO20210315 - fixing typo
 
 
     if(vflags.KBIN_VASP_REPEAT.flag("REPEAT_STATIC_BANDS")) cout << "vflags.KBIN_VASP_REPEAT.flag(\"REPEAT_STATIC_BANDS\")" << endl;
@@ -2263,6 +2263,8 @@ namespace KBIN {
                     aus << "XXXXX ---------------------------------------------------------------------------------------------- " << endl;
                     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
                   }
+                  // clean up worthless stuff
+                  aurostd::execute("cd "+xvasp.Directory+" && rm -f *bands* *static* "+DEFAULT_AFLOW_END_OUT+"*");  //CO20210315 - delete aflow.end.out for --monitor_vasp
                   // UNZIP EVERYTHING
                   for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed 
                     // aurostd::execute("cd "+xvasp.Directory+" && "+"bzip2 -dfq *bz2 "); // ORIGINAL
@@ -2279,8 +2281,8 @@ namespace KBIN {
                       throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, aus.str(), _RUNTIME_ERROR_);
                     }
                   }
-                  // clean up worthless stuff
-                  aurostd::execute("cd "+xvasp.Directory+" && rm -f *bands* *static*");
+                  //[CO20210315 - do before unzip]// clean up worthless stuff
+                  //[CO20210315 - do before unzip]aurostd::execute("cd "+xvasp.Directory+" && rm -f *bands* *static*");
                 } // vflags.KBIN_VASP_REPEAT.flag("REPEAT_STATIC_BANDS")
                 // REPEAT_BANDS PART ----------------------------------------------------------------------------
                 if(vflags.KBIN_VASP_REPEAT.flag("REPEAT_BANDS")) {
@@ -2295,6 +2297,8 @@ namespace KBIN {
                     aus << "XXXXX ---------------------------------------------------------------------------------------------- " << endl;
                     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
                   }
+                  // clean up worthless stuff
+                  aurostd::execute("cd "+xvasp.Directory+" && rm -f *bands* "+DEFAULT_AFLOW_END_OUT+"*"); //CO20210315 - delete aflow.end.out for --monitor_vasp
                   // UNZIP EVERYTHING
                   for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed 
                     // aurostd::execute("cd "+xvasp.Directory+" && "+"bzip2 -dfq *bz2 "); // ORIGINAL
@@ -2308,8 +2312,8 @@ namespace KBIN {
                     aus << "REPEAT_BANDS: STATIC must be present.";
                     throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, aus.str(), _RUNTIME_ERROR_);
                   }
-                  // clean up worthless stuff
-                  aurostd::execute("cd "+xvasp.Directory+" && rm -f *bands* ");
+                  //[CO20210315 - do before unzip]// clean up worthless stuff
+                  //[CO20210315 - do before unzip]aurostd::execute("cd "+xvasp.Directory+" && rm -f *bands* ");
                 } // vflags.KBIN_VASP_REPEAT.flag("REPEAT_BANDS")
                 // STATIC PART ----------------------------------------------------------------------------
                 // STATIC PART ----------------------------------------------------------------------------
@@ -2933,7 +2937,17 @@ int CheckStringInFile(string FileIn,string str,int PID,int TID) { //CO20200502 -
 
 namespace KBIN {
   bool ReachedAccuracy2bool(const string& scheme,const aurostd::xoption& xRequiresAccuracy,const aurostd::xoption& xmessage,bool vasp_still_running){
+    bool LDEBUG=(true || _DEBUG_KVASP_ || XHOST.DEBUG);
+    string soliloquy=XPID+"KBIN::ReachedAccuracy2bool():";
+
+    if(LDEBUG){
+      cerr << soliloquy << " xRequiresAccuracy.flag(\"" << scheme << "\")=" << xRequiresAccuracy.flag(scheme) << endl;
+      cerr << soliloquy << " vasp_still_running=" << vasp_still_running << endl;
+      cerr << soliloquy << " xmessage.flag(\"REACHED_ACCURACY\")=" << xmessage.flag("REACHED_ACCURACY") << endl;
+    }
+
     if(xRequiresAccuracy.flag(scheme)==false){return true;}  //this scheme does not require xmessage.flag("REACHED_ACCURACY"), return true for '&&' logic
+
     return (vasp_still_running==false && xmessage.flag("REACHED_ACCURACY")==false);
   }
   void VASP_ProcessWarnings(_xvasp &xvasp,_aflags &aflags,_kflags &kflags,aurostd::xoption& xmessage,aurostd::xoption& xwarning,ofstream &FileMESSAGE) { //CO20210315
@@ -3038,10 +3052,20 @@ namespace KBIN {
     //WARNINGS START
     if(LDEBUG){aus << soliloquy << " checking warnings" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
     xwarning.flag("OUTCAR_INCOMPLETE",vasp_still_running==false && !KBIN::VASP_RunFinished(xvasp,aflags,FileMESSAGE,false));  //CO20201111
-    xmessage.flag("REACHED_ACCURACY",
-        ( relaxing==true  && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"reached required accuracy",true,true,true,grep_stop_condition) ) ||
-        ( relaxing==false && vasp_oszicar_unconverged==false && xwarning.flag("OUTCAR_INCOMPLETE")==false ) || //CO20210315 - "reached accuracy" for static/bands calculation is a converged electronic scf, need to also check OUTCAR_INCOMPLETE, as a converged OSZICAR might actually be a run that ended because of an error
-        FALSE);
+    xmessage.flag("REACHED_ACCURACY",vasp_still_running==false &&
+        ( ( relaxing==true  && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"reached required accuracy",true,true,true,grep_stop_condition) ) ||
+          ( relaxing==false && vasp_oszicar_unconverged==false && xwarning.flag("OUTCAR_INCOMPLETE")==false ) || //CO20210315 - "reached accuracy" for static/bands calculation is a converged electronic scf, need to also check OUTCAR_INCOMPLETE, as a converged OSZICAR might actually be a run that ended because of an error
+          FALSE) 
+        );
+    
+    if(LDEBUG){
+      aus << soliloquy << " relaxing=" << relaxing << endl;
+      aus << soliloquy << " vasp_oszicar_unconverged=" << vasp_oszicar_unconverged << endl;
+      aus << soliloquy << " xwarning.flag(\"OUTCAR_INCOMPLETE\")=" << xwarning.flag("OUTCAR_INCOMPLETE") << endl;
+      aus << soliloquy << " xmessage.flag(\"REACHED_ACCURACY\")=" << xmessage.flag("REACHED_ACCURACY") << endl;
+      cerr << aus.str();
+      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+    }
 
     string scheme="";
     bool found_warning=false;
@@ -3320,6 +3344,13 @@ namespace KBIN {
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     }
  
+    //[CO20210315 - doesn't work]//CO20210315 - this appears to fix ICSD/LIB/CUB/Ag1Sm1_ICSD_604546
+    //[CO20210315 - doesn't work]if(xwarning.flag("EDDRMM") && xwarning.flag("ZPOTRF")){ // fix EDDRMM first
+    //[CO20210315 - doesn't work]  aus << "MMMMM  MESSAGE ignoring xwarning.flag(\"ZPOTRF\"): prioritizing xwarning.flag(\"EDDRMM\")" << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+    //[CO20210315 - doesn't work]  xwarning.flag("ZPOTRF",FALSE);
+    //[CO20210315 - doesn't work]  //we don't need an xmonitor here, this is only for prioritizing errors
+    //[CO20210315 - doesn't work]}
+    
     ///////////////////////////////////////////////////////////////////////////////////////////////
     //must do before RMM_DIIS and ROTMAT
     if(vasp_monitor_running){
@@ -3362,14 +3393,17 @@ namespace KBIN {
     //[CO20210315 - OBSOLETE]}
 
     //CO20210315 - only ignore KKSYM if OUTCAR is not registered as incomplete
-    if( ( xwarning.flag("KKSYM") ) && ( xwarning.flag("OUTCAR_INCOMPLETE")==false ) && 
+    if( ( xwarning.flag("KKSYM") ) && 
         ((ispin_current==2 && isym_current==-1) || (ispin_current==1 && isym_current==0))){  //CO20200624 - needs to change if we do magnetic systems //ispind_current==2 &&
       if(!xmonitor.flag("IGNORING_WARNINGS:KKSYM")){
-        aus << "MMMMM  MESSAGE ignoring KKSYM warnings: ISYM=" << isym_current << " ISPIN=" << ispin_current << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+        aus << "MMMMM  MESSAGE ignoring KKSYM warning: ISYM=" << isym_current << " ISPIN=" << ispin_current << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
         xmonitor.flag("IGNORING_WARNINGS:KKSYM",TRUE);  //so we don't clog output files
       }
       xwarning.flag("KKSYM",FALSE);
-      xwarning.flag("IBZKPT",FALSE);  //goes with KKSYM
+      if(xwarning.flag("IBZKPT") && xwarning.flag("OUTCAR_INCOMPLETE")==false){  //goes with KKSYM
+        aus << "MMMMM  MESSAGE ignoring IBZKPT warning associated with KKSYM: ISYM=" << isym_current << " ISPIN=" << ispin_current << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+        xwarning.flag("IBZKPT",FALSE);
+      }
     }
 
     //do last
@@ -3446,16 +3480,34 @@ namespace KBIN {
 namespace KBIN {
   bool VASP_Error2Fix(const string& error,_xvasp &xvasp,aurostd::xoption& xwarning,aurostd::xoption& xfixed,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE) { //CO20210315
     int submode=0; //default
-    return VASP_Error2Fix(error,error,submode,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
+    bool try_last_ditch_efforts=true; //default
+    return VASP_Error2Fix(error,error,submode,try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
   }
   bool VASP_Error2Fix(const string& error,const string& mode,_xvasp &xvasp,aurostd::xoption& xwarning,aurostd::xoption& xfixed,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE) {  //CO20210315
     int submode=0; //default
-    return VASP_Error2Fix(error,mode,submode,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
+    bool try_last_ditch_efforts=true; //default
+    return VASP_Error2Fix(error,mode,submode,try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
   }
   bool VASP_Error2Fix(const string& error,int& submode,_xvasp &xvasp,aurostd::xoption& xwarning,aurostd::xoption& xfixed,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE) { //CO20210315
-    return VASP_Error2Fix(error,error,submode,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
+    bool try_last_ditch_efforts=true; //default
+    return VASP_Error2Fix(error,error,submode,try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
   }
   bool VASP_Error2Fix(const string& error,const string& mode,int& submode,_xvasp &xvasp,aurostd::xoption& xwarning,aurostd::xoption& xfixed,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE) {  //CO20210315
+    bool try_last_ditch_efforts=true; //default
+    return VASP_Error2Fix(error,mode,submode,try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
+  }
+  bool VASP_Error2Fix(const string& error,bool try_last_ditch_efforts,_xvasp &xvasp,aurostd::xoption& xwarning,aurostd::xoption& xfixed,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE) { //CO20210315
+    int submode=0; //default
+    return VASP_Error2Fix(error,error,submode,try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
+  }
+  bool VASP_Error2Fix(const string& error,const string& mode,bool try_last_ditch_efforts,_xvasp &xvasp,aurostd::xoption& xwarning,aurostd::xoption& xfixed,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE) {  //CO20210315
+    int submode=0; //default
+    return VASP_Error2Fix(error,mode,submode,try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
+  }
+  bool VASP_Error2Fix(const string& error,int& submode,bool try_last_ditch_efforts,_xvasp &xvasp,aurostd::xoption& xwarning,aurostd::xoption& xfixed,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE) { //CO20210315
+    return VASP_Error2Fix(error,error,submode,try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
+  }
+  bool VASP_Error2Fix(const string& error,const string& mode,int& submode,bool try_last_ditch_efforts,_xvasp &xvasp,aurostd::xoption& xwarning,aurostd::xoption& xfixed,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE) {  //CO20210315
     bool LDEBUG=(true || _DEBUG_KVASP_ || XHOST.DEBUG);
     string soliloquy=XPID+"KBIN::VASP_Error2Fix():";
     stringstream aus;
@@ -3476,7 +3528,7 @@ namespace KBIN {
     }
     //do not reference submode below KBIN::XVASP_Afix(), as it will have been incremented (perhaps by 2)
     //if KBIN::XVASP_Afix() fails, submode will be restored to original, so it is okay to reference for the LDEBUG statement
-    if(apply_fix && !KBIN::XVASP_Afix(mode,submode,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE)){   //CO20210315
+    if(apply_fix && !KBIN::XVASP_Afix(mode,submode,try_last_ditch_efforts,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE)){   //CO20210315
       if(LDEBUG){aus << soliloquy << " KBIN::XVASP_Afix(mode=" << mode << (submode>=0?",submode="+aurostd::utype2string(submode):"") << ") failed" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}  //if KBIN::XVASP_Afix() fails, submode will be restored to original, so it is okay to reference for the LDEBUG statement
       apply_fix=false;
     }
@@ -3503,60 +3555,66 @@ namespace KBIN {
     //check also submode fixes
    
     bool fixed_applied=false;
+    bool try_last_ditch_efforts=true;
+    uint i=0;
 
-    //check NBANDS/LRF_COMMUTATOR problems immediately
-    fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("NBANDS",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
-    //[CO20210315 - fix previously removed]KBIN::VASP_Error2Fix("LRF_COMMUTATOR",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
+    for(i=0;i<2&&fixed_applied==false;i++){
+      try_last_ditch_efforts=(i==1);
 
-    //fix symmetry issues next
-    fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("GAMMA_SHIFT",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
-    // ********* APPLY PREFERRED SYMMETRY FIXES ******************  //all of these must come before ROTMAT
-    fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("NKXYZ_IKPTD",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));  //must come before IBZKPT
-    fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("KKSYM",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));  //must come before IBZKPT
-    fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("IBZKPT",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
-    fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("SYMPREC",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));  //must come before INVGRP
-    fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("INVGRP","SYMPREC",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
-    fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("SGRCON","SYMPREC",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
-    // ********* APPLY GENERIC SYMMETRY FIXES ******************
-    fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("ROTMAT",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
-    
-    //fix MPI/NPAR problems next
-    fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("MPICH11",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
-    fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("MPICH139",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
-    fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("MPICH174","MPICH11",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE)); //CO20210315 - testing, exit code 174 looks like an error on the node, basically try rerunning with more memory
-    fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("NPAR",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
-    fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("NPARC",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
-    fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("NPARN",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
-    fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("NPAR_REMOVE",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+      //check NBANDS/LRF_COMMUTATOR problems immediately
+      fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("NBANDS",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+      //[CO20210315 - fix previously removed]KBIN::VASP_Error2Fix("LRF_COMMUTATOR",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
 
-    //all other fixes, no priority here (alphabetic order)
-    // ********* APPLY OTHER FIXES ******************
-    fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("BRMIX",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
-    fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("CSLOSHING",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE)); //must come before NELM
-    fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("DAV",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
-    fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("DENTET",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
-    fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("EDDDAV",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
-    fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("EDDRMM","RMM_DIIS",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
-    fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("EFIELD_PEAD",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
-    fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("EXCCOR",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
-    fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("MEMORY",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
-    fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("NATOMS",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
-    fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("PSMAXN",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
-    fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("REAL_OPTLAY_1","LREAL",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
-    fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("REAL_OPT","LREAL",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
-    fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("ZPOTRF",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
-    
-    //patch only if above warnings are not patched first
-    fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("NELM",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
-    
-    //apply these last if no other fixes worked
-    // ********* APPLY PREFERRED RMM-DIIS FIXES ******************  //all of these must come before RMM-DIIS
-    fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("ZBRENT",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
-    // ********* APPLY GENERIC RMM-DIIS FIXES ******************
-    fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("RMM_DIIS",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
-    
-    //[CO20210315 - do not apply patches for frozen calc]//CO20210315 - do last, fixes assume out-of-memory error
-    //[CO20210315 - do not apply patches for frozen calc]fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("CALC_FROZEN","MEMORY",xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+      //fix symmetry issues next
+      fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("GAMMA_SHIFT",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+      // ********* APPLY PREFERRED SYMMETRY FIXES ******************  //all of these must come before ROTMAT
+      fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("NKXYZ_IKPTD",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));  //must come before IBZKPT
+      fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("KKSYM",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));  //must come before IBZKPT
+      fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("IBZKPT",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+      fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("SYMPREC",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));  //must come before INVGRP
+      fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("INVGRP","SYMPREC",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+      fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("SGRCON","SYMPREC",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+      // ********* APPLY GENERIC SYMMETRY FIXES ******************
+      fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("ROTMAT",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+      
+      //fix MPI/NPAR problems next
+      fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("MPICH11",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+      fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("MPICH139",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+      fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("MPICH174","MPICH11",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE)); //CO20210315 - testing, exit code 174 looks like an error on the node, basically try rerunning with more memory
+      fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("NPAR",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+      fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("NPARC",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+      fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("NPARN",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+      fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("NPAR_REMOVE",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+
+      //all other fixes, no priority here (alphabetic order)
+      // ********* APPLY OTHER FIXES ******************
+      fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("BRMIX",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+      fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("CSLOSHING",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE)); //must come before NELM
+      fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("DAV",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+      fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("DENTET",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+      fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("EDDDAV",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+      fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("EDDRMM","RMM_DIIS",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+      fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("EFIELD_PEAD",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+      fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("EXCCOR",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+      fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("MEMORY",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+      fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("NATOMS",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+      fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("PSMAXN",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+      fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("REAL_OPTLAY_1","LREAL",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+      fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("REAL_OPT","LREAL",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+      fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("ZPOTRF",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+      
+      //patch only if above warnings are not patched first
+      fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("NELM",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+      
+      //apply these last if no other fixes worked
+      // ********* APPLY PREFERRED RMM-DIIS FIXES ******************  //all of these must come before RMM-DIIS
+      fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("ZBRENT",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+      // ********* APPLY GENERIC RMM-DIIS FIXES ******************
+      fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("RMM_DIIS",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+      
+      //[CO20210315 - do not apply patches for frozen calc]//CO20210315 - do last, fixes assume out-of-memory error
+      //[CO20210315 - do not apply patches for frozen calc]fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("CALC_FROZEN","MEMORY",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+    }
     
     //print out all xfixed BEFORE adding "ALL"
     std::sort(xfixed.vxscheme.begin(),xfixed.vxscheme.end()); //sort for printing
@@ -4720,14 +4778,42 @@ namespace KBIN {
     return NELM;
   }
   uint VASP_getNSTEPS(const string& oszicar){  //CO20200624
-    bool LDEBUG=(FALSE || _DEBUG_KVASP_ || XHOST.DEBUG);
+    bool LDEBUG=(true || _DEBUG_KVASP_ || XHOST.DEBUG);
     string soliloquy=XPID+"KBIN::VASP_getNSTEPS():";
     stringstream command;
     command << aurostd::GetCatCommand(oszicar) << " " << oszicar << " | grep ':' | tail -n 1 | cut -d ':' -f2 | awk '{print $1}'" << endl;
     string tmp=aurostd::execute2string(command);
     if(LDEBUG){cerr << soliloquy << " " << oszicar << " NSTEPS grep response=\"" << tmp << "\"" << endl;}
     int NSTEPS=0;  //VASP default
-    if(!tmp.empty() && aurostd::isfloat(tmp)){NSTEPS=aurostd::string2utype<int>(tmp);}
+    if(!tmp.empty()){
+      if(aurostd::isfloat(tmp)){NSTEPS=aurostd::string2utype<int>(tmp);}
+      else if(tmp.find("*")!=string::npos){
+        if(LDEBUG){cerr << soliloquy << " found number bigger than 999" << endl;}
+        vector<string> vlines,tokens;
+        aurostd::efile2vectorstring(oszicar,vlines);
+        bool found_F_line=false;
+        uint i=0,j=0,nsteps=0;
+        for(i=vlines.size()-1;i<vlines.size()&&NSTEPS==0;i--){ //go backwards
+          if(found_F_line){
+            aurostd::string2tokens(vlines[i],tokens," ");
+            if(tokens.size()<2){continue;}
+            if(tokens[0].find(":")==string::npos){continue;}  //safety check, should be "DAV:" or "RMM:"
+            tmp=tokens[1];
+            if(aurostd::isfloat(tmp)){
+              nsteps=aurostd::string2utype<uint>(tmp);
+              if(LDEBUG){
+                cerr << soliloquy << " last countable nstep: " << nsteps << endl;
+                cerr << soliloquy << " steps after last counterable NSTEP: " << j << endl;
+              }
+              NSTEPS=nsteps+j;
+              if(LDEBUG){cerr << soliloquy << " NSTEPS=" << NSTEPS << endl;}
+            }
+            else{j++;}
+          }
+          if(vlines[i].find("F=")!=string::npos){found_F_line=true;continue;}
+        }
+      }
+    }
     return NSTEPS;
   }
   bool VASP_OSZICARUnconverging(const string& dir,uint cutoff) {
@@ -4760,8 +4846,14 @@ namespace KBIN {
   }
   bool VASP_OSZICARUnconverged(const string& oszicar,const string& outcar) {
     //we only care about the last electronic SC steps
+    bool LDEBUG=(true || _DEBUG_KVASP_ || XHOST.DEBUG);
+    string soliloquy=XPID+"KBIN::VASP_OSZICARUnconverged():";
     uint NELM=KBIN::VASP_getNELM(outcar);
     uint NSTEPS=KBIN::VASP_getNSTEPS(oszicar);
+    if(LDEBUG){
+      cerr << soliloquy << " NELM=" << NELM << endl;
+      cerr << soliloquy << " NSTEPS=" << NSTEPS << endl;
+    }
     if(NELM!=0 && NSTEPS!=0 && NSTEPS>=NELM){return true;}
     return false;
   }
