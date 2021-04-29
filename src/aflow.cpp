@@ -403,8 +403,8 @@ bool coordinationTest(ofstream& FileMESSAGE,ostream& oss){  //CO20190520
   return TRUE; //CO20180419
 }
 
-bool PrototypeGeneratorTest(ostream& oss, bool check_symmetry){ofstream FileMESSAGE;return PrototypeGeneratorTest(FileMESSAGE,oss,check_symmetry);} //DX20200925
-bool PrototypeGeneratorTest(ofstream& FileMESSAGE,ostream& oss,bool check_symmetry){  //DX20200925
+bool PrototypeGeneratorTest(ostream& oss, bool check_symmetry, bool check_uniqueness){ofstream FileMESSAGE;return PrototypeGeneratorTest(FileMESSAGE,oss,check_symmetry,check_uniqueness);} //DX20200925
+bool PrototypeGeneratorTest(ofstream& FileMESSAGE,ostream& oss,bool check_symmetry, bool check_uniqueness){  //DX20200925
   string function_name="PrototypeGeneratorTest():";
   bool LDEBUG=FALSE; // TRUE;
   stringstream message;
@@ -427,9 +427,7 @@ bool PrototypeGeneratorTest(ofstream& FileMESSAGE,ostream& oss,bool check_symmet
   message << "Number of prototype labels = " << num_protos << " (each may have multiple parameter sets)";
   pflow::logger(_AFLOW_FILE_NAME_,function_name,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
 
-  bool check_duplicates = false;//true;
   string catalog="anrl";
-
   for(uint i=0;i<num_protos;i++){
     // get parameters
     vector<string> parameter_sets = anrl::getANRLParameters(prototype_labels[i],"all");
@@ -468,8 +466,8 @@ bool PrototypeGeneratorTest(ofstream& FileMESSAGE,ostream& oss,bool check_symmet
           return false;
         }
       }
-      // check duplicates
-      if(check_duplicates){
+      // check uniqueness
+      if(check_uniqueness){
         aurostd::xoption vpflow;
         stringstream label_input_ss; label_input_ss << prototype_labels[i] << "-" << std::setw(3) << std::setfill('0') << j+1;
         string label_input = label_input_ss.str();
@@ -491,7 +489,7 @@ bool PrototypeGeneratorTest(ofstream& FileMESSAGE,ostream& oss,bool check_symmet
           pflow::logger(_AFLOW_FILE_NAME_,function_name,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
           return false;
         }
-        // if it doesn't matche with ITSELF
+        // if it doesn't match with ITSELF
         if(protos_matching.size()==0){
           message << "ERROR: " << prototype_labels[i] << " given parameters=" << parameter_sets[j] << " does NOT match to any prototypes ";
           message << "(either this system requires a special symmetry tolerance or there is a bug with XtalFinder)." << endl;
@@ -756,6 +754,7 @@ int main(int _argc,char **_argv) {
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_coordination|--coordination_test")) {return (coordinationTest()?0:1);}  //CO20190601
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_PrototypeGenerator|--PrototypeGenerator_test")) {return (PrototypeGeneratorTest()?0:1);}  //DX20200928
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_PrototypeSymmetry|--PrototypeSymmetry_test")) {return (PrototypeGeneratorTest(cout,true)?0:1);}  //DX20201105
+    if(!Arun && aurostd::args2flag(argv,cmds,"--test_PrototypeUniqueness|--PrototypeUniqueness_test")) {return (PrototypeGeneratorTest(cout,false,true)?0:1);}  //DX20210429
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_FoldAtomsInCell|--FoldAtomsInCell_test")) {return (FoldAtomsInCellTest(cout)?0:1);}  //DX20210129
     if(!Arun && aurostd::args2flag(argv,cmds,"--test")) {
 
