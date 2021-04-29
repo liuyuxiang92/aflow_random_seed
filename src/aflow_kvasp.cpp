@@ -2962,7 +2962,7 @@ namespace KBIN {
     if(!aurostd::FileExist(xvasp.Directory+"/"+DEFAULT_VASP_OUT)){return;}
     if(!aurostd::FileExist(xvasp.Directory+"/INCAR")){return;}
     if(!aurostd::FileExist(aflags.Directory+"/"+_AFLOWLOCK_)){return;} //we needed it above to get the vasp_bin
-    bool vasp_monitor_running=aurostd::FileExist(aflags.Directory+"/"+_AFLOWLOCK_+"."+FILE_VASP_MONITOR);
+    bool vasp_monitor_running=AFLOW_MONITOR_instance_running(aflags);
 
     long int tmod_outcar=aurostd::SecondsSinceFileModified(xvasp.Directory+"/"+"OUTCAR"); //better to look at OUTCAR than vasp.out, when vasp is killed you get errors in vasp.out, resetting the time
     unsigned long long int fsize_vaspout=aurostd::FileSize(xvasp.Directory+"/"+DEFAULT_VASP_OUT);
@@ -3021,7 +3021,7 @@ namespace KBIN {
     if(XHOST.vflag_control.flag("KILL_VASP_ALL")){
       //KILL_VASP_ALL allows us to check for ANY instance of vasp running (assumes exclusivity in node environment)
       //we will develop more precise methods for tracking parent/child processes of aflow to target specific vasp instances in the future
-      vasp_still_running=aurostd::ProcessRunning(vasp_bin);
+      vasp_still_running=VASP_instance_running(vasp_bin);
     }
     if(LDEBUG){aus << soliloquy << " vasp_still_running=" << vasp_still_running << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
     
