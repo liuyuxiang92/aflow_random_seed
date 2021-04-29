@@ -422,6 +422,7 @@ namespace aurostd {  // namespace aurostd
 namespace aurostd {  // namespace aurostd
   template<class utype>
     void xmatrix<utype>::setmat(const xmatrix<utype>& mat,int lrow,int lcol) { //these are the starting lrow, lcol, end is dictated by size of mat //CO20191110
+#ifndef __XMATRIX_IGNORE_BOUNDARIES
       bool LDEBUG=(FALSE || XHOST.DEBUG);
       string soliloquy="aurostd::setmat():";
       int urow=lrow+mat.rows-1; //ending row
@@ -434,14 +435,13 @@ namespace aurostd {  // namespace aurostd
       if(urow>urows){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"urow>urows",_VALUE_ILLEGAL_);}
       if(lcol<lcols){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"lcol<lcols",_VALUE_ILLEGAL_);}
       if(ucol>ucols){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"ucol>ucols",_VALUE_ILLEGAL_);}
+#endif
       for(int i=mat.lrows;i<=mat.urows;i++){
         for(int j=mat.lcols;j<=mat.ucols;j++){corpus[lrow+i-mat.lrows][lcol+j-mat.lcols]=mat[i][j];}
       }
     }
   template<class utype>
     void xmatrix<utype>::setmat(const xvector<utype>& xv,int icol,bool col) { //replace icol (col==true) or row (col==false) //CO20191110
-      bool LDEBUG=(FALSE || XHOST.DEBUG);
-      string soliloquy="aurostd::setmat():";
       int lrow=1,lcol=1,urow=1,ucol=1;
       if(col==true){
         lrow=lrows; //starting row
@@ -454,6 +454,9 @@ namespace aurostd {  // namespace aurostd
         urow=icol; //ending row
         ucol=lcols+xv.rows-1; //ending col
       }
+#ifndef __XMATRIX_IGNORE_BOUNDARIES
+      bool LDEBUG=(FALSE || XHOST.DEBUG);
+      string soliloquy="aurostd::setmat():";
       if(LDEBUG){
         cerr << soliloquy << " lrow=" << lrow << endl;
         cerr << soliloquy << " urow=" << urow << endl;
@@ -464,6 +467,7 @@ namespace aurostd {  // namespace aurostd
       if(urow>urows){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"urow>urows",_VALUE_ILLEGAL_);}
       if(lcol<lcols){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"lcol<lcols",_VALUE_ILLEGAL_);}
       if(ucol>ucols){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"ucol>ucols",_VALUE_ILLEGAL_);}
+#endif
       if(col==true){
         for(int i=xv.lrows;i<=xv.urows;i++){corpus[lrow+i-xv.lrows][icol]=xv[i];}
       }else{
