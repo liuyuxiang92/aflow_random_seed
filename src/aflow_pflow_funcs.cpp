@@ -8303,7 +8303,7 @@ namespace pflow{
     //  1) 1 (SG_SETTING_1)    = rhombohedral: rhl setting, monoclinic: unique-axis b, centrosymmetric: origin on high-symmetry site
     //  2) 2 (SG_SETTING_2)    = rhombohedral: hex setting, monoclinic: unique-axis c, centrosymmetric: origin on inversion site
     //  3) 3 (SG_SETTING_ANRL) = rhomobhedral: rhl setting, monoclinic: unique-axis b, centrosymmetric: origin on inversion site 
-    // The mode_default variable is an optional input: --prototype comman defaults to the AFLOW setting, while everything else defaults to SG_SETTING_1
+    // The mode_default variable is an optional input: --prototype command defaults to the AFLOW setting, while everything else defaults to SG_SETTING_1
 
     string function_name = XPID + "pflow::getSpaceGroupSetting():";
     stringstream message;
