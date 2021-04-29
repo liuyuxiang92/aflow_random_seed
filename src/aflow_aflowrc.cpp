@@ -300,7 +300,7 @@
 #define         DEFAULT_VASP_FORCE_OPTION_NELM                        XHOST.adefault.getattachedutype<int>("DEFAULT_VASP_FORCE_OPTION_NELM") //CO20200624
 #define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_NELM_STATIC                 120 //CO20200624
 #define         DEFAULT_VASP_FORCE_OPTION_NELM_STATIC                 XHOST.adefault.getattachedutype<int>("DEFAULT_VASP_FORCE_OPTION_NELM_STATIC")  //CO20200624
-#define AFLOWRC_MAX_VASP_NELM                                         1000  //CO20200624
+#define AFLOWRC_MAX_VASP_NELM                                         300  //CO20200624
 #define         MAX_VASP_NELM                                         XHOST.adefault.getattachedutype<int>("MAX_VASP_NELM") //CO20200624
 #define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_ABMIX_SCHEME                string("DEFAULT")
 #define         DEFAULT_VASP_FORCE_OPTION_ABMIX_SCHEME                XHOST.adefault.getattachedscheme("DEFAULT_VASP_FORCE_OPTION_ABMIX_SCHEME")

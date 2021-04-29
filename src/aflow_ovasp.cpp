@@ -1167,30 +1167,32 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
       }
     }
   }
-  if(LDEBUG) {cerr << soliloquy << " ENCUT=" << ENCUT << endl;}
-  if(LDEBUG) {cerr << soliloquy << " EDIFF=" << EDIFF << endl;}
-  if(LDEBUG) {cerr << soliloquy << " EDIFFG=" << EDIFFG << endl;}
-  if(LDEBUG) {cerr << soliloquy << " NSW=" << NSW << endl;}
-  if(LDEBUG) {cerr << soliloquy << " NBLOCK=" << NBLOCK << endl;}
-  if(LDEBUG) {cerr << soliloquy << " KBLOCK=" << KBLOCK << endl;}
-  if(LDEBUG) {cerr << soliloquy << " IBRION=" << IBRION << endl;}
-  if(LDEBUG) {cerr << soliloquy << " NFREE=" << NFREE << endl;}
-  if(LDEBUG) {cerr << soliloquy << " ISIF=" << ISIF << endl;}
-  if(LDEBUG) {cerr << soliloquy << " IWAVPR=" << IWAVPR << endl;}
-  if(LDEBUG) {cerr << soliloquy << " ISYM=" << ISYM << endl;}
-  if(LDEBUG) {cerr << soliloquy << " POTIM=" << POTIM << endl;}
-  if(LDEBUG) {cerr << soliloquy << " TEIN=" << TEIN << endl;}
-  if(LDEBUG) {cerr << soliloquy << " TEBEG=" << TEBEG << endl;}
-  if(LDEBUG) {cerr << soliloquy << " TEEND=" << TEEND << endl;}
-  if(LDEBUG) {cerr << soliloquy << " SMASS=" << SMASS << endl;}
-  if(LDEBUG) {cerr << soliloquy << " NPACO=" << NPACO << endl;}
-  if(LDEBUG) {cerr << soliloquy << " APACO=" << APACO << endl;}
-  if(LDEBUG) {cerr << soliloquy << " PSTRESS=" << PSTRESS << endl;}
-  if(LDEBUG) {cerr << soliloquy << " pressure(PSTRESS)=" << pressure << endl;}
-  if(LDEBUG) {cerr << soliloquy << " NBANDS=" << NBANDS << endl;}
-  if(LDEBUG) {cerr << soliloquy << " NKPTS=" << NKPTS << endl;}
-  if(LDEBUG) {cerr << soliloquy << " ISPIN=" << ISPIN << endl;}
-  if(LDEBUG) {cerr << soliloquy << " total_energy_change=" << total_energy_change << endl;}
+  if(LDEBUG) {
+    cerr << soliloquy << " ENCUT=" << ENCUT << endl;
+    cerr << soliloquy << " EDIFF=" << EDIFF << endl;
+    cerr << soliloquy << " EDIFFG=" << EDIFFG << endl;
+    cerr << soliloquy << " NSW=" << NSW << endl;
+    cerr << soliloquy << " NBLOCK=" << NBLOCK << endl;
+    cerr << soliloquy << " KBLOCK=" << KBLOCK << endl;
+    cerr << soliloquy << " IBRION=" << IBRION << endl;
+    cerr << soliloquy << " NFREE=" << NFREE << endl;
+    cerr << soliloquy << " ISIF=" << ISIF << endl;
+    cerr << soliloquy << " IWAVPR=" << IWAVPR << endl;
+    cerr << soliloquy << " ISYM=" << ISYM << endl;
+    cerr << soliloquy << " POTIM=" << POTIM << endl;
+    cerr << soliloquy << " TEIN=" << TEIN << endl;
+    cerr << soliloquy << " TEBEG=" << TEBEG << endl;
+    cerr << soliloquy << " TEEND=" << TEEND << endl;
+    cerr << soliloquy << " SMASS=" << SMASS << endl;
+    cerr << soliloquy << " NPACO=" << NPACO << endl;
+    cerr << soliloquy << " APACO=" << APACO << endl;
+    cerr << soliloquy << " PSTRESS=" << PSTRESS << endl;
+    cerr << soliloquy << " pressure(PSTRESS)=" << pressure << endl;
+    cerr << soliloquy << " NBANDS=" << NBANDS << endl;
+    cerr << soliloquy << " NKPTS=" << NKPTS << endl;
+    cerr << soliloquy << " ISPIN=" << ISPIN << endl;
+    cerr << soliloquy << " total_energy_change=" << total_energy_change << endl;
+  }
 
   // if pressure correct enthalpy
   // ----------------------------------------------------------------------

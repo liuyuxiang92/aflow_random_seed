@@ -3993,6 +3993,31 @@ namespace KBIN {
     // ***************************************************************************
     
     // ***************************************************************************
+    // EDIFF EDIFF EDIFF EDIFF EDIFF EDIFF
+    else if(command=="EDIFF") {
+      keyword=command;
+
+      if(Krun){
+        incar_input=keyword+"="+aurostd::utype2string(dvalue,_IVASP_DOUBLE2STRING_PRECISION_);
+        if(aurostd::kvpairfound(xvasp.INCAR,keyword,"=")){
+          incar_input_old=keyword+"="+aurostd::kvpair2value(xvasp.INCAR,keyword,"=");
+          if(incar_input==incar_input_old){Krun=false;}
+        }
+        //[CO20210315 - substring2bool() can match ENMAX=2 with ENMAX=20]if(aurostd::substring2bool(xvasp.INCAR,incar_input,true)){Krun=false;}  //remove whitespaces
+      }
+
+      if(Krun){
+        //REMOVE LINES
+        XVASP_INCAR_REMOVE_ENTRY(xvasp,keyword,operation_dvalue,VERBOSE);  //CO20200624
+        //ADD LINES
+        if(VERBOSE) xvasp.INCAR << "# Performing " << operation_dvalue << " [AFLOW] begin" << endl;
+        xvasp.INCAR << aurostd::PaddedPOST(incar_input,_incarpad_) << " # " << operation_dvalue << endl;
+        if(VERBOSE) xvasp.INCAR << "# Performing " << operation_dvalue << " [AFLOW] end" << endl;
+      }
+    }
+    // ***************************************************************************
+    
+    // ***************************************************************************
     // EDIFFG EDIFFG EDIFFG EDIFFG EDIFFG EDIFFG
     else if(command=="EDIFFG") {
       keyword=command;
@@ -6332,6 +6357,31 @@ namespace KBIN {
       //END - load INCAR into xvasp, modify, then write out new INCAR
       if(Krun){aus << "MMMMM  MESSAGE applied FIX=\"" << fix << "\"" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
     }
+    else if(fix=="EDIFF") { //CO20210315
+      if(Krun && VERBOSE){aus << "MMMMM  MESSAGE attempting FIX=\"" << fix << "\"" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+      //START - load INCAR into xvasp, modify, then write out new INCAR
+      Krun=(Krun && VASP_Reread_INCAR(xvasp));  //preload incar
+      if(Krun){
+        param_double=AUROSTD_MAX_DOUBLE;
+        //try OUTCAR first
+        if(param_double==AUROSTD_MAX_DOUBLE && aurostd::FileExist(xvasp.Directory+"/OUTCAR")&&aurostd::FileNotEmpty(xvasp.Directory+"/OUTCAR")){
+          xOUTCAR OUTCAR(xvasp.Directory+"/OUTCAR",true); //quiet, there might be issues with halfway-written OUTCARs
+          param_double=OUTCAR.EDIFF;
+        }
+        //try INCAR next
+        if(param_double==AUROSTD_MAX_DOUBLE && aurostd::kvpairfound(xvasp.INCAR,"EDIFF","=")){
+          param_double=aurostd::kvpair2utype<double>(xvasp.INCAR,"EDIFF","=");
+        }
+        if(param_double==AUROSTD_MAX_DOUBLE){param_double=1e-4;}  //default for vasp
+        param_double*=10; //increase by an order of magnitdue
+      }
+      Krun=(Krun && KBIN::XVASP_INCAR_PREPARE_GENERIC("EDIFF",xvasp,vflags,"",0,param_double,FALSE));
+      if(xvasp.aopts.flag("FLAG::AFIX_DRYRUN")==false){
+        Krun=(Krun && aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR"))); //write out incar
+      }
+      //END - load INCAR into xvasp, modify, then write out new INCAR
+      if(Krun){aus << "MMMMM  MESSAGE applied FIX=\"" << fix << "\"=" << param_double << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+    }
     else if(fix=="EFIELD_PEAD") {
       if(Krun && VERBOSE){aus << "MMMMM  MESSAGE attempting FIX=\"" << fix << "\"" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
       //START - load INCAR into xvasp, modify, then write out new INCAR
@@ -6926,7 +6976,7 @@ namespace KBIN {
     }
     else if(mode=="NELM") { //CSLOSHING solutions should be tried first
       if(submode<0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"no submode set: \""+mode+"\"",_INPUT_ILLEGAL_);}  //CO20210315
-      if(submode==0){ //AMIX/BMIX fixes
+      if(submode==0){ //AMIX/BMIX fixes, helps here: ICSD/LIB/CUB/Pd1Tm1_ICSD_649071
         bool Krun1=true;fix="AMIX=0.1";
         bool ignorefix1=XVASP_Afix_IgnoreFix(fix,vflags);
         if(ignorefix1){Krun1=false;}
@@ -6968,7 +7018,22 @@ namespace KBIN {
         Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
-      if(submode>=3){Krun=false;}
+      if(submode==3){ //desperate attempt 2, also increase EDIFF, sometimes the threshold is just a bit too high
+        bool Krun1=true;fix="NELM";
+        bool ignorefix1=XVASP_Afix_IgnoreFix(fix,vflags);
+        if(ignorefix1){Krun1=false;}
+        Krun1=(Krun1 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
+
+        bool Krun2=true;fix="EDIFF";
+        bool ignorefix2=XVASP_Afix_IgnoreFix(fix,vflags);
+        if(ignorefix2){Krun2=false;}
+        Krun2=(Krun2 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
+
+        Krun=(Krun1||Krun2);
+        //no need to remove these settings if it fails
+        if(!Krun){Krun=true;submode++;} //reset and go to the next solution
+      }
+      if(submode>=4){Krun=false;}
       submode+=submode_increment;submode_increment=1;  //increment and reset
     }
     else if(mode=="NKXYZ_IKPTD") {

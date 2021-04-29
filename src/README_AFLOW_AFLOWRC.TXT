@@ -718,7 +718,7 @@ DEFAULT_VASP_NELM_STATIC
 MAX_VASP_NELM
   description: Sets the maximum number of electronic self-consistency steps (NELM) for VASP should DEFAULT_VASP_FORCE_OPTION_NELM or DEFAULT_VASP_FORCE_OPTION_NELM_STATIC not be enough for convergence.
   type: int
-  default: 1000
+  default: 300
 
 DEFAULT_VASP_FORCE_OPTION_ABMIX_SCHEME
   description: Default VASP Kerker mixing scheme settings. Defines AMIX/BMIX/AMIX_MAG/BMIX_MAG.

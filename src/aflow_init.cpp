@@ -1947,6 +1947,18 @@ void processFlagsFromLOCK(_xvasp& xvasp,_vflags& vflags,aurostd::xoption& xfixed
 }
 
 // ***************************************************************************
+// AFLOW_VASP_instance_running
+// ***************************************************************************
+bool AFLOW_VASP_instance_running(){ //CO20210315
+  string soliloquy=XPID+"AFLOW_VASP_instance_running():";
+  //this needs to become more complicated as we add options other than --kill_all_vasp
+  if(XHOST.vflag_control.flag("MONITOR_VASP") && XHOST.vflag_control.flag("KILL_VASP_ALL")==false){
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"a targeted kill command for VASP not available yet: try --kill_vasp_all",_INPUT_ILLEGAL_);
+  }
+  return (aurostd::ProcessPIDs("aflow").size()>1);  //check that the instance of aflow running vasp is running
+}
+
+// ***************************************************************************
 // AFLOW_monitor_VASP
 // ***************************************************************************
 #define NCOUNTS_WAIT_MONITOR 10 //wait no more than 10*sleep_secounds (should be 10 minutes)
@@ -2067,7 +2079,8 @@ void AFLOW_monitor_VASP(const string& directory){
 
   string vasp_bin="";
   nloop=0;
-  while((aurostd::ProcessPIDs("aflow").size()>1 || (nloop++)<NCOUNTS_WAIT_MONITOR) && vasp_bin.empty()){  //wait no more than 10 minutes for vasp bin to start up
+
+  while((AFLOW_VASP_instance_running() || (nloop++)<NCOUNTS_WAIT_MONITOR) && vasp_bin.empty()){  //wait no more than 10 minutes for vasp bin to start up
     vasp_bin=GetVASPBinaryFromLOCK(xvasp.Directory);
     if(vasp_bin.empty()){
       if(VERBOSE){message << "sleeping for " << sleep_seconds_afterkill << " seconds, waiting for \"" << vasp_bin << "\" to start running and " << _AFLOWLOCK_ << " to be written";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);}
@@ -2081,7 +2094,7 @@ void AFLOW_monitor_VASP(const string& directory){
 
   nloop=0;
   n_not_running=0;
-  while(aurostd::ProcessPIDs("aflow").size()>1 || n_not_running<NCOUNTS_WAIT_MONITOR){  //wait no more than 10 minutes for vasp bin to start up (again)
+  while(AFLOW_VASP_instance_running() || n_not_running<NCOUNTS_WAIT_MONITOR){  //wait no more than 10 minutes for vasp bin to start up (again)
     if(!aurostd::FileExist(xvasp.Directory+"/"+_AFLOWLOCK_)){break;} //we needed it above to get the vasp_bin
     
     vasp_running=aurostd::ProcessRunning(vasp_bin);
@@ -2146,8 +2159,13 @@ void AFLOW_monitor_VASP(const string& directory){
 
     if(kill_vasp){
       if(XHOST.vflag_control.flag("KILL_VASP_ALL")){
-        message << "issuing kill command for: \""+vasp_bin+"\"";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-        aurostd::ProcessKill(vasp_bin);
+        vasp_running=aurostd::ProcessRunning(vasp_bin);
+        if(vasp_running){
+          message << "issuing kill command for: \""+vasp_bin+"\"";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+          aurostd::ProcessKill(vasp_bin);
+        }else{
+          message << "\""+vasp_bin+"\" has died before the kill command could be issued";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+        }
         xmonitor.clear(); //new run, clear IGNORE_WARNINGS
         message << "sleeping for " << sleep_seconds_afterkill << " seconds after kill command";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
         aurostd::Sleep(sleep_seconds_afterkill); //sleep at least a minute to let aflow sleep since OUTCAR is incomplete
