@@ -989,15 +989,15 @@ namespace pflow {
           // str_aus.CalculateSymmetryPointGroup(FALSE);
           // str_aus.CalculateSymmetryFactorGroup(FALSE);
           // str_aus.CalculateSymmetryPointGroupCrystal(FALSE);
-	  if(!already_calculated){  //CO20171025
-	    str_aus.GetLatticeType(str_sp,str_sc);
-	    if(orig_tolerance == AUROSTD_NAN){
-	      orig_tolerance = str_sp.sym_eps;  // Use new tolerance calculated here
-	    }
-	    tolerance = str_sp.sym_eps;
-	    sym_eps_change_count = str_aus.sym_eps_change_count = str_sp.sym_eps_change_count; //DX20180226 - added sym eps change count
-	    str_aus.sym_eps_no_scan = str_sp.sym_eps_no_scan = no_scan; //DX20210331
-	  }
+          if(!already_calculated){  //CO20171025
+            str_aus.GetLatticeType(str_sp,str_sc);
+            if(orig_tolerance == AUROSTD_NAN){
+              orig_tolerance = str_sp.sym_eps;  // Use new tolerance calculated here
+            }
+            tolerance = str_sp.sym_eps;
+            sym_eps_change_count = str_aus.sym_eps_change_count = str_sp.sym_eps_change_count; //DX20180226 - added sym eps change count
+            str_aus.sym_eps_no_scan = str_sp.sym_eps_no_scan = no_scan; //DX20210331
+          }
           oss << "BRAVAIS LATTICE OF THE CRYSTAL (pgroup_xtal)" << endl;
           oss << " Real space: Bravais Lattice Primitive        = " << str_aus.bravais_lattice_type << endl;// " " << str.title << endl;
           oss << " Real space: Lattice Variation                = " << str_aus.bravais_lattice_variation_type << endl;//WSETYAWAN mod
