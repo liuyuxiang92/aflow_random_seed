@@ -5633,6 +5633,7 @@ bool XtalFinderCalculator::findMatch(
     for(uint i=0;i<num_distances;i++){ //DX20200922 - use uint instead of vector.size(); efficiency
       cerr << function_name << " minimum distance: " << mapping_info.distances_mapped[i] << " (before) --> " << new_mapping_distances[i] << " (after)" << endl;
     }
+    cerr << function_name << " sum(distances_orig)=" << aurostd::sum(mapping_info.distances_mapped) << " sum(distances_new)=" << aurostd::sum(new_mapping_distances) << endl;
   }
 
   // ---------------------------------------------------------------------------

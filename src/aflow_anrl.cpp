@@ -1603,7 +1603,13 @@ namespace anrl {
     // causing structures to fall into higher symmetries when analyzed with
     // certain tolerances; occurs for certain AFLOW Prototype Encyclopedia
     // structures 
-
+    
+    // ---------------------------------------------------------------------------
+    // A2B7C2_oF88_22_k_bdefghij_k-001 (Predicted Phase IV Cd2Re2O7)
+    // see comments in http://aflow.org/prototype-encyclopedia/A2B7C2_oF88_22_k_bdefghij_k.html 
+    if(label_input == "A2B7C2_oF88_22_k_bdefghij_k-001"){
+      return 0.001; // symmetry tolerance
+    }
     // ---------------------------------------------------------------------------
     // AB_oP8_33_a_ai-001 (Modderite)
     // see comments in http://aflow.org/prototype-encyclopedia/AB_oP8_33_a_a.html
@@ -1630,6 +1636,12 @@ namespace anrl {
     // ---------------------------------------------------------------------------
     // A5B2_oP14_49_dehq_ab-001 (beta-Ta2O5)
     else if(label_input == "A5B2_oP14_49_dehq_ab-001"){
+      return 0.001; // symmetry tolerance
+    }
+    // ---------------------------------------------------------------------------
+    // A10B3C4_oP68_55_2e2fgh2i_adef_2e2f-001 (Orthorhombic Sr4Ru3O10, part 3)
+    // see comments in http://aflow.org/prototype-encyclopedia/A10B3C4_oP68_55_2e2fgh2i_adef_2e2f.html
+    else if(label_input == "A10B3C4_oP68_55_2e2fgh2i_adef_2e2f-001"){
       return 0.001; // symmetry tolerance
     }
     // ---------------------------------------------------------------------------

@@ -942,7 +942,7 @@ AB_oP8_62_c_c-001.{AB}                           oP8       Pnma                B
 AB_oP8_62_c_c-002.{AB}                           oP8       Pnma                B31       MnP                 #62       MnP (part 1)        
 AB_oP8_62_c_c-003.{AB}                           oP8       Pnma                B27       FeB                 #62       FeB (part 1)        
 AB_oP8_62_c_c-004.{AB}                           oP8       Pnma                B29       SnS                 #62       SnS (part 1)        
-AB_oP8_62_c_c-005.{AB}                           oP8       Pnma                B14       FeAs                #62       Westerveldite (part 2)
+AB_oP8_62_c_c-005.{AB}                           oP8       Pnma                B14/B_{d} FeAs/NiSi           #62       Westerveldite/eta-NiSi (part 2/part 3); eta-NiSi is structurally similar to westerveldite
 AB_oP8_62_c_c-006.{AB}                           oP8       Pnma                -         HgO                 #62       binary oxide (R. Friedrich), ICSD #14124 
 A2B_oC12_63_2c_c-001.{AB}                        oC12      Cmcm                C49       ZrSi2               #63       ZrSi2 (part 1)      
 A6B_oC28_63_efg_c-001.{AB}                       oC28      Cmcm                D2_{h}    MnAl6               #63       MnAl6 (part 2)      
@@ -959,12 +959,12 @@ AB_oC8_67_a_g-002.{AB}                           oC8       Cmme                -
 AB4_oC20_68_a_i-001.{AB}                         oC20      Ccce                -         PdSn4               #68       PdSn4 (part 2)      
 AB_oF8_69_a_b-001.AB                             oF8       Fmmm                B24       TlF                 #69       TlF (part 1)        
 A2B_oF24_70_e_a-001.{AB}                         oF24      Fddd                C54       TiSi2               #70       TiSi2 (part 1)      
-AB2_oF48_70_f_fg-001.{AB}                        oF48      Fddd                D1_{f}    Mn2B                #70       Mn2B (part 2)       
+AB2_oF48_70_f_fg-001.{AB}                        oF48      Fddd                D1_{f}/C_{b} Mn2B/Mg2Cu       #70       Mn2B/Mg2Cu (part 2/part 3), two Strukturbericht prototypes are structurally similar       
 A4B3_oI14_71_gh_cg-001.{AB}                      oI14      Immm                D7_{b}    Ta3B4               #71       Ta3B4 (part 2)      
 AB2_oI6_71_a_g-001.{AB}                          oI6       Immm                -         MoPt2               #71       MoPt2 (part 1), fcc derivative (Y. Lederer), equivalent to 7,8 [HTQC]     
 AB2_oI6_71_a_i-001.{AB}                          oI6       Immm                -         ReSi2               #71       ReSi2 (part 1)      
 A2B_oI12_72_j_a-001.{AB}                         oI12      Ibam                C42       SiS2                #72       SiS2 (part 1)       
-A2B_oI12_74_h_e-001.{AB}                         oI12      Imma                -         KHg2                #74       KHg2 (part 2)       
+A2B_oI12_74_h_e-001.{AB}                         oI12      Imma                -         KHg2/CeCu2          #74       KHg2/CeCu2 (part 2/part 3) 
 A4B_oI20_74_beh_e-001.{AB}                       oI20      Imma                D1_{b}    Al4U                #74       Al4U (part 2)       
 A3B7_tP40_76_3a_7a-001.{AB}                      tP40      P4_{1}              -         Cs3P7               #76       Cs3P7 (part 2)      
 A2B_tP48_77_8d_4d-001.{AB}                       tP48      P4_{2}              -         H2S                 #77       H2S III (part 2)    
@@ -980,7 +980,7 @@ AB4_tI10_87_a_h-001.{AB}                         tI10      I4/m                D
 A4B_tI20_88_f_a-001.{AB}                         tI20      I4_{1}/a            -         ThCl4               #88       ThCl4 (part 2)      
 AB2_tI96_88_2f_4f-001.{AB}                       tI96      I4_{1}/a            -         alpha-NbO2          #88       alpha-NbO2 (part 2) 
 A2B_tP12_92_b_a-001.{AB}                         tP12      P4_{1}2_{1}2        -         SiO2                #92       alpha-Cristobalite (part 1)
-A2B_tP12_92_b_a-002.{AB}                         tP12      P4_{1}2_{1}2        -         O2Ti                #92       O2Ti binary oxide (R. Friedrich), ICSD #161691
+A2B_tP12_92_b_a-002.{AB}                         tP12      P4_{1}2_{1}2        -         O2Ti                #92       O2Ti binary oxide (R. Friedrich), ICSD #161691, equivalent to alpha-O2Te (paratellurite, http://aflow.org/prototype-encyclopedia/A2B_tP12_92_b_a.TeO2.html, part 3)
 A2B_tP36_96_3b_ab-001.{AB}                       tP36      P4_{3}2_{1}2        -         SiO2                #96       Keatite (part 1)    
 A2B_tI12_98_f_a-001.{AB}                         tI12      I4_{1}22            -         CdAs2               #98       CdAs2 (part 2)      
 A2B3_tP20_102_2c_b2c-001.{AB}                    tP20      P4_{2}nm            -         Gd3Al2              #102      Gd3Al2 (part 2)     
@@ -1033,7 +1033,7 @@ A8B_tI18_139_hi_a-001.{AB}                       tI18      I4/mmm              -
 AB2_tI6_139_a_e-001.{AB}                         tI6       I4/mmm              C11_b     MoSi2               #139      MoSi2 (part 1)      
 AB2_tI6_139_a_e-002.{AB}                         tI6       I4/mmm              -         AB2                 #139      fcc derivative (Y. Lederer), equivalent to 5,6,6b [HTQC]
 AB2_tI6_139_a_e-003.{AB}                         tI6       I4/mmm              -         BaO2                #139      BaO2 binary oxide (R. Friedrich), ICSD #24248 
-AB2_tI6_139_a_e-004.{AB}                         tI6       I4/mmm              -         KO2                 #139      KO2 binary oxide (R. Friedrich), ICSD #38245, equivalent to 250,251,1202.AB/BA,1211.AB/BA [HTQC]
+AB2_tI6_139_a_e-004.{AB}                         tI6       I4/mmm              C11_{a}   KO2 (C2Ca-I)        #139      KO2 binary oxide (R. Friedrich), ICSD #38245, equivalent to 250,251,1202.AB/BA,1211.AB/BA [HTQC], equivalent to C2Ca-I (C11_{a}, http://aflow.org/prototype-encyclopedia/A2B_tI6_139_e_a.html, part 3)
 AB_tI8_139_e_e-001.{AB}                          tI8       I4/mmm              D3_{1}    Hg2Cl2              #139      Calomel (part 2)    
 AB_tI8_139_e_e-002.AB                            tI8       I4/mmm              -         AB                  #139      sc derivative (Y. Lederer)
 A2B_tI12_140_h_a-001.{AB}                        tI12      I4/mcm              C16       Al2Cu               #140      Khatyrkite (part 1) 
@@ -1171,14 +1171,14 @@ A3B_cP4_221_d_a.{AB}                             cP4       Pm-3m               D
 A6B_cP7_221_f_a-001.{AB}                         cP7       Pm-3m               D2_1      CaB6                #221      CaB6 (part 1)       
 AB11_cP36_221_c_agij-001.{AB}                    cP36      Pm-3m               D2_e      BaHg11              #221      BaHg11 (part 1)     
 AB3_cP4_221_a_c.{AB}                             cP4       Pm-3m               L1_2      Cu3Au               #221      Cu3Au (part 1), fcc derivative (Y. Lederer), equivalent to 25,26 [HTQC] 
-AB_cP2_221_b_a.AB                                cP2       Pm-3m               B2        CsCl                #221      CsCl (part 1), equivalent to 61,1026.AB,1205.AB [HTQC]
+AB_cP2_221_b_a.AB                                cP2       Pm-3m               B2/G0_{8} CsCl/(NH4)(NO3)     #221      CsCl (part 1), equivalent to 61,1026.AB,1205.AB [HTQC], equivalent to NH4NO3 I (G0_{8}, http://aflow.org/prototype-encyclopedia/AB_cP2_221_a_b.NH4.NO3.html, part 3)
 AB_cP6_221_c_d.AB                                cP6       Pm-3m               -         NbO                 #221      NbO (part 1)        
 A3B_cP8_223_c_a.{AB}                             cP8       Pm-3n               A15       Cr3Si               #223      Cr3Si (part 1)      
 A2B_cP6_224_b_a.{AB}                             cP6       Pn-3m               C3        Cu2O                #224      Cuprite (part 1)    
 A12B_cF52_225_i_a-001.{AB}                       cF52      Fm-3m               D2_f      UB12                #225      UB12 (part 1)       
 A23B6_cF116_225_bd2f_e-001.{AB}                  cF116     Fm-3m               D8_{a}    Th6Mn23             #225      Th6Mn23 (part 2)    
 A6B23_cF116_225_e_acfh-001.{AB}                  cF116     Fm-3m               D8_4      Cr23C6              #225      Cr23C6 (part 1)     
-A7B_cF32_225_bd_a.{AB}                           cF32      Fm-3m               -         Ca7Ge               #225      Ca7Ge (part 1)      
+A7B_cF32_225_bd_a.{AB}                           cF32      Fm-3m               -/L1_{a}  Ca7Ge/CuPt3         #225      Ca7Ge/CuPt3 (part 1/part 3)      
 AB2_cF12_225_a_c.{AB}                            cF12      Fm-3m               C1        CaF2                #225      CaF2 (part 1)
 AB3_cF16_225_a_bc.{AB}                           cF16      Fm-3m               D0_3      BiF3                #225      BiF3 (part 1)       
 AB_cF8_225_a_b.AB                                cF8       Fm-3m               B1        NaCl                #225      Rock Salt (part 1), equivalent to 201,720.AB,720.BA,1009.AB,1200.AB [HTQC] 
@@ -1244,7 +1244,7 @@ AB4C_oP24_62_c_2cd_c-001.{ABC}                   oP24      Pnma                H
 A2BC3_oC24_63_e_c_cg-001.{ABC}                   oC24      Cmcm                -         KFe2S3              #63       Rasvumite (part 2)  
 A43B5C17_oC260_63_c8fg6h_cfg_ce3f2h-001.{ABC}    oC260     Cmcm                -         La43Ni17Mg5         #63       La43Ni17Mg5 (part 2)
 AB2C_oC16_63_c_2c_c-001.{ABC}                    oC16      Cmcm                -         SrCuO2              #63       SrCuO2 (part 1)     
-AB3C_oC20_63_a_cf_c-001.{ABC}                    oC20      Cmcm                -         MgSiO3              #63       Post-perovskite (part 2)
+AB3C_oC20_63_a_cf_c-001.{ABC}                    oC20      Cmcm                -         MgSiO3/AsCV3        #63       Post-perovskite/V3AsC (part 2/part 3); V3AsC is structurally similar to the post-perovskite
 AB4C_oC24_63_a_fg_c-001.{ABC}                    oC24      Cmcm                -         MgO4S               #63       MgSO4 (part 2)      
 AB4C_oC24_63_c_fg_c-001.{ABC}                    oC24      Cmcm                H0_{1}    CaSO4               #63       Anhydrite (part 2)  
 A2B2C_oC80_64_efg_efg_df-001.{ABC}               oC80      Cmce                -         MgB2C2              #64       MgB2C2 (part 1)     
@@ -1286,7 +1286,7 @@ AB6C_tP16_132_d_io_a-001.{ABC}                   tP16      P4_{2}/mcm          -
 A4B2C_tP28_135_gh_h_d-001.{ABC}                  tP28      P4_{2}/mbc          -         ZnSb2O4             #135      ZnSb2O4 (part 2)    
 A4BC4_tP18_137_g_b_g-001.{ABC}                   tP18      P4_{2}/nmc          -         CeCo4B4             #137      CeCo4B4 (part 2)    
 AB2C4_tI14_139_a_e_ce-001.{ABC}                  tI14      I4/mmm              -         (La,Ba)2CuO4        #139      0201 [(La,Ba)2CuO4] (part 1)
-AB2C4_tI14_139_a_e_ce-002.{ABC}                  tI14      I4/mmm              -         O4Sr2Ti             #139      O4Sr2Ti ternary oxide (R. Friedrich), ICSD #157402 
+AB2C4_tI14_139_a_e_ce-002.{ABC}                  tI14      I4/mmm              -         O4Sr2Ti             #139      O4Sr2Ti ternary oxide (R. Friedrich), ICSD #157402, equivalent to K2NiF4 (http://aflow.org/prototype-encyclopedia/A4B2C_tI14_139_ce_e_a.html, part 3)
 A4BC_tI24_141_h_b_a-001.{ABC}                    tI24      I4_{1}/amd          -         ZrSiO4              #141      Zircon (part 1)     
 ABC4_tI96_142_e_ab_2g-001.{ABC}                  tI96      I4_{1}/acd          -         PPrS4               #142      PPrS4 (part 1)      
 A4B14C3_hP21_143_bd_ac4d_d-001.{ABC}             hP21      P3                  -         Ta3Al4O13[OH]       #143      Simpsonite (part 2) 
@@ -1302,7 +1302,7 @@ ABC2_hP4_164_a_b_d-001.{ABC/BCA/CAB              hP4       P-3m1               -
 ABC2_hR4_166_a_b_c-001.{ABC}                     hR4       R-3m                F5_1      CrNiS2              #166      Caswellsilverite (part 1)
 ABC2_hR4_166_a_b_c-002.ABC/BCA/CAB               hR4       R-3m                -         ABC2                #166      rocksalt derivative (Y. Lederer)
 ABC2_hR4_166_a_b_c-003.ABC/BCA/CAB               hR4       R-3m                -         AlLiO2              #166      AlLiO2 ternary oxide (R. Friedrich), ICSD #28288 
-ABC2_hR4_166_a_b_c-004.{ABC}                     hR4       R-3m                -         CuFeO2              #166      CuFeO2 ternary oxide (R. Friedrich), ICSD #246912 
+ABC2_hR4_166_a_b_c-004.{ABC}                     hR4       R-3m                -         CuFeO2              #166      CuFeO2 ternary oxide (R. Friedrich), ICSD #246912, equivalent to rhombohedral delafossite (CuFeO2, http://aflow.org/prototype-encyclopedia/ABC2_hR4_166_a_b_c.CuFeO2.html, part 3)
 ABC_hR6_166_c_c_c-001.{ABC}                      hR6       R-3m                -         SmSI                #166      SmSI (part 2)       
 AB3C_hR10_167_b_e_a-001.{ABC}                    hR10      R-3c                -         PrNiO3              #167      PrNiO3 (part 2)     
 ABC2_hR24_167_e_e_2e-001.{ABC}                   hR24      R-3c                F5_{13}   KBO2                #167      KBO2 (part 2)       
@@ -1366,7 +1366,7 @@ ANRL - QUATERNARIES
 
 ANRL Label                                       Pearson   SG symbol           Struk     Prototype           SG #      notes (part)
 ----------------------------------------------------------------------------------------------------------------------------------------------------
-ABC6D2_mC40_15_e_e_3f_f-001.{ABCD}               mC40      C2/c                -         CaFeO6Si2           #15       Esseneite (part 1)  
+ABC6D2_mC40_15_e_e_3f_f-001.{ABCD}               mC40      C2/c                -/S4_{1}  CaFeO6Si2/CaMgO6Si2 #15       Esseneite/Diopside (part 1/part 3), Diopside (S4_{1}) is structurally similar to esseneite 
 AB7CD2_oI44_24_a_b3d_c_ac-001.{ABCD}             oI44      I2_{1}2_{1}2_{1}    -         Na2MgAlF7           #24       Weberite (part 2)   
 A6B4C16D_oP108_27_abcd4e_4e_16e_e-001.{ABCD}     oP108     Pcc2                -         Ca4Al6O16S          #27       Ca4Al6O16S (part 2) 
 A2B3C7D_oP13_47_t_aq_eqrs_h-001.{ABCD}           oP13      Pmmm                -         YBa2Cu3O7-x         #47       1212C [YBa2Cu3O7-x] (part 1)
@@ -1419,20 +1419,20 @@ ANRL - BCC-SQS
 
 ANRL Label                                       Pearson   SG symbol           Struk     Prototype           SG #      notes
 ----------------------------------------------------------------------------------------------------------------------------------------------------
-AB_aP16_2_4i_4i-001.AB                           aP16      P-1                 -         AB                  #2        bcc-SQS [10.1103/PhysRevB.69.214202] (O. Levy)
-A5B11_mP16_6_2abc_2a3b3c-001.{AB}                mP16      Pm                  -         A5B11               #6        bcc-SQS [10.1103/PhysRevB.94.224104] (O. Levy)      
-AB3_mC32_8_4a_12a-001.{AB}                       mC32      Cm                  -         AB3                 #8        bcc-SQS [10.1103/PhysRevB.69.214202] (O. Levy)
-AB3_mC32_8_4a_4a4b-001.{AB}                      mC32      Cm                  -         AB3                 #8        bcc-SQS [10.1103/PhysRevB.94.224104] (O. Levy)
-A3B13_oC32_38_ac_a2bcdef-001.{AB}                oC32      Amm2                -         A3B13               #38       bcc-SQS [10.1103/PhysRevB.94.224104] (O. Levy)
-A3B5_oC32_38_abce_abcdf-001.{AB}                 oC32      Amm2                -         A3B5                #38       bcc-SQS [10.1103/PhysRevB.94.224104] (O. Levy)
-AB7_hR16_166_c_c2h-001.{AB}                      hR16      R-3m                -         AB7                 #166      bcc-SQS [10.1103/PhysRevB.94.224104] (O. Levy)
+AB_aP16_2_4i_4i-001.AB                           aP16      P-1                 -         AB                  #2        bcc-SQS [10.1103/PhysRevB.69.214202] (O. Levy, part 3)
+A5B11_mP16_6_2abc_2a3b3c-001.{AB}                mP16      Pm                  -         A5B11               #6        bcc-SQS [10.1103/PhysRevB.94.224104] (O. Levy, part 3)      
+AB3_mC32_8_4a_12a-001.{AB}                       mC32      Cm                  -         AB3                 #8        bcc-SQS [10.1103/PhysRevB.69.214202] (O. Levy, part 3)
+AB3_mC32_8_4a_4a4b-001.{AB}                      mC32      Cm                  -         AB3                 #8        bcc-SQS [10.1103/PhysRevB.94.224104] (O. Levy, part 3)
+A3B13_oC32_38_ac_a2bcdef-001.{AB}                oC32      Amm2                -         A3B13               #38       bcc-SQS [10.1103/PhysRevB.94.224104] (O. Levy, part 3)
+A3B5_oC32_38_abce_abcdf-001.{AB}                 oC32      Amm2                -         A3B5                #38       bcc-SQS [10.1103/PhysRevB.94.224104] (O. Levy, part 3)
+AB7_hR16_166_c_c2h-001.{AB}                      hR16      R-3m                -         AB7                 #166      bcc-SQS [10.1103/PhysRevB.94.224104] (O. Levy, part 3)
 
 *****************************************************************************************************************************************************
 ANRL - miscellaneous
 
 ANRL Label                                       Pearson   SG symbol           Struk     Prototype           SG #      notes
 ----------------------------------------------------------------------------------------------------------------------------------------------------
-A2BCD4_tI16_82_ac_b_d_g-001.ABCD/BCAD/           tI16      I-4                 -         Cu2(Zn,Fe)SnS4      #82       Kesterite, 12 protos [Can. Mineral., 16, 131-137 (1978)] (C. Oses)
+A2BCD4_tI16_82_ac_b_d_g-001.ABCD/BCAD/           tI16      I-4                 -         Cu2(Zn,Fe)SnS4      #82       Kesterite, 12 protos [Can. Mineral., 16, 131-137 (1978)] (C. Oses, part 3)
 CABD/DBAC/BADC/ADBC/ACDB/CDAB/DACB/
 DCBA/CBDA/BDCA   
 A2B3_cI80_206_ad_e.{AB}                          tI80      Ia-3                -         NZn                 #206      NZn (ICSD #84918) (R. Friedrich)
@@ -1515,16 +1515,16 @@ ANRL - oxides - BINARIES (R. Friedrich)
 ANRL Label                                       Pearson   SG symbol           Struk     Prototype           SG #      notes
 ----------------------------------------------------------------------------------------------------------------------------------------------------
 AB_mC20_12_b2i_c2i-001.{AB}                      mC20      C2/m                -         OTi                 #12       OTi, ICSD #56694
-A2B3_mC20_12_2i_3i-001.{AB}                      mC20      C2/m                -         Ga2O3               #12       Ga2O3, ICSD #83645
+A2B3_mC20_12_2i_3i-001.{AB}                      mC20      C2/m                -         Ga2O3               #12       Ga2O3, ICSD #83645, equivalent to beta-Ga2O3 (http://aflow.org/prototype-encyclopedia/A2B3_mC20_12_2i_3i.html, part 3)
 A5B3_mC32_12_5i_3i-001.{AB}                      mC32      C2/m                -         O5Ti3               #12       O5Ti3, ICSD #75193
 A3B_mP16_14_3e_e-001.{AB}                        mP16      P2_{1}/c            -         O3W                 #14       O3W, ICSD #84848
 A2B3_mP20_14_2e_3e-001.{AB}                      mP20      P2_{1}/c            -         Bi2O3               #14       Bi2O3, ICSD #168806
 AB_mC8_15_a_e-001.{AB}                           mC8       C2/c                -         CuO                 #15       CuO, ICSD #92368
 A4B_mC20_15_2f_e-001.{AB}                        mC20      C2/c                -         O4Os                #15       O4Os, ICSD #23803
 A2B5_oP28_19_2a_5a-001.{AB}                      oP28      P2_{1}2_{1}2_{1}    -         As2O5               #19       As2O5, ICSD #654040
-A2B_oP24_33_4a_2a-001.{AB}                       oP24      Pna2_{1}            -         O2Sb                #33       O2Sb, ICSD #4109
+A2B_oP24_33_4a_2a-001.{AB}                       oP24      Pna2_{1}            -         O2Sb                #33       O2Sb, ICSD #4109, equivalent to alpha-Sb2O4 (cervantite, http://aflow.org/prototype-encyclopedia/A2B_oP24_33_4a_2a.html, part 3)
 AB3_oC16_40_b_a2b-001.{AB}                       oC16      Ama2                -         CrO3                #40       CrO3, ICSD #16031
-A5B2_oP14_59_a2e_e-001.{AB}                      oP14      Pmmn                -         O5V2                #59       O5V2, ICSD #60767
+A5B2_oP14_59_a2e_e-001.{AB}                      oP14      Pmmn                -         O5V2                #59       O5V2, ICSD #60767, equivalent to O5V2 (shcherbinaite (revised), http://aflow.org/prototype-encyclopedia/A5B2_oP14_59_a2f_f.html, part 3)
 AB_oC16_64_e_f-001.{AB}                          oC16      Cmce                -         KO                  #64       KO, ICSD #180559
 A4B3_tP28_135_gh_dh-001.{AB}                     tP28      P4_{2}/mbc          -         O4Pb3               #135      O4Pb3, ICSD #29094
 A2B3_hP15_144_2a_3a-001.{AB}                     hP15      P3_{1}              -         B2O3                #144      B2O3, ICSD #24649
@@ -1543,8 +1543,8 @@ ANRL Label                                       Pearson   SG symbol           S
 A4B4C_aP18_2_4i_4i_i-001.{ABC}                   aP18      P-1                 -         Na4O4Si             #2        Na4O4Si, ICSD #15500
 A2B7C2_aP22_2_2i_7i_2i-001.{ABC}                 aP22      P-1                 -         Ca2O7V2             #2        Ca2O7V2, ICSD #421266
 A2B7C2_aP22_2_2i_7i_2i-002.{ABC}                 aP22      P-1                 -         Mg2O7V2             #2        Mg2O7V2, ICSD #2321
-AB3C_aP30_2_3i_9i_3i-001.{ABC}                   aP30      P-1                 -         CaO3Si              #2        CaO3Si, ICSD #201537
-A2B5C_aP32_2_4i_10i_2i-001.{ABC}                 aP32      P-1                 -         Al2O5Si             #2        Al2O5Si, ICSD #85742
+AB3C_aP30_2_3i_9i_3i-001.{ABC}                   aP30      P-1                 -         CaO3Si              #2        CaO3Si, ICSD #201537, equivalent to CaO3Si (wollastonite, http://aflow.org/prototype-encyclopedia/AB3C_aP30_2_3i_9i_3i.html, part 3)
+A2B5C_aP32_2_4i_10i_2i-001.{ABC}                 aP32      P-1                 S0_{1}    Al2O5Si             #2        Al2O5Si, ICSD #85742, equivalent to Al2O5Si (kyanite, http://aflow.org/prototype-encyclopedia/A2B5C_aP32_2_4i_10i_2i.html, part 3)
 A2B4C_mP28_4_4a_8a_2a-001.{ABC}                  mP28      P2_{1}              -         Al2O4Sr             #4        Al2O4Sr, ICSD #160297
 A3BC_mC60_5_ab8c_ab2c_3c-001.{ABC}               mC60      C2                  -         O3SiSr              #5        O3SiSr, ICSD #32542
 A3B5C_mC54_8_3a3b_9a3b_3a-001.{ABC}              mC54      Cm                  -         Ca3O5Si             #8        Ca3O5Si, ICSD #81100
@@ -1553,22 +1553,22 @@ AB6C2_mC18_12_a_3i_i-001.{ABC}                   mC18      C2/m                -
 AB6C2_mC18_12_a_3i_i-002.{ABC}                   mC18      C2/m                -         MgO6V2              #12       MgO6V2, ICSD #10391
 ABC4_mC48_12_gi_hi_2i3j-001.{ABC}                mC48      C2/m                -         MgMoO4              #12       MgMoO4, ICSD #20418
 ABC4_mC48_12_gi_hi_2i3j-002.{ABC}                mC48      C2/m                -         FeMoO4;             #12       FeMoO4, ICSD #43012
-AB4C_mP12_13_f_2g_e-001.{ABC}                    mP12      P2/c                -         MgO4W               #13       MgO4W, ICSD #67903
+AB4C_mP12_13_f_2g_e-001.{ABC}                    mP12      P2/c                H0_{6}    MgO4W               #13       MgO4W, ICSD #67903, equivalent to MgO4W (huanzalaite, H0_{6}, http://aflow.org/prototype-encyclopedia/AB4C_mP12_13_f_2g_e.html, part 3)
 AB4C_mP12_13_f_2g_e-002.{ABC}                    mP12      P2/c                -         NiO4W               #13       NiO4W, ICSD #16685
 AB3C_mP40_14_2e_6e_2e-001.{ABC}                  mP40      P2_{1}/c            -         MgO3Si              #14       MgO3Si, ICSD #30895
 A2B3C_mC24_15_2e_af_e-001.{ABC}                  mC24      C2/c                -         Li2O3Zr             #15       Li2O3Zr, ICSD #94893
 AB3C_mC40_15_2e_3f_f-001.{ABC}                   mC40      C2/c                -         NaO3V               #15       NaO3V, ICSD #2103
-A2B3C_mC48_15_aef_3f_2e-001.{ABC}                mC48      C2/c                -         Li2O3Ti             #15       Li2O3Ti, ICSD #162215
+A2B3C_mC48_15_aef_3f_2e-001.{ABC}                mC48      C2/c                -         Li2O3Ti             #15       Li2O3Ti, ICSD #162215, equivalent to Na2O3Pr (http://aflow.org/prototype-encyclopedia/A2B3C_mC48_15_aef_3f_2e.html, part 3)
 A4BC7_mC48_15_2f_e_e3f-001.{ABC}                 mC48      C2/c                -         Al4CaO7             #15       Al4CaO7, ICSD #14270
 AB3C_mC60_15_cf_e4f_ef-001.{ABC}                 mC60      C2/c                -         CaO3Si              #15       CaO3Si, ICSD #87694
 ABC2_oP16_33_a_a_2a-001.{ABC}                    oP16      Pna2_{1}            -         FeNaO2;             #33       FeNaO2, ICSD #186309
 A2B3C_oC24_36_b_ab_a-001.{ABC}                   oC24      Cmc2_{1}            -         Li2O3Si             #36       Li2O3Si, ICSD #28192
 A2B3C_oC24_36_b_ab_a-002.{ABC}                   oC24      Cmc2_{1}            -         Na2O3Si             #36       Na2O3Si, ICSD #24664
-A2B5C_oP32_58_eg_3gh_g-001.{ABC}                 oP32      Pnnm                -         Al2O5Si             #58       Al2O5Si, ICSD #30679
-AB2C4_oC28_63_c_ac_fg-001.{ABC}                  oC28      Cmcm                -         CrNa2O4             #63       CrNa2O4, ICSD #76001
-AB5C2_oC32_63_c_c2f_f-001.{ABC}                  oC32      Cmcm                -         MgO5Ti2             #63       MgO5Ti2, ICSD #37232
+A2B5C_oP32_58_eg_3gh_g-001.{ABC}                 oP32      Pnnm                S0_{2}    Al2O5Si             #58       Al2O5Si, ICSD #30679, equivalent to Al2O5Si (http://aflow.org/prototype-encyclopedia/A2B5C_oP32_58_eg_3gh_g.html, part 3)
+AB2C4_oC28_63_c_ac_fg-001.{ABC}                  oC28      Cmcm                H1_{8}    CrNa2O4             #63       CrNa2O4, ICSD #76001, equivalent to CrNa2O4 (http://aflow.org/prototype-encyclopedia/AB2C4_oC28_63_c_bc_fg.html, part 3)
+AB5C2_oC32_63_c_c2f_f-001.{ABC}                  oC32      Cmcm                E4_{1}    MgO5Ti2/Fe2O5Ti     #63       MgO5Ti2, ICSD #37232, equivalent to Fe2O5Ti (pseudobrookite, http://aflow.org/prototype-encyclopedia/A2B5C_oC32_63_f_c2f_c.html, part 3)
 ABC4_tI24_88_a_b_f-001.{ABC}                     tI24      I4_{1}/a            -         BaMoO4              #88       BaMoO4, ICSD #50821
-ABC4_tI24_88_a_b_f-002.{ABC}                     tI24      I4_{1}/a            -         CaMoO4              #88       CaMoO4, ICSD #417513
+ABC4_tI24_88_a_b_f-002.{ABC}                     tI24      I4_{1}/a            H0_{4}    CaMoO4/CaO4W        #88       CaMoO4, ICSD #417513, equivalent to CaO4W (scheelite, H0_{4}, http://aflow.org/prototype-encyclopedia/AB4C_tI24_88_b_f_a.html, part 3)
 A4BC2_tP28_91_2d_b_ac-001.{ABC}                  tP28      P4_{1}22            -         O4TiZn2             #91       O4TiZn2, ICSD #109093
 A2BC4_hP56_173_2b2c_ac_b5c-001.{ABC}             hP56      P6_{3}              -         Al2BaO4             #173      Al2BaO4, ICSD #246027
 AB2C4_cF56_227_b_c_e-001.{ABC}                   cF56      Fd-3m               -         MoNa2O4             #227      MoNa2O4, ICSD #151970
@@ -1611,7 +1611,7 @@ A2B_mP6_13_g_e-001.{AB}                          mP6       P2/c                -
 AB2_mP12_14_e_2e-001.{AB}                        mP12      P2_{1}/c            -         Ir1N2               #14       metal-nitride; Ir1N2, ICSD #160623
 A2B_mP12_14_2e_e-004.{AB}                        mP12      P2_{1}/c            -         N2Os1               #14       metal-nitride; N2Os1, ICSD #240759
 AB3_mP16_14_e_3e-001.{AB}                        mP16      P2_{1}/c            -         Hg2N6               #14       metal-nitride; Hg2N6, ICSD #98661
-AB2_mC12_15_e_f-001.{AB}                         mC12      C2/c                -         Ba1N2               #15       metal-nitride; Ba1N2, ICSD #280681
+AB2_mC12_15_e_f-001.{AB}                         mC12      C2/c                C_{g}     Ba1N2               #15       metal-nitride; Ba1N2, ICSD #280681, equivalent to C2Th (C_{g}, http://aflow.org/prototype-encyclopedia/A2B_mC12_15_f_e.html, part 3)
 AB_oC16_36_2a_2a-001.{AB}                        oC16      Cmc2_{1}            -         N1Os1               #36       metal-nitride; N1Os1, ICSD #167514
 AB_oP8_53_h_h-001.{AB}                           oP8       Pmna                -         N1Os1               #53       metal-nitride; N1Os1, ICSD #167513
 A2B_oP12_57_e_c-001.{AB}                         oP12      Pbcm                -         N2Re1               #57       metal-nitride; N2Re1, ICSD #187450
@@ -1619,7 +1619,7 @@ A2B_oP6_58_g_a-002.{AB}                          oP6       Pnnm                -
 A2B_oP6_58_g_a-003.{AB}                          oP6       Pnnm                -         N2Pt1               #58       metal-nitride; N2Pt1, ICSD #166463
 AB2_oP6_58_a_g-004.{AB}                          oP6       Pnnm                -         Ir1N2               #58       metal-nitride; Ir1N2, ICSD #160620
 AB2_oP6_58_a_g-005.{AB}                          oP6       Pnnm                -         Au1N2               #58       metal-nitride; Au1N2, ICSD #166465
-A2B_oP12_60_d_c-001.{AB}                         oP12      Pbcn                -         Fe2N1               #60       metal-nitride; Fe2N1, ICSD #150889 similar to 1213.AB,1213.BA,1222.AB,1222.BA,1284.AB,1284.BA [HTQC]
+A2B_oP12_60_d_c-001.{AB}                         oP12      Pbcn                -         Fe2N1               #60       metal-nitride; Fe2N1, ICSD #150889 similar to 1213.AB,1213.BA,1222.AB,1222.BA,1284.AB,1284.BA [HTQC], equivalent to zeta-Fe2N (http://aflow.org/prototype-encyclopedia/A2B_oP12_60_d_c.Fe2N.html, part 3)
 A2B_oP12_62_2c_c-005.{AB}                        oP12      Pnma                -         N2Re1               #62       metal-nitride; N2Re1, ICSD #187446
 AB3_oP16_62_c_cd-002.{AB}                        oP16      Pnma                -         N1Na3               #62       metal-nitride; N1Na3, ICSD #165990
 A3B_oP16_62_cd_c-002.{AB}                        oP16      Pnma                -         Fe3N1               #62       metal-nitride; Fe3N1, ICSD #260758 similar to 1076.AB,1076.BA [HTQC]
@@ -1632,7 +1632,7 @@ A2B_oI12_71_2e_f-001.{AB}                        oI12      Immm                -
 AB_oI16_71_abe_n-001.{AB}                        oI16      Immm                -         Li2N2               #71       metal-nitride; Li2N2, ICSD #423831
 AB3_oI16_72_b_cj-001.{AB}                        oI16      Ibam                -         Ag1N3               #72       metal-nitride; Ag1N3, ICSD #27135
 A5B4_tI18_87_ah_h-001.{AB}                       tI18      I4/m                -         N5Nb4               #87       metal-nitride; N5Nb4, ICSD #26251
-AB3_tI32_88_d_cf-001.{AB}                        tI32      I4_{1}/a            -         Cu1N3               #88       metal-nitride; Cu1N3, ICSD #30633
+AB3_tI32_88_d_cf-001.{AB}                        tI32      I4_{1}/a            -         Cu1N3               #88       metal-nitride; Cu1N3, ICSD #30633, equivalent to Copper (I) Azide (CuN3, http://aflow.org/prototype-encyclopedia/AB3_tI32_88_d_cf.html, part 3)
 AB_tP2_123_d_a-001.AB                            tP2       P4/mmm              -         N1Pr1               #123      metal-nitride; N1Pr1, ICSD #168645
 A3B_tP4_123_ag_d-001.{AB}                        tP4       P4/mmm              -         N3Rb1               #123      metal-nitride; N3Rb1, ICSD #16963
 A3B_tP8_123_egh_ab-001.{AB}                      tP8       P4/mmm              -         Cu3N1               #123      metal-nitride; Cu3N1, ICSD #180237
@@ -1642,7 +1642,7 @@ AB_tI4_139_a_b-001.AB                            tI4       I4/mmm              -
 A3B2_tI10_139_ae_e-001.{AB}                      tI10      I4/mmm              -         Mn3N2               #139      metal-nitride; Mn3N2, ICSD #71638
 A3B2_tI10_139_ae_e-002.{AB}                      tI10      I4/mmm              -         Mn3N2               #139      metal-nitride; Mn3N2, ICSD #84202
 A3B4_tI14_139_ad_ce-001.{AB}                     tI14      I4/mmm              -         N3Nb4               #139      metal-nitride; N3Nb4, ICSD #76389
-A8B_tI18_139_deh_a-001.{AB}                      tI18      I4/mmm              -         Fe16N2              #139      metal-nitride; Fe16N2, ICSD #41953
+A8B_tI18_139_deh_a-001.{AB}                      tI18      I4/mmm              D2_{g}    Fe16N2              #139      metal-nitride; Fe16N2, ICSD #41953, equivalent to Fe8N (D2_{g}, http://aflow.org/prototype-encyclopedia/A8B_tI18_139_deh_a.html, part 3)
 AB3_tI16_140_a_dh-001.{AB}                       tI16      I4/mcm              -         K1N3                #140      metal-nitride; K1N3, ICSD #24007
 AB3_tI16_140_a_dh-002.{AB}                       tI16      I4/mcm              -         Cs1N3               #140      metal-nitride; Cs1N3, ICSD #25008
 AB3_tI16_140_a_dh-003.{AB}                       tI16      I4/mcm              -         Ag1N3               #140      metal-nitride; Ag1N3, ICSD #183201
@@ -1678,7 +1678,7 @@ A2B_hP6_191_af_d-001.{AB}                        hP6       P6/mmm              -
 AB_hP6_191_bc_ad-001.AB                          hP6       P6/mmm              -         N1Y1                #191      metal-nitride; N1Y1, ICSD #161079
 A3B_hP8_193_g_b-001.{AB}                         hP8       P6_{3}/mcm          -         Ba3N1               #193      metal-nitride; Ba3N1, ICSD #77730
 AB_hP4_194_c_a-002.{AB}                          hP4       P6_{3}/mmc          -         N1Nb1               #194      metal-nitride; N1Nb1, ICSD #76384 similar to 1031.AB,1031.BA,1232.AB,1232.BA [HTQC]
-AB_hP4_194_c_a-003.{AB}                          hP4       P6_{3}/mmc          -         N1Ta1               #194      metal-nitride; N1Ta1, ICSD #105123 similar to 1231.AB,1231.BA [HTQC]
+AB_hP4_194_c_a-003.{AB}                          hP4       P6_{3}/mmc          -/L'3_{0} N1Ta1               #194      metal-nitride; N1Ta1, ICSD #105123 similar to 1231.AB,1231.BA [HTQC], equivalent to Fe2N (L'3_{0}, http://aflow.org/prototype-encyclopedia/AB_hP4_194_c_a.Fe2N.html, part 3)
 AB_hP4_194_c_a-004.{AB}                          hP4       P6_{3}/mmc          -         N1Re1               #194      metal-nitride; N1Re1, ICSD #181300 similar to 1030.AB,1030.BA [HTQC]
 AB_hP4_194_c_a-005.{AB}                          hP4       P6_{3}/mmc          -         N1Nb1               #194      metal-nitride; N1Nb1, ICSD #185559 similar to 1030.AB,1030.BA,1232.AB,1232.BA [HTQC]
 AB_hP4_194_c_d-002.AB                            hP4       P6_{3}/mmc          -         Al1N1               #194      metal-nitride; Al1N1, ICSD #163950
@@ -1694,7 +1694,7 @@ AB_hP16_194_bh_ag-001.{AB}                       hP16      P6_{3}/mmc          -
 AB3_cI32_204_c_g-001.{AB}                        cI32      Im-3                -         Co1N3               #204      metal-nitride; Co1N3, ICSD #162105
 AB3_cI32_204_c_g-002.{AB}                        cI32      Im-3                -         Co1N3               #204      metal-nitride; Co1N3, ICSD #162106
 A4B_cP5_221_ac_b.{AB}                            cP5       Pm-3m               -         Mn4N1               #221      metal-nitride; Mn4N1, ICSD #44369 similar to 679.AB,679.BA [HTQC]
-AB4_cP5_221_a_bc.{AB}                            cP5       Pm-3m               -         N1Ni4               #221      metal-nitride; N1Ni4, ICSD #76403
+AB4_cP5_221_a_bc.{AB}                            cP5       Pm-3m               L'1_{0}   N1Ni4 (Fe4N)        #221      metal-nitride; N1Ni4, ICSD #76403, equivalent to Fe4N (http://aflow.org/prototype-encyclopedia/A4B_cP5_221_bc_a.html, part 3)
 A4B3_cP7_221_ac_d.{AB}                           cP7       Pm-3m               -         N4W3                #221      metal-nitride; N4W3, ICSD #30370 similar to 708.AB,708.BA,1256.AB,1256.BA [HTQC]
 
 *****************************************************************************************************************************************************
@@ -1738,7 +1738,7 @@ A2BC2_tI20_140_h_a_h-001.{ABC}                   tI20      I4/mcm              -
 AB2C2_tI20_140_a_h_h-001.{ABC}                   tI20      I4/mcm              -         Ba1Be2N2            #140      metal-nitride; Ba1Be2N2, ICSD #415304
 AB2C_hR4_160_a_2a_a-001.{ABC}                    hR4       R3m                 -         Cr1N2W1             #160      metal-nitride; Cr1N2W1, ICSD #84639
 A2B2C_hP5_164_d_d_a-001.{ABC}                    hP5       P-3m1               -         Li2N2Zr1            #164      metal-nitride; Li2N2Zr1, ICSD #16231
-A2B2C_hP5_164_d_d_a-002.{ABC}                    hP5       P-3m1               -         Mg2N2Sr1            #164      metal-nitride; Mg2N2Sr1, ICSD #410826
+A2B2C_hP5_164_d_d_a-002.{ABC}                    hP5       P-3m1               -         Mg2N2Sr1            #164      metal-nitride; Mg2N2Sr1, ICSD #410826, equivalent to Ce2O2S (http://aflow.org/prototype-encyclopedia/A2B2C_hP5_164_d_d_a.html, part 3)
 AB2C2_hP5_164_a_d_d-001.{ABC}                    hP5       P-3m1               -         Ce1Li2N2            #164      metal-nitride; Ce1Li2N2, ICSD #34003
 AB2C_hR4_166_a_c_b-001.{ABC}                     hR4       R-3m                -         Cu1N2Ta1            #166      metal-nitride; Cu1N2Ta1, ICSD #71136
 A3BC3_hP14_176_h_c_h-001.{ABC}                   hP14      P6_{3}/m            -         Ba3Fe1N3            #176      metal-nitride; Ba3Fe1N3, ICSD #36502
@@ -1792,7 +1792,7 @@ AB2C_oP8_59_a_e_b-001.ABC/BCA/CAB                oP8       Pmmn                -
 A3B3C_oP14_59_ae_ae_b-001.{ABC}                  oP14      Pmmn                -         Au3In3Sr1           #59       metallic; Au3In3Sr1, ICSD #245679
 AB3C4_oP16_59_b_ae_ef-001.{ABC}                  oP16      Pmmn                -         Au1K3Sn4            #59       metallic; Au1K3Sn4, ICSD #107444
 AB3C4_oP16_59_b_ae_ef-002.{ABC}                  oP16      Pmmn                -         Au1Cs3Pb4           #59       metallic; Au1Cs3Pb4, ICSD #107448
-ABC_oP12_62_c_c_c-003.{ABC}                      oP12      Pnma                -         Ca1Mg1Sn1           #62       metallic; Ca1Mg1Sn1, ICSD #42757
+ABC_oP12_62_c_c_c-003.{ABC}                      oP12      Pnma                -         Ca1Mg1Sn1           #62       metallic; Ca1Mg1Sn1, ICSD #42757, equivalent to CuMnP (http://aflow.org/prototype-encyclopedia/ABC_oP12_62_c_c_c.html, part 3)
 ABC_oP12_62_c_c_c-004.ABC/BCA/CAB                oP12      Pnma                -         Ni1Sn1Tb1           #62       metallic; Ni1Sn1Tb1, ICSD #54301
 ABC_oP12_62_c_c_c-005.{ABC}                      oP12      Pnma                -         Co1Dy1Sn1           #62       metallic; Co1Dy1Sn1, ICSD #54415
 ABC_oP12_62_c_c_c-006.{ABC}                      oP12      Pnma                -         Bi1Ca1Li1           #62       metallic; Bi1Ca1Li1, ICSD #58762
@@ -1809,7 +1809,7 @@ AB2C_oP16_62_c_d_c-002.{ABC}                     oP16      Pnma                -
 ABC_oC12_63_c_c_c-001.{ABC}                      oC12      Cmcm                -         Mg1Ni1Tb1           #63       metallic; Mg1Ni1Tb1, ICSD #166874
 ABC_oC12_63_c_c_a-001.{ABC}                      oC12      Cmcm                -         Pt1Sc1Zn1           #63       metallic; Pt1Sc1Zn1, ICSD #424600
 A2BC_oC16_63_f_c_c-001.{ABC}                     oC16      Cmcm                -         Al2Co1Y1            #63       metallic; Al2Co1Y1, ICSD #57645
-A2BC_oC16_63_f_c_c-002.{ABC}                     oC16      Cmcm                -         Al2Cu1Mg1           #63       metallic; Al2Cu1Mg1, ICSD #57693
+A2BC_oC16_63_f_c_c-002.{ABC}                     oC16      Cmcm                E1_{1}    Al2Cu1Mg1           #63       metallic; Al2Cu1Mg1, ICSD #57693, equivalent to Al2CuMg (E1_{a}, http://aflow.org/prototype-encyclopedia/A2BC_oC16_63_f_c_c.html, part 3)
 ABC2_oC16_63_a_c_g-001.{ABC}                     oC16      Cmcm                -         Au1Bi1Li2           #63       metallic; Au1Bi1Li2, ICSD #261785
 ABC2_oC16_63_a_c_g-002.{ABC}                     oC16      Cmcm                -         Au1Bi1Li2           #63       metallic; Au1Bi1Li2, ICSD #261786
 ABC2_oC16_63_a_c_g-003.{ABC}                     oC16      Cmcm                -         Au1Bi1Na2           #63       metallic; Au1Bi1Na2, ICSD #261788
@@ -1850,7 +1850,7 @@ A3B10C_oI28_71_be_g2n_c-001.{ABC}                oI28      Immm                -
 A6B5C3_oI28_71_gn_cn_be-001.{ABC}                oI28      Immm                -         Cu6Sn5Yb3           #71       metallic; Cu6Sn5Yb3, ICSD #413485
 A9B3C2_oI28_71_c2n_be_g-001.{ABC}                oI28      Immm                -         Ga9Ho3Pd2           #71       metallic; Ga9Ho3Pd2, ICSD #634397
 A2B2C_oI20_72_j_j_a-001.{ABC}                    oI20      Ibam                -         Ba2Bi2Zn1           #72       metallic; Ba2Bi2Zn1, ICSD #421424
-ABC3_tI10_107_a_a_ab-001.{ABC}                   tI10      I4mm                -         Ba1Ni1Sn3           #107      metallic; Ba1Ni1Sn3, ICSD #58662
+ABC3_tI10_107_a_a_ab-001.{ABC}                   tI10      I4mm                -         Ba1Ni1Sn3           #107      metallic; Ba1Ni1Sn3, ICSD #58662, equivalent to BaNiSn3 (http://aflow.org/prototype-encyclopedia/ABC3_tI10_107_a_a_ab.html, part 3)
 A3BC_tI10_107_ab_a_a-001.{ABC}                   tI10      I4mm                -         Al3Cu1Pr1           #107      metallic; Al3Cu1Pr1, ICSD #290390
 A3BC_tI10_119_bf_a_c-001.{ABC}                   tI10      I-4m2               -         In3Mg1Sr1           #119      metallic; In3Mg1Sr1, ICSD #249592
 AB4C2_tI28_120_d_i_e-001.{ABC}                   tI28      I-4c2               -         Ce1Ni4Sn2           #120      metallic; Ce1Ni4Sn2, ICSD #102238
@@ -1867,7 +1867,7 @@ AB2C2_tP10_127_a_g_h-001.{ABC}                   tP10      P4/mbm              -
 A2BC_tP8_129_bc_c_a-001.{ABC}                    tP8       P4/nmm              -         Sn2Tb1Zn1           #129      metallic; Sn2Tb1Zn1, ICSD #163425
 A2BC_tP8_129_bc_c_a-002.{ABC}                    tP8       P4/nmm              -         Bi2La1Li1           #129      metallic; Bi2La1Li1, ICSD #415728
 AB2C2_tP10_129_c_ac_bc-001.ABC/BCA/CAB           tP10      P4/nmm              -         Nd1Ni2Sn2           #129      metallic; Nd1Ni2Sn2, ICSD #160053
-AB2C2_tP10_129_c_bc_ac-001.ABC/BCA/CAB           tP10      P4/nmm              -         Eu1Sn2Zn2           #129      metallic; Eu1Sn2Zn2, ICSD #162267
+AB2C2_tP10_129_c_bc_ac-001.ABC/BCA/CAB           tP10      P4/nmm              -         Eu1Sn2Zn2           #129      metallic; Eu1Sn2Zn2, ICSD #162267, equivalent to Be2CaGe2 (http://aflow.org/prototype-encyclopedia/A2BC2_tP10_129_ac_c_bc.html, part 3)
 A2BC2_tP10_129_bc_c_ac-001.ABC/BCA/CAB           tP10      P4/nmm              -         Bi2Ce1Ni2           #129      metallic; Bi2Ce1Ni2, ICSD #616562
 A2BC4_tP14_129_ac_b_j-001.{ABC}                  tP14      P4/nmm              -         Ce2Ru1Zn4           #129      metallic; Ce2Ru1Zn4, ICSD #418547
 AB2C_tI8_139_b_d_a-001.ABC/BCA/CAB               tI8       I4/mmm              -         Li1Pd2Tl1           #139      metallic; Li1Pd2Tl1, ICSD #54365
@@ -1890,7 +1890,7 @@ A4B8C_tI26_139_i_fj_a-001.{ABC}                  tI26      I4/mmm              -
 A8B4C_tI26_139_ij_f_a-001.{ABC}                  tI26      I4/mmm              -         Al8Mn4Y1            #139      metallic; Al8Mn4Y1, ICSD #57997
 ABC4_tI24_140_a_c_l-001.{ABC}                    tI24      I4/mcm              -         Ir1Li1Sn4           #140      metallic; Ir1Li1Sn4, ICSD #172149
 A2BC4_tI28_140_h_a_k-001.{ABC}                   tI28      I4/mcm              -         Bi2Mn1Ti4           #140      metallic; Bi2Mn1Ti4, ICSD #150145
-A4B2C_tI28_140_l_h_a-001.{ABC}                   tI28      I4/mcm              -         Cu4Sn2Sr1           #140      metallic; Cu4Sn2Sr1, ICSD #182104
+A4B2C_tI28_140_l_h_a-001.{ABC}                   tI28      I4/mcm              -         Cu4Sn2Sr1           #140      metallic; Cu4Sn2Sr1, ICSD #182104, equivalent to Sb2SiV4 (http://aflow.org/prototype-encyclopedia/A2BC4_tI28_140_h_a_k.html, part 3)
 AB5C2_tI32_140_a_cl_h-001.{ABC}                  tI32      I4/mcm              -         Bi1Er5Pt2           #140      metallic; Bi1Er5Pt2, ICSD #107217
 A3B4C_tI32_140_ah_l_c-001.{ABC}                  tI32      I4/mcm              -         Bi3In4Pb1           #140      metallic; Bi3In4Pb1, ICSD #616725
 AB5C2_tI32_140_a_bk_h-001.{ABC}                  tI32      I4/mcm              -         Ga1Nb5Sn2           #140      metallic; Ga1Nb5Sn2, ICSD #103842
@@ -1924,7 +1924,7 @@ ABC_hP9_187_dh_ai_eg-001.{ABC}                   hP9       P-6m2               -
 A5B5C_hP11_187_hk_cgi_a-001.{ABC}                hP11      P-6m2               -         Al5Ba5Pb1           #187      metallic; Al5Ba5Pb1, ICSD #416337
 A4B6C_hP11_187_ck_jk_a-001.{ABC}                 hP11      P-6m2               -         Au4In6K1            #187      metallic; Au4In6K1, ICSD #249520
 A3B2C3_hP8_189_f_c_g-001.{ABC}                   hP8       P-62m               -         In3Rh2Ti3           #189      metallic; In3Rh2Ti3, ICSD #410967
-ABC_hP9_189_g_f_ad-001.{ABC}                     hP9       P-62m               -         Bi1Dy1Rh1           #189      metallic; Bi1Dy1Rh1, ICSD #51845
+ABC_hP9_189_g_f_ad-001.{ABC}                     hP9       P-62m               -         Bi1Dy1Rh1           #189      metallic; Bi1Dy1Rh1, ICSD #51845, equivalent to ZlNiZr (http://aflow.org/prototype-encyclopedia/ABC_hP9_189_g_ad_f.html, part 3)
 AB2C6_hP9_189_b_c_fg-001.{ABC}                   hP9       P-62m               -         Co1Ga2Zr6           #189      metallic; Co1Ga2Zr6, ICSD #20876
 A5B3C_hP9_189_cf_g_b-001.{ABC}                   hP9       P-62m               -         Ga5Lu3Ni1           #189      metallic; Ga5Lu3Ni1, ICSD #634575
 ABC_hP9_189_g_bc_f-001.{ABC}                     hP9       P-62m               -         Pb1Pd1Y1            #189      metallic; Pb1Pd1Y1, ICSD #54315
@@ -1958,7 +1958,7 @@ ABC_hP12_194_ab_f_f-001.{ABC}                    hP12      P6_{3}/mmc          -
 ABC_hP12_194_ab_f_f-002.{ABC}                    hP12      P6_{3}/mmc          -         La1Sn1Zn1           #194      metallic; La1Sn1Zn1, ICSD #152623
 A3B3C2_hP16_194_h_af_f-001.{ABC}                 hP16      P6_{3}/mmc          -         Al2Ba2Ga1.33        #194      metallic; Al2Ba2Ga1.33, ICSD #415931
 AB2C_cP16_215_e_bce_ad-001.{ABC}                 cP16      P-43m               -         Ir1Li2Mg1           #215      metallic; Ir1Li2Mg1, ICSD #180119
-ABC2_cF16_216_a_d_bc.ABC/CAB/BCA                 cF16      F-43m               -         Ag1Al1Li2           #216      metallic; Ag1Al1Li2, ICSD #57330
+ABC2_cF16_216_a_d_bc.ABC/CAB/BCA                 cF16      F-43m               -         Ag1Al1Li2           #216      metallic; Ag1Al1Li2, ICSD #57330, equivalent to inverse Heusler CuHg2Ti (http://aflow.org/prototype-encyclopedia/AB2C_cF16_216_b_ad_c.html, part 3)
 AB4C_cF24_216_a_e_c-001.ABC/BCA/CAB              cF24      F-43m               -         In1Ni4Zr1           #216      metallic; In1Ni4Zr1, ICSD #59462
 A3B4C4_cI22_217_b_c_c-001.{ABC}                  cI22      I-43m               -         Ca3Ga4Ni4           #217      metallic; Ca3Ga4Ni4, ICSD #58899
 A3BC_cP15_221_ag_c_d-001.{ABC}                   cP15      Pm-3m               -         Ga3Os1Tb1           #221      metallic; Ga3Os1Tb1, ICSD #412144
@@ -1974,13 +1974,13 @@ A5B2_mC14_12_a2i_i-002.{AB}                      mC14      C2/m                -
 A3B4_mC28_15_ef_2f-001.{AB}                      mC28      C2/c                -         B3Ni4               #15       metal-boride; B3Ni4, ICSD #24308 equivalent to 1071.AB,1071.BA [HTQC]
 A3B4_mC28_15_ef_2f-002.{AB}                      mC28      C2/c                -         B3Ni4               #15       metal-boride; B3Ni4, ICSD #150561 equivalent to 1070.AB,1070.BA [HTQC]
 A4B_oP10_58_2g_a-001.{AB}                        oP10      Pnnm                -         B4Cr1               #58       metal-boride; B4Cr1, ICSD #186851 equivalent to 1055.AB,1055.BA,1056.AB,1056.BA [HTQC]
-A2B_oP6_59_e_a-001.{AB}                          oP6       Pmmn                -         B2Ru1               #59       metal-boride; B2Ru1, ICSD #31871 equivalent to 1018.AB,1018.BA [HTQC]
+A2B_oP6_59_e_a-001.{AB}                          oP6       Pmmn                -         B2Ru1               #59       metal-boride; B2Ru1, ICSD #31871 equivalent to 1018.AB,1018.BA [HTQC], equivalent to B2Ru1 (http://aflow.org/prototype-encyclopedia/A2B_oP6_59_f_a.html, part 3)
 AB_oP8_62_c_c-007.{AB}                           oP8       Pnma                -         B1Ti1               #62       metal-boride; B1Ti1, ICSD #24701 equivalent to 256,1020.AB,1020.BA,1050.AB,1050.BA [HTQC]
 AB_oP8_62_c_c-008.{AB}                           oP8       Pnma                -         B1Li1               #62       metal-boride; B1Li1, ICSD #153291 equivalent to 1049.AB,1049.BA [HTQC]
 AB_oP8_62_c_c-009.{AB}                           oP8       Pnma                -         B1Co1               #62       metal-boride; B1Co1, ICSD #612863 equivalent to 256,1020.AB,1020.BA,1047.AB,1047.BA,1050.AB,1050.BA [HTQC]
 A2B_oP12_62_d_c-001.{AB}                         oP12      Pnma                -         B2Fe1               #62       metal-boride; B2Fe1, ICSD #425310 equivalent to 1066.AB,1066.BA [HTQC]
 AB_oC8_63_a_c-001.{AB}                           oC8       Cmcm                -         B1Rh1               #63       metal-boride; B1Rh1, ICSD #150732 equivalent to 1029.AB,1029.BA [HTQC]
-AB3_oC16_63_c_cf-001.{AB}                        oC16      Cmcm                -         B1Re3               #63       metal-boride; B1Re3, ICSD #43662 equivalent to 1022.AB,1022.BA [HTQC]
+AB3_oC16_63_c_cf-001.{AB}                        oC16      Cmcm                -         B1Re3               #63       metal-boride; B1Re3, ICSD #43662 equivalent to 1022.AB,1022.BA [HTQC], equivalent to BRe3 (http://aflow.org/prototype-encyclopedia/AB3_oC16_63_c_cf.html, part 3)
 A3B2_oC20_63_3c_2c-001.{AB}                      oC20      Cmcm                -         B3V2                #63       metal-boride; B3V2, ICSD #79258 equivalent to 1012.AB,1012.BA [HTQC]
 A6B5_oC22_65_i2j_aij-001.{AB}                    oC22      Cmmm                -         B6Ta5               #65       metal-boride; B6Ta5, ICSD #68538 equivalent to 1058.AB,1058.BA [HTQC]
 A4B_oI10_71_n_a-001.{AB}                         oI10      Immm                -         B4Cr1               #71       metal-boride; B4Cr1, ICSD #24353 equivalent to 1033.AB,1033.BA [HTQC]
@@ -1988,7 +1988,7 @@ A4B3_oI14_71_ef_af-001.{AB}                      oI14      Immm                -
 A4B3_oI14_71_ef_af-002.{AB}                      oI14      Immm                -         B4Mn3               #71       metal-boride; B4Mn3, ICSD #614732
 A11B_tI24_119_aegi_d-001.{AB}                    tI24      I-4m2               -         B11Li1              #119      metal-boride; B11Li1, ICSD #164844 equivalent to 1062.AB,1062.BA [HTQC]
 A11B_tI24_119_aegi_d-002.{AB}                    tI24      I-4m2               -         B11Li1              #119      metal-boride; B11Li1, ICSD #164845 equivalent to 1063.AB,1063.BA [HTQC]
-AB2_tI12_121_ab_i-001.{AB}                       tI12      I-42m               -         B1Fe2               #121      metal-boride; B1Fe2, ICSD #16809 equivalent to 1037.AB,1037.BA [HTQC]
+AB2_tI12_121_ab_i-001.{AB}                       tI12      I-42m               C17       B1Fe2               #121      metal-boride; B1Fe2, ICSD #16809 equivalent to 1037.AB,1037.BA [HTQC], equivalent to Fe2B (C17, obsolete, http://aflow.org/prototype-encyclopedia/AB2_tI12_121_ab_i.html)
 A12B_tI26_139_jm_a-001.{AB}                      tI26      I4/mmm              -         B12Sc1              #139      metal-boride; B12Sc1, ICSD #615424 equivalent to 1068.AB,1068.BA [HTQC]
 AB2_tI12_140_b_h-001.{AB}                        tI12      I4/mcm              -         B1Fe2               #140      metal-boride; B1Fe2, ICSD #160789 equivalent to 1036.AB,1036.BA [HTQC]
 AB2_tI12_140_b_h-002.{AB}                        tI12      I4/mcm              -         B1Fe2               #140      metal-boride; B1Fe2, ICSD #160790
@@ -2006,7 +2006,7 @@ A2B_hP3_191_d_a-003.{AB}                         hP3       P6/mmm              -
 AB_hP4_194_a_c-002.{AB}                          hP4       P6_{3}/mmc          -         B1Pt1               #194      metal-boride; B1Pt1, ICSD #24363 equivalent to 1016.AB,1016.BA [HTQC]
 A2B_hP6_194_f_c-001.{AB}                         hP6       P6_{3}/mmc          -         B2Re1               #194      metal-boride; B2Re1, ICSD #23871 equivalent to 694.AB,694.BA,1017.AB,1017.BA [HTQC]
 AB_hP8_194_bc_f-001.{AB}                         hP8       P6_{3}/mmc          -         B2Li2               #194      metal-boride; B2Li2, ICSD #2 equivalent to 1051.AB,1051.BA [HTQC]
-A3B_hP8_194_af_c-001.{AB}                        hP8       P6_{3}/mmc          -         B3Re1               #194      metal-boride; B3Re1, ICSD #24361 equivalent to 1053.AB,1053.BA [HTQC]
+A3B_hP8_194_af_c-001.{AB}                        hP8       P6_{3}/mmc          -         B3Re1               #194      metal-boride; B3Re1, ICSD #24361 equivalent to 1053.AB,1053.BA [HTQC], equivalent to B3Re (http://aflow.org/prototype-encyclopedia/A3B_hP8_194_af_c.html, part 3) 
 A3B2_hP10_194_cf_f-002.{AB}                      hP10      P6_{3}/mmc          -         B3Ru2               #194      metal-boride; B3Ru2, ICSD #23715 equivalent to 1023.AB,1023.BA [HTQC]
 A4B_hP10_194_2f_c-001.{AB}                       hP10      P6_{3}/mmc          -         B4Mo1               #194      metal-boride; B4Mo1, ICSD #167735 equivalent to 1057.AB,1057.BA [HTQC]
 A3B2_hP10_194_bf_f-001.{AB}                      hP10      P6_{3}/mmc          -         B3Ru2               #194      metal-boride; B3Ru2, ICSD #108082
@@ -2058,7 +2058,7 @@ A6BC2_oI18_71_hn_a_f-002.{ABC}                   oI18      Immm                -
 ABC3_tP5_99_a_b_ac-001.{ABC}                     tP5       P4mm                -         B1Ce1Pt3            #99       metal-boride; B1Ce1Pt3, ICSD #95049
 A2BC2_tI10_139_e_a_d-001.{ABC}                   tI10      I4/mmm              -         B2Ba1Rh2            #139      metal-boride; B2Ba1Rh2, ICSD #8155
 A2B2C_tI10_139_d_e_a-001.{ABC}                   tI10      I4/mmm              -         B2Ir2Zn1            #139      metal-boride; B2Ir2Zn1, ICSD #71642
-A2B2C_tI10_139_e_d_a-001.{ABC}                   tI10      I4/mmm              -         B2Co2Dy1            #139      metal-boride; B2Co2Dy1, ICSD #612907
+A2B2C_tI10_139_e_d_a-001.{ABC}                   tI10      I4/mmm              -         B2Co2Dy1            #139      metal-boride; B2Co2Dy1, ICSD #612907, equivalent to Cr2Si2Th (http://aflow.org/prototype-encyclopedia/A2B2C_tI10_139_d_e_a.html, part 3)
 A2B3C7_hR12_166_c_bc_ah-001.{ABC}                hR12      R-3m                -         B2Ca3Ni7            #166      metal-boride; B2Ca3Ni7, ICSD #36505
 A6B3C4_hR13_166_g_ac_2c-001.{ABC}                hR13      R-3m                -         B6Fe3Pr4            #166      metal-boride; B6Fe3Pr4, ICSD #614152
 A4BC3_hP16_176_bh_c_h-001.{ABC}                  hP16      P6_{3}/m            -         B4Hf1Ir3            #176      metal-boride; B4Hf1Ir3, ICSD #1518
@@ -2126,7 +2126,7 @@ A8B3_oC22_21_achl_bg-001.{AB}                    oC22      C222                -
 AB_oP8_29_a_a-001.{AB}                           oP8       Pca2_{1}            -         O1Pb1               #29       metal-oxide; O1Pb1, ICSD #36250
 A2B_oP12_29_2a_a-002.{AB}                        oP12      Pca2_{1}            -         O2Zr1               #29       metal-oxide; O2Zr1, ICSD #67004
 AB_oP4_31_a_a-001.{AB}                           oP4       Pmn2_{1}            -         O1Sn1               #31       metal-oxide; O1Sn1, ICSD #20624
-A5B2_oP14_31_a2b_b-001.{AB}                      oP14      Pmn2_{1}            -         O5V2                #31       metal-oxide; O5V2, ICSD #15984
+A5B2_oP14_31_a2b_b-001.{AB}                      oP14      Pmn2_{1}            D8_{7}    O5V2                #31       metal-oxide; O5V2, ICSD #15984, equivalent to O5V2 (shcherbnaite (obsolete), http://aflow.org/prototype-encyclopedia/A5B2_oP14_31_a2b_b.html, part 3)
 A5B2_oP14_31_a2b_b-002.{AB}                      oP14      Pmn2_{1}            -         O5V2                #31       metal-oxide; O5V2, ICSD #29140
 A5B2_oP14_31_a2b_b-003.{AB}                      oP14      Pmn2_{1}            -         O5V2                #31       metal-oxide; O5V2, ICSD #41030
 A2B_oC24_35_abef_de-001.{AB}                     oC24      Cmm2                -         O2Ti1               #35       metal-oxide; O2Ti1, ICSD #97008
@@ -2134,7 +2134,7 @@ AB_oC16_36_2a_2a-002.{AB}                        oC16      Cmc2_{1}            -
 AB_oC16_36_b_2a-001.{AB}                         oC16      Cmc2_{1}            -         O1Sn1               #36       metal-oxide; O1Sn1, ICSD #60619
 A8B_oC18_38_2cde_a-001.{AB}                      oC18      Amm2                -         Cu8O1               #38       metal-oxide; Cu8O1, ICSD #62764
 AB3_oC32_40_c_3c-001.{AB}                        oC32      Ama2                -         Cr1O3               #40       metal-oxide; Cr1O3, ICSD #16031
-A2B3_oF40_43_b_ab-001.{AB}                       oF40      Fdd2                -         Au2O3               #43       metal-oxide; Au2O3, ICSD #8014
+A2B3_oF40_43_b_ab-001.{AB}                       oF40      Fdd2                -         Au2O3               #43       metal-oxide; Au2O3, ICSD #8014, equivalent to Ag2O3 (http://aflow.org/prototype-encyclopedia/A2B3_oF40_43_b_ab.html, part 3)
 AB3_oI8_44_a_ac-001.{AB}                         oI8       Imm2                -         Li1O3               #44       metal-oxide; Li1O3, ICSD #180565
 AB_oP2_47_a_e-001.AB                             oP2       Pmmm                -         Nb1O1               #47       metal-oxide; Nb1O1, ICSD #95729
 AB2_oP3_47_a_m-001.{AB}                          oP3       Pmmm                -         Cu1O2               #47       metal-oxide; Cu1O2, ICSD #54126
@@ -2145,7 +2145,7 @@ AB2_oP12_59_e_2e-001.{AB}                        oP12      Pmmn                -
 AB2_oP12_59_e_2e-002.{AB}                        oP12      Pmmn                -         Hf1O2               #59       metal-oxide; Hf1O2, ICSD #83863
 A5B2_oP14_59_a2e_e-002.{AB}                      oP14      Pmmn                -         O5V2                #59       metal-oxide; O5V2, ICSD #43132
 A2B_oP12_60_d_c-002.{AB}                         oP12      Pbcn                -         O2Ti1               #60       metal-oxide; O2Ti1, ICSD #15328
-A2B_oP12_60_d_c-003.{AB}                         oP12      Pbcn                -         O2Pb1               #60       metal-oxide; O2Pb1, ICSD #20362
+A2B_oP12_60_d_c-003.{AB}                         oP12      Pbcn                -         O2Pb1               #60       metal-oxide; O2Pb1, ICSD #20362, equivalent to alpha-PbO2 (http://aflow.org/prototype-encyclopedia/A2B_oP12_60_d_c.html, part 3)
 A2B_oP12_60_d_c-004.{AB}                         oP12      Pbcn                -         O2Re1               #60       metal-oxide; O2Re1, ICSD #24060
 AB2_oP12_61_a_c-001.{AB}                         oP12      Pbca                -         Hg1O2               #61       metal-oxide; Hg1O2, ICSD #24774
 A2B_oP12_62_2c_c-006.{AB}                        oP12      Pnma                -         O2Zr1               #62       metal-oxide; O2Zr1, ICSD #56696 equivalent to 652.AB,652.BA [HTQC]
@@ -2160,7 +2160,7 @@ A3B4_oC28_63_cf_acf-001.{AB}                     oC28      Cmcm                -
 AB2_oC6_65_a_j-001.{AB}                          oC6       Cmmm                -         Ba1O2               #65       metal-oxide; Ba1O2, ICSD #180398
 AB2_oF12_69_a_h-001.{AB}                         oF12      Fmmm                -         Cu1O2               #69       metal-oxide; Cu1O2, ICSD #85080
 AB2_oF12_69_a_g-001.{AB}                         oF12      Fmmm                -         Cu1O2               #69       metal-oxide; Cu1O2, ICSD #150886
-AB_oI8_71_g_e-001.{AB}                           oI8       Immm                -         O2Rb2               #71       metal-oxide; O2Rb2, ICSD #25528
+AB_oI8_71_g_e-001.{AB}                           oI8       Immm                -         O2Rb2               #71       metal-oxide; O2Rb2, ICSD #25528, equivalent to CsO (http://aflow.org/prototype-encyclopedia/AB_oI8_71_g_i.html, part 3)
 AB_oI32_72_2j_2j-001.AB                          oI32      Ibam                -         Mg1O1               #72       metal-oxide; Mg1O1, ICSD #181462
 A3B4_oI28_74_ace_hi-001.{AB}                     oI28      Imma                -         Fe3O4               #74       metal-oxide; Fe3O4, ICSD #31156
 AB2_tI24_87_h_2h-001.{AB}                        tI24      I4/m                -         Mn1O2               #87       metal-oxide; Mn1O2, ICSD #20227
@@ -2173,12 +2173,12 @@ AB_tP4_129_c_a-001.{AB}                          tP4       P4/nmm              -
 AB2_tP6_129_c_ac-001.{AB}                        tP6       P4/nmm              -         Gd1O2               #129      metal-oxide; Gd1O2, ICSD #6318
 AB2_tP6_129_c_ac-002.{AB}                        tP6       P4/nmm              -         Eu1O2               #129      metal-oxide; Eu1O2, ICSD #631464
 A3B_tP8_129_cd_c-001.{AB}                        tP8       P4/nmm              -         O3W1                #129      metal-oxide; O3W1, ICSD #27961
-A3B_tP16_130_cf_c-001.{AB}                       tP16      P4/ncc              -         O3W1                #130      metal-oxide; O3W1, ICSD #50732
+A3B_tP16_130_cf_c-001.{AB}                       tP16      P4/ncc              -         O3W1                #130      metal-oxide; O3W1, ICSD #50732, equivalent to alpha-WO3 (http://aflow.org/prototype-encyclopedia/A3B_tP16_130_cf_c.html, part 3)
 A2B3_tP10_132_i_be-001.{AB}                      tP10      P4_{2}/mcm          -         Bi2O3               #132      metal-oxide; Bi2O3, ICSD #168807
 A2B_tP6_136_f_a-002.{AB}                         tP6       P4_{2}/mnm          -         O2W1                #136      metal-oxide; O2W1, ICSD #647647
 A2B_tP6_137_d_a-002.{AB}                         tP6       P4_{2}/nmc          -         O2Zr1               #137      metal-oxide; O2Zr1, ICSD #93028
 AB_tI4_139_b_a-001.AB                            tI4       I4/mmm              -         O1Pd1               #139      metal-oxide; O1Pd1, ICSD #41617
-AB_tI4_139_a_b-002.AB                            tI4       I4/mmm              -         Co1O1               #139      metal-oxide; Co1O1, ICSD #174027
+AB_tI4_139_a_b-002.AB                            tI4       I4/mmm              -/L2_{0}  Co1O1/FeC_{x}       #139      metal-oxide; Co1O1, ICSD #174027, equivalent to "Martensite Type" FeC_{x} (L2_{0}, http://aflow.org/prototype-encyclopedia/AB_tI4_139_b_a.html, part 3)
 AB2_tI6_139_a_e-005.{AB}                         tI6       I4/mmm              -         Ca1O2               #139      metal-oxide; Ca1O2, ICSD #20275
 AB2_tI6_139_a_e-006.{AB}                         tI6       I4/mmm              -         Ba1O2               #139      metal-oxide; Ba1O2, ICSD #24729
 AB3_tI32_140_ab_hk-001.{AB}                      tI32      I4/mcm              -         K1O3                #140      metal-oxide; K1O3, ICSD #28347
@@ -2210,7 +2210,7 @@ A2B3_hR10_167_c_e-003.{AB}                       hR10      R-3c                -
 A2B3_hR10_167_c_e-004.{AB}                       hR10      R-3c                -         Al2O3               #167      metal-oxide; Al2O3, ICSD #99783
 A2B_hP6_186_ab_b-001.{AB}                        hP6       P6_{3}mc            -         O2Pt1               #186      metal-oxide; O2Pt1, ICSD #24923
 AB_hP2_187_d_a-003.AB                            hP2       P-6m2               -         Mg1O1               #187      metal-oxide; Mg1O1, ICSD #166273
-A3B_hP12_191_gl_f-001.{AB}                       hP12      P6/mmm              -         O3W1                #191      metal-oxide; O3W1, ICSD #32001 equivalent to 699.AB,699.BA [HTQC]
+A3B_hP12_191_gl_f-001.{AB}                       hP12      P6/mmm              -         O3W1                #191      metal-oxide; O3W1, ICSD #32001 equivalent to 699.AB,699.BA [HTQC], equivalent to hexagonal O3W (http://aflow.org/prototype-encyclopedia/A3B_hP12_191_gl_f.html, part 3)
 A3B_hP8_193_g_b-002.{AB}                         hP8       P6_{3}/mcm          -         Cs3O1               #193      metal-oxide; Cs3O1, ICSD #15695
 AB_hP8_194_f_f-001.{AB}                          hP8       P6_{3}/mmc          -         Li2O2               #194      metal-oxide; Li2O2, ICSD #24143
 AB_hP8_194_f_f-002.{AB}                          hP8       P6_{3}/mmc          -         Li2O2               #194      metal-oxide; Li2O2, ICSD #50658
@@ -2220,7 +2220,7 @@ A3B4_cF56_216_abe_2e-001.{AB}                    cF56      F-43m               -
 AB2_cI24_217_c_abc-001.{AB}                      cI24      I-43m               -         O1Ta2               #217      metal-oxide; O1Ta2, ICSD #28387
 AB_cP12_223_c_d.AB                               cP12      Pm-3n               -         Mg1O1               #223      metal-oxide; Mg1O1, ICSD #181465
 A4B3_cP14_223_e_c.{AB}                           cP14      Pm-3n               -         O4Pt3               #223      metal-oxide; O4Pt3, ICSD #30444
-A2B3_cP10_224_b_d.{AB}                           cP10      Pn-3m               -         Ag2O3               #224      metal-oxide; Ag2O3, ICSD #15999
+A2B3_cP10_224_b_d.{AB}                           cP10      Pn-3m               D5_{5}    Ag2O3 (Mg3P2)       #224      metal-oxide; Ag2O3, ICSD #15999, equivalent to Mg3P2 (D5_{5}, http://aflow.org/prototype-encyclopedia/A3B2_cP10_224_d_b.html, part 3)
 A3B4_cF56_227_ad_e-002.{AB}                      cF56      Fd-3m               -         Co3O4               #227      metal-oxide; Co3O4, ICSD #63164
 
 *****************************************************************************************************************************************************
@@ -2278,7 +2278,7 @@ ABC_mC12_12_i_i_i-002.ABC/BCA/CAB                mC12      C2/m                -
 ABC2_mC16_12_ad_i_2i-001.{ABC}                   mC16      C2/m                -         Li1Mo1O2            #12       metal-oxide; Li1Mo1O2, ICSD #165326
 AB4C4_mC18_12_a_2i_j-001.{ABC}                   mC18      C2/m                -         Ir1K4O4             #12       metal-oxide; Ir1K4O4, ICSD #47223
 A2B3C4_mC18_12_i_ai_2i-001.{ABC}                 mC18      C2/m                -         Cu2Li3O4            #12       metal-oxide; Cu2Li3O4, ICSD #66509
-A2B5C2_mC18_12_i_a2i_i-001.{ABC}                 mC18      C2/m                -         K2O5Ti2             #12       metal-oxide; K2O5Ti2, ICSD #36097
+A2B5C2_mC18_12_i_a2i_i-001.{ABC}                 mC18      C2/m                -         K2O5Ti2             #12       metal-oxide; K2O5Ti2, ICSD #36097, equivalent to K2O5Ti2 (http://aflow.org/prototype-encyclopedia/A2B5C2_mC18_12_i_a2i_i.html, part 3)
 A4BC4_mC18_12_2i_a_j-001.{ABC}                   mC18      C2/m                -         Cs4Ir1O4            #12       metal-oxide; Cs4Ir1O4, ICSD #72287
 AB6C2_mC18_12_a_3i_i-003.{ABC}                   mC18      C2/m                -         Co1O6V2             #12       metal-oxide; Co1O6V2, ICSD #188911
 AB3C_mC20_12_i_ghi_e-001.{ABC}                   mC20      C2/m                -         Ba1O3Pb1            #12       metal-oxide; Ba1O3Pb1, ICSD #94313
@@ -2289,7 +2289,7 @@ A3BC8_mC24_12_ci_a_2ij-001.{ABC}                 mC24      C2/m                -
 A3BC8_mC24_12_ci_a_2ij-002.{ABC}                 mC24      C2/m                -         Cr3Na1O8            #12       metal-oxide; Cr3Na1O8, ICSD #82620
 A3BC8_mC24_12_ci_a_2ij-003.{ABC}                 mC24      C2/m                -         Cr3In1O8            #12       metal-oxide; Cr3In1O8, ICSD #155504
 A3BC8_mC24_12_ci_a_2ij-004.{ABC}                 mC24      C2/m                -         Cr3K1O8             #12       metal-oxide; Cr3K1O8, ICSD #246524
-ABC4_mC24_12_i_i_4i-001.{ABC}                    mC24      C2/m                -         Fe1Nb1O4            #12       metal-oxide; Fe1Nb1O4, ICSD #14016
+ABC4_mC24_12_i_i_4i-001.{ABC}                    mC24      C2/m                -         Fe1Nb1O4            #12       metal-oxide; Fe1Nb1O4, ICSD #14016, equivalent to AlNbO4 (http://aflow.org/prototype-encyclopedia/ABC4_mC24_12_i_i_4i.html, part 3)
 AB4C_mC24_12_i_2ij_g-001.{ABC}                   mC24      C2/m                -         Al1O4W1             #12       metal-oxide; Al1O4W1, ICSD #4164
 AB4C_mC24_12_i_2ij_g-002.{ABC}                   mC24      C2/m                -         Cr1O4Re1            #12       metal-oxide; Cr1O4Re1, ICSD #173875
 A2BC3_mC24_12_acg_h_ij-001.{ABC}                 mC24      C2/m                -         Li2Ni1O3            #12       metal-oxide; Li2Ni1O3, ICSD #153094
@@ -2344,7 +2344,7 @@ A2B5C_mC32_15_f_e2f_c-001.{ABC}                  mC32      C2/c                -
 ABC2_mC32_15_2e_2e_2f-001.{ABC}                  mC32      C2/c                -         Er1Na1O2            #15       metal-oxide; Er1Na1O2, ICSD #2739
 A3B4C_oP16_31_ab_2ab_a-001.{ABC}                 oP16      Pmn2_{1}            -         Li3O4V1             #31       metal-oxide; Li3O4V1, ICSD #19002
 ABC2_oP16_33_a_a_2a-002.{ABC}                    oP16      Pna2_{1}            -         Ga1Na1O2            #33       metal-oxide; Ga1Na1O2, ICSD #4416
-ABC2_oP16_33_a_a_2a-003.ABC/BCA/CAB              oP16      Pna2_{1}            -         Ga1Li1O2            #33       metal-oxide; Ga1Li1O2, ICSD #18152
+ABC2_oP16_33_a_a_2a-003.ABC/BCA/CAB              oP16      Pna2_{1}            -         Ga1Li1O2            #33       metal-oxide; Ga1Li1O2, ICSD #18152, equivalent to GaLiO2 (http://aflow.org/prototype-encyclopedia/ABC2_oP16_33_a_a_2a.html, part 3)
 ABC2_oP16_33_a_a_2a-004.{ABC}                    oP16      Pna2_{1}            -         Fe1Na1O2            #33       metal-oxide; Fe1Na1O2, ICSD #27117
 ABC2_oP16_33_a_a_2a-005.{ABC}                    oP16      Pna2_{1}            -         Ga1Na1O2            #33       metal-oxide; Ga1Na1O2, ICSD #36652
 ABC2_oP16_33_a_a_2a-006.{ABC}                    oP16      Pna2_{1}            -         Ag1Al1O2            #33       metal-oxide; Ag1Al1O2, ICSD #160643
@@ -2402,7 +2402,7 @@ AB4C2_oC28_64_a_ef_f-001.{ABC}                   oC28      Cmce                -
 ABC3_oC10_65_a_c_bf-001.{ABC}                    oC10      Cmmm                -         Na1Nb1O3            #65       metal-oxide; Na1Nb1O3, ICSD #28564
 AB4C_oC12_65_a_hi_c-001.ABC/BCA/CAB              oC12      Cmmm                -         Co1O4Re1            #65       metal-oxide; Co1O4Re1, ICSD #72872
 A2B3C_oC12_65_i_ai_c-001.{ABC}                   oC12      Cmmm                -         Cu2O3Sr1            #65       metal-oxide; Cu2O3Sr1, ICSD #99041
-A2B3C_oC12_65_j_bj_a-001.{ABC}                   oC12      Cmmm                -         Li2O3Pr1            #65       metal-oxide; Li2O3Pr1, ICSD #154704
+A2B3C_oC12_65_j_bj_a-001.{ABC}                   oC12      Cmmm                -         Li2O3Pr1            #65       metal-oxide; Li2O3Pr1, ICSD #154704 equivalent to Li2O3Pr (http://aflow.org/prototype-encyclopedia/A2B3C_oC12_65_h_bh_a.html, part 3)
 AB3C4_oC16_65_b_ai_p-001.{ABC}                   oC16      Cmmm                -         Ba1Cu3O4            #65       metal-oxide; Ba1Cu3O4, ICSD #65881
 AB2C_oC16_65_i_n_ad-001.{ABC}                    oC16      Cmmm                -         O1Ti2Zr1            #65       metal-oxide; O1Ti2Zr1, ICSD #9389
 AB3C4_oC16_65_c_ai_p-001.{ABC}                   oC16      Cmmm                -         Ba1Cu3O4            #65       metal-oxide; Ba1Cu3O4, ICSD #83079
@@ -2471,7 +2471,7 @@ ABC_tI24_119_g_i_i-005.{ABC}                     tI24      I-4m2               -
 A3B4C_tI16_121_bd_i_a-001.{ABC}                  tI16      I-42m               -         K3O4V1              #121      metal-oxide; K3O4V1, ICSD #4138
 A3B4C_tI16_121_bd_i_a-002.{ABC}                  tI16      I-42m               -         Ag3O4V1             #121      metal-oxide; Ag3O4V1, ICSD #417470
 A2BC6_tI18_121_e_a_di-001.{ABC}                  tI18      I-42m               -         La2Mo1O6            #121      metal-oxide; La2Mo1O6, ICSD #25611
-AB3C8_tI24_121_a_bd_2i-001.{ABC}                 tI24      I-42m               -         Cr1K3O8             #121      metal-oxide; Cr1K3O8, ICSD #9356
+AB3C8_tI24_121_a_bd_2i-001.{ABC}                 tI24      I-42m               -         Cr1K3O8             #121      metal-oxide; Cr1K3O8, ICSD #9356, equivalent to Cr1K3O8 (http://aflow.org/prototype-encyclopedia/AB3C8_tI24_121_a_bd_2i.html, part 3)
 A3BC8_tI24_121_bd_a_2i-001.{ABC}                 tI24      I-42m               -         K3Nb1O8             #121      metal-oxide; K3Nb1O8, ICSD #30405
 ABC2_tI16_122_b_a_d-001.{ABC}                    tI16      I-42d               -         Co1K1O2             #122      metal-oxide; Co1K1O2, ICSD #4199
 A2BC4_tI28_122_d_a_e-001.{ABC}                   tI28      I-42d               -         Cr2Cu1O4            #122      metal-oxide; Cr2Cu1O4, ICSD #16708
@@ -2484,7 +2484,7 @@ AB3C_tP10_127_c_bg_a-001.{ABC}                   tP10      P4/mbm              -
 ABC_tP6_129_c_a_c-002.{ABC}                      tP6       P4/nmm              -         K1Na1O1             #129      metal-oxide; K1Na1O1, ICSD #32743
 AB4C2_tP14_131_c_n_j-001.{ABC}                   tP14      P4_{2}/mmc          -         Ca1O4Pt2            #131      metal-oxide; Ca1O4Pt2, ICSD #6159
 A3BC2_tP12_136_ad_b_f-001.{ABC}                  tP12      P4_{2}/mnm          -         K3Ni1O2             #136      metal-oxide; K3Ni1O2, ICSD #262579
-AB2C2_tI10_139_a_e_d-001.{ABC}                   tI10      I4/mmm              -         Bi1Ce2O2            #139      metal-oxide; Bi1Ce2O2, ICSD #9099
+AB2C2_tI10_139_a_e_d-001.{ABC}                   tI10      I4/mmm              -         Bi1Ce2O2            #139      metal-oxide; Bi1Ce2O2, ICSD #9099 equivalent to Co2S2Tl (http://aflow.org/prototype-encyclopedia/A2B2C_tI10_139_d_e_a.TlCo2S2.html, part 3)
 AB2C2_tI10_139_a_e_e-001.{ABC}                   tI10      I4/mmm              -         Hg1Na2O2            #139      metal-oxide; Hg1Na2O2, ICSD #25511
 AB2C4_tI14_139_a_e_cd-001.{ABC}                  tI14      I4/mmm              -         Cu1Nd2O4            #139      metal-oxide; Cu1Nd2O4, ICSD #4203
 AB2C4_tI14_139_a_e_cd-002.{ABC}                  tI14      I4/mmm              -         Cu1La2O4            #139      metal-oxide; Cu1La2O4, ICSD #261660
@@ -2495,7 +2495,7 @@ ABC_tI24_139_h_j_i-001.{ABC}                     tI24      I4/mmm              -
 ABC_tI24_139_h_j_i-002.{ABC}                     tI24      I4/mmm              -         Ag1K1O1             #139      metal-oxide; Ag1K1O1, ICSD #40154
 ABC_tI24_139_h_j_i-003.{ABC}                     tI24      I4/mmm              -         Cu1Li1O1            #139      metal-oxide; Cu1Li1O1, ICSD #40156
 ABC_tI24_139_h_j_i-004.{ABC}                     tI24      I4/mmm              -         Ag1Cs1O1            #139      metal-oxide; Ag1Cs1O1, ICSD #40160
-A7B3C2_tI24_139_aeg_be_e-001.{ABC}               tI24      I4/mmm              -         O7Sr3Ti2            #139      metal-oxide; O7Sr3Ti2, ICSD #20294
+A7B3C2_tI24_139_aeg_be_e-001.{ABC}               tI24      I4/mmm              -         O7Sr3Ti2            #139      metal-oxide; O7Sr3Ti2, ICSD #20294, equivalent to O7Sr3Ti2 (http://aflow.org/prototype-encyclopedia/A7B3C2_tI24_139_aeg_be_e.html, part 3)
 ABC_tI24_139_h_i_j-001.{ABC}                     tI24      I4/mmm              -         Cu1O1Rb1            #139      metal-oxide; Cu1O1Rb1, ICSD #40159
 ABC_tI24_139_h_i_j-002.{ABC}                     tI24      I4/mmm              -         Au1O1Rb1            #139      metal-oxide; Au1O1Rb1, ICSD #409552
 A4B3C8_tI30_139_2e_ae_cdg-001.{ABC}              tI30      I4/mmm              -         Nd4Ni3O8            #139      metal-oxide; Nd4Ni3O8, ICSD #51097
@@ -2521,7 +2521,7 @@ AB8C2_hP11_147_a_dg_d-001.{ABC}                  hP11      P-3                 -
 AB8C2_hP11_147_a_dg_d-002.{ABC}                  hP11      P-3                 -         Ni1O8Re2            #147      metal-oxide; Ni1O8Re2, ICSD #51016
 AB3C_hR10_148_c_f_c-002.ABC/BCA/CAB              hR10      R-3                 -         Cd1O3Ti1            #148      metal-oxide; Cd1O3Ti1, ICSD #15989
 AB3C_hR10_148_c_f_c-003.{ABC}                    hR10      R-3                 -         Fe1O3Ti1            #148      metal-oxide; Fe1O3Ti1, ICSD #153674
-A8B6C_hR15_148_cf_f_a-001.{ABC}                  hR15      R-3                 -         Li8O6Sn1            #148      metal-oxide; Li8O6Sn1, ICSD #1180
+A8B6C_hR15_148_cf_f_a-001.{ABC}                  hR15      R-3                 -         Li8O6Sn1            #148      metal-oxide; Li8O6Sn1, ICSD #1180, equivalent to Li7O6Sn1 (partially occupied Li, http://aflow.org/prototype-encyclopedia/A8B6C_hR15_148_cf_f_a.html, part 3)
 AB2C_hP12_152_b_c_a-001.{ABC}                    hP12      P3_{1}21            -         Ba1O2Zn1            #152      metal-oxide; Ba1O2Zn1, ICSD #25559
 AB2C_hP12_152_a_c_b-001.{ABC}                    hP12      P3_{1}21            -         Ba1O2Zn1            #152      metal-oxide; Ba1O2Zn1, ICSD #25812
 AB2C_hP12_154_a_c_b-001.{ABC}                    hP12      P3_{2}21            -         Hg1O2Sr1            #154      metal-oxide; Hg1O2Sr1, ICSD #69739
@@ -2550,7 +2550,7 @@ ABC2_hR4_166_b_a_c-002.ABC/BCA/CAB               hR4       R-3m                -
 ABC3_hR5_166_b_a_d-001.{ABC}                     hR5       R-3m                -         Bi1Fe1O3            #166      metal-oxide; Bi1Fe1O3, ICSD #20288
 A2BC2_hR5_166_c_a_c-001.{ABC}                    hR5       R-3m                -         Ag2Ni1O2            #166      metal-oxide; Ag2Ni1O2, ICSD #160574
 A2B4C_hR7_166_c_2c_a-001.{ABC}                   hR7       R-3m                -         Fe2O4Yb1            #166      metal-oxide; Fe2O4Yb1, ICSD #4192
-A2B3C2_hR7_166_ab_d_c-001.{ABC}                  hR7       R-3m                -         K2O3Sn2             #166      metal-oxide; K2O3Sn2, ICSD #15511
+A2B3C2_hR7_166_ab_d_c-001.{ABC}                  hR7       R-3m                -         K2O3Sn2             #166      metal-oxide; K2O3Sn2, ICSD #15511, equivalent to Ni3Pb2S2 (shandite, http://aflow.org/prototype-encyclopedia/A3B2C2_hR7_166_d_ab_c.html, part 3)
 A2B4C_hR7_166_c_2c_a-002.{ABC}                   hR7       R-3m                -         Fe2O4Y1             #166      metal-oxide; Fe2O4Y1, ICSD #67701
 A2BC4_hR7_166_c_a_2c-001.{ABC}                   hR7       R-3m                -         Fe2In1O4            #166      metal-oxide; Fe2In1O4, ICSD #157323
 AB2C_hR8_166_c_ad_c-001.{ABC}                    hR8       R-3m                -         Al1O2Tl1            #166      metal-oxide; Al1O2Tl1, ICSD #29010
@@ -2573,7 +2573,7 @@ ABC3_hP10_187_ad_i_jk-001.{ABC}                  hP10      P-6m2               -
 A3B4C_hP16_190_af_cg_d-001.{ABC}                 hP16      P-62c               -         Be3O4Sr1            #190      metal-oxide; Be3O4Sr1, ICSD #26179
 A2B3C_hP6_191_d_f_a-001.{ABC}                    hP6       P6/mmm              -         Mn2O3Ta1            #191      metal-oxide; Mn2O3Ta1, ICSD #15995
 A2BC_hP8_194_f_c_a-001.{ABC}                     hP8       P6_{3}/mmc          -         O2Rb1Sc1            #194      metal-oxide; O2Rb1Sc1, ICSD #1270
-ABC2_hP8_194_c_a_f-002.{ABC}                     hP8       P6_{3}/mmc          -         Ag1Fe1O2            #194      metal-oxide; Ag1Fe1O2, ICSD #2786
+ABC2_hP8_194_c_a_f-002.{ABC}                     hP8       P6_{3}/mmc          -         Ag1Fe1O2            #194      metal-oxide; Ag1Fe1O2, ICSD #2786, equivalent to hexagonal delafossite (AlCuO2, http://aflow.org/prototype-encyclopedia/ABC2_hP8_194_a_c_f.html, part 3)
 ABC2_hP8_194_c_a_f-003.{ABC}                     hP8       P6_{3}/mmc          -         Cs1Nd1O2            #194      metal-oxide; Cs1Nd1O2, ICSD #27336
 ABC2_hP8_194_c_a_f-004.{ABC}                     hP8       P6_{3}/mmc          -         Cu1Fe1O2            #194      metal-oxide; Cu1Fe1O2, ICSD #66546
 ABC2_hP8_194_a_c_f-002.{ABC}                     hP8       P6_{3}/mmc          -         Na1Nb1O2            #194      metal-oxide; Na1Nb1O2, ICSD #29282
@@ -2604,7 +2604,7 @@ ANRL Label                                       Pearson   SG symbol           S
 A2B_aP12_2_4i_2i-001.{AB}                        aP12      P-1                 -         C2Ca1               #2        metal-carbide; C2Ca1, ICSD #66663
 AB4_mP10_11_e_4e-001.{AB}                        mP10      P2_{1}/m            -         C1Fe4               #11       metal-carbide; C1Fe4, ICSD #187143 equivalent to 1271.AB,1271.BA [HTQC]
 A2B_mC12_12_2i_i-003.{AB}                        mC12      C2/m                -         C2Ca1               #12       metal-carbide; C2Ca1, ICSD #54185 equivalent to 1244.AB,1244.BA [HTQC]
-A2B_mC12_12_2i_i-004.{AB}                        mC12      C2/m                -         C2Ca1               #12       metal-carbide; C2Ca1, ICSD #54188 equivalent to 1245.AB,1245.BA [HTQC]
+A2B_mC12_12_2i_i-004.{AB}                        mC12      C2/m                -         C2Ca1               #12       metal-carbide; C2Ca1, ICSD #54188 equivalent to 1245.AB,1245.BA [HTQC], equivalent to CaC2-III (http://aflow.org/prototype-encyclopedia/A2B_mC12_12_2i_i.html, part 3)
 A2B_mC12_12_2i_i-005.{AB}                        mC12      C2/m                -         C2Ir1               #12       metal-carbide; C2Ir1, ICSD #181488 equivalent to 1246.AB,1246.BA [HTQC]
 A5B6_mC22_12_agh_ij-001.{AB}                     mC22      C2/m                -         C5Nb6               #12       metal-carbide; C5Nb6, ICSD #20695 equivalent to 1279.AB,1279.BA [HTQC]
 A4B_mP10_14_2e_a-001.{AB}                        mP10      P2_{1}/c            -         C4Ir1               #14       metal-carbide; C4Ir1, ICSD #181493 equivalent to 1276.AB,1276.BA [HTQC]
@@ -2715,7 +2715,7 @@ AB2_tI6_119_a_f-001.{AB}                         tI6       I-4m2               -
 AB2_tI24_122_d_e-001.{AB}                        tI24      I-42d               -         C1N2                #122      carbo-nitride; C1N2, ICSD #247677
 A3B4_hR7_160_b_ab-001.{AB}                       hR7       R3m                 -         C3N4                #160      carbo-nitride; C3N4, ICSD #41952
 AB2_hP6_164_c_2d-001.{AB}                        hP6       P-3m1               -         C1N2                #164      carbo-nitride; C1N2, ICSD #247679
-A3B4_hP14_176_h_ch-001.{AB}                      hP14      P6_{3}/m            -         C3N4                #176      carbo-nitride; C3N4, ICSD #41950
+A3B4_hP14_176_h_ch-001.{AB}                      hP14      P6_{3}/m            -         C3N4                #176      carbo-nitride; C3N4, ICSD #41950, equivalent to beta-Si3N4 (http://aflow.org/prototype-encyclopedia/A4B3_hP14_176_ch_h.html, part 3)
 A3B4_hP14_187_jk_adjk-001.{AB}                   hP14      P-6m2               -         C3N4                #187      carbo-nitride; C3N4, ICSD #83265
 A3B4_cP7_215_c_e-001.{AB}                        cP7       P-43m               -         C3N4                #215      carbo-nitride; C3N4, ICSD #41951 equivalent to 707.AB,707.BA,1255.AB,1255.BA [HTQC]
 A3B4_cI28_220_b_c-001.{AB}                       cI28      I-43d               -         C3N4                #220      carbo-nitride; C3N4, ICSD #83263
@@ -2742,7 +2742,7 @@ AB2C_oP16_62_c_2c_c-003.{ABC}                    oP16      Pnma                -
 ABC2_oC16_63_c_a_f-001.{ABC}                     oC16      Cmcm                -         C1Cu1N2             #63       metal carbo-nitride; C1Cu1N2, ICSD #161460
 ABC2_tI16_122_a_b_d-002.{ABC}                    tI16      I-42d               -         C1Mg1N2             #122      metal carbo-nitride; C1Mg1N2, ICSD #44110
 AB2C_tI32_122_d_e_d-001.{ABC}                    tI32      I-42d               -         C1N2Zn1             #122      metal carbo-nitride; C1N2Zn1, ICSD #280523
-AB2C2_tI10_139_a_d_e-002.{ABC}                   tI10      I4/mmm              -         C1Li2N2             #139      metal carbo-nitride; C1Li2N2, ICSD #200369
+AB2C2_tI10_139_a_d_e-002.{ABC}                   tI10      I4/mmm              -         C1Li2N2             #139      metal carbo-nitride; C1Li2N2, ICSD #200369, equivalent to CLi2N2 (http://aflow.org/prototype-encyclopedia/AB2C2_tI10_139_a_d_e.Li2CN2.html, part 3)
 A3B2C6_hR11_155_d_c_f-001.{ABC}                  hR11      R32                 -         C3Lu2N6             #155      metal carbo-nitride; C3Lu2N6, ICSD #240311
 ABC_hR3_160_a_a_a-002.ABC/BAC/CAB                hR3       R3m                 -         Ag1C1N1             #160      metal carbo-nitride; Ag1C1N1, ICSD #85783
 ABC2_hR4_160_a_a_2a-001.{ABC}                    hR4       R3m                 -         C1Cd1N2             #160      metal carbo-nitride; C1Cd1N2, ICSD #95265
@@ -2756,6 +2756,459 @@ AB2C_hR4_166_a_c_b-004.{ABC}                     hR4       R-3m                -
 A8B3C4_hR15_166_4c_ac_2c-001.{ABC}               hR15      R-3m                -         Al8C3N4             #166      metal carbo-nitride; Al8C3N4, ICSD #41261
 AB2C_hP8_194_c_f_a-003.{ABC}                     hP8       P6_{3}/mmc          -         C1N2Ni1             #194      metal carbo-nitride; C1N2Ni1, ICSD #249388
 A2BC2_cP10_215_e_ab_e-001.ABC/CAB/BCA            cP10      P-43m               -         C2Cd1N2             #215      metal carbo-nitride; C2Cd1N2, ICSD #20748
+
+*************************************************************************************************************************************************************
+ANRL PROTOTYPES - Part 3
+*************************************************************************************************************************************************************
+
+ANRL Label                                                           Pearson   SG symbol           Struk         Prototype               SG #      notes
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+A5B11CD8E_aP26_1_5a_11a_a_8a_a-001.{ABCDE}                           aP26      P1                  -             C5H11NaO8S              #1        NaC5H11O8S (part 3) 
+A2B2C5_aP18_2_2i_2i_5i-001.{ABC}                                     aP18      P-1                 -             B2Co2O5                 #2        Co2B2O5 (part 3) 
+ABC8D3_aP26_2_i_i_8i_3i-001.{ABCD}                                   aP26      P-1                 S6_{8}        AlNaO8Si3               #2        Albite (NaAlSi3O8) (part 3) 
+AB3C3_aP28_2_2i_6i_6i-001.{ABC}                                      aP28      P-1                 G5_{1}        BH3O3                   #2        Boric Acid (H3BO3) (part 3) 
+A3B_aP32_2_12i_4i-001.{AB}                                           aP32      P-1                 -             O3W                     #2        delta-WO3 (part 3) 
+A3B2C10D3_aP36_2_ah2i_2i_10i_3i-001.{ABCD}                           aP36      P-1                 -             Co3H2O10Se3             #2        Co3(SeO3)3.H2O (part 3) 
+AB10C9D_aP42_2_ae_10i_9i_i-001.{ABCD}                                aP42      P-1                 H4_{10}       CuH10O9S                #2        Chalcanthite (CuSO4.5H2O) (part 3) 
+A2B7C2_aP44_2_4i_14i_4i-001.{ABC}                                    aP44      P-1                 -             Ho2O7Si2                #2        alpha-Ho2Si2O7 (part 3) 
+A12B2CD12_aP54_2_12i_2i_i_12i-001.{ABCD}                             aP54      P-1                 -             H12N2NiO12              #2        Ni(NO3)2(H2O)6 (part 3) 
+A2B2C5D_mP20_4_2a_2a_5a_a-001.{ABCD}                                 mP20      P2_{1}              H4_{8}        H2Li2O5S                #4        Li2SO4.H2O (part 3) 
+A3B6C_mP20_4_3a_6a_a-001.{ABC}                                       mP20      P2_{1}              -             Ca3O6U                  #4        Ca3UO6 (part 3) 
+A11B2C2_mP60_4_22a_4a_4a-001.{ABC}                                   mP60      P2_{1}              -             O11P2W2                 #4        W2O3(PO4)2 (part 3) 
+ABC3_mC10_5_b_a_ac-001.{ABC}                                         mC10      C2                  -             (Ba,Ca)CO3              #5        C2 (Ba,Ca)CO3 (part 3) 
+A2B_mC12_5_2c_c-001.{AB}                                             mC12      C2                  -             As2Nb                   #5        NbAs2 (part 3) 
+AB3_mC16_5_c_3c-001.{AB}                                             mC16      C2                  D0_{15}       AlCl3                   #5        D015 (AlCl3) (obsolete) (part 3) 
+AB6C18D4E2_mC62_5_a_2b2c_9c_2c_c-001.{ABCDE}                         mC62      C2                  -             CaCu6O18P4Rb2           #5        Rb2CaCu6(PO4)4O2 (part 3) 
+A2B2C9D2_mC90_5_ab2c_3c_b13c_3c-001.{ABCD}                           mC90      C2                  H4_{7}        Ca2H2O9S2               #5        Bassanite [CaSO4(H2O)0.5] (part 3) 
+AB2_mP12_7_2a_4a-001.{AB}                                            mP12      Pc                  -             AuTe2                   #7        Calaverite (AuTe2) (part 3) 
+A6B2C15D4_mP54_7_6a_2a_15a_4a-001.{ABCD}                             mP54      Pc                  -             Ca6Na2O15Si4            #7        Na2Ca6Si4O15 (part 3) 
+A8B23_mP124_7_16a_46a-001.{AB}                                       mP124     Pc                  -             Mo8O23                  #7        Low-Temperature Mo8O23 (part 3) 
+ABC2_mC8_8_a_a_b-001.{ABC}                                           mC8       Cm                  F5_{11}       KNO2                    #8        F511 (KNO2) (obsolete) (part 3) 
+A13B4_mC102_8_17a11b_8a2b-001.{AB}                                   mC102     Cm                  -             Al13Co4                 #8        Monoclinic Co4Al13 (part 3) equivalent to 493,494 [HTQC]
+A3B5C4D2_mC56_9_3a_5a_4a_2a-001.{ABCD}                               mC56      Cc                  -             Mg3O5(OH)4Si2           #9        Chrysotile (Mg3Si2O5(OH)4) (part 3) 
+A2B4C9D2_mC68_9_2a_4a_9a_2a-001.{ABCD}                               mC68      Cc                  S5_{4}        Al2H4O9Si2              #9        Nacrite [Al2Si2O5(OH)4] (part 3) 
+A6B36C11_mC212_9_6a_36a_11a-001.{ABC}                                mC212     Cc                  -             Cs6O36W11               #9        Cs6W11O36 (part 3) 
+ABC_mP6_11_e_e_e-001.{ABC}                                           mP6       P2_{1}/m            -             HO2Y                    #11       O(OH)Y (part 3) 
+A3B_mP8_11_3e_e-001.{AB}                                             mP8       P2_{1}/m            -             Se3Zr                   #11       ZrSe3 (part 3) 
+A2B5C2_mP18_11_2e_e2f_2e-001.{ABC}                                   mP18      P2_{1}/m            K0_{1}        K2O5S2                  #11       K2S2O5 (part 3) 
+AB2CD6_mP20_11_e_2e_e_2e2f-001.{ABCD}                                mP20      P2_{1}/m            -             BaC2CaO6                #11       Barytocalcite (BaCa(CO3)2) (part 3) 
+A7B2C2_mP22_11_3e2f_2e_ab-001.{ABC}                                  mP22      P2_{1}/m            -             O7Si2Y2                 #11       y-Y2Si2O7 (part 3) 
+A2B_mC6_12_i_a-001.{AB}                                              mC6       C2/m                -             Cl2Cu                   #12       Tolbachite (CuCl2) (part 3) 
+A3B4_mC14_12_ai_2i-001.{AB}                                          mC14      C2/m                D7_{a}        Ni3Sn4                  #12       delta-Ni3Sn4 (part 3) 
+AB2C_mC16_12_g_2i_i-001.{ABC}                                        mC16      C2/m                -             FeSe2Tl                 #12       Monoclinic FeTlSe2 (part 3) 
+AB2_mC18_12_ai_3i-002.{AB}                                           mC18      C2/m                -             NbTe2                   #12       NbTe2 (part 3) 
+AB6C2_mC18_12_a_3i_i-004.{ABC}                                       mC18      C2/m                -             PdSe6Ta2                #12       Ta2PdSe6 (part 3) 
+ABC3_mC20_12_g_i_ij-001.{ABC}                                        mC20      C2/m                -             MnPS3                   #12       MnPS3 (part 3) 
+A3BC2_mC24_12_ij_h_gi-001.{ABC}                                      mC24      C2/m                B36           H3LiO2                  #12       LiOH.H2O (part 3) 
+AB_mC24_12_3i_3i-001.{AB}                                            mC24      C2/m                -             AsSi                    #12       SiAs (part 3) 
+A13B4_mC34_12_b6i_2i-001.{AB}                                        mC34      C2/m                -             Al13Os4                 #12       Os4Al13 (part 3) 
+AB6C2D_mC40_12_ad_gh4i_j_bc-001.ABCD/DACB/CABD/                      mC40      C2/m                -             NiO6Sr2Te               #12       Sr2NiTeO6 (part 3) 
+DCBA/BCAD/DBAC/CDAB/ADBC/BADC/CBDA/ACDB/BDCA
+A2B12CD6_mC42_12_i_2i2j_a_ij-001.{ABCD}                              mC42      C2/m                J1_{7}        Cl2H12MgO6              #12       Bischofite (MgCl2.6H2O) (part 3) 
+AB5_mC48_12_2i_ac5i2j-001.{AB}                                       mC48      C2/m                D2_{2}        MgZn5                   #12       D22 (MgZn5?) (problematic) (part 3) 
+AB8C4_mC52_12_i_gi3j_2j-001.{ABC}                                    mC52      C2/m                S6_{7}        AlKO8Si3                #12       Sanidine (KAlSi3O8) (part 3) 
+A2B2C5D24E8_mC82_12_h_i_agh_2i5j_2j-001.{ABCDE}                      mC82      C2/m                S4_{2}        Ca2H2Mg5O24Si8          #12       Tremolite (Ca2Mg5Si8O22(OH)2) (part 3) 
+A5B2C10D2E2_mC84_12_acghj_bdi_5j_2i_j-001.{ABCDE}                    mC84      C2/m                -             Al5Fe2O10(OH)2Si2       #12       Staurolite (Al5Fe2O10(OH)2Si2) (part 3) 
+A13B4_mC102_12_dg8i5j_4ij-001.{AB}                                   mC102     C2/m                -             Al13Fe4                 #12       Al13Fe4 (part 3) 
+A8B2CD15E2_mC112_12_2i3j_j_ad_g4i5j_2i-001.{ABCDE}                   mC112     C2/m                H4_{23}       H8K2MnO12S2             #12       Manganese-leonite [K2Mn(SO4)2.4H2O] (part 3) 
+AB6C11D6E4_mC112_12_e_gi2j_i5j_2i2j_2j-001.{ABCDE}                   mC112     C2/m                S4_{5}        (H2O)(OH)6O11Mg6Si4     #12       Chrysotile (H4Mg3Si2O9) (part 3) 
+A8B23_mP62_13_4g_c11g-001.{AB}                                       mP62      P2/c                -             Mo8O23                  #13       High-Temperature Mo8O23 (part 3) 
+ABC_mP12_14_e_e_e-002.{ABC}                                          mP12      P2_{1}/c            E0_{7}        AsFeS                   #14       Arsenopyrite (FeAsS) (part 3) 
+A2B3C2_mP14_14_e_ae_e-001.{ABC}                                      mP14      P2_{1}/c            -             Cl2Hg3O2                #14       HgCl2.2HgO (part 3) 
+AB3_mP16_14_e_3e-002.{AB}                                            mP16      P2_{1}/c            -             beta-B2H6               #14       beta-B2H6 (part 3) 
+ABC2_mP16_14_e_e_2e-003.{ABC}                                        mP16      P2_{1}/c            -             KNO2                    #14       KNO2 III (part 3) 
+ABCD_mP16_14_e_e_e_e-001.{ABCD}                                      mP16      P2_{1}/c            -             ClCuHO                  #14       Cu(OH)Cl (part 3) 
+AB_mP16_14_2e_2e-001.{AB}                                            mP16      P2_{1}/c            -             ClI                     #14       alpha-ICl (part 3) 
+AB3_mP16_14_e_3e-003.{AB}                                            mP16      P2_{1}/c            -             B2H6                    #14       B2H6 (P21/c) (part 3) 
+ABC2_mP16_14_e_e_2e-004.{ABC}                                        mP16      P2_{1}/c            E0_{6}        MnHO2                   #14       Manganite (gamma-MnO(OH)) (part 3) 
+AB_mP16_14_2e_2e-002.{AB}                                            mP16      P2_{1}/c            -             AsLi                    #14       LiAs (part 3) 
+A2B3_mP20_14_2e_3e-002.{AB}                                          mP20      P2_{1}/c            D5_{f}        As2S3                   #14       Orpiment (As2S3) (part 3) 
+A3BC_mP20_14_3e_e_e-001.{ABC}                                        mP20      P2_{1}/c            -             Cl3CuK                  #14       Sanguite (KCuCl3) (part 3) 
+AB6C2D_mP20_14_a_3e_e_d-001.ABCD/DACB/CABD/                          mP20      P2_{1}/c            -             MnO6Sr2Te               #14       Sr2MnTeO6 (part 3) 
+DCBA/BCAD/DBAC/CDAB/ADBC/BADC/CBDA/ACDB/BDCA
+AB6C3_mP20_14_a_3e_de-001.{ABC}                                      mP20      P2_{1}/c            J2_{6}        AlF6Na3                 #14       Cryolite (Na3AlF6) (part 3) 
+A2B5C4_mP22_14_e_c2e_2e-001.{ABC}                                    mP22      P2_{1}/c            -             Cl2O5Sb4                #14       Sb4O5Cl2 (part 3) 
+A4B2C4D_mP22_14_2e_e_2e_a-001.{ABCD}                                 mP22      P2_{1}/c            -             C4K2N4Ni                #14       K2Ni(CN)4 (part 3) 
+A9B2_mP22_14_a4e_e-001.{AB}                                          mP22      P2_{1}/c            D8_{d}        Co2Al9                  #14       Co2Al9 (part 3) 
+A4BC_mP24_14_4e_e_e-001.{ABC}                                        mP24      P2_{1}/c            -             O7Si2Y2                 #14       gamma-Y2Si2O7 (part 3) 
+AB4C_mP24_14_ab_4e_e-001.{ABC}                                       mP24      P2_{1}/c            -             AuBr4K                  #14       Anhydrous KAuBr4 (part 3) 
+ABCD3_mP24_14_e_e_e_3e-001.{ABCD}                                    mP24      P2_{1}/c            G0_{12}       CHNaO3                  #14       Nahcolite (NaHCO3) (part 3) 
+AB_mP24_14_3e_3e-001.{AB}                                            mP24      P2_{1}/c            -             C6Cl6                   #14       epsilon-1,2,3,4,5,6-Hexachlorocyclohexane (C6Cl6) (part 3) 
+AB4C_mP24_14_e_4e_e-001.{ABC}                                        mP24      P2_{1}/c            K4_{1}        (NH4)O4S                #14       Ammonium Persulfate [(NH4)2S2O8] (part 3) 
+AB4C_mP24_14_e_4e_e-002.{ABC}                                        mP24      P2_{1}/c            -             LaO4P                   #14       Monazite (LaPO4) (part 3) 
+ABC4_mP24_14_e_e_4e-001.{ABC}                                        mP24      P2_{1}/c            H0_{9}        AgMnO4                  #14       AgMnO4 (part 3) 
+A2B4C_mP28_14_abe_4e_e-001.{ABC}                                     mP28      P2_{1}/c            -             Cu2O4Se                 #14       Monoclinic Cu2OSeO3 (part 3) 
+A4BCD_mP28_14_4e_e_e_e-001.{ABCD}                                    mP28      P2_{1}/c            H0_{10}       Cl4IK.H2O               #14       KICl4.H2O (part 3) 
+A2B3C2D8_mP30_14_e_ce_e_4e-001.{ABCD}                                mP30      P2_{1}/c            G7_{4}        C2Cu3H2O8               #14       Azurite [Cu3(CO3)2(OH)2] (part 3) 
+A2B5C_mP32_14_2e_5e_ab-001.{ABC}                                     mP32      P2_{1}/c            -             Ca2O5U                  #14       Ca2UO5 (part 3) 
+A2B5C_mP32_14_2e_5e_e-001.{ABC}                                      mP32      P2_{1}/c            -             Gd2O5Si                 #14       Gd2SiO5 (RE2SiO5 X1) (part 3) 
+A3B_mP32_14_6e_2e-001.{AB}                                           mP32      P2_{1}/c            -             O3W                     #14       gamma-WO3 (part 3) 
+AB4C2D_mP32_14_e_4e_2e_e-001.{ABCD}                                  mP32      P2_{1}/c            H4_{19}       AuBr4(H2O)2K            #14       KAuBr4.2H2O (part 3) 
+AB_mP32_14_4e_4e-001.{AB}                                            mP32      P2_{1}/c            -             AsS                     #14       Pararealgar (AsS) (part 3) 
+AB_mP32_14_4e_4e-002.{AB}                                            mP32      P2_{1}/c            B_{l}         AsS                     #14       Realgar (AsS) (part 3) 
+A7B2C_mP40_14_7e_2e_e-001.{ABC}                                      mP40      P2_{1}/c            K6_{2}        F7K2Nb                  #14       K2NbF7 (part 3) 
+A6B4C2D6E2FG6_mP54_14_3e_2e_e_3e_e_a_3e-001.{ABCDEFG}                mP54      P2_{1}/c            -             C6H4K2N6O2PtS6          #14       K2Pt(SCN)6.2H2O (part 3) 
+A11B3_mP56_14_11e_3e-001.{AB}                                        mP56      P2_{1}/c            -             Cs11O3                  #14       Cs11O3 (part 3) 
+AB3C_mP60_14_3e_9e_3e-001.{ABC}                                      mP60      P2_{1}/c            S3_{3} (II)   CaO3Si                  #14       Parawollastonite (CaSiO3) (part 3) 
+AB20C2D14E2_mP78_14_a_10e_e_7e_e-001.{ABCDE}                         mP78      P2_{1}/c            H4_{4}        CuH20N2O14S2            #14       Tutton salt [Cu(NH4)2(SO4)2.6H2O] (part 3) 
+A8B2CD12E2_mP100_14_8e_2e_ad_12e_2e-001.{ABCDE}                      mP100     P2_{1}/c            -             H8K2MnO12S2             #14       Manganese-leonite 110K [K2Mn(SO4)2.4H2O] (part 3) 
+A_mC4_15_e-001.{A}                                                   mC4       C2/c                -             Ga                      #15       beta-Ga (obsolete) (part 3) 
+ABC2_mC16_15_e_e_f-004.{ABC}                                         mC16      C2/c                F5_{a}        FeKS2                   #15       KFeS2 (part 3) 
+A2B2C_mC20_15_ad_f_e-001.{ABC}                                       mC20      C2/c                -             Ag2O2Pb                 #15       Ag2PbO2 (part 3) 
+A2B_mC24_15_2f_ce-001.{AB}                                           mC24      C2/c                -             O2Sb                    #15       Clinocervantite (beta-Sb2O4) (part 3) 
+A2B5_mC28_15_f_e2f-003.{AB}                                          mC28      C2/c                -             Nb2O5                   #15       zeta-Nb2O5 (B-Nb2O5) (part 3) 
+AB5C2_mC32_15_e_e2f_f-001.{ABC}                                      mC32      C2/c                -             NiSe5Ta2                #15       Ta2NiSe5 (part 3) 
+AB5CD_mC32_15_e_e2f_e_b-001.{ABCD}                                   mC32      C2/c                S0_{6}        CaO5SiTi                #15       Titanite (CaTiSiO5) (part 3) 
+A2BC4D2_mC36_15_f_e_2f_f-001.{ABCD}                                  mC36      C2/c                -             C2(H2O)O4Rb2            #15       Rb2C2O4.H2O (part 3) 
+A7B2C2_mC44_15_e3f_f_f-001.{ABC}                                     mC44      C2/c                -             O7V2Zn2                 #15       alpha-Zn2V2O7 (part 3) 
+AB4C6D_mC48_15_e_2f_3f_e-001.{ABCD}                                  mC48      C2/c                H4_{6}        CaH4O6S                 #15       Gypsum (CaSO4.2H2O) (part 3) 
+AB4C4D4E_mC56_15_e_2f_2f_2f_a-001.{ABCDE}                            mC56      C2/c                H4_{22}       BaC4(H2O)4N4Ni          #15       BaNi(CN)4.4H2O (part 3) 
+A5BC2_mC64_15_5f_f_2f-001.{ABC}                                      mC64      C2/c                -             O5SiY2                  #15       Y2SiO5 (RE2SiO5 X2) (part 3) 
+AB5CD2_mC72_15_f_5f_f_2f-001.{ABCD}                                  mC72      C2/c                S5_{6}        AlO5(OH)Si2             #15       Pyrophyllite [AlSi2O5(OH)] (part 3) 
+A2BC10D2E4_mC76_15_f_e_5f_f_2f-001.{ABCDE}                           mC76      C2/c                S5_{1}        Al3KO10(OH)2Si3         #15       Muscovite (KH2Al3Si3O12) (part 3) 
+A2BCD12E3_mC76_15_f_e_b_6f_ef-001.{ABCDE}                            mC76      C2/c                -             Fe2MnNaO12P3            #15       Alluaudite [NaMnFe2(PO4)3] (part 3) 
+A3B5C4D2_mC112_15_a3ef_5f_4f_2f-001.{ABCD}                           mC112     C2/c                S5_{5}        Mg3O5(OH)4Si2           #15       Chlorite [Mg3(Mg2Al)(Si3Al)O10(OH)8] (part 3) 
+A2B4C2D17E6_mC124_15_f_2f_f_e8f_3f-001.{ABCDE}                       mC124     C2/c                -             BeHNaO8Si3              #15       Eudidymite (BeHNaO8Si3) (part 3) 
+A2B3C9D3E_mC144_15_2f_bcdef_9f_3f_ae-001.{ABCDE}                     mC144     C2/c                -             (H2O)2Na2O9Si3Zr        #15       Catapleiite (Na2ZrSi3O9.2H2O) (part 3) 
+A3B16C20D3_mC168_15_ef_8f_10f_ef-001.{ABCD}                          mC168     C2/c                H4_{20}       Cd3H16O20S3             #15       (CdSO4)3.8H2O (part 3) 
+A8B2CD12E2_mC200_15_8f_2f_ce_2e11f_2f-001.{ABCDE}                    mC200     C2/c                -             H8K2MnO12S2             #15       Manganese-leonite 185K [K2Mn(SO4)2.4H2O] (part 3) 
+ABC3_oP40_17_abcd_2e_abcd4e-001.{ABC}                                oP40      P222_{1}            -             NaNbO3                  #17       NaNbO3 (part 3) 
+A2B_oP12_18_2c_c-001.{AB}                                            oP12      P2_{1}2_{1}2        -             O2Te                    #18       gamma-TeO2 (part 3) 
+AB12C5D2_oP40_18_a_6c_b2c_c-001.{ABCD}                               oP40      P2_{1}2_{1}2        -             ClH12N5Zn2              #18       Diamminetriamidodizinc Chloride ([Zn2(NH3)2(NH2)3]Cl) (part 3) 
+AB_oP16_19_2a_2a-001.{AB}                                            oP16      P2_{1}2_{1}2_{1}    -             NaP                     #19       NaP (part 3) 
+A2B2C_oP20_19_2a_2a_a-001.{ABC}                                      oP20      P2_{1}2_{1}2_{1}    C31           H2O2Zn                  #19       W"ulfingite (epsilon-Zn(OH)2) (part 3) 
+AB4C_oP24_19_a_4a_a-001.{ABC}                                        oP24      P2_{1}2_{1}2_{1}    -             AlCl4Na                 #19       NaAlCl4 (part 3) 
+A6BC4D_oP48_19_6a_a_4a_a-001.{ABCD}                                  oP48      P2_{1}2_{1}2_{1}    -             H6NO4P                  #19       Ferroelectric NH4H2PO4 (part 3) 
+AB2C_oP80_19_5a_10a_5a-001.{ABC}                                     oP80      P2_{1}2_{1}2_{1}    -             CH2O                    #19       beta-Arabinose [(CH2O)20] (part 3) 
+A14BC11D_oP108_19_14a_a_11a_a-001.{ABCD}                             oP108     P2_{1}2_{1}2_{1}    H4_{12}       H14NiO11S               #19       Morenosite (NiSO4.7H2O) (part 3) 
+AB3_oC16_20_a_bc-001.{AB}                                            oC16      C222_{1}            D0_{7}        CrO3                    #20       D07 (CrO3) (obsolete) (part 3) 
+AB4C_oC24_20_b_2c_a-001.ABC/CAB/BCA                                  oC24      C222_{1}            -             AlO4P                   #20       AlPO4 ``low cristobalite type'' (part 3) 
+AB5C2_oC32_20_b_a2bc_c-001.{ABC}                                     oC32      C222_{1}            K3_{3}        AlF5Tl2                 #20       Tl2AlF5 (part 3) 
+AB2_oC6_21_a_k-002.{AB}                                              oC6       C222                -             HoSb2                   #21       HoSb2 (part 3) 
+A2B7C2_oF88_22_k_bdefghij_k-001.{ABC}                                oF88      F222                -             Cd2O7Re2                #22       Predicted Phase IV Cd2Re2O7 (part 3) 
+AB6_oP28_29_a_6a-001.{AB}                                            oP28      Pca2_{1}            -             HgN6                    #29       Mercury (II) Azide [Hg(N3)2] (part 3) 
+ABC30DE20F2_oP220_29_a_a_30a_a_20a_2a-001.{ABCDEF}                   oP220     Pca2_{1}            -             AlCH30NO20S2            #29       Low-Temperature (NH3CH3)Al(SO4)2.12H2O (part 3) 
+A4B7C_oP24_31_2b_a3b_a-001.{ABC}                                     oP24      Pmn2_{1}            -             B4O7Sr                  #31       B4SrO7 (part 3) 
+A2B6CD8_oP34_31_2a_2a2b_a_4a2b-001.{ABCD}                            oP34      Pmn2_{1}            H4_{11}       Cl2(H2O)6MgO8           #31       Mg(ClO4)2.6H2O (part 3) 
+A13B4_oP102_31_17a11b_8a2b-001.{AB}                                  oP102     Pmn2_{1}            -             Al13Co4                 #31       Orthorhombic Co4Al13 (part 3) equivalent to 491,492 [HTQC]
+A17B47_oP128_32_a8c_a23c-001.{AB}                                    oP128     Pba2                -             Mo17O47                 #32       Mo17O47 (part 3) 
+ABC3_oP20_33_a_a_3a-001.{ABC}                                        oP20      Pna2_{1}            -             ILiO3                   #33       gamma-LiIO3 (part 3) 
+A2B7C2_oP44_33_2a_7a_2a-001.{ABC}                                    oP44      Pna2_{1}            -             Gd2O7Si2                #33       Possible delta-Gd2Si2O7 (part 3) 
+A4BCD6_oP48_33_4a_a_a_6a-001.{ABCD}                                  oP48      Pna2_{1}            -             B4CsFO6                 #33       CsB4O6F (part 3) 
+A2BC4_oP84_33_6a_3a_12a-001.{ABC}                                    oP84      Pna2_{1}            -             B2CaO4                  #33       CaB2O4 (III) (part 3) 
+A2BC2_oP10_34_c_a_c-001.{ABC}                                        oP10      Pnn2                -             F2-xHxMnOx              #34       MnF2-x(OH)x (part 3) 
+AB2_oC12_36_a_2a-002.{AB}                                            oC12      Cmc2_{1}            -             MoP2                    #36       MoP2 (part 3) 
+A2BC2_oC20_36_b_a_b-001.{ABC}                                        oC20      Cmc2_{1}            -             N2OSi2                  #36       Si2N2O (part 3) 
+A2BC5_oC32_36_b_a_a2b-001.{ABC}                                      oC32      Cmc2_{1}            -             Bi2GeO5                 #36       Bi2GeO5 (part 3) 
+A4B7C2D2_oC60_36_2b_a3b_2a_b-001.{ABCD}                              oC60      Cmc2_{1}            S4_{6}        Be4O7(OH)2Si2           #36       Bertrandite (Be4Si2O7(OH)2) (part 3) 
+A3B2_oC80_36_4a4b_2a3b-001.{AB}                                      oC80      Cmc2_{1}            -             Ni3Si2                  #36       Ni3Si2 (part 3) 
+ABC3_oC80_36_2ab_2ab_2a5b-001.{ABC}                                  oC80      Cmc2_{1}            -             KNO3                    #36       alpha-Potassium Nitrate (KNO3) II (part 3) 
+ABC6D15_oC46_38_b_b_2a2d_2ab4d2e-001.{ABCD}                          oC46      Amm2                -             FNaNb6O15               #38       NaNb6O15F (part 3) 
+AB3_oC16_40_b_a2b-002.{AB}                                           oC16      Ama2                -             CrO3                    #40       Orthorhombic CrO3 (part 3) 
+A2B7C2_oC88_40_abc_2b6c_a3b-001.{ABC}                                oC88      Ama2                -             Mo2O7Rb2                #40       Rb2Mo2O7 (part 3) 
+A5B8CD12_oC104_41_a2b_4b_a_6b-001.{ABCD}                             oC104     Aea2                K3_{5}        B5H8KO12                #41       Santite (KB5O8.4H2O) (part 3) 
+A2B_oF24_43_b_a-001.{AB}                                             oF24      Fdd2                -             Cs2Se                   #43       Cs2Se (part 3) 
+A3B2_oF40_43_ab_b-001.{AB}                                           oF40      Fdd2                -             Al3Zr2                  #43       Zr2Al3 (part 3) equivalent to 365,366 [HTQC]
+A2BC4D_oF64_43_b_a_2b_a-001.{ABCD}                                   oF64      Fdd2                -             H2KO4P                  #43       Archerite (KH2PO4) (part 3) 
+A2B7C2_oF88_43_b_a3b_b-001.{ABC}                                     oF88      Fdd2                -             Cu2O7V2                 #43       Blossite (alpha-Cu2V2O7) (part 3) 
+A2B4C2D12E3_oF184_43_b_2b_b_6b_ab-001.{ABCDE}                        oF184     Fdd2                S6_{10}       Al2H4Na2O12Si3          #43       Natrolite (Na2Al2Si3O10.2H2O) (part 3) 
+ABC2_oI8_44_a_a_c-001.{ABC}                                          oI8       Imm2                F5_{5}        NaNO2                   #44       Ferroelectric NaNO2 (part 3) 
+ABC2_oI8_44_a_a_d-001.{ABC}                                          oI8       Imm2                F5_{12}       AgNO2                   #44       AgNO2 (part 3) 
+A2B5CD2_oI40_44_2c_abcde_d_e-001.{ABCD}                              oI40      Imm2                S2_{2}        H2O5SiZn2               #44       Hemimorphite (Zn4Si2O7(OH)2.H2O) (part 3) 
+AB_oI48_44_6d_ab2cde-001.{AB}                                        oI48      Imm2                B30           MgZn                    #44       B30 (MgZn?) (part 3) 
+A2B17C6_oI100_46_ab_b8c_3c-001.{ABC}                                 oI100     Ima2                -             Nb2O17Zr6               #46       Nb2Zr6O17 (part 3) 
+AB2C_oP8_51_e_be_f-001.{ABC}                                         oP8       Pmma                -             Bi2Ni3S2                #51       Parkerite (Ni3Bi2S2) (part 3) 
+ABC6D15_oP46_51_f_d_2e2i_aef4i2j-001.{ABCD}                          oP46      Pmma                -             FLiNb6O15               #51       LiNb6O15F (part 3) 
+A3B12CDE6_oP276_52_d4e_18e_ce_de_2d8e-001.{ABCDE}                    oP276     Pnna                -             Cl3H12KMgO6             #52       Carnallite [Mg(H2O)6KCl3] (part 3) 
+A2BC_oP16_53_eh_ab_g-001.{ABC}                                       oP16      Pmna                F5_{8}        F2H5N                   #53       NH4HF2 (part 3) 
+A2BC4D2_oP18_53_h_a_i_e-001.{ABCD}                                   oP18      Pmna                C45           Cl2CuH4O2               #53       Eriochalcite (CuCl2.2H2O) (part 3) 
+A2B3C8_oP26_55_h_ag_2g2h-001.{ABC}                                   oP26      Pbam                -             Nb2Pd3Se8               #55       Nb2Pd3Se8 (part 3) 
+A4BCD2_oP32_55_ghi_f_e_gh-001.{ABCD}                                 oP32      Pbam                E3_{4}        Cl4(H2O)HgK2            #55       K2HgCl4.H2O (part 3) 
+AB2C5_oP32_55_g_fh_eghi-001.{ABC}                                    oP32      Pbam                -             HoMn2O5                 #55       HoMn2O5 (part 3) 
+A8B11_oP38_55_g3h_a3g2h-001.{AB}                                     oP38      Pbam                -             B8Ru11                  #55       Ru11B8 (part 3) equivalent to 1086.AB,1086.BA [HTQC]
+A10B3C4_oP68_55_2e2fgh2i_adef_2e2f-001.{ABC}                         oP68      Pbam                -             O10Ru3Sr4               #55       Orthorhombic Sr4Ru3O10 (part 3)
+A2BC4_oP56_56_2e_e_4e-001.{ABC}                                      oP56      Pccn                -             B2CaO4                  #56       Calciborite (CaB2O4 II) (part 3) 
+A3B_oP16_57_a2d_d-001.{AB}                                           oP16      Pbcm                D0_{10}       O3W                     #57       D010 (WO3) (em obsolete) (part 3) 
+A4BC_oP24_57_cde_d_a-001.{ABC}                                       oP24      Pbcm                -             O4SrU                   #57       SrUO4 (part 3) 
+ABC3_oP40_57_cd_e_cd2e-001.{ABC}                                     oP40      Pbcm                -             NaNbO3                  #57       Lueshite (NaNbO3) (part 3) 
+AB_oP8_58_g_g-001.{AB}                                               oP8       Pnnm                -             InS                     #58       InS (part 3) 
+A2B3C6_oP22_58_g_af_gh-001.{ABC}                                     oP22      Pnnm                -             B2Mg3O6                 #58       Kotoite (Mg3(BO3)2) (part 3) 
+A4B3_oP28_58_4g_3g-001.{AB}                                          oP28      Pnnm                -             In4Se3                  #58       In4Se3 (part 3) 
+ABC5D2_oP36_58_g_g_3gh_eg-001.{ABCD}                                 oP36      Pnnm                H2_{7}        AsHO5Zn2                #58       Adamite [Zn2(AsO4)(OH)] (part 3) 
+A2B7C24D8_oP82_58_g_ae2f_2g5h_2h-001.{ABCD}                          oP82      Pnnm                -             H2Mg7O24Si8             #58       Protoanthophyllite (H2Mg7Si8O24) (part 3) 
+A4B2C3_oP18_59_ef_ab_af-001.{ABC}                                    oP18      Pmmn                G0_{11}       H4N2O3                  #59       NH4NO3 IV (part 3) 
+A2BC4_oP28_60_d_c_2d-001.{ABC}                                       oP28      Pbcn                E3_{2}        B2CaO4                  #60       CaB2O4 I (part 3) 
+AB2C6_oP36_60_c_d_3d-001.{ABC}                                       oP36      Pbcn                E5_{1}        FeNb2O6                 #60       Columbite (FeNb2O6) (part 3) 
+A5B12_oP68_60_c2d_6d-001.{AB}                                        oP68      Pbcn                -             Cr5O12                  #60       Cr5O12 (part 3) 
+A2B_oP24_61_2c_c-002.{AB}                                            oP24      Pbca                C52           O2Te                    #61       Tellurite (beta-TeO2) (part 3) 
+ABC_oP24_61_c_c_c-001.{ABC}                                          oP24      Pbca                -             CClO                    #61       COCl (part 3) 
+A2B4C_oP28_61_c_2c_a-001.{ABC}                                       oP28      Pbca                -             Ca2O4Ru                 #61       Ca2RuO4 (part 3) 
+AB2CD4_oP64_61_c_2c_c_4c-001.{ABCD}                                  oP64      Pbca                G7_{2}        BBe2HO4                 #61       Hambergite [Be2BO3(OH)] (part 3) 
+A7BCD_oP80_61_7c_c_c_c-001.{ABCD}                                    oP80      Pbca                -             Cl7OPTi                 #61       (TiCl4.POCl3)2 (part 3) 
+AB3C_oP80_61_2c_6c_2c-001.{ABC}                                      oP80      Pbca                S4_{3}        MgO3Si                  #61       Enstatite (MgSiO3) (part 3) 
+A2B_oP12_62_2c_c-010.{AB}                                            oP12      Pnma                C53           Br2Sr                   #62       C53 (SrBr2) (obsolete) (part 3) 
+A3B_oP16_62_3c_c-002.{AB}                                            oP16      Pnma                D0_{16}       I3(NH4)                 #62       NH4I3 (part 3) 
+ABC2_oP16_62_c_c_2c-002.{ABC}                                        oP16      Pnma                E0_{2}        AlHO2                   #62       Diaspore (AlOOH) (part 3) 
+ABCD_oP16_62_c_c_c_c-001.{ABCD}                                      oP16      Pnma                F5_{14}       ClBrI(NH4)              #62       NH4ClBrI (part 3) 
+AB3C_oP20_62_c_3c_c-001.{ABC}                                        oP20      Pnma                E2_{4}        CdCl3(NH4)              #62       NH4CdCl3 (part 3) 
+ABC3_oP20_62_c_c_cd-001.{ABC}                                        oP20      Pnma                -             KNO3                    #62       alpha-Potassium Nitrate (KNO3) I (part 3) 
+ABC3_oP20_62_c_c_cd-002.{ABC}                                        oP20      Pnma                G0_{10}       N(NH4)O3                #62       NH4NO3 III (part 3) 
+ABC3_oP20_62_c_c_cd-003.{ABC}                                        oP20      Pnma                G0_{2}        CaCO3                   #62       Aragonite (CaCO3) (part 3) 
+A2B_oP24_62_4c_2c-001.{AB}                                           oP24      Pnma                -             Cs2Sb                   #62       Cs2Sb (part 3) 
+AB4C_oP24_62_a_2cd_c-001.{ABC}                                       oP24      Pnma                -             CuO4S                   #62       Chalcocyanite (CuSO4) (part 3) 
+A2B4C_oP28_62_2c_2cd_c-001.{ABC}                                     oP28      Pnma                H1_{6}        K2O4S                   #62       Arcanite (K2SO4) (part 3) 
+A5BC_oP28_62_3cd_c_c-001.{ABC}                                       oP28      Pnma                -             O5SV                    #62       VOSO4 (part 3) 
+AB4C2_oP28_62_c_4c_2c-001.{ABC}                                      oP28      Pnma                E3_{3}        FeS4Sb2                 #62       Berthierite (FeSb2S4) (part 3) 
+AB6_oP28_62_c_6c-001.{AB}                                            oP28      Pnma                -             CuN6                    #62       Copper (II) Azide [Cu(N3)2] (part 3) 
+A2B5C_oP32_62_bc_3cd_c-001.{ABC}                                     oP32      Pnma                S0_{3}        Al2O5Si                 #62       Sillimanite (Al2SiO5) (part 3) 
+A3B_oP32_62_ab4c_2c-001.{AB}                                         oP32      Pnma                -             O3W                     #62       Original beta-WO3 (em obsolete) (part 3) 
+A4BC2D_oP32_62_2cd_b_2c_a-001.{ABCD}                                 oP32      Pnma                E3_{5}        Cl4(H2O)K2Sn            #62       K2SnCl4.H2O (part 3) 
+A4BC2D_oP32_62_2cd_c_d_c-001.{ABCD}                                  oP32      Pnma                -             Cl4(H2O)K2Sn            #62       K2SnCl4.H2O (part 3) 
+A2B2C4D_oP36_62_d_d_2cd_c-001.{ABCD}                                 oP36      Pnma                S0_{5}        Al2F2O4Si               #62       Topaz (Al2SiO4F2, S05) (part 3) 
+AB2C3D3_oP36_62_c_ac_cd_cd-001.{ABCD}                                oP36      Pnma                -             ClCu2H3O3               #62       Atacamite (Cu2(OH)3Cl) (part 3) 
+AB6C2_oP36_62_c_2c2d_d-001.{ABC}                                     oP36      Pnma                -             CaO6Ta2                 #62       Rynersonite (Orthorhombic CaTa2O6) (part 3) 
+A2B3C4D_oP40_62_d_cd_2cd_c-001.{ABCD}                                oP40      Pnma                S0_{7}        F2Mg3O4Si               #62       Norbergite [Mg(F,OH)2.Mg2SiO4] (part 3) 
+A2B6C3_oP44_62_2c_2c2d_3c-001.{ABC}                                  oP44      Pnma                K5_{1}        K2O6S3                  #62       K2S3O6 (part 3) 
+A7B2C2_oP44_62_3c2d_2c_d-001.{ABC}                                   oP44      Pnma                -             O7Si2Y2                 #62       Possible delta-Y2Si2O7 (part 3) 
+A8BCD_oP44_62_4c2d_c_c_c-001.{ABCD}                                  oP44      Pnma                -             Cl8OPSb                 #62       SbCl5.POCl3 (part 3) 
+A2BC8D2_oP52_62_d_c_2c3d_d-001.{ABCD}                                oP52      Pnma                S6_{3}        B2CaO8Si2               #62       Danburite (CaB2Si2O8) (part 3) 
+A4B3_oP56_62_8c_6c-001.{AB}                                          oP56      Pnma                -             Mo4P3                   #62       Mo4P3 (part 3) 
+A3B15C5D_oP96_62_cd_3c6d_3cd_c-001.{ABCD}                            oP96      Pnma                J1_{8}        Cl3H15N5Rh              #62       RhCl2(NH3)5Cl (part 3) 
+A8B4C4DE8F2_oP108_62_4c2d_2d_2cd_c_4c2d_d-001.{ABCDEF}               oP108     Pnma                F2_{1}        C8H4K4MoN8O2            #62       K4[Mo(CN)8].2H2O (part 3) 
+A4B3_oP112_62_8c4d_4c4d-001.{AB}                                     oP112     Pnma                -             P4Se3                   #62       P4Se3 (part 3) 
+ABCD8E3_oP112_62_d_2c_d_4c6d_3d-001.{ABCDE}                          oP112     Pnma                S4_{7}        BeHNaO8Si3              #62       Epididymite (BeHNaO8Si3) (part 3) 
+A2B5C22D2E8_oP156_62_d_c2d_2c10d_2c_4d-001.{ABCDE}                   oP156     Pnma                S4_{4}        Fe2Mg5O22(OH)2Si8       #62       Anthophyllite (Mg5Fe2Si8O22(OH)2) (part 3) 
+AB22C23D2E2_oP200_62_c_11d_3c10d_d_d-001.{ABCDE}                     oP200     Pnma                -             CaH22O23P2U2            #62       Autunite Ca[(UO2)(PO4)]2(H2O)11 (part 3) 
+AB3_oC16_63_c_3c-001.{AB}                                            oC16      Cmcm                D0_{d}        AsMn3                   #63       Mn3As (part 3) 
+AB2C2_oC20_63_c_f_2c-001.{ABC}                                       oC20      Cmcm                E0_{4}        FeHO2                   #63       Lepidocrocite (gamma-FeO(OH)) (part 3) 
+AB2CD_oC20_63_b_f_c_c-001.{ABCD}                                     oC20      Cmcm                -             CFe2SiTh                #63       ThFe2SiC (part 3) 
+A5B_oC24_63_c2f_c-001.{AB}                                           oC24      Cmcm                -             Te5Zr                   #63       ZrTe5 (part 3) 
+A_oC24_63_3f-001.{A}                                                 oC24      Cmcm                -             Si24                    #63       Si24 Clathrate (part 3) 
+A5B3_oC32_63_cfg_ce-001.{AB}                                         oC32      Cmcm                -             Pd5Pu3                  #63       Pd5Pu3 (part 3) equivalent to 661.AB,661.BA [HTQC]
+AB5C2_oC32_63_c_c2f_f-004.{ABC}                                      oC32      Cmcm                -             NiS5Ta2                 #63       Ta2NiS5 (part 3) 
+A2B2C6DE2_oC52_63_g_e_fh_c_f-001.{ABCDE}                             oC52      Cmcm                -             Br2Cu2O6PbSe2           #63       Cu2Pb(SeO3)2Br2 (part 3) 
+A4BC12D2_oC76_63_eg_c_f3gh_g-001.{ABCD}                              oC76      Cmcm                S0_{4}        Al4FeO12Si2             #63       S04 (Staurolite, Fe(OH)2Al4Si2O10) (obsolete) (part 3) 
+A10B3C4_oC68_64_2dfg_ad_2d-001.{ABC}                                 oC68      Cmce                -             O10Ru3Sr4               #64       Base-centered orthorhombic Sr4Ru3O10 (part 3) 
+A2B2C7_oC88_64_ef_df_3f2g-001.{ABC}                                  oC88      Cmce                -             Mo2Na2O7                #64       Na2Mo2O7 (part 3) 
+A3B8_oC22_65_ag_bd2gh-001.{AB}                                       oC22      Cmmm                -             FNb3O7                  #65       Nb3O7F (part 3) 
+A2B8CD2_oC26_65_h_r_a_i-001.{ABCD}                                   oC26      Cmmm                E1_{3}        Cl2H6MgN2               #65       Mg(NH3)2Cl2 (part 3) 
+A2BC2D_oC24_67_m_a_n_g-001.{ABCD}                                    oC24      Cmme                F5_{7}        H2(NH4)O2P              #67       NH4H2PO2 (part 3) 
+A2B4C_oF56_70_g_h_a-001.{ABC}                                        oF56      Fddd                H1_{7}        Na2O4S                  #70       Thenardite [Na2SO4 (V)] (part 3) 
+ABC2_oI16_71_g_i_eh-001.{ABC}                                        oI16      Immm                -             CsFeS2                  #71       CsFeS2 (100K) (part 3) 
+AB6C3_oI20_71_a_in_cj-001.{ABC}                                      oI20      Immm                -             AlF6Na3                 #71       High-Temperature Cryolite (Na3AlF6) (part 3) 
+A2B5_oI28_72_j_bfj-001.{AB}                                          oI28      Ibam                D8_{g}        Ga2Mg5                  #72       Ga2Mg5 (part 3) 
+ABC4D_oI28_74_a_d_hi_e-001.{ABCD}                                    oI28      Imma                -             CuLiO4V                 #74       LiCuVO4 (part 3) 
+A2B6C2D_oI44_74_h_ij_i_e-001.{ABCD}                                  oI44      Imma                E1_{2}        Cl2H6N2Zn               #74       Zn(NH3)2Cl2 (part 3) 
+A4B2C3_tP72_77_8d_ab2c2d_6d-001.{ABC}                                tP72      P4_{2}              -             H4N2O3                  #77       Gwihabaite [NH4NO3 (V)] (part 3) 
+AB5C_tP14_85_c_cg_b-001.{ABC}                                        tP14      P4/n                -             MoO5P                   #85       MoPO5 (part 3) 
+A3B6CD_tP44_85_bcg_3g_ac_e-001.{ABCD}                                tP44      P4/n                E2_{6}        (Br,Cl)3(H2O)6KMg       #85       Bromocarnallite (KMg(H2O)6(Cl,Br)3) (part 3) 
+A2BC_tP32_86_2g_g_g-001.{ABC}                                        tP32      P4_{2}/n            E1_{4}        Cl2NP                   #86       PNCl2 (part 3) 
+AB6C_tP32_86_d_3g_c-001.{ABC}                                        tP32      P4_{2}/n            J1_{11}       Na(OH)6Sb               #86       NaSb(OH)6 (part 3) 
+ABC3_tP40_86_g_g_3g-001.{ABC}                                        tP40      P4_{2}/n            -             ILiO3                   #86       beta-LiIO3 (part 3) 
+A4B11C2_tP68_86_2g_ab5g_g-001.{ABC}                                  tP68      P4_{2}/n            -             Nd4O11Re2               #86       Nd4Re2O11 (part 3) 
+AB6C2D_tI20_87_a_eh_d_b-001.ABCD/DACB/CABD/                          tI20      I4/m                -             NiO6Sr2W                #87       Sr2NiWO6 (part 3) 
+DCBA/BCAD/DBAC/CDAB/ADBC/BADC/CBDA/ACDB/BDCA
+AB4C24D12_tI82_87_a_h_2h2i_hi-001.{ABCD}                             tI82      I4/m                S6_{4}        ClNa4O24(Al3Si9)        #87       Marialite Scapolite [Na4Cl(AlSi3)3O24] (part 3) 
+A9B4C20_tI132_88_a2f_f_5f-001.{ABC}                                  tI132     I4_{1}/a            -             Ge9Na4O20               #88       Na4Ge9O20 (part 3) 
+AB2C3D2_tP16_90_c_f_ce_e-001.{ABCD}                                  tP16      P42_{1}2            G7_{5}        CCl2O3Pb2               #90       G75 (PbCO3.PbCl2, Phosgenite) (obsolete) (part 3) 
+A12BC10D_tP96_92_6b_a_5b_a-001.{ABCD}                                tP96      P4_{1}2_{1}2        H4_{5}        H12NiO10S               #92       Retgersite (alpha-NiSO4.6H2O) (part 3) 
+A2B7C2_tI44_98_f_bcde_f-001.{ABC}                                    tI44      I4_{1}22            -             Cd2O7Re2                #98       Phase III Cd2Re2O7 (part 3) 
+ABC2_tP8_100_b_a_c-001.{ABC}                                         tP8       P4bm                F5_{4}        Cl(NH4)O2               #100      F54 (NH4ClO2) (obsolete) (part 3) 
+ABC3_tP10_100_b_a_bc-001.{ABC}                                       tP10      P4bm                G0_{9}        N(NH4)O3                #100      NH4NO3 II (part 3) 
+A6B2C_tP72_103_abc5d_2d_abc-001.{ABC}                                tP72      P4cc                -             O6Se2V                  #103      VSe2O6 (part 3) 
+A2BC4_tP7_111_f_a_n-001.{ABC}                                        tP7       P-42m               E3_{1}        Ag2HgI4                 #111      E31 (beta-Ag2HgI4) (obsolete) (part 3) 
+AB4CD2_tP16_113_c_f_a_e-001.{ABCD}                                   tP16      P-42_{1}m           -             ClH4NO2                 #113      Ammonium Chlorite (NH4ClO2) (part 3) 
+A2B12C4D4E_tP46_114_d_3e_e_e_a-001.{ABCDE}                           tP46      P-42_{1}c           H4_{17}       Ag2H12N4O4S             #114      Ag2SO4.4NH3 (part 3) 
+A19B15_tP68_114_bc4e_ac3e-001.{AB}                                   tP68      P-42_{1}c           -             C19Sc15                 #114      C19Sc15 (part 3) equivalent to 1217.AB,1217.BA,1346.AB,1346.BA [HTQC]
+ABC2_tP4_115_a_c_g-001.{ABC}                                         tP4       P-4m2               F6_{1}        CuFeS2                  #115      F61 (Chalcopyrite, CuFeS2) (obsolete) (part 3) 
+AB2C_tI8_119_c_e_a-001.{ABC}                                         tI8       I-4m2               -             FeS2Tl                  #119      Tetragonal TlFeS2 (part 3) 
+A2B7C2_tI44_119_i_bdefgh_i-001.{ABC}                                 tI44      I-4m2               -             Cd2O7Re2                #119      Phase II Cd2Re2O7 (part 3)
+AB8C8D_tI72_120_c_2i_2i_b-001.{ABCD}                                 tI72      I-4c2               H4_{3}        BeH8O8S                 #120      BeSO4.4H2O (part 3) 
+AB3_tI32_121_g_f2i-001.{AB}                                          tI32      I-42m               -             SV3                     #121      alpha-V3S (part 3) equivalent to 649.AB,649.BA [HTQC]
+A2B2C6D_tI44_121_i_i_ij_c-001.{ABCD}                                 tI44      I-42m               -             B2Cu2O6Sr               #121      SrCu2(BO3)2 (part 3) 
+A2BC2_tI40_122_e_d_e-001.{ABC}                                       tI40      I-42d               F1_{1}        C2HgN2                  #122      Mercury Cyanide [Hg(CN)2] (part 3) 
+A4BC4D_tI40_122_e_b_e_a-001.{ABCD}                                   tI40      I-42d               H2_{2}        H2KO4P                  #122      KH2PO4 (part 3) 
+AB2_tI48_122_cd_2e-001.{AB}                                          tI48      I-42d               -             NaS2                    #122      NaS2 (part 3) 
+A8BC4D_tI56_122_2e_b_e_a-001.{ABCD}                                  tI56      I-42d               -             H6NO4P                  #122      NH4H2PO4 (part 3) 
+AB_tP2_123_a_d-002.AB                                                tP2       P4/mmm              L2_{a}        CuTi                    #123      delta-CuTi (part 3) 
+A3BC_tP5_123_cg_a_d-001.{ABC}                                        tP5       P4/mmm              E2_{5}        Cl3Hg(NH4)              #123      NH4HgCl3 (part 3) 
+AB4C_tP6_123_d_eh_a-001.{ABC}                                        tP6       P4/mmm              H0_{8}        AlF4Tl                  #123      TlAlF4 (part 3) 
+A4B2C_tP7_123_j_e_a-001.{ABC}                                        tP7       P4/mmm              H1_{5}        Cl4K2Pt                 #123      K2PtCl4 (part 3) 
+A8B2C_tP11_123_r_f_a-001.{ABC}                                       tP11      P4/mmm              E6_{1}        Sr(OH)2(H2O)8           #123      E61 (Sr(OH)2(H2O)8) (obsolete) (part 3) 
+A8B2C_tP11_123_r_h_a-001.{ABC}                                       tP11      P4/mmm              E6_{2}        (H2O)8SrO2              #123      E62 [SrO2(H2O)8] (empossibly obsolete) (part 3) 
+AB8C2_tP22_124_a_n_h-001.{ABC}                                       tP22      P4/mcc              -             Ca(H2O)8O2              #124      CaO2(H2O)8 (part 3) 
+ABC4D2E8_tP32_126_a_b_h_e_k-001.{ABCDE}                              tP32      P4/nnc              J1_{9}        AgCoN4(NH3)2O8          #126      Ag[Co(NH3)2(NO2)4] (part 3) 
+A4B10C2D34E4F9_tP252_126_k_ce2k_f_h8k_k_d2k-001.{ABCDEF}             tP252     P4/nnc              S2_{3}        Ag4Ca10Mg2O34(OH)4Si9   #126      Vesuvianite (Ca10Al4(Mg,Fe)2Si9O34(OH)4) (part 3) 
+A2BC4D_tP16_127_h_d_i_a-001.{ABCD}                                   tP16      P4/mbm              H4_{9}        Cl2(H2O)(NH3)4Pd        #127      Pd(NH3)4Cl2.H2O (part 3) 
+AB2C3D2_tP32_127_g_eh_gk_k-001.{ABCD}                                tP32      P4/mbm              -             CCl2O3Pb2               #127      Phosgenite [Pb2Cl2(CO3)] (part 3) 
+A3B14C5_tP44_128_ac_ehi_bg-001.{ABC}                                 tP44      P4/mnc              K7_{5}        Al3F14Na5               #128      Chiolite (Na5Al3F14) (part 3) 
+A4BC16DE28F8_tP116_128_h_a_2i_b_g3i_i-001.{ABCDEF}                   tP116     P4/mnc              S5_{2}        Ca4FH16KO28Si8          #128      Apophyllite (KCa4Si8O20F.8H2O) (part 3) 
+ABCD_tP8_129_b_c_a_c-001.{ABCD}                                      tP8       P4/nmm              -             AgLaOS                  #129      LaOAgS (part 3) 
+AB4C_tP12_129_c_i_a-001.{ABC}                                        tP12      P4/nmm              B25           BrH4N                   #129      NH4Br (part 3) 
+AB4C6DE_tP26_129_c_j_2ci_a_c-001.{ABCDE}                             tP26      P4/nmm              H5_{10}       Ca(H2O)6O12P2U2         #129      Meta-autunite (I) [Ca(UO2)2(PO4)2.6H2O] (part 3) 
+A18B10C_tP116_130_2c4g_2c2g_a-001.{ABC}                              tP116     P4/ncc              -             H18O10Sr                #130      Sr(OH)2(H2O)8 (part 3) 
+A4B2C_tP14_136_i_g_b-001.{ABC}                                       tP14      P4_{2}/mnm          -             Fe4Si2Zr                #136      ZrFe4Si2 (part 3) 
+A2B3_tP20_136_j_dfg-001.{AB}                                         tP20      P4_{2}/mnm          -             Al2Zr3                  #136      Zr3Al2 (part 3) equivalent to 361,362 [HTQC]
+A4BC4D2E2_tP26_136_fg_a_j_d_e-001.{ABCDE}                            tP26      P4_{2}/mnm          H4_{1}        Cl4CuH4K2O2             #136      K2CuCl4.2H2O (part 3) 
+AB14C2_tP68_136_f_ce2j2k_fg-001.{ABC}                                tP68      P4_{2}/mnm          -             BFe14Nd2                #136      Nd2Fe14B (part 3) 
+A2B3_tI10_139_e_ae-001.{AB}                                          tI10      I4/mmm              -             Au2Nb3                  #139      Au2Nb3 (part 3) 
+AB2C2_tI10_139_a_d_e-003.{ABC}                                       tI10      I4/mmm              H5_{9}        CaP2U2                  #139      H59 [Autunite, Ca(UO2)2(PO4)2.10(1/2)H2O] (obsolete) (part 3) 
+A4B2C2D_tI18_139_h_d_e_a-001.{ABCD}                                  tI18      I4/mmm              J1_{5}        Cl4K2O2Os               #139      K2OsO2Cl4 (part 3) 
+AB3C_tI20_139_ab_eh_d-001.{ABC}                                      tI20      I4/mmm              K7_{6}        AuCl3Cs                 #139      AuCsCl3 (part 3) 
+A10B4C3_tI34_139_c2eg_2e_ae-001.{ABC}                                tI34      I4/mmm              -             O10Sr4Ti3               #139      Sr4Ti3O10 (part 3) 
+A6B2C3D_tI168_139_egikl2m_ejn_bh2n_acf-001.{ABCD}                    tI168     I4/mmm              J3_{1}        Cl6(H2O)2K3Tl           #139      K3TlCl6.2H2O (part 3) 
+A2BC_tI16_140_h_d_a-001.{ABC}                                        tI16      I4/mcm              F5_{2}        F2HK                    #140      KHF2 (part 3) 
+AB6_tI28_140_a_hk-001.{AB}                                           tI28      I4/mcm              D2_{c}        MnU6                    #140      U6Mn (part 3) 
+A5BC2_tI32_140_bl_a_h-001.{ABC}                                      tI32      I4/mcm              K3_{4}        Br5(NH4)Pb2             #140      NH4Pb2Br5 (part 3) 
+A5BC3_tI36_140_cl_b_ah-001.{ABC}                                     tI36      I4/mcm              K3_{1}        Cl5CoCs3                #140      Cs3CoCl5 (part 3) 
+A31B20_tI204_140_b2gh3m_ac2fh3l-001.{AB}                             tI204     I4/mcm              -             Pu31Rh20                #140      Pu31Rh20 (part 3) 
+AB11_tI48_141_a_bdi-001.{AB}                                         tI48      I4_{1}/amd          -             BaCd11                  #141      BaCd11 (part 3) 
+A2B3_tI160_142_deg_3g-001.{AB}                                       tI160     I4_{1}/acd          -             As2Cd3                  #142      Cd3As2 (part 3) 
+A2B2C3D12E4_tI184_142_f_f_be_3g_g-001.{ABCDE}                        tI184     I4_{1}/acd          S6_{1}        Al(H2O)NaO6Si2          #142      Analcime (NaAlSi2O6.H2O) (part 3) 
+AB3C9D_hP28_143_2a_2d_6d_bc-001.{ABCD}                               hP28      P3                  -             BLa3O9W                 #143      La3BWO9 (P3) (part 3) 
+AB3C_hP45_144_3a_9a_3a-001.{ABC}                                     hP45      P3_{1}              -             NO3Rb                   #144      RbNO3 (IV) (part 3) 
+A2B3C_hP12_147_abd_g_d-001.{ABC}                                     hP12      P-3                 G3_{2}        Na2O3S                  #147      Na2SO3 (part 3) 
+A2BCD6_hR10_148_c_a_b_f-001.{ABCD}                                   hR10      R-3                 G1_{1}        C2CaMgO6                #148      Dolomite [MgCa(CO3)2] (part 3) 
+A6B6CD_hR14_148_f_f_b_a-001.ABCD/CABD/BCAD/                          hR14      R-3                 I6_{1}        Cl6(H2O)6NiSn           #148      Ni(H2O)6SnCl6 (part 3) 
+DBAC/ADBC/CDAB/BACD/ACBD/CBAD/BDAC/DABC/DCAB
+A6B2C6D_hR15_148_f_c_f_a-001.{ABCD}                                  hR15      R-3                 H6_{2}        H6K2O6Sn                #148      K2Sn(OH)6 (part 3) 
+ABC8D2_hP12_150_b_a_dg_d-001.{ABCD}                                  hP12      P321                H3_{2}        AlKO8S2                 #150      Steklite [KAl(SO4)2] (part 3) 
+A2B9C3_hP14_150_d_eg_ad-001.{ABC}                                    hP14      P321                K7_{3}        As2Cl9Cs3               #150      Cs3As2Cl9 (part 3) 
+A2B12C6D_hP21_150_d_2g_ef_a-001.{ABCD}                               hP21      P321                -             Cl2H12O6Sr              #150      SrCl2.(H2O)6 (part 3) 
+AB2CD6_hP30_150_e_c2d_f_3g-001.{ABCD}                                hP30      P321                -             BaC2CaO6                #150      Paralstonite (BaCa(CO3)2) (part 3) 
+AB3C_hP30_150_ef_3g_c2d-001.{ABC}                                    hP30      P321                K1_{1}        KO3S                    #150      KSO3 (part 3) 
+AB2C2DE3_hR9_155_b_c_c_a_e-001.{ABCDE}                               hR9       R32                 -             BBe2F2KO3               #155      KBe2BO3F2 (part 3) 
+ABC3_hR5_160_a_a_b-001.{ABC}                                         hR5       R3m                 G0_{7}        BrKO3                   #160      KBrO3 (part 3) 
+ABC3_hR5_160_a_a_b-002.{ABC}                                         hR5       R3m                 -             KNO3                    #160      gamma-Potassium Nitrate (KNO3) (part 3) 
+AB3C2D_hR7_160_a_b_2a_a-001.{ABCD}                                   hR7       R3m                 S5_{7}        FeO3(OH)2Si             #160      Cronstedtite Fe(Fe,Si)[(OH)2,O]O3 (part 3) 
+A3B7C_hR11_160_b_a2b_a-001.{ABC}                                     hR11      R3m                 -             Fe3O7P                  #160      Fe3PO7 (part 3) 
+AB4C8_hR13_160_a_ab_2a2b-001.{ABC}                                   hR13      R3m                 -             GaMo4S8                 #160      Low-Temperature GaMo4S8 (part 3) 
+A3B24C_hR28_160_b_2b3c_a-001.{ABC}                                   hR28      R3m                 -             I3S24Sb                 #160      SbI3S24 (part 3) 
+A2BC4_hR42_161_2b_b_4b-001.{ABC}                                     hR42      R3c                 -             B2BaO4                  #161      alpha-BaB2O4 (Low-Temperature) (part 3) 
+A2B6C_hP9_162_d_k_a-001.{ABC}                                        hP9       P-31m               I1_{3}        Cl2(H2O)6Sr             #162      I13 (SrCl2.(H2O)6) (obsolete) (part 3) 
+A6BC2_hP9_162_k_a_d-001.{ABC}                                        hP9       P-31m               -             O6PbSb2                 #162      Rosiaite (PbSb2O6) (part 3) 
+A6BC_hP16_163_i_b_c-001.{ABC}                                        hP16      P-31c               J1_{12}       F4NaSb                  #163      NaSbF4(OH)2 (part 3) 
+ABC6D_hP18_163_d_b_i_c-001.ABCD/DACB/CABD/                           hP18      P-31c               -             AlCaF6Li                #163      Colquiriite (LiCaAlF6) (part 3) 
+DCBA/BCAD/DBAC/CDAB/ADBC/BADC/CBDA/ACDB/BDCA
+AB3_hP4_164_b_ad-001.{AB}                                            hP4       P-3m1               D0_{13}       AlCl3                   #164      D013 (AlCl3) (obsolete) (part 3) 
+A2BC2_hP5_164_d_a_d-001.{ABC}                                        hP5       P-3m1               -             H2MgO2                  #164      Brucite [Mg(OH)2] (part 3) 
+A2BC6_hP9_164_d_a_i-001.{ABC}                                        hP9       P-3m1               H6_{3}        K2Pt(SCN)6              #164      K2Pt(SCN)6 (part 3) 
+A6B2C_hP9_164_i_d_a-001.{ABC}                                        hP9       P-3m1               J1_{6}        F6(NH4)2Si              #164      Bararite (Trigonal (NH4)2SiF6) (part 3) 
+A6BC2_hP9_164_i_a_d-001.{ABC}                                        hP9       P-3m1               J1_{13}       F6GeK2                  #164      K2GeF6 (part 3) 
+AB2C3_hP12_164_d_ae_i-001.{ABC}                                      hP12      P-3m1               -             HgPt2Se3                #164      Jacutingaite (Pt2HgSe3) (part 3) 
+AB_hP12_164_c2d_c2d-001.{AB}                                         hP12      P-3m1               -             BiSe                    #164      Nevskite (BiSe) (part 3) 
+A16B2C_hP19_164_2d2i_d_b-001.{ABC}                                   hP19      P-3m1               -             H16Li2Mg                #164      Predicted Li2MgH16 300GPa (part 3) 
+AB_hR2_166_a_b-003.AB                                                hR2       R-3m                B22           KS                      #166      K(SH) (part 3) 
+AB2_hR6_166_c_2c-002.{AB}                                            hR6       R-3m                C12           CaSi2                   #166      CaSi2 (part 3) 
+AB4C_hR6_166_b_2c_a-001.{ABC}                                        hR6       R-3m                -             CaO4U                   #166      CaUO4 (part 3) 
+A2BC4_hR7_166_c_a_2c-002.{ABC}                                       hR7       R-3m                -             Bi2MnTe4                #166      MnBi2Te4 (part 3) 
+AB4C2_hR7_166_a_2c_c-001.{ABC}                                       hR7       R-3m                -             CaCu4P2                 #166      CaCu4P2 (part 3) 
+ABC6_hR8_166_a_b_h-001.{ABC}                                         hR8       R-3m                -             KNO3                    #166      beta-Potassium Nitrate (KNO3) (part 3) 
+A13B2_hR15_166_b2h_c-001.{AB}                                        hR15      R-3m                D1_{g}        B13C2                   #166      B13C2 ``B4C'' (part 3) 
+AB4C2_hR28_166_2c_2c2h_abh-001.{ABC}                                 hR28      R-3m                -             CuS4Ti2                 #166      Rhombohedral CuTi2S4 (part 3) 
+A5B21C24D12_hR62_166_a2c_ehi_fg2h_i-001.{ABCD}                       hR62      R-3m                S3_{4}(I)     Ca5(H2O)21O24Si12       #166      Chabazite (Ca1.4Sr0.3Al3.8Si8.3O24.13H2O) (part 3) 
+A3B_hR8_167_e_b-001.{AB}                                             hR8       R-3c                D0_{12}       F3Fe                    #167      FeF3 (part 3) equivalent to 443,444 [HTQC]
+A3BC6_hR20_167_e_b_f-001.{ABC}                                       hR20      R-3c                J2_{2}        Cl3Cr(H2O)6             #167      CrCl3(H2O)6 (part 3) 
+A6BC3D_hR22_167_f_b_e_a-001.{ABCD}                                   hR22      R-3c                -             Cl6FeK3Na               #167      Rinneite (K3NaFeCl6) (part 3) 
+A9B3C2_hR28_167_ef_e_c-001.{ABC}                                     hR28      R-3c                K7_{2}        Cl9Cs3Tl2               #167      Cs3Tl2Cl9 (part 3) 
+A2BC4_hR42_167_f_ac_2f-001.{ABC}                                     hR42      R-3c                -             B2BaO4                  #167      beta-BaB2O4 (High-Temperature) (part 3) 
+A25B21_hR92_167_b2e3f_e3f-001.{AB}                                   hR92      R-3c                -             Re25Zr21                #167      Zr21Re25 (part 3) equivalent to 481,482 [HTQC]
+ABC3_hP10_173_b_a_c-001.{ABC}                                        hP10      P6_{3}              -             ILiO3                   #173      alpha-LiIO3 (part 3) 
+ABC4D_hP14_173_a_b_bc_b-001.{ABCD}                                   hP14      P6_{3}              H1_{4}        KLiO4S                  #173      LiKSO4 (part 3) 
+AB3C7D_hP24_173_a_c_b2c_b-001.{ABCD}                                 hP24      P6_{3}              -             CuLa3S7Si               #173      La3CuSiS7 (part 3) 
+AB3C9D_hP28_173_a_c_3c_b-001.{ABCD}                                  hP28      P6_{3}              -             BLa3O9W                 #173      La3BWO9 (P6_{3}) (part 3) 
+A3BCD3E15F3_hP52_173_c_b_b_c_5c_c-001.{ABCDEF}                       hP52      P6_{3}              S3_{3}(I)     Al3CCaNa3O15Si3         #173      Crancrinite (Na6Ca2Al6Si6O24(CO3)2) (part 3) 
+A3B2_hP20_176_2h_ah-001.{AB}                                         hP20      P6_{3}/m            D8_{k}        S12Th7                  #176      Th7S12 (part 3) 
+A9B3C2_hP28_176_hi_af_f-001.{ABC}                                    hP28      P6_{3}/m            K7_{1}        Cl9K3W2                 #176      K3W2Cl9 (part 3) 
+A10B7_hP34_176_c3h_b2h-001.{AB}                                      hP34      P6_{3}/m            -             Rh20Si13                #176      Rh20Si13 (part 3) 
+A9B2C9_hP40_176_hi_f_hi-001.{ABC}                                    hP40      P6_{3}/m            F4_{1}        C9Fe2O9                 #176      Fe2(CO)9 (part 3) 
+A5BC12D3_hP42_176_fh_a_2hi_h-001.{ABCD}                              hP42      P6_{3}/m            H5_{7}        Ca5FO12P3               #176      Fluorapatite [Ca5F(PO4)3] (part 3) 
+A2BCD2_hP18_180_f_c_b_i-001.{ABCD}                                   hP18      P6_{2}22            -             Hg2INaO2                #180      Hg2O2NaI (part 3) 
+ABC3_hP10_182_c_b_g-001.{ABC}                                        hP10      P6_{3}22            E2_{3}        ILiO3                   #182      E23 (LiIO3) (obsolete) (part 3) 
+A2BC6_hP18_182_f_b_gh-001.{ABC}                                      hP18      P6_{3}22            H2_{8}        Al2BaO4                 #182      BaAl2O4 (part 3) 
+AB2_hP6_186_b_ab-001.{AB}                                            hP6       P6_{3}mc            C27           CdI2                    #186      C27 (CdI2) (emquestionable) (part 3) 
+ABCD_hP8_186_b_b_a_a-001.{ABCD}                                      hP8       P6_{3}mc            E0_{3}        CdClHO                  #186      Cd(OH)Cl (part 3) 
+A3B8C2_hP26_186_c_ab2c_2b-001.{ABC}                                  hP26      P6_{3}mc            -             Mo3O8Zn2                #186      Zn2Mo3O8 (part 3) 
+A4BC7D_hP26_186_ac_b_a2c_b-001.{ABCD}                                hP26      P6_{3}mc            E9_{2}        Be4NaO7Sb               #186      Swedenborgite (NaBe4SbO7) (part 3) 
+AB6CD7_hP30_186_b_d_a_b2c-001.{ABCD}                                 hP30      P6_{3}mc            H4_{18}       ClH6LiO7                #186      LiClO4.3H2O (part 3) 
+A3B9CD9_hP44_186_c_3c_b_cd-001.{ABCD}                                hP44      P6_{3}mc            G2_{2}        Br3(H2O)9NdO9           #186      Nd(BrO3)3.9H2O (part 3) 
+A3B3C2_hP16_187_jk_jk_ck-001.{ABC}                                   hP16      P-6m2               -             As3Cr3K2                #187      Cr-233 Quasi-One-Dimensional Superconductor (K2Cr3As3) (part 3) 
+A7B_hP24_187_ai2j2kn_j-001.{AB}                                      hP24      P-6m2               -             Cs7O                    #187      Cs7O (part 3) 
+AB3C_hP20_190_ac_i_f-001.{ABC}                                       hP20      P-62c               K1_{2}        CsO3S                   #190      CsSO3 (part 3) 
+ABCD3_hP36_190_h_g_af_hi-001.{ABCD}                                  hP36      P-62c               G7_{1}        CCeFO3                  #190      Bastn"asite [CeF(CO3)] (part 3) 
+A12B_hP13_191_cdei_a-001.{AB}                                        hP13      P6/mmm              D2_{a}        Be12Ti                  #191      TiBe12 (approximate) (part 3) 
+A4B5_hP18_193_bg_dg-001.{AB}                                         hP18      P6_{3}/mcm          -             Ga4Ti5                  #193      Ti5Ga4 (part 3) equivalent to 359,360 [HTQC]
+A3B_hP24_193_ack_g-001.{AB}                                          hP24      P6_{3}/mcm          D0_{6}        F3La                    #193      D06 (Tysonite, LaF3) (obsolete) (part 3) 
+AB_hP4_194_a_c-003.{AB}                                              hP4       P6_{3}/mmc          C_{k}         LiZn2                   #194      LiZn2 (part 3) 
+A2B3_hP10_194_f_bf-001.{AB}                                          hP10      P6_{3}/mmc          D5_{b}        Pt2Sn3                  #194      Pt2Sn3 (part 3) 
+AB2C2_hP10_194_a_bc_f-001.{ABC}                                      hP10      P6_{3}/mmc          -             CoNa0.74O2              #194      Na0.74CoO2 (part 3) 
+AB2C2_hP10_194_a_f_f-001.{ABC}                                       hP10      P6_{3}/mmc          -             EuIn2P2                 #194      EuIn2P2 (part 3) 
+A10B_hP22_194_bhj_c-001.{AB}                                         hP22      P6_{3}/mmc          -             H10Hf                   #194      Proposed 300GPa HfH10 (part 3) 
+AB3C2_hP24_194_f_k_bh-001.{ABC}                                      hP24      P6_{3}/mmc          -             CoGa3Lu2                #194      Lu2CoGa3 (part 3) 
+A9B2C3_hP28_194_hk_f_bf-001.{ABC}                                    hP28      P6_{3}/mmc          -             Cl9Cr2Cs3               #194      Cs3Cr2Cl9 (part 3) 
+A3B2C9D3E_hP36_194_g_f_hk_h_a-001.{ABCDE}                            hP36      P6_{3}/mmc          S3_{4}(II)    (H2O)Na2O9Si3Zr         #194      S34 (II) (Catapleiite, Na2Zr(SiO3)3.H2O) (obsolete) (part 3) 
+A2B3_hP60_194_3fk_cdef2k-001.{AB}                                    hP60      P6_{3}/mmc          D5_{6}        Al2O3                   #194      beta-Alumina (Al2O3) (part 3) 
+A12B19C_hP64_194_ab2fk_efh2k_d-001.{ABC}                             hP64      P6_{3}/mmc          -             Fe12O19Pb               #194      Magnetoplumbite (PbFe12O19) (part 3) 
+ABC4D_cP28_198_a_a_ab_a-001.{ABCD}                                   cP28      P2_{1}3             S6_{5}        AlNaO4Si                #198      alpha-Carnegieite (NaAlSiO4) (part 3) 
+AB2C4D_cP32_198_a_2a_ab_a-001.{ABCD}                                 cP32      P2_{1}3             S6_{6}        CaNa2O4Si               #198      Na2CaSiO4 (part 3) 
+A2B4C_cP56_198_ab_2a2b_2a-001.{ABC}                                  cP56      P2_{1}3             -             Cu2O4Se                 #198      Cubic Cu2OSeO3 (part 3) 
+AB2_cI36_199_b_c-001.{AB}                                            cI36      I2_{1}3             C26_{a}       NO2                     #199      C26a (NO2) (obsolete) (part 3) 
+A3B11C3_cP68_201_be_efh_g-001.{ABC}                                  cP68      Pn-3                -             Bi3O11Ru3               #201      Bi3Ru3O11 (part 3) 
+AB3C6D12_cF88_202_a_bc_e_h-001.{ABCD}                                cF88      Fm-3                J2_{4}        CoK3N6O12               #202      K3Co(NO2)6 (part 3) 
+A4BC12_cI34_204_c_a_g-001.{ABC}                                      cI34      Im-3                -             Fe4LaP12                #204      LaFe4P12 (part 3) 
+AB2_cI36_204_d_g-001.{AB}                                            cI36      Im-3                C26           NO2                     #204      NO2 (Modern) (part 3) 
+A7BC12_cI40_204_bc_a_g-001.{ABC}                                     cI40      Im-3                -             Mn7NaO12                #204      NaMn7O12 (part 3) 
+A6BC_cP32_205_d_b_a-001.{ABC}                                        cP32      Pa-3                -             F6NaSb                  #205      NaSbF6 (part 3) 
+A2B6C_cP36_205_c_d_a-001.{ABC}                                       cP36      Pa-3                G2_{1}        N2O6Pb                  #205      Pb(NO3)2 (part 3) 
+A4B_cP40_205_cd_c-001.{AB}                                           cP40      Pa-3                D1_{1}        I4Sn                    #205      SnI4 (part 3) 
+A7B2C_cP40_205_bd_c_a-001.{ABC}                                      cP40      Pa-3                K6_{1}        P2O7Zr                  #205      ZrP2O7 High-Temperature (part 3) 
+A2B6C6D_cP60_205_c_d_d_a-001.{ABCD}                                  cP60      Pa-3                J1_{10}       Br2(H2O)6O6Zn           #205      Zn(BrO3)2.6H2O (J110) (part 3) 
+A2B6CD6_cP60_205_c_d_a_d-001.{ABCD}                                  cP60      Pa-3                H6_{4}        N2(NH3)6NiO6            #205      H64 [Ni(NO3)2(NH3)6] (obsolete) (part 3) 
+A2BC4_cP84_205_d_ac_2d-001.{ABC}                                     cP84      Pa-3                -             B2CaO4                  #205      CaB2O4 (IV) (part 3) 
+AB12CD8E2_cP96_205_a_2d_b_cd_c-001.{ABCDE}                           cP96      Pa-3                -             Cr(H2O)12NaO8S2         #205      NaCr(SO4)2.12H2O Alum (part 3) 
+AB24CD20E2_cP192_205_a_4d_b_c3d_c-001.{ABCDE}                        cP192     Pa-3                H4_{15}       AlH24NaO20S2            #205      gamma-Alum [AlNa(SO4)2.12H2O] (part 3) 
+AB24CD28E2_cP224_205_a_4d_b_2c4d_c-001.{ABCDE}                       cP224     Pa-3                H4_{13}       AlH24KO20S2             #205      alpha-Alum [KAl(SO4)2.12H2O] (part 3) 
+AB2C36D2E20F2_cP252_205_a_c_6d_c_c3d_c-001.{ABCDEF}                  cP252     Pa-3                H4_{14}       AlC2H36N2O20S2          #205      beta-Alum [Al(NH3CH3)2(SO4)2.12H2O] (part 3) 
+A2B3_cP60_212_bcd_ace-001.{AB}                                       cP60      P4_{3}32            D5_{7}        Fe2O3                   #212      Maghemite (gamma-Fe2O3) (part 3) 
+A3B2_cP20_213_d_c-001.{AB}                                           cP20      P4_{1}32            -             Mg3Ru2                  #213      Mg3Ru2 (part 3) equivalent to 593,594 [HTQC]
+A2BC3_cP24_213_c_a_d-001.{ABC}                                       cP24      P4_{1}32            -             Al2CMo3                 #213      Al2Mo3C (part 3) 
+ABC4_cF24_216_b_a_e-001.{ABC}                                        cF24      F-43m               H0_{5}        ClKO4                   #216      High-Temperature Cubic KClO4 (part 3) 
+AB_cF40_216_de_ce-001.AB                                             cF40      F-43m               -             AlN                     #216      AlN (cF40) (part 3) 
+AB4C8_cF52_216_a_e_2e-001.{ABC}                                      cF52      F-43m               -             GaMo4S8                 #216      GaMo4S8 (part 3) 
+A13BC18D20E5_cF228_216_dh_b_fh_2eh_ce-001.{ABCDE}                    cF228     F-43m               S0_{8}        Al13ClF18O20Si5         #216      Zunyite [Al13(OH,F)18Si5O20Cl] (part 3) 
+A16B40C12D6E5_cF316_216_eh_e2g2h_h_f_be-001.{ABCDE}                  cF316     F-43m               -             F16O40Ti12Y6Zn5         #216      Murataite [(Y,Na)6(Zn,Fe)5Ti12O29(O,F)10F4] (part 3) 
+A45B11_cF448_216_bd4efg5h_ac2eh-001.{AB}                             cF448     F-43m               -             Cd45Sm11                #216      Sm11Cd45 (part 3) 
+AB_cI16_217_c_c-001.AB                                               cI16      I-43m               -             AlN                     #217      AlN (cI16) (part 3) 
+A4B24C13_cI82_217_c_deg_ag-001.{ABC}                                 cI82      I-43m               -             As4Cu12S13              #217      Tennantite (Cu12As4S13) (part 3) 
+A3BC4D12E3_cP46_218_d_a_e_i_c-001.{ABCDE}/2 (60)                     cP46      P-43n               S6_{2}        Al3ClNa4O12Si3          #218      Sodalite [Na4(AlSiO4)3Cl] (part 3) 
+A3B4C4D4E16F4G3_cP76_218_c_e_e_e_ei_e_d-001.{ABCDEFG}/2 (2520)       cP76      P-43n               S6_{9}        Al3Ca4K4Na4O16S4Si3     #218      Hauyne [(Na0.5Ca0.3K0.2)8(Al6Si6O24)(SO4)1.5] (part 3) 
+AB_cI24_220_a_b.AB                                                   cI24      I-43d               -             AlN                     #220      AlN (cI24) (part 3) 
+A4B12C3_cI76_220_c_e_a-001.{ABC}                                     cI76      I-43d               S1_{5}        Bi4O12Si3               #220      Eulytine (Bi4(SiO4)3) (part 3) 
+A7B12C19_cI152_220_bc_2d_ace-001.{ABC}                               cI152     I-43d               K7_{4}        Al14Ca12O33             #220      Mayenite (12CaO.7Al2O3, C12A7) (part 3) 
+AB9C3_cI208_220_c_3e_e-001.{ABC}                                     cI208     I-43d               G5_{2}        AlO9P3                  #220      Al(PO3)3 (part 3) 
+AB12C_cP14_221_a_h_b-001.ABC/CAB/BCA                                 cP14      Pm-3m               -             CaH12Y                  #221      Predicted High-Pressure YCaH12 (part 3) 
+A3B40CD12_cP112_224_d_e3k_a_k-001.{ABCD}                             cP112     Pn-3m               -             (H3O)3O40PW12           #224      H3PW12O40.3H2O (part 3) 
+A5B40CD12_cP116_224_cd_e3k_a_k-001.{ABCD}                            cP116     Pn-3m               H4_{16}       (H2.6O)5O40PW12         #224      12-phosphotungstic acid [H3PW12O40.5H2O] (part 3) 
+A27B52CD12_cP184_224_dl_eh3k_a_k-001.{ABCD}                          cP184     Pn-3m               -             H15O46PW12              #224      Dodecatungstophosphoric Acid Hexahydrate [H3PW12O40.6H2O] (part 3) 
+A2BC6D_cF40_225_c_a_e_b-001.ABCD/BDCA/CABD/                          cF40      Fm-3m               -             Ba2MnO6W                #225      Double Perovskite (Ba2MnWO6) (part 3) equivalent to Q0001 [HTQC]
+ADBC/BCAD/CDAB/DBAC/DCBA/BADC/ACDB/CBDA/DACB
+A10B_cF44_225_cf_b-001.{AB}                                          cF44      Fm-3m               -             H10La                   #225      LaH10 High-Tc Superconductor (part 3) 
+A9B8_cF68_225_af_ce-001.{AB}                                         cF68      Fm-3m               D8_{9}        Co9S8                   #225      Co9S8 (part 3) 
+ABC6D8E2_cF72_225_b_a_e_f_c-001.{ABCDE}                              cF72      Fm-3m               H5_{8}        ClFNa6O8S2              #225      Sulphohalite [Na6ClF(SO4)2] (part 3) 
+A6B9CD2E6_cF96_225_e_bf_a_c_e-001.{ABCDE}                            cF96      Fm-3m               J2_{5}        C12Cu3Fe2(H2O)xN12      #225      Cu3[Fe(CN)6]2. xH2O (x approx 3) (part 3) 
+AB30C16D3_cF200_225_a_ej_2f_bc-001.{ABCD}                            cF200     Fm-3m               J2_{1}        AlF6H12N3               #225      (NH4)3AlF6 (part 3) 
+AB_cF32_227_c_d.AB                                                   cF32      Fd-3m               L1_{3}(I)     CuPt                    #227      Cubic CuPt (part 3) 
+A3B2_cF80_227_f_e-002.{AB}                                           cF80      Fd-3m               D6_{1}        O3Sb2                   #227      Senarmontite (Sb2O3) (part 3) 
+A2B_cF96_227_abf_cd-001.{AB}                                         cF96      Fd-3m               D6_{2}        O2Sb                    #227      D62 (Sb2O4) (obsolete) (part 3) 
+A11B4_cF120_227_acdf_e-001.{AB}                                      cF120     Fd-3m               -             Ga2O3                   #227      gamma-Ga2O3 (part 3) 
+A16B2C_cF152_227_eg_d_a-001.{ABC}                                    cF152     Fd-3m               -             H16Li2Mg                #227      Predicted Li2MgH16 High-Temperature Superconductor (250GPa) (part 3) 
+A18B2C3_cF184_227_fg_d_ac-001.{ABC}                                  cF184     Fd-3m               -             Al18Cr2Mg3              #227      Mg3Cr2Al18 (part 3) 
+A22B_cF184_227_cdfg_a-001.{AB}                                       cF184     Fd-3m               -             Zn22Zr                  #227      Zn22Zr (part 3) equivalent to 425,426 [HTQC]
+A2BCD3E6_cF208_227_e_c_d_f_g-001.{ABCDE}                             cF208     Fd-3m               G7_{3}        C2ClMgNa3O6             #227      G73 [Northupite, Na3MgCl(CO3)2] (obsolete) (part 3) 
+A4B2C6D16E_cF232_227_e_d_f_eg_a-001.{ABCDE}                          cF232     Fd-3m               H5_{6}        C4Mg2Na6O16S            #227      H56 [Tychite, Na6Mg2SO4(CO3)4)] (obsolete) (part 3) 
+A29B40CD12_cF656_227_ae2fg_e3g_b_g-001.{ABCD}                        cF656     Fd-3m               H4_{21}       (H2O)29O40PW12          #227      H3PW12O40.29H2O (part 3) 
+A21B_cI44_229_bdh_a-001.{AB}                                         cI44      Im-3m               B23           AgI                     #229      alpha-AgI (part 3) 
+A2B3C12D12_cI232_230_a_c_h_h-001.{ABCD}                              cI232     Ia-3d               J2_{3}        Al2Ca3H12O12            #230      Ca3Al2(OH)12 (part 3) 
 
 ****************************************************************************************************
 ****************************************************************************************************
