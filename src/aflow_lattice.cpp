@@ -689,6 +689,188 @@ namespace LATTICE {
 }
 
 // ***************************************************************************
+// LATTICE::findLattices() //DX20210316
+// ***************************************************************************
+// Find all possible lattices with the same volume as in the input
+// We cannot restrict on lattice vector lengths or angles because
+// the cell could change shape and still have the same volume 
+// (problem of infinite possible lattice choices)
+namespace LATTICE {
+  void findLattices(
+      const vector<xvector<double> >& translation_vectors,
+      const xmatrix<double>& lattice_original,
+      vector<xmatrix<double> >& lattices,
+      vector<xmatrix<double> >& lattices_aaa,
+      const string& crystal_system,
+      double eps){
+  
+    bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_COMPARE_);
+    string function_name = XPID + "LATTICE::findLattices():";
+
+    // ---------------------------------------------------------------------------
+    // get volume of original structure and volume tolerance
+    double volume_orig=det(lattice_original); // volume
+    double amin=min(aurostd::modulus(lattice_original(1)),aurostd::modulus(lattice_original(2)),aurostd::modulus(lattice_original(3)));
+    double volume_eps = eps*amin*amin*amin;
+    double volume_tmp = AUROSTD_MAX_DOUBLE;
+    //DX20210316 [OTHER POSSIBILITY] double tol_vol=0.1;
+    //DX20210316 [OTHER POSSIBILITY] double volume_eps=tol_vol*volume_orig;
+
+    xmatrix<double> tmp_lattice(3,3), tmp_lattice_orig(3,3); // store temporary lattices
+    
+    uint n_translations = translation_vectors.size();
+    if(LDEBUG) { cerr << function_name << " Number of lattice vectors: " << n_translations << endl; }
+    
+    // ---------------------------------------------------------------------------
+    // all crystal systems use this loop except for cubic systems
+    if(crystal_system != "cubic"){
+      // ---------------------------------------------------------------------------
+      // build all possible unit cells with combinations of lattice vectors
+      // do upper triangular first, then if determinants are commensurate,
+      // store all permutations
+      // NOTE: xmatrix.setmat() is slower, so we set the matrix explicitly
+      for(uint i=0;i<n_translations;i++){ for(uint ii=1;ii<=3;ii++) tmp_lattice[1][ii]=translation_vectors[i][ii];       // xmatrix.setmat() is slower
+        for(uint j=i+1;j<n_translations;j++){ for(uint ii=1;ii<=3;ii++) tmp_lattice[2][ii]=translation_vectors[j][ii];   // xmatrix.setmat() is slower
+          for(uint k=j+1;k<n_translations;k++){ for(uint ii=1;ii<=3;ii++) tmp_lattice[3][ii]=translation_vectors[k][ii]; // xmatrix.setmat() is slower
+            // this determinant method is faster than aurostd::det(), and speed is crucial here
+            volume_tmp = (tmp_lattice[1][1]*tmp_lattice[2][2]*tmp_lattice[3][3]+tmp_lattice[1][2]*tmp_lattice[2][3]*tmp_lattice[3][1]+ // FAST
+                tmp_lattice[1][3]*tmp_lattice[2][1]*tmp_lattice[3][2]-tmp_lattice[1][3]*tmp_lattice[2][2]*tmp_lattice[3][1]-           // FAST
+                tmp_lattice[1][2]*tmp_lattice[2][1]*tmp_lattice[3][3]-tmp_lattice[1][1]*tmp_lattice[2][3]*tmp_lattice[3][2]);          // FAST
+            // ---------------------------------------------------------------------------
+            // check determinant
+            // use absolute value to quickly filter, but then check for positive determinant
+            // later for each lattice vector permutation
+            if(abs(volume_tmp) > volume_eps){
+              // do absolute value determinant here
+              if(abs(abs(volume_tmp)-volume_orig) < volume_eps){
+                tmp_lattice_orig = tmp_lattice; // save original lattice before swapping rows
+                // ---------------------------------------------------------------------------
+                // store positive determinant permutations
+                // if initial determinant is positive, do THREE row swaps to keep positive
+                if(volume_tmp>volume_eps){
+                  // 1,2,3
+                  lattices.push_back(tmp_lattice);
+                  // 2,3,1
+                  for(uint ii=1;ii<=3;ii++) tmp_lattice[2][ii]=translation_vectors[i][ii];
+                  for(uint ii=1;ii<=3;ii++) tmp_lattice[3][ii]=translation_vectors[j][ii];
+                  for(uint ii=1;ii<=3;ii++) tmp_lattice[1][ii]=translation_vectors[k][ii];
+                  lattices.push_back(tmp_lattice);
+                  // 3,1,2
+                  for(uint ii=1;ii<=3;ii++) tmp_lattice[3][ii]=translation_vectors[i][ii];
+                  for(uint ii=1;ii<=3;ii++) tmp_lattice[1][ii]=translation_vectors[j][ii];
+                  for(uint ii=1;ii<=3;ii++) tmp_lattice[2][ii]=translation_vectors[k][ii];
+                  lattices.push_back(tmp_lattice);
+                }
+                // if initial determinant is negative, do TWO row swaps to turn positive
+                else{
+                  // 2,1,3
+                  for(uint ii=1;ii<=3;ii++) tmp_lattice[2][ii]=translation_vectors[i][ii];
+                  for(uint ii=1;ii<=3;ii++) tmp_lattice[1][ii]=translation_vectors[j][ii];
+                  for(uint ii=1;ii<=3;ii++) tmp_lattice[3][ii]=translation_vectors[k][ii];
+                  lattices.push_back(tmp_lattice);
+                  // 1,3,2
+                  for(uint ii=1;ii<=3;ii++) tmp_lattice[1][ii]=translation_vectors[i][ii];
+                  for(uint ii=1;ii<=3;ii++) tmp_lattice[3][ii]=translation_vectors[j][ii];
+                  for(uint ii=1;ii<=3;ii++) tmp_lattice[2][ii]=translation_vectors[k][ii];
+                  lattices.push_back(tmp_lattice);
+                  // 3,2,1
+                  for(uint ii=1;ii<=3;ii++) tmp_lattice[3][ii]=translation_vectors[i][ii];
+                  for(uint ii=1;ii<=3;ii++) tmp_lattice[2][ii]=translation_vectors[j][ii];
+                  for(uint ii=1;ii<=3;ii++) tmp_lattice[1][ii]=translation_vectors[k][ii];
+                  lattices.push_back(tmp_lattice);
+                }
+                tmp_lattice=tmp_lattice_orig; //revert to original lattice
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // ---------------------------------------------------------------------------
+    // get equal length lattices; needed for cubic and rhombohedral systems only
+    if(crystal_system == "all" || crystal_system=="cubic" || crystal_system=="trigonal"){
+
+      // ---------------------------------------------------------------------------
+      // compute lengths of possible lattices before-hand (faster than on-the-fly)
+      vector<double> translations_mod;
+      for(uint i=0;i<n_translations;i++){
+        translations_mod.push_back(aurostd::modulus(translation_vectors[i]));
+      }
+
+      // ---------------------------------------------------------------------------
+      // build all possible unit cells with combinations of lattice vectors
+      // AND check lengths are equal
+      // do upper triangular first, then if determinants are commensurate,
+      // store all permutations
+      // NOTE: xmatrix.setmat() is slower, so we set the matrix explicitly
+      for(uint i=0;i<n_translations;i++){ for(uint ii=1;ii<=3;ii++) tmp_lattice[1][ii]=translation_vectors[i][ii]; // xmatrix.setmat() is slower
+        for(uint j=i+1;j<n_translations;j++){ for(uint ii=1;ii<=3;ii++) tmp_lattice[2][ii]=translation_vectors[j][ii]; // xmatrix.setmat() is slower
+          // ---------------------------------------------------------------------------
+          // check lattice vector length: b==a
+          if(abs(translations_mod[j]-translations_mod[i])<eps){
+            for(uint k=j+1;k<n_translations;k++){ for(uint ii=1;ii<=3;ii++) tmp_lattice[3][ii]=translation_vectors[k][ii]; // xmatrix.setmat() is slower
+              // ---------------------------------------------------------------------------
+              // check lattice vector length: c==b
+              if(abs(translations_mod[k]-translations_mod[j])<eps){
+                // this determinant method is faster than aurostd::det(), and speed is crucial here
+                volume_tmp = abs(tmp_lattice[1][1]*tmp_lattice[2][2]*tmp_lattice[3][3]+tmp_lattice[1][2]*tmp_lattice[2][3]*tmp_lattice[3][1]+ // FAST
+                    tmp_lattice[1][3]*tmp_lattice[2][1]*tmp_lattice[3][2]-tmp_lattice[1][3]*tmp_lattice[2][2]*tmp_lattice[3][1]-              // FAST
+                    tmp_lattice[1][2]*tmp_lattice[2][1]*tmp_lattice[3][3]-tmp_lattice[1][1]*tmp_lattice[2][3]*tmp_lattice[3][2]);             // FAST
+                // ---------------------------------------------------------------------------
+                // check determinant
+                // use absolute value to quickly filter, but then check for positive determinant
+                // later for each lattice vector permutation
+                // do absolute value determinant here
+                if(abs(abs(volume_tmp)-volume_orig) < volume_eps){
+                  tmp_lattice_orig = tmp_lattice; // save original lattice before swapping rows
+                  // ---------------------------------------------------------------------------
+                  // store positive determinant permutations
+                  // if initial determinant is positive, do THREE row swaps to keep positive
+                  if(volume_tmp>volume_eps){
+                    // 1,2,3
+                    lattices_aaa.push_back(tmp_lattice);
+                    // 2,3,1
+                    for(uint ii=1;ii<=3;ii++) tmp_lattice[2][ii]=translation_vectors[i][ii];
+                    for(uint ii=1;ii<=3;ii++) tmp_lattice[3][ii]=translation_vectors[j][ii];
+                    for(uint ii=1;ii<=3;ii++) tmp_lattice[1][ii]=translation_vectors[k][ii];
+                    lattices_aaa.push_back(tmp_lattice);
+                    // 3,1,2
+                    for(uint ii=1;ii<=3;ii++) tmp_lattice[3][ii]=translation_vectors[i][ii];
+                    for(uint ii=1;ii<=3;ii++) tmp_lattice[1][ii]=translation_vectors[j][ii];
+                    for(uint ii=1;ii<=3;ii++) tmp_lattice[2][ii]=translation_vectors[k][ii];
+                    lattices_aaa.push_back(tmp_lattice);
+                  }
+                  // if initial determinant is negative, do TWO row swaps to turn positive
+                  else{
+                    // 2,1,3
+                    for(uint ii=1;ii<=3;ii++) tmp_lattice[2][ii]=translation_vectors[i][ii];
+                    for(uint ii=1;ii<=3;ii++) tmp_lattice[1][ii]=translation_vectors[j][ii];
+                    for(uint ii=1;ii<=3;ii++) tmp_lattice[3][ii]=translation_vectors[k][ii];
+                    lattices_aaa.push_back(tmp_lattice);
+                    // 1,3,2
+                    for(uint ii=1;ii<=3;ii++) tmp_lattice[1][ii]=translation_vectors[i][ii];
+                    for(uint ii=1;ii<=3;ii++) tmp_lattice[3][ii]=translation_vectors[j][ii];
+                    for(uint ii=1;ii<=3;ii++) tmp_lattice[2][ii]=translation_vectors[k][ii];
+                    lattices_aaa.push_back(tmp_lattice);
+                    // 3,2,1
+                    for(uint ii=1;ii<=3;ii++) tmp_lattice[3][ii]=translation_vectors[i][ii];
+                    for(uint ii=1;ii<=3;ii++) tmp_lattice[2][ii]=translation_vectors[j][ii];
+                    for(uint ii=1;ii<=3;ii++) tmp_lattice[1][ii]=translation_vectors[k][ii];
+                    lattices_aaa.push_back(tmp_lattice);
+                  }
+                  tmp_lattice=tmp_lattice_orig; //revert to original lattice
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// ***************************************************************************
 namespace LATTICE {
   bool fix_sts_sp(xstructure& str_sp,xmatrix<double> &rlattice,xmatrix<double> &plattice) {
     // this routine sets plattice as the str_sp.lattice, and fixes the atoms
@@ -906,7 +1088,9 @@ namespace LATTICE {
     //  dims(1)=4;dims(2)=4;dims(3)=4;
     xmatrix<double> rlattice(3,3),plattice(3,3),clattice(3,3),klattice(3,3),t(3,3);
     xvector<double> aus(3),a1(3),a2(3),a3(3),rdata(6),kdata(6);
-    double volume,vaus,cutoff,a,b,c,ka,kb,kc,alpha,beta,gamma,ac,bc,cc,minabc,maxabc,kalpha,kbeta,kgamma;  //nndist
+    double volume=0.0,cutoff=0.0;  //nndist //DX20210317 - vaus removed, not used
+    double a=0.0,b=0.0,c=0.0,ka=0.0,kb=0.0,kc=0.0,alpha=0.0,beta=0.0,gamma=0.0,kalpha=0.0,kbeta=0.0,kgamma=0.0,ac=0.0,bc=0.0,cc=0.0;
+    double minabc=AUROSTD_MAX_DOUBLE,maxabc=AUROSTD_MAX_DOUBLE;
     // generate all the possible transformations
     bool found=FALSE;
     vector<xmatrix<double> > vrlattice1,vrlattice1_aaa;
@@ -917,7 +1101,6 @@ namespace LATTICE {
     vrlattice1.push_back(str_sp.lattice);
 
     //CO20180627 nndist=1.0e6;
-    cutoff=1.0e6;
 
     // find NN distance
     //DX [OBSOLETE] - nndist is not used anywhere for(int i=-dims[1];i<=dims[1];i++)
@@ -945,7 +1128,6 @@ namespace LATTICE {
       cerr << "radius_sc=" << RadiusSphereLattice(str_sc.lattice) << endl;
     }
 
-    cutoff=0.0;
     rdata=Getabc_angles(str_sc.lattice,DEGREES);
     if(crystal_system=="cubic") {cutoff=sqrt(2)*max(rdata[1],rdata[2],rdata[3]);}
     if(crystal_system=="hexagonal") {cutoff=max(rdata[1],rdata[2],rdata[3]);} // the primitives always get the max of the lenghts
@@ -966,34 +1148,39 @@ namespace LATTICE {
           if(modulus(aus)<=cutoff+0.01) vvectors.push_back(aus);   // cubics are all in nn distances
         }
 
-    // most of the time is spent inside this routine
-    for(uint i=0;i<vvectors.size();i++) { for(uint ii=1;ii<=3;ii++) rlattice[1][ii]=vvectors[i][ii];
-      for(uint j=0;j<vvectors.size();j++)  { for(uint ii=1;ii<=3;ii++) rlattice[2][ii]=vvectors[j][ii];
-        for(uint k=0;k<vvectors.size();k++)  { for(uint ii=1;ii<=3;ii++) rlattice[3][ii]=vvectors[k][ii];
-          // vaus=det(vvectors[i],vvectors[j],vvectors[k]);                                                 // SLOW
-          vaus=rlattice[1][1]*rlattice[2][2]*rlattice[3][3]+rlattice[1][2]*rlattice[2][3]*rlattice[3][1]+        // FAST
-            rlattice[1][3]*rlattice[2][1]*rlattice[3][2]-rlattice[1][3]*rlattice[2][2]*rlattice[3][1]-        // FAST
-            rlattice[1][2]*rlattice[2][1]*rlattice[3][3]-rlattice[1][1]*rlattice[2][3]*rlattice[3][2];        // FAST
-          if(abs(vaus)>eps_volume){ //DX20170904 - Otherwise, Getabc_angles may fail if vaus=0.0
-            if(abs(vaus-1.0*volume)<eps_volume || abs(vaus-2.0*volume)<eps_volume || abs(vaus-4.0*volume)<eps_volume) { //DX
-              //DX ORIG 20180522 only do rdata when you have to rdata=Getabc_angles(rlattice,DEGREES);a=rdata[1];b=rdata[2];c=rdata[3];alpha=rdata[4];beta=rdata[5];gamma=rdata[6];
-              //DX if(abs(vaus-volume)<eps)
-              if(abs(vaus-volume)<eps_volume) //DX
-              { //CO20200106 - patching for auto-indenting
-                vrlattice1.push_back(rlattice);
-                //DX20180522 - only calculate vrlattice1_aaa if cubic or trigonal (rhl); no other lattice types require it - save time
-                if(crystal_system=="cubic" || crystal_system=="trigonal"){
-                  rdata=Getabc_angles(rlattice,DEGREES);a=rdata[1];b=rdata[2];c=rdata[3];alpha=rdata[4];beta=rdata[5];gamma=rdata[6]; //DX20180522 - only calculate the parameters when necessary
-                  if(aurostd::isequal(a,b,eps) && aurostd::isequal(b,c,eps) && aurostd::isequal(c,a,eps)){
-                    vrlattice1_aaa.push_back(rlattice);
-                  }
-                } //DX20180522
-              } //DX20170904
-            }
-          }
-        }
-      }
-    }
+    //DX20210316 [OBSOLETE]// most of the time is spent inside this routine
+    //DX20210316 [OBSOLETE]for(uint i=0;i<vvectors.size();i++) { cerr << "i: " << i << endl; for(uint ii=1;ii<=3;ii++) rlattice[1][ii]=vvectors[i][ii];
+    //DX20210316 [OBSOLETE]  for(uint j=0;j<vvectors.size();j++)  { for(uint ii=1;ii<=3;ii++) rlattice[2][ii]=vvectors[j][ii];
+    //DX20210316 [OBSOLETE]    for(uint k=0;k<vvectors.size();k++)  { for(uint ii=1;ii<=3;ii++) rlattice[3][ii]=vvectors[k][ii];
+    //DX20210316 [OBSOLETE]      // vaus=det(vvectors[i],vvectors[j],vvectors[k]);                                                 // SLOW
+    //DX20210316 [OBSOLETE]      vaus=rlattice[1][1]*rlattice[2][2]*rlattice[3][3]+rlattice[1][2]*rlattice[2][3]*rlattice[3][1]+        // FAST
+    //DX20210316 [OBSOLETE]        rlattice[1][3]*rlattice[2][1]*rlattice[3][2]-rlattice[1][3]*rlattice[2][2]*rlattice[3][1]-        // FAST
+    //DX20210316 [OBSOLETE]        rlattice[1][2]*rlattice[2][1]*rlattice[3][3]-rlattice[1][1]*rlattice[2][3]*rlattice[3][2];        // FAST
+    //DX20210316 [OBSOLETE]      if(abs(vaus)>eps_volume){ //DX20170904 - Otherwise, Getabc_angles may fail if vaus=0.0
+    //DX20210316 [OBSOLETE]        if(abs(vaus-1.0*volume)<eps_volume || abs(vaus-2.0*volume)<eps_volume || abs(vaus-4.0*volume)<eps_volume) { //DX
+    //DX20210316 [OBSOLETE]          //DX ORIG 20180522 only do rdata when you have to rdata=Getabc_angles(rlattice,DEGREES);a=rdata[1];b=rdata[2];c=rdata[3];alpha=rdata[4];beta=rdata[5];gamma=rdata[6];
+    //DX20210316 [OBSOLETE]          //DX if(abs(vaus-volume)<eps)
+    //DX20210316 [OBSOLETE]          if(abs(vaus-volume)<eps_volume) //DX
+    //DX20210316 [OBSOLETE]          { //CO20200106 - patching for auto-indenting
+    //DX20210316 [OBSOLETE]            vrlattice1.push_back(rlattice);
+    //DX20210316 [OBSOLETE]            //DX20180522 - only calculate vrlattice1_aaa if cubic or trigonal (rhl); no other lattice types require it - save time
+    //DX20210316 [OBSOLETE]            if(crystal_system=="cubic" || crystal_system=="trigonal"){
+    //DX20210316 [OBSOLETE]              rdata=Getabc_angles(rlattice,DEGREES);a=rdata[1];b=rdata[2];c=rdata[3];alpha=rdata[4];beta=rdata[5];gamma=rdata[6]; //DX20180522 - only calculate the parameters when necessary
+    //DX20210316 [OBSOLETE]              if(aurostd::isequal(a,b,eps) && aurostd::isequal(b,c,eps) && aurostd::isequal(c,a,eps)){
+    //DX20210316 [OBSOLETE]                vrlattice1_aaa.push_back(rlattice);
+    //DX20210316 [OBSOLETE]              }
+    //DX20210316 [OBSOLETE]            } //DX20180522
+    //DX20210316 [OBSOLETE]          } //DX20170904
+    //DX20210316 [OBSOLETE]        }
+    //DX20210316 [OBSOLETE]      }
+    //DX20210316 [OBSOLETE]    }
+    //DX20210316 [OBSOLETE]  }
+    //DX20210316 [OBSOLETE]}
+    
+    // ------------------------------------------------------------------------------------
+    // filter vectors - replaces obsolete code above //DX20210316
+    findLattices(vvectors, str_sp.lattice, vrlattice1, vrlattice1_aaa, crystal_system, eps);
+    
     if(LDEBUG || 0) {
       cerr << "DEBUG dims=" << dims << endl;
       cerr << "DEBUG vvectors.size()=" << vvectors.size() << endl;
@@ -1004,7 +1191,6 @@ namespace LATTICE {
       cerr << "DEBUG str_sc.fgroup.size()=" << str_sc.fgroup.size() << endl;
       cerr << "DEBUG crystal_system=" << crystal_system << endl;
     }
-
 
     // ***************************************************************************
     // start scan

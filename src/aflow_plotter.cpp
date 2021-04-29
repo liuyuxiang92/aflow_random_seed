@@ -379,10 +379,12 @@ namespace plotter {
       }
     }
     plotoptions.push_attached("FILE_NAME", filename);
-    // The .tex file created by gnuplot cannot have . or includegraphics will break
-    plotoptions.push_attached("FILE_NAME_LATEX", aurostd::StringSubst(filename, ".", "_"));
-    //ME20200409 - Some terminals do not handle : well, which can break convert
-    plotoptions.push_attached("FILE_NAME_LATEX", aurostd::StringSubst(filename, ":", "_"));
+    //filename_latex is the name of the .tex file
+    //the resulting plot file name will be changed (mv) to filename
+    string filename_latex=filename;
+    aurostd::StringSubst(filename_latex, ".", "_"); // The .tex file created by gnuplot cannot have . or includegraphics will break
+    aurostd::StringSubst(filename_latex, ":", "_"); //ME20200409 - Some terminals do not handle : well, which can break convert
+    plotoptions.push_attached("FILE_NAME_LATEX", filename_latex);
     if(LDEBUG){
       cerr << soliloquy << " filename=" << plotoptions.getattachedscheme("FILE_NAME") << endl;
       cerr << soliloquy << " filename_latex=" << plotoptions.getattachedscheme("FILE_NAME_LATEX") << endl;
@@ -1024,6 +1026,10 @@ namespace plotter {
       PLOT_DOS(plotoptions,xdos,FileMESSAGE,oss);  //CO20200404
       if (outformat == "GNUPLOT") savePlotGNUPLOT(plotoptions, out);
     } else {
+      if (!xdos.partial) {
+        std::cerr << "plotter:PLOT_PDOS(): No partial DOS available." << std::endl;
+        return;
+      }
       xstructure xstr = getStructureWithNames(plotoptions,FileMESSAGE,xdos.carstring,oss); //getStructureWithNames(plotoptions);  //CO20191010 //CO20200404
       if(datatype=="SPECIES"){  //CO20191010 - plot "species-projected"
         if (pdos == -1) {  // Plot partial DOS of all species
@@ -1056,6 +1062,10 @@ namespace plotter {
           int iat=0;
           for (uint i = 0; i < natoms; i++) {
             iat=( plot_all_atoms ? i : xstr.iatoms[i][0] );
+            if (!dosDataAvailable(xdos.vDOS, iat + 1)) {
+              std::cerr << "plotter:PLOT_PDOS(): No partial DOS available for atom " << iat << "." << std::endl;
+              return;
+            }
             xstr.atoms[iat].CleanName();
             plotoptions.pop_attached("DATASET");
             plotoptions.pop_attached("DATALABEL");
@@ -1069,6 +1079,10 @@ namespace plotter {
             }
           }
         } else {
+          if (!dosDataAvailable(xdos.vDOS, pdos)) {
+            std::cerr << "plotter:PLOT_PDOS(): No partial DOS available for index " << pdos << "." << std::endl;
+            return;
+          }
           xstr.atoms[pdos - 1].CleanName();
           plotoptions.push_attached("DATALABEL", xstr.atoms[pdos - 1].cleanname);
           PLOT_DOS(plotoptions, out, xdos,FileMESSAGE,oss);  //CO20200404
@@ -1727,20 +1741,34 @@ namespace plotter {
 
   // DOS ---------------------------------------------------------------------
 
+  //dosDataAvailable//////////////////////////////////////////////////////////
+  // ME20200305
+  // Checks if the DOS contains data for the requested pdos
+  bool dosDataAvailable(const deque<deque<deque<deque<double> > > >& vdos, int pdos) {
+    if (pdos < 0) return false;
+    if (pdos + 1 > (int) vdos.size()) return false;
+    if (vdos[pdos].size() == 0) return false;
+    return true;
+  }
+
   //generateDosPlot///////////////////////////////////////////////////////////
   // Generates the data for a DOS plot. 
+  // ME20200305 - added DOS data checking
   void generateDosPlot(stringstream& out, const xDOSCAR& xdos, const xoption& plotoptions,ostream& oss) {ofstream FileMESSAGE;return generateDosPlot(out,xdos,plotoptions,FileMESSAGE,oss);} //CO20200404
   void generateDosPlot(stringstream& out, const xDOSCAR& xdos, const xoption& plotoptions,ofstream& FileMESSAGE,ostream& oss) {  //CO20200404
     bool LDEBUG=(FALSE || _DEBUG_PLOTTER_ || XHOST.DEBUG); 
     string soliloquy=XPID+"plotter::generateDosPlot():";
     deque<deque<deque<double> > > dos;
-    int pdos = aurostd::string2utype<int>(plotoptions.getattachedscheme("DATASET"));
+    string dataset=plotoptions.getattachedscheme("DATASET");
+    int pdos = aurostd::string2utype<int>(dataset);
     vector<string> labels;
     labels.push_back("total");  // There is always a total DOS
     if(pdos>0){labels.front()+=" "+plotoptions.getattachedscheme("DATALABEL");} //CO20191010
     string projection = plotoptions.getattachedscheme("PROJECTION");
     string datatype=plotoptions.getattachedscheme("DATATYPE");  //CO20191010 - which table to look at, "atoms-projected" by default
     if(LDEBUG){
+      cerr << soliloquy << " dataset=" << dataset << endl;
+      cerr << soliloquy << " pdos=" << pdos << endl;
       cerr << soliloquy << " projection=" << projection << endl;
       cerr << soliloquy << " datatype=" << datatype << endl;
     }
@@ -1751,11 +1779,20 @@ namespace plotter {
       if(datatype=="SPECIES"){  //CO20191010 - plot "species-projected"
         xstructure xstr = getStructureWithNames(plotoptions,FileMESSAGE,xdos.carstring,oss);  //CO20200404
         deque<deque<deque<deque<double> > > > vDOS_species=xdos.GetVDOSSpecies(xstr);
+        if (!dosDataAvailable(vDOS_species, pdos)) {
+          string message = "DOS data not available for pdos = " + aurostd::utype2string<int>(pdos);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _RUNTIME_ERROR_);
+        }
         norbitals=vDOS_species.front().size();
         dos=vDOS_species[pdos];
       }else{  //CO20191010 - plot "atoms-projected"
-        if (xdos.lmResolved) norbitals = (int) std::sqrt(xdos.vDOS[pdos].size());  // size is either 17 or 10
-        else norbitals = (int) xdos.vDOS[pdos].size() - 1;
+        if (!dosDataAvailable(xdos.vDOS, pdos)) {
+          string message = "DOS data not available for pdos = " + aurostd::utype2string<int>(pdos);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _RUNTIME_ERROR_);
+        }
+        if (xdos.lmResolved){norbitals = (int) std::sqrt(xdos.vDOS[pdos].size());}  // size is either 17 or 10
+        else{norbitals = (int) xdos.vDOS[pdos].size() - 1;}
+        if(LDEBUG){cerr << soliloquy << " norbitals=" << norbitals << endl;}
         if (xdos.lmResolved) {
           // Total DOS and s-orbitals
           dos.push_back(xdos.vDOS[pdos][0]);
@@ -1784,23 +1821,34 @@ namespace plotter {
     } else if (projection == "LM") {
       // Safety check
       if (!xdos.lmResolved) {
-        string function = "plotter::generateDosPlot()";
         string message = "Projection scheme LM chosen, but DOSCAR is not lm-resolved.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _RUNTIME_ERROR_);
+      }
+      if (!dosDataAvailable(xdos.vDOS, pdos)) {
+        string message = "DOS data not available for pdos = " + aurostd::utype2string<int>(pdos);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _RUNTIME_ERROR_);
       }
       for (uint i = 1; i < xdos.vDOS[pdos].size(); i++) {
         labels.push_back("$" + LM_ORBITALS_LATEX[i-1] + "$");
       }
       dos = xdos.vDOS[pdos];
     } else if (projection == "ATOMS") { //CO20191004 - "ATOMS" is really "IATOMS"
+      if (!dosDataAvailable(xdos.vDOS, 0)) {
+        string message = "Total DOS not available";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _RUNTIME_ERROR_);
+      }
       dos.push_back(xdos.vDOS[0][0]);
       xstructure xstr = getStructureWithNames(plotoptions,FileMESSAGE,xdos.carstring,oss);  //CO20200404
       if (plotoptions.flag("PLOT_ALL_ATOMS")) { //CO20191010 - special mode - ALL atoms
         if (xdos.vDOS.size() > 1) {
           for (uint i = 0; i < xstr.atoms.size(); i++) {
+            if (!dosDataAvailable(xdos.vDOS, i + 1)) {
+              string message = "DOS data not available for atom " + aurostd::utype2string<uint>(i + 1);
+              throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _RUNTIME_ERROR_);
+            }
             dos.push_back(xdos.vDOS[i + 1][0]);
             xstr.atoms[i].CleanName();
-            labels.push_back(xstr.atoms[i].cleanname + "(" + aurostd::utype2string<int>(i + 1) + ")");
+            labels.push_back(xstr.atoms[i].cleanname + "(" + aurostd::utype2string<uint>(i + 1) + ")");
           }
         }
       } else {
@@ -1810,12 +1858,20 @@ namespace plotter {
             int iat = 0;
             for (uint i = 0; i < xstr.iatoms.size(); i++) {
               iat = xstr.iatoms[i][0];
+              if (!dosDataAvailable(xdos.vDOS, iat + 1)) {
+                string message = "DOS data not available for iatom " + aurostd::utype2string<int>(iat + 1);
+                throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _RUNTIME_ERROR_);
+              }
               dos.push_back(xdos.vDOS[iat + 1][0]);
               xstr.atoms[iat].CleanName();
               labels.push_back(xstr.atoms[iat].cleanname + "(" + aurostd::utype2string<int>(iat + 1) + ")");
             }
           }
         } else { // In case someone uses pdos option and projection=atoms
+          if (!dosDataAvailable(xdos.vDOS, pdos)) {
+            string message = "DOS data not available for pdos = " + aurostd::utype2string<int>(pdos);
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _RUNTIME_ERROR_);
+          }
           xstr.atoms[pdos - 1].CleanName();
           labels.push_back(xstr.atoms[pdos - 1].cleanname + "(" + aurostd::utype2string<int>(pdos) + ")");
           dos.push_back(xdos.vDOS[pdos][0]);
@@ -1829,6 +1885,10 @@ namespace plotter {
         dos.push_back(vDOS_species[0][0]);
         if (vDOS_species.size() > 1) {
           for (uint i = 0; i < xstr.species.size(); i++) {
+            if (!dosDataAvailable(vDOS_species, i + 1)) {
+              string message = "DOS data not available for species " + aurostd::utype2string<uint>(i + 1);
+              throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _RUNTIME_ERROR_);
+            }
             dos.push_back(vDOS_species[i+1][0]);
             labels.push_back(xstr.species[i]);
           }
@@ -1837,14 +1897,22 @@ namespace plotter {
         //labels.push_back(xstr.species[pdos-1]);
         //dos.push_back(vDOS_species[pdos][0]);
         labels.push_back(xstr.atoms[pdos-1].name);//AS20201028
-        dos.push_back(vDOS_species[xstr.atoms[pdos-1].type+1][0]);//AS20201028
+        int dos_index = xstr.atoms[pdos - 1].type + 1;
+        if (!dosDataAvailable(vDOS_species, dos_index)) {
+          string message = "DOS data not available for dos_index = " + aurostd::utype2string<int>(dos_index);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _RUNTIME_ERROR_);
+        }
+        dos.push_back(vDOS_species[dos_index][0]);//AS20201028
       }
     } else if (projection == "NONE") {  // Total DOS only without projections
+      if (!dosDataAvailable(xdos.vDOS, 0)) {
+        string message = "Total DOS not available";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _RUNTIME_ERROR_);
+      }
       dos.push_back(xdos.vDOS[0][0]);
     } else {
-      string function = "plotter::genertateDosPlot()";
       string message = "Unknown projection scheme " + projection + ".";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _INPUT_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _INPUT_ILLEGAL_);
     }
     string outformat = plotoptions.getattachedscheme("OUTPUT_FORMAT");
     if (outformat == "GNUPLOT") {

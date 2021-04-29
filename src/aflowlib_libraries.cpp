@@ -7318,6 +7318,14 @@ namespace aflowlib {
       //return to original
       _AFLOWIN_=_AFLOWIN_orig;
       _AFLOWLOCK_=_AFLOWLOCK_orig;
+
+      //CO20210304 - patch, there are some problematic AEL/AGL runs having LOCK.run and no LOCK
+      //these runs should have moved agl.LOCK, not LOCK
+      //having no LOCK breaks all of the LOCK-reading functionality of lib2raw
+      if(!aurostd::FileExist(directory_LIB+"/"+_AFLOWLOCK_)&&aurostd::FileExist(directory_LIB+"/"+_AFLOWLOCK_+".run")){
+        aurostd::file2file(directory_LIB+"/"+_AFLOWLOCK_+".run",directory_LIB+"/"+_AFLOWLOCK_);   //LOCK.run->LOCK
+      }
+
     }
 
     if(LDEBUG) cerr << soliloquy << " END" << endl;

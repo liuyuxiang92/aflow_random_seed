@@ -1190,7 +1190,7 @@ check_proto:
 	@if [ -z `which md5sum` ]; then echo "Cannot find binary md5sum - check skipped."; else \
 		PROTO4SUM=$$(./aflow --proto=4:Bi:Tc | ./aflow --sprim | md5sum | cut -d ' ' -f1) && \
 		[ "$${PROTO4SUM#*ffb9c5681045fb80f391e9a931f21d1}" != "$$PROTO4SUM" ] && \
-		echo "'aflow --proto' check pass!" && exit 0 || \
+		echo "'aflow --proto' check passed!" && exit 0 || \
 		echo "'aflow --proto' test failed. Check compilation of aflow and aflow_data." && exit 1; \
 	fi
 #ME190313 - only execute check if md5sum is present
