@@ -1604,11 +1604,12 @@ namespace pflow {
       //DX20190425 START
       if(vpflow.flag("COMPARE_DATABASE_ENTRIES")) {cout << compare::compareDatabaseEntries(vpflow); _PROGRAMRUN=true;}
       if(vpflow.flag("COMPARE_MATERIAL") || vpflow.flag("COMPARE_STRUCTURE")){
-        // ME20210206 - Web mode: read files list from stdin
-        if (XHOST.vflag_control.flag("WWW")) {
-          cout << compare::compareInputStructures(vpflow, cin); _PROGRAMRUN=true;
-        } else {
+        if (XHOST.vflag_control.flag("DIRECTORY")
+          || XHOST.vflag_control.flag("FILE")
+          || vpflow.flag("COMPARE_STRUCTURE::STRUCTURE_LIST")) {
           cout << compare::compareInputStructures(vpflow); _PROGRAMRUN=true;
+        } else {  // ME20210429 - Use std::cin otherwise
+          cout << compare::compareInputStructures(vpflow, cin); _PROGRAMRUN=true;
         }
       }
       //DX20190425 END
@@ -6034,26 +6035,30 @@ namespace pflow {
   }
 
   //ME20200224 - added directory option
-  bool PerformFullSymmetry(xstructure& a, ofstream &FileMESSAGE,const string& directory,_kflags &kflags,const bool& osswrite,ostream& oss, string format){
+  bool PerformFullSymmetry(xstructure& a, ofstream &FileMESSAGE,const string& directory,_kflags &kflags,bool osswrite,ostream& oss, string format){
     _aflags aflags;
     aflags.Directory = directory;
     return PerformFullSymmetry(a, FileMESSAGE, aflags, kflags, osswrite, oss, format);
   }
 
-  bool PerformFullSymmetry(xstructure& a, ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags,const bool& osswrite,ostream& oss, string format){
+  bool PerformFullSymmetry(xstructure& a, ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags,bool osswrite,ostream& oss, string format){
     double tolerance = a.sym_eps;
     bool no_scan = false;
     bool force_perform = true;  //if no_scan fails, still return true at default tolerance (even though it cannot be validated)
     return PerformFullSymmetry(a,tolerance,no_scan,force_perform,FileMESSAGE,aflags,kflags,osswrite,oss,format);
   }
 
-  bool PerformFullSymmetry(xstructure& a, double& tolerance, bool no_scan, bool force_perform, ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags,const bool& osswrite,ostream& oss, string format){
+  bool PerformFullSymmetry(xstructure& a, double& tolerance, bool no_scan, bool force_perform, ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags,bool osswrite,ostream& oss, string format){
     string soliloquy = XPID + "pflow::PerformFullSymmetry:";
     a.ClearSymmetry();  //CO20190204
     xstructure b(a);    //save for later
     a.ReScale(1.0);     //the nuclear option, only way to fix all of the issues with f2c/c2f/ctau/ctrasl/etc.
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     bool symmetry_commensurate = FALSE;
+    // ME20210429 - use a function-wide QUIET flag
+    bool QUIET = (aflags.QUIET || XHOST.QUIET || XHOST.vflag_control.flag("WWW"));
+    // ME20210429 - Do not write symmetry information for web; too much output
+    osswrite = (osswrite && !XHOST.vflag_control.flag("WWW"));
     ostringstream aus;
 
     //a.directory = aflags.Directory;
@@ -6078,7 +6083,7 @@ namespace pflow {
     }
 
     // MOVED DOWN A BIT if(!aflags.QUIET) aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "Symmetry: starting tolerance " << _EPS_sym_ << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
+    aurostd::PrintMessageStream(FileMESSAGE,aus,QUIET,osswrite,oss);
     if(1 || a.dist_nn_min == AUROSTD_NAN){  //CO20171024 - always recalculate min_dist (SAFE)
       if(LDEBUG) cerr << XPID << "pflow::PerformFullSymmetry: CALCULATING MIN DISTANCE" << print_directory << endl;
       a.MinDist();
@@ -6108,8 +6113,8 @@ namespace pflow {
     //}
     //a.sym_eps = SYM::defaultTolerance(a);
     double orig_tolerance = a.sym_eps;
-    if(!aflags.QUIET) aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "Symmetry: starting tolerance " << a.sym_eps << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
+    if(!QUIET) aus << XPID << "00000  MESSAGE Symmetry: starting tolerance " << a.sym_eps << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+    aurostd::PrintMessageStream(FileMESSAGE,aus,QUIET,osswrite,oss);
 
     while(symmetry_commensurate==FALSE){
       //[DX OBSOLETE] a.SpaceGroup_ITC(a.sym_eps,orig_tolerance,-1,change_sym_count,no_scan); //rescales to 1.0 internally, but doesn't affect a
@@ -6140,8 +6145,8 @@ namespace pflow {
                 return FALSE;
               }
             }
-            if(!aflags.QUIET) aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUP Symmetry: changing tolerance to " << a.sym_eps << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-            aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
+            if(!QUIET) aus << XPID << "00000  MESSAGE PGROUP Symmetry: changing tolerance to " << a.sym_eps << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+            aurostd::PrintMessageStream(FileMESSAGE,aus,QUIET,osswrite,oss);
             continue;
           }
         }
@@ -6161,8 +6166,8 @@ namespace pflow {
                 return FALSE;
               }
             }
-            if(!aflags.QUIET) aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUPK Symmetry: changing tolerance to " << a.sym_eps << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-            aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
+            if(!QUIET) aus << XPID << "00000  MESSAGE PGROUPK Symmetry: changing tolerance to " << a.sym_eps << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+            aurostd::PrintMessageStream(FileMESSAGE,aus,QUIET,osswrite,oss);
             continue;
           }
         }
@@ -6185,8 +6190,8 @@ namespace pflow {
               return FALSE;
             }
           }
-          if(!aflags.QUIET) aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUP Symmetry: changing tolerance to " << a.sym_eps << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-          aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
+          if(!QUIET) aus << XPID << "00000  MESSAGE PGROUP Symmetry: changing tolerance to " << a.sym_eps << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+          aurostd::PrintMessageStream(FileMESSAGE,aus,QUIET,osswrite,oss);
           continue;
         }
       }
@@ -6206,8 +6211,8 @@ namespace pflow {
                 return FALSE;
               }
             }
-            if(!aflags.QUIET) aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: changing tolerance to " << a.sym_eps << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-            aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
+            if(!QUIET) aus << XPID << "00000  MESSAGE FGROUP Symmetry: changing tolerance to " << a.sym_eps << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+            aurostd::PrintMessageStream(FileMESSAGE,aus,QUIET,osswrite,oss);
             continue;
           }
         }
@@ -6228,8 +6233,8 @@ namespace pflow {
                 return FALSE;
               }
             }
-            if(!aflags.QUIET) aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUP_XTAL Symmetry: changing tolerance to " << a.sym_eps << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-            aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
+            if(!QUIET) aus << XPID << "00000  MESSAGE PGROUP_XTAL Symmetry: changing tolerance to " << a.sym_eps << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+            aurostd::PrintMessageStream(FileMESSAGE,aus,QUIET,osswrite,oss);
             continue;
           }
         }
@@ -6252,8 +6257,8 @@ namespace pflow {
               return FALSE;
             }
           }
-          if(!aflags.QUIET) aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUP_XTAL Symmetry: changing tolerance to " << a.sym_eps << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-          aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
+          if(!QUIET) aus << XPID << "00000  MESSAGE PGROUP_XTAL Symmetry: changing tolerance to " << a.sym_eps << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+          aurostd::PrintMessageStream(FileMESSAGE,aus,QUIET,osswrite,oss);
           continue;
         }
       }
@@ -6278,8 +6283,8 @@ namespace pflow {
                 return FALSE;
               }
             }
-            if(!aflags.QUIET) aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUP_XTAL Symmetry: changing tolerance to " << a.sym_eps << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-            aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
+            if(!QUIET) aus << XPID << "00000  MESSAGE PGROUP_XTAL Symmetry: changing tolerance to " << a.sym_eps << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+            aurostd::PrintMessageStream(FileMESSAGE,aus,QUIET,osswrite,oss);
             continue;
           }
         }
@@ -6299,8 +6304,8 @@ namespace pflow {
                 return FALSE;
               }
             }
-            if(!aflags.QUIET) aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUPK_XTAL Symmetry: changing tolerance to " << a.sym_eps << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-            aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
+            if(!QUIET) aus << XPID << "00000  MESSAGE PGROUPK_XTAL Symmetry: changing tolerance to " << a.sym_eps << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+            aurostd::PrintMessageStream(FileMESSAGE,aus,QUIET,osswrite,oss);
             continue;
           }
         }
@@ -6357,20 +6362,20 @@ namespace pflow {
                 return FALSE;
               }
             }
-            if(!aflags.QUIET) aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUPK_PATTERSON Symmetry: changing tolerance to " << a.sym_eps << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-            aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
+            if(!QUIET) aus << XPID << "00000  MESSAGE PGROUPK_PATTERSON Symmetry: changing tolerance to " << a.sym_eps << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+            aurostd::PrintMessageStream(FileMESSAGE,aus,QUIET,osswrite,oss);
             continue;
           }
         }
       } //DX20200129
       if(kflags.KBIN_SYMMETRY_CALCULATE_SGROUP){ //DX20170814
         if(kflags.KBIN_SYMMETRY_SGROUP_RADIUS>0.0) {
-          if(!aflags.QUIET) aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "POSCAR SGROUP: found RADIUS=" << kflags.KBIN_SYMMETRY_SGROUP_RADIUS << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-          aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
+          if(!QUIET) aus << XPID << "00000  MESSAGE POSCAR SGROUP: found RADIUS=" << kflags.KBIN_SYMMETRY_SGROUP_RADIUS << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+          aurostd::PrintMessageStream(FileMESSAGE,aus,QUIET,osswrite,oss);
         } else {
           kflags.KBIN_SYMMETRY_SGROUP_RADIUS=KBIN_SYMMETRY_SGROUP_RADIUS_DEFAULT;
-          if(!aflags.QUIET) aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "POSCAR SGROUP: Default RADIUS=" << kflags.KBIN_SYMMETRY_SGROUP_RADIUS << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-          aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
+          if(!QUIET) aus << XPID << "00000  MESSAGE POSCAR SGROUP: Default RADIUS=" << kflags.KBIN_SYMMETRY_SGROUP_RADIUS << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+          aurostd::PrintMessageStream(FileMESSAGE,aus,QUIET,osswrite,oss);
         }
         a.sgroup_radius=kflags.KBIN_SYMMETRY_SGROUP_RADIUS;
         // Calculate Space Group
@@ -6388,8 +6393,8 @@ namespace pflow {
                 return FALSE;
               }
             }
-            if(!aflags.QUIET) aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "SGROUP Symmetry: changing tolerance to " << a.sym_eps << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-            aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
+            if(!QUIET) aus << XPID << "00000  MESSAGE SGROUP Symmetry: changing tolerance to " << a.sym_eps << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+            aurostd::PrintMessageStream(FileMESSAGE,aus,QUIET,osswrite,oss);
             continue;
           }
         }
@@ -6410,8 +6415,8 @@ namespace pflow {
                 return FALSE;
               }
             }
-            if(!aflags.QUIET) aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "IATOMS ATOMS: changing tolerance to " << a.sym_eps << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-            aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
+            if(!QUIET) aus << XPID << "00000  MESSAGE IATOMS ATOMS: changing tolerance to " << a.sym_eps << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+            aurostd::PrintMessageStream(FileMESSAGE,aus,QUIET,osswrite,oss);
             continue;
           }
         }
@@ -6440,8 +6445,8 @@ namespace pflow {
                 return FALSE;
               }
             }
-            if(!aflags.QUIET) aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "IATOMS ATOMS: changing tolerance to " << a.sym_eps << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-            aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
+            if(!QUIET) aus << XPID << "00000  MESSAGE IATOMS ATOMS: changing tolerance to " << a.sym_eps << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+            aurostd::PrintMessageStream(FileMESSAGE,aus,QUIET,osswrite,oss);
             continue;
           }
         }
@@ -6462,8 +6467,8 @@ namespace pflow {
                 return FALSE;
               }
             }
-            if(!aflags.QUIET) aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "AGROUP Symmetry: changing tolerance to " << a.sym_eps << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-            aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
+            if(!QUIET) aus << XPID << "00000  MESSAGE AGROUP Symmetry: changing tolerance to " << a.sym_eps << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+            aurostd::PrintMessageStream(FileMESSAGE,aus,QUIET,osswrite,oss);
             continue;
           }
         }
@@ -7663,9 +7668,8 @@ namespace pflow {
   bool POCC_COMMAND_LINE(aurostd::xoption& vpflow,istream& input,ostream& oss) {  //CO20181226
     string soliloquy = XPID + "pflow::POCC_COMMAND_LINE():";
     stringstream message;
-    // ME20210208 - suppress logger output
-    if (XHOST.vflag_control.flag("WWW")) XHOST.QUIET = true;
-    oss << aflow::Banner("BANNER_NORMAL");
+    //ME20210429 - Do not print banner for web output
+    if (!XHOST.vflag_control.flag("WWW")) oss << aflow::Banner("BANNER_NORMAL");
     xstructure xstr(input,IOAFLOW_AUTO);
     if(vpflow.flag("POCC_TOL")){setPOCCTOL(xstr,vpflow.getattachedscheme("POCC_TOL"));}
     pocc::POccCalculator pcalc(xstr,vpflow,oss); //CO20190319
@@ -7676,16 +7680,15 @@ namespace pflow {
     if(vpflow.flag("POCC_COUNT_TOTAL")){return pcalc.m_initialized;}
     pcalc.calculate();
     if(vpflow.flag("POCC_COUNT_UNIQUE")){return pcalc.m_initialized;}
-    oss << (XHOST.vflag_control.flag("WWW")?AFLOWIN_SEPARATION_LINE_SHORT:AFLOWIN_SEPARATION_LINE) << endl;  // ME20210208
+    oss << AFLOWIN_SEPARATION_LINE << endl;
     oss << "Creating list of unique derivative supercells." << endl;  //CO20190116
     for(unsigned long long int i=0;i<pcalc.getUniqueSuperCellsCount();i++) {
       //populate POCC_UNIQUE_DERIVATIVE_STRUCTURES_FILE
-      // ME202010208 - Web mode: print line that's aligned with the banner
-      oss << (XHOST.vflag_control.flag("WWW")?AFLOWIN_SEPARATION_LINE_SHORT:AFLOWIN_SEPARATION_LINE) << endl;
+      oss << AFLOWIN_SEPARATION_LINE << endl;
       oss << "[VASP_POSCAR_MODE_EXPLICIT]START" << endl; // ." << ss_pocc_count.str() << endl;
       oss << pcalc.getUniqueSuperCell(i);
       oss << "[VASP_POSCAR_MODE_EXPLICIT]STOP" << endl; // ." << ss_pocc_count.str() << endl;
-      oss << (XHOST.vflag_control.flag("WWW")?AFLOWIN_SEPARATION_LINE_SHORT:AFLOWIN_SEPARATION_LINE) << endl;
+      oss << AFLOWIN_SEPARATION_LINE << endl;
     }
     return pcalc.m_initialized;
   }
@@ -10360,6 +10363,15 @@ namespace pflow {
     ostringstream stream;
     if(type == _LOGGER_RAW_) {
       for(uint i=0;i<message_parts.size();i++){stream << message_parts[i] << endl;} //CO20181226 //message;
+    }else if (XHOST.vflag_control.flag("WWW")){  //ME20210429 - remove metadata for web output
+      for(uint i=0;i<message_parts.size();i++){
+        stream << tag_code;
+        stream << "  ";
+        stream << tag_message;
+        stream << " ";
+        stream << message_parts[i];
+        stream << endl;
+      }
     }else{
       for(uint i=0;i<message_parts.size();i++){
         stream << XPID; //CO20200524

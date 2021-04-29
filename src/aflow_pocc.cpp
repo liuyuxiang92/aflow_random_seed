@@ -6150,32 +6150,17 @@ namespace pocc {
     if(v_str_configs.size()>1){
       multiple_configs_ss.str("");
       multiple_configs_ss << "*** MULTIPLE CONFIGURATIONS POSSIBLE FOR HNF=" << i_hnf << " - START ***" << endl;
-      // ME20210208 - Output to p_oss directly for web (uses --quiet)
-      if (XHOST.vflag_control.flag("WWW")) {
-        *p_oss << aurostd::PaddedCENTER(multiple_configs_ss.str(), centering_padding + 2);
-      } else {
-        pflow::logger(_AFLOW_FILE_NAME_,soliloquy,aurostd::PaddedCENTER(multiple_configs_ss.str(),centering_padding+2),m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_RAW_);
-      }
+      pflow::logger(_AFLOW_FILE_NAME_,soliloquy,aurostd::PaddedCENTER(multiple_configs_ss.str(),centering_padding+2),m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_RAW_);
     }
 
     for(uint str_config=0;str_config<v_str_configs.size();str_config++){
-      // ME20210208 - Output to p_oss directly for web (uses --quiet)
-      if (XHOST.vflag_control.flag("WWW")) {
-        *p_oss << hnfTableLineOutput(i_hnf, str_config);
-      } else {
-        pflow::logger(_AFLOW_FILE_NAME_,soliloquy,hnfTableLineOutput(i_hnf,str_config),m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_RAW_);
-      }
+      pflow::logger(_AFLOW_FILE_NAME_,soliloquy,hnfTableLineOutput(i_hnf,str_config),m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_RAW_);
     }
 
     if(v_str_configs.size()>1){
       multiple_configs_ss.str("");
       multiple_configs_ss << "*** MULTIPLE CONFIGURATIONS POSSIBLE FOR HNF=" << i_hnf << " - END ***" << endl;
-      // ME20210208 - Output to p_oss directly for web (uses --quiet)
-      if (XHOST.vflag_control.flag("WWW")) {
-        *p_oss << aurostd::PaddedCENTER(multiple_configs_ss.str(), centering_padding + 2);
-      } else {
-        pflow::logger(_AFLOW_FILE_NAME_,soliloquy,aurostd::PaddedCENTER(multiple_configs_ss.str(),centering_padding+2),m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_RAW_);
-      }
+      pflow::logger(_AFLOW_FILE_NAME_,soliloquy,aurostd::PaddedCENTER(multiple_configs_ss.str(),centering_padding+2),m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_RAW_);
     }
   }
 
@@ -6223,34 +6208,20 @@ namespace pocc {
     }
 
     i_hnf=0;
-    // ME20210208 - Output to p_oss directly for web (uses --quiet)
-    if (XHOST.vflag_control.flag("WWW")) {
-      *p_oss << AFLOWIN_SEPARATION_LINE_SHORT  << std::endl;
-      *p_oss << hnfTableHeader();
-    } else {
-      message_raw << AFLOWIN_SEPARATION_LINE  << endl; pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message_raw,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_RAW_);pflow::logger(_AFLOW_FILE_NAME_, soliloquy,hnfTableHeader(),m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_RAW_);
-    }
+    message_raw << AFLOWIN_SEPARATION_LINE  << endl; pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message_raw,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_RAW_);pflow::logger(_AFLOW_FILE_NAME_, soliloquy,hnfTableHeader(),m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_RAW_);
     while( hnf_already_provided ? i_hnf<xstr_pocc.partial_occupation_HNF : stoich_error>stoich_tolerance || site_error>site_tolerance ){
       i_hnf++;
       getSiteCountConfigurations(i_hnf);
       writeHNFTableOutput(i_hnf,stoich_error,site_error);
     }
-    // ME20210208 - Output to p_oss directly for web (uses --quiet)
-    if (XHOST.vflag_control.flag("WWW")) {
-      *p_oss << AFLOWIN_SEPARATION_LINE_SHORT << endl;
-    } else {
-      message_raw << AFLOWIN_SEPARATION_LINE << endl;
-      pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message_raw,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_RAW_);
-    }
+    message_raw << AFLOWIN_SEPARATION_LINE << endl; pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message_raw,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_RAW_);
     n_hnf=i_hnf;
 
     if(hnf_already_provided==false) { //if HNF exists, no need to optimize pocc values
       message << "Optimized HNF value = " << n_hnf;
       char LOGGER_TYPE=_LOGGER_MESSAGE_;
       if(m_p_flags.flag("HNF")){LOGGER_TYPE=_LOGGER_COMPLETE_;}
-      // ME20210208 - Output to p_oss directly for web (uses --quiet)
-      if (XHOST.vflag_control.flag("WWW")) *p_oss << message.str() << std::endl;
-      else pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,LOGGER_TYPE);
+      pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,LOGGER_TYPE);
     }
   }
 

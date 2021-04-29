@@ -68,9 +68,9 @@ namespace pflow {
   void CAGES(_aflags &aflags,const string& options,istream& input);
   //DX+CO START
   bool PerformFullSymmetry(xstructure& a);
-  bool PerformFullSymmetry(xstructure& a,ofstream &FileMESSAGE,const string& directory,_kflags &kflags,const bool& osswrite,ostream& oss, string format="txt");  //ME20200224
-  bool PerformFullSymmetry(xstructure& a,ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags,const bool& osswrite,ostream& oss, string format="txt");
-  bool PerformFullSymmetry(xstructure& a,double& tolerance,bool no_scan,bool force_perform,ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags,const bool& osswrite,ostream& oss, string format="txt");
+  bool PerformFullSymmetry(xstructure& a,ofstream &FileMESSAGE,const string& directory,_kflags &kflags,bool osswrite,ostream& oss, string format="txt");  //ME20200224
+  bool PerformFullSymmetry(xstructure& a,ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags,bool osswrite,ostream& oss, string format="txt");
+  bool PerformFullSymmetry(xstructure& a,double& tolerance,bool no_scan,bool force_perform,ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags,bool osswrite,ostream& oss, string format="txt");
   void ProcessAndAddSpinToXstructure(xstructure& a, const string& magmom_info); //DX20190801
   void defaultKFlags4SymWrite(_kflags& kflags,bool write=true);
   void defaultKFlags4SymCalc(_kflags& kflags,bool calc=true);
