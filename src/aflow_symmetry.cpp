@@ -2765,7 +2765,7 @@ namespace SYM {
     if(DEBUG_SYMMETRY) cerr << "DEBUG: SYM::CalculatePointGroupCrystal [2]" << endl;
 
     // PGROUP_XTAL
-    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " ---------------------------------------------------------------------------" << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " " << SEPARATION_LINE_DASH_SHORT << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
     //cerr << "********************************************************" << endl;
     //cerr << "a.pgroup_xtal.size(): " << a.pgroup_xtal.size() << endl;
@@ -2932,7 +2932,7 @@ namespace SYM {
 
     // ---------------------------------------------------------------------------
     // PGROUPK_PATTERSON
-    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " ---------------------------------------------------------------------------" << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " " << SEPARATION_LINE_DASH_SHORT << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
     for(uint kk=1;kk<=a.pgroupk_Patterson.size();kk++) {  // shift by 1 to use [kk-1]...
       aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " " ;
@@ -3338,7 +3338,7 @@ namespace SYM {
 
     // ------------------------------------------------------------------------------------------- PRINTING AND LEAVING
     aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message
-      << " ---------------------------------------------------------------------------" << endl;
+      << " " << SEPARATION_LINE_DASH_SHORT << endl;
     aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message
       << " Symmetry: unique point group operations " << a.pgroup_xtal.size() << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: " << operations << endl;
@@ -3351,10 +3351,10 @@ namespace SYM {
     aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: Point Group Type = " << a.point_group_type << endl;
     aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: Point Group Order = " << a.point_group_order << endl;
     aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: Point Group Structure = " << a.point_group_structure << endl;
-    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " ---------------------------------------------------------------------------" << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " " << SEPARATION_LINE_DASH_SHORT << endl;
     aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: END " << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message
-      << " ---------------------------------------------------------------------------" << endl;
+      << " " << SEPARATION_LINE_DASH_SHORT << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
     if(_write_) Krun=Krun && KBIN_SymmetryWrite(FileMESSAGE,a,aflags,_PGROUP_XTAL_,osswrite,oss,format);
     //DX20170906 [OBSOLETE] return Krun;
@@ -3412,7 +3412,7 @@ namespace SYM {
     if(DEBUG_SYMMETRY) cerr << "DEBUG: SYM::CalculatePointGroupCrystal [2]" << endl;
 
     // PGROUP_XTAL
-    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " ---------------------------------------------------------------------------" << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " " << SEPARATION_LINE_DASH_SHORT << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
     //cerr << "********************************************************" << endl;
     //cerr << "a.pgroup_xtal.size(): " << a.pgroup_xtal.size() << endl;
@@ -3705,7 +3705,7 @@ namespace SYM {
 
     // ------------------------------------------------------------------------------------------- PRINTING AND LEAVING
     aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message
-      << " ---------------------------------------------------------------------------" << endl;
+      << " " << SEPARATION_LINE_DASH_SHORT << endl;
     aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message
       << " Symmetry: unique point group operations " << a.pgroup_xtal.size() << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: " << operations << endl;
@@ -3718,10 +3718,10 @@ namespace SYM {
     aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: Point Group Type = " << a.point_group_type << endl;
     aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: Point Group Order = " << a.point_group_order << endl;
     aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: Point Group Structure = " << a.point_group_structure << endl;
-    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " ---------------------------------------------------------------------------" << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " " << SEPARATION_LINE_DASH_SHORT << endl;
     aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: END " << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message
-      << " ---------------------------------------------------------------------------" << endl;
+      << " " << SEPARATION_LINE_DASH_SHORT << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
     if(_write_) Krun=Krun && KBIN_SymmetryWrite(FileMESSAGE,a,aflags,_PGROUP_XTAL_,osswrite,oss,format);
     return Krun;
@@ -3797,7 +3797,7 @@ namespace SYM {
     if(DEBUG_SYMMETRY) cerr << "DEBUG: SYM::CalculatePointGroupCrystal [2]" << endl;
 
     // PGROUP_XTAL
-    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " ---------------------------------------------------------------------------" << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " " << SEPARATION_LINE_DASH_SHORT << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
     for(uint kk=1;kk<=a.pgroup_xtal.size();kk++) {  // shift by 1 to use [kk-1]...
       aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " " ;
@@ -4088,7 +4088,7 @@ namespace SYM {
 
     // ------------------------------------------------------------------------------------------- PRINTING AND LEAVING
     aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message
-      << " ---------------------------------------------------------------------------" << endl;
+       << " " << SEPARATION_LINE_DASH_SHORT << endl;
     aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message
       << " Symmetry: unique point group operations " << a.pgroup_xtal.size() << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: " << operations << endl;
@@ -4101,10 +4101,10 @@ namespace SYM {
     aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: Point Group Type = " << a.point_group_type << endl;
     aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: Point Group Order = " << a.point_group_order << endl;
     aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: Point Group Structure = " << a.point_group_structure << endl;
-    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " ---------------------------------------------------------------------------" << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " " << SEPARATION_LINE_DASH_SHORT << endl;
     aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: END " << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message
-      << " ---------------------------------------------------------------------------" << endl;
+      << " " << SEPARATION_LINE_DASH_SHORT << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
     if(_write_) Krun=Krun && KBIN_SymmetryWrite(FileMESSAGE,a,aflags,_PGROUP_XTAL_,osswrite,oss);
     return Krun;
@@ -7141,7 +7141,7 @@ namespace SYM {
       aus << "unique site point group operations " << a.agroup.at(iat).size() << " (#pg_xtal=" << a.pgroup_xtal.size() << ")  " << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;  //DX+CO
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);    
     }
-    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "AGROUP ---------------------------------------------------------------------------" << endl;
+    aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "AGROUP " << SEPARATION_LINE_DASH_SHORT << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);    
     // ------------------------------------------------------------------------------
     if(iatoms_only){
@@ -7150,7 +7150,7 @@ namespace SYM {
       if(!CalculateSitePointGroup_EquivalentSites(a,CALCULATION_MODE!=1,_eps_)){
         return FALSE; 
       }
-      aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "AGROUP ---------------------------------------------------------------------------" << endl;
+      aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "AGROUP " << SEPARATION_LINE_DASH_SHORT << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);    
     }
     //since iatoms calculated, for (CALCULATION_MODE == 2) we can do a quick validatity check
@@ -8321,10 +8321,9 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
     if(mode==_PGROUPK_XTAL_) FileNameOUTPUT=aflags.Directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_JSON; //DX20171205 - Added pgroupk_xtal
     if(mode==_PGROUPK_PATTERSON_) FileNameOUTPUT=aflags.Directory+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_JSON; //DX20200129
   }
-  string _lines_="------------------------------------------------------------------------------------------------";
   FileOUTPUT.open(FileNameOUTPUT.c_str(),std::ios::out);
   if(aurostd::toupper(format)=="TXT" || aurostd::toupper(format)=="TEXT"){ //DX20200206
-    FileOUTPUT << _lines_ << endl;
+    FileOUTPUT << SEPARATION_LINE_DASH << endl;
   } //DX20170802
   if(mode==_PGROUP_) {
     if(aurostd::toupper(format)=="TXT" || aurostd::toupper(format)=="TEXT"){ //DX20200206
@@ -8333,10 +8332,10 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
       for(uint k=0;k<a.pgroup.size();k++) {
         for(int i=0;i<9;i++) aux_rrr(i+1)=a.pgroup[k].Uc(int(i/3)+1,mod(i,3)+1);                 // put in rows
         for(int i=0;i<9;i++) aux_ijk(i+1)=a.pgroup[k].Uf(int(i/3)+1,mod(i,3)+1);                  // put in rows
-        if(k==0) FileOUTPUT << _lines_ << endl;
+        if(k==0) FileOUTPUT << SEPARATION_LINE_DASH << endl;
         FileOUTPUT << " Operation number = " << k+1 << " / " << a.pgroup.size() << endl;
         FileOUTPUT << a.pgroup[k]; // << endl;
-        FileOUTPUT << _lines_ << endl;
+        FileOUTPUT << SEPARATION_LINE_DASH << endl;
         FileOUTPUT.flush();
       }
     }                                                       //DX20170802
@@ -8354,10 +8353,10 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
       for(uint k=0;k<a.pgroup_xtal.size();k++) {
         for(int i=0;i<9;i++) aux_rrr(i+1)=a.pgroup_xtal[k].Uc(int(i/3)+1,mod(i,3)+1);                 // put in rows
         for(int i=0;i<9;i++) aux_ijk(i+1)=a.pgroup_xtal[k].Uf(int(i/3)+1,mod(i,3)+1);                  // put in rows
-        if(k==0) FileOUTPUT << _lines_ << endl;
+        if(k==0) FileOUTPUT << SEPARATION_LINE_DASH << endl;
         FileOUTPUT << " Operation number = " << k+1 << " / " << a.pgroup_xtal.size() << endl;
         FileOUTPUT << a.pgroup_xtal[k]; // << endl;
-        FileOUTPUT << _lines_ << endl;
+        FileOUTPUT << SEPARATION_LINE_DASH << endl;
         FileOUTPUT.flush();
       }
     }                                                       //DX20170802
@@ -8376,10 +8375,10 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
       for(uint k=0;k<a.pgroupk_xtal.size();k++) {
         for(int i=0;i<9;i++) aux_rrr(i+1)=a.pgroupk_xtal[k].Uc(int(i/3)+1,mod(i,3)+1);                 // put in rows
         for(int i=0;i<9;i++) aux_ijk(i+1)=a.pgroupk_xtal[k].Uf(int(i/3)+1,mod(i,3)+1);                  // put in rows
-        if(k==0) FileOUTPUT << _lines_ << endl;
+        if(k==0) FileOUTPUT << SEPARATION_LINE_DASH << endl;
         FileOUTPUT << " Operation number = " << k+1 << " / " << a.pgroupk_xtal.size() << endl;
         FileOUTPUT << a.pgroupk_xtal[k]; // << endl;
-        FileOUTPUT << _lines_ << endl;
+        FileOUTPUT << SEPARATION_LINE_DASH << endl;
         FileOUTPUT.flush();
       }
     }                                                       //DX20170802
@@ -8398,10 +8397,10 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
       for(uint k=0;k<a.pgroupk.size();k++) {
         for(int i=0;i<9;i++) aux_rrr(i+1)=a.pgroupk[k].Uc(int(i/3)+1,mod(i,3)+1);                 // put in rows
         for(int i=0;i<9;i++) aux_ijk(i+1)=a.pgroupk[k].Uf(int(i/3)+1,mod(i,3)+1);                  // put in rows
-        if(k==0) FileOUTPUT << _lines_ << endl;
+        if(k==0) FileOUTPUT << SEPARATION_LINE_DASH << endl;
         FileOUTPUT << " Operation number = " << k+1 << " / " << a.pgroupk.size() << endl;
         FileOUTPUT << a.pgroupk[k]; // << endl;
-        FileOUTPUT << _lines_ << endl;
+        FileOUTPUT << SEPARATION_LINE_DASH << endl;
         FileOUTPUT.flush();
       }
     }                                                       //DX20170802
@@ -8419,10 +8418,10 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
       for(uint k=0;k<a.pgroupk_Patterson.size();k++) {
         for(int i=0;i<9;i++) aux_rrr(i+1)=a.pgroupk_Patterson[k].Uc(int(i/3)+1,mod(i,3)+1);                 // put in rows
         for(int i=0;i<9;i++) aux_ijk(i+1)=a.pgroupk_Patterson[k].Uf(int(i/3)+1,mod(i,3)+1);                  // put in rows
-        if(k==0) FileOUTPUT << _lines_ << endl;
+        if(k==0) FileOUTPUT << SEPARATION_LINE_DASH << endl;
         FileOUTPUT << " Operation number = " << k+1 << " / " << a.pgroupk_Patterson.size() << endl;
         FileOUTPUT << a.pgroupk_Patterson[k]; // << endl;
-        FileOUTPUT << _lines_ << endl;
+        FileOUTPUT << SEPARATION_LINE_DASH << endl;
         FileOUTPUT.flush();
       }
     }                                                       //DX20170802
@@ -8440,10 +8439,10 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
       for(uint k=0;k<a.fgroup.size();k++) {
         for(int i=0;i<9;i++) aux_rrr(i+1)=a.fgroup[k].Uc(int(i/3)+1,mod(i,3)+1);                       // put in rows
         for(int i=0;i<9;i++) aux_ijk(i+1)=a.fgroup[k].Uf(int(i/3)+1,mod(i,3)+1);                    // put in rows
-        if(k==0) FileOUTPUT << _lines_ << endl;
+        if(k==0) FileOUTPUT << SEPARATION_LINE_DASH << endl;
         FileOUTPUT << " Operation number = " << k+1 << " / " << a.fgroup.size() << endl;
         FileOUTPUT << a.fgroup[k]; // << endl;
-        FileOUTPUT << _lines_ << endl;
+        FileOUTPUT << SEPARATION_LINE_DASH << endl;
         FileOUTPUT.flush();
       }
     }                                                       //DX20170802
@@ -8463,10 +8462,10 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
       for(uint k=0;k<a.sgroup.size();k++) {
         for(int i=0;i<9;i++) aux_rrr(i+1)=a.sgroup[k].Uc(int(i/3)+1,mod(i,3)+1);                       // put in rows
         for(int i=0;i<9;i++) aux_ijk(i+1)=a.sgroup[k].Uf(int(i/3)+1,mod(i,3)+1);                    // put in rows
-        if(k==0) FileOUTPUT << _lines_ << endl;
+        if(k==0) FileOUTPUT << SEPARATION_LINE_DASH << endl;
         FileOUTPUT << " Operation number = " << k+1 << " / " << a.sgroup.size() << endl;
         FileOUTPUT << a.sgroup[k]; // << endl;
-        FileOUTPUT << _lines_ << endl;
+        FileOUTPUT << SEPARATION_LINE_DASH << endl;
         FileOUTPUT.flush();
       }
     }                                                       //DX20170802
@@ -8486,11 +8485,11 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
         for(uint k=0;k<a.agroup.at(iat).size();k++) {
           for(int i=0;i<9;i++) aux_rrr(i+1)=a.agroup.at(iat)[k].Uc(int(i/3)+1,mod(i,3)+1);                       // put in rows
           for(int i=0;i<9;i++) aux_ijk(i+1)=a.agroup.at(iat)[k].Uf(int(i/3)+1,mod(i,3)+1);                    // put in rows
-          if(k==0) FileOUTPUT << _lines_ << endl;
+          if(k==0) FileOUTPUT << SEPARATION_LINE_DASH << endl;
           FileOUTPUT << " Site = " << iat << endl;
           FileOUTPUT << " Operation number = " << k+1 << " / " << a.agroup.at(iat).size() << endl;
           FileOUTPUT << a.agroup.at(iat)[k]; // << endl;
-          FileOUTPUT << _lines_ << endl;
+          FileOUTPUT << SEPARATION_LINE_DASH << endl;
           FileOUTPUT.flush();
         }
       }
@@ -8505,19 +8504,19 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
   if(mode==_IATOMS_) {
     if(aurostd::toupper(format)=="TXT" || aurostd::toupper(format)=="TEXT"){ //DX20200206
       FileOUTPUT << "Equivalent atoms file " << endl;
-      FileOUTPUT << _lines_ << endl;
+      FileOUTPUT << SEPARATION_LINE_DASH << endl;
       for(uint iat1=0;iat1<a.iatoms.size();iat1++) {
         FileOUTPUT << " [" << a.iatoms.at(iat1).at(0) << "]  ";
         for(uint iat2=0;iat2<a.iatoms.at(iat1).size();iat2++)
           FileOUTPUT << a.iatoms.at(iat1).at(iat2) << " ";
         FileOUTPUT << endl;
       }
-      FileOUTPUT << _lines_ << endl;
+      FileOUTPUT << SEPARATION_LINE_DASH << endl;
       bool temp=a.write_inequivalent_flag;
       a.write_inequivalent_flag=TRUE;
       FileOUTPUT << a;
       a.write_inequivalent_flag=temp;
-      FileOUTPUT << _lines_ << endl;
+      FileOUTPUT << SEPARATION_LINE_DASH << endl;
       FileOUTPUT.flush();
     }                                                       //DX20170802
     if(aurostd::toupper(format)=="JSON"){ //DX20200206
@@ -8543,55 +8542,54 @@ bool KBIN_SymmetryToScreen(xstructure& a, const string& format, ostream& oss, ch
   // OUT format
   if(aurostd::toupper(format)=="TXT" || aurostd::toupper(format)=="TEXT"){ //DX20200206
     //xvector<double> aux_rrr(9),aux_ijk(9);  //OBSOLETE ME20210402 - not used
-    string _lines_="------------------------------------------------------------------------------------------------";
     if(mode == '\0' || mode == _PGROUP_){
       oss << "AFLOW point groups, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
       oss << a.pgroup.size() << "    point group operations " << endl;
-      oss << _lines_ << endl;
+      oss << SEPARATION_LINE_DASH << endl;
       for(uint k=0;k<a.pgroup.size();k++) {
         //for(int i=0;i<9;i++) aux_rrr(i+1)=a.pgroup[k].Uc(int(i/3)+1,mod(i,3)+1);                 // put in rows
         //for(int i=0;i<9;i++) aux_ijk(i+1)=a.pgroup[k].Uf(int(i/3)+1,mod(i,3)+1);                  // put in rows
         oss << " Operation number = " << k+1 << " / " << a.pgroup.size() << endl;
         oss << a.pgroup[k]; // << endl;
-        oss << _lines_ << endl;
+        oss << SEPARATION_LINE_DASH << endl;
         oss.flush();
       }
     }
     if(mode == '\0' || mode == _PGROUPK_){
       oss << "AFLOW point groups klattice, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
       oss << a.pgroupk.size() << "    point group operations " << endl;
-      oss << _lines_ << endl;
+      oss << SEPARATION_LINE_DASH << endl;
       for(uint k=0;k<a.pgroupk.size();k++) {
         //for(int i=0;i<9;i++) aux_rrr(i+1)=a.pgroupk[k].Uc(int(i/3)+1,mod(i,3)+1);                 // put in rows
         //for(int i=0;i<9;i++) aux_ijk(i+1)=a.pgroupk[k].Uf(int(i/3)+1,mod(i,3)+1);                  // put in rows
         oss << " Operation number = " << k+1 << " / " << a.pgroupk.size() << endl;
         oss << a.pgroupk[k]; // << endl;
-        oss << _lines_ << endl;
+        oss << SEPARATION_LINE_DASH << endl;
         oss.flush();
       }
     }
     if(mode == '\0' || mode == _FGROUP_){
       oss << "AFLOW factor groups, operations are as a=U*b+tau (cols vectors), (Uc,Uf,ctau,ftau for cartesian/fractional)" << endl;
       oss << a.fgroup.size() << "    factor group operations " << endl;
-      oss << _lines_ << endl;
+      oss << SEPARATION_LINE_DASH << endl;
       for(uint k=0;k<a.fgroup.size();k++) {
         //for(int i=0;i<9;i++) aux_rrr(i+1)=a.fgroup[k].Uc(int(i/3)+1,mod(i,3)+1);                       // put in rows
         //for(int i=0;i<9;i++) aux_ijk(i+1)=a.fgroup[k].Uf(int(i/3)+1,mod(i,3)+1);                    // put in rows
         oss << " Operation number = " << k+1 << " / " << a.fgroup.size() << endl;
         oss << a.fgroup[k]; // << endl;
-        oss << _lines_ << endl;
+        oss << SEPARATION_LINE_DASH << endl;
       }
     }
     if(mode == '\0' || mode == _PGROUP_XTAL_){
       oss << "AFLOW crystal point groups, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
       oss << a.pgroup_xtal.size() << "    point group operations " << endl;
-      oss << _lines_ << endl;
+      oss << SEPARATION_LINE_DASH << endl;
       for(uint k=0;k<a.pgroup_xtal.size();k++) {
         //for(int i=0;i<9;i++) aux_rrr(i+1)=a.pgroup_xtal[k].Uc(int(i/3)+1,mod(i,3)+1);                 // put in rows
         //for(int i=0;i<9;i++) aux_ijk(i+1)=a.pgroup_xtal[k].Uf(int(i/3)+1,mod(i,3)+1);                  // put in rows
         oss << " Operation number = " << k+1 << " / " << a.pgroup_xtal.size() << endl;
         oss << a.pgroup_xtal[k]; // << endl;
-        oss << _lines_ << endl;
+        oss << SEPARATION_LINE_DASH << endl;
         oss.flush();
       }
     }
@@ -8599,13 +8597,13 @@ bool KBIN_SymmetryToScreen(xstructure& a, const string& format, ostream& oss, ch
     if(mode == '\0' || mode == _PGROUPK_XTAL_){
       oss << "AFLOW dual of crystal point groups, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
       oss << a.pgroupk_xtal.size() << "    dual of crystal point group operations " << endl;
-      oss << _lines_ << endl;
+      oss << SEPARATION_LINE_DASH << endl;
       for(uint k=0;k<a.pgroupk_xtal.size();k++) {
         //for(int i=0;i<9;i++) aux_rrr(i+1)=a.pgroupk_xtal[k].Uc(int(i/3)+1,mod(i,3)+1);                 // put in rows
         //for(int i=0;i<9;i++) aux_ijk(i+1)=a.pgroupk_xtal[k].Uf(int(i/3)+1,mod(i,3)+1);                  // put in rows
         oss << " Operation number = " << k+1 << " / " << a.pgroupk_xtal.size() << endl;
         oss << a.pgroupk_xtal[k]; // << endl;
-        oss << _lines_ << endl;
+        oss << SEPARATION_LINE_DASH << endl;
         oss.flush();
       }
     }
@@ -8614,13 +8612,13 @@ bool KBIN_SymmetryToScreen(xstructure& a, const string& format, ostream& oss, ch
     if(mode == '\0' || mode == _PGROUPK_PATTERSON_){
       oss << "AFLOW Patterson point groups, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
       oss << a.pgroupk_Patterson.size() << "    point group operations " << endl;
-      oss << _lines_ << endl;
+      oss << SEPARATION_LINE_DASH << endl;
       for(uint k=0;k<a.pgroupk_Patterson.size();k++) {
         //for(int i=0;i<9;i++) aux_rrr(i+1)=a.pgroupk_Patterson[k].Uc(int(i/3)+1,mod(i,3)+1);                 // put in rows
         //for(int i=0;i<9;i++) aux_ijk(i+1)=a.pgroupk_Patterson[k].Uf(int(i/3)+1,mod(i,3)+1);                  // put in rows
         oss << " Operation number = " << k+1 << " / " << a.pgroupk_Patterson.size() << endl;
         oss << a.pgroupk_Patterson[k]; // << endl;
-        oss << _lines_ << endl;
+        oss << SEPARATION_LINE_DASH << endl;
         oss.flush();
       }
     }
@@ -8630,13 +8628,13 @@ bool KBIN_SymmetryToScreen(xstructure& a, const string& format, ostream& oss, ch
       oss << a.sgroup.size() << "    space group operations " << endl;
       oss << a.sgroup_radius << "    radius of space group " << endl;
       oss << a.sgroup_radius_dims << "    dimension of radius of space group " << endl;
-      oss << _lines_ << endl;
+      oss << SEPARATION_LINE_DASH << endl;
       for(uint k=0;k<a.sgroup.size();k++) {
         //for(int i=0;i<9;i++) aux_rrr(i+1)=a.sgroup[k].Uc(int(i/3)+1,mod(i,3)+1);                       // put in rows
         //for(int i=0;i<9;i++) aux_ijk(i+1)=a.sgroup[k].Uf(int(i/3)+1,mod(i,3)+1);                    // put in rows
         oss << " Operation number = " << k+1 << " / " << a.sgroup.size() << endl;
         oss << a.sgroup[k]; // << endl;
-        oss << _lines_ << endl;
+        oss << SEPARATION_LINE_DASH << endl;
         oss.flush();
       }
     }
@@ -8645,27 +8643,27 @@ bool KBIN_SymmetryToScreen(xstructure& a, const string& format, ostream& oss, ch
       for(uint iat=0;iat<a.atoms.size();iat++) {
         oss << " Site="  << iat << endl;
         oss << a.agroup.at(iat).size() << "   site point group operations " << endl;
-        oss << _lines_ << endl;
+        oss << SEPARATION_LINE_DASH << endl;
         for(uint k=0;k<a.agroup.at(iat).size();k++) {
           //for(int i=0;i<9;i++) aux_rrr(i+1)=a.agroup.at(iat)[k].Uc(int(i/3)+1,mod(i,3)+1);                       // put in rows
           //for(int i=0;i<9;i++) aux_ijk(i+1)=a.agroup.at(iat)[k].Uf(int(i/3)+1,mod(i,3)+1);                    // put in rows
           oss << " Site = " << iat << endl;
           oss << " Operation number = " << k+1 << " / " << a.agroup.at(iat).size() << endl;
           oss << a.agroup.at(iat)[k]; // << endl;
-          oss << _lines_ << endl;
+          oss << SEPARATION_LINE_DASH << endl;
         }
       }   
     }   
     if(mode == '\0' || mode == _IATOMS_){
       oss << "Equivalent atoms" << endl;
-      oss << _lines_ << endl;
+      oss << SEPARATION_LINE_DASH << endl;
       for(uint iat1=0;iat1<a.iatoms.size();iat1++) {
         oss << " [" << a.iatoms.at(iat1).at(0) << "]  ";
         for(uint iat2=0;iat2<a.iatoms.at(iat1).size();iat2++)
           oss << a.iatoms.at(iat1).at(iat2) << " ";
         oss << endl;
       }
-      oss << _lines_ << endl;
+      oss << SEPARATION_LINE_DASH << endl;
       bool temp=a.write_inequivalent_flag;
       a.write_inequivalent_flag=TRUE;
       oss << a;
@@ -8734,71 +8732,70 @@ bool KBIN_SymmetryToScreen(xstructure& a, const string& format, ostream& oss, ch
 bool KBIN_SymmetryToScreenWeb(xstructure& a, ostream& oss, char mode) {
   stringstream sscontent_txt, sscontent_json;
   vector<string> vcontent_txt;
-  string _lines_="------------------------------------------------------------------------------------------------";
   switch(mode) {
     case _PGROUP_:
       sscontent_txt << "AFLOW point groups, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
       sscontent_txt << a.pgroup.size() << "    point group operations " << endl;
-      sscontent_txt << _lines_ << endl;
+      sscontent_txt << SEPARATION_LINE_DASH << endl;
       for(uint k=0;k<a.pgroup.size();k++) {
         sscontent_txt << " Operation number = " << k+1 << " / " << a.pgroup.size() << endl;
         sscontent_txt << a.pgroup[k];
-        sscontent_txt << _lines_ << endl;
+        sscontent_txt << SEPARATION_LINE_DASH << endl;
       }
       sscontent_json << SymmetryToJson(a.pgroup, mode);
       break;
     case _PGROUPK_:
       sscontent_txt << "AFLOW point groups klattice, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
       sscontent_txt << a.pgroupk.size() << "    point group operations " << endl;
-      sscontent_txt << _lines_ << endl;
+      sscontent_txt << SEPARATION_LINE_DASH << endl;
       for(uint k=0;k<a.pgroupk.size();k++) {
         sscontent_txt << " Operation number = " << k+1 << " / " << a.pgroupk.size() << endl;
         sscontent_txt << a.pgroupk[k];
-        sscontent_txt << _lines_ << endl;
+        sscontent_txt << SEPARATION_LINE_DASH << endl;
       }
       sscontent_json << SymmetryToJson(a.pgroupk, mode);
       break;
     case _FGROUP_:
       sscontent_txt << "AFLOW factor groups, operations are as a=U*b+tau (cols vectors), (Uc,Uf,ctau,ftau for cartesian/fractional)" << endl;
       sscontent_txt << a.fgroup.size() << "    factor group operations " << endl;
-      sscontent_txt << _lines_ << endl;
+      sscontent_txt << SEPARATION_LINE_DASH << endl;
       for(uint k=0;k<a.fgroup.size();k++) {
         sscontent_txt << " Operation number = " << k+1 << " / " << a.fgroup.size() << endl;
         sscontent_txt << a.fgroup[k];
-        sscontent_txt << _lines_ << endl;
+        sscontent_txt << SEPARATION_LINE_DASH << endl;
       }
       sscontent_json << SymmetryToJson(a.fgroup, mode);
       break;
     case _PGROUP_XTAL_:
       sscontent_txt << "AFLOW crystal point groups, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
       sscontent_txt << a.pgroup_xtal.size() << "    point group operations " << endl;
-      sscontent_txt << _lines_ << endl;
+      sscontent_txt << SEPARATION_LINE_DASH << endl;
       for(uint k=0;k<a.pgroup_xtal.size();k++) {
         sscontent_txt << " Operation number = " << k+1 << " / " << a.pgroup_xtal.size() << endl;
         sscontent_txt << a.pgroup_xtal[k];
-        sscontent_txt << _lines_ << endl;
+        sscontent_txt << SEPARATION_LINE_DASH << endl;
       }
       sscontent_json << SymmetryToJson(a.pgroup_xtal, mode);
       break;
     case _PGROUPK_XTAL_:
       sscontent_txt << "AFLOW dual of crystal point groups, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
       sscontent_txt << a.pgroupk_xtal.size() << "    dual of crystal point group operations " << endl;
-      sscontent_txt << _lines_ << endl;
+      sscontent_txt << SEPARATION_LINE_DASH << endl;
       for(uint k=0;k<a.pgroupk_xtal.size();k++) {
         sscontent_txt << " Operation number = " << k+1 << " / " << a.pgroupk_xtal.size() << endl;
         sscontent_txt << a.pgroupk_xtal[k];
-        sscontent_txt << _lines_ << endl;
+        sscontent_txt << SEPARATION_LINE_DASH << endl;
       }
       sscontent_json << SymmetryToJson(a.pgroupk_xtal, mode);
       break;
     case _PGROUPK_PATTERSON_:
       sscontent_txt << "AFLOW Patterson point groups, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
       sscontent_txt << a.pgroupk_Patterson.size() << "    point group operations " << endl;
-      sscontent_txt << _lines_ << endl;
+      sscontent_txt << SEPARATION_LINE_DASH << endl;
       for(uint k=0;k<a.pgroupk_Patterson.size();k++) {
         sscontent_txt << " Operation number = " << k+1 << " / " << a.pgroupk_Patterson.size() << endl;
         sscontent_txt << a.pgroupk_Patterson[k];
-        sscontent_txt << _lines_ << endl;
+        sscontent_txt << SEPARATION_LINE_DASH << endl;
       }
       sscontent_json << SymmetryToJson(a.pgroupk_Patterson, mode);
       break;
@@ -8810,7 +8807,7 @@ bool KBIN_SymmetryToScreenWeb(xstructure& a, ostream& oss, char mode) {
       for(uint k=0;k<a.sgroup.size();k++) {
         sscontent_txt << " Operation number = " << k+1 << " / " << a.sgroup.size() << endl;
         sscontent_txt << a.sgroup[k];
-        sscontent_txt << _lines_ << endl;
+        sscontent_txt << SEPARATION_LINE_DASH << endl;
       }
       sscontent_json << SymmetryToJson(a.sgroup, mode);
       break;
@@ -8819,11 +8816,11 @@ bool KBIN_SymmetryToScreenWeb(xstructure& a, ostream& oss, char mode) {
       for(uint iat=0;iat<a.atoms.size();iat++) {
         sscontent_txt << " Site="  << iat << endl;
         sscontent_txt << a.agroup.at(iat).size() << "   site point group operations " << endl;
-        sscontent_txt << _lines_ << endl;
+        sscontent_txt << SEPARATION_LINE_DASH << endl;
         for(uint k=0;k<a.agroup[iat].size();k++) {
           sscontent_txt << " Operation number = " << k+1 << " / " << a.agroup[iat].size() << endl;
           sscontent_txt << a.agroup[iat][k];
-          sscontent_txt << _lines_ << endl;
+          sscontent_txt << SEPARATION_LINE_DASH << endl;
         }
       }
       sscontent_json << AgroupSymmetryToJson(a.agroup, mode);

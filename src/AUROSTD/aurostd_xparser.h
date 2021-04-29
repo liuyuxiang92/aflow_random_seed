@@ -96,6 +96,13 @@ namespace aurostd {
 }
 //AS20201214 END
 
+//AS20210309 - added JSON benchmarks (keeping to easily test later, but commented out for now)
+//AS20210309 [BENCHMARK] namespace aurostd {
+//AS20210309 [BENCHMARK] 	 void test_vector_string(int niterations);
+//AS20210309 [BENCHMARK]	 void test_vector_json(int niterations);
+//AS20210309 [BENCHMARK]   void run_vector_string_vs_json_test(void);
+//AS20210309 [BENCHMARK] }
+
 #endif // _AUROSTD_XPARSER_H_
 
 // **************************************************************************

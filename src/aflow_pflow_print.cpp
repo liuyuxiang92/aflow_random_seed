@@ -1752,7 +1752,7 @@ namespace pflow {
       // Real space lattice
       if(str_aus.lattice.rows != 0){
         json.addMatrix("lattice_vectors",str_aus.lattice,_AFLOWLIB_DATA_GEOMETRY_PREC_,roff);
-      } else {
+      } else if(PRINT_NULL) {
         json.addNull("lattice_vectors");
       }
 
@@ -2141,18 +2141,19 @@ namespace pflow {
 
       aurostd::JSONwriter json;
       bool roff = true;
+      bool PRINT_NULL=false;
 
       // Reciprocal space lattice
       if(str_aus.klattice.rows != 0){
         json.addMatrix("reciprocal_lattice_vectors", str_aus.klattice, _AFLOWLIB_DATA_GEOMETRY_PREC_, roff);
-      } else {
+      } else if(PRINT_NULL) {
         json.addNull("reciprocal_lattice_vectors");
       }
 
       // Reciprocal lattice parameters
       if(data.rows != 0){
         json.addVector("reciprocal_lattice_parameters", data, _AFLOWLIB_DATA_GEOMETRY_PREC_, roff);
-      } else {
+      } else if(PRINT_NULL) {
         json.addNull("reciprocal_lattice_parameters");
       }
 
@@ -2162,14 +2163,14 @@ namespace pflow {
       // Reciprocal space: reciprocal lattice type
       if(!str_aus.reciprocal_lattice_type.empty()){
         json.addString("reciprocal_lattice_type", str_aus.reciprocal_lattice_type);
-      } else {
+      } else if(PRINT_NULL) {
         json.addNull("reciprocal_lattice_type");
       }
 
       // Reciprocal space: reciprocal lattice variation type
       if(!str_aus.reciprocal_lattice_variation_type.empty()){
         json.addString("reciprocal_lattice_variation_type", str_aus.reciprocal_lattice_variation_type);
-      } else {
+      } else if(PRINT_NULL) {
         json.addNull("reciprocal_lattice_variation_type");
       }
       ss_output << json.toString(standalone); //standalone: determines if we enclose in brackets
@@ -2286,14 +2287,14 @@ namespace pflow {
       // Real lattice parameters
       if(data.rows != 0){
         json.addVector("lattice_parameters_superlattice", data, _AFLOWLIB_DATA_GEOMETRY_PREC_, roff);
-      } else if (PRINT_NULL){
+      } else if(PRINT_NULL){
         json.addNull("lattice_parameters_superlattice");
       }
 
       // Real lattice parameters (Bohr/Deg)
       if(data_Bohr.rows != 0){
         json.addVector("lattice_parameters_superlattice_Bohr_deg", data_Bohr, _AFLOWLIB_DATA_GEOMETRY_PREC_, roff);
-      } else if (PRINT_NULL){
+      } else if(PRINT_NULL){
         json.addNull("lattice_parameters_superlattice_Bohr_deg");
       }
 
