@@ -4201,16 +4201,14 @@ namespace chull {
     string auid_sc=m_cflags.getattachedscheme("CHULL::CALCULATE_FAKE_HULL_STABILITY_CRITERION");
     if(auid_sc.empty()){fhsc_requested=false;}
     if(fhsc_requested){
-      for(uint i=0,fl_size_i=m_points.size();i<fl_size_i;i++){
+      for(uint i=0,fl_size_i=m_points.size();i<fl_size_i&&i_point_sc==AUROSTD_MAX_UINT;i++){
         const ChullPoint& point=m_points[i];
         const aflowlib::_aflowlib_entry& entry=m_points[i].m_entry;
         if(!point.m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized point");}
         // start remove points
-        if(m_points[i].m_has_entry){
-          if(entry.auid==auid_sc){
-            i_point_sc=i;
-            r_coords_sc_input=point.getStoichiometricCoords();
-          }
+        if(m_points[i].m_has_entry && entry.auid==auid_sc){
+          i_point_sc=i;
+          r_coords_sc_input=point.getStoichiometricCoords();
         }
       }
     }
