@@ -257,7 +257,7 @@ namespace aurostd {  // namespace aurostd
     // removed inline
     utype& xmatrix<utype>::operator()(int i,int j) const {
       //#ifndef XMATRIX_PERIODIC_BOUNDARY_CONDITIONS
-#ifndef __XMATRIX_IGNORE_BOUNDARIES
+#ifndef __XOPTIMIZE
       if(i>urows) {
         string function = XPID + "aurostd::xmatrix::operator():";
         stringstream message;
@@ -282,7 +282,7 @@ namespace aurostd {  // namespace aurostd
         message << "M -> j=" << j << " < lcols=" << lcols;
         throw xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
       }
-#endif // __XMATRIX_IGNORE_BOUNDARIES
+#endif // __XOPTIMIZE
       return corpus[i][j];
     }
   ////#else
@@ -422,7 +422,7 @@ namespace aurostd {  // namespace aurostd
 namespace aurostd {  // namespace aurostd
   template<class utype>
     void xmatrix<utype>::setmat(const xmatrix<utype>& mat,int lrow,int lcol) { //these are the starting lrow, lcol, end is dictated by size of mat //CO20191110
-#ifndef __XMATRIX_IGNORE_BOUNDARIES
+#ifndef __XOPTIMIZE
       bool LDEBUG=(FALSE || XHOST.DEBUG);
       string soliloquy="aurostd::setmat():";
       int urow=lrow+mat.rows-1; //ending row
@@ -454,7 +454,7 @@ namespace aurostd {  // namespace aurostd
         urow=icol; //ending row
         ucol=lcols+xv.rows-1; //ending col
       }
-#ifndef __XMATRIX_IGNORE_BOUNDARIES
+#ifndef __XOPTIMIZE
       bool LDEBUG=(FALSE || XHOST.DEBUG);
       string soliloquy="aurostd::setmat():";
       if(LDEBUG){
