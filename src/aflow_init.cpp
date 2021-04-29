@@ -2186,15 +2186,15 @@ namespace init {
     nschema++;
 
     // schema is CAPITAL, content is not necessarily //DX20200902
-    XHOST.vschema.push_attached("SCHEMA::NAME:AFLOW_PROTOTYPE_PARAMETER_LIST_ORIG","aflow_prototype_parameter_list_orig"); //DX20201001 - updated keyword
-    XHOST.vschema.push_attached("SCHEMA::UNIT:AFLOW_PROTOTYPE_PARAMETER_LIST_ORIG",""); //DX20201001 - updated keyword
-    XHOST.vschema.push_attached("SCHEMA::TYPE:AFLOW_PROTOTYPE_PARAMETER_LIST_ORIG","strings"); //DX20201001 - updated keyword
+    XHOST.vschema.push_attached("SCHEMA::NAME:AFLOW_PROTOTYPE_PARAMS_LIST_ORIG","aflow_prototype_params_list_orig"); //DX20201001 - updated keyword
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AFLOW_PROTOTYPE_PARAMS_LIST_ORIG",""); //DX20201001 - updated keyword
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AFLOW_PROTOTYPE_PARAMS_LIST_ORIG","strings"); //DX20201001 - updated keyword
     nschema++;
 
     // schema is CAPITAL, content is not necessarily //DX20200902
-    XHOST.vschema.push_attached("SCHEMA::NAME:AFLOW_PROTOTYPE_PARAMETER_VALUES_ORIG","aflow_prototype_parameter_values_orig"); //DX20201001 - updated keyword
-    XHOST.vschema.push_attached("SCHEMA::UNIT:AFLOW_PROTOTYPE_PARAMETER_VALUES_ORIG",""); //DX20201001 - updated keyword
-    XHOST.vschema.push_attached("SCHEMA::TYPE:AFLOW_PROTOTYPE_PARAMETER_VALUES_ORIG","numbers"); //DX20201001 - updated keyword
+    XHOST.vschema.push_attached("SCHEMA::NAME:AFLOW_PROTOTYPE_PARAMS_VALUES_ORIG","aflow_prototype_params_values_orig"); //DX20201001 - updated keyword
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AFLOW_PROTOTYPE_PARAMS_VALUES_ORIG",""); //DX20201001 - updated keyword
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AFLOW_PROTOTYPE_PARAMS_VALUES_ORIG","numbers"); //DX20201001 - updated keyword
     nschema++;
 
     // schema is CAPITAL, content is not necessarily //DX20200902
@@ -2204,15 +2204,15 @@ namespace init {
     nschema++;
 
     // schema is CAPITAL, content is not necessarily //DX20200902
-    XHOST.vschema.push_attached("SCHEMA::NAME:AFLOW_PROTOTYPE_PARAMETER_LIST_RELAX","aflow_prototype_parameter_list_relax"); //DX20201001 - updated keyword
-    XHOST.vschema.push_attached("SCHEMA::UNIT:AFLOW_PROTOTYPE_PARAMETER_LIST_RELAX",""); //DX20201001 - updated keyword
-    XHOST.vschema.push_attached("SCHEMA::TYPE:AFLOW_PROTOTYPE_PARAMETER_LIST_RELAX","strings"); //DX20201001 - updated keyword
+    XHOST.vschema.push_attached("SCHEMA::NAME:AFLOW_PROTOTYPE_PARAMS_LIST_RELAX","aflow_prototype_params_list_relax"); //DX20201001 - updated keyword
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AFLOW_PROTOTYPE_PARAMS_LIST_RELAX",""); //DX20201001 - updated keyword
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AFLOW_PROTOTYPE_PARAMS_LIST_RELAX","strings"); //DX20201001 - updated keyword
     nschema++;
 
     // schema is CAPITAL, content is not necessarily //DX20200902
-    XHOST.vschema.push_attached("SCHEMA::NAME:AFLOW_PROTOTYPE_PARAMETER_VALUES_RELAX","aflow_prototype_parameter_values_relax"); //DX20201001 - updated keyword
-    XHOST.vschema.push_attached("SCHEMA::UNIT:AFLOW_PROTOTYPE_PARAMETER_VALUES_RELAX",""); //DX20201001 - updated keyword
-    XHOST.vschema.push_attached("SCHEMA::TYPE:AFLOW_PROTOTYPE_PARAMETER_VALUES_RELAX","numbers"); //DX20201001 - updated keyword
+    XHOST.vschema.push_attached("SCHEMA::NAME:AFLOW_PROTOTYPE_PARAMS_VALUES_RELAX","aflow_prototype_params_values_relax"); //DX20201001 - updated keyword
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AFLOW_PROTOTYPE_PARAMS_VALUES_RELAX",""); //DX20201001 - updated keyword
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AFLOW_PROTOTYPE_PARAMS_VALUES_RELAX","numbers"); //DX20201001 - updated keyword
     nschema++;
 
     // schema is CAPITAL, content is not necessarily
