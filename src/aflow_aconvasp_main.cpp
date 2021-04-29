@@ -1158,6 +1158,8 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   // [OBSOLETE] vpflow.flag("SBATCH",aurostd::args2flag(argv,cmds,"--sbatch"));
   // [OBSOLETE] vpflow.args2addattachedscheme(argv,cmds,"SBATCH","--sbatch=","");
 
+  vpflow.flag("PFLOW::QUEUE_STATUS",aurostd::args2flag(argv,cmds,"--queue_status|--queue|--q"));  //CO20200526
+
   // [OBSOLETE]  vpflow.flag("RASMOL",aurostd::args2flag(argv,cmds,"--rasmol"));
   vpflow.args2addattachedscheme(argv,cmds,"RASMOL","--rasmol=","");
 
@@ -1580,6 +1582,7 @@ namespace pflow {
       if(vpflow.flag("COMPARE2DATABASE")) {cout << compare::printCompare2Database(cin, vpflow); _PROGRAMRUN=true;} //DX20190201
       if(vpflow.flag("GENERALIZED_STACKING_FAULT_ENERGY")) {pflow::GeneralizedStackingFaultEnergyCalculation(vpflow,cin); _PROGRAMRUN=true;} //CO20190520
       if(vpflow.flag("PREPARE_CHGCAR_4_JMOL")) {cout << bader_functions::prepare_CHGCAR_4_Jmol(vpflow); _PROGRAMRUN=true;}
+      if(vpflow.flag("PFLOW::QUEUE_STATUS")) {cout << pflow::getQueueStatus(vpflow); _PROGRAMRUN=true;} //CO20200526
       //DX
     }
     // *********************************************************************
