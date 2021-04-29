@@ -794,6 +794,7 @@ namespace LATTICE {
 	    }
 	  }
 	}
+
       }
     }
 
@@ -805,7 +806,7 @@ namespace LATTICE {
       // compute lengths of possible lattices before-hand (faster than on-the-fly)
       vector<double> translations_mod;
       for(uint i=0;i<n_translations;i++){
-	translations_mod.push_back(aurostd::modulus(translation_vectors[i]));
+	      translations_mod.push_back(aurostd::modulus(translation_vectors[i]));
       }
 
       // ---------------------------------------------------------------------------
