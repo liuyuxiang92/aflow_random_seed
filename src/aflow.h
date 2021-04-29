@@ -569,6 +569,8 @@ extern _XHOST XHOST; // this will be global
 // STRUCTURES
 #define AFLOWIN_SEPARATION_LINE  string("[AFLOW] ************************************************************************************************************************** ")
 #define AFLOWIN_SEPARATION_LINE_SHORT  string("[AFLOW] ********************************************************************************************")  // ME20210208 - Same length as banner
+#define SEPARATION_LINE_DASH string("------------------------------------------------------------------------------------------------") //DX+CO20210429 - generic dash-line separator (used between symmetry operators)
+#define SEPARATION_LINE_DASH_SHORT string("---------------------------------------------------------------------------") //DX+CO20210429 - generic dash-line separator, short (used in symmetry log output)
 
 // --------------------------------------------------------------------------
 // general flags to run aflow
