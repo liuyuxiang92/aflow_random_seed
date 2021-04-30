@@ -85,6 +85,14 @@ namespace aurostd {
 }
 //AS20201214 END
 
+//ME2020408 - JSON reader
+//Moved from the AflowDB class
+
+namespace aurostd {
+  vector<string> extractJsonKeysAflow(const string& json);
+  string extractJsonValueAflow(const string& json, string key);
+}
+
 #endif // _AUROSTD_XPARSER_H_
 
 // **************************************************************************

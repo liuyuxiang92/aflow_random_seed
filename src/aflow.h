@@ -56,6 +56,7 @@ enum filetype {   //CO20190629
   //GENERAL FILE TYPES
   txt_ft,         //general plain text
   json_ft,
+  aflow_ft,       //ME20210329 - aflowlib.out format
   csv_ft,
   latex_ft,
   gnuplot_ft,
@@ -2576,6 +2577,8 @@ void minimumCoordinationShell(const xstructure& xstr, uint center_index,
     double& min_dist, uint& frequency, vector<xvector<double> >& coordinates, const string& type); //DX20191122
 
 //makefile tests
+bool SchemaTest(ostream& oss=std::cout);  //ME20210408
+bool SchemaTest(ofstream& FileMESSAGE,ostream& oss=std::cout);  //ME20210408
 bool CeramGenTest(ostream& oss=cout);
 bool CeramGenTest(ofstream& FileMESSAGE,ostream& oss=cout);
 bool EgapTest(ostream& oss=cout);
