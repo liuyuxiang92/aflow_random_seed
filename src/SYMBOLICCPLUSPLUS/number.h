@@ -122,11 +122,13 @@ namespace symbolic{ //DX20200625
               static std::pair<Number<void>,Number<void> >
                 match(const Number<void>&,const Number<void>&);
 
+              void copy(const Numeric&); //DX20210420 - to fix warnings for gcc>10, need explicit declaration
               Number<void> operator+(const Numeric&) const;
               Number<void> operator-(const Numeric&) const;
               Number<void> operator*(const Numeric&) const;
               Number<void> operator/(const Numeric&) const;
               Number<void> operator%(const Numeric&) const;
+              Number<void> &operator=(const Numeric&); //DX20210420 - to fix warnings for gcc>10, need explicit declaration
               Number<void> &operator+=(const Numeric&);
               Number<void> &operator*=(const Numeric&);
               Number<void> &operator/=(const Numeric&);
@@ -137,11 +139,13 @@ namespace symbolic{ //DX20200625
               int operator<=(const Numeric&) const;
               int operator>=(const Numeric&) const;
 
+              void copy(const Number<void>&); //DX20210420 - to fix warnings for gcc>10, need explicit declaration
               Number<void> operator+(const Number<void>&) const;
               Number<void> operator-(const Number<void>&) const;
               Number<void> operator*(const Number<void>&) const;
               Number<void> operator/(const Number<void>&) const;
               Number<void> operator%(const Number<void>&) const;
+              Number<void> &operator=(const Number<void>&); //DX20210420 - to fix warnings for gcc>10, need explicit declaration
               Number<void> &operator+=(const Number<void>&);
               Number<void> &operator*=(const Number<void>&);
               Number<void> &operator/=(const Number<void>&);

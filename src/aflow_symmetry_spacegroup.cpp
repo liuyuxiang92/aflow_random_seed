@@ -811,7 +811,7 @@ uint xstructure::GetPrimitiveCell(void) {
 
   xmatrix<double> f2c = trasp(lattice_basis_xmat);
   xmatrix<double> c2f = inverse(trasp(lattice_basis_xmat));
-  bool skew = SYM::isLatticeSkewed(lattice_basis_xmat, (*this).dist_nn_min, (*this).sym_eps); //DX20190215 - _SYM_TOL to (*this).sym_eps
+  //DX20210315 [OBSOLETE] bool skew = SYM::isLatticeSkewed(lattice_basis_xmat, (*this).dist_nn_min, (*this).sym_eps); //DX20190215 - _SYM_TOL to (*this).sym_eps
   vector<xvector<double> > diff_vectors;
 
   // Determine the Greatest Common Denominator between the atom types
@@ -879,7 +879,7 @@ uint xstructure::GetPrimitiveCell(void) {
   lattice_basis_xmat = SYM::xvec2xmat(lattice_basis[0], lattice_basis[1], lattice_basis[2]);
   f2c = trasp(lattice_basis_xmat);
   c2f = inverse(trasp(lattice_basis_xmat));
-  skew = SYM::isLatticeSkewed(lattice_basis_xmat, (*this).dist_nn_min, (*this).sym_eps); //DX20190215 - _SYM_TOL_ to (*this).sym_eps
+  //DX20210315 [OBSOLETE] skew = SYM::isLatticeSkewed(lattice_basis_xmat, (*this).dist_nn_min, (*this).sym_eps); //DX20190215 - _SYM_TOL_ to (*this).sym_eps
   vector<_atom> full_basis;  //basis that has been reduced modulo 1
   vector<xvector<double> > lattice_vector_candidates;
 
@@ -907,38 +907,12 @@ uint xstructure::GetPrimitiveCell(void) {
       atom_pos.push_back(i);
     }
 
-    //DX20180503 - FASTER MIN CART DISTANCE CALCULATOR - START
-    //DX20180503 - only calculate multiplication once (time-saver)
-    vector<xvector<double> > l1, l2, l3;
-    vector<int> a_index, b_index, c_index;
-    for(int a=-1;a<=1;a++){l1.push_back(a*(*this).lattice(1));a_index.push_back(a);} //DX calc once and store
-    for(int b=-1;b<=1;b++){l2.push_back(b*(*this).lattice(2));b_index.push_back(b);} //DX calc once and store
-    for(int c=-1;c<=1;c++){l3.push_back(c*(*this).lattice(3));c_index.push_back(c);} //DX calc once and store
-    //Translate by difference vectors and check if equivalent
+    // ---------------------------------------------------------------------------
+    // translate by difference vectors and check if equivalent
+    // (i.e., check if diff vector is a lattice vector) 
+    bool is_frac = true;
     for (uint d = 1; d < diff_vectors.size(); d++) {  //use d=0 if we do double for loop
-      xvector<double> incell_dist = atoms_by_type[index_for_smallest_group][atom_pos[d]].cpos - atoms_by_type[index_for_smallest_group][0].cpos;
-      uint count = 0;
-      for (uint i = 0; i < atomic_basis_.size(); i++) {
-        _atom atmp = atomic_basis_[i]; //DX20191011 - initialized instead of setting individually below
-        //DX20190905 [OBSOLETE-no more mod_one_xvec] atmp.fpos = SYM::mod_one_xvec(atomic_basis_[i].fpos + diff_vectors[d]);
-        atmp.fpos = atomic_basis_[i].fpos + diff_vectors[d]; //DX20190905 
-        BringInCellInPlace(atmp.fpos); //DX20190905
-        //DX20191011 [OBSOLETE] atmp.name = atomic_basis_[i].name;
-        //DX20191011 [OBSOLETE] atmp.type = atomic_basis_[i].type;
-        //DX20191011 [OBSOLETE] atmp.spin = atomic_basis_[i].spin; //DX20170921 - magnetic sym
-        //DX20191011 [OBSOLETE] atmp.spin_is_given = atomic_basis_[i].spin_is_given; //DX20170921 - magnetic sym
-        //DX20191011 [OBSOLETE] atmp.noncoll_spin = atomic_basis_[i].noncoll_spin; //DX20171205 - magnetic sym (non-collinear)
-        //DX20191011 [OBSOLETE] atmp.noncoll_spin_is_given = atomic_basis_[i].noncoll_spin_is_given; //DX20171205 - magnetic sym (non-collinear)
-        if(SYM::MapAtom(atomic_basis_, atmp, TRUE, lattice_basis_xmat, f2c, skew, (*this).sym_eps)) { //DX20190215 - _SYM_TOL_ to (*this).sym_eps //DX20190619 - lattice_basis_xmat and f2c as input
-          count += 1;
-        }
-        //DX20180515 - break if it does not match with one - START
-        else { 
-          break;
-        }
-        //DX20180515 - break if it does not match with one - END
-      }
-      if(count == atomic_basis_.size()) {
+      if(isTranslationVector((*this), diff_vectors[d], (*this).sym_eps, is_frac)){
         lattice_vector_candidates.push_back(diff_vectors[d]);
       }
     }
@@ -1025,35 +999,53 @@ uint xstructure::GetPrimitiveCell(void) {
       lattice_basis[2] = SYM::extract_row(prim_lattice, 3);
 
       lattice_basis_xmat = SYM::xvec2xmat(lattice_basis[0], lattice_basis[1], lattice_basis[2]);
-      xmatrix<double> f2c = trasp(lattice_basis_xmat);
-      xmatrix<double> c2f = inverse(trasp(lattice_basis_xmat));
-      bool skew = SYM::isLatticeSkewed(lattice_basis_xmat, (*this).dist_nn_min, (*this).sym_eps); //DX20190215 - _SYM_TOL_ to (*this).sym_eps
-      xmatrix<double> PL_inv = aurostd::inverse(prim_lattice);
-      double same_atom_tol = (*this).dist_nn_min - 0.1;  //min_dist itself will consider nn atom to be the same, needs to be slightly smaller.`
-      //Now get atoms inside of new, reduced basis:
-      //[CO20190520]newbasis = foldAtomsInCell(expanded_basis, c2f, f2c, skew, same_atom_tol); //CO20180409
-      newbasis = ::foldAtomsInCell(expanded_basis, (*this).lattice, lattice_basis_xmat, skew, same_atom_tol,false); //CO20180409 //DX20190619 - false->do not check min dists (expensive)
+        
+      // ---------------------------------------------------------------------------
+      //DX20210316 - used transformation method (more efficient)
+      xmatrix<double> transformation_matrix = GetBasisTransformation((*this).lattice, lattice_basis_xmat);
+      xmatrix<double> rotation_matrix = aurostd::eye<double>(3,3);
+      xstructure prim = (*this);
+      // try to primitivize, it may fail, so return original structure
+      try{
+        prim.TransformStructure(transformation_matrix, rotation_matrix);
+        (*this) = prim;
+      }
+      catch(aurostd::xerror& re){}
+      return 0;
+
+      //DX20210315 - foldInCell method (too slow for large, skewed cells)
+      //DX20210315 [OBSOLETE]xmatrix<double> f2c = trasp(lattice_basis_xmat);
+      //DX20210315 [OBSOLETE]xmatrix<double> c2f = inverse(trasp(lattice_basis_xmat));
+      //DX20210315 [OBSOLETE]bool skew = SYM::isLatticeSkewed(lattice_basis_xmat, (*this).dist_nn_min, (*this).sym_eps); //DX20190215 - _SYM_TOL_ to (*this).sym_eps
+      //DX20210315 [OBSOLETE]xmatrix<double> PL_inv = aurostd::inverse(prim_lattice);
+      //DX20210315 [OBSOLETE]double same_atom_tol = (*this).dist_nn_min - 0.1;  //min_dist itself will consider nn atom to be the same, needs to be slightly smaller.`
+      //DX20210315 [OBSOLETE]//Now get atoms inside of new, reduced basis:
+      //DX20210315 [OBSOLETE]//[CO20190520]newbasis = foldAtomsInCell(expanded_basis, c2f, f2c, skew, same_atom_tol); //CO20180409
+      //DX20210315 [OBSOLETE]newbasis = ::foldAtomsInCell(expanded_basis, (*this).lattice, lattice_basis_xmat, skew, same_atom_tol,false); //CO20180409 //DX20190619 - false->do not check min dists (expensive)
+	
       //DEBUG
       //cerr << "newbasis.size(): " << newbasis.size() << endl;
       //for(uint n=0;n<newbasis.size();n++){
       //  cerr << newbasis[n].fpos << endl;
       //}
       //DEBUG
-      bool consistent_ratio = SYM::GCD_conventional_atomic_basis(newbasis, orig_split_atom_types, atoms_GCD);
-      if(consistent_ratio == false) {
-        foundbasis = false;
-      } else {
-        //Overwrite basis types (update it for primitive cell):
-        sort(newbasis.begin(), newbasis.end(), sortAtomsTypes);
-        //DX20210129 [OBSOLETE] numofatoms = ::GetNumEachType(newbasis);
-        //DX20210129 [OBSOLETE] basistypes = numofatoms;
-        atomic_basis_.clear();
-        atomic_basis_ = newbasis;
-        if(atomic_basis_.size() == 0) {
-          moduli.clear();
-        }
-        foundbasis = true;
-      }
+ 
+      //DX20210315 [OBSOLETE]bool consistent_ratio = SYM::GCD_conventional_atomic_basis(newbasis, orig_split_atom_types, atoms_GCD);
+      //DX20210315 [OBSOLETE]if(consistent_ratio == false) {
+      //DX20210315 [OBSOLETE]  foundbasis = false;
+      //DX20210315 [OBSOLETE]} else {
+      //DX20210315 [OBSOLETE]  //Overwrite basis types (update it for primitive cell):
+      //DX20210315 [OBSOLETE]  sort(newbasis.begin(), newbasis.end(), sortAtomsTypes);
+      //DX20210315 [OBSOLETE]  //DX20210129 [OBSOLETE] numofatoms = ::GetNumEachType(newbasis);
+      //DX20210315 [OBSOLETE]  //DX20210129 [OBSOLETE] basistypes = numofatoms;
+      //DX20210315 [OBSOLETE]  atomic_basis_.clear();
+      //DX20210315 [OBSOLETE]  atomic_basis_ = newbasis;
+      //DX20210315 [OBSOLETE]  if(atomic_basis_.size() == 0) {
+      //DX20210315 [OBSOLETE]    moduli.clear();
+      //DX20210315 [OBSOLETE]  }
+      //DX20210315 [OBSOLETE]  foundbasis = true;
+      //DX20210315 [OBSOLETE]}
+      //DX20210315 [OBSOLETE]cerr << "(*this): " << (*this) << endl;
     }
   }
 
@@ -1246,6 +1238,7 @@ namespace SYM {
     // ========== Objects containing crystal stucture information ========== //
     xstructure xstr_out;
     xstr.GetPrimitiveCell();
+    xstructure prim = xstr; //DX20210316 - store primitive
 
     xmatrix<double> L = xstr.lattice;
     deque<_atom> primitive_atomic_basis = xstr.atoms;
@@ -1359,6 +1352,7 @@ namespace SYM {
       if(IT >= 1) {
         xstr = CrystOut_prev;
         xstr.GetPrimitiveCell();
+        prim = xstr; //DX20210316 - store primitive
         L = xstr.lattice;
         Linv = aurostd::inverse(L);
       }
@@ -1654,65 +1648,80 @@ namespace SYM {
         char lattice_char = candidate_lattice_chars[i];
 
         // *****************************************************************************************************************************
-        // Fill in cell with conventional atomic basis
+        // Transform into conventional cell //DX20210316 - transformation method based on primitive cell instead of foldAtomsInCell 
         // *****************************************************************************************************************************
-        // ========== Conventional Atomic Basis ========== //
-        //Now add those basis atoms that fit in conventional cell:
-        //[CO20190520]deque<_atom> conventional_basis_atoms = foldAtomsInCell(expanded_basis, c2f, f2c, skew, sym_tol); //DX20190215 - _SYM_TOL_ to sym_tol
-        deque<_atom> conventional_basis_atoms = foldAtomsInCell(expanded_basis, xstr.lattice, CL, skew, sym_tol, false); //DX20190215 - _SYM_TOL_ to sym_tol //DX20190619 - false->do not check min dists (expensive)
-
-        bool consistent_ratio = true;  // Change tolerances if the ratio between atomic basis atoms is inconsistent with the primitive cell.
-        // ===== Check if ratio of atoms is consistent with primitive atomic basis ===== //
-        // Note: If the original POSCAR has atoms overlapping, skip this part (SG will be equal to 1)
-        if(atoms_overlapping == false) {
-          consistent_ratio = GCD_conventional_atomic_basis(conventional_basis_atoms, prim_split_atom_types, prim_GCD);
+        xmatrix<double> transformation_matrix = GetBasisTransformation(prim.lattice, CL);
+        xmatrix<double> rotation_matrix = aurostd::eye<double>(3,3);
+        // try to convert to conventional cell, if it fails, change tolerance
+        try{
+          xstr_out = TransformStructure(prim, transformation_matrix, rotation_matrix);
+          xstr_out.lattice_label_ITC = lattice_char;
         }
-        if(consistent_ratio == false) {
-          if(LDEBUG) { cerr << "SYM::ConventionalCell: WARNING: Conventional cell atomic basis ratio is inconsistent with the primitive cell! Recalculating. [dir=" << xstr.directory << "]." << endl; }
-          symmetryfound = false;
-          continue;
-        }
-
-        // ========== Rearrange atoms/Store ========== //
-        sort(conventional_basis_atoms.begin(), conventional_basis_atoms.end(), sortAtomsTypes);
-
-        xstr_out.lattice_label_ITC = lattice_char;
-        xstr_out.lattice = CL;
-
-        vector<string> in_names;
-        for (uint c = 0; c < conventional_basis_atoms.size(); c++) {
-          conventional_basis_atoms[c].fpos = C2F(xstr_out.lattice, conventional_basis_atoms[c].cpos);
-          in_names.push_back(conventional_basis_atoms[c].name);
-        }
-
-        xstr_out.ReplaceAtoms(conventional_basis_atoms, false); //DX20210129
-        //DX20210129 [OBSOLETE] //Remove old atomic basis
-        //DX20210129 [OBSOLETE] while (xstr_out.atoms.size() > 0) {
-        //DX20210129 [OBSOLETE]   xstr_out.RemoveAtom((uint)0);
-        //DX20210129 [OBSOLETE] }
-        //DX20210129 [OBSOLETE] xstr_out.species.clear();
-        //DX20210129 [OBSOLETE] // Add new atomic basis
-        //DX20210129 [OBSOLETE] for (uint c = 0; c < conventional_basis_atoms.size(); c++) {
-        //DX20210129 [OBSOLETE]   xstr_out.AddAtom(conventional_basis_atoms[c]);
-        //DX20210129 [OBSOLETE] }
-
-        //DX20190410 START
-        // Check if AddAtom removed atoms
-        if(xstr_out.atoms.size() != conventional_basis_atoms.size()){
-          if(LDEBUG) {
-            cerr << "SYM::ConventionalCell: AddAtom() removed conventional basis atoms due to the tolerance value. Change the tolerance." << endl;
-          }
+        catch(aurostd::xerror& re){
           symmetryfound = false;
           return xstr_out;
         }
-        //DX20190410 END
 
-        // Set number of each type
-        //DX20210129 [OBSOLETE - ReplaceAtoms takes care of this] xstr_out.SetNumEachType();
-        if(xstr_out.num_each_type.size() != in_names.size()) {
-          xstr_out = pflow::SetAllAtomNames(xstr_out, in_names);
-        }
-        xstr_out.FixLattices();
+        //DX20210315 [OBSOLETE]// *****************************************************************************************************************************
+        //DX20210315 [OBSOLETE]// Fill in cell with conventional atomic basis
+        //DX20210315 [OBSOLETE]// *****************************************************************************************************************************
+        //DX20210315 [OBSOLETE]// ========== Conventional Atomic Basis ========== //
+        //DX20210315 [OBSOLETE]//Now add those basis atoms that fit in conventional cell:
+        //DX20210315 [OBSOLETE]//[CO20190520]deque<_atom> conventional_basis_atoms = foldAtomsInCell(expanded_basis, c2f, f2c, skew, sym_tol); //DX20190215 - _SYM_TOL_ to sym_tol
+        //DX20210315 [OBSOLETE]deque<_atom> conventional_basis_atoms = foldAtomsInCell(expanded_basis, xstr.lattice, CL, skew, sym_tol, false); //DX20190215 - _SYM_TOL_ to sym_tol //DX20190619 - false->do not check min dists (expensive)
+
+        //DX20210315 [OBSOLETE]bool consistent_ratio = true;  // Change tolerances if the ratio between atomic basis atoms is inconsistent with the primitive cell.
+        //DX20210315 [OBSOLETE]// ===== Check if ratio of atoms is consistent with primitive atomic basis ===== //
+        //DX20210315 [OBSOLETE]// Note: If the original POSCAR has atoms overlapping, skip this part (SG will be equal to 1)
+        //DX20210315 [OBSOLETE]if(atoms_overlapping == false) {
+        //DX20210315 [OBSOLETE]  consistent_ratio = GCD_conventional_atomic_basis(conventional_basis_atoms, prim_split_atom_types, prim_GCD);
+        //DX20210315 [OBSOLETE]}
+        //DX20210315 [OBSOLETE]if(consistent_ratio == false) {
+        //DX20210315 [OBSOLETE]  if(LDEBUG) { cerr << "SYM::ConventionalCell: WARNING: Conventional cell atomic basis ratio is inconsistent with the primitive cell! Recalculating. [dir=" << xstr.directory << "]." << endl; }
+        //DX20210315 [OBSOLETE]  symmetryfound = false;
+        //DX20210315 [OBSOLETE]  continue;
+        //DX20210315 [OBSOLETE]}
+
+        //DX20210315 [OBSOLETE]// ========== Rearrange atoms/Store ========== //
+        //DX20210315 [OBSOLETE]sort(conventional_basis_atoms.begin(), conventional_basis_atoms.end(), sortAtomsTypes);
+
+        //DX20210315 [OBSOLETE]xstr_out.lattice_label_ITC = lattice_char;
+        //DX20210315 [OBSOLETE]xstr_out.lattice = CL;
+
+        //DX20210315 [OBSOLETE]vector<string> in_names;
+        //DX20210315 [OBSOLETE]for (uint c = 0; c < conventional_basis_atoms.size(); c++) {
+        //DX20210315 [OBSOLETE]  conventional_basis_atoms[c].fpos = C2F(xstr_out.lattice, conventional_basis_atoms[c].cpos);
+        //DX20210315 [OBSOLETE]  in_names.push_back(conventional_basis_atoms[c].name);
+        //DX20210315 [OBSOLETE]}
+
+        //DX20210315 [OBSOLETE]xstr_out.ReplaceAtoms(conventional_basis_atoms, false); //DX20210129
+        //DX20210315 [OBSOLETE]//DX20210129 [OBSOLETE] //Remove old atomic basis
+        //DX20210315 [OBSOLETE]//DX20210129 [OBSOLETE] while (xstr_out.atoms.size() > 0) {
+        //DX20210315 [OBSOLETE]//DX20210129 [OBSOLETE]   xstr_out.RemoveAtom((uint)0);
+        //DX20210315 [OBSOLETE]//DX20210129 [OBSOLETE] }
+        //DX20210315 [OBSOLETE]//DX20210129 [OBSOLETE] xstr_out.species.clear();
+        //DX20210315 [OBSOLETE]//DX20210129 [OBSOLETE] // Add new atomic basis
+        //DX20210315 [OBSOLETE]//DX20210129 [OBSOLETE] for (uint c = 0; c < conventional_basis_atoms.size(); c++) {
+        //DX20210315 [OBSOLETE]//DX20210129 [OBSOLETE]   xstr_out.AddAtom(conventional_basis_atoms[c]);
+        //DX20210315 [OBSOLETE]//DX20210129 [OBSOLETE] }
+
+        //DX20210315 [OBSOLETE]//DX20190410 START
+        //DX20210315 [OBSOLETE]// Check if AddAtom removed atoms
+        //DX20210315 [OBSOLETE]if(xstr_out.atoms.size() != conventional_basis_atoms.size()){
+        //DX20210315 [OBSOLETE]  if(LDEBUG) {
+        //DX20210315 [OBSOLETE]    cerr << "SYM::ConventionalCell: AddAtom() removed conventional basis atoms due to the tolerance value. Change the tolerance." << endl;
+        //DX20210315 [OBSOLETE]  }
+        //DX20210315 [OBSOLETE]  symmetryfound = false;
+        //DX20210315 [OBSOLETE]  return xstr_out;
+        //DX20210315 [OBSOLETE]}
+        //DX20210315 [OBSOLETE]//DX20190410 END
+
+        //DX20210315 [OBSOLETE]// Set number of each type
+        //DX20210315 [OBSOLETE]//DX20210129 [OBSOLETE - ReplaceAtoms takes care of this] xstr_out.SetNumEachType();
+        //DX20210315 [OBSOLETE]if(xstr_out.num_each_type.size() != in_names.size()) {
+        //DX20210315 [OBSOLETE]  xstr_out = pflow::SetAllAtomNames(xstr_out, in_names);
+        //DX20210315 [OBSOLETE]}
+        //DX20210315 [OBSOLETE]xstr_out.FixLattices();
 
         // ************************************************************************************************
         // Check if lattice and crystal symmetry are commensurate
@@ -1733,7 +1742,8 @@ namespace SYM {
         centering[4] = 'F';
         centering[5] = 'C';
         xstr_out.bravais_label_ITC = centering[bravais_count];
-        string pearson_symbol = getPearsonSymbol(xstr_out.bravais_label_ITC, lattice_char, conventional_basis_atoms);
+        //DX20210316 [OBSOLETE] string pearson_symbol = getPearsonSymbol(xstr_out.bravais_label_ITC, lattice_char, conventional_basis_atoms);
+        string pearson_symbol = getPearsonSymbol(xstr_out.bravais_label_ITC, lattice_char, xstr_out.atoms);
 
         if(LDEBUG) { cerr << "SYM::ConventionalCell: Pearson: " << pearson_symbol << " [dir=" << xstr.directory << "]." << endl; }
         checkops = check_ccell(xstr_out,ITC_sym_info); //DX20190215 - add ITC sym info
@@ -1774,6 +1784,7 @@ namespace SYM {
 
           // Reduce conventional cell into a primitive form
           xstr.GetPrimitiveCell();
+          prim = xstr; //DX20210316 - store primitive
 
           L = xstr.lattice;
           Linv = aurostd::inverse(L);
@@ -3066,7 +3077,7 @@ namespace SYM {
           symcount++;
           xmatrix<double> Rf = ITC_sym_info.sym_mats[SYMINDEX[i]];  //Uf  //CO
           string sym_symbol = ITC_sym_info.symbol[SYMINDEX[i]];
-          //cerr << "testing " << ITC_sym_info.symbol[SYMINDEX[i]] << endl;
+          //cerr << i << " testing " << ITC_sym_info.symbol[SYMINDEX[i]] << endl;
           xvector<double> T;
           vector<int> atom_map;
           vector<int> type_map;

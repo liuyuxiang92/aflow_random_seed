@@ -2358,6 +2358,7 @@ namespace aurostd {
     if(aurostd::FileExist("/usr/sbin/"+command)) {position="/usr/sbin/"+command;return TRUE;}  // go around path
     if(aurostd::FileExist("/usr/local/bin/"+command)) {position="/usr/local/bin/"+command;return TRUE;}  // go around path
     if(aurostd::FileExist("/usr/local/sbin/"+command)) {position="/usr/local/sbin/"+command;return TRUE;}  // go around path
+    if(aurostd::FileExist("/usr/local/maui/bin/"+command)) {position="/usr/local/maui/bin/"+command;return TRUE;}  // go around path  //CO20200526
     position="";
     return FALSE;
   }

@@ -57,6 +57,64 @@
 //[OBSOLETE]//CO20180419 - global exception handling - STOP
 
 
+bool SchemaTest(ostream& oss){ofstream FileMESSAGE;return SchemaTest(FileMESSAGE,oss);}
+bool SchemaTest(ofstream& FileMESSAGE,ostream& oss) {
+  string function = XPID+"SchemaTest()";
+  _aflags aflags; aflags.Directory = ".";
+  stringstream message;
+  bool all_passed = true, check_passed = true;
+
+  message << "Performing schema test.";
+  pflow::logger(_AFLOW_FILE_NAME_, function, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+
+  message << "Checking for internal consistency of XHOST.vschema.";
+  pflow::logger(_AFLOW_FILE_NAME_, function, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+  vector<string> vschema_keys, vschema_types;
+  string schema_types = "UNIT,TYPE";
+  aurostd::string2tokens(schema_types, vschema_types, ",");
+  string key = "";
+  check_passed = true;
+  for (uint i = 0; i < XHOST.vschema.vxsghost.size(); i+= 2) {
+    if(XHOST.vschema.vxsghost[i].find("::NAME:") != string::npos) {
+      key=aurostd::RemoveSubString(XHOST.vschema.vxsghost[i], "SCHEMA::NAME:");
+      vschema_keys.push_back(XHOST.vschema.getattachedscheme("SCHEMA::NAME:" + key));
+      for (uint j = 0; j < vschema_types.size(); j++) {
+        if (!XHOST.vschema.isdefined("SCHEMA::" + vschema_types[j] + ":" + key)) {
+          check_passed = false;
+          message << "SCHEMA::" << vschema_types[j] << ":" << key << " not found.";
+          pflow::logger(_AFLOW_FILE_NAME_, function, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+        }
+      }
+    }
+  }
+  message << "Schema internal consistency check " << (check_passed?"passed":"failed") << ".";
+  pflow::logger(_AFLOW_FILE_NAME_, function, message, aflags, FileMESSAGE, oss, (check_passed?_LOGGER_COMPLETE_:_LOGGER_ERROR_));
+  all_passed = (all_passed && check_passed);
+
+  message << "Checking for consistency between _aflowlib_entry json and schema.";
+  pflow::logger(_AFLOW_FILE_NAME_, function, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+  aflowlib::_aflowlib_entry aentry;
+  string aflowlib_json = aentry.aflowlib2string("JSON", true);
+  vector<string> json_keys = aurostd::extractJsonKeysAflow(aflowlib_json);
+
+  string keys_ignore = "data_language,error_status,natoms_orig,density_orig,volume_cell_orig,volume_atom_orig,spinD_magmom_orig";
+  vector<string> vkeys_ignore;
+  aurostd::string2tokens(keys_ignore, vkeys_ignore, ",");
+  check_passed = true;
+  for (uint i = 0; i < json_keys.size(); i++) {
+    if (!aurostd::WithinList(vkeys_ignore, json_keys[i]) && !aurostd::WithinList(vschema_keys, json_keys[i])) {
+      check_passed = false;
+      message << json_keys[i] << " not found in schema.";
+      pflow::logger(_AFLOW_FILE_NAME_, function, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+    }
+  }
+  message << "Consistency check between schema and aflowlib.json " << (check_passed?"passed":"failed") << ".";
+  pflow::logger(_AFLOW_FILE_NAME_, function, message, aflags, FileMESSAGE, oss, (check_passed?_LOGGER_COMPLETE_:_LOGGER_ERROR_));
+  all_passed = (all_passed && check_passed);
+
+  return all_passed;
+}
+
 bool CeramGenTest(ostream& oss){ofstream FileMESSAGE;return CeramGenTest(FileMESSAGE,oss);}  //CO20190520
 bool CeramGenTest(ofstream& FileMESSAGE,ostream& oss){  //CO20190520
   string soliloquy="CeramGenTest():";
@@ -747,6 +805,7 @@ int main(int _argc,char **_argv) {
       }
       return 0; //CO20180419
     }
+    if(!Arun && aurostd::args2flag(argv,cmds,"--test_schema|--schema_test")) {return (SchemaTest()?0:1);}  //ME20210408
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_CeramGen|--CeramGen_test")) {return (CeramGenTest()?0:1);}  //CO20190601
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_Egap|--Egap_test")) {return (EgapTest()?0:1);}  //CO20190601
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_gcd|--gcd_test")) {return (gcdTest()?0:1);}  //CO20190601
@@ -1484,6 +1543,8 @@ namespace aflow {
       oss << "       51                              not initialized                    _RUNTIME_INIT_            " << endl;
       oss << "       52                              SQL error                          _RUNTIME_SQL_             " << endl;
       oss << "       53                              busy                               _RUNTIME_BUSY_            " << endl;
+      oss << "       54                              external command not found         _RUNTIME_EXTERNAL_MISS_   " << endl;  //CO20200531
+      oss << "       55                              external command failed            _RUNTIME_EXTERNAL_FAIL_   " << endl;  //CO20200531
       oss << "       60       Allocation Error       generic                            _ALLOC_ERROR_             " << endl;
       oss << "       61                              could not allocate memory          _ALLOC_ALLOCATE_          " << endl;
       oss << "       62                              insufficient memory                _ALLOC_INSUFFICIENT_      " << endl;

@@ -77,6 +77,7 @@ namespace symbolic{ //DX20200625
   {
     public: CloningSymbolicInterface();
             CloningSymbolicInterface(const CloningSymbolicInterface &);
+            CloningSymbolicInterface &operator=(const CloningSymbolicInterface &); //DX20210420 - to fix warnings for gcc>10, need explicit declaration
   };
 
   class SymbolicProxy: public SymbolicInterface,
