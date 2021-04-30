@@ -189,6 +189,9 @@ mac:
 #.PHONY: mac_static
 #mac_static: mac
 #	tar Jcfvp aflow_$(VERSNUMBER)_maxOSX_10.X.X.tar.xz aflow aflow_data
+.PHONY: production
+production: 
+	$(MAKE) OPTS="$(OPTS) -D__XOPTIMIZE" OPTS_MT="$(OPTS_MT) -D__XOPTIMIZE"
 
 
 ###################################################################################################

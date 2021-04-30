@@ -1270,7 +1270,10 @@ void GetUnitCellRep(const xvector<double>& ppos,xvector<double>& p_cell0,xvector
 string xstructure2json(xstructure& xstr); //DX20170831 - xstructure2json
 string atom2json(_atom& atom, int coord_flag, int poccupation); //DX20170831 - atom2json
 
-vector<string> getLeastFrequentAtomTypes(const xstructure& xstr, bool clean=true); //DX20201230 - moved from XtalFinder
+vector<uint> getAtomIndicesByType(const xstructure& xstr, int type); //DX20210322
+vector<uint> getAtomIndicesByName(const xstructure& xstr, const string& name); //DX20210322
+vector<uint> getLeastFrequentAtomTypes(const xstructure& xstr); //DX20210322
+vector<string> getLeastFrequentAtomSpecies(const xstructure& xstr, bool clean=true); //DX20201230 - moved from XtalFinder
 
 // --------------------------------------------------------------------------
 class _sym_op {
@@ -1533,6 +1536,7 @@ class xstructure {
     void BringInCell(double tolerance=_ZERO_TOL_, double upper_bound=1.0, double lower_bound=0.0); //DX20190904
     void BringInCompact(void);                                    // Bring all the atoms near the origin
     void BringInWignerSeitz(void);                                // Bring all the atoms in the Wigner Seitz Cell
+    void GetPrimitive_20210322(double eps=AUROSTD_MAX_DOUBLE);    // Make it primitive, if possible //DX20210323
     void GetPrimitive(void);                                      // Make it primitive, if possible
     void GetPrimitive(double tol);                                // Make it primitive, if possible
     void GetPrimitive1(void);                                     // Make it primitive, if possible
@@ -1757,7 +1761,8 @@ class xstructure {
     // SYMMETRY TOLERANCE ----------------------------
     bool sym_eps_calculated;                                      // was it calculated automatically per symmetry operations (aflowSYM)?
     double sym_eps;                                               // universal tolerance for symmetry (dictates resolution and mapping tolerances)                     
-    uint sym_eps_change_count;                                  // universal tolerance count for symmetry //DX20180223 - added count to xstructure
+    uint sym_eps_change_count;                                    // universal tolerance count for symmetry //DX20180223 - added count to xstructure
+    bool sym_eps_no_scan;                                         // do not use tolerance scan (forced by user or because the scan terminated) //DX20210331
     //DX+CO END
     // POINT GROUP                                                // POINT GROUP LATTICE
     std::vector<_sym_op> pgroup;                                  // rotations/inversions operations
@@ -2440,6 +2445,7 @@ xstructure GetPrimitiveVASP(const xstructure& a,double tol);
 xstructure BringInCompact(const xstructure& a);
 xstructure BringInWignerSeitz(const xstructure& a);
 // primitive stuff
+xstructure GetPrimitive_20210322(const xstructure& a,double eps=AUROSTD_MAX_DOUBLE); //DX20210323
 xstructure GetPrimitive(const xstructure& a);
 xstructure GetPrimitive(const xstructure& a,double tol);
 xstructure GetPrimitive1(const xstructure& a);

@@ -114,7 +114,7 @@ namespace SYM {
           for(uint b=0;b<lattice_lengths[j].size();b++){
             min_dist = aurostd::min(min_dist,aurostd::modulus(lattice_lengths[i][a]+lattice_lengths[j][b]));
             min_dist = aurostd::min(min_dist,aurostd::modulus(lattice_lengths[i][a]-lattice_lengths[j][b]));
-#ifdef DEBUG_MINIMUM_DISTANCE
+#if DEBUG_MINIMUM_DISTANCE
             if(LDEBUG) {cerr << function_name << " lattice_vectors: a=" << lattice_indices[i][a] << ",b=" << lattice_indices[j][b] << "; min_dist=" << min_dist << endl;}
 #endif
           }
@@ -165,7 +165,7 @@ namespace SYM {
                 min_dist = aurostd::min(min_dist,aurostd::modulus(subtracted-lattice_lengths[k][c]));
                 min_dist = aurostd::min(min_dist,aurostd::modulus(added-lattice_lengths[k][c]));
                 min_dist = aurostd::min(min_dist,aurostd::modulus(subtracted+lattice_lengths[k][c]));
-#ifdef DEBUG_MINIMUM_DISTANCE
+#if DEBUG_MINIMUM_DISTANCE
                 if(LDEBUG) {cerr << function_name << " lattice_vectors: a=" << lattice_indices[i][a] << ",b=" << lattice_indices[j][b] << ",c=" << lattice_indices[k][c] << "; min_dist=" << min_dist << endl;}
 #endif
               }
@@ -237,7 +237,7 @@ namespace SYM {
             for(uint p=0;p<l3.size();p++){
               tmp = ab_component + l3[p];                       //DX : coord1-coord2+a*lattice(1) + (b*lattice(2)) + (c*lattice(3))
               min_dist=aurostd::min(min_dist,aurostd::modulus(tmp));
-#ifdef DEBUG_MINIMUM_DISTANCE
+#if DEBUG_MINIMUM_DISTANCE
               if(LDEBUG) {cerr << function_name << " atoms[" << i << "," << k << "]: a=" << a_index[m] << ",b=" << b_index[n] << ",c=" << c_index[p] << "; min_dist=" << min_dist << "; this_dist=" << aurostd::modulus(tmp) << endl;}
 #endif
             }
@@ -357,6 +357,7 @@ namespace SYM {
     double sign = 1.0;
     double orig_range = 0.0;
     double range = 0.0;
+    double change_count_max = 41; //DX20210406
 
     double incomming_tolerance = tolerance; //store current tolerance
     double orig_tolerance = 0; 
@@ -387,7 +388,7 @@ namespace SYM {
       else {  //if odd, scan up
         sign = 1.0;
       }    
-      if(!no_scan){
+      if(!no_scan && xstr.sym_eps_change_count<=change_count_max){ //DX20210330 - check cycle count
         if(range<=max_range){
           tolerance = std::pow(10.0,(std::log10(orig_tolerance)+(sign*range)));
           if(tolerance >= min_dist){ //if larger than min distance, force lower scan
@@ -410,6 +411,7 @@ namespace SYM {
         else {
           cerr << "SYM::change_tolerance WARNING: Inconsistent symmetry, tolerance range (" << std::pow(10.0,(std::log10(orig_tolerance)-(max_range))) << " to " << std::pow(10.0,(std::log10(orig_tolerance)+(max_range))) << ") tested [dir=" << directory << "]." << endl; //DX20180426 - changed xstr.directory to directory (pwd)
           //count -=1;
+          xstr.sym_eps_change_count += 1; //DX20210330 - need to increase the count here too
           no_scan = true;
           tolerance = orig_tolerance; //DX20170906
           return FALSE;
@@ -603,7 +605,7 @@ namespace SYM {
       for(uint j=0;j<l2.size();j++){
         ab_component = a_component + l2[j]; //DX : cpos1-cpos2+a*lattice(1) + (b+lattice(2))
         for(uint k=0;k<l3.size();k++){
-          tmp = ab_component + l3[k];                       //DX : cpos1-cpos2+a*lattice(1) + (b+lattice(2)) + (c+lattice(3))
+          tmp = ab_component + l3[k];       //DX : cpos1-cpos2+a*lattice(1) + (b+lattice(2)) + (c+lattice(3))
           mod_tmp = aurostd::modulus(tmp);
           if(mod_tmp<min_mod){
             min_mod = mod_tmp;
@@ -3055,6 +3057,7 @@ namespace SYM {
     for(uint i=0;i<pgf.size()&&!pg_found;i++) {
       if(MapOperations(operations,pgf.at(i))) {pg_found=TRUE;pgname=pgn.at(i);}
     }
+
     return pg_found;
   }
 }
@@ -3062,9 +3065,9 @@ namespace SYM {
 namespace SYM {
   bool PointGroupLookUpTable(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,string format){
     ostringstream aus;
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
-    DEBUG_SYMMETRY=DEBUG_SYMMETRY || LDEBUG;    
-    if(DEBUG_SYMMETRY) cerr << "DEBUG: SYM::CalculatePointGroupCrystal [3]" << endl;
+    bool LDEBUG=(FALSE || XHOST.DEBUG || DEBUG_SYMMETRY);
+    string function_name = "SYM::PointGroupLookUpTable():";
+    if(LDEBUG) cerr << function_name << " BEGIN" << endl;
     bool Krun=TRUE;
     string message="PGROUP_XTAL";
 
@@ -3141,6 +3144,7 @@ namespace SYM {
     //DX20170916 [OBSOLETE]    //   cerr << pgname << endl;
 
     bool pg_found = PointGroupMap(a,pgname,operations,_PGROUP_XTAL_); //DX20170906
+    if(LDEBUG){ cerr << function_name << " point group symbol: " << pgname << endl; } //DX20210327
     // -------------------------------------------------------------------- scanning  ORDER=48
     if(pgname=="m-3m") {
       pg_found=TRUE;
@@ -8292,6 +8296,8 @@ string EquivalentAtomsToJson(vector<vector<int> >& iatoms){
 ////DX20170802 END: Adding symmetry output formatting option
 
 bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char mode,const bool& osswrite,ostream& oss,const string& format) { //DX20170802
+  string function_name = XPID + "KBIN_SymmetryWrite():";
+  stringstream message;
   ostringstream aus;
   xvector<double> aux_rrr(9),aux_ijk(9);
   bool Krun=TRUE;
@@ -8336,6 +8342,10 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
     FileOUTPUT << _lines_ << endl;
   } //DX20170802
   if(mode==_PGROUP_) {
+    if(a.pgroup.empty()){ //DX20210327 - check if empty
+      message << "No PGROUP (lattice point group) operations! Symmetry calculation failed (bug).";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
+    }
     if(aurostd::toupper(format)=="TXT" || aurostd::toupper(format)=="TEXT"){ //DX20200206
       FileOUTPUT << "AFLOW point group file, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
       FileOUTPUT << a.pgroup.size() << "    point group operations " << endl;
@@ -8357,6 +8367,10 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
     aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUP Symmetry: writing END " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
   }
   if(mode==_PGROUP_XTAL_) {
+    if(a.pgroup_xtal.empty()){ //DX20210327 - check if empty
+      message << "No PGROUP_XTAL (crystal point group) operations! Symmetry calculation failed (bug).";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
+    }
     if(aurostd::toupper(format)=="TXT" || aurostd::toupper(format)=="TEXT"){ //DX20200206
       FileOUTPUT << "AFLOW crystal point group file, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
       FileOUTPUT << a.pgroup_xtal.size() << "    crystal point group operations " << endl;
@@ -8379,6 +8393,10 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
   }
   //DX20171205 - Added pgroupk_xtal - START
   if(mode==_PGROUPK_XTAL_) {
+    if(a.pgroupk_xtal.empty()){ //DX20210327 - check if empty
+      message << "No PGROUPK_XTAL (dual of crystal point group) operations! Symmetry calculation failed (bug).";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
+    }
     if(aurostd::toupper(format)=="TXT" || aurostd::toupper(format)=="TEXT"){ //DX20200206
       FileOUTPUT << "AFLOW dual of crystal point group file, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
       FileOUTPUT << a.pgroupk_xtal.size() << "    dual of crystal point group operations " << endl;
@@ -8401,6 +8419,10 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
   }
   //DX20171205 - Added pgroupk_xtal - END
   if(mode==_PGROUPK_) {
+    if(a.pgroupk.empty()){ //DX20210327 - check if empty
+      message << "No PGROUPK (dual of lattice point group) operations! Symmetry calculation failed (bug).";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
+    }
     if(aurostd::toupper(format)=="TXT" || aurostd::toupper(format)=="TEXT"){ //DX20200206
       FileOUTPUT << "AFLOW point group klattice file, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
       FileOUTPUT << a.pgroupk.size() << "    point group operations " << endl;
@@ -8422,6 +8444,10 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
     aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUPK Symmetry: writing END " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
   }
   if(mode==_PGROUPK_PATTERSON_) { //DX20200129
+    if(a.pgroupk_Patterson.empty()){ //DX20210327 - check if empty
+      message << "No PGROUPK_PATTERSON (Patterson point group) operations! Symmetry calculation failed (bug).";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
+    }
     if(aurostd::toupper(format)=="TXT" || aurostd::toupper(format)=="TEXT"){ //DX20200206
       FileOUTPUT << "AFLOW Patterson point group file, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
       FileOUTPUT << a.pgroupk_Patterson.size() << "    Patterson point group operations " << endl;
@@ -8443,6 +8469,10 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
     aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUPK_PATTERSON Symmetry: writing END " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
   }
   if(mode==_FGROUP_) {
+    if(a.fgroup.empty()){ //DX20210327 - check if empty
+      message << "No FGROUP (factor group representative, unit cell symmetry) operations! Symmetry calculation failed (bug).";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
+    }
     if(aurostd::toupper(format)=="TXT" || aurostd::toupper(format)=="TEXT"){ //DX20200206
       FileOUTPUT << "AFLOW factor group file, operations are as a=U*b+tau (cols vectors), (Uc,Uf,ctau,ftau for cartesian/fractional)" << endl;
       FileOUTPUT << a.fgroup.size() << "    factor group operations " << endl;
@@ -8464,6 +8494,10 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
     aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: writing END " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
   }
   if(mode==_SGROUP_) {
+    if(a.sgroup.empty()){ //DX20210327 - check if empty
+      message << "No SGROUP (space group) operations! Symmetry calculation failed (bug).";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
+    }
     if(aurostd::toupper(format)=="TXT" || aurostd::toupper(format)=="TEXT"){ //DX20200206
       FileOUTPUT << "AFLOW space group file, operations are as a=U*b+tau+trasl (cols vectors), (Uc,Uf,ctau,ftau,ctrasl,ftrasl for cartesian/fractional)" << endl;
       FileOUTPUT << a.sgroup.size() << "    space group operations " << endl;
@@ -8487,6 +8521,10 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
     aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "SGROUP Symmetry: writing END " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
   }
   if(mode==_AGROUP_) {
+    if(a.agroup.empty()){ //DX20210327 - check if empty
+      message << "No AGROUP (site point group) operations! Symmetry calculation failed (bug).";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
+    }
     if(aurostd::toupper(format)=="TXT" || aurostd::toupper(format)=="TEXT"){ //DX20200206
       FileOUTPUT << "AFLOW site point group file centered on the site, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
       for(uint iat=0;iat<a.atoms.size();iat++) {
@@ -8512,6 +8550,10 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
     aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "AGROUP Symmetry: writing END " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
   }
   if(mode==_IATOMS_) {
+    if(a.iatoms.empty()){ //DX20210327 - check if empty
+      message << "No IATOMS (inequivalent atoms)! Symmetry calculation failed (bug).";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
+    }
     if(aurostd::toupper(format)=="TXT" || aurostd::toupper(format)=="TEXT"){ //DX20200206
       FileOUTPUT << "Equivalent atoms file " << endl;
       FileOUTPUT << _lines_ << endl;
@@ -8549,11 +8591,17 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
 //
 // This function prints to screen all the symmetry elements for a given structure 
 bool KBIN_SymmetryToScreen(xstructure& a, string& format, ostream& oss, char mode){
+  string function_name = XPID + "KBIN_SymmetryToScreen():";
+  stringstream message;
   // OUT format
   if(aurostd::toupper(format)=="TXT" || aurostd::toupper(format)=="TEXT"){ //DX20200206
     xvector<double> aux_rrr(9),aux_ijk(9);
     string _lines_="------------------------------------------------------------------------------------------------";
     if(mode == '\0' || mode == _PGROUP_){
+      if(a.pgroup.empty()){ //DX20210327 - check if empty
+        message << "No PGROUP (lattice point group) operations! Symmetry calculation failed (bug).";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
+      }
       oss << "AFLOW point groups, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
       oss << a.pgroup.size() << "    point group operations " << endl;
       for(uint k=0;k<a.pgroup.size();k++) {
@@ -8567,6 +8615,10 @@ bool KBIN_SymmetryToScreen(xstructure& a, string& format, ostream& oss, char mod
       }
     }
     if(mode == '\0' || mode == _PGROUPK_){
+      if(a.pgroupk.empty()){ //DX20210327 - check if empty
+        message << "No PGROUPK (dual of lattice point group) operations! Symmetry calculation failed (bug).";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
+      }
       oss << "AFLOW point groups klattice, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
       oss << a.pgroupk.size() << "    point group operations " << endl;
       for(uint k=0;k<a.pgroupk.size();k++) {
@@ -8580,6 +8632,10 @@ bool KBIN_SymmetryToScreen(xstructure& a, string& format, ostream& oss, char mod
       }
     }
     if(mode == '\0' || mode == _FGROUP_){
+      if(a.fgroup.empty()){ //DX20210327 - check if empty
+        message << "No FGROUP (factor group representative, unit cell symmetry) operations! Symmetry calculation failed (bug).";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
+      }
       oss << "AFLOW factor groups, operations are as a=U*b+tau (cols vectors), (Uc,Uf,ctau,ftau for cartesian/fractional)" << endl;
       oss << a.fgroup.size() << "    factor group operations " << endl;
       for(uint k=0;k<a.fgroup.size();k++) {
@@ -8592,6 +8648,10 @@ bool KBIN_SymmetryToScreen(xstructure& a, string& format, ostream& oss, char mod
       }
     }
     if(mode == '\0' || mode == _PGROUP_XTAL_){
+      if(a.pgroup_xtal.empty()){ //DX20210327 - check if empty
+        message << "No PGROUP_XTAL (crystal point group) operations! Symmetry calculation failed (bug).";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
+      }
       oss << "AFLOW crystal point groups, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
       oss << a.pgroup_xtal.size() << "    point group operations " << endl;
       for(uint k=0;k<a.pgroup_xtal.size();k++) {
@@ -8606,6 +8666,10 @@ bool KBIN_SymmetryToScreen(xstructure& a, string& format, ostream& oss, char mod
     }
     //DX20171205 - Added pgroupk_xtal - START
     if(mode == '\0' || mode == _PGROUPK_XTAL_){
+      if(a.pgroupk_xtal.empty()){ //DX20210327 - check if empty
+        message << "No PGROUPK_XTAL (dual of crystal point group) operations! Symmetry calculation failed (bug).";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
+      }
       oss << "AFLOW dual of crystal point groups, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
       oss << a.pgroupk_xtal.size() << "    dual of crystal point group operations " << endl;
       for(uint k=0;k<a.pgroupk_xtal.size();k++) {
@@ -8621,6 +8685,10 @@ bool KBIN_SymmetryToScreen(xstructure& a, string& format, ostream& oss, char mod
     //DX20171205 - Added pgroupk_xtal - END
     //DX20200129 - Patterson symmetry - START
     if(mode == '\0' || mode == _PGROUPK_PATTERSON_){
+      if(a.pgroupk_Patterson.empty()){ //DX20210327 - check if empty
+        message << "No PGROUPK_PATTERSON (Patterson point group) operations! Symmetry calculation failed (bug).";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
+      }
       oss << "AFLOW Patterson point groups, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
       oss << a.pgroupk_Patterson.size() << "    point group operations " << endl;
       for(uint k=0;k<a.pgroupk_Patterson.size();k++) {
@@ -8635,6 +8703,10 @@ bool KBIN_SymmetryToScreen(xstructure& a, string& format, ostream& oss, char mod
     }
     //DX20200129 - Patterson symmetry - END
     if(mode == '\0' || mode == _SGROUP_){
+      if(a.sgroup.empty()){ //DX20210327 - check if empty
+        message << "No SGROUP (space group) operations! Symmetry calculation failed (bug).";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
+      }
       oss << "AFLOW - space groups, operations are as a=U*b+tau+trasl (cols vectors), (Uc,Uf,ctau,ftau,ctrasl,ftrasl for cartesian/fractional)" << endl;
       oss << a.sgroup.size() << "    space group operations " << endl;
       oss << a.sgroup_radius << "    radius of space group " << endl;
@@ -8650,6 +8722,10 @@ bool KBIN_SymmetryToScreen(xstructure& a, string& format, ostream& oss, char mod
       }
     }
     if(mode == '\0' || mode == _AGROUP_){
+      if(a.agroup.empty()){ //DX20210327 - check if empty
+        message << "No AGROUP (site point group) operations! Symmetry calculation failed (bug).";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
+      }
       oss << "AFLOW site point groups centered on the site, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
       for(uint iat=0;iat<a.atoms.size();iat++) {
         oss << " Site="  << iat << endl;
@@ -8666,6 +8742,10 @@ bool KBIN_SymmetryToScreen(xstructure& a, string& format, ostream& oss, char mod
       }   
     }   
     if(mode == '\0' || mode == _IATOMS_){
+      if(a.iatoms.empty()){ //DX20210327 - check if empty
+        message << "No IATOMS (inequivalent atoms)! Symmetry calculation failed (bug).";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
+      }
       oss << "Equivalent atoms" << endl;
       oss << _lines_ << endl;
       for(uint iat1=0;iat1<a.iatoms.size();iat1++) {
