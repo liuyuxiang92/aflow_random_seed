@@ -3552,9 +3552,11 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
     if(first_run_or_new_tol == true) {
       sym_eps = xstr.sym_eps; //DX20180226 - added sym eps temp variable
       sym_eps_change_count = xstr.sym_eps_change_count; //DX20180226 - added sym eps change count
+      no_scan = xstr.sym_eps_no_scan; //DX20210430 - added no_scan
       xstr = xstr_orig;
       xstr.sym_eps = sym_eps; //DX20190314 - need to update sym_eps, since the structure was overwritten 
       xstr.sym_eps_change_count = sym_eps_change_count; //DX20180423 - need to update change count, since the structure was overwritten 
+      xstr.sym_eps_no_scan = no_scan; //DX20210430 - added no_scan
       CCell.free();
       xstr.MinkowskiBasisReduction();
       //DX20210401 [OBSOLETE] xstr.GetPrimitiveCell();
@@ -3577,8 +3579,10 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
       if(!no_scan){
         SYM::change_tolerance(xstr,xstr.sym_eps, min_dist, no_scan); //DX20190215 - _SYM_TOL_ to xstr.sym_eps
         sym_eps_change_count = xstr.sym_eps_change_count; //DX20180226 - added sym eps change count
+        xstr.sym_eps_no_scan = no_scan; //DX20210430 - added no_scan
       }
       else {
+        (*this).sym_eps_no_scan = no_scan; //DX20210430 - added no_scan
         return 0;
       }
       first_run_or_new_tol = true;
@@ -3618,8 +3622,10 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
         if(!no_scan){
           SYM::change_tolerance(xstr,xstr.sym_eps, min_dist, no_scan); //DX20190215 - _SYM_TOL_ to xstr.sym_eps
           sym_eps_change_count = xstr.sym_eps_change_count; //DX20180226 - added sym eps change count
+          xstr.sym_eps_no_scan = no_scan; //DX20180226 - added sym eps change count
         }
         else {
+          (*this).sym_eps_no_scan = no_scan; //DX20210430 - added no_scan
           return 0;
         }
         first_run_or_new_tol = true;
@@ -3642,8 +3648,10 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
         if(!no_scan){
           SYM::change_tolerance(xstr,xstr.sym_eps, min_dist, no_scan); //DX20190215 - _SYM_TOL_ to xstr.sym_eps
           sym_eps_change_count = xstr.sym_eps_change_count; //DX20180226 - added sym eps change count
+          xstr.sym_eps_no_scan = no_scan; //DX20210430 - added no_scan
         }
         else {
+          (*this).sym_eps_no_scan = no_scan; //DX20210430 - added no_scan
           return 0;
         }
         first_run_or_new_tol = true;
@@ -4197,6 +4205,7 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
   }
   (*this).sym_eps = CCell.sym_eps; //DX20190215 - _SYM_TOL to CCell.sym_eps, redundant, but safe
   (*this).sym_eps_change_count = sym_eps_change_count; //DX20180226 - added sym eps change count
+  (*this).sym_eps_no_scan = no_scan; //DX20210430 - added no_scan
 
   // ***********************************************************************************************************************************
   // Prepare/Create Wyccar

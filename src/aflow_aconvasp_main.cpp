@@ -5497,7 +5497,7 @@ namespace pflow {
     bool already_calculated = false;
     bool standalone = true;
     if(smode == "EDATA" || smode == "DATA"){
-      oss << PrintData(a, smode, ftype, already_calculated, tolerance, no_scan, setting);
+      oss << PrintData(a, smode, ftype, already_calculated, tolerance, a.sym_eps_no_scan, setting);
     }
     else if(smode=="REAL_LATTICE"){
       oss << PrintRealLatticeData(a, "EDATA", ftype, standalone, already_calculated, tolerance);
@@ -5512,7 +5512,7 @@ namespace pflow {
       oss << PrintReciprocalLatticeData(a, ftype, standalone, already_calculated, tolerance);
     }
     else if(smode=="SGDATA"){
-      oss << pflow::PrintSGData(a, ftype, standalone, already_calculated, tolerance, no_scan, setting, suppress_Wyckoff);
+      oss << pflow::PrintSGData(a, ftype, standalone, already_calculated, tolerance, a.sym_eps_no_scan, setting, suppress_Wyckoff);
     }
     
     return true;

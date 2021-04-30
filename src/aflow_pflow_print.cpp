@@ -3566,11 +3566,18 @@ namespace pflow {
       str_sg.SpaceGroup_ITC(sym_eps, -1, setting, no_scan);
     }
 
-    // get symmetry labels
-    string space_group_HM = GetSpaceGroupName(str_sg.space_group_ITC, str_sg.directory);
-    string space_group_Hall = GetSpaceGroupHall(str_sg.space_group_ITC, setting, str_sg.directory);
-    string space_group_Schoenflies = GetSpaceGroupSchoenflies(str_sg.space_group_ITC, str_sg.directory);
-    string class_Laue = GetLaueLabel(str_sg.point_group_ITC);
+    // ---------------------------------------------------------------------------
+    // get symmetry labels ("try" allows the function to continue if no_scan is true)
+    string space_group_HM="", space_group_Hall="", space_group_Schoenflies="", class_Laue="";
+    try {
+      space_group_HM = GetSpaceGroupName(str_sg.space_group_ITC, str_sg.directory);
+      space_group_Hall = GetSpaceGroupHall(str_sg.space_group_ITC, setting, str_sg.directory);
+      space_group_Schoenflies = GetSpaceGroupSchoenflies(str_sg.space_group_ITC, str_sg.directory);
+      class_Laue = GetLaueLabel(str_sg.point_group_ITC);
+    }
+    catch(aurostd::xerror& re){
+      if(!xstr.sym_eps_no_scan){ throw; } //DX20210430 - only throw if symmetry scan is implemented
+    }
 
     stringstream ss_output;
     ss_output.setf(std::ios::fixed,std::ios::floatfield);
