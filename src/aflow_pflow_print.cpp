@@ -1808,7 +1808,6 @@ namespace pflow {
 
       ss_output << json.toString(standalone); //standalone: determines if we enclose in brackets
       if(standalone) { ss_output << endl; }
-
     }
     else{
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Format type is not supported.",_INPUT_ILLEGAL_);

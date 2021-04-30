@@ -41,7 +41,7 @@ const double ROUNDOFF_TOL = pow(10,-CHULL_PRECISION+2); //make less stringent so
 const double ZERO_FULL_TOL = pow(10,-FULL_PRECISION);
 const double ZERO_COEF_TOL = pow(10,-COEF_PRECISION);
 const double ZERO_MEV_TOL = pow(10,-MEV_PRECISION);
-const double ENERGY_TOL = 0.015;                        //eV, CO NOTES - structures within this thresold may be equivalent, I've seen as large as 5meV, keep at 15 to be safe
+const double ENERGY_TOL = 0.015;                        //eV, CO NOTES - structures within this threshold may be equivalent, I've seen as large as 5meV, keep at 15 to be safe
 const int ZERO_RANGE_TOL = 1;
 //[CO20180316 - moved to aflowrc]const uint BINARY_ENTRIES_THRESHOLD = 200;
 
@@ -120,6 +120,7 @@ namespace chull {
   bool correctSignVerticalDistance(double dist_2_hull,bool should_be_positive);
   xvector<double> getTruncatedCoords(const xvector<double>& coords,const xvector<int>& elements_present); //truncated arbitrary coords
   vector<uint> getRelevantIndices(const xvector<int>& elements_present);
+  bool coordsIdentical(const xvector<double>& coords1,const xvector<double>& coords2);  //CO20210315
 } // namespace chull
 
 //CO20180420 - moved to xStream (aflow.h)
@@ -873,6 +874,7 @@ namespace chull {
       void setDecompositionCoefficients(uint i_nary,uint i_alloy,uint i_coord_group);
       void setOffHullProperties(uint i_nary,uint i_alloy);
       void setEquilibriumPhases(uint i_nary,uint i_alloy,uint i_coord_group);
+      bool phasesEquivalent(uint i_point1,uint i_point2,bool perform_structure_comparison) const;
       bool energiesDiffer(uint i_point1,uint i_point2,bool strict=true) const;
       bool spacegroupsDiffer(uint i_point1,uint i_point2,bool strict=true) const;
       bool structuresEquivalent(uint i_point1,uint i_point2) const;
