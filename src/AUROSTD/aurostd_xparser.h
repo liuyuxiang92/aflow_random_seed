@@ -103,6 +103,14 @@ namespace aurostd {
 //AS20210309 [BENCHMARK]   void run_vector_string_vs_json_test(void);
 //AS20210309 [BENCHMARK] }
 
+//ME2020408 - JSON reader
+//Moved from the AflowDB class
+
+namespace aurostd {
+  vector<string> extractJsonKeysAflow(const string& json);
+  string extractJsonValueAflow(const string& json, string key);
+}
+
 #endif // _AUROSTD_XPARSER_H_
 
 // **************************************************************************

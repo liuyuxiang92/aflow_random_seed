@@ -23,6 +23,12 @@
         -- added separate lattice functions for GetRealLatticeType(), GetCrystalPointGroupData(), GetSuperLatticeType() (DX)
         -- added rescale to sconv/sprim (DX+ME)
         -- consolidated space group setting options into function (getSpaceGroupSetting()), fixes missing "aflow" option in --sgdata (DX)
+        -- Added alloy property to database (ME)
+        -- Added functionality to convert entries to json and aflowlib entry formats (ME)
+        -- Improved vector callback function for SQLite (ME)
+        -- Minified database statistics file (ME)
+        -- Updated AFLOW schema (ME)
+        -- Added consistency checks for schema (ME)
         -- added AQueue, APartition, ANode, and --queue_status to aflow for auto-queue submission on qrats/quser (CO)
         -- fixed SymbolicC++ compilation warnings with gcc 10 and later (DX)
 3.2.8 - 2021/02/22

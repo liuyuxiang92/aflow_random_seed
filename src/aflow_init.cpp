@@ -2747,6 +2747,12 @@ namespace init {
     XHOST.vschema.push_attached("SCHEMA::TYPE:LOOP","strings");
     nschema++;
 
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:METAGGA","metagga");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:METAGGA","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:METAGGA","string");
+    nschema++;
+
     //AS20200915 BEGIN
     XHOST.vschema.push_attached("SCHEMA::NAME:MODULUS_BULK_QHA_300K","modulus_bulk_qha_300K");
     XHOST.vschema.push_attached("SCHEMA::UNIT:MODULUS_BULK_QHA_300K","GPa");
@@ -3050,6 +3056,12 @@ namespace init {
     XHOST.vschema.push_attached("SCHEMA::NAME:SPECIES_PP","species_pp");
     XHOST.vschema.push_attached("SCHEMA::UNIT:SPECIES_PP","");
     XHOST.vschema.push_attached("SCHEMA::TYPE:SPECIES_PP","strings");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:SPECIES_PP_AUID","species_pp_AUID");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:SPECIES_PP_AUID","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:SPECIES_PP_AUID","strings");
     nschema++;
 
     // schema is CAPITAL, content is not necessarily
