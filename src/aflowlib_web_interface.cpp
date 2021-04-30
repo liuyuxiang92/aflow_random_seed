@@ -947,7 +947,7 @@ namespace aflowlib {
     bond_aa=999999;bond_ab=999999;bond_bb=999999;
     vNsgroup.clear();vsgroup.clear();vstr.clear();  // apennsy
     // DONE
-    if(0) {							
+    if(0) {
       bool html=TRUE;
       oss << "Keywords" << endl;
       oss << "auid=" << auid << (html?"<br>":"") << endl;
@@ -1160,8 +1160,8 @@ namespace aflowlib {
       oss << "ael_applied_pressure=" << ael_applied_pressure << (html?"<br>":"") << endl; //CT20181212 
       oss << "ael_average_external_pressure=" << ael_average_external_pressure << (html?"<br>":"") << endl; //CT20181212 
       //ME20191105 BEGIN
-      oss << "ael_stiffness_tensor="; for (int i = 1; i <= 6; i++) {for (int j = 1; j <= 6; j++) oss << ael_stiffness_tensor[i][j]; oss << (html?"<br>":"") << endl;} //ME20191105
-      oss << "ael_compliance_tensor="; for (int i = 1; i <= 6; i++) {for (int j = 1; j <= 6; j++) oss << ael_compliance_tensor[i][j]; oss << (html?"<br>":"") << endl;} //ME20191105
+      oss << "ael_stiffness_tensor="; for (int i = ael_stiffness_tensor.lrows; i <= ael_stiffness_tensor.urows; i++) {for (int j = 1; j <= 6; j++) oss << ael_stiffness_tensor[i][j]; oss << (html?"<br>":"") << endl;} //ME20191105
+      oss << "ael_compliance_tensor="; for (int i = 1; i <= ael_compliance_tensor.lrows; i++) {for (int j = 1; j <= ael_compliance_tensor.urows; j++) oss << ael_compliance_tensor[i][j]; oss << (html?"<br>":"") << endl;} //ME20191105
       //ME20191105 END
       //AS20200901 BEGIN
       //QHA
@@ -1192,7 +1192,7 @@ namespace aflowlib {
   }
 
   // aflowlib2string 
-  string _aflowlib_entry::aflowlib2string(string mode) {
+  string _aflowlib_entry::aflowlib2string(string mode, bool PRINT_NULL) {
     string soliloquy=XPID+"aflowlib::_aflowlib_entry::aflowlib2string():";
     stringstream sss("");
     //  string eendl="\n";
@@ -1468,7 +1468,6 @@ namespace aflowlib {
     // this is the aflowlib.json mode
     if(mode=="json" || mode=="JSON") {  //CO OPERATE HERE ALL THE STRINGS AS BEFORE
       string eendl=",";
-      bool PRINT_NULL=FALSE;
       stringstream sscontent_json;
       vector<string> vcontent_json;
       vector<string> sg_tokens;

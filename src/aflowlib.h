@@ -269,7 +269,7 @@ namespace aflowlib {
       uint Load(const string& entry,ostream& oss);               // load from string it std is cout
       uint file2aflowlib(const string& file,ostream& oss=std::cout);       // load from file
       uint url2aflowlib(const string& url,ostream& oss,bool=TRUE); // load from the web (VERBOSE)
-      string aflowlib2string(string="out");                      //
+      string aflowlib2string(string="out", bool=false);          //ME20210408 - added PRINT_NULL
       string aflowlib2file(string file,string="out");            //
       string POCCdirectory2MetadataAUIDjsonfile(const string& directory,uint salt=0);           //CO20200624 - get contents of auid_metadata.json 
       bool directory2auid(const string& directory);                                         // from directory and AURL gives AUID and VAUID
@@ -560,10 +560,6 @@ namespace aflowlib {
       ~AflowDB();
       void clear();
 
-      string data_path;
-      string database_file;
-      string lock_file;
-
       bool isTMP();
 
       int rebuildDatabase(bool force_rebuild=false);
@@ -573,6 +569,13 @@ namespace aflowlib {
       int patchDatabase(const vector<string>&, bool check_timestamps=false);
       void analyzeDatabase(const string&);
 
+      string getEntry(const string&, filetype);
+      _aflowlib_entry getEntryAentry(const string&);
+      vector<string> getEntrySet(const string&, filetype);
+      vector<_aflowlib_entry> getEntrySetAentry(const string&);
+
+      vector<vector<string> > getEntrySetData(const string&);
+
       vector<string> getTables(const string& where="");
       vector<string> getTables(sqlite3*, const string& where="");
 
@@ -581,6 +584,12 @@ namespace aflowlib {
       vector<string> getColumnTypes(const string&);
       vector<string> getColumnTypes(sqlite3*, const string&);
 
+      vector<vector<string> > getRows(const string&, const string& where="");
+      vector<vector<string> > getRows(sqlite3*, const string&, const string& where="");
+      vector<vector<string> > getRowsMultiTables(const string& where="");
+      vector<vector<string> > getRowsMultiTables(sqlite3*, const string& where="");
+      vector<vector<string> > getRowsMultiTables(const vector<string>&, const string& where="");
+      vector<vector<string> > getRowsMultiTables(sqlite3*, const vector<string>&, const string& where="");
       string getValue(const string&, const string&, const string& where="");
       string getValue(sqlite3*, const string&, const string&, const string& where="");
       string getProperty(const string&, const string&, const string&, const string& where="");
@@ -599,16 +608,21 @@ namespace aflowlib {
       void open(int = SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_FULLMUTEX);
       void close();
       void copy(const AflowDB&);
+      void initializeExtraSchema();
 
       sqlite3* db;
       bool is_tmp;
+      aurostd::xoption vschema_extra;
+      string data_path;
+      string database_file;
+      string lock_file;
 
       void openTmpFile(int open_flags=SQLITE_OPEN_READWRITE|SQLITE_OPEN_CREATE|SQLITE_OPEN_FULLMUTEX, bool copy_original=false);
       bool closeTmpFile(bool force_copy=false, bool keep=false, bool nocopy=false);
 
       void rebuildDB();
       void buildTables(int, int, const vector<string>&, const vector<string>&);
-      void populateTable(const string&, const vector<string>&, const vector<vector<string> >&);
+      void populateTable(const string&, const vector<string>&, const vector<string>&, const vector<vector<string> >&);
 
       uint applyPatchFromJsonl(const vector<string>&);
       bool auidInDatabase(const string&);
@@ -617,16 +631,14 @@ namespace aflowlib {
       vector<string> getSchemaKeys();
       vector<string> getDataTypes(const vector<string>&, bool);
       vector<string> getDataValues(const string&, const vector<string>&, const vector<string>&);
-      vector<string> extractJsonKeysAflow(const string&);
-      string extractJsonValueAflow(const string&, string);
 
-      DBStats initDBStats(const string&, const vector<string>&, const vector<string>&);
-      DBStats getCatalogStats(const string&, const vector<string>&, const vector<string>&, const vector<string>&);
+      DBStats initDBStats(const string&, const vector<string>&);
+      DBStats getCatalogStats(const string&, const vector<string>&, const vector<string>&);
       void getColStats(int, int, const string&, const vector<string>&, const vector<string>&,
           const vector<string>&, const vector<string>&, vector<vector<vector<int> > >&, vector<vector<int> >&,
           vector<vector<vector<string> > >&, vector<vector<vector<string> > >&);
       vector<string> getUniqueFromJsonArrays(const vector<string>&);
-      void writeStatsToJson(std::stringstream&, const DBStats&);
+      string stats2json(const DBStats&);
 
       void createIndex(const string&, const string&, const string&);
       void dropIndex(const string&);
