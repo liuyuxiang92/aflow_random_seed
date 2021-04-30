@@ -1531,11 +1531,11 @@ class xstructure {
         bool no_scan=false);                                      // Get all lattices
     void GetExtendedCrystallographicData(
         double sym_eps=AUROSTD_MAX_DOUBLE,
-        bool no_scan=false, int setting=1);
+        bool no_scan=false, int setting=SG_SETTING_1);
     void GetExtendedCrystallographicData(xstructure& sp,
         xstructure& sc,
         double sym_eps=AUROSTD_MAX_DOUBLE,
-        bool no_scan=false, int setting=1);
+        bool no_scan=false, int setting=SG_SETTING_1);
     void GetRealLatticeType(xstructure& sp,xstructure& sc,
         double sym_eps=AUROSTD_MAX_DOUBLE);                       // Get real lattice type //DX2021011
     void GetRealLatticeType(double sym_eps=AUROSTD_MAX_DOUBLE);   // Get real lattice type //DX20210211
@@ -2318,7 +2318,7 @@ string GetSpaceGroupName(int spacegroupnumber, string directory=""); //DX2018052
 int GetSpaceGroupNumber(const string& spacegroupsymbol, string directory=""); //DX20190708
 string GetSpaceGroupLabel(int spacegroupnumber);
 string GetSpaceGroupSchoenflies(int spacegroupnumber, string directory=""); //DX20170901 //DX20180526 - add directory
-string GetSpaceGroupHall(int spacegroupnumber, int setting=1, string directory=""); //DX20170901 //DX20180526 - add directory //DX20180806 - added setting
+string GetSpaceGroupHall(int spacegroupnumber, int setting=SG_SETTING_1, string directory=""); //DX20170901 //DX20180526 - add directory //DX20180806 - added setting
 string GetLaueLabel(string& point_group); //DX20170901 //DX20180526 - add directory
 
 #define RADIANS 0
