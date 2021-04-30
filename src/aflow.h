@@ -572,6 +572,9 @@ extern _XHOST XHOST; // this will be global
 #define SEPARATION_LINE_DASH string("------------------------------------------------------------------------------------------------") //DX+CO20210429 - generic dash-line separator (used between symmetry operators)
 #define SEPARATION_LINE_DASH_SHORT string("---------------------------------------------------------------------------") //DX+CO20210429 - generic dash-line separator, short (used in symmetry log output)
 
+#define PRINT_NULL_JSON false //DX20210430 - add global flag to print "null" for empty JSON values
+
+
 // --------------------------------------------------------------------------
 // general flags to run aflow
 class _aflags {

@@ -17786,7 +17786,6 @@ bool PAULING_WyckoffDetector(vector<string> &vinput) {
 string xstructure2json(xstructure& xstr) {
   string eendl="";
   bool roff=true; //round off
-  bool PRINT_NULL=FALSE;
   stringstream sss;
   stringstream sscontent_json;
   vector<string> vcontent_json;
@@ -17795,7 +17794,7 @@ string xstructure2json(xstructure& xstr) {
   if(xstr.title.size()){
     sscontent_json << "\"title\":\"" << xstr.title << "\"" << eendl;
   } else {
-    if(PRINT_NULL){ sscontent_json << "\"title\":null" << eendl;}
+    if(PRINT_NULL_JSON){ sscontent_json << "\"title\":null" << eendl;}
   }
   vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
@@ -17803,7 +17802,7 @@ string xstructure2json(xstructure& xstr) {
   if(xstr.scale){
     sscontent_json << "\"scale\":" << xstr.scale << "" << eendl; //DX20180306 - number not string (removed quotations)
   } else {
-    if(PRINT_NULL){ sscontent_json << "\"scale\":null" << eendl;}
+    if(PRINT_NULL_JSON){ sscontent_json << "\"scale\":null" << eendl;}
   }
   vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
@@ -17811,7 +17810,7 @@ string xstructure2json(xstructure& xstr) {
   if(xstr.lattice.rows){
     sscontent_json << "\"lattice\":[" << aurostd::xmatDouble2String(xstr.lattice,_DOUBLE_WRITE_PRECISION_MAX_,roff) << "]" << eendl; //CO20180515
   } else {
-    if(PRINT_NULL){ sscontent_json << "\"lattice\":null" << eendl;}
+    if(PRINT_NULL_JSON){ sscontent_json << "\"lattice\":null" << eendl;}
   }
   vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
@@ -17821,7 +17820,7 @@ string xstructure2json(xstructure& xstr) {
     for(uint i=0;i<xstr.species.size(); i++) { cleaned_species.push_back(KBIN::VASP_PseudoPotential_CleanName(xstr.species[i])); } //DX20190612 - cleaned species names
     sscontent_json << "\"species\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(cleaned_species,"\""),",") << "]" << eendl; //DX20190612 - cleaned species names
   } else {
-    if(PRINT_NULL){ sscontent_json << "\"species\":null" << eendl;}
+    if(PRINT_NULL_JSON){ sscontent_json << "\"species\":null" << eendl;}
   }
   vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
@@ -17829,7 +17828,7 @@ string xstructure2json(xstructure& xstr) {
   if(xstr.num_each_type.size()){
     sscontent_json << "\"number_each_type\":[" << aurostd::joinWDelimiter(xstr.num_each_type,",") << "]" << eendl;
   } else {
-    if(PRINT_NULL){ sscontent_json << "\"number_each_type\":null" << eendl;}
+    if(PRINT_NULL_JSON){ sscontent_json << "\"number_each_type\":null" << eendl;}
   }
   vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
@@ -17866,7 +17865,6 @@ string xstructure2json(xstructure& xstr) {
 string atom2json(_atom& atom, int coord_flag, int poccupation) {
   string eendl="";
   bool roff=true; //round off
-  bool PRINT_NULL=FALSE;
   stringstream sss;
   stringstream sscontent_json;
   vector<string> vcontent_json;
@@ -17875,7 +17873,7 @@ string atom2json(_atom& atom, int coord_flag, int poccupation) {
   if(atom.name.size()){
     sscontent_json << "\"name\":\"" << KBIN::VASP_PseudoPotential_CleanName(atom.name) << "\"" << eendl; //DX20190612 - added function to clean names
   } else {
-    if(PRINT_NULL){ sscontent_json << "\"name\":null" << eendl;}
+    if(PRINT_NULL_JSON){ sscontent_json << "\"name\":null" << eendl;}
   }
   vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
@@ -17885,7 +17883,7 @@ string atom2json(_atom& atom, int coord_flag, int poccupation) {
   } else if(coord_flag==_COORDS_CARTESIAN_){
     sscontent_json << "\"position\":[" << aurostd::joinWDelimiter(xvecDouble2vecString(atom.cpos,_DOUBLE_WRITE_PRECISION_MAX_,roff),",") << "]" << eendl; //CO20180515
   } else {
-    if(PRINT_NULL){ sscontent_json << "\"position\":null" << eendl;}
+    if(PRINT_NULL_JSON){ sscontent_json << "\"position\":null" << eendl;}
   }
   vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
@@ -17895,7 +17893,7 @@ string atom2json(_atom& atom, int coord_flag, int poccupation) {
   } else if(poccupation==FALSE){
     sscontent_json << "\"occupancy\":1.0"<< eendl;
   } else {
-    if(PRINT_NULL){ sscontent_json << "\"occupancy\":null" << eendl;}
+    if(PRINT_NULL_JSON){ sscontent_json << "\"occupancy\":null" << eendl;}
   }
   vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 

@@ -1248,7 +1248,6 @@ namespace pflow {
 //DX20210301 [OBSOLETE]       if(format=="json"){
 //DX20210301 [OBSOLETE]         string eendl="";
 //DX20210301 [OBSOLETE]         bool roff=true; //round off
-//DX20210301 [OBSOLETE]         bool PRINT_NULL=FALSE;
 //DX20210301 [OBSOLETE]         stringstream sscontent_json;
 //DX20210301 [OBSOLETE]         vector<string> vcontent_json;
 //DX20210301 [OBSOLETE]
@@ -1258,7 +1257,7 @@ namespace pflow {
 //DX20210301 [OBSOLETE]         if(data.rows){
 //DX20210301 [OBSOLETE]           sscontent_json << "\"lattice_parameters\":[" << aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(data,_AFLOWLIB_DATA_GEOMETRY_PREC_,roff),",") << "]" << eendl;  //CO20200731 - precision
 //DX20210301 [OBSOLETE]         } else {
-//DX20210301 [OBSOLETE]           if(PRINT_NULL){ sscontent_json << "\"lattice_parameters\":null" << eendl;}
+//DX20210301 [OBSOLETE]           if(PRINT_NULL_JSON){ sscontent_json << "\"lattice_parameters\":null" << eendl;}
 //DX20210301 [OBSOLETE]         }
 //DX20210301 [OBSOLETE]         vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 //DX20210301 [OBSOLETE]
@@ -1274,7 +1273,7 @@ namespace pflow {
 //DX20210301 [OBSOLETE]           if(data.rows){
 //DX20210301 [OBSOLETE]             sscontent_json << "\"lattice_parameters_Bohr_deg\":[" << aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(Bohr_Degs_data,_AFLOWLIB_DATA_GEOMETRY_PREC_,roff),",") << "]" << eendl; //CO20200731 - precision
 //DX20210301 [OBSOLETE]           } else {
-//DX20210301 [OBSOLETE]             if(PRINT_NULL){ sscontent_json << "\"lattice_parameters_Bohr_deg\":null" << eendl;}
+//DX20210301 [OBSOLETE]             if(PRINT_NULL_JSON){ sscontent_json << "\"lattice_parameters_Bohr_deg\":null" << eendl;}
 //DX20210301 [OBSOLETE]           }
 //DX20210301 [OBSOLETE]           vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 //DX20210301 [OBSOLETE]         }
@@ -1747,19 +1746,18 @@ namespace pflow {
 
       aurostd::JSONwriter json;
       bool roff = true;
-      bool PRINT_NULL=FALSE;
 
       // Real space lattice
       if(str_aus.lattice.rows != 0){
         json.addMatrix("lattice_vectors",str_aus.lattice,_AFLOWLIB_DATA_GEOMETRY_PREC_,roff);
-      } else if(PRINT_NULL) {
+      } else if(PRINT_NULL_JSON) {
         json.addNull("lattice_vectors");
       }
 
       // Real lattice parameters
       if(data.rows != 0){
         json.addVector("lattice_parameters",data,_AFLOWLIB_DATA_GEOMETRY_PREC_,roff);
-      } else if (PRINT_NULL){
+      } else if (PRINT_NULL_JSON){
         json.addNull("lattice_parameters");
       }
 
@@ -1767,7 +1765,7 @@ namespace pflow {
         // Real lattice parameters (Bohr/Deg)
         if(data_Bohr.rows != 0){
           json.addVector("lattice_parameters_Bohr_deg",data_Bohr,_AFLOWLIB_DATA_GEOMETRY_PREC_,roff);
-        } else if (PRINT_NULL){
+        } else if (PRINT_NULL_JSON){
           json.addNull("lattice_parameters_Bohr_deg");
         }
       }
@@ -1782,28 +1780,28 @@ namespace pflow {
         // Real space: bravais lattice primitive
         if(!str_aus.bravais_lattice_type.empty()){
           json.addString("Bravais_lattice_type", str_aus.bravais_lattice_type);
-        } else if (PRINT_NULL){
+        } else if (PRINT_NULL_JSON){
           json.addNull("Bravais_lattice_type");
         }
 
         // Real space: bravais lattice variation
         if(!str_aus.bravais_lattice_variation_type.empty()){
           json.addString("Bravais_lattice_variation_type", str_aus.bravais_lattice_variation_type);
-        } else if (PRINT_NULL){
+        } else if (PRINT_NULL_JSON){
           json.addNull("Bravais_lattice_variation_type");
         }
 
         // Real space: lattice system
         if(!str_aus.bravais_lattice_system.empty()){
           json.addString("Bravais_lattice_system", str_aus.bravais_lattice_system);
-        } else if (PRINT_NULL){
+        } else if (PRINT_NULL_JSON){
           json.addNull("Bravais_lattice_system");
         }
 
         // Real space: Pearson symbol
         if(!str_aus.pearson_symbol.empty()){
           json.addString("Pearson_symbol", str_aus.pearson_symbol);
-        } else if (PRINT_NULL){
+        } else if (PRINT_NULL_JSON){
           json.addNull("Pearson_symbol");
         }
       }
@@ -1886,26 +1884,25 @@ namespace pflow {
     else if(ftype == json_ft){
 
       aurostd::JSONwriter json;
-      bool PRINT_NULL=FALSE;
 
       // Real space: bravais lattice lattice type
       if(!str_aus.bravais_lattice_lattice_type.empty()){
         json.addString("Bravais_lattice_lattice_type", str_aus.bravais_lattice_lattice_type);
-      } else if (PRINT_NULL){
+      } else if (PRINT_NULL_JSON){
         json.addNull("Bravais_lattice_lattice_type");
       }
 
       // Real space: bravais lattice lattice variation type
       if(!str_aus.bravais_lattice_lattice_variation_type.empty()){
         json.addString("Bravais_lattice_lattice_variation_type", str_aus.bravais_lattice_lattice_variation_type);
-      } else if (PRINT_NULL){
+      } else if (PRINT_NULL_JSON){
         json.addNull("Bravais_lattice_lattice_variation_type");
       }
 
       // Real space: bravais lattice lattice system
       if(!str_aus.bravais_lattice_lattice_system.empty()){
         json.addString("Bravais_lattice_lattice_system", str_aus.bravais_lattice_lattice_system);
-      } else if (PRINT_NULL){
+      } else if (PRINT_NULL_JSON){
         json.addNull("Bravais_lattice_lattice_system");
       }
 
@@ -1984,68 +1981,67 @@ namespace pflow {
     else if(ftype == json_ft){
 
       aurostd::JSONwriter json;
-      bool PRINT_NULL=FALSE;
 
       // Real space: crystal family
       if(!str_aus.crystal_family.empty()){
         json.addString("crystal_family", str_aus.crystal_family);
-      } else if (PRINT_NULL){
+      } else if (PRINT_NULL_JSON){
         json.addNull("crystal_family");
       }
 
       // Real space: crystal system
       if(!str_aus.crystal_system.empty()){
         json.addString("crystal_system", str_aus.crystal_system);
-      } else if (PRINT_NULL){
+      } else if (PRINT_NULL_JSON){
         json.addNull("crystal_system");
       }
 
       // Real space: point group crystal class
       if(!str_aus.point_group_crystal_class.empty()){
         json.addString("point_group_crystal_class", str_aus.point_group_crystal_class);
-      } else if (PRINT_NULL){
+      } else if (PRINT_NULL_JSON){
         json.addNull("point_group_crystal_class");
       }
 
       // Real space: point group Hermann Mauguin
       if(!str_aus.point_group_Hermann_Mauguin.empty()){
         json.addString("point_group_Hermann_Mauguin", str_aus.point_group_Hermann_Mauguin);
-      } else if (PRINT_NULL){
+      } else if (PRINT_NULL_JSON){
         json.addNull("point_group_Hermann_Mauguin");
       }
 
       // Real space: point group Schoenflies
       if(!str_aus.point_group_Shoenflies.empty()){
         json.addString("point_group_Schoenflies", str_aus.point_group_Shoenflies);
-      } else if (PRINT_NULL){
+      } else if (PRINT_NULL_JSON){
         json.addNull("point_group_Schoenflies");
       }
 
       // Real space: point group orbifold
       if(!str_aus.point_group_orbifold.empty()){
         json.addString("point_group_orbifold", str_aus.point_group_orbifold);
-      } else if (PRINT_NULL){
+      } else if (PRINT_NULL_JSON){
         json.addNull("point_group_orbifold");
       }
 
       // Real space: point group type
       if(!str_aus.point_group_type.empty()){
         json.addString("point_group_type", str_aus.point_group_type);
-      } else if (PRINT_NULL){
+      } else if (PRINT_NULL_JSON){
         json.addNull("point_group_type");
       }
 
       // Real space: point group order
       if(!str_aus.point_group_order.empty()){
         json.addNumber("point_group_order", str_aus.point_group_order);
-      } else if (PRINT_NULL){
+      } else if (PRINT_NULL_JSON){
         json.addNull("point_group_order");
       }
 
       // Real space: point group structure
       if(!str_aus.point_group_structure.empty()){
         json.addString("point_group_structure", str_aus.point_group_structure);
-      } else if (PRINT_NULL){
+      } else if (PRINT_NULL_JSON){
         json.addNull("point_group_structure");
       }
 
@@ -2141,19 +2137,18 @@ namespace pflow {
 
       aurostd::JSONwriter json;
       bool roff = true;
-      bool PRINT_NULL=false;
 
       // Reciprocal space lattice
       if(str_aus.klattice.rows != 0){
         json.addMatrix("reciprocal_lattice_vectors", str_aus.klattice, _AFLOWLIB_DATA_GEOMETRY_PREC_, roff);
-      } else if(PRINT_NULL) {
+      } else if(PRINT_NULL_JSON) {
         json.addNull("reciprocal_lattice_vectors");
       }
 
       // Reciprocal lattice parameters
       if(data.rows != 0){
         json.addVector("reciprocal_lattice_parameters", data, _AFLOWLIB_DATA_GEOMETRY_PREC_, roff);
-      } else if(PRINT_NULL) {
+      } else if(PRINT_NULL_JSON) {
         json.addNull("reciprocal_lattice_parameters");
       }
 
@@ -2163,14 +2158,14 @@ namespace pflow {
       // Reciprocal space: reciprocal lattice type
       if(!str_aus.reciprocal_lattice_type.empty()){
         json.addString("reciprocal_lattice_type", str_aus.reciprocal_lattice_type);
-      } else if(PRINT_NULL) {
+      } else if(PRINT_NULL_JSON) {
         json.addNull("reciprocal_lattice_type");
       }
 
       // Reciprocal space: reciprocal lattice variation type
       if(!str_aus.reciprocal_lattice_variation_type.empty()){
         json.addString("reciprocal_lattice_variation_type", str_aus.reciprocal_lattice_variation_type);
-      } else if(PRINT_NULL) {
+      } else if(PRINT_NULL_JSON) {
         json.addNull("reciprocal_lattice_variation_type");
       }
       ss_output << json.toString(standalone); //standalone: determines if we enclose in brackets
@@ -2275,26 +2270,25 @@ namespace pflow {
 
       aurostd::JSONwriter json;
       bool roff = true;
-      bool PRINT_NULL=false;
 
       // Real space: bravais superlattice lattice
       if(!str_aus.bravais_superlattice_type.empty()){
         json.addMatrix("Bravais_superlattice_lattice", str_aus.bravais_superlattice_lattice, _AFLOWLIB_DATA_GEOMETRY_PREC_, roff);
-      } else if(PRINT_NULL){
+      } else if(PRINT_NULL_JSON){
         json.addNull("Bravais_superlattice_lattice");
       }
 
       // Real lattice parameters
       if(data.rows != 0){
         json.addVector("lattice_parameters_superlattice", data, _AFLOWLIB_DATA_GEOMETRY_PREC_, roff);
-      } else if(PRINT_NULL){
+      } else if(PRINT_NULL_JSON){
         json.addNull("lattice_parameters_superlattice");
       }
 
       // Real lattice parameters (Bohr/Deg)
       if(data_Bohr.rows != 0){
         json.addVector("lattice_parameters_superlattice_Bohr_deg", data_Bohr, _AFLOWLIB_DATA_GEOMETRY_PREC_, roff);
-      } else if(PRINT_NULL){
+      } else if(PRINT_NULL_JSON){
         json.addNull("lattice_parameters_superlattice_Bohr_deg");
       }
 
@@ -2307,28 +2301,28 @@ namespace pflow {
       // Real space: bravais superlattice type
       if(!str_aus.bravais_superlattice_type.empty()){
         json.addString("Bravais_superlattice_type", str_aus.bravais_superlattice_type);
-      } else if(PRINT_NULL){
+      } else if(PRINT_NULL_JSON){
         json.addNull("Bravais_superlattice_type");
       }
 
       // Real space: bravais superlattice variation type
       if(!str_aus.bravais_superlattice_type.empty()){
         json.addString("Bravais_superlattice_variation_type", str_aus.bravais_superlattice_variation_type);
-      } else if(PRINT_NULL){
+      } else if(PRINT_NULL_JSON){
         json.addNull("Bravais_superlattice_variation_type");
       }
 
       // Real space: bravais superlattice system
       if(!str_aus.bravais_superlattice_type.empty()){
         json.addString("Bravais_superlattice_system", str_aus.bravais_superlattice_system);
-      } else if(PRINT_NULL){
+      } else if(PRINT_NULL_JSON){
         json.addNull("Bravais_superlattice_system");
       }
 
       // Real space: bravais superlattice type
       if(!str_aus.bravais_superlattice_type.empty()){
         json.addString("Pearson_symbol_superlattice", str_aus.pearson_symbol_superlattice);
-      } else if(PRINT_NULL){
+      } else if(PRINT_NULL_JSON){
         json.addNull("Pearson_symbol_superlattice");
       }
       ss_output << json.toString(standalone); //standalone: determines if we enclose in brackets
@@ -3635,61 +3629,60 @@ namespace pflow {
 
       aurostd::JSONwriter json;
       bool roff = true;
-      bool PRINT_NULL=FALSE;
 
       // space group number
       if(str_sg.space_group_ITC > 0 && str_sg.space_group_ITC < 231){
         json.addNumber("space_group_number", str_sg.space_group_ITC);
-      } else if (PRINT_NULL){
+      } else if (PRINT_NULL_JSON){
         json.addNull("space_group_number");
       }
 
       // space group label (HM)
       if(!space_group_HM.empty()){
         json.addString("space_group_Hermann_Mauguin", space_group_HM);
-      } else if (PRINT_NULL){
+      } else if (PRINT_NULL_JSON){
         json.addNull("space_group_Hermann_Mauguin");
       }
 
       // space group label (Hall)
       if(!space_group_Hall.empty()){
         json.addString("space_group_Hall", space_group_Hall);
-      } else if (PRINT_NULL){
+      } else if (PRINT_NULL_JSON){
         json.addNull("space_group_Hall");
       }
 
       // space group label (Schoenflies)
       if(!space_group_Schoenflies.empty()){
         json.addString("space_group_Schoenflies", space_group_Schoenflies);
-      } else if (PRINT_NULL){
+      } else if (PRINT_NULL_JSON){
         json.addNull("space_group_Schoenflies");
       }
 
       // Laue
       if(!class_Laue.empty()){
         json.addString("Laue", class_Laue);
-      } else if (PRINT_NULL){
+      } else if (PRINT_NULL_JSON){
         json.addNull("Laue");
       }
 
       // crystal class
       if(!str_sg.point_group_ITC.empty()){
         json.addString("crystal_class", str_sg.point_group_ITC);
-      } else if (PRINT_NULL){
+      } else if (PRINT_NULL_JSON){
         json.addNull("crystal_class");
       }
 
       // ITC setting
       if(str_sg.setting_ITC == 1 || str_sg.setting_ITC == 2){
         json.addNumber("setting_ITC", str_sg.setting_ITC);
-      } else if (PRINT_NULL){
+      } else if (PRINT_NULL_JSON){
         json.addNull("setting_ITC");
       }
 
       // ITC origin
       if(str_sg.origin_ITC.rows != 0){
         json.addVector("origin_ITC", str_sg.origin_ITC, _AFLOWLIB_DATA_GEOMETRY_PREC_, roff);
-      } else if (PRINT_NULL){
+      } else if (PRINT_NULL_JSON){
         json.addNull("origin_ITC");
       }
 
@@ -3704,7 +3697,7 @@ namespace pflow {
             positions.push_back(tokens_positions);
           }
           json.addMatrix("general_position_ITC",positions);
-        } else if (PRINT_NULL){
+        } else if (PRINT_NULL_JSON){
           json.addNull("general_position_ITC");
         }
 
@@ -3737,7 +3730,7 @@ namespace pflow {
           }
 
           json.addVector("Wyckoff_positions", vset_json);
-        } else if (PRINT_NULL){
+        } else if (PRINT_NULL_JSON){
           json.addNull("Wyckoff_positions");
         }
 
@@ -3750,7 +3743,7 @@ namespace pflow {
           }
           xstructure xstr_wyccar(wss,IOVASP_WYCKCAR);
           json.addRawJSON("wyccar", xstructure2json(xstr_wyccar));
-        } else if (PRINT_NULL){
+        } else if (PRINT_NULL_JSON){
           json.addNull("wyccar");
         }
       }
@@ -3884,7 +3877,6 @@ namespace pflow {
 //DX20210301 [OBSOLETE]     else if(format=="json"){
 //DX20210301 [OBSOLETE]       string eendl="";
 //DX20210301 [OBSOLETE]       bool roff=true; //round off
-//DX20210301 [OBSOLETE]       bool PRINT_NULL=FALSE;
 //DX20210301 [OBSOLETE]       stringstream sscontent_json;
 //DX20210301 [OBSOLETE]       vector<string> vcontent_json;
 //DX20210301 [OBSOLETE]
@@ -3892,7 +3884,7 @@ namespace pflow {
 //DX20210301 [OBSOLETE]       if(str_sg.space_group_ITC){
 //DX20210301 [OBSOLETE]         sscontent_json << "\"space_group_number\":\"" << str_sg.space_group_ITC << "\"" << eendl;
 //DX20210301 [OBSOLETE]       } else {
-//DX20210301 [OBSOLETE]         if(PRINT_NULL){ sscontent_json << "\"space_group_number\":null" << eendl;}
+//DX20210301 [OBSOLETE]         if(PRINT_NULL_JSON){ sscontent_json << "\"space_group_number\":null" << eendl;}
 //DX20210301 [OBSOLETE]       }
 //DX20210301 [OBSOLETE]       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 //DX20210301 [OBSOLETE]
@@ -3901,7 +3893,7 @@ namespace pflow {
 //DX20210301 [OBSOLETE]       if(sg_HM.size()){
 //DX20210301 [OBSOLETE]         sscontent_json << "\"space_group_Hermann_Mauguin\":\"" << sg_HM << "\"" << eendl;
 //DX20210301 [OBSOLETE]       } else {
-//DX20210301 [OBSOLETE]         if(PRINT_NULL){ sscontent_json << "\"space_group_Hermann_Mauguin\":null" << eendl;}
+//DX20210301 [OBSOLETE]         if(PRINT_NULL_JSON){ sscontent_json << "\"space_group_Hermann_Mauguin\":null" << eendl;}
 //DX20210301 [OBSOLETE]       }
 //DX20210301 [OBSOLETE]       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 //DX20210301 [OBSOLETE]
@@ -3910,7 +3902,7 @@ namespace pflow {
 //DX20210301 [OBSOLETE]       if(sg_Hall.size()){
 //DX20210301 [OBSOLETE]         sscontent_json << "\"space_group_Hall\":\"" << sg_Hall << "\"" << eendl;
 //DX20210301 [OBSOLETE]       } else {
-//DX20210301 [OBSOLETE]         if(PRINT_NULL){ sscontent_json << "\"space_group_Hall\":null" << eendl;}
+//DX20210301 [OBSOLETE]         if(PRINT_NULL_JSON){ sscontent_json << "\"space_group_Hall\":null" << eendl;}
 //DX20210301 [OBSOLETE]       }
 //DX20210301 [OBSOLETE]       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 //DX20210301 [OBSOLETE]
@@ -3919,7 +3911,7 @@ namespace pflow {
 //DX20210301 [OBSOLETE]       if(sg_Schoenflies.size()){
 //DX20210301 [OBSOLETE]         sscontent_json << "\"space_group_Schoenflies\":\"" << sg_Schoenflies << "\"" << eendl;
 //DX20210301 [OBSOLETE]       } else {
-//DX20210301 [OBSOLETE]         if(PRINT_NULL){ sscontent_json << "\"space_group_Schoenflies\":null" << eendl;}
+//DX20210301 [OBSOLETE]         if(PRINT_NULL_JSON){ sscontent_json << "\"space_group_Schoenflies\":null" << eendl;}
 //DX20210301 [OBSOLETE]       }
 //DX20210301 [OBSOLETE]       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 //DX20210301 [OBSOLETE]
@@ -3928,7 +3920,7 @@ namespace pflow {
 //DX20210301 [OBSOLETE]       if(laue.size()){
 //DX20210301 [OBSOLETE]         sscontent_json << "\"Laue\":\"" << laue << "\"" << eendl;
 //DX20210301 [OBSOLETE]       } else {
-//DX20210301 [OBSOLETE]         if(PRINT_NULL){ sscontent_json << "\"Laue\":null" << eendl;}
+//DX20210301 [OBSOLETE]         if(PRINT_NULL_JSON){ sscontent_json << "\"Laue\":null" << eendl;}
 //DX20210301 [OBSOLETE]       }
 //DX20210301 [OBSOLETE]       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 //DX20210301 [OBSOLETE]
@@ -3936,7 +3928,7 @@ namespace pflow {
 //DX20210301 [OBSOLETE]       if(str_sg.point_group_ITC.size()){
 //DX20210301 [OBSOLETE]         sscontent_json << "\"crystal_class\":\"" << str_sg.point_group_ITC << "\"" << eendl;
 //DX20210301 [OBSOLETE]       } else {
-//DX20210301 [OBSOLETE]         if(PRINT_NULL){ sscontent_json << "\"crystal_class\":null" << eendl;}
+//DX20210301 [OBSOLETE]         if(PRINT_NULL_JSON){ sscontent_json << "\"crystal_class\":null" << eendl;}
 //DX20210301 [OBSOLETE]       }
 //DX20210301 [OBSOLETE]       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 //DX20210301 [OBSOLETE]
@@ -3944,7 +3936,7 @@ namespace pflow {
 //DX20210301 [OBSOLETE]       if(str_sg.setting_ITC){
 //DX20210301 [OBSOLETE]         sscontent_json << "\"setting_ITC\":\"" << str_sg.setting_ITC << "\"" << eendl;
 //DX20210301 [OBSOLETE]       } else {
-//DX20210301 [OBSOLETE]         if(PRINT_NULL){ sscontent_json << "\"setting_ITC\":null" << eendl;}
+//DX20210301 [OBSOLETE]         if(PRINT_NULL_JSON){ sscontent_json << "\"setting_ITC\":null" << eendl;}
 //DX20210301 [OBSOLETE]       }
 //DX20210301 [OBSOLETE]       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 //DX20210301 [OBSOLETE]
@@ -3952,7 +3944,7 @@ namespace pflow {
 //DX20210301 [OBSOLETE]       if(str_sg.origin_ITC.rows){
 //DX20210301 [OBSOLETE]         sscontent_json << "\"origin_ITC\":[" << aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(str_sg.origin_ITC,5,roff),",") << "]" << eendl;
 //DX20210301 [OBSOLETE]       } else {
-//DX20210301 [OBSOLETE]         if(PRINT_NULL){ sscontent_json << "\"origin_ITC\":null" << eendl;}
+//DX20210301 [OBSOLETE]         if(PRINT_NULL_JSON){ sscontent_json << "\"origin_ITC\":null" << eendl;}
 //DX20210301 [OBSOLETE]       }
 //DX20210301 [OBSOLETE]       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 //DX20210301 [OBSOLETE]
@@ -3969,7 +3961,7 @@ namespace pflow {
 //DX20210301 [OBSOLETE]         }
 //DX20210301 [OBSOLETE]         sscontent_json << "]";
 //DX20210301 [OBSOLETE]       } else {
-//DX20210301 [OBSOLETE]         if(PRINT_NULL){ sscontent_json << "\"setting_ITC\":null" << eendl;}
+//DX20210301 [OBSOLETE]         if(PRINT_NULL_JSON){ sscontent_json << "\"setting_ITC\":null" << eendl;}
 //DX20210301 [OBSOLETE]       }
 //DX20210301 [OBSOLETE]       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 //DX20210301 [OBSOLETE]
@@ -4041,7 +4033,7 @@ namespace pflow {
 //DX20210301 [OBSOLETE]
 //DX20210301 [OBSOLETE]         sscontent_json << "\"wyccar\":" << xstructure2json(xstr_wyccar) << eendl;
 //DX20210301 [OBSOLETE]       } else {
-//DX20210301 [OBSOLETE]         if(PRINT_NULL){ sscontent_json << "\"wyccar\":null" << eendl;}
+//DX20210301 [OBSOLETE]         if(PRINT_NULL_JSON){ sscontent_json << "\"wyccar\":null" << eendl;}
 //DX20210301 [OBSOLETE]       }
 //DX20210301 [OBSOLETE]       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 //DX20210301 [OBSOLETE]

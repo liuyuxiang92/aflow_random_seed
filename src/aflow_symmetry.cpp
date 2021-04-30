@@ -7983,7 +7983,6 @@ namespace SYM {
 string SymmetryToJson(vector<_sym_op>& group, char& mode){
   string eendl="";
   bool roff=true; //round off
-  bool PRINT_NULL=FALSE;
   stringstream sss;
   stringstream sscontent_json;
   vector<string> vcontent_json;
@@ -8005,7 +8004,7 @@ string SymmetryToJson(vector<_sym_op>& group, char& mode){
     if(group_str.size()){
       sscontent_json << "\"group\":\"" << group_str << "\"" << eendl;
     } else {
-      if(PRINT_NULL){ sscontent_json << "\"group\":null" << eendl;}
+      if(PRINT_NULL_JSON){ sscontent_json << "\"group\":null" << eendl;}
     }
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
@@ -8013,7 +8012,7 @@ string SymmetryToJson(vector<_sym_op>& group, char& mode){
     if(group[i].ctau.rows && group_str == "agroup"){
       sscontent_json << "\"site\":" << group[i].site << eendl;
     } else if (group_str == "agroup"){
-      if(PRINT_NULL){ sscontent_json << "\"site\":null" << eendl;}
+      if(PRINT_NULL_JSON){ sscontent_json << "\"site\":null" << eendl;}
     }
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
@@ -8021,7 +8020,7 @@ string SymmetryToJson(vector<_sym_op>& group, char& mode){
     if(group[i].str_type.size()){
       sscontent_json << "\"type\":\"" << aurostd::RemoveWhiteSpacesFromTheBack(group[i].str_type) << "\"" << eendl;
     } else {
-      if(PRINT_NULL){ sscontent_json << "\"type\":null" << eendl;}
+      if(PRINT_NULL_JSON){ sscontent_json << "\"type\":null" << eendl;}
     }
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
@@ -8029,7 +8028,7 @@ string SymmetryToJson(vector<_sym_op>& group, char& mode){
     if(group[i].str_Hermann_Mauguin.size()){
       sscontent_json << "\"Hermann_Mauguin\":\"" << group[i].str_Hermann_Mauguin << "\"" << eendl;
     } else {
-      if(PRINT_NULL){ sscontent_json << "\"Hermann_Mauguin\":null" << eendl;}
+      if(PRINT_NULL_JSON){ sscontent_json << "\"Hermann_Mauguin\":null" << eendl;}
     }
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
@@ -8037,7 +8036,7 @@ string SymmetryToJson(vector<_sym_op>& group, char& mode){
     if(group[i].str_Schoenflies.size()){
       sscontent_json << "\"Schoenflies\":\"" << group[i].str_Schoenflies << "\"" << eendl;
     } else {
-      if(PRINT_NULL){ sscontent_json << "\"Schoenflies\":null" << eendl;}
+      if(PRINT_NULL_JSON){ sscontent_json << "\"Schoenflies\":null" << eendl;}
     }
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
@@ -8045,7 +8044,7 @@ string SymmetryToJson(vector<_sym_op>& group, char& mode){
     if(group[i].Uc.lrows){
       sscontent_json << "\"Uc\":[" << aurostd::xmatDouble2String(group[i].Uc,5,roff) << "]" << eendl;
     } else {
-      if(PRINT_NULL){ sscontent_json << "\"Uc\":null" << eendl;}
+      if(PRINT_NULL_JSON){ sscontent_json << "\"Uc\":null" << eendl;}
     }
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
@@ -8053,7 +8052,7 @@ string SymmetryToJson(vector<_sym_op>& group, char& mode){
     if(group[i].Uf.lrows){
       sscontent_json << "\"Uf\":[" << aurostd::xmatDouble2String(group[i].Uf,1,roff) << "]" << eendl;
     } else {
-      if(PRINT_NULL){ sscontent_json << "\"Uf\":null" << eendl;}
+      if(PRINT_NULL_JSON){ sscontent_json << "\"Uf\":null" << eendl;}
     }
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
@@ -8061,7 +8060,7 @@ string SymmetryToJson(vector<_sym_op>& group, char& mode){
     if(group[i].generator.lrows){
       sscontent_json << "\"generator\":[" << aurostd::xmatDouble2String(group[i].generator,5,roff) << "]" << eendl;
     } else {
-      if(PRINT_NULL){ sscontent_json << "\"generator\":null" << eendl;}
+      if(PRINT_NULL_JSON){ sscontent_json << "\"generator\":null" << eendl;}
     }
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
@@ -8070,7 +8069,7 @@ string SymmetryToJson(vector<_sym_op>& group, char& mode){
     if(group[i].generator.lrows){
       sscontent_json << "\"generator_coefficients\":[" << aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(group[i].generator_coefficients,5,roff),",") << "]" << eendl; //DX20180726 - added roff
     } else {
-      if(PRINT_NULL){ sscontent_json << "\"generator_coefficients\":null" << eendl;}
+      if(PRINT_NULL_JSON){ sscontent_json << "\"generator_coefficients\":null" << eendl;}
     }
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
     //DX20171207 - added generator_coefficients - END
@@ -8081,7 +8080,7 @@ string SymmetryToJson(vector<_sym_op>& group, char& mode){
       sscontent_json << "\"SU2_matrix\":[" << "[" << aurostd::xcomplex2json(group[i].SU2_matrix(1,1)) << "," << aurostd::xcomplex2json(group[i].SU2_matrix(1,2)) << "]" << "," << eendl; 
       sscontent_json << "[" << aurostd::xcomplex2json(group[i].SU2_matrix(2,1)) << "," << aurostd::xcomplex2json(group[i].SU2_matrix(2,2)) << "]" << "]" << eendl; 
     } else {
-      if(PRINT_NULL){ sscontent_json << "\"SU2_matrix\":null" << eendl;}
+      if(PRINT_NULL_JSON){ sscontent_json << "\"SU2_matrix\":null" << eendl;}
     }
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
     //DX20180117 - added SU2_matrix - END
@@ -8091,7 +8090,7 @@ string SymmetryToJson(vector<_sym_op>& group, char& mode){
     if(group[i].su2_coefficients.lrows){
       sscontent_json << "\"su2_coefficients\":[" <<  aurostd::xcomplex2json(group[i].su2_coefficients(1)) << "," << aurostd::xcomplex2json(group[i].su2_coefficients(2)) << "," << aurostd::xcomplex2json(group[i].su2_coefficients(3)) << "]" << eendl; 
     } else {
-      if(PRINT_NULL){ sscontent_json << "\"su2_coefficients\":null" << eendl;}
+      if(PRINT_NULL_JSON){ sscontent_json << "\"su2_coefficients\":null" << eendl;}
     }
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
     //DX20180117 - added su2_coefficients - END
@@ -8100,7 +8099,7 @@ string SymmetryToJson(vector<_sym_op>& group, char& mode){
     if(group[i].angle!=AUROSTD_NAN){
       sscontent_json << "\"angle\":" << group[i].angle << eendl;
     } else {
-      if(PRINT_NULL){ sscontent_json << "\"angle\":null" << eendl;}
+      if(PRINT_NULL_JSON){ sscontent_json << "\"angle\":null" << eendl;}
     }
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
@@ -8108,7 +8107,7 @@ string SymmetryToJson(vector<_sym_op>& group, char& mode){
     if(group[i].axis.lrows){
       sscontent_json << "\"axis\":[" << aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(group[i].axis,5,roff),",") << "]" << eendl; //DX20180726 - added roff
     } else {
-      if(PRINT_NULL){ sscontent_json << "\"axis\":null" << eendl;}
+      if(PRINT_NULL_JSON){ sscontent_json << "\"axis\":null" << eendl;}
     }
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
@@ -8116,7 +8115,7 @@ string SymmetryToJson(vector<_sym_op>& group, char& mode){
     if(group[i].quaternion_vector.lrows){
       sscontent_json << "\"quaternion_vector\":[" << aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(group[i].quaternion_vector,5,roff),",") << "]" << eendl;
     } else {
-      if(PRINT_NULL){ sscontent_json << "\"quaternion_vector\":null" << eendl;}
+      if(PRINT_NULL_JSON){ sscontent_json << "\"quaternion_vector\":null" << eendl;}
     }
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
@@ -8124,7 +8123,7 @@ string SymmetryToJson(vector<_sym_op>& group, char& mode){
     if(group[i].quaternion_matrix.lrows){
       sscontent_json << "\"quaternion_matrix\":[" << aurostd::xmatDouble2String(group[i].quaternion_matrix,5,roff) << "]" << eendl;
     } else {
-      if(PRINT_NULL){ sscontent_json << "\"quaternion_matrix\":null" << eendl;}
+      if(PRINT_NULL_JSON){ sscontent_json << "\"quaternion_matrix\":null" << eendl;}
     }
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
@@ -8138,7 +8137,7 @@ string SymmetryToJson(vector<_sym_op>& group, char& mode){
         sscontent_json << "false" << eendl;
       }
     } else {
-      if(PRINT_NULL){ sscontent_json << "\"inversion\":null" << eendl;}
+      if(PRINT_NULL_JSON){ sscontent_json << "\"inversion\":null" << eendl;}
     }
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
@@ -8146,7 +8145,7 @@ string SymmetryToJson(vector<_sym_op>& group, char& mode){
     if(group[i].ctau.rows && (group_str == "fgroup" || group_str == "sgroup")){
       sscontent_json << "\"ctau\":[" << aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(group[i].ctau,5,roff),",") << "]" << eendl;
     } else if (group_str == "fgroup" || group_str == "sgroup"){
-      if(PRINT_NULL){ sscontent_json << "\"ctau\":null" << eendl;}
+      if(PRINT_NULL_JSON){ sscontent_json << "\"ctau\":null" << eendl;}
     }
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
@@ -8154,7 +8153,7 @@ string SymmetryToJson(vector<_sym_op>& group, char& mode){
     if(group[i].ftau.rows && (group_str == "fgroup" || group_str == "sgroup")){
       sscontent_json << "\"ftau\":[" << aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(group[i].ftau,5,roff),",") << "]" << eendl;
     } else if (group_str == "fgroup" || group_str == "sgroup"){
-      if(PRINT_NULL){ sscontent_json << "\"ftau\":null" << eendl;}
+      if(PRINT_NULL_JSON){ sscontent_json << "\"ftau\":null" << eendl;}
     }
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
@@ -8162,7 +8161,7 @@ string SymmetryToJson(vector<_sym_op>& group, char& mode){
     if(group[i].basis_atoms_map.size() && (group_str == "fgroup" || group_str == "sgroup")){
       sscontent_json << "\"basis_atoms_map\":[" << aurostd::joinWDelimiter(group[i].basis_atoms_map,",") << "]" << eendl;
     } else if (group_str == "fgroup" || group_str == "sgroup"){
-      if(PRINT_NULL){ sscontent_json << "\"basis_atoms_map\":null" << eendl;}
+      if(PRINT_NULL_JSON){ sscontent_json << "\"basis_atoms_map\":null" << eendl;}
     }
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
@@ -8170,7 +8169,7 @@ string SymmetryToJson(vector<_sym_op>& group, char& mode){
     if(group[i].basis_types_map.size() && (group_str == "fgroup" || group_str == "sgroup")){
       sscontent_json << "\"basis_types_map\":[" << aurostd::joinWDelimiter(group[i].basis_types_map,",") << "]" << eendl;
     } else if (group_str == "fgroup" || group_str == "sgroup"){
-      if(PRINT_NULL){ sscontent_json << "\"basis_types_map\":null" << eendl;}
+      if(PRINT_NULL_JSON){ sscontent_json << "\"basis_types_map\":null" << eendl;}
     }
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
@@ -8178,7 +8177,7 @@ string SymmetryToJson(vector<_sym_op>& group, char& mode){
     if(group[i].ctrasl.rows && group_str == "sgroup"){
       sscontent_json << "\"ctrasl\":[" << aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(group[i].ctrasl,5,roff),",") << "]" << eendl;
     } else if (group_str == "sgroup"){
-      if(PRINT_NULL){ sscontent_json << "\"ctrasl\":null" << eendl;}
+      if(PRINT_NULL_JSON){ sscontent_json << "\"ctrasl\":null" << eendl;}
     }
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
@@ -8186,7 +8185,7 @@ string SymmetryToJson(vector<_sym_op>& group, char& mode){
     if(group[i].ftrasl.rows && group_str == "sgroup"){
       sscontent_json << "\"ftrasl\":[" << aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(group[i].ftrasl,5,roff),",") << "]" << eendl;
     } else if (group_str == "sgroup"){
-      if(PRINT_NULL){ sscontent_json << "\"ftrasl\":null" << eendl;}
+      if(PRINT_NULL_JSON){ sscontent_json << "\"ftrasl\":null" << eendl;}
     }
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
@@ -8228,7 +8227,6 @@ string AgroupSymmetryToJson(vector<vector<_sym_op> >& group, char& mode){
 // ------------------------------------------------------------- WRITE EQUIVALENT ATOMS TO JSON
 string EquivalentAtomsToJson(vector<vector<int> >& iatoms){
   string eendl="";
-  bool PRINT_NULL=FALSE;
   stringstream sss;
   stringstream sscontent_json;
   vector<string> vcontent_json;
@@ -8244,7 +8242,7 @@ string EquivalentAtomsToJson(vector<vector<int> >& iatoms){
     }
     sscontent_json << "]" << eendl;
   } else {
-    if(PRINT_NULL){ sscontent_json << "\"inequivalent_atoms\":null" << eendl;}
+    if(PRINT_NULL_JSON){ sscontent_json << "\"inequivalent_atoms\":null" << eendl;}
   }
   vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
@@ -8266,7 +8264,7 @@ string EquivalentAtomsToJson(vector<vector<int> >& iatoms){
     }
     sscontent_json << "]" << eendl;
   } else {
-    if(PRINT_NULL){ sscontent_json << "\"equivalent_sets\":null" << eendl;}
+    if(PRINT_NULL_JSON){ sscontent_json << "\"equivalent_sets\":null" << eendl;}
   }
   vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
