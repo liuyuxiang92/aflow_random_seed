@@ -1059,7 +1059,7 @@ void XtalFinderCalculator::addStructure2container(
   // ---------------------------------------------------------------------------
   // check if fake names for same species comparison
   if(same_species && !pflow::hasRealElements(str_rep_tmp.structure)){
-    message << "Atomic species are not real/physical " << str_rep_tmp.name << " cannot perform material comparison; skipping strucutre.";
+    message << "Atomic species are not real/physical " << str_rep_tmp.name << " cannot perform material comparison; skipping structure.";
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
     return; // not storing structure
   }
@@ -5307,7 +5307,7 @@ namespace compare{
 
 // ***************************************************************************
 // DX20201230 - moved the following functions to aflow_xatom.cpp
-// compare::getLeastFrequentAtomTypes()
+// compare::getLeastFrequentAtomSpecies()
 // ***************************************************************************
 
 // ***************************************************************************
@@ -5780,7 +5780,7 @@ namespace compare{
 
     // ---------------------------------------------------------------------------
     // determine all LFA atoms in the structure (could be more than one)
-    vector<string> LFAs=getLeastFrequentAtomTypes(xstr);
+    vector<string> LFAs=getLeastFrequentAtomSpecies(xstr);
 
     // ---------------------------------------------------------------------------
     // compute all LFA environments, looping through each LFA type
@@ -5821,7 +5821,7 @@ void XtalFinderCalculator::computeLFAEnvironment(structure_container& str_rep, b
 
   // ---------------------------------------------------------------------------
   // determine all LFA atoms in the structure (could be more than one)
-  vector<string> LFAs=getLeastFrequentAtomTypes(str_rep.structure);
+  vector<string> LFAs=getLeastFrequentAtomSpecies(str_rep.structure);
 
   // ---------------------------------------------------------------------------
   // compute all LFA environments, looping through each LFA type
@@ -6560,8 +6560,8 @@ void XtalFinderCalculator::latticeSearch(
   // determine least-frequently occuring atom type (LFA) for each structure
   // (there may be more than one)
   // perhaps put in _structure_rep object
-  vector<string> LFA_str1=getLeastFrequentAtomTypes(xstr1);
-  vector<string> LFA_str2=getLeastFrequentAtomTypes(xstr2);
+  vector<string> LFA_str1=getLeastFrequentAtomSpecies(xstr1);
+  vector<string> LFA_str2=getLeastFrequentAtomSpecies(xstr2);
   string lfa_str1=LFA_str1[0]; //initialize
   string lfa_str2=LFA_str2[0]; //initialize
 

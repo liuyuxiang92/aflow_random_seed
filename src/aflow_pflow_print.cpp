@@ -983,6 +983,7 @@ namespace pflow {
         //DX20170901 -Add tolerance - START
         str_aus.sym_eps = str_sp.sym_eps = str_sc.sym_eps = tolerance; 
         str_aus.sym_eps_change_count = str_sp.sym_eps_change_count = str_sc.sym_eps_change_count = sym_eps_change_count; //DX20180226 - added sym eps change count
+        str_aus.sym_eps_no_scan = str_sp.sym_eps_no_scan = str_sc.sym_eps_no_scan = no_scan; //DX20180226 - added sym eps no scan
         //DX20170901 -Add tolerance - END
         if(smode=="EDATA") {
           // str_aus.CalculateSymmetryPointGroup(FALSE);
@@ -991,10 +992,11 @@ namespace pflow {
           if(!already_calculated){  //CO20171025
             str_aus.GetLatticeType(str_sp,str_sc);
             if(orig_tolerance == AUROSTD_NAN){
-              orig_tolerance = str_sp.sym_eps;  // Use new tolerance calculated here 
+              orig_tolerance = str_sp.sym_eps;  // Use new tolerance calculated here
             }
             tolerance = str_sp.sym_eps;
             sym_eps_change_count = str_aus.sym_eps_change_count = str_sp.sym_eps_change_count; //DX20180226 - added sym eps change count
+            str_aus.sym_eps_no_scan = str_sp.sym_eps_no_scan = no_scan; //DX20210331
           }
           oss << "BRAVAIS LATTICE OF THE CRYSTAL (pgroup_xtal)" << endl;
           oss << " Real space: Bravais Lattice Primitive        = " << str_aus.bravais_lattice_type << endl;// " " << str.title << endl;
@@ -1011,13 +1013,14 @@ namespace pflow {
           oss << " Real space: Point Group Type                 = " << str_aus.point_group_type << endl;
           oss << " Real space: Point Group Order                = " << str_aus.point_group_order << endl;
           oss << " Real space: Point Group Structure            = " << str_aus.point_group_structure << endl;
-          PrintSGData(str_aus,tolerance,oss,vpflow,no_scan,sg_setting,false,format,already_calculated);  //DX20170831 - SGDATA //CO20171025 //CO20171027 //DX20180823 - added xoption
+          PrintSGData(str_aus,tolerance,oss,vpflow,str_aus.sym_eps_no_scan,sg_setting,false,format,already_calculated);  //DX20170831 - SGDATA //CO20171025 //CO20171027 //DX20180823 - added xoption
           //DX20180608 - recalculate GetLatticeType() before changing tolerance - START
-          if(sym_eps_change_count != str_aus.sym_eps_change_count){
+          if(!already_calculated && sym_eps_change_count != str_aus.sym_eps_change_count){ //DX20210327 - check if not already calculated
             if(LDEBUG) {
               cerr << XPID << "pflow::PrintData: WARNING: PrintSGData() changed the tolerance, need to recalculate GetLatticeType() at the new tolerance (i.e., sym_eps=" << str_aus.sym_eps << ") [dir=" << str.directory << "]" << endl; //DX20180526 - add directory
             }
             sym_eps_change_count = str_aus.sym_eps_change_count;
+            no_scan = str_aus.sym_eps_no_scan; //DX20210331
             str_aus.ClearSymmetry();
             oss.str("");
             continue;
@@ -1027,23 +1030,28 @@ namespace pflow {
           //DX20170901 - Add consistency check for input symmetry method and ITC method - START
           int multiplicity_of_primitive=str_sp.fgroup.size()/str_sp.pgroup_xtal.size();
           bool derivative_structure=false;
-          if(SYM::ComparePointGroupAndSpaceGroupString(str_aus,multiplicity_of_primitive,derivative_structure) || no_scan){
+          string lattice_and_centering = LATTICE::Lattice2TypeAndCentering(str_aus.bravais_lattice_type); //DX20210412 - check centering
+          string lattice_and_centering_from_sg = SYM::spacegroup2latticeAndCentering(str_aus.space_group_ITC); //DX20210412 - check centering
+          if((lattice_and_centering == lattice_and_centering_from_sg && SYM::ComparePointGroupAndSpaceGroupString(str_aus,multiplicity_of_primitive,derivative_structure)) || str_aus.sym_eps_no_scan || already_calculated){ //DX20210327 - added already calculated  //DX20210412 - check centering
             symmetry_commensurate=true;
           }
           else {
             if(LDEBUG) {
               cerr << XPID << "pflow::PrintData: WARNING: Space group symbol and point group symbol do not match. (sg=" << GetSpaceGroupName(str_aus.space_group_ITC,str_aus.directory) << ", pg=" << str_aus.point_group_Hermann_Mauguin << ") [dir=" << str.directory << "]" << endl; //DX20180526 - add directory
             }
-            str_aus.ClearSymmetry();
-            oss.str("");
+            //DX20210331 [THIS SHOULDN'T BE HERE] str_aus.ClearSymmetry();
+            //DX20210331 [THIS SHOULDN'T BE HERE] oss.str("");
             //if(!SYM::change_tolerance(str_aus,tolerance,orig_tolerance,change_sym_count,str_aus.dist_nn_min,no_scan))
-            if(!SYM::change_tolerance(str_aus,tolerance,str_aus.dist_nn_min,no_scan)){
+            if(!SYM::change_tolerance(str_aus,tolerance,str_aus.dist_nn_min,str_aus.sym_eps_no_scan)){
               if(force_perform){
                 if(LDEBUG) {
                   cerr << XPID << "pflow::PrintData: WARNING: Scan failed. Reverting back to original tolerance and recalculating as is (with aforementioned inconsistencies). [dir=" << str.directory << "]" << endl;
                 }
-                no_scan=true; //Force it to continue 
+                //DX20210406 [OBSOLETE] no_scan=true; //Force it to continue
+                no_scan = str_aus.sym_eps_no_scan = str_sp.sym_eps_no_scan = true; //DX20210331
                 tolerance = orig_tolerance;
+                str_sp.sym_eps=tolerance; //DX20210327
+                sym_eps_change_count = str_aus.sym_eps_change_count;
                 str_aus.ClearSymmetry();
                 oss.str("");
                 continue;
@@ -1053,6 +1061,7 @@ namespace pflow {
               str_aus.ClearSymmetry();
               oss.str("");
               sym_eps_change_count = str_aus.sym_eps_change_count; //DX20180226 - added sym eps change count
+              no_scan = str_aus.sym_eps_no_scan; //DX20210331
               continue;
             }
           }
@@ -1140,10 +1149,11 @@ namespace pflow {
           if(!already_calculated){  //CO20171025
             str_aus.GetLatticeType(str_sp,str_sc);
             if(orig_tolerance == AUROSTD_NAN){
-              orig_tolerance = str_sp.sym_eps;  // Use new tolerance calculated here 
+              orig_tolerance = str_sp.sym_eps;  // Use new tolerance calculated here
             }
             tolerance = str_sp.sym_eps;
             sym_eps_change_count = str_aus.sym_eps_change_count = str_sp.sym_eps_change_count; //DX20180226 - added sym eps change count
+            no_scan = str_aus.sym_eps_no_scan = str_sp.sym_eps_no_scan; //DX20210331
           }
 
           // Real space: bravais lattice primitive
@@ -1251,13 +1261,14 @@ namespace pflow {
           vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
           // SGDATA
-          PrintSGData(str_aus,tolerance,sscontent_json,vpflow,no_scan,sg_setting,false,format,already_calculated);  //DX20170831 - SGDATA //CO20171027 //DX20180823 - added xoption
+          PrintSGData(str_aus,tolerance,sscontent_json,vpflow,str_aus.sym_eps_no_scan,sg_setting,false,format,already_calculated);  //DX20170831 - SGDATA //CO20171027 //DX20180823 - added xoption
           //DX20180608 - recalculate GetLatticeType() before changing tolerance - START
-          if(sym_eps_change_count != str_aus.sym_eps_change_count){
+          if(!already_calculated && sym_eps_change_count != str_aus.sym_eps_change_count){ //DX20210327 - check if not already calculated
             if(LDEBUG) {
               cerr << XPID << "pflow::PrintData: WARNING: PrintSGData() changed the tolerance, need to recalculate GetLatticeType() at the new tolerance (i.e., sym_eps=" << str_aus.sym_eps << ") [dir=" << str.directory << "]" << endl; //DX20180526 - add directory
             }
             sym_eps_change_count = str_aus.sym_eps_change_count;
+            no_scan = str_aus.sym_eps_no_scan; //DX20210331
             str_aus.ClearSymmetry();
             sscontent_json.str("");
             vcontent_json.clear();
@@ -1269,24 +1280,27 @@ namespace pflow {
           //DX20170901 - Add consistency check for input symmetry method and ITC method - START
           int multiplicity_of_primitive =str_sp.fgroup.size()/str_sp.pgroup_xtal.size();
           bool derivative_structure=false;
-          if(SYM::ComparePointGroupAndSpaceGroupString(str_aus,multiplicity_of_primitive,derivative_structure) || no_scan == true){
+          if(SYM::ComparePointGroupAndSpaceGroupString(str_aus,multiplicity_of_primitive,derivative_structure) || str_aus.sym_eps_no_scan || already_calculated){ //DX20210327 - added already calculated
             symmetry_commensurate=true;
           } else { //CO20171027
             if(LDEBUG) {
               cerr << XPID << "pflow::PrintData: WARNING: Space group symbol and point group symbol do not match." << endl;
             }
-            str_aus.ClearSymmetry();
-            sscontent_json.str("");
-            vcontent_json.clear();
+            //DX20210331 [THIS SHOULDN'T BE HERE] str_aus.ClearSymmetry();
+            //DX20210331 [THIS SHOULDN'T BE HERE] sscontent_json.str("");
+            //DX20210331 [THIS SHOULDN'T BE HERE] vcontent_json.clear();
             //if(!SYM::change_tolerance(str_aus,tolerance,orig_tolerance,change_sym_count,str_aus.dist_nn_min,no_scan))
-            if(!SYM::change_tolerance(str_aus,tolerance,str_aus.dist_nn_min,no_scan))
+            if(!SYM::change_tolerance(str_aus,tolerance,str_aus.dist_nn_min,str_aus.sym_eps_no_scan))
             {   //CO20200106 - patching for auto-indenting
               if(force_perform){
                 if(LDEBUG) {
                   cerr << XPID << "pflow::PrintData: WARNING: Scan failed. Reverting back to original tolerance and recalculating as is (with aforementioned inconsistencies)." << str.directory << endl;
                 }
-                no_scan=true; //Force it to continue 
+                //DX20210406 [OBSOLETE] no_scan=true; //Force it to continue
+                no_scan = str_aus.sym_eps_no_scan = str_sp.sym_eps_no_scan = true; //DX20210331
                 tolerance = orig_tolerance;
+                str_sp.sym_eps=tolerance; //DX20210327
+                sym_eps_change_count = str_aus.sym_eps_change_count; //DX20210330
                 str_aus.ClearSymmetry();
                 sscontent_json.str("");
                 vcontent_json.clear();
@@ -1298,6 +1312,7 @@ namespace pflow {
               sscontent_json.str("");
               vcontent_json.clear();
               sym_eps_change_count = str_aus.sym_eps_change_count; //DX20180226 - added sym eps change count
+              no_scan = str_aus.sym_eps_no_scan; //DX20210331
               continue;
             }
           }

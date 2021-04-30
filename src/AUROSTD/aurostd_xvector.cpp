@@ -28,6 +28,10 @@
 #include "aurostd_xtensor.h"
 #endif
 
+#ifndef __XOPTIMIZE
+#define _XVECTOR_CHECK_BOUNDARIES_
+#endif
+
 // ----------------------------------------------------------------------------
 // --------------------------------------------------------------- constructors
 namespace aurostd {  // namespace aurostd
@@ -162,7 +166,7 @@ namespace aurostd {  // namespace aurostd
   template<class utype>                                            // operator []
     // removed inline
     utype& xvector<utype>::operator[](int i) const {
-#ifndef __XOPTIMIZE
+#ifndef _XVECTOR_CHECK_BOUNDARIES_
       if(i>urows) {
         string function = XPID + "aurostd::xvector::operator[]:";
         stringstream message;
@@ -191,7 +195,7 @@ namespace aurostd {  // namespace aurostd
     // removed inline
     utype& xvector<utype>::operator()(int i) const {
       //#ifndef BOUNDARY_CONDITIONS_PERIODIC
-#ifndef __XVECTOR_IGNORE_BOUNDARIES
+#ifndef _XVECTOR_CHECK_BOUNDARIES_
       if(i>urows) {
         string function = XPID + "aurostd::xvector::operator():";
         stringstream message;
@@ -229,7 +233,7 @@ namespace aurostd {  // namespace aurostd
   template<class utype>                        // operator () boundary conditions
     inline utype& xvector<utype>::operator()(int i,bool bc) const {
       if(bc==BOUNDARY_CONDITIONS_NONE) {
-#ifndef __XOPTIMIZE
+#ifndef _XVECTOR_CHECK_BOUNDARIES_
         if(i>urows) {
           string function = XPID + "aurostd::xvector::operator():";
           stringstream message;
