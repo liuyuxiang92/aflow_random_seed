@@ -3386,10 +3386,9 @@ namespace KBIN {
           (aurostd::substring2bool(strline,"LAECHG",TRUE) && vflags.KBIN_VASP_FORCE_OPTION_BADER.isentry) || (aurostd::substring2bool(strline,"#LAECHG",TRUE) && vflags.KBIN_VASP_FORCE_OPTION_BADER.isentry)||
           (aurostd::substring2bool(strline,"LELF",TRUE) && vflags.KBIN_VASP_FORCE_OPTION_ELF.isentry) || (aurostd::substring2bool(strline,"#LELF",TRUE) && vflags.KBIN_VASP_FORCE_OPTION_ELF.isentry)||
           aurostd::substring2bool(strline,"LWAVE",TRUE) || aurostd::substring2bool(strline,"#LWAVE",TRUE)) {
-            if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# " << strline << " # AFLOW REMOVED (KBIN::XVASP_INCAR_Relax_Static_Bands_ON)" << endl;
+            if(vflags.KBIN_VASP_INCAR_VERBOSE){xvasp.INCAR << "# " << strline << " # AFLOW REMOVED (KBIN::XVASP_INCAR_Relax_Static_Bands_ON)" << endl;}
           } else {
-            if(!vflags.KBIN_VASP_INCAR_VERBOSE && strline.length()) xvasp.INCAR << strline << endl;
-            if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << strline << endl;
+            if(vflags.KBIN_VASP_INCAR_VERBOSE||strline.length()){xvasp.INCAR << strline << endl;} //CO20210315
           }
     }
     // xvasp.INCAR << endl;
@@ -3425,7 +3424,8 @@ namespace KBIN {
     // check for LDA/GGA
     if(xvasp.POTCAR_TYPE=="LDA" || xvasp.POTCAR_TYPE=="GGA") {
       xvasp.INCAR << "#Fixing RWIGS/LORBIG for LDA/GGA" << endl;
-      ofstream oss;KBIN::XVASP_INCAR_RWIGS_Static(xvasp,vflags,oss,ON);}
+      ofstream oss;KBIN::XVASP_INCAR_RWIGS_Static(xvasp,vflags,oss,ON);
+    }
   }
 }
 
@@ -6989,8 +6989,8 @@ namespace KBIN {
 
         Krun=(Krun1||Krun2);
         if(!Krun){  //remove fixes before going to next submode
-          if(!ignorefix1){fix="AMIX=-1";XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE);}
-          if(!ignorefix2){fix="BMIX=-1";XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE);}
+          if(!ignorefix1){fix="AMIX=-1";XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE);xfixed.flag(fix,false);}
+          if(!ignorefix2){fix="BMIX=-1";XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE);xfixed.flag(fix,false);}
         }
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
@@ -7007,8 +7007,8 @@ namespace KBIN {
 
         Krun=(Krun1||Krun2);
         if(!Krun){  //remove fixes before going to next submode
-          if(!ignorefix1){fix="BMIX=-1";XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE);}
-          if(!ignorefix2){fix="AMIN=-1";XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE);}
+          if(!ignorefix1){fix="BMIX=-1";XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE);xfixed.flag(fix,false);}
+          if(!ignorefix2){fix="AMIN=-1";XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE);xfixed.flag(fix,false);}
         }
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
