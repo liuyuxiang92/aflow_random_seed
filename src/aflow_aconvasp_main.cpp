@@ -8410,7 +8410,7 @@ namespace pflow {
 
     // ---------------------------------------------------------------------------
     // get space group setting
-    uint setting_default = 1;
+    uint setting_default = SG_SETTING_1;
     uint setting = pflow::getSpaceGroupSetting(vpflow.getattachedscheme("LIST_PROTOTYPE_LABELS::SETTING"), setting_default); //DX20210421 - consolidated space group setting into function
 
     //------------------------------------------------- 
