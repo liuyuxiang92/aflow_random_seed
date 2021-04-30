@@ -529,10 +529,8 @@ namespace compare {
 
     // ---------------------------------------------------------------------------
     // print format //DX20210208
-    bool write_txt = false;
-    bool write_json = false;
-    if(XHOST.vflag_control.flag("PRINT_MODE::TXT")){ write_txt = true; }
-    if(XHOST.vflag_control.flag("PRINT_MODE::JSON")){ write_json = true; }
+    bool write_txt = XHOST.vflag_control.flag("PRINT_MODE::TXT");
+    bool write_json = XHOST.vflag_control.flag("PRINT_MODE::JSON");
     // if not specified, write text by default
     if(!write_txt && !write_json){ write_txt = true; }
 
