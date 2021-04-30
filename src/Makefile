@@ -1181,6 +1181,8 @@ check_full:
 	$(MAKE) check_aflow_xtal_finder
 	$(MAKE) check_fold_atoms_in_cell_routine
 	$(MAKE) check_prototype_generator
+	#[VERY SLOW]$(MAKE) check_prototype_symmetry
+	#[VERY SLOW]$(MAKE) check_prototype_uniqueness
 	$(MAKE) check_aflow_gcc_compatibility
 	$(MAKE) check_cce
 	$(MAKE) check_pocc
@@ -1560,6 +1562,14 @@ check_fold_atoms_in_cell_routine:
 check_prototype_generator:
 	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
 	./aflow --PrototypeGenerator_test
+.PHONY: check_prototype_symmetry
+check_prototype_symmetry:
+	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
+	./aflow --PrototypeSymmetry_test
+.PHONY: check_prototype_uniqueness
+check_prototype_uniqueness:
+	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
+	./aflow --PrototypeUniqueness_test
 #RF20200302 - START
 .PHONY: check_cce
 check_cce:
