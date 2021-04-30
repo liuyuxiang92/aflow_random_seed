@@ -572,35 +572,36 @@ namespace SYM {
   xvector<double> minimizeDistanceCartesianMethod(const xvector<double>& cpos1, const xvector<double>& cpos2, const xmatrix<double>& lattice, xvector<int>& ijk){
 
     // ---------------------------------------------------------------------------
-    // determine dimensions to produce uniform sphere; account for skewness 
-    double radius=RadiusSphereLattice(lattice);
-    xvector<int> dims(3);
-    dims=LatticeDimensionSphere(lattice,radius);
-
-    // ---------------------------------------------------------------------------
-    // multiply lattice vectors by index once and store - faster
-    vector<xvector<double> > l1, l2, l3;
-    vector<int> a_index, b_index, c_index;
-    for(int a=-dims[1];a<=dims[1];a++){l1.push_back(a*lattice(1));a_index.push_back(a);} //DX calc once and store
-    for(int b=-dims[2];b<=dims[2];b++){l2.push_back(b*lattice(2));b_index.push_back(b);} //DX calc once and store
-    for(int c=-dims[3];c<=dims[3];c++){l3.push_back(c*lattice(3));c_index.push_back(c);} //DX calc once and store
-
-    // ---------------------------------------------------------------------------
-    // calculate original distance between points and make temporary variables 
+    // calculate original distance between points and make temporary variables //DX20210315 - moved to top
     xvector<double> incell_dist = cpos1-cpos2;
     xvector<double> min_vec = incell_dist;
     double min_mod = aurostd::modulus(min_vec);
 
-    xvector<double> tmp;
-    double mod_tmp;
+    if(min_mod<_ZERO_TOL_){ return min_vec; } //DX20210316 - return right away
+
+    // ---------------------------------------------------------------------------
+    // determine dimensions to produce uniform sphere; account for skewness 
+    double radius=min_mod; //DX20210315 - use distance between atoms, significant speed up for skewed cells (used to be RadiusSphereLattice(lattice); slow)
+    xvector<int> dims(3);
+
+    // ---------------------------------------------------------------------------
+    // multiply lattice vectors by index once and store - faster
+    // DX20210315 - used resetLatticeDimensions, its faster, and it starts with
+    // the zeroth (center) cell
+    vector<xvector<double> > l1, l2, l3;
+    vector<int> a_index, b_index, c_index;
+    resetLatticeDimensions(lattice,radius,dims,l1,l2,l3,a_index,b_index,c_index);
+
+    xvector<double> a_component, ab_component, tmp; //DX20210315 - define outside loop
+    double mod_tmp = AUROSTD_MAX_DOUBLE; //DX20210315 - initialize
 
     // ---------------------------------------------------------------------------
     // consider other periodic images within the grid-sphere 
     // vector stored in each loop to save computation; fewer duplicate operations
     for(uint i=0;i<l1.size();i++){
-      xvector<double> a_component = incell_dist + l1[i];    //DX : cpos1-cpos2+a*lattice(1)
+      a_component = incell_dist + l1[i];    //DX : cpos1-cpos2+a*lattice(1)
       for(uint j=0;j<l2.size();j++){
-        xvector<double> ab_component = a_component + l2[j]; //DX : cpos1-cpos2+a*lattice(1) + (b+lattice(2))
+        ab_component = a_component + l2[j]; //DX : cpos1-cpos2+a*lattice(1) + (b+lattice(2))
         for(uint k=0;k<l3.size();k++){
           tmp = ab_component + l3[k];                       //DX : cpos1-cpos2+a*lattice(1) + (b+lattice(2)) + (c+lattice(3))
           mod_tmp = aurostd::modulus(tmp);
@@ -610,6 +611,14 @@ namespace SYM {
             ijk(1) = a_index[i];
             ijk(2) = b_index[j];
             ijk(3) = c_index[k];
+            if(min_mod<_ZERO_TOL_){ return min_vec; } //DX20210315 - return right away
+            // ---------------------------------------------------------------------------
+            // diminishing dims: if minimum distance changed, then we may not need to
+            // search as far; reset loop and search again based on new minimum distance //DX20210315 (significant speed up)
+            if(!(dims[1]==1 && dims[2]==1 && dims[3]==1)){
+              resetLatticeDimensions(lattice,min_mod,dims,l1,l2,l3,a_index,b_index,c_index);
+              i=j=k=0;
+            }
           } 
         }
       }
