@@ -8887,7 +8887,7 @@ string GetSpaceGroupHall(int spacegroupnumber, int setting, string directory) {
       return "-P 2 2";
     case 48:
       if (setting==SG_SETTING_1) return "P 2 2 -1n";  // ------------------- 48  -P P 2 2 -1n #48 (setting 1)
-      return "-P 2ab 2bc";                 // ------------------- 48  -P 2ab 2bc #48 (setting 2)
+      return "-P 2ab 2bc";                            // ------------------- 48  -P 2ab 2bc #48 (setting 2)
     case 49: // ------------------- 49  -P 2 2c #49
       return "-P 2 2c";
     case 50:
@@ -8911,7 +8911,7 @@ string GetSpaceGroupHall(int spacegroupnumber, int setting, string directory) {
       return "-P 2 2n";
     case 59:
       if (setting==SG_SETTING_1) return "P 2 2ab -1ab"; // ------------------- 59  P 2 2ab -1ab #59 (setting 1)
-      else return "-P 2ab 2a"; // ------------------- 59  -P 2ab 2a #59 (setting 2)
+      else return "-P 2ab 2a";                          // ------------------- 59  -P 2ab 2a #59 (setting 2)
     case 60: // ------------------- 60  -P 2n 2ab #60
       return "-P 2n 2ab";
     case 61: // ------------------- 61  -P 2ac 2ab #61
@@ -8930,12 +8930,12 @@ string GetSpaceGroupHall(int spacegroupnumber, int setting, string directory) {
       return "-C 2b 2";
     case 68:
       if (setting==SG_SETTING_1) return "C 2 2 -1bc"; // ------------------- 68  C 2 2 -1bc #68 (setting 1)
-      else return "-C 2b 2bc";             // ------------------- 68  -C 2b 2bc #68 (setting 2)
+      else return "-C 2b 2bc";                        // ------------------- 68  -C 2b 2bc #68 (setting 2)
     case 69: // ------------------- 69  -F 2 2 #69
       return "-F 2 2";
     case 70:
       if (setting==SG_SETTING_1) return "F 2 2 -1d"; // ------------------- 70  F 2 2 -1d #70 (setting 1)
-      else return "-F 2uv 2vw";            // ------------------- 70  -F 2uv 2vw #70 (setting 2)
+      else return "-F 2uv 2vw";                      // ------------------- 70  -F 2uv 2vw #70 (setting 2)
     case 71: // ------------------- 71  -I 2 2 #71
       return "-I 2 2";
     case 72: // ------------------- 72  -I 2 2c #72
@@ -8966,15 +8966,15 @@ string GetSpaceGroupHall(int spacegroupnumber, int setting, string directory) {
       return "-P 4c";
     case 85:
       if (setting==SG_SETTING_1) return "P 4ab -1ab"; // ------------------- 85  P 4ab -1ab #85 (setting 1)
-      else return "-P 4a";                 // ------------------- 85  -P 4a #85 (setting 2)
+      else return "-P 4a";                            // ------------------- 85  -P 4a #85 (setting 2)
     case 86:
       if (setting==SG_SETTING_1) return "P 4n -1n"; // ------------------- 86  P 4n -1n #86 (setting 1)
-      else return "-P 4bc"; // ------------------- 86  -P 4bc #86 (setting 2)
+      else return "-P 4bc";                         // ------------------- 86  -P 4bc #86 (setting 2)
     case 87: // ------------------- 87  -I 4 #87
       return "-I 4";
     case 88:
       if (setting==SG_SETTING_1) return "I 4bw -1bw"; // ------------------- 88  I 4bw -1bw #88 (setting 1)
-      else return "-I 4ad";                // ------------------- 88  -I 4ad #88 (setting 2)
+      else return "-I 4ad";                           // ------------------- 88  -I 4ad #88 (setting 2)
     case 89: // ------------------- 89  P 4 2 #89
       return "P 4 2";
     case 90: // ------------------- 90  P 4ab 2ab #90
@@ -9049,47 +9049,47 @@ string GetSpaceGroupHall(int spacegroupnumber, int setting, string directory) {
       return "-P 4 2c";
     case 125:
       if (setting==SG_SETTING_1) return "P 4 2 -1ab"; // ------------------- 125  P 4 2 -1ab #125 (setting 1)
-      else return "-P 4a 2b";                // ------------------- 125  -P 4a 2b #125 (setting 2)
+      else return "-P 4a 2b";                         // ------------------- 125  -P 4a 2b #125 (setting 2)
     case 126:
       if (setting==SG_SETTING_1) return "P 4 2 -1n"; // ------------------- 126  P 4 2 -1n #126 (setting 1)
-      else return "-P 4a 2bc";            // ------------------- 126  -P 4a 2bc #126 (setting 2)
+      else return "-P 4a 2bc";                       // ------------------- 126  -P 4a 2bc #126 (setting 2)
     case 127: // ------------------- 127  -P 4 2ab #127
       return "-P 4 2ab";
     case 128: // ------------------- 128  -P 4 2n #128
       return "-P 4 2n";
     case 129:
       if (setting==SG_SETTING_1) return "P 4ab 2ab -1ab"; // ------------------- 129  P 4ab 2ab -1ab #129 (setting 1)
-      else return "-P 4a 2a";                  // ------------------- 129  -P 4a 2a #129 (setting 2)
+      else return "-P 4a 2a";                             // ------------------- 129  -P 4a 2a #129 (setting 2)
     case 130:
       if (setting==SG_SETTING_1) return "P 4ab 2n -1ab"; // ------------------- 130  P 4ab 2n -1ab #130 (setting 1)
-      else return "-P 4a 2ac";                // ------------------- 130  -P 4a 2ac #130 (setting 2)
+      else return "-P 4a 2ac";                           // ------------------- 130  -P 4a 2ac #130 (setting 2)
     case 131: // ------------------- 131  -P 4c 2 #131
       return "-P 4c 2";
     case 132: // ------------------- 132  -P 4c 2c #132
       return "-P 4c 2c";
     case 133:
       if (setting==SG_SETTING_1) return "P 4n 2c -1n"; // ------------------- 133  P 4n 2c -1n #133 (setting 1)
-      else return "-P 4ac 2b";              // ------------------- 133  -P 4ac 2b #133 (setting 2)
+      else return "-P 4ac 2b";                         // ------------------- 133  -P 4ac 2b #133 (setting 2)
     case 134:
       if (setting==SG_SETTING_1) return "P 4n 2 -1n"; // ------------------- 134  -P 4ac 2bc #134 (setting 1)
-      else return "-P 4ac 2bc";            // ------------------- 134  -P 4ac 2bc #134 (setting 2)
+      else return "-P 4ac 2bc";                       // ------------------- 134  -P 4ac 2bc #134 (setting 2)
     case 135: // ------------------- 135  -P 4c 2ab #135
       return "-P 4c 2ab";
     case 136: // ------------------- 136  -P 4n 2n #136
       return "-P 4n 2n";
     case 137:
       if (setting==SG_SETTING_1) return "P 4n 2n -1n"; // ------------------- 137  P 4n 2n -1n #137 (setting 1)
-      else return "-P 4ac 2a";              // ------------------- 137  -P 4ac 2a #137 (setting 2)
+      else return "-P 4ac 2a";                         // ------------------- 137  -P 4ac 2a #137 (setting 2)
     case 138:
       if (setting==SG_SETTING_1) return "P 4n 2ab -1n"; // ------------------- 138  P 4n 2ab -1n #138 (setting 1)
-      else return "-P 4ac 2ac";              // ------------------- 138  -P 4ac 2ac #138 (setting 2)
+      else return "-P 4ac 2ac";                         // ------------------- 138  -P 4ac 2ac #138 (setting 2)
     case 139: // ------------------- 139  -I 4 2 #139
       return "-I 4 2";
     case 140: // ------------------- 140  -I 4 2c #140
       return "-I 4 2c";
     case 141:
       if (setting==SG_SETTING_1) return "I 4bw 2bw -1bw"; // ------------------- 141  I 4bw 2bw -1bw #141 (setting 1)
-      else return "-I 4bd 2"; // ------------------- 141  -I 4bd 2 #141 (setting 2)
+      else return "-I 4bd 2";                             // ------------------- 141  -I 4bd 2 #141 (setting 2)
     case 142:
       if (setting==SG_SETTING_1) return "I 4bw 2aw -1bw"; // ------------------- 142  I 4bw 2aw -1bw #142 (setting 1)
       else return "-I 4bd 2c"; // ------------------- 142  -I 4bd 2c #142 (setting 2)
@@ -9101,12 +9101,12 @@ string GetSpaceGroupHall(int spacegroupnumber, int setting, string directory) {
       return "P 32";
     case 146:
       if (setting==SG_SETTING_1) return "P 3*"; // ------------------- 146  P 3* #146 (setting 1, rhl)
-      else return "R 3";             // ------------------- 146  R 3 #146 (setting 2, hex)
+      else return "R 3";                        // ------------------- 146  R 3 #146 (setting 2, hex)
     case 147: // ------------------- 147  -P 3 #147
       return "-P 3";
     case 148:
       if (setting==SG_SETTING_1) return "-P 3*"; // ------------------- 148  -P 3* #148 (setting 1, rhl)
-      else return "-R 3";             // ------------------- 148  -R 3 #148 (setting 2, hex)
+      else return "-R 3";                        // ------------------- 148  -R 3 #148 (setting 2, hex)
     case 149: // ------------------- 149  P 3 2 #149
       return "P 3 2";
     case 150: // ------------------- 150  P 3 2'' #150
@@ -9121,7 +9121,7 @@ string GetSpaceGroupHall(int spacegroupnumber, int setting, string directory) {
       return "P 32 2''";
     case 155:
       if (setting==SG_SETTING_1) return "P 3* 2"; // ------------------- 155  P 3* 2 #155 (setting 1, rhl)
-      else return "R 3 2''";           // ------------------- 155  R 3 2'' #155 (setting 2, hex)
+      else return "R 3 2''";                      // ------------------- 155  R 3 2'' #155 (setting 2, hex)
     case 156: // ------------------- 156  P 3 -2'' #156
       return "P 3 -2''";
     case 157: // ------------------- 157  P 3 -2 #157
@@ -9132,10 +9132,10 @@ string GetSpaceGroupHall(int spacegroupnumber, int setting, string directory) {
       return "P 3 -2c";
     case 160:
       if (setting==SG_SETTING_1) return "P 3* -2"; // ------------------- 160  P 3* -2 #160 (setting 1, rhl)
-      else return "R 3 -2''";           // ------------------- 160  R 3 -2'' #160 (setting 2, hex)
+      else return "R 3 -2''";                      // ------------------- 160  R 3 -2'' #160 (setting 2, hex)
     case 161:
       if (setting==SG_SETTING_1) return "P 3* -2n"; // ------------------- 161  P 3* -2n #161 (setting 1, rhl)
-      else return "R 3 -2''c";           // ------------------- 161  R 3 -2''c #161 (setting 2, hex)
+      else return "R 3 -2''c";                      // ------------------- 161  R 3 -2''c #161 (setting 2, hex)
     case 162: // ------------------- 162  -P 3 2 #162
       return "-P 3 2";
     case 163: // ------------------- 163  -P 3 2c #163
@@ -9146,10 +9146,10 @@ string GetSpaceGroupHall(int spacegroupnumber, int setting, string directory) {
       return "-P 3 2''c";
     case 166:
       if (setting==SG_SETTING_1) return "-P 3* 2"; // ------------------- 166  -P 3* 2 #166 (setting 1, rhl)
-      else return "-R 3 2''";           // ------------------- 166  -R 3 2'' #166 (setting 2, hex)
+      else return "-R 3 2''";                      // ------------------- 166  -R 3 2'' #166 (setting 2, hex)
     case 167:
       if (setting==SG_SETTING_1) return "-P 3* 2n"; // ------------------- 167  -P 3* 2n #167 (setting 1, rhl)
-      else return "-R 3 2''c";           // ------------------- 167  -R 3 2''c #167 (setting 2, hex)
+      else return "-R 3 2''c";                      // ------------------- 167  -R 3 2''c #167 (setting 2, hex)
     case 168: // ------------------- 168  P 6 #168
       return "P 6";
     case 169: // ------------------- 169  P 61 #169
@@ -9218,12 +9218,12 @@ string GetSpaceGroupHall(int spacegroupnumber, int setting, string directory) {
       return "-P 2 2 3";
     case 201:
       if (setting==SG_SETTING_1) return "P 2 2 3 -1n"; // ------------------- 201  P 2 2 3 -1n #201 (setting 1)
-      else return "-P 2ab 2bc 3";           // ------------------- 201  -P 2ab 2bc 3 #201 (setting 2)
+      else return "-P 2ab 2bc 3";                      // ------------------- 201  -P 2ab 2bc 3 #201 (setting 2)
     case 202: // ------------------- 202  -F 2 2 3 #202
       return "-F 2 2 3";
     case 203:
       if (setting==SG_SETTING_1) return "F 2 2 3 -1d"; // ------------------- 203  F 2 2 3 -1d #203 (setting 1)
-      else return "-F 2uv 2vw 3";           // ------------------- 203  -F 2uv 2vw 3 #203 (setting 2)
+      else return "-F 2uv 2vw 3";                      // ------------------- 203  -F 2uv 2vw 3 #203 (setting 2)
     case 204: // ------------------- 204  -I 2 2 3 #204
       return "-I 2 2 3";
     case 205: // ------------------- 205  -P 2ac 2ab 3 #205
@@ -9262,22 +9262,22 @@ string GetSpaceGroupHall(int spacegroupnumber, int setting, string directory) {
       return "-P 4 2 3";
     case 222:
       if (setting==SG_SETTING_1) return "P 4 2 3 -1n"; // ------------------- 222  P 4 2 3 -1n #222 (setting 1)
-      else return "-P 4a 2bc 3";            // ------------------- 222  -P 4a 2bc 3 #222 (setting 2)
+      else return "-P 4a 2bc 3";                       // ------------------- 222  -P 4a 2bc 3 #222 (setting 2)
     case 223: // ------------------- 223  -P 4n 2 3 #223
       return "-P 4n 2 3";
     case 224:
       if (setting==SG_SETTING_1) return "P 4n 2 3 -1n"; // ------------------- 224  P 4n 2 3 -1n #224 (setting 1)
-      else return "-P 4bc 2bc 3"; // ------------------- 224  -P 4bc 2bc 3 #224 (setting 2)
+      else return "-P 4bc 2bc 3";                       // ------------------- 224  -P 4bc 2bc 3 #224 (setting 2)
     case 225: // ------------------- 225  -F 4 2 3 #225
       return "-F 4 2 3";
     case 226: // ------------------- 226  -F 4c 2 3 #226
       return "-F 4c 2 3";
     case 227:
       if (setting==SG_SETTING_1) return "F 4d 2 3 -1d"; // ------------------- 227  -F 4vw 2vw 3 #227 (setting 1)
-      else return "-F 4vw 2vw 3"; // ------------------- 227  -F 4vw 2vw 3 #227 (setting 2)
+      else return "-F 4vw 2vw 3";                       // ------------------- 227  -F 4vw 2vw 3 #227 (setting 2)
     case 228:
       if (setting==SG_SETTING_1) return "F 4d 2 3 -1cd"; // ------------------- 228  F 4d 2 3 -1cd #228 (setting 1)
-      else return "-F 4cvw 2vw 3"; // ------------------- 228  -F 4cvw 2vw 3 #228 (setting 2)
+      else return "-F 4cvw 2vw 3";                       // ------------------- 228  -F 4cvw 2vw 3 #228 (setting 2)
     case 229: // ------------------- 229  -I 4 2 3 #229
       return "-I 4 2 3";
     case 230: // ------------------- 230  -I 4bd 2c 3 #230
