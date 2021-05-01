@@ -10383,6 +10383,12 @@ void xstructure::GetLatticeType(xstructure& str_sp,xstructure& str_sc, double sy
   // symmetries are commensurate at a common tolerance value
   while(!same_eps && count++ < count_max){
 
+    if(LDEBUG){ cerr << function_name << " [2] Top of self-consistent lattice-type loop (calculating real, reciprocal, and superlattice types) (sym_eps=" << tolerance << ", sym_eps_change_count=" << (*this).sym_eps_change_count << ")" << endl; }
+
+    // ---------------------------------------------------------------------------
+    // clear to start
+    (*this).ClearSymmetry();
+
     // ---------------------------------------------------------------------------
     // update the tolerance, it may have change during loop
     tolerance = (*this).sym_eps;
@@ -10399,19 +10405,19 @@ void xstructure::GetLatticeType(xstructure& str_sp,xstructure& str_sc, double sy
 
     // ---------------------------------------------------------------------------
     // REAL - pass in str_sp and str_sc to keep primitive and conventional info
-    if(LDEBUG){ cerr << function_name << " [2] Calculate real lattice type (sym_eps=" << tolerance << ", sym_eps_change_count=" << (*this).sym_eps_change_count << ")" << endl; }
+    if(LDEBUG){ cerr << function_name << " [3] Calculate real lattice type (sym_eps=" << tolerance << ", sym_eps_change_count=" << (*this).sym_eps_change_count << ")" << endl; }
     (*this).GetRealLatticeType(str_sp, str_sc, tolerance);
     tolerance = (*this).sym_eps; // update the tolerance
 
     // ---------------------------------------------------------------------------
     // RECIPROCAL
-    if(LDEBUG){ cerr << function_name << " [3] Calculate reciprocal lattice type (sym_eps=" << tolerance << ", sym_eps_change_count=" << (*this).sym_eps_change_count << ")" << endl; }
+    if(LDEBUG){ cerr << function_name << " [4] Calculate reciprocal lattice type (sym_eps=" << tolerance << ", sym_eps_change_count=" << (*this).sym_eps_change_count << ")" << endl; }
     (*this).GetReciprocalLatticeType(tolerance);
     if(!no_scan && (*this).sym_eps != tolerance){ continue; } // if tolerance changed, recalc
 
     // ---------------------------------------------------------------------------
     // SUPERLATTICE
-    if(LDEBUG){ cerr << function_name << " [4] Calculate superlattice type (sym_eps=" << tolerance << ", sym_eps_change_count=" << (*this).sym_eps_change_count << ")" << endl; }
+    if(LDEBUG){ cerr << function_name << " [5] Calculate superlattice type (sym_eps=" << tolerance << ", sym_eps_change_count=" << (*this).sym_eps_change_count << ")" << endl; }
     (*this).GetSuperlatticeType(tolerance);
     if(!no_scan && (*this).sym_eps != tolerance){ continue; } // if tolerance changed, recalc
 
@@ -10419,7 +10425,7 @@ void xstructure::GetLatticeType(xstructure& str_sp,xstructure& str_sc, double sy
     same_eps = true;
   }
 
-  if(LDEBUG){ cerr << function_name << " [5] Lattice types calculation finished! (sym_eps=" << tolerance << ", sym_eps_change_count=" << (*this).sym_eps_change_count << ")" << endl; }
+  if(LDEBUG){ cerr << function_name << " [6] Lattice types calculation finished! (sym_eps=" << tolerance << ", sym_eps_change_count=" << (*this).sym_eps_change_count << ")" << endl; }
 
 }
 
@@ -10621,6 +10627,8 @@ void xstructure::GetExtendedCrystallographicData(xstructure& str_sp,
   // symmetries are commensurate with a common tolerance value
   while(!same_eps && count++ < count_max){
 
+    if(LDEBUG){ cerr << function_name << " [2] Top of self-consistent extended crystallographic data loop (calculating lattice type and space group data) (sym_eps=" << tolerance << ", sym_eps_change_count=" << (*this).sym_eps_change_count << ")" << endl; }
+
     // ---------------------------------------------------------------------------
     // clear to start
     (*this).ClearSymmetry();
@@ -10641,13 +10649,13 @@ void xstructure::GetExtendedCrystallographicData(xstructure& str_sp,
 
     // ---------------------------------------------------------------------------
     // REAL, RECIPROCAL, and SUPERLATTICE data
-    if(LDEBUG){ cerr << function_name << " [2] Calculate real, reciprocal, and superlattice information (sym_eps=" << tolerance << ", sym_eps_change_count=" << (*this).sym_eps_change_count << ")" << endl; }
+    if(LDEBUG){ cerr << function_name << " [3] Calculate real, reciprocal, and superlattice information (sym_eps=" << tolerance << ", sym_eps_change_count=" << (*this).sym_eps_change_count << ")" << endl; }
     (*this).GetLatticeType(str_sp, str_sc, (*this).sym_eps);
     tolerance = (*this).sym_eps; // update the tolerance
 
     // ---------------------------------------------------------------------------
     // space group data
-    if(LDEBUG){ cerr << function_name << " [3] Calculate the space group symmetry information (sym_eps=" << tolerance << ", sym_eps_change_count=" << (*this).sym_eps_change_count << ")" << endl; }
+    if(LDEBUG){ cerr << function_name << " [4] Calculate the space group symmetry information (sym_eps=" << tolerance << ", sym_eps_change_count=" << (*this).sym_eps_change_count << ")" << endl; }
     (*this).SpaceGroup_ITC(tolerance, -1, setting, no_scan);
     if(!no_scan && (*this).sym_eps != tolerance){ continue; } // if tolerance changed, recalc
 

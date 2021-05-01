@@ -1051,6 +1051,7 @@ namespace LATTICE {
     bool SYS_VERBOSE=FALSE;
     //DX START
     //DX20170814 - if(str_sp.pgroup_calculated==FALSE || str_sp.fgroup_calculated==FALSE || str_sp.pgroup_xtal_calculated==FALSE) {  //[CO20200106 - close bracket for indenting]}
+    if(LDEBUG){ cerr << XPID << "LATTICE::Standard_Lattice_Structure: Check if str_sp.crystal_system is already calculated: str_sp.crystal_system=" << str_sp.crystal_system << endl; }
     if(str_sp.crystal_system=="") {
       ofstream FileDevNull("/dev/null");
       _aflags aflags;
