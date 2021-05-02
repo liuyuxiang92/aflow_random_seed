@@ -10383,8 +10383,6 @@ void xstructure::GetLatticeType(xstructure& str_sp,xstructure& str_sc, double sy
   // symmetries are commensurate at a common tolerance value
   while(!same_eps && count++ < count_max){
 
-    if(LDEBUG){ cerr << function_name << " [2] Top of self-consistent lattice-type loop (calculating real, reciprocal, and superlattice types) (sym_eps=" << tolerance << ", sym_eps_change_count=" << (*this).sym_eps_change_count << ")" << endl; }
-
     // ---------------------------------------------------------------------------
     // clear to start
     (*this).ClearSymmetry();
@@ -10393,6 +10391,8 @@ void xstructure::GetLatticeType(xstructure& str_sp,xstructure& str_sc, double sy
     // update the tolerance, it may have change during loop
     tolerance = (*this).sym_eps;
     no_scan = (*this).sym_eps_no_scan;
+
+    if(LDEBUG){ cerr << function_name << " [2] Top of self-consistent lattice-type loop (calculating real, reciprocal, and superlattice types) (sym_eps=" << tolerance << ", sym_eps_change_count=" << (*this).sym_eps_change_count << ")" << endl; }
 
     // ---------------------------------------------------------------------------
     // check if consistency checks failed (maxed while loop iteration)
@@ -10627,8 +10627,6 @@ void xstructure::GetExtendedCrystallographicData(xstructure& str_sp,
   // symmetries are commensurate with a common tolerance value
   while(!same_eps && count++ < count_max){
 
-    if(LDEBUG){ cerr << function_name << " [2] Top of self-consistent extended crystallographic data loop (calculating lattice type and space group data) (sym_eps=" << tolerance << ", sym_eps_change_count=" << (*this).sym_eps_change_count << ")" << endl; }
-
     // ---------------------------------------------------------------------------
     // clear to start
     (*this).ClearSymmetry();
@@ -10637,6 +10635,8 @@ void xstructure::GetExtendedCrystallographicData(xstructure& str_sp,
     // update the tolerance, it may have change during loop
     tolerance = (*this).sym_eps;
     no_scan = (*this).sym_eps_no_scan;
+
+    if(LDEBUG){ cerr << function_name << " [2] Top of self-consistent extended crystallographic data loop (calculating lattice type and space group data) (sym_eps=" << tolerance << ", sym_eps_change_count=" << (*this).sym_eps_change_count << ")" << endl; }
 
     // ---------------------------------------------------------------------------
     // check if consistency checks failed (maxed while loop iteration)
