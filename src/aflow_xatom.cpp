@@ -10668,7 +10668,7 @@ void xstructure::GetExtendedCrystallographicData(xstructure& str_sp,
       string lattice_and_centering_from_sg = SYM::spacegroup2latticeAndCentering((*this).space_group_ITC); //DX20210412 - check centering
       if(!(lattice_and_centering == lattice_and_centering_from_sg && SYM::ComparePointGroupAndSpaceGroupString((*this),multiplicity_of_primitive,derivative_structure))){
         if(LDEBUG) {
-          cerr << function_name << " WARNING: Space group symbol and point group symbol do not match. (sg=" << GetSpaceGroupName((*this).space_group_ITC,(*this).directory) << ", pg=" << (*this).point_group_Hermann_Mauguin << ") [dir=" << (*this).directory << "]" << endl;
+          cerr << function_name << " WARNING: Space group symbol and point group symbol do not match. (sg=" << GetSpaceGroupName((*this).space_group_ITC,(*this).directory) << ", centering_sg=" << lattice_and_centering_from_sg << " | pg=" << (*this).point_group_Hermann_Mauguin << ", centering=" << lattice_and_centering << ") [dir=" << (*this).directory << "]" << endl;
         }
         if(!SYM::change_tolerance((*this),(*this).sym_eps,(*this).dist_nn_min,(*this).sym_eps_no_scan)){
           if(force_perform){
