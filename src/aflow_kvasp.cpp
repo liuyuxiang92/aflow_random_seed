@@ -3136,8 +3136,9 @@ namespace KBIN {
     //do not check turn on CSLOSHING with NELM, caused collisions with EDDDAV. it bounces back and forth between ALGO=VERFAST and ALGO=NORMAL
     //[CO20210315 - OBSOLETE]//if there is a patch to be applied for the error (CSLOSHING does), then check both when vasp running and when it's not running
     //[CO20210315 - OBSOLETE]//check NELM first, and set CSLOSHING on if NELM, that way CSLOSHING patches are applied first (work for both errors)
+    //the check for xwarning.flag("OUTCAR_INCOMPLETE")==false ensures we don't flag a run that was killed by --monitor_vasp, not xmessage.flag("REACHED_ACCURACY") (must be unconverged)
     scheme="NELM";
-    found_warning=(vasp_still_running==false && vasp_oszicar_unconverged);  // check from OSZICAR
+    found_warning=(vasp_still_running==false && xwarning.flag("OUTCAR_INCOMPLETE")==false && vasp_oszicar_unconverged);  // check from OSZICAR
     xwarning.flag(scheme,found_warning);
     //
     scheme="CSLOSHING";
