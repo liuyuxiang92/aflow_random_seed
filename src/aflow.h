@@ -569,6 +569,11 @@ extern _XHOST XHOST; // this will be global
 // Structures for flags and properties to share FAST !
 // STRUCTURES
 #define AFLOWIN_SEPARATION_LINE  string("[AFLOW] ************************************************************************************************************************** ")
+#define SEPARATION_LINE_DASH string("------------------------------------------------------------------------------------------------") //DX+CO20210429 - generic dash-line separator (used between symmetry operators)
+#define SEPARATION_LINE_DASH_SHORT string("---------------------------------------------------------------------------") //DX+CO20210429 - generic dash-line separator, short (used in symmetry log output)
+
+#define PRINT_NULL_JSON false //DX20210430 - add global flag to print "null" for empty JSON values
+
 
 // --------------------------------------------------------------------------
 // general flags to run aflow
@@ -1098,15 +1103,15 @@ uint ApennsyARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vfl
 #define _UPDATE_LATTICE_VECTORS_TO_ABCANGLES_   2
 #define _UPDATE_LATTICE_ABCANGLES_TO_VECTORS_   3
 
-#define _PGROUP_ 0             // for point group lattice
-#define _PGROUPK_ 5            // for point group klattice
-#define _PGROUP_XTAL_ 6        // for point group crystal
-#define _PGROUPK_XTAL_ 7       // for point group kcrystal
-#define _PGROUPK_PATTERSON_ 8   // for point group Patterson //DX20200129
-#define _FGROUP_ 1             // for factor group
-#define _SGROUP_ 2             // for space group
-#define _AGROUP_ 3             // for site positions point group
-#define _IATOMS_ 4             // for equivalent atoms
+#define _PGROUP_ 1             // for point group lattice
+#define _PGROUPK_ 6            // for point group klattice
+#define _PGROUP_XTAL_ 7        // for point group crystal
+#define _PGROUPK_XTAL_ 8       // for point group kcrystal
+#define _PGROUPK_PATTERSON_ 9  // for point group Patterson //DX20200129
+#define _FGROUP_ 2             // for factor group
+#define _SGROUP_ 3             // for space group
+#define _AGROUP_ 4             // for site positions point group
+#define _IATOMS_ 5             // for equivalent atoms
 
 // --------------------------------------------------------------------------
 //DX+CO START
@@ -1473,7 +1478,7 @@ bool sortWyckoffByType(const wyckoffsite_ITC& a, const wyckoffsite_ITC& b); // s
 class xstructure {
   public:
     // constructors/destructors                                   // --------------------------------------
-    xstructure(string="");                                        // constructor default
+    xstructure(const string& title="");                           // constructor default
     xstructure(const xstructure& b);                              // constructor copy
     xstructure(istream& input,int=IOVASP_POSCAR);                 // constructor from istream
     xstructure(ifstream& input,int=IOVASP_POSCAR);                // constructor from ifstream
@@ -1516,8 +1521,30 @@ class xstructure {
     string SpeciesString(void);                                   // Gives a string with the list of all the species
     uint SetSpecies(const std::deque<string>& vspecies);          // Set the species
     void UpdateSpecies(const _atom& atom);                        // Update species from atom (consolidated from AddAtom) //DX20210202
-    void GetLatticeType(xstructure& sp,xstructure& sc);           // Get all lattices
-    void GetLatticeType(void);                                    // Get all lattices
+    //DX20210302 [OBSOLETE] void GetLatticeType(xstructure& sp,xstructure& sc);           // Get all lattices
+    //DX20210302 [OBSOLETE] void GetLatticeType(void);                                    // Get all lattices
+    void GetLatticeType(
+        double sym_eps=AUROSTD_MAX_DOUBLE,
+        bool no_scan=false);                                      // Get all lattices
+    void GetLatticeType(xstructure& sp,xstructure& sc,
+        double sym_eps=AUROSTD_MAX_DOUBLE,
+        bool no_scan=false);                                      // Get all lattices
+    void GetExtendedCrystallographicData(
+        double sym_eps=AUROSTD_MAX_DOUBLE,
+        bool no_scan=false, int setting=SG_SETTING_1);
+    void GetExtendedCrystallographicData(xstructure& sp,
+        xstructure& sc,
+        double sym_eps=AUROSTD_MAX_DOUBLE,
+        bool no_scan=false, int setting=SG_SETTING_1);
+    void GetRealLatticeType(xstructure& sp,xstructure& sc,
+        double sym_eps=AUROSTD_MAX_DOUBLE);                       // Get real lattice type //DX2021011
+    void GetRealLatticeType(double sym_eps=AUROSTD_MAX_DOUBLE);   // Get real lattice type //DX20210211
+    void GetReciprocalLatticeType(xstructure& sp,xstructure& sc,
+        double sym_eps=AUROSTD_MAX_DOUBLE);                       // Get reciprocal lattice type //DX20210209
+    void GetReciprocalLatticeType(double sym_eps=AUROSTD_MAX_DOUBLE);// Get reciprocal lattice type //DX20210209
+    void GetSuperlatticeType(xstructure& sp,xstructure& sc,
+        double sym_eps=AUROSTD_MAX_DOUBLE);                       // Get superlattice type //DX20210209
+    void GetSuperlatticeType(double sym_eps=AUROSTD_MAX_DOUBLE);  // Get superlattice type //DX20210209
     void Standard_Primitive_UnitCellForm(void);                   // Reduce the Unit Cell to Standard Primitive Form
     void GetStandardPrimitive(void);                              // stub for void Standard_Primitive_UnitCellForm(void);
     void Standard_Conventional_UnitCellForm(void);                // Reduce the Unit Cell to Standard Conventional Form
@@ -1698,6 +1725,7 @@ class xstructure {
     string reciprocal_lattice_type;                               // reciprocal lattice type as a string
     string reciprocal_lattice_variation_type;                     // reciprocal lattice type as a string WSETYAWAN mod
     //string reciprocal_conventional_lattice_type;                // reciprocal lattice type as a string
+    xmatrix<double> bravais_superlattice_lattice;                 // superlattice lattice (identical atoms) //DX20210209
     string bravais_superlattice_type;                             // super lattice type as a string (identical atoms)
     string bravais_superlattice_variation_type;                   // super lattice type as a string (identical atoms) WSETYAWAN mod
     string bravais_superlattice_system;                           // lattice system http://en.wikipedia.org/wiki/Bravais_lattice (7)
@@ -2290,7 +2318,7 @@ string GetSpaceGroupName(int spacegroupnumber, string directory=""); //DX2018052
 int GetSpaceGroupNumber(const string& spacegroupsymbol, string directory=""); //DX20190708
 string GetSpaceGroupLabel(int spacegroupnumber);
 string GetSpaceGroupSchoenflies(int spacegroupnumber, string directory=""); //DX20170901 //DX20180526 - add directory
-string GetSpaceGroupHall(int spacegroupnumber, int setting=1, string directory=""); //DX20170901 //DX20180526 - add directory //DX20180806 - added setting
+string GetSpaceGroupHall(int spacegroupnumber, int setting=SG_SETTING_1, string directory=""); //DX20170901 //DX20180526 - add directory //DX20180806 - added setting
 string GetLaueLabel(string& point_group); //DX20170901 //DX20180526 - add directory
 
 #define RADIANS 0
@@ -4280,7 +4308,8 @@ string EquivalentAtomsToJson(vector<vector<int> >& iatoms); //DX20170803 - For P
 string SymmetryToJson(vector<_sym_op>& group, char& mode); //DX20170803 - For Python wrapper
 bool KBIN_SymmetryWrite(ofstream& FileMESSAGE,xstructure& a,_aflags& aflags,char group,const bool& osswrite,ostream& oss,const string& format="txt");
 //bool KBIN_SymmetryToScreen(xstructure& a, string& format, ostream& oss); //DX20170803 - For Python wrapper
-bool KBIN_SymmetryToScreen(xstructure& a, string& format, ostream& oss, char mode='\0'); //DX20170822 - For Python wrapper
+bool KBIN_SymmetryToScreen(xstructure& a, const string& format, ostream& oss, char mode='\0'); //DX20170822 - For Python wrapper
+bool KBIN_SymmetryToScreenWeb(xstructure& a, ostream& oss, char mode); //ME20210402
 bool KBIN_StepSymmetryPerform(xstructure& a,string AflowIn,ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags,const bool& osswrite,ostream& oss);
 //DX+CO START
 bool KBIN_StepSymmetryPerform_20161205(xstructure& a,string AflowIn,ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags,const bool& osswrite,ostream& oss); //DX

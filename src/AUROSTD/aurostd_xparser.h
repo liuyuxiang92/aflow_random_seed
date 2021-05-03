@@ -66,8 +66,12 @@ namespace aurostd {
       void addVector(const string &key, const deque<double> &value,
           int precision = AUROSTD_DEFAULT_PRECISION, bool roundoff = false,
           double tol = AUROSTD_ROUNDOFF_TOL);
-      void addVector(const string &key, const vector<string> &value);
-      void addVector(const string &key, const deque<string> &value);
+      void addVector(const string &key, const xvector<double> &value,
+          int precision = AUROSTD_DEFAULT_PRECISION, bool roundoff = false,
+          double tol = AUROSTD_ROUNDOFF_TOL); //DX20210308 - added xvector variant
+      void addVector(const string &key, const vector<string> &value, bool wrap=true); //DX20210301 - added wrap
+      void addVector(const string &key, const deque<string> &value, bool wrap=true); //DX20210301 - added wrap
+      void addVector(const string &key, vector<JSONwriter> &value); //AS20210309
       template <typename utype> void addMatrix(const string &key, const utype &value);
       void addMatrix(const string &key, const vector<vector<double> > &value,
           int precision = AUROSTD_DEFAULT_PRECISION, bool roundoff = false,
@@ -75,15 +79,29 @@ namespace aurostd {
       void addMatrix(const string &key, const deque<deque<double> > &value,
           int precision = AUROSTD_DEFAULT_PRECISION, bool roundoff = false,
           double tol = AUROSTD_ROUNDOFF_TOL);
+      void addMatrix(const string &key, const xmatrix<double> &value,
+          int precision = AUROSTD_DEFAULT_PRECISION, bool roundoff = false,
+          double tol = AUROSTD_ROUNDOFF_TOL); //DX20210308 - added xmatrix variant
+      void addMatrix(const string &key, const vector<vector<string> > &value); //DX20210211
+      void addMatrix(const string &key, const deque<deque<string> > &value); //DX20210211
       void addString(const string &key, const string &value);
       void addBool(const string &key, bool value);
-      void addRaw(const string &value);
+      void mergeRawJSON(const string &value); //DX20210304 - changed from addRaw to mergeRawJSON
+      void addRawJSON(const string &key, const string& value); //DX20210301
+      void addNull(const string &key); //DX20210301
       void addJSON(const string &key, JSONwriter &value);
       void mergeJSON(JSONwriter &value);
       string toString(bool wrap=true);
   };
 }
 //AS20201214 END
+
+//AS20210309 - added JSON benchmarks (keeping to easily test later, but commented out for now)
+//AS20210309 [BENCHMARK] namespace aurostd {
+//AS20210309 [BENCHMARK] 	 void test_vector_string(int niterations);
+//AS20210309 [BENCHMARK]	 void test_vector_json(int niterations);
+//AS20210309 [BENCHMARK]   void run_vector_string_vs_json_test(void);
+//AS20210309 [BENCHMARK] }
 
 //ME2020408 - JSON reader
 //Moved from the AflowDB class

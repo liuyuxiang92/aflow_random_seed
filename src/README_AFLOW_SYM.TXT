@@ -591,7 +591,7 @@ AFLOW COMMANDS USAGE:
         translations as big as |T| and writes it in the aflow.sgroup.out
         file. See documentation of aflow.
         Be careful because the size of the space group increases
-        as the radius^3 times the size of the factor roup.
+        as the radius^3 times the size of the factor group.
         The point and factopr groups are required for the space group,
         therefore the aflow.pgroup.out and aflow.fgroup.out files will
         be generated as well.
