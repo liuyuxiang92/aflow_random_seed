@@ -40,6 +40,9 @@
         -- added more debugging to pflow::PerformFullSymmetry() (DX)
         -- suppressed/reduced output for minimumDistance() and LatticeDimensionSphere() (DX)
         -- fixed ELK reader to include magnetic/spin information (DX)
+        -- added carbonitride and part 3 prototypes to README_PROTO.TXT (DX)
+        -- added check_prototype_symmetry and check_prototype_uniqueness to makefile (DX)
+        -- fixed issues with swapping species (atom types not updated) (DX)
 3.2.8 - 2021/02/22
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.8.tar.xz
         -- improved efficiency/speed of minimizeDistanceCartesianMethod() (DX)
