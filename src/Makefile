@@ -1572,7 +1572,7 @@ check_prototype_symmetry:
 .PHONY: check_prototype_uniqueness
 check_prototype_uniqueness:
 	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
-	if !([ -n "$$TRAVIS" ] || [ "$$CI" = true ]); then ./aflow --PrototypeUniqueness_test fi
+	if !([ -n "$$TRAVIS" ] || [ "$$CI" = true ]); then ./aflow --PrototypeUniqueness_test; fi
 #RF20200302 - START
 .PHONY: check_cce
 check_cce:
