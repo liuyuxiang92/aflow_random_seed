@@ -1166,8 +1166,8 @@ version_updates_email.txt: README_AFLOW_VERSIONS_HISTORY.TXT Makefile
 .PHONY: check
 check:
 	$(MAKE) check_proto
-.PHONY: check_full_CI
-check_full_CI:
+.PHONY: check_full
+check_full:
 	$(MAKE) check_schema
 	$(MAKE) check_CeramGen
 	#[WAITING FOR ICSD LIB2RAW REDO]$(MAKE) check_Egap
@@ -1184,14 +1184,9 @@ check_full_CI:
 	$(MAKE) check_aflow_xtal_finder
 	$(MAKE) check_fold_atoms_in_cell_routine
 	$(MAKE) check_prototype_generator
-	#[VERY SLOW, CI TIMES-OUT]$(MAKE) check_prototype_symmetry
-	#[VERY SLOW, CI TIMES-OUT]$(MAKE) check_prototype_uniqueness
 	$(MAKE) check_aflow_gcc_compatibility
 	$(MAKE) check_cce
 	$(MAKE) check_pocc
-.PHONY: check_full
-check_full:
-	$(MAKE) check_full_CI
 	$(MAKE) check_prototype_symmetry
 	$(MAKE) check_prototype_uniqueness
 .PHONY: check_proto
@@ -1573,11 +1568,11 @@ check_prototype_generator:
 .PHONY: check_prototype_symmetry
 check_prototype_symmetry:
 	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
-	./aflow --PrototypeSymmetry_test
+	if !([ -n "$$TRAVIS" ] || [ "$$CI" = true ]); then ./aflow --PrototypeSymmetry_test; fi
 .PHONY: check_prototype_uniqueness
 check_prototype_uniqueness:
 	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
-	./aflow --PrototypeUniqueness_test
+	if !([ -n "$$TRAVIS" ] || [ "$$CI" = true ]); then ./aflow --PrototypeUniqueness_test fi
 #RF20200302 - START
 .PHONY: check_cce
 check_cce:
