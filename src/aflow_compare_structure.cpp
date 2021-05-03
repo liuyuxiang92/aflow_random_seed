@@ -581,8 +581,22 @@ namespace compare {
     vector<string> matching_prototypes;
     if(prototypes.size()==0){ return matching_prototypes; } //DX20210421 - protect against no matching entries
 
+    // ---------------------------------------------------------------------------
+    // sort, put best matches first
+    vector<double> misfit_matched;
+    uint placement_index = prototypes[0].structures_duplicate.size();
     for(uint i=0;i<prototypes[0].structures_duplicate.size();i++){
-      matching_prototypes.push_back(prototypes[0].structures_duplicate[i]->name);
+      for(uint j=0;j<misfit_matched.size();j++){
+        if(prototypes[0].mapping_info_duplicate[i].misfit<misfit_matched[j]){ placement_index = 0; }
+      }
+      if(placement_index == prototypes[0].structures_duplicate.size()){
+        matching_prototypes.push_back(prototypes[0].structures_duplicate[i]->name);
+        misfit_matched.push_back(prototypes[0].mapping_info_duplicate[i].misfit);
+      }
+      else{
+        matching_prototypes.insert(matching_prototypes.begin()+placement_index,prototypes[0].structures_duplicate[i]->name);
+        misfit_matched.insert(misfit_matched.begin()+placement_index,prototypes[0].mapping_info_duplicate[i].misfit);
+      }
     }
     return matching_prototypes; // duplicates names are prototype labels
   }
