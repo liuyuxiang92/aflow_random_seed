@@ -2405,6 +2405,7 @@ void xstructure::free() { //DX20191220 - moved all initializations from constuct
   rotate_lattice_original2new.clear(); //DX20181024
   rotate_lattice_new2original.clear(); //DX20181024
   //reciprocal_conventional_lattice_type="";
+  bravais_superlattice_lattice.clear(); //DX20210209
   bravais_superlattice_type="";
   bravais_superlattice_variation_type="";
   bravais_superlattice_system="";
@@ -2556,7 +2557,7 @@ void xstructure::free() { //DX20191220 - moved all initializations from constuct
 }
 
 // Constructors
-xstructure::xstructure(string structure_title) {
+xstructure::xstructure(const string& structure_title) {
   free(); //DX20191220 - moved contents below into free()
   title=structure_title;
 }
@@ -2695,6 +2696,7 @@ void xstructure::copy(const xstructure& bstr) {
   pearson_symbol=bstr.pearson_symbol;
   reciprocal_lattice_type=bstr.reciprocal_lattice_type;
   reciprocal_lattice_variation_type=bstr.reciprocal_lattice_variation_type;
+  bravais_superlattice_lattice=bstr.bravais_superlattice_lattice; //DX20210209
   bravais_superlattice_type=bstr.bravais_superlattice_type;
   bravais_superlattice_variation_type=bstr.bravais_superlattice_variation_type;
   bravais_superlattice_system=bstr.bravais_superlattice_system;
@@ -5479,14 +5481,15 @@ istream& operator>>(istream& cinput, xstructure& a) {
     std::stable_sort(a.atoms.begin(),a.atoms.end(),sortAtomsNames);
     a.MakeBasis();
     a.MakeTypes(); //DX20190508 - otherwise types are not created
-    uint iat=0;
     // add system name to title
-    a.title += " "; // add space between existing title
-    for(uint itype=0;itype<a.num_each_type.size();itype++) 
-      for(uint j=0;j<(uint) a.num_each_type.at(itype);j++) {
-        if(j==0) a.title+=a.atoms.at(iat).name+aurostd::utype2string(a.num_each_type.at(itype));
-        a.atoms.at(iat++).type=itype;
-      }
+    a.buildGenericTitle(); //DX20210211
+    //DX20210211 [OBSOLETE] uint iat=0;
+    //DX20210211 [OBSOLETE - abinit does not generally have a title line] a.title += " "; // add space between existing title
+    //DX20210211 [OBSOLETE] for(uint itype=0;itype<a.num_each_type.size();itype++)
+    //DX20210211 [OBSOLETE]   for(uint j=0;j<(uint) a.num_each_type.at(itype);j++) {
+    //DX20210211 [OBSOLETE]     if(j==0) a.title+=a.atoms.at(iat).name+aurostd::utype2string(a.num_each_type.at(itype));
+    //DX20210211 [OBSOLETE]     a.atoms.at(iat++).type=itype;
+    //DX20210211 [OBSOLETE]   }
     a.partial_occupation_flag=FALSE;
     a.is_vasp4_poscar_format=FALSE;
     a.is_vasp5_poscar_format=FALSE;
@@ -5718,14 +5721,15 @@ istream& operator>>(istream& cinput, xstructure& a) {
     std::stable_sort(a.atoms.begin(),a.atoms.end(),sortAtomsNames);
     a.MakeBasis();
     a.MakeTypes();
-    uint iat=0;
     // add system name to title
-    a.title += " "; // add space between existing title
-    for(uint itype=0;itype<a.num_each_type.size();itype++)
-      for(uint j=0;j<(uint) a.num_each_type.at(itype);j++) {
-        if(j==0) a.title+=a.atoms.at(iat).name+aurostd::utype2string(a.num_each_type.at(itype));
-        a.atoms.at(iat++).type=itype;
-      }
+    a.buildGenericTitle(); //DX20210211
+    //DX20210211 [OBSOLETE] uint iat=0;
+    //DX20210211 [OBSOLETE - Elk does not generally have a title line] a.title += " "; // add space between existing title
+    //DX20210211 [OBSOLETE] for(uint itype=0;itype<a.num_each_type.size();itype++)
+    //DX20210211 [OBSOLETE]   for(uint j=0;j<(uint) a.num_each_type.at(itype);j++) {
+    //DX20210211 [OBSOLETE]     if(j==0) a.title+=a.atoms.at(iat).name+aurostd::utype2string(a.num_each_type.at(itype));
+    //DX20210211 [OBSOLETE]    a.atoms.at(iat++).type=itype;
+    //DX20210211 [OBSOLETE]  }
     // NO PARTIAL OCCUPATION
     a.partial_occupation_flag=FALSE;
     a.is_vasp4_poscar_format=FALSE;
@@ -6037,6 +6041,9 @@ istream& operator>>(istream& cinput, xstructure& a) {
     //DX20191010 - moved this loop - END
     a.is_vasp4_poscar_format=FALSE; //DX20190308 - needed or SPECIES section breaks
     a.is_vasp5_poscar_format=FALSE; //DX20190308 - needed or SPECIES section breaks
+
+    // add title, CIFs do not generally have a canonical "title" line, so make one
+    a.buildGenericTitle(); //DX20210211
   } // CIF INPUT
 
   // ----------------------------------------------------------------------
@@ -6318,7 +6325,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
   if(a.iomode==IOVASP_WYCKCAR) {
     // cerr << "[" << a.atoms.size() << "]" << endl;
     a=WyckoffPOSITIONS(a.spacegroupnumber,a.spacegroupnumberoption,a);
-    a.title=a.title+" (WICKOFF "+a.spacegroup+" "+a.spacegrouplabel+")";
+    a.title=a.title+" (WYCKOFF "+a.spacegroup+" "+a.spacegrouplabel+")";
     // cerr << "[" << a.atoms.size() << "]" << endl;
   }
 
@@ -7308,477 +7315,479 @@ string GetElementName(string stringin) {
 // ***************************************************************************
 string GetSpaceGroupName(int spacegroupnumber, string directory) {
   string soliloquy = XPID + "aflow_xatom.cpp::GetSpaceGroupName()"; //DX20190708 - for xerror
-  stringstream message; //DX20190708 - for xerror
-  string spacegroup=""; //DX20190708 - for xerror
   if(spacegroupnumber < 1 || spacegroupnumber > 230) { //DX20190708 - for xerror
+    stringstream message; //DX20190708 - for xerror
     message << "routine: space group specified invalid (1-230): "; //DX20190708 - for xerror
     message << spacegroupnumber << " [dir=" << directory << "]." << endl; //DX20190708 - for xerror
     throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_); //DX20190708 - for xerror
   }
   // OK
   //DX+ME20190708 - changed subsequent "if" to "else if" -> efficiency
-  if(spacegroupnumber==1) { // ------------------- 1  P1 #1
-    spacegroup="P1";}
-  else if(spacegroupnumber==2) { // ------------------- 2  P-1 #2
-    spacegroup="P-1";}
-  else if(spacegroupnumber==3) { // ------------------- 3  P2 #3
-    spacegroup="P2";}
-  else if(spacegroupnumber==4) { // ------------------- 4  P2_{1} #4
-    spacegroup="P2_{1}";}
-  else if(spacegroupnumber==5) { // ------------------- 5  C2 #5
-    spacegroup="C2";}
-  else if(spacegroupnumber==6) { // ------------------- 6  Pm #6
-    spacegroup="Pm";}
-  else if(spacegroupnumber==7) { // ------------------- 7  Pc #7
-    spacegroup="Pc";}
-  else if(spacegroupnumber==8) { // ------------------- 8  Cm #8
-    spacegroup="Cm";}
-  else if(spacegroupnumber==9) { // ------------------- 9  Cc #9
-    spacegroup="Cc";}
-  else if(spacegroupnumber==10) { // ------------------- 10  P2/m #10
-    spacegroup="P2/m";}
-  else if(spacegroupnumber==11) { // ------------------- 11  P2_{1}/m #11
-    spacegroup="P2_{1}/m";}
-  else if(spacegroupnumber==12) { // ------------------- 12  C2/m #12
-    spacegroup="C2/m";}
-  else if(spacegroupnumber==13) { // ------------------- 13  P2/c #13
-    spacegroup="P2/c";}
-  else if(spacegroupnumber==14) { // ------------------- 14  P2_{1}/c #14
-    spacegroup="P2_{1}/c";}
-  else if(spacegroupnumber==15) { // ------------------- 15  C2/c #15
-    spacegroup="C2/c";}
-  else if(spacegroupnumber==16) { // ------------------- 16  P222 #16
-    spacegroup="P222";}
-  else if(spacegroupnumber==17) { // ------------------- 17  P222_{1} #17
-    spacegroup="P222_{1}";}
-  else if(spacegroupnumber==18) { // ------------------- 18  P2_{1}2_{1}2 #18
-    spacegroup="P2_{1}2_{1}2";}
-  else if(spacegroupnumber==19) { // ------------------- 19  P2_{1}2_{1}2_{1} #19
-    spacegroup="P2_{1}2_{1}2_{1}";}
-  else if(spacegroupnumber==20) { // ------------------- 20  C222_{1} #20
-    spacegroup="C222_{1}";}
-  else if(spacegroupnumber==21) { // ------------------- 21  C222 #21
-    spacegroup="C222";}
-  else if(spacegroupnumber==22) { // ------------------- 22  F222 #22
-    spacegroup="F222";}
-  else if(spacegroupnumber==23) { // ------------------- 23  I222 #23
-    spacegroup="I222";}
-  else if(spacegroupnumber==24) { // ------------------- 24  I2_{1}2_{1}2_{1} #24
-    spacegroup="I2_{1}2_{1}2_{1}";}
-  else if(spacegroupnumber==25) { // ------------------- 25  Pmm2 #25
-    spacegroup="Pmm2";}
-  else if(spacegroupnumber==26) { // ------------------- 26  Pmc2_{1} #26
-    spacegroup="Pmc2_{1}";}
-  else if(spacegroupnumber==27) { // ------------------- 27  Pcc2 #27
-    spacegroup="Pcc2";}
-  else if(spacegroupnumber==28) { // ------------------- 28  Pma2 #28
-    spacegroup="Pma2";}
-  else if(spacegroupnumber==29) { // ------------------- 29  Pca2_{1} #29
-    spacegroup="Pca2_{1}";}
-  else if(spacegroupnumber==30) { // ------------------- 30  Pnc2 #30
-    spacegroup="Pnc2";}
-  else if(spacegroupnumber==31) { // ------------------- 31  Pmn2_{1} #31
-    spacegroup="Pmn2_{1}";}
-  else if(spacegroupnumber==32) { // ------------------- 32  Pba2 #32
-    spacegroup="Pba2";}
-  else if(spacegroupnumber==33) { // ------------------- 33  Pna2_{1} #33
-    spacegroup="Pna2_{1}";}
-  else if(spacegroupnumber==34) { // ------------------- 34  Pnn2 #34
-    spacegroup="Pnn2";}
-  else if(spacegroupnumber==35) { // ------------------- 35  Cmm2 #35
-    spacegroup="Cmm2";}
-  else if(spacegroupnumber==36) { // ------------------- 36  Cmc2_{1} #36
-    spacegroup="Cmc2_{1}";}
-  else if(spacegroupnumber==37) { // ------------------- 37  Ccc2 #37
-    spacegroup="Ccc2";}
-  else if(spacegroupnumber==38) { // ------------------- 38  Amm2 #38
-    spacegroup="Amm2";}
-  else if(spacegroupnumber==39) { // ------------------- 39  Aem2 #39
-    spacegroup="Aem2";}
-  else if(spacegroupnumber==40) { // ------------------- 40  Ama2 #40
-    spacegroup="Ama2";}
-  else if(spacegroupnumber==41) { // ------------------- 41  Aea2 #41
-    spacegroup="Aea2";}
-  else if(spacegroupnumber==42) { // ------------------- 42  Fmm2 #42
-    spacegroup="Fmm2";}
-  else if(spacegroupnumber==43) { // ------------------- 43  Fdd2 #43
-    spacegroup="Fdd2";}
-  else if(spacegroupnumber==44) { // ------------------- 44  Imm2 #44
-    spacegroup="Imm2";}
-  else if(spacegroupnumber==45) { // ------------------- 45  Iba2 #45
-    spacegroup="Iba2";}
-  else if(spacegroupnumber==46) { // ------------------- 46  Ima2 #46
-    spacegroup="Ima2";}
-  else if(spacegroupnumber==47) { // ------------------- 47  Pmmm #47
-    spacegroup="Pmmm";}
-  else if(spacegroupnumber==48) { // ------------------- 48  Pnnn #48
-    spacegroup="Pnnn";}
-  else if(spacegroupnumber==49) { // ------------------- 49  Pccm #49
-    spacegroup="Pccm";}
-  else if(spacegroupnumber==50) { // ------------------- 50  Pban #50
-    spacegroup="Pban";}
-  else if(spacegroupnumber==51) { // ------------------- 51  Pmma #51
-    spacegroup="Pmma";}
-  else if(spacegroupnumber==52) { // ------------------- 52  Pnna #52
-    spacegroup="Pnna";}
-  else if(spacegroupnumber==53) { // ------------------- 53  Pmna #53
-    spacegroup="Pmna";}
-  else if(spacegroupnumber==54) { // ------------------- 54  Pcca #54
-    spacegroup="Pcca";}
-  else if(spacegroupnumber==55) { // ------------------- 55  Pbam #55
-    spacegroup="Pbam";}
-  else if(spacegroupnumber==56) { // ------------------- 56  Pccn #56
-    spacegroup="Pccn";}
-  else if(spacegroupnumber==57) { // ------------------- 57  Pbcm #57
-    spacegroup="Pbcm";}
-  else if(spacegroupnumber==58) { // ------------------- 58  Pnnm #58
-    spacegroup="Pnnm";}
-  else if(spacegroupnumber==59) { // ------------------- 59  Pmmn #59
-    spacegroup="Pmmn";}
-  else if(spacegroupnumber==60) { // ------------------- 60  Pbcn #60
-    spacegroup="Pbcn";}
-  else if(spacegroupnumber==61) { // ------------------- 61  Pbca #61
-    spacegroup="Pbca";}
-  else if(spacegroupnumber==62) { // ------------------- 62  Pnma #62
-    spacegroup="Pnma";}
-  else if(spacegroupnumber==63) { // ------------------- 63  Cmcm #63
-    spacegroup="Cmcm";}
-  else if(spacegroupnumber==64) { // ------------------- 64  Cmce #64
-    spacegroup="Cmce";}
-  else if(spacegroupnumber==65) { // ------------------- 65  Cmmm #65
-    spacegroup="Cmmm";}
-  else if(spacegroupnumber==66) { // ------------------- 66  Cccm #66
-    spacegroup="Cccm";}
-  else if(spacegroupnumber==67) { // ------------------- 67  Cmme #67
-    spacegroup="Cmme";}
-  else if(spacegroupnumber==68) { // ------------------- 68  Ccce #68
-    spacegroup="Ccce";}
-  else if(spacegroupnumber==69) { // ------------------- 69  Fmmm #69
-    spacegroup="Fmmm";}
-  else if(spacegroupnumber==70) { // ------------------- 70  Fddd #70
-    spacegroup="Fddd";}
-  else if(spacegroupnumber==71) { // ------------------- 71  Immm #71
-    spacegroup="Immm";}
-  else if(spacegroupnumber==72) { // ------------------- 72  Ibam #72
-    spacegroup="Ibam";}
-  else if(spacegroupnumber==73) { // ------------------- 73  Ibca #73
-    spacegroup="Ibca";}
-  else if(spacegroupnumber==74) { // ------------------- 74  Imma #74
-    spacegroup="Imma";}
-  else if(spacegroupnumber==75) { // ------------------- 75  P4 #75
-    spacegroup="P4";}
-  else if(spacegroupnumber==76) { // ------------------- 76  P4_{1} #76
-    spacegroup="P4_{1}";}
-  else if(spacegroupnumber==77) { // ------------------- 77  P4_{2} #77
-    spacegroup="P4_{2}";}
-  else if(spacegroupnumber==78) { // ------------------- 78  P4_{3} #78
-    spacegroup="P4_{3}";}
-  else if(spacegroupnumber==79) { // ------------------- 79  I4 #79
-    spacegroup="I4";}
-  else if(spacegroupnumber==80) { // ------------------- 80  I4_{1} #80
-    spacegroup="I4_{1}";}
-  else if(spacegroupnumber==81) { // ------------------- 81  P-4 #81
-    spacegroup="P-4";}
-  else if(spacegroupnumber==82) { // ------------------- 82  I-4 #82
-    spacegroup="I-4";}
-  else if(spacegroupnumber==83) { // ------------------- 83  P4/m #83
-    spacegroup="P4/m";}
-  else if(spacegroupnumber==84) { // ------------------- 84  P4_{2}/m #84
-    spacegroup="P4_{2}/m";}
-  else if(spacegroupnumber==85) { // ------------------- 85  P4/n #85
-    spacegroup="P4/n";}
-  else if(spacegroupnumber==86) { // ------------------- 86  P4_{2}/n #86
-    spacegroup="P4_{2}/n";}
-  else if(spacegroupnumber==87) { // ------------------- 87  I4/m #87
-    spacegroup="I4/m";}
-  else if(spacegroupnumber==88) { // ------------------- 88  I4_{1}/a #88
-    spacegroup="I4_{1}/a";}
-  else if(spacegroupnumber==89) { // ------------------- 89  P422 #89
-    spacegroup="P422";}
-  else if(spacegroupnumber==90) { // ------------------- 90  P42_{1}2 #90
-    spacegroup="P42_{1}2";}
-  else if(spacegroupnumber==91) { // ------------------- 91  P4_{1}22 #91
-    spacegroup="P4_{1}22";}
-  else if(spacegroupnumber==92) { // ------------------- 92  P4_{1}2_{1}2 #92
-    spacegroup="P4_{1}2_{1}2";}
-  else if(spacegroupnumber==93) { // ------------------- 93  P4_{2}22 #93
-    spacegroup="P4_{2}22";}
-  else if(spacegroupnumber==94) { // ------------------- 94  P4_{2}2_{1}2 #94
-    spacegroup="P4_{2}2_{1}2";}
-  else if(spacegroupnumber==95) { // ------------------- 95  P4_{3}22 #95
-    spacegroup="P4_{3}22";}
-  else if(spacegroupnumber==96) { // ------------------- 96  P4_{3}2_{1}2 #96
-    spacegroup="P4_{3}2_{1}2";}
-  else if(spacegroupnumber==97) { // ------------------- 97  I422 #97
-    spacegroup="I422";}
-  else if(spacegroupnumber==98) { // ------------------- 98  I4_{1}22 #98
-    spacegroup="I4_{1}22";}
-  else if(spacegroupnumber==99) { // ------------------- 99  P4mm #99
-    spacegroup="P4mm";}
-  else if(spacegroupnumber==100) { // ------------------- 100  P4bm #100
-    spacegroup="P4bm";}
-  else if(spacegroupnumber==101) { // ------------------- 101  P4_{2}cm #101
-    spacegroup="P4_{2}cm";}
-  else if(spacegroupnumber==102) { // ------------------- 102  P4_{2}nm #102
-    spacegroup="P4_{2}nm";}
-  else if(spacegroupnumber==103) { // ------------------- 103  P4cc #103
-    spacegroup="P4cc";}
-  else if(spacegroupnumber==104) { // ------------------- 104  P4nc #104
-    spacegroup="P4nc";}
-  else if(spacegroupnumber==105) { // ------------------- 105  P4_{2}mc #105
-    spacegroup="P4_{2}mc";}
-  else if(spacegroupnumber==106) { // ------------------- 106  P4_{2}bc #106
-    spacegroup="P4_{2}bc";}
-  else if(spacegroupnumber==107) { // ------------------- 107  I4mm #107
-    spacegroup="I4mm";}
-  else if(spacegroupnumber==108) { // ------------------- 108  I4cm #108
-    spacegroup="I4cm";}
-  else if(spacegroupnumber==109) { // ------------------- 109  I4_{1}md #109
-    spacegroup="I4_{1}md";}
-  else if(spacegroupnumber==110) { // ------------------- 110  I4_{1}cd #110
-    spacegroup="I4_{1}cd";}
-  else if(spacegroupnumber==111) { // ------------------- 111  P-42m #111
-    spacegroup="P-42m";}
-  else if(spacegroupnumber==112) { // ------------------- 112  P-42c #112
-    spacegroup="P-42c";}
-  else if(spacegroupnumber==113) { // ------------------- 113  P-42_{1}m #113
-    spacegroup="P-42_{1}m";}
-  else if(spacegroupnumber==114) { // ------------------- 114  P-42_{1}c #114
-    spacegroup="P-42_{1}c";}
-  else if(spacegroupnumber==115) { // ------------------- 115  P-4m2 #115
-    spacegroup="P-4m2";}
-  else if(spacegroupnumber==116) { // ------------------- 116  P-4c2 #116
-    spacegroup="P-4c2";}
-  else if(spacegroupnumber==117) { // ------------------- 117  P-4b2 #117
-    spacegroup="P-4b2";}
-  else if(spacegroupnumber==118) { // ------------------- 118  P-4n2 #118
-    spacegroup="P-4n2";}
-  else if(spacegroupnumber==119) { // ------------------- 119  I-4m2 #119
-    spacegroup="I-4m2";}
-  else if(spacegroupnumber==120) { // ------------------- 120  I-4c2 #120
-    spacegroup="I-4c2";}
-  else if(spacegroupnumber==121) { // ------------------- 121  I-42m #121
-    spacegroup="I-42m";}
-  else if(spacegroupnumber==122) { // ------------------- 122  I-42d #122
-    spacegroup="I-42d";}
-  else if(spacegroupnumber==123) { // ------------------- 123  P4/mmm #123
-    spacegroup="P4/mmm";}
-  else if(spacegroupnumber==124) { // ------------------- 124  P4/mcc #124
-    spacegroup="P4/mcc";}
-  else if(spacegroupnumber==125) { // ------------------- 125  P4/nbm #125
-    spacegroup="P4/nbm";}
-  else if(spacegroupnumber==126) { // ------------------- 126  P4/nnc #126
-    spacegroup="P4/nnc";}
-  else if(spacegroupnumber==127) { // ------------------- 127  P4/mbm #127
-    spacegroup="P4/mbm";}
-  else if(spacegroupnumber==128) { // ------------------- 128  P4/mnc #128
-    spacegroup="P4/mnc";}
-  else if(spacegroupnumber==129) { // ------------------- 129  P4/nmm #129
-    spacegroup="P4/nmm";}
-  else if(spacegroupnumber==130) { // ------------------- 130  P4/ncc #130
-    spacegroup="P4/ncc";}
-  else if(spacegroupnumber==131) { // ------------------- 131  P4_{2}/mmc #131
-    spacegroup="P4_{2}/mmc";}
-  else if(spacegroupnumber==132) { // ------------------- 132  P4_{2}/mcm #132
-    spacegroup="P4_{2}/mcm";}
-  else if(spacegroupnumber==133) { // ------------------- 133  P4_{2}/nbc #133
-    spacegroup="P4_{2}/nbc";}
-  else if(spacegroupnumber==134) { // ------------------- 134  P4_{2}/nnm #134
-    spacegroup="P4_{2}/nnm";}
-  else if(spacegroupnumber==135) { // ------------------- 135  P4_{2}/mbc #135
-    spacegroup="P4_{2}/mbc";}
-  else if(spacegroupnumber==136) { // ------------------- 136  P4_{2}/mnm #136
-    spacegroup="P4_{2}/mnm";}
-  else if(spacegroupnumber==137) { // ------------------- 137  P4_{2}/nmc #137
-    spacegroup="P4_{2}/nmc";}
-  else if(spacegroupnumber==138) { // ------------------- 138  P4_{2}/ncm #138
-    spacegroup="P4_{2}/ncm";}
-  else if(spacegroupnumber==139) { // ------------------- 139  I4/mmm #139
-    spacegroup="I4/mmm";}
-  else if(spacegroupnumber==140) { // ------------------- 140  I4/mcm #140
-    spacegroup="I4/mcm";}
-  else if(spacegroupnumber==141) { // ------------------- 141  I4_{1}/amd #141
-    spacegroup="I4_{1}/amd";}
-  else if(spacegroupnumber==142) { // ------------------- 142  I4_{1}/acd #142
-    spacegroup="I4_{1}/acd";}
-  else if(spacegroupnumber==143) { // ------------------- 143  P3 #143
-    spacegroup="P3";}
-  else if(spacegroupnumber==144) { // ------------------- 144  P3_{1} #144
-    spacegroup="P3_{1}";}
-  else if(spacegroupnumber==145) { // ------------------- 145  P3_{2} #145
-    spacegroup="P3_{2}";}
-  else if(spacegroupnumber==146) { // ------------------- 146  R3 #146
-    spacegroup="R3";}
-  else if(spacegroupnumber==147) { // ------------------- 147  P-3 #147
-    spacegroup="P-3";}
-  else if(spacegroupnumber==148) { // ------------------- 148  R-3 #148
-    spacegroup="R-3";}
-  else if(spacegroupnumber==149) { // ------------------- 149  P312 #149
-    spacegroup="P312";}
-  else if(spacegroupnumber==150) { // ------------------- 150  P321 #150
-    spacegroup="P321";}
-  else if(spacegroupnumber==151) { // ------------------- 151  P3_{1}12 #151
-    spacegroup="P3_{1}12";}
-  else if(spacegroupnumber==152) { // ------------------- 152  P3_{1}21 #152
-    spacegroup="P3_{1}21";}
-  else if(spacegroupnumber==153) { // ------------------- 153  P3_{2}12 #153
-    spacegroup="P3_{2}12";}
-  else if(spacegroupnumber==154) { // ------------------- 154  P3_{2}21 #154
-    spacegroup="P3_{2}21";}
-  else if(spacegroupnumber==155) { // ------------------- 155  R32 #155
-    spacegroup="R32";}
-  else if(spacegroupnumber==156) { // ------------------- 156  P3m1 #156
-    spacegroup="P3m1";}
-  else if(spacegroupnumber==157) { // ------------------- 157  P31m #157
-    spacegroup="P31m";}
-  else if(spacegroupnumber==158) { // ------------------- 158  P3c1 #158
-    spacegroup="P3c1";}
-  else if(spacegroupnumber==159) { // ------------------- 159  P31c #159
-    spacegroup="P31c";}
-  else if(spacegroupnumber==160) { // ------------------- 160  R3m #160
-    spacegroup="R3m";}
-  else if(spacegroupnumber==161) { // ------------------- 161  R3c #161
-    spacegroup="R3c";}
-  else if(spacegroupnumber==162) { // ------------------- 162  P-31m #162
-    spacegroup="P-31m";}
-  else if(spacegroupnumber==163) { // ------------------- 163  P-31c #163
-    spacegroup="P-31c";}
-  else if(spacegroupnumber==164) { // ------------------- 164  P-3m1 #164
-    spacegroup="P-3m1";}
-  else if(spacegroupnumber==165) { // ------------------- 165  P-3c1 #165
-    spacegroup="P-3c1";}
-  else if(spacegroupnumber==166) { // ------------------- 166  R-3m #166
-    spacegroup="R-3m";}
-  else if(spacegroupnumber==167) { // ------------------- 167  R-3c #167
-    spacegroup="R-3c";}
-  else if(spacegroupnumber==168) { // ------------------- 168  P6 #168
-    spacegroup="P6";}
-  else if(spacegroupnumber==169) { // ------------------- 169  P6_{1} #169
-    spacegroup="P6_{1}";}
-  else if(spacegroupnumber==170) { // ------------------- 170  P6_{5} #170
-    spacegroup="P6_{5}";}
-  else if(spacegroupnumber==171) { // ------------------- 171  P6_{2} #171
-    spacegroup="P6_{2}";}
-  else if(spacegroupnumber==172) { // ------------------- 172  P6_{4} #172
-    spacegroup="P6_{4}";}
-  else if(spacegroupnumber==173) { // ------------------- 173  P6_{3} #173
-    spacegroup="P6_{3}";}
-  else if(spacegroupnumber==174) { // ------------------- 174  P-6 #174
-    spacegroup="P-6";}
-  else if(spacegroupnumber==175) { // ------------------- 175  P6/m #175
-    spacegroup="P6/m";}
-  else if(spacegroupnumber==176) { // ------------------- 176  P6_{3}/m #176
-    spacegroup="P6_{3}/m";}
-  else if(spacegroupnumber==177) { // ------------------- 177  P622 #177
-    spacegroup="P622";}
-  else if(spacegroupnumber==178) { // ------------------- 178  P6_{1}22 #178
-    spacegroup="P6_{1}22";}
-  else if(spacegroupnumber==179) { // ------------------- 179  P6_{5}22 #179
-    spacegroup="P6_{5}22";}
-  else if(spacegroupnumber==180) { // ------------------- 180  P6_{2}22 #180
-    spacegroup="P6_{2}22";}
-  else if(spacegroupnumber==181) { // ------------------- 181  P6_{4}22 #181
-    spacegroup="P6_{4}22";}
-  else if(spacegroupnumber==182) { // ------------------- 182  P6_{3}22 #182
-    spacegroup="P6_{3}22";}
-  else if(spacegroupnumber==183) { // ------------------- 183  P6mm #183
-    spacegroup="P6mm";}
-  else if(spacegroupnumber==184) { // ------------------- 184  P6cc #184
-    spacegroup="P6cc";}
-  else if(spacegroupnumber==185) { // ------------------- 185  P6_{3}cm #185
-    spacegroup="P6_{3}cm";}
-  else if(spacegroupnumber==186) { // ------------------- 186  P6_{3}mc #186
-    spacegroup="P6_{3}mc";}
-  else if(spacegroupnumber==187) { // ------------------- 187  P-6m2 #187
-    spacegroup="P-6m2";}
-  else if(spacegroupnumber==188) { // ------------------- 188  P-6c2 #188
-    spacegroup="P-6c2";}
-  else if(spacegroupnumber==189) { // ------------------- 189  P-62m #189
-    spacegroup="P-62m";}
-  else if(spacegroupnumber==190) { // ------------------- 190  P-62c #190
-    spacegroup="P-62c";}
-  else if(spacegroupnumber==191) { // ------------------- 191  P6/mmm #191
-    spacegroup="P6/mmm";}
-  else if(spacegroupnumber==192) { // ------------------- 192  P6/mcc #192
-    spacegroup="P6/mcc";}
-  else if(spacegroupnumber==193) { // ------------------- 193  P6_{3}/mcm #193
-    spacegroup="P6_{3}/mcm";}
-  else if(spacegroupnumber==194) { // ------------------- 194  P6_{3}/mmc #194
-    spacegroup="P6_{3}/mmc";}
-  else if(spacegroupnumber==195) { // ------------------- 195  P23 #195
-    spacegroup="P23";}
-  else if(spacegroupnumber==196) { // ------------------- 196  F23 #196
-    spacegroup="F23";}
-  else if(spacegroupnumber==197) { // ------------------- 197  I23 #197
-    spacegroup="I23";}
-  else if(spacegroupnumber==198) { // ------------------- 198  P2_{1}3 #198
-    spacegroup="P2_{1}3";}
-  else if(spacegroupnumber==199) { // ------------------- 199  I2_{1}3 #199
-    spacegroup="I2_{1}3";}
-  else if(spacegroupnumber==200) { // ------------------- 200  Pm-3 #200
-    spacegroup="Pm-3";}
-  else if(spacegroupnumber==201) { // ------------------- 201  Pn-3 #201
-    spacegroup="Pn-3";}
-  else if(spacegroupnumber==202) { // ------------------- 202  Fm-3 #202
-    spacegroup="Fm-3";}
-  else if(spacegroupnumber==203) { // ------------------- 203  Fd-3 #203
-    spacegroup="Fd-3";}
-  else if(spacegroupnumber==204) { // ------------------- 204  Im-3 #204
-    spacegroup="Im-3";}
-  else if(spacegroupnumber==205) { // ------------------- 205  Pa-3 #205
-    spacegroup="Pa-3";}
-  else if(spacegroupnumber==206) { // ------------------- 206  Ia-3 #206
-    spacegroup="Ia-3";}
-  else if(spacegroupnumber==207) { // ------------------- 207  P432 #207
-    spacegroup="P432";}
-  else if(spacegroupnumber==208) { // ------------------- 208  P4_{2}32 #208
-    spacegroup="P4_{2}32";}
-  else if(spacegroupnumber==209) { // ------------------- 209  F432 #209
-    spacegroup="F432";}
-  else if(spacegroupnumber==210) { // ------------------- 210  F4_{1}32 #210
-    spacegroup="F4_{1}32";}
-  else if(spacegroupnumber==211) { // ------------------- 211  I432 #211
-    spacegroup="I432";}
-  else if(spacegroupnumber==212) { // ------------------- 212  P4_{3}32 #212
-    spacegroup="P4_{3}32";}
-  else if(spacegroupnumber==213) { // ------------------- 213  P4_{1}32 #213
-    spacegroup="P4_{1}32";}
-  else if(spacegroupnumber==214) { // ------------------- 214  I4_{1}32 #214
-    spacegroup="I4_{1}32";}
-  else if(spacegroupnumber==215) { // ------------------- 215  P-43m #215
-    spacegroup="P-43m";}
-  else if(spacegroupnumber==216) { // ------------------- 216  F-43m #216
-    spacegroup="F-43m";}
-  else if(spacegroupnumber==217) { // ------------------- 217  I-43m #217
-    spacegroup="I-43m";}
-  else if(spacegroupnumber==218) { // ------------------- 218  P-43n #218
-    spacegroup="P-43n";}
-  else if(spacegroupnumber==219) { // ------------------- 219  F-43c #219
-    spacegroup="F-43c";}
-  else if(spacegroupnumber==220) { // ------------------- 220  I-43d #220
-    spacegroup="I-43d";}
-  else if(spacegroupnumber==221) { // ------------------- 221  Pm-3m #221
-    spacegroup="Pm-3m";}
-  else if(spacegroupnumber==222) { // ------------------- 222  Pn-3n #222
-    spacegroup="Pn-3n";}
-  else if(spacegroupnumber==223) { // ------------------- 223  Pm-3n #223
-    spacegroup="Pm-3n";}
-  else if(spacegroupnumber==224) { // ------------------- 224  Pn-3m #224
-    spacegroup="Pn-3m";}
-  else if(spacegroupnumber==225) { // ------------------- 225  Fm-3m #225
-    spacegroup="Fm-3m";}
-  else if(spacegroupnumber==226) { // ------------------- 226  Fm-3c #226
-    spacegroup="Fm-3c";}
-  else if(spacegroupnumber==227) { // ------------------- 227  Fd-3m #227
-    spacegroup="Fd-3m";}
-  else if(spacegroupnumber==228) { // ------------------- 228  Fd-3c #228
-    spacegroup="Fd-3c";}
-  else if(spacegroupnumber==229) { // ------------------- 229  Im-3m #229
-    spacegroup="Im-3m";}
-  else if(spacegroupnumber==230) { // ------------------- 230  Ia-3d #230
-    spacegroup="Ia-3d";}
-  // done
-  return spacegroup;
+  //ME20210210 - converted to switch statement (faster)
+  switch(spacegroupnumber) {
+    case 1: // ------------------- 1  P1 #1
+      return "P1";
+    case 2: // ------------------- 2  P-1 #2
+      return "P-1";
+    case 3: // ------------------- 3  P2 #3
+      return "P2";
+    case 4: // ------------------- 4  P2_{1} #4
+      return "P2_{1}";
+    case 5: // ------------------- 5  C2 #5
+      return "C2";
+    case 6: // ------------------- 6  Pm #6
+      return "Pm";
+    case 7: // ------------------- 7  Pc #7
+      return "Pc";
+    case 8: // ------------------- 8  Cm #8
+      return "Cm";
+    case 9: // ------------------- 9  Cc #9
+      return "Cc";
+    case 10: // ------------------- 10  P2/m #10
+      return "P2/m";
+    case 11: // ------------------- 11  P2_{1}/m #11
+      return "P2_{1}/m";
+    case 12: // ------------------- 12  C2/m #12
+      return "C2/m";
+    case 13: // ------------------- 13  P2/c #13
+      return "P2/c";
+    case 14: // ------------------- 14  P2_{1}/c #14
+      return "P2_{1}/c";
+    case 15: // ------------------- 15  C2/c #15
+      return "C2/c";
+    case 16: // ------------------- 16  P222 #16
+      return "P222";
+    case 17: // ------------------- 17  P222_{1} #17
+      return "P222_{1}";
+    case 18: // ------------------- 18  P2_{1}2_{1}2 #18
+      return "P2_{1}2_{1}2";
+    case 19: // ------------------- 19  P2_{1}2_{1}2_{1} #19
+      return "P2_{1}2_{1}2_{1}";
+    case 20: // ------------------- 20  C222_{1} #20
+      return "C222_{1}";
+    case 21: // ------------------- 21  C222 #21
+      return "C222";
+    case 22: // ------------------- 22  F222 #22
+      return "F222";
+    case 23: // ------------------- 23  I222 #23
+      return "I222";
+    case 24: // ------------------- 24  I2_{1}2_{1}2_{1} #24
+      return "I2_{1}2_{1}2_{1}";
+    case 25: // ------------------- 25  Pmm2 #25
+      return "Pmm2";
+    case 26: // ------------------- 26  Pmc2_{1} #26
+      return "Pmc2_{1}";
+    case 27: // ------------------- 27  Pcc2 #27
+      return "Pcc2";
+    case 28: // ------------------- 28  Pma2 #28
+      return "Pma2";
+    case 29: // ------------------- 29  Pca2_{1} #29
+      return "Pca2_{1}";
+    case 30: // ------------------- 30  Pnc2 #30
+      return "Pnc2";
+    case 31: // ------------------- 31  Pmn2_{1} #31
+      return "Pmn2_{1}";
+    case 32: // ------------------- 32  Pba2 #32
+      return "Pba2";
+    case 33: // ------------------- 33  Pna2_{1} #33
+      return "Pna2_{1}";
+    case 34: // ------------------- 34  Pnn2 #34
+      return "Pnn2";
+    case 35: // ------------------- 35  Cmm2 #35
+      return "Cmm2";
+    case 36: // ------------------- 36  Cmc2_{1} #36
+      return "Cmc2_{1}";
+    case 37: // ------------------- 37  Ccc2 #37
+      return "Ccc2";
+    case 38: // ------------------- 38  Amm2 #38
+      return "Amm2";
+    case 39: // ------------------- 39  Aem2 #39
+      return "Aem2";
+    case 40: // ------------------- 40  Ama2 #40
+      return "Ama2";
+    case 41: // ------------------- 41  Aea2 #41
+      return "Aea2";
+    case 42: // ------------------- 42  Fmm2 #42
+      return "Fmm2";
+    case 43: // ------------------- 43  Fdd2 #43
+      return "Fdd2";
+    case 44: // ------------------- 44  Imm2 #44
+      return "Imm2";
+    case 45: // ------------------- 45  Iba2 #45
+      return "Iba2";
+    case 46: // ------------------- 46  Ima2 #46
+      return "Ima2";
+    case 47: // ------------------- 47  Pmmm #47
+      return "Pmmm";
+    case 48: // ------------------- 48  Pnnn #48
+      return "Pnnn";
+    case 49: // ------------------- 49  Pccm #49
+      return "Pccm";
+    case 50: // ------------------- 50  Pban #50
+      return "Pban";
+    case 51: // ------------------- 51  Pmma #51
+      return "Pmma";
+    case 52: // ------------------- 52  Pnna #52
+      return "Pnna";
+    case 53: // ------------------- 53  Pmna #53
+      return "Pmna";
+    case 54: // ------------------- 54  Pcca #54
+      return "Pcca";
+    case 55: // ------------------- 55  Pbam #55
+      return "Pbam";
+    case 56: // ------------------- 56  Pccn #56
+      return "Pccn";
+    case 57: // ------------------- 57  Pbcm #57
+      return "Pbcm";
+    case 58: // ------------------- 58  Pnnm #58
+      return "Pnnm";
+    case 59: // ------------------- 59  Pmmn #59
+      return "Pmmn";
+    case 60: // ------------------- 60  Pbcn #60
+      return "Pbcn";
+    case 61: // ------------------- 61  Pbca #61
+      return "Pbca";
+    case 62: // ------------------- 62  Pnma #62
+      return "Pnma";
+    case 63: // ------------------- 63  Cmcm #63
+      return "Cmcm";
+    case 64: // ------------------- 64  Cmce #64
+      return "Cmce";
+    case 65: // ------------------- 65  Cmmm #65
+      return "Cmmm";
+    case 66: // ------------------- 66  Cccm #66
+      return "Cccm";
+    case 67: // ------------------- 67  Cmme #67
+      return "Cmme";
+    case 68: // ------------------- 68  Ccce #68
+      return "Ccce";
+    case 69: // ------------------- 69  Fmmm #69
+      return "Fmmm";
+    case 70: // ------------------- 70  Fddd #70
+      return "Fddd";
+    case 71: // ------------------- 71  Immm #71
+      return "Immm";
+    case 72: // ------------------- 72  Ibam #72
+      return "Ibam";
+    case 73: // ------------------- 73  Ibca #73
+      return "Ibca";
+    case 74: // ------------------- 74  Imma #74
+      return "Imma";
+    case 75: // ------------------- 75  P4 #75
+      return "P4";
+    case 76: // ------------------- 76  P4_{1} #76
+      return "P4_{1}";
+    case 77: // ------------------- 77  P4_{2} #77
+      return "P4_{2}";
+    case 78: // ------------------- 78  P4_{3} #78
+      return "P4_{3}";
+    case 79: // ------------------- 79  I4 #79
+      return "I4";
+    case 80: // ------------------- 80  I4_{1} #80
+      return "I4_{1}";
+    case 81: // ------------------- 81  P-4 #81
+      return "P-4";
+    case 82: // ------------------- 82  I-4 #82
+      return "I-4";
+    case 83: // ------------------- 83  P4/m #83
+      return "P4/m";
+    case 84: // ------------------- 84  P4_{2}/m #84
+      return "P4_{2}/m";
+    case 85: // ------------------- 85  P4/n #85
+      return "P4/n";
+    case 86: // ------------------- 86  P4_{2}/n #86
+      return "P4_{2}/n";
+    case 87: // ------------------- 87  I4/m #87
+      return "I4/m";
+    case 88: // ------------------- 88  I4_{1}/a #88
+      return "I4_{1}/a";
+    case 89: // ------------------- 89  P422 #89
+      return "P422";
+    case 90: // ------------------- 90  P42_{1}2 #90
+      return "P42_{1}2";
+    case 91: // ------------------- 91  P4_{1}22 #91
+      return "P4_{1}22";
+    case 92: // ------------------- 92  P4_{1}2_{1}2 #92
+      return "P4_{1}2_{1}2";
+    case 93: // ------------------- 93  P4_{2}22 #93
+      return "P4_{2}22";
+    case 94: // ------------------- 94  P4_{2}2_{1}2 #94
+      return "P4_{2}2_{1}2";
+    case 95: // ------------------- 95  P4_{3}22 #95
+      return "P4_{3}22";
+    case 96: // ------------------- 96  P4_{3}2_{1}2 #96
+      return "P4_{3}2_{1}2";
+    case 97: // ------------------- 97  I422 #97
+      return "I422";
+    case 98: // ------------------- 98  I4_{1}22 #98
+      return "I4_{1}22";
+    case 99: // ------------------- 99  P4mm #99
+      return "P4mm";
+    case 100: // ------------------- 100  P4bm #100
+      return "P4bm";
+    case 101: // ------------------- 101  P4_{2}cm #101
+      return "P4_{2}cm";
+    case 102: // ------------------- 102  P4_{2}nm #102
+      return "P4_{2}nm";
+    case 103: // ------------------- 103  P4cc #103
+      return "P4cc";
+    case 104: // ------------------- 104  P4nc #104
+      return "P4nc";
+    case 105: // ------------------- 105  P4_{2}mc #105
+      return "P4_{2}mc";
+    case 106: // ------------------- 106  P4_{2}bc #106
+      return "P4_{2}bc";
+    case 107: // ------------------- 107  I4mm #107
+      return "I4mm";
+    case 108: // ------------------- 108  I4cm #108
+      return "I4cm";
+    case 109: // ------------------- 109  I4_{1}md #109
+      return "I4_{1}md";
+    case 110: // ------------------- 110  I4_{1}cd #110
+      return "I4_{1}cd";
+    case 111: // ------------------- 111  P-42m #111
+      return "P-42m";
+    case 112: // ------------------- 112  P-42c #112
+      return "P-42c";
+    case 113: // ------------------- 113  P-42_{1}m #113
+      return "P-42_{1}m";
+    case 114: // ------------------- 114  P-42_{1}c #114
+      return "P-42_{1}c";
+    case 115: // ------------------- 115  P-4m2 #115
+      return "P-4m2";
+    case 116: // ------------------- 116  P-4c2 #116
+      return "P-4c2";
+    case 117: // ------------------- 117  P-4b2 #117
+      return "P-4b2";
+    case 118: // ------------------- 118  P-4n2 #118
+      return "P-4n2";
+    case 119: // ------------------- 119  I-4m2 #119
+      return "I-4m2";
+    case 120: // ------------------- 120  I-4c2 #120
+      return "I-4c2";
+    case 121: // ------------------- 121  I-42m #121
+      return "I-42m";
+    case 122: // ------------------- 122  I-42d #122
+      return "I-42d";
+    case 123: // ------------------- 123  P4/mmm #123
+      return "P4/mmm";
+    case 124: // ------------------- 124  P4/mcc #124
+      return "P4/mcc";
+    case 125: // ------------------- 125  P4/nbm #125
+      return "P4/nbm";
+    case 126: // ------------------- 126  P4/nnc #126
+      return "P4/nnc";
+    case 127: // ------------------- 127  P4/mbm #127
+      return "P4/mbm";
+    case 128: // ------------------- 128  P4/mnc #128
+      return "P4/mnc";
+    case 129: // ------------------- 129  P4/nmm #129
+      return "P4/nmm";
+    case 130: // ------------------- 130  P4/ncc #130
+      return "P4/ncc";
+    case 131: // ------------------- 131  P4_{2}/mmc #131
+      return "P4_{2}/mmc";
+    case 132: // ------------------- 132  P4_{2}/mcm #132
+      return "P4_{2}/mcm";
+    case 133: // ------------------- 133  P4_{2}/nbc #133
+      return "P4_{2}/nbc";
+    case 134: // ------------------- 134  P4_{2}/nnm #134
+      return "P4_{2}/nnm";
+    case 135: // ------------------- 135  P4_{2}/mbc #135
+      return "P4_{2}/mbc";
+    case 136: // ------------------- 136  P4_{2}/mnm #136
+      return "P4_{2}/mnm";
+    case 137: // ------------------- 137  P4_{2}/nmc #137
+      return "P4_{2}/nmc";
+    case 138: // ------------------- 138  P4_{2}/ncm #138
+      return "P4_{2}/ncm";
+    case 139: // ------------------- 139  I4/mmm #139
+      return "I4/mmm";
+    case 140: // ------------------- 140  I4/mcm #140
+      return "I4/mcm";
+    case 141: // ------------------- 141  I4_{1}/amd #141
+      return "I4_{1}/amd";
+    case 142: // ------------------- 142  I4_{1}/acd #142
+      return "I4_{1}/acd";
+    case 143: // ------------------- 143  P3 #143
+      return "P3";
+    case 144: // ------------------- 144  P3_{1} #144
+      return "P3_{1}";
+    case 145: // ------------------- 145  P3_{2} #145
+      return "P3_{2}";
+    case 146: // ------------------- 146  R3 #146
+      return "R3";
+    case 147: // ------------------- 147  P-3 #147
+      return "P-3";
+    case 148: // ------------------- 148  R-3 #148
+      return "R-3";
+    case 149: // ------------------- 149  P312 #149
+      return "P312";
+    case 150: // ------------------- 150  P321 #150
+      return "P321";
+    case 151: // ------------------- 151  P3_{1}12 #151
+      return "P3_{1}12";
+    case 152: // ------------------- 152  P3_{1}21 #152
+      return "P3_{1}21";
+    case 153: // ------------------- 153  P3_{2}12 #153
+      return "P3_{2}12";
+    case 154: // ------------------- 154  P3_{2}21 #154
+      return "P3_{2}21";
+    case 155: // ------------------- 155  R32 #155
+      return "R32";
+    case 156: // ------------------- 156  P3m1 #156
+      return "P3m1";
+    case 157: // ------------------- 157  P31m #157
+      return "P31m";
+    case 158: // ------------------- 158  P3c1 #158
+      return "P3c1";
+    case 159: // ------------------- 159  P31c #159
+      return "P31c";
+    case 160: // ------------------- 160  R3m #160
+      return "R3m";
+    case 161: // ------------------- 161  R3c #161
+      return "R3c";
+    case 162: // ------------------- 162  P-31m #162
+      return "P-31m";
+    case 163: // ------------------- 163  P-31c #163
+      return "P-31c";
+    case 164: // ------------------- 164  P-3m1 #164
+      return "P-3m1";
+    case 165: // ------------------- 165  P-3c1 #165
+      return "P-3c1";
+    case 166: // ------------------- 166  R-3m #166
+      return "R-3m";
+    case 167: // ------------------- 167  R-3c #167
+      return "R-3c";
+    case 168: // ------------------- 168  P6 #168
+      return "P6";
+    case 169: // ------------------- 169  P6_{1} #169
+      return "P6_{1}";
+    case 170: // ------------------- 170  P6_{5} #170
+      return "P6_{5}";
+    case 171: // ------------------- 171  P6_{2} #171
+      return "P6_{2}";
+    case 172: // ------------------- 172  P6_{4} #172
+      return "P6_{4}";
+    case 173: // ------------------- 173  P6_{3} #173
+      return "P6_{3}";
+    case 174: // ------------------- 174  P-6 #174
+      return "P-6";
+    case 175: // ------------------- 175  P6/m #175
+      return "P6/m";
+    case 176: // ------------------- 176  P6_{3}/m #176
+      return "P6_{3}/m";
+    case 177: // ------------------- 177  P622 #177
+      return "P622";
+    case 178: // ------------------- 178  P6_{1}22 #178
+      return "P6_{1}22";
+    case 179: // ------------------- 179  P6_{5}22 #179
+      return "P6_{5}22";
+    case 180: // ------------------- 180  P6_{2}22 #180
+      return "P6_{2}22";
+    case 181: // ------------------- 181  P6_{4}22 #181
+      return "P6_{4}22";
+    case 182: // ------------------- 182  P6_{3}22 #182
+      return "P6_{3}22";
+    case 183: // ------------------- 183  P6mm #183
+      return "P6mm";
+    case 184: // ------------------- 184  P6cc #184
+      return "P6cc";
+    case 185: // ------------------- 185  P6_{3}cm #185
+      return "P6_{3}cm";
+    case 186: // ------------------- 186  P6_{3}mc #186
+      return "P6_{3}mc";
+    case 187: // ------------------- 187  P-6m2 #187
+      return "P-6m2";
+    case 188: // ------------------- 188  P-6c2 #188
+      return "P-6c2";
+    case 189: // ------------------- 189  P-62m #189
+      return "P-62m";
+    case 190: // ------------------- 190  P-62c #190
+      return "P-62c";
+    case 191: // ------------------- 191  P6/mmm #191
+      return "P6/mmm";
+    case 192: // ------------------- 192  P6/mcc #192
+      return "P6/mcc";
+    case 193: // ------------------- 193  P6_{3}/mcm #193
+      return "P6_{3}/mcm";
+    case 194: // ------------------- 194  P6_{3}/mmc #194
+      return "P6_{3}/mmc";
+    case 195: // ------------------- 195  P23 #195
+      return "P23";
+    case 196: // ------------------- 196  F23 #196
+      return "F23";
+    case 197: // ------------------- 197  I23 #197
+      return "I23";
+    case 198: // ------------------- 198  P2_{1}3 #198
+      return "P2_{1}3";
+    case 199: // ------------------- 199  I2_{1}3 #199
+      return "I2_{1}3";
+    case 200: // ------------------- 200  Pm-3 #200
+      return "Pm-3";
+    case 201: // ------------------- 201  Pn-3 #201
+      return "Pn-3";
+    case 202: // ------------------- 202  Fm-3 #202
+      return "Fm-3";
+    case 203: // ------------------- 203  Fd-3 #203
+      return "Fd-3";
+    case 204: // ------------------- 204  Im-3 #204
+      return "Im-3";
+    case 205: // ------------------- 205  Pa-3 #205
+      return "Pa-3";
+    case 206: // ------------------- 206  Ia-3 #206
+      return "Ia-3";
+    case 207: // ------------------- 207  P432 #207
+      return "P432";
+    case 208: // ------------------- 208  P4_{2}32 #208
+      return "P4_{2}32";
+    case 209: // ------------------- 209  F432 #209
+      return "F432";
+    case 210: // ------------------- 210  F4_{1}32 #210
+      return "F4_{1}32";
+    case 211: // ------------------- 211  I432 #211
+      return "I432";
+    case 212: // ------------------- 212  P4_{3}32 #212
+      return "P4_{3}32";
+    case 213: // ------------------- 213  P4_{1}32 #213
+      return "P4_{1}32";
+    case 214: // ------------------- 214  I4_{1}32 #214
+      return "I4_{1}32";
+    case 215: // ------------------- 215  P-43m #215
+      return "P-43m";
+    case 216: // ------------------- 216  F-43m #216
+      return "F-43m";
+    case 217: // ------------------- 217  I-43m #217
+      return "I-43m";
+    case 218: // ------------------- 218  P-43n #218
+      return "P-43n";
+    case 219: // ------------------- 219  F-43c #219
+      return "F-43c";
+    case 220: // ------------------- 220  I-43d #220
+      return "I-43d";
+    case 221: // ------------------- 221  Pm-3m #221
+      return "Pm-3m";
+    case 222: // ------------------- 222  Pn-3n #222
+      return "Pn-3n";
+    case 223: // ------------------- 223  Pm-3n #223
+      return "Pm-3n";
+    case 224: // ------------------- 224  Pn-3m #224
+      return "Pn-3m";
+    case 225: // ------------------- 225  Fm-3m #225
+      return "Fm-3m";
+    case 226: // ------------------- 226  Fm-3c #226
+      return "Fm-3c";
+    case 227: // ------------------- 227  Fd-3m #227
+      return "Fd-3m";
+    case 228: // ------------------- 228  Fd-3c #228
+      return "Fd-3c";
+    case 229: // ------------------- 229  Im-3m #229
+      return "Im-3m";
+    case 230: // ------------------- 230  Ia-3d #230
+      return "Ia-3d";
+  }
+  // No spacegroup found
+  return "";
 }
 
 // ***************************************************************************
@@ -8255,7 +8264,7 @@ int GetSpaceGroupNumber(const string& spacegroupsymbol, string directory) {
     spacegroupnumber=228;}
   else if(spacegroupsymbol=="Im-3m") {  // ------------------- 229  Im-3m #229
     spacegroupnumber=229;}
-  else if(spacegroupsymbol=="Ia-3d") {  // ------------------- 230  Ia-3d #230                                                                           
+  else if(spacegroupsymbol=="Ia-3d") {  // ------------------- 230  Ia-3d #230
     spacegroupnumber=230;}
   // done
   else{
@@ -8271,477 +8280,479 @@ int GetSpaceGroupNumber(const string& spacegroupsymbol, string directory) {
 // ***************************************************************************
 string GetSpaceGroupSchoenflies(int spacegroupnumber, string directory) {
   string soliloquy = XPID + "aflow_xatom.cpp::GetSpaceGroupSchoenflies()"; //DX20190708 - for xerror
-  stringstream message; //DX20190708 - for xerror
-  string spacegroup=""; //DX20190708 - for xerror
   if(spacegroupnumber < 1 || spacegroupnumber > 230) { //DX20190708 - for xerror
+    stringstream message; //DX20190708 - for xerror
     message << "routine: space group specified invalid (1-230): "; //DX20190708 - for xerror
     message << spacegroupnumber << " [dir=" << directory << "]." << endl; //DX20190708 - for xerror
     throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_); //DX20190708 - for xerror
   }
   // OK
+  //ME20210210 - converted to switch statement (faster)
   //DX+ME20190708 - changed subsequent "if" to "else if" -> efficiency
-  if(spacegroupnumber==1) { // ------------------- 1  C_{1}^{1} #1
-    spacegroup="C_{1}^{1}";}
-  else if(spacegroupnumber==2) { // ------------------- 2  C_{i}^{1} #2
-    spacegroup="C_{i}^{1}";}
-  else if(spacegroupnumber==3) { // ------------------- 3  C_{2}^{1} #3
-    spacegroup="C_{2}^{1}";}
-  else if(spacegroupnumber==4) { // ------------------- 4  C_{2}^{2} #4
-    spacegroup="C_{2}^{2}";}
-  else if(spacegroupnumber==5) { // ------------------- 5  C_{2}^{3} #5
-    spacegroup="C_{2}^{3}";}
-  else if(spacegroupnumber==6) { // ------------------- 6  C_{s}^{1} #6
-    spacegroup="C_{s}^{1}";}
-  else if(spacegroupnumber==7) { // ------------------- 7  C_{s}^{2} #7
-    spacegroup="C_{s}^{2}";}
-  else if(spacegroupnumber==8) { // ------------------- 8  C_{s}^{3} #8
-    spacegroup="C_{s}^{3}";}
-  else if(spacegroupnumber==9) { // ------------------- 9  C_{s}^{4} #9
-    spacegroup="C_{s}^{4}";}
-  else if(spacegroupnumber==10) { // ------------------- 10  C_{2h}^{1} #10
-    spacegroup="C_{2h}^{1}";}
-  else if(spacegroupnumber==11) { // ------------------- 11  C_{2h}^{2} #11
-    spacegroup="C_{2h}^{2}";}
-  else if(spacegroupnumber==12) { // ------------------- 12  C_{2h}^{3} #12
-    spacegroup="C_{2h}^{3}";}
-  else if(spacegroupnumber==13) { // ------------------- 13  C_{2h}^{4} #13
-    spacegroup="C_{2h}^{4}";}
-  else if(spacegroupnumber==14) { // ------------------- 14  C_{2h}^{5} #14
-    spacegroup="C_{2h}^{5}";}
-  else if(spacegroupnumber==15) { // ------------------- 15  C_{2h}^{6} #15
-    spacegroup="C_{2h}^{6}";}
-  else if(spacegroupnumber==16) { // ------------------- 16  D_{2}^{1} #16
-    spacegroup="D_{2}^{1}";}
-  else if(spacegroupnumber==17) { // ------------------- 17  D_{2}^{2} #17
-    spacegroup="D_{2}^{2}";}
-  else if(spacegroupnumber==18) { // ------------------- 18  D_{2}^{3} #18
-    spacegroup="D_{2}^{3}";}
-  else if(spacegroupnumber==19) { // ------------------- 19  D_{2}^{4} #19
-    spacegroup="D_{2}^{4}";}
-  else if(spacegroupnumber==20) { // ------------------- 20  D_{2}^{5} #20
-    spacegroup="D_{2}^{5}";}
-  else if(spacegroupnumber==21) { // ------------------- 21  D_{2}^{6} #21
-    spacegroup="D_{2}^{6}";}
-  else if(spacegroupnumber==22) { // ------------------- 22  D_{2}^{7} #22
-    spacegroup="D_{2}^{7}";}
-  else if(spacegroupnumber==23) { // ------------------- 23  D_{2}^{8} #23
-    spacegroup="D_{2}^{8}";}
-  else if(spacegroupnumber==24) { // ------------------- 24  D_{2}^{9} #24
-    spacegroup="D_{2}^{9}";}
-  else if(spacegroupnumber==25) { // ------------------- 25  C_{2v}^{1} #25
-    spacegroup="C_{2v}^{1}";}
-  else if(spacegroupnumber==26) { // ------------------- 26  C_{2v}^{2} #26
-    spacegroup="C_{2v}^{2}";}
-  else if(spacegroupnumber==27) { // ------------------- 27  C_{2v}^{3} #27
-    spacegroup="C_{2v}^{3}";}
-  else if(spacegroupnumber==28) { // ------------------- 28  C_{2v}^{4} #28
-    spacegroup="C_{2v}^{4}";}
-  else if(spacegroupnumber==29) { // ------------------- 29  C_{2v}^{5} #29
-    spacegroup="C_{2v}^{5}";}
-  else if(spacegroupnumber==30) { // ------------------- 30  C_{2v}^{6} #30
-    spacegroup="C_{2v}^{6}";}
-  else if(spacegroupnumber==31) { // ------------------- 31  C_{2v}^{7} #31
-    spacegroup="C_{2v}^{7}";}
-  else if(spacegroupnumber==32) { // ------------------- 32  C_{2v}^{8} #32
-    spacegroup="C_{2v}^{8}";}
-  else if(spacegroupnumber==33) { // ------------------- 33  C_{2v}^{9} #33
-    spacegroup="C_{2v}^{9}";}
-  else if(spacegroupnumber==34) { // ------------------- 34  C_{2v}^{10} #34
-    spacegroup="C_{2v}^{10}";}
-  else if(spacegroupnumber==35) { // ------------------- 35  C_{2v}^{11} #35
-    spacegroup="C_{2v}^{11}";}
-  else if(spacegroupnumber==36) { // ------------------- 36  C_{2v}^{12} #36
-    spacegroup="C_{2v}^{12}";}
-  else if(spacegroupnumber==37) { // ------------------- 37  C_{2v}^{13} #37
-    spacegroup="C_{2v}^{13}";}
-  else if(spacegroupnumber==38) { // ------------------- 38  C_{2v}^{14} #38
-    spacegroup="C_{2v}^{14}";}
-  else if(spacegroupnumber==39) { // ------------------- 39  C_{2v}^{15} #39
-    spacegroup="C_{2v}^{15}";}
-  else if(spacegroupnumber==40) { // ------------------- 40  C_{2v}^{16} #40
-    spacegroup="C_{2v}^{16}";}
-  else if(spacegroupnumber==41) { // ------------------- 41  C_{2v}^{17} #41
-    spacegroup="C_{2v}^{17}";}
-  else if(spacegroupnumber==42) { // ------------------- 42  C_{2v}^{18} #42
-    spacegroup="C_{2v}^{18}";}
-  else if(spacegroupnumber==43) { // ------------------- 43  C_{2v}^{19} #43
-    spacegroup="C_{2v}^{19}";}
-  else if(spacegroupnumber==44) { // ------------------- 44  C_{2v}^{20} #44
-    spacegroup="C_{2v}^{20}";}
-  else if(spacegroupnumber==45) { // ------------------- 45  C_{2v}^{21} #45
-    spacegroup="C_{2v}^{21}";}
-  else if(spacegroupnumber==46) { // ------------------- 46  C_{2v}^{22} #46
-    spacegroup="C_{2v}^{22}";}
-  else if(spacegroupnumber==47) { // ------------------- 47  D_{2h}^{1} #47
-    spacegroup="D_{2h}^{1}";}
-  else if(spacegroupnumber==48) { // ------------------- 48  D_{2h}^{2} #48
-    spacegroup="D_{2h}^{2}";}
-  else if(spacegroupnumber==49) { // ------------------- 49  D_{2h}^{3} #49
-    spacegroup="D_{2h}^{3}";}
-  else if(spacegroupnumber==50) { // ------------------- 50  D_{2h}^{4} #50
-    spacegroup="D_{2h}^{4}";}
-  else if(spacegroupnumber==51) { // ------------------- 51  D_{2h}^{5} #51
-    spacegroup="D_{2h}^{5}";}
-  else if(spacegroupnumber==52) { // ------------------- 52  D_{2h}^{6} #52
-    spacegroup="D_{2h}^{6}";}
-  else if(spacegroupnumber==53) { // ------------------- 53  D_{2h}^{7} #53
-    spacegroup="D_{2h}^{7}";}
-  else if(spacegroupnumber==54) { // ------------------- 54  D_{2h}^{8} #54
-    spacegroup="D_{2h}^{8}";}
-  else if(spacegroupnumber==55) { // ------------------- 55  D_{2h}^{9} #55
-    spacegroup="D_{2h}^{9}";}
-  else if(spacegroupnumber==56) { // ------------------- 56  D_{2h}^{10} #56
-    spacegroup="D_{2h}^{10}";}
-  else if(spacegroupnumber==57) { // ------------------- 57  D_{2h}^{11} #57
-    spacegroup="D_{2h}^{11}";}
-  else if(spacegroupnumber==58) { // ------------------- 58  D_{2h}^{12} #58
-    spacegroup="D_{2h}^{12}";}
-  else if(spacegroupnumber==59) { // ------------------- 59  D_{2h}^{13} #59
-    spacegroup="D_{2h}^{13}";}
-  else if(spacegroupnumber==60) { // ------------------- 60  D_{2h}^{14} #60
-    spacegroup="D_{2h}^{14}";}
-  else if(spacegroupnumber==61) { // ------------------- 61  D_{2h}^{15} #61
-    spacegroup="D_{2h}^{15}";}
-  else if(spacegroupnumber==62) { // ------------------- 62  D_{2h}^{16} #62
-    spacegroup="D_{2h}^{16}";}
-  else if(spacegroupnumber==63) { // ------------------- 63  D_{2h}^{17} #63
-    spacegroup="D_{2h}^{17}";}
-  else if(spacegroupnumber==64) { // ------------------- 64  D_{2h}^{18} #64
-    spacegroup="D_{2h}^{18}";}
-  else if(spacegroupnumber==65) { // ------------------- 65  D_{2h}^{19} #65
-    spacegroup="D_{2h}^{19}";}
-  else if(spacegroupnumber==66) { // ------------------- 66  D_{2h}^{20} #66
-    spacegroup="D_{2h}^{20}";}
-  else if(spacegroupnumber==67) { // ------------------- 67  D_{2h}^{21} #67
-    spacegroup="D_{2h}^{21}";}
-  else if(spacegroupnumber==68) { // ------------------- 68  D_{2h}^{22} #68
-    spacegroup="D_{2h}^{22}";}
-  else if(spacegroupnumber==69) { // ------------------- 69  D_{2h}^{23} #69
-    spacegroup="D_{2h}^{23}";}
-  else if(spacegroupnumber==70) { // ------------------- 70  D_{2h}^{24} #70
-    spacegroup="D_{2h}^{24}";}
-  else if(spacegroupnumber==71) { // ------------------- 71  D_{2h}^{25} #71
-    spacegroup="D_{2h}^{25}";}
-  else if(spacegroupnumber==72) { // ------------------- 72  D_{2h}^{26} #72
-    spacegroup="D_{2h}^{26}";}
-  else if(spacegroupnumber==73) { // ------------------- 73  D_{2h}^{27} #73
-    spacegroup="D_{2h}^{27}";}
-  else if(spacegroupnumber==74) { // ------------------- 74  D_{2h}^{28} #74
-    spacegroup="D_{2h}^{28}";}
-  else if(spacegroupnumber==75) { // ------------------- 75  C_{4}^{1} #75
-    spacegroup="C_{4}^{1}";}
-  else if(spacegroupnumber==76) { // ------------------- 76  C_{4}^{2} #76
-    spacegroup="C_{4}^{2}";}
-  else if(spacegroupnumber==77) { // ------------------- 77  C_{4}^{3} #77
-    spacegroup="C_{4}^{3}";}
-  else if(spacegroupnumber==78) { // ------------------- 78  C_{4}^{4} #78
-    spacegroup="C_{4}^{4}";}
-  else if(spacegroupnumber==79) { // ------------------- 79  C_{4}^{5} #79
-    spacegroup="C_{4}^{5}";}
-  else if(spacegroupnumber==80) { // ------------------- 80  C_{4}^{6} #80
-    spacegroup="C_{4}^{6}";}
-  else if(spacegroupnumber==81) { // ------------------- 81  S_{4}^{1} #81
-    spacegroup="S_{4}^{1}";}
-  else if(spacegroupnumber==82) { // ------------------- 82  S_{4}^{2} #82
-    spacegroup="S_{4}^{2}";}
-  else if(spacegroupnumber==83) { // ------------------- 83  C_{4h}^{1} #83
-    spacegroup="C_{4h}^{1}";}
-  else if(spacegroupnumber==84) { // ------------------- 84  C_{4h}^{2} #84
-    spacegroup="C_{4h}^{2}";}
-  else if(spacegroupnumber==85) { // ------------------- 85  C_{4h}^{3} #85
-    spacegroup="C_{4h}^{3}";}
-  else if(spacegroupnumber==86) { // ------------------- 86  C_{4h}^{4} #86
-    spacegroup="C_{4h}^{4}";}
-  else if(spacegroupnumber==87) { // ------------------- 87  C_{4h}^{5} #87
-    spacegroup="C_{4h}^{5}";}
-  else if(spacegroupnumber==88) { // ------------------- 88  C_{4h}^{6} #88
-    spacegroup="C_{4h}^{6}";}
-  else if(spacegroupnumber==89) { // ------------------- 89  D_{4}^{1} #89
-    spacegroup="D_{4}^{1}";}
-  else if(spacegroupnumber==90) { // ------------------- 90  D_{4}^{2} #90
-    spacegroup="D_{4}^{2}";}
-  else if(spacegroupnumber==91) { // ------------------- 91  D_{4}^{3} #91
-    spacegroup="D_{4}^{3}";}
-  else if(spacegroupnumber==92) { // ------------------- 92  D_{4}^{4} #92
-    spacegroup="D_{4}^{4}";}
-  else if(spacegroupnumber==93) { // ------------------- 93  D_{4}^{5} #93
-    spacegroup="D_{4}^{5}";}
-  else if(spacegroupnumber==94) { // ------------------- 94  D_{4}^{6} #94
-    spacegroup="D_{4}^{6}";}
-  else if(spacegroupnumber==95) { // ------------------- 95  D_{4}^{7} #95
-    spacegroup="D_{4}^{7}";}
-  else if(spacegroupnumber==96) { // ------------------- 96  D_{4}^{8} #96
-    spacegroup="D_{4}^{8}";}
-  else if(spacegroupnumber==97) { // ------------------- 97  D_{4}^{9} #97
-    spacegroup="D_{4}^{9}";}
-  else if(spacegroupnumber==98) { // ------------------- 98  D_{4}^{10} #98
-    spacegroup="D_{4}^{10}";}
-  else if(spacegroupnumber==99) { // ------------------- 99  C_{4v}^{1} #99
-    spacegroup="C_{4v}^{1}";}
-  else if(spacegroupnumber==100) { // ------------------- 100  C_{4v}^{2} #100
-    spacegroup="C_{4v}^{2}";}
-  else if(spacegroupnumber==101) { // ------------------- 101  C_{4v}^{3} #101
-    spacegroup="C_{4v}^{3}";}
-  else if(spacegroupnumber==102) { // ------------------- 102  C_{4v}^{4} #102
-    spacegroup="C_{4v}^{4}";}
-  else if(spacegroupnumber==103) { // ------------------- 103  C_{4v}^{5} #103
-    spacegroup="C_{4v}^{5}";}
-  else if(spacegroupnumber==104) { // ------------------- 104  C_{4v}^{6} #104
-    spacegroup="C_{4v}^{6}";}
-  else if(spacegroupnumber==105) { // ------------------- 105  C_{4v}^{7} #105
-    spacegroup="C_{4v}^{7}";}
-  else if(spacegroupnumber==106) { // ------------------- 106  C_{4v}^{8} #106
-    spacegroup="C_{4v}^{8}";}
-  else if(spacegroupnumber==107) { // ------------------- 107  C_{4v}^{9} #107
-    spacegroup="C_{4v}^{9}";}
-  else if(spacegroupnumber==108) { // ------------------- 108  C_{4v}^{10} #108
-    spacegroup="C_{4v}^{10}";}
-  else if(spacegroupnumber==109) { // ------------------- 109  C_{4v}^{11} #109
-    spacegroup="C_{4v}^{11}";}
-  else if(spacegroupnumber==110) { // ------------------- 110  C_{4v}^{12} #110
-    spacegroup="C_{4v}^{12}";}
-  else if(spacegroupnumber==111) { // ------------------- 111  D_{2d}^{1} #111
-    spacegroup="D_{2d}^{1}";}
-  else if(spacegroupnumber==112) { // ------------------- 112  D_{2d}^{2} #112
-    spacegroup="D_{2d}^{2}";}
-  else if(spacegroupnumber==113) { // ------------------- 113  D_{2d}^{3} #113
-    spacegroup="D_{2d}^{3}";}
-  else if(spacegroupnumber==114) { // ------------------- 114  D_{2d}^{4} #114
-    spacegroup="D_{2d}^{4}";}
-  else if(spacegroupnumber==115) { // ------------------- 115  D_{2d}^{5} #115
-    spacegroup="D_{2d}^{5}";}
-  else if(spacegroupnumber==116) { // ------------------- 116  D_{2d}^{6} #116
-    spacegroup="D_{2d}^{6}";}
-  else if(spacegroupnumber==117) { // ------------------- 117  D_{2d}^{7} #117
-    spacegroup="D_{2d}^{7}";}
-  else if(spacegroupnumber==118) { // ------------------- 118  D_{2d}^{8} #118
-    spacegroup="D_{2d}^{8}";}
-  else if(spacegroupnumber==119) { // ------------------- 119  D_{2d}^{9} #119
-    spacegroup="D_{2d}^{9}";}
-  else if(spacegroupnumber==120) { // ------------------- 120  D_{2d}^{10} #120
-    spacegroup="D_{2d}^{10}";}
-  else if(spacegroupnumber==121) { // ------------------- 121  D_{2d}^{11} #121
-    spacegroup="D_{2d}^{11}";}
-  else if(spacegroupnumber==122) { // ------------------- 122  D_{2d}^{12} #122
-    spacegroup="D_{2d}^{12}";}
-  else if(spacegroupnumber==123) { // ------------------- 123  D_{4h}^{1} #123
-    spacegroup="D_{4h}^{1}";}
-  else if(spacegroupnumber==124) { // ------------------- 124  D_{4h}^{2} #124
-    spacegroup="D_{4h}^{2}";}
-  else if(spacegroupnumber==125) { // ------------------- 125  D_{4h}^{3} #125
-    spacegroup="D_{4h}^{3}";}
-  else if(spacegroupnumber==126) { // ------------------- 126  D_{4h}^{4} #126
-    spacegroup="D_{4h}^{4}";}
-  else if(spacegroupnumber==127) { // ------------------- 127  D_{4h}^{5} #127
-    spacegroup="D_{4h}^{5}";}
-  else if(spacegroupnumber==128) { // ------------------- 128  D_{4h}^{6} #128
-    spacegroup="D_{4h}^{6}";}
-  else if(spacegroupnumber==129) { // ------------------- 129  D_{4h}^{7} #129
-    spacegroup="D_{4h}^{7}";}
-  else if(spacegroupnumber==130) { // ------------------- 130  D_{4h}^{8} #130
-    spacegroup="D_{4h}^{8}";}
-  else if(spacegroupnumber==131) { // ------------------- 131  D_{4h}^{9} #131
-    spacegroup="D_{4h}^{9}";}
-  else if(spacegroupnumber==132) { // ------------------- 132  D_{4h}^{10} #132
-    spacegroup="D_{4h}^{10}";}
-  else if(spacegroupnumber==133) { // ------------------- 133  D_{4h}^{11} #133
-    spacegroup="D_{4h}^{11}";}
-  else if(spacegroupnumber==134) { // ------------------- 134  D_{4h}^{12} #134
-    spacegroup="D_{4h}^{12}";}
-  else if(spacegroupnumber==135) { // ------------------- 135  D_{4h}^{13} #135
-    spacegroup="D_{4h}^{13}";}
-  else if(spacegroupnumber==136) { // ------------------- 136  D_{4h}^{14} #136
-    spacegroup="D_{4h}^{14}";}
-  else if(spacegroupnumber==137) { // ------------------- 137  D_{4h}^{15} #137
-    spacegroup="D_{4h}^{15}";}
-  else if(spacegroupnumber==138) { // ------------------- 138  D_{4h}^{16} #138
-    spacegroup="D_{4h}^{16}";}
-  else if(spacegroupnumber==139) { // ------------------- 139  D_{4h}^{17} #139
-    spacegroup="D_{4h}^{17}";}
-  else if(spacegroupnumber==140) { // ------------------- 140  D_{4h}^{18} #140
-    spacegroup="D_{4h}^{18}";}
-  else if(spacegroupnumber==141) { // ------------------- 141  D_{4h}^{19} #141
-    spacegroup="D_{4h}^{19}";}
-  else if(spacegroupnumber==142) { // ------------------- 142  D_{4h}^{20} #142
-    spacegroup="D_{4h}^{20}";}
-  else if(spacegroupnumber==143) { // ------------------- 143  C_{3}^{1} #143
-    spacegroup="C_{3}^{1}";}
-  else if(spacegroupnumber==144) { // ------------------- 144  C_{3}^{2} #144
-    spacegroup="C_{3}^{2}";}
-  else if(spacegroupnumber==145) { // ------------------- 145  C_{3}^{3} #145
-    spacegroup="C_{3}^{3}";}
-  else if(spacegroupnumber==146) { // ------------------- 146  C_{3}^{4} #146
-    spacegroup="C_{3}^{4}";}
-  else if(spacegroupnumber==147) { // ------------------- 147  C_{3i}^{1} #147
-    spacegroup="C_{3i}^{1}";}
-  else if(spacegroupnumber==148) { // ------------------- 148  C_{3i}^{2} #148
-    spacegroup="C_{3i}^{2}";}
-  else if(spacegroupnumber==149) { // ------------------- 149  D_{3}^{1} #149
-    spacegroup="D_{3}^{1}";}
-  else if(spacegroupnumber==150) { // ------------------- 150  D_{3}^{2} #150
-    spacegroup="D_{3}^{2}";}
-  else if(spacegroupnumber==151) { // ------------------- 151  D_{3}^{3} #151
-    spacegroup="D_{3}^{3}";}
-  else if(spacegroupnumber==152) { // ------------------- 152  D_{3}^{4} #152
-    spacegroup="D_{3}^{4}";}
-  else if(spacegroupnumber==153) { // ------------------- 153  D_{3}^{5} #153
-    spacegroup="D_{3}^{5}";}
-  else if(spacegroupnumber==154) { // ------------------- 154  D_{3}^{6} #154
-    spacegroup="D_{3}^{6}";}
-  else if(spacegroupnumber==155) { // ------------------- 155  D_{3}^{7} #155
-    spacegroup="D_{3}^{7}";}
-  else if(spacegroupnumber==156) { // ------------------- 156  C_{3v}^{1} #156
-    spacegroup="C_{3v}^{1}";}
-  else if(spacegroupnumber==157) { // ------------------- 157  C_{3v}^{2} #157
-    spacegroup="C_{3v}^{2}";}
-  else if(spacegroupnumber==158) { // ------------------- 158  C_{3v}^{3} #158
-    spacegroup="C_{3v}^{3}";}
-  else if(spacegroupnumber==159) { // ------------------- 159  C_{3v}^{4} #159
-    spacegroup="C_{3v}^{4}";}
-  else if(spacegroupnumber==160) { // ------------------- 160  C_{3v}^{5} #160
-    spacegroup="C_{3v}^{5}";}
-  else if(spacegroupnumber==161) { // ------------------- 161  C_{3v}^{6} #161
-    spacegroup="C_{3v}^{6}";}
-  else if(spacegroupnumber==162) { // ------------------- 162  D_{3d}^{1} #162
-    spacegroup="D_{3d}^{1}";}
-  else if(spacegroupnumber==163) { // ------------------- 163  D_{3d}^{2} #163
-    spacegroup="D_{3d}^{2}";}
-  else if(spacegroupnumber==164) { // ------------------- 164  D_{3d}^{3} #164
-    spacegroup="D_{3d}^{3}";}
-  else if(spacegroupnumber==165) { // ------------------- 165  D_{3d}^{4} #165
-    spacegroup="D_{3d}^{4}";}
-  else if(spacegroupnumber==166) { // ------------------- 166  D_{3d}^{5} #166
-    spacegroup="D_{3d}^{5}";}
-  else if(spacegroupnumber==167) { // ------------------- 167  D_{3d}^{6} #167
-    spacegroup="D_{3d}^{6}";}
-  else if(spacegroupnumber==168) { // ------------------- 168  C_{6}^{1} #168
-    spacegroup="C_{6}^{1}";}
-  else if(spacegroupnumber==169) { // ------------------- 169  C_{6}^{2} #169
-    spacegroup="C_{6}^{2}";}
-  else if(spacegroupnumber==170) { // ------------------- 170  C_{6}^{3} #170
-    spacegroup="C_{6}^{3}";}
-  else if(spacegroupnumber==171) { // ------------------- 171  C_{6}^{4} #171
-    spacegroup="C_{6}^{4}";}
-  else if(spacegroupnumber==172) { // ------------------- 172  C_{6}^{5} #172
-    spacegroup="C_{6}^{5}";}
-  else if(spacegroupnumber==173) { // ------------------- 173  C_{6}^{6} #173
-    spacegroup="C_{6}^{6}";}
-  else if(spacegroupnumber==174) { // ------------------- 174  C_{3h}^{1} #174
-    spacegroup="C_{3h}^{1}";}
-  else if(spacegroupnumber==175) { // ------------------- 175  C_{6h}^{1} #175
-    spacegroup="C_{6h}^{1}";}
-  else if(spacegroupnumber==176) { // ------------------- 176  C_{6h}^{2} #176
-    spacegroup="C_{6h}^{2}";}
-  else if(spacegroupnumber==177) { // ------------------- 177  D_{6}^{1} #177
-    spacegroup="D_{6}^{1}";}
-  else if(spacegroupnumber==178) { // ------------------- 178  D_{6}^{2} #178
-    spacegroup="D_{6}^{2}";}
-  else if(spacegroupnumber==179) { // ------------------- 179  D_{6}^{3} #179
-    spacegroup="D_{6}^{3}";}
-  else if(spacegroupnumber==180) { // ------------------- 180  D_{6}^{4} #180
-    spacegroup="D_{6}^{4}";}
-  else if(spacegroupnumber==181) { // ------------------- 181  D_{6}^{5} #181
-    spacegroup="D_{6}^{5}";}
-  else if(spacegroupnumber==182) { // ------------------- 182  D_{6}^{6} #182
-    spacegroup="D_{6}^{6}";}
-  else if(spacegroupnumber==183) { // ------------------- 183  C_{6v}^{1} #183
-    spacegroup="C_{6v}^{1}";}
-  else if(spacegroupnumber==184) { // ------------------- 184  C_{6v}^{2} #184
-    spacegroup="C_{6v}^{2}";}
-  else if(spacegroupnumber==185) { // ------------------- 185  C_{6v}^{3} #185
-    spacegroup="C_{6v}^{3}";}
-  else if(spacegroupnumber==186) { // ------------------- 186  C_{6v}^{4} #186
-    spacegroup="C_{6v}^{4}";}
-  else if(spacegroupnumber==187) { // ------------------- 187  D_{3h}^{1} #187
-    spacegroup="D_{3h}^{1}";}
-  else if(spacegroupnumber==188) { // ------------------- 188  D_{3h}^{2} #188
-    spacegroup="D_{3h}^{2}";}
-  else if(spacegroupnumber==189) { // ------------------- 189  D_{3h}^{3} #189
-    spacegroup="D_{3h}^{3}";}
-  else if(spacegroupnumber==190) { // ------------------- 190  D_{3h}^{4} #190
-    spacegroup="D_{3h}^{4}";}
-  else if(spacegroupnumber==191) { // ------------------- 191  D_{6h}^{1} #191
-    spacegroup="D_{6h}^{1}";}
-  else if(spacegroupnumber==192) { // ------------------- 192  D_{6h}^{2} #192
-    spacegroup="D_{6h}^{2}";}
-  else if(spacegroupnumber==193) { // ------------------- 193  D_{6h}^{3} #193
-    spacegroup="D_{6h}^{3}";}
-  else if(spacegroupnumber==194) { // ------------------- 194  D_{6h}^{4} #194
-    spacegroup="D_{6h}^{4}";}
-  else if(spacegroupnumber==195) { // ------------------- 195  T^{1} #195
-    spacegroup="T^{1}";}
-  else if(spacegroupnumber==196) { // ------------------- 196  T^{2} #196
-    spacegroup="T^{2}";}
-  else if(spacegroupnumber==197) { // ------------------- 197  T^{3} #197
-    spacegroup="T^{3}";}
-  else if(spacegroupnumber==198) { // ------------------- 198  T^{4} #198
-    spacegroup="T^{4}";}
-  else if(spacegroupnumber==199) { // ------------------- 199  T^{5} #199
-    spacegroup="T^{5}";}
-  else if(spacegroupnumber==200) { // ------------------- 200  T_{h}^{1} #200
-    spacegroup="T_{h}^{1}";}
-  else if(spacegroupnumber==201) { // ------------------- 201  T_{h}^{2} #201
-    spacegroup="T_{h}^{2}";}
-  else if(spacegroupnumber==202) { // ------------------- 202  T_{h}^{3} #202
-    spacegroup="T_{h}^{3}";}
-  else if(spacegroupnumber==203) { // ------------------- 203  T_{h}^{4} #203
-    spacegroup="T_{h}^{4}";}
-  else if(spacegroupnumber==204) { // ------------------- 204  T_{h}^{5} #204
-    spacegroup="T_{h}^{5}";}
-  else if(spacegroupnumber==205) { // ------------------- 205  T_{h}^{6} #205
-    spacegroup="T_{h}^{6}";}
-  else if(spacegroupnumber==206) { // ------------------- 206  T_{h}^{7} #206
-    spacegroup="T_{h}^{7}";}
-  else if(spacegroupnumber==207) { // ------------------- 207  O^{1} #207
-    spacegroup="O^{1}";}
-  else if(spacegroupnumber==208) { // ------------------- 208  O^{2} #208
-    spacegroup="O^{2}";}
-  else if(spacegroupnumber==209) { // ------------------- 209  O^{3} #209
-    spacegroup="O^{3}";}
-  else if(spacegroupnumber==210) { // ------------------- 210  O^{4} #210
-    spacegroup="O^{4}";}
-  else if(spacegroupnumber==211) { // ------------------- 211  O^{5} #211
-    spacegroup="O^{5}";}
-  else if(spacegroupnumber==212) { // ------------------- 212  O^{6} #212
-    spacegroup="O^{6}";}
-  else if(spacegroupnumber==213) { // ------------------- 213  O^{7} #213
-    spacegroup="O^{7}";}
-  else if(spacegroupnumber==214) { // ------------------- 214  O^{8} #214
-    spacegroup="O^{8}";}
-  else if(spacegroupnumber==215) { // ------------------- 215  T_{d}^{1} #215
-    spacegroup="T_{d}^{1}";}
-  else if(spacegroupnumber==216) { // ------------------- 216  T_{d}^{2} #216
-    spacegroup="T_{d}^{2}";}
-  else if(spacegroupnumber==217) { // ------------------- 217  T_{d}^{3} #217
-    spacegroup="T_{d}^{3}";}
-  else if(spacegroupnumber==218) { // ------------------- 218  T_{d}^{4} #218
-    spacegroup="T_{d}^{4}";}
-  else if(spacegroupnumber==219) { // ------------------- 219  T_{d}^{5} #219
-    spacegroup="T_{d}^{5}";}
-  else if(spacegroupnumber==220) { // ------------------- 220  T_{d}^{6} #220
-    spacegroup="T_{d}^{6}";}
-  else if(spacegroupnumber==221) { // ------------------- 221  O_{h}^{1} #221
-    spacegroup="O_{h}^{1}";}
-  else if(spacegroupnumber==222) { // ------------------- 222  O_{h}^{2} #222
-    spacegroup="O_{h}^{2}";}
-  else if(spacegroupnumber==223) { // ------------------- 223  O_{h}^{3} #223
-    spacegroup="O_{h}^{3}";}
-  else if(spacegroupnumber==224) { // ------------------- 224  O_{h}^{4} #224
-    spacegroup="O_{h}^{4}";}
-  else if(spacegroupnumber==225) { // ------------------- 225  O_{h}^{5} #225
-    spacegroup="O_{h}^{5}";}
-  else if(spacegroupnumber==226) { // ------------------- 226  O_{h}^{6} #226
-    spacegroup="O_{h}^{6}";}
-  else if(spacegroupnumber==227) { // ------------------- 227  O_{h}^{7} #227
-    spacegroup="O_{h}^{7}";}
-  else if(spacegroupnumber==228) { // ------------------- 228  O_{h}^{8} #228
-    spacegroup="O_{h}^{8}";}
-  else if(spacegroupnumber==229) { // ------------------- 229  O_{h}^{9} #229
-    spacegroup="O_{h}^{9}";}
-  else if(spacegroupnumber==230) { // ------------------- 230  O_{h}^{10} #230
-    spacegroup="O_{h}^{10}";}
-  // done
-  return spacegroup;
+  switch(spacegroupnumber) {
+    case 1: // ------------------- 1  C_{1}^{1} #1
+      return "C_{1}^{1}";
+    case 2: // ------------------- 2  C_{i}^{1} #2
+      return "C_{i}^{1}";
+    case 3: // ------------------- 3  C_{2}^{1} #3
+      return "C_{2}^{1}";
+    case 4: // ------------------- 4  C_{2}^{2} #4
+      return "C_{2}^{2}";
+    case 5: // ------------------- 5  C_{2}^{3} #5
+      return "C_{2}^{3}";
+    case 6: // ------------------- 6  C_{s}^{1} #6
+      return "C_{s}^{1}";
+    case 7: // ------------------- 7  C_{s}^{2} #7
+      return "C_{s}^{2}";
+    case 8: // ------------------- 8  C_{s}^{3} #8
+      return "C_{s}^{3}";
+    case 9: // ------------------- 9  C_{s}^{4} #9
+      return "C_{s}^{4}";
+    case 10: // ------------------- 10  C_{2h}^{1} #10
+      return "C_{2h}^{1}";
+    case 11: // ------------------- 11  C_{2h}^{2} #11
+      return "C_{2h}^{2}";
+    case 12: // ------------------- 12  C_{2h}^{3} #12
+      return "C_{2h}^{3}";
+    case 13: // ------------------- 13  C_{2h}^{4} #13
+      return "C_{2h}^{4}";
+    case 14: // ------------------- 14  C_{2h}^{5} #14
+      return "C_{2h}^{5}";
+    case 15: // ------------------- 15  C_{2h}^{6} #15
+      return "C_{2h}^{6}";
+    case 16: // ------------------- 16  D_{2}^{1} #16
+      return "D_{2}^{1}";
+    case 17: // ------------------- 17  D_{2}^{2} #17
+      return "D_{2}^{2}";
+    case 18: // ------------------- 18  D_{2}^{3} #18
+      return "D_{2}^{3}";
+    case 19: // ------------------- 19  D_{2}^{4} #19
+      return "D_{2}^{4}";
+    case 20: // ------------------- 20  D_{2}^{5} #20
+      return "D_{2}^{5}";
+    case 21: // ------------------- 21  D_{2}^{6} #21
+      return "D_{2}^{6}";
+    case 22: // ------------------- 22  D_{2}^{7} #22
+      return "D_{2}^{7}";
+    case 23: // ------------------- 23  D_{2}^{8} #23
+      return "D_{2}^{8}";
+    case 24: // ------------------- 24  D_{2}^{9} #24
+      return "D_{2}^{9}";
+    case 25: // ------------------- 25  C_{2v}^{1} #25
+      return "C_{2v}^{1}";
+    case 26: // ------------------- 26  C_{2v}^{2} #26
+      return "C_{2v}^{2}";
+    case 27: // ------------------- 27  C_{2v}^{3} #27
+      return "C_{2v}^{3}";
+    case 28: // ------------------- 28  C_{2v}^{4} #28
+      return "C_{2v}^{4}";
+    case 29: // ------------------- 29  C_{2v}^{5} #29
+      return "C_{2v}^{5}";
+    case 30: // ------------------- 30  C_{2v}^{6} #30
+      return "C_{2v}^{6}";
+    case 31: // ------------------- 31  C_{2v}^{7} #31
+      return "C_{2v}^{7}";
+    case 32: // ------------------- 32  C_{2v}^{8} #32
+      return "C_{2v}^{8}";
+    case 33: // ------------------- 33  C_{2v}^{9} #33
+      return "C_{2v}^{9}";
+    case 34: // ------------------- 34  C_{2v}^{10} #34
+      return "C_{2v}^{10}";
+    case 35: // ------------------- 35  C_{2v}^{11} #35
+      return "C_{2v}^{11}";
+    case 36: // ------------------- 36  C_{2v}^{12} #36
+      return "C_{2v}^{12}";
+    case 37: // ------------------- 37  C_{2v}^{13} #37
+      return "C_{2v}^{13}";
+    case 38: // ------------------- 38  C_{2v}^{14} #38
+      return "C_{2v}^{14}";
+    case 39: // ------------------- 39  C_{2v}^{15} #39
+      return "C_{2v}^{15}";
+    case 40: // ------------------- 40  C_{2v}^{16} #40
+      return "C_{2v}^{16}";
+    case 41: // ------------------- 41  C_{2v}^{17} #41
+      return "C_{2v}^{17}";
+    case 42: // ------------------- 42  C_{2v}^{18} #42
+      return "C_{2v}^{18}";
+    case 43: // ------------------- 43  C_{2v}^{19} #43
+      return "C_{2v}^{19}";
+    case 44: // ------------------- 44  C_{2v}^{20} #44
+      return "C_{2v}^{20}";
+    case 45: // ------------------- 45  C_{2v}^{21} #45
+      return "C_{2v}^{21}";
+    case 46: // ------------------- 46  C_{2v}^{22} #46
+      return "C_{2v}^{22}";
+    case 47: // ------------------- 47  D_{2h}^{1} #47
+      return "D_{2h}^{1}";
+    case 48: // ------------------- 48  D_{2h}^{2} #48
+      return "D_{2h}^{2}";
+    case 49: // ------------------- 49  D_{2h}^{3} #49
+      return "D_{2h}^{3}";
+    case 50: // ------------------- 50  D_{2h}^{4} #50
+      return "D_{2h}^{4}";
+    case 51: // ------------------- 51  D_{2h}^{5} #51
+      return "D_{2h}^{5}";
+    case 52: // ------------------- 52  D_{2h}^{6} #52
+      return "D_{2h}^{6}";
+    case 53: // ------------------- 53  D_{2h}^{7} #53
+      return "D_{2h}^{7}";
+    case 54: // ------------------- 54  D_{2h}^{8} #54
+      return "D_{2h}^{8}";
+    case 55: // ------------------- 55  D_{2h}^{9} #55
+      return "D_{2h}^{9}";
+    case 56: // ------------------- 56  D_{2h}^{10} #56
+      return "D_{2h}^{10}";
+    case 57: // ------------------- 57  D_{2h}^{11} #57
+      return "D_{2h}^{11}";
+    case 58: // ------------------- 58  D_{2h}^{12} #58
+      return "D_{2h}^{12}";
+    case 59: // ------------------- 59  D_{2h}^{13} #59
+      return "D_{2h}^{13}";
+    case 60: // ------------------- 60  D_{2h}^{14} #60
+      return "D_{2h}^{14}";
+    case 61: // ------------------- 61  D_{2h}^{15} #61
+      return "D_{2h}^{15}";
+    case 62: // ------------------- 62  D_{2h}^{16} #62
+      return "D_{2h}^{16}";
+    case 63: // ------------------- 63  D_{2h}^{17} #63
+      return "D_{2h}^{17}";
+    case 64: // ------------------- 64  D_{2h}^{18} #64
+      return "D_{2h}^{18}";
+    case 65: // ------------------- 65  D_{2h}^{19} #65
+      return "D_{2h}^{19}";
+    case 66: // ------------------- 66  D_{2h}^{20} #66
+      return "D_{2h}^{20}";
+    case 67: // ------------------- 67  D_{2h}^{21} #67
+      return "D_{2h}^{21}";
+    case 68: // ------------------- 68  D_{2h}^{22} #68
+      return "D_{2h}^{22}";
+    case 69: // ------------------- 69  D_{2h}^{23} #69
+      return "D_{2h}^{23}";
+    case 70: // ------------------- 70  D_{2h}^{24} #70
+      return "D_{2h}^{24}";
+    case 71: // ------------------- 71  D_{2h}^{25} #71
+      return "D_{2h}^{25}";
+    case 72: // ------------------- 72  D_{2h}^{26} #72
+      return "D_{2h}^{26}";
+    case 73: // ------------------- 73  D_{2h}^{27} #73
+      return "D_{2h}^{27}";
+    case 74: // ------------------- 74  D_{2h}^{28} #74
+      return "D_{2h}^{28}";
+    case 75: // ------------------- 75  C_{4}^{1} #75
+      return "C_{4}^{1}";
+    case 76: // ------------------- 76  C_{4}^{2} #76
+      return "C_{4}^{2}";
+    case 77: // ------------------- 77  C_{4}^{3} #77
+      return "C_{4}^{3}";
+    case 78: // ------------------- 78  C_{4}^{4} #78
+      return "C_{4}^{4}";
+    case 79: // ------------------- 79  C_{4}^{5} #79
+      return "C_{4}^{5}";
+    case 80: // ------------------- 80  C_{4}^{6} #80
+      return "C_{4}^{6}";
+    case 81: // ------------------- 81  S_{4}^{1} #81
+      return "S_{4}^{1}";
+    case 82: // ------------------- 82  S_{4}^{2} #82
+      return "S_{4}^{2}";
+    case 83: // ------------------- 83  C_{4h}^{1} #83
+      return "C_{4h}^{1}";
+    case 84: // ------------------- 84  C_{4h}^{2} #84
+      return "C_{4h}^{2}";
+    case 85: // ------------------- 85  C_{4h}^{3} #85
+      return "C_{4h}^{3}";
+    case 86: // ------------------- 86  C_{4h}^{4} #86
+      return "C_{4h}^{4}";
+    case 87: // ------------------- 87  C_{4h}^{5} #87
+      return "C_{4h}^{5}";
+    case 88: // ------------------- 88  C_{4h}^{6} #88
+      return "C_{4h}^{6}";
+    case 89: // ------------------- 89  D_{4}^{1} #89
+      return "D_{4}^{1}";
+    case 90: // ------------------- 90  D_{4}^{2} #90
+      return "D_{4}^{2}";
+    case 91: // ------------------- 91  D_{4}^{3} #91
+      return "D_{4}^{3}";
+    case 92: // ------------------- 92  D_{4}^{4} #92
+      return "D_{4}^{4}";
+    case 93: // ------------------- 93  D_{4}^{5} #93
+      return "D_{4}^{5}";
+    case 94: // ------------------- 94  D_{4}^{6} #94
+      return "D_{4}^{6}";
+    case 95: // ------------------- 95  D_{4}^{7} #95
+      return "D_{4}^{7}";
+    case 96: // ------------------- 96  D_{4}^{8} #96
+      return "D_{4}^{8}";
+    case 97: // ------------------- 97  D_{4}^{9} #97
+      return "D_{4}^{9}";
+    case 98: // ------------------- 98  D_{4}^{10} #98
+      return "D_{4}^{10}";
+    case 99: // ------------------- 99  C_{4v}^{1} #99
+      return "C_{4v}^{1}";
+    case 100: // ------------------- 100  C_{4v}^{2} #100
+      return "C_{4v}^{2}";
+    case 101: // ------------------- 101  C_{4v}^{3} #101
+      return "C_{4v}^{3}";
+    case 102: // ------------------- 102  C_{4v}^{4} #102
+      return "C_{4v}^{4}";
+    case 103: // ------------------- 103  C_{4v}^{5} #103
+      return "C_{4v}^{5}";
+    case 104: // ------------------- 104  C_{4v}^{6} #104
+      return "C_{4v}^{6}";
+    case 105: // ------------------- 105  C_{4v}^{7} #105
+      return "C_{4v}^{7}";
+    case 106: // ------------------- 106  C_{4v}^{8} #106
+      return "C_{4v}^{8}";
+    case 107: // ------------------- 107  C_{4v}^{9} #107
+      return "C_{4v}^{9}";
+    case 108: // ------------------- 108  C_{4v}^{10} #108
+      return "C_{4v}^{10}";
+    case 109: // ------------------- 109  C_{4v}^{11} #109
+      return "C_{4v}^{11}";
+    case 110: // ------------------- 110  C_{4v}^{12} #110
+      return "C_{4v}^{12}";
+    case 111: // ------------------- 111  D_{2d}^{1} #111
+      return "D_{2d}^{1}";
+    case 112: // ------------------- 112  D_{2d}^{2} #112
+      return "D_{2d}^{2}";
+    case 113: // ------------------- 113  D_{2d}^{3} #113
+      return "D_{2d}^{3}";
+    case 114: // ------------------- 114  D_{2d}^{4} #114
+      return "D_{2d}^{4}";
+    case 115: // ------------------- 115  D_{2d}^{5} #115
+      return "D_{2d}^{5}";
+    case 116: // ------------------- 116  D_{2d}^{6} #116
+      return "D_{2d}^{6}";
+    case 117: // ------------------- 117  D_{2d}^{7} #117
+      return "D_{2d}^{7}";
+    case 118: // ------------------- 118  D_{2d}^{8} #118
+      return "D_{2d}^{8}";
+    case 119: // ------------------- 119  D_{2d}^{9} #119
+      return "D_{2d}^{9}";
+    case 120: // ------------------- 120  D_{2d}^{10} #120
+      return "D_{2d}^{10}";
+    case 121: // ------------------- 121  D_{2d}^{11} #121
+      return "D_{2d}^{11}";
+    case 122: // ------------------- 122  D_{2d}^{12} #122
+      return "D_{2d}^{12}";
+    case 123: // ------------------- 123  D_{4h}^{1} #123
+      return "D_{4h}^{1}";
+    case 124: // ------------------- 124  D_{4h}^{2} #124
+      return "D_{4h}^{2}";
+    case 125: // ------------------- 125  D_{4h}^{3} #125
+      return "D_{4h}^{3}";
+    case 126: // ------------------- 126  D_{4h}^{4} #126
+      return "D_{4h}^{4}";
+    case 127: // ------------------- 127  D_{4h}^{5} #127
+      return "D_{4h}^{5}";
+    case 128: // ------------------- 128  D_{4h}^{6} #128
+      return "D_{4h}^{6}";
+    case 129: // ------------------- 129  D_{4h}^{7} #129
+      return "D_{4h}^{7}";
+    case 130: // ------------------- 130  D_{4h}^{8} #130
+      return "D_{4h}^{8}";
+    case 131: // ------------------- 131  D_{4h}^{9} #131
+      return "D_{4h}^{9}";
+    case 132: // ------------------- 132  D_{4h}^{10} #132
+      return "D_{4h}^{10}";
+    case 133: // ------------------- 133  D_{4h}^{11} #133
+      return "D_{4h}^{11}";
+    case 134: // ------------------- 134  D_{4h}^{12} #134
+      return "D_{4h}^{12}";
+    case 135: // ------------------- 135  D_{4h}^{13} #135
+      return "D_{4h}^{13}";
+    case 136: // ------------------- 136  D_{4h}^{14} #136
+      return "D_{4h}^{14}";
+    case 137: // ------------------- 137  D_{4h}^{15} #137
+      return "D_{4h}^{15}";
+    case 138: // ------------------- 138  D_{4h}^{16} #138
+      return "D_{4h}^{16}";
+    case 139: // ------------------- 139  D_{4h}^{17} #139
+      return "D_{4h}^{17}";
+    case 140: // ------------------- 140  D_{4h}^{18} #140
+      return "D_{4h}^{18}";
+    case 141: // ------------------- 141  D_{4h}^{19} #141
+      return "D_{4h}^{19}";
+    case 142: // ------------------- 142  D_{4h}^{20} #142
+      return "D_{4h}^{20}";
+    case 143: // ------------------- 143  C_{3}^{1} #143
+      return "C_{3}^{1}";
+    case 144: // ------------------- 144  C_{3}^{2} #144
+      return "C_{3}^{2}";
+    case 145: // ------------------- 145  C_{3}^{3} #145
+      return "C_{3}^{3}";
+    case 146: // ------------------- 146  C_{3}^{4} #146
+      return "C_{3}^{4}";
+    case 147: // ------------------- 147  C_{3i}^{1} #147
+      return "C_{3i}^{1}";
+    case 148: // ------------------- 148  C_{3i}^{2} #148
+      return "C_{3i}^{2}";
+    case 149: // ------------------- 149  D_{3}^{1} #149
+      return "D_{3}^{1}";
+    case 150: // ------------------- 150  D_{3}^{2} #150
+      return "D_{3}^{2}";
+    case 151: // ------------------- 151  D_{3}^{3} #151
+      return "D_{3}^{3}";
+    case 152: // ------------------- 152  D_{3}^{4} #152
+      return "D_{3}^{4}";
+    case 153: // ------------------- 153  D_{3}^{5} #153
+      return "D_{3}^{5}";
+    case 154: // ------------------- 154  D_{3}^{6} #154
+      return "D_{3}^{6}";
+    case 155: // ------------------- 155  D_{3}^{7} #155
+      return "D_{3}^{7}";
+    case 156: // ------------------- 156  C_{3v}^{1} #156
+      return "C_{3v}^{1}";
+    case 157: // ------------------- 157  C_{3v}^{2} #157
+      return "C_{3v}^{2}";
+    case 158: // ------------------- 158  C_{3v}^{3} #158
+      return "C_{3v}^{3}";
+    case 159: // ------------------- 159  C_{3v}^{4} #159
+      return "C_{3v}^{4}";
+    case 160: // ------------------- 160  C_{3v}^{5} #160
+      return "C_{3v}^{5}";
+    case 161: // ------------------- 161  C_{3v}^{6} #161
+      return "C_{3v}^{6}";
+    case 162: // ------------------- 162  D_{3d}^{1} #162
+      return "D_{3d}^{1}";
+    case 163: // ------------------- 163  D_{3d}^{2} #163
+      return "D_{3d}^{2}";
+    case 164: // ------------------- 164  D_{3d}^{3} #164
+      return "D_{3d}^{3}";
+    case 165: // ------------------- 165  D_{3d}^{4} #165
+      return "D_{3d}^{4}";
+    case 166: // ------------------- 166  D_{3d}^{5} #166
+      return "D_{3d}^{5}";
+    case 167: // ------------------- 167  D_{3d}^{6} #167
+      return "D_{3d}^{6}";
+    case 168: // ------------------- 168  C_{6}^{1} #168
+      return "C_{6}^{1}";
+    case 169: // ------------------- 169  C_{6}^{2} #169
+      return "C_{6}^{2}";
+    case 170: // ------------------- 170  C_{6}^{3} #170
+      return "C_{6}^{3}";
+    case 171: // ------------------- 171  C_{6}^{4} #171
+      return "C_{6}^{4}";
+    case 172: // ------------------- 172  C_{6}^{5} #172
+      return "C_{6}^{5}";
+    case 173: // ------------------- 173  C_{6}^{6} #173
+      return "C_{6}^{6}";
+    case 174: // ------------------- 174  C_{3h}^{1} #174
+      return "C_{3h}^{1}";
+    case 175: // ------------------- 175  C_{6h}^{1} #175
+      return "C_{6h}^{1}";
+    case 176: // ------------------- 176  C_{6h}^{2} #176
+      return "C_{6h}^{2}";
+    case 177: // ------------------- 177  D_{6}^{1} #177
+      return "D_{6}^{1}";
+    case 178: // ------------------- 178  D_{6}^{2} #178
+      return "D_{6}^{2}";
+    case 179: // ------------------- 179  D_{6}^{3} #179
+      return "D_{6}^{3}";
+    case 180: // ------------------- 180  D_{6}^{4} #180
+      return "D_{6}^{4}";
+    case 181: // ------------------- 181  D_{6}^{5} #181
+      return "D_{6}^{5}";
+    case 182: // ------------------- 182  D_{6}^{6} #182
+      return "D_{6}^{6}";
+    case 183: // ------------------- 183  C_{6v}^{1} #183
+      return "C_{6v}^{1}";
+    case 184: // ------------------- 184  C_{6v}^{2} #184
+      return "C_{6v}^{2}";
+    case 185: // ------------------- 185  C_{6v}^{3} #185
+      return "C_{6v}^{3}";
+    case 186: // ------------------- 186  C_{6v}^{4} #186
+      return "C_{6v}^{4}";
+    case 187: // ------------------- 187  D_{3h}^{1} #187
+      return "D_{3h}^{1}";
+    case 188: // ------------------- 188  D_{3h}^{2} #188
+      return "D_{3h}^{2}";
+    case 189: // ------------------- 189  D_{3h}^{3} #189
+      return "D_{3h}^{3}";
+    case 190: // ------------------- 190  D_{3h}^{4} #190
+      return "D_{3h}^{4}";
+    case 191: // ------------------- 191  D_{6h}^{1} #191
+      return "D_{6h}^{1}";
+    case 192: // ------------------- 192  D_{6h}^{2} #192
+      return "D_{6h}^{2}";
+    case 193: // ------------------- 193  D_{6h}^{3} #193
+      return "D_{6h}^{3}";
+    case 194: // ------------------- 194  D_{6h}^{4} #194
+      return "D_{6h}^{4}";
+    case 195: // ------------------- 195  T^{1} #195
+      return "T^{1}";
+    case 196: // ------------------- 196  T^{2} #196
+      return "T^{2}";
+    case 197: // ------------------- 197  T^{3} #197
+      return "T^{3}";
+    case 198: // ------------------- 198  T^{4} #198
+      return "T^{4}";
+    case 199: // ------------------- 199  T^{5} #199
+      return "T^{5}";
+    case 200: // ------------------- 200  T_{h}^{1} #200
+      return "T_{h}^{1}";
+    case 201: // ------------------- 201  T_{h}^{2} #201
+      return "T_{h}^{2}";
+    case 202: // ------------------- 202  T_{h}^{3} #202
+      return "T_{h}^{3}";
+    case 203: // ------------------- 203  T_{h}^{4} #203
+      return "T_{h}^{4}";
+    case 204: // ------------------- 204  T_{h}^{5} #204
+      return "T_{h}^{5}";
+    case 205: // ------------------- 205  T_{h}^{6} #205
+      return "T_{h}^{6}";
+    case 206: // ------------------- 206  T_{h}^{7} #206
+      return "T_{h}^{7}";
+    case 207: // ------------------- 207  O^{1} #207
+      return "O^{1}";
+    case 208: // ------------------- 208  O^{2} #208
+      return "O^{2}";
+    case 209: // ------------------- 209  O^{3} #209
+      return "O^{3}";
+    case 210: // ------------------- 210  O^{4} #210
+      return "O^{4}";
+    case 211: // ------------------- 211  O^{5} #211
+      return "O^{5}";
+    case 212: // ------------------- 212  O^{6} #212
+      return "O^{6}";
+    case 213: // ------------------- 213  O^{7} #213
+      return "O^{7}";
+    case 214: // ------------------- 214  O^{8} #214
+      return "O^{8}";
+    case 215: // ------------------- 215  T_{d}^{1} #215
+      return "T_{d}^{1}";
+    case 216: // ------------------- 216  T_{d}^{2} #216
+      return "T_{d}^{2}";
+    case 217: // ------------------- 217  T_{d}^{3} #217
+      return "T_{d}^{3}";
+    case 218: // ------------------- 218  T_{d}^{4} #218
+      return "T_{d}^{4}";
+    case 219: // ------------------- 219  T_{d}^{5} #219
+      return "T_{d}^{5}";
+    case 220: // ------------------- 220  T_{d}^{6} #220
+      return "T_{d}^{6}";
+    case 221: // ------------------- 221  O_{h}^{1} #221
+      return "O_{h}^{1}";
+    case 222: // ------------------- 222  O_{h}^{2} #222
+      return "O_{h}^{2}";
+    case 223: // ------------------- 223  O_{h}^{3} #223
+      return "O_{h}^{3}";
+    case 224: // ------------------- 224  O_{h}^{4} #224
+      return "O_{h}^{4}";
+    case 225: // ------------------- 225  O_{h}^{5} #225
+      return "O_{h}^{5}";
+    case 226: // ------------------- 226  O_{h}^{6} #226
+      return "O_{h}^{6}";
+    case 227: // ------------------- 227  O_{h}^{7} #227
+      return "O_{h}^{7}";
+    case 228: // ------------------- 228  O_{h}^{8} #228
+      return "O_{h}^{8}";
+    case 229: // ------------------- 229  O_{h}^{9} #229
+      return "O_{h}^{9}";
+    case 230: // ------------------- 230  O_{h}^{10} #230
+      return "O_{h}^{10}";
+  }
+  // No space group found
+  return "";
 }
 
 // ***************************************************************************
@@ -8760,15 +8771,16 @@ string GetSpaceGroupHall(int spacegroupnumber, int setting, string directory) {
     throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_); //DX20190708 - for xerror
   }
   // OK
-  if(setting==0){ //signals default //DX20180807
+  if(setting==SG_SETTING_ANRL){ setting = anrl::getANRLSettingChoice(spacegroupnumber); } //DX20210420
+  else if (setting==0){ //signals default //DX20180807
     // if RHL, AFLOW prefers hexagonal setting (i.e., setting=2)
     if(spacegroupnumber==146 || spacegroupnumber==148 || spacegroupnumber==155 || spacegroupnumber==160 || 
         spacegroupnumber==161 || spacegroupnumber==166 || spacegroupnumber==167){
       setting=2;
     }
-    // else setting==1
+    // else setting==SG_SETTING_1
     else {
-      setting=1;
+      setting=SG_SETTING_1;
     }
   }
   if(setting < 1 || setting > 2) {
@@ -8777,530 +8789,502 @@ string GetSpaceGroupHall(int spacegroupnumber, int setting, string directory) {
   }
   // OK
   //DX+ME20190708 - changed subsequent "if" to "else if" -> efficiency
-  if(spacegroupnumber==1) { // ------------------- 1  P 1 #1
-    spacegroup="P 1";}
-  else if(spacegroupnumber==2) { // ------------------- 2  -P 1 #2
-    spacegroup="-P 1";}
-  else if(spacegroupnumber==3) { // ------------------- 3  P 2y #3
-    spacegroup="P 2y";}
-  else if(spacegroupnumber==4) { // ------------------- 4  P 2yb #4
-    spacegroup="P 2yb";}
-  else if(spacegroupnumber==5) { // ------------------- 5  C 2y #5
-    spacegroup="C 2y";}
-  else if(spacegroupnumber==6) { // ------------------- 6  P -2y #6
-    spacegroup="P -2y";}
-  else if(spacegroupnumber==7) { // ------------------- 7  P -2yc #7
-    spacegroup="P -2yc";}
-  else if(spacegroupnumber==8) { // ------------------- 8  C -2y #8
-    spacegroup="C -2y";}
-  else if(spacegroupnumber==9) { // ------------------- 9  C -2yc #9
-    spacegroup="C -2yc";}
-  else if(spacegroupnumber==10) { // ------------------- 10  -P 2y #10
-    spacegroup="-P 2y";}
-  else if(spacegroupnumber==11) { // ------------------- 11  -P 2yb #11
-    spacegroup="-P 2yb";}
-  else if(spacegroupnumber==12) { // ------------------- 12  -C 2y #12
-    spacegroup="-C 2y";}
-  else if(spacegroupnumber==13) { // ------------------- 13  -P 2yc #13
-    spacegroup="-P 2yc";}
-  else if(spacegroupnumber==14) { // ------------------- 14  -P 2ybc #14
-    spacegroup="-P 2ybc";}
-  else if(spacegroupnumber==15) { // ------------------- 15  -C 2yc #15
-    spacegroup="-C 2yc";}
-  else if(spacegroupnumber==16) { // ------------------- 16  P 2 2 #16
-    spacegroup="P 2 2";}
-  else if(spacegroupnumber==17) { // ------------------- 17  P 2c 2 #17
-    spacegroup="P 2c 2";}
-  else if(spacegroupnumber==18) { // ------------------- 18  P 2 2ab #18
-    spacegroup="P 2 2ab";}
-  else if(spacegroupnumber==19) { // ------------------- 19  P 2ac 2ab #19
-    spacegroup="P 2ac 2ab";}
-  else if(spacegroupnumber==20) { // ------------------- 20  C 2c 2 #20
-    spacegroup="C 2c 2";}
-  else if(spacegroupnumber==21) { // ------------------- 21  C 2 2 #21
-    spacegroup="C 2 2";}
-  else if(spacegroupnumber==22) { // ------------------- 22  F 2 2 #22
-    spacegroup="F 2 2";}
-  else if(spacegroupnumber==23) { // ------------------- 23  I 2 2 #23
-    spacegroup="I 2 2";}
-  else if(spacegroupnumber==24) { // ------------------- 24  I 2b 2c #24
-    spacegroup="I 2b 2c";}
-  else if(spacegroupnumber==25) { // ------------------- 25  P 2 -2 #25
-    spacegroup="P 2 -2";}
-  else if(spacegroupnumber==26) { // ------------------- 26  P 2c -2 #26
-    spacegroup="P 2c -2";}
-  else if(spacegroupnumber==27) { // ------------------- 27  P 2 -2c #27
-    spacegroup="P 2 -2c";}
-  else if(spacegroupnumber==28) { // ------------------- 28  P 2 -2a #28
-    spacegroup="P 2 -2a";}
-  else if(spacegroupnumber==29) { // ------------------- 29  P 2c -2ac #29
-    spacegroup="P 2c -2ac";}
-  else if(spacegroupnumber==30) { // ------------------- 30  P 2 -2bc #30
-    spacegroup="P 2 -2bc";}
-  else if(spacegroupnumber==31) { // ------------------- 31  P 2ac -2 #31
-    spacegroup="P 2ac -2";}
-  else if(spacegroupnumber==32) { // ------------------- 32  P 2 -2ab #32
-    spacegroup="P 2 -2ab";}
-  else if(spacegroupnumber==33) { // ------------------- 33  P 2c -2n #33
-    spacegroup="P 2c -2n";}
-  else if(spacegroupnumber==34) { // ------------------- 34  P 2 -2n #34
-    spacegroup="P 2 -2n";}
-  else if(spacegroupnumber==35) { // ------------------- 35  C 2 -2 #35
-    spacegroup="C 2 -2";}
-  else if(spacegroupnumber==36) { // ------------------- 36  C 2c -2 #36
-    spacegroup="C 2c -2";}
-  else if(spacegroupnumber==37) { // ------------------- 37  C 2 -2c #37
-    spacegroup="C 2 -2c";}
-  else if(spacegroupnumber==38) { // ------------------- 38  A 2 -2 #38
-    spacegroup="A 2 -2";}
-  else if(spacegroupnumber==39) { // ------------------- 39  A 2 -2c #39
-    spacegroup="A 2 -2c";}
-  else if(spacegroupnumber==40) { // ------------------- 40  A 2 -2a #40
-    spacegroup="A 2 -2a";}
-  else if(spacegroupnumber==41) { // ------------------- 41  A 2 -2ac #41
-    spacegroup="A 2 -2ac";}
-  else if(spacegroupnumber==42) { // ------------------- 42  F 2 -2 #42
-    spacegroup="F 2 -2";}
-  else if(spacegroupnumber==43) { // ------------------- 43  F 2 -2d #43
-    spacegroup="F 2 -2d";}
-  else if(spacegroupnumber==44) { // ------------------- 44  I 2 -2 #44
-    spacegroup="I 2 -2";}
-  else if(spacegroupnumber==45) { // ------------------- 45  I 2 -2c #45
-    spacegroup="I 2 -2c";}
-  else if(spacegroupnumber==46) { // ------------------- 46  I 2 -2a #46
-    spacegroup="I 2 -2a";}
-  else if(spacegroupnumber==47) { // ------------------- 47  -P 2 2 #47
-    spacegroup="-P 2 2";}
-  else if(spacegroupnumber==48 && setting==1) { // ------------------- 48  -P P 2 2 -1n #48 (setting 1)
-    spacegroup="P 2 2 -1n";}
-  else if(spacegroupnumber==48 && setting==2) { // ------------------- 48  -P 2ab 2bc #48 (setting 2)
-    spacegroup="-P 2ab 2bc";}
-  else if(spacegroupnumber==49) { // ------------------- 49  -P 2 2c #49
-    spacegroup="-P 2 2c";}
-  else if(spacegroupnumber==50 && setting==1) { // ------------------- 50  -P P 2 2 -1ab #50 (setting 1)
-    spacegroup="P 2 2 -1ab";}
-  else if(spacegroupnumber==50 && setting==2) { // ------------------- 50  -P 2ab 2b #50 (setting 2)
-    spacegroup="-P 2ab 2b";}
-  else if(spacegroupnumber==51) { // ------------------- 51  -P 2a 2a #51
-    spacegroup="-P 2a 2a";}
-  else if(spacegroupnumber==52) { // ------------------- 52  -P 2a 2bc #52
-    spacegroup="-P 2a 2bc";}
-  else if(spacegroupnumber==53) { // ------------------- 53  -P 2ac 2 #53
-    spacegroup="-P 2ac 2";}
-  else if(spacegroupnumber==54) { // ------------------- 54  -P 2a 2ac #54
-    spacegroup="-P 2a 2ac";}
-  else if(spacegroupnumber==55) { // ------------------- 55  -P 2 2ab #55
-    spacegroup="-P 2 2ab";}
-  else if(spacegroupnumber==56) { // ------------------- 56  -P 2ab 2ac #56
-    spacegroup="-P 2ab 2ac";}
-  else if(spacegroupnumber==57) { // ------------------- 57  -P 2c 2b #57
-    spacegroup="-P 2c 2b";}
-  else if(spacegroupnumber==58) { // ------------------- 58  -P 2 2n #58
-    spacegroup="-P 2 2n";}
-  else if(spacegroupnumber==59 && setting==1) { // ------------------- 59  P 2 2ab -1ab #59 (setting 1)
-    spacegroup="P 2 2ab -1ab";}
-  else if(spacegroupnumber==59 && setting==2) { // ------------------- 59  -P 2ab 2a #59 (setting 2)
-    spacegroup="-P 2ab 2a";}
-  else if(spacegroupnumber==60) { // ------------------- 60  -P 2n 2ab #60
-    spacegroup="-P 2n 2ab";}
-  else if(spacegroupnumber==61) { // ------------------- 61  -P 2ac 2ab #61
-    spacegroup="-P 2ac 2ab";}
-  else if(spacegroupnumber==62) { // ------------------- 62  -P 2ac 2n #62
-    spacegroup="-P 2ac 2n";}
-  else if(spacegroupnumber==63) { // ------------------- 63  -C 2c 2 #63
-    spacegroup="-C 2c 2";}
-  else if(spacegroupnumber==64) { // ------------------- 64  -C 2bc 2 #64
-    spacegroup="-C 2bc 2";}
-  else if(spacegroupnumber==65) { // ------------------- 65  -C 2 2 #65
-    spacegroup="-C 2 2";}
-  else if(spacegroupnumber==66) { // ------------------- 66  -C 2 2c #66
-    spacegroup="-C 2 2c";}
-  else if(spacegroupnumber==67) { // ------------------- 67  -C 2b 2 #67
-    spacegroup="-C 2b 2";}
-  else if(spacegroupnumber==68 && setting==1) { // ------------------- 68  C 2 2 -1bc #68 (setting 1)
-    spacegroup="C 2 2 -1bc";}
-  else if(spacegroupnumber==68 && setting==2) { // ------------------- 68  -C 2b 2bc #68 (setting 2)
-    spacegroup="-C 2b 2bc";}
-  else if(spacegroupnumber==69) { // ------------------- 69  -F 2 2 #69
-    spacegroup="-F 2 2";}
-  else if(spacegroupnumber==70 && setting==1) { // ------------------- 70  F 2 2 -1d #70 (setting 1)
-    spacegroup="F 2 2 -1d";}
-  else if(spacegroupnumber==70 && setting==2) { // ------------------- 70  -F 2uv 2vw #70 (setting 2)
-    spacegroup="-F 2uv 2vw";}
-  else if(spacegroupnumber==71) { // ------------------- 71  -I 2 2 #71
-    spacegroup="-I 2 2";}
-  else if(spacegroupnumber==72) { // ------------------- 72  -I 2 2c #72
-    spacegroup="-I 2 2c";}
-  else if(spacegroupnumber==73) { // ------------------- 73  -I 2b 2c #73
-    spacegroup="-I 2b 2c";}
-  else if(spacegroupnumber==74) { // ------------------- 74  -I 2b 2 #74
-    spacegroup="-I 2b 2";}
-  else if(spacegroupnumber==75) { // ------------------- 75  P 4 #75
-    spacegroup="P 4";}
-  else if(spacegroupnumber==76) { // ------------------- 76  P 4w #76
-    spacegroup="P 4w";}
-  else if(spacegroupnumber==77) { // ------------------- 77  P 4c #77
-    spacegroup="P 4c";}
-  else if(spacegroupnumber==78) { // ------------------- 78  P 4cw #78
-    spacegroup="P 4cw";}
-  else if(spacegroupnumber==79) { // ------------------- 79  I 4 #79
-    spacegroup="I 4";}
-  else if(spacegroupnumber==80) { // ------------------- 80  I 4bw #80
-    spacegroup="I 4bw";}
-  else if(spacegroupnumber==81) { // ------------------- 81  P -4 #81
-    spacegroup="P -4";}
-  else if(spacegroupnumber==82) { // ------------------- 82  I -4 #82
-    spacegroup="I -4";}
-  else if(spacegroupnumber==83) { // ------------------- 83  -P 4 #83
-    spacegroup="-P 4";}
-  else if(spacegroupnumber==84) { // ------------------- 84  -P 4c #84
-    spacegroup="-P 4c";}
-  else if(spacegroupnumber==85 && setting==1) { // ------------------- 85  P 4ab -1ab #85 (setting 1)
-    spacegroup="P 4ab -1ab";}
-  else if(spacegroupnumber==85 && setting==2) { // ------------------- 85  -P 4a #85 (setting 2)
-    spacegroup="-P 4a";}
-  else if(spacegroupnumber==86 && setting==1) { // ------------------- 86  P 4n -1n #86 (setting 1)
-    spacegroup="P 4n -1n";}
-  else if(spacegroupnumber==86 && setting==2) { // ------------------- 86  -P 4bc #86 (setting 2)
-    spacegroup="-P 4bc";}
-  else if(spacegroupnumber==87) { // ------------------- 87  -I 4 #87
-    spacegroup="-I 4";}
-  else if(spacegroupnumber==88 && setting==1) { // ------------------- 88  I 4bw -1bw #88 (setting 1)
-    spacegroup="I 4bw -1bw";}
-  else if(spacegroupnumber==88 && setting==2) { // ------------------- 88  -I 4ad #88 (setting 2)
-    spacegroup="-I 4ad";}
-  else if(spacegroupnumber==89) { // ------------------- 89  P 4 2 #89
-    spacegroup="P 4 2";}
-  else if(spacegroupnumber==90) { // ------------------- 90  P 4ab 2ab #90
-    spacegroup="P 4ab 2ab";}
-  else if(spacegroupnumber==91) { // ------------------- 91  P 4w 2c #91
-    spacegroup="P 4w 2c";}
-  else if(spacegroupnumber==92) { // ------------------- 92  P 4abw 2nw #92
-    spacegroup="P 4abw 2nw";}
-  else if(spacegroupnumber==93) { // ------------------- 93  P 4c 2 #93
-    spacegroup="P 4c 2";}
-  else if(spacegroupnumber==94) { // ------------------- 94  P 4n 2n #94
-    spacegroup="P 4n 2n";}
-  else if(spacegroupnumber==95) { // ------------------- 95  P 4cw 2c #95
-    spacegroup="P 4cw 2c";}
-  else if(spacegroupnumber==96) { // ------------------- 96  P 4nw 2abw #96
-    spacegroup="P 4nw 2abw";}
-  else if(spacegroupnumber==97) { // ------------------- 97  I 4 2 #97
-    spacegroup="I 4 2";}
-  else if(spacegroupnumber==98) { // ------------------- 98  I 4bw 2bw #98
-    spacegroup="I 4bw 2bw";}
-  else if(spacegroupnumber==99) { // ------------------- 99  P 4 -2 #99
-    spacegroup="P 4 -2";}
-  else if(spacegroupnumber==100) { // ------------------- 100  P 4 -2ab #100
-    spacegroup="P 4 -2ab";}
-  else if(spacegroupnumber==101) { // ------------------- 101  P 4c -2c #101
-    spacegroup="P 4c -2c";}
-  else if(spacegroupnumber==102) { // ------------------- 102  P 4n -2n #102
-    spacegroup="P 4n -2n";}
-  else if(spacegroupnumber==103) { // ------------------- 103  P 4 -2c #103
-    spacegroup="P 4 -2c";}
-  else if(spacegroupnumber==104) { // ------------------- 104  P 4 -2n #104
-    spacegroup="P 4 -2n";}
-  else if(spacegroupnumber==105) { // ------------------- 105  P 4c -2 #105
-    spacegroup="P 4c -2";}
-  else if(spacegroupnumber==106) { // ------------------- 106  P 4c -2ab #106
-    spacegroup="P 4c -2ab";}
-  else if(spacegroupnumber==107) { // ------------------- 107  I 4 -2 #107
-    spacegroup="I 4 -2";}
-  else if(spacegroupnumber==108) { // ------------------- 108  I 4 -2c #108
-    spacegroup="I 4 -2c";}
-  else if(spacegroupnumber==109) { // ------------------- 109  I 4bw -2 #109
-    spacegroup="I 4bw -2";}
-  else if(spacegroupnumber==110) { // ------------------- 110  I 4bw -2c #110
-    spacegroup="I 4bw -2c";}
-  else if(spacegroupnumber==111) { // ------------------- 111  P -4 2 #111
-    spacegroup="P -4 2";}
-  else if(spacegroupnumber==112) { // ------------------- 112  P -4 2c #112
-    spacegroup="P -4 2c";}
-  else if(spacegroupnumber==113) { // ------------------- 113  P -4 2ab #113
-    spacegroup="P -4 2ab";}
-  else if(spacegroupnumber==114) { // ------------------- 114  P -4 2n #114
-    spacegroup="P -4 2n";}
-  else if(spacegroupnumber==115) { // ------------------- 115  P -4 -2 #115
-    spacegroup="P -4 -2";}
-  else if(spacegroupnumber==116) { // ------------------- 116  P -4 -2c #116
-    spacegroup="P -4 -2c";}
-  else if(spacegroupnumber==117) { // ------------------- 117  P -4 -2ab #117
-    spacegroup="P -4 -2ab";}
-  else if(spacegroupnumber==118) { // ------------------- 118  P -4 -2n #118
-    spacegroup="P -4 -2n";}
-  else if(spacegroupnumber==119) { // ------------------- 119  I -4 -2 #119
-    spacegroup="I -4 -2";}
-  else if(spacegroupnumber==120) { // ------------------- 120  I -4 -2c #120
-    spacegroup="I -4 -2c";}
-  else if(spacegroupnumber==121) { // ------------------- 121  I -4 2 #121
-    spacegroup="I -4 2";}
-  else if(spacegroupnumber==122) { // ------------------- 122  I -4 2bw #122
-    spacegroup="I -4 2bw";}
-  else if(spacegroupnumber==123) { // ------------------- 123  -P 4 2 #123
-    spacegroup="-P 4 2";}
-  else if(spacegroupnumber==124) { // ------------------- 124  -P 4 2c #124
-    spacegroup="-P 4 2c";}
-  else if(spacegroupnumber==125 && setting==1) { // ------------------- 125  P 4 2 -1ab #125 (setting 1)
-    spacegroup="P 4 2 -1ab";}
-  else if(spacegroupnumber==125 && setting==2) { // ------------------- 125  -P 4a 2b #125 (setting 2)
-    spacegroup="-P 4a 2b";}
-  else if(spacegroupnumber==126 && setting==1) { // ------------------- 126  P 4 2 -1n #126 (setting 1)
-    spacegroup="P 4 2 -1n";}
-  else if(spacegroupnumber==126 && setting==2) { // ------------------- 126  -P 4a 2bc #126 (setting 2)
-    spacegroup="-P 4a 2bc";}
-  else if(spacegroupnumber==127) { // ------------------- 127  -P 4 2ab #127
-    spacegroup="-P 4 2ab";}
-  else if(spacegroupnumber==128) { // ------------------- 128  -P 4 2n #128
-    spacegroup="-P 4 2n";}
-  else if(spacegroupnumber==129 && setting==1) { // ------------------- 129  P 4ab 2ab -1ab #129 (setting 1)
-    spacegroup="P 4ab 2ab -1ab";}
-  else if(spacegroupnumber==129 && setting==2) { // ------------------- 129  -P 4a 2a #129 (setting 2)
-    spacegroup="-P 4a 2a";}
-  else if(spacegroupnumber==130 && setting==1) { // ------------------- 130  P 4ab 2n -1ab #130 (setting 1)
-    spacegroup="P 4ab 2n -1ab";}
-  else if(spacegroupnumber==130 && setting==2) { // ------------------- 130  -P 4a 2ac #130 (setting 2)
-    spacegroup="-P 4a 2ac";}
-  else if(spacegroupnumber==131) { // ------------------- 131  -P 4c 2 #131
-    spacegroup="-P 4c 2";}
-  else if(spacegroupnumber==132) { // ------------------- 132  -P 4c 2c #132
-    spacegroup="-P 4c 2c";}
-  else if(spacegroupnumber==133 && setting==1) { // ------------------- 133  P 4n 2c -1n #133 (setting 1)
-    spacegroup="P 4n 2c -1n";}
-  else if(spacegroupnumber==133 && setting==2) { // ------------------- 133  -P 4ac 2b #133 (setting 2)
-    spacegroup="-P 4ac 2b";}
-  else if(spacegroupnumber==134 && setting==1) { // ------------------- 134  -P 4ac 2bc #134 (setting 1)
-    spacegroup="P 4n 2 -1n";}
-  else if(spacegroupnumber==134 && setting==2) { // ------------------- 134  -P 4ac 2bc #134 (setting 2)
-    spacegroup="-P 4ac 2bc";}
-  else if(spacegroupnumber==135) { // ------------------- 135  -P 4c 2ab #135
-    spacegroup="-P 4c 2ab";}
-  else if(spacegroupnumber==136) { // ------------------- 136  -P 4n 2n #136
-    spacegroup="-P 4n 2n";}
-  else if(spacegroupnumber==137 && setting==1) { // ------------------- 137  P 4n 2n -1n #137 (setting 1)
-    spacegroup="P 4n 2n -1n";}
-  else if(spacegroupnumber==137 && setting==2) { // ------------------- 137  -P 4ac 2a #137 (setting 2)
-    spacegroup="-P 4ac 2a";}
-  else if(spacegroupnumber==138 && setting==1) { // ------------------- 138  P 4n 2ab -1n #138 (setting 1)
-    spacegroup="P 4n 2ab -1n";}
-  else if(spacegroupnumber==138 && setting==2) { // ------------------- 138  -P 4ac 2ac #138 (setting 2)
-    spacegroup="-P 4ac 2ac";}
-  else if(spacegroupnumber==139) { // ------------------- 139  -I 4 2 #139
-    spacegroup="-I 4 2";}
-  else if(spacegroupnumber==140) { // ------------------- 140  -I 4 2c #140
-    spacegroup="-I 4 2c";}
-  else if(spacegroupnumber==141 && setting==1) { // ------------------- 141  I 4bw 2bw -1bw #141 (setting 1)
-    spacegroup="I 4bw 2bw -1bw";}
-  else if(spacegroupnumber==141 && setting==2) { // ------------------- 141  -I 4bd 2 #141 (setting 2)
-    spacegroup="-I 4bd 2";}
-  else if(spacegroupnumber==142 && setting==1) { // ------------------- 142  I 4bw 2aw -1bw #142 (setting 1)
-    spacegroup="I 4bw 2aw -1bw";}
-  else if(spacegroupnumber==142 && setting==2) { // ------------------- 142  -I 4bd 2c #142 (setting 2)
-    spacegroup="-I 4bd 2c";}
-  else if(spacegroupnumber==143) { // ------------------- 143  P 3 #143
-    spacegroup="P 3";}
-  else if(spacegroupnumber==144) { // ------------------- 144  P 31 #144
-    spacegroup="P 31";}
-  else if(spacegroupnumber==145) { // ------------------- 145  P 32 #145
-    spacegroup="P 32";}
-  else if(spacegroupnumber==146 && setting==1) { // ------------------- 146  P 3* #146 (setting 1, rhl)
-    spacegroup="P 3*";}
-  else if(spacegroupnumber==146 && setting==2) { // ------------------- 146  R 3 #146 (setting 2, hex)
-    spacegroup="R 3";}
-  else if(spacegroupnumber==147) { // ------------------- 147  -P 3 #147
-    spacegroup="-P 3";}
-  else if(spacegroupnumber==148 && setting==1) { // ------------------- 148  -P 3* #148 (setting 1, rhl)
-    spacegroup="-P 3*";}
-  else if(spacegroupnumber==148 && setting==2) { // ------------------- 148  -R 3 #148 (setting 2, hex)
-    spacegroup="-R 3";}
-  else if(spacegroupnumber==149) { // ------------------- 149  P 3 2 #149
-    spacegroup="P 3 2";}
-  else if(spacegroupnumber==150) { // ------------------- 150  P 3 2'' #150
-    spacegroup="P 3 2''";}
-  else if(spacegroupnumber==151) { // ------------------- 151  P 31 2c (0 0 1) #151
-    spacegroup="P 31 2c (0 0 1)";}
-  else if(spacegroupnumber==152) { // ------------------- 152  P 31 2'' #152
-    spacegroup="P 31 2''";}
-  else if(spacegroupnumber==153) { // ------------------- 153  P 32 2c (0 0 -1) #153
-    spacegroup="P 32 2c (0 0 -1)";}
-  else if(spacegroupnumber==154) { // ------------------- 154  P 32 2'' #154
-    spacegroup="P 32 2''";}
-  else if(spacegroupnumber==155 && setting==1) { // ------------------- 155  P 3* 2 #155 (setting 1, rhl)
-    spacegroup="P 3* 2";}
-  else if(spacegroupnumber==155 && setting==2) { // ------------------- 155  R 3 2'' #155 (setting 2, hex)
-    spacegroup="R 3 2''";}
-  else if(spacegroupnumber==156) { // ------------------- 156  P 3 -2'' #156
-    spacegroup="P 3 -2''";}
-  else if(spacegroupnumber==157) { // ------------------- 157  P 3 -2 #157
-    spacegroup="P 3 -2";}
-  else if(spacegroupnumber==158) { // ------------------- 158  P 3 -2''c #158
-    spacegroup="P 3 -2''c";}
-  else if(spacegroupnumber==159) { // ------------------- 159  P 3 -2c #159
-    spacegroup="P 3 -2c";}
-  else if(spacegroupnumber==160 && setting==1) { // ------------------- 160  P 3* -2 #160 (setting 1, rhl)
-    spacegroup="P 3* -2";}
-  else if(spacegroupnumber==160 && setting==2) { // ------------------- 160  R 3 -2'' #160 (setting 2, hex)
-    spacegroup="R 3 -2''";}
-  else if(spacegroupnumber==161 && setting==1) { // ------------------- 161  P 3* -2n #161 (setting 1, rhl)
-    spacegroup="P 3* -2n";}
-  else if(spacegroupnumber==161 && setting==2) { // ------------------- 161  R 3 -2''c #161 (setting 2, hex)
-    spacegroup="R 3 -2''c";}
-  else if(spacegroupnumber==162) { // ------------------- 162  -P 3 2 #162
-    spacegroup="-P 3 2";}
-  else if(spacegroupnumber==163) { // ------------------- 163  -P 3 2c #163
-    spacegroup="-P 3 2c";}
-  else if(spacegroupnumber==164) { // ------------------- 164  -P 3 2'' #164
-    spacegroup="-P 3 2''";}
-  else if(spacegroupnumber==165) { // ------------------- 165  -P 3 2''c #165
-    spacegroup="-P 3 2''c";}
-  else if(spacegroupnumber==166 && setting==1) { // ------------------- 166  -P 3* 2 #166 (setting 1, rhl)
-    spacegroup="-P 3* 2";}
-  else if(spacegroupnumber==166 && setting==2) { // ------------------- 166  -R 3 2'' #166 (setting 2, hex)
-    spacegroup="-R 3 2''";}
-  else if(spacegroupnumber==167 && setting==1) { // ------------------- 167  -P 3* 2n #167 (setting 1, rhl)
-    spacegroup="-P 3* 2n";}
-  else if(spacegroupnumber==167 && setting==2) { // ------------------- 167  -R 3 2''c #167 (setting 2, hex)
-    spacegroup="-R 3 2''c";}
-  else if(spacegroupnumber==168) { // ------------------- 168  P 6 #168
-    spacegroup="P 6";}
-  else if(spacegroupnumber==169) { // ------------------- 169  P 61 #169
-    spacegroup="P 61";}
-  else if(spacegroupnumber==170) { // ------------------- 170  P 65 #170
-    spacegroup="P 65";}
-  else if(spacegroupnumber==171) { // ------------------- 171  P 62 #171
-    spacegroup="P 62";}
-  else if(spacegroupnumber==172) { // ------------------- 172  P 64 #172
-    spacegroup="P 64";}
-  else if(spacegroupnumber==173) { // ------------------- 173  P 6c #173
-    spacegroup="P 6c";}
-  else if(spacegroupnumber==174) { // ------------------- 174  P -6 #174
-    spacegroup="P -6";}
-  else if(spacegroupnumber==175) { // ------------------- 175  -P 6 #175
-    spacegroup="-P 6";}
-  else if(spacegroupnumber==176) { // ------------------- 176  -P 6c #176
-    spacegroup="-P 6c";}
-  else if(spacegroupnumber==177) { // ------------------- 177  P 6 2 #177
-    spacegroup="P 6 2";}
-  else if(spacegroupnumber==178) { // ------------------- 178  P 61 2 (0 0 -1) #178
-    spacegroup="P 61 2 (0 0 -1)";}
-  else if(spacegroupnumber==179) { // ------------------- 179  P 65 2 (0 0 1) #179
-    spacegroup="P 65 2 (0 0 1)";}
-  else if(spacegroupnumber==180) { // ------------------- 180  P 62 2c (0 0 1) #180
-    spacegroup="P 62 2c (0 0 1)";}
-  else if(spacegroupnumber==181) { // ------------------- 181  P 64 2c (0 0 -1) #181
-    spacegroup="P 64 2c (0 0 -1)";}
-  else if(spacegroupnumber==182) { // ------------------- 182  P 6c 2c #182
-    spacegroup="P 6c 2c";}
-  else if(spacegroupnumber==183) { // ------------------- 183  P 6 -2 #183
-    spacegroup="P 6 -2";}
-  else if(spacegroupnumber==184) { // ------------------- 184  P 6 -2c #184
-    spacegroup="P 6 -2c";}
-  else if(spacegroupnumber==185) { // ------------------- 185  P 6c -2 #185
-    spacegroup="P 6c -2";}
-  else if(spacegroupnumber==186) { // ------------------- 186  P 6c -2c #186
-    spacegroup="P 6c -2c";}
-  else if(spacegroupnumber==187) { // ------------------- 187  P -6 2 #187
-    spacegroup="P -6 2";}
-  else if(spacegroupnumber==188) { // ------------------- 188  P -6c 2 #188
-    spacegroup="P -6c 2";}
-  else if(spacegroupnumber==189) { // ------------------- 189  P -6 -2 #189
-    spacegroup="P -6 -2";}
-  else if(spacegroupnumber==190) { // ------------------- 190  P -6c -2c #190
-    spacegroup="P -6c -2c";}
-  else if(spacegroupnumber==191) { // ------------------- 191  -P 6 2 #191
-    spacegroup="-P 6 2";}
-  else if(spacegroupnumber==192) { // ------------------- 192  -P 6 2c #192
-    spacegroup="-P 6 2c";}
-  else if(spacegroupnumber==193) { // ------------------- 193  -P 6c 2 #193
-    spacegroup="-P 6c 2";}
-  else if(spacegroupnumber==194) { // ------------------- 194  -P 6c 2c #194
-    spacegroup="-P 6c 2c";}
-  else if(spacegroupnumber==195) { // ------------------- 195  P 2 2 3 #195
-    spacegroup="P 2 2 3";}
-  else if(spacegroupnumber==196) { // ------------------- 196  F 2 2 3 #196
-    spacegroup="F 2 2 3";}
-  else if(spacegroupnumber==197) { // ------------------- 197  I 2 2 3 #197
-    spacegroup="I 2 2 3";}
-  else if(spacegroupnumber==198) { // ------------------- 198  P 2ac 2ab 3 #198
-    spacegroup="P 2ac 2ab 3";}
-  else if(spacegroupnumber==199) { // ------------------- 199  I 2b 2c 3 #199
-    spacegroup="I 2b 2c 3";}
-  else if(spacegroupnumber==200) { // ------------------- 200  -P 2 2 3 #200
-    spacegroup="-P 2 2 3";}
-  else if(spacegroupnumber==201 && setting==1) { // ------------------- 201  P 2 2 3 -1n #201 (setting 1)
-    spacegroup="P 2 2 3 -1n";}
-  else if(spacegroupnumber==201 && setting==2) { // ------------------- 201  -P 2ab 2bc 3 #201 (setting 2)
-    spacegroup="-P 2ab 2bc 3";}
-  else if(spacegroupnumber==202) { // ------------------- 202  -F 2 2 3 #202
-    spacegroup="-F 2 2 3";}
-  else if(spacegroupnumber==203 && setting==1) { // ------------------- 203  F 2 2 3 -1d #203 (setting 1)
-    spacegroup="F 2 2 3 -1d";}
-  else if(spacegroupnumber==203 && setting==2) { // ------------------- 203  -F 2uv 2vw 3 #203 (setting 2)
-    spacegroup="-F 2uv 2vw 3";}
-  else if(spacegroupnumber==204) { // ------------------- 204  -I 2 2 3 #204
-    spacegroup="-I 2 2 3";}
-  else if(spacegroupnumber==205) { // ------------------- 205  -P 2ac 2ab 3 #205
-    spacegroup="-P 2ac 2ab 3";}
-  else if(spacegroupnumber==206) { // ------------------- 206  -I 2b 2c 3 #206
-    spacegroup="-I 2b 2c 3";}
-  else if(spacegroupnumber==207) { // ------------------- 207  P 4 2 3 #207
-    spacegroup="P 4 2 3";}
-  else if(spacegroupnumber==208) { // ------------------- 208  P 4n 2 3 #208
-    spacegroup="P 4n 2 3";}
-  else if(spacegroupnumber==209) { // ------------------- 209  F 4 2 3 #209
-    spacegroup="F 4 2 3";}
-  else if(spacegroupnumber==210) { // ------------------- 210  F 4d 2 3 #210
-    spacegroup="F 4d 2 3";}
-  else if(spacegroupnumber==211) { // ------------------- 211  I 4 2 3 #211
-    spacegroup="I 4 2 3";}
-  else if(spacegroupnumber==212) { // ------------------- 212  P 4acd 2ab 3 #212
-    spacegroup="P 4acd 2ab 3";}
-  else if(spacegroupnumber==213) { // ------------------- 213  P 4bd 2ab 3 #213
-    spacegroup="P 4bd 2ab 3";}
-  else if(spacegroupnumber==214) { // ------------------- 214  I 4bd 2c 3 #214
-    spacegroup="I 4bd 2c 3";}
-  else if(spacegroupnumber==215) { // ------------------- 215  P -4 2 3 #215
-    spacegroup="P -4 2 3";}
-  else if(spacegroupnumber==216) { // ------------------- 216  F -4 2 3 #216
-    spacegroup="F -4 2 3";}
-  else if(spacegroupnumber==217) { // ------------------- 217  I -4 2 3 #217
-    spacegroup="I -4 2 3";}
-  else if(spacegroupnumber==218) { // ------------------- 218  P -4n 2 3 #218
-    spacegroup="P -4n 2 3";}
-  else if(spacegroupnumber==219) { // ------------------- 219  F -4c 2 3 #219
-    spacegroup="F -4c 2 3";}
-  else if(spacegroupnumber==220) { // ------------------- 220  I -4bd 2c 3 #220
-    spacegroup="I -4bd 2c 3";}
-  else if(spacegroupnumber==221) { // ------------------- 221  -P 4 2 3 #221
-    spacegroup="-P 4 2 3";}
-  else if(spacegroupnumber==222 && setting==1) { // ------------------- 222  P 4 2 3 -1n #222 (setting 1)
-    spacegroup="P 4 2 3 -1n";}
-  else if(spacegroupnumber==222 && setting==2) { // ------------------- 222  -P 4a 2bc 3 #222 (setting 2)
-    spacegroup="-P 4a 2bc 3";}
-  else if(spacegroupnumber==223) { // ------------------- 223  -P 4n 2 3 #223
-    spacegroup="-P 4n 2 3";}
-  else if(spacegroupnumber==224 && setting==1) { // ------------------- 224  P 4n 2 3 -1n #224 (setting 1)
-    spacegroup="P 4n 2 3 -1n";}
-  else if(spacegroupnumber==224 && setting==2) { // ------------------- 224  -P 4bc 2bc 3 #224 (setting 2)
-    spacegroup="-P 4bc 2bc 3";}
-  else if(spacegroupnumber==225) { // ------------------- 225  -F 4 2 3 #225
-    spacegroup="-F 4 2 3";}
-  else if(spacegroupnumber==226) { // ------------------- 226  -F 4c 2 3 #226
-    spacegroup="-F 4c 2 3";}
-  else if(spacegroupnumber==227 && setting==1) { // ------------------- 227  -F 4vw 2vw 3 #227 (setting 1)
-    spacegroup="F 4d 2 3 -1d";}
-  else if(spacegroupnumber==227 && setting==2) { // ------------------- 227  -F 4vw 2vw 3 #227 (setting 2)
-    spacegroup="-F 4vw 2vw 3";}
-  else if(spacegroupnumber==228 && setting==1) { // ------------------- 228  F 4d 2 3 -1cd #228 (setting 1)
-    spacegroup="F 4d 2 3 -1cd";}
-  else if(spacegroupnumber==228 && setting==2) { // ------------------- 228  -F 4cvw 2vw 3 #228 (setting 2)
-    spacegroup="-F 4cvw 2vw 3";}
-  else if(spacegroupnumber==229) { // ------------------- 229  -I 4 2 3 #229
-    spacegroup="-I 4 2 3";}
-  else if(spacegroupnumber==230) { // ------------------- 230  -I 4bd 2c 3 #230
-    spacegroup="-I 4bd 2c 3";}
-  // done
-  return spacegroup;
+  //ME20210210 - converted to switch statement (faster)
+  switch (spacegroupnumber) {
+    case 1: // ------------------- 1  P 1 #1
+      return "P 1";
+    case 2: // ------------------- 2  -P 1 #2
+      return "-P 1";
+    case 3: // ------------------- 3  P 2y #3
+      return "P 2y";
+    case 4: // ------------------- 4  P 2yb #4
+      return "P 2yb";
+    case 5: // ------------------- 5  C 2y #5
+      return "C 2y";
+    case 6: // ------------------- 6  P -2y #6
+      return "P -2y";
+    case 7: // ------------------- 7  P -2yc #7
+      return "P -2yc";
+    case 8: // ------------------- 8  C -2y #8
+      return "C -2y";
+    case 9: // ------------------- 9  C -2yc #9
+      return "C -2yc";
+    case 10: // ------------------- 10  -P 2y #10
+      return "-P 2y";
+    case 11: // ------------------- 11  -P 2yb #11
+      return "-P 2yb";
+    case 12: // ------------------- 12  -C 2y #12
+      return "-C 2y";
+    case 13: // ------------------- 13  -P 2yc #13
+      return "-P 2yc";
+    case 14: // ------------------- 14  -P 2ybc #14
+      return "-P 2ybc";
+    case 15: // ------------------- 15  -C 2yc #15
+      return "-C 2yc";
+    case 16: // ------------------- 16  P 2 2 #16
+      return "P 2 2";
+    case 17: // ------------------- 17  P 2c 2 #17
+      return "P 2c 2";
+    case 18: // ------------------- 18  P 2 2ab #18
+      return "P 2 2ab";
+    case 19: // ------------------- 19  P 2ac 2ab #19
+      return "P 2ac 2ab";
+    case 20: // ------------------- 20  C 2c 2 #20
+      return "C 2c 2";
+    case 21: // ------------------- 21  C 2 2 #21
+      return "C 2 2";
+    case 22: // ------------------- 22  F 2 2 #22
+      return "F 2 2";
+    case 23: // ------------------- 23  I 2 2 #23
+      return "I 2 2";
+    case 24: // ------------------- 24  I 2b 2c #24
+      return "I 2b 2c";
+    case 25: // ------------------- 25  P 2 -2 #25
+      return "P 2 -2";
+    case 26: // ------------------- 26  P 2c -2 #26
+      return "P 2c -2";
+    case 27: // ------------------- 27  P 2 -2c #27
+      return "P 2 -2c";
+    case 28: // ------------------- 28  P 2 -2a #28
+      return "P 2 -2a";
+    case 29: // ------------------- 29  P 2c -2ac #29
+      return "P 2c -2ac";
+    case 30: // ------------------- 30  P 2 -2bc #30
+      return "P 2 -2bc";
+    case 31: // ------------------- 31  P 2ac -2 #31
+      return "P 2ac -2";
+    case 32: // ------------------- 32  P 2 -2ab #32
+      return "P 2 -2ab";
+    case 33: // ------------------- 33  P 2c -2n #33
+      return "P 2c -2n";
+    case 34: // ------------------- 34  P 2 -2n #34
+      return "P 2 -2n";
+    case 35: // ------------------- 35  C 2 -2 #35
+      return "C 2 -2";
+    case 36: // ------------------- 36  C 2c -2 #36
+      return "C 2c -2";
+    case 37: // ------------------- 37  C 2 -2c #37
+      return "C 2 -2c";
+    case 38: // ------------------- 38  A 2 -2 #38
+      return "A 2 -2";
+    case 39: // ------------------- 39  A 2 -2c #39
+      return "A 2 -2c";
+    case 40: // ------------------- 40  A 2 -2a #40
+      return "A 2 -2a";
+    case 41: // ------------------- 41  A 2 -2ac #41
+      return "A 2 -2ac";
+    case 42: // ------------------- 42  F 2 -2 #42
+      return "F 2 -2";
+    case 43: // ------------------- 43  F 2 -2d #43
+      return "F 2 -2d";
+    case 44: // ------------------- 44  I 2 -2 #44
+      return "I 2 -2";
+    case 45: // ------------------- 45  I 2 -2c #45
+      return "I 2 -2c";
+    case 46: // ------------------- 46  I 2 -2a #46
+      return "I 2 -2a";
+    case 47: // ------------------- 47  -P 2 2 #47
+      return "-P 2 2";
+    case 48:
+      if (setting==SG_SETTING_1) return "P 2 2 -1n";  // ------------------- 48  -P P 2 2 -1n #48 (setting 1)
+      return "-P 2ab 2bc";                            // ------------------- 48  -P 2ab 2bc #48 (setting 2)
+    case 49: // ------------------- 49  -P 2 2c #49
+      return "-P 2 2c";
+    case 50:
+      if (setting==SG_SETTING_1) return "P 2 2 -1ab"; // ------------------- 50  -P P 2 2 -1ab #50 (setting 1)
+      else return "-P 2ab 2b";             // ------------------- 50  -P 2ab 2b #50 (setting 2)
+    case 51: // ------------------- 51  -P 2a 2a #51
+      return "-P 2a 2a";
+    case 52: // ------------------- 52  -P 2a 2bc #52
+      return "-P 2a 2bc";
+    case 53: // ------------------- 53  -P 2ac 2 #53
+      return "-P 2ac 2";
+    case 54: // ------------------- 54  -P 2a 2ac #54
+      return "-P 2a 2ac";
+    case 55: // ------------------- 55  -P 2 2ab #55
+      return "-P 2 2ab";
+    case 56: // ------------------- 56  -P 2ab 2ac #56
+      return "-P 2ab 2ac";
+    case 57: // ------------------- 57  -P 2c 2b #57
+      return "-P 2c 2b";
+    case 58: // ------------------- 58  -P 2 2n #58
+      return "-P 2 2n";
+    case 59:
+      if (setting==SG_SETTING_1) return "P 2 2ab -1ab"; // ------------------- 59  P 2 2ab -1ab #59 (setting 1)
+      else return "-P 2ab 2a";                          // ------------------- 59  -P 2ab 2a #59 (setting 2)
+    case 60: // ------------------- 60  -P 2n 2ab #60
+      return "-P 2n 2ab";
+    case 61: // ------------------- 61  -P 2ac 2ab #61
+      return "-P 2ac 2ab";
+    case 62: // ------------------- 62  -P 2ac 2n #62
+      return "-P 2ac 2n";
+    case 63: // ------------------- 63  -C 2c 2 #63
+      return "-C 2c 2";
+    case 64: // ------------------- 64  -C 2bc 2 #64
+      return "-C 2bc 2";
+    case 65: // ------------------- 65  -C 2 2 #65
+      return "-C 2 2";
+    case 66: // ------------------- 66  -C 2 2c #66
+      return "-C 2 2c";
+    case 67: // ------------------- 67  -C 2b 2 #67
+      return "-C 2b 2";
+    case 68:
+      if (setting==SG_SETTING_1) return "C 2 2 -1bc"; // ------------------- 68  C 2 2 -1bc #68 (setting 1)
+      else return "-C 2b 2bc";                        // ------------------- 68  -C 2b 2bc #68 (setting 2)
+    case 69: // ------------------- 69  -F 2 2 #69
+      return "-F 2 2";
+    case 70:
+      if (setting==SG_SETTING_1) return "F 2 2 -1d"; // ------------------- 70  F 2 2 -1d #70 (setting 1)
+      else return "-F 2uv 2vw";                      // ------------------- 70  -F 2uv 2vw #70 (setting 2)
+    case 71: // ------------------- 71  -I 2 2 #71
+      return "-I 2 2";
+    case 72: // ------------------- 72  -I 2 2c #72
+      return "-I 2 2c";
+    case 73: // ------------------- 73  -I 2b 2c #73
+      return "-I 2b 2c";
+    case 74: // ------------------- 74  -I 2b 2 #74
+      return "-I 2b 2";
+    case 75: // ------------------- 75  P 4 #75
+      return "P 4";
+    case 76: // ------------------- 76  P 4w #76
+      return "P 4w";
+    case 77: // ------------------- 77  P 4c #77
+      return "P 4c";
+    case 78: // ------------------- 78  P 4cw #78
+      return "P 4cw";
+    case 79: // ------------------- 79  I 4 #79
+      return "I 4";
+    case 80: // ------------------- 80  I 4bw #80
+      return "I 4bw";
+    case 81: // ------------------- 81  P -4 #81
+      return "P -4";
+    case 82: // ------------------- 82  I -4 #82
+      return "I -4";
+    case 83: // ------------------- 83  -P 4 #83
+      return "-P 4";
+    case 84: // ------------------- 84  -P 4c #84
+      return "-P 4c";
+    case 85:
+      if (setting==SG_SETTING_1) return "P 4ab -1ab"; // ------------------- 85  P 4ab -1ab #85 (setting 1)
+      else return "-P 4a";                            // ------------------- 85  -P 4a #85 (setting 2)
+    case 86:
+      if (setting==SG_SETTING_1) return "P 4n -1n"; // ------------------- 86  P 4n -1n #86 (setting 1)
+      else return "-P 4bc";                         // ------------------- 86  -P 4bc #86 (setting 2)
+    case 87: // ------------------- 87  -I 4 #87
+      return "-I 4";
+    case 88:
+      if (setting==SG_SETTING_1) return "I 4bw -1bw"; // ------------------- 88  I 4bw -1bw #88 (setting 1)
+      else return "-I 4ad";                           // ------------------- 88  -I 4ad #88 (setting 2)
+    case 89: // ------------------- 89  P 4 2 #89
+      return "P 4 2";
+    case 90: // ------------------- 90  P 4ab 2ab #90
+      return "P 4ab 2ab";
+    case 91: // ------------------- 91  P 4w 2c #91
+      return "P 4w 2c";
+    case 92: // ------------------- 92  P 4abw 2nw #92
+      return "P 4abw 2nw";
+    case 93: // ------------------- 93  P 4c 2 #93
+      return "P 4c 2";
+    case 94: // ------------------- 94  P 4n 2n #94
+      return "P 4n 2n";
+    case 95: // ------------------- 95  P 4cw 2c #95
+      return "P 4cw 2c";
+    case 96: // ------------------- 96  P 4nw 2abw #96
+      return "P 4nw 2abw";
+    case 97: // ------------------- 97  I 4 2 #97
+      return "I 4 2";
+    case 98: // ------------------- 98  I 4bw 2bw #98
+      return "I 4bw 2bw";
+    case 99: // ------------------- 99  P 4 -2 #99
+      return "P 4 -2";
+    case 100: // ------------------- 100  P 4 -2ab #100
+      return "P 4 -2ab";
+    case 101: // ------------------- 101  P 4c -2c #101
+      return "P 4c -2c";
+    case 102: // ------------------- 102  P 4n -2n #102
+      return "P 4n -2n";
+    case 103: // ------------------- 103  P 4 -2c #103
+      return "P 4 -2c";
+    case 104: // ------------------- 104  P 4 -2n #104
+      return "P 4 -2n";
+    case 105: // ------------------- 105  P 4c -2 #105
+      return "P 4c -2";
+    case 106: // ------------------- 106  P 4c -2ab #106
+      return "P 4c -2ab";
+    case 107: // ------------------- 107  I 4 -2 #107
+      return "I 4 -2";
+    case 108: // ------------------- 108  I 4 -2c #108
+      return "I 4 -2c";
+    case 109: // ------------------- 109  I 4bw -2 #109
+      return "I 4bw -2";
+    case 110: // ------------------- 110  I 4bw -2c #110
+      return "I 4bw -2c";
+    case 111: // ------------------- 111  P -4 2 #111
+      return "P -4 2";
+    case 112: // ------------------- 112  P -4 2c #112
+      return "P -4 2c";
+    case 113: // ------------------- 113  P -4 2ab #113
+      return "P -4 2ab";
+    case 114: // ------------------- 114  P -4 2n #114
+      return "P -4 2n";
+    case 115: // ------------------- 115  P -4 -2 #115
+      return "P -4 -2";
+    case 116: // ------------------- 116  P -4 -2c #116
+      return "P -4 -2c";
+    case 117: // ------------------- 117  P -4 -2ab #117
+      return "P -4 -2ab";
+    case 118: // ------------------- 118  P -4 -2n #118
+      return "P -4 -2n";
+    case 119: // ------------------- 119  I -4 -2 #119
+      return "I -4 -2";
+    case 120: // ------------------- 120  I -4 -2c #120
+      return "I -4 -2c";
+    case 121: // ------------------- 121  I -4 2 #121
+      return "I -4 2";
+    case 122: // ------------------- 122  I -4 2bw #122
+      return "I -4 2bw";
+    case 123: // ------------------- 123  -P 4 2 #123
+      return "-P 4 2";
+    case 124: // ------------------- 124  -P 4 2c #124
+      return "-P 4 2c";
+    case 125:
+      if (setting==SG_SETTING_1) return "P 4 2 -1ab"; // ------------------- 125  P 4 2 -1ab #125 (setting 1)
+      else return "-P 4a 2b";                         // ------------------- 125  -P 4a 2b #125 (setting 2)
+    case 126:
+      if (setting==SG_SETTING_1) return "P 4 2 -1n"; // ------------------- 126  P 4 2 -1n #126 (setting 1)
+      else return "-P 4a 2bc";                       // ------------------- 126  -P 4a 2bc #126 (setting 2)
+    case 127: // ------------------- 127  -P 4 2ab #127
+      return "-P 4 2ab";
+    case 128: // ------------------- 128  -P 4 2n #128
+      return "-P 4 2n";
+    case 129:
+      if (setting==SG_SETTING_1) return "P 4ab 2ab -1ab"; // ------------------- 129  P 4ab 2ab -1ab #129 (setting 1)
+      else return "-P 4a 2a";                             // ------------------- 129  -P 4a 2a #129 (setting 2)
+    case 130:
+      if (setting==SG_SETTING_1) return "P 4ab 2n -1ab"; // ------------------- 130  P 4ab 2n -1ab #130 (setting 1)
+      else return "-P 4a 2ac";                           // ------------------- 130  -P 4a 2ac #130 (setting 2)
+    case 131: // ------------------- 131  -P 4c 2 #131
+      return "-P 4c 2";
+    case 132: // ------------------- 132  -P 4c 2c #132
+      return "-P 4c 2c";
+    case 133:
+      if (setting==SG_SETTING_1) return "P 4n 2c -1n"; // ------------------- 133  P 4n 2c -1n #133 (setting 1)
+      else return "-P 4ac 2b";                         // ------------------- 133  -P 4ac 2b #133 (setting 2)
+    case 134:
+      if (setting==SG_SETTING_1) return "P 4n 2 -1n"; // ------------------- 134  -P 4ac 2bc #134 (setting 1)
+      else return "-P 4ac 2bc";                       // ------------------- 134  -P 4ac 2bc #134 (setting 2)
+    case 135: // ------------------- 135  -P 4c 2ab #135
+      return "-P 4c 2ab";
+    case 136: // ------------------- 136  -P 4n 2n #136
+      return "-P 4n 2n";
+    case 137:
+      if (setting==SG_SETTING_1) return "P 4n 2n -1n"; // ------------------- 137  P 4n 2n -1n #137 (setting 1)
+      else return "-P 4ac 2a";                         // ------------------- 137  -P 4ac 2a #137 (setting 2)
+    case 138:
+      if (setting==SG_SETTING_1) return "P 4n 2ab -1n"; // ------------------- 138  P 4n 2ab -1n #138 (setting 1)
+      else return "-P 4ac 2ac";                         // ------------------- 138  -P 4ac 2ac #138 (setting 2)
+    case 139: // ------------------- 139  -I 4 2 #139
+      return "-I 4 2";
+    case 140: // ------------------- 140  -I 4 2c #140
+      return "-I 4 2c";
+    case 141:
+      if (setting==SG_SETTING_1) return "I 4bw 2bw -1bw"; // ------------------- 141  I 4bw 2bw -1bw #141 (setting 1)
+      else return "-I 4bd 2";                             // ------------------- 141  -I 4bd 2 #141 (setting 2)
+    case 142:
+      if (setting==SG_SETTING_1) return "I 4bw 2aw -1bw"; // ------------------- 142  I 4bw 2aw -1bw #142 (setting 1)
+      else return "-I 4bd 2c"; // ------------------- 142  -I 4bd 2c #142 (setting 2)
+    case 143: // ------------------- 143  P 3 #143
+      return "P 3";
+    case 144: // ------------------- 144  P 31 #144
+      return "P 31";
+    case 145: // ------------------- 145  P 32 #145
+      return "P 32";
+    case 146:
+      if (setting==SG_SETTING_1) return "P 3*"; // ------------------- 146  P 3* #146 (setting 1, rhl)
+      else return "R 3";                        // ------------------- 146  R 3 #146 (setting 2, hex)
+    case 147: // ------------------- 147  -P 3 #147
+      return "-P 3";
+    case 148:
+      if (setting==SG_SETTING_1) return "-P 3*"; // ------------------- 148  -P 3* #148 (setting 1, rhl)
+      else return "-R 3";                        // ------------------- 148  -R 3 #148 (setting 2, hex)
+    case 149: // ------------------- 149  P 3 2 #149
+      return "P 3 2";
+    case 150: // ------------------- 150  P 3 2'' #150
+      return "P 3 2''";
+    case 151: // ------------------- 151  P 31 2c (0 0 1) #151
+      return "P 31 2c (0 0 1)";
+    case 152: // ------------------- 152  P 31 2'' #152
+      return "P 31 2''";
+    case 153: // ------------------- 153  P 32 2c (0 0 -1) #153
+      return "P 32 2c (0 0 -1)";
+    case 154: // ------------------- 154  P 32 2'' #154
+      return "P 32 2''";
+    case 155:
+      if (setting==SG_SETTING_1) return "P 3* 2"; // ------------------- 155  P 3* 2 #155 (setting 1, rhl)
+      else return "R 3 2''";                      // ------------------- 155  R 3 2'' #155 (setting 2, hex)
+    case 156: // ------------------- 156  P 3 -2'' #156
+      return "P 3 -2''";
+    case 157: // ------------------- 157  P 3 -2 #157
+      return "P 3 -2";
+    case 158: // ------------------- 158  P 3 -2''c #158
+      return "P 3 -2''c";
+    case 159: // ------------------- 159  P 3 -2c #159
+      return "P 3 -2c";
+    case 160:
+      if (setting==SG_SETTING_1) return "P 3* -2"; // ------------------- 160  P 3* -2 #160 (setting 1, rhl)
+      else return "R 3 -2''";                      // ------------------- 160  R 3 -2'' #160 (setting 2, hex)
+    case 161:
+      if (setting==SG_SETTING_1) return "P 3* -2n"; // ------------------- 161  P 3* -2n #161 (setting 1, rhl)
+      else return "R 3 -2''c";                      // ------------------- 161  R 3 -2''c #161 (setting 2, hex)
+    case 162: // ------------------- 162  -P 3 2 #162
+      return "-P 3 2";
+    case 163: // ------------------- 163  -P 3 2c #163
+      return "-P 3 2c";
+    case 164: // ------------------- 164  -P 3 2'' #164
+      return "-P 3 2''";
+    case 165: // ------------------- 165  -P 3 2''c #165
+      return "-P 3 2''c";
+    case 166:
+      if (setting==SG_SETTING_1) return "-P 3* 2"; // ------------------- 166  -P 3* 2 #166 (setting 1, rhl)
+      else return "-R 3 2''";                      // ------------------- 166  -R 3 2'' #166 (setting 2, hex)
+    case 167:
+      if (setting==SG_SETTING_1) return "-P 3* 2n"; // ------------------- 167  -P 3* 2n #167 (setting 1, rhl)
+      else return "-R 3 2''c";                      // ------------------- 167  -R 3 2''c #167 (setting 2, hex)
+    case 168: // ------------------- 168  P 6 #168
+      return "P 6";
+    case 169: // ------------------- 169  P 61 #169
+      return "P 61";
+    case 170: // ------------------- 170  P 65 #170
+      return "P 65";
+    case 171: // ------------------- 171  P 62 #171
+      return "P 62";
+    case 172: // ------------------- 172  P 64 #172
+      return "P 64";
+    case 173: // ------------------- 173  P 6c #173
+      return "P 6c";
+    case 174: // ------------------- 174  P -6 #174
+      return "P -6";
+    case 175: // ------------------- 175  -P 6 #175
+      return "-P 6";
+    case 176: // ------------------- 176  -P 6c #176
+      return "-P 6c";
+    case 177: // ------------------- 177  P 6 2 #177
+      return "P 6 2";
+    case 178: // ------------------- 178  P 61 2 (0 0 -1) #178
+      return "P 61 2 (0 0 -1)";
+    case 179: // ------------------- 179  P 65 2 (0 0 1) #179
+      return "P 65 2 (0 0 1)";
+    case 180: // ------------------- 180  P 62 2c (0 0 1) #180
+      return "P 62 2c (0 0 1)";
+    case 181: // ------------------- 181  P 64 2c (0 0 -1) #181
+      return "P 64 2c (0 0 -1)";
+    case 182: // ------------------- 182  P 6c 2c #182
+      return "P 6c 2c";
+    case 183: // ------------------- 183  P 6 -2 #183
+      return "P 6 -2";
+    case 184: // ------------------- 184  P 6 -2c #184
+      return "P 6 -2c";
+    case 185: // ------------------- 185  P 6c -2 #185
+      return "P 6c -2";
+    case 186: // ------------------- 186  P 6c -2c #186
+      return "P 6c -2c";
+    case 187: // ------------------- 187  P -6 2 #187
+      return "P -6 2";
+    case 188: // ------------------- 188  P -6c 2 #188
+      return "P -6c 2";
+    case 189: // ------------------- 189  P -6 -2 #189
+      return "P -6 -2";
+    case 190: // ------------------- 190  P -6c -2c #190
+      return "P -6c -2c";
+    case 191: // ------------------- 191  -P 6 2 #191
+      return "-P 6 2";
+    case 192: // ------------------- 192  -P 6 2c #192
+      return "-P 6 2c";
+    case 193: // ------------------- 193  -P 6c 2 #193
+      return "-P 6c 2";
+    case 194: // ------------------- 194  -P 6c 2c #194
+      return "-P 6c 2c";
+    case 195: // ------------------- 195  P 2 2 3 #195
+      return "P 2 2 3";
+    case 196: // ------------------- 196  F 2 2 3 #196
+      return "F 2 2 3";
+    case 197: // ------------------- 197  I 2 2 3 #197
+      return "I 2 2 3";
+    case 198: // ------------------- 198  P 2ac 2ab 3 #198
+      return "P 2ac 2ab 3";
+    case 199: // ------------------- 199  I 2b 2c 3 #199
+      return "I 2b 2c 3";
+    case 200: // ------------------- 200  -P 2 2 3 #200
+      return "-P 2 2 3";
+    case 201:
+      if (setting==SG_SETTING_1) return "P 2 2 3 -1n"; // ------------------- 201  P 2 2 3 -1n #201 (setting 1)
+      else return "-P 2ab 2bc 3";                      // ------------------- 201  -P 2ab 2bc 3 #201 (setting 2)
+    case 202: // ------------------- 202  -F 2 2 3 #202
+      return "-F 2 2 3";
+    case 203:
+      if (setting==SG_SETTING_1) return "F 2 2 3 -1d"; // ------------------- 203  F 2 2 3 -1d #203 (setting 1)
+      else return "-F 2uv 2vw 3";                      // ------------------- 203  -F 2uv 2vw 3 #203 (setting 2)
+    case 204: // ------------------- 204  -I 2 2 3 #204
+      return "-I 2 2 3";
+    case 205: // ------------------- 205  -P 2ac 2ab 3 #205
+      return "-P 2ac 2ab 3";
+    case 206: // ------------------- 206  -I 2b 2c 3 #206
+      return "-I 2b 2c 3";
+    case 207: // ------------------- 207  P 4 2 3 #207
+      return "P 4 2 3";
+    case 208: // ------------------- 208  P 4n 2 3 #208
+      return "P 4n 2 3";
+    case 209: // ------------------- 209  F 4 2 3 #209
+      return "F 4 2 3";
+    case 210: // ------------------- 210  F 4d 2 3 #210
+      return "F 4d 2 3";
+    case 211: // ------------------- 211  I 4 2 3 #211
+      return "I 4 2 3";
+    case 212: // ------------------- 212  P 4acd 2ab 3 #212
+      return "P 4acd 2ab 3";
+    case 213: // ------------------- 213  P 4bd 2ab 3 #213
+      return "P 4bd 2ab 3";
+    case 214: // ------------------- 214  I 4bd 2c 3 #214
+      return "I 4bd 2c 3";
+    case 215: // ------------------- 215  P -4 2 3 #215
+      return "P -4 2 3";
+    case 216: // ------------------- 216  F -4 2 3 #216
+      return "F -4 2 3";
+    case 217: // ------------------- 217  I -4 2 3 #217
+      return "I -4 2 3";
+    case 218: // ------------------- 218  P -4n 2 3 #218
+      return "P -4n 2 3";
+    case 219: // ------------------- 219  F -4c 2 3 #219
+      return "F -4c 2 3";
+    case 220: // ------------------- 220  I -4bd 2c 3 #220
+      return "I -4bd 2c 3";
+    case 221: // ------------------- 221  -P 4 2 3 #221
+      return "-P 4 2 3";
+    case 222:
+      if (setting==SG_SETTING_1) return "P 4 2 3 -1n"; // ------------------- 222  P 4 2 3 -1n #222 (setting 1)
+      else return "-P 4a 2bc 3";                       // ------------------- 222  -P 4a 2bc 3 #222 (setting 2)
+    case 223: // ------------------- 223  -P 4n 2 3 #223
+      return "-P 4n 2 3";
+    case 224:
+      if (setting==SG_SETTING_1) return "P 4n 2 3 -1n"; // ------------------- 224  P 4n 2 3 -1n #224 (setting 1)
+      else return "-P 4bc 2bc 3";                       // ------------------- 224  -P 4bc 2bc 3 #224 (setting 2)
+    case 225: // ------------------- 225  -F 4 2 3 #225
+      return "-F 4 2 3";
+    case 226: // ------------------- 226  -F 4c 2 3 #226
+      return "-F 4c 2 3";
+    case 227:
+      if (setting==SG_SETTING_1) return "F 4d 2 3 -1d"; // ------------------- 227  -F 4vw 2vw 3 #227 (setting 1)
+      else return "-F 4vw 2vw 3";                       // ------------------- 227  -F 4vw 2vw 3 #227 (setting 2)
+    case 228:
+      if (setting==SG_SETTING_1) return "F 4d 2 3 -1cd"; // ------------------- 228  F 4d 2 3 -1cd #228 (setting 1)
+      else return "-F 4cvw 2vw 3";                       // ------------------- 228  -F 4cvw 2vw 3 #228 (setting 2)
+    case 229: // ------------------- 229  -I 4 2 3 #229
+      return "-I 4 2 3";
+    case 230: // ------------------- 230  -I 4bd 2c 3 #230
+      return "-I 4bd 2c 3";
+  }
+  // No space group found
+  return "";
 }
 
 // ***************************************************************************
@@ -10358,159 +10342,567 @@ xstructure SwapCoordinates(const xstructure& str,const uint& ii,const uint& jj) 
 }
 
 // ***************************************************************************
-// Function GetLatticeType
+// Function GetLatticeType()
 // ***************************************************************************
-void xstructure::GetLatticeType(void) {
+// Determine the real, reciprocal, and superlattice symmetry information
+// Stefano Curtarolo
+// Modified by David Hicks (DX)
+// Includes self-consistency loop to ensure descriptions are commensurate
+// DX20210225 - cleaned/consolidated function
+void xstructure::GetLatticeType(double sym_eps, bool no_scan) {
   xstructure str_sp,str_sc;
-  GetLatticeType(str_sp,str_sc);
+  GetLatticeType(str_sp,str_sc,sym_eps,no_scan);
 }
 
-void xstructure::GetLatticeType(xstructure& str_sp,xstructure& str_sc) {
-  //  bool VERBOSE=TRUE;
-  bool VERBOSE=FALSE;
-  //DX double eps=0.002,epsang=0.02;
-  // double eps=0.02,epsang=0.02;  //JX
-  // DIRECT
-  xstructure str_in;//,str_sp,str_sc;
-  // start
-  str_in=*this;
-  str_in.title="NO_RECURSION";
-  // str_in.GetPrimitive();
-  // str_in.MinkowskiBasisReduction();
-  // cerr << str_in << endl;
-  // str_in.CalculateSymmetryPointGroup(TRUE);
-  // str_in.CalculateSymmetryFactorGroup(TRUE);
-  // str_in.CalculateSymmetryPointGroupCrystal(TRUE);
-  //DX START
+void xstructure::GetLatticeType(xstructure& str_sp,xstructure& str_sc, double sym_eps, bool no_scan) {
+
+  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  string function_name = XPID + "xstructure::GetLatticeType():";
+
+  // ---------------------------------------------------------------------------
+  // set symmetry tolerance based on the following sequence
+  // 1) use input, 2) use sym_eps in xstructure, 3) calculate default
+  double tolerance = sym_eps;
+  if(tolerance==AUROSTD_MAX_DOUBLE){
+    if((*this).sym_eps_calculated){ tolerance = (*this).sym_eps; }
+    else{ tolerance=SYM::defaultTolerance((*this)); }
+  }
+  if(LDEBUG){ cerr << function_name << " [1] Set symmetry tolerance (starting sym_eps=" << tolerance << ")" << endl; }
+
+  // keep track of self-consistent tolerance
   bool same_eps = false;
   uint count = 0;
-  while(same_eps == false && count++ < 100){
-    //DX END
-    if(0) {
-      LATTICE::Standard_Lattice_StructureDefault(str_in,str_sp,str_sc); // STD tolerance  // ONLY BRAVAIS_CRYSTAL
-      // LATTICE::Standard_Lattice_Structure(str_in,str_sp,str_sc,0.0001,0.001);
+  uint count_max = 100; // safety for while loop, don't calculate forever
+
+  // update tolerance info in *this
+  (*this).sym_eps=tolerance;
+  (*this).sym_eps_calculated=true;
+
+  // ---------------------------------------------------------------------------
+  // loop over the real, reciprocal, and superlattice analysis until all
+  // symmetries are commensurate at a common tolerance value
+  while(!same_eps && count++ < count_max){
+
+    // ---------------------------------------------------------------------------
+    // clear to start
+    (*this).ClearSymmetry();
+
+    // ---------------------------------------------------------------------------
+    // update the tolerance, it may have change during loop
+    tolerance = (*this).sym_eps;
+    no_scan = (*this).sym_eps_no_scan;
+
+    if(LDEBUG){ cerr << function_name << " [2] Top of self-consistent lattice-type loop (calculating real, reciprocal, and superlattice types) (sym_eps=" << tolerance << ", sym_eps_change_count=" << (*this).sym_eps_change_count << ")" << endl; }
+
+    // ---------------------------------------------------------------------------
+    // check if consistency checks failed (maxed while loop iteration)
+    // turn of scan
+    if(count==count_max){
+      no_scan=(*this).sym_eps_no_scan=true;
+      tolerance = sym_eps; // set to original eps
+      cerr << function_name << " Unable to calculate consistent symmetry. Calculating at original tolerance (sym_eps=" << sym_eps << ") and ignoring consistency checks." << endl;
     }
-    if(1) {
-      //    cerr << XPID << "LATTICE::Bravais_Lattice_StructureDefault IN" << endl;
-      LATTICE::Bravais_Lattice_StructureDefault(str_in,str_sp,str_sc); // STD tolerance  // ONLY BRAVAIS_CRYSTAL
-      //  cerr << XPID << "LATTICE::Bravais_Lattice_StructureDefault OUT" << endl;
-    }
-    if(VERBOSE) cerr << "xstructure::GetLatticeType: [4]" << endl;
-    if(str_sp.pgroup_calculated==FALSE) str_sp.CalculateSymmetryPointGroup(FALSE);// cerr << "POINT GROUP" << endl;
-    if(str_sp.fgroup_calculated==FALSE) str_sp.CalculateSymmetryFactorGroup(FALSE); //cerr << "FACTOR GROUP" << endl;
-    if(str_sp.pgroup_xtal_calculated==FALSE) str_sp.CalculateSymmetryPointGroupCrystal(FALSE); //cerr << "POINT GROUP XTAL" << endl;
-    //  *this=str_sp; // more obvious but will mess up the structures.... we only want to take the properties
-    this->bravais_lattice_type=str_sp.bravais_lattice_type;
-    this->bravais_lattice_variation_type=str_sp.bravais_lattice_variation_type;
-    this->bravais_lattice_system=str_sp.bravais_lattice_system;
-    this->bravais_lattice_lattice_type=str_sp.bravais_lattice_lattice_type;
-    this->bravais_lattice_lattice_variation_type=str_sp.bravais_lattice_lattice_variation_type;
-    this->bravais_lattice_lattice_system=str_sp.bravais_lattice_lattice_system;
-    this->volume_changed_original2new=str_sp.volume_changed_original2new; //DX20181024
-    this->transform_coordinates_original2new=str_sp.transform_coordinates_original2new; //DX20181024
-    this->transform_coordinates_new2original=str_sp.transform_coordinates_new2original; //DX20181024
-    this->rotate_lattice_original2new=str_sp.rotate_lattice_original2new; //DX20181024
-    this->rotate_lattice_new2original=str_sp.rotate_lattice_new2original; //DX20181024
-    this->pearson_symbol=str_sp.pearson_symbol;
-    this->crystal_family=str_sp.crystal_family;
-    this->crystal_system=str_sp.crystal_system;
-    this->point_group_crystal_class=str_sp.point_group_crystal_class;
-    this->point_group_Shoenflies=str_sp.point_group_Shoenflies;
-    this->point_group_Hermann_Mauguin=str_sp.point_group_Hermann_Mauguin;
-    this->point_group_orbifold=str_sp.point_group_orbifold;
-    this->point_group_type=str_sp.point_group_type;
-    this->point_group_order=str_sp.point_group_order;
-    this->point_group_structure=str_sp.point_group_structure;
+
+    // ---------------------------------------------------------------------------
+    // REAL - pass in str_sp and str_sc to keep primitive and conventional info
+    if(LDEBUG){ cerr << function_name << " [3] Calculate real lattice type (sym_eps=" << tolerance << ", sym_eps_change_count=" << (*this).sym_eps_change_count << ")" << endl; }
+    (*this).GetRealLatticeType(str_sp, str_sc, tolerance);
+    tolerance = (*this).sym_eps; // update the tolerance
+
+    // ---------------------------------------------------------------------------
     // RECIPROCAL
-    xstructure str_reciprocal_in,str_reciprocal_sp,str_reciprocal_sc;
-    str_reciprocal_in.lattice=this->klattice;str_reciprocal_in.FixLattices();
-    str_reciprocal_in.title="NO_RECURSION";
-    //DX+CO START
-    this->sym_eps=str_reciprocal_in.sym_eps=str_reciprocal_sp.sym_eps=str_reciprocal_sc.sym_eps=str_sp.sym_eps; //DX
-    this->sym_eps_calculated=str_reciprocal_in.sym_eps_calculated=str_reciprocal_sp.sym_eps_calculated=str_reciprocal_sc.sym_eps_calculated=str_sp.sym_eps_calculated; //DX
-    this->sym_eps_change_count=str_reciprocal_in.sym_eps_change_count=str_reciprocal_sp.sym_eps_change_count=str_reciprocal_sc.sym_eps_change_count=str_sp.sym_eps_change_count; //DX20180222 - added sym_eps change count
-    this->sym_eps_no_scan=str_reciprocal_in.sym_eps_no_scan=str_reciprocal_sp.sym_eps_no_scan=str_reciprocal_sc.sym_eps_no_scan=str_sp.sym_eps_no_scan; //DX20210331 - added sym_eps no scan
-    //DX+CO END
-    _atom atom;str_reciprocal_in.AddAtom(atom);
-    //LATTICE::Standard_Lattice_Structure(str_reciprocal_in,str_reciprocal_sp,str_reciprocal_sc,eps,epsang); //SC OLD VERSION
-    if(VERBOSE) cerr << "xstructure::GetLatticeType: [5]" << endl;
-    //DX int ss=0; //JX
-    //DX LATTICE::Standard_Lattice_Structure(str_reciprocal_in,str_reciprocal_sp,str_reciprocal_sc,eps,epsang,ss,_EPS_); //JX
-    //DX20170814 START - Use real pgroup to calculate pgroupk and then set pgroupk from str_sp to the pgroup and pgroup_xtal of str_reciprocal_in
-    //DX20170814 The pgroup and pgroup_xtal are the same for the str_reciprocal structure because there is only one atom at the origin
-    //DX20170814 (i.e. lattice and crystal symmetry are the same for the reciprocal space crystal)
-    //DX20170829 [OBSOLETE] -since performing full symmetry analysis by default - str_sp.CalculateSymmetryPointGroupKLattice(FALSE);
-    //DX20180426 - possible that lattice exhibits lower symmetry than crystal (i.e., from str_sp); would need to pass lattice symmetry from Standard_Lattice, but that information is not stored out of scope, commenting out 5 lines below 
-    //DX20180426 [OBSOLETE] - possible that lattice exhibits lower symmetry than crystal (i.e., from str_sp) - str_reciprocal_in.pgroup=str_reciprocal_sp.pgroup=str_reciprocal_sc.pgroup=str_sp.pgroupk;
-    //DX20180426 [OBSOLETE] - possible that lattice exhibits lower symmetry than crystal (i.e., from str_sp) - str_reciprocal_in.pgroup_calculated=str_reciprocal_sp.pgroup_calculated=str_reciprocal_sc.pgroup_calculated=str_sp.pgroupk_calculated;
-    //DX20180426 [OBSOLETE] - possible that lattice exhibits lower symmetry than crystal (i.e., from str_sp) - str_reciprocal_in.pgroup_xtal=str_reciprocal_sp.pgroup_xtal=str_reciprocal_sc.pgroup_xtal=str_sp.pgroupk;
-    //DX20180426 [OBSOLETE] - possible that lattice exhibits lower symmetry than crystal (i.e., from str_sp) - str_reciprocal_in.pgroup_xtal_calculated=str_reciprocal_sp.pgroup_xtal_calculated=str_reciprocal_sc.pgroup_xtal_calculated=str_sp.pgroup_calculated;
-    //DX20180426 [OBSOLETE] - possible that lattice exhibits lower symmetry than crystal (i.e., from str_sp) - str_reciprocal_in.pgroup_xtal_calculated=str_reciprocal_sp.pgroup_xtal_calculated=str_reciprocal_sc.pgroup_xtal_calculated=str_sp.pgroup_calculated;
-    //DX20170814 END
-    LATTICE::Standard_Lattice_StructureDefault(str_reciprocal_in,str_reciprocal_sp,str_reciprocal_sc,false); //DX //DX20180226 - do not need to do full sym for recip
-    //DX START
-    if(str_sp.sym_eps == str_reciprocal_sp.sym_eps){
-      same_eps = true;
-    }
-    else {
-      str_in.sym_eps = str_sp.sym_eps = str_sc.sym_eps = str_reciprocal_sp.sym_eps;
-      str_in.sym_eps_change_count = str_sp.sym_eps_change_count = str_sc.sym_eps_change_count = str_reciprocal_sp.sym_eps_change_count; //DX20180222 - added sym_eps change count
-      str_in.sym_eps_no_scan = str_sp.sym_eps_no_scan = str_sc.sym_eps_no_scan = str_reciprocal_sp.sym_eps_no_scan; //DX20210331
-    }
-    //DX END
-    this->reciprocal_lattice_type=str_reciprocal_sp.bravais_lattice_type;
-    this->reciprocal_lattice_variation_type=str_reciprocal_sp.bravais_lattice_variation_type;
-    if(VERBOSE) cerr << "xstructure::GetLatticeType: [6]" << endl;
+    if(LDEBUG){ cerr << function_name << " [4] Calculate reciprocal lattice type (sym_eps=" << tolerance << ", sym_eps_change_count=" << (*this).sym_eps_change_count << ")" << endl; }
+    (*this).GetReciprocalLatticeType(tolerance);
+    if(!no_scan && (*this).sym_eps != tolerance){ continue; } // if tolerance changed, recalc
+
+    // ---------------------------------------------------------------------------
     // SUPERLATTICE
-    xstructure str_superlattice_in,str_superlattice_sp,str_superlattice_sc;
-    str_superlattice_in=*this;
-    str_superlattice_in.ClearSymmetry();  //DX20170814 - It wasn't cleared, so nothing was being calculated
-    str_superlattice_in.title="NO_RECURSION";
-    //str_superlattice_in.GetPrimitive(0.01);
-    if(VERBOSE) cerr << str_superlattice_in << endl;
-    if(VERBOSE) cerr << "xstructure::GetLatticeType: [7]" << endl;
-    str_superlattice_in.IdenticalAtoms();  // make superlattice
-    if(VERBOSE) cerr << "xstructure::GetLatticeType: [8]" << endl;
-    if(VERBOSE) cerr << str_superlattice_in << endl;
-    //DX20210427 - [OBSOLETE - use default sym_eps] str_superlattice_in.GetPrimitive(0.005);
-    str_superlattice_in.GetPrimitive(); //DX20210427 - use default sym_eps
-    if(VERBOSE) cerr << str_superlattice_in << endl;
-    if(VERBOSE) cerr << "xstructure::GetLatticeType: [9]" << endl;
-    str_superlattice_in.Minkowski_calculated=FALSE;
-    if(VERBOSE) cerr << "xstructure::GetLatticeType: [10]" << endl;
-    str_superlattice_in.MinkowskiBasisReduction();
-    if(VERBOSE) cerr << "xstructure::GetLatticeType: [11]" << endl;
-    if(VERBOSE) cerr << str_superlattice_in << endl;
-    //  LATTICE::Standard_Lattice_Structure(str_superlattice_in,str_superlattice_sp,str_superlattice_sc); //SC OLD VERSION
-    //DX ss=0; //JX
-    //DX+CO START
-    str_superlattice_in.sym_eps=str_superlattice_sp.sym_eps=str_superlattice_sc.sym_eps=str_sp.sym_eps; //DX
-    str_superlattice_in.sym_eps_calculated=str_superlattice_sp.sym_eps_calculated=str_superlattice_sc.sym_eps_calculated=str_sp.sym_eps_calculated; //DX
-    str_superlattice_in.sym_eps_change_count=str_superlattice_sp.sym_eps_change_count=str_superlattice_sc.sym_eps_change_count=str_sp.sym_eps_change_count; //DX20180222 - added sym_eps change count
-    str_superlattice_in.sym_eps_no_scan=str_superlattice_sp.sym_eps_no_scan=str_superlattice_sc.sym_eps_no_scan=str_sp.sym_eps_no_scan; //DX20210331 - added sym_eps no scan
-    //DX+CO END
-    //DX LATTICE::Standard_Lattice_Structure(str_superlattice_in,str_superlattice_sp,str_superlattice_sc,eps,epsang,ss,_EPS_); //JX
-    LATTICE::Standard_Lattice_StructureDefault(str_superlattice_in,str_superlattice_sp,str_superlattice_sc,false); //DX //DX20180226 - do not need to do full sym for superlattice
-    //DX START
-    if(str_sp.sym_eps == str_superlattice_sp.sym_eps){
-      same_eps = true;
+    if(LDEBUG){ cerr << function_name << " [5] Calculate superlattice type (sym_eps=" << tolerance << ", sym_eps_change_count=" << (*this).sym_eps_change_count << ")" << endl; }
+    (*this).GetSuperlatticeType(tolerance);
+    if(!no_scan && (*this).sym_eps != tolerance){ continue; } // if tolerance changed, recalc
+
+    // made it to the end with same sym_eps
+    same_eps = true;
+  }
+
+  if(LDEBUG){ cerr << function_name << " [6] Lattice types calculation finished! (sym_eps=" << tolerance << ", sym_eps_change_count=" << (*this).sym_eps_change_count << ")" << endl; }
+
+}
+
+//DX20210302 [OBSOLETE] // ***************************************************************************
+//DX20210302 [OBSOLETE] // Function GetLatticeType
+//DX20210302 [OBSOLETE] // ***************************************************************************
+//DX20210302 [OBSOLETE] void xstructure::GetLatticeType(void) {
+//DX20210302 [OBSOLETE]   xstructure str_sp,str_sc;
+//DX20210302 [OBSOLETE]   GetLatticeType(str_sp,str_sc);
+//DX20210302 [OBSOLETE] }
+//DX20210302 [OBSOLETE] 
+//DX20210302 [OBSOLETE] void xstructure::GetLatticeType(xstructure& str_sp,xstructure& str_sc) {
+//DX20210302 [OBSOLETE]   //  bool VERBOSE=TRUE;
+//DX20210302 [OBSOLETE]   bool VERBOSE=FALSE;
+//DX20210302 [OBSOLETE]   //DX double eps=0.002,epsang=0.02;
+//DX20210302 [OBSOLETE]   // double eps=0.02,epsang=0.02;  //JX
+//DX20210302 [OBSOLETE]   // DIRECT
+//DX20210302 [OBSOLETE]   xstructure str_in;//,str_sp,str_sc;
+//DX20210302 [OBSOLETE]   // start
+//DX20210302 [OBSOLETE]   str_in=*this;
+//DX20210302 [OBSOLETE]   str_in.title="NO_RECURSION";
+//DX20210302 [OBSOLETE]   // str_in.GetPrimitive();
+//DX20210302 [OBSOLETE]   // str_in.MinkowskiBasisReduction();
+//DX20210302 [OBSOLETE]   // cerr << str_in << endl;
+//DX20210302 [OBSOLETE]   // str_in.CalculateSymmetryPointGroup(TRUE);
+//DX20210302 [OBSOLETE]   // str_in.CalculateSymmetryFactorGroup(TRUE);
+//DX20210302 [OBSOLETE]   // str_in.CalculateSymmetryPointGroupCrystal(TRUE);
+//DX20210302 [OBSOLETE]   //DX START
+//DX20210302 [OBSOLETE]   bool same_eps = false;
+//DX20210302 [OBSOLETE]   uint count = 0;
+//DX20210302 [OBSOLETE]   while(same_eps == false && count++ < 100){
+//DX20210302 [OBSOLETE]     //DX END
+//DX20210302 [OBSOLETE]     if(0) {
+//DX20210302 [OBSOLETE]       LATTICE::Standard_Lattice_StructureDefault(str_in,str_sp,str_sc); // STD tolerance  // ONLY BRAVAIS_CRYSTAL
+//DX20210302 [OBSOLETE]       // LATTICE::Standard_Lattice_Structure(str_in,str_sp,str_sc,0.0001,0.001);
+//DX20210302 [OBSOLETE]     }
+//DX20210302 [OBSOLETE]     if(1) {
+//DX20210302 [OBSOLETE]       //    cerr << XPID << "LATTICE::Bravais_Lattice_StructureDefault IN" << endl;
+//DX20210302 [OBSOLETE]       LATTICE::Bravais_Lattice_StructureDefault(str_in,str_sp,str_sc); // STD tolerance  // ONLY BRAVAIS_CRYSTAL
+//DX20210302 [OBSOLETE]       //  cerr << XPID << "LATTICE::Bravais_Lattice_StructureDefault OUT" << endl;
+//DX20210302 [OBSOLETE]     }
+//DX20210302 [OBSOLETE]     if(VERBOSE) cerr << "xstructure::GetLatticeType: [4]" << endl;
+//DX20210302 [OBSOLETE]     if(str_sp.pgroup_calculated==FALSE) str_sp.CalculateSymmetryPointGroup(FALSE);// cerr << "POINT GROUP" << endl;
+//DX20210302 [OBSOLETE]     if(str_sp.fgroup_calculated==FALSE) str_sp.CalculateSymmetryFactorGroup(FALSE); //cerr << "FACTOR GROUP" << endl;
+//DX20210302 [OBSOLETE]     if(str_sp.pgroup_xtal_calculated==FALSE) str_sp.CalculateSymmetryPointGroupCrystal(FALSE); //cerr << "POINT GROUP XTAL" << endl;
+//DX20210302 [OBSOLETE]     //  *this=str_sp; // more obvious but will mess up the structures.... we only want to take the properties
+//DX20210302 [OBSOLETE]     this->bravais_lattice_type=str_sp.bravais_lattice_type;
+//DX20210302 [OBSOLETE]     this->bravais_lattice_variation_type=str_sp.bravais_lattice_variation_type;
+//DX20210302 [OBSOLETE]     this->bravais_lattice_system=str_sp.bravais_lattice_system;
+//DX20210302 [OBSOLETE]     this->bravais_lattice_lattice_type=str_sp.bravais_lattice_lattice_type;
+//DX20210302 [OBSOLETE]     this->bravais_lattice_lattice_variation_type=str_sp.bravais_lattice_lattice_variation_type;
+//DX20210302 [OBSOLETE]     this->bravais_lattice_lattice_system=str_sp.bravais_lattice_lattice_system;
+//DX20210302 [OBSOLETE]     this->volume_changed_original2new=str_sp.volume_changed_original2new; //DX20181024
+//DX20210302 [OBSOLETE]     this->transform_coordinates_original2new=str_sp.transform_coordinates_original2new; //DX20181024
+//DX20210302 [OBSOLETE]     this->transform_coordinates_new2original=str_sp.transform_coordinates_new2original; //DX20181024
+//DX20210302 [OBSOLETE]     this->rotate_lattice_original2new=str_sp.rotate_lattice_original2new; //DX20181024
+//DX20210302 [OBSOLETE]     this->rotate_lattice_new2original=str_sp.rotate_lattice_new2original; //DX20181024
+//DX20210302 [OBSOLETE]     this->pearson_symbol=str_sp.pearson_symbol;
+//DX20210302 [OBSOLETE]     this->crystal_family=str_sp.crystal_family;
+//DX20210302 [OBSOLETE]     this->crystal_system=str_sp.crystal_system;
+//DX20210302 [OBSOLETE]     this->point_group_crystal_class=str_sp.point_group_crystal_class;
+//DX20210302 [OBSOLETE]     this->point_group_Shoenflies=str_sp.point_group_Shoenflies;
+//DX20210302 [OBSOLETE]     this->point_group_Hermann_Mauguin=str_sp.point_group_Hermann_Mauguin;
+//DX20210302 [OBSOLETE]     this->point_group_orbifold=str_sp.point_group_orbifold;
+//DX20210302 [OBSOLETE]     this->point_group_type=str_sp.point_group_type;
+//DX20210302 [OBSOLETE]     this->point_group_order=str_sp.point_group_order;
+//DX20210302 [OBSOLETE]     this->point_group_structure=str_sp.point_group_structure;
+//DX20210302 [OBSOLETE]     // RECIPROCAL
+//DX20210302 [OBSOLETE]     xstructure str_reciprocal_in,str_reciprocal_sp,str_reciprocal_sc;
+//DX20210302 [OBSOLETE]     str_reciprocal_in.lattice=this->klattice;str_reciprocal_in.FixLattices();
+//DX20210302 [OBSOLETE]     str_reciprocal_in.title="NO_RECURSION";
+//DX20210302 [OBSOLETE]     //DX+CO START
+//DX20210302 [OBSOLETE]     this->sym_eps=str_reciprocal_in.sym_eps=str_reciprocal_sp.sym_eps=str_reciprocal_sc.sym_eps=str_sp.sym_eps; //DX
+//DX20210302 [OBSOLETE]     this->sym_eps_calculated=str_reciprocal_in.sym_eps_calculated=str_reciprocal_sp.sym_eps_calculated=str_reciprocal_sc.sym_eps_calculated=str_sp.sym_eps_calculated; //DX
+//DX20210302 [OBSOLETE]     this->sym_eps_change_count=str_reciprocal_in.sym_eps_change_count=str_reciprocal_sp.sym_eps_change_count=str_reciprocal_sc.sym_eps_change_count=str_sp.sym_eps_change_count; //DX20180222 - added sym_eps change count
+//DX20210302 [OBSOLETE]     //DX+CO END
+//DX20210302 [OBSOLETE]     _atom atom;str_reciprocal_in.AddAtom(atom);
+//DX20210302 [OBSOLETE]     //LATTICE::Standard_Lattice_Structure(str_reciprocal_in,str_reciprocal_sp,str_reciprocal_sc,eps,epsang); //SC OLD VERSION
+//DX20210302 [OBSOLETE]     if(VERBOSE) cerr << "xstructure::GetLatticeType: [5]" << endl;
+//DX20210302 [OBSOLETE]     //DX int ss=0; //JX
+//DX20210302 [OBSOLETE]     //DX LATTICE::Standard_Lattice_Structure(str_reciprocal_in,str_reciprocal_sp,str_reciprocal_sc,eps,epsang,ss,_EPS_); //JX
+//DX20210302 [OBSOLETE]     //DX20170814 START - Use real pgroup to calculate pgroupk and then set pgroupk from str_sp to the pgroup and pgroup_xtal of str_reciprocal_in
+//DX20210302 [OBSOLETE]     //DX20170814 The pgroup and pgroup_xtal are the same for the str_reciprocal structure because there is only one atom at the origin
+//DX20210302 [OBSOLETE]     //DX20170814 (i.e. lattice and crystal symmetry are the same for the reciprocal space crystal)
+//DX20210302 [OBSOLETE]     //DX20170829 [OBSOLETE] -since performing full symmetry analysis by default - str_sp.CalculateSymmetryPointGroupKLattice(FALSE);
+//DX20210302 [OBSOLETE]     //DX20180426 - possible that lattice exhibits lower symmetry than crystal (i.e., from str_sp); would need to pass lattice symmetry from Standard_Lattice, but that information is not stored out of scope, commenting out 5 lines below 
+//DX20210302 [OBSOLETE]     //DX20180426 [OBSOLETE] - possible that lattice exhibits lower symmetry than crystal (i.e., from str_sp) - str_reciprocal_in.pgroup=str_reciprocal_sp.pgroup=str_reciprocal_sc.pgroup=str_sp.pgroupk;
+//DX20210302 [OBSOLETE]     //DX20180426 [OBSOLETE] - possible that lattice exhibits lower symmetry than crystal (i.e., from str_sp) - str_reciprocal_in.pgroup_calculated=str_reciprocal_sp.pgroup_calculated=str_reciprocal_sc.pgroup_calculated=str_sp.pgroupk_calculated;
+//DX20210302 [OBSOLETE]     //DX20180426 [OBSOLETE] - possible that lattice exhibits lower symmetry than crystal (i.e., from str_sp) - str_reciprocal_in.pgroup_xtal=str_reciprocal_sp.pgroup_xtal=str_reciprocal_sc.pgroup_xtal=str_sp.pgroupk;
+//DX20210302 [OBSOLETE]     //DX20180426 [OBSOLETE] - possible that lattice exhibits lower symmetry than crystal (i.e., from str_sp) - str_reciprocal_in.pgroup_xtal_calculated=str_reciprocal_sp.pgroup_xtal_calculated=str_reciprocal_sc.pgroup_xtal_calculated=str_sp.pgroup_calculated;
+//DX20210302 [OBSOLETE]     //DX20180426 [OBSOLETE] - possible that lattice exhibits lower symmetry than crystal (i.e., from str_sp) - str_reciprocal_in.pgroup_xtal_calculated=str_reciprocal_sp.pgroup_xtal_calculated=str_reciprocal_sc.pgroup_xtal_calculated=str_sp.pgroup_calculated;
+//DX20210302 [OBSOLETE]     //DX20170814 END
+//DX20210302 [OBSOLETE]     LATTICE::Standard_Lattice_StructureDefault(str_reciprocal_in,str_reciprocal_sp,str_reciprocal_sc,false); //DX //DX20180226 - do not need to do full sym for recip
+//DX20210302 [OBSOLETE]     //DX START
+//DX20210302 [OBSOLETE]     if(str_sp.sym_eps == str_reciprocal_sp.sym_eps){
+//DX20210302 [OBSOLETE]       same_eps = true;
+//DX20210302 [OBSOLETE]     }
+//DX20210302 [OBSOLETE]     else {
+//DX20210302 [OBSOLETE]       str_in.sym_eps = str_sp.sym_eps = str_sc.sym_eps = str_reciprocal_sp.sym_eps;
+//DX20210302 [OBSOLETE]       str_in.sym_eps_change_count = str_sp.sym_eps_change_count = str_sc.sym_eps_change_count = str_reciprocal_sp.sym_eps_change_count; //DX20180222 - added sym_eps change count
+//DX20210302 [OBSOLETE]     }
+//DX20210302 [OBSOLETE]     //DX END
+//DX20210302 [OBSOLETE]     this->reciprocal_lattice_type=str_reciprocal_sp.bravais_lattice_type;
+//DX20210302 [OBSOLETE]     this->reciprocal_lattice_variation_type=str_reciprocal_sp.bravais_lattice_variation_type;
+//DX20210302 [OBSOLETE]     if(VERBOSE) cerr << "xstructure::GetLatticeType: [6]" << endl;
+//DX20210302 [OBSOLETE]     // SUPERLATTICE
+//DX20210302 [OBSOLETE]     xstructure str_superlattice_in,str_superlattice_sp,str_superlattice_sc;
+//DX20210302 [OBSOLETE]     str_superlattice_in=*this;
+//DX20210302 [OBSOLETE]     str_superlattice_in.ClearSymmetry();  //DX20170814 - It wasn't cleared, so nothing was being calculated
+//DX20210302 [OBSOLETE]     str_superlattice_in.title="NO_RECURSION";
+//DX20210302 [OBSOLETE]     //str_superlattice_in.GetPrimitive(0.01);
+//DX20210302 [OBSOLETE]     if(VERBOSE) cerr << str_superlattice_in << endl;
+//DX20210302 [OBSOLETE]     if(VERBOSE) cerr << "xstructure::GetLatticeType: [7]" << endl;
+//DX20210302 [OBSOLETE]     str_superlattice_in.IdenticalAtoms();  // make superlattice
+//DX20210302 [OBSOLETE]     if(VERBOSE) cerr << "xstructure::GetLatticeType: [8]" << endl;
+//DX20210302 [OBSOLETE]     if(VERBOSE) cerr << str_superlattice_in << endl;
+//DX20210302 [OBSOLETE]     str_superlattice_in.GetPrimitive(0.005);
+//DX20210302 [OBSOLETE]     if(VERBOSE) cerr << str_superlattice_in << endl;
+//DX20210302 [OBSOLETE]     if(VERBOSE) cerr << "xstructure::GetLatticeType: [9]" << endl;
+//DX20210302 [OBSOLETE]     str_superlattice_in.Minkowski_calculated=FALSE;
+//DX20210302 [OBSOLETE]     if(VERBOSE) cerr << "xstructure::GetLatticeType: [10]" << endl;
+//DX20210302 [OBSOLETE]     str_superlattice_in.MinkowskiBasisReduction();
+//DX20210302 [OBSOLETE]     if(VERBOSE) cerr << "xstructure::GetLatticeType: [11]" << endl;
+//DX20210302 [OBSOLETE]     if(VERBOSE) cerr << str_superlattice_in << endl;
+//DX20210302 [OBSOLETE]     //  LATTICE::Standard_Lattice_Structure(str_superlattice_in,str_superlattice_sp,str_superlattice_sc); //SC OLD VERSION
+//DX20210302 [OBSOLETE]     //DX ss=0; //JX
+//DX20210302 [OBSOLETE]     //DX+CO START
+//DX20210302 [OBSOLETE]     str_superlattice_in.sym_eps=str_superlattice_sp.sym_eps=str_superlattice_sc.sym_eps=str_sp.sym_eps; //DX
+//DX20210302 [OBSOLETE]     str_superlattice_in.sym_eps_calculated=str_superlattice_sp.sym_eps_calculated=str_superlattice_sc.sym_eps_calculated=str_sp.sym_eps_calculated; //DX
+//DX20210302 [OBSOLETE]     str_superlattice_in.sym_eps_change_count=str_superlattice_sp.sym_eps_change_count=str_superlattice_sc.sym_eps_change_count=str_sp.sym_eps_change_count; //DX20180222 - added sym_eps change count
+//DX20210302 [OBSOLETE]     //DX+CO END
+//DX20210302 [OBSOLETE]     //DX LATTICE::Standard_Lattice_Structure(str_superlattice_in,str_superlattice_sp,str_superlattice_sc,eps,epsang,ss,_EPS_); //JX
+//DX20210302 [OBSOLETE]     LATTICE::Standard_Lattice_StructureDefault(str_superlattice_in,str_superlattice_sp,str_superlattice_sc,false); //DX //DX20180226 - do not need to do full sym for superlattice
+//DX20210302 [OBSOLETE]     //DX START
+//DX20210302 [OBSOLETE]     if(str_sp.sym_eps == str_superlattice_sp.sym_eps){
+//DX20210302 [OBSOLETE]       same_eps = true;
+//DX20210302 [OBSOLETE]     }
+//DX20210302 [OBSOLETE]     else {
+//DX20210302 [OBSOLETE]       str_sp.sym_eps = str_superlattice_sp.sym_eps;
+//DX20210302 [OBSOLETE]       str_sp.sym_eps_change_count = str_superlattice_sp.sym_eps_change_count; //DX20180222 - added sym_eps change count
+//DX20210302 [OBSOLETE]     }
+//DX20210302 [OBSOLETE]     //DX END
+//DX20210302 [OBSOLETE]     if(VERBOSE) cerr << "xstructure::GetLatticeType: [12]" << endl;
+//DX20210302 [OBSOLETE]     this->bravais_superlattice_lattice=str_superlattice_sp.lattice; //DX20210209
+//DX20210302 [OBSOLETE]     this->bravais_superlattice_type=str_superlattice_sp.bravais_lattice_type;
+//DX20210302 [OBSOLETE]     this->bravais_superlattice_variation_type=str_superlattice_sp.bravais_lattice_variation_type;
+//DX20210302 [OBSOLETE]     this->bravais_superlattice_system=str_superlattice_sp.bravais_lattice_system;
+//DX20210302 [OBSOLETE]     this->pearson_symbol_superlattice=str_superlattice_sp.pearson_symbol;
+//DX20210302 [OBSOLETE]     if(count==100){
+//DX20210302 [OBSOLETE]       cerr << "ERROR in Bravais_Lattice_StructureDefault(): Unable to find reliable sym_eps." << endl;
+//DX20210302 [OBSOLETE]       break;
+//DX20210302 [OBSOLETE]     }
+//DX20210302 [OBSOLETE]   } //DX while loop
+//DX20210302 [OBSOLETE] }
+
+// ***************************************************************************
+// Function GetExtendedCrystallographicData() //DX20210302
+// ***************************************************************************
+// Determine the real, reciprocal, superlattice, and space group symmetries
+// Includes self-consistency loop to ensure descriptions are commensurate
+void xstructure::GetExtendedCrystallographicData(double sym_eps,
+    bool no_scan,
+    int setting) {
+  xstructure str_sp,str_sc;
+  GetExtendedCrystallographicData(str_sp,str_sc,sym_eps,no_scan,setting);
+}
+
+void xstructure::GetExtendedCrystallographicData(xstructure& str_sp,
+    xstructure& str_sc,
+    double sym_eps,
+    bool no_scan,
+    int setting) {
+
+  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  string function_name = XPID + "xstructure::GetExtendedCrystallographicData():";
+
+  // ---------------------------------------------------------------------------
+  // set symmetry tolerance based on the following sequence
+  // 1) use input, 2) use sym_eps in xstructure, 3) calculate default
+  double tolerance = sym_eps;
+  if(tolerance==AUROSTD_MAX_DOUBLE){
+    if((*this).sym_eps_calculated){ tolerance = (*this).sym_eps; }
+    else{ tolerance=SYM::defaultTolerance((*this)); }
+  }
+  if(LDEBUG){ cerr << function_name << " [1] Set symmetry tolerance (starting sym_eps=" << tolerance << ")" << endl; }
+
+  // keep track of self-consistent tolerance
+  bool force_perform = true;
+  bool same_eps = false;
+  uint count = 0;
+  uint count_max = 100; // safety for while loop, don't calculate forever
+
+  // update tolerance info in *this
+  (*this).sym_eps=tolerance;
+  (*this).sym_eps_calculated=true;
+
+  // ---------------------------------------------------------------------------
+  // loop over the real, reciprocal, and superlattice analysis until all
+  // symmetries are commensurate with a common tolerance value
+  while(!same_eps && count++ < count_max){
+
+    // ---------------------------------------------------------------------------
+    // clear to start
+    (*this).ClearSymmetry();
+
+    // ---------------------------------------------------------------------------
+    // update the tolerance, it may have change during loop
+    tolerance = (*this).sym_eps;
+    no_scan = (*this).sym_eps_no_scan;
+
+    if(LDEBUG){ cerr << function_name << " [2] Top of self-consistent extended crystallographic data loop (calculating lattice type and space group data) (sym_eps=" << tolerance << ", sym_eps_change_count=" << (*this).sym_eps_change_count << ")" << endl; }
+
+    // ---------------------------------------------------------------------------
+    // check if consistency checks failed (maxed while loop iteration)
+    // turn off scan
+    if(count==count_max){
+      no_scan=(*this).sym_eps_no_scan=true;
+      tolerance = sym_eps; // set to original eps
+      cerr << function_name << " Unable to calculate consistent symmetry. Calculating at original tolerance (sym_eps=" << sym_eps << ") and ignoring consistency checks." << endl;
     }
-    else {
-      str_sp.sym_eps = str_superlattice_sp.sym_eps;
-      str_sp.sym_eps_change_count = str_superlattice_sp.sym_eps_change_count; //DX20180222 - added sym_eps change count
-      str_sp.sym_eps_no_scan = str_superlattice_sp.sym_eps_no_scan; //DX20210331
+
+    // ---------------------------------------------------------------------------
+    // REAL, RECIPROCAL, and SUPERLATTICE data
+    if(LDEBUG){ cerr << function_name << " [3] Calculate real, reciprocal, and superlattice information (sym_eps=" << tolerance << ", sym_eps_change_count=" << (*this).sym_eps_change_count << ")" << endl; }
+    (*this).GetLatticeType(str_sp, str_sc, (*this).sym_eps);
+    tolerance = (*this).sym_eps; // update the tolerance
+
+    // ---------------------------------------------------------------------------
+    // space group data
+    if(LDEBUG){ cerr << function_name << " [4] Calculate the space group symmetry information (sym_eps=" << tolerance << ", sym_eps_change_count=" << (*this).sym_eps_change_count << ")" << endl; }
+    (*this).SpaceGroup_ITC(tolerance, -1, setting, no_scan);
+    if(!no_scan && (*this).sym_eps != tolerance){ continue; } // if tolerance changed, recalc
+
+    // ---------------------------------------------------------------------------
+    // check GetLatticeType vs SpaceGroup_ITC results
+    if(!(*this).sym_eps_no_scan) {
+      int multiplicity_of_primitive=str_sp.fgroup.size()/str_sp.pgroup_xtal.size();
+      bool derivative_structure=false;
+      string lattice_and_centering = LATTICE::Lattice2TypeAndCentering((*this).bravais_lattice_type); //DX20210412 - check centering
+      string lattice_and_centering_from_sg = SYM::spacegroup2latticeAndCentering((*this).space_group_ITC); //DX20210412 - check centering
+      if(!(lattice_and_centering == lattice_and_centering_from_sg && SYM::ComparePointGroupAndSpaceGroupString((*this),multiplicity_of_primitive,derivative_structure))){
+        if(LDEBUG) {
+          cerr << function_name << " WARNING: Space group symbol and point group symbol do not match. (sg=" << GetSpaceGroupName((*this).space_group_ITC,(*this).directory) << ", centering_sg=" << lattice_and_centering_from_sg << " | pg=" << (*this).point_group_Hermann_Mauguin << ", centering=" << lattice_and_centering << ") [dir=" << (*this).directory << "]" << endl;
+        }
+        if(!SYM::change_tolerance((*this),(*this).sym_eps,(*this).dist_nn_min,(*this).sym_eps_no_scan)){
+          if(force_perform){
+            if(LDEBUG) {
+              cerr << function_name << " WARNING: Scan failed. Reverting back to original tolerance and recalculating as is (with aforementioned inconsistencies)." << (*this).directory << endl;
+            }
+            no_scan = (*this).sym_eps_no_scan = true; //DX20210331
+            (*this).sym_eps = sym_eps; //set to original tolerance
+          }
+        }
+        continue;
+      }
     }
-    //DX END
-    if(VERBOSE) cerr << "xstructure::GetLatticeType: [12]" << endl;
-    this->bravais_superlattice_type=str_superlattice_sp.bravais_lattice_type;
-    this->bravais_superlattice_variation_type=str_superlattice_sp.bravais_lattice_variation_type;
-    this->bravais_superlattice_system=str_superlattice_sp.bravais_lattice_system;
-    this->pearson_symbol_superlattice=str_superlattice_sp.pearson_symbol;
-    if(count==100){
-      cerr << "ERROR in Bravais_Lattice_StructureDefault(): Unable to find reliable sym_eps." << endl;
-      break;
-    }
-  } //DX while loop
+
+    // made it to the end with same sym_eps
+    same_eps = true;
+  }
+
+  if(LDEBUG){ cerr << function_name << " [5] Extended crystallographic data calculation finished! (sym_eps=" << tolerance << ", sym_eps_change_count=" << count << ")" << endl; }
+
+}
+
+// ***************************************************************************
+// Function GetRealLatticeType //DX20210209
+// ***************************************************************************
+// Determine the real space symmetry information
+// Includes self-consistency loop to ensure descriptions are commensurate
+void xstructure::GetRealLatticeType(double sym_eps) {
+  xstructure str_sp,str_sc;
+  GetRealLatticeType(str_sp,str_sc,sym_eps);
+}
+
+void xstructure::GetRealLatticeType(xstructure& str_sp,xstructure& str_sc, double sym_eps) {
+
+  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  string function_name = XPID + "xstructure::GetRealLatticeType():";
+
+  // ---------------------------------------------------------------------------
+  // set symmetry tolerance based on the following sequence
+  // 1) use input, 2) use sym_eps in xstructure, 3) calculate default
+  double tolerance = sym_eps;
+  if(tolerance==AUROSTD_MAX_DOUBLE){
+    if((*this).sym_eps_calculated){ tolerance = (*this).sym_eps; }
+    else{ tolerance=SYM::defaultTolerance((*this)); }
+  }
+  if(LDEBUG){ cerr << function_name << " [1] Set symmetry tolerance (starting sym_eps=" << tolerance << ")" << endl; }
+
+  // need to create a copy
+  xstructure str_in=*this;
+
+  // update tolerance info for all xstructures
+  str_in.sym_eps=str_sp.sym_eps=str_sc.sym_eps=tolerance;
+  str_in.sym_eps_calculated=str_sp.sym_eps_calculated=str_sc.sym_eps_calculated=(*this).sym_eps_calculated;
+  str_in.sym_eps_change_count=str_sp.sym_eps_change_count=str_sc.sym_eps_change_count=(*this).sym_eps_change_count;
+  str_in.sym_eps_no_scan=str_sp.sym_eps_no_scan=str_sc.sym_eps_no_scan=(*this).sym_eps_no_scan; //DX20210430
+
+  // calculate
+  if(LDEBUG){ cerr << function_name << " [2]" << endl; }
+  LATTICE::Bravais_Lattice_StructureDefault(str_in,str_sp,str_sc); // STD tolerance  // ONLY BRAVAIS_CRYSTAL
+
+  // set properties
+  if(LDEBUG){ cerr << function_name << " [3]" << endl; }
+  if(str_sp.pgroup_calculated==FALSE) str_sp.CalculateSymmetryPointGroup(FALSE);// cerr << "POINT GROUP" << endl;
+  if(str_sp.fgroup_calculated==FALSE) str_sp.CalculateSymmetryFactorGroup(FALSE); //cerr << "FACTOR GROUP" << endl;
+  if(str_sp.pgroup_xtal_calculated==FALSE) str_sp.CalculateSymmetryPointGroupCrystal(FALSE); //cerr << "POINT GROUP XTAL" << endl;
+  //  *this=str_sp; // more obvious but will mess up the structures.... we only want to take the properties
+  this->bravais_lattice_type=str_sp.bravais_lattice_type;
+  this->bravais_lattice_variation_type=str_sp.bravais_lattice_variation_type;
+  this->bravais_lattice_system=str_sp.bravais_lattice_system;
+  this->bravais_lattice_lattice_type=str_sp.bravais_lattice_lattice_type;
+  this->bravais_lattice_lattice_variation_type=str_sp.bravais_lattice_lattice_variation_type;
+  this->bravais_lattice_lattice_system=str_sp.bravais_lattice_lattice_system;
+  this->volume_changed_original2new=str_sp.volume_changed_original2new; //DX20181024
+  this->transform_coordinates_original2new=str_sp.transform_coordinates_original2new; //DX20181024
+  this->transform_coordinates_new2original=str_sp.transform_coordinates_new2original; //DX20181024
+  this->rotate_lattice_original2new=str_sp.rotate_lattice_original2new; //DX20181024
+  this->rotate_lattice_new2original=str_sp.rotate_lattice_new2original; //DX20181024
+  this->pearson_symbol=str_sp.pearson_symbol;
+  this->crystal_family=str_sp.crystal_family;
+  this->crystal_system=str_sp.crystal_system;
+  this->point_group_crystal_class=str_sp.point_group_crystal_class;
+  this->point_group_Shoenflies=str_sp.point_group_Shoenflies;
+  this->point_group_Hermann_Mauguin=str_sp.point_group_Hermann_Mauguin;
+  this->point_group_orbifold=str_sp.point_group_orbifold;
+  this->point_group_type=str_sp.point_group_type;
+  this->point_group_order=str_sp.point_group_order;
+  this->point_group_structure=str_sp.point_group_structure;
+  if(LDEBUG){ cerr << function_name << " [4] DONE" << endl; }
+
+  // update sym_eps
+  this->sym_eps=str_in.sym_eps=str_sc.sym_eps=str_sp.sym_eps; //DX
+  this->sym_eps_calculated=str_in.sym_eps_calculated=str_sc.sym_eps_calculated=str_sp.sym_eps_calculated; //DX
+  this->sym_eps_change_count=str_in.sym_eps_change_count=str_sc.sym_eps_change_count=str_sp.sym_eps_change_count; //DX20180222 - added sym_eps change count
+  this->sym_eps_no_scan=str_in.sym_eps_no_scan=str_sc.sym_eps_no_scan=str_sp.sym_eps_no_scan; //DX20210430 - added no_scan
+
+}
+
+// ***************************************************************************
+// Function GetReciprocalLatticeType //DX20210209
+// ***************************************************************************
+// Determine the reciprocal space symmetry information
+// Includes self-consistency loop to ensure descriptions are commensurate
+void xstructure::GetReciprocalLatticeType(double sym_eps) {
+  xstructure str_sp,str_sc;
+  GetReciprocalLatticeType(str_sp,str_sc,sym_eps);
+}
+
+void xstructure::GetReciprocalLatticeType(xstructure& str_sp,xstructure& str_sc, double sym_eps) {
+
+  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  string function_name = XPID + "xstructure::GetReciprocalLatticeType():";
+
+  // ---------------------------------------------------------------------------
+  // set symmetry tolerance based on the following sequence
+  // 1) use input, 2) use sym_eps in xstructure, 3) calculate default
+  double tolerance = sym_eps;
+  if(tolerance==AUROSTD_MAX_DOUBLE){
+    if((*this).sym_eps_calculated){ tolerance = (*this).sym_eps; }
+    else{ tolerance=SYM::defaultTolerance((*this)); }
+  }
+  if(LDEBUG){ cerr << function_name << " [1] Set symmetry tolerance (starting sym_eps=" << tolerance << ")" << endl; }
+
+  // ---------------------------------------------------------------------------
+  // RECIPROCAL - use klattice an one atom (at the origin)
+  xstructure str_in;
+  str_in.lattice=this->klattice;str_in.FixLattices();
+  _atom atom;str_in.AddAtom(atom);
+
+  // update tolerance info for all xstructures
+  str_in.sym_eps=str_sp.sym_eps=str_sc.sym_eps=tolerance;
+  str_in.sym_eps_calculated=str_sp.sym_eps_calculated=str_sc.sym_eps_calculated=(*this).sym_eps_calculated;
+  str_in.sym_eps_change_count=str_sp.sym_eps_change_count=str_sc.sym_eps_change_count=(*this).sym_eps_change_count;
+  str_in.sym_eps_no_scan=str_sp.sym_eps_no_scan=str_sc.sym_eps_no_scan=(*this).sym_eps_no_scan; //DX20210430 - added no_scan
+
+  if(LDEBUG){ cerr << function_name << " [1]" << endl; }
+  //DX20170814 START - Use real pgroup to calculate pgroupk and then set pgroupk from str_sp to the pgroup and pgroup_xtal of str_reciprocal_in
+  //DX20170814 The pgroup and pgroup_xtal are the same for the str_reciprocal structure because there is only one atom at the origin
+  //DX20170814 (i.e. lattice and crystal symmetry are the same for the reciprocal space crystal)
+  //DX20170829 [OBSOLETE] -since performing full symmetry analysis by default - str_sp.CalculateSymmetryPointGroupKLattice(FALSE);
+  //DX20180426 - possible that lattice exhibits lower symmetry than crystal (i.e., from str_sp); would need to pass lattice symmetry from Standard_Lattice, but that information is not stored out of scope, commenting out 5 lines below
+  //DX20180426 [OBSOLETE] - possible that lattice exhibits lower symmetry than crystal (i.e., from str_sp) - str_reciprocal_in.pgroup=str_reciprocal_sp.pgroup=str_reciprocal_sc.pgroup=str_sp.pgroupk;
+  //DX20180426 [OBSOLETE] - possible that lattice exhibits lower symmetry than crystal (i.e., from str_sp) - str_reciprocal_in.pgroup_calculated=str_reciprocal_sp.pgroup_calculated=str_reciprocal_sc.pgroup_calculated=str_sp.pgroupk_calculated;
+  //DX20180426 [OBSOLETE] - possible that lattice exhibits lower symmetry than crystal (i.e., from str_sp) - str_reciprocal_in.pgroup_xtal=str_reciprocal_sp.pgroup_xtal=str_reciprocal_sc.pgroup_xtal=str_sp.pgroupk;
+  //DX20180426 [OBSOLETE] - possible that lattice exhibits lower symmetry than crystal (i.e., from str_sp) - str_reciprocal_in.pgroup_xtal_calculated=str_reciprocal_sp.pgroup_xtal_calculated=str_reciprocal_sc.pgroup_xtal_calculated=str_sp.pgroup_calculated;
+  //DX20180426 [OBSOLETE] - possible that lattice exhibits lower symmetry than crystal (i.e., from str_sp) - str_reciprocal_in.pgroup_xtal_calculated=str_reciprocal_sp.pgroup_xtal_calculated=str_reciprocal_sc.pgroup_xtal_calculated=str_sp.pgroup_calculated;
+  //DX20170814 END
+  LATTICE::Standard_Lattice_StructureDefault(str_in,str_sp,str_sc,false); //DX //DX20180226 - do not need to do full sym for recip
+
+  this->reciprocal_lattice_type=str_sp.bravais_lattice_type;
+  this->reciprocal_lattice_variation_type=str_sp.bravais_lattice_variation_type;
+  if(LDEBUG){ cerr << function_name << " [2]" << endl; }
+
+  // update sym_eps
+  this->sym_eps=str_in.sym_eps=str_sc.sym_eps=str_sp.sym_eps; //DX
+  this->sym_eps_calculated=str_in.sym_eps_calculated=str_sc.sym_eps_calculated=str_sp.sym_eps_calculated; //DX
+  this->sym_eps_change_count=str_in.sym_eps_change_count=str_sc.sym_eps_change_count=str_sp.sym_eps_change_count; //DX20180222 - added sym_eps change count
+  this->sym_eps_no_scan=str_in.sym_eps_no_scan=str_sc.sym_eps_no_scan=str_sp.sym_eps_no_scan; //DX20210430 - added no_scan
+}
+
+// ***************************************************************************
+// Function GetSuperlatticeType() //DX20210302
+// ***************************************************************************
+// Determine the superlattice symmetry information
+// Includes self-consistency loop to ensure descriptions are commensurate
+void xstructure::GetSuperlatticeType(double sym_eps) {
+  xstructure str_sp,str_sc;
+  GetSuperlatticeType(str_sp,str_sc,sym_eps);
+}
+
+void xstructure::GetSuperlatticeType(xstructure& str_sp,xstructure& str_sc, double sym_eps) {
+
+  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  string function_name = XPID + "xstructure::GetSuperlatticeType():";
+
+  // ---------------------------------------------------------------------------
+  // set symmetry tolerance based on the following sequence
+  // 1) use input, 2) use sym_eps in xstructure, 3) calculate default
+  double tolerance = sym_eps;
+  if(tolerance==AUROSTD_MAX_DOUBLE){
+    if((*this).sym_eps_calculated){ tolerance = (*this).sym_eps; }
+    else{ tolerance=SYM::defaultTolerance((*this)); }
+  }
+  if(LDEBUG){ cerr << function_name << " [1] Set symmetry tolerance (starting sym_eps=" << tolerance << ")" << endl; }
+
+  // ---------------------------------------------------------------------------
+  // SUPERLATTICE - decorate with single atom type
+  xstructure str_in=*this;
+  str_in.ClearSymmetry();  // need to clear symmetry; otherwise, nothing is calculated
+  if(LDEBUG){
+    cerr << function_name << " [1]" << endl;
+    cerr << str_in << endl;
+  }
+  // decorate with single atom type
+  str_in.IdenticalAtoms();  // make superlattice
+  if(LDEBUG){
+    cerr << function_name << " [2]" << endl;
+    cerr << str_in << endl;
+  }
+  // primitivize
+  str_in.GetPrimitive(); //DX20210430 - remove obsolete eps=0.005
+  if(LDEBUG){
+    cerr << function_name << " [3]" << endl;
+    cerr << str_in << endl;
+  }
+  // Minkowski
+  str_in.Minkowski_calculated=FALSE;
+  str_in.MinkowskiBasisReduction();
+  if(LDEBUG){
+    cerr << function_name << " [4]" << endl;
+    cerr << str_in << endl;
+  }
+
+  // update tolerance info for all xstructures
+  str_in.sym_eps=str_sp.sym_eps=str_sc.sym_eps=tolerance;
+  str_in.sym_eps_calculated=str_sp.sym_eps_calculated=str_sc.sym_eps_calculated=(*this).sym_eps_calculated;
+  str_in.sym_eps_change_count=str_sp.sym_eps_change_count=str_sc.sym_eps_change_count=(*this).sym_eps_change_count;
+  str_in.sym_eps_no_scan=str_sp.sym_eps_no_scan=str_sc.sym_eps_no_scan=(*this).sym_eps_no_scan; //DX20210430 - added no_scan
+
+  // main lattice function
+  LATTICE::Standard_Lattice_StructureDefault(str_in,str_sp,str_sc,false); //DX //DX20180226 - do not need to do full sym for superlattice
+  str_sp.ReScale(1.0); //DX20210211 - need to rescale to 1 since we aren't propagating the superlattice scaling factor
+  this->bravais_superlattice_lattice=str_sp.lattice;
+  this->bravais_superlattice_type=str_sp.bravais_lattice_type;
+  this->bravais_superlattice_variation_type=str_sp.bravais_lattice_variation_type;
+  this->bravais_superlattice_system=str_sp.bravais_lattice_system;
+  this->pearson_symbol_superlattice=str_sp.pearson_symbol;
+
+  if(LDEBUG){ cerr << function_name << " [6] DONE" << endl; }
+
+  // update sym_eps
+  this->sym_eps=str_in.sym_eps=str_sc.sym_eps=str_sp.sym_eps; //DX
+  this->sym_eps_calculated=str_in.sym_eps_calculated=str_sc.sym_eps_calculated=str_sp.sym_eps_calculated; //DX
+  this->sym_eps_change_count=str_in.sym_eps_change_count=str_sc.sym_eps_change_count=str_sp.sym_eps_change_count; //DX20180222 - added sym_eps change count
+  this->sym_eps_no_scan=str_in.sym_eps_no_scan=str_sc.sym_eps_no_scan=str_sp.sym_eps_no_scan; //DX20210430 - added no_scan
 }
 
 string GetLatticeType(xmatrix<double> lattice) {
@@ -15043,18 +15435,22 @@ void xstructure::ClearSymmetry(void) {
   // PGROUP ----------------------------
   pgroup.clear();            // just initialize
   pgroup_calculated=FALSE;
+  bravais_lattice_lattice_type="";bravais_lattice_lattice_variation_type="";bravais_lattice_lattice_system=""; //DX20210430 - missing
   // PGROUP_XTAL ----------------------------
   pgroup_xtal.clear();        // just initialize
   pgroup_xtal_calculated=FALSE;
   crystal_family="";crystal_system="";point_group_crystal_class="";
   point_group_Shoenflies="";point_group_Hermann_Mauguin="";point_group_orbifold="";
   point_group_type="";point_group_order="";point_group_structure="";
+  pearson_symbol=""; //DX20210430 - missing
+  bravais_lattice_type="";bravais_lattice_variation_type="";bravais_lattice_system=""; //DX20210430 - missing
   // PGROUPK_PATTERSON ---------------------------- //DX20200129
   pgroupk_Patterson.clear();        // just initialize
   pgroupk_Patterson_calculated=FALSE;
   // PGROUPK ----------------------------
   pgroupk.clear();            // just initialize
   pgroupk_calculated=FALSE;
+  reciprocal_lattice_type="";reciprocal_lattice_variation_type=""; //DX20210430 - missing
   // PGROUPK_XTAL ----------------------------
   pgroupk_xtal.clear();            // just initialize //DX20171205 - Added pgroupk_xtal
   pgroupk_xtal_calculated=FALSE;                      //DX20171205 - Added pgroupk_xtal
@@ -15077,6 +15473,10 @@ void xstructure::ClearSymmetry(void) {
     iatoms.at(i).clear();
   iatoms.clear();
   for(uint i=0;i<atoms.size();i++){atoms[i].ClearSymmetry();} //CO20190219
+  // SUPERLATTICE //DX20210430 - missing
+  bravais_superlattice_lattice.clear();
+  bravais_superlattice_type="";bravais_superlattice_variation_type="";
+  bravais_superlattice_system="";pearson_symbol_superlattice="";
 
   if(LDEBUG){ cerr << XPID << "xstructure::ClearSymmetry(): All symmetry attributes have been cleared." << endl; } //DX20210406
 
@@ -17760,7 +18160,6 @@ bool PAULING_WyckoffDetector(vector<string> &vinput) {
 string xstructure2json(xstructure& xstr) {
   string eendl="";
   bool roff=true; //round off
-  bool PRINT_NULL=FALSE;
   stringstream sss;
   stringstream sscontent_json;
   vector<string> vcontent_json;
@@ -17769,7 +18168,7 @@ string xstructure2json(xstructure& xstr) {
   if(xstr.title.size()){
     sscontent_json << "\"title\":\"" << xstr.title << "\"" << eendl;
   } else {
-    if(PRINT_NULL){ sscontent_json << "\"title\":null" << eendl;}
+    if(PRINT_NULL_JSON){ sscontent_json << "\"title\":null" << eendl;}
   }
   vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
@@ -17777,7 +18176,7 @@ string xstructure2json(xstructure& xstr) {
   if(xstr.scale){
     sscontent_json << "\"scale\":" << xstr.scale << "" << eendl; //DX20180306 - number not string (removed quotations)
   } else {
-    if(PRINT_NULL){ sscontent_json << "\"scale\":null" << eendl;}
+    if(PRINT_NULL_JSON){ sscontent_json << "\"scale\":null" << eendl;}
   }
   vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
@@ -17785,7 +18184,7 @@ string xstructure2json(xstructure& xstr) {
   if(xstr.lattice.rows){
     sscontent_json << "\"lattice\":[" << aurostd::xmatDouble2String(xstr.lattice,_DOUBLE_WRITE_PRECISION_MAX_,roff) << "]" << eendl; //CO20180515
   } else {
-    if(PRINT_NULL){ sscontent_json << "\"lattice\":null" << eendl;}
+    if(PRINT_NULL_JSON){ sscontent_json << "\"lattice\":null" << eendl;}
   }
   vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
@@ -17795,7 +18194,7 @@ string xstructure2json(xstructure& xstr) {
     for(uint i=0;i<xstr.species.size(); i++) { cleaned_species.push_back(KBIN::VASP_PseudoPotential_CleanName(xstr.species[i])); } //DX20190612 - cleaned species names
     sscontent_json << "\"species\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(cleaned_species,"\""),",") << "]" << eendl; //DX20190612 - cleaned species names
   } else {
-    if(PRINT_NULL){ sscontent_json << "\"species\":null" << eendl;}
+    if(PRINT_NULL_JSON){ sscontent_json << "\"species\":null" << eendl;}
   }
   vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
@@ -17803,7 +18202,7 @@ string xstructure2json(xstructure& xstr) {
   if(xstr.num_each_type.size()){
     sscontent_json << "\"number_each_type\":[" << aurostd::joinWDelimiter(xstr.num_each_type,",") << "]" << eendl;
   } else {
-    if(PRINT_NULL){ sscontent_json << "\"number_each_type\":null" << eendl;}
+    if(PRINT_NULL_JSON){ sscontent_json << "\"number_each_type\":null" << eendl;}
   }
   vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
@@ -17840,7 +18239,6 @@ string xstructure2json(xstructure& xstr) {
 string atom2json(_atom& atom, int coord_flag, int poccupation) {
   string eendl="";
   bool roff=true; //round off
-  bool PRINT_NULL=FALSE;
   stringstream sss;
   stringstream sscontent_json;
   vector<string> vcontent_json;
@@ -17849,7 +18247,7 @@ string atom2json(_atom& atom, int coord_flag, int poccupation) {
   if(atom.name.size()){
     sscontent_json << "\"name\":\"" << KBIN::VASP_PseudoPotential_CleanName(atom.name) << "\"" << eendl; //DX20190612 - added function to clean names
   } else {
-    if(PRINT_NULL){ sscontent_json << "\"name\":null" << eendl;}
+    if(PRINT_NULL_JSON){ sscontent_json << "\"name\":null" << eendl;}
   }
   vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
@@ -17859,7 +18257,7 @@ string atom2json(_atom& atom, int coord_flag, int poccupation) {
   } else if(coord_flag==_COORDS_CARTESIAN_){
     sscontent_json << "\"position\":[" << aurostd::joinWDelimiter(xvecDouble2vecString(atom.cpos,_DOUBLE_WRITE_PRECISION_MAX_,roff),",") << "]" << eendl; //CO20180515
   } else {
-    if(PRINT_NULL){ sscontent_json << "\"position\":null" << eendl;}
+    if(PRINT_NULL_JSON){ sscontent_json << "\"position\":null" << eendl;}
   }
   vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
@@ -17869,7 +18267,7 @@ string atom2json(_atom& atom, int coord_flag, int poccupation) {
   } else if(poccupation==FALSE){
     sscontent_json << "\"occupancy\":1.0"<< eendl;
   } else {
-    if(PRINT_NULL){ sscontent_json << "\"occupancy\":null" << eendl;}
+    if(PRINT_NULL_JSON){ sscontent_json << "\"occupancy\":null" << eendl;}
   }
   vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 

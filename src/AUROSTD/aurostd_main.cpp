@@ -3623,7 +3623,7 @@ namespace aurostd {
     while(!istreamIN.eof()) {
       char tmp[_CIN_LINE_BUFFER_LENGTH_];
       istreamIN.getline(tmp,_CIN_LINE_BUFFER_LENGTH_-1);
-      vstringout+=string(tmp)+"/n";
+      vstringout+=string(tmp)+"\n";  // ME20210206 - fixed line break
     }
     // istreamIN.clear(); // istreamIN.seekg(0); // ******* INPUT FILE goes at the beginning
     return vstringout.length();  // return FALSE if something got messed up
@@ -3636,7 +3636,7 @@ namespace aurostd {
     while(!ifstreamIN.eof()) {
       char tmp[_CIN_LINE_BUFFER_LENGTH_];
       ifstreamIN.getline(tmp,_CIN_LINE_BUFFER_LENGTH_-1);
-      vstringout+=string(tmp)+"/n";
+      vstringout+=string(tmp)+"\n";  // ME20210206 - fixed line break
     }
     // ifstreamIN.clear(); // ifstreamIN.seekg(0); // ******* INPUT FILE goes at the beginning
     return vstringout.length();  // return FALSE if something got messed up
@@ -3648,7 +3648,7 @@ namespace aurostd {
     while(!stringstreamIN.eof()) {
       char tmp[_CIN_LINE_BUFFER_LENGTH_];
       stringstreamIN.getline(tmp,_CIN_LINE_BUFFER_LENGTH_-1);
-      vstringout+=string(tmp)+"/n";
+      vstringout+=string(tmp)+"\n";  // ME20210206 - fixed line break
     }
     // stringstreamIN.clear();stringstreamIN.seekg(0); // ******* INPUT FILE goes at the beginning
     return vstringout.length();  // return FALSE if something got messed up

@@ -972,6 +972,12 @@ namespace init {
     XHOST.vflag_pflow.clear(); 
     XHOST.vflag_apennsy.clear(); 
     XHOST.vflag_outreach.clear(); 
+
+    // ME20210206 - Load --web_mode before parsing arguments
+    // LOADING ANRL WEB
+    XHOST.vflag_control.flag("WWW",aurostd::args2flag(argv,cmds,"--www|--web|--web_mode|--php|--html|-www|-web|-web_mode|-php|-html"));  //CO20200404
+    if(XHOST.user=="www-data"){XHOST.vflag_control.flag("WWW",true);} //CO20201215
+
     if(INIT_VERBOSE) oss << "--- LOADING @ aconvasp options --- " << endl;
     PflowARGs(XHOST.argv,cmds,XHOST.vflag_pflow);
     if(INIT_VERBOSE) oss << "--- LOADING @ apennsy options --- " << endl;
@@ -1003,10 +1009,6 @@ namespace init {
     //    if(LDEBUG) cout << "OUTREACH OPTIONS: vxscheme.size()=" << XHOST.vflag_control.vxscheme.size() << endl;  OBSOLETE ME20181102
     if(LDEBUG) cout << "OUTREACH OPTIONS: vxsghost.size()=" << XHOST.vflag_control.vxsghost.size() << endl;
     if(LDEBUG) cout << "OUTREACH OPTIONS: argv.size()=" << argv.size() << endl;
-
-    // LOADING ANRL WEB
-    XHOST.vflag_control.flag("WWW",aurostd::args2flag(argv,cmds,"--www|--web|--web_mode|--php|--html|-www|-web|-web_mode|-php|-html"));  //CO20200404
-    if(XHOST.user=="www-data"){XHOST.vflag_control.flag("WWW",true);} //CO20201215
 
     //FANCY_PRINT
     XHOST.vflag_control.flag("NO_FANCY_PRINT",aurostd::args2flag(argv,cmds,"--no_fancy_print|--nofancyprint"));  //CO20200404
