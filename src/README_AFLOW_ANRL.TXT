@@ -28,8 +28,7 @@ found in aflow_anrl.cpp. The prototypes are generally listed in the order they a
 paper (low space group number to high space group number).
 
 Note: This implementation of the geometric prototypes allows for the creation of different
-structure prototypes depending on the parameters chosen. Therefore, these prototypes are quite
-general and powerful.
+structure prototypes depending on the parameters chosen. Therefore, these prototypes are quite general.
 
 ----------------------------------------------------------------------
 [New feature as of V3.2.5]
@@ -137,8 +136,7 @@ A description of each input is described below:
                                                 e.g., VASP, FHI-AIMS, Quantum Espresso, ABINIT, ELK, and WYCKAR.
                                                 The POSCAR (VASP) format is the default.
 	
-  [--add_equations|--equations_only]:     The symbolic math representations (i.e., equations) of the prototype
-				                                  can also be printed.
+  [--add_equations|--equations_only]:     The symbolic math representations (i.e., equations) of the prototype can also be printed.
 
                                             - [--add_equations]  : appends the symbolic math representation to the output
 

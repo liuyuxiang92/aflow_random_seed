@@ -5675,7 +5675,7 @@ namespace SYM {
                   nonzeros.push_back(tmp(ii) / N1(ii));
                 }
               }
-              if(aurostd::identical_entries(nonzeros) && check + nonzeros.size() == 3) { //DX20210422 - SYM::allsame() -> aurostd::identical_entries()
+              if(aurostd::identical_entries(nonzeros,_ZERO_TOL_) && check + nonzeros.size() == 3) { //DX20210422 - SYM::allsame() -> aurostd::identical_entries()
                 same = true;
                 return same;
               } else {

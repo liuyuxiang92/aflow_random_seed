@@ -663,11 +663,11 @@ ostream& operator<<(ostream& oss, const StructurePrototype& StructurePrototype){
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
       // aflow_parameter_list
-      sscontent_json << "\"aflow_prototype_parameter_list\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(StructurePrototype.aflow_parameter_list,"\""),",") << "]" << eendl;
+      sscontent_json << "\"aflow_prototype_params_list\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(StructurePrototype.aflow_parameter_list,"\""),",") << "]" << eendl;
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
       // aflow_parameter_values
-      sscontent_json << "\"aflow_prototype_parameter_values\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(StructurePrototype.aflow_parameter_values,8,roff),",") << "]" << eendl;
+      sscontent_json << "\"aflow_prototype_params_values\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(StructurePrototype.aflow_parameter_values,8,roff),",") << "]" << eendl;
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
     }
 

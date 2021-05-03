@@ -668,40 +668,22 @@ namespace aurostd {
   // ***************************************************************************
   // Function all identical_entries vector //DX20210422
   // ***************************************************************************
-  template<class utype> bool identical_entries(const vector<utype> vec, utype eps) {
+  template<class utype> bool identical_entries(const vector<utype>& vec, utype eps) {
     for(uint i=0;i<vec.size();i++){
       if(isdifferent(vec[i],vec[0],eps)){ return false; }
     }
     return true; //includes case when vec is empty
   }
-  // overload to force compiling
-  bool _aurostd_initialize_identical_entries(const vector<bool> vec) { return identical_entries(vec);}
-  char _aurostd_initialize_identical_entries(const vector<char> vec) { return identical_entries(vec);}
-  int _aurostd_initialize_identical_entries(const vector<int> vec) { return identical_entries(vec);}
-  long _aurostd_initialize_identical_entries(const vector<long> vec) { return identical_entries(vec);}
-  uint _aurostd_initialize_identical_entries(const vector<uint> vec) { return identical_entries(vec);}
-  float _aurostd_initialize_identical_entries(const vector<float> vec) { return identical_entries(vec);}
-  double _aurostd_initialize_identical_entries(const vector<double> vec) { return identical_entries(vec);}
-  long double _aurostd_initialize_identical_entries(const vector<long double> vec) { return identical_entries(vec);}
 
   // ***************************************************************************
   // Function all identical_entries deque //DX20210422
   // ***************************************************************************
-  template<class utype> bool identical_entries(const deque<utype> deq, utype eps) {
+  template<class utype> bool identical_entries(const deque<utype>& deq, utype eps) {
     for(uint i=0;i<deq.size();i++){
       if(isdifferent(deq[i],deq[0],eps)){ return false; }
     }
     return true; //includes case when deq is empty
   }
-  // overload to force compiling
-  bool _aurostd_initialize_identical_entries(const deque<bool> deq) { return identical_entries(deq);}
-  char _aurostd_initialize_identical_entries(const deque<char> deq) { return identical_entries(deq);}
-  int _aurostd_initialize_identical_entries(const deque<int> deq) { return identical_entries(deq);}
-  long _aurostd_initialize_identical_entries(const deque<long> deq) { return identical_entries(deq);}
-  uint _aurostd_initialize_identical_entries(const deque<uint> deq) { return identical_entries(deq);}
-  float _aurostd_initialize_identical_entries(const deque<float> deq) { return identical_entries(deq);}
-  double _aurostd_initialize_identical_entries(const deque<double> deq) { return identical_entries(deq);}
-  long double _aurostd_initialize_identical_entries(const deque<long double> deq) { return identical_entries(deq);}
 
   // ***************************************************************************
   // Function toupper/tolower

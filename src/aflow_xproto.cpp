@@ -1317,46 +1317,46 @@ namespace aflowlib {
           if(str_tmp.atoms.at(iat).type==2)
             str.AddAtom(str_tmp.atoms.at(iat));
 
-      if(nspecies==1) {
-        str.num_each_type.clear();str.num_each_type.push_back(str_tmp.num_each_type.at(0));
-        str.comp_each_type.clear();str.comp_each_type.push_back(str_tmp.comp_each_type.at(0));
-        str.species.clear();str.species.push_back(str_tmp.species.at(0));
-        str.species_pp.clear();str.species_pp.push_back(str_tmp.species_pp.at(0));
-        str.species_pp_type.clear();str.species_pp_type.push_back("");
-        str.species_pp_version.clear();str.species_pp_version.push_back("");
-        str.species_pp_ZVAL.clear();str.species_pp_ZVAL.push_back(0.0);
-        str.species_pp_vLDAU.clear();str.species_pp_vLDAU.push_back(deque<double>());
-        str.species_volume.clear();str.species_volume.push_back(str_tmp.species_volume.at(0));
-        str.species_mass.clear();str.species_mass.push_back(str_tmp.species_mass.at(0));
-      }
+      //DX20210503 [OBSOLETE - accounted for in AddAtom, keeping this re-swaps and messes things up] if(nspecies==1) {
+      //DX20210503 [OBSOLETE - accounted for in AddAtom, keeping this re-swaps and messes things up]   str.num_each_type.clear();str.num_each_type.push_back(str_tmp.num_each_type.at(0));
+      //DX20210503 [OBSOLETE - accounted for in AddAtom, keeping this re-swaps and messes things up]   str.comp_each_type.clear();str.comp_each_type.push_back(str_tmp.comp_each_type.at(0));
+      //DX20210503 [OBSOLETE - accounted for in AddAtom, keeping this re-swaps and messes things up]   str.species.clear();str.species.push_back(str_tmp.species.at(0));
+      //DX20210503 [OBSOLETE - accounted for in AddAtom, keeping this re-swaps and messes things up]   str.species_pp.clear();str.species_pp.push_back(str_tmp.species_pp.at(0));
+      //DX20210503 [OBSOLETE - accounted for in AddAtom, keeping this re-swaps and messes things up]   str.species_pp_type.clear();str.species_pp_type.push_back("");
+      //DX20210503 [OBSOLETE - accounted for in AddAtom, keeping this re-swaps and messes things up]   str.species_pp_version.clear();str.species_pp_version.push_back("");
+      //DX20210503 [OBSOLETE - accounted for in AddAtom, keeping this re-swaps and messes things up]   str.species_pp_ZVAL.clear();str.species_pp_ZVAL.push_back(0.0);
+      //DX20210503 [OBSOLETE - accounted for in AddAtom, keeping this re-swaps and messes things up]   str.species_pp_vLDAU.clear();str.species_pp_vLDAU.push_back(deque<double>());
+      //DX20210503 [OBSOLETE - accounted for in AddAtom, keeping this re-swaps and messes things up]   str.species_volume.clear();str.species_volume.push_back(str_tmp.species_volume.at(0));
+      //DX20210503 [OBSOLETE - accounted for in AddAtom, keeping this re-swaps and messes things up]   str.species_mass.clear();str.species_mass.push_back(str_tmp.species_mass.at(0));
+      //DX20210503 [OBSOLETE - accounted for in AddAtom, keeping this re-swaps and messes things up] }
 
-      if(nspecies>1) {
-        str.num_each_type.clear();str.num_each_type.push_back(str_tmp.num_each_type.at(1));str.num_each_type.push_back(str_tmp.num_each_type.at(0));
-        str.comp_each_type.clear();str.comp_each_type.push_back(str_tmp.comp_each_type.at(1));str.comp_each_type.push_back(str_tmp.comp_each_type.at(0));
-        str.species.clear();str.species.push_back(str_tmp.species.at(1));str.species.push_back(str_tmp.species.at(0));
-        str.species_pp.clear();str.species_pp.push_back(str_tmp.species_pp.at(1));str.species_pp.push_back(str_tmp.species_pp.at(0));
-        str.species_pp_type.clear();str.species_pp_type.push_back("");str.species_pp_type.push_back("");
-        str.species_pp_version.clear();str.species_pp_version.push_back("");str.species_pp_version.push_back("");
-        str.species_pp_ZVAL.clear();str.species_pp_ZVAL.push_back(0.0);str.species_pp_ZVAL.push_back(0.0);
-        str.species_pp_vLDAU.clear();str.species_pp_vLDAU.push_back(deque<double>());str.species_pp_vLDAU.push_back(deque<double>());
-        str.species_volume.clear();str.species_volume.push_back(str_tmp.species_volume.at(1));str.species_volume.push_back(str_tmp.species_volume.at(0));
-        str.species_mass.clear();str.species_mass.push_back(str_tmp.species_mass.at(1));str.species_mass.push_back(str_tmp.species_mass.at(0));
+      //DX20210503 [OBSOLETE - accounted for in AddAtom, keeping this re-swaps and messes things up] if(nspecies>1) {
+      //DX20210503 [OBSOLETE - accounted for in AddAtom, keeping this re-swaps and messes things up]   str.num_each_type.clear();str.num_each_type.push_back(str_tmp.num_each_type.at(1));str.num_each_type.push_back(str_tmp.num_each_type.at(0));
+      //DX20210503 [OBSOLETE - accounted for in AddAtom, keeping this re-swaps and messes things up]   str.comp_each_type.clear();str.comp_each_type.push_back(str_tmp.comp_each_type.at(1));str.comp_each_type.push_back(str_tmp.comp_each_type.at(0));
+      //DX20210503 [OBSOLETE - accounted for in AddAtom, keeping this re-swaps and messes things up]   str.species.clear();str.species.push_back(str_tmp.species.at(1));str.species.push_back(str_tmp.species.at(0));
+      //DX20210503 [OBSOLETE - accounted for in AddAtom, keeping this re-swaps and messes things up]   str.species_pp.clear();str.species_pp.push_back(str_tmp.species_pp.at(1));str.species_pp.push_back(str_tmp.species_pp.at(0));
+      //DX20210503 [OBSOLETE - accounted for in AddAtom, keeping this re-swaps and messes things up]   str.species_pp_type.clear();str.species_pp_type.push_back("");str.species_pp_type.push_back("");
+      //DX20210503 [OBSOLETE - accounted for in AddAtom, keeping this re-swaps and messes things up]   str.species_pp_version.clear();str.species_pp_version.push_back("");str.species_pp_version.push_back("");
+      //DX20210503 [OBSOLETE - accounted for in AddAtom, keeping this re-swaps and messes things up]   str.species_pp_ZVAL.clear();str.species_pp_ZVAL.push_back(0.0);str.species_pp_ZVAL.push_back(0.0);
+      //DX20210503 [OBSOLETE - accounted for in AddAtom, keeping this re-swaps and messes things up]   str.species_pp_vLDAU.clear();str.species_pp_vLDAU.push_back(deque<double>());str.species_pp_vLDAU.push_back(deque<double>());
+      //DX20210503 [OBSOLETE - accounted for in AddAtom, keeping this re-swaps and messes things up]   str.species_volume.clear();str.species_volume.push_back(str_tmp.species_volume.at(1));str.species_volume.push_back(str_tmp.species_volume.at(0));
+      //DX20210503 [OBSOLETE - accounted for in AddAtom, keeping this re-swaps and messes things up]   str.species_mass.clear();str.species_mass.push_back(str_tmp.species_mass.at(1));str.species_mass.push_back(str_tmp.species_mass.at(0));
 
-        if(nspecies>2) {
-          for(uint isp=2;isp<nspecies;isp++) {
-            str.num_each_type.push_back(str_tmp.num_each_type.at(isp));
-            str.comp_each_type.push_back(str_tmp.comp_each_type.at(isp));
-            str.species.push_back(str_tmp.species.at(isp));
-            str.species_pp.push_back(str_tmp.species_pp.at(isp));
-            str.species_pp_type.push_back("");
-            str.species_pp_version.push_back("");
-            str.species_pp_ZVAL.push_back(0.0);
-            str.species_pp_vLDAU.push_back(deque<double>());
-            str.species_volume.push_back(str_tmp.species_volume.at(isp));
-            str.species_mass.push_back(str_tmp.species_mass.at(isp));
-          }
-        }
-      }
+      //DX20210503 [OBSOLETE - accounted for in AddAtom, keeping this re-swaps and messes things up]   if(nspecies>2) {
+      //DX20210503 [OBSOLETE - accounted for in AddAtom, keeping this re-swaps and messes things up]     for(uint isp=2;isp<nspecies;isp++) {
+      //DX20210503 [OBSOLETE - accounted for in AddAtom, keeping this re-swaps and messes things up]       str.num_each_type.push_back(str_tmp.num_each_type.at(isp));
+      //DX20210503 [OBSOLETE - accounted for in AddAtom, keeping this re-swaps and messes things up]       str.comp_each_type.push_back(str_tmp.comp_each_type.at(isp));
+      //DX20210503 [OBSOLETE - accounted for in AddAtom, keeping this re-swaps and messes things up]       str.species.push_back(str_tmp.species.at(isp));
+      //DX20210503 [OBSOLETE - accounted for in AddAtom, keeping this re-swaps and messes things up]       str.species_pp.push_back(str_tmp.species_pp.at(isp));
+      //DX20210503 [OBSOLETE - accounted for in AddAtom, keeping this re-swaps and messes things up]       str.species_pp_type.push_back("");
+      //DX20210503 [OBSOLETE - accounted for in AddAtom, keeping this re-swaps and messes things up]       str.species_pp_version.push_back("");
+      //DX20210503 [OBSOLETE - accounted for in AddAtom, keeping this re-swaps and messes things up]       str.species_pp_ZVAL.push_back(0.0);
+      //DX20210503 [OBSOLETE - accounted for in AddAtom, keeping this re-swaps and messes things up]       str.species_pp_vLDAU.push_back(deque<double>());
+      //DX20210503 [OBSOLETE - accounted for in AddAtom, keeping this re-swaps and messes things up]       str.species_volume.push_back(str_tmp.species_volume.at(isp));
+      //DX20210503 [OBSOLETE - accounted for in AddAtom, keeping this re-swaps and messes things up]       str.species_mass.push_back(str_tmp.species_mass.at(isp));
+      //DX20210503 [OBSOLETE - accounted for in AddAtom, keeping this re-swaps and messes things up]     }
+      //DX20210503 [OBSOLETE - accounted for in AddAtom, keeping this re-swaps and messes things up]   }
+      //DX20210503 [OBSOLETE - accounted for in AddAtom, keeping this re-swaps and messes things up] }
 
       str.species_pp=str.species;
       // patch for species size to avoid pushing back inside
@@ -1373,6 +1373,8 @@ namespace aflowlib {
           str.species_mass.pop_back();
         }
       }
+      str.GetStoich(); //DX20210503 - fix stoich
+      str.MakeTypes(); //DX20210503 - fix types (otherwise the atom types are un-swapped)
       if(isTET) aflowlib::PrototypeFixTET(*voss,str,optionsTET);
       return str;
     }
