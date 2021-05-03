@@ -2004,10 +2004,10 @@ namespace aflowlib {
         //[CO20190406 - fixing for HASH comment]str.title=label_library+" "+"#"+sgstring+" - "+"("+label+")";  // SG# AS WSETYAWAN wants
         str.title=label_library+" SG="+sgstring+" - "+"("+label+")";  // SG# AS WSETYAWAN wants //CO20190520
         str.title+=" - "+str.prototype+" "+_ICSD_STRING_;                                                // SG# as WSETYAWAN wants
-        str.title=str.title+" (WICKOFF "+sgstring+" "+str.spacegrouplabel+")";
+        str.title=str.title+" (WYCKOFF "+sgstring+" "+str.spacegrouplabel+")";
       }
       if(mode_load==STRUCTURE_MODE_WYC) {
-        str.title=str.title+" (WICKOFF "+sgstring+" "+str.spacegrouplabel+")";
+        str.title=str.title+" (WYCKOFF "+sgstring+" "+str.spacegrouplabel+")";
       }
       if(mode_load==STRUCTURE_MODE_ICSD) {
         for(uint i=0;i<str.atoms.size();i++) {
@@ -2256,10 +2256,12 @@ namespace aflowlib {
       } else {
         //     *voss << "PRIM not CONV" << endl;
         uint natoms=str.atoms.size();
-        str.GetPrimitive(0.005);
+        //DX20210427 [OBSOLETE - use default sym_eps] str.GetPrimitive(0.005);
+        str.GetPrimitive(); //DX20210427 - use default sym_eps
         if(natoms<str.atoms.size()) { fixed=TRUE; }
       }
-      if(!fixed) { str.GetPrimitive(0.05); } // now you are totally screwed..... but you save plenty of ab-initio time. Wisdom of SC.
+      //DX20210427 [OBSOLETE - use loose sym_eps] if(!fixed) { str.GetPrimitive(0.05); } // now you are totally screwed..... but you save plenty of ab-initio time. Wisdom of SC.
+      if(!fixed) { double tol = SYM::defaultTolerance(str)*10.0; str.GetPrimitive(tol); } // now you are totally screwed..... but you save plenty of ab-initio time. Wisdom of SC. //DX20210427 - use loose sym_eps
     }
     // done
     str.BringInCell();
@@ -3811,10 +3813,10 @@ namespace aflowlib {
         //[CO20190406 - fixing for HASH comment]str.title=label_library+" "+"#"+sgstring+" - "+"("+PARAMS->label+")";  // SG# AS WSETYAWAN wants
         str.title=label_library+" SG="+sgstring+" - "+"("+PARAMS->label+")";  // SG# AS WSETYAWAN wants //CO20190520
         str.title+=" - "+str.prototype+" "+_ICSD_STRING_;                                                // SG# as WSETYAWAN wants
-        str.title=str.title+" (WICKOFF "+sgstring+" "+str.spacegrouplabel+")";
+        str.title=str.title+" (WYCKOFF "+sgstring+" "+str.spacegrouplabel+")";
       }
       if(mode_load==STRUCTURE_MODE_WYC) {
-        str.title=str.title+" (WICKOFF "+sgstring+" "+str.spacegrouplabel+")";
+        str.title=str.title+" (WYCKOFF "+sgstring+" "+str.spacegrouplabel+")";
       }
       if(mode_load==STRUCTURE_MODE_ICSD) {
         for(uint i=0;i<str.atoms.size();i++) {
@@ -4054,10 +4056,12 @@ namespace aflowlib {
       } else {
         //     cerr << "PRIM not CONV" << endl;
         uint natoms=str.atoms.size();
-        str.GetPrimitive(0.005);
+        //DX20210427 [OBSOLETE - use default sym_eps] str.GetPrimitive(0.005);
+        str.GetPrimitive(); //DX20210427 - use default sym_eps
         if(natoms<str.atoms.size()) fixed=TRUE;
       }
-      if(!fixed) str.GetPrimitive(0.05); // now you are totally screwed..... but you save plenty of ab-initio time. Wisdom of SC.
+      //DX20210427 [OBSOLETE - use loose sym_eps] if(!fixed) { str.GetPrimitive(0.05); } // now you are totally screwed..... but you save plenty of ab-initio time. Wisdom of SC.
+      if(!fixed) { double tol = SYM::defaultTolerance(str)*10.0; str.GetPrimitive(tol); } // now you are totally screwed..... but you save plenty of ab-initio time. Wisdom of SC. //DX20210427 - use loose sym_eps
     }
     // done
     str.BringInCell();

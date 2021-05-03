@@ -811,7 +811,7 @@ uint xstructure::GetPrimitiveCell(void) {
 
   xmatrix<double> f2c = trasp(lattice_basis_xmat);
   xmatrix<double> c2f = inverse(trasp(lattice_basis_xmat));
-  //DX20210315 [OBSOLETE] bool skew = SYM::isLatticeSkewed(lattice_basis_xmat, (*this).dist_nn_min, (*this).sym_eps); //DX20190215 - _SYM_TOL to (*this).sym_eps
+  //DX20210315 [OBSOLETE - now using transformation method for cell conversion] bool skew = SYM::isLatticeSkewed(lattice_basis_xmat, (*this).dist_nn_min, (*this).sym_eps); //DX20190215 - _SYM_TOL to (*this).sym_eps
   vector<xvector<double> > diff_vectors;
 
   // Determine the Greatest Common Denominator between the atom types
@@ -879,7 +879,7 @@ uint xstructure::GetPrimitiveCell(void) {
   lattice_basis_xmat = SYM::xvec2xmat(lattice_basis[0], lattice_basis[1], lattice_basis[2]);
   f2c = trasp(lattice_basis_xmat);
   c2f = inverse(trasp(lattice_basis_xmat));
-  //DX20210315 [OBSOLETE] skew = SYM::isLatticeSkewed(lattice_basis_xmat, (*this).dist_nn_min, (*this).sym_eps); //DX20190215 - _SYM_TOL_ to (*this).sym_eps
+  //DX20210315 [OBSOLETE - now using transformation method for cell conversion] skew = SYM::isLatticeSkewed(lattice_basis_xmat, (*this).dist_nn_min, (*this).sym_eps); //DX20190215 - _SYM_TOL_ to (*this).sym_eps
   vector<_atom> full_basis;  //basis that has been reduced modulo 1
   vector<xvector<double> > lattice_vector_candidates;
 
@@ -1237,7 +1237,8 @@ namespace SYM {
 
     // ========== Objects containing crystal stucture information ========== //
     xstructure xstr_out;
-    xstr.GetPrimitiveCell();
+    //DX20210401 [OBSOLETE] xstr.GetPrimitiveCell();
+    xstr.GetPrimitive(); //DX20210401
     xstructure prim = xstr; //DX20210316 - store primitive
 
     xmatrix<double> L = xstr.lattice;
@@ -1351,7 +1352,8 @@ namespace SYM {
       // ===== If not the first iteration, use the symmetry elements from the first iteration ===== //
       if(IT >= 1) {
         xstr = CrystOut_prev;
-        xstr.GetPrimitiveCell();
+        //DX20210401 [OBSOLETE] xstr.GetPrimitiveCell();
+        xstr.GetPrimitive(); //DX20210401
         prim = xstr; //DX20210316 - store primitive
         L = xstr.lattice;
         Linv = aurostd::inverse(L);
@@ -1783,7 +1785,8 @@ namespace SYM {
           //cerr << "checkops.crystalsystem: " << checkops.crystalsystem << endl;
 
           // Reduce conventional cell into a primitive form
-          xstr.GetPrimitiveCell();
+          //DX20210401 [OBSOLETE] xstr.GetPrimitiveCell();
+          xstr.GetPrimitive(); //DX20210401
           prim = xstr; //DX20210316 - store primitive
 
           L = xstr.lattice;
@@ -3549,12 +3552,15 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
     if(first_run_or_new_tol == true) {
       sym_eps = xstr.sym_eps; //DX20180226 - added sym eps temp variable
       sym_eps_change_count = xstr.sym_eps_change_count; //DX20180226 - added sym eps change count
+      no_scan = xstr.sym_eps_no_scan; //DX20210430 - added no_scan
       xstr = xstr_orig;
       xstr.sym_eps = sym_eps; //DX20190314 - need to update sym_eps, since the structure was overwritten 
       xstr.sym_eps_change_count = sym_eps_change_count; //DX20180423 - need to update change count, since the structure was overwritten 
+      xstr.sym_eps_no_scan = no_scan; //DX20210430 - added no_scan
       CCell.free();
       xstr.MinkowskiBasisReduction();
-      xstr.GetPrimitiveCell();
+      //DX20210401 [OBSOLETE] xstr.GetPrimitiveCell();
+      xstr.GetPrimitive(); //DX20210401
 
       // ===== Ensure Cartesian coordinates are consistent with fractional coordinates ===== //
       for (uint i = 0; i < xstr.atoms.size(); i++) {
@@ -3573,8 +3579,10 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
       if(!no_scan){
         SYM::change_tolerance(xstr,xstr.sym_eps, min_dist, no_scan); //DX20190215 - _SYM_TOL_ to xstr.sym_eps
         sym_eps_change_count = xstr.sym_eps_change_count; //DX20180226 - added sym eps change count
+        xstr.sym_eps_no_scan = no_scan; //DX20210430 - added no_scan
       }
       else {
+        (*this).sym_eps_no_scan = no_scan; //DX20210430 - added no_scan
         return 0;
       }
       first_run_or_new_tol = true;
@@ -3614,8 +3622,10 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
         if(!no_scan){
           SYM::change_tolerance(xstr,xstr.sym_eps, min_dist, no_scan); //DX20190215 - _SYM_TOL_ to xstr.sym_eps
           sym_eps_change_count = xstr.sym_eps_change_count; //DX20180226 - added sym eps change count
+          xstr.sym_eps_no_scan = no_scan; //DX20180226 - added sym eps change count
         }
         else {
+          (*this).sym_eps_no_scan = no_scan; //DX20210430 - added no_scan
           return 0;
         }
         first_run_or_new_tol = true;
@@ -3638,8 +3648,10 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
         if(!no_scan){
           SYM::change_tolerance(xstr,xstr.sym_eps, min_dist, no_scan); //DX20190215 - _SYM_TOL_ to xstr.sym_eps
           sym_eps_change_count = xstr.sym_eps_change_count; //DX20180226 - added sym eps change count
+          xstr.sym_eps_no_scan = no_scan; //DX20210430 - added no_scan
         }
         else {
+          (*this).sym_eps_no_scan = no_scan; //DX20210430 - added no_scan
           return 0;
         }
         first_run_or_new_tol = true;
@@ -4193,6 +4205,7 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
   }
   (*this).sym_eps = CCell.sym_eps; //DX20190215 - _SYM_TOL to CCell.sym_eps, redundant, but safe
   (*this).sym_eps_change_count = sym_eps_change_count; //DX20180226 - added sym eps change count
+  (*this).sym_eps_no_scan = no_scan; //DX20210430 - added no_scan
 
   // ***********************************************************************************************************************************
   // Prepare/Create Wyccar

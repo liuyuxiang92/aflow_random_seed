@@ -189,6 +189,9 @@ mac:
 #.PHONY: mac_static
 #mac_static: mac
 #	tar Jcfvp aflow_$(VERSNUMBER)_maxOSX_10.X.X.tar.xz aflow aflow_data
+.PHONY: production
+production: 
+	$(MAKE) OPTS="$(OPTS) -D__XOPTIMIZE" OPTS_MT="$(OPTS_MT) -D__XOPTIMIZE"
 
 
 ###################################################################################################
@@ -1165,6 +1168,7 @@ check:
 	$(MAKE) check_proto
 .PHONY: check_full
 check_full:
+	$(MAKE) check_schema
 	$(MAKE) check_CeramGen
 	#[WAITING FOR ICSD LIB2RAW REDO]$(MAKE) check_Egap
 	$(MAKE) check_aflow_exits
@@ -1197,6 +1201,10 @@ check_proto:
 #	./aflow --proto=4:Bi:Tc | ./aflow --sprim | md5sum
 #	#ffb9c5681045fb80f391e9a931f21d1
 #	./aflow --checki | grep FAIL
+.PHONY: check_schema
+check_schema:
+	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
+	./aflow --schema_test
 .PHONY: check_Egap
 check_Egap:
 	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi

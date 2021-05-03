@@ -974,6 +974,12 @@ namespace init {
     XHOST.vflag_pflow.clear(); 
     XHOST.vflag_apennsy.clear(); 
     XHOST.vflag_outreach.clear(); 
+
+    // ME20210206 - Load --web_mode before parsing arguments
+    // LOADING ANRL WEB
+    XHOST.vflag_control.flag("WWW",aurostd::args2flag(argv,cmds,"--www|--web|--web_mode|--php|--html|-www|-web|-web_mode|-php|-html"));  //CO20200404
+    if(XHOST.user=="www-data"){XHOST.vflag_control.flag("WWW",true);} //CO20201215
+
     if(INIT_VERBOSE) oss << "--- LOADING @ aconvasp options --- " << endl;
     PflowARGs(XHOST.argv,cmds,XHOST.vflag_pflow);
     if(INIT_VERBOSE) oss << "--- LOADING @ apennsy options --- " << endl;
@@ -1005,10 +1011,6 @@ namespace init {
     //    if(LDEBUG) cout << "OUTREACH OPTIONS: vxscheme.size()=" << XHOST.vflag_control.vxscheme.size() << endl;  OBSOLETE ME20181102
     if(LDEBUG) cout << "OUTREACH OPTIONS: vxsghost.size()=" << XHOST.vflag_control.vxsghost.size() << endl;
     if(LDEBUG) cout << "OUTREACH OPTIONS: argv.size()=" << argv.size() << endl;
-
-    // LOADING ANRL WEB
-    XHOST.vflag_control.flag("WWW",aurostd::args2flag(argv,cmds,"--www|--web|--web_mode|--php|--html|-www|-web|-web_mode|-php|-html"));  //CO20200404
-    if(XHOST.user=="www-data"){XHOST.vflag_control.flag("WWW",true);} //CO20201215
 
     //FANCY_PRINT
     XHOST.vflag_control.flag("NO_FANCY_PRINT",aurostd::args2flag(argv,cmds,"--no_fancy_print|--nofancyprint"));  //CO20200404
@@ -3109,6 +3111,12 @@ namespace init {
     XHOST.vschema.push_attached("SCHEMA::TYPE:LOOP","strings");
     nschema++;
 
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:METAGGA","metagga");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:METAGGA","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:METAGGA","string");
+    nschema++;
+
     //AS20200915 BEGIN
     XHOST.vschema.push_attached("SCHEMA::NAME:MODULUS_BULK_QHA_300K","modulus_bulk_qha_300K");
     XHOST.vschema.push_attached("SCHEMA::UNIT:MODULUS_BULK_QHA_300K","GPa");
@@ -3412,6 +3420,12 @@ namespace init {
     XHOST.vschema.push_attached("SCHEMA::NAME:SPECIES_PP","species_pp");
     XHOST.vschema.push_attached("SCHEMA::UNIT:SPECIES_PP","");
     XHOST.vschema.push_attached("SCHEMA::TYPE:SPECIES_PP","strings");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:SPECIES_PP_AUID","species_pp_AUID");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:SPECIES_PP_AUID","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:SPECIES_PP_AUID","strings");
     nschema++;
 
     // schema is CAPITAL, content is not necessarily

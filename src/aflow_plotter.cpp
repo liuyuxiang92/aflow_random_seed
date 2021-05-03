@@ -607,6 +607,12 @@ namespace plotter {
           arun_pocc=arun_pocc_new;
         }
       }
+     //CO20210315 - might find pocc_params='P0-1xA_P1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF:ARUN.AGL_9_SF_0.95' which is a bad system name, missing ARUN.POCC
+     m=pocc_params.find(ARUN_TITLE_TAG);
+      if(m!=string::npos){
+        arun_module=pocc_params.substr(m+1,string::npos);  //grab whatever follows the ARUN_TITLE_TAG
+        pocc_params=pocc_params.substr(0,m);  //parse it out of pocc_parms
+      }
       if(LDEBUG){
         cerr << soliloquy << " pocc_params=" << pocc_params << endl;
         cerr << soliloquy << " arun_pocc=" << arun_pocc << endl;
@@ -1735,7 +1741,7 @@ namespace plotter {
       bands = bands.substr(1, bands.size() - 2); // remove wrapping curly brackets
     }
 
-    json.addRaw(bands);
+    json.mergeRawJSON(bands); //DX20210304 - addRaw -> mergeRawJSON
     return json;
   }
 

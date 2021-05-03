@@ -947,7 +947,7 @@ namespace aflowlib {
     bond_aa=999999;bond_ab=999999;bond_bb=999999;
     vNsgroup.clear();vsgroup.clear();vstr.clear();  // apennsy
     // DONE
-    if(0) {							
+    if(0) {
       bool html=TRUE;
       oss << "Keywords" << endl;
       oss << "auid=" << auid << (html?"<br>":"") << endl;
@@ -1160,8 +1160,8 @@ namespace aflowlib {
       oss << "ael_applied_pressure=" << ael_applied_pressure << (html?"<br>":"") << endl; //CT20181212 
       oss << "ael_average_external_pressure=" << ael_average_external_pressure << (html?"<br>":"") << endl; //CT20181212 
       //ME20191105 BEGIN
-      oss << "ael_stiffness_tensor="; for (int i = 1; i <= 6; i++) {for (int j = 1; j <= 6; j++) oss << ael_stiffness_tensor[i][j]; oss << (html?"<br>":"") << endl;} //ME20191105
-      oss << "ael_compliance_tensor="; for (int i = 1; i <= 6; i++) {for (int j = 1; j <= 6; j++) oss << ael_compliance_tensor[i][j]; oss << (html?"<br>":"") << endl;} //ME20191105
+      oss << "ael_stiffness_tensor="; for (int i = ael_stiffness_tensor.lrows; i <= ael_stiffness_tensor.urows; i++) {for (int j = 1; j <= 6; j++) oss << ael_stiffness_tensor[i][j]; oss << (html?"<br>":"") << endl;} //ME20191105
+      oss << "ael_compliance_tensor="; for (int i = 1; i <= ael_compliance_tensor.lrows; i++) {for (int j = 1; j <= ael_compliance_tensor.urows; j++) oss << ael_compliance_tensor[i][j]; oss << (html?"<br>":"") << endl;} //ME20191105
       //ME20191105 END
       //AS20200901 BEGIN
       //QHA
@@ -1192,7 +1192,7 @@ namespace aflowlib {
   }
 
   // aflowlib2string 
-  string _aflowlib_entry::aflowlib2string(string mode) {
+  string _aflowlib_entry::aflowlib2string(string mode, bool PRINT_NULL) {
     string soliloquy=XPID+"aflowlib::_aflowlib_entry::aflowlib2string():";
     stringstream sss("");
     //  string eendl="\n";
@@ -1468,7 +1468,6 @@ namespace aflowlib {
     // this is the aflowlib.json mode
     if(mode=="json" || mode=="JSON") {  //CO OPERATE HERE ALL THE STRINGS AS BEFORE
       string eendl=",";
-      bool PRINT_NULL=FALSE;
       stringstream sscontent_json;
       vector<string> vcontent_json;
       vector<string> sg_tokens;
@@ -5045,6 +5044,14 @@ namespace aflowlib {
         directory_AUID_LIB=directory_AUID_LIB+"/LIB";    
         aurostd::string2tokens(aentry.sg2,tokens,"#");if(tokens.size()>0) aentry.sg2=tokens.at(tokens.size()-1);
         if(aentry.vfiles_WEB.size()==0) aentry.vfiles_WEB=aentry.vfiles;
+      }
+
+      // ME20210209 - Show original structure when symmetry changed
+      if (vflags.flag("FLAG::FOUND")) {
+        bool same_symmetry = ((aentry.spacegroup_orig == aentry.spacegroup_relax)
+                           && (aentry.Wyckoff_multiplicities_orig == aentry.Wyckoff_multiplicities)
+                           && (aentry.Wyckoff_site_symmetries_orig == aentry.Wyckoff_site_symmetries_orig));
+        vflags.flag("FLAG::EDATA_ORIG", !same_symmetry);
       }
 
       if(vflags.flag("FLAG::FOUND")) {
