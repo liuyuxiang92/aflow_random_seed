@@ -227,7 +227,7 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   aurostd::sort(dstring,dstring,ddouble,dstring);aurostd::sort(dstring,dstring,ddouble,ddouble,dstring);
   aurostd::reduceByGCD(dutype,dutype); //DX201911225
   aurostd::reduceByGCD(duint,duint); //DX201911225
-  o+=aurostd::identical_entries(dutype); //DX20210502
+  o+=aurostd::identical(dutype); //DX20210502
 
   // initialize vector/deque 
   aurostd::string2tokens(s,vstring,"");aurostd::string2tokens(s,dstring,"");
@@ -263,7 +263,7 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   std::sort(vvu.begin(),vvu.end(),aurostd::compareVecElement<utype>()); //CO20190629
   std::sort(vxvu.begin(),vxvu.end(),aurostd::compareVecElement<utype>()); //CO20190629
 
-  o=+(v==v);o=+(v!=v);o+=identical(v,v);o+=identical(v,v,x);o+=identical(v,v,(utype&) x);o+=identical(v,v,(const utype&) x);o+=isdifferent(v,v);o+=aurostd::identical_entries(vutype); //DX20210502 - added identical_entries
+  o=+(v==v);o=+(v!=v);o+=identical(v,v);o+=identical(v,v,x);o+=identical(v,v,(utype&) x);o+=identical(v,v,(const utype&) x);o+=isdifferent(v,v);o+=aurostd::identical(vutype); //DX20210502 - added identical
   o+=isdifferent(v,v,x);v=-v;o+=max(v);v=abs(v);roundoff(v);roundoff(v,x);reduceByGCD(v,v,x);v+=normalizeSumToOne(v,x);clear(v);floor(v);ceil(v); //DX20191125 - changed input format for reduceByGCD()
   o+=getcos(v,v);v.clear();v.set(x);v.reset();v.resize(1,1);clear(v);reset(v);set(v,x);v=abs(v);v=vabs(v);v=sign(v);
   o+=angle(v,v,v);o+=getangle(v,v,v);isCollinear(v,v,x);v=getCentroid(vxv);v=getCentroid(vxv,vutype);o+=distance(v,v); //DX20200729 - added getCentroid() with weights

@@ -178,8 +178,8 @@ before_install:
   - if [ -n "${MATRIX_EVAL_MAIN}" ];  then echo "${MATRIX_EVAL_MAIN}"; eval "${MATRIX_EVAL_MAIN}";   fi
 script:
   - cd src
-  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then make realclean && make CC=$CC CPP=$CXX -j 4 && make check_full ; fi
-  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then make realclean && make CC=$CC CPP=$CXX -e ARCH=-D_MACOSX_ -j 4 && make check_full ; fi
-  - if [ "$TRAVIS_OS_NAME" = "osx" ] && [ "$CC" = "clang" ] && [ "$CXX" = "clang++" ]; then make realclean && make mac && make check_full ; fi
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then make realclean && make CC=$CC CPP=$CXX -j 4 && make check_full_CI ; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then make realclean && make CC=$CC CPP=$CXX -e ARCH=-D_MACOSX_ -j 4 && make check_full_CI ; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ] && [ "$CC" = "clang" ] && [ "$CXX" = "clang++" ]; then make realclean && make mac && make check_full_CI ; fi
   #test that scripts generated an aflow binary
   - ./aflow

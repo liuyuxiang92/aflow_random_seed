@@ -349,8 +349,8 @@ namespace aurostd {
   bool identical(std::vector<int> v1,std::vector<int> v2,int epsilon);
   bool identical(std::deque<int> v1,std::deque<int> v2,int epsilon);
   template<class utype> bool identical(const std::vector<vector<utype> >& m1,const std::vector<vector<utype> >& m2,utype epsilon);
-  template<class utype> bool identical_entries(const vector<utype>& vec, utype eps=(utype)AUROSTD_IDENTITY_TOL); //DX20210422
-  template<class utype> bool identical_entries(const deque<utype>& vec, utype eps=(utype)AUROSTD_IDENTITY_TOL); //DX20210422
+  template<class utype> bool identical(const vector<utype>& vec, utype eps=(utype)AUROSTD_IDENTITY_TOL); //DX20210422 - checks if all values are the same
+  template<class utype> bool identical(const deque<utype>& vec, utype eps=(utype)AUROSTD_IDENTITY_TOL); //DX20210422 - checks if all values are the same
   string toupper(const string& in)  __xprototype;
   string tolower(const string& in)  __xprototype;
   char toupper(const char& in)  __xprototype;
