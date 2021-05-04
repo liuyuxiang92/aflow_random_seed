@@ -811,6 +811,16 @@ namespace aurostd {  // namespace aurostd
     }
 }
 
+// check if all entries of an xvector are equal
+namespace aurostd { //namespace aurostd //DX20210503
+  template<class utype> bool identical(const xvector<utype>& a, utype tol) {
+    for(int i=a.lrows;i<=a.urows;i++){
+      if(isdifferent(a[i],a[0],tol)){ return false; }
+    }
+    return true; //includes case when xvector is empty
+  }
+}
+
 namespace aurostd {  // namespace aurostd
   template<class utype> bool                             // is xvector == xvector ?
     identical(const xvector<utype>& a,const xvector<utype>& b) {

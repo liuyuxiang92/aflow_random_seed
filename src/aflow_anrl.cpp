@@ -620,9 +620,9 @@ namespace anrl {
 
       sscontent_json << "\"aflow_prototype_label\":\"" << aflow_label << "\"" << eendl;
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-      sscontent_json << "\"aflow_prototype_parameter_list\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(parameter_list,"\""),",") << "]" << eendl;
+      sscontent_json << "\"aflow_prototype_params_list\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(parameter_list,"\""),",") << "]" << eendl;
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-      sscontent_json << "\"aflow_prototype_parameter_values\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(parameter_values,8,roff),",") << "]" << eendl;
+      sscontent_json << "\"aflow_prototype_params_values\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(parameter_values,8,roff),",") << "]" << eendl;
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
       oss << "{" << aurostd::joinWDelimiter(vcontent_json,",")  << "}";
@@ -1590,7 +1590,13 @@ namespace anrl {
     // causing structures to fall into higher symmetries when analyzed with
     // certain tolerances; occurs for certain AFLOW Prototype Encyclopedia
     // structures 
-
+    
+    // ---------------------------------------------------------------------------
+    // A2B7C2_oF88_22_k_bdefghij_k-001 (Predicted Phase IV Cd2Re2O7)
+    // see comments in http://aflow.org/prototype-encyclopedia/A2B7C2_oF88_22_k_bdefghij_k.html 
+    if(label_input == "A2B7C2_oF88_22_k_bdefghij_k-001"){
+      return 0.001; // symmetry tolerance
+    }
     // ---------------------------------------------------------------------------
     // AB_oP8_33_a_ai-001 (Modderite)
     // see comments in http://aflow.org/prototype-encyclopedia/AB_oP8_33_a_a.html
@@ -1617,6 +1623,12 @@ namespace anrl {
     // ---------------------------------------------------------------------------
     // A5B2_oP14_49_dehq_ab-001 (beta-Ta2O5)
     else if(label_input == "A5B2_oP14_49_dehq_ab-001"){
+      return 0.001; // symmetry tolerance
+    }
+    // ---------------------------------------------------------------------------
+    // A10B3C4_oP68_55_2e2fgh2i_adef_2e2f-001 (Orthorhombic Sr4Ru3O10, part 3)
+    // see comments in http://aflow.org/prototype-encyclopedia/A10B3C4_oP68_55_2e2fgh2i_adef_2e2f.html
+    else if(label_input == "A10B3C4_oP68_55_2e2fgh2i_adef_2e2f-001"){
       return 0.001; // symmetry tolerance
     }
     // ---------------------------------------------------------------------------
@@ -1648,6 +1660,268 @@ namespace anrl {
       return 0.001; // symmetry tolerance
     }
     return AUROSTD_MAX_DOUBLE;
+  }
+}
+
+// ***************************************************************************
+// anrl::isSpecialCaseEquivalentPrototypes() //DX20210421
+// ***************************************************************************
+namespace anrl {
+  bool isSpecialCaseEquivalentPrototypes(const vector<string>& labels_matched){
+
+    // Check if prototypes are expected to be duplicates of one another.
+    // In "make check", we ensure newly added prototypes do not match with
+    // existing ones.
+    // However, some prototypes can match for the following reasons:
+    //  1) prototypes are enantiomorphs (i.e., they are duplicates by
+    //     construction, to help represent all 230 space groups)
+    //  2) for historical reasons; due to structure refinement, unique
+    //     Strukturbericht labeling, or other significance described in
+    //     literature (these are usually explained in the comments of the
+    //     prototype encyclopedia)
+    //  3) improvements to XtalFinder reveal structures match (in general, the
+    //     misfits will be just below the default threshold of 0.1; if they
+    //     are not, then we have problems)
+    // New prototype-matches should be investigated with XtalFinder and
+    // only reported here if we wish to keep the equivalent prototypes.
+
+    uint nlabels_matched = labels_matched.size();
+
+    // ---------------------------------------------------------------------------
+    // list of 2 labels matching
+    if(nlabels_matched == 2){
+      // ---------------------------------------------------------------------------
+      // A2B_mP12_14_2e_e-001 (ZrO2, Baddeleyite, Struk: C43) == A2B_mP12_14_2e_e-009 (ZrO2, ICSD #659226)
+      // misfit=0.0998
+      // REASON FOR DUPLICATE: Improvement to XtalFinder code, reduces misfit
+      if(aurostd::WithinList(labels_matched, "A2B_mP12_14_2e_e-001") &&
+          aurostd::WithinList(labels_matched, "A2B_mP12_14_2e_e-009")){
+        return true;
+      }
+      // ---------------------------------------------------------------------------
+      // AB3C4_oP16_31_a_ab_2ab-001 (AsCu3S4, Enargite, Struk:H2_5) == A3B4C_oP16_31_ab_2ab_a-001 (Li3O4V1, ICSD #19002)
+      // misfit=0.0884
+      // REASON FOR DUPLICATE: Improvement to XtalFinder code, reduces misfit
+      else if(aurostd::WithinList(labels_matched, "AB3C4_oP16_31_a_ab_2ab-001") &&
+          aurostd::WithinList(labels_matched, "A3B4C_oP16_31_ab_2ab_a-001")){
+        return true;
+      }
+      // ---------------------------------------------------------------------------
+      // AB_oP8_62_c_c-002 (MnP, Struk:B31) == AB_oP8_62_c_c-005 (FeAs, Westerveldite, Struk:B14)
+      // misfit=0.0442
+      // REASON FOR DUPLICATE: historical; different Strukturbericht designations
+      // see comments in http://aflow.org/prototype-encyclopedia/AB_oP8_62_c_c.FeAs.html
+      else if(aurostd::WithinList(labels_matched, "AB_oP8_62_c_c-002") &&
+          aurostd::WithinList(labels_matched, "AB_oP8_62_c_c-005")){
+        return true;
+      }
+      // ---------------------------------------------------------------------------
+      // A_tP30_136_bf2ij-001 (beta-U, Struk:A_d) == sigma_tP30_136_bf2ij-001 (sigma-CrFe, Struk:D8_b)
+      // misfit=0
+      // REASON FOR DUPLICATE: historical; different Strukturbericht designations
+      // see comments in http://aflow.org/prototype-encyclopedia/sigma_tP30_136_bf2ij.html
+      else if(aurostd::WithinList(labels_matched, "A_tP30_136_bf2ij-001") &&
+          aurostd::WithinList(labels_matched, "sigma_tP30_136_bf2ij-001")){
+        return true;
+      }
+      // ---------------------------------------------------------------------------
+      // A3B_hP24_151_3c_2a-001 (CrCl3, Struk:D0_4) == A3B_hP24_153_3c_2b-001 (CrCl3, enantiomorph)
+      // misfit=0
+      // REASON FOR DUPLICATE: use enantiomorph to represent SG #153
+      // see comments in http://aflow.org/prototype-encyclopedia/A3B_hP24_153_3c_2b.html
+      else if(aurostd::WithinList(labels_matched, "A3B_hP24_151_3c_2a-001") &&
+          aurostd::WithinList(labels_matched, "A3B_hP24_153_3c_2b-001")){
+        return true;
+      }
+      // ---------------------------------------------------------------------------
+      // ABC3_hR10_161_a_a_b-002 (Na1Nb1O3, ICSD #9645) == ABC3_hR10_161_a_a_b-004 (Ga1La1O3, ICSD #51036)
+      // misfit=0.0963
+      // REASON FOR DUPLICATE: Improvement to XtalFinder code, reduces misfit
+      else if( aurostd::WithinList(labels_matched, "ABC3_hR10_161_a_a_b-002") &&
+          aurostd::WithinList(labels_matched, "ABC3_hR10_161_a_a_b-004")){
+        return true;
+      }
+      // ---------------------------------------------------------------------------
+      // A2B3_hR10_167_c_e-001 (Al2O3, Corundum, Struk:D5_1) == A2B3_hR10_167_c_e-002 (O3V2 binary oxide)
+      // misfit=0.0889
+      // REASON FOR DUPLICATE: Improvement to XtalFinder code, reduces misfit
+      else if(aurostd::WithinList(labels_matched, "A2B3_hR10_167_c_e-001") &&
+          aurostd::WithinList(labels_matched, "A2B3_hR10_167_c_e-002")){
+        return true;
+      }
+      // ---------------------------------------------------------------------------
+      // A2B_hP9_180_j_c-001 (beta-Quartz, Struk:C8) == A2B_hP9_181_j_c-001 (beta-SiO2, enantiomorph)
+      // misfit=0
+      // REASON FOR DUPLICATE: use enantiomorph to represent SG #181
+      // see comments in http://aflow.org/prototype-encyclopedia/A2B_hP9_181_j_c.html
+      else if(aurostd::WithinList(labels_matched, "A2B_hP9_180_j_c-001") &&
+          aurostd::WithinList(labels_matched, "A2B_hP9_181_j_c-001")){
+        return true;
+      }
+      // ---------------------------------------------------------------------------
+      // ABC_tP24_91_d_d_d-001 (ThBC) == ABC_tP24_95_d_d_d-001 (ThBC, enantiomorph)
+      // misfit=0
+      // REASON FOR DUPLICATE: use enantiomorph to represent SG #95
+      // see comments in http://aflow.org/prototype-encyclopedia/ABC_tP24_95_d_d_d.html
+      else if( aurostd::WithinList(labels_matched, "ABC_tP24_91_d_d_d-001") &&
+          aurostd::WithinList(labels_matched, "ABC_tP24_95_d_d_d-001")){
+        return true;
+      }
+      // ---------------------------------------------------------------------------
+      // A2B3_hP30_169_2a_3a-001 (alpha-Al2S3) == A2B3_hP30_170_2a_3a-001 (alpha-Al2S3, enantiomorph)
+      // misfit=0
+      // REASON FOR DUPLICATE: use enantiomorph to represent SG #170
+      // see comments in http://aflow.org/prototype-encyclopedia/A2B3_hP30_170_2a_3a.html
+      else if(aurostd::WithinList(labels_matched, "A2B3_hP30_169_2a_3a-001") &&
+          aurostd::WithinList(labels_matched, "A2B3_hP30_170_2a_3a-001")){
+        return true;
+      }
+      // ---------------------------------------------------------------------------
+      // AB3_hP24_178_b_ac-001 (AuF3) == AB3_hP24_179_b_ac-001 (AuF3)
+      // misfit=0
+      // REASON FOR DUPLICATE: use enantiomorph to represent SG #179
+      // see comments in http://aflow.org/prototype-encyclopedia/AB3_hP24_179_b_ac.html
+      else if(aurostd::WithinList(labels_matched, "AB3_hP24_178_b_ac-001") &&
+          aurostd::WithinList(labels_matched, "AB3_hP24_179_b_ac-001")){
+        return true;
+      }
+      // ---------------------------------------------------------------------------
+      // A3B_hP24_185_ab2c_c-001 (Cu3P) == AB3_hP24_185_c_ab2c-001 (Na3As, Struk:D0_18)
+      // misfit=0.0753
+      // REASON FOR DUPLICATE: historical, discrepancies in literature
+      // see comments in http://aflow.org/prototype-encyclopedia/A3B_hP24_185_ab2c_c.html
+      else if(aurostd::WithinList(labels_matched, "A3B_hP24_185_ab2c_c-001") &&
+          aurostd::WithinList(labels_matched, "AB3_hP24_185_c_ab2c-001")){
+        return true;
+      }
+      // ---------------------------------------------------------------------------
+      // AB4C_mP12_13_f_2g_e-001 (MgO4W, ICSD #67903) == AB4C_mP12_13_f_2g_e-004 (CuO4W, ICSD #182751)
+      // misfit=0.0822
+      // REASON FOR DUPLICATE: Improvement to XtalFinder code, reduces misfit
+      else if(aurostd::WithinList(labels_matched, "AB4C_mP12_13_f_2g_e-001") &&
+          aurostd::WithinList(labels_matched, "AB4C_mP12_13_f_2g_e-004")){
+        return true;
+      }
+      // ---------------------------------------------------------------------------
+      // A3B_mC8_12_di_a-001 (N3Na1, ICSD #29370) == A3B_mC8_12_di_a-002 (N3Na1, ICSD #29376)
+      // misfit=0.098383
+      // REASON FOR DUPLICATE: Improvement to XtalFinder code, reduces misfit
+      else if(aurostd::WithinList(labels_matched, "A3B_mC8_12_di_a-001") &&
+          aurostd::WithinList(labels_matched, "A3B_mC8_12_di_a-002")){
+        return true;
+      }
+      // ---------------------------------------------------------------------------
+      // A3B2_mC30_12_a4i_3i-001 (Ca3N2, ICSD #162794) == A3B2_mC30_12_a4i_3i-002 (Ca3N2, ICSD #169726)
+      // misfit=0.0989
+      // REASON FOR DUPLICATE: Improvement to XtalFinder code, reduces misfit
+      else if(aurostd::WithinList(labels_matched, "A3B2_mC30_12_a4i_3i-001") &&
+          aurostd::WithinList(labels_matched, "A3B2_mC30_12_a4i_3i-002")){
+        return true;
+      }
+      // ---------------------------------------------------------------------------
+      // A3B2C2_mC14_12_ai_i_i-003 (C3Ho2Mo2, ICSD #88511) == A3B2C2_mC14_12_ai_i_i-004 (C3Ce2Mo2, ICSD #417827)
+      // misfit=0.0921
+      // REASON FOR DUPLICATE: Improvement to XtalFinder code, reduces misfit
+      else if(aurostd::WithinList(labels_matched, "A3B2C2_mC14_12_ai_i_i-003") &&
+          aurostd::WithinList(labels_matched, "A3B2C2_mC14_12_ai_i_i-004")){
+        return true;
+      }
+      // ---------------------------------------------------------------------------
+      // A4B3C4_oI22_71_n_af_eh-001 (Ag4Dy3Sn4, ICSD #156968) == A3B4C4_oI22_71_af_eh_n-001 (La3Pd4Zn4, ICSD #182774)
+      // misfit=0.0879
+      // REASON FOR DUPLICATE: Improvement to XtalFinder code, reduces misfit
+      else if(aurostd::WithinList(labels_matched, "A4B3C4_oI22_71_n_af_eh-001") &&
+          aurostd::WithinList(labels_matched, "A3B4C4_oI22_71_af_eh_n-001")){
+        return true;
+      }
+      // ---------------------------------------------------------------------------
+      // AB5C2_tI32_140_a_cl_h-001 (Bi1Er5Pt2, ICSD #107217) == A2BC5_tI32_140_h_a_cl-001 (Au2Bi1Tb5, ICSD #156956)
+      // misfit=0.0914
+      // REASON FOR DUPLICATE: Improvement to XtalFinder code, reduces misfit
+      else if(aurostd::WithinList(labels_matched, "AB5C2_tI32_140_a_cl_h-001") &&
+          aurostd::WithinList(labels_matched, "A2BC5_tI32_140_h_a_cl-001")){
+        return true;
+      }
+      // ---------------------------------------------------------------------------
+      // A2BC_hR12_166_h_bc_ac-001 (Al2Cu1Yb1, ICSD #604213) == AB2C_hR12_166_bc_h_ac-001 (Ag1Al2Pr1, ICSD #604688)
+      // misfit=0.0995
+      // REASON FOR DUPLICATE: Improvement to XtalFinder code, reduces misfit
+      else if(aurostd::WithinList(labels_matched, "A2BC_hR12_166_h_bc_ac-001") &&
+          aurostd::WithinList(labels_matched, "AB2C_hR12_166_bc_h_ac-001")){
+        return true;
+      }
+      // ---------------------------------------------------------------------------
+      // A3B2C_hP6_191_g_c_a-001 (Ag3Al2La1, ICSD #57329) == A2BC3_hP6_191_c_a_g-002 (Al2Ce1Pt3, ICSD #658142)
+      // misfit=0.0989
+      // REASON FOR DUPLICATE: Improvement to XtalFinder code, reduces misfit
+      else if(aurostd::WithinList(labels_matched, "A3B2C_hP6_191_g_c_a-001") &&
+          aurostd::WithinList(labels_matched, "A2BC3_hP6_191_c_a_g-002")){
+        return true;
+      }
+      // ---------------------------------------------------------------------------
+      // A4B2C5_mC22_12_2i_i_aj-001 (B4La2Ni5, ICSD #63501) == A4B2C5_mC22_12_2i_i_aj-002 (B4La2Ni5, ICSD #170618)
+      // misfit=0.0677
+      // REASON FOR DUPLICATE: Improvement to XtalFinder code, reduces misfit
+      else if(aurostd::WithinList(labels_matched, "A4B2C5_mC22_12_2i_i_aj-001") &&
+          aurostd::WithinList(labels_matched, "A4B2C5_mC22_12_2i_i_aj-002")){
+        return true;
+      }
+      // ---------------------------------------------------------------------------
+      // ABC2_mC8_12_c_a_i-001 (metal-oxide; Na1Ni1O2, ICSD #26609) == ABC2_mC8_12_a_c_i-002 (Mn1Na1O2, ICSD #16270)
+      // misfit=0.0629
+      // REASON FOR DUPLICATE: Improvement to XtalFinder code, reduces misfit
+      else if(aurostd::WithinList(labels_matched, "ABC2_mC8_12_c_a_i-001") &&
+          aurostd::WithinList(labels_matched, "ABC2_mC8_12_a_c_i-002")){
+        return true;
+      }
+      // ---------------------------------------------------------------------------
+      // ABC2_mC8_12_c_a_i-001 (metal-oxide; Na1Ni1O2, ICSD #26609) == AB2C_mC8_12_a_i_c-001 (Na1O2V1, ICSD #420138)
+      // misfit=0.0741
+      // REASON FOR DUPLICATE: Improvement to XtalFinder code, reduces misfit
+      else if(aurostd::WithinList(labels_matched, "ABC2_mC8_12_c_a_i-001") &&
+          aurostd::WithinList(labels_matched, "AB2C_mC8_12_a_i_c-001")){
+        return true;
+      }
+      // ---------------------------------------------------------------------------
+      // AB2C_mC16_15_e_f_e-001 (Bi1O2Rb1, ICSD #407208) == ABC2_mC16_15_e_e_f-003 (Bi1Cs1O2, ICSD #406564)
+      // misfit=0.0801
+      // REASON FOR DUPLICATE: Improvement to XtalFinder code, reduces misfit
+      else if(aurostd::WithinList(labels_matched, "AB2C_mC16_15_e_f_e-001") &&
+          aurostd::WithinList(labels_matched, "ABC2_mC16_15_e_e_f-003")){
+        return true;
+      }
+      // ---------------------------------------------------------------------------
+      // A3B9C4_hR16_146_3a_3b_4a-001 (Ba3O9Yb4, ICSD #33239) == A3B9C4_hR16_146_3a_3b_4a-002 (Ba3Ho4O9, ICSD #33807)
+      // misfit=0.0999
+      // REASON FOR DUPLICATE: Improvement to XtalFinder code, reduces misfit
+      else if(aurostd::WithinList(labels_matched, "A3B9C4_hR16_146_3a_3b_4a-001") &&
+          aurostd::WithinList(labels_matched, "A3B9C4_hR16_146_3a_3b_4a-002")){
+        return true;
+      }
+      // ---------------------------------------------------------------------------
+      // AB4C_oC24_63_a_fg_c-001 (MgSO4, anrl part 1) == ABC4_oC24_63_c_a_fg-002 (Cr1Hg1O4, ICSD #416147)
+      // misfit=0.0924
+      // REASON FOR DUPLICATE: Improvement to XtalFinder code, reduces misfit
+      else if(aurostd::WithinList(labels_matched, "AB4C_oC24_63_a_fg_c-001") &&
+          aurostd::WithinList(labels_matched, "ABC4_oC24_63_c_a_fg-002")){
+        return true;
+      }
+    }
+    // ---------------------------------------------------------------------------
+    // list of 3 labels matching
+    else if(nlabels_matched == 3){
+      // ---------------------------------------------------------------------------
+      // ABC2_mC8_12_c_a_i-001 (metal-oxide; Na1Ni1O2, ICSD #26609) == AB2C_mC8_12_a_i_c-001 (Na1O2V1, ICSD #420138) == ABC2_mC8_12_a_c_i-002 (Mn1Na1O2, ICSD #16270)
+      // misfits=0.0746 and 0.0639
+      // REASON FOR DUPLICATE: Improvement to XtalFinder code, reduces misfit
+      if(aurostd::WithinList(labels_matched, "ABC2_mC8_12_c_a_i-001") &&
+          aurostd::WithinList(labels_matched, "AB2C_mC8_12_a_i_c-001") &&
+          aurostd::WithinList(labels_matched, "ABC2_mC8_12_a_c_i-002")){
+        return true;
+      }
+    }
+
+    return false; // not a special case
   }
 }
 

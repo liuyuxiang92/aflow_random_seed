@@ -3804,7 +3804,7 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
     }
     // ===== Check other space groups (2-230), and find origin ===== //
     for (uint j = 0; j < ITC_sym_info.sgindex.size(); j++) {
-      if(SYM::invec<int>(sg_search, ITC_sym_info.sgindex[j])) {
+      if(aurostd::WithinList(sg_search, ITC_sym_info.sgindex[j])) { //DX20210422 - SYM::invec() -> aurostd::WithinList()
         //DEBUGGER:
         if(LDEBUG) {
           cerr << function_name << " Checking generators for space group: " << ITC_sym_info.sgindex[j] << " (with cell choice = " << axis_cell.str() << ")." <<  endl;

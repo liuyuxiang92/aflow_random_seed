@@ -53,7 +53,13 @@ namespace SYM {
   double minimumDistance(const xstructure& xstr){
     //xstructure a(xstr); a.ReScale(1.0);
     //xmatrix<double> lattice=xstr.scale*xstr.lattice;
-    return minimumDistance(xstr.atoms,xstr.lattice,xstr.scale);
+    // -------------------------------------------------------------------
+    // need to copy atoms and bring in cell, otherwise minimum distance
+    // calculation may not work
+    deque<_atom> atoms = xstr.atoms; //DX20210502
+    uint natoms=atoms.size(); //DX20210502
+    for(uint i=0;i<natoms;i++){ BringInCellInPlace(atoms[i], xstr.lattice); } //DX20210502
+    return minimumDistance(atoms,xstr.lattice,xstr.scale);
   }
 } // namespace SYM
 

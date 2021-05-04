@@ -4260,24 +4260,24 @@ namespace aflowlib {
         if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.ORIG] BRAVAIS LATTICE OF THE CRYSTAL (pgroup_xtal) - Real space: Lattice Variation = " << data.lattice_variation_orig << endl;
         if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.ORIG] BRAVAIS LATTICE OF THE CRYSTAL (pgroup_xtal) - Real space: Lattice System = " << data.lattice_system_orig << endl;
         if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.ORIG] BRAVAIS LATTICE OF THE CRYSTAL (pgroup_xtal) - Real space: Pearson Symbol = " << data.Pearson_symbol_orig << endl;
-        //DX20190208 - add ANRL label/parameters/parameter values - START
+        //DX20190208 - add AFLOW label/parameters/parameter values - START
         double anrl_symmetry_tolerance = str_sym.sym_eps;
         xstructure str_anrl = str;
         uint setting=SG_SETTING_ANRL;
-        anrl::structure2anrl(str_anrl, anrl_symmetry_tolerance, setting); 
-        if(data.aflow_prototype_label_orig.empty()) { // anrl label 
-          data.aflow_prototype_label_orig = str_anrl.prototype; 
+        anrl::structure2anrl(str_anrl, anrl_symmetry_tolerance, setting);
+        if(data.aflow_prototype_label_orig.empty()) { // aflow label
+          data.aflow_prototype_label_orig = str_anrl.prototype;
         }
-        if(data.aflow_prototype_parameter_list_orig.empty()) { // anrl parameter list
-          data.aflow_prototype_parameter_list_orig = aurostd::joinWDelimiter(str_anrl.prototype_parameter_list,","); 
+        if(data.aflow_prototype_params_list_orig.empty()) { // aflow parameter list
+          data.aflow_prototype_params_list_orig = aurostd::joinWDelimiter(str_anrl.prototype_parameter_list,",");
         }
-        if(data.aflow_prototype_parameter_values_orig.empty()) { // anrl parameter values
-          data.aflow_prototype_parameter_values_orig = aurostd::joinWDelimiter(aurostd::vecDouble2vecString(str_anrl.prototype_parameter_values,_AFLOWLIB_DATA_DOUBLE_PREC_),","); 
+        if(data.aflow_prototype_params_values_orig.empty()) { // anrl parameter values
+          data.aflow_prototype_params_values_orig = aurostd::joinWDelimiter(aurostd::vecDouble2vecString(str_anrl.prototype_parameter_values,_AFLOWLIB_DATA_DOUBLE_PREC_),",");
         }
-        if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.ORIG] ANRL Label = " << data.aflow_prototype_label_orig << endl;
-        if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.ORIG] ANRL parameter list = " << data.aflow_prototype_parameter_list_orig << endl;
-        if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.ORIG] ANRL parameter values = " << data.aflow_prototype_parameter_values_orig << endl;
-        //DX20190208 - add ANRL label/parameters/parameter values - END
+        if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.ORIG] AFLOW Label = " << data.aflow_prototype_label_orig << endl;
+        if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.ORIG] AFLOW parameter list = " << data.aflow_prototype_params_list_orig << endl;
+        if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.ORIG] AFLOW parameter values = " << data.aflow_prototype_params_values_orig << endl;
+        //DX20190208 - add AFLOW label/parameters/parameter values - END
       }
     }
 
@@ -4576,24 +4576,24 @@ namespace aflowlib {
         if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.RELAX] BRAVAIS LATTICE OF THE CRYSTAL (pgroup_xtal) - Real space: Lattice Variation = " << data.lattice_variation_relax << endl;
         if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.RELAX] BRAVAIS LATTICE OF THE CRYSTAL (pgroup_xtal) - Real space: Lattice System = " << data.lattice_system_relax << endl;
         if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.RELAX] BRAVAIS LATTICE OF THE CRYSTAL (pgroup_xtal) - Real space: Pearson Symbol = " << data.Pearson_symbol_relax << endl;
-        //DX20190208 - add ANRL label/parameters/parameter values - START
+        //DX20190208 - add AFLOW label/parameters/parameter values - START
         double anrl_symmetry_tolerance = str_sym.sym_eps;
         xstructure str_anrl = str;
         uint setting=SG_SETTING_ANRL;
-        anrl::structure2anrl(str_anrl, anrl_symmetry_tolerance, setting); 
-        if(data.aflow_prototype_label_relax.empty()) { // anrl label 
-          data.aflow_prototype_label_relax = str_anrl.prototype; 
+        anrl::structure2anrl(str_anrl, anrl_symmetry_tolerance, setting);
+        if(data.aflow_prototype_label_relax.empty()) { // aflow label
+          data.aflow_prototype_label_relax = str_anrl.prototype;
         }
-        if(data.aflow_prototype_parameter_list_relax.empty()) { // anrl parameter list
-          data.aflow_prototype_parameter_list_relax = aurostd::joinWDelimiter(str_anrl.prototype_parameter_list,","); 
+        if(data.aflow_prototype_params_list_relax.empty()) { // aflow parameter list
+          data.aflow_prototype_params_list_relax = aurostd::joinWDelimiter(str_anrl.prototype_parameter_list,",");
         }
-        if(data.aflow_prototype_parameter_values_relax.empty()) { // anrl parameter values
-          data.aflow_prototype_parameter_values_relax = aurostd::joinWDelimiter(aurostd::vecDouble2vecString(str_anrl.prototype_parameter_values,_AFLOWLIB_DATA_DOUBLE_PREC_),","); 
+        if(data.aflow_prototype_params_values_relax.empty()) { // aflow parameter values
+          data.aflow_prototype_params_values_relax = aurostd::joinWDelimiter(aurostd::vecDouble2vecString(str_anrl.prototype_parameter_values,_AFLOWLIB_DATA_DOUBLE_PREC_),",");
         }
-        //DX20190208 - add ANRL label/parameters/parameter values - END
-        if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.RELAX] ANRL Label = " << data.aflow_prototype_label_relax << endl;
-        if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.RELAX] ANRL parameter list = " << data.aflow_prototype_parameter_list_relax << endl;
-        if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.RELAX] ANRL parameter values = " << data.aflow_prototype_parameter_values_relax << endl;
+        //DX20190208 - add AFLOW label/parameters/parameter values - END
+        if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.RELAX] AFLOW Label = " << data.aflow_prototype_label_relax << endl;
+        if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.RELAX] AFLOW parameter list = " << data.aflow_prototype_params_list_relax << endl;
+        if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.RELAX] AFLOW parameter values = " << data.aflow_prototype_params_values_relax << endl;
       }
     }
     if(LDEBUG) cerr << soliloquy << " [17]" << endl;
@@ -4819,7 +4819,7 @@ namespace aflowlib {
         if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.BANDS] BRAVAIS LATTICE OF THE CRYSTAL (pgroup_xtal) - Real space: Lattice Variation = " << data.lattice_variation_relax << endl;
         if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.BANDS] BRAVAIS LATTICE OF THE CRYSTAL (pgroup_xtal) - Real space: Lattice System = " << data.lattice_system_relax << endl;
         if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.BANDS] BRAVAIS LATTICE OF THE CRYSTAL (pgroup_xtal) - Real space: Pearson Symbol = " << data.Pearson_symbol_relax << endl;
-        //DX20190208 - add ANRL label/parameters/parameter values - START
+        //DX20190208 - add AFLOW label/parameters/parameter values - START
         double anrl_symmetry_tolerance = str_sym.sym_eps;
         xstructure str_anrl = str;
         uint setting=SG_SETTING_ANRL;
@@ -4827,16 +4827,16 @@ namespace aflowlib {
         if(data.aflow_prototype_label_relax.empty()) { // anrl label 
           data.aflow_prototype_label_relax = str_anrl.prototype; 
         }
-        if(data.aflow_prototype_parameter_list_relax.empty()) { // anrl parameter list
-          data.aflow_prototype_parameter_list_relax = aurostd::joinWDelimiter(str_anrl.prototype_parameter_list,","); 
+        if(data.aflow_prototype_params_list_relax.empty()) { // anrl parameter list
+          data.aflow_prototype_params_list_relax = aurostd::joinWDelimiter(str_anrl.prototype_parameter_list,","); 
         }
-        if(data.aflow_prototype_parameter_values_relax.empty()) { // anrl parameter values
-          data.aflow_prototype_parameter_values_relax = aurostd::joinWDelimiter(aurostd::vecDouble2vecString(str_anrl.prototype_parameter_values,_AFLOWLIB_DATA_DOUBLE_PREC_),","); 
+        if(data.aflow_prototype_params_values_relax.empty()) { // anrl parameter values
+          data.aflow_prototype_params_values_relax = aurostd::joinWDelimiter(aurostd::vecDouble2vecString(str_anrl.prototype_parameter_values,_AFLOWLIB_DATA_DOUBLE_PREC_),","); 
         }
-        if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.BANDS] ANRL Label = " << data.aflow_prototype_label_relax << endl;
-        if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.BANDS] ANRL parameter list = " << data.aflow_prototype_parameter_list_relax << endl;
-        if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.BANDS] ANRL parameter values = " << data.aflow_prototype_parameter_values_relax << endl;
-        //DX20190208 - add ANRL label/parameters/parameter values - END
+        if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.BANDS] AFLOW Label = " << data.aflow_prototype_label_relax << endl;
+        if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.BANDS] AFLOW parameter list = " << data.aflow_prototype_params_list_relax << endl;
+        if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.BANDS] AFLOW parameter values = " << data.aflow_prototype_params_values_relax << endl;
+        //DX20190208 - add AFLOW label/parameters/parameter values - END
       }
     }
     if(LDEBUG) cerr << soliloquy << " [18]" << endl;
@@ -6107,18 +6107,18 @@ namespace aflowlib {
     anrl::structure2anrl(xstr_anrl,xstr_anrl.sym_eps,SG_SETTING_ANRL);
     data.aflow_prototype_label_orig=xstr_anrl.prototype;
     if(AFLOWLIB_VERBOSE && !data.aflow_prototype_label_orig.empty()) cout << MESSAGE << " aflow_prototype_label_orig=" << data.aflow_prototype_label_orig << endl;
-    data.aflow_prototype_parameter_list_orig=aurostd::joinWDelimiter(xstr_anrl.prototype_parameter_list,",");
-    if(AFLOWLIB_VERBOSE && !data.aflow_prototype_parameter_list_orig.empty()) cout << MESSAGE << " aflow_prototype_parameter_list_orig=" << data.aflow_prototype_parameter_list_orig << endl;
-    //build data.aflow_prototype_parameter_values_orig from scratch
+    data.aflow_prototype_params_list_orig=aurostd::joinWDelimiter(xstr_anrl.prototype_parameter_list,",");
+    if(AFLOWLIB_VERBOSE && !data.aflow_prototype_params_list_orig.empty()) cout << MESSAGE << " aflow_prototype_params_list_orig=" << data.aflow_prototype_params_list_orig << endl;
+    //build data.aflow_prototype_params_values_orig from scratch
     if(LDEBUG){cerr << soliloquy << " prototype_parameter_values(PARENT)=" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(xstr_anrl.prototype_parameter_values,_AFLOWLIB_DATA_DOUBLE_PREC_),",") << endl;}
     vector<double> prototype_parameter_values=xstr_anrl.prototype_parameter_values;
-    if(prototype_parameter_values.empty()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"ANRL parameter values builder failed: prototype_parameter_values.empty()",_RUNTIME_ERROR_);}
+    if(prototype_parameter_values.empty()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"AFLOW parameter values builder failed: prototype_parameter_values.empty()",_RUNTIME_ERROR_);}
     prototype_parameter_values[0]*=(xstr_pocc.GetVolume()/xstr_pocc_parent.GetVolume());  //scale for the volume of the pocc structure, remember: anrl is based on std_conv, not the primitive
     if(prototype_parameter_values.size()!=xstr_anrl.prototype_parameter_values.size()){
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"ANRL parameter values builder failed: prototype_parameter_values.size()!=xstr_anrl.prototype_parameter_values.size()",_RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"AFLOW parameter values builder failed: prototype_parameter_values.size()!=xstr_anrl.prototype_parameter_values.size()",_RUNTIME_ERROR_);
     }
-    data.aflow_prototype_parameter_values_orig=aurostd::joinWDelimiter(aurostd::vecDouble2vecString(prototype_parameter_values,_AFLOWLIB_DATA_DOUBLE_PREC_),",");
-    if(AFLOWLIB_VERBOSE && !data.aflow_prototype_parameter_values_orig.empty()) cout << MESSAGE << " aflow_prototype_parameter_values_orig=" << data.aflow_prototype_parameter_values_orig << endl;
+    data.aflow_prototype_params_values_orig=aurostd::joinWDelimiter(aurostd::vecDouble2vecString(prototype_parameter_values,_AFLOWLIB_DATA_DOUBLE_PREC_),",");
+    if(AFLOWLIB_VERBOSE && !data.aflow_prototype_params_values_orig.empty()) cout << MESSAGE << " aflow_prototype_params_values_orig=" << data.aflow_prototype_params_values_orig << endl;
 
     //get other _atom/_cell properties
     double data_natoms=0.0; //needs to be double for pocc

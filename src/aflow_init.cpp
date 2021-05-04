@@ -691,8 +691,8 @@ namespace init {
     XHOST.vflag_control.flag("README_AAPL",aurostd::args2flag(argv,cmds,"--readme=aapl|--readme_aapl"));
     XHOST.vflag_control.flag("README_AGL",aurostd::args2flag(argv,cmds,"--readme=agl|--readme_agl"));
     XHOST.vflag_control.flag("README_AEL",aurostd::args2flag(argv,cmds,"--readme=ael|--readme_ael"));
-    XHOST.vflag_control.flag("README_ANRL",aurostd::args2flag(argv,cmds,"--readme=anrl|--readme_anrl"));
-    XHOST.vflag_control.flag("README_COMPARE",aurostd::args2flag(argv,cmds,"--readme=compare|--readme_compare"));
+    XHOST.vflag_control.flag("README_ANRL",aurostd::args2flag(argv,cmds,"--readme=prototypes|--readme_prototypes|--readme=anrl|--readme_anrl")); //DX20210422 - added prototypes variants
+    XHOST.vflag_control.flag("README_COMPARE",aurostd::args2flag(argv,cmds,"--readme=xtalfinder|--readme_xtalfinder|--readme=compare|--readme_compare")); //DX20210422 - added xtalfinder variants
     XHOST.vflag_control.flag("README_GFA",aurostd::args2flag(argv,cmds,"--readme=gfa|--readme_gfa")); //CO20190401
     XHOST.vflag_control.flag("README_SYMMETRY",aurostd::args2flag(argv,cmds,"--readme=symmetry|--readme_symmetry"));
     XHOST.vflag_control.flag("README_CCE",aurostd::args2flag(argv,cmds,"--readme=cce|--readme_cce")); //CO20190620
@@ -2196,15 +2196,15 @@ namespace init {
     nschema++;
 
     // schema is CAPITAL, content is not necessarily //DX20200902
-    XHOST.vschema.push_attached("SCHEMA::NAME:AFLOW_PROTOTYPE_PARAMETER_LIST_ORIG","aflow_prototype_parameter_list_orig"); //DX20201001 - updated keyword
-    XHOST.vschema.push_attached("SCHEMA::UNIT:AFLOW_PROTOTYPE_PARAMETER_LIST_ORIG",""); //DX20201001 - updated keyword
-    XHOST.vschema.push_attached("SCHEMA::TYPE:AFLOW_PROTOTYPE_PARAMETER_LIST_ORIG","strings"); //DX20201001 - updated keyword
+    XHOST.vschema.push_attached("SCHEMA::NAME:AFLOW_PROTOTYPE_PARAMS_LIST_ORIG","aflow_prototype_params_list_orig"); //DX20201001 - updated keyword
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AFLOW_PROTOTYPE_PARAMS_LIST_ORIG",""); //DX20201001 - updated keyword
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AFLOW_PROTOTYPE_PARAMS_LIST_ORIG","strings"); //DX20201001 - updated keyword
     nschema++;
 
     // schema is CAPITAL, content is not necessarily //DX20200902
-    XHOST.vschema.push_attached("SCHEMA::NAME:AFLOW_PROTOTYPE_PARAMETER_VALUES_ORIG","aflow_prototype_parameter_values_orig"); //DX20201001 - updated keyword
-    XHOST.vschema.push_attached("SCHEMA::UNIT:AFLOW_PROTOTYPE_PARAMETER_VALUES_ORIG",""); //DX20201001 - updated keyword
-    XHOST.vschema.push_attached("SCHEMA::TYPE:AFLOW_PROTOTYPE_PARAMETER_VALUES_ORIG","numbers"); //DX20201001 - updated keyword
+    XHOST.vschema.push_attached("SCHEMA::NAME:AFLOW_PROTOTYPE_PARAMS_VALUES_ORIG","aflow_prototype_params_values_orig"); //DX20201001 - updated keyword
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AFLOW_PROTOTYPE_PARAMS_VALUES_ORIG",""); //DX20201001 - updated keyword
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AFLOW_PROTOTYPE_PARAMS_VALUES_ORIG","numbers"); //DX20201001 - updated keyword
     nschema++;
 
     // schema is CAPITAL, content is not necessarily //DX20200902
@@ -2214,15 +2214,15 @@ namespace init {
     nschema++;
 
     // schema is CAPITAL, content is not necessarily //DX20200902
-    XHOST.vschema.push_attached("SCHEMA::NAME:AFLOW_PROTOTYPE_PARAMETER_LIST_RELAX","aflow_prototype_parameter_list_relax"); //DX20201001 - updated keyword
-    XHOST.vschema.push_attached("SCHEMA::UNIT:AFLOW_PROTOTYPE_PARAMETER_LIST_RELAX",""); //DX20201001 - updated keyword
-    XHOST.vschema.push_attached("SCHEMA::TYPE:AFLOW_PROTOTYPE_PARAMETER_LIST_RELAX","strings"); //DX20201001 - updated keyword
+    XHOST.vschema.push_attached("SCHEMA::NAME:AFLOW_PROTOTYPE_PARAMS_LIST_RELAX","aflow_prototype_params_list_relax"); //DX20201001 - updated keyword
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AFLOW_PROTOTYPE_PARAMS_LIST_RELAX",""); //DX20201001 - updated keyword
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AFLOW_PROTOTYPE_PARAMS_LIST_RELAX","strings"); //DX20201001 - updated keyword
     nschema++;
 
     // schema is CAPITAL, content is not necessarily //DX20200902
-    XHOST.vschema.push_attached("SCHEMA::NAME:AFLOW_PROTOTYPE_PARAMETER_VALUES_RELAX","aflow_prototype_parameter_values_relax"); //DX20201001 - updated keyword
-    XHOST.vschema.push_attached("SCHEMA::UNIT:AFLOW_PROTOTYPE_PARAMETER_VALUES_RELAX",""); //DX20201001 - updated keyword
-    XHOST.vschema.push_attached("SCHEMA::TYPE:AFLOW_PROTOTYPE_PARAMETER_VALUES_RELAX","numbers"); //DX20201001 - updated keyword
+    XHOST.vschema.push_attached("SCHEMA::NAME:AFLOW_PROTOTYPE_PARAMS_VALUES_RELAX","aflow_prototype_params_values_relax"); //DX20201001 - updated keyword
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AFLOW_PROTOTYPE_PARAMS_VALUES_RELAX",""); //DX20201001 - updated keyword
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AFLOW_PROTOTYPE_PARAMS_VALUES_RELAX","numbers"); //DX20201001 - updated keyword
     nschema++;
 
     // schema is CAPITAL, content is not necessarily

@@ -11,10 +11,11 @@ AFLOW-XtalFinder (COMPARE STRUCTURE) README
 
 README written by: David Hicks (david.hicks@duke.edu)
 
-Citation info: D. Hicks, C. Toher, D.C. Ford, F. Rose, 
-               C. De Santo O. Levy, M.J. Mehl, and S. Curtarolo, 
+Citation info: D. Hicks, C. Toher, D.C. Ford, F. Rose,
+               C. De Santo O. Levy, M.J. Mehl, and S. Curtarolo,
                AFLOW-XtalFinder: a reliable choice to identify crystalline
-               prototypes, in press npj Comput. Mater. (2020).
+               prototypes, npj Comput. Mater. 7, 30 (2020).
+               [doi=10.1038/s41524-020-00483-4]
 
 ********************************************************************************
 GENERAL OVERVIEW
@@ -34,7 +35,7 @@ The AFLOW-XtalFinder functionalities are described below.
 ----------------------------------------------------------------------
 PROTOTYPING TOOLS
 Structures are automatically cast into the AFLOW standard representation
-consistent with the AFLOW Library of Crystallographic Prototypes.
+consistent with the AFLOW Prototype Encyclopedia.
 The routine determines the internal degrees of freedom for the prototype,
 e.g., esseneite:
 
@@ -87,7 +88,7 @@ The supported formats are:
 
 ----------------------------------------------------------------------
 COMPARE TO ESTABLISHED STRUCTURES
-Users can compare input structures to the AFLOW.org repository and the AFLOW Library of Crystallographic Prototypes.
+Users can compare input structures to the AFLOW.org repository and the AFLOW Prototype Encyclopedia.
 The functionality is useful for identifying equivalent compounds within repositories and relating their properties.
 
 ----------------------------------------------------------------------
@@ -105,7 +106,7 @@ LIST OF AFLOW-XtalFinder COMMANDS:
                                       returns their level of similarity
   aflow --compare_structures        : Compares structures (ignore species in mapping) and returns their level
                                       of similarity
-  aflow --get_isopointal_prototypes : Returns all isopointal (i.e., same symmetry) to input structure
+  aflow --get_isopointal_prototypes : Returns all isopointal prototypes (i.e., similar symmetry) to an input structure
   aflow --prototype                 : Returns AFLOW label/parameters/parameter values of the structure
   aflow --unique_atom_decorations   : Returns the unique atom decorations for the structure
 
@@ -147,13 +148,13 @@ Steps:
     7) Once a commensurate lattice is found (i.e., similar lattice vector lengths
        and volume to structure1), transform structure2 to its new
        representation.
-    8) Of the best match (smallest misfit (mis)):
+    8) Find the best match (smallest misfit (mis)):
        If mis <= epsilon_match:
-         Structures similar. Print out new representation of
+         Structures are similar. Print out the new representation of
          structure2 and the figure of misfit
        else if epsilon_match < mis <= epsilon_family:
-         Structures in the same family (possible symmetric
-         group-subgroup relation). Print out new representation
+         Structures are in the same family (possible symmetric
+         group-subgroup relation). Print out the new representation
          of structure2 and the figure of misfit
        else mis>0.2:
          Structures are not the same.
@@ -191,7 +192,7 @@ General options - applicable to all commands - is listed at the bottom of this s
                                                                values with the comparison results.
             [--relaxation_step=original|relax1|most_relaxed] : Compare geometries from a particular step in the DFT relaxation.
                                                                Allows numeric or string input (e.g., 0->original, 1->relax1, 2->most_relaxed).
-    
+
 
     aflow --compare_database_entries [GENERAL_COMPARISON_OPTIONS] [COMPARE_DATABASE_ENTRIES_OPTIONS]
         Compares structures in the AFLOW.org repository and groups entries into structurally similar materials.
@@ -266,12 +267,11 @@ General options - applicable to all commands - is listed at the bottom of this s
 
 
     aflow --get_isopointal_prototype [ISOPOINTAL_OPTIONS] < file
-        Returns the prototype labels that are isopointal (i.e. same symmetry) as the input structure.
+        Returns the prototype labels that are isopointal (i.e. similar symmetry) as the input structure.
         In this case, the same symmetry means that the structures have commensurate:
           1) space groups (equivalent or enantiomorphic pairs) and
           2) Wyckoff positions (same multiplicity and site symmetry)
-        Can be used to quickly determine if structures cannot be generated with AFLOW
-        (i.e., reveals if structures have similar AFLOW prototype designations).
+        Can be used to quickly determine if structures have similar AFLOW prototype designations.
 
         [ISOPOINTAL_OPTIONS] : Options specific to this command:
 
@@ -293,8 +293,8 @@ General options - applicable to all commands - is listed at the bottom of this s
         [--ignore_symmetry]                     : Neglects symmetry analysis (both space group and Wyckoff positions) for grouping comparisons.
         [--ignore_Wyckoff]                      : Neglects Wyckoff symmetry (site symmetry) for filtering comparisons, but considers the space group number.
         [--ignore_environment]                  : Neglects LFA environment analysis for filtering comparisons.
-        [--keep_unmatched!]                     : Retains misfit information of unmatched structures (i.e., misfit>0.1).
-        [--match_to_aflow_prototypes!]          : Identifies matching AFLOW prototypes to the representative structure.  The option does not apply to
+        [--keep_unmatched]                      : Retains misfit information of unmatched structures (i.e., misfit>0.1).
+        [--match_to_aflow_prototypes]           : Identifies matching AFLOW prototypes to the representative structure.  The option does not apply to
                                                   --unique_atom_decorations or --compare2prototypes (redundant).
         [--magmom=<m1,m2,...|INCAR|OUTCAR>:...] : Specifies the magnetic moment for each structure (collinear or non-collinear) delimited by colons,
                                                   signaling a magnetic-type comparison. The option does not apply to --compare_structures since the atom type is neglected.

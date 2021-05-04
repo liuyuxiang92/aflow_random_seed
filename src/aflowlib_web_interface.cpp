@@ -184,11 +184,11 @@ namespace aflowlib {
     //DX20180823 - added more symmetry info - END
     //DX20190209 - added anrl info - START
     aflow_prototype_label_orig=b.aflow_prototype_label_orig;
-    aflow_prototype_parameter_list_orig=b.aflow_prototype_parameter_list_orig;
-    aflow_prototype_parameter_values_orig=b.aflow_prototype_parameter_values_orig;
+    aflow_prototype_params_list_orig=b.aflow_prototype_params_list_orig;
+    aflow_prototype_params_values_orig=b.aflow_prototype_params_values_orig;
     aflow_prototype_label_relax=b.aflow_prototype_label_relax;
-    aflow_prototype_parameter_list_relax=b.aflow_prototype_parameter_list_relax;
-    aflow_prototype_parameter_values_relax=b.aflow_prototype_parameter_values_relax;
+    aflow_prototype_params_list_relax=b.aflow_prototype_params_list_relax;
+    aflow_prototype_params_values_relax=b.aflow_prototype_params_values_relax;
     //DX20190209 - added anrl info - END
     pocc_parameters=b.pocc_parameters;  //CO20200731
     // AGL/AEL
@@ -456,11 +456,11 @@ namespace aflowlib {
     //DX20180823 - added more symmetry info - END
     //DX20190209 - added anrl info - START
     aflow_prototype_label_orig.clear();
-    aflow_prototype_parameter_list_orig.clear();
-    aflow_prototype_parameter_values_orig.clear();
+    aflow_prototype_params_list_orig.clear();
+    aflow_prototype_params_values_orig.clear();
     aflow_prototype_label_relax.clear();
-    aflow_prototype_parameter_list_relax.clear();
-    aflow_prototype_parameter_values_relax.clear();
+    aflow_prototype_params_list_relax.clear();
+    aflow_prototype_params_values_relax.clear();
     //DX20190209 - added anrl info - END
     pocc_parameters.clear(); //CO20200731
     // AGL/AEL
@@ -801,11 +801,11 @@ namespace aflowlib {
         //DX20180823 - added more symmetry info - END
         //DX20190209 - added anrl info - START
         else if(keyword=="aflow_prototype_label_orig") {aflow_prototype_label_orig=content;}
-        else if(keyword=="aflow_prototype_parameter_list_orig") {aflow_prototype_parameter_list_orig=content;}
-        else if(keyword=="aflow_prototype_parameter_values_orig") {aflow_prototype_parameter_values_orig=content;}
+        else if(keyword=="aflow_prototype_params_list_orig") {aflow_prototype_params_list_orig=content;}
+        else if(keyword=="aflow_prototype_params_values_orig") {aflow_prototype_params_values_orig=content;}
         else if(keyword=="aflow_prototype_label_relax") {aflow_prototype_label_relax=content;}
-        else if(keyword=="aflow_prototype_parameter_list_relax") {aflow_prototype_parameter_list_relax=content;}
-        else if(keyword=="aflow_prototype_parameter_values_relax") {aflow_prototype_parameter_values_relax=content;}
+        else if(keyword=="aflow_prototype_params_list_relax") {aflow_prototype_params_list_relax=content;}
+        else if(keyword=="aflow_prototype_params_values_relax") {aflow_prototype_params_values_relax=content;}
         //DX20190209 - added anrl info - END
         else if(keyword=="pocc_parameters") {pocc_parameters=content;}  //CO20200731
         // AGL/AEL
@@ -1121,11 +1121,11 @@ namespace aflowlib {
       //DX20180823 - added more symmetry info - END
       //DX20190208 - added anrl info - START
       oss << "aflow_prototype_label_orig=" << aflow_prototype_label_orig << (html?"<br>":"") << endl;
-      oss << "aflow_prototype_parameter_list_orig=" << aflow_prototype_parameter_list_orig << (html?"<br>":"") << endl;
-      oss << "aflow_prototype_parameter_values_orig=" << aflow_prototype_parameter_values_orig << (html?"<br>":"") << endl;
+      oss << "aflow_prototype_params_list_orig=" << aflow_prototype_params_list_orig << (html?"<br>":"") << endl;
+      oss << "aflow_prototype_params_values_orig=" << aflow_prototype_params_values_orig << (html?"<br>":"") << endl;
       oss << "aflow_prototype_label_relax=" << aflow_prototype_label_relax << (html?"<br>":"") << endl;
-      oss << "aflow_prototype_parameter_list_relax=" << aflow_prototype_parameter_list_relax << (html?"<br>":"") << endl;
-      oss << "aflow_prototype_parameter_values_relax=" << aflow_prototype_parameter_values_relax << (html?"<br>":"") << endl;
+      oss << "aflow_prototype_params_list_relax=" << aflow_prototype_params_list_relax << (html?"<br>":"") << endl;
+      oss << "aflow_prototype_params_values_relax=" << aflow_prototype_params_values_relax << (html?"<br>":"") << endl;
       //DX20190208 - added anrl info - END
       oss << "pocc_parameters=" << pocc_parameters << (html?"<br>":"") << endl;  //CO20200731
       // AGL/AEL
@@ -1368,11 +1368,11 @@ namespace aflowlib {
       //DX20180823 - added more symmetry info - END
       //DX20190208 - added anrl info - START
       if(aflow_prototype_label_orig.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "aflow_prototype_label_orig=" << aflow_prototype_label_orig << eendl;
-      if(aflow_prototype_parameter_list_orig.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "aflow_prototype_parameter_list_orig=" << aflow_prototype_parameter_list_orig << eendl;
-      if(aflow_prototype_parameter_values_orig.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "aflow_prototype_parameter_values_orig=" << aflow_prototype_parameter_values_orig << eendl;
+      if(aflow_prototype_params_list_orig.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "aflow_prototype_params_list_orig=" << aflow_prototype_params_list_orig << eendl;
+      if(aflow_prototype_params_values_orig.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "aflow_prototype_params_values_orig=" << aflow_prototype_params_values_orig << eendl;
       if(aflow_prototype_label_relax.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "aflow_prototype_label_relax=" << aflow_prototype_label_relax << eendl;
-      if(aflow_prototype_parameter_list_relax.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "aflow_prototype_parameter_list_relax=" << aflow_prototype_parameter_list_relax << eendl;
-      if(aflow_prototype_parameter_values_relax.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "aflow_prototype_parameter_values_relax=" << aflow_prototype_parameter_values_relax << eendl;
+      if(aflow_prototype_params_list_relax.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "aflow_prototype_params_list_relax=" << aflow_prototype_params_list_relax << eendl;
+      if(aflow_prototype_params_values_relax.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "aflow_prototype_params_values_relax=" << aflow_prototype_params_values_relax << eendl;
       //DX20190208 - added anrl info - END
       if(pocc_parameters.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "pocc_parameters=" << pocc_parameters << eendl; //CO20200731
       // AGL/AEL
@@ -2931,22 +2931,22 @@ namespace aflowlib {
       vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
       //////////////////////////////////////////////////////////////////////////
-      if(aflow_prototype_parameter_list_orig.size()){
-        vs.clear(); aurostd::string2tokens(aflow_prototype_parameter_list_orig,vs,",");
-        sscontent_json << "\"aflow_prototype_parameter_list_orig\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(vs,"\""),",") << "]";
+      if(aflow_prototype_params_list_orig.size()){
+        vs.clear(); aurostd::string2tokens(aflow_prototype_params_list_orig,vs,",");
+        sscontent_json << "\"aflow_prototype_params_list_orig\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(vs,"\""),",") << "]";
         vs.clear();
       } else {
-        if(PRINT_NULL) sscontent_json << "\"aflow_prototype_parameter_list_orig\":null";
+        if(PRINT_NULL) sscontent_json << "\"aflow_prototype_params_list_orig\":null";
       }
       vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
       //////////////////////////////////////////////////////////////////////////
-      if(aflow_prototype_parameter_values_orig.size()){
-        vs.clear(); aurostd::string2tokens(aflow_prototype_parameter_values_orig,vs,",");
-        sscontent_json << "\"aflow_prototype_parameter_values_orig\":[" << aurostd::joinWDelimiter(vs,",") << "]";
+      if(aflow_prototype_params_values_orig.size()){
+        vs.clear(); aurostd::string2tokens(aflow_prototype_params_values_orig,vs,",");
+        sscontent_json << "\"aflow_prototype_params_values_orig\":[" << aurostd::joinWDelimiter(vs,",") << "]";
         vs.clear();
       } else {
-        if(PRINT_NULL) sscontent_json << "\"aflow_prototype_parameter_values_orig\":null";
+        if(PRINT_NULL) sscontent_json << "\"aflow_prototype_params_values_orig\":null";
       }
       vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
@@ -2959,22 +2959,22 @@ namespace aflowlib {
       vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
       //////////////////////////////////////////////////////////////////////////
-      if(aflow_prototype_parameter_list_relax.size()){
-        vs.clear(); aurostd::string2tokens(aflow_prototype_parameter_list_relax,vs,",");
-        sscontent_json << "\"aflow_prototype_parameter_list_relax\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(vs,"\""),",") << "]";
+      if(aflow_prototype_params_list_relax.size()){
+        vs.clear(); aurostd::string2tokens(aflow_prototype_params_list_relax,vs,",");
+        sscontent_json << "\"aflow_prototype_params_list_relax\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(vs,"\""),",") << "]";
         vs.clear();
       } else {
-        if(PRINT_NULL) sscontent_json << "\"aflow_prototype_parameter_list_relax\":null";
+        if(PRINT_NULL) sscontent_json << "\"aflow_prototype_params_list_relax\":null";
       }
       vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
       //////////////////////////////////////////////////////////////////////////
-      if(aflow_prototype_parameter_values_relax.size()){
-        vs.clear(); aurostd::string2tokens(aflow_prototype_parameter_values_relax,vs,",");
-        sscontent_json << "\"aflow_prototype_parameter_values_relax\":[" << aurostd::joinWDelimiter(vs,",") << "]";
+      if(aflow_prototype_params_values_relax.size()){
+        vs.clear(); aurostd::string2tokens(aflow_prototype_params_values_relax,vs,",");
+        sscontent_json << "\"aflow_prototype_params_values_relax\":[" << aurostd::joinWDelimiter(vs,",") << "]";
         vs.clear();
       } else {
-        if(PRINT_NULL) sscontent_json << "\"aflow_prototype_parameter_values_relax\":null";
+        if(PRINT_NULL) sscontent_json << "\"aflow_prototype_params_values_relax\":null";
       }
       vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
