@@ -703,7 +703,7 @@ namespace LATTICE {
       vector<xmatrix<double> >& lattices_aaa,
       const string& crystal_system,
       double eps){
-  
+
     bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_COMPARE_);
     string function_name = XPID + "LATTICE::findLattices():";
 
@@ -1182,7 +1182,7 @@ namespace LATTICE {
     //DX20210316 [OBSOLETE]    }
     //DX20210316 [OBSOLETE]  }
     //DX20210316 [OBSOLETE]}
-    
+
     // ------------------------------------------------------------------------------------
     // filter vectors - replaces obsolete code above //DX20210316
     findLattices(vvectors, str_sp.lattice, vrlattice1, vrlattice1_aaa, crystal_system, eps);
@@ -1496,7 +1496,7 @@ namespace LATTICE {
             if(aurostd::isequal(a,b,eps) && aurostd::isequal(b,c,eps)) {  // aaa
               if(SYM::checkAngle(b,c,alpha,beta,is_deg,eps) && SYM::checkAngle(a,c,beta,gamma,is_deg,eps)) //DX
               { //CO20200106 - patching for auto-indenting
-              //DX if(aurostd::isequal(alpha,beta,epsang) && aurostd::isequal(beta,gamma,epsang))  // alpha alpha alpha
+                //DX if(aurostd::isequal(alpha,beta,epsang) && aurostd::isequal(beta,gamma,epsang))  // alpha alpha alpha
                 //  cerr << a << " " << b << " " << c << " " << alpha << " " << beta << " " << gamma << " " << eps << " " << epsang << endl;
                 //DX if(aurostd::isdifferent(alpha,90.0,epsang/rhl_ratio) && // no cubic
                 //DX    aurostd::isdifferent(alpha,60.0,epsang/rhl_ratio) && aurostd::isdifferent(alpha,180.0-60.0,epsang/rhl_ratio) && // no fcc (60 and 120)

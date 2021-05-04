@@ -189,11 +189,11 @@ namespace aflowlib {
       //DX20180823 - added more symmetry info - END
       //DX20190208 - added anrl info - START
       string aflow_prototype_label_orig; //DX20201001 - renamed
-      string aflow_prototype_parameter_list_orig; //DX20201001 - renamed
-      string aflow_prototype_parameter_values_orig; //DX20201001 - renamed
+      string aflow_prototype_params_list_orig; //DX20201001 - renamed
+      string aflow_prototype_params_values_orig; //DX20201001 - renamed
       string aflow_prototype_label_relax; //DX20201001 - renamed
-      string aflow_prototype_parameter_list_relax; //DX20201001 - renamed
-      string aflow_prototype_parameter_values_relax; //DX20201001 - renamed
+      string aflow_prototype_params_list_relax; //DX20201001 - renamed
+      string aflow_prototype_params_values_relax; //DX20201001 - renamed
       //DX20190208 - added anrl info - END
       string pocc_parameters; //CO20200731
       // AGL/AEL

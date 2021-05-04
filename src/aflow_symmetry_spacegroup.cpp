@@ -999,7 +999,7 @@ uint xstructure::GetPrimitiveCell(void) {
       lattice_basis[2] = SYM::extract_row(prim_lattice, 3);
 
       lattice_basis_xmat = SYM::xvec2xmat(lattice_basis[0], lattice_basis[1], lattice_basis[2]);
-        
+
       // ---------------------------------------------------------------------------
       //DX20210316 - used transformation method (more efficient)
       xmatrix<double> transformation_matrix = GetBasisTransformation((*this).lattice, lattice_basis_xmat);
@@ -1022,14 +1022,14 @@ uint xstructure::GetPrimitiveCell(void) {
       //DX20210315 [OBSOLETE]//Now get atoms inside of new, reduced basis:
       //DX20210315 [OBSOLETE]//[CO20190520]newbasis = foldAtomsInCell(expanded_basis, c2f, f2c, skew, same_atom_tol); //CO20180409
       //DX20210315 [OBSOLETE]newbasis = ::foldAtomsInCell(expanded_basis, (*this).lattice, lattice_basis_xmat, skew, same_atom_tol,false); //CO20180409 //DX20190619 - false->do not check min dists (expensive)
-	
+
       //DEBUG
       //cerr << "newbasis.size(): " << newbasis.size() << endl;
       //for(uint n=0;n<newbasis.size();n++){
       //  cerr << newbasis[n].fpos << endl;
       //}
       //DEBUG
- 
+
       //DX20210315 [OBSOLETE]bool consistent_ratio = SYM::GCD_conventional_atomic_basis(newbasis, orig_split_atom_types, atoms_GCD);
       //DX20210315 [OBSOLETE]if(consistent_ratio == false) {
       //DX20210315 [OBSOLETE]  foundbasis = false;
@@ -3804,7 +3804,7 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
     }
     // ===== Check other space groups (2-230), and find origin ===== //
     for (uint j = 0; j < ITC_sym_info.sgindex.size(); j++) {
-      if(SYM::invec<int>(sg_search, ITC_sym_info.sgindex[j])) {
+      if(aurostd::WithinList(sg_search, ITC_sym_info.sgindex[j])) { //DX20210422 - SYM::invec() -> aurostd::WithinList()
         //DEBUGGER:
         if(LDEBUG) {
           cerr << function_name << " Checking generators for space group: " << ITC_sym_info.sgindex[j] << " (with cell choice = " << axis_cell.str() << ")." <<  endl;

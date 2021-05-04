@@ -1048,7 +1048,7 @@ namespace pflow {
       const AQueue& operator=(const AQueue& other);
       void clear();
       //NECESSARY PUBLIC CLASS METHODS - STOP
-      
+
       //general attributes
       bool m_initialized;
       aurostd::xoption m_flags;
@@ -1056,7 +1056,7 @@ namespace pflow {
       vector<APartition> m_partitions;
       vector<ANode> m_nodes;
       vector<AJob> m_jobs;
-      
+
       //initialization methods
       bool initialize(ostream& oss);
       bool initialize(ofstream& FilMESSAGE,ostream& oss);
@@ -1089,10 +1089,10 @@ namespace pflow {
       void free();
       void copy(const AQueue& b);
       //NECESSARY END CLASS METHODS - END
-      
+
       void freeQueue();
       void processQueue();  //main processer for external queue commands (pbsnodes, qstat, squeue, etc.)
-      
+
       void readNodesPartitionsSLURM();
       void readJobsSLURM();
       void readPartitionsTORQUE();

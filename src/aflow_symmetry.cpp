@@ -53,7 +53,13 @@ namespace SYM {
   double minimumDistance(const xstructure& xstr){
     //xstructure a(xstr); a.ReScale(1.0);
     //xmatrix<double> lattice=xstr.scale*xstr.lattice;
-    return minimumDistance(xstr.atoms,xstr.lattice,xstr.scale);
+    // -------------------------------------------------------------------
+    // need to copy atoms and bring in cell, otherwise minimum distance
+    // calculation may not work
+    deque<_atom> atoms = xstr.atoms; //DX20210502
+    uint natoms=atoms.size(); //DX20210502
+    for(uint i=0;i<natoms;i++){ BringInCellInPlace(atoms[i], xstr.lattice); } //DX20210502
+    return minimumDistance(atoms,xstr.lattice,xstr.scale);
   }
 } // namespace SYM
 
@@ -4101,7 +4107,7 @@ namespace SYM {
 
     // ------------------------------------------------------------------------------------------- PRINTING AND LEAVING
     aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message
-       << " " << SEPARATION_LINE_DASH_SHORT << endl;
+      << " " << SEPARATION_LINE_DASH_SHORT << endl;
     aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message
       << " Symmetry: unique point group operations " << a.pgroup_xtal.size() << endl;// Message(_AFLOW_FILE_NAME_,aflags) << endl;
     aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: " << operations << endl;
@@ -8918,7 +8924,7 @@ bool KBIN_SymmetryToScreenWeb(xstructure& a, ostream& oss, char mode) {
   }
   aurostd::stream2vectorstring(sscontent_txt, vcontent_txt);
   oss << "{\"txt\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(vcontent_txt, "\"", "\""), ",") << "],"
-      << "\"json\":" << sscontent_json.str() << "}" << std::endl;
+    << "\"json\":" << sscontent_json.str() << "}" << std::endl;
   return true;
 }
 

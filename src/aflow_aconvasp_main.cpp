@@ -1606,8 +1606,8 @@ namespace pflow {
       if(vpflow.flag("COMPARE_DATABASE_ENTRIES")) {cout << compare::compareDatabaseEntries(vpflow); _PROGRAMRUN=true;}
       if(vpflow.flag("COMPARE_MATERIAL") || vpflow.flag("COMPARE_STRUCTURE")){
         if (XHOST.vflag_control.flag("DIRECTORY")
-          || XHOST.vflag_control.flag("FILE")
-          || vpflow.flag("COMPARE_STRUCTURE::STRUCTURE_LIST")) {
+            || XHOST.vflag_control.flag("FILE")
+            || vpflow.flag("COMPARE_STRUCTURE::STRUCTURE_LIST")) {
           cout << compare::compareInputStructures(vpflow); _PROGRAMRUN=true;
         } else {  // ME20210429 - Use std::cin otherwise
           cout << compare::compareInputStructures(vpflow, cin); _PROGRAMRUN=true;
@@ -5513,7 +5513,7 @@ namespace pflow {
     else if(smode=="SGDATA"){
       oss << pflow::PrintSGData(a, ftype, standalone, already_calculated, tolerance, a.sym_eps_no_scan, setting, suppress_Wyckoff);
     }
-    
+
     return true;
   }
 } // namespace pflow
@@ -6112,7 +6112,7 @@ namespace pflow {
     double orig_tolerance = a.sym_eps;
     if(!aflags.QUIET) aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "Symmetry: starting tolerance " << a.sym_eps << " " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
-    
+
     a.sym_eps_no_scan = no_scan; //DX20210406
     if(LDEBUG) {cerr << XPID << "pflow::PerformFullSymmetry: no_scan=" << a.sym_eps_no_scan << endl;}
 

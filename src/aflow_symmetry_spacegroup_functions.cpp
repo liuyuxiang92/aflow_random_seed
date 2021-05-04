@@ -1003,7 +1003,7 @@ namespace SYM {
 namespace SYM {
   double smallest_gt_min(double min, vector<double> vec) {
     double eps = 1e-6;
-    double out = infnorm<double>(vec);
+    double out = aurostd::max(vec); //DX20210422 - use sym::infnorm -> aurostd::max
     for (uint i = 0; i < vec.size(); i++) {
       if((vec[i] - min) > eps && vec[i] <= out) {
         out = vec[i];
@@ -1020,7 +1020,7 @@ namespace SYM {
 namespace SYM {
   int smallest_gt_min_index(double min, int not_index1, int not_index2, vector<double> vec) {
     double eps = 1e-6;
-    double out = infnorm<double>(vec);
+    double out = aurostd::max(vec); //DX20210422 - use sym::infnorm -> aurostd::max
     int index = 0; //DX20180514 - added initialization 
     for (int i = 0; (uint)i < vec.size(); i++) {
       if((vec[i] - min) > eps && i != not_index1 && i != not_index2 && vec[i] <= out) {
@@ -1102,122 +1102,6 @@ namespace SYM {
         }
       } else {
         i++;
-      }
-    }
-    return out;
-  }
-} //namespace SYM
-
-//DX20190905 [OBSOLETE - using aurostd::vector_product()] // ******************************************************************************
-//DX20190905 [OBSOLETE - using aurostd::vector_product()] // CrossPro (Cross Product)
-//DX20190905 [OBSOLETE - using aurostd::vector_product()] // ******************************************************************************
-//DX20190905 [OBSOLETE - using aurostd::vector_product()] namespace SYM {
-//DX20190905 [OBSOLETE - using aurostd::vector_product()]   xvector<double> CrossPro(const xvector<double>& a, const xvector<double>& b) {
-//DX20190905 [OBSOLETE - using aurostd::vector_product()]     xvector<double> resu;
-//DX20190905 [OBSOLETE - using aurostd::vector_product()]     resu[1] = a[2] * b[3] - b[2] * a[3];
-//DX20190905 [OBSOLETE - using aurostd::vector_product()]     resu[2] = a[3] * b[1] - b[3] * a[1];
-//DX20190905 [OBSOLETE - using aurostd::vector_product()]     resu[3] = a[1] * b[2] - b[1] * a[2];
-//DX20190905 [OBSOLETE - using aurostd::vector_product()]     return resu;
-//DX20190905 [OBSOLETE - using aurostd::vector_product()]   }
-//DX20190905 [OBSOLETE - using aurostd::vector_product()] } //namespace SYM
-
-//DX20190905 [OBSOLETE - using aurostd::scalar_product()] // ******************************************************************************
-//DX20190905 [OBSOLETE - using aurostd::scalar_product()] // DotPro (Dot Product)
-//DX20190905 [OBSOLETE - using aurostd::scalar_product()] // ******************************************************************************
-//DX20190905 [OBSOLETE - using aurostd::scalar_product()] namespace SYM {
-//DX20190905 [OBSOLETE - using aurostd::scalar_product()]   double DotPro(xvector<double> a, xvector<double> b) {
-//DX20190905 [OBSOLETE - using aurostd::scalar_product()]     double out = 0.0;
-//DX20190905 [OBSOLETE - using aurostd::scalar_product()]     if(a.urows != b.urows) {
-//DX20190905 [OBSOLETE - using aurostd::scalar_product()]       throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"SYM::DotPro():","Vectors must be the same size.",_VALUE_RANGE_);
-//DX20190905 [OBSOLETE - using aurostd::scalar_product()]     }
-//DX20190905 [OBSOLETE - using aurostd::scalar_product()]     for (uint i = 0; i < (uint)a.urows; i++) {
-//DX20190905 [OBSOLETE - using aurostd::scalar_product()]       out += a(i + 1) * b(i + 1);
-//DX20190905 [OBSOLETE - using aurostd::scalar_product()]     }
-//DX20190905 [OBSOLETE - using aurostd::scalar_product()]     return out;
-//DX20190905 [OBSOLETE - using aurostd::scalar_product()]   }
-//DX20190905 [OBSOLETE - using aurostd::scalar_product()] } //namespace SYM
-
-//DX20190905 [OBSOLETE - using aurostd::modulus()] // ******************************************************************************
-//DX20190905 [OBSOLETE - using aurostd::modulus()] // modulus (Modulus) (Overloaded)
-//DX20190905 [OBSOLETE - using aurostd::modulus()] // ******************************************************************************
-//DX20190905 [OBSOLETE - using aurostd::modulus()] namespace SYM {
-//DX20190905 [OBSOLETE - using aurostd::modulus()]   double modulus(vector<double> a) {
-//DX20190905 [OBSOLETE - using aurostd::modulus()]     double out = 0.0;
-//DX20190905 [OBSOLETE - using aurostd::modulus()]     for (uint i = 0; i < a.size(); i++) {
-//DX20190905 [OBSOLETE - using aurostd::modulus()]       out += a[i] * a[i];
-//DX20190905 [OBSOLETE - using aurostd::modulus()]     }
-//DX20190905 [OBSOLETE - using aurostd::modulus()]     return sqrt(out);
-//DX20190905 [OBSOLETE - using aurostd::modulus()]   }
-//DX20190905 [OBSOLETE - using aurostd::modulus()] } //namespace SYM
-
-// ******************************************************************************
-// DotPro (Modulus) (Overloaded)
-// ******************************************************************************
-//namespace SYM {
-//double modulus(xvector<double> a) {
-//double out = 0.0;
-//for (uint i = 0; i < (uint)a.urows; i++) {
-//out += a(i + 1) * a(i + 1);
-//}
-//return sqrt(out);
-//}
-//} //namespace SYM
-
-// ******************************************************************************
-// swap_rows
-// ******************************************************************************
-namespace SYM {
-  void swap_rows(xmatrix<double>& M, int a, int b) {
-    //uint rowCount = M.urows;
-    uint columnCount = M.ucols;
-    double tmp1, tmp2;
-    for (uint i = 0; i < columnCount; i++) {
-      tmp1 = M(a, i + 1);
-      tmp2 = M(b, i + 1);
-      M(a, i + 1) = tmp2;
-      M(b, i + 1) = tmp1;
-    }
-  }
-} //namespace SYM
-
-// ******************************************************************************
-// vec_compare (Vector Compare) (Overloaded)
-// ******************************************************************************
-namespace SYM {
-  bool vec_compare(vector<double> a, vector<double> b) {
-    // DXdouble epsilon = .00001;
-    double epsilon = 1e-10;
-    if(a.size() != b.size()) {
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"SYM::vec_compare():","Vectors are different sizes.",_VALUE_RANGE_);
-    }
-    bool out = true;
-    for (uint i = 0; i < a.size(); i++) {
-      //    cerr << a[i] << " " <<  b[i] << endl;
-      if(aurostd::abs(a[i] - b[i]) > epsilon) {
-        out = false;
-        break;
-      }
-    }
-    return out;
-  }
-} //namespace SYM
-
-// ******************************************************************************
-// vec_compare (Vector Compare) (Overloaded)
-// ******************************************************************************
-namespace SYM {
-  bool vec_compare(xvector<double> a, xvector<double> b) {
-    //double epsilon = .00001;
-    double epsilon = 1e-10;
-    if(a.urows != b.urows) {
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"SYM::vec_compare():","Vectors are different sizes.",_VALUE_RANGE_);
-    }
-    bool out = true;
-    for (uint i = 1; i <= (uint)a.urows; i++) {
-      //cerr << a[i] << " compared to " <<  b[i] << endl;
-      if(aurostd::abs(a(i) - b(i)) > epsilon) {
-        out = false;
-        break;
       }
     }
     return out;
@@ -1552,27 +1436,6 @@ namespace SYM {
     return false;
   }
 } //namespace SYM
-
-// ******************************************************************************
-// mod_one (Modify double by 1; to keep in unit cell)
-// ******************************************************************************
-// [OBSOLETE] DX20170908
-//namespace SYM {
-//double mod_one(double d) {
-////double delta=1e-6;
-//if(d == INFINITY || d != d || d == -INFINITY) {
-//cerr << "ERROR: (+-)INF or NAN value" << endl;
-//return d;
-//}
-//while (d >= 1 - _ZERO_TOL_ || aurostd::abs(d - 1) < _ZERO_TOL_) {
-//d = d - 1;
-//}
-//while (d < -_ZERO_TOL_) {
-//d = d + 1;
-//}
-//return d;
-//}
-//} //namespace SYM
 
 // ******************************************************************************
 // get_symmetry_symbols
@@ -2085,7 +1948,7 @@ namespace SYM {
     bool LDEBUG = (FALSE || XHOST.DEBUG);
     vector<int> mult_vec = get_multiplicities(spaceg);
     //Error if mult is not contained in mult_vec (i.e., a wyckoff position with multiplicity mult does not exist for the space group spaceg)
-    if(!invec<int>(mult_vec, mult)) {
+    if(!aurostd::WithinList(mult_vec, mult)) { //DX20210422 - SYM::invec() -> aurostd::WithinList()
       if(LDEBUG) { cerr << "SYM::get_wyckoff_equation: WARNING: no wyckoff position with multiplicity " << mult << "." << endl; }
       vector<string> none;
       return none;
@@ -2154,7 +2017,7 @@ namespace SYM {
     string function_name = XPID + "SYM::get_wyckoff_pos()";
     vector<int> mult_vec = get_multiplicities(spaceg);
     //Error if mult is not contained in mult_vec (i.e., a wyckoff position with multiplicity mult does not exist for the space group spaceg)
-    if(!invec<int>(mult_vec, Wyckoff_multiplicity)) {
+    if(!aurostd::WithinList(mult_vec, Wyckoff_multiplicity)) { //DX20210422 - SYM::invec() -> aurostd::WithinList()
       if(LDEBUG) { cerr << function_name << ": WARNING: no wyckoff position with multiplicity " << Wyckoff_multiplicity << "." << endl; }
       vector<vector<string> > none;
       return none;
@@ -2451,7 +2314,7 @@ namespace SYM {
     bool LDEBUG = (FALSE || XHOST.DEBUG);
     vector<int> mult_vec = get_multiplicities(spaceg);
     //Error if mult is not contained in mult_vec (i.e., a wyckoff position with multiplicity mult does not exist for the space group spaceg)
-    if(!invec<int>(mult_vec, mult)) {
+    if(!aurostd::WithinList(mult_vec, mult)) { //DX20210422 - SYM::invec() -> aurostd::WithinList()
       if(LDEBUG) { cerr << "SYM::get_wyckoff_pos: WARNING: no wyckoff position with multiplicity " << mult << "." << endl; }
       vector<vector<vector<string> > > none;
       return none;
@@ -2602,7 +2465,7 @@ namespace SYM {
     //THE MULT SHOULD BE THE FULL MULTIPLICITY (INCLUDING THE CENTERING OPERATIONS). THIS WILL BE MODIFIED AUTOMATICALLY IF GETCENTERING == FALSE.
     vector<int> mult_vec = get_multiplicities(spaceg);
     //Error if mult is not contained in mult_vec (i.e., a wyckoff position with multiplicity mult does not exist for the space group spaceg)
-    if(!invec<int>(mult_vec, mult)) {
+    if(!aurostd::WithinList(mult_vec, mult)) { //DX20210422 - SYM::invec() -> aurostd::WithinList()
       cerr << "SYM::get_wyckoff_pos: WARNING: no wyckoff position with multiplicity " << mult << "." << endl;
       vector<vector<vector<string> > > none;
       return none;
@@ -3628,19 +3491,19 @@ namespace SYM {
   }
 } //namespace SYM
 
-// ******************************************************************************
-// intinvec
-// ******************************************************************************
-namespace SYM {
-  bool intinvec(vector<int> vint, int n) {
-    bool contains = false;
-    for (uint i = 0; i < vint.size(); i++) {
-      if(vint[i] == n)
-        contains = true;
-    }
-    return contains;
-  }
-} //namespace SYM
+//DX20210421 [OBSOLETE]// ******************************************************************************
+//DX20210421 [OBSOLETE]// intinvec
+//DX20210421 [OBSOLETE]// ******************************************************************************
+//DX20210421 [OBSOLETE]namespace SYM {
+//DX20210421 [OBSOLETE]  bool intinvec(vector<int> vint, int n) {
+//DX20210421 [OBSOLETE]    bool contains = false;
+//DX20210421 [OBSOLETE]    for (uint i = 0; i < vint.size(); i++) {
+//DX20210421 [OBSOLETE]      if(vint[i] == n)
+//DX20210421 [OBSOLETE]        contains = true;
+//DX20210421 [OBSOLETE]    }
+//DX20210421 [OBSOLETE]    return contains;
+//DX20210421 [OBSOLETE]  }
+//DX20210421 [OBSOLETE]} //namespace SYM
 
 // ******************************************************************************
 // whichchar
@@ -3760,7 +3623,7 @@ namespace SYM {
       //if(str[i+1]=='-' || str[i+1]=='+' || str[i+1]=='\0' || str[i+1]==' ')
       if(!blank(oss.str()))
       { //CO20200106 - patching for auto-indenting
-        //DX20200924 [OBSOLETE] if(str[i + 1] == '\0' || str[i + 1] == ' ' || str[i + 1] == '+' || str[i + 1] == '-') {
+        //DX20200924 [OBSOLETE] if(str[i + 1] == '\0' || str[i + 1] == ' ' || str[i + 1] == '+' || str[i + 1] == '-')
         //DX20200924 - START
         // distinguish between empty lines and spaces
         if(str[i + 1] == '\0' || str[i + 1] == ' '){
@@ -3864,37 +3727,37 @@ namespace SYM {
 //DX20200313 [reformatted and moved to AUROSTD]  }
 //DX20200313 [reformatted and moved to AUROSTD]}
 
-// ******************************************************************************
-// distance_between_points
-// ******************************************************************************
-namespace SYM {
-  double distance_between_points(const xvector<double>& a, const xvector<double>& b) {
-    double dist = 0;
-    if(a.urows != b.urows) {
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"SYM::distance_between_points():","Vectors are not equal length.",_VALUE_RANGE_);
-    }
-    for (uint i = 1; i <= (uint)a.urows; i++) {
-      dist += (a(i) - b(i)) * (a(i) - b(i));
-    }
-    dist = sqrt(dist);
-    return dist;
-  }
-} //namespace SYM
+//DX20210422 [OBSOLETE]// ******************************************************************************
+//DX20210422 [OBSOLETE]// distance_between_points
+//DX20210422 [OBSOLETE]// ******************************************************************************
+//DX20210422 [OBSOLETE]namespace SYM {
+//DX20210422 [OBSOLETE]  double distance_between_points(const xvector<double>& a, const xvector<double>& b) {
+//DX20210422 [OBSOLETE]    double dist = 0;
+//DX20210422 [OBSOLETE]    if(a.urows != b.urows) {
+//DX20210422 [OBSOLETE]      throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"SYM::distance_between_points():","Vectors are not equal length.",_VALUE_RANGE_);
+//DX20210422 [OBSOLETE]    }
+//DX20210422 [OBSOLETE]    for (uint i = 1; i <= (uint)a.urows; i++) {
+//DX20210422 [OBSOLETE]      dist += (a(i) - b(i)) * (a(i) - b(i));
+//DX20210422 [OBSOLETE]    }
+//DX20210422 [OBSOLETE]    dist = sqrt(dist);
+//DX20210422 [OBSOLETE]    return dist;
+//DX20210422 [OBSOLETE]  }
+//DX20210422 [OBSOLETE]} //namespace SYM
 
-// ******************************************************************************
-// xstring (Overloaded)
-// ******************************************************************************
-namespace SYM {
-  void xstring(ostream& output, xmatrix<double> a) {
-    for (uint i = 1; i <= (uint)a.urows; i++) {
-      for (uint j = 1; j <= (uint)a.lrows; j++) {
-        if(aurostd::abs(a(i, j)) < 1e-8) { a(i, j) = 0; }
-        output << std::showpoint << setprecision(14) << a(i, j) << " ";
-      }
-      cerr << endl;
-    }
-  }
-} //namespace SYM
+//DX20210422 [OBSOLETE]// ******************************************************************************
+//DX20210422 [OBSOLETE]// xstring (Overloaded)
+//DX20210422 [OBSOLETE]// ******************************************************************************
+//DX20210422 [OBSOLETE]namespace SYM {
+//DX20210422 [OBSOLETE]  void xstring(ostream& output, xmatrix<double> a) {
+//DX20210422 [OBSOLETE]    for (uint i = 1; i <= (uint)a.urows; i++) {
+//DX20210422 [OBSOLETE]      for (uint j = 1; j <= (uint)a.lrows; j++) {
+//DX20210422 [OBSOLETE]        if(aurostd::abs(a(i, j)) < 1e-8) { a(i, j) = 0; }
+//DX20210422 [OBSOLETE]        output << std::showpoint << setprecision(14) << a(i, j) << " ";
+//DX20210422 [OBSOLETE]      }
+//DX20210422 [OBSOLETE]      cerr << endl;
+//DX20210422 [OBSOLETE]    }
+//DX20210422 [OBSOLETE]  }
+//DX20210422 [OBSOLETE]} //namespace SYM
 
 // ******************************************************************************
 // minus_one
@@ -5303,71 +5166,6 @@ namespace SYM {
   }
 } //namespace SYM
 
-// **********************************************************************************************************************
-// in_cell (Overloaded)
-// **********************************************************************************************************************
-//check if a point (in cartsian coord) is within the unit cell defined by L1 L2 L3.
-namespace SYM {
-  bool in_cell(xmatrix<double> Linv, xvector<double> point) {
-    bool inside = false;
-    xvector<double> tmp = point * Linv;
-
-    if(tmp(1) <= 1.0 + _ZERO_TOL_ && tmp(1) >= 0.0 - _ZERO_TOL_) {
-      if(tmp(2) <= 1.0 + _ZERO_TOL_ && tmp(2) >= 0.0 - _ZERO_TOL_) {
-        if(tmp(3) <= 1.0 + _ZERO_TOL_ && tmp(3) >= 0.0 - _ZERO_TOL_) {
-          inside = true;
-        }
-      }
-    }
-
-    return inside;
-  }
-} //namespace SYM
-
-// **********************************************************************************************************************
-// in_cell (Overloaded)
-// **********************************************************************************************************************
-//Check if in cell modulo direction of N
-namespace SYM {
-  bool in_cell(xvector<double> P, xvector<double> N) {
-    xvector<double> a, b, c;
-    a(1) = 1;
-    a(2) = 1;
-    a(3) = 1;
-    double tol = 1e-6;
-    bool inside = false;
-    //Either the point falls within the cell or the components outside the cell are linearly dependent on the Normal.
-    if((P(1) < (1.0 - tol) && P(1) >= -tol) || aurostd::abs(aurostd::scalar_product(a, N)) > tol) { //DX20200724 - SYM::DotPro to aurostd::scalar_product
-      if((P(2) < (1.0 - tol) && P(2) >= -tol) || aurostd::abs(aurostd::scalar_product(b, N)) > tol) { //DX20200724 - SYM::DotPro to aurostd::scalar_product
-        if((P(3) < (1.0 - tol) && P(3) >= -tol) || aurostd::abs(aurostd::scalar_product(c, N)) > tol) { //DX20200724 - SYM::DotPro to aurostd::scalar_product
-          inside = true;
-        }
-      }
-    }
-    return inside;
-  }
-} //namespace SYM
-
-// **********************************************************************************************************************
-// in_cell (Overloaded)
-// **********************************************************************************************************************
-namespace SYM {
-  bool in_cell(xvector<double> P) {  //P must be in DIRECT
-    //if P contains any negative components
-    //if P contains any component larger than one
-    double tol = 1e-6;
-    bool inside = false;
-    if(P(1) < (1.0 - tol) && P(1) >= -tol) {
-      if(P(2) < (1.0 - tol) && P(2) >= -tol) {
-        if(P(3) < (1.0 - tol) && P(3) >= -tol) {
-          inside = true;
-        }
-      }
-    }
-    return inside;
-  }
-} //namespace SYM
-
 //[OBSOLETE] // **********************************************************************************************************************
 //[OBSOLETE] // closest_point
 //[OBSOLETE] // **********************************************************************************************************************
@@ -5556,21 +5354,8 @@ namespace SYM {
 //DX20191202 [OBSOLETE]} //namespace SYM
 
 // **********************************************************************************************************************
-// allsame
+// //DX20210422 [OBSOELTE] allsame -> aurostd::identical_entries() //DX20210422
 // **********************************************************************************************************************
-namespace SYM {
-  bool allsame(vector<double> v) {
-    double tol = 1e-9;
-    bool all = true;
-    for (uint i = 0; i < v.size(); i++) {
-      if(aurostd::abs(v[i] - v[0]) > tol) {
-        all = false;
-        break;
-      }
-    }
-    return all;
-  }
-} //namespace SYM
 
 // **********************************************************************************************************************
 // ReturnITCGenShift
@@ -5609,7 +5394,8 @@ namespace SYM {
     //}
 
     for (uint k = 0; k < tmpvvvsd[s].size(); k++) {
-      if(intinvec(genlocations, k + 1)) {
+      //DX20210421 [OBSOLETE] if(intinvec(genlocations, k + 1))
+      if(aurostd::WithinList(genlocations, k + 1)) { //DX20210421
         xvector<double> oneshift;
         for (uint j = 0; j < tmpvvvsd[s][k].size(); j++) {
           double filler = 0;
@@ -5665,8 +5451,11 @@ namespace SYM {
     double r1;
     double r2;
     double r3;
-    vector<int> wint = get_multiplicities(ITC_sym_info.gl_sgs[spacegroupnum]); //DX20190215
-    remove_duplicates_rt(wint);
+    vector<int> wint_all = get_multiplicities(ITC_sym_info.gl_sgs[spacegroupnum]); //DX20190215
+    vector<int> wint; //DX20210422
+    for(uint i=0;i<wint_all.size();i++){ //DX20210422
+      if(!aurostd::WithinList(wint,wint_all[i])){ wint.push_back(wint_all[i]); } //DX20210422
+    } //DX20210422
     //TITLE
     oss << "REVERSE SPACE GROUP: " << spacegroupnum + 1 << " using WYCKOFF multiplicity:" << wint[n] << "-" << l << " " << endl;
     oss << "1" << endl;
@@ -5886,7 +5675,7 @@ namespace SYM {
                   nonzeros.push_back(tmp(ii) / N1(ii));
                 }
               }
-              if(allsame(nonzeros) && check + nonzeros.size() == 3) {
+              if(aurostd::identical(nonzeros,_ZERO_TOL_) && check + nonzeros.size() == 3) { //DX20210422 - SYM::allsame() -> aurostd::identical_entries()
                 same = true;
                 return same;
               } else {

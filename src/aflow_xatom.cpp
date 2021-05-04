@@ -1243,7 +1243,7 @@ vector<uint> getAtomIndicesByType(const xstructure& xstr, int type) {
 
   string function_name = XPID + "getAtomIndicesByType():";
   stringstream message;
-  
+
   uint natoms = xstr.atoms.size();
 
   vector<uint> indices_atoms_subset;
@@ -13249,22 +13249,22 @@ void xstructure::GetPrimitive_20210322(double eps) { //DX20210406
           plattice=::MinkowskiBasisReduction(lattice_tmp);    // Minkowski first, "::" is needed to access outside xstructure scope
           plattice=::NiggliUnitCellForm(plattice);            // Niggli Second, "::" is needed to access outside xstructure scope
           volume_tmp = (plattice[1][1]*plattice[2][2]*plattice[3][3]+plattice[1][2]*plattice[2][3]*plattice[3][1]+  // FAST
-            plattice[1][3]*plattice[2][1]*plattice[3][2]-plattice[1][3]*plattice[2][2]*plattice[3][1]-              // FAST
-            plattice[1][2]*plattice[2][1]*plattice[3][3]-plattice[1][1]*plattice[2][3]*plattice[3][2]);             // FAST
+              plattice[1][3]*plattice[2][1]*plattice[3][2]-plattice[1][3]*plattice[2][2]*plattice[3][1]-              // FAST
+              plattice[1][2]*plattice[2][1]*plattice[3][3]-plattice[1][1]*plattice[2][3]*plattice[3][2]);             // FAST
           atom_number_ratio = (double)natoms_min/aurostd::nint(volume_orig/volume_tmp);
           moduli_sum_tmp = aurostd::modulus(plattice(1)) + aurostd::modulus(plattice(2)) + aurostd::modulus(plattice(3));
           if(volume_tmp > tol_vol &&                                                 // 1) tol > 0
-              volume_tmp < volume_orig &&                                            // 2) new_tol < orig_tol
+            volume_tmp < volume_orig &&                                            // 2) new_tol < orig_tol
               aurostd::isinteger(volume_orig / volume_tmp, integer_tol) &&           // 3) new and orig volumes related by integer multiple
               aurostd::isinteger(atom_number_ratio, 0.05) &&                         // 4) number of atoms is consistent with integer multiple
               (atom_number_ratio-1.0)>-_ZERO_TOL_ &&                                 // 5) didn't lose any atoms
               moduli_sum_tmp < moduli_sum){                                          // 6) ensure shortest sum of vectors (Minkowski should ensure this, but noise can be introduced)
-            moduli_sum = moduli_sum_tmp;
-            olattice=plattice;
-            volume_min = (olattice[1][1]*olattice[2][2]*olattice[3][3]+olattice[1][2]*olattice[2][3]*olattice[3][1]+   // FAST
-                olattice[1][3]*olattice[2][1]*olattice[3][2]-olattice[1][3]*olattice[2][2]*olattice[3][1]-             // FAST
-                olattice[1][2]*olattice[2][1]*olattice[3][3]-olattice[1][1]*olattice[2][3]*olattice[3][2]);            // FAST
-          }
+                moduli_sum = moduli_sum_tmp;
+                olattice=plattice;
+                volume_min = (olattice[1][1]*olattice[2][2]*olattice[3][3]+olattice[1][2]*olattice[2][3]*olattice[3][1]+   // FAST
+                    olattice[1][3]*olattice[2][1]*olattice[3][2]-olattice[1][3]*olattice[2][2]*olattice[3][1]-             // FAST
+                    olattice[1][2]*olattice[2][1]*olattice[3][3]-olattice[1][1]*olattice[2][3]*olattice[3][2]);            // FAST
+              }
         }
       }
     }

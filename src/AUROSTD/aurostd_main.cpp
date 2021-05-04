@@ -672,6 +672,26 @@ namespace aurostd {
   //   bool _aurostd_initialize_isequal(const vector<vector<vector<long double> > >& t1,const vector<vector<vector<long double> > >& t2,long double epsilon) { return isequal(t1,t2,epsilon);}
 
   // ***************************************************************************
+  // Function all identical vector (one argument, checks if all entries are equal) //DX20210422
+  // ***************************************************************************
+  template<class utype> bool identical(const vector<utype>& vec, utype eps) {
+    for(uint i=0;i<vec.size();i++){
+      if(isdifferent(vec[i],vec[0],eps)){ return false; }
+    }
+    return true; //includes case when vec is empty
+  }
+
+  // ***************************************************************************
+  // Function all identical deque (one argument, checks if all entries are equal) //DX20210422
+  // ***************************************************************************
+  template<class utype> bool identical(const deque<utype>& deq, utype eps) {
+    for(uint i=0;i<deq.size();i++){
+      if(isdifferent(deq[i],deq[0],eps)){ return false; }
+    }
+    return true; //includes case when deq is empty
+  }
+
+  // ***************************************************************************
   // Function toupper/tolower
   // ***************************************************************************
   string toupper(const string& in) {

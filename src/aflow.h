@@ -2643,8 +2643,8 @@ bool smithTest(ostream& oss=cout);
 bool smithTest(ofstream& FileMESSAGE,ostream& oss=cout);
 bool coordinationTest(ostream& oss=cout);
 bool coordinationTest(ofstream& FileMESSAGE,ostream& oss=cout);
-bool PrototypeGeneratorTest(ostream& oss=cout, bool check_symmetry=false); //DX20200928
-bool PrototypeGeneratorTest(ofstream& FileMESSAGE,ostream& oss=cout, bool check_symmetry=false); //DX20200928
+bool PrototypeGeneratorTest(ostream& oss=cout, bool check_symmetry=false, bool check_uniqueness=false); //DX20200928
+bool PrototypeGeneratorTest(ofstream& FileMESSAGE,ostream& oss=cout, bool check_symmetry=false, bool check_uniqueness=false); //DX20200928
 bool FoldAtomsInCellTest(ostream& oss=cout); //DX20210129
 bool FoldAtomsInCellTest(ofstream& FileMESSAGE,ostream& oss=cout); //DX20210129
 

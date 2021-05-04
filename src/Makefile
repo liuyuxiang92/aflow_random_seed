@@ -23,7 +23,7 @@
 #
 # ***************************************************************************
 
-VERSNUMBER=3.2.8
+VERSNUMBER=3.2.9
 
 # MAKEFILE FOR AFLOW3
 # FOR FROZSL -lmkl_lapack95_ilp64 -lmkl_core -lmkl_intel_lp64 -lmkl_sequential
@@ -1183,10 +1183,12 @@ check_full:
 	$(MAKE) check_edata
 	$(MAKE) check_aflow_xtal_finder
 	$(MAKE) check_fold_atoms_in_cell_routine
-	$(MAKE) check_prototype_generator
 	$(MAKE) check_aflow_gcc_compatibility
 	$(MAKE) check_cce
 	$(MAKE) check_pocc
+	$(MAKE) check_prototype_generator
+	$(MAKE) check_prototype_symmetry
+	$(MAKE) check_prototype_uniqueness
 .PHONY: check_proto
 check_proto:
 	@echo "Performing 'aflow --proto' test"
@@ -1563,6 +1565,14 @@ check_fold_atoms_in_cell_routine:
 check_prototype_generator:
 	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
 	./aflow --PrototypeGenerator_test
+.PHONY: check_prototype_symmetry
+check_prototype_symmetry:
+	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
+	if !([ -n "$$TRAVIS" ] || [ "$$CI" = true ]); then ./aflow --PrototypeSymmetry_test; fi
+.PHONY: check_prototype_uniqueness
+check_prototype_uniqueness:
+	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
+	if !([ -n "$$TRAVIS" ] || [ "$$CI" = true ]); then ./aflow --PrototypeUniqueness_test; fi
 #RF20200302 - START
 .PHONY: check_cce
 check_cce:

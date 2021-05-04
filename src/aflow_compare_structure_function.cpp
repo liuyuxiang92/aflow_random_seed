@@ -663,11 +663,11 @@ ostream& operator<<(ostream& oss, const StructurePrototype& StructurePrototype){
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
       // aflow_parameter_list
-      sscontent_json << "\"aflow_prototype_parameter_list\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(StructurePrototype.aflow_parameter_list,"\""),",") << "]" << eendl;
+      sscontent_json << "\"aflow_prototype_params_list\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(StructurePrototype.aflow_parameter_list,"\""),",") << "]" << eendl;
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
       // aflow_parameter_values
-      sscontent_json << "\"aflow_prototype_parameter_values\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(StructurePrototype.aflow_parameter_values,8,roff),",") << "]" << eendl;
+      sscontent_json << "\"aflow_prototype_params_values\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(StructurePrototype.aflow_parameter_values,8,roff),",") << "]" << eendl;
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
     }
 
@@ -982,7 +982,9 @@ bool StructurePrototype::calculateSymmetry(){
 
   Pearson = "";
   bool no_scan = false; //DX20191230
-  double use_tol = SYM::defaultTolerance(structure_representative->structure); //DX20191230
+  // use sym_eps if given, otherwise use default
+  if(!structure_representative->structure.sym_eps_calculated || structure_representative->structure.sym_eps==AUROSTD_NAN) { structure_representative->structure.sym_eps = SYM::defaultTolerance(structure_representative->structure); } //DX20210421
+  double use_tol = structure_representative->structure.sym_eps; //DX20210421
   space_group = structure_representative->structure.SpaceGroup_ITC(use_tol,-1,SG_SETTING_ANRL,no_scan); //DX20191230
   vector<GroupedWyckoffPosition> tmp_grouped_Wyckoff_positions;
   compare::groupWyckoffPositions(structure_representative->structure, tmp_grouped_Wyckoff_positions);
@@ -1001,7 +1003,9 @@ void XtalFinderCalculator::calculateSymmetry(structure_container& str_rep){
 
   str_rep.Pearson = "";
   bool no_scan = false; //DX20191230
-  double use_tol = SYM::defaultTolerance(str_rep.structure); //DX20191230
+  // use sym_eps if given, otherwise use default
+  if(!str_rep.structure.sym_eps_calculated || str_rep.structure.sym_eps==AUROSTD_NAN) { str_rep.structure.sym_eps = SYM::defaultTolerance(str_rep.structure); } //DX20210421
+  double use_tol = str_rep.structure.sym_eps; //DX20210421
   str_rep.space_group = str_rep.structure.SpaceGroup_ITC(use_tol,-1,SG_SETTING_ANRL,no_scan); //DX20191230
   vector<GroupedWyckoffPosition> tmp_grouped_Wyckoff_positions;
   compare::groupWyckoffPositions(str_rep.structure, tmp_grouped_Wyckoff_positions);
@@ -3067,7 +3071,9 @@ void XtalFinderCalculator::calculateSpaceGroups(uint start_index, uint end_index
   if(end_index > structure_containers.size()){ end_index=structure_containers.size(); }
 
   for(uint i=start_index;i<end_index;i++){ //DX20191107 - switching convention <= vs <
-    double use_tol = SYM::defaultTolerance(structure_containers[i].structure); //DX20191230
+    // use sym_eps if given, otherwise use default
+    if(!structure_containers[i].structure.sym_eps_calculated || structure_containers[i].structure.sym_eps==AUROSTD_NAN) { structure_containers[i].structure.sym_eps = SYM::defaultTolerance(structure_containers[i].structure); } //DX20210421
+    double use_tol = structure_containers[i].structure.sym_eps; //DX20210421
     structure_containers[i].space_group = structure_containers[i].structure.SpaceGroup_ITC(use_tol, -1, setting, no_scan); //DX20191230 - added arguments
     vector<GroupedWyckoffPosition> grouped_Wyckoff_positions;
     compare::groupWyckoffPositions(structure_containers[i].structure, grouped_Wyckoff_positions);
@@ -5634,6 +5640,7 @@ bool XtalFinderCalculator::findMatch(
     for(uint i=0;i<num_distances;i++){ //DX20200922 - use uint instead of vector.size(); efficiency
       cerr << function_name << " minimum distance: " << mapping_info.distances_mapped[i] << " (before) --> " << new_mapping_distances[i] << " (after)" << endl;
     }
+    cerr << function_name << " sum(distances_orig)=" << aurostd::sum(mapping_info.distances_mapped) << " sum(distances_new)=" << aurostd::sum(new_mapping_distances) << endl;
   }
 
   // ---------------------------------------------------------------------------
