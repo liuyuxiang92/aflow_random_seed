@@ -7388,9 +7388,9 @@ namespace pflow {
   AQueue::AQueue(const aurostd::xoption& vpflow,ostream& oss) : xStream(oss),m_initialized(false) {initialize(vpflow);}
   AQueue::AQueue(const aurostd::xoption& vpflow,ofstream& FileMESSAGE,ostream& oss) : xStream(FileMESSAGE,oss),m_initialized(false) {initialize(vpflow);}
   AQueue::AQueue(const AQueue& b) : xStream(*b.getOFStream(),*b.getOSS()) {copy(b);} // copy PUBLIC
-  
+
   AQueue::~AQueue() {xStream::free();free();}
-  
+
   const AQueue& AQueue::operator=(const AQueue& other) {
     if(this!=&other) {copy(other);}
     return *this;
@@ -7408,7 +7408,7 @@ namespace pflow {
     m_flags.clear();
     freeQueue();
   }
-  
+
   void AQueue::copy(const AQueue& b) {  //copy PRIVATE
     m_initialized=b.m_initialized;
     m_flags=b.m_flags;
@@ -7417,7 +7417,7 @@ namespace pflow {
     m_nodes.clear();for(uint i=0;i<b.m_nodes.size();i++){m_nodes.push_back(b.m_nodes[i]);}
     m_jobs.clear();for(uint i=0;i<b.m_jobs.size();i++){m_jobs.push_back(b.m_jobs[i]);}
   }
-  
+
   bool AQueue::initialize(ostream& oss) {
     xStream::initialize(oss);
     return initialize();
@@ -7446,7 +7446,7 @@ namespace pflow {
   }
 
   void AQueue::setFlags(const aurostd::xoption& vpflow){m_flags=vpflow;}
-  
+
   uint AQueue::getNNodes() const {return m_nodes.size();}
   uint AQueue::getNCPUS() const {
     uint ncpus=0;
@@ -7715,7 +7715,7 @@ namespace pflow {
       if(LDEBUG){cerr << soliloquy << " mapping node=" << node.m_name << " to partition=" << partition.m_name << endl;}
     }
   }
-  
+
   void AQueue::jobMapping(AJob& job){
     bool LDEBUG=(FALSE || _AQUEUE_DEBUG_ || XHOST.DEBUG);
     string soliloquy=XPID+"pflow::AQueue::jobMapping():";
@@ -7787,7 +7787,7 @@ namespace pflow {
   void AQueue::readNodesPartitionsSLURM(){
     bool LDEBUG=(FALSE || _AQUEUE_DEBUG_ || XHOST.DEBUG);
     string soliloquy=XPID+"pflow::AQueue::readNodesPartitionsSLURM():";
-    
+
     vector<string> lines,tokens,tokens2;
     uint iline=0;
     string line="",key="",value="",tmp="";
@@ -7817,8 +7817,8 @@ namespace pflow {
       //tokens[3] is status
       if(tokens[3].find('*')!=string::npos){_node.m_status=NODE_DOWN;}  //catch first, doesn't matter what status it is in, IT'S NOT RESPONDING
       else if(tokens[3]=="allocated+"||tokens[3]=="allocated"||tokens[3]=="alloc"||
-        tokens[3]=="completing"||tokens[3]=="comp"||
-        FALSE){_node.m_status=NODE_FULL;}  //most likely to appear first, quicker to appear at the top
+          tokens[3]=="completing"||tokens[3]=="comp"||
+          FALSE){_node.m_status=NODE_FULL;}  //most likely to appear first, quicker to appear at the top
       else if(tokens[3]=="idle"){_node.m_status=NODE_FREE;}
       else if(tokens[3]=="mixed"||tokens[3]=="mix"){_node.m_status=NODE_OCCUPIED;}
       else if(tokens[3]=="reserved"||tokens[3]=="resv"||tokens[3]=="unknown"||tokens[3]=="unk"){_node.m_status=NODE_OFFLINE;}
@@ -7844,11 +7844,11 @@ namespace pflow {
   void AQueue::readJobsSLURM(){
     bool LDEBUG=(FALSE || _AQUEUE_DEBUG_ || XHOST.DEBUG);
     string soliloquy=XPID+"pflow::AQueue::readJobsSLURM():";
-    
+
     vector<string> lines,tokens,tokens2;
     uint iline=0,i=0;
     string line="",key="",value="",tmp="";
-    
+
     //run squeue
     if(!aurostd::IsCommandAvailable("squeue")){
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"no squeue command found for SLURM configuration",_RUNTIME_EXTERNAL_MISS_);
@@ -7895,7 +7895,7 @@ namespace pflow {
   void AQueue::readPartitionsTORQUE(){
     bool LDEBUG=(FALSE || _AQUEUE_DEBUG_ || XHOST.DEBUG);
     string soliloquy=XPID+"pflow::AQueue::readPartitionsTORQUE():";
-    
+
     vector<string> lines,tokens,tokens2;
     uint iline=0;
     string line="",key="",value="",tmp="";
@@ -7936,7 +7936,7 @@ namespace pflow {
   void AQueue::readNodesJobsTORQUE(){
     bool LDEBUG=(FALSE || _AQUEUE_DEBUG_ || XHOST.DEBUG);
     string soliloquy=XPID+"pflow::AQueue::readNodesJobsTORQUE():";
-    
+
     vector<string> lines,tokens,tokens2;
     uint iline=0,i=0;
     string line="",key="",value="",tmp="";
@@ -8001,7 +8001,7 @@ namespace pflow {
   void AQueue::readJobsTORQUE(){
     bool LDEBUG=(FALSE || _AQUEUE_DEBUG_ || XHOST.DEBUG);
     string soliloquy=XPID+"pflow::AQueue::readJobsTORQUE():";
-    
+
     vector<string> lines,tokens,tokens2;
     uint iline=0,i=0;
     string line="",key="",value="",tmp="";
@@ -8068,7 +8068,7 @@ namespace pflow {
     if(aurostd::IsCommandAvailable("squeue")){m_qsys=QUEUE_SLURM;}
     else if(aurostd::IsCommandAvailable("pbsnodes")){m_qsys=QUEUE_TORQUE;}
     else{throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"cannot identify queuing system",_RUNTIME_ERROR_);}
-    
+
     if(LDEBUG){
       cerr << soliloquy << " m_qsys=";
       if(m_qsys==QUEUE_SLURM){cerr << "SLURM";}
@@ -8128,7 +8128,7 @@ namespace pflow {
         cerr << endl;
       }
     }
-    
+
     if(LDEBUG){
       cerr << soliloquy << " " << XHOST.hostname << " has " << getNNodes() << " nodes (" << getNCPUS() << " cpus)" << endl;
       bool add_comma=false;
@@ -8296,7 +8296,7 @@ namespace pflow{
 // pflow::getSpaceGroupSetting() //DX20210420
 // ***************************************************************************
 namespace pflow{
-   uint getSpaceGroupSetting(const string& setting_string, uint mode_default){
+  uint getSpaceGroupSetting(const string& setting_string, uint mode_default){
 
     // Return the space group setting
     // options:

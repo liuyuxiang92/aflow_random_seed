@@ -1351,7 +1351,7 @@ namespace chull {
     if(!should_be_positive && notNegative(dist_2_hull,true)){return false;}
     return true;
   }
-  
+
   xvector<double> getTruncatedCoords(const xvector<double>& coords,const xvector<int>& elements_present) {
     string soliloquy=XPID+"chull::getTruncatedCoords():";
     if(coords.rows!=elements_present.rows){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Reduction invalid, coords mismatch");}
@@ -5935,22 +5935,22 @@ namespace chull {
     if(i_point2>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
     if(!m_points[i_point1].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Point["+aurostd::utype2string(i_point1)+"] is not initialized");}
     if(!m_points[i_point2].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Point["+aurostd::utype2string(i_point2)+"] is not initialized");}
-      
+
     if(i_point1==i_point2){return true;} //it is equivalent to self, so we only do checks if necessary
-    
+
     //return false early for points without an entry
     if(!m_points[i_point1].m_has_entry){return false;}
     if(!m_points[i_point2].m_has_entry){return false;}
-    
+
     if(LDEBUG) {cerr << soliloquy << " comparing [auid=" << m_points[i_point1].m_entry.auid << "] and [auid=" << m_points[i_point2].m_entry.auid << "]" << endl;}
-    
+
     //strict==false, there might be entries in the database without a formation_enthalpy or sg calculated
     //ultimately, we want to compare structures
     if(energiesDiffer(i_point1,i_point2,false)){return false;} //first filter by those with wildly different energies, not strict
     if(spacegroupsDiffer(i_point1,i_point2,false)){return false;} //first filter by those with wildly different spacegroups, not strict
     if(!perform_structure_comparison){return false;}  //only return true if you can compare structures
     if(!structuresEquivalent(i_point1,i_point2)){return false;}
-    
+
     return true;
   }
 

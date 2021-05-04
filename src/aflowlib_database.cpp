@@ -757,7 +757,7 @@ namespace aflowlib {
         // Filter non-POCC ARUNs
         aurl = aurostd::extractJsonValueAflow(data[d], "aurl");
         if ((aurl.find("ARUN") != string::npos)
-          && (aurl.find("ARUN.POCC") == string::npos)) {
+            && (aurl.find("ARUN.POCC") == string::npos)) {
           continue;
         }
         values.push_back(getDataValues(data[d], columns, types));
@@ -969,24 +969,24 @@ namespace aflowlib {
 
       // Check for synonyms for changed parameter names
       if (value.empty()) {
-       if (cols[c] == "aflow_prototype_label_relax") {
-         value = aurostd::extractJsonValueAflow(entry, "anrl_label_relax");
-       } else if (cols[c] == "aflow_prototype_label_orig") {
-         value = aurostd::extractJsonValueAflow(entry, "anrl_label_orig");
-       } else if (cols[c] == "aflow_prototype_params_list_relax") {
+        if (cols[c] == "aflow_prototype_label_relax") {
+          value = aurostd::extractJsonValueAflow(entry, "anrl_label_relax");
+        } else if (cols[c] == "aflow_prototype_label_orig") {
+          value = aurostd::extractJsonValueAflow(entry, "anrl_label_orig");
+        } else if (cols[c] == "aflow_prototype_params_list_relax") {
           value = aurostd::extractJsonValueAflow(entry, "anrl_parameter_list_relax");
-         if (value.empty()) value = aurostd::extractJsonValueAflow(entry, "aflow_prototype_parameter_list_relax");
-       } else if (cols[c] == "aflow_prototype_params_list_orig") {
+          if (value.empty()) value = aurostd::extractJsonValueAflow(entry, "aflow_prototype_parameter_list_relax");
+        } else if (cols[c] == "aflow_prototype_params_list_orig") {
           value = aurostd::extractJsonValueAflow(entry, "anrl_parameter_list_orig");
-         if (value.empty()) value = aurostd::extractJsonValueAflow(entry, "aflow_prototype_parameter_list_orig");
-       } else if (cols[c] == "aflow_prototype_params_values_relax") {
+          if (value.empty()) value = aurostd::extractJsonValueAflow(entry, "aflow_prototype_parameter_list_orig");
+        } else if (cols[c] == "aflow_prototype_params_values_relax") {
           value = aurostd::extractJsonValueAflow(entry, "anrl_parameter_values_relax");
-         if (value.empty()) value = aurostd::extractJsonValueAflow(entry, "aflow_prototype_parameter_values_relax");
-       } else if (cols[c] == "aflow_prototype_params_values_orig") {
+          if (value.empty()) value = aurostd::extractJsonValueAflow(entry, "aflow_prototype_parameter_values_relax");
+        } else if (cols[c] == "aflow_prototype_params_values_orig") {
           value = aurostd::extractJsonValueAflow(entry, "anrl_parameter_values_orig");
-         if (value.empty()) value = aurostd::extractJsonValueAflow(entry, "aflow_prototype_parameter_values_orig");
-       }
-     }
+          if (value.empty()) value = aurostd::extractJsonValueAflow(entry, "aflow_prototype_parameter_values_orig");
+        }
+      }
 
       // If not found in the json, Check if column is part of the extra schema
       // Only check if not found in case the json is part of a patch file

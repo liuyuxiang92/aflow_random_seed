@@ -3623,7 +3623,7 @@ namespace SYM {
       //if(str[i+1]=='-' || str[i+1]=='+' || str[i+1]=='\0' || str[i+1]==' ')
       if(!blank(oss.str()))
       { //CO20200106 - patching for auto-indenting
-        //DX20200924 [OBSOLETE] if(str[i + 1] == '\0' || str[i + 1] == ' ' || str[i + 1] == '+' || str[i + 1] == '-') {
+        //DX20200924 [OBSOLETE] if(str[i + 1] == '\0' || str[i + 1] == ' ' || str[i + 1] == '+' || str[i + 1] == '-')
         //DX20200924 - START
         // distinguish between empty lines and spaces
         if(str[i + 1] == '\0' || str[i + 1] == ' '){
@@ -5394,7 +5394,7 @@ namespace SYM {
     //}
 
     for (uint k = 0; k < tmpvvvsd[s].size(); k++) {
-      //DX20210421 [OBSOLETE] if(intinvec(genlocations, k + 1)) {
+      //DX20210421 [OBSOLETE] if(intinvec(genlocations, k + 1))
       if(aurostd::WithinList(genlocations, k + 1)) { //DX20210421
         xvector<double> oneshift;
         for (uint j = 0; j < tmpvvvsd[s][k].size(); j++) {

@@ -1298,7 +1298,7 @@ namespace aflowlib {
     GetSpeciesDirectory(directory_LIB,aflowlib_data.vspecies);
     aflowlib_data.species=aurostd::joinWDelimiter(aflowlib_data.vspecies,",");
     aflowlib_data.nspecies=aflowlib_data.vspecies.size();
-    
+
     cout << soliloquy << " nspecies=" << aflowlib_data.nspecies << endl;
     cout << soliloquy << " species=" << aflowlib_data.species << endl;
 
@@ -2582,7 +2582,7 @@ namespace aflowlib {
 
     // OPERATE FORMATION
     //     cerr << "FORMATION_CALC=" << FORMATION_CALC << endl;
-	
+
     // line XXX2					   
     if(FORMATION_CALC) { // no LDAU yet
       if(LDEBUG) cerr << soliloquy << " [FCALC=1]" << endl;
@@ -2721,7 +2721,7 @@ namespace aflowlib {
 
     // OPERATE FORMATION
     //     cerr << "FORMATION_CALC=" << FORMATION_CALC << endl;
-	
+
     // line XXX2					   
     if(FORMATION_CALC) { // no LDAU yet
       if(LDEBUG) cerr << soliloquy << " [FCALC=1]" << endl;

@@ -4107,7 +4107,7 @@ namespace SYM {
 
     // ------------------------------------------------------------------------------------------- PRINTING AND LEAVING
     aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message
-       << " " << SEPARATION_LINE_DASH_SHORT << endl;
+      << " " << SEPARATION_LINE_DASH_SHORT << endl;
     aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message
       << " Symmetry: unique point group operations " << a.pgroup_xtal.size() << endl;// Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: " << operations << endl;
@@ -8924,7 +8924,7 @@ bool KBIN_SymmetryToScreenWeb(xstructure& a, ostream& oss, char mode) {
   }
   aurostd::stream2vectorstring(sscontent_txt, vcontent_txt);
   oss << "{\"txt\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(vcontent_txt, "\"", "\""), ",") << "],"
-      << "\"json\":" << sscontent_json.str() << "}" << std::endl;
+    << "\"json\":" << sscontent_json.str() << "}" << std::endl;
   return true;
 }
 

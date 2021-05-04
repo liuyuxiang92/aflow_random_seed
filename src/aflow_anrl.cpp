@@ -1590,7 +1590,7 @@ namespace anrl {
     // causing structures to fall into higher symmetries when analyzed with
     // certain tolerances; occurs for certain AFLOW Prototype Encyclopedia
     // structures 
-    
+
     // ---------------------------------------------------------------------------
     // A2B7C2_oF88_22_k_bdefghij_k-001 (Predicted Phase IV Cd2Re2O7)
     // see comments in http://aflow.org/prototype-encyclopedia/A2B7C2_oF88_22_k_bdefghij_k.html 
