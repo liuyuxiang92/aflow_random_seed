@@ -3354,9 +3354,10 @@ namespace KBIN {
     
     ///////////////////////////////////////////////////////////////////////////////////////////////
     //must do before RMM_DIIS and ROTMAT
-    if(vasp_monitor_running){
+    if(1||vasp_monitor_running){ //CO20210315 - might consider running this always, come back and test
       //vasp_monitor will kill vasp prematurely, triggering warnings that require xmessage.flag("REACHED_ACCURACY") (false positives)
       //prioritize the other warnings
+      //might be a false positive without vasp_monitor_running, vasp can also trigger its own premature exiting
       uint n_require_accuracy=0;
       for(i=0;i<xwarning.vxscheme.size();i++){
         if(xRequiresAccuracy.flag(xwarning.vxscheme[i])){n_require_accuracy++;}
@@ -3378,7 +3379,7 @@ namespace KBIN {
         vector<string> xwarning_vxscheme=xwarning.vxscheme; //make a copy since we're deleting entries of the vector
         for(i=xwarning_vxscheme.size()-1;i<xwarning_vxscheme.size();i--){  //go backwards since we're removing entries
           if(xRequiresAccuracy.flag(xwarning_vxscheme[i])){
-            aus << "MMMMM  MESSAGE ignoring xwarning.flag(\""+xwarning_vxscheme[i]+"\"): prioritizing other warnings first (requires xmessage.flag(\"REACHED_ACCURACY\"); possible false positive)" << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+            aus << "MMMMM  MESSAGE ignoring xwarning.flag(\""+xwarning_vxscheme[i]+"\"): prioritizing other warnings first (requires xmessage.flag(\"REACHED_ACCURACY\"))" << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET); //; possible false positive
             xwarning.flag(xwarning_vxscheme[i],FALSE);
             //we don't need an xmonitor here, this is only for prioritizing errors
           }
@@ -3581,7 +3582,7 @@ namespace KBIN {
       //fix MPI/NPAR problems next
       fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("MPICH11",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
       fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("MPICH139",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
-      fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("MPICH174","MPICH11",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE)); //CO20210315 - testing, exit code 174 looks like an error on the node, basically try rerunning with more memory
+      fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("MPICH174",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE)); //CO20210315 - testing, exit code 174 looks like an error on the node, basically try rerunning with more memory
       fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("NPAR",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
       fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("NPARC",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
       fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("NPARN",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));

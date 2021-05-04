@@ -6488,6 +6488,17 @@ namespace KBIN {
       //END - load INCAR into xvasp, modify, then write out new INCAR
       if(Krun){aus << "MMMMM  MESSAGE applied FIX=\"" << fix << "\"=" << param_int << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
     }
+    else if(fix=="NCPUS") {
+      if(Krun && VERBOSE){aus << "MMMMM  MESSAGE attempting FIX=\"" << fix << "\" kflags.KBIN_MPI_NCPUS(pre)=" << kflags.KBIN_MPI_NCPUS << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+      //do not check for KBIN_MPI, since --monitor_vasp is running separate binary
+      //we are coming from an MPI error, so we know this is running with NCPUS>1
+      if(Krun){
+        param_int=kflags.KBIN_MPI_NCPUS/2;
+        if(param_int<1){Krun=false;}
+      }
+      if(Krun){kflags.KBIN_MPI_NCPUS=param_int;}
+      if(Krun){aus << "MMMMM  MESSAGE applied FIX=\"" << fix << "\" kflags.KBIN_MPI_NCPUS(post)=" << kflags.KBIN_MPI_NCPUS << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+    }
     else if(fix=="NELM") {
       if(Krun && VERBOSE){aus << "MMMMM  MESSAGE attempting FIX=\"" << fix << "\"" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
       //START - load INCAR into xvasp, modify, then write out new INCAR
@@ -6926,35 +6937,62 @@ namespace KBIN {
     }
     else if(mode=="MEMORY") { //CO20210315
       if(submode<0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"no submode set: \""+mode+"\"",_INPUT_ILLEGAL_);}  //CO20210315
-      if(submode==0){ //lower k-points
-        fix="KPOINTS--";
-        if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
-        Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
+      if(submode==0){ //lower NCPUS
+        bool Krun1=true;fix="ULIMIT"; //always apply ULIMIT for memory stuff
+        if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun1=false;}
+        Krun1=(Krun1 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
+
+        bool Krun2=true;fix="NCPUS";
+        if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun2=false;}
+        Krun2=(Krun2 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
+
+        Krun=(Krun1||Krun2);
+        //no need to remove these settings if it fails
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
-      if(submode==1){ //lower NBANDS
-        fix="NBANDS--";
-        if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
-        Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
+      if(submode==1){ //lower NBANDS, try before lowering k-points
+        bool Krun1=true;fix="ULIMIT"; //always apply ULIMIT for memory stuff
+        if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun1=false;}
+        Krun1=(Krun1 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
+
+        bool Krun2=true;fix="NBANDS--";
+        if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun2=false;}
+        Krun2=(Krun2 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
+
+        Krun=(Krun1||Krun2);
+        //no need to remove these settings if it fails
+        if(!Krun){Krun=true;submode++;} //reset and go to the next solution
+      }
+      if(submode==2){ //lower k-points
+        bool Krun1=true;fix="ULIMIT"; //always apply ULIMIT for memory stuff
+        if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun1=false;}
+        Krun1=(Krun1 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
+        
+        bool Krun2=true;fix="KPOINTS--";
+        if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun2=false;}
+        Krun2=(Krun2 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
+        
+        Krun=(Krun1||Krun2);
+        //no need to remove these settings if it fails
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
       //we might add lowering NGX, need to test...
-      if(submode==2){ //skip run
+      if(submode==3){ //skip run
         fix="SKIP_RUN";
         if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
         Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
-      if(submode>=3){Krun=false;}
+      if(submode>=4){Krun=false;}
       submode+=submode_increment;submode_increment=1;  //increment and reset
     }
     else if(mode=="MPICH11") {
-      fix="ULIMIT";
+      fix="ULIMIT"; //always apply ULIMIT for memory stuff
       if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
       Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
     }
     else if(mode=="MPICH139") {
-      bool Krun1=true;fix="ULIMIT";
+      bool Krun1=true;fix="ULIMIT"; //always apply ULIMIT for memory stuff
       if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun1=false;}
       Krun1=(Krun1 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
       
@@ -6963,6 +7001,26 @@ namespace KBIN {
       Krun2=(Krun2 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
 
       Krun=(Krun1||Krun2);
+    }
+    else if(mode=="MPICH174") { //CO20210315
+      if(submode<0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"no submode set: \""+mode+"\"",_INPUT_ILLEGAL_);}  //CO20210315
+      if(submode==0){ //lower NCPUS
+        bool Krun1=true;fix="ULIMIT"; //always apply ULIMIT for memory stuff
+        if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun1=false;}
+        Krun1=(Krun1 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
+
+        bool Krun2=true;fix="NCPUS";
+        if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun2=false;}
+        Krun2=(Krun2 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
+
+        Krun=(Krun1||Krun2);
+        //no need to remove these settings if it fails
+        if(!Krun){Krun=true;submode++;} //reset and go to the next solution
+      }
+      //this might be a memory issue, might not be
+      //so let's not waste time lowering NBANDS and KPOINTS, just fail
+      if(submode>=1){Krun=false;}
+      submode+=submode_increment;submode_increment=1;  //increment and reset
     }
     else if(mode=="NATOMS") {
       fix="POSCAR_VOLUME*=2";
@@ -7211,6 +7269,10 @@ namespace KBIN {
     if(LDEBUG){aus << soliloquy << " Krun=" << Krun << " [1]" << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
     
     try_last_ditch_effort=try_last_ditch_efforts;
+    if(mode=="MEMORY") {try_last_ditch_effort=false;} //changing POSCAR doesn't help
+    else if(mode=="MPICH11") {try_last_ditch_effort=false;} //changing POSCAR doesn't help
+    else if(mode=="MPICH139") {try_last_ditch_effort=false;} //changing POSCAR doesn't help
+    else if(mode=="MPICH174") {try_last_ditch_effort=false;} //increasing KPOINTS doesn't help
 
     if(Krun==false && try_last_ditch_effort){
       //last-ditch effort, increase volume
@@ -7222,7 +7284,11 @@ namespace KBIN {
     if(LDEBUG){aus << soliloquy << " Krun=" << Krun << " [2]" << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
     
     try_last_ditch_effort=try_last_ditch_efforts;
-    if(mode=="EXCCOR") {try_last_ditch_effort=false;} //changing KPOINTS doesn't help
+    if(0 && mode=="EXCCOR") {try_last_ditch_effort=false;} //changing KPOINTS doesn't help
+    else if(mode=="MEMORY") {try_last_ditch_effort=false;} //increasing KPOINTS doesn't help
+    else if(mode=="MPICH11") {try_last_ditch_effort=false;} //increasing KPOINTS doesn't help
+    else if(mode=="MPICH139") {try_last_ditch_effort=false;} //increasing KPOINTS doesn't help
+    else if(mode=="MPICH174") {try_last_ditch_effort=false;} //increasing KPOINTS doesn't help
     else if(mode=="NATOMS") {try_last_ditch_effort=false;} //changing KPOINTS doesn't help
     
     if(Krun==false && try_last_ditch_effort){
@@ -7235,7 +7301,11 @@ namespace KBIN {
     if(LDEBUG){aus << soliloquy << " Krun=" << Krun << " [3]" << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
     
     try_last_ditch_effort=try_last_ditch_efforts;
-    if(mode=="EXCCOR") {try_last_ditch_effort=false;} //changing KPOINTS doesn't help
+    if(0 && mode=="EXCCOR") {try_last_ditch_effort=false;} //changing KPOINTS doesn't help
+    else if(mode=="MEMORY") {try_last_ditch_effort=false;} //increasing KPOINTS doesn't help
+    else if(mode=="MPICH11") {try_last_ditch_effort=false;} //increasing KPOINTS doesn't help
+    else if(mode=="MPICH139") {try_last_ditch_effort=false;} //increasing KPOINTS doesn't help
+    else if(mode=="MPICH174") {try_last_ditch_effort=false;} //increasing KPOINTS doesn't help
     else if(mode=="NATOMS") {try_last_ditch_effort=false;} //changing KPOINTS doesn't help
     
     if(Krun==false && try_last_ditch_effort){
@@ -7249,15 +7319,18 @@ namespace KBIN {
     
     ///////////////////////////////////////////////////////////////////////////////////////////////
     
-    if(Krun==false){
-      submode=submode_orig; //restore original
+    vflags.KBIN_VASP_INCAR_VERBOSE=vflags_orig.KBIN_VASP_INCAR_VERBOSE; //restore original (always)
+    
+    if(Krun==false||xvasp.aopts.flag("FLAG::AFIX_DRYRUN")){ //restore original for dry-run too
       xvasp=xvasp_orig;     //restore original
       kflags=kflags_orig;   //restore original
       vflags=vflags_orig;   //restore original
-      return false;
     }
 
-    vflags.KBIN_VASP_INCAR_VERBOSE=vflags_orig.KBIN_VASP_INCAR_VERBOSE; //restore original
+    if(Krun==false){
+      submode=submode_orig; //restore original
+      return false;
+    }
     
     if(file_error.empty()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No file_error specified",_INPUT_ILLEGAL_);} //CO20200624
     if(xvasp.aopts.flag("FLAG::AFIX_DRYRUN")==false){
