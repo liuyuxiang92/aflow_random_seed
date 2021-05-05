@@ -6914,9 +6914,21 @@ namespace KBIN {
       Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
     }
     else if(mode=="EXCCOR") {
-      fix="POSCAR_SCALE*=1.2"; //volume*=1.2^3
-      if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
-      Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
+      if(submode<0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"no submode set: \""+mode+"\"",_INPUT_ILLEGAL_);}  //CO20210315
+      if(submode==0){ //try ALGO=VERYFAST //CO20200624
+        fix="POSCAR_SCALE*=1.2"; //volume*=1.2^3
+        if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
+        Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
+        if(!Krun){Krun=true;submode++;} //reset and go to the next solution
+      }
+      if(submode==1){  //CO20210315 - try lowering NBANDS
+        fix="NBANDS--";
+        if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
+        Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
+        if(!Krun){Krun=true;submode++;} //reset and go to the next solution
+      }
+      if(submode>=2){Krun=false;}
+      submode+=submode_increment;submode_increment=1;  //increment and reset
     }
     else if(mode=="GAMMA_SHIFT" || mode=="IBZKPT") {  //CO20210315 - does a simple shift work for IBZKPT? come back
       fix="KPOINTS=GAMMA";
@@ -7125,6 +7137,11 @@ namespace KBIN {
       if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
       Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
     }
+    else if(mode=="RESTART_CALC") {
+      fix="RESTART_CALC";
+      if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
+      //simple restart of calc
+    }
     else if(mode=="RMM_DIIS") {
       //problems with RMM-DIIS, avoid VERYFAST
       //https://www.vasp.at/forum/viewtopic.php?t=214 (EDDRMM)
@@ -7284,7 +7301,7 @@ namespace KBIN {
     if(LDEBUG){aus << soliloquy << " Krun=" << Krun << " [2]" << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
     
     try_last_ditch_effort=try_last_ditch_efforts;
-    if(0 && mode=="EXCCOR") {try_last_ditch_effort=false;} //changing KPOINTS doesn't help
+    if(mode=="EXCCOR") {try_last_ditch_effort=false;} //changing KPOINTS doesn't help
     else if(mode=="MEMORY") {try_last_ditch_effort=false;} //increasing KPOINTS doesn't help
     else if(mode=="MPICH11") {try_last_ditch_effort=false;} //increasing KPOINTS doesn't help
     else if(mode=="MPICH139") {try_last_ditch_effort=false;} //increasing KPOINTS doesn't help
@@ -7301,7 +7318,7 @@ namespace KBIN {
     if(LDEBUG){aus << soliloquy << " Krun=" << Krun << " [3]" << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
     
     try_last_ditch_effort=try_last_ditch_efforts;
-    if(0 && mode=="EXCCOR") {try_last_ditch_effort=false;} //changing KPOINTS doesn't help
+    if(mode=="EXCCOR") {try_last_ditch_effort=false;} //changing KPOINTS doesn't help
     else if(mode=="MEMORY") {try_last_ditch_effort=false;} //increasing KPOINTS doesn't help
     else if(mode=="MPICH11") {try_last_ditch_effort=false;} //increasing KPOINTS doesn't help
     else if(mode=="MPICH139") {try_last_ditch_effort=false;} //increasing KPOINTS doesn't help

@@ -3358,6 +3358,10 @@ namespace KBIN {
       //vasp_monitor will kill vasp prematurely, triggering warnings that require xmessage.flag("REACHED_ACCURACY") (false positives)
       //prioritize the other warnings
       //might be a false positive without vasp_monitor_running, vasp can also trigger its own premature exiting
+      //in the future, if these must be turned off, be careful of switching between DAV (EDDDAV) and RMM-DIIS problems
+      //one requires ALGO=NORMAL, the other =VERYFAST and they are mutually exclusive
+      //therefore, create an xwarnings_fixed which stores which warnings have been fixed previously
+      //if warnings like RMM-DIIS have been fixed before, are not problems now, and we encounter CSLOSHING, we should NOT try =NORMAL
       uint n_require_accuracy=0;
       for(i=0;i<xwarning.vxscheme.size();i++){
         if(xRequiresAccuracy.flag(xwarning.vxscheme[i])){n_require_accuracy++;}
@@ -3549,7 +3553,7 @@ namespace KBIN {
 } // namespace KBIN
 
 namespace KBIN {
-  bool VASP_FixErrors(_xvasp &xvasp,aurostd::xoption& xwarning,aurostd::xoption& xfixed,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE){
+  bool VASP_FixErrors(_xvasp &xvasp,aurostd::xoption& xmessage,aurostd::xoption& xwarning,aurostd::xoption& xfixed,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE){
     //a note about the fixes below
     //they generally compound, which I believe is the right approach
     //however, there might be some options which conflict
@@ -3616,6 +3620,15 @@ namespace KBIN {
       
       //[CO20210315 - do not apply patches for frozen calc]//CO20210315 - do last, fixes assume out-of-memory error
       //[CO20210315 - do not apply patches for frozen calc]fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("CALC_FROZEN","MEMORY",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+    }
+    
+    //sometimes VASP will die after it prints the REACHED_ACCURACY state, but before the OUTCAR is finished (not sure why)
+    //this is rare...
+    //might be a threading/NFS issue
+    //this means any errors inside that require REACHED_ACCURACY will not be triggered
+    //in this case, try restarting the calculation
+    if(fixed_applied==false && xwarning.flag("CALC_FROZEN") && xmessage.flag("REACHED_ACCURACY") && xwarning.flag("OUTCAR_INCOMPLETE")){
+      fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("CALC_FROZEN","RESTART_CALC",false,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
     }
     
     //print out all xfixed BEFORE adding "ALL"
@@ -4210,7 +4223,7 @@ namespace KBIN {
 
         if(LDEBUG){aus << soliloquy << " [5]" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
 
-        KBIN::VASP_FixErrors(xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
+        KBIN::VASP_FixErrors(xvasp,xmessage,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
 
         //come back - should we check if any xwarning() flag is still on?
         //CO20210315 - NO, aflow patches if possible, otherwise let it run. we'll catch BIG issues with --xplug

@@ -1882,7 +1882,7 @@ string GetVASPBinaryFromLOCK(const string& directory){  //CO20210315
 // ***************************************************************************
 void processFlagsFromLOCK(_xvasp& xvasp,_vflags& vflags,aurostd::xoption& xfixed){  //CO20210315
   bool LDEBUG=(true || XHOST.DEBUG);
-  string soliloquy=XPID+"GetVASPBinaryFromLOCK():";
+  string soliloquy=XPID+"processFlagsFromLOCK():";
 
   if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
 
@@ -2099,7 +2099,7 @@ void AFLOW_monitor_VASP(const string& directory){
   uint sleep_seconds=SECONDS_SLEEP_VASP_MONITOR;
   uint sleep_seconds_afterkill=sleep_seconds;
   aurostd::xoption xmessage,xwarning,xmonitor,xfixed;
-  bool VERBOSE=false;
+  bool VERBOSE=true;
   bool vasp_running=false;
   vector<string> vlines_lock;
   
@@ -2168,8 +2168,8 @@ void AFLOW_monitor_VASP(const string& directory){
       processFlagsFromLOCK(xvasp,vflags,xfixed);
       xfixed.flag("ALL",false); //otherwise new attempts cannot be tried
       if(VERBOSE){message << "ls (pre)" << endl << aurostd::execute2string("ls -l") << endl;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);}
-      if(!KBIN::VASP_FixErrors(xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE)){
-        if(xwarning.flag("CALC_FROZEN")==false){  //kill vasp if the calc is frozen (no solution)
+      if(!KBIN::VASP_FixErrors(xvasp,xmessage,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE)){
+        if(xwarning.flag("CALC_FROZEN")==false && xwarning.flag("OUTPUT_LARGE")==false){  //kill vasp if the calc is frozen (no solution)
           kill_vasp=false;
           if(VERBOSE){message << "kill_vasp=" << kill_vasp << ": all fixes exhausted" << endl;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);}
         }
