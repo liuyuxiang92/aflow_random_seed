@@ -3844,7 +3844,7 @@ namespace KBIN {
     //return true/false indicates whether INCAR was modified
     
     bool Krun=true; //indicates whether INCAR was modified
-    bool VERBOSE=(FALSE || VERBOSE_MONITOR_VASP || XHOST.vflag_control.flag("MONITOR_VASP")==false);
+    bool VERBOSE=(FALSE || VERBOSE_MONITOR_VASP || XHOST.vflag_control.flag("MONITOR_VASP")==false || LDEBUG);
     string keyword="",incar_input="",incar_input_old="",incar_comment="";
 
     // ***************************************************************************

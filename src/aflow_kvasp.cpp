@@ -2961,6 +2961,7 @@ namespace KBIN {
     bool LDEBUG=(FALSE || VERBOSE_MONITOR_VASP || _DEBUG_KVASP_ || XHOST.DEBUG);
     string soliloquy=XPID+"KBIN::VASP_ProcessWarnings():";
     stringstream aus;
+    bool VERBOSE=(FALSE || VERBOSE_MONITOR_VASP || XHOST.vflag_control.flag("MONITOR_VASP")==false || LDEBUG);
 
     if(!aurostd::FileExist(xvasp.Directory+"/"+DEFAULT_VASP_OUT)){return;}
     if(!aurostd::FileExist(xvasp.Directory+"/INCAR")){return;}
@@ -2969,7 +2970,7 @@ namespace KBIN {
 
     long int tmod_outcar=aurostd::SecondsSinceFileModified(xvasp.Directory+"/"+"OUTCAR"); //better to look at OUTCAR than vasp.out, when vasp is killed you get errors in vasp.out, resetting the time
     unsigned long long int fsize_vaspout=aurostd::FileSize(xvasp.Directory+"/"+DEFAULT_VASP_OUT);
-    if(1||LDEBUG){
+    if(VERBOSE){
       aus << soliloquy << " time since " << "OUTCAR" << " last modified: " << tmod_outcar << " seconds (max=" << SECONDS_STALE_OUTCAR << " seconds)" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       aus << soliloquy << " size of " << DEFAULT_VASP_OUT << ": " << fsize_vaspout << " bytes (max=" << BYTES_MAX_VASP_OUT << " bytes)" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     }
@@ -3523,7 +3524,7 @@ namespace KBIN {
 
     if(LDEBUG){aus << soliloquy << " [CHECK " << error << " PROBLEMS]" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
     bool apply_fix=xwarning.flag(error);
-    bool VERBOSE=(FALSE || VERBOSE_MONITOR_VASP || XHOST.vflag_control.flag("MONITOR_VASP")==false);
+    bool VERBOSE=(FALSE || VERBOSE_MONITOR_VASP || XHOST.vflag_control.flag("MONITOR_VASP")==false || LDEBUG);
     if(apply_fix && xfixed.flag("ALL")){
       if(LDEBUG){aus << soliloquy << " xfixed.flag(\"ALL\")==TRUE: skipping " << error << " fix" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
       apply_fix=false;
