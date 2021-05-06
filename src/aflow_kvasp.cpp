@@ -2939,7 +2939,7 @@ int CheckStringInFile(string FileIn,string str,int PID,int TID) { //CO20200502 -
 // FLAG Class for KBIN_VASP_Run
 
 namespace KBIN {
-  bool ReachedAccuracy2bool(const string& scheme,const aurostd::xoption& xRequiresAccuracy,const aurostd::xoption& xmessage,bool vasp_still_running){
+  bool ReachedAccuracy2bool(const string& scheme,const aurostd::xoption& xRequiresAccuracy,const aurostd::xoption& xmessage,bool vasp_still_running){ //CO20210315
     bool LDEBUG=(FALSE || VERBOSE_MONITOR_VASP || _DEBUG_KVASP_ || XHOST.DEBUG);
     string soliloquy=XPID+"KBIN::ReachedAccuracy2bool():";
 
@@ -2961,7 +2961,7 @@ namespace KBIN {
     bool LDEBUG=(FALSE || VERBOSE_MONITOR_VASP || _DEBUG_KVASP_ || XHOST.DEBUG);
     string soliloquy=XPID+"KBIN::VASP_ProcessWarnings():";
     stringstream aus;
-    bool VERBOSE=(FALSE || VERBOSE_MONITOR_VASP || XHOST.vflag_control.flag("MONITOR_VASP")==false || LDEBUG);
+    bool VERBOSE=(FALSE || XHOST.vflag_control.flag("MONITOR_VASP")==false || LDEBUG);
 
     if(!aurostd::FileExist(xvasp.Directory+"/"+DEFAULT_VASP_OUT)){return;}
     if(!aurostd::FileExist(xvasp.Directory+"/INCAR")){return;}
@@ -3141,7 +3141,7 @@ namespace KBIN {
     //[CO20210315 - OBSOLETE]//if there is a patch to be applied for the error (CSLOSHING does), then check both when vasp running and when it's not running
     //[CO20210315 - OBSOLETE]//check NELM first, and set CSLOSHING on if NELM, that way CSLOSHING patches are applied first (work for both errors)
     //the check for xwarning.flag("OUTCAR_INCOMPLETE")==false ensures we don't flag a run that was killed by --monitor_vasp, not xmessage.flag("REACHED_ACCURACY") (must be unconverged)
-    scheme="NELM";
+    scheme="NELM";  //CO20210315
     found_warning=(vasp_still_running==false && xwarning.flag("OUTCAR_INCOMPLETE")==false && vasp_oszicar_unconverged);  // check from OSZICAR
     xwarning.flag(scheme,found_warning);
     //
@@ -3210,7 +3210,7 @@ namespace KBIN {
     found_warning=(found_warning && (aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"BAD TERMINATION OF ONE OF YOUR APPLICATION PROCESSES",true,true,true,grep_stop_condition) && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"EXIT CODE: 139",true,true,true,grep_stop_condition) ));
     xwarning.flag(scheme,found_warning);
     //
-    scheme="MPICH174";
+    scheme="MPICH174";  //CO20210315
     found_warning=ReachedAccuracy2bool(scheme,xRequiresAccuracy,xmessage,vasp_still_running);
     found_warning=(found_warning && (aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"BAD TERMINATION OF ONE OF YOUR APPLICATION PROCESSES",true,true,true,grep_stop_condition) && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"EXIT CODE: 174",true,true,true,grep_stop_condition) ));
     xwarning.flag(scheme,found_warning);
@@ -3284,8 +3284,8 @@ namespace KBIN {
     //vasp.out should NEVER get this large, means its filled with warnings/errors
     //do not look for other warnings, some might depend on xmessage.flag(\"REACHED_ACCURACY\")
     //make sure BYTES_MAX_VASP_OUT is as LARGE as possible, we want vasp to exit gracefully whenever possible. real errors might appear only after long list of warnings.
-    scheme="OUTPUT_LARGE";
-    found_warning=(vasp_still_running==true && fsize_vaspout>=BYTES_MAX_VASP_OUT);  //100MB, make aflowrc parameter, 1GB is too large for NFS mounted nodes (NFS has to push the entire file over cable), when set to 100MB it still took 3 hours
+    scheme="OUTPUT_LARGE";  //CO20210315
+    found_warning=(fsize_vaspout>=BYTES_MAX_VASP_OUT);  //100MB, make aflowrc parameter, 1GB is too large for NFS mounted nodes (NFS has to push the entire file over cable), when set to 100MB it still took 3 hours //CO20210315 - these stats were pre-renice, the processing time is much better now //vasp_still_running==true &&
     xwarning.flag(scheme,found_warning);
 
     if(LDEBUG){aus << soliloquy << " [2]" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
@@ -3524,7 +3524,7 @@ namespace KBIN {
 
     if(LDEBUG){aus << soliloquy << " [CHECK " << error << " PROBLEMS]" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
     bool apply_fix=xwarning.flag(error);
-    bool VERBOSE=(FALSE || VERBOSE_MONITOR_VASP || XHOST.vflag_control.flag("MONITOR_VASP")==false || LDEBUG);
+    bool VERBOSE=(FALSE || XHOST.vflag_control.flag("MONITOR_VASP")==false || LDEBUG);
     if(apply_fix && xfixed.flag("ALL")){
       if(LDEBUG){aus << soliloquy << " xfixed.flag(\"ALL\")==TRUE: skipping " << error << " fix" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
       apply_fix=false;
