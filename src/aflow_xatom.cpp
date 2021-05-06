@@ -9595,7 +9595,7 @@ string KPPRA_DELTA(xstructure& str,const double& DK) {
 // **************************************************************************
 // returns estimated version of NBANDS starting from
 // electrons, ions, spin and ispin
-int GetNBANDS(int electrons,int nions,int spineach,bool ispin) {
+int GetNBANDS(int electrons,int nions,int spineach,bool ispin,int NPAR) {
   string function_name=XPID+"GetNBANDS():";
   double out=0.0;
   out=max(ceil((electrons+4.0)/1.75)+max(nions/1.75,6.0),ceil(0.80*electrons)); // from VASP
@@ -9615,7 +9615,14 @@ int GetNBANDS(int electrons,int nions,int spineach,bool ispin) {
   }
   //  cerr << "GetNBANDS=" << out << endl;
   // throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Throw for debugging purposes.",_GENERIC_ERROR_);
-  return (int) ceil(out);
+  int nbands=(int)ceil(out);
+  //CO20210315 START - adjust for NPAR
+  if(NPAR>0){
+    int increment=1; //(increase?+1:-1);
+    while((nbands%NPAR)!=0){nbands+=increment;}
+  }
+  //CO20210315 END - adjust for NPAR
+  return nbands;
 }
 
 // **************************************************************************

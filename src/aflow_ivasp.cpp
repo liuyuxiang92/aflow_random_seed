@@ -704,7 +704,7 @@ namespace KBIN {
         aus << "00000  MESSAGE INCAR-MPI: found AUTOTUNE option " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
         aus << "00000  MESSAGE INCAR-MPI: input files WILL be auto-tuned for PARALLEL execution with " << kflags.KBIN_MPI_NCPUS << " CPUs " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-        KBIN::VASP_MPI_Autotune(xvasp,aflags,vflags.KBIN_VASP_INCAR_VERBOSE);
+        KBIN::XVASP_MPI_Autotune(xvasp,aflags,vflags.KBIN_VASP_INCAR_VERBOSE);
         xvasp.aopts.flag("FLAG::XVASP_INCAR_changed",TRUE);
       } else {
         aus << "00000  MESSAGE INCAR-MPI: AUTOTUNE option NOT found! (aflow_ivasp.cpp) " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
@@ -757,7 +757,7 @@ namespace KBIN {
     if(Krun && vflags.KBIN_VASP_FORCE_OPTION_NOTUNE.isentry==FALSE && vflags.KBIN_VASP_FORCE_OPTION_NBANDS_AUTO_isentry) {             /*************** INCAR **************/
       aus << "00000  MESSAGE-OPTION  [VASP_FORCE_OPTION]NBANDS - " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-      KBIN::XVASP_INCAR_PREPARE_GENERIC("NBANDS",xvasp,vflags,"",KBIN::XVASP_INCAR_GetNBANDS(xvasp,vflags.KBIN_VASP_FORCE_OPTION_SPIN.option),0.0,FALSE);
+      KBIN::XVASP_INCAR_PREPARE_GENERIC("NBANDS",xvasp,vflags,"",KBIN::XVASP_INCAR_GetNBANDS(xvasp,aflags,vflags.KBIN_VASP_FORCE_OPTION_SPIN.option),0.0,FALSE);
       xvasp.aopts.flag("FLAG::XVASP_INCAR_changed",TRUE);
     }
 
@@ -2885,40 +2885,12 @@ namespace KBIN {
 // INCAR MODIFICATIONS
 
 // ***************************************************************************
-// KBIN::XVASP_MPI_Autotune
+// KBIN::XVASP_Get_NPAR_NCORE
 // ***************************************************************************
 namespace KBIN {
-  void VASP_MPI_Autotune(_xvasp& xvasp,_aflags &aflags,bool VERBOSE) {
-    string FileContent,strline;
-    int imax;
-
-    FileContent=xvasp.INCAR.str();
-    xvasp.INCAR.str(std::string());
-    xvasp.aopts.flag("FLAG::XVASP_INCAR_changed",TRUE);
-    imax=aurostd::GetNLinesString(FileContent);
-    for(int i=1;i<=imax;i++) {
-      strline=aurostd::GetLineString(FileContent,i);
-      if(aurostd::substring2bool(strline,"IALGO",TRUE)  || aurostd::substring2bool(strline,"#IALGO",TRUE) ||
-          aurostd::substring2bool(strline,"LPLANE",TRUE) || aurostd::substring2bool(strline,"#LPLANE",TRUE) ||
-          aurostd::substring2bool(strline,"NPAR",TRUE)   || aurostd::substring2bool(strline,"#NPAR",TRUE)   ||
-          aurostd::substring2bool(strline,"LSCALU",TRUE) || aurostd::substring2bool(strline,"#LSCALU",TRUE) ||
-          aurostd::substring2bool(strline,"NSIM",TRUE)   || aurostd::substring2bool(strline,"#NSIM",TRUE)) {
-        if(VERBOSE) xvasp.INCAR << "# " << strline << " # AFLOW REMOVED (KBIN::VASP_MPI_Autotune)" << endl;
-      } else {
-        if(!VERBOSE && strline.length()) xvasp.INCAR << strline << endl;
-        if(VERBOSE) xvasp.INCAR << strline << endl;
-      }
-    }
-    // xvasp.INCAR << endl;
-    if(VERBOSE) xvasp.INCAR << "# Performing MPI-AUTOTUNE [AFLOW] begin" << endl;
-    if(VERBOSE) xvasp.INCAR << "# MPI tuning for Linux cluster with CPUS=" << xvasp.NCPUS << endl;
-    if(VERBOSE) xvasp.INCAR << "# look at the VASP manual" << endl;
-    //[CO20210315 - OBSOLETE link]if(VERBOSE) xvasp.INCAR << "# http://www.teragridforum.org/mediawiki/images/7/7e/Performance_on_Ranger_of_the_medium_size_problem.pdf" << endl;
-    xvasp.INCAR << aurostd::PaddedPOST("IALGO=48",_incarpad_) << " # MPI algorithm" << endl;
-    xvasp.INCAR << aurostd::PaddedPOST("LPLANE=.TRUE.",_incarpad_) << " # parallelization" << endl;
-    // xvasp.INCAR << aurostd::PaddedPOST("NPAR="+aurostd::utype2string(xvasp.NCPUS),_incarpad_) << " # number of CPUs" << endl;
-    // xvasp.INCAR << aurostd::PaddedPOST("NPAR="+aurostd::utype2string(sqrt(xvasp.NCPUS)),_incarpad_) << " # number of CPUs" << endl;
-    int NPAR=0,NCORE=1;
+  void XVASP_Get_NPAR_NCORE(const _xvasp& xvasp,const _aflags& aflags,int& NPAR,int& NCORE){  //CO20210315
+    NPAR=0,NCORE=1; //reset
+    
     if(xvasp.NCPUS >   0 && xvasp.NCPUS <=  32) {NPAR=2;NCORE=xvasp.NCPUS/NPAR;}
     if(xvasp.NCPUS >  32 && xvasp.NCPUS <=  64) {NPAR=4;NCORE=xvasp.NCPUS/NPAR;}
     if(xvasp.NCPUS >  64 && xvasp.NCPUS <= 128) {NPAR=8;NCORE=xvasp.NCPUS/NPAR;}
@@ -2927,6 +2899,8 @@ namespace KBIN {
     if(xvasp.NCPUS > 512 && xvasp.NCPUS <=1024) {NPAR=64;NCORE=xvasp.NCPUS/NPAR;}
     if(xvasp.NCPUS >1024) {NPAR=128;NCORE=xvasp.NCPUS/NPAR;}
     if(NPAR==0) {NPAR=4;NCORE=1;}
+
+    //DX COME BACK: should these be set by machine? looks like they are being overridden below
     if(xvasp.NCPUS==32)  {NPAR=4;NCORE=32;} // test for DX conrad and gordon
     if(xvasp.NCPUS==48)  {NPAR=4;NCORE=48;} // test for DX gaffney, koehr, and mustang
     if(xvasp.NCPUS==44)  {NPAR=4;NCORE=44;} // test for DX onyx
@@ -3027,28 +3001,79 @@ namespace KBIN {
     }
 
     if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_EOS") && xvasp.NCPUS==32)  {
-      xvasp.INCAR << aurostd::PaddedPOST("# Override for MACHINE::MPCDF_EOS and xvasp.NCPUS==32",_incarpad_) << endl; 
       NPAR=4;NCORE=32;
     }
     if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_DRACO") && xvasp.NCPUS==32)  {
-      xvasp.INCAR << aurostd::PaddedPOST("# Override for MACHINE::MPCDF_DRACO and xvasp.NCPUS==32",_incarpad_) << endl; 
       NPAR=4;NCORE=32;
     }
     if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_COBRA") && xvasp.NCPUS==32)  {
-      xvasp.INCAR << aurostd::PaddedPOST("# Override for MACHINE::MPCDF_COBRA and xvasp.NCPUS==32",_incarpad_) << endl; 
       NPAR=4;NCORE=32;
     }
     if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_COBRA") && xvasp.NCPUS==40)  {
-      xvasp.INCAR << aurostd::PaddedPOST("# Override for MACHINE::MPCDF_COBRA and xvasp.NCPUS==40",_incarpad_) << endl; 
       NPAR=4;NCORE=40;
     }
     if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_HYDRA") && xvasp.NCPUS==32)  {
-      xvasp.INCAR << aurostd::PaddedPOST("# Override for MACHINE::MPCDF_HYDRA and xvasp.NCPUS==32",_incarpad_) << endl; 
       NPAR=4;NCORE=32;
     }
 
     //  cerr << "xvasp.NCPUS=" << xvasp.NCPUS << endl;;
     // cerr << "NPAR=" << NPAR << endl;
+  }
+}
+
+// ***************************************************************************
+// KBIN::XVASP_MPI_Autotune
+// ***************************************************************************
+namespace KBIN {
+  void XVASP_MPI_Autotune(_xvasp& xvasp,_aflags &aflags,bool VERBOSE) {
+    string FileContent,strline;
+    int imax;
+
+    FileContent=xvasp.INCAR.str();
+    xvasp.INCAR.str(std::string());
+    xvasp.aopts.flag("FLAG::XVASP_INCAR_changed",TRUE);
+    imax=aurostd::GetNLinesString(FileContent);
+    for(int i=1;i<=imax;i++) {
+      strline=aurostd::GetLineString(FileContent,i);
+      if(aurostd::substring2bool(strline,"IALGO",TRUE)  || aurostd::substring2bool(strline,"#IALGO",TRUE) ||
+          aurostd::substring2bool(strline,"LPLANE",TRUE) || aurostd::substring2bool(strline,"#LPLANE",TRUE) ||
+          aurostd::substring2bool(strline,"NPAR",TRUE)   || aurostd::substring2bool(strline,"#NPAR",TRUE)   ||
+          aurostd::substring2bool(strline,"LSCALU",TRUE) || aurostd::substring2bool(strline,"#LSCALU",TRUE) ||
+          aurostd::substring2bool(strline,"NSIM",TRUE)   || aurostd::substring2bool(strline,"#NSIM",TRUE)) {
+        if(VERBOSE) xvasp.INCAR << "# " << strline << " # AFLOW REMOVED (KBIN::VASP_MPI_Autotune)" << endl;
+      } else {
+        if(!VERBOSE && strline.length()) xvasp.INCAR << strline << endl;
+        if(VERBOSE) xvasp.INCAR << strline << endl;
+      }
+    }
+    // xvasp.INCAR << endl;
+    if(VERBOSE) xvasp.INCAR << "# Performing MPI-AUTOTUNE [AFLOW] begin" << endl;
+    if(VERBOSE) xvasp.INCAR << "# MPI tuning for Linux cluster with CPUS=" << xvasp.NCPUS << endl;
+    if(VERBOSE) xvasp.INCAR << "# look at the VASP manual" << endl;
+    //[CO20210315 - OBSOLETE link]if(VERBOSE) xvasp.INCAR << "# http://www.teragridforum.org/mediawiki/images/7/7e/Performance_on_Ranger_of_the_medium_size_problem.pdf" << endl;
+    xvasp.INCAR << aurostd::PaddedPOST("IALGO=48",_incarpad_) << " # MPI algorithm" << endl;
+    xvasp.INCAR << aurostd::PaddedPOST("LPLANE=.TRUE.",_incarpad_) << " # parallelization" << endl;
+    // xvasp.INCAR << aurostd::PaddedPOST("NPAR="+aurostd::utype2string(xvasp.NCPUS),_incarpad_) << " # number of CPUs" << endl;
+    // xvasp.INCAR << aurostd::PaddedPOST("NPAR="+aurostd::utype2string(sqrt(xvasp.NCPUS)),_incarpad_) << " # number of CPUs" << endl;
+    int NPAR=0,NCORE=1;
+
+    KBIN::XVASP_Get_NPAR_NCORE(xvasp,aflags,NPAR,NCORE); //CO20210315
+    
+    if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_EOS") && xvasp.NCPUS==32)  {
+      xvasp.INCAR << aurostd::PaddedPOST("# Override for MACHINE::MPCDF_EOS and xvasp.NCPUS==32",_incarpad_) << endl; 
+    }
+    if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_DRACO") && xvasp.NCPUS==32)  {
+      xvasp.INCAR << aurostd::PaddedPOST("# Override for MACHINE::MPCDF_DRACO and xvasp.NCPUS==32",_incarpad_) << endl; 
+    }
+    if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_COBRA") && xvasp.NCPUS==32)  {
+      xvasp.INCAR << aurostd::PaddedPOST("# Override for MACHINE::MPCDF_COBRA and xvasp.NCPUS==32",_incarpad_) << endl; 
+    }
+    if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_COBRA") && xvasp.NCPUS==40)  {
+      xvasp.INCAR << aurostd::PaddedPOST("# Override for MACHINE::MPCDF_COBRA and xvasp.NCPUS==40",_incarpad_) << endl; 
+    }
+    if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_HYDRA") && xvasp.NCPUS==32)  {
+      xvasp.INCAR << aurostd::PaddedPOST("# Override for MACHINE::MPCDF_HYDRA and xvasp.NCPUS==32",_incarpad_) << endl; 
+    }
 
     xvasp.INCAR << aurostd::PaddedPOST("NPAR="+aurostd::utype2string(NPAR),_incarpad_) << " # lookup table from NCPUS=" << xvasp.NCPUS << endl;    // 6 times faster than NPAR=cpus.
     xvasp.INCAR << aurostd::PaddedPOST("NCORE="+aurostd::utype2string(NCORE),_incarpad_) << " # lookup table from NCPUS=" << xvasp.NCPUS << endl;    
@@ -3755,13 +3780,15 @@ namespace KBIN {
 // ***************************************************************************
 // KBIN::XVASP_INCAR_GetNBANDS
 namespace KBIN {
-  int XVASP_INCAR_GetNBANDS(_xvasp& xvasp,bool ispin) {
+  int XVASP_INCAR_GetNBANDS(const _xvasp& xvasp,const _aflags& aflags,bool ispin) {
     vector<double> vZVAL;
     double ZVAL=GetZVAL(xvasp.POTCAR,vZVAL);
     // // cout << XPID << "00000  MESSAGE POTCAR ZVAL max   = " << ZVAL << endl;
     int nbands=0;
     ispin=true; //CO20210315 - override for safety
-    nbands=GetNBANDS((int) ZVAL,(int) xvasp.str.atoms.size(),5,ispin);
+    int NPAR=0,NCORE=1;
+    KBIN::XVASP_Get_NPAR_NCORE(xvasp,aflags,NPAR,NCORE); //CO20210315
+    nbands=GetNBANDS((int) ZVAL,(int) xvasp.str.atoms.size(),5,ispin,NPAR);
     // nbands=nbands+20+nbands/5; // MORE SAFETY
     // cout << XPID << "00000  MESSAGE POTCAR NBANDS = " << nbands << endl;
     if(!XHOST.QUIET) cout << XPID << "00000  MESSAGE-OPTION  [VASP_FORCE_OPTION]NBANDS  = " << nbands << endl;
@@ -3824,7 +3851,7 @@ namespace KBIN {
 // ***************************************************************************
 // KBIN::XVASP_INCAR_PREPARE_GENERIC
 namespace KBIN {
-  bool XVASP_INCAR_PREPARE_GENERIC(const string& command,_xvasp& xvasp,_vflags& vflags,const string& svalue,int ivalue,double dvalue,bool OPTION){
+  bool XVASP_INCAR_PREPARE_GENERIC(const string& command,_xvasp& xvasp,const _vflags& vflags,const string& svalue,int ivalue,double dvalue,bool OPTION){
     //CO20210315 - extensive rewrite
     //the schemes below check if the modification needs to be made (has it already been made?)
     //maintain this feedback system to ensure aflow doesn't keep spinning its wheels on the same fixes
@@ -5896,11 +5923,11 @@ namespace KBIN {
 //[CO20210315 - OBSOLETE]}
 
 namespace KBIN {
-  bool XVASP_Afix_NBANDS(_xvasp& xvasp,_vflags& vflags,bool increase) {
+  bool XVASP_Afix_NBANDS(_xvasp& xvasp,const _aflags& aflags,const _vflags& vflags,bool increase) {
     int nbands=0;
-    return XVASP_Afix_NBANDS(xvasp,vflags,nbands,increase);
+    return XVASP_Afix_NBANDS(xvasp,aflags,vflags,nbands,increase);
   }
-  bool XVASP_Afix_NBANDS(_xvasp& xvasp,_vflags& vflags,int& nbands,bool increase) {
+  bool XVASP_Afix_NBANDS(_xvasp& xvasp,const _aflags& aflags,const _vflags& vflags,int& nbands,bool increase) {
     //note, this function is part of the XVASP_Afix_* series
     //it will assume xvasp.INCAR has been pre-loaded and will NOT rewrite the INCAR
     //this is all done inside the main XVASP_Afix() function
@@ -5940,7 +5967,7 @@ namespace KBIN {
       cerr << soliloquy << " nelectrons=" << nelectrons << endl;
       cerr << soliloquy << " npar=" << npar << endl;
     }
-    if(nbands==0){nbands=KBIN::XVASP_INCAR_GetNBANDS(xvasp,TRUE);}
+    if(nbands==0){nbands=KBIN::XVASP_INCAR_GetNBANDS(xvasp,aflags,TRUE);}
     else{
       if(increase){nbands+=(int)(20+(double)nbands*0.2);}
       else{nbands=(int)((double)nbands*0.9);}  //CO20210315
@@ -5971,11 +5998,11 @@ namespace KBIN {
 }
 
 namespace KBIN {
-  bool XVASP_Afix_POTIM(_xvasp& xvasp,_vflags& vflags) {
+  bool XVASP_Afix_POTIM(_xvasp& xvasp,const _vflags& vflags) {
     double potim=0.0;
     return XVASP_Afix_POTIM(xvasp,vflags,potim);
   }
-  bool XVASP_Afix_POTIM(_xvasp& xvasp,_vflags& vflags,double& potim) {
+  bool XVASP_Afix_POTIM(_xvasp& xvasp,const _vflags& vflags,double& potim) {
     //note, this function is part of the XVASP_Afix_* series
     //it will assume xvasp.INCAR has been pre-loaded and will NOT rewrite the INCAR
     //this is all done inside the main XVASP_Afix() function
@@ -6018,11 +6045,11 @@ namespace KBIN {
 }
 
 namespace KBIN {
-  bool XVASP_Afix_NELM(_xvasp& xvasp,_vflags& vflags) {  //CO20200624
+  bool XVASP_Afix_NELM(_xvasp& xvasp,const _vflags& vflags) {  //CO20200624
     int nelm=0;
     return XVASP_Afix_NELM(xvasp,vflags,nelm);
   }
-  bool XVASP_Afix_NELM(_xvasp& xvasp,_vflags& vflags,int& nelm) {  //CO20200624
+  bool XVASP_Afix_NELM(_xvasp& xvasp,const _vflags& vflags,int& nelm) {  //CO20200624
     //note, this function is part of the XVASP_Afix_* series
     //it will assume xvasp.INCAR has been pre-loaded and will NOT rewrite the INCAR
     //this is all done inside the main XVASP_Afix() function
@@ -6062,11 +6089,11 @@ namespace KBIN {
 // ***************************************************************************
 // KBIN::XVASP_Afix_EFIELD_PEAD
 namespace KBIN {
-  bool XVASP_Afix_EFIELD_PEAD(_xvasp& xvasp,_vflags& vflags) {        // AFLOW_FUNCTION_IMPLEMENTATION
+  bool XVASP_Afix_EFIELD_PEAD(_xvasp& xvasp,const _vflags& vflags) {        // AFLOW_FUNCTION_IMPLEMENTATION
     xvector<double> E;
     return XVASP_Afix_EFIELD_PEAD(xvasp,vflags,E);
   }
-  bool XVASP_Afix_EFIELD_PEAD(_xvasp& xvasp,_vflags& vflags,xvector<double>& E) {        // AFLOW_FUNCTION_IMPLEMENTATION
+  bool XVASP_Afix_EFIELD_PEAD(_xvasp& xvasp,const _vflags& vflags,xvector<double>& E) {        // AFLOW_FUNCTION_IMPLEMENTATION
     //note, this function is part of the XVASP_Afix_* series
     //it will assume xvasp.INCAR has been pre-loaded and will NOT rewrite the INCAR
     //this is all done inside the main XVASP_Afix() function
@@ -6481,7 +6508,7 @@ namespace KBIN {
       if(Krun && VERBOSE){aus << "MMMMM  MESSAGE attempting FIX=\"" << fix << "\"" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
       //START - load INCAR into xvasp, modify, then write out new INCAR
       Krun=(Krun && VASP_Reread_INCAR(xvasp));  //preload incar
-      Krun=(Krun && KBIN::XVASP_Afix_NBANDS(xvasp,vflags,param_int,increase));
+      Krun=(Krun && KBIN::XVASP_Afix_NBANDS(xvasp,aflags,vflags,param_int,increase));
       if(xvasp.aopts.flag("FLAG::AFIX_DRYRUN")==false){
         Krun=(Krun && aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR"))); //write out incar
       }

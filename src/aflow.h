@@ -2362,7 +2362,7 @@ string KPPRA(int& k1,int& k2,int& k3,const xmatrix<double>& rlattice,const int& 
 string KPPRA(xstructure& str,const int& _NK);
 string KPPRA_DELTA(int& k1,int& k2,int& k3,const xmatrix<double>& rlattice,const double& DK);
 string KPPRA_DELTA(xstructure& str,const double& DK);
-int GetNBANDS(int electrons,int nions,int spineach,bool ispin=true);  //CO20210315 - spin==true is safer
+int GetNBANDS(int electrons,int nions,int spineach,bool ispin=true,int NPAR=1);  //CO20210315 - spin==true is safer, added NPAR
 double GetZVAL(const stringstream& sss,vector<double>& vZVAL);
 double GetZVAL(const _xvasp& xvasp,vector<double>& vZVAL);
 double GetZVAL(const string& directory,vector<double>& vZVAL);
@@ -3118,7 +3118,8 @@ namespace KBIN {
   bool VASP_SplitAlloyPseudoPotentials(string alloy, string &species_ppA, string &species_ppB, string &species_ppC);
   bool VASP_SplitAlloyPseudoPotentials(vector<string> alloy, vector<string> &species_ppsA, vector<string> &species_ppsB);
   bool VASP_SplitAlloyPseudoPotentials(vector<string> alloy, vector<string> &species_ppsA, vector<string> &species_ppsB, vector<string> &species_ppsC);
-  void VASP_MPI_Autotune(_xvasp& xvasp,_aflags &aflags,bool VERBOSE);
+  void XVASP_Get_NPAR_NCORE(const _xvasp& xvasp,const _aflags& aflags,int& NPAR,int& NCORE);  //CO20210315
+  void XVASP_MPI_Autotune(_xvasp& xvasp,_aflags &aflags,bool VERBOSE);
   void XVASP_INCAR_System_Auto(_xvasp& xvasp,bool VERBOSE);
   void XVASP_INCAR_Relax_ON(_xvasp& xvasp,bool VERBOSE);
   void XVASP_INCAR_Relax_ON(_xvasp& xvasp,_vflags& vflags,int number); // for steps
@@ -3130,10 +3131,10 @@ namespace KBIN {
   void XVASP_INCAR_Metagga(_xvasp& xvasp,_vflags& vflags);
   void XVASP_INCAR_Ivdw(_xvasp& xvasp,_vflags& vflags);
   void XVASP_INCAR_ABMIX(_xvasp& xvasp,_vflags& vflags);
-  int XVASP_INCAR_GetNBANDS(_xvasp& xvasp,bool ispin=true); //CO20210315 - spin==true is safer
+  int XVASP_INCAR_GetNBANDS(const _xvasp& xvasp,const _aflags& aflags,bool ispin=true); //CO20210315 - spin==true is safer
   string INCAR_IALGO2ALGO(int ialgo); //CO20210315
   bool XVASP_INCAR_Read_MAGMOM(_xvasp& xvasp);  //CO20210315
-  bool XVASP_INCAR_PREPARE_GENERIC(const string& command,_xvasp& xvasp,_vflags& vflags,const string& svalue,int ivalue,double dvalue,bool bvalue);
+  bool XVASP_INCAR_PREPARE_GENERIC(const string& command,_xvasp& xvasp,const _vflags& vflags,const string& svalue,int ivalue,double dvalue,bool bvalue);
   void XVASP_INCAR_ADJUST_ICHARG(_xvasp&, _vflags&, _aflags&, int, ofstream&);  //ME20191028
   void XVASP_INCAR_SPIN_REMOVE_RELAX(_xvasp& xvasp,_aflags &aflags,_vflags& vflags,int step,ofstream &FileMESSAGE);
   void XVASP_KPOINTS_IBZKPT_UPDATE(_xvasp& xvasp,_aflags &aflags,_vflags& vflags,int step,ofstream &FileMESSAGE);
@@ -3173,14 +3174,14 @@ namespace KBIN {
   //[CO20210315 - OBSOLETE]bool XVASP_Afix_ROTMAT(_xvasp& xvasp,int mode,_aflags& aflags,bool VERBOSE,ofstream &FileMESSAGE);
   //[CO20210315 - OBSOLETE]bool XVASP_Afix_ROTMAT(_xvasp& xvasp,int mode,_kflags kflags,_vflags vflags,_aflags& aflags,bool VERBOSE,ofstream &FileMESSAGE);
   //the following functions are all associated with XVASP_Afix()
-  bool XVASP_Afix_NBANDS(_xvasp& xvasp,_vflags& vflags,bool increase=true);  //CO20200624 - this is not a general Afix, this can only be used inside Afix_GENERIC
-  bool XVASP_Afix_NBANDS(_xvasp& xvasp,_vflags& vflags,int& nbands,bool increase=true);  //CO20200624 - this is not a general Afix, this can only be used inside Afix_GENERIC
-  bool XVASP_Afix_POTIM(_xvasp& xvasp,_vflags& vflags);  //CO20200624 - this is not a general Afix, this can only be used inside Afix_GENERIC
-  bool XVASP_Afix_POTIM(_xvasp& xvasp,_vflags& vflags,double& potim);  //CO20200624 - this is not a general Afix, this can only be used inside Afix_GENERIC
-  bool XVASP_Afix_NELM(_xvasp& xvasp,_vflags& vflags); //CO20200624 - this is not a general Afix, this can only be used inside Afix_GENERIC
-  bool XVASP_Afix_NELM(_xvasp& xvasp,_vflags& vflags,int& nelm); //CO20200624 - this is not a general Afix, this can only be used inside Afix_GENERIC
-  bool XVASP_Afix_EFIELD_PEAD(_xvasp& xvasp,_vflags& vflags); //CO20200624 - this is not a general Afix, this can only be used inside Afix_GENERIC
-  bool XVASP_Afix_EFIELD_PEAD(_xvasp& xvasp,_vflags& vflags,xvector<double>& E); //CO20200624 - this is not a general Afix, this can only be used inside Afix_GENERIC
+  bool XVASP_Afix_NBANDS(_xvasp& xvasp,const _aflags& aflags,const _vflags& vflags,bool increase=true);  //CO20200624 - this is not a general Afix, this can only be used inside Afix_GENERIC
+  bool XVASP_Afix_NBANDS(_xvasp& xvasp,const _aflags& aflags,const _vflags& vflags,int& nbands,bool increase=true);  //CO20200624 - this is not a general Afix, this can only be used inside Afix_GENERIC
+  bool XVASP_Afix_POTIM(_xvasp& xvasp,const _vflags& vflags);  //CO20200624 - this is not a general Afix, this can only be used inside Afix_GENERIC
+  bool XVASP_Afix_POTIM(_xvasp& xvasp,const _vflags& vflags,double& potim);  //CO20200624 - this is not a general Afix, this can only be used inside Afix_GENERIC
+  bool XVASP_Afix_NELM(_xvasp& xvasp,const _vflags& vflags); //CO20200624 - this is not a general Afix, this can only be used inside Afix_GENERIC
+  bool XVASP_Afix_NELM(_xvasp& xvasp,const _vflags& vflags,int& nelm); //CO20200624 - this is not a general Afix, this can only be used inside Afix_GENERIC
+  bool XVASP_Afix_EFIELD_PEAD(_xvasp& xvasp,const _vflags& vflags); //CO20200624 - this is not a general Afix, this can only be used inside Afix_GENERIC
+  bool XVASP_Afix_EFIELD_PEAD(_xvasp& xvasp,const _vflags& vflags,xvector<double>& E); //CO20200624 - this is not a general Afix, this can only be used inside Afix_GENERIC
   bool XVASP_Afix_ApplyFix(const string& fix,aurostd::xoption& xfixed,_xvasp& xvasp,_kflags& kflags,_vflags& vflags,_aflags &aflags,ofstream& FileMESSAGE); //CO20200624 - adding submode so we don't need to make a bunch of spin-off functions
   bool XVASP_Afix_IgnoreFix(const string& _fix,const _vflags& vflags);  //CO20210315
   bool XVASP_Afix(const string& mode,int& submode,bool try_last_ditch_efforts,aurostd::xoption& xfixed,_xvasp& xvasp,_kflags& kflags,_vflags& vflags,_aflags &aflags,ofstream& FileMESSAGE); //CO20200624 - adding submode so we don't need to make a bunch of spin-off functions
