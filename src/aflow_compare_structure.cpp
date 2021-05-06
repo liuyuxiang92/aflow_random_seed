@@ -213,6 +213,16 @@ vector<string> XtalFinderCalculator::getUniquePermutations(
 // compare::compareInputStructures()
 // ***************************************************************************
 namespace compare {
+  string compareInputStructures(aurostd::xoption& vpflow, istream& input_stream, ostream& logstream){ //ME20210206 - std::cin variant
+    string input_string;
+    aurostd::stream2string(input_stream, input_string);
+    vpflow.push_attached("COMPARE_STRUCTURE::STRUCTURE_STRING", input_string);
+    vpflow.pop_attached("COMPARE_STRUCTURE::STRUCTURE_LIST");
+    vpflow.pop_attached("COMPARE_STRUCTURE::DIRECTORY");
+    vpflow.pop_attached("COMPARE_STRUCTURE::FILE");
+    return compareInputStructures(vpflow, logstream);
+  }
+
   string compareInputStructures(const aurostd::xoption& vpflow, ostream& logstream){ //DX20190425 - changed name, more general
 
     // This function compares multiple structures (i.e., more than two).
@@ -276,12 +286,17 @@ namespace compare {
     if(!vpflow.getattachedscheme("COMPARE_STRUCTURE::FILE").empty()){
       structures_source = "file";
     }
+    // ME20210206 - from stream
+    if(!vpflow.getattachedscheme("COMPARE_STRUCTURE::STRUCTURE_STRING").empty()){
+      structures_source = "string";
+    }
 
     // ---------------------------------------------------------------------------
     // FLAG: directory of structures to compare
     vector<string> file_list; //DX20190424
     string directory=".";
     string filename="";
+    string structures_string="";  // ME20210206
     //DX20190424 START
     if(structures_source=="structure_list") {
       aurostd::string2tokens(vpflow.getattachedscheme("COMPARE_STRUCTURE::STRUCTURE_LIST"),file_list,",");
@@ -309,6 +324,18 @@ namespace compare {
         return oss.str();
       }
       message << "Comparison file: " << filename;
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+    }
+    // ---------------------------------------------------------------------------
+    // FLAG: structures stored in a string (ME20210206)
+    else if(structures_source=="string") {
+      structures_string = vpflow.getattachedscheme("COMPARE_STRUCTURE::STRUCTURE_STRING");
+      if (structures_string.empty()) {
+        message << "Input string empty.";
+        pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_ERROR_);
+        return oss.str();
+      }
+      message << "Structures taken from string.";
       pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     }
     else {
@@ -384,6 +411,9 @@ namespace compare {
     }
     else if(structures_source=="directory") {
       prototypes_final = xtal_finder.compareStructuresFromDirectory(directory, magmoms_for_systems, xtal_finder.num_proc, same_species, comparison_options); //DX20200103 - condensed booleans to xoptions
+    }
+    else if(structures_source=="string") {  // ME20210205
+      prototypes_final = xtal_finder.compareStructuresFromString(structures_string, magmoms_for_systems, xtal_finder.num_proc, same_species, comparison_options);
     }
     if(structures_source=="file") {
       prototypes_final = xtal_finder.compareStructuresFromFile(filename, magmoms_for_systems, xtal_finder.num_proc, same_species, comparison_options); //DX20200103 - condensed booleans to xoptions
@@ -497,11 +527,26 @@ namespace compare {
     // (calculates symmetry of input structure and grabs symmetrically similar prototypes)
     vector<string> isopointal_prototypes = compare::getIsopointalPrototypes(xstr, catalog);
 
-    if(isopointal_prototypes.size()==0){
-      return "no isopointal prototypes in AFLOW";
+    // ---------------------------------------------------------------------------
+    // print format //DX20210208
+    bool write_txt = XHOST.vflag_control.flag("PRINT_MODE::TXT");
+    bool write_json = XHOST.vflag_control.flag("PRINT_MODE::JSON");
+    // if not specified, write text by default
+    if(!write_txt && !write_json){ write_txt = true; }
+
+    stringstream ss_output;
+    if(write_txt){
+      if(isopointal_prototypes.size()==0){ ss_output << "no isopointal prototypes in AFLOW"; }
+      else{ ss_output << aurostd::joinWDelimiter(isopointal_prototypes,","); }
+    }
+    if(write_json){
+      if(!ss_output.str().empty()){ ss_output << endl; } // if printing both text and json, add a newline
+      ss_output << "{\"prototypes_isopointal\":";
+      ss_output << "[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(isopointal_prototypes,"\""),",") << "]";
+      ss_output << "}";
     }
 
-    return aurostd::joinWDelimiter(isopointal_prototypes,",");
+    return ss_output.str();
   }
 }
 
@@ -543,10 +588,16 @@ namespace compare {
 // ***************************************************************************
 namespace compare {
   vector<string> getMatchingPrototypes(xstructure& xstr, const string& catalog){
+    aurostd::xoption vpflow_input;
+    return getMatchingPrototypes(xstr,vpflow_input,catalog);
+  }
+}
+namespace compare {
+  vector<string> getMatchingPrototypes(xstructure& xstr, const aurostd::xoption& vpflow_input, const string& catalog){ //DX20210421 - added vpflow variant
 
     // Returns the matching prototype label, if any exists
 
-    aurostd::xoption vpflow;
+    aurostd::xoption vpflow = vpflow_input; //DX20210421 - transfer input options to vpflow
     vpflow.flag("COMPARE2PROTOTYPES",TRUE);
 
     // ---------------------------------------------------------------------------
@@ -573,8 +624,24 @@ namespace compare {
     XHOST.QUIET=original_quiet;
 
     vector<string> matching_prototypes;
+    if(prototypes.size()==0){ return matching_prototypes; } //DX20210421 - protect against no matching entries
+
+    // ---------------------------------------------------------------------------
+    // sort, put best matches first
+    vector<double> misfit_matched;
+    uint placement_index = prototypes[0].structures_duplicate.size();
     for(uint i=0;i<prototypes[0].structures_duplicate.size();i++){
-      matching_prototypes.push_back(prototypes[0].structures_duplicate[i]->name);
+      for(uint j=0;j<misfit_matched.size();j++){
+        if(prototypes[0].mapping_info_duplicate[i].misfit<misfit_matched[j]){ placement_index = 0; }
+      }
+      if(placement_index == prototypes[0].structures_duplicate.size()){
+        matching_prototypes.push_back(prototypes[0].structures_duplicate[i]->name);
+        misfit_matched.push_back(prototypes[0].mapping_info_duplicate[i].misfit);
+      }
+      else{
+        matching_prototypes.insert(matching_prototypes.begin()+placement_index,prototypes[0].structures_duplicate[i]->name);
+        misfit_matched.insert(misfit_matched.begin()+placement_index,prototypes[0].mapping_info_duplicate[i].misfit);
+      }
     }
     return matching_prototypes; // duplicates names are prototype labels
   }
@@ -1008,7 +1075,7 @@ vector<StructurePrototype> XtalFinderCalculator::compare2database(
     if(relaxation_step == _COMPARE_DATABASE_GEOMETRY_ORIGINAL_){ relaxation_name = "original"; }
     else if(relaxation_step == _COMPARE_DATABASE_GEOMETRY_RELAX1_){ relaxation_name = "relax1"; }
     else { throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, "Unexpected relaxation step input: "+aurostd::utype2string<uint>(relaxation_step)+".", _INPUT_ERROR_); }
-    message << "The " << relaxation_name << " structures will be extracted; the properties will not correspond to these structures. Proceed with caution.";
+    message << "The " << relaxation_name << " structures will be extracted; the properties may not correspond to these structures. Proceed with caution.";
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
   }
 
@@ -1700,6 +1767,35 @@ vector<StructurePrototype> XtalFinderCalculator::compareStructuresFromFile(
 
   // ---------------------------------------------------------------------------
   // compare structures returns vector<StructureProtoype> of unique/duplicate info
+  return compareMultipleStructures(num_proc, same_species, directory, comparison_options);
+
+}
+
+// ***************************************************************************
+// XtalFinderCalculator::compareStructuresFromString() //ME20201206
+// ***************************************************************************
+vector<StructurePrototype> XtalFinderCalculator::compareStructuresFromString(
+    const string& structures_string,
+    vector<string>& magmoms_for_systems,
+    uint num_proc,
+    bool same_species,
+    const aurostd::xoption& comparison_options){
+
+  // ---------------------------------------------------------------------------
+  // directory to write results
+  string directory = aurostd::getPWD();
+
+  // ---------------------------------------------------------------------------
+  // load structures in string
+  stringstream structures;
+  structures << structures_string;
+  loadStructuresFromStringstream(structures,
+      magmoms_for_systems,
+      same_species);
+
+  // ---------------------------------------------------------------------------
+  // compare structures returns vector<StructureProtoype> of unique/duplicate info
+
   return compareMultipleStructures(num_proc, same_species, directory, comparison_options);
 
 }

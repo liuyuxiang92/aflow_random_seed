@@ -61,12 +61,13 @@ namespace aurostd{
     return dp;
   }
 
-  /// Constructs the Vandermonde matrix with columns up to a given number of columns n.
+  /// Constructs the Vandermonde matrix with columns up to a given number of columns n,
+  /// which corresponds to the polynomial of degree n-1.
   /// Vandermonde matrix:
-  /// 1 x1^2 x1^3 .. x1^(n-1)
-  /// 1 x2^2 x2^3 .. x2^(n-1)
+  /// 1 x1^1 x1^2 .. x1^(n-1)
+  /// 1 x2^1 x2^2 .. x2^(n-1)
   /// ...
-  /// 1 xm^2 xm^3 .. xm^(n-1)
+  /// 1 xm^1 xm^2 .. xm^(n-1)
   /// where m is the size of x array
   xmatrix<double> Vandermonde_matrix(const xvector<double> &x, int n)
   {
@@ -81,7 +82,7 @@ namespace aurostd{
   }
 
   /// Calculates the extremum of the polynomial bounded by the region [xmin,xmax] by searching
-  /// for the value x where the derviative of polynomial equals to zero using the
+  /// for the value x where the derivative of polynomial equals to zero using the
   /// bisection method.
   ///
   /// The function returns a negative number if an error has occurred.

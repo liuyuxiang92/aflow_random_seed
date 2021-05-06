@@ -200,6 +200,9 @@ namespace aurostd {
     identical(const xvector<utype>&,const xvector<utype>&,const utype&) __xprototype;
 
   template<class utype> bool
+    identical(const xvector<utype>&, utype tol=(utype)_AUROSTD_XVECTOR_TOLERANCE_IDENTITY_) __xprototype; //DX20210503
+
+  template<class utype> bool
     identical(const xvector<utype>&,const xvector<utype>&) __xprototype;
 
   template<class utype> bool

@@ -494,7 +494,8 @@ bool xOUTCAR::GetProperties(const string& stringIN,bool QUIET) {
 bool xOUTCAR::GetPropertiesFile(const string& fileIN,bool QUIET) {
   stringstream sss;
   aurostd::efile2stringstream(fileIN,sss);
-  if(filename=="") filename=fileIN;
+  //[CO20210315 - always set for GetPropertiesFile]if(filename=="") 
+  filename=fileIN;
   return xOUTCAR::GetProperties(sss,QUIET);
 }
 
@@ -510,11 +511,12 @@ bool xOUTCAR::GetPropertiesFile(const string& fileIN,uint natoms_check,bool QUIE
   return flag;
 }
 
-bool xOUTCAR::GetPropertiesUrlFile(const string& url,const string& file,bool VERBOSE) {
+bool xOUTCAR::GetPropertiesUrlFile(const string& url,const string& file,bool QUIET) {
   //[CO20200502 - OBSOLETE]string tmpfile=XHOST.tmpfs+"/_aflow_"+XHOST.user+".pid"+XHOST.ostrPID.str()+".a"+string(AFLOW_VERSION)+".rnd"+aurostd::utype2string(uint((double) std::floor((double)100000*aurostd::ran0())))+".u"+aurostd::utype2string(uint((double) aurostd::get_useconds()))+"_"+file;
   string tmpfile=aurostd::TmpFileCreate("xOUTCAR_GetProperties"); //CO20200502 - threadID
-  aurostd::url2file(url+"/"+file,tmpfile,VERBOSE);
-  bool out=GetPropertiesFile(tmpfile,VERBOSE); //CO20200404 - added VERBOSE
+  aurostd::url2file(url+"/"+file,tmpfile,!QUIET);
+  bool out=GetPropertiesFile(tmpfile,QUIET); //CO20200404 - added QUIET
+  filename="url="+url;  //CO20210315
   aurostd::RemoveFile(tmpfile);
   return out;
 }
@@ -1739,12 +1741,14 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   if(LDEBUG) cout << soliloquy << " calculation_cores=" << calculation_cores << endl;
   // CALCULATION_TIME
   calculation_time=0.0;
-  for(int iline=(int)vcontent.size()-1;iline>=0;iline--)  // NEW FROM THE BACK
-    if(aurostd::substring2bool(vcontent.at(iline),"time"))
+  for(int iline=(int)vcontent.size()-1;iline>=0;iline--){  // NEW FROM THE BACK
+    if(aurostd::substring2bool(vcontent.at(iline),"time")){
       if(aurostd::substring2bool(vcontent.at(iline),"Total")) {
         line=vcontent.at(iline);
         break;
       } 
+    }
+  }
   if(line.empty()) {
     //[CO20200404 - OBSOLETE]if(!QUIET) cerr << "WARNING - "<< soliloquy << " in OUTCAR (no calculation_time)" << "   filename=[" << filename << "]" << endl;
     message << "In OUTCAR (no calculation_time)" << "   filename=[" << filename << "]";
@@ -2380,6 +2384,10 @@ double xOUTCAR::minimumDistanceKPoints(vector<xvector<double> >& vkpoints,uint i
 double xOUTCAR::minimumDistanceKPoints(xvector<double>& kpoint1_kl,xvector<double>& kpoint2_kl){  //these are in units of reciprocal lattice vectors
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   double dist_min=AUROSTD_MAX_DOUBLE;
+  if(LDEBUG){
+    cerr << XPID << "xOUTCAR::minimumDistanceKPoints: kpoint1_kl=" << kpoint1_kl << endl;
+    cerr << XPID << "xOUTCAR::minimumDistanceKPoints: kpoint2_kl=" << kpoint2_kl << endl;
+  }
   //special case, identicalKPoints()
   if(identicalKPoints(kpoint1_kl,kpoint2_kl)){
     dist_min=0.0;
@@ -2408,7 +2416,7 @@ double xOUTCAR::minimumDistanceKPoints(xvector<double>& kpoint1_kl,xvector<doubl
   xvector<int> dims=LatticeDimensionSphere(klattice,RadiusSphereLattice(klattice));
 
   xvector<double> vdist_kcart,vdist_kcart_min;
-  double dist;
+  double dist=0.0;
   for(int i=-dims[1];i<=dims[1];i++){
     for(int j=-dims[2];j<=dims[2];j++){
       for(int k=-dims[3];k<=dims[3];k++){
@@ -2429,7 +2437,7 @@ double xOUTCAR::minimumDistanceKPoints(xvector<double>& kpoint1_kl,xvector<doubl
   double dist_dcart;
   vdist_dcart(1)=sum(metric_tensor(1)*vdist_kcart_min(1));  //remember metric_tensor is symmetric!
   vdist_dcart(2)=sum(metric_tensor(2)*vdist_kcart_min(2));  //remember metric_tensor is symmetric!
-  vdist_dcart(3)=sum(metric_tensor(3)*vdist_kcart_min(1));  //remember metric_tensor is symmetric!
+  vdist_dcart(3)=sum(metric_tensor(3)*vdist_kcart_min(3));  //remember metric_tensor is symmetric!
   vdist_dcart/=(2*pi);  //conversion back requires undoing 2pi
   if(LDEBUG) {cerr << XPID << "xOUTCAR::minimumDistanceKPoints: distance vector in real space        = " << vdist_dcart << endl;}
   dist_dcart=aurostd::modulus(vdist_dcart);
@@ -2443,48 +2451,48 @@ bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
   //aflow --bandgap=/common/ICSD/LIB/RHL/Ag1Ni1O2_ICSD_73974
   //System        :   Ag1Ni1O2_ICSD_73974
   //Spin tag      :   2
-  //Fermi level   :  +3.2142e+00
+  //Fermi level   :  +2.9623e+00
   //                  VBT           CBB           Egap          Egap_fit     Type
   //Majority Spin :  -1.0000e+00   -1.0000e+00   -1.0000e+09   -1.0000e+09   metal
-  //Minority Spin :  -1.1228e+00   +1.2232e+00   +2.3460e+00   +4.0754e+00   insulator-indirect
+  //Minority Spin :  -8.7090e-01   +1.4751e+00   +2.3460e+00   +4.0754e+00   insulator-indirect
   //Net Result    :  -1.0000e+00   -1.0000e+00   -1.0000e+09   -1.0000e+09   half-metal
   //
   //aflow --bandgap=/common/ICSD/LIB/FCC/Ni1O1_ICSD_92133
   //System        :   Ni1O1_ICSD_92133
   //Spin tag      :   2
-  //Fermi level   :  +6.3759e+00
+  //Fermi level   :  +5.7976e+00
   //                  VBT           CBB           Egap          Egap_fit     Type
-  //Majority Spin :  -9.9810e-01   +1.5938e+00   +2.1620e+00   +3.8274e+00   insulator-indirect
-  //Minority Spin :  -1.6986e+00   +1.2234e+00   +2.9220e+00   +4.8519e+00   insulator-indirect
-  //Net Result    :  -9.9810e-01   +1.2234e+00   +2.2215e+00   +3.9076e+00   insulator-indirect_spin-polarized
+  //Majority Spin :  +1.0100e-02   +2.1721e+00   +2.1620e+00   +3.8274e+00   insulator-indirect
+  //Minority Spin :  -1.1203e+00   +1.8017e+00   +2.9220e+00   +4.8519e+00   insulator-indirect
+  //Net Result    :  +1.0100e-02   +1.8017e+00   +1.7916e+00   +3.3281e+00   insulator-indirect_spin-polarized
   //
   //aflow --bandgap=/common/ICSD/LIB/FCC/Cr1O2_ICSD_186838
   //System        :   Cr1O2_ICSD_186838
   //Spin tag      :   2
-  //Fermi level   :  +5.2091e+00
+  //Fermi level   :  +5.1970e+00
   //                  VBT           CBB           Egap          Egap_fit     Type
   //Majority Spin :  -1.0000e+00   -1.0000e+00   -1.0000e+09   -1.0000e+09   metal
-  //Minority Spin :  -4.9230e-01   +2.1851e+00   +2.6774e+00   +4.5221e+00   insulator-indirect
+  //Minority Spin :  -4.8020e-01   +2.1972e+00   +2.6774e+00   +4.5221e+00   insulator-indirect
   //Net Result    :  -1.0000e+00   -1.0000e+00   -1.0000e+09   -1.0000e+09   half-metal
   //
   //aflow --bandgap=/common/ICSD/LIB/FCC/Ba2Dy1Nb1O6_ICSD_109156
   //System        :   Ba2Dy1Nb1O6_ICSD_109156
   //Spin tag      :   1
-  //Fermi level   :  +3.1773e+00
+  //Fermi level   :  +2.8134e+00
   //                  VBT           CBB           Egap          Egap_fit     Type
-  //Net Result    :  -3.7000e-01   +2.7214e+00   +3.0914e+00   +5.0802e+00   insulator-direct
+  //Net Result    :  -6.1000e-03   +3.0853e+00   +3.0914e+00   +5.0802e+00   insulator-direct
   //
   //aflow --bandgap=/common/ICSD/LIB/FCC/Si1_ICSD_150530
   //System        :   Si1_ICSD_150530
   //Spin tag      :   1
-  //Fermi level   :  +5.9186e+00
+  //Fermi level   :  +5.6171e+00
   //                  VBT           CBB           Egap          Egap_fit     Type
-  //Net Result    :  -2.9430e-01   +3.1570e-01   +6.1000e-01   +1.7353e+00   insulator-indirect
+  //Net Result    :  +7.2000e-03   +6.1720e-01   +6.1000e-01   +1.7353e+00   insulator-indirect
   //
   //aflow --bandgap=/common/ICSD/LIB/BCC/Fe1_ICSD_52258
   //System        :   Fe1_ICSD_52258
   //Spin tag      :   2
-  //Fermi level   :  +5.2672e+00
+  //Fermi level   :  +4.8034e+00
   //                  VBT           CBB           Egap          Egap_fit     Type
   //Majority Spin :  -1.0000e+00   -1.0000e+00   -1.0000e+09   -1.0000e+09   metal
   //Minority Spin :  -1.0000e+00   -1.0000e+00   -1.0000e+09   -1.0000e+09   metal
@@ -2505,6 +2513,15 @@ bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
   //[OBSOLETE]Majority Spin :  -2.4930e-01   +7.1586e+00   +7.4079e+00   +1.0899e+01   insulator-indirect
   //[OBSOLETE]Minority Spin :  -1.0000e+00   -1.0000e+00   -1.0000e+09   -1.0000e+09   empty
   //[OBSOLETE]Net Result    :  -2.4930e-01   +7.1586e+00   +7.4079e+00   +1.0899e+01   insulator-indirect
+  //
+  //aflow --bandgap=/common/ICSD/LIB/HEX/Br2Mn1_ICSD_60250
+  //System        :   Br2Mn1_ICSD_60250
+  //Spin tag      :   2
+  //Fermi level   :  +1.8650e-01
+  //                  VBT           CBB           Egap          Egap_fit     Type
+  //Majority Spin :  -1.3600e-02   +3.3703e+00   +3.3839e+00   +5.4745e+00   insulator-indirect
+  //Minority Spin :  -5.8990e-01   +3.4065e+00   +3.9964e+00   +6.3001e+00   insulator-indirect
+  //Net Result    :  -1.3600e-02   +3.3703e+00   +3.3839e+00   +5.4745e+00   insulator-indirect
 
   //repetita iuvant!!!!!!!!
   bool LDEBUG=(FALSE || XHOST.DEBUG);
@@ -2708,6 +2725,8 @@ bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
   vector<INSULATOR_TYPES> insulator_type; insulator_type.resize(ISPIN);
   vector<GAP_TYPES> gap_type; gap_type.resize(ISPIN);
   vector<double> gap; gap.resize(ISPIN);
+  vector<uint> vimax_VBTs;vimax_VBTs.resize(ISPIN); //for each spin
+  vector<uint> vimin_CBBs;vimin_CBBs.resize(ISPIN); //for each spin
 
   //broad_type
   for(uint ispin=0;ispin<(uint)ISPIN;ispin++){
@@ -2724,7 +2743,7 @@ bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
   double max_VBT=0.0,min_CBB=0.0;
   double dist=0.0,dist_min=0.0;
   uint imax_VBT=0,imin_CBB=0; //absolutes, then our final picks
-  vector<uint> vimax_VBTs,vimin_CBBs; //within tolerance of absolutes
+  vector<uint> vimax_VBTs_equiv,vimin_CBBs_equiv; //within tolerance of absolutes
   bool vbt_duplicate_remove,cbb_duplicate_remove;
 
   //specific types here
@@ -2773,22 +2792,22 @@ bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
       cerr << soliloquy << " absolute VBT=" << max_VBT << " at k-point " << vkpoints[ispin][imax_VBT] << " (kpt=" << imax_VBT << ",spin=" << ispin+1 << ")" << endl;
       cerr << soliloquy << " absolute CBB=" << min_CBB << " at k-point " << vkpoints[ispin][imin_CBB] << " (kpt=" << imin_CBB << ",spin=" << ispin+1 << ")" << endl;
     }
-    vimax_VBTs.clear(); vimin_CBBs.clear();
+    vimax_VBTs_equiv.clear(); vimin_CBBs_equiv.clear();
     //grab any equivalently high/low extrema
     for(uint ikpt=0;ikpt<vkpoints[ispin].size();ikpt++){
       if(abs(max_VBT-vVBT[ispin][ikpt])<energy_tol){
-        vimax_VBTs.push_back(ikpt);
+        vimax_VBTs_equiv.push_back(ikpt);
         if(LDEBUG && ikpt!=imax_VBT){cerr << soliloquy << " found equivalent VBT at " << vkpoints[ispin][ikpt] << " (kpt=" << ikpt << ",spin=" << ispin+1 << ")" << endl;}
       }
       if(abs(min_CBB-vCBB[ispin][ikpt])<energy_tol){
-        vimin_CBBs.push_back(ikpt);
+        vimin_CBBs_equiv.push_back(ikpt);
         if(LDEBUG && ikpt!=imin_CBB){cerr << soliloquy << " found equivalent CBB at " << vkpoints[ispin][ikpt] << " (kpt=" << ikpt << ",spin=" << ispin+1 << ")" << endl;}
       }
     }
     if(LDEBUG) {cerr << soliloquy << " removing duplicate k-points from VBT search (spin=" << ispin+1 << ")" << endl;}
-    vbt_duplicate_remove=removeDuplicateKPoints(vkpoints[ispin],vimax_VBTs);
+    vbt_duplicate_remove=removeDuplicateKPoints(vkpoints[ispin],vimax_VBTs_equiv);
     if(LDEBUG) {cerr << soliloquy << " removing duplicate k-points from CBB search (spin=" << ispin+1 << ")" << endl;}
-    cbb_duplicate_remove=removeDuplicateKPoints(vkpoints[ispin],vimin_CBBs);
+    cbb_duplicate_remove=removeDuplicateKPoints(vkpoints[ispin],vimin_CBBs_equiv);
     if(!vbt_duplicate_remove || !cbb_duplicate_remove){
       //[CO20200404 - OBSOLETE]ERROR = soliloquy + " cannot find equivalent band extrema (spin="+
       //[CO20200404 - OBSOLETE]  aurostd::utype2string(ispin+1)+") \n";
@@ -2798,18 +2817,18 @@ bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
     }
     //if we found more than one possible extrema, minimize kpoint distance between max/min
     //this simulates the electron trying to reduce momentum needed to conduct
-    if(vimax_VBTs.size()==1 && vimin_CBBs.size()==1){  //easy case, keep already defined imax/imin
+    if(vimax_VBTs_equiv.size()==1 && vimin_CBBs_equiv.size()==1){  //easy case, keep already defined imax/imin
       dist_min=minimumDistanceKPoints(vkpoints[ispin],imax_VBT,imin_CBB);
     }
     else { //find minimum distance pairs of max/min
       dist_min=AUROSTD_MAX_DOUBLE;
-      for(uint imax=0;imax<vimax_VBTs.size();imax++){
-        for(uint imin=0;imin<vimin_CBBs.size();imin++){
-          dist=minimumDistanceKPoints(vkpoints[ispin],vimax_VBTs[imax],vimin_CBBs[imin]);
+      for(uint imax=0;imax<vimax_VBTs_equiv.size();imax++){
+        for(uint imin=0;imin<vimin_CBBs_equiv.size();imin++){
+          dist=minimumDistanceKPoints(vkpoints[ispin],vimax_VBTs_equiv[imax],vimin_CBBs_equiv[imin]);
           if(dist<dist_min){
             dist_min=dist;
-            imax_VBT=vimax_VBTs[imax];
-            imin_CBB=vimin_CBBs[imin];
+            imax_VBT=vimax_VBTs_equiv[imax];
+            imin_CBB=vimin_CBBs_equiv[imin];
           }
         }
       }
@@ -2821,7 +2840,15 @@ bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
       message << "Cannot calculate k-point distance between band extrema (spin=" << ispin+1 << ")";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _RUNTIME_ERROR_);
     }
+    if(LDEBUG){cerr << soliloquy << " dist_min=" << dist_min << endl;}
+    if(LDEBUG){
+      cerr << soliloquy << " vCBB[ispin=" << ispin << "][imin_CBB=" << imin_CBB << "]=" << vCBB[ispin][imin_CBB] << endl;
+      cerr << soliloquy << " vVBT[ispin=" << ispin << "][imax_VBT=" << imax_VBT << "]=" << vVBT[ispin][imax_VBT] << endl;
+    }
     gap[ispin]=vCBB[ispin][imin_CBB]-vVBT[ispin][imax_VBT];
+    vimin_CBBs[ispin]=imin_CBB; //save for later spin loops
+    vimax_VBTs[ispin]=imax_VBT; //save for later spin loops
+    if(LDEBUG){cerr << soliloquy << " gap[ispin=" << ispin << "]=" << gap[ispin] << endl;}
     if(gap[ispin]<0){ //test of stupidity, this should NEVER happen
       //[CO20200404 - OBSOLETE]ERROR = soliloquy + " negative band gap found, something broke (spin="+
       //[CO20200404 - OBSOLETE]  aurostd::utype2string(ispin+1)+") \n";
@@ -2867,8 +2894,8 @@ bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
       message << "Unknown material type (!empty && !metal && !insulator) (spin=" << ispin+1 << ")";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _RUNTIME_ERROR_);
     } else {
-      valence_band_max[ispin]=vVBT[ispin][imax_VBT];
-      conduction_band_min[ispin]=vCBB[ispin][imin_CBB];
+      valence_band_max[ispin]=vVBT[ispin][vimax_VBTs[ispin]];
+      conduction_band_min[ispin]=vCBB[ispin][vimin_CBBs[ispin]];
       Egap[ispin]=(gap_type[ispin]==zero_gap ? 0.0 : gap[ispin]);
       Egap_type[ispin]="insulator-"+
         string(insulator_type[ispin]==insulator_indirect ? "in" : "")+"direct"+
@@ -2886,29 +2913,32 @@ bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
       Egap_type_net="empty"+string(empty_type[0]==empty_partial || (ISPIN==2 && empty_type[1]==empty_partial) ? "-partially" : "");;
     } else {
       if(broad_type[0]==empty){ //grab properties of spin-channel 2
-        valence_band_max_net=(broad_type[1]==metal ? _METALEDGE_ : vVBT[1][imax_VBT]);
-        conduction_band_min_net=(broad_type[1]==metal ? _METALEDGE_ : vCBB[1][imin_CBB]);
-        Egap_net=(broad_type[1]==metal ? _METALGAP_ : gap[1]);
-        Egap_type_net=(broad_type[1]==metal ? "metal" : "insulator-"+
-            string(insulator_type[1]==insulator_indirect ? "in" : "")+"direct"+
-            string(gap_type[1]==zero_gap ? "_zero-gap" : ""));
+        uint ispin=1;
+        valence_band_max_net=(broad_type[ispin]==metal ? _METALEDGE_ : vVBT[ispin][vimax_VBTs[ispin]]);
+        conduction_band_min_net=(broad_type[ispin]==metal ? _METALEDGE_ : vCBB[ispin][vimin_CBBs[ispin]]);
+        Egap_net=(broad_type[ispin]==metal ? _METALGAP_ : gap[ispin]);
+        Egap_type_net=(broad_type[ispin]==metal ? "metal" : "insulator-"+
+            string(insulator_type[ispin]==insulator_indirect ? "in" : "")+"direct"+
+            string(gap_type[ispin]==zero_gap ? "_zero-gap" : ""));
       } else {  //broad_type[1]==empty, grab properties of spin-channel 1
-        valence_band_max_net=(broad_type[0]==metal ? _METALEDGE_ : vVBT[0][imax_VBT]);
-        conduction_band_min_net=(broad_type[0]==metal ? _METALEDGE_ : vCBB[0][imin_CBB]);
-        Egap_net=(broad_type[0]==metal ? _METALGAP_ : gap[0]);
-        Egap_type_net=(broad_type[0]==metal ? "metal" : "insulator-"+
-            string(insulator_type[0]==insulator_indirect ? "in" : "")+"direct"+
-            string(gap_type[0]==zero_gap ? "_zero-gap" : ""));
+        uint ispin=0;
+        valence_band_max_net=(broad_type[ispin]==metal ? _METALEDGE_ : vVBT[ispin][vimax_VBTs[ispin]]);
+        conduction_band_min_net=(broad_type[ispin]==metal ? _METALEDGE_ : vCBB[ispin][vimin_CBBs[ispin]]);
+        Egap_net=(broad_type[ispin]==metal ? _METALGAP_ : gap[ispin]);
+        Egap_type_net=(broad_type[ispin]==metal ? "metal" : "insulator-"+
+            string(insulator_type[ispin]==insulator_indirect ? "in" : "")+"direct"+
+            string(gap_type[ispin]==zero_gap ? "_zero-gap" : ""));
       }
     }
   } else if(!(ISPIN==2 && !(broad_type[0]==metal && broad_type[0]==broad_type[1]))){ //easy cases
     if(ISPIN==1){  //all ISPIN==1 come here
-      valence_band_max_net=(broad_type[0]==metal ? _METALEDGE_ : vVBT[0][imax_VBT]);
-      conduction_band_min_net=(broad_type[0]==metal ? _METALEDGE_ : vCBB[0][imin_CBB]);
-      Egap_net=(broad_type[0]==metal ? _METALGAP_ : gap[0]);
-      Egap_type_net=(broad_type[0]==metal ? "metal" : "insulator-"+
-          string(insulator_type[0]==insulator_indirect ? "in" : "")+"direct"+
-          string(gap_type[0]==zero_gap ? "_zero-gap" : ""));
+      uint ispin=0;
+      valence_band_max_net=(broad_type[ispin]==metal ? _METALEDGE_ : vVBT[ispin][vimax_VBTs[ispin]]);
+      conduction_band_min_net=(broad_type[ispin]==metal ? _METALEDGE_ : vCBB[ispin][vimin_CBBs[ispin]]);
+      Egap_net=(broad_type[ispin]==metal ? _METALGAP_ : gap[ispin]);
+      Egap_type_net=(broad_type[ispin]==metal ? "metal" : "insulator-"+
+          string(insulator_type[ispin]==insulator_indirect ? "in" : "")+"direct"+
+          string(gap_type[ispin]==zero_gap ? "_zero-gap" : ""));
     } else { //special case ISPIN==2 where both are metallic
       valence_band_max_net=_METALEDGE_;
       conduction_band_min_net=_METALEDGE_;
@@ -2932,7 +2962,7 @@ bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
     max_VBT_net = (-1.0) * AUROSTD_MAX_DOUBLE;
     min_CBB_net =          AUROSTD_MAX_DOUBLE;
     uint imax_VBT_net = 0, imin_CBB_net = 0, ispin_VBT_net = 0, ispin_CBB_net = 0;
-    vector<uint> vimax_VBTs_net,vimin_CBBs_net; //within tolerance of absolutes
+    vector<uint> vimax_VBTs_equiv_net,vimin_CBBs_equiv_net; //within tolerance of absolutes
     vector<uint> vispin_VBTs_net,vispin_CBBs_net;
     //first, get absolute max of VBT/min of CBB
     //these will be the max(vVBT[ispin]) and min(vCBB[ispin]) across spins from before
@@ -2952,26 +2982,26 @@ bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
       cerr << soliloquy << " absolute VBT_net=" << max_VBT_net << " at k-point " << vkpoints[ispin_VBT_net][imax_VBT_net] << " (kpt=" << imax_VBT_net << ",spin=" << ispin_VBT_net << ")" << endl;
       cerr << soliloquy << " absolute CBB_net=" << min_CBB_net << " at k-point " << vkpoints[ispin_VBT_net][imin_CBB_net] << " (kpt=" << imin_CBB_net << ",spin=" << ispin_CBB_net << ")" << endl;
     }
-    vimax_VBTs_net.clear(); vispin_VBTs_net.clear(); vimin_CBBs_net.clear(); vispin_CBBs_net.clear();
+    vimax_VBTs_equiv_net.clear(); vispin_VBTs_net.clear(); vimin_CBBs_equiv_net.clear(); vispin_CBBs_net.clear();
     //grab any equivalently high/low extrema
     for(uint ispin=0;ispin<(uint)ISPIN;ispin++){
       for(uint ikpt=0;ikpt<vkpoints[ispin].size();ikpt++){
         if(abs(max_VBT_net-vVBT[ispin][ikpt])<energy_tol){
-          vimax_VBTs_net.push_back(ikpt);
+          vimax_VBTs_equiv_net.push_back(ikpt);
           vispin_VBTs_net.push_back(ispin);
           if(LDEBUG && ikpt!=imax_VBT_net){cerr << soliloquy << " found equivalent VBT_net at " << vkpoints[ispin][ikpt] << " (kpt=" << ikpt << ",spin=" << ispin << ")" << endl;}
         }
         if(abs(min_CBB_net-vCBB[ispin][ikpt])<energy_tol){
-          vimin_CBBs_net.push_back(ikpt);
+          vimin_CBBs_equiv_net.push_back(ikpt);
           vispin_CBBs_net.push_back(ispin);
           if(LDEBUG && ikpt!=imin_CBB_net){cerr << soliloquy << " found equivalent CBB_net at " << vkpoints[ispin][ikpt] << " (kpt=" << ikpt << ",spin=" << ispin << ")" << endl;}
         }
       }
     }
     if(LDEBUG) {cerr << soliloquy << " removing duplicate k-points from VBT search (spin-averaged)" << endl;}
-    vbt_duplicate_remove=removeDuplicateKPoints(vkpoints,vimax_VBTs_net,vispin_VBTs_net);
+    vbt_duplicate_remove=removeDuplicateKPoints(vkpoints,vimax_VBTs_equiv_net,vispin_VBTs_net);
     if(LDEBUG) {cerr << soliloquy << " removing duplicate k-points from CBB search (spin-averaged)" << endl;}
-    cbb_duplicate_remove=removeDuplicateKPoints(vkpoints,vimin_CBBs_net,vispin_CBBs_net);
+    cbb_duplicate_remove=removeDuplicateKPoints(vkpoints,vimin_CBBs_equiv_net,vispin_CBBs_net);
     if(!vbt_duplicate_remove || !cbb_duplicate_remove){
       //[CO20200404 - OBSOLETE]ERROR = soliloquy + " cannot find equivalent band extrema (spin-averaged) \n";
       //[CO20200404 - OBSOLETE]return false;
@@ -2981,18 +3011,18 @@ bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
     }
     //if we found more than one possible extrema, minimize kpoint distance between max/min
     //this simulates the electron trying to reduce momentum needed to conduct
-    if(vimax_VBTs_net.size()==1 && vimin_CBBs_net.size()==1){  //easy case, keep already defined imax/imin
-      dist_min=minimumDistanceKPoints(vkpoints[vispin_VBTs_net[0]][vimax_VBTs_net[0]],vkpoints[vispin_CBBs_net[0]][vimin_CBBs_net[0]]);
+    if(vimax_VBTs_equiv_net.size()==1 && vimin_CBBs_equiv_net.size()==1){  //easy case, keep already defined imax/imin
+      dist_min=minimumDistanceKPoints(vkpoints[vispin_VBTs_net[0]][vimax_VBTs_equiv_net[0]],vkpoints[vispin_CBBs_net[0]][vimin_CBBs_equiv_net[0]]);
     }
     else { //find minimum distance pairs of max/min
       dist_min=AUROSTD_MAX_DOUBLE;
-      for(uint imax=0;imax<vimax_VBTs_net.size();imax++){
-        for(uint imin=0;imin<vimin_CBBs_net.size();imin++){
-          dist=minimumDistanceKPoints(vkpoints[vispin_VBTs_net[imax]][vimax_VBTs_net[imax]],vkpoints[vispin_CBBs_net[imin]][vimin_CBBs_net[imin]]);
+      for(uint imax=0;imax<vimax_VBTs_equiv_net.size();imax++){
+        for(uint imin=0;imin<vimin_CBBs_equiv_net.size();imin++){
+          dist=minimumDistanceKPoints(vkpoints[vispin_VBTs_net[imax]][vimax_VBTs_equiv_net[imax]],vkpoints[vispin_CBBs_net[imin]][vimin_CBBs_equiv_net[imin]]);
           if(dist<dist_min){
             dist_min=dist;
-            imax_VBT_net=vimax_VBTs_net[imax];ispin_VBT_net=vispin_VBTs_net[imax];
-            imin_CBB_net=vimin_CBBs_net[imin];ispin_CBB_net=vispin_CBBs_net[imin];
+            imax_VBT_net=vimax_VBTs_equiv_net[imax];ispin_VBT_net=vispin_VBTs_net[imax];
+            imin_CBB_net=vimin_CBBs_equiv_net[imin];ispin_CBB_net=vispin_CBBs_net[imin];
           }
         }
       }
@@ -3003,10 +3033,15 @@ bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
       message << "Cannot calculate k-point distance between band extrema (spin-averaged)";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _RUNTIME_ERROR_);
     }
-    valence_band_max_net=vVBT[ispin_VBT_net][imax_VBT];
-    conduction_band_min_net=vCBB[ispin_CBB_net][imin_CBB];
+    valence_band_max_net=vVBT[ispin_VBT_net][imax_VBT_net];
+    conduction_band_min_net=vCBB[ispin_CBB_net][imin_CBB_net];
+    if(LDEBUG){
+      cerr << soliloquy << " vCBB[ispin_CBB_net=" << ispin_CBB_net << "][imin_CBB_net=" << imin_CBB_net << "]=" << vCBB[ispin_CBB_net][imin_CBB_net] << endl;
+      cerr << soliloquy << " vVBT[ispin_VBT_net=" << ispin_VBT_net << "][imax_VBT_net=" << imax_VBT_net << "]" << vVBT[ispin_VBT_net][imax_VBT_net] << endl;
+    }
     bool direct_insulator_net=abs(dist_min)<kpt_tol;
     double gap_net=(conduction_band_min_net-valence_band_max_net);
+    if(LDEBUG){cerr << soliloquy << " gap_net=" << gap_net << endl;}
     if(gap_net<0){ //test of stupidity, this should NEVER happen
       //[CO20200404 - OBSOLETE]ERROR = soliloquy + " negative band gap found, something broke (spin-averaged) \n";
       //[CO20200404 - OBSOLETE]return false;
@@ -4151,16 +4186,18 @@ bool xDOSCAR::GetProperties(const string& stringIN,bool QUIET) {
 
 bool xDOSCAR::GetPropertiesFile(const string& fileIN,bool QUIET) {
   stringstream sss;
-  if(filename=="") filename=fileIN;
+  //[CO20210315 - always set for GetPropertiesFile]if(filename=="") 
+  filename=fileIN;
   aurostd::efile2stringstream(fileIN,sss);
   return xDOSCAR::GetProperties(sss,QUIET);
 }
 
-bool xDOSCAR::GetPropertiesUrlFile(const string& url,const string& file,bool VERBOSE) {
+bool xDOSCAR::GetPropertiesUrlFile(const string& url,const string& file,bool QUIET) {
   //[CO20200502 - OBSOLETE]string tmpfile=XHOST.tmpfs+"/_aflow_"+XHOST.user+".pid"+XHOST.ostrPID.str()+".a"+string(AFLOW_VERSION)+".rnd"+aurostd::utype2string(uint((double) std::floor((double)100000*aurostd::ran0())))+".u"+aurostd::utype2string(uint((double) aurostd::get_useconds()))+"_"+file;
   string tmpfile=aurostd::TmpFileCreate("xDOSCAR_GetProperties"); //CO20200502 - threadID
-  aurostd::url2file(url+"/"+file,tmpfile,VERBOSE);
-  bool out=GetPropertiesFile(tmpfile);
+  aurostd::url2file(url+"/"+file,tmpfile,!QUIET);
+  bool out=GetPropertiesFile(tmpfile,QUIET);
+  filename="url="+url;  //CO20210315
   aurostd::RemoveFile(tmpfile);
   return out;
 }
@@ -4228,6 +4265,13 @@ bool xDOSCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   }
   // Done reading header
   //ME20190614 START
+  //ME20200305 - Check if DOSCAR is broken
+  uint number_lines = number_energies + 6;
+  if (partial) number_lines += number_atoms * (number_energies + 1);
+  if (vcontent.size() < number_lines) {
+    message << "Broken DOSCAR - not enough lines.";
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _FILE_CORRUPT_);
+  }
   uint norbitals = 0;
   int d = 0, e = 0;
   double dos = 0.0;
@@ -4584,7 +4628,7 @@ bool xDOSCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
     //[CO20200404 - OBSOLETE]  "        GetProperties(const string&); \n"
     //[CO20200404 - OBSOLETE]  "        GetPropertiesFile(const string&); \n";
     //[CO20200404 - OBSOLETE]return FALSE;
-    message << "xOUTCAR needs to be loaded before." << endl;
+    message << "xDOSCAR needs to be loaded before." << endl;
     message << "GetProperties(const stringstream&);" << endl;
     message << "GetProperties(const string&);" << endl;
     message << "GetPropertiesFile(const string&);" << endl;
@@ -5044,11 +5088,12 @@ bool xEIGENVAL::GetPropertiesFile(const string& fileIN,bool QUIET) {
   return xEIGENVAL::GetProperties(sss,QUIET);
 }
 
-bool xEIGENVAL::GetPropertiesUrlFile(const string& url,const string& file,bool VERBOSE) {
+bool xEIGENVAL::GetPropertiesUrlFile(const string& url,const string& file,bool QUIET) {
   //[CO20200502 - OBSOLETE]string tmpfile=XHOST.tmpfs+"/_aflow_"+XHOST.user+".pid"+XHOST.ostrPID.str()+".a"+string(AFLOW_VERSION)+".rnd"+aurostd::utype2string(uint((double) std::floor((double)100000*aurostd::ran0())))+".u"+aurostd::utype2string(uint((double) aurostd::get_useconds()))+"_"+file;
   string tmpfile=aurostd::TmpFileCreate("xEIGENVAL_GetProperties"); //CO20200502 - threadID
-  aurostd::url2file(url+"/"+file,tmpfile,VERBOSE);
-  bool out=GetPropertiesFile(tmpfile);
+  aurostd::url2file(url+"/"+file,tmpfile,!QUIET);
+  bool out=GetPropertiesFile(tmpfile,QUIET);
+  filename="url="+url;  //CO20210315
   aurostd::RemoveFile(tmpfile);
   return out;
 }
@@ -7583,11 +7628,12 @@ bool xPOTCAR::GetPropertiesFile(const string& fileIN,bool QUIET) {
   return xPOTCAR::GetProperties(sss,QUIET);
 }
 
-bool xPOTCAR::GetPropertiesUrlFile(const string& url,const string& file,bool VERBOSE) {
+bool xPOTCAR::GetPropertiesUrlFile(const string& url,const string& file,bool QUIET) {
   //[CO20200502 - OBSOLETE]string tmpfile=XHOST.tmpfs+"/_aflow_"+XHOST.user+".pid"+XHOST.ostrPID.str()+".a"+string(AFLOW_VERSION)+".rnd"+aurostd::utype2string(uint((double) std::floor((double)100000*aurostd::ran0())))+".u"+aurostd::utype2string(uint((double) aurostd::get_useconds()))+"_"+file;
   string tmpfile=aurostd::TmpFileCreate("xPOTCAR_GetProperties"); //CO20200502 - threadID
-  aurostd::url2file(url+"/"+file,tmpfile,VERBOSE);
-  bool out=GetPropertiesFile(tmpfile);
+  aurostd::url2file(url+"/"+file,tmpfile,!QUIET);
+  bool out=GetPropertiesFile(tmpfile,QUIET);
+  filename="url="+url;  //CO20210315
   aurostd::RemoveFile(tmpfile);
   return out;
 }
@@ -7979,11 +8025,12 @@ bool xVASPRUNXML::GetPropertiesFile(const string& fileIN,bool QUIET) {
   return xVASPRUNXML::GetProperties(sss,QUIET);
 }
 
-bool xVASPRUNXML::GetPropertiesUrlFile(const string& url,const string& file,bool VERBOSE) {
+bool xVASPRUNXML::GetPropertiesUrlFile(const string& url,const string& file,bool QUIET) {
   //[CO20200502 - OBSOLETE]string tmpfile=XHOST.tmpfs+"/_aflow_"+XHOST.user+".pid"+XHOST.ostrPID.str()+".a"+string(AFLOW_VERSION)+".rnd"+aurostd::utype2string(uint((double) std::floor((double)100000*aurostd::ran0())))+".u"+aurostd::utype2string(uint((double) aurostd::get_useconds()))+"_"+file;
   string tmpfile=aurostd::TmpFileCreate("xVASPRUNXML_GetProperties"); //CO20200502 - threadID
-  aurostd::url2file(url+"/"+file,tmpfile,VERBOSE);
-  bool out=GetPropertiesFile(tmpfile);
+  aurostd::url2file(url+"/"+file,tmpfile,!QUIET);
+  bool out=GetPropertiesFile(tmpfile,QUIET);
+  filename="url="+url;  //CO20210315
   aurostd::RemoveFile(tmpfile);
   return out;
 }
@@ -8309,11 +8356,12 @@ bool xIBZKPT::GetPropertiesFile(const string& fileIN,bool QUIET) {
   return xIBZKPT::GetProperties(sss,QUIET);
 }
 
-bool xIBZKPT::GetPropertiesUrlFile(const string& url,const string& file,bool VERBOSE) {
+bool xIBZKPT::GetPropertiesUrlFile(const string& url,const string& file,bool QUIET) {
   //[CO20200502 - OBSOLETE]string tmpfile=XHOST.tmpfs+"/_aflow_"+XHOST.user+".pid"+XHOST.ostrPID.str()+".a"+string(AFLOW_VERSION)+".rnd"+aurostd::utype2string(uint((double) std::floor((double)100000*aurostd::ran0())))+".u"+aurostd::utype2string(uint((double) aurostd::get_useconds()))+"_"+file;
   string tmpfile=aurostd::TmpFileCreate("xIBZKPT_GetProperties"); //CO20200502 - threadID
-  aurostd::url2file(url+"/"+file,tmpfile,VERBOSE);
-  bool out=GetPropertiesFile(tmpfile);
+  aurostd::url2file(url+"/"+file,tmpfile,!QUIET);
+  bool out=GetPropertiesFile(tmpfile,QUIET);
+  filename="url="+url;  //CO20210315
   aurostd::RemoveFile(tmpfile);
   return out;
 }
@@ -8520,11 +8568,12 @@ bool xKPOINTS::GetPropertiesFile(const string& fileIN,bool QUIET) {
   return xKPOINTS::GetProperties(sss,QUIET);
 }
 
-bool xKPOINTS::GetPropertiesUrlFile(const string& url,const string& file,bool VERBOSE) {
+bool xKPOINTS::GetPropertiesUrlFile(const string& url,const string& file,bool QUIET) {
   //[CO20200502 - OBSOLETE]string tmpfile=XHOST.tmpfs+"/_aflow_"+XHOST.user+".pid"+XHOST.ostrPID.str()+".a"+string(AFLOW_VERSION)+".rnd"+aurostd::utype2string(uint((double) std::floor((double)100000*aurostd::ran0())))+".u"+aurostd::utype2string(uint((double) aurostd::get_useconds()))+"_"+file;
   string tmpfile=aurostd::TmpFileCreate("xKPOINTS_GetProperties"); //CO20200502 - threadID
-  aurostd::url2file(url+"/"+file,tmpfile,VERBOSE);
-  bool out=GetPropertiesFile(tmpfile);
+  aurostd::url2file(url+"/"+file,tmpfile,!QUIET);
+  bool out=GetPropertiesFile(tmpfile,QUIET);
+  filename="url="+url;  //CO20210315
   aurostd::RemoveFile(tmpfile);
   return out;
 }
@@ -8833,11 +8882,12 @@ bool xCHGCAR::GetPropertiesFile(const string& fileIN,bool QUIET) {
   return xCHGCAR::GetProperties(sss,QUIET);
 }
 
-bool xCHGCAR::GetPropertiesUrlFile(const string& url,const string& file,bool VERBOSE) {
+bool xCHGCAR::GetPropertiesUrlFile(const string& url,const string& file,bool QUIET) {
   //[CO20200502 - OBSOLETE]string tmpfile=XHOST.tmpfs+"/_aflow_"+XHOST.user+".pid"+XHOST.ostrPID.str()+".a"+string(AFLOW_VERSION)+".rnd"+aurostd::utype2string(uint((double) std::floor((double)100000*aurostd::ran0())))+".u"+aurostd::utype2string(uint((double) aurostd::get_useconds()))+"_"+file;
   string tmpfile=aurostd::TmpFileCreate("xCHGCAR_GetProperties"); //CO20200502 - threadID
-  aurostd::url2file(url+"/"+file,tmpfile,VERBOSE);
-  bool out=GetPropertiesFile(tmpfile);
+  aurostd::url2file(url+"/"+file,tmpfile,!QUIET);
+  bool out=GetPropertiesFile(tmpfile,QUIET);
+  filename="url="+url;  //CO20210315
   aurostd::RemoveFile(tmpfile);
   return out;
 }
@@ -9018,11 +9068,12 @@ bool xQMVASP::GetPropertiesFile(const string& fileIN,bool QUIET) { //CO20191110
   return xQMVASP::GetProperties(sss,QUIET);
 }
 
-bool xQMVASP::GetPropertiesUrlFile(const string& url,const string& file,bool VERBOSE) {  //CO20191110
+bool xQMVASP::GetPropertiesUrlFile(const string& url,const string& file,bool QUIET) {  //CO20191110
   //[CO20200502 - OBSOLETE]string tmpfile=XHOST.tmpfs+"/_aflow_"+XHOST.user+".pid"+XHOST.ostrPID.str()+".a"+string(AFLOW_VERSION)+".rnd"+aurostd::utype2string(uint((double) std::floor((double)100000*aurostd::ran0())))+".u"+aurostd::utype2string(uint((double) aurostd::get_useconds()))+"_"+file;
   string tmpfile=aurostd::TmpFileCreate("xQMVASP_GetProperties"); //CO20200502 - threadID
-  aurostd::url2file(url+"/"+file,tmpfile,VERBOSE);
-  bool out=GetPropertiesFile(tmpfile);
+  aurostd::url2file(url+"/"+file,tmpfile,!QUIET);
+  bool out=GetPropertiesFile(tmpfile,QUIET);
+  filename="url="+url;  //CO20210315
   aurostd::RemoveFile(tmpfile);
   return out;
 }

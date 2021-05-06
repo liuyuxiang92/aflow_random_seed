@@ -23,7 +23,7 @@
 #
 # ***************************************************************************
 
-VERSNUMBER=3.2.8
+VERSNUMBER=3.2.9
 
 # MAKEFILE FOR AFLOW3
 # FOR FROZSL -lmkl_lapack95_ilp64 -lmkl_core -lmkl_intel_lp64 -lmkl_sequential
@@ -189,6 +189,9 @@ mac:
 #.PHONY: mac_static
 #mac_static: mac
 #	tar Jcfvp aflow_$(VERSNUMBER)_maxOSX_10.X.X.tar.xz aflow aflow_data
+.PHONY: production
+production: 
+	$(MAKE) OPTS="$(OPTS) -D__XOPTIMIZE" OPTS_MT="$(OPTS_MT) -D__XOPTIMIZE"
 
 
 ###################################################################################################
@@ -1165,6 +1168,7 @@ check:
 	$(MAKE) check_proto
 .PHONY: check_full
 check_full:
+	$(MAKE) check_schema
 	$(MAKE) check_CeramGen
 	#[WAITING FOR ICSD LIB2RAW REDO]$(MAKE) check_Egap
 	$(MAKE) check_aflow_exits
@@ -1179,17 +1183,19 @@ check_full:
 	$(MAKE) check_edata
 	$(MAKE) check_aflow_xtal_finder
 	$(MAKE) check_fold_atoms_in_cell_routine
-	$(MAKE) check_prototype_generator
 	$(MAKE) check_aflow_gcc_compatibility
 	$(MAKE) check_cce
 	$(MAKE) check_pocc
+	$(MAKE) check_prototype_generator
+	$(MAKE) check_prototype_symmetry
+	$(MAKE) check_prototype_uniqueness
 .PHONY: check_proto
 check_proto:
 	@echo "Performing 'aflow --proto' test"
 	@if [ -z `which md5sum` ]; then echo "Cannot find binary md5sum - check skipped."; else \
 		PROTO4SUM=$$(./aflow --proto=4:Bi:Tc | ./aflow --sprim | md5sum | cut -d ' ' -f1) && \
 		[ "$${PROTO4SUM#*ffb9c5681045fb80f391e9a931f21d1}" != "$$PROTO4SUM" ] && \
-		echo "'aflow --proto' check pass!" && exit 0 || \
+		echo "'aflow --proto' check passed!" && exit 0 || \
 		echo "'aflow --proto' test failed. Check compilation of aflow and aflow_data." && exit 1; \
 	fi
 #ME190313 - only execute check if md5sum is present
@@ -1197,6 +1203,10 @@ check_proto:
 #	./aflow --proto=4:Bi:Tc | ./aflow --sprim | md5sum
 #	#ffb9c5681045fb80f391e9a931f21d1
 #	./aflow --checki | grep FAIL
+.PHONY: check_schema
+check_schema:
+	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
+	./aflow --schema_test
 .PHONY: check_Egap
 check_Egap:
 	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
@@ -1555,6 +1565,14 @@ check_fold_atoms_in_cell_routine:
 check_prototype_generator:
 	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
 	./aflow --PrototypeGenerator_test
+.PHONY: check_prototype_symmetry
+check_prototype_symmetry:
+	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
+	if !([ -n "$$TRAVIS" ] || [ "$$CI" = true ]); then ./aflow --PrototypeSymmetry_test; fi
+.PHONY: check_prototype_uniqueness
+check_prototype_uniqueness:
+	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
+	if !([ -n "$$TRAVIS" ] || [ "$$CI" = true ]); then ./aflow --PrototypeUniqueness_test; fi
 #RF20200302 - START
 .PHONY: check_cce
 check_cce:

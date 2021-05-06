@@ -28,6 +28,10 @@
 #include "aurostd_xtensor.h"
 #endif
 
+#ifndef __XOPTIMIZE
+#define _XVECTOR_CHECK_BOUNDARIES_
+#endif
+
 // ----------------------------------------------------------------------------
 // --------------------------------------------------------------- constructors
 namespace aurostd {  // namespace aurostd
@@ -162,7 +166,7 @@ namespace aurostd {  // namespace aurostd
   template<class utype>                                            // operator []
     // removed inline
     utype& xvector<utype>::operator[](int i) const {
-#ifndef __XOPTIMIZE
+#ifndef _XVECTOR_CHECK_BOUNDARIES_
       if(i>urows) {
         string function = XPID + "aurostd::xvector::operator[]:";
         stringstream message;
@@ -191,7 +195,7 @@ namespace aurostd {  // namespace aurostd
     // removed inline
     utype& xvector<utype>::operator()(int i) const {
       //#ifndef BOUNDARY_CONDITIONS_PERIODIC
-#ifndef __XVECTOR_IGNORE_BOUNDARIES
+#ifndef _XVECTOR_CHECK_BOUNDARIES_
       if(i>urows) {
         string function = XPID + "aurostd::xvector::operator():";
         stringstream message;
@@ -229,7 +233,7 @@ namespace aurostd {  // namespace aurostd
   template<class utype>                        // operator () boundary conditions
     inline utype& xvector<utype>::operator()(int i,bool bc) const {
       if(bc==BOUNDARY_CONDITIONS_NONE) {
-#ifndef __XOPTIMIZE
+#ifndef _XVECTOR_CHECK_BOUNDARIES_
         if(i>urows) {
           string function = XPID + "aurostd::xvector::operator():";
           stringstream message;
@@ -805,6 +809,16 @@ namespace aurostd {  // namespace aurostd
       }
       return (bool) output;
     }
+}
+
+// check if all entries of an xvector are equal
+namespace aurostd { //namespace aurostd //DX20210503
+  template<class utype> bool identical(const xvector<utype>& a, utype tol) {
+    for(int i=a.lrows;i<=a.urows;i++){
+      if(isdifferent(a[i],a[0],tol)){ return false; }
+    }
+    return true; //includes case when xvector is empty
+  }
 }
 
 namespace aurostd {  // namespace aurostd

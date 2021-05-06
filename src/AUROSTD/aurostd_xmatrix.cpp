@@ -44,6 +44,10 @@
 #include "aurostd_xtensor.h"
 #endif
 
+#ifndef __XOPTIMIZE
+#define _XMATRIX_CHECK_BOUNDARIES_
+#endif
+
 // ----------------------------------------------------------------------------
 // --------------------------------------------------------------- constructors
 namespace aurostd {  // namespace aurostd
@@ -234,7 +238,7 @@ namespace aurostd {  // namespace aurostd
   template<class utype>
     // removed inline
     utype* xmatrix<utype>::operator[] (int ir) const {
-#ifndef __XOPTIMIZE
+#ifdef _XMATRIX_CHECK_BOUNDARIES_
       if(ir>urows)  {
         string function = XPID + "aurostd::xmatrix::operator[]:";
         stringstream message;
@@ -257,7 +261,7 @@ namespace aurostd {  // namespace aurostd
     // removed inline
     utype& xmatrix<utype>::operator()(int i,int j) const {
       //#ifndef XMATRIX_PERIODIC_BOUNDARY_CONDITIONS
-#ifndef __XMATRIX_IGNORE_BOUNDARIES
+#ifdef _XMATRIX_CHECK_BOUNDARIES_
       if(i>urows) {
         string function = XPID + "aurostd::xmatrix::operator():";
         stringstream message;
@@ -282,7 +286,7 @@ namespace aurostd {  // namespace aurostd
         message << "M -> j=" << j << " < lcols=" << lcols;
         throw xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
       }
-#endif // __XMATRIX_IGNORE_BOUNDARIES
+#endif // _XMATRIX_CHECK_BOUNDARIES_
       return corpus[i][j];
     }
   ////#else
@@ -422,6 +426,7 @@ namespace aurostd {  // namespace aurostd
 namespace aurostd {  // namespace aurostd
   template<class utype>
     void xmatrix<utype>::setmat(const xmatrix<utype>& mat,int lrow,int lcol) { //these are the starting lrow, lcol, end is dictated by size of mat //CO20191110
+#ifdef _XMATRIX_CHECK_BOUNDARIES_
       bool LDEBUG=(FALSE || XHOST.DEBUG);
       string soliloquy="aurostd::setmat():";
       int urow=lrow+mat.rows-1; //ending row
@@ -434,23 +439,29 @@ namespace aurostd {  // namespace aurostd
       if(urow>urows){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"urow>urows",_VALUE_ILLEGAL_);}
       if(lcol<lcols){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"lcol<lcols",_VALUE_ILLEGAL_);}
       if(ucol>ucols){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"ucol>ucols",_VALUE_ILLEGAL_);}
+#endif
       for(int i=mat.lrows;i<=mat.urows;i++){
         for(int j=mat.lcols;j<=mat.ucols;j++){corpus[lrow+i-mat.lrows][lcol+j-mat.lcols]=mat[i][j];}
       }
     }
   template<class utype>
     void xmatrix<utype>::setmat(const xvector<utype>& xv,int icol,bool col) { //replace icol (col==true) or row (col==false) //CO20191110
-      bool LDEBUG=(FALSE || XHOST.DEBUG);
-      string soliloquy="aurostd::setmat():";
-      int lrow=1,lcol=1,urow=1,ucol=1;
+      int lrow=1,lcol=1;
       if(col==true){
         lrow=lrows; //starting row
         lcol=icol; //starting col
-        urow=lrow+xv.rows-1; //ending row
-        ucol=icol; //ending col
       }else{
         lrow=icol; //starting row
         lcol=lcols; //starting col
+      }
+#ifdef _XMATRIX_CHECK_BOUNDARIES_
+      bool LDEBUG=(FALSE || XHOST.DEBUG);
+      string soliloquy="aurostd::setmat():";
+      int urow=1,ucol=1;
+      if(col==true){
+        urow=lrow+xv.rows-1; //ending row
+        ucol=icol; //ending col
+      }else{
         urow=icol; //ending row
         ucol=lcols+xv.rows-1; //ending col
       }
@@ -464,6 +475,7 @@ namespace aurostd {  // namespace aurostd
       if(urow>urows){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"urow>urows",_VALUE_ILLEGAL_);}
       if(lcol<lcols){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"lcol<lcols",_VALUE_ILLEGAL_);}
       if(ucol>ucols){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"ucol>ucols",_VALUE_ILLEGAL_);}
+#endif
       if(col==true){
         for(int i=xv.lrows;i<=xv.urows;i++){corpus[lrow+i-xv.lrows][icol]=xv[i];}
       }else{
@@ -480,7 +492,7 @@ namespace aurostd {  // namespace aurostd
     // removed inline
     utype& xmatrix<utype>::operator()(int i,int j,bool bc) const {
       if(bc==BOUNDARY_CONDITIONS_NONE) {
-#ifndef __XOPTIMIZE
+#ifdef _XMATRIX_CHECK_BOUNDARIES_
         if(i>urows) {
           string function = XPID + "aurostd::xmatrix::operator():";
           stringstream message;
@@ -518,7 +530,7 @@ namespace aurostd {  // namespace aurostd
         if(jj==lcols-1) jj=ucols; // fast switching
         if(jj>ucols) jj=lcols+mod(j-lcols,ucols-lcols+1);
         if(jj<lcols) jj=ucols-mod(ucols-j,ucols-lcols+1);
-#ifndef __XOPTIMIZE
+#ifdef _XMATRIX_CHECK_BOUNDARIES_
         if(ii>urows) {
           string function = XPID + "aurostd::xmatrix::operator():";
           stringstream message;

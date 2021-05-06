@@ -294,57 +294,6 @@ namespace SYM {
   // Template Declarations
   // ******************************************************************************
 
-  template <class d>
-    d infnorm(vector<d> vec) {
-      if (vec.size() == 0) {
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"SYM::infnorm()","Empty vector.",_GENERIC_ERROR_);
-      }
-      d largest = vec[0];
-      for (uint i = 0; i < vec.size(); i++) {
-        if (vec[i] > largest) {
-          largest = vec[i];
-        }
-      }
-      return largest;
-    }
-
-  template <class d>
-    int infnormindex(vector<d> vec) {
-      if (vec.size() == 0) {
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"SYM::infnormindex()","Empty vector.",_GENERIC_ERROR_);
-      }
-      d largest = vec[0];
-      int out;
-      for (uint i = 0; i < vec.size(); i++) {
-        if (vec[i] > largest) {
-          //largest = vec[i];
-          out = i;
-        }
-      }
-      return out;
-    }
-
-  template <class d>
-    d infnorm(xvector<d> xvec) {
-      if (xvec.urows == 0) {
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"SYM::infnormindex()","Empty vector.",_GENERIC_ERROR_);
-      }
-      d largest = aurostd::abs(xvec[1]);
-      for (int i = 0; i < xvec.urows; i++) {
-        if (aurostd::abs(xvec[i + 1]) > largest) {
-          largest = aurostd::abs(xvec[i + 1]);
-        }
-      }
-      return largest;
-    }
-
-  template <typename T>
-    void remove_duplicates_rt(vector<T>& vec) {
-      //sort(vec.begin(), vec.end());//sorts ascending order
-      vec.erase(unique(vec.begin(), vec.end()), vec.end());
-      //sort(vec.begin(), vec.end(), std::greater<int>());//sorts in descending order
-    }
-
   template <class dmmy>
     bool allsame(vector<dmmy> vec) {
       bool all = true;
@@ -355,44 +304,6 @@ namespace SYM {
       return all;
     }
 
-  template <class dmmy>
-    bool invec(vector<dmmy> vec, dmmy n) {
-      bool contains = false;
-      for (uint i = 0; i < vec.size(); i++) {
-        if (vec[i] == n)
-          contains = true;
-      }
-      return contains;
-    }
-
-  template <class dmmy>
-    int invec_index(vector<dmmy> vec, dmmy n) {
-      int out;
-      for (uint i = 0; i < vec.size(); i++) {
-        if (vec[i] == n)
-          out = i;
-      }
-      return out;
-    }
-
-  int invecindex(vector<_atom> vec, _atom n);
-
-  template <class dmmy>
-    bool inveconce(vector<dmmy> vec, dmmy n) {
-      bool contains = false;
-      int count = 0;
-      for (uint i = 0; i < vec.size(); i++) {
-        if (vec[i] == n) {
-          count++;
-        }
-      }
-      //if(count >= 1)
-      if (count == 1)
-      { //CO20200106 - patching for auto-indenting
-        contains = true;
-      }
-      return contains;
-    }
 } //namespace SYM
 
 //End Templates
@@ -521,12 +432,9 @@ namespace SYM {
   xvector<double> next_point_on_line(xvector<double> P, xmatrix<double> L);
   void add_3d_point(vector<xvector<double> >& points, double x, double y, double z);
   char discern_rot_sym(xmatrix<double> m, double& tol); //DX20190215
-  bool allsame(vector<double> v);
+  //DX20210422 [OBSOLETE] bool allsame(vector<double> v);
   bool is_lattice_point(xmatrix<double> L, xvector<double> point, xvector<double>& lattice_vector, double& radius, bool& skew, double& tol); //DX20190215
-  bool in_cell(xmatrix<double> Linv, xvector<double> point);
-  bool in_cell(xvector<double> P);                     //For use
-  bool in_cell(xvector<double> P, xvector<double> N);  //Check if in cell modulo the direction of N (normal)
-  double distance_between_points(const xvector<double>& a, const xvector<double>& b);
+  //DX20210422 [OBSOLETE] double distance_between_points(const xvector<double>& a, const xvector<double>& b);
 
   double get_angle(xvector<double> a, xvector<double> b, string c);
   xvector<double> get_random_point_in_plane(string plane);
@@ -538,14 +446,14 @@ namespace SYM {
   bool containschar(string str_in);
   bool iselem(string str_in);
   bool havechar(string str_in, char c);  //see template function "invec"
-  bool intinvec(vector<int> vint, int n);
+  //DX20210421 [OBSOLETE] bool intinvec(vector<int> vint, int n);
   int whereischar(string str, char c);
   char whichchar(string str_in);
   double whichnum(string str_in);
   //DX20200313 [MOVED TO AUROSTD] double frac2dbl(string str);  //expand to cover case when input is e.g., ".5"
   //DX20190724 [MOVED TO AUROSTD] string dbl2frac(double a, bool sign_prefix=true);
   void multiply(vector<string> A, vector<string> B);
-  void xstring(ostream& output, xmatrix<double> a);
+  //DX20210422 [OBSOLETE] void xstring(ostream& output, xmatrix<double> a);
   void cleanupstring(string& str);  //eliminates blank spaces before and after string
   vector<string> splitstring(string str, char c);  //c is delimeter
   vector<string> splitstringbyspaces(string str);
@@ -569,19 +477,6 @@ namespace SYM {
   // ******************************************************************************
   //  namespace rstd {
   typedef std::map<int, xvector<double> > hash;
-  //DX20190905 [OBSOLETE] xvector<double> CrossPro(const xvector<double>& a, const xvector<double>& b);
-  //DX20190905 [OBSOLETE] double DotPro(xvector<double> a, xvector<double> b);
-  //  double modulus(xvector<double> a);
-  //DX20190905 [OBSOLETE] double modulus(vector<double> a);
-  //  //Linear Algebra Functions:
-  void swap_rows(xmatrix<double>& M, int a, int b);
-  //  }
-
-  xmatrix<double> concatenate(vector<xvector<double> >& V);
-  xmatrix<double> concatenate(vector<xmatrix<double> >& V);
-
-  //DX20190905 [OBSOLETE] void normalize(xvector<double>& v);
-  //DX20190905 [OBSOLETE] void normalize(vector<double>& v);
   xmatrix<double> xvec2xmat(xvector<double> a, xvector<double> b, xvector<double> c);
   xmatrix<double> xvec2xmat(vector<xvector<double> > V);
   xmatrix<double> xvec2xmat(vector<xvector<double> > V, vector<double> R);
@@ -591,9 +486,6 @@ namespace SYM {
   xmatrix<double> a2m3x3(double* array);
 
   double get_random_double(double min, double max);
-
-  bool vec_compare(vector<double> a, vector<double> b);
-  bool vec_compare(xvector<double> a, xvector<double> b);
 
   //SYMMETRY OPERATIONS FUNCTIONS
   //DX20190215 [OBSOLETE] symfolder check_ccell(xstructure& xstr);
@@ -629,8 +521,6 @@ namespace SYM {
   //DX20191202 [OBSOLETE] unsigned long long int gcd(unsigned long long int u, unsigned long long int v);  //Dijkstra's GCD Algorithm
   //DX20191202 [OBSOLETE] int gcdD(int u, int v);
   //[OBSOLETE]long long int cast2int(double d, long long int prec);
-  //modulo reduce
-  //DX20190905 [OBSOLETE] double mod_one(double d);
   double smallest_gt_min(double min, vector<double> vec);
   int smallest_gt_min_index(double min, int not_index1, int not_index2, vector<double> vec);
 

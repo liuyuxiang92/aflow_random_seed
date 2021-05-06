@@ -666,6 +666,26 @@ namespace aurostd {
   //   bool _aurostd_initialize_isequal(const vector<vector<vector<long double> > >& t1,const vector<vector<vector<long double> > >& t2,long double epsilon) { return isequal(t1,t2,epsilon);}
 
   // ***************************************************************************
+  // Function all identical vector (one argument, checks if all entries are equal) //DX20210422
+  // ***************************************************************************
+  template<class utype> bool identical(const vector<utype>& vec, utype eps) {
+    for(uint i=0;i<vec.size();i++){
+      if(isdifferent(vec[i],vec[0],eps)){ return false; }
+    }
+    return true; //includes case when vec is empty
+  }
+
+  // ***************************************************************************
+  // Function all identical deque (one argument, checks if all entries are equal) //DX20210422
+  // ***************************************************************************
+  template<class utype> bool identical(const deque<utype>& deq, utype eps) {
+    for(uint i=0;i<deq.size();i++){
+      if(isdifferent(deq[i],deq[0],eps)){ return false; }
+    }
+    return true; //includes case when deq is empty
+  }
+
+  // ***************************************************************************
   // Function toupper/tolower
   // ***************************************************************************
   string toupper(const string& in) {
@@ -2320,6 +2340,7 @@ namespace aurostd {
     if(aurostd::FileExist("/usr/sbin/"+command)) {position="/usr/sbin/"+command;return TRUE;}  // go around path
     if(aurostd::FileExist("/usr/local/bin/"+command)) {position="/usr/local/bin/"+command;return TRUE;}  // go around path
     if(aurostd::FileExist("/usr/local/sbin/"+command)) {position="/usr/local/sbin/"+command;return TRUE;}  // go around path
+    if(aurostd::FileExist("/usr/local/maui/bin/"+command)) {position="/usr/local/maui/bin/"+command;return TRUE;}  // go around path  //CO20200526
     position="";
     return FALSE;
   }
@@ -3602,7 +3623,7 @@ namespace aurostd {
     while(!istreamIN.eof()) {
       char tmp[_CIN_LINE_BUFFER_LENGTH_];
       istreamIN.getline(tmp,_CIN_LINE_BUFFER_LENGTH_-1);
-      vstringout+=string(tmp)+"/n";
+      vstringout+=string(tmp)+"\n";  // ME20210206 - fixed line break
     }
     // istreamIN.clear(); // istreamIN.seekg(0); // ******* INPUT FILE goes at the beginning
     return vstringout.length();  // return FALSE if something got messed up
@@ -3615,7 +3636,7 @@ namespace aurostd {
     while(!ifstreamIN.eof()) {
       char tmp[_CIN_LINE_BUFFER_LENGTH_];
       ifstreamIN.getline(tmp,_CIN_LINE_BUFFER_LENGTH_-1);
-      vstringout+=string(tmp)+"/n";
+      vstringout+=string(tmp)+"\n";  // ME20210206 - fixed line break
     }
     // ifstreamIN.clear(); // ifstreamIN.seekg(0); // ******* INPUT FILE goes at the beginning
     return vstringout.length();  // return FALSE if something got messed up
@@ -3627,7 +3648,7 @@ namespace aurostd {
     while(!stringstreamIN.eof()) {
       char tmp[_CIN_LINE_BUFFER_LENGTH_];
       stringstreamIN.getline(tmp,_CIN_LINE_BUFFER_LENGTH_-1);
-      vstringout+=string(tmp)+"/n";
+      vstringout+=string(tmp)+"\n";  // ME20210206 - fixed line break
     }
     // stringstreamIN.clear();stringstreamIN.seekg(0); // ******* INPUT FILE goes at the beginning
     return vstringout.length();  // return FALSE if something got messed up

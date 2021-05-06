@@ -46,6 +46,7 @@ namespace anrl{
   // ---------------------------------------------------------------------------
   // checking functions
   double specialCaseSymmetryTolerances(const string& label_input);
+  bool isSpecialCaseEquivalentPrototypes(const vector<string>& labels_matched);
   bool structureAndLabelConsistent(const xstructure& _xstr,
       const string& label_input,
       string& label_and_params_calculated,
