@@ -17703,14 +17703,14 @@ vector<xvector<double> > GetBasisTransformationInternalTranslations(const xmatri
     xvector<double> b_vec=lattice_shrink(2);
     xvector<double> c_vec=lattice_shrink(3);
     xvector<double> a_vec_scaled, b_vec_scaled, c_vec_scaled;
-    for(int a=0;a<dims[1];a++){
+    for(int a=0;a<=dims[1];a++){ //DX20210506 - need <=
       a_vec_scaled = (double)a*a_vec;
       translations.push_back(a_vec_scaled);
-      for(int b=0;b<dims[2];b++){
+      for(int b=0;b<=dims[2];b++){ //DX20210506 - need <=
         b_vec_scaled = (double)b*b_vec;
         translations.push_back(b_vec_scaled);
         translations.push_back(a_vec_scaled+b_vec_scaled);
-        for(int c=0;c<dims[3];c++){
+        for(int c=0;c<=dims[3];c++){ //DX20210506 - need <=
           c_vec_scaled = (double)c*c_vec;
           translations.push_back(c_vec_scaled);
           translations.push_back(a_vec_scaled+c_vec_scaled);

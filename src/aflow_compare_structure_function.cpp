@@ -5276,6 +5276,7 @@ namespace compare{
     //cerr << xstr1.Volume()/xstr1.atoms.size() << " vs " << xstr2.Volume()/xstr2.atoms.size() << endl;
     rescale_factor=(xstr1.Volume()/xstr1.atoms.size())/(xstr2.Volume()/xstr2.atoms.size()); //DX20201215 - store rescale factor
     xstr2.InflateVolume(rescale_factor); //already updates cartesian coordinates
+    xstr2.dist_nn_min*=std::pow(rescale_factor,(double) 1/3); //DX20210505 - need to update minimum distance with scaling factor
     // update Cartesian coordinates
     //DX20201210 [OBSOLETE - INFLATE VOLUME ACCOUNTS FOR THIS NOW] for(uint i=0; i<xstr2.atoms.size(); i++){
     //DX20201210 [OBSOLETE - INFLATE VOLUME ACCOUNTS FOR THIS NOW]  xstr2.atoms[i].cpos=F2C(xstr2.lattice,xstr2.atoms[i].fpos);
