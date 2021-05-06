@@ -3844,7 +3844,7 @@ namespace KBIN {
     //return true/false indicates whether INCAR was modified
     
     bool Krun=true; //indicates whether INCAR was modified
-    bool VERBOSE=true;
+    bool VERBOSE=(FALSE || VERBOSE_MONITOR_VASP || XHOST.vflag_control.flag("MONITOR_VASP")==false);
     string keyword="",incar_input="",incar_input_old="",incar_comment="";
 
     // ***************************************************************************
@@ -5674,7 +5674,7 @@ namespace KBIN {
 namespace KBIN {
   bool XVASP_KPOINTS_isAutoMesh(const _xvasp& xvasp){ //CO20210315
     //returns if KPOINTS is automatic generation scheme: https://www.vasp.at/wiki/index.php/KPOINTS
-    bool LDEBUG=(true || _DEBUG_IVASP_ || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || VERBOSE_MONITOR_VASP || _DEBUG_IVASP_ || XHOST.DEBUG);
     string soliloquy=XPID+"KBIN::XVASP_KPOINTS_string2numbers():";
     
     if(LDEBUG){cerr << soliloquy << " xvasp.KPOINTS=" << endl;cerr << xvasp.KPOINTS.str() << endl;}
@@ -5740,7 +5740,7 @@ namespace KBIN {
   bool XVASP_KPOINTS_numbers2string(_xvasp& xvasp) {  //CO20210315 - cleaned up
     //CO20210315 - can only read auto-meshes of MP or G
     //https://www.vasp.at/wiki/index.php/KPOINTS
-    bool LDEBUG=(TRUE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || VERBOSE_MONITOR_VASP || XHOST.DEBUG);
     string soliloquy=XPID+"KBIN::XVASP_KPOINTS_string2numbers():";
 
     if(LDEBUG){cerr << soliloquy << " xvasp.KPOINTS(pre)=" << endl;cerr << xvasp.KPOINTS.str() << endl;}
@@ -5906,7 +5906,7 @@ namespace KBIN {
     //this is all done inside the main XVASP_Afix() function
     //BE CAREFUL not to overwrite xvasp.INCAR
     //for now the default is to increase NBANDS, we might decrease later as a fix to MEMORY
-    bool LDEBUG=(true || _DEBUG_IVASP_ || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || VERBOSE_MONITOR_VASP || _DEBUG_IVASP_ || XHOST.DEBUG);
     string function="KBIN::XVASP_Afix_NBANDS";
     string soliloquy=XPID+function+"():";
 
@@ -6142,7 +6142,7 @@ namespace KBIN {
     string operation=function+fix_str;
     string incar_input="";
     stringstream aus;
-    bool VERBOSE=true;
+    bool VERBOSE=(FALSE || VERBOSE_MONITOR_VASP || XHOST.vflag_control.flag("MONITOR_VASP")==false);
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
     //checks and quick return false here
@@ -6773,7 +6773,7 @@ namespace KBIN {
 
 namespace KBIN {
   bool XVASP_Afix_IgnoreFix(const string& _fix,const _vflags& vflags){
-    bool LDEBUG=(true || _DEBUG_IVASP_ || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || VERBOSE_MONITOR_VASP || _DEBUG_IVASP_ || XHOST.DEBUG);
     string soliloquy=XPID+"KBIN::XVASP_Afix_IgnoreFix():";
     
     if(vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:"+_fix)){
@@ -6827,7 +6827,7 @@ namespace KBIN {
     //CO20210315 - extensive rewrite
     //the schemes below check if the modification needs to be made (has it already been made?)
     //maintain this feedback system to ensure aflow doesn't keep spinning its wheels on the same fixes
-    bool LDEBUG=(true || _DEBUG_IVASP_ || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || VERBOSE_MONITOR_VASP || _DEBUG_IVASP_ || XHOST.DEBUG);
     string function="KBIN::XVASP_Afix";
     string soliloquy=XPID+function+"():";
     string file_error="",incar_input="";

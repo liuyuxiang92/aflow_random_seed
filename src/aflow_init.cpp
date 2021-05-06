@@ -1881,7 +1881,7 @@ string GetVASPBinaryFromLOCK(const string& directory){  //CO20210315
 // processFlagsFromLOCK
 // ***************************************************************************
 void processFlagsFromLOCK(_xvasp& xvasp,_vflags& vflags,aurostd::xoption& xfixed){  //CO20210315
-  bool LDEBUG=(true || XHOST.DEBUG);
+  bool LDEBUG=(FALSE || VERBOSE_MONITOR_VASP || XHOST.DEBUG);
   string soliloquy=XPID+"processFlagsFromLOCK():";
 
   if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
@@ -2099,7 +2099,7 @@ void AFLOW_monitor_VASP(const string& directory){
   uint sleep_seconds=SECONDS_SLEEP_VASP_MONITOR;
   uint sleep_seconds_afterkill=sleep_seconds;
   aurostd::xoption xmessage,xwarning,xmonitor,xfixed;
-  bool VERBOSE=true;
+  bool VERBOSE=(FALSE || VERBOSE_MONITOR_VASP || XHOST.vflag_control.flag("MONITOR_VASP")==false);
   bool vasp_running=false;
   vector<string> vlines_lock;
   
