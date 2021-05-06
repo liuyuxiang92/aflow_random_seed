@@ -886,7 +886,7 @@
 #define         SECONDS_SLEEP_VASP_MONITOR                    XHOST.adefault.getattachedutype<double>("SECONDS_SLEEP_VASP_MONITOR") 
 #define AFLOWRC_SECONDS_STALE_OUTCAR                          10800    // seconds
 #define         SECONDS_STALE_OUTCAR                          XHOST.adefault.getattachedutype<double>("SECONDS_STALE_OUTCAR") 
-#define AFLOWRC_BYTES_MAX_VASP_OUT                            1000000000    // bytes
+#define AFLOWRC_BYTES_MAX_VASP_OUT                            30000000000    // bytes
 #define         BYTES_MAX_VASP_OUT                            XHOST.adefault.getattachedutype<unsigned long long int>("BYTES_MAX_VASP_OUT") 
 #define AFLOWRC_FILE_VASP_MONITOR                             string("monitor_vasp")
 #define         FILE_VASP_MONITOR                             XHOST.adefault.getattachedscheme("FILE_VASP_MONITOR")
