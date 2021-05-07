@@ -6933,7 +6933,6 @@ namespace KBIN {
       fix="ISMEAR=2";
       if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
       Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
-      if(!Krun){Krun=true;submode++;} //reset and go to the next solution
     }
     else if(mode=="EFIELD_PEAD") {
       fix="EFIELD_PEAD";
