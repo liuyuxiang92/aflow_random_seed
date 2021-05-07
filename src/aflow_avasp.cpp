@@ -2257,7 +2257,7 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
   else if(xvasp.AVASP_flag_RUN_STATIC) aflowin << aurostd::PaddedPOST("[VASP_RUN]STATIC",_AFLOWINPAD_); //CO20181226 - must be else if
   else if(xvasp.AVASP_flag_RUN_STATIC_BANDS) aflowin << aurostd::PaddedPOST("[VASP_RUN]STATIC_BANDS",_AFLOWINPAD_); //CO20181226 - must be else if
   else if(xvasp.AVASP_flag_GENERATE) aflowin << aurostd::PaddedPOST("[VASP_RUN]GENERATE",_AFLOWINPAD_); //CO20181226 - must be else if
-  aflowin << " // GENERATE | STATIC | RELAX=N | RELAX_STATIC=N | STATIC_BANDS | RELAX_STATIC_BANDS=N | REPEAT_BANDS [,DS[,DD[,DSCF]]] " << endl;
+  aflowin << " // GENERATE | STATIC | RELAX=N | RELAX_STATIC=N | STATIC_BANDS | RELAX_STATIC_BANDS=N | REPEAT_STATIC | REPEAT_STATIC_BANDS | REPEAT_BANDS [,DS[,DD[,DSCF]]] " << endl;
 
   if(xvasp.AVASP_flag_RUN_RELAX_STATIC ||
       xvasp.AVASP_flag_RUN_RELAX_STATIC_BANDS ||
@@ -4004,7 +4004,7 @@ bool AVASP_MakeSingleAFLOWIN_20180101(_xvasp& xvasp_in,stringstream &_aflowin,bo
   if(xvasp.AVASP_flag_RUN_STATIC_BANDS) aflowin << aurostd::PaddedPOST("[VASP_RUN]STATIC_BANDS",_AFLOWINPAD_);
   if(xvasp.AVASP_flag_RUN_STATIC) aflowin << aurostd::PaddedPOST("[VASP_RUN]STATIC",_AFLOWINPAD_);
   if(xvasp.AVASP_flag_GENERATE) aflowin << aurostd::PaddedPOST("[VASP_RUN]GENERATE",_AFLOWINPAD_);
-  aflowin << " // GENERATE | STATIC | RELAX=N | RELAX_STATIC=N | STATIC_BANDS | RELAX_STATIC_BANDS=N | REPEAT_BANDS [,DS[,DD[,DSCF]]] " << endl;
+  aflowin << " // GENERATE | STATIC | RELAX=N | RELAX_STATIC=N | STATIC_BANDS | RELAX_STATIC_BANDS=N | REPEAT_STATIC | REPEAT_STATIC_BANDS | REPEAT_BANDS [,DS[,DD[,DSCF]]] " << endl;
 
   if(xvasp.AVASP_flag_RUN_RELAX_STATIC ||
       xvasp.AVASP_flag_RUN_RELAX_STATIC_BANDS ||

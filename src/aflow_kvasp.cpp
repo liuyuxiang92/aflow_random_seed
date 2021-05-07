@@ -734,16 +734,18 @@ namespace KBIN {
     // if(vflags.KBIN_VASP_RUN.flag("DIELECTRIC_DYNAMIC")) cout << "vflags.KBIN_VASP_RUN.flag(\"DIELECTRIC_DYNAMIC\")" << endl;
     // if(vflags.KBIN_VASP_RUN.flag("DSCF")) cout << "vflags.KBIN_VASP_RUN.flag(\"DSCF\")" << endl;
 
-    // [OBSOLETE] vflags.KBIN_VASP_REPEAT_BANDS        = aurostd::FileExist(aflags.Directory+string("/REPEAT_BANDS")) || aurostd::substring2bool(AflowIn,"[VASP_RUN_REPEAT_BANDS]") || aurostd::substring2bool(AflowIn,"[VASP_RUN]REPEAT_BANDS]");
+    // [OBSOLETE] vflags.KBIN_VASP_REPEAT_STATIC        = aurostd::FileExist(aflags.Directory+string("/REPEAT_STATIC")) || aurostd::substring2bool(AflowIn,"[VASP_RUN_REPEAT_STATIC]") || aurostd::substring2bool(AflowIn,"[VASP_RUN]REPEAT_STATIC]");
     // [OBSOLETE] vflags.KBIN_VASP_REPEAT_STATIC_BANDS = aurostd::FileExist(aflags.Directory+string("/REPEAT_STATIC_BANDS")) || aurostd::substring2bool(AflowIn,"[VASP_RUN_REPEAT_STATIC_BANDS]") || aurostd::substring2bool(AflowIn,"[VASP_RUN]REPEAT_STATIC_BANDS]");
+    // [OBSOLETE] vflags.KBIN_VASP_REPEAT_BANDS        = aurostd::FileExist(aflags.Directory+string("/REPEAT_BANDS")) || aurostd::substring2bool(AflowIn,"[VASP_RUN_REPEAT_BANDS]") || aurostd::substring2bool(AflowIn,"[VASP_RUN]REPEAT_BANDS]");
     // [OBSOLETE] vflags.KBIN_VASP_REPEAT_DELSOL       = aurostd::FileExist(aflags.Directory+string("/REPEAT_DELSOL")) || aurostd::substring2bool(AflowIn,"[VASP_RUN_REPEAT_DELSOL]") || aurostd::substring2bool(AflowIn,"[VASP_RUN]REPEAT_DELSOL]");
 
     vflags.KBIN_VASP_REPEAT.clear();
-    if(aurostd::FileExist(aflags.Directory+string("/REPEAT_BANDS")) || aurostd::substring2bool(AflowIn,"[VASP_RUN_REPEAT_BANDS]") || aurostd::substring2bool(AflowIn,"[VASP_RUN]REPEAT_BANDS")) vflags.KBIN_VASP_REPEAT.push("REPEAT_BANDS"); //CO20210315 - fixing typo
+    if(aurostd::FileExist(aflags.Directory+string("/REPEAT_STATIC")) || aurostd::substring2bool(AflowIn,"[VASP_RUN_REPEAT_STATIC]") || aurostd::substring2bool(AflowIn,"[VASP_RUN]REPEAT_STATIC")) vflags.KBIN_VASP_REPEAT.push("REPEAT_STATIC"); //CO20210315
     if(aurostd::FileExist(aflags.Directory+string("/REPEAT_STATIC_BANDS")) || aurostd::substring2bool(AflowIn,"[VASP_RUN_REPEAT_STATIC_BANDS]") || aurostd::substring2bool(AflowIn,"[VASP_RUN]REPEAT_STATIC_BANDS")) vflags.KBIN_VASP_REPEAT.push("REPEAT_STATIC_BANDS"); //CO20210315 - fixing typo
+    if(aurostd::FileExist(aflags.Directory+string("/REPEAT_BANDS")) || aurostd::substring2bool(AflowIn,"[VASP_RUN_REPEAT_BANDS]") || aurostd::substring2bool(AflowIn,"[VASP_RUN]REPEAT_BANDS")) vflags.KBIN_VASP_REPEAT.push("REPEAT_BANDS"); //CO20210315 - fixing typo
     if(aurostd::FileExist(aflags.Directory+string("/REPEAT_DELSOL")) || aurostd::substring2bool(AflowIn,"[VASP_RUN_REPEAT_DELSOL]") || aurostd::substring2bool(AflowIn,"[VASP_RUN]REPEAT_DELSOL")) vflags.KBIN_VASP_REPEAT.push("REPEAT_DELSOL"); //CO20210315 - fixing typo
 
-
+    if(vflags.KBIN_VASP_REPEAT.flag("REPEAT_STATIC")) cout << "vflags.KBIN_VASP_REPEAT.flag(\"REPEAT_STATIC\")" << endl;
     if(vflags.KBIN_VASP_REPEAT.flag("REPEAT_STATIC_BANDS")) cout << "vflags.KBIN_VASP_REPEAT.flag(\"REPEAT_STATIC_BANDS\")" << endl;
 
     // priorities about RUN
@@ -805,42 +807,62 @@ namespace KBIN {
       }
     }
     // priorities about REPEAT
-    if(vflags.KBIN_VASP_REPEAT.flag("REPEAT_STATIC_BANDS")) {
+    if(vflags.KBIN_VASP_REPEAT.flag("REPEAT_STATIC")) { //CO20210315
       vflags.KBIN_VASP_RUN.flag("STATIC",FALSE);
       vflags.KBIN_VASP_RUN.flag("STATIC_BANDS",FALSE);
       vflags.KBIN_VASP_RUN.flag("KPOINTS",FALSE);
       vflags.KBIN_VASP_RUN.flag("RELAX",FALSE);
       vflags.KBIN_VASP_RUN.flag("RELAX_STATIC",FALSE);
       vflags.KBIN_VASP_RUN.flag("RELAX_STATIC_BANDS",FALSE);
+      vflags.KBIN_VASP_REPEAT.flag("REPEAT_STATIC_BANDS",FALSE);  //CO20210315
+      vflags.KBIN_VASP_REPEAT.flag("REPEAT_BANDS",FALSE);  //CO20210315
+      vflags.KBIN_VASP_REPEAT.flag("REPEAT_DELSOL",FALSE);  //CO20210315
+    }
+    else if(vflags.KBIN_VASP_REPEAT.flag("REPEAT_STATIC_BANDS")) {
+      vflags.KBIN_VASP_RUN.flag("STATIC",FALSE);
+      vflags.KBIN_VASP_RUN.flag("STATIC_BANDS",FALSE);
+      vflags.KBIN_VASP_RUN.flag("KPOINTS",FALSE);
+      vflags.KBIN_VASP_RUN.flag("RELAX",FALSE);
+      vflags.KBIN_VASP_RUN.flag("RELAX_STATIC",FALSE);
+      vflags.KBIN_VASP_RUN.flag("RELAX_STATIC_BANDS",FALSE);
+      vflags.KBIN_VASP_REPEAT.flag("REPEAT_STATIC",FALSE);  //CO20210315
       vflags.KBIN_VASP_REPEAT.flag("REPEAT_BANDS",FALSE);
+      vflags.KBIN_VASP_REPEAT.flag("REPEAT_DELSOL",FALSE);  //CO20210315
     }
-    if(vflags.KBIN_VASP_REPEAT.flag("REPEAT_BANDS")) {
+    else if(vflags.KBIN_VASP_REPEAT.flag("REPEAT_BANDS")) {
       vflags.KBIN_VASP_RUN.flag("STATIC",FALSE);
       vflags.KBIN_VASP_RUN.flag("STATIC_BANDS",FALSE);
       vflags.KBIN_VASP_RUN.flag("KPOINTS",FALSE);
       vflags.KBIN_VASP_RUN.flag("RELAX",FALSE);
       vflags.KBIN_VASP_RUN.flag("RELAX_STATIC",FALSE);
       vflags.KBIN_VASP_RUN.flag("RELAX_STATIC_BANDS",FALSE);
+      vflags.KBIN_VASP_REPEAT.flag("REPEAT_STATIC",FALSE);  //CO20210315
+      vflags.KBIN_VASP_REPEAT.flag("REPEAT_STATIC_BANDS",FALSE);  //CO20210315
+      vflags.KBIN_VASP_REPEAT.flag("REPEAT_DELSOL",FALSE);  //CO20210315
     }
-    if(vflags.KBIN_VASP_REPEAT.flag("REPEAT_DELSOL")) {
+    else if(vflags.KBIN_VASP_REPEAT.flag("REPEAT_DELSOL")) {
       vflags.KBIN_VASP_RUN.flag("STATIC",FALSE);
       vflags.KBIN_VASP_RUN.flag("STATIC_BANDS",FALSE);
       vflags.KBIN_VASP_RUN.flag("KPOINTS",FALSE);
       vflags.KBIN_VASP_RUN.flag("RELAX",FALSE);
       vflags.KBIN_VASP_RUN.flag("RELAX_STATIC",FALSE);
       vflags.KBIN_VASP_RUN.flag("RELAX_STATIC_BANDS",FALSE);
+      vflags.KBIN_VASP_REPEAT.flag("REPEAT_STATIC",FALSE);  //CO20210315
+      vflags.KBIN_VASP_REPEAT.flag("REPEAT_STATIC_BANDS",FALSE);  //CO20210315
       vflags.KBIN_VASP_REPEAT.flag("REPEAT_BANDS",FALSE);
     }
 
     if(kflags.KBIN_PHONONS_CALCULATION_APL || kflags.KBIN_PHONONS_CALCULATION_QHA || kflags.KBIN_PHONONS_CALCULATION_AAPL || kflags.KBIN_PHONONS_CALCULATION_FROZSL || kflags.KBIN_PHONONS_CALCULATION_AGL || kflags.KBIN_PHONONS_CALCULATION_AEL) {  //CO20170601
-      vflags.KBIN_VASP_REPEAT.flag("REPEAT_DELSOL",FALSE);
       vflags.KBIN_VASP_RUN.flag("STATIC",FALSE);
       vflags.KBIN_VASP_RUN.flag("STATIC_BANDS",FALSE);
       vflags.KBIN_VASP_RUN.flag("KPOINTS",FALSE);
       vflags.KBIN_VASP_RUN.flag("RELAX",FALSE);
       vflags.KBIN_VASP_RUN.flag("RELAX_STATIC",FALSE);
-      vflags.KBIN_VASP_RUN.flag("RELAX_STATIC_BANDS",FALSE);
+      vflags.KBIN_VASP_RUN.flag("RELAX_STATIC_BANDS",FALSE);  //CO20210315
+      vflags.KBIN_VASP_REPEAT.flag("REPEAT_STATIC",FALSE);  //CO20210315
+      vflags.KBIN_VASP_REPEAT.flag("REPEAT_STATIC_BANDS",FALSE);
       vflags.KBIN_VASP_REPEAT.flag("REPEAT_BANDS",FALSE); 
+      vflags.KBIN_VASP_REPEAT.flag("REPEAT_DELSOL",FALSE);
       kflags.KBIN_SYMMETRY_CALCULATION=FALSE;
     }
 
@@ -1650,8 +1672,9 @@ namespace KBIN {
     if(LDEBUG) cerr << "[DEBUG] aflags.AFLOW_MACHINE_LOCAL=" << aflags.AFLOW_MACHINE_LOCAL << endl;
 
     // ***************************************************************************
-    if(LDEBUG) cerr << "[DEBUG] vflags.KBIN_VASP_REPEAT.flag(\"REPEAT_BANDS\")=" << vflags.KBIN_VASP_REPEAT.flag("REPEAT_BANDS") << endl;
+    if(LDEBUG) cerr << "[DEBUG] vflags.KBIN_VASP_REPEAT.flag(\"REPEAT_STATIC\")=" << vflags.KBIN_VASP_REPEAT.flag("REPEAT_STATIC") << endl; //CO20210315
     if(LDEBUG) cerr << "[DEBUG] vflags.KBIN_VASP_REPEAT.flag(\"REPEAT_STATIC_BANDS\")=" << vflags.KBIN_VASP_REPEAT.flag("REPEAT_STATIC_BANDS") << endl;
+    if(LDEBUG) cerr << "[DEBUG] vflags.KBIN_VASP_REPEAT.flag(\"REPEAT_BANDS\")=" << vflags.KBIN_VASP_REPEAT.flag("REPEAT_BANDS") << endl;
     if(LDEBUG) cerr << "[DEBUG] vflags.KBIN_VASP_REPEAT.flag(\"REPEAT_DELSOL\")=" << vflags.KBIN_VASP_REPEAT.flag("REPEAT_DELSOL") << endl;
 
     // ***************************************************************************
@@ -1759,8 +1782,9 @@ namespace KBIN {
       if(0){  //CO20210315 - better to keep verbosity ON
         if(vflags.KBIN_VASP_RUN.flag("STATIC_BANDS")) vflags.KBIN_VASP_INCAR_VERBOSE=FALSE; // TURN OFF VERBOSITY
         if(vflags.KBIN_VASP_RUN.flag("RELAX_STATIC_BANDS")) vflags.KBIN_VASP_INCAR_VERBOSE=FALSE; // TURN OFF VERBOSITY
-        if(vflags.KBIN_VASP_REPEAT.flag("REPEAT_BANDS")) vflags.KBIN_VASP_INCAR_VERBOSE=FALSE; // TURN OFF VERBOSITY
+        if(vflags.KBIN_VASP_REPEAT.flag("REPEAT_STATIC")) vflags.KBIN_VASP_INCAR_VERBOSE=FALSE; // TURN OFF VERBOSITY
         if(vflags.KBIN_VASP_REPEAT.flag("REPEAT_STATIC_BANDS")) vflags.KBIN_VASP_INCAR_VERBOSE=FALSE; // TURN OFF VERBOSITY
+        if(vflags.KBIN_VASP_REPEAT.flag("REPEAT_BANDS")) vflags.KBIN_VASP_INCAR_VERBOSE=FALSE; // TURN OFF VERBOSITY
         if(vflags.KBIN_VASP_REPEAT.flag("REPEAT_DELSOL")) vflags.KBIN_VASP_INCAR_VERBOSE=FALSE; // TURN OFF VERBOSITY
       }
 
@@ -2003,14 +2027,19 @@ namespace KBIN {
               aus << "00000  MESSAGE RELAX Running [nrelax=" << xvasp.NRELAX << "] " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
               aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
             }
-            if(vflags.KBIN_VASP_REPEAT.flag("REPEAT_BANDS")) { // RUN REPEAT_BANDS ------------------------
+            if(vflags.KBIN_VASP_REPEAT.flag("REPEAT_STATIC")) { // RUN REPEAT_STATIC ------------------------ //CO20210315
               xvasp.NRELAX=-1;	
-              aus << "00000  MESSAGE REPEAT_BANDS Running " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+              aus << "00000  MESSAGE REPEAT_STATIC Running " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
               aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
             }
             if(vflags.KBIN_VASP_REPEAT.flag("REPEAT_STATIC_BANDS")) { // RUN REPEAT_STATIC_BANDS ------------------------
               xvasp.NRELAX=-1;	
               aus << "00000  MESSAGE REPEAT_STATIC_BANDS Running " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+              aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
+            }
+            if(vflags.KBIN_VASP_REPEAT.flag("REPEAT_BANDS")) { // RUN REPEAT_BANDS ------------------------
+              xvasp.NRELAX=-1;	
+              aus << "00000  MESSAGE REPEAT_BANDS Running " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
               aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
             }
             if(vflags.KBIN_VASP_REPEAT.flag("REPEAT_DELSOL")) { // RUN REPEAT_DELSOL ------------------------
@@ -2174,12 +2203,13 @@ namespace KBIN {
               // --------------------------------------------------------------------------------------------------------------------
               // --------------------------------------------------------------------------------------------------------------------
               // --------------------------------------------------------------------------------------------------------------------
-              // RELAX_STATIC_BANDS RELAX_STATIC_BANDS RELAX_STATIC_BANDS REPEAT_STATIC_BANDS REPEAT_BANDS
+              // RELAX_STATIC_BANDS RELAX_STATIC_BANDS RELAX_STATIC_BANDS REPEAT_STATIC REPEAT_STATIC_BANDS REPEAT_BANDS
               // STATIC_BANDS STATIC_BANDS STATIC_BANDS 	
               // RELAX_STATIC RELAX_STATIC RELAX_STATIC
+              // REPEAT_STATIC REPEAT_STATIC REPEAT_STATIC
               // REPEAT_STATIC_BANDS REPEAT_STATIC_BANDS
               // REPEAT_BANDS REPEAT_BANDS REPEAT_BANDS
-              if(vflags.KBIN_VASP_RUN.flag("RELAX_STATIC_BANDS") || vflags.KBIN_VASP_RUN.flag("STATIC_BANDS") || vflags.KBIN_VASP_RUN.flag("RELAX_STATIC") || vflags.KBIN_VASP_REPEAT.flag("REPEAT_STATIC_BANDS") || vflags.KBIN_VASP_REPEAT.flag("REPEAT_BANDS")) {    // xvasp.RELAX>0
+              if(vflags.KBIN_VASP_RUN.flag("RELAX_STATIC_BANDS") || vflags.KBIN_VASP_RUN.flag("STATIC_BANDS") || vflags.KBIN_VASP_RUN.flag("RELAX_STATIC") || vflags.KBIN_VASP_REPEAT.flag("REPEAT_STATIC") || vflags.KBIN_VASP_REPEAT.flag("REPEAT_STATIC_BANDS") || vflags.KBIN_VASP_REPEAT.flag("REPEAT_BANDS")) {    // xvasp.RELAX>0 //CO20210315
                 vector<double> xvasp_spin_evolution;
                 xmatrix<double> rlattice(xvasp.str.lattice);
 
@@ -2188,6 +2218,7 @@ namespace KBIN {
                 if(vflags.KBIN_VASP_RUN.flag("RELAX_STATIC")) STRING_TO_SHOW="RELAX_STATIC";
                 if(vflags.KBIN_VASP_RUN.flag("RELAX_STATIC_BANDS")) STRING_TO_SHOW="RELAX_STATIC_BANDS";
                 if(vflags.KBIN_VASP_RUN.flag("STATIC_BANDS")) STRING_TO_SHOW="STATIC_BANDS";
+                if(vflags.KBIN_VASP_REPEAT.flag("REPEAT_STATIC")) STRING_TO_SHOW="REPEAT_STATIC"; //CO20210315
                 if(vflags.KBIN_VASP_REPEAT.flag("REPEAT_STATIC_BANDS")) STRING_TO_SHOW="REPEAT_STATIC_BANDS";
                 if(vflags.KBIN_VASP_REPEAT.flag("REPEAT_BANDS")) STRING_TO_SHOW="REPEAT_BANDS";
                 aus << "00000  MESSAGE MODE= (" << STRING_TO_SHOW << ") - " << xvasp.Directory << Message(_AFLOW_FILE_NAME_,aflags) << endl;
@@ -2252,9 +2283,43 @@ namespace KBIN {
                     xvasp.NRELAX=0;
                   }
                   xvasp.NRELAXING=xvasp.NRELAX;
-                } // vflags.KBIN_VASP_RUN.flag("RELAX_STATIC_BANDS") || vflags.KBIN_VASP_RUN.flag("STATIC_BANDS") || vflags.KBIN_VASP_RUN.flag("RELAX_STATIC")
+                } // vflags.KBIN_VASP_RUN.flag("RELAX_STATIC_BANDS") || vflags.KBIN_VASP_RUN.flag("STATIC_BANDS") || vflags.KBIN_VASP_RUN.flag("RELAX_STATIC") || vflags.KBIN_VASP_RUN.flag("STATIC")
+                // REPEAT_STATIC ----------------------------------------------------------------------------
+                if(vflags.KBIN_VASP_REPEAT.flag("REPEAT_STATIC")) {  //CO20210315
+                  // LOAD FORMER LOCK
+                  if(aurostd::FileExist(xvasp.Directory+string("/REPEAT_STATIC"))) {
+                    stringstream lock_recycled;
+                    aurostd::file2stringstream(xvasp.Directory+"/REPEAT_STATIC",lock_recycled);
+                    aus << "XXXXX ---------------------------------------------------------------------------------------------- " << endl;
+                    aus << "XXXXX FORMER LOCK BEGIN, recycled (" << STRING_TO_SHOW << ") - " << xvasp.Directory << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+                    //	aus << lock_recycled.str();
+                    aus << "XXXXX FORMER LOCK END, recycled (" << STRING_TO_SHOW << ") - " << xvasp.Directory << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+                    aus << "XXXXX ---------------------------------------------------------------------------------------------- " << endl;
+                    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+                  }
+                  // clean up worthless stuff
+                  aurostd::execute("cd "+xvasp.Directory+" && rm -f *static* "+DEFAULT_AFLOW_END_OUT+"*");  //CO20210315 - delete aflow.end.out for --monitor_vasp
+                  // UNZIP EVERYTHING
+                  for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed 
+                    // aurostd::execute("cd "+xvasp.Directory+" && "+"bzip2 -dfq *bz2 "); // ORIGINAL
+                    aus << "DEBUG - KBIN::VASP_Directory: EXT POINT [1] " << endl; aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);		  
+                    aurostd::execute(XHOST.vzip.at(iext)+" -dfq `find \""+aurostd::CleanFileName(xvasp.Directory)+"\" -name \"*"+XHOST.vext.at(iext)+"\"`");
+                  }		
+                  if(aurostd::FileExist(xvasp.Directory+string("/POSCAR.relax2"))) {
+                    KBIN::VASP_Recycle(xvasp,"relax2");
+                  } else {
+                    if(aurostd::FileExist(xvasp.Directory+string("/POSCAR.relax1"))) {
+                      KBIN::VASP_Recycle(xvasp,"relax1");
+                    } else {
+                      aus << "REPEAT_STATIC: RELAX2 or RELAX1 must be present.";
+                      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, aus.str(), _RUNTIME_ERROR_);
+                    }
+                  }
+                  //[CO20210315 - do before unzip]// clean up worthless stuff
+                  //[CO20210315 - do before unzip]aurostd::execute("cd "+xvasp.Directory+" && rm -f *static*");
+                } // vflags.KBIN_VASP_REPEAT.flag("REPEAT_STATIC")
                 // REPEAT_STATIC_BANDS PART ----------------------------------------------------------------------------
-                if(vflags.KBIN_VASP_REPEAT.flag("REPEAT_STATIC_BANDS")) {
+                if(vflags.KBIN_VASP_REPEAT.flag("REPEAT_STATIC_BANDS")) {  //CO20210315
                   // LOAD FORMER LOCK
                   if(aurostd::FileExist(xvasp.Directory+string("/REPEAT_STATIC_BANDS"))) {
                     stringstream lock_recycled;
@@ -2267,7 +2332,7 @@ namespace KBIN {
                     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
                   }
                   // clean up worthless stuff
-                  aurostd::execute("cd "+xvasp.Directory+" && rm -f *bands* *static* "+DEFAULT_AFLOW_END_OUT+"*");  //CO20210315 - delete aflow.end.out for --monitor_vasp
+                  aurostd::execute("cd "+xvasp.Directory+" && rm -f *static* *bands* "+DEFAULT_AFLOW_END_OUT+"*");  //CO20210315 - delete aflow.end.out for --monitor_vasp
                   // UNZIP EVERYTHING
                   for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed 
                     // aurostd::execute("cd "+xvasp.Directory+" && "+"bzip2 -dfq *bz2 "); // ORIGINAL
@@ -2285,7 +2350,7 @@ namespace KBIN {
                     }
                   }
                   //[CO20210315 - do before unzip]// clean up worthless stuff
-                  //[CO20210315 - do before unzip]aurostd::execute("cd "+xvasp.Directory+" && rm -f *bands* *static*");
+                  //[CO20210315 - do before unzip]aurostd::execute("cd "+xvasp.Directory+" && rm -f *static* *bands*");
                 } // vflags.KBIN_VASP_REPEAT.flag("REPEAT_STATIC_BANDS")
                 // REPEAT_BANDS PART ----------------------------------------------------------------------------
                 if(vflags.KBIN_VASP_REPEAT.flag("REPEAT_BANDS")) {
@@ -2323,7 +2388,7 @@ namespace KBIN {
                 // STATIC PART ----------------------------------------------------------------------------
                 // STATIC PART ----------------------------------------------------------------------------
                 // NOW DO THE STATIC PATCHING POSCAR
-                if(vflags.KBIN_VASP_RUN.flag("RELAX_STATIC_BANDS") || vflags.KBIN_VASP_RUN.flag("STATIC_BANDS") || vflags.KBIN_VASP_RUN.flag("RELAX_STATIC") || vflags.KBIN_VASP_REPEAT.flag("REPEAT_STATIC_BANDS") || vflags.KBIN_VASP_RUN.flag("STATIC")) {
+                if(vflags.KBIN_VASP_RUN.flag("RELAX_STATIC_BANDS") || vflags.KBIN_VASP_RUN.flag("STATIC_BANDS") || vflags.KBIN_VASP_RUN.flag("RELAX_STATIC") || vflags.KBIN_VASP_REPEAT.flag("REPEAT_STATIC") || vflags.KBIN_VASP_REPEAT.flag("REPEAT_STATIC_BANDS") || vflags.KBIN_VASP_RUN.flag("STATIC")) {
                   aus << "00000  MESSAGE Patching POSCAR " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
                   aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
                   vflags.KBIN_VASP_RUN.push("STATIC");        // force to suck them up from STATIC_KPPRA....
@@ -2335,15 +2400,16 @@ namespace KBIN {
                   rlattice=xvasp.str.lattice; // in rlattice I`ve always the final structure
                   bool STATIC_DEBUG=FALSE;//TRUE;
                   // RECREATE CONVENTIONAL OR PRIMITIVE
-                  if(vflags.KBIN_VASP_RUN.flag("RELAX_STATIC_BANDS") || vflags.KBIN_VASP_RUN.flag("STATIC_BANDS") || vflags.KBIN_VASP_REPEAT.flag("REPEAT_STATIC_BANDS")) {
+                  if(vflags.KBIN_VASP_RUN.flag("RELAX_STATIC_BANDS") || vflags.KBIN_VASP_RUN.flag("STATIC_BANDS") || vflags.KBIN_VASP_REPEAT.flag("REPEAT_STATIC") || vflags.KBIN_VASP_REPEAT.flag("REPEAT_STATIC_BANDS")) {
                     // shall we restandardize ?
                   }
                   //WSETYAWAN_LOOK
                   //    STATIC_DEBUG=TRUE;
-                  if(vflags.KBIN_VASP_RUN.flag("RELAX_STATIC_BANDS") || vflags.KBIN_VASP_RUN.flag("STATIC_BANDS") || vflags.KBIN_VASP_REPEAT.flag("REPEAT_STATIC_BANDS")) {
+                  if(vflags.KBIN_VASP_RUN.flag("RELAX_STATIC_BANDS") || vflags.KBIN_VASP_RUN.flag("STATIC_BANDS") || vflags.KBIN_VASP_REPEAT.flag("REPEAT_STATIC") || vflags.KBIN_VASP_REPEAT.flag("REPEAT_STATIC_BANDS")) {
                     if(STATIC_DEBUG) {aus << "STATIC_DEBUG: " << endl;}
                     if(STATIC_DEBUG) {aus << "STATIC_DEBUG: vflags.KBIN_VASP_RUN.flag(\"RELAX_STATIC_BANDS\")=" << vflags.KBIN_VASP_RUN.flag("RELAX_STATIC_BANDS") << endl;}
                     if(STATIC_DEBUG) {aus << "STATIC_DEBUG: vflags.KBIN_VASP_RUN.flag(\"STATIC_BANDS\")=" << vflags.KBIN_VASP_RUN.flag("STATIC_BANDS") << endl;}
+                    if(STATIC_DEBUG) {aus << "STATIC_DEBUG: vflags.KBIN_VASP_REPEAT.flag(\"REPEAT_STATIC\")=" << vflags.KBIN_VASP_REPEAT.flag("REPEAT_STATIC") << endl;}
                     if(STATIC_DEBUG) {aus << "STATIC_DEBUG: vflags.KBIN_VASP_REPEAT.flag(\"REPEAT_STATIC_BANDS\")=" << vflags.KBIN_VASP_REPEAT.flag("REPEAT_STATIC_BANDS") << endl;}
                     if(STATIC_DEBUG) {aus << "STATIC_DEBUG: vflags.KBIN_VASP_REPEAT.flag(\"REPEAT_BANDS\")=" << vflags.KBIN_VASP_REPEAT.flag("REPEAT_BANDS") << endl;}
                     if(STATIC_DEBUG) {aus << "STATIC_DEBUG: vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE.isentry=" << vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE.isentry << endl;}
@@ -2461,7 +2527,7 @@ namespace KBIN {
                   xvasp_spin_evolution.push_back(xvasp.str.qm_mag_atom); // keep track of spins
                   aus << "00000  MESSAGE RESULT SPIN=" << xvasp_spin_evolution.at(xvasp_spin_evolution.size()-1) << Message(_AFLOW_FILE_NAME_,aflags) << endl;
                   aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-                } // vflags.KBIN_VASP_RUN.flag("RELAX_STATIC_BANDS") || vflags.KBIN_VASP_RUN.flag("STATIC_BANDS") || vflags.KBIN_VASP_RUN.flag("RELAX_STATIC") || vflags.KBIN_VASP_REPEAT.flag("REPEAT_STATIC_BANDS")
+                } // vflags.KBIN_VASP_RUN.flag("RELAX_STATIC_BANDS") || vflags.KBIN_VASP_RUN.flag("STATIC_BANDS") || vflags.KBIN_VASP_RUN.flag("RELAX_STATIC") || vflags.KBIN_VASP_REPEAT.flag("REPEAT_STATIC") || vflags.KBIN_VASP_REPEAT.flag("REPEAT_STATIC_BANDS") || vflags.KBIN_VASP_RUN.flag("STATIC")
                 // BANDS PART ----------------------------------------------------------------------------
                 // BANDS PART ----------------------------------------------------------------------------
                 // BANDS PART ----------------------------------------------------------------------------
@@ -2647,7 +2713,7 @@ namespace KBIN {
                 aurostd::execute(xaus);
                 // done ....
                 //WSETYAWAN, you might ask something more here
-              } // vflags.KBIN_VASP_RUN.flag("RELAX_STATIC_BANDS") || vflags.KBIN_VASP_RUN.flag("STATIC_BANDS") || vflags.KBIN_VASP_REPEAT.flag("REPEAT_STATIC_BANDS") || vflags.KBIN_VASP_REPEAT.flag("REPEAT_BANDS")
+              } // vflags.KBIN_VASP_RUN.flag("RELAX_STATIC_BANDS") || vflags.KBIN_VASP_RUN.flag("STATIC_BANDS") || vflags.KBIN_VASP_RUN.flag("RELAX_STATIC") || vflags.KBIN_VASP_REPEAT.flag("REPEAT_STATIC") || vflags.KBIN_VASP_REPEAT.flag("REPEAT_STATIC_BANDS") || vflags.KBIN_VASP_REPEAT.flag("REPEAT_BANDS")
               // --------------------------------------------------------------------------------------------------------------------
               // --------------------------------------------------------------------------------------------------------------------
               // --------------------------------------------------------------------------------------------------------------------
@@ -3534,16 +3600,16 @@ namespace KBIN {
       apply_fix=false;
     }
     if(apply_fix && VERBOSE){
-      aus << "MMMMM  MESSAGE attempting to fix ERROR=\"" << error << "\" (mode=" << mode << ")" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);  //CO20210315 - do not reference submode after KBIN::XVASP_Afix(), (submode>=0?" (SUBMODE="+aurostd::utype2string(submode)+")":"")
+      aus << "MMMMM  MESSAGE attempting to fix ERROR=\"" << error << "\" (mode=\"" << mode << "\")" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);  //CO20210315 - do not reference submode after KBIN::XVASP_Afix(), (submode>=0?" (SUBMODE="+aurostd::utype2string(submode)+")":"")
     }
     //do not reference submode below KBIN::XVASP_Afix(), as it will have been incremented (perhaps by 2)
     //if KBIN::XVASP_Afix() fails, submode will be restored to original, so it is okay to reference for the LDEBUG statement
     if(apply_fix && !KBIN::XVASP_Afix(mode,submode,try_last_ditch_efforts,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE)){   //CO20210315
-      if(LDEBUG){aus << soliloquy << " KBIN::XVASP_Afix(mode=" << mode << (submode>=0?",submode="+aurostd::utype2string(submode):"") << ") failed" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}  //if KBIN::XVASP_Afix() fails, submode will be restored to original, so it is okay to reference for the LDEBUG statement
+      if(LDEBUG){aus << soliloquy << " KBIN::XVASP_Afix(mode=\"" << mode << "\"" << (submode>=0?",submode="+aurostd::utype2string(submode):"") << ") failed" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}  //if KBIN::XVASP_Afix() fails, submode will be restored to original, so it is okay to reference for the LDEBUG statement
       apply_fix=false;
     }
     if(apply_fix && VERBOSE){
-      aus << "MMMMM  MESSAGE fix applied for ERROR=\"" << error << "\" (mode=" << mode << ")" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);  //CO20210315 - do not reference submode after KBIN::XVASP_Afix(), (submode>=0?" (SUBMODE="+aurostd::utype2string(submode)+")":"")
+      aus << "MMMMM  MESSAGE fix applied for ERROR=\"" << error << "\" (mode=\"" << mode << "\")" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);  //CO20210315 - do not reference submode after KBIN::XVASP_Afix(), (submode>=0?" (SUBMODE="+aurostd::utype2string(submode)+")":"")
     }
     if(apply_fix){
       if(xvasp.aopts.flag("FLAG::AFIX_DRYRUN")==false){
@@ -3568,7 +3634,7 @@ namespace KBIN {
     bool try_last_ditch_efforts=true;
     uint i=0;
 
-    for(i=0;i<2&&fixed_applied==false;i++){
+    for(i=0;i<2&&fixed_applied==false;i++){ //for loop goes twice, once with try_last_ditch_efforts==false, then again with ==true
       try_last_ditch_efforts=(i==1);
 
       //check NBANDS/LRF_COMMUTATOR problems immediately
@@ -3625,7 +3691,7 @@ namespace KBIN {
       //[CO20210315 - do not apply patches for frozen calc]//CO20210315 - do last, fixes assume out-of-memory error
       //[CO20210315 - do not apply patches for frozen calc]fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("CALC_FROZEN","MEMORY",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
     }
-    
+
     //sometimes VASP will die after it prints the REACHED_ACCURACY state, but before the OUTCAR is finished (not sure why)
     //this is rare...
     //might be a threading/NFS issue
@@ -3640,9 +3706,11 @@ namespace KBIN {
     //print ALL first
     stringstream aus;
     if(xfixed.flag("ALL")){aus << "MMMMM  MESSAGE xfixed.flag(\"ALL\")=" << xfixed.flag("ALL") << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
-    for(uint i=0;i<xfixed.vxscheme.size();i++){
-      if(xfixed.vxscheme[i]=="ALL"){continue;}  //already done above
-      aus << "MMMMM  MESSAGE xfixed.flag(\""+xfixed.vxscheme[i]+"\")=" << xfixed.flag(xfixed.vxscheme[i]) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+    if(xfixed.flag("ALL") || XHOST.vflag_control.flag("MONITOR_VASP")==false){  //very important that we print all xfixed even if not "ALL" for LOCK file, --monitor_vasp reads the LOCK looking here. otherwise, only print if "ALL"
+      for(uint i=0;i<xfixed.vxscheme.size();i++){
+        if(xfixed.vxscheme[i]=="ALL"){continue;}  //already done above
+        aus << "MMMMM  MESSAGE xfixed.flag(\""+xfixed.vxscheme[i]+"\")=" << xfixed.flag(xfixed.vxscheme[i]) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+      }
     }
 
     return fixed_applied;

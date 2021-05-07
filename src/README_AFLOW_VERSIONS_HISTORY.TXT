@@ -40,6 +40,7 @@
         -- adding patch for EXIT CODE: 174 (MPICH174) (CO)
         -- adding patch for CALC_FROZEN (CO)
         -- patching initial NBANDS so it's commensurate with NPAR (CO)
+        -- added REPEAT_STATIC (CO)
 3.2.9 - 2021/05/05
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.9.tar.xz
         -- Fixed bug with APL overwriting *.orig files. (AS)
