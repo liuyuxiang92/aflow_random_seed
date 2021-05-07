@@ -2302,7 +2302,7 @@ namespace KBIN {
                   // UNZIP EVERYTHING
                   for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed 
                     // aurostd::execute("cd "+xvasp.Directory+" && "+"bzip2 -dfq *bz2 "); // ORIGINAL
-                    aus << "DEBUG - KBIN::VASP_Directory: EXT POINT [1] " << endl; aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);		  
+                    aus << "00000  MESSAGE attempting UNZIP=" << XHOST.vzip.at(iext) << endl; aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);		  
                     aurostd::execute(XHOST.vzip.at(iext)+" -dfq `find \""+aurostd::CleanFileName(xvasp.Directory)+"\" -name \"*"+XHOST.vext.at(iext)+"\"`");
                   }		
                   if(aurostd::FileExist(xvasp.Directory+string("/POSCAR.relax2"))) {
@@ -2336,7 +2336,7 @@ namespace KBIN {
                   // UNZIP EVERYTHING
                   for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed 
                     // aurostd::execute("cd "+xvasp.Directory+" && "+"bzip2 -dfq *bz2 "); // ORIGINAL
-                    aus << "DEBUG - KBIN::VASP_Directory: EXT POINT [1] " << endl; aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);		  
+                    aus << "00000  MESSAGE attempting UNZIP=" << XHOST.vzip.at(iext) << endl; aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);		  
                     aurostd::execute(XHOST.vzip.at(iext)+" -dfq `find \""+aurostd::CleanFileName(xvasp.Directory)+"\" -name \"*"+XHOST.vext.at(iext)+"\"`");
                   }		
                   if(aurostd::FileExist(xvasp.Directory+string("/POSCAR.relax2"))) {
@@ -2370,7 +2370,7 @@ namespace KBIN {
                   // UNZIP EVERYTHING
                   for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed 
                     // aurostd::execute("cd "+xvasp.Directory+" && "+"bzip2 -dfq *bz2 "); // ORIGINAL
-                    aus << "DEBUG - KBIN::VASP_Directory: EXT POINT [2] " << endl; aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);		  
+                    aus << "00000  MESSAGE attempting UNZIP=" << XHOST.vzip.at(iext) << endl; aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);		  
                     aurostd::execute(XHOST.vzip.at(iext)+" -dfq `find \""+aurostd::CleanFileName(xvasp.Directory)+"\" -name \"*"+XHOST.vext.at(iext)+"\"`");
                   }		
 
@@ -2748,7 +2748,7 @@ namespace KBIN {
                   // command.clear();command.str(std::string());  // ORIGINAL
                   // command << "cd " <<  xvasp.Directory << endl; command << "bzip2" << " -dfq *bz2 " << endl;  // ORIGINAL
                   // aurostd::execute(command);  // ORIGINAL
-                  aus << "DEBUG - KBIN::VASP_Directory: EXT POINT [3] " << endl; aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);		  
+                  aus << "00000  MESSAGE attempting UNZIP=" << XHOST.vzip.at(iext) << endl; aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);		  
                   aurostd::execute(XHOST.vzip.at(iext)+" -dfq `find \""+aurostd::CleanFileName(xvasp.Directory)+"\" -name \"*"+XHOST.vext.at(iext)+"\"`");
                 }		
 
@@ -3110,9 +3110,9 @@ namespace KBIN {
     vector<string> vtokens;
     
     //determine which schemes require xmessage.flag("REACHED_ACCURACY")
-    //CO+AS202010315 - added DENTET to this list, check...
+    //CO+AS202010315 - considering DENTET for this list, patches seem to be working. See: LIB3/CTa_pvTi_sv/ABC2_tP8_123_h_h_abg-001.ABC
     aurostd::xoption xRequiresAccuracy;
-    aurostd::string2tokens("DAV,DENTET,EDDRMM,IBZKPT,NUM_PROB,ZBRENT",vtokens,",");
+    aurostd::string2tokens("DAV,EDDRMM,IBZKPT,NUM_PROB,ZBRENT",vtokens,","); //DENTET,
     for(i=0;i<vtokens.size();i++){xRequiresAccuracy.flag(vtokens[i],true);}
 
     xwarning.clear(); //CO20210315 - very important to clear!
