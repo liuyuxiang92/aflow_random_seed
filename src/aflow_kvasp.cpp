@@ -740,10 +740,10 @@ namespace KBIN {
     // [OBSOLETE] vflags.KBIN_VASP_REPEAT_DELSOL       = aurostd::FileExist(aflags.Directory+string("/REPEAT_DELSOL")) || aurostd::substring2bool(AflowIn,"[VASP_RUN_REPEAT_DELSOL]") || aurostd::substring2bool(AflowIn,"[VASP_RUN]REPEAT_DELSOL]");
 
     vflags.KBIN_VASP_REPEAT.clear();
-    if(aurostd::FileExist(aflags.Directory+string("/REPEAT_STATIC")) || aurostd::substring2bool(AflowIn,"[VASP_RUN_REPEAT_STATIC]") || aurostd::substring2bool(AflowIn,"[VASP_RUN]REPEAT_STATIC")) vflags.KBIN_VASP_REPEAT.push("REPEAT_STATIC"); //CO20210315
-    if(aurostd::FileExist(aflags.Directory+string("/REPEAT_STATIC_BANDS")) || aurostd::substring2bool(AflowIn,"[VASP_RUN_REPEAT_STATIC_BANDS]") || aurostd::substring2bool(AflowIn,"[VASP_RUN]REPEAT_STATIC_BANDS")) vflags.KBIN_VASP_REPEAT.push("REPEAT_STATIC_BANDS"); //CO20210315 - fixing typo
-    if(aurostd::FileExist(aflags.Directory+string("/REPEAT_BANDS")) || aurostd::substring2bool(AflowIn,"[VASP_RUN_REPEAT_BANDS]") || aurostd::substring2bool(AflowIn,"[VASP_RUN]REPEAT_BANDS")) vflags.KBIN_VASP_REPEAT.push("REPEAT_BANDS"); //CO20210315 - fixing typo
-    if(aurostd::FileExist(aflags.Directory+string("/REPEAT_DELSOL")) || aurostd::substring2bool(AflowIn,"[VASP_RUN_REPEAT_DELSOL]") || aurostd::substring2bool(AflowIn,"[VASP_RUN]REPEAT_DELSOL")) vflags.KBIN_VASP_REPEAT.push("REPEAT_DELSOL"); //CO20210315 - fixing typo
+    if(aurostd::FileExist(aflags.Directory+string("/REPEAT_STATIC_BANDS")) || aurostd::substring2bool(AflowIn,"[VASP_RUN_REPEAT_STATIC_BANDS]") || aurostd::substring2bool(AflowIn,"[VASP_RUN]REPEAT_STATIC_BANDS")) vflags.KBIN_VASP_REPEAT.push("REPEAT_STATIC_BANDS"); //CO20210315 - fixing typo  //CO20210315 - needs to go BEFORE REPEAT_STATIC
+    else if(aurostd::FileExist(aflags.Directory+string("/REPEAT_STATIC")) || aurostd::substring2bool(AflowIn,"[VASP_RUN_REPEAT_STATIC]") || aurostd::substring2bool(AflowIn,"[VASP_RUN]REPEAT_STATIC")) vflags.KBIN_VASP_REPEAT.push("REPEAT_STATIC"); //CO20210315 - needs to go AFTER REPEAT_STATIC_BANDS
+    else if(aurostd::FileExist(aflags.Directory+string("/REPEAT_BANDS")) || aurostd::substring2bool(AflowIn,"[VASP_RUN_REPEAT_BANDS]") || aurostd::substring2bool(AflowIn,"[VASP_RUN]REPEAT_BANDS")) vflags.KBIN_VASP_REPEAT.push("REPEAT_BANDS"); //CO20210315 - fixing typo
+    else if(aurostd::FileExist(aflags.Directory+string("/REPEAT_DELSOL")) || aurostd::substring2bool(AflowIn,"[VASP_RUN_REPEAT_DELSOL]") || aurostd::substring2bool(AflowIn,"[VASP_RUN]REPEAT_DELSOL")) vflags.KBIN_VASP_REPEAT.push("REPEAT_DELSOL"); //CO20210315 - fixing typo
 
     if(vflags.KBIN_VASP_REPEAT.flag("REPEAT_STATIC")) cout << "vflags.KBIN_VASP_REPEAT.flag(\"REPEAT_STATIC\")" << endl;
     if(vflags.KBIN_VASP_REPEAT.flag("REPEAT_STATIC_BANDS")) cout << "vflags.KBIN_VASP_REPEAT.flag(\"REPEAT_STATIC_BANDS\")" << endl;
@@ -3037,8 +3037,8 @@ namespace KBIN {
     long int tmod_outcar=aurostd::SecondsSinceFileModified(xvasp.Directory+"/"+"OUTCAR"); //better to look at OUTCAR than vasp.out, when vasp is killed you get errors in vasp.out, resetting the time
     unsigned long long int fsize_vaspout=aurostd::FileSize(xvasp.Directory+"/"+DEFAULT_VASP_OUT);
     if(VERBOSE){
-      aus << soliloquy << " time since " << "OUTCAR" << " last modified: " << tmod_outcar << " seconds (max=" << SECONDS_STALE_OUTCAR << " seconds)" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-      aus << soliloquy << " size of " << DEFAULT_VASP_OUT << ": " << fsize_vaspout << " bytes (max=" << BYTES_MAX_VASP_OUT << " bytes)" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+      aus << "00000  MESSAGE time since " << "OUTCAR" << " last modified: " << tmod_outcar << " seconds (max=" << SECONDS_STALE_OUTCAR << " seconds)" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+      aus << "00000  MESSAGE size of " << DEFAULT_VASP_OUT << ": " << fsize_vaspout << " bytes (max=" << BYTES_MAX_VASP_OUT << " bytes)" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     }
 
     //CO20210315 - reading the full vasp.out does not work
@@ -3460,6 +3460,22 @@ namespace KBIN {
         }
       }
     }
+    //NUM_PROB and ZBRENT are soft errors, only fix if the OUTCAR is incomplete (and not if accuracy not reached)
+    //the ZBRENT patch (changing IBRION) may be beneficial
+    //conjugate gradient might fail too close to the minimum, so this patch might be good for relax2
+    //however, it has shown to steer other calculations in bad directions, leading to other warnings that cannot be fixed
+    //better not to over-correct
+    //better to check for convergence of the calculation later with --xplug
+    if(xwarning.flag("OUTCAR_INCOMPLETE")==false){
+      if(xwarning.flag("NUM_PROB")){
+        aus << "MMMMM  MESSAGE ignoring xwarning.flag(\"NUM_PROB\"): OUTCAR is complete (soft warning)" << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+        xwarning.flag("NUM_PROB",FALSE);
+      }
+      if(xwarning.flag("ZBRENT")){
+        aus << "MMMMM  MESSAGE ignoring xwarning.flag(\"ZBRENT\"): OUTCAR is complete (soft warning)" << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+        xwarning.flag("ZBRENT",FALSE);
+      }
+    }
     //[CO20210315 - OBSOLETE]//ZBRENT is a soft error, fix anything else first
     //[CO20210315 - OBSOLETE]if(xwarning.flag("ZBRENT") && 
     //[CO20210315 - OBSOLETE]    ((xwarning.flag("OUTCAR_INCOMPLETE")==false && xwarning.vxscheme.size()>1) || (xwarning.flag("OUTCAR_INCOMPLETE") && xwarning.vxscheme.size()>2))){
@@ -3698,7 +3714,8 @@ namespace KBIN {
     //this means any errors inside that require REACHED_ACCURACY will not be triggered
     //in this case, try restarting the calculation
     if(fixed_applied==false && xwarning.flag("CALC_FROZEN") && xmessage.flag("REACHED_ACCURACY") && xwarning.flag("OUTCAR_INCOMPLETE")){
-      fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("CALC_FROZEN","RESTART_CALC",false,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+      //[CO20210315 - not shown to work]fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("CALC_FROZEN","RESTART_CALC",false,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+      //not sure what to do here...
     }
     
     //print out all xfixed BEFORE adding "ALL"

@@ -4985,10 +4985,10 @@ namespace KBIN {
     }
 
     if(0) {
-      xvasp.INCAR << "#LDAU_SPECIES=";for(uint i=0;i<nspecies;i++) xvasp.INCAR << vLDAUspecies.at(i) << " ";xvasp.INCAR << " # LDAU species" << endl;
-      xvasp.INCAR << "LDAUL=";for(uint i=0;i<nspecies;i++) xvasp.INCAR << vLDAUL.at(i) << " ";xvasp.INCAR << " # l-quantum number for which the on site interaction is added (Default 2) automatic LDAUL table" << endl;
-      xvasp.INCAR << "LDAUU=";for(uint i=0;i<nspecies;i++) xvasp.INCAR << vLDAUU.at(i) << " ";xvasp.INCAR << " # UEFF parameter. Automatic LDAUU table" << endl;
-      xvasp.INCAR << "LDAUJ=";for(uint i=0;i<nspecies;i++) xvasp.INCAR << vLDAUJ.at(i) << " ";xvasp.INCAR << " # J parameter (if used). Automatic LDAUJ table" << endl;
+      xvasp.INCAR << "#LDAU_SPECIES=";for(uint i=0;i<nspecies;i++) xvasp.INCAR << vLDAUspecies.at(i) << " ";xvasp.INCAR << "# LDAU species" << endl;
+      xvasp.INCAR << "LDAUL=";for(uint i=0;i<nspecies;i++) xvasp.INCAR << vLDAUL.at(i) << " ";xvasp.INCAR << "# l-quantum number for which the on site interaction is added (Default 2) automatic LDAUL table" << endl;
+      xvasp.INCAR << "LDAUU=";for(uint i=0;i<nspecies;i++) xvasp.INCAR << vLDAUU.at(i) << " ";xvasp.INCAR << "# UEFF parameter. Automatic LDAUU table" << endl;
+      xvasp.INCAR << "LDAUJ=";for(uint i=0;i<nspecies;i++) xvasp.INCAR << vLDAUJ.at(i) << " ";xvasp.INCAR << "# J parameter (if used). Automatic LDAUJ table" << endl;
     }
 
     xvasp.INCAR << aurostd::PaddedPOST("LDAUTYPE="+aurostd::utype2string(type),_incarpad_) << " # Type of LDA+U." << endl;
@@ -6147,9 +6147,9 @@ namespace KBIN {
     //[CO20210315 - substring2bool() can match ENMAX=2 with ENMAX=20]if(aurostd::substring2bool(xvasp.INCAR,incar_input,true)){return false;}  //remove whitespaces
 
     KBIN::XVASP_INCAR_REMOVE_ENTRY(xvasp,"EFIELD_PEAD",function,vflags.KBIN_VASP_INCAR_VERBOSE);  //CO20200624
-    if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << " # Performing " << function << " [AFLOW] start" << endl;
+    if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# Performing " << function << " [AFLOW] start" << endl;
     xvasp.INCAR << aurostd::PaddedPOST(incar_input,_incarpad_) << " # " << function << endl;
-    if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << " # Performing " << function << " [AFLOW] end" << endl;
+    if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# Performing " << function << " [AFLOW] end" << endl;
 
     //[CO20210315 - avoid writing orig]xvasp.aopts.flag("FLAG::XVASP_INCAR_changed",TRUE); //CO20200624
     
@@ -6696,13 +6696,13 @@ namespace KBIN {
         //REMOVE LINES
         KBIN::XVASP_INCAR_REMOVE_ENTRY(xvasp,"IBRION,NELMIN,ADDGRID,EDIFFG,NSW",operation,vflags.KBIN_VASP_INCAR_VERBOSE); //CO20200624
         //ADD LINES
-        if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << " # Performing " << operation << " [AFLOW] start" << endl;
+        if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# Performing " << operation << " [AFLOW] start" << endl;
         xvasp.INCAR << aurostd::PaddedPOST(incar_input,_incarpad_) << " # " << operation << endl; //CO20200624
         xvasp.INCAR << aurostd::PaddedPOST("NELMIN=4",_incarpad_) << " # " << operation << endl; //CO20200624
         xvasp.INCAR << aurostd::PaddedPOST("ADDGRID=.TRUE.",_incarpad_) << " # " << operation << endl; //CO20200624
         xvasp.INCAR << aurostd::PaddedPOST("EDIFFG="+aurostd::utype2string(DEFAULT_VASP_PREC_EDIFFG,12),_incarpad_) << " # " << operation << endl; //CO20200624
         xvasp.INCAR << aurostd::PaddedPOST("NSW=100",_incarpad_) << " # " << operation << endl; //CO20200624
-        if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << " # Performing " << operation << " [AFLOW] end" << endl;
+        if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# Performing " << operation << " [AFLOW] end" << endl;
       }
       if(xvasp.aopts.flag("FLAG::AFIX_DRYRUN")==false){
         Krun=(Krun && aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR"))); //write out incar
@@ -6717,6 +6717,10 @@ namespace KBIN {
         }
       }
       //END - add fix to _AFLOWIN_ 
+    }
+    else if(fix=="RESTART_CALC") {
+      if(Krun && VERBOSE){aus << "MMMMM  MESSAGE attempting FIX=\"" << fix << "\"" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+      if(Krun && VERBOSE){aus << "MMMMM  MESSAGE applied FIX=\"" << fix << "\"" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
     }
     else if(fix=="SKIP_RUN") { //CO20210315
       if(Krun && VERBOSE){aus << "MMMMM  MESSAGE attempting FIX=\"" << fix << "\"" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
@@ -6951,7 +6955,7 @@ namespace KBIN {
         Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
-      if(submode==1){  //CO20210315 - try lowering NBANDS
+      if(submode==1){  //CO20210315 - try lowering NBANDS, worked for LIB2/LIB/Ca_svCr_pv/64
         fix="NBANDS--";
         if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
         Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
@@ -7170,7 +7174,7 @@ namespace KBIN {
     else if(mode=="RESTART_CALC") {
       fix="RESTART_CALC";
       if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
-      //simple restart of calc
+      Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
     }
     else if(mode=="RMM_DIIS") {
       //problems with RMM-DIIS, avoid VERYFAST
