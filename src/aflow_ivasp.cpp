@@ -6811,6 +6811,11 @@ namespace KBIN {
     bool LDEBUG=(FALSE || VERBOSE_MONITOR_VASP || _DEBUG_IVASP_ || XHOST.DEBUG);
     string soliloquy=XPID+"KBIN::XVASP_Afix_IgnoreFix():";
     
+    if(vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:ALL")){
+      if(LDEBUG){cerr << soliloquy << " vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:ALL\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:"+_fix) << endl;}
+      return true;
+    }
+
     if(vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:"+_fix)){
       if(LDEBUG){cerr << soliloquy << " vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:"+_fix+"\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:"+_fix) << endl;}
       return true;

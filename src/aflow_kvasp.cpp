@@ -1195,6 +1195,7 @@ namespace KBIN {
     vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.options2entry(BflowIn,string(_STROPT_+"IGNORE_AFIX="),aurostd_xoptionMULTI,""); // stack them all
     if(0) {
       //ERRORS
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:ALL\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ERROR:ALL") << endl;
       cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:BRMIX\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ERROR:BRMIX") << endl;
       cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:CSLOSHING\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ERROR:CSLOSHING") << endl;
       cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:CALC_FROZEN\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ERROR:CALC_FROZEN") << endl;
@@ -1235,6 +1236,11 @@ namespace KBIN {
       cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:ZBRENT\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ERROR:ZBRENT") << endl;
       cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:ZPOTRF\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ERROR:ZPOTRF") << endl;
       //FIXES
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:ALL\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:ALL") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:ALGO\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:ALGO") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:ALGO=FAST\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:ALGO=FAST") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:ALGO=NORMAL\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:ALGO=NORMAL") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:ALGO=VERYFAST\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:ALGO=VERYFAST") << endl;
       cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:AMIN\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:AMIN") << endl;
       cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:AMIN=0.01\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:AMIN=0.01") << endl;
       cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:AMIX\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:AMIX") << endl;
@@ -1242,10 +1248,7 @@ namespace KBIN {
       cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:BMIX\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:BMIX") << endl;
       cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:BMIX=0.01\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:BMIX=0.01") << endl;
       cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:BMIX=3\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:BMIX=3") << endl;  //CO20210315 - what to do about 3 vs. 3.0?
-      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:ALGO\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:ALGO") << endl;
-      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:ALGO=FAST\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:ALGO=FAST") << endl;
-      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:ALGO=NORMAL\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:ALGO=NORMAL") << endl;
-      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:ALGO=VERYFAST\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:ALGO=VERYFAST") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:EDIFF\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:EDIFF") << endl;
       cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:EFIELD_PEAD\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:EFIELD_PEAD") << endl;
       cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:ENMAX\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:ENMAX") << endl;
       cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:ISMEAR\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:ISMEAR") << endl;
@@ -1260,6 +1263,8 @@ namespace KBIN {
       cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:KPOINTS-=2\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:KPOINTS-=2") << endl;
       cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:LREAL\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:LREAL") << endl;
       cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:NBANDS\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:NBANDS") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:NBANDS++\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:NBANDS++") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:NBANDS--\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:NBANDS--") << endl;
       cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:NPAR\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:NPAR") << endl;
       cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:NPAR=1\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:NPAR=1") << endl;
       cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:NPAR=4\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:NPAR=4") << endl;
@@ -3609,6 +3614,10 @@ namespace KBIN {
     bool VERBOSE=(FALSE || XHOST.vflag_control.flag("MONITOR_VASP")==false || LDEBUG);
     if(apply_fix && xfixed.flag("ALL")){
       if(LDEBUG){aus << soliloquy << " xfixed.flag(\"ALL\")==TRUE: skipping " << error << " fix" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+      apply_fix=false;
+    }
+    if(apply_fix && vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ERROR:ALL")){
+      if(LDEBUG){aus << soliloquy << " vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:ALL\")==TRUE: skipping " << error << " fix" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
       apply_fix=false;
     }
     if(apply_fix && vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ERROR:"+error)){

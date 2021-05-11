@@ -1272,6 +1272,9 @@ IVDW=number_for_VASP_see_manual_for_IVDW
 
   Input options include:
 
+  ERROR:ALL
+    AFLOW will ignore all errors. This is equivalent to FIX:ALL.
+  
   ERROR:BRMIX
     The BRMIX error is triggered when the following text is found in the vasp.out: "BRMIX: very serious problems".
     AFLOW will apply the following change to the INCAR: ALGO=VERYFAST.
@@ -1283,8 +1286,7 @@ IVDW=number_for_VASP_see_manual_for_IVDW
   
   ERROR:CALC_FROZEN
     The CALC_FROZEN error is triggered when the OUTCAR has not modified for SECONDS_STALE_OUTCAR seconds (see README_AFLOW_AFLOWRC.TXT).
-    If no other errors occur, AFLOW assumes the calculation is frozen because the node experienced an out-of-memory error, and
-    apply patches for "ERROR:MEMORY".
+    If no other errors occur, AFLOW will skip the run.
 
   ERROR:DAV
     The DAV error is triggered when the required accuracy is not reached and the following text is found in the vasp.out: "WARNING: Sub-Space-Matrix is not hermitian in DAV".
@@ -1311,6 +1313,8 @@ IVDW=number_for_VASP_see_manual_for_IVDW
   ERROR:EXCCOR
     The EXCCOR error is triggered when the following text is found in the vasp.out: "ERROR FEXCF: supplied exchange-correlation table" or "ERROR FEXCP: supplied Exchange-correletion table".
     AFLOW will increase the volume of the structure by a factor of 1.2.
+    Should the error occur again, AFLOW will decrease the NBANDS.
+    Should the error occur again, AFLOW will continue to decrease the NBANDS until ERROR:NBANDS is triggered.
 
   ERROR:GAMMA_SHIFT
     The GAMMA_SHIFT error is triggered when the following text is found in the vasp.out: "shift your grid to Gamma".
@@ -1336,7 +1340,12 @@ IVDW=number_for_VASP_see_manual_for_IVDW
 
   ERROR:MEMORY
     The MEMORY error is triggered when an out-of-memory error is detected in the vasp.out (depends on the cluster).
-    AFLOW will reduce the KPOINTS mesh in all direction by 1.
+    AFLOW will divide NCPUS by two to allow more memory per process and
+    allocate all possible resources to VASP by executing the following command before executing VASP again: ulimit -s unlimited.
+    Should the error occur again, AFLOW will decrease the NBANDS.
+    Should the error occur again, AFLOW will continue to decrease the NBANDS until ERROR:NBANDS is triggered.
+    Should the error occur again, AFLOW will reduce the KPOINTS mesh in all direction by 1.
+    Should the error occur again, AFLOW will continue to reduce the KPOINTS mesh in all direction by 1.
     Should the error occur again, AFLOW will skip the run.
 
   ERROR:MPICH11
@@ -1346,6 +1355,11 @@ IVDW=number_for_VASP_see_manual_for_IVDW
   ERROR:MPICH139
     The MPICH139 error is triggered when the following text is found in the vasp.out: "BAD TERMINATION OF ONE OF YOUR APPLICATION PROCESSES" and "EXIT CODE: 139".
     AFLOW will reduce the KPOINTS mesh in all directions by 2 to maintain parity and 
+    allocate all possible resources to VASP by executing the following command before executing VASP again: ulimit -s unlimited.
+
+  ERROR:MPICH174
+    The MPICH174 error is triggered when the following text is found in the vasp.out: "BAD TERMINATION OF ONE OF YOUR APPLICATION PROCESSES" and "EXIT CODE: 174".
+    AFLOW will divide NCPUS by two to allow more memory per process and
     allocate all possible resources to VASP by executing the following command before executing VASP again: ulimit -s unlimited.
 
   ERROR:NATOMS
@@ -1362,6 +1376,7 @@ IVDW=number_for_VASP_see_manual_for_IVDW
     AFLOW will change the mixing parameters in the INCAR: AMIX=0.1 and BMIX=0.01.
     Should the error occur again, AFLOW will change the mixing parameters in the INCAR: BMIX=3 and AMIN=0.01.
     Should the error occur again, AFLOW will set NELM to MAX_VASP_NELM (see README_AFLOW_AFLOWRC.TXT).
+    Should the error occur again, AFLOW will set NELM to MAX_VASP_NELM (see README_AFLOW_AFLOWRC.TXT) while decreasing EDIFF by a factor of 10.
     
   ERROR:NIRMAT
     The NIRMAT error is triggered when the following text is found in the vasp.out: "Found some non-integer element in rotation matrix".
@@ -1453,10 +1468,25 @@ IVDW=number_for_VASP_see_manual_for_IVDW
     AFLOW will halve the default POTIM parameter (0.5) and apply it as an input in the INCAR.
     Should the error occur again, AFLOW will continue to halve POTIM until 
     Should the error occur again, AFLOW will half POTIM until it falls below 0.01.
-    Should the error occur again, AFLOW will half POTIM until it falls below 0.01.
     Should the error occur again, AFLOW will increase the volume of the structure by a factor of 1.05.
-    Should the error occur again, AFLOW will convert the structure to the standard conventional cell.
+    Should the error occur again, AFLOW will decrease the NBANDS.
+    Should the error occur again, AFLOW will continue to decrease the NBANDS until ERROR:NBANDS is triggered.
   
+  FIX:ALL
+    AFLOW will ignore all fixes. This is equivalent to ERROR:ALL.
+
+  FIX:ALGO
+    This input will avoid any ALGO fixes. Relevant errors: ERROR:BRMIX, ERROR:CSLOSHING, ERROR:DAV, ERROR:RMM_DIIS, .
+
+  FIX:ALGO=FAST
+    This input will avoid the ALGO=FAST fix. Relevant errors: ERROR:CSLOSHING, ERROR:DAV, ERROR:RMM_DIIS.
+
+  FIX:ALGO=NORMAL
+    This input will avoid the ALGO=NORMAL fix. Relevant errors: ERROR:CSLOSHING, ERROR:RMM_DIIS.
+
+  FIX:ALGO=VERYFAST
+    This input will avoid the ALGO=VERYFAST fix. Relevant errors: ERROR:BRMIX, ERROR:DAV.
+
   FIX:AMIN
     This input will avoid any AMIN fixes. Relevant errors: ERROR:NELM.
 
@@ -1478,17 +1508,8 @@ IVDW=number_for_VASP_see_manual_for_IVDW
   FIX:BMIX=3
     This input will avoid the BMIX=3 fix. Relevant errors: ERROR:NELM.
   
-  FIX:ALGO
-    This input will avoid any ALGO fixes. Relevant errors: ERROR:BRMIX, ERROR:CSLOSHING, ERROR:DAV, ERROR:RMM_DIIS, .
-
-  FIX:ALGO=FAST
-    This input will avoid the ALGO=FAST fix. Relevant errors: ERROR:CSLOSHING, ERROR:DAV, ERROR:RMM_DIIS.
-
-  FIX:ALGO=NORMAL
-    This input will avoid the ALGO=NORMAL fix. Relevant errors: ERROR:CSLOSHING, ERROR:RMM_DIIS.
-
-  FIX:ALGO=VERYFAST
-    This input will avoid the ALGO=VERYFAST fix. Relevant errors: ERROR:BRMIX, ERROR:DAV.
+  FIX:EDIFF
+    This input will avoid decreasing EDIFF. Relevant errors: ERROR:NELM.
 
   FIX:EFIELD_PEAD
     This input will avoid the EFIELD_PEAD fix. Relevant errors: ERROR:EFIELD_PEAD.
@@ -1529,8 +1550,11 @@ IVDW=number_for_VASP_see_manual_for_IVDW
   FIX:LREAL
     This input will avoid the LREAL fix. Relevant errors: ERROR:REAL_OPT, ERROR:REAL_OPTLAY_1.
   
-  FIX:NBANDS
-    This input will avoid the NBANDS fix. Relevant errors: ERROR:NBANDS.
+  FIX:NBANDS++
+    This input will avoid the NBANDS increase fix. Relevant errors: ERROR:NBANDS.
+  
+  FIX:NBANDS--
+    This input will avoid the NBANDS decrease fix. Relevant errors: ERROR:EXCCOR, ERROR:MEMORY, ERROR:ZPOTRF.
 
   FIX:NPAR
     This input will avoid any NPAR fixes. Relevant errors: ERROR:NPAR, ERROR:NPARC, ERROR:NPARN, ERROR:NPAR_REMOVE.
@@ -1573,6 +1597,9 @@ IVDW=number_for_VASP_see_manual_for_IVDW
 
   FIX:RELAX_MODE=FORCES
     This input will avoid the RELAX_MODE=FORCES fix. Relevant errors: ERROR:RMM_DIIS, ERROR:ZBRENT.
+  
+  FIX:RESTART_CALC
+    This input will avoid the restarting of the calculation with no changes to the input files.
 
   FIX:SKIP_RUN
     This input will avoid the SKIP_RUN fix. Relevant errors: ERROR:MEMORY.
