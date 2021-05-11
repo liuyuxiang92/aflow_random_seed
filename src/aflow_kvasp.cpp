@@ -3042,8 +3042,12 @@ namespace KBIN {
     long int tmod_outcar=aurostd::SecondsSinceFileModified(xvasp.Directory+"/"+"OUTCAR"); //better to look at OUTCAR than vasp.out, when vasp is killed you get errors in vasp.out, resetting the time
     unsigned long long int fsize_vaspout=aurostd::FileSize(xvasp.Directory+"/"+DEFAULT_VASP_OUT);
     if(VERBOSE){
-      aus << "00000  MESSAGE time since " << "OUTCAR" << " last modified: " << tmod_outcar << " seconds (max=" << SECONDS_STALE_OUTCAR << " seconds)" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-      aus << "00000  MESSAGE size of " << DEFAULT_VASP_OUT << ": " << fsize_vaspout << " bytes (max=" << BYTES_MAX_VASP_OUT << " bytes)" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+      aus << "00000  MESSAGE time since " << "OUTCAR" << " last modified: " << tmod_outcar << " seconds (max=" << SECONDS_STALE_OUTCAR << " seconds)" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+      if(LDEBUG){cerr << aus.str();}
+      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+      aus << "00000  MESSAGE size of " << DEFAULT_VASP_OUT << ": " << fsize_vaspout << " bytes (max=" << BYTES_MAX_VASP_OUT << " bytes)" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+      if(LDEBUG){cerr << aus.str();}
+      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     }
 
     //CO20210315 - reading the full vasp.out does not work
