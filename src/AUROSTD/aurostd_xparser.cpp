@@ -26,6 +26,26 @@ namespace aurostd {
     }
 
     if(capital_letters_only==false){
+      //from AFLOW.org database //CO20210315 - must come before .5 (removed below)
+      aurostd::RemoveSubStringInPlace(species,"pot_LDA/");
+      aurostd::RemoveSubStringInPlace(species,"pot_GGA/");
+      aurostd::RemoveSubStringInPlace(species,"pot_PBE/");
+      aurostd::RemoveSubStringInPlace(species,"potpaw_LDA/");
+      aurostd::RemoveSubStringInPlace(species,"potpaw_GGA/");
+      aurostd::RemoveSubStringInPlace(species,"potpaw_PBE/");
+      aurostd::RemoveSubStringInPlace(species,"potpaw_LDA.54/");
+      aurostd::RemoveSubStringInPlace(species,"potpaw_PBE.54/");
+
+      //general database  //CO20210315 - must come before .5 (removed below)
+      aurostd::RemoveSubStringInPlace(species,DEFAULT_VASP_POTCAR_DIR_POT_LDA+"/");
+      aurostd::RemoveSubStringInPlace(species,DEFAULT_VASP_POTCAR_DIR_POT_GGA+"/");
+      aurostd::RemoveSubStringInPlace(species,DEFAULT_VASP_POTCAR_DIR_POT_PBE+"/");
+      aurostd::RemoveSubStringInPlace(species,DEFAULT_VASP_POTCAR_DIR_POTPAW_LDA+"/");
+      aurostd::RemoveSubStringInPlace(species,DEFAULT_VASP_POTCAR_DIR_POTPAW_GGA+"/");
+      aurostd::RemoveSubStringInPlace(species,DEFAULT_VASP_POTCAR_DIR_POTPAW_PBE+"/");
+      aurostd::RemoveSubStringInPlace(species,DEFAULT_VASP_POTCAR_DIR_POTPAW_LDA_KIN+"/");
+      aurostd::RemoveSubStringInPlace(species,DEFAULT_VASP_POTCAR_DIR_POTPAW_PBE_KIN+"/");
+
       aurostd::RemoveSubStringInPlace(species,"_old");  //CO20190712 - potpaw_PBE/potpaw_PBE.20100506/Si_h_old
       aurostd::RemoveSubStringInPlace(species,".old");  //CO20190712 - potpaw_PBE/potpaw_PBE.20100506/Mg_pv.old
       aurostd::RemoveSubStringInPlace(species,"_vnew");  //CO20190712 - potpaw_PBE/potpaw_PBE.20100506/Pd_vnew
@@ -82,26 +102,6 @@ namespace aurostd {
       aurostd::RemoveSubStringInPlace(species,"-3");
       aurostd::RemoveSubStringInPlace(species,"-5");
       aurostd::RemoveSubStringInPlace(species,"-7");
-
-      //from AFLOW.org database
-      aurostd::RemoveSubStringInPlace(species,"pot_LDA/");
-      aurostd::RemoveSubStringInPlace(species,"pot_GGA/");
-      aurostd::RemoveSubStringInPlace(species,"pot_PBE/");
-      aurostd::RemoveSubStringInPlace(species,"potpaw_LDA/");
-      aurostd::RemoveSubStringInPlace(species,"potpaw_GGA/");
-      aurostd::RemoveSubStringInPlace(species,"potpaw_PBE/");
-      aurostd::RemoveSubStringInPlace(species,"potpaw_LDA.54/");
-      aurostd::RemoveSubStringInPlace(species,"potpaw_PBE.54/");
-
-      //general database
-      aurostd::RemoveSubStringInPlace(species,DEFAULT_VASP_POTCAR_DIR_POT_LDA+"/");
-      aurostd::RemoveSubStringInPlace(species,DEFAULT_VASP_POTCAR_DIR_POT_GGA+"/");
-      aurostd::RemoveSubStringInPlace(species,DEFAULT_VASP_POTCAR_DIR_POT_PBE+"/");
-      aurostd::RemoveSubStringInPlace(species,DEFAULT_VASP_POTCAR_DIR_POTPAW_LDA+"/");
-      aurostd::RemoveSubStringInPlace(species,DEFAULT_VASP_POTCAR_DIR_POTPAW_GGA+"/");
-      aurostd::RemoveSubStringInPlace(species,DEFAULT_VASP_POTCAR_DIR_POTPAW_PBE+"/");
-      aurostd::RemoveSubStringInPlace(species,DEFAULT_VASP_POTCAR_DIR_POTPAW_LDA_KIN+"/");
-      aurostd::RemoveSubStringInPlace(species,DEFAULT_VASP_POTCAR_DIR_POTPAW_PBE_KIN+"/");
 
       aurostd::RemoveSubStringInPlace(species,"__"); //CO20190712 - BEFORE _ - potpaw_LDA/potpaw_LDA.05May2010/Si_sv_GW__
       aurostd::RemoveSubStringInPlace(species,"_");  //CO20190712  //potpaw_LDA/potpaw_LDA.05May2010/Si_sv_GW_
@@ -231,8 +231,13 @@ namespace aurostd {
         loc2=input.find(vspecies[i],loc2+1);
       }
       if(LDEBUG){cerr << soliloquy << " loc1=" << loc1 << ", loc2=" << loc2 << endl;}
-      velements.push_back(input.substr(loc1,loc2-loc1));  //loc2-loc1 because it is the distance
-      loc1=loc2;
+      if(loc2==string::npos){ //CO20210315
+        velements.push_back(input.substr(loc1));
+        break;
+      }else{
+        velements.push_back(input.substr(loc1,loc2-loc1));  //loc2-loc1 because it is the distance
+        loc1=loc2;
+      }
     }
 
     if(LDEBUG){cerr << soliloquy << " velements=" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(velements,"\""),",") << endl;}
@@ -442,17 +447,41 @@ namespace aurostd {
     content.back() += "]";
   }
 
-  void JSONwriter::addVector(const string &key, const vector<string> &value)
+  void JSONwriter::addVector(const string &key, const xvector<double> &value, int precision,
+      bool roundoff, double tol) //DX20210308 - added xvector variant
   {
     content.push_back("\"" + key + "\":[");
-    content.back() += aurostd::joinWDelimiter(aurostd::wrapVecEntries(value, "\""), ",");
+    content.back() += aurostd::joinWDelimiter(
+        aurostd::xvecDouble2vecString(value, precision, roundoff, tol),",");
     content.back() += "]";
   }
 
-  void JSONwriter::addVector(const string &key, const deque<string> &value)
+  void JSONwriter::addVector(const string &key, const vector<string> &value, bool wrap) //DX20210301 - added wrap
   {
     content.push_back("\"" + key + "\":[");
-    content.back() += aurostd::joinWDelimiter(aurostd::wrapVecEntries(value, "\""), ",");
+    if(wrap){content.back() += aurostd::joinWDelimiter(aurostd::wrapVecEntries(value, "\""), ","); }
+    else{ content.back() += aurostd::joinWDelimiter(value, ","); }
+    content.back() += "]";
+  }
+
+  void JSONwriter::addVector(const string &key, const deque<string> &value, bool wrap) //DX20210301 - added wrap
+  {
+    content.push_back("\"" + key + "\":[");
+    if(wrap){content.back() += aurostd::joinWDelimiter(aurostd::wrapVecEntries(value, "\""), ","); }
+    else{ content.back() += aurostd::joinWDelimiter(value, ","); }
+    content.back() += "]";
+  }
+
+  void JSONwriter::addVector(const string &key, vector<JSONwriter> &value) //AS20210309
+  {
+    content.push_back("\"" + key + "\":[");
+    uint size = value.size();
+    if (size){
+      for (uint i=0; i<size-1; i++){
+        content.back() += value[i].toString() + ",";
+      }
+      content.back() += value[size-1].toString();
+    }
     content.back() += "]";
   }
 
@@ -496,6 +525,38 @@ namespace aurostd {
     content.back() += "]";
   }
 
+  void JSONwriter::addMatrix(const string &key, const xmatrix<double> &value,
+      int precision, bool roundoff, double tol) //DX20210308 - added xmatrix variant
+  {
+    content.push_back("\"" + key + "\":[");
+    content.back() += xmatDouble2String(value, precision, roundoff, tol);
+    content.back() += "]";
+  }
+
+  void JSONwriter::addMatrix(const string &key, const vector<vector<string> > &value) //DX20210211
+  {
+    content.push_back("\"" + key + "\":[");
+    vector<string> matrix;
+    for (uint i=0; i<value.size(); i++){
+      matrix.push_back("[" + aurostd::joinWDelimiter(
+            aurostd::wrapVecEntries(value[i],"\""), ",") + "]");
+    }
+    content.back() += aurostd::joinWDelimiter(matrix, ",");
+    content.back() += "]";
+  }
+
+  void JSONwriter::addMatrix(const string &key, const deque<deque<string> > &value) //DX20210211
+  {
+    content.push_back("\"" + key + "\":[");
+    vector<string> matrix;
+    for (uint i=0; i<value.size(); i++){
+      matrix.push_back("[" + aurostd::joinWDelimiter(
+            aurostd::wrapVecEntries(value[i],"\""), ",") + "]");
+    }
+    content.back() += aurostd::joinWDelimiter(matrix, ",");
+    content.back() += "]";
+  }
+
   //***************************************************************************
   void JSONwriter::addString(const string &key, const string &value)
   {
@@ -509,9 +570,24 @@ namespace aurostd {
   }
 
   //***************************************************************************
-  void JSONwriter::addRaw(const string &value)
+  void JSONwriter::mergeRawJSON(const string &value) //DX20210304 - changed name from addRaw to mergeRawJSON
   {
     content.push_back(value);
+  }
+
+  //***************************************************************************
+  /// Add null value to a key //DX20210301
+  void JSONwriter::addNull(const string &key)
+  {
+    content.push_back("\"" + key + "\":null");
+  }
+
+  //***************************************************************************
+  /// Add "raw" value for a particular key //DX20210301
+  /// Enables JSONs to be passed in as strings, e.g., xstructure2json()
+  void JSONwriter::addRawJSON(const string &key, const string& value)
+  {
+    content.push_back("\"" + key + "\":" + value);
   }
 
   //***************************************************************************
@@ -540,6 +616,195 @@ namespace aurostd {
   }
 }
 //AS20201214 END
+
+//***************************************************************************
+// BENCHMARK FOR JSONWriter //AS20210309
+//***************************************************************************
+// Comparing vector of strings vs vector of JSONs
+// Results from 20210309:
+//   vector of strings 474.436 ms
+//   vector of jsons   481.034 ms
+// Keeping benchmark to test any performance degredation with new objects
+// Need header<random> to run:
+
+//AS20210309 [BENCHMARK] #include <random>
+//AS20210309 [BENCHMARK] namespace aurostd {
+//AS20210309 [BENCHMARK] 	void test_vector_string(int niterations)
+//AS20210309 [BENCHMARK] 	{
+//AS20210309 [BENCHMARK] 		std::random_device rd;
+//AS20210309 [BENCHMARK] 		std::mt19937 mt(rd());
+//AS20210309 [BENCHMARK] 		std::uniform_int_distribution<int> dist(0,100);
+//AS20210309 [BENCHMARK]
+//AS20210309 [BENCHMARK] 		aurostd::JSONwriter json;
+//AS20210309 [BENCHMARK]
+//AS20210309 [BENCHMARK] 		vector<string> set;
+//AS20210309 [BENCHMARK] 		xvector<double> position;
+//AS20210309 [BENCHMARK] 		for(int i=0;i<niterations;i++){
+//AS20210309 [BENCHMARK] 			json.clear();
+//AS20210309 [BENCHMARK] 			position.clear();
+//AS20210309 [BENCHMARK]
+//AS20210309 [BENCHMARK] 			position(1) = dist(mt);
+//AS20210309 [BENCHMARK] 			position(2) = dist(mt);
+//AS20210309 [BENCHMARK] 			position(3) = dist(mt);
+//AS20210309 [BENCHMARK] 			json.addVector("position", position, _AFLOWLIB_DATA_GEOMETRY_PREC_);
+//AS20210309 [BENCHMARK] 			json.addString("name", "Al");
+//AS20210309 [BENCHMARK] 			json.addNumber("mulitiplicity", dist(mt));
+//AS20210309 [BENCHMARK] 			json.addString("Wyckoff_letter", "a");
+//AS20210309 [BENCHMARK] 			json.addString("site_symmetry",  "1");
+//AS20210309 [BENCHMARK] 			set.push_back(json.toString(true));
+//AS20210309 [BENCHMARK] 		}
+//AS20210309 [BENCHMARK]
+//AS20210309 [BENCHMARK] 		aurostd::JSONwriter json_out;
+//AS20210309 [BENCHMARK] 		json_out.addVector("test", set, false);
+//AS20210309 [BENCHMARK]
+//AS20210309 [BENCHMARK] 		//  cout << json_out.toString() << endl;
+//AS20210309 [BENCHMARK] 	}
+//AS20210309 [BENCHMARK]
+//AS20210309 [BENCHMARK] 	void test_vector_json(int niterations)
+//AS20210309 [BENCHMARK] 	{
+//AS20210309 [BENCHMARK] 		std::random_device rd;
+//AS20210309 [BENCHMARK] 		std::mt19937 mt(rd());
+//AS20210309 [BENCHMARK] 		std::uniform_int_distribution<int> dist(0,100);
+//AS20210309 [BENCHMARK]
+//AS20210309 [BENCHMARK] 		aurostd::JSONwriter json;
+//AS20210309 [BENCHMARK] 		vector<aurostd::JSONwriter> set;
+//AS20210309 [BENCHMARK]
+//AS20210309 [BENCHMARK] 		xvector<double> position;
+//AS20210309 [BENCHMARK] 		for(int i=0;i<niterations;i++){
+//AS20210309 [BENCHMARK] 			json.clear();
+//AS20210309 [BENCHMARK]
+//AS20210309 [BENCHMARK] 			position(1) = dist(mt);
+//AS20210309 [BENCHMARK] 			position(2) = dist(mt);
+//AS20210309 [BENCHMARK] 			position(3) = dist(mt);
+//AS20210309 [BENCHMARK] 			json.addVector("position", position, _AFLOWLIB_DATA_GEOMETRY_PREC_);
+//AS20210309 [BENCHMARK] 			json.addString("name", "Al");
+//AS20210309 [BENCHMARK] 			json.addNumber("mulitiplicity", dist(mt));
+//AS20210309 [BENCHMARK] 			json.addString("Wyckoff_letter", "a");
+//AS20210309 [BENCHMARK] 			json.addString("site_symmetry",  "1");
+//AS20210309 [BENCHMARK] 			set.push_back(json);
+//AS20210309 [BENCHMARK] 		}
+//AS20210309 [BENCHMARK]
+//AS20210309 [BENCHMARK] 		aurostd::JSONwriter json_out;
+//AS20210309 [BENCHMARK] 		json_out.addVector("test", set);
+//AS20210309 [BENCHMARK]
+//AS20210309 [BENCHMARK] 		//  cout << json_out.toString() << endl;
+//AS20210309 [BENCHMARK] 	}
+//AS20210309 [BENCHMARK]
+//AS20210309 [BENCHMARK] 	void run_vector_string_vs_json_test(void)
+//AS20210309 [BENCHMARK] 	{
+//AS20210309 [BENCHMARK] 		int num = 10000;
+//AS20210309 [BENCHMARK] 		int n_avg = 20;
+//AS20210309 [BENCHMARK]
+//AS20210309 [BENCHMARK] 		std::clock_t start, duration;
+//AS20210309 [BENCHMARK]
+//AS20210309 [BENCHMARK] 		for (int i=0; i<n_avg; i++){
+//AS20210309 [BENCHMARK] 			start = std::clock();
+//AS20210309 [BENCHMARK] 			test_vector_string(num);
+//AS20210309 [BENCHMARK] 			duration += std::clock() - start;
+//AS20210309 [BENCHMARK] 		}
+//AS20210309 [BENCHMARK] 		cout << "vector of strings " << 1000.0 * duration/CLOCKS_PER_SEC/n_avg << " ms\n";
+//AS20210309 [BENCHMARK]
+//AS20210309 [BENCHMARK] 		duration = 0;
+//AS20210309 [BENCHMARK] 		for (int i=0; i<n_avg; i++){
+//AS20210309 [BENCHMARK] 			start = std::clock();
+//AS20210309 [BENCHMARK] 			test_vector_json(num);
+//AS20210309 [BENCHMARK] 			duration += std::clock() - start;
+//AS20210309 [BENCHMARK] 		}
+//AS20210309 [BENCHMARK] 		cout << "vector of jsons " << 1000.0 * duration/CLOCKS_PER_SEC/n_avg << " ms\n";
+//AS20210309 [BENCHMARK] 	}
+//AS20210309 [BENCHMARK] }
+
+//ME2020408 - JSON reader
+//Moved from the AflowDB class
+namespace aurostd {
+
+  //extractJsonKeysAflow//////////////////////////////////////////////////////
+  // This function extracts keys from an aflowlib.json file. It is much
+  // faster than using SQLite's JSON extension, but was designed to only
+  // work for the aflowlib.json. It cannot handle nested JSONs!
+  vector<string> extractJsonKeysAflow(const string& json) {
+    vector<string> keys;
+    string substring = "";
+    string::size_type pos = 0, lastPos = 0, dpos = 0, quote1  = 0, quote2 = 0, colon = 0;
+
+    // Find the first comma - this is either the end of the key-value pair
+    // or part of an array. Either way, the key is inside.
+    pos = json.find(",");
+    lastPos = 1;  // First character is a curly brace, so skip
+    dpos = pos - lastPos;
+    while ((pos != string::npos) || (lastPos != string::npos)) {
+      // A comma could be separating a key-value pair an array
+      // or numbers or strings
+      substring = json.substr(lastPos, dpos);
+
+      // Find the colon - if there is no colon, it cannot be a key-value pair
+      colon = substring.find(":");
+      if (colon != string::npos) {
+        // A key is enclosed in quotes, so there must be at least two of them
+        quote1 = substring.find("\"");
+        if (quote1 != string::npos) {
+          quote2 = substring.find("\"", quote1 + 1);
+          // Most non-keys are filtered out by now. There could still be array
+          // elements left. In that case, however, the colon is between the quotes,
+          // so make sure that the first two quotes appear before the colon and
+          // take everything in-between as the key. This breaks if quotes, colons,
+          // and commas are inside a string in the right sequence, but should not
+          // be the case in AFLOW's JSON files.
+          if ((quote2 != string::npos) && (quote1 < colon) && (quote2 < colon)) {
+            substring = substring.substr(quote1 + 1, quote2 - quote1 - 1);
+            if (!substring.empty()) keys.push_back(substring);
+          }
+        }
+      }
+      // Move on to the next comma
+      lastPos = json.find_first_not_of(",", pos);
+      pos = json.find(",", lastPos);
+      dpos = pos - lastPos;
+    }
+    return keys;
+  }
+
+  //extractJsonValueAflow/////////////////////////////////////////////////////
+  // This function extracts values from an aflowlib.json file. It is much
+  // faster than using SQLite's JSON extension, but has was designed to only
+  // work for the aflowlib.json. It cannot handle nested JSONs!
+  string extractJsonValueAflow(const string& json, string key) {
+    string value = "";
+    key = "\"" + key + "\":";
+    string::size_type start = 0, end = 0;
+    start = json.find(key);
+    if (start != string::npos) {
+      start += key.length();
+      end = json.find("\":", start);
+      if (end != string::npos) {
+        // In case there is any white space between key and value
+        value = aurostd::RemoveWhiteSpacesFromTheFront(json.substr(start, end - start));
+        // If we have a nested object, "value" should only be '{' + white space by now.
+        if (value[0] == '{') {
+          string function = XPID + "aurostd::extractJsonValueAflow():";
+          string message = "JSON parser cannot read nested objects.";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
+        }
+        end = value.find_last_of(",");
+        value = value.substr(0, end);
+      } else {
+        end = json.find("}", start);
+        // In case there is any white space between key and value
+        value = aurostd::RemoveWhiteSpacesFromTheFront(json.substr(start, end - start));
+        // If we have a nested object, it should start with '{'
+        if (value[0] == '{') {
+          string function = XPID + "aurostd::extractJsonValueAflow():";
+          string message = "JSON parser cannot read nested objects.";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
+        }
+      }
+    } else {
+      value = "";
+    }
+    return value;
+  }
+
+}
 
 #endif // _AUROSTD_XPARSER_CPP_
 

@@ -285,6 +285,7 @@ class XtalFinderCalculator : public xStream {
         bool optimize_match);
     vector<StructurePrototype> compareStructuresFromStructureList(const vector<string>& filenames, vector<string>& magmoms_for_systems, uint num_proc, bool same_species, const aurostd::xoption& comparison_options); //DX20200103 - condensed bools to xoptions
     vector<StructurePrototype> compareStructuresFromDirectory(const string& directory, vector<string>& magmoms_for_systems, uint num_proc, bool same_species, const aurostd::xoption& comparison_options); //DX20200103 - condensed bools to xoptions
+    vector<StructurePrototype> compareStructuresFromString(const string& structures_string, vector<string>& magmoms_for_systems, uint num_proc, bool same_species, const aurostd::xoption& comparison_options); //ME202010206
     vector<StructurePrototype> compareStructuresFromFile(const string& filename, vector<string>& magmoms_for_systems, uint num_proc, bool same_species, const aurostd::xoption& comparison_options); //DX20200103 - condensed bools to xoptions
 
     // ---------------------------------------------------------------------------
@@ -365,6 +366,7 @@ class XtalFinderCalculator : public xStream {
     void loadStructuresFromStructureList(const vector<string>& filenames, const vector<string>& magmoms_for_systems, bool same_species); //DX20190424 //DX20190801 - added vector<string>& magmoms_for_systems //DX20191122 - added ostream and consts
     void loadStructuresFromDirectory(const string& directory, const vector<string>& magmoms_for_systems, bool same_species); //DX20190424 //DX20190801 - added vector<string>& magmoms_for_systems //DX20191122 - added ostream and consts
     void loadStructuresFromFile(const string& filename, const vector<string>& magmoms_for_systems, bool same_species); //DX20190424 //DX20190801 - added vector<string>& magmoms_for_systems //DX20191122 - added ostream and consts
+    void loadStructuresFromStringstream(stringstream& input_stream, const vector<string>& magmoms_for_systems, bool same_species); //ME20210206
     void loadStructuresFromAflowlibEntries(const vector<aflowlib::_aflowlib_entry>& entries, const vector<string>& magmoms_for_systems, bool same_species); //DX20201201
 
     // ---------------------------------------------------------------------------
@@ -567,6 +569,7 @@ class XtalFinderCalculator : public xStream {
 namespace compare{
   // ---------------------------------------------------------------------------
   // pair-wise comparisons (for use by other AFLOW processes) 
+  string compareInputStructures(aurostd::xoption& vpflow, std::istream& cin, ostream& logstream=cout); //ME20210206
   string compareInputStructures(const aurostd::xoption& vpflow, ostream& logstream=cout); //DX //DX20190425
   bool aflowCompareStructure(const xstructure& xstr1, const xstructure& xstr2, bool same_species, bool scale_volume, bool optimize_match, double& final_misfit, uint num_proc=1); //Main function //DX20191108 - remove const & from bools
   bool aflowCompareStructure(const xstructure& xstr1, const xstructure& xstr2, bool same_species, bool scale_volume, bool optimize_match, double& final_misfit, structure_mapping_info& final_misfit_info, uint num_proc=1); //Main function //DX20191108 - remove const & from bools 
@@ -606,6 +609,8 @@ namespace compare{
   vector<StructurePrototype> compare2prototypes(istream& input, const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream=cout); //DX20181004 //DX20190314 - changed return value
   string printMatchingPrototypes(istream& cin, const aurostd::xoption& vpflow); //DX20190314
   vector<string> getMatchingPrototypes(xstructure& xstr, const string& catalog); //DX20190314
+  vector<string> getMatchingPrototypes(xstructure& xstr, const string& catalog); //DX20190314
+  vector<string> getMatchingPrototypes(xstructure& xstr, const aurostd::xoption& vpflow, const string& catalog); //DX20210421
 
   // ---------------------------------------------------------------------------
   // permutaion comparisons

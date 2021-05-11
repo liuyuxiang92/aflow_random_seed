@@ -116,7 +116,7 @@ namespace KBIN {
 }
 
 namespace KBIN {
-  bool VASP_Write_INPUT(_xvasp& xvasp,_vflags &vflags) {        // AFLOW_FUNCTION_IMPLEMENTATION
+  bool VASP_Write_INPUT(_xvasp& xvasp,_vflags &vflags,const string& ext_module) {        // AFLOW_FUNCTION_IMPLEMENTATION
     string soliloquy=XPID+"KBIN::VASP_Write_INPUT():";
     ifstream DirectoryStream;
     DirectoryStream.open(xvasp.Directory.c_str(),std::ios::in);
@@ -142,10 +142,11 @@ namespace KBIN {
     if(Krun) Krun=(Krun && VASP_Write_ppAUID_AFLOWIN(xvasp.Directory,xvasp.POTCAR_AUID,xvasp.str.species));
 
     // VASP BACKUP VASP WRITE
-    if(Krun && xvasp.aopts.flag("FLAG::XVASP_POSCAR_changed"))  Krun=(Krun && aurostd::stringstream2file(xvasp.POSCAR_orig,string(xvasp.Directory+"/POSCAR.orig")));
-    if(Krun && xvasp.aopts.flag("FLAG::XVASP_INCAR_changed"))   Krun=(Krun && aurostd::stringstream2file(xvasp.INCAR_orig,string(xvasp.Directory+"/INCAR.orig")));
-    if(Krun && xvasp.aopts.flag("FLAG::XVASP_KPOINTS_changed")) Krun=(Krun && aurostd::stringstream2file(xvasp.KPOINTS_orig,string(xvasp.Directory+"/KPOINTS.orig")));
-    if(Krun && xvasp.aopts.flag("FLAG::XVASP_POTCAR_changed"))  Krun=(Krun && aurostd::stringstream2file(xvasp.POTCAR_orig,string(xvasp.Directory+"/POTCAR.orig")));
+    if(Krun && xvasp.aopts.flag("FLAG::XVASP_POSCAR_changed"))  Krun=(Krun && aurostd::stringstream2file(xvasp.POSCAR_orig,string(xvasp.Directory+"/POSCAR.orig"+ext_module)));
+    if(Krun && xvasp.aopts.flag("FLAG::XVASP_INCAR_changed"))   Krun=(Krun && aurostd::stringstream2file(xvasp.INCAR_orig,string(xvasp.Directory+"/INCAR.orig"+ext_module)));
+    if(Krun && xvasp.aopts.flag("FLAG::XVASP_KPOINTS_changed")) Krun=(Krun && aurostd::stringstream2file(xvasp.KPOINTS_orig,string(xvasp.Directory+"/KPOINTS.orig"+ext_module)));
+    if(Krun && xvasp.aopts.flag("FLAG::XVASP_POTCAR_changed"))  Krun=(Krun && aurostd::stringstream2file(xvasp.POTCAR_orig,string(xvasp.Directory+"/POTCAR.orig"+ext_module)));
+    // AS20210302 adding ext_module to be able to distinguish between different orig files (for example, we do not want APL to overwrite an existing POSCAR.orig file)
 
     if(vflags.KBIN_VASP_INCAR_VERBOSE) {;} // DUMMY
 
@@ -4876,28 +4877,49 @@ namespace KBIN {
     if(LDEBUG) cout << XPID << "KBIN::XVASP_KPOINTS_OPERATION  xvasp.str.kpoints_s*=(" << xvasp.str.kpoints_s1 << "," << xvasp.str.kpoints_s2 << "," << xvasp.str.kpoints_s3 << ")" << endl;
     if(LDEBUG) cout << XPID << "KBIN::XVASP_KPOINTS_OPERATION  xvasp.str.kpoints_kscheme=*=(" << xvasp.str.kpoints_kscheme << ")" << endl;
     uint i=0;
-    if(aurostd::substring2bool(operation,"X--")) {i++;xvasp.str.kpoints_k1--;if(LDEBUG) cout << "X-- k1=" << xvasp.str.kpoints_k1 << endl;}
-    if(aurostd::substring2bool(operation,"Y--")) {i++;xvasp.str.kpoints_k2--;if(LDEBUG) cout << "Y-- k2=" << xvasp.str.kpoints_k2 << endl;}
-    if(aurostd::substring2bool(operation,"Z--")) {i++;xvasp.str.kpoints_k3--;if(LDEBUG) cout << "Z-- k3=" << xvasp.str.kpoints_k3 << endl;}
-    if(aurostd::substring2bool(operation,"X++")) {i++;xvasp.str.kpoints_k1++;if(LDEBUG) cout << "X++ k1=" << xvasp.str.kpoints_k1 << endl;}
-    if(aurostd::substring2bool(operation,"Y++")) {i++;xvasp.str.kpoints_k2++;if(LDEBUG) cout << "Y++ k2=" << xvasp.str.kpoints_k2 << endl;}
-    if(aurostd::substring2bool(operation,"Z++")) {i++;xvasp.str.kpoints_k3++;if(LDEBUG) cout << "Z++ k3=" << xvasp.str.kpoints_k3 << endl;}
-    if(aurostd::substring2bool(operation,"Xeven")) {i++;if(_isodd(xvasp.str.kpoints_k1)) {xvasp.str.kpoints_k1++;xvasp.str.kpoints_s1=0.0;if(LDEBUG) cout << "Xeven k1=" << xvasp.str.kpoints_k1 << endl;}}
-    if(aurostd::substring2bool(operation,"Yeven")) {i++;if(_isodd(xvasp.str.kpoints_k2)) {xvasp.str.kpoints_k2++;xvasp.str.kpoints_s2=0.0;if(LDEBUG) cout << "Yeven k2=" << xvasp.str.kpoints_k2 << endl;}}
-    if(aurostd::substring2bool(operation,"Zeven")) {i++;if(_isodd(xvasp.str.kpoints_k3)) {xvasp.str.kpoints_k3++;xvasp.str.kpoints_s3=0.0;if(LDEBUG) cout << "Zeven k3=" << xvasp.str.kpoints_k3 << endl;}}
-    if(aurostd::substring2bool(operation,"Xodd")) {i++;if(_iseven(xvasp.str.kpoints_k1)) {xvasp.str.kpoints_k1++;xvasp.str.kpoints_s1=0.0;if(LDEBUG) cout << "Xeven k1=" << xvasp.str.kpoints_k1 << endl;}}
-    if(aurostd::substring2bool(operation,"Yodd")) {i++;if(_iseven(xvasp.str.kpoints_k2)) {xvasp.str.kpoints_k2++;xvasp.str.kpoints_s2=0.0;if(LDEBUG) cout << "Yeven k2=" << xvasp.str.kpoints_k2 << endl;}}
-    if(aurostd::substring2bool(operation,"Zodd")) {i++;if(_iseven(xvasp.str.kpoints_k3)) {xvasp.str.kpoints_k3++;xvasp.str.kpoints_s3=0.0;if(LDEBUG) cout << "Zeven k3=" << xvasp.str.kpoints_k3 << endl;}}
-    if(aurostd::substring2bool(operation,"Xevenshift")) {i++;if(_iseven(xvasp.str.kpoints_k1)) xvasp.str.kpoints_s1=0.5; else xvasp.str.kpoints_s1=0.0;if(LDEBUG) cout << "Xevenshift s1=" << xvasp.str.kpoints_s1 << endl;}
-    if(aurostd::substring2bool(operation,"Yevenshift")) {i++;if(_iseven(xvasp.str.kpoints_k2)) xvasp.str.kpoints_s2=0.5; else xvasp.str.kpoints_s2=0.0;if(LDEBUG) cout << "Yevenshift s2=" << xvasp.str.kpoints_s2 << endl;}
-    if(aurostd::substring2bool(operation,"Zevenshift")) {i++;if(_iseven(xvasp.str.kpoints_k3)) xvasp.str.kpoints_s3=0.5; else xvasp.str.kpoints_s3=0.0;if(LDEBUG) cout << "Zevenshift s3=" << xvasp.str.kpoints_s3 << endl;}
-    if(aurostd::substring2bool(operation,"Xoddshift")) {i++;if(_isodd(xvasp.str.kpoints_k1)) xvasp.str.kpoints_s1=0.5; else xvasp.str.kpoints_s1=0.0;if(LDEBUG) cout << "Xoddshift s1=" << xvasp.str.kpoints_s1 << endl;}
-    if(aurostd::substring2bool(operation,"Yoddshift")) {i++;if(_isodd(xvasp.str.kpoints_k2)) xvasp.str.kpoints_s2=0.5; else xvasp.str.kpoints_s2=0.0;if(LDEBUG) cout << "Yoddshift s2=" << xvasp.str.kpoints_s2 << endl;}
-    if(aurostd::substring2bool(operation,"Zoddshift")) {i++;if(_isodd(xvasp.str.kpoints_k3)) xvasp.str.kpoints_s3=0.5; else xvasp.str.kpoints_s3=0.0;if(LDEBUG) cout << "Zoddshift s3=" << xvasp.str.kpoints_s3 << endl;}
-    if(operation.at(0)=='M' || operation.at(0)=='m') {i++;xvasp.str.kpoints_kscheme="Monkhorst-Pack";if(LDEBUG) cout << "Monkhorst-Pack" << endl;} // "Monkhorst-Pack";
-    if(operation.at(0)=='G' || operation.at(0)=='g') {i++;xvasp.str.kpoints_kscheme="Gamma";if(LDEBUG) cout << "Gamma" << endl;} // "Gamma";
-    if(aurostd::substring2bool(operation,"Monkhorst-Pack")) {i++;xvasp.str.kpoints_kscheme="Monkhorst-Pack";if(LDEBUG) cout << "Monkhorst-Pack" << endl;} // "Monkhorst-Pack";
-    if(aurostd::substring2bool(operation,"Gamma")) {i++;xvasp.str.kpoints_kscheme="Gamma";if(LDEBUG) cout << "Gamma" << endl;} // "Gamma";
+    bool change_made=false; //CO20210201
+    //CO20210304 - some notes about change_made
+    //this function tries to make modifications to VASP files based on an input (e.g., make Xeven).
+    //it never checks whether the change was actually made (what if X was already even?).
+    //change_made is a local variable to facilitate what to do in such cases.
+    //it's a bit complicated because you could request Xeven,Yeven,Zeven and you could have one of them change, some of them change, or none of them change.
+    //if there is any change at all, the function is considered successful.
+    //if there is no change, then the function tries to change the whole set (X,Y,Z).
+    //the goal is to prevent aflow from spinning its wheels on an identical input.
+    if(operation.find("X--")) {i++;xvasp.str.kpoints_k1--;change_made=true;if(LDEBUG) cout << "X-- k1=" << xvasp.str.kpoints_k1 << endl;}
+    if(operation.find("Y--")) {i++;xvasp.str.kpoints_k2--;change_made=true;if(LDEBUG) cout << "Y-- k2=" << xvasp.str.kpoints_k2 << endl;}
+    if(operation.find("Z--")) {i++;xvasp.str.kpoints_k3--;change_made=true;if(LDEBUG) cout << "Z-- k3=" << xvasp.str.kpoints_k3 << endl;}
+    if(operation.find("X++")) {i++;xvasp.str.kpoints_k1++;change_made=true;if(LDEBUG) cout << "X++ k1=" << xvasp.str.kpoints_k1 << endl;}
+    if(operation.find("Y++")) {i++;xvasp.str.kpoints_k2++;change_made=true;if(LDEBUG) cout << "Y++ k2=" << xvasp.str.kpoints_k2 << endl;}
+    if(operation.find("Z++")) {i++;xvasp.str.kpoints_k3++;change_made=true;if(LDEBUG) cout << "Z++ k3=" << xvasp.str.kpoints_k3 << endl;}
+    change_made=false;  //reset for Xeven/Xodd/etc.
+    if(operation.find("Xeven")) {i++;if(_isodd(xvasp.str.kpoints_k1)) {xvasp.str.kpoints_k1++;xvasp.str.kpoints_s1=0.0;change_made=true;if(LDEBUG) cout << "Xeven k1=" << xvasp.str.kpoints_k1 << endl;}}
+    if(operation.find("Yeven")) {i++;if(_isodd(xvasp.str.kpoints_k2)) {xvasp.str.kpoints_k2++;xvasp.str.kpoints_s2=0.0;change_made=true;if(LDEBUG) cout << "Yeven k2=" << xvasp.str.kpoints_k2 << endl;}}
+    if(operation.find("Zeven")) {i++;if(_isodd(xvasp.str.kpoints_k3)) {xvasp.str.kpoints_k3++;xvasp.str.kpoints_s3=0.0;change_made=true;if(LDEBUG) cout << "Zeven k3=" << xvasp.str.kpoints_k3 << endl;}}
+    if(!change_made&&(operation.find("Xeven")||operation.find("Yeven")||operation.find("Zeven"))){  //CO20210201 - was already even before, increment by 2
+      if(operation.find("Xeven")) {i++;xvasp.str.kpoints_k1+=2;xvasp.str.kpoints_s1=0.0;change_made=true;if(LDEBUG) cout << "Xeven k1=" << xvasp.str.kpoints_k1 << endl;}
+      if(operation.find("Yeven")) {i++;xvasp.str.kpoints_k2+=2;xvasp.str.kpoints_s2=0.0;change_made=true;if(LDEBUG) cout << "Yeven k2=" << xvasp.str.kpoints_k2 << endl;}
+      if(operation.find("Zeven")) {i++;xvasp.str.kpoints_k3+=2;xvasp.str.kpoints_s3=0.0;change_made=true;if(LDEBUG) cout << "Zeven k3=" << xvasp.str.kpoints_k3 << endl;}
+    }
+    change_made=false;  //reset for Xeven/Xodd/etc.
+    if(operation.find("Xodd")) {i++;if(_iseven(xvasp.str.kpoints_k1)) {xvasp.str.kpoints_k1++;xvasp.str.kpoints_s1=0.0;change_made=true;if(LDEBUG) cout << "Xodd k1=" << xvasp.str.kpoints_k1 << endl;}}
+    if(operation.find("Yodd")) {i++;if(_iseven(xvasp.str.kpoints_k2)) {xvasp.str.kpoints_k2++;xvasp.str.kpoints_s2=0.0;change_made=true;if(LDEBUG) cout << "Yodd k2=" << xvasp.str.kpoints_k2 << endl;}}
+    if(operation.find("Zodd")) {i++;if(_iseven(xvasp.str.kpoints_k3)) {xvasp.str.kpoints_k3++;xvasp.str.kpoints_s3=0.0;change_made=true;if(LDEBUG) cout << "Zodd k3=" << xvasp.str.kpoints_k3 << endl;}}
+    if(!change_made&&(operation.find("Xodd")||operation.find("Yodd")||operation.find("Zodd"))){  //CO20210201 - was already odd before, increment by 2
+      if(operation.find("Xodd")) {i++;xvasp.str.kpoints_k1+=2;xvasp.str.kpoints_s1=0.0;change_made=true;if(LDEBUG) cout << "Xodd k1=" << xvasp.str.kpoints_k1 << endl;}
+      if(operation.find("Yodd")) {i++;xvasp.str.kpoints_k2+=2;xvasp.str.kpoints_s2=0.0;change_made=true;if(LDEBUG) cout << "Yodd k2=" << xvasp.str.kpoints_k2 << endl;}
+      if(operation.find("Zodd")) {i++;xvasp.str.kpoints_k3+=2;xvasp.str.kpoints_s3=0.0;change_made=true;if(LDEBUG) cout << "Zodd k3=" << xvasp.str.kpoints_k3 << endl;}
+    }
+    if(operation.find("Xevenshift")) {i++;if(_iseven(xvasp.str.kpoints_k1)) xvasp.str.kpoints_s1=0.5; else xvasp.str.kpoints_s1=0.0;change_made=true;if(LDEBUG) cout << "Xevenshift s1=" << xvasp.str.kpoints_s1 << endl;}
+    if(operation.find("Yevenshift")) {i++;if(_iseven(xvasp.str.kpoints_k2)) xvasp.str.kpoints_s2=0.5; else xvasp.str.kpoints_s2=0.0;change_made=true;if(LDEBUG) cout << "Yevenshift s2=" << xvasp.str.kpoints_s2 << endl;}
+    if(operation.find("Zevenshift")) {i++;if(_iseven(xvasp.str.kpoints_k3)) xvasp.str.kpoints_s3=0.5; else xvasp.str.kpoints_s3=0.0;change_made=true;if(LDEBUG) cout << "Zevenshift s3=" << xvasp.str.kpoints_s3 << endl;}
+    if(operation.find("Xoddshift")) {i++;if(_isodd(xvasp.str.kpoints_k1)) xvasp.str.kpoints_s1=0.5; else xvasp.str.kpoints_s1=0.0;change_made=true;if(LDEBUG) cout << "Xoddshift s1=" << xvasp.str.kpoints_s1 << endl;}
+    if(operation.find("Yoddshift")) {i++;if(_isodd(xvasp.str.kpoints_k2)) xvasp.str.kpoints_s2=0.5; else xvasp.str.kpoints_s2=0.0;change_made=true;if(LDEBUG) cout << "Yoddshift s2=" << xvasp.str.kpoints_s2 << endl;}
+    if(operation.find("Zoddshift")) {i++;if(_isodd(xvasp.str.kpoints_k3)) xvasp.str.kpoints_s3=0.5; else xvasp.str.kpoints_s3=0.0;change_made=true;if(LDEBUG) cout << "Zoddshift s3=" << xvasp.str.kpoints_s3 << endl;}
+    if(operation.at(0)=='M' || operation.at(0)=='m') {i++;xvasp.str.kpoints_kscheme="Monkhorst-Pack";change_made=true;if(LDEBUG) cout << "Monkhorst-Pack" << endl;} // "Monkhorst-Pack";
+    if(operation.at(0)=='G' || operation.at(0)=='g') {i++;xvasp.str.kpoints_kscheme="Gamma";change_made=true;if(LDEBUG) cout << "Gamma" << endl;} // "Gamma";
+    if(operation.find("Monkhorst-Pack")) {i++;xvasp.str.kpoints_kscheme="Monkhorst-Pack";change_made=true;if(LDEBUG) cout << "Monkhorst-Pack" << endl;} // "Monkhorst-Pack";
+    if(operation.find("Gamma")) {i++;xvasp.str.kpoints_kscheme="Gamma";change_made=true;if(LDEBUG) cout << "Gamma" << endl;} // "Gamma";
     if(xvasp.str.kpoints_k1<1) xvasp.str.kpoints_k1=1;
     if(xvasp.str.kpoints_k2<1) xvasp.str.kpoints_k2=1;
     if(xvasp.str.kpoints_k3<1) xvasp.str.kpoints_k3=1;

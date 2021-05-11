@@ -207,6 +207,7 @@ namespace init {
     if(XHOST.hostname=="nietzsche") XHOST.hostname="nietzsche.mems.duke.edu";
     if(XHOST.hostname=="materials") XHOST.hostname="materials.duke.edu";
     if(XHOST.hostname=="aflowlib") XHOST.hostname="aflowlib.mems.duke.edu";
+    if(XHOST.hostname=="quser") XHOST.hostname="quser.materials.duke.edu";  //CO20200526
     if(INIT_VERBOSE) oss << aurostd::PaddedPOST("hostname = ",depth_short) << XHOST.hostname << endl;
     if(AFLOW_BlackList(XHOST.hostname)) {
       message = "HOSTNAME BLACKLISTED = " + XHOST.hostname;
@@ -321,6 +322,8 @@ namespace init {
     // search for updates and proxies
     if(LDEBUG) cerr << "AFLOW V(" << string(AFLOW_VERSION) << ") init::InitMachine: [14]" << endl;
 
+    if(XHOST.hostname=="qrats.materials.duke.edu" && aurostd::FileExist("/usr/local/maui/bin/showq")){XHOST.vcmd.push_back("/usr/local/maui/bin/showq");}  //CO20200526
+
     // if(XHOST.is_command("wget")) {aurostd::execute("wget -q http://materials.duke.edu/aflow_update/"+XHOST.user+"/"+XHOST.hostname);};
 
     // SOME LOADING UP
@@ -351,6 +354,7 @@ namespace init {
       if(XHOST.is_command("mpivasp52s")) {oss << aurostd::PaddedPOST("XHOST.is_command(\"mpivasp52s\")=TRUE",depth_long) << "[" << XHOST.command("mpivasp52s") << "]" << endl;} else {oss << "XHOST.is_command(\"mpivasp52s\")=FALSE" << endl;}
       if(XHOST.is_command("mpivasp54s")) {oss << aurostd::PaddedPOST("XHOST.is_command(\"mpivasp54s\")=TRUE",depth_long) << "[" << XHOST.command("mpivasp54s") << "]" << endl;} else {oss << "XHOST.is_command(\"mpivasp54s\")=FALSE" << endl;}
       if(XHOST.is_command("mpivasp54s")) {oss << aurostd::PaddedPOST("XHOST.is_command(\"mpivasp54s\")=TRUE",depth_long) << "[" << XHOST.command("mpivasp54s") << "]" << endl;} else {oss << "XHOST.is_command(\"mpivasp54s\")=FALSE" << endl;}
+      if(XHOST.is_command("pbsnodes")) {oss << aurostd::PaddedPOST("XHOST.is_command(\"pbsnodes\")=TRUE",depth_long) << "[" << XHOST.command("pbsnodes") << "]" << endl;} else {oss << "XHOST.is_command(\"pbsnodes\")=FALSE" << endl;} //CO20200526
       if(XHOST.is_command("pdflatex")) {oss << aurostd::PaddedPOST("XHOST.is_command(\"pdflatex\")=TRUE",depth_long) << "[" << XHOST.command("pdflatex") << "]" << endl;} else {oss << "XHOST.is_command(\"pdflatex\")=FALSE" << endl;}
       if(XHOST.is_command("platon")) {oss << aurostd::PaddedPOST("XHOST.is_command(\"platon\")=TRUE",depth_long) << "[" << XHOST.command("platon") << "]" << endl;} else {oss << "XHOST.is_command(\"platon\")=FALSE" << endl;}
       if(XHOST.is_command("ps2pdf")) {oss << aurostd::PaddedPOST("XHOST.is_command(\"ps2pdf\")=TRUE",depth_long) << "[" << XHOST.command("ps2pdf") << "]" << endl;} else {oss << "XHOST.is_command(\"ps2pdf\")=FALSE" << endl;}
@@ -358,10 +362,14 @@ namespace init {
       if(XHOST.is_command("qconvex")) {oss << aurostd::PaddedPOST("XHOST.is_command(\"qconvex\")=TRUE",depth_long) << "[" << XHOST.command("qconvex") << "]" << endl;} else {oss << "XHOST.is_command(\"qconvex\")=FALSE" << endl;}
       if(XHOST.is_command("qdel")) {oss << aurostd::PaddedPOST("XHOST.is_command(\"qdel\")=TRUE",depth_long) << "[" << XHOST.command("qdel") << "]" << endl;} else {oss << "XHOST.is_command(\"qdel\")=FALSE" << endl;}
       if(XHOST.is_command("qhull")) {oss << aurostd::PaddedPOST("XHOST.is_command(\"qhull\")=TRUE",depth_long) << "[" << XHOST.command("qhull") << "]" << endl;} else {oss << "XHOST.is_command(\"qhull\")=FALSE" << endl;}
+      if(XHOST.is_command("qstat")) {oss << aurostd::PaddedPOST("XHOST.is_command(\"qstat\")=TRUE",depth_long) << "[" << XHOST.command("qstat") << "]" << endl;} else {oss << "XHOST.is_command(\"qstat\")=FALSE" << endl;} //CO20200526
       if(XHOST.is_command("qsub")) {oss << aurostd::PaddedPOST("XHOST.is_command(\"qsub\")=TRUE",depth_long) << "[" << XHOST.command("qsub") << "]" << endl;} else {oss << "XHOST.is_command(\"qsub\")=FALSE" << endl;}
       if(XHOST.is_command("rasmol")) {oss << aurostd::PaddedPOST("XHOST.is_command(\"rasmol\")=TRUE",depth_long) << "[" << XHOST.command("rasmol") << "]" << endl;} else {oss << "XHOST.is_command(\"rasmol\")=FALSE" << endl;}
       if(XHOST.is_command("rsync")) {oss << aurostd::PaddedPOST("XHOST.is_command(\"rsync\")=TRUE",depth_long) << "[" << XHOST.command("rsync") << "]" << endl;} else {oss << "XHOST.is_command(\"rsync\")=FALSE" << endl;}
       if(XHOST.is_command("sbatch")) {oss << aurostd::PaddedPOST("XHOST.is_command(\"sbatch\")=TRUE",depth_long) << "[" << XHOST.command("sbatch") << "]" << endl;} else {oss << "XHOST.is_command(\"sbatch\")=FALSE" << endl;}
+      if(XHOST.is_command("showq")) {oss << aurostd::PaddedPOST("XHOST.is_command(\"showq\")=TRUE",depth_long) << "[" << XHOST.command("showq") << "]" << endl;} else {oss << "XHOST.is_command(\"showq\")=FALSE" << endl;} //CO20200526
+      if(XHOST.is_command("sinfo")) {oss << aurostd::PaddedPOST("XHOST.is_command(\"sinfo\")=TRUE",depth_long) << "[" << XHOST.command("sinfo") << "]" << endl;} else {oss << "XHOST.is_command(\"sinfo\")=FALSE" << endl;} //CO20200526
+      if(XHOST.is_command("squeue")) {oss << aurostd::PaddedPOST("XHOST.is_command(\"squeue\")=TRUE",depth_long) << "[" << XHOST.command("squeue") << "]" << endl;} else {oss << "XHOST.is_command(\"squeue\")=FALSE" << endl;} //CO20200526
       if(XHOST.is_command("scancel")) {oss << aurostd::PaddedPOST("XHOST.is_command(\"scancel\")=TRUE",depth_long) << "[" << XHOST.command("scancel") << "]" << endl;} else {oss << "XHOST.is_command(\"scancel\")=FALSE" << endl;}
       if(XHOST.is_command("sensors")) {oss << aurostd::PaddedPOST("XHOST.is_command(\"sensors\")=TRUE",depth_long) << "[" << XHOST.command("sensors") << "]" << endl;} else {oss << "XHOST.is_command(\"sensors\")=FALSE" << endl;}
       if(XHOST.is_command("unzip")) {oss << aurostd::PaddedPOST("XHOST.is_command(\"unzip\")=TRUE",depth_long) << "[" << XHOST.command("unzip") << "]" << endl;} else {oss << "XHOST.is_command(\"unzip\")=FALSE" << endl;}
@@ -683,8 +691,8 @@ namespace init {
     XHOST.vflag_control.flag("README_AAPL",aurostd::args2flag(argv,cmds,"--readme=aapl|--readme_aapl"));
     XHOST.vflag_control.flag("README_AGL",aurostd::args2flag(argv,cmds,"--readme=agl|--readme_agl"));
     XHOST.vflag_control.flag("README_AEL",aurostd::args2flag(argv,cmds,"--readme=ael|--readme_ael"));
-    XHOST.vflag_control.flag("README_ANRL",aurostd::args2flag(argv,cmds,"--readme=anrl|--readme_anrl"));
-    XHOST.vflag_control.flag("README_COMPARE",aurostd::args2flag(argv,cmds,"--readme=compare|--readme_compare"));
+    XHOST.vflag_control.flag("README_ANRL",aurostd::args2flag(argv,cmds,"--readme=prototypes|--readme_prototypes|--readme=anrl|--readme_anrl")); //DX20210422 - added prototypes variants
+    XHOST.vflag_control.flag("README_COMPARE",aurostd::args2flag(argv,cmds,"--readme=xtalfinder|--readme_xtalfinder|--readme=compare|--readme_compare")); //DX20210422 - added xtalfinder variants
     XHOST.vflag_control.flag("README_GFA",aurostd::args2flag(argv,cmds,"--readme=gfa|--readme_gfa")); //CO20190401
     XHOST.vflag_control.flag("README_SYMMETRY",aurostd::args2flag(argv,cmds,"--readme=symmetry|--readme_symmetry"));
     XHOST.vflag_control.flag("README_CCE",aurostd::args2flag(argv,cmds,"--readme=cce|--readme_cce")); //CO20190620
@@ -964,6 +972,12 @@ namespace init {
     XHOST.vflag_pflow.clear(); 
     XHOST.vflag_apennsy.clear(); 
     XHOST.vflag_outreach.clear(); 
+
+    // ME20210206 - Load --web_mode before parsing arguments
+    // LOADING ANRL WEB
+    XHOST.vflag_control.flag("WWW",aurostd::args2flag(argv,cmds,"--www|--web|--web_mode|--php|--html|-www|-web|-web_mode|-php|-html"));  //CO20200404
+    if(XHOST.user=="www-data"){XHOST.vflag_control.flag("WWW",true);} //CO20201215
+
     if(INIT_VERBOSE) oss << "--- LOADING @ aconvasp options --- " << endl;
     PflowARGs(XHOST.argv,cmds,XHOST.vflag_pflow);
     if(INIT_VERBOSE) oss << "--- LOADING @ apennsy options --- " << endl;
@@ -995,10 +1009,6 @@ namespace init {
     //    if(LDEBUG) cout << "OUTREACH OPTIONS: vxscheme.size()=" << XHOST.vflag_control.vxscheme.size() << endl;  OBSOLETE ME20181102
     if(LDEBUG) cout << "OUTREACH OPTIONS: vxsghost.size()=" << XHOST.vflag_control.vxsghost.size() << endl;
     if(LDEBUG) cout << "OUTREACH OPTIONS: argv.size()=" << argv.size() << endl;
-
-    // LOADING ANRL WEB
-    XHOST.vflag_control.flag("WWW",aurostd::args2flag(argv,cmds,"--www|--web|--web_mode|--php|--html|-www|-web|-web_mode|-php|-html"));  //CO20200404
-    if(XHOST.user=="www-data"){XHOST.vflag_control.flag("WWW",true);} //CO20201215
 
     //FANCY_PRINT
     XHOST.vflag_control.flag("NO_FANCY_PRINT",aurostd::args2flag(argv,cmds,"--no_fancy_print|--nofancyprint"));  //CO20200404
@@ -2186,15 +2196,15 @@ namespace init {
     nschema++;
 
     // schema is CAPITAL, content is not necessarily //DX20200902
-    XHOST.vschema.push_attached("SCHEMA::NAME:AFLOW_PROTOTYPE_PARAMETER_LIST_ORIG","aflow_prototype_parameter_list_orig"); //DX20201001 - updated keyword
-    XHOST.vschema.push_attached("SCHEMA::UNIT:AFLOW_PROTOTYPE_PARAMETER_LIST_ORIG",""); //DX20201001 - updated keyword
-    XHOST.vschema.push_attached("SCHEMA::TYPE:AFLOW_PROTOTYPE_PARAMETER_LIST_ORIG","strings"); //DX20201001 - updated keyword
+    XHOST.vschema.push_attached("SCHEMA::NAME:AFLOW_PROTOTYPE_PARAMS_LIST_ORIG","aflow_prototype_params_list_orig"); //DX20201001 - updated keyword
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AFLOW_PROTOTYPE_PARAMS_LIST_ORIG",""); //DX20201001 - updated keyword
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AFLOW_PROTOTYPE_PARAMS_LIST_ORIG","strings"); //DX20201001 - updated keyword
     nschema++;
 
     // schema is CAPITAL, content is not necessarily //DX20200902
-    XHOST.vschema.push_attached("SCHEMA::NAME:AFLOW_PROTOTYPE_PARAMETER_VALUES_ORIG","aflow_prototype_parameter_values_orig"); //DX20201001 - updated keyword
-    XHOST.vschema.push_attached("SCHEMA::UNIT:AFLOW_PROTOTYPE_PARAMETER_VALUES_ORIG",""); //DX20201001 - updated keyword
-    XHOST.vschema.push_attached("SCHEMA::TYPE:AFLOW_PROTOTYPE_PARAMETER_VALUES_ORIG","numbers"); //DX20201001 - updated keyword
+    XHOST.vschema.push_attached("SCHEMA::NAME:AFLOW_PROTOTYPE_PARAMS_VALUES_ORIG","aflow_prototype_params_values_orig"); //DX20201001 - updated keyword
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AFLOW_PROTOTYPE_PARAMS_VALUES_ORIG",""); //DX20201001 - updated keyword
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AFLOW_PROTOTYPE_PARAMS_VALUES_ORIG","numbers"); //DX20201001 - updated keyword
     nschema++;
 
     // schema is CAPITAL, content is not necessarily //DX20200902
@@ -2204,15 +2214,15 @@ namespace init {
     nschema++;
 
     // schema is CAPITAL, content is not necessarily //DX20200902
-    XHOST.vschema.push_attached("SCHEMA::NAME:AFLOW_PROTOTYPE_PARAMETER_LIST_RELAX","aflow_prototype_parameter_list_relax"); //DX20201001 - updated keyword
-    XHOST.vschema.push_attached("SCHEMA::UNIT:AFLOW_PROTOTYPE_PARAMETER_LIST_RELAX",""); //DX20201001 - updated keyword
-    XHOST.vschema.push_attached("SCHEMA::TYPE:AFLOW_PROTOTYPE_PARAMETER_LIST_RELAX","strings"); //DX20201001 - updated keyword
+    XHOST.vschema.push_attached("SCHEMA::NAME:AFLOW_PROTOTYPE_PARAMS_LIST_RELAX","aflow_prototype_params_list_relax"); //DX20201001 - updated keyword
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AFLOW_PROTOTYPE_PARAMS_LIST_RELAX",""); //DX20201001 - updated keyword
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AFLOW_PROTOTYPE_PARAMS_LIST_RELAX","strings"); //DX20201001 - updated keyword
     nschema++;
 
     // schema is CAPITAL, content is not necessarily //DX20200902
-    XHOST.vschema.push_attached("SCHEMA::NAME:AFLOW_PROTOTYPE_PARAMETER_VALUES_RELAX","aflow_prototype_parameter_values_relax"); //DX20201001 - updated keyword
-    XHOST.vschema.push_attached("SCHEMA::UNIT:AFLOW_PROTOTYPE_PARAMETER_VALUES_RELAX",""); //DX20201001 - updated keyword
-    XHOST.vschema.push_attached("SCHEMA::TYPE:AFLOW_PROTOTYPE_PARAMETER_VALUES_RELAX","numbers"); //DX20201001 - updated keyword
+    XHOST.vschema.push_attached("SCHEMA::NAME:AFLOW_PROTOTYPE_PARAMS_VALUES_RELAX","aflow_prototype_params_values_relax"); //DX20201001 - updated keyword
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AFLOW_PROTOTYPE_PARAMS_VALUES_RELAX",""); //DX20201001 - updated keyword
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AFLOW_PROTOTYPE_PARAMS_VALUES_RELAX","numbers"); //DX20201001 - updated keyword
     nschema++;
 
     // schema is CAPITAL, content is not necessarily
@@ -2737,6 +2747,12 @@ namespace init {
     XHOST.vschema.push_attached("SCHEMA::TYPE:LOOP","strings");
     nschema++;
 
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:METAGGA","metagga");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:METAGGA","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:METAGGA","string");
+    nschema++;
+
     //AS20200915 BEGIN
     XHOST.vschema.push_attached("SCHEMA::NAME:MODULUS_BULK_QHA_300K","modulus_bulk_qha_300K");
     XHOST.vschema.push_attached("SCHEMA::UNIT:MODULUS_BULK_QHA_300K","GPa");
@@ -3040,6 +3056,12 @@ namespace init {
     XHOST.vschema.push_attached("SCHEMA::NAME:SPECIES_PP","species_pp");
     XHOST.vschema.push_attached("SCHEMA::UNIT:SPECIES_PP","");
     XHOST.vschema.push_attached("SCHEMA::TYPE:SPECIES_PP","strings");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:SPECIES_PP_AUID","species_pp_AUID");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:SPECIES_PP_AUID","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:SPECIES_PP_AUID","strings");
     nschema++;
 
     // schema is CAPITAL, content is not necessarily

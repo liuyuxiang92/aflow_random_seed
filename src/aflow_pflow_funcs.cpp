@@ -7283,6 +7283,881 @@ namespace pflow {
   }
 }
 
+//[CO20200526 - EASY TEMPLATE CLASS]namespace pflow {
+//[CO20200526 - EASY TEMPLATE CLASS]  AQueue::AQueue(ostream& oss) : xStream(oss),m_initialized(false) {initialize();}
+//[CO20200526 - EASY TEMPLATE CLASS]  AQueue::AQueue(ofstream& FileMESSAGE,ostream& oss) : xStream(FileMESSAGE,oss),m_initialized(false) {initialize();}
+//[CO20200526 - EASY TEMPLATE CLASS]  AQueue::AQueue(const AQueue& b) : xStream(*b.getOFStream(),*b.getOSS()) {copy(b);} // copy PUBLIC
+//[CO20200526 - EASY TEMPLATE CLASS]  
+//[CO20200526 - EASY TEMPLATE CLASS]  AQueue::~AQueue() {xStream::free();free();}
+//[CO20200526 - EASY TEMPLATE CLASS]
+//[CO20200526 - EASY TEMPLATE CLASS]  const AQueue& AQueue::operator=(const AQueue& other) {
+//[CO20200526 - EASY TEMPLATE CLASS]    if(this!=&other) {copy(other);}
+//[CO20200526 - EASY TEMPLATE CLASS]    return *this;
+//[CO20200526 - EASY TEMPLATE CLASS]  }
+//[CO20200526 - EASY TEMPLATE CLASS]
+//[CO20200526 - EASY TEMPLATE CLASS]  void AQueue::clear() {free();}  //clear PUBLIC
+//[CO20200526 - EASY TEMPLATE CLASS]  void AQueue::free() {
+//[CO20200526 - EASY TEMPLATE CLASS]    m_initialized=false;
+//[CO20200526 - EASY TEMPLATE CLASS]  }
+//[CO20200526 - EASY TEMPLATE CLASS]  
+//[CO20200526 - EASY TEMPLATE CLASS]  void AQueue::copy(const AQueue& b) {  //copy PRIVATE
+//[CO20200526 - EASY TEMPLATE CLASS]    m_initialized=b.m_initialized;
+//[CO20200526 - EASY TEMPLATE CLASS]  }
+//[CO20200526 - EASY TEMPLATE CLASS]  
+//[CO20200526 - EASY TEMPLATE CLASS]  bool AQueue::initialize(ostream& oss) {
+//[CO20200526 - EASY TEMPLATE CLASS]    xStream::initialize(oss);
+//[CO20200526 - EASY TEMPLATE CLASS]    return initialize();
+//[CO20200526 - EASY TEMPLATE CLASS]  }
+//[CO20200526 - EASY TEMPLATE CLASS]
+//[CO20200526 - EASY TEMPLATE CLASS]  bool AQueue::initialize(ofstream& FileMESSAGE,ostream& oss) {
+//[CO20200526 - EASY TEMPLATE CLASS]    xStream::initialize(FileMESSAGE,oss);
+//[CO20200526 - EASY TEMPLATE CLASS]    return initialize();
+//[CO20200526 - EASY TEMPLATE CLASS]  }
+//[CO20200526 - EASY TEMPLATE CLASS]
+//[CO20200526 - EASY TEMPLATE CLASS]  bool AQueue::initialize() {
+//[CO20200526 - EASY TEMPLATE CLASS]    free();
+//[CO20200526 - EASY TEMPLATE CLASS]    return false;
+//[CO20200526 - EASY TEMPLATE CLASS]  }
+//[CO20200526 - EASY TEMPLATE CLASS]}
+
+#define _AQUEUE_DEBUG_ false
+
+//CO20200526 - queueing class
+namespace pflow {
+  void AJob::free(){
+    m_index=AUROSTD_MAX_UINT;
+    m_id=AUROSTD_MAX_UINT;
+    m_user="";
+    m_status=JOB_QUEUED;
+    m_ncpus=0;  //total ncpus specified for the job
+    m_vinodes.clear();
+    m_vncpus.clear(); //ncpus allocated to each node (sum of this should be m_ncpus)
+    m_vipartitions.clear();
+  }
+}
+
+namespace pflow {
+  void ANode::free(){
+    m_index=AUROSTD_MAX_UINT;
+    m_name="";
+    m_status=NODE_OFFLINE;
+    m_ncpus=0;
+    m_ncpus_occupied=0;
+    m_properties="";
+    m_vijobs.clear();
+    m_vipartitions.clear();
+  }
+  bool ANode::isStatus(const node_status& status) const {
+    //[keep silent]bool LDEBUG=(FALSE || _AQUEUE_DEBUG_ || XHOST.DEBUG);
+    //[keep silent]string soliloquy=XPID+"pflow::ANode::isStatus():";
+    //[keep silent]if(LDEBUG){
+    //[keep silent]  //status
+    //[keep silent]  if(status==NODE_FREE){cerr << soliloquy << " status==NODE_FREE" << endl;}
+    //[keep silent]  else if(status==NODE_OCCUPIED){cerr << soliloquy << " status==NODE_OCCUPIED" << endl;}
+    //[keep silent]  else if(status==NODE_FULL){cerr << soliloquy << " status==NODE_FULL" << endl;}
+    //[keep silent]  else if(status==NODE_DOWN){cerr << soliloquy << " status==NODE_DOWN" << endl;}
+    //[keep silent]  else if(status==NODE_OFFLINE){cerr << soliloquy << " status==NODE_OFFLINE" << endl;}
+    //[keep silent]  else if(status==NODE_OPERATIONAL){cerr << soliloquy << " status==NODE_OPERATIONAL" << endl;}
+    //[keep silent]  else if(status==NODE_NONOPERATIONAL){cerr << soliloquy << " status==NODE_NONOPERATIONAL" << endl;}
+    //[keep silent]  //m_status
+    //[keep silent]  if(m_status==NODE_FREE){cerr << soliloquy << " m_status==NODE_FREE" << endl;}
+    //[keep silent]  else if(m_status==NODE_OCCUPIED){cerr << soliloquy << " m_status==NODE_OCCUPIED" << endl;}
+    //[keep silent]  else if(m_status==NODE_FULL){cerr << soliloquy << " m_status==NODE_FULL" << endl;}
+    //[keep silent]  else if(m_status==NODE_DOWN){cerr << soliloquy << " m_status==NODE_DOWN" << endl;}
+    //[keep silent]  else if(m_status==NODE_OFFLINE){cerr << soliloquy << " m_status==NODE_OFFLINE" << endl;}
+    //[keep silent]}
+    if(status==NODE_OPERATIONAL && (m_status==NODE_FREE||m_status==NODE_OCCUPIED||m_status==NODE_FULL)){return true;}
+    else if(status==NODE_NONOPERATIONAL && (m_status==NODE_DOWN||m_status==NODE_OFFLINE)){return true;}
+    return m_status==status;
+  }
+}
+
+namespace pflow {
+  void APartition::free(){
+    m_index=AUROSTD_MAX_UINT;
+    m_name="";
+    m_properties_node="";
+    m_inodes.clear();
+    m_vijobs.clear();
+  }
+}
+
+namespace pflow {
+  AQueue::AQueue(ostream& oss) : xStream(oss),m_initialized(false) {initialize();}
+  AQueue::AQueue(ofstream& FileMESSAGE,ostream& oss) : xStream(FileMESSAGE,oss),m_initialized(false) {initialize();}
+  AQueue::AQueue(const aurostd::xoption& vpflow,ostream& oss) : xStream(oss),m_initialized(false) {initialize(vpflow);}
+  AQueue::AQueue(const aurostd::xoption& vpflow,ofstream& FileMESSAGE,ostream& oss) : xStream(FileMESSAGE,oss),m_initialized(false) {initialize(vpflow);}
+  AQueue::AQueue(const AQueue& b) : xStream(*b.getOFStream(),*b.getOSS()) {copy(b);} // copy PUBLIC
+
+  AQueue::~AQueue() {xStream::free();free();}
+
+  const AQueue& AQueue::operator=(const AQueue& other) {
+    if(this!=&other) {copy(other);}
+    return *this;
+  }
+
+  void AQueue::clear() {free();}  //clear PUBLIC
+  void AQueue::freeQueue() {
+    m_qsys=QUEUE_SLURM;
+    m_partitions.clear();
+    m_nodes.clear();
+    m_jobs.clear();
+  }
+  void AQueue::free() {
+    m_initialized=false;
+    m_flags.clear();
+    freeQueue();
+  }
+
+  void AQueue::copy(const AQueue& b) {  //copy PRIVATE
+    m_initialized=b.m_initialized;
+    m_flags=b.m_flags;
+    m_qsys=b.m_qsys;
+    m_partitions.clear();for(uint i=0;i<b.m_partitions.size();i++){m_partitions.push_back(b.m_partitions[i]);}
+    m_nodes.clear();for(uint i=0;i<b.m_nodes.size();i++){m_nodes.push_back(b.m_nodes[i]);}
+    m_jobs.clear();for(uint i=0;i<b.m_jobs.size();i++){m_jobs.push_back(b.m_jobs[i]);}
+  }
+
+  bool AQueue::initialize(ostream& oss) {
+    xStream::initialize(oss);
+    return initialize();
+  }
+  bool AQueue::initialize(ofstream& FileMESSAGE,ostream& oss) {
+    xStream::initialize(FileMESSAGE,oss);
+    return initialize();
+  }
+  bool AQueue::initialize(const aurostd::xoption& vpflow,ostream& oss) {
+    xStream::initialize(oss);
+    return initialize(vpflow);
+  }
+  bool AQueue::initialize(const aurostd::xoption& vpflow,ofstream& FileMESSAGE,ostream& oss) {
+    xStream::initialize(FileMESSAGE,oss);
+    return initialize(vpflow);
+  }
+
+  bool AQueue::initialize() {
+    free();
+    return false;
+  }
+  bool AQueue::initialize(const aurostd::xoption& vpflow) {
+    free();
+    setFlags(vpflow);
+    return true;
+  }
+
+  void AQueue::setFlags(const aurostd::xoption& vpflow){m_flags=vpflow;}
+
+  uint AQueue::getNNodes() const {return m_nodes.size();}
+  uint AQueue::getNCPUS() const {
+    uint ncpus=0;
+    for(uint i=0;i<m_nodes.size();i++){ncpus+=m_nodes[i].m_ncpus;}
+    return ncpus;
+  }
+  uint AQueue::getNNodes(const APartition& partition) const {return partition.m_inodes.size();}
+  uint AQueue::getNCPUS(const APartition& partition) const {
+    uint ncpus=0;
+    for(uint i=0;i<partition.m_inodes.size();i++){ncpus+=m_nodes[partition.m_inodes[i]].m_ncpus;}
+    return ncpus;
+  }
+  uint AQueue::getNNodes(const APartition& partition,const node_status& status) const {
+    uint nnodes=0;
+    for(uint i=0;i<partition.m_inodes.size();i++){
+      if(m_nodes[partition.m_inodes[i]].isStatus(status)){nnodes+=1;}
+    }
+    return nnodes;
+  }
+  uint AQueue::getNCPUS(const APartition& partition,const node_status& status_node,const cpus_status& status_cpus) const {
+    uint ncpus=0;
+    if(status_cpus==CPUS_TOTAL){
+      for(uint i=0;i<partition.m_inodes.size();i++){
+        if(m_nodes[partition.m_inodes[i]].isStatus(status_node)){
+          ncpus+=m_nodes[partition.m_inodes[i]].m_ncpus;
+        }
+      }
+    }
+    else if(status_cpus==CPUS_FREE){
+      for(uint i=0;i<partition.m_inodes.size();i++){
+        if(m_nodes[partition.m_inodes[i]].isStatus(status_node)){
+          ncpus+=m_nodes[partition.m_inodes[i]].m_ncpus-m_nodes[partition.m_inodes[i]].m_ncpus_occupied;
+        }
+      }
+    }
+    else if(status_cpus==CPUS_OCCUPIED){
+      for(uint i=0;i<partition.m_inodes.size();i++){
+        if(m_nodes[partition.m_inodes[i]].isStatus(status_node)){
+          ncpus+=m_nodes[partition.m_inodes[i]].m_ncpus_occupied;
+        }
+      }
+    }
+    return ncpus;
+  }
+  uint AQueue::getNCPUS(const string& user,const string& partition,const job_status& status) const {
+    string soliloquy=XPID+"pflow::AQueue::getNCPUS():";
+    uint ipartition=partitionName2Index(partition);
+    if(ipartition>m_partitions.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"ipartition>m_partitions.size()-1",_INDEX_BOUNDS_);}
+    return getNCPUS(user,m_partitions[ipartition],status);
+  }
+  uint AQueue::getNCPUS(const string& user,const APartition& partition,const job_status& status) const {
+    bool LDEBUG=(FALSE || _AQUEUE_DEBUG_ || XHOST.DEBUG);
+    string soliloquy=XPID+"pflow::AQueue::getNCPUS():";
+    uint ncpus=0;
+    uint ijob=0;
+    if(LDEBUG){cerr << soliloquy << " partition=" << partition.m_name << endl;}
+    for(uint i=0;i<partition.m_vijobs.size();i++){
+      ijob=partition.m_vijobs[i];
+      if(ijob>m_jobs.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"ijob>m_jobs.size()-1",_INDEX_BOUNDS_);}
+      const AJob& job=m_jobs[ijob];
+      if(job.m_user==user && job.m_status==status){
+        if(LDEBUG){cerr << soliloquy << " job=" << job.m_id << " ncpus=" << job.m_ncpus << endl;}
+        ncpus+=job.m_ncpus;
+      }
+    }
+    return ncpus;
+  }
+  double AQueue::getPercentage(const string& user,const string& partition,const job_status& status) const {
+    string soliloquy=XPID+"pflow::AQueue::getPercentage():";
+    uint ipartition=partitionName2Index(partition);
+    if(ipartition>m_partitions.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"ipartition>m_partitions.size()-1",_INDEX_BOUNDS_);}
+    return getPercentage(user,m_partitions[ipartition],status);
+  }
+  double AQueue::getPercentage(const string& user,const APartition& partition,const job_status& status) const {
+    uint denom=getNCPUS(partition,NODE_OPERATIONAL);
+    if(denom==0){return 0.0;}
+    return (double)getNCPUS(user,partition,status)/(double)denom;
+  }
+
+  uint AQueue::nodeName2Index(const string& name) const {
+    string soliloquy=XPID+"pflow::AQueue::nodeName2Index():";
+    for(uint inode=0;inode<m_nodes.size();inode++){
+      if(m_nodes[inode].m_name==name){
+        return inode;
+      }
+    }
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No node found with name="+name,_INPUT_UNKNOWN_);
+  }
+  uint AQueue::partitionName2Index(const string& name) const {
+    string soliloquy=XPID+"pflow::AQueue::partitionName2Index():";
+    for(uint ipartition=0;ipartition<m_partitions.size();ipartition++){
+      if(m_partitions[ipartition].m_name==name){
+        return ipartition;
+      }
+    }
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No partition found with name="+name,_INPUT_UNKNOWN_);
+  }
+
+  uint getTORQUEIDFromString(const string& torqueid_str) {
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy=XPID+"pflow::getTORQUEIDFromString():";
+    string tmp="";
+    vector<string> tokens;
+    aurostd::string2tokens(torqueid_str,tokens,".");
+    if(tokens.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"tokens.size()==0 [1]",_RUNTIME_ERROR_);}
+    tmp=tokens[0];
+    aurostd::string2tokens(tmp,tokens,"/");
+    if(tokens.size()==1){tmp=tokens[0];}  //no '/' found
+    else if(tokens.size()==2){tmp=tokens[1];}
+    else{throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"tokens.size()!=1||2",_RUNTIME_ERROR_);}
+    if(!aurostd::isfloat(tmp)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"!aurostd::isfloat(tmp)",_RUNTIME_ERROR_);}
+    if(LDEBUG){cerr << soliloquy << " id=" << tmp << endl;}
+    return aurostd::string2utype<uint>(tmp);
+  }
+
+  bool AQueue::addJob(const AJob& _job){  //add job to m_jobs
+    bool LDEBUG=(FALSE || _AQUEUE_DEBUG_ || XHOST.DEBUG);
+    string soliloquy=XPID+"pflow::AQueue::addJob():";
+    bool job_added=false;
+    bool found_job=false,found_node=false;
+    uint i=0,j=0;
+    for(i=0;i<m_jobs.size()&&found_job==false;i++){
+      if(m_jobs[i].m_id==_job.m_id){
+        //job found
+        AJob& job=m_jobs[i];
+        if(job.m_status!=_job.m_status){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"job.m_status!=_job.m_status",_RUNTIME_ERROR_);}  //mismatch in statuses
+        const job_status& jstat=job.m_status;
+        if(jstat==JOB_RUNNING && _job.m_vinodes.size()==0){ //then where is it running? we should have node information (m_vinodes and m_vncpus)
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"RUNNING job="+aurostd::utype2string(_job.m_id)+" has not been assigned to a node",_RUNTIME_ERROR_);
+        }
+        if(_job.m_vinodes.size()>0){  //node information is available for mapping to a node
+          //to add a job, its record should have been taken from one node (at a time)
+          if(_job.m_vinodes.size()!=1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"_job.m_vinodes.size()!=1",_RUNTIME_ERROR_);}
+          if(_job.m_vncpus.size()!=1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"_job.m_vncpus.size()!=1",_RUNTIME_ERROR_);}
+          if(_job.m_vinodes.size()!=_job.m_vncpus.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"_job.m_vinodes.size()!=_job.m_vncpus.size()",_RUNTIME_ERROR_);}
+          const uint inode=_job.m_vinodes[0];
+          const uint ncpus=_job.m_vncpus[0];
+          found_node=false;
+          for(j=0;j<job.m_vinodes.size()&&found_node==false;j++){
+            if(job.m_vinodes[j]==inode){
+              if(LDEBUG){cerr << soliloquy << " adding " << ncpus << " cpus to job=" << job.m_id << ",inode=" << job.m_vinodes[j] << endl;}
+              job.m_ncpus+=ncpus;
+              job.m_vncpus[j]+=ncpus;
+              found_node=true;
+            }
+          }
+          if(!found_node){
+            if(LDEBUG){cerr << soliloquy << " job=" << job.m_id << " is also running on inode=" << inode << " with " << ncpus << " cpus" << endl;}
+            job.m_ncpus+=ncpus;
+            job.m_vinodes.push_back(inode);
+            job.m_vncpus.push_back(ncpus);
+          }
+        }
+        found_job=true;
+      }
+    }
+    if(!found_job){
+      m_jobs.push_back(_job);m_jobs.back().m_index=m_jobs.size()-1;job_added=true;
+      if(LDEBUG){cerr << soliloquy << " adding NEW job=" << m_jobs.back().m_id << endl;}
+    }
+    return job_added;
+  }
+
+  bool AQueue::addPartition(const APartition& _partition){
+    bool LDEBUG=(FALSE || _AQUEUE_DEBUG_ || XHOST.DEBUG);
+    string soliloquy=XPID+"pflow::AQueue::addPartition():";
+    uint i=0;
+    for(i=0;i<m_partitions.size();i++){
+      if(m_partitions[i].m_name==_partition.m_name){return false;}
+    }
+    bool partition_added=false;
+    m_partitions.push_back(_partition);m_partitions.back().m_index=m_partitions.size()-1;partition_added=true;
+    APartition& partition=m_partitions.back();
+    if(LDEBUG){cerr << soliloquy << " adding partition=" << partition.m_name << endl;}
+    if(partition.m_properties_node.empty()){  //only available if user is root
+      partition.m_properties_node=partition.m_name; //default string to search
+      //[resort to default]throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Not sure how to define partitions for HOST="+XHOST.hostname,_RUNTIME_ERROR_);
+      if(XHOST.hostname=="qrats.materials.duke.edu"){ //protection, ideally the aflow user would be "root"
+        //hack
+        if(partition.m_name=="priority"){partition.m_properties_node="sharedCompute";}
+        else if(partition.m_name=="debug"){partition.m_properties_node="debug";}
+        else if(partition.m_name=="batch"){partition.m_properties_node="sharedCompute";}
+        else if(partition.m_name=="research"){partition.m_properties_node="sharedCompute";}
+        else{throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown queue="+partition.m_name,_RUNTIME_ERROR_);}
+      }
+    }
+    return partition_added;
+  }
+
+#define DELIM_PROPERTIES_NODE ","
+
+  bool AQueue::addNode(const ANode& _node){
+    bool LDEBUG=(FALSE || _AQUEUE_DEBUG_ || XHOST.DEBUG);
+    string soliloquy=XPID+"pflow::AQueue::addNode():";
+    uint inode=0;
+    for(inode=0;inode<m_nodes.size();inode++){
+      if(m_nodes[inode].m_name==_node.m_name){
+        ANode& node=m_nodes[inode];
+        //the find()!=string::npos could be problematic if we have queues like 'fast' and 'faster'
+        if(node.m_properties!=_node.m_properties&&node.m_properties.find(_node.m_properties)==string::npos){  //QUSER patch: a comma-separated string is important for quser where each node is listed N times for each partition it is associated with
+          //from http://docs.adaptivecomputing.com/torque/4-2-8/Content/topics/4-serverPolicies/mappingQueueToRes.htm
+          //"TORQUE does not currently provide a simple mechanism for mapping queues to nodes. However, schedulers such as Moab and Maui can provide this functionality."
+          //since properties can be anything, we add additional matching queues as a comma-separated string
+          //[sort]if(!node.m_properties.empty()){node.m_properties+=DELIM_PROPERTIES_NODE;}
+          //[sort]if(!_node.m_properties.empty()){node.m_properties+=_node.m_properties;}
+          vector<string> tokens;
+          aurostd::string2tokens(node.m_properties,tokens,DELIM_PROPERTIES_NODE);
+          tokens.push_back(_node.m_properties);
+          std::sort(tokens.begin(),tokens.end());
+          node.m_properties=aurostd::joinWDelimiter(tokens,DELIM_PROPERTIES_NODE);
+          if(LDEBUG){cerr << soliloquy << " adding properties=\"" << _node.m_properties << "\" to node=" << node.m_name << " properties (NEW properties=" << node.m_properties << ")" << endl;}
+        }
+        return false;
+      }
+    }
+    bool node_added=false;
+    m_nodes.push_back(_node);m_nodes.back().m_index=m_nodes.size()-1;node_added=true;
+    ANode& node=m_nodes.back();
+    //determine OCCUPIED vs. FULL
+    if(node.m_status==NODE_FREE && node.m_ncpus_occupied>0){node.m_status=NODE_OCCUPIED;}
+    if(node.m_status==NODE_OCCUPIED && node.m_ncpus_occupied>=node.m_ncpus){node.m_status=NODE_FULL;}
+    if(LDEBUG){
+      cerr << soliloquy << " adding ";
+      if(node.m_status==NODE_FREE){cerr << "FREE";}
+      else if(node.m_status==NODE_OCCUPIED){cerr << "OCCUPIED";}
+      else if(node.m_status==NODE_FULL){cerr << "FULL";}
+      else if(node.m_status==NODE_DOWN){cerr << "DOWN";}
+      else if(node.m_status==NODE_OFFLINE){cerr << "OFFLINE";}
+      else{throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown node.status",_RUNTIME_ERROR_);}
+      cerr << " node=" << node.m_name << endl;
+    }
+    return node_added;
+  }
+
+  void AQueue::nodePartitionMapping(ANode& node){
+    bool LDEBUG=(FALSE || _AQUEUE_DEBUG_ || XHOST.DEBUG);
+    string soliloquy=XPID+"pflow::AQueue::nodePartitionMapping():";
+    //get partition
+    bool found=false;
+    node.m_vipartitions.clear();
+    uint ipartition=0,iproperty=0;
+    //parse node.m_properties by DELIM_PROPERTIES_NODE
+    vector<string> vproperties_node;
+    aurostd::string2tokens(node.m_properties,vproperties_node,DELIM_PROPERTIES_NODE);
+    //search for node-partition matches
+    for(ipartition=0;ipartition<m_partitions.size();ipartition++){
+      APartition& partition=m_partitions[ipartition];
+      for(iproperty=0;iproperty<vproperties_node.size();iproperty++){
+        if(vproperties_node[iproperty]==partition.m_properties_node){
+          partition.m_inodes.push_back(node.m_index);
+          node.m_vipartitions.push_back(ipartition);
+          found=true;
+          if(LDEBUG){cerr << soliloquy << " mapping node=" << node.m_name << " to partition=" << partition.m_name << endl;}
+        }
+      }
+    }
+    if(!found){
+      APartition _partition;_partition.free();
+      _partition.m_name=node.m_properties;
+      //set m_properties_node inside addPartition()
+      if(!addPartition(_partition)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Partition already exists",_RUNTIME_ERROR_);}
+      ipartition=m_partitions.size()-1;
+      APartition& partition=m_partitions[ipartition];
+      partition.m_inodes.push_back(node.m_index);
+      node.m_vipartitions.push_back(ipartition);
+      if(LDEBUG){cerr << soliloquy << " mapping node=" << node.m_name << " to partition=" << partition.m_name << endl;}
+    }
+  }
+
+  void AQueue::jobMapping(AJob& job){
+    bool LDEBUG=(FALSE || _AQUEUE_DEBUG_ || XHOST.DEBUG);
+    string soliloquy=XPID+"pflow::AQueue::jobMapping():";
+    uint i=0,ipartition=0;
+    //map job to partition
+    //mapping MUST have happened upon adding the job, just checking and verbose
+    if(job.m_vipartitions.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"job="+aurostd::utype2string(job.m_id)+" has not been assigned a partition",_INPUT_ERROR_);}
+    for(i=0;i<job.m_vipartitions.size();i++){
+      ipartition=job.m_vipartitions[i];
+      if(ipartition>m_partitions.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"ipartition>m_partitions.size()-1",_INDEX_BOUNDS_);}
+      APartition& partition=m_partitions[ipartition];
+      partition.m_vijobs.push_back(job.m_index);
+      if(LDEBUG){cerr << soliloquy << " mapping job=" << job.m_id << " to partition=" << partition.m_name << endl;}
+    }
+    //map RUNNING job to node
+    if(job.m_status==JOB_RUNNING && job.m_vinodes.size()==0){ //then where is it running? we should have node information (m_vinodes and m_vncpus)
+      //it's possible that, in the non-zero amount of time between processing pbsnodes and qstat, a job status changes from 'Q' or 'H' to 'R'
+      //this "transition state' is always possible when the commands are not run at the exact same time
+      //therefore, it is better to sleep for a few seconds, and re-reun the whole processing script again
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"RUNNING job="+aurostd::utype2string(job.m_id)+" has not been assigned a node",_RUNTIME_EXTERNAL_FAIL_); //this will issue a re-run
+    }
+    if(job.m_vinodes.size()>0){
+      uint inode=0;
+      for(i=0;i<job.m_vinodes.size();i++){
+        inode=job.m_vinodes[i];
+        if(inode>m_nodes.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"inode>m_nodes.size()-1",_INDEX_BOUNDS_);}
+        ANode& node=m_nodes[inode];
+        node.m_vijobs.push_back(job.m_index);
+        if(LDEBUG){cerr << soliloquy << " mapping job=" << job.m_id << " to node=" << node.m_name << endl;}
+        //[WRONG - job maps to node and node to partitions, but job maps to 1 (usually) partition]if(node.m_vipartitions.size()==0){nodePartitionMapping(node);}  //safety
+        //[WRONG - job maps to node and node to partitions, but job maps to 1 (usually) partition]//we could check that ALL nodes belong to a partition, but we might have a separate node...
+        //[WRONG - job maps to node and node to partitions, but job maps to 1 (usually) partition]for(j=0;j<node.m_vipartitions.size();j++){
+        //[WRONG - job maps to node and node to partitions, but job maps to 1 (usually) partition]  ipartition=node.m_vipartitions[j];
+        //[WRONG - job maps to node and node to partitions, but job maps to 1 (usually) partition]  if(ipartition>m_partitions.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"ipartition>m_partitions.size()-1",_INDEX_BOUNDS_);}
+        //[WRONG - job maps to node and node to partitions, but job maps to 1 (usually) partition]  APartition& partition=m_partitions[ipartition];
+        //[WRONG - job maps to node and node to partitions, but job maps to 1 (usually) partition]  partition.m_vijobs.push_back(job.m_index);
+        //[WRONG - job maps to node and node to partitions, but job maps to 1 (usually) partition]  job.m_vipartitions.push_back(ipartition);
+        //[WRONG - job maps to node and node to partitions, but job maps to 1 (usually) partition]  if(LDEBUG){cerr << soliloquy << " mapping job=" << job.m_id << " to partition=" << partition.m_name << endl;}
+        //[WRONG - job maps to node and node to partitions, but job maps to 1 (usually) partition]}
+      }
+    }
+  }
+
+#define ATTEMPTS_GETQUEUE_MAX 10
+  void AQueue::getQueue() {
+    bool LDEBUG=(TRUE || _AQUEUE_DEBUG_ || XHOST.DEBUG);
+    string soliloquy=XPID+"pflow::AQueue::getQueue():";
+
+    bool SUCCESS=false;
+    uint attempts=0;
+    while(attempts++<ATTEMPTS_GETQUEUE_MAX && SUCCESS==false){
+      try {freeQueue();processQueue();SUCCESS=true;}
+      catch(aurostd::xerror& err) {
+        SUCCESS=false;
+        if(err.error_code!=_RUNTIME_EXTERNAL_FAIL_){attempts=ATTEMPTS_GETQUEUE_MAX;}
+        if(attempts<ATTEMPTS_GETQUEUE_MAX){
+          if(LDEBUG){cerr << soliloquy << " failed attempt, trying to process queue again" << endl;}
+          aurostd::Sleep(2);
+        }
+        else{
+          if(SUCCESS==false){
+            pflow::logger(err.whereFileName(),err.whereFunction(),err.what(),std::cout,_LOGGER_ERROR_);
+          }
+        }
+      }
+    }
+  }
+
+  void AQueue::readNodesPartitionsSLURM(){
+    bool LDEBUG=(FALSE || _AQUEUE_DEBUG_ || XHOST.DEBUG);
+    string soliloquy=XPID+"pflow::AQueue::readNodesPartitionsSLURM():";
+
+    vector<string> lines,tokens,tokens2;
+    uint iline=0;
+    string line="",key="",value="",tmp="";
+
+    //run sinfo
+    //https://slurm.schedmd.com/sinfo.html
+    if(!aurostd::IsCommandAvailable("sinfo")){
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"no sinfo command found for SLURM configuration",_RUNTIME_EXTERNAL_MISS_);
+    }
+    lines=aurostd::string2vectorstring(aurostd::execute2string(XHOST.command("sinfo")+" -N -l"));
+    APartition _partition;_partition.free();
+    ANode _node;_node.free();
+    for(iline=0;iline<lines.size();iline++){
+      if(lines[iline].find("NODELIST")!=string::npos){continue;}  //skip date and header
+      line=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(lines[iline]);
+      if(line.empty()){continue;}
+      if(LDEBUG){cerr << soliloquy << " line=\"" << line << "\"" << endl;}
+      _node.free();
+      aurostd::string2tokens(line,tokens," ");
+      if(tokens.size()<11){continue;}   //skip date and header //throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"tokens.size()<11",_RUNTIME_ERROR_);
+      _node.m_name=tokens[0];
+      //tokens[2] is partition, addPartition() takes care of checking that it's not already in the list
+      _partition.free();
+      _partition.m_name=tokens[2];aurostd::StringSubst(_partition.m_name,"*","");  //this signifies default queue, we don't care
+      addPartition(_partition);
+      _node.m_properties=_partition.m_name; //for node-partition mapping() later
+      //tokens[3] is status
+      if(tokens[3].find('*')!=string::npos){_node.m_status=NODE_DOWN;}  //catch first, doesn't matter what status it is in, IT'S NOT RESPONDING
+      else if(tokens[3]=="allocated+"||tokens[3]=="allocated"||tokens[3]=="alloc"||
+          tokens[3]=="completing"||tokens[3]=="comp"||
+          FALSE){_node.m_status=NODE_FULL;}  //most likely to appear first, quicker to appear at the top
+      else if(tokens[3]=="idle"){_node.m_status=NODE_FREE;}
+      else if(tokens[3]=="mixed"||tokens[3]=="mix"){_node.m_status=NODE_OCCUPIED;}
+      else if(tokens[3]=="reserved"||tokens[3]=="resv"||tokens[3]=="unknown"||tokens[3]=="unk"){_node.m_status=NODE_OFFLINE;}
+      else if(tokens[3]=="down"||
+          tokens[3]=="drained"||tokens[3]=="drain"||tokens[3]=="draining"||tokens[3]=="drng"||
+          tokens[3]=="fail"||tokens[3]=="failing"||tokens[3]=="failg"||
+          tokens[3]=="future"||tokens[3]=="futr"||
+          tokens[3]=="maint"||tokens[3]=="reboot"||
+          tokens[3]=="perfctrs"||tokens[3]=="npc"||
+          tokens[3]=="power_down"||tokens[3]=="powering_down"||tokens[3]=="pow_dn"||
+          tokens[3]=="power_up"||tokens[3]=="powering_up"||tokens[3]=="pow_up"||
+          tokens[3]=="no_respond"||
+          FALSE){_node.m_status=NODE_DOWN;} //leave for last, many variants to consider
+      //tokens[4] is ncpus
+      if(!aurostd::isfloat(tokens[4])){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"tokens[4] is NOT a float (ncpus)",_RUNTIME_ERROR_);}
+      _node.m_ncpus=aurostd::string2utype<double>(tokens[4]);
+      addNode(_node);
+    }
+    if(LDEBUG){cerr << soliloquy << " found " << m_partitions.size() << " partitions" << endl;}
+    if(LDEBUG){cerr << soliloquy << " found " << m_nodes.size() << " nodes" << endl;}
+  }
+
+  void AQueue::readJobsSLURM(){
+    bool LDEBUG=(FALSE || _AQUEUE_DEBUG_ || XHOST.DEBUG);
+    string soliloquy=XPID+"pflow::AQueue::readJobsSLURM():";
+
+    vector<string> lines,tokens,tokens2;
+    uint iline=0,i=0;
+    string line="",key="",value="",tmp="";
+
+    //run squeue
+    if(!aurostd::IsCommandAvailable("squeue")){
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"no squeue command found for SLURM configuration",_RUNTIME_EXTERNAL_MISS_);
+    }
+    lines=aurostd::string2vectorstring(aurostd::execute2string(XHOST.command("squeue")+" --format=\"\%.18i %.9P %.8j \%.8u %.2t %.10M \%.6D \%C \%R\"")); //man squeue
+    AJob _job;_job.free();
+    for(iline=0;iline<lines.size();iline++){
+      if(lines[iline].find("JOBID")!=string::npos){continue;}  //skip date and header
+      line=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(lines[iline]);
+      if(line.empty()){continue;}
+      if(LDEBUG){cerr << soliloquy << " line=\"" << line << "\"" << endl;}
+      aurostd::string2tokens(line,tokens," ");
+      //tokens[0] is job id
+      if(!aurostd::isfloat(tokens[0])){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"!aurostd::isfloat(tokens[0])",_RUNTIME_ERROR_);}
+      _job.free();
+      _job.m_id=aurostd::string2utype<uint>(tokens[0]);
+      //tokens[1] is partition
+      aurostd::string2tokens(tokens[1],tokens2,",");
+      for(i=0;i<tokens2.size();i++){
+        _job.m_vipartitions.push_back(partitionName2Index(tokens2[i]));
+      }
+      //tokens[4] is status
+      //https://curc.readthedocs.io/en/latest/running-jobs/squeue-status-codes.html
+      if(tokens[4]=="PD"){_job.m_status=JOB_QUEUED;}
+      else if(tokens[4]=="R"||tokens[4]=="ST"){_job.m_status=JOB_RUNNING;}  //ST because it retains cores
+      else if(tokens[4]=="S"){_job.m_status=JOB_HELD;} //S because cores are given up for other jobs (transition state)
+      else if(tokens[4]=="CD"||tokens[4]=="CG"||
+          tokens[4]=="F"||
+          tokens[4]=="PR"||
+          FALSE){_job.m_status=JOB_DONE;}
+      else{throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown job status="+tokens[4],_RUNTIME_ERROR_);}
+      //tokens[7] is ncpus
+      if(!aurostd::isfloat(tokens[7])){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"!aurostd::isfloat(tokens[7])",_RUNTIME_ERROR_);}
+      _job.m_ncpus=aurostd::string2utype<uint>(tokens[7]);
+      //tokens[8] is node if running
+      if(_job.m_status==JOB_RUNNING){
+        _job.m_vinodes.push_back(nodeName2Index(tokens[8]));
+        _job.m_vncpus.push_back(_job.m_ncpus);
+      }
+      addJob(_job);
+    }
+  }
+
+  void AQueue::readPartitionsTORQUE(){
+    bool LDEBUG=(FALSE || _AQUEUE_DEBUG_ || XHOST.DEBUG);
+    string soliloquy=XPID+"pflow::AQueue::readPartitionsTORQUE():";
+
+    vector<string> lines,tokens,tokens2;
+    uint iline=0;
+    string line="",key="",value="",tmp="";
+
+    //run qstat -f -Q
+    if(!aurostd::IsCommandAvailable("qstat")){
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"no qstat command found for TORQUE configuration",_RUNTIME_EXTERNAL_MISS_);
+    }
+    //'qstat -f' gives FULL job information, but takes a long time
+    lines=aurostd::string2vectorstring(aurostd::execute2string(XHOST.command("qstat")+" -f -Q"));
+    APartition _partition;_partition.free();
+    _partition.m_name="";
+    _partition.m_properties_node="";
+    for(iline=0;iline<lines.size();iline++){
+      line=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(lines[iline]);
+      if(line.empty()){continue;}
+      if(LDEBUG){cerr << soliloquy << " line=\"" << line << "\"" << endl;}
+      if(line.find("Queue:")!=string::npos){
+        if(!_partition.m_name.empty()){addPartition(_partition);}
+        aurostd::string2tokens(line,tokens,":");
+        if(tokens.size()!=2){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"tokens.size()!=2",_RUNTIME_ERROR_);}
+        _partition.free(); //reset
+        _partition.m_name=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(tokens[1]);
+      }
+      else{
+        aurostd::string2tokens(line,tokens,"=");
+        if(tokens.size()!=2){continue;}   //sometimes we get garbage lines like 'lete:0' //throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"!tokens.size()",_RUNTIME_ERROR_);
+        key=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(tokens[0]);
+        value=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(tokens[1]);
+        if(LDEBUG){cerr << soliloquy << " key=" << key << endl;}
+        if(key=="resources_default.neednodes"){_partition.m_properties_node=value;}  //really only works for root, but we leave here for now
+      }
+    }
+    if(!_partition.m_name.empty()){addPartition(_partition);}
+    if(LDEBUG){cerr << soliloquy << " found " << m_partitions.size() << " partitions" << endl;}
+  }
+
+  void AQueue::readNodesJobsTORQUE(){
+    bool LDEBUG=(FALSE || _AQUEUE_DEBUG_ || XHOST.DEBUG);
+    string soliloquy=XPID+"pflow::AQueue::readNodesJobsTORQUE():";
+
+    vector<string> lines,tokens,tokens2;
+    uint iline=0,i=0;
+    string line="",key="",value="",tmp="";
+
+    //run pbsnodes
+    if(!aurostd::IsCommandAvailable("pbsnodes")){
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"no pbsnodes command found for TORQUE configuration",_RUNTIME_EXTERNAL_MISS_);
+    }
+    lines=aurostd::string2vectorstring(aurostd::execute2string(XHOST.command("pbsnodes")));
+    ANode _node;_node.free();
+    AJob _job;_job.free();
+    for(iline=0;iline<lines.size();iline++){
+      line=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(lines[iline]);
+      if(line.empty()){continue;}
+      if(LDEBUG){cerr << soliloquy << " line=\"" << line << "\"" << endl;}
+      if(line.find('=')==string::npos){
+        if(!_node.m_properties.empty()){addNode(_node);} //we have node information loaded up
+        _node.free();  //reset node
+        _node.m_name=line;
+        continue;
+      }
+      else{
+        aurostd::string2tokens(line,tokens,"=");
+        if(tokens.size()!=2){continue;}   //sometimes we get garbage lines like 'lete:0' //throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"!tokens.size()",_RUNTIME_ERROR_);
+        key=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(tokens[0]);
+        value=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(tokens[1]);
+        if(LDEBUG){cerr << soliloquy << " key=" << key << endl;}
+        if(key=="state"){
+          //possible states: http://docs.adaptivecomputing.com/torque/4-0-2/Content/topics/commands/pbsnodes.htm
+          //"active", "all", "busy", "down", "free", "job-exclusive", "job-sharing", "offline", "reserve", "state-unknown", "time-shared", and "up"
+          if(value.find("down")!=string::npos){_node.m_status=NODE_DOWN;} //down first so we can rectify
+          else if(value.find("offline")!=string::npos){_node.m_status=NODE_OFFLINE;} //offline next
+          else if(value.find("job-exclusive")!=string::npos){_node.m_status=NODE_OCCUPIED;}
+          else if(value.find("free")!=string::npos){_node.m_status=NODE_FREE;}
+          else{
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"unknown state from pbsnodes: state=\""+value+"\"",_RUNTIME_ERROR_);  //more states to account for
+          }
+        }
+        else if(key=="np"){_node.m_ncpus=aurostd::string2utype<uint>(value);}
+        else if(key=="properties"){_node.m_properties=value;}  //needed to match with queue
+        else if(key=="jobs"){
+          aurostd::string2tokens(value,tokens,",");
+          _node.m_ncpus_occupied=tokens.size();  //easy, this is all we need for now
+          //parse 0/709843.qrats.materials.duke.edu
+          for(i=0;i<tokens.size();i++){
+            _job.free();
+            _job.m_id=getTORQUEIDFromString(tokens[i]);
+            _job.m_status=JOB_RUNNING; //if it's here, it's running
+            _job.m_ncpus=1;
+            _job.m_vinodes.push_back(m_nodes.size());  //we haven't added the node yet, so this will be 0 first...
+            _job.m_vncpus.push_back(_job.m_ncpus);
+            addJob(_job);
+          }
+        }
+        //no else, there are other keys that we don't process
+      }
+    }
+    if(!_node.m_properties.empty()){addNode(_node);} //we have node information loaded up
+    if(LDEBUG){cerr << soliloquy << " found " << m_nodes.size() << " nodes" << endl;}
+  }
+
+  void AQueue::readJobsTORQUE(){
+    bool LDEBUG=(FALSE || _AQUEUE_DEBUG_ || XHOST.DEBUG);
+    string soliloquy=XPID+"pflow::AQueue::readJobsTORQUE():";
+
+    vector<string> lines,tokens,tokens2;
+    uint iline=0,i=0;
+    string line="",key="",value="",tmp="";
+    uint id=AUROSTD_MAX_UINT;
+    bool found=false;
+    AJob _job;_job.free();
+
+    //get jobs user
+    if(!aurostd::IsCommandAvailable("qstat")){
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"no qstat command found for TORQUE configuration",_RUNTIME_EXTERNAL_MISS_);
+    }
+    //'qstat -f' gives FULL job information, but takes a long time
+    lines=aurostd::string2vectorstring(aurostd::execute2string(XHOST.command("qstat")+" -a"));
+    for(iline=0;iline<lines.size();iline++){
+      if(lines[iline].find("Job ID")!=string::npos){continue;}  //skip header lines
+      line=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(lines[iline]);
+      if(line.empty()){continue;}
+      if(LDEBUG){cerr << soliloquy << " line=\"" << line << "\"" << endl;}
+      aurostd::string2tokens(line,tokens," ");
+      if(tokens.size()<11){continue;}   //skip date and header //throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"tokens.size()<11",_RUNTIME_ERROR_);
+      //tokens[0] has job id
+      tmp=tokens[0];
+      if(tmp.find("---")!=string::npos){continue;}  //skip header //must be longer than 2 --, see 'Req'd Memory'
+      //709759.qrats.materials
+      id=getTORQUEIDFromString(tmp);
+      found=false;
+      for(i=0;i<m_jobs.size()&&found==false;i++){
+        if(m_jobs[i].m_id==id){
+          //get user: tokens[1]
+          m_jobs[i].m_user=tokens[1];
+          if(LDEBUG){cerr << soliloquy << " adding user=" << m_jobs[i].m_user << " to job=" << m_jobs[i].m_id << endl;}
+          //get partition: tokens[2]
+          m_jobs[i].m_vipartitions.push_back(partitionName2Index(tokens[2]));
+          found=true;
+        }
+      }
+      if(found==false){ //add job
+        _job.free();
+        _job.m_id=id;
+        _job.m_user=tokens[1];
+        //tokens[2] has queue, very important for non-running jobs
+        _job.m_vipartitions.push_back(partitionName2Index(tokens[2]));
+        //tokens[6] has ncpus
+        if(!aurostd::isfloat(tokens[6])){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"!aurostd::isfloat(tokens[6])",_RUNTIME_ERROR_);}
+        _job.m_ncpus=aurostd::string2utype<uint>(tokens[6]);
+        //tokens[9] has job status
+        //http://docs.adaptivecomputing.com/torque/4-1-4/Content/topics/commands/qstat.htm
+        if(tokens[9]=="Q"){_job.m_status=JOB_QUEUED;}
+        else if(tokens[9]=="R"){_job.m_status=JOB_RUNNING;}
+        else if(tokens[9]=="H"||tokens[9]=="S"){_job.m_status=JOB_HELD;}
+        else if(tokens[9]=="C"||tokens[9]=="E"||tokens[9]=="W"){_job.m_status=JOB_DONE;} //not sure about W...
+        else{throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown job status="+tokens[9],_RUNTIME_ERROR_);} //T?
+        addJob(_job);
+      }
+    }
+  }
+
+  void AQueue::processQueue() {
+    bool LDEBUG=(FALSE || _AQUEUE_DEBUG_ || XHOST.DEBUG);
+    string soliloquy=XPID+"pflow::AQueue::processQueue():";
+
+    if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
+
+    if(aurostd::IsCommandAvailable("squeue")){m_qsys=QUEUE_SLURM;}
+    else if(aurostd::IsCommandAvailable("pbsnodes")){m_qsys=QUEUE_TORQUE;}
+    else{throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"cannot identify queuing system",_RUNTIME_ERROR_);}
+
+    if(LDEBUG){
+      cerr << soliloquy << " m_qsys=";
+      if(m_qsys==QUEUE_SLURM){cerr << "SLURM";}
+      if(m_qsys==QUEUE_TORQUE){cerr << "TORQUE";}
+      cerr << endl;
+    }
+
+    if(m_qsys==QUEUE_SLURM){
+      readNodesPartitionsSLURM();
+      readJobsSLURM();
+    }
+    else if(m_qsys==QUEUE_TORQUE){
+      readPartitionsTORQUE();
+      readNodesJobsTORQUE();  //get job numbers and association to nodes here
+      readJobsTORQUE();  //get job users here, validate information from readNodesJobsTORQUE()
+
+      //may need showq later for node-specific submission
+      //if(LDEBUG){cerr << soliloquy << " XHOST.command(\"showq\")=" << XHOST.command("showq") << endl;}
+    }
+
+    //get mappings now - clear first START
+    for(uint inode=0;inode<m_nodes.size();inode++){
+      ANode& node=m_nodes[inode];
+      node.m_vijobs.clear();
+      node.m_vipartitions.clear();
+    }
+    for(uint ipartition=0;ipartition<m_partitions.size();ipartition++){
+      APartition& partition=m_partitions[ipartition];
+      partition.m_inodes.clear();
+      partition.m_vijobs.clear();
+    }
+    //get mappings now - clear first END
+
+    //get node mappings
+    for(uint inode=0;inode<m_nodes.size();inode++){
+      ANode& node=m_nodes[inode];
+      nodePartitionMapping(node);
+    }
+    //get job mappings
+    for(uint ijob=0;ijob<m_jobs.size();ijob++){
+      AJob& job=m_jobs[ijob];
+      jobMapping(job);
+    }
+
+    if(LDEBUG){
+      //see node to job mapping
+      uint ijob=0;
+      for(uint inode=0;inode<m_nodes.size();inode++){
+        ANode& node=m_nodes[inode];
+        cerr << soliloquy << " node=" << node.m_name << " has jobs=";
+        for(uint i=0;i<node.m_vijobs.size();i++){
+          ijob=node.m_vijobs[i];
+          if(ijob>m_jobs.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"ijob>m_jobs.size()-1",_INDEX_BOUNDS_);}
+          AJob& job=m_jobs[ijob];
+          cerr << job.m_id << (i<node.m_vijobs.size()-1?",":"");
+        }
+        cerr << endl;
+      }
+    }
+
+    if(LDEBUG){
+      cerr << soliloquy << " " << XHOST.hostname << " has " << getNNodes() << " nodes (" << getNCPUS() << " cpus)" << endl;
+      bool add_comma=false;
+      for(uint i=0;i<m_partitions.size();i++){
+        add_comma=false;
+        cerr << soliloquy << " " << m_partitions[i].m_name << ":";
+        if(getNCPUS(m_partitions[i],NODE_FREE)>0){cerr << (add_comma?",":"") << " " << getNNodes(m_partitions[i],NODE_FREE) << " free nodes (" << getNCPUS(m_partitions[i],NODE_FREE) << " cpus)";if(add_comma==false){add_comma=true;}}
+        if(getNCPUS(m_partitions[i],NODE_OCCUPIED)>0){cerr << (add_comma?",":"") << " " << getNNodes(m_partitions[i],NODE_OCCUPIED) << " occupied nodes (" << getNCPUS(m_partitions[i],NODE_OCCUPIED,CPUS_FREE) << " cpus free, " << getNCPUS(m_partitions[i],NODE_OCCUPIED,CPUS_OCCUPIED) << " cpus occupied)";if(add_comma==false){add_comma=true;}}
+        if(getNCPUS(m_partitions[i],NODE_FULL)>0){cerr << (add_comma?",":"") << " " << getNNodes(m_partitions[i],NODE_FULL) << " full nodes (" << getNCPUS(m_partitions[i],NODE_FULL) << " cpus)";if(add_comma==false){add_comma=true;}}
+        if(getNCPUS(m_partitions[i],NODE_DOWN)>0){cerr << (add_comma?",":"") << " " << getNNodes(m_partitions[i],NODE_DOWN) << " down nodes (" << getNCPUS(m_partitions[i],NODE_DOWN) << " cpus)";if(add_comma==false){add_comma=true;}}
+        if(getNCPUS(m_partitions[i],NODE_OFFLINE)>0){cerr << (add_comma?",":"") << " " << getNNodes(m_partitions[i],NODE_OFFLINE) << " offline nodes (" << getNCPUS(m_partitions[i],NODE_OFFLINE) << " cpus)";if(add_comma==false){add_comma=true;}}
+        if(getNCPUS(m_partitions[i])>0){cerr << (add_comma?",":"") << " " << getNNodes(m_partitions[i]) << " TOTAL nodes (" << getNCPUS(m_partitions[i]) << " cpus)";if(add_comma==false){add_comma=true;}}
+        cerr << endl;
+      }
+    }
+
+  }
+}
+
+//CO20200526 - queueing class
+namespace pflow {
+  string getQueueStatus(const aurostd::xoption& vpflow){  //CO20200526
+    AQueue aqueue(vpflow);
+    aqueue.getQueue();
+    //[only test on qrats]cerr << aqueue.getPercentage("aflow","batch",JOB_RUNNING) << endl;
+    return "";
+  }
+}
+
 // ***************************************************************************
 // pflow::getFakeElements()
 // ***************************************************************************
@@ -7414,6 +8289,43 @@ namespace pflow{
     }
 
     return tolerance_spectrum;
+  }
+}
+
+// ***************************************************************************
+// pflow::getSpaceGroupSetting() //DX20210420
+// ***************************************************************************
+namespace pflow{
+  uint getSpaceGroupSetting(const string& setting_string, uint mode_default){
+
+    // Return the space group setting
+    // options:
+    //  1) 1 (SG_SETTING_1)    = rhombohedral: rhl setting, monoclinic: unique-axis b, centrosymmetric: origin on high-symmetry site
+    //  2) 2 (SG_SETTING_2)    = rhombohedral: hex setting, monoclinic: unique-axis c, centrosymmetric: origin on inversion site
+    //  3) 3 (SG_SETTING_ANRL) = rhomobhedral: rhl setting, monoclinic: unique-axis b, centrosymmetric: origin on inversion site 
+    // The mode_default variable is an optional input: --prototype command defaults to the AFLOW setting, while everything else defaults to SG_SETTING_1
+
+    string function_name = XPID + "pflow::getSpaceGroupSetting():";
+    stringstream message;
+
+    uint setting = mode_default; //default
+
+    // space group setting
+    if(!setting_string.empty()){
+      if(aurostd::tolower(setting_string) == "aflow" || aurostd::tolower(setting_string) == "anrl"){
+        setting=SG_SETTING_ANRL;
+      }
+      else {
+        int setting_num=aurostd::string2utype<int>(setting_string);
+        if(setting_num==1){setting=SG_SETTING_1;}
+        else if(setting_num==2){setting=SG_SETTING_2;}
+        if(setting_num!=SG_SETTING_1 && setting_num!=SG_SETTING_2){
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Setting must be 1, 2, or \"aflow\" (for rhombohedral systems: 1=rhl setting and 2=hex setting; for monoclinic systems: 1=unique axis-b and 2=unique axis-c).",_INPUT_ILLEGAL_);
+        }
+      }
+    }
+
+    return setting;
   }
 }
 

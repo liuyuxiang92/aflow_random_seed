@@ -943,50 +943,52 @@ namespace aflowlib {
       throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _INDEX_MISMATCH_);
     }
 
-    if(LDEBUG) cerr << soliloquy << " [1]" << endl;
+    if(LDEBUG) cerr << soliloquy << " vspecies.size()=" << vspecies.size() << " [1]" << endl;
     for(uint iext=0;iext<XHOST.vext.size();iext++) { // check _AFLOWIN_.EXT
       if(!vspecies.size() && aurostd::FileExist(directory+"/" + _AFLOWIN_ + XHOST.vext.at(iext))) {
         aurostd::string2vectorstring(aurostd::execute2string(XHOST.vcat.at(iext)+" \""+directory+"/" + _AFLOWIN_ + XHOST.vext.at(iext)+"\""+" | grep VASP_POTCAR_FILE"),vspecies);
-        for(uint i=0;i<vspecies.size();i++) aurostd::StringSubst(vspecies.at(i),"[VASP_POTCAR_FILE]","");
-        for(uint i=0;i<vspecies.size();i++) KBIN::VASP_PseudoPotential_CleanName(vspecies.at(i));
+        for(uint i=0;i<vspecies.size();i++) aurostd::StringSubst(vspecies[i],"[VASP_POTCAR_FILE]","");
+        if(LDEBUG) cerr << soliloquy << " vspecies=" << aurostd::joinWDelimiter(vspecies,",") << endl;  //CO20210315
+        for(uint i=0;i<vspecies.size();i++) vspecies[i]=KBIN::VASP_PseudoPotential_CleanName(vspecies[i]); //CO20210315
+        if(LDEBUG) cerr << soliloquy << " vspecies=" << aurostd::joinWDelimiter(vspecies,",") << endl;  //CO20210315
       }
     }
-    if(LDEBUG) cerr << soliloquy << " [2]" << endl;
+    if(LDEBUG) cerr << soliloquy << " vspecies.size()=" << vspecies.size() << " [2]" << endl;
     for(uint iext=0;iext<XHOST.vext.size();iext++) { // check POSCAR.orig.EXT
       if(!vspecies.size() && aurostd::FileExist(directory+"/POSCAR.orig"+XHOST.vext.at(iext))) {
         oss.str(aurostd::execute2string(XHOST.vcat.at(iext)+" \""+directory+"/POSCAR.orig"+XHOST.vext.at(iext)+"\""));
         xstructure xstr(oss,IOVASP_POSCAR);
-        if(xstr.species.size()>0) if(xstr.species.at(0)!="") for(uint i=0;i<xstr.species.size();i++) vspecies.push_back(xstr.species.at(i)); // dont change order
+        if(xstr.species.size()>0) if(xstr.species.at(0)!="") for(uint i=0;i<xstr.species.size();i++) vspecies.push_back(xstr.species[i]); // dont change order
       }
     }
-    if(LDEBUG) cerr << soliloquy << " [3]" << endl;
+    if(LDEBUG) cerr << soliloquy << " vspecies.size()=" << vspecies.size() << " [3]" << endl;
     for(uint iext=0;iext<XHOST.vext.size();iext++) {  // check POSCAR.relax1.EXT
       if(!vspecies.size() && aurostd::FileExist(directory+"/POSCAR.relax1"+XHOST.vext.at(iext))) {
         oss.str(aurostd::execute2string(XHOST.vcat.at(iext)+" \""+directory+"/POSCAR.relax1"+XHOST.vext.at(iext)+"\""));
         xstructure xstr(oss,IOVASP_POSCAR);
-        if(xstr.species.size()>0) if(xstr.species.at(0)!="") for(uint i=0;i<xstr.species.size();i++) vspecies.push_back(xstr.species.at(i)); // dont change order
+        if(xstr.species.size()>0) if(xstr.species.at(0)!="") for(uint i=0;i<xstr.species.size();i++) vspecies.push_back(xstr.species[i]); // dont change order
       }
     }
-    if(LDEBUG) cerr << soliloquy << " [4]" << endl;
+    if(LDEBUG) cerr << soliloquy << " vspecies.size()=" << vspecies.size() << " [4]" << endl;
     for(uint iext=0;iext<XHOST.vext.size();iext++) { // check POSCAR.bands.EXT
       if(!vspecies.size() && aurostd::FileExist(directory+"/POSCAR.bands"+XHOST.vext.at(iext))) {
         oss.str(aurostd::execute2string(XHOST.vcat.at(iext)+" \""+directory+"/POSCAR.bands"+XHOST.vext.at(iext)+"\""));
         xstructure xstr(oss,IOVASP_POSCAR);
-        if(xstr.species.size()>0) if(xstr.species.at(0)!="") for(uint i=0;i<xstr.species.size();i++) vspecies.push_back(xstr.species.at(i)); // dont change order
+        if(xstr.species.size()>0) if(xstr.species.at(0)!="") for(uint i=0;i<xstr.species.size();i++) vspecies.push_back(xstr.species[i]); // dont change order
       }
     }
-    if(LDEBUG) cerr << soliloquy << " [5]" << endl;
+    if(LDEBUG) cerr << soliloquy << " vspecies.size()=" << vspecies.size() << " [5]" << endl;
     for(uint iext=0;iext<XHOST.vext.size();iext++) { // check OUTCAR.relax1.EXT
       if(!vspecies.size() && aurostd::FileExist(directory+"/OUTCAR.relax1"+XHOST.vext.at(iext))) {
         aurostd::string2vectorstring(aurostd::execute2string(XHOST.vcat.at(iext)+" \""+directory+"/OUTCAR.relax1"+XHOST.vext.at(iext)+"\""+" | grep TITEL"),vs);
-        for(uint i=0;i<vs.size();i++) { aurostd::string2tokens(vs.at(i),tokens," ");vspecies.push_back(KBIN::VASP_PseudoPotential_CleanName(tokens.at(3))); }
+        for(uint i=0;i<vs.size();i++) { aurostd::string2tokens(vs[i],tokens," ");vspecies.push_back(KBIN::VASP_PseudoPotential_CleanName(tokens.at(3))); }
       }
     }
-    if(LDEBUG) cerr << soliloquy << " [6]" << endl;
+    if(LDEBUG) cerr << soliloquy << " vspecies.size()=" << vspecies.size() << " [6]" << endl;
     for(uint iext=0;iext<XHOST.vext.size();iext++) { // check OUTCAR.static.EXT
       if(!vspecies.size() && aurostd::FileExist(directory+"/OUTCAR.static"+XHOST.vext.at(iext))) {
         aurostd::string2vectorstring(aurostd::execute2string(XHOST.vcat.at(iext)+" \""+directory+"/OUTCAR.static"+XHOST.vext.at(iext)+"\""+" | grep TITEL"),vs);
-        for(uint i=0;i<vs.size();i++) { aurostd::string2tokens(vs.at(i),tokens," ");vspecies.push_back(KBIN::VASP_PseudoPotential_CleanName(tokens.at(3))); }
+        for(uint i=0;i<vs.size();i++) { aurostd::string2tokens(vs[i],tokens," ");vspecies.push_back(KBIN::VASP_PseudoPotential_CleanName(tokens.at(3))); }
       }
     }
     if(LDEBUG) cerr << soliloquy << " END" << endl;
@@ -1296,6 +1298,9 @@ namespace aflowlib {
     GetSpeciesDirectory(directory_LIB,aflowlib_data.vspecies);
     aflowlib_data.species=aurostd::joinWDelimiter(aflowlib_data.vspecies,",");
     aflowlib_data.nspecies=aflowlib_data.vspecies.size();
+
+    cout << soliloquy << " nspecies=" << aflowlib_data.nspecies << endl;
+    cout << soliloquy << " species=" << aflowlib_data.species << endl;
 
     if(LDEBUG) cerr << soliloquy << " [2]" << endl;
 
@@ -2576,7 +2581,7 @@ namespace aflowlib {
     }
 
     // OPERATE FORMATION
-    //     cerr << "FORMATION_CALC=" << FORMATION_CALC << endl; exit(0);
+    //     cerr << "FORMATION_CALC=" << FORMATION_CALC << endl;
 
     // line XXX2					   
     if(FORMATION_CALC) { // no LDAU yet
@@ -2715,7 +2720,7 @@ namespace aflowlib {
     }
 
     // OPERATE FORMATION
-    //     cerr << "FORMATION_CALC=" << FORMATION_CALC << endl; exit(0);
+    //     cerr << "FORMATION_CALC=" << FORMATION_CALC << endl;
 
     // line XXX2					   
     if(FORMATION_CALC) { // no LDAU yet
@@ -3958,7 +3963,7 @@ namespace aflowlib {
           if(VOLDISTEvolution_flag) if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [Volume Distance Bonds Analyzer: ORIGINAL]" << endl;
           ssfile << "Volume Distance Bonds Analyzer: ORIGINAL" << endl;
           stringstream sss;vector<string> vline;
-          pflow::PrintData(xstructure(directory_RAW+"/POSCAR.orig",IOAFLOW_AUTO),sss,"DATA"); // DATA
+          sss << pflow::PrintData(xstructure(directory_RAW+"/POSCAR.orig",IOAFLOW_AUTO),"DATA"); // DATA //DX20210301 - void to string output
           aurostd::string2vectorstring(sss.str(),vline);
           for(uint iline=0;iline<vline.size();iline++) if(aurostd::substring2bool(vline.at(iline),"real space volume")) ssfile << vline.at(iline) << endl;
           for(uint iline=0;iline<vline.size();iline++) if(aurostd::substring2bool(vline.at(iline),"Real space a b c alpha beta gamma")) ssfile << vline.at(iline) << endl;
@@ -3967,7 +3972,7 @@ namespace aflowlib {
           if(VOLDISTEvolution_flag) if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [Volume Distance Bonds Analyzer: RELAX1]" << endl;
           ssfile << "Volume Distance Bonds Analyzer: RELAX1" << endl;
           stringstream sss;vector<string> vline;
-          pflow::PrintData(xstructure(directory_RAW+"/CONTCAR.relax1",IOAFLOW_AUTO),sss,"DATA"); // DATA
+          sss << pflow::PrintData(xstructure(directory_RAW+"/CONTCAR.relax1",IOAFLOW_AUTO),"DATA"); // DATA //DX20210301 - void to string output
           aurostd::string2vectorstring(sss.str(),vline);
           for(uint iline=0;iline<vline.size();iline++) if(aurostd::substring2bool(vline.at(iline),"real space volume")) ssfile << vline.at(iline) << endl;
           for(uint iline=0;iline<vline.size();iline++) if(aurostd::substring2bool(vline.at(iline),"Real space a b c alpha beta gamma")) ssfile << vline.at(iline) << endl;
@@ -3976,7 +3981,7 @@ namespace aflowlib {
           if(VOLDISTEvolution_flag) if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [Volume Distance Bonds Analyzer: RELAX]" << endl;
           ssfile << "Volume Distance Bonds Analyzer: RELAX" << endl;
           stringstream sss;vector<string> vline;
-          pflow::PrintData(xstructure(directory_RAW+"/CONTCAR.relax",IOAFLOW_AUTO),sss,"DATA"); // DATA
+          sss << pflow::PrintData(xstructure(directory_RAW+"/CONTCAR.relax",IOAFLOW_AUTO),"DATA"); // DATA //DX20210301 - void to string output
           aurostd::string2vectorstring(sss.str(),vline);
           for(uint iline=0;iline<vline.size();iline++) if(aurostd::substring2bool(vline.at(iline),"real space volume")) ssfile << vline.at(iline) << endl;
           for(uint iline=0;iline<vline.size();iline++) if(aurostd::substring2bool(vline.at(iline),"Real space a b c alpha beta gamma")) ssfile << vline.at(iline) << endl;
@@ -4044,11 +4049,11 @@ namespace aflowlib {
         stringstream sss; sss << aflow::Banner("BANNER_TINY") << endl;
         xstructure str_sym=str; //CO20171027 //DX20180226 - set equal str
         aurostd::xoption vpflow_edata_orig; //DX20180823 - added xoption
-        pflow::PrintData(str,str_sym,str_sp,str_sc,sss,vpflow_edata_orig,"EDATA","txt",false); // 1=EDATA //CO20171025 //CO20171027
+        sss << pflow::PrintData(str,str_sym,str_sp,str_sc,vpflow_edata_orig,"EDATA",txt_ft,false); // 1=EDATA //CO20171025 //CO20171027 //DX20210301 - void to string output, "txt" to txt_ft
         aurostd::stringstream2file(sss,directory_RAW+"/"+DEFAULT_FILE_EDATA_ORIG_OUT);
         if(AFLOWLIB_VERBOSE) cout << MESSAGE << " EDATA doing orig (POSCAR.orig) json format: " << directory_RAW << endl;
         stringstream jjj; //CO20171025
-        pflow::PrintData(str_sym,str_sym,str_sp,str_sc,jjj,vpflow_edata_orig,"EDATA","json",true); // 1=EDATA, already_calculated!  //CO20171025 //CO20171027
+        jjj << pflow::PrintData(str_sym,str_sym,str_sp,str_sc,vpflow_edata_orig,"EDATA",json_ft,true); // 1=EDATA, already_calculated!  //CO20171025 //CO20171027  //DX20210301 - void to string output, "json" to json_ft
         aurostd::stringstream2file(jjj,directory_RAW+"/"+DEFAULT_FILE_EDATA_ORIG_JSON); //CO20171025
         vcif.clear();vcif.push_back(str);vcif.push_back(str_sp);vcif.push_back(str_sc);
         //CO+DX START 20170713 - adding symmetry output to RAW
@@ -4255,24 +4260,24 @@ namespace aflowlib {
         if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.ORIG] BRAVAIS LATTICE OF THE CRYSTAL (pgroup_xtal) - Real space: Lattice Variation = " << data.lattice_variation_orig << endl;
         if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.ORIG] BRAVAIS LATTICE OF THE CRYSTAL (pgroup_xtal) - Real space: Lattice System = " << data.lattice_system_orig << endl;
         if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.ORIG] BRAVAIS LATTICE OF THE CRYSTAL (pgroup_xtal) - Real space: Pearson Symbol = " << data.Pearson_symbol_orig << endl;
-        //DX20190208 - add ANRL label/parameters/parameter values - START
+        //DX20190208 - add AFLOW label/parameters/parameter values - START
         double anrl_symmetry_tolerance = str_sym.sym_eps;
         xstructure str_anrl = str;
         uint setting=SG_SETTING_ANRL;
-        anrl::structure2anrl(str_anrl, anrl_symmetry_tolerance, setting); 
-        if(data.aflow_prototype_label_orig.empty()) { // anrl label 
-          data.aflow_prototype_label_orig = str_anrl.prototype; 
+        anrl::structure2anrl(str_anrl, anrl_symmetry_tolerance, setting);
+        if(data.aflow_prototype_label_orig.empty()) { // aflow label
+          data.aflow_prototype_label_orig = str_anrl.prototype;
         }
-        if(data.aflow_prototype_parameter_list_orig.empty()) { // anrl parameter list
-          data.aflow_prototype_parameter_list_orig = aurostd::joinWDelimiter(str_anrl.prototype_parameter_list,","); 
+        if(data.aflow_prototype_params_list_orig.empty()) { // aflow parameter list
+          data.aflow_prototype_params_list_orig = aurostd::joinWDelimiter(str_anrl.prototype_parameter_list,",");
         }
-        if(data.aflow_prototype_parameter_values_orig.empty()) { // anrl parameter values
-          data.aflow_prototype_parameter_values_orig = aurostd::joinWDelimiter(aurostd::vecDouble2vecString(str_anrl.prototype_parameter_values,_AFLOWLIB_DATA_DOUBLE_PREC_),","); 
+        if(data.aflow_prototype_params_values_orig.empty()) { // anrl parameter values
+          data.aflow_prototype_params_values_orig = aurostd::joinWDelimiter(aurostd::vecDouble2vecString(str_anrl.prototype_parameter_values,_AFLOWLIB_DATA_DOUBLE_PREC_),",");
         }
-        if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.ORIG] ANRL Label = " << data.aflow_prototype_label_orig << endl;
-        if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.ORIG] ANRL parameter list = " << data.aflow_prototype_parameter_list_orig << endl;
-        if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.ORIG] ANRL parameter values = " << data.aflow_prototype_parameter_values_orig << endl;
-        //DX20190208 - add ANRL label/parameters/parameter values - END
+        if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.ORIG] AFLOW Label = " << data.aflow_prototype_label_orig << endl;
+        if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.ORIG] AFLOW parameter list = " << data.aflow_prototype_params_list_orig << endl;
+        if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.ORIG] AFLOW parameter values = " << data.aflow_prototype_params_values_orig << endl;
+        //DX20190208 - add AFLOW label/parameters/parameter values - END
       }
     }
 
@@ -4357,11 +4362,11 @@ namespace aflowlib {
         stringstream sss; sss << aflow::Banner("BANNER_TINY") << endl;
         xstructure str_sym=str; //CO20171027 //DX20180226 - set equal str
         aurostd::xoption vpflow_edata_relax; //DX20180823 - added xoption
-        pflow::PrintData(str,str_sym,str_sp,str_sc,sss,vpflow_edata_relax,"EDATA","txt",false); // EDATA //CO20171025 //CO20171027
+        sss << pflow::PrintData(str,str_sym,str_sp,str_sc,vpflow_edata_relax,"EDATA",txt_ft,false); // EDATA //CO20171025 //CO20171027 //DX20210301 - void to string output, "txt" to txt_ft
         aurostd::stringstream2file(sss,directory_RAW+"/"+DEFAULT_FILE_EDATA_RELAX_OUT);
         if(AFLOWLIB_VERBOSE) cout << MESSAGE << " EDATA doing relax (CONTCAR.relax) json format: " << directory_RAW << endl;
         stringstream jjj; //CO20171025
-        pflow::PrintData(str_sym,str_sym,str_sp,str_sc,jjj,vpflow_edata_relax,"EDATA","json",true); // EDATA already_calculated! //CO20171025 //CO20171027
+        jjj << pflow::PrintData(str_sym,str_sym,str_sp,str_sc,vpflow_edata_relax,"EDATA",json_ft,true); // EDATA already_calculated! //CO20171025 //CO20171027 //DX20210301 - void to string output, "json" to json_ft
         aurostd::stringstream2file(jjj,directory_RAW+"/"+DEFAULT_FILE_EDATA_RELAX_JSON); //CO20171025
         vcif.clear();vcif.push_back(str);vcif.push_back(str_sp);vcif.push_back(str_sc);
         //CO+DX START 20170713 - adding symmetry output to RAW
@@ -4571,24 +4576,24 @@ namespace aflowlib {
         if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.RELAX] BRAVAIS LATTICE OF THE CRYSTAL (pgroup_xtal) - Real space: Lattice Variation = " << data.lattice_variation_relax << endl;
         if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.RELAX] BRAVAIS LATTICE OF THE CRYSTAL (pgroup_xtal) - Real space: Lattice System = " << data.lattice_system_relax << endl;
         if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.RELAX] BRAVAIS LATTICE OF THE CRYSTAL (pgroup_xtal) - Real space: Pearson Symbol = " << data.Pearson_symbol_relax << endl;
-        //DX20190208 - add ANRL label/parameters/parameter values - START
+        //DX20190208 - add AFLOW label/parameters/parameter values - START
         double anrl_symmetry_tolerance = str_sym.sym_eps;
         xstructure str_anrl = str;
         uint setting=SG_SETTING_ANRL;
-        anrl::structure2anrl(str_anrl, anrl_symmetry_tolerance, setting); 
-        if(data.aflow_prototype_label_relax.empty()) { // anrl label 
-          data.aflow_prototype_label_relax = str_anrl.prototype; 
+        anrl::structure2anrl(str_anrl, anrl_symmetry_tolerance, setting);
+        if(data.aflow_prototype_label_relax.empty()) { // aflow label
+          data.aflow_prototype_label_relax = str_anrl.prototype;
         }
-        if(data.aflow_prototype_parameter_list_relax.empty()) { // anrl parameter list
-          data.aflow_prototype_parameter_list_relax = aurostd::joinWDelimiter(str_anrl.prototype_parameter_list,","); 
+        if(data.aflow_prototype_params_list_relax.empty()) { // aflow parameter list
+          data.aflow_prototype_params_list_relax = aurostd::joinWDelimiter(str_anrl.prototype_parameter_list,",");
         }
-        if(data.aflow_prototype_parameter_values_relax.empty()) { // anrl parameter values
-          data.aflow_prototype_parameter_values_relax = aurostd::joinWDelimiter(aurostd::vecDouble2vecString(str_anrl.prototype_parameter_values,_AFLOWLIB_DATA_DOUBLE_PREC_),","); 
+        if(data.aflow_prototype_params_values_relax.empty()) { // aflow parameter values
+          data.aflow_prototype_params_values_relax = aurostd::joinWDelimiter(aurostd::vecDouble2vecString(str_anrl.prototype_parameter_values,_AFLOWLIB_DATA_DOUBLE_PREC_),",");
         }
-        //DX20190208 - add ANRL label/parameters/parameter values - END
-        if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.RELAX] ANRL Label = " << data.aflow_prototype_label_relax << endl;
-        if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.RELAX] ANRL parameter list = " << data.aflow_prototype_parameter_list_relax << endl;
-        if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.RELAX] ANRL parameter values = " << data.aflow_prototype_parameter_values_relax << endl;
+        //DX20190208 - add AFLOW label/parameters/parameter values - END
+        if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.RELAX] AFLOW Label = " << data.aflow_prototype_label_relax << endl;
+        if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.RELAX] AFLOW parameter list = " << data.aflow_prototype_params_list_relax << endl;
+        if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.RELAX] AFLOW parameter values = " << data.aflow_prototype_params_values_relax << endl;
       }
     }
     if(LDEBUG) cerr << soliloquy << " [17]" << endl;
@@ -4600,11 +4605,11 @@ namespace aflowlib {
         stringstream sss; sss << aflow::Banner("BANNER_TINY") << endl;
         xstructure str_sym=str; //CO20171027 //DX20180226 - set equal str
         aurostd::xoption vpflow_edata_bands; //DX20180823 - added xoption
-        pflow::PrintData(str,str_sym,str_sp,str_sc,sss,vpflow_edata_bands,"EDATA","txt",false); // EDATA //CO20171025 //CO20171027
+        sss << pflow::PrintData(str,str_sym,str_sp,str_sc,vpflow_edata_bands,"EDATA",txt_ft,false); // EDATA //CO20171025 //CO20171027 //DX20210301 - void to string output, "txt" to txt_ft
         aurostd::stringstream2file(sss,directory_RAW+"/"+DEFAULT_FILE_EDATA_BANDS_OUT);
         if(AFLOWLIB_VERBOSE) cout << MESSAGE << " EDATA doing bands (POSCAR.bands) json format: " << directory_RAW << endl;
         stringstream jjj; //CO20171025
-        pflow::PrintData(str_sym,str_sym,str_sp,str_sc,jjj,vpflow_edata_bands,"EDATA","json",true); // EDATA already_calculated! //CO20171025 //CO20171027
+        jjj << pflow::PrintData(str_sym,str_sym,str_sp,str_sc,vpflow_edata_bands,"EDATA",json_ft,true); // EDATA already_calculated! //CO20171025 //CO20171027 //DX20210301 - void to string output, "json" to json_ft
         aurostd::stringstream2file(jjj,directory_RAW+"/"+DEFAULT_FILE_EDATA_BANDS_JSON); //CO20171025
         vcif.clear();vcif.push_back(str);vcif.push_back(str_sp);vcif.push_back(str_sc);
         //CO+DX START 20170713 - adding symmetry output to RAW
@@ -4814,7 +4819,7 @@ namespace aflowlib {
         if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.BANDS] BRAVAIS LATTICE OF THE CRYSTAL (pgroup_xtal) - Real space: Lattice Variation = " << data.lattice_variation_relax << endl;
         if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.BANDS] BRAVAIS LATTICE OF THE CRYSTAL (pgroup_xtal) - Real space: Lattice System = " << data.lattice_system_relax << endl;
         if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.BANDS] BRAVAIS LATTICE OF THE CRYSTAL (pgroup_xtal) - Real space: Pearson Symbol = " << data.Pearson_symbol_relax << endl;
-        //DX20190208 - add ANRL label/parameters/parameter values - START
+        //DX20190208 - add AFLOW label/parameters/parameter values - START
         double anrl_symmetry_tolerance = str_sym.sym_eps;
         xstructure str_anrl = str;
         uint setting=SG_SETTING_ANRL;
@@ -4822,16 +4827,16 @@ namespace aflowlib {
         if(data.aflow_prototype_label_relax.empty()) { // anrl label 
           data.aflow_prototype_label_relax = str_anrl.prototype; 
         }
-        if(data.aflow_prototype_parameter_list_relax.empty()) { // anrl parameter list
-          data.aflow_prototype_parameter_list_relax = aurostd::joinWDelimiter(str_anrl.prototype_parameter_list,","); 
+        if(data.aflow_prototype_params_list_relax.empty()) { // anrl parameter list
+          data.aflow_prototype_params_list_relax = aurostd::joinWDelimiter(str_anrl.prototype_parameter_list,","); 
         }
-        if(data.aflow_prototype_parameter_values_relax.empty()) { // anrl parameter values
-          data.aflow_prototype_parameter_values_relax = aurostd::joinWDelimiter(aurostd::vecDouble2vecString(str_anrl.prototype_parameter_values,_AFLOWLIB_DATA_DOUBLE_PREC_),","); 
+        if(data.aflow_prototype_params_values_relax.empty()) { // anrl parameter values
+          data.aflow_prototype_params_values_relax = aurostd::joinWDelimiter(aurostd::vecDouble2vecString(str_anrl.prototype_parameter_values,_AFLOWLIB_DATA_DOUBLE_PREC_),","); 
         }
-        if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.BANDS] ANRL Label = " << data.aflow_prototype_label_relax << endl;
-        if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.BANDS] ANRL parameter list = " << data.aflow_prototype_parameter_list_relax << endl;
-        if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.BANDS] ANRL parameter values = " << data.aflow_prototype_parameter_values_relax << endl;
-        //DX20190208 - add ANRL label/parameters/parameter values - END
+        if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.BANDS] AFLOW Label = " << data.aflow_prototype_label_relax << endl;
+        if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.BANDS] AFLOW parameter list = " << data.aflow_prototype_params_list_relax << endl;
+        if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.BANDS] AFLOW parameter values = " << data.aflow_prototype_params_values_relax << endl;
+        //DX20190208 - add AFLOW label/parameters/parameter values - END
       }
     }
     if(LDEBUG) cerr << soliloquy << " [18]" << endl;
@@ -4843,11 +4848,11 @@ namespace aflowlib {
         str=xstructure(directory_RAW+"/POSCAR.orig",IOAFLOW_AUTO);str_sp.clear();str_sc.clear(); //DX20191220 - uppercase to lowercase clear
         stringstream sss; sss << aflow::Banner("BANNER_TINY") << endl;
         xstructure str_sym=str; //CO20171027 //DX20180226 - set equal str
-        pflow::PrintData(str,str_sym,str_sp,str_sc,sss,"DATA","txt",false); // DATA //CO20171025 //CO20171027
+        sss << pflow::PrintData(str,str_sym,str_sp,str_sc,"DATA",txt_ft,false); // DATA //CO20171025 //CO20171027 //DX20210301 - void to string output, "txt" to txt_ft
         aurostd::stringstream2file(sss,directory_RAW+"/"+DEFAULT_FILE_DATA_ORIG_OUT);
         if(AFLOWLIB_VERBOSE) cout << MESSAGE << " DATA doing orig (POSCAR.orig) json format: " << directory_RAW << endl;
         stringstream jjj; //CO20171025
-        pflow::PrintData(str_sym,str_sym,str_sp,str_sc,jjj,"DATA","json",true); // DATA already_calculated! //CO20171025 //CO20171027
+        jjj << pflow::PrintData(str_sym,str_sym,str_sp,str_sc,"DATA",json_ft,true); // DATA already_calculated! //CO20171025 //CO20171027 //DX20210301 - void to string output, "json" to json_ft
         aurostd::stringstream2file(jjj,directory_RAW+"/"+DEFAULT_FILE_DATA_ORIG_JSON); //CO20171025
       }
     }
@@ -4858,11 +4863,11 @@ namespace aflowlib {
         str=xstructure(directory_RAW+"/CONTCAR.relax",IOAFLOW_AUTO);str_sp.clear();str_sc.clear(); //DX20191220 - uppercase to lowercase clear
         stringstream sss; sss << aflow::Banner("BANNER_TINY") << endl;
         xstructure str_sym=str; //CO20171027 //DX20180226 - set equal str
-        pflow::PrintData(str,str_sym,str_sp,str_sc,sss,"DATA","txt",false); // DATA //CO20171025 //CO20171027
+        sss << pflow::PrintData(str,str_sym,str_sp,str_sc,"DATA",txt_ft,false); // DATA //CO20171025 //CO20171027 //DX20210301 - void to string output, "txt" to txt_ft
         aurostd::stringstream2file(sss,directory_RAW+"/"+DEFAULT_FILE_DATA_RELAX_OUT);
         if(AFLOWLIB_VERBOSE) cout << MESSAGE << " DATA doing relax (CONTCAR.relax) json format: " << directory_RAW << endl;
         stringstream jjj; //CO20171025
-        pflow::PrintData(str_sym,str_sym,str_sp,str_sc,jjj,"DATA","json",true); // DATA already_calculated! //CO20171025 //CO20171027
+        jjj << pflow::PrintData(str_sym,str_sym,str_sp,str_sc,"DATA",json_ft,true); // DATA already_calculated! //CO20171025 //CO20171027 //DX20210301 - void to string output, "json" to json_ft
         aurostd::stringstream2file(jjj,directory_RAW+"/"+DEFAULT_FILE_DATA_RELAX_JSON); //CO20171025
       }
     }
@@ -4873,11 +4878,11 @@ namespace aflowlib {
         str=xstructure(directory_RAW+"/POSCAR.bands",IOAFLOW_AUTO);str_sp.clear();str_sc.clear(); //DX20191220 - uppercase to lowercase clear
         stringstream sss; sss << aflow::Banner("BANNER_TINY") << endl;
         xstructure str_sym=str; //CO20171027 //DX20180226 - set equal str
-        pflow::PrintData(str,str_sym,str_sp,str_sc,sss,"DATA","txt",false); // DATA //CO20171025 //CO20171027
+        sss << pflow::PrintData(str,str_sym,str_sp,str_sc,"DATA",txt_ft,false); // DATA //CO20171025 //CO20171027 //DX20210301 - void to string output, "txt" to txt_ft
         aurostd::stringstream2file(sss,directory_RAW+"/"+DEFAULT_FILE_DATA_BANDS_OUT);
         if(AFLOWLIB_VERBOSE) cout << MESSAGE << " DATA doing relax (POSCAR.bands) json format: " << directory_RAW << endl;
         stringstream jjj; //CO20171025
-        pflow::PrintData(str_sym,str_sym,str_sp,str_sc,jjj,"DATA","json",true); // DATA already_calculated! //CO20171025 //CO20171027
+        jjj << pflow::PrintData(str_sym,str_sym,str_sp,str_sc,"DATA",json_ft,true); // DATA already_calculated! //CO20171025 //CO20171027 //DX20210301 - void to string output, "json" to json_ft
         aurostd::stringstream2file(jjj,directory_RAW+"/"+DEFAULT_FILE_DATA_BANDS_JSON); //CO20171025
       }
     }
@@ -6005,7 +6010,7 @@ namespace aflowlib {
     stringstream sss;
     aurostd::xoption vpflow_edata; //DX20180823 - added xoption
     if(LDEBUG){cerr << soliloquy << " starting EDATA analysis" << endl;}
-    pflow::PrintData(xstr_pocc_parent,xstr_sp,xstr_sc,sss,vpflow_edata,"EDATA"); // 1=EDATA //CO20171025 //CO20171027
+    sss << pflow::PrintData(xstr_pocc_parent,xstr_sp,xstr_sc,vpflow_edata,"EDATA"); // 1=EDATA //CO20171025 //CO20171027 //DX20210301 void to string output
     if(LDEBUG){cerr << soliloquy << " EDATA analysis finished" << endl;}
     xmatrix<double> klattice;
     //do NOT write out file, not all the properties are applicable
@@ -6102,18 +6107,18 @@ namespace aflowlib {
     anrl::structure2anrl(xstr_anrl,xstr_anrl.sym_eps,SG_SETTING_ANRL);
     data.aflow_prototype_label_orig=xstr_anrl.prototype;
     if(AFLOWLIB_VERBOSE && !data.aflow_prototype_label_orig.empty()) cout << MESSAGE << " aflow_prototype_label_orig=" << data.aflow_prototype_label_orig << endl;
-    data.aflow_prototype_parameter_list_orig=aurostd::joinWDelimiter(xstr_anrl.prototype_parameter_list,",");
-    if(AFLOWLIB_VERBOSE && !data.aflow_prototype_parameter_list_orig.empty()) cout << MESSAGE << " aflow_prototype_parameter_list_orig=" << data.aflow_prototype_parameter_list_orig << endl;
-    //build data.aflow_prototype_parameter_values_orig from scratch
+    data.aflow_prototype_params_list_orig=aurostd::joinWDelimiter(xstr_anrl.prototype_parameter_list,",");
+    if(AFLOWLIB_VERBOSE && !data.aflow_prototype_params_list_orig.empty()) cout << MESSAGE << " aflow_prototype_params_list_orig=" << data.aflow_prototype_params_list_orig << endl;
+    //build data.aflow_prototype_params_values_orig from scratch
     if(LDEBUG){cerr << soliloquy << " prototype_parameter_values(PARENT)=" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(xstr_anrl.prototype_parameter_values,_AFLOWLIB_DATA_DOUBLE_PREC_),",") << endl;}
     vector<double> prototype_parameter_values=xstr_anrl.prototype_parameter_values;
-    if(prototype_parameter_values.empty()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"ANRL parameter values builder failed: prototype_parameter_values.empty()",_RUNTIME_ERROR_);}
+    if(prototype_parameter_values.empty()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"AFLOW parameter values builder failed: prototype_parameter_values.empty()",_RUNTIME_ERROR_);}
     prototype_parameter_values[0]*=(xstr_pocc.GetVolume()/xstr_pocc_parent.GetVolume());  //scale for the volume of the pocc structure, remember: anrl is based on std_conv, not the primitive
     if(prototype_parameter_values.size()!=xstr_anrl.prototype_parameter_values.size()){
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"ANRL parameter values builder failed: prototype_parameter_values.size()!=xstr_anrl.prototype_parameter_values.size()",_RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"AFLOW parameter values builder failed: prototype_parameter_values.size()!=xstr_anrl.prototype_parameter_values.size()",_RUNTIME_ERROR_);
     }
-    data.aflow_prototype_parameter_values_orig=aurostd::joinWDelimiter(aurostd::vecDouble2vecString(prototype_parameter_values,_AFLOWLIB_DATA_DOUBLE_PREC_),",");
-    if(AFLOWLIB_VERBOSE && !data.aflow_prototype_parameter_values_orig.empty()) cout << MESSAGE << " aflow_prototype_parameter_values_orig=" << data.aflow_prototype_parameter_values_orig << endl;
+    data.aflow_prototype_params_values_orig=aurostd::joinWDelimiter(aurostd::vecDouble2vecString(prototype_parameter_values,_AFLOWLIB_DATA_DOUBLE_PREC_),",");
+    if(AFLOWLIB_VERBOSE && !data.aflow_prototype_params_values_orig.empty()) cout << MESSAGE << " aflow_prototype_params_values_orig=" << data.aflow_prototype_params_values_orig << endl;
 
     //get other _atom/_cell properties
     double data_natoms=0.0; //needs to be double for pocc

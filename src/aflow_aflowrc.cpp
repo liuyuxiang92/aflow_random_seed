@@ -24,13 +24,13 @@
 
 //ME20191001 START
 // DEFAULTS AFLOW DATABASE
-#define AFLOWRC_DEFAULT_AFLOW_DB_FILE                   string("/common/AFLOWCACHE/aflowlib.db")
+#define AFLOWRC_DEFAULT_AFLOW_DB_FILE                   string("/var/cache/aflow_data/AFLOWDB/aflowlib.db")
 #define         DEFAULT_AFLOW_DB_FILE                   XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_DB_FILE")
-#define AFLOWRC_DEFAULT_AFLOW_DB_STATS_FILE             string("/common/AFLOWCACHE/aflowlib.json")
+#define AFLOWRC_DEFAULT_AFLOW_DB_STATS_FILE             string("/var/cache/aflow_data/AFLOWDB/aflowlib.json")
 #define         DEFAULT_AFLOW_DB_STATS_FILE             XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_DB_STATS_FILE")
 #define AFLOWRC_DEFAULT_AFLOW_DB_DATA_PATH              string("/common/AFLOW/LIBS/")
 #define         DEFAULT_AFLOW_DB_DATA_PATH              XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_DB_DATA_PATH")
-#define AFLOWRC_DEFAULT_AFLOW_DB_LOCK_FILE              string("/common/AFLOWCACHE/ADB_Idle.lock")
+#define AFLOWRC_DEFAULT_AFLOW_DB_LOCK_FILE              string("/var/cache/aflow_data/AFLOWDB/ADB_Idle.lock")
 #define         DEFAULT_AFLOW_DB_LOCK_FILE              XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_DB_LOCK_FILE")
 #define AFLOWRC_DEFAULT_AFLOW_DB_STALE_THRESHOLD        3*3600
 #define         DEFAULT_AFLOW_DB_STALE_THRESHOLD        XHOST.adefault.getattachedutype<long int>("DEFAULT_AFLOW_DB_STALE_THRESHOLD")
@@ -356,7 +356,7 @@
 #define         DEFAULT_GNUPLOT_GREEK_FONT_BOLD_ITALICS       XHOST.adefault.getattachedscheme("DEFAULT_GNUPLOT_GREEK_FONT_BOLD_ITALICS")
 
 // DEFAULT CHULL
-#define AFLOWRC_DEFAULT_CHULL_ALLOWED_DFT_TYPES                           string("PAW_PBE")
+#define AFLOWRC_DEFAULT_CHULL_ALLOWED_DFT_TYPES                           string("PAW_PBE,PAW_PBE_KIN")
 #define         DEFAULT_CHULL_ALLOWED_DFT_TYPES                           XHOST.adefault.getattachedscheme("DEFAULT_CHULL_ALLOWED_DFT_TYPES")
 #define AFLOWRC_DEFAULT_CHULL_ALLOW_ALL_FORMATION_ENERGIES                FALSE
 #define         DEFAULT_CHULL_ALLOW_ALL_FORMATION_ENERGIES                XHOST.adefault.getattachedutype<bool>("DEFAULT_CHULL_ALLOW_ALL_FORMATION_ENERGIES")
@@ -908,7 +908,7 @@
 
 #define AFLOWRC_MPI_OPTIONS_DUKE_QFLOW_OPENMPI                string("ulimit -s unlimited ") // DUKE_QFLOW_MPICH
 #define         MPI_OPTIONS_DUKE_QFLOW_OPENMPI                XHOST.adefault.getattachedscheme("MPI_OPTIONS_DUKE_QFLOW_OPENMPI")
-#define AFLOWRC_MPI_COMMAND_DUKE_QFLOW_OPENMPI                string("/usr/bin/mpirun -n") // DUKE_QFLOW_MPICH
+#define AFLOWRC_MPI_COMMAND_DUKE_QFLOW_OPENMPI                string("/home/bin/local/bin/mpirun -n") // DUKE_QFLOW_MPICH
 #define         MPI_COMMAND_DUKE_QFLOW_OPENMPI                XHOST.adefault.getattachedscheme("MPI_COMMAND_DUKE_QFLOW_OPENMPI")
 #define AFLOWRC_MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI             string("/home/bin/") // DUKE_QFLOW_MPICH
 #define         MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI             XHOST.adefault.getattachedscheme("MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI")

@@ -68,9 +68,9 @@ namespace pflow {
   void CAGES(_aflags &aflags,const string& options,istream& input);
   //DX+CO START
   bool PerformFullSymmetry(xstructure& a);
-  bool PerformFullSymmetry(xstructure& a,ofstream &FileMESSAGE,const string& directory,_kflags &kflags,const bool& osswrite,ostream& oss, string format="txt");  //ME20200224
-  bool PerformFullSymmetry(xstructure& a,ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags,const bool& osswrite,ostream& oss, string format="txt");
-  bool PerformFullSymmetry(xstructure& a,double& tolerance,bool no_scan,bool force_perform,ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags,const bool& osswrite,ostream& oss, string format="txt");
+  bool PerformFullSymmetry(xstructure& a,ofstream &FileMESSAGE,const string& directory,_kflags &kflags,bool osswrite,ostream& oss, string format="txt");  //ME20200224
+  bool PerformFullSymmetry(xstructure& a,ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags,bool osswrite,ostream& oss, string format="txt");
+  bool PerformFullSymmetry(xstructure& a,double& tolerance,bool no_scan,bool force_perform,ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags,bool osswrite,ostream& oss, string format="txt");
   void ProcessAndAddSpinToXstructure(xstructure& a, const string& magmom_info); //DX20190801
   void defaultKFlags4SymWrite(_kflags& kflags,bool write=true);
   void defaultKFlags4SymCalc(_kflags& kflags,bool calc=true);
@@ -115,7 +115,7 @@ namespace pflow {
   //DX20200225 [OBSOLETE - moved to XtalFinder header] vector<StructurePrototype> compare2prototypes(const xstructure& xstrIN, const aurostd::xoption& vpflow, ostream& logstream=cout); //DX20190314 - overloaded 
   //DX20200225 [OBSOLETE - moved to XtalFinder header] vector<StructurePrototype> compare2prototypes(const xstructure& xstrIN, const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream=cout); //DX20190314 - overloaded 
   //DX20170901 [OBSOLETE] void DATA(const string& smode="DATA",istream& input);
-  bool DATA(istream& input,aurostd::xoption& vpflow,const string& smode="DATA",ostream& oss=cout); //DX20170901 - SGDATA + JSON
+  bool DATA(istream& input,const aurostd::xoption& vpflow,const string& smode="DATA",ostream& oss=cout); //DX20170901 - SGDATA + JSON //DX20210302 - added const to vpflow
   void DATA1(const string& options,istream& input);
   void DATA2(istream& input);
   void DEBYE(const string& options);
@@ -433,7 +433,7 @@ namespace pflow {
   xstructure SETORIGIN(istream& input,const int& natom);
   void SEWALD(vector<string>,istream& input);
   void SG(istream& input);
-  bool SGDATA(istream& input, aurostd::xoption& vpflow, ostream& oss=cout); //DX20170831 - SGDATA
+  //DX20210301 [OBSOLETE - moved into pflow::DATA()] bool SGDATA(istream& input, aurostd::xoption& vpflow, ostream& oss=cout); //DX20170831 - SGDATA
   void SGROUP(_aflags &aflags,istream& input,double radius);
   void SHELL(const string& options,istream& input);
   string SPECIES(istream& input);
@@ -481,14 +481,29 @@ namespace pflow {
   void PrintCIF(ostream& oss,const xstructure&,int=1,int=1); //DX20180806 - added setting default
   void PrintClat(const xvector<double>& data,ostream& oss=cout);
   void PrintCmpStr(const xstructure& str1,const xstructure& str2,const double& rcut,ostream& oss=cout);
-  void PrintData(const xstructure& str,xstructure& str_sym,xstructure& str_sp,xstructure& str_sc,ostream& oss,const string& smode="DATA",const string& format="txt",bool already_calculated=false); //CO20171027
-  void PrintData(const xstructure& str,xstructure& str_sym,xstructure& str_sp,xstructure& str_sc,ostream& oss,double tolerance,const string& smode="DATA",bool no_scan=false,int sg_setting=1,const string& format="txt",bool already_calculated=false); //CO20171027
-  void PrintData(const xstructure& str,xstructure& str_sym,xstructure& str_sp,xstructure& str_sc,ostream& oss,aurostd::xoption& vpflow,const string& smode="DATA",const string& format="txt",bool already_calculated=false); //DX20180823
-  void PrintData(const xstructure& str,xstructure& str_sym,xstructure& str_sp,xstructure& str_sc,ostream& oss_final,aurostd::xoption& vpflow,double tolerance,const string& smode="DATA",bool no_scan=false,int sg_setting=1,const string& format="txt",bool already_calculated=false); //DX20180822
-  void PrintData(const xstructure& str,ostream& oss,double tolerance,const string& smode="DATA",bool no_scan=false,int sg_setting=1,const string& format="txt");
-  void PrintData(const xstructure& str,ostream& oss,const string& smode="DATA",const string& format="txt");
-  void PrintData(const xstructure& str,ostream& oss,aurostd::xoption& vpflow,const string& smode="DATA",const string& format="txt");  //CO20200731
-  void PrintData(const xstructure& str,xstructure& str_sp,xstructure& str_sc,ostream& oss,aurostd::xoption& vpflow,const string& smode="DATA",const string& format="txt");  //CO20200731
+  string PrintData(const xstructure& xstr, const string& smode="DATA", filetype ftype=txt_ft, bool already_calculated=false, double sym_eps=AUROSTD_MAX_DOUBLE, bool no_scan=false, int setting=1); //DX20210301
+  string PrintData(const xstructure& xstr, aurostd::xoption& vpflow, const string& smode="DATA", filetype ftype=txt_ft, bool already_calculated=false, double sym_eps=AUROSTD_MAX_DOUBLE, bool no_scan=false, int setting=1); //DX20210301
+  string PrintData(const xstructure& xstr, xstructure& str_sp, xstructure& str_sc, aurostd::xoption& vpflow, const string& smode="DATA", filetype ftype=txt_ft, bool already_calculated=false, double sym_eps=AUROSTD_MAX_DOUBLE, bool no_scan=false, int setting=1); //DX20210301
+  string PrintData(const xstructure& xstr, xstructure& str_sym, xstructure& str_sp, xstructure& str_sc, const string& smode="DATA", filetype ftype=txt_ft, bool already_calculated=false, double sym_eps=AUROSTD_MAX_DOUBLE, bool no_scan=false, int setting=1); //DX20210301
+  string PrintData(const xstructure& xstr, xstructure& str_sym, xstructure& str_sp, xstructure& str_sc, aurostd::xoption& vpflow, const string& smode="DATA", filetype ftype=txt_ft, bool already_calculated=false, double sym_eps=AUROSTD_MAX_DOUBLE, bool no_scan=false, int setting=1); //DX20210301
+  //DX20210301 [OBSOLETE] void PrintData(const xstructure& str,xstructure& str_sym,xstructure& str_sp,xstructure& str_sc,ostream& oss,const string& smode="DATA",const string& format="txt",bool already_calculated=false); //CO20171027
+  //DX20210301 [OBSOLETE] void PrintData(const xstructure& str,xstructure& str_sym,xstructure& str_sp,xstructure& str_sc,ostream& oss,double tolerance,const string& smode="DATA",bool no_scan=false,int sg_setting=1,const string& format="txt",bool already_calculated=false); //CO20171027
+  //DX20210301 [OBSOLETE] void PrintData(const xstructure& str,xstructure& str_sym,xstructure& str_sp,xstructure& str_sc,ostream& oss,aurostd::xoption& vpflow,const string& smode="DATA",const string& format="txt",bool already_calculated=false); //DX20180823
+  //DX20210301 [OBSOLETE] void PrintData(const xstructure& str,xstructure& str_sym,xstructure& str_sp,xstructure& str_sc,ostream& oss_final,aurostd::xoption& vpflow,double tolerance,const string& smode="DATA",bool no_scan=false,int sg_setting=1,const string& format="txt",bool already_calculated=false); //DX20180822
+  //DX20210301 [OBSOLETE] void PrintData(const xstructure& str,ostream& oss,double tolerance,const string& smode="DATA",bool no_scan=false,int sg_setting=1,const string& format="txt");
+  //DX20210301 [OBSOLETE] void PrintData(const xstructure& str,ostream& oss,const string& smode="DATA",const string& format="txt");
+  //DX20210301 [OBSOLETE] void PrintData(const xstructure& str,ostream& oss,aurostd::xoption& vpflow,const string& smode="DATA",const string& format="txt");  //CO20200731
+  //DX20210301 [OBSOLETE] void PrintData(const xstructure& str,xstructure& str_sp,xstructure& str_sc,ostream& oss,aurostd::xoption& vpflow,const string& smode="DATA",const string& format="txt");  //CO20200731
+  string PrintRealLatticeData(const xstructure& xstr, const string& smode="DATA", filetype ftype=txt_ft, bool standalone=true, bool already_calculated=false, double sym_eps=AUROSTD_MAX_DOUBLE); //DX20210211
+  string PrintRealLatticeData(const xstructure& xstr, aurostd::xoption& vpflow, const string& smode="DATA", filetype ftype=txt_ft, bool standalone=true, bool already_calculated=false, double sym_eps=AUROSTD_MAX_DOUBLE); //DX20210211
+  string PrintLatticeLatticeData(const xstructure& xstr, filetype ftype=txt_ft, bool standalone=true, bool already_calculated=false, double sym_eps=AUROSTD_MAX_DOUBLE); //DX20210211
+  string PrintLatticeLatticeData(const xstructure& xstr, aurostd::xoption& vpflow, filetype ftype=txt_ft, bool standalone=true, bool already_calculated=false, double sym_eps=AUROSTD_MAX_DOUBLE); //DX20210211
+  string PrintCrystalPointGroupData(const xstructure& xstr, filetype ftype=txt_ft, bool standalone=true, bool already_calculated=false, double sym_eps=AUROSTD_MAX_DOUBLE); //DX20210211
+  string PrintCrystalPointGroupData(const xstructure& xstr, aurostd::xoption& vpflow, filetype ftype=txt_ft, bool standalone=true, bool already_calculated=false, double sym_eps=AUROSTD_MAX_DOUBLE); //DX20210211
+  string PrintReciprocalLatticeData(const xstructure& xstr, filetype ftype=txt_ft, bool standalone=true, bool already_calculated=false, double sym_eps=AUROSTD_MAX_DOUBLE); //DX20210209
+  string PrintReciprocalLatticeData(const xstructure& xstr, aurostd::xoption& vpflow, filetype ftype=txt_ft, bool standalone=true, bool already_calculated=false, double sym_eps=AUROSTD_MAX_DOUBLE); //DX20210209
+  string PrintSuperlatticeData(const xstructure& xstr, filetype ftype=txt_ft, bool standalone=true, bool already_calculated=false, double sym_eps=AUROSTD_MAX_DOUBLE); //DX20210209
+  string PrintSuperlatticeData(const xstructure& xstr, aurostd::xoption& vpflow, filetype ftype=txt_ft, bool standalone=true, bool already_calculated=false, double sym_eps=AUROSTD_MAX_DOUBLE); //DX20210209
   void PrintData1(const xstructure& str1,const double& rcut,ostream& oss);
   string PrintData1(const xstructure& str1,const double& rcut);
   void PrintData2(const xstructure&,ostream& oss=cout);
@@ -496,9 +511,11 @@ namespace pflow {
   void PrintDistances(xstructure str,const double cutoff,ostream& oss=cout);
   void PrintEwald(const xstructure& in_str,double& epoint,double& ereal,double& erecip,double& eewald,double& eta,const double& SUMTOL,ostream& oss=cout);
   void PrintGulp(const xstructure&,ostream& oss=cout);
-  bool PrintSGData(xstructure& str_sg,ostream& oss,bool standalone=true,const string& format="txt",bool already_calculated=false); //DX20170830 - SGDATA
-  bool PrintSGData(xstructure& str_sg,double& tolerance,ostream& oss,bool no_scan=false,int setting=1,bool standalone=true,const string& format="txt",bool already_calculated=false); //DX20180226 - added & to tolerance
-  bool PrintSGData(xstructure& str_sg,double& tolerance,ostream& oss_final,aurostd::xoption& vpflow,bool no_scan=false,int sg_setting=1,bool standalone=true,const string& format="txt",bool already_calculated=false); //DX20180822
+  string PrintSGData(xstructure& xstr, filetype ftype=txt_ft, bool standalone=true, bool already_calculated=false, double sym_eps=AUROSTD_MAX_DOUBLE, bool no_scan=false, int setting=1, bool supress_Wyckoff=false); //DX20210211
+  string PrintSGData(xstructure& xstr, aurostd::xoption& vpflow, filetype ftype=txt_ft, bool standalone=true, bool already_calculated=false, double sym_eps=AUROSTD_MAX_DOUBLE, bool no_scan=false, int setting=1, bool suppress_Wyckoff=false); //DX20210211
+  //DX20210301 [OBSOLETE] bool PrintSGData(xstructure& str_sg,ostream& oss,bool standalone=true,const string& format="txt",bool already_calculated=false); //DX20170830 - SGDATA
+  //DX20210301 [OBSOLETE] bool PrintSGData(xstructure& str_sg,double& tolerance,ostream& oss,bool no_scan=false,int setting=1,bool standalone=true,const string& format="txt",bool already_calculated=false); //DX20180226 - added & to tolerance
+  //DX20210301 [OBSOLETE] bool PrintSGData(xstructure& str_sg,double& tolerance,ostream& oss_final,aurostd::xoption& vpflow,bool no_scan=false,int sg_setting=1,bool standalone=true,const string& format="txt",bool already_calculated=false); //DX20180822
 }
 void PrintKmesh(const xmatrix<double>& kmesh,ostream& oss=cout);    // HERE
 void PrintImages(xstructure strA,xstructure strB,const int& ni,const string& path_flag);
@@ -921,11 +938,186 @@ namespace pflow {
 
 }  // namespace pflow
 
+//[CO20200526 - EASY TEMPLATE CLASS]namespace pflow {
+//[CO20200526 - EASY TEMPLATE CLASS]  class AQueue : public xStream {
+//[CO20200526 - EASY TEMPLATE CLASS]    public:
+//[CO20200526 - EASY TEMPLATE CLASS]      //NECESSARY PUBLIC CLASS METHODS - START
+//[CO20200526 - EASY TEMPLATE CLASS]      //constructors - START
+//[CO20200526 - EASY TEMPLATE CLASS]      AQueue(ostream& oss=cout);
+//[CO20200526 - EASY TEMPLATE CLASS]      AQueue(ofstream& FileMESSAGE,ostream& oss=cout);
+//[CO20200526 - EASY TEMPLATE CLASS]      AQueue(const AQueue& b);
+//[CO20200526 - EASY TEMPLATE CLASS]      //constructors - STOP
+//[CO20200526 - EASY TEMPLATE CLASS]      ~AQueue();
+//[CO20200526 - EASY TEMPLATE CLASS]      const AQueue& operator=(const AQueue& other);
+//[CO20200526 - EASY TEMPLATE CLASS]      void clear();
+//[CO20200526 - EASY TEMPLATE CLASS]      //NECESSARY PUBLIC CLASS METHODS - STOP
+//[CO20200526 - EASY TEMPLATE CLASS]      
+//[CO20200526 - EASY TEMPLATE CLASS]      //general attributes
+//[CO20200526 - EASY TEMPLATE CLASS]      bool m_initialized;
+//[CO20200526 - EASY TEMPLATE CLASS]      
+//[CO20200526 - EASY TEMPLATE CLASS]      //initialization methods
+//[CO20200526 - EASY TEMPLATE CLASS]      bool initialize(ostream& oss);
+//[CO20200526 - EASY TEMPLATE CLASS]      bool initialize(ofstream& FilMESSAGE,ostream& oss);
+//[CO20200526 - EASY TEMPLATE CLASS]    private:
+//[CO20200526 - EASY TEMPLATE CLASS]      //NECESSARY private CLASS METHODS - START
+//[CO20200526 - EASY TEMPLATE CLASS]      void free();
+//[CO20200526 - EASY TEMPLATE CLASS]      void copy(const AQueue& b);
+//[CO20200526 - EASY TEMPLATE CLASS]      //NECESSARY END CLASS METHODS - END
+//[CO20200526 - EASY TEMPLATE CLASS]  };
+//[CO20200526 - EASY TEMPLATE CLASS]}
+
+enum job_status { //CO20200526
+  JOB_RUNNING,
+  JOB_QUEUED,
+  JOB_HELD,
+  JOB_DONE
+};
+
+enum node_status { //CO20200526
+  NODE_FREE,
+  NODE_OCCUPIED,
+  NODE_FULL,
+  NODE_DOWN,
+  NODE_OFFLINE,
+  NODE_OPERATIONAL,     //NOT ASSIGNED - this is an aggregate of free+occupied+full
+  NODE_NONOPERATIONAL,  //NOT ASSIGNED - this is an aggregate of down+offline
+};
+
+enum cpus_status { //CO20200526
+  CPUS_FREE,
+  CPUS_OCCUPIED,
+  CPUS_TOTAL,
+};
+
+enum queue_system { //CO20200526
+  QUEUE_SLURM,
+  QUEUE_TORQUE
+};
+
+namespace pflow {
+  //AJob stays a struct until we need more than just free
+  struct AJob { //CO20200526
+    uint m_index; //reflection to m_jobs
+    uint m_id;
+    string m_user;
+    job_status m_status;
+    uint m_ncpus; //this is a "total" ncpus for the job (NOT an index)
+    vector<uint> m_vinodes;
+    vector<uint> m_vncpus;  //this is ncpus split across nodes (NOT an index)
+    vector<uint> m_vipartitions;
+    void free();
+  };
+  //ANode stays a struct until we need more than just free
+  struct ANode {  //CO20200526
+    uint m_index; //reflection to m_nodes
+    string m_name;
+    node_status m_status;
+    uint m_ncpus;
+    uint m_ncpus_occupied;  //if we need to collect job information later, then this should become a getter based on job count
+    string m_properties;  //needed to match with queues
+    vector<uint> m_vijobs;
+    vector<uint> m_vipartitions;
+    void free();
+    bool isStatus(const node_status& status) const;
+  };
+  //APartition stays a struct until we need more than just free
+  struct APartition {  //CO20200526
+    uint m_index; //reflection to m_partitions
+    string m_name;
+    string m_properties_node;   //needed to match with queues //also seems to be available ONLY to root user, so we hack for QRATS  //http://docs.adaptivecomputing.com/torque/4-2-8/Content/topics/4-serverPolicies/mappingQueueToRes.htm
+    vector<uint> m_inodes;
+    vector<uint> m_vijobs;
+    void free();
+  };
+}
+
+//CO20200526 - queueing class
+namespace pflow {
+  uint getTORQUEIDFromString(const string& torqueid_str);
+  class AQueue : public xStream {
+    public:
+      //NECESSARY PUBLIC CLASS METHODS - START
+      //constructors - START
+      AQueue(ostream& oss=cout);
+      AQueue(ofstream& FileMESSAGE,ostream& oss=cout);
+      AQueue(const aurostd::xoption& vpflow,ostream& oss=cout);
+      AQueue(const aurostd::xoption& vpflow,ofstream& FileMESSAGE,ostream& oss=cout);
+      AQueue(const AQueue& b);
+      //constructors - STOP
+      ~AQueue();
+      const AQueue& operator=(const AQueue& other);
+      void clear();
+      //NECESSARY PUBLIC CLASS METHODS - STOP
+
+      //general attributes
+      bool m_initialized;
+      aurostd::xoption m_flags;
+      queue_system m_qsys;
+      vector<APartition> m_partitions;
+      vector<ANode> m_nodes;
+      vector<AJob> m_jobs;
+
+      //initialization methods
+      bool initialize(ostream& oss);
+      bool initialize(ofstream& FilMESSAGE,ostream& oss);
+      bool initialize(const aurostd::xoption& vpflow,ostream& oss);
+      bool initialize(const aurostd::xoption& vpflow,ofstream& FilMESSAGE,ostream& oss);
+      bool initialize();
+      bool initialize(const aurostd::xoption& vpflow);
+
+      //setters
+      void setFlags(const aurostd::xoption& vpflow);
+
+      //getters
+      uint getNNodes() const;
+      uint getNCPUS() const;
+      uint getNNodes(const APartition& partition) const;
+      uint getNCPUS(const APartition& partition) const;
+      uint getNNodes(const APartition& partition,const node_status& status) const;
+      uint getNCPUS(const APartition& partition,const node_status& status_node,const cpus_status& status_cpus=CPUS_TOTAL) const;
+      uint getNCPUS(const string& user,const string& partition,const job_status& status) const;
+      uint getNCPUS(const string& user,const APartition& partition,const job_status& status) const;
+      double getPercentage(const string& user,const string& partition,const job_status& status) const;
+      double getPercentage(const string& user,const APartition& partition,const job_status& status) const;
+      uint nodeName2Index(const string& name) const;
+      uint partitionName2Index(const string& name) const;
+
+      //methods
+      void getQueue();  //wrapper around processQueue() with try's for failed external calls
+    private:
+      //NECESSARY private CLASS METHODS - START
+      void free();
+      void copy(const AQueue& b);
+      //NECESSARY END CLASS METHODS - END
+
+      void freeQueue();
+      void processQueue();  //main processer for external queue commands (pbsnodes, qstat, squeue, etc.)
+
+      void readNodesPartitionsSLURM();
+      void readJobsSLURM();
+      void readPartitionsTORQUE();
+      void readNodesJobsTORQUE();
+      void readJobsTORQUE();
+
+      bool addJob(const AJob& _job);
+      bool addPartition(const APartition& _partition);
+      bool addNode(const ANode& _node);
+      void nodePartitionMapping(ANode& node);
+      void jobMapping(AJob& job);
+  };
+}
+
+//CO20200526 - queueing class
+namespace pflow {
+  string getQueueStatus(const aurostd::xoption& vpflow);
+}
+
 namespace pflow {
   vector<string> getFakeElements(uint nspecies); //DX20200728
   bool hasRealElements(const xstructure& xstr); //DX20210113
   double getSymmetryTolerance(const xstructure& xstr, const string& tolerance_string);
   vector<double> getSymmetryToleranceSpectrum(const string& tolerance_range_string);
+  uint getSpaceGroupSetting(const string& setting_string, uint mode_default=0); //DX20210420 - mode_default=0: unspecified, AFLOW will determine
 }
 
 #endif

@@ -319,21 +319,21 @@ namespace chull {
     //////////////////////////////////////////////////////////////////////////////
     // START Adding --sc=XX to CHULL::NEGLECT if --output=web
     //////////////////////////////////////////////////////////////////////////////
-    if(vpflow.flag("CHULL::STABILITY_CRITERION")&&vpflow.flag("CHULL::WEB_DOC")){
-      string sc_input=vpflow.getattachedscheme("CHULL::STABILITY_CRITERION");
-      if(vpflow.flag("CHULL::NEGLECT")){
-        string neglect=vpflow.getattachedscheme("CHULL::NEGLECT");
-        if(!neglect.empty()){neglect+=",";}
-        neglect+=sc_input;
-        vpflow.pop_attached("CHULL::NEGLECT");
-        vpflow.push_attached("CHULL::NEGLECT",neglect);
-        vpflow.flag("CHULL::NEGLECT",true); //repetita iuvant
-      }else{
-        vpflow.flag("CHULL::NEGLECT",true);
-        vpflow.push_attached("CHULL::NEGLECT",sc_input);
-      }
-      if(LDEBUG){cerr << soliloquy << " vpflow.getattachedscheme(\"CHULL::NEGLECT\")=" << vpflow.getattachedscheme("CHULL::NEGLECT") << endl;}
-    }
+    //[CO20210315 - using --fake_hull_sc]if(vpflow.flag("CHULL::STABILITY_CRITERION")&&vpflow.flag("CHULL::WEB_DOC")){
+    //[CO20210315 - using --fake_hull_sc]  string sc_input=vpflow.getattachedscheme("CHULL::STABILITY_CRITERION");
+    //[CO20210315 - using --fake_hull_sc]  if(vpflow.flag("CHULL::NEGLECT")){
+    //[CO20210315 - using --fake_hull_sc]    string neglect=vpflow.getattachedscheme("CHULL::NEGLECT");
+    //[CO20210315 - using --fake_hull_sc]    if(!neglect.empty()){neglect+=",";}
+    //[CO20210315 - using --fake_hull_sc]    neglect+=sc_input;
+    //[CO20210315 - using --fake_hull_sc]    vpflow.pop_attached("CHULL::NEGLECT");
+    //[CO20210315 - using --fake_hull_sc]    vpflow.push_attached("CHULL::NEGLECT",neglect);
+    //[CO20210315 - using --fake_hull_sc]    vpflow.flag("CHULL::NEGLECT",true); //repetita iuvant
+    //[CO20210315 - using --fake_hull_sc]  }else{
+    //[CO20210315 - using --fake_hull_sc]    vpflow.flag("CHULL::NEGLECT",true);
+    //[CO20210315 - using --fake_hull_sc]    vpflow.push_attached("CHULL::NEGLECT",sc_input);
+    //[CO20210315 - using --fake_hull_sc]  }
+    //[CO20210315 - using --fake_hull_sc]  if(LDEBUG){cerr << soliloquy << " vpflow.getattachedscheme(\"CHULL::NEGLECT\")=" << vpflow.getattachedscheme("CHULL::NEGLECT") << endl;}
+    //[CO20210315 - using --fake_hull_sc]}
     //////////////////////////////////////////////////////////////////////////////
     // END Adding --sc=XX to CHULL::NEGLECT if --output=web
     //////////////////////////////////////////////////////////////////////////////
@@ -622,7 +622,7 @@ namespace chull {
       ////////////////////////////////////////////////////////////////////////////
       // START Stability criterion calculation
       ////////////////////////////////////////////////////////////////////////////
-      if(vpflow.flag("CHULL::STABILITY_CRITERION")&&(!vpflow.flag("CHULL::WEB_DOC"))) { //CO20210201 - chull-web SS plotter
+      if(vpflow.flag("CHULL::STABILITY_CRITERION")) { //CO20210201 - chull-web SS plotter //&&(!vpflow.flag("CHULL::WEB_DOC"))
         message << "Starting stable criterion calculation of " << vpflow.getattachedscheme("CHULL::STABILITY_CRITERION");
         message << " on " << vinputs[i] << " hull";
         pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
@@ -1007,6 +1007,9 @@ namespace chull {
     if(vpflow.flag("CHULL::SEE_NEGLECT")) {
       pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::SEE_NEGLECT set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
     }
+    if(vpflow.flag("CHULL::CALCULATE_FAKE_HULL_STABILITY_CRITERION")) { //CO20210315
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::CALCULATE_FAKE_HULL_STABILITY_CRITERION set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent); 
+    }
     if(vpflow.flag("CHULL::CALCULATE_FAKE_HULL_N+1_ENTHALPY_GAIN")) { //SK20200327
       pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::CALCULATE_FAKE_HULL_N+1_ENTHALPY_GAIN set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent); 
     }
@@ -1349,6 +1352,32 @@ namespace chull {
     return true;
   }
 
+  xvector<double> getTruncatedCoords(const xvector<double>& coords,const xvector<int>& elements_present) {
+    string soliloquy=XPID+"chull::getTruncatedCoords():";
+    if(coords.rows!=elements_present.rows){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Reduction invalid, coords mismatch");}
+    uint h_dim=sum(elements_present);
+    xvector<double> red_coords(coords.lrows,coords.lrows+h_dim-1);
+    vector<uint> relevant_indices=getRelevantIndices(elements_present);
+    for(uint i=0,fl_size_i=relevant_indices.size();i<fl_size_i;i++){red_coords[i+red_coords.lrows]=coords[relevant_indices[i]];}
+    return red_coords;
+  }
+
+  vector<uint> getRelevantIndices(const xvector<int>& elements_present) {
+    bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
+    string soliloquy=XPID+"chull::getRelevantIndices():";
+    vector<uint> relevant_indices;
+    for(int i=elements_present.lrows;i<=elements_present.urows;i++){
+      if(elements_present[i]==1){relevant_indices.push_back(i);}
+    }
+    if(LDEBUG) {
+      cerr << soliloquy << " relevant indices=";
+      for(uint i=0,fl_size_i=relevant_indices.size();i<fl_size_i;i++){cerr << relevant_indices[i] << (i!=relevant_indices.size()-1?",":"");}
+      cerr << " (elements_present=" << elements_present << ")" << endl;
+    }
+    return relevant_indices;
+  }
+
+  bool coordsIdentical(const xvector<double>& coords1,const xvector<double>& coords2){return identical(coords1,coords2,ZERO_TOL);}
 } // namespace chull
 
 //CO20180420 - moved to xStream (xclasses.cpp)
@@ -1580,16 +1609,6 @@ namespace chull {
     xvector<double> out;return out;
   }
 
-  xvector<double> getTruncatedCoords(const xvector<double>& coords,const xvector<int>& elements_present) {
-    string soliloquy=XPID+"chull::getTruncatedCoords():";
-    if(coords.rows!=elements_present.rows){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Reduction invalid, coords mismatch");}
-    uint h_dim=sum(elements_present);
-    xvector<double> red_coords(coords.lrows,coords.lrows+h_dim-1);
-    vector<uint> relevant_indices=getRelevantIndices(elements_present);
-    for(uint i=0,fl_size_i=relevant_indices.size();i<fl_size_i;i++){red_coords[i+red_coords.lrows]=coords[relevant_indices[i]];}
-    return red_coords;
-  }
-
   xvector<double> ChullPoint::getTruncatedSCoords(const xvector<int>& elements_present) const {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
     string soliloquy=XPID+"ChullPoint::getTruncatedSCoords():";
@@ -1752,21 +1771,6 @@ namespace chull {
     if(formation_energy_coord){coord[coord.urows]=H_f_atom(entry);} //entry.enthalpy_formation_atom
     else {coord[coord.urows]=entry.entropic_temperature;}  //entropic temperature is positive for stable compounds (we want upper half convex-hull)
     setGenCoords(coord,formation_energy_coord);
-  }
-
-  vector<uint> getRelevantIndices(const xvector<int>& elements_present) {
-    bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy=XPID+"chull::getRelevantIndices():";
-    vector<uint> relevant_indices;
-    for(int i=elements_present.lrows;i<=elements_present.urows;i++){
-      if(elements_present[i]==1){relevant_indices.push_back(i);}
-    }
-    if(LDEBUG) {
-      cerr << soliloquy << " relevant indices=";
-      for(uint i=0,fl_size_i=relevant_indices.size();i<fl_size_i;i++){cerr << relevant_indices[i] << (i!=relevant_indices.size()-1?",":"");}
-      cerr << " (elements_present=" << elements_present << ")" << endl;
-    }
-    return relevant_indices;
   }
 
   vector<uint> ChullPoint::getRelevantIndices(const xvector<int>& elements_present) const {
@@ -3382,7 +3386,7 @@ namespace chull {
     }
     for(uint i=0,fl_size_i=m_coord_groups.size();i<fl_size_i;i++){
       if(!m_coord_groups[i].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized coordgroup");}
-      if(identical(m_coord_groups[i].m_coords,r_coords,ZERO_TOL)){
+      if(coordsIdentical(m_coord_groups[i].m_coords,r_coords)){
         i_coord_group=i;
         return true;
       }
@@ -4190,10 +4194,30 @@ namespace chull {
     //if you want points for the hull, go through m_coord_groups
     if(LDEBUG) {cerr << soliloquy << " gathering points to neglect" << endl;}
 
+    bool fhsc_requested=m_cflags.flag("CHULL::CALCULATE_FAKE_HULL_STABILITY_CRITERION"); //CO20210315
+    bool perform_structure_comparison=(1&&(!m_cflags.flag("CHULL::SKIP_STRUCTURE_COMPARISON"))); //(1&&!(m_cflags.flag("CHULL::SKIP_STRUCTURE_COMPARISON")||(!m_cflags.flag("CHULL::MULTI_OUTPUT")&&m_cflags.flag("CHULL::LATEX_DOC")&&m_cflags.flag("CHULL::IMAGE_ONLY"))));
+    uint i_point_sc=AUROSTD_MAX_UINT;
+    xvector<double> r_coords_sc_input;
+    string auid_sc=m_cflags.getattachedscheme("CHULL::CALCULATE_FAKE_HULL_STABILITY_CRITERION");
+    if(auid_sc.empty()){fhsc_requested=false;}
+    if(fhsc_requested){
+      for(uint i=0,fl_size_i=m_points.size();i<fl_size_i&&i_point_sc==AUROSTD_MAX_UINT;i++){
+        const ChullPoint& point=m_points[i];
+        const aflowlib::_aflowlib_entry& entry=m_points[i].m_entry;
+        if(!point.m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized point");}
+        // start remove points
+        if(m_points[i].m_has_entry && entry.auid==auid_sc){
+          i_point_sc=i;
+          r_coords_sc_input=point.getStoichiometricCoords();
+        }
+      }
+    }
+    if(i_point_sc==AUROSTD_MAX_UINT){fhsc_requested=false;}
+
     bool remove_requested=m_cflags.flag("CHULL::NEGLECT");
     bool see_neglect=m_cflags.flag("CHULL::SEE_NEGLECT");
     bool remove_submodular=true;  //remove AEL-AGL, APL, etc.
-    bool n1eg_requested=m_cflags.flag("CHULL::CALCULATE_FAKE_HULL_N+1_ENTHALPY_GAIN"); //SK20200327
+    bool fhn1eg_requested=m_cflags.flag("CHULL::CALCULATE_FAKE_HULL_N+1_ENTHALPY_GAIN"); //SK20200327
     bool remove_invalid=true;
     bool remove_duplicate_entries=true;        //we remove duplicate entries from the database, but in general, keep input of user constant
     bool remove_extreme=m_cflags.flag("CHULL::REMOVE_EXTREMA");
@@ -4226,10 +4250,11 @@ namespace chull {
     vector<string> removing_messages;
     if(remove_requested){removing_messages.push_back("undesired");}
     if(remove_invalid){removing_messages.push_back("erroneous");}
-    if(n1eg_requested){removing_messages.push_back("n1eg");}  //SK20200327
     if(remove_duplicate_entries){removing_messages.push_back("duplicate");}
     if(remove_extreme){removing_messages.push_back("extreme");}
     if(remove_outliers){removing_messages.push_back("outlier");}
+    if(fhn1eg_requested){removing_messages.push_back(aurostd::utype2string(m_velements.size())+"D (N+1 enthalpy gain)");}  //SK20200327
+    if(fhsc_requested){removing_messages.push_back("auid="+auid_sc+" and equivalent (stability criterion)");}  //SK20200327
     if(removing_messages.size()){
       message << "Filtering out " << aurostd::joinWDelimiter(removing_messages,"/") << " entries";
       pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
@@ -4289,12 +4314,16 @@ namespace chull {
           pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_OPTION_);
           continue;
         }
-        if(n1eg_requested) {
-          // point.m_i_nary = sum(elements_present) - 1
-          // point.getDim() is dimension of hull
-          //SK20200330
-          if (point.getDim() == point.m_i_nary + 1) {
+        if(fhn1eg_requested) {  //SK20200330
+          if(point.getDim()==(point.m_i_nary+1)) {
             message << "Neglecting [auid=" << entry.auid << ",aurl=" << entry.aurl << "] to calculate N+1 enthalpy gain";
+            pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_OPTION_);
+            continue;
+          }
+        }
+        if(fhsc_requested){ //CO20210315
+          if(coordsIdentical(r_coords_sc_input,point.getStoichiometricCoords()) && phasesEquivalent(i_point_sc,i,perform_structure_comparison)){
+            message << "Neglecting [auid=" << entry.auid << ",aurl=" << entry.aurl << "] to calculate stability criterion hull";
             pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_OPTION_);
             continue;
           }
@@ -5899,6 +5928,32 @@ namespace chull {
     if(LDEBUG) {cerr << soliloquy << " stop" << endl;}
   }
 
+  bool ConvexHull::phasesEquivalent(uint i_point1,uint i_point2,bool perform_structure_comparison) const {
+    bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
+    string soliloquy=XPID+"ConvexHull::phasesEquivalent():";
+    if(i_point1>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
+    if(i_point2>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
+    if(!m_points[i_point1].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Point["+aurostd::utype2string(i_point1)+"] is not initialized");}
+    if(!m_points[i_point2].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Point["+aurostd::utype2string(i_point2)+"] is not initialized");}
+
+    if(i_point1==i_point2){return true;} //it is equivalent to self, so we only do checks if necessary
+
+    //return false early for points without an entry
+    if(!m_points[i_point1].m_has_entry){return false;}
+    if(!m_points[i_point2].m_has_entry){return false;}
+
+    if(LDEBUG) {cerr << soliloquy << " comparing [auid=" << m_points[i_point1].m_entry.auid << "] and [auid=" << m_points[i_point2].m_entry.auid << "]" << endl;}
+
+    //strict==false, there might be entries in the database without a formation_enthalpy or sg calculated
+    //ultimately, we want to compare structures
+    if(energiesDiffer(i_point1,i_point2,false)){return false;} //first filter by those with wildly different energies, not strict
+    if(spacegroupsDiffer(i_point1,i_point2,false)){return false;} //first filter by those with wildly different spacegroups, not strict
+    if(!perform_structure_comparison){return false;}  //only return true if you can compare structures
+    if(!structuresEquivalent(i_point1,i_point2)){return false;}
+
+    return true;
+  }
+
   //strict === strictly differ
   //if we don't know, because of AUROSTD_NAN's or NOSG's, we may still return false anyway to 
   //continue on to more strict determination later
@@ -5995,15 +6050,7 @@ namespace chull {
     uint i_point=AUROSTD_MAX_UINT;
     for(uint i=0,fl_size_i=m_coord_groups[i_coord_group].m_points.size();i<fl_size_i;i++){
       i_point=m_coord_groups[i_coord_group].m_points[i];
-      if(!m_points[i_point].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
-      if(g_state!=i_point){ //it is equivalent to self, so we only do checks if necessary
-        if(LDEBUG) {cerr << soliloquy << " comparing [auid=" << m_points[g_state].m_entry.auid << "] and [auid=" << m_points[i_point].m_entry.auid << "]" << endl;}
-        if(!m_points[i_point].m_has_entry){continue;}
-        if(energiesDiffer(g_state,i_point,false)){continue;} //first filter by those with wildly different energies, not strict
-        if(spacegroupsDiffer(g_state,i_point,false)){continue;} //first filter by those with wildly different spacegroups, not strict
-        if(!perform_structure_comparison){continue;}
-        if(!structuresEquivalent(g_state,i_point)){continue;}
-      }
+      if(!phasesEquivalent(g_state,i_point,perform_structure_comparison)){continue;}
       equivalent_g_states.push_back(i_point);
     }
     if(LDEBUG) {
@@ -11731,13 +11778,13 @@ namespace chull {
     main_JSON_file="aflow_"+input; //SK20200406
     //[SK20200325 - OBSOLETE]main_JSON_file="aflow_"+input+"_hull_web.json"; //WSCHMITT20190620
     //SK20200331 START
-    bool sc_requested=m_cflags.flag("CHULL::STABILITY_CRITERION");  //only neglect feature via web
-    bool n1eg_requested=m_cflags.flag("CHULL::CALCULATE_FAKE_HULL_N+1_ENTHALPY_GAIN");
+    bool fhsc_requested=m_cflags.flag("CHULL::CALCULATE_FAKE_HULL_STABILITY_CRITERION");  //only neglect feature via web
+    bool fhn1eg_requested=m_cflags.flag("CHULL::CALCULATE_FAKE_HULL_N+1_ENTHALPY_GAIN");
     vector<string> sc_point;
     string delimiter="";
     // naming stability criterion files
-    if(sc_requested) {
-      aurostd::string2tokens(m_cflags.getattachedscheme("CHULL::STABILITY_CRITERION"),sc_point,",");
+    if(fhsc_requested) {
+      aurostd::string2tokens(m_cflags.getattachedscheme("CHULL::CALCULATE_FAKE_HULL_STABILITY_CRITERION"),sc_point,",");
       std::sort(sc_point.begin(),sc_point.end()); //CO20200404 - this sort is NOT necessary, as web only removes 1 point a time, but this is SAFE
       delimiter = "_sc_";
       // limiting to the characters after "aflow:" because ":" is a reserved character for php query calls, also shortening queries
@@ -11745,7 +11792,7 @@ namespace chull {
       if(LDEBUG){cerr << soliloquy << " main_JSON_file=" << main_JSON_file << endl;}
     }
     // naming n+1 enthalpy gain files
-    if (n1eg_requested) {
+    if (fhn1eg_requested) {
       delimiter = "_n1eg";  //CO20200404 - n+1 is the same for all points on a hull
       main_JSON_file=main_JSON_file + delimiter;
     }

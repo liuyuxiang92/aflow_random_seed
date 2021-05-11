@@ -56,6 +56,7 @@ enum filetype {   //CO20190629
   //GENERAL FILE TYPES
   txt_ft,         //general plain text
   json_ft,
+  aflow_ft,       //ME20210329 - aflowlib.out format
   csv_ft,
   latex_ft,
   gnuplot_ft,
@@ -568,6 +569,11 @@ extern _XHOST XHOST; // this will be global
 // Structures for flags and properties to share FAST !
 // STRUCTURES
 #define AFLOWIN_SEPARATION_LINE  string("[AFLOW] ************************************************************************************************************************** ")
+#define SEPARATION_LINE_DASH string("------------------------------------------------------------------------------------------------") //DX+CO20210429 - generic dash-line separator (used between symmetry operators)
+#define SEPARATION_LINE_DASH_SHORT string("---------------------------------------------------------------------------") //DX+CO20210429 - generic dash-line separator, short (used in symmetry log output)
+
+#define PRINT_NULL_JSON false //DX20210430 - add global flag to print "null" for empty JSON values
+
 
 // --------------------------------------------------------------------------
 // general flags to run aflow
@@ -1097,15 +1103,15 @@ uint ApennsyARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vfl
 #define _UPDATE_LATTICE_VECTORS_TO_ABCANGLES_   2
 #define _UPDATE_LATTICE_ABCANGLES_TO_VECTORS_   3
 
-#define _PGROUP_ 0             // for point group lattice
-#define _PGROUPK_ 5            // for point group klattice
-#define _PGROUP_XTAL_ 6        // for point group crystal
-#define _PGROUPK_XTAL_ 7       // for point group kcrystal
-#define _PGROUPK_PATTERSON_ 8   // for point group Patterson //DX20200129
-#define _FGROUP_ 1             // for factor group
-#define _SGROUP_ 2             // for space group
-#define _AGROUP_ 3             // for site positions point group
-#define _IATOMS_ 4             // for equivalent atoms
+#define _PGROUP_ 1             // for point group lattice
+#define _PGROUPK_ 6            // for point group klattice
+#define _PGROUP_XTAL_ 7        // for point group crystal
+#define _PGROUPK_XTAL_ 8       // for point group kcrystal
+#define _PGROUPK_PATTERSON_ 9  // for point group Patterson //DX20200129
+#define _FGROUP_ 2             // for factor group
+#define _SGROUP_ 3             // for space group
+#define _AGROUP_ 4             // for site positions point group
+#define _IATOMS_ 5             // for equivalent atoms
 
 // --------------------------------------------------------------------------
 //DX+CO START
@@ -1269,7 +1275,10 @@ void GetUnitCellRep(const xvector<double>& ppos,xvector<double>& p_cell0,xvector
 string xstructure2json(xstructure& xstr); //DX20170831 - xstructure2json
 string atom2json(_atom& atom, int coord_flag, int poccupation); //DX20170831 - atom2json
 
-vector<string> getLeastFrequentAtomTypes(const xstructure& xstr, bool clean=true); //DX20201230 - moved from XtalFinder
+vector<uint> getAtomIndicesByType(const xstructure& xstr, int type); //DX20210322
+vector<uint> getAtomIndicesByName(const xstructure& xstr, const string& name); //DX20210322
+vector<uint> getLeastFrequentAtomTypes(const xstructure& xstr); //DX20210322
+vector<string> getLeastFrequentAtomSpecies(const xstructure& xstr, bool clean=true); //DX20201230 - moved from XtalFinder
 
 // --------------------------------------------------------------------------
 class _sym_op {
@@ -1469,7 +1478,7 @@ bool sortWyckoffByType(const wyckoffsite_ITC& a, const wyckoffsite_ITC& b); // s
 class xstructure {
   public:
     // constructors/destructors                                   // --------------------------------------
-    xstructure(string="");                                        // constructor default
+    xstructure(const string& title="");                           // constructor default
     xstructure(const xstructure& b);                              // constructor copy
     xstructure(istream& input,int=IOVASP_POSCAR);                 // constructor from istream
     xstructure(ifstream& input,int=IOVASP_POSCAR);                // constructor from ifstream
@@ -1512,8 +1521,30 @@ class xstructure {
     string SpeciesString(void);                                   // Gives a string with the list of all the species
     uint SetSpecies(const std::deque<string>& vspecies);          // Set the species
     void UpdateSpecies(const _atom& atom);                        // Update species from atom (consolidated from AddAtom) //DX20210202
-    void GetLatticeType(xstructure& sp,xstructure& sc);           // Get all lattices
-    void GetLatticeType(void);                                    // Get all lattices
+    //DX20210302 [OBSOLETE] void GetLatticeType(xstructure& sp,xstructure& sc);           // Get all lattices
+    //DX20210302 [OBSOLETE] void GetLatticeType(void);                                    // Get all lattices
+    void GetLatticeType(
+        double sym_eps=AUROSTD_MAX_DOUBLE,
+        bool no_scan=false);                                      // Get all lattices
+    void GetLatticeType(xstructure& sp,xstructure& sc,
+        double sym_eps=AUROSTD_MAX_DOUBLE,
+        bool no_scan=false);                                      // Get all lattices
+    void GetExtendedCrystallographicData(
+        double sym_eps=AUROSTD_MAX_DOUBLE,
+        bool no_scan=false, int setting=SG_SETTING_1);
+    void GetExtendedCrystallographicData(xstructure& sp,
+        xstructure& sc,
+        double sym_eps=AUROSTD_MAX_DOUBLE,
+        bool no_scan=false, int setting=SG_SETTING_1);
+    void GetRealLatticeType(xstructure& sp,xstructure& sc,
+        double sym_eps=AUROSTD_MAX_DOUBLE);                       // Get real lattice type //DX2021011
+    void GetRealLatticeType(double sym_eps=AUROSTD_MAX_DOUBLE);   // Get real lattice type //DX20210211
+    void GetReciprocalLatticeType(xstructure& sp,xstructure& sc,
+        double sym_eps=AUROSTD_MAX_DOUBLE);                       // Get reciprocal lattice type //DX20210209
+    void GetReciprocalLatticeType(double sym_eps=AUROSTD_MAX_DOUBLE);// Get reciprocal lattice type //DX20210209
+    void GetSuperlatticeType(xstructure& sp,xstructure& sc,
+        double sym_eps=AUROSTD_MAX_DOUBLE);                       // Get superlattice type //DX20210209
+    void GetSuperlatticeType(double sym_eps=AUROSTD_MAX_DOUBLE);  // Get superlattice type //DX20210209
     void Standard_Primitive_UnitCellForm(void);                   // Reduce the Unit Cell to Standard Primitive Form
     void GetStandardPrimitive(void);                              // stub for void Standard_Primitive_UnitCellForm(void);
     void Standard_Conventional_UnitCellForm(void);                // Reduce the Unit Cell to Standard Conventional Form
@@ -1532,6 +1563,7 @@ class xstructure {
     void BringInCell(double tolerance=_ZERO_TOL_, double upper_bound=1.0, double lower_bound=0.0); //DX20190904
     void BringInCompact(void);                                    // Bring all the atoms near the origin
     void BringInWignerSeitz(void);                                // Bring all the atoms in the Wigner Seitz Cell
+    void GetPrimitive_20210322(double eps=AUROSTD_MAX_DOUBLE);    // Make it primitive, if possible //DX20210323
     void GetPrimitive(void);                                      // Make it primitive, if possible
     void GetPrimitive(double tol);                                // Make it primitive, if possible
     void GetPrimitive1(void);                                     // Make it primitive, if possible
@@ -1693,6 +1725,7 @@ class xstructure {
     string reciprocal_lattice_type;                               // reciprocal lattice type as a string
     string reciprocal_lattice_variation_type;                     // reciprocal lattice type as a string WSETYAWAN mod
     //string reciprocal_conventional_lattice_type;                // reciprocal lattice type as a string
+    xmatrix<double> bravais_superlattice_lattice;                 // superlattice lattice (identical atoms) //DX20210209
     string bravais_superlattice_type;                             // super lattice type as a string (identical atoms)
     string bravais_superlattice_variation_type;                   // super lattice type as a string (identical atoms) WSETYAWAN mod
     string bravais_superlattice_system;                           // lattice system http://en.wikipedia.org/wiki/Bravais_lattice (7)
@@ -1756,7 +1789,8 @@ class xstructure {
     // SYMMETRY TOLERANCE ----------------------------
     bool sym_eps_calculated;                                      // was it calculated automatically per symmetry operations (aflowSYM)?
     double sym_eps;                                               // universal tolerance for symmetry (dictates resolution and mapping tolerances)                     
-    uint sym_eps_change_count;                                  // universal tolerance count for symmetry //DX20180223 - added count to xstructure
+    uint sym_eps_change_count;                                    // universal tolerance count for symmetry //DX20180223 - added count to xstructure
+    bool sym_eps_no_scan;                                         // do not use tolerance scan (forced by user or because the scan terminated) //DX20210331
     //DX+CO END
     // POINT GROUP                                                // POINT GROUP LATTICE
     std::vector<_sym_op> pgroup;                                  // rotations/inversions operations
@@ -2284,7 +2318,7 @@ string GetSpaceGroupName(int spacegroupnumber, string directory=""); //DX2018052
 int GetSpaceGroupNumber(const string& spacegroupsymbol, string directory=""); //DX20190708
 string GetSpaceGroupLabel(int spacegroupnumber);
 string GetSpaceGroupSchoenflies(int spacegroupnumber, string directory=""); //DX20170901 //DX20180526 - add directory
-string GetSpaceGroupHall(int spacegroupnumber, int setting=1, string directory=""); //DX20170901 //DX20180526 - add directory //DX20180806 - added setting
+string GetSpaceGroupHall(int spacegroupnumber, int setting=SG_SETTING_1, string directory=""); //DX20170901 //DX20180526 - add directory //DX20180806 - added setting
 string GetLaueLabel(string& point_group); //DX20170901 //DX20180526 - add directory
 
 #define RADIANS 0
@@ -2439,6 +2473,7 @@ xstructure GetPrimitiveVASP(const xstructure& a,double tol);
 xstructure BringInCompact(const xstructure& a);
 xstructure BringInWignerSeitz(const xstructure& a);
 // primitive stuff
+xstructure GetPrimitive_20210322(const xstructure& a,double eps=AUROSTD_MAX_DOUBLE); //DX20210323
 xstructure GetPrimitive(const xstructure& a);
 xstructure GetPrimitive(const xstructure& a,double tol);
 xstructure GetPrimitive1(const xstructure& a);
@@ -2570,6 +2605,8 @@ void minimumCoordinationShell(const xstructure& xstr, uint center_index,
     double& min_dist, uint& frequency, vector<xvector<double> >& coordinates, const string& type); //DX20191122
 
 //makefile tests
+bool SchemaTest(ostream& oss=std::cout);  //ME20210408
+bool SchemaTest(ofstream& FileMESSAGE,ostream& oss=std::cout);  //ME20210408
 bool CeramGenTest(ostream& oss=cout);
 bool CeramGenTest(ofstream& FileMESSAGE,ostream& oss=cout);
 bool EgapTest(ostream& oss=cout);
@@ -2580,8 +2617,8 @@ bool smithTest(ostream& oss=cout);
 bool smithTest(ofstream& FileMESSAGE,ostream& oss=cout);
 bool coordinationTest(ostream& oss=cout);
 bool coordinationTest(ofstream& FileMESSAGE,ostream& oss=cout);
-bool PrototypeGeneratorTest(ostream& oss=cout, bool check_symmetry=false); //DX20200928
-bool PrototypeGeneratorTest(ofstream& FileMESSAGE,ostream& oss=cout, bool check_symmetry=false); //DX20200928
+bool PrototypeGeneratorTest(ostream& oss=cout, bool check_symmetry=false, bool check_uniqueness=false); //DX20200928
+bool PrototypeGeneratorTest(ofstream& FileMESSAGE,ostream& oss=cout, bool check_symmetry=false, bool check_uniqueness=false); //DX20200928
 bool FoldAtomsInCellTest(ostream& oss=cout); //DX20210129
 bool FoldAtomsInCellTest(ofstream& FileMESSAGE,ostream& oss=cout); //DX20210129
 
@@ -2996,7 +3033,7 @@ namespace KBIN {
   bool VASP_Write_ppAUID_FILE(const string& directory,const deque<string>& vppAUIDs,const deque<string>& species);
   bool VASP_Write_ppAUID_AFLOWIN(const string& directory,const vector<string>& vppAUIDs,const vector<string>& species);
   bool VASP_Write_ppAUID_AFLOWIN(const string& directory,const deque<string>& vppAUIDs,const deque<string>& species);
-  bool VASP_Write_INPUT(_xvasp& xvasp,_vflags &vflags);
+  bool VASP_Write_INPUT(_xvasp& xvasp,_vflags &vflags,const string& ext_module="");//AS20210302
   bool VASP_Produce_INCAR(_xvasp& xvasp,const string& AflowIn,ofstream& FileERROR,_aflags& aflags,_kflags& kflags,_vflags& vflags);
   bool VASP_Modify_INCAR(_xvasp& xvasp,ofstream& FileERROR,_aflags& aflags,_kflags& kflags,_vflags& vflags);
   bool VASP_Reread_INCAR(_xvasp& xvasp,ofstream &FileMESSAGE,_aflags &aflags);
@@ -4271,7 +4308,8 @@ string EquivalentAtomsToJson(vector<vector<int> >& iatoms); //DX20170803 - For P
 string SymmetryToJson(vector<_sym_op>& group, char& mode); //DX20170803 - For Python wrapper
 bool KBIN_SymmetryWrite(ofstream& FileMESSAGE,xstructure& a,_aflags& aflags,char group,const bool& osswrite,ostream& oss,const string& format="txt");
 //bool KBIN_SymmetryToScreen(xstructure& a, string& format, ostream& oss); //DX20170803 - For Python wrapper
-bool KBIN_SymmetryToScreen(xstructure& a, string& format, ostream& oss, char mode='\0'); //DX20170822 - For Python wrapper
+bool KBIN_SymmetryToScreen(xstructure& a, const string& format, ostream& oss, char mode='\0'); //DX20170822 - For Python wrapper
+bool KBIN_SymmetryToScreenWeb(xstructure& a, ostream& oss, char mode); //ME20210402
 bool KBIN_StepSymmetryPerform(xstructure& a,string AflowIn,ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags,const bool& osswrite,ostream& oss);
 //DX+CO START
 bool KBIN_StepSymmetryPerform_20161205(xstructure& a,string AflowIn,ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags,const bool& osswrite,ostream& oss); //DX
