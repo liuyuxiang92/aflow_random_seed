@@ -12,6 +12,7 @@
 
 string _AFLOWIN_; 
 string _AFLOWLOCK_; 
+string _STOPFLOW_;  //CO20210315
 
 // THREADS
 namespace AFLOW_PTHREADS {
@@ -594,8 +595,10 @@ namespace init {
     if(INIT_VERBOSE) oss << "--- LOADING @ _AFLOWIN_ and _AFLOWLOCK_ --- " << endl;
     _AFLOWIN_=aurostd::args2attachedstring(XHOST.argv,"--use_aflow.in=","aflow.in");
     _AFLOWLOCK_=aurostd::args2attachedstring(XHOST.argv,"--use_LOCK=","LOCK");
+    _STOPFLOW_=aurostd::args2attachedstring(XHOST.argv,"--use_stop_file=","STOPFLOW");  //CO20210315
     if(INIT_VERBOSE) oss << "_AFLOWIN_=" << _AFLOWIN_ << endl;
     if(INIT_VERBOSE) oss << "_AFLOWLOCK_=" << _AFLOWLOCK_ << endl;
+    if(INIT_VERBOSE) oss << "_STOPFLOW_=" << _STOPFLOW_ << endl;  //CO20210315
 
     // LOAD control stuff
     if(INIT_VERBOSE) oss << "--- LOADING @ control --- " << endl;
@@ -2038,13 +2041,13 @@ void AFLOW_monitor_VASP(){
       }
       //if --FILE=LOCK, this will be useful
       if(aurostd::EFileExist(file_dir+"/"+DEFAULT_AFLOW_END_OUT)){break;}
-      if(aurostd::EFileExist(file_dir+"/STOPFLOW")){aurostd::RemoveFile(file_dir+"/STOPFLOW");break;}
+      if(aurostd::EFileExist(file_dir+"/"+_STOPFLOW_)){aurostd::RemoveFile(file_dir+"/"+_STOPFLOW_);break;}
       
       aurostd::Sleep(SECONDS_SLEEP_VASP_MONITOR);
       
       //if --FILE=LOCK, this will be useful
       if(aurostd::EFileExist(file_dir+"/"+DEFAULT_AFLOW_END_OUT)){break;}
-      if(aurostd::EFileExist(file_dir+"/STOPFLOW")){aurostd::RemoveFile(file_dir+"/STOPFLOW");break;}
+      if(aurostd::EFileExist(file_dir+"/"+_STOPFLOW_)){aurostd::RemoveFile(file_dir+"/"+_STOPFLOW_);break;}
     }
   }
   else if(XHOST.vflag_control.flag("DIRECTORY_CLEAN")){
@@ -2209,13 +2212,13 @@ void AFLOW_monitor_VASP(const string& directory){
     }
 
     if(aurostd::EFileExist(xvasp.Directory+"/"+DEFAULT_AFLOW_END_OUT)){break;}
-    if(aurostd::EFileExist(xvasp.Directory+"/STOPFLOW")){aurostd::RemoveFile(xvasp.Directory+"/STOPFLOW");break;}
+    if(aurostd::EFileExist(xvasp.Directory+"/"+_STOPFLOW_)){aurostd::RemoveFile(xvasp.Directory+"/"+_STOPFLOW_);break;}
 
     if(VERBOSE){message << "sleeping for " << sleep_seconds << " seconds";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);}
     aurostd::Sleep(sleep_seconds);
     
     if(aurostd::EFileExist(xvasp.Directory+"/"+DEFAULT_AFLOW_END_OUT)){break;}
-    if(aurostd::EFileExist(xvasp.Directory+"/STOPFLOW")){aurostd::RemoveFile(xvasp.Directory+"/STOPFLOW");break;}
+    if(aurostd::EFileExist(xvasp.Directory+"/"+_STOPFLOW_)){aurostd::RemoveFile(xvasp.Directory+"/"+_STOPFLOW_);break;}
   }
   message << "END        - " << xvasp.Directory;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_); //include directory so noticeable space remains
   FileMESSAGE.flush();FileMESSAGE.clear();FileMESSAGE.close();
