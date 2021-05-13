@@ -3359,8 +3359,9 @@ namespace KBIN {
     //vasp.out should NEVER get this large, means its filled with warnings/errors
     //do not look for other warnings, some might depend on xmessage.flag(\"REACHED_ACCURACY\")
     //make sure BYTES_MAX_VASP_OUT is as LARGE as possible, we want vasp to exit gracefully whenever possible. real errors might appear only after long list of warnings.
+    //should only be an error when vasp is running, there is no treatment for this warning except to kill vasp
     scheme="OUTPUT_LARGE";  //CO20210315
-    found_warning=(fsize_vaspout>=BYTES_MAX_VASP_OUT);  //100MB, make aflowrc parameter, 1GB is too large for NFS mounted nodes (NFS has to push the entire file over cable), when set to 100MB it still took 3 hours //CO20210315 - these stats were pre-renice, the processing time is much better now //vasp_still_running==true &&
+    found_warning=(vasp_still_running==true && fsize_vaspout>=BYTES_MAX_VASP_OUT);  //100MB, make aflowrc parameter, 1GB is too large for NFS mounted nodes (NFS has to push the entire file over cable), when set to 100MB it still took 3 hours //CO20210315 - these stats were pre-renice, the processing time is much better now
     xwarning.flag(scheme,found_warning);
 
     if(LDEBUG){aus << soliloquy << " [2]" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
