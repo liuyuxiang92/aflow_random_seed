@@ -3419,7 +3419,7 @@ namespace KBIN {
       if(LDEBUG){cerr << aus.str();}
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     }
- 
+
     //[CO20210315 - doesn't work]//CO20210315 - this appears to fix ICSD/LIB/CUB/Ag1Sm1_ICSD_604546
     //[CO20210315 - doesn't work]if(xwarning.flag("EDDRMM") && xwarning.flag("ZPOTRF")){ // fix EDDRMM first
     //[CO20210315 - doesn't work]  aus << "MMMMM  MESSAGE ignoring xwarning.flag(\"ZPOTRF\"): prioritizing xwarning.flag(\"EDDRMM\")" << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -3500,6 +3500,16 @@ namespace KBIN {
       if(xwarning.flag("IBZKPT") && xwarning.flag("OUTCAR_INCOMPLETE")==false){  //goes with KKSYM
         aus << "MMMMM  MESSAGE ignoring IBZKPT warning associated with KKSYM: ISYM=" << isym_current << " ISPIN=" << ispin_current << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
         xwarning.flag("IBZKPT",FALSE);
+      }
+    }
+    
+    //do just before RMM_DIIS and ROTMAT
+    //we generally treat CALC_FROZEN as a out-of-memory error UNLESS the calculation has reached its accuracy (finished) and the OUTCAR is incomplete (odd occurrence, noticed on qrats so far)
+    //only convert CALC_FROZEN to MEMORY if it's the only warning (OUTCAR_INCOMPLETE is derivative)
+    if(xwarning.flag("CALC_FROZEN") && xmessage.flag("REACHED_ACCURACY")==false){
+      if((xwarning.vxscheme.size()==1)||(xwarning.flag("OUTCAR_INCOMPLETE") && xwarning.vxscheme.size()==2)){
+        xwarning.flag("CALC_FROZEN",false);xwarning.flag("MEMORY",true);
+        aus << "MMMMM  MESSAGE treating xwarning.flag(\"CALC_FROZEN\") as xwarning.flag(\"MEMORY\")" << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET); //; possible false positive
       }
     }
 
