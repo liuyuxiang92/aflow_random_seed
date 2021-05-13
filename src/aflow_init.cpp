@@ -2127,7 +2127,7 @@ void AFLOW_monitor_VASP(const string& directory){
     vasp_bin=aurostd::basename(vasp_bin); //remove director stuff
   }
   if(vasp_bin.empty()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"no vasp binary found in "+xvasp.Directory+"/"+_AFLOWLOCK_,_RUNTIME_ERROR_);}
-  message << "vasp_binary=" << vasp_bin << " (from " << _AFLOWLOCK_ << ")";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+  message << "vasp_binary=\"" << vasp_bin << "\" (from " << _AFLOWLOCK_ << ")";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
 
   nloop=0;
   n_not_running=0;
