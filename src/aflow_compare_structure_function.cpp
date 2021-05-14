@@ -5976,7 +5976,8 @@ namespace compare{
         // ---------------------------------------------------------------------------
         // check frequency of distance
         // this is sensitive to tolerance of cutoff; use with caution
-        //DX - THIS IS TOO SENSITIVE - if(compare_frequency && env_1.coordinations_neighbor[i]!=env_2.neighbor_frequencies[j]){ continue; }
+        //DX - THIS IS TOO SENSITIVE - if(compare_frequency && env_1.coordinations_neighbor[i]!=env_2.coordinations_neighbor[j]){ continue; }
+        if(exact_match && env_1.coordinations_neighbor[i]!=env_2.coordinations_neighbor[j]){ continue; } //DX20210514 - if exact match, then this is needed
 
         // ---------------------------------------------------------------------------
         // exact match
