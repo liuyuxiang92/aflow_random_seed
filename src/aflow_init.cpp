@@ -2133,6 +2133,8 @@ void AFLOW_monitor_VASP(const string& directory){
   n_not_running=0;
   while(AFLOW_VASP_instance_running() || n_not_running<NCOUNTS_WAIT_MONITOR){  //wait no more than 10 minutes for vasp bin to start up (again)
     if(!aurostd::FileExist(xvasp.Directory+"/"+_AFLOWLOCK_)){break;} //we needed it above to get the vasp_bin
+    if(aurostd::EFileExist(xvasp.Directory+"/"+DEFAULT_AFLOW_END_OUT)){break;}  //check before continue below
+    if(aurostd::EFileExist(xvasp.Directory+"/"+_STOPFLOW_)){aurostd::RemoveFile(xvasp.Directory+"/"+_STOPFLOW_);break;} //check before continue below
     
     vasp_running=VASP_instance_running(vasp_bin);
     if(VERBOSE){
