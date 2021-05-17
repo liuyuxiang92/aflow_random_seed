@@ -7300,14 +7300,15 @@ namespace pflow {
         bool magmom_found = false;
         for(uint i=0;i<vcontent.size();i++){
           if(vcontent[i].find("MAGMOM=") != std::string::npos){
-            if(vcontent[i].find("#") != std::string::npos){
-              cerr << XPID << "pflow::GetNonCollinearMagneticInfo: ERROR: MAGMOM line in INCAR contains a \"#\" prefix." << endl;
+            vcontent[i] = aurostd::RemoveComments(vcontent[i]); //DX20210517 - better way to check/remove comments
+            if(vcontent[i].find("MAGMOM=") == std::string::npos){
+              cerr << XPID << "pflow::GetCollinearMagneticInfo: ERROR: MAGMOM tag is commented out." << endl;
               return false;
             }
-            else {
-              string magmom_values=aurostd::RemoveSubString(vcontent[i],"MAGMOM=");
-              vector<string> mag_tokens;
-              aurostd::string2tokens(magmom_values,mag_tokens);
+            else{
+	      string magmom_values=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(aurostd::RemoveCharacter(aurostd::RemoveSubString(vcontent[i],"MAGMOM="),'\n')); //DX20210517 - need to condition string
+	      vector<string> mag_tokens;
+              aurostd::string2tokens(magmom_values,mag_tokens," "); //DX20210517 - need to split on spaces
               for(uint m=0;m<mag_tokens.size();m++){
                 // INCAR allows multiplication of elements to describe magnetic moment (i.e. 2*2.0)
                 if(mag_tokens[m].find("*") != std::string::npos){
@@ -7318,7 +7319,7 @@ namespace pflow {
                     vmag.push_back(aurostd::string2utype<double>(tokens[1]));
                   }
                 }
-                else {
+                else if(!mag_tokens[m].empty()) { //DX20210517 - ensure the token is not empty
                   vmag.push_back(aurostd::string2utype<double>(mag_tokens[m]));
                 }
               }
@@ -7394,14 +7395,15 @@ namespace pflow {
         bool magmom_found = false;
         for(uint i=0;i<vcontent.size();i++){
           if(vcontent[i].find("MAGMOM=") != std::string::npos){
-            if(vcontent[i].find("#") != std::string::npos){
-              cerr << XPID << "pflow::GetNonCollinearMagneticInfo: ERROR: MAGMOM line in INCAR contains a \"#\" prefix." << endl;
+            vcontent[i] = aurostd::RemoveComments(vcontent[i]); //DX20210517 - better way to check/remove comments
+            if(vcontent[i].find("MAGMOM=") == std::string::npos){
+              cerr << XPID << "pflow::GetNonCollinearMagneticInfo: ERROR: MAGMOM tag is commented out." << endl;
               return false;
             }
-            else {
-              string magmom_values=aurostd::RemoveSubString(vcontent[i],"MAGMOM=");
-              vector<string> mag_tokens;
-              aurostd::string2tokens(magmom_values,mag_tokens);
+            else{
+	      string magmom_values=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(aurostd::RemoveCharacter(aurostd::RemoveSubString(vcontent[i],"MAGMOM="),'\n')); //DX20210517 - need to condition string
+	      vector<string> mag_tokens;
+              aurostd::string2tokens(magmom_values,mag_tokens," "); //DX20210517 - need to split on spaces
               // INCAR allows multiplication of elements to describe magnetic moment (i.e. 2*2.0)
               vector<double> all_magmom_tokens;
               for(uint m=0;m<mag_tokens.size();m++){
@@ -7413,7 +7415,7 @@ namespace pflow {
                     all_magmom_tokens.push_back(aurostd::string2utype<double>(tokens[1]));
                   }
                 }
-                else {
+                else if(!mag_tokens[m].empty()) { //DX20210517 - ensure the token is not empty
                   all_magmom_tokens.push_back(aurostd::string2utype<double>(mag_tokens[m]));
                 }
               }
