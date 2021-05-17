@@ -1702,6 +1702,151 @@ namespace chull {
     return convertUnits(sqrt(getDist2Hull() / getEntropyFormingAbility()),units);
   }
 
+  /**
+   * @brief sort the vertex indexes based on their angle around a central normal vector
+   * @param facet list of vertex indexes forming the facet
+   * @param facet_id id of one of the original facets (to use its already calculated normal vector)
+   */
+  void ConvexHull::sortFacetVertices(vector<uint> &facet, const uint &facet_id){//HE20210510
+    xvector<double> center(3,1);
+    struct sa {
+      uint p_ind;
+      double angle;
+    };
+    vector<sa> angle;
+    for (uint p_id: facet){
+      center += m_points[p_id].m_coords;
+    }
+    center /= facet.size();
+    const xvector<double> start_vector = m_points[facet[0]].m_coords - center;
+    const xvector<double> normal = m_facets[facet_id].m_normal;
+
+    // first index is used for the start_vector, therefore the angle is set to 0.0
+    angle.push_back({facet[0], 0.0});
+    for (uint i=1; i<facet.size(); i++){
+      const xvector<double> next_vector = m_points[facet[i]].m_coords - center;
+      const double dot = aurostd::scalar_product(start_vector, next_vector);
+      const double det = start_vector[1]*next_vector[2]*normal[3] + next_vector[1]*normal[2]*start_vector[3] + normal[1]*start_vector[2]*next_vector[3]
+                         - start_vector[3]*next_vector[2]*normal[1] - next_vector[3]*normal[2]*start_vector[1] - normal[3]*start_vector[2]*next_vector[1];
+      angle.push_back({facet[i], atan2(det, dot)});
+    }
+    sort(angle.begin(),angle.end(), [&](sa i,sa j){return i.angle<j.angle;});
+    for (uint i=0; i<facet.size(); i++) facet[i] = angle[i].p_ind;
+  }
+
+  /**
+   * @brief generates list of facets, if two neighboring facets are coplanar join them
+   * @param facet_collection output vector containing lists of vertex indexes
+   * @param angle_threshold max angle between two facts in radian to be still coplanar
+   */
+  void ConvexHull::getJoinedFacets(vector<vector<uint>> &facet_collection, const double &angle_threshold) {//HE20210510
+    bool LDEBUG=(false || XHOST.DEBUG);
+    string soliloquy=XPID+"ConvexHull::getJoinedFacets(): ";
+
+    if (m_dim != 3) throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, "facet joining is just available in 3D", _VALUE_RANGE_);
+    vector <vector<uint>> raw_facets;
+    vector<xvector<double>> normals;
+    std::map<uint, std::set<uint>>  point_neighbors;
+    std::set<std::array<uint, 2>> raw_join_list;
+    vector<std::set<uint>> join_list;
+    std::set<uint> remove_facet;
+
+    // Collect information on each facet
+    for (ChullFacet facet: h_facets) {
+      vector <uint> vertices;
+
+      // Represent facet based on the vertices indexes
+      for(chull::FacetPoint vert: facet.m_vertices) vertices.push_back(vert.ch_index);
+      raw_facets.push_back(vertices);
+      normals.push_back(facet.m_normal);
+    }
+
+    // Build lookup for neighboring points
+    // (Base point is included to make a check easier)
+    for (vector<uint> facet: raw_facets){
+      for (uint ind: facet) std::copy(facet.begin(),facet.end(), std::inserter(point_neighbors[ind],point_neighbors[ind].end()));
+    }
+
+    // Check for each facet, if their neighbors have an equivalent normal vector
+    if (LDEBUG) cerr << soliloquy << " coplanar | angle | facets | n1 | n2" << endl;
+    for (uint i1=0; i1<raw_facets.size(); i1++){
+      const vector<uint> base_facet = raw_facets[i1];
+      for (uint i2=i1+1; i2<raw_facets.size(); i2++){
+        uint check=0;
+        const vector<uint> compare_facet = raw_facets[i2];
+        for (uint k=0; k<3; k++) {
+          for (uint j=0; j<3; j++) {
+            if (base_facet[k]==compare_facet[j]) check++;
+          }
+        }
+        // neighbor share two vertices
+        if (check != 2) continue;
+        double check_angle = aurostd::angle(normals[i1], normals[i2]);
+        if (check_angle<angle_threshold){
+          if(LDEBUG) cerr << soliloquy << "Y | ";
+          raw_join_list.insert({i1, i2});
+          remove_facet.insert(i1);
+          remove_facet.insert(i2);
+        }
+        else {
+          if (LDEBUG) cerr << soliloquy << "N | ";
+        }
+        if (LDEBUG) {
+          cerr << check_angle << " | ";
+          cerr << i1 << ", " << i2 << " | ";
+          for (uint k: {1, 2, 3}) cerr << normals[i1][k] << ", ";
+          cerr << "| ";
+          for (uint k: {1, 2, 3}) cerr << normals[i2][k] << ", ";
+          cerr << endl;
+        }
+      }
+    }
+
+    // Combine the join pairs into complete facets
+    while (raw_join_list.size()){
+      std::array<uint,2> start=*raw_join_list.begin();
+      std::set<uint> new_facet(start.begin(), start.end());
+      raw_join_list.erase(start);
+      std::vector<std::array<uint,2>> to_delete;
+      for (std::array<uint,2> next: raw_join_list){
+        if (new_facet.count(next[0])) {
+          new_facet.insert(next[1]);
+          to_delete.push_back(next);
+        }
+        else if (new_facet.count(next[1])) {
+          new_facet.insert(next[0]);
+          to_delete.push_back(next);
+        }
+      }
+      for (std::array<uint,2> next: to_delete) raw_join_list.erase(next);
+      join_list.push_back(new_facet);
+    }
+
+    // Build the new facet collection
+    // Add unchanged facets (no sorting, as they should all be triangles)
+    for (uint i=0; i<raw_facets.size(); i++){
+      if (!remove_facet.count(i)) facet_collection.push_back(raw_facets[i]);
+    }
+    // Add joined facets
+    for (std::set<uint> to_join: join_list){
+      std::set<uint> vertices;
+      for (uint f_id: to_join){
+        for (uint p_id: raw_facets[f_id]) vertices.insert(p_id);
+      }
+      // If a vertex has no outside neighbor it is removed
+      vector<uint> vertices_to_remove;
+      for (uint p_id: vertices){
+        std::vector<uint> diff_result;
+        std::set_difference(point_neighbors[p_id].begin(), point_neighbors[p_id].end(), vertices.begin(), vertices.end(), std::inserter(diff_result, diff_result.end()));
+        if (!diff_result.size()) vertices_to_remove.push_back(p_id);
+      }
+      for (uint p_id: vertices_to_remove) vertices.erase(p_id);
+      vector<uint> vec_vertices;
+      for (uint p_id: vertices) vec_vertices.push_back(p_id);
+      sortFacetVertices(vec_vertices, *to_join.begin());
+      facet_collection.push_back(vec_vertices);
+    }
+  }
   //since we don't check ALL attributes of entry, then we weed out MORE
   //entries existing in different catalogs will not be strictly identical
   //avoid this by comparing only the most pertinent information
@@ -3785,8 +3930,15 @@ namespace chull {
     //flag defaults
     m_formation_energy_hull=formation_energy_hull;    //energy vs. entropic_temperature hull
     if(m_formation_energy_hull){m_half_hull=m_lower_hull=true;} //default
-    m_half_hull=(m_half_hull || true);                //energy/entropic_temperature lower/upper hull  //override with flag from m_cflags
-    m_lower_hull=(m_formation_energy_hull || true);   //energy/entropic_temperature lower/upper hull  //override with flag from m_cflags
+  if(m_cflags.flag("CHULL::BASIC_HULL")) { //HE20210510
+    m_half_hull = false;
+    m_lower_hull = false;
+  }
+  else {
+    m_half_hull= true;
+    m_lower_hull=true;
+  }  //energy/entropic_temperature lower/upper hull  //override with flag from m_cflags
+
     m_add_artificial_unaries=add_artificial_unaries;
 
     //detect for coord types mixture!

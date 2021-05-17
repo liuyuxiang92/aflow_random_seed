@@ -551,7 +551,7 @@ extern _XHOST XHOST; // this will be global
 
 //DX20191122 START
 // atom environment modes
-#define ATOM_ENVIRONMENT_MODE_1    1 // minimum coordination shell
+#define ATOM_ENVIRONMENT_MODE_1    1 // minimum coordination shell - element split
 #define ATOM_ENVIRONMENT_MODE_2    2 // [FUTURE] out to a given radius
 #define ATOM_ENVIRONMENT_MODE_3    3 // [FUTURE] largest gap in radial distribution function (GFA)
 //DX20191122 END
@@ -1430,14 +1430,24 @@ class AtomEnvironment{
     AtomEnvironment(const AtomEnvironment& b);                                              // copy constructor
     string element_center;                                                                  // species/element at center of environment                                                                   
     uint type_center;                                                                       // type (uint) at center of environment
+    uint num_neighbors;
     vector<string> elements_neighbor;                                                       // species/element of atoms neighboring center atom
     vector<uint> types_neighbor;                                                            // types (uint) of atoms neighboring center atom
     vector<double> distances_neighbor;                                                      // distances to atoms neighboring atoms (typically put in a bin with small tolerance threshold)                                             
     vector<uint> coordinations_neighbor;                                                    // coordination of neighboring distance                                              
     vector<vector<xvector<double> > > coordinates_neighbor;                                 // coordinates of atoms neighboring atoms (center is assumed to be zero,i.e. coord=neighbor-origin)
+    vector<vector<uint>> facets;                                                            // list of facet vertices in order (coordinates_neighbor_flat indexes)  //HE20210408
+    vector<double> facet_area;                                                              // area of each facet //HE20210408
+    std::array<uint, 8> facet_order;                                                        // count of facet with (index+3) vertices - index 7 counts facets with more than 9 vertices //HE20210408
+    bool has_hull=false;
+    double area;                                                                            // surface area of each environment //HE20210408
+    double volume;                                                                          // volume of each environment //HE20210408
     //functions
     void getAtomEnvironment(const xstructure& xstr, uint center_index, uint mode=ATOM_ENVIRONMENT_MODE_1);                                          // get environment around atom index                                               
     void getAtomEnvironment(const xstructure& xstr, uint center_index, const vector<string>& neighbor_elements, uint mode=ATOM_ENVIRONMENT_MODE_1); // get restricted environment (via specified elements) around atom index
+    void constructAtomEnvironmentHull(void);                                                                                                        // construct hull around an environment //HE20210408
+    xvector<double> index2Point(uint index);                                                                                                        // flat view on coordinates_neighbor //HE20210408
+    string toJSON(void);
   private:
     void free();                                                                            // free operator
     void copy(const AtomEnvironment& b);                                                    // copy constructor
@@ -2621,7 +2631,10 @@ bool PrototypeGeneratorTest(ostream& oss=cout, bool check_symmetry=false, bool c
 bool PrototypeGeneratorTest(ofstream& FileMESSAGE,ostream& oss=cout, bool check_symmetry=false, bool check_uniqueness=false); //DX20200928
 bool FoldAtomsInCellTest(ostream& oss=cout); //DX20210129
 bool FoldAtomsInCellTest(ofstream& FileMESSAGE,ostream& oss=cout); //DX20210129
-
+bool AtomicEnvironmentTest(ostream& oss=cout); //HE20210511
+bool AtomicEnvironmentTest(ofstream& FileMESSAGE,ostream& oss=cout); //HE20210511
+bool AurostdTest(ostream& oss=cout); //HE20210512
+bool AurostdTest(ofstream& FileMESSAGE,ostream& oss=cout); //HE20210512
 // ----------------------------------------------------------------------------
 // Structure Prototypes
 // aflow_xproto.cpp

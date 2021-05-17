@@ -634,6 +634,412 @@ bool FoldAtomsInCellTest(ofstream& FileMESSAGE,ostream& oss){ //DX20210129
 
   return true;
 }
+template <typename utype>
+void check(const bool &passed, const utype &calculated, const utype &expected, const string &check_name,
+           const uint& check_num, uint &passed_checks, vector<string> &results){
+  stringstream result;
+  if (passed) {
+    passed_checks++;
+    result << std::setw(3) << check_num << " | pass | " << check_name;
+  }
+  else {
+    result << std::setw(3) << check_num << " | FAIL | " << check_name << " (result: " << calculated << " | expected: " << expected << ")";
+  }
+  results.push_back(result.str());
+}
+
+template <typename utype>
+void check_equal(const utype &calculated, const utype &expected, const string &check_name,
+                 const uint& check_num, uint &passed_checks, vector<string> &results){
+  bool passed = false;
+  if (aurostd::isequal(calculated, expected)) passed = true;
+  check(passed, calculated, expected, check_name, check_num, passed_checks, results);
+}
+void check_equal(const string &calculated, const string &expected, const string &check_name,
+                 const uint& check_num, uint &passed_checks, vector<string> &results){
+  bool passed = false;
+  if (calculated == expected) passed = true;
+  check(passed, calculated, expected, check_name, check_num, passed_checks, results);
+}
+void check_equal(const bool &calculated, const bool &expected, const string &check_name,
+                 const uint& check_num, uint &passed_checks, vector<string> &results){
+  bool passed = false;
+  if (calculated == expected) passed = true;
+  check(passed, calculated, expected, check_name, check_num, passed_checks, results);
+}
+
+void check_similar(const double &calculated, const double &expected, const string &check_name,
+                   const uint& check_num, uint &passed_checks, vector<string> &results, const double &relative=1E-10){
+  bool passed = false;
+  if (std::abs(expected - calculated) <= expected * relative) passed = true;
+  check(passed, calculated, expected, check_name, check_num, passed_checks, results);
+}
+
+bool AurostdTest(ostream& oss){ofstream FileMESSAGE; return AurostdTest(FileMESSAGE,oss);} //HE20210511
+bool AurostdTest(ofstream& FileMESSAGE, ostream& oss) { //HE20210511
+
+  string function_name="AurostdTest():";
+  stringstream message;
+  _aflags aflags;
+  aflags.Directory=aurostd::getPWD();
+
+  // setup test environment
+  vector<string> results;
+  stringstream result;
+  uint passed_checks = 0;
+  string check_name;
+  uint check_num = 0;
+
+  double expected;
+  double calculated;
+
+  int expected_int;
+//  int calculated_int;
+  std::string expected_error;
+
+  vector<xvector<double>> points;
+  vector<xvector<int>> ipoints;
+  vector<vector<uint>> facets;
+
+  xvector<double> p0(3,1); xvector<int> p0i(3,1);
+  xvector<double> p1(3,1); xvector<int> p1i(3,1);
+  xvector<double> p2(3,1); xvector<int> p2i(3,1);
+  xvector<double> p3(3,1); xvector<int> p3i(3,1);
+  xvector<double> p4(3,1); xvector<int> p4i(3,1);
+  xvector<double> p5(3,1); xvector<int> p5i(3,1);
+  xvector<double> p6(3,1); xvector<int> p6i(3,1);
+  xvector<double> p7(3,1); xvector<int> p7i(3,1);
+  xvector<double> p8(3,1); xvector<int> p8i(3,1);
+  xvector<double> p9(3,1); xvector<int> p9i(3,1);
+  xvector<double> p10(3,1); xvector<int> p10i(3,1);
+  xvector<double> p11(3,1); xvector<int> p11i(3,1);
+
+
+  // define convex solid
+  p0i(1) = p0(1) = 0.0; p0i(2) = p0(2) = 0.0; p0i(3) = p0(3) = 0.0;
+  p1i(1) = p1(1) = 1.0; p1i(2) = p1(2) = 0.0; p1i(3) = p1(3) = 0.0;
+  p2i(1) = p2(1) = 1.0; p2i(2) = p2(2) = 1.0; p2i(3) = p2(3) = 0.0;
+  p3i(1) = p3(1) = 0.0; p3i(2) = p3(2) = 1.0; p3i(3) = p3(3) = 0.0;
+  p4i(1) = p4(1) = 0.0; p4i(2) = p4(2) = 0.0; p4i(3) = p4(3) = 2.0;
+  p5i(1) = p5(1) = 1.0; p5i(2) = p5(2) = 0.0; p5i(3) = p5(3) = 2.0;
+  p6i(1) = p6(1) = 1.0; p6i(2) = p6(2) = 1.0; p6i(3) = p6(3) = 3.0;
+  p7i(1) = p7(1) = 0.0; p7i(2) = p7(2) = 1.0; p7i(3) = p7(3) = 3.0;
+
+  points = {p0, p1, p2, p3, p4, p5, p6, p7};
+  ipoints = {p0i, p1i, p2i, p3i, p4i, p5i, p6i, p7i};
+  facets.push_back({0,1,2,3});
+  facets.push_back({4,5,6,7});
+  facets.push_back({1,2,6,5});
+  facets.push_back({0,3,7,4});
+  facets.push_back({0,1,5,4});
+  facets.push_back({3,2,6,7});
+
+  // ---------------------------------------------------------------------------
+  // Check | convex solid volume (double)
+  check_num++;
+  check_name = "convex solid volume (double)";
+  expected = 2.5;
+
+  calculated = aurostd::volumeConvex(points, facets);
+  check_equal(calculated, expected, check_name, check_num, passed_checks, results);
+
+  // ---------------------------------------------------------------------------
+  // Check | convex solid volume (int)
+  check_num++;
+  check_name = "convex solid volume (int)";
+
+  calculated = aurostd::volumeConvex(ipoints, facets);
+  check_equal(calculated, expected, check_name, check_num, passed_checks, results);
+
+
+  // define non convex solid
+  p0i(1) = p0(1)   = 0.0; p0i(2) = p0(2)   = 0.0; p0i(3) = p0(3)   = 0.0;
+  p1i(1) = p1(1)   = 0.0; p1i(2) = p1(2)   = 4.0; p1i(3) = p1(3)   = 0.0;
+  p2i(1) = p2(1)   = 2.0; p2i(2) = p2(2)   = 4.0; p2i(3) = p2(3)   = 0.0;
+  p3i(1) = p3(1)   = 1.0; p3i(2) = p3(2)   = 1.0; p3i(3) = p3(3)   = 0.0;
+  p4i(1) = p4(1)   = 4.0; p4i(2) = p4(2)   = 2.0; p4i(3) = p4(3)   = 0.0;
+  p5i(1) = p5(1)   = 4.0; p5i(2) = p5(2)   = 0.0; p5i(3) = p5(3)   = 0.0;
+
+  p6i(1) = p6(1)   = 0.0; p6i(2) = p6(2)   = 0.0; p6i(3) = p6(3)   = 4.0;
+  p7i(1) = p7(1)   = 0.0; p7i(2) = p7(2)   = 4.0; p7i(3) = p7(3)   = 4.0;
+  p8i(1) = p8(1)   = 2.0; p8i(2) = p8(2)   = 4.0; p8i(3) = p8(3)   = 4.0;
+  p9i(1) = p9(1)   = 1.0; p9i(2) = p9(2)   = 1.0; p9i(3) = p9(3)   = 4.0;
+  p10i(1) = p10(1) = 4.0; p10i(2) = p10(2) = 2.0; p10i(3) = p10(3) = 4.0;
+  p11i(1) = p11(1) = 4.0; p11i(2) = p11(2) = 0.0; p11i(3) = p11(3) = 4.0;
+
+
+  points = {p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11};
+  ipoints = {p0i, p1i, p2i, p3i, p4i, p5i, p6i, p7i, p8i, p9i, p10i, p11i};
+  facets.clear();
+  facets.push_back({5,4,3,2,1,0});
+  facets.push_back({6,7,8,9,10,11});
+  facets.push_back({0,6,11,5});
+  facets.push_back({4,5,11,10});
+  facets.push_back({3,4,10,9});
+  facets.push_back({3,9,8,2});
+  facets.push_back({1,2,8,7});
+  facets.push_back({0,1,7,6});
+
+  // ---------------------------------------------------------------------------
+  // Check | non convex solid volume (double)
+  check_num++;
+  check_name = "non convex solid volume (double)";
+  expected = 40.0;
+
+  calculated = aurostd::volume(points, facets);
+  check_equal(calculated, expected, check_name, check_num, passed_checks, results);
+
+  // ---------------------------------------------------------------------------
+  // Check | error facet/normals mismatch
+  check_num++;
+  check_name = "error facet/normals mismatch";
+  vector<xvector<double>> normals;
+  expected_error = "xerror code 30";
+  expected_int = 30;
+
+  try {
+    calculated = aurostd::volume(points, facets, normals);
+    check(false, std::string("no error"), expected_error, check_name, check_num, passed_checks, results);
+  }
+  catch (aurostd::xerror e)
+  {
+    if (e.error_code == expected_int) check(true, "", "", check_name, check_num, passed_checks, results);
+    else check(false, std::to_string(e.error_code), expected_error, check_name, check_num, passed_checks, results);
+  }
+  catch (...) {
+    check(false, std::string("not an xerror"), expected_error, check_name, check_num, passed_checks, results);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Check | non convex solid volume (int)
+  check_num++;
+  check_name = "non convex solid volume (int)";
+  expected = 40.0;
+
+  calculated = aurostd::volume(ipoints, facets);
+  check_equal(calculated, expected, check_name, check_num, passed_checks, results);
+
+  // ---------------------------------------------------------------------------
+  // Check | error facet size
+  check_num++;
+  check_name = "error facet size";
+  expected_error = "xerror code 30";
+  expected_int = 30;
+
+  facets.push_back({1,2});
+  try {
+    calculated = aurostd::volume(points, facets);
+    check(false, std::string("no error"), expected_error, check_name, check_num, passed_checks, results);
+  }
+  catch (aurostd::xerror e)
+  {
+    if (e.error_code == expected_int) check(true, "", "", check_name, check_num, passed_checks, results);
+    else check(false, std::to_string(e.error_code), expected_error, check_name, check_num, passed_checks, results);
+  }
+  catch (...) {
+    check(false, std::string("not an xerror"), expected_error, check_name, check_num, passed_checks, results);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Check | non convex area (double)
+  check_num++;
+  check_name = "non convex area (double)";
+  expected = 10.0;
+  points = {p0, p1, p2, p3, p4, p5};
+  ipoints = {p0i, p1i, p2i, p3i, p4i, p5i};
+
+  calculated = aurostd::area(points);
+  check_equal(calculated, expected, check_name, check_num, passed_checks, results);
+
+  // ---------------------------------------------------------------------------
+  // Check | non convex area (int)
+  check_num++;
+  check_name = "non convex area (int)";
+  expected = 10.0;
+
+  calculated = aurostd::area(ipoints);
+  check_equal(calculated, expected, check_name, check_num, passed_checks, results);
+
+
+  // define triangle in 3D to better test int handling
+  p0i(1) = p0(1) = 0.0; p0i(2) = p0(2) = 0.0; p0i(3) = p0(3) = 0.0;
+  p1i(1) = p1(1) = 1.0; p1i(2) = p1(2) = 1.0; p1i(3) = p1(3) = 1.0;
+  p2i(1) = p2(1) = 5.0; p2i(2) = p2(2) = 0.0; p2i(3) = p2(3) = 5.0;
+
+  points = {p0, p1, p2};
+  ipoints = {p0i, p1i, p2i};
+
+  // ---------------------------------------------------------------------------
+  // Check | 3d triangle area (double)
+  check_num++;
+  check_name = "3d triangle area (double)";
+  expected = 3.5355339059;
+
+  calculated = aurostd::area(points);
+  check_similar(calculated, expected, check_name, check_num, passed_checks, results);
+
+  // ---------------------------------------------------------------------------
+  // Check | 3d triangle area (int)
+  check_num++;
+  check_name = "3d triangle area (int)";
+  expected = 3.5355339059;
+
+  calculated = aurostd::area(ipoints);
+  check_similar(calculated, expected, check_name, check_num, passed_checks, results);
+
+  // present overall result
+  if (passed_checks == check_num) {
+    message << "Testing of aurostd was successful (passing " << check_num << " checks)" << endl << "\t" << aurostd::joinWDelimiter(results, "\n\t");
+    pflow::logger(_AFLOW_FILE_NAME_,function_name,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+  }
+  else {
+    message << check_num-passed_checks << " of " << check_num << " checks failed while testing aurostd " << endl << "\t" << aurostd::joinWDelimiter(results, "\n\t");
+    pflow::logger(_AFLOW_FILE_NAME_,function_name,message,aflags,FileMESSAGE,oss,_LOGGER_WARNING_);
+    return false;
+  }
+  return true;
+}
+
+bool AtomicEnvironmentTest(ostream& oss){ofstream FileMESSAGE;return AtomicEnvironmentTest(FileMESSAGE,oss);} //HE20210511
+bool AtomicEnvironmentTest(ofstream& FileMESSAGE, ostream& oss){ //HE20210511
+
+  string function_name="AtomicEnvironmentTest():";
+  stringstream message;
+  _aflags aflags;
+  aflags.Directory=aurostd::getPWD();
+
+  // setup test environment
+  vector<string> results;
+  stringstream result;
+  uint passed_checks = 0;
+  string check_name;
+  uint check_num = 0;
+
+  // ---------------------------------------------------------------------------
+  // Test 1: create AE - mode 1
+  // ---------------------------------------------------------------------------
+
+  // load test system
+  string auid = "aflow:d912e209c81aeb94";
+  string aurl = "aflowlib.duke.edu:AFLOWDATA/LIB2_RAW/Ca_svCu_pv/138";
+  aflowlib::_aflowlib_entry entry;
+  xstructure str;
+
+  entry.aurl=aurl;
+  entry.auid=auid;
+  pflow::loadXstructures(entry);
+  str = entry.vstr.back();
+  vector<AtomEnvironment> AE = getAtomEnvironments(str, 1);
+
+  // ---------------------------------------------------------------------------
+  // Check | number of created AEs
+  check_num++;
+  check_name = "number of created AEs";
+  check_equal(uint(AE.size()), uint(6), check_name, check_num, passed_checks, results);
+
+  // ---------------------------------------------------------------------------
+  // Check | point index mapping
+  check_num++;
+  check_name = "point index mapping";
+  check_equal(AE[1].index2Point(10), AE[1].coordinates_neighbor[1][2], check_name, check_num, passed_checks, results);
+
+  // ---------------------------------------------------------------------------
+  // Check | coordinate matching
+  check_num++;
+  check_name = "coordinate matching";
+  xvector<double> compare_point(3,1);
+  compare_point(1) = -1.9551925593108925e0;
+  compare_point(2) = -2.2642136090979212e0;
+  compare_point(3) = 2.4896636484942385e0;
+
+  check_equal(AE[1].index2Point(2), compare_point, check_name, check_num, passed_checks, results);
+
+  // ---------------------------------------------------------------------------
+  // Check | center element
+  check_num++;
+  check_name = "center element";
+  check_equal(std::string(AE[2].element_center), std::string("Ca"), check_name, check_num, passed_checks, results);
+
+  // ---------------------------------------------------------------------------
+  // Check | center element id
+  check_num++;
+  check_name = "center element id";
+  check_equal(AE[4].type_center, uint(1), check_name, check_num, passed_checks, results);
+
+  // present overall result
+  if (passed_checks == check_num) {
+    message << "Testing the creation of basic atomic environments for " << auid << " was successful (passing " << check_num << " checks)" << endl << "\t" << aurostd::joinWDelimiter(results, "\n\t");
+    pflow::logger(_AFLOW_FILE_NAME_,function_name,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+  }
+  else {
+    message << check_num-passed_checks << " of " << check_num << " failed while creating basic atomic environments for " << auid << endl << "\t" << aurostd::joinWDelimiter(results, "\n\t");
+    pflow::logger(_AFLOW_FILE_NAME_,function_name,message,aflags,FileMESSAGE,oss,_LOGGER_WARNING_);
+    return false;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Test 2: create AE convex hull
+  // ---------------------------------------------------------------------------
+
+  // setup test environment
+  results.clear();
+  result.str("");
+  result.clear();
+  passed_checks = 0;
+  check_num = 0;
+  const uint test_AE = 4;
+
+  // create hull
+  AE[test_AE].constructAtomEnvironmentHull();
+
+  // ---------------------------------------------------------------------------
+  // Check | hull bit set
+  check_num++;
+  check_name = "hull bit set";
+  check_equal(AE[test_AE].has_hull, true, check_name, check_num, passed_checks, results);
+
+  // ---------------------------------------------------------------------------
+  // Check | hull volume
+  check_num++;
+  check_name = "hull volume";
+  check_similar(AE[test_AE].volume, 31.4622167689, check_name, check_num, passed_checks, results);
+
+  // ---------------------------------------------------------------------------
+  // Check | hull area
+  check_num++;
+  check_name = "hull area";
+  check_similar(AE[test_AE].area, 60.4979100628, check_name, check_num, passed_checks, results);
+
+  // ---------------------------------------------------------------------------
+  // Check | triangle count
+  check_num++;
+  check_name = "triangle count";
+  check_equal(AE[test_AE].facet_order[0], uint(6), check_name, check_num, passed_checks, results);
+
+  // ---------------------------------------------------------------------------
+  // Check | tetragon count
+  check_num++;
+  check_name = "tetragon count";
+  check_equal(AE[test_AE].facet_order[1], uint(2), check_name, check_num, passed_checks, results);
+
+  // ---------------------------------------------------------------------------
+  // Check | pentagon count
+  check_num++;
+  check_name = "pentagon count";
+  check_equal(AE[test_AE].facet_order[2], uint(0), check_name, check_num, passed_checks, results);
+
+  // present overall result
+  if (passed_checks == check_num) {
+    message << "Testing the creation of a convex hull around " << auid << " AEs was successful (passing " << check_num << " checks)" << endl << "\t" << aurostd::joinWDelimiter(results, "\n\t");
+    pflow::logger(_AFLOW_FILE_NAME_,function_name,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+  }
+  else {
+    message << check_num-passed_checks << " of " << check_num << " failed while creating a convex hull around " << auid << " AEs" << endl << "\t" << aurostd::joinWDelimiter(results, "\n\t");
+    pflow::logger(_AFLOW_FILE_NAME_,function_name,message,aflags,FileMESSAGE,oss,_LOGGER_WARNING_);
+    return false;
+  }
+  return true;
+  }
 
 int main(int _argc,char **_argv) {
   string soliloquy = XPID + "main():"; //CO20180419
@@ -815,6 +1221,8 @@ int main(int _argc,char **_argv) {
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_PrototypeSymmetry|--PrototypeSymmetry_test")) {return (PrototypeGeneratorTest(cout,true)?0:1);}  //DX20201105
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_PrototypeUniqueness|--PrototypeUniqueness_test")) {return (PrototypeGeneratorTest(cout,false,true)?0:1);}  //DX20210429
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_FoldAtomsInCell|--FoldAtomsInCell_test")) {return (FoldAtomsInCellTest(cout)?0:1);}  //DX20210129
+    if(!Arun && aurostd::args2flag(argv,cmds,"--test_AtomicEnvironment|--AtomicEnvironment_test")) {return (AtomicEnvironmentTest(cout)?0:1);}  //HE20210511
+    if(!Arun && aurostd::args2flag(argv,cmds,"--test_Aurostd|--Aurostd_test")) {return (AurostdTest(cout)?0:1);} //HE20210512
     if(!Arun && aurostd::args2flag(argv,cmds,"--test")) {
 
       if(XHOST.vext.size()!=XHOST.vcat.size()) {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"XHOST.vext.size()!=XHOST.vcat.size(), aborting.",_RUNTIME_ERROR_);}

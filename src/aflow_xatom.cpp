@@ -11,6 +11,7 @@
 #include "aflow_symmetry_spacegroup.h" //DX20180723
 #include "AUROSTD/aurostd_xscalar.h"
 #include "aflow_compare_structure.h" //CO20180409
+#include "aflow_chull.h" //HE20210408
 
 #define _calculate_symmetry_default_sgroup_radius_   2.0
 #define PLATON_MIN_VOLUME_PER_ATOM   6.0   // for symmetry calculation
@@ -1883,11 +1884,13 @@ AtomEnvironment::AtomEnvironment(){
 void AtomEnvironment::free(){
   element_center="";
   type_center=0;
+  has_hull=false;
   elements_neighbor.clear();
   types_neighbor.clear();
   distances_neighbor.clear();
   coordinations_neighbor.clear();
   coordinates_neighbor.clear();
+  facet_order = {0,0,0,0,0,0,0,0};
 }
 
 // ---------------------------------------------------------------------------
@@ -1907,11 +1910,18 @@ AtomEnvironment::AtomEnvironment(const AtomEnvironment& b){
 void AtomEnvironment::copy(const AtomEnvironment& b) {
   element_center=b.element_center;
   type_center=b.type_center;
+  num_neighbors=b.num_neighbors;
   elements_neighbor=b.elements_neighbor;
   types_neighbor=b.types_neighbor;
   distances_neighbor=b.distances_neighbor;
   coordinations_neighbor=b.coordinations_neighbor;
   coordinates_neighbor=b.coordinates_neighbor;
+  facets=b.facets;
+  facet_order=b.facet_order;
+  facet_area=b.facet_area;
+  area=b.area;
+  volume=b.volume;
+  has_hull=has_hull;
 }
 
 // ---------------------------------------------------------------------------
@@ -1980,6 +1990,132 @@ ostream& operator<<(ostream& oss, const AtomEnvironment& AtomEnvironment){
 }
 
 // ***************************************************************************
+// AtomEnvironment::constructAtomEnvironmentHull() - HE20210408
+// ***************************************************************************
+/**
+ * @brief constructed a convex hull around the atomic environment
+ */
+void AtomEnvironment::constructAtomEnvironmentHull(void){
+  string soliloquy=XPID+"AtomEnvironment::constructAtomEnvironmentHull(): ";
+  bool LDEBUG=(false || XHOST.DEBUG);
+  if (has_hull) {
+    if(LDEBUG) cerr << soliloquy << "AE hull is already set" << endl;
+    return;
+  }
+
+  vector<xvector<double>> points;
+  for (uint t = 0; t < num_neighbors; t++) {
+    points.push_back(index2Point(t));
+  }
+
+  if(LDEBUG) cerr << soliloquy << "create AE hull around " << num_neighbors << " atoms" << endl;
+  xoption hull_options;
+  hull_options.flag("CHULL::BASIC_HULL", true);
+  hull_options.flag("CHULL::SKIP_N+1_ENTHALPY_GAIN_ANALYSIS",true);
+  hull_options.flag("CHULL::SKIP_STABILITY_CRITERION_ANALYSIS",true);
+  chull::ConvexHull AEhull;
+  AEhull = chull::ConvexHull(hull_options, points);
+
+  if(LDEBUG) cerr << soliloquy << "resulting hull has " << AEhull.m_facets.size() << " raw facets" << endl;
+
+  vector<vector<uint>> facet_collection;
+  AEhull.getJoinedFacets(facet_collection);
+
+  for (vector<uint> f: facet_collection){
+    vector<uint> nf;
+    for (uint v: f) nf.push_back(v);
+    facets.push_back(nf);
+  }
+  if(LDEBUG) cerr << soliloquy << "after joining " << facets.size() << " facets are remaining" << endl;
+
+  for (vector<uint> f: facets){
+    if (f.size()<10) facet_order[f.size()-3]++;
+    else facet_order[7]++;
+  }
+
+  for (uint t = 0; t < facet_collection.size(); t++) {
+    vector<xvector<double>> facet_coords;
+    for (uint ind: facet_collection[t]) facet_coords.push_back(points[ind]);
+    facet_area.push_back(aurostd::area(facet_coords));
+  }
+  volume = aurostd::volumeConvex(points, facets);
+  area = aurostd::sum(facet_area);
+  has_hull = true;
+}
+
+// ***************************************************************************
+// AtomEnvironment::index2Point() - HE20210408
+// ***************************************************************************
+/**
+ * @brief lookup function to map flat neighbor index back into element sorted coordinates_neighbor list
+ * @param index neighbor index
+ * @return neighbor coordinates
+ */
+xvector<double> AtomEnvironment::index2Point(uint index){
+    string soliloquy=XPID+"AtomEnvironment::index2Point(): ";
+    for(uint i=0;i<coordinates_neighbor.size();i++){
+        if (index < coordinations_neighbor[i]) return coordinates_neighbor[i][index];
+        else index += - coordinations_neighbor[i];
+    }
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, "index out of bounds", _INDEX_BOUNDS_);
+}
+
+// ***************************************************************************
+// AtomEnvironment::toJSON() - HE20210408
+// ***************************************************************************
+/**
+ * @brief serialize AtomEnvironment class to json
+ * @return json string
+ */
+string AtomEnvironment::toJSON(void){
+    string soliloquy=XPID+"AtomEnvironment::toJSON(): ";
+
+    stringstream json_content;
+
+    json_content << "{" << endl;
+    json_content << "  \"center_element\": \"" << element_center << "\"," << endl;
+    if (has_hull){
+      json_content << "  \"volume\": \"" << volume << "\"," << endl;
+      json_content << "  \"area\": \"" << area << "\"," << endl;
+    }
+    json_content << "  \"neighbors\": [" << endl;
+    uint index=0;
+    for (uint i = 0; i < coordinations_neighbor.size(); i++){
+        for (uint k = 0; k < coordinations_neighbor[i]; k++){
+            json_content << "    {\"index\": " << index << ", ";
+            json_content << "\"element\": \"" << elements_neighbor[i] << "\", ";
+            json_content << "\"element_index\": " << types_neighbor[i] << ", ";
+            json_content << "\"coordinate\": [" << coordinates_neighbor[i][k][1] << ", " << coordinates_neighbor[i][k][2] << ", " << coordinates_neighbor[i][k][3] << "]}," << endl;
+            index++;
+        }
+    }
+    json_content.seekp(-2,json_content.cur);
+    json_content << endl << "    ]," << endl;
+
+    if (has_hull) {
+      json_content << "  \"facets\": [" << endl;
+      for (uint i = 0; i < facets.size(); i++) {
+        json_content << "    {\"area\": " << facet_area[i] << ", ";
+        json_content << "\"vertices\": [";
+        for (const uint &v : facets[i]) json_content << v << ", ";
+        json_content.seekp(-2, json_content.cur);
+        json_content << "]}," << endl;
+      }
+      json_content.seekp(-2, json_content.cur);
+      json_content << endl << "    ]," << endl;
+
+      json_content << "  \"facet_orders\": [";
+      for (const uint &v : facet_order) json_content << v << ", ";
+      json_content.seekp(-2, json_content.cur);
+      json_content << "]";
+      json_content << endl << "}";
+    }
+
+    return json_content.str();
+}
+
+
+// ***************************************************************************
 // AtomEnvironment::getAtomEnvironment() - DX20191122 
 // ***************************************************************************
 // determines the atomic environment around a central atom 
@@ -2009,6 +2145,12 @@ void AtomEnvironment::getAtomEnvironment(const xstructure& xstr, uint center_ind
     }
   }
 
+  // init parameters that are filled later by constructAtomEnvironmentHull \\HE20210409
+  std::fill(facet_order.begin(), facet_order.end(), 0.0);
+  area = 0.0;
+  volume = 0.0;
+  num_neighbors= 0;
+
   // ---------------------------------------------------------------------------
   // ATOM_ENVIRONMENT_MODE_1 : minimum coordination environment for each type 
   if(mode==ATOM_ENVIRONMENT_MODE_1){
@@ -2028,6 +2170,7 @@ void AtomEnvironment::getAtomEnvironment(const xstructure& xstr, uint center_ind
         distances_neighbor.push_back(min_dist);
         coordinations_neighbor.push_back(frequency);
         coordinates_neighbor.push_back(coordinates);
+        num_neighbors += frequency;
       }
     }
   }
@@ -2038,6 +2181,21 @@ void AtomEnvironment::getAtomEnvironment(const xstructure& xstr, uint center_ind
   // ---------------------------------------------------------------------------
   // [FUTURE] ATOM_ENVIRONMENT_MODE_3 : environment out to largest gap in radial distribution function 
   // i.e., GFA convention
+
+  if(mode==ATOM_ENVIRONMENT_MODE_3){
+    uint frequency = 0;
+    double min_dist = AUROSTD_MAX_DOUBLE;
+    vector<xvector<double> > coordinates;
+    minimumCoordinationShell(xstr, center_index, min_dist, frequency, coordinates);
+
+   elements_neighbor.push_back("Mix");
+   types_neighbor.push_back(0);
+   distances_neighbor.push_back(min_dist);
+   coordinations_neighbor.push_back(frequency);
+   coordinates_neighbor.push_back(coordinates);
+   num_neighbors += frequency;
+
+   }
 
 }
 

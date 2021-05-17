@@ -8292,6 +8292,71 @@ namespace pflow{
   }
 }
 
+
+
+// ***************************************************************************
+// pflow::getAtomicEnvironment() //HE20210504
+// ***************************************************************************
+namespace pflow {
+  /**
+   * @brief write collection of atomic environments into json files
+   * @param auid AFLOW ID
+   * @param aeMode enviroment definition (see ATOM_ENVIRONMENT_MODE_X in aflow.h)
+   * @param aeOutBase output folder
+   *
+   * Feature request: analyse a structure file directly
+   */
+  void getAtomicEnvironment(const string &auid, const uint &aeMode, string aeOutBase) {
+    bool LDEBUG=(false || XHOST.DEBUG);
+    string soliloquy=XPID+"pflow::getAtomicEnvironment(): ";
+    if(LDEBUG) cerr << soliloquy << "Start" << endl;
+
+    string aurl;
+    bool foundAUID = false;
+    aflowlib::_aflowlib_entry entry;
+    xstructure str;
+
+    // TODO: speed up AURL lookup
+    if (auid != "") foundAUID = aflowlib::AflowlibLocator(auid, aurl, "AFLOWLIB_AUID2AURL");
+
+    if (aeOutBase != "") mkdir(aeOutBase.c_str(), 0777);
+
+    if (foundAUID){
+      aeOutBase += auid.substr(6);
+      entry.aurl=aurl;
+      entry.auid=auid;
+      loadXstructures(entry);
+      str = entry.vstr.back();
+      if(LDEBUG) cerr << soliloquy << "AUID: "<< auid << endl;
+      if(LDEBUG) cerr << soliloquy << "AURL: "<< aurl << endl;
+    }
+
+    else {
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, "could not load a structure", _INPUT_ERROR_);
+    }
+
+    mkdir(aeOutBase.c_str(), 0777);
+    vector<AtomEnvironment> AE = getAtomEnvironments(str, aeMode);
+
+    string file_name;
+    ofstream AEData;
+    if(LDEBUG) cerr << soliloquy << "Saving " << AE.size() << " atomic environments" << endl;
+    for(uint i=0; i<AE.size(); i++) {
+      file_name = aeOutBase + "/" + std::to_string(i) + "_" + AE[i].element_center + ".json";
+      AE[i].constructAtomEnvironmentHull();
+      string json_content = AE[i].toJSON();
+      AEData.open(file_name.c_str());
+      AEData << json_content << endl;
+      AEData.close();
+      if(LDEBUG) cerr << soliloquy << file_name << endl;
+    }
+  }
+
+  void getAtomicEnvironment(const string &auid, string aeOutBase) {
+    getAtomicEnvironment(auid, 1, aeOutBase);
+  }
+}
+
 // ***************************************************************************
 // pflow::getSpaceGroupSetting() //DX20210420
 // ***************************************************************************

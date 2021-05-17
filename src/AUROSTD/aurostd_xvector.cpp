@@ -2078,6 +2078,137 @@ namespace aurostd {
     }
 }
 
+namespace aurostd { //HE20210511
+  /**
+   * @brief area encapsulated by ordered points on a plane
+   * @param points collection of points
+   * @return area
+   *
+   * This function will return the wrong area if edges are crossed.
+   */
+  template<class utype> double
+    area(const vector<xvector<utype>>& points){ //HE20210511
+      double result = 0.0;
+      xvector<utype> sum_temp(points[0].lrows,points[0].urows);
+      for (uint k=1; k<points.size()-1;k++) sum_temp += aurostd::vector_product(points[k]-points[0], points[k+1]-points[0]);
+      for (int i=sum_temp.lrows;i<=sum_temp.urows;i++) result += (double) abs(sum_temp[i]*sum_temp[i]);
+      return 0.5 * std::sqrt(result);
+  }
+}
+
+namespace aurostd { //HE20210511
+  /**
+   * @brief volume of a solid defined by points, facets their normals
+   * @param points collection of points
+   * @param facets collection of ordered point indices describing a facet
+   * @param normals collection of facet normals pointing all either outwards or inwards of the solid
+   * @return volume
+   */
+  template<class utype> double
+  volume(const vector<xvector<utype>>& points, const vector<vector<uint>>& facets, const vector<xvector<utype>>& normals){ //HE20210511
+    bool LDEBUG=(false || XHOST.DEBUG);
+    string soliloquy=XPID+"aurostd::volume(): ";
+
+    if (facets.size() != normals.size()){
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, XPID + "aurostd::xvector::volume():", "there must be an equal number of facets and normal vectors", _VALUE_ERROR_);
+    }
+    double result = 0.0;
+
+    vector<xvector<utype>> facet_points;
+    if (LDEBUG) cerr << soliloquy << "facet id | contribution | area | normal | scalar_prod" << endl;
+    for (uint f_id=0; f_id<facets.size();f_id++){
+      if (facets[f_id].size() < 3){
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, XPID + "aurostd::xvector::volume():", "there must be at least three vertices in each facets", _VALUE_ERROR_);
+      }
+      facet_points.clear();
+      for (uint p_id: facets[f_id]) facet_points.push_back(points[p_id]);
+      double area = aurostd::area(facet_points);
+      double scalar_prod = aurostd::scalar_product(normals[f_id], facet_points[0]);
+      if (LDEBUG) cerr << soliloquy  << f_id << " | " << scalar_prod * area / 3.0 << " | " << area << " | " << normals[f_id] << " | " << scalar_prod << endl;
+      result += scalar_prod * area;
+      }
+    if (LDEBUG) cerr << soliloquy  << "Volume: " << std::abs(result) / 3.0 << endl;
+    return std::abs(result) / 3.0; // depending on the normal direction the volume could be negative
+  }
+
+  /**
+   * @brief volume of a solid encapsulated by points on ordered facets
+   * @param points collection of points
+   * @param facets collection of consistently ordered point indices describing a facet
+   * @return volume
+   *
+   * All facets need to be sorted consistently clockwise or anticlockwise in regards to the outside facing facet normal.
+   */
+  template<class utype> double
+  volume(const vector<xvector<utype>>& points, const vector<vector<uint>>& facets){ //HE20210511
+    vector<xvector<utype>> facet_points;
+    vector<xvector<utype>> facet_direction;
+    vector<xvector<utype>> normals;
+    for (uint f_id=0; f_id<facets.size();f_id++){
+      if (facets[f_id].size() < 3){
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, XPID + "aurostd::xvector::volume():", "there must be at least three vertices in each facets", _VALUE_ERROR_);
+      }
+      facet_points.clear(); facet_direction.clear();
+      for (uint p_id: facets[f_id]) facet_points.push_back(points[p_id]);
+      facet_direction.push_back(facet_points[0] - facet_points[1]);
+      facet_direction.push_back(facet_points[1] - facet_points[2]);
+      normals.push_back(aurostd::getGeneralNormal(facet_direction));
+    }
+    return volume(points, facets, normals);
+  }
+  // integer xvectors are converted into double vectors, to enable a correct volume calculation
+  double volume(const vector<xvector<int>>& points, const vector<vector<uint>>& facets){//HE20210514
+    vector<xvector<double>> mapped_points;
+    for (xvector<int> point : points){
+      xvector<double> new_point(3,1);
+      for (int i=point.lrows;i<=point.urows;i++) new_point(i) = (double) point(i);
+      mapped_points.push_back(new_point);
+    }
+    return volume(mapped_points, facets);
+  }
+
+  /**
+   * @brief volume of a convex solid encapsulated by points on ordered facets
+   * @param points collection of points
+   * @param facets collection of ordered point indices describing a facet
+   * @return volume
+   *
+   * In a convex solid it is not necessary that all facets are ordered in the same manner.
+   */
+  template<class utype> double // volume defined by points an facets of a convex solid
+  volumeConvex(const vector<xvector<utype>>& points, const vector<vector<uint>>& facets){ //HE20210511
+    vector<xvector<utype>> facet_points;
+    vector<xvector<utype>> facet_direction;
+    xvector<utype> center = aurostd::getCentroid(points);
+    vector<xvector<utype>> normals;
+    for (uint f_id=0; f_id<facets.size();f_id++){
+      if (facets[f_id].size() < 3){
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, XPID + "aurostd::xvector::volume():", "there must be at least three vertices in each facets", _VALUE_ERROR_);
+      }
+      facet_points.clear(); facet_direction.clear();
+      for (uint p_id: facets[f_id]) facet_points.push_back(points[p_id]);
+      facet_direction.push_back(facet_points[0]-facet_points[1]);
+      facet_direction.push_back(facet_points[1]-facet_points[2]);
+      xvector<utype> normal = aurostd::getGeneralNormal(facet_direction);
+      utype direction_check = aurostd::scalar_product(facet_points[0]-center, normal);
+      if (direction_check < 0) normal = -normal;
+      normals.push_back(normal);
+    }
+    return volume(points, facets, normals);
+  }
+  // integer xvectors are converted into double vectors, to enable a correct volume calculation
+  double volumeConvex(const vector<xvector<int>>& points, const vector<vector<uint>>& facets){//HE20210514
+    vector<xvector<double>> mapped_points;
+    for (xvector<int> point : points){
+      xvector<double> new_point(3,1);
+      for (int i=point.lrows;i<=point.urows;i++) new_point(i) = (double) point(i);
+      mapped_points.push_back(new_point);
+    }
+    return volumeConvex(mapped_points, facets);
+  }
+}
+
+
 namespace aurostd {
   template<class utype> xvector<utype> //get centroid of data points //CO20180409
     getCentroid(const vector<xvector<utype> >& points) { //DX20200728 - added weights

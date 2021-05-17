@@ -594,6 +594,13 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     vpflow.args2addattachedscheme(argv,cmds,"GFA::FORMATION_ENTHALPY_CUTOFF","--cutoff_formation_enthalpy=|--cutoff_enthalpy=|--cutoff_energy=|--cut=","0.05"); //DF20190619
   }	//DF20190329
 
+  vpflow.flag("ATOMIC_ENVIRONMENT::INIT",aurostd::args2flag(argv,cmds,"--ae|--atomic_environment")); //HE20210331 - Testing
+  if(vpflow.flag("ATOMIC_ENVIRONMENT::INIT")){	//HE20210331
+     vpflow.args2addattachedscheme(argv,cmds,"ATOMIC_ENVIRONMENT::AUID","--auid=","none");
+     vpflow.args2addattachedscheme(argv,cmds,"ATOMIC_ENVIRONMENT::OUTFOLDER","--out=|--outfolder=","AE_out/");
+     vpflow.args2addattachedscheme(argv, cmds,"ATOMIC_ENVIRONMENT::MODE","--mode=","1");
+  }	//HE20210331
+
   vpflow.flag("GENERATE_CERAMICS",aurostd::args2flag(argv,cmds,"--generate_ceramics|--gen_ceram"));  //CO20200731
   if(vpflow.flag("GENERATE_CERAMICS")){ //CO20200731
     vpflow.args2addattachedscheme(argv,cmds,"GENERATE_CERAMICS::NON_METALS","--non_metals=|--nm=","C");
@@ -1616,6 +1623,7 @@ namespace pflow {
       //DX20190425 END
       if(vpflow.flag("COMPARE_PERMUTATION")) {cout << compare::compareAtomDecorations(cin,vpflow); _PROGRAMRUN=true;} //DX20190201
       if(vpflow.flag("GFA::INIT")){pflow::GLASS_FORMING_ABILITY(vpflow); _PROGRAMRUN=true;} //DF20190329 - GFA
+      if(vpflow.flag("ATOMIC_ENVIRONMENT::INIT")){pflow::ATOMIC_ENVIRONMENT(vpflow); _PROGRAMRUN=true;} //HE20210331 - Testing
       if(vpflow.flag("GENERATE_CERAMICS")){cout << pflow::GENERATE_CERAMICS_PRINT(vpflow) << endl; _PROGRAMRUN=true;} //CO20200731
       //DX+CO START
       if(vpflow.flag("FULLSYMMETRY")) {pflow::CalculateFullSymmetry(cin,vpflow,cout); _PROGRAMRUN=true;}
@@ -7488,6 +7496,24 @@ namespace pflow {
   }
 }
 //DX20170927 - get collinear magnetic info - END
+
+
+// ***************************************************************************
+// pflow::ATOMIC_ENVIRONMENT
+// ***************************************************************************
+namespace pflow { //HE20210331
+  void ATOMIC_ENVIRONMENT(aurostd::xoption& vpflow){
+    string soliloquy=XPID+"pflow::ATOMIC_ENVIRONMENT():";
+    string auid = "";
+    uint ae_mode = 1;
+    string aeOutBase = "AE_out/";
+    if (vpflow.flag("ATOMIC_ENVIRONMENT::AUID")) auid = vpflow.getattachedscheme("ATOMIC_ENVIRONMENT::AUID");
+    else throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, "missing auid - could not load structure", _INPUT_ERROR_);
+    if (vpflow.flag("ATOMIC_ENVIRONMENT::MODE")) ae_mode = vpflow.getattachedutype<uint>("ATOMIC_ENVIRONMENT::MODE");
+    if (vpflow.flag("ATOMIC_ENVIRONMENT::OUTFOLDER")) aeOutBase = vpflow.getattachedscheme("ATOMIC_ENVIRONMENT::OUTFOLDER");
+    pflow::getAtomicEnvironment(auid, ae_mode, aeOutBase);
+  }
+}
 
 // ***************************************************************************
 // pflow::GLASS_FORMING_ABILITY
