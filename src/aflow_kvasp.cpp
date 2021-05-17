@@ -1211,6 +1211,7 @@ namespace KBIN {
       cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:KKSYM\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ERROR:KKSYM") << endl;
       cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:LRF_COMMUTATOR\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ERROR:LRF_COMMUTATOR") << endl;
       cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:MEMORY\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ERROR:MEMORY") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:MPICH0\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ERROR:MPICH0") << endl;
       cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:MPICH11\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ERROR:MPICH11") << endl;
       cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:MPICH139\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ERROR:MPICH139") << endl;
       cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:MPICH174\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ERROR:MPICH174") << endl;
@@ -3072,7 +3073,7 @@ namespace KBIN {
       cerr << soliloquy << " memory_used=" << memory_total-memory_free << endl;
       cerr << soliloquy << " memory_total=" << memory_total << endl;
     }
-    if(1||VERBOSE){
+    if(VERBOSE){
       aus << "00000  MESSAGE memory used: " << memory_usage_percentage << "% (max=" << MEMORY_MAX_USAGE << "%)" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
       if(LDEBUG){cerr << aus.str();}
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -3295,19 +3296,45 @@ namespace KBIN {
     found_warning=(found_warning && (aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,AFLOW_MEMORY_TAG,true,true,true,grep_stop_condition) || memory_usage_percentage>=MEMORY_MAX_USAGE));
     xwarning.flag(scheme,found_warning);
     //
+    //on qrats, we see this
+    //===================================================================================
+    //=   BAD TERMINATION OF ONE OF YOUR APPLICATION PROCESSES
+    //=   PID 27264 RUNNING AT prod-0004
+    //=   EXIT CODE: 9
+    //=   CLEANING UP REMAINING PROCESSES
+    //=   YOU CAN IGNORE THE BELOW CLEANUP MESSAGES
+    //===================================================================================
+    //YOUR APPLICATION TERMINATED WITH THE EXIT STRING: Killed (signal 9)
+    //This typically refers to a problem with your application.
+    //Please see the FAQ page for debugging suggestions
+    //
+    //on quser, we see nothing...
+    //
+    //on x, we see this
+    //===================================================================================
+    //=   BAD TERMINATION OF ONE OF YOUR APPLICATION PROCESSES
+    //=   RANK 58 PID 63228 RUNNING AT node6
+    //=   KILLED BY SIGNAL: 9 (Killed)
+    //===================================================================================
+    //
+    scheme="MPICH0";  //0 just means that it is generic, maybe fix name later
+    found_warning=ReachedAccuracy2bool(scheme,xRequiresAccuracy,xmessage,vasp_still_running);
+    found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"BAD TERMINATION OF ONE OF YOUR APPLICATION PROCESSES",true,true,true,grep_stop_condition));
+    xwarning.flag(scheme,found_warning);
+    //
     scheme="MPICH11";
     found_warning=ReachedAccuracy2bool(scheme,xRequiresAccuracy,xmessage,vasp_still_running);
-    found_warning=(found_warning && (aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"BAD TERMINATION OF ONE OF YOUR APPLICATION PROCESSES",true,true,true,grep_stop_condition) && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"EXIT CODE: 11",true,true,true,grep_stop_condition) ));
+    found_warning=(found_warning && (aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"BAD TERMINATION OF ONE OF YOUR APPLICATION PROCESSES",true,true,true,grep_stop_condition) && (aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"EXIT CODE: 11",true,true,true,grep_stop_condition) || aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"KILLED BY SIGNAL: 11",true,true,true,grep_stop_condition)) ));
     xwarning.flag(scheme,found_warning);
     //
     scheme="MPICH139";
     found_warning=ReachedAccuracy2bool(scheme,xRequiresAccuracy,xmessage,vasp_still_running);
-    found_warning=(found_warning && (aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"BAD TERMINATION OF ONE OF YOUR APPLICATION PROCESSES",true,true,true,grep_stop_condition) && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"EXIT CODE: 139",true,true,true,grep_stop_condition) ));
+    found_warning=(found_warning && (aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"BAD TERMINATION OF ONE OF YOUR APPLICATION PROCESSES",true,true,true,grep_stop_condition) && (aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"EXIT CODE: 139",true,true,true,grep_stop_condition) || aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"KILLED BY SIGNAL: 139",true,true,true,grep_stop_condition)) ));
     xwarning.flag(scheme,found_warning);
     //
     scheme="MPICH174";  //CO20210315
     found_warning=ReachedAccuracy2bool(scheme,xRequiresAccuracy,xmessage,vasp_still_running);
-    found_warning=(found_warning && (aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"BAD TERMINATION OF ONE OF YOUR APPLICATION PROCESSES",true,true,true,grep_stop_condition) && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"EXIT CODE: 174",true,true,true,grep_stop_condition) ));
+    found_warning=(found_warning && (aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"BAD TERMINATION OF ONE OF YOUR APPLICATION PROCESSES",true,true,true,grep_stop_condition) && (aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"EXIT CODE: 174",true,true,true,grep_stop_condition) || aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"KILLED BY SIGNAL: 174",true,true,true,grep_stop_condition)) ));
     xwarning.flag(scheme,found_warning);
     //
     scheme="NATOMS";  //look for problem for distance
@@ -3419,6 +3446,7 @@ namespace KBIN {
       if(!xmonitor.flag("IGNORING_WARNINGS:KKSYM") && (wdebug || xwarning.flag("KKSYM"))) aus << "WWWWW  WARNING xwarning.flag(\"KKSYM\")=" << xwarning.flag("KKSYM") << endl;
       if(wdebug || xwarning.flag("LRF_COMMUTATOR")) aus << "WWWWW  WARNING xwarning.flag(\"LRF_COMMUTATOR\")=" << xwarning.flag("LRF_COMMUTATOR") << endl;
       if(wdebug || xwarning.flag("MEMORY")) aus << "WWWWW  WARNING xwarning.flag(\"MEMORY\")=" << xwarning.flag("MEMORY") << endl;
+      if(wdebug || xwarning.flag("MPICH0")) aus << "WWWWW  WARNING xwarning.flag(\"MPICH0\")=" << xwarning.flag("MPICH0") << endl;
       if(wdebug || xwarning.flag("MPICH11")) aus << "WWWWW  WARNING xwarning.flag(\"MPICH11\")=" << xwarning.flag("MPICH11") << endl;
       if(wdebug || xwarning.flag("MPICH139")) aus << "WWWWW  WARNING xwarning.flag(\"MPICH139\")=" << xwarning.flag("MPICH139") << endl;
       if(wdebug || xwarning.flag("MPICH174")) aus << "WWWWW  WARNING xwarning.flag(\"MPICH174\")=" << xwarning.flag("MPICH174") << endl;
@@ -3535,6 +3563,15 @@ namespace KBIN {
       if((xwarning.vxscheme.size()==1)||(xwarning.flag("OUTCAR_INCOMPLETE") && xwarning.vxscheme.size()==2)){
         xwarning.flag("CALC_FROZEN",false);xwarning.flag("MEMORY",true);
         aus << "MMMMM  MESSAGE treating xwarning.flag(\"CALC_FROZEN\") as xwarning.flag(\"MEMORY\")" << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET); //; possible false positive
+      }
+    }
+    
+    //the memory might ramp up too quickly, in which the OOM killer will kill vasp
+    //if we are lucky, we'll get the "BAD TERMINATION..." warning in the vasp.out (works on qrats)
+    if(xwarning.flag("MPICH0") && xmessage.flag("REACHED_ACCURACY")==false){
+      if((xwarning.vxscheme.size()==1)||(xwarning.flag("OUTCAR_INCOMPLETE") && xwarning.vxscheme.size()==2)){
+        xwarning.flag("MPICH0",false);xwarning.flag("MEMORY",true);
+        aus << "MMMMM  MESSAGE treating xwarning.flag(\"MPICH0\") as xwarning.flag(\"MEMORY\")" << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET); //; possible false positive
       }
     }
 

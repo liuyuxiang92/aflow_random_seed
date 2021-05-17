@@ -2182,6 +2182,7 @@ void AFLOW_monitor_VASP(const string& directory){
       kill_vasp=true;
       //the --monitor_vasp instance will not have the right ncpus set, so grab it from the LOCK
       GetVASPBinaryFromLOCK(xvasp.Directory,vasp_bin,ncpus);  //grab ncpus and set to kflags.KBIN_MPI_NCPUS
+      vasp_bin=aurostd::basename(vasp_bin); //remove directory stuff
       if(ncpus>0){kflags.KBIN_MPI_NCPUS=ncpus;}
       //HERE: plug in exceptions from xfixed, etc. to turn OFF kill_vasp
       //read LOCK to see what has been issued already
@@ -2217,7 +2218,7 @@ void AFLOW_monitor_VASP(const string& directory){
         if(vasp_running){
           //special case for MEMORY, the error will be triggered in the --monitor_vasp instance, and not in the --run one
           //so write out "AFLOW ERROR: AFLOW_MEMORY" so it gets caught in the --run instance
-          if(xwarning.flag("MEMORY")){aurostd::string2file(string(AFLOW_MEMORY_TAG)+"\n",xvasp.Directory+"/"+DEFAULT_VASP_OUT,"APPEND");}
+          if(xwarning.flag("MEMORY")){aurostd::string2file(" "+string(AFLOW_MEMORY_TAG)+"\n",xvasp.Directory+"/"+DEFAULT_VASP_OUT,"APPEND");} //pre-pending space to match formating
           //write BEFORE issuing the kill, the other instance of aflow will start to act as soon as the process is dead
           message << "issuing kill command for: \""+vasp_bin+"\"";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
           aurostd::ProcessKill(vasp_bin);
