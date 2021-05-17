@@ -2326,6 +2326,29 @@ namespace aurostd {
     return sizeout;
   }
 
+  bool GetMemory(unsigned long long int& free,unsigned long long int& total){ //CO20210315 - only works for linux: needs `free` command
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy=XPID+"aurostd::GetMemory():";
+
+    if(!aurostd::IsCommandAvailable("free")){return false;}
+    string output=aurostd::execute2string("free");
+    //                            total        used        free      shared  buff/cache   available
+    //              Mem:      395654628    41363940    30948848     4106252   323341840   349143640
+    //              Swap:       2097148           0     2097148
+    vector<string> vlines;
+    aurostd::string2vectorstring(output,vlines);
+    if(vlines.size()<2){return false;}
+    if(vlines[1].find("Mem:")==string::npos){return false;}
+    vector<string> vtokens;
+    aurostd::string2tokens(vlines[1],vtokens," ");
+    if(!aurostd::isfloat(vtokens[1])){return false;}
+    total=aurostd::string2utype<unsigned long long int>(vtokens[1]);
+    if(!aurostd::isfloat(vtokens[3])){return false;}
+    free=aurostd::string2utype<unsigned long long int>(vtokens[3]);
+    if(LDEBUG){cerr << soliloquy << " free=" << free << " total=" << total << endl;}
+    return true;
+  }
+
   // ***************************************************************************
   // Function FileEmpty && FileNotEmpty
   // ***************************************************************************

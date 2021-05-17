@@ -3060,6 +3060,19 @@ namespace KBIN {
     //[CO20210315 - does not work for big files]content_vasp_out=aurostd::RemoveWhiteSpaces(content_vasp_out);  //remove whitespaces
     //[CO20210315 - does not work for big files]content_vasp_out=aurostd::toupper(content_vasp_out);  //put toupper to eliminate case-sensitivity 
     
+    //do memory check
+    unsigned long long int memory_free=0,memory_total=0;
+    double memory_usage_percentage=0;
+    if(aurostd::GetMemory(memory_free,memory_total)){memory_usage_percentage=100.0*(1.0-(double)(memory_free/memory_total));}
+    else{
+      if(LDEBUG){cerr << soliloquy << " unable to query memory on the node" << endl;}
+    }
+    if(1||VERBOSE){
+      aus << "00000  MESSAGE memory used: " << memory_usage_percentage << "% (max=" << MEMORY_MAX_USAGE << "%)" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+      if(LDEBUG){cerr << aus.str();}
+      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+    }
+
     //get INCAR
     VASP_Reread_INCAR(xvasp);  //preload incar
     
@@ -3272,7 +3285,7 @@ namespace KBIN {
     //
     scheme="MEMORY";
     found_warning=ReachedAccuracy2bool(scheme,xRequiresAccuracy,xmessage,vasp_still_running);
-    found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"AFLOW ERROR: AFLOW_MEMORY=",true,true,true,grep_stop_condition));
+    found_warning=(found_warning && (aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"AFLOW ERROR: AFLOW_MEMORY=",true,true,true,grep_stop_condition) || memory_usage_percentage>=MEMORY_MAX_USAGE));
     xwarning.flag(scheme,found_warning);
     //
     scheme="MPICH11";

@@ -473,6 +473,7 @@ namespace aurostd {
   bool FileExist(const string& FileName);  bool FileExist(const string& FileName,string &FileNameOut);
   bool EFileExist(const string& FileName); bool EFileExist(const string& FileName,string &FileNameOut);
   unsigned long long int FileSize(const string& FileName);  //ME20191001
+  bool GetMemory(unsigned long long int& free,unsigned long long int& total); //CO20210315
   bool FileEmpty(const string& FileName);
   bool FileNotEmpty(const string& FileName);
   bool EFileEmpty(const string& FileName); //CO20190808

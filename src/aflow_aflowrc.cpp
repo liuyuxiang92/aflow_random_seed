@@ -888,6 +888,8 @@
 #define         SECONDS_STALE_OUTCAR                          XHOST.adefault.getattachedutype<double>("SECONDS_STALE_OUTCAR") 
 #define AFLOWRC_BYTES_MAX_VASP_OUT                            20000000000    // bytes
 #define         BYTES_MAX_VASP_OUT                            XHOST.adefault.getattachedutype<unsigned long long int>("BYTES_MAX_VASP_OUT") 
+#define AFLOWRC_MEMORY_MAX_USAGE                              95    // percent
+#define         MEMORY_MAX_USAGE                              XHOST.adefault.getattachedutype<double>("MEMORY_MAX_USAGE") 
 #define AFLOWRC_FILE_VASP_MONITOR                             string("monitor_vasp")
 #define         FILE_VASP_MONITOR                             XHOST.adefault.getattachedscheme("FILE_VASP_MONITOR")
 
@@ -1658,6 +1660,7 @@ namespace aflowrc {
     aflowrc::load_default("SECONDS_SLEEP_VASP_MONITOR",AFLOWRC_SECONDS_SLEEP_VASP_MONITOR); //CO20201111
     aflowrc::load_default("SECONDS_STALE_OUTCAR",AFLOWRC_SECONDS_STALE_OUTCAR); //CO20201111
     aflowrc::load_default("BYTES_MAX_VASP_OUT",AFLOWRC_BYTES_MAX_VASP_OUT); //CO20201111
+    aflowrc::load_default("MEMORY_MAX_USAGE",AFLOWRC_MEMORY_MAX_USAGE); //CO20201111
     aflowrc::load_default("FILE_VASP_MONITOR",AFLOWRC_FILE_VASP_MONITOR); //CO20201111
 
     // DEFAULT MACHINE DEPENDENT MPI
@@ -2265,6 +2268,7 @@ namespace aflowrc {
     aflowrc << "SECONDS_SLEEP_VASP_MONITOR=" << AFLOWRC_SECONDS_SLEEP_VASP_MONITOR << " // seconds"   << endl;  //CO20201111
     aflowrc << "SECONDS_STALE_OUTCAR=" << AFLOWRC_SECONDS_STALE_OUTCAR << " // seconds"   << endl;  //CO20201111
     aflowrc << "BYTES_MAX_VASP_OUT=" << AFLOWRC_BYTES_MAX_VASP_OUT << " // bytes"   << endl;  //CO20201111
+    aflowrc << "MEMORY_MAX_USAGE=" << AFLOWRC_MEMORY_MAX_USAGE << " // bytes"   << endl;  //CO20201111
     aflowrc << "FILE_VASP_MONITOR=" << AFLOWRC_FILE_VASP_MONITOR << " // monitor file postfix"   << endl;  //CO20201111
 
     aflowrc << " " << endl;
@@ -2839,6 +2843,7 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<double>(\"SECONDS_SLEEP_VASP_MONITOR\")=" << SECONDS_SLEEP_VASP_MONITOR << endl; //CO20201111
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<double>(\"SECONDS_STALE_OUTCAR\")=" << SECONDS_STALE_OUTCAR << endl; //CO20201111
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<double>(\"BYTES_MAX_VASP_OUT\")=" << BYTES_MAX_VASP_OUT << endl; //CO20201111
+    if(LDEBUG) oss << "XHOST.adefault.getattachedutype<double>(\"MEMORY_MAX_USAGE\")=" << MEMORY_MAX_USAGE << endl; //CO20201111
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<double>(\"FILE_VASP_MONITOR\")=" << FILE_VASP_MONITOR << endl; //CO20201111
 
     if(LDEBUG) oss << "// DEFAULT MACHINE DEPENDENT MPI" << endl;

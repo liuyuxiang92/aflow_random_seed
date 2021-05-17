@@ -1340,6 +1340,7 @@ IVDW=number_for_VASP_see_manual_for_IVDW
 
   ERROR:MEMORY
     The MEMORY error is triggered when an out-of-memory error is detected in the vasp.out (depends on the cluster).
+    Exceeding the MEMORY_MAX_USAGE (see README_AFLOW_AFLOWRC.TXT) will also trigger this error.
     AFLOW will divide NCPUS by two to allow more memory per process and
     allocate all possible resources to VASP by executing the following command before executing VASP again: ulimit -s unlimited.
     Should the error occur again, AFLOW will decrease the NBANDS.
