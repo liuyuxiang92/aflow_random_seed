@@ -140,6 +140,7 @@ static const string POCC_ARUN_TITLE_TAG=ARUN_TITLE_TAG+"POCC_";
 
 //MONITOR_VASP
 #define VERBOSE_MONITOR_VASP false
+#define AFLOW_MEMORY_TAG "AFLOW ERROR: AFLOW_MEMORY"
 
 // --------------------------------------------------------------------------
 // definitions for MULTHREADS
@@ -1091,7 +1092,8 @@ string aflow_get_time_string_short(void);
 
 class _xvasp; //forward declaration
 
-string GetVASPBinaryFromLOCK(const string& directory);  //CO20210315
+bool GetVASPBinaryFromLOCK(const string& directory,string& vasp_bin);  //CO20210315
+bool GetVASPBinaryFromLOCK(const string& directory,string& vasp_bin,int& ncpus);  //CO20210315
 void processFlagsFromLOCK(_xvasp& xvasp,_vflags& vflags,aurostd::xoption& xfixed);  //CO20210315
 bool AFLOW_VASP_instance_running(); //CO20210315
 bool AFLOW_MONITOR_instance_running(const _aflags& aflags); //CO20210315

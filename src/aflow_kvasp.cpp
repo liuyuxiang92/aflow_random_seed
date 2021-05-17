@@ -3063,9 +3063,14 @@ namespace KBIN {
     //do memory check
     unsigned long long int memory_free=0,memory_total=0;
     double memory_usage_percentage=0;
-    if(aurostd::GetMemory(memory_free,memory_total)){memory_usage_percentage=100.0*(1.0-(double)(memory_free/memory_total));}
+    if(aurostd::GetMemory(memory_free,memory_total)){memory_usage_percentage=100.0*(((double)(memory_total-memory_free))/((double)(memory_total)));}
     else{
       if(LDEBUG){cerr << soliloquy << " unable to query memory on the node" << endl;}
+    }
+    if(LDEBUG){
+      cerr << soliloquy << " memory_free=" << memory_free << endl;
+      cerr << soliloquy << " memory_used=" << memory_total-memory_free << endl;
+      cerr << soliloquy << " memory_total=" << memory_total << endl;
     }
     if(1||VERBOSE){
       aus << "00000  MESSAGE memory used: " << memory_usage_percentage << "% (max=" << MEMORY_MAX_USAGE << "%)" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
@@ -3102,7 +3107,9 @@ namespace KBIN {
     //therefore, the most robust way to define the binary is to search the LOCK file
     //[CO20210315 - OBSOLETE]string& vasp_bin=kflags.KBIN_MPI_BIN;
     //[CO20210315 - OBSOLETE]if(!(kflags.KBIN_MPI==true||XHOST.MPI==true)){vasp_bin=kflags.KBIN_BIN;}
-    string vasp_bin=aurostd::basename(GetVASPBinaryFromLOCK(xvasp.Directory));
+    string vasp_bin="";
+    GetVASPBinaryFromLOCK(xvasp.Directory,vasp_bin);
+    vasp_bin=aurostd::basename(vasp_bin); //remove directory stuff
     if(vasp_bin.empty()){ //rely on defaults here in case we're not running --monitor_vasp
       vasp_bin=kflags.KBIN_MPI_BIN;
       if(!(kflags.KBIN_MPI==true||XHOST.MPI==true)){vasp_bin=kflags.KBIN_BIN;}
@@ -3285,7 +3292,7 @@ namespace KBIN {
     //
     scheme="MEMORY";
     found_warning=ReachedAccuracy2bool(scheme,xRequiresAccuracy,xmessage,vasp_still_running);
-    found_warning=(found_warning && (aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"AFLOW ERROR: AFLOW_MEMORY=",true,true,true,grep_stop_condition) || memory_usage_percentage>=MEMORY_MAX_USAGE));
+    found_warning=(found_warning && (aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,AFLOW_MEMORY_TAG,true,true,true,grep_stop_condition) || memory_usage_percentage>=MEMORY_MAX_USAGE));
     xwarning.flag(scheme,found_warning);
     //
     scheme="MPICH11";

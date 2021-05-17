@@ -1856,13 +1856,21 @@ double AFLOW_checkMEMORY(const string& progname,double memory) {
 // ***************************************************************************
 // GetVASPBinaryFromLOCK
 // ***************************************************************************
-string GetVASPBinaryFromLOCK(const string& directory){  //CO20210315
+bool GetVASPBinaryFromLOCK(const string& directory,string& vasp_bin){  //CO20210315
+  int ncpus=0;
+  return GetVASPBinaryFromLOCK(directory,vasp_bin,ncpus);
+}
+bool GetVASPBinaryFromLOCK(const string& directory,string& vasp_bin,int& ncpus){  //CO20210315
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   string soliloquy=XPID+"GetVASPBinaryFromLOCK():";
 
   if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
 
-  if(!aurostd::FileExist(directory+"/"+_AFLOWLOCK_)){return "";}
+  //reset
+  vasp_bin="";
+  ncpus=0;
+
+  if(!aurostd::FileExist(directory+"/"+_AFLOWLOCK_)){return false;}
 
   vector<string> vlines,vtokens;
   aurostd::file2vectorstring(directory+"/"+_AFLOWLOCK_,vlines);
@@ -1872,12 +1880,15 @@ string GetVASPBinaryFromLOCK(const string& directory){  //CO20210315
     if(vlines[i].find(VASP_KEYWORD_EXECUTION)==string::npos){continue;} //look for 'Executing:' line
     aurostd::string2tokens(vlines[i],vtokens," ");
     for(j=0;j<vtokens.size();j++){
-      if(j-2<vtokens.size() && vtokens[j]==DEFAULT_VASP_OUT){ //looking for sequence VASP_BIN >> VASP_OUT //if j goes below 0, then it goes to max uint
-        return vtokens[j-2];
+      if((j-2)<vtokens.size() && vtokens[j]==DEFAULT_VASP_OUT){ //looking for sequence VASP_BIN >> VASP_OUT //if j goes below 0, then it goes to max uint
+        vasp_bin=vtokens[j-2];
+        ncpus=1;  //set default
+        if((j-3)<vtokens.size() && aurostd::isfloat(vtokens[j-3])){ncpus=aurostd::string2utype<int>(vtokens[j-3]);} //grab if available, it will be just before the bin
+        return true;
       }
     }
   }
-  return "";
+  return false;
 }
 
 // ***************************************************************************
@@ -2115,16 +2126,17 @@ void AFLOW_monitor_VASP(const string& directory){
   //CO20210315 - when we generalize this code to run for targeted instances of vasp, we also need to target the right instances of aflow
 
   string vasp_bin="";
+  int ncpus=0;
   nloop=0;
 
   while((AFLOW_VASP_instance_running() || (nloop++)<NCOUNTS_WAIT_MONITOR) && vasp_bin.empty()){  //wait no more than 10 minutes for vasp bin to start up
-    vasp_bin=GetVASPBinaryFromLOCK(xvasp.Directory);
+    GetVASPBinaryFromLOCK(xvasp.Directory,vasp_bin,ncpus);
+    vasp_bin=aurostd::basename(vasp_bin); //remove directory stuff
     if(vasp_bin.empty()){
-      if(VERBOSE){message << "sleeping for " << sleep_seconds_afterkill << " seconds, waiting for \"" << vasp_bin << "\" to start running and " << _AFLOWLOCK_ << " to be written";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);}
+      if(VERBOSE){message << "sleeping for " << sleep_seconds_afterkill << " seconds, waiting for VASP binary to start running and " << _AFLOWLOCK_ << " to be written";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);}
       aurostd::Sleep(sleep_seconds_afterkill); //sleep at least a minute to let aflow startup
       continue;
     }
-    vasp_bin=aurostd::basename(vasp_bin); //remove director stuff
   }
   if(vasp_bin.empty()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"no vasp binary found in "+xvasp.Directory+"/"+_AFLOWLOCK_,_RUNTIME_ERROR_);}
   message << "vasp_binary=\"" << vasp_bin << "\" (from " << _AFLOWLOCK_ << ")";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
@@ -2168,6 +2180,9 @@ void AFLOW_monitor_VASP(const string& directory){
     bool kill_vasp=false;
     if(xwarning.flag()){  //if any flag is on
       kill_vasp=true;
+      //the --monitor_vasp instance will not have the right ncpus set, so grab it from the LOCK
+      GetVASPBinaryFromLOCK(xvasp.Directory,vasp_bin,ncpus);  //grab ncpus and set to kflags.KBIN_MPI_NCPUS
+      if(ncpus>0){kflags.KBIN_MPI_NCPUS=ncpus;}
       //HERE: plug in exceptions from xfixed, etc. to turn OFF kill_vasp
       //read LOCK to see what has been issued already
       processFlagsFromLOCK(xvasp,vflags,xfixed);
@@ -2200,6 +2215,10 @@ void AFLOW_monitor_VASP(const string& directory){
       if(XHOST.vflag_control.flag("KILL_VASP_ALL")){
         vasp_running=VASP_instance_running(vasp_bin);
         if(vasp_running){
+          //special case for MEMORY, the error will be triggered in the --monitor_vasp instance, and not in the --run one
+          //so write out "AFLOW ERROR: AFLOW_MEMORY" so it gets caught in the --run instance
+          if(xwarning.flag("MEMORY")){aurostd::string2file(string(AFLOW_MEMORY_TAG)+"\n",xvasp.Directory+"/"+DEFAULT_VASP_OUT,"APPEND");}
+          //write BEFORE issuing the kill, the other instance of aflow will start to act as soon as the process is dead
           message << "issuing kill command for: \""+vasp_bin+"\"";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
           aurostd::ProcessKill(vasp_bin);
         }else{
