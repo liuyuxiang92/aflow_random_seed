@@ -133,8 +133,10 @@ vector<string> XtalFinderCalculator::getUniquePermutations(
         ss_output << " " << aurostd::joinWDelimiter(unique_permutations,"\n ") << endl;
       }
       if(format==json_ft){ //DX20190506
+        vector<string> vcontent;
+        for(uint j=0;j<unique_permutations.size();j++){ vcontent.push_back("[\""+unique_permutations[j]+"\"]"); } //DX20210517 - fixed printing error
         ss_output << "{\"atom_decorations_equivalent\":[";
-        ss_output << "[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(unique_permutations,"\""),",") << "]"; //DX20191125 - Vec to Dec
+        ss_output << aurostd::joinWDelimiter(vcontent,","); //DX20191125 - Vec to Dec //DX20210517 - fixed printing error
         ss_output << "]}" << endl;
       }
       results_ss << ss_output.str();
