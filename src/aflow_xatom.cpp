@@ -2010,7 +2010,7 @@ void AtomEnvironment::constructAtomEnvironmentHull(void){
 
   if(LDEBUG) cerr << soliloquy << "create AE hull around " << num_neighbors << " atoms" << endl;
   xoption hull_options;
-  hull_options.flag("CHULL::BASIC_HULL", true);
+  hull_options.flag("CHULL::FULL_HULL", true);
   hull_options.flag("CHULL::SKIP_N+1_ENTHALPY_GAIN_ANALYSIS",true);
   hull_options.flag("CHULL::SKIP_STABILITY_CRITERION_ANALYSIS",true);
   chull::ConvexHull AEhull;

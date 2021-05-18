@@ -3930,14 +3930,8 @@ namespace chull {
     //flag defaults
     m_formation_energy_hull=formation_energy_hull;    //energy vs. entropic_temperature hull
     if(m_formation_energy_hull){m_half_hull=m_lower_hull=true;} //default
-  if(m_cflags.flag("CHULL::BASIC_HULL")) { //HE20210510
-    m_half_hull = false;
-    m_lower_hull = false;
-  }
-  else {
-    m_half_hull= true;
-    m_lower_hull=true;
-  }  //energy/entropic_temperature lower/upper hull  //override with flag from m_cflags
+    m_half_hull=(m_half_hull && m_cflags.flag("CHULL::FULL_HULL")==false); //energy/entropic_temperature lower/upper hull //override with flag from m_cflags  //HE20210510 - added CHULL::FULL_HULL
+    m_lower_hull=(m_formation_energy_hull && m_cflags.flag("CHULL::FULL_HULL")==false); //energy/entropic_temperature lower/upper hull //override with flag from m_cflags  //HE20210510 - added CHULL::FULL_HULL
 
     m_add_artificial_unaries=add_artificial_unaries;
 
