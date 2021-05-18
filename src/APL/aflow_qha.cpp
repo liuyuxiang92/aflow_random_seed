@@ -615,6 +615,8 @@ namespace apl
       // results of calculations with potentially different parameters
       if (eos_static_data_available){
         aurostd::RemoveFile(currentDirectory+'/'+DEFAULT_QHA_FILE_PREFIX+DEFAULT_QHA_THERMO_FILE);
+        aurostd::RemoveFile(currentDirectory+'/'+DEFAULT_QHA_FILE_PREFIX+DEFAULT_QHA_COEFF_FILE);
+        aurostd::RemoveFile(currentDirectory+'/'+"aflow.qha.imag.out");
       }
 
       // In a QHA calculation, the EOS flag performs APL calculations for a set of volumes.
@@ -1166,6 +1168,7 @@ namespace apl
 
     int Nqpoints = 0;
     bool apl_data_read_successfully = true;
+    bool has_negative_frequencies   = false;
 
     string phposcarfile = "", directory = "";
     for (uint i=0; i<subdirectories.size(); i++){
@@ -1248,6 +1251,7 @@ namespace apl
           pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
               *p_oss, _LOGGER_ERROR_);
           apl_data_read_successfully = false;
+          has_negative_frequencies   = true;
         }
       }
 
@@ -1365,6 +1369,34 @@ namespace apl
             }
           }
           break;
+      }
+    }
+
+    // write the flag that tells if a specific type of QHA calculation contains
+    // imaginary frequencies
+    switch(type){
+      case(QHA_EOS):
+        msg = (std::string)"[QHA]IMAG=" + (has_negative_frequencies ? "YES" : "NO") + "\n";
+        break;
+      case(QHA_FD):
+        msg = (std::string)"[QHA3P]IMAG=" + (has_negative_frequencies ? "YES" : "NO") + "\n";
+        msg = (std::string)"[SCQHA]IMAG=" + (has_negative_frequencies ? "YES" : "NO") + "\n";
+        break;
+      case(QHA_TE):
+        msg = (std::string)"[QHANP]IMAG=" + (has_negative_frequencies ? "YES" : "NO") + "\n";
+        break;
+    }
+    string filename = "aflow.qha.imag.out";
+    if (aurostd::FileExist(filename)){
+      if (!aurostd::string2file(msg, filename, "APPEND")){
+        msg = "Error writing to " + filename + " file.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function,msg,_FILE_ERROR_);
+      }
+    }
+    else{
+      if (!aurostd::string2file(msg, filename)){
+        msg = "Error writing to " + filename + " file.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function,msg,_FILE_ERROR_);
       }
     }
 
@@ -1758,7 +1790,8 @@ namespace apl
   /// America, 30 (9): 244–247
   /// Birch-Murnaghan: Physical Review. 71 (11): 809–824
   ///
-  xvector<double> QHA::fitToEOSmodel(xvector<double> &E, EOSmethod method)
+  xvector<double> QHA::fitToEOSmodel(xvector<double> &V, xvector<double> &E,
+      EOSmethod method)
   {
     string function = XPID + "QHA::fitToEOSmodel():", msg = "";
 
@@ -1768,7 +1801,6 @@ namespace apl
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function,msg,_VALUE_RANGE_);
     }
 
-    xvector<double> V = aurostd::vector2xvector(EOSvolumes);
     xvector<double> fit_params;
     xvector<double> guess(4);
     switch(method){
@@ -1864,6 +1896,11 @@ namespace apl
     }
 
     return fit_params;
+  }
+  xvector<double> QHA::fitToEOSmodel(xvector<double> &E, EOSmethod method)
+  {
+    xvector<double> V = aurostd::vector2xvector(EOSvolumes);
+    return fitToEOSmodel(V, E, method);
   }
 
   /// Returns the (free) energy at a given volume for a chosen EOS model.
@@ -2834,19 +2871,19 @@ namespace apl
     // QHA calculation
     switch(eos_method){
       case(EOS_SJ):
-        blockname += "SJ_THERMO]";
+        blockname += "SJ";
         break;
       case(EOS_BIRCH_MURNAGHAN2):
-        blockname += "BM2_THERMO]";
+        blockname += "BM2";
         break;
       case(EOS_BIRCH_MURNAGHAN3):
-        blockname += "BM3_THERMO]";
+        blockname += "BM3";
         break;
       case(EOS_BIRCH_MURNAGHAN4):
-        blockname += "BM4_THERMO]";
+        blockname += "BM4";
         break;
       case(EOS_MURNAGHAN):
-        blockname += "M_THERMO]";
+        blockname += "M";
         break;
       default:
         msg = "Nonexistent EOS method was passed to " + function;
@@ -2854,17 +2891,22 @@ namespace apl
         break;
     }
 
+    string blockname_coeff  = blockname + "_COEFF]";
+    blockname += "_THERMO]";
+
     string filename = directory+'/'+DEFAULT_QHA_FILE_PREFIX+DEFAULT_QHA_THERMO_FILE;
     msg = "Writing T-dependent properties to "+filename;
     pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE, *p_oss,
         _LOGGER_MESSAGE_);
 
-    stringstream file;
+    stringstream file, file_coeff;
     file.precision(10);
+    file_coeff.precision(20);
 
     file << AFLOWIN_SEPARATION_LINE << std::endl;
     file << blockname + "SYSTEM=" << system_title << std::endl;
     file << blockname + "START" << std::endl;
+
     // write header
     file << setw(5)  << "#T[K]"          << setw(SW) << ' ' <<
       setw(TW) << "V[A^3/atom]"          << setw(SW) << ' ' <<
@@ -2910,6 +2952,16 @@ namespace apl
 
     uint f_contrib = includeElectronicContribution ? F_ELEC | F_VIB : F_VIB;
 
+    xvector<double> p; // EOS fit coefficients
+
+    file_coeff << AFLOWIN_SEPARATION_LINE << std::endl;
+    file_coeff << blockname_coeff + "VMIN=" << min(xvolumes) << std::endl;
+    file_coeff << blockname_coeff + "VMAX=" << max(xvolumes) << std::endl;
+    file_coeff << blockname_coeff + "IMAG=" << "NO" << std::endl;
+    file_coeff << AFLOWIN_SEPARATION_LINE << std::endl;
+    file_coeff << blockname_coeff + "SYSTEM=" << system_title << std::endl;
+    file_coeff << blockname_coeff + "START" << std::endl;
+
     try{
       for (int Tid=0; Tid<Ntemperatures; Tid++){
         T = Temperatures[Tid];
@@ -2924,7 +2976,15 @@ namespace apl
           break;
         }
 
-        fitToEOSmodel(F, eos_method);
+        p = fitToEOSmodel(F, eos_method);
+
+        // output fit coefficients to the file
+        file_coeff << setw(5)  << T;
+        for (int i=p.lrows; i<=p.urows; i++){
+          file_coeff << setw(SW) << ' ' << setw(TW) << p[i];
+        }
+        file_coeff << std::endl;
+
         // note that the state of the EOS fit is changed by the calcThermalExpansion and/or
         // calcIsochoricSpecificHeat functions, so save Veq, Feq and B for future use
         Veq = EOS_volume_at_equilibrium;
@@ -3028,6 +3088,24 @@ namespace apl
         throw aurostd::xerror(_AFLOW_FILE_NAME_,function,msg,_FILE_ERROR_);
       }
     }
+
+    file_coeff << blockname_coeff + "STOP" << std::endl;
+    file_coeff << AFLOWIN_SEPARATION_LINE << std::endl;
+
+    // write EOS coefficients to file
+    filename = "aflow.qha.coeff.out";
+    if (aurostd::FileExist(filename)){
+      if (!aurostd::stringstream2file(file_coeff, filename, "APPEND")){
+        msg = "Error writing to " + filename + " file.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function,msg,_FILE_ERROR_);
+      }
+    }
+    else{
+      if (!aurostd::stringstream2file(file_coeff, filename)){
+        msg = "Error writing to " + filename + " file.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function,msg,_FILE_ERROR_);
+      }
+    }
   }
 
   /// Writes the F(V,T) data to aflow.qha.FVT.out file
@@ -3043,11 +3121,19 @@ namespace apl
     string filename = directory+'/'+DEFAULT_QHA_FILE_PREFIX+DEFAULT_QHA_FVT_FILE;
     file.precision(10);
 
+    // output the calculation parameters
+    file << AFLOWIN_SEPARATION_LINE << std::endl;
+    file << "[QHA_FVT_PARAMETERS]START" << std::endl;
+    file << "N_VOLUMES="      << N_EOSvolumes  << std::endl;
+    file << "N_TEMPERATURES=" << Ntemperatures << std::endl;
+    file << "[QHA_FVT_PARAMETERS]STOP"  << std::endl;
+
     file << AFLOWIN_SEPARATION_LINE << std::endl;
     file << "[QHA_FVT]START" << std::endl;
 
+    // output the FVT data
     xvector<double> Felec(N_EOSvolumes);
-    double T = 0.0;
+    double T = 0.0, Ftot = 0.0;
 
     for (int Tid = 0; Tid < Ntemperatures; Tid++){
       T = Temperatures[Tid];
@@ -3060,7 +3146,9 @@ namespace apl
           Felec[Vid+1]=calcElectronicFreeEnergy(T,Vid);
         }
 
+        Ftot = E0_V[Vid] + calcVibFreeEnergy(T, Vid) + Felec[Vid+1];
         file << setw(TW) << EOSvolumes[Vid]    << setw(SW) << ' '
+          << setw(TW) << Ftot << setw(SW) << ' '
           << setw(TW) << calcVibFreeEnergy(T, Vid) << setw(SW) << ' '
           << setw(TW) << Felec[Vid+1]       << setw(SW) << ' '
           << setw(TW) << E0_V[Vid] <<
@@ -3474,6 +3562,57 @@ namespace apl{
     }
 
     return qha_aflowin_is_found;
+  }
+
+  string EOSmethod2label(EOSmethod eos_method)
+  {
+    string function = "EOSmethod2label():", msg = "";
+
+    switch(eos_method){
+      case(EOS_SJ):
+        return "SJ";
+        break;
+      case(EOS_BIRCH_MURNAGHAN2):
+        return "BM2";
+        break;
+      case(EOS_BIRCH_MURNAGHAN3):
+        return "BM3";
+        break;
+      case(EOS_BIRCH_MURNAGHAN4):
+        return "BM4";
+        break;
+      case(EOS_MURNAGHAN):
+        return "M";
+        break;
+      default:
+        msg = "Nonexistent EOS method was passed to " + function;
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, QHA_ARUN_MODE, msg, _INPUT_UNKNOWN_);
+        break;
+    }
+  }
+
+  string QHAmethod2label(QHAmethod qha_method)
+  {
+    string function = "QHAmethod2label():", msg = "";
+
+    switch(qha_method){
+      case(QHA_CALC):
+        return "QHA";
+        break;
+      case(QHA3P_CALC):
+        return "QHA3P";
+        break;
+      case(SCQHA_CALC):
+        return "SCQHA";
+        break;
+      case(QHANP_CALC):
+        return "QHANP";
+        break;
+      default:
+        msg = "Nonexistent QHA method was passed to " + function;
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, QHA_ARUN_MODE, msg, _INPUT_UNKNOWN_);
+        break;
+    }
   }
 
   // AS20201211 OBSOLETE, but might be useful

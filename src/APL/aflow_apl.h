@@ -1182,6 +1182,8 @@ namespace apl
   enum QHAtype   {QHA_FD, QHA_EOS, QHA_TE};
 
   bool QHA_Get_AflowInName(string &AflowInName, const string &directory_LIB);
+  string EOSmethod2label(EOSmethod eos_method);//AS20210518
+  string QHAmethod2label(QHAmethod qha_method);//AS20210518
   //void linkAPLtoQHA();//AS20201216 OBSOLETE
 
   /// Calculates QHA-related properties
@@ -1215,6 +1217,7 @@ namespace apl
       xvector<double> calcFreeEnergy(double T, QHAmethod qha_method, uint contrib);
       xvector<double> calcDOSatEf();
       double calcInternalEnergyFit(double T, double V, EOSmethod method);
+      xvector<double> fitToEOSmodel(xvector<double> &V, xvector<double> &E, EOSmethod method);
       xvector<double> fitToEOSmodel(xvector<double> &E, EOSmethod method);
       double evalEOSmodel(double V, const xvector<double> &p, EOSmethod eos_method);
       double calcBulkModulus(double V, const xvector<double> &parameters, EOSmethod method);

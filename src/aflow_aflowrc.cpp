@@ -658,6 +658,10 @@
 #define AFLOWRC_DEFAULT_QHA_FVT_FILE                          string("FVT.out")
 #define         DEFAULT_QHA_FVT_FILE                          XHOST.adefault.getattachedscheme("DEFAULT_QHA_FVT_FILE")
 //AS20200508 END
+//AS20210517 BEGIN
+#define AFLOWRC_DEFAULT_QHA_COEFF_FILE                        string("coeff.out")
+#define         DEFAULT_QHA_COEFF_FILE                        XHOST.adefault.getattachedscheme("DEFAULT_QHA_coeff_FILE")
+//AS20210517 END
 //AS20201022 BEGIN
 #define AFLOWRC_DEFAULT_QHA_PDIS_FILE                         string("dispersion_phonon")
 #define         DEFAULT_QHA_PDIS_FILE                         XHOST.adefault.getattachedscheme("DEFAULT_QHA_PDIS_FILE")
@@ -1538,6 +1542,7 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_QHA_FREQS_FILE", AFLOWRC_DEFAULT_QHA_FREQS_FILE);
     aflowrc::load_default("DEFAULT_QHA_FVT_FILE", AFLOWRC_DEFAULT_QHA_FVT_FILE);
     //AS20200508 END
+    aflowrc::load_default("DEFAULT_QHA_COEFF_FILE", AFLOWRC_DEFAULT_QHA_COEFF_FILE);//AS20210517
     aflowrc::load_default("DEFAULT_QHA_PDIS_FILE", AFLOWRC_DEFAULT_QHA_PDIS_FILE);//AS20201022
     aflowrc::load_default("DEFAULT_QHA_PDOS_FILE", AFLOWRC_DEFAULT_QHA_PDOS_FILE);//AS20201201
     aflowrc::load_default("DEFAULT_QHA_KPOINTS_FILE", AFLOWRC_DEFAULT_QHA_KPOINTS_FILE);//AS20201112
@@ -2155,6 +2160,7 @@ namespace aflowrc {
     aflowrc << "DEFAULT_QHA_FREQS_FILE=\"" << AFLOWRC_DEFAULT_QHA_FREQS_FILE << "\"" << endl;
     aflowrc << "DEFAULT_QHA_FVT_FILE=\"" << AFLOWRC_DEFAULT_QHA_FVT_FILE << "\"" << endl;
     //AS20200508 END
+    aflowrc << "DEFAULT_QHA_COEFF_FILE=\"" << AFLOWRC_DEFAULT_QHA_COEFF_FILE << "\"" << endl;//AS20210517
     aflowrc << "DEFAULT_QHA_PDIS_FILE=\"" << AFLOWRC_DEFAULT_QHA_PDIS_FILE << "\"" << endl;//AS20201022
     aflowrc << "DEFAULT_QHA_PDOS_FILE=\"" << AFLOWRC_DEFAULT_QHA_PDOS_FILE << "\"" << endl;//AS20201201
     aflowrc << "DEFAULT_QHA_KPOINTS_FILE=\"" << AFLOWRC_DEFAULT_QHA_KPOINTS_FILE << "\"" << endl;//AS20201112
@@ -2739,6 +2745,7 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_FREQS_FILE\")=\"" << DEFAULT_QHA_FREQS_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_FVT_FILE\")=\"" << DEFAULT_QHA_FVT_FILE << "\"" << endl;
     //AS20200508 END
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_COEFF_FILE\")=\"" << DEFAULT_QHA_COEFF_FILE << "\"" << endl;//AS20210517
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_PDIS_FILE\")=\"" << DEFAULT_QHA_PDIS_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_PDOS_FILE\")=\"" << DEFAULT_QHA_PDOS_FILE << "\"" << endl;//AS20201201
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_KPOINTS_FILE\")=\"" << DEFAULT_QHA_KPOINTS_FILE << "\"" << endl;//AS20201112
