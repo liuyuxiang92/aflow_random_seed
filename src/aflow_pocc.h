@@ -757,7 +757,7 @@ namespace pocc {
 
       //AS20210204 QHA
       void calculateQHAProperties();
-      void calculateQHAProperties(const string &QHA_method, apl::EOSmethod eos_method);
+      void calculateQHAProperties(apl::QHAmethod qha_method, apl::EOSmethod eos_method);
   };
 } // namespace pocc
 

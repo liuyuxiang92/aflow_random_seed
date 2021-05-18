@@ -141,13 +141,15 @@ namespace pocc {
   bool readCoeffData(const string& filename, const string& blockname,
       xvector<double> &T, xmatrix<double> &coeffs)
   {
+    string function = "readCoeffData():", msg = "";
     string block = "[" + blockname + "_COEFF]";
     string data;
-    cout << "Extract: " <<
+
+    bool LDEBUG = false || _DEBUG_POCC_QHA_ || XHOST.DEBUG;
+
+    // extract data
     aurostd::ExtractToStringEXPLICIT(aurostd::efile2string(filename), data,
-        block + "START", block + "STOP")
-    << std::endl;
-    cout << block << std::endl;
+        block + "START", block + "STOP");
     vector<string> v_data = aurostd::string2vectorstring(data);
 
     uint ncols = 0;
@@ -157,13 +159,13 @@ namespace pocc {
       aurostd::string2tokens(v_data[0], tokens);
       ncols = tokens.size();
       if (ncols <= 1){
-        cerr << "Only one column" << std::endl;
-        exit(0);
-        return false;
+        msg = "Data block " + blockname + " contains only one column:";
+        msg += " the file might be corrupt.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg, _FILE_CORRUPT_);
       }
     }
     else{
-      cerr << "Empty params block" << std::endl;
+      // there is no data in the block, but this might be a nominal operation
       return false;
     }
 
@@ -173,38 +175,43 @@ namespace pocc {
     for (uint i=0; i<nrows; i++){
       aurostd::string2tokens(v_data[i], tokens);
       if (tokens.size() != ncols){
-        cout << "Inconsistent amount of columns" << std::endl;
-        return false;
-        exit(0);
+        msg = "Data block " + blockname + " the same amount of columns in each";
+        msg += "line: the file might be corrupt.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg, _FILE_CORRUPT_);
       }
 
       T[i+1] = tokens[0];
       for (uint j=1; j<ncols; j++) coeffs[i+1][j] = tokens[j];
     }
-    //cout << nrows << " " << ncols << std::endl;
-    //cout << coeffs << endl;
+
+    if (LDEBUG){
+      cerr << function << "nrows=" << nrows << " ncols=" << ncols << std::endl;
+      cerr << function << "coeffs=" << coeffs << std::endl;
+    }
+
     return true;
   }
 
   bool hasImaginary(const string& filename, const string &QHA_method)
   {
+    string function = "hasImaginary():", msg = "";
+
     vector<string> vlines;
     bool has_imaginary = false;
     if (!aurostd::efile2vectorstring(filename, vlines)){
-      cout << "File does not exist" << std::endl;
-      return false;
+      msg = "File " + filename + " does not exist.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg, _FILE_NOT_FOUND_);
     }
 
     vector<string> tokens;
     for (uint i=0; i<vlines.size(); i++){
       if (vlines[i].find("["+QHA_method+"]") != std::string::npos){
         if (vlines[i].find("IMAG") != std::string::npos){
-          cout << vlines[i] << std::endl;
           aurostd::string2tokens(vlines[i],tokens,"=");
-          cout << tokens.size() << std::endl;
           if (tokens.size() != 2){
-            cout << "File is corrupted?" << std::endl;
-            exit(0);
+            msg = "Incorrect number of tokens: should be 2 instead of ";
+            msg += tokens.size();
+            throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg, _FILE_CORRUPT_);
           }
 
           has_imaginary = tokens[1].find("YES") != std::string::npos;
@@ -382,7 +389,7 @@ namespace pocc {
 
 
   /// Calculates POCC-average of QHA-related properties.
-  void POccCalculator::calculateQHAProperties(const string &QHA_method,
+  void POccCalculator::calculateQHAProperties(apl::QHAmethod qha_method,
       apl::EOSmethod eos_method)
   {
     string function = XPID +  "POccCalculator::calculateQHAProperties():";
@@ -390,7 +397,9 @@ namespace pocc {
 
     bool LDEBUG = false || _DEBUG_POCC_QHA_ || XHOST.DEBUG;
 
-    msg = "Performing POCC+QHA post-processing step.";
+    msg = "Performing POCC+QHA post-processing step for ";
+    msg += apl::QHAmethod2label(qha_method) + " with ";
+    msg += apl::EOSmethod2label(eos_method) + " EOS.";
     pflow::logger(_AFLOW_FILE_NAME_, function, msg, m_aflags.Directory,
       *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
 
@@ -416,7 +425,7 @@ namespace pocc {
         return;
       }
 
-      v_is_unstable[i] = hasImaginary(filename, QHA_method);
+      v_is_unstable[i] = hasImaginary(filename, apl::QHAmethod2label(qha_method));
 
       if (!v_is_unstable[i]){
         filename = m_aflags.Directory + "/" + m_ARUN_directories[i] + "/";
@@ -427,9 +436,14 @@ namespace pocc {
         POCC_Vmin = min(Vmin, POCC_Vmin);
         POCC_Vmax = max(Vmax, POCC_Vmax);
 
-        if (!readCoeffData(filename, 
-              QHA_method+"_"+apl::EOSmethod2label(eos_method), T, coeffs)){
-          cout << "Exit" << std::endl;
+        if (!readCoeffData(filename, apl::QHAmethod2label(qha_method) + "_" + 
+              apl::EOSmethod2label(eos_method), T, coeffs))
+        {
+          msg = "No data was extracted for " + apl::QHAmethod2label(qha_method);
+          msg += " with " + apl::EOSmethod2label(eos_method) + " EOS.";
+          msg += " The calculation will be stopped.";
+          pflow::logger(_AFLOW_FILE_NAME_, function, msg, m_aflags.Directory,
+           *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
           return;
         }
         T_list.push_back(T);
@@ -582,7 +596,7 @@ namespace pocc {
     file.precision(10);
 
     // write header
-    string block = "[" + QHA_method + "_";
+    string block = "[" + apl::QHAmethod2label(qha_method) + "_";
     block += apl::EOSmethod2label(eos_method) + "_THERMO]";
     file << AFLOWIN_SEPARATION_LINE << std::endl;
     file << block + "START" << std::endl;
@@ -631,7 +645,8 @@ namespace pocc {
   void POccCalculator::calculateQHAProperties()
   {
     static const int N_QHA_methods = 3;
-    static const string QHA_methods[N_QHA_methods] = {"QHANP", "QHA3P", "QHA"};
+    static const apl::QHAmethod QHA_methods[N_QHA_methods] = {apl::QHA_CALC,
+      apl::QHA3P_CALC, apl::QHANP_CALC};
     static const int N_EOS_methods = 5;
     static const apl::EOSmethod EOS_methods[N_EOS_methods] = {apl::EOS_SJ,
       apl::EOS_BIRCH_MURNAGHAN2, apl::EOS_BIRCH_MURNAGHAN3, apl::EOS_BIRCH_MURNAGHAN4,
@@ -647,10 +662,15 @@ namespace pocc {
     filename = POCC_FILE_PREFIX + "qha." + DEFAULT_QHA_THERMO_FILE;
     if (aurostd::FileExist(filename)) aurostd::RemoveFile(filename);
 
-    for (int i=0; i<N_QHA_methods; i++){
-      for (int j=0; j<N_EOS_methods; j++){
-        POccCalculator::calculateQHAProperties(QHA_methods[i], EOS_methods[j]);
+    try{
+      for (int i=0; i<N_QHA_methods; i++){
+        for (int j=0; j<N_EOS_methods; j++){
+          POccCalculator::calculateQHAProperties(QHA_methods[i], EOS_methods[j]);
+        }
       }
+    } catch (aurostd::xerror e) {
+      pflow::logger(e.whereFileName(), e.whereFunction(), e.error_message,
+          m_aflags.Directory, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
     }
   }
 
