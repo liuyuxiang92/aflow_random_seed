@@ -1287,6 +1287,7 @@ IVDW=number_for_VASP_see_manual_for_IVDW
   ERROR:CALC_FROZEN
     The CALC_FROZEN error is triggered when the OUTCAR has not modified for SECONDS_STALE_OUTCAR seconds (see README_AFLOW_AFLOWRC.TXT).
     If no other errors occur, AFLOW will skip the run.
+    AFLOW may try to restart the calculation from the most up-to-date CONTCAR.
 
   ERROR:DAV
     The DAV error is triggered when the required accuracy is not reached and the following text is found in the vasp.out: "WARNING: Sub-Space-Matrix is not hermitian in DAV".
@@ -1593,6 +1594,9 @@ IVDW=number_for_VASP_see_manual_for_IVDW
   FIX:POTIM
     This input will avoid the POTIM fix. Relevant errors: ERROR:RMM_DIIS, ERROR:ZPOTRF.
 
+  FIX:RECYCLE_CONTCAR
+    This input will avoid restarting the calculation from most up-to-date CONTCAR. Relevant errors: ERROR:CALC_FROZEN.
+  
   FIX:RELAX_MODE
     This input will avoid any RELAX_MODE fixes. Relevant errors: ERROR:RMM_DIIS, ERROR:ZBRENT.
 

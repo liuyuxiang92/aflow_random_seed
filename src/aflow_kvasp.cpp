@@ -1276,6 +1276,7 @@ namespace KBIN {
       cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:POSCAR_VOLUME*=2\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:POSCAR=VOLUME") << endl;
       cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:POSCAR=STANDARD_CONVENTIONAL\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:POSCAR=STANDARD_CONVENTIONAL") << endl;
       cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:POTIM\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:POTIM") << endl;
+      cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:RECYCLE_CONTCAR\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:RECYCLE_CONTCAR") << endl;
       cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:RELAX_MODE\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:RELAX_MODE") << endl;
       cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:RELAX_MODE=FORCES\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:RELAX_MODE=FORCES") << endl;
       cerr << "vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"FIX:SKIP_RUN\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("FIX:SKIP_RUN") << endl;
@@ -3793,10 +3794,10 @@ namespace KBIN {
     //this is rare...
     //might be a threading/NFS issue
     //this means any errors inside that require REACHED_ACCURACY will not be triggered
-    //in this case, try restarting the calculation
+    //in this case, try restarting the calculation from CONTCAR
     if(fixed_applied==false && xwarning.flag("CALC_FROZEN") && xmessage.flag("REACHED_ACCURACY") && xwarning.flag("OUTCAR_INCOMPLETE")){
       //[CO20210315 - not shown to work]fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("CALC_FROZEN","RESTART_CALC",false,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
-      //not sure what to do here...
+      fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("CALC_FROZEN","RECYCLE_CONTCAR",false,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
     }
     
     //print out all xfixed BEFORE adding "ALL"

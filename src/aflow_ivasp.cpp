@@ -1977,6 +1977,11 @@ namespace KBIN {
 }
 
 namespace KBIN {
+  bool VASP_Reread_POSCAR(_xvasp& xvasp) { // AFLOW_FUNCTION_IMPLEMENTATION //CO20210315
+    ofstream FileMESSAGE;
+    _aflags aflags;aflags.Directory=XHOST.vflag_control.getattachedscheme("DIRECTORY_CLEAN");
+    return VASP_Reread_POSCAR(xvasp,FileMESSAGE,aflags);
+  }
   bool VASP_Reread_POSCAR(_xvasp& xvasp,ofstream &FileMESSAGE,_aflags &aflags) { // AFLOW_FUNCTION_IMPLEMENTATION
     if(!aurostd::FileExist(xvasp.Directory+"/POSCAR")) {
       string soliloquy=XPID+"KBIN::VASP_Reread_POSCAR():";
@@ -6215,15 +6220,7 @@ namespace KBIN {
     if(relaxing){
       //add here any fixes that would not apply for relaxations
     }else{  //static, bands, etc.
-      if(fix.find("RELAX_MODE")!=string::npos){ //does not apply
-        if(VERBOSE){aus << "MMMMM  MESSAGE ignoring FIX=\"" << fix << "\"" << ": does not apply for static/bands calculations" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
-        Krun=false;
-      }
-      else if(fix=="POTIM"){  //has no effect for these runs
-        if(VERBOSE){aus << "MMMMM  MESSAGE ignoring FIX=\"" << fix << "\"" << ": does not apply for static/bands calculations" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
-        Krun=false;
-      }
-      else if(fix.find("POSCAR")!=string::npos){  //do not change the POSCAR, only during relaxation
+      if(fix.find("ISMEAR=")!=string::npos){ //specific smearing selected is very important for static/bands
         if(VERBOSE){aus << "MMMMM  MESSAGE ignoring FIX=\"" << fix << "\"" << ": does not apply for static/bands calculations" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
         Krun=false;
       }
@@ -6231,7 +6228,19 @@ namespace KBIN {
       //[CO20210315 - can change KPOINTS for static]  if(VERBOSE){aus << "MMMMM  MESSAGE ignoring FIX=\"" << fix << "\"" << ": does not apply for static/bands calculations" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
       //[CO20210315 - can change KPOINTS for static]  Krun=false;
       //[CO20210315 - can change KPOINTS for static]}
-      else if(fix.find("ISMEAR=")!=string::npos){ //specific smearing selected is very important for static/bands
+      else if(fix.find("POSCAR")!=string::npos){  //do not change the POSCAR, only during relaxation
+        if(VERBOSE){aus << "MMMMM  MESSAGE ignoring FIX=\"" << fix << "\"" << ": does not apply for static/bands calculations" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+        Krun=false;
+      }
+      else if(fix=="POTIM"){  //has no effect for these runs
+        if(VERBOSE){aus << "MMMMM  MESSAGE ignoring FIX=\"" << fix << "\"" << ": does not apply for static/bands calculations" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+        Krun=false;
+      }
+      else if(fix.find("RECYCLE_CONTCAR")!=string::npos){  //do not change the POSCAR, only during relaxation
+        if(VERBOSE){aus << "MMMMM  MESSAGE ignoring FIX=\"" << fix << "\"" << ": does not apply for static/bands calculations" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+        Krun=false;
+      }
+      else if(fix.find("RELAX_MODE")!=string::npos){ //does not apply
         if(VERBOSE){aus << "MMMMM  MESSAGE ignoring FIX=\"" << fix << "\"" << ": does not apply for static/bands calculations" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
         Krun=false;
       }
@@ -6587,18 +6596,37 @@ namespace KBIN {
         if(value.find("*=")!=string::npos){param_string=value;aurostd::StringSubst(param_string,"*=","");param_double=aurostd::string2utype<double>(param_string);}
         else{throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"POSCAR_SCALE unknown mode: \""+value+"\"",_INPUT_ILLEGAL_);}
       }
-      if(Krun && VERBOSE){aus << "MMMMM  MESSAGE attempting FIX=\"" << fix << "\" volume(pre)=" << xvasp.str.GetVolume() << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
-      //START - modify xvasp.str and write out new POSCAR
+      if(Krun && VERBOSE){aus << "MMMMM  MESSAGE attempting FIX=\"" << fix << "\"" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+      //START - load POSCAR, modify xvasp.str, and write out new POSCAR
+      Krun=(Krun && KBIN::VASP_Reread_POSCAR(xvasp)); //preload POSCAR
+      if(Krun){xvasp.str=xstructure(xvasp.POSCAR,IOVASP_POSCAR);} //plug inside xvasp.str (WARNING: this overwrites xvasp.str_kpoints*)
       if(xvasp.aopts.flag("FLAG::AFIX_DRYRUN")==false){
         Krun=(Krun && aurostd::stringstream2file(xvasp.POSCAR,string(xvasp.Directory+"/POSCAR.orig")));  //CO20210315 - POSCAR.orig here is NOT the original structure, but a saved state, come back later
       }
+      if(Krun){
+        if(VERBOSE){
+          aus << "00000  MESSAGE WARNING changing scale" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+          aus << "00000  MESSAGE BEFORE: volume=" << xvasp.str.GetVolume() << endl;
+          aus << "00000  MESSAGE BEFORE: structure: " << endl;
+          aus << xvasp.str;
+          aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+        }
+      }
       if(Krun){xvasp.str.scale*=param_double;}
+      if(Krun){
+        if(VERBOSE){
+          aus << "00000  MESSAGE AFTER: volume=" << xvasp.str.GetVolume() << endl;
+          aus << "00000  MESSAGE AFTER: structure: " << endl;
+          aus << xvasp.str;
+          aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+        }
+      }
       Krun=(Krun && KBIN::VASP_Produce_POSCAR(xvasp)); //creates xvasp.POSCAR
       if(xvasp.aopts.flag("FLAG::AFIX_DRYRUN")==false){
         Krun=(Krun && aurostd::stringstream2file(xvasp.POSCAR,string(xvasp.Directory+"/POSCAR")));
       }
-      //END - modify xvasp.str and write out new POSCAR
-      if(Krun && VERBOSE){aus << "MMMMM  MESSAGE applied FIX=\"" << fix << "\" volume(post)=" << xvasp.str.GetVolume() << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+      //END - load POSCAR, modify xvasp.str, and write out new POSCAR
+      if(Krun && VERBOSE){aus << "MMMMM  MESSAGE applied FIX=\"" << fix << "\"" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
     }
     else if(fix.find("POSCAR_VOLUME")!=string::npos) {
       if(xvasp.aopts.flag("FLAG::POSCAR_PRESERVED")){Krun=false;} // don't touch poscar
@@ -6611,24 +6639,45 @@ namespace KBIN {
         if(value.find("*=")!=string::npos){param_string=value;aurostd::StringSubst(param_string,"*=","");param_double=aurostd::string2utype<double>(param_string);}
         else{throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"POSCAR_VOLUME unknown mode: \""+value+"\"",_INPUT_ILLEGAL_);}
       }
-      if(Krun && VERBOSE){aus << "MMMMM  MESSAGE attempting FIX=\"" << fix << "\" volume(pre)=" << xvasp.str.GetVolume() << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
-      //START - modify xvasp.str and write out new POSCAR
+      if(Krun && VERBOSE){aus << "MMMMM  MESSAGE attempting FIX=\"" << fix << "\"" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+      //START - load POSCAR, modify xvasp.str, and write out new POSCAR
+      Krun=(Krun && KBIN::VASP_Reread_POSCAR(xvasp)); //preload POSCAR
+      if(Krun){xvasp.str=xstructure(xvasp.POSCAR,IOVASP_POSCAR);} //plug inside xvasp.str (WARNING: this overwrites xvasp.str_kpoints*)
       if(xvasp.aopts.flag("FLAG::AFIX_DRYRUN")==false){
         Krun=(Krun && aurostd::stringstream2file(xvasp.POSCAR,string(xvasp.Directory+"/POSCAR.orig")));  //CO20210315 - POSCAR.orig here is NOT the original structure, but a saved state, come back later
       }
+      if(Krun){
+        if(VERBOSE){
+          aus << "00000  MESSAGE WARNING changing volume" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+          aus << "00000  MESSAGE BEFORE: volume=" << xvasp.str.GetVolume() << endl;
+          aus << "00000  MESSAGE BEFORE: structure: " << endl;
+          aus << xvasp.str;
+          aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+        }
+      }
       if(Krun){xvasp.str.scale*=std::pow(param_double,(1.0/3.0));}
+      if(Krun){
+        if(VERBOSE){
+          aus << "00000  MESSAGE AFTER: volume=" << xvasp.str.GetVolume() << endl;
+          aus << "00000  MESSAGE AFTER: structure: " << endl;
+          aus << xvasp.str;
+          aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+        }
+      }
       Krun=(Krun && KBIN::VASP_Produce_POSCAR(xvasp)); //creates xvasp.POSCAR
       if(xvasp.aopts.flag("FLAG::AFIX_DRYRUN")==false){
         Krun=(Krun && aurostd::stringstream2file(xvasp.POSCAR,string(xvasp.Directory+"/POSCAR")));
       }
-      //END - modify xvasp.str and write out new POSCAR
-      if(Krun && VERBOSE){aus << "MMMMM  MESSAGE applied FIX=\"" << fix << "\" volume(post)=" << xvasp.str.GetVolume() << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+      //END - load POSCAR, modify xvasp.str, and write out new POSCAR
+      if(Krun && VERBOSE){aus << "MMMMM  MESSAGE applied FIX=\"" << fix << "\"" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
     }
     else if(fix=="POSCAR=STANDARD_CONVENTIONAL") {
       if(xvasp.aopts.flag("FLAG::POSCAR_PRESERVED")){Krun=false;} // don't touch poscar
-      if(Krun && xvasp.str.Standard_Lattice_conventional){Krun=false;}  //DX is this right?
       if(Krun && VERBOSE){aus << "MMMMM  MESSAGE attempting FIX=\"" << fix << "\"" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
-      //START - modify xvasp.str and write out new POSCAR
+      //START - load POSCAR, modify xvasp.str, and write out new POSCAR
+      Krun=(Krun && KBIN::VASP_Reread_POSCAR(xvasp)); //preload POSCAR
+      if(Krun){xvasp.str=xstructure(xvasp.POSCAR,IOVASP_POSCAR);} //plug inside xvasp.str (WARNING: this overwrites xvasp.str_kpoints*)
+      if(Krun && xvasp.str.Standard_Lattice_conventional){Krun=false;}  //DX is this right?  //CO20210315 - OBSOLETE as we read in fresh POSCAR above, so this setting will not be set, we need a function here
       if(xvasp.aopts.flag("FLAG::AFIX_DRYRUN")==false){
         Krun=(Krun && aurostd::stringstream2file(xvasp.POSCAR,string(xvasp.Directory+"/POSCAR.orig")));  //CO20210315 - POSCAR.orig here is NOT the original structure, but a saved state, come back later
       }
@@ -6639,8 +6688,9 @@ namespace KBIN {
         bool remove_magmom=aurostd::kvpairfound(xvasp.INCAR,"MAGMOM","=");
         bool write_magmom=XVASP_INCAR_Read_MAGMOM(xvasp);
         if(VERBOSE){
-          aus << "00000  MESSAGE WARNING SWAPPING TO CONVENTIONAL STRUCTURE" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
-          aus << "00000  MESSAGE BEFORE: a,b,c,alpha,beta,gamma " << xvasp.str.a << "," << xvasp.str.b << "," << xvasp.str.c << "," << xvasp.str.alpha << "," << xvasp.str.beta << "," << xvasp.str.gamma << endl;
+          aus << "00000  MESSAGE WARNING changing to the conventional cell" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+          aus << "00000  MESSAGE BEFORE: a,b,c,alpha,beta,gamma=" << xvasp.str.a << "," << xvasp.str.b << "," << xvasp.str.c << "," << xvasp.str.alpha << "," << xvasp.str.beta << "," << xvasp.str.gamma << endl;
+          aus << "00000  MESSAGE BEFORE: volume=" << xvasp.str.GetVolume() << endl;
           if(write_magmom){aus << "00000  MESSAGE BEFORE: MAGMOM=" << aurostd::kvpair2value(xvasp.INCAR,"MAGMOM","=") << endl;}
           aus << "00000  MESSAGE BEFORE: structure: " << endl;
           aus << xvasp.str;
@@ -6655,7 +6705,8 @@ namespace KBIN {
         }
         //
         if(VERBOSE){
-          aus << "00000  MESSAGE AFTER: a,b,c,alpha,beta,gamma " << xvasp.str.a << "," << xvasp.str.b << "," << xvasp.str.c << "," << xvasp.str.alpha << "," << xvasp.str.beta << "," << xvasp.str.gamma << endl;
+          aus << "00000  MESSAGE AFTER: a,b,c,alpha,beta,gamma=" << xvasp.str.a << "," << xvasp.str.b << "," << xvasp.str.c << "," << xvasp.str.alpha << "," << xvasp.str.beta << "," << xvasp.str.gamma << endl;
+          aus << "00000  MESSAGE AFTER: volume=" << xvasp.str.GetVolume() << endl;
           if(write_magmom){aus << "00000  MESSAGE AFTER: MAGMOM=" << aurostd::kvpair2value(xvasp.INCAR,"MAGMOM","=") << endl;}
           aus << "00000  MESSAGE AFTER: structure: " << endl;
           aus << xvasp.str;
@@ -6666,7 +6717,7 @@ namespace KBIN {
       if(xvasp.aopts.flag("FLAG::AFIX_DRYRUN")==false){
         Krun=(Krun && aurostd::stringstream2file(xvasp.POSCAR,string(xvasp.Directory+"/POSCAR")));
       }
-      //END - modify xvasp.str and write out new POSCAR
+      //END - load POSCAR, modify xvasp.str, and write out new POSCAR
       if(Krun && VERBOSE){aus << "MMMMM  MESSAGE applied FIX=\"" << fix << "\"" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
       //START - add fix to _AFLOWIN_ 
       if(xvasp.aopts.flag("FLAG::AFIX_DRYRUN")==false){
@@ -6674,6 +6725,49 @@ namespace KBIN {
           KBIN::AFLOWIN_REMOVE(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]CONVERT_UNIT_CELL=",operation);
           KBIN::AFLOWIN_ADD(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]CONVERT_UNIT_CELL=SCONV",operation);
         }
+      }
+      //END - add fix to _AFLOWIN_ 
+    }
+    else if(fix=="RECYCLE_CONTCAR") {
+      if(xvasp.aopts.flag("FLAG::POSCAR_PRESERVED")){Krun=false;} // don't touch poscar
+      param_string=xvasp.Directory+string("/CONTCAR");
+      Krun=(Krun && aurostd::FileExist(param_string) && !aurostd::FileEmpty(param_string));
+      if(Krun && VERBOSE){aus << "MMMMM  MESSAGE attempting FIX=\"" << fix << "\"" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+      //START - load POSCAR, modify xvasp.str, and write out new POSCAR
+      Krun=(Krun && KBIN::VASP_Reread_POSCAR(xvasp)); //preload POSCAR
+      if(Krun){xvasp.str=xstructure(xvasp.POSCAR,IOVASP_POSCAR);} //plug inside xvasp.str (WARNING: this overwrites xvasp.str_kpoints*)
+      if(xvasp.aopts.flag("FLAG::AFIX_DRYRUN")==false){
+        Krun=(Krun && aurostd::stringstream2file(xvasp.POSCAR,string(xvasp.Directory+"/POSCAR.orig")));  //CO20210315 - POSCAR.orig here is NOT the original structure, but a saved state, come back later
+      }
+      if(Krun){
+        if(VERBOSE){
+          aus << "00000  MESSAGE WARNING recycling CONTCAR" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+          aus << "00000  MESSAGE BEFORE: a,b,c,alpha,beta,gamma=" << xvasp.str.a << "," << xvasp.str.b << "," << xvasp.str.c << "," << xvasp.str.alpha << "," << xvasp.str.beta << "," << xvasp.str.gamma << endl;
+          aus << "00000  MESSAGE BEFORE: volume=" << xvasp.str.GetVolume() << endl;
+          aus << "00000  MESSAGE BEFORE: structure: " << endl;
+          aus << xvasp.str;
+          aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+        }
+      }
+      if(Krun){xvasp.str=xstructure(param_string,IOVASP_POSCAR);}
+      if(Krun){
+        if(VERBOSE){
+          aus << "00000  MESSAGE AFTER: a,b,c,alpha,beta,gamma=" << xvasp.str.a << "," << xvasp.str.b << "," << xvasp.str.c << "," << xvasp.str.alpha << "," << xvasp.str.beta << "," << xvasp.str.gamma << endl;
+          aus << "00000  MESSAGE AFTER: volume=" << xvasp.str.GetVolume() << endl;
+          aus << "00000  MESSAGE AFTER: structure: " << endl;
+          aus << xvasp.str;
+          aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+        }
+      }
+      Krun=(Krun && KBIN::VASP_Produce_POSCAR(xvasp)); //CO20210315 - previously missing before  //creates xvasp.POSCAR
+      if(xvasp.aopts.flag("FLAG::AFIX_DRYRUN")==false){
+        Krun=(Krun && aurostd::stringstream2file(xvasp.POSCAR,string(xvasp.Directory+"/POSCAR")));
+      }
+      //END - load POSCAR, modify xvasp.str, and write out new POSCAR
+      if(Krun && VERBOSE){aus << "MMMMM  MESSAGE applied FIX=\"" << fix << "\"" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+      //START - add fix to _AFLOWIN_ 
+      if(xvasp.aopts.flag("FLAG::AFIX_DRYRUN")==false){
+        if(Krun){KBIN::VASP_CONTCAR_Save(xvasp,"breakpoint");}
       }
       //END - add fix to _AFLOWIN_ 
     }
@@ -6788,6 +6882,7 @@ namespace KBIN {
     if(fix.find("KPOINTS")!=string::npos){reset_xfixes=true;}
     else if(fix.find("POSCAR_SCALE")!=string::npos){reset_xfixes=true;}
     else if(fix.find("POSCAR_VOLUME")!=string::npos){reset_xfixes=true;}
+    else if(fix.find("RECYCLE_CONTCAR")!=string::npos){reset_xfixes=true;}
     //add others here
     if(reset_xfixes){
       for(uint i=xfixed.vxscheme.size()-1;i<xfixed.vxscheme.size();i--){ //go backwards
@@ -7173,6 +7268,11 @@ namespace KBIN {
     }
     else if(mode=="READ_KPOINTS_RD_SYM") {
       fix="SYM=OFF";
+      if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
+      Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
+    }
+    else if(mode=="RECYCLE_CONTCAR") {
+      fix="RECYCLE_CONTCAR";
       if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
       Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
     }
