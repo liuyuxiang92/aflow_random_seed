@@ -2097,15 +2097,14 @@ string AtomEnvironment::toJSON(void){
       for (uint i = 0; i < facets.size(); i++) {
         json_content << "    {\"area\": " << facet_area[i] << ", ";
         json_content << "\"vertices\": [";
-        for (const uint &v : facets[i]) json_content << v << ", ";
-        json_content.seekp(-2, json_content.cur);
+        json_content << aurostd::joinWDelimiter(facets[i], ", ");
         json_content << "]}," << endl;
       }
       json_content.seekp(-2, json_content.cur);
       json_content << endl << "    ]," << endl;
 
       json_content << "  \"facet_orders\": [";
-      for (const uint &v : facet_order) json_content << v << ", ";
+      for (std::array<uint, 8>::iterator order = facet_order.begin(); order != facet_order.end(); ++order) json_content << *order << ", ";
       json_content.seekp(-2, json_content.cur);
       json_content << "]";
       json_content << endl << "}";

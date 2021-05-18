@@ -2121,7 +2121,7 @@ namespace aurostd { //HE20210511
         throw aurostd::xerror(_AFLOW_FILE_NAME_, XPID + "aurostd::xvector::volume():", "there must be at least three vertices in each facets", _VALUE_ERROR_);
       }
       facet_points.clear();
-      for (uint p_id: facets[f_id]) facet_points.push_back(points[p_id]);
+      for (std::vector<uint>::const_iterator p_id = facets[f_id].begin(); p_id != facets[f_id].end(); ++p_id) facet_points.push_back(points[*p_id]);
       double area = aurostd::area(facet_points);
       double scalar_prod = aurostd::scalar_product(normals[f_id], facet_points[0]);
       if (LDEBUG) cerr << soliloquy  << f_id << " | " << scalar_prod * area / 3.0 << " | " << area << " | " << normals[f_id] << " | " << scalar_prod << endl;
@@ -2159,7 +2159,8 @@ namespace aurostd { //HE20210511
   // integer xvectors are converted into double vectors, to enable a correct volume calculation
   double volume(const vector<xvector<int>>& points, const vector<vector<uint>>& facets){//HE20210514
     vector<xvector<double>> mapped_points;
-    for (xvector<int> point : points){
+    for (std::vector<xvector<int>>::const_iterator p_point = points.begin(); p_point != points.end(); ++p_point){
+      xvector<int> point = *p_point;
       xvector<double> new_point(3,1);
       for (int i=point.lrows;i<=point.urows;i++) new_point(i) = (double) point(i);
       mapped_points.push_back(new_point);
