@@ -6,16 +6,15 @@
 //****************************************************************************
 // Written by Andriy Smolyanyuk, 2021.
 //
-// This file provides a framework to calculate thermal properties for
+// This file provides a framework to calculate thermodynamic properties for
 // disordered materials modeled using the POCC + QHA methodology.
 
 #ifndef _AFLOW_POCC_QHA_CPP_
 #define _AFLOW_POCC_QHA_CPP_
 
-#include <limits.h>
+#include <cfloat>
 #include "aflow.h"
 #include "aflow_pocc.h"
-#include "APL/aflow_apl.h"
 
 #define _DEBUG_POCC_QHA_ false
 
@@ -138,6 +137,8 @@ namespace pocc {
 //    }
 //  }
 
+  /// Reads fitting coefficients from the filename file.
+  /// QHA and EOS methods are defined by blockname.
   bool readCoeffData(const string& filename, const string& blockname,
       xvector<double> &T, xmatrix<double> &coeffs)
   {
@@ -152,6 +153,7 @@ namespace pocc {
         block + "START", block + "STOP");
     vector<string> v_data = aurostd::string2vectorstring(data);
 
+    // determine number of column in the file and do some consistency check
     uint ncols = 0;
     uint nrows = v_data.size();
     vector<double> tokens;
@@ -159,8 +161,8 @@ namespace pocc {
       aurostd::string2tokens(v_data[0], tokens);
       ncols = tokens.size();
       if (ncols <= 1){
-        msg = "Data block " + blockname + " contains only one column:";
-        msg += " the file might be corrupt.";
+        msg = "Data block " + blockname + " at line " + aurostd::utype2string(nrows);
+        msg += " contains one column or no data at all: the file might be corrupt.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg, _FILE_CORRUPT_);
       }
     }
@@ -169,14 +171,15 @@ namespace pocc {
       return false;
     }
 
+    // extract coefficients and list of temperatures
     coeffs = xmatrix<double>(nrows, ncols-1);
     T = xvector<double>(nrows);
 
     for (uint i=0; i<nrows; i++){
       aurostd::string2tokens(v_data[i], tokens);
       if (tokens.size() != ncols){
-        msg = "Data block " + blockname + " the same amount of columns in each";
-        msg += "line: the file might be corrupt.";
+        msg = "Data block " + blockname + " does not have the same amount of";
+        msg += " columns in each line: the file might be corrupt.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg, _FILE_CORRUPT_);
       }
 
@@ -192,6 +195,9 @@ namespace pocc {
     return true;
   }
 
+  /// Checks if the given POCC structure contains imaginary frequencies by
+  /// reading the corresponding flag from filename.
+  /// The flag is IMAG and is set to YES if it contains imaginary frequencies.
   bool hasImaginary(const string& filename, const string &QHA_method)
   {
     string function = "hasImaginary():", msg = "";
@@ -222,6 +228,8 @@ namespace pocc {
     return has_imaginary;
   }
 
+  /// Reads POCC structure calculation parameters (minimum and maximum volumes)
+  /// from the file filename.
   void readCoeffParameters(const string& filename, double &Vmin, double &Vmax)
   {
     vector<string> vlines;
@@ -257,6 +265,7 @@ namespace pocc {
     }
   }
 
+  /// Calculates the logarithm of the partition function.
   double logZ(const xvector<double> &E, const vector<int> &degeneracies, double T)
   {
     xvector<double> khi = E;
@@ -272,6 +281,8 @@ namespace pocc {
     return shift + std::log(sum);
   }
 
+  /// Calculates the thermal expansion coefficient as a logarithmic derivative
+  /// of equilibrium volume employing Savitzky-Golay filter for the differentiation.
   xvector<double> calcThermalExpansionSG(const xvector<double> &volumes, double dT)
   {
     // Convolution weights for Savitzky-Golay 5pt cubic filter as reported in:
@@ -288,10 +299,14 @@ namespace pocc {
     SGvec[1]= 1.0/12.0; SGvec[2]=-8.0/12.0; SGvec[3]= 0.0/12.0; SGvec[4]= 8.0/12.0; SGvec[5]=-1.0/12.0;
     ////////////////////////////////////////////////////////////////////////////////
 
+    string function = "calcThermalExpansionSG():", msg = "";
     int npoints = volumes.rows;
     if (npoints<5){
-      cout << "Please provide at least 5 points" << std::endl;
-      exit(0);
+      msg = "Savitzky-Golay filter requires at least 5 points: only ";
+      msg += aurostd::utype2string(npoints) + " were provided.";
+      msg += " Make sure that the minimum range among the set of POCC structures,";
+      msg += "defined by the [AFLOW_APL]TPT parameter for each, is reasonable.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg, _INDEX_ILLEGAL_);
     }
 
     xvector<double> endpoints(5), dummy(5);
@@ -323,6 +338,9 @@ namespace pocc {
     return beta;
   }
 
+  /// Calculates the isobaric specif heat as a second derivative of the free
+  /// energy multiplied by (-1)*temperature employing Savitzky-Golay filter for 
+  /// the differentiation.
   xvector<double> calcIsobaricSpecificHeatSG(const xvector<double> &free_energies, double dT)
   {
     // Convolution weights for Savitzky-Golay 5pt cubic filter as reported in:
@@ -349,11 +367,15 @@ namespace pocc {
     SGvec[4]=-1.4285714285714285E-001;
     SGvec[5]= 2.8571428571428570E-001;
     ////////////////////////////////////////////////////////////////////////////////
-    //
+
+    string function = "calcThermalExpansionSG():", msg = "";
     int npoints = free_energies.rows;
     if (npoints<5){
-      cout << "Please provide at least 5 points" << std::endl;
-      exit(0);
+      msg = "Savitzky-Golay filter requires at least 5 points: only ";
+      msg += aurostd::utype2string(npoints) + " were provided.";
+      msg += " Make sure that the minimum range among the set of POCC structures,";
+      msg += "defined by the [AFLOW_APL]TPT parameter for each, is reasonable.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg, _INDEX_ILLEGAL_);
     }
 
     xvector<double> endpoints(5), dummy(5);
@@ -403,7 +425,7 @@ namespace pocc {
     pflow::logger(_AFLOW_FILE_NAME_, function, msg, m_aflags.Directory,
       *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
 
-    double POCC_Vmin = 1e30, POCC_Vmax = 0;
+    double POCC_Vmin = DBL_MAX, POCC_Vmax = 0;
     double Vmin = 0, Vmax = 0;
     vector<bool> v_is_unstable(m_ARUN_directories.size());
 
@@ -642,6 +664,8 @@ namespace pocc {
     }
   }
 
+  /// Calculates POCC-average of QHA-related properties for various QHA methods
+  /// with various EOS models.
   void POccCalculator::calculateQHAProperties()
   {
     static const int N_QHA_methods = 3;
