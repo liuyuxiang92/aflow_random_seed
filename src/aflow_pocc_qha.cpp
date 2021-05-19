@@ -232,6 +232,8 @@ namespace pocc {
   /// from the file filename.
   void readCoeffParameters(const string& filename, double &Vmin, double &Vmax)
   {
+    string function = "readCoeffParameters():", msg = "";
+
     vector<string> vlines;
     Vmin = 0; Vmax = 0;
     if (!aurostd::efile2vectorstring(filename, vlines)) return;
@@ -244,8 +246,10 @@ namespace pocc {
       if (vlines[i].find("VMIN") != std::string::npos){
         aurostd::string2tokens(vlines[i],tokens,"=");
         if (tokens.size() != 2){
-          cout << "File is corrupted?";
-          exit(0);
+          msg = "Number of tokens for VMIN parameter is ";
+          msg += aurostd::utyp2string(tokens.size()) + " instead of 2:";
+          msg += "file " + filename + " might be corrupt.";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg, _FILE_CORRUPT_);
         }
         Vmin = tokens[1];
         Vmin_found = true;
@@ -254,8 +258,10 @@ namespace pocc {
       if (vlines[i].find("VMAX") != std::string::npos){
         aurostd::string2tokens(vlines[i],tokens,"=");
         if (tokens.size() != 2){
-          cout << "File is corrupted?";
-          exit(0);
+          msg = "Number of tokens for VMAX parameter is ";
+          msg += aurostd::utyp2string(tokens.size()) + " instead of 2:";
+          msg += "file " + filename + " might be corrupt.";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg, _FILE_CORRUPT_);
         }
         Vmax = tokens[1];
         Vmax_found = true;
