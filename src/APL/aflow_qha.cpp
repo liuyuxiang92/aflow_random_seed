@@ -616,7 +616,7 @@ namespace apl
       if (eos_static_data_available){
         aurostd::RemoveFile(currentDirectory+'/'+DEFAULT_QHA_FILE_PREFIX+DEFAULT_QHA_THERMO_FILE);
         aurostd::RemoveFile(currentDirectory+'/'+DEFAULT_QHA_FILE_PREFIX+DEFAULT_QHA_COEFF_FILE);
-        aurostd::RemoveFile(currentDirectory+'/'+"aflow.qha.imag.out");
+        aurostd::RemoveFile(currentDirectory+'/'+DEFAULT_QHA_FILE_PREFIX+DEFAULT_QHA_IMAG_FILE);
       }
 
       // In a QHA calculation, the EOS flag performs APL calculations for a set of volumes.
@@ -1386,7 +1386,8 @@ namespace apl
         msg = (std::string)"[QHANP]IMAG=" + (has_negative_frequencies ? "YES" : "NO") + "\n";
         break;
     }
-    string filename = "aflow.qha.imag.out";
+
+    string filename = directory+'/'+DEFAULT_QHA_FILE_PREFIX+DEFAULT_QHA_IMAG_FILE;
     if (aurostd::FileExist(filename)){
       if (!aurostd::string2file(msg, filename, "APPEND")){
         msg = "Error writing to " + filename + " file.";
@@ -2957,7 +2958,6 @@ namespace apl
     file_coeff << AFLOWIN_SEPARATION_LINE << std::endl;
     file_coeff << blockname_coeff + "VMIN=" << min(xvolumes) << std::endl;
     file_coeff << blockname_coeff + "VMAX=" << max(xvolumes) << std::endl;
-    file_coeff << blockname_coeff + "IMAG=" << "NO" << std::endl;
     file_coeff << AFLOWIN_SEPARATION_LINE << std::endl;
     file_coeff << blockname_coeff + "SYSTEM=" << system_title << std::endl;
     file_coeff << blockname_coeff + "START" << std::endl;
@@ -3093,7 +3093,7 @@ namespace apl
     file_coeff << AFLOWIN_SEPARATION_LINE << std::endl;
 
     // write EOS coefficients to file
-    filename = "aflow.qha.coeff.out";
+    filename = directory+'/'+DEFAULT_QHA_FILE_PREFIX+DEFAULT_QHA_COEFF_FILE;
     if (aurostd::FileExist(filename)){
       if (!aurostd::stringstream2file(file_coeff, filename, "APPEND")){
         msg = "Error writing to " + filename + " file.";
