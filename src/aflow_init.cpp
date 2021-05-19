@@ -2011,7 +2011,7 @@ bool VASP_instance_running(const string& vasp_bin){ //CO20210315
 // ***************************************************************************
 #define NCOUNTS_WAIT_MONITOR 10 //wait no more than 10*sleep_secounds (should be 10 minutes)
 void AFLOW_monitor_VASP(){
-  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  bool LDEBUG=(FALSE || VERBOSE_MONITOR_VASP || XHOST.DEBUG);
   string soliloquy=XPID+"AFLOW_monitor_VASP():";
 
   if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
@@ -2019,6 +2019,7 @@ void AFLOW_monitor_VASP(){
   string directory="";
 
   if(XHOST.vflag_control.flag("FILE")){
+    if(LDEBUG){cerr << soliloquy << " found FILE input: " << XHOST.vflag_control.getattachedscheme("FILE") << endl;}
     uint nfailures=0,nsuccesses=0;  //nfailures waits for file to be written, nsuccesses makes sure we didn't run out of directories
     string file=XHOST.vflag_control.getattachedscheme("FILE");
     string file_dir=aurostd::dirname(file);
@@ -2029,25 +2030,35 @@ void AFLOW_monitor_VASP(){
     string directory_old="";
     while(nfailures<NCOUNTS_WAIT_MONITOR && nsuccesses<NCOUNTS_WAIT_MONITOR){  //10 minutes, keeps us from wasting walltime
       if(!aurostd::FileExist(file)){
+        if(LDEBUG){cerr << soliloquy << " FILE not yet found, waiting...: FILE=" << file << endl;}
         nfailures++;  //increment, only wait 10 minutes for a file to be written
         aurostd::Sleep(SECONDS_SLEEP_VASP_MONITOR);
         continue;
       }
+      if(LDEBUG){cerr << soliloquy << " FILE found: FILE=" << file << endl;}
       nfailures=0;  //reset
       aurostd::file2vectorstring(file,vlines);
       found=false;
       for(i=vlines.size()-1;i<vlines.size()&&!found;i--){ //go backwards
         //looking for "... - [dir=.] - [user=aflow] ..."
         if(vlines[i].find(search_str)==string::npos){continue;}
+        if(LDEBUG){cerr << soliloquy << " found line containing \"" << search_str << "\": " << vlines[i] << endl;}
         aurostd::string2tokens(vlines[i],vtokens," ");
         for(j=0;j<vtokens.size()&&!found;j++){
           if(vtokens[j].find(search_str)==string::npos){continue;}
           directory=vtokens[j];
           aurostd::StringSubst(directory,search_str,"");aurostd::StringSubst(directory,"]","");
-          if(directory!=directory_old){directory_old=directory;nsuccesses=0;}
-          else{nsuccesses++;} //increment, only wait 10 minutes for a new directory to be found
-          AFLOW_monitor_VASP(directory);
           found=true;
+          if(LDEBUG){cerr << soliloquy << " dir=" << directory << endl;}
+          if(directory==directory_old){ //increment, only wait 10 minutes for a new directory to be found
+            if(LDEBUG){cerr << soliloquy << " already ran this directory, waiting...: dir=" << directory << endl;}
+            nsuccesses++;
+            continue;
+          }
+          if(LDEBUG){cerr << soliloquy << " found directory to run: dir=" << directory << endl;}
+          directory_old=directory;
+          nsuccesses=0;
+          AFLOW_monitor_VASP(directory);
         }
       }
       //if --FILE=LOCK, this will be useful
@@ -2062,10 +2073,12 @@ void AFLOW_monitor_VASP(){
     }
   }
   else if(XHOST.vflag_control.flag("DIRECTORY_CLEAN")){
+    if(LDEBUG){cerr << soliloquy << " found DIRECTORY input: " << XHOST.vflag_control.getattachedscheme("DIRECTORY_CLEAN") << endl;}
     directory=XHOST.vflag_control.getattachedscheme("DIRECTORY_CLEAN");
     return AFLOW_monitor_VASP(directory);
   }
   else{throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"no directory input provided",_INPUT_ILLEGAL_);}
+  if(LDEBUG){cerr << soliloquy << " END" << endl;}
 }
 
 void AFLOW_monitor_VASP(const string& directory){
@@ -2113,7 +2126,7 @@ void AFLOW_monitor_VASP(const string& directory){
   uint sleep_seconds=SECONDS_SLEEP_VASP_MONITOR;
   uint sleep_seconds_afterkill=sleep_seconds;
   aurostd::xoption xmessage,xwarning,xmonitor,xfixed;
-  bool VERBOSE=(FALSE || VERBOSE_MONITOR_VASP || XHOST.vflag_control.flag("MONITOR_VASP")==false);
+  bool VERBOSE=(FALSE || VERBOSE_MONITOR_VASP);
   bool vasp_running=false;
   vector<string> vlines_lock;
   
