@@ -3073,7 +3073,8 @@ namespace aurostd {
   // ***************************************************************************
   string execute2string(const string& _command,FSIO fsio) { //CO20200624 - added file system IO mode
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy=XPID+"AUROSTD::execute2string():";
+    string soliloquy=XPID+"aurostd::execute2string():";
+
     // bool INIT_VERBOSE=TRUE;
     // cerr << "COMMAND " <<  command << endl;
     
