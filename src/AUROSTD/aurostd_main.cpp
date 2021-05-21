@@ -3140,7 +3140,8 @@ namespace aurostd {
   
   string CleanCommand4Execute(const string& _command){ //CO20200624
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy=XPID+"AUROSTD::CleanCommand4Execute():";
+    string soliloquy=XPID+"aurostd::CleanCommand4Execute():";
+
     if(LDEBUG){cerr << soliloquy << " command(pre )=\"" << _command << "\"" << endl;}
     //CO20200624 START - some command cleanup
     vector<string> vtokens,vtokens_new;
