@@ -4597,7 +4597,7 @@ uint GetCages2(const xstructure& str,const double& roughness,vector<acage>& cage
     const bool& osswrite1,ostream& oss1, const bool& osswrite2,ostream& oss2);
 bool GetCages(const xstructure& _str,_aflags& aflags,
     vector<acage>& cagesirreducible,vector<acage>& cagesreducible,vector<acage>& cages4,
-    vector<acage>& cages3,vector<acage>& cages2,const double& _roughness,const bool& osswrite,ostream& oss);
+    vector<acage>& cages3,vector<acage>& cages2,double _roughness,bool FFFflag,bool osswrite,ostream& oss);
 // ----------------------------------------------------------------------------
 // aflow_pocc //CO20180502
 namespace KBIN {

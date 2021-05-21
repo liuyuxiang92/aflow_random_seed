@@ -3678,7 +3678,9 @@ namespace pflow {
     if(tokens.size()>=1) roughness=aurostd::string2utype<double>(tokens.at(0));
     xstructure a(input,IOAFLOW_AUTO);
     vector<acage> cagesirreducible,cagesreducible,cages4,cages3,cages2;
-    GetCages(a,aflags,cagesirreducible,cagesreducible,cages4,cages3,cages2,roughness,TRUE,cout);
+    //ME20210521
+    bool ofwrite = !XHOST.vflag_control.flag("WWW");
+    GetCages(a,aflags,cagesirreducible,cagesreducible,cages4,cages3,cages2,roughness,ofwrite,TRUE,cout);
     //  cout << "REDUCIBLE_SIZE " << cagesreducible.size() << endl;
     // cout << "IRREDUCIBLE_SIZE " << cagesirreducible.size() << endl;
     if(LDEBUG) cerr << soliloquy << " END" << endl;
