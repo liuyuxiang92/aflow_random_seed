@@ -3584,7 +3584,7 @@ namespace pflow {
     // ---------------------------------------------------------------------------
     // text output
     // ME20210402 - print both for web
-    if((ftype == txt_ft) || (XHOST.vflag_control.flag("WWW"))) {
+    if((ftype == txt_ft) || (XHOST.vflag_control.flag("WWW") && standalone)) { //DX20210521 - add standalone
       ss_output << "SPACE GROUP OF THE CRYSTAL" << endl;
       ss_output << " Space group number                           = " << str_sg.space_group_ITC << endl;
       ss_output << " Space group label (Hermann Mauguin)          = " << space_group_HM << endl;
@@ -3620,7 +3620,7 @@ namespace pflow {
         }
       }
       // ME20210402 - Convert to array of strings for web
-      if (XHOST.vflag_control.flag("WWW")) {
+      if (XHOST.vflag_control.flag("WWW") && standalone) { //DX20210521 - add standalone
         vector<string> voutput;
         aurostd::stream2vectorstring(ss_output, voutput);
         ss_output.clear();
@@ -3631,7 +3631,7 @@ namespace pflow {
     // ---------------------------------------------------------------------------
     // json output
     // ME20210402 - print both for web
-    if((ftype == json_ft) || XHOST.vflag_control.flag("WWW")){
+    if((ftype == json_ft) || (XHOST.vflag_control.flag("WWW") && standalone)){ //DX20210521 - add standalone
 
       aurostd::JSONwriter json;
       bool roff = true;
@@ -3754,7 +3754,7 @@ namespace pflow {
         }
       }
       // ME20210402 - added web output
-      if (XHOST.vflag_control.flag("WWW")) ss_output << "\"json\":" << json.toString(standalone) << "}" << std::endl;
+      if (XHOST.vflag_control.flag("WWW") && standalone) ss_output << "\"json\":" << json.toString(standalone) << "}" << std::endl; //DX20210521 - add standalone
       else ss_output << json.toString(standalone);
       if(standalone) { ss_output << endl; }
     }
