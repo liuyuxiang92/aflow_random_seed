@@ -3033,7 +3033,8 @@ namespace aurostd {
   }
 
   bool execute(const string& _command) {
-    string soliloquy=XPID+"AUROSTD::execute():";
+    string soliloquy=XPID+"aurostd::execute():";
+
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     // cerr << "COMMAND " <<  command.c_str() << endl;
     string command=aurostd::CleanCommand4Execute(_command); //CO20200624
