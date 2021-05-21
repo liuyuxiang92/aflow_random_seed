@@ -17662,100 +17662,102 @@ vector<xvector<double> > GetBasisTransformationInternalTranslations(const xmatri
 
   vector<xvector<double> > translations;
 
-  double cell_volume_change = aurostd::abs(aurostd::det(basis_transformation));
+  //DX20210520 [OBSOLETE] double cell_volume_change = aurostd::abs(aurostd::det(basis_transformation));
 
-  if(LDEBUG){ cerr << function_name << " changed in cell volume from basis transformation: " << cell_volume_change << endl; }
+  //DX20210520 [OBSOLETE] if(LDEBUG){ cerr << function_name << " changed in cell volume from basis transformation: " << cell_volume_change << endl; }
 
   // ---------------------------------------------------------------------------
   // check if the basis transformation makes the cell larger and find
   // corresponding internal translations
-  if(cell_volume_change-1.0>_AUROSTD_XSCALAR_TOLERANCE_INTEGER_){
+  // DX20210520 - DO NOT EXCLUDE BASED ON DETERMINANT
+  // It is possible to stretch in one direction and compress in another and still
+  // get determinant=1 (e.g., POCC structures)
+  //DX20210520 [OBSOELTE] if(cell_volume_change-1.0>_AUROSTD_XSCALAR_TOLERANCE_INTEGER_){}
 
-    if(LDEBUG){ cerr << function_name << " cell size increases. Finding internal translations." << endl; }
+  if(LDEBUG){ cerr << function_name << " cell size increases. Finding internal translations." << endl; }
 
-    // ---------------------------------------------------------------------------
-    // get inverse matrix (Q)
-    xmatrix<double> inverse_transform = aurostd::inverse(basis_transformation);
+  // ---------------------------------------------------------------------------
+  // get inverse matrix (Q)
+  xmatrix<double> inverse_transform = aurostd::inverse(basis_transformation);
 
-    // ---------------------------------------------------------------------------
-    // to get translations take the "larger cell" in fractional coordinates
-    // and perform the inverse operation (Q) to see how small it gets,
-    // then these are the internal translations
-    xmatrix<double> lattice_frac = aurostd::eye<double>(3,3);
-    xmatrix<double> lattice_shrink = inverse_transform*lattice_frac;
+  // ---------------------------------------------------------------------------
+  // to get translations take the "larger cell" in fractional coordinates
+  // and perform the inverse operation (Q) to see how small it gets,
+  // then these are the internal translations
+  xmatrix<double> lattice_frac = aurostd::eye<double>(3,3);
+  xmatrix<double> lattice_shrink = inverse_transform*lattice_frac;
 
-    if(LDEBUG){ cerr << function_name << " shrunken lattice: " << lattice_shrink << endl; }
+  if(LDEBUG){ cerr << function_name << " shrunken lattice: " << lattice_shrink << endl; }
 
-    // ---------------------------------------------------------------------------
-    // Now that we have the shortest internal translations from lattice shrink
-    // (forms a basis), we need to find all the internal translations inside this
-    // cell via linear combinations of this basis.
-    // To determine how many combinations we need (i.e. how far to expand), we can
-    // use LatticeDimensionSphere(). Since lattice_shrink is in fractional
-    // coordinates, we need to find the necessary dimensions in each direction
-    // to fill the cell (i.e., the unit box). //DX20210111
-    xvector<int> dims=LatticeDimensionSphere(lattice_shrink,1.0);
-    if(LDEBUG){ cerr << function_name << " number of times to apply each internal translation: " << dims[1] << "," << dims[2] << "," << dims[3] << endl; }
+  // ---------------------------------------------------------------------------
+  // Now that we have the shortest internal translations from lattice shrink
+  // (forms a basis), we need to find all the internal translations inside this
+  // cell via linear combinations of this basis.
+  // To determine how many combinations we need (i.e. how far to expand), we can
+  // use LatticeDimensionSphere(). Since lattice_shrink is in fractional
+  // coordinates, we need to find the necessary dimensions in each direction
+  // to fill the cell (i.e., the unit box). //DX20210111
+  xvector<int> dims=LatticeDimensionSphere(lattice_shrink,1.0);
+  if(LDEBUG){ cerr << function_name << " number of times to apply each internal translation: " << dims[1] << "," << dims[2] << "," << dims[3] << endl; }
 
-    // ---------------------------------------------------------------------------
-    // create all linear combinations of translations, filter out duplicates later
-    xvector<double> a_vec=lattice_shrink(1);
-    xvector<double> b_vec=lattice_shrink(2);
-    xvector<double> c_vec=lattice_shrink(3);
-    xvector<double> a_vec_scaled, b_vec_scaled, c_vec_scaled;
-    for(int a=0;a<=dims[1];a++){ //DX20210506 - need <=
-      a_vec_scaled = (double)a*a_vec;
-      translations.push_back(a_vec_scaled);
-      for(int b=0;b<=dims[2];b++){ //DX20210506 - need <=
-        b_vec_scaled = (double)b*b_vec;
-        translations.push_back(b_vec_scaled);
-        translations.push_back(a_vec_scaled+b_vec_scaled);
-        for(int c=0;c<=dims[3];c++){ //DX20210506 - need <=
-          c_vec_scaled = (double)c*c_vec;
-          translations.push_back(c_vec_scaled);
-          translations.push_back(a_vec_scaled+c_vec_scaled);
-          translations.push_back(b_vec_scaled+c_vec_scaled);
-          translations.push_back(a_vec_scaled+b_vec_scaled+c_vec_scaled);
-        }
+  // ---------------------------------------------------------------------------
+  // create all linear combinations of translations, filter out duplicates later
+  xvector<double> a_vec=lattice_shrink(1);
+  xvector<double> b_vec=lattice_shrink(2);
+  xvector<double> c_vec=lattice_shrink(3);
+  xvector<double> a_vec_scaled, b_vec_scaled, c_vec_scaled;
+  for(int a=0;a<=dims[1];a++){ //DX20210506 - need <=
+    a_vec_scaled = (double)a*a_vec;
+    translations.push_back(a_vec_scaled);
+    for(int b=0;b<=dims[2];b++){ //DX20210506 - need <=
+      b_vec_scaled = (double)b*b_vec;
+      translations.push_back(b_vec_scaled);
+      translations.push_back(a_vec_scaled+b_vec_scaled);
+      for(int c=0;c<=dims[3];c++){ //DX20210506 - need <=
+        c_vec_scaled = (double)c*c_vec;
+        translations.push_back(c_vec_scaled);
+        translations.push_back(a_vec_scaled+c_vec_scaled);
+        translations.push_back(b_vec_scaled+c_vec_scaled);
+        translations.push_back(a_vec_scaled+b_vec_scaled+c_vec_scaled);
       }
     }
-
-    if(LDEBUG){
-      cerr << function_name << " # translations:" << translations.size() << endl;
-      for(uint t=0;t<translations.size();t++){
-        cerr << function_name << " translations:" << translations[t] << endl;
-      }
-    }
-
-    // ---------------------------------------------------------------------------
-    // filter out unique translations 
-    vector<xvector<double> > unique_translations;
-    bool unique = true;
-    for(uint t=0;t<translations.size();t++){
-      xvector<double> translation_incell = BringInCell(translations[t]);
-      unique = true;
-      for(uint u=0;u<unique_translations.size() && unique ;u++){
-        unique = !(aurostd::isequal(translation_incell,unique_translations[u]));
-      }
-      if(unique){ unique_translations.push_back(translation_incell); }
-    }
-
-    if(LDEBUG){
-      cerr << function_name << " # unique_translations:" << unique_translations.size() << endl;
-      for(uint t=0;t<unique_translations.size();t++){
-        cerr << function_name << " unique_translations:" << unique_translations[t] << endl;
-      }
-    }
-    translations = unique_translations;
   }
+
+  if(LDEBUG){
+    cerr << function_name << " # translations:" << translations.size() << endl;
+    for(uint t=0;t<translations.size();t++){
+      cerr << function_name << " translations:" << translations[t] << endl;
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // filter out unique translations 
+  vector<xvector<double> > unique_translations;
+  bool unique = true;
+  for(uint t=0;t<translations.size();t++){
+    xvector<double> translation_incell = BringInCell(translations[t]);
+    unique = true;
+    for(uint u=0;u<unique_translations.size() && unique ;u++){
+      unique = !(aurostd::isequal(translation_incell,unique_translations[u]));
+    }
+    if(unique){ unique_translations.push_back(translation_incell); }
+  }
+
+  if(LDEBUG){
+    cerr << function_name << " # unique_translations:" << unique_translations.size() << endl;
+    for(uint t=0;t<unique_translations.size();t++){
+      cerr << function_name << " unique_translations:" << unique_translations[t] << endl;
+    }
+  }
+  translations = unique_translations;
+
   // ---------------------------------------------------------------------------
   // if the cell size remains the same or shrinks, no internal translations
-  else{
-    // use null vector
-    if(LDEBUG){ cerr << function_name << " cell size remains the same or reduced. No internal translations." << endl; }
-    xvector<double> zero_xvector;
-    translations.push_back(zero_xvector);
-  }
+  //DX20210520 [OBSOELTE] else{}
+  //DX20210520 [OBSOELTE]  // use null vector
+  //DX20210520 [OBSOELTE]  if(LDEBUG){ cerr << function_name << " cell size remains the same or reduced. No internal translations." << endl; }
+  //DX20210520 [OBSOELTE]  xvector<double> zero_xvector;
+  //DX20210520 [OBSOELTE]  translations.push_back(zero_xvector);
   return translations;
 }
 
