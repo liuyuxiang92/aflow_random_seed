@@ -1659,7 +1659,7 @@ namespace aurostd {
   //CO20210315
   void ProcessKill(const string& process,bool sigkill){ //CO20210315
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy="aurostd::ProcessRunning():";
+    string soliloquy=XPID+"aurostd::ProcessKill():";
     string command="";
 
     bool process_killed=(!aurostd::ProcessRunning(process));
