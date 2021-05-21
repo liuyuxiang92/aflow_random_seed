@@ -1599,7 +1599,7 @@ namespace aurostd {
   //CO20210315
   vector<string> ProcessPIDs(const string& process){ //CO20210315
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy="aurostd::ProcessRunning():";
+    string soliloquy=XPID+"aurostd::ProcessPIDs():";
     vector<string> vpids;
     
     if(aurostd::IsCommandAvailable("pgrep")) {
