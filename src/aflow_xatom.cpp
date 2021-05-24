@@ -4255,7 +4255,8 @@ istream& operator>>(istream& cinput, xstructure& a) {
       for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
     }  //CO20180420 - check for missing lines
-    a.title=vinput.at(iline++);
+    //DX+ME20210525 [OBSOLETE - need to remove control code characters from input, important for web] a.title=vinput.at(iline++);
+    aurostd::RemoveControlCodeCharactersFromString(vinput[iline++],a.title); //DX+ME20210525 - need to remove control code characters from input, important for web
     // -------------- SCALE
     //    input >> a.scale;
     if(vinput.size()-1<iline) {
