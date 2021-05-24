@@ -1387,7 +1387,7 @@ namespace apl
         break;
     }
 
-    string filename = directory+'/'+DEFAULT_QHA_FILE_PREFIX+DEFAULT_QHA_IMAG_FILE;
+    string filename = currentDirectory+'/'+DEFAULT_QHA_FILE_PREFIX+DEFAULT_QHA_IMAG_FILE;
     if (aurostd::FileExist(filename)){
       if (!aurostd::string2file(msg, filename, "APPEND")){
         msg = "Error writing to " + filename + " file.";

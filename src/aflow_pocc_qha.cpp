@@ -300,7 +300,6 @@ namespace pocc {
     return Cp;
   }
 
-
   /// Calculates POCC-average of QHA-related properties.
   void POccCalculator::calculateQHAProperties(apl::QHAmethod qha_method,
       apl::EOSmethod eos_method)
