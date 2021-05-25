@@ -3031,7 +3031,7 @@ namespace KBIN {
 // ***************************************************************************
 namespace KBIN {
   void XVASP_MPI_Autotune(_xvasp& xvasp,_aflags &aflags,bool VERBOSE) {
-    string FileContent,strline;
+    string FileContent="",strline="";
     int imax;
 
     FileContent=xvasp.INCAR.str();
