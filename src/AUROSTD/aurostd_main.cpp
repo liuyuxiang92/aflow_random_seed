@@ -1675,15 +1675,15 @@ namespace aurostd {
     if(!process_killed){
       if(aurostd::IsCommandAvailable("killall")) {
         command="killall "+(sigkill?string("-9 "):string(""))+process+" 2>/dev/null";
+        if(LDEBUG){cerr << soliloquy << " running command=\"" << command << "\"" << endl;}
         aurostd::execute(command);
-        if(LDEBUG){cerr << soliloquy << " issuing command: \"" << command << "\"" << endl;}
         aurostd::Sleep(sleep_seconds);process_killed=aurostd::ProcessRunning(process);
       }
     }
     if(!process_killed){
       if(aurostd::IsCommandAvailable("pkill")) {
         command="pkill "+(sigkill?string("-9 "):string(""))+process+" 2>/dev/null";
-        if(LDEBUG){cerr << soliloquy << " issuing command: \"" << command << "\"" << endl;}
+        if(LDEBUG){cerr << soliloquy << " running command=\"" << command << "\"" << endl;}
         aurostd::execute(command);
         aurostd::Sleep(sleep_seconds);process_killed=aurostd::ProcessRunning(process);
       }
@@ -1694,7 +1694,7 @@ namespace aurostd {
         if(vpids.empty()){process_killed=true;}
         else{
           command="kill "+(sigkill?string("-9 "):string(""))+aurostd::joinWDelimiter(vpids," ")+" 2>/dev/null";
-          if(LDEBUG){cerr << soliloquy << " issuing command: \"" << command << "\"" << endl;}
+          if(LDEBUG){cerr << soliloquy << " running command=\"" << command << "\"" << endl;}
           aurostd::execute(command);
           aurostd::Sleep(sleep_seconds);process_killed=aurostd::ProcessRunning(process);
         }
