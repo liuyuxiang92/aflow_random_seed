@@ -3032,7 +3032,7 @@ namespace KBIN {
 namespace KBIN {
   void XVASP_MPI_Autotune(_xvasp& xvasp,_aflags &aflags,bool VERBOSE) {
     string FileContent="",strline="";
-    int imax;
+    int imax=0;
 
     FileContent=xvasp.INCAR.str();
     xvasp.INCAR.str(std::string());
