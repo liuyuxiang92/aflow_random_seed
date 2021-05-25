@@ -4605,7 +4605,7 @@ namespace KBIN {
         if(OPTION==ON && MAGMOM_ALREADY_SPECIFIED==FALSE && vflags.KBIN_VASP_FORCE_OPTION_LSCOUPLING.option==FALSE) { //CO
           if(vflags.KBIN_VASP_FORCE_OPTION_AUTO_MAGMOM.isentry && vflags.KBIN_VASP_FORCE_OPTION_AUTO_MAGMOM.option){  // with spin, make the mag mom +5
             xvasp.INCAR << aurostd::PaddedPOST("MAGMOM="+aurostd::utype2string(xvasp.str.atoms.size())+"*5",_incarpad_) << " # " << operation_option << " " << xvasp.str.atoms.size() << " atom" << (xvasp.str.atoms.size()>1?"s":"") << endl;
-          }else{  // otherwise, make the mag mom +1
+          }else{  // otherwise, make the magmom +1
             xvasp.INCAR << aurostd::PaddedPOST("MAGMOM="+aurostd::utype2string(xvasp.str.atoms.size())+"*1",_incarpad_) << " # " << operation_option << " " << xvasp.str.atoms.size() << " atom" << (xvasp.str.atoms.size()>1?"s":"") << " (default)" << endl;
           }
         }
