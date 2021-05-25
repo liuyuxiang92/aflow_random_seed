@@ -3031,8 +3031,8 @@ namespace KBIN {
 // ***************************************************************************
 namespace KBIN {
   void XVASP_MPI_Autotune(_xvasp& xvasp,_aflags &aflags,bool VERBOSE) {
-    string FileContent,strline;
-    int imax;
+    string FileContent="",strline="";
+    int imax=0;
 
     FileContent=xvasp.INCAR.str();
     xvasp.INCAR.str(std::string());
@@ -3159,7 +3159,7 @@ namespace KBIN {
     //this is the ONLY exception for not overwriting a property, use the VASP_FORCE_OPTIONs otherwise
     //the only properties that should go in the [VASP_INCAR_MODE_EXPLICIT] section are those NOT overwritten by AUTOTUNE
     bool nelm_patch=(aurostd::kvpairfound(FileContent,"NELM","=")==false);
-    //[CO20210315 - always patch, you might NELM in INCAR section of aflow.in](vflags.KBIN_VASP_FORCE_OPTION_NELM_EQUAL.content_int!=AFLOWRC_DEFAULT_VASP_FORCE_OPTION_NELM); //CO20200624 - default for VASP is 60, don't add the line if unnecessary
+    //[CO20210315 - always patch, you might have NELM in INCAR section of aflow.in](vflags.KBIN_VASP_FORCE_OPTION_NELM_EQUAL.content_int!=AFLOWRC_DEFAULT_VASP_FORCE_OPTION_NELM); //CO20200624 - default for VASP is 60, don't add the line if unnecessary
 
     // RELAX_MODE=ENERGY mode
     if(vflags.KBIN_VASP_FORCE_OPTION_RELAX_MODE.xscheme=="ENERGY") {
@@ -4372,7 +4372,7 @@ namespace KBIN {
       keyword="NELM";
       
       if(Krun){
-        bool nelm_fix=true; //[CO20210315 - always patch, you might NELM in INCAR section of aflow.in](ivalue!=AFLOWRC_DEFAULT_VASP_FORCE_OPTION_NELM); //CO20200624 - default for VASP is 60, don't add the line if unnecessary
+        bool nelm_fix=true; //[CO20210315 - always patch, you might have NELM in INCAR section of aflow.in](ivalue!=AFLOWRC_DEFAULT_VASP_FORCE_OPTION_NELM); //CO20200624 - default for VASP is 60, don't add the line if unnecessary
         if(nelm_fix==false){Krun=false;}
       }
       
@@ -4604,7 +4604,7 @@ namespace KBIN {
         if(OPTION==ON && magmom_already_specified==FALSE && vflags.KBIN_VASP_FORCE_OPTION_LSCOUPLING.option==FALSE) { //CO
           if(vflags.KBIN_VASP_FORCE_OPTION_AUTO_MAGMOM.isentry && vflags.KBIN_VASP_FORCE_OPTION_AUTO_MAGMOM.option){  // with spin, make the mag mom +5
             xvasp.INCAR << aurostd::PaddedPOST("MAGMOM="+aurostd::utype2string(xvasp.str.atoms.size())+"*5",_incarpad_) << " # " << operation_option << " " << xvasp.str.atoms.size() << " atom" << (xvasp.str.atoms.size()>1?"s":"") << endl;
-          }else{  // otherwise, make the mag mom +1
+          }else{  // otherwise, make the magmom +1
             xvasp.INCAR << aurostd::PaddedPOST("MAGMOM="+aurostd::utype2string(xvasp.str.atoms.size())+"*1",_incarpad_) << " # " << operation_option << " " << xvasp.str.atoms.size() << " atom" << (xvasp.str.atoms.size()>1?"s":"") << " (default)" << endl;
           }
         }
@@ -5564,7 +5564,7 @@ namespace KBIN {
     }
     if(operation.find("YEVENSHIFT")!=string::npos){
       if(_iseven(xvasp.str.kpoints_k2)){
-        if(!aurostd::isequal(xvasp.str.kpoints_s2,0.5)){xvasp.str.kpoints_s2=0.5;nchanges_made++;if(LDEBUG) cerr << "Xevenshift s2=" << xvasp.str.kpoints_s2 << endl;}
+        if(!aurostd::isequal(xvasp.str.kpoints_s2,0.5)){xvasp.str.kpoints_s2=0.5;nchanges_made++;if(LDEBUG) cerr << "Yevenshift s2=" << xvasp.str.kpoints_s2 << endl;}
       }
       else{ //_isodd()
         if(!aurostd::isequal(xvasp.str.kpoints_s2,0.0)){xvasp.str.kpoints_s2=0.0;nchanges_made++;if(LDEBUG) cerr << "Yevenshift s2=" << xvasp.str.kpoints_s2 << endl;}

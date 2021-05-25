@@ -1599,11 +1599,18 @@ namespace aurostd {
   //CO20210315
   vector<string> ProcessPIDs(const string& process){ //CO20210315
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy="aurostd::ProcessPIDs():";
+    string soliloquy=XPID+"aurostd::ProcessPIDs():";
     vector<string> vpids;
     
+    if(LDEBUG){cerr << soliloquy << " looking for process=" << process << endl;}
+
+    if(1){cerr << soliloquy << " ps table:" << endl << aurostd::execute2string("ps aux") << endl;}  //not a good idea to run this all the time
+
+    string command="";
     if(aurostd::IsCommandAvailable("pgrep")) {
-      string output=aurostd::execute2string("pgrep "+process+" 2> /dev/null");
+      command="pgrep "+process+" 2> /dev/null";
+      if(LDEBUG){cerr << soliloquy << " running command=\"" << command << "\"" << endl;}
+      string output=aurostd::execute2string(command);
       if(LDEBUG){cerr << soliloquy << " pgrep output:" << endl << "\"" << output << "\"" << endl;}
       aurostd::StringSubst(output,"\n"," ");
       output=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(output);
@@ -1619,7 +1626,8 @@ namespace aurostd {
       //FR recommends ps aux vs. ps -e
       //tested on linux and mac, PIDs are in second column, process is the last column
       string command_grep="grep "+process;
-      string command="ps aux 2>/dev/null | "+command_grep+" 2> /dev/null";
+      command="ps aux 2>/dev/null | "+command_grep+" 2> /dev/null";
+      if(LDEBUG){cerr << soliloquy << " running command=\"" << command << "\"" << endl;}
       string output=aurostd::execute2string(command);
       if(LDEBUG){cerr << soliloquy << " ps/grep output:" << endl << output << endl;}
       vector<string> vlines,vtokens,vpids;
@@ -1659,7 +1667,7 @@ namespace aurostd {
   //CO20210315
   void ProcessKill(const string& process,bool sigkill){ //CO20210315
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy="aurostd::ProcessKill():";
+    string soliloquy=XPID+"aurostd::ProcessKill():";
     string command="";
 
     bool process_killed=(!aurostd::ProcessRunning(process));
@@ -1667,15 +1675,15 @@ namespace aurostd {
     if(!process_killed){
       if(aurostd::IsCommandAvailable("killall")) {
         command="killall "+(sigkill?string("-9 "):string(""))+process+" 2>/dev/null";
+        if(LDEBUG){cerr << soliloquy << " running command=\"" << command << "\"" << endl;}
         aurostd::execute(command);
-        if(LDEBUG){cerr << soliloquy << " issuing command: \"" << command << "\"" << endl;}
         aurostd::Sleep(sleep_seconds);process_killed=aurostd::ProcessRunning(process);
       }
     }
     if(!process_killed){
       if(aurostd::IsCommandAvailable("pkill")) {
         command="pkill "+(sigkill?string("-9 "):string(""))+process+" 2>/dev/null";
-        if(LDEBUG){cerr << soliloquy << " issuing command: \"" << command << "\"" << endl;}
+        if(LDEBUG){cerr << soliloquy << " running command=\"" << command << "\"" << endl;}
         aurostd::execute(command);
         aurostd::Sleep(sleep_seconds);process_killed=aurostd::ProcessRunning(process);
       }
@@ -1686,7 +1694,7 @@ namespace aurostd {
         if(vpids.empty()){process_killed=true;}
         else{
           command="kill "+(sigkill?string("-9 "):string(""))+aurostd::joinWDelimiter(vpids," ")+" 2>/dev/null";
-          if(LDEBUG){cerr << soliloquy << " issuing command: \"" << command << "\"" << endl;}
+          if(LDEBUG){cerr << soliloquy << " running command=\"" << command << "\"" << endl;}
           aurostd::execute(command);
           aurostd::Sleep(sleep_seconds);process_killed=aurostd::ProcessRunning(process);
         }
@@ -3033,7 +3041,8 @@ namespace aurostd {
   }
 
   bool execute(const string& _command) {
-    string soliloquy=XPID+"AUROSTD::execute():";
+    string soliloquy=XPID+"aurostd::execute():";
+
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     // cerr << "COMMAND " <<  command.c_str() << endl;
     string command=aurostd::CleanCommand4Execute(_command); //CO20200624
@@ -3072,7 +3081,8 @@ namespace aurostd {
   // ***************************************************************************
   string execute2string(const string& _command,FSIO fsio) { //CO20200624 - added file system IO mode
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy=XPID+"AUROSTD::execute2string():";
+    string soliloquy=XPID+"aurostd::execute2string():";
+
     // bool INIT_VERBOSE=TRUE;
     // cerr << "COMMAND " <<  command << endl;
     
@@ -3138,7 +3148,8 @@ namespace aurostd {
   
   string CleanCommand4Execute(const string& _command){ //CO20200624
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy=XPID+"AUROSTD::CleanCommand4Execute():";
+    string soliloquy=XPID+"aurostd::CleanCommand4Execute():";
+
     if(LDEBUG){cerr << soliloquy << " command(pre )=\"" << _command << "\"" << endl;}
     //CO20200624 START - some command cleanup
     vector<string> vtokens,vtokens_new;
