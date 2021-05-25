@@ -1444,21 +1444,22 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.flag("ORTHODEFECT_RHT",aurostd::args2flag(argv,cmds,"--OrthoDefect"));  //RHT
   vpflow.flag("REVERSE_SPACEGROUP_RHT",aurostd::args2flag(argv,cmds,"--revsg")); //RHT
   vpflow.flag("PRIMITIVE_LATTICE_RHT",aurostd::args2flag(argv,cmds, "--primr | --fastprimitivecell | --fprim")); //RHT
-  vpflow.args2addattachedscheme(argv,cmds,"WYCCAR","--wyccar=","");
-  if(vpflow.flag("WYCCAR")){
+  vpflow.args2addattachedscheme(argv,cmds,"WYCKOFF_POSITIONS","--Wyckoff=|--Wyckoff_positions=|--wyckoff=|--wyckoff_positions=|--wyccar=","");
+  if(vpflow.flag("WYCKOFF_POSITIONS")){
     //DX20180807 - added more wyccar flags (--usage, --no_scan, setting, --magmom) - START
-    vpflow.flag("WYCCAR::USAGE",aurostd::args2flag(argv,cmds,"--usage|--USAGE"));
-    vpflow.flag("WYCCAR::NO_SCAN",aurostd::args2flag(argv,cmds,"--no_scan"));
-    vpflow.flag("WYCCAR::LETTERS_ONLY",aurostd::args2flag(argv,cmds,"--letters_only"));
-    vpflow.flag("WYCCAR::SITE_SYMMETRIES_ONLY",aurostd::args2flag(argv,cmds,"--site_symmetries_only"));
-    vpflow.flag("WYCCAR::MULTIPLICITIES_ONLY",aurostd::args2flag(argv,cmds,"--multiplicities_only"));
-    if(aurostd::args2attachedflag(argv,"--wyccar=")){
-      vpflow.args2addattachedscheme(argv,cmds,"WYCCAR::TOLERANCE","--wyccar=",""); //DX20200907 - default is system specific, leaving empty
+    vpflow.flag("WYCKOFF_POSITIONS::USAGE",aurostd::args2flag(argv,cmds,"--usage|--USAGE"));
+    vpflow.flag("WYCKOFF_POSITIONS::NO_SCAN",aurostd::args2flag(argv,cmds,"--no_scan"));
+    vpflow.flag("WYCKOFF_POSITIONS::PRINT_WYCCAR",aurostd::args2flag(argv,cmds,"--wyccar")); //DX20210525 - treat wyccar as a special way of printing
+    vpflow.flag("WYCKOFF_POSITIONS::PRINT_LETTERS_ONLY",aurostd::args2flag(argv,cmds,"--letters_only"));
+    vpflow.flag("WYCKOFF_POSITIONS::PRINT_SITE_SYMMETRIES_ONLY",aurostd::args2flag(argv,cmds,"--site_symmetries_only"));
+    vpflow.flag("WYCKOFF_POSITIONS::PRINT_MULTIPLICITIES_ONLY",aurostd::args2flag(argv,cmds,"--multiplicities_only"));
+    if(aurostd::args2attachedflag(argv,"--Wyckoff=|--Wyckoff_positions=|--wyckoff=|--wyckoff_positions=|--wyccar=")){
+      vpflow.args2addattachedscheme(argv,cmds,"WYCKOFF_POSITION::TOLERANCE","--Wyckoff=|--Wyckoff_positions=|--wyckoff=|--wyckoff_positions=|--wyccar=",""); //DX20200907 - default is system specific, leaving empty
     }
     if(aurostd::args2attachedflag(argv,"--setting=")){
-      vpflow.args2addattachedscheme(argv,cmds,"WYCCAR::SETTING","--setting=","1");
+      vpflow.args2addattachedscheme(argv,cmds,"WYCKOFF_POSITION::SETTING","--setting=","1");
     }
-    vpflow.args2addattachedscheme(argv,cmds,"WYCCAR::MAGNETIC","--mag=|--magnetic=|--magmom=","");
+    vpflow.args2addattachedscheme(argv,cmds,"WYCCAR_POSITION::MAGNETIC","--mag=|--magnetic=|--magmom=","");
     //DX20180807 - added more wyccar flags (--usage, --no_scan, setting, --magmom) - END
   }
   // [OBSOLETE]  vpflow.flag("AFLOWSG",aurostd::args2flag(argv,cmds, "--aflowSG")); //RHT  // FIX
@@ -2069,7 +2070,7 @@ namespace pflow {
       // [OBSOLETE]       if(vpflow.flag("WYCCAR_MANUAL_RHT")) {initsymmats();initglides();initsymops();SetTolerance(argv);
       // [OBSOLETE]   xstructure str(cin); str.SpaceGroup_ITC(true,argv);printWyccar(File,str,aflags,WRITE,verbose,cout); _PROGRAMRUN=true;}
 
-      if(vpflow.flag("WYCCAR")) {cout << pflow::WYCCAR(vpflow,cin) << endl; _PROGRAMRUN=true;} //DX20180807 - put into pflow function
+      if(vpflow.flag("WYCKOFF_POSITIONS")) {cout << pflow::WyckoffPositions(vpflow,cin) << endl; _PROGRAMRUN=true;} //DX20180807 - put into pflow function
       //[OBSOLETE] (DX)if(vpflow.flag("WYCCAR_MANUAL_RHT")) {// [OBSOLETE] initsymmats();initglides();initsymops();SetTolerance(argv);
       //[OBSOLETE] (DX)  xstructure str(cin); double tolerance=0.001; int man_int=-1; if(argv.size()==2) {tolerance=0.001;}; if(argv.size()>=3) {tolerance=atof(argv.at(2).c_str()); man_int=atof(argv.at(3).c_str());}; str.SpaceGroup_ITC(tolerance,man_int); printWyccar(File,str,verbose,cout); _PROGRAMRUN=true;}
       //End Richard's Functions
@@ -14253,61 +14254,61 @@ namespace pflow {
 
 //DX20180807 - put wyccar options into pflow - START
 // ***************************************************************************
-// pflow::WYCCAR
+// pflow::WyckoffPositions()
 // ***************************************************************************
 namespace pflow {
-  string WYCCAR(aurostd::xoption& vpflow,istream& input) {
+  string WyckoffPositions(aurostd::xoption& vpflow,istream& input) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy=XPID+"pflow::WYCCAR():";  //CO20200624
+    string soliloquy=XPID+"pflow::WyckoffPositions():";  //CO20200624
     if(LDEBUG) cerr << soliloquy << " BEGIN" << endl;
-    stringstream oss;
 
-    string options = vpflow.getattachedscheme("WYCCAR");
+    string options = vpflow.getattachedscheme("WYCKOFF_POSITIONS");
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     if(vpflow.flag("WYCCAR::USAGE")) {
       init::MessageOption(options,soliloquy,
-          aurostd::liststring2string("aflow --wyccar[=tolerance|=tight|=loose] [--no_scan] [--setting=1| =2] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR  default: tolerance=(minimum_interatomic_distance)/100.0, setting=1"));
+          aurostd::liststring2string("aflow --Wyckoff|--Wyckoff_positions|--wyckoff|--wyckoff_positions|--wyccar[=tolerance|=tight|=loose] [--no_scan] [--setting=1| =2] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR  default: tolerance=(minimum_interatomic_distance)/100.0, setting=1"));
       return "";  //CO20200624 - the option was expressed successfully
     }
     //DX20190201 START
-    bool letters_only = false;
-    if(vpflow.flag("WYCCAR::LETTERS_ONLY")){
-      letters_only = true;
-    }
-    bool site_symmetries_only = false;
-    if(vpflow.flag("WYCCAR::SITE_SYMMETRIES_ONLY")){
-      site_symmetries_only = true;
-    }
-    bool multiplicities_only = false;
-    if(vpflow.flag("WYCCAR::MULTIPLICITIES_ONLY")){
-      multiplicities_only = true;
-    }
+    //bool wyccar = vpflow.flag("WYCCAR::LETTERS_ONLY");
+    bool wyccar = vpflow.flag("WYCKOFF_POSITIONS::PRINT_WYCCAR"); //DX20210525
+    bool letters_only = vpflow.flag("WYCKOFF_POSITIONS::PRINT_LETTERS_ONLY");
+    bool site_symmetries_only = vpflow.flag("WYCKOFF_POSITIONS::PRINT_SITE_SYMMETRIES_ONLY");
+    bool multiplicities_only = vpflow.flag("WYCKOFF_POSITIONS::PRINT_MULTIPLICITIES_ONLY");
+    
     //DX20190201 END
     xstructure str(input,IOAFLOW_AUTO); 
     str.ReScale(1.0);
 
     // get tolerance
-    double tolerance = pflow::getSymmetryTolerance(str,vpflow.getattachedscheme("WYCCAR::TOLERANCE")); //DX20200820 - consolidated setting tolerance into a function
+    double tolerance = pflow::getSymmetryTolerance(str,vpflow.getattachedscheme("WYCKOFF_POSITIONS::TOLERANCE")); //DX20200820 - consolidated setting tolerance into a function
 
     // ---------------------------------------------------------------------------
     // get space group setting
-    uint setting = pflow::getSpaceGroupSetting(vpflow.getattachedscheme("WYCCAR::SETTING")); //DX20210421 - consolidated space group setting into function
+    uint setting = pflow::getSpaceGroupSetting(vpflow.getattachedscheme("WYCKOFF_POSITIONS::SETTING")); //DX20210421 - consolidated space group setting into function
 
     // get magnetic moment
-    if(vpflow.flag("WYCCAR::MAGNETIC")){
-      string magmom_info = vpflow.getattachedscheme("WYCCAR::MAGNETIC");
+    if(vpflow.flag("WYCKOFF_POSITIONS::MAGNETIC")){
+      string magmom_info = vpflow.getattachedscheme("WYCKOFF_POSITIONS::MAGNETIC");
       ProcessAndAddSpinToXstructure(str, magmom_info); //DX20191108 - condensed into a single function
     }
 
     // tolerance scan 
-    if(vpflow.flag("WYCCAR::NO_SCAN")) {
+    if(vpflow.flag("WYCKOFF_POSITIONS::NO_SCAN")) {
       str.sym_eps_no_scan = true; //DX20210406
     }
     //DX20190201 START
     uint space_group_number = str.SpaceGroup_ITC(tolerance,-1,setting,str.sym_eps_no_scan);
 
-    if(letters_only){
+    if(wyccar){
+      ofstream File("/dev/null");
+      bool verbose=TRUE;
+      stringstream oss;
+      SYM::printWyccar(File,str,verbose,oss);
+      return oss.str(); 
+    }
+    else if(letters_only){
       string letters = SYM::ExtractWyckoffLettersString(str.wyccar_ITC);
       string sym_info = "sg=" + aurostd::utype2string<uint>(space_group_number) + ": " + letters;
       return sym_info;
@@ -14322,11 +14323,109 @@ namespace pflow {
       string sym_info = "sg=" + aurostd::utype2string<uint>(space_group_number) + ": " + multiplicities;
       return sym_info;
     }
-    //DX20190201 END
-    ofstream File("/dev/null");
-    bool verbose=TRUE;
-    SYM::printWyccar(File,str,verbose,oss);
-    return oss.str(); 
+   
+    bool standalone=true;
+    // ---------------------------------------------------------------------------
+    // file type //DX20210525 - string to filetype
+    filetype ftype = txt_ft;
+    if(XHOST.vflag_control.flag("PRINT_MODE::TXT")){ ftype = txt_ft; }
+    else if(XHOST.vflag_control.flag("PRINT_MODE::JSON")){ ftype = json_ft; }
+    
+    xvector<double> data = Getabc_angles(str.standard_lattice_ITC,DEGREES);
+    stringstream ss_output;
+    if(ftype == txt_ft || (XHOST.vflag_control.flag("WWW") && standalone)){
+      ss_output << " Space group number                           = " << space_group_number << endl; 
+      ss_output << " Setting                                      = " << str.setting_ITC << endl;
+      ss_output << " ITC cell parameters - a b c alpha beta gamma = ";
+      ss_output.precision(10); ss_output << data(1) << " " << data(2) << " " << data(3) << " ";
+      ss_output.precision(3); ss_output << data(4) << " " << data(5) << " " << data(6) << endl;
+      ss_output << " Wyckoff positions" << endl;
+      uint nWyckoff_sites = str.wyckoff_sites_ITC.size();
+      for(uint i=0;i<nWyckoff_sites;i++){
+        ss_output << "  " << setw(5) << str.wyckoff_sites_ITC[i].type // set(5): species have max of two characters + pseudopoential (up to three characters)
+          << " " << setw(3) << str.wyckoff_sites_ITC[i].multiplicity  // set(3): Wyckoff positions have a max of three digits
+          << " " << setw(5) << str.wyckoff_sites_ITC[i].letter        // set(5): space group #47 has Wyckoff letter "alpha" (i.e, five letters)
+          << " " << setw(8) << str.wyckoff_sites_ITC[i].site_symmetry // set(8): Wyckoff site symmetry generally lists three/four directions, each with one to two characters (e.g., inversion)
+          << std::setprecision(14) << std::fixed;
+          double _coord = AUROSTD_MAX_DOUBLE;
+          for(uint j=1;j<=3;j++) {
+            _coord=aurostd::roundoff(str.wyckoff_sites_ITC[i].coord(j),pow(10.0,-(double)14));
+            if(abs(_coord)<10.0) ss_output << " ";
+            if(!std::signbit(_coord)) ss_output << " ";
+            ss_output << _coord << " ";
+          }
+          ss_output << endl;
+      }
+      // ME20210402 - Convert to array of strings for web
+      if (XHOST.vflag_control.flag("WWW") && standalone) { //DX20210521 - add standalone
+        vector<string> voutput;
+        aurostd::stream2vectorstring(ss_output, voutput);
+        ss_output.clear();
+        ss_output.str("");
+        ss_output << "{\"txt\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(voutput, "\"", "\""), ",") << "],";
+      }
+    }
+    if(ftype == json_ft || (XHOST.vflag_control.flag("WWW") && standalone)){
+      aurostd::JSONwriter json;
+      bool roff = true;
+      
+      // space group number
+      if(str.space_group_ITC > 0 && str.space_group_ITC < 231){
+        json.addNumber("space_group_number", str.space_group_ITC);
+      } else if (PRINT_NULL_JSON){
+        json.addNull("space_group_number");
+      }
+      
+      // ITC setting
+      if(str.setting_ITC == 1 || str.setting_ITC == 2){
+        json.addNumber("setting_ITC", str.setting_ITC);
+      } else if (PRINT_NULL_JSON){
+        json.addNull("setting_ITC");
+      }
+      // Real lattice parameters
+      if(data.rows != 0){
+        json.addVector("lattice_parameters_ITC",data,_AFLOWLIB_DATA_GEOMETRY_PREC_,roff);
+      } else if (PRINT_NULL_JSON){
+        json.addNull("lattice_parameters_ITC");
+      }
+      // representative Wyckoff positions
+      if(str.wyccar_ITC.size()){
+
+        aurostd::JSONwriter Wyckoff_json;
+        vector<aurostd::JSONwriter> vset_json;
+
+        xvector<double> position;
+        for(uint i=0;i<str.wyccar_ITC.size();i++){
+          if(i>4 && i!=str.wyccar_ITC.size()-1){ //Skip title, scale, lattice parameters, number of atoms, and coordinate type, and last newline
+            Wyckoff_json.clear();
+            position.clear();
+
+            vector<string> tokens;
+            aurostd::string2tokens(str.wyccar_ITC[i],tokens," ");
+            if(tokens.size() == 7){
+              position(1) = aurostd::string2utype<double>(tokens[0]);
+              position(2) = aurostd::string2utype<double>(tokens[1]);
+              position(3) = aurostd::string2utype<double>(tokens[2]);
+              Wyckoff_json.addVector("position", position, _AFLOWLIB_DATA_GEOMETRY_PREC_, roff);
+              Wyckoff_json.addString("name", tokens[3]);
+              Wyckoff_json.addNumber("mulitiplicity", tokens[4]);
+              Wyckoff_json.addString("Wyckoff_letter", tokens[5]);
+              Wyckoff_json.addString("site_symmetry", tokens[6]);
+              vset_json.push_back(Wyckoff_json);
+            }
+          }
+        }
+
+        json.addVector("Wyckoff_positions", vset_json);
+      } else if (PRINT_NULL_JSON){
+        json.addNull("Wyckoff_positions");
+      }
+      if (XHOST.vflag_control.flag("WWW") && standalone) ss_output << "\"json\":" << json.toString(standalone) << "}" << std::endl; //DX20210521 - add standalone
+      else ss_output << json.toString(standalone);
+      if(standalone) { ss_output << endl; }
+    }
+    
+    return ss_output.str(); 
   }
 }
 

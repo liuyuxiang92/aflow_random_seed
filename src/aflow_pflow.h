@@ -444,7 +444,7 @@ namespace pflow {
   void SUPERCELLSTRLIST(const string& options);
   xstructure xstrSWAP(vector<string>, istream& input);
   xstructure VOLUME(const string& options, istream& input);
-  string WYCCAR(aurostd::xoption& vpflow,istream& input); //DX20180807 - added wyccar to pflow
+  string WyckoffPositions(aurostd::xoption& vpflow,istream& input); //DX20180807 - added wyccar to pflow //DX20210525 - changed name and generalized function
   xstructure WYCKOFF(vector<string>,istream& input);
   void XRAY(const string& options,istream& input);
   void XRAY_PEAKS(const aurostd::xoption& vpflow,istream& input); //CO20190409
