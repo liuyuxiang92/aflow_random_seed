@@ -1602,8 +1602,13 @@ namespace aurostd {
     string soliloquy=XPID+"aurostd::ProcessPIDs():";
     vector<string> vpids;
     
+    if(LDEBUG){cerr << soliloquy << " looking for process=" << process << endl;}
+
+    string command="";
     if(aurostd::IsCommandAvailable("pgrep")) {
-      string output=aurostd::execute2string("pgrep "+process+" 2> /dev/null");
+      command="pgrep "+process+" 2> /dev/null";
+      if(LDEBUG){cerr << soliloquy << " running command=\"" << command << "\"" << endl;}
+      string output=aurostd::execute2string(command);
       if(LDEBUG){cerr << soliloquy << " pgrep output:" << endl << "\"" << output << "\"" << endl;}
       aurostd::StringSubst(output,"\n"," ");
       output=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(output);
@@ -1619,7 +1624,8 @@ namespace aurostd {
       //FR recommends ps aux vs. ps -e
       //tested on linux and mac, PIDs are in second column, process is the last column
       string command_grep="grep "+process;
-      string command="ps aux 2>/dev/null | "+command_grep+" 2> /dev/null";
+      command="ps aux 2>/dev/null | "+command_grep+" 2> /dev/null";
+      if(LDEBUG){cerr << soliloquy << " running command=\"" << command << "\"" << endl;}
       string output=aurostd::execute2string(command);
       if(LDEBUG){cerr << soliloquy << " ps/grep output:" << endl << output << endl;}
       vector<string> vlines,vtokens,vpids;
