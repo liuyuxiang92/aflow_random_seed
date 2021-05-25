@@ -3138,9 +3138,9 @@ namespace KBIN {
   string INCAR_IALGO2ALGO(int ialgo); //CO20210315
   bool XVASP_INCAR_Read_MAGMOM(_xvasp& xvasp);  //CO20210315
   bool XVASP_INCAR_PREPARE_GENERIC(const string& command,_xvasp& xvasp,const _vflags& vflags,const string& svalue,int ivalue,double dvalue,bool bvalue);
-  void XVASP_INCAR_ADJUST_ICHARG(_xvasp&, _vflags&, _aflags&, int, ofstream&);  //ME20191028
-  void XVASP_INCAR_SPIN_REMOVE_RELAX(_xvasp& xvasp,_aflags &aflags,_vflags& vflags,int step,ofstream &FileMESSAGE);
-  void XVASP_KPOINTS_IBZKPT_UPDATE(_xvasp& xvasp,_aflags &aflags,_vflags& vflags,int step,ofstream &FileMESSAGE);
+  void XVASP_INCAR_ADJUST_ICHARG(_xvasp&, _vflags&, _aflags&, int,bool write_incar, ofstream&);  //ME20191028 //CO20210315 - write_incar
+  void XVASP_INCAR_SPIN_REMOVE_RELAX(_xvasp& xvasp,_aflags &aflags,_vflags& vflags,int step,bool write_incar,ofstream &FileMESSAGE);  //CO20210315 - write_incar
+  void XVASP_KPOINTS_IBZKPT_UPDATE(_xvasp& xvasp,_aflags &aflags,_vflags& vflags,int step,bool write_incar,ofstream &FileMESSAGE);  //CO20210315 - write_incar
   void XVASP_INCAR_LDAU_OFF(_xvasp& xvasp,bool VERBOSE);
   void XVASP_INCAR_LDAU_ON(_xvasp& xvasp,_vflags& vflags,uint type);
   void XVASP_INCAR_LDAU_ADIABATIC(_xvasp& xvasp,int step);

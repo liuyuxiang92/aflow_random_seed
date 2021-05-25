@@ -42,6 +42,7 @@
         -- patching initial NBANDS so it's commensurate with NPAR (CO)
         -- added REPEAT_STATIC (CO)
         -- adding RECYCLE_CONTCAR to list of patches for CALC_FROZEN (CO)
+        -- patching SPIN_REMOVE_RELAX bug which was not turning off spin (CO)
 3.2.9 - 2021/05/05
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.9.tar.xz
         -- Fixed bug with APL overwriting *.orig files. (AS)

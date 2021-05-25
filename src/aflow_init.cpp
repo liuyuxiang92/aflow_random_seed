@@ -2141,6 +2141,9 @@ void AFLOW_monitor_VASP(const string& directory){
   string vasp_bin="";
   int ncpus=0;
   nloop=0;
+  string memory_string="";
+  unsigned long long int memory_free=0,memory_total=0;
+  double memory_usage_percentage=0;
 
   while((AFLOW_VASP_instance_running() || (nloop++)<NCOUNTS_WAIT_MONITOR) && vasp_bin.empty()){  //wait no more than 10 minutes for vasp bin to start up
     GetVASPBinaryFromLOCK(xvasp.Directory,vasp_bin,ncpus);
@@ -2231,7 +2234,15 @@ void AFLOW_monitor_VASP(const string& directory){
         if(vasp_running){
           //special case for MEMORY, the error will be triggered in the --monitor_vasp instance, and not in the --run one
           //so write out "AFLOW ERROR: AFLOW_MEMORY" so it gets caught in the --run instance
-          if(xwarning.flag("MEMORY")){aurostd::string2file(" "+string(AFLOW_MEMORY_TAG)+"\n",xvasp.Directory+"/"+DEFAULT_VASP_OUT,"APPEND");} //pre-pending space to match formating
+          if(xwarning.flag("MEMORY")){
+            memory_string=" "+string(AFLOW_MEMORY_TAG); //pre-pending space to match formating
+            if(aurostd::GetMemory(memory_free,memory_total)){
+              memory_usage_percentage=100.0*(((double)(memory_total-memory_free))/((double)(memory_total)));
+              memory_string+=" ("+aurostd::utype2string(memory_usage_percentage,4,FIXED_STREAM)+"% memory usage)";  //CO20210315 - use fixed stream here, since we'll have two sig figs before decimal, and two after (99.99%)
+            }
+            memory_string+="\n";
+            aurostd::string2file(memory_string,xvasp.Directory+"/"+DEFAULT_VASP_OUT,"APPEND");
+          }
           //write BEFORE issuing the kill, the other instance of aflow will start to act as soon as the process is dead
           message << "issuing kill command for: \""+vasp_bin+"\"";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
           aurostd::ProcessKill(vasp_bin);

@@ -1941,34 +1941,34 @@ namespace KBIN {
           if(kflags.KBIN_POCC) {  // RUN POCC ------------------------  //CO20180419 //POCC is special, run as priority
             aus << "00000  MESSAGE PERFORMING POCC_CALCULATION" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
             aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-            xvasp.NRELAX=-3;}
-          else if(kflags.KBIN_PHONONS_CALCULATION_APL) {  // RUN PHONONS APL ------------------------
+            xvasp.NRELAX=-3;
+          }else if(kflags.KBIN_PHONONS_CALCULATION_APL) {  // RUN PHONONS APL ------------------------
             aus << "00000  MESSAGE PERFORMING PHONONS_CALCULATION_APL" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
             aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-            xvasp.NRELAX=-3;}
+            xvasp.NRELAX=-3;
           //CO20170601 START
-          else if(kflags.KBIN_PHONONS_CALCULATION_QHA) {  // RUN PHONONS QHA ------------------------
+          }else if(kflags.KBIN_PHONONS_CALCULATION_QHA) {  // RUN PHONONS QHA ------------------------
             aus << "00000  MESSAGE PERFORMING PHONONS_CALCULATION_QHA" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
             aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-            xvasp.NRELAX=-3;}
-          else if(kflags.KBIN_PHONONS_CALCULATION_AAPL) {  // RUN PHONONS AAPL ------------------------
+            xvasp.NRELAX=-3;
+          }else if(kflags.KBIN_PHONONS_CALCULATION_AAPL) {  // RUN PHONONS AAPL ------------------------
             aus << "00000  MESSAGE PERFORMING PHONONS_CALCULATION_AAPL" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
             aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-            xvasp.NRELAX=-3;}
+            xvasp.NRELAX=-3;
           //CO20170601 END
-          else if(kflags.KBIN_PHONONS_CALCULATION_AGL) {  // RUN PHONONS AGL ------------------------
+          }else if(kflags.KBIN_PHONONS_CALCULATION_AGL) {  // RUN PHONONS AGL ------------------------
             aus << "00000  MESSAGE PERFORMING PHONONS_CALCULATION_AGL (Debye Model)" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
             aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-            xvasp.NRELAX=-3;}
-          else if(kflags.KBIN_PHONONS_CALCULATION_AEL) {  // RUN PHONONS AEL ------------------------
+            xvasp.NRELAX=-3;
+          }else if(kflags.KBIN_PHONONS_CALCULATION_AEL) {  // RUN PHONONS AEL ------------------------
             aus << "00000  MESSAGE PERFORMING PHONONS_CALCULATION_AEL (Elastic constants)" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
             aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-            xvasp.NRELAX=-3;}
-          else if(kflags.KBIN_PHONONS_CALCULATION_FROZSL) {  // RUN PHONONS FROZSL ------------------------
+            xvasp.NRELAX=-3;
+          }else if(kflags.KBIN_PHONONS_CALCULATION_FROZSL) {  // RUN PHONONS FROZSL ------------------------
             aus << "00000  MESSAGE PERFORMING PHONONS_CALCULATION_FROZSL" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
             aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-            xvasp.NRELAX=-3;}
-          else {
+            xvasp.NRELAX=-3;
+          }else {
             if(vflags.KBIN_VASP_RUN.flag("STATIC")) {  // RUN STATIC ------------------------
               aus << "00000  MESSAGE Performing Static RUN" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
               aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -2166,8 +2166,8 @@ namespace KBIN {
                         if(!Krun) {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error [RELAXATION<]");return Krun;}
                         //[CO20210104 - OUTCAR has already been moved to OUTCAR.RELAX, check is inside VASP_RUN()]Krun=KBIN::VASP_RunFinished(xvasp,aflags,FileMESSAGE,true); //CO20201111
                         //[CO20210104 - OUTCAR has already been moved to OUTCAR.RELAX, check is inside VASP_RUN()]if(!Krun) {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error (OUTCAR_INCOMPLETE) [RELAXATION<]");return Krun;} //CO20201111
-                        KBIN::XVASP_INCAR_SPIN_REMOVE_RELAX(xvasp,aflags,vflags,xvasp.NRELAXING,FileMESSAGE);         // check if it is the case of turning off spin
-                        KBIN::XVASP_KPOINTS_IBZKPT_UPDATE(xvasp,aflags,vflags,xvasp.NRELAXING,FileMESSAGE);           // check if it is the case of updating IBZKPT
+                        KBIN::XVASP_INCAR_SPIN_REMOVE_RELAX(xvasp,aflags,vflags,xvasp.NRELAXING,true,FileMESSAGE);         // check if it is the case of turning off spin //CO20210315 - always write_incar here
+                        KBIN::XVASP_KPOINTS_IBZKPT_UPDATE(xvasp,aflags,vflags,xvasp.NRELAXING,true,FileMESSAGE);           // check if it is the case of updating IBZKPT  //CO20210315 - always write_incar here
                         //ME20190301 BEGIN
                         // CHGCAR/WAVECAR needs to be recycled if CHGCAR/WAVECAR=ON or VASP
                         // won't be able to read the files. Bug found by Rico Friedrich
@@ -2191,9 +2191,9 @@ namespace KBIN {
                         if(!Krun) {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error [RELAXATION=]");return Krun;}
                         //[CO20210104 - OUTCAR has already been moved to OUTCAR.RELAX, check is inside VASP_RUN()]Krun=KBIN::VASP_RunFinished(xvasp,aflags,FileMESSAGE,true); //CO20201111
                         //[CO20210104 - OUTCAR has already been moved to OUTCAR.RELAX, check is inside VASP_RUN()]if(!Krun) {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error (OUTCAR_INCOMPLETE) [RELAXATION=]");return Krun;} //CO20201111
-                        KBIN::XVASP_INCAR_SPIN_REMOVE_RELAX(xvasp,aflags,vflags,xvasp.NRELAXING,FileMESSAGE);  //ME20190610 - or else SPIN_REMOVE_RELAX_2 won't work
+                        KBIN::XVASP_INCAR_SPIN_REMOVE_RELAX(xvasp,aflags,vflags,xvasp.NRELAXING,false,FileMESSAGE);  //ME20190610 - or else SPIN_REMOVE_RELAX_2 won't work  //CO20210315 - never write_incar here (last step for sure)
                       }
-                      KBIN::XVASP_INCAR_ADJUST_ICHARG(xvasp, vflags, aflags, xvasp.NRELAXING, FileMESSAGE);  //ME20191028
+                      KBIN::XVASP_INCAR_ADJUST_ICHARG(xvasp, vflags, aflags, xvasp.NRELAXING, (xvasp.NRELAXING<xvasp.NRELAX), FileMESSAGE);  //ME20191028 //CO20210315 - only write_incar if it's not the last relaxation (last step)
                     }
                     xvasp.NRELAXING=xvasp.NRELAX;
                     xvasp.NRELAXING++;
@@ -2271,18 +2271,21 @@ namespace KBIN {
                         //[CO20210104 - OUTCAR has already been moved to OUTCAR.RELAX, check is inside VASP_RUN()]Krun=KBIN::VASP_RunFinished(xvasp,aflags,FileMESSAGE,true); //CO20201111
                         //[CO20210104 - OUTCAR has already been moved to OUTCAR.RELAX, check is inside VASP_RUN()]if(!Krun) {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error (OUTCAR_INCOMPLETE) [RELAX_STATIC_BANDS RELAXATION=]");return Krun;} //CO20201111
                       }
-                      KBIN::XVASP_INCAR_ADJUST_ICHARG(xvasp, vflags, aflags, xvasp.NRELAXING, FileMESSAGE);  //ME20191028
+                      KBIN::XVASP_INCAR_ADJUST_ICHARG(xvasp, vflags, aflags, xvasp.NRELAXING, true, FileMESSAGE);  //ME20191028 //CO20210315 - always write_incar, there's a STATIC that follows (at least)
                       xvasp_spin_evolution.push_back(xvasp.str.qm_mag_atom); // keep track of spins
                       aus << "00000  MESSAGE RESULT SPIN=" << xvasp_spin_evolution.at(xvasp_spin_evolution.size()-1) << Message(_AFLOW_FILE_NAME_,aflags) << endl;
                       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-                      if(xvasp.NRELAXING<xvasp.NRELAX) KBIN::XVASP_INCAR_SPIN_REMOVE_RELAX(xvasp,aflags,vflags,xvasp.NRELAXING,FileMESSAGE); 	// check if it is the case of turning off spin
+                      //[CO20210315 - made robust enough to work in all cases]if(xvasp.NRELAXING<xvasp.NRELAX) 
+                      KBIN::XVASP_INCAR_SPIN_REMOVE_RELAX(xvasp,aflags,vflags,xvasp.NRELAXING,true,FileMESSAGE); 	// check if it is the case of turning off spin  //CO20210315 - always write_incar, there's a STATIC that follows (at least)
                     }
                     if(xvasp.NRELAX>0) KBIN::VASP_Recycle(xvasp,"relax"+aurostd::utype2string(xvasp.NRELAX));  // bring back the stuff
-                    if(xvasp.NRELAX==2) KBIN::XVASP_INCAR_SPIN_REMOVE_RELAX(xvasp,aflags,vflags,xvasp.NRELAX,FileMESSAGE); 	// check if it is the case of turning off spin
+                    //[CO20210315 - not sure why only if NRELAX==2, we could have NRELAX==1 and this still might apply]if(xvasp.NRELAX==2) 
+                    KBIN::XVASP_INCAR_SPIN_REMOVE_RELAX(xvasp,aflags,vflags,xvasp.NRELAX,true,FileMESSAGE); 	// check if it is the case of turning off spin  //CO20210315 - always write_incar, there's a STATIC that follows (at least) //CO20210315 - no longer necessary per above (we check after every relaxation, but it doesn't hurt
                   }
-                  if(vflags.KBIN_VASP_RUN.flag("RELAX_STATIC")) {
+                  if(vflags.KBIN_VASP_RUN.flag("STATIC_BANDS")) { //CO20210315 - looks like a typo to me //RELAX_STATIC
                     aus << "00000  NO RELAXATION IN (" << STRING_TO_SHOW << ") - " << xvasp.Directory << Message(_AFLOW_FILE_NAME_,aflags) << endl;
                     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
+                    xvasp.NRELAX=0; //CO20210315 - mimicking STATIC below
                   }
                   if(vflags.KBIN_VASP_RUN.flag("STATIC")) {
                     aus << "00000  NO RELAXATION IN (" << STRING_TO_SHOW << ") - " << xvasp.Directory << Message(_AFLOW_FILE_NAME_,aflags) << endl;
@@ -3075,7 +3078,7 @@ namespace KBIN {
       cerr << soliloquy << " memory_total=" << memory_total << endl;
     }
     if(VERBOSE){
-      aus << "00000  MESSAGE memory used: " << memory_usage_percentage << "% (max=" << MEMORY_MAX_USAGE << "%)" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+      aus << "00000  MESSAGE memory used: " << aurostd::utype2string(memory_usage_percentage,4,FIXED_STREAM) << "% (max=" << MEMORY_MAX_USAGE << "%)" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
       if(LDEBUG){cerr << aus.str();}
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     }

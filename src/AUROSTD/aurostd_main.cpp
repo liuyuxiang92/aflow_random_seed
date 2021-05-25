@@ -1599,7 +1599,7 @@ namespace aurostd {
   //CO20210315
   vector<string> ProcessPIDs(const string& process){ //CO20210315
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy="aurostd::ProcessRunning():";
+    string soliloquy="aurostd::ProcessPIDs():";
     vector<string> vpids;
     
     if(aurostd::IsCommandAvailable("pgrep")) {
@@ -1659,7 +1659,7 @@ namespace aurostd {
   //CO20210315
   void ProcessKill(const string& process,bool sigkill){ //CO20210315
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy="aurostd::ProcessRunning():";
+    string soliloquy="aurostd::ProcessKill():";
     string command="";
 
     bool process_killed=(!aurostd::ProcessRunning(process));
