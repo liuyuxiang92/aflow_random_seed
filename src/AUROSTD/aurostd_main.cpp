@@ -1604,6 +1604,8 @@ namespace aurostd {
     
     if(LDEBUG){cerr << soliloquy << " looking for process=" << process << endl;}
 
+    if(1){cerr << soliloquy << " ps table:" << endl << aurostd::execute2string("ps aux") << endl;}  //not a good idea to run this all the time
+
     string command="";
     if(aurostd::IsCommandAvailable("pgrep")) {
       command="pgrep "+process+" 2> /dev/null";
