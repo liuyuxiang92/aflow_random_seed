@@ -4373,7 +4373,7 @@ namespace KBIN {
       keyword="NELM";
       
       if(Krun){
-        bool nelm_fix=true; //[CO20210315 - always patch, you might NELM in INCAR section of aflow.in](ivalue!=AFLOWRC_DEFAULT_VASP_FORCE_OPTION_NELM); //CO20200624 - default for VASP is 60, don't add the line if unnecessary
+        bool nelm_fix=true; //[CO20210315 - always patch, you might have NELM in INCAR section of aflow.in](ivalue!=AFLOWRC_DEFAULT_VASP_FORCE_OPTION_NELM); //CO20200624 - default for VASP is 60, don't add the line if unnecessary
         if(nelm_fix==false){Krun=false;}
       }
       
