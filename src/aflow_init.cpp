@@ -1878,6 +1878,7 @@ bool GetVASPBinaryFromLOCK(const string& directory,string& vasp_bin,int& ncpus){
   uint i=0,j=0;
   for(i=vlines.size()-1;i<vlines.size();i--){ //go backwards
     if(vlines[i].find(VASP_KEYWORD_EXECUTION)==string::npos){continue;} //look for 'Executing:' line
+    if(LDEBUG){cerr << soliloquy << " found line containing execution line: \"" << vlines[i] << "\"" << endl;
     aurostd::string2tokens(vlines[i],vtokens," ");
     for(j=0;j<vtokens.size();j++){
       if((j-2)<vtokens.size() && vtokens[j]==DEFAULT_VASP_OUT){ //looking for sequence VASP_BIN >> VASP_OUT //if j goes below 0, then it goes to max uint

@@ -42,7 +42,7 @@ aflow
                                     --FILE=LOCK to point to the AFLOW LOCK file for the run of interest.
 
                                     Example use case in qsub file:
-                                    aflow --monitor_vasp --kill_vasp_all --FILE=$RUN_PATH/LOCK &
+                                    aflow --monitor_vasp --kill_vasp_all --FILE=$RUN_PATH/LOCK --use_aflow.in=aflow.in --use_LOCK=LOCK &
                                     MONITOR_PID=$!
                                     aflow --run --mpi --np=64 --force --use_aflow.in=aflow.in --use_LOCK=LOCK -D $RUN_PATH >> $LOG_PATH
 
