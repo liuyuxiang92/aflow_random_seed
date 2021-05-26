@@ -1597,25 +1597,40 @@ namespace aurostd {
   // Function ProcessPIDs
   // ***************************************************************************
   //CO20210315
-  vector<string> ProcessPIDs(const string& process){ //CO20210315
+  vector<string> ProcessPIDs(const string& process,bool user_specific){ //CO20210315
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy=XPID+"aurostd::ProcessPIDs():";
-    vector<string> vpids;
-    
     if(LDEBUG){cerr << soliloquy << " looking for process=" << process << endl;}
-
-    if(1){cerr << soliloquy << " ps table:" << endl << aurostd::execute2string("ps aux") << endl;}  //not a good idea to run this all the time
+    if(0){cerr << soliloquy << " ps table:" << endl << aurostd::execute2string("ps aux") << endl;}  //not a good idea to run this all the time
 
     string command="";
+    vector<string> vlines,vtokens,vpids;
+    uint i=0,j=0;
     if(aurostd::IsCommandAvailable("pgrep")) {
-      command="pgrep "+process+" 2> /dev/null";
+      command="pgrep -l"; //the -l is important, we will need to neglect the subshell call below
+      if(user_specific && !XHOST.user.empty()){command+=" -u "+XHOST.user;}
+      command+=" -f "+process+" 2> /dev/null";  //the -f is important, will match mpivasp46s in /usr/bin/mpivasp46s
       if(LDEBUG){cerr << soliloquy << " running command=\"" << command << "\"" << endl;}
       string output=aurostd::execute2string(command);
       if(LDEBUG){cerr << soliloquy << " pgrep output:" << endl << "\"" << output << "\"" << endl;}
-      aurostd::StringSubst(output,"\n"," ");
-      output=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(output);
-      if(output.empty()){return vpids;}
-      aurostd::string2tokens(output,vpids," ");
+      if(0){  //before -f and -l
+        aurostd::StringSubst(output,"\n"," ");
+        output=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(output);
+        if(output.empty()){return vpids;}
+        aurostd::string2tokens(output,vpids," ");
+      }
+      aurostd::string2vectorstring(output,vlines);
+      for(i=0;i<vlines.size();i++){
+        aurostd::string2tokens(vlines[i],vtokens," ");
+        if(vtokens.size()<2){continue;}
+        const string& pid=vtokens[0];
+        string proc=vtokens[1]; //since we split on " ", we need to join columns 11-onward
+        for(j=2;j<vtokens.size();j++){proc+=" "+vtokens[j];}
+        if(LDEBUG){cerr << soliloquy << " proc[i=" << i << "]=\"" << proc << "\"" << endl;}
+        if(proc.find(process)==string::npos){continue;}
+        if(proc.find(command)!=string::npos){continue;} //ps aux | grep ... always returns itself, neglect  //do a find() instead of == here
+        vpids.push_back(pid);
+      }
       if(LDEBUG){
         cerr << soliloquy << " vpids=" << aurostd::joinWDelimiter(vpids,",") << endl;
         cerr << soliloquy << " vpids.empty()=" << vpids.empty() << endl;
@@ -1626,13 +1641,14 @@ namespace aurostd {
       //FR recommends ps aux vs. ps -e
       //tested on linux and mac, PIDs are in second column, process is the last column
       string command_grep="grep "+process;
-      command="ps aux 2>/dev/null | "+command_grep+" 2> /dev/null";
+      command="ps";
+      if(user_specific){command+=" ux";}
+      else{command+=" aux";}
+      command+=" 2>/dev/null | "+command_grep+" 2> /dev/null";
       if(LDEBUG){cerr << soliloquy << " running command=\"" << command << "\"" << endl;}
       string output=aurostd::execute2string(command);
       if(LDEBUG){cerr << soliloquy << " ps/grep output:" << endl << output << endl;}
-      vector<string> vlines,vtokens,vpids;
       aurostd::string2vectorstring(output,vlines);
-      uint i=0,j=0;
       for(i=0;i<vlines.size();i++){
         aurostd::string2tokens(vlines[i],vtokens," ");
         if(vtokens.size()<11){continue;}
@@ -1659,44 +1675,53 @@ namespace aurostd {
   // Function ProcessRunning
   // ***************************************************************************
   //CO20210315
-  bool ProcessRunning(const string& process){return !aurostd::ProcessPIDs(process).empty();} //CO20210315
+  bool ProcessRunning(const string& process,bool user_specific){return !aurostd::ProcessPIDs(process,user_specific).empty();} //CO20210315
   
   // ***************************************************************************
   // Function ProcessKill
   // ***************************************************************************
   //CO20210315
-  void ProcessKill(const string& process,bool sigkill){ //CO20210315
+  void ProcessKill(const string& process,bool user_specific,bool sigkill){ //CO20210315
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy=XPID+"aurostd::ProcessKill():";
     string command="";
 
-    bool process_killed=(!aurostd::ProcessRunning(process));
+    bool process_killed=(!aurostd::ProcessRunning(process,user_specific));
     uint sleep_seconds=5; //2 seconds is too few
     if(!process_killed){
       if(aurostd::IsCommandAvailable("killall")) {
-        command="killall "+(sigkill?string("-9 "):string(""))+process+" 2>/dev/null";
+        command="killall";
+        if(user_specific && !XHOST.user.empty()){command+=" -u "+XHOST.user;}
+        if(sigkill){command+=" -9";}
+        command+=" "+process+" 2>/dev/null";
         if(LDEBUG){cerr << soliloquy << " running command=\"" << command << "\"" << endl;}
         aurostd::execute(command);
-        aurostd::Sleep(sleep_seconds);process_killed=aurostd::ProcessRunning(process);
+        aurostd::Sleep(sleep_seconds);process_killed=aurostd::ProcessRunning(process,user_specific);
       }
     }
     if(!process_killed){
       if(aurostd::IsCommandAvailable("pkill")) {
-        command="pkill "+(sigkill?string("-9 "):string(""))+process+" 2>/dev/null";
+        command="pkill";
+        if(user_specific && !XHOST.user.empty()){command+=" -u "+XHOST.user;}
+        if(sigkill){command+=" -9";}
+        command+=" "+process+" 2>/dev/null";
         if(LDEBUG){cerr << soliloquy << " running command=\"" << command << "\"" << endl;}
         aurostd::execute(command);
-        aurostd::Sleep(sleep_seconds);process_killed=aurostd::ProcessRunning(process);
+        aurostd::Sleep(sleep_seconds);process_killed=aurostd::ProcessRunning(process,user_specific);
       }
     }
     if(!process_killed){
       if(aurostd::IsCommandAvailable("kill")) {
-        vector<string> vpids=aurostd::ProcessPIDs(process);
+        vector<string> vpids=aurostd::ProcessPIDs(process,user_specific);
         if(vpids.empty()){process_killed=true;}
         else{
-          command="kill "+(sigkill?string("-9 "):string(""))+aurostd::joinWDelimiter(vpids," ")+" 2>/dev/null";
+          command="kill";
+          if(user_specific && !XHOST.user.empty()){command+=" -u "+XHOST.user;}
+          if(sigkill){command+=" -9";}
+          command+=" "+aurostd::joinWDelimiter(vpids," ")+" 2>/dev/null";
           if(LDEBUG){cerr << soliloquy << " running command=\"" << command << "\"" << endl;}
           aurostd::execute(command);
-          aurostd::Sleep(sleep_seconds);process_killed=aurostd::ProcessRunning(process);
+          aurostd::Sleep(sleep_seconds);process_killed=aurostd::ProcessRunning(process,user_specific);
         }
       }
     }
@@ -1710,8 +1735,8 @@ namespace aurostd {
   // Function ProcessRenice
   // ***************************************************************************
   //CO20210315
-  void ProcessRenice(const string& process,int nvalue){ //CO20210315
-    vector<string> vpids=ProcessPIDs(process);
+  void ProcessRenice(const string& process,int nvalue,bool user_specific){ //CO20210315
+    vector<string> vpids=ProcessPIDs(process,user_specific);
     if(vpids.empty()){return;}
     string command="renice "+aurostd::utype2string(nvalue)+" "+aurostd::joinWDelimiter(vpids," ");
     aurostd::execute(command);
