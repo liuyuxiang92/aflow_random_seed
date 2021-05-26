@@ -1606,7 +1606,7 @@ namespace aurostd {
     string command="";
     vector<string> vlines,vtokens,vpids;
     uint i=0,j=0;
-    if(aurostd::IsCommandAvailable("pgrep")) {
+    if(0 && aurostd::IsCommandAvailable("pgrep")) { //pgrep requires -a on some installations (instead of -l), better to rely on ps: https://fossies.org/linux/procps-ng/pgrep.1
       command="pgrep -l"; //the -l is important, we will need to neglect the subshell call below
       if(user_specific && !XHOST.user.empty()){command+=" -u "+XHOST.user;}
       command+=" -f "+process+" 2> /dev/null";  //the -f is important, will match mpivasp46s in /usr/bin/mpivasp46s
