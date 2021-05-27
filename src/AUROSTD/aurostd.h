@@ -318,6 +318,7 @@ namespace aurostd {
 }
 // ----------------------------------------------------------------------------
 
+//FSIO: file system IO
 enum FSIO {  //CO20200624 - for execute2string
   stdout_fsio,
   stderr_fsio,

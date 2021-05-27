@@ -1606,37 +1606,42 @@ namespace aurostd {
     string command="";
     vector<string> vlines,vtokens,vpids;
     uint i=0,j=0;
-    if(0 && aurostd::IsCommandAvailable("pgrep")) { //pgrep requires -a on some installations (instead of -l), better to rely on ps: https://fossies.org/linux/procps-ng/pgrep.1
-      command="pgrep -l"; //the -l is important, we will need to neglect the subshell call below
-      if(user_specific && !XHOST.user.empty()){command+=" -u "+XHOST.user;}
-      command+=" -f "+process+" 2> /dev/null";  //the -f is important, will match mpivasp46s in /usr/bin/mpivasp46s
-      if(LDEBUG){cerr << soliloquy << " running command=\"" << command << "\"" << endl;}
-      string output=aurostd::execute2string(command);
-      if(LDEBUG){cerr << soliloquy << " pgrep output:" << endl << "\"" << output << "\"" << endl;}
-      if(0){  //before -f and -l
-        aurostd::StringSubst(output,"\n"," ");
-        output=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(output);
-        if(output.empty()){return vpids;}
-        aurostd::string2tokens(output,vpids," ");
+    if(aurostd::IsCommandAvailable("pgrep")) {
+      string command_pgrep="pgrep -a";  //needed over -l on fossies installs: https://fossies.org/linux/procps-ng/pgrep.1
+      if(!aurostd::execute2string(command_pgrep+" test",stderr_fsio).empty()){command_pgrep="pgrep -l";}  //should work on all linux  //the "test" is a dummy to see if the pgrep command works
+      if(aurostd::execute2string(command_pgrep+" test",stderr_fsio).empty()){ //the "test" is a dummy to see if the pgrep command works
+        command=command_pgrep; //the -a/-l is important, we will need to neglect the subshell call below
+        if(user_specific && !XHOST.user.empty()){command+=" -u "+XHOST.user;}
+        command+=" -f "+process+" 2> /dev/null";  //the -f is important, will match mpivasp46s in /usr/bin/mpivasp46s
+        if(LDEBUG){cerr << soliloquy << " running command=\"" << command << "\"" << endl;}
+        string output=aurostd::execute2string(command);
+        if(LDEBUG){cerr << soliloquy << " pgrep output:" << endl << "\"" << output << "\"" << endl;}
+        if(0){  //before -f and -l
+          aurostd::StringSubst(output,"\n"," ");
+          output=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(output);
+          if(output.empty()){return vpids;}
+          aurostd::string2tokens(output,vpids," ");
+        }
+        aurostd::string2vectorstring(output,vlines);
+        for(i=0;i<vlines.size();i++){
+          aurostd::string2tokens(vlines[i],vtokens," ");
+          if(vtokens.size()<2){continue;}
+          const string& pid=vtokens[0];
+          string proc=vtokens[1]; //since we split on " ", we need to join columns 11-onward
+          for(j=2;j<vtokens.size();j++){proc+=" "+vtokens[j];}
+          if(LDEBUG){cerr << soliloquy << " proc[i=" << i << "]=\"" << proc << "\"" << endl;}
+          if(proc.find(process)==string::npos){continue;}
+          if(proc.find(command)!=string::npos){continue;} //ps aux | grep ... always returns itself, neglect  //do a find() instead of == here
+          vpids.push_back(pid);
+        }
+        if(LDEBUG){
+          cerr << soliloquy << " vpids=" << aurostd::joinWDelimiter(vpids,",") << endl;
+          cerr << soliloquy << " vpids.empty()=" << vpids.empty() << endl;
+        }
+        return vpids;
       }
-      aurostd::string2vectorstring(output,vlines);
-      for(i=0;i<vlines.size();i++){
-        aurostd::string2tokens(vlines[i],vtokens," ");
-        if(vtokens.size()<2){continue;}
-        const string& pid=vtokens[0];
-        string proc=vtokens[1]; //since we split on " ", we need to join columns 11-onward
-        for(j=2;j<vtokens.size();j++){proc+=" "+vtokens[j];}
-        if(LDEBUG){cerr << soliloquy << " proc[i=" << i << "]=\"" << proc << "\"" << endl;}
-        if(proc.find(process)==string::npos){continue;}
-        if(proc.find(command)!=string::npos){continue;} //ps aux | grep ... always returns itself, neglect  //do a find() instead of == here
-        vpids.push_back(pid);
-      }
-      if(LDEBUG){
-        cerr << soliloquy << " vpids=" << aurostd::joinWDelimiter(vpids,",") << endl;
-        cerr << soliloquy << " vpids.empty()=" << vpids.empty() << endl;
-      }
-      return vpids;
     }
+    
     if(aurostd::IsCommandAvailable("ps") && aurostd::IsCommandAvailable("grep")) {
       //FR recommends ps aux vs. ps -e
       //tested on linux and mac, PIDs are in second column, process is the last column
@@ -1716,7 +1721,7 @@ namespace aurostd {
         if(vpids.empty()){process_killed=true;}
         else{
           command="kill";
-          if(user_specific && !XHOST.user.empty()){command+=" -u "+XHOST.user;}
+          //[CO20210315 - does not work, user-specific comes from PID search]if(user_specific && !XHOST.user.empty()){command+=" -u "+XHOST.user;}
           if(sigkill){command+=" -9";}
           command+=" "+aurostd::joinWDelimiter(vpids," ")+" 2>/dev/null";
           if(LDEBUG){cerr << soliloquy << " running command=\"" << command << "\"" << endl;}
