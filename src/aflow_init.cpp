@@ -1884,7 +1884,7 @@ bool GetVASPBinaryFromLOCK(const string& directory,string& vasp_bin,int& ncpus){
     if(LDEBUG){cerr << soliloquy << " found line containing execution command: \"" << vlines[i] << "\"" << endl;}
     aurostd::string2tokens(vlines[i],vtokens," ");
     for(j=0;j<vtokens.size();j++){
-      if((j-2)<vtokens.size() && vtokens[j]==DEFAULT_VASP_OUT){ //looking for sequence VASP_BIN >> VASP_OUT //if j goes below 0, then it goes to max uint
+      if((j-2)<vtokens.size() && (vtokens[j]==DEFAULT_VASP_OUT||vtokens[j]==DEFAULT_VASP_OUT+";")){ //looking for sequence VASP_BIN >> VASP_OUT //if j goes below 0, then it goes to max uint //CO20210315 - adding semicolon as NO HOST mode used to print it
         vasp_bin=vtokens[j-2];
         ncpus=1;  //set default
         if((j-3)<vtokens.size() && aurostd::isfloat(vtokens[j-3])){ncpus=aurostd::string2utype<int>(vtokens[j-3]);} //grab if available, it will be just before the bin

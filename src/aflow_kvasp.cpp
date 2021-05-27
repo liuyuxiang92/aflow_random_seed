@@ -3979,17 +3979,17 @@ namespace KBIN {
               aus << "00000  MESSAGE" << VASP_KEYWORD_EXECUTION;
               if(!kflags.KBIN_MPI_OPTIONS.empty()){
                 aus_exec << kflags.KBIN_MPI_OPTIONS << endl;
-                aus << kflags.KBIN_MPI_OPTIONS << "; ";
+                //[CO20210315 - do not print, will confuse vasp monitor]aus << kflags.KBIN_MPI_OPTIONS << "; ";
               }
               if(!kflags.KBIN_MPI_START.empty()){
                 aus_exec << kflags.KBIN_MPI_START << " > " << DEFAULT_VASP_OUT << endl;
-                aus << kflags.KBIN_MPI_START << " > " << DEFAULT_VASP_OUT << "; ";
+                //[CO20210315 - do not print, will confuse vasp monitor]aus << kflags.KBIN_MPI_START << " > " << DEFAULT_VASP_OUT << "; ";
               }
               aus_exec << kflags.KBIN_MPI_COMMAND << " " << kflags.KBIN_MPI_NCPUS << " " << kflags.KBIN_MPI_BIN << " >> " << DEFAULT_VASP_OUT << endl;
-              aus << kflags.KBIN_MPI_COMMAND << " " << kflags.KBIN_MPI_NCPUS << " " << kflags.KBIN_MPI_BIN << " >> " << DEFAULT_VASP_OUT << "; ";
+              aus << kflags.KBIN_MPI_COMMAND << " " << kflags.KBIN_MPI_NCPUS << " " << kflags.KBIN_MPI_BIN << " >> " << DEFAULT_VASP_OUT; //[CO20210315 - do not print, will confuse vasp monitor]<< "; ";
               if(!kflags.KBIN_MPI_STOP.empty()){
                 aus_exec << kflags.KBIN_MPI_STOP << " >> " << DEFAULT_VASP_OUT << endl;
-                aus << kflags.KBIN_MPI_STOP << " >> " << DEFAULT_VASP_OUT;
+                //[CO20210315 - do not print, will confuse vasp monitor]aus << kflags.KBIN_MPI_STOP << " >> " << DEFAULT_VASP_OUT;
               }
               aus << Message(_AFLOW_FILE_NAME_,aflags,string(_AFLOW_MESSAGE_DEFAULTS_)+",memory") << endl; //CO20170628 - SLOW WITH MEMORY
               aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);	
