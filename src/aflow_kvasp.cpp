@@ -3077,7 +3077,8 @@ namespace KBIN {
       cerr << soliloquy << " memory_used=" << memory_total-memory_free << endl;
       cerr << soliloquy << " memory_total=" << memory_total << endl;
     }
-    if(VERBOSE){
+    bool approaching_oom=(memory_usage_percentage>=MEMORY_MAX_USAGE);
+    if(VERBOSE||approaching_oom){
       aus << "00000  MESSAGE memory used: " << aurostd::utype2string(memory_usage_percentage,4,FIXED_STREAM) << "% (max=" << MEMORY_MAX_USAGE << "%)" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
       if(LDEBUG){cerr << aus.str();}
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -3297,7 +3298,7 @@ namespace KBIN {
     //
     scheme="MEMORY";
     found_warning=ReachedAccuracy2bool(scheme,xRequiresAccuracy,xmessage,vasp_still_running);
-    found_warning=(found_warning && (aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,AFLOW_MEMORY_TAG,true,true,true,grep_stop_condition) || memory_usage_percentage>=MEMORY_MAX_USAGE));
+    found_warning=(found_warning && (aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,AFLOW_MEMORY_TAG,true,true,true,grep_stop_condition) || approaching_oom));
     xwarning.flag(scheme,found_warning);
     //
     //on qrats, we see this
