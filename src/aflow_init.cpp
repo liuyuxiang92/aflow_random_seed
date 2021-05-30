@@ -2197,6 +2197,25 @@ void AFLOW_monitor_VASP(const string& directory){
     //check vasp output file here
     KBIN::VASP_ProcessWarnings(xvasp,aflags,kflags,xmessage,xwarning,xmonitor,FileMESSAGE);
 
+    //check memory again, it's possible it floated above the threshold only for a second
+    bool ignore_memory=false;
+    memory_usage_percentage=0.0;
+    if(0){  //do not turn off MEMORY because it fails the GetMemory(), it's possible MEMORY was triggered for other reasons (e.g., FROZEN_CALC)
+      if(xwarning.flag("MEMORY")){
+        if(aurostd::GetMemory(memory_free,memory_total)==false){
+          message << "ignoring xwarning.flag(\"MEMORY\"), could not retrieve memory status";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+          ignore_memory=true;
+        }else{
+          memory_usage_percentage=100.0*(((double)(memory_total-memory_free))/((double)(memory_total)));
+          if(memory_usage_percentage<MEMORY_MAX_USAGE){
+            message << "ignoring xwarning.flag(\"MEMORY\"), memory usage dropped below threshold ("+aurostd::utype2string(memory_usage_percentage,2,FIXED_STREAM)+"% memory usage)";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+            ignore_memory=true;
+          }
+        }
+        if(ignore_memory){xwarning.flag("MEMORY",false);}
+      }
+    }
+
     bool kill_vasp=false;
     if(xwarning.flag()){  //if any flag is on
       kill_vasp=true;
@@ -2239,10 +2258,10 @@ void AFLOW_monitor_VASP(const string& directory){
           //special case for MEMORY, the error will be triggered in the --monitor_vasp instance, and not in the --run one
           //so write out "AFLOW ERROR: AFLOW_MEMORY" so it gets caught in the --run instance
           if(xwarning.flag("MEMORY")){
-            memory_string=" "+string(AFLOW_MEMORY_TAG); //pre-pending space to match formating
+            memory_string=" "+string(AFLOW_MEMORY_TAG); //pre-pending space to match formatting
             if(aurostd::GetMemory(memory_free,memory_total)){
               memory_usage_percentage=100.0*(((double)(memory_total-memory_free))/((double)(memory_total)));
-              memory_string+=" ("+aurostd::utype2string(memory_usage_percentage,4,FIXED_STREAM)+"% memory usage)";  //CO20210315 - use fixed stream here, since we'll have two sig figs before decimal, and two after (99.99%)
+              memory_string+=" ("+aurostd::utype2string(memory_usage_percentage,2,FIXED_STREAM)+"% memory usage)";  //CO20210315 - use fixed stream here, since we'll have two sig figs before decimal, and two after (99.99%)
             }
             memory_string+="\n";
             aurostd::string2file(memory_string,xvasp.Directory+"/"+DEFAULT_VASP_OUT,"APPEND");

@@ -3079,7 +3079,7 @@ namespace KBIN {
     }
     bool approaching_oom=(memory_usage_percentage>=MEMORY_MAX_USAGE);
     if(VERBOSE||approaching_oom){
-      aus << "00000  MESSAGE memory used: " << aurostd::utype2string(memory_usage_percentage,4,FIXED_STREAM) << "% (max=" << MEMORY_MAX_USAGE << "%)" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+      aus << "00000  MESSAGE memory used: " << aurostd::utype2string(memory_usage_percentage,2,FIXED_STREAM) << "% (max=" << MEMORY_MAX_USAGE << "%)" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
       if(LDEBUG){cerr << aus.str();}
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     }
