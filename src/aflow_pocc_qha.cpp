@@ -7,23 +7,24 @@
 // Written by Andriy Smolyanyuk, 2021.
 //
 // This file provides a framework to calculate thermodynamic properties for
-// disordered materials modeled using the POCC + QHA methodology.
+// disordered materials modeled using the POCC methodology.
 
-#ifndef _AFLOW_POCC_QHA_CPP_
-#define _AFLOW_POCC_QHA_CPP_
+#ifndef _AFLOW_POCC_THERMO_CPP_
+#define _AFLOW_POCC_THERMO_CPP_
 
 #include <cfloat>
 #include "aflow.h"
 #include "aflow_pocc.h"
 
-#define _DEBUG_POCC_QHA_ false
+#define _DEBUG_POCC_THERMO_ false
 
 #define SW 5  // width of columns with blank space separator
 #define TW 15 // width of columns containing label/number
 
-
-
+///////////////////////////////////////////////////////////////////////////////
 namespace pocc {
+  /// This class is used to calculate  thermodynamic properties over the ensemble,
+  /// defined by structures generated using POCC method.
   class EnsembleThermo : public xStream {
     public:
       EnsembleThermo(ostream &oss=std::cout);
@@ -33,32 +34,29 @@ namespace pocc {
           ofstream &FileMESSAGE, ostream &oss=std::cout);
       const EnsembleThermo& operator=(const EnsembleThermo &ens);
       ~EnsembleThermo();
-      void clear();
       apl::QHA qha;
       apl::EOSmethod eos_method;
       uint Nstructures;
       int Nvolumes;
       int nrows;
+      double Ensemble_Vmin, Ensemble_Vmax;
       xvector<double> T;
       xmatrix<double> FV;
       xvector<double> volumes;
       vector<int> degeneracies;
       vector<xmatrix<double> > coeffs_list;
       xvector<double> Veq, Feq, B, Bprime, Cv, Cp, gamma, beta;
-      double Ensemble_Vmin, Ensemble_Vmax;
       double logZ(const xvector<double> &E, const vector<int> &degeneracies, double T);
       xvector<double> calcThermalExpansionSG(const xvector<double> &volumes, double dT);
       xvector<double> calcIsobaricSpecificHeatSG(const xvector<double> &free_energies, double dT);
       void calculateThermodynamicProperties();
       void writeThermodynamicProperties();
-//      double logZ(const xvector<double> &E, const vector<int> &degeneracies, double T)
-//      xvector<double> calcIsobaricSpecificHeatSG(const xvector<double> &free_energies, double dT)
-//      xvector<double> calcThermalExpansionSG(const xvector<double> &volumes, double dT)
+      void clear();
     private:
      void readFVTParameters(const string &filename, const string &blockname,
-        uint &Nvolumes, uint &Ntemperatures);
-      void readFVTdata(const string& filename, const string& blockname,
-        uint n_volumes, uint n_temperatures, xvector<double> &t,
+         uint &Nvolumes, uint &Ntemperatures);
+      void readFVTdata(const string & dirname, const string& filename,
+        const string& blockname, uint n_volumes, uint n_temperatures, xvector<double> &t,
         xmatrix<double> &c, double &Vmin, double &Vmax);
       bool readCoeffData(const string& filename, const string& blockname,
         xvector<double> &T, xmatrix<double> &coeffs);
@@ -68,10 +66,24 @@ namespace pocc {
       void copy(const EnsembleThermo &ens);
   };
 
-  /// Reads FVT parameters
+  /// Reads the parameters N_VOLUMES (number of volumes) and N_TEMPERATURES
+  /// (number of temperatures) from the file.
+  /// These parameters define the amount of data entries in the
+  /// free energy-volume-temperature (FVT) data block.
+  ///
+  /// The following format is used:
+  /// [blockname_FVT_PARAMETERS]START
+  /// N_VOLUMES=5
+  /// N_TEMPERATURES=201
+  /// [blockname_FVT_PARAMETERS]STOP
+  ///
+  /// @param blockname defines the type of calculation that was used to generate
+  /// the FVT data.
   void EnsembleThermo::readFVTParameters(const string &filename,
       const string &blockname, uint &Nvolumes, uint &Ntemperatures)
   {
+    string function = "EnsembleThermo::readFVTParameters():", msg = "";
+
     Nvolumes = 0; Ntemperatures = 0;
 
     string file = aurostd::efile2string(filename);
@@ -90,7 +102,8 @@ namespace pocc {
           Nvolumes = tokens[1];
         }
         else{
-          // TODO: error
+          msg = "Failed to extract N_VOLUMES parameter.";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,function,msg,_FILE_CORRUPT_);
         }
       }
 
@@ -100,28 +113,55 @@ namespace pocc {
           Ntemperatures = tokens[1];
         }
         else{
-          // TODO: error
+          msg = "Failed to extract N_TEMPERATURES parameter.";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,function,msg,_FILE_CORRUPT_);
         }
       }
     }
   }
 
-  /// Reads FVT data from file
-  void EnsembleThermo::readFVTdata(const string& filename, const string& blockname,
-      uint n_volumes, uint n_temperatures,
+  /// Reads the free energy-volume-temperature data from file.
+  /// The following format is used (first column is volume, second column is
+  /// the total free energy, empty lines are ignored and it is allowed to
+  /// have more than two columns, but the data in extra columns is ignored):
+  ///
+  /// [blockname_FVT]START
+  /// # T = 0 K
+  ///     11.83833032        -3.759537431       0.03411044646                   0        -3.793647878
+  ///      12.6454892        -3.863598492       0.02981390092                   0        -3.893412393
+  ///     13.45264809        -3.901567423       0.02580288732                   0         -3.92737031
+  ///     14.25980697        -3.893411314       0.02216216581                   0         -3.91557348
+  ///     15.06696586        -3.853770428       0.01915647489                   0        -3.872926903
+  ///
+  ///
+  /// # T = 10 K
+  ///     11.83833032        -3.759537674       0.03411020371                   0        -3.793647878
+  ///      12.6454892        -3.863598841       0.02981355113                   0        -3.893412393
+  ///     13.45264809         -3.90156796       0.02580234964                   0         -3.92737031
+  ///     14.25980697        -3.893412151       0.02216132936                   0         -3.91557348
+  ///     15.06696586        -3.853771607       0.01915529576                   0        -3.872926903
+  ///
+  /// ...
+  ///
+  /// [blockname_FVT]STOP
+  ///
+  /// @param blockname defines the type of calculation that was used to generate
+  /// the FVT data.
+  void EnsembleThermo::readFVTdata(const string &dirname, const string& filename,
+      const string& blockname, uint n_volumes, uint n_temperatures,
       xvector<double> &t, xmatrix<double> &c, double &Vmin, double &Vmax)
   {
+    string function = "EnsembleThermo::readFVTdata():", msg = "";
+
     string block = "[" + blockname + "_FVT]";
     string data_block;
-    string file = aurostd::efile2string(filename);
-    cout << "success: " << aurostd::ExtractToStringEXPLICIT(file, 
-        data_block, block + "START", block + "STOP") << endl;
+    string file = aurostd::efile2string(dirname + "/" + filename);
+    aurostd::ExtractToStringEXPLICIT(file, data_block, block + "START", block + "STOP");
     vector<string> v_data_block = aurostd::string2vectorstring(data_block);
 
     if (v_data_block.size() != (n_volumes+1)*n_temperatures){ // +1 to account for the line with the value of temperature
-      cout << "incon" << endl;
-      exit(0);
-      // TODO: error
+      msg = "Inconsistent size of the block of data with N_VOLUMES and N_TEMPERATURES parameters.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function,msg,_FILE_CORRUPT_);
     }
 
     vector<double> temperatures;
@@ -135,8 +175,8 @@ namespace pocc {
       id = t*(n_volumes+1);
       aurostd::string2tokens(v_data_block[id], d_tokens, "=");
       if (d_tokens.size() != 2){
-        cout << "eror size tokens" << endl;
-        exit(0);
+        msg = "Failed to extract the value of the temperature.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function,msg,_FILE_CORRUPT_);
       }
 
       T = d_tokens[1];
@@ -150,14 +190,13 @@ namespace pocc {
         coeffs.push_back(qha.fitToEOSmodel(V, F, apl::EOS_SJ));
         temperatures.push_back(T);
       } catch (aurostd::xerror e){
-        // QHA throws _VALUE_RANGE_ exception only when there is no minimum in
+        // the _VALUE_RANGE_ exception is thrown when there is no minimum in
         // the energy-volume relation: at this point the calculation of
         // thermodynamic properties should be stopped and a warning should be
         // printed, and all calculated data should be saved to the file
         if (e.error_code == _VALUE_RANGE_){
           pflow::logger(e.whereFileName(), e.whereFunction(), e.error_message,
-            ".", *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
-          // TODO
+            dirname, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
           break;
         }
         else{
@@ -178,8 +217,16 @@ namespace pocc {
     Vmax = aurostd::max(V);
   }
 
-  /// Reads fitting coefficients from the filename file.
+  /// Reads the fitting coefficients from the filename file as generated by 
+  /// the QHA module.
   /// QHA and EOS methods are defined by blockname.
+  /// The following format is used (first column is temperature and all other
+  /// columns are the fitting coefficients):
+  /// [blockname_COEFF]START
+  ///  0     -72.365133756841373724     617.96307966655285782     -1781.0747838714055433     1661.5391070343962383
+  /// 10     -72.365379162624094533     617.96446657359308574     -1781.0772952250738399     1661.540528959478479
+  /// ...
+  /// [blockname_COEFF]STOP
   bool EnsembleThermo::readCoeffData(const string& filename, const string& blockname,
       xvector<double> &T, xmatrix<double> &coeffs)
   {
@@ -187,7 +234,7 @@ namespace pocc {
     string block = "[" + blockname + "_COEFF]";
     string data;
 
-    bool LDEBUG = false || _DEBUG_POCC_QHA_ || XHOST.DEBUG;
+    bool LDEBUG = false || _DEBUG_POCC_THERMO_ || XHOST.DEBUG;
 
     // extract data
     aurostd::ExtractToStringEXPLICIT(aurostd::efile2string(filename), data,
@@ -236,41 +283,11 @@ namespace pocc {
     return true;
   }
 
-  /// Checks if the given POCC structure contains imaginary frequencies by
-  /// reading the corresponding flag from filename.
-  /// The flag is IMAG and is set to YES if it contains imaginary frequencies.
-  bool hasImaginary(const string& filename, const string &QHA_method)
-  {
-    string function = "hasImaginary():", msg = "";
-
-    vector<string> vlines;
-    bool has_imaginary = false;
-    if (!aurostd::efile2vectorstring(filename, vlines)){
-      msg = "File " + filename + " does not exist.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg, _FILE_NOT_FOUND_);
-    }
-
-    vector<string> tokens;
-    for (uint i=0; i<vlines.size(); i++){
-      if (vlines[i].find("["+QHA_method+"]") != std::string::npos){
-        if (vlines[i].find("IMAG") != std::string::npos){
-          aurostd::string2tokens(vlines[i],tokens,"=");
-          if (tokens.size() != 2){
-            msg = "Incorrect number of tokens: should be 2 instead of ";
-            msg += tokens.size();
-            throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg, _FILE_CORRUPT_);
-          }
-
-          has_imaginary = tokens[1].find("YES") != std::string::npos;
-          break;
-        }
-      }
-    }
-    return has_imaginary;
-  }
-
   /// Reads POCC structure calculation parameters (minimum and maximum volumes)
   /// from the file filename.
+  /// The following format is used:
+  /// [blockname_COEFF]VMIN=11.838330315765318801
+  /// [blockname_COEFF]VMAX=15.066965856428589987
   void EnsembleThermo::readCoeffParameters(const string& filename, double &Vmin,
       double &Vmax)
   {
@@ -313,6 +330,40 @@ namespace pocc {
     }
   }
 
+  /// Checks if the given POCC structure contains imaginary frequencies by
+  /// reading the corresponding flag from filename.
+  /// The flag is IMAG and is set to YES if it contains imaginary frequencies, i.e:
+  /// [QHA_method]IMAG=NO
+  bool hasImaginary(const string& filename, const string &QHA_method)
+  {
+    string function = "hasImaginary():", msg = "";
+
+    vector<string> vlines;
+    bool has_imaginary = false;
+    if (!aurostd::efile2vectorstring(filename, vlines)){
+      msg = "File " + filename + " does not exist.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg, _FILE_NOT_FOUND_);
+    }
+
+    vector<string> tokens;
+    for (uint i=0; i<vlines.size(); i++){
+      if (vlines[i].find("["+QHA_method+"]") != std::string::npos){
+        if (vlines[i].find("IMAG") != std::string::npos){
+          aurostd::string2tokens(vlines[i],tokens,"=");
+          if (tokens.size() != 2){
+            msg = "Incorrect number of tokens: should be 2 instead of ";
+            msg += tokens.size();
+            throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg, _FILE_CORRUPT_);
+          }
+
+          has_imaginary = tokens[1].find("YES") != std::string::npos;
+          break;
+        }
+      }
+    }
+    return has_imaginary;
+  }
+
   /// Calculates the logarithm of the partition function.
   double EnsembleThermo::logZ(const xvector<double> &E, const vector<int> &degeneracies, double T)
   {
@@ -330,10 +381,11 @@ namespace pocc {
   }
 
   /// Calculates the thermal expansion coefficient as a logarithmic derivative
-  /// of equilibrium volume employing Savitzky-Golay filter for the differentiation.
+  /// of equilibrium volume employing the Savitzky-Golay filter for the 
+  /// differentiation.
   xvector<double> EnsembleThermo::calcThermalExpansionSG(const xvector<double> &volumes, double dT)
   {
-    // Convolution weights for Savitzky-Golay 5pt cubic filter as reported in:
+    // Convolution weights for the Savitzky-Golay 5pt cubic filter as reported in:
     // "General least-squares smoothing and differentiation by the convolution (Savitzky-Golay) method"
     // Peter A. Gorry Analytical Chemistry 1990 62 (6), 570-573
     // https://doi.org/10.1021/ac00205a007
@@ -387,11 +439,11 @@ namespace pocc {
   }
 
   /// Calculates the isobaric specif heat as a second derivative of the free
-  /// energy multiplied by (-1)*temperature employing Savitzky-Golay filter for 
-  /// the differentiation.
+  /// energy multiplied by (-1)*temperature employing the Savitzky-Golay filter 
+  /// for the differentiation.
   xvector<double> EnsembleThermo::calcIsobaricSpecificHeatSG(const xvector<double> &free_energies, double dT)
   {
-    // Convolution weights for Savitzky-Golay 5pt cubic filter as reported in:
+    // Convolution weights for the Savitzky-Golay 5pt cubic filter as reported in:
     // "General least-squares smoothing and differentiation by the convolution (Savitzky-Golay) method"
     // Peter A. Gorry Analytical Chemistry 1990 62 (6), 570-573
     // https://doi.org/10.1021/ac00205a007
@@ -525,7 +577,7 @@ namespace pocc {
     string function = XPID + "EnsembleThermo::EnsembleThermo():";
     string msg = "", file = "";
 
-    bool LDEBUG = false || _DEBUG_POCC_QHA_ || XHOST.DEBUG;
+    bool LDEBUG = false || _DEBUG_POCC_THERMO_ || XHOST.DEBUG;
 
     xStream::initialize(FileMESSAGE, oss);
     this->eos_method = eos_method;
@@ -538,7 +590,6 @@ namespace pocc {
 
     for (uint i=0; i<directories.size(); i++){
       file = directories[i] + "/" + fname;
-      cout << file << std::endl;
 
       if (!aurostd::EFileExist(file)){
         msg = "File " + file + " does not exists:";
@@ -549,16 +600,20 @@ namespace pocc {
       }
 
       if (isFVTprovided){
-        cout << "FVT mode" << std::endl;
+        if (LDEBUG) cerr << function << "FVT mode" << std::endl;
 
         uint Nvolumes = 0, Ntemperatures = 0;
         readFVTParameters(file, calc_type, Nvolumes, Ntemperatures);
 
-        cout  << Nvolumes << " " << Ntemperatures << std::endl;
-        readFVTdata(file, calc_type, Nvolumes, Ntemperatures, T, coeffs, Vmin, Vmax);
+        if (LDEBUG){
+          cerr << function << "Nvolumes="  << Nvolumes;
+          cerr << " Ntemperatures=" << Ntemperatures << std::endl;
+        }
+        readFVTdata(directories[i], fname, calc_type, Nvolumes, Ntemperatures,
+            T, coeffs, Vmin, Vmax);
       }
       else{
-        cout << "COEFF mode" << std::endl;
+        if (LDEBUG) cerr << function << "COFF mode" << std::endl;
 
         readCoeffParameters(file, Vmin, Vmax);
 
@@ -590,23 +645,6 @@ namespace pocc {
       cerr << function << " Ensemble_Vmin = " << Ensemble_Vmin;
       cerr << " Ensemble_Vmax = " << Ensemble_Vmax << std::endl;
     }
-
-//    // collect degeneracies only for stable structures
-//    vector<int> degeneracies;
-//    unsigned long long int isupercell=0;
-//    for (std::list<POccSuperCellSet>::iterator it = l_supercell_sets.begin();
-//         it != l_supercell_sets.end(); ++it)
-//    {
-//      isupercell=std::distance(l_supercell_sets.begin(),it);
-//      if (!v_is_unstable[isupercell]) degeneracies.push_back((*it).getDegeneracy());
-//    }
-//
-//    if (LDEBUG){
-//      cerr << function << " Degeneracies:" << std::endl;
-//      for (uint i=0; i<degeneracies.size(); i++){
-//        cerr << function << " id = " << i << " deg = " << degeneracies[i] << std::endl;
-//      }
-//    }
 
     // check that there is data to work with
     Nstructures = T_list.size();
@@ -703,8 +741,7 @@ namespace pocc {
       // printed, and all calculated data should be saved to the file
       if (e.error_code == _VALUE_RANGE_){
         pflow::logger(e.whereFileName(), e.whereFunction(), e.error_message,
-          ".", *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
-        // TODO
+          aurostd::getPWD(), *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
       }
       else{
         throw;
@@ -792,265 +829,16 @@ namespace pocc {
     }
   }
 
-
-//  /// Calculates POCC-average of QHA-related properties.
-//  void POccCalculator::calculateQHAProperties(apl::QHAmethod qha_method,
-//      apl::EOSmethod eos_method)
-//  {
-//    string function = XPID +  "POccCalculator::calculateQHAProperties():";
-//    string msg = "", filename = "";
-//
-//    bool LDEBUG = false || _DEBUG_POCC_QHA_ || XHOST.DEBUG;
-//
-//    msg = "Performing POCC+QHA post-processing step for ";
-//    msg += apl::QHAmethod2label(qha_method) + " with ";
-//    msg += apl::EOSmethod2label(eos_method) + " EOS.";
-//    pflow::logger(_AFLOW_FILE_NAME_, function, msg, m_aflags.Directory,
-//      *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
-//
-//    double POCC_Vmin = DBL_MAX, POCC_Vmax = 0;
-//    double Vmin = 0, Vmax = 0;
-//    vector<bool> v_is_unstable(m_ARUN_directories.size());
-//
-//    xvector<double> T;
-//    xmatrix<double> coeffs;
-//
-//    vector<xvector<double> > T_list;
-//    vector<xmatrix<double> > coeffs_list;
-//
-//    for (uint i=0; i<m_ARUN_directories.size(); i++){
-//      filename = m_aflags.Directory + "/" + m_ARUN_directories[i] + "/";
-//      filename += DEFAULT_QHA_FILE_PREFIX+DEFAULT_QHA_IMAG_FILE;
-//
-//      if (!aurostd::EFileExist(filename)){
-//        msg = "File " + filename + " does not exists:";
-//        msg += " the calculation will be stopped.";
-//        pflow::logger(_AFLOW_FILE_NAME_, function, msg, m_aflags.Directory,
-//         *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
-//        return;
-//      }
-//
-//      v_is_unstable[i] = hasImaginary(filename, apl::QHAmethod2label(qha_method));
-//
-//      if (!v_is_unstable[i]){
-//        filename = m_aflags.Directory + "/" + m_ARUN_directories[i] + "/";
-//        filename += DEFAULT_QHA_FILE_PREFIX+DEFAULT_QHA_COEFF_FILE;
-//
-//        readCoeffParameters(filename, Vmin, Vmax);
-//
-//        POCC_Vmin = min(Vmin, POCC_Vmin);
-//        POCC_Vmax = max(Vmax, POCC_Vmax);
-//
-//        if (!readCoeffData(filename, apl::QHAmethod2label(qha_method) + "_" + 
-//              apl::EOSmethod2label(eos_method), T, coeffs))
-//        {
-//          msg = "No data was extracted for " + apl::QHAmethod2label(qha_method);
-//          msg += " with " + apl::EOSmethod2label(eos_method) + " EOS.";
-//          msg += " The calculation will be stopped.";
-//          pflow::logger(_AFLOW_FILE_NAME_, function, msg, m_aflags.Directory,
-//           *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
-//          return;
-//        }
-//        T_list.push_back(T);
-//        coeffs_list.push_back(coeffs);
-//      }
-//    }
-//
-//    // to be sure, make the region wider: +-5%
-//    POCC_Vmin *= 0.95;
-//    POCC_Vmax *= 1.05;
-//
-//    if (LDEBUG) cerr << function << " POCC_Vmin = " << POCC_Vmin << " POCC_Vmax = " << POCC_Vmax << std::endl;
-//
-//    // collect degeneracies only for stable structures
-//    vector<int> degeneracies;
-//    unsigned long long int isupercell=0;
-//    for (std::list<POccSuperCellSet>::iterator it = l_supercell_sets.begin();
-//         it != l_supercell_sets.end(); ++it)
-//    {
-//      isupercell=std::distance(l_supercell_sets.begin(),it);
-//      if (!v_is_unstable[isupercell]) degeneracies.push_back((*it).getDegeneracy());
-//    }
-//
-//    if (LDEBUG){
-//      cerr << function << " Degeneracies:" << std::endl;
-//      for (uint i=0; i<degeneracies.size(); i++){
-//        cerr << function << " id = " << i << " deg = " << degeneracies[i] << std::endl;
-//      }
-//    }
-//
-//    // check that there is data to work with
-//    uint Nstructures = T_list.size();
-//    if (!Nstructures){
-//      msg="No data was extracted: check that all QHA calculations are complete.";
-//      throw aurostd::xerror(_AFLOW_FILE_NAME_,function,msg,_FILE_ERROR_);
-//    }
-//
-//    // the temperature range, where QHA is able to calculate the thermodynamic
-//    // properties, might differ for different POCC structures:
-//    // the temperature region for the averaged POCC "material" is at least the
-//    // lowest range among the structures
-//    int nrows = T_list[0].rows;
-//    for (uint i=1; i<Nstructures; i++){
-//      nrows = std::min(nrows, T_list[i].rows);
-//    }
-//
-//    // check that calculations for POCC structures are consistent and the same
-//    // set of temperatures was used for QHA calculation for each of them
-//    for (uint i=0; i<Nstructures-1; i++){
-//      for (int row=1; row<=nrows; row++){
-//        if (!aurostd::isequal(T_list[i][row], T_list[i+1][row])){
-//          msg="Inconsistent list of temperatures among different ";
-//          msg+="POCC::QHA calculations.";
-//          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg,
-//              _VALUE_ILLEGAL_);
-//        }
-//      }
-//    }
-//    T = T_list[0];
-//
-//    // sanity/corruption check: the number of fitting coefficients should
-//    // be the same for all POCC structures
-//    int ncols = coeffs_list[0].cols;
-//    for (uint i=1; i<Nstructures; i++){
-//      if (ncols != coeffs_list[i].cols){
-//        msg="Inconsistent number of fitting coefficients among different ";
-//        msg+="POCC::QHA calculations.";
-//        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg,
-//              _VALUE_ILLEGAL_);
-//      }
-//    }
-//
-//    // generate a set of volumes to determine the EOS for the POCC "material"
-//    static int Nvolumes = 5;
-//    xvector<double> volumes(Nvolumes);
-//    for (int i=1; i<=Nvolumes; i++){
-//      volumes[i] = POCC_Vmin + (POCC_Vmax-POCC_Vmin)*(i-1)/(Nvolumes-1);
-//    }
-//
-//    // use QHA to calculate the thermodynamic properties of the POCC "material"
-//    apl::QHA qha;
-//
-//    xvector<double> F(Nvolumes), E(Nstructures);
-//    xvector<double> Feq(nrows), Veq(nrows), B(nrows), Bprime(nrows);
-//    try{
-//      for (int i=1; i<=nrows; i++){
-//        if (aurostd::isequal(T[i], 0.0)) T[i] = _ZERO_TOL_;
-//
-//        for (int v=volumes.lrows; v<=volumes.urows; v++){
-//          for (uint s=0; s<Nstructures; s++){
-//            // EOS for each POCC structure
-//            E[s+1] = qha.evalEOSmodel(volumes[v], coeffs_list[s](i), eos_method);
-//          }
-//          if (LDEBUG) cerr << function << " E: " << E << std::endl;
-//          // the set of free energies (includes the contribution from the configurational
-//          // entropy) to be used in the fitting procedure
-//          F[v] = -KBOLTZEV * T[i] * logZ(E, degeneracies, T[i]);
-//        }
-//
-//        // fit EOS for the POCC "material"
-//        qha.fitToEOSmodel(volumes, F, eos_method);
-//        Feq[i]    = qha.EOS_energy_at_equilibrium;
-//        Veq[i]    = qha.EOS_volume_at_equilibrium;
-//        B[i]      = qha.EOS_bulk_modulus_at_equilibrium;
-//        Bprime[i] = qha.EOS_Bprime_at_equilibrium;
-//        if (LDEBUG){
-//          cerr << function << " V: " << volumes << std::endl;
-//          cerr << function << " F: " << F << std::endl;
-//        }
-//      }
-//    } catch (aurostd::xerror e){
-//      // QHA throws _VALUE_RANGE_ exception only when there is no minimum in
-//      // the energy-volume relation: at this point the calculation of 
-//      // thermodynamic properties should be stopped and a warning should be
-//      // printed, and all calculated data should be saved to the file
-//      if (e.error_code == _VALUE_RANGE_){
-//        pflow::logger(e.whereFileName(), e.whereFunction(), e.error_message, 
-//          m_aflags.Directory, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
-//      }
-//      else{
-//        throw;
-//      }
-//    }
-//
-//    // calculation of the thermal expansion and heat capacity involves derivatives:
-//    // dT is a temperature step for the derivative
-//    double dT = (max(T)-min(T))/(nrows-1);
-//    if (LDEBUG) cerr << function << " dT = " << dT << std::endl;
-//
-//    // calculate the thermal expansion coefficients
-//    xvector<double> beta = calcThermalExpansionSG(Veq, dT);
-//
-//    // calculate the heat capacity
-//    xvector<double> Cp = calcIsobaricSpecificHeatSG(Feq, dT);
-//    for (int i=1; i<=nrows; i++) Cp[i] *= -T[i]/KBOLTZEV;
-//
-//    xvector<double> Cv(nrows);
-//    for (int i=1; i<=nrows; i++){
-//      Cv[i] = Cp[i] - Veq[i]*T[i]*B[i]*pow(beta[i],2)/eV2GPa/KBOLTZEV;
-//    }
-//
-//    // calculate the average Grueneisen parameters
-//    xvector<double> gamma(nrows);
-//    for (int i=1; i<=nrows; i++){
-//      gamma[i] = (beta[i]/Cv[i])*B[i]*Veq[i]/eV2GPa/KBOLTZEV;
-//    }
-//
-//    // prepare the data for the output
-//    stringstream file;
-//    file.precision(10);
-//
-//    // write header
-//    string block = "[" + apl::QHAmethod2label(qha_method) + "_";
-//    block += apl::EOSmethod2label(eos_method) + "_THERMO]";
-//    file << AFLOWIN_SEPARATION_LINE << std::endl;
-//    file << block + "START" << std::endl;
-//    file << setw(5)  << "#T[K]"          << setw(SW) << ' ' <<
-//      setw(TW) << "V[A^3/atom]"          << setw(SW) << ' ' <<
-//      setw(TW) << "F(V)[eV/atom]"        << setw(SW) << ' ' <<
-//      setw(TW) << "B[GPa]"               << setw(SW) << ' ' <<
-//      setw(TW) << "beta[10^-5/K]"        << setw(SW) << ' ' <<
-//      setw(TW) << "Cv(V)[kB/atom]"       << setw(SW) << ' ' <<
-//      setw(TW) << "Cp(V)[kB/atom]"       << setw(SW) << ' ' <<
-//      setw(TW) << "gamma(beta,B,Cv(V))"  << setw(SW) << ' ' <<
-//      setw(TW) << "Bprime"
-//      << std::endl;
-//
-//    for (int i=1; i<=nrows; i++){
-//      file << setw(5) << T[i]         << setw(SW) << ' ' <<
-//        setw(TW) << Veq[i]            << setw(SW) << ' ' <<
-//        setw(TW) << Feq[i]            << setw(SW) << ' ' <<
-//        setw(TW) << B[i]              << setw(SW) << ' ' <<
-//        setw(TW) << beta[i] * 1e5     << setw(SW) << ' ' <<
-//        setw(TW) << Cv[i]             << setw(SW) << ' ' <<
-//        setw(TW) << Cp[i]             << setw(SW) << ' ' <<
-//        setw(TW) << gamma[i]          << setw(SW) << ' ' <<
-//        setw(TW) << Bprime[i]
-//        << std::endl;
-//    }
-//    file << block + "STOP" << std::endl;
-//    file << AFLOWIN_SEPARATION_LINE << std::endl;
-//
-//    // save data into the file
-//    filename = POCC_FILE_PREFIX + "qha." + DEFAULT_QHA_THERMO_FILE;
-//    if (aurostd::FileExist(filename)){
-//      if (!aurostd::stringstream2file(file, filename, "APPEND")){
-//        msg = "Error writing to " + filename + " file.";
-//        throw aurostd::xerror(_AFLOW_FILE_NAME_,function,msg,_FILE_ERROR_);
-//      }
-//    }
-//    else{
-//      if (!aurostd::stringstream2file(file, filename)){
-//        msg = "Error writing to " + filename + " file.";
-//        throw aurostd::xerror(_AFLOW_FILE_NAME_,function,msg,_FILE_ERROR_);
-//      }
-//    }
-//  }
-
   /// Calculates POCC-average of QHA-related properties for various QHA methods
   /// with various EOS models.
   void POccCalculator::calculateQHAProperties()
   {
+    string function = "POccCalculator::calculateQHAProperties()", msg = "";
+    msg = "Calculating thermodynamic properties for the POCC ensemble using";
+    msg += " the data obtained by QHA";
+    pflow::logger(_AFLOW_FILE_NAME_, function, msg, aurostd::getPWD(),
+            *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+
     apl::QHAmethod qha_method = apl::QHA_CALC;
 
     string filename = "";
@@ -1089,51 +877,15 @@ namespace pocc {
       aurostd::RemoveFile(filename);
     }
 
-    // proceed with the calculation of thermodynamic properties
-    bool FVT = false;
-    string fname = DEFAULT_QHA_FILE_PREFIX;
-    if (FVT){
-      fname += DEFAULT_QHA_FVT_FILE;
-    }
-    else{
-      fname += DEFAULT_QHA_COEFF_FILE;
-    }
-    EnsembleThermo ens(m_ARUN_directories, fname, "QHA", apl::EOS_SJ, FVT,
-        *p_FileMESSAGE);
+    // calculate thermodynamic properties using data provided by QHA reading
+    // the fitting coefficients data (isFVTprovided = false)
+    string fname = DEFAULT_QHA_FILE_PREFIX + DEFAULT_QHA_COEFF_FILE;
+    EnsembleThermo ens(m_ARUN_directories, fname, apl::QHAmethod2label(qha_method),
+        apl::EOS_SJ, false, *p_FileMESSAGE);
     ens.degeneracies = degeneracies;
     ens.calculateThermodynamicProperties();
     ens.writeThermodynamicProperties();
   }
-//  {
-//    static const int N_QHA_methods = 3;
-//    static const apl::QHAmethod QHA_methods[N_QHA_methods] = {apl::QHA_CALC,
-//      apl::QHA3P_CALC, apl::QHANP_CALC};
-//    static const int N_EOS_methods = 5;
-//    static const apl::EOSmethod EOS_methods[N_EOS_methods] = {apl::EOS_SJ,
-//      apl::EOS_BIRCH_MURNAGHAN2, apl::EOS_BIRCH_MURNAGHAN3, apl::EOS_BIRCH_MURNAGHAN4,
-//      apl::EOS_MURNAGHAN};
-//
-//    string function = XPID +  "POccCalculator::calculateQHAProperties():";
-//    string msg = "", filename = "";
-//
-//    msg = "Performing POCC+QHA post-processing step.";
-//    pflow::logger(_AFLOW_FILE_NAME_, function, msg, m_aflags.Directory,
-//      *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
-//
-//    filename = POCC_FILE_PREFIX + "qha." + DEFAULT_QHA_THERMO_FILE;
-//    if (aurostd::FileExist(filename)) aurostd::RemoveFile(filename);
-//
-//    try{
-//      for (int i=0; i<N_QHA_methods; i++){
-//        for (int j=0; j<N_EOS_methods; j++){
-//          POccCalculator::calculateQHAProperties(QHA_methods[i], EOS_methods[j]);
-//        }
-//      }
-//    } catch (aurostd::xerror e) {
-//      pflow::logger(e.whereFileName(), e.whereFunction(), e.error_message,
-//          m_aflags.Directory, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
-//    }
-//  }
 }
 
 #endif
