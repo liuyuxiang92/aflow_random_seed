@@ -1563,16 +1563,15 @@ namespace pocc {
 
     message << "Performing POCC post-processing for these temperatures: " << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(v_temperatures,5),",");pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
 
-    ////TODO: uncomment the following lines
-////    if(1){  //turn off slow pocc-postprocessing
-////      aurostd::RemoveFile(m_aflags.Directory+"/"+POCC_FILE_PREFIX+POCC_OUT_FILE); //clear file
-////      writeResults(); //write temperature-independent properties first
-////      for(uint itemp=0;itemp<v_temperatures.size();itemp++){
-////        calculateRELAXProperties(v_temperatures[itemp]);
-////        calculateSTATICProperties(v_temperatures[itemp]);
-////        writeResults(v_temperatures[itemp]);  //write temperature-dependent properties next
-////      }
-////    }
+    if(1){  //turn off slow pocc-postprocessing
+      aurostd::RemoveFile(m_aflags.Directory+"/"+POCC_FILE_PREFIX+POCC_OUT_FILE); //clear file
+      writeResults(); //write temperature-independent properties first
+      for(uint itemp=0;itemp<v_temperatures.size();itemp++){
+        calculateRELAXProperties(v_temperatures[itemp]);
+        calculateSTATICProperties(v_temperatures[itemp]);
+        writeResults(v_temperatures[itemp]);  //write temperature-dependent properties next
+      }
+    }
     if (m_kflags.KBIN_PHONONS_CALCULATION_AEL) { //CT20200319
       if(LDEBUG){cerr << soliloquy << "Running AEL postprocessing" << endl;}
       calculateElasticProperties(v_temperatures);
