@@ -23,48 +23,191 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace pocc {
-  /// This class is used to calculate  thermodynamic properties over the ensemble,
-  /// defined by structures generated using POCC method.
-  class EnsembleThermo : public xStream {
-    public:
-      EnsembleThermo(ostream &oss=std::cout);
-      EnsembleThermo(const EnsembleThermo &ens);
-      EnsembleThermo(vector<string> &directories, const string &filename,
-          const string &calc_type, apl::EOSmethod eos_method, bool isFVTprovided,
-          ofstream &FileMESSAGE, ostream &oss=std::cout);
-      const EnsembleThermo& operator=(const EnsembleThermo &ens);
-      ~EnsembleThermo();
-      apl::QHA qha;
-      apl::EOSmethod eos_method;
-      uint Nstructures;
-      int Nvolumes;
-      int nrows;
-      double Ensemble_Vmin, Ensemble_Vmax;
-      xvector<double> T;
-      xmatrix<double> FV;
-      xvector<double> volumes;
-      vector<int> degeneracies;
-      vector<xmatrix<double> > coeffs_list;
-      xvector<double> Veq, Feq, B, Bprime, Cv, Cp, gamma, beta;
-      double logZ(const xvector<double> &E, const vector<int> &degeneracies, double T);
-      xvector<double> calcThermalExpansionSG(const xvector<double> &volumes, double dT);
-      xvector<double> calcIsobaricSpecificHeatSG(const xvector<double> &free_energies, double dT);
-      void calculateThermodynamicProperties();
-      void writeThermodynamicProperties();
-      void clear();
-    private:
-     void readFVTParameters(const string &filename, const string &blockname,
-         uint &Nvolumes, uint &Ntemperatures);
-      void readFVTdata(const string & dirname, const string& filename,
-        const string& blockname, uint n_volumes, uint n_temperatures, xvector<double> &t,
-        xmatrix<double> &c, double &Vmin, double &Vmax);
-      bool readCoeffData(const string& filename, const string& blockname,
-        xvector<double> &T, xmatrix<double> &coeffs);
-      void readCoeffParameters(const string& filename, double &Vmin, double &Vmax);
-      // mandatory
-      void free();
-      void copy(const EnsembleThermo &ens);
-  };
+  EnsembleThermo::EnsembleThermo(ostream &oss) : xStream(oss) { free(); }
+  EnsembleThermo::EnsembleThermo(const EnsembleThermo &ens) :
+    xStream(*ens.getOFStream(),*ens.getOSS()){
+      free(); copy(ens);
+  }
+  EnsembleThermo::~EnsembleThermo() { xStream::free(); free(); }
+  const EnsembleThermo& EnsembleThermo::operator=(const EnsembleThermo &ens){
+    copy(ens);
+    return *this;
+  }
+
+  void EnsembleThermo::clear() { free(); }
+
+  /// Initializes all values to "zero" and attempts to clear all containers.
+  void EnsembleThermo::free()
+  {
+    qha.clear();
+    eos_method = apl::EOS_SJ;
+    Nstructures = 0;
+    Nvolumes = 0;
+    nrows = 0;
+    T.clear();
+    FV.clear();
+    volumes.clear();
+    degeneracies.clear();
+    coeffs_list.clear();
+    Veq.clear();
+    Feq.clear();
+    B.clear();
+    Bprime.clear();
+    Cv.clear();
+    Cp.clear();
+    gamma.clear();
+    beta.clear();
+  }
+
+  void EnsembleThermo::copy(const EnsembleThermo &ens)
+  {
+    if (this==&ens) return;
+
+    qha = ens.qha;
+    eos_method = ens.eos_method;
+    Nstructures = ens.Nstructures;
+    Nvolumes = ens.Nvolumes;
+    nrows = ens.nrows;
+    T = ens.T;
+    FV = ens.FV;
+    volumes = ens.volumes;
+    degeneracies = ens.degeneracies;
+    coeffs_list = ens.coeffs_list;
+    Veq = ens.Veq;
+    Feq = ens.Feq;
+    B = ens.B;
+    Bprime = ens.Bprime;
+    Cv = ens.Cv;
+    Cp = ens.Cp;
+    gamma = ens.gamma;
+    beta = ens.beta;
+  }
+
+  EnsembleThermo::EnsembleThermo(vector<string> &directories, const string &fname,
+      const string &calc_type, apl::EOSmethod eos_method, bool isFVTprovided,
+      ofstream &FileMESSAGE, ostream &oss)
+  {
+    string function = XPID + "EnsembleThermo::EnsembleThermo():";
+    string msg = "", file = "";
+
+    bool LDEBUG = false || _DEBUG_POCC_THERMO_ || XHOST.DEBUG;
+
+    xStream::initialize(FileMESSAGE, oss);
+    this->eos_method = eos_method;
+
+    Ensemble_Vmin = DBL_MAX, Ensemble_Vmax = 0;
+    double Vmin = 0, Vmax = 0;
+
+    xmatrix<double> coeffs;
+    vector<xvector<double> > T_list;
+
+    for (uint i=0; i<directories.size(); i++){
+      file = directories[i] + "/" + fname;
+
+      if (!aurostd::EFileExist(file)){
+        msg = "File " + file + " does not exists:";
+        msg += " the calculation will be stopped.";
+        pflow::logger(_AFLOW_FILE_NAME_, function, msg, directories[i],
+         *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
+        return;
+      }
+
+      if (isFVTprovided){
+        if (LDEBUG) cerr << function << "FVT mode" << std::endl;
+
+        uint Nvolumes = 0, Ntemperatures = 0;
+        readFVTParameters(file, calc_type, Nvolumes, Ntemperatures);
+
+        if (LDEBUG){
+          cerr << function << "Nvolumes="  << Nvolumes;
+          cerr << " Ntemperatures=" << Ntemperatures << std::endl;
+        }
+        readFVTdata(directories[i], fname, calc_type, Nvolumes, Ntemperatures,
+            T, coeffs, Vmin, Vmax);
+      }
+      else{
+        if (LDEBUG) cerr << function << "COFF mode" << std::endl;
+
+        readCoeffParameters(file, Vmin, Vmax);
+
+        apl::EOSmethod eos_method = apl::EOS_SJ;
+        if (!readCoeffData(file, calc_type + "_" +
+              apl::EOSmethod2label(eos_method), T, coeffs))
+        {
+          msg = "No data was extracted for " + calc_type;
+          msg += " with " + apl::EOSmethod2label(eos_method) + " EOS.";
+          msg += " The calculation will be stopped.";
+          pflow::logger(_AFLOW_FILE_NAME_, function, msg, directories[i],
+            *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+          return;
+        }
+      }
+
+      Ensemble_Vmin = min(Vmin, Ensemble_Vmin);
+      Ensemble_Vmax = max(Vmax, Ensemble_Vmax);
+
+      T_list.push_back(T);
+      coeffs_list.push_back(coeffs);
+    }
+
+    // to be sure, make the region wider: +-5%
+    Ensemble_Vmin *= 0.95;
+    Ensemble_Vmax *= 1.05;
+
+    if (LDEBUG){
+      cerr << function << " Ensemble_Vmin = " << Ensemble_Vmin;
+      cerr << " Ensemble_Vmax = " << Ensemble_Vmax << std::endl;
+    }
+
+    // check that there is data to work with
+    Nstructures = T_list.size();
+    if (!Nstructures){
+      msg="No data was extracted: check that all QHA calculations are complete.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function,msg,_FILE_ERROR_);
+    }
+
+    // the temperature range, where QHA is able to calculate the thermodynamic
+    // properties, might differ for different POCC structures:
+    // the temperature region for the averaged POCC "material" is at least the
+    // lowest range among the structures
+    nrows = T_list[0].rows;
+    for (uint i=1; i<Nstructures; i++){
+      nrows = std::min(nrows, T_list[i].rows);
+    }
+
+    // check that calculations for POCC structures are consistent and the same
+    // set of temperatures was used for QHA calculation for each of them
+    for (uint i=0; i<Nstructures-1; i++){
+      for (int row=1; row<=nrows; row++){
+        if (!aurostd::isequal(T_list[i][row], T_list[i+1][row])){
+          msg="Inconsistent list of temperatures among different ";
+          msg+="POCC::QHA calculations.";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg,
+              _VALUE_ILLEGAL_);
+        }
+      }
+    }
+    T = T_list[0];
+
+    // sanity/corruption check: the number of fitting coefficients should
+    // be the same for all POCC structures
+    int ncols = coeffs_list[0].cols;
+    for (uint i=1; i<Nstructures; i++){
+      if (ncols != coeffs_list[i].cols){
+        msg="Inconsistent number of fitting coefficients among different ";
+        msg+="POCC::QHA calculations.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg,
+              _VALUE_ILLEGAL_);
+      }
+    }
+
+    // generate a set of volumes to determine the EOS for the POCC "material"
+    Nvolumes = 5;
+    volumes = xvector<double>(Nvolumes);
+    for (int i=1; i<=Nvolumes; i++){
+      volumes[i] = Ensemble_Vmin + (Ensemble_Vmax-Ensemble_Vmin)*(i-1)/(Nvolumes-1);
+    }
+  }
 
   /// Reads the parameters N_VOLUMES (number of volumes) and N_TEMPERATURES
   /// (number of temperatures) from the file.
@@ -509,192 +652,6 @@ namespace pocc {
     return Cp;
   }
 
-
-  EnsembleThermo::EnsembleThermo(ostream &oss) : xStream(oss) { free(); }
-  EnsembleThermo::EnsembleThermo(const EnsembleThermo &ens) :
-    xStream(*ens.getOFStream(),*ens.getOSS()){
-      free(); copy(ens);
-  }
-  EnsembleThermo::~EnsembleThermo() { xStream::free(); free(); }
-  const EnsembleThermo& EnsembleThermo::operator=(const EnsembleThermo &ens){
-    copy(ens);
-    return *this;
-  }
-
-  void EnsembleThermo::clear() { free(); }
-
-  /// Initializes all values to "zero" and attempts to clear all containers.
-  void EnsembleThermo::free()
-  {
-    qha.clear();
-    eos_method = apl::EOS_SJ;
-    Nstructures = 0;
-    Nvolumes = 0;
-    nrows = 0;
-    T.clear();
-    FV.clear();
-    volumes.clear();
-    degeneracies.clear();
-    coeffs_list.clear();
-    Veq.clear();
-    Feq.clear();
-    B.clear();
-    Bprime.clear();
-    Cv.clear();
-    Cp.clear();
-    gamma.clear();
-    beta.clear();
-  }
-
-  void EnsembleThermo::copy(const EnsembleThermo &ens)
-  {
-    if (this==&ens) return;
-
-    qha = ens.qha;
-    eos_method = ens.eos_method;
-    Nstructures = ens.Nstructures;
-    Nvolumes = ens.Nvolumes;
-    nrows = ens.nrows;
-    T = ens.T;
-    FV = ens.FV;
-    volumes = ens.volumes;
-    degeneracies = ens.degeneracies;
-    coeffs_list = ens.coeffs_list;
-    Veq = ens.Veq;
-    Feq = ens.Feq;
-    B = ens.B;
-    Bprime = ens.Bprime;
-    Cv = ens.Cv;
-    Cp = ens.Cp;
-    gamma = ens.gamma;
-    beta = ens.beta;
-  }
-
-  EnsembleThermo::EnsembleThermo(vector<string> &directories, const string &fname,
-      const string &calc_type, apl::EOSmethod eos_method, bool isFVTprovided,
-      ofstream &FileMESSAGE, ostream &oss)
-  {
-    string function = XPID + "EnsembleThermo::EnsembleThermo():";
-    string msg = "", file = "";
-
-    bool LDEBUG = false || _DEBUG_POCC_THERMO_ || XHOST.DEBUG;
-
-    xStream::initialize(FileMESSAGE, oss);
-    this->eos_method = eos_method;
-
-    Ensemble_Vmin = DBL_MAX, Ensemble_Vmax = 0;
-    double Vmin = 0, Vmax = 0;
-
-    xmatrix<double> coeffs;
-    vector<xvector<double> > T_list;
-
-    for (uint i=0; i<directories.size(); i++){
-      file = directories[i] + "/" + fname;
-
-      if (!aurostd::EFileExist(file)){
-        msg = "File " + file + " does not exists:";
-        msg += " the calculation will be stopped.";
-        pflow::logger(_AFLOW_FILE_NAME_, function, msg, directories[i],
-         *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
-        return;
-      }
-
-      if (isFVTprovided){
-        if (LDEBUG) cerr << function << "FVT mode" << std::endl;
-
-        uint Nvolumes = 0, Ntemperatures = 0;
-        readFVTParameters(file, calc_type, Nvolumes, Ntemperatures);
-
-        if (LDEBUG){
-          cerr << function << "Nvolumes="  << Nvolumes;
-          cerr << " Ntemperatures=" << Ntemperatures << std::endl;
-        }
-        readFVTdata(directories[i], fname, calc_type, Nvolumes, Ntemperatures,
-            T, coeffs, Vmin, Vmax);
-      }
-      else{
-        if (LDEBUG) cerr << function << "COFF mode" << std::endl;
-
-        readCoeffParameters(file, Vmin, Vmax);
-
-        apl::EOSmethod eos_method = apl::EOS_SJ;
-        if (!readCoeffData(file, calc_type + "_" +
-              apl::EOSmethod2label(eos_method), T, coeffs))
-        {
-          msg = "No data was extracted for " + calc_type;
-          msg += " with " + apl::EOSmethod2label(eos_method) + " EOS.";
-          msg += " The calculation will be stopped.";
-          pflow::logger(_AFLOW_FILE_NAME_, function, msg, directories[i],
-            *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
-          return;
-        }
-      }
-
-      Ensemble_Vmin = min(Vmin, Ensemble_Vmin);
-      Ensemble_Vmax = max(Vmax, Ensemble_Vmax);
-
-      T_list.push_back(T);
-      coeffs_list.push_back(coeffs);
-    }
-
-    // to be sure, make the region wider: +-5%
-    Ensemble_Vmin *= 0.95;
-    Ensemble_Vmax *= 1.05;
-
-    if (LDEBUG){
-      cerr << function << " Ensemble_Vmin = " << Ensemble_Vmin;
-      cerr << " Ensemble_Vmax = " << Ensemble_Vmax << std::endl;
-    }
-
-    // check that there is data to work with
-    Nstructures = T_list.size();
-    if (!Nstructures){
-      msg="No data was extracted: check that all QHA calculations are complete.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function,msg,_FILE_ERROR_);
-    }
-
-    // the temperature range, where QHA is able to calculate the thermodynamic
-    // properties, might differ for different POCC structures:
-    // the temperature region for the averaged POCC "material" is at least the
-    // lowest range among the structures
-    nrows = T_list[0].rows;
-    for (uint i=1; i<Nstructures; i++){
-      nrows = std::min(nrows, T_list[i].rows);
-    }
-
-    // check that calculations for POCC structures are consistent and the same
-    // set of temperatures was used for QHA calculation for each of them
-    for (uint i=0; i<Nstructures-1; i++){
-      for (int row=1; row<=nrows; row++){
-        if (!aurostd::isequal(T_list[i][row], T_list[i+1][row])){
-          msg="Inconsistent list of temperatures among different ";
-          msg+="POCC::QHA calculations.";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg,
-              _VALUE_ILLEGAL_);
-        }
-      }
-    }
-    T = T_list[0];
-
-    // sanity/corruption check: the number of fitting coefficients should
-    // be the same for all POCC structures
-    int ncols = coeffs_list[0].cols;
-    for (uint i=1; i<Nstructures; i++){
-      if (ncols != coeffs_list[i].cols){
-        msg="Inconsistent number of fitting coefficients among different ";
-        msg+="POCC::QHA calculations.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg,
-              _VALUE_ILLEGAL_);
-      }
-    }
-
-    // generate a set of volumes to determine the EOS for the POCC "material"
-    Nvolumes = 5;
-    volumes = xvector<double>(Nvolumes);
-    for (int i=1; i<=Nvolumes; i++){
-      volumes[i] = Ensemble_Vmin + (Ensemble_Vmax-Ensemble_Vmin)*(i-1)/(Nvolumes-1);
-    }
-  }
 
   void EnsembleThermo::calculateThermodynamicProperties()
   {
