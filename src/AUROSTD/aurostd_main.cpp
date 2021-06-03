@@ -2387,6 +2387,7 @@ namespace aurostd {
 
     if(!aurostd::IsCommandAvailable("free")){return false;}
     string output=aurostd::execute2string("free");
+    if(LDEBUG){cerr << soliloquy << " free output:" << endl << output << endl;}
     //                            total        used        free      shared  buff/cache   available
     //              Mem:      395654628    41363940    30948848     4106252   323341840   349143640
     //              Swap:       2097148           0     2097148
