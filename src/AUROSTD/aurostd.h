@@ -286,6 +286,8 @@ namespace aurostd {
   int get_month(tm* tsruct);  //CO20200624
   int get_year(void);
   int get_year(tm* tstruct);  //CO20200624
+  int get_offset_utc(void); //CO20210601
+  int get_offset_utc(tm* tstruct);  //CO20210601
   long int get_date(void);
   long int get_date(tm* tstruct);  //CO20200624
   int get_hour(void);
