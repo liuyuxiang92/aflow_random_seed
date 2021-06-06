@@ -57,6 +57,23 @@ namespace aurostd {
   int get_month(tm* tstruct) {return tstruct->tm_mon+1;}  //CO20200624
   int get_year(void) {time_t t=time(0);struct tm *now=localtime(&t);return get_year(now);}
   int get_year(tm* tstruct) {return tstruct->tm_year+1900;} //CO20200624
+  int get_offset_utc(void) {time_t t=time(0);struct tm *now=localtime(&t);return get_offset_utc(now);}  //CO20210601: https://codereview.stackexchange.com/questions/175353/getting-current-timezone
+  int get_offset_utc(tm* tstruct) {  //CO20210601
+    //https://codereview.stackexchange.com/questions/175353/getting-current-timezone
+    bool LDEBUG=(true || XHOST.DEBUG);
+    string soliloquy=XPID+"aurostd::get_offset_utc():";
+    char buffer[26];
+    //mktime might modify tstruct
+    tm* tstruct_local=tstruct;
+    if(LDEBUG){strftime(buffer,26,"%Y:%m:%d %H:%M:%S",tstruct_local);cerr << soliloquy << " tstruct_local=" << buffer << endl;}
+    std::time_t local=std::mktime(tstruct_local);
+    struct tm* tstruct_gmt=std::gmtime(&local);
+    if(LDEBUG){strftime(buffer,26,"%Y:%m:%d %H:%M:%S",tstruct_gmt);cerr << soliloquy << " tstruct_gmt=" << buffer << endl;}
+    tstruct_gmt->tm_isdst=-1; //VERY IMPORTANT, forces mktime to figure out dst
+    std::time_t gmt=std::mktime(tstruct_gmt);
+    long timezone=static_cast<long>(local-gmt); //flip gmt-local to get right sign
+    return (int)(timezone/3600);
+  }
   long int get_date(void) {time_t t=time(0);struct tm *now=localtime(&t);return get_date(now);}  //CO20200624
   long int get_date(tm* tstruct) {return aurostd::get_year(tstruct)*10000+aurostd::get_month(tstruct)*100+aurostd::get_day(tstruct);}  //CO20200624
   int get_hour(void) {time_t t=time(0);struct tm *now=localtime(&t);return get_hour(now);}  //CO20200624

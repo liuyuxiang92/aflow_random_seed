@@ -1785,7 +1785,7 @@ namespace aflowlib {
     if(aflowlib_data.vaflowlib_date.size()!=2){ //CO20200624 - this means we didn't get the LOCK dates, spit warning
       pflow::logger(_AFLOW_FILE_NAME_,soliloquy,"LOCK dates NOT found",_LOGGER_WARNING_);
     }
-    aflowlib_data.vaflowlib_date.push_back(aurostd::get_datetime()+"_GMT-5"); //CO20200624 - adding LOCK date
+    aflowlib_data.vaflowlib_date.push_back(aurostd::get_datetime()+"_GMT"+aurostd::utype2string(aurostd::get_offset_utc())); //CO20200624 - adding LOCK date
 
     //     cout << DEFAULT_FILE_AFLOWLIB_ENTRY_OUT << ": " << aflowlib_data.aflowlib2file(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT);
     //      aurostd::LinkFile("../../"+_XENTRY_","directory_RAW+"/"+_XENTRY_);
@@ -6289,10 +6289,10 @@ namespace aflowlib {
         if(LDEBUG) cerr << soliloquy << " FOUND LOCK date = " << tmp << endl;
         tmp=aflow_convert_time_ctime2aurostd(tmp);
         if(!tmp.empty()){
-          if(data.vaflowlib_date.empty()){data.vaflowlib_date.push_back(tmp+"_GMT-5");} //get first date
+          if(data.vaflowlib_date.empty()){data.vaflowlib_date.push_back(tmp+"_GMT"+aurostd::utype2string(aurostd::get_offset_utc()));} //get first date
           else{ //get last date
             if(data.vaflowlib_date.size()>1){data.vaflowlib_date.pop_back();}
-            data.vaflowlib_date.push_back(tmp+"_GMT-5");
+            data.vaflowlib_date.push_back(tmp+"_GMT"+aurostd::utype2string(aurostd::get_offset_utc()));
           }
         }
       }
@@ -6316,10 +6316,10 @@ namespace aflowlib {
               if(LDEBUG) cerr << soliloquy << " FOUND LOCK date = " << tmp << endl;
               tmp=aflow_convert_time_ctime2aurostd(tmp);
               if(!tmp.empty()){
-                if(data.vaflowlib_date.empty()){data.vaflowlib_date.push_back(tmp+"_GMT-5");} //get first date
+                if(data.vaflowlib_date.empty()){data.vaflowlib_date.push_back(tmp+"_GMT"+aurostd::utype2string(aurostd::get_offset_utc()));} //get first date
                 else{ //get last date
                   if(data.vaflowlib_date.size()>1){data.vaflowlib_date.pop_back();}
-                  data.vaflowlib_date.push_back(tmp+"_GMT-5");
+                  data.vaflowlib_date.push_back(tmp+"_GMT"+aurostd::utype2string(aurostd::get_offset_utc()));
                 }
               }
               //STOP taken from above
