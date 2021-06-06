@@ -5587,7 +5587,7 @@ namespace KBIN {
     }
     if(operation.find("ZEVENSHIFT")!=string::npos){
       if(_iseven(xvasp.str.kpoints_k3)){
-        if(!aurostd::isequal(xvasp.str.kpoints_s3,0.5)){xvasp.str.kpoints_s3=0.5;nchanges_made++;if(LDEBUG) cerr << "Xevenshift s3=" << xvasp.str.kpoints_s3 << endl;}
+        if(!aurostd::isequal(xvasp.str.kpoints_s3,0.5)){xvasp.str.kpoints_s3=0.5;nchanges_made++;if(LDEBUG) cerr << "Zevenshift s3=" << xvasp.str.kpoints_s3 << endl;}
       } 
       else{ //_isodd()
         if(!aurostd::isequal(xvasp.str.kpoints_s3,0.0)){xvasp.str.kpoints_s3=0.0;nchanges_made++;if(LDEBUG) cerr << "Zevenshift s3=" << xvasp.str.kpoints_s3 << endl;}
