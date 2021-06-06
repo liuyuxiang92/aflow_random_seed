@@ -5266,7 +5266,7 @@ namespace KBIN {
     //CO20210315 - modifying this function, not using substring2bool() which might match IALGO with ALGO or NELM with NELMIN, keyword is specific key to remove
     //do NOT preload/rewrite the INCAR file, only modify xvasp.INCAR
     bool LDEBUG=(FALSE || _DEBUG_IVASP_ || XHOST.DEBUG);
-    string function="KBIN::AFLOWIN_REMOVE";
+    string function="KBIN::XVASP_INCAR_REMOVE_ENTRY";
     string soliloquy=XPID+function+"():";
     
     if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
@@ -5587,7 +5587,7 @@ namespace KBIN {
     }
     if(operation.find("ZEVENSHIFT")!=string::npos){
       if(_iseven(xvasp.str.kpoints_k3)){
-        if(!aurostd::isequal(xvasp.str.kpoints_s3,0.5)){xvasp.str.kpoints_s3=0.5;nchanges_made++;if(LDEBUG) cerr << "Xevenshift s3=" << xvasp.str.kpoints_s3 << endl;}
+        if(!aurostd::isequal(xvasp.str.kpoints_s3,0.5)){xvasp.str.kpoints_s3=0.5;nchanges_made++;if(LDEBUG) cerr << "Zevenshift s3=" << xvasp.str.kpoints_s3 << endl;}
       } 
       else{ //_isodd()
         if(!aurostd::isequal(xvasp.str.kpoints_s3,0.0)){xvasp.str.kpoints_s3=0.0;nchanges_made++;if(LDEBUG) cerr << "Zevenshift s3=" << xvasp.str.kpoints_s3 << endl;}
@@ -5604,7 +5604,7 @@ namespace KBIN {
     }
     if(operation.find("YODDSHIFT")!=string::npos){
       if(_isodd(xvasp.str.kpoints_k2)){
-        if(!aurostd::isequal(xvasp.str.kpoints_s2,0.5)){xvasp.str.kpoints_s2=0.5;nchanges_made++;if(LDEBUG) cerr << "Xoddshift s2=" << xvasp.str.kpoints_s2 << endl;}
+        if(!aurostd::isequal(xvasp.str.kpoints_s2,0.5)){xvasp.str.kpoints_s2=0.5;nchanges_made++;if(LDEBUG) cerr << "Yoddshift s2=" << xvasp.str.kpoints_s2 << endl;}
       }
       else{ //_iseven()
         if(!aurostd::isequal(xvasp.str.kpoints_s2,0.0)){xvasp.str.kpoints_s2=0.0;nchanges_made++;if(LDEBUG) cerr << "Yoddshift s2=" << xvasp.str.kpoints_s2 << endl;}
@@ -5612,7 +5612,7 @@ namespace KBIN {
     }
     if(operation.find("ZODDSHIFT")!=string::npos){
       if(_isodd(xvasp.str.kpoints_k3)){
-        if(!aurostd::isequal(xvasp.str.kpoints_s3,0.5)){xvasp.str.kpoints_s3=0.5;nchanges_made++;if(LDEBUG) cerr << "Xoddshift s3=" << xvasp.str.kpoints_s3 << endl;}
+        if(!aurostd::isequal(xvasp.str.kpoints_s3,0.5)){xvasp.str.kpoints_s3=0.5;nchanges_made++;if(LDEBUG) cerr << "Zoddshift s3=" << xvasp.str.kpoints_s3 << endl;}
       } 
       else{ //_iseven()
         if(!aurostd::isequal(xvasp.str.kpoints_s3,0.0)){xvasp.str.kpoints_s3=0.0;nchanges_made++;if(LDEBUG) cerr << "Zoddshift s3=" << xvasp.str.kpoints_s3 << endl;}
